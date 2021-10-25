@@ -2,100 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 242B5439AC8
-	for <lists+kvm@lfdr.de>; Mon, 25 Oct 2021 17:48:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 94F54439AE1
+	for <lists+kvm@lfdr.de>; Mon, 25 Oct 2021 17:54:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232805AbhJYPu4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Oct 2021 11:50:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58770 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232887AbhJYPuv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Oct 2021 11:50:51 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2061C061745
-        for <kvm@vger.kernel.org>; Mon, 25 Oct 2021 08:48:29 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id r5so3639242pls.1
-        for <kvm@vger.kernel.org>; Mon, 25 Oct 2021 08:48:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=0lZC/4YVNiq6m54gciVPWUG9HJx9IWHvMOAiOdASGoo=;
-        b=QyfrOXYXYzIEyrLD44pl5e5qrBHvKskln3PRReuWzpAgV2++kLJzI050rqe2oVwX2v
-         /YSSz3klIowpfUugVLMls4E5ALzM885A+JjaGYEd8dI6xPFGzSKWWGCwhTUoU1wJJ2+4
-         q6QXjhMZdsCR4vmwSFpvR/7/SOjlriEKOoj6W/QPj/mWp9yfleITVSt3gv9SSl80X7Ip
-         BvJTrYEOJKTHV3pbSlO8IHWn3hT4T3KR9LJVANxEXG1UOo91F4D+Bcp+BL0MB5OCLaKP
-         Mo/ai6V2iZC0VqjsN2MnwKzxW/qxPY5ehn5rtVsOHSmvZ7PywSIV88EiySKFBzouQ+tc
-         9/iA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=0lZC/4YVNiq6m54gciVPWUG9HJx9IWHvMOAiOdASGoo=;
-        b=uOueBvIIoAtFEh/4mn09UOdT9unP/tAbPsSuT4O2x/nNvvdnSfxQ061nMM+xS7lE5L
-         e0S6DeTuDz0mvaXtzVp3l0xNRvMK3gtcqA6anVbq3dmEqB01toL6H1uIwWUtA0XEAMj7
-         toRTjMO6d4xT/TUn8E+BcwwnXuNp4Oln3URUWnJHxZ7ZyRWLRNhx7OacU8qcEkaEDWlU
-         0xbPo1PHP4DVGfh2a5RthNGrXEhIWy/RrSNnFVJ1PF+COphkJKf11HaXy+ncVGcI3kIH
-         ZRQLgN9EqTlebg2T+65C96VIdK1FZ0AXVkIZZEpQ85MR5havT3U/7Vojik02O13+ENY5
-         GgRA==
-X-Gm-Message-State: AOAM532ljGj7f/CeCP6E5Qi2rtcXgHg+3Btf2NnPz2mHkCbPmI89+Glw
-        d8zzbmGbqJLLYrdexFKgjE+2bw==
-X-Google-Smtp-Source: ABdhPJxrKJ5kv/isPaW6TJ/VoEghKiV6FVNK9Q5PXIGPB6cKE19gMMU7U+s4ZFt4KBH5EHg4mjv+Qw==
-X-Received: by 2002:a17:90a:bf0e:: with SMTP id c14mr5921807pjs.180.1635176908950;
-        Mon, 25 Oct 2021 08:48:28 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id g5sm11457677pfc.65.2021.10.25.08.48.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Oct 2021 08:48:28 -0700 (PDT)
-Date:   Mon, 25 Oct 2021 15:48:24 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        David Hildenbrand <david@redhat.com>,
+        id S233309AbhJYP4t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Oct 2021 11:56:49 -0400
+Received: from new3-smtp.messagingengine.com ([66.111.4.229]:56503 "EHLO
+        new3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233222AbhJYP4s (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 25 Oct 2021 11:56:48 -0400
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+        by mailnew.nyi.internal (Postfix) with ESMTP id 2AFED580565;
+        Mon, 25 Oct 2021 11:54:25 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute4.internal (MEProxy); Mon, 25 Oct 2021 11:54:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=stwcx.xyz; h=
+        date:from:to:cc:subject:message-id:references:mime-version
+        :content-type:in-reply-to; s=fm3; bh=7Lt0k6A2AQYTvM69ey9mLazpSHP
+        whVPhfDQe2pFO0n8=; b=uIEKyAdugpjJCTJJB3D18APBAQv66TGIg9cS2eIkPOl
+        Vj9Nr8TyKEz/W5Av7vkFU7LaOKqWltfZCoBwGB8F9Heba/tAcT4qxrngHy0SGTjf
+        D0zOA0/sFuzEvXlcJzPqgSypzGHuSOOoWWXIxo43R+DGO3vADojj1J/jNP0m3Y/w
+        a7VDivJmM0pjR+L2wBREXDY4zT4nBskt6unfB5lBpicLr+viN1tXFLP+L3k4tb9w
+        2li4uS+L4Kqg+tGAwAe/tiRfztTAlqKpOQbl0+mNVgkR/KH7+meYMrJyjn/4MOtY
+        c2nUYLy6pwAK2cmWyFsBklolFrDiPVHCjBCuV75oJGg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-type:date:from:in-reply-to
+        :message-id:mime-version:references:subject:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=7Lt0k6
+        A2AQYTvM69ey9mLazpSHPwhVPhfDQe2pFO0n8=; b=ezLem8TPwEbDCt5ng2Xr/0
+        dmUsypkC5C34MDkGAzg6JqbVKWmoQyYWAgd+T4RScIi2bXt1N19dlx4Sd81Q2aGr
+        ++8ltY6ilo6QZSoKV9pHVP6Jq97G9R4+IxcnVGhuCAPACeUseLz8it6XgmLu4Gjk
+        O6xmlYl7GwPMmQf0M/oraqRcI2j6DBn/jGcWzYhLyJqjGcIxGO0KSAAqd44p+9fO
+        fbaGqmyx7EHJa90bIun41mOpYJRwGJH0h3sCbkN4bRH2fGRetDHc1yvTdmt9qK+R
+        +1T7O41wIp9Yv8SJdTcYIuueD2YnEfdqG5QiC+LQoNuFHICRWQFVhfZRLC55rfPw
+        ==
+X-ME-Sender: <xms:L9N2YUdZoc0rilMIpO1zGrBp7s2cVY0sjegSK1tTEqxzR527YnC6EA>
+    <xme:L9N2YWPpUqv8V4RHkPyfV9pBe1QRQCyZ9V0lZg8JjtHvh2TxXgoquQlkVgjr4DyDP
+    E2MHd7xt-jjQ_9Tovc>
+X-ME-Received: <xmr:L9N2YVipoGj-TpshW2OlKqzsXX3G3ykDSUESUQrXz9KS1UwtUE6I5jUfHMykWdcCEZ1ETGRMwZszRdF1mRptx3uQOvrIFDlLT2uvtg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvtddrvdefhedgkeekucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    gfrhhlucfvnfffucdljedtmdenucfjughrpeffhffvuffkfhggtggujgesghdtreertddt
+    vdenucfhrhhomheprfgrthhrihgtkhcuhghilhhlihgrmhhsuceophgrthhrihgtkhessh
+    htfigtgidrgiihiieqnecuggftrfgrthhtvghrnhepgeehheefffegkeevhedthffgudfh
+    geefgfdthefhkedtleffveekgfeuffehtdeinecuvehluhhsthgvrhfuihiivgeptdenuc
+    frrghrrghmpehmrghilhhfrhhomhepphgrthhrihgtkhesshhtfigtgidrgiihii
+X-ME-Proxy: <xmx:L9N2YZ-WkJYYSvoGRwmsT_6SPbiVf54pcrDuZ8_Q68-82Kit0JSTxw>
+    <xmx:L9N2YQvAuvsmC00aBxXrwp_GYY1jVEna8xMqB5JV4n2HFqAQheQ8Ow>
+    <xmx:L9N2YQFDGAwX1xqqm_78qJ0gyMqC6X7sQUPNgA7zdCIk-YwA8RDyIQ>
+    <xmx:MdN2YdtGbwICmM5LUx98Jfs2-Lp5COgjISeC2vqKoby7uurvRn0KaA>
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 25 Oct 2021 11:54:22 -0400 (EDT)
+Date:   Mon, 25 Oct 2021 10:54:21 -0500
+From:   Patrick Williams <patrick@stwcx.xyz>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Frank Rowand <frowand.list@gmail.com>,
+        Zev Weiss <zev@bewilderbeest.net>, kvm@vger.kernel.org,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Jeremy Kerr <jk@codeconstruct.com.au>,
+        Rajat Jain <rajatja@google.com>,
+        Jianxiong Gao <jxgao@google.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Saravana Kannan <saravanak@google.com>,
+        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+        openbmc@lists.ozlabs.org, devicetree@vger.kernel.org,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Bhaskar Chowdhury <unixbhaskar@gmail.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andrew Jeffery <andrew@aj.id.au>,
         Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        David Matlack <dmatlack@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH v2 37/43] KVM: SVM: Unconditionally mark AVIC as running
- on vCPU load (with APICv)
-Message-ID: <YXbRyMQgMpHVQa3G@google.com>
-References: <20211009021236.4122790-1-seanjc@google.com>
- <20211009021236.4122790-38-seanjc@google.com>
- <acea3c6d-49f4-ab5e-d9fe-6c6a8a665a46@redhat.com>
+        linux-kernel@vger.kernel.org, Vinod Koul <vkoul@kernel.org>,
+        dmaengine@vger.kernel.org
+Subject: Re: [PATCH 4/5] driver core: inhibit automatic driver binding on
+ reserved devices
+Message-ID: <YXbTLYzHadphE5ZN@heinlein>
+References: <YXLWMyleiTFDDZgm@heinlein>
+ <YXPOSZPA41f+EUvM@kroah.com>
+ <627101ee-7414-57d1-9952-6e023b8db317@gmail.com>
+ <YXZLjTvGevAXcidW@kroah.com>
+ <YXaYmie/CUHnixtX@heinlein>
+ <YXap8V/jMM3Ksj7x@smile.fi.intel.com>
+ <YXavBWTNYsufqj8u@heinlein>
+ <YXayTeJiQvpRutU0@kroah.com>
+ <YXa5AExKg+k0MmHV@heinlein>
+ <YXa6t/ifxZGGSCNj@kroah.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="IBKYz2UKeI4sOQXI"
 Content-Disposition: inline
-In-Reply-To: <acea3c6d-49f4-ab5e-d9fe-6c6a8a665a46@redhat.com>
+In-Reply-To: <YXa6t/ifxZGGSCNj@kroah.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 25, 2021, Paolo Bonzini wrote:
-> On 09/10/21 04:12, Sean Christopherson wrote:
-> > +	/* TODO: Document why the unblocking path checks for updates. */
-> 
-> Is that a riddle or what? :)
 
-Yes?  I haven't been able to figure out why the unblocking path explicitly
-checks and handles an APICv update.
+--IBKYz2UKeI4sOQXI
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Oct 25, 2021 at 04:09:59PM +0200, Greg Kroah-Hartman wrote:
+> On Mon, Oct 25, 2021 at 09:02:40AM -0500, Patrick Williams wrote:
+> > On Mon, Oct 25, 2021 at 03:34:05PM +0200, Greg Kroah-Hartman wrote:
+> > > On Mon, Oct 25, 2021 at 08:20:05AM -0500, Patrick Williams wrote:
+> > > I think "it" is "something needs to be the moderator between the two
+> > > operating systems".  What is the external entity that handles the
+> > > switching between the two?
+> >=20
+> > Ah, ok.
+> >=20
+> > Those usually end up being system / device specific.  In the case of th=
+e BIOS
+> > flash, most designs I've seen use a SPI mux between the BMC and the host
+> > processor or IO hub (PCH on Xeons).  The BMC has a GPIO to control the =
+mux.
+> >=20
+> > As far as state, the BMC on start-up will go through a set of discovery=
+ code to
+> > figure out where it left the system prior to getting reset.  That invol=
+ves
+> > looking at the power subsystem and usually doing some kind of query to =
+the host
+> > to see if it is alive.  These queries are mostly system / host-processo=
+r design
+> > specific.  I've seen anything from an IPMI/IPMB message alert from the =
+BMC to
+> > the BIOS to ask "are you alive" to reading host processor state over JT=
+AG to
+> > figure out if the processors are "making progress".
+>=20
+> But which processor is "in control" here over the hardware? =20
+
+The BMC.  It owns the GPIO that controls the SPI mux. =20
+
+But, the BMC is responsible for doing all operations in a way that doesn't =
+mess
+up the running host processor(s).  Pulling away the SPI flash containing the
+BIOS code at an incorrect time might do that.
+
+> What method
+> is used to pass the device from one CPU to another from a logical point
+> of view? =20
+
+The state of the server as a whole is determined and maintained by the BMC.=
+  I'm
+simplifying here a bit but the operation "turn on the host processors" impl=
+ies
+"the host processors will access the BIOS" so the BMC must ensure "SPI mux =
+is
+switched towards the host" before "turn on the host processors".
+
+> Sounds like it is another driver that needs to handle all of
+> this, so why not have that be the one that adds/removes the devices
+> under control here?
+
+If what you're describing is moving all of the state control logic into the
+kernel, I don't think that is feasible.  For some systems it would mean mov=
+ing
+yet another entire IPMI stack into the kernel tree.  On others it might be
+somewhat simpler, but it is still a good amount of code.  We could probably
+write up more details on the scope of this.
+
+If what you're describing is a small driver, similar to the board support
+drivers that were used before the device tree, that instantiates subordinate
+devices it doesn't seem like an unreasonable alternative to DT overlays to =
+me
+(for whatever my limited kernel contribution experience counts for).
+
+--=20
+Patrick Williams
+
+--IBKYz2UKeI4sOQXI
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEBGD9ii4LE9cNbqJBqwNHzC0AwRkFAmF20ysACgkQqwNHzC0A
+wRllog//fo/4DsHCATlBG2JbJ+kty/4DMaxw9s4LPzxMRjzAcpUNlU4aZU0MCE8I
+OscYTGpzhNhtddtAWjgJpLWLIokDJfdQ+K/fj/c/gV6lFgBzdRB8V3i4WKCnxb+s
+1GZpKmb+f5AKRLz83jRe9bx8X4lBafvlt1Riwmz4wywVqrzKcB9wJDQHmM90hsCI
+XgJ82cdNBTYzw+tYl534zZiAU4qn6kq1+5oVi5qeCGMylF9dcZhnWdtyxSWNagSk
+FbcmxLztkVEuzxI0GWoJsUc8fKL/bJPCwIJzIs+/+mdwd5iINh3TFZ0Ik3SM/6+V
+3GvaXafAyTrSFHwbd7BFdljgrnvteE81XLd8X+VHP3GZ/T2yFNRY381KuXMmC0ti
+X11xR+nNYVRtTrqZmmUPQ/FyQ2z6A30SzSdMav2y15SAVyoYY6KxU4/k+amxACzS
+n06PV7i+2LLGwl83I1vqzdLS7dTdXj0dyyP/EzxG1OSS65FnJ1F6GItJq4BAcDQL
+VhMVCegClPqjHUaKQsNRZLW6c0lfZJeVJG8Cl82TLPXb7eSAMT7OS0BG4pCnX+6L
+csbREZYtI3j9QSzEkeM14dAS322I3iiQPpubwSwHMn8OOG4mFj9K3paoEQXsG0yF
+C2bUFdioZUpiLRvmwFhkrOUOOavOjxRit7hIsDOSvCrUue4rKl8=
+=VXwf
+-----END PGP SIGNATURE-----
+
+--IBKYz2UKeI4sOQXI--
