@@ -2,129 +2,260 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D7D60439E98
-	for <lists+kvm@lfdr.de>; Mon, 25 Oct 2021 20:36:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E66E9439EAD
+	for <lists+kvm@lfdr.de>; Mon, 25 Oct 2021 20:47:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233368AbhJYSjO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Oct 2021 14:39:14 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56198 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232887AbhJYSjN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Oct 2021 14:39:13 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 8163460FC2;
-        Mon, 25 Oct 2021 18:36:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1635187011;
-        bh=jIprGbQQGmCBYkXpWgtIIUsn7k/Yq53REA+NhZj7hPE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=1mZo0buWeicna4EeDy7pCWTVfV7Pypgz3V4SqexKw3u/P2XFpmyTIxKzBZkRkyhTk
-         l3DauXemQGppDSo2cWDvwDK3j8ZIEf7jrXqhJ0uOyPRS+3oxKmXSyUSZf6mKp36V+S
-         yK9EHmPPGBBoSsvzcFfWPPA4a/tid9yAcwSxs1eE=
-Date:   Mon, 25 Oct 2021 20:36:47 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Patrick Williams <patrick@stwcx.xyz>
-Cc:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Frank Rowand <frowand.list@gmail.com>,
-        Zev Weiss <zev@bewilderbeest.net>, kvm@vger.kernel.org,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Jeremy Kerr <jk@codeconstruct.com.au>,
-        Rajat Jain <rajatja@google.com>,
-        Jianxiong Gao <jxgao@google.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Saravana Kannan <saravanak@google.com>,
-        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-        openbmc@lists.ozlabs.org, devicetree@vger.kernel.org,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Bhaskar Chowdhury <unixbhaskar@gmail.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andrew Jeffery <andrew@aj.id.au>,
-        Cornelia Huck <cohuck@redhat.com>,
-        linux-kernel@vger.kernel.org, Vinod Koul <vkoul@kernel.org>,
-        dmaengine@vger.kernel.org
-Subject: Re: [PATCH 4/5] driver core: inhibit automatic driver binding on
- reserved devices
-Message-ID: <YXb5P6D8qB1cQrxh@kroah.com>
-References: <YXPOSZPA41f+EUvM@kroah.com>
- <627101ee-7414-57d1-9952-6e023b8db317@gmail.com>
- <YXZLjTvGevAXcidW@kroah.com>
- <YXaYmie/CUHnixtX@heinlein>
- <YXap8V/jMM3Ksj7x@smile.fi.intel.com>
- <YXavBWTNYsufqj8u@heinlein>
- <YXayTeJiQvpRutU0@kroah.com>
- <YXa5AExKg+k0MmHV@heinlein>
- <YXa6t/ifxZGGSCNj@kroah.com>
- <YXbTLYzHadphE5ZN@heinlein>
+        id S233304AbhJYSt6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Oct 2021 14:49:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39474 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233224AbhJYSt6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 25 Oct 2021 14:49:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635187654;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=6EW7txlh+uOUAxYxbDB9IshowiDOro3wjgqyCQ3sGxM=;
+        b=fJkbN3PJ9OiYS+XsKMr53TPqtJNGP9g5O4cpr6IMn1bjyUT8IutVcLmAVr2gGSEWBBwYrU
+        Oka0eVLXCRRwRHKHGUDEsUip1k1X9IvaXJmWyjcDTAAxbp2zGFS5UhjJG6qF5s5p0TI4Yu
+        RMn+ny0Dzzkp13Cf16IY5oGcQsnLvEM=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-235-SeEnAw3-NUqk9E-7fOemTw-1; Mon, 25 Oct 2021 14:47:33 -0400
+X-MC-Unique: SeEnAw3-NUqk9E-7fOemTw-1
+Received: by mail-wr1-f69.google.com with SMTP id d10-20020adffd8a000000b00167f0846597so2900888wrr.16
+        for <kvm@vger.kernel.org>; Mon, 25 Oct 2021 11:47:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=6EW7txlh+uOUAxYxbDB9IshowiDOro3wjgqyCQ3sGxM=;
+        b=BI7lBYlGEk2a2Un6WeAY5XxBQPVcpVmBAW7pJq8PFG36C6D/AKi+hfGQ5NLh0gdsYN
+         702ehHC02ysGrMgthgAlpYK4n5Yj/PhtPQm8D4OszUGvviIMqzznTR59TdIOzC/S+48X
+         U+mWjLBiLzHjEnMdyXk5dUu79ONLbai8pG+LQUTFZPofg+XkBrsayuDgpD7df4eXBnw7
+         XuADArPr/CmFIz+cCvSYMc1eikjNNzC2JgZ7FSD43K4MHriUCKRevbZB//3uNf3TFZlw
+         vmpvvfxxaWpf3IjZGxwS0cFSNqZGxpQNXAFbUImEnmY2chCoPKK9BirmJu3C6w2qxMp7
+         M/Zw==
+X-Gm-Message-State: AOAM531En7St6uhsuZI/rdvkiwEtrEZPbgzbXOC14KxbZhqsmoDvH7PE
+        r6p+5INctuLfEzbHm6Yo4gkmOPpST7/Ny3Bve3wDupzM5L57Yj+BtSDtpBtnExb7lcZCm/zeDMU
+        qL4nPPmSbWXT6
+X-Received: by 2002:a05:600c:4894:: with SMTP id j20mr18300686wmp.60.1635187652359;
+        Mon, 25 Oct 2021 11:47:32 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwi88GrvhJPJqUxL4ZtskRmjUnoxymkGeWDaizgJygyAfc7km4fzKFhWVkl7rV8mcptOfZ47Q==
+X-Received: by 2002:a05:600c:4894:: with SMTP id j20mr18300661wmp.60.1635187652104;
+        Mon, 25 Oct 2021 11:47:32 -0700 (PDT)
+Received: from work-vm (cpc109025-salf6-2-0-cust480.10-2.cable.virginm.net. [82.30.61.225])
+        by smtp.gmail.com with ESMTPSA id s11sm3916497wru.16.2021.10.25.11.47.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Oct 2021 11:47:31 -0700 (PDT)
+Date:   Mon, 25 Oct 2021 19:47:29 +0100
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>,
+        Jason Gunthorpe <jgg@nvidia.com>, bhelgaas@google.com,
+        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
+        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com,
+        Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH V2 mlx5-next 12/14] vfio/mlx5: Implement vfio_pci driver
+ for mlx5 devices
+Message-ID: <YXb7wejD1qckNrhC@work-vm>
+References: <20211019105838.227569-1-yishaih@nvidia.com>
+ <20211019105838.227569-13-yishaih@nvidia.com>
+ <20211019124352.74c3b6ba.alex.williamson@redhat.com>
+ <20211019192328.GZ2744544@nvidia.com>
+ <20211019145856.2fa7f7c8.alex.williamson@redhat.com>
+ <20211019230431.GA2744544@nvidia.com>
+ <5a496713-ae1d-11f2-1260-e4c1956e1eda@nvidia.com>
+ <20211020105230.524e2149.alex.williamson@redhat.com>
+ <YXbceaVo0q6hOesg@work-vm>
+ <20211025115535.49978053.alex.williamson@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <YXbTLYzHadphE5ZN@heinlein>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20211025115535.49978053.alex.williamson@redhat.com>
+User-Agent: Mutt/2.0.7 (2021-05-04)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 25, 2021 at 10:54:21AM -0500, Patrick Williams wrote:
-> On Mon, Oct 25, 2021 at 04:09:59PM +0200, Greg Kroah-Hartman wrote:
-> > On Mon, Oct 25, 2021 at 09:02:40AM -0500, Patrick Williams wrote:
-> > > On Mon, Oct 25, 2021 at 03:34:05PM +0200, Greg Kroah-Hartman wrote:
-> > > > On Mon, Oct 25, 2021 at 08:20:05AM -0500, Patrick Williams wrote:
-> > > > I think "it" is "something needs to be the moderator between the two
-> > > > operating systems".  What is the external entity that handles the
-> > > > switching between the two?
+* Alex Williamson (alex.williamson@redhat.com) wrote:
+> On Mon, 25 Oct 2021 17:34:01 +0100
+> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> 
+> > * Alex Williamson (alex.williamson@redhat.com) wrote:
+> > > [Cc +dgilbert, +cohuck]
 > > > 
-> > > Ah, ok.
+> > > On Wed, 20 Oct 2021 11:28:04 +0300
+> > > Yishai Hadas <yishaih@nvidia.com> wrote:
+> > >   
+> > > > On 10/20/2021 2:04 AM, Jason Gunthorpe wrote:  
+> > > > > On Tue, Oct 19, 2021 at 02:58:56PM -0600, Alex Williamson wrote:    
+> > > > >> I think that gives us this table:
+> > > > >>
+> > > > >> |   NDMA   | RESUMING |  SAVING  |  RUNNING |
+> > > > >> +----------+----------+----------+----------+ ---
+> > > > >> |     X    |     0    |     0    |     0    |  ^
+> > > > >> +----------+----------+----------+----------+  |
+> > > > >> |     0    |     0    |     0    |     1    |  |
+> > > > >> +----------+----------+----------+----------+  |
+> > > > >> |     X    |     0    |     1    |     0    |
+> > > > >> +----------+----------+----------+----------+  NDMA value is either compatible
+> > > > >> |     0    |     0    |     1    |     1    |  to existing behavior or don't
+> > > > >> +----------+----------+----------+----------+  care due to redundancy vs
+> > > > >> |     X    |     1    |     0    |     0    |  !_RUNNING/INVALID/ERROR
+> > > > >> +----------+----------+----------+----------+
+> > > > >> |     X    |     1    |     0    |     1    |  |
+> > > > >> +----------+----------+----------+----------+  |
+> > > > >> |     X    |     1    |     1    |     0    |  |
+> > > > >> +----------+----------+----------+----------+  |
+> > > > >> |     X    |     1    |     1    |     1    |  v
+> > > > >> +----------+----------+----------+----------+ ---
+> > > > >> |     1    |     0    |     0    |     1    |  ^
+> > > > >> +----------+----------+----------+----------+  Desired new useful cases
+> > > > >> |     1    |     0    |     1    |     1    |  v
+> > > > >> +----------+----------+----------+----------+ ---
+> > > > >>
+> > > > >> Specifically, rows 1, 3, 5 with NDMA = 1 are valid states a user can
+> > > > >> set which are simply redundant to the NDMA = 0 cases.    
+> > > > > It seems right
+> > > > >    
+> > > > >> Row 6 remains invalid due to lack of support for pre-copy (_RESUMING
+> > > > >> | _RUNNING) and therefore cannot be set by userspace.  Rows 7 & 8
+> > > > >> are error states and cannot be set by userspace.    
+> > > > > I wonder, did Yishai's series capture this row 6 restriction? Yishai?    
+> > > > 
+> > > > 
+> > > > It seems so,  by using the below check which includes the 
+> > > > !VFIO_DEVICE_STATE_VALID clause.
+> > > > 
+> > > > if (old_state == VFIO_DEVICE_STATE_ERROR ||
+> > > >          !VFIO_DEVICE_STATE_VALID(state) ||
+> > > >          (state & ~MLX5VF_SUPPORTED_DEVICE_STATES))
+> > > >          return -EINVAL;
+> > > > 
+> > > > Which is:
+> > > > 
+> > > > #define VFIO_DEVICE_STATE_VALID(state) \
+> > > >      (state & VFIO_DEVICE_STATE_RESUMING ? \
+> > > >      (state & VFIO_DEVICE_STATE_MASK) == VFIO_DEVICE_STATE_RESUMING : 1)
+> > > >   
+> > > > >    
+> > > > >> Like other bits, setting the bit should be effective at the completion
+> > > > >> of writing device state.  Therefore the device would need to flush any
+> > > > >> outbound DMA queues before returning.    
+> > > > > Yes, the device commands are expected to achieve this.
+> > > > >    
+> > > > >> The question I was really trying to get to though is whether we have a
+> > > > >> supportable interface without such an extension.  There's currently
+> > > > >> only an experimental version of vfio migration support for PCI devices
+> > > > >> in QEMU (afaik),    
+> > > > > If I recall this only matters if you have a VM that is causing
+> > > > > migratable devices to interact with each other. So long as the devices
+> > > > > are only interacting with the CPU this extra step is not strictly
+> > > > > needed.
+> > > > >
+> > > > > So, single device cases can be fine as-is
+> > > > >
+> > > > > IMHO the multi-device case the VMM should probably demand this support
+> > > > > from the migration drivers, otherwise it cannot know if it is safe for
+> > > > > sure.
+> > > > >
+> > > > > A config option to override the block if the admin knows there is no
+> > > > > use case to cause devices to interact - eg two NVMe devices without
+> > > > > CMB do not have a useful interaction.
+> > > > >    
+> > > > >> so it seems like we could make use of the bus-master bit to fill
+> > > > >> this gap in QEMU currently, before we claim non-experimental
+> > > > >> support, but this new device agnostic extension would be required
+> > > > >> for non-PCI device support (and PCI support should adopt it as
+> > > > >> available).  Does that sound right?  Thanks,    
+> > > > > I don't think the bus master support is really a substitute, tripping
+> > > > > bus master will stop DMA but it will not do so in a clean way and is
+> > > > > likely to be non-transparent to the VM's driver.
+> > > > >
+> > > > > The single-device-assigned case is a cleaner restriction, IMHO.
+> > > > >
+> > > > > Alternatively we can add the 4th bit and insist that migration drivers
+> > > > > support all the states. I'm just unsure what other HW can do, I get
+> > > > > the feeling people have been designing to the migration description in
+> > > > > the header file for a while and this is a new idea.  
 > > > 
-> > > Those usually end up being system / device specific.  In the case of the BIOS
-> > > flash, most designs I've seen use a SPI mux between the BMC and the host
-> > > processor or IO hub (PCH on Xeons).  The BMC has a GPIO to control the mux.
-> > > 
-> > > As far as state, the BMC on start-up will go through a set of discovery code to
-> > > figure out where it left the system prior to getting reset.  That involves
-> > > looking at the power subsystem and usually doing some kind of query to the host
-> > > to see if it is alive.  These queries are mostly system / host-processor design
-> > > specific.  I've seen anything from an IPMI/IPMB message alert from the BMC to
-> > > the BIOS to ask "are you alive" to reading host processor state over JTAG to
-> > > figure out if the processors are "making progress".
+> > > I'm wondering if we're imposing extra requirements on the !_RUNNING
+> > > state that don't need to be there.  For example, if we can assume that
+> > > all devices within a userspace context are !_RUNNING before any of the
+> > > devices begin to retrieve final state, then clearing of the _RUNNING
+> > > bit becomes the device quiesce point and the beginning of reading
+> > > device data is the point at which the device state is frozen and
+> > > serialized.  No new states required and essentially works with a slight
+> > > rearrangement of the callbacks in this series.  Why can't we do that?  
 > > 
-> > But which processor is "in control" here over the hardware?  
+> > So without me actually understanding your bit encodings that closely, I
+> > think the problem is we have to asusme that any transition takes time.
+> > From the QEMU point of view I think the requirement is when we stop the
+> > machine (vm_stop_force_state(RUN_STATE_FINISH_MIGRATE) in
+> > migration_completion) that at the point that call returns (with no
+> > error) all devices are idle.  That means you need a way to command the
+> > device to go into the stopped state, and probably another to make sure
+> > it's got there.
 > 
-> The BMC.  It owns the GPIO that controls the SPI mux.  
-> 
-> But, the BMC is responsible for doing all operations in a way that doesn't mess
-> up the running host processor(s).  Pulling away the SPI flash containing the
-> BIOS code at an incorrect time might do that.
-> 
-> > What method
-> > is used to pass the device from one CPU to another from a logical point
-> > of view?  
-> 
-> The state of the server as a whole is determined and maintained by the BMC.  I'm
-> simplifying here a bit but the operation "turn on the host processors" implies
-> "the host processors will access the BIOS" so the BMC must ensure "SPI mux is
-> switched towards the host" before "turn on the host processors".
-> 
-> > Sounds like it is another driver that needs to handle all of
-> > this, so why not have that be the one that adds/removes the devices
-> > under control here?
-> 
-> If what you're describing is moving all of the state control logic into the
-> kernel, I don't think that is feasible.  For some systems it would mean moving
-> yet another entire IPMI stack into the kernel tree.  On others it might be
-> somewhat simpler, but it is still a good amount of code.  We could probably
-> write up more details on the scope of this.
-> 
-> If what you're describing is a small driver, similar to the board support
-> drivers that were used before the device tree, that instantiates subordinate
-> devices it doesn't seem like an unreasonable alternative to DT overlays to me
-> (for whatever my limited kernel contribution experience counts for).
-> 
+> In a way.  We're essentially recognizing that we cannot stop a single
+> device in isolation of others that might participate in peer-to-peer
+> DMA with that device, so we need to make a pass to quiesce each device
+> before we can ask the device to fully stop.  This new device state bit
+> is meant to be that quiescent point, devices can accept incoming DMA
+> but should cease to generate any.  Once all device are quiesced then we
+> can safely stop them.
 
-Something has to be here doing the mediation between the two processors
-and keeping things straight as to what processor is handling the
-hardware when.  I suggest you focus on that first...
+It may need some further refinement; for example in that quiesed state
+do counters still tick? will a NIC still respond to packets that don't
+get forwarded to the host?
 
-Good luck!
+Note I still think you need a way to know when you have actually reached
+these states; setting a bit in a register is asking nicely for a device
+to go into a state - has it got there?
 
-greg k-h
+> > Now, you could be a *little* more sloppy; you could allow a device carry
+> > on doing stuff purely with it's own internal state up until the point
+> > it needs to serialise; but that would have to be strictly internal state
+> > only - if it can change any other devices state (or issue an interrupt,
+> > change RAM etc) then you get into ordering issues on the serialisation
+> > of multiple devices.
+> 
+> Yep, that's the proposal that doesn't require a uAPI change, we loosen
+> the definition of stopped to mean the device can no longer generate DMA
+> or interrupts and all internal processing outside or responding to
+> incoming DMA should halt (essentially the same as the new quiescent
+> state above).  Once all devices are in this state, there should be no
+> incoming DMA and we can safely collect per device migration data.  If
+> state changes occur beyond the point in time where userspace has
+> initiated the collection of migration data, drivers have options for
+> generating errors when userspace consumes that data.
+
+How do you know that last device has actually gone into that state?
+Also be careful; it feels much more delicate where something might
+accidentally start a transaction.
+
+> AFAICT, the two approaches are equally valid.  If we modify the uAPI to
+> include this new quiescent state then userspace needs to make some hard
+> choices about what configurations they support without such a feature.
+> The majority of configurations are likely not exercising p2p between
+> assigned devices, but the hypervisor can't know that.  If we work
+> within the existing uAPI, well there aren't any open source driver
+> implementations yet anyway and any non-upstream implementations would
+> need to be updated for this clarification.  Existing userspace works
+> better with no change, so long as they already follow the guideline
+> that all devices in the userspace context must be stopped before the
+> migration data of any device can be considered valid.  Thanks,
+
+Dave
+
+> Alex
+> 
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
