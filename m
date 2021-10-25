@@ -2,362 +2,271 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B996143909B
-	for <lists+kvm@lfdr.de>; Mon, 25 Oct 2021 09:53:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AC5944390BC
+	for <lists+kvm@lfdr.de>; Mon, 25 Oct 2021 09:59:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232029AbhJYHzq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Oct 2021 03:55:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33350 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229491AbhJYHzp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Oct 2021 03:55:45 -0400
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A769C061745
-        for <kvm@vger.kernel.org>; Mon, 25 Oct 2021 00:53:23 -0700 (PDT)
-Received: by mail-wr1-x435.google.com with SMTP id e4so11167149wrc.7
-        for <kvm@vger.kernel.org>; Mon, 25 Oct 2021 00:53:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=PY7OImfFW1P8bQ0QlvHwXkZR2vZcIxhaTifA9ufJ8P4=;
-        b=tl6PAuFwmzuHDpVrtoEOFdfzpUz4WGHJumUuIyVy43BBxGE3x2DFL/Z8Yk56HcwzKk
-         xNqTrUmHHgu5zWuNYYcaxRARTao+zoXyxefMbnmrycezy5M4+9Dp+r1sCe78Y73p7Vd5
-         WQFUh/FdrxqhgDCsnwZGFt6gmLuuXUqyQEy5o1Ql7ZfEsRvJ9AicyZgyJW7TEbjNtWO/
-         8BO9VPtLpgJ+WZBbuTqjxRbDbL26W8jJ6V69z2jD9zJ1cBkLhSPh/QgUMZtVLvrMgmsE
-         Nr/F1oa2+2XY/YAzN6GXpgfTPvw5o8khjo9IMysQe/D+25pvt1m4cPa74qJC2nGcTFa7
-         QI4Q==
+        id S231128AbhJYIBn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Oct 2021 04:01:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31470 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232090AbhJYIBg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 25 Oct 2021 04:01:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635148754;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Q04iVz1hDDZHwQhitRW4nEgXkPCLMuRbW0JSH/7gDj8=;
+        b=Xpjo0vlPHjCZua63JlsGZ9zS9zIRykVvyIPXml3RXKVL3OfibEuBxcYGe+aSQH011KlVwU
+        gwOhzIUQTHkTD37DobI3wJ582f8aaaWNTLnuygEUReOYk7k5ONwgfpVKBaCZ4S6vxnSVAc
+        AEbgCCP+EtUGVht4HjCrAXbdwNu1/gU=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-56-H4EdjvbtN42b5z5YgynLdg-1; Mon, 25 Oct 2021 03:59:12 -0400
+X-MC-Unique: H4EdjvbtN42b5z5YgynLdg-1
+Received: by mail-ed1-f69.google.com with SMTP id k28-20020a508adc000000b003dd5e21da4bso1457442edk.11
+        for <kvm@vger.kernel.org>; Mon, 25 Oct 2021 00:59:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=PY7OImfFW1P8bQ0QlvHwXkZR2vZcIxhaTifA9ufJ8P4=;
-        b=ZfSouThnM8C85bvhh7ZNtPmtRRaJ7f+MOZOJWbqPHZ0ENCXxXwCLmnjPcfTP01Vs3G
-         afIcmVRI5wguMsCdKjp9BplrfxX2zD+A+qb57ixsQTWfJP2c8pVX5kkwHLdPZc85ZUvb
-         vuFF/K/S349Z0CT88ThSw6kCdTntFhq1CAm9PGGqDgiuUVtU0OSiqM5pPB7x0usd23DE
-         oiTRDNW3vrGMkXhQmrYiBUEvnHQR687GrkAZ039Ju0ExCD7Dho49Yh44NPBIP0TWFOq+
-         jPdQq+08gvY83MmpWo8s3Z/xr9hXQAc72cJ05Od+ZYLk/23I4d1Ti6Ia81lad12HLHev
-         rDHQ==
-X-Gm-Message-State: AOAM531fhYqrPq+uSwGEgCGsiWRHy02Lq8ktPNfCxUNEir2CUTY54gcO
-        Bf1UeXxX3KTv6pVq7c6olSSW5+7ANyEEFqszkGvqWQ==
-X-Google-Smtp-Source: ABdhPJz6XFwHX4gF7AJsr/wjpA1dcgU7x3MQz4X9XMueINN1pYaIgzVg5wQVlnoaawxzU0i5CVeuceHYlqvQYOycT44=
-X-Received: by 2002:adf:ce09:: with SMTP id p9mr21578993wrn.363.1635148401689;
- Mon, 25 Oct 2021 00:53:21 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Q04iVz1hDDZHwQhitRW4nEgXkPCLMuRbW0JSH/7gDj8=;
+        b=eF4dflqsAj8dx0v9h9XS3s6XuNMfGSxCkQqI4s5NTcdk4NCA9T4cdQDTsEBCW2brsE
+         gEUXuZYjDpVqObeZL9qtMiJ9OdFOxx3yourNyZwN7T5p27Y1jZxAvFn8QVvn2s4af3Gq
+         p1O05rjxWbB5lsY8jKP0QAkFfS27eTv8c4WzW3vR+XY9wyHiijeXi4DzMnz2au9u4xNG
+         lc998KxiZpa/5i7FDpsN560DDyRHvSruL5XL8NwFKd+mX0tXFXShlwniIRTmZRKNAYJE
+         x9YGgBK+WUh3Uk9nCv01oO0gX4eC7ig4mytEQ1zwgxVWkQzg7y4TZdpOB5xNk6UmHvkK
+         /t+Q==
+X-Gm-Message-State: AOAM530ldxi+O6bODmxSxOmrYmXFmXk/e6kGTxePy7qDC7VMgqrCyrNf
+        RWy1zx68JuPPAH22Pt8Y71bsfsRIeLmDnlmOFNlo53umaM9AF78fxzLiXPw3+B9kQ9rIDehGgLN
+        5Q2IsLA1ymtyU
+X-Received: by 2002:a17:906:12d0:: with SMTP id l16mr3418131ejb.415.1635148751621;
+        Mon, 25 Oct 2021 00:59:11 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz8eMDBf77eHe46Uh3ELHYmE/FONquQfABgzYHv8qlxAf37AXr/2pUt9N94dzZqr3jYBxpbJQ==
+X-Received: by 2002:a17:906:12d0:: with SMTP id l16mr3418119ejb.415.1635148751444;
+        Mon, 25 Oct 2021 00:59:11 -0700 (PDT)
+Received: from redhat.com ([2.55.151.113])
+        by smtp.gmail.com with ESMTPSA id ec18sm3818032edb.21.2021.10.25.00.59.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Oct 2021 00:59:10 -0700 (PDT)
+Date:   Mon, 25 Oct 2021 03:59:07 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     kernel test robot <lkp@intel.com>
+Cc:     Max Gurtovoy <mgurtovoy@nvidia.com>, kbuild-all@lists.01.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, Israel Rukshin <israelr@nvidia.com>,
+        Feng Li <lifeng1519@gmail.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [mst-vhost:vhost 4/47] drivers/block/virtio_blk.c:238:24:
+ sparse: sparse: incorrect type in return expression (different base types)
+Message-ID: <20211025034645-mutt-send-email-mst@kernel.org>
+References: <202110251506.OFYmNDFp-lkp@intel.com>
 MIME-Version: 1.0
-References: <20211008032036.2201971-1-atish.patra@wdc.com> <20211008032036.2201971-2-atish.patra@wdc.com>
-In-Reply-To: <20211008032036.2201971-2-atish.patra@wdc.com>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Mon, 25 Oct 2021 13:23:10 +0530
-Message-ID: <CAAhSdy2gdUfgMn0B-z8tpsNbqdZDnN_dEfa=TB6TsLbu7uskfg@mail.gmail.com>
-Subject: Re: [PATCH v3 1/5] RISC-V: Mark the existing SBI v0.1 implementation
- as legacy
-To:     Atish Patra <atish.patra@wdc.com>
-Cc:     "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Anup Patel <anup.patel@wdc.com>,
-        Kefeng Wang <wangkefeng.wang@huawei.com>,
-        kvm-riscv@lists.infradead.org, KVM General <kvm@vger.kernel.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Vincent Chen <vincent.chen@sifive.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202110251506.OFYmNDFp-lkp@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 8, 2021 at 8:50 AM Atish Patra <atish.patra@wdc.com> wrote:
->
-> The existing SBI specification impelementation follows v0.1 or legacy
-> specification. The latest specification known as v0.2 allows more
-> scalability and performance improvements.
->
-> Rename the existing implementation as legacy and provide a way to allow
-> future extensions.
->
-> Signed-off-by: Atish Patra <atish.patra@wdc.com>
+On Mon, Oct 25, 2021 at 03:24:16PM +0800, kernel test robot wrote:
+> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git vhost
+> head:   2b109044b081148b58974f5696ffd4383c3e9abb
+> commit: b2c5221fd074fbb0e57d6707bed5b7386bf430ed [4/47] virtio-blk: avoid preallocating big SGL for data
+> config: i386-randconfig-s001-20211025 (attached as .config)
+> compiler: gcc-9 (Debian 9.3.0-22) 9.3.0
+> reproduce:
+>         # apt-get install sparse
+>         # sparse version: v0.6.4-dirty
+>         # https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git/commit/?id=b2c5221fd074fbb0e57d6707bed5b7386bf430ed
+>         git remote add mst-vhost https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git
+>         git fetch --no-tags mst-vhost vhost
+>         git checkout b2c5221fd074fbb0e57d6707bed5b7386bf430ed
+>         # save the attached .config to linux build tree
+>         make W=1 C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' ARCH=i386 
+> 
+> If you fix the issue, kindly add following tag as appropriate
+> Reported-by: kernel test robot <lkp@intel.com>
+
+
+Patch sent. Max can you take a look pls?
+
+> 
+> sparse warnings: (new ones prefixed by >>)
+> >> drivers/block/virtio_blk.c:238:24: sparse: sparse: incorrect type in return expression (different base types) @@     expected int @@     got restricted blk_status_t [usertype] @@
+>    drivers/block/virtio_blk.c:238:24: sparse:     expected int
+>    drivers/block/virtio_blk.c:238:24: sparse:     got restricted blk_status_t [usertype]
+>    drivers/block/virtio_blk.c:246:32: sparse: sparse: incorrect type in return expression (different base types) @@     expected int @@     got restricted blk_status_t [usertype] @@
+>    drivers/block/virtio_blk.c:246:32: sparse:     expected int
+>    drivers/block/virtio_blk.c:246:32: sparse:     got restricted blk_status_t [usertype]
+> >> drivers/block/virtio_blk.c:320:24: sparse: sparse: incorrect type in return expression (different base types) @@     expected restricted blk_status_t @@     got int [assigned] err @@
+>    drivers/block/virtio_blk.c:320:24: sparse:     expected restricted blk_status_t
+>    drivers/block/virtio_blk.c:320:24: sparse:     got int [assigned] err
+> 
+> vim +238 drivers/block/virtio_blk.c
+> 
+>    203	
+>    204	static int virtblk_setup_cmd(struct virtio_device *vdev, struct request *req,
+>    205			struct virtblk_req *vbr)
+>    206	{
+>    207		bool unmap = false;
+>    208		u32 type;
+>    209	
+>    210		vbr->out_hdr.sector = 0;
+>    211	
+>    212		switch (req_op(req)) {
+>    213		case REQ_OP_READ:
+>    214			type = VIRTIO_BLK_T_IN;
+>    215			vbr->out_hdr.sector = cpu_to_virtio64(vdev,
+>    216							      blk_rq_pos(req));
+>    217			break;
+>    218		case REQ_OP_WRITE:
+>    219			type = VIRTIO_BLK_T_OUT;
+>    220			vbr->out_hdr.sector = cpu_to_virtio64(vdev,
+>    221							      blk_rq_pos(req));
+>    222			break;
+>    223		case REQ_OP_FLUSH:
+>    224			type = VIRTIO_BLK_T_FLUSH;
+>    225			break;
+>    226		case REQ_OP_DISCARD:
+>    227			type = VIRTIO_BLK_T_DISCARD;
+>    228			break;
+>    229		case REQ_OP_WRITE_ZEROES:
+>    230			type = VIRTIO_BLK_T_WRITE_ZEROES;
+>    231			unmap = !(req->cmd_flags & REQ_NOUNMAP);
+>    232			break;
+>    233		case REQ_OP_DRV_IN:
+>    234			type = VIRTIO_BLK_T_GET_ID;
+>    235			break;
+>    236		default:
+>    237			WARN_ON_ONCE(1);
+>  > 238			return BLK_STS_IOERR;
+>    239		}
+>    240	
+>    241		vbr->out_hdr.type = cpu_to_virtio32(vdev, type);
+>    242		vbr->out_hdr.ioprio = cpu_to_virtio32(vdev, req_get_ioprio(req));
+>    243	
+>    244		if (type == VIRTIO_BLK_T_DISCARD || type == VIRTIO_BLK_T_WRITE_ZEROES) {
+>    245			if (virtblk_setup_discard_write_zeroes(req, unmap))
+>    246				return BLK_STS_RESOURCE;
+>    247		}
+>    248	
+>    249		return 0;
+>    250	}
+>    251	
+>    252	static inline void virtblk_request_done(struct request *req)
+>    253	{
+>    254		struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
+>    255	
+>    256		virtblk_unmap_data(req, vbr);
+>    257		virtblk_cleanup_cmd(req);
+>    258		blk_mq_end_request(req, virtblk_result(vbr));
+>    259	}
+>    260	
+>    261	static void virtblk_done(struct virtqueue *vq)
+>    262	{
+>    263		struct virtio_blk *vblk = vq->vdev->priv;
+>    264		bool req_done = false;
+>    265		int qid = vq->index;
+>    266		struct virtblk_req *vbr;
+>    267		unsigned long flags;
+>    268		unsigned int len;
+>    269	
+>    270		spin_lock_irqsave(&vblk->vqs[qid].lock, flags);
+>    271		do {
+>    272			virtqueue_disable_cb(vq);
+>    273			while ((vbr = virtqueue_get_buf(vblk->vqs[qid].vq, &len)) != NULL) {
+>    274				struct request *req = blk_mq_rq_from_pdu(vbr);
+>    275	
+>    276				if (likely(!blk_should_fake_timeout(req->q)))
+>    277					blk_mq_complete_request(req);
+>    278				req_done = true;
+>    279			}
+>    280			if (unlikely(virtqueue_is_broken(vq)))
+>    281				break;
+>    282		} while (!virtqueue_enable_cb(vq));
+>    283	
+>    284		/* In case queue is stopped waiting for more buffers. */
+>    285		if (req_done)
+>    286			blk_mq_start_stopped_hw_queues(vblk->disk->queue, true);
+>    287		spin_unlock_irqrestore(&vblk->vqs[qid].lock, flags);
+>    288	}
+>    289	
+>    290	static void virtio_commit_rqs(struct blk_mq_hw_ctx *hctx)
+>    291	{
+>    292		struct virtio_blk *vblk = hctx->queue->queuedata;
+>    293		struct virtio_blk_vq *vq = &vblk->vqs[hctx->queue_num];
+>    294		bool kick;
+>    295	
+>    296		spin_lock_irq(&vq->lock);
+>    297		kick = virtqueue_kick_prepare(vq->vq);
+>    298		spin_unlock_irq(&vq->lock);
+>    299	
+>    300		if (kick)
+>    301			virtqueue_notify(vq->vq);
+>    302	}
+>    303	
+>    304	static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
+>    305				   const struct blk_mq_queue_data *bd)
+>    306	{
+>    307		struct virtio_blk *vblk = hctx->queue->queuedata;
+>    308		struct request *req = bd->rq;
+>    309		struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
+>    310		unsigned long flags;
+>    311		unsigned int num;
+>    312		int qid = hctx->queue_num;
+>    313		int err;
+>    314		bool notify = false;
+>    315	
+>    316		BUG_ON(req->nr_phys_segments + 2 > vblk->sg_elems);
+>    317	
+>    318		err = virtblk_setup_cmd(vblk->vdev, req, vbr);
+>    319		if (unlikely(err))
+>  > 320			return err;
+>    321	
+>    322		blk_mq_start_request(req);
+>    323	
+>    324		num = virtblk_map_data(hctx, req, vbr);
+>    325		if (unlikely(num < 0)) {
+>    326			virtblk_cleanup_cmd(req);
+>    327			return BLK_STS_RESOURCE;
+>    328		}
+>    329	
+>    330		spin_lock_irqsave(&vblk->vqs[qid].lock, flags);
+>    331		err = virtblk_add_req(vblk->vqs[qid].vq, vbr, vbr->sg_table.sgl, num);
+>    332		if (err) {
+>    333			virtqueue_kick(vblk->vqs[qid].vq);
+>    334			/* Don't stop the queue if -ENOMEM: we may have failed to
+>    335			 * bounce the buffer due to global resource outage.
+>    336			 */
+>    337			if (err == -ENOSPC)
+>    338				blk_mq_stop_hw_queue(hctx);
+>    339			spin_unlock_irqrestore(&vblk->vqs[qid].lock, flags);
+>    340			virtblk_unmap_data(req, vbr);
+>    341			virtblk_cleanup_cmd(req);
+>    342			switch (err) {
+>    343			case -ENOSPC:
+>    344				return BLK_STS_DEV_RESOURCE;
+>    345			case -ENOMEM:
+>    346				return BLK_STS_RESOURCE;
+>    347			default:
+>    348				return BLK_STS_IOERR;
+>    349			}
+>    350		}
+>    351	
+>    352		if (bd->last && virtqueue_kick_prepare(vblk->vqs[qid].vq))
+>    353			notify = true;
+>    354		spin_unlock_irqrestore(&vblk->vqs[qid].lock, flags);
+>    355	
+>    356		if (notify)
+>    357			virtqueue_notify(vblk->vqs[qid].vq);
+>    358		return BLK_STS_OK;
+>    359	}
+>    360	
+> 
 > ---
->  arch/riscv/include/asm/kvm_vcpu_sbi.h |  29 +++++
->  arch/riscv/kvm/vcpu_sbi.c             | 149 ++++++++++++++++++++------
->  2 files changed, 148 insertions(+), 30 deletions(-)
->  create mode 100644 arch/riscv/include/asm/kvm_vcpu_sbi.h
->
-> diff --git a/arch/riscv/include/asm/kvm_vcpu_sbi.h b/arch/riscv/include/asm/kvm_vcpu_sbi.h
-> new file mode 100644
-> index 000000000000..1a4cb0db2d0b
-> --- /dev/null
-> +++ b/arch/riscv/include/asm/kvm_vcpu_sbi.h
-> @@ -0,0 +1,29 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/**
-> + * Copyright (c) 2021 Western Digital Corporation or its affiliates.
-> + *
-> + * Authors:
-> + *     Atish Patra <atish.patra@wdc.com>
-> + */
-> +
-> +#ifndef __RISCV_KVM_VCPU_SBI_H__
-> +#define __RISCV_KVM_VCPU_SBI_H__
-> +
-> +#define KVM_SBI_VERSION_MAJOR 0
-> +#define KVM_SBI_VERSION_MINOR 2
-> +
-> +struct kvm_vcpu_sbi_extension {
-> +       unsigned long extid_start;
-> +       unsigned long extid_end;
-> +       /**
-> +        * SBI extension handler. It can be defined for a given extension or group of
-> +        * extension. But it should always return linux error codes rather than SBI
-> +        * specific error codes.
-> +        */
-> +       int (*handler)(struct kvm_vcpu *vcpu, struct kvm_run *run,
-> +                      unsigned long *out_val, struct kvm_cpu_trap *utrap,
-> +                      bool *exit);
-> +};
-> +
-> +const struct kvm_vcpu_sbi_extension *kvm_vcpu_sbi_find_ext(unsigned long extid);
-> +#endif /* __RISCV_KVM_VCPU_SBI_H__ */
-> diff --git a/arch/riscv/kvm/vcpu_sbi.c b/arch/riscv/kvm/vcpu_sbi.c
-> index ebdcdbade9c6..8c168d305763 100644
-> --- a/arch/riscv/kvm/vcpu_sbi.c
-> +++ b/arch/riscv/kvm/vcpu_sbi.c
-> @@ -12,9 +12,25 @@
->  #include <asm/csr.h>
->  #include <asm/sbi.h>
->  #include <asm/kvm_vcpu_timer.h>
-> +#include <asm/kvm_vcpu_sbi.h>
->
-> -#define SBI_VERSION_MAJOR                      0
-> -#define SBI_VERSION_MINOR                      1
-> +static int kvm_linux_err_map_sbi(int err)
-> +{
-> +       switch (err) {
-> +       case 0:
-> +               return SBI_SUCCESS;
-> +       case -EPERM:
-> +               return SBI_ERR_DENIED;
-> +       case -EINVAL:
-> +               return SBI_ERR_INVALID_PARAM;
-> +       case -EFAULT:
-> +               return SBI_ERR_INVALID_ADDRESS;
-> +       case -EOPNOTSUPP:
-> +               return SBI_ERR_NOT_SUPPORTED;
-> +       default:
-> +               return SBI_ERR_FAILURE;
-> +       };
-> +}
->
->  static void kvm_riscv_vcpu_sbi_forward(struct kvm_vcpu *vcpu,
->                                        struct kvm_run *run)
-> @@ -72,16 +88,17 @@ static void kvm_sbi_system_shutdown(struct kvm_vcpu *vcpu,
->         run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
->  }
->
-> -int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> +static int kvm_sbi_ext_legacy_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
-> +                                     unsigned long *out_val,
-> +                                     struct kvm_cpu_trap *utrap,
-> +                                     bool *exit)
->  {
->         ulong hmask;
-> -       int i, ret = 1;
-> +       int i, ret = 0;
->         u64 next_cycle;
->         struct kvm_vcpu *rvcpu;
-> -       bool next_sepc = true;
->         struct cpumask cm, hm;
->         struct kvm *kvm = vcpu->kvm;
-> -       struct kvm_cpu_trap utrap = { 0 };
->         struct kvm_cpu_context *cp = &vcpu->arch.guest_context;
->
->         if (!cp)
-> @@ -95,8 +112,7 @@ int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu, struct kvm_run *run)
->                  * handled in kernel so we forward these to user-space
->                  */
->                 kvm_riscv_vcpu_sbi_forward(vcpu, run);
-> -               next_sepc = false;
-> -               ret = 0;
-> +               *exit = true;
->                 break;
->         case SBI_EXT_0_1_SET_TIMER:
->  #if __riscv_xlen == 32
-> @@ -104,47 +120,42 @@ int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu, struct kvm_run *run)
->  #else
->                 next_cycle = (u64)cp->a0;
->  #endif
-> -               kvm_riscv_vcpu_timer_next_event(vcpu, next_cycle);
-> +               ret = kvm_riscv_vcpu_timer_next_event(vcpu, next_cycle);
->                 break;
->         case SBI_EXT_0_1_CLEAR_IPI:
-> -               kvm_riscv_vcpu_unset_interrupt(vcpu, IRQ_VS_SOFT);
-> +               ret = kvm_riscv_vcpu_unset_interrupt(vcpu, IRQ_VS_SOFT);
->                 break;
->         case SBI_EXT_0_1_SEND_IPI:
->                 if (cp->a0)
->                         hmask = kvm_riscv_vcpu_unpriv_read(vcpu, false, cp->a0,
-> -                                                          &utrap);
-> +                                                          utrap);
->                 else
->                         hmask = (1UL << atomic_read(&kvm->online_vcpus)) - 1;
-> -               if (utrap.scause) {
-> -                       utrap.sepc = cp->sepc;
-> -                       kvm_riscv_vcpu_trap_redirect(vcpu, &utrap);
-> -                       next_sepc = false;
-> +               if (utrap->scause)
->                         break;
-> -               }
-> +
->                 for_each_set_bit(i, &hmask, BITS_PER_LONG) {
->                         rvcpu = kvm_get_vcpu_by_id(vcpu->kvm, i);
-> -                       kvm_riscv_vcpu_set_interrupt(rvcpu, IRQ_VS_SOFT);
-> +                       ret = kvm_riscv_vcpu_set_interrupt(rvcpu, IRQ_VS_SOFT);
-> +                       if (ret < 0)
-> +                               break;
->                 }
->                 break;
->         case SBI_EXT_0_1_SHUTDOWN:
->                 kvm_sbi_system_shutdown(vcpu, run, KVM_SYSTEM_EVENT_SHUTDOWN);
-> -               next_sepc = false;
-> -               ret = 0;
-> +               *exit = true;
->                 break;
->         case SBI_EXT_0_1_REMOTE_FENCE_I:
->         case SBI_EXT_0_1_REMOTE_SFENCE_VMA:
->         case SBI_EXT_0_1_REMOTE_SFENCE_VMA_ASID:
->                 if (cp->a0)
->                         hmask = kvm_riscv_vcpu_unpriv_read(vcpu, false, cp->a0,
-> -                                                          &utrap);
-> +                                                          utrap);
->                 else
->                         hmask = (1UL << atomic_read(&kvm->online_vcpus)) - 1;
-> -               if (utrap.scause) {
-> -                       utrap.sepc = cp->sepc;
-> -                       kvm_riscv_vcpu_trap_redirect(vcpu, &utrap);
-> -                       next_sepc = false;
-> +               if (utrap->scause)
->                         break;
-> -               }
-> +
->                 cpumask_clear(&cm);
->                 for_each_set_bit(i, &hmask, BITS_PER_LONG) {
->                         rvcpu = kvm_get_vcpu_by_id(vcpu->kvm, i);
-> @@ -154,22 +165,100 @@ int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu, struct kvm_run *run)
->                 }
->                 riscv_cpuid_to_hartid_mask(&cm, &hm);
->                 if (cp->a7 == SBI_EXT_0_1_REMOTE_FENCE_I)
-> -                       sbi_remote_fence_i(cpumask_bits(&hm));
-> +                       ret = sbi_remote_fence_i(cpumask_bits(&hm));
->                 else if (cp->a7 == SBI_EXT_0_1_REMOTE_SFENCE_VMA)
-> -                       sbi_remote_hfence_vvma(cpumask_bits(&hm),
-> +                       ret = sbi_remote_hfence_vvma(cpumask_bits(&hm),
->                                                 cp->a1, cp->a2);
->                 else
-> -                       sbi_remote_hfence_vvma_asid(cpumask_bits(&hm),
-> +                       ret = sbi_remote_hfence_vvma_asid(cpumask_bits(&hm),
->                                                 cp->a1, cp->a2, cp->a3);
->                 break;
->         default:
-> -               /* Return error for unsupported SBI calls */
-> -               cp->a0 = SBI_ERR_NOT_SUPPORTED;
-> +               ret = -EINVAL;
->                 break;
->         };
->
-> +       return ret;
-> +}
-> +
-> +const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_legacy = {
-> +       .extid_start = SBI_EXT_0_1_SET_TIMER,
-> +       .extid_end = SBI_EXT_0_1_SHUTDOWN,
-> +       .handler = kvm_sbi_ext_legacy_handler,
-> +};
-> +
-> +static const struct kvm_vcpu_sbi_extension *sbi_ext[] = {
-> +       &vcpu_sbi_ext_legacy,
-> +};
-> +
-> +const struct kvm_vcpu_sbi_extension *kvm_vcpu_sbi_find_ext(unsigned long extid)
-> +{
-> +       int i = 0;
-> +
-> +       for (i = 0; i < ARRAY_SIZE(sbi_ext); i++) {
-> +               if (sbi_ext[i]->extid_start <= extid &&
-> +                   sbi_ext[i]->extid_end >= extid)
-> +                       return sbi_ext[i];
-> +       }
-> +
-> +       return NULL;
-> +}
-> +
-> +int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> +{
-> +       int ret = 1;
-> +       bool next_sepc = true;
-> +       bool userspace_exit = false;
-> +       struct kvm_cpu_context *cp = &vcpu->arch.guest_context;
-> +       const struct kvm_vcpu_sbi_extension *sbi_ext;
-> +       struct kvm_cpu_trap utrap = { 0 };
-> +       unsigned long out_val = 0;
-> +       bool ext_is_v01 = false;
-> +
-> +       if (!cp)
-> +               return -EINVAL;
+> 0-DAY CI Kernel Test Service, Intel Corporation
+> https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
 
-This is a redundant check because cp is always non-NULL.
 
-> +
-> +       sbi_ext = kvm_vcpu_sbi_find_ext(cp->a7);
-> +       if (sbi_ext && sbi_ext->handler) {
-> +               if (cp->a7 >= SBI_EXT_0_1_SET_TIMER &&
-> +                   cp->a7 <= SBI_EXT_0_1_SHUTDOWN)
-> +                       ext_is_v01 = true;
-> +               ret = sbi_ext->handler(vcpu, run, &out_val, &utrap, &userspace_exit);
-> +       } else {
-> +               /* Return error for unsupported SBI calls */
-> +               cp->a0 = SBI_ERR_NOT_SUPPORTED;
-> +               goto ecall_done;
-> +       }
-> +
-> +       /* Handle special error cases i.e trap, exit or userspace forward */
-> +       if (utrap.scause) {
-> +               /* No need to increment sepc or exit ioctl loop */
-> +               ret = 1;
-> +               utrap.sepc = cp->sepc;
-> +               kvm_riscv_vcpu_trap_redirect(vcpu, &utrap);
-> +               next_sepc = false;
-> +               goto ecall_done;
-> +       }
-> +
-> +       /* Exit ioctl loop or Propagate the error code the guest */
-> +       if (userspace_exit) {
-> +               next_sepc = false;
-> +               ret = 0;
-> +       } else {
-> +               /**
-> +                * SBI extension handler always returns an Linux error code. Convert
-> +                * it to the SBI specific error code that can be propagated the SBI
-> +                * caller.
-> +                */
-> +               ret = kvm_linux_err_map_sbi(ret);
-> +               cp->a0 = ret;
-> +               ret = 1;
-> +       }
-> +ecall_done:
->         if (next_sepc)
->                 cp->sepc += 4;
-> +       if (!ext_is_v01)
-> +               cp->a1 = out_val;
->
->         return ret;
->  }
-> --
-> 2.31.1
->
->
-> --
-> kvm-riscv mailing list
-> kvm-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/kvm-riscv
-
-Regards,
-Anup
