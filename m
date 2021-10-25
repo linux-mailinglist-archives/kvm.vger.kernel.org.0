@@ -2,126 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 46770439815
-	for <lists+kvm@lfdr.de>; Mon, 25 Oct 2021 16:06:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AAE64439829
+	for <lists+kvm@lfdr.de>; Mon, 25 Oct 2021 16:10:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232625AbhJYOJK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Oct 2021 10:09:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27381 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230174AbhJYOJJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 25 Oct 2021 10:09:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635170807;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=FblMqi74l2aNQDmIbjX/cagfl890xy4Kf5Rp2sw8Ik4=;
-        b=iybnwA0ZadanTHPHXV9Sbz8JrJm508VE747MwvM0WjR6zQ0H7YDqd8ZruBnkQ8FFxyEkLe
-        EgxdHniFGcd9Kn9JX9OlnRN8CIce0gmXIzCQlA1kEkpfoB6YZQAZlGvUeoCF65178Zytrj
-        D7Zwzzcgb/nbyViN/FOhKcEzj6+6j48=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-261-x0DnCQioPP-QGIXdq18NVQ-1; Mon, 25 Oct 2021 10:06:46 -0400
-X-MC-Unique: x0DnCQioPP-QGIXdq18NVQ-1
-Received: by mail-ed1-f71.google.com with SMTP id x13-20020a05640226cd00b003dd4720703bso4063633edd.8
-        for <kvm@vger.kernel.org>; Mon, 25 Oct 2021 07:06:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=FblMqi74l2aNQDmIbjX/cagfl890xy4Kf5Rp2sw8Ik4=;
-        b=lWFjOr4nKACsS9xBicUW33jSFB77athEot25DvyVDLhcghOKzNuy1dFg5mwx+tyELd
-         VhonYmQ3XIMocQl1jVSu/N0XD26Vqoc+jZ3HmMPC2hFl6eKTo/U7Zk6AQ4cKFNM/7okX
-         TBrrCMJnYXh0aRrMzOcjIsf/YBIsxsFY0T072L6Tk6aWOic+NXpkMMY7wru8Ni5HHd6m
-         5NCBMiORkxpPxzmYO9//N5qtxszaStwPZxU7HDDAurHij3SrxJzgneu2hPid4jed1byx
-         nOkPJuEyh+7hBc6ZIGcYaqR6KgR0e45e/4jBo0P6fE/blXEzznrDS5KHuZDOKn8TCAQW
-         z9ig==
-X-Gm-Message-State: AOAM533ykGt3SjOxgcAG7G6L27kkzzlCG3ZOF/GPV2JdrmZ9ocwo9tFq
-        ob0kjC65oXaKv9h/JjRHtTKhaAuWM0pPkuTHt8JS6pHfs8V48wk2FYcVC7sQO1qWl3ud4c87HhK
-        7j7eulc3WqXfy
-X-Received: by 2002:a50:fb02:: with SMTP id d2mr11770121edq.100.1635170804931;
-        Mon, 25 Oct 2021 07:06:44 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyZ2X8dAbxM+1kv2smymvR7I3dtS7qD9GGOcFC9wjjp+md9MuSuvCzqRB05il5WqZEpIp8nlw==
-X-Received: by 2002:a50:fb02:: with SMTP id d2mr11770084edq.100.1635170804745;
-        Mon, 25 Oct 2021 07:06:44 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id o3sm7472237eju.123.2021.10.25.07.06.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 25 Oct 2021 07:06:44 -0700 (PDT)
-Message-ID: <591073c1-b520-21de-8573-ddb83950e9f1@redhat.com>
-Date:   Mon, 25 Oct 2021 16:06:31 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH v2 19/43] KVM: Add helpers to wake/query blocking vCPU
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-Cc:     James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        David Hildenbrand <david@redhat.com>,
+        id S233325AbhJYOM0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Oct 2021 10:12:26 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54886 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233009AbhJYOMY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Oct 2021 10:12:24 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 7A8B860F70;
+        Mon, 25 Oct 2021 14:10:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1635171002;
+        bh=keekYHdYAWdyATEPVva/BLVQO6EKoTmmk3kBb7KadD8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=XBxJJmEPAXirY/tRVpXuJnIeh0slTyHNA95Ovi49PA5U63ohfmz3WuMZLCiyIc9n2
+         IaoxVT1evX8GtEwThTfwpaycwgwr9lo3SyMekZYko/T6kWJN8V7UdDHig+8qKnkNoq
+         NvA/6Nx4qGIvRfBzPaEpi5OlMuu/+inZXvjn3oTk=
+Date:   Mon, 25 Oct 2021 16:09:59 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Patrick Williams <patrick@stwcx.xyz>
+Cc:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Frank Rowand <frowand.list@gmail.com>,
+        Zev Weiss <zev@bewilderbeest.net>, kvm@vger.kernel.org,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Jeremy Kerr <jk@codeconstruct.com.au>,
+        Rajat Jain <rajatja@google.com>,
+        Jianxiong Gao <jxgao@google.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Saravana Kannan <saravanak@google.com>,
+        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+        openbmc@lists.ozlabs.org, devicetree@vger.kernel.org,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Bhaskar Chowdhury <unixbhaskar@gmail.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Andrew Jeffery <andrew@aj.id.au>,
         Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        David Matlack <dmatlack@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>
-References: <20211009021236.4122790-1-seanjc@google.com>
- <20211009021236.4122790-20-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211009021236.4122790-20-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        linux-kernel@vger.kernel.org, Vinod Koul <vkoul@kernel.org>,
+        dmaengine@vger.kernel.org
+Subject: Re: [PATCH 4/5] driver core: inhibit automatic driver binding on
+ reserved devices
+Message-ID: <YXa6t/ifxZGGSCNj@kroah.com>
+References: <YXJ88eARBE3vU1aA@kroah.com>
+ <YXLWMyleiTFDDZgm@heinlein>
+ <YXPOSZPA41f+EUvM@kroah.com>
+ <627101ee-7414-57d1-9952-6e023b8db317@gmail.com>
+ <YXZLjTvGevAXcidW@kroah.com>
+ <YXaYmie/CUHnixtX@heinlein>
+ <YXap8V/jMM3Ksj7x@smile.fi.intel.com>
+ <YXavBWTNYsufqj8u@heinlein>
+ <YXayTeJiQvpRutU0@kroah.com>
+ <YXa5AExKg+k0MmHV@heinlein>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YXa5AExKg+k0MmHV@heinlein>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 09/10/21 04:12, Sean Christopherson wrote:
-> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> index 7e8396f74010..addd53b6eba6 100644
-> --- a/arch/arm64/kvm/arch_timer.c
-> +++ b/arch/arm64/kvm/arch_timer.c
-> @@ -649,7 +649,6 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
->   {
->   	struct arch_timer_cpu *timer = vcpu_timer(vcpu);
->   	struct timer_map map;
-> -	struct rcuwait *wait = kvm_arch_vcpu_get_wait(vcpu);
->   
->   	if (unlikely(!timer->enabled))
->   		return;
-> @@ -672,7 +671,7 @@ void kvm_timer_vcpu_put(struct kvm_vcpu *vcpu)
->   	if (map.emul_ptimer)
->   		soft_timer_cancel(&map.emul_ptimer->hrtimer);
->   
-> -	if (rcuwait_active(wait))
-> +	if (kvm_vcpu_is_blocking(vcpu))
->   		kvm_timer_blocking(vcpu);
->   
->   	/*
+On Mon, Oct 25, 2021 at 09:02:40AM -0500, Patrick Williams wrote:
+> On Mon, Oct 25, 2021 at 03:34:05PM +0200, Greg Kroah-Hartman wrote:
+> > On Mon, Oct 25, 2021 at 08:20:05AM -0500, Patrick Williams wrote:
+> > > On Mon, Oct 25, 2021 at 03:58:25PM +0300, Andy Shevchenko wrote:
+> > > > On Mon, Oct 25, 2021 at 06:44:26AM -0500, Patrick Williams wrote:
+> > > > > On Mon, Oct 25, 2021 at 08:15:41AM +0200, Greg Kroah-Hartman wrote:
+> > > > > > On Mon, Oct 25, 2021 at 12:38:08AM -0500, Frank Rowand wrote:
+> > > > > > > On 10/23/21 3:56 AM, Greg Kroah-Hartman wrote:
+> > > > >  
+> > > > > > We have the bind/unbind ability today, from userspace, that can control
+> > > > > > this.  Why not just have Linux grab the device when it boots, and then
+> > > > > > when userspace wants to "give the device up", it writes to "unbind" in
+> > > > > > sysfs, and then when all is done, it writes to the "bind" file and then
+> > > > > > Linux takes back over.
+> > > > > > 
+> > > > > > Unless for some reason Linux should _not_ grab the device when booting,
+> > > > > > then things get messier, as we have seen in this thread.
+> > > > > 
+> > > > > This is probably more typical on a BMC than atypical.  The systems often require
+> > > > > the BMC (running Linux) to be able to reboot independently from the managed host
+> > > > > (running anything).  In the example Zev gave, the BMC rebooting would rip away
+> > > > > the BIOS chip from the running host.
+> > > > > 
+> > > > > The BMC almost always needs to come up in a "I don't know what could possibly be
+> > > > > going on in the system" state and re-discover where the system was left off.
+> > > > 
+> > > > Isn't it an architectural issue then?
+> > > 
+> > > I'm not sure what "it" you are referring to here.
+> > > 
+> > > I was trying to explain why starting in "bind" state is not a good idea for a
+> > > BMC in most of these cases where we want to be able to dynamically add a device.
+> > 
+> > I think "it" is "something needs to be the moderator between the two
+> > operating systems".  What is the external entity that handles the
+> > switching between the two?
+> 
+> Ah, ok.
+> 
+> Those usually end up being system / device specific.  In the case of the BIOS
+> flash, most designs I've seen use a SPI mux between the BMC and the host
+> processor or IO hub (PCH on Xeons).  The BMC has a GPIO to control the mux.
+> 
+> As far as state, the BMC on start-up will go through a set of discovery code to
+> figure out where it left the system prior to getting reset.  That involves
+> looking at the power subsystem and usually doing some kind of query to the host
+> to see if it is alive.  These queries are mostly system / host-processor design
+> specific.  I've seen anything from an IPMI/IPMB message alert from the BMC to
+> the BIOS to ask "are you alive" to reading host processor state over JTAG to
+> figure out if the processors are "making progress".
 
-So this trick is what you're applying to x86 too instead of using 
-vmx_pre_block, I see.
+But which processor is "in control" here over the hardware?  What method
+is used to pass the device from one CPU to another from a logical point
+of view?  Sounds like it is another driver that needs to handle all of
+this, so why not have that be the one that adds/removes the devices
+under control here?
 
-Paolo
+thanks,
 
+greg k-h
