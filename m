@@ -2,253 +2,293 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C4C01439B9C
-	for <lists+kvm@lfdr.de>; Mon, 25 Oct 2021 18:34:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 28B88439BAA
+	for <lists+kvm@lfdr.de>; Mon, 25 Oct 2021 18:36:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233978AbhJYQga (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Oct 2021 12:36:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45671 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231258AbhJYQg3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 25 Oct 2021 12:36:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635179647;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ynlrOvDkwL5I16uhJfJEmQ9iYxzs+WVm4ZH555IrioY=;
-        b=DZ8hU244YouFZnIh51uEwlB1VAU3F6fBXzg2BLwVFu9cDGYrMp3/gA77hV7v98dzL+ojVU
-        K3J6n8vhKxF1IG2nN+GVjYhXieGmg3StAy6FCFrupWK6VcjlNqZ/Kx/65qFmaqa4FKC4fI
-        uXbSS1LwL/Gjnzv4UxyvxINJii/1muE=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-593-rFYYjzQEMbKw77afZFnQ_Q-1; Mon, 25 Oct 2021 12:34:05 -0400
-X-MC-Unique: rFYYjzQEMbKw77afZFnQ_Q-1
-Received: by mail-wm1-f71.google.com with SMTP id l187-20020a1c25c4000000b0030da46b76daso3693569wml.9
-        for <kvm@vger.kernel.org>; Mon, 25 Oct 2021 09:34:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=ynlrOvDkwL5I16uhJfJEmQ9iYxzs+WVm4ZH555IrioY=;
-        b=AFlEiWL26Z9VOvuuPGPitxOcZWNFIMrlbjZCXWFjKX0uHhGmnowNHyeUK7fcTvQcHP
-         PS1in6bxJkZBRy2zqu1SVc0Ms91rWfByPJmAhumAtnPT0nB0mX3c+9/56cyMKqEldn0T
-         TBliSv7Zo/UCCE1X73OHA7YVvMq/UFl8Geo1mb36fTIeTtEEQMdy4ByarMUiejBDPg3T
-         bFSJaUywNpeV+4SiGe8Wn6joa8FY1Lyp59vuIzYrgdape/q99W2RCJWwuo7uXb81vbsH
-         t4Kd69YfaoJvCBHNZY4Xq4XwPzMrJaeiNw0XD9G/bMoscMjl8us1Cj1Atq91vghXRY72
-         DLFg==
-X-Gm-Message-State: AOAM530jc5aGLTHfJdh8VG/uOIygarL65/QljD5TSY/jok5Ec4dppOCE
-        32q6hkQbSbF74YMt54ypBmNnx72rt8ScXfZQ2hVtBDdVQnf1V6KfLZ1d0/z+BEAfAyiO/MDotkU
-        gKUeij+gaU8Y9
-X-Received: by 2002:a1c:1f17:: with SMTP id f23mr13074614wmf.125.1635179644504;
-        Mon, 25 Oct 2021 09:34:04 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx4mcLAz7awLLqXAZYrdfxP8MmMW/541UPPqAs48umNwcoQAJHMARVeyspPwbjDaQyAkZNijQ==
-X-Received: by 2002:a1c:1f17:: with SMTP id f23mr13074595wmf.125.1635179644281;
-        Mon, 25 Oct 2021 09:34:04 -0700 (PDT)
-Received: from work-vm (cpc109025-salf6-2-0-cust480.10-2.cable.virginm.net. [82.30.61.225])
-        by smtp.gmail.com with ESMTPSA id 19sm10487749wmb.24.2021.10.25.09.34.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Oct 2021 09:34:03 -0700 (PDT)
-Date:   Mon, 25 Oct 2021 17:34:01 +0100
-From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Yishai Hadas <yishaih@nvidia.com>,
-        Jason Gunthorpe <jgg@nvidia.com>, bhelgaas@google.com,
-        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
-        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com,
-        Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH V2 mlx5-next 12/14] vfio/mlx5: Implement vfio_pci driver
- for mlx5 devices
-Message-ID: <YXbceaVo0q6hOesg@work-vm>
-References: <20211019105838.227569-1-yishaih@nvidia.com>
- <20211019105838.227569-13-yishaih@nvidia.com>
- <20211019124352.74c3b6ba.alex.williamson@redhat.com>
- <20211019192328.GZ2744544@nvidia.com>
- <20211019145856.2fa7f7c8.alex.williamson@redhat.com>
- <20211019230431.GA2744544@nvidia.com>
- <5a496713-ae1d-11f2-1260-e4c1956e1eda@nvidia.com>
- <20211020105230.524e2149.alex.williamson@redhat.com>
+        id S234016AbhJYQiY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Oct 2021 12:38:24 -0400
+Received: from mail-mw2nam12on2069.outbound.protection.outlook.com ([40.107.244.69]:45472
+        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S232526AbhJYQiX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Oct 2021 12:38:23 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=HNzQtoElNHIMh/D2c8OWmWpDsq2F4aHCVLQCCbPrKlhzWzaDNc4VrV0yzOc+fFgIZv779iKuxCmkvk6IeZtvX8qG3g/FZ60bWJUCVzWhH+FCQG5ngKDf5lg/eqA8uPhRw1m6ZtD6R3YMsJsgFImTNPSA6WRR333ircxqQHWEDch2xoeUOvU3QVQuy8iXH2dQIp58eLtG9rCwdh8utQNXkRGPZqA5i7j2AkFb2rjiljh7Zivxq1LQpzDT5jQvyGeJqvYNNgJKNKnopVff1kPQC3lyhFNRmjQYVGMI2x7N+gbfP/WqOu0bo8v5Vn5jZUevntAMHdZhigvja1JrkPhkGw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8OzXdvqpdppUhbZQiqVrBcxRN8JmC66LS6cHqbBjmQg=;
+ b=NStx7W5un4abmH+OXVWuES4glxGkyneCA7lGbFooitEtxe+S/AQ+ebqjHvsOZaP55sL6jBNNh65VTP5a0nTiL+QuhvKazSxCx89xsvNLhL2j8Vr3gqoA+KeTOs+4g8RhpU/WMLjN4LX7Xrtf3Y2Lqc3/g4vRNaZTCkAeWvNc5kGYCZnFP6TuzwQ8wg8YOgPzDvs6Dlnxathx53AsKuyDimLuGQTYo0e4ayMC/Rod62PBsHNoGnUUFGDRyzF1NWiKCdNSqwfOMUtygu0d6ToAZKkU1UixKFIbSkEqYmf4Vk8J0OwUFOlkml6lZ8bWcePgZnlb32zHlvJZ7sTsNfuwLA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=alien8.de smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8OzXdvqpdppUhbZQiqVrBcxRN8JmC66LS6cHqbBjmQg=;
+ b=dr7nye3N4Pz+IJ/OjJiHE6uh8gZywEQDZ7uu10qJXno5sQ3v9/ePtJht7ZT6gokyY3Ae7MS6uy65WEtu3OjXRH2b3qLMTa4CyRjdgeQVRm0+i70OGquXseVl/K8MIblEfVj8tqZYC93l52YsdJAK6MgC47+QyATn6wepxha+FS0=
+Received: from MWHPR07CA0020.namprd07.prod.outlook.com (2603:10b6:300:116::30)
+ by DM6PR12MB3258.namprd12.prod.outlook.com (2603:10b6:5:187::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4628.20; Mon, 25 Oct
+ 2021 16:35:57 +0000
+Received: from CO1NAM11FT008.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:300:116:cafe::5e) by MWHPR07CA0020.outlook.office365.com
+ (2603:10b6:300:116::30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4628.15 via Frontend
+ Transport; Mon, 25 Oct 2021 16:35:57 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; alien8.de; dkim=none (message not signed)
+ header.d=none;alien8.de; dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com;
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CO1NAM11FT008.mail.protection.outlook.com (10.13.175.191) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.4628.16 via Frontend Transport; Mon, 25 Oct 2021 16:35:56 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.15; Mon, 25 Oct
+ 2021 11:35:55 -0500
+Date:   Mon, 25 Oct 2021 11:35:18 -0500
+From:   Michael Roth <michael.roth@amd.com>
+To:     Borislav Petkov <bp@alien8.de>
+CC:     Brijesh Singh <brijesh.singh@amd.com>, <x86@kernel.org>,
+        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <linux-efi@vger.kernel.org>, <platform-driver-x86@vger.kernel.org>,
+        <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        "Andy Lutomirski" <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        "Peter Zijlstra" <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        <tony.luck@intel.com>, <marcorr@google.com>,
+        <sathyanarayanan.kuppuswamy@linux.intel.com>
+Subject: Re: [PATCH v6 08/42] x86/sev-es: initialize sev_status/features
+ within #VC handler
+Message-ID: <20211025163518.rztqnngwggnbfxvs@amd.com>
+References: <20211008180453.462291-1-brijesh.singh@amd.com>
+ <20211008180453.462291-9-brijesh.singh@amd.com>
+ <YW2EsxcqBucuyoal@zn.tnic>
+ <20211018184003.3ob2uxcpd2rpee3s@amd.com>
+ <YW3IdfMs61191qnU@zn.tnic>
+ <20211020161023.hzbj53ehmzjrt4xd@amd.com>
+ <YXF+WjMHW/dd0Wb6@zn.tnic>
+ <20211021204149.pof2exhwkzy2zqrg@amd.com>
+ <YXaPKsicNYFZe84I@zn.tnic>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20211020105230.524e2149.alex.williamson@redhat.com>
-User-Agent: Mutt/2.0.7 (2021-05-04)
+In-Reply-To: <YXaPKsicNYFZe84I@zn.tnic>
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 5ade8967-52a8-401e-ddf1-08d997d584d5
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3258:
+X-Microsoft-Antispam-PRVS: <DM6PR12MB32581D403B3BAD5B2EA6583495839@DM6PR12MB3258.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: KUdUEepCBXMNLP1PLPj24zdS+OjZQRVgkR/iKf66x+FgDZuF0HldDVvarc/U5arPXg7DgwIY/mldbDsSYZB+GZj3xFJYGJugrKRcMEXwrSeaMAJOI2XFHmRM+GBuRcbWNiDiP785mT9UNEP4ufXtH2TvH6hVsZ8pnCbol7Y1qDaRUaWsoIY8jETakWGvRkJ5akQv1Gnkd05JhF2Iw2NyMWuRJAXUgUoF/Pb0WZeKZYLv4lFT24IcnY5dpC2/pwCf0rARdZn8qF9mWTspyMXf4g5tc2iUt+/myMNksqKDyAOMZURXPY1H8MpW3U4Ip1keRSZ5DdY6tJsUWqJ9lgEJQ2ySgeqvXeO5R9QwtqnYCDGLgU4/BTF9i7I95YKgbPwfUaRk1xR1ctGDYefP6CZeeO6Hv5A8LySLz3VtsFNNLbCciro6ZUVHIjqk3Av+E9awdiJgsEu313YyrF9OnlyLV8T4Uaillh/DIZfzoDNMOsIfTNFtMIN1lx7p53eW3N6RVlwO8sh6G0zB/V/HRFRut0FGkp6Wc7vqGq/KtNrQeOOxQwTbzd56v/f8ano9/ki++qOpny6IdCqhF9DlRQ+weDrqyMsgPPUliBox3SyvyYlvmY82aTqxvzH3ORJdwIoWuj4pYSVFT42quuX3FbVF3ZD7Q5/m2UnVzdqd6CptJQZq+s4aCyoWPCAYTegeUvEaefsHvS/plY0c/d/aM/JHGB0gfvJHXYX2Eaw7kn+7Lguw4iV6wLeMBPrg/YWl5Rrk0mRbwV68T/PpTf7xK2awyZqTy+39jtFYqVuURBcdHUAWiU4iGq6oFokqfWL8G87b
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(4636009)(46966006)(36840700001)(36860700001)(8936002)(44832011)(2906002)(16526019)(4326008)(6666004)(47076005)(7416002)(54906003)(5660300002)(7406005)(8676002)(81166007)(36756003)(1076003)(356005)(186003)(70206006)(508600001)(6916009)(45080400002)(83380400001)(70586007)(316002)(426003)(966005)(18074004)(336012)(26005)(3716004)(2616005)(86362001)(82310400003)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Oct 2021 16:35:56.0433
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5ade8967-52a8-401e-ddf1-08d997d584d5
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT008.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3258
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-* Alex Williamson (alex.williamson@redhat.com) wrote:
-> [Cc +dgilbert, +cohuck]
->=20
-> On Wed, 20 Oct 2021 11:28:04 +0300
-> Yishai Hadas <yishaih@nvidia.com> wrote:
->=20
-> > On 10/20/2021 2:04 AM, Jason Gunthorpe wrote:
-> > > On Tue, Oct 19, 2021 at 02:58:56PM -0600, Alex Williamson wrote: =20
-> > >> I think that gives us this table:
-> > >>
-> > >> |   NDMA   | RESUMING |  SAVING  |  RUNNING |
-> > >> +----------+----------+----------+----------+ ---
-> > >> |     X    |     0    |     0    |     0    |  ^
-> > >> +----------+----------+----------+----------+  |
-> > >> |     0    |     0    |     0    |     1    |  |
-> > >> +----------+----------+----------+----------+  |
-> > >> |     X    |     0    |     1    |     0    |
-> > >> +----------+----------+----------+----------+  NDMA value is either =
-compatible
-> > >> |     0    |     0    |     1    |     1    |  to existing behavior =
-or don't
-> > >> +----------+----------+----------+----------+  care due to redundanc=
-y vs
-> > >> |     X    |     1    |     0    |     0    |  !_RUNNING/INVALID/ERR=
-OR
-> > >> +----------+----------+----------+----------+
-> > >> |     X    |     1    |     0    |     1    |  |
-> > >> +----------+----------+----------+----------+  |
-> > >> |     X    |     1    |     1    |     0    |  |
-> > >> +----------+----------+----------+----------+  |
-> > >> |     X    |     1    |     1    |     1    |  v
-> > >> +----------+----------+----------+----------+ ---
-> > >> |     1    |     0    |     0    |     1    |  ^
-> > >> +----------+----------+----------+----------+  Desired new useful ca=
-ses
-> > >> |     1    |     0    |     1    |     1    |  v
-> > >> +----------+----------+----------+----------+ ---
-> > >>
-> > >> Specifically, rows 1, 3, 5 with NDMA =3D 1 are valid states a user c=
-an
-> > >> set which are simply redundant to the NDMA =3D 0 cases. =20
-> > > It seems right
-> > > =20
-> > >> Row 6 remains invalid due to lack of support for pre-copy (_RESUMING
-> > >> | _RUNNING) and therefore cannot be set by userspace.  Rows 7 & 8
-> > >> are error states and cannot be set by userspace. =20
-> > > I wonder, did Yishai's series capture this row 6 restriction? Yishai?=
- =20
-> >=20
-> >=20
-> > It seems so,=A0 by using the below check which includes the=20
-> > !VFIO_DEVICE_STATE_VALID clause.
-> >=20
-> > if (old_state =3D=3D VFIO_DEVICE_STATE_ERROR ||
-> >  =A0=A0=A0 =A0=A0=A0 !VFIO_DEVICE_STATE_VALID(state) ||
-> >  =A0=A0=A0 =A0=A0=A0 (state & ~MLX5VF_SUPPORTED_DEVICE_STATES))
-> >  =A0=A0=A0 =A0=A0=A0 return -EINVAL;
-> >=20
-> > Which is:
-> >=20
-> > #define VFIO_DEVICE_STATE_VALID(state) \
-> >  =A0=A0=A0 (state & VFIO_DEVICE_STATE_RESUMING ? \
-> >  =A0=A0=A0 (state & VFIO_DEVICE_STATE_MASK) =3D=3D VFIO_DEVICE_STATE_RE=
-SUMING : 1)
-> >=20
-> > > =20
-> > >> Like other bits, setting the bit should be effective at the completi=
-on
-> > >> of writing device state.  Therefore the device would need to flush a=
-ny
-> > >> outbound DMA queues before returning. =20
-> > > Yes, the device commands are expected to achieve this.
-> > > =20
-> > >> The question I was really trying to get to though is whether we have=
- a
-> > >> supportable interface without such an extension.  There's currently
-> > >> only an experimental version of vfio migration support for PCI devic=
-es
-> > >> in QEMU (afaik), =20
-> > > If I recall this only matters if you have a VM that is causing
-> > > migratable devices to interact with each other. So long as the devices
-> > > are only interacting with the CPU this extra step is not strictly
-> > > needed.
-> > >
-> > > So, single device cases can be fine as-is
-> > >
-> > > IMHO the multi-device case the VMM should probably demand this support
-> > > from the migration drivers, otherwise it cannot know if it is safe for
-> > > sure.
-> > >
-> > > A config option to override the block if the admin knows there is no
-> > > use case to cause devices to interact - eg two NVMe devices without
-> > > CMB do not have a useful interaction.
-> > > =20
-> > >> so it seems like we could make use of the bus-master bit to fill
-> > >> this gap in QEMU currently, before we claim non-experimental
-> > >> support, but this new device agnostic extension would be required
-> > >> for non-PCI device support (and PCI support should adopt it as
-> > >> available).  Does that sound right?  Thanks, =20
-> > > I don't think the bus master support is really a substitute, tripping
-> > > bus master will stop DMA but it will not do so in a clean way and is
-> > > likely to be non-transparent to the VM's driver.
-> > >
-> > > The single-device-assigned case is a cleaner restriction, IMHO.
-> > >
-> > > Alternatively we can add the 4th bit and insist that migration drivers
-> > > support all the states. I'm just unsure what other HW can do, I get
-> > > the feeling people have been designing to the migration description in
-> > > the header file for a while and this is a new idea.
->=20
-> I'm wondering if we're imposing extra requirements on the !_RUNNING
-> state that don't need to be there.  For example, if we can assume that
-> all devices within a userspace context are !_RUNNING before any of the
-> devices begin to retrieve final state, then clearing of the _RUNNING
-> bit becomes the device quiesce point and the beginning of reading
-> device data is the point at which the device state is frozen and
-> serialized.  No new states required and essentially works with a slight
-> rearrangement of the callbacks in this series.  Why can't we do that?
+On Mon, Oct 25, 2021 at 01:04:10PM +0200, Borislav Petkov wrote:
+> On Thu, Oct 21, 2021 at 03:41:49PM -0500, Michael Roth wrote:
+> > On Thu, Oct 21, 2021 at 04:51:06PM +0200, Borislav Petkov wrote:
+> > > On Wed, Oct 20, 2021 at 11:10:23AM -0500, Michael Roth wrote:
+> > > > The CPUID calls in snp_cpuid_init() weren't added specifically to induce
+> > > > the #VC-based SEV MSR read, they were added only because I thought the
+> > > > gist of your earlier suggestions were to do more validation against the
+> > > > CPUID table advertised by EFI
+> > > 
+> > > Well, if EFI is providing us with the CPUID table, who verified it? The
+> > > attestation process? Is it signed with the AMD platform key?
+> > 
+> > For CPUID table pages, the only thing that's assured/attested to by firmware
+> > is that:
+> > 
+> >  1) it is present at the expected guest physical address (that address
+> >     is generally baked into the EFI firmware, which *is* attested to)
+> >  2) its contents have been validated by the PSP against the current host
+> >     CPUID capabilities as defined by the AMD PPR (Publication #55898),
+> >     Section 2.1.5.3, "CPUID Policy Enforcement"
+> >  3) it is encrypted with the guest key
+> >  4) it is in a validated state at launch
+> > 
+> > The actual contents of the CPUID table are *not* attested to,
+> 
+> Why?
 
-So without me actually understanding your bit encodings that closely, I
-think the problem is we have to asusme that any transition takes time.
-=46rom the QEMU point of view I think the requirement is when we stop the
-machine (vm_stop_force_state(RUN_STATE_FINISH_MIGRATE) in
-migration_completion) that at the point that call returns (with no
-error) all devices are idle.  That means you need a way to command the
-device to go into the stopped state, and probably another to make sure
-it's got there.
+As counter-intuitive as it sounds, it actually doesn't buy us if the CPUID
+table is part of the PSP attestation report, since:
 
-Now, you could be a *little* more sloppy; you could allow a device carry
-on doing stuff purely with it's own internal state up until the point
-it needs to serialise; but that would have to be strictly internal state
-only - if it can change any other devices state (or issue an interrupt,
-change RAM etc) then you get into ordering issues on the serialisation
-of multiple devices.
+ - the boot stack is attested to, and if the boot stack isn't careful to
+   use the CPUID table at all times, then attesting CPUID table after
+   boot doesn't provide any assurance that the boot wasn't manipulated
+   by CPUID
+ - given the boot stack must take these precautions, guest-specific
+   attestation code is just as capable of attesting the CPUID table
+   contents/values, since it has the same view of the CPUID values that
+   were used during boot.
 
-Dave
+So leaving it to the guest owner to attest it provides some flexibility
+to guest owners to implement it as they see fit, whereas making it part
+of the attestation report means that the guest needs the exact contents
+of the CPUID page for a particular guest configuration so it can be
+incorporated into the measurement they are expecting, which would likely
+require some tooling provided by the cloud vendor, since every different
+guest configuration, or even changes like the ordering in which entries
+are placed in the table, would affect measurement, so it's not something
+that could be easily surmised separately with minimal involvement from a
+cloud vendor.
 
-> Maybe a clarification of the uAPI spec is sufficient to achieve this,
-> ex. !_RUNNING devices may still update their internal state machine
-> based on external access.  Userspace is expected to quiesce all external
-> access prior to initiating the retrieval of the final device state from
-> the data section of the migration region.  Failure to do so may result
-> in inconsistent device state or optionally the device driver may induce
-> a fault if a quiescent state is not maintained.
->=20
-> > Just to be sure,
-> >=20
-> > We refer here to some future functionality support with this extra 4th=
-=20
-> > bit but it doesn't enforce any change in the submitted code, right ?
-> >=20
-> > The below code uses the (state & ~MLX5VF_SUPPORTED_DEVICE_STATES) claus=
-e=20
-> > which fails any usage of a non-supported bit as of this one.
-> >=20
-> > if (old_state =3D=3D VFIO_DEVICE_STATE_ERROR ||
-> >  =A0=A0=A0 =A0=A0=A0 !VFIO_DEVICE_STATE_VALID(state) ||
-> >  =A0=A0=A0 =A0=A0=A0 (state & ~MLX5VF_SUPPORTED_DEVICE_STATES))
-> >  =A0=A0=A0 =A0=A0=A0 return -EINVAL;
->=20
-> Correct, userspace shouldn't be setting any extra bits unless we
-> advertise support, such as via a capability or flag.  Drivers need to
-> continue to sanitize user input to validate yet-to-be-defined bits are
-> not accepted from userspace or else we risk not being able to define
-> them later without breaking userspace.  Thanks,
->=20
-> Alex
->=20
---=20
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+And even if the cloud vendor provided a simple way to export the table
+contents for measurement, can you really trust it? If you have to audit
+individual entries to be sure there's nothing fishy, why not just
+incorporate those checks into the guest owner's attestation flow and
+leave the vendor out of it completely?
 
+So not including it in the measurement meshes well with the overall
+SEV-SNP approach of reducing the cloud vendor's involvement in the
+overall attestation process.
+
+> 
+> > so in theory it can still be manipulated by a malicious hypervisor as
+> > part of the initial SNP_LAUNCH_UPDATE firmware commands that provides
+> > the initial plain-text encoding of the CPUID table that is provided
+> > to the PSP via SNP_LAUNCH_UPDATE. It's also not signed in any way
+> > (apparently there were some security reasons for that decision, though
+> > I don't know the full details).
+> 
+> So this sounds like an unnecessary complication. I'm sure there are
+> reasons to do it this way but my simple thinking would simply want the
+> CPUID page to be read-only and signed so that the guest can trust it
+> unconditionally.
+
+The thing here is that it's not just a specific CPUID page that's valid
+for all guests for a particular host. Booting a guest with additional
+vCPUs changes the contents, different CPU models/flags changes the
+contents, etc. So it needs to be generated for each specific guest
+configuration, and can't just be a read-only page.
+
+Some sort of signature that indicates the PSP's stamp of approval on a
+particular CPUID page would be nice, but we do sort of have this in the
+sense that CPUID page 'address' is part of measurement, and can only
+contain values that were blessed by the PSP. The problem then becomes
+ensuring that only that address it used for CPUID lookups, and that it's
+contents weren't manipulated in a way where it's 'valid' as far as the
+PSP is concerned, but still not the 'expected' values for a particular
+guest (which is where the attestation mentioned above would come into
+play).
+
+> 
+> > [A guest owner can still validate their CPUID values against known good
+> > ones as part of their attestation flow, but that is not part of the
+> > attestation report as reported by SNP firmware. (So long as there is some
+> > care taken to ensure the source of the CPUID values visible to
+> > userspace/guest attestion process are the same as what was used by the boot
+> > stack: i.e. EFI/bootloader/kernel all use the CPUID page at that same
+> > initial address, or in cases where a copy is used, that copy is placed in
+> > encrypted/private/validated guest memory so it can't be tampered with during
+> > boot.]
+> 
+> This sounds like the good practices advice to guest owners would be,
+> "Hey, I just booted your SNP guest but for full trust, you should go and
+> verify the CPUID page's contents."
+> 
+> "And if I were you, I wouldn't want to run any verification of CPUID
+> pages' contents on the same guest because it itself hasn't been verified
+> yet."
+> 
+> It all sounds weird.
+
+Yes, understandably so. But the only way to avoid that sort of weirdness
+in general is for *all* guest state to be measured, all pages, all
+registers, etc. Baking that directly into the SEV-SNP attestation report
+would be a non-starter for most since computing the measurement for all
+that state independently would require lots of additional inputs from
+cloud vendor (who we don't necessarily trust in the first place), and
+constant updates of measurement values since they would change with
+every guest configuration change, every different starting TSC offset,
+different, maybe the order in which vCPUs were onlined, stuff that the
+kernel prints to log buffers, etc.
+
+But, if a guest owner wants to attempt clever ways to account for some/all
+of that in their attestation flow, they are welcome to try. That's sort of
+the idea behind SNP attestation vs. SEV. Things like page
+validation/encryption, cpuid enforcement, etc., reduce some of the
+variables/possibilities guest owners need to account for during attestation
+to make the process more secure/tenable, but they don't rule out all
+possibilities, just as Trusted Boot doesn't necessarily mean you can fully
+trust your OS state immediately afer boot; there are still outside
+influences at play, and the boot stack should guard against them
+wherever possible.
+
+> 
+> > So, while it's more difficult to do, and the scope of influence is reduced,
+> > there are still some games that can be played to mess with boot via
+> > manipulation of the initial CPUID table values, so long as they are within
+> > the constraints set by the CPUID enforcement policy defined in the PPR.
+> > 
+> > Unfortunately, the presence of the SEV/SEV-ES/SEV-SNP bits in 0x8000001F,
+> > EAX, are not enforced by PSP. The only thing enforced there is that the
+> > hypervisor cannot advertise bits that aren't supported by hardware. So
+> > no matter how much the boot stack is trusted, the CPUID table does not
+> > inherit that trust, and even values that we *know* should be true should be
+> > verified rather than assumed.
+> > 
+> > But I think there are a couple approaches for verifying this is an SNP
+> > guest that are robust against this sort of scenario. You've touched on
+> > some of them in your other replies, so I'll respond there.
+> 
+> Yah, I guess the kernel can do good enough verification and then the
+> full thing needs to be done by the guest owner and in *some* userspace
+> - not necessarily on the currently booted, unverified guest - but
+> somewhere, where you have maximal flexibility.
+
+Exactly, moving attestation into the guest allows for more of the these
+unexpected states to be accounted for at whatever level of paranoia a guest
+owner sees fit, while still allowing firmware to provide some basic
+assurances via attestation report and various features to reduce common
+attack vectors during/after boot.
+
+> 
+> IMHO.
+> 
+> -- 
+> Regards/Gruss,
+>     Boris.
+> 
+> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fpeople.kernel.org%2Ftglx%2Fnotes-about-netiquette&amp;data=04%7C01%7CMichael.Roth%40amd.com%7Cd9f9c20a37ce4a4b0e0608d997a72f6a%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637707566641580997%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C1000&amp;sdata=OmfuUZfcf3bkC%2FmSsiInQ1vScK5Onu1lHWAUH3o%2FUmE%3D&amp;reserved=0
