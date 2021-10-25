@@ -2,140 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EA15B438F39
-	for <lists+kvm@lfdr.de>; Mon, 25 Oct 2021 08:15:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AEB4A43900F
+	for <lists+kvm@lfdr.de>; Mon, 25 Oct 2021 09:08:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230270AbhJYGSP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Oct 2021 02:18:15 -0400
-Received: from mail.kernel.org ([198.145.29.99]:41618 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229841AbhJYGSO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Oct 2021 02:18:14 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 3C87160C4B;
-        Mon, 25 Oct 2021 06:15:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1635142552;
-        bh=u9RFlgxwvggAHpp7I4+HRdZrg6XEuwYHqHQWNGfxSN0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=QcD21YYGVBBXK0h72/zv5Qxuw9Yl0WUj3Wnm092zX6gBExTHPK8PxzzU9Yu00Ln09
-         epbz6ZBrDNhM4Wk82l6Vd7RDb59BnHIYiaGAcz/Ijwa0t5okU981n6iDmwMCyVJeur
-         W855A2NWAW9yAO4gGBSoAz8A6OMUMPoRDK3igEww=
-Date:   Mon, 25 Oct 2021 08:15:41 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Frank Rowand <frowand.list@gmail.com>
-Cc:     Patrick Williams <patrick@stwcx.xyz>,
-        Zev Weiss <zev@bewilderbeest.net>, kvm@vger.kernel.org,
-        "Rafael J. Wysocki" <rafael@kernel.org>,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Jeremy Kerr <jk@codeconstruct.com.au>,
-        Rajat Jain <rajatja@google.com>,
-        Jianxiong Gao <jxgao@google.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Saravana Kannan <saravanak@google.com>,
-        Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-        openbmc@lists.ozlabs.org, devicetree@vger.kernel.org,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Bhaskar Chowdhury <unixbhaskar@gmail.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Andrew Jeffery <andrew@aj.id.au>,
-        Cornelia Huck <cohuck@redhat.com>,
-        linux-kernel@vger.kernel.org, Vinod Koul <vkoul@kernel.org>,
-        dmaengine@vger.kernel.org
-Subject: Re: [PATCH 4/5] driver core: inhibit automatic driver binding on
- reserved devices
-Message-ID: <YXZLjTvGevAXcidW@kroah.com>
-References: <20211022020032.26980-1-zev@bewilderbeest.net>
- <20211022020032.26980-5-zev@bewilderbeest.net>
- <YXJeYCFJ5DnBB63R@kroah.com>
- <YXJ3IPPkoLxqXiD3@hatter.bewilderbeest.net>
- <YXJ88eARBE3vU1aA@kroah.com>
- <YXLWMyleiTFDDZgm@heinlein>
- <YXPOSZPA41f+EUvM@kroah.com>
- <627101ee-7414-57d1-9952-6e023b8db317@gmail.com>
+        id S231250AbhJYHK4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Oct 2021 03:10:56 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:9434 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230305AbhJYHKx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 25 Oct 2021 03:10:53 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19P3WMk5017680;
+        Mon, 25 Oct 2021 03:08:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=k2ChBLW25Iimg7zHT6ky7uJ4CkJ459lBXNUHjlhewDM=;
+ b=CQ6QsWE1VR8M0c2Q0VAPROEMg4t1iY/PhAgJV4aqEFRBZyJ/NkJDpaxPtSga9o9/xM8b
+ hNL0mdeuzk/33jLu0yUBZgGZ8PJ2iJNTFOyThq50nHoNq9LmJd/hv5isKvzGRVao3Jk9
+ j5e7nxXuYmxnsOZVr24JGjqkQj5L8LiBtvlOpKHJaURxjH1n/M7LJRB1856X52QvMgAe
+ js5fS+xdOd2Bf6yPsbFse+OIY7CQB9l2Q4weayKUpqqkja/uQVhPtJ5OXUGOO1lWyhGX
+ ygYRqvzuU6Diarh9XFhGKvz2gPKNeuCRvVcx+/RhIO/5+obNgDJ2cbo0IsZ8dr+YeVmU 6g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bvydftueh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 25 Oct 2021 03:08:30 -0400
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19P6fVOI025330;
+        Mon, 25 Oct 2021 03:08:30 -0400
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bvydftudu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 25 Oct 2021 03:08:30 -0400
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19P72fiR001480;
+        Mon, 25 Oct 2021 07:08:28 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma05fra.de.ibm.com with ESMTP id 3bva199af2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 25 Oct 2021 07:08:27 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19P78O813932900
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 25 Oct 2021 07:08:24 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4103311C064;
+        Mon, 25 Oct 2021 07:08:24 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9747E11C04A;
+        Mon, 25 Oct 2021 07:08:23 +0000 (GMT)
+Received: from li-43c5434c-23b8-11b2-a85c-c4958fb47a68.ibm.com (unknown [9.171.42.28])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 25 Oct 2021 07:08:23 +0000 (GMT)
+Subject: Re: [PATCH] KVM: s390: Fix handle_sske page fault handling
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20211022112913.211986-1-scgl@linux.ibm.com>
+ <723441ee-2744-32c3-1820-3307bf98fce5@de.ibm.com>
+ <20211022152648.26536-1-scgl@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <4c81140a-add0-8593-7941-55822b45df3c@de.ibm.com>
+Date:   Mon, 25 Oct 2021 09:08:23 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <627101ee-7414-57d1-9952-6e023b8db317@gmail.com>
+In-Reply-To: <20211022152648.26536-1-scgl@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: vUmC-TwrnLUkF7psBH1hOR4gBfGF5Vpw
+X-Proofpoint-GUID: 7Qs5CkG2AkM0G92wxwHVaDib-x4M2Qte
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
+ definitions=2021-10-25_02,2021-10-25_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
+ spamscore=0 phishscore=0 suspectscore=0 lowpriorityscore=0
+ priorityscore=1501 mlxscore=0 malwarescore=0 impostorscore=0 adultscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2109230001 definitions=main-2110250040
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 25, 2021 at 12:38:08AM -0500, Frank Rowand wrote:
-> On 10/23/21 3:56 AM, Greg Kroah-Hartman wrote:
-> > On Fri, Oct 22, 2021 at 10:18:11AM -0500, Patrick Williams wrote:
-> >> Hi Greg,
-> >>
-> >> On Fri, Oct 22, 2021 at 10:57:21AM +0200, Greg Kroah-Hartman wrote:
-> >>> On Fri, Oct 22, 2021 at 01:32:32AM -0700, Zev Weiss wrote:
-> >>>> On Thu, Oct 21, 2021 at 11:46:56PM PDT, Greg Kroah-Hartman wrote:
-> >>>>> On Thu, Oct 21, 2021 at 07:00:31PM -0700, Zev Weiss wrote:
-> >>
-> >>>> So we want the kernel to be aware of the device's existence (so that we
-> >>>> *can* bind a driver to it when needed), but we don't want it touching the
-> >>>> device unless we really ask for it.
-> >>>>
-> >>>> Does that help clarify the motivation for wanting this functionality?
-> >>>
-> >>> Sure, then just do this type of thing in the driver itself.  Do not have
-> >>> any matching "ids" for this hardware it so that the bus will never call
-> >>> the probe function for this hardware _until_ a manual write happens to
-> >>> the driver's "bind" sysfs file.
-> >>
-> >> It sounds like you're suggesting a change to one particular driver to satisfy
-> >> this one particular case (and maybe I'm just not understanding your suggestion).
-> >> For a BMC, this is a pretty regular situation and not just as one-off as Zev's
-> >> example.
-> >>
-> >> Another good example is where a system can have optional riser cards with a
-> >> whole tree of devices that might be on that riser card (and there might be
-> >> different variants of a riser card that could go in the same slot).  Usually
-> >> there is an EEPROM of some sort at a well-known address that can be parsed to
-> >> identify which kind of riser card it is and then the appropriate sub-devices can
-> >> be enumerated.  That EEPROM parsing is something that is currently done in
-> >> userspace due to the complexity and often vendor-specific nature of it.
-> >>
-> >> Many of these devices require quite a bit more configuration information than
-> >> can be passed along a `bind` call.  I believe it has been suggested previously
-> >> that this riser-card scenario could also be solved with dynamic loading of DT
-> >> snippets, but that support seems simple pretty far from being merged.
-> > 
-> > Then work to get the DT code merged!  Do not try to create
-> > yet-another-way of doing things here if DT overlays is the correct
-> > solution here (and it seems like it is.)
+Am 22.10.21 um 17:26 schrieb Janis Schoetterl-Glausch:
+> On Fri, Oct 22, 2021 at 02:00:13PM +0200, Christian Borntraeger wrote:
+>> Am 22.10.21 um 13:29 schrieb Janis Schoetterl-Glausch:
+>>> Retry if fixup_user_fault succeeds.
+>>
+>> Maybe rephrase that with a more verbose description (e.g. if fixup_user_fault succeeds
+>> we return EAGAIN and thus we ust retry the loop and  blabla....)
+>>
+> Done
 > 
-> I don't think this is a case that fits the overlay model.
+> [...]
+> -- >8 --
+> Subject: [PATCH v2] KVM: s390: Fix handle_sske page fault handling
 > 
-> We know what the description of the device is (which is what devicetree
-> is all about), but the device is to be shared between the Linux kernel
-> and some other entity, such as the firmware or another OS.  The issue
-> to be resolved is how to describe that the device is to be shared (in
-> this case exclusively by the kernel _or_ by the other entity at any
-> given moment), and how to move ownership of the device between the
-> Linux kernel and the other entity.
+> If handle_sske cannot set the storage key, because there is no
+> page table entry or no present large page entry, it calls
+> fixup_user_fault.
+> However, currently, if the call succeeds, handle_sske returns
+> -EAGAIN, without having set the storage key.
+> Instead, retry by continue'ing the loop without incrementing the
+> address.
+> The same issue in handle_pfmf was fixed by
+> a11bdb1a6b78 (KVM: s390: Fix pfmf and conditional skey emulation).
 > 
-> In the scenario presented by Zev, it is suggested that a user space
-> agent will be involved in deciding which entity owns the device and
-> to tell the Linux kernel when to take ownership of the device (and
-> presumably when to relinquish ownership, although we haven't seen
-> the implementation of relinquishing ownership yet).  One could
-> imagine direct communication between the driver and the other
-> entity to mediate ownership.  That seems like a driver specific
-> defined choice to me, though if there are enough different drivers
-> facing this situation then eventually a shared framework would
-> make sense.
+> Fixes: bd096f644319 ("KVM: s390: Add skey emulation fault handling")
+> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> ---
+>   arch/s390/kvm/priv.c | 2 ++
+>   1 file changed, 2 insertions(+)
+> 
+> diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
+> index 53da4ceb16a3..417154b314a6 100644
+> --- a/arch/s390/kvm/priv.c
+> +++ b/arch/s390/kvm/priv.c
+> @@ -397,6 +397,8 @@ static int handle_sske(struct kvm_vcpu *vcpu)
+>   		mmap_read_unlock(current->mm);
+>   		if (rc == -EFAULT)
+>   			return kvm_s390_inject_program_int(vcpu, PGM_ADDRESSING);
+> +		if (rc == -EAGAIN)
+> +			continue;
+>   		if (rc < 0)
+>   			return rc;
+>   		start += PAGE_SIZE;
+> 
 
-We have the bind/unbind ability today, from userspace, that can control
-this.  Why not just have Linux grab the device when it boots, and then
-when userspace wants to "give the device up", it writes to "unbind" in
-sysfs, and then when all is done, it writes to the "bind" file and then
-Linux takes back over.
-
-Unless for some reason Linux should _not_ grab the device when booting,
-then things get messier, as we have seen in this thread.
-
-thanks,
-
-greg k-h
+thanks applied.
