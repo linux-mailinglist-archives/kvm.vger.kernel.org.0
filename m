@@ -2,236 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 14CA743AAA2
-	for <lists+kvm@lfdr.de>; Tue, 26 Oct 2021 05:12:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 05EA543AAAA
+	for <lists+kvm@lfdr.de>; Tue, 26 Oct 2021 05:14:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234545AbhJZDPR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Oct 2021 23:15:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44344 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233243AbhJZDPQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Oct 2021 23:15:16 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6055BC061745
-        for <kvm@vger.kernel.org>; Mon, 25 Oct 2021 20:12:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=MIME-Version:Content-Type:Date:Cc:To:
-        From:Subject:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=adApSZdYFI7D6gASGouAH73cZexc2o75mkLavqOrHkQ=; b=g42hwq1mOHXt7kCfDuGsgnHQsW
-        66z3Ya4nvKM2DGSLi8Yx8ipKCv/F+MQ41MQqGC1h0Vb7VD1xH3GPxR/bbOZRuHfS/D/D1BMWuZtgb
-        TObxP0vSFsMTOOwKajlZygehL0X2Xta0DVT11pRliG9/Fs3lqTRqz+DTq/Had5+ayKd5mbge5cQAN
-        eEyPK4NBJDGqEtm7sTow1C2+9rnwDsgvU5XE2Zbi3uLgyDWSKGHtkZIYiXzeY0K0oING4V/nCf3Ih
-        LEbIEt6ALhYJrUmIf++CquNAWsTMhbO3gcBm9vPcwQMBzgIoae27/i8jMU7dPvIL+wj8r38Mkv3pO
-        p9H0mn/w==;
-Received: from [2001:8b0:10b:1::3ae] (helo=u3832b3a9db3152.ant.amazon.com)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mfCtF-000WGx-Dd; Tue, 26 Oct 2021 03:12:41 +0000
-Message-ID: <606aaaf29fca3850a63aa4499826104e77a72346.camel@infradead.org>
-Subject: [PATCH] KVM: x86: Take srcu lock in post_kvm_run_save()
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     kvm <kvm@vger.kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        id S233577AbhJZDRT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Oct 2021 23:17:19 -0400
+Received: from mga06.intel.com ([134.134.136.31]:56614 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232702AbhJZDRS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Oct 2021 23:17:18 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10148"; a="290647681"
+X-IronPort-AV: E=Sophos;i="5.87,182,1631602800"; 
+   d="scan'208";a="290647681"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2021 20:14:55 -0700
+X-IronPort-AV: E=Sophos;i="5.87,182,1631602800"; 
+   d="scan'208";a="497101919"
+Received: from cqiang-mobl.ccr.corp.intel.com (HELO [10.238.2.71]) ([10.238.2.71])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2021 20:14:52 -0700
+Message-ID: <ce42bf75-7c19-e1e2-80e3-e7729d9beab9@intel.com>
+Date:   Tue, 26 Oct 2021 11:14:50 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.2.1
+Subject: Re: [PATCH v5 0/7] KVM: PKS Virtualization support
+Content-Language: en-US
+To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, mtosatti <mtosatti@redhat.com>
-Date:   Tue, 26 Oct 2021 04:12:38 +0100
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-OmkgNCmq8NVRoUR5zKCU"
-User-Agent: Evolution 3.36.5-0ubuntu1 
-MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+        Joerg Roedel <joro@8bytes.org>,
+        Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210811101126.8973-1-chenyi.qiang@intel.com>
+ <6ccc8ee5-264b-8341-0af7-bbc6731e93a8@redhat.com>
+From:   Chenyi Qiang <chenyi.qiang@intel.com>
+In-Reply-To: <6ccc8ee5-264b-8341-0af7-bbc6731e93a8@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-OmkgNCmq8NVRoUR5zKCU
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-From: David Woodhouse <dwmw@amazon.co.uk>
+On 10/25/2021 11:12 PM, Paolo Bonzini wrote:
+> On 11/08/21 12:11, Chenyi Qiang wrote:
+>> This patch series is based on top of kernel patchset:
+>> https://lore.kernel.org/lkml/20210804043231.2655537-1-ira.weiny@intel.com/ 
+>>
+>>
+>> To help patches review, one missing info in SDM is that PKSR will be
+>> cleared on Powerup/INIT/RESET, which should be listed in Table 9.1
+>> "IA-32 and Intel 64 Processor States Following Power-up, Reset, or INIT"
+>>
+>> ---
+>>
+>> Protection Keys for Supervisor Pages(PKS) is a feature that extends the
+>> Protection Keys architecture to support thread-specific permission
+>> restrictions on supervisor pages.
+>>
+>> PKS works similar to an existing feature named PKU(protecting user 
+>> pages).
+>> They both perform an additional check after normal paging permission
+>> checks are done. Access or Writes can be disabled via a MSR update
+>> without TLB flushes when permissions changes. If violating this
+>> addional check, #PF occurs and PFEC.PK bit will be set.
+>>
+>> PKS introduces MSR IA32_PKRS to manage supervisor protection key
+>> rights. The MSR contains 16 pairs of ADi and WDi bits. Each pair
+>> advertises on a group of pages with the same key which is set in the
+>> leaf paging-structure entries(bits[62:59]). Currently, IA32_PKRS is not
+>> supported by XSAVES architecture.
+>>
+>> This patchset aims to add the virtualization of PKS in KVM. It
+>> implemented PKS CPUID enumeration, vmentry/vmexit configuration, MSR
+>> exposure, nested supported etc. Currently, PKS is not yet supported for
+>> shadow paging.
+>>
+>> Detailed information about PKS can be found in the latest Intel 64 and
+>> IA-32 Architectures Software Developer's Manual.
+> 
+> Hi Chenyi,
+> 
+> pkrs_cache does not yet exist in Linux 5.15.  What is the state of the 
+> bare-metal support for PKS?
+> 
+> Thanks,
+> 
+> Paolo
+> 
 
-The Xen interrupt injection for event channels relies on accessing the
-guest's vcpu_info structure in __kvm_xen_has_interrupt(), through a
-gfn_to_hva_cache.
+Hi Paolo,
 
-This requires the srcu lock to be held, which is mostly the case except
-for this code path:
+The latest version is still at
+https://lore.kernel.org/lkml/20210804043231.2655537-1-ira.weiny@intel.com/
 
-[   11.822877] WARNING: suspicious RCU usage
-[   11.822965] -----------------------------
-[   11.823013] include/linux/kvm_host.h:664 suspicious rcu_dereference_chec=
-k() usage!
-[   11.823131]
-[   11.823131] other info that might help us debug this:
-[   11.823131]
-[   11.823196]
-[   11.823196] rcu_scheduler_active =3D 2, debug_locks =3D 1
-[   11.823253] 1 lock held by dom:0/90:
-[   11.823292]  #0: ffff998956ec8118 (&vcpu->mutex){+.+.}, at: kvm_vcpu_ioc=
-tl+0x85/0x680
-[   11.823379]
-[   11.823379] stack backtrace:
-[   11.823428] CPU: 2 PID: 90 Comm: dom:0 Kdump: loaded Not tainted 5.4.34+=
- #5
-[   11.823496] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel=
--1.12.1-0-ga5cab58e9a3f-prebuilt.qemu.org 04/01/2014
-[   11.823612] Call Trace:
-[   11.823645]  dump_stack+0x7a/0xa5
-[   11.823681]  lockdep_rcu_suspicious+0xc5/0x100
-[   11.823726]  __kvm_xen_has_interrupt+0x179/0x190
-[   11.823773]  kvm_cpu_has_extint+0x6d/0x90
-[   11.823813]  kvm_cpu_accept_dm_intr+0xd/0x40
-[   11.823853]  kvm_vcpu_ready_for_interrupt_injection+0x20/0x30
-              < post_kvm_run_save() inlined here >
-[   11.823906]  kvm_arch_vcpu_ioctl_run+0x135/0x6a0
-[   11.823947]  kvm_vcpu_ioctl+0x263/0x680
+Ira is working on the next version but doesn't have concrete schedule.
 
-Fixes: 40da8ccd724f ("KVM: x86/xen: Add event channel interrupt vector upca=
-ll")
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
----
+Thanks
+Chenyi
 
-There are potentially other ways of doing this, by shuffling the tail
-of kvm_arch_vcpu_ioctl_run() around a little and holding the lock once
-there instead of taking it within vcpu_run(). But the call to
-post_kvm_run_save() occurs even on the error paths, and it gets complex
-to untangle. This is the simple approach.
-
-This doesn't show up when I enable event channel delivery in
-xen_shinfo_test because we have pic_in_kernel() there. I'll fix the
-tests not to hardcode that, as I expand the event channel support and
-add more testing of it.
-
- arch/x86/kvm/x86.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index f0874c3d12ce..cd42d58008f7 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -8783,9 +8783,17 @@ static void post_kvm_run_save(struct kvm_vcpu *vcpu)
-=20
- 	kvm_run->cr8 =3D kvm_get_cr8(vcpu);
- 	kvm_run->apic_base =3D kvm_get_apic_base(vcpu);
-+
-+	/*
-+	 * The call to kvm_ready_for_interrupt_injection() may end up in
-+	 * kvm_xen_has_interrupt() which may require the srcu lock to be
-+	 * held to protect against changes in the vcpu_info address.
-+	 */
-+	vcpu->srcu_idx =3D srcu_read_lock(&vcpu->kvm->srcu);
- 	kvm_run->ready_for_interrupt_injection =3D
- 		pic_in_kernel(vcpu->kvm) ||
- 		kvm_vcpu_ready_for_interrupt_injection(vcpu);
-+	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
-=20
- 	if (is_smm(vcpu))
- 		kvm_run->flags |=3D KVM_RUN_X86_SMM;
---=20
-2.25.1
-
-
---=-OmkgNCmq8NVRoUR5zKCU
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCECow
-ggUcMIIEBKADAgECAhEA4rtJSHkq7AnpxKUY8ZlYZjANBgkqhkiG9w0BAQsFADCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTkwMTAyMDAwMDAwWhcNMjIwMTAxMjM1
-OTU5WjAkMSIwIAYJKoZIhvcNAQkBFhNkd213MkBpbmZyYWRlYWQub3JnMIIBIjANBgkqhkiG9w0B
-AQEFAAOCAQ8AMIIBCgKCAQEAsv3wObLTCbUA7GJqKj9vHGf+Fa+tpkO+ZRVve9EpNsMsfXhvFpb8
-RgL8vD+L133wK6csYoDU7zKiAo92FMUWaY1Hy6HqvVr9oevfTV3xhB5rQO1RHJoAfkvhy+wpjo7Q
-cXuzkOpibq2YurVStHAiGqAOMGMXhcVGqPuGhcVcVzVUjsvEzAV9Po9K2rpZ52FE4rDkpDK1pBK+
-uOAyOkgIg/cD8Kugav5tyapydeWMZRJQH1vMQ6OVT24CyAn2yXm2NgTQMS1mpzStP2ioPtTnszIQ
-Ih7ASVzhV6csHb8Yrkx8mgllOyrt9Y2kWRRJFm/FPRNEurOeNV6lnYAXOymVJwIDAQABo4IB0zCC
-Ac8wHwYDVR0jBBgwFoAUgq9sjPjF/pZhfOgfPStxSF7Ei8AwHQYDVR0OBBYEFLfuNf820LvaT4AK
-xrGK3EKx1DE7MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUF
-BwMEBggrBgEFBQcDAjBGBgNVHSAEPzA9MDsGDCsGAQQBsjEBAgEDBTArMCkGCCsGAQUFBwIBFh1o
-dHRwczovL3NlY3VyZS5jb21vZG8ubmV0L0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3Js
-LmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWls
-Q0EuY3JsMIGLBggrBgEFBQcBAQR/MH0wVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuY29tb2RvY2Eu
-Y29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYI
-KwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmNvbW9kb2NhLmNvbTAeBgNVHREEFzAVgRNkd213MkBpbmZy
-YWRlYWQub3JnMA0GCSqGSIb3DQEBCwUAA4IBAQALbSykFusvvVkSIWttcEeifOGGKs7Wx2f5f45b
-nv2ghcxK5URjUvCnJhg+soxOMoQLG6+nbhzzb2rLTdRVGbvjZH0fOOzq0LShq0EXsqnJbbuwJhK+
-PnBtqX5O23PMHutP1l88AtVN+Rb72oSvnD+dK6708JqqUx2MAFLMevrhJRXLjKb2Mm+/8XBpEw+B
-7DisN4TMlLB/d55WnT9UPNHmQ+3KFL7QrTO8hYExkU849g58Dn3Nw3oCbMUgny81ocrLlB2Z5fFG
-Qu1AdNiBA+kg/UxzyJZpFbKfCITd5yX49bOriL692aMVDyqUvh8fP+T99PqorH4cIJP6OxSTdxKM
-MIIFHDCCBASgAwIBAgIRAOK7SUh5KuwJ6cSlGPGZWGYwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTE5MDEwMjAwMDAwMFoXDTIyMDEwMTIz
-NTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCASIwDQYJKoZIhvcN
-AQEBBQADggEPADCCAQoCggEBALL98Dmy0wm1AOxiaio/bxxn/hWvraZDvmUVb3vRKTbDLH14bxaW
-/EYC/Lw/i9d98CunLGKA1O8yogKPdhTFFmmNR8uh6r1a/aHr301d8YQea0DtURyaAH5L4cvsKY6O
-0HF7s5DqYm6tmLq1UrRwIhqgDjBjF4XFRqj7hoXFXFc1VI7LxMwFfT6PStq6WedhROKw5KQytaQS
-vrjgMjpICIP3A/CroGr+bcmqcnXljGUSUB9bzEOjlU9uAsgJ9sl5tjYE0DEtZqc0rT9oqD7U57My
-ECIewElc4VenLB2/GK5MfJoJZTsq7fWNpFkUSRZvxT0TRLqznjVepZ2AFzsplScCAwEAAaOCAdMw
-ggHPMB8GA1UdIwQYMBaAFIKvbIz4xf6WYXzoHz0rcUhexIvAMB0GA1UdDgQWBBS37jX/NtC72k+A
-CsaxitxCsdQxOzAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEF
-BQcDBAYIKwYBBQUHAwIwRgYDVR0gBD8wPTA7BgwrBgEEAbIxAQIBAwUwKzApBggrBgEFBQcCARYd
-aHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9DUFMwWgYDVR0fBFMwUTBPoE2gS4ZJaHR0cDovL2Ny
-bC5jb21vZG9jYS5jb20vQ09NT0RPUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFp
-bENBLmNybDCBiwYIKwYBBQUHAQEEfzB9MFUGCCsGAQUFBzAChklodHRwOi8vY3J0LmNvbW9kb2Nh
-LmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3J0MCQG
-CCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAC20spBbrL71ZEiFrbXBHonzhhirO1sdn+X+O
-W579oIXMSuVEY1LwpyYYPrKMTjKECxuvp24c829qy03UVRm742R9Hzjs6tC0oatBF7KpyW27sCYS
-vj5wbal+TttzzB7rT9ZfPALVTfkW+9qEr5w/nSuu9PCaqlMdjABSzHr64SUVy4ym9jJvv/FwaRMP
-gew4rDeEzJSwf3eeVp0/VDzR5kPtyhS+0K0zvIWBMZFPOPYOfA59zcN6AmzFIJ8vNaHKy5QdmeXx
-RkLtQHTYgQPpIP1Mc8iWaRWynwiE3ecl+PWzq4i+vdmjFQ8qlL4fHz/k/fT6qKx+HCCT+jsUk3cS
-jDCCBeYwggPOoAMCAQICEGqb4Tg7/ytrnwHV2binUlYwDQYJKoZIhvcNAQEMBQAwgYUxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMSswKQYDVQQDEyJDT01PRE8gUlNBIENlcnRpZmljYXRp
-b24gQXV0aG9yaXR5MB4XDTEzMDExMDAwMDAwMFoXDTI4MDEwOTIzNTk1OVowgZcxCzAJBgNVBAYT
-AkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNV
-BAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAvrOeV6wodnVAFsc4A5jTxhh2IVDzJXkLTLWg0X06WD6cpzEup/Y0dtmEatrQPTRI5Or1u6zf
-+bGBSyD9aH95dDSmeny1nxdlYCeXIoymMv6pQHJGNcIDpFDIMypVpVSRsivlJTRENf+RKwrB6vcf
-WlP8dSsE3Rfywq09N0ZfxcBa39V0wsGtkGWC+eQKiz4pBZYKjrc5NOpG9qrxpZxyb4o4yNNwTqza
-aPpGRqXB7IMjtf7tTmU2jqPMLxFNe1VXj9XB1rHvbRikw8lBoNoSWY66nJN/VCJv5ym6Q0mdCbDK
-CMPybTjoNCQuelc0IAaO4nLUXk0BOSxSxt8kCvsUtQIDAQABo4IBPDCCATgwHwYDVR0jBBgwFoAU
-u69+Aj36pvE8hI6t7jiY7NkyMtQwHQYDVR0OBBYEFIKvbIz4xf6WYXzoHz0rcUhexIvAMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMBEGA1UdIAQKMAgwBgYEVR0gADBMBgNVHR8E
-RTBDMEGgP6A9hjtodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDZXJ0aWZpY2F0aW9u
-QXV0aG9yaXR5LmNybDBxBggrBgEFBQcBAQRlMGMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9jcnQuY29t
-b2RvY2EuY29tL0NPTU9ET1JTQUFkZFRydXN0Q0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2Nz
-cC5jb21vZG9jYS5jb20wDQYJKoZIhvcNAQEMBQADggIBAHhcsoEoNE887l9Wzp+XVuyPomsX9vP2
-SQgG1NgvNc3fQP7TcePo7EIMERoh42awGGsma65u/ITse2hKZHzT0CBxhuhb6txM1n/y78e/4ZOs
-0j8CGpfb+SJA3GaBQ+394k+z3ZByWPQedXLL1OdK8aRINTsjk/H5Ns77zwbjOKkDamxlpZ4TKSDM
-KVmU/PUWNMKSTvtlenlxBhh7ETrN543j/Q6qqgCWgWuMAXijnRglp9fyadqGOncjZjaaSOGTTFB+
-E2pvOUtY+hPebuPtTbq7vODqzCM6ryEhNhzf+enm0zlpXK7q332nXttNtjv7VFNYG+I31gnMrwfH
-M5tdhYF/8v5UY5g2xANPECTQdu9vWPoqNSGDt87b3gXb1AiGGaI06vzgkejL580ul+9hz9D0S0U4
-jkhJiA7EuTecP/CFtR72uYRBcunwwH3fciPjviDDAI9SnC/2aPY8ydehzuZutLbZdRJ5PDEJM/1t
-yZR2niOYihZ+FCbtf3D9mB12D4ln9icgc7CwaxpNSCPt8i/GqK2HsOgkL3VYnwtx7cJUmpvVdZ4o
-gnzgXtgtdk3ShrtOS1iAN2ZBXFiRmjVzmehoMof06r1xub+85hFQzVxZx5/bRaTKTlL8YXLI8nAb
-R9HWdFqzcOoB/hxfEyIQpx9/s81rgzdEZOofSlZHynoSMYIDyjCCA8YCAQEwga0wgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
-ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjEx
-MDI2MDMxMjM4WjAvBgkqhkiG9w0BCQQxIgQgszUzmd6duOWq9/jGmVM9wT+nbtZk9Jj2vLfu9qGf
-WCQwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
-TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
-PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
-aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBAHdHcCbMVdWVVlYytGfoYo4QeIqg9TqIzROQKmMtCOdIR6631AdpcbdosQNd/gsx
-iLshM4jAdxdLwE6/WnNaaQKhLZvAX44S+eLFlqpVlM11o+i+T6+eAirgH3oF3j7yBa8++BVQQyXK
-uuzfRSeYLcXFFyncX1LwpbavFgo4XOIaWA4Z/5yCBn3csctVmkdn3PTeX6tSO98LSpEqTrkSWR3/
-nPSVw6/8f9ZkeMQNLlZj2WMKPo+Xf7yyo3RotixwjWxOQFVKyIkC9XUapW0s33ah7Of0k2aG2sZH
-qJ/iAoFbHmLicBsbFJozvT43ekyBMmGCEcbZNuwYn1xFyS6ucPYAAAAAAAA=
-
-
---=-OmkgNCmq8NVRoUR5zKCU--
-
+>>
+>> ---
+>>
+>> Changelogs:
+>>
+>> v4->v5
+>> - Make setting of MSR intercept/vmcs control bits not dependent on 
+>> guest.CR4.PKS.
+>>    And set them if PKS is exposed to guest. (Suggested by Sean)
+>> - Add pkrs to standard register caching mechanism to help update
+>>    vcpu->arch.pkrs on demand. Add related helper functions. (Suggested 
+>> by Sean)
+>> - Do the real pkrs update in VMCS field in vmx_vcpu_reset and
+>>    vmx_sync_vmcs_host_state(). (Sean)
+>> - Add a new mmu_role cr4_pks instead of smushing PKU and PKS together.
+>>    (Sean & Paolo)
+>> - v4: 
+>> https://lore.kernel.org/lkml/20210205083706.14146-1-chenyi.qiang@intel.com/ 
+>>
+>>
+>> v3->v4
+>> - Make the MSR intercept and load-controls setting depend on CR4.PKS 
+>> value
+>> - shadow the guest pkrs and make it usable in PKS emultion
+>> - add the cr4_pke and cr4_pks check in pkr_mask update
+>> - squash PATCH 2 and PATCH 5 to make the dependencies read more clear
+>> - v3: 
+>> https://lore.kernel.org/lkml/20201105081805.5674-1-chenyi.qiang@intel.com/ 
+>>
+>>
+>> v2->v3:
+>> - No function changes since last submit
+>> - rebase on the latest PKS kernel support:
+>>    
+>> https://lore.kernel.org/lkml/20201102205320.1458656-1-ira.weiny@intel.com/ 
+>>
+>> - add MSR_IA32_PKRS to the vmx_possible_passthrough_msrs[]
+>> - RFC v2: 
+>> https://lore.kernel.org/lkml/20201014021157.18022-1-chenyi.qiang@intel.com/ 
+>>
+>>
+>> v1->v2:
+>> - rebase on the latest PKS kernel support:
+>>    https://github.com/weiny2/linux-kernel/tree/pks-rfc-v3
+>> - add a kvm-unit-tests for PKS
+>> - add the check in kvm_init_msr_list for PKRS
+>> - place the X86_CR4_PKS in mmu_role_bits in kvm_set_cr4
+>> - add the support to expose VM_{ENTRY, EXIT}_LOAD_IA32_PKRS in nested
+>>    VMX MSR
+>> - RFC v1: 
+>> https://lore.kernel.org/lkml/20200807084841.7112-1-chenyi.qiang@intel.com/ 
+>>
+>>
+>> ---
+>>
+>> Chenyi Qiang (7):
+>>    KVM: VMX: Introduce PKS VMCS fields
+>>    KVM: VMX: Add proper cache tracking for PKRS
+>>    KVM: X86: Expose IA32_PKRS MSR
+>>    KVM: MMU: Rename the pkru to pkr
+>>    KVM: MMU: Add support for PKS emulation
+>>    KVM: VMX: Expose PKS to guest
+>>    KVM: VMX: Enable PKS for nested VM
+>>
+>>   arch/x86/include/asm/kvm_host.h | 17 ++++---
+>>   arch/x86/include/asm/vmx.h      |  6 +++
+>>   arch/x86/kvm/cpuid.c            |  2 +-
+>>   arch/x86/kvm/kvm_cache_regs.h   |  7 +++
+>>   arch/x86/kvm/mmu.h              | 25 +++++----
+>>   arch/x86/kvm/mmu/mmu.c          | 68 ++++++++++++++-----------
+>>   arch/x86/kvm/vmx/capabilities.h |  6 +++
+>>   arch/x86/kvm/vmx/nested.c       | 41 ++++++++++++++-
+>>   arch/x86/kvm/vmx/vmcs.h         |  1 +
+>>   arch/x86/kvm/vmx/vmcs12.c       |  2 +
+>>   arch/x86/kvm/vmx/vmcs12.h       |  4 ++
+>>   arch/x86/kvm/vmx/vmx.c          | 89 ++++++++++++++++++++++++++++++---
+>>   arch/x86/kvm/vmx/vmx.h          |  7 ++-
+>>   arch/x86/kvm/x86.c              |  6 ++-
+>>   arch/x86/kvm/x86.h              |  8 +++
+>>   arch/x86/mm/pkeys.c             |  6 +++
+>>   include/linux/pkeys.h           |  5 ++
+>>   17 files changed, 243 insertions(+), 57 deletions(-)
+>>
+> 
