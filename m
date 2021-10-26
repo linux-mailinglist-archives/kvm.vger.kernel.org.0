@@ -2,153 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 675AF43BE25
-	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 01:50:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 98DBF43BE65
+	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 02:15:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236093AbhJZXwc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Oct 2021 19:52:32 -0400
-Received: from mail-bn7nam10on2053.outbound.protection.outlook.com ([40.107.92.53]:8208
-        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S233019AbhJZXwa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Oct 2021 19:52:30 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nyUb37w4W8X8fIiiR5x+EFV5bTaGNVTO9bFyh5knbTY9lRfIpFNoswNNqm8J9N5EHe8xU/Tw3UQD1ecxtfbSDwsqTgsLDEFqqo4RBJZrOUNdsurL1+RkHvJ3YKB6DIS9RKXymR6mogUIDb+igCWXrr4eGoY9+Jl+v7iibDTX+J+lEqhFRyP6YJY39l3uBMyFydMls5tbgwVbgTZ4dU9Ue5NrtqSUfetTUzKJZcX8A+UiF/zIHUuhRBY8sEnWghzAgzrCxerIJ8i3LHCfHiz1QwG3bKh9Z/S/8XK7CuZCi85XWLVWV73nOcHM04eR06CWZnWRTREfsCu+CZXqYY5MuA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Y+YBruSr2rM8CufOmMx83icRANNErh0k1WeV/rTnhe0=;
- b=KGH/mr6s5GbofrvokrzOwLo7wFNV+4NTf6jrp4WIw8p+u6UofAZK6TsZ36Qre9hb/kUlanGbLjwgiaZRsYdLvoza22EZ0mQ4JQ/eLueT7J2hmZdPxZ1ruQRllbTbPeWb695lZl6O98o/bh/g+sBC7bX3FIWhQ5ccJOJyy65MWQ+aiJtSzIu0M2ebm8Ue+E39E7qFeQFyXFOOurHNEKjvMruFZ58T08/yX4H3c2zg+APmApf9QH0nqD8/zizt+xOLxFQKINAoMVSkaRXJgZ8c8r5f7zM9BbJviMBJabZQ/nlFrKDPvxStx9asWITfYpIrpVXEkkjPsw2JAeWYk1W/8g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Y+YBruSr2rM8CufOmMx83icRANNErh0k1WeV/rTnhe0=;
- b=FTJbvu34570XLUoVbONnQ2gFF9m7prVQh/JZmQsSKYOsR9HZRHNftP1ac9ETh8HOIgME6fPHV4ksHiqazs9tbPvB1RcESvgNPyG9NxsWw6OK1BtCwxuKI1dz8HLmZ/tR/IrUmCx7/NxwmqCvYWvQzyJVIAFqufyTs+qQly1jFxKkfH1BoLLBDr93c7zw5HisIDNxVTgu7rkYJJS2KNM8PAwdpJVY9oc3RCwhKI3tDzdml5G3GG48rfJqk6b2Ly8H31S3c0vApKoTiK922iNnE8CHBSDYCCmGxqgXPpqWg06xwQhYd0PfiL4vccovAD6YTJ+UwcKG90iHu+3F3aknuA==
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5080.namprd12.prod.outlook.com (2603:10b6:208:30a::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4628.15; Tue, 26 Oct
- 2021 23:50:04 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95%8]) with mapi id 15.20.4649.014; Tue, 26 Oct 2021
- 23:50:04 +0000
-Date:   Tue, 26 Oct 2021 20:50:02 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
-        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
-        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com
-Subject: Re: [PATCH V4 mlx5-next 13/13] vfio/mlx5: Use its own PCI reset_done
- error handler
-Message-ID: <20211026235002.GC2744544@nvidia.com>
-References: <20211026090605.91646-1-yishaih@nvidia.com>
- <20211026090605.91646-14-yishaih@nvidia.com>
- <20211026171644.41019161.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211026171644.41019161.alex.williamson@redhat.com>
-X-ClientProxiedBy: YT3PR01CA0042.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:82::28) To BL0PR12MB5506.namprd12.prod.outlook.com
- (2603:10b6:208:1cb::22)
+        id S233446AbhJ0ARx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Oct 2021 20:17:53 -0400
+Received: from gandalf.ozlabs.org ([150.107.74.76]:51593 "EHLO
+        gandalf.ozlabs.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231166AbhJ0ARp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Oct 2021 20:17:45 -0400
+Received: by gandalf.ozlabs.org (Postfix, from userid 1007)
+        id 4Hf8N76gFJz4xbt; Wed, 27 Oct 2021 11:15:19 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gibson.dropbear.id.au; s=201602; t=1635293719;
+        bh=dKeVKsGMF2yh/WmFnvSeUwHjMJ9NdhhLGarW1W7UHaM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=O3tFvRmZe2stjsNh610SuRMHbefz50riV1AKZDV2Uc0s3jsive5JQNnaACk8GwOR/
+         zygRbW0flKtrC7nLiDDNB6wcj2AwVb5QnfRQaZhmdUGzEmZB0hiDitdBRgH6JoBMud
+         Tr73DXkaFeMXFBbm8Y69+xUSBDXtCLxD/I4DHCfQ=
+Date:   Tue, 26 Oct 2021 20:23:22 +1100
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "hch@lst.de" <hch@lst.de>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "lkml@metux.net" <lkml@metux.net>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "lushenming@huawei.com" <lushenming@huawei.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "dwmw2@infradead.org" <dwmw2@infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>
+Subject: Re: [RFC 13/20] iommu: Extend iommu_at[de]tach_device() for multiple
+ devices group
+Message-ID: <YXfJCrvtaXHV+qs/@yekko>
+References: <20210919063848.1476776-1-yi.l.liu@intel.com>
+ <20210919063848.1476776-14-yi.l.liu@intel.com>
+ <YWe+88sfCbxgMYPN@yekko>
+ <BN9PR11MB54337A8E65C789D038D875C68CB89@BN9PR11MB5433.namprd11.prod.outlook.com>
+ <YWzwmAQDB9Qwu2uQ@yekko>
+ <20211018163238.GO2744544@nvidia.com>
+ <YXY9UIKDlQpNDGax@yekko>
+ <20211025121410.GQ2744544@nvidia.com>
+ <YXauO+YSR7ivz1QW@yekko>
+ <20211025233602.GN2744544@nvidia.com>
 MIME-Version: 1.0
-Received: from mlx.ziepe.ca (206.223.160.26) by YT3PR01CA0042.CANPRD01.PROD.OUTLOOK.COM (2603:10b6:b01:82::28) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4628.22 via Frontend Transport; Tue, 26 Oct 2021 23:50:03 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mfWCg-002Etz-DL; Tue, 26 Oct 2021 20:50:02 -0300
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 22d74b6d-22b8-4923-5829-08d998db54e7
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5080:
-X-Microsoft-Antispam-PRVS: <BL1PR12MB508040D4244DA0E8E2AAF01BC2849@BL1PR12MB5080.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: WFMCETv21UkQpVJsY3SRiwVSaTKqpPFyim0Z9xEBtwjYwBqEtGIHJ8HReFuWjDfanlDzPFlgUbjOt9XMTb9o2TZNakagIshIr3NGwLhePwZGL7Cxhm5VM+vXDmITAFO+gALiGfxeEIdO2EYxvZIv9gnJZm/a8pSgU0Ib5FJrnStxD1LurN/UUpJJOFBR236HWmobk3zEvIKPy5RFHgQAvy9gTH9go1wOID/cUwHPy0USpxVFkZUoJqm50lcFce+UWi6Jvr/V45pAXgGRmAlUiacIiOeHPBWKBEdXSfi6nFzPiMe9pPwhLQHJgUmtLgg4e/2F3JBqThZGJqRfwAksEhdtwV32a2h6Zx59L4Dep0VUbu5hx7ZWV8NA+O+VFHNXAssL0FAyEu6EtYj96M+aIqgmHCiJ9EECWvCAIOA44KbfpJOYWHRfDXGoUX3FNZHlMWwJM8Hw7aw/ixQd7d67e6WqAQscaIsYW09SBdy3X/OXL8fornx3p4wBnneS2Zl2ta5dM9ggwuQdb1rdP50ZStPnAjFbCPVr1lTmD9LaJbRug8EvxOjSogtTBApkimYR3IBZ/D9X1qANqDBcy52UiVl3NStfWhEyyYQDK0ORMIxk3UJG1ANi/cLGdERyuNhrpz8KczkBnaaUghlhwMTvFg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(6916009)(107886003)(86362001)(8676002)(508600001)(4326008)(1076003)(8936002)(2906002)(186003)(426003)(33656002)(316002)(9786002)(36756003)(66946007)(66476007)(66556008)(2616005)(9746002)(83380400001)(26005)(5660300002)(38100700002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?De5rIEh9SrahvlIKE2TtwknwnTKjvsOovsZ8ZOuBRSckn+ZbCsLyLxnkIwQY?=
- =?us-ascii?Q?16ulW05ZZkeSRG+wCjTRbgo7E0AJGtcauhj0vELGgIZ0XG1h1DA48MtQWpcC?=
- =?us-ascii?Q?G8IZcLBtWnuUZAjiNR5CB/POVECr0yuaCIJcxio/S7PvQCbXbnm26LHvMBz3?=
- =?us-ascii?Q?hHjW6sH3+vcZufSccCgVe5k6eeuRZKT8t0XUmmr6ldOeiNkmmsNeF1RcLp1I?=
- =?us-ascii?Q?yzvNUnrtm1jhGwo4f1EgpKv/1iNiD85CjNtcifg0qdKrsg5eUoanxeQCsck5?=
- =?us-ascii?Q?398qCUEAlpkRekkmYZsuJo9YQ7EiIykF1zMC25GoxmVqv/ly2qWXYFaJP2Ct?=
- =?us-ascii?Q?C/LwJ4cUwoFjfseU2GVP3HXSeX60WdDGFk8Yw8JXbuYTaRjO2Hou6fX9xWsL?=
- =?us-ascii?Q?s9uZZj26zxIhI754+c7tu37ocWn1m9KmRluvwQgLuavgy4WlWqu4csX73nTg?=
- =?us-ascii?Q?OMk5knMFj6oOaYAFaB3GjrkrfRy5HTpTAqXGy3O8DikP3L0O55e+Ud7/ns7o?=
- =?us-ascii?Q?jSbd6D8zghT/0S02Uv2w4OOZRljPqyIk+lEUHXU5AqVS87nlrMlgc/ypBfk4?=
- =?us-ascii?Q?qWr5TVYQVGRoRVb1TVsCDk53oJiuWiPUo0+VzsY7gH1A4Nl3NSgru/+l8nbI?=
- =?us-ascii?Q?RG+/nCqhHtef294xWj2fMyTv9deXgw4CEGXVlxKkAjCWWQYrLb0RPO8YXHRF?=
- =?us-ascii?Q?1GEaNprfyejrufUFIcHycEYX0/AyKf0Qk6SCseLnaO1iqI+wKn/zizAyZOVl?=
- =?us-ascii?Q?oZGlBmo2FAN3qCdgnQAJi+B0HKyzwRsu9VRLf9ZLb+76FOzCX1bWQMf8oLlV?=
- =?us-ascii?Q?IRhLmAZEUTQsUBzGHXJTcWycp9xvt7hHeJ1uLS15WyyTTpajIbdJJUS8cuRD?=
- =?us-ascii?Q?6gBjSYh4vzGeXiecl1e9+PKkrtWIozAH4JuN3IlFq9ydyUWsI8hfUtNkLI9D?=
- =?us-ascii?Q?B1pWjRWr9Bnl8lVGVS51tqMS6rrJc7aQ8jzrOnAIrx9sj2YlqrNXkMlBa1Yp?=
- =?us-ascii?Q?p9knJHw7zTlSFzj2iaWXyHCLncoi0QuquGzvqe7wfkAf5KV3+THpio1qfQpe?=
- =?us-ascii?Q?b4sFqGF0XDLe23syJQEuU4ONc5jiC/4I0spa0rt4aIjuKm5NaoMfCMju7yqA?=
- =?us-ascii?Q?g+CaFxX3sbwx26xkB1YY/1WCKayyKnkA3dnXMyjXTd8kfFm9AdJwPbdGVJbS?=
- =?us-ascii?Q?1X92uREIwtAkpKx117/N1ZXor9dXXq5s6lU/1VykMfshzFwK+TKr4+vafYVb?=
- =?us-ascii?Q?tgo25WFUCyartG1stwGNWydMNmdKDqEODqBMLIIhhYesYwJWlbC5BNF2Ts/t?=
- =?us-ascii?Q?JvggWberzNuwddobxlF8TLlhR0fR5N2L8pVtTaANjf14qY7uI+aFr/VoL/7j?=
- =?us-ascii?Q?ZRtxVCokh69Mj9+xSIAYSc8297Ix/8VUO3WjfkWrGgbq1bRaeBI8KPN8Q5Si?=
- =?us-ascii?Q?lPwxbV01dj0rKOkMjYBf0jxgNjOZOuz5nchglhWdhE3tiF3H99BAljUy31qd?=
- =?us-ascii?Q?2Xuw5VbISPepMtaqX8/u5f8xUHnRXxKLR1h5T1yPMB3gPV/CqU2VN0Hgtaa4?=
- =?us-ascii?Q?MPS+Cn7ICKC9XvP/6+w=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 22d74b6d-22b8-4923-5829-08d998db54e7
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Oct 2021 23:50:04.2101
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: F+COzOjp9ra1XgWkrpPspPNsBaoRoK3v4h/OKcn5FmeVEEr+Pksudvrgyv6lVTD7
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5080
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="HAEESUd3nsaELdfA"
+Content-Disposition: inline
+In-Reply-To: <20211025233602.GN2744544@nvidia.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 26, 2021 at 05:16:44PM -0600, Alex Williamson wrote:
-> > @@ -471,6 +474,47 @@ mlx5vf_pci_migration_data_rw(struct mlx5vf_pci_core_device *mvdev,
-> >  	return count;
-> >  }
-> >  
-> > +/* This function is called in all state_mutex unlock cases to
-> > + * handle a 'defered_reset' if exists.
-> > + */
-> 
-> I refrained from noting it elsewhere, but we're not in net/ or
-> drivers/net/ here, but we're using their multi-line comment style.  Are
-> we using the strong relation to a driver that does belong there as
-> justification for the style here?
 
-I think it is an oversight, tell Yishai you prefer the other format in
-drivers/vfio and it can be fixed
+--HAEESUd3nsaELdfA
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> > @@ -539,7 +583,7 @@ static ssize_t mlx5vf_pci_mig_rw(struct vfio_pci_core_device *vdev,
-> >  	}
-> >  
-> >  end:
-> > -	mutex_unlock(&mvdev->state_mutex);
-> > +	mlx5vf_state_mutex_unlock(mvdev);
-> 
-> I'm a little lost here, if the operation was to read the device_state
-> and mvdev->vmig.vfio_dev_state was error, that's already been copied to
-> the user buffer, so the user continues to see the error state for the
-> first read of device_state after reset if they encounter this race?
+On Mon, Oct 25, 2021 at 08:36:02PM -0300, Jason Gunthorpe wrote:
+> On Tue, Oct 26, 2021 at 12:16:43AM +1100, David Gibson wrote:
+> > If you attach devices A and B (both in group X) to IOAS 1, then detach
+> > device A, what happens?  Do you detach both devices?  Or do you have a
+> > counter so you have to detach as many time as you attached?
+>=20
+> I would refcount it since that is the only thing that makes semantic
+> sense with the device centric model.
 
-Yes. If the userspace races ioctls they get a deserved mess.
+Yes, I definitely think that's the better option here.  This does
+still leave (at least) one weird edge case where the group structure
+can "leak" into the awareness of code that otherwise doesn't care,
+though it's definitely less nasty that the ones I mentioned before:
 
-This race exists no matter what we do, as soon as the unlock happens a
-racing reset ioctl could run in during the system call exit path.
+If an app wants to move a bunch of devices from one IOAS to another,
+it can do it either:
 
-The purpose of the locking is to protect the kernel from hostile
-userspace, not to allow userspace to execute concurrent ioctl's in a
-sensible way.
+A)
+	for each dev:
+		detach dev from IOAS
+	for each dev:
+		attach dev to new IOAS
 
-Jason
+or B)
+
+	for each dev:
+		detach dev from IOAS
+		attach dev to new IOAS
+
+With only singleton groups they're pretty much equivalent, but with
+multiple devices in a group, (B) will fail.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--HAEESUd3nsaELdfA
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmF3yQoACgkQbDjKyiDZ
+s5LyLBAAsvp/wdXHEJM94XhKjCF5ao1wc21uqzV/TsPjACrM7F0hBGc58zmLojnN
+SrvWkquRwIZJKQPtQTNfck2bsDXYP5bv0Kfr2C7NJF63COQc/G112VoUQSa+6cKu
+doeXjM0heJj6e8Rs/d3vtBnNtpsiAowZVB2T45vpeVKRMwrPz6AHeus5T3kPcRcL
+hTi9zDLal1AtfomkvLzSZXmS/alx3xraTe4dMCdgCfG6l1VlDfaTQouX52ELZrDy
+Glnr/CX5zAi/PX+e4Vtojjr1+wt8IKbQeXXB5/m9Fxbn8Q6OirmuMnElgra2hRG2
+6Zoe5VmV148pB31a17eDcEn4ISCy0XTzvXxvYFbqyU+zBat8BIWnSrHHkK/HnwPr
+hdQSJZLcCq4vZh0LmSEIEanq66a4BTGaFmDoP2+MV2KCniQouwrrQdxPndDMmm+K
+6VNuSrReFl6EYBBvbFX3Xs4UT3cVeRPRXhuMLo3nLdjcTqQnK8hJlUB6PCDUahcb
+NZwmAlsRSuMRrWoB6tFd8fLENKDwO4+PKbX7MK2UPUOy+2YFATypnAe26STD0jOj
+nwgz6yvTuKTLRvpXsYVzxc7bMJgWHXzNWPlogsttWd0yDd4ZX1n65SMid0/JRWvZ
+dja1XtV+i0gGz3Z+L+CPSdwZai1jRL5ZNFWOjdruncdKXUNDHkY=
+=YvzU
+-----END PGP SIGNATURE-----
+
+--HAEESUd3nsaELdfA--
