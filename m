@@ -2,122 +2,214 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 45E7043B4D4
-	for <lists+kvm@lfdr.de>; Tue, 26 Oct 2021 16:52:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C9FD43B4EB
+	for <lists+kvm@lfdr.de>; Tue, 26 Oct 2021 16:56:01 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236171AbhJZOyl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Oct 2021 10:54:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:30609 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230324AbhJZOyk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 26 Oct 2021 10:54:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635259936;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=T3DVTWtNGq2QrB5FfajrN5UrC6srYwyWJ01LjyrOPSs=;
-        b=TPiU/Tr/xSbnXs/dypM8/OOgAkiMpbj1aFLB/vNPF03Mhlb1IuoH538U166wWPr5ISjK4g
-        bCUowYX+S6FcQ/4LmzePrJ97pTDsnlN5cHyNl2P0DeZyfYiPG3yEJV074wORnvERjMUat6
-        FJHgIqJ2l31M0gW+zH0cxqpeDMQJR8k=
-Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com
- [209.85.210.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-191-FPORER-lNluu6MkYp8RoQg-1; Tue, 26 Oct 2021 10:52:13 -0400
-X-MC-Unique: FPORER-lNluu6MkYp8RoQg-1
-Received: by mail-ot1-f69.google.com with SMTP id 61-20020a9d02c3000000b00553c97d94abso96526otl.9
-        for <kvm@vger.kernel.org>; Tue, 26 Oct 2021 07:52:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=T3DVTWtNGq2QrB5FfajrN5UrC6srYwyWJ01LjyrOPSs=;
-        b=tIDhgGSStov/++4ppdEEUGKlpVa3L1MfacfhsOdZd1llcuI5CIpgO3Osc83JNePqTd
-         oGUH1yhUB4vcMDNIeNMGRkY7Sea7koI6gcXLUbV/cG6S1btb1nB4i/xH+CiIzHG9u3iT
-         SEOBzwCx9zo9+NRankheGCWZ97jaU7ZjTgsUWnT/+hVY+foiPPziHZcQGBHfwlxZ0HKx
-         z/+bsbkw8p3d19evVJ/MdFi0AvtsuUAxMYkTa0HG6diuojJnhhH2lX3TqpDAtm/RL1+c
-         95/KLhVyc5szIM/cWRu4acCMdTC3lP1R0NwgWt2vD+4WO9anYaF0FhCYZR5OoW6Ba05y
-         JctA==
-X-Gm-Message-State: AOAM533qcAdxq+1+NHcSn6chhLRR1BfwxScm5if6yE5UotLnXUfbN/l3
-        8oqJ9Fy/PDo4Rj2Lb6wDKA8p0aAB/1/wTIDCbMjBEJxzHY4knfmiL1uy4fanjaGUEsI8W42PPkY
-        90IbhNLHlM426
-X-Received: by 2002:a05:6830:1af0:: with SMTP id c16mr19471590otd.16.1635259932617;
-        Tue, 26 Oct 2021 07:52:12 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyThT8eyPPQ8unPM1ZyhVDxxqj6w0ptUlI7/UnRnEG1ZGmmkygz7HHXWNIWKyWD09IVK3ntmQ==
-X-Received: by 2002:a05:6830:1af0:: with SMTP id c16mr19471566otd.16.1635259932424;
-        Tue, 26 Oct 2021 07:52:12 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id e23sm4572613oih.40.2021.10.26.07.52.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Oct 2021 07:52:12 -0700 (PDT)
-Date:   Tue, 26 Oct 2021 08:52:10 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
-        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
-        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com,
-        Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH V2 mlx5-next 12/14] vfio/mlx5: Implement vfio_pci driver
- for mlx5 devices
-Message-ID: <20211026085210.000dc19b.alex.williamson@redhat.com>
-In-Reply-To: <20211026121353.GP2744544@nvidia.com>
-References: <20211019192328.GZ2744544@nvidia.com>
-        <20211019145856.2fa7f7c8.alex.williamson@redhat.com>
-        <20211019230431.GA2744544@nvidia.com>
-        <5a496713-ae1d-11f2-1260-e4c1956e1eda@nvidia.com>
-        <20211020105230.524e2149.alex.williamson@redhat.com>
-        <YXbceaVo0q6hOesg@work-vm>
-        <20211025115535.49978053.alex.williamson@redhat.com>
-        <YXb7wejD1qckNrhC@work-vm>
-        <20211025191509.GB2744544@nvidia.com>
-        <YXe/AvwQcAxJ/hXQ@work-vm>
-        <20211026121353.GP2744544@nvidia.com>
+        id S234911AbhJZO6X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Oct 2021 10:58:23 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:55666 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S231178AbhJZO6W (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 26 Oct 2021 10:58:22 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19QDkAc6027055;
+        Tue, 26 Oct 2021 14:55:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=a227DL1MWcEzOfb2kTBHeBAcS29Z6xXBRzh8+Ji87Sc=;
+ b=ddn1Fz6PxH8IskPaXG87uj8ARVbNRM6cIYoh7oltu5G4IdcV995SijnCcSWgnSqJwz2A
+ eb2Id+SzxdVY1skUcW1wsqNjwn7rkLTlc6is68NT5arHT9ciZIfM40vOALOFQ7ojbgAw
+ gCvAKdWKRhuh3fphx4Ywofnm1TcgTpFr4YQQCzNqjGlcazMOeSJFx/Vf/+bBSti7Rx/f
+ KeBziAmvpVfQw6xc+RV7D5D/NQboFLwPvG1Bvwif+i5HQsP2L6pxNg7nji9gegPgzaed
+ P97aJosdead1gDftFJSyfjM2wtXOBRmTZ0QPXZNPtZEaf/egQ2XmJwBJnhNhoPnnloJn IA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3bx59720x3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 26 Oct 2021 14:55:58 +0000
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19QEs6si029466;
+        Tue, 26 Oct 2021 14:55:57 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3bx59720w3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 26 Oct 2021 14:55:57 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19QEldQI018554;
+        Tue, 26 Oct 2021 14:55:56 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma04ams.nl.ibm.com with ESMTP id 3bx4edpq0p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 26 Oct 2021 14:55:55 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19QEtqXr60096922
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 26 Oct 2021 14:55:52 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 73B8242041;
+        Tue, 26 Oct 2021 14:55:52 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 072B342049;
+        Tue, 26 Oct 2021 14:55:52 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.0.93])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 26 Oct 2021 14:55:51 +0000 (GMT)
+Date:   Tue, 26 Oct 2021 16:55:49 +0200
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>
+Cc:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v3 2/2] s390x: Test specification
+ exceptions during transaction
+Message-ID: <20211026165549.18137134@p-imbrenda>
+In-Reply-To: <32dfb400-4191-44f8-354e-809fac890b63@linux.vnet.ibm.com>
+References: <20211022120156.281567-1-scgl@linux.ibm.com>
+        <20211022120156.281567-3-scgl@linux.ibm.com>
+        <20211025193012.3be31938@p-imbrenda>
+        <32dfb400-4191-44f8-354e-809fac890b63@linux.vnet.ibm.com>
+Organization: IBM
 X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: wdEehobYG5_gpyFnbzDJXDmCr5eLUD92
+X-Proofpoint-GUID: J0G5_THnQQG-wa7zgtIgUNYxo3Q2pOhc
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
+ definitions=2021-10-26_04,2021-10-26_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 malwarescore=0
+ mlxlogscore=999 phishscore=0 adultscore=0 impostorscore=0 bulkscore=0
+ mlxscore=0 lowpriorityscore=0 priorityscore=1501 spamscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2110260083
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 26 Oct 2021 09:13:53 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Tue, 26 Oct 2021 16:22:40 +0200
+Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com> wrote:
 
-> On Tue, Oct 26, 2021 at 09:40:34AM +0100, Dr. David Alan Gilbert wrote:
-> > * Jason Gunthorpe (jgg@nvidia.com) wrote:  
-> > > On Mon, Oct 25, 2021 at 07:47:29PM +0100, Dr. David Alan Gilbert wrote:
-> > >   
-> > > > It may need some further refinement; for example in that quiesed state
-> > > > do counters still tick? will a NIC still respond to packets that don't
-> > > > get forwarded to the host?  
-> > > 
-> > > At least for the mlx5 NIC the two states are 'able to issue outbound
-> > > DMA' and 'all internal memories and state are frozen and unchanging'.  
-> > 
-> > Yeh, so my point was just that if you're adding a new state to this
-> > process, you need to define the details like that.  
+> On 10/25/21 19:30, Claudio Imbrenda wrote:
+> > On Fri, 22 Oct 2021 14:01:56 +0200
+> > Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
+> >   
+> >> Program interruptions during transactional execution cause other
+> >> interruption codes.
+> >> Check that we see the expected code for (some) specification exceptions.
+> >>
+> >> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+> >> ---  
 > 
-> We are not planning to propose any patches/uAPI specification for this
-> problem until after the mlx5 vfio driver is merged..
+> [...]
+> 
+> >> +#define TRANSACTION_MAX_RETRIES 5
+> >> +
+> >> +/* NULL must be passed to __builtin_tbegin via constant, forbid diagnose from
+> >> + * being NULL to keep things simple
+> >> + */
+> >> +static int __attribute__((nonnull))
+> >> +with_transaction(void (*trigger)(void), struct __htm_tdb *diagnose)
+> >> +{
+> >> +	int cc;
+> >> +  
+> > 
+> > if you want to be extra sure, put an assert here (although I'm not sure
+> > how nonnull works, I have never seen it before)  
+> 
+> Ok, with nonnull, the compiler might warn you if you pass NULL.
 
-I'm not super comfortable with that.  If we're expecting to add a new
-bit to define a quiescent state prior to clearing the running flag and
-this is an optional device feature that userspace migration needs to be
-aware of and it's really not clear from a hypervisor when p2p DMA might
-be in use, I think that leaves userspace in a pickle how and when
-they'd impose restrictions on assignment with multiple assigned
-devices.  It's likely that the majority of initial use cases wouldn't
-need this feature, which would make it difficult to arbitrarily impose
-later.
+fair enough
 
-OTOH, if we define !_RUNNING as quiescent and userspace reading
-pending_bytes as the point by which the user is responsible for
-quiescing all devices and the device state becomes stable (or drivers
-can generate errors during collection of device state if that proves
-otherwise), then I think existing userspace doesn't care about this
-issue.  Thanks,
+> >   
+> >> +	cc = __builtin_tbegin(diagnose);
+> >> +	if (cc == _HTM_TBEGIN_STARTED) {
+> >> +		trigger();
+> >> +		__builtin_tend();
+> >> +		return -TRANSACTION_COMPLETED;
+> >> +	} else {
+> >> +		return -cc;
+> >> +	}
+> >> +}
+> >> +
+> >> +static int retry_transaction(const struct spec_ex_trigger *trigger, unsigned int max_retries,
+> >> +			     struct __htm_tdb *tdb, uint16_t expected_pgm)
+> >> +{
+> >> +	int trans_result, i;
+> >> +	uint16_t pgm;
+> >> +
+> >> +	for (i = 0; i < max_retries; i++) {
+> >> +		expect_pgm_int();
+> >> +		trans_result = with_transaction(trigger->func, tdb);
+> >> +		if (trans_result == -_HTM_TBEGIN_TRANSIENT) {
+> >> +			mb();
+> >> +			pgm = lc->pgm_int_code;
+> >> +			if (pgm == 0)
+> >> +				continue;
+> >> +			else if (pgm == expected_pgm)
+> >> +				return 0;
+> >> +		}
+> >> +		return trans_result;
+> >> +	}
+> >> +	return -TRANSACTION_MAX_RETRIES;  
+> > 
+> > so this means that a test will be considered failed if the transaction
+> > failed too many times?  
+> 
+> Yes.
+> > 
+> > this means that could fail if the test is run on busy system, even if
+> > the host running the unit test is correct  
+> 
+> I suppose so, don't know how likely that is.
 
-Alex
+I don't like the idea of failing a test when the implementation is
+correct, just because the system might be a little more busy than
+expected.
+
+if you can't find a way to refactor the test so that it doesn't fail if
+there are too many retries, then at least make it a skip?
+
+but I'd really like to see something that does not fail on a correctly
+implemented system just because the test machine was too busy.
+
+> > 
+> > also, do you really need to use negative values? it's probably easier
+> > to read if you stick to positive values, and less prone to mistakes if
+> > you accidentally forget a - somewhere.  
+> 
+> Ok.
+> >   
+> >> +}
+> >> +
+> >> +static void test_spec_ex_trans(struct args *args, const struct spec_ex_trigger *trigger)
+> >> +{
+> >> +	const uint16_t expected_pgm = PGM_INT_CODE_SPECIFICATION
+> >> +			      | PGM_INT_CODE_TX_ABORTED_EVENT;
+> >> +	union {
+> >> +		struct __htm_tdb tdb;
+> >> +		uint64_t dwords[sizeof(struct __htm_tdb) / sizeof(uint64_t)];
+> >> +	} diag;
+> >> +	unsigned int i, failures = 0;
+> >> +	int trans_result;
+> >> +
+> >> +	if (!test_facility(73)) {
+> >> +		report_skip("transactional-execution facility not installed");
+> >> +		return;
+> >> +	}
+> >> +	ctl_set_bit(0, CTL0_TRANSACT_EX_CTL); /* enable transactional-exec */
+> >> +
+> >> +	for (i = 0; i < args->iterations && failures <= args->max_failures; i++) {
+> >> +		register_pgm_cleanup_func(trigger->fixup);
+> >> +		trans_result = retry_transaction(trigger, args->max_retries, &diag.tdb, expected_pgm);  
+> > 
+> > so you retry each iteration up to args->max_retries times, and if a
+> > transaction aborts too many times (maybe because the host system is
+> > very busy), then you consider it a fail
+> >   
+> 
+> [...]
 
