@@ -2,168 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D11443B484
-	for <lists+kvm@lfdr.de>; Tue, 26 Oct 2021 16:42:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D335543B4BC
+	for <lists+kvm@lfdr.de>; Tue, 26 Oct 2021 16:48:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236875AbhJZOol (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Oct 2021 10:44:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:44115 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236851AbhJZOok (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 26 Oct 2021 10:44:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635259336;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KiAOMFFmr8a+X0LpJnX8Lz9+s9dbAEJz1395MTiVhXQ=;
-        b=CCaG1lAwdcQPW12jmqxSqty6dHq9SBiEeQzsMrxhMZyHSDNXkXC1ok/pjudSrDS/nDaEyU
-        vIFpM2oHEqJgKZVWAwkuiTO3S+U93DCJHk6DWIP+J7JT4maHfI3fol2tLqhYo+O4Jhzhe+
-        rMO/EKwOdi1jnMu3aaxFLxShO18wvKI=
-Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com
- [209.85.161.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-412-NUfSNBtnOxKhcq-wWR5Xjw-1; Tue, 26 Oct 2021 10:42:15 -0400
-X-MC-Unique: NUfSNBtnOxKhcq-wWR5Xjw-1
-Received: by mail-oo1-f71.google.com with SMTP id u11-20020a4a85cb000000b002b725ac13d8so6016389ooh.0
-        for <kvm@vger.kernel.org>; Tue, 26 Oct 2021 07:42:15 -0700 (PDT)
+        id S236952AbhJZOud (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Oct 2021 10:50:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60196 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236949AbhJZOub (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Oct 2021 10:50:31 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F00F6C061767
+        for <kvm@vger.kernel.org>; Tue, 26 Oct 2021 07:48:07 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id y1-20020a17090a134100b001a27a7e9c8dso2096084pjf.3
+        for <kvm@vger.kernel.org>; Tue, 26 Oct 2021 07:48:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=t+GavL7jaDIOLO9+HWOF0JpCL4n+9982OXgOJJO3B68=;
+        b=mMtlNqAGEx5moOXiuoulPA91tzGA7QXfJoC+FMrgS7kXKDaeQEPhlrtU0/6hIAVeF6
+         4XgOag3S8f64bxtieFkoj/CBTBoyg71uy6bYxr2fBQK7J8y0qvj3yp4nxsZiGo0ugwoy
+         chqWhQbdF2M/ss8dRD5cMeGRjF2i7TFbnWAE4XD/Gn+/ew4eCp8tBNWFi6mKqTjGiuSB
+         4K+eMtDT8TA09mAfuKwzPO/bGE/KLqBK8ggRwFAk21MDpCSdzSupIOVWDECUMDk9Gucp
+         WDZDdD8wswuh2DToiC42rEb1Gvw+Zc82wwd7L/2Pn0t+7EwhXqTAcJo8pcrg6fGfmqKg
+         9NUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=KiAOMFFmr8a+X0LpJnX8Lz9+s9dbAEJz1395MTiVhXQ=;
-        b=OWOWzteXAXliz7LL07xO8kE6BlDxbxRod03XkWDH8Xu/O6AbQbHWsUkiFaGYgtVrz+
-         gmUNqLUhEcsvW41HH5c3zjnmliqBjevUNOqdkRA9XWkY/AbzUUePKsUvIoPd6yY8chmp
-         fUR8whqok4o8hWGWqXQScdnMszJBxrCko6mqufnTWY0tT6bg/bHqJD8NoZY4JA927e9Z
-         JNar/86G9hyHXyvezV/LVV97zL/YKGqiT0vK5pXvpjLecs+mLzQkyp3Nd6yxHOz51w02
-         PQQKakcPSvMIcMdLsT+9QSPA5CyZN9urtbMJUf3NlbBpi+pduywITW9nRDZPx/gaTefX
-         CeZQ==
-X-Gm-Message-State: AOAM53101fUUJt0MXIY+p6VjhoX65C2323Y7WpYs+wHCUkVOHMbEMkhk
-        cgFgeaoStyH4Za46fBR9kZ2jlsbocrL+An6QYnTwjClC1Oujp7v+OiCvWtMfrM8UJShxKGSZOhA
-        Bgch7nzEgpKgy
-X-Received: by 2002:a9d:60dd:: with SMTP id b29mr19581593otk.117.1635259334742;
-        Tue, 26 Oct 2021 07:42:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyST1/XzJTg/5DfqLHtgP59NLmCW5cCEnBVzPC+ydnvMqHEPhvPl7zdCTaW1rzIoB4jsSg6sg==
-X-Received: by 2002:a9d:60dd:: with SMTP id b29mr19581565otk.117.1635259334446;
-        Tue, 26 Oct 2021 07:42:14 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id w12sm3544794oor.42.2021.10.26.07.42.13
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=t+GavL7jaDIOLO9+HWOF0JpCL4n+9982OXgOJJO3B68=;
+        b=Rgm/oaWv+KH9HgdBfUdreWwugbVTMXhvttGQuVeoGmeB9gLhd4E24kOAwU4CtpTzk3
+         cU2hUO58+a6WzaQafIKL9LuCqXWRJaAY87AN0lg23ZV97Ra70GSZu+osDwS9zlQn8D+Y
+         9I4y8HD4JPZ1ZwY04r7c2m//QAjd3jtrRbQwY2S3gQ+04hchWoM+faOTzTOoj5rtAt5t
+         AIq7zvUrhJUvHg6hlTnF/l6OwfXinV6Cl1FrYEol9fYzkJWCCGWOHXpddNvD8mHzGOAt
+         Pe4jypi0aVUcl/K5RlRTLhZEjDt3ZyWsnYZ1KkMP6/tGdt8hdgtyN/dybY6vxDrGDvBG
+         Y3hg==
+X-Gm-Message-State: AOAM530DCoJzjSpcDrWm9Lnu3r4DaX8yVG8yFu+fhFitW8ti0FW8Wevc
+        3H7QnvjAUeBtblkulqyWyEfFEA==
+X-Google-Smtp-Source: ABdhPJwehmwFySoaS1hi2p+T+LiAO8upF6izWYrpOOMtkZkPW5L2hiCqpK0gC/Rhqd0TA7qN0BGQqw==
+X-Received: by 2002:a17:902:e88a:b0:140:25a7:4a1b with SMTP id w10-20020a170902e88a00b0014025a74a1bmr22402882plg.67.1635259687236;
+        Tue, 26 Oct 2021 07:48:07 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id fy8sm186294pjb.47.2021.10.26.07.48.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Oct 2021 07:42:14 -0700 (PDT)
-Date:   Tue, 26 Oct 2021 08:42:12 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
-        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
-        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH V2 mlx5-next 12/14] vfio/mlx5: Implement vfio_pci driver
- for mlx5 devices
-Message-ID: <20211026084212.36b0142c.alex.williamson@redhat.com>
-In-Reply-To: <20211025145646.GX2744544@nvidia.com>
-References: <20211019145856.2fa7f7c8.alex.williamson@redhat.com>
-        <20211019230431.GA2744544@nvidia.com>
-        <5a496713-ae1d-11f2-1260-e4c1956e1eda@nvidia.com>
-        <20211020105230.524e2149.alex.williamson@redhat.com>
-        <20211020185919.GH2744544@nvidia.com>
-        <20211020150709.7cff2066.alex.williamson@redhat.com>
-        <87o87isovr.fsf@redhat.com>
-        <20211021154729.0e166e67.alex.williamson@redhat.com>
-        <20211025122938.GR2744544@nvidia.com>
-        <20211025082857.4baa4794.alex.williamson@redhat.com>
-        <20211025145646.GX2744544@nvidia.com>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        Tue, 26 Oct 2021 07:48:06 -0700 (PDT)
+Date:   Tue, 26 Oct 2021 14:48:02 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Anup Patel <anup.patel@wdc.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Atish Patra <atish.patra@wdc.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        David Matlack <dmatlack@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH v2 00/43] KVM: Halt-polling and x86 APICv overhaul
+Message-ID: <YXgVIvYhABnrP2Jo@google.com>
+References: <20211009021236.4122790-1-seanjc@google.com>
+ <04b1a72e-47b4-4bde-eb9e-ba36c156ff0d@de.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <04b1a72e-47b4-4bde-eb9e-ba36c156ff0d@de.ibm.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 25 Oct 2021 11:56:46 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
-
-> On Mon, Oct 25, 2021 at 08:28:57AM -0600, Alex Williamson wrote:
-> > On Mon, 25 Oct 2021 09:29:38 -0300
-> > Jason Gunthorpe <jgg@nvidia.com> wrote:
-> >   
-> > > On Thu, Oct 21, 2021 at 03:47:29PM -0600, Alex Williamson wrote:  
-> > > > I recall that we previously suggested a very strict interpretation of
-> > > > clearing the _RUNNING bit, but again I'm questioning if that's a real
-> > > > requirement or simply a nice-to-have feature for some undefined
-> > > > debugging capability.  In raising the p2p DMA issue, we can see that a
-> > > > hard stop independent of other devices is not really practical but I
-> > > > also don't see that introducing a new state bit solves this problem any
-> > > > more elegantly than proposed here.  Thanks,    
-> > > 
-> > > I still disagree with this - the level of 'frozenness' of a device is
-> > > something that belongs in the defined state exposed to userspace, not
-> > > as a hidden internal state that userspace can't see.
-> > > 
-> > > It makes the state transitions asymmetric between suspend/resume as
-> > > resume does have a defined uAPI state for each level of frozeness and
-> > > suspend does not.
-> > > 
-> > > With the extra bit resume does:
-> > >   
-> > >   0000, 0100, 1000, 0001
-> > > 
-> > > And suspend does:
-> > > 
-> > >   0001, 1001, 0010, 0000
-> > > 
-> > > However, without the extra bit suspend is only
-> > >   
-> > >   001,  010, 000
-> > > 
-> > > With hidden state inside the 010  
+On Tue, Oct 26, 2021, Christian Borntraeger wrote:
+> Am 09.10.21 um 04:11 schrieb Sean Christopherson:
+> > This is basically two series smushed into one.  The first "half" aims
+> > to differentiate between "halt" and a more generic "block", where "halt"
+> > aligns with x86's HLT instruction, the halt-polling mechanisms, and
+> > associated stats, and "block" means any guest action that causes the vCPU
+> > to block/wait.
 > > 
-> > And what is the device supposed to do if it receives a DMA while in
-> > this strictly defined stopped state?  If it generates an unsupported
-> > request, that can trigger a fatal platform error.    
+> > The second "half" overhauls x86's APIC virtualization code (Posted
+> > Interrupts on Intel VMX, AVIC on AMD SVM) to do their updates in response
+> > to vCPU (un)blocking in the vcpu_load/put() paths, keying off of the
+> > vCPU's rcuwait status to determine when a blocking vCPU is being put and
+> > reloaded.  This idea comes from arm64's kvm_timer_vcpu_put(), which I
+> > stumbled across when diving into the history of arm64's (un)blocking hooks.
+> > 
+> > The x86 APICv overhaul allows for killing off several sets of hooks in
+> > common KVM and in x86 KVM (to the vendor code).  Moving everything to
+> > vcpu_put/load() also realizes nice cleanups, especially for the Posted
+> > Interrupt code, which required some impressive mental gymnastics to
+> > understand how vCPU task migration interacted with vCPU blocking.
+> > 
+> > Non-x86 folks, sorry for the noise.  I'm hoping the common parts can get
+> > applied without much fuss so that future versions can be x86-only.
+> > 
+> > v2:
+> >   - Collect reviews. [Christian, David]
+> >   - Add patch to move arm64 WFI functionality out of hooks. [Marc]
+> >   - Add RISC-V to the fun.
+> >   - Add all the APICv fun.
 > 
-> I don't see that this question changes anything, we always have a
-> state where the device is unable to respond to incoming DMA.
+> Have we actually followed up on the regression regarding halt_poll_ns=0 no longer disabling
+> polling for running systems?
 
-I think that depends on the device implementation.  If all devices can
-receive incoming DMA, but all devices are also quiesced not to send
-DMA, there's not necessarily a need to put the device in a state where
-it errors TLPs.  This ventures into conversations about why assigning
-VFs can be considered safer than assigning PFs, users cannot disable
-memory space of VFs and therefore cannot generate URs on writes to
-MMIO, which may generate fatal faults on some platforms.  If we create
-a uAPI that requires dropping TLPs, then we provide userspace with a
-means to specifically generate those faults.
-
-> In all cases entry to this state is triggered only by user space
-> action, if userspace does the ioctls in the wrong order then it will
-> hit it.
-
-And if userspace does not quiesce DMA and gets an intermediate device
-state, that's a failure to follow the protocol.
-
-> > If it silently drops the DMA, then we have data loss.  We're
-> > defining a catch-22 scenario for drivers versus placing the onus on
-> > the user to quiesce the set of devices in order to consider the
-> > migration status as valid.    
-> 
-> The device should error the TLP.
-
-That's a bit of a landmine as outlined above.
- 
-> Userspace must globally fence access to the device before it enters
-> the device into the state where it errors TLPs.
-> 
-> This is also why I don't like it being so transparent as it is
-> something userspace needs to care about - especially if the HW cannot
-> support such a thing, if we intend to allow that.
-
-Userspace does need to care, but userspace's concern over this should
-not be able to compromise the platform and therefore making VF
-assignment more susceptible to fatal error conditions to comply with a
-migration uAPI is troublesome for me.  Thanks,
-
-Alex
-
+No, I have that conversation flagged but haven't gotten back to it.  I still like
+the idea of special casing halt_poll_ns=0 to override the capability.  I can send
+a proper patch for that unless there's a different/better idea?
