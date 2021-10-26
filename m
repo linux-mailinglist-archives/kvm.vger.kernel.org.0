@@ -2,198 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2901A43B481
-	for <lists+kvm@lfdr.de>; Tue, 26 Oct 2021 16:42:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D11443B484
+	for <lists+kvm@lfdr.de>; Tue, 26 Oct 2021 16:42:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235809AbhJZOoe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Oct 2021 10:44:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58674 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236875AbhJZOod (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Oct 2021 10:44:33 -0400
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76AD8C061243
-        for <kvm@vger.kernel.org>; Tue, 26 Oct 2021 07:42:09 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id x66so14507681pfx.13
-        for <kvm@vger.kernel.org>; Tue, 26 Oct 2021 07:42:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=15ypjFUpEZR6j1f2lct8JIBlISDABGh8xT/edVB0GWk=;
-        b=XUED9cjOhv6KEtIoMQpCiNdsQoV6dg3e/7lW2+FHPnhaQds6h3BWc8tFP6L5SuK3TY
-         yvJzYA1i0DQtwKFitv0MDcoUNKySCeZO68ZPIhrcWMkkMQyQznxEzn/Ul3V0F+F446Ju
-         1uK4jfVuv28ayDaXn6lJWG+Z2UBWIubmCGbG5mKLDu+5/nstf0NRuWgBgyds16PAY49R
-         giU3jccm4ppgbqcoaRjjc3Olhba4B0nT8+dbQZ9IGdwLoJK7SswCLBzZuBMF7Ss/qRiO
-         h5+M1VpqRXEnYYk42eDZvsGn7R8qwdYO0yd8MDGrG8nL+uoSyKJNbPeO8tdRXq3lF4PT
-         BT4w==
+        id S236875AbhJZOol (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Oct 2021 10:44:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:44115 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236851AbhJZOok (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 26 Oct 2021 10:44:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635259336;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=KiAOMFFmr8a+X0LpJnX8Lz9+s9dbAEJz1395MTiVhXQ=;
+        b=CCaG1lAwdcQPW12jmqxSqty6dHq9SBiEeQzsMrxhMZyHSDNXkXC1ok/pjudSrDS/nDaEyU
+        vIFpM2oHEqJgKZVWAwkuiTO3S+U93DCJHk6DWIP+J7JT4maHfI3fol2tLqhYo+O4Jhzhe+
+        rMO/EKwOdi1jnMu3aaxFLxShO18wvKI=
+Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com
+ [209.85.161.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-412-NUfSNBtnOxKhcq-wWR5Xjw-1; Tue, 26 Oct 2021 10:42:15 -0400
+X-MC-Unique: NUfSNBtnOxKhcq-wWR5Xjw-1
+Received: by mail-oo1-f71.google.com with SMTP id u11-20020a4a85cb000000b002b725ac13d8so6016389ooh.0
+        for <kvm@vger.kernel.org>; Tue, 26 Oct 2021 07:42:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=15ypjFUpEZR6j1f2lct8JIBlISDABGh8xT/edVB0GWk=;
-        b=fVbtsIL9BKm8kUHgNiH85BcCSqdq5nMuF8o4i13TzXd8bd1SIANvnyKfksRnlgLZrh
-         xscmmuBKe9b7coFxwv+ePRCUkXmuXyK6pdR8rCEx72KdOgZfFPIlS1JyA1CChMp48bpr
-         iQ6xnQX0UtCQbKJN0xuPNLGkDv4HEJPMt1ZLis1xMagS6fKx6UrMX+BqGw/5IAX88sbc
-         IbTxaqQYpyOwp6RcSGsQxy8fBLAoN1IUOAa5gTqdNptXNZVYvtQA7nn4CM0ZnTV4D4cb
-         1aIRTO2cwTnorXWG6QRZSorMSOuB6RnUZCv/q7/tFY1VLSN8Ul6aCHlnh4QvsySSBZO0
-         9RzQ==
-X-Gm-Message-State: AOAM5305vaqo4riVktmgqmuUanechtc6YMP3ArarDU8+4HZjhVIQMd6H
-        eL6ms5JS7OVRxecSyWA4ubmK6g==
-X-Google-Smtp-Source: ABdhPJyaXzK/n6vYjSctZudbm5fQ/5PMOVLMP7wCvjywBUqne0BVpn05yyRelu/zWqpraE7IByymcw==
-X-Received: by 2002:aa7:9212:0:b0:47b:aefd:2cc4 with SMTP id 18-20020aa79212000000b0047baefd2cc4mr26275184pfo.47.1635259327183;
-        Tue, 26 Oct 2021 07:42:07 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id b8sm24482555pfv.56.2021.10.26.07.42.06
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=KiAOMFFmr8a+X0LpJnX8Lz9+s9dbAEJz1395MTiVhXQ=;
+        b=OWOWzteXAXliz7LL07xO8kE6BlDxbxRod03XkWDH8Xu/O6AbQbHWsUkiFaGYgtVrz+
+         gmUNqLUhEcsvW41HH5c3zjnmliqBjevUNOqdkRA9XWkY/AbzUUePKsUvIoPd6yY8chmp
+         fUR8whqok4o8hWGWqXQScdnMszJBxrCko6mqufnTWY0tT6bg/bHqJD8NoZY4JA927e9Z
+         JNar/86G9hyHXyvezV/LVV97zL/YKGqiT0vK5pXvpjLecs+mLzQkyp3Nd6yxHOz51w02
+         PQQKakcPSvMIcMdLsT+9QSPA5CyZN9urtbMJUf3NlbBpi+pduywITW9nRDZPx/gaTefX
+         CeZQ==
+X-Gm-Message-State: AOAM53101fUUJt0MXIY+p6VjhoX65C2323Y7WpYs+wHCUkVOHMbEMkhk
+        cgFgeaoStyH4Za46fBR9kZ2jlsbocrL+An6QYnTwjClC1Oujp7v+OiCvWtMfrM8UJShxKGSZOhA
+        Bgch7nzEgpKgy
+X-Received: by 2002:a9d:60dd:: with SMTP id b29mr19581593otk.117.1635259334742;
+        Tue, 26 Oct 2021 07:42:14 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyST1/XzJTg/5DfqLHtgP59NLmCW5cCEnBVzPC+ydnvMqHEPhvPl7zdCTaW1rzIoB4jsSg6sg==
+X-Received: by 2002:a9d:60dd:: with SMTP id b29mr19581565otk.117.1635259334446;
+        Tue, 26 Oct 2021 07:42:14 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id w12sm3544794oor.42.2021.10.26.07.42.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Oct 2021 07:42:06 -0700 (PDT)
-Date:   Tue, 26 Oct 2021 14:42:02 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, mtosatti <mtosatti@redhat.com>
-Subject: Re: [PATCH] KVM: x86: Take srcu lock in post_kvm_run_save()
-Message-ID: <YXgTugzJgJYUu01A@google.com>
-References: <606aaaf29fca3850a63aa4499826104e77a72346.camel@infradead.org>
+        Tue, 26 Oct 2021 07:42:14 -0700 (PDT)
+Date:   Tue, 26 Oct 2021 08:42:12 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
+        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
+        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH V2 mlx5-next 12/14] vfio/mlx5: Implement vfio_pci driver
+ for mlx5 devices
+Message-ID: <20211026084212.36b0142c.alex.williamson@redhat.com>
+In-Reply-To: <20211025145646.GX2744544@nvidia.com>
+References: <20211019145856.2fa7f7c8.alex.williamson@redhat.com>
+        <20211019230431.GA2744544@nvidia.com>
+        <5a496713-ae1d-11f2-1260-e4c1956e1eda@nvidia.com>
+        <20211020105230.524e2149.alex.williamson@redhat.com>
+        <20211020185919.GH2744544@nvidia.com>
+        <20211020150709.7cff2066.alex.williamson@redhat.com>
+        <87o87isovr.fsf@redhat.com>
+        <20211021154729.0e166e67.alex.williamson@redhat.com>
+        <20211025122938.GR2744544@nvidia.com>
+        <20211025082857.4baa4794.alex.williamson@redhat.com>
+        <20211025145646.GX2744544@nvidia.com>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <606aaaf29fca3850a63aa4499826104e77a72346.camel@infradead.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Oct 26, 2021, David Woodhouse wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
+On Mon, 25 Oct 2021 11:56:46 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
+
+> On Mon, Oct 25, 2021 at 08:28:57AM -0600, Alex Williamson wrote:
+> > On Mon, 25 Oct 2021 09:29:38 -0300
+> > Jason Gunthorpe <jgg@nvidia.com> wrote:
+> >   
+> > > On Thu, Oct 21, 2021 at 03:47:29PM -0600, Alex Williamson wrote:  
+> > > > I recall that we previously suggested a very strict interpretation of
+> > > > clearing the _RUNNING bit, but again I'm questioning if that's a real
+> > > > requirement or simply a nice-to-have feature for some undefined
+> > > > debugging capability.  In raising the p2p DMA issue, we can see that a
+> > > > hard stop independent of other devices is not really practical but I
+> > > > also don't see that introducing a new state bit solves this problem any
+> > > > more elegantly than proposed here.  Thanks,    
+> > > 
+> > > I still disagree with this - the level of 'frozenness' of a device is
+> > > something that belongs in the defined state exposed to userspace, not
+> > > as a hidden internal state that userspace can't see.
+> > > 
+> > > It makes the state transitions asymmetric between suspend/resume as
+> > > resume does have a defined uAPI state for each level of frozeness and
+> > > suspend does not.
+> > > 
+> > > With the extra bit resume does:
+> > >   
+> > >   0000, 0100, 1000, 0001
+> > > 
+> > > And suspend does:
+> > > 
+> > >   0001, 1001, 0010, 0000
+> > > 
+> > > However, without the extra bit suspend is only
+> > >   
+> > >   001,  010, 000
+> > > 
+> > > With hidden state inside the 010  
+> > 
+> > And what is the device supposed to do if it receives a DMA while in
+> > this strictly defined stopped state?  If it generates an unsupported
+> > request, that can trigger a fatal platform error.    
 > 
-> The Xen interrupt injection for event channels relies on accessing the
-> guest's vcpu_info structure in __kvm_xen_has_interrupt(), through a
-> gfn_to_hva_cache.
+> I don't see that this question changes anything, we always have a
+> state where the device is unable to respond to incoming DMA.
+
+I think that depends on the device implementation.  If all devices can
+receive incoming DMA, but all devices are also quiesced not to send
+DMA, there's not necessarily a need to put the device in a state where
+it errors TLPs.  This ventures into conversations about why assigning
+VFs can be considered safer than assigning PFs, users cannot disable
+memory space of VFs and therefore cannot generate URs on writes to
+MMIO, which may generate fatal faults on some platforms.  If we create
+a uAPI that requires dropping TLPs, then we provide userspace with a
+means to specifically generate those faults.
+
+> In all cases entry to this state is triggered only by user space
+> action, if userspace does the ioctls in the wrong order then it will
+> hit it.
+
+And if userspace does not quiesce DMA and gets an intermediate device
+state, that's a failure to follow the protocol.
+
+> > If it silently drops the DMA, then we have data loss.  We're
+> > defining a catch-22 scenario for drivers versus placing the onus on
+> > the user to quiesce the set of devices in order to consider the
+> > migration status as valid.    
 > 
-> This requires the srcu lock to be held, which is mostly the case except
-> for this code path:
+> The device should error the TLP.
+
+That's a bit of a landmine as outlined above.
+ 
+> Userspace must globally fence access to the device before it enters
+> the device into the state where it errors TLPs.
 > 
-> [   11.822877] WARNING: suspicious RCU usage
-> [   11.822965] -----------------------------
-> [   11.823013] include/linux/kvm_host.h:664 suspicious rcu_dereference_check() usage!
-> [   11.823131]
-> [   11.823131] other info that might help us debug this:
-> [   11.823131]
-> [   11.823196]
-> [   11.823196] rcu_scheduler_active = 2, debug_locks = 1
-> [   11.823253] 1 lock held by dom:0/90:
-> [   11.823292]  #0: ffff998956ec8118 (&vcpu->mutex){+.+.}, at: kvm_vcpu_ioctl+0x85/0x680
-> [   11.823379]
-> [   11.823379] stack backtrace:
-> [   11.823428] CPU: 2 PID: 90 Comm: dom:0 Kdump: loaded Not tainted 5.4.34+ #5
-> [   11.823496] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.12.1-0-ga5cab58e9a3f-prebuilt.qemu.org 04/01/2014
-> [   11.823612] Call Trace:
-> [   11.823645]  dump_stack+0x7a/0xa5
-> [   11.823681]  lockdep_rcu_suspicious+0xc5/0x100
-> [   11.823726]  __kvm_xen_has_interrupt+0x179/0x190
-> [   11.823773]  kvm_cpu_has_extint+0x6d/0x90
-> [   11.823813]  kvm_cpu_accept_dm_intr+0xd/0x40
-> [   11.823853]  kvm_vcpu_ready_for_interrupt_injection+0x20/0x30
->               < post_kvm_run_save() inlined here >
-> [   11.823906]  kvm_arch_vcpu_ioctl_run+0x135/0x6a0
-> [   11.823947]  kvm_vcpu_ioctl+0x263/0x680
-> 
-> Fixes: 40da8ccd724f ("KVM: x86/xen: Add event channel interrupt vector upcall")
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> ---
-> 
-> There are potentially other ways of doing this, by shuffling the tail
-> of kvm_arch_vcpu_ioctl_run() around a little and holding the lock once
-> there instead of taking it within vcpu_run(). But the call to
-> post_kvm_run_save() occurs even on the error paths, and it gets complex
-> to untangle. This is the simple approach.
+> This is also why I don't like it being so transparent as it is
+> something userspace needs to care about - especially if the HW cannot
+> support such a thing, if we intend to allow that.
 
-What about taking the lock well early on so that the tail doesn't need to juggle
-errors?  Dropping the lock for the KVM_MP_STATE_UNINITIALIZED case is a little
-unfortunate, but that at least pairs with similar logic in x86's other call to
-kvm_vcpu_block().  Relocking if xfer_to_guest_mode_handle_work() triggers an exit
-to userspace is also unfortunate but it's not the end of the world.
+Userspace does need to care, but userspace's concern over this should
+not be able to compromise the platform and therefore making VF
+assignment more susceptible to fatal error conditions to comply with a
+migration uAPI is troublesome for me.  Thanks,
 
-On the plus side, the complete_userspace_io() callback doesn't need to worry
-about taking the lock.
+Alex
 
----
- arch/x86/kvm/x86.c | 21 ++++++++++-----------
- 1 file changed, 10 insertions(+), 11 deletions(-)
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index ac83d873d65b..90751a080447 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -10039,7 +10039,6 @@ static int vcpu_run(struct kvm_vcpu *vcpu)
- 	int r;
- 	struct kvm *kvm = vcpu->kvm;
-
--	vcpu->srcu_idx = srcu_read_lock(&kvm->srcu);
- 	vcpu->arch.l1tf_flush_l1d = true;
-
- 	for (;;) {
-@@ -10067,25 +10066,18 @@ static int vcpu_run(struct kvm_vcpu *vcpu)
- 		if (__xfer_to_guest_mode_work_pending()) {
- 			srcu_read_unlock(&kvm->srcu, vcpu->srcu_idx);
- 			r = xfer_to_guest_mode_handle_work(vcpu);
-+			vcpu->srcu_idx = srcu_read_lock(&kvm->srcu);
- 			if (r)
- 				return r;
--			vcpu->srcu_idx = srcu_read_lock(&kvm->srcu);
- 		}
- 	}
-
--	srcu_read_unlock(&kvm->srcu, vcpu->srcu_idx);
--
- 	return r;
- }
-
- static inline int complete_emulated_io(struct kvm_vcpu *vcpu)
- {
--	int r;
--
--	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
--	r = kvm_emulate_instruction(vcpu, EMULTYPE_NO_DECODE);
--	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
--	return r;
-+	return kvm_emulate_instruction(vcpu, EMULTYPE_NO_DECODE);
- }
-
- static int complete_emulated_pio(struct kvm_vcpu *vcpu)
-@@ -10224,12 +10216,16 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 	kvm_run->flags = 0;
- 	kvm_load_guest_fpu(vcpu);
-
-+	vcpu->srcu_idx = srcu_read_lock(&kvm->srcu);
- 	if (unlikely(vcpu->arch.mp_state == KVM_MP_STATE_UNINITIALIZED)) {
- 		if (kvm_run->immediate_exit) {
- 			r = -EINTR;
- 			goto out;
- 		}
-+		srcu_read_unlock(&kvm->srcu, vcpu->srcu_idx);
- 		kvm_vcpu_block(vcpu);
-+		vcpu->srcu_idx = srcu_read_lock(&kvm->srcu);
-+
- 		if (kvm_apic_accept_events(vcpu) < 0) {
- 			r = 0;
- 			goto out;
-@@ -10279,10 +10275,13 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
- 		r = vcpu_run(vcpu);
-
- out:
--	kvm_put_guest_fpu(vcpu);
- 	if (kvm_run->kvm_valid_regs)
- 		store_regs(vcpu);
- 	post_kvm_run_save(vcpu);
-+
-+	srcu_read_unlock(&kvm->srcu, vcpu->srcu_idx);
-+
-+	kvm_put_guest_fpu(vcpu);
- 	kvm_sigset_deactivate(vcpu);
-
- 	vcpu_put(vcpu);
---
