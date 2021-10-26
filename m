@@ -2,192 +2,262 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BB33643B750
-	for <lists+kvm@lfdr.de>; Tue, 26 Oct 2021 18:36:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 3EBDC43B75B
+	for <lists+kvm@lfdr.de>; Tue, 26 Oct 2021 18:37:58 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237488AbhJZQih (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Oct 2021 12:38:37 -0400
-Received: from mx0b-002c1b01.pphosted.com ([148.163.155.12]:17404 "EHLO
-        mx0b-002c1b01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237465AbhJZQig (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 26 Oct 2021 12:38:36 -0400
-Received: from pps.filterd (m0127842.ppops.net [127.0.0.1])
-        by mx0b-002c1b01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19QFVTAV002819;
-        Tue, 26 Oct 2021 09:36:11 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references :
- content-transfer-encoding : content-type : mime-version;
- s=proofpoint20171006; bh=r+9ob9GAaw/Ct0X5a6c8nspQz4pZc63o+WBoopL5Anw=;
- b=D6myO+z6dPSq4z4x9tZg3+JT+lUaOKqGEqCH2ObjC0evM0rQP1Up7SpmAQIJIcK81SBd
- 4OmlhDVYTF8dnHAMirX2uDbUqf6GT3L/btp0s7XYebMa9PkKuX8L3tBN1PJkdZY+JJa/
- 56Gt8KC0Jqgvwza1NYT3OVsWleJ7+DmtVpnV3i3Eq03bWKM+4u4lu+fWb+QuOOTmEwjT
- KufF8PteUZmIjBODsjMScM51TQfUURH/aeKbrZuOWMw1bLIHDAzeWvRnQInr6akfiOje
- Kr8OjNtHHA5vsFOjXj181IJExwv4oZGTv8c/4ByNS1NrrrZKXM/x2EDXS4WSh+veJBfm yw== 
-Received: from nam02-dm3-obe.outbound.protection.outlook.com (mail-dm3nam07lp2043.outbound.protection.outlook.com [104.47.56.43])
-        by mx0b-002c1b01.pphosted.com with ESMTP id 3bx4du9v5j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 26 Oct 2021 09:36:10 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HzUlj5oXByUC5tNCaFyQ8HQV/sW8jjMMsD0MKhxH5xl7UCNohB06KASimCXN/jDyoBt4z6re00x9hFpl8IdlwzFK+wy3+W/ENaCnI4cRzorj9n4sxy5C+ycLNptzgkr5G/mCVhCv/Rj2RePI2CsZZZK69sHCOO6g9XsBJpZhREOPybTAAMXsWInSfLJhaKugXgqQ+0UIooA0dl4VcdAFuIaeJXrPQWXZ5N/u7Gwo1Q158sxghx7ZsFKDAlBSTYxslT/Dng2m83TtoaoFDB0Ss3Qv6j0VX0RHqzYA/Jvm6Kik4GlnOCaPntuVtkhY3z/S/fgA1ghUtbRLWPMCQCf9bw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=r+9ob9GAaw/Ct0X5a6c8nspQz4pZc63o+WBoopL5Anw=;
- b=bOFMH1CQwD0zW2JEA9fVsOENkgmtCSg34THtyqc157zAzxSm6idw4N15FF8OL02hGDp8Bpef48Spec1ic7nDkHJxK3WnBnat1yfvwJ87maKdkOoERcIhs3P0mMlDikUd/fqSthzybitXn89czN3vLluKnhBnQM+cILwhMMq1d22gXRt9ew8sFQOpGQppR/TUCQGyrugKH2zD0QjG4w4lf8kL9UhimIpLhWBsL209ReXQc/WqdNHMz46Ly7VUlS7o+vymunqJenaHVihGXa4u45piGwYvPsalT8dgxKqR3E6veg3Ks5sgFwyZFdHS2N+4YoHKhEsnf2QNF66bHnQBdQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
- dkim=pass header.d=nutanix.com; arc=none
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=nutanix.com;
-Received: from CO6PR02MB7555.namprd02.prod.outlook.com (2603:10b6:303:b3::20)
- by MW2PR02MB3772.namprd02.prod.outlook.com (2603:10b6:907:3::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4628.16; Tue, 26 Oct
- 2021 16:36:09 +0000
-Received: from CO6PR02MB7555.namprd02.prod.outlook.com
- ([fe80::8d99:ba07:279:25c3]) by CO6PR02MB7555.namprd02.prod.outlook.com
- ([fe80::8d99:ba07:279:25c3%8]) with mapi id 15.20.4628.020; Tue, 26 Oct 2021
- 16:36:09 +0000
-From:   Shivam Kumar <shivam.kumar1@nutanix.com>
-To:     pbonzini@redhat.com
-Cc:     kvm@vger.kernel.org, Shivam Kumar <shivam.kumar1@nutanix.com>,
-        Anurag Madnawat <anurag.madnawat@nutanix.com>,
-        Shaju Abraham <shaju.abraham@nutanix.com>,
-        Manish Mishra <manish.mishra@nutanix.com>
-Subject: [PATCH 6/6] Free space allocated for the vCPU's dirty quota context upon destroy.
-Date:   Tue, 26 Oct 2021 16:35:11 +0000
-Message-Id: <20211026163511.90558-7-shivam.kumar1@nutanix.com>
-X-Mailer: git-send-email 2.22.3
-In-Reply-To: <20211026163511.90558-1-shivam.kumar1@nutanix.com>
-References: <20211026163511.90558-1-shivam.kumar1@nutanix.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SJ0PR03CA0369.namprd03.prod.outlook.com
- (2603:10b6:a03:3a1::14) To CO6PR02MB7555.namprd02.prod.outlook.com
- (2603:10b6:303:b3::20)
+        id S235999AbhJZQkU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Oct 2021 12:40:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57628 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233019AbhJZQkT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Oct 2021 12:40:19 -0400
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72395C061767
+        for <kvm@vger.kernel.org>; Tue, 26 Oct 2021 09:37:55 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id t11so10710242plq.11
+        for <kvm@vger.kernel.org>; Tue, 26 Oct 2021 09:37:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=9OJA0DYk/+bmg6KQJ8dcy/bsZjx+8jt3B2rPkt4S2lE=;
+        b=suJTGyXg5yWgwl4sIcxUN/D8f+rk/F3yQiQdMFu++jOwCRao/1c9WUOt1UFr63a5mR
+         OYJxAMwAxP4OTLrFDM/6182iXFCSCwt2/j/ROIl4usJ+MRREPxF1PuVDMR7CgpGKRU9l
+         SUhBBJfD99rYNNN2vnwY9jmUfA65XlXQCk56WvU6jcR8RvemNKMGCFSwk12QUVpePnO2
+         a5fchcywm3/zHqThlKcQIrRhsslRt8ITuNhZtb/7sloo5RVCEv3klkScn1Y2YGjg3tXR
+         FtazhWu2IydF7VgfJpt2y+Bpw2ZXwx5euGHzjkHYPlvZHV1s4yevTTjuG1rRonM3Q+MK
+         Z4Qg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=9OJA0DYk/+bmg6KQJ8dcy/bsZjx+8jt3B2rPkt4S2lE=;
+        b=4+1xMwFS8TSkwi3STF8M1poNDh0ldjIa/6IsyfF+/vLJPxeSXwhgahbvLRAy2zxzjX
+         /oyowjfFcfiopsE/Wz+ZwRtrwo1GXB/pKcJSibwpyOyNHMFcffbhx9dxBoq9LhBPrf4d
+         ferJFdgI5s/UXIcO0stynPkokgd2o1PKkg/gjTgbH6zOdLvPHhRKBWebFxYoVP8iuz6P
+         GsMW9VU5aTJpsQz6H/xVUU6tBzFHn+nsgVtAfnVeRlJKZ+A/DOXaipYxDLeAwGDuxyw5
+         CwqWMqboUsztmjp25HQg3sYS2yYcZSRvA+vOBIPV1scePxA+fqIGpR31rS/HaaKJfPz6
+         QNag==
+X-Gm-Message-State: AOAM531o4lfUfoN0khTHTGZbsOAoclHKRPZeX4x+MqiUhZLic5rslWYE
+        psL6NXFH83MJ63HGkdKRMb/G+g==
+X-Google-Smtp-Source: ABdhPJzjediTuRD9CTnetuoeTHNyo14omSTC3XRhPFY2QJ841gBjAfmJzNBlNl+dcQTFChLPbKr5dg==
+X-Received: by 2002:a17:90a:530f:: with SMTP id x15mr30102443pjh.156.1635266274680;
+        Tue, 26 Oct 2021 09:37:54 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id q18sm25710421pfj.46.2021.10.26.09.37.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Oct 2021 09:37:54 -0700 (PDT)
+Date:   Tue, 26 Oct 2021 16:37:50 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Hou Wenlong <houwenlong93@linux.alibaba.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] KVM: VMX: fix instruction skipping when handling UD
+ exception
+Message-ID: <YXgu3pvk+Ifrl0Yu@google.com>
+References: <cover.1634870747.git.houwenlong93@linux.alibaba.com>
+ <8ad4de9dae77ee3690ee9bd3c5a51d235d619eb6.1634870747.git.houwenlong93@linux.alibaba.com>
 MIME-Version: 1.0
-Received: from shivam-kumar1.ubvm.nutanix.com (192.146.154.240) by SJ0PR03CA0369.namprd03.prod.outlook.com (2603:10b6:a03:3a1::14) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4628.16 via Frontend Transport; Tue, 26 Oct 2021 16:36:08 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 4d8ae1b7-7964-4552-66a7-08d9989eb6e8
-X-MS-TrafficTypeDiagnostic: MW2PR02MB3772:
-X-Microsoft-Antispam-PRVS: <MW2PR02MB3772D722B96C2AB643AAE6D9B3849@MW2PR02MB3772.namprd02.prod.outlook.com>
-x-proofpoint-crosstenant: true
-X-MS-Oob-TLC-OOBClassifiers: OLM:161;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: uzv+u/PiyGoD8qio0kbTgTOu+NcK22jG69J7IBD1L5yR5G02FsX96axBKhi6cao/lptALGkImSqmJPpKO2M/S+RCvYOd9k+LqYlwPbLzU1GMjOs18tJP0ykwE0Lui59bAHbmzaMh8gxZ2cEyLhp1QTH+KEKBVRuV8EXWckqFEQo6NjTap5QlIstI06zkxcxxcqvc2SzJfXoSC8b/NslS5iZtoO0AMAZmqcdWGpHArzTEjBIeqJ8Jg8J3sX0/YlMP/thJqiXJuIb4TVjKTVPnwuLUKkSfR30AnDsnXQUTGBb3x8Dq1iAQEgz9f7651QukXCrnNdkFhYMh2LrDd+cdGPQ6tFUVoEj6iVnzD1nU2wU5X7ztkJ8GjITFveepmIJeD3oF1sVlrUTE9gXJL9DS9OFnaXarSTd6hdtVJA6JUhK5Ecx5FXRroi4KYpmLHvfvdbSxL1yXsbacSS1MdyJ8ztqHg6+Gh0dK/EtCJG5Ce4mzVwm7rSG+DCMmlX0wh11X59Si55vmuXpWPLwVltRv1uTloexkskGYNgz3OEnvWZhUuyY0Gp8TNS5/K5gscIeXHpUsDx7jARik1bkgbr5FlTsiX/HM6UEcc52Xqbf/LymNLrjJTkoZtx5wJZCLjQAtObtpgM8ELBK0pAYGvUlBz/PbDks5krmK9cAUCF214jSmfC3bE7zwKZVUUycWrx3RdpB3gOX8kpF7RGjB0Ay1/C0FW5rzWLSO3qcdj/IRJWE=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO6PR02MB7555.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(26005)(4326008)(8676002)(36756003)(66476007)(66556008)(956004)(66946007)(86362001)(6666004)(2906002)(38350700002)(6486002)(5660300002)(15650500001)(52116002)(7696005)(107886003)(54906003)(1076003)(6916009)(508600001)(2616005)(316002)(38100700002)(8936002)(186003)(83380400001)(14143004);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Wl9RQdCil4ZedE1hNapgMmFBScq78k7azkBPW7CcM1PTST0jvdCSdU5MaQ75?=
- =?us-ascii?Q?E47SwGVCMHixTvq0q+eb1rllxt4GXJ8LilqK0gD57h0/BgHYTBGaBSjcAfoI?=
- =?us-ascii?Q?HxThiyVH0mehpEn9Ud5FqANDxYA7px0xPhEGB/iEyxQs2ER9278+l1PpWjKF?=
- =?us-ascii?Q?2SOY2wllSBWUb5LUy8jSlMRq8l30ghZBkLxm3CFy6gPe+Wl2BH0qo8psNQ8q?=
- =?us-ascii?Q?eAadTOaEyyyX2EIFwFBGGrDTXrnSKmncTTNXnoyajYHAnPxn5KvXDk83irA0?=
- =?us-ascii?Q?zZLBqrYWL+N+cZ/KKUPUTo0wa+eGMg1dCrwGVyLm6r3cN/ueMbRi8DRkijyy?=
- =?us-ascii?Q?wm2lYu1hNRl82fuqAvb135EjFX6xQP7KgDFc2caZMzLxVej11VChreRMwf5/?=
- =?us-ascii?Q?OZ2Fs6fii1yPs3RNGYEJmLrfjn0yW8R6meeS8iQssfBx3K8BeMVI9LR5YmAe?=
- =?us-ascii?Q?RTMICNBBX70qpRXe7+g0FOMsDF12NaIOBuro3nH06H5qWDnXLjYcYNap1Q7F?=
- =?us-ascii?Q?BI+0fiREO2cb/wW/th69i/59nYOSHROTdqDAYkK8Eus07c/eDyTJkFRLkZdV?=
- =?us-ascii?Q?BB+ccH/SWWKaHvxAs7tkGQEgHk3IJWnSXtEkYSmQnmpciQ/Zk36GeAGmFkfV?=
- =?us-ascii?Q?sSbVDL8Jjdh0CdCMM0DZZcOXVF6pfVeu6qiA4gL7kpjp2QGoTqHTgAGqwTeZ?=
- =?us-ascii?Q?tsITRaKpsr00R7NlOqYhz+X9wpuJ55H6/qzFVdi/cpdP7sG0eC4nAep+X0l0?=
- =?us-ascii?Q?9Rc8rErkRaCsYEEnSdWYgQ5kwuA8awAcmjHYuPIJaDCO7OTWaa0PJvNpoog2?=
- =?us-ascii?Q?QCt02kS+L/wQ0oRJo9tE2xuG18NBK0kpApV0mL+HnuiV/sTOd/ar67fUwV9O?=
- =?us-ascii?Q?BdzIWZV1/FBBwarnFEsXh58SlyA5+tdY3vDS+tMIcldNadszOzsg9sRmILkc?=
- =?us-ascii?Q?zH6VQKjJd+GKwDqVebnAEeFkmW/fZhSt+AwTB6zp3U9Rg2/h+QMQqmqDLMFC?=
- =?us-ascii?Q?fpsxUr/2BWZ+XX1p+59jpmOgdgauP/4kRhfgmbcJVktAz4QvA53BQSdYhXSv?=
- =?us-ascii?Q?yGyVBN+xIzSJ3BU8mAETsbl5D00jG3oBi+Ww4D5g2L1VkveUWGOkpZ+HOgWB?=
- =?us-ascii?Q?kIJmW0ZcFOxwS0r0dNWs4LKUblaQ6nNMgn+48vUd/v01rD9+WcSlwmt0N25a?=
- =?us-ascii?Q?GOV0MapnK6NlRpIe/+1ah6GNjZHxRj62eki+j1bTai8slz6jQI+0mte0BBrU?=
- =?us-ascii?Q?lzpgvY9X+Z53BzgNVi16l/sRwQZ1HQqA+JCXT4FNFvW4dYgFEwQ6vB1QSEVE?=
- =?us-ascii?Q?p7kYNYUpdD7csAYhqCnMeU+mAnn46UYi5naObm3myA5HzL2rVacjxtHDsyUj?=
- =?us-ascii?Q?96Ni4xdNxL2dDmWcW8QLvDi4AKL4U8A2eJ9y8Bz1Sq4d+bGNVHG/XJ/VvLgR?=
- =?us-ascii?Q?JKommI5WiIWFLFNjUJfL4Zox6XXDewaviTBAONAf0CNpWwUFWuPlpb3DpQ97?=
- =?us-ascii?Q?flYDBoJBhqN39ziHKlg+G1i7A0KY+vSJ2BoPns3jYT3QOh5HJ3Ya7HWzVzmM?=
- =?us-ascii?Q?X32NtqcJExlYq1b/TnUwwc/r9ZCtV2WpKTmg3sDERF/f5FUaU7oqXRbmmqM/?=
- =?us-ascii?Q?NSlnUWp6c2UaTokeyfNKyr2Ljao8Wb55kyKFocMoo2xZWPFCscMcwlEFF8xR?=
- =?us-ascii?Q?yPacExnqyybEpRiuqvnLpaeP71g=3D?=
-X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4d8ae1b7-7964-4552-66a7-08d9989eb6e8
-X-MS-Exchange-CrossTenant-AuthSource: CO6PR02MB7555.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Oct 2021 16:36:09.1928
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: bb047546-786f-4de1-bd75-24e5b6f79043
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3GnEOGkjsObQZjtNUiK6vTwQrFYVdPa9P6HWjodLpJotEuc86FWr8kOaQ1VUTET+5rMobRZP50ezVBEzNMchPOQcKMr49u0pWuH2DuwsheA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW2PR02MB3772
-X-Proofpoint-ORIG-GUID: _YVCejzQkP5_BYN8_1RZe9b31avrWu7o
-X-Proofpoint-GUID: _YVCejzQkP5_BYN8_1RZe9b31avrWu7o
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-10-26_05,2021-10-26_01,2020-04-07_01
-X-Proofpoint-Spam-Reason: safe
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8ad4de9dae77ee3690ee9bd3c5a51d235d619eb6.1634870747.git.houwenlong93@linux.alibaba.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When the vCPU is destroyed, we must free the space allocated to the dirty
-quota context for the vCPU.
+On Fri, Oct 22, 2021, Hou Wenlong wrote:
+> When kvm.force_emulation_prefix is enabled, instruction with
+> kvm prefix would trigger an UD exception and do instruction
+> emulation. The emulation may need to exit to userspace due
+> to userspace io, and the complete_userspace_io callback may
+> skip instruction, i.e. MSR accesses emulation would exit to
+> userspace if userspace wanted to know about the MSR fault.
+> However, VM_EXIT_INSTRUCTION_LEN in vmcs is invalid now, it
+> should use kvm_emulate_instruction() to skip instruction.
+> 
+> Signed-off-by: Hou Wenlong <houwenlong93@linux.alibaba.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 4 ++--
+>  arch/x86/kvm/vmx/vmx.h | 9 +++++++++
+>  2 files changed, 11 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 1c8b2b6e7ed9..01049d65da26 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -1501,8 +1501,8 @@ static int skip_emulated_instruction(struct kvm_vcpu *vcpu)
+>  	 * (namely Hyper-V) don't set it due to it being undefined behavior,
+>  	 * i.e. we end up advancing IP with some random value.
+>  	 */
+> -	if (!static_cpu_has(X86_FEATURE_HYPERVISOR) ||
+> -	    exit_reason.basic != EXIT_REASON_EPT_MISCONFIG) {
+> +	if (!is_ud_exit(vcpu) && (!static_cpu_has(X86_FEATURE_HYPERVISOR) ||
 
-Co-developed-by: Anurag Madnawat <anurag.madnawat@nutanix.com>
-Signed-off-by: Anurag Madnawat <anurag.madnawat@nutanix.com>
-Signed-off-by: Shivam Kumar <shivam.kumar1@nutanix.com>
-Signed-off-by: Shaju Abraham <shaju.abraham@nutanix.com>
-Signed-off-by: Manish Mishra <manish.mishra@nutanix.com>
+This is incomplete and is just a workaround for the underlying bug.  The same
+mess can occur if the emulator triggers an exit to userspace during "normal"
+emulation, e.g. if unrestricted guest is disabled and the guest accesses an MSR
+while in Big RM.  In that case, there's no #UD to key off of.
+
+The correct way to fix this is to attach a different callback when the MSR access
+comes from the emulator.  I'd say rename the existing complete_emulated_{rd,wr}msr()
+callbacks to complete_fast_{rd,wr}msr() to match the port I/O nomenclature.
+
+Something like this (which also has some opportunistic simplification of the
+error handling in kvm_emulate_{rd,wr}msr()).
+
 ---
- include/linux/dirty_quota_migration.h | 1 +
- virt/kvm/dirty_quota_migration.c      | 6 ++++++
- virt/kvm/kvm_main.c                   | 2 ++
- 3 files changed, 9 insertions(+)
+ arch/x86/kvm/x86.c | 82 +++++++++++++++++++++++++---------------------
+ 1 file changed, 45 insertions(+), 37 deletions(-)
 
-diff --git a/include/linux/dirty_quota_migration.h b/include/linux/dirty_quota_migration.h
-index f343c073f38d..d3ccab153d44 100644
---- a/include/linux/dirty_quota_migration.h
-+++ b/include/linux/dirty_quota_migration.h
-@@ -16,5 +16,6 @@ int kvm_vcpu_dirty_quota_alloc(struct vCPUDirtyQuotaContext **vCPUdqctx);
- struct page *kvm_dirty_quota_context_get_page(
- 		struct vCPUDirtyQuotaContext *vCPUdqctx, u32 offset);
- bool is_dirty_quota_full(struct vCPUDirtyQuotaContext *vCPUdqctx);
-+void kvm_vcpu_dirty_quota_free(struct vCPUDirtyQuotaContext **vCPUdqctx);
- 
- #endif  /* DIRTY_QUOTA_MIGRATION_H */
-diff --git a/virt/kvm/dirty_quota_migration.c b/virt/kvm/dirty_quota_migration.c
-index eeef19347af4..3f74af2ccab9 100644
---- a/virt/kvm/dirty_quota_migration.c
-+++ b/virt/kvm/dirty_quota_migration.c
-@@ -23,3 +23,9 @@ bool is_dirty_quota_full(struct vCPUDirtyQuotaContext *vCPUdqctx)
- {
- 	return (vCPUdqctx->dirty_counter >= vCPUdqctx->dirty_quota);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index ac83d873d65b..7ff5b8d58ca3 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1814,18 +1814,44 @@ int kvm_set_msr(struct kvm_vcpu *vcpu, u32 index, u64 data)
  }
-+
-+void kvm_vcpu_dirty_quota_free(struct vCPUDirtyQuotaContext **vCPUdqctx)
-+{
-+	vfree(*vCPUdqctx);
-+	*vCPUdqctx = NULL;
-+}
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index c41b85af8682..30fce3f93ce0 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -430,6 +430,7 @@ static void kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned id)
- 
- void kvm_vcpu_destroy(struct kvm_vcpu *vcpu)
- {
-+	kvm_vcpu_dirty_quota_free(&vcpu->vCPUdqctx);
- 	kvm_dirty_ring_free(&vcpu->dirty_ring);
- 	kvm_arch_vcpu_destroy(vcpu);
- 
-@@ -3683,6 +3684,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
- 
- unlock_vcpu_destroy:
- 	mutex_unlock(&kvm->lock);
-+	kvm_vcpu_dirty_quota_free(&vcpu->vCPUdqctx);
- 	kvm_dirty_ring_free(&vcpu->dirty_ring);
- arch_vcpu_destroy:
- 	kvm_arch_vcpu_destroy(vcpu);
--- 
-2.22.3
+ EXPORT_SYMBOL_GPL(kvm_set_msr);
 
+-static int complete_emulated_rdmsr(struct kvm_vcpu *vcpu)
++static void __complete_emulated_rdmsr(struct kvm_vcpu *vcpu)
+ {
+-	int err = vcpu->run->msr.error;
+-	if (!err) {
++	if (!vcpu->run->msr.error) {
+ 		kvm_rax_write(vcpu, (u32)vcpu->run->msr.data);
+ 		kvm_rdx_write(vcpu, vcpu->run->msr.data >> 32);
+ 	}
++}
+
+-	return static_call(kvm_x86_complete_emulated_msr)(vcpu, err);
++static int complete_emulated_msr_access(struct kvm_vcpu *vcpu)
++{
++	if (vcpu->run->msr.error) {
++		kvm_inject_gp(vcpu, 0);
++		return 1;
++	}
++
++	return kvm_emulate_instruction(vcpu, EMULTYPE_SKIP);
++}
++
++static int complete_emulated_rdmsr(struct kvm_vcpu *vcpu)
++{
++	__complete_emulated_rdmsr(vcpu);
++
++	return complete_emulated_msr_access(vcpu);
+ }
+
+ static int complete_emulated_wrmsr(struct kvm_vcpu *vcpu)
++{
++	return complete_emulated_msr_access(vcpu);
++}
++
++static int complete_fast_rdmsr(struct kvm_vcpu *vcpu)
++{
++	__complete_emulated_rdmsr(vcpu);
++
++	return static_call(kvm_x86_complete_emulated_msr)(vcpu, vcpu->run->msr.error);
++}
++
++static int complete_fast_wrmsr(struct kvm_vcpu *vcpu)
+ {
+ 	return static_call(kvm_x86_complete_emulated_msr)(vcpu, vcpu->run->msr.error);
+ }
+@@ -1864,18 +1890,6 @@ static int kvm_msr_user_space(struct kvm_vcpu *vcpu, u32 index,
+ 	return 1;
+ }
+
+-static int kvm_get_msr_user_space(struct kvm_vcpu *vcpu, u32 index, int r)
+-{
+-	return kvm_msr_user_space(vcpu, index, KVM_EXIT_X86_RDMSR, 0,
+-				   complete_emulated_rdmsr, r);
+-}
+-
+-static int kvm_set_msr_user_space(struct kvm_vcpu *vcpu, u32 index, u64 data, int r)
+-{
+-	return kvm_msr_user_space(vcpu, index, KVM_EXIT_X86_WRMSR, data,
+-				   complete_emulated_wrmsr, r);
+-}
+-
+ int kvm_emulate_rdmsr(struct kvm_vcpu *vcpu)
+ {
+ 	u32 ecx = kvm_rcx_read(vcpu);
+@@ -1883,19 +1897,15 @@ int kvm_emulate_rdmsr(struct kvm_vcpu *vcpu)
+ 	int r;
+
+ 	r = kvm_get_msr(vcpu, ecx, &data);
+-
+-	/* MSR read failed? See if we should ask user space */
+-	if (r && kvm_get_msr_user_space(vcpu, ecx, r)) {
+-		/* Bounce to user space */
+-		return 0;
+-	}
+-
+ 	if (!r) {
+ 		trace_kvm_msr_read(ecx, data);
+
+ 		kvm_rax_write(vcpu, data & -1u);
+ 		kvm_rdx_write(vcpu, (data >> 32) & -1u);
+ 	} else {
++		if (kvm_msr_user_space(vcpu, ecx, KVM_EXIT_X86_RDMSR, 0,
++				       complete_fast_rdmsr, r))
++			return 0;
+ 		trace_kvm_msr_read_ex(ecx);
+ 	}
+
+@@ -1910,20 +1920,16 @@ int kvm_emulate_wrmsr(struct kvm_vcpu *vcpu)
+ 	int r;
+
+ 	r = kvm_set_msr(vcpu, ecx, data);
+-
+-	/* MSR write failed? See if we should ask user space */
+-	if (r && kvm_set_msr_user_space(vcpu, ecx, data, r))
+-		/* Bounce to user space */
+-		return 0;
+-
+-	/* Signal all other negative errors to userspace */
+-	if (r < 0)
+-		return r;
+-
+-	if (!r)
++	if (!r) {
+ 		trace_kvm_msr_write(ecx, data);
+-	else
++	} else {
++		if (kvm_msr_user_space(vcpu, ecx, KVM_EXIT_X86_WRMSR, data,
++				       complete_fast_wrmsr, r))
++			return 0;
++		if (r < 0)
++			return r;
+ 		trace_kvm_msr_write_ex(ecx, data);
++	}
+
+ 	return static_call(kvm_x86_complete_emulated_msr)(vcpu, r);
+ }
+@@ -7387,7 +7393,8 @@ static int emulator_get_msr(struct x86_emulate_ctxt *ctxt,
+
+ 	r = kvm_get_msr(vcpu, msr_index, pdata);
+
+-	if (r && kvm_get_msr_user_space(vcpu, msr_index, r)) {
++	if (r && kvm_msr_user_space(vcpu, msr_index, KVM_EXIT_X86_RDMSR, 0,
++				    complete_emulated_rdmsr, r)) {
+ 		/* Bounce to user space */
+ 		return X86EMUL_IO_NEEDED;
+ 	}
+@@ -7403,7 +7410,8 @@ static int emulator_set_msr(struct x86_emulate_ctxt *ctxt,
+
+ 	r = kvm_set_msr(vcpu, msr_index, data);
+
+-	if (r && kvm_set_msr_user_space(vcpu, msr_index, data, r)) {
++	if (r && kvm_msr_user_space(vcpu, msr_index, KVM_EXIT_X86_WRMSR, data,
++				    complete_emulated_wrmsr, r)) {
+ 		/* Bounce to user space */
+ 		return X86EMUL_IO_NEEDED;
+ 	}
+--
