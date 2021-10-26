@@ -2,114 +2,277 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 166D943B618
-	for <lists+kvm@lfdr.de>; Tue, 26 Oct 2021 17:51:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 5179643B622
+	for <lists+kvm@lfdr.de>; Tue, 26 Oct 2021 17:53:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237140AbhJZPyJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Oct 2021 11:54:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40081 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237154AbhJZPxZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 26 Oct 2021 11:53:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635263460;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=7tz1ztkDJ8/mfxOMQDKDmzGKJgDrZn1JGVp6nZRCrRs=;
-        b=BqMHxZbduQ8KSNVo+eNZb2DIgYv8XZF4lXY/AnCTbV/OIIi0JHxVJ9nvmpK+Cnxk1DxfOq
-        u8YBXZle67hM5+O5+U+zDoC7cFtTIghm4KX6HO3o07zVGe/ceDY3mSXGJwOosOjYaHmNMX
-        cddDf6yp2mwgltdp5AnGxq9TcJbW4Ew=
-Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
- [209.85.210.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-331-IbAaEziBMUOfgl-hp-swUw-1; Tue, 26 Oct 2021 11:50:59 -0400
-X-MC-Unique: IbAaEziBMUOfgl-hp-swUw-1
-Received: by mail-ot1-f71.google.com with SMTP id z15-20020a9d71cf000000b0055036817463so9335245otj.0
-        for <kvm@vger.kernel.org>; Tue, 26 Oct 2021 08:50:59 -0700 (PDT)
+        id S237048AbhJZPzj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Oct 2021 11:55:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46860 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237070AbhJZPza (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Oct 2021 11:55:30 -0400
+Received: from mail-yb1-xb2d.google.com (mail-yb1-xb2d.google.com [IPv6:2607:f8b0:4864:20::b2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81721C061243
+        for <kvm@vger.kernel.org>; Tue, 26 Oct 2021 08:52:41 -0700 (PDT)
+Received: by mail-yb1-xb2d.google.com with SMTP id a6so25121966ybq.9
+        for <kvm@vger.kernel.org>; Tue, 26 Oct 2021 08:52:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=/sasRfabbPuEjBen+tyWL4c0tyBTfXF/+shmskjClrw=;
+        b=JwYkC6CWUO/oqH+2cIkcp0Z43KZbcu5vi0cjuGIWT/T7FJFLm1deKl7LB6dPXtLSvB
+         uBCeXwxkIlK/DE26TcjF5NDD7cbDAGXCpVSWdxPxXd8O1ofj1CiBmUk37RGK83LEo9Ws
+         P81FPMZrlHUDo23Ne5zY6nkyJRyjn48eTtoLf/fZP3HK1H+RLJZkJeoGSyR4Ggyz+fC8
+         I38s5iInh8DfmRhHukanb4QaPRe3D8zlnDcLFhIEz0ScYiICxAX8BnstOyxVI1zjm7Qp
+         Ziy1Kw5u5Jt2joDt2nGPcukBx48gO3T8WGxZmZ3gYsb12vEwDv5+UfnJFsPyHYt6BDS0
+         W7uA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=7tz1ztkDJ8/mfxOMQDKDmzGKJgDrZn1JGVp6nZRCrRs=;
-        b=SYgs2NbgimT2Gg2WssEl8rdIecYjNwBmLXAQ7+jAguqtEq15E2Kj8OucNZjre3GwQk
-         pVquBrMDQXamauLqO/IX0e2YxGKen2yuJuAGocuCGOidbP5I3DQAl+0wyA+uoCQb6guy
-         Rn6m/1G2ajBv5ZA8fg+4eWlImvyoe1hRo5uS/MaZItUlURgumGWoDwlmQo7OhxS24QnF
-         HyTjXzv52O/+cmQ+NfY6Xh+ti5PwxI1WFGdcRHWjAjF3rknbMKyuk5esdwXiSO65IhpD
-         XDzk0JZieBy0X7DFUlzZSSgBlPE6usal95+fHBG7VuoEBisSozX9T9lcp6A5kxUVn7zK
-         bhmA==
-X-Gm-Message-State: AOAM532cwUKYD3SWf1CyVmf0GQe7zHgUOjx4JML5WXvM4bk2xhpvY16d
-        fYA/wXhjIKaF/79dkZGA9zTP5hdnxvZPhrGr3N3SHQyjNVLb6zEme6kLfvOJFRPIB/WAPrzIi5s
-        zjhiTJWzHyEMA
-X-Received: by 2002:a05:6808:1302:: with SMTP id y2mr28467703oiv.24.1635263458702;
-        Tue, 26 Oct 2021 08:50:58 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxwKwVU0S0IFXJyByTOQvRXw6ryzeoMp+YocfGDa8qsGEiNUdjdaki5Abf+Y8mGKt7upXgiSw==
-X-Received: by 2002:a05:6808:1302:: with SMTP id y2mr28467689oiv.24.1635263458562;
-        Tue, 26 Oct 2021 08:50:58 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id l9sm4675881oie.15.2021.10.26.08.50.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Oct 2021 08:50:58 -0700 (PDT)
-Date:   Tue, 26 Oct 2021 09:50:57 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Cornelia Huck <cohuck@redhat.com>
-Cc:     Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
-        jgg@nvidia.com, saeedm@nvidia.com, linux-pci@vger.kernel.org,
-        kvm@vger.kernel.org, netdev@vger.kernel.org, kuba@kernel.org,
-        leonro@nvidia.com, kwankhede@nvidia.com, mgurtovoy@nvidia.com,
-        maorg@nvidia.com
-Subject: Re: [PATCH V4 mlx5-next 06/13] vfio: Fix
- VFIO_DEVICE_STATE_SET_ERROR macro
-Message-ID: <20211026095057.1024c132.alex.williamson@redhat.com>
-In-Reply-To: <87pmrrdcos.fsf@redhat.com>
-References: <20211026090605.91646-1-yishaih@nvidia.com>
-        <20211026090605.91646-7-yishaih@nvidia.com>
-        <87pmrrdcos.fsf@redhat.com>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=/sasRfabbPuEjBen+tyWL4c0tyBTfXF/+shmskjClrw=;
+        b=1SI1U3JQ7pqG2AP0LzQ908EUWgLfCjaT1txaHlRlT+VNXLNuI6UwhEr+mgErcMppyD
+         WliYV7BG4V16BJD6yvbYeKwfrSIGiiJNVv5z0oqp2FWJhkw9N36QczWXymNVCDiCXrCM
+         jK6absLke3/09VEtiorjJFQrfKoWJ8LNERYbED8ypHuLKyBfG/0EaTq/jeEACTehG9w0
+         MvGmJYY3K3+060iODqczf6lcL1eiO/KviGL8DSrfWactOw1UsBzbdFQFliODxHuwyR7y
+         6/2W2TIhvRL110s90Tt/5AhIx4mfY8A/NboeOKPN6BnEpj84TqP7HNUjTcdtXkLgQsa/
+         v1nA==
+X-Gm-Message-State: AOAM532ebHlrTc7hxfxeIXsTRKXgaWYu17KZ2DaOu5vciI9lB64Jbt21
+        P9WUdoU3SY3KaHEkTCj1YwZ1Fzl66gsdlqPi2uYFOQ==
+X-Google-Smtp-Source: ABdhPJyBDuC69bwxJ5kEJFcWiDOSowL08nmwikSLFscBvcyZcDXqdIUQNZrTfmI8kCafXhhd26aAAdZaXiagnuUSIdc=
+X-Received: by 2002:a25:3142:: with SMTP id x63mr23679155ybx.99.1635263560527;
+ Tue, 26 Oct 2021 08:52:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20211005234459.430873-1-michael.roth@amd.com> <20211005234459.430873-2-michael.roth@amd.com>
+ <CAL715WK2toExGW7GGWGQyzhqBijMEhQfhamyb9_eZkrU=+LKnQ@mail.gmail.com> <20211021034529.gwv3hz5xhomtvnu7@amd.com>
+In-Reply-To: <20211021034529.gwv3hz5xhomtvnu7@amd.com>
+From:   Mingwei Zhang <mizhang@google.com>
+Date:   Tue, 26 Oct 2021 08:52:29 -0700
+Message-ID: <CAL715W+PE1hGmxZfMc4oOm6dyNzCBmStnJzp-OyW6DdhNAmwjQ@mail.gmail.com>
+Subject: Re: [RFC 01/16] KVM: selftests: move vm_phy_pages_alloc() earlier in file
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     linux-kselftest@vger.kernel.org, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
+        Nathan Tempelman <natet@google.com>,
+        Marc Orr <marcorr@google.com>,
+        Steve Rutherford <srutherford@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Varad Gautam <varad.gautam@suse.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 26 Oct 2021 17:32:19 +0200
-Cornelia Huck <cohuck@redhat.com> wrote:
-
-> On Tue, Oct 26 2021, Yishai Hadas <yishaih@nvidia.com> wrote:
-> 
-> > Fixed the non-compiled macro VFIO_DEVICE_STATE_SET_ERROR (i.e. SATE
-> > instead of STATE).
+On Wed, Oct 20, 2021 at 8:47 PM Michael Roth <michael.roth@amd.com> wrote:
+>
+> On Mon, Oct 18, 2021 at 08:00:00AM -0700, Mingwei Zhang wrote:
+> > On Tue, Oct 5, 2021 at 4:46 PM Michael Roth <michael.roth@amd.com> wrote:
+> > >
+> > > Subsequent patches will break some of this code out into file-local
+> > > helper functions, which will be used by functions like vm_vaddr_alloc(),
+> > > which currently are defined earlier in the file, so a forward
+> > > declaration would be needed.
+> > >
+> > > Instead, move it earlier in the file, just above vm_vaddr_alloc() and
+> > > and friends, which are the main users.
+> > >
+> > > Signed-off-by: Michael Roth <michael.roth@amd.com>
+> > > ---
+> > >  tools/testing/selftests/kvm/lib/kvm_util.c | 146 ++++++++++-----------
+> > >  1 file changed, 73 insertions(+), 73 deletions(-)
+> > >
+> > > diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> > > index 10a8ed691c66..92f59adddebe 100644
+> > > --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> > > +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> > > @@ -1145,6 +1145,79 @@ void vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid)
+> > >         list_add(&vcpu->list, &vm->vcpus);
+> > >  }
+> > >
+> > > +/*
+> > > + * Physical Contiguous Page Allocator
+> > > + *
+> > > + * Input Args:
+> > > + *   vm - Virtual Machine
+> > > + *   num - number of pages
+> > > + *   paddr_min - Physical address minimum
+> > > + *   memslot - Memory region to allocate page from
+> > > + *
+> > > + * Output Args: None
+> > > + *
+> > > + * Return:
+> > > + *   Starting physical address
+> > > + *
+> > > + * Within the VM specified by vm, locates a range of available physical
+> > > + * pages at or above paddr_min. If found, the pages are marked as in use
+> > > + * and their base address is returned. A TEST_ASSERT failure occurs if
+> > > + * not enough pages are available at or above paddr_min.
+> > > + */
+> > > +vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
+> > > +                             vm_paddr_t paddr_min, uint32_t memslot)
+> > > +{
+> > > +       struct userspace_mem_region *region;
+> > > +       sparsebit_idx_t pg, base;
+> > > +
+> > > +       TEST_ASSERT(num > 0, "Must allocate at least one page");
+> > > +
+> > > +       TEST_ASSERT((paddr_min % vm->page_size) == 0, "Min physical address "
+> > > +               "not divisible by page size.\n"
+> > > +               "  paddr_min: 0x%lx page_size: 0x%x",
+> > > +               paddr_min, vm->page_size);
+> > > +
+> > > +       region = memslot2region(vm, memslot);
+> > > +       base = pg = paddr_min >> vm->page_shift;
+> > > +
+> > > +       do {
+> > > +               for (; pg < base + num; ++pg) {
+> > > +                       if (!sparsebit_is_set(region->unused_phy_pages, pg)) {
+> > > +                               base = pg = sparsebit_next_set(region->unused_phy_pages, pg);
+> > > +                               break;
+> > > +                       }
+> > > +               }
+> > > +       } while (pg && pg != base + num);
+> > > +
+> > > +       if (pg == 0) {
+> > > +               fprintf(stderr, "No guest physical page available, "
+> > > +                       "paddr_min: 0x%lx page_size: 0x%x memslot: %u\n",
+> > > +                       paddr_min, vm->page_size, memslot);
+> > > +               fputs("---- vm dump ----\n", stderr);
+> > > +               vm_dump(stderr, vm, 2);
+> > > +               abort();
+> > > +       }
+> > > +
+> > > +       for (pg = base; pg < base + num; ++pg)
+> > > +               sparsebit_clear(region->unused_phy_pages, pg);
+> > > +
+> > > +       return base * vm->page_size;
+> > > +}
+> > > +
+> > > +vm_paddr_t vm_phy_page_alloc(struct kvm_vm *vm, vm_paddr_t paddr_min,
+> > > +                            uint32_t memslot)
+> > > +{
+> > > +       return vm_phy_pages_alloc(vm, 1, paddr_min, memslot);
+> > > +}
+> > > +
+> > > +/* Arbitrary minimum physical address used for virtual translation tables. */
+> > > +#define KVM_GUEST_PAGE_TABLE_MIN_PADDR 0x180000
+> > > +
+> > > +vm_paddr_t vm_alloc_page_table(struct kvm_vm *vm)
+> > > +{
+> > > +       return vm_phy_page_alloc(vm, KVM_GUEST_PAGE_TABLE_MIN_PADDR, 0);
+> > > +}
+> > > +
+> > >  /*
+> > >   * VM Virtual Address Unused Gap
+> > >   *
+> > > @@ -2149,79 +2222,6 @@ const char *exit_reason_str(unsigned int exit_reason)
+> > >         return "Unknown";
+> > >  }
+> > >
+> > > -/*
+> > > - * Physical Contiguous Page Allocator
+> > > - *
+> > > - * Input Args:
+> > > - *   vm - Virtual Machine
+> > > - *   num - number of pages
+> > > - *   paddr_min - Physical address minimum
+> > > - *   memslot - Memory region to allocate page from
+> > > - *
+> > > - * Output Args: None
+> > > - *
+> > > - * Return:
+> > > - *   Starting physical address
+> > > - *
+> > > - * Within the VM specified by vm, locates a range of available physical
+> > > - * pages at or above paddr_min. If found, the pages are marked as in use
+> > > - * and their base address is returned. A TEST_ASSERT failure occurs if
+> > > - * not enough pages are available at or above paddr_min.
+> > > - */
+> > > -vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
+> > > -                             vm_paddr_t paddr_min, uint32_t memslot)
+> > > -{
+> > > -       struct userspace_mem_region *region;
+> > > -       sparsebit_idx_t pg, base;
+> > > -
+> > > -       TEST_ASSERT(num > 0, "Must allocate at least one page");
+> > > -
+> > > -       TEST_ASSERT((paddr_min % vm->page_size) == 0, "Min physical address "
+> > > -               "not divisible by page size.\n"
+> > > -               "  paddr_min: 0x%lx page_size: 0x%x",
+> > > -               paddr_min, vm->page_size);
+> > > -
+> > > -       region = memslot2region(vm, memslot);
+> > > -       base = pg = paddr_min >> vm->page_shift;
+> > > -
+> > > -       do {
+> > > -               for (; pg < base + num; ++pg) {
+> > > -                       if (!sparsebit_is_set(region->unused_phy_pages, pg)) {
+> > > -                               base = pg = sparsebit_next_set(region->unused_phy_pages, pg);
+> > > -                               break;
+> > > -                       }
+> > > -               }
+> > > -       } while (pg && pg != base + num);
+> > > -
+> > > -       if (pg == 0) {
+> > > -               fprintf(stderr, "No guest physical page available, "
+> > > -                       "paddr_min: 0x%lx page_size: 0x%x memslot: %u\n",
+> > > -                       paddr_min, vm->page_size, memslot);
+> > > -               fputs("---- vm dump ----\n", stderr);
+> > > -               vm_dump(stderr, vm, 2);
+> > > -               abort();
+> > > -       }
+> > > -
+> > > -       for (pg = base; pg < base + num; ++pg)
+> > > -               sparsebit_clear(region->unused_phy_pages, pg);
+> > > -
+> > > -       return base * vm->page_size;
+> > > -}
+> > > -
+> > > -vm_paddr_t vm_phy_page_alloc(struct kvm_vm *vm, vm_paddr_t paddr_min,
+> > > -                            uint32_t memslot)
+> > > -{
+> > > -       return vm_phy_pages_alloc(vm, 1, paddr_min, memslot);
+> > > -}
+> > > -
+> > > -/* Arbitrary minimum physical address used for virtual translation tables. */
+> > > -#define KVM_GUEST_PAGE_TABLE_MIN_PADDR 0x180000
+> > > -
+> > > -vm_paddr_t vm_alloc_page_table(struct kvm_vm *vm)
+> > > -{
+> > > -       return vm_phy_page_alloc(vm, KVM_GUEST_PAGE_TABLE_MIN_PADDR, 0);
+> > > -}
+> > > -
+> > >  /*
+> > >   * Address Guest Virtual to Host Virtual
+> > >   *
+> > > --
+> > > 2.25.1
+> > >
 > >
-> > Fixes: a8a24f3f6e38 ("vfio: UAPI for migration interface for device state")
-> > Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
-> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>  
-> 
-> This s-o-b chain looks weird; your s-o-b always needs to be last.
-> 
-> > ---
-> >  include/uapi/linux/vfio.h | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> > index ef33ea002b0b..114ffcefe437 100644
-> > --- a/include/uapi/linux/vfio.h
-> > +++ b/include/uapi/linux/vfio.h
-> > @@ -622,7 +622,7 @@ struct vfio_device_migration_info {
-> >  					      VFIO_DEVICE_STATE_RESUMING))
-> >  
-> >  #define VFIO_DEVICE_STATE_SET_ERROR(state) \
-> > -	((state & ~VFIO_DEVICE_STATE_MASK) | VFIO_DEVICE_SATE_SAVING | \
-> > +	((state & ~VFIO_DEVICE_STATE_MASK) | VFIO_DEVICE_STATE_SAVING | \
-> >  					     VFIO_DEVICE_STATE_RESUMING)
-> >  
-> >  	__u32 reserved;  
-> 
-> Change looks fine, although we might consider merging it with the next
-> patch? Anyway,
+> > Why move the function implementation? Maybe just adding a declaration
+> > at the top of kvm_util.c should suffice.
+>
+> At least from working on other projects I'd gotten the impression that
+> forward function declarations should be avoided if they can be solved by
+> moving the function above the caller. Certainly don't mind taking your
+> suggestion and dropping this patch if that's not the case here though.
 
-I had requested it separate a couple revisions ago since it's a fix.
-Thanks,
+Understood. Yes, I think it would be better to follow your experience
+then. I was thinking that if you move the code and then potentially
+git blame on that function might point to you :)
 
-Alex
-
+Thanks.
+-Mingwei
