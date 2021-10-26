@@ -2,303 +2,198 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F0D8843B428
-	for <lists+kvm@lfdr.de>; Tue, 26 Oct 2021 16:30:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2901A43B481
+	for <lists+kvm@lfdr.de>; Tue, 26 Oct 2021 16:42:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236693AbhJZOcO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Oct 2021 10:32:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58230 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236590AbhJZOcA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 26 Oct 2021 10:32:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635258570;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2kYAPX2VGBsH1X6cP0RtYj20ucdCaNWXLNB7+ktwG10=;
-        b=GI08+dfMQV6quth1hg+yS0peN6amCHuPFBGgq9MNrI8MJ6vaJsA+F43sdRLt/SYyhOw4eZ
-        lkpk48cXhkfCn1TTS3CS+H1Sl4OGfpWgKT2cZijbcbSOQDhouZ6qP6ezmxk4KVDIAPIvOH
-        q2nCmWd0qFyztnG4YaDppv/YoBcceNE=
-Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com
- [209.85.161.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-420-m9iWXBCRMYao475L1cZyJg-1; Tue, 26 Oct 2021 10:29:25 -0400
-X-MC-Unique: m9iWXBCRMYao475L1cZyJg-1
-Received: by mail-oo1-f72.google.com with SMTP id o6-20020a4ad486000000b002b8d8eef8f3so95539oos.16
-        for <kvm@vger.kernel.org>; Tue, 26 Oct 2021 07:29:24 -0700 (PDT)
+        id S235809AbhJZOoe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Oct 2021 10:44:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58674 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236875AbhJZOod (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Oct 2021 10:44:33 -0400
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76AD8C061243
+        for <kvm@vger.kernel.org>; Tue, 26 Oct 2021 07:42:09 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id x66so14507681pfx.13
+        for <kvm@vger.kernel.org>; Tue, 26 Oct 2021 07:42:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=15ypjFUpEZR6j1f2lct8JIBlISDABGh8xT/edVB0GWk=;
+        b=XUED9cjOhv6KEtIoMQpCiNdsQoV6dg3e/7lW2+FHPnhaQds6h3BWc8tFP6L5SuK3TY
+         yvJzYA1i0DQtwKFitv0MDcoUNKySCeZO68ZPIhrcWMkkMQyQznxEzn/Ul3V0F+F446Ju
+         1uK4jfVuv28ayDaXn6lJWG+Z2UBWIubmCGbG5mKLDu+5/nstf0NRuWgBgyds16PAY49R
+         giU3jccm4ppgbqcoaRjjc3Olhba4B0nT8+dbQZ9IGdwLoJK7SswCLBzZuBMF7Ss/qRiO
+         h5+M1VpqRXEnYYk42eDZvsGn7R8qwdYO0yd8MDGrG8nL+uoSyKJNbPeO8tdRXq3lF4PT
+         BT4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=2kYAPX2VGBsH1X6cP0RtYj20ucdCaNWXLNB7+ktwG10=;
-        b=xRTU7r5BE038bi+uQ6Hya/zqUKL/4Bb4rfsZYAjXTlhOsG8T5SLXkJSZq6jufuosk6
-         x+OoIvggblJnhQ5azxfTXPIxakvDiUC5teDld3kNflE9dKDTSI+VUp402HsRR4sYE6JI
-         iqkSeaOZWHEvrLy7hP/E+g519LD/2l2TVFwSswIZMhrBOVm/0OMLl8cnsUYEf6wW5l8W
-         NP0Yt4JrspigZhjqWuN3Yi+PFfmUxPY6/w5zv4Tpa1hDmHHZ3u6kZcEshTR5goRrnJh2
-         MWa6K6dfGx38NP6KQxG1TmDu2oAf22o2f6fFB/nSHCDGlJG+8FCEf9PWm2iTIbDFMKEq
-         LxzA==
-X-Gm-Message-State: AOAM533E0GZFsWyvajaE5hQ5K+Ye51cXT1tK0blne3LO6GYLU1ITKRs4
-        y5NPhNnhSP1jTqElwBGp4vAXWHPJohRXjQCj6l/fraMkeOIwGWy8+q+Np/3fV/OaIFQpRVUM4L8
-        MNJQ3JUveB/WM
-X-Received: by 2002:a05:6830:142:: with SMTP id j2mr19958163otp.252.1635258563320;
-        Tue, 26 Oct 2021 07:29:23 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxG4KUMnqa1iY9x1BOCXowMXBHg3LGdshyNNXldXqNcmbfhcg/JpKs4aVIrfaxlvz4ZhAYNFg==
-X-Received: by 2002:a05:6830:142:: with SMTP id j2mr19958135otp.252.1635258562996;
-        Tue, 26 Oct 2021 07:29:22 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id v24sm3822218oou.45.2021.10.26.07.29.22
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=15ypjFUpEZR6j1f2lct8JIBlISDABGh8xT/edVB0GWk=;
+        b=fVbtsIL9BKm8kUHgNiH85BcCSqdq5nMuF8o4i13TzXd8bd1SIANvnyKfksRnlgLZrh
+         xscmmuBKe9b7coFxwv+ePRCUkXmuXyK6pdR8rCEx72KdOgZfFPIlS1JyA1CChMp48bpr
+         iQ6xnQX0UtCQbKJN0xuPNLGkDv4HEJPMt1ZLis1xMagS6fKx6UrMX+BqGw/5IAX88sbc
+         IbTxaqQYpyOwp6RcSGsQxy8fBLAoN1IUOAa5gTqdNptXNZVYvtQA7nn4CM0ZnTV4D4cb
+         1aIRTO2cwTnorXWG6QRZSorMSOuB6RnUZCv/q7/tFY1VLSN8Ul6aCHlnh4QvsySSBZO0
+         9RzQ==
+X-Gm-Message-State: AOAM5305vaqo4riVktmgqmuUanechtc6YMP3ArarDU8+4HZjhVIQMd6H
+        eL6ms5JS7OVRxecSyWA4ubmK6g==
+X-Google-Smtp-Source: ABdhPJyaXzK/n6vYjSctZudbm5fQ/5PMOVLMP7wCvjywBUqne0BVpn05yyRelu/zWqpraE7IByymcw==
+X-Received: by 2002:aa7:9212:0:b0:47b:aefd:2cc4 with SMTP id 18-20020aa79212000000b0047baefd2cc4mr26275184pfo.47.1635259327183;
+        Tue, 26 Oct 2021 07:42:07 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id b8sm24482555pfv.56.2021.10.26.07.42.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Oct 2021 07:29:22 -0700 (PDT)
-Date:   Tue, 26 Oct 2021 08:29:20 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc:     Yishai Hadas <yishaih@nvidia.com>,
-        Jason Gunthorpe <jgg@nvidia.com>, bhelgaas@google.com,
-        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
-        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com,
-        Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH V2 mlx5-next 12/14] vfio/mlx5: Implement vfio_pci driver
- for mlx5 devices
-Message-ID: <20211026082920.1f302a45.alex.williamson@redhat.com>
-In-Reply-To: <YXb7wejD1qckNrhC@work-vm>
-References: <20211019105838.227569-1-yishaih@nvidia.com>
-        <20211019105838.227569-13-yishaih@nvidia.com>
-        <20211019124352.74c3b6ba.alex.williamson@redhat.com>
-        <20211019192328.GZ2744544@nvidia.com>
-        <20211019145856.2fa7f7c8.alex.williamson@redhat.com>
-        <20211019230431.GA2744544@nvidia.com>
-        <5a496713-ae1d-11f2-1260-e4c1956e1eda@nvidia.com>
-        <20211020105230.524e2149.alex.williamson@redhat.com>
-        <YXbceaVo0q6hOesg@work-vm>
-        <20211025115535.49978053.alex.williamson@redhat.com>
-        <YXb7wejD1qckNrhC@work-vm>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        Tue, 26 Oct 2021 07:42:06 -0700 (PDT)
+Date:   Tue, 26 Oct 2021 14:42:02 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Woodhouse <dwmw2@infradead.org>
+Cc:     kvm <kvm@vger.kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, mtosatti <mtosatti@redhat.com>
+Subject: Re: [PATCH] KVM: x86: Take srcu lock in post_kvm_run_save()
+Message-ID: <YXgTugzJgJYUu01A@google.com>
+References: <606aaaf29fca3850a63aa4499826104e77a72346.camel@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <606aaaf29fca3850a63aa4499826104e77a72346.camel@infradead.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 25 Oct 2021 19:47:29 +0100
-"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+On Tue, Oct 26, 2021, David Woodhouse wrote:
+> From: David Woodhouse <dwmw@amazon.co.uk>
+> 
+> The Xen interrupt injection for event channels relies on accessing the
+> guest's vcpu_info structure in __kvm_xen_has_interrupt(), through a
+> gfn_to_hva_cache.
+> 
+> This requires the srcu lock to be held, which is mostly the case except
+> for this code path:
+> 
+> [   11.822877] WARNING: suspicious RCU usage
+> [   11.822965] -----------------------------
+> [   11.823013] include/linux/kvm_host.h:664 suspicious rcu_dereference_check() usage!
+> [   11.823131]
+> [   11.823131] other info that might help us debug this:
+> [   11.823131]
+> [   11.823196]
+> [   11.823196] rcu_scheduler_active = 2, debug_locks = 1
+> [   11.823253] 1 lock held by dom:0/90:
+> [   11.823292]  #0: ffff998956ec8118 (&vcpu->mutex){+.+.}, at: kvm_vcpu_ioctl+0x85/0x680
+> [   11.823379]
+> [   11.823379] stack backtrace:
+> [   11.823428] CPU: 2 PID: 90 Comm: dom:0 Kdump: loaded Not tainted 5.4.34+ #5
+> [   11.823496] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.12.1-0-ga5cab58e9a3f-prebuilt.qemu.org 04/01/2014
+> [   11.823612] Call Trace:
+> [   11.823645]  dump_stack+0x7a/0xa5
+> [   11.823681]  lockdep_rcu_suspicious+0xc5/0x100
+> [   11.823726]  __kvm_xen_has_interrupt+0x179/0x190
+> [   11.823773]  kvm_cpu_has_extint+0x6d/0x90
+> [   11.823813]  kvm_cpu_accept_dm_intr+0xd/0x40
+> [   11.823853]  kvm_vcpu_ready_for_interrupt_injection+0x20/0x30
+>               < post_kvm_run_save() inlined here >
+> [   11.823906]  kvm_arch_vcpu_ioctl_run+0x135/0x6a0
+> [   11.823947]  kvm_vcpu_ioctl+0x263/0x680
+> 
+> Fixes: 40da8ccd724f ("KVM: x86/xen: Add event channel interrupt vector upcall")
+> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+> ---
+> 
+> There are potentially other ways of doing this, by shuffling the tail
+> of kvm_arch_vcpu_ioctl_run() around a little and holding the lock once
+> there instead of taking it within vcpu_run(). But the call to
+> post_kvm_run_save() occurs even on the error paths, and it gets complex
+> to untangle. This is the simple approach.
 
-> * Alex Williamson (alex.williamson@redhat.com) wrote:
-> > On Mon, 25 Oct 2021 17:34:01 +0100
-> > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
-> >  =20
-> > > * Alex Williamson (alex.williamson@redhat.com) wrote: =20
-> > > > [Cc +dgilbert, +cohuck]
-> > > >=20
-> > > > On Wed, 20 Oct 2021 11:28:04 +0300
-> > > > Yishai Hadas <yishaih@nvidia.com> wrote:
-> > > >    =20
-> > > > > On 10/20/2021 2:04 AM, Jason Gunthorpe wrote:   =20
-> > > > > > On Tue, Oct 19, 2021 at 02:58:56PM -0600, Alex Williamson wrote=
-:     =20
-> > > > > >> I think that gives us this table:
-> > > > > >>
-> > > > > >> |   NDMA   | RESUMING |  SAVING  |  RUNNING |
-> > > > > >> +----------+----------+----------+----------+ ---
-> > > > > >> |     X    |     0    |     0    |     0    |  ^
-> > > > > >> +----------+----------+----------+----------+  |
-> > > > > >> |     0    |     0    |     0    |     1    |  |
-> > > > > >> +----------+----------+----------+----------+  |
-> > > > > >> |     X    |     0    |     1    |     0    |
-> > > > > >> +----------+----------+----------+----------+  NDMA value is e=
-ither compatible
-> > > > > >> |     0    |     0    |     1    |     1    |  to existing beh=
-avior or don't
-> > > > > >> +----------+----------+----------+----------+  care due to red=
-undancy vs
-> > > > > >> |     X    |     1    |     0    |     0    |  !_RUNNING/INVAL=
-ID/ERROR
-> > > > > >> +----------+----------+----------+----------+
-> > > > > >> |     X    |     1    |     0    |     1    |  |
-> > > > > >> +----------+----------+----------+----------+  |
-> > > > > >> |     X    |     1    |     1    |     0    |  |
-> > > > > >> +----------+----------+----------+----------+  |
-> > > > > >> |     X    |     1    |     1    |     1    |  v
-> > > > > >> +----------+----------+----------+----------+ ---
-> > > > > >> |     1    |     0    |     0    |     1    |  ^
-> > > > > >> +----------+----------+----------+----------+  Desired new use=
-ful cases
-> > > > > >> |     1    |     0    |     1    |     1    |  v
-> > > > > >> +----------+----------+----------+----------+ ---
-> > > > > >>
-> > > > > >> Specifically, rows 1, 3, 5 with NDMA =3D 1 are valid states a =
-user can
-> > > > > >> set which are simply redundant to the NDMA =3D 0 cases.     =20
-> > > > > > It seems right
-> > > > > >     =20
-> > > > > >> Row 6 remains invalid due to lack of support for pre-copy (_RE=
-SUMING
-> > > > > >> | _RUNNING) and therefore cannot be set by userspace.  Rows 7 =
-& 8
-> > > > > >> are error states and cannot be set by userspace.     =20
-> > > > > > I wonder, did Yishai's series capture this row 6 restriction? Y=
-ishai?     =20
-> > > > >=20
-> > > > >=20
-> > > > > It seems so,=C2=A0 by using the below check which includes the=20
-> > > > > !VFIO_DEVICE_STATE_VALID clause.
-> > > > >=20
-> > > > > if (old_state =3D=3D VFIO_DEVICE_STATE_ERROR ||
-> > > > >  =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 !VFIO_DEVICE_STATE_VALID(s=
-tate) ||
-> > > > >  =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 (state & ~MLX5VF_SUPPORTED=
-_DEVICE_STATES))
-> > > > >  =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 return -EINVAL;
-> > > > >=20
-> > > > > Which is:
-> > > > >=20
-> > > > > #define VFIO_DEVICE_STATE_VALID(state) \
-> > > > >  =C2=A0=C2=A0=C2=A0 (state & VFIO_DEVICE_STATE_RESUMING ? \
-> > > > >  =C2=A0=C2=A0=C2=A0 (state & VFIO_DEVICE_STATE_MASK) =3D=3D VFIO_=
-DEVICE_STATE_RESUMING : 1)
-> > > > >    =20
-> > > > > >     =20
-> > > > > >> Like other bits, setting the bit should be effective at the co=
-mpletion
-> > > > > >> of writing device state.  Therefore the device would need to f=
-lush any
-> > > > > >> outbound DMA queues before returning.     =20
-> > > > > > Yes, the device commands are expected to achieve this.
-> > > > > >     =20
-> > > > > >> The question I was really trying to get to though is whether w=
-e have a
-> > > > > >> supportable interface without such an extension.  There's curr=
-ently
-> > > > > >> only an experimental version of vfio migration support for PCI=
- devices
-> > > > > >> in QEMU (afaik),     =20
-> > > > > > If I recall this only matters if you have a VM that is causing
-> > > > > > migratable devices to interact with each other. So long as the =
-devices
-> > > > > > are only interacting with the CPU this extra step is not strict=
-ly
-> > > > > > needed.
-> > > > > >
-> > > > > > So, single device cases can be fine as-is
-> > > > > >
-> > > > > > IMHO the multi-device case the VMM should probably demand this =
-support
-> > > > > > from the migration drivers, otherwise it cannot know if it is s=
-afe for
-> > > > > > sure.
-> > > > > >
-> > > > > > A config option to override the block if the admin knows there =
-is no
-> > > > > > use case to cause devices to interact - eg two NVMe devices wit=
-hout
-> > > > > > CMB do not have a useful interaction.
-> > > > > >     =20
-> > > > > >> so it seems like we could make use of the bus-master bit to fi=
-ll
-> > > > > >> this gap in QEMU currently, before we claim non-experimental
-> > > > > >> support, but this new device agnostic extension would be requi=
-red
-> > > > > >> for non-PCI device support (and PCI support should adopt it as
-> > > > > >> available).  Does that sound right?  Thanks,     =20
-> > > > > > I don't think the bus master support is really a substitute, tr=
-ipping
-> > > > > > bus master will stop DMA but it will not do so in a clean way a=
-nd is
-> > > > > > likely to be non-transparent to the VM's driver.
-> > > > > >
-> > > > > > The single-device-assigned case is a cleaner restriction, IMHO.
-> > > > > >
-> > > > > > Alternatively we can add the 4th bit and insist that migration =
-drivers
-> > > > > > support all the states. I'm just unsure what other HW can do, I=
- get
-> > > > > > the feeling people have been designing to the migration descrip=
-tion in
-> > > > > > the header file for a while and this is a new idea.   =20
-> > > >=20
-> > > > I'm wondering if we're imposing extra requirements on the !_RUNNING
-> > > > state that don't need to be there.  For example, if we can assume t=
-hat
-> > > > all devices within a userspace context are !_RUNNING before any of =
-the
-> > > > devices begin to retrieve final state, then clearing of the _RUNNING
-> > > > bit becomes the device quiesce point and the beginning of reading
-> > > > device data is the point at which the device state is frozen and
-> > > > serialized.  No new states required and essentially works with a sl=
-ight
-> > > > rearrangement of the callbacks in this series.  Why can't we do tha=
-t?   =20
-> > >=20
-> > > So without me actually understanding your bit encodings that closely,=
- I
-> > > think the problem is we have to asusme that any transition takes time.
-> > > From the QEMU point of view I think the requirement is when we stop t=
-he
-> > > machine (vm_stop_force_state(RUN_STATE_FINISH_MIGRATE) in
-> > > migration_completion) that at the point that call returns (with no
-> > > error) all devices are idle.  That means you need a way to command the
-> > > device to go into the stopped state, and probably another to make sure
-> > > it's got there. =20
-> >=20
-> > In a way.  We're essentially recognizing that we cannot stop a single
-> > device in isolation of others that might participate in peer-to-peer
-> > DMA with that device, so we need to make a pass to quiesce each device
-> > before we can ask the device to fully stop.  This new device state bit
-> > is meant to be that quiescent point, devices can accept incoming DMA
-> > but should cease to generate any.  Once all device are quiesced then we
-> > can safely stop them. =20
->=20
-> It may need some further refinement; for example in that quiesed state
-> do counters still tick? will a NIC still respond to packets that don't
-> get forwarded to the host?
+What about taking the lock well early on so that the tail doesn't need to juggle
+errors?  Dropping the lock for the KVM_MP_STATE_UNINITIALIZED case is a little
+unfortunate, but that at least pairs with similar logic in x86's other call to
+kvm_vcpu_block().  Relocking if xfer_to_guest_mode_handle_work() triggers an exit
+to userspace is also unfortunate but it's not the end of the world.
 
-I'd think no, but I imagine it's largely device specific to what extent
-a device can be fully halted yet minimally handle incoming DMA.
-=20
-> Note I still think you need a way to know when you have actually reached
-> these states; setting a bit in a register is asking nicely for a device
-> to go into a state - has it got there?
+On the plus side, the complete_userspace_io() callback doesn't need to worry
+about taking the lock.
 
-It's more than asking nicely, we define the device_state bits as
-synchronous, the device needs to enter the state before returning from
-the write operation or return an errno.
+---
+ arch/x86/kvm/x86.c | 21 ++++++++++-----------
+ 1 file changed, 10 insertions(+), 11 deletions(-)
 
-> > > Now, you could be a *little* more sloppy; you could allow a device ca=
-rry
-> > > on doing stuff purely with it's own internal state up until the point
-> > > it needs to serialise; but that would have to be strictly internal st=
-ate
-> > > only - if it can change any other devices state (or issue an interrup=
-t,
-> > > change RAM etc) then you get into ordering issues on the serialisation
-> > > of multiple devices. =20
-> >=20
-> > Yep, that's the proposal that doesn't require a uAPI change, we loosen
-> > the definition of stopped to mean the device can no longer generate DMA
-> > or interrupts and all internal processing outside or responding to
-> > incoming DMA should halt (essentially the same as the new quiescent
-> > state above).  Once all devices are in this state, there should be no
-> > incoming DMA and we can safely collect per device migration data.  If
-> > state changes occur beyond the point in time where userspace has
-> > initiated the collection of migration data, drivers have options for
-> > generating errors when userspace consumes that data. =20
->=20
-> How do you know that last device has actually gone into that state?
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index ac83d873d65b..90751a080447 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -10039,7 +10039,6 @@ static int vcpu_run(struct kvm_vcpu *vcpu)
+ 	int r;
+ 	struct kvm *kvm = vcpu->kvm;
 
-Each device cannot, the burden is on the user to make sure all devices
-are stopped before proceeding to read migration data.
+-	vcpu->srcu_idx = srcu_read_lock(&kvm->srcu);
+ 	vcpu->arch.l1tf_flush_l1d = true;
 
-> Also be careful; it feels much more delicate where something might
-> accidentally start a transaction.
+ 	for (;;) {
+@@ -10067,25 +10066,18 @@ static int vcpu_run(struct kvm_vcpu *vcpu)
+ 		if (__xfer_to_guest_mode_work_pending()) {
+ 			srcu_read_unlock(&kvm->srcu, vcpu->srcu_idx);
+ 			r = xfer_to_guest_mode_handle_work(vcpu);
++			vcpu->srcu_idx = srcu_read_lock(&kvm->srcu);
+ 			if (r)
+ 				return r;
+-			vcpu->srcu_idx = srcu_read_lock(&kvm->srcu);
+ 		}
+ 	}
 
-This sounds like a discussion of theoretically broken drivers.  Like
-the above device_state, drivers still have a synchronization point when
-the user reads the pending_bytes field to initiate retrieving the
-device state.  If the implementation requires the device to be fully
-stopped to snapshot the device state to provide to the user, this is
-where that would happen.  Thanks,
+-	srcu_read_unlock(&kvm->srcu, vcpu->srcu_idx);
+-
+ 	return r;
+ }
 
-Alex
+ static inline int complete_emulated_io(struct kvm_vcpu *vcpu)
+ {
+-	int r;
+-
+-	vcpu->srcu_idx = srcu_read_lock(&vcpu->kvm->srcu);
+-	r = kvm_emulate_instruction(vcpu, EMULTYPE_NO_DECODE);
+-	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
+-	return r;
++	return kvm_emulate_instruction(vcpu, EMULTYPE_NO_DECODE);
+ }
 
+ static int complete_emulated_pio(struct kvm_vcpu *vcpu)
+@@ -10224,12 +10216,16 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 	kvm_run->flags = 0;
+ 	kvm_load_guest_fpu(vcpu);
+
++	vcpu->srcu_idx = srcu_read_lock(&kvm->srcu);
+ 	if (unlikely(vcpu->arch.mp_state == KVM_MP_STATE_UNINITIALIZED)) {
+ 		if (kvm_run->immediate_exit) {
+ 			r = -EINTR;
+ 			goto out;
+ 		}
++		srcu_read_unlock(&kvm->srcu, vcpu->srcu_idx);
+ 		kvm_vcpu_block(vcpu);
++		vcpu->srcu_idx = srcu_read_lock(&kvm->srcu);
++
+ 		if (kvm_apic_accept_events(vcpu) < 0) {
+ 			r = 0;
+ 			goto out;
+@@ -10279,10 +10275,13 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 		r = vcpu_run(vcpu);
+
+ out:
+-	kvm_put_guest_fpu(vcpu);
+ 	if (kvm_run->kvm_valid_regs)
+ 		store_regs(vcpu);
+ 	post_kvm_run_save(vcpu);
++
++	srcu_read_unlock(&kvm->srcu, vcpu->srcu_idx);
++
++	kvm_put_guest_fpu(vcpu);
+ 	kvm_sigset_deactivate(vcpu);
+
+ 	vcpu_put(vcpu);
+--
