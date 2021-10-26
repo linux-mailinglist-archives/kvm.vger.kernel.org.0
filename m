@@ -2,84 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B9C7D43BB13
-	for <lists+kvm@lfdr.de>; Tue, 26 Oct 2021 21:39:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 53D0F43BB3A
+	for <lists+kvm@lfdr.de>; Tue, 26 Oct 2021 21:51:00 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235251AbhJZTlr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Oct 2021 15:41:47 -0400
-Received: from ssh.movementarian.org ([139.162.205.133]:34924 "EHLO
-        movementarian.org" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S231182AbhJZTlq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Oct 2021 15:41:46 -0400
-X-Greylist: delayed 2261 seconds by postgrey-1.27 at vger.kernel.org; Tue, 26 Oct 2021 15:41:46 EDT
-Received: from movement by movementarian.org with local (Exim 4.94)
-        (envelope-from <movement@movementarian.org>)
-        id 1mfRhb-0027Fj-Gr; Tue, 26 Oct 2021 20:01:39 +0100
-Date:   Tue, 26 Oct 2021 20:01:39 +0100
-From:   John Levon <levon@movementarian.org>
-To:     Elena <elena.ufimtseva@oracle.com>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org,
-        kvm@vger.kernel.org, mst@redhat.com, john.g.johnson@oracle.com,
-        dinechin@redhat.com, cohuck@redhat.com, jasowang@redhat.com,
-        felipe@nutanix.com, jag.raman@oracle.com, eafanasova@gmail.com
-Subject: Re: MMIO/PIO dispatch file descriptors (ioregionfd) design discussion
-Message-ID: <YXhQk/Sh0nLOmA2n@movementarian.org>
-References: <88ca79d2e378dcbfb3988b562ad2c16c4f929ac7.camel@gmail.com>
- <YWUeZVnTVI7M/Psr@heatpipe>
- <YXamUDa5j9uEALYr@stefanha-x1.localdomain>
- <20211025152122.GA25901@nuker>
+        id S239036AbhJZTxX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Oct 2021 15:53:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:32792 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S239052AbhJZTxR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 26 Oct 2021 15:53:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635277853;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=v6YsqIJF4cmqUM5VoIFLtZ3R3oEYuHT98TJT5vDKLv0=;
+        b=VmFMPltyE2xIpZWjagtuPiJatv7Te7kIAvbaPiRZ0YPra7xqRfJ4N1UKWNimTR6tL0WHqb
+        XJ25+CQeIimYTcwiFHvXGKgNxHrmCF49kyEu6/J661m0TFq7Bx6TRO/WmFgXhZ0ixII9jO
+        q5NgSkWA1ybOAKm3lZlpXPZbz6CF5Dg=
+Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
+ [209.85.161.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-250-mEgoBJa1PEaHA6wUnDawqg-1; Tue, 26 Oct 2021 15:50:49 -0400
+X-MC-Unique: mEgoBJa1PEaHA6wUnDawqg-1
+Received: by mail-oo1-f69.google.com with SMTP id f21-20020a4abb15000000b002b766ff48feso137989oop.20
+        for <kvm@vger.kernel.org>; Tue, 26 Oct 2021 12:50:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=v6YsqIJF4cmqUM5VoIFLtZ3R3oEYuHT98TJT5vDKLv0=;
+        b=XSmDkT79Vzji3L0nu0C0/eBjGgni0DytVrFtW+89M4e2cviSCuUccL/u3gTx/WLF/M
+         6GSdyR+xzzkB1Oc7HkPirYlsVt3Y8171OEKW1gZrCqar+Gh4cWcwVXUyAkKSwetpFTu5
+         uIDobqicJlGrrTZ+qd7NdPktQDoZn7icmomGD8aQHzXefcJQ77WCPYTKhf5ohFtFGBut
+         4q70tjxrec7dvHez6z8bVHo24Ojmfs23TsjFk2KM6rwYl/wpyt46oFMw+478ZfUZJvJX
+         kZpznZ6bOqKVnsm+kPdK0tTgmkukD07tPPVDWv8RHDgjojXlryxJx9IfA5Yj0VPTTK0/
+         D3RQ==
+X-Gm-Message-State: AOAM530Z2jf9p6sLOfhMseIOeWWc5vsmiDsuttHDHcOh0pfVy9iGu0IP
+        d+U7OkqBpHPGmMVQTOalznhAgWQliWuRhFsmktDhh9GMXxrn+Ay0O9OQf+UHGKCSQI7RmNJOA1k
+        pnek4WV7t5G1X
+X-Received: by 2002:a05:6830:2b11:: with SMTP id l17mr21915526otv.298.1635277848322;
+        Tue, 26 Oct 2021 12:50:48 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyP54OPC5IwSQShzWiwXn/t8EIhJAPy/ttWlrC47tIMalPERR7bNfkUdrFXsvQn1ejkueIxKw==
+X-Received: by 2002:a05:6830:2b11:: with SMTP id l17mr21915507otv.298.1635277848077;
+        Tue, 26 Oct 2021 12:50:48 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id m7sm5109762oiw.49.2021.10.26.12.50.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Oct 2021 12:50:47 -0700 (PDT)
+Date:   Tue, 26 Oct 2021 13:50:46 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
+        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
+        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH V2 mlx5-next 12/14] vfio/mlx5: Implement vfio_pci driver
+ for mlx5 devices
+Message-ID: <20211026135046.5190e103.alex.williamson@redhat.com>
+In-Reply-To: <20211026151851.GW2744544@nvidia.com>
+References: <5a496713-ae1d-11f2-1260-e4c1956e1eda@nvidia.com>
+        <20211020105230.524e2149.alex.williamson@redhat.com>
+        <20211020185919.GH2744544@nvidia.com>
+        <20211020150709.7cff2066.alex.williamson@redhat.com>
+        <87o87isovr.fsf@redhat.com>
+        <20211021154729.0e166e67.alex.williamson@redhat.com>
+        <20211025122938.GR2744544@nvidia.com>
+        <20211025082857.4baa4794.alex.williamson@redhat.com>
+        <20211025145646.GX2744544@nvidia.com>
+        <20211026084212.36b0142c.alex.williamson@redhat.com>
+        <20211026151851.GW2744544@nvidia.com>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211025152122.GA25901@nuker>
-X-Url:  http://www.movementarian.org/
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 25, 2021 at 08:21:22AM -0700, Elena wrote:
+On Tue, 26 Oct 2021 12:18:51 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-> > I'm curious what approach you want to propose for QEMU integration. A
-> > while back I thought about the QEMU API. It's possible to implement it
-> > along the lines of the memory_region_add_eventfd() API where each
-> > ioregionfd is explicitly added by device emulation code. An advantage of
-> > this approach is that a MemoryRegion can have multiple ioregionfds, but
-> > I'm not sure if that is a useful feature.
-> >
+> On Tue, Oct 26, 2021 at 08:42:12AM -0600, Alex Williamson wrote:
 > 
-> This is the approach that is currently in the works. Agree, I dont see
-> much of the application here at this point to have multiple ioregions
-> per MemoryRegion.
-> I added Memory API/eventfd approach to the vfio-user as well to try
-> things out.
-> 
-> > An alternative is to cover the entire MemoryRegion with one ioregionfd.
-> > That way the device emulation code can use ioregionfd without much fuss
-> > since there is a 1:1 mapping between MemoryRegions, which are already
-> > there in existing devices. There is no need to think deeply about which
-> > ioregionfds to create for a device.
-> >
-> > A new API called memory_region_set_aio_context(MemoryRegion *mr,
-> > AioContext *ctx) would cause ioregionfd (or a userspace fallback for
-> > non-KVM cases) to execute the MemoryRegion->read/write() accessors from
-> > the given AioContext. The details of ioregionfd are hidden behind the
-> > memory_region_set_aio_context() API, so the device emulation code
-> > doesn't need to know the capabilities of ioregionfd.
-> 
+> > > This is also why I don't like it being so transparent as it is
+> > > something userspace needs to care about - especially if the HW cannot
+> > > support such a thing, if we intend to allow that.  
 > > 
-> > The second approach seems promising if we want more devices to use
-> > ioregionfd inside QEMU because it requires less ioregionfd-specific
-> > code.
-> > 
-> I like this approach as well.
-> As you have mentioned, the device emulation code with first approach
-> does have to how to handle the region accesses. The second approach will
-> make things more transparent. Let me see how can I modify what there is
-> there now and may ask further questions.
+> > Userspace does need to care, but userspace's concern over this should
+> > not be able to compromise the platform and therefore making VF
+> > assignment more susceptible to fatal error conditions to comply with a
+> > migration uAPI is troublesome for me.  
+> 
+> It is an interesting scenario.
+> 
+> I think it points that we are not implementing this fully properly.
+> 
+> The !RUNNING state should be like your reset efforts.
+> 
+> All access to the MMIO memories from userspace should be revoked
+> during !RUNNING
+> 
+> All VMAs zap'd.
+> 
+> All IOMMU peer mappings invalidated.
+> 
+> The kernel should directly block userspace from causing a MMIO TLP
+> before the device driver goes to !RUNNING.
+> 
+> Then the question of what the device does at this edge is not
+> relevant as hostile userspace cannot trigger it.
+> 
+> The logical way to implement this is to key off running and
+> block/unblock MMIO access when !RUNNING.
+> 
+> To me this strongly suggests that the extra bit is the correct way
+> forward as the driver is much simpler to implement and understand if
+> RUNNING directly controls the availability of MMIO instead of having
+> an irregular case where !RUNNING still allows MMIO but only until a
+> pending_bytes read.
+> 
+> Given the complexity of this can we move ahead with the current
+> mlx5_vfio and Yishai&co can come with some followup proposal to split
+> the freeze/queice and block MMIO?
 
-Sorry I'm a bit late to this discussion, I'm not clear on the above WRT
-vfio-user. If an ioregionfd has to cover a whole BAR0 (?), how would this
-interact with partly-mmap()able regions like we do with SPDK/vfio-user/NVMe?
+I know how much we want this driver in, but I'm surprised that you're
+advocating to cut-and-run with an implementation where we've identified
+a potentially significant gap with some hand waving that we'll resolve
+it later.
 
-thanks
-john
+Deciding at some point in the future to forcefully block device MMIO
+access from userspace when the device stops running is clearly a user
+visible change and therefore subject to the don't-break-userspace
+clause.  It also seems to presume that the device relies on the
+vfio-core to block device access, whereas device implementations may
+not require such if they're able to snapshot device state.  That might
+also indicate that "freeze" is only an implementation specific
+requirement.  Thanks,
+
+Alex
+
