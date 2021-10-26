@@ -2,505 +2,262 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 56CF943B8C3
-	for <lists+kvm@lfdr.de>; Tue, 26 Oct 2021 19:57:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EEB0843B8E5
+	for <lists+kvm@lfdr.de>; Tue, 26 Oct 2021 20:03:07 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238007AbhJZSAJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Oct 2021 14:00:09 -0400
-Received: from mail-bn8nam11on2062.outbound.protection.outlook.com ([40.107.236.62]:57056
-        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
+        id S238018AbhJZSFa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Oct 2021 14:05:30 -0400
+Received: from mail-bn7nam10on2074.outbound.protection.outlook.com ([40.107.92.74]:59584
+        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S236589AbhJZSAD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Oct 2021 14:00:03 -0400
+        id S230258AbhJZSF3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Oct 2021 14:05:29 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ybdd2Ak23I8iczv1BWDPMIs/bBysL4Fsutn0O1XLp2RwlFe7mPQZE2Rk0Qo+AtPIDOh4yQcSNKNT10uKaDwMDsDgwypR6iEKB7TOj+4jnZj1hEv5c3MlFThftDsgi1IyClO+EGlAxDZgrzjOuNmRV4uiplDVwDtk18A3Ffaopg0tCHihFl0tvViuH7rpOryCxkC42ILuX0vb1Xh5EEk82Z1wP2bvvnGaOr76i+wxvotoyP+2Fsz4cJs9k2gYCcDBtA9IQHV4VvsYD94gDuWCY3cAgGXpmhRQuXNYNDMkc06cbKr/Kso4vEf2RVGlwSGBRzBUO755Haa3msFfwDTYNQ==
+ b=RxwW3AtPl/9mOF8/RPKVvoYVHtK8Sv7q0w7uGOFgyQJjxvIers/ZdMk6OvxGR9M6hK6qLrkvQCAJR4cJYK2o3087K7ODNmNxGuETBkip4jjGUG1A8YuCk4mYButTQ4F9JpFJuNbAiztiXpmMdIDgQZmHnJvEdL0xaQAIW54N60p0ugJmnBXNMzA4csfNl55GBYp2H4ioBJ4pz5+y9ZAqUuY4C3lqsGddX/xBvRRJIOjP+JGuqNa/y0XlJnrYsjmq6/xZDYr3wTBCPUeHbAsVnwQcXeYWIi/0rDyzAUTUkIqsDhfyP0S6XIWigxrv1qU/i2tFEvQmiqyuA25quv20DA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=W4VL6PuHi5a5+MX1ro02IDczVKwAYeaIkjY305cS1kI=;
- b=LeN8zvN5qAt7K/0LOz4fXhTqssx5jqgtvMQ0uGMxcOIh6PpCKrC7GsXoOp4cb0GpEVwvIEYDpCQl2jQTxW8B9z0d2b8KkHABJ+upMXcEFzYRggpX75pfnF5kXGYtSZKvKzPVn9y6aNPFPz1u4qH3y0Xh7Xikd8mLHTigGaod5Sh7Q2z5F7aORRjhYfjWdIgBQGkjI3A4oLAqMWFNPEagUaGSHfXYgsKeYJ1lq9Q2Hzqq+DdwZgdsIc2iSrw1Q6rhflGuYxyrA8CSwAtfqw4sFrnfKFN6ln1J2Y4gOmB5RsaAltrHWRvtN9WssHv+Qw2fJtpUpCFG3uXt/nh7X1Spsw==
+ bh=nfS1HdhpKsZc0wYx+h3rSsR8QxRHyFufMGPnQ/o9zJk=;
+ b=Th3vPeDi41RHscuVSQV97sLo3dWAQPyQgxwTfZo4ptDX+ILXdz7v4aSRl7SBa159uOS7+hCWO45XPAHYT7ZhdKyCRMc4p0TBwlHAPSHy/+ubhbry6lDfW2gvOg9f29M0BG4pIsxDizc/dVhy/bSBH2kYSz3A9hqEii9zOs9dLWgsrZSFMqhSQrs3kFiTVSIlm37Ki2BK8FkqRwbGsGBUsBkZloUv5D23hcfgXeAmovY24aErl/c0KDRb9Dmg5IKfVckeskJO/HVN3dklQSjSA+JyWWU9h9PBzYQkuvvnGD6WlyBrBA8mDCdo6/aiqmU5t4ICo6NKiQlRED6NkLjgdg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=W4VL6PuHi5a5+MX1ro02IDczVKwAYeaIkjY305cS1kI=;
- b=CYerfw/I7UzFkWwvrg38DtvqJpzaIrBPzdVsEhVwCxSrkiJkvagHjdayIadNjPE2dMJ09jfXQsG5vx3uzl9fkDl4pdx45MGI2xLC/OCBl4hd/wR0X0Cbs7zva1caB0XeY9YhfyRw2ESs6XafmXB3nSdODmJMOX69hnnzlhJLoYoWRuhQF0OGgyg7iud7VPHdlx8mk+MBMQtwmkDp9RpaWgz0VxjL9OsvTcPT7sDV9Hh2Aq34SqPmEnjENKUijiZUnHsPVXDqD8WOHeTbhwWtIVMCe5o1wjyfDAtW7EBkZWIJa9rzEz2ZJH+cht9vBtWf827M6SVs6WT2yiUen4A9Ww==
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5048.namprd12.prod.outlook.com (2603:10b6:208:30a::17) with
+ bh=nfS1HdhpKsZc0wYx+h3rSsR8QxRHyFufMGPnQ/o9zJk=;
+ b=uPCJn6/IE/tvoEuLJACGhdq/CtJ//cikyXkQAWQy2wJtKi+D12jU1IP3EkOIK09v5qs7GXFE9V8y0XF1P07BDKcpckIu5jS9ZbZBELeM2nDEYyO61FYJOFZvJ3o8dndYykP05StUVf7QjweNY9CvnjG6YlPnmyr863rKV33GY7E=
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
+ by DM4PR12MB5374.namprd12.prod.outlook.com (2603:10b6:5:39a::11) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4649.13; Tue, 26 Oct
- 2021 17:57:37 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95%8]) with mapi id 15.20.4649.014; Tue, 26 Oct 2021
- 17:57:37 +0000
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>
-Cc:     Eric Farman <farman@linux.ibm.com>, Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v4 4/4] vfio/ccw: Convert to use vfio_register_emulated_iommu_dev()
-Date:   Tue, 26 Oct 2021 14:57:33 -0300
-Message-Id: <4-v4-cea4f5bd2c00+b52-ccw_mdev_jgg@nvidia.com>
-In-Reply-To: <0-v4-cea4f5bd2c00+b52-ccw_mdev_jgg@nvidia.com>
-References: 
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4628.18; Tue, 26 Oct
+ 2021 18:03:03 +0000
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::a87d:568d:994f:c5f9]) by DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::a87d:568d:994f:c5f9%7]) with mapi id 15.20.4628.020; Tue, 26 Oct 2021
+ 18:03:03 +0000
+Subject: Re: [PATCH v2] KVM: x86: Assume a 64-bit hypercall for guests with
+ protected state
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Jim Mattson <jmattson@google.com>, Joerg Roedel <joro@8bytes.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Ashish Kalra <Ashish.Kalra@amd.com>,
+        linux-kernel@vger.kernel.org, x86@kernel.org,
+        kvm list <kvm@vger.kernel.org>
+References: <e0b20c770c9d0d1403f23d83e785385104211f74.1621878537.git.thomas.lendacky@amd.com>
+ <87cztf8h43.fsf@vitty.brq.redhat.com>
+ <3b8953c9-0611-27da-f955-c79a6fcef9ce@amd.com>
+Message-ID: <e45669fa-372f-a29d-d9c9-b4747e56b97c@amd.com>
+Date:   Tue, 26 Oct 2021 13:03:00 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
+In-Reply-To: <3b8953c9-0611-27da-f955-c79a6fcef9ce@amd.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: YT3PR01CA0114.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:85::31) To BL0PR12MB5506.namprd12.prod.outlook.com
- (2603:10b6:208:1cb::22)
+X-ClientProxiedBy: BLAP220CA0011.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:208:32c::16) To DM4PR12MB5229.namprd12.prod.outlook.com
+ (2603:10b6:5:398::12)
 MIME-Version: 1.0
-Received: from mlx.ziepe.ca (206.223.160.26) by YT3PR01CA0114.CANPRD01.PROD.OUTLOOK.COM (2603:10b6:b01:85::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4628.22 via Frontend Transport; Tue, 26 Oct 2021 17:57:36 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mfQhZ-002BK5-IV; Tue, 26 Oct 2021 14:57:33 -0300
+Received: from [10.236.30.241] (165.204.77.1) by BLAP220CA0011.NAMP220.PROD.OUTLOOK.COM (2603:10b6:208:32c::16) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4628.22 via Frontend Transport; Tue, 26 Oct 2021 18:03:02 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: b6262367-d3ac-42a0-6cda-08d998aa182b
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5048:
-X-Microsoft-Antispam-PRVS: <BL1PR12MB50485881A60DAD8E53C98814C2849@BL1PR12MB5048.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3044;
+X-MS-Office365-Filtering-Correlation-Id: e9f509ff-7ffd-4f83-bea7-08d998aadabe
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5374:
+X-Microsoft-Antispam-PRVS: <DM4PR12MB5374D0C64EBF9FEB46BA6B6CEC849@DM4PR12MB5374.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: EzgobSZ43RsI9TVwi8wrqynHAiiLeZaNmk5CvJ/AGw6iiz0JysyZaWW3a92F9cdINSHC/FvYFr0y/5by1W1/vhY5JJlLsXf2Jvc4EHuD9fjY8QcBBFwVSsj8WObi4HCIlkpBksJoG1GJkOEieVIUJYa81fSL7+AE/OYxXB3j1lEt9N1ZNO0sRfDaBJnYvzMerg/TAk97JyBNuZvzuw0Fivm9pD39l5MlHE/yXeixb97geGuhDA8khVQEekYc4gK2LKNbNvn+HVa4AnPtTc9vV3O7VEq5PCOZUO3GkSGeomw0YSoe0/8Ufe487ufJPtKcIxp7d6Qn31wNAXhHZhfJs041jnEAkPgAYCh7b16cuDULe9Il0GO9XJf0DEnulHm5qyVujkdjqZzebgSIYKy6m9jU5VQcwZRNKylpTVixz8TsZG93Cv32sSMGEZfdy/jH3i4kybBNL1WTpCXBXCdoJKzc+uVPFMn3vrxCkfGGFccZm7/aRuVkvjp16Pagcys9RWvAQKrPAOnU5LCOvjhAwHuO5YPfsej37fvIDjRv0SdG4fXDpkR3emKholPL11+Y6PlUF654rBKRmRZ0uLGekQriBCj7NBnLl5VVF8pqieGfve5BEAfTxYDUvaDoBOoZTjFBxES552q9pMMJpLVkLbozH3G6cFOZJ1o8UhFmpEoEkcELNc7Y4ZfMEjM55unXR6xLGrltxh6aHdf1gFS0sVDEfziQyjxMpbMLvUlx1ws=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(110136005)(54906003)(2906002)(36756003)(508600001)(2616005)(9746002)(316002)(921005)(426003)(30864003)(8676002)(66556008)(83380400001)(8936002)(86362001)(26005)(5660300002)(186003)(38100700002)(66946007)(4326008)(66476007)(9786002)(7416002)(4216001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: +i+Qfww8Segzw/hHkKdJF8DKf+yAI9fB6XmGiwAmnC593U99ZdU9evx9lBAfDWN7I4oxcsoB6ftZum2Z+iONV0vBZVxM66GSx2tlp0e2JbpqEoMvwvqD1cU+VMBABNSAQsJq4YuLaOsW6eMuqOyQm1JPwtBia8Rb3saQO8V1FhrRgDU6MT0yecew2Bi8d2jkoU7rfSDSIbfCzk+VweqVt8ftI8Kng0LC6Nhp2bDJ09+hoP77Vr3TxELEaL7HdsUU+qUQktP09ib2AMbT1peOxa/Uqw3sV5YSncLEmzHlfFQHIX2+T8DC9FA72Ro+J/A25TvFFoAdGGuPUJpJkL1SmJglE+3MWD+EmwKhoF6pzy6vqLezcLHyJq44FIWwe7KcLGL+80VijPUSZo+EsWLaxuwRQWEsvbb4aYw2KKjE3TMAcQAbOnzzxwtUCvEJAp5Mazq/RxwOzsCtuowQtTY3YTy2PEOO/VRJR7Ww+TC/EYa8jlXbmgB1vuIK91HJsoIaxL9tkSaJD6rOeC1Ro7CgKFt2FcluVDlTV0M6HCbm1mymamcX3m/HZvAwWu3K7MPl7aMNPO9NXMw1aZEsTLqvhE7sON+XqU3bxb9Xx6nSXA4v6DI/Tn6tlJ1VJY4Z0qErN0luEsxYrXhvWcgJuejDw7EA9dmy4Q3tBzP/o1AGvPvaIxlZQKtqk6jdwnOTWib2/nn9a6KK85iN44D07G1w/qrcyP8fBP9FDQmS90jMx8zzEVPiMhBSvh8ULKKnObJe
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(31686004)(36756003)(7416002)(53546011)(8936002)(508600001)(86362001)(2616005)(83380400001)(66556008)(16576012)(110136005)(38100700002)(316002)(8676002)(54906003)(66476007)(4326008)(6486002)(956004)(5660300002)(31696002)(66946007)(26005)(186003)(2906002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?xhiO+cPM5SpBiA+ZHmxqVq1mV90PMaGltqqU3ELs5FFgV8TlfTU++zYeH31t?=
- =?us-ascii?Q?RLE+x1cTOvLq/KELqGMTGOVACcnLLFNRyTgmhl4OTBfTPJNLFqpcXqWSsLia?=
- =?us-ascii?Q?elZlwFW/KawtZusr4T2pkqE0/14XSuqToj49d4syLepqWSTbh9PSXbZqkX/P?=
- =?us-ascii?Q?mm4aO7O7tMA0JVFnilc64LCNbC8je4AQogWFnheYpoIQUVetG5lvbR8GgPS3?=
- =?us-ascii?Q?SGSFbxvvT6ZMMx81sbri+nzIhp75Zkblkju5vOJAWnTx/qI0drr8uGZfZdSk?=
- =?us-ascii?Q?G0c9d/AYlR8j5SZkFNslfvNPVtwC1cnVfVBkWxKbf24WSDVaf3g6Pfc8BDnn?=
- =?us-ascii?Q?w9dP0+TukWvGhbxn62sP9BljtYCF4x2uzzX7NZtK4DOqeIXPMfQZfXLrThVL?=
- =?us-ascii?Q?cJEmerrQCpOIWNHexYLlkv6BXm2VQHNw6iNmMZIPZ8Fx58G4H071488eEmgI?=
- =?us-ascii?Q?+OiysQJ7qso+17PEP4Y2kWLyBuckwyrmna+cKJ0ZjatOKenE9MVJ3RaH0WQU?=
- =?us-ascii?Q?pYjsT6E/969iMJYB65vQDt5w6hAFhHylvNU6C7eCk8O5v06yiAdEVabdaJq5?=
- =?us-ascii?Q?1hJBkM50wtqxhV5WFgwnfp8ncz6PXhD+/8BeIfYpvbyCLy2SIqeF6807sWs6?=
- =?us-ascii?Q?9yrg2bcSNpLCXlaUJoMgcgteEGBEATRLGdKbEc1umTCbL9vDNAVmGzgZNcWM?=
- =?us-ascii?Q?phOVW32xNWfzYKXBjr1GVPnCDAUuO1s8Abv1xNpHPW/NfGo1+uVMZ9flQVFf?=
- =?us-ascii?Q?AYiaR+xmA2cD17dwRlkH7fuop/stbaR2BJc+/6VA06fRflQGDya9ZbpR1kCF?=
- =?us-ascii?Q?8LAyGA1DqV8XUenF/upY7jOtwNshRMy38ippQmFl9fTN8zUZ50cvCo3s0RD+?=
- =?us-ascii?Q?t8Z9fGFOtq5cy90qICDkT5w0UYCVjVQJu5PLd/UJAFcYW+F9UUTJ+L8JDEoH?=
- =?us-ascii?Q?eEFa1hlmHaWWl9KyqiuJjuTZ1K/Xwn7n0bCZj+cRIkfKSOEuwmItuwN/dDGt?=
- =?us-ascii?Q?NrJJcF9mOaAllSMM/fidnZZtxg0ovZbEXNsq5KnmjxCpTwSsQpigUye9F5e1?=
- =?us-ascii?Q?JasfFqFLM3VXWsi7EC9Wg2gFUczbaM/shXhIH32X2bJ29dyuMUp82FVL45/Z?=
- =?us-ascii?Q?SNwz20q07T+C8Y5zIIBJ8lgrFCWskh0sUclK3XOghMNNW+Acyz707RlETvPf?=
- =?us-ascii?Q?WucpE8U2gjeVUCeMCw6RymbPXICKmZ6p3eTvlPiqgzPHy9GAZ8udadPbvazN?=
- =?us-ascii?Q?AuFio6b61Ad8oVoXqRQq0WciFi/hZW0RS5DMpV+twwddsCxfNc8y4dABZdJG?=
- =?us-ascii?Q?+rT09/Te1Vor5eRzFi8SGoOi/+ZvOyjdChJBl6nEtlyCa5Ks3ZnXWjF/ti/Q?=
- =?us-ascii?Q?jPxMMFr3SZ7FUSTP4tXcqNzAYrf/1u2WDHXPkUqNY+fGLznCKJW93pwx9p/A?=
- =?us-ascii?Q?v3nc6l/K2f/Q1mt1D53DFtAw6iXUoVn55RbVXs6MGG9QRASUURmwh3iXu1Ky?=
- =?us-ascii?Q?UliZ6VEYMSjBtEJ+8QtGHo8kJQq01Nb9CmzKKvK+rgWN9lGqpc0cKq7bpdTt?=
- =?us-ascii?Q?+eXdqYYVQDETcZCVj2I=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b6262367-d3ac-42a0-6cda-08d998aa182b
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VWJRbG9sbXNaTW9TZE9LSkRXdWt5QitnWUxKN2x5RUJYbU01czU4NklGaVk0?=
+ =?utf-8?B?c0pYblNIVFdLL3orVVhUdkFlcFlXb0oxQTZUbW8vUHVEVkl0RUtTMnJYZVc0?=
+ =?utf-8?B?aXd2a1dEZFZjNk1DMUVNRHBnZUt0dWx4RVpIUHM3Vkx6Sk9Ic2wxakpXMnVF?=
+ =?utf-8?B?cGMwWm9aUTFpbWo3cXlVdWltKzl4TWs3ZzFUdVZrODVFTVlwaXV6eFNVUk81?=
+ =?utf-8?B?OS9PZGZ5elhHTjdZWXJxeEh0UWpmUkdjcDROYTNpcjlaeHI5bktZUlk2VDhO?=
+ =?utf-8?B?d3Y0Z0FGVmxHTXZRVXE1NnZkdVFRdDhJSzMxU2trUTBqay9BM3dYMDJyaU5I?=
+ =?utf-8?B?TGNKTmIyTXU2NHkvS1R2OHMzSytqSEV1aVJDQjFKSy9KaEJyU0cyVGQ1R0RO?=
+ =?utf-8?B?eDdOWlpDdEF0aExRZ0lxU1h0QlNvVGFPSS83U2JxblNEZWpTTXVoVW1Od3Ey?=
+ =?utf-8?B?K0t3Tmx5Slh3MEtIMTRta2dvWXpHTmVFK0pYaUxJQTNJT1lzNWNEeUVwWjBZ?=
+ =?utf-8?B?Q3RuSTRHai9GR0pyc1BmcjRSRFdIeDRPbXAxQ09Jamp1K3IyODRuR2lzTjN0?=
+ =?utf-8?B?T3h2ODcvRjJUc1hjcFJuU0d4SWFJV1M4K3k4Uk04bHZYQ3Frcnh3QXdVcFJm?=
+ =?utf-8?B?Q01TNHUwYUFmd005VjhMenVsUlVHUjRmZHFRYk5WOUk4a3cyRC8yU3ZDM040?=
+ =?utf-8?B?azFOYkVkeFQ1TTc0cUlnOGMxYnlvbk5SVlBtUFhwMjdlTVlXV0lHZ3hkVlJ2?=
+ =?utf-8?B?aGQ1d3lYK3BRY1FGVmNUOVNsM0NWZ3NDZm9wVDBiUTlDRGN5SUl1UVJhdGpI?=
+ =?utf-8?B?RWQ3TWlvdzhpa1AxZXNvNEh1TnhQMDgxdjhlK2IwcDhRT2s0aE16VDlHLzhz?=
+ =?utf-8?B?U2hnYmVtVURBMGpaRmFFMjIwaWdRTUNId0ZNbXhzL0pxcDR4Mmo5aVJWMjJ5?=
+ =?utf-8?B?dWhYNUpqRmRMc0t4MnBWR3kyakNmV1l6LytXTVJESDVtWlZtQUxuZGoreEZ2?=
+ =?utf-8?B?cFdpZld3bnhOeWdZelNzWHZicXpNNVZIZzlnQ2x6YmgreWl2eG5CWWJTTXpu?=
+ =?utf-8?B?ZTR6L0ZQaEMxLzQrdnlveUZVMGh2Zkp6MlBlWkhYWFN3a3NpV1ArWHg1QWRq?=
+ =?utf-8?B?ZnpoNXhvYW1LejNnVzZwMXh1WlVaemxOOVQ0Umk3eWpSbWM3L3IxRUZRYld4?=
+ =?utf-8?B?VWtKZUlER25BTTVGSVR4RVA3QXI5RkpWbFVRdHZUSHRqY0I4SzRTQzVBUlhu?=
+ =?utf-8?B?V0RiSTFIYUxyVEh6aXZHN0o3cUg4Q3ppcEtjUVJqUjhBSHEyREdwZWV2TjFm?=
+ =?utf-8?B?Mmg1cFV6cWl2cmJWa0JnYzE3ZEhlWUVJSTRTOTE5WFZlcE5qM2FNYXg3SUE5?=
+ =?utf-8?B?SlZHS2RWNXNrZDljTGhaSEhOQ21kZHFtMHRRdkJibzBqWllNaDJxWTR6SldK?=
+ =?utf-8?B?NUJQZUM4dmRIYWYxRzJITkRXRS9jcXkwdnpqZDFoMDR3R0hJbGMycElEWWwv?=
+ =?utf-8?B?UC8zaE9oWG1hQlRVejBhUzFvb3E5d0FUdWVwaU5WRVVhWFAyamVyelg0R3d5?=
+ =?utf-8?B?QUxyMzY1bzU1L2hMZFIwa3RZOHhBbllBM2h5blcxUUVmRFIzekEyT1hJSUMw?=
+ =?utf-8?B?d0JUOVBsdXRFNVlFblBDRklIOEp3bjhtUDB5Ni81d085c0swWHkzR2FkdDNx?=
+ =?utf-8?B?Kzc4ellJZW4yY0xZdmV3Q0FLbkZQNVhGQWN3MU5KaGJwZnZFb3ZTVWJhTHU0?=
+ =?utf-8?B?bGk2TjNjcDRpaEJsZTEzeElnT3hCQjYvWUVscjNOdTlnRk12YWVYUy85ODZP?=
+ =?utf-8?B?d3g3OUplWmFvMWtCbmx1dGNXckR0b3hyM2VrblhOeWNMbi80Y1hENk5acnhk?=
+ =?utf-8?B?RTdKOElwYTQ1YnJIWVg4bytLZEdTbFlnV3R6NkxGWlRUZmdBVVZZakhCRjhj?=
+ =?utf-8?B?cTRLNElSL3c4cGlVWEJxQ3JuanhMZnB1OGdIZFBCdDhoVkx4cXdRbSt4aWlp?=
+ =?utf-8?B?N1pJV2hPeGNwTytXenFETVRGL0JyMjRDRFhBeWg5bEcyUmdtTjU2NFYrSjBj?=
+ =?utf-8?B?N0szOGdlbDk2ZFRqWkVQd0I5b3ZlRDN6aVlOZmJnb29tNXhrbW5CQ2xmb1pD?=
+ =?utf-8?B?UDcvOEJlU0RWVVRvVWdHVlEzL0xTYTErdkg2K0QvSkU2Mk1HakRKQ3l6T2RO?=
+ =?utf-8?Q?l/FlreVyrH/NercKs/N5xWM=3D?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e9f509ff-7ffd-4f83-bea7-08d998aadabe
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Oct 2021 17:57:36.9804
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Oct 2021 18:03:03.3293
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: CEyFQX/tpsc5Z1/1Q8gC3zOM5vv8OEY1wjtJe0BiaXn8WYczy6gyNdNRomcTw4/h
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5048
+X-MS-Exchange-CrossTenant-UserPrincipalName: svKX7Ect2E7wf6xIB0dSKOhU96QuGotZYlDqNGXS5+o3J9nOibo0xWgQLRNlYjApJQuCYHUdwp1Mvfc/LjlUdw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5374
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is a more complicated conversion because vfio_ccw is sharing the
-vfio_device between both the mdev_device, its vfio_device and the
-css_driver.
+On 10/1/21 12:06 PM, Tom Lendacky wrote:
+> On 5/25/21 1:25 AM, Vitaly Kuznetsov wrote:
+>> Tom Lendacky <thomas.lendacky@amd.com> writes:
+>>
+>>> When processing a hypercall for a guest with protected state, currently
+>>> SEV-ES guests, the guest CS segment register can't be checked to
+>>> determine if the guest is in 64-bit mode. For an SEV-ES guest, it is
+>>> expected that communication between the guest and the hypervisor is
+>>> performed to shared memory using the GHCB. In order to use the GHCB, the
+>>> guest must have been in long mode, otherwise writes by the guest to the
+>>> GHCB would be encrypted and not be able to be comprehended by the
+>>> hypervisor.
+>>>
+>>> Create a new helper function, is_64_bit_hypercall(), that assumes the
+>>> guest is in 64-bit mode when the guest has protected state, and returns
+>>> true, otherwise invoking is_64_bit_mode() to determine the mode. Update
+>>> the hypercall related routines to use is_64_bit_hypercall() instead of
+>>> is_64_bit_mode().
+>>>
+>>> Add a WARN_ON_ONCE() to is_64_bit_mode() to catch occurences of calls to
+>>> this helper function for a guest running with protected state.
+>>>
+>>> Fixes: f1c6366e3043 ("KVM: SVM: Add required changes to support 
+>>> intercepts under SEV-ES")
+>>> Reported-by: Sean Christopherson <seanjc@google.com>
+>>> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
+>>> ---
+>>>
+>>> Changes since v1:
+>>> - Create a new helper routine, is_64_bit_hypercall(), and use it in place
+>>>    of is_64_bit_mode() in hypercall related areas.
+>>> - Add a WARN_ON_ONCE() to is_64_bit_mode() to issue a warning if invoked
+>>>    for a guest with protected state.
+>>> ---
+>>>   arch/x86/kvm/hyperv.c |  4 ++--
+>>>   arch/x86/kvm/x86.c    |  2 +-
+>>>   arch/x86/kvm/x86.h    | 12 ++++++++++++
+>>>   arch/x86/kvm/xen.c    |  2 +-
+>>>   4 files changed, 16 insertions(+), 4 deletions(-)
+>>>
+>>> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+>>> index f98370a39936..1cdf2b213f41 100644
+>>> --- a/arch/x86/kvm/hyperv.c
+>>> +++ b/arch/x86/kvm/hyperv.c
+>>> @@ -1818,7 +1818,7 @@ static void kvm_hv_hypercall_set_result(struct 
+>>> kvm_vcpu *vcpu, u64 result)
+>>>   {
+>>>       bool longmode;
+>>> -    longmode = is_64_bit_mode(vcpu);
+>>> +    longmode = is_64_bit_hypercall(vcpu);
+>>>       if (longmode)
+>>>           kvm_rax_write(vcpu, result);
+>>>       else {
+>>> @@ -1895,7 +1895,7 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
+>>>       }
+>>>   #ifdef CONFIG_X86_64
+>>> -    if (is_64_bit_mode(vcpu)) {
+>>> +    if (is_64_bit_hypercall(vcpu)) {
+>>>           param = kvm_rcx_read(vcpu);
+>>>           ingpa = kvm_rdx_read(vcpu);
+>>>           outgpa = kvm_r8_read(vcpu);
+>>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>>> index 9b6bca616929..dc72f0a1609a 100644
+>>> --- a/arch/x86/kvm/x86.c
+>>> +++ b/arch/x86/kvm/x86.c
+>>> @@ -8403,7 +8403,7 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+>>>       trace_kvm_hypercall(nr, a0, a1, a2, a3);
+>>> -    op_64_bit = is_64_bit_mode(vcpu);
+>>> +    op_64_bit = is_64_bit_hypercall(vcpu);
+>>>       if (!op_64_bit) {
+>>>           nr &= 0xFFFFFFFF;
+>>>           a0 &= 0xFFFFFFFF;
+>>> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+>>> index 521f74e5bbf2..3102caf689d2 100644
+>>> --- a/arch/x86/kvm/x86.h
+>>> +++ b/arch/x86/kvm/x86.h
+>>> @@ -151,12 +151,24 @@ static inline bool is_64_bit_mode(struct kvm_vcpu 
+>>> *vcpu)
+>>>   {
+>>>       int cs_db, cs_l;
+>>> +    WARN_ON_ONCE(vcpu->arch.guest_state_protected);
+>>> +
+>>>       if (!is_long_mode(vcpu))
+>>>           return false;
+>>>       static_call(kvm_x86_get_cs_db_l_bits)(vcpu, &cs_db, &cs_l);
+>>>       return cs_l;
+>>>   }
+>>> +static inline bool is_64_bit_hypercall(struct kvm_vcpu *vcpu)
+>>> +{
+>>> +    /*
+>>> +     * If running with protected guest state, the CS register is not
+>>> +     * accessible. The hypercall register values will have had to been
+>>> +     * provided in 64-bit mode, so assume the guest is in 64-bit.
+>>> +     */
+>>> +    return vcpu->arch.guest_state_protected || is_64_bit_mode(vcpu);
+>>> +}
+>>> +
+>>>   static inline bool is_la57_mode(struct kvm_vcpu *vcpu)
+>>>   {
+>>>   #ifdef CONFIG_X86_64
+>>> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+>>> index ae17250e1efe..c58f6369e668 100644
+>>> --- a/arch/x86/kvm/xen.c
+>>> +++ b/arch/x86/kvm/xen.c
+>>> @@ -680,7 +680,7 @@ int kvm_xen_hypercall(struct kvm_vcpu *vcpu)
+>>>           kvm_hv_hypercall_enabled(vcpu))
+>>>           return kvm_hv_hypercall(vcpu);
+>>> -    longmode = is_64_bit_mode(vcpu);
+>>> +    longmode = is_64_bit_hypercall(vcpu);
+>>>       if (!longmode) {
+>>>           params[0] = (u32)kvm_rbx_read(vcpu);
+>>>           params[1] = (u32)kvm_rcx_read(vcpu);
+>>
+>> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>>
+>> Thanks!
+> 
+> Paolo,
+> 
+> This got lost in my stack of work... any comments?
+> 
+> Thanks,
+> Tom
 
-The mdev is a singleton, and the reason for this sharing is so the extra
-css_driver function callbacks to be delivered to the vfio_device
-implementation.
+Ping
 
-This keeps things as they are, with the css_driver allocating the
-singleton, not the mdev_driver.
+Thanks,
+Tom
 
-Embed the vfio_device in the vfio_ccw_private and instantiate it as a
-vfio_device when the mdev probes. The drvdata of both the css_device and
-the mdev_device point at the private, and container_of is used to get it
-back from the vfio_device.
-
-Reviewed-by: Eric Farman <farman@linux.ibm.com>
-Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
----
- drivers/s390/cio/vfio_ccw_drv.c     |  21 ++++--
- drivers/s390/cio/vfio_ccw_ops.c     | 107 +++++++++++++++++-----------
- drivers/s390/cio/vfio_ccw_private.h |   5 ++
- 3 files changed, 85 insertions(+), 48 deletions(-)
-
-diff --git a/drivers/s390/cio/vfio_ccw_drv.c b/drivers/s390/cio/vfio_ccw_drv.c
-index e32678a71644fb..0407427770955d 100644
---- a/drivers/s390/cio/vfio_ccw_drv.c
-+++ b/drivers/s390/cio/vfio_ccw_drv.c
-@@ -468,7 +468,7 @@ static int __init vfio_ccw_sch_init(void)
- 	vfio_ccw_work_q = create_singlethread_workqueue("vfio-ccw");
- 	if (!vfio_ccw_work_q) {
- 		ret = -ENOMEM;
--		goto out_err;
-+		goto out_regions;
- 	}
- 
- 	vfio_ccw_io_region = kmem_cache_create_usercopy("vfio_ccw_io_region",
-@@ -477,7 +477,7 @@ static int __init vfio_ccw_sch_init(void)
- 					sizeof(struct ccw_io_region), NULL);
- 	if (!vfio_ccw_io_region) {
- 		ret = -ENOMEM;
--		goto out_err;
-+		goto out_regions;
- 	}
- 
- 	vfio_ccw_cmd_region = kmem_cache_create_usercopy("vfio_ccw_cmd_region",
-@@ -486,7 +486,7 @@ static int __init vfio_ccw_sch_init(void)
- 					sizeof(struct ccw_cmd_region), NULL);
- 	if (!vfio_ccw_cmd_region) {
- 		ret = -ENOMEM;
--		goto out_err;
-+		goto out_regions;
- 	}
- 
- 	vfio_ccw_schib_region = kmem_cache_create_usercopy("vfio_ccw_schib_region",
-@@ -496,7 +496,7 @@ static int __init vfio_ccw_sch_init(void)
- 
- 	if (!vfio_ccw_schib_region) {
- 		ret = -ENOMEM;
--		goto out_err;
-+		goto out_regions;
- 	}
- 
- 	vfio_ccw_crw_region = kmem_cache_create_usercopy("vfio_ccw_crw_region",
-@@ -506,19 +506,25 @@ static int __init vfio_ccw_sch_init(void)
- 
- 	if (!vfio_ccw_crw_region) {
- 		ret = -ENOMEM;
--		goto out_err;
-+		goto out_regions;
- 	}
- 
-+	ret = mdev_register_driver(&vfio_ccw_mdev_driver);
-+	if (ret)
-+		goto out_regions;
-+
- 	isc_register(VFIO_CCW_ISC);
- 	ret = css_driver_register(&vfio_ccw_sch_driver);
- 	if (ret) {
- 		isc_unregister(VFIO_CCW_ISC);
--		goto out_err;
-+		goto out_driver;
- 	}
- 
- 	return ret;
- 
--out_err:
-+out_driver:
-+	mdev_unregister_driver(&vfio_ccw_mdev_driver);
-+out_regions:
- 	vfio_ccw_destroy_regions();
- 	destroy_workqueue(vfio_ccw_work_q);
- 	vfio_ccw_debug_exit();
-@@ -528,6 +534,7 @@ static int __init vfio_ccw_sch_init(void)
- static void __exit vfio_ccw_sch_exit(void)
- {
- 	css_driver_unregister(&vfio_ccw_sch_driver);
-+	mdev_unregister_driver(&vfio_ccw_mdev_driver);
- 	isc_unregister(VFIO_CCW_ISC);
- 	vfio_ccw_destroy_regions();
- 	destroy_workqueue(vfio_ccw_work_q);
-diff --git a/drivers/s390/cio/vfio_ccw_ops.c b/drivers/s390/cio/vfio_ccw_ops.c
-index 1edbea9de0ec42..d8589afac272f1 100644
---- a/drivers/s390/cio/vfio_ccw_ops.c
-+++ b/drivers/s390/cio/vfio_ccw_ops.c
-@@ -17,6 +17,8 @@
- 
- #include "vfio_ccw_private.h"
- 
-+static const struct vfio_device_ops vfio_ccw_dev_ops;
-+
- static int vfio_ccw_mdev_reset(struct vfio_ccw_private *private)
- {
- 	struct subchannel *sch;
-@@ -111,10 +113,10 @@ static struct attribute_group *mdev_type_groups[] = {
- 	NULL,
- };
- 
--static int vfio_ccw_mdev_create(struct mdev_device *mdev)
-+static int vfio_ccw_mdev_probe(struct mdev_device *mdev)
- {
--	struct vfio_ccw_private *private =
--		dev_get_drvdata(mdev_parent_dev(mdev));
-+	struct vfio_ccw_private *private = dev_get_drvdata(mdev->dev.parent);
-+	int ret;
- 
- 	if (private->state == VFIO_CCW_STATE_NOT_OPER)
- 		return -ENODEV;
-@@ -122,6 +124,10 @@ static int vfio_ccw_mdev_create(struct mdev_device *mdev)
- 	if (atomic_dec_if_positive(&private->avail) < 0)
- 		return -EPERM;
- 
-+	memset(&private->vdev, 0, sizeof(private->vdev));
-+	vfio_init_group_dev(&private->vdev, &mdev->dev,
-+			    &vfio_ccw_dev_ops);
-+
- 	private->mdev = mdev;
- 	private->state = VFIO_CCW_STATE_IDLE;
- 
-@@ -130,19 +136,31 @@ static int vfio_ccw_mdev_create(struct mdev_device *mdev)
- 			   private->sch->schid.ssid,
- 			   private->sch->schid.sch_no);
- 
-+	ret = vfio_register_emulated_iommu_dev(&private->vdev);
-+	if (ret)
-+		goto err_atomic;
-+	dev_set_drvdata(&mdev->dev, private);
- 	return 0;
-+
-+err_atomic:
-+	vfio_uninit_group_dev(&private->vdev);
-+	atomic_inc(&private->avail);
-+	private->mdev = NULL;
-+	private->state = VFIO_CCW_STATE_IDLE;
-+	return ret;
- }
- 
--static int vfio_ccw_mdev_remove(struct mdev_device *mdev)
-+static void vfio_ccw_mdev_remove(struct mdev_device *mdev)
- {
--	struct vfio_ccw_private *private =
--		dev_get_drvdata(mdev_parent_dev(mdev));
-+	struct vfio_ccw_private *private = dev_get_drvdata(mdev->dev.parent);
- 
- 	VFIO_CCW_MSG_EVENT(2, "mdev %pUl, sch %x.%x.%04x: remove\n",
- 			   mdev_uuid(mdev), private->sch->schid.cssid,
- 			   private->sch->schid.ssid,
- 			   private->sch->schid.sch_no);
- 
-+	vfio_unregister_group_dev(&private->vdev);
-+
- 	if ((private->state != VFIO_CCW_STATE_NOT_OPER) &&
- 	    (private->state != VFIO_CCW_STATE_STANDBY)) {
- 		if (!vfio_ccw_sch_quiesce(private->sch))
-@@ -150,23 +168,22 @@ static int vfio_ccw_mdev_remove(struct mdev_device *mdev)
- 		/* The state will be NOT_OPER on error. */
- 	}
- 
-+	vfio_uninit_group_dev(&private->vdev);
- 	cp_free(&private->cp);
- 	private->mdev = NULL;
- 	atomic_inc(&private->avail);
--
--	return 0;
- }
- 
--static int vfio_ccw_mdev_open_device(struct mdev_device *mdev)
-+static int vfio_ccw_mdev_open_device(struct vfio_device *vdev)
- {
- 	struct vfio_ccw_private *private =
--		dev_get_drvdata(mdev_parent_dev(mdev));
-+		container_of(vdev, struct vfio_ccw_private, vdev);
- 	unsigned long events = VFIO_IOMMU_NOTIFY_DMA_UNMAP;
- 	int ret;
- 
- 	private->nb.notifier_call = vfio_ccw_mdev_notifier;
- 
--	ret = vfio_register_notifier(mdev_dev(mdev), VFIO_IOMMU_NOTIFY,
-+	ret = vfio_register_notifier(vdev->dev, VFIO_IOMMU_NOTIFY,
- 				     &events, &private->nb);
- 	if (ret)
- 		return ret;
-@@ -187,15 +204,15 @@ static int vfio_ccw_mdev_open_device(struct mdev_device *mdev)
- 
- out_unregister:
- 	vfio_ccw_unregister_dev_regions(private);
--	vfio_unregister_notifier(mdev_dev(mdev), VFIO_IOMMU_NOTIFY,
-+	vfio_unregister_notifier(vdev->dev, VFIO_IOMMU_NOTIFY,
- 				 &private->nb);
- 	return ret;
- }
- 
--static void vfio_ccw_mdev_close_device(struct mdev_device *mdev)
-+static void vfio_ccw_mdev_close_device(struct vfio_device *vdev)
- {
- 	struct vfio_ccw_private *private =
--		dev_get_drvdata(mdev_parent_dev(mdev));
-+		container_of(vdev, struct vfio_ccw_private, vdev);
- 
- 	if ((private->state != VFIO_CCW_STATE_NOT_OPER) &&
- 	    (private->state != VFIO_CCW_STATE_STANDBY)) {
-@@ -206,8 +223,7 @@ static void vfio_ccw_mdev_close_device(struct mdev_device *mdev)
- 
- 	cp_free(&private->cp);
- 	vfio_ccw_unregister_dev_regions(private);
--	vfio_unregister_notifier(mdev_dev(mdev), VFIO_IOMMU_NOTIFY,
--				 &private->nb);
-+	vfio_unregister_notifier(vdev->dev, VFIO_IOMMU_NOTIFY, &private->nb);
- }
- 
- static ssize_t vfio_ccw_mdev_read_io_region(struct vfio_ccw_private *private,
-@@ -231,15 +247,14 @@ static ssize_t vfio_ccw_mdev_read_io_region(struct vfio_ccw_private *private,
- 	return ret;
- }
- 
--static ssize_t vfio_ccw_mdev_read(struct mdev_device *mdev,
-+static ssize_t vfio_ccw_mdev_read(struct vfio_device *vdev,
- 				  char __user *buf,
- 				  size_t count,
- 				  loff_t *ppos)
- {
-+	struct vfio_ccw_private *private =
-+		container_of(vdev, struct vfio_ccw_private, vdev);
- 	unsigned int index = VFIO_CCW_OFFSET_TO_INDEX(*ppos);
--	struct vfio_ccw_private *private;
--
--	private = dev_get_drvdata(mdev_parent_dev(mdev));
- 
- 	if (index >= VFIO_CCW_NUM_REGIONS + private->num_regions)
- 		return -EINVAL;
-@@ -284,15 +299,14 @@ static ssize_t vfio_ccw_mdev_write_io_region(struct vfio_ccw_private *private,
- 	return ret;
- }
- 
--static ssize_t vfio_ccw_mdev_write(struct mdev_device *mdev,
-+static ssize_t vfio_ccw_mdev_write(struct vfio_device *vdev,
- 				   const char __user *buf,
- 				   size_t count,
- 				   loff_t *ppos)
- {
-+	struct vfio_ccw_private *private =
-+		container_of(vdev, struct vfio_ccw_private, vdev);
- 	unsigned int index = VFIO_CCW_OFFSET_TO_INDEX(*ppos);
--	struct vfio_ccw_private *private;
--
--	private = dev_get_drvdata(mdev_parent_dev(mdev));
- 
- 	if (index >= VFIO_CCW_NUM_REGIONS + private->num_regions)
- 		return -EINVAL;
-@@ -510,12 +524,12 @@ void vfio_ccw_unregister_dev_regions(struct vfio_ccw_private *private)
- 	private->region = NULL;
- }
- 
--static ssize_t vfio_ccw_mdev_ioctl(struct mdev_device *mdev,
-+static ssize_t vfio_ccw_mdev_ioctl(struct vfio_device *vdev,
- 				   unsigned int cmd,
- 				   unsigned long arg)
- {
- 	struct vfio_ccw_private *private =
--		dev_get_drvdata(mdev_parent_dev(mdev));
-+		container_of(vdev, struct vfio_ccw_private, vdev);
- 	int ret = 0;
- 	unsigned long minsz;
- 
-@@ -606,37 +620,48 @@ static ssize_t vfio_ccw_mdev_ioctl(struct mdev_device *mdev,
- }
- 
- /* Request removal of the device*/
--static void vfio_ccw_mdev_request(struct mdev_device *mdev, unsigned int count)
-+static void vfio_ccw_mdev_request(struct vfio_device *vdev, unsigned int count)
- {
--	struct vfio_ccw_private *private = dev_get_drvdata(mdev_parent_dev(mdev));
--
--	if (!private)
--		return;
-+	struct vfio_ccw_private *private =
-+		container_of(vdev, struct vfio_ccw_private, vdev);
-+	struct device *dev = vdev->dev;
- 
- 	if (private->req_trigger) {
- 		if (!(count % 10))
--			dev_notice_ratelimited(mdev_dev(private->mdev),
-+			dev_notice_ratelimited(dev,
- 					       "Relaying device request to user (#%u)\n",
- 					       count);
- 
- 		eventfd_signal(private->req_trigger, 1);
- 	} else if (count == 0) {
--		dev_notice(mdev_dev(private->mdev),
-+		dev_notice(dev,
- 			   "No device request channel registered, blocked until released by user\n");
- 	}
- }
- 
-+static const struct vfio_device_ops vfio_ccw_dev_ops = {
-+	.open_device = vfio_ccw_mdev_open_device,
-+	.close_device = vfio_ccw_mdev_close_device,
-+	.read = vfio_ccw_mdev_read,
-+	.write = vfio_ccw_mdev_write,
-+	.ioctl = vfio_ccw_mdev_ioctl,
-+	.request = vfio_ccw_mdev_request,
-+};
-+
-+struct mdev_driver vfio_ccw_mdev_driver = {
-+	.driver = {
-+		.name = "vfio_ccw_mdev",
-+		.owner = THIS_MODULE,
-+		.mod_name = KBUILD_MODNAME,
-+	},
-+	.probe = vfio_ccw_mdev_probe,
-+	.remove = vfio_ccw_mdev_remove,
-+};
-+
- static const struct mdev_parent_ops vfio_ccw_mdev_ops = {
- 	.owner			= THIS_MODULE,
-+	.device_driver		= &vfio_ccw_mdev_driver,
- 	.supported_type_groups  = mdev_type_groups,
--	.create			= vfio_ccw_mdev_create,
--	.remove			= vfio_ccw_mdev_remove,
--	.open_device		= vfio_ccw_mdev_open_device,
--	.close_device		= vfio_ccw_mdev_close_device,
--	.read			= vfio_ccw_mdev_read,
--	.write			= vfio_ccw_mdev_write,
--	.ioctl			= vfio_ccw_mdev_ioctl,
--	.request		= vfio_ccw_mdev_request,
- };
- 
- int vfio_ccw_mdev_reg(struct subchannel *sch)
-diff --git a/drivers/s390/cio/vfio_ccw_private.h b/drivers/s390/cio/vfio_ccw_private.h
-index b2c762eb42b9bb..7272eb78861244 100644
---- a/drivers/s390/cio/vfio_ccw_private.h
-+++ b/drivers/s390/cio/vfio_ccw_private.h
-@@ -17,6 +17,7 @@
- #include <linux/eventfd.h>
- #include <linux/workqueue.h>
- #include <linux/vfio_ccw.h>
-+#include <linux/vfio.h>
- #include <asm/crw.h>
- #include <asm/debug.h>
- 
-@@ -67,6 +68,7 @@ struct vfio_ccw_crw {
- 
- /**
-  * struct vfio_ccw_private
-+ * @vdev: Embedded VFIO device
-  * @sch: pointer to the subchannel
-  * @state: internal state of the device
-  * @completion: synchronization helper of the I/O completion
-@@ -90,6 +92,7 @@ struct vfio_ccw_crw {
-  * @crw_work: work for deferral process of CRW handling
-  */
- struct vfio_ccw_private {
-+	struct vfio_device vdev;
- 	struct subchannel	*sch;
- 	int			state;
- 	struct completion	*completion;
-@@ -121,6 +124,8 @@ extern void vfio_ccw_mdev_unreg(struct subchannel *sch);
- 
- extern int vfio_ccw_sch_quiesce(struct subchannel *sch);
- 
-+extern struct mdev_driver vfio_ccw_mdev_driver;
-+
- /*
-  * States of the device statemachine.
-  */
--- 
-2.33.0
-
+> 
+>>
