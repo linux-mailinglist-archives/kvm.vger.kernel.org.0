@@ -2,204 +2,236 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BD89643A932
-	for <lists+kvm@lfdr.de>; Tue, 26 Oct 2021 02:23:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 14CA743AAA2
+	for <lists+kvm@lfdr.de>; Tue, 26 Oct 2021 05:12:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235339AbhJZAZW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Oct 2021 20:25:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35058 "EHLO
+        id S234545AbhJZDPR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 25 Oct 2021 23:15:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235347AbhJZAZU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Oct 2021 20:25:20 -0400
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E79C6C061745
-        for <kvm@vger.kernel.org>; Mon, 25 Oct 2021 17:22:57 -0700 (PDT)
-Received: by mail-pj1-x102f.google.com with SMTP id v1-20020a17090a088100b001a21156830bso765906pjc.1
-        for <kvm@vger.kernel.org>; Mon, 25 Oct 2021 17:22:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=8MJkxFXnTdTQg1tWaJuynFwFllV0sR389qKLE8Dsarc=;
-        b=PUXIQcIHk+jqVydEXxeKJqmADEQwKao3vRNOlHO1VeCSAwoWNHdO80o2C2C35x6GmE
-         NFbxyjcvZ+d9aIhNJGCEm8TgvAlS+f7w6/oVu8/UbPUYQ5VrXCJCmeUK7fqcMlBgG9CU
-         alOI4bkOJp0JT669FKwRgZEaDFQtZHJ8ckAlzO+TjkU0R9yErwJ/gkpD0vySn935+cLY
-         m4lZi6avlIwI5SPm/fRAxwujnhe+cAcK+cKfpB2u5KIIKgbAQ/a/eFtk9Rat8MmJI4m8
-         0Y63+y+voTofRsQD0vMRGN1hgbmdw+xEwfqknPzfsLT5xJD4o2GqnIY7Hd9jhQnp7/xX
-         KJKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=8MJkxFXnTdTQg1tWaJuynFwFllV0sR389qKLE8Dsarc=;
-        b=X8yJ0/YLUgbDZKIgD3mZ305qK3BufcQGCCDj7I+9SUI7yqxFQueLDMpNCoGCRAHFbj
-         A5CEBFvKAN6ACkxHbKxti9FjDWLkXetbXjmb8XwFxRnlA+qqV61X/UFTt4lx0DDbtDdi
-         ATug3z87hXiryqdffWU3LDpPHbc2MkycXjxShEBP6Q6ACWpAnpof4rhD1V3F77cQoN3B
-         J507yuT/GvAzyBAqLoL5cWFsLBXyTeen10OitzaE6IfzZMJpksr6kYamNt+y8f7jW0L7
-         ub3vB5RzcnQuuGImPOK2M5sNgwzTLsrYEl2YQBxaM7LaiyeA+Q720v3h6TAHgyYwud6s
-         hELQ==
-X-Gm-Message-State: AOAM533slquPGs6M6nE9N6UQru7Uqji6enXxH4TqvxQkRvC1QtyabOFz
-        HnL3GO6ospacoYAtnVBpvjqnp1HFN2k=
-X-Google-Smtp-Source: ABdhPJxpPsgEcP3OiMOJDlH56vwfYLXOOQwpNdFGEk6uvXEvaNoeoFp8p+mWu1+VhGCjltiDfCOD/g==
-X-Received: by 2002:a17:903:22d1:b0:140:53fb:e546 with SMTP id y17-20020a17090322d100b0014053fbe546mr9131273plg.25.1635207777095;
-        Mon, 25 Oct 2021 17:22:57 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id lr3sm2086610pjb.3.2021.10.25.17.22.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Oct 2021 17:22:56 -0700 (PDT)
-Date:   Tue, 26 Oct 2021 00:22:52 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ajay Garg <ajaygargnsit@gmail.com>
-Cc:     kvm@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86: (64-bit x86_64 machine) : fix
- -frame-larger-than warnings/errors.
-Message-ID: <YXdKXOfWZNAHCQkS@google.com>
-References: <1631894159-10146-1-git-send-email-ajaygargnsit@gmail.com>
- <YWcswAD9dmYun+sI@google.com>
- <CAHP4M8XwS-4W6gWga5C=AgipJntR3X944kJ3v4CXkZ+BTTUZbg@mail.gmail.com>
- <CAHP4M8VzjPgzBmfn2DAdGD0P9OBF7_cafPP8nrjvTampGLoxyA@mail.gmail.com>
+        with ESMTP id S233243AbhJZDPQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 25 Oct 2021 23:15:16 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6055BC061745
+        for <kvm@vger.kernel.org>; Mon, 25 Oct 2021 20:12:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=MIME-Version:Content-Type:Date:Cc:To:
+        From:Subject:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=adApSZdYFI7D6gASGouAH73cZexc2o75mkLavqOrHkQ=; b=g42hwq1mOHXt7kCfDuGsgnHQsW
+        66z3Ya4nvKM2DGSLi8Yx8ipKCv/F+MQ41MQqGC1h0Vb7VD1xH3GPxR/bbOZRuHfS/D/D1BMWuZtgb
+        TObxP0vSFsMTOOwKajlZygehL0X2Xta0DVT11pRliG9/Fs3lqTRqz+DTq/Had5+ayKd5mbge5cQAN
+        eEyPK4NBJDGqEtm7sTow1C2+9rnwDsgvU5XE2Zbi3uLgyDWSKGHtkZIYiXzeY0K0oING4V/nCf3Ih
+        LEbIEt6ALhYJrUmIf++CquNAWsTMhbO3gcBm9vPcwQMBzgIoae27/i8jMU7dPvIL+wj8r38Mkv3pO
+        p9H0mn/w==;
+Received: from [2001:8b0:10b:1::3ae] (helo=u3832b3a9db3152.ant.amazon.com)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mfCtF-000WGx-Dd; Tue, 26 Oct 2021 03:12:41 +0000
+Message-ID: <606aaaf29fca3850a63aa4499826104e77a72346.camel@infradead.org>
+Subject: [PATCH] KVM: x86: Take srcu lock in post_kvm_run_save()
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     kvm <kvm@vger.kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, mtosatti <mtosatti@redhat.com>
+Date:   Tue, 26 Oct 2021 04:12:38 +0100
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-OmkgNCmq8NVRoUR5zKCU"
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHP4M8VzjPgzBmfn2DAdGD0P9OBF7_cafPP8nrjvTampGLoxyA@mail.gmail.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Oct 24, 2021, Ajay Garg wrote:
-> Hi Sean.
-> 
-> Today I enabled a debug-build, and the compilation broke again.
-> 
-> 1.
-> Please find attached the .config  file.
 
-Aha!  The problem is CONFIG_KASAN_STACK=y, which is selected (and can't be
-unselected) by CONFIG_KASAN=y when compiling with gcc (clang/LLVM is a stack hog
-in some cases so it's opt-in for clang).  KASAN_STACK adds a redzone around every
-stack variable, which pushes the Hyper-V functions over the limit.
+--=-OmkgNCmq8NVRoUR5zKCU
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> Please let know if/when I should float a v2 patch.
+From: David Woodhouse <dwmw@amazon.co.uk>
 
-I still don't love hoisting sparse_banks up a level, that info really shouldn't
-bleed into the caller.  My alternative solution is to push vp_bitmap down into
-sparse_set_to_vcpu_mask().  That doesn't "free" up as much stack, but it's enough
-to get under the 1024 byte default.  It's also nice in that it hides the VP
-index mismatch logic in sparse_set_to_vcpu_mask().
+The Xen interrupt injection for event channels relies on accessing the
+guest's vcpu_info structure in __kvm_xen_has_interrupt(), through a
+gfn_to_hva_cache.
 
-I'll post a proper patch tomorrow (completely untested):
+This requires the srcu lock to be held, which is mostly the case except
+for this code path:
 
+[   11.822877] WARNING: suspicious RCU usage
+[   11.822965] -----------------------------
+[   11.823013] include/linux/kvm_host.h:664 suspicious rcu_dereference_chec=
+k() usage!
+[   11.823131]
+[   11.823131] other info that might help us debug this:
+[   11.823131]
+[   11.823196]
+[   11.823196] rcu_scheduler_active =3D 2, debug_locks =3D 1
+[   11.823253] 1 lock held by dom:0/90:
+[   11.823292]  #0: ffff998956ec8118 (&vcpu->mutex){+.+.}, at: kvm_vcpu_ioc=
+tl+0x85/0x680
+[   11.823379]
+[   11.823379] stack backtrace:
+[   11.823428] CPU: 2 PID: 90 Comm: dom:0 Kdump: loaded Not tainted 5.4.34+=
+ #5
+[   11.823496] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel=
+-1.12.1-0-ga5cab58e9a3f-prebuilt.qemu.org 04/01/2014
+[   11.823612] Call Trace:
+[   11.823645]  dump_stack+0x7a/0xa5
+[   11.823681]  lockdep_rcu_suspicious+0xc5/0x100
+[   11.823726]  __kvm_xen_has_interrupt+0x179/0x190
+[   11.823773]  kvm_cpu_has_extint+0x6d/0x90
+[   11.823813]  kvm_cpu_accept_dm_intr+0xd/0x40
+[   11.823853]  kvm_vcpu_ready_for_interrupt_injection+0x20/0x30
+              < post_kvm_run_save() inlined here >
+[   11.823906]  kvm_arch_vcpu_ioctl_run+0x135/0x6a0
+[   11.823947]  kvm_vcpu_ioctl+0x263/0x680
+
+Fixes: 40da8ccd724f ("KVM: x86/xen: Add event channel interrupt vector upca=
+ll")
+Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 ---
- arch/x86/kvm/hyperv.c | 55 ++++++++++++++++++++++---------------------
- 1 file changed, 28 insertions(+), 27 deletions(-)
 
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index 4f15c0165c05..80018cfab5c7 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -1710,31 +1710,36 @@ int kvm_hv_get_msr_common(struct kvm_vcpu *vcpu, u32 msr, u64 *pdata, bool host)
- 		return kvm_hv_get_msr(vcpu, msr, pdata, host);
- }
+There are potentially other ways of doing this, by shuffling the tail
+of kvm_arch_vcpu_ioctl_run() around a little and holding the lock once
+there instead of taking it within vcpu_run(). But the call to
+post_kvm_run_save() occurs even on the error paths, and it gets complex
+to untangle. This is the simple approach.
 
--static __always_inline unsigned long *sparse_set_to_vcpu_mask(
--	struct kvm *kvm, u64 *sparse_banks, u64 valid_bank_mask,
--	u64 *vp_bitmap, unsigned long *vcpu_bitmap)
-+static void sparse_set_to_vcpu_mask(struct kvm *kvm, u64 *sparse_banks,
-+				    u64 valid_bank_mask, unsigned long *vcpu_mask)
- {
- 	struct kvm_hv *hv = to_kvm_hv(kvm);
-+	bool has_mismatch = atomic_read(&hv->num_mismatched_vp_indexes);
-+	u64 vp_bitmap[KVM_HV_MAX_SPARSE_VCPU_SET_BITS];
- 	struct kvm_vcpu *vcpu;
- 	int i, bank, sbank = 0;
-+	u64 *bitmap;
+This doesn't show up when I enable event channel delivery in
+xen_shinfo_test because we have pic_in_kernel() there. I'll fix the
+tests not to hardcode that, as I expand the event channel support and
+add more testing of it.
 
--	memset(vp_bitmap, 0,
--	       KVM_HV_MAX_SPARSE_VCPU_SET_BITS * sizeof(*vp_bitmap));
-+	BUILD_BUG_ON(sizeof(vp_bitmap) >
-+		     sizeof(*vcpu_mask) * BITS_TO_LONGS(KVM_MAX_VCPUS));
+ arch/x86/kvm/x86.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index f0874c3d12ce..cd42d58008f7 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -8783,9 +8783,17 @@ static void post_kvm_run_save(struct kvm_vcpu *vcpu)
+=20
+ 	kvm_run->cr8 =3D kvm_get_cr8(vcpu);
+ 	kvm_run->apic_base =3D kvm_get_apic_base(vcpu);
 +
-+	/* If vp_index == vcpu_idx for all vCPUs, fill vcpu_mask directly. */
-+	if (likely(!has_mismatch))
-+		bitmap = (u64 *)vcpu_mask;
-+
-+	memset(bitmap, 0, sizeof(vp_bitmap));
- 	for_each_set_bit(bank, (unsigned long *)&valid_bank_mask,
- 			 KVM_HV_MAX_SPARSE_VCPU_SET_BITS)
--		vp_bitmap[bank] = sparse_banks[sbank++];
-+		bitmap[bank] = sparse_banks[sbank++];
++	/*
++	 * The call to kvm_ready_for_interrupt_injection() may end up in
++	 * kvm_xen_has_interrupt() which may require the srcu lock to be
++	 * held to protect against changes in the vcpu_info address.
++	 */
++	vcpu->srcu_idx =3D srcu_read_lock(&vcpu->kvm->srcu);
+ 	kvm_run->ready_for_interrupt_injection =3D
+ 		pic_in_kernel(vcpu->kvm) ||
+ 		kvm_vcpu_ready_for_interrupt_injection(vcpu);
++	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
+=20
+ 	if (is_smm(vcpu))
+ 		kvm_run->flags |=3D KVM_RUN_X86_SMM;
+--=20
+2.25.1
 
--	if (likely(!atomic_read(&hv->num_mismatched_vp_indexes))) {
--		/* for all vcpus vp_index == vcpu_idx */
--		return (unsigned long *)vp_bitmap;
--	}
-+	if (likely(!has_mismatch))
-+		return;
 
--	bitmap_zero(vcpu_bitmap, KVM_MAX_VCPUS);
-+	bitmap_zero(vcpu_mask, KVM_MAX_VCPUS);
- 	kvm_for_each_vcpu(i, vcpu, kvm) {
- 		if (test_bit(kvm_hv_get_vpindex(vcpu), (unsigned long *)vp_bitmap))
--			__set_bit(i, vcpu_bitmap);
-+			__set_bit(i, vcpu_mask);
- 	}
--	return vcpu_bitmap;
- }
+--=-OmkgNCmq8NVRoUR5zKCU
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
 
- struct kvm_hv_hcall {
-@@ -1756,9 +1761,7 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc, bool
- 	struct kvm *kvm = vcpu->kvm;
- 	struct hv_tlb_flush_ex flush_ex;
- 	struct hv_tlb_flush flush;
--	u64 vp_bitmap[KVM_HV_MAX_SPARSE_VCPU_SET_BITS];
--	DECLARE_BITMAP(vcpu_bitmap, KVM_MAX_VCPUS);
--	unsigned long *vcpu_mask;
-+	DECLARE_BITMAP(vcpu_mask, KVM_MAX_VCPUS);
- 	u64 valid_bank_mask;
- 	u64 sparse_banks[64];
- 	int sparse_banks_len;
-@@ -1842,11 +1845,9 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc, bool
- 	if (all_cpus) {
- 		kvm_make_all_cpus_request(kvm, KVM_REQ_TLB_FLUSH_GUEST);
- 	} else {
--		vcpu_mask = sparse_set_to_vcpu_mask(kvm, sparse_banks, valid_bank_mask,
--						    vp_bitmap, vcpu_bitmap);
-+		sparse_set_to_vcpu_mask(kvm, sparse_banks, valid_bank_mask, vcpu_mask);
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCECow
+ggUcMIIEBKADAgECAhEA4rtJSHkq7AnpxKUY8ZlYZjANBgkqhkiG9w0BAQsFADCBlzELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
+A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
+bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTkwMTAyMDAwMDAwWhcNMjIwMTAxMjM1
+OTU5WjAkMSIwIAYJKoZIhvcNAQkBFhNkd213MkBpbmZyYWRlYWQub3JnMIIBIjANBgkqhkiG9w0B
+AQEFAAOCAQ8AMIIBCgKCAQEAsv3wObLTCbUA7GJqKj9vHGf+Fa+tpkO+ZRVve9EpNsMsfXhvFpb8
+RgL8vD+L133wK6csYoDU7zKiAo92FMUWaY1Hy6HqvVr9oevfTV3xhB5rQO1RHJoAfkvhy+wpjo7Q
+cXuzkOpibq2YurVStHAiGqAOMGMXhcVGqPuGhcVcVzVUjsvEzAV9Po9K2rpZ52FE4rDkpDK1pBK+
+uOAyOkgIg/cD8Kugav5tyapydeWMZRJQH1vMQ6OVT24CyAn2yXm2NgTQMS1mpzStP2ioPtTnszIQ
+Ih7ASVzhV6csHb8Yrkx8mgllOyrt9Y2kWRRJFm/FPRNEurOeNV6lnYAXOymVJwIDAQABo4IB0zCC
+Ac8wHwYDVR0jBBgwFoAUgq9sjPjF/pZhfOgfPStxSF7Ei8AwHQYDVR0OBBYEFLfuNf820LvaT4AK
+xrGK3EKx1DE7MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUF
+BwMEBggrBgEFBQcDAjBGBgNVHSAEPzA9MDsGDCsGAQQBsjEBAgEDBTArMCkGCCsGAQUFBwIBFh1o
+dHRwczovL3NlY3VyZS5jb21vZG8ubmV0L0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3Js
+LmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWls
+Q0EuY3JsMIGLBggrBgEFBQcBAQR/MH0wVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuY29tb2RvY2Eu
+Y29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYI
+KwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmNvbW9kb2NhLmNvbTAeBgNVHREEFzAVgRNkd213MkBpbmZy
+YWRlYWQub3JnMA0GCSqGSIb3DQEBCwUAA4IBAQALbSykFusvvVkSIWttcEeifOGGKs7Wx2f5f45b
+nv2ghcxK5URjUvCnJhg+soxOMoQLG6+nbhzzb2rLTdRVGbvjZH0fOOzq0LShq0EXsqnJbbuwJhK+
+PnBtqX5O23PMHutP1l88AtVN+Rb72oSvnD+dK6708JqqUx2MAFLMevrhJRXLjKb2Mm+/8XBpEw+B
+7DisN4TMlLB/d55WnT9UPNHmQ+3KFL7QrTO8hYExkU849g58Dn3Nw3oCbMUgny81ocrLlB2Z5fFG
+Qu1AdNiBA+kg/UxzyJZpFbKfCITd5yX49bOriL692aMVDyqUvh8fP+T99PqorH4cIJP6OxSTdxKM
+MIIFHDCCBASgAwIBAgIRAOK7SUh5KuwJ6cSlGPGZWGYwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
+ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTE5MDEwMjAwMDAwMFoXDTIyMDEwMTIz
+NTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCASIwDQYJKoZIhvcN
+AQEBBQADggEPADCCAQoCggEBALL98Dmy0wm1AOxiaio/bxxn/hWvraZDvmUVb3vRKTbDLH14bxaW
+/EYC/Lw/i9d98CunLGKA1O8yogKPdhTFFmmNR8uh6r1a/aHr301d8YQea0DtURyaAH5L4cvsKY6O
+0HF7s5DqYm6tmLq1UrRwIhqgDjBjF4XFRqj7hoXFXFc1VI7LxMwFfT6PStq6WedhROKw5KQytaQS
+vrjgMjpICIP3A/CroGr+bcmqcnXljGUSUB9bzEOjlU9uAsgJ9sl5tjYE0DEtZqc0rT9oqD7U57My
+ECIewElc4VenLB2/GK5MfJoJZTsq7fWNpFkUSRZvxT0TRLqznjVepZ2AFzsplScCAwEAAaOCAdMw
+ggHPMB8GA1UdIwQYMBaAFIKvbIz4xf6WYXzoHz0rcUhexIvAMB0GA1UdDgQWBBS37jX/NtC72k+A
+CsaxitxCsdQxOzAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEF
+BQcDBAYIKwYBBQUHAwIwRgYDVR0gBD8wPTA7BgwrBgEEAbIxAQIBAwUwKzApBggrBgEFBQcCARYd
+aHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9DUFMwWgYDVR0fBFMwUTBPoE2gS4ZJaHR0cDovL2Ny
+bC5jb21vZG9jYS5jb20vQ09NT0RPUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFp
+bENBLmNybDCBiwYIKwYBBQUHAQEEfzB9MFUGCCsGAQUFBzAChklodHRwOi8vY3J0LmNvbW9kb2Nh
+LmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3J0MCQG
+CCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAC20spBbrL71ZEiFrbXBHonzhhirO1sdn+X+O
+W579oIXMSuVEY1LwpyYYPrKMTjKECxuvp24c829qy03UVRm742R9Hzjs6tC0oatBF7KpyW27sCYS
+vj5wbal+TttzzB7rT9ZfPALVTfkW+9qEr5w/nSuu9PCaqlMdjABSzHr64SUVy4ym9jJvv/FwaRMP
+gew4rDeEzJSwf3eeVp0/VDzR5kPtyhS+0K0zvIWBMZFPOPYOfA59zcN6AmzFIJ8vNaHKy5QdmeXx
+RkLtQHTYgQPpIP1Mc8iWaRWynwiE3ecl+PWzq4i+vdmjFQ8qlL4fHz/k/fT6qKx+HCCT+jsUk3cS
+jDCCBeYwggPOoAMCAQICEGqb4Tg7/ytrnwHV2binUlYwDQYJKoZIhvcNAQEMBQAwgYUxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMSswKQYDVQQDEyJDT01PRE8gUlNBIENlcnRpZmljYXRp
+b24gQXV0aG9yaXR5MB4XDTEzMDExMDAwMDAwMFoXDTI4MDEwOTIzNTk1OVowgZcxCzAJBgNVBAYT
+AkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNV
+BAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAvrOeV6wodnVAFsc4A5jTxhh2IVDzJXkLTLWg0X06WD6cpzEup/Y0dtmEatrQPTRI5Or1u6zf
++bGBSyD9aH95dDSmeny1nxdlYCeXIoymMv6pQHJGNcIDpFDIMypVpVSRsivlJTRENf+RKwrB6vcf
+WlP8dSsE3Rfywq09N0ZfxcBa39V0wsGtkGWC+eQKiz4pBZYKjrc5NOpG9qrxpZxyb4o4yNNwTqza
+aPpGRqXB7IMjtf7tTmU2jqPMLxFNe1VXj9XB1rHvbRikw8lBoNoSWY66nJN/VCJv5ym6Q0mdCbDK
+CMPybTjoNCQuelc0IAaO4nLUXk0BOSxSxt8kCvsUtQIDAQABo4IBPDCCATgwHwYDVR0jBBgwFoAU
+u69+Aj36pvE8hI6t7jiY7NkyMtQwHQYDVR0OBBYEFIKvbIz4xf6WYXzoHz0rcUhexIvAMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMBEGA1UdIAQKMAgwBgYEVR0gADBMBgNVHR8E
+RTBDMEGgP6A9hjtodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDZXJ0aWZpY2F0aW9u
+QXV0aG9yaXR5LmNybDBxBggrBgEFBQcBAQRlMGMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9jcnQuY29t
+b2RvY2EuY29tL0NPTU9ET1JTQUFkZFRydXN0Q0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2Nz
+cC5jb21vZG9jYS5jb20wDQYJKoZIhvcNAQEMBQADggIBAHhcsoEoNE887l9Wzp+XVuyPomsX9vP2
+SQgG1NgvNc3fQP7TcePo7EIMERoh42awGGsma65u/ITse2hKZHzT0CBxhuhb6txM1n/y78e/4ZOs
+0j8CGpfb+SJA3GaBQ+394k+z3ZByWPQedXLL1OdK8aRINTsjk/H5Ns77zwbjOKkDamxlpZ4TKSDM
+KVmU/PUWNMKSTvtlenlxBhh7ETrN543j/Q6qqgCWgWuMAXijnRglp9fyadqGOncjZjaaSOGTTFB+
+E2pvOUtY+hPebuPtTbq7vODqzCM6ryEhNhzf+enm0zlpXK7q332nXttNtjv7VFNYG+I31gnMrwfH
+M5tdhYF/8v5UY5g2xANPECTQdu9vWPoqNSGDt87b3gXb1AiGGaI06vzgkejL580ul+9hz9D0S0U4
+jkhJiA7EuTecP/CFtR72uYRBcunwwH3fciPjviDDAI9SnC/2aPY8ydehzuZutLbZdRJ5PDEJM/1t
+yZR2niOYihZ+FCbtf3D9mB12D4ln9icgc7CwaxpNSCPt8i/GqK2HsOgkL3VYnwtx7cJUmpvVdZ4o
+gnzgXtgtdk3ShrtOS1iAN2ZBXFiRmjVzmehoMof06r1xub+85hFQzVxZx5/bRaTKTlL8YXLI8nAb
+R9HWdFqzcOoB/hxfEyIQpx9/s81rgzdEZOofSlZHynoSMYIDyjCCA8YCAQEwga0wgZcxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
+ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
+ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjEx
+MDI2MDMxMjM4WjAvBgkqhkiG9w0BCQQxIgQgszUzmd6duOWq9/jGmVM9wT+nbtZk9Jj2vLfu9qGf
+WCQwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
+PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
+aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
+A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
+bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
+DQEBAQUABIIBAHdHcCbMVdWVVlYytGfoYo4QeIqg9TqIzROQKmMtCOdIR6631AdpcbdosQNd/gsx
+iLshM4jAdxdLwE6/WnNaaQKhLZvAX44S+eLFlqpVlM11o+i+T6+eAirgH3oF3j7yBa8++BVQQyXK
+uuzfRSeYLcXFFyncX1LwpbavFgo4XOIaWA4Z/5yCBn3csctVmkdn3PTeX6tSO98LSpEqTrkSWR3/
+nPSVw6/8f9ZkeMQNLlZj2WMKPo+Xf7yyo3RotixwjWxOQFVKyIkC9XUapW0s33ah7Of0k2aG2sZH
+qJ/iAoFbHmLicBsbFJozvT43ekyBMmGCEcbZNuwYn1xFyS6ucPYAAAAAAAA=
 
--		kvm_make_vcpus_request_mask(kvm, KVM_REQ_TLB_FLUSH_GUEST,
--					    vcpu_mask);
-+		kvm_make_vcpus_request_mask(kvm, KVM_REQ_TLB_FLUSH_GUEST, vcpu_mask);
- 	}
 
- ret_success:
-@@ -1879,9 +1880,7 @@ static u64 kvm_hv_send_ipi(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc, bool
- 	struct kvm *kvm = vcpu->kvm;
- 	struct hv_send_ipi_ex send_ipi_ex;
- 	struct hv_send_ipi send_ipi;
--	u64 vp_bitmap[KVM_HV_MAX_SPARSE_VCPU_SET_BITS];
--	DECLARE_BITMAP(vcpu_bitmap, KVM_MAX_VCPUS);
--	unsigned long *vcpu_mask;
-+	DECLARE_BITMAP(vcpu_mask, KVM_MAX_VCPUS);
- 	unsigned long valid_bank_mask;
- 	u64 sparse_banks[64];
- 	int sparse_banks_len;
-@@ -1937,11 +1936,13 @@ static u64 kvm_hv_send_ipi(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc, bool
- 	if ((vector < HV_IPI_LOW_VECTOR) || (vector > HV_IPI_HIGH_VECTOR))
- 		return HV_STATUS_INVALID_HYPERCALL_INPUT;
+--=-OmkgNCmq8NVRoUR5zKCU--
 
--	vcpu_mask = all_cpus ? NULL :
--		sparse_set_to_vcpu_mask(kvm, sparse_banks, valid_bank_mask,
--					vp_bitmap, vcpu_bitmap);
-+	if (all_cpus) {
-+		kvm_send_ipi_to_many(kvm, vector, NULL);
-+	} else {
-+		sparse_set_to_vcpu_mask(kvm, sparse_banks, valid_bank_mask, vcpu_mask);
-
--	kvm_send_ipi_to_many(kvm, vector, vcpu_mask);
-+		kvm_send_ipi_to_many(kvm, vector, vcpu_mask);
-+	}
-
- ret_success:
- 	return HV_STATUS_SUCCESS;
---
-2.33.0.1079.g6e70778dc9-goog
