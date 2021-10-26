@@ -2,72 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E365043B6E9
-	for <lists+kvm@lfdr.de>; Tue, 26 Oct 2021 18:18:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id C0A8A43B6F2
+	for <lists+kvm@lfdr.de>; Tue, 26 Oct 2021 18:18:12 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237426AbhJZQT7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Oct 2021 12:19:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31205 "EHLO
+        id S237530AbhJZQUb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Oct 2021 12:20:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:32722 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237389AbhJZQT2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 26 Oct 2021 12:19:28 -0400
+        by vger.kernel.org with ESMTP id S237540AbhJZQTn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 26 Oct 2021 12:19:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635265023;
+        s=mimecast20190719; t=1635265039;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=HrGP2hx/5gqG8KTbScu3FM5mqdfWvd8zWiCw/D9kcnY=;
-        b=Pd5YrAYpkwa/tw+562IPdlNBXS64oZMRqcgA8HzFFAHU957yht3MQfPJCQxQ22H0YTEi/o
-        kArq+BJzWwWoj32Tf5fqHC+8pnaynFubg5YSXOr70HxuaQfbqJoU+Yn9usCgM1mBJjX3Kn
-        TeCODiQ4/IQDjg95GdGNjEta+oWacic=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-364-XzDVchtXPNi22oLTubIDgg-1; Tue, 26 Oct 2021 12:17:02 -0400
-X-MC-Unique: XzDVchtXPNi22oLTubIDgg-1
-Received: by mail-ed1-f70.google.com with SMTP id u17-20020a50d511000000b003daa3828c13so13538511edi.12
-        for <kvm@vger.kernel.org>; Tue, 26 Oct 2021 09:17:01 -0700 (PDT)
+        bh=3jgSUASYWyT5tYVtpdVqMRt2uKiCafnLlQ6NZfT7RQo=;
+        b=FSjsOYfVE/KoKC9WQe/bd2vWMV8NOFlUSOFpBXmG+HTlHaq2uiYfZ4lCsitvIFfMbTzWfg
+        Kz0QThOWgmSLB70s8++eG3zZ8jqmi3nuUStl1pyv28HnlzGWMLtUDuLxZ8SgqjME9qmcDD
+        xUB6uP4NSM7TQFeaeZCYG3GnleE+wvE=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-94-Jj3axnUfP8WV5YxFFrhKlQ-1; Tue, 26 Oct 2021 12:17:16 -0400
+X-MC-Unique: Jj3axnUfP8WV5YxFFrhKlQ-1
+Received: by mail-ed1-f71.google.com with SMTP id t1-20020a056402524100b003dd9a419eb5so1806506edd.4
+        for <kvm@vger.kernel.org>; Tue, 26 Oct 2021 09:17:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=HrGP2hx/5gqG8KTbScu3FM5mqdfWvd8zWiCw/D9kcnY=;
-        b=ofKmTZBMeTt57S+hbWx0DZWU9xZ1gstO4Rhh3VI4uP7I6FRS0TEKXb5jrOFTA4SKaa
-         wZysHzp1T1s30Y9MoS4wrTpnVqaX9QHmNK6YjWItJlme6MBHiluzeYBuHqvu2sssJvMN
-         00UJNfa0crENvJiVw6JDntkYanBYr9pUTSmSKmiws2s0oJp3afRAV32CNQyZvm1JKWgP
-         k2SfcPClCg/ZX0HtzsnIeQySQat16EIUs2vpjaNvnKWaGWDOou82dBqVWXyyNrSq43nf
-         wp5jIlWqkctRwNaPVppuxJkp3vJfjbzoAAHPmMnlR/mQlr1XjG/HuM0Uu0uXcy1hWAg3
-         VcCw==
-X-Gm-Message-State: AOAM530CKtMPdEAR2pJ2ato2VhBU08Ka9PcFFtc2MOiOOABOTikY624j
-        4lSVniAClGsxlua9CzfbHV/XOpAqiJz5AArbG4k13Np6ILOXZ7Tu4SLNmmGuS2PQEdjtaZzF9FW
-        OQDMuZtUB1Vt+
-X-Received: by 2002:a17:906:ca18:: with SMTP id jt24mr31355806ejb.325.1635265020751;
-        Tue, 26 Oct 2021 09:17:00 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzCAgaJ1nXM1ocpSePMgU4hrCoy1y+RLuGZFU21qMLu8XFQGQoffuE7NXc4djJHfV0Ccx8NlQ==
-X-Received: by 2002:a17:906:ca18:: with SMTP id jt24mr31355787ejb.325.1635265020563;
-        Tue, 26 Oct 2021 09:17:00 -0700 (PDT)
+        bh=3jgSUASYWyT5tYVtpdVqMRt2uKiCafnLlQ6NZfT7RQo=;
+        b=7BW4a9ctqG1vF2jrfUcEFRMihiEItCtYLvcTXbpbZMSX/c/L/BgleEkPZb24sRcrMJ
+         0i7+5GN704J8Rwo+HxppfBMzgk0kGEhAm16mrto5fz6m3Cf66avr3+9hNMRPI7deeuwJ
+         L1wdhnxZyoABB3Lotsqc8qUZPNrGXm0wtKYsOpq/y8//LTWXJo0dxNtYJ7ZJSQGERu+5
+         jMftZeCdMeGvjUUqipeC1GdMYK/KmqdzO30/EL/Cd+k8LVa0cJ/nlVXbIcFg0RVGv5pA
+         yE0zbFJ+vkBErJnvZRFyyLUCwplHwSS/D6U689WOKXXZ1zFhWtHmAdLCoph3NhrgY/hH
+         8XQQ==
+X-Gm-Message-State: AOAM532WGoY9S8DlmbRBxNqHn5rMzTSQojTlB8Cclm+nxiRxeBZl1gx7
+        i00P8j0Ai/iYBg8csPH32xCDTeH6kZVSEz53forZnGd20/4TRY6KsMc84jOnY3u3AM/JJUKnH+M
+        eQ7178Z+sY78a
+X-Received: by 2002:a17:906:b184:: with SMTP id w4mr31291859ejy.418.1635265032943;
+        Tue, 26 Oct 2021 09:17:12 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw0CHq+n59DAZ2qwoWG3v25yTG1EA+fzNL7P1VBFbJ8j5wzwu7ibo4hUT23/l+2O/v0fOKE0A==
+X-Received: by 2002:a17:906:b184:: with SMTP id w4mr31291837ejy.418.1635265032719;
+        Tue, 26 Oct 2021 09:17:12 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id x6sm468027eds.83.2021.10.26.09.16.58
+        by smtp.gmail.com with ESMTPSA id nd22sm10019205ejc.98.2021.10.26.09.17.10
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Oct 2021 09:17:00 -0700 (PDT)
-Message-ID: <dabdf154-eba2-f453-1597-fa84d464a106@redhat.com>
-Date:   Tue, 26 Oct 2021 18:16:56 +0200
+        Tue, 26 Oct 2021 09:17:12 -0700 (PDT)
+Message-ID: <54842867-9d40-5b8d-ea24-3ce32c8137ac@redhat.com>
+Date:   Tue, 26 Oct 2021 18:17:09 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.1.0
-Subject: Re: [PATCH MANUALSEL 5.14 4/5] KVM: SEV-ES: Set guest_state_protected
- after VMSA update
+Subject: Re: [PATCH MANUALSEL 5.14 5/5] KVM: MMU: Reset mmu->pkru_mask to
+ avoid stale data
 Content-Language: en-US
 To:     Sasha Levin <sashal@kernel.org>, linux-kernel@vger.kernel.org,
         stable@vger.kernel.org
-Cc:     Peter Gonda <pgonda@google.com>, tglx@linutronix.de,
+Cc:     Chenyi Qiang <chenyi.qiang@intel.com>,
+        Sean Christopherson <seanjc@google.com>, tglx@linutronix.de,
         mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, kvm@vger.kernel.org
+        x86@kernel.org, huaitong.han@intel.com,
+        guangrong.xiao@linux.intel.com, kvm@vger.kernel.org
 References: <20211025203828.1404503-1-sashal@kernel.org>
- <20211025203828.1404503-4-sashal@kernel.org>
+ <20211025203828.1404503-5-sashal@kernel.org>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211025203828.1404503-4-sashal@kernel.org>
+In-Reply-To: <20211025203828.1404503-5-sashal@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -75,48 +77,43 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 25/10/21 22:38, Sasha Levin wrote:
-> From: Peter Gonda <pgonda@google.com>
+> From: Chenyi Qiang <chenyi.qiang@intel.com>
 > 
-> [ Upstream commit baa1e5ca172ce7bf9554070139482dd7ea919528 ]
+> [ Upstream commit a3ca5281bb771d8103ea16f0a6a8a5df9a7fb4f3 ]
 > 
-> The refactoring in commit bb18a6777465 ("KVM: SEV: Acquire
-> vcpu mutex when updating VMSA") left behind the assignment to
-> svm->vcpu.arch.guest_state_protected; add it back.
+> When updating mmu->pkru_mask, the value can only be added but it isn't
+> reset in advance. This will make mmu->pkru_mask keep the stale data.
+> Fix this issue.
 > 
-> Signed-off-by: Peter Gonda <pgonda@google.com>
-> [Delta between v2 and v3 of Peter's patch, which had already been
->   committed; the commit message is my own. - Paolo]
-> Fixes: bb18a6777465 ("KVM: SEV: Acquire vcpu mutex when updating VMSA")
+> Fixes: 2d344105f57c ("KVM, pkeys: introduce pkru_mask to cache conditions")
+> Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
+> Message-Id: <20211021071022.1140-1-chenyi.qiang@intel.com>
+> Reviewed-by: Sean Christopherson <seanjc@google.com>
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > Signed-off-by: Sasha Levin <sashal@kernel.org>
 > ---
->   arch/x86/kvm/svm/sev.c | 7 ++++++-
->   1 file changed, 6 insertions(+), 1 deletion(-)
+>   arch/x86/kvm/mmu/mmu.c | 6 +++---
+>   1 file changed, 3 insertions(+), 3 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index cb166bde449b..50dabccd664e 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -619,7 +619,12 @@ static int __sev_launch_update_vmsa(struct kvm *kvm, struct kvm_vcpu *vcpu,
->   	vmsa.handle = to_kvm_svm(kvm)->sev_info.handle;
->   	vmsa.address = __sme_pa(svm->vmsa);
->   	vmsa.len = PAGE_SIZE;
-> -	return sev_issue_cmd(kvm, SEV_CMD_LAUNCH_UPDATE_VMSA, &vmsa, error);
-> +	ret = sev_issue_cmd(kvm, SEV_CMD_LAUNCH_UPDATE_VMSA, &vmsa, error);
-> +	if (ret)
-> +	  return ret;
-> +
-> +	vcpu->arch.guest_state_protected = true;
-> +	return 0;
->   }
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index c268fb59f779..6719a8041f59 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -4465,10 +4465,10 @@ static void update_pkru_bitmask(struct kvm_mmu *mmu)
+>   	unsigned bit;
+>   	bool wp;
 >   
->   static int sev_launch_update_vmsa(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> -	if (!is_cr4_pke(mmu)) {
+> -		mmu->pkru_mask = 0;
+> +	mmu->pkru_mask = 0;
+> +
+> +	if (!is_cr4_pke(mmu))
+>   		return;
+> -	}
+>   
+>   	wp = is_cr0_wp(mmu);
+>   
 > 
 
 Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-
-I missed that bb18a677746543e7f5eeb478129c92cedb0f9658 was Cc'd to 
-stable.  Good bot. :)
-
-Paolo
 
