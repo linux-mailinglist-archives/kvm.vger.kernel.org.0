@@ -2,189 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 05EA543AAAA
-	for <lists+kvm@lfdr.de>; Tue, 26 Oct 2021 05:14:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EAEF543AC20
+	for <lists+kvm@lfdr.de>; Tue, 26 Oct 2021 08:15:41 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233577AbhJZDRT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 25 Oct 2021 23:17:19 -0400
-Received: from mga06.intel.com ([134.134.136.31]:56614 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232702AbhJZDRS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 25 Oct 2021 23:17:18 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10148"; a="290647681"
-X-IronPort-AV: E=Sophos;i="5.87,182,1631602800"; 
-   d="scan'208";a="290647681"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2021 20:14:55 -0700
-X-IronPort-AV: E=Sophos;i="5.87,182,1631602800"; 
-   d="scan'208";a="497101919"
-Received: from cqiang-mobl.ccr.corp.intel.com (HELO [10.238.2.71]) ([10.238.2.71])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Oct 2021 20:14:52 -0700
-Message-ID: <ce42bf75-7c19-e1e2-80e3-e7729d9beab9@intel.com>
-Date:   Tue, 26 Oct 2021 11:14:50 +0800
+        id S234044AbhJZGSD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Oct 2021 02:18:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39715 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232553AbhJZGSD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 26 Oct 2021 02:18:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635228939;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=mJsqqM2/684FT0TwstqLEKbletkgBGtXBJVjOMHdqD4=;
+        b=jAUStqdUUcOVpyUD8Rv5153vnHtzsUVD+UMg3MXz/u93dPLBMAJzRhbpus+FgvS9bx8YYJ
+        PHTLhWV4v9Iyq5+K+JS7JZu2df8ZIBAClQ133eSTwKDQkpMFD9tUlPrZYbaghvq+M/U0ez
+        OlkuL4Bqb8LAoMtUFliHXaKkxxb6Hlc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-579-1VFxE8J9Ovyip5b-RoQx2g-1; Tue, 26 Oct 2021 02:15:37 -0400
+X-MC-Unique: 1VFxE8J9Ovyip5b-RoQx2g-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8FC5F10A8E00;
+        Tue, 26 Oct 2021 06:15:36 +0000 (UTC)
+Received: from thuth.com (dhcp-192-183.str.redhat.com [10.33.192.183])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id ADC945C1A3;
+        Tue, 26 Oct 2021 06:15:33 +0000 (UTC)
+From:   Thomas Huth <thuth@redhat.com>
+To:     kvm@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>
+Cc:     kvm-ppc@vger.kernel.org
+Subject: [kvm-unit-tests PATCH] powerpc/emulator: Fix compilation with recent versions of GCC
+Date:   Tue, 26 Oct 2021 08:15:32 +0200
+Message-Id: <20211026061532.117368-1-thuth@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.2.1
-Subject: Re: [PATCH v5 0/7] KVM: PKS Virtualization support
-Content-Language: en-US
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210811101126.8973-1-chenyi.qiang@intel.com>
- <6ccc8ee5-264b-8341-0af7-bbc6731e93a8@redhat.com>
-From:   Chenyi Qiang <chenyi.qiang@intel.com>
-In-Reply-To: <6ccc8ee5-264b-8341-0af7-bbc6731e93a8@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+New versions of GCC (e.g. version 11.2 from Fedora 34) refuse to compile
+assembly with the lswx and lswi mnemonics in little endian mode since the
+instruction is only allowed in big endian mode, thus emulator.c cannot be
+compiled anymore. Re-arrange the tests a little bit to use hand-crafted
+instructions in little endian mode to fix this issue. Additionally, the lswx
+and lswi instructions generate an alignment exception with recent versions
+of QEMU, too (see https://gitlab.com/qemu-project/qemu/-/commit/5817355ed0),
+so we can turn the report_xfail() into proper report() statements now.
 
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ powerpc/emulator.c | 69 +++++++++++++++++++++++++++-------------------
+ 1 file changed, 40 insertions(+), 29 deletions(-)
 
-On 10/25/2021 11:12 PM, Paolo Bonzini wrote:
-> On 11/08/21 12:11, Chenyi Qiang wrote:
->> This patch series is based on top of kernel patchset:
->> https://lore.kernel.org/lkml/20210804043231.2655537-1-ira.weiny@intel.com/ 
->>
->>
->> To help patches review, one missing info in SDM is that PKSR will be
->> cleared on Powerup/INIT/RESET, which should be listed in Table 9.1
->> "IA-32 and Intel 64 Processor States Following Power-up, Reset, or INIT"
->>
->> ---
->>
->> Protection Keys for Supervisor Pages(PKS) is a feature that extends the
->> Protection Keys architecture to support thread-specific permission
->> restrictions on supervisor pages.
->>
->> PKS works similar to an existing feature named PKU(protecting user 
->> pages).
->> They both perform an additional check after normal paging permission
->> checks are done. Access or Writes can be disabled via a MSR update
->> without TLB flushes when permissions changes. If violating this
->> addional check, #PF occurs and PFEC.PK bit will be set.
->>
->> PKS introduces MSR IA32_PKRS to manage supervisor protection key
->> rights. The MSR contains 16 pairs of ADi and WDi bits. Each pair
->> advertises on a group of pages with the same key which is set in the
->> leaf paging-structure entries(bits[62:59]). Currently, IA32_PKRS is not
->> supported by XSAVES architecture.
->>
->> This patchset aims to add the virtualization of PKS in KVM. It
->> implemented PKS CPUID enumeration, vmentry/vmexit configuration, MSR
->> exposure, nested supported etc. Currently, PKS is not yet supported for
->> shadow paging.
->>
->> Detailed information about PKS can be found in the latest Intel 64 and
->> IA-32 Architectures Software Developer's Manual.
-> 
-> Hi Chenyi,
-> 
-> pkrs_cache does not yet exist in Linux 5.15.  What is the state of the 
-> bare-metal support for PKS?
-> 
-> Thanks,
-> 
-> Paolo
-> 
+diff --git a/powerpc/emulator.c b/powerpc/emulator.c
+index 147878e..65ae4b6 100644
+--- a/powerpc/emulator.c
++++ b/powerpc/emulator.c
+@@ -86,8 +86,25 @@ static void test_lswi(void)
+ 	for (i = 0; i < 128; i++)
+ 		addr[i] = 1 + i;
+ 
+-	/* check incomplete register filling */
++#if  __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
++
++	/*
++	 * lswi is supposed to cause an alignment exception in little endian
++	 * mode, but to be able to check this, we also have to specify the
++	 * opcode without mnemonic here since newer versions of GCC refuse
++	 * "lswi" when compiling in little endian mode.
++	 */
+ 	alignment = 0;
++	asm volatile ("mr r12,%[addr];"
++		      ".long 0x7d6c24aa;"       /* lswi r11,r12,4 */
++		      "std r11,0(%[regs]);"
++		       :: [addr] "r" (addr), [regs] "r" (regs)
++		       : "r11", "r12", "memory");
++	report(alignment, "alignment");
++
++#else
++
++	/* check incomplete register filling */
+ 	asm volatile ("li r12,-1;"
+ 		      "mr r11, r12;"
+ 		      "lswi r11, %[addr], %[len];"
+@@ -99,19 +116,6 @@ static void test_lswi(void)
+ 		      [regs] "r" (regs)
+ 		      :
+ 		      "r11", "r12", "memory");
+-
+-#if  __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+-	/*
+-	 * lswi is supposed to cause an alignment exception in little endian
+-	 * mode, but QEMU does not support it. So in case we do not get an
+-	 * exception, this is an expected failure and we run the other tests
+-	 */
+-	report_xfail(!alignment, alignment, "alignment");
+-	if (alignment) {
+-		report_prefix_pop();
+-		return;
+-	}
+-#endif
+ 	report(regs[0] == 0x01020300 && regs[1] == (uint64_t)-1, "partial");
+ 
+ 	/* check NB = 0 ==> 32 bytes. */
+@@ -191,6 +195,8 @@ static void test_lswi(void)
+ 	 */
+ 	report(regs[2] == (uint64_t)addr, "Don't overwrite Ra");
+ 
++#endif
++
+ 	report_prefix_pop();
+ }
+ 
+@@ -224,13 +230,29 @@ static void test_lswx(void)
+ 	report_prefix_push("lswx");
+ 
+ 	/* fill memory with sequence */
+-
+ 	for (i = 0; i < 128; i++)
+ 		addr[i] = 1 + i;
+ 
+-	/* check incomplete register filling */
++#if  __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+ 
++	/*
++	 * lswx is supposed to cause an alignment exception in little endian
++	 * mode, but to be able to check this, we also have to specify the
++	 * opcode without mnemonic here since newer versions of GCC refuse
++	 * "lswx" when compiling in little endian mode.
++	 */
+ 	alignment = 0;
++	asm volatile ("mtxer %[len];"
++		      "mr r11,%[addr];"
++		      ".long 0x7d805c2a;"       /* lswx r12,0,r11 */
++		      "std r12,0(%[regs]);"
++		      :: [len]"r"(4), [addr]"r"(addr), [regs]"r"(regs)
++		      : "r11", "r12", "memory");
++	report(alignment, "alignment");
++
++#else
++
++	/* check incomplete register filling */
+ 	asm volatile ("mtxer %[len];"
+ 		      "li r12,-1;"
+ 		      "mr r11, r12;"
+@@ -243,19 +265,6 @@ static void test_lswx(void)
+ 		      [regs] "r" (regs)
+ 		      :
+ 		      "xer", "r11", "r12", "memory");
+-
+-#if  __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+-	/*
+-	 * lswx is supposed to cause an alignment exception in little endian
+-	 * mode, but QEMU does not support it. So in case we do not get an
+-	 * exception, this is an expected failure and we run the other tests
+-	 */
+-	report_xfail(!alignment, alignment, "alignment");
+-	if (alignment) {
+-		report_prefix_pop();
+-		return;
+-	}
+-#endif
+ 	report(regs[0] == 0x01020300 && regs[1] == (uint64_t)-1, "partial");
+ 
+ 	/* check an old know bug: the number of bytes is used as
+@@ -344,6 +353,8 @@ static void test_lswx(void)
+ 	 */
+ 	report(regs[1] == (uint64_t)addr, "Don't overwrite Rb");
+ 
++#endif
++
+ 	report_prefix_pop();
+ }
+ 
+-- 
+2.27.0
 
-Hi Paolo,
-
-The latest version is still at
-https://lore.kernel.org/lkml/20210804043231.2655537-1-ira.weiny@intel.com/
-
-Ira is working on the next version but doesn't have concrete schedule.
-
-Thanks
-Chenyi
-
->>
->> ---
->>
->> Changelogs:
->>
->> v4->v5
->> - Make setting of MSR intercept/vmcs control bits not dependent on 
->> guest.CR4.PKS.
->>    And set them if PKS is exposed to guest. (Suggested by Sean)
->> - Add pkrs to standard register caching mechanism to help update
->>    vcpu->arch.pkrs on demand. Add related helper functions. (Suggested 
->> by Sean)
->> - Do the real pkrs update in VMCS field in vmx_vcpu_reset and
->>    vmx_sync_vmcs_host_state(). (Sean)
->> - Add a new mmu_role cr4_pks instead of smushing PKU and PKS together.
->>    (Sean & Paolo)
->> - v4: 
->> https://lore.kernel.org/lkml/20210205083706.14146-1-chenyi.qiang@intel.com/ 
->>
->>
->> v3->v4
->> - Make the MSR intercept and load-controls setting depend on CR4.PKS 
->> value
->> - shadow the guest pkrs and make it usable in PKS emultion
->> - add the cr4_pke and cr4_pks check in pkr_mask update
->> - squash PATCH 2 and PATCH 5 to make the dependencies read more clear
->> - v3: 
->> https://lore.kernel.org/lkml/20201105081805.5674-1-chenyi.qiang@intel.com/ 
->>
->>
->> v2->v3:
->> - No function changes since last submit
->> - rebase on the latest PKS kernel support:
->>    
->> https://lore.kernel.org/lkml/20201102205320.1458656-1-ira.weiny@intel.com/ 
->>
->> - add MSR_IA32_PKRS to the vmx_possible_passthrough_msrs[]
->> - RFC v2: 
->> https://lore.kernel.org/lkml/20201014021157.18022-1-chenyi.qiang@intel.com/ 
->>
->>
->> v1->v2:
->> - rebase on the latest PKS kernel support:
->>    https://github.com/weiny2/linux-kernel/tree/pks-rfc-v3
->> - add a kvm-unit-tests for PKS
->> - add the check in kvm_init_msr_list for PKRS
->> - place the X86_CR4_PKS in mmu_role_bits in kvm_set_cr4
->> - add the support to expose VM_{ENTRY, EXIT}_LOAD_IA32_PKRS in nested
->>    VMX MSR
->> - RFC v1: 
->> https://lore.kernel.org/lkml/20200807084841.7112-1-chenyi.qiang@intel.com/ 
->>
->>
->> ---
->>
->> Chenyi Qiang (7):
->>    KVM: VMX: Introduce PKS VMCS fields
->>    KVM: VMX: Add proper cache tracking for PKRS
->>    KVM: X86: Expose IA32_PKRS MSR
->>    KVM: MMU: Rename the pkru to pkr
->>    KVM: MMU: Add support for PKS emulation
->>    KVM: VMX: Expose PKS to guest
->>    KVM: VMX: Enable PKS for nested VM
->>
->>   arch/x86/include/asm/kvm_host.h | 17 ++++---
->>   arch/x86/include/asm/vmx.h      |  6 +++
->>   arch/x86/kvm/cpuid.c            |  2 +-
->>   arch/x86/kvm/kvm_cache_regs.h   |  7 +++
->>   arch/x86/kvm/mmu.h              | 25 +++++----
->>   arch/x86/kvm/mmu/mmu.c          | 68 ++++++++++++++-----------
->>   arch/x86/kvm/vmx/capabilities.h |  6 +++
->>   arch/x86/kvm/vmx/nested.c       | 41 ++++++++++++++-
->>   arch/x86/kvm/vmx/vmcs.h         |  1 +
->>   arch/x86/kvm/vmx/vmcs12.c       |  2 +
->>   arch/x86/kvm/vmx/vmcs12.h       |  4 ++
->>   arch/x86/kvm/vmx/vmx.c          | 89 ++++++++++++++++++++++++++++++---
->>   arch/x86/kvm/vmx/vmx.h          |  7 ++-
->>   arch/x86/kvm/x86.c              |  6 ++-
->>   arch/x86/kvm/x86.h              |  8 +++
->>   arch/x86/mm/pkeys.c             |  6 +++
->>   include/linux/pkeys.h           |  5 ++
->>   17 files changed, 243 insertions(+), 57 deletions(-)
->>
-> 
