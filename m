@@ -2,187 +2,238 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D38A443AD1B
-	for <lists+kvm@lfdr.de>; Tue, 26 Oct 2021 09:21:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 2AD4A43AD21
+	for <lists+kvm@lfdr.de>; Tue, 26 Oct 2021 09:21:52 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234337AbhJZHXk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Oct 2021 03:23:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42444 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234446AbhJZHXQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Oct 2021 03:23:16 -0400
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7CEBC061767
-        for <kvm@vger.kernel.org>; Tue, 26 Oct 2021 00:20:52 -0700 (PDT)
-Received: by mail-wm1-x335.google.com with SMTP id j205so12410487wmj.3
-        for <kvm@vger.kernel.org>; Tue, 26 Oct 2021 00:20:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=uK4FEnHzYo2iEEhaGJnf6I9ZRkM8/MsJyen6l90ZGKI=;
-        b=L40b46cvNdnoFhEJgc4ozV6AU+8HP3JD9axeHoM1+le7lYvCvQzY34TfMZqx/L2q/0
-         ug63G0r7I68BS/CtcWqpLnCMbmJlNSbkxElIbYZioptOg0yw/s7ST4dpS/4FZzX5UwvD
-         WGhWgKCcYfbjp9NgyazdiWncis/Brnk5cRx+PCDZD9oD0dsh5vwG7KEcNgkjg4LmuQik
-         oEhOQS1B6biVGXQ32ihYHZDvnABGdCt0kIFIRZsrkFR72BUCbu6vU4nFu5p8/TIxsHtl
-         NKbMydmy1tBt8K6jZQ/zBUrGyDVx2hdxcc+nb97ZKG+6QhNZ4pmUhurmX7kRgjjUO+0o
-         WFMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=uK4FEnHzYo2iEEhaGJnf6I9ZRkM8/MsJyen6l90ZGKI=;
-        b=JQS7GUFsHsfIVi6xoK1bbuprXRP7xne6dW9gGGYvehuJu/0FWPkbh2ItudRdU1rIfw
-         NfQOjAhfxWn/5+YCwgDVZhSoghoP92JAFm1HFLBXm90ymn0wreJnaIe3iokZiFIoaGuJ
-         vMvnD7b5lu7+o6373k7loBogWnebr+fl4SHkK2+0IfoP6VpjOuHgDc2TaEylkk61EuMC
-         po2x2tqtyVRrMpbZcbsECeBIdMZk6T5OVegFcMk8b+tUnqRvMqQS/ftgSAt4QdMjf99o
-         /ELKRG5GEMLZrMHDOQ25mUxevj6eW+G2FRqxlK7UVKFNc+jcIPfy3Jm4cm8zrqUVioj6
-         FIcw==
-X-Gm-Message-State: AOAM530vwX/uYI1hB9g4an904eOcOqJL9Q58Xlb6OfBnbcebT6V7CDoc
-        mUKspJsVb1E+bosiRIb1ZeK29tgcA58trJeImeiwTA==
-X-Google-Smtp-Source: ABdhPJxaZPO1AnPCFdVJO9RU5s/rQ6FpcabewmEN+KQwwXwpufrKWHvczAximO9dbWgB2kgUPqL0aH5nekYca6HIiQg=
-X-Received: by 2002:a05:600c:354c:: with SMTP id i12mr26131590wmq.59.1635232851263;
- Tue, 26 Oct 2021 00:20:51 -0700 (PDT)
-MIME-Version: 1.0
-References: <CAAhSdy3DWOux6HiDU6fPazZUq=FOor8_ZEoqh6FBZru07NyxLQ@mail.gmail.com>
- <20211021115706.1060778-1-ran.jianping@zte.com.cn>
-In-Reply-To: <20211021115706.1060778-1-ran.jianping@zte.com.cn>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Tue, 26 Oct 2021 12:50:40 +0530
-Message-ID: <CAAhSdy3mu-eKUYjEQmQoDODeKnzXEErkmLrgtztsFN7-+o3rHg@mail.gmail.com>
-Subject: Re: [PATCH] RISC-V:KVM: remove unneeded semicolon
-To:     cgel.zte@gmail.com
-Cc:     Anup Patel <anup.patel@wdc.com>, Albert Ou <aou@eecs.berkeley.edu>,
-        Atish Patra <atish.patra@wdc.com>,
-        kvm-riscv@lists.infradead.org, KVM General <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
+        id S233803AbhJZHYL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Oct 2021 03:24:11 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33278 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232528AbhJZHYK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 26 Oct 2021 03:24:10 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19Q4iNBE021439;
+        Tue, 26 Oct 2021 07:20:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
+ references : from : message-id : date : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=Olukvk8q/6M5vaMGvBvWcSri6ngs7Qe9V4nVbNTAMJQ=;
+ b=Nyx3w1bGlQFD8DW3/nbHsdwCZZEZKGyQHe82atvEnyRHiFaWUP0o/LcZBhheUCum6Om6
+ Hvt3TDj3dG/5nLAOtCpCj79o1m4T82eNP+stFdX61QoG9XYNt8WI04k33BOk+NWU7/pX
+ o99JSi/86Ke8XVejmEPBLDeiuOIG7dXV+JeQDj01Q+0UEfjjnCW0QAKX7scrDv5LCZYd
+ CfDljh2FyONxqT1znLtJ+r+R6igzoddCe3bl0Fke5neczs5v5mrIGfP2WPPkEGikjugR
+ T+hvH4iJQ8hPkXNrEG0PzIBJD5OZI/DkkLVRrDdXD1ZzWIFzNHxluRDEJaeckjZ6jNYs qQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bx4k83yef-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 26 Oct 2021 07:20:54 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19Q7GPjC031880;
+        Tue, 26 Oct 2021 07:20:53 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3bx4k83ydb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 26 Oct 2021 07:20:53 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19Q7CNIf001730;
+        Tue, 26 Oct 2021 07:20:51 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma03ams.nl.ibm.com with ESMTP id 3bx4estw59-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 26 Oct 2021 07:20:51 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19Q7KlwR49480020
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 26 Oct 2021 07:20:47 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3BB0352063;
+        Tue, 26 Oct 2021 07:20:47 +0000 (GMT)
+Received: from li-43c5434c-23b8-11b2-a85c-c4958fb47a68.ibm.com (unknown [9.171.51.215])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id DF3745204F;
+        Tue, 26 Oct 2021 07:20:45 +0000 (GMT)
+Subject: Re: [PATCH v2 00/43] KVM: Halt-polling and x86 APICv overhaul
+To:     Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Anup Patel <anup.patel@wdc.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
-        ran jianping <ran.jianping@zte.com.cn>,
-        Zeal Robot <zealci@zte.com.cn>
-Content-Type: text/plain; charset="UTF-8"
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Atish Patra <atish.patra@wdc.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        David Matlack <dmatlack@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+References: <20211009021236.4122790-1-seanjc@google.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+Message-ID: <04b1a72e-47b4-4bde-eb9e-ba36c156ff0d@de.ibm.com>
+Date:   Tue, 26 Oct 2021 09:20:45 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
+In-Reply-To: <20211009021236.4122790-1-seanjc@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 9pKTY4MsH4PMCMPB45BmL813hD3MQPUl
+X-Proofpoint-ORIG-GUID: HiwQM4uJCHKEZaVYE6osYmazrosz4OIK
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
+ definitions=2021-10-25_08,2021-10-25_02,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
+ lowpriorityscore=0 phishscore=0 impostorscore=0 malwarescore=0 spamscore=0
+ mlxscore=0 adultscore=0 mlxlogscore=999 suspectscore=0 priorityscore=1501
+ clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2110260039
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 21, 2021 at 5:27 PM <cgel.zte@gmail.com> wrote:
->
-> From: ran jianping <ran.jianping@zte.com.cn>
->
->  Elimate the following coccinelle check warning:
->  ./arch/riscv/kvm/vcpu_sbi.c:169:2-3: Unneeded semicolon
->  ./arch/riscv/kvm/vcpu_exit.c:397:2-3: Unneeded semicolon
->  ./arch/riscv/kvm/vcpu_exit.c:687:2-3: Unneeded semicolon
->  ./arch/riscv/kvm/vcpu_exit.c:645:2-3: Unneeded semicolon
->  ./arch/riscv/kvm/vcpu.c:247:2-3: Unneeded semicolon
->  ./arch/riscv/kvm/vcpu.c:284:2-3: Unneeded semicolon
->  ./arch/riscv/kvm/vcpu_timer.c:123:2-3: Unneeded semicolon
->  ./arch/riscv/kvm/vcpu_timer.c:170:2-3: Unneeded semicolon
->
-> Reported-by: Zeal Robot <zealci@zte.com.cn>
-> Signed-off-by: ran jianping <ran.jianping@zte.com.cn>
+Am 09.10.21 um 04:11 schrieb Sean Christopherson:
+> This is basically two series smushed into one.  The first "half" aims
+> to differentiate between "halt" and a more generic "block", where "halt"
+> aligns with x86's HLT instruction, the halt-polling mechanisms, and
+> associated stats, and "block" means any guest action that causes the vCPU
+> to block/wait.
+> 
+> The second "half" overhauls x86's APIC virtualization code (Posted
+> Interrupts on Intel VMX, AVIC on AMD SVM) to do their updates in response
+> to vCPU (un)blocking in the vcpu_load/put() paths, keying off of the
+> vCPU's rcuwait status to determine when a blocking vCPU is being put and
+> reloaded.  This idea comes from arm64's kvm_timer_vcpu_put(), which I
+> stumbled across when diving into the history of arm64's (un)blocking hooks.
+> 
+> The x86 APICv overhaul allows for killing off several sets of hooks in
+> common KVM and in x86 KVM (to the vendor code).  Moving everything to
+> vcpu_put/load() also realizes nice cleanups, especially for the Posted
+> Interrupt code, which required some impressive mental gymnastics to
+> understand how vCPU task migration interacted with vCPU blocking.
+> 
+> Non-x86 folks, sorry for the noise.  I'm hoping the common parts can get
+> applied without much fuss so that future versions can be x86-only.
+> 
+> v2:
+>   - Collect reviews. [Christian, David]
+>   - Add patch to move arm64 WFI functionality out of hooks. [Marc]
+>   - Add RISC-V to the fun.
+>   - Add all the APICv fun.
 
-Applied to riscv_kvm_next, Thanks!
+Have we actually followed up on the regression regarding halt_poll_ns=0 no longer disabling
+polling for running systems?
 
-Regards,
-Anup
-
-> ---
->  arch/riscv/kvm/vcpu.c       | 4 ++--
->  arch/riscv/kvm/vcpu_exit.c  | 6 +++---
->  arch/riscv/kvm/vcpu_sbi.c   | 2 +-
->  arch/riscv/kvm/vcpu_timer.c | 4 ++--
->  4 files changed, 8 insertions(+), 8 deletions(-)
->
-> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> index c44cabce7dd8..912928586df9 100644
-> --- a/arch/riscv/kvm/vcpu.c
-> +++ b/arch/riscv/kvm/vcpu.c
-> @@ -244,7 +244,7 @@ static int kvm_riscv_vcpu_get_reg_config(struct kvm_vcpu *vcpu,
->                 break;
->         default:
->                 return -EINVAL;
-> -       };
-> +       }
->
->         if (copy_to_user(uaddr, &reg_val, KVM_REG_SIZE(reg->id)))
->                 return -EFAULT;
-> @@ -281,7 +281,7 @@ static int kvm_riscv_vcpu_set_reg_config(struct kvm_vcpu *vcpu,
->                 break;
->         default:
->                 return -EINVAL;
-> -       };
-> +       }
->
->         return 0;
->  }
-> diff --git a/arch/riscv/kvm/vcpu_exit.c b/arch/riscv/kvm/vcpu_exit.c
-> index 13bbc3f73713..7f2d742ae4c6 100644
-> --- a/arch/riscv/kvm/vcpu_exit.c
-> +++ b/arch/riscv/kvm/vcpu_exit.c
-> @@ -394,7 +394,7 @@ static int emulate_store(struct kvm_vcpu *vcpu, struct kvm_run *run,
->                 break;
->         default:
->                 return -EOPNOTSUPP;
-> -       };
-> +       }
->
->         /* Update MMIO details in kvm_run struct */
->         run->mmio.is_write = true;
-> @@ -642,7 +642,7 @@ int kvm_riscv_vcpu_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
->                 break;
->         default:
->                 return -EOPNOTSUPP;
-> -       };
-> +       }
->
->  done:
->         /* Move to next instruction */
-> @@ -684,7 +684,7 @@ int kvm_riscv_vcpu_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
->                 break;
->         default:
->                 break;
-> -       };
-> +       }
->
->         /* Print details in-case of error */
->         if (ret < 0) {
-> diff --git a/arch/riscv/kvm/vcpu_sbi.c b/arch/riscv/kvm/vcpu_sbi.c
-> index ebdcdbade9c6..eb3c045edf11 100644
-> --- a/arch/riscv/kvm/vcpu_sbi.c
-> +++ b/arch/riscv/kvm/vcpu_sbi.c
-> @@ -166,7 +166,7 @@ int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu, struct kvm_run *run)
->                 /* Return error for unsupported SBI calls */
->                 cp->a0 = SBI_ERR_NOT_SUPPORTED;
->                 break;
-> -       };
-> +       }
->
->         if (next_sepc)
->                 cp->sepc += 4;
-> diff --git a/arch/riscv/kvm/vcpu_timer.c b/arch/riscv/kvm/vcpu_timer.c
-> index ddd0ce727b83..5c4c37ff2d48 100644
-> --- a/arch/riscv/kvm/vcpu_timer.c
-> +++ b/arch/riscv/kvm/vcpu_timer.c
-> @@ -120,7 +120,7 @@ int kvm_riscv_vcpu_get_reg_timer(struct kvm_vcpu *vcpu,
->                 break;
->         default:
->                 return -EINVAL;
-> -       };
-> +       }
->
->         if (copy_to_user(uaddr, &reg_val, KVM_REG_SIZE(reg->id)))
->                 return -EFAULT;
-> @@ -167,7 +167,7 @@ int kvm_riscv_vcpu_set_reg_timer(struct kvm_vcpu *vcpu,
->         default:
->                 ret = -EINVAL;
->                 break;
-> -       };
-> +       }
->
->         return ret;
->  }
-> --
-> 2.25.1
->
+> 
+> v1: https://lkml.kernel.org/r/20210925005528.1145584-1-seanjc@google.com
+> 
+> Jing Zhang (1):
+>    KVM: stats: Add stat to detect if vcpu is currently blocking
+> 
+> Sean Christopherson (42):
+>    KVM: VMX: Don't unblock vCPU w/ Posted IRQ if IRQs are disabled in
+>      guest
+>    KVM: SVM: Ensure target pCPU is read once when signalling AVIC
+>      doorbell
+>    KVM: s390: Ensure kvm_arch_no_poll() is read once when blocking vCPU
+>    KVM: Force PPC to define its own rcuwait object
+>    KVM: Update halt-polling stats if and only if halt-polling was
+>      attempted
+>    KVM: Refactor and document halt-polling stats update helper
+>    KVM: Reconcile discrepancies in halt-polling stats
+>    KVM: s390: Clear valid_wakeup in kvm_s390_handle_wait(), not in arch
+>      hook
+>    KVM: Drop obsolete kvm_arch_vcpu_block_finish()
+>    KVM: arm64: Move vGIC v4 handling for WFI out arch callback hook
+>    KVM: Don't block+unblock when halt-polling is successful
+>    KVM: x86: Tweak halt emulation helper names to free up kvm_vcpu_halt()
+>    KVM: Rename kvm_vcpu_block() => kvm_vcpu_halt()
+>    KVM: Split out a kvm_vcpu_block() helper from kvm_vcpu_halt()
+>    KVM: Don't redo ktime_get() when calculating halt-polling
+>      stop/deadline
+>    KVM: x86: Directly block (instead of "halting") UNINITIALIZED vCPUs
+>    KVM: x86: Invoke kvm_vcpu_block() directly for non-HALTED wait states
+>    KVM: Add helpers to wake/query blocking vCPU
+>    KVM: VMX: Skip Posted Interrupt updates if APICv is hard disabled
+>    KVM: VMX: Clean up PI pre/post-block WARNs
+>    KVM: VMX: Drop unnecessary PI logic to handle impossible conditions
+>    KVM: VMX: Use boolean returns for Posted Interrupt "test" helpers
+>    KVM: VMX: Drop pointless PI.NDST update when blocking
+>    KVM: VMX: Save/restore IRQs (instead of CLI/STI) during PI pre/post
+>      block
+>    KVM: VMX: Read Posted Interrupt "control" exactly once per loop
+>      iteration
+>    KVM: VMX: Move Posted Interrupt ndst computation out of write loop
+>    KVM: VMX: Remove vCPU from PI wakeup list before updating PID.NV
+>    KVM: VMX: Handle PI wakeup shenanigans during vcpu_put/load
+>    KVM: Drop unused kvm_vcpu.pre_pcpu field
+>    KVM: Move x86 VMX's posted interrupt list_head to vcpu_vmx
+>    KVM: VMX: Move preemption timer <=> hrtimer dance to common x86
+>    KVM: x86: Unexport LAPIC's switch_to_{hv,sw}_timer() helpers
+>    KVM: x86: Remove defunct pre_block/post_block kvm_x86_ops hooks
+>    KVM: SVM: Signal AVIC doorbell iff vCPU is in guest mode
+>    KVM: SVM: Don't bother checking for "running" AVIC when kicking for
+>      IPIs
+>    KVM: SVM: Unconditionally mark AVIC as running on vCPU load (with
+>      APICv)
+>    KVM: Drop defunct kvm_arch_vcpu_(un)blocking() hooks
+>    KVM: VMX: Don't do full kick when triggering posted interrupt "fails"
+>    KVM: VMX: Wake vCPU when delivering posted IRQ even if vCPU == this
+>      vCPU
+>    KVM: VMX: Pass desired vector instead of bool for triggering posted
+>      IRQ
+>    KVM: VMX: Fold fallback path into triggering posted IRQ helper
+>    KVM: VMX: Don't do full kick when handling posted interrupt wakeup
+> 
+>   arch/arm64/include/asm/kvm_emulate.h |   2 +
+>   arch/arm64/include/asm/kvm_host.h    |   1 -
+>   arch/arm64/kvm/arch_timer.c          |   5 +-
+>   arch/arm64/kvm/arm.c                 |  60 +++---
+>   arch/arm64/kvm/handle_exit.c         |   5 +-
+>   arch/arm64/kvm/psci.c                |   2 +-
+>   arch/mips/include/asm/kvm_host.h     |   3 -
+>   arch/mips/kvm/emulate.c              |   2 +-
+>   arch/powerpc/include/asm/kvm_host.h  |   4 +-
+>   arch/powerpc/kvm/book3s_pr.c         |   2 +-
+>   arch/powerpc/kvm/book3s_pr_papr.c    |   2 +-
+>   arch/powerpc/kvm/booke.c             |   2 +-
+>   arch/powerpc/kvm/powerpc.c           |   5 +-
+>   arch/riscv/include/asm/kvm_host.h    |   1 -
+>   arch/riscv/kvm/vcpu_exit.c           |   2 +-
+>   arch/s390/include/asm/kvm_host.h     |   4 -
+>   arch/s390/kvm/interrupt.c            |   3 +-
+>   arch/s390/kvm/kvm-s390.c             |   7 +-
+>   arch/x86/include/asm/kvm-x86-ops.h   |   4 -
+>   arch/x86/include/asm/kvm_host.h      |  29 +--
+>   arch/x86/kvm/lapic.c                 |   4 +-
+>   arch/x86/kvm/svm/avic.c              |  95 ++++-----
+>   arch/x86/kvm/svm/svm.c               |   8 -
+>   arch/x86/kvm/svm/svm.h               |  14 --
+>   arch/x86/kvm/vmx/nested.c            |   2 +-
+>   arch/x86/kvm/vmx/posted_intr.c       | 279 ++++++++++++---------------
+>   arch/x86/kvm/vmx/posted_intr.h       |  14 +-
+>   arch/x86/kvm/vmx/vmx.c               |  63 +++---
+>   arch/x86/kvm/vmx/vmx.h               |   3 +
+>   arch/x86/kvm/x86.c                   |  55 ++++--
+>   include/linux/kvm_host.h             |  27 ++-
+>   include/linux/kvm_types.h            |   1 +
+>   virt/kvm/async_pf.c                  |   2 +-
+>   virt/kvm/kvm_main.c                  | 138 +++++++------
+>   34 files changed, 413 insertions(+), 437 deletions(-)
+> 
