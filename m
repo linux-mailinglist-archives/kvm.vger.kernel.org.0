@@ -2,138 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E83F43AC47
-	for <lists+kvm@lfdr.de>; Tue, 26 Oct 2021 08:27:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D38A443AD1B
+	for <lists+kvm@lfdr.de>; Tue, 26 Oct 2021 09:21:20 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233057AbhJZG32 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Oct 2021 02:29:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58608 "EHLO
+        id S234337AbhJZHXk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Oct 2021 03:23:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229635AbhJZG31 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Oct 2021 02:29:27 -0400
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2C02C061745
-        for <kvm@vger.kernel.org>; Mon, 25 Oct 2021 23:27:03 -0700 (PDT)
-Received: by mail-lj1-x22e.google.com with SMTP id k13so1049559ljj.12
-        for <kvm@vger.kernel.org>; Mon, 25 Oct 2021 23:27:03 -0700 (PDT)
+        with ESMTP id S234446AbhJZHXQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Oct 2021 03:23:16 -0400
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7CEBC061767
+        for <kvm@vger.kernel.org>; Tue, 26 Oct 2021 00:20:52 -0700 (PDT)
+Received: by mail-wm1-x335.google.com with SMTP id j205so12410487wmj.3
+        for <kvm@vger.kernel.org>; Tue, 26 Oct 2021 00:20:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
+        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=hQaOAxX7BvTpJD5atNWBkDW/jFvHgvU+9LT0US+JHAk=;
-        b=GJ3PC2KSkStOMDOvjR32eW/9dEOqrF88C16zgnHylO/ln1X1i1s8ABcFP4ADANfQ06
-         xVzqAD00ObbjX/JXOYn154Lma9v+Ce8c2zAsJrxjIIQmc+1hvnJttX9jUI6LqReTv8ib
-         t0fjtjmSjsFtQqbZqcmskq4BI3Ng+bJntMPaebJZ563N/oVIYACFbfUuqtGDSJnREwDM
-         5na+AHpMZVuqXILWbWXTtmORSqG38tokPtwG9iry+RB3laRrWKrU1460n6kyG8Xq62+M
-         Jhs1Z6FJW6k3/jbGwg2X8N2Djlyc8QWMkW2dMpngk+H4eNH/booV/CKpn29grsXXidt/
-         rfJA==
+        bh=uK4FEnHzYo2iEEhaGJnf6I9ZRkM8/MsJyen6l90ZGKI=;
+        b=L40b46cvNdnoFhEJgc4ozV6AU+8HP3JD9axeHoM1+le7lYvCvQzY34TfMZqx/L2q/0
+         ug63G0r7I68BS/CtcWqpLnCMbmJlNSbkxElIbYZioptOg0yw/s7ST4dpS/4FZzX5UwvD
+         WGhWgKCcYfbjp9NgyazdiWncis/Brnk5cRx+PCDZD9oD0dsh5vwG7KEcNgkjg4LmuQik
+         oEhOQS1B6biVGXQ32ihYHZDvnABGdCt0kIFIRZsrkFR72BUCbu6vU4nFu5p8/TIxsHtl
+         NKbMydmy1tBt8K6jZQ/zBUrGyDVx2hdxcc+nb97ZKG+6QhNZ4pmUhurmX7kRgjjUO+0o
+         WFMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=hQaOAxX7BvTpJD5atNWBkDW/jFvHgvU+9LT0US+JHAk=;
-        b=shPZmIoFR/9B0D15UvUa1ZXF480+XVoFhU0V7ZZcmD+OH41Fp/1zrw9OWQQy2x8+0h
-         ZmH3lY9r97R2oMZyRHdKoyRyH+unCyYvNPyGu/yOOcYjTGbtBb94aylSDMNDmgqn1sma
-         W5lYuwYTIF3azLrmEws64fhvr+rHgtmAKFHb8Kn6LGfz82nhHrH8tUH8KyQ3z2PANsT7
-         GdOh0GgXaXUsVArfKzNmIzmaPz/Xz9Io35OqZJE5TP9nTuSPNWvg+NGeXtAH0PFijOTc
-         1BdSXh4Q0ASJZPfHESDdfvoE64fvuvyH/V4229ojPz6p0LDGh2ysNsDarJ8NwO5kz79y
-         B6HQ==
-X-Gm-Message-State: AOAM5310UVRjx0qy2WYx3KaxP8lYdK03bEjCKrG4cSeNOfrGmuxOMBdj
-        1GJqDcH5i5/baBHcDhgbJ++UDFIxXQ4hDXjwqMe/TWknoHGccw==
-X-Google-Smtp-Source: ABdhPJwPi5y51llC0/yrXXGjrriUXs6G6JzKWLqf8YiZEjnKzG0gu60tX+vsQ0Mo6P5zMW6fpy8NztmOXjUb8Lkh10U=
-X-Received: by 2002:a2e:a5c8:: with SMTP id n8mr23829633ljp.307.1635229622080;
- Mon, 25 Oct 2021 23:27:02 -0700 (PDT)
+        bh=uK4FEnHzYo2iEEhaGJnf6I9ZRkM8/MsJyen6l90ZGKI=;
+        b=JQS7GUFsHsfIVi6xoK1bbuprXRP7xne6dW9gGGYvehuJu/0FWPkbh2ItudRdU1rIfw
+         NfQOjAhfxWn/5+YCwgDVZhSoghoP92JAFm1HFLBXm90ymn0wreJnaIe3iokZiFIoaGuJ
+         vMvnD7b5lu7+o6373k7loBogWnebr+fl4SHkK2+0IfoP6VpjOuHgDc2TaEylkk61EuMC
+         po2x2tqtyVRrMpbZcbsECeBIdMZk6T5OVegFcMk8b+tUnqRvMqQS/ftgSAt4QdMjf99o
+         /ELKRG5GEMLZrMHDOQ25mUxevj6eW+G2FRqxlK7UVKFNc+jcIPfy3Jm4cm8zrqUVioj6
+         FIcw==
+X-Gm-Message-State: AOAM530vwX/uYI1hB9g4an904eOcOqJL9Q58Xlb6OfBnbcebT6V7CDoc
+        mUKspJsVb1E+bosiRIb1ZeK29tgcA58trJeImeiwTA==
+X-Google-Smtp-Source: ABdhPJxaZPO1AnPCFdVJO9RU5s/rQ6FpcabewmEN+KQwwXwpufrKWHvczAximO9dbWgB2kgUPqL0aH5nekYca6HIiQg=
+X-Received: by 2002:a05:600c:354c:: with SMTP id i12mr26131590wmq.59.1635232851263;
+ Tue, 26 Oct 2021 00:20:51 -0700 (PDT)
 MIME-Version: 1.0
-References: <20211004204931.1537823-1-zxwang42@gmail.com> <20211004204931.1537823-12-zxwang42@gmail.com>
- <7179dbe7-b5bb-7336-bda7-6207979bc52b@redhat.com>
-In-Reply-To: <7179dbe7-b5bb-7336-bda7-6207979bc52b@redhat.com>
-From:   Zixuan Wang <zxwang42@gmail.com>
-Date:   Mon, 25 Oct 2021 23:26:00 -0700
-Message-ID: <CAEDJ5ZQfwDmTburh6sBQH96KG5EYoip092rW8SkJUxFbgFkhZA@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH v3 11/17] x86 UEFI: Convert x86 test cases
- to PIC
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm list <kvm@vger.kernel.org>, Andrew Jones <drjones@redhat.com>,
-        Marc Orr <marcorr@google.com>,
-        "Hyunwook (Wooky) Baek" <baekhw@google.com>,
-        Tom Roeder <tmroeder@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        "Singh, Brijesh" <brijesh.singh@amd.com>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        Varad Gautam <varad.gautam@suse.com>,
-        Joerg Roedel <jroedel@suse.de>, bp@suse.de
+References: <CAAhSdy3DWOux6HiDU6fPazZUq=FOor8_ZEoqh6FBZru07NyxLQ@mail.gmail.com>
+ <20211021115706.1060778-1-ran.jianping@zte.com.cn>
+In-Reply-To: <20211021115706.1060778-1-ran.jianping@zte.com.cn>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Tue, 26 Oct 2021 12:50:40 +0530
+Message-ID: <CAAhSdy3mu-eKUYjEQmQoDODeKnzXEErkmLrgtztsFN7-+o3rHg@mail.gmail.com>
+Subject: Re: [PATCH] RISC-V:KVM: remove unneeded semicolon
+To:     cgel.zte@gmail.com
+Cc:     Anup Patel <anup.patel@wdc.com>, Albert Ou <aou@eecs.berkeley.edu>,
+        Atish Patra <atish.patra@wdc.com>,
+        kvm-riscv@lists.infradead.org, KVM General <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        ran jianping <ran.jianping@zte.com.cn>,
+        Zeal Robot <zealci@zte.com.cn>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 21, 2021 at 7:12 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Thu, Oct 21, 2021 at 5:27 PM <cgel.zte@gmail.com> wrote:
 >
-> On 04/10/21 22:49, Zixuan Wang wrote:
-> > From: Zixuan Wang <zixuanwang@google.com>
-> >
-> > UEFI loads EFI applications to dynamic runtime addresses, so it requires
-> > all applications to be compiled as PIC (position independent code). PIC
-> > does not allow the usage of compile time absolute address.
-> >
-> > This commit converts multiple x86 test cases to PIC so they can compile
-> > and run in UEFI:
-> >
-> > - x86/cet.efi
-> >
-> > - x86/emulator.c: x86/emulator.c depends on lib/x86/usermode.c. But
-> > usermode.c contains non-PIC inline assembly code. This commit converts
-> > lib/x86/usermode.c and x86/emulator.c to PIC, so x86/emulator.c can
-> > compile and run in UEFI.
-> >
-> > - x86/vmware_backdoors.c: it depends on lib/x86/usermode.c and now works
-> > without modifications
-> >
-> > - x86/eventinj.c
-> >
-> > - x86/smap.c
-> >
-> > - x86/access.c
-> >
-> > - x86/umip.c
-> >
-> > Signed-off-by: Zixuan Wang <zixuanwang@google.com>
+> From: ran jianping <ran.jianping@zte.com.cn>
 >
-> I have left this patch out for now, because it breaks 32-bit builds.
-> It's not a huge deal and can be redone on top of the rest.
+>  Elimate the following coccinelle check warning:
+>  ./arch/riscv/kvm/vcpu_sbi.c:169:2-3: Unneeded semicolon
+>  ./arch/riscv/kvm/vcpu_exit.c:397:2-3: Unneeded semicolon
+>  ./arch/riscv/kvm/vcpu_exit.c:687:2-3: Unneeded semicolon
+>  ./arch/riscv/kvm/vcpu_exit.c:645:2-3: Unneeded semicolon
+>  ./arch/riscv/kvm/vcpu.c:247:2-3: Unneeded semicolon
+>  ./arch/riscv/kvm/vcpu.c:284:2-3: Unneeded semicolon
+>  ./arch/riscv/kvm/vcpu_timer.c:123:2-3: Unneeded semicolon
+>  ./arch/riscv/kvm/vcpu_timer.c:170:2-3: Unneeded semicolon
 >
-> Paolo
+> Reported-by: Zeal Robot <zealci@zte.com.cn>
+> Signed-off-by: ran jianping <ran.jianping@zte.com.cn>
+
+Applied to riscv_kvm_next, Thanks!
+
+Regards,
+Anup
+
+> ---
+>  arch/riscv/kvm/vcpu.c       | 4 ++--
+>  arch/riscv/kvm/vcpu_exit.c  | 6 +++---
+>  arch/riscv/kvm/vcpu_sbi.c   | 2 +-
+>  arch/riscv/kvm/vcpu_timer.c | 4 ++--
+>  4 files changed, 8 insertions(+), 8 deletions(-)
 >
-
-Marc and I are working on a follow-up patch set that includes the
-fixes for this patch under 32-bit mode. I have also identified a
-potential bug in x86/umip.c and fixed it in the next patch set. The
-full debugging detail is described in our off-list GitHub discussion
-[1].
-
-In summary, in the following line, %[sp0] can be compiled as a
-%r8-based offset address:
-
-x86/umip.c:127
-"mov %%" R "sp, %[sp0]\n\t" /* kernel sp for exception handlers */
-
-%r8 is then modified in the function call without saving/restoring,
-thus making the following line using the wrong address.
-
-x86/umip.c:148
-"mov %[sp0], %%" R "sp\n\t"
-
-This register is selected by the compiler, it's not guaranteed to be
-%r8 so we cannot just push/pop %r8 before/after the function call. A
-simple fix is to save the %rsp to %rbx (in addition to saving it to
-%[sp0]). %rbx is a callee-saved register, so its value is not
-modified.
-
-We already have this fix in the patch set draft [1] and will post it once ready.
-
-[1] https://github.com/marc-orr/KVM-Unit-Tests-dev-fork/pull/9
-
-Best regards,
-Zixuan
+> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+> index c44cabce7dd8..912928586df9 100644
+> --- a/arch/riscv/kvm/vcpu.c
+> +++ b/arch/riscv/kvm/vcpu.c
+> @@ -244,7 +244,7 @@ static int kvm_riscv_vcpu_get_reg_config(struct kvm_vcpu *vcpu,
+>                 break;
+>         default:
+>                 return -EINVAL;
+> -       };
+> +       }
+>
+>         if (copy_to_user(uaddr, &reg_val, KVM_REG_SIZE(reg->id)))
+>                 return -EFAULT;
+> @@ -281,7 +281,7 @@ static int kvm_riscv_vcpu_set_reg_config(struct kvm_vcpu *vcpu,
+>                 break;
+>         default:
+>                 return -EINVAL;
+> -       };
+> +       }
+>
+>         return 0;
+>  }
+> diff --git a/arch/riscv/kvm/vcpu_exit.c b/arch/riscv/kvm/vcpu_exit.c
+> index 13bbc3f73713..7f2d742ae4c6 100644
+> --- a/arch/riscv/kvm/vcpu_exit.c
+> +++ b/arch/riscv/kvm/vcpu_exit.c
+> @@ -394,7 +394,7 @@ static int emulate_store(struct kvm_vcpu *vcpu, struct kvm_run *run,
+>                 break;
+>         default:
+>                 return -EOPNOTSUPP;
+> -       };
+> +       }
+>
+>         /* Update MMIO details in kvm_run struct */
+>         run->mmio.is_write = true;
+> @@ -642,7 +642,7 @@ int kvm_riscv_vcpu_mmio_return(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>                 break;
+>         default:
+>                 return -EOPNOTSUPP;
+> -       };
+> +       }
+>
+>  done:
+>         /* Move to next instruction */
+> @@ -684,7 +684,7 @@ int kvm_riscv_vcpu_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
+>                 break;
+>         default:
+>                 break;
+> -       };
+> +       }
+>
+>         /* Print details in-case of error */
+>         if (ret < 0) {
+> diff --git a/arch/riscv/kvm/vcpu_sbi.c b/arch/riscv/kvm/vcpu_sbi.c
+> index ebdcdbade9c6..eb3c045edf11 100644
+> --- a/arch/riscv/kvm/vcpu_sbi.c
+> +++ b/arch/riscv/kvm/vcpu_sbi.c
+> @@ -166,7 +166,7 @@ int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>                 /* Return error for unsupported SBI calls */
+>                 cp->a0 = SBI_ERR_NOT_SUPPORTED;
+>                 break;
+> -       };
+> +       }
+>
+>         if (next_sepc)
+>                 cp->sepc += 4;
+> diff --git a/arch/riscv/kvm/vcpu_timer.c b/arch/riscv/kvm/vcpu_timer.c
+> index ddd0ce727b83..5c4c37ff2d48 100644
+> --- a/arch/riscv/kvm/vcpu_timer.c
+> +++ b/arch/riscv/kvm/vcpu_timer.c
+> @@ -120,7 +120,7 @@ int kvm_riscv_vcpu_get_reg_timer(struct kvm_vcpu *vcpu,
+>                 break;
+>         default:
+>                 return -EINVAL;
+> -       };
+> +       }
+>
+>         if (copy_to_user(uaddr, &reg_val, KVM_REG_SIZE(reg->id)))
+>                 return -EFAULT;
+> @@ -167,7 +167,7 @@ int kvm_riscv_vcpu_set_reg_timer(struct kvm_vcpu *vcpu,
+>         default:
+>                 ret = -EINVAL;
+>                 break;
+> -       };
+> +       }
+>
+>         return ret;
+>  }
+> --
+> 2.25.1
+>
