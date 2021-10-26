@@ -2,193 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D037143BA0D
-	for <lists+kvm@lfdr.de>; Tue, 26 Oct 2021 20:59:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B9C7D43BB13
+	for <lists+kvm@lfdr.de>; Tue, 26 Oct 2021 21:39:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238441AbhJZTCB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 26 Oct 2021 15:02:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33676 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231592AbhJZTB7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 26 Oct 2021 15:01:59 -0400
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04FC4C061767
-        for <kvm@vger.kernel.org>; Tue, 26 Oct 2021 11:59:35 -0700 (PDT)
-Received: by mail-pg1-x52c.google.com with SMTP id c4so409381pgv.11
-        for <kvm@vger.kernel.org>; Tue, 26 Oct 2021 11:59:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=OUtXKDfwROclVXg7NlW3DIt7U+eqIXthvFR6buHyDoA=;
-        b=bKPpbTCz4hlYFag9BhzbxFL3ekENWVmE7zokGDd2k+Bo4Q38U8Or35HwBIpB9F89e9
-         181GFN9dwIvggOsFfzXmTZg4yQWx1lx91aFJgp78u9ppApKuNIB2HrMwAIAoddskgqDJ
-         hDiKRc+irPYtJsymjex1SQ2bXQcndBDoWI4JAQQdTZjhzD2iW8zvsGSNBe0pXzndOQ1w
-         Q1V/TclRhOVCM1hPYhUma3XsRO/TnRQXoA1G3auvEno9wwMAkqk1e9Al08MISdnWl794
-         1w26Qcm8lEwIJD1i4CCohyBUfuEBIVxYIujnAzVPBENCE+dm+Bq1g8pRAhtU7fpu/J2t
-         bNDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=OUtXKDfwROclVXg7NlW3DIt7U+eqIXthvFR6buHyDoA=;
-        b=KY5tIryGe4WFg4lmp1Cd9hSkhakSXdMFvFUusNM5Ud8rDDzlgJi+LNN7fkJoI2m9w8
-         +F2qcOlC/cs11EBAdzM2fBFQmpdYfHQ+H/TE/Ga6DQSX95po6Zael+dGoe+X66INywOW
-         dnv+oVNGLhYOGKtRSKdbzLcm2v9wiuDUBRdLjlaWkkOWfkhQEyXlZhIrNEcF3Fllh7zg
-         X/IIT6KjPn93OKw2tpQ5nzDlhD5DUK0rbNcMKSiwphS3bpKmTXNycsQ+gLueRv2zzkwZ
-         +1opJgLuIOHYT9bbtmjdJuOqo8w8wP/qegEdJeSrnnPOLAobIHyprohcnJODjIyFWpdi
-         0dkg==
-X-Gm-Message-State: AOAM530DRF8yQeHNk3fLCX0zqgUEuX0OYr6Z4fdxT/q6LMNXQ5ByPiG+
-        P2V7IuwRkRSRq3aWc35RNHBSJQ==
-X-Google-Smtp-Source: ABdhPJxLJpwgi7sPiQ7DQnadRmTST5jwmy/xByXWZOdZz6ymNKhOL/JPYHvGG2qyaYZkxyYGeuKNaw==
-X-Received: by 2002:aa7:9197:0:b0:44d:a2e9:72cf with SMTP id x23-20020aa79197000000b0044da2e972cfmr27766363pfa.38.1635274774214;
-        Tue, 26 Oct 2021 11:59:34 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id g37sm2634394pgg.89.2021.10.26.11.59.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Oct 2021 11:59:33 -0700 (PDT)
-Date:   Tue, 26 Oct 2021 18:59:29 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 13/13] KVM: Optimize overlapping memslots check
-Message-ID: <YXhQEeNxi2+fAQPM@google.com>
-References: <cover.1632171478.git.maciej.szmigiero@oracle.com>
- <4f8718fc8da57ab799e95ef7c2060f8be0f2391f.1632171479.git.maciej.szmigiero@oracle.com>
+        id S235251AbhJZTlr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 26 Oct 2021 15:41:47 -0400
+Received: from ssh.movementarian.org ([139.162.205.133]:34924 "EHLO
+        movementarian.org" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S231182AbhJZTlq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 26 Oct 2021 15:41:46 -0400
+X-Greylist: delayed 2261 seconds by postgrey-1.27 at vger.kernel.org; Tue, 26 Oct 2021 15:41:46 EDT
+Received: from movement by movementarian.org with local (Exim 4.94)
+        (envelope-from <movement@movementarian.org>)
+        id 1mfRhb-0027Fj-Gr; Tue, 26 Oct 2021 20:01:39 +0100
+Date:   Tue, 26 Oct 2021 20:01:39 +0100
+From:   John Levon <levon@movementarian.org>
+To:     Elena <elena.ufimtseva@oracle.com>
+Cc:     Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org, mst@redhat.com, john.g.johnson@oracle.com,
+        dinechin@redhat.com, cohuck@redhat.com, jasowang@redhat.com,
+        felipe@nutanix.com, jag.raman@oracle.com, eafanasova@gmail.com
+Subject: Re: MMIO/PIO dispatch file descriptors (ioregionfd) design discussion
+Message-ID: <YXhQk/Sh0nLOmA2n@movementarian.org>
+References: <88ca79d2e378dcbfb3988b562ad2c16c4f929ac7.camel@gmail.com>
+ <YWUeZVnTVI7M/Psr@heatpipe>
+ <YXamUDa5j9uEALYr@stefanha-x1.localdomain>
+ <20211025152122.GA25901@nuker>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4f8718fc8da57ab799e95ef7c2060f8be0f2391f.1632171479.git.maciej.szmigiero@oracle.com>
+In-Reply-To: <20211025152122.GA25901@nuker>
+X-Url:  http://www.movementarian.org/
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Sep 20, 2021, Maciej S. Szmigiero wrote:
-> From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+On Mon, Oct 25, 2021 at 08:21:22AM -0700, Elena wrote:
+
+> > I'm curious what approach you want to propose for QEMU integration. A
+> > while back I thought about the QEMU API. It's possible to implement it
+> > along the lines of the memory_region_add_eventfd() API where each
+> > ioregionfd is explicitly added by device emulation code. An advantage of
+> > this approach is that a MemoryRegion can have multiple ioregionfds, but
+> > I'm not sure if that is a useful feature.
+> >
 > 
-> Do a quick lookup for possibly overlapping gfns when creating or moving
-> a memslot instead of performing a linear scan of the whole memslot set.
+> This is the approach that is currently in the works. Agree, I dont see
+> much of the application here at this point to have multiple ioregions
+> per MemoryRegion.
+> I added Memory API/eventfd approach to the vfio-user as well to try
+> things out.
 > 
-> Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
-> ---
->  virt/kvm/kvm_main.c | 36 +++++++++++++++++++++++++++---------
->  1 file changed, 27 insertions(+), 9 deletions(-)
+> > An alternative is to cover the entire MemoryRegion with one ioregionfd.
+> > That way the device emulation code can use ioregionfd without much fuss
+> > since there is a 1:1 mapping between MemoryRegions, which are already
+> > there in existing devices. There is no need to think deeply about which
+> > ioregionfds to create for a device.
+> >
+> > A new API called memory_region_set_aio_context(MemoryRegion *mr,
+> > AioContext *ctx) would cause ioregionfd (or a userspace fallback for
+> > non-KVM cases) to execute the MemoryRegion->read/write() accessors from
+> > the given AioContext. The details of ioregionfd are hidden behind the
+> > memory_region_set_aio_context() API, so the device emulation code
+> > doesn't need to know the capabilities of ioregionfd.
 > 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 5fea467d6fec..78dad8c6376f 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -1667,6 +1667,30 @@ static int kvm_delete_memslot(struct kvm *kvm,
->  	return kvm_set_memslot(kvm, mem, old, &new, as_id, KVM_MR_DELETE);
->  }
->  
-> +static bool kvm_check_memslot_overlap(struct kvm_memslots *slots,
-> +				      struct kvm_memory_slot *nslot)
-> +{
-> +	int idx = slots->node_idx;
-> +	gfn_t nend = nslot->base_gfn + nslot->npages;
-> +	struct rb_node *node;
-> +
-> +	kvm_for_each_memslot_in_gfn_range(node, slots, nslot->base_gfn, nend) {
-> +		struct kvm_memory_slot *cslot;
-> +		gfn_t cend;
-> +
-> +		cslot = container_of(node, struct kvm_memory_slot, gfn_node[idx]);
-> +		cend = cslot->base_gfn + cslot->npages;
-> +		if (cslot->id == nslot->id)
-> +			continue;
-> +
-> +		/* kvm_for_each_in_gfn_no_more() guarantees that cslot->base_gfn < nend */
-> +		if (cend > nslot->base_gfn)
+> > 
+> > The second approach seems promising if we want more devices to use
+> > ioregionfd inside QEMU because it requires less ioregionfd-specific
+> > code.
+> > 
+> I like this approach as well.
+> As you have mentioned, the device emulation code with first approach
+> does have to how to handle the region accesses. The second approach will
+> make things more transparent. Let me see how can I modify what there is
+> there now and may ask further questions.
 
-Hmm, IMO the need for this check means that kvm_for_each_memslot_in_gfn_range()
-is flawed.  The user of kvm_for_each...() should not be responsible for skipping
-memslots that do not actually overlap the requested range.  I.e. this function
-should be no more than:
+Sorry I'm a bit late to this discussion, I'm not clear on the above WRT
+vfio-user. If an ioregionfd has to cover a whole BAR0 (?), how would this
+interact with partly-mmap()able regions like we do with SPDK/vfio-user/NVMe?
 
-static bool kvm_check_memslot_overlap(struct kvm_memslots *slots,
-				      struct kvm_memory_slot *slot)
-{
-	gfn_t start = slot->base_gfn;
-	gfn_t end = start + slot->npages;
-
-	kvm_for_each_memslot_in_gfn_range(&iter, slots, start, end) {
-		if (iter.slot->id != slot->id)
-			return true;
-	}
-
-	return false;
-}
-
-
-and I suspect kvm_zap_gfn_range() could be further simplified as well.
-
-Looking back at the introduction of the helper, its comment's highlighting of
-"possibily" now makes sense.
-
-  /* Iterate over each memslot *possibly* intersecting [start, end) range */
-  #define kvm_for_each_memslot_in_gfn_range(node, slots, start, end)	\
-
-That's an unnecessarily bad API.  It's a very solvable problem for the iterator
-helpers to advance until there's actually overlap, not doing so violates the
-principle of least surprise, and unless I'm missing something, there's no use
-case for an "approximate" iteration.
-
-> +			return true;
-> +	}
-> +
-> +	return false;
-> +}
-> +
->  /*
->   * Allocate some memory and give it an address in the guest physical address
->   * space.
-> @@ -1752,16 +1776,10 @@ int __kvm_set_memory_region(struct kvm *kvm,
->  	}
->  
->  	if ((change == KVM_MR_CREATE) || (change == KVM_MR_MOVE)) {
-> -		int bkt;
-> -
->  		/* Check for overlaps */
-
-This comment can be dropped, the new function is fairly self-documenting.
-
-> -		kvm_for_each_memslot(tmp, bkt, __kvm_memslots(kvm, as_id)) {
-> -			if (tmp->id == id)
-> -				continue;
-> -			if (!((new.base_gfn + new.npages <= tmp->base_gfn) ||
-> -			      (new.base_gfn >= tmp->base_gfn + tmp->npages)))
-> -				return -EEXIST;
-> -		}
-> +		if (kvm_check_memslot_overlap(__kvm_memslots(kvm, as_id),
-> +					      &new))
-
-And then with the comment dropped, the wrap can be avoided by folding the check
-into the outer if statement, e.g.
-
-	if (((change == KVM_MR_CREATE) || (change == KVM_MR_MOVE)) &&
-	    kvm_check_memslot_overlap(__kvm_memslots(kvm, as_id), &new))
-		return -EEXIST;
-
-> +			return -EEXIST;
->  	}
->  
->  	/* Allocate/free page dirty bitmap as needed */
+thanks
+john
