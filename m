@@ -2,115 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0520E43CD77
-	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 17:28:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D2F3A43CD81
+	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 17:29:50 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242739AbhJ0PbC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Oct 2021 11:31:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57928 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237698AbhJ0PbB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Oct 2021 11:31:01 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8339C061745
-        for <kvm@vger.kernel.org>; Wed, 27 Oct 2021 08:28:35 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id m14so3040956pfc.9
-        for <kvm@vger.kernel.org>; Wed, 27 Oct 2021 08:28:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=jluBW5yA9LvugmQi8oyfDy8/cabbakiUXPqo4utsaB8=;
-        b=IXIkAF60iwH8Ca28unKtkkjCxMxH4jsRE7rdlyRpHRKxqRH5DKvzKzXeE1xZpeP67E
-         xwOJxCxtNAW/vuRZ9/cA++xLC0bu82EJesdjjIouYVg3x2VESqFJeksK7bKKBVif038n
-         GNlri9Hc+F1u7CW4lPLn9JPRn52da4aBC4xsr93HTbSLq1yGzKbznkaiM+WfpWPTb1nX
-         8Hjyo7QQx66GQF0REMEMDncs7WF5cqEgNENljeKIdAyawTn2njGp/q6Q7uPOzyYDFpEX
-         mqf5isD4pvLAp694w88H9zUwbgY74QXFwiejeE2dZlhZt757K0HlOnfUIVAivKet6eGr
-         4Dpg==
+        id S242712AbhJ0PcP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Oct 2021 11:32:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44494 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237727AbhJ0PcO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 Oct 2021 11:32:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635348588;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=OyWc/N/hzZAc5JmBicW4mZo6NhyOujGkSJMtDUnE6+Q=;
+        b=RQUpaKvXjb2ZBR/k3/DHn+tJ9ypRSapO0w5b+jH2yjU2a/RlvPnsGK0UhMNP36ehKWW5sM
+        N5/zKbP/coMlIu2KW+4njWqxeV8kkrADamMrLmA/tMqUF8v5NqhoKsqzmFYIva7rgkPRuq
+        UfuDVxNo/aWgbu1zSi1jSDM2nohWFlA=
+Received: from mail-oo1-f69.google.com (mail-oo1-f69.google.com
+ [209.85.161.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-481-2iwbNoAdNYurYNVMNHgIrA-1; Wed, 27 Oct 2021 11:29:47 -0400
+X-MC-Unique: 2iwbNoAdNYurYNVMNHgIrA-1
+Received: by mail-oo1-f69.google.com with SMTP id l17-20020a056820031100b002b92d219e44so492703ooe.9
+        for <kvm@vger.kernel.org>; Wed, 27 Oct 2021 08:29:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=jluBW5yA9LvugmQi8oyfDy8/cabbakiUXPqo4utsaB8=;
-        b=p5Xaky1VWIZbn+JRQ07wJqmb89RFMucRHS8Uma/IZyz+68gcVMkCTnzZY9NvpM6o58
-         f03dj+77NToGXbPoJ92k1aBrbVJ4eye4EK+q3wgeH0MOccY1TaV6SIwKkOMpjH5Mn7xR
-         BC/Xzv/Yv8gefhflZkK9MJsvgaJkLDkwGb0qdKMn/d8BQZhvjtrP4isHdCwhe3Pyz87/
-         tsyHBSSZ4fBbYGGG9nyiYlGT1Dk377zRbytMeq9YcMgppqhDC2wl4t3FbIgkOPH7IGrg
-         LkOL0D6wDxL2bbrsFw1YR0KclyECiLPcak3pytcGPCJ9m/sYifLjuflDwN6mlU8haanT
-         KQmA==
-X-Gm-Message-State: AOAM530Lt+sP2u7OJigsk2WVQoilmkvdF1Z31BeLv05tmWwrGkSg7s1K
-        N2OewtGppEeiuW530iJK9Hc5qQ==
-X-Google-Smtp-Source: ABdhPJxibfpJFn220g32tVsxXXYwD2JThHpi8b5HJLrZMbbjn5Hu0UDQk4ZV4kEcRQbC7q9gao3DeQ==
-X-Received: by 2002:a05:6a00:2405:b0:44c:1ec3:8dbe with SMTP id z5-20020a056a00240500b0044c1ec38dbemr33619608pfh.33.1635348515143;
-        Wed, 27 Oct 2021 08:28:35 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id y19sm340714pfn.23.2021.10.27.08.28.34
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=OyWc/N/hzZAc5JmBicW4mZo6NhyOujGkSJMtDUnE6+Q=;
+        b=z5BcYj7SXvSYVd5GUWkVc3bFOh3HFrDqKO557hd0bSONXPV/ZsoixaS1oGNRNZRmpp
+         4y6JUx87hDlwMWvEjuVHgtT0QAZ52Kwn7dMjqFoU1fo2zT1+ezSh0NHS+zeujZjnY7OY
+         v8sdkhotr9lxvOEUPMJ2nYTEeBhEGDUkvpT5CwpJ3jRV5cAeLixSWi5VrcVF0q+f14fX
+         klYYvEbvutiBZA8P9mM5/Q/RKnXQ3DH07OFjQq1mNJcFKoZnK0IGIe1NB8t84QMj7VVK
+         /Xg4at+be57dNAJ7/MST50wWNhWutb7AAJIjdybal4bQi1MzkqKYXs1zIlQh1t3OrG0k
+         bOlQ==
+X-Gm-Message-State: AOAM532eQJvJehegMsYLlZT2usdsnmcPU0IWxmKRjyJoS1KkHqs/btPp
+        ylO9DuBjJW2rqqkzOx1b5kqx1B7O0cm2cqL/OI+93C0sG3EU4htz1Sgwckj2U1xD7nDTKytiP8Z
+        0XGKfoQvVoONj
+X-Received: by 2002:aca:300e:: with SMTP id w14mr4210038oiw.178.1635348586498;
+        Wed, 27 Oct 2021 08:29:46 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyTxFcAgeuq1Diai3BB4irLIENGYdyXntO6d+LQ7ij4Nc5NGrTPvQBz87bd/efni4z/y288kg==
+X-Received: by 2002:aca:300e:: with SMTP id w14mr4210018oiw.178.1635348586264;
+        Wed, 27 Oct 2021 08:29:46 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id r14sm96409oiw.44.2021.10.27.08.29.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Oct 2021 08:28:34 -0700 (PDT)
-Date:   Wed, 27 Oct 2021 15:28:31 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        David Matlack <dmatlack@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH v2 00/43] KVM: Halt-polling and x86 APICv overhaul
-Message-ID: <YXlwH2vWILFS9QOG@google.com>
-References: <20211009021236.4122790-1-seanjc@google.com>
- <614858dd-106c-64cc-04bc-f1887b2054d1@redhat.com>
- <YXllGfrjPX1pVUx6@google.com>
- <ecec4d7d-13dd-c992-6648-3624d7c14c24@redhat.com>
+        Wed, 27 Oct 2021 08:29:45 -0700 (PDT)
+Date:   Wed, 27 Oct 2021 09:29:43 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
+        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
+        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com
+Subject: Re: [PATCH V4 mlx5-next 13/13] vfio/mlx5: Use its own PCI
+ reset_done error handler
+Message-ID: <20211027092943.4f95f220.alex.williamson@redhat.com>
+In-Reply-To: <20211026235002.GC2744544@nvidia.com>
+References: <20211026090605.91646-1-yishaih@nvidia.com>
+        <20211026090605.91646-14-yishaih@nvidia.com>
+        <20211026171644.41019161.alex.williamson@redhat.com>
+        <20211026235002.GC2744544@nvidia.com>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ecec4d7d-13dd-c992-6648-3624d7c14c24@redhat.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 27, 2021, Paolo Bonzini wrote:
-> On 27/10/21 16:41, Sean Christopherson wrote:
-> > The other thing I don't like about having the WARN in the loop is that it suggests
-> > that something other than the vCPU can modify the NDST and SN fields, which is
-> > wrong and confusing (for me).
-> 
-> Yeah, I can agree with that.  Can you add it in a comment above the cmpxchg
-> loop, it can be as simple as
-> 
-> 	/* The processor can set ON concurrently.  */
-> 
-> when you respin patch 21 and the rest of the series?
+On Tue, 26 Oct 2021 20:50:02 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-I can definitely add a comment, but I think that comment is incorrect.  AIUI,
-the CPU is the one thing in the system that _doesn't_ set ON, at least not without
-IPI virtualization (haven't read that spec yet).  KVM (software) sets it when
-emulating IPIs, and the IOMMU (hardware) sets it for "real" posted interrupts,
-but the CPU (sans IPI virtualization) only clears ON when processing an IRQ on
-the notification vector.
+> On Tue, Oct 26, 2021 at 05:16:44PM -0600, Alex Williamson wrote:
+> > > @@ -471,6 +474,47 @@ mlx5vf_pci_migration_data_rw(struct mlx5vf_pci_core_device *mvdev,
+> > >  	return count;
+> > >  }
+> > >  
+> > > +/* This function is called in all state_mutex unlock cases to
+> > > + * handle a 'defered_reset' if exists.
+> > > + */  
+> > 
+> > I refrained from noting it elsewhere, but we're not in net/ or
+> > drivers/net/ here, but we're using their multi-line comment style.  Are
+> > we using the strong relation to a driver that does belong there as
+> > justification for the style here?  
+> 
+> I think it is an oversight, tell Yishai you prefer the other format in
+> drivers/vfio and it can be fixed
 
-So something like this?
+Seems fixed in the new version.
 
-	/* ON can be set concurrently by a different vCPU or by hardware. */
+> > > @@ -539,7 +583,7 @@ static ssize_t mlx5vf_pci_mig_rw(struct vfio_pci_core_device *vdev,
+> > >  	}
+> > >  
+> > >  end:
+> > > -	mutex_unlock(&mvdev->state_mutex);
+> > > +	mlx5vf_state_mutex_unlock(mvdev);  
+> > 
+> > I'm a little lost here, if the operation was to read the device_state
+> > and mvdev->vmig.vfio_dev_state was error, that's already been copied to
+> > the user buffer, so the user continues to see the error state for the
+> > first read of device_state after reset if they encounter this race?  
+> 
+> Yes. If the userspace races ioctls they get a deserved mess.
+> 
+> This race exists no matter what we do, as soon as the unlock happens a
+> racing reset ioctl could run in during the system call exit path.
+> 
+> The purpose of the locking is to protect the kernel from hostile
+> userspace, not to allow userspace to execute concurrent ioctl's in a
+> sensible way.
+
+The reset_done handler sets deferred_reset = true and if it's possible
+to get the state_mutex, will reset migration data and device_state as
+part of releasing that mutex.  If there's contention on state_mutex,
+the deferred_reset field flags that this migration state is still stale.
+
+So, I assume that it's possible that a user resets the device via ioctl
+or config space, there was contention and the migration state is still
+stale, right?
+
+The user then goes to read device_state, but the staleness of the
+migration state is not resolved until *after* the stale device state is
+copied to the user buffer.
+
+What did the user do wrong to see stale data?  Thanks,
+
+Alex
+
