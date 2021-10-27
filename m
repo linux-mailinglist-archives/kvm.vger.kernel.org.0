@@ -2,115 +2,215 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EA17043CBAD
-	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 16:11:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id DEE0E43CBD8
+	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 16:18:53 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238064AbhJ0OOJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Oct 2021 10:14:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46332 "EHLO
+        id S242462AbhJ0OVO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Oct 2021 10:21:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:38557 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232901AbhJ0OOI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 27 Oct 2021 10:14:08 -0400
+        by vger.kernel.org with ESMTP id S242460AbhJ0OVN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 Oct 2021 10:21:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635343902;
+        s=mimecast20190719; t=1635344327;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=rPlcjmpRh7lIBb9ysHvcn9Jm3y0keBJttZPoQy9XWeU=;
-        b=SA5KFqhjOi5AFneriUuPW2/VvZ4XL+2NyCh9cSCyj5kvc8wehhQ5Su4xgwMwRzaGs1nDz2
-        iUuXxYpl5G1VgMPID4YP60l1kKZn7B9iTRJKX1oVqQMmJWhCqb/TVVo+6mdXaSZrV+ekFo
-        3QZqQomv9/AQ6BfHwjiag6iAo15w/Rw=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-513-Y2fEDSvSOEC0LwXzMDUk0g-1; Wed, 27 Oct 2021 10:11:41 -0400
-X-MC-Unique: Y2fEDSvSOEC0LwXzMDUk0g-1
-Received: by mail-wm1-f70.google.com with SMTP id y12-20020a1c7d0c000000b0032ccaad73d0so1312933wmc.5
-        for <kvm@vger.kernel.org>; Wed, 27 Oct 2021 07:11:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=rPlcjmpRh7lIBb9ysHvcn9Jm3y0keBJttZPoQy9XWeU=;
-        b=mkJqJfRASkxHQltKJvO0SzsCiGfUUqKUlvFUUP4Odn8aeBZzpL98BTTe7qwclqm2HU
-         2YedGmEEh+JuPW3GVPtwHrkawT6D7JaqwdkcVunWbrqNbiS6jLmFzk2wO3IC1T5svvOA
-         z57i+QYtTxFCfnE2aRtNMwVAnAwEWEYHC2l5+k2GedrpJsWiTP6A9AMGhsFPtBb9iILp
-         wx+hrU9OblETpQOFBqW6D5Sa+CsJKszxzc1fE8iHyX++jzeypuHowHiNyRCM91FscAWO
-         L4bPMKnxH7DqKTguv8g9Yzv6c2i/ypxcZpeQPaWhdyvf0/ClWpNoEb+lIGE/4y9yp0rE
-         TJ8g==
-X-Gm-Message-State: AOAM532lRIN5BO37QrICkcml4VVk/ud18P7Q6qUB2M8VbInuANtLiG9c
-        3Plk1YfJH9EI/G9q2UweQZpovB6c4VSRy69CRvIFAoWmAGeBg9oTD9dIGAyCjekCWx5dtO+5wEn
-        fTJTW8PY70mQL
-X-Received: by 2002:a05:600c:3b89:: with SMTP id n9mr5942154wms.7.1635343900274;
-        Wed, 27 Oct 2021 07:11:40 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy1FjwOf1e6IdsT5TMePNBMDiAYa24+2CFNIXTvefxpkQihLhiTxR4JuhEFTMrIeN+uxEoKeQ==
-X-Received: by 2002:a05:600c:3b89:: with SMTP id n9mr5942126wms.7.1635343900116;
-        Wed, 27 Oct 2021 07:11:40 -0700 (PDT)
-Received: from [192.168.1.36] (62.red-83-57-168.dynamicip.rima-tde.net. [83.57.168.62])
-        by smtp.gmail.com with ESMTPSA id j7sm4782010wmq.32.2021.10.27.07.11.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Oct 2021 07:11:39 -0700 (PDT)
-Message-ID: <8fc703aa-a256-fdef-36a5-6faad3da47d6@redhat.com>
-Date:   Wed, 27 Oct 2021 16:11:38 +0200
+        bh=tBSPA7SFj6S0l15DFmmTz29aiCenNhw8/4n7QaHyqGY=;
+        b=FoIwbpjEU9RDfcqDKaMrOAvPF0B7uHviFTjjzq6XLjGqMlzlG6S2XkgGzHttlMMOkwCMFT
+        +N/KTwLBwLV0VUuWS1iT8jpexuTudW/nZt2LJ/eas09etldymeHHotH1vEGFwb6VZdDsHS
+        h8xqrpttIkMnbNRTdO15ALhFMd6zQ5A=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-18-EGGnys3PO8eSwUAtseuBvQ-1; Wed, 27 Oct 2021 10:18:44 -0400
+X-MC-Unique: EGGnys3PO8eSwUAtseuBvQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 46F7487320A;
+        Wed, 27 Oct 2021 14:18:40 +0000 (UTC)
+Received: from starship (unknown [10.40.194.243])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 714835C1B4;
+        Wed, 27 Oct 2021 14:18:31 +0000 (UTC)
+Message-ID: <e04b75455437da29fb009668e60b5be1732a183b.camel@redhat.com>
+Subject: Re: [PATCH v2 12/43] KVM: x86: Tweak halt emulation helper names to
+ free up kvm_vcpu_halt()
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Anup Patel <anup.patel@wdc.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Atish Patra <atish.patra@wdc.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        David Matlack <dmatlack@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+Date:   Wed, 27 Oct 2021 17:18:30 +0300
+In-Reply-To: <363479dd55760979da208cacf015a6f7fe2afd69.camel@redhat.com>
+References: <20211009021236.4122790-1-seanjc@google.com>
+         <20211009021236.4122790-13-seanjc@google.com>
+         <363479dd55760979da208cacf015a6f7fe2afd69.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH v1 02/12] vhost: Return number of free memslots
-Content-Language: en-US
-To:     David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Cc:     Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Sebastien Boeuf <sebastien.boeuf@intel.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Ani Sinha <ani@anisinha.ca>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Hui Zhu <teawater@gmail.com>
-References: <20211027124531.57561-1-david@redhat.com>
- <20211027124531.57561-3-david@redhat.com>
- <4ce74e8f-080d-9a0d-1b5b-6f7a7203e2ab@redhat.com>
- <7f1ee7ea-0100-a7ac-4322-316ccc75d85f@redhat.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-In-Reply-To: <7f1ee7ea-0100-a7ac-4322-316ccc75d85f@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/27/21 16:04, David Hildenbrand wrote:
-> On 27.10.21 15:36, Philippe Mathieu-Daudé wrote:
->> On 10/27/21 14:45, David Hildenbrand wrote:
->>> Let's return the number of free slots instead of only checking if there
->>> is a free slot. Required to support memory devices that consume multiple
->>> memslots.
->>>
->>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>> ---
->>>  hw/mem/memory-device.c    | 2 +-
->>>  hw/virtio/vhost-stub.c    | 2 +-
->>>  hw/virtio/vhost.c         | 4 ++--
->>>  include/hw/virtio/vhost.h | 2 +-
->>>  4 files changed, 5 insertions(+), 5 deletions(-)
-
->>> -bool vhost_has_free_slot(void)
->>> +unsigned int vhost_get_free_memslots(void)
->>>  {
->>>      return true;
->>
->>        return 0;
+On Wed, 2021-10-27 at 17:10 +0300, Maxim Levitsky wrote:
+> On Fri, 2021-10-08 at 19:12 -0700, Sean Christopherson wrote:
+> > Rename a variety of HLT-related helpers to free up the function name
+> > "kvm_vcpu_halt" for future use in generic KVM code, e.g. to differentiate
+> > between "block" and "halt".
+> > 
+> > No functional change intended.
+> > 
+> > Reviewed-by: David Matlack <dmatlack@google.com>
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  arch/x86/include/asm/kvm_host.h |  2 +-
+> >  arch/x86/kvm/vmx/nested.c       |  2 +-
+> >  arch/x86/kvm/vmx/vmx.c          |  4 ++--
+> >  arch/x86/kvm/x86.c              | 13 +++++++------
+> >  4 files changed, 11 insertions(+), 10 deletions(-)
+> > 
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > index 7aafc27ce7a9..328103a520d3 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -1689,7 +1689,7 @@ int kvm_emulate_monitor(struct kvm_vcpu *vcpu);
+> >  int kvm_fast_pio(struct kvm_vcpu *vcpu, int size, unsigned short port, int in);
+> >  int kvm_emulate_cpuid(struct kvm_vcpu *vcpu);
+> >  int kvm_emulate_halt(struct kvm_vcpu *vcpu);
+> > -int kvm_vcpu_halt(struct kvm_vcpu *vcpu);
+> > +int kvm_emulate_halt_noskip(struct kvm_vcpu *vcpu);
+> >  int kvm_emulate_ap_reset_hold(struct kvm_vcpu *vcpu);
+> >  int kvm_emulate_wbinvd(struct kvm_vcpu *vcpu);
+> >  
+> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> > index af1bbb73430a..d0237a441feb 100644
+> > --- a/arch/x86/kvm/vmx/nested.c
+> > +++ b/arch/x86/kvm/vmx/nested.c
+> > @@ -3619,7 +3619,7 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
+> >  		    !(nested_cpu_has(vmcs12, CPU_BASED_INTR_WINDOW_EXITING) &&
+> >  		      (vmcs12->guest_rflags & X86_EFLAGS_IF))) {
+> >  			vmx->nested.nested_run_pending = 0;
+> > -			return kvm_vcpu_halt(vcpu);
+> > +			return kvm_emulate_halt_noskip(vcpu);
+> >  		}
+> >  		break;
+> >  	case GUEST_ACTIVITY_WAIT_SIPI:
+> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > index 1c8b2b6e7ed9..5517893f12fc 100644
+> > --- a/arch/x86/kvm/vmx/vmx.c
+> > +++ b/arch/x86/kvm/vmx/vmx.c
+> > @@ -4741,7 +4741,7 @@ static int handle_rmode_exception(struct kvm_vcpu *vcpu,
+> >  		if (kvm_emulate_instruction(vcpu, 0)) {
+> >  			if (vcpu->arch.halt_request) {
+> >  				vcpu->arch.halt_request = 0;
+> > -				return kvm_vcpu_halt(vcpu);
+> > +				return kvm_emulate_halt_noskip(vcpu);
 > 
-> Oh wait, no. This actually has to be
+> Could you elaborate on why you choose _noskip suffix? 
+>  
+> As far as I see, kvm_vcpu_halt just calls __kvm_vcpu_halt with new VCPU run state/exit reason,
+> which is used only when local apic is not in the kernel (which is these days not that
+> supported configuration).
 > 
-> "return ~0U;" (see real vhost_get_free_memslots())
+> Other user of __kvm_vcpu_halt is something SEV related.
+>  
+> Best regards,
+> 	Maxim Levitsky
 > 
-> ... because there is no vhost and consequently no limit applies.
+> 
+> >  			}
+> >  			return 1;
+> >  		}
+> > @@ -5415,7 +5415,7 @@ static int handle_invalid_guest_state(struct kvm_vcpu *vcpu)
+> >  
+> >  		if (vcpu->arch.halt_request) {
+> >  			vcpu->arch.halt_request = 0;
+> > -			return kvm_vcpu_halt(vcpu);
+> > +			return kvm_emulate_halt_noskip(vcpu);
+> >  		}
+> >  
+> >  		/*
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 4a52a08707de..9c23ae1d483d 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -8649,7 +8649,7 @@ void kvm_arch_exit(void)
+> >  #endif
+> >  }
+> >  
+> > -static int __kvm_vcpu_halt(struct kvm_vcpu *vcpu, int state, int reason)
+> > +static int __kvm_emulate_halt(struct kvm_vcpu *vcpu, int state, int reason)
+> >  {
+> >  	++vcpu->stat.halt_exits;
+> >  	if (lapic_in_kernel(vcpu)) {
+> > @@ -8661,11 +8661,11 @@ static int __kvm_vcpu_halt(struct kvm_vcpu *vcpu, int state, int reason)
+> >  	}
+> >  }
+> >  
+> > -int kvm_vcpu_halt(struct kvm_vcpu *vcpu)
+> > +int kvm_emulate_halt_noskip(struct kvm_vcpu *vcpu)
+> >  {
+> > -	return __kvm_vcpu_halt(vcpu, KVM_MP_STATE_HALTED, KVM_EXIT_HLT);
+> > +	return __kvm_emulate_halt(vcpu, KVM_MP_STATE_HALTED, KVM_EXIT_HLT);
+> >  }
+> > -EXPORT_SYMBOL_GPL(kvm_vcpu_halt);
+> > +EXPORT_SYMBOL_GPL(kvm_emulate_halt_noskip);
+> >  
+> >  int kvm_emulate_halt(struct kvm_vcpu *vcpu)
+> >  {
+> > @@ -8674,7 +8674,7 @@ int kvm_emulate_halt(struct kvm_vcpu *vcpu)
+> >  	 * TODO: we might be squashing a GUESTDBG_SINGLESTEP-triggered
+> >  	 * KVM_EXIT_DEBUG here.
+> >  	 */
+> > -	return kvm_vcpu_halt(vcpu) && ret;
+> > +	return kvm_emulate_halt_noskip(vcpu) && ret;
+> >  }
+> >  EXPORT_SYMBOL_GPL(kvm_emulate_halt);
+> >  
+> > @@ -8682,7 +8682,8 @@ int kvm_emulate_ap_reset_hold(struct kvm_vcpu *vcpu)
+> >  {
+> >  	int ret = kvm_skip_emulated_instruction(vcpu);
+> >  
+> > -	return __kvm_vcpu_halt(vcpu, KVM_MP_STATE_AP_RESET_HOLD, KVM_EXIT_AP_RESET_HOLD) && ret;
+> > +	return __kvm_emulate_halt(vcpu, KVM_MP_STATE_AP_RESET_HOLD,
+> > +					KVM_EXIT_AP_RESET_HOLD) && ret;
+> >  }
+> >  EXPORT_SYMBOL_GPL(kvm_emulate_ap_reset_hold);
+> >  
 
-Indeed.
+Also while at it, why not to use say '__kvm_emulate_hlt' ('hlt' instead of 'halt') to 
+put emphasis on the fact that we are emulating a cpu instruction?
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Best regards,
+	Maxim Levitsky
+ 
 
