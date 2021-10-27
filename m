@@ -2,127 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1962643CDC0
-	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 17:38:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AE40443CDDF
+	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 17:45:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242806AbhJ0Pk0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Oct 2021 11:40:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21607 "EHLO
+        id S235463AbhJ0Prm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Oct 2021 11:47:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49958 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236437AbhJ0PkZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 27 Oct 2021 11:40:25 -0400
+        by vger.kernel.org with ESMTP id S233252AbhJ0Prl (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 Oct 2021 11:47:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635349080;
+        s=mimecast20190719; t=1635349515;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=bSqxXsSY7PzPPy6E5Cy05Nx/OdmHcN1STcnBEYyHdIs=;
-        b=MbMxbXAupMhsOj7n1ORnzGUbt2FJk9mfhs1WY97br91xQhy2gI1grOuvQnxEp6LE0pzRZZ
-        1ueNqOMlSarkjIx3XpEKw+UEb5n1ek2asuexqFwukbmOUCbHmkd+mobwHsmwa1bWXKCwn1
-        2CRz2Zv9n8TOyxe7u0sslDWf0CgTm/E=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-403-9Ug5MjS0NpmFztHc_7h70g-1; Wed, 27 Oct 2021 11:37:58 -0400
-X-MC-Unique: 9Ug5MjS0NpmFztHc_7h70g-1
-Received: by mail-ed1-f70.google.com with SMTP id q6-20020a056402518600b003dd81fc405eso2735112edd.1
-        for <kvm@vger.kernel.org>; Wed, 27 Oct 2021 08:37:58 -0700 (PDT)
+        bh=SIGkDHIUVkYP70eTHFjrm/6ZTOCdlcXs59fUFAQIFH4=;
+        b=KeIUhgO9OZIFli1o85PS+5DI+X0nB6pcCBnc+SCfRuhB6+jBuRxFWnvYnLiKybqgjFNw4l
+        FSO11zWL8shZZYhL1JI05RXf8YboaLFYHK9Nti1NkHAyBVo0N4edQgkA3RtZ3Q83OtMvZs
+        wjSc02sVQxUY4NuDgrnBPKhkOV+JODg=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-427-LkaaYnfCNTaVOT0uy5EAxg-1; Wed, 27 Oct 2021 11:45:14 -0400
+X-MC-Unique: LkaaYnfCNTaVOT0uy5EAxg-1
+Received: by mail-wm1-f70.google.com with SMTP id v10-20020a1cf70a000000b00318203a6bd1so1337730wmh.6
+        for <kvm@vger.kernel.org>; Wed, 27 Oct 2021 08:45:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
+         :content-language:to:cc:references:from:organization:in-reply-to
          :content-transfer-encoding;
-        bh=bSqxXsSY7PzPPy6E5Cy05Nx/OdmHcN1STcnBEYyHdIs=;
-        b=OFLvjbBoOBLr2fn87E1p/mg2Z1sc3UICDG+f+cRnp6p/QO5XJDv2pGVpiHtNFLs129
-         YeGmXw4AmnDV5Ka0gh1AtiHBIlQPHX7CYva50UbU5qiuqboLATa0Q4eBnMqhyj1FW+1A
-         nqxgqTO6aBuco0y01KSMk0Yn+f+IuIYLaZI3dIjn90Q4lpei/1bs4oIEaxPbc3Cv4y3D
-         Btlej1PA6ApaWx0Yxd4JKYA4spGSfB2fG3U/mp3xCOsNtMRAbGUoqWxMxnEnTaL57T7E
-         D2KuXgHynoeZ21+Lv6RLJrhl/QyhAThAG0JBkQMG7L7MrUbONEjkNjsyDQ+R9CuWenQU
-         f4zg==
-X-Gm-Message-State: AOAM531MjldMDA3vnfk8vZgPR5yvZRvrvkHyKrGlrx/NAlWBEnWtATZv
-        alX0W2HqBahQZJ4hS0papO3hHIz+bZje5gT/zv/TB3YXf5ZhdkA9wlOIABuiaACIqlL77dzQStS
-        d0Shes8fbjhf/
-X-Received: by 2002:a05:6402:520f:: with SMTP id s15mr19650586edd.376.1635349077546;
-        Wed, 27 Oct 2021 08:37:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxcV3ajcrSuCCBMr6jO83QbO8KNKYMvLx5Z90JLfoEGGYsQl7acheIlREFbLHWM9uSofWHX3A==
-X-Received: by 2002:a05:6402:520f:: with SMTP id s15mr19650552edd.376.1635349077353;
-        Wed, 27 Oct 2021 08:37:57 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id h7sm218074edt.37.2021.10.27.08.37.48
+        bh=SIGkDHIUVkYP70eTHFjrm/6ZTOCdlcXs59fUFAQIFH4=;
+        b=t4Wlcyx38rDwFDVV/StEJgpGyEnc1vsSs3WwmUnNHAPpjflLtjwxQXcir8dE1UPanp
+         9plsQho5NdssyEEM/Y2yKkVKwFqmTXWlzH9ANzJ3ozFJvvSMqY9MxJSiC3HGqVu9KZg+
+         klAqqtKWxKTsg6VCmBknnuW82k6p0sUZzmgjmPunsiBv+Yx42XfG7QMJBB9BR4y0CQPD
+         HBNuNNgxjgklQOl7VOy2hRx+bGv5ZJwng1IOMiYJ92vXYGgcLw9XkNjY+tuVL+bypovw
+         4lfLw5dHcRb9q4mTS9yXybILYwsG9hSGm6LWlD0Ekxd9FVox6NwGeFEmAwA31BuFOw+s
+         6CNg==
+X-Gm-Message-State: AOAM532zLzIeVOo3ma2orhdT783oK65SujjkvYlTWU3F2Vcy+qEdNjSf
+        hr4yaZKeSkQeasJdbVuntrwan4sCJAGDMzAw6/aW4Ym1qOSZdDuynPRo/HciMPniVAwte1r68TW
+        TBcfFLtxx14yE
+X-Received: by 2002:a7b:c8d0:: with SMTP id f16mr6422796wml.193.1635349513364;
+        Wed, 27 Oct 2021 08:45:13 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyHTYW5hgWloBaFrBCq9K/FgnbelKLC8BS0fFuuZPYsub01BQvaMISk1qWWRLde3+jZig5qCw==
+X-Received: by 2002:a7b:c8d0:: with SMTP id f16mr6422768wml.193.1635349513180;
+        Wed, 27 Oct 2021 08:45:13 -0700 (PDT)
+Received: from [192.168.3.132] (p4ff23d76.dip0.t-ipconnect.de. [79.242.61.118])
+        by smtp.gmail.com with ESMTPSA id m125sm3608153wmm.44.2021.10.27.08.45.12
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Oct 2021 08:37:56 -0700 (PDT)
-Message-ID: <5b8f554b-5bbc-e257-12d0-800ec82489d0@redhat.com>
-Date:   Wed, 27 Oct 2021 17:37:47 +0200
+        Wed, 27 Oct 2021 08:45:12 -0700 (PDT)
+Message-ID: <1a01da70-fc6d-f0f0-bd75-8f0a3c2dff94@redhat.com>
+Date:   Wed, 27 Oct 2021 17:45:11 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.1.0
-Subject: Re: [PATCH v2 00/43] KVM: Halt-polling and x86 APICv overhaul
+Subject: Re: [PATCH v1 02/12] vhost: Return number of free memslots
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        David Matlack <dmatlack@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>
-References: <20211009021236.4122790-1-seanjc@google.com>
- <614858dd-106c-64cc-04bc-f1887b2054d1@redhat.com>
- <YXllGfrjPX1pVUx6@google.com>
- <ecec4d7d-13dd-c992-6648-3624d7c14c24@redhat.com>
- <YXlwH2vWILFS9QOG@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YXlwH2vWILFS9QOG@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+To:     "Michael S. Tsirkin" <mst@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc:     qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
+        kvm@vger.kernel.org,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        Sebastien Boeuf <sebastien.boeuf@intel.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Ani Sinha <ani@anisinha.ca>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Hui Zhu <teawater@gmail.com>
+References: <20211027124531.57561-1-david@redhat.com>
+ <20211027124531.57561-3-david@redhat.com>
+ <4ce74e8f-080d-9a0d-1b5b-6f7a7203e2ab@redhat.com>
+ <7f1ee7ea-0100-a7ac-4322-316ccc75d85f@redhat.com>
+ <8fc703aa-a256-fdef-36a5-6faad3da47d6@redhat.com>
+ <20211027113245-mutt-send-email-mst@kernel.org>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+In-Reply-To: <20211027113245-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/10/21 17:28, Sean Christopherson wrote:
-> On Wed, Oct 27, 2021, Paolo Bonzini wrote:
->> On 27/10/21 16:41, Sean Christopherson wrote:
->>> The other thing I don't like about having the WARN in the loop is that it suggests
->>> that something other than the vCPU can modify the NDST and SN fields, which is
->>> wrong and confusing (for me).
+On 27.10.21 17:33, Michael S. Tsirkin wrote:
+> On Wed, Oct 27, 2021 at 04:11:38PM +0200, Philippe Mathieu-Daudé wrote:
+>> On 10/27/21 16:04, David Hildenbrand wrote:
+>>> On 27.10.21 15:36, Philippe Mathieu-Daudé wrote:
+>>>> On 10/27/21 14:45, David Hildenbrand wrote:
+>>>>> Let's return the number of free slots instead of only checking if there
+>>>>> is a free slot. Required to support memory devices that consume multiple
+>>>>> memslots.
+>>>>>
+>>>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>>>> ---
+>>>>>  hw/mem/memory-device.c    | 2 +-
+>>>>>  hw/virtio/vhost-stub.c    | 2 +-
+>>>>>  hw/virtio/vhost.c         | 4 ++--
+>>>>>  include/hw/virtio/vhost.h | 2 +-
+>>>>>  4 files changed, 5 insertions(+), 5 deletions(-)
 >>
->> Yeah, I can agree with that.  Can you add it in a comment above the cmpxchg
->> loop, it can be as simple as
+>>>>> -bool vhost_has_free_slot(void)
+>>>>> +unsigned int vhost_get_free_memslots(void)
+>>>>>  {
+>>>>>      return true;
+>>>>
+>>>>        return 0;
+>>>
+>>> Oh wait, no. This actually has to be
+>>>
+>>> "return ~0U;" (see real vhost_get_free_memslots())
+>>>
+>>> ... because there is no vhost and consequently no limit applies.
 >>
->> 	/* The processor can set ON concurrently.  */
+>> Indeed.
 >>
->> when you respin patch 21 and the rest of the series?
+>> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > 
-> I can definitely add a comment, but I think that comment is incorrect.
-
-It's completely backwards indeed.  I first had "the hardware" and then 
-shut down my brain for a second to replace it.
-
-> So something like this?
+> confused. are you acking the theoretical patch with ~0 here?
 > 
-> 	/* ON can be set concurrently by a different vCPU or by hardware. */
 
-Yes, of course.
+That's how I interpreted it.
 
-Paolo
+-- 
+Thanks,
+
+David / dhildenb
 
