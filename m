@@ -2,117 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D5FA543CD9C
-	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 17:33:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0302E43CDB9
+	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 17:36:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242808AbhJ0Pfi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Oct 2021 11:35:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:29346 "EHLO
+        id S238707AbhJ0Pi7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Oct 2021 11:38:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:59170 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S242783AbhJ0Pfh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 27 Oct 2021 11:35:37 -0400
+        by vger.kernel.org with ESMTP id S238438AbhJ0Pi5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 Oct 2021 11:38:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635348791;
+        s=mimecast20190719; t=1635348991;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=4LbTw5RdCBbk7mSqMfjlgY/jo+9kargrdnPczNL3830=;
-        b=jH5zoeRNSw2lxhojSkd7ctHaDa3FyI6Flbwj0/nHVmFo2jJoS1Q3fx0YZ2a9SerNlWWa85
-        eEcpCwIvd/tdH/Akk7RPeyn3LFSzC35OO4cxkxSqKozcXHb6rI5CwzjHnhokuN38WVpXFE
-        YmvdxzxoKae6HwsvhL8DKacfkdW8w9A=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-564-lo0mzr3GNhy3IegOSgZfZg-1; Wed, 27 Oct 2021 11:33:10 -0400
-X-MC-Unique: lo0mzr3GNhy3IegOSgZfZg-1
-Received: by mail-wm1-f70.google.com with SMTP id j38-20020a05600c1c2600b0032ccf96ea8eso1271303wms.1
-        for <kvm@vger.kernel.org>; Wed, 27 Oct 2021 08:33:09 -0700 (PDT)
+        bh=5uRyMZIN45jCj2VKDrWR2a9G78BQWuHGJKl7OtHJZ6k=;
+        b=e2dR+en+X1RDREBLLt64xZsmtbn2gJbApYWO5LX8Vut55CfpXVAk81mSZdLNxqHu/Ho85b
+        ubVa4Dq6esUrtQxHn2He/jDyHvGeNyRITA+GUK+2vIMqB8clziqaw2gtKhvjWKphvPlBXg
+        387CZYQIr/IItEkZlX7eLGEgp9R0xts=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-212-w4_ITimFMH-iykwCMzm28w-1; Wed, 27 Oct 2021 11:36:30 -0400
+X-MC-Unique: w4_ITimFMH-iykwCMzm28w-1
+Received: by mail-ed1-f72.google.com with SMTP id v9-20020a50d849000000b003dcb31eabaaso2693989edj.13
+        for <kvm@vger.kernel.org>; Wed, 27 Oct 2021 08:36:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=4LbTw5RdCBbk7mSqMfjlgY/jo+9kargrdnPczNL3830=;
-        b=gvx5cnRN1036E1Ril7PhrNJAfQSY/2TWPZN8q9/bzJA2PYPcV8qIx3VN1xb2lXMGPT
-         QCIxKQMwB5BelGcXEZWKD/f/5JxP8NfJNQqM0rJA/HI61BqZr61I1ma5e0PTzAymJLmK
-         MVk258/KFkaB84+EfAB6qcDYBdH+5M7cQvrbIr0BNL3N6/o03/9hHoMwSUHHFplMy4HJ
-         0isCuSYb834btJif8vcv0x2QDU9C9YkGr1aAwCRRuXIRPIjQ8h88HzM0d/Ok+DmJVYvE
-         s2vZ73J3gbS4Njy4E68oPbt2bx+ISLGaz0UubjuNO575ZJmwfa3DtMuneKA27LNujhMP
-         0YQA==
-X-Gm-Message-State: AOAM531QZxwwXQ+r9Cp/oJiXCuRRIf3p9PHEO9W+TN73gPZvJu2OH3eU
-        Q+tItY1Uy6EcM5pTg2jhGiA1lzwDhqcu1cjrw56N9vhRekk18GkppZCd/KJGSf+o87v7a9WUFFO
-        4nh7NADGc+Av9
-X-Received: by 2002:adf:ebd0:: with SMTP id v16mr36722072wrn.291.1635348789084;
-        Wed, 27 Oct 2021 08:33:09 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwpQZUP2sBX55AWGDuLgHVqCKu1ZKjs2Z/KakgNx4x2sxb1c8gCRSsxKWcnL4FHm9zGTfYvwQ==
-X-Received: by 2002:adf:ebd0:: with SMTP id v16mr36722028wrn.291.1635348788870;
-        Wed, 27 Oct 2021 08:33:08 -0700 (PDT)
-Received: from redhat.com ([2a03:c5c0:207e:a543:72f:c4d1:8911:6346])
-        by smtp.gmail.com with ESMTPSA id r1sm122264wmq.15.2021.10.27.08.33.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Oct 2021 08:33:08 -0700 (PDT)
-Date:   Wed, 27 Oct 2021 11:33:02 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Cc:     David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org,
-        Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Sebastien Boeuf <sebastien.boeuf@intel.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Ani Sinha <ani@anisinha.ca>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Hui Zhu <teawater@gmail.com>
-Subject: Re: [PATCH v1 02/12] vhost: Return number of free memslots
-Message-ID: <20211027113245-mutt-send-email-mst@kernel.org>
-References: <20211027124531.57561-1-david@redhat.com>
- <20211027124531.57561-3-david@redhat.com>
- <4ce74e8f-080d-9a0d-1b5b-6f7a7203e2ab@redhat.com>
- <7f1ee7ea-0100-a7ac-4322-316ccc75d85f@redhat.com>
- <8fc703aa-a256-fdef-36a5-6faad3da47d6@redhat.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=5uRyMZIN45jCj2VKDrWR2a9G78BQWuHGJKl7OtHJZ6k=;
+        b=DHeRnk4eT+LOVbgwn97y98RvMKj3GWXY09rU3oc1TJ0wvPggX+4ISaRlargIA+AIrB
+         80gcn5dZfx/+1Khc+zbA3xEODsrm7cwIpKBmkhWEZ7sIH8wqGKa9ZEH/1wORWRhW93UM
+         ZAIPQwl02CdNY3KxZ9G1WcjulHEvmN9raudJ+GPBoYjaAJo7G1lH6ImJ1M77iOOTOdqK
+         g1yCHGZJfefc9mkBoJhWeWduOGAPLRc5vv1Hnm/rSEFs0tk2AUtJP+9TUv54eY7vRkI0
+         dffd7wbZuLy01uEZZ6J/LYvgnUsH56HSZg3Gd2teOjBd4HXsPsDVGrs6saPNmmM3lXuV
+         KFTQ==
+X-Gm-Message-State: AOAM531HNGfNwuBAasACd/HxcVBrRyl14bVFBSZcQl5Vqh9hc7NM2XVD
+        1klE3IB4Rig9uUrFoqqWyNAEuZ2B3lugsJhRXL6ZraOAgzOJacMfrgivghQueZYVecHGeZCqMPv
+        fvjPx2VOb/mlv
+X-Received: by 2002:a17:907:72d4:: with SMTP id du20mr27123530ejc.324.1635348988851;
+        Wed, 27 Oct 2021 08:36:28 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwlnTQW53CgmXIn8to0kDTGFp7NuPe5vIqIt10aS0tdUzKBzxmlSrEKcMCaMlb8sNDTKtez8Q==
+X-Received: by 2002:a17:907:72d4:: with SMTP id du20mr27123484ejc.324.1635348988605;
+        Wed, 27 Oct 2021 08:36:28 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id dx2sm110885ejb.125.2021.10.27.08.36.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 Oct 2021 08:36:26 -0700 (PDT)
+Message-ID: <185502d7-861e-fa5c-b225-419710fe77ed@redhat.com>
+Date:   Wed, 27 Oct 2021 17:36:18 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <8fc703aa-a256-fdef-36a5-6faad3da47d6@redhat.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH v2 35/43] KVM: SVM: Signal AVIC doorbell iff vCPU is in
+ guest mode
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Anup Patel <anup.patel@wdc.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Atish Patra <atish.patra@wdc.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        David Matlack <dmatlack@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+References: <20211009021236.4122790-1-seanjc@google.com>
+ <20211009021236.4122790-36-seanjc@google.com>
+ <0333be2a-76d8-657a-6c82-3bb5c9ff2e3b@redhat.com>
+ <YXlrEWmBohaDXmqL@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <YXlrEWmBohaDXmqL@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 27, 2021 at 04:11:38PM +0200, Philippe Mathieu-Daudé wrote:
-> On 10/27/21 16:04, David Hildenbrand wrote:
-> > On 27.10.21 15:36, Philippe Mathieu-Daudé wrote:
-> >> On 10/27/21 14:45, David Hildenbrand wrote:
-> >>> Let's return the number of free slots instead of only checking if there
-> >>> is a free slot. Required to support memory devices that consume multiple
-> >>> memslots.
-> >>>
-> >>> Signed-off-by: David Hildenbrand <david@redhat.com>
-> >>> ---
-> >>>  hw/mem/memory-device.c    | 2 +-
-> >>>  hw/virtio/vhost-stub.c    | 2 +-
-> >>>  hw/virtio/vhost.c         | 4 ++--
-> >>>  include/hw/virtio/vhost.h | 2 +-
-> >>>  4 files changed, 5 insertions(+), 5 deletions(-)
+On 27/10/21 17:06, Sean Christopherson wrote:
+>> Does this still need to check the "running" flag?  That should be a strict
+>> superset of vcpu->mode == IN_GUEST_MODE.
+>
+> No.  Signalling the doorbell when "running" is set but the vCPU is not in the
+> guest is just an expensive nop.  So even if KVM were to rework its handling of
+> "running" to set the flag immediately before VMRUN and clear it immediately after,
+> keying off IN_GUEST_MODE and not "running" would not be wrong, just sub-optimal.
 > 
-> >>> -bool vhost_has_free_slot(void)
-> >>> +unsigned int vhost_get_free_memslots(void)
-> >>>  {
-> >>>      return true;
-> >>
-> >>        return 0;
-> > 
-> > Oh wait, no. This actually has to be
-> > 
-> > "return ~0U;" (see real vhost_get_free_memslots())
-> > 
-> > ... because there is no vhost and consequently no limit applies.
-> 
-> Indeed.
-> 
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> I doubt KVM will ever make the "running" flag super precise, because keeping the
+> flag set when the vCPU is loaded avoids VM-Exits on other vCPUs due to undelivered
+> IPIs.
 
-confused. are you acking the theoretical patch with ~0 here?
+Right, so should we drop the "if (running)" check in this patch, at the 
+same time as it's adding the IN_GUEST_MODE check?
+
+Paolo
 
