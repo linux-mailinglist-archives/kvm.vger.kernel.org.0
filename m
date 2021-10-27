@@ -2,63 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AF25543CACB
-	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 15:36:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4491543CACC
+	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 15:37:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242212AbhJ0NjE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Oct 2021 09:39:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:39747 "EHLO
+        id S236689AbhJ0Njw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Oct 2021 09:39:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35487 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S242206AbhJ0NjB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 27 Oct 2021 09:39:01 -0400
+        by vger.kernel.org with ESMTP id S235710AbhJ0Njv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 Oct 2021 09:39:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635341795;
+        s=mimecast20190719; t=1635341845;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1SrQ6jaJilOp1yrFZ9zv1K0mKYN/sJK782ufNt11Lqg=;
-        b=YY1w9MQyOT9KAyRGLKD/AQaWbkrn7hRlkcYSpFtSERKiQVSZbeT6R4dtcIeVPDR11mTvDa
-        OmLNEKn2enBALKvw9JakdPAeMz1Ujo/CTIl/AljvE6pVy+DR0oqMZQDk6V7ulPdCWpPMF3
-        xYKvqiQMgkXxZATF3doTrW6L9UvZ43Q=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-426-_co_vZc2OXa_F43K1JT6uQ-1; Wed, 27 Oct 2021 09:36:34 -0400
-X-MC-Unique: _co_vZc2OXa_F43K1JT6uQ-1
-Received: by mail-wr1-f69.google.com with SMTP id f18-20020a5d58f2000000b001645b92c65bso677293wrd.6
-        for <kvm@vger.kernel.org>; Wed, 27 Oct 2021 06:36:34 -0700 (PDT)
+        bh=Ut7JFSM6pT1dCI/plvMy2BAlhUzvqJVXt8BhFqSqPVU=;
+        b=CoCxm7dncniwko/9FMSbtKMGFg3CMW2RPC54SXOhdOkncu2zOm6fPZlZUF4zSRWQ0XmLTL
+        am7/Er0GRl5KVzZAqy77mlmIe1i55eaUOnu4fA9fYDINCN5vDa6JXR8a3F0agaPG6tjlnR
+        /sVml1t4YrsHY7spVOACIHRHtQtec/4=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-418-RKSoTTqANW2LyPhL8a7OEA-1; Wed, 27 Oct 2021 09:37:24 -0400
+X-MC-Unique: RKSoTTqANW2LyPhL8a7OEA-1
+Received: by mail-wm1-f70.google.com with SMTP id l187-20020a1c25c4000000b0030da46b76daso1984930wml.9
+        for <kvm@vger.kernel.org>; Wed, 27 Oct 2021 06:37:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
+         :content-language:to:cc:references:from:organization:in-reply-to
          :content-transfer-encoding;
-        bh=1SrQ6jaJilOp1yrFZ9zv1K0mKYN/sJK782ufNt11Lqg=;
-        b=C1LhLV7ABuS35SoGkmBL7qmnVoLy8C/D6WVa+EGaGqIk4VzihoKMxOzORpTG5pUAzW
-         uFBBXyR/IQ7xChsyZ03WM5cLMygHJUWnKh3wEWKj1IGQky1pap80CRjvjwjQwhPIIL9Y
-         +oBsprdXVqxW+Au8HCT1J+hr9gxAEF70ot5Q5mTcmjP0NvDJhQ64YFYCJzolwJlkSUo1
-         00WJ5FUhiWmMBGEV4zzmTSI4UINE7rjb4dE4+hluXSxnrLaWOqXphP1W7yRLc4MSbNX0
-         46Ml3QYqMsL/CfR2Jyymxu4xd2pkF70EztLM3YFKKWUII63TbZCfEutaE6S1jCHOtCND
-         kz5Q==
-X-Gm-Message-State: AOAM533qYTQPSe4zgJOypW9xrNcliYV2+i0oNAWmLr0yc0oXUis1LRNb
-        vXoMoIS7CNpz/whcjuVu1iHxYH87I+OJ7TR/+qiX1WaVo3CkcocuhpVtw4vypQEM7iRCEpCjfqP
-        R6z2x7X/FLe0c
-X-Received: by 2002:a5d:59aa:: with SMTP id p10mr40379625wrr.45.1635341793211;
-        Wed, 27 Oct 2021 06:36:33 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwEOZHXkux47bJsEHIMV3VqdLetz3CsBoRWhuCRjNcgcHCrOfHRroHar5PFK0+IW5n+RlAcsw==
-X-Received: by 2002:a5d:59aa:: with SMTP id p10mr40379584wrr.45.1635341793004;
-        Wed, 27 Oct 2021 06:36:33 -0700 (PDT)
-Received: from [192.168.1.36] (62.red-83-57-168.dynamicip.rima-tde.net. [83.57.168.62])
-        by smtp.gmail.com with ESMTPSA id l6sm3788173wmq.17.2021.10.27.06.36.31
+        bh=Ut7JFSM6pT1dCI/plvMy2BAlhUzvqJVXt8BhFqSqPVU=;
+        b=hHgQuCjpZGhYfnFcJlIq7aZseZ3OovvjPZ7BXqeIqsohYsGXh0+fvqpl8IfQ9zojpB
+         UoawiHw8lNfPLNnwHh2WUZenQOMJbBioHvr5BR9ekzNTNKY7NtIxXndjs0y6PFIN3wJR
+         TjY41WQHohroM6LHRWQ52O+WrLY9LN0OA0JaykDZUM6p1lvrCZXB1uiBhynEmDuSFo3n
+         BzFeN/NBgLCDVOFBoM9Jz7FqvsetmBFhBbMpgJyo4pYpcn6in5akuEi3B9BBWHLe34DI
+         fOdr90YhOj1D2ue8MLZ7m5wfvnCRFwfrOAdRl3UIhlKnlr51XN8beLttJ1n4GjNwtcCJ
+         X94A==
+X-Gm-Message-State: AOAM533Ib4nmw/a83108cpyO4B1HDObWxzr/aNqLBkmMGjTZTBaenTVS
+        A3rUF7OXtkPXjY3N975f+pNZsFFly/k7sMWYn8lsOMjn/LNeacSUzfQwANxWFec+9b6A54/sS+k
+        Uhxp9l6Ua8INc
+X-Received: by 2002:a05:6000:154b:: with SMTP id 11mr40214380wry.422.1635341843365;
+        Wed, 27 Oct 2021 06:37:23 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxSE64BO1997/KxNCx8CUwU8ijBlTBVBUYZasxWGQVPEl+UMA5zCI9OPkDTTnCzFDbSMFniRg==
+X-Received: by 2002:a05:6000:154b:: with SMTP id 11mr40214352wry.422.1635341843200;
+        Wed, 27 Oct 2021 06:37:23 -0700 (PDT)
+Received: from [192.168.3.132] (p4ff23d76.dip0.t-ipconnect.de. [79.242.61.118])
+        by smtp.gmail.com with ESMTPSA id a4sm3300928wmb.39.2021.10.27.06.37.22
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Oct 2021 06:36:32 -0700 (PDT)
-Message-ID: <4ce74e8f-080d-9a0d-1b5b-6f7a7203e2ab@redhat.com>
-Date:   Wed, 27 Oct 2021 15:36:31 +0200
+        Wed, 27 Oct 2021 06:37:22 -0700 (PDT)
+Message-ID: <a656bb15-0bf1-1738-c6de-6db31bc269c2@redhat.com>
+Date:   Wed, 27 Oct 2021 15:37:21 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
+ Thunderbird/91.1.0
 Subject: Re: [PATCH v1 02/12] vhost: Return number of free memslots
 Content-Language: en-US
-To:     David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+        qemu-devel@nongnu.org
 Cc:     Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
         "Michael S. Tsirkin" <mst@redhat.com>,
         Richard Henderson <richard.henderson@linaro.org>,
@@ -72,39 +73,47 @@ Cc:     Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
         Hui Zhu <teawater@gmail.com>
 References: <20211027124531.57561-1-david@redhat.com>
  <20211027124531.57561-3-david@redhat.com>
-From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-In-Reply-To: <20211027124531.57561-3-david@redhat.com>
+ <4ce74e8f-080d-9a0d-1b5b-6f7a7203e2ab@redhat.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+In-Reply-To: <4ce74e8f-080d-9a0d-1b5b-6f7a7203e2ab@redhat.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/27/21 14:45, David Hildenbrand wrote:
-> Let's return the number of free slots instead of only checking if there
-> is a free slot. Required to support memory devices that consume multiple
-> memslots.
+On 27.10.21 15:36, Philippe Mathieu-Daudé wrote:
+> On 10/27/21 14:45, David Hildenbrand wrote:
+>> Let's return the number of free slots instead of only checking if there
+>> is a free slot. Required to support memory devices that consume multiple
+>> memslots.
+>>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> ---
+>>  hw/mem/memory-device.c    | 2 +-
+>>  hw/virtio/vhost-stub.c    | 2 +-
+>>  hw/virtio/vhost.c         | 4 ++--
+>>  include/hw/virtio/vhost.h | 2 +-
+>>  4 files changed, 5 insertions(+), 5 deletions(-)
 > 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  hw/mem/memory-device.c    | 2 +-
->  hw/virtio/vhost-stub.c    | 2 +-
->  hw/virtio/vhost.c         | 4 ++--
->  include/hw/virtio/vhost.h | 2 +-
->  4 files changed, 5 insertions(+), 5 deletions(-)
+>> --- a/hw/virtio/vhost-stub.c
+>> +++ b/hw/virtio/vhost-stub.c
+>> @@ -2,7 +2,7 @@
+>>  #include "hw/virtio/vhost.h"
+>>  #include "hw/virtio/vhost-user.h"
+>>  
+>> -bool vhost_has_free_slot(void)
+>> +unsigned int vhost_get_free_memslots(void)
+>>  {
+>>      return true;
+> 
+>        return 0;
 
-> --- a/hw/virtio/vhost-stub.c
-> +++ b/hw/virtio/vhost-stub.c
-> @@ -2,7 +2,7 @@
->  #include "hw/virtio/vhost.h"
->  #include "hw/virtio/vhost-user.h"
->  
-> -bool vhost_has_free_slot(void)
-> +unsigned int vhost_get_free_memslots(void)
->  {
->      return true;
+Thanks, nice catch!
 
-       return 0;
+-- 
+Thanks,
 
->  }
+David / dhildenb
 
