@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 348A743C7E2
-	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 12:45:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9379543C7E5
+	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 12:45:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241524AbhJ0Krc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Oct 2021 06:47:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20798 "EHLO
+        id S241513AbhJ0Krl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Oct 2021 06:47:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35265 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241507AbhJ0Kr2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 27 Oct 2021 06:47:28 -0400
+        by vger.kernel.org with ESMTP id S236103AbhJ0Krk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 Oct 2021 06:47:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635331502;
+        s=mimecast20190719; t=1635331515;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=dsTW88JLxmgtPXVjSysbobchSF9Z8lO6SXfy0oNtT3s=;
-        b=cCVVbAVJRbTounO52FfqsmKjVShy41xLOjfuRkD8V+kos2M6MoIOwYdSZiTzFZEjw6Bkux
-        jowqfHgoffGPRIQLCbJ3RN/eUKPoRpkPCsjZ0E3g6UVhRNrkFC/rvrqS5U6W9eWLiiD72q
-        ixDSzVwOSYlDlCNOFdIGCaV80WJkwoY=
+        bh=DYKtuFeI92e2qzvw3oJX8Blw0OOiqQbveU+79Ggu+Ko=;
+        b=DBFfLoc6s/scvG4esosZwWpJQxFJUvPZrHxwTEYeQ6BVmOO+TKJ9h9NDnetb5MC36hqnDf
+        5ey4RyT2HMTM+eyOYxTQTxU3NEuYIeNwdmGBZQdHb5lRCapqV7ScCkbk1hBGvgIw8R7pNB
+        aTk5wbYmv5qS+lzUQSl8n6HC8TEkX3A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-261-SwsB4E-xMYmszDiSO5eE_A-1; Wed, 27 Oct 2021 06:44:59 -0400
-X-MC-Unique: SwsB4E-xMYmszDiSO5eE_A-1
+ us-mta-520-XEWrSar_PfGWmbj8tWOsww-1; Wed, 27 Oct 2021 06:45:13 -0400
+X-MC-Unique: XEWrSar_PfGWmbj8tWOsww-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E2C7610A8E00;
-        Wed, 27 Oct 2021 10:44:55 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EFD3A19200C0;
+        Wed, 27 Oct 2021 10:45:09 +0000 (UTC)
 Received: from laptop.redhat.com (unknown [10.39.193.154])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 216A0100238C;
-        Wed, 27 Oct 2021 10:44:48 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 44FDC100E12D;
+        Wed, 27 Oct 2021 10:44:56 +0000 (UTC)
 From:   Eric Auger <eric.auger@redhat.com>
 To:     eric.auger.pro@gmail.com, eric.auger@redhat.com,
         iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
@@ -48,9 +48,9 @@ Cc:     alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com,
         sumitg@nvidia.com, nicolinc@nvidia.com, vdumpa@nvidia.com,
         zhangfei.gao@linaro.org, zhangfei.gao@gmail.com,
         lushenming@huawei.com, vsethi@nvidia.com
-Subject: [RFC v16 1/9] iommu: Introduce attach/detach_pasid_table API
-Date:   Wed, 27 Oct 2021 12:44:20 +0200
-Message-Id: <20211027104428.1059740-2-eric.auger@redhat.com>
+Subject: [RFC v16 2/9] iommu: Introduce iommu_get_nesting
+Date:   Wed, 27 Oct 2021 12:44:21 +0200
+Message-Id: <20211027104428.1059740-3-eric.auger@redhat.com>
 In-Reply-To: <20211027104428.1059740-1-eric.auger@redhat.com>
 References: <20211027104428.1059740-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -60,250 +60,162 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In virtualization use case, when a guest is assigned
-a PCI host device, protected by a virtual IOMMU on the guest,
-the physical IOMMU must be programmed to be consistent with
-the guest mappings. If the physical IOMMU supports two
-translation stages it makes sense to program guest mappings
-onto the first stage/level (ARM/Intel terminology) while the host
-owns the stage/level 2.
+Add iommu_get_nesting() which allow to retrieve whether a domain
+uses nested stages.
 
-In that case, it is mandated to trap on guest configuration
-settings and pass those to the physical iommu driver.
-
-This patch adds a new API to the iommu subsystem that allows
-to set/unset the pasid table information.
-
-A generic iommu_pasid_table_config struct is introduced in
-a new iommu.h uapi header. This is going to be used by the VFIO
-user API.
-
-Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
-Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
-Signed-off-by: Ashok Raj <ashok.raj@intel.com>
-Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
-
 ---
+ drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c |  8 ++++++++
+ drivers/iommu/arm/arm-smmu/arm-smmu.c       |  8 ++++++++
+ drivers/iommu/intel/iommu.c                 | 13 +++++++++++++
+ drivers/iommu/iommu.c                       | 10 ++++++++++
+ include/linux/iommu.h                       |  8 ++++++++
+ 5 files changed, 47 insertions(+)
 
-v13 -> v14:
-- export iommu_attach_pasid_table
-- add dummy iommu_uapi_attach_pasid_table
-- swap base_ptr and format in iommu_pasid_table_config
-
-v12 -> v13:
-- Fix config check
-
-v11 -> v12:
-- add argsz, name the union
----
- drivers/iommu/iommu.c      | 69 ++++++++++++++++++++++++++++++++++++++
- include/linux/iommu.h      | 27 +++++++++++++++
- include/uapi/linux/iommu.h | 54 +++++++++++++++++++++++++++++
- 3 files changed, 150 insertions(+)
-
+diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+index a388e318f86e..61477853a536 100644
+--- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
++++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+@@ -2731,6 +2731,13 @@ static int arm_smmu_enable_nesting(struct iommu_domain *domain)
+ 	return ret;
+ }
+ 
++static bool arm_smmu_get_nesting(struct iommu_domain *domain)
++{
++	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
++
++	return smmu_domain->stage == ARM_SMMU_DOMAIN_NESTED;
++}
++
+ static int arm_smmu_of_xlate(struct device *dev, struct of_phandle_args *args)
+ {
+ 	return iommu_fwspec_add_ids(dev, args->args, 1);
+@@ -2845,6 +2852,7 @@ static struct iommu_ops arm_smmu_ops = {
+ 	.release_device		= arm_smmu_release_device,
+ 	.device_group		= arm_smmu_device_group,
+ 	.enable_nesting		= arm_smmu_enable_nesting,
++	.get_nesting		= arm_smmu_get_nesting,
+ 	.of_xlate		= arm_smmu_of_xlate,
+ 	.get_resv_regions	= arm_smmu_get_resv_regions,
+ 	.put_resv_regions	= generic_iommu_put_resv_regions,
+diff --git a/drivers/iommu/arm/arm-smmu/arm-smmu.c b/drivers/iommu/arm/arm-smmu/arm-smmu.c
+index 4bc75c4ce402..167cf1d51279 100644
+--- a/drivers/iommu/arm/arm-smmu/arm-smmu.c
++++ b/drivers/iommu/arm/arm-smmu/arm-smmu.c
+@@ -1522,6 +1522,13 @@ static int arm_smmu_enable_nesting(struct iommu_domain *domain)
+ 	return ret;
+ }
+ 
++static bool arm_smmu_get_nesting(struct iommu_domain *domain)
++{
++	struct arm_smmu_domain *smmu_domain = to_smmu_domain(domain);
++
++	return smmu_domain->stage == ARM_SMMU_DOMAIN_NESTED;
++}
++
+ static int arm_smmu_set_pgtable_quirks(struct iommu_domain *domain,
+ 		unsigned long quirks)
+ {
+@@ -1595,6 +1602,7 @@ static struct iommu_ops arm_smmu_ops = {
+ 	.probe_finalize		= arm_smmu_probe_finalize,
+ 	.device_group		= arm_smmu_device_group,
+ 	.enable_nesting		= arm_smmu_enable_nesting,
++	.get_nesting		= arm_smmu_get_nesting,
+ 	.set_pgtable_quirks	= arm_smmu_set_pgtable_quirks,
+ 	.of_xlate		= arm_smmu_of_xlate,
+ 	.get_resv_regions	= arm_smmu_get_resv_regions,
+diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
+index d75f59ae28e6..e42767bd47f9 100644
+--- a/drivers/iommu/intel/iommu.c
++++ b/drivers/iommu/intel/iommu.c
+@@ -5524,6 +5524,18 @@ intel_iommu_enable_nesting(struct iommu_domain *domain)
+ 	return ret;
+ }
+ 
++static bool intel_iommu_get_nesting(struct iommu_domain *domain)
++{
++	struct dmar_domain *dmar_domain = to_dmar_domain(domain);
++	bool nesting;
++
++	spin_lock_irqsave(&device_domain_lock, flags);
++	nesting =  dmar_domain->flags & DOMAIN_FLAG_NESTING_MODE &&
++		   !(dmar_domain->flags & DOMAIN_FLAG_USE_FIRST_LEVEL);
++	spin_unlock_irqrestore(&device_domain_lock, flags);
++	return nesting;
++}
++
+ /*
+  * Check that the device does not live on an external facing PCI port that is
+  * marked as untrusted. Such devices should not be able to apply quirks and
+@@ -5561,6 +5573,7 @@ const struct iommu_ops intel_iommu_ops = {
+ 	.domain_alloc		= intel_iommu_domain_alloc,
+ 	.domain_free		= intel_iommu_domain_free,
+ 	.enable_nesting		= intel_iommu_enable_nesting,
++	.get_nesting		= intel_iommu_get_nesting,
+ 	.attach_dev		= intel_iommu_attach_device,
+ 	.detach_dev		= intel_iommu_detach_device,
+ 	.aux_attach_dev		= intel_iommu_aux_attach_device,
 diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-index 3303d707bab4..6033c263c6e6 100644
+index 6033c263c6e6..3e639c4e8015 100644
 --- a/drivers/iommu/iommu.c
 +++ b/drivers/iommu/iommu.c
-@@ -2236,6 +2236,75 @@ int iommu_uapi_sva_unbind_gpasid(struct iommu_domain *domain, struct device *dev
+@@ -2843,6 +2843,16 @@ int iommu_enable_nesting(struct iommu_domain *domain)
  }
- EXPORT_SYMBOL_GPL(iommu_uapi_sva_unbind_gpasid);
+ EXPORT_SYMBOL_GPL(iommu_enable_nesting);
  
-+int iommu_attach_pasid_table(struct iommu_domain *domain,
-+			     struct iommu_pasid_table_config *cfg)
++bool iommu_get_nesting(struct iommu_domain *domain)
 +{
-+	if (unlikely(!domain->ops->attach_pasid_table))
-+		return -ENODEV;
-+
-+	return domain->ops->attach_pasid_table(domain, cfg);
++	if (domain->type != IOMMU_DOMAIN_UNMANAGED)
++		return false;
++	if (!domain->ops->enable_nesting)
++		return false;
++	return domain->ops->get_nesting(domain);
 +}
-+EXPORT_SYMBOL_GPL(iommu_attach_pasid_table);
++EXPORT_SYMBOL_GPL(iommu_get_nesting);
 +
-+int iommu_uapi_attach_pasid_table(struct iommu_domain *domain,
-+				  void __user *uinfo)
-+{
-+	struct iommu_pasid_table_config pasid_table_data = { 0 };
-+	u32 minsz;
-+
-+	if (unlikely(!domain->ops->attach_pasid_table))
-+		return -ENODEV;
-+
-+	/*
-+	 * No new spaces can be added before the variable sized union, the
-+	 * minimum size is the offset to the union.
-+	 */
-+	minsz = offsetof(struct iommu_pasid_table_config, vendor_data);
-+
-+	/* Copy minsz from user to get flags and argsz */
-+	if (copy_from_user(&pasid_table_data, uinfo, minsz))
-+		return -EFAULT;
-+
-+	/* Fields before the variable size union are mandatory */
-+	if (pasid_table_data.argsz < minsz)
-+		return -EINVAL;
-+
-+	/* PASID and address granu require additional info beyond minsz */
-+	if (pasid_table_data.version != PASID_TABLE_CFG_VERSION_1)
-+		return -EINVAL;
-+	if (pasid_table_data.format == IOMMU_PASID_FORMAT_SMMUV3 &&
-+	    pasid_table_data.argsz <
-+		offsetofend(struct iommu_pasid_table_config, vendor_data.smmuv3))
-+		return -EINVAL;
-+
-+	/*
-+	 * User might be using a newer UAPI header which has a larger data
-+	 * size, we shall support the existing flags within the current
-+	 * size. Copy the remaining user data _after_ minsz but not more
-+	 * than the current kernel supported size.
-+	 */
-+	if (copy_from_user((void *)&pasid_table_data + minsz, uinfo + minsz,
-+			   min_t(u32, pasid_table_data.argsz, sizeof(pasid_table_data)) - minsz))
-+		return -EFAULT;
-+
-+	/* Now the argsz is validated, check the content */
-+	if (pasid_table_data.config < IOMMU_PASID_CONFIG_TRANSLATE ||
-+	    pasid_table_data.config > IOMMU_PASID_CONFIG_ABORT)
-+		return -EINVAL;
-+
-+	return domain->ops->attach_pasid_table(domain, &pasid_table_data);
-+}
-+EXPORT_SYMBOL_GPL(iommu_uapi_attach_pasid_table);
-+
-+void iommu_detach_pasid_table(struct iommu_domain *domain)
-+{
-+	if (unlikely(!domain->ops->detach_pasid_table))
-+		return;
-+
-+	domain->ops->detach_pasid_table(domain);
-+}
-+EXPORT_SYMBOL_GPL(iommu_detach_pasid_table);
-+
- static void __iommu_detach_device(struct iommu_domain *domain,
- 				  struct device *dev)
+ int iommu_set_pgtable_quirks(struct iommu_domain *domain,
+ 		unsigned long quirk)
  {
 diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index d2f3435e7d17..e34a1b1c805b 100644
+index e34a1b1c805b..846e19151f40 100644
 --- a/include/linux/iommu.h
 +++ b/include/linux/iommu.h
-@@ -232,6 +232,8 @@ struct iommu_iotlb_gather {
-  * @cache_invalidate: invalidate translation caches
-  * @sva_bind_gpasid: bind guest pasid and mm
-  * @sva_unbind_gpasid: unbind guest pasid and mm
-+ * @attach_pasid_table: attach a pasid table
-+ * @detach_pasid_table: detach the pasid table
-  * @def_domain_type: device default domain type, return value:
-  *		- IOMMU_DOMAIN_IDENTITY: must use an identity domain
-  *		- IOMMU_DOMAIN_DMA: must use a dma domain
-@@ -297,6 +299,9 @@ struct iommu_ops {
- 				      void *drvdata);
- 	void (*sva_unbind)(struct iommu_sva *handle);
- 	u32 (*sva_get_pasid)(struct iommu_sva *handle);
-+	int (*attach_pasid_table)(struct iommu_domain *domain,
-+				  struct iommu_pasid_table_config *cfg);
-+	void (*detach_pasid_table)(struct iommu_domain *domain);
+@@ -213,6 +213,7 @@ struct iommu_iotlb_gather {
+  *                  group and attached to the groups domain
+  * @device_group: find iommu group for a particular device
+  * @enable_nesting: Enable nesting
++ * @get_nesting: get whether the domain uses nested stages
+  * @set_pgtable_quirks: Set io page table quirks (IO_PGTABLE_QUIRK_*)
+  * @get_resv_regions: Request list of reserved regions for a device
+  * @put_resv_regions: Free list of reserved regions for a device
+@@ -271,6 +272,7 @@ struct iommu_ops {
+ 	void (*probe_finalize)(struct device *dev);
+ 	struct iommu_group *(*device_group)(struct device *dev);
+ 	int (*enable_nesting)(struct iommu_domain *domain);
++	bool (*get_nesting)(struct iommu_domain *domain);
+ 	int (*set_pgtable_quirks)(struct iommu_domain *domain,
+ 				  unsigned long quirks);
  
- 	int (*page_response)(struct device *dev,
- 			     struct iommu_fault_event *evt,
-@@ -430,6 +435,11 @@ extern int iommu_uapi_sva_unbind_gpasid(struct iommu_domain *domain,
- 					struct device *dev, void __user *udata);
- extern int iommu_sva_unbind_gpasid(struct iommu_domain *domain,
- 				   struct device *dev, ioasid_t pasid);
-+extern int iommu_attach_pasid_table(struct iommu_domain *domain,
-+				    struct iommu_pasid_table_config *cfg);
-+extern int iommu_uapi_attach_pasid_table(struct iommu_domain *domain,
-+					 void __user *udata);
-+extern void iommu_detach_pasid_table(struct iommu_domain *domain);
- extern struct iommu_domain *iommu_get_domain_for_dev(struct device *dev);
- extern struct iommu_domain *iommu_get_dma_domain(struct device *dev);
- extern int iommu_map(struct iommu_domain *domain, unsigned long iova,
-@@ -1035,6 +1045,23 @@ iommu_aux_get_pasid(struct iommu_domain *domain, struct device *dev)
- 	return -ENODEV;
- }
+@@ -690,6 +692,7 @@ struct iommu_sva *iommu_sva_bind_device(struct device *dev,
+ 					void *drvdata);
+ void iommu_sva_unbind_device(struct iommu_sva *handle);
+ u32 iommu_sva_get_pasid(struct iommu_sva *handle);
++bool iommu_get_nesting(struct iommu_domain *domain);
  
-+static inline
-+int iommu_attach_pasid_table(struct iommu_domain *domain,
-+			     struct iommu_pasid_table_config *cfg)
-+{
-+	return -ENODEV;
-+}
-+
-+static inline
-+int iommu_uapi_attach_pasid_table(struct iommu_domain *domain,
-+				  void __user *uinfo)
-+{
-+	return -ENODEV;
-+}
-+
-+static inline
-+void iommu_detach_pasid_table(struct iommu_domain *domain) {}
-+
- static inline struct iommu_sva *
- iommu_sva_bind_device(struct device *dev, struct mm_struct *mm, void *drvdata)
+ #else /* CONFIG_IOMMU_API */
+ 
+@@ -1108,6 +1111,11 @@ static inline struct iommu_fwspec *dev_iommu_fwspec_get(struct device *dev)
  {
-diff --git a/include/uapi/linux/iommu.h b/include/uapi/linux/iommu.h
-index 59178fc229ca..8c079a78dfec 100644
---- a/include/uapi/linux/iommu.h
-+++ b/include/uapi/linux/iommu.h
-@@ -339,4 +339,58 @@ struct iommu_gpasid_bind_data {
- 	} vendor;
- };
+ 	return NULL;
+ }
++
++static inline bool iommu_get_nesting(struct iommu_domain *domain)
++{
++	return false;
++}
+ #endif /* CONFIG_IOMMU_API */
  
-+/**
-+ * struct iommu_pasid_smmuv3 - ARM SMMUv3 Stream Table Entry stage 1 related
-+ *     information
-+ * @version: API version of this structure
-+ * @s1fmt: STE s1fmt (format of the CD table: single CD, linear table
-+ *         or 2-level table)
-+ * @s1dss: STE s1dss (specifies the behavior when @pasid_bits != 0
-+ *         and no PASID is passed along with the incoming transaction)
-+ * @padding: reserved for future use (should be zero)
-+ *
-+ * The PASID table is referred to as the Context Descriptor (CD) table on ARM
-+ * SMMUv3. Please refer to the ARM SMMU 3.x spec (ARM IHI 0070A) for full
-+ * details.
-+ */
-+struct iommu_pasid_smmuv3 {
-+#define PASID_TABLE_SMMUV3_CFG_VERSION_1 1
-+	__u32	version;
-+	__u8	s1fmt;
-+	__u8	s1dss;
-+	__u8	padding[2];
-+};
-+
-+/**
-+ * struct iommu_pasid_table_config - PASID table data used to bind guest PASID
-+ *     table to the host IOMMU
-+ * @argsz: User filled size of this data
-+ * @version: API version to prepare for future extensions
-+ * @base_ptr: guest physical address of the PASID table
-+ * @format: format of the PASID table
-+ * @pasid_bits: number of PASID bits used in the PASID table
-+ * @config: indicates whether the guest translation stage must
-+ *          be translated, bypassed or aborted.
-+ * @padding: reserved for future use (should be zero)
-+ * @vendor_data.smmuv3: table information when @format is
-+ * %IOMMU_PASID_FORMAT_SMMUV3
-+ */
-+struct iommu_pasid_table_config {
-+	__u32	argsz;
-+#define PASID_TABLE_CFG_VERSION_1 1
-+	__u32	version;
-+	__u64	base_ptr;
-+#define IOMMU_PASID_FORMAT_SMMUV3	1
-+	__u32	format;
-+	__u8	pasid_bits;
-+#define IOMMU_PASID_CONFIG_TRANSLATE	1
-+#define IOMMU_PASID_CONFIG_BYPASS	2
-+#define IOMMU_PASID_CONFIG_ABORT	3
-+	__u8	config;
-+	__u8    padding[2];
-+	union {
-+		struct iommu_pasid_smmuv3 smmuv3;
-+	} vendor_data;
-+};
-+
- #endif /* _UAPI_IOMMU_H */
+ /**
 -- 
 2.26.3
 
