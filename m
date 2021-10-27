@@ -2,147 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A495443C829
-	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 12:57:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id CB46743C82C
+	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 12:58:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239934AbhJ0K7a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Oct 2021 06:59:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36442 "EHLO
+        id S239454AbhJ0LBC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Oct 2021 07:01:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54006 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239804AbhJ0K73 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 27 Oct 2021 06:59:29 -0400
+        by vger.kernel.org with ESMTP id S233865AbhJ0LBB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 Oct 2021 07:01:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635332223;
+        s=mimecast20190719; t=1635332315;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=q0cqoEHWoafdN/neNzYUeAZhdEpkcTz/8jBJYOGEWjQ=;
-        b=MjdPA2i37KSVL9JuUpe6F7hgc2uCocfLNY70l6lcl73NMAR5ff33SIiH6q26C3k0MMbEWX
-        kagjt6DZ97rfTYViECwQwDfGQSNWQ/9PxYSLtGFkTmQJXrfeNS6nHkMlPKzd9BoCk2B2vL
-        VUYjxkYgeqFK5mtEUxXF8mZf/kssvn4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-528-yDgbhhxWNqOR-mR8eneedg-1; Wed, 27 Oct 2021 06:57:00 -0400
-X-MC-Unique: yDgbhhxWNqOR-mR8eneedg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EAFF59F92B;
-        Wed, 27 Oct 2021 10:56:56 +0000 (UTC)
-Received: from starship (unknown [10.40.194.243])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BEBD457CA5;
-        Wed, 27 Oct 2021 10:56:44 +0000 (UTC)
-Message-ID: <4acc8c7fb3751be07953322a8334be140c2b153e.camel@redhat.com>
-Subject: Re: [PATCH v2 06/43] KVM: Refactor and document halt-polling stats
- update helper
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        David Matlack <dmatlack@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>
-Date:   Wed, 27 Oct 2021 13:56:43 +0300
-In-Reply-To: <20211009021236.4122790-7-seanjc@google.com>
-References: <20211009021236.4122790-1-seanjc@google.com>
-         <20211009021236.4122790-7-seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        bh=Qj8iuBeW+SwYxG4JX9Q8fVc5FJNZbXtV8v6zQfHvcBQ=;
+        b=QDLV2blBHAkMQ1RsqtZ2UZVyfoFdSmlvPqt7BBr/Jpy7KSvj+nJlUETNTZ+dONUuMdpztz
+        xfTtqhFYjsPnHg4fi8ThANPkYF1N8Sbc7rBOogvhJARLxFPxbiHIgnjj98koqLFN9lz9U7
+        pfGgPx6uV39cZLlSRmU9au5P5Qq1Fa8=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-509-XVomGmpCPvyimupKtIMhEg-1; Wed, 27 Oct 2021 06:58:33 -0400
+X-MC-Unique: XVomGmpCPvyimupKtIMhEg-1
+Received: by mail-ed1-f72.google.com with SMTP id w7-20020a056402268700b003dd46823a18so1900218edd.18
+        for <kvm@vger.kernel.org>; Wed, 27 Oct 2021 03:58:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=Qj8iuBeW+SwYxG4JX9Q8fVc5FJNZbXtV8v6zQfHvcBQ=;
+        b=ikl72dNFxTiKreiORNMIqo+dEN1Zfd3r9Rt2kdX+ffSTqujKRdG21P5wgSYWu8CjLs
+         K86iTmCEsdil/HTgSKQ5ry/MHUPcI7EgRHgmEyN4IMzEkl42lbkh30OXEiOQJuSqGxRX
+         BI3bVh175HMP9/AsH7AkCy+YIhjlxdVuPf2vy2iHUQ/NqDYZ718+p+WV0YZ96mURYxdf
+         6kmjEeZAJ1f9i350yctSkCMczYEePjYgp41/ItwExtDrGd6+CB+uoI772MzQkx9zPexO
+         Wr/zbWUZ8qu4iZTySjNg2Y9cQnPmNyayeU+djoUfs1pQytWu+nFL5oxzc1d5Mi+I3teA
+         IZvw==
+X-Gm-Message-State: AOAM531DRC5w/DC3s5T+3tNuirrJJ4st/BvmEaWt14jcKmGDrNapHhCz
+        eR4tSIHAwjrwKumOdOk0RVyrL45X0wPuy1GRvhXYuatM8R2c+Z2mzPWS9xQI6aUzm6BZlWgzyYe
+        D3hmjHWo7D3+s
+X-Received: by 2002:a50:fd93:: with SMTP id o19mr521143edt.174.1635332312266;
+        Wed, 27 Oct 2021 03:58:32 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx8+o6dvUUaSaBXx8qz7NmzfUaR6FGeBVuoZSngvvAw9kfQvVWaceKd6ZFZNCZp9huNPMjDeg==
+X-Received: by 2002:a50:fd93:: with SMTP id o19mr521126edt.174.1635332312094;
+        Wed, 27 Oct 2021 03:58:32 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.gmail.com with ESMTPSA id p25sm12439125edt.23.2021.10.27.03.58.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 Oct 2021 03:58:31 -0700 (PDT)
+Message-ID: <1216740e-ba36-4f9b-d393-d6364c545a09@redhat.com>
+Date:   Wed, 27 Oct 2021 12:58:30 +0200
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH] MAINTAINERS: Update powerpc KVM entry
+Content-Language: en-US
+To:     Michael Ellerman <mpe@ellerman.id.au>,
+        linuxppc-dev@lists.ozlabs.org, paulus@samba.org
+Cc:     npiggin@gmail.com, kvm-ppc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20211027061646.540708-1-mpe@ellerman.id.au>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20211027061646.540708-1-mpe@ellerman.id.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2021-10-08 at 19:11 -0700, Sean Christopherson wrote:
-> Add a comment to document that halt-polling is considered successful even
-> if the polling loop itself didn't detect a wake event, i.e. if a wake
-> event was detect in the final kvm_vcpu_check_block().  Invert the param
-> to update helper so that the helper is a dumb function that is "told"
-> whether or not polling was successful, as opposed to determining success
-> based on blocking behavior.
+On 27/10/21 08:16, Michael Ellerman wrote:
+> Paul is no longer handling patches for kvmppc.
 > 
-> Opportunistically tweak the params to the update helper to reduce the
-> line length for the call site so that it fits on a single line, and so
-> that the prototype conforms to the more traditional kernel style.
+> Instead we'll treat them as regular powerpc patches, taking them via the
+> powerpc tree, using the topic/ppc-kvm branch when necessary.
 > 
-> No functional change intended.
+> Also drop the web reference, it doesn't have any information
+> specifically relevant to powerpc KVM.
 > 
-> Reviewed-by: David Matlack <dmatlack@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
 > ---
->  virt/kvm/kvm_main.c | 20 +++++++++++++-------
->  1 file changed, 13 insertions(+), 7 deletions(-)
+>   MAINTAINERS | 7 ++-----
+>   1 file changed, 2 insertions(+), 5 deletions(-)
 > 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 6156719bcbbc..4dfcd736b274 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -3201,13 +3201,15 @@ static int kvm_vcpu_check_block(struct kvm_vcpu *vcpu)
->  	return ret;
->  }
->  
-> -static inline void
-> -update_halt_poll_stats(struct kvm_vcpu *vcpu, u64 poll_ns, bool waited)
-> +static inline void update_halt_poll_stats(struct kvm_vcpu *vcpu, ktime_t start,
-> +					  ktime_t end, bool success)
->  {
-> -	if (waited)
-> -		vcpu->stat.generic.halt_poll_fail_ns += poll_ns;
-> -	else
-> +	u64 poll_ns = ktime_to_ns(ktime_sub(end, start));
-> +
-> +	if (success)
->  		vcpu->stat.generic.halt_poll_success_ns += poll_ns;
-> +	else
-> +		vcpu->stat.generic.halt_poll_fail_ns += poll_ns;
->  }
->  
->  /*
-> @@ -3277,9 +3279,13 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
->  	kvm_arch_vcpu_unblocking(vcpu);
->  	block_ns = ktime_to_ns(cur) - ktime_to_ns(start);
->  
-> +	/*
-> +	 * Note, halt-polling is considered successful so long as the vCPU was
-> +	 * never actually scheduled out, i.e. even if the wake event arrived
-> +	 * after of the halt-polling loop itself, but before the full wait.
-> +	 */
->  	if (do_halt_poll)
-> -		update_halt_poll_stats(
-> -			vcpu, ktime_to_ns(ktime_sub(poll_end, start)), waited);
-> +		update_halt_poll_stats(vcpu, start, poll_end, !waited);
->  
->  	if (halt_poll_allowed) {
->  		if (!vcpu_valid_wakeup(vcpu)) {
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index ca6d6fde85cf..fbfd3345c40d 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -10260,11 +10260,8 @@ F:	arch/mips/include/uapi/asm/kvm*
+>   F:	arch/mips/kvm/
+>   
+>   KERNEL VIRTUAL MACHINE FOR POWERPC (KVM/powerpc)
+> -M:	Paul Mackerras <paulus@ozlabs.org>
+> -L:	kvm-ppc@vger.kernel.org
+> -S:	Supported
+> -W:	http://www.linux-kvm.org/
+> -T:	git git://github.com/agraf/linux-2.6.git
+> +L:	linuxppc-dev@lists.ozlabs.org
+> +T:	git git://git.kernel.org/pub/scm/linux/kernel/git/powerpc/linux.git topic/ppc-kvm
+>   F:	arch/powerpc/include/asm/kvm*
+>   F:	arch/powerpc/include/uapi/asm/kvm*
+>   F:	arch/powerpc/kernel/kvm*
+> 
 
-Best regards,
-	Maxim Levitsky
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+
+Thanks Michael and Paul!
+
+Paolo
 
