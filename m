@@ -2,195 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F67B43CB1C
-	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 15:48:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D0AA443CB7E
+	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 16:04:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237526AbhJ0Nu4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Oct 2021 09:50:56 -0400
-Received: from vps-vb.mhejs.net ([37.28.154.113]:41838 "EHLO vps-vb.mhejs.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231458AbhJ0Nuz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Oct 2021 09:50:55 -0400
-Received: from MUA
-        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <mail@maciej.szmigiero.name>)
-        id 1mfjHu-0001RD-DR; Wed, 27 Oct 2021 15:48:18 +0200
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <cover.1632171478.git.maciej.szmigiero@oracle.com>
- <4f8718fc8da57ab799e95ef7c2060f8be0f2391f.1632171479.git.maciej.szmigiero@oracle.com>
- <YXhQEeNxi2+fAQPM@google.com>
-From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Subject: Re: [PATCH v5 13/13] KVM: Optimize overlapping memslots check
-Message-ID: <4222ead3-f80f-0992-569f-9e1a7adbabcc@maciej.szmigiero.name>
-Date:   Wed, 27 Oct 2021 15:48:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        id S237655AbhJ0OHA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Oct 2021 10:07:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53462 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237451AbhJ0OHA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 Oct 2021 10:07:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635343474;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=YN/bLTk9W4jFoqX1MmfKo8264P/GPmaZJoxCKcTGJ7Q=;
+        b=Tq3VzCvQUmCwLFaCf1O4NFwJ8K9mthZwQrSL3WJ5zLfEVqc504dh1XNTBGijxo+dVq2xjt
+        ze6O7DuyGI6oFFCBxktyAyX8r1ssNLVIj0a5Wuwi2Vnsqe3BTA5fyijNRqiKUZkrMenydS
+        vHuMRmymRWR8k0XDXYXgR9GkuwDXmFE=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-445-dk9gY1SdOlyBjkw0JI42Yg-1; Wed, 27 Oct 2021 10:04:33 -0400
+X-MC-Unique: dk9gY1SdOlyBjkw0JI42Yg-1
+Received: by mail-wm1-f72.google.com with SMTP id u14-20020a05600c19ce00b0030d8549d49aso1819376wmq.0
+        for <kvm@vger.kernel.org>; Wed, 27 Oct 2021 07:04:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:organization:in-reply-to
+         :content-transfer-encoding;
+        bh=YN/bLTk9W4jFoqX1MmfKo8264P/GPmaZJoxCKcTGJ7Q=;
+        b=KnFt+YmECPUxsh9fxxCkUYLTJ+1aRWu8Zyx2Fkdb05E5+nF1HAcF8ev0+Z8KrEnG6j
+         lVTxiUnDc4IRj09wpK9V9EXGqTYVgYZR0gEglinkR5jTXAaEH3ObHqWqG6bRl18/+2Uo
+         ATg89SzrSddnNmZEnFiKW49vBwHnY2rWN46TUOfZnLaPp0nify3nawQcImxtQI9Iujg6
+         4mOL/xSoiFT2nARBPq5wzG73a/nypAOY8MFQ6992Y/ZZKqzcVwSEN8M+88tYuwdyzKGo
+         gs0aFdyySFn2xJQqvzOAj6Bvewgw3DWa8+269oWPGKDYxc4SAKr7QRH2Gf7k7j/Lqu4P
+         DhIg==
+X-Gm-Message-State: AOAM5329O24vRNxhaKDgCNHGIA3tS9JJRmWUNaIsygsDNgEbn7EIRilu
+        67QjQYQ4k9P0mMTt8h3tIVgXE5m+s7AEmQ8NRVJYocuO/hmQ8xJt6GWgai55djADc04/CWKdrl6
+        vVXk4Fq0EGqB0
+X-Received: by 2002:a05:6000:18af:: with SMTP id b15mr39135212wri.359.1635343472025;
+        Wed, 27 Oct 2021 07:04:32 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyMG5hMHU+fqjF6OiSm16HnX+RXpo9rofMs4qTZ/GsQ4SgoEFZ97KLsPkMhH1j+K05s+YoZkQ==
+X-Received: by 2002:a05:6000:18af:: with SMTP id b15mr39135082wri.359.1635343471021;
+        Wed, 27 Oct 2021 07:04:31 -0700 (PDT)
+Received: from [192.168.3.132] (p4ff23d76.dip0.t-ipconnect.de. [79.242.61.118])
+        by smtp.gmail.com with ESMTPSA id 126sm3461950wmz.28.2021.10.27.07.04.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 Oct 2021 07:04:29 -0700 (PDT)
+Message-ID: <7f1ee7ea-0100-a7ac-4322-316ccc75d85f@redhat.com>
+Date:   Wed, 27 Oct 2021 16:04:28 +0200
 MIME-Version: 1.0
-In-Reply-To: <YXhQEeNxi2+fAQPM@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH v1 02/12] vhost: Return number of free memslots
 Content-Language: en-US
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+        qemu-devel@nongnu.org
+Cc:     Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        Sebastien Boeuf <sebastien.boeuf@intel.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Ani Sinha <ani@anisinha.ca>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Hui Zhu <teawater@gmail.com>
+References: <20211027124531.57561-1-david@redhat.com>
+ <20211027124531.57561-3-david@redhat.com>
+ <4ce74e8f-080d-9a0d-1b5b-6f7a7203e2ab@redhat.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+In-Reply-To: <4ce74e8f-080d-9a0d-1b5b-6f7a7203e2ab@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 26.10.2021 20:59, Sean Christopherson wrote:
-> On Mon, Sep 20, 2021, Maciej S. Szmigiero wrote:
->> From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+On 27.10.21 15:36, Philippe Mathieu-Daudé wrote:
+> On 10/27/21 14:45, David Hildenbrand wrote:
+>> Let's return the number of free slots instead of only checking if there
+>> is a free slot. Required to support memory devices that consume multiple
+>> memslots.
 >>
->> Do a quick lookup for possibly overlapping gfns when creating or moving
->> a memslot instead of performing a linear scan of the whole memslot set.
->>
->> Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+>> Signed-off-by: David Hildenbrand <david@redhat.com>
 >> ---
->>   virt/kvm/kvm_main.c | 36 +++++++++++++++++++++++++++---------
->>   1 file changed, 27 insertions(+), 9 deletions(-)
->>
->> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
->> index 5fea467d6fec..78dad8c6376f 100644
->> --- a/virt/kvm/kvm_main.c
->> +++ b/virt/kvm/kvm_main.c
->> @@ -1667,6 +1667,30 @@ static int kvm_delete_memslot(struct kvm *kvm,
->>   	return kvm_set_memslot(kvm, mem, old, &new, as_id, KVM_MR_DELETE);
->>   }
->>   
->> +static bool kvm_check_memslot_overlap(struct kvm_memslots *slots,
->> +				      struct kvm_memory_slot *nslot)
->> +{
->> +	int idx = slots->node_idx;
->> +	gfn_t nend = nslot->base_gfn + nslot->npages;
->> +	struct rb_node *node;
->> +
->> +	kvm_for_each_memslot_in_gfn_range(node, slots, nslot->base_gfn, nend) {
->> +		struct kvm_memory_slot *cslot;
->> +		gfn_t cend;
->> +
->> +		cslot = container_of(node, struct kvm_memory_slot, gfn_node[idx]);
->> +		cend = cslot->base_gfn + cslot->npages;
->> +		if (cslot->id == nslot->id)
->> +			continue;
->> +
->> +		/* kvm_for_each_in_gfn_no_more() guarantees that cslot->base_gfn < nend */
->> +		if (cend > nslot->base_gfn)
+>>  hw/mem/memory-device.c    | 2 +-
+>>  hw/virtio/vhost-stub.c    | 2 +-
+>>  hw/virtio/vhost.c         | 4 ++--
+>>  include/hw/virtio/vhost.h | 2 +-
+>>  4 files changed, 5 insertions(+), 5 deletions(-)
 > 
-> Hmm, IMO the need for this check means that kvm_for_each_memslot_in_gfn_range()
-> is flawed.  The user of kvm_for_each...() should not be responsible for skipping
-> memslots that do not actually overlap the requested range.  I.e. this function
-> should be no more than:
+>> --- a/hw/virtio/vhost-stub.c
+>> +++ b/hw/virtio/vhost-stub.c
+>> @@ -2,7 +2,7 @@
+>>  #include "hw/virtio/vhost.h"
+>>  #include "hw/virtio/vhost-user.h"
+>>  
+>> -bool vhost_has_free_slot(void)
+>> +unsigned int vhost_get_free_memslots(void)
+>>  {
+>>      return true;
 > 
-> static bool kvm_check_memslot_overlap(struct kvm_memslots *slots,
-> 				      struct kvm_memory_slot *slot)
-> {
-> 	gfn_t start = slot->base_gfn;
-> 	gfn_t end = start + slot->npages;
-> 
-> 	kvm_for_each_memslot_in_gfn_range(&iter, slots, start, end) {
-> 		if (iter.slot->id != slot->id)
-> 			return true;
-> 	}
-> 
-> 	return false;
-> }
-> 
-> 
-> and I suspect kvm_zap_gfn_range() could be further simplified as well.
-> 
-> Looking back at the introduction of the helper, its comment's highlighting of
-> "possibily" now makes sense.
-> 
->    /* Iterate over each memslot *possibly* intersecting [start, end) range */
->    #define kvm_for_each_memslot_in_gfn_range(node, slots, start, end)	\
-> 
-> That's an unnecessarily bad API.  It's a very solvable problem for the iterator
-> helpers to advance until there's actually overlap, not doing so violates the
-> principle of least surprise, and unless I'm missing something, there's no use
-> case for an "approximate" iteration.
+>        return 0;
 
-In principle this can be done, however this will complicate the gfn
-iterator logic - especially the kvm_memslot_iter_start() part, which
-will already get messier from open-coding kvm_memslots_gfn_upper_bound()
-there.
+Oh wait, no. This actually has to be
 
-At the same kvm_zap_gfn_range() will still need to do the memslot range
-<-> request range merging by itself as it does not want to process the
-whole returned memslot, but rather just the part that's actually
-overlapping its requested range.
+"return ~0U;" (see real vhost_get_free_memslots())
 
-In the worst case, the current code can return one memslot too much, so
-I don't think it's worth bringing additional complexity just to detect
-and skip it - it's not that uncommon to design an API that needs extra
-checking from its caller to cover some corner cases.
+... because there is no vhost and consequently no limit applies.
 
-For example, see pthread_cond_wait() or kernel waitqueues with their
-spurious wakeups or atomic_compare_exchange_weak() from C11.
-And these are higher level APIs than a very limited internal KVM one
-with just two callers.
-In case of kvm_zap_gfn_range() the necessary checking is already
-there and has to be kept due to the above range merging.
-
-Also, a code that is simpler is easier to understand, maintain and
-so less prone to subtle bugs.
-
->> +			return true;
->> +	}
->> +
->> +	return false;
->> +}
->> +
->>   /*
->>    * Allocate some memory and give it an address in the guest physical address
->>    * space.
->> @@ -1752,16 +1776,10 @@ int __kvm_set_memory_region(struct kvm *kvm,
->>   	}
->>   
->>   	if ((change == KVM_MR_CREATE) || (change == KVM_MR_MOVE)) {
->> -		int bkt;
->> -
->>   		/* Check for overlaps */
-> 
-> This comment can be dropped, the new function is fairly self-documenting.
-
-Will drop it.
-
->> -		kvm_for_each_memslot(tmp, bkt, __kvm_memslots(kvm, as_id)) {
->> -			if (tmp->id == id)
->> -				continue;
->> -			if (!((new.base_gfn + new.npages <= tmp->base_gfn) ||
->> -			      (new.base_gfn >= tmp->base_gfn + tmp->npages)))
->> -				return -EEXIST;
->> -		}
->> +		if (kvm_check_memslot_overlap(__kvm_memslots(kvm, as_id),
->> +					      &new))
-> 
-> And then with the comment dropped, the wrap can be avoided by folding the check
-> into the outer if statement, e.g.
-> 
-> 	if (((change == KVM_MR_CREATE) || (change == KVM_MR_MOVE)) &&
-> 	    kvm_check_memslot_overlap(__kvm_memslots(kvm, as_id), &new))
-> 		return -EEXIST;
-> 
-
-Will fold it.
-
+-- 
 Thanks,
-Maciej
+
+David / dhildenb
+
