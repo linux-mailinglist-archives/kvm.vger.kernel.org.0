@@ -2,159 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 21E1243CF0B
-	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 18:51:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 006D343CF11
+	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 18:53:43 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243055AbhJ0Qx5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Oct 2021 12:53:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:20919 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S242964AbhJ0Qxy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 27 Oct 2021 12:53:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635353488;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=gy5cJnvtXii1KYg8kaPz4ztKoxko3IwoHdJfXjXNCAc=;
-        b=ewq5zh8w2I8nsNmU8fp0O8mdjeg8NrnHFzSpRTKYy7T4Y19a7VibRL0Xb/ZTnEXJ3I0pOV
-        8loXmRiC7ff2YnEtPu3Sj5TRROYPOqBRj35b1c8oSlMxLV0o7vt46kOfEEJqkDSvx4vVZp
-        O7gfN8hV/7SA0ZJ3p/uu3P2+aqBNlPM=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-416--BTuqxa0Ng-mqilv4rh4SQ-1; Wed, 27 Oct 2021 12:51:27 -0400
-X-MC-Unique: -BTuqxa0Ng-mqilv4rh4SQ-1
-Received: by mail-wm1-f71.google.com with SMTP id k126-20020a1ca184000000b003231d0e329bso2140022wme.4
-        for <kvm@vger.kernel.org>; Wed, 27 Oct 2021 09:51:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=gy5cJnvtXii1KYg8kaPz4ztKoxko3IwoHdJfXjXNCAc=;
-        b=COPxvlmKgJTLBSe26S2JBk70MVFynGLD5Rei4hIBUmQQCeaobI0b3yzeZocUExl1YK
-         ac0olyfhVyMG5sLuQab31GANpANG2Mc/WkmtrHncrALNxUiSMm2Eq8ixFzkFGNccao8g
-         z0FT+frhB1W4qVIMwX+zeQtxN+KcJfm+W4eT+YQX3KmjgTrK7wcLEliCn96kb23sJ/uG
-         x1anCThTQD1+PZipl8wOIge0MmtXcBGElSobRnv2C8H/xsaOBCUnclLsRXxwOisppxua
-         10CXrj4fujZl0597lqpWnrr/AsVFqtiPrgRh7JPn99UTM0dzuTB13EzIrr+czkUhtrGW
-         +rpg==
-X-Gm-Message-State: AOAM531q3YPZ0yu90OM1eK2wApyCKAtwMp9vU92c1B2HgIrDpoYi9iK+
-        mbbNAJYJiWcNpGqQeFcAFgUHgvQSXNAE7BDKsK32pXhvFiUN3+vW75Lg9SFX2QY/7ZkJFATZ1GR
-        yYgFGQ4jnZEtk
-X-Received: by 2002:a5d:530e:: with SMTP id e14mr42490470wrv.326.1635353486061;
-        Wed, 27 Oct 2021 09:51:26 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyvOL9tcB4shi2C0GoOD7T7Et3/vAlnQm4M0rMtYahyCRUvvNXt2UK95E6yY2/83fDh2wAYXA==
-X-Received: by 2002:a5d:530e:: with SMTP id e14mr42490425wrv.326.1635353485826;
-        Wed, 27 Oct 2021 09:51:25 -0700 (PDT)
-Received: from [192.168.3.132] (p4ff23d76.dip0.t-ipconnect.de. [79.242.61.118])
-        by smtp.gmail.com with ESMTPSA id r1sm4339811wmr.36.2021.10.27.09.51.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Oct 2021 09:51:25 -0700 (PDT)
-Message-ID: <747f8a27-5a06-7a82-803f-e5bbf2bbbd7b@redhat.com>
-Date:   Wed, 27 Oct 2021 18:51:24 +0200
+        id S242994AbhJ0Q4G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Oct 2021 12:56:06 -0400
+Received: from mail-mw2nam12on2049.outbound.protection.outlook.com ([40.107.244.49]:42593
+        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S239523AbhJ0Q4F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Oct 2021 12:56:05 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=btC+KOpN+2bJq0jYo5U94VgNowVELQH6E4IKNKSmTbzPYNhXybixa2CClcAQF7dMzMULHpmqBqHAoY/05ilXo+WluJQTOIZ5m5NQr67mtjbUUeQ8/l916Vu1eJzoM/gP+Utk4I82R2+X/OZeYvqD/Yq3Wp6K8EjwkuHoOxqny3rLR8bCoQFrpnV0R/Tnpn1wxnnyh/ypW0ghBg3+IUZI0/aVIq62Y1gItKOVGtkH8QBoQ0kkBz6INQcBdKZeY6oYBWp1+k+GjBZ8b3Yt6tBpZIyQ6gTw4DAZmisv+RDIr4UFsoi/Mb+PBFv6C2MbJVXdLEaVdVP0WvKELV+yFZfB0g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=K69kOi99wKYWhIFkS0zS1IFdt96fwTEjWcBZdRQ1lUs=;
+ b=YYaKdLjfVn1n2o+R9sZx0wi0OWNR+vfG81oAkhqkFQ7lWlPIIR9HyEMCwyi/HKeIXF0UyYb2Xi+6p49K65bmtYvI616rtCccF4efNuvuE3OSWfhW798jK1ArjQWWuuWqpQRigMX9ECOM854Lx2eAQht7BJSEK1CfZNRO6cHm1JChiOfaiO/Th7JfT3krvAHDVUgN9xBpvaiLaQQiVlJ6lVf4ZH8bVVOC/wF8M9xFCycfwYJNIt12Q5AoVd+TV9xcIq6EzLPNHXV0sun6DO+XhraMCP1EXkQMKSauqtPVYA67XR+krE/wHvR834cV3dyfHXSEyo3VwzDw4zDLyHCv5Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=K69kOi99wKYWhIFkS0zS1IFdt96fwTEjWcBZdRQ1lUs=;
+ b=Xbg1Q6r+bP2syExPgZa/73GXehw7ZNTMeLI+prTA46MWrsE5UHYK7NqcAgxOjRhkX4diJu9fGrds7uwQBHxpvxOxH+2gtYGZhB2z204O6b8jq9i8tGM5yPJJLBJKOsDj3/qUxKiXN2SGXOa/YgQLb4D3neXy2mb5EOMNRejXvRITwFO6xYYduVPCWUcuv0t6FKgMgnrFkwExHTKloIa+tRmSMu8F7+5cInkJNlLNNZljjXzNbmJcadniVog+BUU4lN89lzC6BEN7nGhwz3Ji/O9YC2ozaXnN2B+zGtV0N6nrRO9oXBTO9oApzfwtWOM+bnhsMzfUoy2X09HlDfzN8Q==
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5238.namprd12.prod.outlook.com (2603:10b6:208:31e::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4649.13; Wed, 27 Oct
+ 2021 16:53:36 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::e8af:232:915e:2f95%8]) with mapi id 15.20.4649.015; Wed, 27 Oct 2021
+ 16:53:36 +0000
+Date:   Wed, 27 Oct 2021 13:53:35 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
+        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
+        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com
+Subject: Re: [PATCH V4 mlx5-next 13/13] vfio/mlx5: Use its own PCI reset_done
+ error handler
+Message-ID: <20211027165335.GF2744544@nvidia.com>
+References: <20211026090605.91646-1-yishaih@nvidia.com>
+ <20211026090605.91646-14-yishaih@nvidia.com>
+ <20211026171644.41019161.alex.williamson@redhat.com>
+ <20211026235002.GC2744544@nvidia.com>
+ <20211027092943.4f95f220.alex.williamson@redhat.com>
+ <20211027155339.GE2744544@nvidia.com>
+ <20211027104855.7d35be05.alex.williamson@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211027104855.7d35be05.alex.williamson@redhat.com>
+X-ClientProxiedBy: CH0PR03CA0225.namprd03.prod.outlook.com
+ (2603:10b6:610:e7::20) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH v1 02/12] vhost: Return number of free memslots
-Content-Language: en-US
-To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>,
-        kvm@vger.kernel.org,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Sebastien Boeuf <sebastien.boeuf@intel.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Ani Sinha <ani@anisinha.ca>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Hui Zhu <teawater@gmail.com>
-References: <20211027124531.57561-1-david@redhat.com>
- <20211027124531.57561-3-david@redhat.com>
- <4ce74e8f-080d-9a0d-1b5b-6f7a7203e2ab@redhat.com>
- <7f1ee7ea-0100-a7ac-4322-316ccc75d85f@redhat.com>
- <8fc703aa-a256-fdef-36a5-6faad3da47d6@redhat.com>
- <20211027113245-mutt-send-email-mst@kernel.org>
- <1a01da70-fc6d-f0f0-bd75-8f0a3c2dff94@redhat.com>
- <99dde5cf-2f96-18c9-a806-f72365f68f8c@redhat.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <99dde5cf-2f96-18c9-a806-f72365f68f8c@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Received: from mlx.ziepe.ca (206.223.160.26) by CH0PR03CA0225.namprd03.prod.outlook.com (2603:10b6:610:e7::20) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4649.15 via Frontend Transport; Wed, 27 Oct 2021 16:53:36 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mfmBD-002gXk-Ev; Wed, 27 Oct 2021 13:53:35 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: f1a751c0-723e-40d2-52bf-08d9996a51ad
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5238:
+X-Microsoft-Antispam-PRVS: <BL1PR12MB5238E3A98828807311CFD6A7C2859@BL1PR12MB5238.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:4303;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 8H216t1vQaSofq7csPbdGPoMJWb8eStWR1knNxDpHDCeEytIbcz28GxpbSYoX9yd6wyQIGQBTbykU2ArXopi+vagjgbdF0on+1/vL9uTvlBwjmZEAVGtaB5q5tdftyTMhklb6sJDiaGG04B7TA2Vi9lIo3Rss9WPFcUX9o7MlspFzGEGax/JegQMkZer6PWAUmV4lxgHFdgItW7pekbJX3brXCyuGnCjt4qAWnXWGJ1f2Ux9Qj2YuXTgbEN+URyuWk4BNbBpvd/pT7Cmyfwx8dg3YiQfzm9gN9R7ngz9Go4BpU9JKyHWc8PjcVou9yjO+i8Tv/dFSV2DAyeZqTupTSmg48zjkoLv55PK5GfFCOkbeMXfDt2buAf9sFDPcb4RfQtaI3REtZY65u3dk6T+ciKuzbl1Utmbf9X4evEauilKbxFSxb1s/Pri501gEuxlKy+acX3Gy6HlaSKTAcHmZ+5OJpE+CB1p+xv5dcASEpjrazB7wz9+Iwv93JC8b5dF2C2+GiYKbGz86EUX+pelyXOYrdXS+CY1rOOPKR43PB5KYDJa0nFSK9loOH12ONg7tBwIZjB7rYNBBITTzsWlCLGAQt196WyxMkwRAQH6K+fNihMNPtDdbYPUgU0km9aNBvJVbo7F1h8MGsHNJ8XEKA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(1076003)(33656002)(36756003)(8936002)(4326008)(26005)(186003)(107886003)(316002)(5660300002)(2906002)(2616005)(9786002)(426003)(66476007)(8676002)(66946007)(83380400001)(66556008)(4744005)(38100700002)(9746002)(86362001)(508600001)(6916009);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?LtGHsG042q68rwYf5ZdOI2ucAWbTLQccpPMJlQk9UrTW+SWieSUCu5e7cVRv?=
+ =?us-ascii?Q?hWJZXWlS98tk0vzMieg7S9uUnkmxCRnC/kHa6GSsfqaHHrc68nZfeD3e7HhU?=
+ =?us-ascii?Q?Ekco+rEFFYpCHrpzqdwo2S1vc/cjzEnTw79Zn9hZuGiDS9cU8x30LRZl2dg+?=
+ =?us-ascii?Q?KKjEAOk9IFl8+pBRLLFG74MnM822hMgLMfZEFMTaJen9GYbyEX44wyw1obqs?=
+ =?us-ascii?Q?QqdefYBAStcUv5gJaFubTkhJhKiVj+bAHFa97RwNiBKVVjwJwmVbNzFhoI7M?=
+ =?us-ascii?Q?J4hJvJ6lWvL2zVbrMWiin+a2HkVQ863I/jgxVUva/RMYo2GstCvMs5t0K8c7?=
+ =?us-ascii?Q?yMUA76qqKuAgLZBrJLqN5WmUO3b9cA5IMaQ9VTWfuqYoDPhXFk4CJH8YdH8Y?=
+ =?us-ascii?Q?348qPJ58YtuClZWOzGJ0qGqP68MtPBYXqm9fEPAhlGvZpmUSpR2CYOmQbsNX?=
+ =?us-ascii?Q?zaP16pTwfnMmgtcuzqXamJ45fCR+lir3SKwcq6ewy8iWmTquAJfZoQkGE6kV?=
+ =?us-ascii?Q?impy6m08pWrWqSexuY0IyxXhkwH4oEjbg0xC4NyJalgqlNY5J/+6hVFUEhte?=
+ =?us-ascii?Q?hYnzaJFm73AD4a0xbEVDN289LPEyTLYoB2/7lWEhRrQhTy1ItXI6ObcZD3Di?=
+ =?us-ascii?Q?D4dmLZqCr0L2opBkM1xXZbVdofe5nSm9GNRriUxfzKE6TUmObCMQeXyPsk9M?=
+ =?us-ascii?Q?HHV726a4/pzaoa3NhGZ/dS06GyWX1Lg5iTDF6ipz0BICT92nBPEQr2bOvJuC?=
+ =?us-ascii?Q?Vb4PH4sHDm2I4LgqLpfUrA95+wcsitV4tdrSalHcPTp+IfEDE0vNB91lToWE?=
+ =?us-ascii?Q?uPCgFGBSyC8rI3ob0KJbjrlnSdglcsOXDIOiyHLCpY7I9AoqKGR1wo6xa4b1?=
+ =?us-ascii?Q?CCpugiQ97y8Sq1TofNntHhZESnO8SM1TkdqSF4sLUm3+ZEfLqijT1o7T64C7?=
+ =?us-ascii?Q?glbazAiuV0/PWSXd8C2sT5oCtmxtp4nL6kA4QAxgb6mYox76ieNEAhKYZdlD?=
+ =?us-ascii?Q?asJEO3e1xI9eCrktLIBKs9RleY2dwO+9ElYD/x4eBAvmaC8eMzQ/bz3yBTxp?=
+ =?us-ascii?Q?P7bSaHMTDeDJbuJeUg9Zaxy5/KreMwd8FdZ9cQVI1S6MnghylUI7q6Luva4c?=
+ =?us-ascii?Q?8AHY6L2/9Cew3WzVmzg6KqDs9WYiMB6cjiOhAoWyHRTPWiixrDoY4kyLHdiE?=
+ =?us-ascii?Q?UQwqSN6xJ8nZCYsngrAdV3+XtDz8eIVXoXOeoaZy4T/LaTtT21T1YwCr8T3l?=
+ =?us-ascii?Q?Ip2Lj1wTtlfZH3Q0tEUssT3m4yXACtIoWXmnDv/CFNDHOy1W6I/86RbuYdSp?=
+ =?us-ascii?Q?/o1uHIJzQ28xd1Ljj+sxxdTF/vxwhwAMerPz6VHSoRJNM6Ygf0jGued7OsNm?=
+ =?us-ascii?Q?pWOaOEi++r7ijszsDgBrU3FoXqk3ZNX3t0iZ/aDq3OfQa0odHztSG3KDpDEh?=
+ =?us-ascii?Q?4ApT4q+2y8GET9xU3zAkiCWxecKcJiWuw/ONhP6HkmXPszWau+JYzDE5yucV?=
+ =?us-ascii?Q?E4HNmgxlXi87CR5wGK0mBmzOOTjzYl73vXGSZSGkeKYcMdOBbJZxO0FIJrP8?=
+ =?us-ascii?Q?ve5T6/4fMV5Nu5WOLEs=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f1a751c0-723e-40d2-52bf-08d9996a51ad
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Oct 2021 16:53:36.6886
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: yw93iq+LimNOFqiylhzOhxWhFzK7hqX7V3aUBWBpiVsL/Wu+YuKuKvnlVBdIIj75
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5238
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27.10.21 18:11, Philippe Mathieu-Daudé wrote:
-> On 10/27/21 17:45, David Hildenbrand wrote:
->> On 27.10.21 17:33, Michael S. Tsirkin wrote:
->>> On Wed, Oct 27, 2021 at 04:11:38PM +0200, Philippe Mathieu-Daudé wrote:
->>>> On 10/27/21 16:04, David Hildenbrand wrote:
->>>>> On 27.10.21 15:36, Philippe Mathieu-Daudé wrote:
->>>>>> On 10/27/21 14:45, David Hildenbrand wrote:
->>>>>>> Let's return the number of free slots instead of only checking if there
->>>>>>> is a free slot. Required to support memory devices that consume multiple
->>>>>>> memslots.
->>>>>>>
->>>>>>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>>>>>> ---
->>>>>>>  hw/mem/memory-device.c    | 2 +-
->>>>>>>  hw/virtio/vhost-stub.c    | 2 +-
->>>>>>>  hw/virtio/vhost.c         | 4 ++--
->>>>>>>  include/hw/virtio/vhost.h | 2 +-
->>>>>>>  4 files changed, 5 insertions(+), 5 deletions(-)
->>>>
->>>>>>> -bool vhost_has_free_slot(void)
->>>>>>> +unsigned int vhost_get_free_memslots(void)
->>>>>>>  {
->>>>>>>      return true;
->>>>>>
->>>>>>        return 0;
->>>>>
->>>>> Oh wait, no. This actually has to be
->>>>>
->>>>> "return ~0U;" (see real vhost_get_free_memslots())
->>>>>
->>>>> ... because there is no vhost and consequently no limit applies.
->>>>
->>>> Indeed.
->>>>
->>>> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->>>
->>> confused. are you acking the theoretical patch with ~0 here?
->>>
->>
->> That's how I interpreted it.
-> 
-> ~0U doesn't seem harmful when comparing. However I haven't tested
-> nor looked at the big picture. I wonder if vhost_has_free_slot()
-> shouldn't take the Error* as argument and each implementation set
-> the error message ("virtio/vhost support disabled" would be more
-> explicit in the stub case). But I still don't understand why when
-> built without virtio/vhost we return vhost_get_free_memslots() > 0.
+On Wed, Oct 27, 2021 at 10:48:55AM -0600, Alex Williamson wrote:
 
-For the same reason we faked infinite slots via
-vhost_has_free_slot()->true for now. We call it unconditionally from
-memory device code.
+> Ok, I see.  I didn't digest that contention on state_mutex can only
+> occur from a concurrent migration region access and the stale state is
+> resolved at the end of that concurrent access, not some subsequent
+> access.
 
-Sure, we could add a stub "vhost_available()-> false" (or
-vhost_enabled() ?) instead and do
+Ah, I see, yes, that is tricky - the spinlock around the mutex
+provides the guarentee: deferral cannot be set at mutex_lock() time.
 
-if (vhost_available())
-	... vhost_get_free_memslots()
-
-similar to how we have
-
-if (kvm_enabled())
-	... kvm_get_free_memslots()
-
-Not sure if it's worth it, though.
-
--- 
-Thanks,
-
-David / dhildenb
-
+Jason
