@@ -2,84 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 17BC643C93C
-	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 14:08:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9DFE843C983
+	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 14:22:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240351AbhJ0MK6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Oct 2021 08:10:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:33944 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231441AbhJ0MKz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 27 Oct 2021 08:10:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635336510;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=XBL3Wt9IebM3ldnKa6PwYfPT8mt15aCFJBjCOuaXlGY=;
-        b=CjT5TbA1Q2KahhDt/roxozNMwe5JR57CMMOqr2fPuX6+jhpcmIq7HLjt21ga0W65nn65Gv
-        H/ERcw0TATlmKtvtSOuNGXGvuic7vwnLz7snyG8MWIzuBznR7qwVqI6mrTAOQnOXaPOFmM
-        5lo4eeISALy3VrJDihXxtKaDskT3LHg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-234-DBpqN599PbyWGsheFxb0Jw-1; Wed, 27 Oct 2021 08:08:26 -0400
-X-MC-Unique: DBpqN599PbyWGsheFxb0Jw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8CBAE10A8E15;
-        Wed, 27 Oct 2021 12:08:25 +0000 (UTC)
-Received: from thuth.remote.csb (unknown [10.39.195.128])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9125019D9D;
-        Wed, 27 Oct 2021 12:08:11 +0000 (UTC)
-Subject: Re: [kvm-unit-tests PATCH v3 1/2] s390x: Add specification exception
- test
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>
-Cc:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-References: <20211022120156.281567-1-scgl@linux.ibm.com>
- <20211022120156.281567-2-scgl@linux.ibm.com>
- <20211025191722.31cf7215@p-imbrenda>
- <d7b701ba-785f-5019-d2e4-a7eb30598c8f@linux.vnet.ibm.com>
- <20211026154113.1a9ab666@p-imbrenda>
-From:   Thomas Huth <thuth@redhat.com>
-Message-ID: <34a47a4e-0176-902e-c458-9e532cdb9fcb@redhat.com>
-Date:   Wed, 27 Oct 2021 14:08:10 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        id S240257AbhJ0MY5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Oct 2021 08:24:57 -0400
+Received: from ssh.movementarian.org ([139.162.205.133]:58822 "EHLO
+        movementarian.org" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S240243AbhJ0MY4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Oct 2021 08:24:56 -0400
+Received: from movement by movementarian.org with local (Exim 4.94)
+        (envelope-from <movement@movementarian.org>)
+        id 1mfhwq-002PuS-9X; Wed, 27 Oct 2021 13:22:28 +0100
+Date:   Wed, 27 Oct 2021 13:22:28 +0100
+From:   John Levon <levon@movementarian.org>
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     Elena <elena.ufimtseva@oracle.com>, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org, mst@redhat.com, john.g.johnson@oracle.com,
+        dinechin@redhat.com, cohuck@redhat.com, jasowang@redhat.com,
+        felipe@nutanix.com, jag.raman@oracle.com, eafanasova@gmail.com
+Subject: Re: MMIO/PIO dispatch file descriptors (ioregionfd) design discussion
+Message-ID: <YXlEhCYAJuhsVwDv@movementarian.org>
+References: <88ca79d2e378dcbfb3988b562ad2c16c4f929ac7.camel@gmail.com>
+ <YWUeZVnTVI7M/Psr@heatpipe>
+ <YXamUDa5j9uEALYr@stefanha-x1.localdomain>
+ <20211025152122.GA25901@nuker>
+ <YXhQk/Sh0nLOmA2n@movementarian.org>
+ <YXkmx3V0VklA6qHl@stefanha-x1.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20211026154113.1a9ab666@p-imbrenda>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YXkmx3V0VklA6qHl@stefanha-x1.localdomain>
+X-Url:  http://www.movementarian.org/
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 26/10/2021 15.41, Claudio Imbrenda wrote:
-> On Tue, 26 Oct 2021 14:00:31 +0200
-> Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com> wrote:
-[...]
->>> since you're ignoring the return value, can't you hardcode r6, and mark
->>> it (and r7) as clobbered? like:
->>> 		"lpq 6, %[bad]"
->>> 		: : [bad] "T"(words[1])
->>> 		: "%r6", "%r7"
->>>    
->> Ok, btw. is there a reason bare register numbers seem to be more common
->> compared to %%rN ?
+On Wed, Oct 27, 2021 at 11:15:35AM +0100, Stefan Hajnoczi wrote:
+
+> > > I like this approach as well.
+> > > As you have mentioned, the device emulation code with first approach
+> > > does have to how to handle the region accesses. The second approach will
+> > > make things more transparent. Let me see how can I modify what there is
+> > > there now and may ask further questions.
+> > 
+> > Sorry I'm a bit late to this discussion, I'm not clear on the above WRT
+> > vfio-user. If an ioregionfd has to cover a whole BAR0 (?), how would this
+> > interact with partly-mmap()able regions like we do with SPDK/vfio-user/NVMe?
 > 
-> I don't know, I guess laziness?
+> The ioregionfd doesn't need to cover an entire BAR. QEMU's MemoryRegions
+> form a hierarchy, so it's possible to sub-divide the BAR into several
+> MemoryRegions.
 
-FWIW, older versions of Clang do not support bare register numbers on s390x, 
-so it's better to use %%rN, AFAIK...
-OTOH, we cannot compile the kvm-unit-tests with older versions of Clang 
-anyway, so it likely doesn't matter here.
+I think you're saying that when vfio-user client in qemu calls
+VFIO_USER_DEVICE_GET_REGION_IO_FDS, it would create a sub-MR corresponding to
+each one, before asking KVM to configure them?
 
-  Thomas
-
+thanks
+john
