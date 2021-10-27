@@ -2,121 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 297F743C863
-	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 13:17:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8388A43C887
+	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 13:26:37 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241622AbhJ0LTj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Oct 2021 07:19:39 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:48362 "EHLO mail.skyhub.de"
+        id S232566AbhJ0L3B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Oct 2021 07:29:01 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49394 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237402AbhJ0LTi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Oct 2021 07:19:38 -0400
-Received: from zn.tnic (p200300ec2f1615002935f4cf24b5c3ba.dip0.t-ipconnect.de [IPv6:2003:ec:2f16:1500:2935:f4cf:24b5:c3ba])
+        id S229869AbhJ0L3B (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Oct 2021 07:29:01 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id C06CA1EC0622;
-        Wed, 27 Oct 2021 13:17:11 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1635333431;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=stNjoo2XJVbCmOdEgRU5yFEgbX9ASxd3JdeLr48Zahs=;
-        b=ebK1cCm9TusIIJya8AsuEOa2C3nQXceCim+lTIqBQiXlDB1x/eNW5KTm2nrR7tb97mQhQS
-        vnvCswmbz10LpK/Kw8nzXp85LtQ568h2zkaEyr3nXmArdt3dd3cOUNBshF/UW+o8mvILwa
-        acBETot9fx4OESPek0YesL84jKRUcrY=
-Date:   Wed, 27 Oct 2021 13:17:11 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v6 08/42] x86/sev-es: initialize sev_status/features
- within #VC handler
-Message-ID: <YXk1N6ApJA8PgkwM@zn.tnic>
-References: <20211008180453.462291-1-brijesh.singh@amd.com>
- <20211008180453.462291-9-brijesh.singh@amd.com>
- <YW2EsxcqBucuyoal@zn.tnic>
- <20211018184003.3ob2uxcpd2rpee3s@amd.com>
- <YW3IdfMs61191qnU@zn.tnic>
- <20211020161023.hzbj53ehmzjrt4xd@amd.com>
- <YXF+WjMHW/dd0Wb6@zn.tnic>
- <20211021204149.pof2exhwkzy2zqrg@amd.com>
- <YXaPKsicNYFZe84I@zn.tnic>
- <20211025163518.rztqnngwggnbfxvs@amd.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20211025163518.rztqnngwggnbfxvs@amd.com>
+        by mail.kernel.org (Postfix) with ESMTPSA id 00B8D60E73;
+        Wed, 27 Oct 2021 11:26:36 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mfh4j-001tTL-SX; Wed, 27 Oct 2021 12:26:34 +0100
+Date:   Wed, 27 Oct 2021 12:26:33 +0100
+Message-ID: <8735ombtee.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Mark Brown <broonie@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Quentin Perret <qperret@google.com>,
+        Will Deacon <will@kernel.org>, kernel-team@android.com
+Subject: Re: [PATCH 4/4] arm64/fpsimd: Document the use of TIF_FOREIGN_FPSTATE by KVM
+In-Reply-To: <YXGN26tHnRyWkWns@sirena.org.uk>
+References: <20211021151124.3098113-1-maz@kernel.org>
+        <20211021151124.3098113-5-maz@kernel.org>
+        <YXGN26tHnRyWkWns@sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, qperret@google.com, will@kernel.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 25, 2021 at 11:35:18AM -0500, Michael Roth wrote:
-> As counter-intuitive as it sounds, it actually doesn't buy us if the CPUID
-> table is part of the PSP attestation report, since:
+On Thu, 21 Oct 2021 16:57:15 +0100,
+Mark Brown <broonie@kernel.org> wrote:
+> 
+> [1  <text/plain; us-ascii (quoted-printable)>]
+> On Thu, Oct 21, 2021 at 04:11:24PM +0100, Marc Zyngier wrote:
+> > The bit of documentation that talks about TIF_FOREIGN_FPSTATE
+> > does not mention the ungodly tricks that KVM plays with this flag.
+> > 
+> > Try and document this for the posterity.
+> 
+> Yes, more documentation here would definitely be helpful - it's pretty
+> hard to follow what KVM is doing here.
+> 
+> >   * CPU currently contain the most recent userland FPSIMD state of the current
+> > - * task.
+> > + * task *or* the state of the corresponding KVM vcpu if userspace is behaving
+> > + * as a VMM and that the vcpu has used FP during its last run. In the latter
+> > + * case, KVM will set TIF_FOREIGN_FPSTATE on kvm_vcpu_put(). For all intents
+> > + * and purposes, the vcpu FP state is treated identically to userspace's.
+> 
+> I'm not able to find a kvm_vcpu_put() function in upstream, just
+> kvm_cpu_put_sysregs_vhe().  There's kvm_arch_vcpu_put() which is called
+> from the vcpu_put() function in generic KVM code but they don't show up
+> until you start mangling the name in that comment.
 
-Thanks for taking the time to explain in detail - I think I know now
-what's going on, and David explained some additional stuff to me
-yesterday.
+You, vcpu_put() is the one I had in mind.
 
-So, to cut to the chase:
+> It'd be good to
+> mention what vcpu_put() is actually doing and a bit more about the
+> general model, KVM is behaving differently here AFAICT in that it flags
+> the current state as invalid when it saves the context to memory rather
+> than when an event happens that requires that the context be reloaded.
+> There's no problem there but it's a bit surprising due the difference
+> and worth highlighting.
 
- - yeah, ok, I guess guest owner attestation is what should happen.
+There is a bit more to it: KVM flags the userspace state as invalid,
+but also ties the guest state to the current task via
+fpsimd_bind_state_to_cpu() so that the state can be saved on
+vcpu_put() via fpsimd_save_and_flush_cpu_state(), or if we end-up
+running kernel_neon_begin() because of some softirq handling.
 
- - as to the boot detection, I think you should do in sme_enable(), in
-pseudo:
+> I think I'd also be inclined to restructure this to foreground the fact
+> that it's the state of the current task but that task may be a VMM.  So
+> something more like
+> 
+> 	...contain the most recent FPSIMD state of the current userspace
+> 	task.  If the task is behaving as a VMM then this will be
+> 	managed by KVM which will...
+> 
+> making it a bit easier to follow (assuming my understanding of what's
+> going on is correct, if not then I guess something else needs
+> clarifying!).
 
-	bool snp_guest_detected;
+I'll have a go at rewriting this.
 
-        if (CPUID page address) {
-                read SEV_STATUS;
-
-                snp_guest_detected = SEV_STATUS & MSR_AMD64_SEV_SNP_ENABLED;
-        }
-
-        /* old SME/SEV detection path */
-        read 0x8000_001F_EAX and look at bits SME and SEV, yadda yadda.
-
-        if (snp_guest_detected && (!SME || !SEV))
-                /*
-		 * HV is lying to me, do something there, dunno what. I guess we can
-		 * continue booting unencrypted so that the guest owner knows that
-		 * detection has failed and maybe the HV didn't want us to force SNP.
-		 * This way, attestation will fail and the user will know why.
-		 * Or something like that.
-		 */
-
-
-        /* normal feature detection continues. */
-
-How does that sound?
+	M.
 
 -- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Without deviation from the norm, progress is not possible.
