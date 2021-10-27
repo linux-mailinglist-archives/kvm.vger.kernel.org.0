@@ -2,176 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0769B43C89A
-	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 13:30:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 17BC643C93C
+	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 14:08:34 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241646AbhJ0Lci (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Oct 2021 07:32:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35247 "EHLO
+        id S240351AbhJ0MK6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Oct 2021 08:10:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:33944 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241637AbhJ0Lch (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 27 Oct 2021 07:32:37 -0400
+        by vger.kernel.org with ESMTP id S231441AbhJ0MKz (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 Oct 2021 08:10:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635334212;
+        s=mimecast20190719; t=1635336510;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=6755i8Ev1p/V649+fKWbCguz7hafsCtx6KF7gf1uorY=;
-        b=TX/V5o7c9HZn0ZYo1Stbn5UuRW1GQ4TLUWo1UuB7pNERiGnFNu87TCgocVolnSwZws3Ly0
-        McB8kWSV8zufJ0S2j5l9cGSYABg9A2udHCTxhp7HgKb+bsB9vhLVkYGONA5Vah5BRrPu9j
-        lvJFsPddbHDevsHwOr3pgLk5y/5Y4Gk=
+        bh=XBL3Wt9IebM3ldnKa6PwYfPT8mt15aCFJBjCOuaXlGY=;
+        b=CjT5TbA1Q2KahhDt/roxozNMwe5JR57CMMOqr2fPuX6+jhpcmIq7HLjt21ga0W65nn65Gv
+        H/ERcw0TATlmKtvtSOuNGXGvuic7vwnLz7snyG8MWIzuBznR7qwVqI6mrTAOQnOXaPOFmM
+        5lo4eeISALy3VrJDihXxtKaDskT3LHg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-97-SCV0Ypy_PSae9_O3yFoh6Q-1; Wed, 27 Oct 2021 07:30:07 -0400
-X-MC-Unique: SCV0Ypy_PSae9_O3yFoh6Q-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-234-DBpqN599PbyWGsheFxb0Jw-1; Wed, 27 Oct 2021 08:08:26 -0400
+X-MC-Unique: DBpqN599PbyWGsheFxb0Jw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B14A3100C66D;
-        Wed, 27 Oct 2021 11:30:03 +0000 (UTC)
-Received: from starship (unknown [10.40.194.243])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A291C101E591;
-        Wed, 27 Oct 2021 11:29:47 +0000 (UTC)
-Message-ID: <62231cec8a62db6bf2baba24cc55e0ec2515d0b1.camel@redhat.com>
-Subject: Re: [PATCH v2 07/43] KVM: Reconcile discrepancies in halt-polling
- stats
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8CBAE10A8E15;
+        Wed, 27 Oct 2021 12:08:25 +0000 (UTC)
+Received: from thuth.remote.csb (unknown [10.39.195.128])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9125019D9D;
+        Wed, 27 Oct 2021 12:08:11 +0000 (UTC)
+Subject: Re: [kvm-unit-tests PATCH v3 1/2] s390x: Add specification exception
+ test
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>
+Cc:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        David Matlack <dmatlack@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>
-Date:   Wed, 27 Oct 2021 14:29:46 +0300
-In-Reply-To: <20211009021236.4122790-8-seanjc@google.com>
-References: <20211009021236.4122790-1-seanjc@google.com>
-         <20211009021236.4122790-8-seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+References: <20211022120156.281567-1-scgl@linux.ibm.com>
+ <20211022120156.281567-2-scgl@linux.ibm.com>
+ <20211025191722.31cf7215@p-imbrenda>
+ <d7b701ba-785f-5019-d2e4-a7eb30598c8f@linux.vnet.ibm.com>
+ <20211026154113.1a9ab666@p-imbrenda>
+From:   Thomas Huth <thuth@redhat.com>
+Message-ID: <34a47a4e-0176-902e-c458-9e532cdb9fcb@redhat.com>
+Date:   Wed, 27 Oct 2021 14:08:10 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
+In-Reply-To: <20211026154113.1a9ab666@p-imbrenda>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2021-10-08 at 19:12 -0700, Sean Christopherson wrote:
-> Move the halt-polling "success" and histogram stats update into the
-> dedicated helper to fix a discrepancy where the success/fail "time" stats
-> consider polling successful so long as the wait is avoided, but the main
-> "success" and histogram stats consider polling successful if and only if
-> a wake event was detected by the halt-polling loop.
+On 26/10/2021 15.41, Claudio Imbrenda wrote:
+> On Tue, 26 Oct 2021 14:00:31 +0200
+> Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com> wrote:
+[...]
+>>> since you're ignoring the return value, can't you hardcode r6, and mark
+>>> it (and r7) as clobbered? like:
+>>> 		"lpq 6, %[bad]"
+>>> 		: : [bad] "T"(words[1])
+>>> 		: "%r6", "%r7"
+>>>    
+>> Ok, btw. is there a reason bare register numbers seem to be more common
+>> compared to %%rN ?
 > 
-> Move halt_attempted_poll to the helper as well so that all the stats are
-> updated in a single location.  While it's a bit odd to update the stat
-> well after the fact, practically speaking there's no meaningful advantage
-> to updating before polling.
-> 
-> Note, there is a functional change in addition to the success vs. fail
-> change.  The histogram updates previously called ktime_get() instead of
-> using "cur".  But that change is desirable as it means all the stats are
-> now updated with the same polling time, and avoids the extra ktime_get(),
-> which isn't expensive but isn't free either.
-> 
-> Reviewed-by: David Matlack <dmatlack@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  virt/kvm/kvm_main.c | 35 ++++++++++++++++-------------------
->  1 file changed, 16 insertions(+), 19 deletions(-)
-> 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 4dfcd736b274..1292c7876d3f 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -3204,12 +3204,23 @@ static int kvm_vcpu_check_block(struct kvm_vcpu *vcpu)
->  static inline void update_halt_poll_stats(struct kvm_vcpu *vcpu, ktime_t start,
->  					  ktime_t end, bool success)
->  {
-> +	struct kvm_vcpu_stat_generic *stats = &vcpu->stat.generic;
->  	u64 poll_ns = ktime_to_ns(ktime_sub(end, start));
->  
-> -	if (success)
-> -		vcpu->stat.generic.halt_poll_success_ns += poll_ns;
-> -	else
-> -		vcpu->stat.generic.halt_poll_fail_ns += poll_ns;
-> +	++vcpu->stat.generic.halt_attempted_poll;
-> +
-> +	if (success) {
-> +		++vcpu->stat.generic.halt_successful_poll;
-> +
-> +		if (!vcpu_valid_wakeup(vcpu))
-> +			++vcpu->stat.generic.halt_poll_invalid;
-> +
-> +		stats->halt_poll_success_ns += poll_ns;
-> +		KVM_STATS_LOG_HIST_UPDATE(stats->halt_poll_success_hist, poll_ns);
-> +	} else {
-> +		stats->halt_poll_fail_ns += poll_ns;
-> +		KVM_STATS_LOG_HIST_UPDATE(stats->halt_poll_fail_hist, poll_ns);
-> +	}
->  }
->  
->  /*
-> @@ -3230,30 +3241,16 @@ void kvm_vcpu_block(struct kvm_vcpu *vcpu)
->  	if (do_halt_poll) {
->  		ktime_t stop = ktime_add_ns(ktime_get(), vcpu->halt_poll_ns);
->  
-> -		++vcpu->stat.generic.halt_attempted_poll;
->  		do {
->  			/*
->  			 * This sets KVM_REQ_UNHALT if an interrupt
->  			 * arrives.
->  			 */
-> -			if (kvm_vcpu_check_block(vcpu) < 0) {
-> -				++vcpu->stat.generic.halt_successful_poll;
-> -				if (!vcpu_valid_wakeup(vcpu))
-> -					++vcpu->stat.generic.halt_poll_invalid;
-> -
-> -				KVM_STATS_LOG_HIST_UPDATE(
-> -				      vcpu->stat.generic.halt_poll_success_hist,
-> -				      ktime_to_ns(ktime_get()) -
-> -				      ktime_to_ns(start));
-> +			if (kvm_vcpu_check_block(vcpu) < 0)
->  				goto out;
-> -			}
->  			cpu_relax();
->  			poll_end = cur = ktime_get();
->  		} while (kvm_vcpu_can_poll(cur, stop));
-> -
-> -		KVM_STATS_LOG_HIST_UPDATE(
-> -				vcpu->stat.generic.halt_poll_fail_hist,
-> -				ktime_to_ns(ktime_get()) - ktime_to_ns(start));
->  	}
->  
->  
+> I don't know, I guess laziness?
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+FWIW, older versions of Clang do not support bare register numbers on s390x, 
+so it's better to use %%rN, AFAIK...
+OTOH, we cannot compile the kvm-unit-tests with older versions of Clang 
+anyway, so it likely doesn't matter here.
 
-Best regards,
-	Maxim Levitsky
-
+  Thomas
 
