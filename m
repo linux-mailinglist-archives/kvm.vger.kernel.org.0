@@ -2,210 +2,406 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 52D1043C723
-	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 11:59:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0962343C73C
+	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 12:00:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241356AbhJ0KCF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Oct 2021 06:02:05 -0400
-Received: from mail-bn8nam08on2046.outbound.protection.outlook.com ([40.107.100.46]:13952
-        "EHLO NAM04-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S241404AbhJ0KBO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Oct 2021 06:01:14 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZHTvXQYJqgIAeOCWpIO2vUVgGdvKpwnpBQngMRh5uApqdxMowcFCbqDyFzad3TkQxJA9YmRf0p4kkn/tvmxHGuXskfsJbegGMfpqWkFPND59REYqwRlWh+6bGKGUVl+bMo027X0OatkwyDRyCXumBpQShawG479b69GSKIhCd3g2tOaH4R7VrZljkpk6jU3X5S8OXxDus7HTHXcmY4M+33TBwU01rM3EfnXm0S8HE2dO/03LJO0MqAAuI7gzxLzyj2KkHjF844x9GawrQxVwxPDwyqexq0C5L2ifYeGMMWagVJsCYFSVVxs7F5fM/T1etJlbGVBQPIfuNvxCRGtJDw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gWw4s5zff8tpYbvenChfKHDHCcPIEZCXHB0FTB/vMfM=;
- b=ECmd0WJwUsBMDDL+avrAnF6ZrKM0VPfaXvgKZbmLSAui3wTZce5oATs873Gxqcg0d+771S2+aBg0WUS04LxBCbcduD6fmGbepVDcMA5efmgb8xARg4rZkWqsN81zcJnmtQrZdSWESLrhm9nXZbORfmEhSJcUHjGq28MzsD4fbCJ065iyaek6swMnaKOVPEUwPUl9vosiTMa2kRQ3KhSSgkVPWAJuuSAxqvZv+rIUkXgO8xYSzw7xJi6/3svz16NXkpDaY1LptrPRKSiofN7NOD+xUjP5el9k09h2Sg+LYzMPRzCNMdcvDt6UluYq2ZOpNGApxQIJQFEgh3s0JJJpww==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.112.36) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=nvidia.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gWw4s5zff8tpYbvenChfKHDHCcPIEZCXHB0FTB/vMfM=;
- b=tQ22dNZEmMaMp2ew3cTErqovk+sfByu9L6/7i97mTA1T+MLhD4mX7PEXU1IIbv41JPvRnDCkOFgN6njCrsZxwqc84S7Xx26Q63+UXT0XDBq5ynMmTV8r9avArU0pgjzJckenh3AgfuAsBRGJfovB4U96+UcGzjMWGiCtKwAizREdyFQaKnYWGH9S/KqhyfixH6CCuPpPWXdRVTqbQq8yzknK0UKnF5VwCFtDVD0RoJaaI5as+4HT1PqBg0eCtvViCG6ApvHlwM5g7xK/JbvlSzHMOt+v8BfB/CSV/ljm8fLV9m8Fs3kiuPCzpf28bfzd3g+p6L/GTUfox+RIpjZcBQ==
-Received: from BN6PR14CA0005.namprd14.prod.outlook.com (2603:10b6:404:79::15)
- by DM6PR12MB5022.namprd12.prod.outlook.com (2603:10b6:5:20e::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4628.18; Wed, 27 Oct
- 2021 09:58:47 +0000
-Received: from BN8NAM11FT020.eop-nam11.prod.protection.outlook.com
- (2603:10b6:404:79:cafe::ac) by BN6PR14CA0005.outlook.office365.com
- (2603:10b6:404:79::15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4628.18 via Frontend
- Transport; Wed, 27 Oct 2021 09:58:47 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.36)
- smtp.mailfrom=nvidia.com; vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.112.36 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.112.36; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (216.228.112.36) by
- BN8NAM11FT020.mail.protection.outlook.com (10.13.176.223) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4649.14 via Frontend Transport; Wed, 27 Oct 2021 09:58:46 +0000
-Received: from HQMAIL111.nvidia.com (172.20.187.18) by HQMAIL101.nvidia.com
- (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Wed, 27 Oct
- 2021 09:58:34 +0000
-Received: from vdi.nvidia.com (172.20.187.5) by mail.nvidia.com
- (172.20.187.18) with Microsoft SMTP Server id 15.0.1497.18 via Frontend
- Transport; Wed, 27 Oct 2021 09:58:32 +0000
-From:   Yishai Hadas <yishaih@nvidia.com>
-To:     <alex.williamson@redhat.com>, <bhelgaas@google.com>,
-        <jgg@nvidia.com>, <saeedm@nvidia.com>
-CC:     <linux-pci@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <kuba@kernel.org>, <leonro@nvidia.com>,
-        <kwankhede@nvidia.com>, <mgurtovoy@nvidia.com>,
-        <yishaih@nvidia.com>, <maorg@nvidia.com>
-Subject: [PATCH V5 mlx5-next 13/13] vfio/mlx5: Use its own PCI reset_done error handler
-Date:   Wed, 27 Oct 2021 12:56:58 +0300
-Message-ID: <20211027095658.144468-14-yishaih@nvidia.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20211027095658.144468-1-yishaih@nvidia.com>
-References: <20211027095658.144468-1-yishaih@nvidia.com>
+        id S239098AbhJ0KDW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Oct 2021 06:03:22 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33738 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S241493AbhJ0KCu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 Oct 2021 06:02:50 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19R9pxmd030186;
+        Wed, 27 Oct 2021 10:00:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=CDUNR6m+If0jMQUi2cldh/Fajci9f4UgxjWcahISUFY=;
+ b=cZE57fQp9f5OqLnq8bQWgKlre1jp6u9+XyqcYOLWFDM3gAoAXd7PNvedngUKILC9Z7po
+ gUu6P/Vs6G41tNLvjFUtK8Ods/l07YXegJgsXFbmxx+38K/HLFzDj+DfTBJRp4JYk6X1
+ 66YjIJ4DRY9BZKp7oUdmX/SKzGo9E1H8QWOYaJOYklPCSOybeKTn1buMp4OwBAeXMJxq
+ zBzdiJfBq/FVvphWPZBfxGMjnzzs2BYHhmdJ2X/AvECJYxcPnvfMEJON8WAjwhEGqWtH
+ DC65JcxQQQ+7GiIQUCrH6izTkoBXxqYa5gjxL1Qg6qAY5ZNX8sgF2KoPSuQIOPfwjGFH UA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3by3n19597-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 Oct 2021 10:00:23 +0000
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19R9tAcJ007534;
+        Wed, 27 Oct 2021 10:00:23 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3by3n1957x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 Oct 2021 10:00:23 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19R9vmmZ000997;
+        Wed, 27 Oct 2021 10:00:21 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma04ams.nl.ibm.com with ESMTP id 3bx4edwpxc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 Oct 2021 10:00:20 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19RA0H7u55050522
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 27 Oct 2021 10:00:17 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 47DD111C069;
+        Wed, 27 Oct 2021 10:00:17 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DE87311C05E;
+        Wed, 27 Oct 2021 10:00:16 +0000 (GMT)
+Received: from [9.171.92.208] (unknown [9.171.92.208])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 27 Oct 2021 10:00:16 +0000 (GMT)
+Message-ID: <7649d08e-bc5c-512d-fb70-c2b9b512fc42@linux.vnet.ibm.com>
+Date:   Wed, 27 Oct 2021 12:00:16 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: f89cc3c2-52bb-4d43-9fda-08d999305e65
-X-MS-TrafficTypeDiagnostic: DM6PR12MB5022:
-X-Microsoft-Antispam-PRVS: <DM6PR12MB502283BD550B7355AE221008C3859@DM6PR12MB5022.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: QWtf67fSUakBnwl2lTKs/+1KTmwYCV5wy4uFvp2506cWqxGt78D80rhRQCF9+wpVjqb83JJCp/D/wwA+ruWoAlF0893y0SWwjcFBvOE9yrlfsypPnkJDzN01Va1ZpdzNNnV40GezUyIFl8JErpy13/QeLzec903s5NLmbU+KH11JnVoO0LL/a1Hl2gu3zPrsXrCspsliPBBtZRHsXjvJoVAjAnbOprs65HyI0/BT9VbYXT5KQsDJ0sPLZ/OXiU4XUdbSWKN3EneQ29zeXp+ed6oXuI2uEKa/wdl2KSSJV6gCXtUieqB4ns4WIsV4VQUf13l13lraXjQP+TJ2YLmufBFZXduWsszSECeZ/sK2uJOeT1KL7GTF74XqQwpMcrxI3qUaONccIbCg/gHTw1Tywan/Y1vNBX0alkr/6WkLfV7H69xtM4OsN+sz4lWNfqMpQWj4NhIPidBkjX6qeOdOYSEVFYGJ8FBXx6/O4U8rcgyQDF6IS56P6Ei17atyVNtSkmmFewA/IK4MhIcOMs444AYoSqvYlO0Yg2TeJg6wdzcLvyj0KgOZofiywvGqYQrk/LQcJHMm0nNp9DgXr6+/sbmKHweomX3DfpuxQbiSRyJbWIwbhSx9m6BBX3PQ5uXoLXz2UcFVrifiuuoXAPdGS9Z3y6oHCpA9YLpd8VgyDhqFK60dSJzfVaht78nBQDyJXc47RGLcseOCxCFD+5obYA==
-X-Forefront-Antispam-Report: CIP:216.228.112.36;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid05.nvidia.com;CAT:NONE;SFS:(4636009)(46966006)(36840700001)(36756003)(36906005)(5660300002)(336012)(8676002)(426003)(82310400003)(316002)(7696005)(110136005)(107886003)(508600001)(70206006)(8936002)(36860700001)(6636002)(7636003)(54906003)(186003)(70586007)(83380400001)(1076003)(6666004)(2906002)(4326008)(356005)(2616005)(26005)(47076005)(86362001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Oct 2021 09:58:46.7145
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f89cc3c2-52bb-4d43-9fda-08d999305e65
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.36];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT020.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB5022
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [kvm-unit-tests PATCH v3 1/2] s390x: Add specification exception
+ test
+Content-Language: en-US
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+References: <20211022120156.281567-1-scgl@linux.ibm.com>
+ <20211022120156.281567-2-scgl@linux.ibm.com>
+ <20211025191722.31cf7215@p-imbrenda>
+ <d7b701ba-785f-5019-d2e4-a7eb30598c8f@linux.vnet.ibm.com>
+ <20211026154113.1a9ab666@p-imbrenda>
+From:   Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>
+In-Reply-To: <20211026154113.1a9ab666@p-imbrenda>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: BUR42g-g3pXL6-NmDG_DsZOgXMCeND8L
+X-Proofpoint-GUID: L8KNRlNckv2mhNKauFv4lIWd8w733Wws
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
+ definitions=2021-10-27_03,2021-10-26_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 suspectscore=0
+ mlxscore=0 lowpriorityscore=0 priorityscore=1501 malwarescore=0
+ mlxlogscore=999 impostorscore=0 adultscore=0 phishscore=0 clxscore=1011
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2110270058
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Register its own handler for pci_error_handlers.reset_done and update
-state accordingly.
+On 10/26/21 15:41, Claudio Imbrenda wrote:
+> On Tue, 26 Oct 2021 14:00:31 +0200
+> Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com> wrote:
+> 
+> [...]
+> 
+>> I don't think that would work, the compiler might inline the function,
+>> duplicating the label.
+> 
+> __attribute__((noinline))
+> 
+> :)
 
-Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
----
- drivers/vfio/pci/mlx5/main.c | 56 ++++++++++++++++++++++++++++++++++--
- 1 file changed, 54 insertions(+), 2 deletions(-)
++ a comment on why it's necessary and at that point I don't think it's worth it.
+> 
+>> I suppose I could replace the stg with an assignment in C, not sure if that's nicer.
+>>
+>>>> +	fixup_psw.mask = extract_psw_mask();  
+>>>
+>>> then you could add this here:
+>>> 	fixup_psw.addr = after_lpswe;
+>>>   
+>>>> +	asm volatile (
+>>>> +		"	larl	%[scratch],nop%=\n"
+>>>> +		"	stg	%[scratch],%[addr]\n"  
+>>> 	^ those two lines are no longer needed ^  
+>>>> +		"	lpswe	%[psw]\n"
+>>>> +		"nop%=:	nop\n"  
+>>> 	".global after_lpswe \n"
+>>> 	"after_lpswe:	nop"  
+>>>> +		: [scratch] "=&r"(scratch),
+>>>> +		  [addr] "=&T"(fixup_psw.addr)
+>>>> +		: [psw] "Q"(psw)
+>>>> +		: "cc", "memory"
+>>>> +	);
+>>>> +}
+> 
+> [...]
+>  
+>> That's nicer indeed.
+>>>   
+>>>> +	asm volatile ("lpq %0,%2"
+>>>> +		      : "=r"(r1), "=r"(r2)  
+>>>
+>>> since you're ignoring the return value, can't you hardcode r6, and mark
+>>> it (and r7) as clobbered? like:
+>>> 		"lpq 6, %[bad]"
+>>> 		: : [bad] "T"(words[1])
+>>> 		: "%r6", "%r7" 
+>>>   
+>> Ok, btw. is there a reason bare register numbers seem to be more common
+>> compared to %%rN ?
+> 
+> I don't know, I guess laziness?
+> 
+>>
+>>>> +		      : "T"(*bad_aligned)
+>>>> +	);
+>>>> +}
+>>>> +
+>>>> +static void not_even(void)
+>>>> +{
+>>>> +	uint64_t quad[2];
+>>>> +
+>>>> +	register uint64_t r1 asm("7");
+>>>> +	register uint64_t r2 asm("8");
+>>>> +	asm volatile (".insn	rxy,0xe3000000008f,%0,%2" //lpq
+>>>> %0,%2  
+>>>
+>>> this is even uglier. I guess you had already tried this?
+>>>   
+>> Yes, the assembler won't let you do that.
+> 
+> yeah I thought so
+> 
+>>
+>>> 		"lpq 7, %[good]"
+>>> 			: : [good] "T"(quad)
+>>> 			: "%r7", "%r8"
+>>>
+>>> if that doesn't work, then the same but with .insn
+> 
+> I guess you can still try this ^ ?
 
-diff --git a/drivers/vfio/pci/mlx5/main.c b/drivers/vfio/pci/mlx5/main.c
-index 467dee08ad77..a94cb9cdb82e 100644
---- a/drivers/vfio/pci/mlx5/main.c
-+++ b/drivers/vfio/pci/mlx5/main.c
-@@ -55,8 +55,11 @@ struct mlx5vf_pci_migration_info {
- struct mlx5vf_pci_core_device {
- 	struct vfio_pci_core_device core_device;
- 	u8 migrate_cap:1;
-+	u8 deferred_reset:1;
- 	/* protect migration state */
- 	struct mutex state_mutex;
-+	/* protect the reset_done flow */
-+	spinlock_t reset_lock;
- 	struct mlx5vf_pci_migration_info vmig;
- };
- 
-@@ -473,6 +476,49 @@ mlx5vf_pci_migration_data_rw(struct mlx5vf_pci_core_device *mvdev,
- 	return count;
- }
- 
-+/*
-+ * This function is called in all state_mutex unlock cases to
-+ * handle a 'deferred_reset' if exists.
-+ */
-+static void mlx5vf_state_mutex_unlock(struct mlx5vf_pci_core_device *mvdev)
-+{
-+again:
-+	spin_lock(&mvdev->reset_lock);
-+	if (mvdev->deferred_reset) {
-+		mvdev->deferred_reset = false;
-+		spin_unlock(&mvdev->reset_lock);
-+		mlx5vf_reset_mig_state(mvdev);
-+		mvdev->vmig.vfio_dev_state = VFIO_DEVICE_STATE_RUNNING;
-+		goto again;
-+	}
-+	mutex_unlock(&mvdev->state_mutex);
-+	spin_unlock(&mvdev->reset_lock);
-+}
-+
-+static void mlx5vf_pci_aer_reset_done(struct pci_dev *pdev)
-+{
-+	struct mlx5vf_pci_core_device *mvdev = dev_get_drvdata(&pdev->dev);
-+
-+	if (!mvdev->migrate_cap)
-+		return;
-+
-+	/*
-+	 * As the higher VFIO layers are holding locks across reset and using
-+	 * those same locks with the mm_lock we need to prevent ABBA deadlock
-+	 * with the state_mutex and mm_lock.
-+	 * In case the state_mutex was taken already we defer the cleanup work
-+	 * to the unlock flow of the other running context.
-+	 */
-+	spin_lock(&mvdev->reset_lock);
-+	mvdev->deferred_reset = true;
-+	if (!mutex_trylock(&mvdev->state_mutex)) {
-+		spin_unlock(&mvdev->reset_lock);
-+		return;
-+	}
-+	spin_unlock(&mvdev->reset_lock);
-+	mlx5vf_state_mutex_unlock(mvdev);
-+}
-+
- static ssize_t mlx5vf_pci_mig_rw(struct vfio_pci_core_device *vdev,
- 				 char __user *buf, size_t count, loff_t *ppos,
- 				 bool iswrite)
-@@ -541,7 +587,7 @@ static ssize_t mlx5vf_pci_mig_rw(struct vfio_pci_core_device *vdev,
- 	}
- 
- end:
--	mutex_unlock(&mvdev->state_mutex);
-+	mlx5vf_state_mutex_unlock(mvdev);
- 	return ret;
- }
- 
-@@ -636,6 +682,7 @@ static int mlx5vf_pci_probe(struct pci_dev *pdev,
- 			if (MLX5_CAP_GEN(mdev, migration)) {
- 				mvdev->migrate_cap = 1;
- 				mutex_init(&mvdev->state_mutex);
-+				spin_lock_init(&mvdev->reset_lock);
- 			}
- 			mlx5_vf_put_core_dev(mdev);
- 		}
-@@ -670,12 +717,17 @@ static const struct pci_device_id mlx5vf_pci_table[] = {
- 
- MODULE_DEVICE_TABLE(pci, mlx5vf_pci_table);
- 
-+const struct pci_error_handlers mlx5vf_err_handlers = {
-+	.reset_done = mlx5vf_pci_aer_reset_done,
-+	.error_detected = vfio_pci_core_aer_err_detected,
-+};
-+
- static struct pci_driver mlx5vf_pci_driver = {
- 	.name = KBUILD_MODNAME,
- 	.id_table = mlx5vf_pci_table,
- 	.probe = mlx5vf_pci_probe,
- 	.remove = mlx5vf_pci_remove,
--	.err_handler = &vfio_pci_core_err_handlers,
-+	.err_handler = &mlx5vf_err_handlers,
- };
- 
- static void __exit mlx5vf_pci_cleanup(void)
--- 
-2.18.1
+Ok.
+> 
+>>>   
+>>>> +		      : "=r"(r1), "=r"(r2)
+>>>> +		      : "T"(quad)
+>>>> +	);
+>>>> +}
+>>>> +
+>>>> +struct spec_ex_trigger {
+>>>> +	const char *name;
+>>>> +	void (*func)(void);
+>>>> +	void (*fixup)(void);
+>>>> +};
+>>>> +
+>>>> +static const struct spec_ex_trigger spec_ex_triggers[] = {
+>>>> +	{ "psw_bit_12_is_1", &psw_bit_12_is_1, &fixup_invalid_psw},
+>>>> +	{ "bad_alignment", &bad_alignment, NULL},
+>>>> +	{ "not_even", &not_even, NULL},
+>>>> +	{ NULL, NULL, NULL},
+>>>> +};
+>>>> +  
+>>>
+>>> this is a lot of infrastructure for 3 tests... (or even for 5 tests,
+>>> since you will add the transactions in the next patch)  
+>>
+>> Is it? I think we'd want a test for a "normal" specification exception,
+>> and one for an invalid PSW at least. Even for just those two, I don't
+>> think it would be nice to duplicate the test_spec_ex harness.
+> 
+> usually we do duplicate code for simple tests, so that reviewers have
+> an easier time understanding what's going on, on the other hand..
+> 
+>>>
+>>> are you planning to significantly extend this test in the future?  
+>>
+>> Not really, but I thought having it be easily extensible might be nice.
+> 
+> ..fair enough
+> 
+> this way it will be easier to extend this in the future, even though we
+> don't have any immediate plans to do so
+> 
+> maybe add some words in the patch description, and some comments, to
+> explain what's going on, to make it easier for others to understand
+> this code
+
+Ok.
+> 
+>>>   
+>>>> +struct args {
+>>>> +	uint64_t iterations;
+>>>> +};
+>>>> +
+>>>> +static void test_spec_ex(struct args *args,
+>>>> +			 const struct spec_ex_trigger *trigger)
+>>>> +{
+>>>> +	uint16_t expected_pgm = PGM_INT_CODE_SPECIFICATION;
+>>>> +	uint16_t pgm;
+>>>> +	unsigned int i;
+>>>> +
+>>>> +	for (i = 0; i < args->iterations; i++) {
+>>>> +		expect_pgm_int();
+>>>> +		register_pgm_cleanup_func(trigger->fixup);
+>>>> +		trigger->func();
+>>>> +		register_pgm_cleanup_func(NULL);
+>>>> +		pgm = clear_pgm_int();
+>>>> +		if (pgm != expected_pgm) {
+>>>> +			report_fail("Program interrupt: expected(%d)
+>>>> == received(%d)",
+>>>> +				    expected_pgm,
+>>>> +				    pgm);
+>>>> +			return;
+>>>> +		}
+>>>> +	}
+>>>> +	report_pass("Program interrupt: always expected(%d) ==
+>>>> received(%d)",
+>>>> +		    expected_pgm,
+>>>> +		    expected_pgm);
+>>>> +}
+>>>> +
+>>>> +static struct args parse_args(int argc, char **argv)  
+>>>
+>>> do we _really_ need commandline arguments?
+>>>   
+>> No, but they can be useful.
+>> The iterations argument can be used to check if interpretation happens.
+>> The transaction arguments can be useful while developing a test case.
+>>
+>>> is it really so important to be able to control these parameters?
+>>>
+>>> can you find some values for the parameters so that the test works (as
+>>> in, it actually tests what it's supposed to) and also so that the whole
+>>> unit test ends in less than 30 seconds?  
+>>
+>> I think the defaults are fine for that, no?
+> 
+> ok so they are only for convenience in case things go wrong?
+
+Yes, for when you want to poke at it manually for whatever reason.
+> 
+>>>   
+>>>> +{
+>>>> +	struct args args = {
+>>>> +		.iterations = 1,
+>>>> +	};
+>>>> +	unsigned int i;
+>>>> +	long arg;
+>>>> +	bool no_arg;
+>>>> +	char *end;
+>>>> +
+>>>> +	for (i = 1; i < argc; i++) {
+>>>> +		no_arg = true;
+>>>> +		if (i < argc - 1) {
+>>>> +			no_arg = *argv[i + 1] == '\0';
+>>>> +			arg = strtol(argv[i + 1], &end, 10);
+>>>> +			no_arg |= *end != '\0';
+>>>> +			no_arg |= arg < 0;
+>>>> +		}
+>>>> +
+>>>> +		if (!strcmp("--iterations", argv[i])) {
+>>>> +			if (no_arg)
+>>>> +				report_abort("--iterations needs a
+>>>> positive parameter");
+>>>> +			args.iterations = arg;
+>>>> +			++i;
+>>>> +		} else {
+>>>> +			report_abort("Unsupported parameter '%s'",
+>>>> +				     argv[i]);
+>>>> +		}
+>>>> +	}
+> 
+> I wonder if we can factor out the parameter parsing
+
+I don't think it's worth it. Only three arguments are handled the same.
+Doing this might be worthwhile tho:
+
+        for (i = 1; i < argc; i++) {                                            
+                no_arg = true;                                                  
+                if (i < argc - 1) {                                             
+                        no_arg = *argv[i + 1] == '\0';                          
+                        arg = strtol(argv[i + 1], &end, 10);                    
+                        no_arg |= *end != '\0';                                 
+                        no_arg |= arg < 0;                                      
+                }                                                               
+                                                                                
+                cmp = "--iterations";                                           
+                argp = &args.iterations;                                        
+                if (!strcmp(cmp, argv[i])) {                                    
+                        if (no_arg)                                             
+                                report_abort("%s needs a positive parameter", cmp);
+                        *argp = arg;                                            
+                        ++i;                                                    
+                        continue;                                               
+                }                                                               
+                cmp = "--max-retries";                                          
+                argp = &args.max_retries;                                       
+                if (!strcmp(cmp, argv[i])) {                                    
+                        if (no_arg)                                             
+                                report_abort("%s needs a positive parameter", cmp);
+                        *argp = arg;                                            
+                        ++i;                                                    
+                        continue;                                               
+                }                                                               
+                cmp = "--suppress-info";                                        
+                argp = &args.suppress_info;                                     
+                if (!strcmp(cmp, argv[i])) {                                    
+                        if (no_arg)                                             
+                                report_abort("%s needs a positive parameter", cmp);
+                        *argp = arg;                                            
+                        ++i;                                                    
+                        continue;                                               
+                }                                                               
+                cmp = "--max-failures";                                         
+                argp = &args.max_failures;                                      
+                if (!strcmp(cmp, argv[i])) {                                    
+                        max_failures = true;                                    
+                                                                                
+                        if (no_arg)                                             
+                                report_abort("%s needs a positive parameter", cmp);
+                        *argp = arg;                                            
+                        ++i;                                                    
+                        continue;                                               
+                }                                                               
+                if (!strcmp("--diagnose", argv[i])) {                           
+                        args.diagnose = true;                                   
+                        continue;
+		}                                              
+                if (!strcmp("--no-diagnose", argv[i])) {                        
+                        args.diagnose = false;                                  
+                        continue;                                               
+                }                                                               
+                report_abort("Unsupported parameter '%s'",                      
+                             argv[i]);                                          
+        }
+> 
+>>>> +	return args;
+>>>> +}
+>>>> +
+>>>> +int main(int argc, char **argv)
+>>>> +{
+>>>> +	unsigned int i;
+>>>> +
+>>>> +	struct args args = parse_args(argc, argv);
+>>>> +
+>>>> +	report_prefix_push("specification exception");
+>>>> +	for (i = 0; spec_ex_triggers[i].name; i++) {
+>>>> +		report_prefix_push(spec_ex_triggers[i].name);
+>>>> +		test_spec_ex(&args, &spec_ex_triggers[i]);
+>>>> +		report_prefix_pop();
+>>>> +	}
+>>>> +	report_prefix_pop();
+>>>> +
+>>>> +	return report_summary();
+>>>> +}
+>>>> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+>>>> index 9e1802f..5f43d52 100644
+>>>> --- a/s390x/unittests.cfg
+>>>> +++ b/s390x/unittests.cfg
+>>>> @@ -109,3 +109,6 @@ file = edat.elf
+>>>>  
+>>>>  [mvpg-sie]
+>>>>  file = mvpg-sie.elf
+>>>> +
+>>>> +[spec_ex]
+>>>> +file = spec_ex.elf  
+>>>   
+>>
+> 
 
