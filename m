@@ -2,250 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D04C943CC17
-	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 16:25:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 84C3343CC24
+	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 16:26:51 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242485AbhJ0O1c (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Oct 2021 10:27:32 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:63860 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238437AbhJ0O1b (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 27 Oct 2021 10:27:31 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19REMPWQ026724;
-        Wed, 27 Oct 2021 14:25:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=WJuazXrqQ31UiuLErxP8RMoE6Pat5wKBFWTh8hyYEEg=;
- b=tscz0b/60gavkC6cS2UqkYsIt13j4lLuZGxbt1TxGzLOajHB6sjw4/8nG+pOPBYS3si7
- BkJ/IZa9ps7hJ9XsuoI9Cqj408SX5g8GnR2DZ28MMlCIdVrK2vQb8yG1wmUJEXkAQnDd
- S1mUyYjExrLCcZM2pj4IN4FIUBSmPY+mUZzMJgVoUvyZwSnDWUbYgA3KeVVKNW6tkwCV
- TSXC8yI8rNSpvsJfk4vWgN+S+mXuGC+XJs2gbeHPxDvgxYghvzY+cJ1CzLeCsYGxDQE6
- VoL6/pCikmrqMDItAKgDyK6JVQb8s5PAl+QzGP9FJG56YyyoJyuXfckaV6hR+QIwTooO jQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3by8fqg26g-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 27 Oct 2021 14:25:04 +0000
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19REO02f000891;
-        Wed, 27 Oct 2021 14:25:04 GMT
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3by8fqg25h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 27 Oct 2021 14:25:03 +0000
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
-        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19REHsqm002192;
-        Wed, 27 Oct 2021 14:25:02 GMT
-Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
-        by ppma01wdc.us.ibm.com with ESMTP id 3bx4eg3r91-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 27 Oct 2021 14:25:02 +0000
-Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
-        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19REP0xE44958206
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 27 Oct 2021 14:25:00 GMT
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E2B92B2077;
-        Wed, 27 Oct 2021 14:24:59 +0000 (GMT)
-Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7A653B2064;
-        Wed, 27 Oct 2021 14:24:57 +0000 (GMT)
-Received: from cpe-172-100-181-211.stny.res.rr.com (unknown [9.65.227.42])
-        by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
-        Wed, 27 Oct 2021 14:24:57 +0000 (GMT)
-Subject: Re: [PATCH v17 00/15] s390/vfio-ap: dynamic configuration support
-To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     jjherne@linux.ibm.com, freude@linux.ibm.com,
-        borntraeger@de.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com,
-        pasic@linux.ibm.com, alex.williamson@redhat.com,
-        kwankhede@nvidia.com, fiuczy@linux.ibm.com
-References: <20211021152332.70455-1-akrowiak@linux.ibm.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Message-ID: <6c510a1a-8229-4511-47d7-71f66c18b814@linux.ibm.com>
-Date:   Wed, 27 Oct 2021 10:24:56 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S238400AbhJ0O3N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Oct 2021 10:29:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43402 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238083AbhJ0O3J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Oct 2021 10:29:09 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0738C0613B9
+        for <kvm@vger.kernel.org>; Wed, 27 Oct 2021 07:26:43 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id n11so2133610plf.4
+        for <kvm@vger.kernel.org>; Wed, 27 Oct 2021 07:26:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=LMqODRZlF8nHhJs02sWnsNzJB8DCwjwV772Lcvk4X9o=;
+        b=iWwrbnSH9Fky5OxBApAzRFVpTKOaMHDs7Xrzkqa4bfHRvpB9pNrmqtwX5XStYSbIol
+         NG6pr6of1LmRK/X8yeBvBQ0Fz8uYI6sCKWIvgmckbalOjA8rZIStxifaaVVG+5EdlLz8
+         2ckfTI/AHFWKc1rHQsrwcPVdrkLnqwK/drtGVgppY9agtMGjOEk436kI8PMz0SqSkGNT
+         dkWDCvrzCBVDPIbGEr6AdGS2sCg8RuoXUFOHg6zS7uI1OSE10fKTNRuuwKsMoNZNiFkf
+         iPVMGJAgypYBjZDhK8mjFm7rCt98R0DWG7pkzdEiPhkk3mMy819HFjaZfkrakLKQ8KAR
+         Wy0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=LMqODRZlF8nHhJs02sWnsNzJB8DCwjwV772Lcvk4X9o=;
+        b=hPEXMByN2WqUNk7/7DN62KV9DDFomYHEZ3uqS3Hr1iLOfnXfdt/TO612lBs/SFRDG8
+         3+YyIlNEx8VdDqmUJ+T7noxqJ9HeL3+YAizo9YhbAb1DTgrBtk3pX9utjINB0IREzDew
+         BHnsiA+HwnJtNsCGlquWh2GY+dMfSJuM2iHWREE57TPZUyS8cA6DmFaxQM08REG4SiZs
+         dlfG8UiET+5joEtOn+xDnz/RQ4dfPm70cwOJNAYByPwwMPssx06izrAI5UxKC312PX0x
+         +d+yC4cXB9WqXyySOQd4ilQovwYk8CavyY6i5bsPwYtQ8sVD/+YGOYsrjDgN5p2QRtGZ
+         pGDw==
+X-Gm-Message-State: AOAM530huJlR59r7I79BxV75TIitw4cra9Lt8r7P6N31a+/eSnyJxMQR
+        QpQl0E/1GsVhOV2nkTQj9o8rEQ==
+X-Google-Smtp-Source: ABdhPJzNj2nhULmp/RR7LS0ShzDRkQdxHUhFj7X33pr1fS/jZmoi4Y5oDiGoEdEWKdZH8tXcKWxvmw==
+X-Received: by 2002:a17:90b:11c2:: with SMTP id gv2mr5997881pjb.133.1635344802985;
+        Wed, 27 Oct 2021 07:26:42 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id n12sm37080pgh.55.2021.10.27.07.26.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Oct 2021 07:26:42 -0700 (PDT)
+Date:   Wed, 27 Oct 2021 14:26:38 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Anup Patel <anup.patel@wdc.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Atish Patra <atish.patra@wdc.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        David Matlack <dmatlack@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH v2 24/43] KVM: VMX: Drop pointless PI.NDST update when
+ blocking
+Message-ID: <YXlhnkp4/XJCCO0R@google.com>
+References: <20211009021236.4122790-1-seanjc@google.com>
+ <20211009021236.4122790-25-seanjc@google.com>
+ <18e6a656-f583-0ad4-6770-9678be3f5cf4@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20211021152332.70455-1-akrowiak@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: fuAhpcae6qyshMi9wKtHrVQibmipfdDF
-X-Proofpoint-GUID: hzLcgHsLu_oWqgXVoPcI9rthIzJ5UDyO
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-10-27_04,2021-10-26_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- lowpriorityscore=0 bulkscore=0 impostorscore=0 spamscore=0 adultscore=0
- malwarescore=0 mlxscore=0 mlxlogscore=999 phishscore=0 suspectscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2110270086
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <18e6a656-f583-0ad4-6770-9678be3f5cf4@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PING!!
+On Mon, Oct 25, 2021, Paolo Bonzini wrote:
+> On 09/10/21 04:12, Sean Christopherson wrote:
+> > Don't update Posted Interrupt's NDST, a.k.a. the target pCPU, in the
+> > pre-block path, as NDST is guaranteed to be up-to-date.  The comment
+> > about the vCPU being preempted during the update is simply wrong, as the
+> > update path runs with IRQs disabled (from before snapshotting vcpu->cpu,
+> > until after the update completes).
+> 
+> Right, it didn't as of commit bf9f6ac8d74969690df1485b33b7c238ca9f2269 (when
+> VT-d posted interrupts were introduced).
+> 
+> The interrupt disable/enable pair was added in the same commit that
+> motivated the introduction of the sanity checks:
 
-On 10/21/21 11:23 AM, Tony Krowiak wrote:
-> The current design for AP pass-through does not support making dynamic
-> changes to the AP matrix of a running guest resulting in a few
-> deficiencies this patch series is intended to mitigate:
->
-> 1. Adapters, domains and control domains can not be added to or removed
->      from a running guest. In order to modify a guest's AP configuration,
->      the guest must be terminated; only then can AP resources be assigned
->      to or unassigned from the guest's matrix mdev. The new AP
->      configuration becomes available to the guest when it is subsequently
->      restarted.
->
-> 2. The AP bus's /sys/bus/ap/apmask and /sys/bus/ap/aqmask interfaces can
->      be modified by a root user without any restrictions. A change to
->      either mask can result in AP queue devices being unbound from the
->      vfio_ap device driver and bound to a zcrypt device driver even if a
->      guest is using the queues, thus giving the host access to the guest's
->      private crypto data and vice versa.
->
-> 3. The APQNs derived from the Cartesian product of the APIDs of the
->      adapters and APQIs of the domains assigned to a matrix mdev must
->      reference an AP queue device bound to the vfio_ap device driver. The
->      AP architecture allows assignment of AP resources that are not
->      available to the system, so this artificial restriction is not
->      compliant with the architecture.
->
-> 4. The AP configuration profile can be dynamically changed for the linux
->      host after a KVM guest is started. For example, a new domain can be
->      dynamically added to the configuration profile via the SE or an HMC
->      connected to a DPM enabled lpar. Likewise, AP adapters can be
->      dynamically configured (online state) and deconfigured (standby state)
->      using the SE, an SCLP command or an HMC connected to a DPM enabled
->      lpar. This can result in inadvertent sharing of AP queues between the
->      guest and host.
->
-> 5. A root user can manually unbind an AP queue device representing a
->      queue in use by a KVM guest via the vfio_ap device driver's sysfs
->      unbind attribute. In this case, the guest will be using a queue that
->      is not bound to the driver which violates the device model.
->
-> This patch series introduces the following changes to the current design
-> to alleviate the shortcomings described above as well as to implement
-> more of the AP architecture:
->
-> 1. A root user will be prevented from making edits to the AP bus's
->      /sys/bus/ap/apmask or /sys/bus/ap/aqmask if the change would transfer
->      ownership of an APQN from the vfio_ap device driver to a zcrypt driver
->      while the APQN is assigned to a matrix mdev.
->
-> 2. Allow a root user to hot plug/unplug AP adapters, domains and control
->      domains for a KVM guest using the matrix mdev via its sysfs
->      assign/unassign attributes.
->
-> 4. Allow assignment of an AP adapter or domain to a matrix mdev even if
->      it results in assignment of an APQN that does not reference an AP
->      queue device bound to the vfio_ap device driver, as long as the APQN
->      is not reserved for use by the default zcrypt drivers (also known as
->      over-provisioning of AP resources). Allowing over-provisioning of AP
->      resources better models the architecture which does not preclude
->      assigning AP resources that are not yet available in the system. Such
->      APQNs, however, will not be assigned to the guest using the matrix
->      mdev; only APQNs referencing AP queue devices bound to the vfio_ap
->      device driver will actually get assigned to the guest.
->
-> 5. Handle dynamic changes to the AP device model.
->
-> 1. Rationale for changes to AP bus's apmask/aqmask interfaces:
-> ----------------------------------------------------------
-> Due to the extremely sensitive nature of cryptographic data, it is
-> imperative that great care be taken to ensure that such data is secured.
-> Allowing a root user, either inadvertently or maliciously, to configure
-> these masks such that a queue is shared between the host and a guest is
-> not only avoidable, it is advisable. It was suggested that this scenario
-> is better handled in user space with management software, but that does
-> not preclude a malicious administrator from using the sysfs interfaces
-> to gain access to a guest's crypto data. It was also suggested that this
-> scenario could be avoided by taking access to the adapter away from the
-> guest and zeroing out the queues prior to the vfio_ap driver releasing the
-> device; however, stealing an adapter in use from a guest as a by-product
-> of an operation is bad and will likely cause problems for the guest
-> unnecessarily. It was decided that the most effective solution with the
-> least number of negative side effects is to prevent the situation at the
-> source.
->
-> 2. Rationale for hot plug/unplug using matrix mdev sysfs interfaces:
-> ----------------------------------------------------------------
-> Allowing a user to hot plug/unplug AP resources using the matrix mdev
-> sysfs interfaces circumvents the need to terminate the guest in order to
-> modify its AP configuration. Allowing dynamic configuration makes
-> reconfiguring a guest's AP matrix much less disruptive.
->
-> 3. Rationale for allowing over-provisioning of AP resources:
-> -----------------------------------------------------------
-> Allowing assignment of AP resources to a matrix mdev and ultimately to a
-> guest better models the AP architecture. The architecture does not
-> preclude assignment of unavailable AP resources. If a queue subsequently
-> becomes available while a guest using the matrix mdev to which its APQN
-> is assigned, the guest will be given access to it. If an APQN
-> is dynamically unassigned from the underlying host system, it will
-> automatically become unavailable to the guest.
->
-> Change log v16-v17:
-> ------------------
-> * Introduced a new patch (patch 1) to remove the setting of the pqap hook
->    in the group notifier callback. It is now set when the vfio_ap device
->    driver is loaded.
->
-> * Patch 6:
->      - Split the filtering of the APQNs and the control domains into
->        two functions and consolidated the vfio_ap_mdev_refresh_apcb and
->        vfio_ap_mdev_filter_apcb into one function named
->        vfio_ap_mdev_filter_matrix because the matrix is actually what is
->        being filtered.
->
->      - Removed ACK by Halil Pasic because of changes above; needs re-review.
->
-> * Introduced a new patch (patch 8) to keep track of active guests.
->
-> * Patch 9 (patch 8 in v16):
->      - Refactored locking to ensure KVM lock is taken before
->        matrix_dev->lock when hot plugging adapters, domains and
->        control domains.
->
->      - Removed ACK by Halil because of changes above; needs re-review.
->
-> * Patch 14 (patch 13 in v16):
->      - This patch has been redesigned to ensure proper locking order (i.e.,
->        taking kvm->lock before matrix_dev->lock).
->
->      - Removed Halil's Removed-by because of changes above; needs re-review.
->
-> Tony Krowiak (15):
->    s390/vfio-ap: Set pqap hook when vfio_ap module is loaded
->    s390/vfio-ap: use new AP bus interface to search for queue devices
->    s390/vfio-ap: move probe and remove callbacks to vfio_ap_ops.c
->    s390/vfio-ap: manage link between queue struct and matrix mdev
->    s390/vfio-ap: introduce shadow APCB
->    s390/vfio-ap: refresh guest's APCB by filtering APQNs assigned to mdev
->    s390/vfio-ap: allow assignment of unavailable AP queues to mdev device
->    s390/vfio-ap: keep track of active guests
->    s390/vfio-ap: allow hot plug/unplug of AP resources using mdev device
->    s390/vfio-ap: reset queues after adapter/domain unassignment
->    s390/ap: driver callback to indicate resource in use
->    s390/vfio-ap: implement in-use callback for vfio_ap driver
->    s390/vfio-ap: sysfs attribute to display the guest's matrix
->    s390/ap: notify drivers on config changed and scan complete callbacks
->    s390/vfio-ap: update docs to include dynamic config support
->
->   Documentation/s390/vfio-ap.rst        |  492 ++++++---
->   arch/s390/include/asm/kvm_host.h      |   10 +-
->   arch/s390/kvm/kvm-s390.c              |    1 -
->   arch/s390/kvm/priv.c                  |   45 +-
->   drivers/s390/crypto/ap_bus.c          |  241 ++++-
->   drivers/s390/crypto/ap_bus.h          |   16 +
->   drivers/s390/crypto/vfio_ap_drv.c     |   52 +-
->   drivers/s390/crypto/vfio_ap_ops.c     | 1379 ++++++++++++++++++-------
->   drivers/s390/crypto/vfio_ap_private.h |   66 +-
->   9 files changed, 1714 insertions(+), 588 deletions(-)
->
+Ya, I found that commit when digging around for different commit in the series
+and forgot to come back to this changelog.  I'll incorporate this info into the
+next version.
 
+>     commit 8b306e2f3c41939ea528e6174c88cfbfff893ce1
+>     Author: Paolo Bonzini <pbonzini@redhat.com>
+>     Date:   Tue Jun 6 12:57:05 2017 +0200
+> 
+>     KVM: VMX: avoid double list add with VT-d posted interrupts
+> 
+>     In some cases, for example involving hot-unplug of assigned
+>     devices, pi_post_block can forget to remove the vCPU from the
+>     blocked_vcpu_list.  When this happens, the next call to
+>     pi_pre_block corrupts the list.
+> 
+>     Fix this in two ways.  First, check vcpu->pre_pcpu in pi_pre_block
+>     and WARN instead of adding the element twice in the list.  Second,
+>     always do the list removal in pi_post_block if vcpu->pre_pcpu is
+>     set (not -1).
+> 
+>     The new code keeps interrupts disabled for the whole duration of
+>     pi_pre_block/pi_post_block.  This is not strictly necessary, but
+>     easier to follow.  For the same reason, PI.ON is checked only
+>     after the cmpxchg, and to handle it we just call the post-block
+>     code.  This removes duplication of the list removal code.
+> 
+> At the time, I didn't notice the now useless NDST update.
+> 
+> Paolo
+> 
+> > The vCPU can get preempted_before_  the update starts, but not during.
+> > And if the vCPU is preempted before, vmx_vcpu_pi_load() is responsible
+> > for updating NDST when the vCPU is scheduled back in.  In that case, the
+> > check against the wakeup vector in vmx_vcpu_pi_load() cannot be true as
+> > that would require the notification vector to have been set to the wakeup
+> > vector_before_  blocking.
+> > 
+> > Opportunistically switch to using vcpu->cpu for the list/lock lookups,
+> > which presumably used pre_pcpu only for some phantom preemption logic.
+> 
