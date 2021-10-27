@@ -2,112 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9371A43CCD8
-	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 16:57:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 157CF43CCE1
+	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 16:59:32 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242643AbhJ0O7g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Oct 2021 10:59:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58206 "EHLO
+        id S237461AbhJ0PB4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Oct 2021 11:01:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:33331 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S242640AbhJ0O7e (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 27 Oct 2021 10:59:34 -0400
+        by vger.kernel.org with ESMTP id S235415AbhJ0PBz (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 Oct 2021 11:01:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635346629;
+        s=mimecast20190719; t=1635346769;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=1kiv1BZf6xFogujw6ml5Mx2cj+xKDQFeYDEEPX1GMOs=;
-        b=A/5DhUG7viz9Q20XNQp3R6VBeocsmcHHxyZnXNKlXb2LeOhxQD3FBuD/IHfg64yyzpTE88
-        Yd8E9nyDnQNDrL+TNML6kaLLWBbIi9CoNgujO3/B3q1sUlM+l6HfFeY3ZfaIrwEUtixyJM
-        rsyKtuYm24TO6HmYojVtsAYztUdbfaM=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-258-GyU1gbVZO06TC3UNJV4KrQ-1; Wed, 27 Oct 2021 10:57:08 -0400
-X-MC-Unique: GyU1gbVZO06TC3UNJV4KrQ-1
-Received: by mail-ed1-f70.google.com with SMTP id g6-20020a056402424600b003dd2b85563bso2572451edb.7
-        for <kvm@vger.kernel.org>; Wed, 27 Oct 2021 07:57:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=1kiv1BZf6xFogujw6ml5Mx2cj+xKDQFeYDEEPX1GMOs=;
-        b=rkyvJBr7AMdWrSpZjBfyLJ5o1PQrQdTLVVNK/nTzKCO1u9DoFF8MRUKOZ8ALe4WJKx
-         1ee/9AiGW5CA+QEm2VfmVfw5vYg7zZUT4FEyTclA38A8XevaEVcUp+YLRHr3mJbS8pVz
-         soLs05+E3sQA/yZJKc9ReR63ZLQHPeQWU48YbGBbqTyG+wT92J7HQZ16hQ/bhidLOfps
-         uDz+5CJvwSg1yEzb/BAIUR2m1+UrJnpvpPS2hKB2voJdwunT6a2HBzsp9529GErd/5dj
-         qGzPPYy3/rlvj5QQOU/DSDhDy6H2JNkpoKxTYST2Wu9Oqx/D1dffZp0auJg3cTV22JNn
-         ShIg==
-X-Gm-Message-State: AOAM532oMuN6APWhEyxSDW70EvaLKcpK3FW/XAeck/5MT4FhZpMXGOpw
-        L4g298o+nGWVFpUfeyUtVC+akleIOOxWwspZg6LslC5WiBrb6A9WhCD498Kkq95FZXmY2Ak0HIF
-        p7fAKsUCC6ZJA
-X-Received: by 2002:a17:907:7d94:: with SMTP id oz20mr38999413ejc.98.1635346626737;
-        Wed, 27 Oct 2021 07:57:06 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJytn7bu+kBLh9LVQ/1pex7gMJDdz0Rr/buTYBO2a2VZJzJDbs6skZyshVLbERw1F1K5YyM70Q==
-X-Received: by 2002:a17:907:7d94:: with SMTP id oz20mr38999381ejc.98.1635346626512;
-        Wed, 27 Oct 2021 07:57:06 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id t15sm67707ejx.75.2021.10.27.07.57.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Oct 2021 07:57:05 -0700 (PDT)
-Message-ID: <ecec4d7d-13dd-c992-6648-3624d7c14c24@redhat.com>
-Date:   Wed, 27 Oct 2021 16:57:00 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH v2 00/43] KVM: Halt-polling and x86 APICv overhaul
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        David Matlack <dmatlack@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>
-References: <20211009021236.4122790-1-seanjc@google.com>
- <614858dd-106c-64cc-04bc-f1887b2054d1@redhat.com>
- <YXllGfrjPX1pVUx6@google.com>
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=dmMAXlBbydUPcO3WhWZ8PkBNlDfdb7R7qupK88yQ1m8=;
+        b=h0B0RJ74SA3htok9Ot4q0ZdzeLe1QatIEbjkSTOKWRVIXx9d4vJ5Es30bLw72ppmH+/UEz
+        M1LLnvfzCthxrkRHl9H8kPZk6S4x7b6/GbYVaRtoNECEdE/+x8+fZ5XBa+O+RhcytGWKRZ
+        UmEd3sjbwd8g8QBOtxOYtIjYy+8Zr8U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-270-E56qGJLRP3erriuCDy46wA-1; Wed, 27 Oct 2021 10:59:28 -0400
+X-MC-Unique: E56qGJLRP3erriuCDy46wA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 43C2910B3942;
+        Wed, 27 Oct 2021 14:59:27 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D065060862;
+        Wed, 27 Oct 2021 14:59:26 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YXllGfrjPX1pVUx6@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     stable@vger.kernel.org, Marc Orr <marcorr@google.com>
+Subject: [PATCH] KVM: SEV-ES: fix another issue with string I/O VMGEXITs
+Date:   Wed, 27 Oct 2021 10:59:26 -0400
+Message-Id: <20211027145926.2873481-1-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/10/21 16:41, Sean Christopherson wrote:
-> The other thing I don't like about having the WARN in the loop is that it suggests
-> that something other than the vCPU can modify the NDST and SN fields, which is
-> wrong and confusing (for me).
+If the guest requests string I/O from the hypervisor via VMGEXIT,
+SW_EXITINFO2 will contain the REP count.  However, sev_es_string_io
+was incorrectly treating it as the size of the GHCB buffer in
+bytes.
 
-Yeah, I can agree with that.  Can you add it in a comment above the 
-cmpxchg loop, it can be as simple as
+This fixes the "outsw" test in the experimental SEV tests of
+kvm-unit-tests.
 
-	/* The processor can set ON concurrently.  */
+Cc: stable@vger.kernel.org
+Fixes: 7ed9abfe8e9f ("KVM: SVM: Support string IO operations for an SEV-ES guest")
+Reported-by: Marc Orr <marcorr@google.com>
+Tested-by: Marc Orr <marcorr@google.com>
+Reviewed-by: Marc Orr <marcorr@google.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/svm/sev.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
-when you respin patch 21 and the rest of the series?
-
-Paolo
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index e672493b5d8d..efd207fd335e 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -2579,11 +2579,20 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
+ 
+ int sev_es_string_io(struct vcpu_svm *svm, int size, unsigned int port, int in)
+ {
+-	if (!setup_vmgexit_scratch(svm, in, svm->vmcb->control.exit_info_2))
++	int count;
++	int bytes;
++
++	if (svm->vmcb->control.exit_info_2 > INT_MAX)
++		return -EINVAL;
++
++	count = svm->vmcb->control.exit_info_2;
++	if (unlikely(check_mul_overflow(count, size, &bytes)))
++		return -EINVAL;
++
++	if (!setup_vmgexit_scratch(svm, in, bytes))
+ 		return -EINVAL;
+ 
+-	return kvm_sev_es_string_io(&svm->vcpu, size, port,
+-				    svm->ghcb_sa, svm->ghcb_sa_len / size, in);
++	return kvm_sev_es_string_io(&svm->vcpu, size, port, svm->ghcb_sa, count, in);
+ }
+ 
+ void sev_es_init_vmcb(struct vcpu_svm *svm)
+-- 
+2.27.0
 
