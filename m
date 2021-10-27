@@ -2,129 +2,195 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C614643CD12
-	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 17:07:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A904943CD42
+	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 17:14:26 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242678AbhJ0PJ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Oct 2021 11:09:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52882 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237757AbhJ0PJ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Oct 2021 11:09:28 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8ABAAC0613B9
-        for <kvm@vger.kernel.org>; Wed, 27 Oct 2021 08:07:02 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id y7so2991015pfg.8
-        for <kvm@vger.kernel.org>; Wed, 27 Oct 2021 08:07:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=O5lEF3hXOuOGQ36jWeA5WrZK+395dTI4kUNN+CFJhtE=;
-        b=GJjlg8jJfw+Bt9Zd0zP4mtqcSM31wSFBYCetU17CHbzQQW4kiFtHDgsZBVvEH8887p
-         yw/Js4mEDuANgaxd1QymvaNpmXbEvaNRm2HNB868WPSRynugBhM6LN65l++VZht0g2X0
-         XFMEItNS+WJlFOOOZlwyo5ghqOI0eoYdx8EfG7dg89d25ghzdUn9Jr0jTft3rzInpzui
-         t+nhlFj3SyV2ez0xA0qiaGWyaH3JZAU5KHIJMn2b+NEmBeF/xDfhUhjIDnEt41PMETob
-         dNlEs4TAu5VbQ+MRxeaG1Cc4kLdotzXGkh/U5A20JnxHgI8kyVG06UiAaMfvZtmJbPiD
-         c4pA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=O5lEF3hXOuOGQ36jWeA5WrZK+395dTI4kUNN+CFJhtE=;
-        b=zxdCSs3kGKn0RlB7kBjUJSXcyzW0UMp9B8+sju2zimmrYxsYqaPzbbncjugHekXZ2+
-         zuq84es7AhxJ8i9xQ+X0lfGEjFKg+z5naj1qkiIBEUfeMSUhAFd/ycDDKPeyN1fGhHLE
-         21N4VxlUEIsd1eG47fVm2yTJD0K/AT8rkkmoHLf9VdKvxxgV/GwQpZzueLltxHRM2omT
-         +dRohMR+aKi4c9UHcL3EPNymdE3v6FpYAqGqpqI7bgrboE/qSvhofPA+Bj0HF9RavwYG
-         DhWhOK1f9AVflDukIiRjn50LkmGkgZATTUukbZbyZJ62eYfkzeS4v82Mge7Rh5IJnuRy
-         X85Q==
-X-Gm-Message-State: AOAM533EziWgzyDXQksm0WFQDA4I2P1CmRHhv9ELw+6N8lWL303i6CwI
-        f5bevXPy0EBA+q6WhjyFt79RJQ==
-X-Google-Smtp-Source: ABdhPJyFiG0oaOa31Ni2mfE2COsoLS8wTaHHbwW9HjhwNmX9PoY62hBCx/P2f3tKT436xIXd6QXjiA==
-X-Received: by 2002:a05:6a00:15c9:b0:44c:a998:b50d with SMTP id o9-20020a056a0015c900b0044ca998b50dmr33155514pfu.49.1635347221673;
-        Wed, 27 Oct 2021 08:07:01 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id x15sm310904pfp.30.2021.10.27.08.07.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Oct 2021 08:07:00 -0700 (PDT)
-Date:   Wed, 27 Oct 2021 15:06:57 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+        id S242693AbhJ0PQs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Oct 2021 11:16:48 -0400
+Received: from mail-dm6nam10on2071.outbound.protection.outlook.com ([40.107.93.71]:38772
+        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S242681AbhJ0PQr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 27 Oct 2021 11:16:47 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OBeHbpXsMEm0ZgaYkUyXjFAYbGRNGV40JcdzP/J6HIflEDlOBXYTvIofn9UgdPjKEBGrCdGk8OE3EDwBfhGF6nqihC63CsJQD4VYaNfKd3bprgCHlWwHoW+ivRIy8N0Kj3kQnaKOa66vD/6Zj7qmBCqAdpo//ZgHOMAm3bswKsMfwD7slyIZk50FE0JF7TQAg2F1CgsB0phMlWuK43N6f6W+dayA3O5thG8zbUd42gkSvVCjsxW8zm9xrnGxhVcNZepICQ9NFDRW6RPy0WntKGNj3DjgM2eCzGZ3Zu2CtbjH4VN6dHrpgz+uerB/tl6ZlrdzrsVSm7u+3WNTA6Xksg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=wPod+ObHf4kgKPISc2cRbmeSv313djtHuT9BF8uRLQQ=;
+ b=ILastPJMq/ttmRZ6OeGDJY0IBiwGYMXKJ0arlnEwNtMhWX3BClhNdSOnxIxcFzsI3sxLLkUd4yTHfnxw9jYdRcS+9/5BzzWnvjbTdUk3vS3f9edEyQAYvRzpUQVOaMgNngwQsQ9rAgWMND/A6RqaDtvcV+8JXWAtdjmgw7Uz06fWAekehdhAfvMyNd9IJZovLxmLSuE7LZvP6gNkZ/Qi8DLuX6g/CJm5ndQaCo2H6D4baRxdGd+w2Sg7lvse4+zL2hM9eSlAt0oxVYFrdail/m9btbJxsXuLCXT3r9848QZqaC7xgJ3wM0UTLLOszqyINbB42LnaRVTk/vapd1IXjw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=alien8.de smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wPod+ObHf4kgKPISc2cRbmeSv313djtHuT9BF8uRLQQ=;
+ b=Xct1ifkX2noaqHa3vgHSJhZGn1Z2Um08u58aK5WKGimBRHuWWb5ddLIW7sM5S3qWvRP8USUO8nDQtB7TuBC5Dz/mzQ9MW0fKi2hNiOC1xsGeL8sF+MplwQ8S770wWBouxmJ5vtNx1BQRapDND/86fRu1u4mNDN9VR9ZfqQSInrk=
+Received: from CO1PR15CA0067.namprd15.prod.outlook.com (2603:10b6:101:20::11)
+ by SN6PR12MB2717.namprd12.prod.outlook.com (2603:10b6:805:68::29) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4628.18; Wed, 27 Oct
+ 2021 15:14:18 +0000
+Received: from CO1NAM11FT003.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:101:20:cafe::b0) by CO1PR15CA0067.outlook.office365.com
+ (2603:10b6:101:20::11) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4649.14 via Frontend
+ Transport; Wed, 27 Oct 2021 15:14:18 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; alien8.de; dkim=none (message not signed)
+ header.d=none;alien8.de; dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com;
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CO1NAM11FT003.mail.protection.outlook.com (10.13.175.93) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.4649.14 via Frontend Transport; Wed, 27 Oct 2021 15:14:16 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.15; Wed, 27 Oct
+ 2021 10:14:15 -0500
+Date:   Wed, 27 Oct 2021 10:13:25 -0500
+From:   Michael Roth <michael.roth@amd.com>
+To:     Borislav Petkov <bp@alien8.de>
+CC:     Brijesh Singh <brijesh.singh@amd.com>, <x86@kernel.org>,
+        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <linux-efi@vger.kernel.org>, <platform-driver-x86@vger.kernel.org>,
+        <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        David Matlack <dmatlack@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH v2 35/43] KVM: SVM: Signal AVIC doorbell iff vCPU is in
- guest mode
-Message-ID: <YXlrEWmBohaDXmqL@google.com>
-References: <20211009021236.4122790-1-seanjc@google.com>
- <20211009021236.4122790-36-seanjc@google.com>
- <0333be2a-76d8-657a-6c82-3bb5c9ff2e3b@redhat.com>
+        "Andy Lutomirski" <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        "Peter Zijlstra" <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        <tony.luck@intel.com>, <marcorr@google.com>,
+        <sathyanarayanan.kuppuswamy@linux.intel.com>
+Subject: Re: [PATCH v6 08/42] x86/sev-es: initialize sev_status/features
+ within #VC handler
+Message-ID: <20211027151325.v3w3nghq5z2o5dto@amd.com>
+References: <20211008180453.462291-9-brijesh.singh@amd.com>
+ <YW2EsxcqBucuyoal@zn.tnic>
+ <20211018184003.3ob2uxcpd2rpee3s@amd.com>
+ <YW3IdfMs61191qnU@zn.tnic>
+ <20211020161023.hzbj53ehmzjrt4xd@amd.com>
+ <YXF+WjMHW/dd0Wb6@zn.tnic>
+ <20211021204149.pof2exhwkzy2zqrg@amd.com>
+ <YXaPKsicNYFZe84I@zn.tnic>
+ <20211025163518.rztqnngwggnbfxvs@amd.com>
+ <YXk1N6ApJA8PgkwM@zn.tnic>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <0333be2a-76d8-657a-6c82-3bb5c9ff2e3b@redhat.com>
+In-Reply-To: <YXk1N6ApJA8PgkwM@zn.tnic>
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 21678983-18d1-43f4-bcd9-08d9995c7102
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2717:
+X-Microsoft-Antispam-PRVS: <SN6PR12MB271797E5EDB35909FC705D4195859@SN6PR12MB2717.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 335AejeA9HH0DRMzDDGwerbr/qGVU7oe6fLBXvuyTlBPwu+Bvu5Bl0zt6tve0gioFtIfk+rei5zWfeG0itST0AcZFi9VlP0ssb/mMkTXpGLz0hZXEgrTlRS0dBuA7ATYHx0N4QJozESJpXamz+5tRu4u63m+HmkMn/LSkJ5kZpEByrUqRKP27lddmPT22oEe85MAbblpHRTKudfSLPIqQqRLEa1gXGbyeJqrUAPFo63R8Mw6DO4wUQGK6H+IyQccCbnUn/75NIkuXOWUmdND6xObU5tjqeu4Gl4S3OGqMwjB2hp78IRkkBftKEfvTbQD8PKJWBtHL6DcUY1d9rTKXZtv7h33sAw54MWFEKSeFS8DOyr2YX0y+6tS7buSy+MbhPIssHCNKugvcJIhjRHJuXiWgLp64viVR7iRsXpEIB/eJtI/okXdPcR4nAyhK8TCgFc0Jq9Tu6PGjUALNVGvV7qqTzZrwp9boMW/y/VZwkOm2lyzmwOXyt+D2mU7gFUeKlnliZXsUyIpzHw4Oya4vmdXbNOD1u6iqJkAvM2K50YPsIvL2Ji0D9kdd6UuyOuW/XzH7OXiw6uLRhCrTuoA31tBtYzKp0uK1ZNtturb93qwEfrR0gYhAgN8gyoMsIXMjRNKz/xtLc4FSzdYEQ57g2ezeZDnFla1AjpqyM5XFgwSvmangswGQ0Y9W38PhqFE1p1VgjHcLdoRjh4k5obyT2KbkT8gRL+ZPyaPvdGd8g0v5Gzdezqr8eEzbuwHmdLCVqgcvXKInFsvBaMo2FOvR4ZR4A2vWgiPfDfoag3CKXitR44zGLpje3JJffKfQBe+
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(4636009)(46966006)(36840700001)(2906002)(5660300002)(316002)(7416002)(83380400001)(4326008)(36860700001)(8676002)(70586007)(356005)(54906003)(1076003)(966005)(81166007)(8936002)(82310400003)(6916009)(47076005)(70206006)(7406005)(426003)(2616005)(45080400002)(508600001)(26005)(86362001)(336012)(36756003)(16526019)(6666004)(186003)(44832011)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Oct 2021 15:14:16.0062
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 21678983-18d1-43f4-bcd9-08d9995c7102
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT003.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2717
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 25, 2021, Paolo Bonzini wrote:
-> On 09/10/21 04:12, Sean Christopherson wrote:
-> > +	 */
-> > +	if (vcpu->mode == IN_GUEST_MODE) {
-> >   		int cpu = READ_ONCE(vcpu->cpu);
-> >   		/*
-> > @@ -687,8 +692,13 @@ int svm_deliver_avic_intr(struct kvm_vcpu *vcpu, int vec)
-> >   		if (cpu != get_cpu())
-> >   			wrmsrl(SVM_AVIC_DOORBELL, kvm_cpu_get_apicid(cpu));
-> >   		put_cpu();
-> > -	} else
-> > +	} else {
-> > +		/*
-> > +		 * Wake the vCPU if it was blocking.  KVM will then detect the
-> > +		 * pending IRQ when checking if the vCPU has a wake event.
-> > +		 */
-> >   		kvm_vcpu_wake_up(vcpu);
-> > +	}
+On Wed, Oct 27, 2021 at 01:17:11PM +0200, Borislav Petkov wrote:
+> On Mon, Oct 25, 2021 at 11:35:18AM -0500, Michael Roth wrote:
+> > As counter-intuitive as it sounds, it actually doesn't buy us if the CPUID
+> > table is part of the PSP attestation report, since:
 > 
-> Does this still need to check the "running" flag?  That should be a strict
-> superset of vcpu->mode == IN_GUEST_MODE.
+> Thanks for taking the time to explain in detail - I think I know now
+> what's going on, and David explained some additional stuff to me
+> yesterday.
+> 
+> So, to cut to the chase:
+> 
+>  - yeah, ok, I guess guest owner attestation is what should happen.
+> 
+>  - as to the boot detection, I think you should do in sme_enable(), in
+> pseudo:
+> 
+> 	bool snp_guest_detected;
+> 
+>         if (CPUID page address) {
+>                 read SEV_STATUS;
+> 
+>                 snp_guest_detected = SEV_STATUS & MSR_AMD64_SEV_SNP_ENABLED;
+>         }
+> 
+>         /* old SME/SEV detection path */
+>         read 0x8000_001F_EAX and look at bits SME and SEV, yadda yadda.
+> 
+>         if (snp_guest_detected && (!SME || !SEV))
+>                 /*
+> 		 * HV is lying to me, do something there, dunno what. I guess we can
+> 		 * continue booting unencrypted so that the guest owner knows that
+> 		 * detection has failed and maybe the HV didn't want us to force SNP.
+> 		 * This way, attestation will fail and the user will know why.
+> 		 * Or something like that.
+> 		 */
+> 
+> 
+>         /* normal feature detection continues. */
+> 
+> How does that sound?
 
-No.  Signalling the doorbell when "running" is set but the vCPU is not in the
-guest is just an expensive nop.  So even if KVM were to rework its handling of
-"running" to set the flag immediately before VMRUN and clear it immediately after,
-keying off IN_GUEST_MODE and not "running" would not be wrong, just sub-optimal.
+That seems promising. I've been testing a similar approach in conjunction with
+moving sme_enable() to after the initial #VC handler is set up and things seem
+to work out pretty nicely.
 
-I doubt KVM will ever make the "running" flag super precise, because keeping the
-flag set when the vCPU is loaded avoids VM-Exits on other vCPUs due to undelivered
-IPIs.  But the flip side is that it means the flag has terrible granularity, and
-is arguably inaccurate when viewed from a software perspective.  Anyways, if the
-treatment of "running" were ever changed, then this code should also be changed
-to essentially revert this commit since vcpu->mode would then be redundant.
+boot/compressed is a little less straightforward since the sme_enable()
+equivalent is set_sev_encryption_mask() which sets sev_status and is written
+in assembly, whereas the SNP-specific bits we're adding relies on C code
+that handles stuff like scanning EFI config table are in C, so probably
+worthwhile to see if everything can be redone in C. But then there's
+get_sev_encryption_bit(), which needs to be in assembly since it needs
+to be called from 32-bit entry path as well, but that doesn't actually
+rely on anything set by set_sev_encryption_mask(), so it seems like it
+should be okay to split set_sev_encryption_mask() out into a separate C
+routine.
 
-And IMO, it makes sense to intentionally separate KVM's delivery of interrupts
-from hardware's delivery of interrupts.  I.e. use the same core rules as
-kvm_vcpu_kick() for when to send interrupts and when to wake for the AVIC.
+Will work on implementing/testing that approach, but if you or Joerg are
+aware of any showstoppers there just let me know.
+
+Thanks!
+
+-Mike
+
+> 
+> -- 
+> Regards/Gruss,
+>     Boris.
+> 
+> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fpeople.kernel.org%2Ftglx%2Fnotes-about-netiquette&amp;data=04%7C01%7Cmichael.roth%40amd.com%7C72940826a93b49882ffa08d9993b5390%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637709302358641670%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C1000&amp;sdata=%2BoUx7zP3RA57CwGG2q5IkUkrYQZiOL9ZoLxvIVTq%2BDY%3D&amp;reserved=0
