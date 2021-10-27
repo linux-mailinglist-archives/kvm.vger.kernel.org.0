@@ -2,130 +2,207 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5FCD443CB8F
-	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 16:07:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 053E443CBAA
+	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 16:10:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242402AbhJ0OJ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Oct 2021 10:09:59 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:11736 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230160AbhJ0OJ6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 27 Oct 2021 10:09:58 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19RDHf6W032778;
-        Wed, 27 Oct 2021 14:07:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=2HhZ1iSB06fU1gQUbee7ylyzdJtktEf57Zt5XEr4R1M=;
- b=ZhPch7hJgClbPZDeLFHfaFZ86e+IZBt7jX8Ln8pLhKrBcxFQkGP8DI5c55BziRIToAtK
- be5asmE/hArUk/6uiSpALWJbklPhnozzunOq0KHOFL2/LeabpCd/eYyGcWK2gAS1udgR
- ll4v9Wna/vJpL3140STzQMSwhd3nUtLb8O8QsFk54NO9JPcUlruSB3aVGWCC3AL+VfIc
- ydehHQ2UcSBLKWZscsvcLmPYjc4zjoJY8SDhd2oWbyuLkV116W1j0xaRAmwrFEiKUQKc
- cElrKOQ5dwJbaj95sWmQj/JwH5sJUUVEIaps9tbYcLk+cR+6t6RliXOY68zZNBaUl5fs +g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3by7hb983y-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 27 Oct 2021 14:07:32 +0000
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19RDufam021267;
-        Wed, 27 Oct 2021 14:07:32 GMT
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3by7hb9838-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 27 Oct 2021 14:07:32 +0000
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19RE3Xqk021716;
-        Wed, 27 Oct 2021 14:07:30 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
-        by ppma01dal.us.ibm.com with ESMTP id 3bx4fabwfg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 27 Oct 2021 14:07:30 +0000
-Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
-        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19RE71xC7799416
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 27 Oct 2021 14:07:01 GMT
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F2A522806E;
-        Wed, 27 Oct 2021 14:07:00 +0000 (GMT)
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5D28C28066;
-        Wed, 27 Oct 2021 14:07:00 +0000 (GMT)
-Received: from [9.160.124.65] (unknown [9.160.124.65])
-        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
-        Wed, 27 Oct 2021 14:07:00 +0000 (GMT)
-Message-ID: <83c63ace-3277-cf8a-8fd1-88d8d28113db@linux.ibm.com>
-Date:   Wed, 27 Oct 2021 10:07:00 -0400
+        id S237766AbhJ0ONS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Oct 2021 10:13:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26581 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S238114AbhJ0ONP (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 Oct 2021 10:13:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635343850;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=cVoa83Mt37o7LxzLcjDlhV+CHKfwNHfJj/XpdkZn+wM=;
+        b=d308hwnv7O0t+sslPO+fxl/hQlG8c3iNdqeNNE6UPmyW2xOBrD9jAm5wI6adYhIugAbD+u
+        3lwJWGeqdwbgOF9VH7UIoNFBNhcAHvvf2q8NWWYhonIMhax88y9pcnicQQ3nzaZgfSy80F
+        cZJ6/STI7aNlm6TIRgaz9AT+Sf0t9DM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-450-HHU7zf4COr2mtmPfjcXavw-1; Wed, 27 Oct 2021 10:10:45 -0400
+X-MC-Unique: HHU7zf4COr2mtmPfjcXavw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A6B619251DC;
+        Wed, 27 Oct 2021 14:10:24 +0000 (UTC)
+Received: from starship (unknown [10.40.194.243])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C89B45DF36;
+        Wed, 27 Oct 2021 14:10:07 +0000 (UTC)
+Message-ID: <363479dd55760979da208cacf015a6f7fe2afd69.camel@redhat.com>
+Subject: Re: [PATCH v2 12/43] KVM: x86: Tweak halt emulation helper names to
+ free up kvm_vcpu_halt()
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Anup Patel <anup.patel@wdc.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Atish Patra <atish.patra@wdc.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        David Matlack <dmatlack@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+Date:   Wed, 27 Oct 2021 17:10:06 +0300
+In-Reply-To: <20211009021236.4122790-13-seanjc@google.com>
+References: <20211009021236.4122790-1-seanjc@google.com>
+         <20211009021236.4122790-13-seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH] KVM: s390x: add debug statement for diag 318 CPNC data
-Content-Language: en-US
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com
-References: <20211027025451.290124-1-walling@linux.ibm.com>
- <5f91eed7-993a-cb76-8a9f-0c17438cd064@de.ibm.com>
-From:   Collin Walling <walling@linux.ibm.com>
-In-Reply-To: <5f91eed7-993a-cb76-8a9f-0c17438cd064@de.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 0LtBPSX_8woc1nUMBvczgXB7UiZC6wdQ
-X-Proofpoint-ORIG-GUID: 2mMEelC8xQ84Bb5TGHUqy9rPUDGOP0jf
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-10-27_04,2021-10-26_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
- impostorscore=0 bulkscore=0 adultscore=0 phishscore=0 mlxlogscore=999
- spamscore=0 priorityscore=1501 malwarescore=0 lowpriorityscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2110270086
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/27/21 01:41, Christian Borntraeger wrote:
-> Am 27.10.21 um 04:54 schrieb Collin Walling:
->> The diag 318 data contains values that denote information regarding the
->> guest's environment. Currently, it is unecessarily difficult to observe
->> this value (either manually-inserted debug statements, gdb stepping, mem
->> dumping etc). It's useful to observe this information to obtain an
->> at-a-glance view of the guest's environment, so lets add a simple VCPU
->> event that prints the CPNC to the s390dbf logs.
->>
->> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+On Fri, 2021-10-08 at 19:12 -0700, Sean Christopherson wrote:
+> Rename a variety of HLT-related helpers to free up the function name
+> "kvm_vcpu_halt" for future use in generic KVM code, e.g. to differentiate
+> between "block" and "halt".
 > 
-> applied and queued
->> ---
->>   arch/s390/kvm/kvm-s390.c | 1 +
->>   1 file changed, 1 insertion(+)
->>
->> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->> index 6a6dd5e1daf6..da3ff24eabd0 100644
->> --- a/arch/s390/kvm/kvm-s390.c
->> +++ b/arch/s390/kvm/kvm-s390.c
->> @@ -4254,6 +4254,7 @@ static void sync_regs_fmt2(struct kvm_vcpu *vcpu)
->>       if (kvm_run->kvm_dirty_regs & KVM_SYNC_DIAG318) {
->>           vcpu->arch.diag318_info.val = kvm_run->s.regs.diag318;
->>           vcpu->arch.sie_block->cpnc = vcpu->arch.diag318_info.cpnc;
->> +        VCPU_EVENT(vcpu, 2, "setting cpnc to %d",
->> vcpu->arch.diag318_info.cpnc);
+> No functional change intended.
 > 
-> After comparing this with the other events I think level==3 is better.
-> Changed when applying.
->>       }
->>       /*
->>        * If userspace sets the riccb (e.g. after migration) to a valid
->> state,
->>
+> Reviewed-by: David Matlack <dmatlack@google.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h |  2 +-
+>  arch/x86/kvm/vmx/nested.c       |  2 +-
+>  arch/x86/kvm/vmx/vmx.c          |  4 ++--
+>  arch/x86/kvm/x86.c              | 13 +++++++------
+>  4 files changed, 11 insertions(+), 10 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 7aafc27ce7a9..328103a520d3 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1689,7 +1689,7 @@ int kvm_emulate_monitor(struct kvm_vcpu *vcpu);
+>  int kvm_fast_pio(struct kvm_vcpu *vcpu, int size, unsigned short port, int in);
+>  int kvm_emulate_cpuid(struct kvm_vcpu *vcpu);
+>  int kvm_emulate_halt(struct kvm_vcpu *vcpu);
+> -int kvm_vcpu_halt(struct kvm_vcpu *vcpu);
+> +int kvm_emulate_halt_noskip(struct kvm_vcpu *vcpu);
+>  int kvm_emulate_ap_reset_hold(struct kvm_vcpu *vcpu);
+>  int kvm_emulate_wbinvd(struct kvm_vcpu *vcpu);
+>  
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index af1bbb73430a..d0237a441feb 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -3619,7 +3619,7 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
+>  		    !(nested_cpu_has(vmcs12, CPU_BASED_INTR_WINDOW_EXITING) &&
+>  		      (vmcs12->guest_rflags & X86_EFLAGS_IF))) {
+>  			vmx->nested.nested_run_pending = 0;
+> -			return kvm_vcpu_halt(vcpu);
+> +			return kvm_emulate_halt_noskip(vcpu);
+>  		}
+>  		break;
+>  	case GUEST_ACTIVITY_WAIT_SIPI:
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 1c8b2b6e7ed9..5517893f12fc 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -4741,7 +4741,7 @@ static int handle_rmode_exception(struct kvm_vcpu *vcpu,
+>  		if (kvm_emulate_instruction(vcpu, 0)) {
+>  			if (vcpu->arch.halt_request) {
+>  				vcpu->arch.halt_request = 0;
+> -				return kvm_vcpu_halt(vcpu);
+> +				return kvm_emulate_halt_noskip(vcpu);
 
-Thanks!
+Could you elaborate on why you choose _noskip suffix? 
+ 
+As far as I see, kvm_vcpu_halt just calls __kvm_vcpu_halt with new VCPU run state/exit reason,
+which is used only when local apic is not in the kernel (which is these days not that
+supported configuration).
+
+Other user of __kvm_vcpu_halt is something SEV related.
+ 
+Best regards,
+	Maxim Levitsky
 
 
--- 
-Regards,
-Collin
+>  			}
+>  			return 1;
+>  		}
+> @@ -5415,7 +5415,7 @@ static int handle_invalid_guest_state(struct kvm_vcpu *vcpu)
+>  
+>  		if (vcpu->arch.halt_request) {
+>  			vcpu->arch.halt_request = 0;
+> -			return kvm_vcpu_halt(vcpu);
+> +			return kvm_emulate_halt_noskip(vcpu);
+>  		}
+>  
+>  		/*
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 4a52a08707de..9c23ae1d483d 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -8649,7 +8649,7 @@ void kvm_arch_exit(void)
+>  #endif
+>  }
+>  
+> -static int __kvm_vcpu_halt(struct kvm_vcpu *vcpu, int state, int reason)
+> +static int __kvm_emulate_halt(struct kvm_vcpu *vcpu, int state, int reason)
+>  {
+>  	++vcpu->stat.halt_exits;
+>  	if (lapic_in_kernel(vcpu)) {
+> @@ -8661,11 +8661,11 @@ static int __kvm_vcpu_halt(struct kvm_vcpu *vcpu, int state, int reason)
+>  	}
+>  }
+>  
+> -int kvm_vcpu_halt(struct kvm_vcpu *vcpu)
+> +int kvm_emulate_halt_noskip(struct kvm_vcpu *vcpu)
+>  {
+> -	return __kvm_vcpu_halt(vcpu, KVM_MP_STATE_HALTED, KVM_EXIT_HLT);
+> +	return __kvm_emulate_halt(vcpu, KVM_MP_STATE_HALTED, KVM_EXIT_HLT);
+>  }
+> -EXPORT_SYMBOL_GPL(kvm_vcpu_halt);
+> +EXPORT_SYMBOL_GPL(kvm_emulate_halt_noskip);
+>  
+>  int kvm_emulate_halt(struct kvm_vcpu *vcpu)
+>  {
+> @@ -8674,7 +8674,7 @@ int kvm_emulate_halt(struct kvm_vcpu *vcpu)
+>  	 * TODO: we might be squashing a GUESTDBG_SINGLESTEP-triggered
+>  	 * KVM_EXIT_DEBUG here.
+>  	 */
+> -	return kvm_vcpu_halt(vcpu) && ret;
+> +	return kvm_emulate_halt_noskip(vcpu) && ret;
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_emulate_halt);
+>  
+> @@ -8682,7 +8682,8 @@ int kvm_emulate_ap_reset_hold(struct kvm_vcpu *vcpu)
+>  {
+>  	int ret = kvm_skip_emulated_instruction(vcpu);
+>  
+> -	return __kvm_vcpu_halt(vcpu, KVM_MP_STATE_AP_RESET_HOLD, KVM_EXIT_AP_RESET_HOLD) && ret;
+> +	return __kvm_emulate_halt(vcpu, KVM_MP_STATE_AP_RESET_HOLD,
+> +					KVM_EXIT_AP_RESET_HOLD) && ret;
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_emulate_ap_reset_hold);
+>  
 
-Stay safe and stay healthy
+
