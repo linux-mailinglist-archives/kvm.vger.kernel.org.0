@@ -2,129 +2,213 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 006D343CF11
-	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 18:53:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BEB0043D162
+	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 21:05:28 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242994AbhJ0Q4G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Oct 2021 12:56:06 -0400
-Received: from mail-mw2nam12on2049.outbound.protection.outlook.com ([40.107.244.49]:42593
-        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S239523AbhJ0Q4F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Oct 2021 12:56:05 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=btC+KOpN+2bJq0jYo5U94VgNowVELQH6E4IKNKSmTbzPYNhXybixa2CClcAQF7dMzMULHpmqBqHAoY/05ilXo+WluJQTOIZ5m5NQr67mtjbUUeQ8/l916Vu1eJzoM/gP+Utk4I82R2+X/OZeYvqD/Yq3Wp6K8EjwkuHoOxqny3rLR8bCoQFrpnV0R/Tnpn1wxnnyh/ypW0ghBg3+IUZI0/aVIq62Y1gItKOVGtkH8QBoQ0kkBz6INQcBdKZeY6oYBWp1+k+GjBZ8b3Yt6tBpZIyQ6gTw4DAZmisv+RDIr4UFsoi/Mb+PBFv6C2MbJVXdLEaVdVP0WvKELV+yFZfB0g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=K69kOi99wKYWhIFkS0zS1IFdt96fwTEjWcBZdRQ1lUs=;
- b=YYaKdLjfVn1n2o+R9sZx0wi0OWNR+vfG81oAkhqkFQ7lWlPIIR9HyEMCwyi/HKeIXF0UyYb2Xi+6p49K65bmtYvI616rtCccF4efNuvuE3OSWfhW798jK1ArjQWWuuWqpQRigMX9ECOM854Lx2eAQht7BJSEK1CfZNRO6cHm1JChiOfaiO/Th7JfT3krvAHDVUgN9xBpvaiLaQQiVlJ6lVf4ZH8bVVOC/wF8M9xFCycfwYJNIt12Q5AoVd+TV9xcIq6EzLPNHXV0sun6DO+XhraMCP1EXkQMKSauqtPVYA67XR+krE/wHvR834cV3dyfHXSEyo3VwzDw4zDLyHCv5Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=K69kOi99wKYWhIFkS0zS1IFdt96fwTEjWcBZdRQ1lUs=;
- b=Xbg1Q6r+bP2syExPgZa/73GXehw7ZNTMeLI+prTA46MWrsE5UHYK7NqcAgxOjRhkX4diJu9fGrds7uwQBHxpvxOxH+2gtYGZhB2z204O6b8jq9i8tGM5yPJJLBJKOsDj3/qUxKiXN2SGXOa/YgQLb4D3neXy2mb5EOMNRejXvRITwFO6xYYduVPCWUcuv0t6FKgMgnrFkwExHTKloIa+tRmSMu8F7+5cInkJNlLNNZljjXzNbmJcadniVog+BUU4lN89lzC6BEN7nGhwz3Ji/O9YC2ozaXnN2B+zGtV0N6nrRO9oXBTO9oApzfwtWOM+bnhsMzfUoy2X09HlDfzN8Q==
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5238.namprd12.prod.outlook.com (2603:10b6:208:31e::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4649.13; Wed, 27 Oct
- 2021 16:53:36 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95%8]) with mapi id 15.20.4649.015; Wed, 27 Oct 2021
- 16:53:36 +0000
-Date:   Wed, 27 Oct 2021 13:53:35 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
+        id S240543AbhJ0THw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Oct 2021 15:07:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59843 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S238907AbhJ0THv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 Oct 2021 15:07:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635361525;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=O4yfqS02aUffRcN2ytxZ7WbUoLeVw/KvRKeeY+nzKuw=;
+        b=LX+6dEHGpXBXmmn9MdufcZAmpi7ndXXkJGMcRJ7cHjKHE4vvFwD0qDcZDf2lqXZ948E9dP
+        9jltFSnbe6ylbbJTc7fYk05NX1epe7vQ/yz2Fd96bZNPxAudppMQqKw3VPH1u7vk/R0+BM
+        2/EcBwSpp01L0MhSULHCD9ASiqLdIhU=
+Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com
+ [209.85.161.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-453-TTeeZMTCMNG34l65JZDL9w-1; Wed, 27 Oct 2021 15:05:24 -0400
+X-MC-Unique: TTeeZMTCMNG34l65JZDL9w-1
+Received: by mail-oo1-f71.google.com with SMTP id i25-20020a4ad399000000b002b85e3dd7d5so1720043oos.2
+        for <kvm@vger.kernel.org>; Wed, 27 Oct 2021 12:05:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=O4yfqS02aUffRcN2ytxZ7WbUoLeVw/KvRKeeY+nzKuw=;
+        b=C6hhElHs79akClj9DwxM9mEoPjJc2lwric2xNtoXaA1LTTT9G8R1sFVb2ZgockGCVe
+         VEWyGe88fJLC3+3M7LCapZPmqgGOIC4aVscd2F1rqGsrwuZAURsdBorLE0exgPBCNWzj
+         HMd6wbeXq/zd21n1wlvKOvkDTUW0kRNYPm6X2RjRV6an5SUffIixCmBK2hSdApnA/mkL
+         unox5tfGsQfgd/X3q9A+HfRegwiWEt+3xCyFvJ8YSUsRBdSCGZ1Axf/HBfEcXs2pc/wZ
+         mpyJ3IT4es1nwP0+B2MqI51fVpQFIQBri3EPjHRZ+LzgeP7ZAJNsTWZPXThG5hoOnqb6
+         D2TA==
+X-Gm-Message-State: AOAM5326J0W/cLXhYpg2oNWKiVDu73PlYwChB361+SXCH8uRzYicPZFy
+        /J4ee9bb7gdfu6DeRH+QxMW8Kb64O/+FpUN3qqg7vhtD4F4jZHCA9quWb4eeL3NVBlLquJpWl3c
+        dk+6eRUmMyqZ/
+X-Received: by 2002:a54:4616:: with SMTP id p22mr5021278oip.96.1635361523012;
+        Wed, 27 Oct 2021 12:05:23 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzFM+Cz5lXh23pqTW76bAGRqwtXY3wmttTlhsrmR78I98eJDUGGmUd4LUJuJppVWjEQ1+MClA==
+X-Received: by 2002:a54:4616:: with SMTP id p22mr5021246oip.96.1635361522696;
+        Wed, 27 Oct 2021 12:05:22 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id 187sm276901oig.19.2021.10.27.12.05.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Oct 2021 12:05:22 -0700 (PDT)
+Date:   Wed, 27 Oct 2021 13:05:20 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
         saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
         netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
-        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com
-Subject: Re: [PATCH V4 mlx5-next 13/13] vfio/mlx5: Use its own PCI reset_done
- error handler
-Message-ID: <20211027165335.GF2744544@nvidia.com>
-References: <20211026090605.91646-1-yishaih@nvidia.com>
- <20211026090605.91646-14-yishaih@nvidia.com>
- <20211026171644.41019161.alex.williamson@redhat.com>
- <20211026235002.GC2744544@nvidia.com>
- <20211027092943.4f95f220.alex.williamson@redhat.com>
- <20211027155339.GE2744544@nvidia.com>
- <20211027104855.7d35be05.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211027104855.7d35be05.alex.williamson@redhat.com>
-X-ClientProxiedBy: CH0PR03CA0225.namprd03.prod.outlook.com
- (2603:10b6:610:e7::20) To BL0PR12MB5506.namprd12.prod.outlook.com
- (2603:10b6:208:1cb::22)
+        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH V2 mlx5-next 12/14] vfio/mlx5: Implement vfio_pci driver
+ for mlx5 devices
+Message-ID: <20211027130520.33652a49.alex.williamson@redhat.com>
+In-Reply-To: <20211026234300.GA2744544@nvidia.com>
+References: <20211020185919.GH2744544@nvidia.com>
+        <20211020150709.7cff2066.alex.williamson@redhat.com>
+        <87o87isovr.fsf@redhat.com>
+        <20211021154729.0e166e67.alex.williamson@redhat.com>
+        <20211025122938.GR2744544@nvidia.com>
+        <20211025082857.4baa4794.alex.williamson@redhat.com>
+        <20211025145646.GX2744544@nvidia.com>
+        <20211026084212.36b0142c.alex.williamson@redhat.com>
+        <20211026151851.GW2744544@nvidia.com>
+        <20211026135046.5190e103.alex.williamson@redhat.com>
+        <20211026234300.GA2744544@nvidia.com>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Received: from mlx.ziepe.ca (206.223.160.26) by CH0PR03CA0225.namprd03.prod.outlook.com (2603:10b6:610:e7::20) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4649.15 via Frontend Transport; Wed, 27 Oct 2021 16:53:36 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mfmBD-002gXk-Ev; Wed, 27 Oct 2021 13:53:35 -0300
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: f1a751c0-723e-40d2-52bf-08d9996a51ad
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5238:
-X-Microsoft-Antispam-PRVS: <BL1PR12MB5238E3A98828807311CFD6A7C2859@BL1PR12MB5238.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4303;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 8H216t1vQaSofq7csPbdGPoMJWb8eStWR1knNxDpHDCeEytIbcz28GxpbSYoX9yd6wyQIGQBTbykU2ArXopi+vagjgbdF0on+1/vL9uTvlBwjmZEAVGtaB5q5tdftyTMhklb6sJDiaGG04B7TA2Vi9lIo3Rss9WPFcUX9o7MlspFzGEGax/JegQMkZer6PWAUmV4lxgHFdgItW7pekbJX3brXCyuGnCjt4qAWnXWGJ1f2Ux9Qj2YuXTgbEN+URyuWk4BNbBpvd/pT7Cmyfwx8dg3YiQfzm9gN9R7ngz9Go4BpU9JKyHWc8PjcVou9yjO+i8Tv/dFSV2DAyeZqTupTSmg48zjkoLv55PK5GfFCOkbeMXfDt2buAf9sFDPcb4RfQtaI3REtZY65u3dk6T+ciKuzbl1Utmbf9X4evEauilKbxFSxb1s/Pri501gEuxlKy+acX3Gy6HlaSKTAcHmZ+5OJpE+CB1p+xv5dcASEpjrazB7wz9+Iwv93JC8b5dF2C2+GiYKbGz86EUX+pelyXOYrdXS+CY1rOOPKR43PB5KYDJa0nFSK9loOH12ONg7tBwIZjB7rYNBBITTzsWlCLGAQt196WyxMkwRAQH6K+fNihMNPtDdbYPUgU0km9aNBvJVbo7F1h8MGsHNJ8XEKA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(1076003)(33656002)(36756003)(8936002)(4326008)(26005)(186003)(107886003)(316002)(5660300002)(2906002)(2616005)(9786002)(426003)(66476007)(8676002)(66946007)(83380400001)(66556008)(4744005)(38100700002)(9746002)(86362001)(508600001)(6916009);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?LtGHsG042q68rwYf5ZdOI2ucAWbTLQccpPMJlQk9UrTW+SWieSUCu5e7cVRv?=
- =?us-ascii?Q?hWJZXWlS98tk0vzMieg7S9uUnkmxCRnC/kHa6GSsfqaHHrc68nZfeD3e7HhU?=
- =?us-ascii?Q?Ekco+rEFFYpCHrpzqdwo2S1vc/cjzEnTw79Zn9hZuGiDS9cU8x30LRZl2dg+?=
- =?us-ascii?Q?KKjEAOk9IFl8+pBRLLFG74MnM822hMgLMfZEFMTaJen9GYbyEX44wyw1obqs?=
- =?us-ascii?Q?QqdefYBAStcUv5gJaFubTkhJhKiVj+bAHFa97RwNiBKVVjwJwmVbNzFhoI7M?=
- =?us-ascii?Q?J4hJvJ6lWvL2zVbrMWiin+a2HkVQ863I/jgxVUva/RMYo2GstCvMs5t0K8c7?=
- =?us-ascii?Q?yMUA76qqKuAgLZBrJLqN5WmUO3b9cA5IMaQ9VTWfuqYoDPhXFk4CJH8YdH8Y?=
- =?us-ascii?Q?348qPJ58YtuClZWOzGJ0qGqP68MtPBYXqm9fEPAhlGvZpmUSpR2CYOmQbsNX?=
- =?us-ascii?Q?zaP16pTwfnMmgtcuzqXamJ45fCR+lir3SKwcq6ewy8iWmTquAJfZoQkGE6kV?=
- =?us-ascii?Q?impy6m08pWrWqSexuY0IyxXhkwH4oEjbg0xC4NyJalgqlNY5J/+6hVFUEhte?=
- =?us-ascii?Q?hYnzaJFm73AD4a0xbEVDN289LPEyTLYoB2/7lWEhRrQhTy1ItXI6ObcZD3Di?=
- =?us-ascii?Q?D4dmLZqCr0L2opBkM1xXZbVdofe5nSm9GNRriUxfzKE6TUmObCMQeXyPsk9M?=
- =?us-ascii?Q?HHV726a4/pzaoa3NhGZ/dS06GyWX1Lg5iTDF6ipz0BICT92nBPEQr2bOvJuC?=
- =?us-ascii?Q?Vb4PH4sHDm2I4LgqLpfUrA95+wcsitV4tdrSalHcPTp+IfEDE0vNB91lToWE?=
- =?us-ascii?Q?uPCgFGBSyC8rI3ob0KJbjrlnSdglcsOXDIOiyHLCpY7I9AoqKGR1wo6xa4b1?=
- =?us-ascii?Q?CCpugiQ97y8Sq1TofNntHhZESnO8SM1TkdqSF4sLUm3+ZEfLqijT1o7T64C7?=
- =?us-ascii?Q?glbazAiuV0/PWSXd8C2sT5oCtmxtp4nL6kA4QAxgb6mYox76ieNEAhKYZdlD?=
- =?us-ascii?Q?asJEO3e1xI9eCrktLIBKs9RleY2dwO+9ElYD/x4eBAvmaC8eMzQ/bz3yBTxp?=
- =?us-ascii?Q?P7bSaHMTDeDJbuJeUg9Zaxy5/KreMwd8FdZ9cQVI1S6MnghylUI7q6Luva4c?=
- =?us-ascii?Q?8AHY6L2/9Cew3WzVmzg6KqDs9WYiMB6cjiOhAoWyHRTPWiixrDoY4kyLHdiE?=
- =?us-ascii?Q?UQwqSN6xJ8nZCYsngrAdV3+XtDz8eIVXoXOeoaZy4T/LaTtT21T1YwCr8T3l?=
- =?us-ascii?Q?Ip2Lj1wTtlfZH3Q0tEUssT3m4yXACtIoWXmnDv/CFNDHOy1W6I/86RbuYdSp?=
- =?us-ascii?Q?/o1uHIJzQ28xd1Ljj+sxxdTF/vxwhwAMerPz6VHSoRJNM6Ygf0jGued7OsNm?=
- =?us-ascii?Q?pWOaOEi++r7ijszsDgBrU3FoXqk3ZNX3t0iZ/aDq3OfQa0odHztSG3KDpDEh?=
- =?us-ascii?Q?4ApT4q+2y8GET9xU3zAkiCWxecKcJiWuw/ONhP6HkmXPszWau+JYzDE5yucV?=
- =?us-ascii?Q?E4HNmgxlXi87CR5wGK0mBmzOOTjzYl73vXGSZSGkeKYcMdOBbJZxO0FIJrP8?=
- =?us-ascii?Q?ve5T6/4fMV5Nu5WOLEs=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f1a751c0-723e-40d2-52bf-08d9996a51ad
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Oct 2021 16:53:36.6886
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: yw93iq+LimNOFqiylhzOhxWhFzK7hqX7V3aUBWBpiVsL/Wu+YuKuKvnlVBdIIj75
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5238
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 27, 2021 at 10:48:55AM -0600, Alex Williamson wrote:
+On Tue, 26 Oct 2021 20:43:00 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-> Ok, I see.  I didn't digest that contention on state_mutex can only
-> occur from a concurrent migration region access and the stale state is
-> resolved at the end of that concurrent access, not some subsequent
-> access.
+> On Tue, Oct 26, 2021 at 01:50:46PM -0600, Alex Williamson wrote:
+> > On Tue, 26 Oct 2021 12:18:51 -0300
+> > Jason Gunthorpe <jgg@nvidia.com> wrote:
+> >   
+> > > On Tue, Oct 26, 2021 at 08:42:12AM -0600, Alex Williamson wrote:
+> > >   
+> > > > > This is also why I don't like it being so transparent as it is
+> > > > > something userspace needs to care about - especially if the HW cannot
+> > > > > support such a thing, if we intend to allow that.    
+> > > > 
+> > > > Userspace does need to care, but userspace's concern over this should
+> > > > not be able to compromise the platform and therefore making VF
+> > > > assignment more susceptible to fatal error conditions to comply with a
+> > > > migration uAPI is troublesome for me.    
+> > > 
+> > > It is an interesting scenario.
+> > > 
+> > > I think it points that we are not implementing this fully properly.
+> > > 
+> > > The !RUNNING state should be like your reset efforts.
+> > > 
+> > > All access to the MMIO memories from userspace should be revoked
+> > > during !RUNNING
+> > > 
+> > > All VMAs zap'd.
+> > > 
+> > > All IOMMU peer mappings invalidated.
+> > > 
+> > > The kernel should directly block userspace from causing a MMIO TLP
+> > > before the device driver goes to !RUNNING.
+> > > 
+> > > Then the question of what the device does at this edge is not
+> > > relevant as hostile userspace cannot trigger it.
+> > > 
+> > > The logical way to implement this is to key off running and
+> > > block/unblock MMIO access when !RUNNING.
+> > > 
+> > > To me this strongly suggests that the extra bit is the correct way
+> > > forward as the driver is much simpler to implement and understand if
+> > > RUNNING directly controls the availability of MMIO instead of having
+> > > an irregular case where !RUNNING still allows MMIO but only until a
+> > > pending_bytes read.
+> > > 
+> > > Given the complexity of this can we move ahead with the current
+> > > mlx5_vfio and Yishai&co can come with some followup proposal to split
+> > > the freeze/queice and block MMIO?  
+> > 
+> > I know how much we want this driver in, but I'm surprised that you're
+> > advocating to cut-and-run with an implementation where we've identified
+> > a potentially significant gap with some hand waving that we'll resolve
+> > it later.  
+> 
+> I don't view it as cut and run, but making reasonable quanta of
+> progress with patch series of reviewable size and scope.
+> 
+> At a certain point we need to get the base level of functionality,
+> that matches the currently defined ABI merged so we can talk about
+> where the ABI needs to go.
+> 
+> If you are uncomfortable about this from a uABI stability perspective
+> then mark the driver EXPERIMENTAL and do not merge any other migration
+> drivers until the two details are fully sorted out.
+> 
+> As far as the actual issue, if you hadn't just discovered it now
+> nobody would have known we have this gap - much like how the very
+> similar reset issue was present in VFIO for so many years until you
+> plugged it.
 
-Ah, I see, yes, that is tricky - the spinlock around the mutex
-provides the guarentee: deferral cannot be set at mutex_lock() time.
+But the fact that we did discover it is hugely important.  We've
+identified that the potential use case is significantly limited and
+that userspace doesn't have a good mechanism to determine when to
+expose that limitation to the user.  We're tossing around solutions
+that involve extensions, if not changes to the uAPI.  It's Wednesday of
+rc7.
 
-Jason
+I feel like we've already been burned by making one of these
+"reasonable quanta of progress" to accept and mark experimental
+decisions with where we stand between defining the uAPI in the kernel
+and accepting an experimental implementation in QEMU.  Now we have
+multiple closed driver implementations (none of which are contributing
+to this discussion), but thankfully we're not committed to supporting
+them because we have no open implementations.  I think we could get away
+with ripping up the uAPI if we really needed to.  
+
+> > Deciding at some point in the future to forcefully block device MMIO
+> > access from userspace when the device stops running is clearly a user
+> > visible change and therefore subject to the don't-break-userspace
+> > clause.    
+> 
+> I don't think so, this was done for reset retroactively after
+> all. Well behaved qmeu should have silenced all MMIO touches as part
+> of the ABI contract anyhow.
+
+That's not obvious to me and I think it conflates access to the device
+and execution of the device.  If it's QEMU's responsibility to quiesce
+access to the device anyway, why does the kernel need to impose this
+restriction.  I'd think we'd generally only impose such a restriction
+if the alternative allows the user to invoke bad behavior outside the
+scope of their use of the device or consistency of the migration data.
+It appears that any such behavior would be implementation specific here.
+
+> The "don't-break-userspace" is not an absolute prohibition, Linus has
+> been very clear this limitation is about direct, ideally demonstrable,
+> breakage to actually deployed software.
+
+And if we introduce an open driver that unblocks QEMU support to become
+non-experimental, I think that's where we stand.
+
+> > That might also indicate that "freeze" is only an implementation
+> > specific requirement.  Thanks,  
+> 
+> It doesn't matter if a theoretical device can exist that doesn't need
+> "freeze" - this device does, and so it is the lowest common
+> denominator for the uAPI contract and userspace must abide by the
+> restriction.
+
+Sorry, "to the victor go the spoils" is not really how I strictly want
+to define a uAPI contract with userspace.  If we're claiming that
+userspace is responsible for quiescing devices and we're providing a
+means for that to occur, and userspace is already responsible for
+managing MMIO access, then the only reason the kernel would forcefully
+impose such a restriction itself would be to protect the host and the
+implementation of that would depend on whether this is expected to be a
+universal or device specific limitation.  Thanks,
+
+Alex
+
