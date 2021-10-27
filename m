@@ -2,220 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E024C43C755
-	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 12:05:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 0798843C776
+	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 12:15:59 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239396AbhJ0KHh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Oct 2021 06:07:37 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:29140 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237205AbhJ0KHh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 27 Oct 2021 06:07:37 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19R9Rcal014851;
-        Wed, 27 Oct 2021 10:05:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=YyhpI9JAhixGgPCXLDhjCT2RJrtwgoVqKvTdvWeVcvI=;
- b=phHaxekAHjpdgihtFflKTnlBEhEldWBFzTn9RzERO4vFw2g2LEgamXySgGCAKpbEuTFC
- X+TFwdKy8Ol+2ej/gpMGGxZJ9uNDS5v2a6rsM+uzQZZrp1+gzlA7wdi6TrGt+OHmN9nN
- 1P3ha6B2YH+lfXAWc4Hq6QxwDeLPQkt2Hn/0cEgzE8GuGHAtOSA+T5/ERZptaxgmz0wp
- lOhbV3Hf2SCA5jahfAB2VXv2NO5NLfXRBeQkMb1wDij9OQSYmLvTd9DcsoHUtMIErCjZ
- TAv8gbiYafm0ch208HoLuR+f2/vrVybrQ1SNWUerCWkzWFpmO27thKoL52FtYa8VrhY2 Hg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bx4k9hm3e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 27 Oct 2021 10:05:11 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19R9sAt1000378;
-        Wed, 27 Oct 2021 10:05:11 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3bx4k9hm2t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 27 Oct 2021 10:05:11 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19R9vkGt000978;
-        Wed, 27 Oct 2021 10:05:09 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma04ams.nl.ibm.com with ESMTP id 3bx4edwrf4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 27 Oct 2021 10:05:08 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19R9wwXE61407738
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 27 Oct 2021 09:58:58 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6E1F842049;
-        Wed, 27 Oct 2021 10:05:05 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1B20A42045;
-        Wed, 27 Oct 2021 10:05:05 +0000 (GMT)
-Received: from [9.171.92.208] (unknown [9.171.92.208])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 27 Oct 2021 10:05:05 +0000 (GMT)
-Message-ID: <cf15ecce-af3b-9597-8911-538ea98d1548@linux.vnet.ibm.com>
-Date:   Wed, 27 Oct 2021 12:05:04 +0200
+        id S232533AbhJ0KSW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Oct 2021 06:18:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:54784 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S241418AbhJ0KSV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 Oct 2021 06:18:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635329756;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=8RrIMa43+CDtWe02+sOZ/DmF+8SE2AFh8Rw9HUpvuIY=;
+        b=f8zTXFD1F4vrmDFTikZW0QavFPVqNagHCzMf8pIchCtQ24YUOkLNLeHs0bTNcDEnQ0mEcv
+        UgCHDEtUqDCrVUdzBRQH5ebes/lyE5xbDLV/GDgJyTjPMgLS2ecDn3j8BrmWkiHaLSfKfl
+        4331eOJDMTMhHMA0FUzPm2Vmpj1Z5m8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-142-sBjZeUYqOq-DQLky1OoOqQ-1; Wed, 27 Oct 2021 06:15:54 -0400
+X-MC-Unique: sBjZeUYqOq-DQLky1OoOqQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0BC4419251A1;
+        Wed, 27 Oct 2021 10:15:53 +0000 (UTC)
+Received: from localhost (unknown [10.39.195.83])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D1F401017CE7;
+        Wed, 27 Oct 2021 10:15:36 +0000 (UTC)
+Date:   Wed, 27 Oct 2021 11:15:35 +0100
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     John Levon <levon@movementarian.org>
+Cc:     Elena <elena.ufimtseva@oracle.com>, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org, mst@redhat.com, john.g.johnson@oracle.com,
+        dinechin@redhat.com, cohuck@redhat.com, jasowang@redhat.com,
+        felipe@nutanix.com, jag.raman@oracle.com, eafanasova@gmail.com
+Subject: Re: MMIO/PIO dispatch file descriptors (ioregionfd) design discussion
+Message-ID: <YXkmx3V0VklA6qHl@stefanha-x1.localdomain>
+References: <88ca79d2e378dcbfb3988b562ad2c16c4f929ac7.camel@gmail.com>
+ <YWUeZVnTVI7M/Psr@heatpipe>
+ <YXamUDa5j9uEALYr@stefanha-x1.localdomain>
+ <20211025152122.GA25901@nuker>
+ <YXhQk/Sh0nLOmA2n@movementarian.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [kvm-unit-tests PATCH v3 2/2] s390x: Test specification
- exceptions during transaction
-Content-Language: en-US
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-References: <20211022120156.281567-1-scgl@linux.ibm.com>
- <20211022120156.281567-3-scgl@linux.ibm.com>
- <20211025193012.3be31938@p-imbrenda>
- <32dfb400-4191-44f8-354e-809fac890b63@linux.vnet.ibm.com>
- <20211026165549.18137134@p-imbrenda>
-From:   Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>
-In-Reply-To: <20211026165549.18137134@p-imbrenda>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: mUHm4OpVbqk3z_JYgTeUkGRk0_esgtHr
-X-Proofpoint-ORIG-GUID: IMK8wix6Sjx1tiW_LSD2z7X6GYbnmjTe
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-10-27_03,2021-10-26_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- lowpriorityscore=0 phishscore=0 impostorscore=0 malwarescore=0 spamscore=0
- mlxscore=0 adultscore=0 mlxlogscore=999 suspectscore=0 priorityscore=1501
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2110270062
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="J/R1b5NXlPlkwaQ9"
+Content-Disposition: inline
+In-Reply-To: <YXhQk/Sh0nLOmA2n@movementarian.org>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/26/21 16:55, Claudio Imbrenda wrote:
-> On Tue, 26 Oct 2021 16:22:40 +0200
-> Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com> wrote:
-> 
->> On 10/25/21 19:30, Claudio Imbrenda wrote:
->>> On Fri, 22 Oct 2021 14:01:56 +0200
->>> Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
->>>   
->>>> Program interruptions during transactional execution cause other
->>>> interruption codes.
->>>> Check that we see the expected code for (some) specification exceptions.
->>>>
->>>> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
->>>> ---  
->>
->> [...]
->>
->>>> +#define TRANSACTION_MAX_RETRIES 5
->>>> +
->>>> +/* NULL must be passed to __builtin_tbegin via constant, forbid diagnose from
->>>> + * being NULL to keep things simple
->>>> + */
->>>> +static int __attribute__((nonnull))
->>>> +with_transaction(void (*trigger)(void), struct __htm_tdb *diagnose)
->>>> +{
->>>> +	int cc;
->>>> +  
->>>
->>> if you want to be extra sure, put an assert here (although I'm not sure
->>> how nonnull works, I have never seen it before)  
->>
->> Ok, with nonnull, the compiler might warn you if you pass NULL.
-> 
-> fair enough
-> 
->>>   
->>>> +	cc = __builtin_tbegin(diagnose);
->>>> +	if (cc == _HTM_TBEGIN_STARTED) {
->>>> +		trigger();
->>>> +		__builtin_tend();
->>>> +		return -TRANSACTION_COMPLETED;
->>>> +	} else {
->>>> +		return -cc;
->>>> +	}
->>>> +}
->>>> +
->>>> +static int retry_transaction(const struct spec_ex_trigger *trigger, unsigned int max_retries,
->>>> +			     struct __htm_tdb *tdb, uint16_t expected_pgm)
->>>> +{
->>>> +	int trans_result, i;
->>>> +	uint16_t pgm;
->>>> +
->>>> +	for (i = 0; i < max_retries; i++) {
->>>> +		expect_pgm_int();
->>>> +		trans_result = with_transaction(trigger->func, tdb);
->>>> +		if (trans_result == -_HTM_TBEGIN_TRANSIENT) {
->>>> +			mb();
->>>> +			pgm = lc->pgm_int_code;
->>>> +			if (pgm == 0)
->>>> +				continue;
->>>> +			else if (pgm == expected_pgm)
->>>> +				return 0;
->>>> +		}
->>>> +		return trans_result;
->>>> +	}
->>>> +	return -TRANSACTION_MAX_RETRIES;  
->>>
->>> so this means that a test will be considered failed if the transaction
->>> failed too many times?  
->>
->> Yes.
->>>
->>> this means that could fail if the test is run on busy system, even if
->>> the host running the unit test is correct  
->>
->> I suppose so, don't know how likely that is.
-> 
-> I don't like the idea of failing a test when the implementation is
-> correct, just because the system might be a little more busy than
-> expected.
 
-Fair enough, I'll see what I can do.
-> 
-> if you can't find a way to refactor the test so that it doesn't fail if
-> there are too many retries, then at least make it a skip?
-> 
-> but I'd really like to see something that does not fail on a correctly
-> implemented system just because the test machine was too busy.
-> 
->>>
->>> also, do you really need to use negative values? it's probably easier
->>> to read if you stick to positive values, and less prone to mistakes if
->>> you accidentally forget a - somewhere.  
->>
->> Ok.
->>>   
->>>> +}
->>>> +
->>>> +static void test_spec_ex_trans(struct args *args, const struct spec_ex_trigger *trigger)
->>>> +{
->>>> +	const uint16_t expected_pgm = PGM_INT_CODE_SPECIFICATION
->>>> +			      | PGM_INT_CODE_TX_ABORTED_EVENT;
->>>> +	union {
->>>> +		struct __htm_tdb tdb;
->>>> +		uint64_t dwords[sizeof(struct __htm_tdb) / sizeof(uint64_t)];
->>>> +	} diag;
->>>> +	unsigned int i, failures = 0;
->>>> +	int trans_result;
->>>> +
->>>> +	if (!test_facility(73)) {
->>>> +		report_skip("transactional-execution facility not installed");
->>>> +		return;
->>>> +	}
->>>> +	ctl_set_bit(0, CTL0_TRANSACT_EX_CTL); /* enable transactional-exec */
->>>> +
->>>> +	for (i = 0; i < args->iterations && failures <= args->max_failures; i++) {
->>>> +		register_pgm_cleanup_func(trigger->fixup);
->>>> +		trans_result = retry_transaction(trigger, args->max_retries, &diag.tdb, expected_pgm);  
->>>
->>> so you retry each iteration up to args->max_retries times, and if a
->>> transaction aborts too many times (maybe because the host system is
->>> very busy), then you consider it a fail
->>>   
->>
->> [...]
-> 
+--J/R1b5NXlPlkwaQ9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Oct 26, 2021 at 08:01:39PM +0100, John Levon wrote:
+> On Mon, Oct 25, 2021 at 08:21:22AM -0700, Elena wrote:
+>=20
+> > > I'm curious what approach you want to propose for QEMU integration. A
+> > > while back I thought about the QEMU API. It's possible to implement it
+> > > along the lines of the memory_region_add_eventfd() API where each
+> > > ioregionfd is explicitly added by device emulation code. An advantage=
+ of
+> > > this approach is that a MemoryRegion can have multiple ioregionfds, b=
+ut
+> > > I'm not sure if that is a useful feature.
+> > >
+> >=20
+> > This is the approach that is currently in the works. Agree, I dont see
+> > much of the application here at this point to have multiple ioregions
+> > per MemoryRegion.
+> > I added Memory API/eventfd approach to the vfio-user as well to try
+> > things out.
+> >=20
+> > > An alternative is to cover the entire MemoryRegion with one ioregionf=
+d.
+> > > That way the device emulation code can use ioregionfd without much fu=
+ss
+> > > since there is a 1:1 mapping between MemoryRegions, which are already
+> > > there in existing devices. There is no need to think deeply about whi=
+ch
+> > > ioregionfds to create for a device.
+> > >
+> > > A new API called memory_region_set_aio_context(MemoryRegion *mr,
+> > > AioContext *ctx) would cause ioregionfd (or a userspace fallback for
+> > > non-KVM cases) to execute the MemoryRegion->read/write() accessors fr=
+om
+> > > the given AioContext. The details of ioregionfd are hidden behind the
+> > > memory_region_set_aio_context() API, so the device emulation code
+> > > doesn't need to know the capabilities of ioregionfd.
+> >=20
+> > >=20
+> > > The second approach seems promising if we want more devices to use
+> > > ioregionfd inside QEMU because it requires less ioregionfd-specific
+> > > code.
+> > >=20
+> > I like this approach as well.
+> > As you have mentioned, the device emulation code with first approach
+> > does have to how to handle the region accesses. The second approach will
+> > make things more transparent. Let me see how can I modify what there is
+> > there now and may ask further questions.
+>=20
+> Sorry I'm a bit late to this discussion, I'm not clear on the above WRT
+> vfio-user. If an ioregionfd has to cover a whole BAR0 (?), how would this
+> interact with partly-mmap()able regions like we do with SPDK/vfio-user/NV=
+Me?
+
+The ioregionfd doesn't need to cover an entire BAR. QEMU's MemoryRegions
+form a hierarchy, so it's possible to sub-divide the BAR into several
+MemoryRegions.
+
+This means it's still possible to have mmap() sub-regions or even
+ioeventfds sprinkled in between.
+
+Stefan
+
+--J/R1b5NXlPlkwaQ9
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmF5JscACgkQnKSrs4Gr
+c8i1NAgAoVH+VwSZD4M/XspAXmHGqiveQebbCraCrI8p3xbEfQIMsEVErG1dHWCV
+vcAYeO7X6J+X0flOygk0g7ZeFVYmGKKr9XPAFeiFPQ5MRPhfrDlHTxrtvhxWgLuF
+F2K/jkp+fl4wFvGsUZB5i/kGojbw5U3G9YRUoIHvF5N++wHNG+0cxKiqvt/n24Pc
+LxkSHer04M+XDB0nsjVSJ2fNu0bWmEx3d9pSuPaVK4POLmM21whWZ3VIomW7hAPk
+U0FffmXnIFYjaXA2thLf0cMBJu7oyjbCDJnBpWkEUvd5DBqTircR2pZgjiWmXBfq
+ty4XOCH6ltESi6kQcPmrgMd3/ZzYjw==
+=6vzl
+-----END PGP SIGNATURE-----
+
+--J/R1b5NXlPlkwaQ9--
 
