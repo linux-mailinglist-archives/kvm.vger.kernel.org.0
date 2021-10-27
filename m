@@ -2,165 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9CF3443D3B0
-	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 23:16:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 1DF6743D650
+	for <lists+kvm@lfdr.de>; Thu, 28 Oct 2021 00:09:57 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244259AbhJ0VSq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Oct 2021 17:18:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53190 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244269AbhJ0VSL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 27 Oct 2021 17:18:11 -0400
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42441C061243
-        for <kvm@vger.kernel.org>; Wed, 27 Oct 2021 14:15:40 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id j9so8966601lfu.7
-        for <kvm@vger.kernel.org>; Wed, 27 Oct 2021 14:15:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ZUzj8OdRUyoCesvY9oYCJsi3ZMdPAltpXbUySPTyBuc=;
-        b=ZIKZfwDyLiBXM4FTpiIdXUlr5R+dGI4KZkzsZUVmNpqPvYo82Eg9+mHUocDVdvsZRp
-         bHC9ooluOVD3eOGj7LPilAH9no8kzTwRRuYP+1gemifBf9EmDbJHIc5OrlyAX3AErpYL
-         rCUkbQ4oC/0/RC8tdZ8NSo7568axnml9rN/sSJ5mA2MGDa5CgiyJRlLuhtN1U3Q4WSCG
-         AnMNeoEa0RpKePUuZlZiGhzIsuYPu5BLCjJhMGzARP7vYLxtIXT7UyovYQkTwrt82WqU
-         9RBNxTpyNJrocw3u98bizPwdzQxbEvMV670aQO7grbt5qAOhoDZmzAPqEDsUVxS/KD76
-         ZNrg==
+        id S230022AbhJ0WMV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Oct 2021 18:12:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:29222 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229703AbhJ0WMN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 Oct 2021 18:12:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635372587;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vPTDsq9RY16fTCCoMhEcqKhkYxR/hT5AGgzHMhJ6ojY=;
+        b=GW84Vw7pza+og6AlQkSStDCr+1P5nspQ7TtvSEueKXYKAkG62c75otaTSgTDcHmZeCWVfT
+        uwTNQTOGQCU7TvhtCZdIIeGUW18IXf5YInxnS1/X/q/y1v6tUSxRouck3/RjgSajycTUij
+        gK+XzfOD7Ppyo2nzL6zjKY+Izr8o0ZI=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-584-IWesYai4OUOLq824RdObkw-1; Wed, 27 Oct 2021 18:09:45 -0400
+X-MC-Unique: IWesYai4OUOLq824RdObkw-1
+Received: by mail-ed1-f70.google.com with SMTP id t18-20020a056402021200b003db9e6b0e57so3651698edv.10
+        for <kvm@vger.kernel.org>; Wed, 27 Oct 2021 15:09:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ZUzj8OdRUyoCesvY9oYCJsi3ZMdPAltpXbUySPTyBuc=;
-        b=Jq5s2nT1xlZiilgQnhhBnRgNYs8VfGz7L75LBKSAXo11NaE53VBZazv7DeUlLjavu1
-         rmlSEV3ThBWw7yqKApDixelJWEn8plwS7GnSY1dQ8WDfwtAoZHfKSXZaROhngaJQGanU
-         CyUq6TLSLlZy3imX2k3bHJBniSg+9UrsS5Dm91vwmflzNQ0Uhy5gZnTCKeQpjFcUOb+D
-         ty4f0Ue7AROgQP296Q6Zw+7CVkeyFaNmncMDAtqh8nKy6HTaDKA8Z+qVzwGK6jQXj76g
-         EWvLYPi7gW1DWzXqjtsBht3iJkHZC6FPZZmJcUpMb6iGY59YF+hWdKHuGESVuMRf9NOs
-         vkUQ==
-X-Gm-Message-State: AOAM530Ftmd2ffG1RC5zAq4sPKjHmy3qw0FQqcCjh38OovDUGG+q0FLF
-        PMm0yhaCmq3rwqyWBk6VLg1u+gZauXwpO7BRVLoILg==
-X-Google-Smtp-Source: ABdhPJybiFy4oIGNhhlBmd8VY61nM798zr2vK1FyUgViR6EzKUCgaGgxcLv7n9sV9CUY4RPDWZNVBYEO2FFLs9wKsoY=
-X-Received: by 2002:a05:6512:39d1:: with SMTP id k17mr95057lfu.79.1635369338308;
- Wed, 27 Oct 2021 14:15:38 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=vPTDsq9RY16fTCCoMhEcqKhkYxR/hT5AGgzHMhJ6ojY=;
+        b=XXEapOsGlygWjEuKLvtU/E43QlDm5XDz4/5xPEvVMvqJ2NmEkoiDd2JbRNLmpU4uTk
+         qRRq27ywBQUR2olHdx8WTnfyFJc5fDn6z2YvfXMGiXxnfSng9zdjDy6tzLQHxyVvgFh2
+         l4putqySudbr4+nXVEq0qXNx2d8WyeTHlwFL4JYo8etmzdARHCLUU+suGXeEb38VAy6E
+         B+WmQIbZPZ35VmMHlq3oINID4XEexfebHErFR+uXUUQiydbP9il1/iYeM5/sgmEVnCjp
+         ks0ufyrVOANN9qgvcuAVxXQnZqo/s7qHAEMPB6J4vKvV1kelWCArXmIDE4RbI/EV4or2
+         Apnw==
+X-Gm-Message-State: AOAM532AljBR830FZDdT66wWSGHJvs2PF55yf3Z7LHCcNe/bp+whkNei
+        7ls6I4oABr0VAu4Pqoc8O8DJBdjfCABvYJVv8lYrvwRYG3lUF/WxY3NavwdhkwQNSuefKge/H2g
+        duxdvfoe+oZql
+X-Received: by 2002:a17:906:3f95:: with SMTP id b21mr341850ejj.368.1635372584297;
+        Wed, 27 Oct 2021 15:09:44 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxoBx4vKjR30o+Kgjfdb4KsDUE6yjTUINxxdU8F5+6sRGk01DyvRy4bEl13EnJPgWSCV29mNQ==
+X-Received: by 2002:a17:906:3f95:: with SMTP id b21mr341810ejj.368.1635372584078;
+        Wed, 27 Oct 2021 15:09:44 -0700 (PDT)
+Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.gmail.com with ESMTPSA id a9sm675279edm.31.2021.10.27.15.09.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 Oct 2021 15:09:43 -0700 (PDT)
+Message-ID: <fdf90c2f-81c8-513b-2e06-a90959f4cd89@redhat.com>
+Date:   Thu, 28 Oct 2021 00:09:25 +0200
 MIME-Version: 1.0
-References: <20211008180453.462291-1-brijesh.singh@amd.com>
- <20211008180453.462291-41-brijesh.singh@amd.com> <CAMkAt6rPVsJpvdzwG3Keu3gv=n0hmYdDpYJMVoDP7XgwzvH7vQ@mail.gmail.com>
- <bf55b53c-cc3d-f2c3-cf21-df6fb4882e13@amd.com> <CAMkAt6pCSNZiB7zVXp=70fF-qORZT0D5KCSY=GrJU0iiLZN_Mw@mail.gmail.com>
- <943a1b7d-d867-5daa-e2e7-f0d91de37103@amd.com> <CAMkAt6qPHtOy8ONBtjn4V28P5F5qqQtnP2sD5YrBjbe_Uwkdcg@mail.gmail.com>
- <ecfe3b3a-0a7d-86e7-08fb-f693bfa9255b@amd.com>
-In-Reply-To: <ecfe3b3a-0a7d-86e7-08fb-f693bfa9255b@amd.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Wed, 27 Oct 2021 15:15:26 -0600
-Message-ID: <CAMkAt6pgXJ5vop5j7BNF_FQ6ZbWKWCCfUmic2yx3kk0Z1AvJwA@mail.gmail.com>
-Subject: Re: [PATCH v6 40/42] virt: Add SEV-SNP guest driver
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>, linux-efi@vger.kernel.org,
-        platform-driver-x86@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <Thomas.Lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH v2 39/43] KVM: VMX: Don't do full kick when triggering
+ posted interrupt "fails"
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Anup Patel <anup.patel@wdc.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Atish Patra <atish.patra@wdc.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        tony.luck@intel.com, Marc Orr <marcorr@google.com>,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Content-Type: text/plain; charset="UTF-8"
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        David Matlack <dmatlack@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+References: <20211009021236.4122790-1-seanjc@google.com>
+ <20211009021236.4122790-40-seanjc@google.com>
+ <335822ac-b98b-1eec-4911-34e4d0e99907@redhat.com>
+ <YXl4mK7CyUBnPaQV@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <YXl4mK7CyUBnPaQV@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 27, 2021 at 3:13 PM Brijesh Singh <brijesh.singh@amd.com> wrote:
+On 27/10/21 18:04, Sean Christopherson wrote:
+>>> +		/*
+>>> +		 * The smp_wmb() in kvm_make_request() pairs with the smp_mb_*()
+>>> +		 * after setting vcpu->mode in vcpu_enter_guest(), thus the vCPU
+>>> +		 * is guaranteed to see the event request if triggering a posted
+>>> +		 * interrupt "fails" because vcpu->mode != IN_GUEST_MODE.
+>>
+>> What this smp_wmb() pair with, is the smp_mb__after_atomic in
+>> kvm_check_request(KVM_REQ_EVENT, vcpu).
 >
->
->
-> On 10/27/21 4:05 PM, Peter Gonda wrote:
-> ....
->
-> >>>>>
-> >>>>> Thanks for updating this sequence number logic. But I still have some
-> >>>>> concerns. In verify_and_dec_payload() we check the encryption header
-> >>>>> but all these fields are accessible to the hypervisor, meaning it can
-> >>>>> change the header and cause this sequence number to not get
-> >>>>> incremented. We then will reuse the sequence number for the next
-> >>>>> command, which isn't great for AES GCM. It seems very hard to tell if
-> >>>>> the FW actually got our request and created a response there by
-> >>>>> incrementing the sequence number by 2, or if the hypervisor is acting
-> >>>>> in bad faith. It seems like to be safe we need to completely stop
-> >>>>> using this vmpck if we cannot confirm the PSP has gotten our request
-> >>>>> and created a response. Thoughts?
-> >>>>>
-> >>>>
-> >>>> Very good point, I think we can detect this condition by rearranging the
-> >>>> checks. The verify_and_dec_payload() is called only after the command is
-> >>>> succesful and does the following checks
-> >>>>
-> >>>> 1) Verifies the header
-> >>>> 2) Decrypts the payload
-> >>>> 3) Later we increment the sequence
-> >>>>
-> >>>> If we arrange to the below order then we can avoid this condition.
-> >>>> 1) Decrypt the payload
-> >>>> 2) Increment the sequence number
-> >>>> 3) Verify the header
-> >>>>
-> >>>> The descryption will succeed only if PSP constructed the payload.
-> >>>>
-> >>>> Does this make sense ?
-> >>>
-> >>> Either ordering seems fine to me. I don't think it changes much though
-> >>> since the header (bytes 30-50 according to the spec) are included in
-> >>> the authenticated data of the encryption. So any hypervisor modictions
-> >>> will lead to a decryption failure right?
-> >>>
-> >>> Either case if we do fail the decryption, what are your thoughts on
-> >>> not allowing further use of that VMPCK?
-> >>>
-> >>
-> >> We have limited number of VMPCK (total 3). I am not sure switching to
-> >> different will change much. HV can quickly exaust it. Once we have SVSM
-> >> in-place then its possible that SVSM may use of the VMPCK. If the
-> >> decryption failed, then maybe its safe to erase the key from the secrets
-> >> page (in other words guest OS cannot use that key for any further
-> >> communication). A guest can reload the driver will different VMPCK id
-> >> and try again.
-> >
-> > SNP cannot really cover DOS at all since the VMM could just never
-> > schedule the VM. In this case we know that the hypervisor is trying to
-> > mess with the guest, so my preference would be to stop sending guest
-> > messages to prevent that duplicated IV usage. If one caller gets an
-> > EBADMSG it knows its in this case but the rest of userspace has no
-> > idea. Maybe log an error?
-> >
-> >>
->
-> Yap, we cannot protect against the DOS. This is why I was saying that we
-> zero the key from secrets page so that guest cannot use that key for any
-> future communication (whether its from rest of userspace or kexec
-> kernel). I can update the driver to log the message and ensure that
-> future messages will *not* use that key. The VMPCK ID is a module
-> params, so a guest can reload the driver to use different VMPCK.
+> I don't think that's correct.  There is no kvm_check_request() in the relevant path.
+> kvm_vcpu_exit_request() uses kvm_request_pending(), which is just a READ_ONCE()
+> without a barrier.
 
-Duh! Sorry I thought you said we needed a VMPL0 SVSM to do that. That
-sounds great.
+Ok, we are talking about two different set of barriers.  This is mine:
 
->
->
-> >> thanks
+- smp_wmb() in kvm_make_request() pairs with the smp_mb__after_atomic() in
+kvm_check_request(); it ensures that everything before the request
+(in this case, pi_pending = true) is seen by inject_pending_event.
+
+- pi_test_and_set_on() orders the write to ON after the write to PIR,
+pairing with vmx_sync_pir_to_irr and ensuring that the bit in the PIR is
+seen.
+
+And this is yours:
+
+- pi_test_and_set_on() _also_ orders the write to ON before the read of
+vcpu->mode, pairing with vcpu_enter_guest()
+
+- kvm_make_request() however does _not_ order the write to
+vcpu->requests before the read of vcpu->mode, even though it's needed.
+Usually that's handled by kvm_vcpu_exiting_guest_mode(), but in this case
+vcpu->mode is read in kvm_vcpu_trigger_posted_interrupt.
+
+So vmx_deliver_nested_posted_interrupt() is missing a smp_mb__after_atomic().
+It's documentation only for x86, but still easily done in v3.
+
+Paolo
+
