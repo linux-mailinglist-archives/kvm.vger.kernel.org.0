@@ -2,122 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D0AA443CB7E
-	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 16:04:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 7178F43CB87
+	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 16:06:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237655AbhJ0OHA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Oct 2021 10:07:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53462 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237451AbhJ0OHA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 27 Oct 2021 10:07:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635343474;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=YN/bLTk9W4jFoqX1MmfKo8264P/GPmaZJoxCKcTGJ7Q=;
-        b=Tq3VzCvQUmCwLFaCf1O4NFwJ8K9mthZwQrSL3WJ5zLfEVqc504dh1XNTBGijxo+dVq2xjt
-        ze6O7DuyGI6oFFCBxktyAyX8r1ssNLVIj0a5Wuwi2Vnsqe3BTA5fyijNRqiKUZkrMenydS
-        vHuMRmymRWR8k0XDXYXgR9GkuwDXmFE=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-445-dk9gY1SdOlyBjkw0JI42Yg-1; Wed, 27 Oct 2021 10:04:33 -0400
-X-MC-Unique: dk9gY1SdOlyBjkw0JI42Yg-1
-Received: by mail-wm1-f72.google.com with SMTP id u14-20020a05600c19ce00b0030d8549d49aso1819376wmq.0
-        for <kvm@vger.kernel.org>; Wed, 27 Oct 2021 07:04:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=YN/bLTk9W4jFoqX1MmfKo8264P/GPmaZJoxCKcTGJ7Q=;
-        b=KnFt+YmECPUxsh9fxxCkUYLTJ+1aRWu8Zyx2Fkdb05E5+nF1HAcF8ev0+Z8KrEnG6j
-         lVTxiUnDc4IRj09wpK9V9EXGqTYVgYZR0gEglinkR5jTXAaEH3ObHqWqG6bRl18/+2Uo
-         ATg89SzrSddnNmZEnFiKW49vBwHnY2rWN46TUOfZnLaPp0nify3nawQcImxtQI9Iujg6
-         4mOL/xSoiFT2nARBPq5wzG73a/nypAOY8MFQ6992Y/ZZKqzcVwSEN8M+88tYuwdyzKGo
-         gs0aFdyySFn2xJQqvzOAj6Bvewgw3DWa8+269oWPGKDYxc4SAKr7QRH2Gf7k7j/Lqu4P
-         DhIg==
-X-Gm-Message-State: AOAM5329O24vRNxhaKDgCNHGIA3tS9JJRmWUNaIsygsDNgEbn7EIRilu
-        67QjQYQ4k9P0mMTt8h3tIVgXE5m+s7AEmQ8NRVJYocuO/hmQ8xJt6GWgai55djADc04/CWKdrl6
-        vVXk4Fq0EGqB0
-X-Received: by 2002:a05:6000:18af:: with SMTP id b15mr39135212wri.359.1635343472025;
-        Wed, 27 Oct 2021 07:04:32 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyMG5hMHU+fqjF6OiSm16HnX+RXpo9rofMs4qTZ/GsQ4SgoEFZ97KLsPkMhH1j+K05s+YoZkQ==
-X-Received: by 2002:a05:6000:18af:: with SMTP id b15mr39135082wri.359.1635343471021;
-        Wed, 27 Oct 2021 07:04:31 -0700 (PDT)
-Received: from [192.168.3.132] (p4ff23d76.dip0.t-ipconnect.de. [79.242.61.118])
-        by smtp.gmail.com with ESMTPSA id 126sm3461950wmz.28.2021.10.27.07.04.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 27 Oct 2021 07:04:29 -0700 (PDT)
-Message-ID: <7f1ee7ea-0100-a7ac-4322-316ccc75d85f@redhat.com>
-Date:   Wed, 27 Oct 2021 16:04:28 +0200
+        id S242383AbhJ0OJM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Oct 2021 10:09:12 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:8380 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S233046AbhJ0OJL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 Oct 2021 10:09:11 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19RDHnDr027637;
+        Wed, 27 Oct 2021 14:06:45 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=vqAejZvKe9AeVf7S/8IHMdKVXn9Kn+hdYqiAWpzm8wg=;
+ b=XWSZnsWDykFn+YxPctjSWx7yQPozOUaq9XcmfzexVh40BZZEB433uGxw5GXdFbd/TsLE
+ Lh307cTeYfa4jQ6IE5Lftlp6pRFZ2myKLj/ahQZErM3mPxR2HjQE4g1QOFI0cL0uiY3M
+ q7Z4EXwQV8ssINMbFx+8gUm6+HhrfoPn405vpdkGhGzUT24Abvvnl4G8ViIlRs0T0mQC
+ lWYgkU8Q2FtmYh2Th1Z+nAy8PpKcSrNdtp+69UHmeFWTiW5lofOIaVxkgZ5+UIJ7EvJX
+ zPX00qOC3P98yXa6cevkXNmyi2rE3GrplXyRAkNHqUxH84rMOguuPL5ultnxXL+eKddk mQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3by7he965s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 Oct 2021 14:06:45 +0000
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19RDJJgE032176;
+        Wed, 27 Oct 2021 14:06:45 GMT
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3by7he965f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 Oct 2021 14:06:45 +0000
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19RE3Tvc021183;
+        Wed, 27 Oct 2021 14:06:44 GMT
+Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
+        by ppma04dal.us.ibm.com with ESMTP id 3bx4f83w5b-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 27 Oct 2021 14:06:44 +0000
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
+        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19RE6gOU42402196
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 27 Oct 2021 14:06:42 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4B0AB2805E;
+        Wed, 27 Oct 2021 14:06:42 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7E21028067;
+        Wed, 27 Oct 2021 14:06:41 +0000 (GMT)
+Received: from [9.160.124.65] (unknown [9.160.124.65])
+        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
+        Wed, 27 Oct 2021 14:06:41 +0000 (GMT)
+Message-ID: <b0d3a026-68ab-4783-d0dd-af50fd709260@linux.ibm.com>
+Date:   Wed, 27 Oct 2021 10:06:40 -0400
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.1.0
-Subject: Re: [PATCH v1 02/12] vhost: Return number of free memslots
+Subject: Re: [PATCH] KVM: s390x: add debug statement for diag 318 CPNC data
 Content-Language: en-US
-To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-        qemu-devel@nongnu.org
-Cc:     Eduardo Habkost <ehabkost@redhat.com>, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Sebastien Boeuf <sebastien.boeuf@intel.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Ani Sinha <ani@anisinha.ca>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Hui Zhu <teawater@gmail.com>
-References: <20211027124531.57561-1-david@redhat.com>
- <20211027124531.57561-3-david@redhat.com>
- <4ce74e8f-080d-9a0d-1b5b-6f7a7203e2ab@redhat.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <4ce74e8f-080d-9a0d-1b5b-6f7a7203e2ab@redhat.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com
+References: <20211027025451.290124-1-walling@linux.ibm.com>
+ <ab36ddd3-1a05-ec6a-3c6e-a8881956d0e2@de.ibm.com>
+From:   Collin Walling <walling@linux.ibm.com>
+In-Reply-To: <ab36ddd3-1a05-ec6a-3c6e-a8881956d0e2@de.ibm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: J0b1rhH_UwOyjMKT_yqwkhsdk5xDAPlR
+X-Proofpoint-ORIG-GUID: _SQF5PrXJDlzcvsCtia8qmLJF8jwISPE
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
+ definitions=2021-10-27_04,2021-10-26_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
+ malwarescore=0 lowpriorityscore=0 mlxscore=0 suspectscore=0 clxscore=1015
+ impostorscore=0 spamscore=0 phishscore=0 priorityscore=1501 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
+ definitions=main-2110270086
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27.10.21 15:36, Philippe Mathieu-Daudé wrote:
-> On 10/27/21 14:45, David Hildenbrand wrote:
->> Let's return the number of free slots instead of only checking if there
->> is a free slot. Required to support memory devices that consume multiple
->> memslots.
+On 10/27/21 01:37, Christian Borntraeger wrote:
+> Am 27.10.21 um 04:54 schrieb Collin Walling:
+>> The diag 318 data contains values that denote information regarding the
+>> guest's environment. Currently, it is unecessarily difficult to observe
+>> this value (either manually-inserted debug statements, gdb stepping, mem
+>> dumping etc). It's useful to observe this information to obtain an
+>> at-a-glance view of the guest's environment, so lets add a simple VCPU
+>> event that prints the CPNC to the s390dbf logs.
 >>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
+>> Signed-off-by: Collin Walling <walling@linux.ibm.com>
+> 
+> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> 
+> And it even finds a bug in QEMU. We clear the CPNC on local CPU resets.
+> Can you have a look? I think we just have to move the cpnc in the env
+> field from the normal/initial reset range to the full reset range.
+
+I'll take a look at this right away.
+
 >> ---
->>  hw/mem/memory-device.c    | 2 +-
->>  hw/virtio/vhost-stub.c    | 2 +-
->>  hw/virtio/vhost.c         | 4 ++--
->>  include/hw/virtio/vhost.h | 2 +-
->>  4 files changed, 5 insertions(+), 5 deletions(-)
-> 
->> --- a/hw/virtio/vhost-stub.c
->> +++ b/hw/virtio/vhost-stub.c
->> @@ -2,7 +2,7 @@
->>  #include "hw/virtio/vhost.h"
->>  #include "hw/virtio/vhost-user.h"
->>  
->> -bool vhost_has_free_slot(void)
->> +unsigned int vhost_get_free_memslots(void)
->>  {
->>      return true;
-> 
->        return 0;
+>>   arch/s390/kvm/kvm-s390.c | 1 +
+>>   1 file changed, 1 insertion(+)
+>>
+>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+>> index 6a6dd5e1daf6..da3ff24eabd0 100644
+>> --- a/arch/s390/kvm/kvm-s390.c
+>> +++ b/arch/s390/kvm/kvm-s390.c
+>> @@ -4254,6 +4254,7 @@ static void sync_regs_fmt2(struct kvm_vcpu *vcpu)
+>>       if (kvm_run->kvm_dirty_regs & KVM_SYNC_DIAG318) {
+>>           vcpu->arch.diag318_info.val = kvm_run->s.regs.diag318;
+>>           vcpu->arch.sie_block->cpnc = vcpu->arch.diag318_info.cpnc;
+>> +        VCPU_EVENT(vcpu, 2, "setting cpnc to %d",
+>> vcpu->arch.diag318_info.cpnc);
+>>       }
+>>       /*
+>>        * If userspace sets the riccb (e.g. after migration) to a valid
+>> state,
+>>
 
-Oh wait, no. This actually has to be
-
-"return ~0U;" (see real vhost_get_free_memslots())
-
-... because there is no vhost and consequently no limit applies.
 
 -- 
-Thanks,
+Regards,
+Collin
 
-David / dhildenb
-
+Stay safe and stay healthy
