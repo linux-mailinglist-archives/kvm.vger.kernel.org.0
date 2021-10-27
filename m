@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 03D6243C9F3
-	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 14:46:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id BFF2D43C9F4
+	for <lists+kvm@lfdr.de>; Wed, 27 Oct 2021 14:46:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241988AbhJ0MsY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 27 Oct 2021 08:48:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25662 "EHLO
+        id S240158AbhJ0Ms2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 27 Oct 2021 08:48:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34698 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241980AbhJ0MsX (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 27 Oct 2021 08:48:23 -0400
+        by vger.kernel.org with ESMTP id S240311AbhJ0Ms1 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 27 Oct 2021 08:48:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635338757;
+        s=mimecast20190719; t=1635338761;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=cHf2ZqC5DC9zioFkkyjMYiEOu523mJCDOZFO8VfZXy8=;
-        b=BL267+ptq0W2bYQ52iivwUPQPh5j3f2vS1ZEExf0yo9m/Xdqd+JsA+NXksaWc2h7NnvhLj
-        QFHdAz8gA+eJp4l34ipayYGbl2FLvFD39tOwNofc4yuYr3/x+Biuc6A21cJgH4NxI+xJka
-        dP6QI+I7T/TWuYiSpwk9Vy+p/rqzbq4=
+        bh=S8/nicczR9pseL6axCf0NoW1qX9tQ1hx5V0enNVRtU0=;
+        b=RgXUaHtNz7/b/WiA9BI7rxGRMeLMXUvT0eFvT0fRagj2P+jJHR/I2wgATY0GHBZUFiKYmG
+        D/555mx5wjNylk46MPZFP4a9KecSU1dD5FaRDZaP43efxI7Drl6EW4WkR2i0NJb7ANmWgE
+        fHkKanGcDfpNmJDT1tQAA8F5xRZ9vO0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-347-EzF0ft-uOY2jUUW1mdrN4g-1; Wed, 27 Oct 2021 08:45:54 -0400
-X-MC-Unique: EzF0ft-uOY2jUUW1mdrN4g-1
+ us-mta-227-DbfXdOn_NBeY2lX9nHYyZg-1; Wed, 27 Oct 2021 08:45:58 -0400
+X-MC-Unique: DbfXdOn_NBeY2lX9nHYyZg-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 00F92802B4F;
-        Wed, 27 Oct 2021 12:45:53 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D7FC410A8E01;
+        Wed, 27 Oct 2021 12:45:56 +0000 (UTC)
 Received: from t480s.redhat.com (unknown [10.39.193.176])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AA57D19724;
-        Wed, 27 Oct 2021 12:45:49 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 76C95196E6;
+        Wed, 27 Oct 2021 12:45:53 +0000 (UTC)
 From:   David Hildenbrand <david@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     David Hildenbrand <david@redhat.com>,
@@ -49,9 +49,9 @@ Cc:     David Hildenbrand <david@redhat.com>,
         Hui Zhu <teawater@gmail.com>,
         Sebastien Boeuf <sebastien.boeuf@intel.com>,
         kvm@vger.kernel.org
-Subject: [PATCH v1 04/12] vhost: Don't merge unmergeable memory sections
-Date:   Wed, 27 Oct 2021 14:45:23 +0200
-Message-Id: <20211027124531.57561-5-david@redhat.com>
+Subject: [PATCH v1 05/12] memory-device: Move memory_device_check_addable() directly into memory_device_pre_plug()
+Date:   Wed, 27 Oct 2021 14:45:24 +0200
+Message-Id: <20211027124531.57561-6-david@redhat.com>
 In-Reply-To: <20211027124531.57561-1-david@redhat.com>
 References: <20211027124531.57561-1-david@redhat.com>
 MIME-Version: 1.0
@@ -61,36 +61,63 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Memory sections that are marked unmergeable should not be merged, to
-allow for atomic removal later.
+Move it out of memory_device_get_free_addr(), which is cleaner and
+prepares for future changes.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- hw/virtio/vhost.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/mem/memory-device.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 2707972870..49a1074097 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -620,7 +620,7 @@ static void vhost_region_add_section(struct vhost_dev *dev,
-                                                mrs_size, mrs_host);
+diff --git a/hw/mem/memory-device.c b/hw/mem/memory-device.c
+index 7f76a09e57..68a2c3dbcc 100644
+--- a/hw/mem/memory-device.c
++++ b/hw/mem/memory-device.c
+@@ -67,9 +67,10 @@ static int memory_device_used_region_size(Object *obj, void *opaque)
+     return 0;
+ }
+ 
+-static void memory_device_check_addable(MachineState *ms, uint64_t size,
++static void memory_device_check_addable(MachineState *ms, MemoryRegion *mr,
+                                         Error **errp)
+ {
++    const uint64_t size = memory_region_size(mr);
+     uint64_t used_region_size = 0;
+ 
+     /* we will need a new memory slot for kvm and vhost */
+@@ -99,7 +100,6 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
+                                             uint64_t align, uint64_t size,
+                                             Error **errp)
+ {
+-    Error *err = NULL;
+     GSList *list = NULL, *item;
+     Range as, new = range_empty;
+ 
+@@ -125,12 +125,6 @@ static uint64_t memory_device_get_free_addr(MachineState *ms,
+                     align);
      }
  
--    if (dev->n_tmp_sections) {
-+    if (dev->n_tmp_sections && !section->unmergeable) {
-         /* Since we already have at least one section, lets see if
-          * this extends it; since we're scanning in order, we only
-          * have to look at the last one, and the FlatView that calls
-@@ -653,7 +653,7 @@ static void vhost_region_add_section(struct vhost_dev *dev,
-             size_t offset = mrs_gpa - prev_gpa_start;
+-    memory_device_check_addable(ms, size, &err);
+-    if (err) {
+-        error_propagate(errp, err);
+-        return 0;
+-    }
+-
+     if (hint && !QEMU_IS_ALIGNED(*hint, align)) {
+         error_setg(errp, "address must be aligned to 0x%" PRIx64 " bytes",
+                    align);
+@@ -259,6 +253,11 @@ void memory_device_pre_plug(MemoryDeviceState *md, MachineState *ms,
+         goto out;
+     }
  
-             if (prev_host_start + offset == mrs_host &&
--                section->mr == prev_sec->mr &&
-+                section->mr == prev_sec->mr && !prev_sec->unmergeable &&
-                 (!dev->vhost_ops->vhost_backend_can_merge ||
-                  dev->vhost_ops->vhost_backend_can_merge(dev,
-                     mrs_host, mrs_size,
++    memory_device_check_addable(ms, mr, &local_err);
++    if (local_err) {
++        goto out;
++    }
++
+     if (legacy_align) {
+         align = *legacy_align;
+     } else {
 -- 
 2.31.1
 
