@@ -2,66 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 13DF943DF9F
-	for <lists+kvm@lfdr.de>; Thu, 28 Oct 2021 13:00:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 638BC43DFD2
+	for <lists+kvm@lfdr.de>; Thu, 28 Oct 2021 13:16:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230119AbhJ1LC7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Oct 2021 07:02:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39482 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230093AbhJ1LC6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Oct 2021 07:02:58 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08B62C061570
-        for <kvm@vger.kernel.org>; Thu, 28 Oct 2021 04:00:32 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id s24so4210664plp.0
-        for <kvm@vger.kernel.org>; Thu, 28 Oct 2021 04:00:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:sender:in-reply-to:references:from:date:message-id
-         :subject:to;
-        bh=SdeQLGcX9mvI/gMbFbBsioglPQKFAJY8wprEGUZOknk=;
-        b=C0j/YY2hXkAvmHqas8a9oCawW+fEByTpd+0qMss3MgjstT9R/G17tIY5cixuIJWohW
-         Apg1ZUjxV6p5gUEaO2ZoUiBU2hb7n11ZwiXKFR7YE8me3qyPFMYAuAos/UpmBGlChUMk
-         iErHobbS5aScPSnZ9yTwutSqPPf4uy8lNGydZ8uY7VyQs2IiApEAOv9v/T/6AXdOp1zq
-         JVsmqWESCgOCNlyuOW9gRyg9yW96lt0CafAspv5LiQ3QIr2PbgDT6OzBYoxuV2yGEZD1
-         3Y+ydEyABpUL5VZoRZHi3+SBFQqx83knrxiXi1nK/jVOBAJ+qOQvNjbRryPIeCx67K7h
-         dqaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:sender:in-reply-to:references:from
-         :date:message-id:subject:to;
-        bh=SdeQLGcX9mvI/gMbFbBsioglPQKFAJY8wprEGUZOknk=;
-        b=wP4ASOkaRCnswLS365LbaOcJy1TAmlBgyu/C0kAZruhNKkOWy3lBRfxFV+f12DCNE+
-         /mbYtISUOTud4FNcbale7GBPAhiyWKDMcjnjEBHUJdHrRyCTdvKVBVXqKr6JrEshq8oo
-         2ZzzaGx9OfNz+SQkDW8+PP/JsrBtmtb3S7QdWZEfdIsCmsKg1kUfDMrcv1sWZpw7iJ4r
-         SX5m2yS/7nJLn2JDmaWbW3JE2kYYRWql4Bxf1HN9NEFE0D82uXCjJtLw49XUpWaDPQcI
-         rWdw4a9mcq5Un7G0imyJlT+EMRKb2/rmeCqHG4GW4YcPvaeSq/JZummKuX1soJ9Sq4E6
-         hCEA==
-X-Gm-Message-State: AOAM533kiOyi9sUe131vT3zbNx8xRAmOxo+v83DALFMNfzcHLqrzvQpD
-        A9hB/pt69oN1Jus5YyBatXAdCPREkTU5k/X0EH9jTEVa
-X-Google-Smtp-Source: ABdhPJz2I3zczye4UpkNx/zWw/KYYV2t+quksiyfBLr4fujp1AKyaa0TxbHCh8y/bS5/7ICPPCFmzYDLzTuUGaotcWc=
-X-Received: by 2002:a17:90b:3014:: with SMTP id hg20mr3653776pjb.168.1635418831662;
- Thu, 28 Oct 2021 04:00:31 -0700 (PDT)
+        id S230222AbhJ1LTN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Oct 2021 07:19:13 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56950 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229578AbhJ1LTM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Oct 2021 07:19:12 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id D07FB610F8;
+        Thu, 28 Oct 2021 11:16:45 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mg3Ol-002BtD-I6; Thu, 28 Oct 2021 12:16:43 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Cc:     James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Quentin Perret <qperret@google.com>,
+        Will Deacon <will@kernel.org>, broonie@kernel.org,
+        kernel-team@android.com
+Subject: [PATCH v2 0/5] KVM: arm64: Rework FPSIMD/SVE tracking
+Date:   Thu, 28 Oct 2021 12:16:35 +0100
+Message-Id: <20211028111640.3663631-1-maz@kernel.org>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Sender: audreymehiwa@gmail.com
-Received: by 2002:a05:6a10:6d0:0:0:0:0 with HTTP; Thu, 28 Oct 2021 04:00:31
- -0700 (PDT)
-In-Reply-To: <CAMN34wiVaFwjDP2_eHK6Mr=GZ_+BgU6Bp6p_06CKx+7JE9qa2A@mail.gmail.com>
-References: <CAMN34wiSsO8EJOSTeoOr-ch3oK3G-AvbEPsX2-AwiC5HC1ACUg@mail.gmail.com>
- <CAMN34wiVaFwjDP2_eHK6Mr=GZ_+BgU6Bp6p_06CKx+7JE9qa2A@mail.gmail.com>
-From:   "Mrs. Rose Guzman Donna" <ebubedikemplc@gmail.com>
-Date:   Thu, 28 Oct 2021 11:00:31 +0000
-X-Google-Sender-Auth: N2r91tmTSaL9TXp4s4-qnU7wGCU
-Message-ID: <CAMN34wjNmT4ViYbmMBKEhnCTiuwN73y3e21o+1nNeHnUPnWEEw@mail.gmail.com>
-Subject: Fwd: I'm Mrs. Rose Guzman Donna from America
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, qperret@google.com, will@kernel.org, broonie@kernel.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
- I am contacting you because, I want to donate a huge amount of money
-to help the  poor people ETC / covid19 victims and to open a charity
-foundation on your behalf in your country is OK?. This involves a lot
-of money Get back to me for more details. R Guzman from America
+This is v2 of this series aiming at simplifying the FP handling.
+
+It recently became apparent that we are mapping each vcpu thread's
+thread_info structure at EL2 for the sole purpose of checking on the
+TIF_FOREIGN_FPSTATE flag.
+
+Given that this looks like a slightly over-engineered way of sharing a
+single bit of information, let's move to a slightly more obvious
+implementation by maintaining a vcpu-private shadow flag that
+represents the same state.
+
+In the same vein, it appears that the code that deals with saving the
+host SVE state when used by the guest can never run, and that's by
+construction. This is actually a good thing, because it be guaranteed
+to explode on nVHE. Let's get rid of it.
+
+I also take this opportunity to add what looks like a missing, and
+nonetheless crucial piece of information to the FPSIMD code regarding
+the way KVM (ab)uses the TIF_FOREIGN_FPSTATE.
+
+Lightly tested on an A53 box with a bunch of paranoia instances
+running in both host and guests, and more heavily on a FVP to check
+the SVE behaviour (using the sve-test selftest running in both host
+and guest at the same time).
+
+* From v1 [1]:
+  - New patch getting rid of the host SVE save code
+  - Reworded the documentation update patch
+
+[1] https://lore.kernel.org/r/20211021151124.3098113-1-maz@kernel.org
+
+Marc Zyngier (5):
+  KVM: arm64: Reorder vcpu flag definitions
+  KVM: arm64: Get rid of host SVE tracking/saving
+  KVM: arm64: Introduce flag shadowing TIF_FOREIGN_FPSTATE
+  KVM: arm64: Stop mapping current thread_info at EL2
+  arm64/fpsimd: Document the use of TIF_FOREIGN_FPSTATE by KVM
+
+ arch/arm64/include/asm/kvm_host.h       | 29 ++++++++++---------
+ arch/arm64/kernel/fpsimd.c              |  6 +++-
+ arch/arm64/kvm/arm.c                    |  1 +
+ arch/arm64/kvm/fpsimd.c                 | 37 ++++++++++---------------
+ arch/arm64/kvm/hyp/include/hyp/switch.h | 30 +++-----------------
+ arch/arm64/kvm/hyp/nvhe/switch.c        |  1 -
+ arch/arm64/kvm/hyp/vhe/switch.c         |  1 -
+ 7 files changed, 38 insertions(+), 67 deletions(-)
+
+-- 
+2.30.2
+
