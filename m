@@ -2,179 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F0E143E436
-	for <lists+kvm@lfdr.de>; Thu, 28 Oct 2021 16:49:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id EB33343E46C
+	for <lists+kvm@lfdr.de>; Thu, 28 Oct 2021 16:58:25 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231409AbhJ1OvE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Oct 2021 10:51:04 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57076 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231235AbhJ1OvC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 28 Oct 2021 10:51:02 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19SDmh6a030596;
-        Thu, 28 Oct 2021 14:48:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=AkOfNJYInjF/oBHpisU8Hp0IrDgq53HnCVySzYnXpnk=;
- b=a6j3jvcUMwCj+8UPYFaO16PQBYwujIS/cuMVmT30qhQrEhebPhN6SQVYgV8rTmqHetTI
- uVDps4mdttjHN1UxHZDPwDXuJa44sK6YpAuwU71CcBH1aEZQKC9FbyW4rE+ATDONA9j0
- LOBdJLPN9fem0Nb49WrWxh6uz4c1lTG6lBMj3MQZ2B7JZhY3zYj+NIut9GcuyJJMvWWW
- DXSmfrqi5+aqJtOGZUEd/F0EXVMaNYUlxvKL1zhXPz/wfAyuj2lxcIiR3zi8I/6dQ3Nh
- emxN4QOV/mkqE78blI+RLHVR7l2s9KH+Zpa7jv/GWVgE6yA77GD3FS2fQvvpW2NFBLNn hA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3byw2n9dg0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 28 Oct 2021 14:48:35 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 19SEOmdF008877;
-        Thu, 28 Oct 2021 14:48:35 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3byw2n9df6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 28 Oct 2021 14:48:35 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 19SEmNTT025217;
-        Thu, 28 Oct 2021 14:48:32 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma05fra.de.ibm.com with ESMTP id 3bx4es0snn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 28 Oct 2021 14:48:32 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 19SEmTxB524856
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 28 Oct 2021 14:48:29 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 17B9B4C059;
-        Thu, 28 Oct 2021 14:48:29 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 952F34C04A;
-        Thu, 28 Oct 2021 14:48:28 +0000 (GMT)
-Received: from [9.171.30.68] (unknown [9.171.30.68])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 28 Oct 2021 14:48:28 +0000 (GMT)
-Message-ID: <457896b2-b462-639e-bb40-dee3716fcb9a@linux.vnet.ibm.com>
-Date:   Thu, 28 Oct 2021 16:48:28 +0200
+        id S231321AbhJ1PAr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Oct 2021 11:00:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38538 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230406AbhJ1PAq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Oct 2021 11:00:46 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1496BC061745
+        for <kvm@vger.kernel.org>; Thu, 28 Oct 2021 07:58:19 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id r5so4631520pls.1
+        for <kvm@vger.kernel.org>; Thu, 28 Oct 2021 07:58:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=QGXF5oWPYn5wMkU6IdsSHBlyLVAw8pj3F3Vqsyv9n4A=;
+        b=P6eCMloWeqINUEj9ranXxT68xKyKG+nZeXgfOAjzUbfehAu/rt22mvQK6Cv6/wEVhf
+         ILloehy+H3AmheBwCsJOWXj/ExWSGoUX7OnMiNGVroCNOp4k9Vgiy6/GMu5fFT6Zszgf
+         KXJW6oVWAEOgw+nZb3EgWed+o32RfN8X4ovTA7EnWrvpelJNMO8xQoTFTMttXOUzUZwb
+         0Xly/nYCzxtW3j12hxAVfUgxFKxGC5/vHAA21WJTYrU6D50yjoLIq2WotwRspD3zmaKZ
+         masg4S+YLS4wCtzhqaBIf6crO0VS8UF0feqHXJVclVA/LnZwLrGD4PHQtvtjpiCHo8A/
+         G3WQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=QGXF5oWPYn5wMkU6IdsSHBlyLVAw8pj3F3Vqsyv9n4A=;
+        b=zF96e/AJFSq175CrIRhLSwb3nQf+DCKnv7kFSBqoJais2p8xK5VAnMGPGXtKswpqMz
+         ck+SDRa9BL4mmcmUPRr9JmAREX8eTI6mkoDGc4Lhal4mVkabKKUXnsYnFssxZGYtSm5E
+         kxZLr6kjitdbnCExNe1M4+z6A4F6Aydy5n+sBy2D7ek96cqIENRIY8BBjy0LnSig/Ydf
+         JC4WLrnbC/iQuR9OIiWWAr7VNofYvhUfXYEGNS8TdaUSbvfWxVrdYwOCYVvhFLijsy6R
+         5y4mAflO365ItBlzFM5RVkocrzh8qmVBrUh6SITK7AV4qzi6ArBPKBiyAydCa+YI5gYN
+         YvZw==
+X-Gm-Message-State: AOAM530GS66zcOo3dLPUzL5FIQPQ5bttG8Bv2o1eHT2Rwa5CDJdfCpEG
+        BceuKHs2KINXElPTxeFoNZCvKQ==
+X-Google-Smtp-Source: ABdhPJzktVilKhrXQKOyuMENgwV5ET+AbhuNqDf8NyijYHCTVEjAfRDleaAvbK/MY9xZIowkHZVQMA==
+X-Received: by 2002:a17:90b:388a:: with SMTP id mu10mr5243207pjb.0.1635433098398;
+        Thu, 28 Oct 2021 07:58:18 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id m10sm8036396pjs.21.2021.10.28.07.58.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Oct 2021 07:58:17 -0700 (PDT)
+Date:   Thu, 28 Oct 2021 14:58:13 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     syzbot <syzbot+05017ad275a64a3246f8@syzkaller.appspotmail.com>
+Cc:     bcm-kernel-feedback-list@broadcom.com, bhelgaas@google.com,
+        bp@alien8.de, dave.hansen@linux.intel.com,
+        devel@driverdev.osuosl.org, f.fainelli@gmail.com,
+        gregkh@linuxfoundation.org, hpa@zytor.com,
+        info@cestasdeplastico.com, jmattson@google.com, joro@8bytes.org,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-pci@vger.kernel.org,
+        linux-rpi-kernel-owner@lists.infradead.org,
+        linux-rpi-kernel@lists.infradead.org, lorenzo.pieralisi@arm.com,
+        mchehab@kernel.org, mingo@redhat.com, nsaenzjulienne@suse.de,
+        pbonzini@redhat.com, robh@kernel.org,
+        sean.j.christopherson@intel.com, sfr@canb.auug.org.au,
+        syzkaller-bugs@googlegroups.com, tcs_kernel@tencent.com,
+        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
+        x86@kernel.org
+Subject: Re: [syzbot] BUG: spinlock bad magic in synchronize_srcu
+Message-ID: <YXq6hTAOhOaWGsNA@google.com>
+References: <0000000000000f73a805afeb9be8@google.com>
+ <000000000000792dda05cf604775@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH v2 3/3] KVM: s390: gaccess: Cleanup access to guest frames
-Content-Language: en-US
-To:     David Hildenbrand <david@redhat.com>,
-        Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>
-Cc:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20211028135556.1793063-1-scgl@linux.ibm.com>
- <20211028135556.1793063-4-scgl@linux.ibm.com>
- <4ac7c459-8e13-087a-f98d-9f3e0e6d8ee6@redhat.com>
-From:   Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>
-In-Reply-To: <4ac7c459-8e13-087a-f98d-9f3e0e6d8ee6@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: k53KMm4IAAkzNdsYvhd724PKKsITVDp-
-X-Proofpoint-ORIG-GUID: pm5fHHQCBtMRbV_KgNakyK2z3EijAQtP
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.182.1,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-10-28_01,2021-10-26_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
- mlxscore=0 spamscore=0 bulkscore=0 adultscore=0 clxscore=1011
- mlxlogscore=999 lowpriorityscore=0 impostorscore=0 priorityscore=1501
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2110280081
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <000000000000792dda05cf604775@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/28/21 16:25, David Hildenbrand wrote:
-> On 28.10.21 15:55, Janis Schoetterl-Glausch wrote:
->> Introduce a helper function for guest frame access.
+On Wed, Oct 27, 2021, syzbot wrote:
+> syzbot suspects this issue was fixed by commit:
 > 
-> "guest page access"
+> commit eb7511bf9182292ef1df1082d23039e856d1ddfb
+> Author: Haimin Zhang <tcs_kernel@tencent.com>
+> Date:   Fri Sep 3 02:37:06 2021 +0000
+> 
+>     KVM: x86: Handle SRCU initialization failure during page track init
+> 
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=143e2b02b00000
+> start commit:   78e709522d2c Merge tag 'for_linus' of git://git.kernel.org..
+> git tree:       upstream
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=2150ebd7e72fa695
+> dashboard link: https://syzkaller.appspot.com/bug?extid=05017ad275a64a3246f8
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10b72895300000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14c42853300000
+> 
+> If the result looks correct, please mark the issue as fixed by replying with:
+> 
+> #syz fix: KVM: x86: Handle SRCU initialization failure during page track init
 
-Ok.
-> 
-> But I do wonder if you actually want to call it
-> 
-> "access_guest_abs"
-> 
-> and say "guest absolute access" instead here.
-> 
-> Because we're dealing with absolute addresses and the fact that we are
-> accessing it page-wise is just because we have to perform a page-wise
-> translation in the callers (either virtual->absolute or real->absolute).
-> 
-> Theoretically, if you know you're across X pages but they are contiguous
-> in absolute address space, nothing speaks against using that function
-> directly across X pages with a single call.
-
-There currently is no point to this, is there?
-kvm_read/write_guest break the region up into pages anyway,
-so no reason to try to identify larger continuous chunks.
-> 
->>
->> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
->> ---
->>  arch/s390/kvm/gaccess.c | 24 ++++++++++++++++--------
->>  1 file changed, 16 insertions(+), 8 deletions(-)
->>
->> diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
->> index f0848c37b003..9a633310b6fe 100644
->> --- a/arch/s390/kvm/gaccess.c
->> +++ b/arch/s390/kvm/gaccess.c
->> @@ -866,6 +866,20 @@ static int guest_range_to_gpas(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar,
->>  	return 0;
->>  }
->>  
->> +static int access_guest_page(struct kvm *kvm, enum gacc_mode mode, gpa_t gpa,
->> +			      void *data, unsigned int len)
->> +{
->> +	const unsigned int offset = offset_in_page(gpa);
->> +	const gfn_t gfn = gpa_to_gfn(gpa);
->> +	int rc;
->> +
->> +	if (mode == GACC_STORE)
->> +		rc = kvm_write_guest_page(kvm, gfn, data, offset, len);
->> +	else
->> +		rc = kvm_read_guest_page(kvm, gfn, data, offset, len);
->> +	return rc;
->> +}
->> +
->>  int access_guest(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar, void *data,
->>  		 unsigned long len, enum gacc_mode mode)
->>  {
->> @@ -896,10 +910,7 @@ int access_guest(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar, void *data,
->>  	rc = guest_range_to_gpas(vcpu, ga, ar, gpas, len, asce, mode);
->>  	for (idx = 0; idx < nr_pages && !rc; idx++) {
->>  		fragment_len = min(PAGE_SIZE - offset_in_page(gpas[idx]), len);
->> -		if (mode == GACC_STORE)
->> -			rc = kvm_write_guest(vcpu->kvm, gpas[idx], data, fragment_len);
->> -		else
->> -			rc = kvm_read_guest(vcpu->kvm, gpas[idx], data, fragment_len);
->> +		rc = access_guest_page(vcpu->kvm, mode, gpas[idx], data, fragment_len);
->>  		len -= fragment_len;
->>  		data += fragment_len;
->>  	}
->> @@ -920,10 +931,7 @@ int access_guest_real(struct kvm_vcpu *vcpu, unsigned long gra,
->>  	while (len && !rc) {
->>  		gpa = kvm_s390_real_to_abs(vcpu, gra);
->>  		fragment_len = min(PAGE_SIZE - offset_in_page(gpa), len);
->> -		if (mode)
->> -			rc = write_guest_abs(vcpu, gpa, data, fragment_len);
->> -		else
->> -			rc = read_guest_abs(vcpu, gpa, data, fragment_len);
->> +		rc = access_guest_page(vcpu->kvm, mode, gpa, data, fragment_len);
->>  		len -= fragment_len;
->>  		gra += fragment_len;
->>  		data += fragment_len;
->>
-> 
-> 
-
+#syz fix: KVM: x86: Handle SRCU initialization failure during page track init
