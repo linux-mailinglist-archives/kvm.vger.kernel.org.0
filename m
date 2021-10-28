@@ -2,44 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 25B3E43E56E
-	for <lists+kvm@lfdr.de>; Thu, 28 Oct 2021 17:47:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D378B43E588
+	for <lists+kvm@lfdr.de>; Thu, 28 Oct 2021 17:55:48 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230413AbhJ1Ptf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Oct 2021 11:49:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35517 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230410AbhJ1Pta (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 28 Oct 2021 11:49:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635436023;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=CbmNsSUrvGPtUZE+MWwRLOXXOyUhB+AbdYKB6eOYzgI=;
-        b=A2+MzG9VRxzCdP01FQTteiGI9DnLvYndC+MU2PY5uYdrJ4eyo+H24bptCO3kLCDW46xB3o
-        eUQQQPSL8ewMKaUSiXq56bwh/DkLDZMPxdnEhY/jIFf0q6owCjXifBICI3D/7g9qw78Dj1
-        +djfTCMGZhinv3PRXE0McP1ZdEbZmxQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-359-qmR5zb0kMGqaJpP-fhah4A-1; Thu, 28 Oct 2021 11:47:01 -0400
-X-MC-Unique: qmR5zb0kMGqaJpP-fhah4A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 00705802682;
-        Thu, 28 Oct 2021 15:46:58 +0000 (UTC)
-Received: from starship (unknown [10.40.194.243])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 193772637D;
-        Thu, 28 Oct 2021 15:46:48 +0000 (UTC)
-Message-ID: <412931e082b33403c8778cae7376325871ab0d54.camel@redhat.com>
-Subject: Re: [PATCH v2 34/43] KVM: x86: Remove defunct pre_block/post_block
- kvm_x86_ops hooks
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
+        id S229764AbhJ1P6O (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Oct 2021 11:58:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51818 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229565AbhJ1P6N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Oct 2021 11:58:13 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7799C0613B9
+        for <kvm@vger.kernel.org>; Thu, 28 Oct 2021 08:55:46 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id gn3so5066672pjb.0
+        for <kvm@vger.kernel.org>; Thu, 28 Oct 2021 08:55:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=m0tHnHlQJDBdfArgGfCXfVMbH9LdSSnDL35miUYeLjs=;
+        b=QQmaJ8nXN2KbyIG5k1JyBoSquPg6yk3b/FNSx1V8PjEEIwsY4bZfol7aYj6Ws7u8lu
+         AL3QNRVPk8G4o1zbT2wS3T+0q2unqIYIGvpD4X4hbS+GWLCfdCjK1582SOfCPxgbXaj6
+         rp1/zAb/gxsig9wW4x8Hmz3hVUCDwIHJtvbG8WTJj+OyXJ9Qbywk0hsQ9i5L1juwa1hs
+         n78Jiehn21G0dcgi1vzqMRfnUHdXLWIscCjEk3VHPYnbJSs6c8My2YAhN/ZegigH9hDg
+         LWqS5PZjO6n0Z4WJ0z7BuPmceVWRsCdNKwW5JM9MnEgXi3tzkHrjJO1A1KNXmTOVd/Xz
+         cMxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=m0tHnHlQJDBdfArgGfCXfVMbH9LdSSnDL35miUYeLjs=;
+        b=i/J6Ksioqe6PThVq1hcYL3jOgRadRKzjwt7E/2dXqMdoa4LwTWQX8ND7dRzjUUKyGP
+         JYVNBFhLINp32hPWVDzfsQjzLyTILsAjAktyT8enQtNC4cjAh98Cm753nz7+n8iPd1zl
+         QVG1hLoNHxZa7KjWMsqphyNnN7ybtORWAig++sJXfOchrB1QHn5opAJQtPDKtD6PWIR8
+         7SsENuR1hguCJTd+aGLpXXQU0PZhDpDOMf887drhGqpYjhc5hv9Tv/SKHhqT+7oEc5+I
+         xDBVFszsOFGFc2d0sTj1krS7sPPCHzoqxbi0ywBAf41jeGWV1bGVgHicRwMOwxyVgmb2
+         9/fQ==
+X-Gm-Message-State: AOAM531VXY0Lu9xTX+FY2zJ0eUeA0CVlqbLz+NK3tFmgJi3fsz2CvutR
+        ucnS395IBuwBjOYiWCTLs52Weg==
+X-Google-Smtp-Source: ABdhPJwGUzCGTG+bFEKCx4HxRTPn7WtM79GFmjO7irPTWNvcrtXMPEuDRtNZ53pGeMNDkz8HGfA6sw==
+X-Received: by 2002:a17:90b:17d0:: with SMTP id me16mr13884280pjb.152.1635436545938;
+        Thu, 28 Oct 2021 08:55:45 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id s12sm3788591pfg.70.2021.10.28.08.55.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Oct 2021 08:55:45 -0700 (PDT)
+Date:   Thu, 28 Oct 2021 15:55:41 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
         Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
         Paul Mackerras <paulus@ozlabs.org>,
         Anup Patel <anup.patel@wdc.com>,
@@ -48,8 +59,8 @@ To:     Sean Christopherson <seanjc@google.com>,
         Albert Ou <aou@eecs.berkeley.edu>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     James Morse <james.morse@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Atish Patra <atish.patra@wdc.com>,
@@ -67,126 +78,106 @@ Cc:     James Morse <james.morse@arm.com>,
         David Matlack <dmatlack@google.com>,
         Oliver Upton <oupton@google.com>,
         Jing Zhang <jingzhangos@google.com>
-Date:   Thu, 28 Oct 2021 18:46:11 +0300
-In-Reply-To: <20211009021236.4122790-35-seanjc@google.com>
+Subject: Re: [PATCH v2 26/43] KVM: VMX: Read Posted Interrupt "control"
+ exactly once per loop iteration
+Message-ID: <YXrH/ZZBOHrWHz4j@google.com>
 References: <20211009021236.4122790-1-seanjc@google.com>
-         <20211009021236.4122790-35-seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+ <20211009021236.4122790-27-seanjc@google.com>
+ <b078cce30f86672d7d8f8eaa0adc47d24def24e2.camel@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b078cce30f86672d7d8f8eaa0adc47d24def24e2.camel@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2021-10-08 at 19:12 -0700, Sean Christopherson wrote:
-> Drop kvm_x86_ops' pre/post_block() now that all implementations are nops.
+On Thu, Oct 28, 2021, Maxim Levitsky wrote:
+> On Fri, 2021-10-08 at 19:12 -0700, Sean Christopherson wrote:
+> > Use READ_ONCE() when loading the posted interrupt descriptor control
+> > field to ensure "old" and "new" have the same base value.  If the
+> > compiler emits separate loads, and loads into "new" before "old", KVM
+> > could theoretically drop the ON bit if it were set between the loads.
+> > 
+> > Fixes: 28b835d60fcc ("KVM: Update Posted-Interrupts Descriptor when vCPU is preempted")
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  arch/x86/kvm/vmx/posted_intr.c | 6 +++---
+> >  1 file changed, 3 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
+> > index 414ea6972b5c..fea343dcc011 100644
+> > --- a/arch/x86/kvm/vmx/posted_intr.c
+> > +++ b/arch/x86/kvm/vmx/posted_intr.c
+> > @@ -53,7 +53,7 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
+> >  
+> >  	/* The full case.  */
+> >  	do {
+> > -		old.control = new.control = pi_desc->control;
+> > +		old.control = new.control = READ_ONCE(pi_desc->control);
+> >  
+> >  		dest = cpu_physical_id(cpu);
+> >  
+> > @@ -104,7 +104,7 @@ static void __pi_post_block(struct kvm_vcpu *vcpu)
+> >  	     "Wakeup handler not enabled while the vCPU was blocking");
+> >  
+> >  	do {
+> > -		old.control = new.control = pi_desc->control;
+> > +		old.control = new.control = READ_ONCE(pi_desc->control);
+> >  
+> >  		dest = cpu_physical_id(vcpu->cpu);
+> >  
+> > @@ -160,7 +160,7 @@ int pi_pre_block(struct kvm_vcpu *vcpu)
+> >  	     "Posted Interrupt Suppress Notification set before blocking");
+> >  
+> >  	do {
+> > -		old.control = new.control = pi_desc->control;
+> > +		old.control = new.control = READ_ONCE(pi_desc->control);
+> >  
+> >  		/* set 'NV' to 'wakeup vector' */
+> >  		new.nv = POSTED_INTR_WAKEUP_VECTOR;
 > 
-> No functional change intended.
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/include/asm/kvm-x86-ops.h |  2 --
->  arch/x86/include/asm/kvm_host.h    | 12 ------------
->  arch/x86/kvm/vmx/vmx.c             | 13 -------------
->  arch/x86/kvm/x86.c                 |  6 +-----
->  4 files changed, 1 insertion(+), 32 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-> index cefe1d81e2e8..c2b007171abd 100644
-> --- a/arch/x86/include/asm/kvm-x86-ops.h
-> +++ b/arch/x86/include/asm/kvm-x86-ops.h
-> @@ -96,8 +96,6 @@ KVM_X86_OP(handle_exit_irqoff)
->  KVM_X86_OP_NULL(request_immediate_exit)
->  KVM_X86_OP(sched_in)
->  KVM_X86_OP_NULL(update_cpu_dirty_logging)
-> -KVM_X86_OP_NULL(pre_block)
-> -KVM_X86_OP_NULL(post_block)
->  KVM_X86_OP_NULL(vcpu_blocking)
->  KVM_X86_OP_NULL(vcpu_unblocking)
->  KVM_X86_OP_NULL(update_pi_irte)
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 328103a520d3..76a8dddc1a48 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1445,18 +1445,6 @@ struct kvm_x86_ops {
->  	const struct kvm_pmu_ops *pmu_ops;
->  	const struct kvm_x86_nested_ops *nested_ops;
->  
-> -	/*
-> -	 * Architecture specific hooks for vCPU blocking due to
-> -	 * HLT instruction.
-> -	 * Returns for .pre_block():
-> -	 *    - 0 means continue to block the vCPU.
-> -	 *    - 1 means we cannot block the vCPU since some event
-> -	 *        happens during this period, such as, 'ON' bit in
-> -	 *        posted-interrupts descriptor is set.
-> -	 */
-> -	int (*pre_block)(struct kvm_vcpu *vcpu);
-> -	void (*post_block)(struct kvm_vcpu *vcpu);
-> -
->  	void (*vcpu_blocking)(struct kvm_vcpu *vcpu);
->  	void (*vcpu_unblocking)(struct kvm_vcpu *vcpu);
->  
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index a24f19874716..13e732a818f3 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -7462,16 +7462,6 @@ void vmx_update_cpu_dirty_logging(struct kvm_vcpu *vcpu)
->  		secondary_exec_controls_clearbit(vmx, SECONDARY_EXEC_ENABLE_PML);
->  }
->  
-> -static int vmx_pre_block(struct kvm_vcpu *vcpu)
-> -{
-> -	return 0;
-> -}
-> -
-> -static void vmx_post_block(struct kvm_vcpu *vcpu)
-> -{
-> -
-> -}
-> -
->  static void vmx_setup_mce(struct kvm_vcpu *vcpu)
->  {
->  	if (vcpu->arch.mcg_cap & MCG_LMCE_P)
-> @@ -7665,9 +7655,6 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
->  	.cpu_dirty_log_size = PML_ENTITY_NUM,
->  	.update_cpu_dirty_logging = vmx_update_cpu_dirty_logging,
->  
-> -	.pre_block = vmx_pre_block,
-> -	.post_block = vmx_post_block,
-> -
->  	.pmu_ops = &intel_pmu_ops,
->  	.nested_ops = &vmx_nested_ops,
->  
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 909e932a7ae7..9643f23c28c7 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -9898,8 +9898,7 @@ static inline int vcpu_block(struct kvm *kvm, struct kvm_vcpu *vcpu)
->  {
->  	bool hv_timer;
->  
-> -	if (!kvm_arch_vcpu_runnable(vcpu) &&
-> -	    (!kvm_x86_ops.pre_block || static_call(kvm_x86_pre_block)(vcpu) == 0)) {
-> +	if (!kvm_arch_vcpu_runnable(vcpu)) {
->  		/*
->  		 * Switch to the software timer before halt-polling/blocking as
->  		 * the guest's timer may be a break event for the vCPU, and the
-> @@ -9921,9 +9920,6 @@ static inline int vcpu_block(struct kvm *kvm, struct kvm_vcpu *vcpu)
->  		if (hv_timer)
->  			kvm_lapic_switch_to_hv_timer(vcpu);
->  
-> -		if (kvm_x86_ops.post_block)
-> -			static_call(kvm_x86_post_block)(vcpu);
-> -
->  		if (!kvm_check_request(KVM_REQ_UNHALT, vcpu))
->  			return 1;
->  	}
+> I wish there was a way to mark fields in a struct, as requiring 'READ_ONCE' on them
+> so that compiler would complain if this isn't done, or automatically use 'READ_ONCE'
+> logic.
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+Hmm, I think you could make an argument that ON and thus the whole "control"
+word should be volatile.  AFAICT, tagging just "on" as volatile actually works.
+There's even in a clause in Documentation/process/volatile-considered-harmful.rst
+that calls this out as a (potentially) legitimate use case.
 
-Best regards,
-	Maxim Levitsky
+  - Pointers to data structures in coherent memory which might be modified
+    by I/O devices can, sometimes, legitimately be volatile.
 
+That said, I think I actually prefer forcing the use of READ_ONCE.  The descriptor
+requires more protections than what volatile provides, namely that all writes need
+to be atomic.  So given that volatile alone isn't sufficient, I'd prefer to have
+the code itself be more self-documenting.
+
+E.g. this compiles and does mess up the expected size.
+
+diff --git a/arch/x86/kvm/vmx/posted_intr.h b/arch/x86/kvm/vmx/posted_intr.h
+index 7f7b2326caf5..149df3b18789 100644
+--- a/arch/x86/kvm/vmx/posted_intr.h
++++ b/arch/x86/kvm/vmx/posted_intr.h
+@@ -11,9 +11,9 @@ struct pi_desc {
+        union {
+                struct {
+                                /* bit 256 - Outstanding Notification */
+-                       u16     on      : 1,
++                       volatile u16    on      : 1;
+                                /* bit 257 - Suppress Notification */
+-                               sn      : 1,
++                       u16     sn      : 1,
+                                /* bit 271:258 - Reserved */
+                                rsvd_1  : 14;
+                                /* bit 279:272 - Notification Vector */
+@@ -23,7 +23,7 @@ struct pi_desc {
+                                /* bit 319:288 - Notification Destination */
+                        u32     ndst;
+                };
+-               u64 control;
++               volatile u64 control;
+        };
+        u32 rsvd[6];
+ } __aligned(64);
