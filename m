@@ -2,102 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C5BD43DC44
-	for <lists+kvm@lfdr.de>; Thu, 28 Oct 2021 09:42:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D602343DCD9
+	for <lists+kvm@lfdr.de>; Thu, 28 Oct 2021 10:14:29 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229846AbhJ1Hot (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Oct 2021 03:44:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50910 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229822AbhJ1Hos (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Oct 2021 03:44:48 -0400
-Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78031C061570;
-        Thu, 28 Oct 2021 00:42:21 -0700 (PDT)
-Received: by mail-yb1-xb33.google.com with SMTP id t127so12925740ybf.13;
-        Thu, 28 Oct 2021 00:42:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=jg8omDm1zuEDYPy2wE96j8MIp8X+Ixp0yvqeM2ZpT0g=;
-        b=KA1YcV+oqiq8WH3aVGXJM18kP7H/wclsYSoUmbKqww/bQPKzs9CJtDAqYY8PekzznP
-         aO3Ryl3VH9yQWVnq9OmuBOlynAhLo4NFRVS6EkioResNdxBJI/ITkqQDkCuE0aenNqYX
-         SpyalUqhdLFPWFpjuDpH+L9UYYF2MnnEZziK72BnGVkfRBHywxt7YKztfPbi6y8IKiRN
-         1vwU/CRM+BfRGZrUAUY3Ap60xJKQOui9Oh0B195Pp6OFoK4EAorIqJBGhbNwvo6BtB5u
-         pYdJ8ENi52vSCnhp02vWuUy8Ppyr6e9nzg76PMvkXErbgGBs7eJO7+bm8w6gEBYRkwxB
-         0oyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=jg8omDm1zuEDYPy2wE96j8MIp8X+Ixp0yvqeM2ZpT0g=;
-        b=vfwh7TUByeruekWfivDPetMruh00jOw2FsMyE7vtL6O6KQ29CgqOaZLpG5vGapt/8f
-         3hAIAhuUuIiG+DQ0bYA/ppeejcA0vv4SPuemXwr9/9AUQtu2UJDdskFSRK2SOa9mAGIH
-         8/fvCITaTic082go+ky3oXOSP8EeBejqMa0pQUJDChnhcP+S0rtKpIkV/9dm5Q+4jWx1
-         tv9TzsPSVZOuNmlb+1BlxPFQIuTgnmUq1zzv7SXlr0QrADFbSCf6zxOqtjznet6/i31M
-         Z4T8koT8YBLmPbWv29AWs2d0xYoZtOBPeGvMuAqHIuCtOu4c/d3F3WwEzGjFpO5PAyFW
-         XOCQ==
-X-Gm-Message-State: AOAM531vEdG4pf7IMaRaw2VGiBkLkaLXvOywzAv3NBKZJ7wNzGM10GP8
-        PTCBd+wmY1aY+ZLPXtmP+NLPA/Li+a8fXtMAgwcb3jN0d9xY3BmW
-X-Google-Smtp-Source: ABdhPJx8TRc2pBelVwfWJtgvJIqkXLIPcG50fiUihdVHkF0f9haejbKjz7kVZOG51P9njEiIiOUr8G2SKv48mxzEPgE=
-X-Received: by 2002:a5b:a92:: with SMTP id h18mr2872386ybq.439.1635406940758;
- Thu, 28 Oct 2021 00:42:20 -0700 (PDT)
+        id S229985AbhJ1IQz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Oct 2021 04:16:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:59042 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230100AbhJ1IQy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 28 Oct 2021 04:16:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635408867;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=cDuOiyvsuW5iZzHfKwncUU1ksOibBW1HjvLFDhVTp80=;
+        b=SzfYZwpxtrWiOfCJDE+LJ/qM97QDlcptZFNV/ojGEk1UVpeyIZP1ludOsxUg6JyXDD5aM4
+        2qrl+tZcQASGfQBozzXZzzOamzG1GoxFHTgsJOHMmg12V2lU2rAHBXAPNw6xYJsyR5gMky
+        FlpRQs0NgQMXi6mUEoEppSLMfKP68Sk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-364-IDBgccwHNOu-sOzrvvQ5Dg-1; Thu, 28 Oct 2021 04:14:24 -0400
+X-MC-Unique: IDBgccwHNOu-sOzrvvQ5Dg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7C2D2101796C;
+        Thu, 28 Oct 2021 08:14:22 +0000 (UTC)
+Received: from localhost (unknown [10.39.194.138])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 266645D740;
+        Thu, 28 Oct 2021 08:14:13 +0000 (UTC)
+Date:   Thu, 28 Oct 2021 09:14:13 +0100
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     John Levon <levon@movementarian.org>
+Cc:     Elena <elena.ufimtseva@oracle.com>, qemu-devel@nongnu.org,
+        kvm@vger.kernel.org, mst@redhat.com, john.g.johnson@oracle.com,
+        dinechin@redhat.com, cohuck@redhat.com, jasowang@redhat.com,
+        felipe@nutanix.com, jag.raman@oracle.com, eafanasova@gmail.com
+Subject: Re: MMIO/PIO dispatch file descriptors (ioregionfd) design discussion
+Message-ID: <YXpb1f3KicZxj1oj@stefanha-x1.localdomain>
+References: <88ca79d2e378dcbfb3988b562ad2c16c4f929ac7.camel@gmail.com>
+ <YWUeZVnTVI7M/Psr@heatpipe>
+ <YXamUDa5j9uEALYr@stefanha-x1.localdomain>
+ <20211025152122.GA25901@nuker>
+ <YXhQk/Sh0nLOmA2n@movementarian.org>
+ <YXkmx3V0VklA6qHl@stefanha-x1.localdomain>
+ <YXlEhCYAJuhsVwDv@movementarian.org>
 MIME-Version: 1.0
-References: <CAFcO6XOmoS7EacN_n6v4Txk7xL7iqRa2gABg3F7E3Naf5uG94g@mail.gmail.com>
- <9eb83cdd-9314-0d1f-0d4b-0cf4432e1e84@redhat.com>
-In-Reply-To: <9eb83cdd-9314-0d1f-0d4b-0cf4432e1e84@redhat.com>
-From:   butt3rflyh4ck <butterflyhuangxx@gmail.com>
-Date:   Thu, 28 Oct 2021 15:42:10 +0800
-Message-ID: <CAFcO6XO7YMxHN+TwZvr3fxFypTt_nE3xLdvuBKPF_j0-ApsiFg@mail.gmail.com>
-Subject: Re: There is a null-ptr-deref bug in kvm_dirty_ring_get in virt/kvm/dirty_ring.c
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     "Woodhouse, David" <dwmw@amazon.co.uk>, kvm@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="cwItEpQlM3dmBURJ"
+Content-Disposition: inline
+In-Reply-To: <YXlEhCYAJuhsVwDv@movementarian.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-I agree with you. But I don=E2=80=99t have a good idea how to fix it
 
+--cwItEpQlM3dmBURJ
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Regards,
+On Wed, Oct 27, 2021 at 01:22:28PM +0100, John Levon wrote:
+> On Wed, Oct 27, 2021 at 11:15:35AM +0100, Stefan Hajnoczi wrote:
+>=20
+> > > > I like this approach as well.
+> > > > As you have mentioned, the device emulation code with first approach
+> > > > does have to how to handle the region accesses. The second approach=
+ will
+> > > > make things more transparent. Let me see how can I modify what ther=
+e is
+> > > > there now and may ask further questions.
+> > >=20
+> > > Sorry I'm a bit late to this discussion, I'm not clear on the above W=
+RT
+> > > vfio-user. If an ioregionfd has to cover a whole BAR0 (?), how would =
+this
+> > > interact with partly-mmap()able regions like we do with SPDK/vfio-use=
+r/NVMe?
+> >=20
+> > The ioregionfd doesn't need to cover an entire BAR. QEMU's MemoryRegions
+> > form a hierarchy, so it's possible to sub-divide the BAR into several
+> > MemoryRegions.
+>=20
+> I think you're saying that when vfio-user client in qemu calls
+> VFIO_USER_DEVICE_GET_REGION_IO_FDS, it would create a sub-MR correspondin=
+g to
+> each one, before asking KVM to configure them?
 
-  butt3rflyh4ck.
+Yes. Actually I wasn't thinking of the vfio-user client but just about
+QEMU device emulation code in general. What you suggested sounds like a
+clean mapping from MemoryRegions to vfio-user.
 
-On Fri, Oct 22, 2021 at 4:08 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 18/10/21 19:14, butt3rflyh4ck wrote:
-> > {
-> > struct kvm_vcpu *vcpu =3D kvm_get_running_vcpu();  //-------> invoke
-> > kvm_get_running_vcpu() to get a vcpu.
-> >
-> > WARN_ON_ONCE(vcpu->kvm !=3D kvm); [1]
-> >
-> > return &vcpu->dirty_ring;
-> > }
-> > ```
-> > but we had not called KVM_CREATE_VCPU ioctl to create a kvm_vcpu so
-> > vcpu is NULL.
->
-> It's not just because there was no call to KVM_CREATE_VCPU; in general
-> kvm->dirty_ring_size only works if all writes are associated to a
-> specific vCPU, which is not the case for the one of
-> kvm_xen_shared_info_init.
->
-> David, what do you think?  Making dirty-page ring buffer incompatible
-> with Xen is ugly and I'd rather avoid it; taking the mutex for vcpu 0 is
-> not an option because, as the reporter said, you might not have even
-> created a vCPU yet when you call KVM_XEN_HVM_SET_ATTR.  The remaining
-> option would be just "do not mark the page as dirty if the ring buffer
-> is active".  This is feasible because userspace itself has passed the
-> shared info gfn; but again, it's ugly...
->
-> Paolo
->
+Stefan
 
+--cwItEpQlM3dmBURJ
+Content-Type: application/pgp-signature; name="signature.asc"
 
---=20
-Active Defense Lab of Venustech
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmF6W9UACgkQnKSrs4Gr
+c8i+hwgAyCI2iGTHLFwogMjJbsa9jdKXiwENuqVpyhbeW7ov29LHVODiRJX0FvDj
+RhQRePoHohxQSaMU2czi5re+0QD6QoVpSnTuhsWkoBHH6LUQJgT+WP5la2AItplG
+YBeE7KdtEqpkRVKrRlvZMTGEbg4+rSLh80fdyh6owqFw531pOtlvZjx6Qpdj+rwb
+UbOv//OuSq/RJGsi3ZDsL0ifUctKS4+NUIcxawjTvprbpLY5jnSdarxgjEKn2NJh
+axhKFgV0D+DaU9xxrtLl12uqI1cGrY07gPEhiDI5bTMmc91OtMZJ9OxHEnDX7CVn
+pS/A+nv2kQq74Y/LqT3lIWGVpeJMmA==
+=4x+E
+-----END PGP SIGNATURE-----
+
+--cwItEpQlM3dmBURJ--
+
