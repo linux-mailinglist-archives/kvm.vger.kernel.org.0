@@ -2,152 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 15CB243E000
-	for <lists+kvm@lfdr.de>; Thu, 28 Oct 2021 13:28:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 26FD543E065
+	for <lists+kvm@lfdr.de>; Thu, 28 Oct 2021 13:59:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230246AbhJ1LbU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Oct 2021 07:31:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22005 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230225AbhJ1LbT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 28 Oct 2021 07:31:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635420532;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=MHpIfrYfSW8Oruu5gZzONXfOs5cqhayPI05VEPrlFqI=;
-        b=ZXK1SsScmTgtnETpIVi2QXHMMs18RzTZPLNJsMQPBJZrv9133Un6zEiD04wYDmRLk8iqrN
-        iuZX4yT7S6TUZoHT9hESffo8pukWCq5lQV0yzXImlSkMPgQqKPN/CyfuhIr/OGE6dxfDS+
-        vegJ1oDUxlGxo3f0//TYGU5zmJ/np9g=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-301-eJZbxn5mNyK61ySDSBCRrA-1; Thu, 28 Oct 2021 07:28:46 -0400
-X-MC-Unique: eJZbxn5mNyK61ySDSBCRrA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CF9359F92B;
-        Thu, 28 Oct 2021 11:28:42 +0000 (UTC)
-Received: from starship (unknown [10.40.194.243])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 108AF5DA61;
-        Thu, 28 Oct 2021 11:28:30 +0000 (UTC)
-Message-ID: <643d9c249b5863f04290a6f047ea1a2d98bd75f9.camel@redhat.com>
-Subject: Re: [PATCH v2 27/43] KVM: VMX: Move Posted Interrupt ndst
- computation out of write loop
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        David Matlack <dmatlack@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>
-Date:   Thu, 28 Oct 2021 14:28:29 +0300
-In-Reply-To: <20211009021236.4122790-28-seanjc@google.com>
-References: <20211009021236.4122790-1-seanjc@google.com>
-         <20211009021236.4122790-28-seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        id S230226AbhJ1MCJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Oct 2021 08:02:09 -0400
+Received: from mail-wm1-f41.google.com ([209.85.128.41]:51733 "EHLO
+        mail-wm1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230312AbhJ1MCE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Oct 2021 08:02:04 -0400
+Received: by mail-wm1-f41.google.com with SMTP id z200so4678917wmc.1;
+        Thu, 28 Oct 2021 04:59:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=UUZZZRqs2X/yCmG5FpkNKJ3V0/nFoXe7+MUrLvu5RPY=;
+        b=6a3fX8oXqGkt/1uk7Bt2CSiRCUvL36J1Kg5prFOpgXuXpOj9euV1ShWX9Bg8GANCy0
+         IHX55d5pe3a2B2ss9Y2fMrEk2eEZKPF1T2pgPK0EUfnM5gW4T9ahs8MD/VHAux6I3lKK
+         BPWaHTuKXzIj/H9i4pZPPEvTrHLUaxCBVo06Lfx/+CXSvhGKRM15wreXZ9bLNww4G3h9
+         aR5044Dqyj9FtbDgN+mpHqRVYmEc230Pcc/r+hjYUl9Ael8oclAWXdFz72wq6N4ywmhE
+         rmFUNpvslRvNtkzjIgj+P6brrpWg3XDxyKwL6TeS/J0ahfr34hnD3hlc8OWdbCOR2LvV
+         sorQ==
+X-Gm-Message-State: AOAM531qqZO0mWpHXiRJVilTxgeZXHkkfbhzD/oiTfXyUMFzqIywERHp
+        MfvxZuyIaAS0HpPYlAt1xPE=
+X-Google-Smtp-Source: ABdhPJwpMMOf7H0HdBo/7eop+RGS3mt1nTq9UCoVM+ITcPtyWGM2tl0Uo9wcJ4RGOVL2jGC5KUZbig==
+X-Received: by 2002:a1c:4306:: with SMTP id q6mr2632176wma.29.1635422375199;
+        Thu, 28 Oct 2021 04:59:35 -0700 (PDT)
+Received: from liuwe-devbox-debian-v2 ([51.145.34.42])
+        by smtp.gmail.com with ESMTPSA id o23sm2693592wms.18.2021.10.28.04.59.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 28 Oct 2021 04:59:34 -0700 (PDT)
+Date:   Thu, 28 Oct 2021 11:59:33 +0000
+From:   Wei Liu <wei.liu@kernel.org>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     linux-hyperv@vger.kernel.org, Wei Liu <wei.liu@kernel.org>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Michael Kelley <mikelley@microsoft.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Dexuan Cui <decui@microsoft.com>
+Subject: Re: [PATCH] x86/hyperv: Protect set_hv_tscchange_cb() against
+ getting preempted
+Message-ID: <20211028115933.ffxaqq6yhdbmvetv@liuwe-devbox-debian-v2>
+References: <20211012155005.1613352-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211012155005.1613352-1-vkuznets@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2021-10-08 at 19:12 -0700, Sean Christopherson wrote:
-> Hoist the CPU => APIC ID conversion for the Posted Interrupt descriptor
-> out of the loop to write the descriptor, preemption is disabled so the
-> CPU won't change, and if the APIC ID changes KVM has bigger problems.
+On Tue, Oct 12, 2021 at 05:50:05PM +0200, Vitaly Kuznetsov wrote:
+> The following issue is observed with CONFIG_DEBUG_PREEMPT when KVM loads:
 > 
-> No functional change intended.
-
-Is preemption always disabled in vmx_vcpu_pi_load? vmx_vcpu_pi_load is called from vmx_vcpu_load,
-which is called indirectly from vcpu_load which is called from many ioctls,
-which userspace does. In these places I don't think that preemption is disabled.
-
-Best regards,
-	Maxim Levitsky
-
+>  KVM: vmx: using Hyper-V Enlightened VMCS
+>  BUG: using smp_processor_id() in preemptible [00000000] code: systemd-udevd/488
+>  caller is set_hv_tscchange_cb+0x16/0x80
+>  CPU: 1 PID: 488 Comm: systemd-udevd Not tainted 5.15.0-rc5+ #396
+>  Hardware name: Microsoft Corporation Virtual Machine/Virtual Machine, BIOS Hyper-V UEFI Release v4.0 12/17/2019
+>  Call Trace:
+>   dump_stack_lvl+0x6a/0x9a
+>   check_preemption_disabled+0xde/0xe0
+>   ? kvm_gen_update_masterclock+0xd0/0xd0 [kvm]
+>   set_hv_tscchange_cb+0x16/0x80
+>   kvm_arch_init+0x23f/0x290 [kvm]
+>   kvm_init+0x30/0x310 [kvm]
+>   vmx_init+0xaf/0x134 [kvm_intel]
+>   ...
 > 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> set_hv_tscchange_cb() can get preempted in between acquiring
+> smp_processor_id() and writing to HV_X64_MSR_REENLIGHTENMENT_CONTROL. This
+> is not an issue by itself: HV_X64_MSR_REENLIGHTENMENT_CONTROL is a
+> partition-wide MSR and it doesn't matter which particular CPU will be
+> used to receive reenlightenment notifications. The only real problem can
+> (in theory) be observed if the CPU whose id was acquired with
+> smp_processor_id() goes offline before we manage to write to the MSR,
+> the logic in hv_cpu_die() won't be able to reassign it correctly.
+> 
+> Reported-by: Michael Kelley <mikelley@microsoft.com>
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+
+Applied to hyperv-next.
+
 > ---
->  arch/x86/kvm/vmx/posted_intr.c | 25 +++++++++++--------------
->  1 file changed, 11 insertions(+), 14 deletions(-)
+>  arch/x86/hyperv/hv_init.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-> index fea343dcc011..2b2206339174 100644
-> --- a/arch/x86/kvm/vmx/posted_intr.c
-> +++ b/arch/x86/kvm/vmx/posted_intr.c
-> @@ -51,17 +51,15 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
->  		goto after_clear_sn;
->  	}
+> diff --git a/arch/x86/hyperv/hv_init.c b/arch/x86/hyperv/hv_init.c
+> index 708a2712a516..179fc173104d 100644
+> --- a/arch/x86/hyperv/hv_init.c
+> +++ b/arch/x86/hyperv/hv_init.c
+> @@ -139,7 +139,6 @@ void set_hv_tscchange_cb(void (*cb)(void))
+>  	struct hv_reenlightenment_control re_ctrl = {
+>  		.vector = HYPERV_REENLIGHTENMENT_VECTOR,
+>  		.enabled = 1,
+> -		.target_vp = hv_vp_index[smp_processor_id()]
+>  	};
+>  	struct hv_tsc_emulation_control emu_ctrl = {.enabled = 1};
 >  
-> -	/* The full case.  */
-> +	/* The full case.  Set the new destination and clear SN. */
-> +	dest = cpu_physical_id(cpu);
-> +	if (!x2apic_mode)
-> +		dest = (dest << 8) & 0xFF00;
+> @@ -153,8 +152,12 @@ void set_hv_tscchange_cb(void (*cb)(void))
+>  	/* Make sure callback is registered before we write to MSRs */
+>  	wmb();
+>  
+> +	re_ctrl.target_vp = hv_vp_index[get_cpu()];
 > +
->  	do {
->  		old.control = new.control = READ_ONCE(pi_desc->control);
->  
-> -		dest = cpu_physical_id(cpu);
-> -
-> -		if (x2apic_mode)
-> -			new.ndst = dest;
-> -		else
-> -			new.ndst = (dest << 8) & 0xFF00;
-> -
-> +		new.ndst = dest;
->  		new.sn = 0;
->  	} while (cmpxchg64(&pi_desc->control, old.control,
->  			   new.control) != old.control);
-> @@ -103,15 +101,14 @@ static void __pi_post_block(struct kvm_vcpu *vcpu)
->  	WARN(pi_desc->nv != POSTED_INTR_WAKEUP_VECTOR,
->  	     "Wakeup handler not enabled while the vCPU was blocking");
->  
-> +	dest = cpu_physical_id(vcpu->cpu);
-> +	if (!x2apic_mode)
-> +		dest = (dest << 8) & 0xFF00;
+>  	wrmsrl(HV_X64_MSR_REENLIGHTENMENT_CONTROL, *((u64 *)&re_ctrl));
+>  	wrmsrl(HV_X64_MSR_TSC_EMULATION_CONTROL, *((u64 *)&emu_ctrl));
 > +
->  	do {
->  		old.control = new.control = READ_ONCE(pi_desc->control);
+> +	put_cpu();
+>  }
+>  EXPORT_SYMBOL_GPL(set_hv_tscchange_cb);
 >  
-> -		dest = cpu_physical_id(vcpu->cpu);
-> -
-> -		if (x2apic_mode)
-> -			new.ndst = dest;
-> -		else
-> -			new.ndst = (dest << 8) & 0xFF00;
-> +		new.ndst = dest;
->  
->  		/* set 'NV' to 'notification vector' */
->  		new.nv = POSTED_INTR_VECTOR;
-
-
+> -- 
+> 2.31.1
+> 
