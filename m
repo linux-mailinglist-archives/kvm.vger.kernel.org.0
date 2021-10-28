@@ -2,210 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CAFED43E54E
-	for <lists+kvm@lfdr.de>; Thu, 28 Oct 2021 17:37:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9BB8743E564
+	for <lists+kvm@lfdr.de>; Thu, 28 Oct 2021 17:46:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230258AbhJ1PkN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Oct 2021 11:40:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47708 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229946AbhJ1PkM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Oct 2021 11:40:12 -0400
-Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23C02C061745
-        for <kvm@vger.kernel.org>; Thu, 28 Oct 2021 08:37:45 -0700 (PDT)
-Received: by mail-wr1-x42a.google.com with SMTP id d10so11014183wrb.1
-        for <kvm@vger.kernel.org>; Thu, 28 Oct 2021 08:37:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ajUUMnRMo/CfkqSYpjRKHF3O4uKdRUUoW9jGXm2YH/8=;
-        b=YClg6r+Pjz+KcVotJsLNPXbLH9rBZDDotsVtGKPz45+pVaqV/8VvUjjmgxfln+tl16
-         pNgJZteb1XcKJu8Rq2O+Ynz/a0nrl5R1VzAZCyQkBuj48jBJeEKmI91ATjk19ed3/slS
-         C81BjQjFI0TIdMvGA8/1Np3r5VYzz1pIj+AiN8B5R5bQdSRzJ6eV67fmV1J/W1Ph864s
-         bkD9r359wt5zBv00KUKa4W7rGTHW5SHb/bNIWtzdO8UdH441eq4XJD3GsByeCoLO5L8I
-         ZMgcjyA79pYnH7Dabb/EbzZdbWJ8S5Kjtru5/7Zsbabr+kgD909eP4gs8/bUlW2SdT/L
-         ns2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ajUUMnRMo/CfkqSYpjRKHF3O4uKdRUUoW9jGXm2YH/8=;
-        b=tcqCEG1HD2G2Gcuhm1HOrDSJiksX9O4zOOyh7EGtViq8jDG6uARwzetGgnAqvTWwVS
-         3eUeYa5Sho4TIKoEFqJFg1KF5zVJrpkSxhdy+vt58FoDVMceNeUWBEIRf3VHX6tgZtmJ
-         Db4WqbLiJWqQPATINPWzsAhJsvFETgGh5r63DhZsEkovkJENu1caK/xW6W+1LU/b2wBg
-         329ru1AKRVcLsTviLDBn5Oy1oIkA835PRfHswgc5xx0fb3Qo+CGK5DpS1pbRygb+fGhZ
-         09acBlCG5Yu1OFPKAVoX3VG+5EgEKhIXlS1yL1XacqMZQ1OBkstXUGymX1+yVzScCwzp
-         564A==
-X-Gm-Message-State: AOAM531XBJVsad5GDu/QEDz4+7zi7wX+r3zfQG/lHHTFF2jQFvVTbdRb
-        a5QtinR4qLR1GAXoDwq1RLisBfUTOoKpfejkUmeLWw==
-X-Google-Smtp-Source: ABdhPJxSMxsPRNAYx8kcStvSGAzhyUcPtRJdvcLJU2SSsUAIOtS/6o5e+daLbr1h08HtBnOjMLBDhmaly+ryMxoJScw=
-X-Received: by 2002:a05:6000:1a89:: with SMTP id f9mr6700138wry.249.1635435463471;
- Thu, 28 Oct 2021 08:37:43 -0700 (PDT)
-MIME-Version: 1.0
-References: <20211026170136.2147619-2-anup.patel@wdc.com> <mhng-1044c135-bede-498b-b244-9f9c5f5ea89b@palmerdabbelt-glaptop>
-In-Reply-To: <mhng-1044c135-bede-498b-b244-9f9c5f5ea89b@palmerdabbelt-glaptop>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Thu, 28 Oct 2021 21:07:31 +0530
-Message-ID: <CAAhSdy2SCjncCRP22Zfu+5vXPageteQkC-L3aEkkTXvuKjb4Gw@mail.gmail.com>
-Subject: Re: [PATCH 1/3] RISC-V: Enable KVM in RV64 and RV32 defconfigs as a module
-To:     Palmer Dabbelt <palmerdabbelt@google.com>
-Cc:     Anup Patel <Anup.Patel@wdc.com>,
+        id S230337AbhJ1Psj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Oct 2021 11:48:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:43843 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230265AbhJ1Psi (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 28 Oct 2021 11:48:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635435970;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=F4tMjT47BZ3DwbmAEWq81W0GAGbuRTe5m3IotIof8YU=;
+        b=BjqOJFROTIOhDmJkCsO6Exs79jec8AvAq0YcQV3+y6zihBb/DGdQas3lnaz5aNxZE2hqbK
+        WhObPml9ixi3GkAgkTvb2ovSasE+MsFT1a5iP4142pp+zyc0PR58hxt5QbukfE3NmyqktO
+        zLewA7VN5IUax5mM4WnTFZ7PBNDdWt8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-192-HPiuQd71NyeJUfJbOWNqdw-1; Thu, 28 Oct 2021 11:46:07 -0400
+X-MC-Unique: HPiuQd71NyeJUfJbOWNqdw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F02CB19251A0;
+        Thu, 28 Oct 2021 15:46:02 +0000 (UTC)
+Received: from starship (unknown [10.40.194.243])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9106C5DA61;
+        Thu, 28 Oct 2021 15:45:15 +0000 (UTC)
+Message-ID: <06ed37a510347fdc7c6f7ce46fd98ce5b9ff7554.camel@redhat.com>
+Subject: Re: [PATCH v2 32/43] KVM: VMX: Move preemption timer <=> hrtimer
+ dance to common x86
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Anup Patel <anup.patel@wdc.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
         Albert Ou <aou@eecs.berkeley.edu>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <Atish.Patra@wdc.com>,
-        KVM General <kvm@vger.kernel.org>,
-        kvm-riscv@lists.infradead.org,
-        linux-riscv <linux-riscv@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Atish Patra <atish.patra@wdc.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        David Matlack <dmatlack@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+Date:   Thu, 28 Oct 2021 18:45:14 +0300
+In-Reply-To: <20211009021236.4122790-33-seanjc@google.com>
+References: <20211009021236.4122790-1-seanjc@google.com>
+         <20211009021236.4122790-33-seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 28, 2021 at 3:42 AM Palmer Dabbelt <palmerdabbelt@google.com> wrote:
->
-> On Tue, 26 Oct 2021 10:01:34 PDT (-0700), Anup Patel wrote:
-> > Let's enable KVM RISC-V in RV64 and RV32 defconfigs as module
-> > so that it always built along with the default kernel image.
->
-> Turning on KVM in the defconfigs seems like the right way to go, but
-> this has more diff than just that.  Not sure if that's all just
-> savedefconfig stuff, I usually try and split out the non-functional
-> changes from anything that makes a change.
+On Fri, 2021-10-08 at 19:12 -0700, Sean Christopherson wrote:
+> Handle the switch to/from the hypervisor/software timer when a vCPU is
+> blocking in common x86 instead of in VMX.  Even though VMX is the only
+> user of a hypervisor timer, the logic and all functions involved are
+> generic x86 (unless future CPUs do something completely different and
+> implement a hypervisor timer that runs regardless of mode).
+> 
+> Handling the switch in common x86 will allow for the elimination of the
+> pre/post_blocks hooks, and also lets KVM switch back to the hypervisor
+> timer if and only if it was in use (without additional params).  Add a
+> comment explaining why the switch cannot be deferred to kvm_sched_out()
+> or kvm_vcpu_block().
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c |  6 +-----
+>  arch/x86/kvm/x86.c     | 21 +++++++++++++++++++++
+>  2 files changed, 22 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index b3bb2031a7ac..a24f19874716 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -7464,16 +7464,12 @@ void vmx_update_cpu_dirty_logging(struct kvm_vcpu *vcpu)
+>  
+>  static int vmx_pre_block(struct kvm_vcpu *vcpu)
+>  {
+> -	if (kvm_lapic_hv_timer_in_use(vcpu))
+> -		kvm_lapic_switch_to_sw_timer(vcpu);
+> -
+>  	return 0;
+>  }
+>  
+>  static void vmx_post_block(struct kvm_vcpu *vcpu)
+>  {
+> -	if (kvm_x86_ops.set_hv_timer)
+> -		kvm_lapic_switch_to_hv_timer(vcpu);
+> +
+>  }
+>  
+>  static void vmx_setup_mce(struct kvm_vcpu *vcpu)
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index e0219acfd9cf..909e932a7ae7 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -9896,8 +9896,21 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>  
+>  static inline int vcpu_block(struct kvm *kvm, struct kvm_vcpu *vcpu)
+>  {
+> +	bool hv_timer;
+> +
+>  	if (!kvm_arch_vcpu_runnable(vcpu) &&
+>  	    (!kvm_x86_ops.pre_block || static_call(kvm_x86_pre_block)(vcpu) == 0)) {
+> +		/*
+> +		 * Switch to the software timer before halt-polling/blocking as
+> +		 * the guest's timer may be a break event for the vCPU, and the
+> +		 * hypervisor timer runs only when the CPU is in guest mode.
+> +		 * Switch before halt-polling so that KVM recognizes an expired
+> +		 * timer before blocking.
+> +		 */
 
-Other diffs in the defconfigs are generated by "make savedefconfig". I
-guess this is because most people don't use "make savedefconfig"
-to generate updated defconfigs.
+I didn't knew about this until now but it all makes sense. The comment is very good.
 
->
-> If you checked then
->
-> Acked-by: Palmer Dabbelt <palmerdabbelt@google.com>
->
-> assuming you want to keep these together.  LMK if you want me to take
-> this on its own (I'll split it up if you do).
+> +		hv_timer = kvm_lapic_hv_timer_in_use(vcpu);
+> +		if (hv_timer)
+> +			kvm_lapic_switch_to_sw_timer(vcpu);
+> +
+>  		srcu_read_unlock(&kvm->srcu, vcpu->srcu_idx);
+>  		if (vcpu->arch.mp_state == KVM_MP_STATE_HALTED)
+>  			kvm_vcpu_halt(vcpu);
+> @@ -9905,6 +9918,9 @@ static inline int vcpu_block(struct kvm *kvm, struct kvm_vcpu *vcpu)
+>  			kvm_vcpu_block(vcpu);
+>  		vcpu->srcu_idx = srcu_read_lock(&kvm->srcu);
+>  
+> +		if (hv_timer)
+> +			kvm_lapic_switch_to_hv_timer(vcpu);
+> +
+>  		if (kvm_x86_ops.post_block)
+>  			static_call(kvm_x86_post_block)(vcpu);
+>  
+> @@ -10136,6 +10152,11 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+>  			r = -EINTR;
+>  			goto out;
+>  		}
+> +		/*
+> +		 * It should be impossible for the hypervisor timer to be in
+> +		 * use before KVM has ever run the vCPU.
+> +		 */
+> +		WARN_ON_ONCE(kvm_lapic_hv_timer_in_use(vcpu));
+>  		kvm_vcpu_block(vcpu);
+>  		if (kvm_apic_accept_events(vcpu) < 0) {
+>  			r = 0;
 
-Thanks Palmer.
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
-Regards,
-Anup
+Best regards,
+	Maxim Levitsky
 
->
-> >
-> > Signed-off-by: Anup Patel <anup.patel@wdc.com>
-> > ---
-> >  arch/riscv/configs/defconfig      | 15 +++++++--------
-> >  arch/riscv/configs/rv32_defconfig |  8 ++++----
-> >  2 files changed, 11 insertions(+), 12 deletions(-)
-> >
-> > diff --git a/arch/riscv/configs/defconfig b/arch/riscv/configs/defconfig
-> > index 4ebc80315f01..40506dfab5cf 100644
-> > --- a/arch/riscv/configs/defconfig
-> > +++ b/arch/riscv/configs/defconfig
-> > @@ -2,6 +2,7 @@ CONFIG_SYSVIPC=y
-> >  CONFIG_POSIX_MQUEUE=y
-> >  CONFIG_NO_HZ_IDLE=y
-> >  CONFIG_HIGH_RES_TIMERS=y
-> > +CONFIG_BPF_SYSCALL=y
-> >  CONFIG_IKCONFIG=y
-> >  CONFIG_IKCONFIG_PROC=y
-> >  CONFIG_CGROUPS=y
-> > @@ -13,12 +14,14 @@ CONFIG_USER_NS=y
-> >  CONFIG_CHECKPOINT_RESTORE=y
-> >  CONFIG_BLK_DEV_INITRD=y
-> >  CONFIG_EXPERT=y
-> > -CONFIG_BPF_SYSCALL=y
-> > +# CONFIG_SYSFS_SYSCALL is not set
-> > +CONFIG_SOC_MICROCHIP_POLARFIRE=y
-> >  CONFIG_SOC_SIFIVE=y
-> >  CONFIG_SOC_VIRT=y
-> > -CONFIG_SOC_MICROCHIP_POLARFIRE=y
-> >  CONFIG_SMP=y
-> >  CONFIG_HOTPLUG_CPU=y
-> > +CONFIG_VIRTUALIZATION=y
-> > +CONFIG_KVM=m
-> >  CONFIG_JUMP_LABEL=y
-> >  CONFIG_MODULES=y
-> >  CONFIG_MODULE_UNLOAD=y
-> > @@ -68,14 +71,12 @@ CONFIG_HW_RANDOM=y
-> >  CONFIG_HW_RANDOM_VIRTIO=y
-> >  CONFIG_SPI=y
-> >  CONFIG_SPI_SIFIVE=y
-> > +# CONFIG_PTP_1588_CLOCK is not set
-> >  CONFIG_GPIOLIB=y
-> >  CONFIG_GPIO_SIFIVE=y
-> > -# CONFIG_PTP_1588_CLOCK is not set
-> > -CONFIG_POWER_RESET=y
-> >  CONFIG_DRM=y
-> >  CONFIG_DRM_RADEON=y
-> >  CONFIG_DRM_VIRTIO_GPU=y
-> > -CONFIG_FRAMEBUFFER_CONSOLE=y
-> >  CONFIG_USB=y
-> >  CONFIG_USB_XHCI_HCD=y
-> >  CONFIG_USB_XHCI_PLATFORM=y
-> > @@ -85,10 +86,10 @@ CONFIG_USB_OHCI_HCD=y
-> >  CONFIG_USB_OHCI_HCD_PLATFORM=y
-> >  CONFIG_USB_STORAGE=y
-> >  CONFIG_USB_UAS=y
-> > +CONFIG_MMC=y
-> >  CONFIG_MMC_SDHCI=y
-> >  CONFIG_MMC_SDHCI_PLTFM=y
-> >  CONFIG_MMC_SDHCI_CADENCE=y
-> > -CONFIG_MMC=y
-> >  CONFIG_MMC_SPI=y
-> >  CONFIG_RTC_CLASS=y
-> >  CONFIG_VIRTIO_PCI=y
-> > @@ -139,5 +140,3 @@ CONFIG_RCU_EQS_DEBUG=y
-> >  # CONFIG_FTRACE is not set
-> >  # CONFIG_RUNTIME_TESTING_MENU is not set
-> >  CONFIG_MEMTEST=y
-> > -# CONFIG_SYSFS_SYSCALL is not set
-> > -CONFIG_EFI=y
-> > diff --git a/arch/riscv/configs/rv32_defconfig b/arch/riscv/configs/rv32_defconfig
-> > index 434ef5b64599..44022e048efd 100644
-> > --- a/arch/riscv/configs/rv32_defconfig
-> > +++ b/arch/riscv/configs/rv32_defconfig
-> > @@ -2,6 +2,7 @@ CONFIG_SYSVIPC=y
-> >  CONFIG_POSIX_MQUEUE=y
-> >  CONFIG_NO_HZ_IDLE=y
-> >  CONFIG_HIGH_RES_TIMERS=y
-> > +CONFIG_BPF_SYSCALL=y
-> >  CONFIG_IKCONFIG=y
-> >  CONFIG_IKCONFIG_PROC=y
-> >  CONFIG_CGROUPS=y
-> > @@ -13,12 +14,14 @@ CONFIG_USER_NS=y
-> >  CONFIG_CHECKPOINT_RESTORE=y
-> >  CONFIG_BLK_DEV_INITRD=y
-> >  CONFIG_EXPERT=y
-> > -CONFIG_BPF_SYSCALL=y
-> > +# CONFIG_SYSFS_SYSCALL is not set
-> >  CONFIG_SOC_SIFIVE=y
-> >  CONFIG_SOC_VIRT=y
-> >  CONFIG_ARCH_RV32I=y
-> >  CONFIG_SMP=y
-> >  CONFIG_HOTPLUG_CPU=y
-> > +CONFIG_VIRTUALIZATION=y
-> > +CONFIG_KVM=m
-> >  CONFIG_JUMP_LABEL=y
-> >  CONFIG_MODULES=y
-> >  CONFIG_MODULE_UNLOAD=y
-> > @@ -67,11 +70,9 @@ CONFIG_HW_RANDOM_VIRTIO=y
-> >  CONFIG_SPI=y
-> >  CONFIG_SPI_SIFIVE=y
-> >  # CONFIG_PTP_1588_CLOCK is not set
-> > -CONFIG_POWER_RESET=y
-> >  CONFIG_DRM=y
-> >  CONFIG_DRM_RADEON=y
-> >  CONFIG_DRM_VIRTIO_GPU=y
-> > -CONFIG_FRAMEBUFFER_CONSOLE=y
-> >  CONFIG_USB=y
-> >  CONFIG_USB_XHCI_HCD=y
-> >  CONFIG_USB_XHCI_PLATFORM=y
-> > @@ -130,4 +131,3 @@ CONFIG_RCU_EQS_DEBUG=y
-> >  # CONFIG_FTRACE is not set
-> >  # CONFIG_RUNTIME_TESTING_MENU is not set
-> >  CONFIG_MEMTEST=y
-> > -# CONFIG_SYSFS_SYSCALL is not set
