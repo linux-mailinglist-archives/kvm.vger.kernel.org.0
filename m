@@ -2,135 +2,272 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 223A143E4FE
-	for <lists+kvm@lfdr.de>; Thu, 28 Oct 2021 17:22:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8CED743E529
+	for <lists+kvm@lfdr.de>; Thu, 28 Oct 2021 17:30:46 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230318AbhJ1PZF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Oct 2021 11:25:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44176 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230344AbhJ1PZC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Oct 2021 11:25:02 -0400
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AF93C061348
-        for <kvm@vger.kernel.org>; Thu, 28 Oct 2021 08:22:32 -0700 (PDT)
-Received: by mail-pl1-x62f.google.com with SMTP id t11so4641944plq.11
-        for <kvm@vger.kernel.org>; Thu, 28 Oct 2021 08:22:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=wq2fDK4Y1PYwyFg0KcaMcSGyQtEXNmJj70LIwShSA+Q=;
-        b=CZX8flQtIVS05QrpK8YoB5qywUviOPjv2q2uZ4eYLf+8b9f3ZmF23ddtLnEJyiYkpa
-         apiZF4s4CJRnLoq8tgZVPWnCXtqReuMEko2ICe02Aj9lKpXGnJSBM2snTQDnxmPjjs18
-         nErNOdhiP6p0jHsyCm7eNWqRgcv7HnJPkXYvcAUGjcegiAIN7h/UGFem+7ofSHiaTrCD
-         885Sqqon8TODsp4DRZ0YcCyh1KJO0caYUvtUsRdTOGRp8MQNDd/YOM/RHbHBbuoDzSO1
-         /RBYfRiXn7f5zXDOF3n4RKU/40f/YzkCitydxImHYpSeo20H4iK79qsytq2Vhca3uAxY
-         u9ow==
+        id S230344AbhJ1PdK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Oct 2021 11:33:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28981 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230325AbhJ1PdI (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 28 Oct 2021 11:33:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635435041;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ZshgRYyHAdt1PeMoc+6tLxE9wsgBE8CpYOKrXJsLZ+w=;
+        b=O+u7OxtPriITIROKFEEctV0T8FcE2UwzSy0gtGjSyx2XYqbeJQZpkCteLaUh5Az2Ae4+mX
+        6Wa/RTsVgzwlUmArkc0phxQV3E9UuCYXPVlB3MK9YPhO3zp/IyWguKUQnhQrnxGbIskZD3
+        vvHUQts2il/M1rSRQSKIw85yDHGvKa0=
+Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com
+ [209.85.167.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-510-t9mFu1fHObOdzvzYRIH7cA-1; Thu, 28 Oct 2021 11:30:38 -0400
+X-MC-Unique: t9mFu1fHObOdzvzYRIH7cA-1
+Received: by mail-oi1-f198.google.com with SMTP id 7-20020aca0d07000000b002988ff10791so3275322oin.8
+        for <kvm@vger.kernel.org>; Thu, 28 Oct 2021 08:30:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=wq2fDK4Y1PYwyFg0KcaMcSGyQtEXNmJj70LIwShSA+Q=;
-        b=w3TBlWnVCrDNYKBo8vYVFA+7plALJxUZz+/j1vbRH8D7JxgWf6I1W8z5oWFEzSpr4S
-         mDKck+qRb3PpNlAxZx61IvciRlumNAE/m7wvbGz/hPF0/JlgEJxKcODeO7KleAjDoI+2
-         Ep+XAT8ft3l+bi3Bkr7vn4qK+gJsBfHuh0imqm20TiaSOSkZpGFa+DVH2Dj5Cv9Ol+Wa
-         Lhdx9NkKkHO1Pd48GM3F9ERacIjzjxYf52QKdNp723+se+KQ3gvglSZa2TjVlSIwO502
-         DiM7v9i/DkRTBQGe0+nqXpXMUrfjc+iQrEI2HrSD5n1YiKhRZYmJqDrtj8yeZ4oaBo1I
-         f7LA==
-X-Gm-Message-State: AOAM53278kze52bDabl+Xtmv+Ub7QZeIeKt3FlvW8FwlhuFEcAI1Dyxd
-        jOcOBkJiHYJK6EcnUrtt5yE/yg==
-X-Google-Smtp-Source: ABdhPJzMzl5yGCkZYibocwnByVzQKmmQKSZmgPXRr65ajBmCV+xq9SIKT52tvNqaOt+05b5mMNH+mw==
-X-Received: by 2002:a17:902:a5c2:b0:140:14bb:8efd with SMTP id t2-20020a170902a5c200b0014014bb8efdmr4572984plq.31.1635434551473;
-        Thu, 28 Oct 2021 08:22:31 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id g13sm4229663pfv.20.2021.10.28.08.22.30
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=ZshgRYyHAdt1PeMoc+6tLxE9wsgBE8CpYOKrXJsLZ+w=;
+        b=eDTjLRqUdibmxBSDca7DenzBR3AueqkfGkZLxIhVV9SN6zv9RBNixsHJWy1ZK5f+3C
+         Cxpr1T9zRX1blzA/566KFZYf1/w+hWU/jTY1I8FpErIEqtHZTzH7owvW/9hbTieUZ0vE
+         bc6GQdn+Wp3Z5OPA+zmI71l8/OvSiE0yffqx1Ff5Ja5gpDogDs4+XhYjJjOCzDyLB4U7
+         KuQx2DUXldJARUnhwjbfxRkHMXc59BLZSQMjpdQQNAbY4xdijY12oqMjbPXCxrCGu2c6
+         cYV/kC/UWkiGUM3qOEjHjwwlNX/Khb2FtYsz3Ft6gFuHk53b+TyH4tPPGbZQpuehmvOC
+         e4UQ==
+X-Gm-Message-State: AOAM531s3vJlfx4e8Bh4e7W4opD6LT1cVJEBZf2KewKKjzk/wxwSE54e
+        pgwVvIOqN2/OAXhhktRFbK2NDbOMIS5r869u8IsT/Bu0VFN3DG9uNCQ++mwcyjCfsf0oYYiz8C4
+        sz53TRx3uXB3F
+X-Received: by 2002:a05:6830:1e11:: with SMTP id s17mr4074655otr.100.1635435037533;
+        Thu, 28 Oct 2021 08:30:37 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzpNMCCzEm/qWgDKhdT5NLeUiAirUH23ASGGy1T4UcITEIIqA9L5QZiXzArSRzkZFMWgtRDdw==
+X-Received: by 2002:a05:6830:1e11:: with SMTP id s17mr4074605otr.100.1635435037190;
+        Thu, 28 Oct 2021 08:30:37 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id be2sm1197935oib.1.2021.10.28.08.30.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Oct 2021 08:22:30 -0700 (PDT)
-Date:   Thu, 28 Oct 2021 15:22:27 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Lai Jiangshan <jiangshanlai+lkml@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        Ben Gardon <bgardon@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        John Haxby <john.haxby@oracle.com>,
-        Miaohe Lin <linmiaohe@huawei.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH v3 23/37] KVM: nVMX: Add helper to handle TLB flushes on
- nested VM-Enter/VM-Exit
-Message-ID: <YXrAM9MNqgLTU6+m@google.com>
-References: <20200320212833.3507-1-sean.j.christopherson@intel.com>
- <20200320212833.3507-24-sean.j.christopherson@intel.com>
- <CAJhGHyD=S6pVB+OxM7zF0_6LnMUCLqyTfMK4x9GZsdRHZmgN7Q@mail.gmail.com>
+        Thu, 28 Oct 2021 08:30:36 -0700 (PDT)
+Date:   Thu, 28 Oct 2021 09:30:35 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
+        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
+        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH V2 mlx5-next 12/14] vfio/mlx5: Implement vfio_pci driver
+ for mlx5 devices
+Message-ID: <20211028093035.17ecbc5d.alex.williamson@redhat.com>
+In-Reply-To: <20211027192345.GJ2744544@nvidia.com>
+References: <87o87isovr.fsf@redhat.com>
+ <20211021154729.0e166e67.alex.williamson@redhat.com>
+ <20211025122938.GR2744544@nvidia.com>
+ <20211025082857.4baa4794.alex.williamson@redhat.com>
+ <20211025145646.GX2744544@nvidia.com>
+ <20211026084212.36b0142c.alex.williamson@redhat.com>
+ <20211026151851.GW2744544@nvidia.com>
+ <20211026135046.5190e103.alex.williamson@redhat.com>
+ <20211026234300.GA2744544@nvidia.com>
+ <20211027130520.33652a49.alex.williamson@redhat.com>
+ <20211027192345.GJ2744544@nvidia.com>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJhGHyD=S6pVB+OxM7zF0_6LnMUCLqyTfMK4x9GZsdRHZmgN7Q@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
--me :-)
+On Wed, 27 Oct 2021 16:23:45 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-On Thu, Oct 28, 2021, Lai Jiangshan wrote:
-> On Sat, Mar 21, 2020 at 5:29 AM Sean Christopherson
-> <sean.j.christopherson@intel.com> wrote:
+> On Wed, Oct 27, 2021 at 01:05:20PM -0600, Alex Williamson wrote:
 > 
-> > +       if (!nested_cpu_has_vpid(vmcs12) || !nested_has_guest_tlb_tag(vcpu)) {
-> > +               kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
-> > +       } else if (is_vmenter &&
-> > +                  vmcs12->virtual_processor_id != vmx->nested.last_vpid) {
-> > +               vmx->nested.last_vpid = vmcs12->virtual_processor_id;
-> > +               vpid_sync_context(nested_get_vpid02(vcpu));
-> > +       }
-> > +}
+> > > As far as the actual issue, if you hadn't just discovered it now
+> > > nobody would have known we have this gap - much like how the very
+> > > similar reset issue was present in VFIO for so many years until you
+> > > plugged it.  
+> > 
+> > But the fact that we did discover it is hugely important.  We've
+> > identified that the potential use case is significantly limited and
+> > that userspace doesn't have a good mechanism to determine when to
+> > expose that limitation to the user.    
 > 
-> (I'm sorry to pick this old email to reply to, but the problem has
-> nothing to do with this patch nor 5c614b3583e7 and it exists since
-> nested vmx is introduced.)
+> Huh?
 > 
-> I think kvm_mmu_free_guest_mode_roots() should be called
-> if (!enable_ept && vmcs12->virtual_processor_id != vmx->nested.last_vpid)
-> just because prev_roots doesn't cache the vpid12.
-> (prev_roots caches PCID, which is distinctive)
+> We've identified that, depending on device behavior, the kernel may
+> need to revoke MMIO access to protect itself from hostile userspace
+> triggering TLP Errors or something.
 > 
-> The problem hardly exists if L1's hypervisor is also kvm, but if L1's
-> hypervisor is different or is also kvm with some changes in the way how it
-> manages VPID.
+> Well behaved userspace must already stop touching the MMIO on the
+> device when !RUNNING - I see no compelling argument against that
+> position.
 
-Indeed.  A more straightforward error case would be if L1 and L2 share CR3, and
-vmcs02.VPID is toggled (or used for the first time) on the L1 => L2 VM-Enter.
+Not touching MMIO is not specified in our uAPI protocol, nor is it an
+obvious assumption to me, nor is it sufficient to assume well behaved
+userspace in the implementation of a kernel interface.
 
-The fix should simply be:
+> We've been investigating how the mlx5 HW will behave in corner cases,
+> and currently it looks like mlx5 vfio will not generate error TLPs, or
+> corrupt the device itself due to MMIO operations when !RUNNING. So the
+> driver itself, as written, probably does not currently have a bug
+> here, or need changes.
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index eedcebf58004..574823370e7a 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -1202,17 +1202,15 @@ static void nested_vmx_transition_tlb_flush(struct kvm_vcpu *vcpu,
-         *
-         * If a TLB flush isn't required due to any of the above, and vpid12 is
-         * changing then the new "virtual" VPID (vpid12) will reuse the same
--        * "real" VPID (vpid02), and so needs to be flushed.  There's no direct
--        * mapping between vpid02 and vpid12, vpid02 is per-vCPU and reused for
--        * all nested vCPUs.  Remember, a flush on VM-Enter does not invalidate
--        * guest-physical mappings, so there is no need to sync the nEPT MMU.
-+        * "real" VPID (vpid02), and so needs to be flushed.  Like the !vpid02
-+        * case above, this is a full TLB flush from the guest's perspective.
-         */
-        if (!nested_has_guest_tlb_tag(vcpu)) {
-                kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
-        } else if (is_vmenter &&
-                   vmcs12->virtual_processor_id != vmx->nested.last_vpid) {
-                vmx->nested.last_vpid = vmcs12->virtual_processor_id;
--               vpid_sync_context(nested_get_vpid02(vcpu));
-+               kvm_make_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu);
-        }
- }
+This is a system level observation or is it actually looking at the
+bus?  An Unsupported Request on MMIO write won't even generate an AER
+on some systems, but others can trigger a fatal error on others.
+
+That sounds like potentially good news, but either way we're still also
+discussing a fundamental gap in the uAPI for quiescing multiple devices
+in a coordinated way and how we actually define !_RUNNING.
+
+> > We're tossing around solutions that involve extensions, if not
+> > changes to the uAPI.  It's Wednesday of rc7.  
+> 
+> The P2P issue is seperate, and as I keep saying, unless you want to
+> block support for any HW that does not have freeze&queice userspace
+> must be aware of this ability and it is logical to design it as an
+> extension from where we are now.
+
+Is this essentially suggesting that the uAPI be clarified to state
+that the base implementation is only applicable to userspace contexts
+with a single migratable vfio device instance?  Does that need to
+preemptively include /dev/iommu generically, ie. anything that could
+potentially have an IOMMU mapping to the device?
+
+I agree that it would be easier to add a capability to expose
+multi-device compatibility than to try to retrofit one to expose a
+restriction.
+
+> > I feel like we've already been burned by making one of these
+> > "reasonable quanta of progress" to accept and mark experimental
+> > decisions with where we stand between defining the uAPI in the kernel
+> > and accepting an experimental implementation in QEMU.    
+> 
+> I won't argue there..
+> 
+> > Now we have multiple closed driver implementations (none of which
+> > are contributing to this discussion), but thankfully we're not
+> > committed to supporting them because we have no open
+> > implementations.  I think we could get away with ripping up the uAPI
+> > if we really needed to.  
+> 
+> Do we need to?
+
+I'd prefer not.
+
+> > > > Deciding at some point in the future to forcefully block device MMIO
+> > > > access from userspace when the device stops running is clearly a user
+> > > > visible change and therefore subject to the don't-break-userspace
+> > > > clause.      
+> > > 
+> > > I don't think so, this was done for reset retroactively after
+> > > all. Well behaved qmeu should have silenced all MMIO touches as part
+> > > of the ABI contract anyhow.  
+> > 
+> > That's not obvious to me and I think it conflates access to the device
+> > and execution of the device.  If it's QEMU's responsibility to quiesce
+> > access to the device anyway, why does the kernel need to impose this
+> > restriction.  I'd think we'd generally only impose such a restriction
+> > if the alternative allows the user to invoke bad behavior outside the
+> > scope of their use of the device or consistency of the migration data.
+> > It appears that any such behavior would be implementation specific here.  
+> 
+> I think if an implementation has a problem, like error TLPs, then yes,
+> it must fence. The conservative specification of the uAPI is that
+> userspace should not allow MMIO when !RUNNING.
+> 
+> If we ever get any implementation that needs this to fence then we
+> should do it for all implementations just out of consistency.
+
+Like I've indicated, this is not an obvious corollary of the !_RUNNING
+state to me.  I'd tend more towards letting userspace do what they want
+and only restrict as necessary to protect the host.  For example the
+state of the device when !_RUNNING may be changed by external stimuli,
+including MMIO and DMA accesses, but the device does not independently
+advance state.
+
+Also, I think we necessarily require config space read-access to
+support migration, which begs the question specifically which regions,
+if any, are restricted when !_RUNNING?  Could we get away with zapping
+mmaps (sigbus on fault) but allowing r/w access?
+
+> > > The "don't-break-userspace" is not an absolute prohibition, Linus has
+> > > been very clear this limitation is about direct, ideally demonstrable,
+> > > breakage to actually deployed software.  
+> > 
+> > And if we introduce an open driver that unblocks QEMU support to become
+> > non-experimental, I think that's where we stand.  
+> 
+> Yes, if qemu becomes deployed, but our testing shows qemu support
+> needs a lot of work before it is deployable, so that doesn't seem to
+> be an immediate risk.
+
+Good news... I guess...  but do we know what other uAPI changes might
+be lurking without completing that effort?
+
+> > > > That might also indicate that "freeze" is only an implementation
+> > > > specific requirement.  Thanks,    
+> > > 
+> > > It doesn't matter if a theoretical device can exist that doesn't need
+> > > "freeze" - this device does, and so it is the lowest common
+> > > denominator for the uAPI contract and userspace must abide by the
+> > > restriction.  
+> > 
+> > Sorry, "to the victor go the spoils" is not really how I strictly want
+> > to define a uAPI contract with userspace.    
+> 
+> This is not the "victor go the spoils" this is meeting the least
+> common denominator of HW we have today.
+>
+> If some fictional HW can be more advanced and can snapshot not freeze,
+> that is great, but it doesn't change one bit that mlx5 cannot and will
+> not work that way. Since mlx5 must be supported, there is no choice
+> but to define the uAPI around its limitations.
+
+But it seems like you've found that mlx5 is resilient to these things
+that you're also deeming necessary to restrict.
+
+> snapshot devices are strictly a superset of freeze devices, they can
+> emulate freeze by doing snapshot at the freeze operation.
+
+True.
+
+> In all cases userspace should not touch the device when !RUNNING to
+> preserve generality to all implementations.
+
+Not and obvious conclusion to me.
+
+> > If we're claiming that userspace is responsible for quiescing
+> > devices and we're providing a means for that to occur, and userspace
+> > is already responsible for managing MMIO access, then the only
+> > reason the kernel would forcefully impose such a restriction itself
+> > would be to protect the host and the implementation of that would
+> > depend on whether this is expected to be a universal or device
+> > specific limitation.    
+> 
+> I think the best way forward is to allow for revoke to happen if we
+> ever need it (by specification), and not implement it right now.
+> 
+> So, I am not left with a clear idea what is still open that you see as
+> blocking. Can you summarize?
+
+It seems we have numerous uAPI questions floating around, including
+whether the base specification is limited to a single physical device
+within the user's IOMMU context, what the !_RUNNING state actually
+implies about the device state, expectations around userspace access
+to device regions while in this state, and who is responsible for
+limiting such access, and uncertainty what other uAPI changes are
+necessary as QEMU support is stabilized.
+
+Why should we rush a driver in just before the merge window and
+potentially increase our experimental driver debt load rather than
+continue to co-develop kernel and userspace drivers and maybe also
+get input from the owners of the existing out-of-tree drivers?  Thanks,
+
+Alex
+
