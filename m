@@ -2,110 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F7E743E1BA
-	for <lists+kvm@lfdr.de>; Thu, 28 Oct 2021 15:11:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4107543E1D0
+	for <lists+kvm@lfdr.de>; Thu, 28 Oct 2021 15:14:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230271AbhJ1NNv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Oct 2021 09:13:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41500 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230185AbhJ1NNu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Oct 2021 09:13:50 -0400
-Received: from mail-il1-x12e.google.com (mail-il1-x12e.google.com [IPv6:2607:f8b0:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7265BC061570;
-        Thu, 28 Oct 2021 06:11:23 -0700 (PDT)
-Received: by mail-il1-x12e.google.com with SMTP id f10so2249719ilu.5;
-        Thu, 28 Oct 2021 06:11:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=1sv2pVjuobpaTD6e7jjCzSJYHPbS/EWvyrW59yWrJP4=;
-        b=kGeEAnH2GZMfu36XdYP0RYPN3EHxgor/2x4oBQFh8bL0W+rn1CsbXgt6zE7DULl6V5
-         4RvPh9qjgTQLYEem/svKD3wQRNU4wHQTDr7DS79PGD2pSTtUpBqrAo4EKuYtD7zhUozi
-         cWo+s5fDFhaRwaMUFycNjhkXrW5rsf17GzsmgJ+VgmMbXCTHk+3Rc7cd7yd5FSDsG9ue
-         ay1RDoZeUHinplF7rKnlp7MiFWKMVCZP+cZtl67mDJjapDQgJ7DAmeGUB+aQjSUrK12u
-         NT5qf7hEMODgbPIK2sgB8w7lSwJn9Jn/jNpen9bz825uBYG9hTv30iyKHM2IerPgdh1Q
-         qVIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=1sv2pVjuobpaTD6e7jjCzSJYHPbS/EWvyrW59yWrJP4=;
-        b=jfz3A2ZsYYKMgZIdz4Coeqmirs3Ca0xWe4T2VLTLzFDsHhgXwU8E8NltAJNMftK8sW
-         akqfb5cohsRXqun1PMygMqCidWOUDM6XUfzgY8yYYzYW3stpkXC9qWxEL6OCxgUHZEao
-         22yIeFjjhBupKQnTG1/gY3jqC8BYZ3bFEGSukhdRr02Tfxln1QALz3auO0FeDk0xZysK
-         +9BvSVuemqoTa58HDPTkhXZhnjU9hUng5b4MhUIpIsn57grxHI54wSTgAtXlZO8mMCoY
-         jyvsvnI2ALDsKRhbHuxIp8JW8VIxKquyaU5aB/AvhFwQl+w5QBNtISn+3VlvFMkDvml9
-         XKwA==
-X-Gm-Message-State: AOAM532bcntxR9TWLchdMlz63vXkyMr98IR6BfwLmyZ0cnlxkRZhgcFi
-        AbkcMq9pSA0FvP86ARK6FpLKPFGVuwW8+qpYw+CSsPYIkVg=
-X-Google-Smtp-Source: ABdhPJz7vI5nHIlFyRgGSpaq+jCGnJTbs4wpK50NHm0c4jUfi0BQOrUqDOa59ndDyLUF6VuTlx6uYvTGfaBN1jblSKI=
-X-Received: by 2002:a05:6e02:893:: with SMTP id z19mr3129606ils.224.1635426682913;
- Thu, 28 Oct 2021 06:11:22 -0700 (PDT)
+        id S230248AbhJ1NRA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Oct 2021 09:17:00 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34740 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230179AbhJ1NQ7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Oct 2021 09:16:59 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id ED12661130;
+        Thu, 28 Oct 2021 13:14:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1635426872;
+        bh=C1zcco3bTHMOEHdKG2K0ubtIXS9WB8cgc60pAqatfuM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=F0wjY9u/vzPiiOcYBGLPCdlL8W/wye2808zGSSQAVBVvHo/k6qFihwjODj6AWxUpD
+         4TnjpzUad9tFa0QeVAscGyxf79lr7ZUDOhs8nhxG/Wq0OjKAnOBuSUuH+wFnP2HJGz
+         lXCelmjWvayCluyGPRNQO5W4RR5klCwzcqgUXrm6/Z6JqwyrJHa4kORFN/B7iKiOIH
+         aZAfoTQLXefS5RE/GyokVWq4IJNcXln+AsQ9c1U936K4kHiTiCMUexLy/qF5oFxNt1
+         rjbthJ4kZ+lyzX2khiduaBRJLZz1TBUgRtkthU2PGlO2zKrHyz+tE56i/WjAwPFWg8
+         ye00MdxCfpgig==
+Date:   Thu, 28 Oct 2021 14:14:27 +0100
+From:   Mark Brown <broonie@kernel.org>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Quentin Perret <qperret@google.com>,
+        Will Deacon <will@kernel.org>, kernel-team@android.com
+Subject: Re: [PATCH v2 5/5] arm64/fpsimd: Document the use of
+ TIF_FOREIGN_FPSTATE by KVM
+Message-ID: <YXqiM08YPeyYley5@sirena.org.uk>
+References: <20211028111640.3663631-1-maz@kernel.org>
+ <20211028111640.3663631-6-maz@kernel.org>
 MIME-Version: 1.0
-References: <20200320212833.3507-1-sean.j.christopherson@intel.com> <20200320212833.3507-24-sean.j.christopherson@intel.com>
-In-Reply-To: <20200320212833.3507-24-sean.j.christopherson@intel.com>
-From:   Lai Jiangshan <jiangshanlai+lkml@gmail.com>
-Date:   Thu, 28 Oct 2021 21:11:11 +0800
-Message-ID: <CAJhGHyD=S6pVB+OxM7zF0_6LnMUCLqyTfMK4x9GZsdRHZmgN7Q@mail.gmail.com>
-Subject: Re: [PATCH v3 23/37] KVM: nVMX: Add helper to handle TLB flushes on
- nested VM-Enter/VM-Exit
-To:     Sean Christopherson <sean.j.christopherson@intel.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        Ben Gardon <bgardon@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        John Haxby <john.haxby@oracle.com>,
-        Miaohe Lin <linmiaohe@huawei.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="58r1ffgyFCvuxbm+"
+Content-Disposition: inline
+In-Reply-To: <20211028111640.3663631-6-maz@kernel.org>
+X-Cookie: try again
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Mar 21, 2020 at 5:29 AM Sean Christopherson
-<sean.j.christopherson@intel.com> wrote:
 
-> +       if (!nested_cpu_has_vpid(vmcs12) || !nested_has_guest_tlb_tag(vcpu)) {
-> +               kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
-> +       } else if (is_vmenter &&
-> +                  vmcs12->virtual_processor_id != vmx->nested.last_vpid) {
-> +               vmx->nested.last_vpid = vmcs12->virtual_processor_id;
-> +               vpid_sync_context(nested_get_vpid02(vcpu));
-> +       }
-> +}
+--58r1ffgyFCvuxbm+
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Oct 28, 2021 at 12:16:40PM +0100, Marc Zyngier wrote:
+> The bit of documentation that talks about TIF_FOREIGN_FPSTATE
+> does not mention the ungodly tricks that KVM plays with this flag.
+>=20
+> Try and document this for the posterity.
 
-(I'm sorry to pick this old email to reply to, but the problem has
-nothing to do with this patch nor 5c614b3583e7 and it exists since
-nested vmx is introduced.)
+Reviwed-by: Mark Brown <broonie@kernel.org>
 
-I think kvm_mmu_free_guest_mode_roots() should be called
-if (!enable_ept && vmcs12->virtual_processor_id != vmx->nested.last_vpid)
-just because prev_roots doesn't cache the vpid12.
-(prev_roots caches PCID, which is distinctive)
+--58r1ffgyFCvuxbm+
+Content-Type: application/pgp-signature; name="signature.asc"
 
-The problem hardly exists if L1's hypervisor is also kvm, but if
-L1's hypervisor is different or is also kvm with some changes
-in the way how it manages VPID.  (Actually, I planned to
-change the way how it manages VPID to svm-like.)
+-----BEGIN PGP SIGNATURE-----
 
-nvcpu0 and nvcpu1 are in the same nested VM and are running the same
-application process.
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmF6ojMACgkQJNaLcl1U
+h9ADwwf+LD87gkZpKtme+gaULezsWo6+93ZLEdBBNTy13T2KQTAbi5wtv2tjrTh0
+eCnrIjgyz35mSb3pF+vNn8+iyUBuELXFfK5+ZapkpduIBwY2tNLKCXQrpg28gVWV
+AuZR6K7b3fktMxMM+vU2zMIacVr50uDT0Ba5BCUpcg0YwvRKORG4W+0UqetRjizz
+ZfceGiGUd46iepoa5clJXJhZ1eJrUb9FLnekPOEcEUqs7Q1G5bF3Zoifc1JeDtdv
+e38oMmLfKtwi8DSLfto5jPgb2/xYGBT1FATkdmDtGJaLhIggmkiNyzaugvwbY/BZ
+MUYuoAUf80pcTiFpov2Kn7FWnw2R4g==
+=+aPl
+-----END PGP SIGNATURE-----
 
-vcpu1: runs nvcpu1 with the same cr3 as nvcpu0
-vcpu0: runs nvcpu0, modifies pagetable and L1 sync root, and flush VPID12
-       but L0 doesn't sync, it just removes the root from vcpu0's prev_roots.
-vcpu1: L1 migrates nvcpu0 to here, allocates a *fresh* VPID12 to nvcpu0
-       like the ways svm allocates a fresh ASID.
-vcpu1: runs nvcpu0 without any flush. (vcpu1's prev_roots has already had it
-       L0 hasn't synced it)
-
-If my understanding is correct, I hope it is a report and somebody fixes it.
+--58r1ffgyFCvuxbm+--
