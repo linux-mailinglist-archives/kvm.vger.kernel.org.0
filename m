@@ -2,55 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D378B43E588
-	for <lists+kvm@lfdr.de>; Thu, 28 Oct 2021 17:55:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 431E743E5C9
+	for <lists+kvm@lfdr.de>; Thu, 28 Oct 2021 18:10:03 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229764AbhJ1P6O (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Oct 2021 11:58:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51818 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229565AbhJ1P6N (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Oct 2021 11:58:13 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7799C0613B9
-        for <kvm@vger.kernel.org>; Thu, 28 Oct 2021 08:55:46 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id gn3so5066672pjb.0
-        for <kvm@vger.kernel.org>; Thu, 28 Oct 2021 08:55:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=m0tHnHlQJDBdfArgGfCXfVMbH9LdSSnDL35miUYeLjs=;
-        b=QQmaJ8nXN2KbyIG5k1JyBoSquPg6yk3b/FNSx1V8PjEEIwsY4bZfol7aYj6Ws7u8lu
-         AL3QNRVPk8G4o1zbT2wS3T+0q2unqIYIGvpD4X4hbS+GWLCfdCjK1582SOfCPxgbXaj6
-         rp1/zAb/gxsig9wW4x8Hmz3hVUCDwIHJtvbG8WTJj+OyXJ9Qbywk0hsQ9i5L1juwa1hs
-         n78Jiehn21G0dcgi1vzqMRfnUHdXLWIscCjEk3VHPYnbJSs6c8My2YAhN/ZegigH9hDg
-         LWqS5PZjO6n0Z4WJ0z7BuPmceVWRsCdNKwW5JM9MnEgXi3tzkHrjJO1A1KNXmTOVd/Xz
-         cMxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=m0tHnHlQJDBdfArgGfCXfVMbH9LdSSnDL35miUYeLjs=;
-        b=i/J6Ksioqe6PThVq1hcYL3jOgRadRKzjwt7E/2dXqMdoa4LwTWQX8ND7dRzjUUKyGP
-         JYVNBFhLINp32hPWVDzfsQjzLyTILsAjAktyT8enQtNC4cjAh98Cm753nz7+n8iPd1zl
-         QVG1hLoNHxZa7KjWMsqphyNnN7ybtORWAig++sJXfOchrB1QHn5opAJQtPDKtD6PWIR8
-         7SsENuR1hguCJTd+aGLpXXQU0PZhDpDOMf887drhGqpYjhc5hv9Tv/SKHhqT+7oEc5+I
-         xDBVFszsOFGFc2d0sTj1krS7sPPCHzoqxbi0ywBAf41jeGWV1bGVgHicRwMOwxyVgmb2
-         9/fQ==
-X-Gm-Message-State: AOAM531VXY0Lu9xTX+FY2zJ0eUeA0CVlqbLz+NK3tFmgJi3fsz2CvutR
-        ucnS395IBuwBjOYiWCTLs52Weg==
-X-Google-Smtp-Source: ABdhPJwGUzCGTG+bFEKCx4HxRTPn7WtM79GFmjO7irPTWNvcrtXMPEuDRtNZ53pGeMNDkz8HGfA6sw==
-X-Received: by 2002:a17:90b:17d0:: with SMTP id me16mr13884280pjb.152.1635436545938;
-        Thu, 28 Oct 2021 08:55:45 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id s12sm3788591pfg.70.2021.10.28.08.55.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Oct 2021 08:55:45 -0700 (PDT)
-Date:   Thu, 28 Oct 2021 15:55:41 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+        id S230256AbhJ1QM3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Oct 2021 12:12:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:43745 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230225AbhJ1QM1 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 28 Oct 2021 12:12:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635437400;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=RPIozLU8n1iGsiSzHPyPa84e4ejX/UYwSJJGhpw0Bzs=;
+        b=EN22D5+rckM0+dVsDEOd5Um7waQihRqPh6Q4A52PQWPPu9B2miQoDBM3ruy/ofFKtnNF9z
+        yzDMab8E6co1fGe7aWPQ5+CCtCouJ9EwcsJ60U65VIEWhBffXlWMULKuYLdKg6GoPyrhGf
+        EzqV6Hax5Zc2nbL9RtMSLqbY7Or8wcQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-46-PimS6ymnOV-UnZZtG5v5zw-1; Thu, 28 Oct 2021 12:09:56 -0400
+X-MC-Unique: PimS6ymnOV-UnZZtG5v5zw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E21580A5C0;
+        Thu, 28 Oct 2021 16:09:52 +0000 (UTC)
+Received: from starship (unknown [10.40.194.243])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 79BD660843;
+        Thu, 28 Oct 2021 16:09:42 +0000 (UTC)
+Message-ID: <5769bb700d94c3828bdef57963a3fe9422e801e7.camel@redhat.com>
+Subject: Re: [PATCH v2 27/43] KVM: VMX: Move Posted Interrupt ndst
+ computation out of write loop
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
         Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
         Paul Mackerras <paulus@ozlabs.org>,
         Anup Patel <anup.patel@wdc.com>,
@@ -59,8 +48,8 @@ Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
         Albert Ou <aou@eecs.berkeley.edu>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     James Morse <james.morse@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Atish Patra <atish.patra@wdc.com>,
@@ -78,106 +67,99 @@ Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
         David Matlack <dmatlack@google.com>,
         Oliver Upton <oupton@google.com>,
         Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH v2 26/43] KVM: VMX: Read Posted Interrupt "control"
- exactly once per loop iteration
-Message-ID: <YXrH/ZZBOHrWHz4j@google.com>
+Date:   Thu, 28 Oct 2021 19:09:41 +0300
+In-Reply-To: <643d9c249b5863f04290a6f047ea1a2d98bd75f9.camel@redhat.com>
 References: <20211009021236.4122790-1-seanjc@google.com>
- <20211009021236.4122790-27-seanjc@google.com>
- <b078cce30f86672d7d8f8eaa0adc47d24def24e2.camel@redhat.com>
+         <20211009021236.4122790-28-seanjc@google.com>
+         <643d9c249b5863f04290a6f047ea1a2d98bd75f9.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b078cce30f86672d7d8f8eaa0adc47d24def24e2.camel@redhat.com>
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 28, 2021, Maxim Levitsky wrote:
+On Thu, 2021-10-28 at 14:28 +0300, Maxim Levitsky wrote:
 > On Fri, 2021-10-08 at 19:12 -0700, Sean Christopherson wrote:
-> > Use READ_ONCE() when loading the posted interrupt descriptor control
-> > field to ensure "old" and "new" have the same base value.  If the
-> > compiler emits separate loads, and loads into "new" before "old", KVM
-> > could theoretically drop the ON bit if it were set between the loads.
+> > Hoist the CPU => APIC ID conversion for the Posted Interrupt descriptor
+> > out of the loop to write the descriptor, preemption is disabled so the
+> > CPU won't change, and if the APIC ID changes KVM has bigger problems.
 > > 
-> > Fixes: 28b835d60fcc ("KVM: Update Posted-Interrupts Descriptor when vCPU is preempted")
+> > No functional change intended.
+> 
+> Is preemption always disabled in vmx_vcpu_pi_load? vmx_vcpu_pi_load is called from vmx_vcpu_load,
+> which is called indirectly from vcpu_load which is called from many ioctls,
+> which userspace does. In these places I don't think that preemption is disabled.
+
+You can disregard this, I missed the fact that we have 'int cpu = get_cpu();'
+which disables preemption in 'vcpu_load'
+
+Thus,
+
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+
+
+Best regards,
+	Maxim Levitsky
+> 
+> Best regards,
+> 	Maxim Levitsky
+> 
 > > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > > ---
-> >  arch/x86/kvm/vmx/posted_intr.c | 6 +++---
-> >  1 file changed, 3 insertions(+), 3 deletions(-)
+> >  arch/x86/kvm/vmx/posted_intr.c | 25 +++++++++++--------------
+> >  1 file changed, 11 insertions(+), 14 deletions(-)
 > > 
 > > diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-> > index 414ea6972b5c..fea343dcc011 100644
+> > index fea343dcc011..2b2206339174 100644
 > > --- a/arch/x86/kvm/vmx/posted_intr.c
 > > +++ b/arch/x86/kvm/vmx/posted_intr.c
-> > @@ -53,7 +53,7 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
+> > @@ -51,17 +51,15 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
+> >  		goto after_clear_sn;
+> >  	}
 > >  
-> >  	/* The full case.  */
+> > -	/* The full case.  */
+> > +	/* The full case.  Set the new destination and clear SN. */
+> > +	dest = cpu_physical_id(cpu);
+> > +	if (!x2apic_mode)
+> > +		dest = (dest << 8) & 0xFF00;
+> > +
 > >  	do {
-> > -		old.control = new.control = pi_desc->control;
-> > +		old.control = new.control = READ_ONCE(pi_desc->control);
+> >  		old.control = new.control = READ_ONCE(pi_desc->control);
 > >  
-> >  		dest = cpu_physical_id(cpu);
-> >  
-> > @@ -104,7 +104,7 @@ static void __pi_post_block(struct kvm_vcpu *vcpu)
+> > -		dest = cpu_physical_id(cpu);
+> > -
+> > -		if (x2apic_mode)
+> > -			new.ndst = dest;
+> > -		else
+> > -			new.ndst = (dest << 8) & 0xFF00;
+> > -
+> > +		new.ndst = dest;
+> >  		new.sn = 0;
+> >  	} while (cmpxchg64(&pi_desc->control, old.control,
+> >  			   new.control) != old.control);
+> > @@ -103,15 +101,14 @@ static void __pi_post_block(struct kvm_vcpu *vcpu)
+> >  	WARN(pi_desc->nv != POSTED_INTR_WAKEUP_VECTOR,
 > >  	     "Wakeup handler not enabled while the vCPU was blocking");
 > >  
+> > +	dest = cpu_physical_id(vcpu->cpu);
+> > +	if (!x2apic_mode)
+> > +		dest = (dest << 8) & 0xFF00;
+> > +
 > >  	do {
-> > -		old.control = new.control = pi_desc->control;
-> > +		old.control = new.control = READ_ONCE(pi_desc->control);
+> >  		old.control = new.control = READ_ONCE(pi_desc->control);
 > >  
-> >  		dest = cpu_physical_id(vcpu->cpu);
+> > -		dest = cpu_physical_id(vcpu->cpu);
+> > -
+> > -		if (x2apic_mode)
+> > -			new.ndst = dest;
+> > -		else
+> > -			new.ndst = (dest << 8) & 0xFF00;
+> > +		new.ndst = dest;
 > >  
-> > @@ -160,7 +160,7 @@ int pi_pre_block(struct kvm_vcpu *vcpu)
-> >  	     "Posted Interrupt Suppress Notification set before blocking");
-> >  
-> >  	do {
-> > -		old.control = new.control = pi_desc->control;
-> > +		old.control = new.control = READ_ONCE(pi_desc->control);
-> >  
-> >  		/* set 'NV' to 'wakeup vector' */
-> >  		new.nv = POSTED_INTR_WAKEUP_VECTOR;
-> 
-> I wish there was a way to mark fields in a struct, as requiring 'READ_ONCE' on them
-> so that compiler would complain if this isn't done, or automatically use 'READ_ONCE'
-> logic.
+> >  		/* set 'NV' to 'notification vector' */
+> >  		new.nv = POSTED_INTR_VECTOR;
 
-Hmm, I think you could make an argument that ON and thus the whole "control"
-word should be volatile.  AFAICT, tagging just "on" as volatile actually works.
-There's even in a clause in Documentation/process/volatile-considered-harmful.rst
-that calls this out as a (potentially) legitimate use case.
 
-  - Pointers to data structures in coherent memory which might be modified
-    by I/O devices can, sometimes, legitimately be volatile.
-
-That said, I think I actually prefer forcing the use of READ_ONCE.  The descriptor
-requires more protections than what volatile provides, namely that all writes need
-to be atomic.  So given that volatile alone isn't sufficient, I'd prefer to have
-the code itself be more self-documenting.
-
-E.g. this compiles and does mess up the expected size.
-
-diff --git a/arch/x86/kvm/vmx/posted_intr.h b/arch/x86/kvm/vmx/posted_intr.h
-index 7f7b2326caf5..149df3b18789 100644
---- a/arch/x86/kvm/vmx/posted_intr.h
-+++ b/arch/x86/kvm/vmx/posted_intr.h
-@@ -11,9 +11,9 @@ struct pi_desc {
-        union {
-                struct {
-                                /* bit 256 - Outstanding Notification */
--                       u16     on      : 1,
-+                       volatile u16    on      : 1;
-                                /* bit 257 - Suppress Notification */
--                               sn      : 1,
-+                       u16     sn      : 1,
-                                /* bit 271:258 - Reserved */
-                                rsvd_1  : 14;
-                                /* bit 279:272 - Notification Vector */
-@@ -23,7 +23,7 @@ struct pi_desc {
-                                /* bit 319:288 - Notification Destination */
-                        u32     ndst;
-                };
--               u64 control;
-+               volatile u64 control;
-        };
-        u32 rsvd[6];
- } __aligned(64);
