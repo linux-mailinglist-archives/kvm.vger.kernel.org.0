@@ -2,112 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2140943E493
-	for <lists+kvm@lfdr.de>; Thu, 28 Oct 2021 17:07:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 58E8043E49E
+	for <lists+kvm@lfdr.de>; Thu, 28 Oct 2021 17:08:45 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231364AbhJ1PJf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Oct 2021 11:09:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40556 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231182AbhJ1PJc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Oct 2021 11:09:32 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C006DC061570;
-        Thu, 28 Oct 2021 08:07:04 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f13a70087f257aa50e887e8.dip0.t-ipconnect.de [IPv6:2003:ec:2f13:a700:87f2:57aa:50e8:87e8])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 949121EC066A;
-        Thu, 28 Oct 2021 17:07:02 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1635433622;
+        id S231388AbhJ1PLK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Oct 2021 11:11:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21015 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230406AbhJ1PLG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 28 Oct 2021 11:11:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635433719;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=J04OyLRjmP/Bb50HHEZHiheIH7udus/52nzjDQ9g+3E=;
-        b=VaGwp2OPxwdjgKaxM7E+eksULkuJb7cCcbi4a60aTInd/N+MvwhVeTu4DVX0rswnJY0h8g
-        9pIIL/v19aDofBPs1LcMHiGfoFG6Dfzu/M/fJROUeBI7vWamyEn02d9fikieFvfH2VWi37
-        KENovLjUyCmLl1N20a7v1V9B1DFCIE0=
-Date:   Thu, 28 Oct 2021 17:07:00 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v6 11/42] x86/sev: Check the vmpl level
-Message-ID: <YXq8lJHDa+Rdnizt@zn.tnic>
-References: <20211008180453.462291-1-brijesh.singh@amd.com>
- <20211008180453.462291-12-brijesh.singh@amd.com>
+         in-reply-to:in-reply-to:references:references;
+        bh=KGUjOsKlPvctyYo7MwbILT0VMStj53cixSTDxOA1q+Y=;
+        b=iOmtnoTc8ItHJnpYftmtCAUHmXeotDQBLtLIsyKE+B2PbuWh2tdo4YPn6SqPkmOR4u7azy
+        dQZv//cX9Fe9NxL3z/oMLgFZUsqUqzohk16DuVydG0xSHU67tHMBos2rFIiwYPP9oE2SOB
+        /18zOQwsuBweiu063vgvHZ5cyP+pfto=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-569-n-pTxEjBOZScaxp0ncqPDQ-1; Thu, 28 Oct 2021 11:08:35 -0400
+X-MC-Unique: n-pTxEjBOZScaxp0ncqPDQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 621AE802682;
+        Thu, 28 Oct 2021 15:08:27 +0000 (UTC)
+Received: from localhost (unknown [10.39.193.60])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 58A465C1B4;
+        Thu, 28 Oct 2021 15:08:13 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
+        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
+        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH V2 mlx5-next 12/14] vfio/mlx5: Implement vfio_pci driver
+ for mlx5 devices
+In-Reply-To: <20211027192345.GJ2744544@nvidia.com>
+Organization: Red Hat GmbH
+References: <87o87isovr.fsf@redhat.com>
+ <20211021154729.0e166e67.alex.williamson@redhat.com>
+ <20211025122938.GR2744544@nvidia.com>
+ <20211025082857.4baa4794.alex.williamson@redhat.com>
+ <20211025145646.GX2744544@nvidia.com>
+ <20211026084212.36b0142c.alex.williamson@redhat.com>
+ <20211026151851.GW2744544@nvidia.com>
+ <20211026135046.5190e103.alex.williamson@redhat.com>
+ <20211026234300.GA2744544@nvidia.com>
+ <20211027130520.33652a49.alex.williamson@redhat.com>
+ <20211027192345.GJ2744544@nvidia.com>
+User-Agent: Notmuch/0.32.1 (https://notmuchmail.org)
+Date:   Thu, 28 Oct 2021 17:08:11 +0200
+Message-ID: <87zgqtb31g.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20211008180453.462291-12-brijesh.singh@amd.com>
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 08, 2021 at 01:04:22PM -0500, Brijesh Singh wrote:
-> +static bool is_vmpl0(void)
-> +{
-> +	u64 attrs, va;
+On Wed, Oct 27 2021, Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-That local variable va is not needed.
+> On Wed, Oct 27, 2021 at 01:05:20PM -0600, Alex Williamson wrote:
 
-> +	int err;
-> +
-> +	/*
-> +	 * There is no straightforward way to query the current VMPL level. The
-> +	 * simplest method is to use the RMPADJUST instruction to change a page
-> +	 * permission to a VMPL level-1, and if the guest kernel is launched at
-> +	 * a level <= 1, then RMPADJUST instruction will return an error.
-> +	 */
-> +	attrs = 1;
-> +
-> +	/*
-> +	 * Any page aligned virtual address is sufficent to test the VMPL level.
+>> We're tossing around solutions that involve extensions, if not
+>> changes to the uAPI.  It's Wednesday of rc7.
+>
+> The P2P issue is seperate, and as I keep saying, unless you want to
+> block support for any HW that does not have freeze&queice userspace
+> must be aware of this ability and it is logical to design it as an
+> extension from where we are now.
 
-"page-aligned" ... 				"sufficient"
+I think the very fact that we're still discussing whether something
+needs to be changed/documented or not already shows that this is nothing
+that should go in right now. Actually, I'd already consider it too late
+even if we agreed now; I would expect a change like this to get at least
+two weeks in linux-next before the merge window.
 
-> +	 * The boot_ghcb_page is page aligned memory, so lets use for the test.
-> +	 */
-> +	va = (u64)&boot_ghcb_page;
-> +
-> +	/* Instruction mnemonic supported in binutils versions v2.36 and later */
-> +	asm volatile (".byte 0xf3,0x0f,0x01,0xfe\n\t"
-> +		      : "=a" (err)
-> +		      : "a" (va), "c" (RMP_PG_SIZE_4K), "d" (attrs)
-> +		      : "memory", "cc");
+>> > The "don't-break-userspace" is not an absolute prohibition, Linus has
+>> > been very clear this limitation is about direct, ideally demonstrable,
+>> > breakage to actually deployed software.
+>> 
+>> And if we introduce an open driver that unblocks QEMU support to become
+>> non-experimental, I think that's where we stand.
+>
+> Yes, if qemu becomes deployed, but our testing shows qemu support
+> needs a lot of work before it is deployable, so that doesn't seem to
+> be an immediate risk.
 
-You're adding a separate rmpadjust() primitive function in patch 24.
-In order to avoid duplication, define that primitive first, just like
-you've done for PVALIDATE in the previous patch and use said primitive
-at both call sites.
+Do you have any patches/problem reports you can share?
 
--- 
-Regards/Gruss,
-    Boris.
+If you already identified that there is work to be done in QEMU, I think
+that speaks even more for delaying this. What if we notice that uapi
+changes are needed while fixing QEMU?
 
-https://people.kernel.org/tglx/notes-about-netiquette
