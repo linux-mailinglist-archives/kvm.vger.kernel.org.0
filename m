@@ -2,101 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EB33343E46C
-	for <lists+kvm@lfdr.de>; Thu, 28 Oct 2021 16:58:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 8655A43E48C
+	for <lists+kvm@lfdr.de>; Thu, 28 Oct 2021 17:05:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231321AbhJ1PAr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Oct 2021 11:00:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38538 "EHLO
+        id S231337AbhJ1PHh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Oct 2021 11:07:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230406AbhJ1PAq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Oct 2021 11:00:46 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1496BC061745
-        for <kvm@vger.kernel.org>; Thu, 28 Oct 2021 07:58:19 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id r5so4631520pls.1
-        for <kvm@vger.kernel.org>; Thu, 28 Oct 2021 07:58:19 -0700 (PDT)
+        with ESMTP id S231313AbhJ1PHg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Oct 2021 11:07:36 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22E5FC061745
+        for <kvm@vger.kernel.org>; Thu, 28 Oct 2021 08:05:08 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id oa12-20020a17090b1bcc00b0019f715462a8so4957695pjb.3
+        for <kvm@vger.kernel.org>; Thu, 28 Oct 2021 08:05:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=QGXF5oWPYn5wMkU6IdsSHBlyLVAw8pj3F3Vqsyv9n4A=;
-        b=P6eCMloWeqINUEj9ranXxT68xKyKG+nZeXgfOAjzUbfehAu/rt22mvQK6Cv6/wEVhf
-         ILloehy+H3AmheBwCsJOWXj/ExWSGoUX7OnMiNGVroCNOp4k9Vgiy6/GMu5fFT6Zszgf
-         KXJW6oVWAEOgw+nZb3EgWed+o32RfN8X4ovTA7EnWrvpelJNMO8xQoTFTMttXOUzUZwb
-         0Xly/nYCzxtW3j12hxAVfUgxFKxGC5/vHAA21WJTYrU6D50yjoLIq2WotwRspD3zmaKZ
-         masg4S+YLS4wCtzhqaBIf6crO0VS8UF0feqHXJVclVA/LnZwLrGD4PHQtvtjpiCHo8A/
-         G3WQ==
+        d=dabbelt-com.20210112.gappssmtp.com; s=20210112;
+        h=date:subject:in-reply-to:cc:from:to:message-id:mime-version
+         :content-transfer-encoding;
+        bh=4gMtHi9lx++3HO8vHpSr1p/5SUEC9v5TgkpF9eatiFk=;
+        b=K+NZNuK0NEy7CWaSV4JOiMoT1ySYl6N3psbfIWxFVz1dNkttxp8v1yfcGJYuRN1wQ2
+         qTBQdAU/viqVKYgueJn3+kUsPZyTErYkXStWjxkMnERO/TJ7TAIEJkb9uJ3NnyvedF15
+         KGXi3XJTzqFVc2DL7LV6IEeYXkcEGk137v0IxMTPxmToOcUxs0S5AlHrLaWddDVEjYZN
+         Jh/93FheIbHdWy7RcEmassxL63YQ3P5YuPUqPH0uH9S4lqAI/kG1X7xn2cGnopL49tnN
+         rqfwiTUqrN3qQ2VpvNF30j5y/hBy9Ziey8OVbNXJ+fv/M51074tMETY59y+ZI7cllj7a
+         nEDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=QGXF5oWPYn5wMkU6IdsSHBlyLVAw8pj3F3Vqsyv9n4A=;
-        b=zF96e/AJFSq175CrIRhLSwb3nQf+DCKnv7kFSBqoJais2p8xK5VAnMGPGXtKswpqMz
-         ck+SDRa9BL4mmcmUPRr9JmAREX8eTI6mkoDGc4Lhal4mVkabKKUXnsYnFssxZGYtSm5E
-         kxZLr6kjitdbnCExNe1M4+z6A4F6Aydy5n+sBy2D7ek96cqIENRIY8BBjy0LnSig/Ydf
-         JC4WLrnbC/iQuR9OIiWWAr7VNofYvhUfXYEGNS8TdaUSbvfWxVrdYwOCYVvhFLijsy6R
-         5y4mAflO365ItBlzFM5RVkocrzh8qmVBrUh6SITK7AV4qzi6ArBPKBiyAydCa+YI5gYN
-         YvZw==
-X-Gm-Message-State: AOAM530GS66zcOo3dLPUzL5FIQPQ5bttG8Bv2o1eHT2Rwa5CDJdfCpEG
-        BceuKHs2KINXElPTxeFoNZCvKQ==
-X-Google-Smtp-Source: ABdhPJzktVilKhrXQKOyuMENgwV5ET+AbhuNqDf8NyijYHCTVEjAfRDleaAvbK/MY9xZIowkHZVQMA==
-X-Received: by 2002:a17:90b:388a:: with SMTP id mu10mr5243207pjb.0.1635433098398;
-        Thu, 28 Oct 2021 07:58:18 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id m10sm8036396pjs.21.2021.10.28.07.58.17
+        h=x-gm-message-state:date:subject:in-reply-to:cc:from:to:message-id
+         :mime-version:content-transfer-encoding;
+        bh=4gMtHi9lx++3HO8vHpSr1p/5SUEC9v5TgkpF9eatiFk=;
+        b=JzoZjbgLzl4Ymqul/RChJXc0KAptpxBBvk/yNl74O+8qiAXNqGzpggarVwcDCyZgUI
+         GNQK/E7Cfah8xK8ngWj4WAAUU3rYsiIquSTSrKZxJkxqIumbnED8rC6Ro6Guohr3/pRz
+         InAO4Hyhfxhhsey3QK9zJ36XzftTu9idinccxBBidLmaCvGEU7Zy2jN1t2lh123qF2Jh
+         +ILYC18hTNiu0wU6WsoECdmlr+w1tfxAG6rGOkLn6q7Jnx3iBkKmL5/p85xgzoIMp95C
+         5SjOSLMaYJ3XUNcphU0VfJ6aqexPI4maaIvT7ljqKfLiAlruitneEdWu8ibbACHlblMO
+         FYDQ==
+X-Gm-Message-State: AOAM533qb8i46VdG/bZpv1wtnXC0GW+5YXgCdElgRue8dgpjnNEMtvpa
+        ZhRWBnPHt6nOafJt56GSRb28ug==
+X-Google-Smtp-Source: ABdhPJxjB/bUKH1oax3ewBcarZQQHiVnAU8V8Q1ZM8DOQgZjlVjFf7NuLsk1V8PGZf2QWwCTX3AR1g==
+X-Received: by 2002:a17:902:ab50:b0:13f:4c70:9322 with SMTP id ij16-20020a170902ab5000b0013f4c709322mr4222731plb.89.1635433507260;
+        Thu, 28 Oct 2021 08:05:07 -0700 (PDT)
+Received: from localhost (76-210-143-223.lightspeed.sntcca.sbcglobal.net. [76.210.143.223])
+        by smtp.gmail.com with ESMTPSA id o22sm4215280pfu.50.2021.10.28.08.05.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Oct 2021 07:58:17 -0700 (PDT)
-Date:   Thu, 28 Oct 2021 14:58:13 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     syzbot <syzbot+05017ad275a64a3246f8@syzkaller.appspotmail.com>
-Cc:     bcm-kernel-feedback-list@broadcom.com, bhelgaas@google.com,
-        bp@alien8.de, dave.hansen@linux.intel.com,
-        devel@driverdev.osuosl.org, f.fainelli@gmail.com,
-        gregkh@linuxfoundation.org, hpa@zytor.com,
-        info@cestasdeplastico.com, jmattson@google.com, joro@8bytes.org,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-pci@vger.kernel.org,
-        linux-rpi-kernel-owner@lists.infradead.org,
-        linux-rpi-kernel@lists.infradead.org, lorenzo.pieralisi@arm.com,
-        mchehab@kernel.org, mingo@redhat.com, nsaenzjulienne@suse.de,
-        pbonzini@redhat.com, robh@kernel.org,
-        sean.j.christopherson@intel.com, sfr@canb.auug.org.au,
-        syzkaller-bugs@googlegroups.com, tcs_kernel@tencent.com,
-        tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com,
-        x86@kernel.org
-Subject: Re: [syzbot] BUG: spinlock bad magic in synchronize_srcu
-Message-ID: <YXq6hTAOhOaWGsNA@google.com>
-References: <0000000000000f73a805afeb9be8@google.com>
- <000000000000792dda05cf604775@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <000000000000792dda05cf604775@google.com>
+        Thu, 28 Oct 2021 08:05:06 -0700 (PDT)
+Date:   Thu, 28 Oct 2021 08:05:06 -0700 (PDT)
+X-Google-Original-Date: Thu, 28 Oct 2021 08:05:03 PDT (-0700)
+Subject:     Re: [PATCH 0/3] RISC-V: KVM: Few assorted changes
+In-Reply-To: <62fe1c8e-abe0-5de9-5c00-3549faae1dba@redhat.com>
+CC:     Anup Patel <Anup.Patel@wdc.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        aou@eecs.berkeley.edu, Atish Patra <Atish.Patra@wdc.com>,
+        anup@brainfault.org, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+From:   Palmer Dabbelt <palmer@dabbelt.com>
+To:     pbonzini@redhat.com
+Message-ID: <mhng-e9d8caea-eae9-45dc-8072-cde5e275833f@palmerdabbelt-glaptop>
+Mime-Version: 1.0 (MHng)
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 27, 2021, syzbot wrote:
-> syzbot suspects this issue was fixed by commit:
-> 
-> commit eb7511bf9182292ef1df1082d23039e856d1ddfb
-> Author: Haimin Zhang <tcs_kernel@tencent.com>
-> Date:   Fri Sep 3 02:37:06 2021 +0000
-> 
->     KVM: x86: Handle SRCU initialization failure during page track init
-> 
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=143e2b02b00000
-> start commit:   78e709522d2c Merge tag 'for_linus' of git://git.kernel.org..
-> git tree:       upstream
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=2150ebd7e72fa695
-> dashboard link: https://syzkaller.appspot.com/bug?extid=05017ad275a64a3246f8
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10b72895300000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14c42853300000
-> 
-> If the result looks correct, please mark the issue as fixed by replying with:
-> 
-> #syz fix: KVM: x86: Handle SRCU initialization failure during page track init
+On Thu, 28 Oct 2021 07:07:33 PDT (-0700), pbonzini@redhat.com wrote:
+> On 26/10/21 19:01, Anup Patel wrote:
+>> I had a few assorted KVM RISC-V changes which I wanted to sent after
+>> KVM RISC-V was merged hence this series.
+>>
+>> These patches can also be found in riscv_kvm_assorted_v1 branch at:
+>> https://github.com/avpatel/linux.git
+>>
+>> Anup Patel (3):
+>>    RISC-V: Enable KVM in RV64 and RV32 defconfigs as a module
+>>    RISC-V: KVM: Factor-out FP virtualization into separate sources
+>>    RISC-V: KVM: Fix GPA passed to __kvm_riscv_hfence_gvma_xyz() functions
+>>
+>>   arch/riscv/configs/defconfig         |  15 ++-
+>>   arch/riscv/configs/rv32_defconfig    |   8 +-
+>>   arch/riscv/include/asm/kvm_host.h    |  10 +-
+>>   arch/riscv/include/asm/kvm_vcpu_fp.h |  59 +++++++++
+>>   arch/riscv/kvm/Makefile              |   1 +
+>>   arch/riscv/kvm/tlb.S                 |   4 +-
+>>   arch/riscv/kvm/vcpu.c                | 172 ---------------------------
+>>   arch/riscv/kvm/vcpu_fp.c             | 167 ++++++++++++++++++++++++++
+>>   8 files changed, 244 insertions(+), 192 deletions(-)
+>>   create mode 100644 arch/riscv/include/asm/kvm_vcpu_fp.h
+>>   create mode 100644 arch/riscv/kvm/vcpu_fp.c
+>>
+>
+> Queued 2+3, thanks.
 
-#syz fix: KVM: x86: Handle SRCU initialization failure during page track init
+Thanks.  I'll pick up 1, as per the thread.
