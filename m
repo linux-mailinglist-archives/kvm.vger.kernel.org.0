@@ -2,178 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C15143E394
-	for <lists+kvm@lfdr.de>; Thu, 28 Oct 2021 16:24:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9FA7243E398
+	for <lists+kvm@lfdr.de>; Thu, 28 Oct 2021 16:25:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231178AbhJ1O0b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Oct 2021 10:26:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58650 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230265AbhJ1O03 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Oct 2021 10:26:29 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2504FC061570
-        for <kvm@vger.kernel.org>; Thu, 28 Oct 2021 07:24:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=JsW7QzXTMpJvsN0UqcIBXScQ51MZKTY7MOJ5Elpf5+Q=; b=XbFOLM6gsP8r1Ku5fWugWuDJ52
-        0Ftmhv/VU8mWYaI9sNC+4QxuT0AR+WS1sLD8X5d5Ogh+GoMFzIv6acOTJRMSJ8ps5TBim9N/HqU1A
-        QBvcm+OokZouW19rwB7AOAUUHDsavvwpyaTJSbeq7b/jXF9U+48a48mmKn7P9BqmqWCU2QIeXGNmP
-        gXukunxDi+GVyYNNM4IUQWrABhtZGzBKYSwQNY6C4x5GLohBG4MYOhnWWz4+SOnqnjTvTaoget/uM
-        +6+Xnyd5fLtkMo0G+frJC3upUhwTrNHmGRX/CI8Z3X6Uwn9O45DnEZNa1JV8CREb4Ajn0lpZk8mWM
-        rUMIxJGA==;
-Received: from 54-240-197-232.amazon.com ([54.240.197.232] helo=u3832b3a9db3152.ant.amazon.com)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mg6Jr-0087wC-MC; Thu, 28 Oct 2021 14:23:52 +0000
-Message-ID: <442c9279d0f4d86f01729757f55d0504c614386f.camel@infradead.org>
-Subject: Re: [PATCH] KVM: x86: Take srcu lock in post_kvm_run_save()
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, mtosatti <mtosatti@redhat.com>
-Date:   Thu, 28 Oct 2021 15:23:48 +0100
-In-Reply-To: <15750c83-5698-02dd-58f9-784aadde36b9@redhat.com>
-References: <606aaaf29fca3850a63aa4499826104e77a72346.camel@infradead.org>
-         <15750c83-5698-02dd-58f9-784aadde36b9@redhat.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-ai2PH+uXP5VJpB16zLRn"
-User-Agent: Evolution 3.36.5-0ubuntu1 
+        id S230479AbhJ1O1j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Oct 2021 10:27:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:57675 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230258AbhJ1O1i (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 28 Oct 2021 10:27:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635431111;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=0G7LmSeoTaOCEDD4Qdow17gIDFlX8I4Q0C2wC4wNyVM=;
+        b=UzdMzX1Cm7GtivQ3CecDSYQMcD1E7MLbGPFjrZTsAPqT7ivP7gFQirNFk64VuSVqgtnoq6
+        e+Xu3aO7MB21MpwjphrmO69R5GsQ9urRvAziOgs6DBON1SfMjkZybH2qr/EvHegLdvt30G
+        Ybj8HZ8EsuXxydQPKxK0Zyi88/LQhnQ=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-230-XxWTT6rdP_KtWnOrWcfQjA-1; Thu, 28 Oct 2021 10:25:10 -0400
+X-MC-Unique: XxWTT6rdP_KtWnOrWcfQjA-1
+Received: by mail-wm1-f72.google.com with SMTP id c1-20020a05600c0ac100b00322fcaa2bc7so2086705wmr.4
+        for <kvm@vger.kernel.org>; Thu, 28 Oct 2021 07:25:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:cc:references:from:organization:subject
+         :in-reply-to:content-transfer-encoding;
+        bh=0G7LmSeoTaOCEDD4Qdow17gIDFlX8I4Q0C2wC4wNyVM=;
+        b=BZtMmLrsUis2Gn57iG4OWQRMNaE+4fJctStpaLLSesoqnRBXAy94rdS+P63TyRro/Y
+         e4zX6EMFNI1aLvm6z/VUS31gKYdIJT1nbtnfAtOJ7lKXw16Jm0fQhPta7P9Ix0dOjflQ
+         uLO/VsssuI+SW5dXgkF53oWabNfu6GyRC5GdKRk1JtI8rdv3jjwo/Zw3ztN0ZaInkewX
+         DnpPdUOF6dsMTD7msVIvkMeRxfxj9Gyq9k8YtWWODPKU8TZnAeSkxI5Q70cnRwW+s9Ow
+         7CBPdQI03X04Qx+wLFCxKF+kUrcC23nLv291/jeWym1DomCoea0j637JMo+pXbCQfRjC
+         Tepw==
+X-Gm-Message-State: AOAM531grjYha67CiRIdLheIRlNnDXOjVcDh2VFYz2rynAb5jRTvED9y
+        KuGBAFIJJumG53xyBppzqyeG4fmd8NI/p1v0zzQDJqBGJPCNWtp4r29w0VH1JKP7FpIvOw8QZL0
+        isBQGLHk1ep+w
+X-Received: by 2002:a05:6000:186a:: with SMTP id d10mr6384578wri.279.1635431109200;
+        Thu, 28 Oct 2021 07:25:09 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxOi9O+vaOwxJUXA6a+jCK0+01FKTzme4s23K0tex2QVjKnfZgH01pT2wTLAsv8N0KStFFkhg==
+X-Received: by 2002:a05:6000:186a:: with SMTP id d10mr6384549wri.279.1635431108942;
+        Thu, 28 Oct 2021 07:25:08 -0700 (PDT)
+Received: from [192.168.3.132] (p4ff23b52.dip0.t-ipconnect.de. [79.242.59.82])
+        by smtp.gmail.com with ESMTPSA id x21sm6332839wmc.14.2021.10.28.07.25.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 28 Oct 2021 07:25:08 -0700 (PDT)
+Message-ID: <4ac7c459-8e13-087a-f98d-9f3e0e6d8ee6@redhat.com>
+Date:   Thu, 28 Oct 2021 16:25:07 +0200
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Content-Language: en-US
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>
+Cc:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20211028135556.1793063-1-scgl@linux.ibm.com>
+ <20211028135556.1793063-4-scgl@linux.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+Subject: Re: [PATCH v2 3/3] KVM: s390: gaccess: Cleanup access to guest frames
+In-Reply-To: <20211028135556.1793063-4-scgl@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 28.10.21 15:55, Janis Schoetterl-Glausch wrote:
+> Introduce a helper function for guest frame access.
 
---=-ai2PH+uXP5VJpB16zLRn
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+"guest page access"
 
-On Thu, 2021-10-28 at 16:11 +0200, Paolo Bonzini wrote:
->=20
-> > There are potentially other ways of doing this, by shuffling the tail
-> > of kvm_arch_vcpu_ioctl_run() around a little and holding the lock once
-> > there instead of taking it within vcpu_run(). But the call to
-> > post_kvm_run_save() occurs even on the error paths, and it gets complex
-> > to untangle. This is the simple approach.
-> >=20
-> > This doesn't show up when I enable event channel delivery in
-> > xen_shinfo_test because we have pic_in_kernel() there. I'll fix the
-> > tests not to hardcode that, as I expand the event channel support and
-> > add more testing of it.
->=20
-> Queued for 5.15, thanks.
+But I do wonder if you actually want to call it
 
-Thanks.
+"access_guest_abs"
 
-Sean, since you actually went ahead and implemented the alternative
-approach along the lines I describe above, I'll let you submit that as
-a subsequent cleanup while keeping the simple version for stable as
-discussed?
+and say "guest absolute access" instead here.
 
+Because we're dealing with absolute addresses and the fact that we are
+accessing it page-wise is just because we have to perform a page-wise
+translation in the callers (either virtual->absolute or real->absolute).
 
---=-ai2PH+uXP5VJpB16zLRn
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+Theoretically, if you know you're across X pages but they are contiguous
+in absolute address space, nothing speaks against using that function
+directly across X pages with a single call.
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCECow
-ggUcMIIEBKADAgECAhEA4rtJSHkq7AnpxKUY8ZlYZjANBgkqhkiG9w0BAQsFADCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTkwMTAyMDAwMDAwWhcNMjIwMTAxMjM1
-OTU5WjAkMSIwIAYJKoZIhvcNAQkBFhNkd213MkBpbmZyYWRlYWQub3JnMIIBIjANBgkqhkiG9w0B
-AQEFAAOCAQ8AMIIBCgKCAQEAsv3wObLTCbUA7GJqKj9vHGf+Fa+tpkO+ZRVve9EpNsMsfXhvFpb8
-RgL8vD+L133wK6csYoDU7zKiAo92FMUWaY1Hy6HqvVr9oevfTV3xhB5rQO1RHJoAfkvhy+wpjo7Q
-cXuzkOpibq2YurVStHAiGqAOMGMXhcVGqPuGhcVcVzVUjsvEzAV9Po9K2rpZ52FE4rDkpDK1pBK+
-uOAyOkgIg/cD8Kugav5tyapydeWMZRJQH1vMQ6OVT24CyAn2yXm2NgTQMS1mpzStP2ioPtTnszIQ
-Ih7ASVzhV6csHb8Yrkx8mgllOyrt9Y2kWRRJFm/FPRNEurOeNV6lnYAXOymVJwIDAQABo4IB0zCC
-Ac8wHwYDVR0jBBgwFoAUgq9sjPjF/pZhfOgfPStxSF7Ei8AwHQYDVR0OBBYEFLfuNf820LvaT4AK
-xrGK3EKx1DE7MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUF
-BwMEBggrBgEFBQcDAjBGBgNVHSAEPzA9MDsGDCsGAQQBsjEBAgEDBTArMCkGCCsGAQUFBwIBFh1o
-dHRwczovL3NlY3VyZS5jb21vZG8ubmV0L0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3Js
-LmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWls
-Q0EuY3JsMIGLBggrBgEFBQcBAQR/MH0wVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuY29tb2RvY2Eu
-Y29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYI
-KwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmNvbW9kb2NhLmNvbTAeBgNVHREEFzAVgRNkd213MkBpbmZy
-YWRlYWQub3JnMA0GCSqGSIb3DQEBCwUAA4IBAQALbSykFusvvVkSIWttcEeifOGGKs7Wx2f5f45b
-nv2ghcxK5URjUvCnJhg+soxOMoQLG6+nbhzzb2rLTdRVGbvjZH0fOOzq0LShq0EXsqnJbbuwJhK+
-PnBtqX5O23PMHutP1l88AtVN+Rb72oSvnD+dK6708JqqUx2MAFLMevrhJRXLjKb2Mm+/8XBpEw+B
-7DisN4TMlLB/d55WnT9UPNHmQ+3KFL7QrTO8hYExkU849g58Dn3Nw3oCbMUgny81ocrLlB2Z5fFG
-Qu1AdNiBA+kg/UxzyJZpFbKfCITd5yX49bOriL692aMVDyqUvh8fP+T99PqorH4cIJP6OxSTdxKM
-MIIFHDCCBASgAwIBAgIRAOK7SUh5KuwJ6cSlGPGZWGYwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTE5MDEwMjAwMDAwMFoXDTIyMDEwMTIz
-NTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCASIwDQYJKoZIhvcN
-AQEBBQADggEPADCCAQoCggEBALL98Dmy0wm1AOxiaio/bxxn/hWvraZDvmUVb3vRKTbDLH14bxaW
-/EYC/Lw/i9d98CunLGKA1O8yogKPdhTFFmmNR8uh6r1a/aHr301d8YQea0DtURyaAH5L4cvsKY6O
-0HF7s5DqYm6tmLq1UrRwIhqgDjBjF4XFRqj7hoXFXFc1VI7LxMwFfT6PStq6WedhROKw5KQytaQS
-vrjgMjpICIP3A/CroGr+bcmqcnXljGUSUB9bzEOjlU9uAsgJ9sl5tjYE0DEtZqc0rT9oqD7U57My
-ECIewElc4VenLB2/GK5MfJoJZTsq7fWNpFkUSRZvxT0TRLqznjVepZ2AFzsplScCAwEAAaOCAdMw
-ggHPMB8GA1UdIwQYMBaAFIKvbIz4xf6WYXzoHz0rcUhexIvAMB0GA1UdDgQWBBS37jX/NtC72k+A
-CsaxitxCsdQxOzAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEF
-BQcDBAYIKwYBBQUHAwIwRgYDVR0gBD8wPTA7BgwrBgEEAbIxAQIBAwUwKzApBggrBgEFBQcCARYd
-aHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9DUFMwWgYDVR0fBFMwUTBPoE2gS4ZJaHR0cDovL2Ny
-bC5jb21vZG9jYS5jb20vQ09NT0RPUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFp
-bENBLmNybDCBiwYIKwYBBQUHAQEEfzB9MFUGCCsGAQUFBzAChklodHRwOi8vY3J0LmNvbW9kb2Nh
-LmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3J0MCQG
-CCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAC20spBbrL71ZEiFrbXBHonzhhirO1sdn+X+O
-W579oIXMSuVEY1LwpyYYPrKMTjKECxuvp24c829qy03UVRm742R9Hzjs6tC0oatBF7KpyW27sCYS
-vj5wbal+TttzzB7rT9ZfPALVTfkW+9qEr5w/nSuu9PCaqlMdjABSzHr64SUVy4ym9jJvv/FwaRMP
-gew4rDeEzJSwf3eeVp0/VDzR5kPtyhS+0K0zvIWBMZFPOPYOfA59zcN6AmzFIJ8vNaHKy5QdmeXx
-RkLtQHTYgQPpIP1Mc8iWaRWynwiE3ecl+PWzq4i+vdmjFQ8qlL4fHz/k/fT6qKx+HCCT+jsUk3cS
-jDCCBeYwggPOoAMCAQICEGqb4Tg7/ytrnwHV2binUlYwDQYJKoZIhvcNAQEMBQAwgYUxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMSswKQYDVQQDEyJDT01PRE8gUlNBIENlcnRpZmljYXRp
-b24gQXV0aG9yaXR5MB4XDTEzMDExMDAwMDAwMFoXDTI4MDEwOTIzNTk1OVowgZcxCzAJBgNVBAYT
-AkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNV
-BAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAvrOeV6wodnVAFsc4A5jTxhh2IVDzJXkLTLWg0X06WD6cpzEup/Y0dtmEatrQPTRI5Or1u6zf
-+bGBSyD9aH95dDSmeny1nxdlYCeXIoymMv6pQHJGNcIDpFDIMypVpVSRsivlJTRENf+RKwrB6vcf
-WlP8dSsE3Rfywq09N0ZfxcBa39V0wsGtkGWC+eQKiz4pBZYKjrc5NOpG9qrxpZxyb4o4yNNwTqza
-aPpGRqXB7IMjtf7tTmU2jqPMLxFNe1VXj9XB1rHvbRikw8lBoNoSWY66nJN/VCJv5ym6Q0mdCbDK
-CMPybTjoNCQuelc0IAaO4nLUXk0BOSxSxt8kCvsUtQIDAQABo4IBPDCCATgwHwYDVR0jBBgwFoAU
-u69+Aj36pvE8hI6t7jiY7NkyMtQwHQYDVR0OBBYEFIKvbIz4xf6WYXzoHz0rcUhexIvAMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMBEGA1UdIAQKMAgwBgYEVR0gADBMBgNVHR8E
-RTBDMEGgP6A9hjtodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDZXJ0aWZpY2F0aW9u
-QXV0aG9yaXR5LmNybDBxBggrBgEFBQcBAQRlMGMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9jcnQuY29t
-b2RvY2EuY29tL0NPTU9ET1JTQUFkZFRydXN0Q0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2Nz
-cC5jb21vZG9jYS5jb20wDQYJKoZIhvcNAQEMBQADggIBAHhcsoEoNE887l9Wzp+XVuyPomsX9vP2
-SQgG1NgvNc3fQP7TcePo7EIMERoh42awGGsma65u/ITse2hKZHzT0CBxhuhb6txM1n/y78e/4ZOs
-0j8CGpfb+SJA3GaBQ+394k+z3ZByWPQedXLL1OdK8aRINTsjk/H5Ns77zwbjOKkDamxlpZ4TKSDM
-KVmU/PUWNMKSTvtlenlxBhh7ETrN543j/Q6qqgCWgWuMAXijnRglp9fyadqGOncjZjaaSOGTTFB+
-E2pvOUtY+hPebuPtTbq7vODqzCM6ryEhNhzf+enm0zlpXK7q332nXttNtjv7VFNYG+I31gnMrwfH
-M5tdhYF/8v5UY5g2xANPECTQdu9vWPoqNSGDt87b3gXb1AiGGaI06vzgkejL580ul+9hz9D0S0U4
-jkhJiA7EuTecP/CFtR72uYRBcunwwH3fciPjviDDAI9SnC/2aPY8ydehzuZutLbZdRJ5PDEJM/1t
-yZR2niOYihZ+FCbtf3D9mB12D4ln9icgc7CwaxpNSCPt8i/GqK2HsOgkL3VYnwtx7cJUmpvVdZ4o
-gnzgXtgtdk3ShrtOS1iAN2ZBXFiRmjVzmehoMof06r1xub+85hFQzVxZx5/bRaTKTlL8YXLI8nAb
-R9HWdFqzcOoB/hxfEyIQpx9/s81rgzdEZOofSlZHynoSMYIDyjCCA8YCAQEwga0wgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
-ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjEx
-MDI4MTQyMzQ4WjAvBgkqhkiG9w0BCQQxIgQgDGZPTiE9xIKlNLuY5/A6RNk/FEEwu+dsF2JU2bEQ
-31wwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
-TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
-PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
-aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBALJJwiuHvUHe91UNeu41Grgw+MKNO689wCY/Jy1Azk6x7sKurMUeQHi/vmnJ1pSW
-cCuGSB1TgDgTGUXWw9OYjShTkFL8A85dziGD4c61SsCKNRoe2qFXuWXYn1KGBeKFg2Tuaox2dCg1
-yK0I/966Ku47D181YqJ5HZs0hV8FsmQtBbj8KQijiOGEHHAdeigmSlfGyQiRNSoCG7tSLbR6+4UO
-1iTXUb4TyOcwwQxKEhc0AuiAv/JJs0KtaBt5jqiC+RCZegm8ZWcztxNwx7HIjhFjE7ObnTp8l20O
-1iXNfkxf85Mqkvja4nhvBChYEWWHCSQVpOK6RCSDImEGpcvqN6UAAAAAAAA=
+> 
+> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+> ---
+>  arch/s390/kvm/gaccess.c | 24 ++++++++++++++++--------
+>  1 file changed, 16 insertions(+), 8 deletions(-)
+> 
+> diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
+> index f0848c37b003..9a633310b6fe 100644
+> --- a/arch/s390/kvm/gaccess.c
+> +++ b/arch/s390/kvm/gaccess.c
+> @@ -866,6 +866,20 @@ static int guest_range_to_gpas(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar,
+>  	return 0;
+>  }
+>  
+> +static int access_guest_page(struct kvm *kvm, enum gacc_mode mode, gpa_t gpa,
+> +			      void *data, unsigned int len)
+> +{
+> +	const unsigned int offset = offset_in_page(gpa);
+> +	const gfn_t gfn = gpa_to_gfn(gpa);
+> +	int rc;
+> +
+> +	if (mode == GACC_STORE)
+> +		rc = kvm_write_guest_page(kvm, gfn, data, offset, len);
+> +	else
+> +		rc = kvm_read_guest_page(kvm, gfn, data, offset, len);
+> +	return rc;
+> +}
+> +
+>  int access_guest(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar, void *data,
+>  		 unsigned long len, enum gacc_mode mode)
+>  {
+> @@ -896,10 +910,7 @@ int access_guest(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar, void *data,
+>  	rc = guest_range_to_gpas(vcpu, ga, ar, gpas, len, asce, mode);
+>  	for (idx = 0; idx < nr_pages && !rc; idx++) {
+>  		fragment_len = min(PAGE_SIZE - offset_in_page(gpas[idx]), len);
+> -		if (mode == GACC_STORE)
+> -			rc = kvm_write_guest(vcpu->kvm, gpas[idx], data, fragment_len);
+> -		else
+> -			rc = kvm_read_guest(vcpu->kvm, gpas[idx], data, fragment_len);
+> +		rc = access_guest_page(vcpu->kvm, mode, gpas[idx], data, fragment_len);
+>  		len -= fragment_len;
+>  		data += fragment_len;
+>  	}
+> @@ -920,10 +931,7 @@ int access_guest_real(struct kvm_vcpu *vcpu, unsigned long gra,
+>  	while (len && !rc) {
+>  		gpa = kvm_s390_real_to_abs(vcpu, gra);
+>  		fragment_len = min(PAGE_SIZE - offset_in_page(gpa), len);
+> -		if (mode)
+> -			rc = write_guest_abs(vcpu, gpa, data, fragment_len);
+> -		else
+> -			rc = read_guest_abs(vcpu, gpa, data, fragment_len);
+> +		rc = access_guest_page(vcpu->kvm, mode, gpa, data, fragment_len);
+>  		len -= fragment_len;
+>  		gra += fragment_len;
+>  		data += fragment_len;
+> 
 
 
---=-ai2PH+uXP5VJpB16zLRn--
+-- 
+Thanks,
+
+David / dhildenb
 
