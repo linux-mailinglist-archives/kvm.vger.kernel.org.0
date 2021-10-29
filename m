@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 24FF443FB47
-	for <lists+kvm@lfdr.de>; Fri, 29 Oct 2021 13:17:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B3A3743FB57
+	for <lists+kvm@lfdr.de>; Fri, 29 Oct 2021 13:27:42 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231624AbhJ2LT2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Oct 2021 07:19:28 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47134 "EHLO mail.kernel.org"
+        id S231820AbhJ2LaJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Oct 2021 07:30:09 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48610 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229930AbhJ2LT1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Oct 2021 07:19:27 -0400
+        id S231670AbhJ2LaI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Oct 2021 07:30:08 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 22FC0610D2;
-        Fri, 29 Oct 2021 11:16:59 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8664F6113E;
+        Fri, 29 Oct 2021 11:27:40 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1mgPsW-002Ow6-VI; Fri, 29 Oct 2021 12:16:57 +0100
-Date:   Fri, 29 Oct 2021 12:16:56 +0100
-Message-ID: <87mtms9j2v.wl-maz@kernel.org>
+        id 1mgQ2s-002P0J-8C; Fri, 29 Oct 2021 12:27:38 +0100
+Date:   Fri, 29 Oct 2021 12:27:37 +0100
+Message-ID: <87lf2c9il2.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Oliver Upton <oupton@google.com>
 Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
@@ -34,10 +34,10 @@ Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
         Peter Shier <pshier@google.com>,
         Ricardo Koller <ricarkol@google.com>,
         Reiji Watanabe <reijiw@google.com>
-Subject: Re: [PATCH 2/3] KVM: arm64: Allow the guest to change the OS Lock status
-In-Reply-To: <20211029003202.158161-3-oupton@google.com>
+Subject: Re: [PATCH 1/3] KVM: arm64: Stash OSLSR_EL1 in the cpu context
+In-Reply-To: <20211029003202.158161-2-oupton@google.com>
 References: <20211029003202.158161-1-oupton@google.com>
-        <20211029003202.158161-3-oupton@google.com>
+        <20211029003202.158161-2-oupton@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -51,119 +51,80 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Oliver,
-
-On Fri, 29 Oct 2021 01:32:01 +0100,
+On Fri, 29 Oct 2021 01:32:00 +0100,
 Oliver Upton <oupton@google.com> wrote:
 > 
-> KVM diverges from the architecture in the way it handles the OSLAR_EL1
-> register. While the architecture requires that the register be WO and
-> that the OSLK bit is 1 out of reset, KVM implements the register as
-> RAZ/WI.
+> An upcoming change to KVM will context switch the OS Lock status between
+> guest/host. Add OSLSR_EL1 to the cpu context and handle guest reads
+> using the stored value.
 > 
-> Align KVM with the architecture by permitting writes to OSLAR_EL1. Since
-> the register is WO, stash the OS Lock status bit in OSLSR_EL1 and
-> context switch the status between host/guest. Additionally, change the
-> reset value of the OSLK bit to 1.
-> 
-> Suggested-by: Marc Zyngier <maz@kernel.org>
 > Signed-off-by: Oliver Upton <oupton@google.com>
 > ---
->  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h |  5 +++++
->  arch/arm64/kvm/sys_regs.c                  | 22 +++++++++++++++++++---
->  2 files changed, 24 insertions(+), 3 deletions(-)
+>  arch/arm64/include/asm/kvm_host.h |  1 +
+>  arch/arm64/kvm/sys_regs.c         | 13 ++++++-------
+>  2 files changed, 7 insertions(+), 7 deletions(-)
 > 
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> index de7e14c862e6..a65dab34f85b 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-> @@ -65,6 +65,8 @@ static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
->  	ctxt_sys_reg(ctxt, SP_EL1)	= read_sysreg(sp_el1);
->  	ctxt_sys_reg(ctxt, ELR_EL1)	= read_sysreg_el1(SYS_ELR);
->  	ctxt_sys_reg(ctxt, SPSR_EL1)	= read_sysreg_el1(SYS_SPSR);
-> +
-> +	ctxt_sys_reg(ctxt, OSLSR_EL1)	= read_sysreg(oslsr_el1);
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index f8be56d5342b..c98f65c4a1f7 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -172,6 +172,7 @@ enum vcpu_sysreg {
+>  	MDSCR_EL1,	/* Monitor Debug System Control Register */
+>  	MDCCINT_EL1,	/* Monitor Debug Comms Channel Interrupt Enable Reg */
+>  	DISR_EL1,	/* Deferred Interrupt Status Register */
+> +	OSLSR_EL1,	/* OS Lock Status Register */
 
-Why do we need to save/restore this outside of the debug context? It
-seems to me that this is only needed if debug has been enabled by the
-guest (KVM_ARM64_DEBUG_DIRTY being set), as we will have trapped the
-OSLAR_EL1 access otherwise. I don't think we need to deal with this
-register outside of this context, as debug exceptions cannot happen
-otherwise (BRK excepted, of course).
+Please move it one line up, next to the rest of the debug stuff
+(DISR_EL1 is RAS and not debug).
 
->  }
->  
->  static inline void __sysreg_save_el2_return_state(struct kvm_cpu_context *ctxt)
-> @@ -149,6 +151,9 @@ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
->  	write_sysreg(ctxt_sys_reg(ctxt, SP_EL1),	sp_el1);
->  	write_sysreg_el1(ctxt_sys_reg(ctxt, ELR_EL1),	SYS_ELR);
->  	write_sysreg_el1(ctxt_sys_reg(ctxt, SPSR_EL1),	SYS_SPSR);
-> +
-> +	/* restore OSLSR_EL1 by writing the OSLK bit to OSLAR_EL1 */
-> +	write_sysreg((ctxt_sys_reg(ctxt, OSLSR_EL1) >> 1) & 1, oslar_el1);
-
-Please introduce some eye-pleasing bit definitions ("Here, there, and
-everywhere", to quote someone famous).
-
->  }
->  
->  static inline void __sysreg_restore_el2_return_state(struct kvm_cpu_context *ctxt)
+>
+>  	/* Performance Monitors Registers */
+>  	PMCR_EL0,	/* Control Register */
 > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 0eb03e7508fe..0840ae081290 100644
+> index 1d46e185f31e..0eb03e7508fe 100644
 > --- a/arch/arm64/kvm/sys_regs.c
 > +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -298,6 +298,22 @@ static bool trap_oslsr_el1(struct kvm_vcpu *vcpu,
->  	return true;
+> @@ -291,12 +291,11 @@ static bool trap_oslsr_el1(struct kvm_vcpu *vcpu,
+>  			   struct sys_reg_params *p,
+>  			   const struct sys_reg_desc *r)
+>  {
+> -	if (p->is_write) {
+> +	if (p->is_write)
+>  		return ignore_write(vcpu, p);
+
+This should be UNDEF (though the HW should catch that, really).
+
+> -	} else {
+> -		p->regval = (1 << 3);
+> -		return true;
+> -	}
+> +
+> +	p->regval = vcpu_read_sys_reg(vcpu, r->reg);
+> +	return true;
 >  }
 >  
-> +static bool trap_oslar_el1(struct kvm_vcpu *vcpu,
-> +			   struct sys_reg_params *p,
-> +			   const struct sys_reg_desc *r)
-> +{
-> +	u64 oslsr;
-> +
-> +	if (!p->is_write)
-> +		return read_zero(vcpu, p);
-
-This really should be an UNDEF (and it really should UNDEF in HW, but
-we are being, maybe pointlessly, cautious).
-
-> +
-> +	/* preserve all but the OSLK bit */
-> +	oslsr = vcpu_read_sys_reg(vcpu, OSLSR_EL1) & ~0x2ull;
-> +	vcpu_write_sys_reg(vcpu, OSLSR_EL1, oslsr | ((p->regval & 1) << 1));
-> +	return true;
-> +}
-> +
-> +
-
-Extra newline.
-
 >  static bool trap_dbgauthstatus_el1(struct kvm_vcpu *vcpu,
->  				   struct sys_reg_params *p,
->  				   const struct sys_reg_desc *r)
-> @@ -1439,8 +1455,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  	DBG_BCR_BVR_WCR_WVR_EL1(15),
+> @@ -1441,7 +1440,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
 >  
 >  	{ SYS_DESC(SYS_MDRAR_EL1), trap_raz_wi },
-> -	{ SYS_DESC(SYS_OSLAR_EL1), trap_raz_wi },
-> -	{ SYS_DESC(SYS_OSLSR_EL1), trap_oslsr_el1, reset_val, OSLSR_EL1, 0x00000008 },
-> +	{ SYS_DESC(SYS_OSLAR_EL1), trap_oslar_el1 },
-> +	{ SYS_DESC(SYS_OSLSR_EL1), trap_oslsr_el1, reset_val, OSLSR_EL1, 0x0000000A },
+>  	{ SYS_DESC(SYS_OSLAR_EL1), trap_raz_wi },
+> -	{ SYS_DESC(SYS_OSLSR_EL1), trap_oslsr_el1 },
+> +	{ SYS_DESC(SYS_OSLSR_EL1), trap_oslsr_el1, reset_val, OSLSR_EL1, 0x00000008 },
 >  	{ SYS_DESC(SYS_OSDLR_EL1), trap_raz_wi },
 >  	{ SYS_DESC(SYS_DBGPRCR_EL1), trap_raz_wi },
 >  	{ SYS_DESC(SYS_DBGCLAIMSET_EL1), trap_raz_wi },
-> @@ -1912,7 +1928,7 @@ static const struct sys_reg_desc cp14_regs[] = {
->  
->  	DBGBXVR(0),
->  	/* DBGOSLAR */
-> -	{ Op1( 0), CRn( 1), CRm( 0), Op2( 4), trap_raz_wi },
-> +	{ Op1( 0), CRn( 1), CRm( 0), Op2( 4), trap_oslar_el1 },
+> @@ -1916,7 +1915,7 @@ static const struct sys_reg_desc cp14_regs[] = {
+>  	{ Op1( 0), CRn( 1), CRm( 0), Op2( 4), trap_raz_wi },
 >  	DBGBXVR(1),
 >  	/* DBGOSLSR */
->  	{ Op1( 0), CRn( 1), CRm( 1), Op2( 4), trap_oslsr_el1, NULL, OSLSR_EL1 },
+> -	{ Op1( 0), CRn( 1), CRm( 1), Op2( 4), trap_oslsr_el1 },
+> +	{ Op1( 0), CRn( 1), CRm( 1), Op2( 4), trap_oslsr_el1, NULL, OSLSR_EL1 },
+>  	DBGBXVR(2),
+>  	DBGBXVR(3),
+>  	/* DBGOSDLR */
 
-Thanks,
+Please update tools/testing/selftests/kvm/aarch64/get-reg-list.c
+before Andrew catches you red-handed! :D
 
 	M.
 
