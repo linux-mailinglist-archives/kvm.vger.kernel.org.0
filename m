@@ -2,142 +2,318 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E5CEE43F414
-	for <lists+kvm@lfdr.de>; Fri, 29 Oct 2021 02:44:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id D439543F7EE
+	for <lists+kvm@lfdr.de>; Fri, 29 Oct 2021 09:42:44 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231400AbhJ2Aqy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Oct 2021 20:46:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58744 "EHLO
+        id S232229AbhJ2HpI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Oct 2021 03:45:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37378 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230211AbhJ2Aqx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Oct 2021 20:46:53 -0400
-Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3794C061570;
-        Thu, 28 Oct 2021 17:44:25 -0700 (PDT)
-Received: by mail-io1-xd32.google.com with SMTP id z144so9366948iof.0;
-        Thu, 28 Oct 2021 17:44:25 -0700 (PDT)
+        with ESMTP id S230247AbhJ2HpI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Oct 2021 03:45:08 -0400
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [IPv6:2404:9400:2:0:216:3eff:fee2:21ea])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 004C4C061570;
+        Fri, 29 Oct 2021 00:42:39 -0700 (PDT)
+Received: by gandalf.ozlabs.org (Postfix, from userid 1007)
+        id 4HgZCL0M3Nz4xZ1; Fri, 29 Oct 2021 18:42:38 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=zQP4kRzm3ZSndyVhtvxvd/t2NKU3Z81W6oJKDHuooD0=;
-        b=Mqu8zRtKOuus4eaIvw+S3uKGxoOqY0VjK92sWkJ5SYeeKEdEGXqdK2U/WeoOLAeI+w
-         1ekw3doiTOXxiQmqIcRoUgux9R/AamtSEEyp/oc7DVmOzxynHNasxpYqHlBbZKLCusos
-         zeZM3fpFS2N0G1w26R5F/6vvTCcbUYWLQ3yxXeIZdmCoCXuh49sUAVh9UimQpOTMeS+C
-         n8nHEGPmyChZqJO6uHoOhruMoTCxDpNlebk/+XbdtxJjQMOWYx+txuz14rbYA8bPu33G
-         c0hl//lhdQOeGGyU8a/nBPyKYaxfAsq27F9ORBEfvmCorVvluWB3wN7yZx02mIARfuuw
-         kZIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=zQP4kRzm3ZSndyVhtvxvd/t2NKU3Z81W6oJKDHuooD0=;
-        b=6XNlWPoM+2uPO5i4Fv35ea3feUu2tLu3gj5I8A6maIdseYX7CddPeMxm8EpyeykpA1
-         A1L7ru7kzsgxGiro9ctHQ5qWGPEQx8pciQeK8SYqrL/RqZtaGBxfOJj5ANsg9LjhG9Lw
-         ZesvRSZ8ai5mhPZILZ8B6QhdWnHAbWlMMvTjMmA6uilKh8E8NlEjWtr7e1+ylm8CwpIN
-         O9VplGva/4TT28Pe7jP3yUdoLzMZlKxFw5mxZVdJcC4kUW9/4IDK6kwPUFkw3qmxFkPz
-         l+qMqTDTGv4o8I3UF5PTUrY++ZNbIeT3NVKL0JTdMbYoLSUmDA2m8P63Vpb5Y2N4sZMF
-         RQqg==
-X-Gm-Message-State: AOAM532+HYV8LM6VskFjhj+1GIuymemDc+EMZWbh9Zyc01F60vCmWgMk
-        TDVPMwkRr6JMHb2RidSB/8LKtWuuZtDFXHLJRaOhNRrOdRs=
-X-Google-Smtp-Source: ABdhPJzJKilq3tDV5Olh9mImUtsSsiwF8o6rvu8pTkX4MbWwe2o0arz6VTezLeOsEfqHk6p3OWm4ylILeLP4hUTLPMU=
-X-Received: by 2002:a5d:80d6:: with SMTP id h22mr5663782ior.152.1635468265191;
- Thu, 28 Oct 2021 17:44:25 -0700 (PDT)
+        d=gibson.dropbear.id.au; s=201602; t=1635493358;
+        bh=2SGbEMmzDI08MpQNEg9P7FwyGtzoC87TixsMq3kMbWw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=DaCaXqHDfxUotFEcUMg+PamBC9g7iqAFC2RC5KQzTTsQoPBRE2UcPzL/UbxbSsFmK
+         cYTLsEBSxgyd/f0VeRJewC0Wv77RXvwP1qJcaOBxBASlRPwl3f2No6jzK/YiRgwwIZ
+         Qo/cRsUraJPqN8Q6FPwVAUzuZMo3+kU696PlmkLQ=
+Date:   Fri, 29 Oct 2021 11:15:31 +1100
+From:   David Gibson <david@gibson.dropbear.id.au>
+To:     Liu Yi L <yi.l.liu@intel.com>
+Cc:     alex.williamson@redhat.com, jgg@nvidia.com, hch@lst.de,
+        jasowang@redhat.com, joro@8bytes.org, jean-philippe@linaro.org,
+        kevin.tian@intel.com, parav@mellanox.com, lkml@metux.net,
+        pbonzini@redhat.com, lushenming@huawei.com, eric.auger@redhat.com,
+        corbet@lwn.net, ashok.raj@intel.com, yi.l.liu@linux.intel.com,
+        jun.j.tian@intel.com, hao.wu@intel.com, dave.jiang@intel.com,
+        jacob.jun.pan@linux.intel.com, kwankhede@nvidia.com,
+        robin.murphy@arm.com, kvm@vger.kernel.org,
+        iommu@lists.linux-foundation.org, dwmw2@infradead.org,
+        linux-kernel@vger.kernel.org, baolu.lu@linux.intel.com,
+        nicolinc@nvidia.com
+Subject: Re: [RFC 20/20] Doc: Add documentation for /dev/iommu
+Message-ID: <YXs9IwqYHvUUXePO@yekko>
+References: <20210919063848.1476776-1-yi.l.liu@intel.com>
+ <20210919063848.1476776-21-yi.l.liu@intel.com>
 MIME-Version: 1.0
-References: <20200320212833.3507-1-sean.j.christopherson@intel.com>
- <20200320212833.3507-24-sean.j.christopherson@intel.com> <CAJhGHyD=S6pVB+OxM7zF0_6LnMUCLqyTfMK4x9GZsdRHZmgN7Q@mail.gmail.com>
- <YXrAM9MNqgLTU6+m@google.com>
-In-Reply-To: <YXrAM9MNqgLTU6+m@google.com>
-From:   Lai Jiangshan <jiangshanlai+lkml@gmail.com>
-Date:   Fri, 29 Oct 2021 08:44:13 +0800
-Message-ID: <CAJhGHyBKVUsuKdvfaART6NWF7Axk5=eFQLidhGrM=mUO2cv2vw@mail.gmail.com>
-Subject: Re: [PATCH v3 23/37] KVM: nVMX: Add helper to handle TLB flushes on
- nested VM-Enter/VM-Exit
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        Ben Gardon <bgardon@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Liran Alon <liran.alon@oracle.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        John Haxby <john.haxby@oracle.com>,
-        Miaohe Lin <linmiaohe@huawei.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="ptBJ3+8XsUlnvRfc"
+Content-Disposition: inline
+In-Reply-To: <20210919063848.1476776-21-yi.l.liu@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 28, 2021 at 11:22 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> -me :-)
->
-> On Thu, Oct 28, 2021, Lai Jiangshan wrote:
-> > On Sat, Mar 21, 2020 at 5:29 AM Sean Christopherson
-> > <sean.j.christopherson@intel.com> wrote:
-> >
-> > > +       if (!nested_cpu_has_vpid(vmcs12) || !nested_has_guest_tlb_tag(vcpu)) {
-> > > +               kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
-> > > +       } else if (is_vmenter &&
-> > > +                  vmcs12->virtual_processor_id != vmx->nested.last_vpid) {
-> > > +               vmx->nested.last_vpid = vmcs12->virtual_processor_id;
-> > > +               vpid_sync_context(nested_get_vpid02(vcpu));
-> > > +       }
-> > > +}
-> >
-> > (I'm sorry to pick this old email to reply to, but the problem has
-> > nothing to do with this patch nor 5c614b3583e7 and it exists since
-> > nested vmx is introduced.)
-> >
-> > I think kvm_mmu_free_guest_mode_roots() should be called
-> > if (!enable_ept && vmcs12->virtual_processor_id != vmx->nested.last_vpid)
-> > just because prev_roots doesn't cache the vpid12.
-> > (prev_roots caches PCID, which is distinctive)
-> >
-> > The problem hardly exists if L1's hypervisor is also kvm, but if L1's
-> > hypervisor is different or is also kvm with some changes in the way how it
-> > manages VPID.
->
-> Indeed.  A more straightforward error case would be if L1 and L2 share CR3, and
-> vmcs02.VPID is toggled (or used for the first time) on the L1 => L2 VM-Enter.
->
-> The fix should simply be:
->
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index eedcebf58004..574823370e7a 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -1202,17 +1202,15 @@ static void nested_vmx_transition_tlb_flush(struct kvm_vcpu *vcpu,
->          *
->          * If a TLB flush isn't required due to any of the above, and vpid12 is
->          * changing then the new "virtual" VPID (vpid12) will reuse the same
-> -        * "real" VPID (vpid02), and so needs to be flushed.  There's no direct
-> -        * mapping between vpid02 and vpid12, vpid02 is per-vCPU and reused for
-> -        * all nested vCPUs.  Remember, a flush on VM-Enter does not invalidate
-> -        * guest-physical mappings, so there is no need to sync the nEPT MMU.
-> +        * "real" VPID (vpid02), and so needs to be flushed.  Like the !vpid02
-> +        * case above, this is a full TLB flush from the guest's perspective.
->          */
->         if (!nested_has_guest_tlb_tag(vcpu)) {
->                 kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
->         } else if (is_vmenter &&
->                    vmcs12->virtual_processor_id != vmx->nested.last_vpid) {
->                 vmx->nested.last_vpid = vmcs12->virtual_processor_id;
-> -               vpid_sync_context(nested_get_vpid02(vcpu));
-> +               kvm_make_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu);
 
-This change is neat.
+--ptBJ3+8XsUlnvRfc
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-But current KVM_REQ_TLB_FLUSH_GUEST flushes vpid01 only, and it doesn't flush
-vpid02.  vmx_flush_tlb_guest() might need to be changed to flush vpid02 too.
+On Sun, Sep 19, 2021 at 02:38:48PM +0800, Liu Yi L wrote:
+> Document the /dev/iommu framework for user.
+>=20
+> Open:
+> Do we want to document /dev/iommu in Documentation/userspace-api/iommu.rs=
+t?
+> Existing iommu.rst is for the vSVA interfaces, honestly, may need to rewr=
+ite
+> this doc entirely.
+>=20
+> Signed-off-by: Kevin Tian <kevin.tian@intel.com>
+> Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+> ---
+>  Documentation/userspace-api/index.rst   |   1 +
+>  Documentation/userspace-api/iommufd.rst | 183 ++++++++++++++++++++++++
+>  2 files changed, 184 insertions(+)
+>  create mode 100644 Documentation/userspace-api/iommufd.rst
+>=20
+> diff --git a/Documentation/userspace-api/index.rst b/Documentation/usersp=
+ace-api/index.rst
+> index 0b5eefed027e..54df5a278023 100644
+> --- a/Documentation/userspace-api/index.rst
+> +++ b/Documentation/userspace-api/index.rst
+> @@ -25,6 +25,7 @@ place where this information is gathered.
+>     ebpf/index
+>     ioctl/index
+>     iommu
+> +   iommufd
+>     media/index
+>     sysfs-platform_profile
+> =20
+> diff --git a/Documentation/userspace-api/iommufd.rst b/Documentation/user=
+space-api/iommufd.rst
+> new file mode 100644
+> index 000000000000..abffbb47dc02
+> --- /dev/null
+> +++ b/Documentation/userspace-api/iommufd.rst
+> @@ -0,0 +1,183 @@
+> +.. SPDX-License-Identifier: GPL-2.0
+> +.. iommu:
+> +
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +IOMMU Userspace API
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +Direct device access from userspace has been a crtical feature in
+> +high performance computing and virtualization usages. Linux now
+> +includes multiple device-passthrough frameworks (e.g. VFIO and vDPA)
+> +to manage secure device access from the userspace. One critical
+> +task of those frameworks is to put the assigned device in a secure,
+> +IOMMU-protected context so the device is prevented from doing harm
+> +to the rest of the system.
+> +
+> +Currently those frameworks implement their own logic for managing
+> +I/O page tables to isolate user-initiated DMAs. This doesn't scale
+> +to support many new IOMMU features, such as PASID-granular DMA
+> +remapping, nested translation, I/O page fault, IOMMU dirty bit, etc.
+> +
+> +The /dev/iommu framework provides an unified interface for managing
+> +I/O page tables for passthrough devices. Existing passthrough
+> +frameworks are expected to use this interface instead of continuing
+> +their ad-hoc implementations.
+> +
+> +IOMMUFDs, IOASIDs, Devices and Groups
+> +-------------------------------------
+> +
+> +The core concepts in /dev/iommu are IOMMUFDs and IOASIDs. IOMMUFD (by
+> +opening /dev/iommu) is the container holding multiple I/O address
+> +spaces for a user, while IOASID is the fd-local software handle
+> +representing an I/O address space and associated with a single I/O
+> +page table. User manages those address spaces through fd operations,
+> +e.g. by using vfio type1v2 mapping semantics to manage respective
+> +I/O page tables.
+> +
+> +IOASID is comparable to the conatiner concept in VFIO. The latter
+> +is also associated to a single I/O address space. A main difference
+> +between them is that multiple IOASIDs in the same IOMMUFD can be
+> +nested together (not supported yet) to allow centralized accounting
+> +of locked pages, while multiple containers are disconnected thus
+> +duplicated accounting is incurred. Typically one IOMMUFD is
+> +sufficient for all intended IOMMU usages for a user.
+> +
+> +An I/O address space takes effect in the IOMMU only after it is
+> +attached by a device. One I/O address space can be attached by
+> +multiple devices. One device can be only attached to a single I/O
+> +address space at this point (on par with current vfio behavior).
+> +
+> +Device must be bound to an iommufd before the attach operation can
+> +be conducted. The binding operation builds the connection between
+> +the devicefd (opened via device-passthrough framework) and IOMMUFD.
+> +IOMMU-protected security context is esbliashed when the binding
+> +operation is completed.
 
-And if so, this nested_vmx_transition_tlb_flush() can be simplified further
-since KVM_REQ_TLB_FLUSH_CURRENT(!enable_ept) can be replaced with
-KVM_REQ_TLB_FLUSH_GUEST.
+This can't be quite right.  You can't establish a safe security
+context until all devices in the groun are bound, but you can only
+bind them one at a time.
 
->         }
->  }
+>  The passthrough framework must block user
+> +access to the assigned device until bind() returns success.
+> +
+> +The entire /dev/iommu framework adopts a device-centric model w/o
+> +carrying any container/group legacy as current vfio does. However
+> +the group is the minimum granularity that must be used to ensure
+> +secure user access (refer to vfio.rst). This framework relies on
+> +the IOMMU core layer to map device-centric model into group-granular
+> +isolation.
+> +
+> +Managing I/O Address Spaces
+> +---------------------------
+> +
+> +When creating an I/O address space (by allocating IOASID), the user
+> +must specify the type of underlying I/O page table. Currently only
+> +one type (kernel-managed) is supported. In the future other types
+> +will be introduced, e.g. to support user-managed I/O page table or
+> +a shared I/O page table which is managed by another kernel sub-
+> +system (mm, ept, etc.). Kernel-managed I/O page table is currently
+> +managed via vfio type1v2 equivalent mapping semantics.
+> +
+> +The user also needs to specify the format of the I/O page table
+> +when allocating an IOASID.
+
+This almost seems redundant with the previous paragraph.  I think
+maybe it's making a distinction between "type" and "format", but I
+don't think it's very clear what the distinction is.
+
+> The format must be compatible to the
+> +attached devices (or more specifically to the IOMMU which serves
+> +the DMA from the attached devices). User can query the device IOMMU
+> +format via IOMMUFD once a device is successfully bound. Attaching a
+> +device to an IOASID with incompatible format is simply rejected.
+> +
+> +Currently no-snoop DMA is not supported yet. This implies that
+> +IOASID must be created in an enforce-snoop format and only devices
+> +which can be forced to snoop cache by IOMMU are allowed to be
+> +attached to IOASID. The user should check uAPI extension and get
+> +device info via IOMMUFD to handle such restriction.
+> +
+> +Usage Example
+> +-------------
+> +
+> +Assume user wants to access PCI device 0000:06:0d.0, which is
+> +exposed under the new /dev/vfio/devices directory by VFIO:
+> +
+> +	/* Open device-centric interface and /dev/iommu interface */
+> +	device_fd =3D open("/dev/vfio/devices/0000:06:0d.0", O_RDWR);
+> +	iommu_fd =3D open("/dev/iommu", O_RDWR);
+> +
+> +	/* Bind device to IOMMUFD */
+> +	bind_data =3D { .iommu_fd =3D iommu_fd, .dev_cookie =3D cookie };
+> +	ioctl(device_fd, VFIO_DEVICE_BIND_IOMMUFD, &bind_data);
+> +
+> +	/* Query per-device IOMMU capability/format */
+> +	info =3D { .dev_cookie =3D cookie, };
+> +	ioctl(iommu_fd, IOMMU_DEVICE_GET_INFO, &info);
+> +
+> +	if (!(info.flags & IOMMU_DEVICE_INFO_ENFORCE_SNOOP)) {
+> +		if (!ioctl(iommu_fd, IOMMU_CHECK_EXTENSION,
+> +				EXT_DMA_NO_SNOOP))
+> +			/* No support of no-snoop DMA */
+> +	}
+> +
+> +	if (!ioctl(iommu_fd, IOMMU_CHECK_EXTENSION, EXT_MAP_TYPE1V2))
+> +		/* No support of vfio type1v2 mapping semantics */
+> +
+> +	/* Decides IOASID alloc fields based on info */
+> +	alloc_data =3D { .type =3D IOMMU_IOASID_TYPE_KERNEL,
+> +		       .flags =3D IOMMU_IOASID_ENFORCE_SNOOP,
+> +		       .addr_width =3D info.addr_width, };
+> +
+> +	/* Allocate IOASID */
+> +	gpa_ioasid =3D ioctl(iommu_fd, IOMMU_IOASID_ALLOC, &alloc_data);
+> +
+> +	/* Attach device to an IOASID */
+> +	at_data =3D { .iommu_fd =3D iommu_fd; .ioasid =3D gpa_ioasid};
+> +	ioctl(device_fd, VFIO_DEVICE_ATTACH_IOASID, &at_data);
+> +
+> +	/* Setup GPA mapping [0 - 1GB] */
+> +	dma_map =3D {
+> +		.ioasid	=3D gpa_ioasid,
+> +		.data {
+> +			.flags  =3D R/W		/* permission */
+> +			.iova	=3D 0,		/* GPA */
+> +			.vaddr	=3D 0x40000000,	/* HVA */
+> +			.size	=3D 1GB,
+> +		},
+> +	};
+> +	ioctl(iommu_fd, IOMMU_MAP_DMA, &dma_map);
+> +
+> +	/* DMA */
+> +
+> +	/* Unmap GPA mapping [0 - 1GB] */
+> +	dma_unmap =3D {
+> +		.ioasid	=3D gpa_ioasid,
+> +		.data {
+> +			.iova	=3D 0,		/* GPA */
+> +			.size	=3D 1GB,
+> +		},
+> +	};
+> +	ioctl(iommu_fd, IOMMU_UNMAP_DMA, &dma_unmap);
+> +
+> +	/* Detach device from an IOASID */
+> +	dt_data =3D { .iommu_fd =3D iommu_fd; .ioasid =3D gpa_ioasid};
+> +	ioctl(device_fd, VFIO_DEVICE_DETACH_IOASID, &dt_data);
+> +
+> +	/* Free IOASID */
+> +	ioctl(iommu_fd, IOMMU_IOASID_FREE, gpa_ioasid);
+> +
+> +	close(device_fd);
+> +	close(iommu_fd);
+> +
+> +API for device-passthrough frameworks
+> +-------------------------------------
+> +
+> +iommufd binding and IOASID attach/detach are initiated via the device-
+> +passthrough framework uAPI.
+> +
+> +When a binding operation is requested by the user, the passthrough
+> +framework should call iommufd_bind_device(). When the device fd is
+> +closed by the user, iommufd_unbind_device() should be called
+> +automatically::
+> +
+> +	struct iommufd_device *
+> +	iommufd_bind_device(int fd, struct device *dev,
+> +			   u64 dev_cookie);
+> +	void iommufd_unbind_device(struct iommufd_device *idev);
+> +
+> +IOASID attach/detach operations are per iommufd_device which is
+> +returned by iommufd_bind_device():
+> +
+> +	int iommufd_device_attach_ioasid(struct iommufd_device *idev,
+> +					int ioasid);
+> +	void iommufd_device_detach_ioasid(struct iommufd_device *idev,
+> +					int ioasid);
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--ptBJ3+8XsUlnvRfc
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAmF7PSMACgkQbDjKyiDZ
+s5JX5g//VoYN5DuZHAMTNQKqRM/ijZcatJwkpIL6eQrgohmJImQlSHJ9KUBHej1z
+YXlaYqO9q55OZMeUeCMDzZh7u4j07VhaHW1O1qtcuLa0j8+A0vBZeMi2D/tl+tcF
+rhsNnftXqAGyk6OXUIVYZnRnE/ZAAfSGp6I4GMF4bwEbTnO3tSseHEQb3j9FWq8N
+y6ank6sPpf8BxYTH9CQU5iPWRb/SkYSlJeGfXe4/F/cTor49OEDGoJdidDsFtm7q
+XB89OKXHD8zn2ITw/XVawb2qi3boRTibChUCdU1Y2QyrAZQ9ssNIn6ZoZrOBDUCc
+JNyf5K3tmNn3cVYbvH2UO7yyUTxY9YfY8Gtue8tsZ6IaNfgKITyBhu6cEk2gD+Mr
+iUSqi5IBl4xV0D0l+8lSOLrSgq80/Irw3kbyaOHlqilVhuFASduGUnxHLlNcVxo6
+L+78q4Z5GLTc2B2DPAhjxDyWcDzTwqeTC5ouXDIpbBvz8iN+KqT9NAF3zuKN3jxW
+DFWnVMxUDzki9MHns04QXXtsJDVGFlVZWq/Wm1ar/cCFANnQaMutKUak1ahNP8bT
+Vo5buTPlx9UpRLRw98BYKjB472hjJUooChVEgAhPKaLKtvfFq0f0ab47WUBBWVRd
+ycB4qlHgHiY2Tk4uOHLLLpD1e5WNXFjga0kJzeZo4ph4R0LdJAk=
+=Qvdu
+-----END PGP SIGNATURE-----
+
+--ptBJ3+8XsUlnvRfc--
