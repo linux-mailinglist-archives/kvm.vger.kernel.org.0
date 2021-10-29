@@ -2,106 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BDF924401C5
-	for <lists+kvm@lfdr.de>; Fri, 29 Oct 2021 20:18:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 788C1440281
+	for <lists+kvm@lfdr.de>; Fri, 29 Oct 2021 20:51:02 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230070AbhJ2SU6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Oct 2021 14:20:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41108 "EHLO
+        id S231262AbhJ2Sx3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Oct 2021 14:53:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48686 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229489AbhJ2SU5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Oct 2021 14:20:57 -0400
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7258BC0613F5
-        for <kvm@vger.kernel.org>; Fri, 29 Oct 2021 11:18:28 -0700 (PDT)
-Received: by mail-lj1-x235.google.com with SMTP id s19so18144424ljj.11
-        for <kvm@vger.kernel.org>; Fri, 29 Oct 2021 11:18:28 -0700 (PDT)
+        with ESMTP id S230160AbhJ2Sx3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Oct 2021 14:53:29 -0400
+Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85D7CC061714
+        for <kvm@vger.kernel.org>; Fri, 29 Oct 2021 11:51:00 -0700 (PDT)
+Received: by mail-io1-xd30.google.com with SMTP id r194so13699344iod.7
+        for <kvm@vger.kernel.org>; Fri, 29 Oct 2021 11:51:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=6gzqVRL5S6+afpMyNODH0pBpVAT9PrZbeLsch+p0Irs=;
-        b=tGz+64nOHnWsxk51dfc06pYJyhw9jonhHrQdFBodgY5y5sesT8bA8ktgmSBugp+3Je
-         FzZDdezUG1/Jeq3xf5CiQrNyVymLY416TUqBoP548TlAKopBWSaAzkjP024cOrvd+OUL
-         CWV3ga0R0bj2W2/REDcE7KL+gJ+IJER0KwaRXFnO4MZS0lT5ozuJU+dT3b4k/n7vS+1h
-         AUF6HL5lxYlDmvqaPUePlgp9FtD51CuXXhHpyCANZwkPjrNhe0lyIEECqEhiuCrpcW7I
-         xcWGXGSIxic4UqkUeU5UDXcSDjXtq0rh0lQoq4hlpiDn4qaty2wTflNUkZTLli3josc+
-         zJGA==
+        d=gmail.com; s=20210112;
+        h=mime-version:reply-to:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=H4c4tjtJNiPWILWizA9VEJwL7Vfdx8BKyPY8kL9NZwE=;
+        b=bdx6xGP5u/MjgmVoxvz5NTTDD77NCCnZoDtkRcI3xC6gtVAaiILpSiAIQy/A8c9TdV
+         vvtGdYZRdSMn7UcHPGlyyrT2oy7y6Yx3ejjH9wHVJBEpwP3PffZ7Y1vFFaLRogZqasyC
+         BYuWK+B6avz1QWT7jMwsbnXR48B8VOPmCpPBoRsHRHLMUk0jDP2OQYlmQE/D+wrvSdN5
+         p64UlRWwgA8T5oYEb7NHV4TlI+YZBPXSc+6SdHVQcAtcJsTXUiu1wa4QP+fP7gsDTcM/
+         y0s3o03ewsbPzGRwt7itpYTa1w5SWmhD/vZ/9qnCuoEKPGb7e/mz2uXKn6dk+25k8LP+
+         6WXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=6gzqVRL5S6+afpMyNODH0pBpVAT9PrZbeLsch+p0Irs=;
-        b=bg+Q8eivWTatMMk68QAV3isxZbfNoveEPvwfOR7H6Siu033JqfsoCHpHlaTzvVTc2V
-         n9npN8E+c+/HXHauUTk+iYu85IaMo8UO9l3MCEa1/7bAo/0dGk9L3W+tQ22bt4l12Wr1
-         wUd/e8Io1XGYTwxz7GxSwCkt4/KmnovZMWjXVQBNYD7cUV5fjK+5+kLFLJUDQNCIbkCg
-         byJWL1ypQlmjSZMOVlV0qQbOSeEbdZhgnRKjaifoAJ50REzEwplAXBKXanjNRU4WdHe+
-         TVvo46muO8SkNlEfvZfKN4d+N2eAvY98AjbMlyuLprVWiaG5MHvS3h88UO54uXE2ygwv
-         6x9w==
-X-Gm-Message-State: AOAM5319d/dvTLgNd38K763GjIq0vey4ZAexb8Hfw5e6qesNSDwDQmtG
-        NmP0UGtQsf5lsLZjuFDE8q9+fVZP4UsnujSgRuUEKA==
-X-Google-Smtp-Source: ABdhPJwuuUqHsGAxudNHy1pXSqXpNJwQ0mQILNxJN/3XPiTCFRDAfELtLMvtP273AM4utb+UT0qen6DLY3ZL1rAG6JA=
-X-Received: by 2002:a05:651c:1051:: with SMTP id x17mr10679682ljm.337.1635531506374;
- Fri, 29 Oct 2021 11:18:26 -0700 (PDT)
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to:content-transfer-encoding;
+        bh=H4c4tjtJNiPWILWizA9VEJwL7Vfdx8BKyPY8kL9NZwE=;
+        b=nWKL4OX/jvhrIbzSe2lSSTuV6wpi4hL1qHOsy6BIeqpqtb8/0A5+CRwFvk7vjBbfjE
+         Flv4WPyTcVmkERlE6ehDPhj+hQtz4yxYuCjKiKmr93VVpJT0RknQyCjljzMRiq2bGsYG
+         9FKK3NaZW/1f4aW1cXJ+eZvofM44xRfTGEJqQQrYCaXfLtv0gBh1QvxittLsl1pkucaZ
+         DbvdtQfrmBhzhtLN5HMvqyYjptBFj5iQKocd58XOpDiG0lDMjOsXMLs0NDPqDzVH6Wqr
+         S4SGhXZx+Ut+fJc/KWi1w9Jfsu8pB8rsdCNjwkBcbVtHUgbVTVyhD+DGtpJS8GZCSGnR
+         +UVw==
+X-Gm-Message-State: AOAM532HNPldE5bPIEaoZB/Go5lrd1IlaI9LJcMGJ5BikigogTHtUlYo
+        2Hv1HwV0Agqrt+6R9j3NjnrGVuQB0lcSGHWxgdw=
+X-Google-Smtp-Source: ABdhPJyXZanA6GY0ngzKTB5Spv5SDrwX3qO27neU7lxzEGh5myeUQbZxrtAIQ0CdUl4CnqNZOwwcHVon333DEnBoPSM=
+X-Received: by 2002:a6b:7604:: with SMTP id g4mr9514802iom.162.1635533459696;
+ Fri, 29 Oct 2021 11:50:59 -0700 (PDT)
 MIME-Version: 1.0
-References: <20211029003202.158161-1-oupton@google.com> <20211029003202.158161-4-oupton@google.com>
- <87k0hw9iez.wl-maz@kernel.org>
-In-Reply-To: <87k0hw9iez.wl-maz@kernel.org>
-From:   Oliver Upton <oupton@google.com>
-Date:   Fri, 29 Oct 2021 11:18:13 -0700
-Message-ID: <CAOQ_QshjMXMFK2uHVDxYbFkVJApGxhT4M4NbMNY+qX3QvPe5_A@mail.gmail.com>
-Subject: Re: [PATCH 3/3] KVM: arm64: Raise KVM's reported debug architecture
- to v8.2
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <Alexandru.Elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Andrew Jones <drjones@redhat.com>,
-        Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Reiji Watanabe <reijiw@google.com>
+Received: by 2002:a05:6602:2b06:0:0:0:0 with HTTP; Fri, 29 Oct 2021 11:50:59
+ -0700 (PDT)
+Reply-To: christharmonyloanfund@gmail.com
+From:   Asinguza Jonan <asinguza1993@gmail.com>
+Date:   Fri, 29 Oct 2021 11:50:59 -0700
+Message-ID: <CALo=3D8jp-PrJ-PB4otXJ5BEf_dWeMsT=LPHvc8ZXCLp-SnTDA@mail.gmail.com>
+Subject: FINANZIELLE HILFE
+To:     undisclosed-recipients:;
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hey Marc,
+--=20
+BEN=C3=96TIGEN SIE EINEN PERS=C3=96NLICHEN DARLEHEN ODER EINEN GESCH=C3=84F=
+TSDARLEHEN
+VON 5000 $ bis 90.000.000,00 $? WENN JA, KONTAKTIEREN SIE UNS PER
+E-MAIL: christharmonyloanfund@gmail.com MIT DEN UNTEN STEHENDEN INFOS.
 
-On Fri, Oct 29, 2021 at 4:31 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> On Fri, 29 Oct 2021 01:32:02 +0100,
-> Oliver Upton <oupton@google.com> wrote:
-[...]
-> >       case SYS_ID_AA64DFR0_EL1:
-> > -             /* Limit debug to ARMv8.0 */
-> > +             /* Limit debug to ARMv8.2 */
-> >               val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER);
-> > -             val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER), 6);
-> > +             val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER), 8);
-> > +
-> > +             /* Hide DoubleLock from guests */
-> > +             val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_DOUBLELOCK);
-> > +             val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_DOUBLELOCK), 0CF);
-> > +
->
-> One issue with that is that this will break migration from an older
-> kernel (DFR0 will be different between source and destination).
->
-> You'll need a set_user handler and deal with it in a similar way to
-> CSV2/CSV3.
-
-Yeah, definitely so. In that case, unless we're strongly motivated to
-expose these changes soon, I'll just punt the ID register changes
-until Reiji's series [1] lands, as anything I add for a writable DFR0
-will invariably be scrapped in favor of his work.
-
-I'll post v2 of this series folding in your feedback (thx for quick
-review, btw), less this patch.
-
-[1] https://patchwork.kernel.org/project/kvm/cover/20211012043535.500493-1-reijiw@google.com/
-
---
-Thanks,
-Oliver
+Ihren vollst=C3=A4ndigen Namen: ...
+Ben=C3=B6tigte Menge:...
+Dauer: ..
+Telefon: ....
+Land: ..
+Kontakt =C3=BCber: christharmonyloanfund@gmail.com
