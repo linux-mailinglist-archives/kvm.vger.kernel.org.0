@@ -2,144 +2,249 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DAEDC43FC93
-	for <lists+kvm@lfdr.de>; Fri, 29 Oct 2021 14:45:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E7B6F43FCC5
+	for <lists+kvm@lfdr.de>; Fri, 29 Oct 2021 14:56:14 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231793AbhJ2Mra (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Oct 2021 08:47:30 -0400
-Received: from mail-bn7nam10on2082.outbound.protection.outlook.com ([40.107.92.82]:36555
-        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S231792AbhJ2MrZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Oct 2021 08:47:25 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fcm65KIwwV4AU+9hCsFW5aUcoNj4AE5v3pKQ+qNNThCmYY2Put0t93zDcjZSuFG0rN1D235OsqwdCnGpTwXyX2qfd5cZ58deMH1hsZquvRGiGpo2BfVnu3kesH1ccv59Bq0nVVD1i/VpS8+4Jm6psX70Ek+0vCxy1A6c6i/nE5Dp0IY1ZSBliimE34/pr5TL0BTVUJqa7hSJSTFK9jTd/6gsBfiW3rlfKZBDJVYKYl/MDi8P1mXXjo/sj9O/HFzMpT3wN8W8ifGhMML66QI4h70J5e/jyiQdJnRrqZJBJMTkd9TYpQeefYSn8JVuL430hwDnfGVJbW0u2JWe0JrVig==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Qnk0xEp4YArqZwFVKdS34i4OLTlfweZv3UstK1nUZTg=;
- b=GUWNSC4mSztJMl36MuaVI/w+6LKokVgZ+pSeh+qtjywd4SnT6tbvBbQp7Qp14p/HKF2NVla6k2khwNlwRKBwE3U7AwZURLUn8UIBRQHLJm7ktOLzJex3zQ9NWjaZyjPexLcDC3XIUji5tSQWjkwooqD2yWl4MKcuM6oyhmIhQJHQ0vHMyO5+OkwnZJiB1XeA+b5z9ZHAUuZzoLPDYEDo0De+ogSRkvgXDwK9gibUF3PVegBRqKvDez559/JfhMsGP/WUFLkp6pDKv078PEgApJjHQycDkG1Rl3C6ouK0Q1SI1gbMDnSQV7NjmzXEW+EUTxIrv5hfe5u1l8btF3BV5w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Qnk0xEp4YArqZwFVKdS34i4OLTlfweZv3UstK1nUZTg=;
- b=imVIvT/Xlykj6rf23+opzVIDQhpM+RbDAMtqpkEEXJD24KFcUEHqGJ+r0+YJ0aCfHACXv90lFciLee6IJcuBB3SWJpCFa9yWlWbeejPALbn8v5qjAJT3b9ONb2IFey1pJLsK2oOxcCWch+Moy04Q4aQiS85Uy8OBDJa1wQ8q9f5QtBH7H6ZayxdEKa3smDekM8r9xuTZ7KtJWAFnluXDvMU3cQWeidIy50pyR5LdBFjqEUmMKXd+YXjmePafi7T7nLqUPOv6mR9TKrc5lOebrvDPVs09fkJzBgt9tkKPHHS69Ia/mqOWzAYIuWQURm5/59bq1cBg4WW31iNmtaPR7A==
-Authentication-Results: gibson.dropbear.id.au; dkim=none (message not signed)
- header.d=none;gibson.dropbear.id.au; dmarc=none action=none
- header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5288.namprd12.prod.outlook.com (2603:10b6:208:314::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4649.13; Fri, 29 Oct
- 2021 12:44:54 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::e8af:232:915e:2f95%8]) with mapi id 15.20.4649.015; Fri, 29 Oct 2021
- 12:44:54 +0000
-Date:   Fri, 29 Oct 2021 09:44:52 -0300
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     David Gibson <david@gibson.dropbear.id.au>
-Cc:     Liu Yi L <yi.l.liu@intel.com>, alex.williamson@redhat.com,
-        hch@lst.de, jasowang@redhat.com, joro@8bytes.org,
-        jean-philippe@linaro.org, kevin.tian@intel.com, parav@mellanox.com,
-        lkml@metux.net, pbonzini@redhat.com, lushenming@huawei.com,
-        eric.auger@redhat.com, corbet@lwn.net, ashok.raj@intel.com,
-        yi.l.liu@linux.intel.com, jun.j.tian@intel.com, hao.wu@intel.com,
-        dave.jiang@intel.com, jacob.jun.pan@linux.intel.com,
-        kwankhede@nvidia.com, robin.murphy@arm.com, kvm@vger.kernel.org,
-        iommu@lists.linux-foundation.org, dwmw2@infradead.org,
-        linux-kernel@vger.kernel.org, baolu.lu@linux.intel.com,
-        nicolinc@nvidia.com
-Subject: Re: [RFC 20/20] Doc: Add documentation for /dev/iommu
-Message-ID: <20211029124452.GW2744544@nvidia.com>
-References: <20210919063848.1476776-1-yi.l.liu@intel.com>
- <20210919063848.1476776-21-yi.l.liu@intel.com>
- <YXs9IwqYHvUUXePO@yekko>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YXs9IwqYHvUUXePO@yekko>
-X-ClientProxiedBy: YTOPR0101CA0046.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b00:14::23) To BL0PR12MB5506.namprd12.prod.outlook.com
- (2603:10b6:208:1cb::22)
+        id S231596AbhJ2M6l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Oct 2021 08:58:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:22318 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230273AbhJ2M6i (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 29 Oct 2021 08:58:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635512169;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=d0L5NlzkxXwUpiuMJl7fVIMjjxlsJowOl0CPT1kdun0=;
+        b=ZQHPPyL/bqC3JPlm8Pp8CKmTLa0syt/xHZhSzoRAUYXoo9JVqogpzw24Vnmbt24D9rlnZ5
+        s1Re6xCGdg2Z0p5Fe+0Nwh3zb1I345g9kS9aTJnn1spxiabSKEIuLyeFZtsNM3bvq6t39S
+        f5RrDjn0w+yPGkvzmBPxL2Yu6DyOI34=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-191-K5EoP40jNT-kFtS9Ei-55A-1; Fri, 29 Oct 2021 08:56:08 -0400
+X-MC-Unique: K5EoP40jNT-kFtS9Ei-55A-1
+Received: by mail-ed1-f70.google.com with SMTP id g6-20020a056402424600b003dd2b85563bso9120171edb.7
+        for <kvm@vger.kernel.org>; Fri, 29 Oct 2021 05:56:07 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=d0L5NlzkxXwUpiuMJl7fVIMjjxlsJowOl0CPT1kdun0=;
+        b=LrhaQyOs2EpB7KwmHoSGiGKDrjmTHsDyRx0qY93oCNaXd1eJo3m1XYHxIVCm07IVic
+         naqv9bWDOVXlfhJYUhCtJN+NfA4QAhRMsu+UZix9qImBbVuuiP0da/8TSVNDI2s67Fbl
+         gqwYT7v9DTZRoA804B3aeFYjf29jQWEWEBtBVIvgNC0rWYNm2YK9tPftfHf1CuxQD6dC
+         +l9KRarOLwUPvE5nKxZaR3I1KpNd243la2tb4J7SLEteftYx8T6yYCFX3bxpjyF4jH4Q
+         3UknM6QBxmT8SObwPB0T05mGVkpYK7YoJ979diFGiT2xFTMfh5aln24Li9Vs6LYLnzpt
+         n44w==
+X-Gm-Message-State: AOAM5330jwMb4eD8azYqWGyumHDwdhuteCXjiPPFGfl65zTnOyQySP3x
+        RmQQAqC5NmS7hmBaElC/q1lVw+kUeMDHl1rFuo15WqPZXFxENP57IcsH7klngzw8CvhcqDnwJs6
+        nfzlWtCFBZmpQ
+X-Received: by 2002:a17:907:3e19:: with SMTP id hp25mr6777842ejc.72.1635512166886;
+        Fri, 29 Oct 2021 05:56:06 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz7OP0JFnb/I+DV9ovvS4NRvD8P3XfBnwRLB5GvR+8tmzIzPlvDUB4lPXF2A/ATmGs1ilsBpA==
+X-Received: by 2002:a17:907:3e19:: with SMTP id hp25mr6777798ejc.72.1635512166571;
+        Fri, 29 Oct 2021 05:56:06 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id m3sm3548604edc.36.2021.10.29.05.56.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Oct 2021 05:56:06 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        llvm@lists.linux.dev, linux-kernel@vger.kernel.org,
+        Ajay Garg <ajaygargnsit@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>
+Subject: Re: [PATCH] KVM: x86: Shove vp_bitmap handling down into
+ sparse_set_to_vcpu_mask()
+In-Reply-To: <20211028213408.2883933-1-seanjc@google.com>
+References: <20211028213408.2883933-1-seanjc@google.com>
+Date:   Fri, 29 Oct 2021 14:56:05 +0200
+Message-ID: <87pmrokn16.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Received: from mlx.ziepe.ca (206.223.160.26) by YTOPR0101CA0046.CANPRD01.PROD.OUTLOOK.COM (2603:10b6:b00:14::23) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4608.18 via Frontend Transport; Fri, 29 Oct 2021 12:44:54 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mgRFc-003S1H-MB; Fri, 29 Oct 2021 09:44:52 -0300
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 4d41d750-81fb-4edb-b981-08d99ad9e80e
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5288:
-X-Microsoft-Antispam-PRVS: <BL1PR12MB52888B4382B277F09F6561CCC2879@BL1PR12MB5288.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5797;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: g4pmQiYIhYh3mqVfmnW57QL549msHjh3hfvBKA/HICz1Jqa41ytjRtbz3qE9yiQFFvgaO8RKYb3nYje77WZUBXWlp49ZfLxIy+SoqAr61okEg9Bho7lF7zOzDIGvMKyO1B0rAMNnTSFxujgnlzWm9i4u35WRN7BoNypX6nYtUZmhE2K9lw4BGVND+oBMfjLdWNnLvZwUSVVu7fMeW6jOAvHjqhSvbKfhzDuBJBNOz7wgFYEyyuTLJuaX/PqmCHkDoL+T5szxkGDWm6g5QHKZSTfZ3/kl2b297YDb7/i9zJSKLSF4vFGo3cFWAd9gjJnggedbmEAzYnWcqgoJXz8UTjkBVahQyF0uyFelPN9qgWHZZB+g2jUkLCSlEj87n7IAE4MwY+a3Xo9iiaMXXwqNh6HXnj9PxI5jVC+tei9oZvWcRyIiMV8BfdxEZrMj89IakzE37T+JwJsmBc7Le9UPOZQm2f7oLbwnnz2ijHz7qP3bZNm0d3hjZ5rYxOAW37m55funyOT+OG5ugjvA9LZG2C/tPhzI99lZhNLzWJvCXSJNafNmuS8wHJoSJSN2Z4m7xU9wnI//be3bjFfE6u/8he/c61GW0+iyBO+gAsrS8soaDWz9ary3My/DnLE/7arg/GX5MTK26s+d+gMOxMgw5w==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(1076003)(5660300002)(8936002)(316002)(4326008)(86362001)(33656002)(26005)(8676002)(66946007)(4744005)(36756003)(9746002)(9786002)(186003)(66476007)(38100700002)(107886003)(83380400001)(426003)(7416002)(508600001)(6916009)(2616005)(66556008)(2906002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?cx9bd1RUVR6B6gzOX3YC0H6trKkQeIhIOPZMGy22qOT2Z7LOmCTi4P75Hqg5?=
- =?us-ascii?Q?GN9ftXMoBd6w06PQkD4TvBqpT0uYe7EOnpoqfEbcydMGY8JC2jQ9SxBO/CpZ?=
- =?us-ascii?Q?AbdYBGgJXtKbeDucV1SqJESeN82wfMIUe+xp0nrQ2fzCx/r89pGUCFSsKAdd?=
- =?us-ascii?Q?uFei0GgfLlMik9RnzanVUs/qmoK0PXOxA1lSEectiJx3+7EiOJFhrY9EI5QJ?=
- =?us-ascii?Q?Ao6tavHOopYbf78ew3EN77wLLe+TWZgrESDJoWizJ88e2WrZFabZvaIZx3SO?=
- =?us-ascii?Q?JDRsdCZhsId9EenhQbsEEouzA7+nH8NyGl0RN8vlxY/hR6q6Sc1VMurS3J+A?=
- =?us-ascii?Q?UZNmBlVU7uXYe65agJgGxFzd5KUtdHq3UJzK+AE5IiDTMBjiynegarzSrAo1?=
- =?us-ascii?Q?/kRp+jWCq7BtVeWvCV0OIokfGfCBl1yvklm0aWLvACxOqnbVsQjwWrlM50y6?=
- =?us-ascii?Q?gR9Yzvr19b6YknQ8DVztsUAyvFm4USqSMAfB1eqc9ldbPJoU8s7EIA0mjR4+?=
- =?us-ascii?Q?OE63jwQFBxQnmTfuAYNqhJve5YC9m1hhuXfreW+0sVZFLrXdunLsbF4cZF4x?=
- =?us-ascii?Q?HUO9yAvMXywztKXvEMBbeJA9+z8RHzVyVf+CNE/RKyRuDnCOXDWalnVhoW0G?=
- =?us-ascii?Q?Yz6b0SAkTF3LGQ5/HJQj3ZIwpDkLmiFowzAbqkU9xYTleojhurHdj0QqV/5I?=
- =?us-ascii?Q?OR1u10jeQWi8ziHGBfYz85T7Q14/7XY4opxaNbEoU0saumruluGd4TxsqriM?=
- =?us-ascii?Q?xVS3k9Bxm9GnnxhIeGXIb2ThR2L3rhoRHAySRTGlYN5Wm0sIlJxhQPirWkJb?=
- =?us-ascii?Q?Y2r/RdOwpUiXsFtjuX7JH+oZcN4G1wBdoEQ4skHBezZz46RB82BUtL7CHnGX?=
- =?us-ascii?Q?ygD2Bx661QS7lfvYZIC80Jjhe+u5B7QTacfqEWFieF4AkMxkNhHBGVw68WOL?=
- =?us-ascii?Q?rEnX9Htc9Lx89hxiEhhsc5wt6w92hMM0Xnj146+GuCwobG43CWP0MAG7cbNb?=
- =?us-ascii?Q?l/XTO74nhQrMEvyTa3/s3DUqIwBCetHRuVRbpXiT1oj6g62CJt+8j/6y3d1Z?=
- =?us-ascii?Q?Kx4AITNl4wITVAkdXnVv8Fx5FFl1QU3vMGf0kkujoWKTkOzok8ZRlm3IVz3z?=
- =?us-ascii?Q?aPjVBe91n2hwall1Krn23eJUtR9HWIjMiYxrI1FyGgcPc3SXvRWCZivlhIAy?=
- =?us-ascii?Q?7XvEKsUxP+OWkuKy6ddb2mChg1lNCbuchw7JWNYupBbmpmwKJz+Q1JUIGWOF?=
- =?us-ascii?Q?/4e4L0wDyszFxuQcu5mEFYIAxnCHI4ZFnF5kvrE6kuCsbpdcxZSxVj0tkmYC?=
- =?us-ascii?Q?XK1CU02vZ0ZA3K1fOG5E06/BkPRJiMgIVCCpEmYyT5lBfpiycuAlYerTwBPC?=
- =?us-ascii?Q?hV3pheicupg2web1hL3km9E6TLH1+dgex7fienvijSakBlY7o9LfId/eeGx7?=
- =?us-ascii?Q?LYW9N93Pz3m12V3iHawWzGEVotwsYtm/mzfSiwZF1hv8v6oaJpR4DtWm74HV?=
- =?us-ascii?Q?AkKZosk9jadiEIfMkEo2vbJkpzYSdkl8YIlWiyEd6csKpYUx5fYy1bDPs1eM?=
- =?us-ascii?Q?DZxO5ctAXJpqk+Bswi8=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4d41d750-81fb-4edb-b981-08d99ad9e80e
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Oct 2021 12:44:54.3855
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: pj8naDd3dda/DY+F+z+qUZ4Jiv8bmq6BG9TYA8/Zv/pe5Q4Pyz/UP4PVTHL7AIrv
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5288
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 29, 2021 at 11:15:31AM +1100, David Gibson wrote:
+Sean Christopherson <seanjc@google.com> writes:
 
-> > +Device must be bound to an iommufd before the attach operation can
-> > +be conducted. The binding operation builds the connection between
-> > +the devicefd (opened via device-passthrough framework) and IOMMUFD.
-> > +IOMMU-protected security context is esbliashed when the binding
-> > +operation is completed.
-> 
-> This can't be quite right.  You can't establish a safe security
-> context until all devices in the groun are bound, but you can only
-> bind them one at a time.
+> Move the vp_bitmap "allocation" that's need to handle mismatched vp_index
+> values down into sparse_set_to_vcpu_mask() and drop __always_inline from
+> said helper.  The vp_bitmap mess is a detail that's specific to the sparse
+> translation and does not need to be exposed to the caller.
+>
+> The underlying motivation is to fudge around a compilation warning/error
+> when CONFIG_KASAN_STACK=y, which is selected (and can't be unselected) by
+> CONFIG_KASAN=y when compiling with gcc (clang/LLVM is a stack hog in some
+> cases so it's opt-in for clang).  KASAN_STACK adds a redzone around every
+> stack variable, which pushes the Hyper-V functions over the default limit
+> of 1024.  With CONFIG_KVM_WERROR=y, this breaks the build.  Shuffling which
+> function is charged with vp_bitmap gets all functions below the default
+> limit.
+>
+> Regarding the __always_inline, prior to commit f21dd494506a ("KVM: x86:
+> hyperv: optimize sparse VP set processing") the helper, then named
+> hv_vcpu_in_sparse_set(), was a tiny bit of code that effectively boiled
+> down to a handful of bit ops.  The __always_inline was understandable, if
+> not justifiable.  Since the aforementioned change, sparse_set_to_vcpu_mask()
+> is a chunky 350-450+ bytes of code without KASAN=y, and balloons to 1100+
+> with KASAN=y.  In other words, it has no business being forcefully inlined.
+>
+> Reported-by: Ajay Garg <ajaygargnsit@gmail.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>
+> Vitaly (and anyone with extensive KVM + Hyper-V knowledge), it would be
+> really helpful to get better coverage in kvm-unit-tests.
 
-When any device is bound the entire group is implicitly adopted to
-this iommufd and the whole group enters a safe-for-userspace state.
+I can't agree more. This *is* in my backlog but unfortunately I can't
+give any forcast on when I'll get to it :-(
 
-It is symmetrical with the kernel side which is also device focused,
-when any struct device is bound to a kernel driver the entire group is
-implicitly adopted to kernel mode.
+>  There's a smoke
+> test for this in selftests, but it's not really all that interesting.  It
+> took me over an hour and a half just to get a Linux guest to hit the
+> relevant flows.  Most of that was due to QEMU 5.1 bugs (doesn't advertise
+> HYPERCALL MSR by default)
 
-Lu should send a patch series soon that harmonize how this works, it
-is a very nice cleanup.
+This should be fixed already, right?
 
-Jason
+>  and Linux guest stupidity (silently disables
+> itself if said MSR isn't available), but it was really annoying to have to
+> go digging through QEMU to figure out how to even enable features that are
+> extensive/critical enough to warrant their own tests.
+>
+> /wave to the clang folks for the pattern patch on the changelog ;-)
+>
+>  arch/x86/kvm/hyperv.c | 55 ++++++++++++++++++++++---------------------
+>  1 file changed, 28 insertions(+), 27 deletions(-)
+>
+> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+> index 4f15c0165c05..80018cfab5c7 100644
+> --- a/arch/x86/kvm/hyperv.c
+> +++ b/arch/x86/kvm/hyperv.c
+> @@ -1710,31 +1710,36 @@ int kvm_hv_get_msr_common(struct kvm_vcpu *vcpu, u32 msr, u64 *pdata, bool host)
+>  		return kvm_hv_get_msr(vcpu, msr, pdata, host);
+>  }
+>  
+> -static __always_inline unsigned long *sparse_set_to_vcpu_mask(
+> -	struct kvm *kvm, u64 *sparse_banks, u64 valid_bank_mask,
+> -	u64 *vp_bitmap, unsigned long *vcpu_bitmap)
+> +static void sparse_set_to_vcpu_mask(struct kvm *kvm, u64 *sparse_banks,
+> +				    u64 valid_bank_mask, unsigned long *vcpu_mask)
+>  {
+>  	struct kvm_hv *hv = to_kvm_hv(kvm);
+> +	bool has_mismatch = atomic_read(&hv->num_mismatched_vp_indexes);
+> +	u64 vp_bitmap[KVM_HV_MAX_SPARSE_VCPU_SET_BITS];
+>  	struct kvm_vcpu *vcpu;
+>  	int i, bank, sbank = 0;
+> +	u64 *bitmap;
+>  
+> -	memset(vp_bitmap, 0,
+> -	       KVM_HV_MAX_SPARSE_VCPU_SET_BITS * sizeof(*vp_bitmap));
+> +	BUILD_BUG_ON(sizeof(vp_bitmap) >
+> +		     sizeof(*vcpu_mask) * BITS_TO_LONGS(KVM_MAX_VCPUS));
+> +
+> +	/* If vp_index == vcpu_idx for all vCPUs, fill vcpu_mask directly. */
+> +	if (likely(!has_mismatch))
+> +		bitmap = (u64 *)vcpu_mask;
+> +
+> +	memset(bitmap, 0, sizeof(vp_bitmap));
+
+... but in the unlikely case has_mismatch == true 'bitmap' is still
+uninitialized here, right? How doesn't it crash?
+
+>  	for_each_set_bit(bank, (unsigned long *)&valid_bank_mask,
+>  			 KVM_HV_MAX_SPARSE_VCPU_SET_BITS)
+> -		vp_bitmap[bank] = sparse_banks[sbank++];
+> +		bitmap[bank] = sparse_banks[sbank++];
+>  
+> -	if (likely(!atomic_read(&hv->num_mismatched_vp_indexes))) {
+> -		/* for all vcpus vp_index == vcpu_idx */
+> -		return (unsigned long *)vp_bitmap;
+> -	}
+> +	if (likely(!has_mismatch))
+> +		return;
+>  
+> -	bitmap_zero(vcpu_bitmap, KVM_MAX_VCPUS);
+> +	bitmap_zero(vcpu_mask, KVM_MAX_VCPUS);
+>  	kvm_for_each_vcpu(i, vcpu, kvm) {
+>  		if (test_bit(kvm_hv_get_vpindex(vcpu), (unsigned long *)vp_bitmap))
+
+'vp_bitmap' also doesn't seem to be assigned to anything, I'm really
+confused :-(
+
+Didn't you accidentally mix up 'vp_bitmap' and 'bitmap'?
+
+> -			__set_bit(i, vcpu_bitmap);
+> +			__set_bit(i, vcpu_mask);
+>  	}
+> -	return vcpu_bitmap;
+>  }
+>  
+>  struct kvm_hv_hcall {
+> @@ -1756,9 +1761,7 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc, bool
+>  	struct kvm *kvm = vcpu->kvm;
+>  	struct hv_tlb_flush_ex flush_ex;
+>  	struct hv_tlb_flush flush;
+> -	u64 vp_bitmap[KVM_HV_MAX_SPARSE_VCPU_SET_BITS];
+> -	DECLARE_BITMAP(vcpu_bitmap, KVM_MAX_VCPUS);
+> -	unsigned long *vcpu_mask;
+> +	DECLARE_BITMAP(vcpu_mask, KVM_MAX_VCPUS);
+>  	u64 valid_bank_mask;
+>  	u64 sparse_banks[64];
+>  	int sparse_banks_len;
+> @@ -1842,11 +1845,9 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc, bool
+>  	if (all_cpus) {
+>  		kvm_make_all_cpus_request(kvm, KVM_REQ_TLB_FLUSH_GUEST);
+>  	} else {
+> -		vcpu_mask = sparse_set_to_vcpu_mask(kvm, sparse_banks, valid_bank_mask,
+> -						    vp_bitmap, vcpu_bitmap);
+> +		sparse_set_to_vcpu_mask(kvm, sparse_banks, valid_bank_mask, vcpu_mask);
+>  
+> -		kvm_make_vcpus_request_mask(kvm, KVM_REQ_TLB_FLUSH_GUEST,
+> -					    vcpu_mask);
+> +		kvm_make_vcpus_request_mask(kvm, KVM_REQ_TLB_FLUSH_GUEST, vcpu_mask);
+
+We're not bound by 80-char limit anymore, are we? :-)
+
+>  	}
+>  
+>  ret_success:
+> @@ -1879,9 +1880,7 @@ static u64 kvm_hv_send_ipi(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc, bool
+>  	struct kvm *kvm = vcpu->kvm;
+>  	struct hv_send_ipi_ex send_ipi_ex;
+>  	struct hv_send_ipi send_ipi;
+> -	u64 vp_bitmap[KVM_HV_MAX_SPARSE_VCPU_SET_BITS];
+> -	DECLARE_BITMAP(vcpu_bitmap, KVM_MAX_VCPUS);
+> -	unsigned long *vcpu_mask;
+> +	DECLARE_BITMAP(vcpu_mask, KVM_MAX_VCPUS);
+>  	unsigned long valid_bank_mask;
+>  	u64 sparse_banks[64];
+>  	int sparse_banks_len;
+> @@ -1937,11 +1936,13 @@ static u64 kvm_hv_send_ipi(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc, bool
+>  	if ((vector < HV_IPI_LOW_VECTOR) || (vector > HV_IPI_HIGH_VECTOR))
+>  		return HV_STATUS_INVALID_HYPERCALL_INPUT;
+>  
+> -	vcpu_mask = all_cpus ? NULL :
+> -		sparse_set_to_vcpu_mask(kvm, sparse_banks, valid_bank_mask,
+> -					vp_bitmap, vcpu_bitmap);
+> +	if (all_cpus) {
+> +		kvm_send_ipi_to_many(kvm, vector, NULL);
+> +	} else {
+> +		sparse_set_to_vcpu_mask(kvm, sparse_banks, valid_bank_mask, vcpu_mask);
+>  
+> -	kvm_send_ipi_to_many(kvm, vector, vcpu_mask);
+> +		kvm_send_ipi_to_many(kvm, vector, vcpu_mask);
+> +	}
+>  
+>  ret_success:
+>  	return HV_STATUS_SUCCESS;
+
+-- 
+Vitaly
+
