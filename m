@@ -2,110 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D75D4402DB
-	for <lists+kvm@lfdr.de>; Fri, 29 Oct 2021 21:06:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E22244402F1
+	for <lists+kvm@lfdr.de>; Fri, 29 Oct 2021 21:10:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230522AbhJ2TJK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Oct 2021 15:09:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52464 "EHLO
+        id S229474AbhJ2TNP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Oct 2021 15:13:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230168AbhJ2TJJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Oct 2021 15:09:09 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57985C061714
-        for <kvm@vger.kernel.org>; Fri, 29 Oct 2021 12:06:40 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id x66so10033471pfx.13
-        for <kvm@vger.kernel.org>; Fri, 29 Oct 2021 12:06:40 -0700 (PDT)
+        with ESMTP id S231293AbhJ2TNN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Oct 2021 15:13:13 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1339CC061570
+        for <kvm@vger.kernel.org>; Fri, 29 Oct 2021 12:10:44 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id s10-20020a17090a13ca00b001a211aa215fso5793548pjf.0
+        for <kvm@vger.kernel.org>; Fri, 29 Oct 2021 12:10:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Ldj1ddyxFxyQn1P+7U21zE8sjEfcNWeGvgdcMjeN8ow=;
-        b=GpXuydJMaY5WU3GNXnra8fb0QxJ21K1yg/2Yfr+9y9SdyTweeX/PFEXrDKILHAxhHt
-         p6K5FRUHJXAGqi5tOfGlbq3rqnFQCU2R2JiBWlJZtHgQeo8lZksJS8JLuVaKUFln8+UQ
-         QB5PdKrNUElX3lot09fgygBgsJvl3WiOqXY3AzxtQyOGbuiadFHr5lhNGeSbw5ZHhmLs
-         H0LM4w/AkVBucc8LLr9ItQ1HNz4qJIAUROHDyt2qdPFHUZa7n3x55AsaTmHdFJI1KCih
-         uKoXNahx5vdoJcc6I7BJ01DbFRWPY4qTxQsVCnXeB2j8/VlGXuCaFN6C5fzY4NSdp0Ir
-         g0aw==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=KDWKTc1GJTEzUINDXTg5a2/zzse2UtRtRLssuaNb2rI=;
+        b=aZiOLfvakJLdzV1huKFzd8QB4UdYtkzjaj0IBJj7fxt5PlUpmesvsxlOyfj82YZUPU
+         ucDdOouegMOHvVzYGYpa74JsUOnHThoc8NWq8bDwMMi9tmsrXTRic/558wzeZArK7b7/
+         KZtXdVyBK6VjaZFyFztF7nb7HOmWQANWn2wQmxSrABGcS5+Lz5Kimz/8eL3+h+8G0uBn
+         NyeISAJ8ITRZfX6Lnu9h7bKBw7RToA+nb4vD+l6MBMMspWH9xKmPBkeddPfikgx2irzl
+         3r9PrChcxb3KZryUbOAtRmdz7ttVlBAIFM+qywM1JFyfWA5hdRGGzGnNmh3at2KzGiy9
+         Nk4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Ldj1ddyxFxyQn1P+7U21zE8sjEfcNWeGvgdcMjeN8ow=;
-        b=2WQjfiMfLBKhvgial01qWpo1xxq2qpOx3t8pLYlY8hXUxk5SrDfhm0/CkxrTkUeRnl
-         76qXy58cas3VPU1V4XQ2njuW4c032m/KIXG6wg0qLAkx0viDoL+Tr4duLwFx9Y9wAVil
-         5gCMwPCLFojyFncnPyNFIYCSuJhSGZJR3rSmBi9pXs6tR6VwQxev39thlKLTJeTfdL45
-         JlLXydbljRIT/Fb+xSz6Rxmr/3+T7BE1YD4Cb/sRXocW3nGmqYeyCZl4JcT1zquiwJkN
-         lDxeHKG0JFDZIwJYdgyDNxdCoKcCorJTSUJgeZib+qp351EA2zdpEQkpTe5nZ1kouDfO
-         hodg==
-X-Gm-Message-State: AOAM532UrYelGq4PHMzHj0J4aU/EfqHHEaQSKyuQAh+k9u3mNvN1ED3t
-        XtGgn81yaOO8Mhotoabi9yxAIw==
-X-Google-Smtp-Source: ABdhPJze0lQCEEqIKDMf/2e7SXLtpJ3is5kITQ6qUJHlSXMzFeN48xOz6hwg/+xzSFZScLJ2N/rB6g==
-X-Received: by 2002:a63:8aca:: with SMTP id y193mr1486059pgd.362.1635534399609;
-        Fri, 29 Oct 2021 12:06:39 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id m22sm7408458pfo.71.2021.10.29.12.06.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Oct 2021 12:06:39 -0700 (PDT)
-Date:   Fri, 29 Oct 2021 19:06:35 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=KDWKTc1GJTEzUINDXTg5a2/zzse2UtRtRLssuaNb2rI=;
+        b=BxMIIwnnYkYT7aP9ybe+Bw8u1vGcFE3lYI83nlsg3E327+3Fok4+9WS4bNlDHWoBx1
+         UpK4hUU1PDjitBz5B9P79O8u5ZaxOmnz3OtfrcEIzwvKo5AAs6/nPbJYYiC9My5mB7g6
+         FZh5Z6tFhENEbsHTI7f+LLRnTssoluu+1+vZHffVp+o3T6Q0CYRTi0TR15guZii6TWY7
+         xQ6/x+bZkr8eOmQeRds5XJ0+Yso6PUM54r2AlwkRxcsARE/+kwsLv8XOiJzcVURqTY9x
+         itCFT1B7fD+3qcpLw+r+466ZRFN79kTcdyUNX+vvUFEsBBHDgkyVvliERInbhG0zmWj4
+         s5+Q==
+X-Gm-Message-State: AOAM533BkbSSH6Pd4FZgJVLtLiIm4IkGvHsb4gbw6iwtqBduGsHFR2T5
+        LMe/wz66clX+UJ9jcJcYzatNLc47zOJLdw==
+X-Google-Smtp-Source: ABdhPJy1PYGpyojSgnzxnHnk5U7eEQcouMhhw6dvPDHHgehIitu1neNt4cVcQFxUw5K8PSLO6/l9dHCZoHFEWg==
+X-Received: from xllamas.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:b1])
+ (user=cmllamas job=sendgmr) by 2002:a05:6a00:ccb:b0:47e:49ed:88f7 with SMTP
+ id b11-20020a056a000ccb00b0047e49ed88f7mr12014429pfv.34.1635534643556; Fri,
+ 29 Oct 2021 12:10:43 -0700 (PDT)
+Date:   Fri, 29 Oct 2021 19:10:36 +0000
+Message-Id: <20211029191036.3166209-1-cmllamas@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.1.1089.g2158813163f-goog
+Subject: [PATCH] KVM: x86: fix code indentation issues
+From:   Carlos Llamas <cmllamas@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        llvm@lists.linux.dev, linux-kernel@vger.kernel.org,
-        Ajay Garg <ajaygargnsit@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Subject: Re: [PATCH] KVM: x86: Shove vp_bitmap handling down into
- sparse_set_to_vcpu_mask()
-Message-ID: <YXxGO5/xO8KWfnKj@google.com>
-References: <20211028213408.2883933-1-seanjc@google.com>
- <87pmrokn16.fsf@vitty.brq.redhat.com>
- <YXwF+jSnDq9ONTQJ@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YXwF+jSnDq9ONTQJ@google.com>
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>, x86@kernel.org
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-team@android.com, Carlos Llamas <cmllamas@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 29, 2021, Sean Christopherson wrote:
-> On Fri, Oct 29, 2021, Vitaly Kuznetsov wrote:
-> > > +	/* If vp_index == vcpu_idx for all vCPUs, fill vcpu_mask directly. */
-> > > +	if (likely(!has_mismatch))
-> > > +		bitmap = (u64 *)vcpu_mask;
-> > > +
-> > > +	memset(bitmap, 0, sizeof(vp_bitmap));
-> > 
-> > ... but in the unlikely case has_mismatch == true 'bitmap' is still
-> > uninitialized here, right? How doesn't it crash?
-> 
-> I'm sure it does crash.  I'll hack the guest to actually test this.
+This fixes the following checkpatch.pl errors:
 
-Crash confirmed.  But I don't feel too bad about my one-line goof because the
-existing code botches sparse VP_SET, i.e. _EX flows.  The spec requires the guest
-to explicit specify the number of QWORDS in the variable header[*], e.g. VP_SET
-in this case, but KVM ignores that and does a harebrained calculation to "count"
-the number of sparse banks.  It does this by counting the number of bits set in
-valid_bank_mask, which is comically broken because (a) the whole "sparse" thing
-should be a clue that they banks are not packed together, (b) the spec clearly
-states that "bank = VPindex / 64", (c) the sparse_bank madness makes this waaaay
-more complicated than it needs to be, and (d) the massive sparse_bank allocation
-on the stack is completely unnecessary because KVM simply ignores everything that
-wouldn't fit in vp_bitmap.
+ERROR: code indent should use tabs where possible
++                vcpu->arch.pio.count = 0;$
 
-To reproduce, stuff vp_index in descending order starting from KVM_MAX_VCPUS - 1.
+ERROR: code indent should use tabs where possible
++        return ret;$
 
-	hv_vcpu->vp_index = KVM_MAX_VCPUS - vcpu->vcpu_idx - 1;
+Fixes: 0d33b1baeb6c ("KVM: x86: leave vcpu->arch.pio.count alone in emulator_pio_in_out")
+Signed-off-by: Carlos Llamas <cmllamas@google.com>
+---
+ arch/x86/kvm/x86.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-E.g. with an 8 vCPU guest, KVM will calculate sparse_banks_len=1, read zeros, and
-do nothing, hanging the guest because it never sends IPIs.
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index b26647a5ea22..ff04b78ece5f 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -6980,9 +6980,9 @@ static int emulator_pio_out(struct kvm_vcpu *vcpu, int size,
+ 	trace_kvm_pio(KVM_PIO_OUT, port, size, count, vcpu->arch.pio_data);
+ 	ret = emulator_pio_in_out(vcpu, size, port, count, false);
+ 	if (ret)
+-                vcpu->arch.pio.count = 0;
++		vcpu->arch.pio.count = 0;
+ 
+-        return ret;
++	return ret;
+ }
+ 
+ static int emulator_pio_out_emulated(struct x86_emulate_ctxt *ctxt,
+-- 
+2.33.1.1089.g2158813163f-goog
 
-So v2 will be completely different because the "fix" for the KASAN issue is to
-get rid of sparse_banks entirely.
-
-[1] https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/tlfs/hypercall-interface#variable-sized-hypercall-input-headers
-[2] https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/tlfs/datatypes/hv_vp_set#sparse-virtual-processor-set
