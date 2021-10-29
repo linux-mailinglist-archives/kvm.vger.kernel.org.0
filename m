@@ -2,160 +2,277 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7514743F818
-	for <lists+kvm@lfdr.de>; Fri, 29 Oct 2021 09:49:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4179343F9FC
+	for <lists+kvm@lfdr.de>; Fri, 29 Oct 2021 11:35:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232358AbhJ2Hvt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Oct 2021 03:51:49 -0400
-Received: from mail-dm3nam07on2063.outbound.protection.outlook.com ([40.107.95.63]:4256
-        "EHLO NAM02-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S232348AbhJ2HvX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Oct 2021 03:51:23 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kS9wziXzo5nD08B13KvmFVrSpgutstUzrI2jVdAkFqQK+y+KknrlM1QpbkGNzs8zwA6BrEGgjsfpsbuyC9RI1NZSGPdy31Z2j64EzaIWFvXhtJYMT8yOqCSlF9i8FnntoHgM9Awgz/4Vgg03GLdmFUqNHjHCLyBM4sOMYhiX7S8yZvMZMTpo2pqvX2TzMw7J/AnbSTNR36SwpxWJ66pKfi0py14ofWkznkSEc6jbVuitXLOsv6ARKp4cP8+S5Wj8tFPAYKxMpQkEYICZE8MMerWv8HL03q2hPM9BX/Zm0CSEC8ygufrlVUU3xrECBZ3CGxpxLXttrHLQMsqy83NNvw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3YBp0orr3fgREoQihO4wMEf9UfgCaQ/ih2zPCpuM8X0=;
- b=cBU5LCZ7i+lRsa5gEtLV1Rbh7JM6/MAZmgwjoTK+S9lrojbuGcnWB42+4tD0ZlyhzOL4MviSpQC175D4oa8xP02dRBCDD5InY/2JPCkneh5009HwHGfdWl1XXEvxanN8/9orLHL3dR3NURQ3SM2ddgVLdA1tKun4ok2hn/VQGp2jW3+y1Cs0sxta0oi2DxJhqRTOTJEo0wr4akIBeIIQkbPd0rgjroW5yXil1ng4bCyT9jnWOcOkZ3H64tmLCAmrOMdbOKGFr5XVUgPhXt0eFjtD8F9NgEV6ElyMcFWlsY0rN/e7v927OryczuDU6DYTo/i/gXtEW46RuPfPmjdA/w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.112.34) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=nvidia.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3YBp0orr3fgREoQihO4wMEf9UfgCaQ/ih2zPCpuM8X0=;
- b=bDuUgeboaFwPx5k4KwD1DdTkBSKQt9AzVam+672001cu5TeEx8IGKsClMDHdeymqx/MDCqXLtVEe7C0GRKaWWqxTAJ8h7rClKOBLvPdjY4q4yKktkG/iy/i+mUKo7UKQHXHU1kmTaeeaCistOxA6gQLahXuZHVGM4mcoxGHSgSJs2zA/D8KrQiOEJMmb0HfGirCW5Mx8tkOGMIRWAsP1fFuHAr5aN4YY/t41U7okV+CLqFoKyhCAik6aFCZYPx/ToWIa7/ccZYNnMJPKco8KDzxaT3AKNm8RyUgIES1R9OOxI9RrIxmnry0125ArwKOPmJBVEJffNoacNS/HbA3heQ==
-Received: from CO2PR04CA0124.namprd04.prod.outlook.com (2603:10b6:104:7::26)
- by CY4PR1201MB0149.namprd12.prod.outlook.com (2603:10b6:910:1c::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4649.15; Fri, 29 Oct
- 2021 07:48:42 +0000
-Received: from CO1NAM11FT042.eop-nam11.prod.protection.outlook.com
- (2603:10b6:104:7:cafe::1e) by CO2PR04CA0124.outlook.office365.com
- (2603:10b6:104:7::26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4649.14 via Frontend
- Transport; Fri, 29 Oct 2021 07:48:42 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.112.34)
- smtp.mailfrom=nvidia.com; google.com; dkim=none (message not signed)
- header.d=none;google.com; dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.112.34 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.112.34; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (216.228.112.34) by
- CO1NAM11FT042.mail.protection.outlook.com (10.13.174.250) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.4649.14 via Frontend Transport; Fri, 29 Oct 2021 07:48:41 +0000
-Received: from [172.27.0.156] (172.20.187.6) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Fri, 29 Oct
- 2021 07:48:34 +0000
-Subject: Re: [PATCH V2 mlx5-next 12/14] vfio/mlx5: Implement vfio_pci driver
- for mlx5 devices
-To:     Cornelia Huck <cohuck@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        "Alex Williamson" <alex.williamson@redhat.com>
-CC:     <bhelgaas@google.com>, <saeedm@nvidia.com>,
-        <linux-pci@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <kuba@kernel.org>, <leonro@nvidia.com>,
-        <kwankhede@nvidia.com>, <mgurtovoy@nvidia.com>, <maorg@nvidia.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-References: <20211025122938.GR2744544@nvidia.com>
- <20211025082857.4baa4794.alex.williamson@redhat.com>
- <20211025145646.GX2744544@nvidia.com>
- <20211026084212.36b0142c.alex.williamson@redhat.com>
- <20211026151851.GW2744544@nvidia.com>
- <20211026135046.5190e103.alex.williamson@redhat.com>
- <20211026234300.GA2744544@nvidia.com>
- <20211027130520.33652a49.alex.williamson@redhat.com>
- <20211027192345.GJ2744544@nvidia.com>
- <20211028093035.17ecbc5d.alex.williamson@redhat.com>
- <20211028234750.GP2744544@nvidia.com> <87wnlwb9o3.fsf@redhat.com>
-From:   Yishai Hadas <yishaih@nvidia.com>
-Message-ID: <76130eb7-6252-85a7-33d9-c7f00f5a3506@nvidia.com>
-Date:   Fri, 29 Oct 2021 10:48:30 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        id S231564AbhJ2Jhy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Oct 2021 05:37:54 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57884 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229927AbhJ2Jhx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Oct 2021 05:37:53 -0400
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 591D860F93;
+        Fri, 29 Oct 2021 09:35:25 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mgOIF-002O2i-3C; Fri, 29 Oct 2021 10:35:23 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Andrew Scull <ascull@google.com>,
+        David Brazdil <dbrazdil@google.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Fuad Tabba <tabba@google.com>, Jia He <justin.he@arm.com>,
+        Joey Gouly <joey.gouly@arm.com>,
+        Oliver Upton <oupton@google.com>,
+        Quentin Perret <qperret@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Subject: [GIT PULL] KVM/arm64 updates for 5.16
+Date:   Fri, 29 Oct 2021 10:35:10 +0100
+Message-Id: <20211029093510.3682241-1-maz@kernel.org>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-In-Reply-To: <87wnlwb9o3.fsf@redhat.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Originating-IP: [172.20.187.6]
-X-ClientProxiedBy: HQMAIL101.nvidia.com (172.20.187.10) To
- HQMAIL107.nvidia.com (172.20.187.13)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 82a557b0-6705-4e82-5128-08d99ab086ff
-X-MS-TrafficTypeDiagnostic: CY4PR1201MB0149:
-X-Microsoft-Antispam-PRVS: <CY4PR1201MB0149B0332BA5B779CA0C5D19C3879@CY4PR1201MB0149.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: P1phuo8cSI3RkkX3ffdXrvL+3pHvmKWrpq1dyLcbXFOBDYxvqYZ9CkYvVME/wuTwi1gZUEnlUw4TysU9mX/HLw6WLChe2I6r4LeiZcX6LYns9x1wehk6WUps3K0dYElrmfMFS3PlzpfTZBHvGQY/hCJqm8NNw68HcpZpIliIDdSCpq68bhp0ekJ2jt2kgx7yq9s5iHFyWVjK0sbtVeddaDYsVl+ZXyCsP1mQ6jrB+qt32x6XVFtho06FXxGJpdLUAXXMaUlERoApdZ+KEc8Mv0EsJ3drd0uo0c+gbZM5AEYZI2tCWqAGtX6iIICRzXK2KiXp8N+lobq8oHUBH4a0Ps0cQfC49k1w2m/3xv7RXOLVqrI19jqlHpWnrT8Eppf0krIHSQJTkCnizr+yhn3qy2H2nJNUAH+0jbENtpE48c7QbVrvIPcCLBeiaS4OzZE9twsqkKhyQOwJTur/e9HB4R4RtF+GgD9CrdS0b81hB620s+E4Ja6wN3LInlF912ajo96GpcQIIXeK3nSbDEk1NP9XOj8UoJ5CAFseaRN1h2yi5r/OqTc0LULu6W8QwUSUgKS0aRVbRU4efC2Tn+T/l6r1SaftHlRruZiIrw1BfSB9PjepPDUXB8WbHEAI3kEE7xxRAbGhW+c7ALksWEBOy16bQoTQuOUtm3ZmgZFWhQ7VMOKEjBHSySEGQlBKVTXr1RQz14ec01rEiRGEh3hnelCDrViL7cadlYAUEokKtNw=
-X-Forefront-Antispam-Report: CIP:216.228.112.34;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:schybrid03.nvidia.com;CAT:NONE;SFS:(4636009)(46966006)(36840700001)(8936002)(53546011)(54906003)(47076005)(16576012)(110136005)(2906002)(8676002)(5660300002)(86362001)(31686004)(82310400003)(6666004)(316002)(4326008)(36860700001)(26005)(2616005)(508600001)(70206006)(36756003)(31696002)(16526019)(70586007)(336012)(426003)(83380400001)(356005)(7636003)(186003)(43740500002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Oct 2021 07:48:41.6718
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 82a557b0-6705-4e82-5128-08d99ab086ff
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.112.34];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT042.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR1201MB0149
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com, drjones@redhat.com, ascull@google.com, dbrazdil@google.com, eric.auger@redhat.com, tabba@google.com, justin.he@arm.com, joey.gouly@arm.com, oupton@google.com, qperret@google.com, rananta@google.com, reijiw@google.com, ricarkol@google.com, seanjc@google.com, suzuki.poulose@arm.com, will@kernel.org, james.morse@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/29/2021 9:57 AM, Cornelia Huck wrote:
-> On Thu, Oct 28 2021, Jason Gunthorpe <jgg@nvidia.com> wrote:
->
->> On Thu, Oct 28, 2021 at 09:30:35AM -0600, Alex Williamson wrote:
->>> On Wed, 27 Oct 2021 16:23:45 -0300
->>> Jason Gunthorpe <jgg@nvidia.com> wrote:
->>>
->>>> On Wed, Oct 27, 2021 at 01:05:20PM -0600, Alex Williamson wrote:
->>>>
->>>>>> As far as the actual issue, if you hadn't just discovered it now
->>>>>> nobody would have known we have this gap - much like how the very
->>>>>> similar reset issue was present in VFIO for so many years until you
->>>>>> plugged it.
->>>>> But the fact that we did discover it is hugely important.  We've
->>>>> identified that the potential use case is significantly limited and
->>>>> that userspace doesn't have a good mechanism to determine when to
->>>>> expose that limitation to the user.
->>>> Huh?
->>>>
->>>> We've identified that, depending on device behavior, the kernel may
->>>> need to revoke MMIO access to protect itself from hostile userspace
->>>> triggering TLP Errors or something.
->>>>
->>>> Well behaved userspace must already stop touching the MMIO on the
->>>> device when !RUNNING - I see no compelling argument against that
->>>> position.
->>> Not touching MMIO is not specified in our uAPI protocol,
->> To be frank, not much is specified in the uAPI comment, certainly not
->> a detailed meaning of RUNNING.
-> Yes! And I think that means we need to improve that comment before the
-> first in-tree driver to use it is merged, just to make sure we all agree
-> on the protocol, and future drivers can rely on that understanding as
-> well.
->
+Hi Paolo,
 
-This can done by a follow-up patch as part of the the RC cycles, once we 
-agree on the exact comment.
+Here's the bulk of KVM/arm64 updates for 5.16. The changes are more or
+less equaly split between new features (more pKVM stuff trickling in
+as it gets written), a bunch of new selftests (timer, vgic), and bug
+fixes.
 
-Alternatively,
+Please pull,
 
-We can come with V6 on Sunday if we can agree on the comment here soon.
+	M.
 
-In any case, we don't expect for now code changes in mlx5 as of that.
+The following changes since commit 9e1ff307c779ce1f0f810c7ecce3d95bbae40896:
 
-Frankly, I don't believe that this should block the series from being 
-merged.
+  Linux 5.15-rc4 (2021-10-03 14:08:47 -0700)
 
-Yishai
+are available in the Git repository at:
 
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-5.16
+
+for you to fetch changes up to 5a2acbbb0179a7ffbb5440b9fa46689f619705ac:
+
+  Merge branch kvm/selftests/memslot into kvmarm-master/next (2021-10-21 11:40:03 +0100)
+
+----------------------------------------------------------------
+KVM/arm64 updates for Linux 5.16
+
+- More progress on the protected VM front, now with the full
+  fixed feature set as well as the limitation of some hypercalls
+  after initialisation.
+
+- Cleanup of the RAZ/WI sysreg handling, which was pointlessly
+  complicated
+
+- Fixes for the vgic placement in the IPA space, together with a
+  bunch of selftests
+
+- More memcg accounting of the memory allocated on behalf of a guest
+
+- Timer and vgic selftests
+
+- Workarounds for the Apple M1 broken vgic implementation
+
+- KConfig cleanups
+
+- New kvmarm.mode=none option, for those who really dislike us
+
+----------------------------------------------------------------
+Alexandru Elisei (4):
+      KVM: arm64: Return early from read_id_reg() if register is RAZ
+      KVM: arm64: Use get_raz_reg() for userspace reads of PMSWINC_EL0
+      KVM: arm64: Replace get_raz_id_reg() with get_raz_reg()
+      Documentation: admin-guide: Document side effects when pKVM is enabled
+
+Fuad Tabba (8):
+      KVM: arm64: Pass struct kvm to per-EC handlers
+      KVM: arm64: Add missing field descriptor for MDCR_EL2
+      KVM: arm64: Simplify masking out MTE in feature id reg
+      KVM: arm64: Add handlers for protected VM System Registers
+      KVM: arm64: Initialize trap registers for protected VMs
+      KVM: arm64: Move sanitized copies of CPU features
+      KVM: arm64: Trap access to pVM restricted features
+      KVM: arm64: Handle protected guests at 32 bits
+
+Jia He (2):
+      KVM: arm64: vgic: Add memcg accounting to vgic allocations
+      KVM: arm64: Add memcg accounting to KVM allocations
+
+Marc Zyngier (33):
+      KVM: arm64: Turn __KVM_HOST_SMCCC_FUNC_* into an enum (mostly)
+      Merge branch kvm-arm64/pkvm/restrict-hypercalls into kvmarm-master/next
+      Merge branch kvm-arm64/vgic-ipa-checks into kvmarm-master/next
+      KVM: arm64: Allow KVM to be disabled from the command line
+      Merge branch kvm-arm64/misc-5.16 into kvmarm-master/next
+      Merge branch kvm-arm64/raz-sysregs into kvmarm-master/next
+      KVM: arm64: Move __get_fault_info() and co into their own include file
+      KVM: arm64: Don't include switch.h into nvhe/kvm-main.c
+      KVM: arm64: Move early handlers to per-EC handlers
+      Merge branch kvm-arm64/pkvm/restrict-hypercalls into kvmarm-master/next
+      KVM: arm64: Fix reporting of endianess when the access originates at EL0
+      Merge branch kvm-arm64/misc-5.16 into kvmarm-master/next
+      KVM: arm64: Force ID_AA64PFR0_EL1.GIC=1 when exposing a virtual GICv3
+      KVM: arm64: vgic-v3: Work around GICv3 locally generated SErrors
+      KVM: arm64: vgic-v3: Reduce common group trapping to ICV_DIR_EL1 when possible
+      KVM: arm64: vgic-v3: Don't advertise ICC_CTLR_EL1.SEIS
+      KVM: arm64: vgic-v3: Align emulated cpuif LPI state machine with the pseudocode
+      Merge branch kvm-arm64/vgic-fixes-5.16 into kvmarm-master/next
+      Merge branch kvm-arm64/selftest/timer into kvmarm-master/next
+      Merge branch kvm-arm64/memory-accounting into kvmarm-master/next
+      KVM: arm64: Fix early exit ptrauth handling
+      KVM: arm64: pkvm: Use a single function to expose all id-regs
+      KVM: arm64: pkvm: Make the ERR/ERX*_EL1 registers RAZ/WI
+      KVM: arm64: pkvm: Drop AArch32-specific registers
+      KVM: arm64: pkvm: Drop sysregs that should never be routed to the host
+      KVM: arm64: pkvm: Handle GICv3 traps as required
+      KVM: arm64: pkvm: Preserve pending SError on exit from AArch32
+      KVM: arm64: pkvm: Consolidate include files
+      KVM: arm64: pkvm: Move kvm_handle_pvm_restricted around
+      KVM: arm64: pkvm: Pass vpcu instead of kvm to kvm_get_exit_handler_array()
+      KVM: arm64: pkvm: Give priority to standard traps over pvm handling
+      Merge branch kvm-arm64/pkvm/fixed-features into kvmarm-master/next
+      Merge branch kvm/selftests/memslot into kvmarm-master/next
+
+Raghavendra Rao Ananta (14):
+      KVM: arm64: selftests: Add MMIO readl/writel support
+      tools: arm64: Import sysreg.h
+      KVM: arm64: selftests: Introduce ARM64_SYS_KVM_REG
+      KVM: arm64: selftests: Add support for cpu_relax
+      KVM: arm64: selftests: Add basic support for arch_timers
+      KVM: arm64: selftests: Add basic support to generate delays
+      KVM: arm64: selftests: Add support to disable and enable local IRQs
+      KVM: arm64: selftests: Maintain consistency for vcpuid type
+      KVM: arm64: selftests: Add guest support to get the vcpuid
+      KVM: arm64: selftests: Add light-weight spinlock support
+      KVM: arm64: selftests: Add basic GICv3 support
+      KVM: arm64: selftests: Add host support for vGIC
+      KVM: arm64: selftests: Add arch_timer test
+      KVM: arm64: selftests: arch_timer: Support vCPU migration
+
+Ricardo Koller (13):
+      kvm: arm64: vgic: Introduce vgic_check_iorange
+      KVM: arm64: vgic-v3: Check redist region is not above the VM IPA size
+      KVM: arm64: vgic-v2: Check cpu interface region is not above the VM IPA size
+      KVM: arm64: vgic-v3: Check ITS region is not above the VM IPA size
+      KVM: arm64: vgic: Drop vgic_check_ioaddr()
+      KVM: arm64: selftests: Make vgic_init gic version agnostic
+      KVM: arm64: selftests: Make vgic_init/vm_gic_create version agnostic
+      KVM: arm64: selftests: Add some tests for GICv2 in vgic_init
+      KVM: arm64: selftests: Add tests for GIC redist/cpuif partially above IPA range
+      KVM: arm64: selftests: Add test for legacy GICv3 REDIST base partially above IPA range
+      KVM: arm64: selftests: Add init ITS device test
+      KVM: selftests: Make memslot_perf_test arch independent
+      KVM: selftests: Build the memslot tests for arm64
+
+Sean Christopherson (2):
+      KVM: arm64: Unconditionally include generic KVM's Kconfig
+      KVM: arm64: Depend on HAVE_KVM instead of OF
+
+Will Deacon (5):
+      arm64: Prevent kexec and hibernation if is_protected_kvm_enabled()
+      KVM: arm64: Reject stub hypercalls after pKVM has been initialised
+      KVM: arm64: Propagate errors from __pkvm_prot_finalize hypercall
+      KVM: arm64: Prevent re-finalisation of pKVM for a given CPU
+      KVM: arm64: Disable privileged hypercalls after pKVM finalisation
+
+ Documentation/admin-guide/kernel-parameters.txt    |    6 +-
+ arch/arm64/Kconfig                                 |    1 +
+ arch/arm64/include/asm/kvm_arm.h                   |    1 +
+ arch/arm64/include/asm/kvm_asm.h                   |   48 +-
+ arch/arm64/include/asm/kvm_emulate.h               |    5 +-
+ arch/arm64/include/asm/kvm_host.h                  |    3 +
+ arch/arm64/include/asm/kvm_hyp.h                   |    5 +
+ arch/arm64/include/asm/sysreg.h                    |    3 +
+ arch/arm64/kernel/smp.c                            |    3 +-
+ arch/arm64/kvm/Kconfig                             |   10 +-
+ arch/arm64/kvm/arm.c                               |   94 +-
+ arch/arm64/kvm/hyp/include/hyp/fault.h             |   75 ++
+ arch/arm64/kvm/hyp/include/hyp/switch.h            |  235 ++--
+ arch/arm64/kvm/hyp/include/nvhe/fixed_config.h     |  200 +++
+ arch/arm64/kvm/hyp/include/nvhe/trap_handler.h     |    2 +
+ arch/arm64/kvm/hyp/nvhe/Makefile                   |    2 +-
+ arch/arm64/kvm/hyp/nvhe/host.S                     |   26 +-
+ arch/arm64/kvm/hyp/nvhe/hyp-main.c                 |   48 +-
+ arch/arm64/kvm/hyp/nvhe/mem_protect.c              |   11 +-
+ arch/arm64/kvm/hyp/nvhe/pkvm.c                     |  185 +++
+ arch/arm64/kvm/hyp/nvhe/setup.c                    |    3 +
+ arch/arm64/kvm/hyp/nvhe/switch.c                   |   99 ++
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c                 |  487 ++++++++
+ arch/arm64/kvm/hyp/vgic-v3-sr.c                    |   22 +-
+ arch/arm64/kvm/hyp/vhe/switch.c                    |   16 +
+ arch/arm64/kvm/mmu.c                               |    2 +-
+ arch/arm64/kvm/pmu-emul.c                          |    2 +-
+ arch/arm64/kvm/reset.c                             |    2 +-
+ arch/arm64/kvm/sys_regs.c                          |   41 +-
+ arch/arm64/kvm/vgic/vgic-init.c                    |    2 +-
+ arch/arm64/kvm/vgic/vgic-irqfd.c                   |    2 +-
+ arch/arm64/kvm/vgic/vgic-its.c                     |   18 +-
+ arch/arm64/kvm/vgic/vgic-kvm-device.c              |   25 +-
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c                 |    8 +-
+ arch/arm64/kvm/vgic/vgic-v3.c                      |   27 +-
+ arch/arm64/kvm/vgic/vgic-v4.c                      |    2 +-
+ arch/arm64/kvm/vgic/vgic.h                         |    5 +-
+ tools/arch/arm64/include/asm/sysreg.h              | 1296 ++++++++++++++++++++
+ tools/testing/selftests/kvm/.gitignore             |    1 +
+ tools/testing/selftests/kvm/Makefile               |    5 +-
+ tools/testing/selftests/kvm/aarch64/arch_timer.c   |  479 ++++++++
+ .../selftests/kvm/aarch64/debug-exceptions.c       |   30 +-
+ .../selftests/kvm/aarch64/psci_cpu_on_test.c       |    2 +-
+ tools/testing/selftests/kvm/aarch64/vgic_init.c    |  369 ++++--
+ .../selftests/kvm/include/aarch64/arch_timer.h     |  142 +++
+ .../testing/selftests/kvm/include/aarch64/delay.h  |   25 +
+ tools/testing/selftests/kvm/include/aarch64/gic.h  |   21 +
+ .../selftests/kvm/include/aarch64/processor.h      |   90 +-
+ .../selftests/kvm/include/aarch64/spinlock.h       |   13 +
+ tools/testing/selftests/kvm/include/aarch64/vgic.h |   20 +
+ tools/testing/selftests/kvm/include/kvm_util.h     |    2 +
+ tools/testing/selftests/kvm/lib/aarch64/gic.c      |   95 ++
+ .../selftests/kvm/lib/aarch64/gic_private.h        |   21 +
+ tools/testing/selftests/kvm/lib/aarch64/gic_v3.c   |  240 ++++
+ tools/testing/selftests/kvm/lib/aarch64/gic_v3.h   |   70 ++
+ .../testing/selftests/kvm/lib/aarch64/processor.c  |   24 +-
+ tools/testing/selftests/kvm/lib/aarch64/spinlock.c |   27 +
+ tools/testing/selftests/kvm/lib/aarch64/vgic.c     |   70 ++
+ tools/testing/selftests/kvm/memslot_perf_test.c    |   56 +-
+ 59 files changed, 4373 insertions(+), 451 deletions(-)
+ create mode 100644 arch/arm64/kvm/hyp/include/hyp/fault.h
+ create mode 100644 arch/arm64/kvm/hyp/include/nvhe/fixed_config.h
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/pkvm.c
+ create mode 100644 arch/arm64/kvm/hyp/nvhe/sys_regs.c
+ create mode 100644 tools/arch/arm64/include/asm/sysreg.h
+ create mode 100644 tools/testing/selftests/kvm/aarch64/arch_timer.c
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/arch_timer.h
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/delay.h
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/gic.h
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/spinlock.h
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/vgic.h
+ create mode 100644 tools/testing/selftests/kvm/lib/aarch64/gic.c
+ create mode 100644 tools/testing/selftests/kvm/lib/aarch64/gic_private.h
+ create mode 100644 tools/testing/selftests/kvm/lib/aarch64/gic_v3.c
+ create mode 100644 tools/testing/selftests/kvm/lib/aarch64/gic_v3.h
+ create mode 100644 tools/testing/selftests/kvm/lib/aarch64/spinlock.c
+ create mode 100644 tools/testing/selftests/kvm/lib/aarch64/vgic.c
