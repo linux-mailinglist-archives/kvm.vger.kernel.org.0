@@ -2,180 +2,237 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3AB3B43FB0C
-	for <lists+kvm@lfdr.de>; Fri, 29 Oct 2021 12:48:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 81EFF43FB1E
+	for <lists+kvm@lfdr.de>; Fri, 29 Oct 2021 12:57:55 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231749AbhJ2KvL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Oct 2021 06:51:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51264 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231719AbhJ2KvJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Oct 2021 06:51:09 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1687C061570
-        for <kvm@vger.kernel.org>; Fri, 29 Oct 2021 03:48:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=KAjkddvJ6GhqYthoGQrQLrb6hZ6oI9J+wXAWHuW1OCw=; b=C5jPEi8vbZrYAeRZ6jA3EwJNTi
-        EWVuitB9XeuT1Eg00FBmD8iYlOmBM8YAWf/pOrZmSj5KwNOIsLLHRtvnNN+ww6LWvOmilmwJQoYh2
-        EC/Xf7nipQ+C8XtpFFMiIEuIxxw/p0SJtP7dfH4PwRqJ6n7P+CpLROyFCa9D+JmHoMbwHpZ/rUJ4Q
-        wa5dfRDbkecLb3H60yUbm7Qb5AbrhLFxcPKTX8ccyQwLJmUy/a7TcpAOuZdo6eSF+PUWtrN/eNa6G
-        WliVy7otSMOHnKC20AiD7IdpECDIOU+toaU6Y26F2G2kIUhG2ozKJcF45gMfEQch0G2e0DywGiExs
-        TPc+LBRw==;
-Received: from 54-240-197-234.amazon.com ([54.240.197.234] helo=u3832b3a9db3152.ant.amazon.com)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mgPQz-00AgSC-Tt; Fri, 29 Oct 2021 10:48:30 +0000
-Message-ID: <b38d8ad79c33fefcfa59a9b191845f35091e3ed2.camel@infradead.org>
-Subject: Re: [EXTERNAL] [PATCH] KVM: x86/xen: Fix runstate updates to be
- atomic when preempting vCPU
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Raslan, KarimAllah" <karahmed@amazon.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Ankur Arora <ankur.a.arora@oracle.com>
-Cc:     "jmattson@google.com" <jmattson@google.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "mtosatti@redhat.com" <mtosatti@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>
-Date:   Fri, 29 Oct 2021 11:48:26 +0100
-In-Reply-To: <9e8e6547db506e9a91d65d9b8d0c749c26f3de89.camel@infradead.org>
-References: <3d2a13164cbc61142b16edba85960db9a381bebe.camel@amazon.co.uk>
-         <09f4468b-0916-cf2c-1cef-46970a238ce4@redhat.com>
-         <a0906628f31e359deb9e9a6cdf15eb72920c5960.camel@infradead.org>
-         <2e7bcafe1077d31d8af6cc0cd120a613cc070cfb.camel@infradead.org>
-         <95bee081-c744-1586-d4df-0d1e04a8490f@redhat.com>
-         <9e8e6547db506e9a91d65d9b8d0c749c26f3de89.camel@infradead.org>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-lkb3UiUcBYwZ3ThlrKkR"
-User-Agent: Evolution 3.36.5-0ubuntu1 
+        id S231827AbhJ2LAW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Oct 2021 07:00:22 -0400
+Received: from out30-42.freemail.mail.aliyun.com ([115.124.30.42]:33178 "EHLO
+        out30-42.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231861AbhJ2LAT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 29 Oct 2021 07:00:19 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04407;MF=houwenlong93@linux.alibaba.com;NM=1;PH=DS;RN=2;SR=0;TI=SMTPD_---0Uu7vr4d_1635505069;
+Received: from localhost(mailfrom:houwenlong93@linux.alibaba.com fp:SMTPD_---0Uu7vr4d_1635505069)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Fri, 29 Oct 2021 18:57:49 +0800
+Date:   Fri, 29 Oct 2021 18:57:49 +0800
+From:   Hou Wenlong <houwenlong93@linux.alibaba.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org
+Subject: Re: [PATCH 1/2] KVM: VMX: fix instruction skipping when handling UD
+ exception
+Message-ID: <20211029105749.GA113630@k08j02272.eu95sqa>
+References: <cover.1634870747.git.houwenlong93@linux.alibaba.com>
+ <8ad4de9dae77ee3690ee9bd3c5a51d235d619eb6.1634870747.git.houwenlong93@linux.alibaba.com>
+ <YXgu3pvk+Ifrl0Yu@google.com>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YXgu3pvk+Ifrl0Yu@google.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Oct 26, 2021 at 04:37:50PM +0000, Sean Christopherson wrote:
+> On Fri, Oct 22, 2021, Hou Wenlong wrote:
+> > When kvm.force_emulation_prefix is enabled, instruction with
+> > kvm prefix would trigger an UD exception and do instruction
+> > emulation. The emulation may need to exit to userspace due
+> > to userspace io, and the complete_userspace_io callback may
+> > skip instruction, i.e. MSR accesses emulation would exit to
+> > userspace if userspace wanted to know about the MSR fault.
+> > However, VM_EXIT_INSTRUCTION_LEN in vmcs is invalid now, it
+> > should use kvm_emulate_instruction() to skip instruction.
+> > 
+> > Signed-off-by: Hou Wenlong <houwenlong93@linux.alibaba.com>
+> > ---
+> >  arch/x86/kvm/vmx/vmx.c | 4 ++--
+> >  arch/x86/kvm/vmx/vmx.h | 9 +++++++++
+> >  2 files changed, 11 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > index 1c8b2b6e7ed9..01049d65da26 100644
+> > --- a/arch/x86/kvm/vmx/vmx.c
+> > +++ b/arch/x86/kvm/vmx/vmx.c
+> > @@ -1501,8 +1501,8 @@ static int skip_emulated_instruction(struct kvm_vcpu *vcpu)
+> >  	 * (namely Hyper-V) don't set it due to it being undefined behavior,
+> >  	 * i.e. we end up advancing IP with some random value.
+> >  	 */
+> > -	if (!static_cpu_has(X86_FEATURE_HYPERVISOR) ||
+> > -	    exit_reason.basic != EXIT_REASON_EPT_MISCONFIG) {
+> > +	if (!is_ud_exit(vcpu) && (!static_cpu_has(X86_FEATURE_HYPERVISOR) ||
+> 
+> This is incomplete and is just a workaround for the underlying bug.  The same
+> mess can occur if the emulator triggers an exit to userspace during "normal"
+> emulation, e.g. if unrestricted guest is disabled and the guest accesses an MSR
+> while in Big RM.  In that case, there's no #UD to key off of.
+> 
+> The correct way to fix this is to attach a different callback when the MSR access
+> comes from the emulator.  I'd say rename the existing complete_emulated_{rd,wr}msr()
+> callbacks to complete_fast_{rd,wr}msr() to match the port I/O nomenclature.
+> 
+> Something like this (which also has some opportunistic simplification of the
+> error handling in kvm_emulate_{rd,wr}msr()).
+> 
+> ---
+>  arch/x86/kvm/x86.c | 82 +++++++++++++++++++++++++---------------------
+>  1 file changed, 45 insertions(+), 37 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index ac83d873d65b..7ff5b8d58ca3 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -1814,18 +1814,44 @@ int kvm_set_msr(struct kvm_vcpu *vcpu, u32 index, u64 data)
+>  }
+>  EXPORT_SYMBOL_GPL(kvm_set_msr);
+> 
+> -static int complete_emulated_rdmsr(struct kvm_vcpu *vcpu)
+> +static void __complete_emulated_rdmsr(struct kvm_vcpu *vcpu)
+>  {
+> -	int err = vcpu->run->msr.error;
+> -	if (!err) {
+> +	if (!vcpu->run->msr.error) {
+>  		kvm_rax_write(vcpu, (u32)vcpu->run->msr.data);
+>  		kvm_rdx_write(vcpu, vcpu->run->msr.data >> 32);
+>  	}
+> +}
+> 
+> -	return static_call(kvm_x86_complete_emulated_msr)(vcpu, err);
+> +static int complete_emulated_msr_access(struct kvm_vcpu *vcpu)
+> +{
+> +	if (vcpu->run->msr.error) {
+> +		kvm_inject_gp(vcpu, 0);
+> +		return 1;
+> +	}
+> +
+> +	return kvm_emulate_instruction(vcpu, EMULTYPE_SKIP);
+> +}
+> +
+> +static int complete_emulated_rdmsr(struct kvm_vcpu *vcpu)
+> +{
+> +	__complete_emulated_rdmsr(vcpu);
+> +
+> +	return complete_emulated_msr_access(vcpu);
+>  }
+> 
+>  static int complete_emulated_wrmsr(struct kvm_vcpu *vcpu)
+> +{
+> +	return complete_emulated_msr_access(vcpu);
+> +}
+> +
+> +static int complete_fast_rdmsr(struct kvm_vcpu *vcpu)
+> +{
+> +	__complete_emulated_rdmsr(vcpu);
+> +
+> +	return static_call(kvm_x86_complete_emulated_msr)(vcpu, vcpu->run->msr.error);
+> +}
+> +
+> +static int complete_fast_wrmsr(struct kvm_vcpu *vcpu)
+>  {
+>  	return static_call(kvm_x86_complete_emulated_msr)(vcpu, vcpu->run->msr.error);
+>  }
+> @@ -1864,18 +1890,6 @@ static int kvm_msr_user_space(struct kvm_vcpu *vcpu, u32 index,
+>  	return 1;
+>  }
+> 
+> -static int kvm_get_msr_user_space(struct kvm_vcpu *vcpu, u32 index, int r)
+> -{
+> -	return kvm_msr_user_space(vcpu, index, KVM_EXIT_X86_RDMSR, 0,
+> -				   complete_emulated_rdmsr, r);
+> -}
+> -
+> -static int kvm_set_msr_user_space(struct kvm_vcpu *vcpu, u32 index, u64 data, int r)
+> -{
+> -	return kvm_msr_user_space(vcpu, index, KVM_EXIT_X86_WRMSR, data,
+> -				   complete_emulated_wrmsr, r);
+> -}
+> -
+>  int kvm_emulate_rdmsr(struct kvm_vcpu *vcpu)
+>  {
+>  	u32 ecx = kvm_rcx_read(vcpu);
+> @@ -1883,19 +1897,15 @@ int kvm_emulate_rdmsr(struct kvm_vcpu *vcpu)
+>  	int r;
+> 
+>  	r = kvm_get_msr(vcpu, ecx, &data);
+> -
+> -	/* MSR read failed? See if we should ask user space */
+> -	if (r && kvm_get_msr_user_space(vcpu, ecx, r)) {
+> -		/* Bounce to user space */
+> -		return 0;
+> -	}
+> -
+>  	if (!r) {
+>  		trace_kvm_msr_read(ecx, data);
+> 
+>  		kvm_rax_write(vcpu, data & -1u);
+>  		kvm_rdx_write(vcpu, (data >> 32) & -1u);
+>  	} else {
+> +		if (kvm_msr_user_space(vcpu, ecx, KVM_EXIT_X86_RDMSR, 0,
+> +				       complete_fast_rdmsr, r))
+> +			return 0;
+>  		trace_kvm_msr_read_ex(ecx);
+>  	}
+> 
+> @@ -1910,20 +1920,16 @@ int kvm_emulate_wrmsr(struct kvm_vcpu *vcpu)
+>  	int r;
+> 
+>  	r = kvm_set_msr(vcpu, ecx, data);
+> -
+> -	/* MSR write failed? See if we should ask user space */
+> -	if (r && kvm_set_msr_user_space(vcpu, ecx, data, r))
+> -		/* Bounce to user space */
+> -		return 0;
+> -
+> -	/* Signal all other negative errors to userspace */
+> -	if (r < 0)
+> -		return r;
+> -
+> -	if (!r)
+> +	if (!r) {
+>  		trace_kvm_msr_write(ecx, data);
+> -	else
+> +	} else {
+> +		if (kvm_msr_user_space(vcpu, ecx, KVM_EXIT_X86_WRMSR, data,
+> +				       complete_fast_wrmsr, r))
+> +			return 0;
+> +		if (r < 0)
+> +			return r;
+>  		trace_kvm_msr_write_ex(ecx, data);
+> +	}
+> 
+>  	return static_call(kvm_x86_complete_emulated_msr)(vcpu, r);
+>  }
+> @@ -7387,7 +7393,8 @@ static int emulator_get_msr(struct x86_emulate_ctxt *ctxt,
+> 
+>  	r = kvm_get_msr(vcpu, msr_index, pdata);
+> 
+> -	if (r && kvm_get_msr_user_space(vcpu, msr_index, r)) {
+> +	if (r && kvm_msr_user_space(vcpu, msr_index, KVM_EXIT_X86_RDMSR, 0,
+> +				    complete_emulated_rdmsr, r)) {
+>  		/* Bounce to user space */
+>  		return X86EMUL_IO_NEEDED;
+>  	}
+> @@ -7403,7 +7410,8 @@ static int emulator_set_msr(struct x86_emulate_ctxt *ctxt,
+> 
+>  	r = kvm_set_msr(vcpu, msr_index, data);
+> 
+> -	if (r && kvm_set_msr_user_space(vcpu, msr_index, data, r)) {
+> +	if (r && kvm_msr_user_space(vcpu, msr_index, KVM_EXIT_X86_WRMSR, data,
+> +				    complete_emulated_wrmsr, r)) {
+>  		/* Bounce to user space */
+>  		return X86EMUL_IO_NEEDED;
+>  	}
+> --
+Hi Sean,
 
---=-lkb3UiUcBYwZ3ThlrKkR
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+The note in x86_emulate_instruction() for EMULTYPE_SKIP said that the
+caller should be responsible for updating interruptibility state and
+injecting single-step #DB. And vendor callbacks for
+kvm_skip_emulated_instruction() also do some special things, e.g.
+I found that sev_es guest just skips RIP updating. So it may be
+more appropriate to add a parameter for skip_emulated_instruction()
+callback, which force to use x86_skip_instruction() if the instruction
+length is invalid.
 
-On Mon, 2021-10-25 at 14:13 +0100, David Woodhouse wrote:
->=20
-> When you put it like that, it just seems so stunningly redundant :)
->=20
-> "When we get notified that the guest HVA has been mapped, we create
-> our own kernel mapping of the same page. When we are notifed that the
-> guest HVA gets unmapped, we tear down our kernel mapping of it."
-
-Except, of course, that the kernel mapping can be used from *anywhere*
-and not just a from thread belonging to the VM.
-
-Like when irqfd_inject() invokes kvm_set_irq() from a work queue, which
-is *obviously* oopsing once I fix up the other minor issues in the
-patch I sent out last night.
-
---=-lkb3UiUcBYwZ3ThlrKkR
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCECow
-ggUcMIIEBKADAgECAhEA4rtJSHkq7AnpxKUY8ZlYZjANBgkqhkiG9w0BAQsFADCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTkwMTAyMDAwMDAwWhcNMjIwMTAxMjM1
-OTU5WjAkMSIwIAYJKoZIhvcNAQkBFhNkd213MkBpbmZyYWRlYWQub3JnMIIBIjANBgkqhkiG9w0B
-AQEFAAOCAQ8AMIIBCgKCAQEAsv3wObLTCbUA7GJqKj9vHGf+Fa+tpkO+ZRVve9EpNsMsfXhvFpb8
-RgL8vD+L133wK6csYoDU7zKiAo92FMUWaY1Hy6HqvVr9oevfTV3xhB5rQO1RHJoAfkvhy+wpjo7Q
-cXuzkOpibq2YurVStHAiGqAOMGMXhcVGqPuGhcVcVzVUjsvEzAV9Po9K2rpZ52FE4rDkpDK1pBK+
-uOAyOkgIg/cD8Kugav5tyapydeWMZRJQH1vMQ6OVT24CyAn2yXm2NgTQMS1mpzStP2ioPtTnszIQ
-Ih7ASVzhV6csHb8Yrkx8mgllOyrt9Y2kWRRJFm/FPRNEurOeNV6lnYAXOymVJwIDAQABo4IB0zCC
-Ac8wHwYDVR0jBBgwFoAUgq9sjPjF/pZhfOgfPStxSF7Ei8AwHQYDVR0OBBYEFLfuNf820LvaT4AK
-xrGK3EKx1DE7MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUF
-BwMEBggrBgEFBQcDAjBGBgNVHSAEPzA9MDsGDCsGAQQBsjEBAgEDBTArMCkGCCsGAQUFBwIBFh1o
-dHRwczovL3NlY3VyZS5jb21vZG8ubmV0L0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3Js
-LmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWls
-Q0EuY3JsMIGLBggrBgEFBQcBAQR/MH0wVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuY29tb2RvY2Eu
-Y29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYI
-KwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmNvbW9kb2NhLmNvbTAeBgNVHREEFzAVgRNkd213MkBpbmZy
-YWRlYWQub3JnMA0GCSqGSIb3DQEBCwUAA4IBAQALbSykFusvvVkSIWttcEeifOGGKs7Wx2f5f45b
-nv2ghcxK5URjUvCnJhg+soxOMoQLG6+nbhzzb2rLTdRVGbvjZH0fOOzq0LShq0EXsqnJbbuwJhK+
-PnBtqX5O23PMHutP1l88AtVN+Rb72oSvnD+dK6708JqqUx2MAFLMevrhJRXLjKb2Mm+/8XBpEw+B
-7DisN4TMlLB/d55WnT9UPNHmQ+3KFL7QrTO8hYExkU849g58Dn3Nw3oCbMUgny81ocrLlB2Z5fFG
-Qu1AdNiBA+kg/UxzyJZpFbKfCITd5yX49bOriL692aMVDyqUvh8fP+T99PqorH4cIJP6OxSTdxKM
-MIIFHDCCBASgAwIBAgIRAOK7SUh5KuwJ6cSlGPGZWGYwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTE5MDEwMjAwMDAwMFoXDTIyMDEwMTIz
-NTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCASIwDQYJKoZIhvcN
-AQEBBQADggEPADCCAQoCggEBALL98Dmy0wm1AOxiaio/bxxn/hWvraZDvmUVb3vRKTbDLH14bxaW
-/EYC/Lw/i9d98CunLGKA1O8yogKPdhTFFmmNR8uh6r1a/aHr301d8YQea0DtURyaAH5L4cvsKY6O
-0HF7s5DqYm6tmLq1UrRwIhqgDjBjF4XFRqj7hoXFXFc1VI7LxMwFfT6PStq6WedhROKw5KQytaQS
-vrjgMjpICIP3A/CroGr+bcmqcnXljGUSUB9bzEOjlU9uAsgJ9sl5tjYE0DEtZqc0rT9oqD7U57My
-ECIewElc4VenLB2/GK5MfJoJZTsq7fWNpFkUSRZvxT0TRLqznjVepZ2AFzsplScCAwEAAaOCAdMw
-ggHPMB8GA1UdIwQYMBaAFIKvbIz4xf6WYXzoHz0rcUhexIvAMB0GA1UdDgQWBBS37jX/NtC72k+A
-CsaxitxCsdQxOzAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEF
-BQcDBAYIKwYBBQUHAwIwRgYDVR0gBD8wPTA7BgwrBgEEAbIxAQIBAwUwKzApBggrBgEFBQcCARYd
-aHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9DUFMwWgYDVR0fBFMwUTBPoE2gS4ZJaHR0cDovL2Ny
-bC5jb21vZG9jYS5jb20vQ09NT0RPUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFp
-bENBLmNybDCBiwYIKwYBBQUHAQEEfzB9MFUGCCsGAQUFBzAChklodHRwOi8vY3J0LmNvbW9kb2Nh
-LmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3J0MCQG
-CCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAC20spBbrL71ZEiFrbXBHonzhhirO1sdn+X+O
-W579oIXMSuVEY1LwpyYYPrKMTjKECxuvp24c829qy03UVRm742R9Hzjs6tC0oatBF7KpyW27sCYS
-vj5wbal+TttzzB7rT9ZfPALVTfkW+9qEr5w/nSuu9PCaqlMdjABSzHr64SUVy4ym9jJvv/FwaRMP
-gew4rDeEzJSwf3eeVp0/VDzR5kPtyhS+0K0zvIWBMZFPOPYOfA59zcN6AmzFIJ8vNaHKy5QdmeXx
-RkLtQHTYgQPpIP1Mc8iWaRWynwiE3ecl+PWzq4i+vdmjFQ8qlL4fHz/k/fT6qKx+HCCT+jsUk3cS
-jDCCBeYwggPOoAMCAQICEGqb4Tg7/ytrnwHV2binUlYwDQYJKoZIhvcNAQEMBQAwgYUxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMSswKQYDVQQDEyJDT01PRE8gUlNBIENlcnRpZmljYXRp
-b24gQXV0aG9yaXR5MB4XDTEzMDExMDAwMDAwMFoXDTI4MDEwOTIzNTk1OVowgZcxCzAJBgNVBAYT
-AkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNV
-BAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAvrOeV6wodnVAFsc4A5jTxhh2IVDzJXkLTLWg0X06WD6cpzEup/Y0dtmEatrQPTRI5Or1u6zf
-+bGBSyD9aH95dDSmeny1nxdlYCeXIoymMv6pQHJGNcIDpFDIMypVpVSRsivlJTRENf+RKwrB6vcf
-WlP8dSsE3Rfywq09N0ZfxcBa39V0wsGtkGWC+eQKiz4pBZYKjrc5NOpG9qrxpZxyb4o4yNNwTqza
-aPpGRqXB7IMjtf7tTmU2jqPMLxFNe1VXj9XB1rHvbRikw8lBoNoSWY66nJN/VCJv5ym6Q0mdCbDK
-CMPybTjoNCQuelc0IAaO4nLUXk0BOSxSxt8kCvsUtQIDAQABo4IBPDCCATgwHwYDVR0jBBgwFoAU
-u69+Aj36pvE8hI6t7jiY7NkyMtQwHQYDVR0OBBYEFIKvbIz4xf6WYXzoHz0rcUhexIvAMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMBEGA1UdIAQKMAgwBgYEVR0gADBMBgNVHR8E
-RTBDMEGgP6A9hjtodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDZXJ0aWZpY2F0aW9u
-QXV0aG9yaXR5LmNybDBxBggrBgEFBQcBAQRlMGMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9jcnQuY29t
-b2RvY2EuY29tL0NPTU9ET1JTQUFkZFRydXN0Q0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2Nz
-cC5jb21vZG9jYS5jb20wDQYJKoZIhvcNAQEMBQADggIBAHhcsoEoNE887l9Wzp+XVuyPomsX9vP2
-SQgG1NgvNc3fQP7TcePo7EIMERoh42awGGsma65u/ITse2hKZHzT0CBxhuhb6txM1n/y78e/4ZOs
-0j8CGpfb+SJA3GaBQ+394k+z3ZByWPQedXLL1OdK8aRINTsjk/H5Ns77zwbjOKkDamxlpZ4TKSDM
-KVmU/PUWNMKSTvtlenlxBhh7ETrN543j/Q6qqgCWgWuMAXijnRglp9fyadqGOncjZjaaSOGTTFB+
-E2pvOUtY+hPebuPtTbq7vODqzCM6ryEhNhzf+enm0zlpXK7q332nXttNtjv7VFNYG+I31gnMrwfH
-M5tdhYF/8v5UY5g2xANPECTQdu9vWPoqNSGDt87b3gXb1AiGGaI06vzgkejL580ul+9hz9D0S0U4
-jkhJiA7EuTecP/CFtR72uYRBcunwwH3fciPjviDDAI9SnC/2aPY8ydehzuZutLbZdRJ5PDEJM/1t
-yZR2niOYihZ+FCbtf3D9mB12D4ln9icgc7CwaxpNSCPt8i/GqK2HsOgkL3VYnwtx7cJUmpvVdZ4o
-gnzgXtgtdk3ShrtOS1iAN2ZBXFiRmjVzmehoMof06r1xub+85hFQzVxZx5/bRaTKTlL8YXLI8nAb
-R9HWdFqzcOoB/hxfEyIQpx9/s81rgzdEZOofSlZHynoSMYIDyjCCA8YCAQEwga0wgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
-ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjEx
-MDI5MTA0ODI2WjAvBgkqhkiG9w0BCQQxIgQgKbjtTB7DPzt/Ibxyi80DCUSJM1RahOThf2QZBGUk
-iMgwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
-TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
-PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
-aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBAHu2p2qrsqsrhnK/iIjvXCgzKg0tYkNxgPDEslSPC0CHDlhpkHGLTwnW3p3GOCBv
-P0ba/jO2J4MLWlabFD3vfF2SguOA4xlxtXrFZvXK1h7ZqXbHKL9lojNBbSTW3HTjXhdSlpb4BjS/
-og7ZnHf7hwU0Ro9V0Bb+P+ShcxYPrw4oM1EwCe28RvxqYDEuV6I9skSW6h/BMuj2PcJQZTlYhlDz
-55YW0W9luuwEvGJmbedFzYPjI/N0t2vc3gwFn0UNZv93TNol2s7L5G0LQiZp+5qjBhA86z7stZwf
-ziNxNPyTIg2rXLt8Hh8K3Y2vA7D0epFgTcQN+cK1jeNTJGRKStgAAAAAAAA=
-
-
---=-lkb3UiUcBYwZ3ThlrKkR--
-
+Thanks
