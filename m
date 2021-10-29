@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B3A3743FB57
-	for <lists+kvm@lfdr.de>; Fri, 29 Oct 2021 13:27:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id AD5DE43FB69
+	for <lists+kvm@lfdr.de>; Fri, 29 Oct 2021 13:31:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231820AbhJ2LaJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Oct 2021 07:30:09 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48610 "EHLO mail.kernel.org"
+        id S232002AbhJ2Ldx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Oct 2021 07:33:53 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49332 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231670AbhJ2LaI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Oct 2021 07:30:08 -0400
+        id S231867AbhJ2Ldr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Oct 2021 07:33:47 -0400
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8664F6113E;
-        Fri, 29 Oct 2021 11:27:40 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id ED34361167;
+        Fri, 29 Oct 2021 11:31:18 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1mgQ2s-002P0J-8C; Fri, 29 Oct 2021 12:27:38 +0100
-Date:   Fri, 29 Oct 2021 12:27:37 +0100
-Message-ID: <87lf2c9il2.wl-maz@kernel.org>
+        id 1mgQ6O-002P4Z-QB; Fri, 29 Oct 2021 12:31:16 +0100
+Date:   Fri, 29 Oct 2021 12:31:16 +0100
+Message-ID: <87k0hw9iez.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Oliver Upton <oupton@google.com>
 Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
@@ -34,10 +34,10 @@ Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
         Peter Shier <pshier@google.com>,
         Ricardo Koller <ricarkol@google.com>,
         Reiji Watanabe <reijiw@google.com>
-Subject: Re: [PATCH 1/3] KVM: arm64: Stash OSLSR_EL1 in the cpu context
-In-Reply-To: <20211029003202.158161-2-oupton@google.com>
+Subject: Re: [PATCH 3/3] KVM: arm64: Raise KVM's reported debug architecture to v8.2
+In-Reply-To: <20211029003202.158161-4-oupton@google.com>
 References: <20211029003202.158161-1-oupton@google.com>
-        <20211029003202.158161-2-oupton@google.com>
+        <20211029003202.158161-4-oupton@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -51,80 +51,53 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 29 Oct 2021 01:32:00 +0100,
+On Fri, 29 Oct 2021 01:32:02 +0100,
 Oliver Upton <oupton@google.com> wrote:
 > 
-> An upcoming change to KVM will context switch the OS Lock status between
-> guest/host. Add OSLSR_EL1 to the cpu context and handle guest reads
-> using the stored value.
+> The additions made to the Debug architecture between v8.0 and v8.2 are
+> only applicable to external debug. KVM does not (and likely will never)
+> support external debug, so KVM can proudly report support for v8.2 to
+> its guests.
 > 
+> Raise the reported Debug architecture to v8.2. Additionally, v8.2 makes
+> FEAT_DoubleLock optional. Even though KVM never supported it in the
+> first place, report DoubleLock as not implemented now as the
+> architecture permits it for v8.2.
+> 
+> Cc: Reiji Watanabe <reijiw@google.com>
+> Cc: Ricardo Koller <ricarkol@google.com>
+> Suggested-by: Marc Zyngier <maz@kernel.org>
 > Signed-off-by: Oliver Upton <oupton@google.com>
 > ---
->  arch/arm64/include/asm/kvm_host.h |  1 +
->  arch/arm64/kvm/sys_regs.c         | 13 ++++++-------
->  2 files changed, 7 insertions(+), 7 deletions(-)
+>  arch/arm64/kvm/sys_regs.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index f8be56d5342b..c98f65c4a1f7 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -172,6 +172,7 @@ enum vcpu_sysreg {
->  	MDSCR_EL1,	/* Monitor Debug System Control Register */
->  	MDCCINT_EL1,	/* Monitor Debug Comms Channel Interrupt Enable Reg */
->  	DISR_EL1,	/* Deferred Interrupt Status Register */
-> +	OSLSR_EL1,	/* OS Lock Status Register */
-
-Please move it one line up, next to the rest of the debug stuff
-(DISR_EL1 is RAS and not debug).
-
->
->  	/* Performance Monitors Registers */
->  	PMCR_EL0,	/* Control Register */
 > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 1d46e185f31e..0eb03e7508fe 100644
+> index 0840ae081290..f56ee5830d18 100644
 > --- a/arch/arm64/kvm/sys_regs.c
 > +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -291,12 +291,11 @@ static bool trap_oslsr_el1(struct kvm_vcpu *vcpu,
->  			   struct sys_reg_params *p,
->  			   const struct sys_reg_desc *r)
->  {
-> -	if (p->is_write) {
-> +	if (p->is_write)
->  		return ignore_write(vcpu, p);
-
-This should be UNDEF (though the HW should catch that, really).
-
-> -	} else {
-> -		p->regval = (1 << 3);
-> -		return true;
-> -	}
+> @@ -1109,9 +1109,14 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+>  				 ARM64_FEATURE_MASK(ID_AA64ISAR1_GPI));
+>  		break;
+>  	case SYS_ID_AA64DFR0_EL1:
+> -		/* Limit debug to ARMv8.0 */
+> +		/* Limit debug to ARMv8.2 */
+>  		val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER);
+> -		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER), 6);
+> +		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER), 8);
 > +
-> +	p->regval = vcpu_read_sys_reg(vcpu, r->reg);
-> +	return true;
->  }
->  
->  static bool trap_dbgauthstatus_el1(struct kvm_vcpu *vcpu,
-> @@ -1441,7 +1440,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  
->  	{ SYS_DESC(SYS_MDRAR_EL1), trap_raz_wi },
->  	{ SYS_DESC(SYS_OSLAR_EL1), trap_raz_wi },
-> -	{ SYS_DESC(SYS_OSLSR_EL1), trap_oslsr_el1 },
-> +	{ SYS_DESC(SYS_OSLSR_EL1), trap_oslsr_el1, reset_val, OSLSR_EL1, 0x00000008 },
->  	{ SYS_DESC(SYS_OSDLR_EL1), trap_raz_wi },
->  	{ SYS_DESC(SYS_DBGPRCR_EL1), trap_raz_wi },
->  	{ SYS_DESC(SYS_DBGCLAIMSET_EL1), trap_raz_wi },
-> @@ -1916,7 +1915,7 @@ static const struct sys_reg_desc cp14_regs[] = {
->  	{ Op1( 0), CRn( 1), CRm( 0), Op2( 4), trap_raz_wi },
->  	DBGBXVR(1),
->  	/* DBGOSLSR */
-> -	{ Op1( 0), CRn( 1), CRm( 1), Op2( 4), trap_oslsr_el1 },
-> +	{ Op1( 0), CRn( 1), CRm( 1), Op2( 4), trap_oslsr_el1, NULL, OSLSR_EL1 },
->  	DBGBXVR(2),
->  	DBGBXVR(3),
->  	/* DBGOSDLR */
+> +		/* Hide DoubleLock from guests */
+> +		val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_DOUBLELOCK);
+> +		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_DOUBLELOCK), 0CF);
+> +
 
-Please update tools/testing/selftests/kvm/aarch64/get-reg-list.c
-before Andrew catches you red-handed! :D
+One issue with that is that this will break migration from an older
+kernel (DFR0 will be different between source and destination).
+
+You'll need a set_user handler and deal with it in a similar way to
+CSV2/CSV3.
+
+Thanks,
 
 	M.
 
