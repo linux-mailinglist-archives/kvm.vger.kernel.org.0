@@ -2,111 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 56C0543F3F8
-	for <lists+kvm@lfdr.de>; Fri, 29 Oct 2021 02:32:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id E5CEE43F414
+	for <lists+kvm@lfdr.de>; Fri, 29 Oct 2021 02:44:27 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231420AbhJ2AfN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 28 Oct 2021 20:35:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56086 "EHLO
+        id S231400AbhJ2Aqy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 28 Oct 2021 20:46:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231384AbhJ2AfM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 28 Oct 2021 20:35:12 -0400
-Received: from mail-io1-xd4a.google.com (mail-io1-xd4a.google.com [IPv6:2607:f8b0:4864:20::d4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A969DC061714
-        for <kvm@vger.kernel.org>; Thu, 28 Oct 2021 17:32:44 -0700 (PDT)
-Received: by mail-io1-xd4a.google.com with SMTP id u20-20020a5ec014000000b005df4924e18dso5347232iol.17
-        for <kvm@vger.kernel.org>; Thu, 28 Oct 2021 17:32:44 -0700 (PDT)
+        with ESMTP id S230211AbhJ2Aqx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 28 Oct 2021 20:46:53 -0400
+Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3794C061570;
+        Thu, 28 Oct 2021 17:44:25 -0700 (PDT)
+Received: by mail-io1-xd32.google.com with SMTP id z144so9366948iof.0;
+        Thu, 28 Oct 2021 17:44:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=Oy01IknDRFVJKLSnWHmExcfPSXKDoq8nS6BDKnDz0O8=;
-        b=i4SQt8b1AkstVV8CAePyo55dLl6VOqR1QVAiVbqgmCto/zYMwI9p6BgIoTIFAPZXvC
-         RYV9R9Ieg85IjpWwhQ80iBwhSdmiRXDjZ4Cn6EKwvCQ4VFzULIRTbQVedU4MI34xHFpE
-         knIqoBIrFOrTTrlhR63X91EXWeHBrqc8Wy44sc0gQ2InrMkPC7POadxyO/T73FTHi0Uz
-         U1XBNc8ODIfe3BJS4+JTlNavF3j1xjXWmuzWnVVrW+KmGUeZemgl6ZxQKNUlvzmsAt2S
-         XJRivugCqYaiWWIKtuyQlzaOJghDbN2iENFoRYExbkDSbvRJj/hVa65/XRo4FEamT4QT
-         hQHA==
+        bh=zQP4kRzm3ZSndyVhtvxvd/t2NKU3Z81W6oJKDHuooD0=;
+        b=Mqu8zRtKOuus4eaIvw+S3uKGxoOqY0VjK92sWkJ5SYeeKEdEGXqdK2U/WeoOLAeI+w
+         1ekw3doiTOXxiQmqIcRoUgux9R/AamtSEEyp/oc7DVmOzxynHNasxpYqHlBbZKLCusos
+         zeZM3fpFS2N0G1w26R5F/6vvTCcbUYWLQ3yxXeIZdmCoCXuh49sUAVh9UimQpOTMeS+C
+         n8nHEGPmyChZqJO6uHoOhruMoTCxDpNlebk/+XbdtxJjQMOWYx+txuz14rbYA8bPu33G
+         c0hl//lhdQOeGGyU8a/nBPyKYaxfAsq27F9ORBEfvmCorVvluWB3wN7yZx02mIARfuuw
+         kZIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=Oy01IknDRFVJKLSnWHmExcfPSXKDoq8nS6BDKnDz0O8=;
-        b=LiM84x+9dYJK6cfdrM6YOoZBuRLxOKh6s7AVbA3ACBhAsmDhRXjMNWkQsBnBg4o7+j
-         D0E06pMAKEEow3XvMDqZ/gkvxu1h9mf5Nn0IPiS+JU+BU19sHDDhh7qz4OGEAZd5oECu
-         R1PP2mJK8lR6NaK/H5EwRHLq3fGzRvN7f4YMVtB6YwpXaKmL9SDx3EAoVu2A5XfzBsgj
-         hi45KbuQvM3wyAlaLx3Rczjg2Gcch7C5MVstKg11xLa33+jdSJjnhT0bpPENFTcporbG
-         flFW1olRnC1bP3W8WeiQBV9QWkh9jbs41GiuL6RXZN3UBDwlQmyRL55UJFK3nU0eG3LX
-         kBbQ==
-X-Gm-Message-State: AOAM531gGlqjLinYK3xqSvBdzB67IfOFOoHGmVV4SL7tVyDl0dgIW0QR
-        L/5I8bl2cPSLOoAE54wSpesirp3faVE=
-X-Google-Smtp-Source: ABdhPJyxXD1Yuus5/OHrCt1h6LMDXta7JdKp3vcZcLarAByoLzOk+GrzMDSQpNSt9IwjFcgVU85NVKnra50=
-X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a05:6638:329e:: with SMTP id
- f30mr4310865jav.63.1635467564021; Thu, 28 Oct 2021 17:32:44 -0700 (PDT)
-Date:   Fri, 29 Oct 2021 00:32:02 +0000
-In-Reply-To: <20211029003202.158161-1-oupton@google.com>
-Message-Id: <20211029003202.158161-4-oupton@google.com>
-Mime-Version: 1.0
-References: <20211029003202.158161-1-oupton@google.com>
-X-Mailer: git-send-email 2.33.1.1089.g2158813163f-goog
-Subject: [PATCH 3/3] KVM: arm64: Raise KVM's reported debug architecture to v8.2
-From:   Oliver Upton <oupton@google.com>
-To:     kvmarm@lists.cs.columbia.edu
-Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        linux-arm-kernel@lists.infradead.org,
-        Andrew Jones <drjones@redhat.com>,
-        Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Oliver Upton <oupton@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=zQP4kRzm3ZSndyVhtvxvd/t2NKU3Z81W6oJKDHuooD0=;
+        b=6XNlWPoM+2uPO5i4Fv35ea3feUu2tLu3gj5I8A6maIdseYX7CddPeMxm8EpyeykpA1
+         A1L7ru7kzsgxGiro9ctHQ5qWGPEQx8pciQeK8SYqrL/RqZtaGBxfOJj5ANsg9LjhG9Lw
+         ZesvRSZ8ai5mhPZILZ8B6QhdWnHAbWlMMvTjMmA6uilKh8E8NlEjWtr7e1+ylm8CwpIN
+         O9VplGva/4TT28Pe7jP3yUdoLzMZlKxFw5mxZVdJcC4kUW9/4IDK6kwPUFkw3qmxFkPz
+         l+qMqTDTGv4o8I3UF5PTUrY++ZNbIeT3NVKL0JTdMbYoLSUmDA2m8P63Vpb5Y2N4sZMF
+         RQqg==
+X-Gm-Message-State: AOAM532+HYV8LM6VskFjhj+1GIuymemDc+EMZWbh9Zyc01F60vCmWgMk
+        TDVPMwkRr6JMHb2RidSB/8LKtWuuZtDFXHLJRaOhNRrOdRs=
+X-Google-Smtp-Source: ABdhPJzJKilq3tDV5Olh9mImUtsSsiwF8o6rvu8pTkX4MbWwe2o0arz6VTezLeOsEfqHk6p3OWm4ylILeLP4hUTLPMU=
+X-Received: by 2002:a5d:80d6:: with SMTP id h22mr5663782ior.152.1635468265191;
+ Thu, 28 Oct 2021 17:44:25 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200320212833.3507-1-sean.j.christopherson@intel.com>
+ <20200320212833.3507-24-sean.j.christopherson@intel.com> <CAJhGHyD=S6pVB+OxM7zF0_6LnMUCLqyTfMK4x9GZsdRHZmgN7Q@mail.gmail.com>
+ <YXrAM9MNqgLTU6+m@google.com>
+In-Reply-To: <YXrAM9MNqgLTU6+m@google.com>
+From:   Lai Jiangshan <jiangshanlai+lkml@gmail.com>
+Date:   Fri, 29 Oct 2021 08:44:13 +0800
+Message-ID: <CAJhGHyBKVUsuKdvfaART6NWF7Axk5=eFQLidhGrM=mUO2cv2vw@mail.gmail.com>
+Subject: Re: [PATCH v3 23/37] KVM: nVMX: Add helper to handle TLB flushes on
+ nested VM-Enter/VM-Exit
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>,
+        Ben Gardon <bgardon@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Liran Alon <liran.alon@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        John Haxby <john.haxby@oracle.com>,
+        Miaohe Lin <linmiaohe@huawei.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The additions made to the Debug architecture between v8.0 and v8.2 are
-only applicable to external debug. KVM does not (and likely will never)
-support external debug, so KVM can proudly report support for v8.2 to
-its guests.
+On Thu, Oct 28, 2021 at 11:22 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> -me :-)
+>
+> On Thu, Oct 28, 2021, Lai Jiangshan wrote:
+> > On Sat, Mar 21, 2020 at 5:29 AM Sean Christopherson
+> > <sean.j.christopherson@intel.com> wrote:
+> >
+> > > +       if (!nested_cpu_has_vpid(vmcs12) || !nested_has_guest_tlb_tag(vcpu)) {
+> > > +               kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
+> > > +       } else if (is_vmenter &&
+> > > +                  vmcs12->virtual_processor_id != vmx->nested.last_vpid) {
+> > > +               vmx->nested.last_vpid = vmcs12->virtual_processor_id;
+> > > +               vpid_sync_context(nested_get_vpid02(vcpu));
+> > > +       }
+> > > +}
+> >
+> > (I'm sorry to pick this old email to reply to, but the problem has
+> > nothing to do with this patch nor 5c614b3583e7 and it exists since
+> > nested vmx is introduced.)
+> >
+> > I think kvm_mmu_free_guest_mode_roots() should be called
+> > if (!enable_ept && vmcs12->virtual_processor_id != vmx->nested.last_vpid)
+> > just because prev_roots doesn't cache the vpid12.
+> > (prev_roots caches PCID, which is distinctive)
+> >
+> > The problem hardly exists if L1's hypervisor is also kvm, but if L1's
+> > hypervisor is different or is also kvm with some changes in the way how it
+> > manages VPID.
+>
+> Indeed.  A more straightforward error case would be if L1 and L2 share CR3, and
+> vmcs02.VPID is toggled (or used for the first time) on the L1 => L2 VM-Enter.
+>
+> The fix should simply be:
+>
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index eedcebf58004..574823370e7a 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -1202,17 +1202,15 @@ static void nested_vmx_transition_tlb_flush(struct kvm_vcpu *vcpu,
+>          *
+>          * If a TLB flush isn't required due to any of the above, and vpid12 is
+>          * changing then the new "virtual" VPID (vpid12) will reuse the same
+> -        * "real" VPID (vpid02), and so needs to be flushed.  There's no direct
+> -        * mapping between vpid02 and vpid12, vpid02 is per-vCPU and reused for
+> -        * all nested vCPUs.  Remember, a flush on VM-Enter does not invalidate
+> -        * guest-physical mappings, so there is no need to sync the nEPT MMU.
+> +        * "real" VPID (vpid02), and so needs to be flushed.  Like the !vpid02
+> +        * case above, this is a full TLB flush from the guest's perspective.
+>          */
+>         if (!nested_has_guest_tlb_tag(vcpu)) {
+>                 kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
+>         } else if (is_vmenter &&
+>                    vmcs12->virtual_processor_id != vmx->nested.last_vpid) {
+>                 vmx->nested.last_vpid = vmcs12->virtual_processor_id;
+> -               vpid_sync_context(nested_get_vpid02(vcpu));
+> +               kvm_make_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu);
 
-Raise the reported Debug architecture to v8.2. Additionally, v8.2 makes
-FEAT_DoubleLock optional. Even though KVM never supported it in the
-first place, report DoubleLock as not implemented now as the
-architecture permits it for v8.2.
+This change is neat.
 
-Cc: Reiji Watanabe <reijiw@google.com>
-Cc: Ricardo Koller <ricarkol@google.com>
-Suggested-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Oliver Upton <oupton@google.com>
----
- arch/arm64/kvm/sys_regs.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+But current KVM_REQ_TLB_FLUSH_GUEST flushes vpid01 only, and it doesn't flush
+vpid02.  vmx_flush_tlb_guest() might need to be changed to flush vpid02 too.
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 0840ae081290..f56ee5830d18 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1109,9 +1109,14 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
- 				 ARM64_FEATURE_MASK(ID_AA64ISAR1_GPI));
- 		break;
- 	case SYS_ID_AA64DFR0_EL1:
--		/* Limit debug to ARMv8.0 */
-+		/* Limit debug to ARMv8.2 */
- 		val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER);
--		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER), 6);
-+		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER), 8);
-+
-+		/* Hide DoubleLock from guests */
-+		val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_DOUBLELOCK);
-+		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_DOUBLELOCK), 0xf);
-+
- 		/* Limit guests to PMUv3 for ARMv8.4 */
- 		val = cpuid_feature_cap_perfmon_field(val,
- 						      ID_AA64DFR0_PMUVER_SHIFT,
--- 
-2.33.0.1079.g6e70778dc9-goog
+And if so, this nested_vmx_transition_tlb_flush() can be simplified further
+since KVM_REQ_TLB_FLUSH_CURRENT(!enable_ept) can be replaced with
+KVM_REQ_TLB_FLUSH_GUEST.
 
+>         }
+>  }
