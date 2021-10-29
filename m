@@ -2,70 +2,36 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 54E3F43FB6B
-	for <lists+kvm@lfdr.de>; Fri, 29 Oct 2021 13:32:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B0D1643FBE4
+	for <lists+kvm@lfdr.de>; Fri, 29 Oct 2021 13:56:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231807AbhJ2LfD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Oct 2021 07:35:03 -0400
-Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:39070 "EHLO
-        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230492AbhJ2LfC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 29 Oct 2021 07:35:02 -0400
-Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 19T9shFf002201;
-        Fri, 29 Oct 2021 11:31:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2021-07-09;
- bh=ASL/5ZgHammi5DIVzEszdXatehiW9Vna3ApAnWoSmLs=;
- b=Ege9Xx5xyb0F+KDwp7dkM47y5oqAGDadKj4i8VrqBO2sddejVQRt9lK9/y08O3bsBm7I
- 7UjfxCpg9uscAO3IIgADppVaBuiTJWLYIjq6XrfWpCcYvwh/oIBzdcGr1usbDZKAqf4u
- 6HRHXktb9FyxYi/tENUbbqZuNInrKT1C9wjNAQEz4XR2wp9LKOOd5o2iFRMa/jfG+4WE
- ezd4h+sF45COdYkgkvle6z/dynKY/iuf5/Jmb19iAqV76PDuU6JJvMXSFdvH9aVK2q19
- eSoLBgYXzohQGvTeS84QFdOZj6pqTVTfSgY9QRbntE0jIpok6y8xmXAnb88pHOBL5EbN gg== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3byj7s08b4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 29 Oct 2021 11:31:42 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 19TBM4Vo079655;
-        Fri, 29 Oct 2021 11:31:41 GMT
-Received: from nam12-bn8-obe.outbound.protection.outlook.com (mail-bn8nam12lp2173.outbound.protection.outlook.com [104.47.55.173])
-        by userp3020.oracle.com with ESMTP id 3bx4guc5pa-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 29 Oct 2021 11:31:41 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=eRW/VJD3XoNrVSatX26kYq9JbMzcOAR2PDIRlCJdrhbkYgc76Vi99zJonv4XrTF5Thj1Ks/72/+KcGDUumwSn+Ppr0ua11KSbKyk4MYoVWWKW/U2p6xH1DxcxOSYFgG/3DGKVYK3nj8aOrTh7qbPdYJQvArXJaFU/UYdmd7zgowRFnuda+s5rBTKSUAuNdX6hl9wdg4JzyD6daLEDA/jiz2E/70ZHS7hf8LavD5Yq6kxtCVtZe989x3Wg+REZRCaIE9FCu2POLJJ6Zealp6NQ7S9BS+uCOk0ZmXSry49/MRlq+lZyBYDvXxi772PpLaIdUdigQawgJsWKU/Af3KqvA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ASL/5ZgHammi5DIVzEszdXatehiW9Vna3ApAnWoSmLs=;
- b=j2W3bBh7bb+1Wo/a2PYoHCGPNOyVEQJ2K9NCJKGdqHFcTx+rfwnd+dBoV5pcYuDJLYaJgBGVS6/VnHGfxKd19b0ob6s35N/q2E/jEh/pBcDlfx0506UgUfeMlvhJRNgo6S0QZbf18UzjpBmrJy4y+/21NquUpeYrfROkt8vT+QHlnqF/ZNn/jLLhw0+Kj+g85J3ZQMPrggWfMijkIPzU2s5HunR6hNEXyOrO2I0VIQUrsK3gL0D5LXKbCGSrq+xT1ssL5dYUycfFPkWdjZJ/3zB+jH2eojq0i/NM89xMIBI60Lmj/Q+cD6OY+ouhgzp4GK3o47skw5eVfvJSUFbd4w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ASL/5ZgHammi5DIVzEszdXatehiW9Vna3ApAnWoSmLs=;
- b=0U2CzUmJmslmT+k7TG+G8zJP9eop/RcOOIIeYUvVXcyd7TxEDsDrdG13UX23vZKS6MsLIgrUJn+3Gm+7BIZ2Bc2TeAI0WXlMAuhDCuzmfprk8tDwRKONsrrshqrajogugkR+yUzgyhWED0mWBwjJAqrHaEHSHH+7/G6ZQoeuaVI=
-Authentication-Results: infradead.org; dkim=none (message not signed)
- header.d=none;infradead.org; dmarc=none action=none header.from=oracle.com;
-Received: from BLAPR10MB4835.namprd10.prod.outlook.com (2603:10b6:208:331::11)
- by MN2PR10MB3854.namprd10.prod.outlook.com (2603:10b6:208:1b9::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4649.15; Fri, 29 Oct
- 2021 11:31:39 +0000
-Received: from BLAPR10MB4835.namprd10.prod.outlook.com
- ([fe80::d809:9016:4511:2bc6]) by BLAPR10MB4835.namprd10.prod.outlook.com
- ([fe80::d809:9016:4511:2bc6%8]) with mapi id 15.20.4649.015; Fri, 29 Oct 2021
- 11:31:39 +0000
-Message-ID: <99c7d806-4642-c329-79d4-0ff9f04d56ce@oracle.com>
-Date:   Fri, 29 Oct 2021 12:31:32 +0100
+        id S230273AbhJ2L7C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Oct 2021 07:59:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38394 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230134AbhJ2L7C (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Oct 2021 07:59:02 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D18DBC061570
+        for <kvm@vger.kernel.org>; Fri, 29 Oct 2021 04:56:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=lhgdYAA/F7t3UUWIB+JlExzUOeE0B/iAhq0qC/YpBy0=; b=VTGxg+yHNY4yjyipmtub1CJ0zh
+        /xFmPuxAMbiU1C7SdIhvgM/CAPFe6QWQQIqgXGXxCTjB7NprROG2cOS2EREIMPEsNYjbvA2bC4Au9
+        K53/fZYxu3u6HYrr1mlYJlYT3JR3kdXnG4AvIX0QFLgFMsOQUBGin5XiiNoSiFH+UBZOHHoPSLC99
+        UzvABCSfAJytg3XGosS1CM0+T6MC0bvoxUDTO1COJL8mtw3AXrsJF5OLhVXbz3dUQV70Ya7WdmSxb
+        uYTBqbzisy7PF27VYPr+bqzDy4A41r2B5wTY5dZLopfd3ZNYa76LS1lHO75GRPMl/asNRj4ED4cjm
+        yjxftd0Q==;
+Received: from [2001:8b0:10b:1::3ae] (helo=u3832b3a9db3152.ant.amazon.com)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mgQUZ-00Apwk-2U; Fri, 29 Oct 2021 11:56:15 +0000
+Message-ID: <33b564a9d394a1b189f36f2415465cb445ca2d2a.camel@infradead.org>
 Subject: Re: [EXTERNAL] [PATCH] KVM: x86/xen: Fix runstate updates to be
  atomic when preempting vCPU
-Content-Language: en-US
-To:     David Woodhouse <dwmw2@infradead.org>
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Joao Martins <joao.m.martins@oracle.com>
 Cc:     "jmattson@google.com" <jmattson@google.com>,
         "wanpengli@tencent.com" <wanpengli@tencent.com>,
         "seanjc@google.com" <seanjc@google.com>,
@@ -76,316 +42,279 @@ Cc:     "jmattson@google.com" <jmattson@google.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
         "Raslan, KarimAllah" <karahmed@amazon.com>,
         Ankur Arora <ankur.a.arora@oracle.com>
+Date:   Fri, 29 Oct 2021 12:56:11 +0100
+In-Reply-To: <99c7d806-4642-c329-79d4-0ff9f04d56ce@oracle.com>
 References: <3d2a13164cbc61142b16edba85960db9a381bebe.camel@amazon.co.uk>
- <09f4468b-0916-cf2c-1cef-46970a238ce4@redhat.com>
- <a0906628f31e359deb9e9a6cdf15eb72920c5960.camel@infradead.org>
- <2e7bcafe1077d31d8af6cc0cd120a613cc070cfb.camel@infradead.org>
- <1d5f4755ea6be5c7eb8f59dea2daef30fc16b173.camel@infradead.org>
-From:   Joao Martins <joao.m.martins@oracle.com>
-In-Reply-To: <1d5f4755ea6be5c7eb8f59dea2daef30fc16b173.camel@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: LO2P265CA0114.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:c::30) To BLAPR10MB4835.namprd10.prod.outlook.com
- (2603:10b6:208:331::11)
+         <09f4468b-0916-cf2c-1cef-46970a238ce4@redhat.com>
+         <a0906628f31e359deb9e9a6cdf15eb72920c5960.camel@infradead.org>
+         <2e7bcafe1077d31d8af6cc0cd120a613cc070cfb.camel@infradead.org>
+         <1d5f4755ea6be5c7eb8f59dea2daef30fc16b173.camel@infradead.org>
+         <99c7d806-4642-c329-79d4-0ff9f04d56ce@oracle.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-pcvVOEGT5WZWel5fVDIs"
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-Received: from [10.175.170.77] (138.3.204.13) by LO2P265CA0114.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:c::30) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4649.14 via Frontend Transport; Fri, 29 Oct 2021 11:31:37 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: eb9638c4-1664-4fc5-f356-08d99acfac1c
-X-MS-TrafficTypeDiagnostic: MN2PR10MB3854:
-X-Microsoft-Antispam-PRVS: <MN2PR10MB38548B699CFEEB1D2770C11ABB879@MN2PR10MB3854.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4714;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: NLVPyA7GckAOw+UA6YC6M3UY1jTHwfZ6MZK+594aIiDikbUw51pfZBlccKKyqpDOM9Qic0I5m2+2lLHy2oVKnsp1V/wjYcY/ixspzpWR8yDK0pE5g3Gj8O/PW6iucVPmk+G7+5iHPw1JlnzfGfL5LLsl+JtA3Ea5/+Ch0TiyFESKPTZy9yXNbICIxj8VoOcMMH/j1L2WqqD8S+jEjsj/9TWbgI0OM9FVse0aL6sjH3vHTDEV+HVCkyhXgZNHfCgQP59djLDHebFK5auWPUH5hxCMfEJDvEQGWM5dAhMfBlSuWG6P0U0zb7+PvTVxWhoAxAbCv9yXvzefa33WCFk7HJadqU5zTHLr1OxxXNKn1oRfIwkoelZVEkMVF5laWq0KRr4/PWkvwLDCoMBXpHMFsnl+NRzyh3sy+zfPHi2M9W0Af8tDtgZBbcHHQWPuXhJ22Y0S7NulO+eI7fs2MpJ+FktHmB5f0uWhPXYgjga1MN8MP/l2qjs/o7p77JofiZTzihijodA51NP4pRHlPpwVSTyRGxzZweQ8v44Yv2e5eNHl/+cp5s2zc0Ye/13HxEcnPhv8djGTqWKAXZQe4jwwYpgkAhLXCgGPKpaWH119Y15xzd1TpgxjKI9oGsk63y4Uyup6pFtf/s9+eIQe3RG1+FBiaA1K6CYslOxFm13iKhq6SpuhHSVZ/feNPbtFKii50tRf8vgOh5M97U3igAcUFQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BLAPR10MB4835.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(38100700002)(26005)(4001150100001)(66946007)(8936002)(66556008)(66476007)(8676002)(53546011)(6486002)(186003)(31686004)(31696002)(5660300002)(2906002)(86362001)(7416002)(6916009)(107886003)(4326008)(16576012)(316002)(2616005)(956004)(508600001)(54906003)(6666004)(36756003)(83380400001)(66574015)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WTJCZDF2RW9yT01WZ3Fyb2Y3ZHlIUzYwaXpsT2ExRjgrMWR2YXpUOS9rNWVo?=
- =?utf-8?B?NWJpTWsydk4xODVlb3VLd1FrSXZpWFhwYU9HcGwwWUtFWWZuTHVXYk9IWENQ?=
- =?utf-8?B?NmhMbmlYenlKUXRQMHBJeUNsTFRlcCtlRUdYNnhCQW4xRGR4Y2E1QU1pOFAr?=
- =?utf-8?B?SXZMSm85ZTRNRWFDTjhjMnFsMlptaHNZSlBxaXdqclZUZ2R5d2hlUEg1RlFz?=
- =?utf-8?B?MmQ0NWJhV1B0RE5Wa29SY21JYmttWWI1N2JwTXA3M1BremxKL1ZnMjkwcVVl?=
- =?utf-8?B?RFFEcjQyMWZEQ0JiVHJjUHFzVld0UFdsU1VLN0FtNjh5dUw2d1pOYVRNdmU2?=
- =?utf-8?B?ajc0SmZhakRRR3dES0R0ZmVqb1NJQkNTQzRLd3ROSnhXT2NjdlBPc09mQ3JU?=
- =?utf-8?B?ckNFNVJYNmlRdnFmMFdMY2Y0WklNcGJCUlgrMHdXSW10dWYvb3B2c09NSTJO?=
- =?utf-8?B?MlRkdFpRR2VLR2hzSUkzMGlRdU9uTjYvQVBkK1paZVlQWWw5WXJaSnk1UnlW?=
- =?utf-8?B?SVhrRlk1a25RMWhVaVNMQ1RNVGxjMHJuNWE4c2RndDgweEtsTTMvTkNCb0hp?=
- =?utf-8?B?TWlaRmk5WWpZQUhPbm9GR013dVR4N0pZTTZGQ3AyZEM2aktHbDMyVEtmMnAr?=
- =?utf-8?B?TkhaSmQ5V1NNam1SbG9IQnNxZ1lvbDRvY0FwTWw5eS9uTTNGQ2RJODJTb25s?=
- =?utf-8?B?SFNNZFAxZ0w2VmhHTXdZa01sNHg1MU04YldxT2kwWG8vQ0RKckN2SXA3czNa?=
- =?utf-8?B?cHZOdUJwekNOQmhRQWJJclFDRnUrL2xHQUNkcU5xRU1uMERIL3grM3BZSmtQ?=
- =?utf-8?B?c05aWW1IRG84RWQvNFl3V2UwR2lQSy9VZ2VWSHlNVnpzZVVzUlhEZDM3OEhF?=
- =?utf-8?B?eVpuL2RmdHl0d3NHdTFBcGJJZTNDdXhxRmh3dURLU0R5WXJGYWU1VHprMFNq?=
- =?utf-8?B?Z0FZazErU2R6eHpKNFhDWFJlK2U3ejFIS3J2ZzFYSFdVVXBvVTdadThoNmpk?=
- =?utf-8?B?cWlzVWZWaHpBRnUvSUR1cXF2SjJ0SVo4dlc5RWg0dFdYOUhVdExDRlRYZXUy?=
- =?utf-8?B?K0lZRWlWTzVVSTZMcXQvcFlDbHlCNWxhWkF0L2VsRFg3ODFXSlB6b1ZiWERU?=
- =?utf-8?B?WlFST0gveWlLRy93OUNKNGlkNjI5V29QZkh2MGFJOXhMaHpMY1V3ZER5ZDZH?=
- =?utf-8?B?M1NsQnJaY2xsdW9Zb3M1UExzK2Y2ZXE0OFhtZWVSOTM3R0RmOHNlRU82aVRI?=
- =?utf-8?B?Q08vWjhYanZ4MjVyRXFpRGpvZUpvMStMakJqa0F0bkNFbXlaK3k0aGozQkpF?=
- =?utf-8?B?YzBPTWs2OWJ2b2s4eFlQWXI5bEdULzBxR1VUdUkxbWl6VEhFTjZGM1pQQ2wy?=
- =?utf-8?B?ZHRkYSsxdFMyVmxSUXZ6NXlSZlFjZ2F4ZkcvNkd2Wjd4ZFAxTjA1M1JKT2or?=
- =?utf-8?B?RDV0WUVSVWNBa0JGMlRYT0JkWFRMd1dLYlYwWVJwZWZpUGcwei9pa2hSUDN1?=
- =?utf-8?B?QmE3R0Jaamc4YkRxSjltQ2U4Sysxb0Q3bUtrV09uMnZ2M0RVYm10SGdQQ1d0?=
- =?utf-8?B?TEk0aFVLc25rN1p6dmdHTVU5SEo4blVOMVRVTnJEbjFPdy9hb2V0aG5YbWlZ?=
- =?utf-8?B?c1BkSTA4RDVFYm1MNkFhbGpqQ0hIT3JxcjU4emtqWTdmL1hUaEt2RGppK1Fl?=
- =?utf-8?B?MXVET293N3U2Sm5Gd1BDWHlyL0RSMzFYTUlBZ2VROThJM0h3RzhBamdyMXFI?=
- =?utf-8?B?YmxjUW84akgrUjFvVlFlVTBPRUs1Wkc5cVB0MzhsajNLOEg2UTFkdEhFMy9D?=
- =?utf-8?B?M2ZYYnVCUDlmMnl4R3lYUnVMaXEwZGJ1ODZqeDd2UGMvVzhuL2VYRm1XVEhx?=
- =?utf-8?B?aHJ2RWxiSXJrWTlzcFE4dlFMUmhIblJJMVZUc240Wjl2WlJhV1VuUy9tSDBw?=
- =?utf-8?B?NjNCM0IvaFIzY3ZWcWo3VGRRK242RFBOMWIwS01VZjl1VUp5M3QwbXI4OEFy?=
- =?utf-8?B?VTAydUVLQmFDQzc2anM0elFwdUdCdHRrWXIxb3ZKdzlKcEkydUpERnNBS0g4?=
- =?utf-8?B?UmgxSGhubkNsdlJkeWJEREZhdmx4Nk9Bdy9yTHZCQ2FYMEJ4UmRhU1k3ZWhq?=
- =?utf-8?B?MkNMcjhVelEzZUl5UFN2bzl5dlpkUlU1bitPUTR6bSs4OHV4cVpGQjlTblB2?=
- =?utf-8?B?eFJSL3NqcVdQV0VzNTdzZXBaOUVuYjA2NWxpcmtoYkg2S1U0VWxWN0h2MXk3?=
- =?utf-8?B?V1RQYkwwSzdlUEZBRUEwMHdQMHdnPT0=?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: eb9638c4-1664-4fc5-f356-08d99acfac1c
-X-MS-Exchange-CrossTenant-AuthSource: BLAPR10MB4835.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Oct 2021 11:31:38.8800
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Sr12qEQRo/NX5/Vyshd10OyGIEDSHYuYsQmI9ghOnbAOXqEwbj+LAUdDNitfVZUaVWZLW8YeuWRAKThdaCOw2gXOxvuWUvlNTx4J31o1sNs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR10MB3854
-X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10151 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 malwarescore=0
- adultscore=0 suspectscore=0 bulkscore=0 mlxscore=0 spamscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2110290066
-X-Proofpoint-ORIG-GUID: YPPGqexcgZSFLdK1HssSlqqpebMinJ0c
-X-Proofpoint-GUID: YPPGqexcgZSFLdK1HssSlqqpebMinJ0c
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/28/21 23:22, David Woodhouse wrote:
-> On Mon, 2021-10-25 at 13:19 +0100, David Woodhouse wrote:
->> On Mon, 2021-10-25 at 11:39 +0100, David Woodhouse wrote:
->>>> One possible solution (which I even have unfinished patches for) is to
->>>> put all the gfn_to_pfn_caches on a list, and refresh them when the MMU
->>>> notifier receives an invalidation.
->>>
->>> For this use case I'm not even sure why I'd *want* to cache the PFN and
->>> explicitly kmap/memremap it, when surely by *definition* there's a
->>> perfectly serviceable HVA which already points to it?
->>
->> That's indeed true for *this* use case but my *next* use case is
->> actually implementing the event channel delivery.
->>
->> What we have in-kernel already is everything we absolutely *need* in
->> order to host Xen guests, but I really do want to fix the fact that
->> even IPIs and timers are bouncing up through userspace.
-> 
-> Here's a completely untested attempt, in which all the complexity is
-> based around the fact that I can't just pin the pages as João and
-> Ankur's original did.
-> 
-> It adds a new KVM_IRQ_ROUTING_XEN_EVTCHN with an ABI that allows for us
-> to add FIFO event channels, but for now only supports 2 level.
-> 
-> In kvm_xen_set_evtchn() I currently use kvm_map_gfn() *without* a cache
-> at all, but I'll work something out for that. I think I can use a
-> gfn_to_hva_cache (like the one removed in commit 319afe685) and in the
-> rare case that it's invalid, I can take kvm->lock to revalidate it.
-> 
-> It sets the bit in the global shared info but doesn't touch the target
-> vCPU's vcpu_info; instead it sets a bit in an *in-kernel* shadow of the
-> target's evtchn_pending_sel word, and kicks the vCPU.
-> 
-> That shadow is actually synced to the guest's vcpu_info struct in
-> kvm_xen_has_interrupt(). There's a little bit of fun asm there to set
-> the bits in the userspace struct and then clear the same set of bits in
-> the kernel shadow *if* the first op didn't fault. Or such is the
-> intent; I didn't hook up a test yet.
-> 
-> As things stand, I should be able to use this for delivery of PIRQs
-> from my VMM, where things like passed-through PCI MSI gets turned into
-> Xen event channels. As well as KVM unit tests, of course.
-> 
-Cool stuff!! I remember we only made IPIs and timers work but not PIRQs
-event channels.
 
-> The plan is then to hook up IPIs and timers — again based on the Oracle
-> code from before, but using eventfds for the actual evtchn delivery. 
-> 
-I recall the eventfd_signal() was there should the VMM choose supply an
-eventfd. But working without one was mainly for IPI/timers due to
-performance reasons (avoiding the call to eventfd_signal()). We saw some
-slight overhead there -- but I can't find the data right now :(
+--=-pcvVOEGT5WZWel5fVDIs
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-> index c4bca001a7c9..bff5c458af96 100644
-> --- a/arch/x86/kvm/xen.c
-> +++ b/arch/x86/kvm/xen.c
-> @@ -207,6 +207,8 @@ void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, int state)
->  
->  int __kvm_xen_has_interrupt(struct kvm_vcpu *v)
->  {
-> +	unsigned long evtchn_pending_sel = READ_ONCE(v->arch.xen.evtchn_pending_sel);
-> +	bool atomic = in_atomic() || !task_is_running(current);
->  	int err;
->  	u8 rc = 0;
->  
-> @@ -216,6 +218,9 @@ int __kvm_xen_has_interrupt(struct kvm_vcpu *v)
->  	 */
->  	struct gfn_to_hva_cache *ghc = &v->arch.xen.vcpu_info_cache;
->  	struct kvm_memslots *slots = kvm_memslots(v->kvm);
-> +	bool ghc_valid = slots->generation == ghc->generation &&
-> +		!kvm_is_error_hva(ghc->hva) && ghc->memslot;
-> +
->  	unsigned int offset = offsetof(struct vcpu_info, evtchn_upcall_pending);
->  
->  	/* No need for compat handling here */
-> @@ -231,8 +236,7 @@ int __kvm_xen_has_interrupt(struct kvm_vcpu *v)
->  	 * cache in kvm_read_guest_offset_cached(), but just uses
->  	 * __get_user() instead. And falls back to the slow path.
->  	 */
-> -	if (likely(slots->generation == ghc->generation &&
-> -		   !kvm_is_error_hva(ghc->hva) && ghc->memslot)) {
-> +	if (!evtchn_pending_sel && ghc_valid) {
->  		/* Fast path */
->  		pagefault_disable();
->  		err = __get_user(rc, (u8 __user *)ghc->hva + offset);
-> @@ -251,12 +255,72 @@ int __kvm_xen_has_interrupt(struct kvm_vcpu *v)
->  	 * and we'll end up getting called again from a context where we *can*
->  	 * fault in the page and wait for it.
->  	 */
-> -	if (in_atomic() || !task_is_running(current))
-> +	if (atomic)
->  		return 1;
->  
-> -	kvm_read_guest_offset_cached(v->kvm, ghc, &rc, offset,
-> -				     sizeof(rc));
-> +	if (!ghc_valid) {
-> +		err = kvm_gfn_to_hva_cache_init(v->kvm, ghc, ghc->gpa, ghc->len);
-> +		if (err && !ghc->memslot) {
-> +			/*
-> +			 * If this failed, userspace has screwed up the
-> +			 * vcpu_info mapping. No interrupts for you.
-> +			 */
-> +			return 0;
-> +		}
-> +	}
->  
-> +	/*
-> +	 * Now we have a valid (protected by srcu) userspace HVA in
-> +	 * ghc->hva which points to the struct vcpu_info. If there
-> +	 * are any bits in the in-kernel evtchn_pending_sel then
-> +	 * we need to write those to the guest vcpu_info and set
-> +	 * its evtchn_upcall_pending flag. If there aren't any bits
-> +	 * to add, we only want to *check* evtchn_upcall_pending.
-> +	 */
-> +	if (evtchn_pending_sel) {
-> +		if (IS_ENABLED(CONFIG_64BIT) && v->kvm->arch.xen.long_mode) {
-> +			struct vcpu_info __user *vi = (void *)ghc->hva;
-> +
-> +			/* Attempt to set the evtchn_pending_sel bits in the
-> +			 * guest, and if that succeeds then clear the same
-> +			 * bits in the in-kernel version. */
-> +			asm volatile("1:\t" LOCK_PREFIX "orq %1, %0\n"
-> +				     "\tnotq %0\n"
-> +				     "\t" LOCK_PREFIX "andq %2, %0\n"
-> +				     "2:\n"
-> +				     "\t.section .fixup,\"ax\"\n"
-> +				     "3:\tjmp\t2b\n"
-> +				     "\t.previous\n"
-> +				     _ASM_EXTABLE_UA(1b, 3b)
-> +				     : "=r" (evtchn_pending_sel)
-> +				     : "m" (vi->evtchn_pending_sel),
-> +				       "m" (v->arch.xen.evtchn_pending_sel),
-> +				       "0" (evtchn_pending_sel));
-> +		} else {
-> +			struct compat_vcpu_info __user *vi = (void *)ghc->hva;
-> +			u32 evtchn_pending_sel32 = evtchn_pending_sel;
-> +
-> +			/* Attempt to set the evtchn_pending_sel bits in the
-> +			 * guest, and if that succeeds then clear the same
-> +			 * bits in the in-kernel version. */
-> +			asm volatile("1:\t" LOCK_PREFIX "orl %1, %0\n"
-> +				     "\tnotl %0\n"
-> +				     "\t" LOCK_PREFIX "andl %2, %0\n"
-> +				     "2:\n"
-> +				     "\t.section .fixup,\"ax\"\n"
-> +				     "3:\tjmp\t2b\n"
-> +				     "\t.previous\n"
-> +				     _ASM_EXTABLE_UA(1b, 3b)
-> +				     : "=r" (evtchn_pending_sel32)
-> +				     : "m" (vi->evtchn_pending_sel),
-> +				       "m" (v->arch.xen.evtchn_pending_sel),
-> +				       "0" (evtchn_pending_sel32));
-> +		}
+On Fri, 2021-10-29 at 12:31 +0100, Joao Martins wrote:
+> On 10/28/21 23:22, David Woodhouse wrote:
+> > On Mon, 2021-10-25 at 13:19 +0100, David Woodhouse wrote:
+> > > On Mon, 2021-10-25 at 11:39 +0100, David Woodhouse wrote:
+> > > > > One possible solution (which I even have unfinished patches for) =
+is to
+> > > > > put all the gfn_to_pfn_caches on a list, and refresh them when th=
+e MMU
+> > > > > notifier receives an invalidation.
+> > > >=20
+> > > > For this use case I'm not even sure why I'd *want* to cache the PFN=
+ and
+> > > > explicitly kmap/memremap it, when surely by *definition* there's a
+> > > > perfectly serviceable HVA which already points to it?
+> > >=20
+> > > That's indeed true for *this* use case but my *next* use case is
+> > > actually implementing the event channel delivery.
+> > >=20
+> > > What we have in-kernel already is everything we absolutely *need* in
+> > > order to host Xen guests, but I really do want to fix the fact that
+> > > even IPIs and timers are bouncing up through userspace.
+> >=20
+> > Here's a completely untested attempt, in which all the complexity is
+> > based around the fact that I can't just pin the pages as Jo=C3=A3o and
+> > Ankur's original did.
+> >=20
+> > It adds a new KVM_IRQ_ROUTING_XEN_EVTCHN with an ABI that allows for us
+> > to add FIFO event channels, but for now only supports 2 level.
+> >=20
+> > In kvm_xen_set_evtchn() I currently use kvm_map_gfn() *without* a cache
+> > at all, but I'll work something out for that. I think I can use a
+> > gfn_to_hva_cache (like the one removed in commit 319afe685) and in the
+> > rare case that it's invalid, I can take kvm->lock to revalidate it.
+> >=20
+> > It sets the bit in the global shared info but doesn't touch the target
+> > vCPU's vcpu_info; instead it sets a bit in an *in-kernel* shadow of the
+> > target's evtchn_pending_sel word, and kicks the vCPU.
+> >=20
+> > That shadow is actually synced to the guest's vcpu_info struct in
+> > kvm_xen_has_interrupt(). There's a little bit of fun asm there to set
+> > the bits in the userspace struct and then clear the same set of bits in
+> > the kernel shadow *if* the first op didn't fault. Or such is the
+> > intent; I didn't hook up a test yet.
+> >=20
+> > As things stand, I should be able to use this for delivery of PIRQs
+> > from my VMM, where things like passed-through PCI MSI gets turned into
+> > Xen event channels. As well as KVM unit tests, of course.
+> >=20
+> Cool stuff!! I remember we only made IPIs and timers work but not PIRQs
+> event channels.
 
-Perhaps I am not reading it right (or I forgot) but don't you need to use the shared info
-vcpu info when the guest hasn't explicitly registered for a *separate* vcpu info, no?
+PIRQs turn out to be fairly trivial in the end, once you get your head
+around the fact that Xen guests don't actually *unmask* MSI-X when
+they're routed to PIRQ; they rely on Xen to do that for them!
 
-Or maybe this relies on the API contract (?) that VMM needs to register the vcpu info in
-addition to shared info regardless of Xen guest explicitly asking for a separate vcpu
-info. If so, might be worth a comment...
+If you already have a virtual IOMMU doing interrupt remapping, hooking
+it up to remap from the magic Xen MSI 'this is really a PIRQ' message
+is fairly simple. Right now I fail that translation and inject the
+evtchn manually from userspace, but this will allow me to translate
+to KVM_IRQ_ROUTING_XEN_EVTCHN and hook the vfio eventfd directly up to
+it.
+
+> > The plan is then to hook up IPIs and timers =E2=80=94 again based on th=
+e Oracle
+> > code from before, but using eventfds for the actual evtchn delivery.=
+=20
+> >=20
+> I recall the eventfd_signal() was there should the VMM choose supply an
+> eventfd. But working without one was mainly for IPI/timers due to
+> performance reasons (avoiding the call to eventfd_signal()). We saw some
+> slight overhead there -- but I can't find the data right now :(
+>=20
+
+Hm, there shouldn't have been *much* additional overhead, since you did
+hook up the evtchn delivery from kvm_arch_set_irq_inatomic() so you
+weren't incurring the workqueue latency every time. I'll play.
+
+Given that we can't pin pages, I spent a while lying awake at night
+pondering *how* we defer the evtchn delivery, if we take a page fault
+when we can't just sleep. I was pondering a shadow of the whole
+evtchn_pending bitmap, perhaps one per vCPU because the deferred
+delivery would need to know *which* vCPU to deliver it to. And more
+complexity about whether it was masked or not, too (what if we set the
+pending bit but then take a fault when reading whether it was masked?)
+
+Then I remembered that irqfd_wakeup() will *try* the inatomic version
+and then fall back to a workqueue, and the whole horridness just went
+away :)
+
+Perhaps as an optimisation I can do the same kind of thing =E2=80=94 when I=
+PI
+or timer wants to raise an evtchn, it can *try* to do so atomically but
+fall back to the eventfd if it needs to wait.
+
+I think I've just conceded that I have to map/unmap the page at a
+kernel virtual address from the MMU notifier when it becomes
+present/absent, so I might get *some* of the benefits of pinning from
+that (at least if I protect it with a spinlock it can't go away
+*between* two consecutive accesses).
+
+> Perhaps I am not reading it right (or I forgot) but don't you need to use=
+ the shared info
+> vcpu info when the guest hasn't explicitly registered for a *separate* vc=
+pu info, no?
+
+We can't, because we don't know the *Xen* CPU numbering scheme. It may
+differ from both kvm_vcpu->vcpu_id and kvm_vcpu->idx. I lost a week or
+so of my life to that, delivering interrupts to the wrong vCPUs :)
+
+> Or maybe this relies on the API contract (?) that VMM needs to register t=
+he vcpu info in
+> addition to shared info regardless of Xen guest explicitly asking for a s=
+eparate vcpu
+> info. If so, might be worth a comment...
+
+Indeed, I washed my hands of that complexity in the kernel and left it
+entirely up to the VMM. From Documentation/virt/kvm/api.rst:
+
+KVM_XEN_ATTR_TYPE_SHARED_INFO
+  Sets the guest physical frame number at which the Xen "shared info"
+  page resides. Note that although Xen places vcpu_info for the first
+  32 vCPUs in the shared_info page, KVM does not automatically do so
+  and instead requires that KVM_XEN_VCPU_ATTR_TYPE_VCPU_INFO be used
+  explicitly even when the vcpu_info for a given vCPU resides at the
+  "default" location in the shared_info page. This is because KVM is
+  not aware of the Xen CPU id which is used as the index into the
+  vcpu_info[] array, so cannot know the correct default location.
 
 
-> +		rc = 1;
-> +		__put_user(rc, (u8 __user *)ghc->hva + offset);
-> +	} else {
-> +		__get_user(rc, (u8 __user *)ghc->hva + offset);
-> +	}
->  	return rc;
->  }
->  
-> @@ -772,3 +836,105 @@ int kvm_xen_hypercall(struct kvm_vcpu *vcpu)
->  
->  	return 0;
->  }
-> +
-> +static inline int max_evtchn_port(struct kvm *kvm)
-> +{
-> +	if (IS_ENABLED(CONFIG_64BIT) && kvm->arch.xen.long_mode)
-> +		return 4096;
-> +	else
-> +		return 1024;
-> +}
-> +
+> > +static inline int max_evtchn_port(struct kvm *kvm)
+> > +{
+> > +	if (IS_ENABLED(CONFIG_64BIT) && kvm->arch.xen.long_mode)
+> > +		return 4096;
+> > +	else
+> > +		return 1024;
+> > +}
+> > +
+>=20
+> Maybe worth using Xen ABI interface macros that help tieing this in
+> to Xen guest ABI. Particular the macros in include/xen/interface/event_ch=
+annel.h
+>=20
+> #define EVTCHN_2L_NR_CHANNELS (sizeof(xen_ulong_t) * sizeof(xen_ulong_t) =
+* 64)
+>=20
+> Sadly doesn't cover 32-bit case :( given the xen_ulong_t.
 
-Maybe worth using Xen ABI interface macros that help tieing this in
-to Xen guest ABI. Particular the macros in include/xen/interface/event_channel.h
+Yeah, that's a bit of a placeholder and wants cleanup but only after
+I've made it *work*. :)
 
-#define EVTCHN_2L_NR_CHANNELS (sizeof(xen_ulong_t) * sizeof(xen_ulong_t) * 64)
+For KVM I have definitions of the compat stuff in arch/x86/kvm/xen.h so
+could add it there.
 
-Sadly doesn't cover 32-bit case :( given the xen_ulong_t.
 
-> +int kvm_xen_setup_evtchn(struct kvm *kvm,
-> +			 struct kvm_kernel_irq_routing_entry *e,
-> +			 const struct kvm_irq_routing_entry *ue)
-> +
-> +{
-> +	struct kvm_vcpu *vcpu;
-> +
-> +	if (kvm->arch.xen.shinfo_gfn == GPA_INVALID)
-> +		return -EINVAL;
-> +
-> +	if (e->xen_evtchn.vcpu >= KVM_MAX_VCPUS)
-> +		return -EINVAL;
-> +
-> +	vcpu = kvm_get_vcpu_by_id(kvm, ue->u.xen_evtchn.vcpu);
-> +	if (!vcpu)
-> +		return -EINVAL;
-> +
-> +	if (vcpu->arch.xen.vcpu_info_set)
-> +		return -EINVAL;
-> +
-> +	if (!kvm->arch.xen.upcall_vector)
-> +		return -EINVAL;
-> +
-> +	/* Once we support the per-vCPU LAPIC based vector we will permit
-> +	 * that here instead of the per-KVM upcall vector */
-> +
-> +	if (e->xen_evtchn.port >= max_evtchn_port(kvm))
-> +		return -EINVAL;
-> +
-> +	/* We only support 2 level event channels for now */
-> +	if (e->xen_evtchn.priority != KVM_IRQ_ROUTING_XEN_EVTCHN_PRIO_2LEVEL)
-> +		return -EINVAL;
-> +
+--=-pcvVOEGT5WZWel5fVDIs
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCECow
+ggUcMIIEBKADAgECAhEA4rtJSHkq7AnpxKUY8ZlYZjANBgkqhkiG9w0BAQsFADCBlzELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
+A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
+bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTkwMTAyMDAwMDAwWhcNMjIwMTAxMjM1
+OTU5WjAkMSIwIAYJKoZIhvcNAQkBFhNkd213MkBpbmZyYWRlYWQub3JnMIIBIjANBgkqhkiG9w0B
+AQEFAAOCAQ8AMIIBCgKCAQEAsv3wObLTCbUA7GJqKj9vHGf+Fa+tpkO+ZRVve9EpNsMsfXhvFpb8
+RgL8vD+L133wK6csYoDU7zKiAo92FMUWaY1Hy6HqvVr9oevfTV3xhB5rQO1RHJoAfkvhy+wpjo7Q
+cXuzkOpibq2YurVStHAiGqAOMGMXhcVGqPuGhcVcVzVUjsvEzAV9Po9K2rpZ52FE4rDkpDK1pBK+
+uOAyOkgIg/cD8Kugav5tyapydeWMZRJQH1vMQ6OVT24CyAn2yXm2NgTQMS1mpzStP2ioPtTnszIQ
+Ih7ASVzhV6csHb8Yrkx8mgllOyrt9Y2kWRRJFm/FPRNEurOeNV6lnYAXOymVJwIDAQABo4IB0zCC
+Ac8wHwYDVR0jBBgwFoAUgq9sjPjF/pZhfOgfPStxSF7Ei8AwHQYDVR0OBBYEFLfuNf820LvaT4AK
+xrGK3EKx1DE7MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUF
+BwMEBggrBgEFBQcDAjBGBgNVHSAEPzA9MDsGDCsGAQQBsjEBAgEDBTArMCkGCCsGAQUFBwIBFh1o
+dHRwczovL3NlY3VyZS5jb21vZG8ubmV0L0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3Js
+LmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWls
+Q0EuY3JsMIGLBggrBgEFBQcBAQR/MH0wVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuY29tb2RvY2Eu
+Y29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYI
+KwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmNvbW9kb2NhLmNvbTAeBgNVHREEFzAVgRNkd213MkBpbmZy
+YWRlYWQub3JnMA0GCSqGSIb3DQEBCwUAA4IBAQALbSykFusvvVkSIWttcEeifOGGKs7Wx2f5f45b
+nv2ghcxK5URjUvCnJhg+soxOMoQLG6+nbhzzb2rLTdRVGbvjZH0fOOzq0LShq0EXsqnJbbuwJhK+
+PnBtqX5O23PMHutP1l88AtVN+Rb72oSvnD+dK6708JqqUx2MAFLMevrhJRXLjKb2Mm+/8XBpEw+B
+7DisN4TMlLB/d55WnT9UPNHmQ+3KFL7QrTO8hYExkU849g58Dn3Nw3oCbMUgny81ocrLlB2Z5fFG
+Qu1AdNiBA+kg/UxzyJZpFbKfCITd5yX49bOriL692aMVDyqUvh8fP+T99PqorH4cIJP6OxSTdxKM
+MIIFHDCCBASgAwIBAgIRAOK7SUh5KuwJ6cSlGPGZWGYwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
+ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTE5MDEwMjAwMDAwMFoXDTIyMDEwMTIz
+NTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCASIwDQYJKoZIhvcN
+AQEBBQADggEPADCCAQoCggEBALL98Dmy0wm1AOxiaio/bxxn/hWvraZDvmUVb3vRKTbDLH14bxaW
+/EYC/Lw/i9d98CunLGKA1O8yogKPdhTFFmmNR8uh6r1a/aHr301d8YQea0DtURyaAH5L4cvsKY6O
+0HF7s5DqYm6tmLq1UrRwIhqgDjBjF4XFRqj7hoXFXFc1VI7LxMwFfT6PStq6WedhROKw5KQytaQS
+vrjgMjpICIP3A/CroGr+bcmqcnXljGUSUB9bzEOjlU9uAsgJ9sl5tjYE0DEtZqc0rT9oqD7U57My
+ECIewElc4VenLB2/GK5MfJoJZTsq7fWNpFkUSRZvxT0TRLqznjVepZ2AFzsplScCAwEAAaOCAdMw
+ggHPMB8GA1UdIwQYMBaAFIKvbIz4xf6WYXzoHz0rcUhexIvAMB0GA1UdDgQWBBS37jX/NtC72k+A
+CsaxitxCsdQxOzAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEF
+BQcDBAYIKwYBBQUHAwIwRgYDVR0gBD8wPTA7BgwrBgEEAbIxAQIBAwUwKzApBggrBgEFBQcCARYd
+aHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9DUFMwWgYDVR0fBFMwUTBPoE2gS4ZJaHR0cDovL2Ny
+bC5jb21vZG9jYS5jb20vQ09NT0RPUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFp
+bENBLmNybDCBiwYIKwYBBQUHAQEEfzB9MFUGCCsGAQUFBzAChklodHRwOi8vY3J0LmNvbW9kb2Nh
+LmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3J0MCQG
+CCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAC20spBbrL71ZEiFrbXBHonzhhirO1sdn+X+O
+W579oIXMSuVEY1LwpyYYPrKMTjKECxuvp24c829qy03UVRm742R9Hzjs6tC0oatBF7KpyW27sCYS
+vj5wbal+TttzzB7rT9ZfPALVTfkW+9qEr5w/nSuu9PCaqlMdjABSzHr64SUVy4ym9jJvv/FwaRMP
+gew4rDeEzJSwf3eeVp0/VDzR5kPtyhS+0K0zvIWBMZFPOPYOfA59zcN6AmzFIJ8vNaHKy5QdmeXx
+RkLtQHTYgQPpIP1Mc8iWaRWynwiE3ecl+PWzq4i+vdmjFQ8qlL4fHz/k/fT6qKx+HCCT+jsUk3cS
+jDCCBeYwggPOoAMCAQICEGqb4Tg7/ytrnwHV2binUlYwDQYJKoZIhvcNAQEMBQAwgYUxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMSswKQYDVQQDEyJDT01PRE8gUlNBIENlcnRpZmljYXRp
+b24gQXV0aG9yaXR5MB4XDTEzMDExMDAwMDAwMFoXDTI4MDEwOTIzNTk1OVowgZcxCzAJBgNVBAYT
+AkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNV
+BAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAvrOeV6wodnVAFsc4A5jTxhh2IVDzJXkLTLWg0X06WD6cpzEup/Y0dtmEatrQPTRI5Or1u6zf
++bGBSyD9aH95dDSmeny1nxdlYCeXIoymMv6pQHJGNcIDpFDIMypVpVSRsivlJTRENf+RKwrB6vcf
+WlP8dSsE3Rfywq09N0ZfxcBa39V0wsGtkGWC+eQKiz4pBZYKjrc5NOpG9qrxpZxyb4o4yNNwTqza
+aPpGRqXB7IMjtf7tTmU2jqPMLxFNe1VXj9XB1rHvbRikw8lBoNoSWY66nJN/VCJv5ym6Q0mdCbDK
+CMPybTjoNCQuelc0IAaO4nLUXk0BOSxSxt8kCvsUtQIDAQABo4IBPDCCATgwHwYDVR0jBBgwFoAU
+u69+Aj36pvE8hI6t7jiY7NkyMtQwHQYDVR0OBBYEFIKvbIz4xf6WYXzoHz0rcUhexIvAMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMBEGA1UdIAQKMAgwBgYEVR0gADBMBgNVHR8E
+RTBDMEGgP6A9hjtodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDZXJ0aWZpY2F0aW9u
+QXV0aG9yaXR5LmNybDBxBggrBgEFBQcBAQRlMGMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9jcnQuY29t
+b2RvY2EuY29tL0NPTU9ET1JTQUFkZFRydXN0Q0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2Nz
+cC5jb21vZG9jYS5jb20wDQYJKoZIhvcNAQEMBQADggIBAHhcsoEoNE887l9Wzp+XVuyPomsX9vP2
+SQgG1NgvNc3fQP7TcePo7EIMERoh42awGGsma65u/ITse2hKZHzT0CBxhuhb6txM1n/y78e/4ZOs
+0j8CGpfb+SJA3GaBQ+394k+z3ZByWPQedXLL1OdK8aRINTsjk/H5Ns77zwbjOKkDamxlpZ4TKSDM
+KVmU/PUWNMKSTvtlenlxBhh7ETrN543j/Q6qqgCWgWuMAXijnRglp9fyadqGOncjZjaaSOGTTFB+
+E2pvOUtY+hPebuPtTbq7vODqzCM6ryEhNhzf+enm0zlpXK7q332nXttNtjv7VFNYG+I31gnMrwfH
+M5tdhYF/8v5UY5g2xANPECTQdu9vWPoqNSGDt87b3gXb1AiGGaI06vzgkejL580ul+9hz9D0S0U4
+jkhJiA7EuTecP/CFtR72uYRBcunwwH3fciPjviDDAI9SnC/2aPY8ydehzuZutLbZdRJ5PDEJM/1t
+yZR2niOYihZ+FCbtf3D9mB12D4ln9icgc7CwaxpNSCPt8i/GqK2HsOgkL3VYnwtx7cJUmpvVdZ4o
+gnzgXtgtdk3ShrtOS1iAN2ZBXFiRmjVzmehoMof06r1xub+85hFQzVxZx5/bRaTKTlL8YXLI8nAb
+R9HWdFqzcOoB/hxfEyIQpx9/s81rgzdEZOofSlZHynoSMYIDyjCCA8YCAQEwga0wgZcxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
+ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
+ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjEx
+MDI5MTE1NjExWjAvBgkqhkiG9w0BCQQxIgQgGqAthx6vUdRbb2Q3ikSAgClyx9sptnvD/JJQt/50
+8dswgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
+PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
+aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
+A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
+bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
+DQEBAQUABIIBAFZKUVLtfGZMvsylalOQwn9/UJ6DR4BwxZc4cMW/f6FeZMZe6XVa3aja1+EouW0c
+xgM4ZDdmJy4KOnqpfZKgGOPYozYgVBOXOLAJPiq3+kiY6p5wFGRwhvoheqZ1FYfuDM8g9Yvov/6e
+VIBv4xn2s/g6YfLxzZSVjEgJLOr8AOdZZ3hbrH6up8a2FyE4luXKqSREIXJX13GmxlfrU7gcGo+v
+U/Y9qLIQOBpYxvhmgl8KCj2yHzzoaPUe8cek5kUK8Lc5o4DFoN+LZWY8CEue2OuPZBQ4XID29xYy
+wPuUGk39/f8hafUCZNsxHuHNDUmP/sAVUqPQfzHn+cBaU6ULt/8AAAAAAAA=
+
+
+--=-pcvVOEGT5WZWel5fVDIs--
 
