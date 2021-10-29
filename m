@@ -2,277 +2,228 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4179343F9FC
-	for <lists+kvm@lfdr.de>; Fri, 29 Oct 2021 11:35:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 60A6343FA33
+	for <lists+kvm@lfdr.de>; Fri, 29 Oct 2021 11:47:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231564AbhJ2Jhy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Oct 2021 05:37:54 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57884 "EHLO mail.kernel.org"
+        id S231629AbhJ2JuC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Oct 2021 05:50:02 -0400
+Received: from mga18.intel.com ([134.134.136.126]:55367 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229927AbhJ2Jhx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Oct 2021 05:37:53 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 591D860F93;
-        Fri, 29 Oct 2021 09:35:25 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1mgOIF-002O2i-3C; Fri, 29 Oct 2021 10:35:23 +0100
-From:   Marc Zyngier <maz@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Andrew Scull <ascull@google.com>,
-        David Brazdil <dbrazdil@google.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Fuad Tabba <tabba@google.com>, Jia He <justin.he@arm.com>,
-        Joey Gouly <joey.gouly@arm.com>,
-        Oliver Upton <oupton@google.com>,
-        Quentin Perret <qperret@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Subject: [GIT PULL] KVM/arm64 updates for 5.16
-Date:   Fri, 29 Oct 2021 10:35:10 +0100
-Message-Id: <20211029093510.3682241-1-maz@kernel.org>
-X-Mailer: git-send-email 2.30.2
+        id S231564AbhJ2JuB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Oct 2021 05:50:01 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10151"; a="217546100"
+X-IronPort-AV: E=Sophos;i="5.87,192,1631602800"; 
+   d="scan'208";a="217546100"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2021 02:47:32 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.87,192,1631602800"; 
+   d="scan'208";a="557163249"
+Received: from orsmsx605.amr.corp.intel.com ([10.22.229.18])
+  by fmsmga004.fm.intel.com with ESMTP; 29 Oct 2021 02:47:31 -0700
+Received: from orsmsx605.amr.corp.intel.com (10.22.229.18) by
+ ORSMSX605.amr.corp.intel.com (10.22.229.18) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.12; Fri, 29 Oct 2021 02:47:31 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx605.amr.corp.intel.com (10.22.229.18) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.12 via Frontend Transport; Fri, 29 Oct 2021 02:47:31 -0700
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.170)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2242.12; Fri, 29 Oct 2021 02:47:31 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eVIc+kp+F8nnJhm4sqQ9tDuf24vbLGDSqqbxXxQ1XsppuRl7fwxnWThPrJR+Hgl8ukW1yg/DqxJjWMzLSaFYa0P/CMNh/kVLGKwCTDLp8aXkSIVOj9tIi/hycWyYF9dnrMLgLBktOHCf4jjG523gpAqpyt86xUlQpB1/ezzC2vTRyRe1lb8WeT0igh3WFPf1Qio42D1MtSx8AYL6dMuII2sRJ6yGMoWaRb0x8ORqwFoIEktA3KqoVF7ej03KvmM1yAv1U1QwkcAn3k0h16J3A1WpRuepnpVJya0Byczxt1CA3PSn+ayx40y0AwYbRPnfsDZacKm+0LKbF7CDYEZzGA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xSGVDrCgcgSRkXfLh/lVYlgmKME89K8w3nLtpJ/gZvc=;
+ b=kpwWmBGtjPmJcbyTMJWZDdfUR+qhqPY75JACc9tdORCwNOEJy9mabTqXEbVHzH+s6Ve7DVQxz7/E+w17zUgbzhmhktcZ9qyT89LCcTfLMTB90eUf94TtPPf2m1+dRhPIlzEHDMk487XiHBH6ODKXan9R5GQ4JEH4kOzGY0596z4gvN0MIStaHAKYqA1AQz1F6U53gKG7aMlzZ/2QhoaBa735nXR4jseaKw9oc+ti32HrEDlTebXNaAOoWvhGRvE/SX/ZkWBlsqKrDFt59NVeMJr/LdOfZLHc5a5MmWF3Wfp/uedANci37Jul4XcXnpqydus8Km+yfXAAgCTuSohGEA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xSGVDrCgcgSRkXfLh/lVYlgmKME89K8w3nLtpJ/gZvc=;
+ b=dqjLmp2LABCwAHJs2eeE+WzZVcyw5Ecd84ckME5RhmOMXB4T/V/k5E21v8c3mhRgxvcEOiJngDf59f9Ehp7bLuiIC2Yoo2jL3aV0CXRxrApnfMxrlqSng51kWM5GhRzLgJbotv2yc0g/N6SojoVAi9H3V8novv7YH7SzQQYahmg=
+Received: from PH0PR11MB5658.namprd11.prod.outlook.com (2603:10b6:510:e2::23)
+ by PH0PR11MB5644.namprd11.prod.outlook.com (2603:10b6:510:ef::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4649.15; Fri, 29 Oct
+ 2021 09:47:27 +0000
+Received: from PH0PR11MB5658.namprd11.prod.outlook.com
+ ([fe80::5009:9c8c:4cb4:e119]) by PH0PR11MB5658.namprd11.prod.outlook.com
+ ([fe80::5009:9c8c:4cb4:e119%6]) with mapi id 15.20.4628.020; Fri, 29 Oct 2021
+ 09:47:27 +0000
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "hch@lst.de" <hch@lst.de>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "parav@mellanox.com" <parav@mellanox.com>,
+        "lkml@metux.net" <lkml@metux.net>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "lushenming@huawei.com" <lushenming@huawei.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "yi.l.liu@linux.intel.com" <yi.l.liu@linux.intel.com>,
+        "Tian, Jun J" <jun.j.tian@intel.com>, "Wu, Hao" <hao.wu@intel.com>,
+        "Jiang, Dave" <dave.jiang@intel.com>,
+        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "robin.murphy@arm.com" <robin.murphy@arm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "dwmw2@infradead.org" <dwmw2@infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
+        "david@gibson.dropbear.id.au" <david@gibson.dropbear.id.au>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>
+Subject: RE: [RFC 02/20] vfio: Add device class for /dev/vfio/devices
+Thread-Topic: [RFC 02/20] vfio: Add device class for /dev/vfio/devices
+Thread-Index: AQHXyZ9N9hHTiUakTUi0phVNj8QgQ6vpuU9g
+Date:   Fri, 29 Oct 2021 09:47:27 +0000
+Message-ID: <PH0PR11MB56586D2EC89F282C915AF18DC3879@PH0PR11MB5658.namprd11.prod.outlook.com>
+References: <PH0PR11MB56583D477B3977D92C2C1ADDC3839@PH0PR11MB5658.namprd11.prod.outlook.com>
+ <20211025125309.GT2744544@nvidia.com>
+In-Reply-To: <20211025125309.GT2744544@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-reaction: no-action
+dlp-version: 11.6.200.16
+dlp-product: dlpe-windows
+authentication-results: nvidia.com; dkim=none (message not signed)
+ header.d=none;nvidia.com; dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 80c5d844-cd0e-475b-9036-08d99ac11e2e
+x-ms-traffictypediagnostic: PH0PR11MB5644:
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-microsoft-antispam-prvs: <PH0PR11MB5644437FD91424CD2BD4B335C3879@PH0PR11MB5644.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7691;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: hIEC71P9dqBAgQuhij+dTWGjl2ypuHAb7Cm/umod0CIoTM/PsmTx8SQqRFIhXYPYFpiISEBuDKw4OGPVuaED04N20yjy1rncyPUSxonI7cIcARuDvBRHQ/f1iS/n2vG61d0fdVN7p2B59XbUQj/Gedoccg1MR7VmjYnXHQUD0oPW6R1DX+jMoc7QdYAR7VJ0LC0wq7J1QHqeHIDpmeauBNM3Bzn/musas/geEue86IRoWkDiYxG3Q+VmsOfdIk8UmHODnS27KJCIJLJgcv7QWNZqIxl1ZkZOD7dN81gJ0VrKiQ/uPgmNl4uEAS7GLelwDS+EADx5Mwpa59SJyWQy8ZpCIBpJ2QtB/m8pAPbWytxsArMWxk7iQJIdwv8JG4JBpIFrXM87T7vQx8MTWXtVucZ0at0cwpxOm7oIjKUVA3kxsAbgSYZXtIMu/aJe/NBQJs1XfJWbSfOBY6zbWeMNzjPWN8aDttlrVpJETvPVKXBgdViEPoesBpme3/AefJTEwNYJtS118QkOX0I+xmfyZN1QCdewD1dwhn2J4H9jMfj8Em/N+dFtZ9f+ddHj4Cs5zPzznaQjyAw/2k5Q1kp02MH7uoXD10wHhoJ7AAfPPG1vuX2PUSkylKsDv/y9wjEQY3HAC4Zv5tadxbwNBzVr9DdRH043AUo5cxTLSpDBW+RcLBLRxUPjPm7RbKTpn9KKvXuK6fdzfkwWTvQqwudkqQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5658.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(6506007)(7696005)(7416002)(5660300002)(9686003)(55016002)(71200400001)(52536014)(83380400001)(316002)(66446008)(8936002)(76116006)(186003)(26005)(54906003)(8676002)(64756008)(508600001)(4326008)(33656002)(38070700005)(66556008)(122000001)(38100700002)(82960400001)(66476007)(6916009)(2906002)(66946007)(86362001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?VHACYHR3sj8UWMRZHBiKnP+hiydylG9fcANQaFMiIJNrpj41rLpVI7FKNAtN?=
+ =?us-ascii?Q?ayy3fzgQ8R9Xhg4IObyi3Z33mPuQnzlrIObsSDbW8acN3k64CptsQBPImi44?=
+ =?us-ascii?Q?JNgeSonI3oZmwLzizDncUkKgDAV6llwRET/5zba8163HW1zLZMRIiCrc9NBn?=
+ =?us-ascii?Q?ui3ogs2N0W4ixF4fUlsnPqKpqjtOlzAdm6fuWS86P4o6ESQ4h5yPBSfHDpos?=
+ =?us-ascii?Q?wvNBDewaaY3HGySeYjOY3c9r/FS4Luo2IBHWYtHl9oAoAax8/7x0vyCHbRNV?=
+ =?us-ascii?Q?4wtNrNiHSs3QSOKNIrignKZyr0CqOva3bVgEHx99u8zF7i/VaUckvWOw2tNl?=
+ =?us-ascii?Q?7euKs7WW9auQU2Hziob5g/HUh2aXlEWjVgMYqfT0XFUY2EqdCsZh5rOW34L7?=
+ =?us-ascii?Q?vsVv4XGzcu7HLiRtbCKjGtG5bzEKdQza4vRj4kQavCPeI7qdJogOcoIpOm9P?=
+ =?us-ascii?Q?8fQPeY7ONv6E+le0vhPqxxFRi3tsf3WzujjekA2W2+oXHVK2Pk9TQ8hbe5VB?=
+ =?us-ascii?Q?q3iEgog4m2W53xdrzdmdLDut46WxEt99BFflZrzYseKaxmc8nnzBRso3FmV1?=
+ =?us-ascii?Q?ZIjl1zOS/43D9o9L8HWdlH4D3Wg1m05ufdunSlpjJqr+C1yVM7nvbYjUyaek?=
+ =?us-ascii?Q?7ctghH4uPwmaz2qzsbcAL+cov9DlK7Uz1+dHIHuMMyQ9VNXDh1PpJuig/cVO?=
+ =?us-ascii?Q?LsdmPT4PchDGNxyJiwS2xiqtqUbAqTQkMTZgudNJpZrtMpZQUJ60oVcM9JUZ?=
+ =?us-ascii?Q?2gBjJloRXDyVyofYMAF6qx0a65R8DWIkPyagRWrcaQy8u7jR2HGueOjxhT60?=
+ =?us-ascii?Q?oKAZcM7vP0Zepgye+IDiiukIjMl4W2d6WCCcuaxDYVu3kgZHJYQPJwHfczRN?=
+ =?us-ascii?Q?I9vBekQX/juWHBgIigfystYMQPDHQkmT8h8BziOUXl7v7PkxIfoG+pz4SQ5U?=
+ =?us-ascii?Q?oKaXqYiDnxcEeIfvAp2mX82hyaoIbw1MlH5hjm1vjlmPOSCbWkG7UZBj1kKI?=
+ =?us-ascii?Q?z6enztUH4mu2mUCjkz+za4IJuNtbo3OHG+rUqcVe/cXZvGH7t7bREaRg4iHp?=
+ =?us-ascii?Q?m6WqkBn4R0MwOesp5EH+VVhFr/zQAYQPfUGtMCktxZzKJUqK/d9e24nbZ0SP?=
+ =?us-ascii?Q?qBjfi7RHzAPLsTOU/JvX3ewH3LjYtbzgqyOKFdrxToCrpCkCvujCjwrfWoUd?=
+ =?us-ascii?Q?rKGTvClwCZwbIVk7b5xUiQCHjBCIFOmsV4aXLHq9KuJVKwrorhXhxc7AGFvd?=
+ =?us-ascii?Q?7PwSmWGlrXTo3GFBmpWU5usnPKXaoITUT3ZVjUROjS8H/U35cIvU8cpZWhLD?=
+ =?us-ascii?Q?mARxt9QJGtDmIBqsvXoTCGUFbRpGWCacPL3YQcRrpM+KmLsQarDUsmBPk389?=
+ =?us-ascii?Q?fHVlkwHvrLiHGiUmE3F8SsawzYb+psLwD/9+35CbAE2kUSySPoUko7t9/Zys?=
+ =?us-ascii?Q?EP7Q1oLh+7QrP9Hy1HHcLPhbYXIOt24sph+Yr4QJ8pXkJMO15dA4m8fa+wlA?=
+ =?us-ascii?Q?Z/DqhX0Lg8CeoPzY+3hX467mYnKRhWFrlq0ENO7fGAm4nUq/WaNKWrb1cc22?=
+ =?us-ascii?Q?Uix2d4M0yuhLWU27HxgDAZXfigTwnk6ctvuInrA0ni/IRiQJdV+w4a1qNZ7I?=
+ =?us-ascii?Q?wCT1lXkIE5/zshGWySVBshY=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com, drjones@redhat.com, ascull@google.com, dbrazdil@google.com, eric.auger@redhat.com, tabba@google.com, justin.he@arm.com, joey.gouly@arm.com, oupton@google.com, qperret@google.com, rananta@google.com, reijiw@google.com, ricarkol@google.com, seanjc@google.com, suzuki.poulose@arm.com, will@kernel.org, james.morse@arm.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5658.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 80c5d844-cd0e-475b-9036-08d99ac11e2e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Oct 2021 09:47:27.2641
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Ks9I9MXQReUkj/WbTPohaU8T5RJR8S1hrsX++E/f5jvyzZS2X0ieGUrL9WMwYY00PJR5Tddd8E98Bd9+x5FGHA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5644
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+Hi Jason,
 
-Here's the bulk of KVM/arm64 updates for 5.16. The changes are more or
-less equaly split between new features (more pKVM stuff trickling in
-as it gets written), a bunch of new selftests (timer, vgic), and bug
-fixes.
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Monday, October 25, 2021 8:53 PM
+>=20
+> On Mon, Oct 25, 2021 at 06:28:09AM +0000, Liu, Yi L wrote:
+> >    thanks for the guiding. will also refer to your vfio_group_cdev seri=
+es.
+> >
+> >    Need to double confirm here. Not quite following on the kfree. Is
+> >    this kfree to free the vfio_device structure? But now the
+> >    vfio_device pointer is provided by callers (e.g. vfio-pci). Do
+> >    you want to let vfio core allocate the vfio_device struct and
+> >    return the pointer to callers?
+>=20
+> There are several common patterns for this problem, two that would be
+> suitable:
+>=20
+> - Require each driver to provide a release op inside vfio_device_ops
+>   that does the kfree. Have the core provide a struct device release
+>   op that calls this one. Keep the kalloc/kfree in the drivers
 
-Please pull,
+this way sees to suit the existing vfio registration manner listed
+below. right? But device drivers needs to do the kfree in the
+newly added release op instead of doing it on their own (e.g.
+doing kfree in remove).
 
-	M.
+vfio_init_group_dev()
+vfio_register_group_dev()
+vfio_unregister_group_dev()
+vfio_uninit_group_dev()
 
-The following changes since commit 9e1ff307c779ce1f0f810c7ecce3d95bbae40896:
+> - Move the kalloc into the core and have the core provide the kfree
+>   with an optional release callback for anydriver specific cleanup
+>=20
+>   This requires some macro to make the memory layout work. RDMA has
+>   a version of this:
+>=20
+> struct ib_device *_ib_alloc_device(size_t size);
+> #define ib_alloc_device(drv_struct, member)                              =
+      \
+>         container_of(_ib_alloc_device(sizeof(struct drv_struct) +        =
+      \
+>                                       BUILD_BUG_ON_ZERO(offsetof(        =
+      \
+>                                               struct drv_struct, member))=
+),    \
+>                      struct drv_struct, member)
+>=20
 
-  Linux 5.15-rc4 (2021-10-03 14:08:47 -0700)
+thanks for the example. If this way, still requires driver to provide
+a release op inside vfio_device_ops. right?
 
-are available in the Git repository at:
+> In part the choice is how many drivers require a release callback
+> anyhow, if they all do then the first is easier to understand. If only
+> few or none do then the latter is less code in drivers, and never
+> exposes the driver to the tricky transition from alloc to refcount
+> cleanup.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-5.16
+I'm not quite sure. But per my understanding, since the vfio_device
+is expected to be embedded in the device state struct (e.g.
+vfio_pci_core_device), I guess most of the drivers will require callback
+to do driver specific cleanup. Seems like option #1 may make sense?
 
-for you to fetch changes up to 5a2acbbb0179a7ffbb5440b9fa46689f619705ac:
+Regards,
+Yi Liu
 
-  Merge branch kvm/selftests/memslot into kvmarm-master/next (2021-10-21 11:40:03 +0100)
-
-----------------------------------------------------------------
-KVM/arm64 updates for Linux 5.16
-
-- More progress on the protected VM front, now with the full
-  fixed feature set as well as the limitation of some hypercalls
-  after initialisation.
-
-- Cleanup of the RAZ/WI sysreg handling, which was pointlessly
-  complicated
-
-- Fixes for the vgic placement in the IPA space, together with a
-  bunch of selftests
-
-- More memcg accounting of the memory allocated on behalf of a guest
-
-- Timer and vgic selftests
-
-- Workarounds for the Apple M1 broken vgic implementation
-
-- KConfig cleanups
-
-- New kvmarm.mode=none option, for those who really dislike us
-
-----------------------------------------------------------------
-Alexandru Elisei (4):
-      KVM: arm64: Return early from read_id_reg() if register is RAZ
-      KVM: arm64: Use get_raz_reg() for userspace reads of PMSWINC_EL0
-      KVM: arm64: Replace get_raz_id_reg() with get_raz_reg()
-      Documentation: admin-guide: Document side effects when pKVM is enabled
-
-Fuad Tabba (8):
-      KVM: arm64: Pass struct kvm to per-EC handlers
-      KVM: arm64: Add missing field descriptor for MDCR_EL2
-      KVM: arm64: Simplify masking out MTE in feature id reg
-      KVM: arm64: Add handlers for protected VM System Registers
-      KVM: arm64: Initialize trap registers for protected VMs
-      KVM: arm64: Move sanitized copies of CPU features
-      KVM: arm64: Trap access to pVM restricted features
-      KVM: arm64: Handle protected guests at 32 bits
-
-Jia He (2):
-      KVM: arm64: vgic: Add memcg accounting to vgic allocations
-      KVM: arm64: Add memcg accounting to KVM allocations
-
-Marc Zyngier (33):
-      KVM: arm64: Turn __KVM_HOST_SMCCC_FUNC_* into an enum (mostly)
-      Merge branch kvm-arm64/pkvm/restrict-hypercalls into kvmarm-master/next
-      Merge branch kvm-arm64/vgic-ipa-checks into kvmarm-master/next
-      KVM: arm64: Allow KVM to be disabled from the command line
-      Merge branch kvm-arm64/misc-5.16 into kvmarm-master/next
-      Merge branch kvm-arm64/raz-sysregs into kvmarm-master/next
-      KVM: arm64: Move __get_fault_info() and co into their own include file
-      KVM: arm64: Don't include switch.h into nvhe/kvm-main.c
-      KVM: arm64: Move early handlers to per-EC handlers
-      Merge branch kvm-arm64/pkvm/restrict-hypercalls into kvmarm-master/next
-      KVM: arm64: Fix reporting of endianess when the access originates at EL0
-      Merge branch kvm-arm64/misc-5.16 into kvmarm-master/next
-      KVM: arm64: Force ID_AA64PFR0_EL1.GIC=1 when exposing a virtual GICv3
-      KVM: arm64: vgic-v3: Work around GICv3 locally generated SErrors
-      KVM: arm64: vgic-v3: Reduce common group trapping to ICV_DIR_EL1 when possible
-      KVM: arm64: vgic-v3: Don't advertise ICC_CTLR_EL1.SEIS
-      KVM: arm64: vgic-v3: Align emulated cpuif LPI state machine with the pseudocode
-      Merge branch kvm-arm64/vgic-fixes-5.16 into kvmarm-master/next
-      Merge branch kvm-arm64/selftest/timer into kvmarm-master/next
-      Merge branch kvm-arm64/memory-accounting into kvmarm-master/next
-      KVM: arm64: Fix early exit ptrauth handling
-      KVM: arm64: pkvm: Use a single function to expose all id-regs
-      KVM: arm64: pkvm: Make the ERR/ERX*_EL1 registers RAZ/WI
-      KVM: arm64: pkvm: Drop AArch32-specific registers
-      KVM: arm64: pkvm: Drop sysregs that should never be routed to the host
-      KVM: arm64: pkvm: Handle GICv3 traps as required
-      KVM: arm64: pkvm: Preserve pending SError on exit from AArch32
-      KVM: arm64: pkvm: Consolidate include files
-      KVM: arm64: pkvm: Move kvm_handle_pvm_restricted around
-      KVM: arm64: pkvm: Pass vpcu instead of kvm to kvm_get_exit_handler_array()
-      KVM: arm64: pkvm: Give priority to standard traps over pvm handling
-      Merge branch kvm-arm64/pkvm/fixed-features into kvmarm-master/next
-      Merge branch kvm/selftests/memslot into kvmarm-master/next
-
-Raghavendra Rao Ananta (14):
-      KVM: arm64: selftests: Add MMIO readl/writel support
-      tools: arm64: Import sysreg.h
-      KVM: arm64: selftests: Introduce ARM64_SYS_KVM_REG
-      KVM: arm64: selftests: Add support for cpu_relax
-      KVM: arm64: selftests: Add basic support for arch_timers
-      KVM: arm64: selftests: Add basic support to generate delays
-      KVM: arm64: selftests: Add support to disable and enable local IRQs
-      KVM: arm64: selftests: Maintain consistency for vcpuid type
-      KVM: arm64: selftests: Add guest support to get the vcpuid
-      KVM: arm64: selftests: Add light-weight spinlock support
-      KVM: arm64: selftests: Add basic GICv3 support
-      KVM: arm64: selftests: Add host support for vGIC
-      KVM: arm64: selftests: Add arch_timer test
-      KVM: arm64: selftests: arch_timer: Support vCPU migration
-
-Ricardo Koller (13):
-      kvm: arm64: vgic: Introduce vgic_check_iorange
-      KVM: arm64: vgic-v3: Check redist region is not above the VM IPA size
-      KVM: arm64: vgic-v2: Check cpu interface region is not above the VM IPA size
-      KVM: arm64: vgic-v3: Check ITS region is not above the VM IPA size
-      KVM: arm64: vgic: Drop vgic_check_ioaddr()
-      KVM: arm64: selftests: Make vgic_init gic version agnostic
-      KVM: arm64: selftests: Make vgic_init/vm_gic_create version agnostic
-      KVM: arm64: selftests: Add some tests for GICv2 in vgic_init
-      KVM: arm64: selftests: Add tests for GIC redist/cpuif partially above IPA range
-      KVM: arm64: selftests: Add test for legacy GICv3 REDIST base partially above IPA range
-      KVM: arm64: selftests: Add init ITS device test
-      KVM: selftests: Make memslot_perf_test arch independent
-      KVM: selftests: Build the memslot tests for arm64
-
-Sean Christopherson (2):
-      KVM: arm64: Unconditionally include generic KVM's Kconfig
-      KVM: arm64: Depend on HAVE_KVM instead of OF
-
-Will Deacon (5):
-      arm64: Prevent kexec and hibernation if is_protected_kvm_enabled()
-      KVM: arm64: Reject stub hypercalls after pKVM has been initialised
-      KVM: arm64: Propagate errors from __pkvm_prot_finalize hypercall
-      KVM: arm64: Prevent re-finalisation of pKVM for a given CPU
-      KVM: arm64: Disable privileged hypercalls after pKVM finalisation
-
- Documentation/admin-guide/kernel-parameters.txt    |    6 +-
- arch/arm64/Kconfig                                 |    1 +
- arch/arm64/include/asm/kvm_arm.h                   |    1 +
- arch/arm64/include/asm/kvm_asm.h                   |   48 +-
- arch/arm64/include/asm/kvm_emulate.h               |    5 +-
- arch/arm64/include/asm/kvm_host.h                  |    3 +
- arch/arm64/include/asm/kvm_hyp.h                   |    5 +
- arch/arm64/include/asm/sysreg.h                    |    3 +
- arch/arm64/kernel/smp.c                            |    3 +-
- arch/arm64/kvm/Kconfig                             |   10 +-
- arch/arm64/kvm/arm.c                               |   94 +-
- arch/arm64/kvm/hyp/include/hyp/fault.h             |   75 ++
- arch/arm64/kvm/hyp/include/hyp/switch.h            |  235 ++--
- arch/arm64/kvm/hyp/include/nvhe/fixed_config.h     |  200 +++
- arch/arm64/kvm/hyp/include/nvhe/trap_handler.h     |    2 +
- arch/arm64/kvm/hyp/nvhe/Makefile                   |    2 +-
- arch/arm64/kvm/hyp/nvhe/host.S                     |   26 +-
- arch/arm64/kvm/hyp/nvhe/hyp-main.c                 |   48 +-
- arch/arm64/kvm/hyp/nvhe/mem_protect.c              |   11 +-
- arch/arm64/kvm/hyp/nvhe/pkvm.c                     |  185 +++
- arch/arm64/kvm/hyp/nvhe/setup.c                    |    3 +
- arch/arm64/kvm/hyp/nvhe/switch.c                   |   99 ++
- arch/arm64/kvm/hyp/nvhe/sys_regs.c                 |  487 ++++++++
- arch/arm64/kvm/hyp/vgic-v3-sr.c                    |   22 +-
- arch/arm64/kvm/hyp/vhe/switch.c                    |   16 +
- arch/arm64/kvm/mmu.c                               |    2 +-
- arch/arm64/kvm/pmu-emul.c                          |    2 +-
- arch/arm64/kvm/reset.c                             |    2 +-
- arch/arm64/kvm/sys_regs.c                          |   41 +-
- arch/arm64/kvm/vgic/vgic-init.c                    |    2 +-
- arch/arm64/kvm/vgic/vgic-irqfd.c                   |    2 +-
- arch/arm64/kvm/vgic/vgic-its.c                     |   18 +-
- arch/arm64/kvm/vgic/vgic-kvm-device.c              |   25 +-
- arch/arm64/kvm/vgic/vgic-mmio-v3.c                 |    8 +-
- arch/arm64/kvm/vgic/vgic-v3.c                      |   27 +-
- arch/arm64/kvm/vgic/vgic-v4.c                      |    2 +-
- arch/arm64/kvm/vgic/vgic.h                         |    5 +-
- tools/arch/arm64/include/asm/sysreg.h              | 1296 ++++++++++++++++++++
- tools/testing/selftests/kvm/.gitignore             |    1 +
- tools/testing/selftests/kvm/Makefile               |    5 +-
- tools/testing/selftests/kvm/aarch64/arch_timer.c   |  479 ++++++++
- .../selftests/kvm/aarch64/debug-exceptions.c       |   30 +-
- .../selftests/kvm/aarch64/psci_cpu_on_test.c       |    2 +-
- tools/testing/selftests/kvm/aarch64/vgic_init.c    |  369 ++++--
- .../selftests/kvm/include/aarch64/arch_timer.h     |  142 +++
- .../testing/selftests/kvm/include/aarch64/delay.h  |   25 +
- tools/testing/selftests/kvm/include/aarch64/gic.h  |   21 +
- .../selftests/kvm/include/aarch64/processor.h      |   90 +-
- .../selftests/kvm/include/aarch64/spinlock.h       |   13 +
- tools/testing/selftests/kvm/include/aarch64/vgic.h |   20 +
- tools/testing/selftests/kvm/include/kvm_util.h     |    2 +
- tools/testing/selftests/kvm/lib/aarch64/gic.c      |   95 ++
- .../selftests/kvm/lib/aarch64/gic_private.h        |   21 +
- tools/testing/selftests/kvm/lib/aarch64/gic_v3.c   |  240 ++++
- tools/testing/selftests/kvm/lib/aarch64/gic_v3.h   |   70 ++
- .../testing/selftests/kvm/lib/aarch64/processor.c  |   24 +-
- tools/testing/selftests/kvm/lib/aarch64/spinlock.c |   27 +
- tools/testing/selftests/kvm/lib/aarch64/vgic.c     |   70 ++
- tools/testing/selftests/kvm/memslot_perf_test.c    |   56 +-
- 59 files changed, 4373 insertions(+), 451 deletions(-)
- create mode 100644 arch/arm64/kvm/hyp/include/hyp/fault.h
- create mode 100644 arch/arm64/kvm/hyp/include/nvhe/fixed_config.h
- create mode 100644 arch/arm64/kvm/hyp/nvhe/pkvm.c
- create mode 100644 arch/arm64/kvm/hyp/nvhe/sys_regs.c
- create mode 100644 tools/arch/arm64/include/asm/sysreg.h
- create mode 100644 tools/testing/selftests/kvm/aarch64/arch_timer.c
- create mode 100644 tools/testing/selftests/kvm/include/aarch64/arch_timer.h
- create mode 100644 tools/testing/selftests/kvm/include/aarch64/delay.h
- create mode 100644 tools/testing/selftests/kvm/include/aarch64/gic.h
- create mode 100644 tools/testing/selftests/kvm/include/aarch64/spinlock.h
- create mode 100644 tools/testing/selftests/kvm/include/aarch64/vgic.h
- create mode 100644 tools/testing/selftests/kvm/lib/aarch64/gic.c
- create mode 100644 tools/testing/selftests/kvm/lib/aarch64/gic_private.h
- create mode 100644 tools/testing/selftests/kvm/lib/aarch64/gic_v3.c
- create mode 100644 tools/testing/selftests/kvm/lib/aarch64/gic_v3.h
- create mode 100644 tools/testing/selftests/kvm/lib/aarch64/spinlock.c
- create mode 100644 tools/testing/selftests/kvm/lib/aarch64/vgic.c
