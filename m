@@ -2,178 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C102440669
-	for <lists+kvm@lfdr.de>; Sat, 30 Oct 2021 02:32:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 74A104406BD
+	for <lists+kvm@lfdr.de>; Sat, 30 Oct 2021 03:34:49 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231481AbhJ3Aeh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Oct 2021 20:34:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40648 "EHLO
+        id S231397AbhJ3BhN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Oct 2021 21:37:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231377AbhJ3Aeg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Oct 2021 20:34:36 -0400
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCE03C061714
-        for <kvm@vger.kernel.org>; Fri, 29 Oct 2021 17:32:07 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id t21so7838179plr.6
-        for <kvm@vger.kernel.org>; Fri, 29 Oct 2021 17:32:07 -0700 (PDT)
+        with ESMTP id S229694AbhJ3BhM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Oct 2021 21:37:12 -0400
+Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57BBAC061714;
+        Fri, 29 Oct 2021 18:34:43 -0700 (PDT)
+Received: by mail-io1-xd2c.google.com with SMTP id h81so5908486iof.6;
+        Fri, 29 Oct 2021 18:34:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=tfN/NZ9bKyA3ymAP3/RxrMfh6+uEmny6i5vUMe2cPU8=;
-        b=C7fcPQiJRBEaAhNWBIA7kYZ8HHNl/QchUEZIHa+JwOgg1Mu2eJF4ud/0uuHAzoSgKx
-         f7lbOdt9KZBZxV6NGhrpr/LBbrKIx2257W8SBXos+EaBCOnBTQR5zfY44kcW/zlyoDHP
-         /HvSIoUmF/hgHce7rKx6MZawAPVuyWQIlc0TQJ5TszC3c1LKgxsC3Fg4YEVMUr2bgKHn
-         Ahh+mx6GyZwQ7CcL0Ne4LPzCYqX530mLhAGT9/Fe9ZWZT8aqTroWGrQAeICb+CdxZa1b
-         1DNVEUSQ8OYLU5IMswWyCjQbvlKtylRAV9bmy89qewoq2hHM7Guj0IkVzzWkE876XAol
-         qV1Q==
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=aM2UIDKlHlRVDNMmLAAR2KZpDgdEIfkzvAwIfORb7XU=;
+        b=MPVLBnNyPG7Q/KThwcQMZpg6zOdy9NX6BGc+y5juZfuTiL76Js8z2ZAWfkHEVtFyge
+         fU0wzrqiqzQ24n1Z04yXrKxyycH6E+67m1ePl4LIU/WQCrCFDhqR+I3bbIsfw+dEg/ZC
+         tmRFAKk7I4rcHZi/TRaoGoApvrJ3Ka+CmeICLJ/6gxQokwq2xMy3zsr2VwluZO/tSGze
+         UGEYnPt2U9zA8jQcolyVcfanknDjldZvpklou6PNia5HAc8IhU7OxvW7ESiSgYhlnW//
+         pcfSSAkSMsAVxVE9Pe9ItQi4kodCoeWCStz4pFbLxBhwbi/Z+Y3Zr2+AS0tWcRQj4Fnb
+         1Q7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=tfN/NZ9bKyA3ymAP3/RxrMfh6+uEmny6i5vUMe2cPU8=;
-        b=VFVwuoT5pC0uo2E71yXiJV5t4o3ZbS0r872wsrpKHNwA4U7e9wqBNqhBvF149AmJ89
-         M+TtjeuS54I5Tf83OUaPTgXwTe7p443AMAo2nqukfNPpVaD+/0g8/39w3xz60+8Fq3F9
-         hrK4/W4wiXJkFeBbEMjt08jNyNpbou5AknQ8l/fZIPO/BdeIYLCPnVFn1Anju9nxtN5P
-         jgn4RRkoWmuIUh8ScbvWygF/QKnsEJtI/1bD7dQI4V+dbSAsagJzNA6oth65VpxvXngD
-         3iBb9jiwF8F18iLjo6+u2v2+/40AKcLcGgb+nBeCZAqZvAGxmZcaPi2jYwZvgbpjSWB5
-         UHEw==
-X-Gm-Message-State: AOAM531ppkYE0yupA3b+4n1wRcye+h1B+ndlaeP963Ypee5Xq5qc82wc
-        tI+PPYB4p0yIk83sfoF3defCAw==
-X-Google-Smtp-Source: ABdhPJyCn9GLlrncVFZ/FTBTXAmXjTaj0DZZZ2p4NowSrEFTteGtsBSUa8Qc3Ib5s/QTuyXp9PtMUg==
-X-Received: by 2002:a17:90b:218:: with SMTP id fy24mr13099463pjb.187.1635553927061;
-        Fri, 29 Oct 2021 17:32:07 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id b4sm8625778pfl.60.2021.10.29.17.32.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Oct 2021 17:32:06 -0700 (PDT)
-Date:   Sat, 30 Oct 2021 00:32:02 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=aM2UIDKlHlRVDNMmLAAR2KZpDgdEIfkzvAwIfORb7XU=;
+        b=IFNzVNKaniiOU8fCPOvcPi2bNWmMp7HhjIx8tDzeX95TIwiUeO1GG/CQ1FoJuC3tq4
+         bNcnbaatKF2/A7CymQCu8W1/paKkxoxTT1BEf9ppbOs7riB1rzjJk67s72+kPwAb/gUf
+         44L3GIEq8RO8j1mGOXZ0HK06Vfyu13goakA7q06+ecHS2Knf9fHrdVHXWtt8O0kcm+vy
+         bms3Sjee3h4h4dabeJnN8GLJqtlraw5FhIA2Hubxll9E9Figi5Y/Y7mBxeJT4ORsmxrv
+         KSw/mvy8cz4pxSTuMvFeHiMYDp/aA+AAFRTETqaGXABsNxkEGEZ00AmvV4FQApufWbCU
+         bQgw==
+X-Gm-Message-State: AOAM5306cder/eblpToqiFYTZrXeRHZaP9FrSrFGh5X32YCrdXlDLM0K
+        BnDEPvAP0Kv4+Ce3tMUnHMz0wFOlJNrW/UB0Gj0=
+X-Google-Smtp-Source: ABdhPJygNNPndHZOPvUvjR+W4LGfsfL++Y/Bsge3qeff8gNMYOQ/wY/+CYxIy80nYNBtjd9zopHt4uY6TX5jpqEN62c=
+X-Received: by 2002:a05:6602:1594:: with SMTP id e20mr10725393iow.14.1635557682679;
+ Fri, 29 Oct 2021 18:34:42 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200320212833.3507-1-sean.j.christopherson@intel.com>
+ <20200320212833.3507-24-sean.j.christopherson@intel.com> <CAJhGHyD=S6pVB+OxM7zF0_6LnMUCLqyTfMK4x9GZsdRHZmgN7Q@mail.gmail.com>
+ <YXrAM9MNqgLTU6+m@google.com> <CAJhGHyBKVUsuKdvfaART6NWF7Axk5=eFQLidhGrM=mUO2cv2vw@mail.gmail.com>
+ <YXwq+Q3+I81jwv7G@google.com>
+In-Reply-To: <YXwq+Q3+I81jwv7G@google.com>
+From:   Lai Jiangshan <jiangshanlai+lkml@gmail.com>
+Date:   Sat, 30 Oct 2021 09:34:31 +0800
+Message-ID: <CAJhGHyBNazRUiwPT5nGC=JNYX96J1dP9Y+KWFz7TeYuT3teYZg@mail.gmail.com>
+Subject: Re: [PATCH v3 23/37] KVM: nVMX: Add helper to handle TLB flushes on
+ nested VM-Enter/VM-Exit
+To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 13/13] KVM: Optimize overlapping memslots check
-Message-ID: <YXySglMHYhHHVxm/@google.com>
-References: <cover.1632171478.git.maciej.szmigiero@oracle.com>
- <4f8718fc8da57ab799e95ef7c2060f8be0f2391f.1632171479.git.maciej.szmigiero@oracle.com>
- <YXhQEeNxi2+fAQPM@google.com>
- <4222ead3-f80f-0992-569f-9e1a7adbabcc@maciej.szmigiero.name>
- <YXrjnSKBhzG7JVLF@google.com>
- <4156d889-5320-ff78-9898-e065d8554c7d@maciej.szmigiero.name>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4156d889-5320-ff78-9898-e065d8554c7d@maciej.szmigiero.name>
+        LKML <linux-kernel@vger.kernel.org>,
+        Ben Gardon <bgardon@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Liran Alon <liran.alon@oracle.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        John Haxby <john.haxby@oracle.com>,
+        Miaohe Lin <linmiaohe@huawei.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 29, 2021, Maciej S. Szmigiero wrote:
-> On 28.10.2021 19:53, Sean Christopherson wrote:
-> > Hmm, no, this is trivial to handle, though admittedly a bit unpleasant.
-> > 
-> > /*
-> >   * Note, kvm_memslot_iter_start() finds the first memslot that _may_ overlap
-> >   * the range, it does not verify that there is actual overlap.  The check in
-> >   * the loop body filters out the case where the highest memslot with a base_gfn
-> >   * below start doesn't actually overlap.
-> >   */
-> > #define kvm_for_each_memslot_in_gfn_range(iter, node, slots, start, end) \
-> >          for (kvm_memslot_iter_start(iter, node, slots, start, end);      \
-> >               kvm_memslot_iter_is_valid(iter);                            \
-> >               kvm_memslot_iter_next(node))                                \
-> > 		if (iter->slot->base_gfn + iter->slot->npages < start) { \
-> > 		} else
-> 
-> As you say, that's rather unpleasant, since we know that the first
-> returned memslot is the only one that's possibly *not* overlapping
-> (and then it only happens sometimes).
-> Yet with the above change we'll pay the price of this check for every
-> loop iteration (for every returned memslot).
+/
 
-I'm definitely not saying that it's the best/right/only way to handle this,
-merely pointing out that it's not _that_ complex, modulo off-by-one bugs :-)
+On Sat, Oct 30, 2021 at 1:10 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> TL;DR: I'll work on a proper series next week, there are multiple things that need
+> to be fixed.
+>
+> On Fri, Oct 29, 2021, Lai Jiangshan wrote:
+> > On Thu, Oct 28, 2021 at 11:22 PM Sean Christopherson <seanjc@google.com> wrote:
+> > > The fix should simply be:
+> > >
+> > > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> > > index eedcebf58004..574823370e7a 100644
+> > > --- a/arch/x86/kvm/vmx/nested.c
+> > > +++ b/arch/x86/kvm/vmx/nested.c
+> > > @@ -1202,17 +1202,15 @@ static void nested_vmx_transition_tlb_flush(struct kvm_vcpu *vcpu,
+> > >          *
+> > >          * If a TLB flush isn't required due to any of the above, and vpid12 is
+> > >          * changing then the new "virtual" VPID (vpid12) will reuse the same
+> > > -        * "real" VPID (vpid02), and so needs to be flushed.  There's no direct
+> > > -        * mapping between vpid02 and vpid12, vpid02 is per-vCPU and reused for
+> > > -        * all nested vCPUs.  Remember, a flush on VM-Enter does not invalidate
+> > > -        * guest-physical mappings, so there is no need to sync the nEPT MMU.
+> > > +        * "real" VPID (vpid02), and so needs to be flushed.  Like the !vpid02
+> > > +        * case above, this is a full TLB flush from the guest's perspective.
+> > >          */
+> > >         if (!nested_has_guest_tlb_tag(vcpu)) {
+> > >                 kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
+> > >         } else if (is_vmenter &&
+> > >                    vmcs12->virtual_processor_id != vmx->nested.last_vpid) {
+> > >                 vmx->nested.last_vpid = vmcs12->virtual_processor_id;
+> > > -               vpid_sync_context(nested_get_vpid02(vcpu));
+> > > +               kvm_make_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu);
+> >
+> > This change is neat.
+>
+> Heh, yeah, but too neat to be right :-)
+>
+> > But current KVM_REQ_TLB_FLUSH_GUEST flushes vpid01 only, and it doesn't flush
+> > vpid02.  vmx_flush_tlb_guest() might need to be changed to flush vpid02 too.
+>
+> Hmm.  I think vmx_flush_tlb_guest() is straight up broken.  E.g. if EPT is enabled
+> but L1 doesn't use EPT for L2 and doesn't intercept INVPCID, then KVM will handle
+> INVPCID from L2.  That means the recent addition to kvm_invalidate_pcid() (see
+> below) will flush the wrong VPID.  And it's incorrect (well, more than is required
+> by the SDM) to flush both VPIDs because flushes from INVPCID (and flushes from the
+> guest's perspective in general) are scoped to the current VPID, e.g. a "full" TLB
+> flush in the "host" by toggling CR4.PGE flushes only the current VPID:
 
-> That's definitely not optimizing for the most common case.
+I think KVM_REQ_TLB_FLUSH_GUEST/kvm_vcpu_flush_tlb_guest/vmx_flush_tlb_guest
+was deliberately designed for the L1 guest only.  It can be seen from the code,
+from the history, and from the caller's side.  For example,
+nested_vmx_transition_tlb_flush() knows KVM_REQ_TLB_FLUSH_GUEST flushes
+L1 guest:
 
-Meh, it's a nop for kvm_check_memslot_overlap() and completely in the noise for
-kvm_zap_gfn_range().  Not saying I disagree that's a flawed way to handle this
-just saying that even the quick-and-dirty solution is extremely unlikely to be
-relevant to performance.
+        /*
+         * If vmcs12 doesn't use VPID, L1 expects linear and combined mappings
+         * for *all* contexts to be flushed on VM-Enter/VM-Exit, i.e. it's a
+         * full TLB flush from the guest's perspective.  This is required even
+         * if VPID is disabled in the host as KVM may need to synchronize the
+         * MMU in response to the guest TLB flush.
+         *
+         * Note, using TLB_FLUSH_GUEST is correct even if nested EPT is in use.
+         * EPT is a special snowflake, as guest-physical mappings aren't
+         * flushed on VPID invalidations, including VM-Enter or VM-Exit with
+         * VPID disabled.  As a result, KVM _never_ needs to sync nEPT
+         * entries on VM-Enter because L1 can't rely on VM-Enter to flush
+         * those mappings.
+         */
+        if (!nested_cpu_has_vpid(vmcs12)) {
+                kvm_make_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu);
+                return;
+        }
 
-> Also, the above code has a bug - using a [start, end) notation compatible
-> with what kvm_for_each_memslot_in_gfn_range() expects,  where [1, 4)
-> means a range consisting of { 1, 2, 3 }, consider a tree consisting of the
-> following two memslots: [1, 2), [3, 5)
-> 
-> When kvm_for_each_memslot_in_gfn_range() is then called to "return"
-> memslots overlapping range [2, 4) it will "return" the [1, 2) memslot, too -
-> even though it does *not*  actually overlap the requested range.
-> 
-> While this bug is easy to fix (just use "<=" instead of "<") it serves to
-> underline that one has to be very careful with working with this type of
-> code as it is very easy to introduce subtle mistakes here.
+While handle_invvpid() doesn't use KVM_REQ_TLB_FLUSH_GUEST.
 
-Yes, and that's exactly why I want to write this _once_.
+So, I don't think KVM_REQ_TLB_FLUSH_GUEST, kvm_vcpu_flush_tlb_guest
+or vmx_flush_tlb_guest is broken since they are for L1 guests.
+What we have to do is to consider is it worth extending them for
+nested guests for the convenience of nested code.
 
-> > Two _existing_ callers.  Odds are very, very high that future usage of
-> > kvm_for_each_memslot_in_gfn_range() will overlook the detail about the helper
-> > not actually doing what it says it does.  That could be addressed to some extent
-> > by renaming it kvm_for_each_memslot_in_gfn_range_approx() or whatever, but as
-> > above this isn't difficult to handle, just gross.
-> 
-> What kind of future users of this API do you envision?
-> 
-> I've pointed out above that adding this extra check means essentially
-> optimizing for an uncommon case.
+I second that they are extended.
 
-Usage similar to kvm_zap_gfn_range() where KVM wants to take action on a specific
-gfn range.  I'm actually somewhat surprised that none of the other architectures
-have a use case in their MMUs, though I don't know the story for things like
-shadow paging that "necessitate" x86's behavior.
-
-> One of the callers of this function already has the necessary code to
-> reject non-overlapping memslots and have to keep it to calculate the
-> effective overlapping range for each memslot.
-> For the second caller (which, by the way, is called much less often than
-> kvm_zap_gfn_range()) it's a matter of one extra condition.
-> 
-> > > In case of kvm_zap_gfn_range() the necessary checking is already
-> > > there and has to be kept due to the above range merging.
-> > > 
-> > > Also, a code that is simpler is easier to understand, maintain and
-> > > so less prone to subtle bugs.
-> > 
-> > Heh, and IMO that's an argument for putting all the complexity into a single
-> > location.  :-)
-> > 
-> 
-> If you absolutely insist then obviously I can change the code to return
-> only memslots strictly overlapping the requested range in the next
-> patchset version.
-
-I feel pretty strongly that the risk vs. reward is heavily in favor of returning
-only strictly overlapping memslots.  The risk being that a few years down the road
-someone runs afoul of this and we end up with a bug in production.  The reward is
-avoiding writing moderately complex code and at best shave a few uops in an x86
-slooow path.  It's entirely possible there's never a third user, but IMO there
-isn't enough reward to justify even the smallest amount of risk.
-
-Paolo, any opinion?
+A small comment in your proposal: I found that KVM_REQ_TLB_FLUSH_CURRENT
+and KVM_REQ_TLB_FLUSH_GUEST is to flush "current" vpid only, some special
+work needs to be added when switching mmu from L1 to L2 and vice versa:
+handle the requests before switching.
