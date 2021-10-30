@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DFC03440B89
+	by mail.lfdr.de (Postfix) with ESMTP id 974F8440B88
 	for <lists+kvm@lfdr.de>; Sat, 30 Oct 2021 21:46:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231165AbhJ3TtE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S231142AbhJ3TtE (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Sat, 30 Oct 2021 15:49:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35130 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230497AbhJ3TtD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S229782AbhJ3TtD (ORCPT <rfc822;kvm@vger.kernel.org>);
         Sat, 30 Oct 2021 15:49:03 -0400
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B50BC061746
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AD1EC061570
         for <kvm@vger.kernel.org>; Sat, 30 Oct 2021 12:46:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
-        Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=oLvZ4oUv+JlX0dOr7KVY1E/i7qAM2QVUmxT2vZxhivA=; b=HsgyDfVbLjfkEvvo/E9MDE5Hs9
-        X7NVkkwWC/eVe2KzTOxXRAJKqBwREcV2D+RW78huLz3YvXiJeU/m9S3Tclq2/4qRJHVj+qWBIdYKo
-        1o+pOhO964kqCWX/HbAAjJgepqQ5KRiFY9HP3pDF2VQWjx6847RMVmmbwJT/k07RSdUWiSXWserg+
-        g0y1juPMo1ZVdJnrS7+V8jE34zc9LOrOPU+fm9go0NbW8hYzWsiDozjX6jNLajpvTwUSwhrhirm5x
-        soukyFV5TLXh/BMmJEfi2dqeJWXPbemIm+i1BYCuljNhp4VTWXB7UvSikd5V0hWWkdr4rGsoN2m6Q
-        TcxtMlNg==;
+        Content-Type:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:
+        To:From:Reply-To:Content-ID:Content-Description;
+        bh=UEmjHzlaSw/Bk9cSeKR1RCrm9Xy11sNaMiRUcfJsH9E=; b=iG9F0jt0rf+g2uAKo/mBlAVpVr
+        dZbJlpHJRorNR40TEbQZO31DPq3C+tf2V82D3abPTbpwWrxydz/t1lNVZ8gJUDeGsRBdR9uOl8sVB
+        rxYNZE6dwKviwB8I6nF1CJguFyyz8mRVqSNv8dqpKaSBPMrVtfwS9m6AuZj0wndxsMtvP5QKOHlKj
+        GToqPVO3mEbsodWzpnGt2zdWO7rOas+SWpIu4pGva7kFSYMwoN/5UyK3ZUx9/BPpeWh0ClQefVUoO
+        vD+oK8CpIHpbESQSy/U1yJZpDjnfRqlzy/Cj+xhMQbNDQHzeSu71tEic7jvE2W2UyOLUvPJTJs9nG
+        a4ugm+/A==;
 Received: from i7.infradead.org ([2001:8b0:10b:1:21e:67ff:fecb:7a92])
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mguHF-002cmN-9K; Sat, 30 Oct 2021 19:45:12 +0000
+        id 1mguHF-002cmO-BS; Sat, 30 Oct 2021 19:45:12 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mguHE-00066E-QN; Sat, 30 Oct 2021 20:44:28 +0100
+        id 1mguHE-00066I-SJ; Sat, 30 Oct 2021 20:44:28 +0100
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     "kvm @ vger . kernel . org" <kvm@vger.kernel.org>
 Cc:     "jmattson @ google . com" <jmattson@google.com>,
@@ -40,13 +40,14 @@ Cc:     "jmattson @ google . com" <jmattson@google.com>,
         "joro @ 8bytes . org" <joro@8bytes.org>,
         Joao Martins <joao.m.martins@oracle.com>,
         Ankur Arora <ankur.a.arora@oracle.com>, karahmed@amazon.com
-Subject: [PATCH 3/5] KVM: Fix kvm_map_gfn()/kvm_unmap_gfn() to take a kvm as their names imply
-Date:   Sat, 30 Oct 2021 20:44:26 +0100
-Message-Id: <20211030194428.23395-3-dwmw2@infradead.org>
+Subject: [PATCH 4/5] KVM: x86/xen: Reinstate mapping of Xen shared_info page
+Date:   Sat, 30 Oct 2021 20:44:27 +0100
+Message-Id: <20211030194428.23395-4-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20211030194428.23395-1-dwmw2@infradead.org>
 References: <20211030194428.23395-1-dwmw2@infradead.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: David Woodhouse <dwmw2@infradead.org>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -56,110 +57,213 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: David Woodhouse <dwmw@amazon.co.uk>
 
-These were somewhat misnamed, as they actually took a kvm_vcpu, even
-though they didn't do anything with it except to find vcpu->kvm.
+In order to allow for event channel delivery, we would like to have a
+kernel mapping of the shared_info page which can be accessed in atomic
+context in the common case.
 
-And more to the point I don't *have* a vcpu to give them, in an upcoming
-use case...
+Allegedly, keeping a page mapped is frowned upon because it *pins* the
+page and causes issues for memory unplug, error handling and migration.
+
+But as far as I can tell, it isn't the *mapping* per se which is pinning
+the pages; the gfn_to_pfn_cache *alone* is doing that, all the while the
+PFN is cached. So doing the map/unmap dance every time we want to touch
+the page (as the steal time recording does) appears to be somewhat
+pointless.
+
+Furthermore, the gfn_to_pfn_cache doesn't appear to be invalidated when
+the PFN *changes* due to userspace unmapping or remapping the HVA in
+question. Pinning the page, although we shouldn't be doing it anyway,
+may help avoid it just being paged out — but it doesn't stop various
+other failure modes where it goes away or changes. We really need to
+hook up the MMU notifiers to invalidate the gfn_to_pfn_cache when
+necessary. And then we resolve the pinning problem anyway.
+
+So, having reduced all that to a previously *unsolved* problem, I'll
+just go ahead and use it anyway, and promise to fix it later.
 
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 ---
- arch/x86/kvm/x86.c       |  8 ++++----
- include/linux/kvm_host.h |  4 ++--
- virt/kvm/kvm_main.c      | 11 +++++------
- 3 files changed, 11 insertions(+), 12 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  6 +++-
+ arch/x86/kvm/xen.c              | 55 +++++++++++++++++++++++++--------
+ include/linux/kvm_host.h        | 37 +++++++++++-----------
+ 3 files changed, 66 insertions(+), 32 deletions(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index cd42d58008f7..8e9b850d967b 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3207,7 +3207,7 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
- 		return;
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 70771376e246..e264301f71d7 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1014,8 +1014,12 @@ struct msr_bitmap_range {
+ /* Xen emulation context */
+ struct kvm_xen {
+ 	bool long_mode;
++	bool shinfo_set;
+ 	u8 upcall_vector;
+-	gfn_t shinfo_gfn;
++	rwlock_t shinfo_lock;
++	void *shared_info;
++	struct kvm_host_map shinfo_map;
++	struct gfn_to_pfn_cache shinfo_cache;
+ };
  
- 	/* -EAGAIN is returned in atomic context so we can just return. */
--	if (kvm_map_gfn(vcpu, vcpu->arch.st.msr_val >> PAGE_SHIFT,
-+	if (kvm_map_gfn(vcpu->kvm, vcpu->arch.st.msr_val >> PAGE_SHIFT,
- 			&map, &vcpu->arch.st.cache, false))
- 		return;
+ enum kvm_irqchip_mode {
+diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+index c4bca001a7c9..75bb033c9613 100644
+--- a/arch/x86/kvm/xen.c
++++ b/arch/x86/kvm/xen.c
+@@ -21,18 +21,44 @@
  
-@@ -3246,7 +3246,7 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
+ DEFINE_STATIC_KEY_DEFERRED_FALSE(kvm_xen_enabled, HZ);
  
- 	st->version += 1;
+-static int kvm_xen_shared_info_init(struct kvm *kvm, gfn_t gfn)
++static void kvm_xen_shared_info_unmap(struct kvm *kvm)
++{
++	write_lock(&kvm->arch.xen.shinfo_lock);
++	kvm->arch.xen.shared_info = NULL;
++	write_unlock(&kvm->arch.xen.shinfo_lock);
++
++	if (kvm_vcpu_mapped(&kvm->arch.xen.shinfo_map))
++		kvm_unmap_gfn(kvm, &kvm->arch.xen.shinfo_map,
++			      &kvm->arch.xen.shinfo_cache, true, false);
++}
++
++static int kvm_xen_shared_info_init(struct kvm *kvm, gfn_t gfn, bool update_clock)
+ {
+ 	gpa_t gpa = gfn_to_gpa(gfn);
+ 	int wc_ofs, sec_hi_ofs;
+ 	int ret = 0;
+ 	int idx = srcu_read_lock(&kvm->srcu);
  
--	kvm_unmap_gfn(vcpu, &map, &vcpu->arch.st.cache, true, false);
-+	kvm_unmap_gfn(vcpu->kvm, &map, &vcpu->arch.st.cache, true, false);
+-	if (kvm_is_error_hva(gfn_to_hva(kvm, gfn))) {
+-		ret = -EFAULT;
++	kvm_xen_shared_info_unmap(kvm);
++
++	if (gfn == GPA_INVALID) {
++		kvm->arch.xen.shinfo_set = false;
+ 		goto out;
+ 	}
+-	kvm->arch.xen.shinfo_gfn = gfn;
++
++	ret = kvm_map_gfn(kvm, gfn, &kvm->arch.xen.shinfo_map,
++			  &kvm->arch.xen.shinfo_cache, false);
++	if (ret)
++		goto out;
++
++	write_lock(&kvm->arch.xen.shinfo_lock);
++	kvm->arch.xen.shared_info = kvm->arch.xen.shinfo_map.hva;
++	write_unlock(&kvm->arch.xen.shinfo_lock);
++
++	kvm->arch.xen.shinfo_set = true;
++
++	if (!update_clock)
++		goto out;
+ 
+ 	/* Paranoia checks on the 32-bit struct layout */
+ 	BUILD_BUG_ON(offsetof(struct compat_shared_info, wc) != 0x900);
+@@ -277,15 +303,9 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
+ 		break;
+ 
+ 	case KVM_XEN_ATTR_TYPE_SHARED_INFO:
+-		if (data->u.shared_info.gfn == GPA_INVALID) {
+-			kvm->arch.xen.shinfo_gfn = GPA_INVALID;
+-			r = 0;
+-			break;
+-		}
+-		r = kvm_xen_shared_info_init(kvm, data->u.shared_info.gfn);
++		r = kvm_xen_shared_info_init(kvm, data->u.shared_info.gfn, true);
+ 		break;
+ 
+-
+ 	case KVM_XEN_ATTR_TYPE_UPCALL_VECTOR:
+ 		if (data->u.vector && data->u.vector < 0x10)
+ 			r = -EINVAL;
+@@ -316,7 +336,10 @@ int kvm_xen_hvm_get_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
+ 		break;
+ 
+ 	case KVM_XEN_ATTR_TYPE_SHARED_INFO:
+-		data->u.shared_info.gfn = gpa_to_gfn(kvm->arch.xen.shinfo_gfn);
++		if (kvm->arch.xen.shinfo_set)
++			data->u.shared_info.gfn = kvm->arch.xen.shinfo_cache.gfn;
++		else
++			data->u.shared_info.gfn = GPA_INVALID;
+ 		r = 0;
+ 		break;
+ 
+@@ -696,11 +719,17 @@ int kvm_xen_hvm_config(struct kvm *kvm, struct kvm_xen_hvm_config *xhc)
+ 
+ void kvm_xen_init_vm(struct kvm *kvm)
+ {
+-	kvm->arch.xen.shinfo_gfn = GPA_INVALID;
++	rwlock_init(&kvm->arch.xen.shinfo_lock);
  }
  
- int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-@@ -4294,7 +4294,7 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
- 	if (vcpu->arch.st.preempted)
- 		return;
- 
--	if (kvm_map_gfn(vcpu, vcpu->arch.st.msr_val >> PAGE_SHIFT, &map,
-+	if (kvm_map_gfn(vcpu->kvm, vcpu->arch.st.msr_val >> PAGE_SHIFT, &map,
- 			&vcpu->arch.st.cache, true))
- 		return;
- 
-@@ -4303,7 +4303,7 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
- 
- 	st->preempted = vcpu->arch.st.preempted = KVM_VCPU_PREEMPTED;
- 
--	kvm_unmap_gfn(vcpu, &map, &vcpu->arch.st.cache, true, true);
-+	kvm_unmap_gfn(vcpu->kvm, &map, &vcpu->arch.st.cache, true, true);
+ void kvm_xen_destroy_vm(struct kvm *kvm)
+ {
++	struct gfn_to_pfn_cache *cache = &kvm->arch.xen.shinfo_cache;
++
++	kvm_xen_shared_info_unmap(kvm);
++
++	kvm_release_pfn(cache->pfn, cache->dirty, cache);
++
+ 	if (kvm->arch.xen_hvm_config.msr)
+ 		static_branch_slow_dec_deferred(&kvm_xen_enabled);
  }
- 
- void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
 diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 0f18df7fe874..749cdc77fc4e 100644
+index 749cdc77fc4e..9dab85a55e19 100644
 --- a/include/linux/kvm_host.h
 +++ b/include/linux/kvm_host.h
-@@ -943,11 +943,11 @@ struct kvm_memory_slot *kvm_vcpu_gfn_to_memslot(struct kvm_vcpu *vcpu, gfn_t gfn
- kvm_pfn_t kvm_vcpu_gfn_to_pfn_atomic(struct kvm_vcpu *vcpu, gfn_t gfn);
- kvm_pfn_t kvm_vcpu_gfn_to_pfn(struct kvm_vcpu *vcpu, gfn_t gfn);
- int kvm_vcpu_map(struct kvm_vcpu *vcpu, gpa_t gpa, struct kvm_host_map *map);
--int kvm_map_gfn(struct kvm_vcpu *vcpu, gfn_t gfn, struct kvm_host_map *map,
-+int kvm_map_gfn(struct kvm *kvm, gfn_t gfn, struct kvm_host_map *map,
- 		struct gfn_to_pfn_cache *cache, bool atomic);
- struct page *kvm_vcpu_gfn_to_page(struct kvm_vcpu *vcpu, gfn_t gfn);
- void kvm_vcpu_unmap(struct kvm_vcpu *vcpu, struct kvm_host_map *map, bool dirty);
--int kvm_unmap_gfn(struct kvm_vcpu *vcpu, struct kvm_host_map *map,
-+int kvm_unmap_gfn(struct kvm *kvm, struct kvm_host_map *map,
- 		  struct gfn_to_pfn_cache *cache, bool dirty, bool atomic);
- unsigned long kvm_vcpu_gfn_to_hva(struct kvm_vcpu *vcpu, gfn_t gfn);
- unsigned long kvm_vcpu_gfn_to_hva_prot(struct kvm_vcpu *vcpu, gfn_t gfn, bool *writable);
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 7851f3a1b5f7..f3a2740660ae 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -2620,11 +2620,10 @@ static int __kvm_map_gfn(struct kvm_memslots *slots, gfn_t gfn,
- 	return 0;
- }
+@@ -36,9 +36,27 @@
  
--int kvm_map_gfn(struct kvm_vcpu *vcpu, gfn_t gfn, struct kvm_host_map *map,
-+int kvm_map_gfn(struct kvm *kvm, gfn_t gfn, struct kvm_host_map *map,
- 		struct gfn_to_pfn_cache *cache, bool atomic)
- {
--	return __kvm_map_gfn(kvm_memslots(vcpu->kvm), gfn, map,
--			cache, atomic);
-+	return __kvm_map_gfn(kvm_memslots(kvm), gfn, map, cache, atomic);
- }
- EXPORT_SYMBOL_GPL(kvm_map_gfn);
+ #include <linux/kvm_types.h>
  
-@@ -2672,11 +2671,11 @@ static void __kvm_unmap_gfn(struct kvm *kvm,
- 	map->page = NULL;
- }
+-#include <asm/kvm_host.h>
+ #include <linux/kvm_dirty_ring.h>
  
--int kvm_unmap_gfn(struct kvm_vcpu *vcpu, struct kvm_host_map *map, 
-+int kvm_unmap_gfn(struct kvm *kvm, struct kvm_host_map *map,
- 		  struct gfn_to_pfn_cache *cache, bool dirty, bool atomic)
- {
--	__kvm_unmap_gfn(vcpu->kvm, gfn_to_memslot(vcpu->kvm, map->gfn), map,
--			cache, dirty, atomic);
-+	__kvm_unmap_gfn(kvm, gfn_to_memslot(kvm, map->gfn), map, cache, dirty,
-+			atomic);
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(kvm_unmap_gfn);
++#define KVM_UNMAPPED_PAGE	((void *) 0x500 + POISON_POINTER_DELTA)
++
++struct kvm_host_map {
++	/*
++	 * Only valid if the 'pfn' is managed by the host kernel (i.e. There is
++	 * a 'struct page' for it. When using mem= kernel parameter some memory
++	 * can be used as guest memory but they are not managed by host
++	 * kernel).
++	 * If 'pfn' is not managed by the host kernel, this field is
++	 * initialized to KVM_UNMAPPED_PAGE.
++	 */
++	struct page *page;
++	void *hva;
++	kvm_pfn_t pfn;
++	kvm_pfn_t gfn;
++};
++
++#include <asm/kvm_host.h>
++
+ #ifndef KVM_MAX_VCPU_ID
+ #define KVM_MAX_VCPU_ID KVM_MAX_VCPUS
+ #endif
+@@ -251,23 +269,6 @@ enum {
+ 	READING_SHADOW_PAGE_TABLES,
+ };
+ 
+-#define KVM_UNMAPPED_PAGE	((void *) 0x500 + POISON_POINTER_DELTA)
+-
+-struct kvm_host_map {
+-	/*
+-	 * Only valid if the 'pfn' is managed by the host kernel (i.e. There is
+-	 * a 'struct page' for it. When using mem= kernel parameter some memory
+-	 * can be used as guest memory but they are not managed by host
+-	 * kernel).
+-	 * If 'pfn' is not managed by the host kernel, this field is
+-	 * initialized to KVM_UNMAPPED_PAGE.
+-	 */
+-	struct page *page;
+-	void *hva;
+-	kvm_pfn_t pfn;
+-	kvm_pfn_t gfn;
+-};
+-
+ /*
+  * Used to check if the mapping is valid or not. Never use 'kvm_host_map'
+  * directly to check for that.
 -- 
 2.31.1
 
