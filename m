@@ -2,132 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B9C44405A0
-	for <lists+kvm@lfdr.de>; Sat, 30 Oct 2021 01:00:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 18DB4440632
+	for <lists+kvm@lfdr.de>; Sat, 30 Oct 2021 02:08:17 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230410AbhJ2XCi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 29 Oct 2021 19:02:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48554 "EHLO
+        id S231723AbhJ3AKo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 29 Oct 2021 20:10:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35332 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229546AbhJ2XCh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 29 Oct 2021 19:02:37 -0400
-Received: from mail-ot1-x32e.google.com (mail-ot1-x32e.google.com [IPv6:2607:f8b0:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94B8EC061570
-        for <kvm@vger.kernel.org>; Fri, 29 Oct 2021 16:00:08 -0700 (PDT)
-Received: by mail-ot1-x32e.google.com with SMTP id s23-20020a056830125700b00553e2ca2dccso10757166otp.3
-        for <kvm@vger.kernel.org>; Fri, 29 Oct 2021 16:00:08 -0700 (PDT)
+        with ESMTP id S231696AbhJ3AKk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 29 Oct 2021 20:10:40 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76658C061714
+        for <kvm@vger.kernel.org>; Fri, 29 Oct 2021 17:08:11 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id d9-20020a251d09000000b005c208092922so4404125ybd.20
+        for <kvm@vger.kernel.org>; Fri, 29 Oct 2021 17:08:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=GYEVlalX4SLaDkU0WKyoC1RuJPfLy1LYt4RvHHoipPQ=;
-        b=QK3fd35JSRUMGpb1uqofScpOzporq79t08H5VjNIT4hpmjanb6AHZE6Upw6PQv3gPg
-         tzs/Cep79x9Qi6Z+In+RwON8OXYtZsyF3kFQzWxPNueR7coQFcuUZAmOukh0U/lcFGXr
-         Cwn1MU6A4jykxnT0axhyRzz8KLZCt3R/J/jEswPT1jhIzUtKtMyzhj9GXEfgOmjQWMyL
-         nFpMlky9l+6IV51c7BshgbGSda26JTb9/u8pXnhpX2k0I1i7EtGM4xXvhctze8kBbA6j
-         RWcu2vy4sl+EoV8MHM0C92AcAi3MvfqHefkEd30WuYxiLKXOqw8q9L4RFdlketOV0SZN
-         a8UA==
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=MitYekao9rqnFTXUAu9e8R+/MKTk3btas9HJLycPsWc=;
+        b=my9LTkQDSabE3uNrKhMOQ2hYTIoQgwsz/LmNZkzGOHCRzyJkKca1ngJ6utKC9iC1/t
+         QhlZalPYJZ3tgsKfRNlq+6LD1g/RkJRw3mpUHu57gpL3p8H4xmmgccC2UXx7yejWm9fR
+         rSItlwVGidUiWjDE0OGLnmeeJOFw37ispjN9W2SB+/QIv5hkcfQ4EqQjaYp3VHyHuvqH
+         HhZBOmCTkaaUXbGgfSaD/fhTUC4E/H6VJtf1MuAyHpTJpB19zZeudVRj7NzZWeZqDyz0
+         KVjRq/ta9HEWXn0OELRkX+g6dFHCrO4QRSGfGSbBT9TEVl8SHHR4+O3IK4ZCX22eO0z/
+         12vA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=GYEVlalX4SLaDkU0WKyoC1RuJPfLy1LYt4RvHHoipPQ=;
-        b=BHIDJc+jdrSw0s1l3Nae9HyXo1/t5+LDg6tMJ52//ubVxg5sXMYiSD3yQNaAqKRFut
-         Te/riiEh/fLx876ZYZMYpiTRCa3ILKLPje99s1V/tBNqnFapELnkQMIJV4Bdh0yWH4cz
-         cNTW8UHC4clR+2oubFkEB2o/cfkkqWSk6Nvew6KqDa7ZjlJe3EdTtg71xuxs4aTj6w4G
-         BYSQrbcOdudBBQuEHdwOvXSsgV9GnIzZG4HBtTQCvslmYVci9zG5eV+CJX2EB9w6hMp4
-         arSC8uFUwey/se5mj5GUtNf8OQ+kL8lrpNBJxq/R1OPHK3f8GzuXdz0Vv2+y5HZuVqdV
-         oXQw==
-X-Gm-Message-State: AOAM530BObisYSOfq6rr2SsU4Jk6xB7SWmEuZJzuGqb6ltgl7ZyVWNtw
-        hE8HB4/TUiDtlRCPvaClvLcMRbb8eGtbn7d5fJbSyL73rjM=
-X-Google-Smtp-Source: ABdhPJyhBLrEM8cuq9LGftLa+A0JE2+B2PxUr8JL/zd6OWqwtK2HwraOD6XSoy/XSqY0hAiArTUdwvrLecB0cXmOO44=
-X-Received: by 2002:a9d:6e09:: with SMTP id e9mr674131otr.367.1635548407547;
- Fri, 29 Oct 2021 16:00:07 -0700 (PDT)
-MIME-Version: 1.0
-References: <20211029214759.1541992-1-aaronlewis@google.com> <YXx6K9l2QTwbLYng@google.com>
-In-Reply-To: <YXx6K9l2QTwbLYng@google.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Fri, 29 Oct 2021 15:59:56 -0700
-Message-ID: <CALMp9eSKVn2233GzCtWMEHmeN-WVCot2X44v1PSPEiZp8bH7hw@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH] x86: Look up the PTE rather than assuming it
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Aaron Lewis <aaronlewis@google.com>, kvm@vger.kernel.org,
-        pbonzini@redhat.com
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=MitYekao9rqnFTXUAu9e8R+/MKTk3btas9HJLycPsWc=;
+        b=pkR5TN48JRMdeCQOswbSfEmISvRDU2uetoPp6Z4uHzPtOsJHKHIKVm4tLzW/vCIMef
+         MF5nPb5sOn2rD/WjvG+AVOuv8Cz0gE9KKTnyLJa/xNJpeNPg/Geuk+xc9Gz/75xNCNH9
+         ezF+mHwsYg1EkqRIqPwG4WgiRhXk0y0yFJkqz8pz5Vsl4kDCzauLcWFAe1JAHJ2wsqHM
+         VeSi2MHfOfFX2QsNQxmT3Go0UbYkaJG8HL0cRgGeRYiqHGif34UjPyW6speyBasksINT
+         FaKc7/6Fv8p6IvdV4N0EPTWDEy6wlc5WpkYGeo2zavmROBXQ43AXuY3XUVldPMMg4Lwf
+         8W3g==
+X-Gm-Message-State: AOAM533lSnaTMNxu9WOA+Gks+Nn1rvwVn/cZ2qNX95NPa2EMW2iWgTQn
+        gcJL1TPozvCF52zfX2l0J35i4wGpOm8=
+X-Google-Smtp-Source: ABdhPJwZ2XQbbdMh4Oubf+Z+oTyEdeydN5FjqJXnMZxUNKnOYppZlMFuqVxKis25KfxbME9PXm4evnP2z0A=
+X-Received: from seanjc798194.pdx.corp.google.com ([2620:15c:90:200:ce6:9e5f:4ab5:a0d2])
+ (user=seanjc job=sendgmr) by 2002:a25:3082:: with SMTP id w124mr15887159ybw.6.1635552490730;
+ Fri, 29 Oct 2021 17:08:10 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Fri, 29 Oct 2021 17:07:52 -0700
+Message-Id: <20211030000800.3065132-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.1.1089.g2158813163f-goog
+Subject: [PATCH v2 0/8] KVM: x86: Hyper-V hypercall fix and cleanups
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+        Arnd Bergmann <arnd@arndb.de>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ajay Garg <ajaygargnsit@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 29, 2021 at 3:48 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Fri, Oct 29, 2021, Aaron Lewis wrote:
-> > Rather than assuming which PTE the SMEP test is running on, look it up
-> > to ensure we have the correct entry.  If this test were to run on a
-> > different page table (ie: run in an L2 test) the wrong PTE would be set.
-> > Switch to looking up the PTE to avoid this from happening.
-> >
-> > Signed-off-by: Aaron Lewis <aaronlewis@google.com>
-> > ---
-> >  x86/access.c   | 9 ++++++---
-> >  x86/cstart64.S | 1 -
-> >  2 files changed, 6 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/x86/access.c b/x86/access.c
-> > index 4725bbd..a4d72d9 100644
-> > --- a/x86/access.c
-> > +++ b/x86/access.c
-> > @@ -204,7 +204,7 @@ static void set_cr0_wp(int wp)
-> >  static unsigned set_cr4_smep(int smep)
-> >  {
-> >      unsigned long cr4 = shadow_cr4;
-> > -    extern u64 ptl2[];
-> > +    pteval_t *pte;
-> >      unsigned r;
-> >
-> >      cr4 &= ~CR4_SMEP_MASK;
-> > @@ -213,11 +213,14 @@ static unsigned set_cr4_smep(int smep)
-> >      if (cr4 == shadow_cr4)
-> >          return 0;
-> >
-> > +    pte = get_pte(phys_to_virt(read_cr3()), set_cr4_smep);
->
-> What guarantees are there that set_cr4_smep() and the rest of the test are mapped
-> by the same PTE?  I 100% agree the current code is ugly, e.g. I can't remember how
-> ptl2[2] is guaranteed to be used, but if we're going to fix it then we should aim
-> for a more robust solution.
+Fix a bug where KVM incorrectly skips an "all_cpus" IPI request, and misc
+cleanups and enhancements for KVM handling of Hyper-V hypercalls.
 
-One possible solution is to put labels around the code that has to run
-with SMEP and then to implement a function to modify the PTEs for a
-range of addresses, using gcc's double-ampersand syntax to get the
-addresses of the labels.
+Note, I couldn't find any documentation on the DEBUG hypercalls, I'm
+basically just guessing that they don't have a variable sized header
+and thus should reject hypercalls with a non-zero VARHEAD field.
 
-> > +    assert(pte);
-> > +
-> >      if (smep)
-> > -        ptl2[2] &= ~PT_USER_MASK;
-> > +        *pte &= ~PT_USER_MASK;
-> >      r = write_cr4_checking(cr4);
-> >      if (r || !smep) {
-> > -        ptl2[2] |= PT_USER_MASK;
-> > +        *pte |= PT_USER_MASK;
-> >
-> >       /* Flush to avoid spurious #PF */
-> >       invlpg((void *)(2 << 21));
->
-> This invlpg() should be updated as well.
->
-> > diff --git a/x86/cstart64.S b/x86/cstart64.S
-> > index 5c6ad38..4ba9943 100644
-> > --- a/x86/cstart64.S
-> > +++ b/x86/cstart64.S
-> > @@ -26,7 +26,6 @@ ring0stacktop:
-> >  .data
-> >
-> >  .align 4096
-> > -.globl ptl2
-> >  ptl2:
-> >  i = 0
-> >       .rept 512 * 4
-> > --
-> > 2.33.1.1089.g2158813163f-goog
-> >
+Sean Christopherson (8):
+  KVM: x86: Ignore sparse banks size for an "all CPUs", non-sparse IPI
+    req
+  KVM: x86: Get the number of Hyper-V sparse banks from the VARHEAD
+    field
+  KVM: x86: Refactor kvm_hv_flush_tlb() to reduce indentation
+  KVM: x86: Add a helper to get the sparse VP_SET for IPIs and TLB
+    flushes
+  KVM: x86: Don't bother reading sparse banks that end up being ignored
+  KVM: x86: Shove vp_bitmap handling down into sparse_set_to_vcpu_mask()
+  KVM: x86: Reject fixeds-size Hyper-V hypercalls with non-zero
+    "var_cnt"
+  KVM: x86: Add checks for reserved-to-zero Hyper-V hypercall fields
+
+ arch/x86/kvm/hyperv.c             | 172 ++++++++++++++++++------------
+ arch/x86/kvm/trace.h              |  14 +--
+ include/asm-generic/hyperv-tlfs.h |   7 ++
+ 3 files changed, 120 insertions(+), 73 deletions(-)
+
+-- 
+2.33.1.1089.g2158813163f-goog
+
