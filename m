@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 05E3F440B86
+	by mail.lfdr.de (Postfix) with ESMTP id DFC03440B89
 	for <lists+kvm@lfdr.de>; Sat, 30 Oct 2021 21:46:36 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230367AbhJ3TrN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 30 Oct 2021 15:47:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34716 "EHLO
+        id S231165AbhJ3TtE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 30 Oct 2021 15:49:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230016AbhJ3TrM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 30 Oct 2021 15:47:12 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13734C061714
-        for <kvm@vger.kernel.org>; Sat, 30 Oct 2021 12:44:41 -0700 (PDT)
+        with ESMTP id S230497AbhJ3TtD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 30 Oct 2021 15:49:03 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B50BC061746
+        for <kvm@vger.kernel.org>; Sat, 30 Oct 2021 12:46:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
+        d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=hhPo34I8NULxaODFxrGTl8Dl9pubMGQ160a6gnqKEPo=; b=koo83rfecXZowu6Sh6uwWm/yAX
-        1X+P2aFt+InrWD1X21DV5bpTeMRdHQcO+tP3fmt7H/U+alvfD6Rtjwo7mA9OyXtTw7LCwAxnIhmf4
-        jHjkq9L+PpIgVRwuzO0ZNkUN1vyWJ16NPey46IiFNBaE56+RHOOBSBkUHMTT2/zvMJ+WR4QBPWQFD
-        zGDxiRQnZJ6ZWXMgS82pdUZI15K18g0+LOjB6/qzGNyQyfwPacLbDNM875hyoZ8hn2zHqBALzVfdp
-        Bh/TTv1ago8+noNLOyMXr7v/blKy51WuUIZzVD8rufi3HuDx+cw4pkQjoBv2NVDkPiZsDSkmkIsmu
-        rgTjwmqw==;
+        bh=oLvZ4oUv+JlX0dOr7KVY1E/i7qAM2QVUmxT2vZxhivA=; b=HsgyDfVbLjfkEvvo/E9MDE5Hs9
+        X7NVkkwWC/eVe2KzTOxXRAJKqBwREcV2D+RW78huLz3YvXiJeU/m9S3Tclq2/4qRJHVj+qWBIdYKo
+        1o+pOhO964kqCWX/HbAAjJgepqQ5KRiFY9HP3pDF2VQWjx6847RMVmmbwJT/k07RSdUWiSXWserg+
+        g0y1juPMo1ZVdJnrS7+V8jE34zc9LOrOPU+fm9go0NbW8hYzWsiDozjX6jNLajpvTwUSwhrhirm5x
+        soukyFV5TLXh/BMmJEfi2dqeJWXPbemIm+i1BYCuljNhp4VTWXB7UvSikd5V0hWWkdr4rGsoN2m6Q
+        TcxtMlNg==;
 Received: from i7.infradead.org ([2001:8b0:10b:1:21e:67ff:fecb:7a92])
-        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mguHF-00DHbL-29; Sat, 30 Oct 2021 19:44:30 +0000
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mguHF-002cmN-9K; Sat, 30 Oct 2021 19:45:12 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mguHE-00066A-Od; Sat, 30 Oct 2021 20:44:28 +0100
+        id 1mguHE-00066E-QN; Sat, 30 Oct 2021 20:44:28 +0100
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     "kvm @ vger . kernel . org" <kvm@vger.kernel.org>
 Cc:     "jmattson @ google . com" <jmattson@google.com>,
@@ -40,80 +40,126 @@ Cc:     "jmattson @ google . com" <jmattson@google.com>,
         "joro @ 8bytes . org" <joro@8bytes.org>,
         Joao Martins <joao.m.martins@oracle.com>,
         Ankur Arora <ankur.a.arora@oracle.com>, karahmed@amazon.com
-Subject: [PATCH 2/5] KVM: x86/xen: Use sizeof_field() instead of open-coding it
-Date:   Sat, 30 Oct 2021 20:44:25 +0100
-Message-Id: <20211030194428.23395-2-dwmw2@infradead.org>
+Subject: [PATCH 3/5] KVM: Fix kvm_map_gfn()/kvm_unmap_gfn() to take a kvm as their names imply
+Date:   Sat, 30 Oct 2021 20:44:26 +0100
+Message-Id: <20211030194428.23395-3-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20211030194428.23395-1-dwmw2@infradead.org>
 References: <20211030194428.23395-1-dwmw2@infradead.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: David Woodhouse <dwmw2@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 From: David Woodhouse <dwmw@amazon.co.uk>
 
+These were somewhat misnamed, as they actually took a kvm_vcpu, even
+though they didn't do anything with it except to find vcpu->kvm.
+
+And more to the point I don't *have* a vcpu to give them, in an upcoming
+use case...
+
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 ---
- arch/x86/kvm/xen.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ arch/x86/kvm/x86.c       |  8 ++++----
+ include/linux/kvm_host.h |  4 ++--
+ virt/kvm/kvm_main.c      | 11 +++++------
+ 3 files changed, 11 insertions(+), 12 deletions(-)
 
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index a0bd0014ec66..c4bca001a7c9 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -152,9 +152,9 @@ void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, int state)
- 	state_entry_time = vx->runstate_entry_time;
- 	state_entry_time |= XEN_RUNSTATE_UPDATE;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index cd42d58008f7..8e9b850d967b 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3207,7 +3207,7 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
+ 		return;
  
--	BUILD_BUG_ON(sizeof(((struct vcpu_runstate_info *)0)->state_entry_time) !=
-+	BUILD_BUG_ON(sizeof_field(struct vcpu_runstate_info, state_entry_time) !=
- 		     sizeof(state_entry_time));
--	BUILD_BUG_ON(sizeof(((struct compat_vcpu_runstate_info *)0)->state_entry_time) !=
-+	BUILD_BUG_ON(sizeof_field(struct compat_vcpu_runstate_info, state_entry_time) !=
- 		     sizeof(state_entry_time));
+ 	/* -EAGAIN is returned in atomic context so we can just return. */
+-	if (kvm_map_gfn(vcpu, vcpu->arch.st.msr_val >> PAGE_SHIFT,
++	if (kvm_map_gfn(vcpu->kvm, vcpu->arch.st.msr_val >> PAGE_SHIFT,
+ 			&map, &vcpu->arch.st.cache, false))
+ 		return;
  
- 	if (__put_user(state_entry_time, user_times))
-@@ -165,9 +165,9 @@ void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, int state)
- 	 * Next, write the new runstate. This is in the *same* place
- 	 * for 32-bit and 64-bit guests, asserted here for paranoia.
- 	 */
--	BUILD_BUG_ON(sizeof(((struct vcpu_runstate_info *)0)->state) !=
-+	BUILD_BUG_ON(sizeof_field(struct vcpu_runstate_info, state) !=
- 		     sizeof(vx->current_runstate));
--	BUILD_BUG_ON(sizeof(((struct compat_vcpu_runstate_info *)0)->state) !=
-+	BUILD_BUG_ON(sizeof_field(struct compat_vcpu_runstate_info, state) !=
- 		     sizeof(vx->current_runstate));
+@@ -3246,7 +3246,7 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
  
- 	if (__put_user(vx->current_runstate, user_state))
-@@ -181,9 +181,9 @@ void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, int state)
- 		     offsetof(struct vcpu_runstate_info, time) - sizeof(u64));
- 	BUILD_BUG_ON(offsetof(struct compat_vcpu_runstate_info, state_entry_time) !=
- 		     offsetof(struct compat_vcpu_runstate_info, time) - sizeof(u64));
--	BUILD_BUG_ON(sizeof(((struct vcpu_runstate_info *)0)->time) !=
--		     sizeof(((struct compat_vcpu_runstate_info *)0)->time));
--	BUILD_BUG_ON(sizeof(((struct vcpu_runstate_info *)0)->time) !=
-+	BUILD_BUG_ON(sizeof_field(struct vcpu_runstate_info, time) !=
-+		     sizeof_field(struct compat_vcpu_runstate_info, time));
-+	BUILD_BUG_ON(sizeof_field(struct vcpu_runstate_info, time) !=
- 		     sizeof(vx->runstate_times));
+ 	st->version += 1;
  
- 	if (__copy_to_user(user_times + 1, vx->runstate_times, sizeof(vx->runstate_times)))
-@@ -222,9 +222,9 @@ int __kvm_xen_has_interrupt(struct kvm_vcpu *v)
- 	BUILD_BUG_ON(offsetof(struct vcpu_info, evtchn_upcall_pending) !=
- 		     offsetof(struct compat_vcpu_info, evtchn_upcall_pending));
- 	BUILD_BUG_ON(sizeof(rc) !=
--		     sizeof(((struct vcpu_info *)0)->evtchn_upcall_pending));
-+		     sizeof_field(struct vcpu_info, evtchn_upcall_pending));
- 	BUILD_BUG_ON(sizeof(rc) !=
--		     sizeof(((struct compat_vcpu_info *)0)->evtchn_upcall_pending));
-+		     sizeof_field(struct compat_vcpu_info, evtchn_upcall_pending));
+-	kvm_unmap_gfn(vcpu, &map, &vcpu->arch.st.cache, true, false);
++	kvm_unmap_gfn(vcpu->kvm, &map, &vcpu->arch.st.cache, true, false);
+ }
  
- 	/*
- 	 * For efficiency, this mirrors the checks for using the valid
+ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+@@ -4294,7 +4294,7 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
+ 	if (vcpu->arch.st.preempted)
+ 		return;
+ 
+-	if (kvm_map_gfn(vcpu, vcpu->arch.st.msr_val >> PAGE_SHIFT, &map,
++	if (kvm_map_gfn(vcpu->kvm, vcpu->arch.st.msr_val >> PAGE_SHIFT, &map,
+ 			&vcpu->arch.st.cache, true))
+ 		return;
+ 
+@@ -4303,7 +4303,7 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
+ 
+ 	st->preempted = vcpu->arch.st.preempted = KVM_VCPU_PREEMPTED;
+ 
+-	kvm_unmap_gfn(vcpu, &map, &vcpu->arch.st.cache, true, true);
++	kvm_unmap_gfn(vcpu->kvm, &map, &vcpu->arch.st.cache, true, true);
+ }
+ 
+ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 0f18df7fe874..749cdc77fc4e 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -943,11 +943,11 @@ struct kvm_memory_slot *kvm_vcpu_gfn_to_memslot(struct kvm_vcpu *vcpu, gfn_t gfn
+ kvm_pfn_t kvm_vcpu_gfn_to_pfn_atomic(struct kvm_vcpu *vcpu, gfn_t gfn);
+ kvm_pfn_t kvm_vcpu_gfn_to_pfn(struct kvm_vcpu *vcpu, gfn_t gfn);
+ int kvm_vcpu_map(struct kvm_vcpu *vcpu, gpa_t gpa, struct kvm_host_map *map);
+-int kvm_map_gfn(struct kvm_vcpu *vcpu, gfn_t gfn, struct kvm_host_map *map,
++int kvm_map_gfn(struct kvm *kvm, gfn_t gfn, struct kvm_host_map *map,
+ 		struct gfn_to_pfn_cache *cache, bool atomic);
+ struct page *kvm_vcpu_gfn_to_page(struct kvm_vcpu *vcpu, gfn_t gfn);
+ void kvm_vcpu_unmap(struct kvm_vcpu *vcpu, struct kvm_host_map *map, bool dirty);
+-int kvm_unmap_gfn(struct kvm_vcpu *vcpu, struct kvm_host_map *map,
++int kvm_unmap_gfn(struct kvm *kvm, struct kvm_host_map *map,
+ 		  struct gfn_to_pfn_cache *cache, bool dirty, bool atomic);
+ unsigned long kvm_vcpu_gfn_to_hva(struct kvm_vcpu *vcpu, gfn_t gfn);
+ unsigned long kvm_vcpu_gfn_to_hva_prot(struct kvm_vcpu *vcpu, gfn_t gfn, bool *writable);
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 7851f3a1b5f7..f3a2740660ae 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2620,11 +2620,10 @@ static int __kvm_map_gfn(struct kvm_memslots *slots, gfn_t gfn,
+ 	return 0;
+ }
+ 
+-int kvm_map_gfn(struct kvm_vcpu *vcpu, gfn_t gfn, struct kvm_host_map *map,
++int kvm_map_gfn(struct kvm *kvm, gfn_t gfn, struct kvm_host_map *map,
+ 		struct gfn_to_pfn_cache *cache, bool atomic)
+ {
+-	return __kvm_map_gfn(kvm_memslots(vcpu->kvm), gfn, map,
+-			cache, atomic);
++	return __kvm_map_gfn(kvm_memslots(kvm), gfn, map, cache, atomic);
+ }
+ EXPORT_SYMBOL_GPL(kvm_map_gfn);
+ 
+@@ -2672,11 +2671,11 @@ static void __kvm_unmap_gfn(struct kvm *kvm,
+ 	map->page = NULL;
+ }
+ 
+-int kvm_unmap_gfn(struct kvm_vcpu *vcpu, struct kvm_host_map *map, 
++int kvm_unmap_gfn(struct kvm *kvm, struct kvm_host_map *map,
+ 		  struct gfn_to_pfn_cache *cache, bool dirty, bool atomic)
+ {
+-	__kvm_unmap_gfn(vcpu->kvm, gfn_to_memslot(vcpu->kvm, map->gfn), map,
+-			cache, dirty, atomic);
++	__kvm_unmap_gfn(kvm, gfn_to_memslot(kvm, map->gfn), map, cache, dirty,
++			atomic);
+ 	return 0;
+ }
+ EXPORT_SYMBOL_GPL(kvm_unmap_gfn);
 -- 
 2.31.1
 
