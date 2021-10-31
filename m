@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EAB83441132
-	for <lists+kvm@lfdr.de>; Sun, 31 Oct 2021 23:19:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BECA6441135
+	for <lists+kvm@lfdr.de>; Sun, 31 Oct 2021 23:25:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229982AbhJaWW3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 31 Oct 2021 18:22:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24832 "EHLO
+        id S230303AbhJaW2Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 31 Oct 2021 18:28:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51501 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230346AbhJaWW2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 31 Oct 2021 18:22:28 -0400
+        by vger.kernel.org with ESMTP id S230232AbhJaW2X (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 31 Oct 2021 18:28:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635718795;
+        s=mimecast20190719; t=1635719150;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=9lPPZrT4HkW0yreYUc+o8IFGdpWCwnC6KSSIpRHe7JA=;
-        b=bczl6QSYJwgEbkcwUvqt3ED0xgsNb7n2e1zrqWGBHE8xuExiSOKeV5/cj3wKzx5oPrEDH4
-        oJE5K0zh8o8E1M1sno1LCqxbWlMDskzHy1l1VCFG8isD5iF7zWqZsDIS14Bnnp06eRwrJP
-        HuQh/cbcBcj7nUPRQ4//qO9Y7FJQOQg=
+        bh=SbOGjXYHIaVWWvxDmyY/7NrfjCgFCeLG7KQq/v0+M1g=;
+        b=LFX9W4Orb+uJ6iG3CoroROdTkqnHSqiIs7Z3bXZNjXabTY6WrT3eKlaT+CGEORIB5c6t0A
+        5/otLuEz+DzX1BFuRQNrTbgu4ANQYHyvusWUzhEHmmDcMpyvoh7xvZR8GuVa6EnE0ilQQp
+        sn7ZeS92W0j2QQDrl7HurhgwyGOIFDI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-303-B-0MMCdFPt2mLeVjPh4hvA-1; Sun, 31 Oct 2021 18:19:50 -0400
-X-MC-Unique: B-0MMCdFPt2mLeVjPh4hvA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-559-CLsFAk3fN5iz-7DE45UL9g-1; Sun, 31 Oct 2021 18:25:47 -0400
+X-MC-Unique: CLsFAk3fN5iz-7DE45UL9g-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ADDEB80668E;
-        Sun, 31 Oct 2021 22:19:46 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 058441006AA2;
+        Sun, 31 Oct 2021 22:25:44 +0000 (UTC)
 Received: from starship (unknown [10.40.194.243])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id F213B19C59;
-        Sun, 31 Oct 2021 22:19:32 +0000 (UTC)
-Message-ID: <1f2fb5f18b0f0bcee71c9d506769dd1357273444.camel@redhat.com>
-Subject: Re: [PATCH v2 40/43] KVM: VMX: Wake vCPU when delivering posted IRQ
- even if vCPU == this vCPU
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E30CC5DD68;
+        Sun, 31 Oct 2021 22:25:26 +0000 (UTC)
+Message-ID: <0e6e3ed2831a01f5dad9f51b83f3bd1a3c318847.camel@redhat.com>
+Subject: Re: [PATCH v2 41/43] KVM: VMX: Pass desired vector instead of bool
+ for triggering posted IRQ
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
         Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
         Paul Mackerras <paulus@ozlabs.org>,
         Anup Patel <anup.patel@wdc.com>,
@@ -48,7 +48,8 @@ Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
         Albert Ou <aou@eecs.berkeley.edu>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>,
-        James Morse <james.morse@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     James Morse <james.morse@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Atish Patra <atish.patra@wdc.com>,
@@ -66,38 +67,78 @@ Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
         David Matlack <dmatlack@google.com>,
         Oliver Upton <oupton@google.com>,
         Jing Zhang <jingzhangos@google.com>
-Date:   Mon, 01 Nov 2021 00:19:31 +0200
-In-Reply-To: <YXlwmrrRVIoaU2kG@google.com>
+Date:   Mon, 01 Nov 2021 00:25:25 +0200
+In-Reply-To: <20211009021236.4122790-42-seanjc@google.com>
 References: <20211009021236.4122790-1-seanjc@google.com>
-         <20211009021236.4122790-41-seanjc@google.com>
-         <a2a4e076-edb8-2cb5-5cb2-6825a1a4559a@redhat.com>
-         <YXlwmrrRVIoaU2kG@google.com>
+         <20211009021236.4122790-42-seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2021-10-27 at 15:30 +0000, Sean Christopherson wrote:
-> On Mon, Oct 25, 2021, Paolo Bonzini wrote:
-> > On 09/10/21 04:12, Sean Christopherson wrote:
-> > > Lastly, this aligns the non-nested and nested usage of triggering posted
-> > > interrupts, and will allow for additional cleanups.
-> > 
-> > It also aligns with SVM a little bit more (especially given patch 35),
-> > doesn't it?
+On Fri, 2021-10-08 at 19:12 -0700, Sean Christopherson wrote:
+> Refactor the posted interrupt helper to take the desired notification
+> vector instead of a bool so that the callers are self-documenting.
 > 
-> Yes, aligning VMX and SVM APICv behavior as much as possible is definitely a goal
-> of this series, though I suspect I failed to state that anywhere.
+> No functional change intended.
 > 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/vmx/vmx.c | 8 +++-----
+>  1 file changed, 3 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 78c8bc7f1b3b..f505fee3cf5c 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -3928,11 +3928,9 @@ static void vmx_msr_filter_changed(struct kvm_vcpu *vcpu)
+>  }
+>  
+>  static inline bool kvm_vcpu_trigger_posted_interrupt(struct kvm_vcpu *vcpu,
+> -						     bool nested)
+> +						     int pi_vec)
+>  {
+>  #ifdef CONFIG_SMP
+> -	int pi_vec = nested ? POSTED_INTR_NESTED_VECTOR : POSTED_INTR_VECTOR;
+> -
+>  	if (vcpu->mode == IN_GUEST_MODE) {
+>  		/*
+>  		 * The vector of interrupt to be delivered to vcpu had
+> @@ -3986,7 +3984,7 @@ static int vmx_deliver_nested_posted_interrupt(struct kvm_vcpu *vcpu,
+>  		 */
+>  		kvm_make_request(KVM_REQ_EVENT, vcpu);
+>  		/* the PIR and ON have been set by L1. */
+> -		if (!kvm_vcpu_trigger_posted_interrupt(vcpu, true))
+> +		if (!kvm_vcpu_trigger_posted_interrupt(vcpu, POSTED_INTR_NESTED_VECTOR))
+>  			kvm_vcpu_wake_up(vcpu);
+>  		return 0;
+>  	}
+> @@ -4024,7 +4022,7 @@ static int vmx_deliver_posted_interrupt(struct kvm_vcpu *vcpu, int vector)
+>  	 * guaranteed to see PID.ON=1 and sync the PIR to IRR if triggering a
+>  	 * posted interrupt "fails" because vcpu->mode != IN_GUEST_MODE.
+>  	 */
+> -	if (!kvm_vcpu_trigger_posted_interrupt(vcpu, false))
+> +	if (!kvm_vcpu_trigger_posted_interrupt(vcpu, POSTED_INTR_VECTOR))
+>  		kvm_vcpu_wake_up(vcpu);
+>  
+>  	return 0;
 
-Looks reasonable to me.
+I both like and don't like this patch.
+
+It is indeed a bit more more self documented, but then it allows caller to
+pass anything other than POSTED_INTR_NESTED_VECTOR/POSTED_INTR_VECTOR which
+would fail.
+
+Maybe addd an assert?
+
+I won't do bikesheddding about this though, so
 
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
 Best regards,
-	Maxim Levitky
+	Maxim Levitsky
 
