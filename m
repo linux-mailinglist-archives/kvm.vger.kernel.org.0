@@ -2,144 +2,247 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D5283440F49
-	for <lists+kvm@lfdr.de>; Sun, 31 Oct 2021 17:14:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 552F3440F74
+	for <lists+kvm@lfdr.de>; Sun, 31 Oct 2021 17:34:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230061AbhJaQRL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 31 Oct 2021 12:17:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44698 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229725AbhJaQRK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 31 Oct 2021 12:17:10 -0400
-Received: from mail-oi1-x22a.google.com (mail-oi1-x22a.google.com [IPv6:2607:f8b0:4864:20::22a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 486CCC061570
-        for <kvm@vger.kernel.org>; Sun, 31 Oct 2021 09:14:38 -0700 (PDT)
-Received: by mail-oi1-x22a.google.com with SMTP id g125so21443675oif.9
-        for <kvm@vger.kernel.org>; Sun, 31 Oct 2021 09:14:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=gM1NYq8tqFljzCysQFVWza8eGeUxnOBuiBailDG0Fxc=;
-        b=b6SAZPKifTTyKnSgnq4Lpnz88tGEnWSIH1IclIgZ2wKQio00JDBtZOwQgWZe0ml+JR
-         Nnydx47Aujj9AaMLvJuXIQl2qn2M4egxEEEmqOiyDrJfywX8jmN5BOV5yNz8oNFl2eX3
-         4SWS7OBeB7AzNMYNXYhAzOhCHtJwjMw9MM2hCsfcn6F7rilvXuZAd4dSMfDTxugDefBT
-         RvuF3NZBuBe8sn9GY4HktJrCw3alDfcfuIleOQJJ7mrVf6SVqrkxyeRur0NXtzIB5Cer
-         DmwVDfiRSPeXw52BaM7ZBRTQPqIyJbwBArUGTVw6mXVJuWgzGYEf75G3nZitsEq5gM4g
-         rtXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=gM1NYq8tqFljzCysQFVWza8eGeUxnOBuiBailDG0Fxc=;
-        b=f62ubRWY7SLno4mxSNg8HP4KwlqMphTK6CdIWH1g6gyNBRrII0lgzYFONhv25kMxzd
-         ZE7dtxNiiTvCfT6EI9sbTHlK1WrAYA/5DUuwoes7T19bUkztqLZ8TEeAODPb4nI82RaZ
-         0boT5KM/2j13tXGECTg4usXkVS6yUdklC/L5YejXcoodLptKeaWIo9RG70OvB1QZG/Ox
-         3k7xBdJS2YqQe4nmVsmfBP/BluBj0oA7S47AfMiY9EvPYq1frlIzN3qu1HMlTcGjz43c
-         Acws0VSp/0Gb5PmCG+yN/iIc6mKA37cgOmxY9T6omuOlfKf8ujtL4VQxtJDq2ZPPdmvB
-         5OJw==
-X-Gm-Message-State: AOAM533HG8yC0r4igCPOOrcoF2jG8mT6OUIHxv/jnL13tDQC63a/xGY2
-        ZBMkwKeaTuNU9VRtPq02rQ1j6VjIGOGkqRGWRvAzeg==
-X-Google-Smtp-Source: ABdhPJzFa8OvIqPc6FWgR7FHW4Jt2cpZhA/bb19lK9q9biT4dZHkVXaleA8A5NPI8CZmKryW+tViq0w7yWuC1bdVIK8=
-X-Received: by 2002:a05:6808:2128:: with SMTP id r40mr14795202oiw.164.1635696876987;
- Sun, 31 Oct 2021 09:14:36 -0700 (PDT)
-MIME-Version: 1.0
-References: <20211031055634.894263-1-zxwang42@gmail.com> <d6c56f03-1da7-1ebf-1d2e-0ec1aa0b241c@redhat.com>
-In-Reply-To: <d6c56f03-1da7-1ebf-1d2e-0ec1aa0b241c@redhat.com>
-From:   Marc Orr <marcorr@google.com>
-Date:   Sun, 31 Oct 2021 09:14:25 -0700
-Message-ID: <CAA03e5GZ6HnW8uk+2nh_vZcKvtt+wcdVchm4cjRm_yPFC-P7Eg@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH v1 0/7] x86_64 UEFI set up process refactor
- and scripts fixes
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Zixuan Wang <zxwang42@gmail.com>, kvm@vger.kernel.org,
-        drjones@redhat.com, erdemaktas@google.com, rientjes@google.com,
-        seanjc@google.com, brijesh.singh@amd.com, Thomas.Lendacky@amd.com,
-        varad.gautam@suse.com, jroedel@suse.de, bp@suse.de
+        id S229982AbhJaQhL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 31 Oct 2021 12:37:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:21769 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229936AbhJaQhK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 31 Oct 2021 12:37:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635698075;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=iolz7u4TGw7YKdAJNXlS5PjuhU48Pq50OJFf9JL7Yf4=;
+        b=X9NMF8ndzds0/x3qPimhegcHYDfOLT1cp80akyygPQhAo9f1q4HtRTRzVoX+5E9GuXVb8O
+        C6CHs9FdO/Go8WM+zHuTQiOlxBv0//DkwbEJ35XWNl9yW7pcjaqyNoO3V5sF1dcfNt/KgS
+        fghRtSERe9C/+00zhs97fRUykHWr8EA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-209-xYadWGzHPUmgUltMfPd33w-1; Sun, 31 Oct 2021 12:34:30 -0400
+X-MC-Unique: xYadWGzHPUmgUltMfPd33w-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C6E248018AC;
+        Sun, 31 Oct 2021 16:34:26 +0000 (UTC)
+Received: from starship (unknown [10.40.194.243])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0F80E5C1C5;
+        Sun, 31 Oct 2021 16:34:01 +0000 (UTC)
+Message-ID: <933f1be27745d56660df13a9e76e46563bbd6261.camel@redhat.com>
+Subject: Re: [PATCH v2 37/43] KVM: SVM: Unconditionally mark AVIC as running
+ on vCPU load (with APICv)
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Anup Patel <anup.patel@wdc.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Atish Patra <atish.patra@wdc.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        David Matlack <dmatlack@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+Date:   Sun, 31 Oct 2021 18:34:00 +0200
+In-Reply-To: <20211009021236.4122790-38-seanjc@google.com>
+References: <20211009021236.4122790-1-seanjc@google.com>
+         <20211009021236.4122790-38-seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Oct 31, 2021 at 12:28 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 31/10/21 06:56, Zixuan Wang wrote:
-> > Hello,
-> >
-> > This patch series refactors the x86_64 UEFI set up process and fixes the
-> > `run-tests.sh` script to run under UEFI. The patches are organized as
-> > three parts.
-> >
-> > The first part (patches 1-2) refactors the x86_64 UEFI set up process.
-> > The previous UEFI setup calls arch-specific setup functions twice and
-> > generates arch-specific data structure. As Andrew suggested [1], we
-> > refactor this process to make only one call to the arch-specific
-> > function and generate arch-neutral data structures. This simplifies the
-> > set up process and makes it easier to develop UEFI support for other
-> > architectures.
-> >
-> > The second part (patch 3) converts several x86 test cases to
-> > Position-Independent Code (PIC) to run under UEFI. This patch is ported
-> > from the initial UEFI support patchset [2] with fixes to the 32-bit
-> > compilation.
-> >
-> > The third part (patches 4-7) fixes the UEFI runner scripts. Patch 4 sets
-> > UEFI OVMF image as readonly. Patch 5 fixes test cases' return code under
-> > UEFI, enabling Patch 6-7 to fix the `run-tests.sh` script under UEFI.
-> >
-> > This patch set is based on the `uefi` branch.
->
-> Thank you, for patches 1-6 I have squashed the patches when applicable
-> (1, 4, 5, 6) and queued the others (2 and 3).
->
-> I did not queue patch 7 yet, it seems okay but I want to understand
-> better the changes it needs in the harness and what is missing.  I'll
-> take a look during the week.
+On Fri, 2021-10-08 at 19:12 -0700, Sean Christopherson wrote:
+> Always mark the AVIC as "running" on vCPU load when the AVIC is enabled and
+> drop the vcpu_blocking/unblocking hooks that toggle "running".  There is no
+> harm in keeping the flag set for a wee bit longer when a vCPU is blocking,
+> i.e. between the start of blocking and being scheduled out.  At worst, an
+> agent in the host will unnecessarily signal the doorbell, but that's
+> already the status quo in KVM as the "running" flag is set the entire time
+> a vCPU is loaded, not just when it's actively running the guest.
+> 
+> In addition to simplifying the code, keeping the "running" flag set longer
+> can reduce the number of VM-Exits due to incomplete IPI delivery.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/svm/avic.c | 53 +++++++++++++----------------------------
+>  arch/x86/kvm/svm/svm.c  |  8 -------
+>  arch/x86/kvm/svm/svm.h  |  3 ---
+>  3 files changed, 17 insertions(+), 47 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> index b43b05610ade..213f5223f63e 100644
+> --- a/arch/x86/kvm/svm/avic.c
+> +++ b/arch/x86/kvm/svm/avic.c
+> @@ -967,6 +967,15 @@ void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>  	int h_physical_id = kvm_cpu_get_apicid(cpu);
+>  	struct vcpu_svm *svm = to_svm(vcpu);
+>  
+> +	/* TODO: Document why the unblocking path checks for updates. */
+> +	if (kvm_vcpu_is_blocking(vcpu) &&
+> +	    kvm_check_request(KVM_REQ_APICV_UPDATE, vcpu)) {
+> +		kvm_vcpu_update_apicv(vcpu);
+> +
+> +		if (!kvm_vcpu_apicv_active(vcpu))
+> +			return;
+> +	}
+> +
+>  	/*
+>  	 * Since the host physical APIC id is 8 bits,
+>  	 * we can support host APIC ID upto 255.
+> @@ -974,19 +983,21 @@ void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>  	if (WARN_ON(h_physical_id > AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK))
+>  		return;
+>  
+> +	/*
+> +	 * Unconditionally mark the AVIC as "running", even if the vCPU is in
+> +	 * kvm_vcpu_block().  kvm_vcpu_check_block() will detect pending IRQs
+> +	 * and bail out of the block loop, and if not, avic_vcpu_put() will
+> +	 * set the AVIC back to "not running" when the vCPU is scheduled out.
+> +	 */
+>  	entry = READ_ONCE(*(svm->avic_physical_id_cache));
+>  	WARN_ON(entry & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK);
+>  
+>  	entry &= ~AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK;
+>  	entry |= (h_physical_id & AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK);
+> -
+> -	entry &= ~AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK;
+> -	if (svm->avic_is_running)
+> -		entry |= AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK;
+> +	entry |= AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK;
+>  
+>  	WRITE_ONCE(*(svm->avic_physical_id_cache), entry);
+> -	avic_update_iommu_vcpu_affinity(vcpu, h_physical_id,
+> -					svm->avic_is_running);
+> +	avic_update_iommu_vcpu_affinity(vcpu, h_physical_id, true);
+>  }
+>  
+>  void avic_vcpu_put(struct kvm_vcpu *vcpu)
+> @@ -1001,33 +1012,3 @@ void avic_vcpu_put(struct kvm_vcpu *vcpu)
+>  	entry &= ~AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK;
+>  	WRITE_ONCE(*(svm->avic_physical_id_cache), entry);
+>  }
+> -
+> -/*
+> - * This function is called during VCPU halt/unhalt.
+> - */
+> -static void avic_set_running(struct kvm_vcpu *vcpu, bool is_run)
+> -{
+> -	struct vcpu_svm *svm = to_svm(vcpu);
+> -
+> -	svm->avic_is_running = is_run;
+> -
+> -	if (!kvm_vcpu_apicv_active(vcpu))
+> -		return;
+> -
+> -	if (is_run)
+> -		avic_vcpu_load(vcpu, vcpu->cpu);
+> -	else
+> -		avic_vcpu_put(vcpu);
+> -}
+> -
+> -void svm_vcpu_blocking(struct kvm_vcpu *vcpu)
+> -{
+> -	avic_set_running(vcpu, false);
+> -}
+> -
+> -void svm_vcpu_unblocking(struct kvm_vcpu *vcpu)
+> -{
+> -	if (kvm_check_request(KVM_REQ_APICV_UPDATE, vcpu))
+> -		kvm_vcpu_update_apicv(vcpu);
+> -	avic_set_running(vcpu, true);
+> -}
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 89077160d463..a1ca5707f2c8 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -1433,12 +1433,6 @@ static int svm_create_vcpu(struct kvm_vcpu *vcpu)
+>  	if (err)
+>  		goto error_free_vmsa_page;
+>  
+> -	/* We initialize this flag to true to make sure that the is_running
+> -	 * bit would be set the first time the vcpu is loaded.
+> -	 */
+> -	if (irqchip_in_kernel(vcpu->kvm) && kvm_apicv_activated(vcpu->kvm))
+> -		svm->avic_is_running = true;
+> -
+>  	svm->msrpm = svm_vcpu_alloc_msrpm();
+>  	if (!svm->msrpm) {
+>  		err = -ENOMEM;
+> @@ -4597,8 +4591,6 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+>  	.prepare_guest_switch = svm_prepare_guest_switch,
+>  	.vcpu_load = svm_vcpu_load,
+>  	.vcpu_put = svm_vcpu_put,
+> -	.vcpu_blocking = svm_vcpu_blocking,
+> -	.vcpu_unblocking = svm_vcpu_unblocking,
+>  
+>  	.update_exception_bitmap = svm_update_exception_bitmap,
+>  	.get_msr_feature = svm_get_msr_feature,
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index 7f5b01bbee29..652d71acfb6c 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -169,7 +169,6 @@ struct vcpu_svm {
+>  	u32 dfr_reg;
+>  	struct page *avic_backing_page;
+>  	u64 *avic_physical_id_cache;
+> -	bool avic_is_running;
+>  
+>  	/*
+>  	 * Per-vcpu list of struct amd_svm_iommu_ir:
+> @@ -529,8 +528,6 @@ int svm_deliver_avic_intr(struct kvm_vcpu *vcpu, int vec);
+>  bool svm_dy_apicv_has_pending_interrupt(struct kvm_vcpu *vcpu);
+>  int svm_update_pi_irte(struct kvm *kvm, unsigned int host_irq,
+>  		       uint32_t guest_irq, bool set);
+> -void svm_vcpu_blocking(struct kvm_vcpu *vcpu);
+> -void svm_vcpu_unblocking(struct kvm_vcpu *vcpu);
+>  
+>  /* sev.c */
+>  
 
-SGTM, thank you! Zixuan and I discussed a few things that are missing:
+Looks good. It is nice to get rid of all of this logic that was just making things more complicated.
 
-1. Test cases that take the `-append` arg are currently marked `SKIP`.
-Two issues need to be resolved here. First, we're not using QEMU's
-`-kernel` flag for EFI test cases [1]. And the `-append` flag does not
-work without the `-kernel` flag. I don't understand the details on why
-we don't use the `-kernel` flag myself. Maybe Zixuan can elaborate.
-Second, assuming we fix the first issue, then we need to enlighten the
-KVM-Unit-Tests under UEFI to parse kernel command line arguments and
-pass them down to the test cases via `argv`. Zixuan pointed out to me
-that there is some prior work from Drew [2] that we should be able to
-follow to make this work. So I'm hoping that Zixuan and I can work
-together on solving these issues to get the argument passing working
-next.
-2. We need a way to annotate test cases in `x86/unittests.cfg` as
-known to work under SEV. I'm thinking of doing this via new (very
-broad) test groups in `unittests.cfg`. I _think_ SEV is the primary
-scenario we care about. However, folks may care about running the test
-cases under UEFI outside of SEV. For example, last time I checked,
-emulator runs OK under UEFI minus SEV-ES but fails under SEV-ES. And
-similarly, while most test cases work under UEFI minus SEV, there are
-a few that do mis-behave -- and it probably makes sense to document
-this (e.g., via annotations in `unittests.cfg`). Also, there are many
-variations of SEV (SEV, SEV-ES, SEV-SNP)... And hopefully some of this
-will eventually be applicable to TDX as well. So many testgroups is
-not a good solution. I'm not sure.
-3. Multi-CPU needs to be made to work under UEFI. For now, patch #7
-forces all EFI test cases to run with 1 vCPU. I chatted with Brijesh,
-and he mentioned that Varad would like to work on this. However, if
-anything here changes, please let me know, because we can work on this
-as well. But for now, I'm not planning to work on it so we can avoid
-duplicating work.
-4. UEFI runs a lot slower than SEABIOS. It doesn't help that the test
-harness launches QEMU more than once for each test case (i.e., it runs
-the `_NO_FILE_4Uhere_` scenario to check QEMU arguments). I'm not sure
-how much of an issue this is in practice. Depending on the answer, I
-know Zixuan had some ideas on how to speed this up in the current test
-harness. Or maybe we can explore an alternative to the
-`_NO_FILE_4Uhere_` approach instead.
+Something else nice to do here which I didn't finish back then when I worked on avic, would be
+to maybe rename avic_vcpu_load/avic_vcpu_put because those are also now run on avic inhibit/uninhibit.
 
-Zixuan: Please add/correct anything as needed!
+Basically the 'svm_refresh_apicv_exec_ctrl' is the full avic activate/deactivate, while
+avic_vcpu_load/avic_vcpu_put are the lighter weight partial avic activation/deactivation functions.
 
-[1] https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/blob/uefi/x86/run#L42-44
-[2] https://github.com/rhdrjones/kvm-unit-tests/blob/target-efi/scripts/mkefi.sh
+So minus the comment from Paolo about the updating avic on unblock which I missed back when I wrote
+my patches:
 
-Thanks,
-Marc
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+
+Best regards,
+	Maxim Levitsky
+
+
