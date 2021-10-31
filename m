@@ -2,185 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 46879441116
-	for <lists+kvm@lfdr.de>; Sun, 31 Oct 2021 22:55:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B1E0D441127
+	for <lists+kvm@lfdr.de>; Sun, 31 Oct 2021 23:15:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230185AbhJaV62 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 31 Oct 2021 17:58:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34174 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230025AbhJaV62 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 31 Oct 2021 17:58:28 -0400
-Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E13CC061714
-        for <kvm@vger.kernel.org>; Sun, 31 Oct 2021 14:55:55 -0700 (PDT)
-Received: by mail-lj1-x22a.google.com with SMTP id 205so26342812ljf.9
-        for <kvm@vger.kernel.org>; Sun, 31 Oct 2021 14:55:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=a2i5XTc1KMSXqatxOPSSBXpgpt/T0ryirE2DLf/LEoc=;
-        b=Qz0rYF/9NPb60RRIcVAvRpepybf3qQuiBHgGCnQxEIsOHW+4AAM78OhYOJcGxhcwSv
-         O9iHjj1HLdSLXkTypIztTbgU+1h/dMrOvHS6jRw6xlaclBfhyvueFORkI08ZjQwk9XIT
-         J3LRb5szqeMLEeBLe6TSlR+s+JWyBWEEnomnELObTcU3V0nzRc4FEu1PdGLxqrXIHTHI
-         D9lmTyOaFYVrE9Cvb5rtsd5CLJ0cgHMcfXj4AUZspY9ZJZATg2gzoywP4f/w+QBaYTJQ
-         HGyKKP7GdxDiZCFkch1uZt5RaqgEnC94q+JB63LCQv2U1Sq3hg8EzOZfGUOoeQbuPZ5f
-         JQGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=a2i5XTc1KMSXqatxOPSSBXpgpt/T0ryirE2DLf/LEoc=;
-        b=CO3oNM/Lx7ETxQOTlYREcSsaXJfAJKIDXdVu6745Bj72ShJQkv4p+UIu6CU69wPXkY
-         IOCVabvG60+aZqXCgAjBWHPjVjbiCORXcu6mW4M0bVq5uuEqVHdFL10kTCdMtSm71va6
-         WvvKlcB4HfXDLz15FKxsVqPMrJwgv7YbLlauRvl+JsPcYG5VVHQocLeaVuKjgbvNNyhT
-         ETHYc/kutkOXfcspI0D36+I5dD5qb2rSbcddRxeiQehtUTtG9ORcn2KROXROHNNVo36W
-         5vjCHI+i7ED1T0jD1P2rtIqVrBz3ZXJBYUlYyPioSwDltFg9mXS9DETQdr3vOp49P8ZD
-         aQHg==
-X-Gm-Message-State: AOAM531SXRFvxAKIYD299nIGjygEdn9/2EtRvKRgVDk8tjyA3lRUy//B
-        PTpGFYmmxcHm1o5sx3QX777rhASYv5D1D/MwYgQ=
-X-Google-Smtp-Source: ABdhPJz34Cq7KTaCUcW0cjWR2BYL22TMTsiS/hnkugusIvDT6PJACvF651W8FCI07oqxhaomnxJL73VEVLQpnsjQy6g=
-X-Received: by 2002:a05:651c:22b:: with SMTP id z11mr24501034ljn.36.1635717353788;
- Sun, 31 Oct 2021 14:55:53 -0700 (PDT)
-MIME-Version: 1.0
-References: <20211031055634.894263-1-zxwang42@gmail.com> <d6c56f03-1da7-1ebf-1d2e-0ec1aa0b241c@redhat.com>
- <CAA03e5GZ6HnW8uk+2nh_vZcKvtt+wcdVchm4cjRm_yPFC-P7Eg@mail.gmail.com>
-In-Reply-To: <CAA03e5GZ6HnW8uk+2nh_vZcKvtt+wcdVchm4cjRm_yPFC-P7Eg@mail.gmail.com>
-From:   Zixuan Wang <zxwang42@gmail.com>
-Date:   Sun, 31 Oct 2021 14:54:00 -0700
-Message-ID: <CAEDJ5ZRm6GtH6hL+Y_g7_5O=-GPWrSKu-bpKSf3yWcBuDJEKcg@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH v1 0/7] x86_64 UEFI set up process refactor
- and scripts fixes
-To:     Marc Orr <marcorr@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        "Singh, Brijesh" <brijesh.singh@amd.com>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        Varad Gautam <varad.gautam@suse.com>,
-        Joerg Roedel <jroedel@suse.de>, bp@suse.de
+        id S230326AbhJaWSZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 31 Oct 2021 18:18:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:37815 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230250AbhJaWSY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 31 Oct 2021 18:18:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635718552;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=C+trWHtpu8oYBXENs5w3b/Qoz24VhlDIgpUGDh1mOJU=;
+        b=XHcPXesaDsG+RV8jNnEYgLvztUOo9bsp/bYIdgNPkTYIaOtkp4tX6lQTAsrfTeeoN/8VhQ
+        Y/6AIcnmE9wJDU1+Km8O9UBDOJnlvXp4hbNFz/j4ERq5T1ZKutGsxf2c4BRc8y8JgdC+uH
+        /6lLDOBUv8VpIEnLK7Q1w6bu5G+IYag=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-192-WYECgU2fMxmEks3noiYjYA-1; Sun, 31 Oct 2021 18:15:48 -0400
+X-MC-Unique: WYECgU2fMxmEks3noiYjYA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6428F801AE3;
+        Sun, 31 Oct 2021 22:15:45 +0000 (UTC)
+Received: from starship (unknown [10.40.194.243])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 292202B0B8;
+        Sun, 31 Oct 2021 22:15:28 +0000 (UTC)
+Message-ID: <592a315a8932b03f601e4c22d5846e97bd4a1103.camel@redhat.com>
+Subject: Re: [PATCH v2 39/43] KVM: VMX: Don't do full kick when triggering
+ posted interrupt "fails"
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Anup Patel <anup.patel@wdc.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Atish Patra <atish.patra@wdc.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        David Matlack <dmatlack@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+Date:   Mon, 01 Nov 2021 00:15:26 +0200
+In-Reply-To: <fdf90c2f-81c8-513b-2e06-a90959f4cd89@redhat.com>
+References: <20211009021236.4122790-1-seanjc@google.com>
+         <20211009021236.4122790-40-seanjc@google.com>
+         <335822ac-b98b-1eec-4911-34e4d0e99907@redhat.com>
+         <YXl4mK7CyUBnPaQV@google.com>
+         <fdf90c2f-81c8-513b-2e06-a90959f4cd89@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Oct 31, 2021 at 9:14 AM Marc Orr <marcorr@google.com> wrote:
->
-> On Sun, Oct 31, 2021 at 12:28 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >
-> > On 31/10/21 06:56, Zixuan Wang wrote:
-> > > Hello,
-> > >
-> > > This patch series refactors the x86_64 UEFI set up process and fixes the
-> > > `run-tests.sh` script to run under UEFI. The patches are organized as
-> > > three parts.
-> > >
-> > > The first part (patches 1-2) refactors the x86_64 UEFI set up process.
-> > > The previous UEFI setup calls arch-specific setup functions twice and
-> > > generates arch-specific data structure. As Andrew suggested [1], we
-> > > refactor this process to make only one call to the arch-specific
-> > > function and generate arch-neutral data structures. This simplifies the
-> > > set up process and makes it easier to develop UEFI support for other
-> > > architectures.
-> > >
-> > > The second part (patch 3) converts several x86 test cases to
-> > > Position-Independent Code (PIC) to run under UEFI. This patch is ported
-> > > from the initial UEFI support patchset [2] with fixes to the 32-bit
-> > > compilation.
-> > >
-> > > The third part (patches 4-7) fixes the UEFI runner scripts. Patch 4 sets
-> > > UEFI OVMF image as readonly. Patch 5 fixes test cases' return code under
-> > > UEFI, enabling Patch 6-7 to fix the `run-tests.sh` script under UEFI.
-> > >
-> > > This patch set is based on the `uefi` branch.
-> >
-> > Thank you, for patches 1-6 I have squashed the patches when applicable
-> > (1, 4, 5, 6) and queued the others (2 and 3).
-> >
-> > I did not queue patch 7 yet, it seems okay but I want to understand
-> > better the changes it needs in the harness and what is missing.  I'll
-> > take a look during the week.
->
-> SGTM, thank you! Zixuan and I discussed a few things that are missing:
->
-> 1. Test cases that take the `-append` arg are currently marked `SKIP`.
-> Two issues need to be resolved here. First, we're not using QEMU's
-> `-kernel` flag for EFI test cases [1]. And the `-append` flag does not
-> work without the `-kernel` flag. I don't understand the details on why
-> we don't use the `-kernel` flag myself. Maybe Zixuan can elaborate.
-> Second, assuming we fix the first issue, then we need to enlighten the
-> KVM-Unit-Tests under UEFI to parse kernel command line arguments and
-> pass them down to the test cases via `argv`. Zixuan pointed out to me
-> that there is some prior work from Drew [2] that we should be able to
-> follow to make this work. So I'm hoping that Zixuan and I can work
-> together on solving these issues to get the argument passing working
-> next.
+On Thu, 2021-10-28 at 00:09 +0200, Paolo Bonzini wrote:
+> On 27/10/21 18:04, Sean Christopherson wrote:
+> > > > +		/*
+> > > > +		 * The smp_wmb() in kvm_make_request() pairs with the smp_mb_*()
+> > > > +		 * after setting vcpu->mode in vcpu_enter_guest(), thus the vCPU
+> > > > +		 * is guaranteed to see the event request if triggering a posted
+> > > > +		 * interrupt "fails" because vcpu->mode != IN_GUEST_MODE.
+> > > 
+> > > What this smp_wmb() pair with, is the smp_mb__after_atomic in
+> > > kvm_check_request(KVM_REQ_EVENT, vcpu).
+> > 
+> > I don't think that's correct.  There is no kvm_check_request() in the relevant path.
+> > kvm_vcpu_exit_request() uses kvm_request_pending(), which is just a READ_ONCE()
+> > without a barrier.
+> 
+> Ok, we are talking about two different set of barriers.  This is mine:
+> 
+> - smp_wmb() in kvm_make_request() pairs with the smp_mb__after_atomic() in
+> kvm_check_request(); it ensures that everything before the request
+> (in this case, pi_pending = true) is seen by inject_pending_event.
+> 
+> - pi_test_and_set_on() orders the write to ON after the write to PIR,
+> pairing with vmx_sync_pir_to_irr and ensuring that the bit in the PIR is
+> seen.
+> 
+> And this is yours:
+> 
+> - pi_test_and_set_on() _also_ orders the write to ON before the read of
+> vcpu->mode, pairing with vcpu_enter_guest()
+> 
+> - kvm_make_request() however does _not_ order the write to
+> vcpu->requests before the read of vcpu->mode, even though it's needed.
+> Usually that's handled by kvm_vcpu_exiting_guest_mode(), but in this case
+> vcpu->mode is read in kvm_vcpu_trigger_posted_interrupt.
 
-Thank you for the detailed summary!
+Yes indeed, kvm_make_request() writes the vcpu->requests after the memory barrier,
+and then there is no barrier until reading of vcpu->mode in kvm_vcpu_trigger_posted_interrupt.
 
-Current kvm-unit-tests pass an EFI binary as part of a disk image,
-instead of using the `-kernel` argument.
+> 
+> So vmx_deliver_nested_posted_interrupt() is missing a smp_mb__after_atomic().
+> It's documentation only for x86, but still easily done in v3.
+> 
+> Paolo
+> 
 
-I just tested the `-kernel` argument and it seems to work with EFI
-binaries, and more importantly, it's really fast (bypassing the
-default 5-second user input waiting). I will update the `x86/efi/run`
-to use `-kernel` argument to pass the EFI binaries.
-
-Since `-kernel` is working, I can start to investigate how to use
-`-append` to pass arguments. If that doesn't work well, an alternative
-approach could be:
-
-1. (host) create a file `args.txt` in the disk image, which contains
-all the arguments needed
-2. (guest) call UEFI filesystem interface to read this `args.txt` from
-the disk image, parse it and pass the arguments to `main()`
-
-> 2. We need a way to annotate test cases in `x86/unittests.cfg` as
-> known to work under SEV. I'm thinking of doing this via new (very
-> broad) test groups in `unittests.cfg`. I _think_ SEV is the primary
-> scenario we care about. However, folks may care about running the test
-> cases under UEFI outside of SEV. For example, last time I checked,
-> emulator runs OK under UEFI minus SEV-ES but fails under SEV-ES. And
-> similarly, while most test cases work under UEFI minus SEV, there are
-> a few that do mis-behave -- and it probably makes sense to document
-> this (e.g., via annotations in `unittests.cfg`). Also, there are many
-> variations of SEV (SEV, SEV-ES, SEV-SNP)... And hopefully some of this
-> will eventually be applicable to TDX as well. So many testgroups is
-> not a good solution. I'm not sure.
-
-Adding an `efi` group seems helpful. E.g., the current `x86/smap.c`
-does not work under UEFI; but the `run-tests.sh` still tries to run
-this test case, even if this test case is not compiled.
-
-> 3. Multi-CPU needs to be made to work under UEFI. For now, patch #7
-> forces all EFI test cases to run with 1 vCPU. I chatted with Brijesh,
-> and he mentioned that Varad would like to work on this. However, if
-> anything here changes, please let me know, because we can work on this
-> as well. But for now, I'm not planning to work on it so we can avoid
-> duplicating work.
-> 4. UEFI runs a lot slower than SEABIOS. It doesn't help that the test
-> harness launches QEMU more than once for each test case (i.e., it runs
-> the `_NO_FILE_4Uhere_` scenario to check QEMU arguments). I'm not sure
-> how much of an issue this is in practice. Depending on the answer, I
-> know Zixuan had some ideas on how to speed this up in the current test
-> harness. Or maybe we can explore an alternative to the
-> `_NO_FILE_4Uhere_` approach instead.
-
-As the `-kernel` argument now works with the EFI binaries and is
-significantly faster, this should not be an issue anymore. We just
-need to update the runner scripts to use `-kernel` argument.
-
-> Zixuan: Please add/correct anything as needed!
->
-> [1] https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/blob/uefi/x86/run#L42-44
-> [2] https://github.com/rhdrjones/kvm-unit-tests/blob/target-efi/scripts/mkefi.sh
->
-> Thanks,
-> Marc
-
+I used this patch as a justification to read Paolo's excellent LWN series of articles on memory barriers,
+to refresh my knowledge of the memory barriers and understand the above analysis better.
+https://lwn.net/Articles/844224/
+ 
+I agree with the above, but this is something that is so easy to make a mistake
+that I can't be 100% sure.
+ 
 Best regards,
-Zixuan
+	Maxim Levitsky
+
+
