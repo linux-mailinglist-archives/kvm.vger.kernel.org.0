@@ -2,59 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F194444106D
-	for <lists+kvm@lfdr.de>; Sun, 31 Oct 2021 20:24:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6411344110E
+	for <lists+kvm@lfdr.de>; Sun, 31 Oct 2021 22:36:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231182AbhJaT1R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 31 Oct 2021 15:27:17 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39086 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230262AbhJaT1Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 31 Oct 2021 15:27:16 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id F3E3860F0F;
-        Sun, 31 Oct 2021 19:24:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1635708279;
-        bh=B4JQ/G/C0682OSRB6eJLx1VBdxV+Zedlp5L5IKs/IPw=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=mpwjHNKYcGLqX6gTjgDmE03E7q6tcAIJ2PMp3GwI51WP66y0s5Q6xCogF3fp2HXif
-         IUGjIWUTiDMISGnsOesBqsWu2ITDvFCJyd3vTrydsIlLYF12GBgQ5HJvV1pQB83fJ1
-         e/ZpIvqiv4CGWBovXlEdaAHb2u4iRzWbFm6gu+wMvnwMvB/wSvZ5zPWbKd3C+vYrmH
-         RIF9jFjGII/f4dml5QiXXEZToMzsI01gM4B9hoNCmq4hg2fc+WfDbX8i51ZjOHS/6F
-         DM7DgkvQGmhQBGQl7uge1lUCfLW3vDox/RcLhuMqYRStmQg3lXyXM9AFT3EFi4rwzD
-         9rTFuF8q1+rsQ==
-Received: from pdx-korg-docbuild-2.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by pdx-korg-docbuild-2.ci.codeaurora.org (Postfix) with ESMTP id EDCD760A25;
-        Sun, 31 Oct 2021 19:24:38 +0000 (UTC)
-Subject: Re: [GIT PULL] KVM fixes for Linux 5.15 (rc8 or final)
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20211031063520.4090094-1-pbonzini@redhat.com>
-References: <20211031063520.4090094-1-pbonzini@redhat.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20211031063520.4090094-1-pbonzini@redhat.com>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-X-PR-Tracked-Commit-Id: f3d1436d4bf8ced1c9a62a045d193a65567e1fcc
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: ca5e83eddc8bc85db5698ef702b610ee64243459
-Message-Id: <163570827896.30704.10889967667019099329.pr-tracker-bot@kernel.org>
-Date:   Sun, 31 Oct 2021 19:24:38 +0000
+        id S230098AbhJaVjW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 31 Oct 2021 17:39:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58296 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230041AbhJaVjV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 31 Oct 2021 17:39:21 -0400
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 318C2C061714
+        for <kvm@vger.kernel.org>; Sun, 31 Oct 2021 14:36:49 -0700 (PDT)
+Received: by mail-lj1-x22c.google.com with SMTP id u5so26338661ljo.8
+        for <kvm@vger.kernel.org>; Sun, 31 Oct 2021 14:36:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=RH047mBRPA+53TMlNcP8FjKAFIuJlSdRZt0OVWAL79g=;
+        b=kdi0y25PRIL4zy+u9wDEJa3fLHYhwNp22TNcHWAh0tIxPjfmJE5/Ont2PV4KNyWjkg
+         gQmqZ3lvtbNRqfRkOwg9Uq5a5PycYM5sQiHAQyp3QSOvJXX3aNpTAuudpKWl/eaJkTjn
+         ls1vGqvzc7Xd0WSJJb9pryNO7/JrdmD1PjCt8Yzv5Pkpbbfh+GxqVSnN+JxCY65Yzmmc
+         JTsyjJzICM/Xzc18BmKbAfwFP4/r/MHIHLWtUeaTiU1opYV4suyS7RHprPt4upHyM/9B
+         s0ROs/i9cKOeITDqIc3H1KzDAquM3ZwTPpUmnUXfoH5QBm+iMfSwCFE5RZ3PkSPpiPd3
+         2zpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=RH047mBRPA+53TMlNcP8FjKAFIuJlSdRZt0OVWAL79g=;
+        b=PCRHTmPSYGLDa1wzN4rU5S0TLz5gHhHnkjEGsE0EYnQqf+TDctjmlPBk5MA6bhu/sr
+         hK8sJr/Jj2ALfPlGwdbBzm3xKrsAQv92B+6WvPDGU5gofotR6dv9AkAlJVWZ8X5+2Cyy
+         5lzB+SjPRz9mFbCYASjbLX7LUL7mSr2c2FlcmYSJ9z4IcGRvQpQkuWjCz/E4qpwSm6mm
+         BghoW418Du4mcxgNANGmvExuHiXAKdiCBoA0xvtQZ07SYIEhi3bR6pQuyCa0f+vnEKTD
+         GgFn4cj/Le1ej7k9BhySPAj89y1MjqWxJIL8Mu6ZT/8Ou6xDJG9qA2B9bCuqT6nwtf2k
+         qgjw==
+X-Gm-Message-State: AOAM5304eBxATVcvBBNLJ1CeOfl1Xd8sWcZ+IEieo92Vrn75Ld/ewZ0L
+        azMqu8OrBW/mrgaKMReyF+h+NW7Go0dn1sV5obtVMBg62sU=
+X-Google-Smtp-Source: ABdhPJzMc6xlu1P5wmnJrIoMdBxqpeQ+s/uCCNm4bhYq0z/elFQZ5dW++v//TiQIQP6Z+Cnv3KUkN+CqlWfUe1sO7Pc=
+X-Received: by 2002:a2e:969a:: with SMTP id q26mr26105399lji.44.1635716207631;
+ Sun, 31 Oct 2021 14:36:47 -0700 (PDT)
+MIME-Version: 1.0
+References: <20211031055634.894263-1-zxwang42@gmail.com> <20211031055634.894263-6-zxwang42@gmail.com>
+ <5460ca03-4547-b538-e187-6eb8e9ce8641@redhat.com>
+In-Reply-To: <5460ca03-4547-b538-e187-6eb8e9ce8641@redhat.com>
+From:   Zixuan Wang <zxwang42@gmail.com>
+Date:   Sun, 31 Oct 2021 14:36:00 -0700
+Message-ID: <CAEDJ5ZQVX6c_FQ_=b4thNXo76cN2_a4cu+-4PZERdLovmjKmvg@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH v1 5/7] x86 UEFI: Exit QEMU with return code
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
+Cc:     kvm list <kvm@vger.kernel.org>, Andrew Jones <drjones@redhat.com>,
+        Marc Orr <marcorr@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        "Singh, Brijesh" <brijesh.singh@amd.com>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        Varad Gautam <varad.gautam@suse.com>,
+        Joerg Roedel <jroedel@suse.de>, bp@suse.de
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The pull request you sent on Sun, 31 Oct 2021 02:35:20 -0400:
+On Sun, Oct 31, 2021 at 3:02 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 31/10/21 06:56, Zixuan Wang wrote:
+> > From: Zixuan Wang <zxwang42@gmail.com>
+> >   efi_status_t efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
+> >   {
+> > -     int ret;
+> > +     unsigned long ret;
+>
+> Why this change?
 
-> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+Didn't notice this, it should be int, thanks for pointing it out!
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/ca5e83eddc8bc85db5698ef702b610ee64243459
+> >       efi_status_t status;
+> >       efi_bootinfo_t efi_bootinfo;
+> >
+> > @@ -134,14 +134,14 @@ efi_status_t efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
+> >       ret = main(__argc, __argv, __environ);
+> >
+> >       /* Shutdown the guest VM */
+> > -     efi_rs_call(reset_system, EFI_RESET_SHUTDOWN, ret, 0, NULL);
+> > +     exit(ret);
+> >
+> >       /* Unreachable */
+> >       return EFI_UNSUPPORTED;
+> >
+> >   efi_main_error:
+> >       /* Shutdown the guest with error EFI status */
+> > -     efi_rs_call(reset_system, EFI_RESET_SHUTDOWN, status, 0, NULL);
+> > +     exit(status);
+> >
+> >       /* Unreachable */
+> >       return EFI_UNSUPPORTED;
+>
+> It's better to keep the exit() *and* the efi_rs_call(), I think, in case
+> the testdev is missing and therefore the exit() does not work.
+>
+> Paolo
+>
 
-Thank you!
+I agree, I think there are three possible solutions:
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+1. keep both exit() and efi_rs_call() here, or
+2. define a new function efi_exit() that calls both exit() and efi_rs_call(), or
+3. add efi_rs_call() to the end of exit() function (defined in
+lib/x86/io.c), so many other calls to exit() can utilize EFI exit as a
+backup
+
+Best regards,
+Zixuan
