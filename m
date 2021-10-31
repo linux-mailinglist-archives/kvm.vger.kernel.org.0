@@ -2,149 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A5BA440D71
-	for <lists+kvm@lfdr.de>; Sun, 31 Oct 2021 08:28:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B3F21440D79
+	for <lists+kvm@lfdr.de>; Sun, 31 Oct 2021 08:52:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230309AbhJaHbP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 31 Oct 2021 03:31:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:53986 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229697AbhJaHbO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 31 Oct 2021 03:31:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635665323;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=eo1MSr4ckckQxvAK3VBPPPuV6lxn6t3zOtFTXVQ2H5w=;
-        b=UTlBJoCX3HtHvscqxpFFoFB5Tx57lJJ2yogZeXXokFTrpaUt+oWqtHoAW7aOseYKmQ/YkY
-        rBP1a3hBJdsGvgx/bBPbWsWo4wDIxo1lX3nh04Ymchw64CrLBiPbZL0Ni+SAL2Q6xDmn8s
-        eKT7cB8YkfTtChIK3JrmG+WBGxGHf94=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-132-dD2ByfbPPA2vO0aSdr3hNA-1; Sun, 31 Oct 2021 03:28:41 -0400
-X-MC-Unique: dD2ByfbPPA2vO0aSdr3hNA-1
-Received: by mail-ed1-f72.google.com with SMTP id x13-20020a05640226cd00b003dd4720703bso12862357edd.8
-        for <kvm@vger.kernel.org>; Sun, 31 Oct 2021 00:28:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=eo1MSr4ckckQxvAK3VBPPPuV6lxn6t3zOtFTXVQ2H5w=;
-        b=h1yZZcxnRdQB7enc7CoEnwA6HxBc45yBc2H4v0RVUm1hitcUFZkBWJSFnnVOL5N2OS
-         oJZisPR4EEBnMCe/MMZiFFLHW6KKe87HvfsxOmTinCQhpOSlc2/nvQNB3eUkjr1JzSdZ
-         xX2DEsqcg+2xwRe/fJEWJ/UyjLXOutBnXCzKzanULhLdmrb/Ct03bOP1eeSBdPlTj3hz
-         wvMDRLP2gjP+8zDSx4EsZOxdLTfoZQ45P5bkvNorq4d/gEsGYs/v8szymr64mdRtv/2V
-         aPOmMfDyrHj0bXYrzNRsyJS3ODpz+XYaRDBt7tCVakFcoDRUllECj5NCSM1218ktGZE3
-         GKFQ==
-X-Gm-Message-State: AOAM531vTmZilY+vY6ONhTbxpeuhUbw0M4tderFkkJCREuH1uiya1puV
-        RJ9HM4fmu4g4AifvB6Sm4QMPR8OOChcRDADEgsyBW5yn+BPbFAgUgYBkcny5yTRPa00wPIkkGuB
-        HpDZdK7iyo4nb
-X-Received: by 2002:a17:907:9694:: with SMTP id hd20mr26513516ejc.508.1635665320315;
-        Sun, 31 Oct 2021 00:28:40 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJykYMQYRlPyS4iYy0Y40u1793ZYYUoHA4NO3sFjyivxOWVVZQhxAoUhHQEDa6iE4TEvaNKJZw==
-X-Received: by 2002:a17:907:9694:: with SMTP id hd20mr26513496ejc.508.1635665320077;
-        Sun, 31 Oct 2021 00:28:40 -0700 (PDT)
-Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id qf38sm5457438ejc.116.2021.10.31.00.28.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 31 Oct 2021 00:28:39 -0700 (PDT)
-Message-ID: <d6c56f03-1da7-1ebf-1d2e-0ec1aa0b241c@redhat.com>
-Date:   Sun, 31 Oct 2021 08:28:37 +0100
+        id S230025AbhJaHyZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 31 Oct 2021 03:54:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49448 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229525AbhJaHyW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 31 Oct 2021 03:54:22 -0400
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8B11C061570
+        for <kvm@vger.kernel.org>; Sun, 31 Oct 2021 00:51:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
+        :MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:
+        Sender:Reply-To:Content-ID:Content-Description;
+        bh=rY9jtXknFzArop/HcmxsK8ra1hmgoCzXxz093GBO1Rk=; b=lwHHpSo++SidnmQd8jAUVANpIh
+        6Yv/2Pg7HcBAqjUzAQoybu3NPsizroliVKk66qOJra0WD1rgtf+NRUGLVPvrQvt7IWDiaB/3t/qi+
+        N3LUqHNQVybcOe8sAryzpCOeZdcjkIYrJd/rrIRj2fjZtYqNKg/P+Daymz1f95p8s98n/uPNcQU7K
+        SPAs/7ay0aJqKnAP7l2M9a5FbDfPUNmwmLT1VKucJkl5Ga0DRwNBSuoWn6+h5O+9Y/+4hFpFrnIa8
+        QKqsjuMLhwDRiFknlUDvQ3sFe+fJyCr0FPQFVFPzPO1pKNO4a6B7XVjxQNwGwegD0Tunge9vrUTUl
+        BCh+OPBw==;
+Received: from [2001:8b0:10b:1:401:b8e5:106a:b86] (helo=[IPv6:::1])
+        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mh5cs-00DMLu-Di; Sun, 31 Oct 2021 07:51:34 +0000
+Date:   Sun, 31 Oct 2021 07:51:33 +0000
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Raslan, KarimAllah" <karahmed@amazon.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Ankur Arora <ankur.a.arora@oracle.com>
+CC:     "jmattson@google.com" <jmattson@google.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "mtosatti@redhat.com" <mtosatti@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>
+Subject: =?US-ASCII?Q?Re=3A_=5BEXTERNAL=5D_=5BPATCH=5D_KVM=3A_x86/xen=3A_Fix_runs?= =?US-ASCII?Q?tate_updates_to_be_atomic_when_preempting_vCPU?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <c0dd5fcd-343c-1186-0b1b-3a8ce8a797fe@redhat.com>
+References: <3d2a13164cbc61142b16edba85960db9a381bebe.camel@amazon.co.uk> <09f4468b-0916-cf2c-1cef-46970a238ce4@redhat.com> <a0906628f31e359deb9e9a6cdf15eb72920c5960.camel@infradead.org> <2e7bcafe1077d31d8af6cc0cd120a613cc070cfb.camel@infradead.org> <95bee081-c744-1586-d4df-0d1e04a8490f@redhat.com> <8950681efdae90b089fcbe65fb0f39612b33cea5.camel@infradead.org> <c0dd5fcd-343c-1186-0b1b-3a8ce8a797fe@redhat.com>
+Message-ID: <5CCCE89D-C00F-451A-B1E2-38D142ACD76B@infradead.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [kvm-unit-tests PATCH v1 0/7] x86_64 UEFI set up process refactor
- and scripts fixes
-Content-Language: en-US
-To:     Zixuan Wang <zxwang42@gmail.com>, kvm@vger.kernel.org,
-        drjones@redhat.com
-Cc:     marcorr@google.com, erdemaktas@google.com, rientjes@google.com,
-        seanjc@google.com, brijesh.singh@amd.com, Thomas.Lendacky@amd.com,
-        varad.gautam@suse.com, jroedel@suse.de, bp@suse.de
-References: <20211031055634.894263-1-zxwang42@gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211031055634.894263-1-zxwang42@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 31/10/21 06:56, Zixuan Wang wrote:
-> Hello,
-> 
-> This patch series refactors the x86_64 UEFI set up process and fixes the
-> `run-tests.sh` script to run under UEFI. The patches are organized as
-> three parts.
-> 
-> The first part (patches 1-2) refactors the x86_64 UEFI set up process.
-> The previous UEFI setup calls arch-specific setup functions twice and
-> generates arch-specific data structure. As Andrew suggested [1], we
-> refactor this process to make only one call to the arch-specific
-> function and generate arch-neutral data structures. This simplifies the
-> set up process and makes it easier to develop UEFI support for other
-> architectures.
-> 
-> The second part (patch 3) converts several x86 test cases to
-> Position-Independent Code (PIC) to run under UEFI. This patch is ported
-> from the initial UEFI support patchset [2] with fixes to the 32-bit
-> compilation.
-> 
-> The third part (patches 4-7) fixes the UEFI runner scripts. Patch 4 sets
-> UEFI OVMF image as readonly. Patch 5 fixes test cases' return code under
-> UEFI, enabling Patch 6-7 to fix the `run-tests.sh` script under UEFI.
-> 
-> This patch set is based on the `uefi` branch.
 
-Thank you, for patches 1-6 I have squashed the patches when applicable 
-(1, 4, 5, 6) and queued the others (2 and 3).
 
-I did not queue patch 7 yet, it seems okay but I want to understand 
-better the changes it needs in the harness and what is missing.  I'll 
-take a look during the week.
+On 31 October 2021 06:52:33 GMT, Paolo Bonzini <pbonzini@redhat=2Ecom> wro=
+te:
+>On 30/10/21 09:58, David Woodhouse wrote:
+>>> Absolutely!  The fixed version of kvm_map_gfn should not do any
+>>> map/unmap, it should do it eagerly on MMU notifier operations=2E
+>> Staring at this some more=2E=2E=2E what*currently*  protects a
+>> gfn_to_pfn_cache when the page tables change =E2=80=94 either because u=
+serspace
+>> either mmaps something else over the same HVA, or the underlying page
+>> is just swapped out and restored?
+>
+>kvm_cache_gfn_to_pfn calls gfn_to_pfn_memslot, which pins the page=2E
 
-Paolo
 
-> Best regards,
-> Zixuan Wang and Marc Orr
-> 
-> [1] https://lore.kernel.org/kvm/20211005060549.clar5nakynz2zecl@gator.home/
-> [2] https://lore.kernel.org/kvm/20211004204931.1537823-1-zxwang42@gmail.com/
-> 
-> Marc Orr (2):
->    scripts: Generalize EFI check
->    x86 UEFI: Make run_tests.sh (mostly) work under UEFI
-> 
-> Zixuan Wang (5):
->    x86 UEFI: Remove mixed_mode
->    x86 UEFI: Refactor set up process
->    x86 UEFI: Convert x86 test cases to PIC
->    x86 UEFI: Set UEFI OVMF as readonly
->    x86 UEFI: Exit QEMU with return code
-> 
->   lib/efi.c            |  54 ++++++--
->   lib/efi.h            |  19 ++-
->   lib/linux/efi.h      | 317 ++++++++++++++-----------------------------
->   lib/x86/acpi.c       |  36 +++--
->   lib/x86/acpi.h       |   5 +-
->   lib/x86/asm/setup.h  |  16 +--
->   lib/x86/setup.c      | 153 ++++++++++-----------
->   lib/x86/usermode.c   |   3 +-
->   scripts/common.bash  |   9 +-
->   scripts/runtime.bash |  15 +-
->   x86/Makefile.common  |  10 +-
->   x86/Makefile.x86_64  |   7 +-
->   x86/access.c         |   9 +-
->   x86/cet.c            |   8 +-
->   x86/efi/run          |  27 +++-
->   x86/emulator.c       |   5 +-
->   x86/eventinj.c       |   8 ++
->   x86/run              |   6 +-
->   x86/smap.c           |  13 +-
->   x86/umip.c           |  26 +++-
->   20 files changed, 360 insertions(+), 386 deletions(-)
-> 
+It pins the underlying page but that doesn't guarantee that the page remai=
+ns mapped at the HVA corresponding to that GFN, does it?
 
+And I though the whole point of the repeated map/unmap was *not* to pin th=
+e page, anyway?
+
+--=20
+Sent from my Android device with K-9 Mail=2E Please excuse my brevity=2E
