@@ -2,97 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 00176440D64
-	for <lists+kvm@lfdr.de>; Sun, 31 Oct 2021 07:52:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9894A440D6B
+	for <lists+kvm@lfdr.de>; Sun, 31 Oct 2021 08:13:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229790AbhJaGzO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 31 Oct 2021 02:55:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26414 "EHLO
+        id S230209AbhJaHQH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 31 Oct 2021 03:16:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44368 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229638AbhJaGzN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 31 Oct 2021 02:55:13 -0400
+        by vger.kernel.org with ESMTP id S229697AbhJaHQG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 31 Oct 2021 03:16:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635663161;
+        s=mimecast20190719; t=1635664415;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=aYgTKb60mO7MO0wuvtOlhBspoOKZc5JUMrX5Ed5BNqU=;
-        b=eayx7fad/kpFpOfN6aCpUfGcWS4yURv59Rtkzy3NbtccZeZjOavEsYpxYavdWGvv6z6Q/A
-        jKeusLbhu9JfTdaft7D8vBfh0EXAuze1/5vcYxyoBJx90eTDxHfscYVtp1QtxMHUrWvrCx
-        9OB8wt+C//HDWOM2xs7ScxSnezRVdU4=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-587-ZmIOOQQRNF-6xH6XOGxKxw-1; Sun, 31 Oct 2021 02:52:40 -0400
-X-MC-Unique: ZmIOOQQRNF-6xH6XOGxKxw-1
-Received: by mail-wr1-f69.google.com with SMTP id a2-20020a5d4d42000000b0017b3bcf41b9so2315388wru.23
-        for <kvm@vger.kernel.org>; Sat, 30 Oct 2021 23:52:39 -0700 (PDT)
+        bh=suAtYmJ7OQZiL5jR324hSERM5cwi98PPFWVwsXXFWhQ=;
+        b=f7qrA5j4tzUq+QnA46wAMU9JfHfSvgRiuvTBaDkqwe8VgLdQKcAD0u0Y+MD69kMa/nCpz6
+        Z7BBvakzdm1JVhTlN5NnQ01pv+uBaOyPvi2WCNcln2R1vmlrCoOifhXGuziRIzvlXNHz6A
+        EdT5KNUYMu4Kk8rum1UwS4LhNxQa9BA=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-335-vcwMNVKOMjyvcHIofjoO9w-1; Sun, 31 Oct 2021 03:13:33 -0400
+X-MC-Unique: vcwMNVKOMjyvcHIofjoO9w-1
+Received: by mail-ed1-f70.google.com with SMTP id f21-20020a0564021e9500b003dd77985601so12897850edf.9
+        for <kvm@vger.kernel.org>; Sun, 31 Oct 2021 00:13:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=aYgTKb60mO7MO0wuvtOlhBspoOKZc5JUMrX5Ed5BNqU=;
-        b=oc41pSXkSudIA/Wlf0uCmdOhk5rCtQMjY4BsJjdaTI5oQxIZjDNfk2BT/1CZiouEwk
-         xICbD7OvWlMEtp8ArIaU7psz7avLBhyYqpBCMRUa6kklnn+8ppVUPbKnVIFXcNJkwuHs
-         LBwjWPks/woaNyExqWvM6gGy/Z2wFfQRhGUu7mbFtUw2yZpejcincErMwKv8SAApVLOp
-         JthWTwV1RmqfsjPBbaITqV3SyajdwlUPH5tqMdJoSHIUxWv7ZviqO3dmBUKnn9WOxxpm
-         N8TnJEsw9NmNt0dFXfBD2/p5yUXfI7SHO1c2m1INFpJJkxhr7Gf0RNsnBpZXPqOgclzC
-         pZcw==
-X-Gm-Message-State: AOAM532X3+moWqJOwXc+SmrEo7vJjhCWQmRGWI/7rYfKU5LN+lapH4HZ
-        Sy5FlDnwqvukbwlW4A/7y42Z0sy9Qw6VtVIppBjuCVYqrZYTJzg18XcaDc2YCKVLeSd1z//wDvz
-        ESob9P27PQ4U7
-X-Received: by 2002:a05:6000:12d2:: with SMTP id l18mr15600084wrx.289.1635663158891;
-        Sat, 30 Oct 2021 23:52:38 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw4ULJiKhtZbjwvjl5gLCB6FUvjNgqFUn3ABnn0bbQ8n5CBZ09dcENuQz1qWCAJ7MI47PdlXg==
-X-Received: by 2002:a05:6000:12d2:: with SMTP id l18mr15600063wrx.289.1635663158694;
-        Sat, 30 Oct 2021 23:52:38 -0700 (PDT)
+        bh=suAtYmJ7OQZiL5jR324hSERM5cwi98PPFWVwsXXFWhQ=;
+        b=qmAsP7bNxuDIDRHMGD+rwtp1puO/PqzvYMQnvz9DgZGHZYvbhXoHFcaplqirIBxr3g
+         +OUHL5YCtSJxnqqNnA9EjbquipeW2squZ2npXaEee/6h+hqLsTqe8AU2ZJFt9+lOmyAN
+         3OWgRedIx950Du2iXMXLDeYOMYsGLaX2sfHuz7qTg3ol1AZCQdlo3uVNkW7Rj/2l6z8R
+         11aTp8JqpcLacnYDaea/UqXwQpjznU6K6fjywSkFOqwhjFt8n/BmZ5GhGQrZ3i8/66W3
+         LReufBeS+606U/mJKQlGifyr02wNtkjeiBnlnfDSvl9jNMnbrHf4SwsqqtYRfUphtmO/
+         6vbw==
+X-Gm-Message-State: AOAM5326Og1FQ9Xyb6Fu4eA9WDl2GMNa1wJJ4iz5MA7FJiBjDym/GdFc
+        zRe6Zrx3olsCr3b+zcZOVCbpE1lEQCPuZDtlfT4KzpanNnKBIEt/iDJ0jaZ/0vWWviROjP584Qp
+        xGUhaD9uHCYcS
+X-Received: by 2002:a05:6402:42d4:: with SMTP id i20mr29730211edc.337.1635664412380;
+        Sun, 31 Oct 2021 00:13:32 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzydojA163WgKAw0lu6/M2WcCJ9GCa+mKvQQKb1CbM1/ZslrZG5dTGD52Zhk0SdkTLIi6GHFw==
+X-Received: by 2002:a05:6402:42d4:: with SMTP id i20mr29730181edc.337.1635664412165;
+        Sun, 31 Oct 2021 00:13:32 -0700 (PDT)
 Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.gmail.com with ESMTPSA id w15sm1218416wrk.77.2021.10.30.23.52.34
+        by smtp.gmail.com with ESMTPSA id s26sm4062964edq.6.2021.10.31.00.13.30
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 30 Oct 2021 23:52:37 -0700 (PDT)
-Message-ID: <c0dd5fcd-343c-1186-0b1b-3a8ce8a797fe@redhat.com>
-Date:   Sun, 31 Oct 2021 07:52:33 +0100
+        Sun, 31 Oct 2021 00:13:31 -0700 (PDT)
+Message-ID: <969294ed-444b-3806-af2d-b94ed9eded80@redhat.com>
+Date:   Sun, 31 Oct 2021 08:13:29 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.1.0
-Subject: Re: [EXTERNAL] [PATCH] KVM: x86/xen: Fix runstate updates to be
- atomic when preempting vCPU
+Subject: Re: [kvm-unit-tests PATCH v1 6/7] scripts: Generalize EFI check
 Content-Language: en-US
-To:     David Woodhouse <dwmw2@infradead.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Raslan, KarimAllah" <karahmed@amazon.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Ankur Arora <ankur.a.arora@oracle.com>
-Cc:     "jmattson@google.com" <jmattson@google.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "mtosatti@redhat.com" <mtosatti@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>
-References: <3d2a13164cbc61142b16edba85960db9a381bebe.camel@amazon.co.uk>
- <09f4468b-0916-cf2c-1cef-46970a238ce4@redhat.com>
- <a0906628f31e359deb9e9a6cdf15eb72920c5960.camel@infradead.org>
- <2e7bcafe1077d31d8af6cc0cd120a613cc070cfb.camel@infradead.org>
- <95bee081-c744-1586-d4df-0d1e04a8490f@redhat.com>
- <8950681efdae90b089fcbe65fb0f39612b33cea5.camel@infradead.org>
+To:     Zixuan Wang <zxwang42@gmail.com>, kvm@vger.kernel.org,
+        drjones@redhat.com
+Cc:     marcorr@google.com, erdemaktas@google.com, rientjes@google.com,
+        seanjc@google.com, brijesh.singh@amd.com, Thomas.Lendacky@amd.com,
+        varad.gautam@suse.com, jroedel@suse.de, bp@suse.de
+References: <20211031055634.894263-1-zxwang42@gmail.com>
+ <20211031055634.894263-7-zxwang42@gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <8950681efdae90b089fcbe65fb0f39612b33cea5.camel@infradead.org>
+In-Reply-To: <20211031055634.894263-7-zxwang42@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/10/21 09:58, David Woodhouse wrote:
->> Absolutely!  The fixed version of kvm_map_gfn should not do any
->> map/unmap, it should do it eagerly on MMU notifier operations.
-> Staring at this some more... what*currently*  protects a
-> gfn_to_pfn_cache when the page tables change — either because userspace
-> either mmaps something else over the same HVA, or the underlying page
-> is just swapped out and restored?
+On 31/10/21 06:56, Zixuan Wang wrote:
+> From: Marc Orr<marcorr@google.com>
+> 
+> Previously, the scripts distinguish between seabios and UEFI via a
+> hard-coded env var in the EFI run script, `arch/x86/efi/run`.
+> Furthermore, this var is passed to the x86 run script, `arch/x86/run`,
+> and then not available in other scripts (or to other architectures).
+> 
+> Replace the previous approach with a common helper function to check
+> whether the repo has been configured to run under EFI. The helper does
+> this by probing the `config.mak` file generated by `configure`.
 
-kvm_cache_gfn_to_pfn calls gfn_to_pfn_memslot, which pins the page.
+It should be possible to just use
+
+	[ "${TARGET_EFI}" == "y" ]
+
+as the test:
+
+diff --git a/x86/efi/run b/x86/efi/run
+index 922b266..aacc691 100755
+--- a/x86/efi/run
++++ b/x86/efi/run
+@@ -52,7 +52,6 @@ popd || exit 2
+  # run in UEFI, some test cases, e.g. `x86/pmu.c`, require more free memory. A
+  # simple fix is to increase the QEMU default memory size to 256MiB so that
+  # UEFI's largest allocatable memory region is large enough.
+-EFI_RUN=y \
+  "$TEST_DIR/run" \
+  	-drive file="$EFI_UEFI",format=raw,if=pflash,readonly=on \
+  	-drive file.dir="$EFI_TEST/$EFI_CASE/",file.driver=vvfat,file.rw=on,format=raw,if=virtio \
+diff --git a/x86/run b/x86/run
+index 4eba2b9..0a4dda9 100755
+--- a/x86/run
++++ b/x86/run
+@@ -39,12 +39,12 @@ fi
+  
+  command="${qemu} --no-reboot -nodefaults $pc_testdev -vnc none -serial stdio $pci_testdev"
+  command+=" -machine accel=$ACCEL"
+-if ! [ "$EFI_RUN" ]; then
++if [ ${TARGET_EFI} != "y" ]; then
+  	command+=" -kernel"
+  fi
+  command="$(timeout_cmd) $command"
+  
+-if [ "$EFI_RUN" ]; then
++if [ ${TARGET_EFI} = "y" ]; then
+  	# Set ENVIRON_DEFAULT=n to remove '-initrd' flag for QEMU (see
+  	# 'scripts/arch-run.bash' for more details). This is because when using
+  	# UEFI, the test case binaries are passed to QEMU through the disk
 
 Paolo
 
