@@ -2,161 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CFE69440EEA
-	for <lists+kvm@lfdr.de>; Sun, 31 Oct 2021 15:51:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 15A35440F2F
+	for <lists+kvm@lfdr.de>; Sun, 31 Oct 2021 16:36:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229853AbhJaOxu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 31 Oct 2021 10:53:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23575 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229725AbhJaOxt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 31 Oct 2021 10:53:49 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635691877;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=JWkqObtzatE8ZqTA7P0n9xOaXL3kRPYh9u09IqRGd+c=;
-        b=YbfpCla095LLS2kGegcZiwxuYq9j+Z+VmuOqAnI8Mptjn005Re/0HVZKW3aNEr70O8U8cZ
-        qKIUvMxna6Y9wQRlXOzzjGvft+QuJrhLwpLuxvA4RkJDlbjz4kMmMAuZj1hxupfKC8KpcP
-        XDNFVySxYhX+kzotQgxq7XXiDbOtweE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-595-hgIuyZhQNzuaYxdMVVu2jQ-1; Sun, 31 Oct 2021 10:51:14 -0400
-X-MC-Unique: hgIuyZhQNzuaYxdMVVu2jQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3C08418D6A25;
-        Sun, 31 Oct 2021 14:51:10 +0000 (UTC)
-Received: from starship (unknown [10.40.194.243])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 885E65F4E9;
-        Sun, 31 Oct 2021 14:50:40 +0000 (UTC)
-Message-ID: <ca017e53bfa81d96dc534e395ff35b6899607fd8.camel@redhat.com>
-Subject: Re: [PATCH v2 36/43] KVM: SVM: Don't bother checking for "running"
- AVIC when kicking for IPIs
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        David Matlack <dmatlack@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>
-Date:   Sun, 31 Oct 2021 16:50:39 +0200
-In-Reply-To: <20211009021236.4122790-37-seanjc@google.com>
-References: <20211009021236.4122790-1-seanjc@google.com>
-         <20211009021236.4122790-37-seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        id S229853AbhJaPio (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 31 Oct 2021 11:38:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36440 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229734AbhJaPin (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 31 Oct 2021 11:38:43 -0400
+Received: from mail-ot1-x32a.google.com (mail-ot1-x32a.google.com [IPv6:2607:f8b0:4864:20::32a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D94F9C061570
+        for <kvm@vger.kernel.org>; Sun, 31 Oct 2021 08:36:11 -0700 (PDT)
+Received: by mail-ot1-x32a.google.com with SMTP id v19-20020a9d69d3000000b00555a7318f31so9602398oto.9
+        for <kvm@vger.kernel.org>; Sun, 31 Oct 2021 08:36:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=zyaynE2EfZgIjGnuqh23tw4nEncoqsvfeJUvwl7i7Ug=;
+        b=RBv+zjSFfYMBSI99yAG/uYZn02QQISN752m+UmLJHXLVYUw7gkj9yaP5335oYvl1Ks
+         JaGGn0gYvETTDEdNCA0RQ2yZKTkOhbFP0ZWFwjGQ9TPG7KCp8NRfjW7mcbJrvsXNsSeK
+         Zj/K7k45s9mx+85nFDZa2QSLyFi4ecKTFJ2aCUt1aKgeeF4smnjeaMiPZGU4QSVINNHa
+         M0dHj2Uli8hLDOB7yLkXSOGHQJUyj2p3+TwEZBgcmSZSlES503Vm2A08geIsTLtil6jk
+         F2rHulYvTB+6GB7F8AXCJNI93AT7fjO/5BG/8XXtxEWMWqhIASgrXCgEDzeodOHvmZ6W
+         IUjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=zyaynE2EfZgIjGnuqh23tw4nEncoqsvfeJUvwl7i7Ug=;
+        b=rPSYXosvNet8rk+gXm5otktXYloWmIaLD52GWw3Exk12+drihvu7LhhksliLMVODiP
+         zEPdd/RjXmjEYQbh1D6+8T3nXiesEmc2UL++ZCdIUxmAebRXXtJFEp6Zjd3MrHKi2S9b
+         V3sGPvkON0wiMNQIS2HUnQkx8Y4jPctUTgY0yBoCVZFPijJT/Wk3JKh5KugCzbhG/m4M
+         aI2OO9nglfbIq6Sf0wcmPL6hefs77lPsJBOStUMJXlUvwVEU8zDckyIJsJNfYzoUk6NA
+         JMoC0V0lhD1rO/OnnD5uZU/Ay5CR3IJVs9ncoYvkYabNtPYG43+RUsoVu4amgXHWvgZ0
+         9/nA==
+X-Gm-Message-State: AOAM531sxWe0fqu+P53wkW6P56VAo/Je1ok1A5QYqw8yl+Cn6CQnzWSA
+        x2W2rbHdZTgyfGqRXNPsmdwMbCFqIj80TuMB4FTNWw==
+X-Google-Smtp-Source: ABdhPJxWyoZcoMk9z8Ozd0F29yk/e3pwfWP5yaJ7EwPAmF/hBEH1Xfp0ZrSsPzfbUhIe3020MdnDJAXe2Ie5Vf3dmaM=
+X-Received: by 2002:a9d:1c8c:: with SMTP id l12mr17258110ota.35.1635694541082;
+ Sun, 31 Oct 2021 08:35:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+References: <20211031055634.894263-1-zxwang42@gmail.com> <20211031055634.894263-7-zxwang42@gmail.com>
+ <969294ed-444b-3806-af2d-b94ed9eded80@redhat.com>
+In-Reply-To: <969294ed-444b-3806-af2d-b94ed9eded80@redhat.com>
+From:   Marc Orr <marcorr@google.com>
+Date:   Sun, 31 Oct 2021 08:35:29 -0700
+Message-ID: <CAA03e5EBZ0YYf+nDjHRuaHX=on+u4hph3AFyiSRty6QLkB=Vbw@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH v1 6/7] scripts: Generalize EFI check
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Zixuan Wang <zxwang42@gmail.com>, kvm@vger.kernel.org,
+        drjones@redhat.com, erdemaktas@google.com, rientjes@google.com,
+        seanjc@google.com, brijesh.singh@amd.com, Thomas.Lendacky@amd.com,
+        varad.gautam@suse.com, jroedel@suse.de, bp@suse.de
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2021-10-08 at 19:12 -0700, Sean Christopherson wrote:
-> Drop the avic_vcpu_is_running() check when waking vCPUs in response to a
-> VM-Exit due to incomplete IPI delivery.  The check isn't wrong per se, but
-> it's not 100% accurate in the sense that it doesn't guarantee that the vCPU
-> was one of the vCPUs that didn't receive the IPI.
-> 
-> The check isn't required for correctness as blocking == !running in this
-> context.
-> 
-> From a performance perspective, waking a live task is not expensive as the
-> only moderately costly operation is a locked operation to temporarily
-> disable preemption.  And if that is indeed a performance issue,
-> kvm_vcpu_is_blocking() would be a better check than poking into the AVIC.
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/svm/avic.c | 15 +++++++++------
->  arch/x86/kvm/svm/svm.h  | 11 -----------
->  2 files changed, 9 insertions(+), 17 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> index cbf02e7e20d0..b43b05610ade 100644
-> --- a/arch/x86/kvm/svm/avic.c
-> +++ b/arch/x86/kvm/svm/avic.c
-> @@ -295,13 +295,16 @@ static void avic_kick_target_vcpus(struct kvm *kvm, struct kvm_lapic *source,
->  	struct kvm_vcpu *vcpu;
->  	int i;
->  
-> +	/*
-> +	 * Wake any target vCPUs that are blocking, i.e. waiting for a wake
-> +	 * event.  There's no need to signal doorbells, as hardware has handled
-> +	 * vCPUs that were in guest at the time of the IPI, and vCPUs that have
-> +	 * since entered the guest will have processed pending IRQs at VMRUN.
-> +	 */
->  	kvm_for_each_vcpu(i, vcpu, kvm) {
-> -		bool m = kvm_apic_match_dest(vcpu, source,
-> -					     icrl & APIC_SHORT_MASK,
-> -					     GET_APIC_DEST_FIELD(icrh),
-> -					     icrl & APIC_DEST_MASK);
-> -
-> -		if (m && !avic_vcpu_is_running(vcpu))
-> +		if (kvm_apic_match_dest(vcpu, source, icrl & APIC_SHORT_MASK,
-> +					GET_APIC_DEST_FIELD(icrh),
-> +					icrl & APIC_DEST_MASK))
->  			kvm_vcpu_wake_up(vcpu);
->  	}
->  }
-> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-> index 0d7bbe548ac3..7f5b01bbee29 100644
-> --- a/arch/x86/kvm/svm/svm.h
-> +++ b/arch/x86/kvm/svm/svm.h
-> @@ -509,17 +509,6 @@ extern struct kvm_x86_nested_ops svm_nested_ops;
->  
->  #define VMCB_AVIC_APIC_BAR_MASK		0xFFFFFFFFFF000ULL
->  
-> -static inline bool (struct kvm_vcpu *vcpu)
-> -{
-> -	struct vcpu_svm *svm = to_svm(vcpu);
-> -	u64 *entry = svm->avic_physical_id_cache;
-> -
-> -	if (!entry)
-> -		return false;
-> -
-> -	return (READ_ONCE(*entry) & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK);
-> -}
-> -
->  int avic_ga_log_notifier(u32 ga_tag);
->  void avic_vm_destroy(struct kvm *kvm);
->  int avic_vm_init(struct kvm *kvm);
+On Sun, Oct 31, 2021 at 12:13 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 31/10/21 06:56, Zixuan Wang wrote:
+> > From: Marc Orr<marcorr@google.com>
+> >
+> > Previously, the scripts distinguish between seabios and UEFI via a
+> > hard-coded env var in the EFI run script, `arch/x86/efi/run`.
+> > Furthermore, this var is passed to the x86 run script, `arch/x86/run`,
+> > and then not available in other scripts (or to other architectures).
+> >
+> > Replace the previous approach with a common helper function to check
+> > whether the repo has been configured to run under EFI. The helper does
+> > this by probing the `config.mak` file generated by `configure`.
+>
+> It should be possible to just use
+>
+>         [ "${TARGET_EFI}" == "y" ]
+>
+> as the test:
+>
+> diff --git a/x86/efi/run b/x86/efi/run
+> index 922b266..aacc691 100755
+> --- a/x86/efi/run
+> +++ b/x86/efi/run
+> @@ -52,7 +52,6 @@ popd || exit 2
+>   # run in UEFI, some test cases, e.g. `x86/pmu.c`, require more free memory. A
+>   # simple fix is to increase the QEMU default memory size to 256MiB so that
+>   # UEFI's largest allocatable memory region is large enough.
+> -EFI_RUN=y \
+>   "$TEST_DIR/run" \
+>         -drive file="$EFI_UEFI",format=raw,if=pflash,readonly=on \
+>         -drive file.dir="$EFI_TEST/$EFI_CASE/",file.driver=vvfat,file.rw=on,format=raw,if=virtio \
+> diff --git a/x86/run b/x86/run
+> index 4eba2b9..0a4dda9 100755
+> --- a/x86/run
+> +++ b/x86/run
+> @@ -39,12 +39,12 @@ fi
+>
+>   command="${qemu} --no-reboot -nodefaults $pc_testdev -vnc none -serial stdio $pci_testdev"
+>   command+=" -machine accel=$ACCEL"
+> -if ! [ "$EFI_RUN" ]; then
+> +if [ ${TARGET_EFI} != "y" ]; then
+>         command+=" -kernel"
+>   fi
+>   command="$(timeout_cmd) $command"
+>
+> -if [ "$EFI_RUN" ]; then
+> +if [ ${TARGET_EFI} = "y" ]; then
+>         # Set ENVIRON_DEFAULT=n to remove '-initrd' flag for QEMU (see
+>         # 'scripts/arch-run.bash' for more details). This is because when using
+>         # UEFI, the test case binaries are passed to QEMU through the disk
+>
+> Paolo
+>
 
-
-I guess this makes sense to do, to get rid of the avic_vcpu_is_running.
-As you explained in previous patch, waking up a live task isn't that expensive,
-so let it be.
-
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-
-Best regards,
-	Maxim Levitsky 
-
+Agreed. That SGTM.
