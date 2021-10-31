@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A02F440D4B
+	by mail.lfdr.de (Postfix) with ESMTP id 72E31440D4C
 	for <lists+kvm@lfdr.de>; Sun, 31 Oct 2021 06:57:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230196AbhJaF7S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 31 Oct 2021 01:59:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52870 "EHLO
+        id S230110AbhJaF7T (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 31 Oct 2021 01:59:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230289AbhJaF7Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 31 Oct 2021 01:59:16 -0400
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34EEEC061714
-        for <kvm@vger.kernel.org>; Sat, 30 Oct 2021 22:56:45 -0700 (PDT)
-Received: by mail-pg1-x52b.google.com with SMTP id g184so14116368pgc.6
-        for <kvm@vger.kernel.org>; Sat, 30 Oct 2021 22:56:45 -0700 (PDT)
+        with ESMTP id S230312AbhJaF7R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 31 Oct 2021 01:59:17 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B1B0C061570
+        for <kvm@vger.kernel.org>; Sat, 30 Oct 2021 22:56:46 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id n18so9550318plc.2
+        for <kvm@vger.kernel.org>; Sat, 30 Oct 2021 22:56:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=sNcO4ibyEoUEN8Dd5WdiBof8ChwMLkTeLNeAxVmxfok=;
-        b=qsOi42wzaB6RWKrjOyfTKcs1obiU7gL0Y7FdgLPVkYX5d7T8yl0B+KkwEt9EgVABHG
-         aJ5vp9x6l6Xst5x/W3Q3ntuOzQqSQXED4PLBkxRXT/WM67UtzBEJHKYGisJuJufsVIC4
-         Y1a0rOUTIyFPnsENakwX6uT57VESOXLaY4OUSVhWGDU3dYtWFv7TissQgoBObc3VgtXK
-         1MsfEIjIEjOY2LGZ81cCiTCh0mvFSJLeODeEFzhntRpvMKMaXpC10gt+dSyPCNJoNcGl
-         d/gXHcBg0M+jTXdrHLawdOc+Mpl9fSxJ/XtswrXq22YhilFel4aYRa9tOC0IrGFChd8s
-         9yKA==
+        bh=bO1N9Zxka8xPPjy7oAD9PdbIBCgxedCv6giVOzcBrEo=;
+        b=j28CygT/ZpQn9InIn1/xNT6zmecpXfZ1dT/Oy91/kUTkbsSGmZKH3gh5CmpHs7FbgO
+         3rwpdhWYlV+T+G08NZIRHfWsY9dIsVyvZhzg1A2Vf1+ouzEFAF9aYhjD1rCsB1TZuHSX
+         D0sMuBBqAQIHwNgzZ7jiM8xf/Fr2pnvN2Ln6p+AYEbIPbOuIi1UBOdu6xpFhjBnKvyFZ
+         PuSYcSvOav+qHqC4P9CzW6duIVmGUuuY8hOzMPxub/a4ue4Egzus9crLT3uOz71uifut
+         83GxfqtDm2qVNz99j4TNm6SeRKc+lYpqDTwfa/4JPhkKM+u9SCFJ2DNNQORF2/GKT7Ki
+         bxfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=sNcO4ibyEoUEN8Dd5WdiBof8ChwMLkTeLNeAxVmxfok=;
-        b=gxBym+Qq4TLilzqM55Xq85ALshR3OjcWLVXLGx0Iq8UMjl3QEktIoXP3pmst8cFTQ2
-         vw31FiLL+aOPZP6jtoGfbiFSdmrYKeGw3aVkUxv2Hcex5Ih3Wv7HOfAuX4jwWj6yRqYi
-         vhn1H03k1ySeZ4QziZGpj81UHkXkwGAU/is4qYaoI0G0WvX4RHb2vBEpNwAeyni/NCw0
-         SEXZTYvRENhNAmweOPPO7lMgs0faUd0itXFxSD2gW/fkkoced6EDL41eqoxLVLiBt8lF
-         vS0Ff2pzGZKLlSLsB23eARdgC5jOA+ERSIHjSh+pfnGCQEIf0D6mle7YUsMD4HXy/ykp
-         Juag==
-X-Gm-Message-State: AOAM530ZzTx4rbs5GJ0dKYj3t0eoh8NGYBRUW5OiiL0DXZbfyn0zoywV
-        Of7qzaE2Hwcj40w6OtV6HcSFx1CzsCPPwQ==
-X-Google-Smtp-Source: ABdhPJwCWyvcFXfMMwAO40D+5pJ5OV3GqEzWvWjuHWZ1V1uhM9CLPfkyvVqZ+wd1drYOsEP7fZTBIA==
-X-Received: by 2002:a62:e901:0:b0:47b:f1bc:55e4 with SMTP id j1-20020a62e901000000b0047bf1bc55e4mr21252575pfh.0.1635659804346;
-        Sat, 30 Oct 2021 22:56:44 -0700 (PDT)
+        bh=bO1N9Zxka8xPPjy7oAD9PdbIBCgxedCv6giVOzcBrEo=;
+        b=YEXzsjiz+gdjV4G0mXzphWekYVM4CkhQD/FDSWl7CbjWuC1YDWHVjqGThlpyDS2Fmt
+         ZA1DxFkAmI+2AAb1HoSKI+h5uByXQIXmvvuh19RTLEN3ecHkvYrAJv3jpQ9OZt52Z6YM
+         QqmZbTiqMyl4c+84YQxWaULISYbe/hFkOSQ0bkMhTuiSi0tGfNEaMBv4stw0u3hT9kfi
+         jutGTjlZKPQmMc3lsdlNYDswsO4FydfVAPjqC75+h2lfPbk0erPH+KIOz0UNjkjx4M5J
+         RG0S2kYExdtWBn9CytQEb1Nb86GpEN93/PlqnxKbVHl+8OcnDEJMB2OTYUkSf6p7o3+t
+         FCVw==
+X-Gm-Message-State: AOAM533EnvWL245z5O7TgTYGzbg8PXXwNjXMBZBsaJIqR4ypcqNKNy8h
+        ESJGfWNd9evzWAPFHWQOFTFpEGTZlXzxeQ==
+X-Google-Smtp-Source: ABdhPJxbNfV9ix53yVOMFyoGQQXpL5lukS4AaLgTqtSFhXZHwpHR3BB0cZc2GhAvNdC/legwTEwIjg==
+X-Received: by 2002:a17:90a:1649:: with SMTP id x9mr29964507pje.70.1635659805805;
+        Sat, 30 Oct 2021 22:56:45 -0700 (PDT)
 Received: from localhost.localdomain (netadmin.ucsd.edu. [137.110.160.224])
-        by smtp.gmail.com with ESMTPSA id j19sm11403179pfj.127.2021.10.30.22.56.43
+        by smtp.gmail.com with ESMTPSA id j19sm11403179pfj.127.2021.10.30.22.56.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 30 Oct 2021 22:56:43 -0700 (PDT)
+        Sat, 30 Oct 2021 22:56:45 -0700 (PDT)
 From:   Zixuan Wang <zxwang42@gmail.com>
 To:     kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com
 Cc:     marcorr@google.com, erdemaktas@google.com, rientjes@google.com,
         seanjc@google.com, brijesh.singh@amd.com, Thomas.Lendacky@amd.com,
         varad.gautam@suse.com, jroedel@suse.de, bp@suse.de
-Subject: [kvm-unit-tests PATCH v1 5/7] x86 UEFI: Exit QEMU with return code
-Date:   Sat, 30 Oct 2021 22:56:32 -0700
-Message-Id: <20211031055634.894263-6-zxwang42@gmail.com>
+Subject: [kvm-unit-tests PATCH v1 6/7] scripts: Generalize EFI check
+Date:   Sat, 30 Oct 2021 22:56:33 -0700
+Message-Id: <20211031055634.894263-7-zxwang42@gmail.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20211031055634.894263-1-zxwang42@gmail.com>
 References: <20211031055634.894263-1-zxwang42@gmail.com>
@@ -64,50 +64,78 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Zixuan Wang <zxwang42@gmail.com>
+From: Marc Orr <marcorr@google.com>
 
-kvm-unit-tests runner scripts parse QEMU exit code to determine if a
-test case runs successfully. But the UEFI 'reset_system' function always
-exits QEMU with code 0, even if the test case returns a non-zero code.
+Previously, the scripts distinguish between seabios and UEFI via a
+hard-coded env var in the EFI run script, `arch/x86/efi/run`.
+Furthermore, this var is passed to the x86 run script, `arch/x86/run`,
+and then not available in other scripts (or to other architectures).
 
-This commit fixes this issue by replacing the 'reset_system' call with
-an 'exit' call, which ensures QEMU exit with the correct code.
+Replace the previous approach with a common helper function to check
+whether the repo has been configured to run under EFI. The helper does
+this by probing the `config.mak` file generated by `configure`.
 
-Signed-off-by: Zixuan Wang <zxwang42@gmail.com>
+Signed-off-by: Marc Orr <marcorr@google.com>
 ---
- lib/efi.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ scripts/common.bash | 5 +++++
+ x86/efi/run         | 1 -
+ x86/run             | 6 ++++--
+ 3 files changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/lib/efi.c b/lib/efi.c
-index 99eb00c..cc0386c 100644
---- a/lib/efi.c
-+++ b/lib/efi.c
-@@ -87,7 +87,7 @@ efi_status_t efi_get_system_config_table(efi_guid_t table_guid, void **table)
+diff --git a/scripts/common.bash b/scripts/common.bash
+index 7b983f7..6f45843 100644
+--- a/scripts/common.bash
++++ b/scripts/common.bash
+@@ -1,5 +1,10 @@
+ source config.mak
  
- efi_status_t efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
++function running_under_efi()
++{
++	[[ ${TARGET_EFI} == "y" ]] && echo "y" || echo ""
++}
++
+ function for_each_unittest()
  {
--	int ret;
-+	unsigned long ret;
- 	efi_status_t status;
- 	efi_bootinfo_t efi_bootinfo;
+ 	local unittests="$1"
+diff --git a/x86/efi/run b/x86/efi/run
+index 922b266..aacc691 100755
+--- a/x86/efi/run
++++ b/x86/efi/run
+@@ -52,7 +52,6 @@ popd || exit 2
+ # run in UEFI, some test cases, e.g. `x86/pmu.c`, require more free memory. A
+ # simple fix is to increase the QEMU default memory size to 256MiB so that
+ # UEFI's largest allocatable memory region is large enough.
+-EFI_RUN=y \
+ "$TEST_DIR/run" \
+ 	-drive file="$EFI_UEFI",format=raw,if=pflash,readonly=on \
+ 	-drive file.dir="$EFI_TEST/$EFI_CASE/",file.driver=vvfat,file.rw=on,format=raw,if=virtio \
+diff --git a/x86/run b/x86/run
+index 4eba2b9..95b56b6 100755
+--- a/x86/run
++++ b/x86/run
+@@ -1,5 +1,7 @@
+ #!/usr/bin/env bash
  
-@@ -134,14 +134,14 @@ efi_status_t efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
- 	ret = main(__argc, __argv, __environ);
++source scripts/common.bash
++
+ if [ -z "$STANDALONE" ]; then
+ 	if [ ! -f config.mak ]; then
+ 		echo "run ./configure && make first. See ./configure -h"
+@@ -39,12 +41,12 @@ fi
  
- 	/* Shutdown the guest VM */
--	efi_rs_call(reset_system, EFI_RESET_SHUTDOWN, ret, 0, NULL);
-+	exit(ret);
+ command="${qemu} --no-reboot -nodefaults $pc_testdev -vnc none -serial stdio $pci_testdev"
+ command+=" -machine accel=$ACCEL"
+-if ! [ "$EFI_RUN" ]; then
++if ! [ "$(running_under_efi)" ]; then
+ 	command+=" -kernel"
+ fi
+ command="$(timeout_cmd) $command"
  
- 	/* Unreachable */
- 	return EFI_UNSUPPORTED;
- 
- efi_main_error:
- 	/* Shutdown the guest with error EFI status */
--	efi_rs_call(reset_system, EFI_RESET_SHUTDOWN, status, 0, NULL);
-+	exit(status);
- 
- 	/* Unreachable */
- 	return EFI_UNSUPPORTED;
+-if [ "$EFI_RUN" ]; then
++if [ "$(running_under_efi)" ]; then
+ 	# Set ENVIRON_DEFAULT=n to remove '-initrd' flag for QEMU (see
+ 	# 'scripts/arch-run.bash' for more details). This is because when using
+ 	# UEFI, the test case binaries are passed to QEMU through the disk
 -- 
 2.33.0
 
