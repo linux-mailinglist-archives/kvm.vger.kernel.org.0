@@ -2,202 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B8FE4421D0
-	for <lists+kvm@lfdr.de>; Mon,  1 Nov 2021 21:44:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DA14944226A
+	for <lists+kvm@lfdr.de>; Mon,  1 Nov 2021 22:12:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229964AbhKAUqe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Nov 2021 16:46:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56618 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229541AbhKAUqe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Nov 2021 16:46:34 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7827DC061714
-        for <kvm@vger.kernel.org>; Mon,  1 Nov 2021 13:44:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=VmyM68tJ7AyabrNMkQY/Me2NQSNTU4ywpbRzi0Lr/ps=; b=jYQSuwU9t/NHZ6bDWkc4wCgwcl
-        B4YnSIhp9IJjAXjaqqTevqyyU1Hw376OsXS8VMy0k8V11QsBCwfBIIrSAXuS80eIAqr0GscX10TU9
-        264BLeWBUBHQAbRmhudR6haB/t1+ffzH8opd36f/bacJmJKF8wmTdqeg7bspmVpil7POiQf9CUWFn
-        +pldnLy+ELtHePIjrq24eewI31afifm+aR2dBnVBf3TagtHWROCfrEKKVFrwJHIGjH4K5ZZxweDHc
-        UJfGRwrZzW2wXea5o9f1ODVDoIH1xN4IdZGdBfU49xBAL30YunY+ndLAyyYBmrFKbaLBcahFDQ1Of
-        4dhE6D3w==;
-Received: from [2001:8b0:10b:1::3ae] (helo=u3832b3a9db3152.ant.amazon.com)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mhe9j-00HI2E-8F; Mon, 01 Nov 2021 20:43:47 +0000
-Message-ID: <1f70ec5b3018ee598959c9f580a0065cf8ba7510.camel@infradead.org>
-Subject: Re: [PATCH 5/6] KVM: x86/xen: Maintain valid mapping of Xen
- shared_inf=
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     kernel test robot <lkp@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Raslan, KarimAllah" <karahmed@amazon.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Ankur Arora <ankur.a.arora@oracle.com>
-Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
-        "jmattson@google.com" <jmattson@google.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "mtosatti@redhat.com" <mtosatti@redhat.com>
-Date:   Mon, 01 Nov 2021 20:43:42 +0000
-In-Reply-To: <202111020458.3Cfw2cfn-lkp@intel.com>
-References: <8ba4d8cf27f03eb13841ebb9039fc4ff15fa1b50.camel@infradead.org>
-         <202111020458.3Cfw2cfn-lkp@intel.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-Y5QIEiOEc8ExfLY3/9J3"
-User-Agent: Evolution 3.36.5-0ubuntu1 
+        id S230246AbhKAVO5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Nov 2021 17:14:57 -0400
+Received: from out02.mta.xmission.com ([166.70.13.232]:38738 "EHLO
+        out02.mta.xmission.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229501AbhKAVOy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Nov 2021 17:14:54 -0400
+Received: from in01.mta.xmission.com ([166.70.13.51]:44908)
+        by out02.mta.xmission.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.93)
+        (envelope-from <ebiederm@xmission.com>)
+        id 1mhebJ-0082VH-1q; Mon, 01 Nov 2021 15:12:17 -0600
+Received: from ip68-227-160-95.om.om.cox.net ([68.227.160.95]:34474 helo=email.xmission.com)
+        by in01.mta.xmission.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.93)
+        (envelope-from <ebiederm@xmission.com>)
+        id 1mhebH-002zh6-PG; Mon, 01 Nov 2021 15:12:16 -0600
+From:   ebiederm@xmission.com (Eric W. Biederman)
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
+        kexec@lists.infradead.org, Joerg Roedel <jroedel@suse.de>,
+        stable@vger.kernel.org, hpa@zytor.com,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+References: <20210913155603.28383-1-joro@8bytes.org>
+        <20210913155603.28383-2-joro@8bytes.org> <YYARccITlowHABg1@zn.tnic>
+Date:   Mon, 01 Nov 2021 16:11:42 -0500
+In-Reply-To: <YYARccITlowHABg1@zn.tnic> (Borislav Petkov's message of "Mon, 1
+        Nov 2021 17:10:25 +0100")
+Message-ID: <87pmrjbmy9.fsf@disp2133>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain
+X-XM-SPF: eid=1mhebH-002zh6-PG;;;mid=<87pmrjbmy9.fsf@disp2133>;;;hst=in01.mta.xmission.com;;;ip=68.227.160.95;;;frm=ebiederm@xmission.com;;;spf=neutral
+X-XM-AID: U2FsdGVkX1/dOcje8rMk6fFebgEu/saSTasGNFo4jXQ=
+X-SA-Exim-Connect-IP: 68.227.160.95
+X-SA-Exim-Mail-From: ebiederm@xmission.com
+X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on sa08.xmission.com
+X-Spam-Level: **
+X-Spam-Status: No, score=2.5 required=8.0 tests=ALL_TRUSTED,BAYES_50,
+        DCC_CHECK_NEGATIVE,TR_XM_BayesUnsub,T_TM2_M_HEADER_IN_MSG,
+        T_TooManySym_01,XMSubLong,XM_B_Unsub autolearn=disabled version=3.4.2
+X-Spam-Report: * -1.0 ALL_TRUSTED Passed through trusted hosts only via SMTP
+        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
+        *      [score: 0.4982]
+        *  0.7 XMSubLong Long Subject
+        *  0.0 T_TM2_M_HEADER_IN_MSG BODY: No description available.
+        * -0.0 DCC_CHECK_NEGATIVE Not listed in DCC
+        *      [sa08 1397; Body=1 Fuz1=1 Fuz2=1]
+        *  0.0 T_TooManySym_01 4+ unique symbols in subject
+        *  0.5 XM_B_Unsub Unsubscribe in body of email but missing unsubscribe
+        *       header
+        *  1.5 TR_XM_BayesUnsub High bayes score with no unsubscribe header
+X-Spam-DCC: XMission; sa08 1397; Body=1 Fuz1=1 Fuz2=1 
+X-Spam-Combo: **;Borislav Petkov <bp@alien8.de>
+X-Spam-Relay-Country: 
+X-Spam-Timing: total 611 ms - load_scoreonly_sql: 0.05 (0.0%),
+        signal_user_changed: 14 (2.3%), b_tie_ro: 12 (2.0%), parse: 0.91
+        (0.1%), extract_message_metadata: 17 (2.8%), get_uri_detail_list: 1.38
+        (0.2%), tests_pri_-1000: 11 (1.8%), tests_pri_-950: 1.41 (0.2%),
+        tests_pri_-900: 1.43 (0.2%), tests_pri_-90: 131 (21.5%), check_bayes:
+        112 (18.4%), b_tokenize: 8 (1.3%), b_tok_get_all: 8 (1.3%),
+        b_comp_prob: 2.8 (0.5%), b_tok_touch_all: 88 (14.4%), b_finish: 1.62
+        (0.3%), tests_pri_0: 416 (68.0%), check_dkim_signature: 0.64 (0.1%),
+        check_dkim_adsp: 3.1 (0.5%), poll_dns_idle: 1.11 (0.2%), tests_pri_10:
+        3.8 (0.6%), tests_pri_500: 11 (1.8%), rewrite_mail: 0.00 (0.0%)
+Subject: Re: [PATCH v2 01/12] kexec: Allow architecture code to opt-out at runtime
+X-SA-Exim-Version: 4.2.1 (built Sat, 08 Feb 2020 21:53:50 +0000)
+X-SA-Exim-Scanned: Yes (on in01.mta.xmission.com)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Borislav Petkov <bp@alien8.de> writes:
 
---=-Y5QIEiOEc8ExfLY3/9J3
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+> On Mon, Sep 13, 2021 at 05:55:52PM +0200, Joerg Roedel wrote:
+>> From: Joerg Roedel <jroedel@suse.de>
+>> 
+>> Allow a runtime opt-out of kexec support for architecture code in case
+>> the kernel is running in an environment where kexec is not properly
+>> supported yet.
+>> 
+>> This will be used on x86 when the kernel is running as an SEV-ES
+>> guest. SEV-ES guests need special handling for kexec to hand over all
+>> CPUs to the new kernel. This requires special hypervisor support and
+>> handling code in the guest which is not yet implemented.
+>> 
+>> Cc: stable@vger.kernel.org # v5.10+
+>> Signed-off-by: Joerg Roedel <jroedel@suse.de>
+>> ---
+>>  include/linux/kexec.h |  1 +
+>>  kernel/kexec.c        | 14 ++++++++++++++
+>>  kernel/kexec_file.c   |  9 +++++++++
+>>  3 files changed, 24 insertions(+)
+>
+> I guess I can take this through the tip tree along with the next one.
 
-On Tue, 2021-11-02 at 04:35 +0800, kernel test robot wrote:
->=20
-> All errors (new ones prefixed by >>):
->=20
-> >> arch/x86/kvm/mmu/mmu.c:1582:30: error: use of undeclared identifier 'k=
-vm_xen_enabled'
->            if (static_branch_unlikely(&kvm_xen_enabled.key)) {
->                                        ^
-> >> arch/x86/kvm/mmu/mmu.c:1582:30: error: use of undeclared identifier 'k=
-vm_xen_enabled'
-> >> arch/x86/kvm/mmu/mmu.c:1582:30: error: use of undeclared identifier 'k=
-vm_xen_enabled'
-> >> arch/x86/kvm/mmu/mmu.c:1582:30: error: use of undeclared identifier 'k=
-vm_xen_enabled'
-> >> arch/x86/kvm/mmu/mmu.c:1582:6: error: invalid argument type 'void' to =
-unary expression
->            if (static_branch_unlikely(&kvm_xen_enabled.key)) {
->                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
->    include/linux/jump_label.h:508:35: note: expanded from macro 'static_b=
-ranch_unlikely'
->    #define static_branch_unlikely(x)       unlikely_notrace(static_key_en=
-abled(&(x)->key))
->                                            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~~~~~~~~~~~~~~~
->    include/linux/compiler.h:80:30: note: expanded from macro 'unlikely_no=
-trace'
->    # define unlikely_notrace(x)    unlikely(x)
->                                    ^~~~~~~~~~~
->    include/linux/compiler.h:78:40: note: expanded from macro 'unlikely'
->    # define unlikely(x)    __builtin_expect(!!(x), 0)
->                                              ^~~~
->    5 errors generated.
+I seem to remember the consensus when this was reviewed that it was
+unnecessary and there is already support for doing something like
+this at a more fine grained level so we don't need a new kexec hook.
 
-
-Oops, missing #ifdef CONFIG_KVM_XEN around that one. Fixed in=20
-https://git.infradead.org/users/dwmw2/linux.git/shortlog/refs/heads/xen-evt=
-chn
-
-Thanks.
-
---=-Y5QIEiOEc8ExfLY3/9J3
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCECow
-ggUcMIIEBKADAgECAhEA4rtJSHkq7AnpxKUY8ZlYZjANBgkqhkiG9w0BAQsFADCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTkwMTAyMDAwMDAwWhcNMjIwMTAxMjM1
-OTU5WjAkMSIwIAYJKoZIhvcNAQkBFhNkd213MkBpbmZyYWRlYWQub3JnMIIBIjANBgkqhkiG9w0B
-AQEFAAOCAQ8AMIIBCgKCAQEAsv3wObLTCbUA7GJqKj9vHGf+Fa+tpkO+ZRVve9EpNsMsfXhvFpb8
-RgL8vD+L133wK6csYoDU7zKiAo92FMUWaY1Hy6HqvVr9oevfTV3xhB5rQO1RHJoAfkvhy+wpjo7Q
-cXuzkOpibq2YurVStHAiGqAOMGMXhcVGqPuGhcVcVzVUjsvEzAV9Po9K2rpZ52FE4rDkpDK1pBK+
-uOAyOkgIg/cD8Kugav5tyapydeWMZRJQH1vMQ6OVT24CyAn2yXm2NgTQMS1mpzStP2ioPtTnszIQ
-Ih7ASVzhV6csHb8Yrkx8mgllOyrt9Y2kWRRJFm/FPRNEurOeNV6lnYAXOymVJwIDAQABo4IB0zCC
-Ac8wHwYDVR0jBBgwFoAUgq9sjPjF/pZhfOgfPStxSF7Ei8AwHQYDVR0OBBYEFLfuNf820LvaT4AK
-xrGK3EKx1DE7MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUF
-BwMEBggrBgEFBQcDAjBGBgNVHSAEPzA9MDsGDCsGAQQBsjEBAgEDBTArMCkGCCsGAQUFBwIBFh1o
-dHRwczovL3NlY3VyZS5jb21vZG8ubmV0L0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3Js
-LmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWls
-Q0EuY3JsMIGLBggrBgEFBQcBAQR/MH0wVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuY29tb2RvY2Eu
-Y29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYI
-KwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmNvbW9kb2NhLmNvbTAeBgNVHREEFzAVgRNkd213MkBpbmZy
-YWRlYWQub3JnMA0GCSqGSIb3DQEBCwUAA4IBAQALbSykFusvvVkSIWttcEeifOGGKs7Wx2f5f45b
-nv2ghcxK5URjUvCnJhg+soxOMoQLG6+nbhzzb2rLTdRVGbvjZH0fOOzq0LShq0EXsqnJbbuwJhK+
-PnBtqX5O23PMHutP1l88AtVN+Rb72oSvnD+dK6708JqqUx2MAFLMevrhJRXLjKb2Mm+/8XBpEw+B
-7DisN4TMlLB/d55WnT9UPNHmQ+3KFL7QrTO8hYExkU849g58Dn3Nw3oCbMUgny81ocrLlB2Z5fFG
-Qu1AdNiBA+kg/UxzyJZpFbKfCITd5yX49bOriL692aMVDyqUvh8fP+T99PqorH4cIJP6OxSTdxKM
-MIIFHDCCBASgAwIBAgIRAOK7SUh5KuwJ6cSlGPGZWGYwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTE5MDEwMjAwMDAwMFoXDTIyMDEwMTIz
-NTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCASIwDQYJKoZIhvcN
-AQEBBQADggEPADCCAQoCggEBALL98Dmy0wm1AOxiaio/bxxn/hWvraZDvmUVb3vRKTbDLH14bxaW
-/EYC/Lw/i9d98CunLGKA1O8yogKPdhTFFmmNR8uh6r1a/aHr301d8YQea0DtURyaAH5L4cvsKY6O
-0HF7s5DqYm6tmLq1UrRwIhqgDjBjF4XFRqj7hoXFXFc1VI7LxMwFfT6PStq6WedhROKw5KQytaQS
-vrjgMjpICIP3A/CroGr+bcmqcnXljGUSUB9bzEOjlU9uAsgJ9sl5tjYE0DEtZqc0rT9oqD7U57My
-ECIewElc4VenLB2/GK5MfJoJZTsq7fWNpFkUSRZvxT0TRLqznjVepZ2AFzsplScCAwEAAaOCAdMw
-ggHPMB8GA1UdIwQYMBaAFIKvbIz4xf6WYXzoHz0rcUhexIvAMB0GA1UdDgQWBBS37jX/NtC72k+A
-CsaxitxCsdQxOzAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEF
-BQcDBAYIKwYBBQUHAwIwRgYDVR0gBD8wPTA7BgwrBgEEAbIxAQIBAwUwKzApBggrBgEFBQcCARYd
-aHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9DUFMwWgYDVR0fBFMwUTBPoE2gS4ZJaHR0cDovL2Ny
-bC5jb21vZG9jYS5jb20vQ09NT0RPUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFp
-bENBLmNybDCBiwYIKwYBBQUHAQEEfzB9MFUGCCsGAQUFBzAChklodHRwOi8vY3J0LmNvbW9kb2Nh
-LmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3J0MCQG
-CCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAC20spBbrL71ZEiFrbXBHonzhhirO1sdn+X+O
-W579oIXMSuVEY1LwpyYYPrKMTjKECxuvp24c829qy03UVRm742R9Hzjs6tC0oatBF7KpyW27sCYS
-vj5wbal+TttzzB7rT9ZfPALVTfkW+9qEr5w/nSuu9PCaqlMdjABSzHr64SUVy4ym9jJvv/FwaRMP
-gew4rDeEzJSwf3eeVp0/VDzR5kPtyhS+0K0zvIWBMZFPOPYOfA59zcN6AmzFIJ8vNaHKy5QdmeXx
-RkLtQHTYgQPpIP1Mc8iWaRWynwiE3ecl+PWzq4i+vdmjFQ8qlL4fHz/k/fT6qKx+HCCT+jsUk3cS
-jDCCBeYwggPOoAMCAQICEGqb4Tg7/ytrnwHV2binUlYwDQYJKoZIhvcNAQEMBQAwgYUxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMSswKQYDVQQDEyJDT01PRE8gUlNBIENlcnRpZmljYXRp
-b24gQXV0aG9yaXR5MB4XDTEzMDExMDAwMDAwMFoXDTI4MDEwOTIzNTk1OVowgZcxCzAJBgNVBAYT
-AkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNV
-BAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAvrOeV6wodnVAFsc4A5jTxhh2IVDzJXkLTLWg0X06WD6cpzEup/Y0dtmEatrQPTRI5Or1u6zf
-+bGBSyD9aH95dDSmeny1nxdlYCeXIoymMv6pQHJGNcIDpFDIMypVpVSRsivlJTRENf+RKwrB6vcf
-WlP8dSsE3Rfywq09N0ZfxcBa39V0wsGtkGWC+eQKiz4pBZYKjrc5NOpG9qrxpZxyb4o4yNNwTqza
-aPpGRqXB7IMjtf7tTmU2jqPMLxFNe1VXj9XB1rHvbRikw8lBoNoSWY66nJN/VCJv5ym6Q0mdCbDK
-CMPybTjoNCQuelc0IAaO4nLUXk0BOSxSxt8kCvsUtQIDAQABo4IBPDCCATgwHwYDVR0jBBgwFoAU
-u69+Aj36pvE8hI6t7jiY7NkyMtQwHQYDVR0OBBYEFIKvbIz4xf6WYXzoHz0rcUhexIvAMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMBEGA1UdIAQKMAgwBgYEVR0gADBMBgNVHR8E
-RTBDMEGgP6A9hjtodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDZXJ0aWZpY2F0aW9u
-QXV0aG9yaXR5LmNybDBxBggrBgEFBQcBAQRlMGMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9jcnQuY29t
-b2RvY2EuY29tL0NPTU9ET1JTQUFkZFRydXN0Q0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2Nz
-cC5jb21vZG9jYS5jb20wDQYJKoZIhvcNAQEMBQADggIBAHhcsoEoNE887l9Wzp+XVuyPomsX9vP2
-SQgG1NgvNc3fQP7TcePo7EIMERoh42awGGsma65u/ITse2hKZHzT0CBxhuhb6txM1n/y78e/4ZOs
-0j8CGpfb+SJA3GaBQ+394k+z3ZByWPQedXLL1OdK8aRINTsjk/H5Ns77zwbjOKkDamxlpZ4TKSDM
-KVmU/PUWNMKSTvtlenlxBhh7ETrN543j/Q6qqgCWgWuMAXijnRglp9fyadqGOncjZjaaSOGTTFB+
-E2pvOUtY+hPebuPtTbq7vODqzCM6ryEhNhzf+enm0zlpXK7q332nXttNtjv7VFNYG+I31gnMrwfH
-M5tdhYF/8v5UY5g2xANPECTQdu9vWPoqNSGDt87b3gXb1AiGGaI06vzgkejL580ul+9hz9D0S0U4
-jkhJiA7EuTecP/CFtR72uYRBcunwwH3fciPjviDDAI9SnC/2aPY8ydehzuZutLbZdRJ5PDEJM/1t
-yZR2niOYihZ+FCbtf3D9mB12D4ln9icgc7CwaxpNSCPt8i/GqK2HsOgkL3VYnwtx7cJUmpvVdZ4o
-gnzgXtgtdk3ShrtOS1iAN2ZBXFiRmjVzmehoMof06r1xub+85hFQzVxZx5/bRaTKTlL8YXLI8nAb
-R9HWdFqzcOoB/hxfEyIQpx9/s81rgzdEZOofSlZHynoSMYIDyjCCA8YCAQEwga0wgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
-ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjEx
-MTAxMjA0MzQyWjAvBgkqhkiG9w0BCQQxIgQg9e3JdjTPP3/2tJYlzpfsudNuEM4J1Qj5OJX2OYe1
-hIgwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
-TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
-PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
-aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBAAI5Klxj94ilc0k/MiL4KS3BA0cOqN0sWJTCFwBwUxBkEFdtn74OoxSH7bzgbckd
-2Psv5UVW9L5quug+qrkBGA0JkixfhKbyeCMZO8fwRsK90p/KY/TP8wIuXFkwq8MQ4ucBwcWW+YZe
-sQlc9QYuhOcrE2ZxH8TtxMICSvXNH2EEQu/BFGo9uwTyEtEHOB9tNAfqET6yu5uZ4mwnmIOvmRJX
-NDzZ86cRtsUSNcfGXYIQmHQiXbxPymgTbfaRtIs87Ys8yHx3p2xXW4J8mFCUuuuq7YXcLctgr9E/
-bRSjzvuM4mhwCj3fx+EaSoYrcbNMO6wwdADu1J7Q3NLZmFPZGFgAAAAAAAA=
-
-
---=-Y5QIEiOEc8ExfLY3/9J3--
+Eric
 
