@@ -2,147 +2,286 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F572441F75
-	for <lists+kvm@lfdr.de>; Mon,  1 Nov 2021 18:41:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 93D8B441F80
+	for <lists+kvm@lfdr.de>; Mon,  1 Nov 2021 18:44:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231126AbhKARoK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Nov 2021 13:44:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43746 "EHLO
+        id S231699AbhKARqf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Nov 2021 13:46:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44332 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229990AbhKARoH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Nov 2021 13:44:07 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74625C061766
-        for <kvm@vger.kernel.org>; Mon,  1 Nov 2021 10:41:34 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id t5-20020a17090a4e4500b001a0a284fcc2so16549483pjl.2
-        for <kvm@vger.kernel.org>; Mon, 01 Nov 2021 10:41:34 -0700 (PDT)
+        with ESMTP id S230206AbhKARqe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Nov 2021 13:46:34 -0400
+Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C1CDC061767
+        for <kvm@vger.kernel.org>; Mon,  1 Nov 2021 10:44:01 -0700 (PDT)
+Received: by mail-yb1-xb29.google.com with SMTP id d10so35626915ybe.3
+        for <kvm@vger.kernel.org>; Mon, 01 Nov 2021 10:44:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=rtTqRA7823rLhhDHR/FeABtCXlD+vQwUZXFhSKbl7nw=;
-        b=otcBvN/3IcuDrr15J0K5CvKDj9ic0jccTokbwB/sVPFst2f0LLD/XC7PPmPO9eJXRu
-         P2OBNUe1RlpO0zOo26l/3DPAdKxfcfvQY3tyTT+VRt2u50F02VgF8OTA49ToznF2ILGt
-         Yy6m85iKMGx1XCrOjugojlIHRrq3kXSGg8wFybO1VALqYGLus50IE17TDpBh8OqfqKK1
-         AAKVEsJcdEBK8202Jfb1yydMhJbNy9mJ8dChJ1pRBEEAKk0vwWevUCT/VxYAjLKOhhmx
-         ip94OeR4ZQJbCq2qfgBZUaSsgLQoBT6PDF+7fUOqfu8QIWy5qh2RFzJV0Hmhvl6+AMgp
-         M0Sw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=+Fmyu5Mn4i82cp8HMsdl33MAzo8mJP0Q39h/qUlCf0Q=;
+        b=ZGLIjb6VJaU8wer4pug6zS3Pp/Ya9KByddsZSsXhikN90vlK5Kns3+32lBZMa+bhOG
+         fqvbiUWC8nnj8k0LR7K7IEiuEpg1lLlGflHTVR7UGt+xZ1+lmdzZhgPDHgJojsBrR8/B
+         F0+KKHEXD7BtVvxGO5lH7Pvexp9z8qPpqE9MGQaQ/AE3oQw4+XlQi6vKHVO3CP8rJlGK
+         77mY/JwzORTKv+1glzTayTuswnAKEEjYhQRZl0VfmDq+sbuCfy66ohqVdsUspHBiAR/l
+         mIBEGCaP0g628RohfMcrErdtaO4fvTLObe+0N1Wjg4i3SyTylaOEt9Q+q1K/CZcEErO+
+         tJoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=rtTqRA7823rLhhDHR/FeABtCXlD+vQwUZXFhSKbl7nw=;
-        b=rs3Zs5s5A8KTiY2q1rr+YZw3+S3+ToGcs4ntEoK35TZ9JoGy6D1a21WnP3pM7FMksR
-         quHCmqMueOIswuTzCPugAZhNcXTMkK0E9b3dd4xr0vbXZH9SsRHQN37L5XDW71iftkEB
-         U4LpOcCr5Pp9fMwbT0ZyGSBKJr64+qnivQt6IPhbHPVIkvEl35f9panpWCNCmR+qSb5F
-         DysegDZkGm1d7viv4Bc2qLt7CN1fxfG1Qf92fvXPKUXO5YeYSYuO+y246oxQl1gafBYj
-         bX3KVwwML3pZoDztlBaAos95XhXtjfa2N528GBmEGuBB6MuG6pRk1DdpjYCTgYjY9kiF
-         MhrA==
-X-Gm-Message-State: AOAM533B3pH1+ifLRYpUNsYKUCgjpUmFC65KPKnHXqtL2Qo6JGCbRYhl
-        8EB/SKoiL8clrgjJ1AB13RtxCQ==
-X-Google-Smtp-Source: ABdhPJyQ2rd8AtzfLKSk7pcRIWMkAF0QH30KhY5NHLgIkgccLRDTnxh33KsvfNWVKvhaR3vGZrvloQ==
-X-Received: by 2002:a17:90b:3ec6:: with SMTP id rm6mr365778pjb.27.1635788493615;
-        Mon, 01 Nov 2021 10:41:33 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id cv1sm86275pjb.48.2021.11.01.10.41.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Nov 2021 10:41:33 -0700 (PDT)
-Date:   Mon, 1 Nov 2021 17:41:29 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        David Matlack <dmatlack@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH v2 26/43] KVM: VMX: Read Posted Interrupt "control"
- exactly once per loop iteration
-Message-ID: <YYAmyUZhmcSntUza@google.com>
-References: <20211009021236.4122790-1-seanjc@google.com>
- <20211009021236.4122790-27-seanjc@google.com>
- <b078cce30f86672d7d8f8eaa0adc47d24def24e2.camel@redhat.com>
- <YXrH/ZZBOHrWHz4j@google.com>
- <20a17d75855dfb9bd496466fcd9f14baab0b2bda.camel@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=+Fmyu5Mn4i82cp8HMsdl33MAzo8mJP0Q39h/qUlCf0Q=;
+        b=e3eti098krT5of9+BrypGgCV8c9eLxTlfborKeJHd5pEQzLPk4kuvHmbn6In6NxmKd
+         /UCZXswKi65zo82GJ7U6Ddx0T8wL7ZVQMrPx6uUoUtBPVscrqIYA07qXr+DwGGZL6Xj1
+         R4Vc5hWHbrr9OunUTE1T0xsOfcy/MWowJ3yEH++sukWETRTNsXJtFELsja6DjFEDpEYX
+         Knh10jV7AUhcGJ5r12H+9UJGjxlpfllxHwnii1rBQw6V5uj02AAq/xBj4AEJQrY6AtYC
+         3OoD5CWlAGPl16SWCR6UTSWqhgN0i0NQXcQk4Ij0hkFiSTm7WrU1zf6Pkmi/acVMezw8
+         vTsQ==
+X-Gm-Message-State: AOAM5334hfSFethBJ20vE1qsvsh8S9sWwygVPF5ExgwqF1mni3Qc7Ddr
+        nDNLvkKkFVWUFCAx94hYCJEkbt4sRvVTXEgbATA8YA==
+X-Google-Smtp-Source: ABdhPJy8yTlLWG4HgdFtxqaTwCWYlCCin5bPaCJr6rTK2yhMkgh4cmx6q7WO1dC/nFaHckuJT6sw6Twf/PBBdFf/KfE=
+X-Received: by 2002:a25:3142:: with SMTP id x63mr31367323ybx.99.1635788639054;
+ Mon, 01 Nov 2021 10:43:59 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20a17d75855dfb9bd496466fcd9f14baab0b2bda.camel@redhat.com>
+References: <20211005234459.430873-1-michael.roth@amd.com> <20211005234459.430873-2-michael.roth@amd.com>
+ <CAL715WK2toExGW7GGWGQyzhqBijMEhQfhamyb9_eZkrU=+LKnQ@mail.gmail.com>
+ <20211021034529.gwv3hz5xhomtvnu7@amd.com> <CAL715W+PE1hGmxZfMc4oOm6dyNzCBmStnJzp-OyW6DdhNAmwjQ@mail.gmail.com>
+In-Reply-To: <CAL715W+PE1hGmxZfMc4oOm6dyNzCBmStnJzp-OyW6DdhNAmwjQ@mail.gmail.com>
+From:   Mingwei Zhang <mizhang@google.com>
+Date:   Mon, 1 Nov 2021 10:43:48 -0700
+Message-ID: <CAL715W+q1NuV6vWGoK=ef==zLv26mTqbft6F5r=wFF81E+72tA@mail.gmail.com>
+Subject: Re: [RFC 01/16] KVM: selftests: move vm_phy_pages_alloc() earlier in file
+To:     Michael Roth <Michael.Roth@amd.com>
+Cc:     linux-kselftest@vger.kernel.org, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
+        Nathan Tempelman <natet@google.com>,
+        Marc Orr <marcorr@google.com>,
+        Steve Rutherford <srutherford@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        Varad Gautam <varad.gautam@suse.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 01, 2021, Maxim Levitsky wrote:
-> On Thu, 2021-10-28 at 15:55 +0000, Sean Christopherson wrote:
-> > On Thu, Oct 28, 2021, Maxim Levitsky wrote:
-> > > On Fri, 2021-10-08 at 19:12 -0700, Sean Christopherson wrote:
-> > > I wish there was a way to mark fields in a struct, as requiring 'READ_ONCE' on them
-> > > so that compiler would complain if this isn't done, or automatically use 'READ_ONCE'
-> > > logic.
-> > 
-> > Hmm, I think you could make an argument that ON and thus the whole "control"
-> > word should be volatile.  AFAICT, tagging just "on" as volatile actually works.
-> > There's even in a clause in Documentation/process/volatile-considered-harmful.rst
-> > that calls this out as a (potentially) legitimate use case.
-> > 
-> >   - Pointers to data structures in coherent memory which might be modified
-> >     by I/O devices can, sometimes, legitimately be volatile.
-> > 
-> > That said, I think I actually prefer forcing the use of READ_ONCE.  The descriptor
-> > requires more protections than what volatile provides, namely that all writes need
-> > to be atomic.  So given that volatile alone isn't sufficient, I'd prefer to have
-> > the code itself be more self-documenting.
-> 
-> I took a look at how READ_ONCE/WRITE_ONCE is implemented and indeed they use volatile
-> (the comment above __READ_ONCE is worth gold...), so there is a bit of contradiction:
-> 
-> volatile-considered-harmful.rst states not to mark struct members volatile since
-> you usually need more that than (very true often) and yet, I also heard that
-> READ_ONCE/WRITE_ONCE is very encouraged to be used to fields that are used in lockless
-> algorithms, even when not strictly needed,
-> so why not to just mark the field and then use it normally? I guess that
-> explicit READ_ONCE/WRITE_ONCE is much more readable/visible that a volatile
-> in some header file.
+On Tue, Oct 26, 2021 at 8:52 AM Mingwei Zhang <mizhang@google.com> wrote:
+>
+> On Wed, Oct 20, 2021 at 8:47 PM Michael Roth <michael.roth@amd.com> wrote:
+> >
+> > On Mon, Oct 18, 2021 at 08:00:00AM -0700, Mingwei Zhang wrote:
+> > > On Tue, Oct 5, 2021 at 4:46 PM Michael Roth <michael.roth@amd.com> wrote:
+> > > >
+> > > > Subsequent patches will break some of this code out into file-local
+> > > > helper functions, which will be used by functions like vm_vaddr_alloc(),
+> > > > which currently are defined earlier in the file, so a forward
+> > > > declaration would be needed.
+> > > >
+> > > > Instead, move it earlier in the file, just above vm_vaddr_alloc() and
+> > > > and friends, which are the main users.
+> > > >
+> > > > Signed-off-by: Michael Roth <michael.roth@amd.com>
+> > > > ---
+> > > >  tools/testing/selftests/kvm/lib/kvm_util.c | 146 ++++++++++-----------
+> > > >  1 file changed, 73 insertions(+), 73 deletions(-)
+> > > >
+> > > > diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> > > > index 10a8ed691c66..92f59adddebe 100644
+> > > > --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> > > > +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> > > > @@ -1145,6 +1145,79 @@ void vm_vcpu_add(struct kvm_vm *vm, uint32_t vcpuid)
+> > > >         list_add(&vcpu->list, &vm->vcpus);
+> > > >  }
+> > > >
+> > > > +/*
+> > > > + * Physical Contiguous Page Allocator
+> > > > + *
+> > > > + * Input Args:
+> > > > + *   vm - Virtual Machine
+> > > > + *   num - number of pages
+> > > > + *   paddr_min - Physical address minimum
+> > > > + *   memslot - Memory region to allocate page from
+> > > > + *
+> > > > + * Output Args: None
+> > > > + *
+> > > > + * Return:
+> > > > + *   Starting physical address
+> > > > + *
+> > > > + * Within the VM specified by vm, locates a range of available physical
+> > > > + * pages at or above paddr_min. If found, the pages are marked as in use
+> > > > + * and their base address is returned. A TEST_ASSERT failure occurs if
+> > > > + * not enough pages are available at or above paddr_min.
+> > > > + */
+> > > > +vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
+> > > > +                             vm_paddr_t paddr_min, uint32_t memslot)
+> > > > +{
+> > > > +       struct userspace_mem_region *region;
+> > > > +       sparsebit_idx_t pg, base;
+> > > > +
+> > > > +       TEST_ASSERT(num > 0, "Must allocate at least one page");
+> > > > +
+> > > > +       TEST_ASSERT((paddr_min % vm->page_size) == 0, "Min physical address "
+> > > > +               "not divisible by page size.\n"
+> > > > +               "  paddr_min: 0x%lx page_size: 0x%x",
+> > > > +               paddr_min, vm->page_size);
+> > > > +
+> > > > +       region = memslot2region(vm, memslot);
+> > > > +       base = pg = paddr_min >> vm->page_shift;
+> > > > +
+> > > > +       do {
+> > > > +               for (; pg < base + num; ++pg) {
+> > > > +                       if (!sparsebit_is_set(region->unused_phy_pages, pg)) {
+> > > > +                               base = pg = sparsebit_next_set(region->unused_phy_pages, pg);
+> > > > +                               break;
+> > > > +                       }
+> > > > +               }
+> > > > +       } while (pg && pg != base + num);
+> > > > +
+> > > > +       if (pg == 0) {
+> > > > +               fprintf(stderr, "No guest physical page available, "
+> > > > +                       "paddr_min: 0x%lx page_size: 0x%x memslot: %u\n",
+> > > > +                       paddr_min, vm->page_size, memslot);
+> > > > +               fputs("---- vm dump ----\n", stderr);
+> > > > +               vm_dump(stderr, vm, 2);
+> > > > +               abort();
+> > > > +       }
+> > > > +
+> > > > +       for (pg = base; pg < base + num; ++pg)
+> > > > +               sparsebit_clear(region->unused_phy_pages, pg);
+> > > > +
+> > > > +       return base * vm->page_size;
+> > > > +}
+> > > > +
+> > > > +vm_paddr_t vm_phy_page_alloc(struct kvm_vm *vm, vm_paddr_t paddr_min,
+> > > > +                            uint32_t memslot)
+> > > > +{
+> > > > +       return vm_phy_pages_alloc(vm, 1, paddr_min, memslot);
+> > > > +}
+> > > > +
+> > > > +/* Arbitrary minimum physical address used for virtual translation tables. */
+> > > > +#define KVM_GUEST_PAGE_TABLE_MIN_PADDR 0x180000
+> > > > +
+> > > > +vm_paddr_t vm_alloc_page_table(struct kvm_vm *vm)
+> > > > +{
+> > > > +       return vm_phy_page_alloc(vm, KVM_GUEST_PAGE_TABLE_MIN_PADDR, 0);
+> > > > +}
+> > > > +
+> > > >  /*
+> > > >   * VM Virtual Address Unused Gap
+> > > >   *
+> > > > @@ -2149,79 +2222,6 @@ const char *exit_reason_str(unsigned int exit_reason)
+> > > >         return "Unknown";
+> > > >  }
+> > > >
+> > > > -/*
+> > > > - * Physical Contiguous Page Allocator
+> > > > - *
+> > > > - * Input Args:
+> > > > - *   vm - Virtual Machine
+> > > > - *   num - number of pages
+> > > > - *   paddr_min - Physical address minimum
+> > > > - *   memslot - Memory region to allocate page from
+> > > > - *
+> > > > - * Output Args: None
+> > > > - *
+> > > > - * Return:
+> > > > - *   Starting physical address
+> > > > - *
+> > > > - * Within the VM specified by vm, locates a range of available physical
+> > > > - * pages at or above paddr_min. If found, the pages are marked as in use
+> > > > - * and their base address is returned. A TEST_ASSERT failure occurs if
+> > > > - * not enough pages are available at or above paddr_min.
+> > > > - */
+> > > > -vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
+> > > > -                             vm_paddr_t paddr_min, uint32_t memslot)
+> > > > -{
+> > > > -       struct userspace_mem_region *region;
+> > > > -       sparsebit_idx_t pg, base;
+> > > > -
+> > > > -       TEST_ASSERT(num > 0, "Must allocate at least one page");
+> > > > -
+> > > > -       TEST_ASSERT((paddr_min % vm->page_size) == 0, "Min physical address "
+> > > > -               "not divisible by page size.\n"
+> > > > -               "  paddr_min: 0x%lx page_size: 0x%x",
+> > > > -               paddr_min, vm->page_size);
+> > > > -
+> > > > -       region = memslot2region(vm, memslot);
+> > > > -       base = pg = paddr_min >> vm->page_shift;
+> > > > -
+> > > > -       do {
+> > > > -               for (; pg < base + num; ++pg) {
+> > > > -                       if (!sparsebit_is_set(region->unused_phy_pages, pg)) {
+> > > > -                               base = pg = sparsebit_next_set(region->unused_phy_pages, pg);
+> > > > -                               break;
+> > > > -                       }
+> > > > -               }
+> > > > -       } while (pg && pg != base + num);
+> > > > -
+> > > > -       if (pg == 0) {
+> > > > -               fprintf(stderr, "No guest physical page available, "
+> > > > -                       "paddr_min: 0x%lx page_size: 0x%x memslot: %u\n",
+> > > > -                       paddr_min, vm->page_size, memslot);
+> > > > -               fputs("---- vm dump ----\n", stderr);
+> > > > -               vm_dump(stderr, vm, 2);
+> > > > -               abort();
+> > > > -       }
+> > > > -
+> > > > -       for (pg = base; pg < base + num; ++pg)
+> > > > -               sparsebit_clear(region->unused_phy_pages, pg);
+> > > > -
+> > > > -       return base * vm->page_size;
+> > > > -}
+> > > > -
+> > > > -vm_paddr_t vm_phy_page_alloc(struct kvm_vm *vm, vm_paddr_t paddr_min,
+> > > > -                            uint32_t memslot)
+> > > > -{
+> > > > -       return vm_phy_pages_alloc(vm, 1, paddr_min, memslot);
+> > > > -}
+> > > > -
+> > > > -/* Arbitrary minimum physical address used for virtual translation tables. */
+> > > > -#define KVM_GUEST_PAGE_TABLE_MIN_PADDR 0x180000
+> > > > -
+> > > > -vm_paddr_t vm_alloc_page_table(struct kvm_vm *vm)
+> > > > -{
+> > > > -       return vm_phy_page_alloc(vm, KVM_GUEST_PAGE_TABLE_MIN_PADDR, 0);
+> > > > -}
+> > > > -
+> > > >  /*
+> > > >   * Address Guest Virtual to Host Virtual
+> > > >   *
+> > > > --
+> > > > 2.25.1
+> > > >
+> > >
+> > > Why move the function implementation? Maybe just adding a declaration
+> > > at the top of kvm_util.c should suffice.
+> >
+> > At least from working on other projects I'd gotten the impression that
+> > forward function declarations should be avoided if they can be solved by
+> > moving the function above the caller. Certainly don't mind taking your
+> > suggestion and dropping this patch if that's not the case here though.
+>
+> Understood. Yes, I think it would be better to follow your experience
+> then. I was thinking that if you move the code and then potentially
+> git blame on that function might point to you :)
+>
+> Thanks.
+> -Mingwei
 
-Are you asking about this PI field in particular, or for any field in general?
 
-In this particular case, visibility and documentation is really the only difference,
-functionally the result is the same.  But that's also very much related to why this
-case gets the exception listed above.  The "use it normally" part is also why I
-don't want to tag the field volatile since writing the field absolutely cannot be
-done "normally", it must be done atomically, and volatile doesn't capture that
-detail.
+Reviewed-by: Mingwei Zhang <mizhang@google.com>
 
-If you're asking about fields in general, the "volatile is harmful" guideline is
-to deter usage of volatile for cases where the field/variable in question is not
-intrinsically volatile.  As the docs call out, using volatile in those cases often
-leads to worse code generation because the compiler is disallowed from optimizing
-accesses that are protected through other mechanisms.
-
-A good example in x86 KVM is the READ_ONCE(sp->unsync) in mmu_try_to_unsync_pages() to
-force the compiler to emit a load of sp->unsync after acquiring mmu_unsync_pages_lock.
-Tagging "unsync" as volatile is unnecessary since the vast majority of its usage is
-protected by holding a spinlock for write, and would prevent optimizing references in
-kvm_mmu_get_page() and other flows that are protected by mmu_lock in the legacy MMU.
+Thanks.
+-Mingwei
