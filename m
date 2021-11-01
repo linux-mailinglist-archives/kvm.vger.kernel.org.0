@@ -2,188 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C80444236F
-	for <lists+kvm@lfdr.de>; Mon,  1 Nov 2021 23:29:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1214A44237F
+	for <lists+kvm@lfdr.de>; Mon,  1 Nov 2021 23:36:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230167AbhKAWbp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Nov 2021 18:31:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52900 "EHLO
+        id S230407AbhKAWiw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Nov 2021 18:38:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232356AbhKAWbp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Nov 2021 18:31:45 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B9DCC061714
-        for <kvm@vger.kernel.org>; Mon,  1 Nov 2021 15:29:11 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id t11so12913838plq.11
-        for <kvm@vger.kernel.org>; Mon, 01 Nov 2021 15:29:11 -0700 (PDT)
+        with ESMTP id S232260AbhKAWiv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Nov 2021 18:38:51 -0400
+Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1A9AC061714
+        for <kvm@vger.kernel.org>; Mon,  1 Nov 2021 15:36:16 -0700 (PDT)
+Received: by mail-lj1-x22d.google.com with SMTP id 205so31691584ljf.9
+        for <kvm@vger.kernel.org>; Mon, 01 Nov 2021 15:36:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=RrU1MJ/4uTu6+T3pfv3zx2EhdvwG5+grtllrLBzle4M=;
-        b=AUeK79xZFdmdz+B6CkAt+NHLg98ZBphv0hzwKyzSt2AUOswoZQMqHBGJzpzBo/VOhP
-         Q2BxGvSzmBHCKBTfFJQ7PlZK1QBY/Pv2hVx1bzGtv5nkxczXoMP5kSZjGpYMRsRTvFa7
-         Ml5dMTuo8aFWHd9y8hHn9d5DdNccH9O46J1YE+2ptWvQwcW4jux48GrYDqv2TCdeFsj2
-         r0EfDFT2g4AChRGZy8K082hvpbbSZG/Eb5nehm8AKYvRcv3DAR5Bfa9cYeQq+qSnwSRk
-         kU1JDVbmQDvlcxqERU4tK9mmPMfTKrpA1mSgMK3uSRUXXEofWwoM+iWZMuLJ2elJqn8E
-         xCgw==
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=7lOyoLfrnPL5wifZjFGNf2V3W2L2g6u7lRx5r9VTwtQ=;
+        b=VQcxKEin/4EBWJ/OnFZJq0F+xUhFasMPKCxirp1U04LT1LBMr7JS6hFWN8zFZIvzm8
+         yDlFjzf5o6tfnQHqJwa4uLjHV7QUUbvTUI4kdHO0hI6HKRx5k8uksrJ4NnXncwJgC4uo
+         wIAxxY1tH7yACalr7BYThomVbwjv2M4gK5FKQfMzVELxqKBmNjI2S6V0x7fsbKccLP6M
+         qVNH7wU0LZZ7gidYr3rDWhFSKYVOdvIFBZQfyK0W+GF2nNvIUPspayNN19ZrCf/RwkyN
+         DNew+93U/54sZzF2UfNZVeFexbj9y/W9JRQMR7Wu/brdfU07JhmLqHJ5APcPz8Xmhdhe
+         /mpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=RrU1MJ/4uTu6+T3pfv3zx2EhdvwG5+grtllrLBzle4M=;
-        b=zPwJdpwGU5+IDPSmt+DxjbM9jTtx3DaptqixUv6vQ/9gIJB/Lmr5FQyZH0uLhZ8DYu
-         ymQtWVkjIFLn883AvmnIqsepO3CerKhk7ATtC5TgUdni1rre5bRM5c/amMi9RJt7bRqS
-         DrfaDogASgRmzAgfyKIuxyW7mLnRF6SCgpMIU5Mn8x7zJ016rncO2OGbijMiGhQowz3a
-         aifzg+bRipY2zMarRkfqdYhe5DvJ6Ah8gi87GtqvnnUNDjd3kMMi0p6zSd+V/ePz81OA
-         eY74GIztDlCIgXD11OBjWIHZsGXDo8XOEB0ntcRtwLk6qnQ41WXQ3/IOc4gBNMs3DuCN
-         coCw==
-X-Gm-Message-State: AOAM5331FLR6GXZvN4F2/rj52tTW2UHZeZ+/16UXYdNoimROjO2fHWLs
-        su8AVQWj3a0Z1Zz9CEL+PCEhoA==
-X-Google-Smtp-Source: ABdhPJwWOAavFsgRVBIr8Oy0QFnvzRUVFNT585YkHtLNIJzBlgOrcYPsCeJXblrSZiJZc+cYROvb0g==
-X-Received: by 2002:a17:90a:ae18:: with SMTP id t24mr1997276pjq.92.1635805750337;
-        Mon, 01 Nov 2021 15:29:10 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id g4sm5404655pfj.67.2021.11.01.15.29.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Nov 2021 15:29:09 -0700 (PDT)
-Date:   Mon, 1 Nov 2021 22:29:06 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 01/13] KVM: x86: Cache total page count to avoid
- traversing the memslot array
-Message-ID: <YYBqMipZT9qcwDMt@google.com>
-References: <cover.1632171478.git.maciej.szmigiero@oracle.com>
- <d07f07cdd545ab1a495a9a0da06e43ad97c069a2.1632171479.git.maciej.szmigiero@oracle.com>
- <YW9Fi128rYxiF1v3@google.com>
- <e618edce-b310-6d9a-3860-d7f4d8c0d98f@maciej.szmigiero.name>
- <YXBnn6ZaXbaqKvOo@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=7lOyoLfrnPL5wifZjFGNf2V3W2L2g6u7lRx5r9VTwtQ=;
+        b=vROt4JHmMHoMmB81Nj+rjjgfriAwNTPskcl5QW0E5g/4n/GDdirt9lBU8W2mB6r4jS
+         ebyevK+/NTaU1QhMBwNcw15W70y9JUFoRuD6BszgLw8K1WKg9pzW9pTW8CQb22ZEYmPB
+         ON+8toiyLn205qBs9dy3S/OXsSh7j34WZ78Ta/HLcNsU5NxEQPXub9g6jaHtkyWmb1Dr
+         eQpMyxaCgTvIwFeIrxAX3IjgrY/zqIndTtxaiagxA9Ud45qW3Oqrqynh4mQ0vPrijTGK
+         rpG9y9YrfeduMPt4qapbOhrggKhvRZ79ZBOWKYdcAxjM17Ighrfv6uWz2oFB7Vvx7/gW
+         GOwg==
+X-Gm-Message-State: AOAM530/ESsNRSfqOnEmjiHSkoc3Q1nao6/lGsMWAW2NZKnGtwbNP9Yn
+        BI1I5jeLkKq/8i7B7DDJX8UBFL5Zoa7NqeWUk+4=
+X-Google-Smtp-Source: ABdhPJy7MogUjbIksUzaLrviFZiOlIZ4xf6BHjb9SfK3ErBHy1c4Ak+exo4cFhPpDEn3pGQ2RqBr2lr2EIC/M59fAx4=
+X-Received: by 2002:a2e:9b91:: with SMTP id z17mr25078947lji.213.1635806174896;
+ Mon, 01 Nov 2021 15:36:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YXBnn6ZaXbaqKvOo@google.com>
+References: <20211031055634.894263-1-zxwang42@gmail.com> <d6c56f03-1da7-1ebf-1d2e-0ec1aa0b241c@redhat.com>
+ <CAA03e5GZ6HnW8uk+2nh_vZcKvtt+wcdVchm4cjRm_yPFC-P7Eg@mail.gmail.com>
+ <CAEDJ5ZRm6GtH6hL+Y_g7_5O=-GPWrSKu-bpKSf3yWcBuDJEKcg@mail.gmail.com> <20211101071128.osha4ckes2gcrd6i@gator.home>
+In-Reply-To: <20211101071128.osha4ckes2gcrd6i@gator.home>
+From:   Zixuan Wang <zxwang42@gmail.com>
+Date:   Mon, 1 Nov 2021 15:35:00 -0700
+Message-ID: <CAEDJ5ZQLm1rz+0a7MPPz3wMAoeTq2oH9z92sd0ZhCxEjWMkOpg@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH v1 0/7] x86_64 UEFI set up process refactor
+ and scripts fixes
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     Marc Orr <marcorr@google.com>, Paolo Bonzini <pbonzini@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Erdem Aktas <erdemaktas@google.com>,
+        David Rientjes <rientjes@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        "Singh, Brijesh" <brijesh.singh@amd.com>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        Varad Gautam <varad.gautam@suse.com>,
+        Joerg Roedel <jroedel@suse.de>, bp@suse.de
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Oct 20, 2021, Sean Christopherson wrote:
-> On Wed, Oct 20, 2021, Maciej S. Szmigiero wrote:
-> > On 20.10.2021 00:24, Sean Christopherson wrote:
-> > > E.g. the whole thing can be
-> > > 
-> > > 	if (!kvm->arch.n_requested_mmu_pages &&
-> > > 	    (change == KVM_MR_CREATE || change == KVM_MR_DELETE)) {
-> > > 		unsigned long nr_mmu_pages;
-> > > 
-> > > 		if (change == KVM_MR_CREATE) {
-> > > 			kvm->arch.n_memslots_pages += new->npages;
-> > > 		} else {
-> > > 			WARN_ON(kvm->arch.n_memslots_pages < old->npages);
-> > > 			kvm->arch.n_memslots_pages -= old->npages;
-> > > 		}
-> > > 
-> > > 		nr_mmu_pages = (unsigned long)kvm->arch.n_memslots_pages;
-> > > 		nr_mmu_pages *= (KVM_PERMILLE_MMU_PAGES / 1000);
-> > 
-> > The above line will set nr_mmu_pages to zero since KVM_PERMILLE_MMU_PAGES
-> > is 20, so when integer-divided by 1000 will result in a multiplication
-> > coefficient of zero.
-> 
-> Ugh, math.  And thus do_div() to avoid the whole 64-bit divide issue on 32-bit KVM.
-> Bummer.
+On Mon, Nov 1, 2021 at 12:11 AM Andrew Jones <drjones@redhat.com> wrote:
+>
+> On Sun, Oct 31, 2021 at 02:54:00PM -0700, Zixuan Wang wrote:
+> > On Sun, Oct 31, 2021 at 9:14 AM Marc Orr <marcorr@google.com> wrote:
+> > >
+> > > On Sun, Oct 31, 2021 at 12:28 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+> > > >
+> > > > On 31/10/21 06:56, Zixuan Wang wrote:
+> > > > > Hello,
+> > > > >
+> > > > > This patch series refactors the x86_64 UEFI set up process and fixes the
+> > > > > `run-tests.sh` script to run under UEFI. The patches are organized as
+> > > > > three parts.
+> > > > >
+> > > > > The first part (patches 1-2) refactors the x86_64 UEFI set up process.
+> > > > > The previous UEFI setup calls arch-specific setup functions twice and
+> > > > > generates arch-specific data structure. As Andrew suggested [1], we
+> > > > > refactor this process to make only one call to the arch-specific
+> > > > > function and generate arch-neutral data structures. This simplifies the
+> > > > > set up process and makes it easier to develop UEFI support for other
+> > > > > architectures.
+> > > > >
+> > > > > The second part (patch 3) converts several x86 test cases to
+> > > > > Position-Independent Code (PIC) to run under UEFI. This patch is ported
+> > > > > from the initial UEFI support patchset [2] with fixes to the 32-bit
+> > > > > compilation.
+> > > > >
+> > > > > The third part (patches 4-7) fixes the UEFI runner scripts. Patch 4 sets
+> > > > > UEFI OVMF image as readonly. Patch 5 fixes test cases' return code under
+> > > > > UEFI, enabling Patch 6-7 to fix the `run-tests.sh` script under UEFI.
+> > > > >
+> > > > > This patch set is based on the `uefi` branch.
+> > > >
+> > > > Thank you, for patches 1-6 I have squashed the patches when applicable
+> > > > (1, 4, 5, 6) and queued the others (2 and 3).
+> > > >
+> > > > I did not queue patch 7 yet, it seems okay but I want to understand
+> > > > better the changes it needs in the harness and what is missing.  I'll
+> > > > take a look during the week.
+> > >
+> > > SGTM, thank you! Zixuan and I discussed a few things that are missing:
+> > >
+> > > 1. Test cases that take the `-append` arg are currently marked `SKIP`.
+> > > Two issues need to be resolved here. First, we're not using QEMU's
+> > > `-kernel` flag for EFI test cases [1]. And the `-append` flag does not
+> > > work without the `-kernel` flag. I don't understand the details on why
+> > > we don't use the `-kernel` flag myself. Maybe Zixuan can elaborate.
+> > > Second, assuming we fix the first issue, then we need to enlighten the
+> > > KVM-Unit-Tests under UEFI to parse kernel command line arguments and
+> > > pass them down to the test cases via `argv`. Zixuan pointed out to me
+> > > that there is some prior work from Drew [2] that we should be able to
+> > > follow to make this work. So I'm hoping that Zixuan and I can work
+> > > together on solving these issues to get the argument passing working
+> > > next.
+> >
+> > Thank you for the detailed summary!
+> >
+> > Current kvm-unit-tests pass an EFI binary as part of a disk image,
+> > instead of using the `-kernel` argument.
+> >
+> > I just tested the `-kernel` argument and it seems to work with EFI
+> > binaries, and more importantly, it's really fast (bypassing the
+> > default 5-second user input waiting). I will update the `x86/efi/run`
+> > to use `-kernel` argument to pass the EFI binaries.
+> >
+> > Since `-kernel` is working, I can start to investigate how to use
+> > `-append` to pass arguments. If that doesn't work well, an alternative
+> > approach could be:
+> >
+> > 1. (host) create a file `args.txt` in the disk image, which contains
+> > all the arguments needed
+> > 2. (guest) call UEFI filesystem interface to read this `args.txt` from
+> > the disk image, parse it and pass the arguments to `main()`
+> >
+> > > 2. We need a way to annotate test cases in `x86/unittests.cfg` as
+> > > known to work under SEV. I'm thinking of doing this via new (very
+> > > broad) test groups in `unittests.cfg`. I _think_ SEV is the primary
+> > > scenario we care about. However, folks may care about running the test
+> > > cases under UEFI outside of SEV. For example, last time I checked,
+> > > emulator runs OK under UEFI minus SEV-ES but fails under SEV-ES. And
+> > > similarly, while most test cases work under UEFI minus SEV, there are
+> > > a few that do mis-behave -- and it probably makes sense to document
+> > > this (e.g., via annotations in `unittests.cfg`). Also, there are many
+> > > variations of SEV (SEV, SEV-ES, SEV-SNP)... And hopefully some of this
+> > > will eventually be applicable to TDX as well. So many testgroups is
+> > > not a good solution. I'm not sure.
+> >
+> > Adding an `efi` group seems helpful. E.g., the current `x86/smap.c`
+> > does not work under UEFI; but the `run-tests.sh` still tries to run
+> > this test case, even if this test case is not compiled.
+> >
+> > > 3. Multi-CPU needs to be made to work under UEFI. For now, patch #7
+> > > forces all EFI test cases to run with 1 vCPU. I chatted with Brijesh,
+> > > and he mentioned that Varad would like to work on this. However, if
+> > > anything here changes, please let me know, because we can work on this
+> > > as well. But for now, I'm not planning to work on it so we can avoid
+> > > duplicating work.
+> > > 4. UEFI runs a lot slower than SEABIOS. It doesn't help that the test
+> > > harness launches QEMU more than once for each test case (i.e., it runs
+> > > the `_NO_FILE_4Uhere_` scenario to check QEMU arguments). I'm not sure
+> > > how much of an issue this is in practice. Depending on the answer, I
+> > > know Zixuan had some ideas on how to speed this up in the current test
+> > > harness. Or maybe we can explore an alternative to the
+> > > `_NO_FILE_4Uhere_` approach instead.
+> >
+> > As the `-kernel` argument now works with the EFI binaries and is
+> > significantly faster, this should not be an issue anymore. We just
+> > need to update the runner scripts to use `-kernel` argument.
+>
+> You can add an additional '-kernel' + EFI binary runner if you want, but
+> the goal of being able to run kvm-unit-tests on bare-metal means we
+> shouldn't be counting on QEMU/OVMF to do magic stuff with the kernel. We
+> need to build disk images. Argument passing works with EFI apps, when
+> implemented, so that's not a problem. I also created a script that uses
+> the framework's for_each_unittest to generate an EFI script that allowed
+> each test to be easily run with its arguments.
+>
+> Thanks,
+> drew
 
-I was revisiting this today because (a) simply making n_memslots_pages a u64 doesn't
-cleanly handle the case where the resulting nr_mmu_pages would wrap, (b) any fix
-in that are should really go in a separate patch to fix
-kvm_mmu_calculate_default_mmu_pages() and then carry that behavior forward
+I see, I think an alternative approach is to rename test case binaries
+to UEFI default binary filename, which is EFI/BOOT/BOOTX64.EFI for
+x86_64. This should work just like the `-kernel` argument. I will
+explore this approach with the argument passing mechanisms.
 
-But as I dove deeper (and deeper), I came to the conclusion that supporting a
-total number of memslot pages that doesn't fit in an unsigned long is a waste of
-our time.  With a 32-bit kernel, userspace can at most address 3gb of virtual
-memory, whereas wrapping the total number of pages would require 4tb+ of guest
-physical memory.  Even with x86's second address space for SMM, that means userspace
-would need to alias all of guest memory more than one _thousand_ times.  And on
-older hardware with MAXPHYADDR < 43, the guest couldn't actually access any of those
-aliases even if userspace lied about guest.MAXPHYADDR.
-
-So unless I'm missing something, or PPC or MIPS has some crazy way for a 32-bit
-host to support 4TB of guest memory, my vote would be to explicitly disallow
-creating more memslot pages than can fit in an unsigned long.  Then x86 KVM could
-reuse the cache nr_memslot_pages and x86's MMU wouldn't have to update a big pile
-of code to support a scenario that practically speaking is useless.
-
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 72b329e82089..acabdbdef5cf 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -552,6 +552,7 @@ struct kvm {
-         */
-        struct mutex slots_arch_lock;
-        struct mm_struct *mm; /* userspace tied to this vm */
-+       unsigned long nr_memslot_pages;
-        struct kvm_memslots __rcu *memslots[KVM_ADDRESS_SPACE_NUM];
-        struct kvm_vcpu *vcpus[KVM_MAX_VCPUS];
-
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 8bf4b89cfa03..c63fc5c05322 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -1567,6 +1567,15 @@ static void kvm_commit_memory_region(struct kvm *kvm,
-                                     const struct kvm_memory_slot *new,
-                                     enum kvm_mr_change change)
- {
-+       /*
-+        * Update the total number of memslot pages before calling the arch
-+        * hook so that architectures can consume the result directly.
-+        */
-+       if (change == KVM_MR_DELETE)
-+               kvm->nr_memslot_pages -= old->npages;
-+       else if (change == KVM_MR_CREATE)
-+               kvm->nr_memslot_pages += new->npages;
-+
-        kvm_arch_commit_memory_region(kvm, old, new, change);
-
-        /*
-@@ -1738,6 +1747,9 @@ int __kvm_set_memory_region(struct kvm *kvm,
-                if (!old || !old->npages)
-                        return -EINVAL;
-
-+               if (WARN_ON_ONCE(kvm->nr_memslot_pages < old->npages))
-+                       return -EIO;
-+
-                memset(&new, 0, sizeof(new));
-                new.id = id;
-                new.as_id = as_id;
-@@ -1756,6 +1768,13 @@ int __kvm_set_memory_region(struct kvm *kvm,
-
-        if (!old || !old->npages) {
-                change = KVM_MR_CREATE;
-+
-+               /*
-+                * To simplify KVM internals, the total number of pages across
-+                * all memslots must fit in an unsigned long.
-+                */
-+               if ((kvm->nr_memslot_pages + new.npages) < kvm->nr_memslot_pages)
-+                       return -EINVAL;
-        } else { /* Modify an existing slot. */
-                if ((new.userspace_addr != old->userspace_addr) ||
-                    (new.npages != old->npages) ||
+Best regards,
+Zixuan
