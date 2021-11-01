@@ -2,214 +2,399 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F3848441C33
-	for <lists+kvm@lfdr.de>; Mon,  1 Nov 2021 15:05:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BB839441C43
+	for <lists+kvm@lfdr.de>; Mon,  1 Nov 2021 15:09:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232474AbhKAOHg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Nov 2021 10:07:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49644 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231794AbhKAOHg (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 1 Nov 2021 10:07:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635775502;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6B0VxLQI1vBxKxE4KBUueszbiUbdBit+lWmouyGJ5Us=;
-        b=NdbANonnsYzVqnp1uNcBjewbSfL3VGd1AST+ucUD+qO/5RFP5E/YE+9Uh5fxLgR0cMyz83
-        oaHqqo8nxPX4v7GlHOBhpEM09Ms7uJSI68hlxJHN6M75RFrCqjHhLkaGli2kNnVvdE0tOX
-        STKKKj109sIWYhFw6SoSCVwesETDvdQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-441-pi21nRj_OP6D9jtnT1FFjw-1; Mon, 01 Nov 2021 10:05:01 -0400
-X-MC-Unique: pi21nRj_OP6D9jtnT1FFjw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1C9DB1054F90;
-        Mon,  1 Nov 2021 14:04:59 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.40.194.243])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EBD54101E5AE;
-        Mon,  1 Nov 2021 14:04:42 +0000 (UTC)
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Shuah Khan <shuah@kernel.org>,
-        linux-kselftest@vger.kernel.org (open list:KERNEL SELFTEST FRAMEWORK),
-        Borislav Petkov <bp@alien8.de>,
+        id S232124AbhKAOLw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Nov 2021 10:11:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52056 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229826AbhKAOLw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Nov 2021 10:11:52 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA717C061714
+        for <kvm@vger.kernel.org>; Mon,  1 Nov 2021 07:09:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=MIME-Version:Content-Type:Date:Cc:To:
+        From:Subject:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=8SYllSrkXmDulo1kN+zlthS7Gr0Kw9phzuw/BkAI2iQ=; b=w1/h1xQ9lgyszwHZcEVz6vnU8B
+        BYoY9CvB7G39JxUOHa0myCs4xrbVzkScT0+I6ixmXlMCqTZhqC3ZbHLX9dDsxzbQZVO3SOdvDz6qW
+        jDCx+m1Mlq9n1PQpDc4vo4mZLzbMP3Y/4m/zytKVUAimy+kWMuHWbMOONMS0IYcRBppPnaklmMyBc
+        t5o6JMgEb8UVaNVYwmumkyivpFiSVoLvBgGtLZppcTv4zSrlUo6XGTVC46S5QbIjCf9Wod0vIOfM/
+        8thIZTu5Y6c6j51fHwWpe/AXuYDO2XyF71yBXWsDyKUJnxilwHWJFLNp//mzudYcdZFt8es00rT5/
+        n717QeUQ==;
+Received: from [2001:8b0:10b:1::3ae] (helo=u3832b3a9db3152.infradead.org)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mhXzm-00GXoZ-8t; Mon, 01 Nov 2021 14:09:06 +0000
+Message-ID: <5d4002373c3ae614cb87b72ba5b7cdc161a0cd46.camel@infradead.org>
+Subject: [PATCH] KVM: x86: Fix recording of guest steal time / preempted
+ status
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     kvm <kvm@vger.kernel.org>
+Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kernel@vger.kernel.org (open list:X86 ARCHITECTURE (32-BIT AND
-        64-BIT)), Joerg Roedel <joro@8bytes.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Bandan Das <bsd@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Wei Huang <wei.huang2@amd.com>,
-        x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
-        Ingo Molnar <mingo@redhat.com>
-Subject: [PATCH v2 6/6] KVM: x86: SVM: implement nested vGIF
-Date:   Mon,  1 Nov 2021 16:03:24 +0200
-Message-Id: <20211101140324.197921-7-mlevitsk@redhat.com>
-In-Reply-To: <20211101140324.197921-1-mlevitsk@redhat.com>
-References: <20211101140324.197921-1-mlevitsk@redhat.com>
+        "jmattson@google.com" <jmattson@google.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "mtosatti@redhat.com" <mtosatti@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>, karahmed@amazon.com
+Date:   Mon, 01 Nov 2021 14:09:02 +0000
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-Pbv31nmGuxQMbtaMvONL"
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In case L1 enables vGIF for L2, the L2 cannot affect L1's GIF, regardless
-of STGI/CLGI intercepts, and since VM entry enables GIF, this means
-that L1's GIF is always 1 while L2 is running.
 
-Thus in this case leave L1's vGIF in vmcb01, while letting L2
-control the vGIF thus implementing nested vGIF.
+--=-Pbv31nmGuxQMbtaMvONL
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Also allow KVM to toggle L1's GIF during nested entry/exit
-by always using vmcb01.
+From: David Woodhouse <dwmw@amazon.co.uk>
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+In commit b043138246a4 ("x86/KVM: Make sure KVM_VCPU_FLUSH_TLB flag is
+not missed") we switched to using a gfn_to_pfn_cache for accessing the
+guest steal time structure in order to allow for an atomic xchg of the
+preempted field. This has a couple of problems.
+
+Firstly, kvm_map_gfn() doesn't work at all for IOMEM pages when the
+atomic flag is set, which it is in kvm_steal_time_set_preempted(). So a
+guest vCPU using an IOMEM page for its steal time would never have its
+preempted field set.
+
+Secondly, the gfn_to_pfn_cache is not invalidated in all cases where it
+should have been. There are two stages to the GFN =E2=86=92 PFN conversion;
+first the GFN is converted to a userspace HVA, and then that HVA is
+looked up in the process page tables to find the underlying host PFN.
+Correct invalidation of the latter would require being hooked up to the
+MMU notifiers, but that doesn't happen =E2=80=94 so it just keeps mapping a=
+nd
+unmapping the *wrong* PFN after the userspace page tables change.
+
+In the !IOMEM case at least the stale page *is* pinned all the time it's
+cached, so it won't be freed and reused by anyone else while still
+receiving the steal time updates. (This kind of makes a mockery of this
+repeated map/unmap dance which I thought was supposed to avoid pinning
+the page. AFAICT we might as well have just kept a kernel mapping of it
+all the time).
+
+But there's no point in a kernel mapping of it anyway, when in all cases
+we care about, we have a perfectly serviceable userspace HVA for it. We
+just need to implement the atomic xchg on the userspace address with
+appropriate exception handling, which is fairly trivial.
+
+Cc: stable@vger.kernel.org
+Fixes: b043138246a4 ("x86/KVM: Make sure KVM_VCPU_FLUSH_TLB flag is not mis=
+sed")
+Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 ---
- arch/x86/kvm/svm/nested.c | 17 +++++++++++++----
- arch/x86/kvm/svm/svm.c    |  5 +++++
- arch/x86/kvm/svm/svm.h    | 25 +++++++++++++++++++++----
- 3 files changed, 39 insertions(+), 8 deletions(-)
+ arch/x86/include/asm/kvm_host.h |   2 +-
+ arch/x86/kvm/x86.c              | 109 +++++++++++++++++++++++---------
+ 2 files changed, 79 insertions(+), 32 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 15be37368380d..4e4e3aea519be 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -384,6 +384,10 @@ void nested_sync_control_from_vmcb02(struct vcpu_svm *svm)
- 		 */
- 		mask &= ~V_IRQ_MASK;
- 	}
-+
-+	if (nested_vgif_enabled(svm))
-+		mask |= V_GIF_MASK;
-+
- 	svm->nested.ctl.int_ctl        &= ~mask;
- 	svm->nested.ctl.int_ctl        |= svm->vmcb->control.int_ctl & mask;
- }
-@@ -555,10 +559,8 @@ static void nested_vmcb02_prepare_save(struct vcpu_svm *svm, struct vmcb *vmcb12
- 
- static void nested_vmcb02_prepare_control(struct vcpu_svm *svm)
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_hos=
+t.h
+index 63d70fa34d3a..02ec330dbb4a 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -752,7 +752,7 @@ struct kvm_vcpu_arch {
+ 		u8 preempted;
+ 		u64 msr_val;
+ 		u64 last_steal;
+-		struct gfn_to_pfn_cache cache;
++		struct gfn_to_hva_cache cache;
+ 	} st;
+=20
+ 	u64 l1_tsc_offset;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 8a116999f601..14c44e1c1bc7 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3195,8 +3195,11 @@ static void kvm_vcpu_flush_tlb_guest(struct kvm_vcpu=
+ *vcpu)
+=20
+ static void record_steal_time(struct kvm_vcpu *vcpu)
  {
--	const u32 int_ctl_vmcb01_bits =
--		V_INTR_MASKING_MASK | V_GIF_MASK | V_GIF_ENABLE_MASK;
--
--	const u32 int_ctl_vmcb12_bits = V_TPR_MASK | V_IRQ_INJECTION_BITS_MASK;
-+	u32 int_ctl_vmcb01_bits = V_INTR_MASKING_MASK;
-+	u32 int_ctl_vmcb12_bits = V_TPR_MASK | V_IRQ_INJECTION_BITS_MASK;
- 
- 	struct kvm_vcpu *vcpu = &svm->vcpu;
- 
-@@ -573,6 +575,13 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm)
+-	struct kvm_host_map map;
+-	struct kvm_steal_time *st;
++	struct gfn_to_hva_cache *ghc =3D &vcpu->arch.st.cache;
++	struct kvm_steal_time __user *st;
++	struct kvm_memslots *slots;
++	u64 steal;
++	u32 version;
+=20
+ 	if (kvm_xen_msr_enabled(vcpu->kvm)) {
+ 		kvm_xen_runstate_set_running(vcpu);
+@@ -3206,47 +3209,87 @@ static void record_steal_time(struct kvm_vcpu *vcpu=
+)
+ 	if (!(vcpu->arch.st.msr_val & KVM_MSR_ENABLED))
+ 		return;
+=20
+-	/* -EAGAIN is returned in atomic context so we can just return. */
+-	if (kvm_map_gfn(vcpu->kvm, vcpu->arch.st.msr_val >> PAGE_SHIFT,
+-			&map, &vcpu->arch.st.cache, false))
++	if (WARN_ON_ONCE(current->mm !=3D vcpu->kvm->mm))
+ 		return;
+=20
+-	st =3D map.hva +
+-		offset_in_page(vcpu->arch.st.msr_val & KVM_STEAL_VALID_BITS);
++	slots =3D kvm_memslots(vcpu->kvm);
++
++	if (unlikely(slots->generation !=3D ghc->generation ||
++		     kvm_is_error_hva(ghc->hva) || !ghc->memslot)) {
++		gfn_t gfn =3D vcpu->arch.st.msr_val & KVM_STEAL_VALID_BITS;
++
++		/* We rely on the fact that it fits in a single page. */
++		BUILD_BUG_ON((sizeof(*st) - 1) & KVM_STEAL_VALID_BITS);
++
++		if (kvm_gfn_to_hva_cache_init(vcpu->kvm, ghc, gfn, sizeof(*st)) ||
++		    kvm_is_error_hva(ghc->hva) || !ghc->memslot)
++			return;
++	}
++
++	st =3D (struct kvm_steal_time __user *)ghc->hva;
++	if (!user_access_begin(st, sizeof(*st)))
++		return;
+=20
+ 	/*
+ 	 * Doing a TLB flush here, on the guest's behalf, can avoid
+ 	 * expensive IPIs.
  	 */
- 	WARN_ON(kvm_apicv_activated(svm->vcpu.kvm));
- 
+-	if (guest_pv_has(vcpu, KVM_FEATURE_PV_TLB_FLUSH)) {
+-		u8 st_preempted =3D xchg(&st->preempted, 0);
++	if (guest_pv_has(vcpu, KVM_FEATURE_PV_TLB_FLUSH)) {
++		int err;
++		u8 st_preempted =3D 0;
 +
++		asm volatile("1:\t" LOCK_PREFIX "xchgb %0, %1\n"
++			     "\txor %2, %2\n"
++			     "2:\n"
++			     "\t.section .fixup,\"ax\"\n"
++			     "3:\tmovl %3, %2\n"
++			     "\tjmp\t2b\n"
++			     "\t.previous\n"
++			     _ASM_EXTABLE_UA(1b, 3b)
++			     : "=3Dr" (st_preempted)
++			     : "m" (st->preempted),
++			       "r" (err),
++			       "i" (-EFAULT),
++			       "0" (st_preempted));
++		if (err)
++			goto out;
 +
-+	if (svm->vgif_enabled && (svm->nested.ctl.int_ctl & V_GIF_ENABLE_MASK))
-+		int_ctl_vmcb12_bits |= (V_GIF_MASK | V_GIF_ENABLE_MASK);
-+	else
-+		int_ctl_vmcb01_bits |= (V_GIF_MASK | V_GIF_ENABLE_MASK);
++		user_access_end();
 +
- 	/* Copied from vmcb01.  msrpm_base can be overwritten later.  */
- 	svm->vmcb->control.nested_ctl = svm->vmcb01.ptr->control.nested_ctl;
- 	svm->vmcb->control.iopm_base_pa = svm->vmcb01.ptr->control.iopm_base_pa;
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index ff1447a3551fc..0461a3430d529 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1032,6 +1032,9 @@ static __init void svm_set_cpu_caps(void)
- 		if (pause_filter_thresh)
- 			kvm_cpu_cap_set(X86_FEATURE_PFTHRESHOLD);
- 
-+		if (vgif)
-+			kvm_cpu_cap_set(X86_FEATURE_VGIF);
++		vcpu->arch.st.preempted =3D 0;
+=20
+ 		trace_kvm_pv_tlb_flush(vcpu->vcpu_id,
+ 				       st_preempted & KVM_VCPU_FLUSH_TLB);
+ 		if (st_preempted & KVM_VCPU_FLUSH_TLB)
+ 			kvm_vcpu_flush_tlb_guest(vcpu);
 +
- 		/* Nested VM can receive #VMEXIT instead of triggering #GP */
- 		kvm_cpu_cap_set(X86_FEATURE_SVME_ADDR_CHK);
++		if (!user_access_begin(st, sizeof(*st)))
++			return;
+ 	} else {
+-		st->preempted =3D 0;
++		unsafe_put_user(0, &st->preempted, out);
++		vcpu->arch.st.preempted =3D 0;
  	}
-@@ -4180,6 +4183,8 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
- 		svm->pause_threshold_enabled = false;
- 	}
- 
-+	svm->vgif_enabled = vgif && guest_cpuid_has(vcpu, X86_FEATURE_VGIF);
-+
- 	svm_recalc_instruction_intercepts(vcpu, svm);
- 
- 	/* For sev guests, the memory encryption bit is not reserved in CR3.  */
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 75781d66cbd60..06e5c43ce18a8 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -168,6 +168,7 @@ struct vcpu_svm {
- 	bool v_vmload_vmsave_enabled      : 1;
- 	bool pause_filter_enabled         : 1;
- 	bool pause_threshold_enabled      : 1;
-+	bool vgif_enabled                 : 1;
- 
- 	u32 ldr_reg;
- 	u32 dfr_reg;
-@@ -386,31 +387,47 @@ static inline bool svm_is_intercept(struct vcpu_svm *svm, int bit)
- 	return vmcb_is_intercept(&svm->vmcb->control, bit);
+=20
+-	vcpu->arch.st.preempted =3D 0;
+-
+-	if (st->version & 1)
+-		st->version +=3D 1;  /* first time write, random junk */
++	unsafe_get_user(version, &st->version, out);
++	if (version & 1)
++		version +=3D 1;  /* first time write, random junk */
+=20
+-	st->version +=3D 1;
++	version +=3D 1;
++	unsafe_put_user(version, &st->version, out);
+=20
+ 	smp_wmb();
+=20
+-	st->steal +=3D current->sched_info.run_delay -
++	unsafe_get_user(steal, &st->steal, out);
++	steal +=3D current->sched_info.run_delay -
+ 		vcpu->arch.st.last_steal;
+ 	vcpu->arch.st.last_steal =3D current->sched_info.run_delay;
++	unsafe_put_user(steal, &st->steal, out);
+=20
+-	smp_wmb();
+-
+-	st->version +=3D 1;
++	version +=3D 1;
++	unsafe_put_user(version, &st->version, out);
+=20
+-	kvm_unmap_gfn(vcpu->kvm, &map, &vcpu->arch.st.cache, true, false);
++ out:
++	user_access_end();
  }
- 
-+static bool nested_vgif_enabled(struct vcpu_svm *svm)
-+{
-+	if (!is_guest_mode(&svm->vcpu) || !svm->vgif_enabled)
-+		return false;
-+	return svm->nested.ctl.int_ctl & V_GIF_ENABLE_MASK;
-+}
-+
- static inline bool vgif_enabled(struct vcpu_svm *svm)
+=20
+ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+@@ -4286,8 +4329,10 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int c=
+pu)
+=20
+ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
  {
--	return !!(svm->vmcb->control.int_ctl & V_GIF_ENABLE_MASK);
-+	struct vmcb *vmcb = nested_vgif_enabled(svm) ? svm->vmcb01.ptr : svm->vmcb;
+-	struct kvm_host_map map;
+-	struct kvm_steal_time *st;
++	struct gfn_to_hva_cache *ghc =3D &vcpu->arch.st.cache;
++	struct kvm_steal_time __user *st;
++	struct kvm_memslots *slots;
++	static const u8 preempted =3D KVM_VCPU_PREEMPTED;
+=20
+ 	if (!(vcpu->arch.st.msr_val & KVM_MSR_ENABLED))
+ 		return;
+@@ -4295,16 +4340,21 @@ static void kvm_steal_time_set_preempted(struct kvm=
+_vcpu *vcpu)
+ 	if (vcpu->arch.st.preempted)
+ 		return;
+=20
+-	if (kvm_map_gfn(vcpu->kvm, vcpu->arch.st.msr_val >> PAGE_SHIFT, &map,
+-			&vcpu->arch.st.cache, true))
++	/* This happens on process exit */
++	if (unlikely(current->mm !=3D vcpu->kvm->mm))
+ 		return;
+=20
+-	st =3D map.hva +
+-		offset_in_page(vcpu->arch.st.msr_val & KVM_STEAL_VALID_BITS);
++	slots =3D kvm_memslots(vcpu->kvm);
+=20
+-	st->preempted =3D vcpu->arch.st.preempted =3D KVM_VCPU_PREEMPTED;
++	if (unlikely(slots->generation !=3D ghc->generation ||
++		     kvm_is_error_hva(ghc->hva) || !ghc->memslot))
++		return;
+=20
+-	kvm_unmap_gfn(vcpu->kvm, &map, &vcpu->arch.st.cache, true, true);
++	st =3D (struct kvm_steal_time __user *)ghc->hva;
++	BUILD_BUG_ON(sizeof(st->preempted) !=3D sizeof(preempted));
 +
-+	return !!(vmcb->control.int_ctl & V_GIF_ENABLE_MASK);
++	if (!copy_to_user_nofault(&st->preempted, &preempted, sizeof(preempted)))
++		vcpu->arch.st.preempted =3D KVM_VCPU_PREEMPTED;
  }
- 
- static inline void enable_gif(struct vcpu_svm *svm)
+=20
+ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+@@ -10818,11 +10868,8 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcp=
+u)
+=20
+ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
  {
-+	struct vmcb *vmcb = nested_vgif_enabled(svm) ? svm->vmcb01.ptr : svm->vmcb;
-+
- 	if (vgif_enabled(svm))
--		svm->vmcb->control.int_ctl |= V_GIF_MASK;
-+		vmcb->control.int_ctl |= V_GIF_MASK;
- 	else
- 		svm->vcpu.arch.hflags |= HF_GIF_MASK;
- }
- 
- static inline void disable_gif(struct vcpu_svm *svm)
- {
-+	struct vmcb *vmcb = nested_vgif_enabled(svm) ? svm->vmcb01.ptr : svm->vmcb;
-+
- 	if (vgif_enabled(svm))
--		svm->vmcb->control.int_ctl &= ~V_GIF_MASK;
-+		vmcb->control.int_ctl &= ~V_GIF_MASK;
- 	else
- 		svm->vcpu.arch.hflags &= ~HF_GIF_MASK;
-+
- }
- 
- static inline bool gif_set(struct vcpu_svm *svm)
- {
-+	struct vmcb *vmcb = nested_vgif_enabled(svm) ? svm->vmcb01.ptr : svm->vmcb;
-+
- 	if (vgif_enabled(svm))
--		return !!(svm->vmcb->control.int_ctl & V_GIF_MASK);
-+		return !!(vmcb->control.int_ctl & V_GIF_MASK);
- 	else
- 		return !!(svm->vcpu.arch.hflags & HF_GIF_MASK);
- }
--- 
-2.26.3
+-	struct gfn_to_pfn_cache *cache =3D &vcpu->arch.st.cache;
+ 	int idx;
+=20
+-	kvm_release_pfn(cache->pfn, cache->dirty, cache);
+-
+ 	kvmclock_reset(vcpu);
+=20
+ 	static_call(kvm_x86_vcpu_free)(vcpu);
+--=20
+2.31.1
+
+
+--=-Pbv31nmGuxQMbtaMvONL
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCECow
+ggUcMIIEBKADAgECAhEA4rtJSHkq7AnpxKUY8ZlYZjANBgkqhkiG9w0BAQsFADCBlzELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
+A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
+bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTkwMTAyMDAwMDAwWhcNMjIwMTAxMjM1
+OTU5WjAkMSIwIAYJKoZIhvcNAQkBFhNkd213MkBpbmZyYWRlYWQub3JnMIIBIjANBgkqhkiG9w0B
+AQEFAAOCAQ8AMIIBCgKCAQEAsv3wObLTCbUA7GJqKj9vHGf+Fa+tpkO+ZRVve9EpNsMsfXhvFpb8
+RgL8vD+L133wK6csYoDU7zKiAo92FMUWaY1Hy6HqvVr9oevfTV3xhB5rQO1RHJoAfkvhy+wpjo7Q
+cXuzkOpibq2YurVStHAiGqAOMGMXhcVGqPuGhcVcVzVUjsvEzAV9Po9K2rpZ52FE4rDkpDK1pBK+
+uOAyOkgIg/cD8Kugav5tyapydeWMZRJQH1vMQ6OVT24CyAn2yXm2NgTQMS1mpzStP2ioPtTnszIQ
+Ih7ASVzhV6csHb8Yrkx8mgllOyrt9Y2kWRRJFm/FPRNEurOeNV6lnYAXOymVJwIDAQABo4IB0zCC
+Ac8wHwYDVR0jBBgwFoAUgq9sjPjF/pZhfOgfPStxSF7Ei8AwHQYDVR0OBBYEFLfuNf820LvaT4AK
+xrGK3EKx1DE7MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUF
+BwMEBggrBgEFBQcDAjBGBgNVHSAEPzA9MDsGDCsGAQQBsjEBAgEDBTArMCkGCCsGAQUFBwIBFh1o
+dHRwczovL3NlY3VyZS5jb21vZG8ubmV0L0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3Js
+LmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWls
+Q0EuY3JsMIGLBggrBgEFBQcBAQR/MH0wVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuY29tb2RvY2Eu
+Y29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYI
+KwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmNvbW9kb2NhLmNvbTAeBgNVHREEFzAVgRNkd213MkBpbmZy
+YWRlYWQub3JnMA0GCSqGSIb3DQEBCwUAA4IBAQALbSykFusvvVkSIWttcEeifOGGKs7Wx2f5f45b
+nv2ghcxK5URjUvCnJhg+soxOMoQLG6+nbhzzb2rLTdRVGbvjZH0fOOzq0LShq0EXsqnJbbuwJhK+
+PnBtqX5O23PMHutP1l88AtVN+Rb72oSvnD+dK6708JqqUx2MAFLMevrhJRXLjKb2Mm+/8XBpEw+B
+7DisN4TMlLB/d55WnT9UPNHmQ+3KFL7QrTO8hYExkU849g58Dn3Nw3oCbMUgny81ocrLlB2Z5fFG
+Qu1AdNiBA+kg/UxzyJZpFbKfCITd5yX49bOriL692aMVDyqUvh8fP+T99PqorH4cIJP6OxSTdxKM
+MIIFHDCCBASgAwIBAgIRAOK7SUh5KuwJ6cSlGPGZWGYwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
+ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTE5MDEwMjAwMDAwMFoXDTIyMDEwMTIz
+NTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCASIwDQYJKoZIhvcN
+AQEBBQADggEPADCCAQoCggEBALL98Dmy0wm1AOxiaio/bxxn/hWvraZDvmUVb3vRKTbDLH14bxaW
+/EYC/Lw/i9d98CunLGKA1O8yogKPdhTFFmmNR8uh6r1a/aHr301d8YQea0DtURyaAH5L4cvsKY6O
+0HF7s5DqYm6tmLq1UrRwIhqgDjBjF4XFRqj7hoXFXFc1VI7LxMwFfT6PStq6WedhROKw5KQytaQS
+vrjgMjpICIP3A/CroGr+bcmqcnXljGUSUB9bzEOjlU9uAsgJ9sl5tjYE0DEtZqc0rT9oqD7U57My
+ECIewElc4VenLB2/GK5MfJoJZTsq7fWNpFkUSRZvxT0TRLqznjVepZ2AFzsplScCAwEAAaOCAdMw
+ggHPMB8GA1UdIwQYMBaAFIKvbIz4xf6WYXzoHz0rcUhexIvAMB0GA1UdDgQWBBS37jX/NtC72k+A
+CsaxitxCsdQxOzAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEF
+BQcDBAYIKwYBBQUHAwIwRgYDVR0gBD8wPTA7BgwrBgEEAbIxAQIBAwUwKzApBggrBgEFBQcCARYd
+aHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9DUFMwWgYDVR0fBFMwUTBPoE2gS4ZJaHR0cDovL2Ny
+bC5jb21vZG9jYS5jb20vQ09NT0RPUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFp
+bENBLmNybDCBiwYIKwYBBQUHAQEEfzB9MFUGCCsGAQUFBzAChklodHRwOi8vY3J0LmNvbW9kb2Nh
+LmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3J0MCQG
+CCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAC20spBbrL71ZEiFrbXBHonzhhirO1sdn+X+O
+W579oIXMSuVEY1LwpyYYPrKMTjKECxuvp24c829qy03UVRm742R9Hzjs6tC0oatBF7KpyW27sCYS
+vj5wbal+TttzzB7rT9ZfPALVTfkW+9qEr5w/nSuu9PCaqlMdjABSzHr64SUVy4ym9jJvv/FwaRMP
+gew4rDeEzJSwf3eeVp0/VDzR5kPtyhS+0K0zvIWBMZFPOPYOfA59zcN6AmzFIJ8vNaHKy5QdmeXx
+RkLtQHTYgQPpIP1Mc8iWaRWynwiE3ecl+PWzq4i+vdmjFQ8qlL4fHz/k/fT6qKx+HCCT+jsUk3cS
+jDCCBeYwggPOoAMCAQICEGqb4Tg7/ytrnwHV2binUlYwDQYJKoZIhvcNAQEMBQAwgYUxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMSswKQYDVQQDEyJDT01PRE8gUlNBIENlcnRpZmljYXRp
+b24gQXV0aG9yaXR5MB4XDTEzMDExMDAwMDAwMFoXDTI4MDEwOTIzNTk1OVowgZcxCzAJBgNVBAYT
+AkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNV
+BAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAvrOeV6wodnVAFsc4A5jTxhh2IVDzJXkLTLWg0X06WD6cpzEup/Y0dtmEatrQPTRI5Or1u6zf
++bGBSyD9aH95dDSmeny1nxdlYCeXIoymMv6pQHJGNcIDpFDIMypVpVSRsivlJTRENf+RKwrB6vcf
+WlP8dSsE3Rfywq09N0ZfxcBa39V0wsGtkGWC+eQKiz4pBZYKjrc5NOpG9qrxpZxyb4o4yNNwTqza
+aPpGRqXB7IMjtf7tTmU2jqPMLxFNe1VXj9XB1rHvbRikw8lBoNoSWY66nJN/VCJv5ym6Q0mdCbDK
+CMPybTjoNCQuelc0IAaO4nLUXk0BOSxSxt8kCvsUtQIDAQABo4IBPDCCATgwHwYDVR0jBBgwFoAU
+u69+Aj36pvE8hI6t7jiY7NkyMtQwHQYDVR0OBBYEFIKvbIz4xf6WYXzoHz0rcUhexIvAMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMBEGA1UdIAQKMAgwBgYEVR0gADBMBgNVHR8E
+RTBDMEGgP6A9hjtodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDZXJ0aWZpY2F0aW9u
+QXV0aG9yaXR5LmNybDBxBggrBgEFBQcBAQRlMGMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9jcnQuY29t
+b2RvY2EuY29tL0NPTU9ET1JTQUFkZFRydXN0Q0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2Nz
+cC5jb21vZG9jYS5jb20wDQYJKoZIhvcNAQEMBQADggIBAHhcsoEoNE887l9Wzp+XVuyPomsX9vP2
+SQgG1NgvNc3fQP7TcePo7EIMERoh42awGGsma65u/ITse2hKZHzT0CBxhuhb6txM1n/y78e/4ZOs
+0j8CGpfb+SJA3GaBQ+394k+z3ZByWPQedXLL1OdK8aRINTsjk/H5Ns77zwbjOKkDamxlpZ4TKSDM
+KVmU/PUWNMKSTvtlenlxBhh7ETrN543j/Q6qqgCWgWuMAXijnRglp9fyadqGOncjZjaaSOGTTFB+
+E2pvOUtY+hPebuPtTbq7vODqzCM6ryEhNhzf+enm0zlpXK7q332nXttNtjv7VFNYG+I31gnMrwfH
+M5tdhYF/8v5UY5g2xANPECTQdu9vWPoqNSGDt87b3gXb1AiGGaI06vzgkejL580ul+9hz9D0S0U4
+jkhJiA7EuTecP/CFtR72uYRBcunwwH3fciPjviDDAI9SnC/2aPY8ydehzuZutLbZdRJ5PDEJM/1t
+yZR2niOYihZ+FCbtf3D9mB12D4ln9icgc7CwaxpNSCPt8i/GqK2HsOgkL3VYnwtx7cJUmpvVdZ4o
+gnzgXtgtdk3ShrtOS1iAN2ZBXFiRmjVzmehoMof06r1xub+85hFQzVxZx5/bRaTKTlL8YXLI8nAb
+R9HWdFqzcOoB/hxfEyIQpx9/s81rgzdEZOofSlZHynoSMYIDyjCCA8YCAQEwga0wgZcxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
+ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
+ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjEx
+MTAxMTQwOTAyWjAvBgkqhkiG9w0BCQQxIgQgxVIGBqm520UypwKkI1IGNfY4UH+fDC/gSdrcomBH
+rpQwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
+PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
+aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
+A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
+bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
+DQEBAQUABIIBADb0j0a5dFexan3pGLWcVqYZwjxupPXLaUGzqGq516dgX/sybvLMLbomyN1LrvfR
+8QfkTZWIu98G2T/TDZbHuHm4KVKFp/UTdGoGZ1XxGdXsJW8HvXJm8az3zcm+VquNyZy2069yuYNB
+M3c+Yz9mQKl5D0qYlh3aYjbJMOkNZQvL2ypYoO80bs+kw56qJgWKfWKPu0S1zklq7iyND9FH3q97
+UIy2kdGtnDiDr/6Pzhd6Hh/HX5w2coqOowNulwpx+sxpAbkWXtm6/AL9miwfC25EnM77M+AmCZPD
+FheVsvj9+EZQwS9pZsNfNuBr0qUGrKpWlwKN267PFBDDZ+RtjqEAAAAAAAA=
+
+
+--=-Pbv31nmGuxQMbtaMvONL--
 
