@@ -2,140 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 73B384419FA
-	for <lists+kvm@lfdr.de>; Mon,  1 Nov 2021 11:33:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BB521441B3A
+	for <lists+kvm@lfdr.de>; Mon,  1 Nov 2021 13:34:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231841AbhKAKgD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Nov 2021 06:36:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:44714 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232183AbhKAKf5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 1 Nov 2021 06:35:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635762804;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=mh/lXvO/DjLUSeyCpSgez/WyU/AXkpH1vth0jy9+/fg=;
-        b=JCDS9HOsqqUfqgICCW0+V2rH5YqqW2u0KwtnJbRi5ggUB8SygzGdG6N9FsS4iI3gd8FNiD
-        b+DEhbivgiqoVbXpp7qUsFqkOU6Jx5MS6vcQJ6BVf940bboI2MBzjYUlChxZKe8ritp292
-        /1pd2pgLHIndacXaeaR02hlDGbvvPQo=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-602-JST4sEUhMT6Xilmg3FPA-A-1; Mon, 01 Nov 2021 06:33:21 -0400
-X-MC-Unique: JST4sEUhMT6Xilmg3FPA-A-1
-Received: by mail-ed1-f71.google.com with SMTP id z1-20020a05640235c100b003e28c89743bso2189647edc.22
-        for <kvm@vger.kernel.org>; Mon, 01 Nov 2021 03:33:21 -0700 (PDT)
+        id S232518AbhKAMhI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Nov 2021 08:37:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58560 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232500AbhKAMhF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Nov 2021 08:37:05 -0400
+Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CDF5C061714
+        for <kvm@vger.kernel.org>; Mon,  1 Nov 2021 05:34:32 -0700 (PDT)
+Received: by mail-wr1-x436.google.com with SMTP id v17so27906972wrv.9
+        for <kvm@vger.kernel.org>; Mon, 01 Nov 2021 05:34:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=y2Y8ilwyriUGgynMYA//pB8+mWDgGay/mxGbSkA0Eaw=;
+        b=dWbZ5hl+TdK4c89/9/Zi3TeCysZvskdagk6cPPB/UOgyPuNIYJhHaNTwLjhTX96cfZ
+         rONGHyASgQZcBVPl6XJb4hFnQU6VzT8tBTLsAmuzw2ow2wSS0S7qRhEhp+JZ1xrh++pQ
+         USWPRap6wBGCT8nJhEQxW60dXU1fXMV43ewud+QlhicLqXBwqdzB26MEFzzYNxVOlJV0
+         kUGtE+E7PbbALSqGQqMpCZuJCo/OqOvwbFTnX4THLD5Jyd20Zo+yDVje6BPSmiQeo7aF
+         qvdBdlT3rV2xJXfHxhDatDNSq4Hg76ZtEKMxxlNFQsyKZHRb1vBvpvbOoxlg/lmJX5QZ
+         abng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=mh/lXvO/DjLUSeyCpSgez/WyU/AXkpH1vth0jy9+/fg=;
-        b=g1/oRaVcGxOwjzF8S/YDgeQpyO4A6dHQStQFOlVGaap1F8v8Z7wYbg/v7GB0dkuDQU
-         ezP/cqDVlqSteHkleYS7uZV1eVXzFIUZEnGmqiFvNmVQ616i46VWUAtSOS1nsI8dPXTM
-         eZ9B9vDZdHXUTI+WrIUKUhlTJhkyi8YfsZco319PRQ1PftSDwpY38jN7U5N7iDxrVQK5
-         csj9nOJ3o85dUHgL7DkEU9vkq/Au28f9Gi7jPEf9P0mZgyN25LsbZQmPH3bsddne9sJP
-         0YP4KusKJZC3r0+c1EwoPyN570WEBLQkyR93v5bjuHYS+PvH7zKi8BHwWmlYESD/2kmT
-         OTdg==
-X-Gm-Message-State: AOAM533ZGOxxB+S9PLViTfpSvUMwr2R/MfHDuF24pibRzeLiekDXfycN
-        UNtBmcrZm6bmpluw4eOyqhG7Gl8EPQEB8QlsMgmNBeb3ZNB+8ddD3sJzMLlz/yVADIwxQSnfn3d
-        9lBbLGLrqaRN4
-X-Received: by 2002:a50:8e05:: with SMTP id 5mr39702751edw.76.1635762800379;
-        Mon, 01 Nov 2021 03:33:20 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw9gnk66lzzUHLALthwE3raOdlZGF410uhbCdfiSGqNONoUSpPMJi4RKxjukoAv0gSOLjBOOg==
-X-Received: by 2002:a50:8e05:: with SMTP id 5mr39702727edw.76.1635762800215;
-        Mon, 01 Nov 2021 03:33:20 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id q17sm6607866ejp.106.2021.11.01.03.33.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Nov 2021 03:33:19 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ajay Garg <ajaygargnsit@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-        Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH v2 8/8] KVM: x86: Add checks for reserved-to-zero
- Hyper-V hypercall fields
-In-Reply-To: <20211030000800.3065132-9-seanjc@google.com>
-References: <20211030000800.3065132-1-seanjc@google.com>
- <20211030000800.3065132-9-seanjc@google.com>
-Date:   Mon, 01 Nov 2021 11:33:18 +0100
-Message-ID: <87v91cjhch.fsf@vitty.brq.redhat.com>
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=y2Y8ilwyriUGgynMYA//pB8+mWDgGay/mxGbSkA0Eaw=;
+        b=yuo5ZTuOp+8ZfqICvmAM0C0gjrkEJ1pnmfByOxTu37k8ruqjhjNhRKuAZ18kdzD3N/
+         AC9QUdJNeaveZi8amMKXXZ+HrddFv8372I9SSQBB0lkYs/XsjQ5GnYhZZdD6BvwnXMay
+         IPvRufuYOemv/Zh/8enPuVpoZyZeL0zfYNIvRBMWLsiu57Q0B6QOb/irK3Lh2LRmfu6h
+         hvJHHbgICf4bos6zBp//6sTTszURDbmb8hHSpCWpFaSkQeRslxyUKL2M0rtrLoCgo8/A
+         Qz3mRAjIN9LZ8b/VtQemsW/LMjFZePodc0XOC5nCkg+U45ZP1CACbZxZlLTkaaqUf1bK
+         Ozww==
+X-Gm-Message-State: AOAM5307vGbR/zxF/3aVMtrIMAPQmhkIPoPF5ocGQPjerspp+TS2ztZ1
+        QRETGkTR9KlbhEXk/xSbmimoLwqN3WiUb8plRUdpPQ==
+X-Google-Smtp-Source: ABdhPJyju/FbxRBXiA9b3A3dGPr7fMUwMbj02mX3uH1UpvPkV4V9+KVxHWflnZp/9M2Io/WVc9SRwGgvCE1MnXaRY+0=
+X-Received: by 2002:a5d:628f:: with SMTP id k15mr24637104wru.363.1635770070888;
+ Mon, 01 Nov 2021 05:34:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
+From:   Anup Patel <anup@brainfault.org>
+Date:   Mon, 1 Nov 2021 18:04:19 +0530
+Message-ID: <CAAhSdy0TUZAgb5Wyp4Lnv30A1sJ009ATr9VTq49ow_C9-YVeBg@mail.gmail.com>
+Subject: [GIT PULL] KVM/riscv for 5.16 take #2
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
+        KVM General <kvm@vger.kernel.org>,
+        Atish Patra <atish.patra@wdc.com>,
+        kvm-riscv@lists.infradead.org,
+        linux-riscv <linux-riscv@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
+Hi Paolo,
 
-> Add checks for the three fields in Hyper-V's hypercall params that must
-> be zero.  Per the TLFS, HV_STATUS_INVALID_HYPERCALL_INPUT is returned if
-> "A reserved bit in the specified hypercall input value is non-zero."
->
-> Note, the TLFS has an off-by-one bug for the last reserved field, which
-> it defines as being bits 64:60.  The same section states "The input field
-> 64-bit value called a hypercall input value.", i.e. bit 64 doesn't
-> exist.
+I had two warning fixes in the KVM RISC-V repo which I am
+sending as part of this PR. Also, sorry if I sent the PR too late.
 
-This version are you looking at? I can't see this issue in 6.0b
+Please pull.
 
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/hyperv.c             | 5 +++++
->  include/asm-generic/hyperv-tlfs.h | 6 ++++++
->  2 files changed, 11 insertions(+)
->
-> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-> index ad455df850c9..1cdcf3ad5684 100644
-> --- a/arch/x86/kvm/hyperv.c
-> +++ b/arch/x86/kvm/hyperv.c
-> @@ -2228,6 +2228,11 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
->  		goto hypercall_complete;
->  	}
->  
-> +	if (unlikely(hc.param & HV_HYPERCALL_RSVD_MASK)) {
-> +		ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
-> +		goto hypercall_complete;
-> +	}
-> +
->  	if (hc.fast && is_xmm_fast_hypercall(&hc)) {
->  		if (unlikely(hv_vcpu->enforce_cpuid &&
->  			     !(hv_vcpu->cpuid_cache.features_edx &
-> diff --git a/include/asm-generic/hyperv-tlfs.h b/include/asm-generic/hyperv-tlfs.h
-> index 1ba8e6da4427..92b9ce5882f8 100644
-> --- a/include/asm-generic/hyperv-tlfs.h
-> +++ b/include/asm-generic/hyperv-tlfs.h
-> @@ -183,11 +183,17 @@ enum HV_GENERIC_SET_FORMAT {
->  #define HV_HYPERCALL_FAST_BIT		BIT(16)
->  #define HV_HYPERCALL_VARHEAD_OFFSET	17
->  #define HV_HYPERCALL_VARHEAD_MASK	GENMASK_ULL(26, 17)
-> +#define HV_HYPERCALL_RSVD0_MASK		GENMASK_ULL(31, 27)
->  #define HV_HYPERCALL_REP_COMP_OFFSET	32
->  #define HV_HYPERCALL_REP_COMP_1		BIT_ULL(32)
->  #define HV_HYPERCALL_REP_COMP_MASK	GENMASK_ULL(43, 32)
-> +#define HV_HYPERCALL_RSVD1_MASK		GENMASK_ULL(47, 44)
->  #define HV_HYPERCALL_REP_START_OFFSET	48
->  #define HV_HYPERCALL_REP_START_MASK	GENMASK_ULL(59, 48)
-> +#define HV_HYPERCALL_RSVD2_MASK		GENMASK_ULL(63, 60)
-> +#define HV_HYPERCALL_RSVD_MASK		(HV_HYPERCALL_RSVD0_MASK | \
-> +					 HV_HYPERCALL_RSVD1_MASK | \
-> +					 HV_HYPERCALL_RSVD2_MASK)
->  
->  /* hypercall status code */
->  #define HV_STATUS_SUCCESS			0
+Best Regards,
+Anup
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+The following changes since commit 9c6eb531e7606dc957bf0ef7f3eed8a5c5cb774d:
 
--- 
-Vitaly
+  Merge tag 'kvm-s390-next-5.16-1' of
+git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux into HEAD
+(2021-10-31 09:01:25 -0400)
 
+are available in the Git repository at:
+
+  git://github.com/kvm-riscv/linux.git tags/kvm-riscv-5.16-2
+
+for you to fetch changes up to bbd5ba8db7662dbfcc15204eb105cd0c2971a47c:
+
+  RISC-V: KVM: fix boolreturn.cocci warnings (2021-11-01 17:35:17 +0530)
+
+----------------------------------------------------------------
+Minor cocci warning fixes:
+1) Bool return warning fix
+2) Unneeded semicolon warning fix
+
+----------------------------------------------------------------
+Bixuan Cui (1):
+      RISC-V: KVM: fix boolreturn.cocci warnings
+
+ran jianping (1):
+      RISC-V: KVM: remove unneeded semicolon
+
+ arch/riscv/kvm/mmu.c        | 18 +++++++++---------
+ arch/riscv/kvm/vcpu.c       |  4 ++--
+ arch/riscv/kvm/vcpu_exit.c  |  6 +++---
+ arch/riscv/kvm/vcpu_sbi.c   |  2 +-
+ arch/riscv/kvm/vcpu_timer.c |  4 ++--
+ 5 files changed, 17 insertions(+), 17 deletions(-)
