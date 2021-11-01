@@ -2,124 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DA14944226A
-	for <lists+kvm@lfdr.de>; Mon,  1 Nov 2021 22:12:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 47C27442308
+	for <lists+kvm@lfdr.de>; Mon,  1 Nov 2021 23:09:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230246AbhKAVO5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Nov 2021 17:14:57 -0400
-Received: from out02.mta.xmission.com ([166.70.13.232]:38738 "EHLO
-        out02.mta.xmission.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229501AbhKAVOy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Nov 2021 17:14:54 -0400
-Received: from in01.mta.xmission.com ([166.70.13.51]:44908)
-        by out02.mta.xmission.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.93)
-        (envelope-from <ebiederm@xmission.com>)
-        id 1mhebJ-0082VH-1q; Mon, 01 Nov 2021 15:12:17 -0600
-Received: from ip68-227-160-95.om.om.cox.net ([68.227.160.95]:34474 helo=email.xmission.com)
-        by in01.mta.xmission.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.93)
-        (envelope-from <ebiederm@xmission.com>)
-        id 1mhebH-002zh6-PG; Mon, 01 Nov 2021 15:12:16 -0600
-From:   ebiederm@xmission.com (Eric W. Biederman)
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
-        kexec@lists.infradead.org, Joerg Roedel <jroedel@suse.de>,
-        stable@vger.kernel.org, hpa@zytor.com,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>,
-        Kees Cook <keescook@chromium.org>,
-        David Rientjes <rientjes@google.com>,
-        Cfir Cohen <cfir@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Mike Stunes <mstunes@vmware.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Martin Radev <martin.b.radev@gmail.com>,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
-References: <20210913155603.28383-1-joro@8bytes.org>
-        <20210913155603.28383-2-joro@8bytes.org> <YYARccITlowHABg1@zn.tnic>
-Date:   Mon, 01 Nov 2021 16:11:42 -0500
-In-Reply-To: <YYARccITlowHABg1@zn.tnic> (Borislav Petkov's message of "Mon, 1
-        Nov 2021 17:10:25 +0100")
-Message-ID: <87pmrjbmy9.fsf@disp2133>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
+        id S231939AbhKAWLv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Nov 2021 18:11:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22451 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229702AbhKAWLv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 1 Nov 2021 18:11:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635804556;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=mg126+9me9ZhZB/Tacp08IAkZeaGvGDXykNGOzkIohU=;
+        b=c7aQMpuUKLGHl8F6UHs9Y03QUwYa7eFSRXuM8mF63VBvwTP+DujK5XsuRnyJrqvKTSzRpd
+        VYtuGiQmH4i2IpyLp9/2HghZ9gqUPbF7z5il/1rDGYtLDQWthKG/S5fBVcESEc/xCNdkkx
+        Ds1IEOgUH+ZF/+MXRTt+LJFkR6Y3rKw=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-415-A_54PQ-wMGS5MYKXYLy_zw-1; Mon, 01 Nov 2021 18:09:15 -0400
+X-MC-Unique: A_54PQ-wMGS5MYKXYLy_zw-1
+Received: by mail-wr1-f70.google.com with SMTP id v17-20020adfedd1000000b0017c5e737b02so3785807wro.18
+        for <kvm@vger.kernel.org>; Mon, 01 Nov 2021 15:09:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=mg126+9me9ZhZB/Tacp08IAkZeaGvGDXykNGOzkIohU=;
+        b=MP7PHjtkv9KjQJH/a63ZpBdTyzGxc7fA9ipGfXkVvNkd/OLXwcAwyKu+SeNb3ZDhMv
+         R4SNC55d8EKxaq5Uigr4N6L1n0KdP+rkkb0J+l1XWmB74+gD7zeyz/z4lgHc0uGsFcYl
+         bdV+eVZFWEmA1fz9J2QtG2fiJ2kxb0fiWmbtB5Tcmu7pAmkyOR/B+VmcyCDPHJKd/sSG
+         GxI2G57UqL/8m0cDxwDHNRY2Zy3M4sPLlt0wWM9UOo/pTLbLvFz+XHFBLg+9UCOW6etb
+         IAhFXk7QUlD1MhmrhWw7Qdd4lJUCPj3tsPfOlvl4rbGrWwXw0eCKA5Mvn1gTkRTL0tMt
+         eHNg==
+X-Gm-Message-State: AOAM53016Ov1WTh+H+MU5h7sfAz8Mk2mLgw5olBQjdlmKE1TbepTTILQ
+        dOkRs6pVicZU5uSjB4ybPwoY9HE81lsR1WNtAhgJ9NlwKTCU1vckDL6z0Vxhhxn2qJBSKBpkbDU
+        JiQpEtcfKdcA6
+X-Received: by 2002:a5d:6e8c:: with SMTP id k12mr40207221wrz.401.1635804554336;
+        Mon, 01 Nov 2021 15:09:14 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwiYqS6XG9xwq0Xi+0IIDYOMlQDxPDwjRqxs0xc44YT7VvgO+jFUiosfcGK1mj6k1mDxUBPBw==
+X-Received: by 2002:a5d:6e8c:: with SMTP id k12mr40207187wrz.401.1635804554086;
+        Mon, 01 Nov 2021 15:09:14 -0700 (PDT)
+Received: from localhost (static-233-86-86-188.ipcom.comunitel.net. [188.86.86.233])
+        by smtp.gmail.com with ESMTPSA id i15sm630121wmb.20.2021.11.01.15.09.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 01 Nov 2021 15:09:13 -0700 (PDT)
+From:   Juan Quintela <quintela@redhat.com>
+To:     qemu-devel@nongnu.org
+Cc:     Markus Armbruster <armbru@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        xen-devel@lists.xenproject.org,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Eric Blake <eblake@redhat.com>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+        kvm@vger.kernel.org, Peter Xu <peterx@redhat.com>,
+        =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+        Paul Durrant <paul@xen.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Juan Quintela <quintela@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Anthony Perard <anthony.perard@citrix.com>
+Subject: [PULL 00/20] Migration 20211031 patches
+Date:   Mon,  1 Nov 2021 23:08:52 +0100
+Message-Id: <20211101220912.10039-1-quintela@redhat.com>
+X-Mailer: git-send-email 2.33.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-XM-SPF: eid=1mhebH-002zh6-PG;;;mid=<87pmrjbmy9.fsf@disp2133>;;;hst=in01.mta.xmission.com;;;ip=68.227.160.95;;;frm=ebiederm@xmission.com;;;spf=neutral
-X-XM-AID: U2FsdGVkX1/dOcje8rMk6fFebgEu/saSTasGNFo4jXQ=
-X-SA-Exim-Connect-IP: 68.227.160.95
-X-SA-Exim-Mail-From: ebiederm@xmission.com
-X-Spam-Checker-Version: SpamAssassin 3.4.2 (2018-09-13) on sa08.xmission.com
-X-Spam-Level: **
-X-Spam-Status: No, score=2.5 required=8.0 tests=ALL_TRUSTED,BAYES_50,
-        DCC_CHECK_NEGATIVE,TR_XM_BayesUnsub,T_TM2_M_HEADER_IN_MSG,
-        T_TooManySym_01,XMSubLong,XM_B_Unsub autolearn=disabled version=3.4.2
-X-Spam-Report: * -1.0 ALL_TRUSTED Passed through trusted hosts only via SMTP
-        *  0.8 BAYES_50 BODY: Bayes spam probability is 40 to 60%
-        *      [score: 0.4982]
-        *  0.7 XMSubLong Long Subject
-        *  0.0 T_TM2_M_HEADER_IN_MSG BODY: No description available.
-        * -0.0 DCC_CHECK_NEGATIVE Not listed in DCC
-        *      [sa08 1397; Body=1 Fuz1=1 Fuz2=1]
-        *  0.0 T_TooManySym_01 4+ unique symbols in subject
-        *  0.5 XM_B_Unsub Unsubscribe in body of email but missing unsubscribe
-        *       header
-        *  1.5 TR_XM_BayesUnsub High bayes score with no unsubscribe header
-X-Spam-DCC: XMission; sa08 1397; Body=1 Fuz1=1 Fuz2=1 
-X-Spam-Combo: **;Borislav Petkov <bp@alien8.de>
-X-Spam-Relay-Country: 
-X-Spam-Timing: total 611 ms - load_scoreonly_sql: 0.05 (0.0%),
-        signal_user_changed: 14 (2.3%), b_tie_ro: 12 (2.0%), parse: 0.91
-        (0.1%), extract_message_metadata: 17 (2.8%), get_uri_detail_list: 1.38
-        (0.2%), tests_pri_-1000: 11 (1.8%), tests_pri_-950: 1.41 (0.2%),
-        tests_pri_-900: 1.43 (0.2%), tests_pri_-90: 131 (21.5%), check_bayes:
-        112 (18.4%), b_tokenize: 8 (1.3%), b_tok_get_all: 8 (1.3%),
-        b_comp_prob: 2.8 (0.5%), b_tok_touch_all: 88 (14.4%), b_finish: 1.62
-        (0.3%), tests_pri_0: 416 (68.0%), check_dkim_signature: 0.64 (0.1%),
-        check_dkim_adsp: 3.1 (0.5%), poll_dns_idle: 1.11 (0.2%), tests_pri_10:
-        3.8 (0.6%), tests_pri_500: 11 (1.8%), rewrite_mail: 0.00 (0.0%)
-Subject: Re: [PATCH v2 01/12] kexec: Allow architecture code to opt-out at runtime
-X-SA-Exim-Version: 4.2.1 (built Sat, 08 Feb 2020 21:53:50 +0000)
-X-SA-Exim-Scanned: Yes (on in01.mta.xmission.com)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Borislav Petkov <bp@alien8.de> writes:
-
-> On Mon, Sep 13, 2021 at 05:55:52PM +0200, Joerg Roedel wrote:
->> From: Joerg Roedel <jroedel@suse.de>
->> 
->> Allow a runtime opt-out of kexec support for architecture code in case
->> the kernel is running in an environment where kexec is not properly
->> supported yet.
->> 
->> This will be used on x86 when the kernel is running as an SEV-ES
->> guest. SEV-ES guests need special handling for kexec to hand over all
->> CPUs to the new kernel. This requires special hypervisor support and
->> handling code in the guest which is not yet implemented.
->> 
->> Cc: stable@vger.kernel.org # v5.10+
->> Signed-off-by: Joerg Roedel <jroedel@suse.de>
->> ---
->>  include/linux/kexec.h |  1 +
->>  kernel/kexec.c        | 14 ++++++++++++++
->>  kernel/kexec_file.c   |  9 +++++++++
->>  3 files changed, 24 insertions(+)
->
-> I guess I can take this through the tip tree along with the next one.
-
-I seem to remember the consensus when this was reviewed that it was
-unnecessary and there is already support for doing something like
-this at a more fine grained level so we don't need a new kexec hook.
-
-Eric
+The following changes since commit af531756d25541a1b3b3d9a14e72e7fedd941a2e=
+:=0D
+=0D
+  Merge remote-tracking branch 'remotes/philmd/tags/renesas-20211030' into =
+staging (2021-10-30 11:31:41 -0700)=0D
+=0D
+are available in the Git repository at:=0D
+=0D
+  https://github.com/juanquintela/qemu.git tags/migration-20211031-pull-req=
+uest=0D
+=0D
+for you to fetch changes up to 826b8bc80cb191557a4ce7cf0e155b436d2d1afa:=0D
+=0D
+  migration/dirtyrate: implement dirty-bitmap dirtyrate calculation (2021-1=
+1-01 22:56:44 +0100)=0D
+=0D
+----------------------------------------------------------------=0D
+Migration Pull request=0D
+=0D
+Hi=0D
+=0D
+this includes pending bits of migration patches.=0D
+=0D
+- virtio-mem support by David Hildenbrand=0D
+- dirtyrate improvements by Hyman Huang=0D
+- fix rdma wrid by Li Zhijian=0D
+- dump-guest-memory fixes by Peter Xu=0D
+=0D
+Pleas apply.=0D
+=0D
+Thanks, Juan.=0D
+=0D
+----------------------------------------------------------------=0D
+=0D
+David Hildenbrand (8):=0D
+  memory: Introduce replay_discarded callback for RamDiscardManager=0D
+  virtio-mem: Implement replay_discarded RamDiscardManager callback=0D
+  migration/ram: Handle RAMBlocks with a RamDiscardManager on the=0D
+    migration source=0D
+  virtio-mem: Drop precopy notifier=0D
+  migration/postcopy: Handle RAMBlocks with a RamDiscardManager on the=0D
+    destination=0D
+  migration: Simplify alignment and alignment checks=0D
+  migration/ram: Factor out populating pages readable in=0D
+    ram_block_populate_pages()=0D
+  migration/ram: Handle RAMBlocks with a RamDiscardManager on background=0D
+    snapshots=0D
+=0D
+Hyman Huang(=C3=A9=C2=BB=E2=80=9E=C3=A5=E2=80=B9=E2=80=A1) (6):=0D
+  KVM: introduce dirty_pages and kvm_dirty_ring_enabled=0D
+  memory: make global_dirty_tracking a bitmask=0D
+  migration/dirtyrate: introduce struct and adjust DirtyRateStat=0D
+  migration/dirtyrate: adjust order of registering thread=0D
+  migration/dirtyrate: move init step of calculation to main thread=0D
+  migration/dirtyrate: implement dirty-ring dirtyrate calculation=0D
+=0D
+Hyman Huang(=E9=BB=84=E5=8B=87) (2):=0D
+  memory: introduce total_dirty_pages to stat dirty pages=0D
+  migration/dirtyrate: implement dirty-bitmap dirtyrate calculation=0D
+=0D
+Li Zhijian (1):=0D
+  migration/rdma: Fix out of order wrid=0D
+=0D
+Peter Xu (3):=0D
+  migration: Make migration blocker work for snapshots too=0D
+  migration: Add migrate_add_blocker_internal()=0D
+  dump-guest-memory: Block live migration=0D
+=0D
+ qapi/migration.json            |  48 ++++-=0D
+ include/exec/memory.h          |  41 +++-=0D
+ include/exec/ram_addr.h        |  13 +-=0D
+ include/hw/core/cpu.h          |   1 +=0D
+ include/hw/virtio/virtio-mem.h |   3 -=0D
+ include/migration/blocker.h    |  16 ++=0D
+ include/sysemu/kvm.h           |   1 +=0D
+ migration/dirtyrate.h          |  21 +-=0D
+ migration/ram.h                |   1 +=0D
+ accel/kvm/kvm-all.c            |   7 +=0D
+ accel/stubs/kvm-stub.c         |   5 +=0D
+ dump/dump.c                    |  19 ++=0D
+ hw/i386/xen/xen-hvm.c          |   4 +-=0D
+ hw/virtio/virtio-mem.c         |  92 ++++++---=0D
+ migration/dirtyrate.c          | 367 ++++++++++++++++++++++++++++++---=0D
+ migration/migration.c          |  30 +--=0D
+ migration/postcopy-ram.c       |  40 +++-=0D
+ migration/ram.c                | 180 ++++++++++++++--=0D
+ migration/rdma.c               | 138 +++++++++----=0D
+ softmmu/memory.c               |  43 +++-=0D
+ hmp-commands.hx                |   8 +-=0D
+ migration/trace-events         |   2 +=0D
+ softmmu/trace-events           |   1 +=0D
+ 23 files changed, 909 insertions(+), 172 deletions(-)=0D
+=0D
+-- =0D
+2.33.1=0D
+=0D
 
