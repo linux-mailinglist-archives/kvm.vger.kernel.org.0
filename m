@@ -2,399 +2,198 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BB839441C43
-	for <lists+kvm@lfdr.de>; Mon,  1 Nov 2021 15:09:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 45382441C4E
+	for <lists+kvm@lfdr.de>; Mon,  1 Nov 2021 15:11:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232124AbhKAOLw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Nov 2021 10:11:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52056 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229826AbhKAOLw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Nov 2021 10:11:52 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA717C061714
-        for <kvm@vger.kernel.org>; Mon,  1 Nov 2021 07:09:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=MIME-Version:Content-Type:Date:Cc:To:
-        From:Subject:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=8SYllSrkXmDulo1kN+zlthS7Gr0Kw9phzuw/BkAI2iQ=; b=w1/h1xQ9lgyszwHZcEVz6vnU8B
-        BYoY9CvB7G39JxUOHa0myCs4xrbVzkScT0+I6ixmXlMCqTZhqC3ZbHLX9dDsxzbQZVO3SOdvDz6qW
-        jDCx+m1Mlq9n1PQpDc4vo4mZLzbMP3Y/4m/zytKVUAimy+kWMuHWbMOONMS0IYcRBppPnaklmMyBc
-        t5o6JMgEb8UVaNVYwmumkyivpFiSVoLvBgGtLZppcTv4zSrlUo6XGTVC46S5QbIjCf9Wod0vIOfM/
-        8thIZTu5Y6c6j51fHwWpe/AXuYDO2XyF71yBXWsDyKUJnxilwHWJFLNp//mzudYcdZFt8es00rT5/
-        n717QeUQ==;
-Received: from [2001:8b0:10b:1::3ae] (helo=u3832b3a9db3152.infradead.org)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mhXzm-00GXoZ-8t; Mon, 01 Nov 2021 14:09:06 +0000
-Message-ID: <5d4002373c3ae614cb87b72ba5b7cdc161a0cd46.camel@infradead.org>
-Subject: [PATCH] KVM: x86: Fix recording of guest steal time / preempted
- status
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     kvm <kvm@vger.kernel.org>
-Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "mtosatti@redhat.com" <mtosatti@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>, karahmed@amazon.com
-Date:   Mon, 01 Nov 2021 14:09:02 +0000
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-Pbv31nmGuxQMbtaMvONL"
-User-Agent: Evolution 3.36.5-0ubuntu1 
+        id S232498AbhKAOOM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Nov 2021 10:14:12 -0400
+Received: from mail-mw2nam08on2078.outbound.protection.outlook.com ([40.107.101.78]:19373
+        "EHLO NAM04-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S232487AbhKAOOL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Nov 2021 10:14:11 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Wjh5WRVLYV0YmRD4vA051mvgRSmdBgsuJoV5OuA3wIwFSsSEEJna5BhIJV314eZqtLi53Ok4Yz34Ojbpx85n7bQOPDkHFhNEde6rAlGjIkoeF8A4Tci5/ELvKqtQlak/WquWmEbWQEyHYmwI0M3Wl5FK3Ee87gjyE7xgYPws6Uf0tWOXdnBbbzvU8iKAJu3jyv2DXwdcIigO5cTkvVwpeMkklJNTY9zGSYDcCefUobPvYDJ27ejz7DgcB40Jpdp/V5tZK5/SFq9U4RFQf/rt5oo88OEp8oV2eGAMMP4VOw5/rV1rQzVux0xbTrKNpURUXIEQLLkv6vuolxAe6Uio1A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dIIx1P1taO7wpxY1v8HK+pEl0vZ1v1m1fnd2lJzGstA=;
+ b=kMK2op5Dx1Wqz8iPzlRwso5G0UjNPegZDVCxZDxpb2QMXjhplds05oQPH1/2qe94C/WsISmMhrLsVb/47u4hQkK4Tj1dDKUnBXARUAu9/RRO5WTU03uHirtm6DqEWUta9KlGbZLBeCTQt+Bf+05pwzhwlGzapyzqmeflKvnumpQayaIu4PR/U1KUCHmudECyLUEZ7d4c8nBtx9bfA/9OMKSiVO5s+yt/Tpw0oPcimnF8BZMqkYAIhTB5QNCPbAUYenv7qFVa43RhY8WJu9lvOc8UfN3TOCHkuQ+kL+NLLZpDkqZw+pdry28j3WO8OT6L6uoyTauSZf0IUfBtDjZyEQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dIIx1P1taO7wpxY1v8HK+pEl0vZ1v1m1fnd2lJzGstA=;
+ b=n3lPikvfE+FgGb81cysB8FHTJ4h9OXNf3lVqk6JOEs0t+wiyUISdKejvlPtDCoepWi1PaMEV0AfA70zJ1UmV3V/gYpCss/HWYNksFB+od5MKU9ELcQOi1G/TB5AvAHrfwhhx1tngigTdeKr5+7npvG5JiJDnZzNobyJD+u8D6hC39/j60Xo5I/qpp1AxakD6TgNM4CMlGyJubgRVw7BTkWG9S+ubLDeiQjotW0DEbIUnHNr4lyoMa/dAjZpODim+38Sp++Qx3oQahCJ+fmBABS6WePpk4KvPjY8GerC6Z9wO9IEr2yFxiafxVuUvPCqnoVt4xmpncjvap6HbYdpTtg==
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5285.namprd12.prod.outlook.com (2603:10b6:208:31f::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4649.14; Mon, 1 Nov
+ 2021 14:11:35 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::e8af:232:915e:2f95]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::e8af:232:915e:2f95%8]) with mapi id 15.20.4649.019; Mon, 1 Nov 2021
+ 14:11:35 +0000
+Date:   Mon, 1 Nov 2021 11:11:33 -0300
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     mst@redhat.com, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        maxime.coquelin@redhat.com, cunming.liang@intel.com,
+        zhihong.wang@intel.com, rob.miller@broadcom.com,
+        xiao.w.wang@intel.com, lingshan.zhu@intel.com, eperezma@redhat.com,
+        lulu@redhat.com, parav@mellanox.com, kevin.tian@intel.com,
+        stefanha@redhat.com, rdunlap@infradead.org, hch@infradead.org,
+        aadam@redhat.com, jiri@mellanox.com, shahafs@mellanox.com,
+        hanand@xilinx.com, mhabets@solarflare.com, gdawar@xilinx.com,
+        saugatm@xilinx.com, vmireyno@marvell.com,
+        zhangweining@ruijie.com.cn, Tiwei Bie <tiwei.bie@intel.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>
+Subject: Re: [PATCH V9 7/9] vhost: introduce vDPA-based backend
+Message-ID: <20211101141133.GA1073864@nvidia.com>
+References: <20200326140125.19794-1-jasowang@redhat.com>
+ <20200326140125.19794-8-jasowang@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200326140125.19794-8-jasowang@redhat.com>
+X-ClientProxiedBy: MN2PR16CA0002.namprd16.prod.outlook.com
+ (2603:10b6:208:134::15) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Received: from mlx.ziepe.ca (142.162.113.129) by MN2PR16CA0002.namprd16.prod.outlook.com (2603:10b6:208:134::15) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4649.15 via Frontend Transport; Mon, 1 Nov 2021 14:11:34 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mhY29-004Vh4-HI; Mon, 01 Nov 2021 11:11:33 -0300
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 685db139-32ab-4d73-c148-08d99d4182fe
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5285:
+X-Microsoft-Antispam-PRVS: <BL1PR12MB5285B8D76A64AB2551F1D2A0C28A9@BL1PR12MB5285.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ClL4yZMwnteRcgjFF2G2eq/UHVaW7+/kUAbXR/GUTgweJptXbxi5U4lcZgtvfatMTSVWLgRjxGu9+q1X1DpfqeOQ8Kek6BPRrd3K3Wr3FmdHoeYu6hEoWzG9haCos3scj0GIsCxzKNYe7LUsKyFY//8MHg/nB2H24busktczmr/zSMNB4Jp7/jby8Kl7VvfTfIS8KenKMK+qoBijh4W+dATIE6Fpbtg/YNyWP/9RTdh0e/vvDA1HXTKPI4bwJyo9wDBJCbayque28EVsb1Aa4f3scvpeLXXvwTae+uBCcm+KhMwlUKojmaZrMuWQ9HZcCOXn4Qxn7PA6BR0oORbyfAhFWimdC9CQMszE5fqw/5rGo9g5rhLi9dQa8jGCCL/iDtciOZiFQ8AXlPsaidNXmfQkEcawGymf13BD+RhMkwOYA6AleZQYFmlCdwj+DGmvqpCfPwNSmD6oSa0m+6xuyZFVOtVCFfvMtdWXJBDU0kCxOXPLqsczWpIUqi/1i/FDMw5d3yxt3XCK0TAosOc48K6xlPt4SblDYqjrTNdb/udo4VyIMjYOg6X1JdU6bhrA1dBKtDhpqOqSVHJgS1K2LFmKV8Q9cmjiX5d/oWxS0EDMP0J/8Z4yyuP4dw1ltm9H8vV25dl+CoPVhh0c+peCQQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(9786002)(38100700002)(9746002)(36756003)(4326008)(2906002)(86362001)(6916009)(508600001)(316002)(26005)(2616005)(8936002)(8676002)(33656002)(5660300002)(1076003)(186003)(426003)(7416002)(83380400001)(66946007)(54906003)(66476007)(66556008);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?XEdDIz28RaBdwPs43TVJMoPsuZjKCxg12b9GzB1BT8YvJQo4LNQ/SDeT+QPG?=
+ =?us-ascii?Q?YocNhsiH0jE2an9p3syXfRNMp/JB0ThwMGTf+rvlZHcQ6a45nAVKIVLvE3vU?=
+ =?us-ascii?Q?ZyjV+1M+BM0wcQHAen5NPzrPloqk6E2ELCmioIe6SSDIEKfhIW1C2k0CpeTz?=
+ =?us-ascii?Q?cBEiabOEmRZovTB2Ky01Rmr8MkkmSuRdisjj4KeuTH2O/BWoPR4V7PbP+/9o?=
+ =?us-ascii?Q?dw3s7sOJulqr5kouP0Nry1vMULf51DjEC6Pi3FFjQUH99Nh6MyklUr9XiPZN?=
+ =?us-ascii?Q?3MAfAr3Rd8FIC6o6opqHDoKD/xqm+RLbl6dn3Dk8eNUGp68zFnihFCphJThV?=
+ =?us-ascii?Q?9/xHequer0gj6vT6H6QWV9lmhN7vCHEsP8/97fdOs+rFMH/SFLY/55T6T5xt?=
+ =?us-ascii?Q?tdgruXcub03ZpWWms2AHeExr9kqGGFFMPgcglzSg/n2Awi8CYbCm2arp9Z7W?=
+ =?us-ascii?Q?NJuXK6VSgu7+yR8PATC75TA1b7sq6H3i1UFaIrvEzPZ0hwSTbi8+u+va1cj3?=
+ =?us-ascii?Q?D3WI4hTHdyFeMK2qQM+DqNI3N0Aw6i1YyzksYkCljS3SxQnOKlosHkvNumqp?=
+ =?us-ascii?Q?LgLqHSL0R8PIqX/4iCmMEx0HRWPO7rawf1Nkzp8jEr+NTsVWyNT8pU2nP9XK?=
+ =?us-ascii?Q?zLoxW2VTGFxugW9Q0yYtb/24X/jcNUUJeZ0jp0H5Y4I2/SS+hZYFPdaGFce6?=
+ =?us-ascii?Q?pTM9FkdyKRZ2dKCrvQm7YpBpsa6bVSTkefLliPNtlrPT1fdpAXowxKV+4umM?=
+ =?us-ascii?Q?Gj4JPdFbpLeb6okVz4h5tgMDKSZDKpPUlRZO4p5EJ8PeNkpnyUkDWJ3I+LPd?=
+ =?us-ascii?Q?AePpEZQhDpcSSIt7ax6IHvtK2ha7UKFqsQFFcJ9qpsKUGfZ7EtPkXzuEt4/7?=
+ =?us-ascii?Q?bmjT7yBIH//3EBuF9u1Vibd9WgnDVjuyEvPTkFqaBoeeJnm6/rU3lBWr60rH?=
+ =?us-ascii?Q?lCoAvrCO1YUMd5MHca7z2tlWOGy3H36hVXuQQFzrCL6q9UxImabzDUYLJ8Qn?=
+ =?us-ascii?Q?ZzGx6MTdqUsNX2Uh0VfksIm6GUbGd6y4YND3uai2H30cKQf5ATBEud+1mpoX?=
+ =?us-ascii?Q?Pek0L72cGgjYamveu+NNXKoGSd5lHAhfTEGfdFH1fl8HP3raJfliAiUQqIHs?=
+ =?us-ascii?Q?HWjS9LZzYm5A8IMTvKAkPh73vE9NZ2HuEImvirakN6Bs/dnbNqCv0D3sXjfN?=
+ =?us-ascii?Q?yFJKXQHoGTCpuoRDf7k5FHmXadtpaugxlzaF2ynBMl+t69Aqv/wGN2cc+UXE?=
+ =?us-ascii?Q?0dwtQZ4khBoOK8vnr124nngVl+kWaM62WHU+yJ/yg7JCdszo+twnWNtZZwUi?=
+ =?us-ascii?Q?3UkGG/j1KBHXd44ucsVHr8ga4HElURkOYrB5oXJNSheDieRW6kfG0Fk+gDMV?=
+ =?us-ascii?Q?rAK9EfedKcauXgAwLh67ZVSrNUq0pyXzvigy4gN2E9BpoWwc+DxRItecag3H?=
+ =?us-ascii?Q?LdqYZyZ0NIh07Jyw8ATt+mitvtECBKgALV3kz86UvUP5gbLsdBxB5eRuW/WZ?=
+ =?us-ascii?Q?SwYYbfV7RYM08ckfeFmBXtt7XpomaK0ujLSMcJfk6Q6y51w27rHEzAiciZqI?=
+ =?us-ascii?Q?QYxvzazcHpmFqAVNFGM=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 685db139-32ab-4d73-c148-08d99d4182fe
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Nov 2021 14:11:34.9130
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 4kKF/JRC2CxCyRE+Tnsv9g8jT4aQJb/TxJJIO94jE7c8pjEDIhqM1ZA0jJS6Vwpl
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5285
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Mar 26, 2020 at 10:01:23PM +0800, Jason Wang wrote:
+> From: Tiwei Bie <tiwei.bie@intel.com>
+> 
+> This patch introduces a vDPA-based vhost backend. This backend is
+> built on top of the same interface defined in virtio-vDPA and provides
+> a generic vhost interface for userspace to accelerate the virtio
+> devices in guest.
+> 
+> This backend is implemented as a vDPA device driver on top of the same
+> ops used in virtio-vDPA. It will create char device entry named
+> vhost-vdpa-$index for userspace to use. Userspace can use vhost ioctls
+> on top of this char device to setup the backend.
+> 
+> Vhost ioctls are extended to make it type agnostic and behave like a
+> virtio device, this help to eliminate type specific API like what
+> vhost_net/scsi/vsock did:
+> 
+> - VHOST_VDPA_GET_DEVICE_ID: get the virtio device ID which is defined
+>   by virtio specification to differ from different type of devices
+> - VHOST_VDPA_GET_VRING_NUM: get the maximum size of virtqueue
+>   supported by the vDPA device
+> - VHSOT_VDPA_SET/GET_STATUS: set and get virtio status of vDPA device
+> - VHOST_VDPA_SET/GET_CONFIG: access virtio config space
+> - VHOST_VDPA_SET_VRING_ENABLE: enable a specific virtqueue
+> 
+> For memory mapping, IOTLB API is mandated for vhost-vDPA which means
+> userspace drivers are required to use
+> VHOST_IOTLB_UPDATE/VHOST_IOTLB_INVALIDATE to add or remove mapping for
+> a specific userspace memory region.
+> 
+> The vhost-vDPA API is designed to be type agnostic, but it allows net
+> device only in current stage. Due to the lacking of control virtqueue
+> support, some features were filter out by vhost-vdpa.
+> 
+> We will enable more features and devices in the near future.
 
---=-Pbv31nmGuxQMbtaMvONL
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+[..]
 
-From: David Woodhouse <dwmw@amazon.co.uk>
+> +static int vhost_vdpa_alloc_domain(struct vhost_vdpa *v)
+> +{
+> +	struct vdpa_device *vdpa = v->vdpa;
+> +	const struct vdpa_config_ops *ops = vdpa->config;
+> +	struct device *dma_dev = vdpa_get_dma_dev(vdpa);
+> +	struct bus_type *bus;
+> +	int ret;
+> +
+> +	/* Device want to do DMA by itself */
+> +	if (ops->set_map || ops->dma_map)
+> +		return 0;
+> +
+> +	bus = dma_dev->bus;
+> +	if (!bus)
+> +		return -EFAULT;
+> +
+> +	if (!iommu_capable(bus, IOMMU_CAP_CACHE_COHERENCY))
+> +		return -ENOTSUPP;
+> +
+> +	v->domain = iommu_domain_alloc(bus);
+> +	if (!v->domain)
+> +		return -EIO;
+> +
+> +	ret = iommu_attach_device(v->domain, dma_dev);
+> +	if (ret)
+> +		goto err_attach;
+> 
 
-In commit b043138246a4 ("x86/KVM: Make sure KVM_VCPU_FLUSH_TLB flag is
-not missed") we switched to using a gfn_to_pfn_cache for accessing the
-guest steal time structure in order to allow for an atomic xchg of the
-preempted field. This has a couple of problems.
+I've been looking at the security of iommu_attach_device() users, and
+I wonder if this is safe?
 
-Firstly, kvm_map_gfn() doesn't work at all for IOMEM pages when the
-atomic flag is set, which it is in kvm_steal_time_set_preempted(). So a
-guest vCPU using an IOMEM page for its steal time would never have its
-preempted field set.
+The security question is if userspace is able to control the DMA
+address the devices uses? Eg if any of the cpu to device ring's are in
+userspace memory?
 
-Secondly, the gfn_to_pfn_cache is not invalidated in all cases where it
-should have been. There are two stages to the GFN =E2=86=92 PFN conversion;
-first the GFN is converted to a userspace HVA, and then that HVA is
-looked up in the process page tables to find the underlying host PFN.
-Correct invalidation of the latter would require being hooked up to the
-MMU notifiers, but that doesn't happen =E2=80=94 so it just keeps mapping a=
-nd
-unmapping the *wrong* PFN after the userspace page tables change.
+For instance if userspace can tell the device to send a packet from an
+arbitrary user controlled address.
 
-In the !IOMEM case at least the stale page *is* pinned all the time it's
-cached, so it won't be freed and reused by anyone else while still
-receiving the steal time updates. (This kind of makes a mockery of this
-repeated map/unmap dance which I thought was supposed to avoid pinning
-the page. AFAICT we might as well have just kept a kernel mapping of it
-all the time).
-
-But there's no point in a kernel mapping of it anyway, when in all cases
-we care about, we have a perfectly serviceable userspace HVA for it. We
-just need to implement the atomic xchg on the userspace address with
-appropriate exception handling, which is fairly trivial.
-
-Cc: stable@vger.kernel.org
-Fixes: b043138246a4 ("x86/KVM: Make sure KVM_VCPU_FLUSH_TLB flag is not mis=
-sed")
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
----
- arch/x86/include/asm/kvm_host.h |   2 +-
- arch/x86/kvm/x86.c              | 109 +++++++++++++++++++++++---------
- 2 files changed, 79 insertions(+), 32 deletions(-)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_hos=
-t.h
-index 63d70fa34d3a..02ec330dbb4a 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -752,7 +752,7 @@ struct kvm_vcpu_arch {
- 		u8 preempted;
- 		u64 msr_val;
- 		u64 last_steal;
--		struct gfn_to_pfn_cache cache;
-+		struct gfn_to_hva_cache cache;
- 	} st;
-=20
- 	u64 l1_tsc_offset;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 8a116999f601..14c44e1c1bc7 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3195,8 +3195,11 @@ static void kvm_vcpu_flush_tlb_guest(struct kvm_vcpu=
- *vcpu)
-=20
- static void record_steal_time(struct kvm_vcpu *vcpu)
- {
--	struct kvm_host_map map;
--	struct kvm_steal_time *st;
-+	struct gfn_to_hva_cache *ghc =3D &vcpu->arch.st.cache;
-+	struct kvm_steal_time __user *st;
-+	struct kvm_memslots *slots;
-+	u64 steal;
-+	u32 version;
-=20
- 	if (kvm_xen_msr_enabled(vcpu->kvm)) {
- 		kvm_xen_runstate_set_running(vcpu);
-@@ -3206,47 +3209,87 @@ static void record_steal_time(struct kvm_vcpu *vcpu=
-)
- 	if (!(vcpu->arch.st.msr_val & KVM_MSR_ENABLED))
- 		return;
-=20
--	/* -EAGAIN is returned in atomic context so we can just return. */
--	if (kvm_map_gfn(vcpu->kvm, vcpu->arch.st.msr_val >> PAGE_SHIFT,
--			&map, &vcpu->arch.st.cache, false))
-+	if (WARN_ON_ONCE(current->mm !=3D vcpu->kvm->mm))
- 		return;
-=20
--	st =3D map.hva +
--		offset_in_page(vcpu->arch.st.msr_val & KVM_STEAL_VALID_BITS);
-+	slots =3D kvm_memslots(vcpu->kvm);
-+
-+	if (unlikely(slots->generation !=3D ghc->generation ||
-+		     kvm_is_error_hva(ghc->hva) || !ghc->memslot)) {
-+		gfn_t gfn =3D vcpu->arch.st.msr_val & KVM_STEAL_VALID_BITS;
-+
-+		/* We rely on the fact that it fits in a single page. */
-+		BUILD_BUG_ON((sizeof(*st) - 1) & KVM_STEAL_VALID_BITS);
-+
-+		if (kvm_gfn_to_hva_cache_init(vcpu->kvm, ghc, gfn, sizeof(*st)) ||
-+		    kvm_is_error_hva(ghc->hva) || !ghc->memslot)
-+			return;
-+	}
-+
-+	st =3D (struct kvm_steal_time __user *)ghc->hva;
-+	if (!user_access_begin(st, sizeof(*st)))
-+		return;
-=20
- 	/*
- 	 * Doing a TLB flush here, on the guest's behalf, can avoid
- 	 * expensive IPIs.
- 	 */
--	if (guest_pv_has(vcpu, KVM_FEATURE_PV_TLB_FLUSH)) {
--		u8 st_preempted =3D xchg(&st->preempted, 0);
-+	if (guest_pv_has(vcpu, KVM_FEATURE_PV_TLB_FLUSH)) {
-+		int err;
-+		u8 st_preempted =3D 0;
-+
-+		asm volatile("1:\t" LOCK_PREFIX "xchgb %0, %1\n"
-+			     "\txor %2, %2\n"
-+			     "2:\n"
-+			     "\t.section .fixup,\"ax\"\n"
-+			     "3:\tmovl %3, %2\n"
-+			     "\tjmp\t2b\n"
-+			     "\t.previous\n"
-+			     _ASM_EXTABLE_UA(1b, 3b)
-+			     : "=3Dr" (st_preempted)
-+			     : "m" (st->preempted),
-+			       "r" (err),
-+			       "i" (-EFAULT),
-+			       "0" (st_preempted));
-+		if (err)
-+			goto out;
-+
-+		user_access_end();
-+
-+		vcpu->arch.st.preempted =3D 0;
-=20
- 		trace_kvm_pv_tlb_flush(vcpu->vcpu_id,
- 				       st_preempted & KVM_VCPU_FLUSH_TLB);
- 		if (st_preempted & KVM_VCPU_FLUSH_TLB)
- 			kvm_vcpu_flush_tlb_guest(vcpu);
-+
-+		if (!user_access_begin(st, sizeof(*st)))
-+			return;
- 	} else {
--		st->preempted =3D 0;
-+		unsafe_put_user(0, &st->preempted, out);
-+		vcpu->arch.st.preempted =3D 0;
- 	}
-=20
--	vcpu->arch.st.preempted =3D 0;
--
--	if (st->version & 1)
--		st->version +=3D 1;  /* first time write, random junk */
-+	unsafe_get_user(version, &st->version, out);
-+	if (version & 1)
-+		version +=3D 1;  /* first time write, random junk */
-=20
--	st->version +=3D 1;
-+	version +=3D 1;
-+	unsafe_put_user(version, &st->version, out);
-=20
- 	smp_wmb();
-=20
--	st->steal +=3D current->sched_info.run_delay -
-+	unsafe_get_user(steal, &st->steal, out);
-+	steal +=3D current->sched_info.run_delay -
- 		vcpu->arch.st.last_steal;
- 	vcpu->arch.st.last_steal =3D current->sched_info.run_delay;
-+	unsafe_put_user(steal, &st->steal, out);
-=20
--	smp_wmb();
--
--	st->version +=3D 1;
-+	version +=3D 1;
-+	unsafe_put_user(version, &st->version, out);
-=20
--	kvm_unmap_gfn(vcpu->kvm, &map, &vcpu->arch.st.cache, true, false);
-+ out:
-+	user_access_end();
- }
-=20
- int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-@@ -4286,8 +4329,10 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int c=
-pu)
-=20
- static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
- {
--	struct kvm_host_map map;
--	struct kvm_steal_time *st;
-+	struct gfn_to_hva_cache *ghc =3D &vcpu->arch.st.cache;
-+	struct kvm_steal_time __user *st;
-+	struct kvm_memslots *slots;
-+	static const u8 preempted =3D KVM_VCPU_PREEMPTED;
-=20
- 	if (!(vcpu->arch.st.msr_val & KVM_MSR_ENABLED))
- 		return;
-@@ -4295,16 +4340,21 @@ static void kvm_steal_time_set_preempted(struct kvm=
-_vcpu *vcpu)
- 	if (vcpu->arch.st.preempted)
- 		return;
-=20
--	if (kvm_map_gfn(vcpu->kvm, vcpu->arch.st.msr_val >> PAGE_SHIFT, &map,
--			&vcpu->arch.st.cache, true))
-+	/* This happens on process exit */
-+	if (unlikely(current->mm !=3D vcpu->kvm->mm))
- 		return;
-=20
--	st =3D map.hva +
--		offset_in_page(vcpu->arch.st.msr_val & KVM_STEAL_VALID_BITS);
-+	slots =3D kvm_memslots(vcpu->kvm);
-=20
--	st->preempted =3D vcpu->arch.st.preempted =3D KVM_VCPU_PREEMPTED;
-+	if (unlikely(slots->generation !=3D ghc->generation ||
-+		     kvm_is_error_hva(ghc->hva) || !ghc->memslot))
-+		return;
-=20
--	kvm_unmap_gfn(vcpu->kvm, &map, &vcpu->arch.st.cache, true, true);
-+	st =3D (struct kvm_steal_time __user *)ghc->hva;
-+	BUILD_BUG_ON(sizeof(st->preempted) !=3D sizeof(preempted));
-+
-+	if (!copy_to_user_nofault(&st->preempted, &preempted, sizeof(preempted)))
-+		vcpu->arch.st.preempted =3D KVM_VCPU_PREEMPTED;
- }
-=20
- void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
-@@ -10818,11 +10868,8 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcp=
-u)
-=20
- void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
- {
--	struct gfn_to_pfn_cache *cache =3D &vcpu->arch.st.cache;
- 	int idx;
-=20
--	kvm_release_pfn(cache->pfn, cache->dirty, cache);
--
- 	kvmclock_reset(vcpu);
-=20
- 	static_call(kvm_x86_vcpu_free)(vcpu);
---=20
-2.31.1
-
-
---=-Pbv31nmGuxQMbtaMvONL
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCECow
-ggUcMIIEBKADAgECAhEA4rtJSHkq7AnpxKUY8ZlYZjANBgkqhkiG9w0BAQsFADCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTkwMTAyMDAwMDAwWhcNMjIwMTAxMjM1
-OTU5WjAkMSIwIAYJKoZIhvcNAQkBFhNkd213MkBpbmZyYWRlYWQub3JnMIIBIjANBgkqhkiG9w0B
-AQEFAAOCAQ8AMIIBCgKCAQEAsv3wObLTCbUA7GJqKj9vHGf+Fa+tpkO+ZRVve9EpNsMsfXhvFpb8
-RgL8vD+L133wK6csYoDU7zKiAo92FMUWaY1Hy6HqvVr9oevfTV3xhB5rQO1RHJoAfkvhy+wpjo7Q
-cXuzkOpibq2YurVStHAiGqAOMGMXhcVGqPuGhcVcVzVUjsvEzAV9Po9K2rpZ52FE4rDkpDK1pBK+
-uOAyOkgIg/cD8Kugav5tyapydeWMZRJQH1vMQ6OVT24CyAn2yXm2NgTQMS1mpzStP2ioPtTnszIQ
-Ih7ASVzhV6csHb8Yrkx8mgllOyrt9Y2kWRRJFm/FPRNEurOeNV6lnYAXOymVJwIDAQABo4IB0zCC
-Ac8wHwYDVR0jBBgwFoAUgq9sjPjF/pZhfOgfPStxSF7Ei8AwHQYDVR0OBBYEFLfuNf820LvaT4AK
-xrGK3EKx1DE7MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUF
-BwMEBggrBgEFBQcDAjBGBgNVHSAEPzA9MDsGDCsGAQQBsjEBAgEDBTArMCkGCCsGAQUFBwIBFh1o
-dHRwczovL3NlY3VyZS5jb21vZG8ubmV0L0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3Js
-LmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWls
-Q0EuY3JsMIGLBggrBgEFBQcBAQR/MH0wVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuY29tb2RvY2Eu
-Y29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYI
-KwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmNvbW9kb2NhLmNvbTAeBgNVHREEFzAVgRNkd213MkBpbmZy
-YWRlYWQub3JnMA0GCSqGSIb3DQEBCwUAA4IBAQALbSykFusvvVkSIWttcEeifOGGKs7Wx2f5f45b
-nv2ghcxK5URjUvCnJhg+soxOMoQLG6+nbhzzb2rLTdRVGbvjZH0fOOzq0LShq0EXsqnJbbuwJhK+
-PnBtqX5O23PMHutP1l88AtVN+Rb72oSvnD+dK6708JqqUx2MAFLMevrhJRXLjKb2Mm+/8XBpEw+B
-7DisN4TMlLB/d55WnT9UPNHmQ+3KFL7QrTO8hYExkU849g58Dn3Nw3oCbMUgny81ocrLlB2Z5fFG
-Qu1AdNiBA+kg/UxzyJZpFbKfCITd5yX49bOriL692aMVDyqUvh8fP+T99PqorH4cIJP6OxSTdxKM
-MIIFHDCCBASgAwIBAgIRAOK7SUh5KuwJ6cSlGPGZWGYwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTE5MDEwMjAwMDAwMFoXDTIyMDEwMTIz
-NTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCASIwDQYJKoZIhvcN
-AQEBBQADggEPADCCAQoCggEBALL98Dmy0wm1AOxiaio/bxxn/hWvraZDvmUVb3vRKTbDLH14bxaW
-/EYC/Lw/i9d98CunLGKA1O8yogKPdhTFFmmNR8uh6r1a/aHr301d8YQea0DtURyaAH5L4cvsKY6O
-0HF7s5DqYm6tmLq1UrRwIhqgDjBjF4XFRqj7hoXFXFc1VI7LxMwFfT6PStq6WedhROKw5KQytaQS
-vrjgMjpICIP3A/CroGr+bcmqcnXljGUSUB9bzEOjlU9uAsgJ9sl5tjYE0DEtZqc0rT9oqD7U57My
-ECIewElc4VenLB2/GK5MfJoJZTsq7fWNpFkUSRZvxT0TRLqznjVepZ2AFzsplScCAwEAAaOCAdMw
-ggHPMB8GA1UdIwQYMBaAFIKvbIz4xf6WYXzoHz0rcUhexIvAMB0GA1UdDgQWBBS37jX/NtC72k+A
-CsaxitxCsdQxOzAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEF
-BQcDBAYIKwYBBQUHAwIwRgYDVR0gBD8wPTA7BgwrBgEEAbIxAQIBAwUwKzApBggrBgEFBQcCARYd
-aHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9DUFMwWgYDVR0fBFMwUTBPoE2gS4ZJaHR0cDovL2Ny
-bC5jb21vZG9jYS5jb20vQ09NT0RPUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFp
-bENBLmNybDCBiwYIKwYBBQUHAQEEfzB9MFUGCCsGAQUFBzAChklodHRwOi8vY3J0LmNvbW9kb2Nh
-LmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3J0MCQG
-CCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAC20spBbrL71ZEiFrbXBHonzhhirO1sdn+X+O
-W579oIXMSuVEY1LwpyYYPrKMTjKECxuvp24c829qy03UVRm742R9Hzjs6tC0oatBF7KpyW27sCYS
-vj5wbal+TttzzB7rT9ZfPALVTfkW+9qEr5w/nSuu9PCaqlMdjABSzHr64SUVy4ym9jJvv/FwaRMP
-gew4rDeEzJSwf3eeVp0/VDzR5kPtyhS+0K0zvIWBMZFPOPYOfA59zcN6AmzFIJ8vNaHKy5QdmeXx
-RkLtQHTYgQPpIP1Mc8iWaRWynwiE3ecl+PWzq4i+vdmjFQ8qlL4fHz/k/fT6qKx+HCCT+jsUk3cS
-jDCCBeYwggPOoAMCAQICEGqb4Tg7/ytrnwHV2binUlYwDQYJKoZIhvcNAQEMBQAwgYUxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMSswKQYDVQQDEyJDT01PRE8gUlNBIENlcnRpZmljYXRp
-b24gQXV0aG9yaXR5MB4XDTEzMDExMDAwMDAwMFoXDTI4MDEwOTIzNTk1OVowgZcxCzAJBgNVBAYT
-AkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNV
-BAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAvrOeV6wodnVAFsc4A5jTxhh2IVDzJXkLTLWg0X06WD6cpzEup/Y0dtmEatrQPTRI5Or1u6zf
-+bGBSyD9aH95dDSmeny1nxdlYCeXIoymMv6pQHJGNcIDpFDIMypVpVSRsivlJTRENf+RKwrB6vcf
-WlP8dSsE3Rfywq09N0ZfxcBa39V0wsGtkGWC+eQKiz4pBZYKjrc5NOpG9qrxpZxyb4o4yNNwTqza
-aPpGRqXB7IMjtf7tTmU2jqPMLxFNe1VXj9XB1rHvbRikw8lBoNoSWY66nJN/VCJv5ym6Q0mdCbDK
-CMPybTjoNCQuelc0IAaO4nLUXk0BOSxSxt8kCvsUtQIDAQABo4IBPDCCATgwHwYDVR0jBBgwFoAU
-u69+Aj36pvE8hI6t7jiY7NkyMtQwHQYDVR0OBBYEFIKvbIz4xf6WYXzoHz0rcUhexIvAMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMBEGA1UdIAQKMAgwBgYEVR0gADBMBgNVHR8E
-RTBDMEGgP6A9hjtodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDZXJ0aWZpY2F0aW9u
-QXV0aG9yaXR5LmNybDBxBggrBgEFBQcBAQRlMGMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9jcnQuY29t
-b2RvY2EuY29tL0NPTU9ET1JTQUFkZFRydXN0Q0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2Nz
-cC5jb21vZG9jYS5jb20wDQYJKoZIhvcNAQEMBQADggIBAHhcsoEoNE887l9Wzp+XVuyPomsX9vP2
-SQgG1NgvNc3fQP7TcePo7EIMERoh42awGGsma65u/ITse2hKZHzT0CBxhuhb6txM1n/y78e/4ZOs
-0j8CGpfb+SJA3GaBQ+394k+z3ZByWPQedXLL1OdK8aRINTsjk/H5Ns77zwbjOKkDamxlpZ4TKSDM
-KVmU/PUWNMKSTvtlenlxBhh7ETrN543j/Q6qqgCWgWuMAXijnRglp9fyadqGOncjZjaaSOGTTFB+
-E2pvOUtY+hPebuPtTbq7vODqzCM6ryEhNhzf+enm0zlpXK7q332nXttNtjv7VFNYG+I31gnMrwfH
-M5tdhYF/8v5UY5g2xANPECTQdu9vWPoqNSGDt87b3gXb1AiGGaI06vzgkejL580ul+9hz9D0S0U4
-jkhJiA7EuTecP/CFtR72uYRBcunwwH3fciPjviDDAI9SnC/2aPY8ydehzuZutLbZdRJ5PDEJM/1t
-yZR2niOYihZ+FCbtf3D9mB12D4ln9icgc7CwaxpNSCPt8i/GqK2HsOgkL3VYnwtx7cJUmpvVdZ4o
-gnzgXtgtdk3ShrtOS1iAN2ZBXFiRmjVzmehoMof06r1xub+85hFQzVxZx5/bRaTKTlL8YXLI8nAb
-R9HWdFqzcOoB/hxfEyIQpx9/s81rgzdEZOofSlZHynoSMYIDyjCCA8YCAQEwga0wgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
-ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjEx
-MTAxMTQwOTAyWjAvBgkqhkiG9w0BCQQxIgQgxVIGBqm520UypwKkI1IGNfY4UH+fDC/gSdrcomBH
-rpQwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
-TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
-PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
-aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBADb0j0a5dFexan3pGLWcVqYZwjxupPXLaUGzqGq516dgX/sybvLMLbomyN1LrvfR
-8QfkTZWIu98G2T/TDZbHuHm4KVKFp/UTdGoGZ1XxGdXsJW8HvXJm8az3zcm+VquNyZy2069yuYNB
-M3c+Yz9mQKl5D0qYlh3aYjbJMOkNZQvL2ypYoO80bs+kw56qJgWKfWKPu0S1zklq7iyND9FH3q97
-UIy2kdGtnDiDr/6Pzhd6Hh/HX5w2coqOowNulwpx+sxpAbkWXtm6/AL9miwfC25EnM77M+AmCZPD
-FheVsvj9+EZQwS9pZsNfNuBr0qUGrKpWlwKN267PFBDDZ+RtjqEAAAAAAAA=
-
-
---=-Pbv31nmGuxQMbtaMvONL--
-
+Thanks,
+Jason
