@@ -2,314 +2,265 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 70D9044231B
-	for <lists+kvm@lfdr.de>; Mon,  1 Nov 2021 23:09:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B7DE544233B
+	for <lists+kvm@lfdr.de>; Mon,  1 Nov 2021 23:15:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232397AbhKAWMW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Nov 2021 18:12:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:39386 "EHLO
+        id S232284AbhKAWSZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Nov 2021 18:18:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45518 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232363AbhKAWMR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 1 Nov 2021 18:12:17 -0400
+        by vger.kernel.org with ESMTP id S232283AbhKAWSS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 1 Nov 2021 18:18:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635804583;
+        s=mimecast20190719; t=1635804943;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=jP/I5apHpfB9miqWjOSmHHOjh4FLTnrs+cMqC3xHGrM=;
-        b=UJ5ZYR8tosx+CzcwON4T+X4Pi1p9fiytMUwu6K59IdAOrEjcL6tYOckZh6mWgAEMaWzGNb
-        GJsPqHbPkym0ee8SwOdKSLQXidEtiXVZUgTjkyK+QblnVNU4R9BH13RooVy4Fcax8pQ/jC
-        Gf+M7G/GN81pNH1GLN9S/L/bL4GtVqg=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-193-B3mBpnEbPPaU_3amosRpJQ-1; Mon, 01 Nov 2021 18:09:42 -0400
-X-MC-Unique: B3mBpnEbPPaU_3amosRpJQ-1
-Received: by mail-wm1-f72.google.com with SMTP id n189-20020a1c27c6000000b00322f2e380f2so171879wmn.6
-        for <kvm@vger.kernel.org>; Mon, 01 Nov 2021 15:09:42 -0700 (PDT)
+        bh=kULSYLoNK3MMdlcejBQXxDbQbCYS0VSwoKO2REatSm4=;
+        b=h7u6HjGM+lf+MWZG+/aIdzYfV9glLT+FDI27nqCVoz+tOHBvjPIsV5sPa865nOVKnomxRi
+        NJAeUlEpQiWBaHi0uAKnzkG3ZQsu9LhVXNEP4YLO2sHs/tEj3nrkE6h35cFpdD3h2lyxzk
+        hVz4EYgZ0H3BfV5Nk3D/hqeD4hj6HX8=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-148-Bf7m7GkcNACi58c7BEZo2w-1; Mon, 01 Nov 2021 18:15:40 -0400
+X-MC-Unique: Bf7m7GkcNACi58c7BEZo2w-1
+Received: by mail-ed1-f72.google.com with SMTP id h16-20020a05640250d000b003dd8167857aso16953565edb.0
+        for <kvm@vger.kernel.org>; Mon, 01 Nov 2021 15:15:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=jP/I5apHpfB9miqWjOSmHHOjh4FLTnrs+cMqC3xHGrM=;
-        b=d0d6C5Zn2L7YNhUOGwVG+r6KQyUELO5GM0IDehI6q2wyimrQI1BgKbxFhr4nx2hvqf
-         /dQNlp4mKD80oJn5iETRkgRboQafWBeDlCiVmNEkhwtTaD1JqpxS7Aj8MBGnFiRl9LE2
-         vtrumKZNyOcBDx5DsXQCHBTFHVTLfryDcVj9EzFRGCyvtsOf4p9FXahhMEFOwtt7+Lmk
-         H3noZMgtgLtSmAT1nH8DSxdbwmWStiVV0YWw1iUBEnccumeKKYmYWCD4Q57NWnpHd+4X
-         2cVjhR75FoUYkLRFoRJQyuZf1BfwenvZ414eKyQynd1wzCs604kpsY/x/xB+wtcBoMaD
-         olrg==
-X-Gm-Message-State: AOAM532vQRccGX4B1iaMjUz29+4L3p7dxcfwIresifD6NkQZntRLvF+Y
-        1IHg1/9/lA4qBdOubO8snhdzF48v3oDzWUH/tgdoy80y0b6GBdwHT2t7CRx2XbsqTosrZUGGLOf
-        4bx4DaD/JxAAT
-X-Received: by 2002:a5d:69ca:: with SMTP id s10mr17619039wrw.312.1635804581263;
-        Mon, 01 Nov 2021 15:09:41 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwekiY665T3KtWYk+MojmKh2E8nDk/brzhW8Smm/r4bdKRN1BvOX4dI3pL5wzRW0aYS3i58/A==
-X-Received: by 2002:a5d:69ca:: with SMTP id s10mr17619009wrw.312.1635804581077;
-        Mon, 01 Nov 2021 15:09:41 -0700 (PDT)
-Received: from localhost (static-233-86-86-188.ipcom.comunitel.net. [188.86.86.233])
-        by smtp.gmail.com with ESMTPSA id k8sm688985wms.41.2021.11.01.15.09.40
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=kULSYLoNK3MMdlcejBQXxDbQbCYS0VSwoKO2REatSm4=;
+        b=3l5GIkQ1MBj3TRl/qNyIpy6wzxb0ZMz6ivnfrLpB5Rxj3eMoHQ+ncmsIB0zvKSHGn/
+         YYC1xeThG24ExD2Yr4f11mL2CuiN1BgoDWOznC5CfQHMt2k/2l4inoGdFBYIdeiU1RuE
+         pxKEa9eTiDWESTVwSTV2cxsn35YoX+DrLPFsixxA0u+YSg1054UGOMDOWqoeFzeyL+/k
+         UPXNc0cYc52Yy38eFf2agVBfuKnp1Ol55aiyOQXGWlCJtGDSjD2AcHqQfa+a2Z2rg74y
+         54+Ttql7VkOKawq4eNxxMrG8imqhtdwvspRHblNKOIzICMU+kTpmdpg4pf9WAAIV9vTK
+         YxcA==
+X-Gm-Message-State: AOAM531X91RNeuB4qHjidgPaU8bHjqPauxOIKRKhTsd/rODxqlGTm696
+        +ChQOOzah/MLd/1nZCJKjLWale8nxiHlatN5MUpYenMpqIfJkMNPqJnIwAzcN5GOlO94FOXfF5y
+        cAQlNf8J1Xg5Z
+X-Received: by 2002:a17:906:4fc8:: with SMTP id i8mr38381683ejw.342.1635804939146;
+        Mon, 01 Nov 2021 15:15:39 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwjWrNq0ltV/7mWaI9dUnocsPMjnaPQxyOdrrUF0hMy1fJO7N0y4OyHwichdduDe/qHph4KJA==
+X-Received: by 2002:a17:906:4fc8:: with SMTP id i8mr38381652ejw.342.1635804938912;
+        Mon, 01 Nov 2021 15:15:38 -0700 (PDT)
+Received: from redhat.com ([2.55.156.42])
+        by smtp.gmail.com with ESMTPSA id i22sm9557576edu.93.2021.11.01.15.15.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Nov 2021 15:09:40 -0700 (PDT)
-From:   Juan Quintela <quintela@redhat.com>
-To:     qemu-devel@nongnu.org
-Cc:     Markus Armbruster <armbru@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
+        Mon, 01 Nov 2021 15:15:37 -0700 (PDT)
+Date:   Mon, 1 Nov 2021 18:15:33 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
         Eduardo Habkost <ehabkost@redhat.com>,
-        xen-devel@lists.xenproject.org,
-        Richard Henderson <richard.henderson@linaro.org>,
-        Stefano Stabellini <sstabellini@kernel.org>,
         Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Eric Blake <eblake@redhat.com>,
-        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
-        kvm@vger.kernel.org, Peter Xu <peterx@redhat.com>,
-        =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
-        Paul Durrant <paul@xen.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Juan Quintela <quintela@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Anthony Perard <anthony.perard@citrix.com>,
-        =?UTF-8?q?Hyman=20Huang=28=E9=BB=84=E5=8B=87=29?= 
-        <huangy81@chinatelecom.cn>
-Subject: [PULL 20/20] migration/dirtyrate: implement dirty-bitmap dirtyrate calculation
-Date:   Mon,  1 Nov 2021 23:09:12 +0100
-Message-Id: <20211101220912.10039-21-quintela@redhat.com>
-X-Mailer: git-send-email 2.33.1
-In-Reply-To: <20211101220912.10039-1-quintela@redhat.com>
-References: <20211101220912.10039-1-quintela@redhat.com>
+        Igor Mammedov <imammedo@redhat.com>,
+        Ani Sinha <ani@anisinha.ca>, Peter Xu <peterx@redhat.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
+        Hui Zhu <teawater@gmail.com>,
+        Sebastien Boeuf <sebastien.boeuf@intel.com>,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH v1 00/12] virtio-mem: Expose device memory via multiple
+ memslots
+Message-ID: <20211101181352-mutt-send-email-mst@kernel.org>
+References: <20211027124531.57561-1-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20211027124531.57561-1-david@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Hyman Huang(黄勇) <huangy81@chinatelecom.cn>
+On Wed, Oct 27, 2021 at 02:45:19PM +0200, David Hildenbrand wrote:
+> This is the follow-up of [1], dropping auto-detection and vhost-user
+> changes from the initial RFC.
+> 
+> Based-on: 20211011175346.15499-1-david@redhat.com
+> 
+> A virtio-mem device is represented by a single large RAM memory region
+> backed by a single large mmap.
+> 
+> Right now, we map that complete memory region into guest physical addres
+> space, resulting in a very large memory mapping, KVM memory slot, ...
+> although only a small amount of memory might actually be exposed to the VM.
+> 
+> For example, when starting a VM with a 1 TiB virtio-mem device that only
+> exposes little device memory (e.g., 1 GiB) towards the VM initialliy,
+> in order to hotplug more memory later, we waste a lot of memory on metadata
+> for KVM memory slots (> 2 GiB!) and accompanied bitmaps. Although some
+> optimizations in KVM are being worked on to reduce this metadata overhead
+> on x86-64 in some cases, it remains a problem with nested VMs and there are
+> other reasons why we would want to reduce the total memory slot to a
+> reasonable minimum.
+> 
+> We want to:
+> a) Reduce the metadata overhead, including bitmap sizes inside KVM but also
+>    inside QEMU KVM code where possible.
+> b) Not always expose all device-memory to the VM, to reduce the attack
+>    surface of malicious VMs without using userfaultfd.
 
-introduce dirty-bitmap mode as the third method of calc-dirty-rate.
-implement dirty-bitmap dirtyrate calculation, which can be used
-to measuring dirtyrate in the absence of dirty-ring.
+I'm confused by the mention of these security considerations,
+and I expect users will be just as confused.
+So let's say user wants to not be exposed. What value for
+the option should be used? What if a lower option is used?
+Is there still some security advantage?
 
-introduce "dirty_bitmap:-b" option in hmp calc_dirty_rate to
-indicate dirty bitmap method should be used for calculation.
-
-Signed-off-by: Hyman Huang(黄勇) <huangy81@chinatelecom.cn>
-Reviewed-by: Peter Xu <peterx@redhat.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
-Signed-off-by: Juan Quintela <quintela@redhat.com>
----
- qapi/migration.json   |   6 ++-
- migration/dirtyrate.c | 112 ++++++++++++++++++++++++++++++++++++++----
- hmp-commands.hx       |   9 ++--
- 3 files changed, 112 insertions(+), 15 deletions(-)
-
-diff --git a/qapi/migration.json b/qapi/migration.json
-index fae4bc608c..87146ceea2 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -1770,13 +1770,15 @@
- #
- # @page-sampling: calculate dirtyrate by sampling pages.
- #
--# @dirty-ring: calculate dirtyrate by via dirty ring.
-+# @dirty-ring: calculate dirtyrate by dirty ring.
-+#
-+# @dirty-bitmap: calculate dirtyrate by dirty bitmap.
- #
- # Since: 6.1
- #
- ##
- { 'enum': 'DirtyRateMeasureMode',
--  'data': ['page-sampling', 'dirty-ring'] }
-+  'data': ['page-sampling', 'dirty-ring', 'dirty-bitmap'] }
- 
- ##
- # @DirtyRateInfo:
-diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
-index 17b3d2cbb5..d65e744af9 100644
---- a/migration/dirtyrate.c
-+++ b/migration/dirtyrate.c
-@@ -15,6 +15,7 @@
- #include "qapi/error.h"
- #include "cpu.h"
- #include "exec/ramblock.h"
-+#include "exec/ram_addr.h"
- #include "qemu/rcu_queue.h"
- #include "qemu/main-loop.h"
- #include "qapi/qapi-commands-migration.h"
-@@ -118,6 +119,10 @@ static struct DirtyRateInfo *query_dirty_rate_info(void)
-             }
-             info->vcpu_dirty_rate = head;
-         }
-+
-+        if (dirtyrate_mode == DIRTY_RATE_MEASURE_MODE_DIRTY_BITMAP) {
-+            info->sample_pages = 0;
-+        }
-     }
- 
-     trace_query_dirty_rate_info(DirtyRateStatus_str(CalculatingState));
-@@ -429,6 +434,79 @@ static int64_t do_calculate_dirtyrate_vcpu(DirtyPageRecord dirty_pages)
-     return memory_size_MB / time_s;
- }
- 
-+static inline void record_dirtypages_bitmap(DirtyPageRecord *dirty_pages,
-+                                            bool start)
-+{
-+    if (start) {
-+        dirty_pages->start_pages = total_dirty_pages;
-+    } else {
-+        dirty_pages->end_pages = total_dirty_pages;
-+    }
-+}
-+
-+static void do_calculate_dirtyrate_bitmap(DirtyPageRecord dirty_pages)
-+{
-+    DirtyStat.dirty_rate = do_calculate_dirtyrate_vcpu(dirty_pages);
-+}
-+
-+static inline void dirtyrate_manual_reset_protect(void)
-+{
-+    RAMBlock *block = NULL;
-+
-+    WITH_RCU_READ_LOCK_GUARD() {
-+        RAMBLOCK_FOREACH_MIGRATABLE(block) {
-+            memory_region_clear_dirty_bitmap(block->mr, 0,
-+                                             block->used_length);
-+        }
-+    }
-+}
-+
-+static void calculate_dirtyrate_dirty_bitmap(struct DirtyRateConfig config)
-+{
-+    int64_t msec = 0;
-+    int64_t start_time;
-+    DirtyPageRecord dirty_pages;
-+
-+    qemu_mutex_lock_iothread();
-+    memory_global_dirty_log_start(GLOBAL_DIRTY_DIRTY_RATE);
-+
-+    /*
-+     * 1'round of log sync may return all 1 bits with
-+     * KVM_DIRTY_LOG_INITIALLY_SET enable
-+     * skip it unconditionally and start dirty tracking
-+     * from 2'round of log sync
-+     */
-+    memory_global_dirty_log_sync();
-+
-+    /*
-+     * reset page protect manually and unconditionally.
-+     * this make sure kvm dirty log be cleared if
-+     * KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE cap is enabled.
-+     */
-+    dirtyrate_manual_reset_protect();
-+    qemu_mutex_unlock_iothread();
-+
-+    record_dirtypages_bitmap(&dirty_pages, true);
-+
-+    start_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
-+    DirtyStat.start_time = start_time / 1000;
-+
-+    msec = config.sample_period_seconds * 1000;
-+    msec = set_sample_page_period(msec, start_time);
-+    DirtyStat.calc_time = msec / 1000;
-+
-+    /*
-+     * dirtyrate_global_dirty_log_stop do two things.
-+     * 1. fetch dirty bitmap from kvm
-+     * 2. stop dirty tracking
-+     */
-+    dirtyrate_global_dirty_log_stop();
-+
-+    record_dirtypages_bitmap(&dirty_pages, false);
-+
-+    do_calculate_dirtyrate_bitmap(dirty_pages);
-+}
-+
- static void calculate_dirtyrate_dirty_ring(struct DirtyRateConfig config)
- {
-     CPUState *cpu;
-@@ -514,7 +592,9 @@ out:
- 
- static void calculate_dirtyrate(struct DirtyRateConfig config)
- {
--    if (config.mode == DIRTY_RATE_MEASURE_MODE_DIRTY_RING) {
-+    if (config.mode == DIRTY_RATE_MEASURE_MODE_DIRTY_BITMAP) {
-+        calculate_dirtyrate_dirty_bitmap(config);
-+    } else if (config.mode == DIRTY_RATE_MEASURE_MODE_DIRTY_RING) {
-         calculate_dirtyrate_dirty_ring(config);
-     } else {
-         calculate_dirtyrate_sample_vm(config);
-@@ -597,12 +677,15 @@ void qmp_calc_dirty_rate(int64_t calc_time,
- 
-     /*
-      * dirty ring mode only works when kvm dirty ring is enabled.
-+     * on the contrary, dirty bitmap mode is not.
-      */
--    if ((mode == DIRTY_RATE_MEASURE_MODE_DIRTY_RING) &&
--        !kvm_dirty_ring_enabled()) {
--        error_setg(errp, "dirty ring is disabled, use sample-pages method "
--                         "or remeasure later.");
--        return;
-+    if (((mode == DIRTY_RATE_MEASURE_MODE_DIRTY_RING) &&
-+        !kvm_dirty_ring_enabled()) ||
-+        ((mode == DIRTY_RATE_MEASURE_MODE_DIRTY_BITMAP) &&
-+         kvm_dirty_ring_enabled())) {
-+        error_setg(errp, "mode %s is not enabled, use other method instead.",
-+                         DirtyRateMeasureMode_str(mode));
-+         return;
-     }
- 
-     /*
-@@ -678,9 +761,8 @@ void hmp_calc_dirty_rate(Monitor *mon, const QDict *qdict)
-     int64_t sample_pages = qdict_get_try_int(qdict, "sample_pages_per_GB", -1);
-     bool has_sample_pages = (sample_pages != -1);
-     bool dirty_ring = qdict_get_try_bool(qdict, "dirty_ring", false);
--    DirtyRateMeasureMode mode =
--        (dirty_ring ? DIRTY_RATE_MEASURE_MODE_DIRTY_RING :
--         DIRTY_RATE_MEASURE_MODE_PAGE_SAMPLING);
-+    bool dirty_bitmap = qdict_get_try_bool(qdict, "dirty_bitmap", false);
-+    DirtyRateMeasureMode mode = DIRTY_RATE_MEASURE_MODE_PAGE_SAMPLING;
-     Error *err = NULL;
- 
-     if (!sec) {
-@@ -688,6 +770,18 @@ void hmp_calc_dirty_rate(Monitor *mon, const QDict *qdict)
-         return;
-     }
- 
-+    if (dirty_ring && dirty_bitmap) {
-+        monitor_printf(mon, "Either dirty ring or dirty bitmap "
-+                       "can be specified!\n");
-+        return;
-+    }
-+
-+    if (dirty_bitmap) {
-+        mode = DIRTY_RATE_MEASURE_MODE_DIRTY_BITMAP;
-+    } else if (dirty_ring) {
-+        mode = DIRTY_RATE_MEASURE_MODE_DIRTY_RING;
-+    }
-+
-     qmp_calc_dirty_rate(sec, has_sample_pages, sample_pages, true,
-                         mode, &err);
-     if (err) {
-diff --git a/hmp-commands.hx b/hmp-commands.hx
-index b6d47bd03f..3a5aeba3fe 100644
---- a/hmp-commands.hx
-+++ b/hmp-commands.hx
-@@ -1737,9 +1737,10 @@ ERST
- 
-     {
-         .name       = "calc_dirty_rate",
--        .args_type  = "dirty_ring:-r,second:l,sample_pages_per_GB:l?",
--        .params     = "[-r] second [sample_pages_per_GB]",
--        .help       = "start a round of guest dirty rate measurement (using -d to"
--                      "\n\t\t\t specify dirty ring as the method of calculation)",
-+        .args_type  = "dirty_ring:-r,dirty_bitmap:-b,second:l,sample_pages_per_GB:l?",
-+        .params     = "[-r] [-b] second [sample_pages_per_GB]",
-+        .help       = "start a round of guest dirty rate measurement (using -r to"
-+                      "\n\t\t\t specify dirty ring as the method of calculation and"
-+                      "\n\t\t\t -b to specify dirty bitmap as method of calculation)",
-         .cmd        = hmp_calc_dirty_rate,
-     },
--- 
-2.33.1
+> So instead, expose the RAM memory region not by a single large mapping
+> (consuming one memslot) but instead by multiple mappings, each consuming
+> one memslot. To do that, we divide the RAM memory region via aliases into
+> separate parts and only map the aliases into a device container we actually
+> need. We have to make sure that QEMU won't silently merge the memory
+> sections corresponding to the aliases (and thereby also memslots),
+> otherwise we lose atomic updates with KVM and vhost-user, which we deeply
+> care about when adding/removing memory. Further, to get memslot accounting
+> right, such merging is better avoided.
+> 
+> Within the memslots, virtio-mem can (un)plug memory in smaller granularity
+> dynamically. So memslots are a pure optimization to tackle a) and b) above.
+> 
+> The user configures how many memslots a virtio-mem device should use, the
+> default is "1" -- essentially corresponding to the old behavior.
+> 
+> Memslots are right now mapped once they fall into the usable device region
+> (which grows/shrinks on demand right now either when requesting to
+>  hotplug more memory or during/after reboots). In the future, with
+> VIRTIO_MEM_F_UNPLUGGED_INACCESSIBLE, we'll be able to (un)map aliases even
+> more dynamically when (un)plugging device blocks.
+> 
+> 
+> Adding a 500GiB virtio-mem device with "memslots=500" and not hotplugging
+> any memory results in:
+>     0000000140000000-000001047fffffff (prio 0, i/o): device-memory
+>       0000000140000000-0000007e3fffffff (prio 0, i/o): virtio-mem-memslots
+> 
+> Requesting the VM to consume 2 GiB results in (note: the usable region size
+> is bigger than 2 GiB, so 3 * 1 GiB memslots are required):
+>     0000000140000000-000001047fffffff (prio 0, i/o): device-memory
+>       0000000140000000-0000007e3fffffff (prio 0, i/o): virtio-mem-memslots
+>         0000000140000000-000000017fffffff (prio 0, ram): alias virtio-mem-memslot-0 @mem0 0000000000000000-000000003fffffff
+>         0000000180000000-00000001bfffffff (prio 0, ram): alias virtio-mem-memslot-1 @mem0 0000000040000000-000000007fffffff
+>         00000001c0000000-00000001ffffffff (prio 0, ram): alias virtio-mem-memslot-2 @mem0 0000000080000000-00000000bfffffff
+> 
+> Requesting the VM to consume 20 GiB results in:
+>     0000000140000000-000001047fffffff (prio 0, i/o): device-memory
+>       0000000140000000-0000007e3fffffff (prio 0, i/o): virtio-mem-memslots
+>         0000000140000000-000000017fffffff (prio 0, ram): alias virtio-mem-memslot-0 @mem0 0000000000000000-000000003fffffff
+>         0000000180000000-00000001bfffffff (prio 0, ram): alias virtio-mem-memslot-1 @mem0 0000000040000000-000000007fffffff
+>         00000001c0000000-00000001ffffffff (prio 0, ram): alias virtio-mem-memslot-2 @mem0 0000000080000000-00000000bfffffff
+>         0000000200000000-000000023fffffff (prio 0, ram): alias virtio-mem-memslot-3 @mem0 00000000c0000000-00000000ffffffff
+>         0000000240000000-000000027fffffff (prio 0, ram): alias virtio-mem-memslot-4 @mem0 0000000100000000-000000013fffffff
+>         0000000280000000-00000002bfffffff (prio 0, ram): alias virtio-mem-memslot-5 @mem0 0000000140000000-000000017fffffff
+>         00000002c0000000-00000002ffffffff (prio 0, ram): alias virtio-mem-memslot-6 @mem0 0000000180000000-00000001bfffffff
+>         0000000300000000-000000033fffffff (prio 0, ram): alias virtio-mem-memslot-7 @mem0 00000001c0000000-00000001ffffffff
+>         0000000340000000-000000037fffffff (prio 0, ram): alias virtio-mem-memslot-8 @mem0 0000000200000000-000000023fffffff
+>         0000000380000000-00000003bfffffff (prio 0, ram): alias virtio-mem-memslot-9 @mem0 0000000240000000-000000027fffffff
+>         00000003c0000000-00000003ffffffff (prio 0, ram): alias virtio-mem-memslot-10 @mem0 0000000280000000-00000002bfffffff
+>         0000000400000000-000000043fffffff (prio 0, ram): alias virtio-mem-memslot-11 @mem0 00000002c0000000-00000002ffffffff
+>         0000000440000000-000000047fffffff (prio 0, ram): alias virtio-mem-memslot-12 @mem0 0000000300000000-000000033fffffff
+>         0000000480000000-00000004bfffffff (prio 0, ram): alias virtio-mem-memslot-13 @mem0 0000000340000000-000000037fffffff
+>         00000004c0000000-00000004ffffffff (prio 0, ram): alias virtio-mem-memslot-14 @mem0 0000000380000000-00000003bfffffff
+>         0000000500000000-000000053fffffff (prio 0, ram): alias virtio-mem-memslot-15 @mem0 00000003c0000000-00000003ffffffff
+>         0000000540000000-000000057fffffff (prio 0, ram): alias virtio-mem-memslot-16 @mem0 0000000400000000-000000043fffffff
+>         0000000580000000-00000005bfffffff (prio 0, ram): alias virtio-mem-memslot-17 @mem0 0000000440000000-000000047fffffff
+>         00000005c0000000-00000005ffffffff (prio 0, ram): alias virtio-mem-memslot-18 @mem0 0000000480000000-00000004bfffffff
+>         0000000600000000-000000063fffffff (prio 0, ram): alias virtio-mem-memslot-19 @mem0 00000004c0000000-00000004ffffffff
+>         0000000640000000-000000067fffffff (prio 0, ram): alias virtio-mem-memslot-20 @mem0 0000000500000000-000000053fffffff
+> 
+> Requesting the VM to consume 5 GiB and rebooting (note: usable region size
+> will change during reboots) results in:
+>     0000000140000000-000001047fffffff (prio 0, i/o): device-memory
+>       0000000140000000-0000007e3fffffff (prio 0, i/o): virtio-mem-memslots
+>         0000000140000000-000000017fffffff (prio 0, ram): alias virtio-mem-memslot-0 @mem0 0000000000000000-000000003fffffff
+>         0000000180000000-00000001bfffffff (prio 0, ram): alias virtio-mem-memslot-1 @mem0 0000000040000000-000000007fffffff
+>         00000001c0000000-00000001ffffffff (prio 0, ram): alias virtio-mem-memslot-2 @mem0 0000000080000000-00000000bfffffff
+>         0000000200000000-000000023fffffff (prio 0, ram): alias virtio-mem-memslot-3 @mem0 00000000c0000000-00000000ffffffff
+>         0000000240000000-000000027fffffff (prio 0, ram): alias virtio-mem-memslot-4 @mem0 0000000100000000-000000013fffffff
+>         0000000280000000-00000002bfffffff (prio 0, ram): alias virtio-mem-memslot-5 @mem0 0000000140000000-000000017fffffff
+> 
+> 
+> In addition to other factors (e.g., device block size), we limit the number
+> of memslots to 1024 per devices and the size of one memslot to at least
+> 128 MiB. Further, we make sure internally to align the memslot size to at
+> least 128 MiB. For now, we limit the total number of memslots that can
+> be used by memory devices to 2048, to no go crazy on individual RAM
+> mappings in our address spaces.
+> 
+> Future work:
+> - vhost-user and libvhost-user/vhost-user-backend changes to support more than
+>   32 memslots.
+> - "memslots=0" mode to allow for auto-determining the number of memslots to
+>   use.
+> - Eventually have an interface to query the memslot limit for a QEMU
+>   instance. But vhost-* devices complicate that matter.
+> 
+> RCF -> v1:
+> - Dropped "max-memslots=" parameter and converted to "memslots=" parameter
+> - Dropped auto-determining the number of memslots to use
+> - Dropped vhost* memslot changes
+> - Improved error messages regarding memory slot limits
+> - Reshuffled, cleaned up patches, rewrote patch descriptions
+> 
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Cc: Ani Sinha <ani@anisinha.ca>
+> Cc: Peter Xu <peterx@redhat.com>
+> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+> Cc: Richard Henderson <richard.henderson@linaro.org>
+> Cc: Philippe Mathieu-Daud� <f4bug@amsat.org>
+> Cc: Hui Zhu <teawater@gmail.com>
+> Cc: Sebastien Boeuf <sebastien.boeuf@intel.com>
+> Cc: kvm@vger.kernel.org
+> 
+> [1] https://lkml.kernel.org/r/20211013103330.26869-1-david@redhat.com
+> 
+> David Hildenbrand (12):
+>   kvm: Return number of free memslots
+>   vhost: Return number of free memslots
+>   memory: Allow for marking memory region aliases unmergeable
+>   vhost: Don't merge unmergeable memory sections
+>   memory-device: Move memory_device_check_addable() directly into
+>     memory_device_pre_plug()
+>   memory-device: Generalize memory_device_used_region_size()
+>   memory-device: Support memory devices that dynamically consume
+>     multiple memslots
+>   vhost: Respect reserved memslots for memory devices when realizing a
+>     vhost device
+>   memory: Drop mapping check from
+>     memory_region_get_ram_discard_manager()
+>   virtio-mem: Fix typo in virito_mem_intersect_memory_section() function
+>     name
+>   virtio-mem: Set the RamDiscardManager for the RAM memory region
+>     earlier
+>   virtio-mem: Expose device memory via multiple memslots
+> 
+>  accel/kvm/kvm-all.c            |  24 ++--
+>  accel/stubs/kvm-stub.c         |   4 +-
+>  hw/mem/memory-device.c         | 115 ++++++++++++++----
+>  hw/virtio/vhost-stub.c         |   2 +-
+>  hw/virtio/vhost.c              |  21 ++--
+>  hw/virtio/virtio-mem-pci.c     |  23 ++++
+>  hw/virtio/virtio-mem.c         | 212 +++++++++++++++++++++++++++++----
+>  include/exec/memory.h          |  23 ++++
+>  include/hw/mem/memory-device.h |  33 +++++
+>  include/hw/virtio/vhost.h      |   2 +-
+>  include/hw/virtio/virtio-mem.h |  25 +++-
+>  include/sysemu/kvm.h           |   2 +-
+>  softmmu/memory.c               |  35 ++++--
+>  stubs/qmp_memory_device.c      |   5 +
+>  14 files changed, 449 insertions(+), 77 deletions(-)
+> 
+> -- 
+> 2.31.1
 
