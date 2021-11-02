@@ -2,95 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BB658443417
-	for <lists+kvm@lfdr.de>; Tue,  2 Nov 2021 17:54:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 88EF9443439
+	for <lists+kvm@lfdr.de>; Tue,  2 Nov 2021 18:00:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234978AbhKBQ5N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Nov 2021 12:57:13 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:52284 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234954AbhKBQ5F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Nov 2021 12:57:05 -0400
-Received: from zn.tnic (p200300ec2f0f6200599060f0a067c463.dip0.t-ipconnect.de [IPv6:2003:ec:2f0f:6200:5990:60f0:a067:c463])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S230373AbhKBRDB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Nov 2021 13:03:01 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:34434 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229684AbhKBRDA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Nov 2021 13:03:00 -0400
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 46E391EC0532;
-        Tue,  2 Nov 2021 17:54:29 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1635872069;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=XRnIinnL4tOnsAL/GsMC8vW8ZfXO/hpxLuI1GtroUw0=;
-        b=MkIi5voWdAAqnJnlNQK6bNu9R7cztziHTaU/XPDf0ZKy0BqKKb1BQ3RuzDIFFXHy9EJP83
-        lb8sQGtpdAFvET5XpRXx283CSabxdd1se7RVnQ+RMaimeIJVnDCNa3vkNqD8JkEkKV3iVn
-        j67HJZb2nQ1KtMFypPkKcJjVwQmjdIA=
-Date:   Tue, 2 Nov 2021 17:54:29 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
+        by smtp-out1.suse.de (Postfix) with ESMTPS id F12D22191E;
+        Tue,  2 Nov 2021 17:00:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1635872424; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=dnCsQ7BN32L02J/65RauwbZm1QvjnZr+v+hxhCe8MxI=;
+        b=LN+ZU9zVSkG+f0o1YeJTC9q80r9sNYe6LxDrXS7XF8DzJ53ODTemD9FbGpNEHMy+hyDNXE
+        hdCigzNumqte3Rcc9+thzX+rrlZxhUHNqmkECg5/UMzrWtj7pGm1s+8O7g8aXdyMZf7HDq
+        BtYnASAc7IuY5Caj6S3VgneFfyq5XBk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1635872424;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=dnCsQ7BN32L02J/65RauwbZm1QvjnZr+v+hxhCe8MxI=;
+        b=ja6aDrNj7Fh4aeiNIcEUe8KPzSQl+xaRPWbSKjWn8xpSUgSP3K6SrDUs+ZMp4zP3RFNhuJ
+        g7inhpvxt12rZPCg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 0963513E74;
+        Tue,  2 Nov 2021 17:00:23 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id OXF4AKdugWFDfQAAMHmgww
+        (envelope-from <jroedel@suse.de>); Tue, 02 Nov 2021 17:00:23 +0000
+Date:   Tue, 2 Nov 2021 18:00:21 +0100
+From:   Joerg Roedel <jroedel@suse.de>
+To:     "Eric W. Biederman" <ebiederm@xmission.com>
+Cc:     Borislav Petkov <bp@alien8.de>, Joerg Roedel <joro@8bytes.org>,
+        x86@kernel.org, kexec@lists.infradead.org, stable@vger.kernel.org,
+        hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
         Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
         Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
         David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com,
-        Borislav Petkov <bp@suse.de>
-Subject: Re: [PATCH v6 15/42] x86/sev: Remove do_early_exception() forward
- declarations
-Message-ID: <YYFtRfdSEtjRI15D@zn.tnic>
-References: <20211008180453.462291-1-brijesh.singh@amd.com>
- <20211008180453.462291-16-brijesh.singh@amd.com>
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v2 01/12] kexec: Allow architecture code to opt-out at
+ runtime
+Message-ID: <YYFupTJjUljpuZgL@suse.de>
+References: <20210913155603.28383-1-joro@8bytes.org>
+ <20210913155603.28383-2-joro@8bytes.org>
+ <YYARccITlowHABg1@zn.tnic>
+ <87pmrjbmy9.fsf@disp2133>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20211008180453.462291-16-brijesh.singh@amd.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87pmrjbmy9.fsf@disp2133>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 08, 2021 at 01:04:26PM -0500, Brijesh Singh wrote:
-> From: Borislav Petkov <bp@suse.de>
-> 
-> There's a perfectly fine prototype in the asm/setup.h header. Use it.
-> 
-> No functional changes.
-> 
-> Signed-off-by: Borislav Petkov <bp@suse.de>
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  arch/x86/kernel/sev.c | 7 +------
->  1 file changed, 1 insertion(+), 6 deletions(-)
+Hi again,
 
-Right, for the next and all future submissions, it is a lot easier if
-you put all fixes and cleanups and code reorganizations at the beginning
-of the patchset. Because then they can simply get applied earlier -
-they're useful cleanups and fixes, after all - and this way you'll
-unload some of the patches quicker and have to deal with a smaller set.
+On Mon, Nov 01, 2021 at 04:11:42PM -0500, Eric W. Biederman wrote:
+> I seem to remember the consensus when this was reviewed that it was
+> unnecessary and there is already support for doing something like
+> this at a more fine grained level so we don't need a new kexec hook.
 
-Thx.
+Forgot to state to problem again which these patches solve:
+
+Currently a Linux kernel running as an SEV-ES guest has no way to
+successfully kexec into a new kernel. The normal SIPI sequence to reset
+the non-boot VCPUs does not work in SEV-ES guests and special code is
+needed in Linux to safely hand over the VCPUs from one kernel to the
+next. What happens currently is that the kexec'ed kernel will just hang.
+
+The code which implements the VCPU hand-over is also included in this
+patch-set, but it requires a certain level of Hypervisor support which
+is not available everywhere.
+
+To make it clear to the user that kexec will not work in their
+environment, it is best to disable the respected syscalls. This is what
+the hook is needed for.
+
+Regards,
 
 -- 
-Regards/Gruss,
-    Boris.
+Jörg Rödel
+jroedel@suse.de
 
-https://people.kernel.org/tglx/notes-about-netiquette
+SUSE Software Solutions Germany GmbH
+Maxfeldstr. 5
+90409 Nürnberg
+Germany
+ 
+(HRB 36809, AG Nürnberg)
+Geschäftsführer: Ivo Totev
+
