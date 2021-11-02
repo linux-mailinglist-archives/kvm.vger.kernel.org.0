@@ -2,142 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A40144423EA
-	for <lists+kvm@lfdr.de>; Tue,  2 Nov 2021 00:22:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9CF24442496
+	for <lists+kvm@lfdr.de>; Tue,  2 Nov 2021 01:22:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232470AbhKAXYk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Nov 2021 19:24:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36336 "EHLO
+        id S231393AbhKBAYy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Nov 2021 20:24:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232428AbhKAXYi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Nov 2021 19:24:38 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D8AEC061764
-        for <kvm@vger.kernel.org>; Mon,  1 Nov 2021 16:22:05 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id u17so3950790plg.9
-        for <kvm@vger.kernel.org>; Mon, 01 Nov 2021 16:22:05 -0700 (PDT)
+        with ESMTP id S229479AbhKBAYx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 1 Nov 2021 20:24:53 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3597C061714
+        for <kvm@vger.kernel.org>; Mon,  1 Nov 2021 17:22:19 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id k9-20020a170902ba8900b00141f601d5c8so1747803pls.1
+        for <kvm@vger.kernel.org>; Mon, 01 Nov 2021 17:22:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=1DmJsDZOreKd3PODnjVspgGOYDJOtOgJGhWnyk3NAL0=;
-        b=OfmV25Rs/0KiayRA/5l31wf4/dncjDlC4EW7XyT/JaAibTlnL2JNY/ecf8e2UaDk05
-         iOYiB9DfDtj0/JtL7xe04CFY9ouJkYJD3naY0EQtJD4g568ULoL9hz9kZJeF5gcWijSS
-         4bOkM2qD66dp8biPKFIXT7qklrAu+SMLTH5oburqr0KLsvvha2M/XjKvX2HvKFeFXSdy
-         tVRBtRhI6PVl+Y0OdhxTPF4jRo293v0V7zpP+SDuYg+DXlrcfogephCtXDhJqCsVvMAN
-         7TbA7jr4cLKnbN+utfdCImhH/tZ1gVIPvOAircJ3WPMTTghZqN0cYTRr+BogRDa4/78l
-         6vbg==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=0q1tLc0oeztZBZsXvvPTzof7ayB7Bik3/teaxGikVwA=;
+        b=M9RyMn9NtpqtxZRq6dzqh0AmQGmFRmQFCx0PnDS2BS3EfbwgzHnzMPoUT2VW2baznj
+         s/4fI0vdhHNI76oo0fmgPbIBhoai9JINiRpWpJUOG2dlyqm6CqqJR5kWP5ZUv+dsnVIV
+         V6vOssewxpAsmnUIyrtJ1cuEd+jTbQVSJf+572afB4Bhyl/o6D41fSZK1n/iV2T7a/f7
+         YlsTaWYn0UvkbjeKDIifzJna5+4mnIo+8UdBYC6+VQyTnS+Y0lkbYcoXGQVMjW4r7Cqj
+         OV+FXdbxhJC+XuK8NFkZPJ+UG5ZcHG5ePMrx+yZEseXk7KjEywWzFJvgXxvVq5zrPO2P
+         Wp/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=1DmJsDZOreKd3PODnjVspgGOYDJOtOgJGhWnyk3NAL0=;
-        b=ViGUPo1nhg216LXaejNrf4QxoDxOn0Vogt3z3nXwD66s2G4DiL6/7ytX6GefnlCvur
-         jfvLqRXwVgFt9Sdd/bHgPogYHJzTlyLenl7Dltcvw4DvWnIJMTJdakYh2Mc3SPH2tzCs
-         d+DWOCdLRsZ7Sq7z3rOk7cx0BomRHn7TaHrkCDa7DuxSuvWbztexuDUwNLgEDupK/dCj
-         BcBKC/tsrmP8sdudGjfHDJeKCQqjzD3f1zSVnU/BQPkEWZhtf2sWlgixuvGcN/ZXAr6d
-         +hxSwzB/Uzy5gHyZVbIAR6BkqwE8EI3mEjOl0b7Iz4zObRVZ7kF4ShGt18FWunBBxslx
-         blkA==
-X-Gm-Message-State: AOAM533lW4aTuWT6977lL7uR8bbl/RNctzTFFUXhIUGjnNGXm52yJldR
-        c0pVoOm7h8dOsQYgKUknjP6kS2Pumy4mig==
-X-Google-Smtp-Source: ABdhPJwKAbW9or9w/+9imMlYoFGpzkavS1OdIzsCCdVPPYYMFOIxBIv+rSbAKoBh06Z2wGBlsMa0MA==
-X-Received: by 2002:a17:903:228c:b0:141:f600:c161 with SMTP id b12-20020a170903228c00b00141f600c161mr6273421plh.10.1635808924335;
-        Mon, 01 Nov 2021 16:22:04 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id f11sm6040491pfv.191.2021.11.01.16.22.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Nov 2021 16:22:03 -0700 (PDT)
-Date:   Mon, 1 Nov 2021 23:21:59 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Kieran Bingham <kbingham@kernel.org>,
-        Jan Kiszka <jan.kiszka@siemens.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Johannes Berg <johannes.berg@intel.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Jessica Yu <jeyu@kernel.org>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Yang Weijiang <weijiang.yang@intel.com>,
-        linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        Shuah Khan <shuah@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH v3 6/6] KVM: selftests: test KVM_GUESTDBG_BLOCKIRQ
-Message-ID: <YYB2l9bzFhKzobZB@google.com>
-References: <20210811122927.900604-1-mlevitsk@redhat.com>
- <20210811122927.900604-7-mlevitsk@redhat.com>
- <137f2dcc-75d2-9d71-e259-dd66d43ad377@redhat.com>
- <87sfwfkhk5.fsf@vitty.brq.redhat.com>
- <b48210a35b3bc6d63beeb33c19b609b3014191dd.camel@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b48210a35b3bc6d63beeb33c19b609b3014191dd.camel@redhat.com>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=0q1tLc0oeztZBZsXvvPTzof7ayB7Bik3/teaxGikVwA=;
+        b=fC6qYkzTjsjuOZha7NvFanflKS4tEZMyrRnGquNQLu21hYGAO2scCQ0WSbI28tC7Ex
+         vXRu44hmKrsPFDxirfk+BW3EDZGdJHfpmCFE8tRBUlB4D75SvrQSKpLWjxsuW1cSApAK
+         7YcRUr3Cjk2q3NVTZaPO/CSr0sA5jwCZqUGd1o8LsjDRCkSNGRHz19ndtYFAHsZD6iXs
+         5XCeubiXVLVP6VfiSOXZqyhZQ87u5HjcW6U7PRJ5DZgGA6DMPpgbo3yLTj6Q4pHyiWW0
+         /TLFxrujjzdJZQUGPFy+IvAcdYyBmuUn5bABKce3pGxo/iUyKIFc/sqECrCuKpGT8pLA
+         iLdA==
+X-Gm-Message-State: AOAM531I6z6Y4QVtLpboPVZrIRaiPtXUaFdQq9mruHSsYvqqW6nZPuFa
+        2HQsSYZ5opi9r8CDjawA5fIO7pe5d/LA
+X-Google-Smtp-Source: ABdhPJxNMFUzGq4vVDxdHLg1Zowo37UyC15esk5w81Yj2K1hViKi29lRAuknRKEVUhuJwiI85y6JmFLNHLAH
+X-Received: from rananta-virt.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1bcc])
+ (user=rananta job=sendgmr) by 2002:a17:902:6bc8:b0:13f:8a54:1188 with SMTP id
+ m8-20020a1709026bc800b0013f8a541188mr27979352plt.49.1635812539339; Mon, 01
+ Nov 2021 17:22:19 -0700 (PDT)
+Date:   Tue,  2 Nov 2021 00:21:55 +0000
+Message-Id: <20211102002203.1046069-1-rananta@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.1.1089.g2158813163f-goog
+Subject: [RFC PATCH 0/8] KVM: arm64: Add support for hypercall services selection
+From:   Raghavendra Rao Ananta <rananta@google.com>
+To:     Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc:     Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 01, 2021, Maxim Levitsky wrote:
-> On Mon, 2021-11-01 at 16:43 +0100, Vitaly Kuznetsov wrote:
-> > Paolo Bonzini <pbonzini@redhat.com> writes:
-> > 
-> > > On 11/08/21 14:29, Maxim Levitsky wrote:
-> > > > Modify debug_regs test to create a pending interrupt
-> > > > and see that it is blocked when single stepping is done
-> > > > with KVM_GUESTDBG_BLOCKIRQ
-> > > > 
-> > > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > > > ---
-> > > >   .../testing/selftests/kvm/x86_64/debug_regs.c | 24 ++++++++++++++++---
-> > > >   1 file changed, 21 insertions(+), 3 deletions(-)
-> > > 
-> > > I haven't looked very much at this, but the test fails.
-> > > 
-> > 
-> > Same here,
-> > 
-> > the test passes on AMD but fails consistently on Intel:
-> > 
-> > # ./x86_64/debug_regs 
-> > ==== Test Assertion Failure ====
-> >   x86_64/debug_regs.c:179: run->exit_reason == KVM_EXIT_DEBUG && run->debug.arch.exception == DB_VECTOR && run->debug.arch.pc == target_rip && run->debug.arch.dr6 == target_dr6
-> >   pid=13434 tid=13434 errno=0 - Success
-> >      1	0x00000000004027c6: main at debug_regs.c:179
-> >      2	0x00007f65344cf554: ?? ??:0
-> >      3	0x000000000040294a: _start at ??:?
-> >   SINGLE_STEP[1]: exit 8 exception 1 rip 0x402a25 (should be 0x402a27) dr6 0xffff4ff0 (should be 0xffff4ff0)
-> > 
-> > (I know I'm late to the party).
-> 
-> Well that is strange. It passes on my intel laptop. Just tested 
-> (kvm/queue + qemu master, compiled today) :-(
-> 
-> It fails on iteration 1 (and there is iteration 0) which I think means that we
-> start with RIP on sti, and get #DB on start of xor instruction first (correctly), 
-> and then we get #DB again on start of xor instruction again?
-> 
-> Something very strange. My laptop has i7-7600U.
+Hello,
 
-I haven't verified on hardware, but my guess is that this code in vmx_vcpu_run()
+Continuing the discussion from [1], the series tries to add support
+for the user-space to elect the hypercall services that it wishes
+to expose to the guest, rather than the guest discovering them
+unconditionally. The idea employed by the series was taken from
+[1] as suggested by Marc Z.
 
-	/* When single-stepping over STI and MOV SS, we must clear the
-	 * corresponding interruptibility bits in the guest state. Otherwise
-	 * vmentry fails as it then expects bit 14 (BS) in pending debug
-	 * exceptions being set, but that's not correct for the guest debugging
-	 * case. */
-	if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP)
-		vmx_set_interrupt_shadow(vcpu, 0);
+In a broad sense, the idea is similar to the current implementation
+of PSCI interface- create a 'psuedo-firmware register' to handle the
+firmware revisions. The series extends this idea to all the other
+hypercalls such as TRNG (True Random Number Generator), PV_TIME
+(Paravirtualized Time), and PTP (Precision Time protocol).
 
-interacts badly with APICv=1.  It will kill the STI shadow and cause the IRQ in
-vmcs.GUEST_RVI to be recognized when it (micro-)architecturally should not.  My
-head is going in circles trying to sort out what would actually happen.  Maybe
-comment out that and/or disable APICv to see if either one makes the test pass?
+For better categorization and future scaling, firmware registers
+are introduced based on the SMCCC service call owner (standard secure
+service, standard hypervisor service, and vendor specific hypervisor
+service). Each of these registers exposes the features employed in
+the form of a bitmap and are enveloped into a generic interface (for
+future expansion).
+
+Upon VM creation, all the features supported by each owner type are
+enabled. User-space/VMM can learn about the services currently enabled
+via GET_ONE_REG and can manipulate them via SET_ONE_REG interfaces.
+These 'writes' directly effect the bitmap, which is further checked
+when the guest tries to issue the hypercall and a decision is taken
+weather or not the hypercall is accessable to the guest. The interface
+works well across live-migrations where the VMM can simply save/restore
+these firmware registers using the existing IOCTL interfaces.
+
+Upon VM start (at least one vCPU runs), the registers become read-only
+and cannot be manupulated by the VMM. This is just to avoid providing
+conflicting views of the services to the guests.
+
+One of the problems that the series need to address is the enablement
+of the features carried by a firmware register, whose existance is
+not known to the VMM yet. A couple of ideas were discussed to handle this:
+
+    1) Upon the first SET_ONE_REG, clear all the firmware registers
+    implicitly. It's the responsibility of the VMM to make sure that it
+    configures all the registers that's known to it.
+
+    2) Contrary to #1, which implicitly clears all the registers, introduce
+    a new capability to handle this explicitly. That is, the after learning
+    about the services supported by the host, the VMM writes to the
+    capability to explictly clear the registers.
+
+The series currently employs #1 just for the sake of completion, but is
+open for further discussion.
+
+The patches are based off of kvmarm-next 5.15-rc4, with the selftest
+patches from [2] applied.
+
+Patch-1 factors out the non-PSCI related interface from psci.c to
+hypercalls.c, as the series would extend the list in the upcoming
+patches.
+
+Patch-2 sets up a base environment to handle the 'writes' of firmware
+register- clear all the registers upon first 'write' and block 'writes'
+to the registers upon VM start.
+
+Patch-3 introduces the firmware register, KVM_REG_ARM_STD, which holds
+the standard secure services (such as TRNG).
+
+Patch-4 introduces the firmware register, KVM_REG_ARM_STD_HYP, which holds
+the standard hypervisor services (such as PV_TIME).
+
+Patch-5 introduces the firmware register, KVM_REG_ARM_VENDOR_HYP, which holds
+the vendor specific hypercall services.
+
+Patch-6 imports the firmware registers' UAPI definitions into tools/ for
+further use in selftests.
+
+Patch-7 imports the SMCCC definitions from linux/arm-smccc.h into tools/
+for further use in selftests.
+
+Patch-8 adds the selftest to test the guest (using 'hvc') and VMM
+interfaces (SET/GET_ONE_REG).
+
+[1]: https://lore.kernel.org/kvmarm/874kbcpmlq.wl-maz@kernel.org/T/
+[2]: https://lore.kernel.org/kvmarm/YUzgdbYk8BeCnHyW@google.com/
+
+Raghavendra Rao Ananta (8):
+  KVM: arm64: Factor out firmware register handling from psci.c
+  KVM: arm64: Setup base for hypercall firmware registers
+  KVM: arm64: Add standard secure service calls firmware register
+  KVM: arm64: Add standard hypervisor service calls firmware register
+  KVM: arm64: Add vendor hypervisor service calls firmware register
+  tools: Import the firmware registers
+  tools: Import ARM SMCCC definitions
+  selftests: KVM: aarch64: Introduce hypercall ABI test
+
+ .../virt/kvm/arm/{psci.rst => hypercalls.rst} |  59 ++-
+ Documentation/virt/kvm/arm/index.rst          |   2 +-
+ arch/arm64/include/asm/kvm_host.h             |  12 +
+ arch/arm64/include/uapi/asm/kvm.h             |  18 +
+ arch/arm64/kvm/arm.c                          |  17 +
+ arch/arm64/kvm/guest.c                        |   2 +-
+ arch/arm64/kvm/hypercalls.c                   | 339 ++++++++++++++++-
+ arch/arm64/kvm/psci.c                         | 167 +--------
+ arch/arm64/kvm/pvtime.c                       |   3 +
+ arch/arm64/kvm/trng.c                         |   9 +-
+ include/kvm/arm_hypercalls.h                  |  18 +
+ include/kvm/arm_psci.h                        |   8 +-
+ tools/arch/arm64/include/uapi/asm/kvm.h       |  18 +
+ tools/include/linux/arm-smccc.h               | 188 ++++++++++
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/aarch64/hypercalls.c        | 340 ++++++++++++++++++
+ 17 files changed, 1018 insertions(+), 184 deletions(-)
+ rename Documentation/virt/kvm/arm/{psci.rst => hypercalls.rst} (57%)
+ create mode 100644 tools/include/linux/arm-smccc.h
+ create mode 100644 tools/testing/selftests/kvm/aarch64/hypercalls.c
+
+-- 
+2.33.1.1089.g2158813163f-goog
+
