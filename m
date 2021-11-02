@@ -2,160 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 60F8A443459
-	for <lists+kvm@lfdr.de>; Tue,  2 Nov 2021 18:10:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 34C5A44345C
+	for <lists+kvm@lfdr.de>; Tue,  2 Nov 2021 18:11:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230479AbhKBRMy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Nov 2021 13:12:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:60928 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229806AbhKBRMx (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 2 Nov 2021 13:12:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635873017;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=AqB2+vWDu8kUZTT+JPMQEQDA5wOgN4OdhbbH+AKsKFU=;
-        b=iC6525jZuP81ZPbFifVeXD5gnlF+MhDeDTTUl4J/3hOlOsWeTtXIxw6TGxJFdX/uJkMadh
-        wlx3KsfxS37HKWlNpXafJIzDxdJ0Kh31un8eKsmQtsBGSki6fnxlTaC8q5ujv2cMlxuEQI
-        2PWhtrO7ka2WkzX0oQMCgLml97rfUj0=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-24-O47oNnc_NTiDZcOBL0U6ig-1; Tue, 02 Nov 2021 13:10:16 -0400
-X-MC-Unique: O47oNnc_NTiDZcOBL0U6ig-1
-Received: by mail-wr1-f71.google.com with SMTP id y10-20020adffa4a000000b0017eea6cb05dso3780159wrr.6
-        for <kvm@vger.kernel.org>; Tue, 02 Nov 2021 10:10:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=AqB2+vWDu8kUZTT+JPMQEQDA5wOgN4OdhbbH+AKsKFU=;
-        b=YzHPr2tVp+JJvufwGgZmTU5E57yC3e8Bds6h0aOmAPrq89eflKgJSKIQCpa/TiyllB
-         BBmfP7Mqx/Uavgb/QdjF1sa56GE0RAUsZST1iE7fOWkoVy4IkP+/MRuA/J6txStpm0PA
-         JKBjjrW1Qa3jkvLweqESoli6KIQ8ge9jTmC0S8pEo09wRN97WdFTYNcJb9iCP8C/JNw4
-         tyEDjNj/cBzn48SjUXyEgnpvsAJ1YBdxXfD/XG4H9W82J2SuBcCPpJFAHvKBFcnGXJWv
-         /gQMjNaOzQ0m+pZzCdwBAJbD/322VbzN2gdXFaESg9iqD1kfFvUOzjj958BygW/3HzQn
-         ZWPQ==
-X-Gm-Message-State: AOAM531V8fLMX/z5RPDC5UxPuoxTF6bO8U7xLK8EKfiuk0acbHb9xgop
-        bzVzXGQvlmCEjE/6T1v8ZmBS4mASjlylbUyaLBGisv2vkJ1fRinYj6XtEmhCBSshCxC1G2xGlfu
-        Ja510JljQD42E
-X-Received: by 2002:a5d:5984:: with SMTP id n4mr27750289wri.23.1635873015297;
-        Tue, 02 Nov 2021 10:10:15 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy2W66tFfyiDF+65PYWfaVjjbQg42cKoiuKxiz9n2v7pdkOFWhAZRfESPhnoXBuqcFdQeT6xA==
-X-Received: by 2002:a5d:5984:: with SMTP id n4mr27750240wri.23.1635873015040;
-        Tue, 02 Nov 2021 10:10:15 -0700 (PDT)
-Received: from [192.168.3.132] (p5b0c6810.dip0.t-ipconnect.de. [91.12.104.16])
-        by smtp.gmail.com with ESMTPSA id w15sm8634967wrk.77.2021.11.02.10.10.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Nov 2021 10:10:14 -0700 (PDT)
-Message-ID: <e4b63a74-57ad-551c-0046-97a02eb798e5@redhat.com>
-Date:   Tue, 2 Nov 2021 18:10:13 +0100
+        id S232033AbhKBRNr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Nov 2021 13:13:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51020 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229806AbhKBRNq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Nov 2021 13:13:46 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9C3AC061714
+        for <kvm@vger.kernel.org>; Tue,  2 Nov 2021 10:11:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=WOp62y/x6mKcLhovQbGcOkKaZrc/CCZrBG2y2SDvEJo=; b=aY9Ap/Ij9XIiesBUHjIemF4r+d
+        PyQgBL9xgys9lnIhNOl49MMaQeiGcgsMozy34S0A97JPJuq5b7Tgh6QMUbqd518fFLBTg3KsaJP5E
+        y3flJ0Y4VdTeW6dQ9T0SCO3Ag19xFJfT4yb0f8BE/TmSSrgaDKKXxPeFr+50Ct7GiDeTaoukoFi5P
+        Y9Hgb8U6vpoChdKs31HxWFKf0lvGmK9213563Q1T1s4RGswdcj6MogDkD5JssDZ76lMudnu87Of2f
+        QznF0Bnjv9JGNuhk0us9Bsweadi5w90csEqh49/soBhaBmnYN65YDtwM7eEgUUEPb9OeU3XWopruw
+        q1Bc34VA==;
+Received: from 54-240-197-239.amazon.com ([54.240.197.239] helo=freeip.amazon.com)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mhxJR-002Sk2-T6; Tue, 02 Nov 2021 17:11:06 +0000
+Message-ID: <0372987a52b5f43963721b517664830e7e6f1818.camel@infradead.org>
+Subject: Re: [PATCH v2] KVM: x86: Fix recording of guest steal time /
+ preempted status
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>
+Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "mtosatti@redhat.com" <mtosatti@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>, karahmed@amazon.com
+Date:   Tue, 02 Nov 2021 17:11:02 +0000
+In-Reply-To: <624bc910-1bec-e6dd-b09a-f86dc6cdbef0@redhat.com>
+References: <5d4002373c3ae614cb87b72ba5b7cdc161a0cd46.camel@infradead.org>
+         <4369bbef7f0c2b239da419c917f9a9f2ca6a76f1.camel@infradead.org>
+         <624bc910-1bec-e6dd-b09a-f86dc6cdbef0@redhat.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-adl2V0PLZBg01+bTnVvX"
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH v1 00/12] virtio-mem: Expose device memory via multiple
- memslots
-Content-Language: en-US
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Ani Sinha <ani@anisinha.ca>, Peter Xu <peterx@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
-        Hui Zhu <teawater@gmail.com>,
-        Sebastien Boeuf <sebastien.boeuf@intel.com>,
-        kvm@vger.kernel.org
-References: <20211027124531.57561-1-david@redhat.com>
- <20211101181352-mutt-send-email-mst@kernel.org>
- <a5c94705-b66d-1b19-1c1f-52e99d9dacce@redhat.com>
- <20211102072843-mutt-send-email-mst@kernel.org>
- <171c8ed0-d55e-77ef-963b-6d836729ef4b@redhat.com>
- <20211102111228-mutt-send-email-mst@kernel.org>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <20211102111228-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02.11.21 18:06, Michael S. Tsirkin wrote:
-> On Tue, Nov 02, 2021 at 12:55:17PM +0100, David Hildenbrand wrote:
->> On 02.11.21 12:35, Michael S. Tsirkin wrote:
->>> On Tue, Nov 02, 2021 at 09:33:55AM +0100, David Hildenbrand wrote:
->>>> On 01.11.21 23:15, Michael S. Tsirkin wrote:
->>>>> On Wed, Oct 27, 2021 at 02:45:19PM +0200, David Hildenbrand wrote:
->>>>>> This is the follow-up of [1], dropping auto-detection and vhost-user
->>>>>> changes from the initial RFC.
->>>>>>
->>>>>> Based-on: 20211011175346.15499-1-david@redhat.com
->>>>>>
->>>>>> A virtio-mem device is represented by a single large RAM memory region
->>>>>> backed by a single large mmap.
->>>>>>
->>>>>> Right now, we map that complete memory region into guest physical addres
->>>>>> space, resulting in a very large memory mapping, KVM memory slot, ...
->>>>>> although only a small amount of memory might actually be exposed to the VM.
->>>>>>
->>>>>> For example, when starting a VM with a 1 TiB virtio-mem device that only
->>>>>> exposes little device memory (e.g., 1 GiB) towards the VM initialliy,
->>>>>> in order to hotplug more memory later, we waste a lot of memory on metadata
->>>>>> for KVM memory slots (> 2 GiB!) and accompanied bitmaps. Although some
->>>>>> optimizations in KVM are being worked on to reduce this metadata overhead
->>>>>> on x86-64 in some cases, it remains a problem with nested VMs and there are
->>>>>> other reasons why we would want to reduce the total memory slot to a
->>>>>> reasonable minimum.
->>>>>>
->>>>>> We want to:
->>>>>> a) Reduce the metadata overhead, including bitmap sizes inside KVM but also
->>>>>>    inside QEMU KVM code where possible.
->>>>>> b) Not always expose all device-memory to the VM, to reduce the attack
->>>>>>    surface of malicious VMs without using userfaultfd.
->>>>>
->>>>> I'm confused by the mention of these security considerations,
->>>>> and I expect users will be just as confused.
->>>>
->>>> Malicious VMs wanting to consume more memory than desired is only
->>>> relevant when running untrusted VMs in some environments, and it can be
->>>> caught differently, for example, by carefully monitoring and limiting
->>>> the maximum memory consumption of a VM. We have the same issue already
->>>> when using virtio-balloon to logically unplug memory. For me, it's a
->>>> secondary concern ( optimizing a is much more important ).
->>>>
->>>> Some users showed interest in having QEMU disallow access to unplugged
->>>> memory, because coming up with a maximum memory consumption for a VM is
->>>> hard. This is one step into that direction without having to run with
->>>> uffd enabled all of the time.
->>>
->>> Sorry about missing the memo - is there a lot of overhead associated
->>> with uffd then?
->>
->> When used with huge/gigantic pages, we don't particularly care.
->>
->> For other memory backends, we'll have to route any population via the
->> uffd handler: guest accesses a 4k page -> place a 4k page from user
->> space. Instead of the kernel automatically placing a THP, we'd be
->> placing single 4k pages and have to hope the kernel will collapse them
->> into a THP later.
-> 
-> How much value there is in a THP given it's not present?
 
-If you don't place a THP right during the first page fault inside the
-THP region, you'll have to rely on khugepagd to eventually place a huge
-page later -- and manually fault in each and every 4k page. I haven't
-done any performance measurements so far. Going via userspace on every
-4k fault will most certainly hurt performance when first touching memory.
+--=-adl2V0PLZBg01+bTnVvX
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
--- 
-Thanks,
+On Tue, 2021-11-02 at 18:01 +0100, Paolo Bonzini wrote:
+> On 02/11/21 17:38, David Woodhouse wrote:
+> > This kind of makes a mockery of this
+> > repeated map/unmap dance which I thought was supposed to avoid pinning
+> > the page
+>=20
+> The map/unmap dance is supposed to catch the moment where you'd look at=
+=20
+> a stale cache, by giving the non-atomic code a chance to update the=20
+> gfn->pfn mapping.
+>=20
 
-David / dhildenb
+It might have *chance* to do so, but it doesn't actually do it.
+
+As noted, a GFN=E2=86=92PFN mapping is really a GFN=E2=86=92HVA=E2=86=92PFN=
+ mapping. And the
+non-atomic code *does* update the GFN=E2=86=92HVA part of that, correctly
+looking at the memslots generation etc..=20
+
+But it pays absolutely no attention to the *second* part, and assumes
+that the HVA=E2=86=92PFN mapping in the userspace page tables will never
+change.
+
+Which isn't necessarily true, even if the underlying physical page *is*
+pinned to avoid most cases (ksm, swap, etc.) of the *kernel* changing
+it. Userspace still can.
+
+> The unmap is also the moment where you can mark the page as dirty.
+
+Sure, but it's the wrong page :)
+
+It's not necessarily the page that is at that userspace HVA, and hence
+in the guest's EPT at that GFN any more.
+
+In my Xen event channel series, I added a 'mmap a page from /dev/zero
+over the shared_info page after it's active' torture test to
+demonstrate this and check it was fixed. I suppose we could do the same
+in the steal_time test...?
+
+--=-adl2V0PLZBg01+bTnVvX
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCECow
+ggUcMIIEBKADAgECAhEA4rtJSHkq7AnpxKUY8ZlYZjANBgkqhkiG9w0BAQsFADCBlzELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
+A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
+bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTkwMTAyMDAwMDAwWhcNMjIwMTAxMjM1
+OTU5WjAkMSIwIAYJKoZIhvcNAQkBFhNkd213MkBpbmZyYWRlYWQub3JnMIIBIjANBgkqhkiG9w0B
+AQEFAAOCAQ8AMIIBCgKCAQEAsv3wObLTCbUA7GJqKj9vHGf+Fa+tpkO+ZRVve9EpNsMsfXhvFpb8
+RgL8vD+L133wK6csYoDU7zKiAo92FMUWaY1Hy6HqvVr9oevfTV3xhB5rQO1RHJoAfkvhy+wpjo7Q
+cXuzkOpibq2YurVStHAiGqAOMGMXhcVGqPuGhcVcVzVUjsvEzAV9Po9K2rpZ52FE4rDkpDK1pBK+
+uOAyOkgIg/cD8Kugav5tyapydeWMZRJQH1vMQ6OVT24CyAn2yXm2NgTQMS1mpzStP2ioPtTnszIQ
+Ih7ASVzhV6csHb8Yrkx8mgllOyrt9Y2kWRRJFm/FPRNEurOeNV6lnYAXOymVJwIDAQABo4IB0zCC
+Ac8wHwYDVR0jBBgwFoAUgq9sjPjF/pZhfOgfPStxSF7Ei8AwHQYDVR0OBBYEFLfuNf820LvaT4AK
+xrGK3EKx1DE7MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUF
+BwMEBggrBgEFBQcDAjBGBgNVHSAEPzA9MDsGDCsGAQQBsjEBAgEDBTArMCkGCCsGAQUFBwIBFh1o
+dHRwczovL3NlY3VyZS5jb21vZG8ubmV0L0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3Js
+LmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWls
+Q0EuY3JsMIGLBggrBgEFBQcBAQR/MH0wVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuY29tb2RvY2Eu
+Y29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYI
+KwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmNvbW9kb2NhLmNvbTAeBgNVHREEFzAVgRNkd213MkBpbmZy
+YWRlYWQub3JnMA0GCSqGSIb3DQEBCwUAA4IBAQALbSykFusvvVkSIWttcEeifOGGKs7Wx2f5f45b
+nv2ghcxK5URjUvCnJhg+soxOMoQLG6+nbhzzb2rLTdRVGbvjZH0fOOzq0LShq0EXsqnJbbuwJhK+
+PnBtqX5O23PMHutP1l88AtVN+Rb72oSvnD+dK6708JqqUx2MAFLMevrhJRXLjKb2Mm+/8XBpEw+B
+7DisN4TMlLB/d55WnT9UPNHmQ+3KFL7QrTO8hYExkU849g58Dn3Nw3oCbMUgny81ocrLlB2Z5fFG
+Qu1AdNiBA+kg/UxzyJZpFbKfCITd5yX49bOriL692aMVDyqUvh8fP+T99PqorH4cIJP6OxSTdxKM
+MIIFHDCCBASgAwIBAgIRAOK7SUh5KuwJ6cSlGPGZWGYwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
+ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTE5MDEwMjAwMDAwMFoXDTIyMDEwMTIz
+NTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCASIwDQYJKoZIhvcN
+AQEBBQADggEPADCCAQoCggEBALL98Dmy0wm1AOxiaio/bxxn/hWvraZDvmUVb3vRKTbDLH14bxaW
+/EYC/Lw/i9d98CunLGKA1O8yogKPdhTFFmmNR8uh6r1a/aHr301d8YQea0DtURyaAH5L4cvsKY6O
+0HF7s5DqYm6tmLq1UrRwIhqgDjBjF4XFRqj7hoXFXFc1VI7LxMwFfT6PStq6WedhROKw5KQytaQS
+vrjgMjpICIP3A/CroGr+bcmqcnXljGUSUB9bzEOjlU9uAsgJ9sl5tjYE0DEtZqc0rT9oqD7U57My
+ECIewElc4VenLB2/GK5MfJoJZTsq7fWNpFkUSRZvxT0TRLqznjVepZ2AFzsplScCAwEAAaOCAdMw
+ggHPMB8GA1UdIwQYMBaAFIKvbIz4xf6WYXzoHz0rcUhexIvAMB0GA1UdDgQWBBS37jX/NtC72k+A
+CsaxitxCsdQxOzAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEF
+BQcDBAYIKwYBBQUHAwIwRgYDVR0gBD8wPTA7BgwrBgEEAbIxAQIBAwUwKzApBggrBgEFBQcCARYd
+aHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9DUFMwWgYDVR0fBFMwUTBPoE2gS4ZJaHR0cDovL2Ny
+bC5jb21vZG9jYS5jb20vQ09NT0RPUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFp
+bENBLmNybDCBiwYIKwYBBQUHAQEEfzB9MFUGCCsGAQUFBzAChklodHRwOi8vY3J0LmNvbW9kb2Nh
+LmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3J0MCQG
+CCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAC20spBbrL71ZEiFrbXBHonzhhirO1sdn+X+O
+W579oIXMSuVEY1LwpyYYPrKMTjKECxuvp24c829qy03UVRm742R9Hzjs6tC0oatBF7KpyW27sCYS
+vj5wbal+TttzzB7rT9ZfPALVTfkW+9qEr5w/nSuu9PCaqlMdjABSzHr64SUVy4ym9jJvv/FwaRMP
+gew4rDeEzJSwf3eeVp0/VDzR5kPtyhS+0K0zvIWBMZFPOPYOfA59zcN6AmzFIJ8vNaHKy5QdmeXx
+RkLtQHTYgQPpIP1Mc8iWaRWynwiE3ecl+PWzq4i+vdmjFQ8qlL4fHz/k/fT6qKx+HCCT+jsUk3cS
+jDCCBeYwggPOoAMCAQICEGqb4Tg7/ytrnwHV2binUlYwDQYJKoZIhvcNAQEMBQAwgYUxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMSswKQYDVQQDEyJDT01PRE8gUlNBIENlcnRpZmljYXRp
+b24gQXV0aG9yaXR5MB4XDTEzMDExMDAwMDAwMFoXDTI4MDEwOTIzNTk1OVowgZcxCzAJBgNVBAYT
+AkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNV
+BAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAvrOeV6wodnVAFsc4A5jTxhh2IVDzJXkLTLWg0X06WD6cpzEup/Y0dtmEatrQPTRI5Or1u6zf
++bGBSyD9aH95dDSmeny1nxdlYCeXIoymMv6pQHJGNcIDpFDIMypVpVSRsivlJTRENf+RKwrB6vcf
+WlP8dSsE3Rfywq09N0ZfxcBa39V0wsGtkGWC+eQKiz4pBZYKjrc5NOpG9qrxpZxyb4o4yNNwTqza
+aPpGRqXB7IMjtf7tTmU2jqPMLxFNe1VXj9XB1rHvbRikw8lBoNoSWY66nJN/VCJv5ym6Q0mdCbDK
+CMPybTjoNCQuelc0IAaO4nLUXk0BOSxSxt8kCvsUtQIDAQABo4IBPDCCATgwHwYDVR0jBBgwFoAU
+u69+Aj36pvE8hI6t7jiY7NkyMtQwHQYDVR0OBBYEFIKvbIz4xf6WYXzoHz0rcUhexIvAMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMBEGA1UdIAQKMAgwBgYEVR0gADBMBgNVHR8E
+RTBDMEGgP6A9hjtodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDZXJ0aWZpY2F0aW9u
+QXV0aG9yaXR5LmNybDBxBggrBgEFBQcBAQRlMGMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9jcnQuY29t
+b2RvY2EuY29tL0NPTU9ET1JTQUFkZFRydXN0Q0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2Nz
+cC5jb21vZG9jYS5jb20wDQYJKoZIhvcNAQEMBQADggIBAHhcsoEoNE887l9Wzp+XVuyPomsX9vP2
+SQgG1NgvNc3fQP7TcePo7EIMERoh42awGGsma65u/ITse2hKZHzT0CBxhuhb6txM1n/y78e/4ZOs
+0j8CGpfb+SJA3GaBQ+394k+z3ZByWPQedXLL1OdK8aRINTsjk/H5Ns77zwbjOKkDamxlpZ4TKSDM
+KVmU/PUWNMKSTvtlenlxBhh7ETrN543j/Q6qqgCWgWuMAXijnRglp9fyadqGOncjZjaaSOGTTFB+
+E2pvOUtY+hPebuPtTbq7vODqzCM6ryEhNhzf+enm0zlpXK7q332nXttNtjv7VFNYG+I31gnMrwfH
+M5tdhYF/8v5UY5g2xANPECTQdu9vWPoqNSGDt87b3gXb1AiGGaI06vzgkejL580ul+9hz9D0S0U4
+jkhJiA7EuTecP/CFtR72uYRBcunwwH3fciPjviDDAI9SnC/2aPY8ydehzuZutLbZdRJ5PDEJM/1t
+yZR2niOYihZ+FCbtf3D9mB12D4ln9icgc7CwaxpNSCPt8i/GqK2HsOgkL3VYnwtx7cJUmpvVdZ4o
+gnzgXtgtdk3ShrtOS1iAN2ZBXFiRmjVzmehoMof06r1xub+85hFQzVxZx5/bRaTKTlL8YXLI8nAb
+R9HWdFqzcOoB/hxfEyIQpx9/s81rgzdEZOofSlZHynoSMYIDyjCCA8YCAQEwga0wgZcxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
+ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
+ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjEx
+MTAyMTcxMTAyWjAvBgkqhkiG9w0BCQQxIgQg47iV0bo7mzfvyKkh2cF6auHvuSv9gTRl+ZTxCqbl
+aUMwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
+PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
+aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
+A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
+bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
+DQEBAQUABIIBAIxr13wQzfykKFe5x8WefwpERft0OUGg6myW54w/CnpjGi4rfw9/V5bQpzxWA7MS
+XuecxiTLWNKEEBcBwY9LXJXdARMqKIfxWtEloVzdbjmGIqBGke5MrmLc+01mOTAsRsOrxEzTkr0/
+YUl2xfu/yMgcWVNhi+a2cKpV0/PFBY783kPyecuWCZha9002gxVHKpxTr4zsi2LF/e7J5aUSYUvv
+0cvy6vl3jzv0lk9e29Fz7z6n3DDjShrrsrxckQgZuQPRKF7tReQP9RWaJt0sd5kfg2DMtTdTZOZd
+lcmm97qjh8QcVZmXXwFapxACdEUriH3ZPidpLPvrodTP7QqU+xoAAAAAAAA=
+
+
+--=-adl2V0PLZBg01+bTnVvX--
 
