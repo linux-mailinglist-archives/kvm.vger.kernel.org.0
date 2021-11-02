@@ -2,34 +2,34 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D0A244348A
-	for <lists+kvm@lfdr.de>; Tue,  2 Nov 2021 18:26:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E09234434A2
+	for <lists+kvm@lfdr.de>; Tue,  2 Nov 2021 18:36:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233663AbhKBR30 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Nov 2021 13:29:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54556 "EHLO
+        id S229684AbhKBRjY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Nov 2021 13:39:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229689AbhKBR3Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Nov 2021 13:29:25 -0400
+        with ESMTP id S230214AbhKBRjY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Nov 2021 13:39:24 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1899C061714
-        for <kvm@vger.kernel.org>; Tue,  2 Nov 2021 10:26:48 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E684C061203
+        for <kvm@vger.kernel.org>; Tue,  2 Nov 2021 10:36:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=wzVBpoSkcPyeThwrW6bDs+Z4vu+mqLjMvu3fYbHEVDw=; b=tQ/LMOdOqfBvgqwKb/3oO7djNM
-        CAdpo2vvwaD95xKjA0BKIZi5hFphq5Ki7Im04RP2RUxgj425vJ2oCVDJ3zAIMcUs23FB2GK2qt857
-        ZgphPUAj3aA7nIXChx7w+3bttazj6vKs0VsZz54xgyackIvnCFN+FIRPJjOYW+BRty7fwxYQxBL6n
-        8mt5+H4eQNmp21HFCn5f1CaeyoAXDyfDMiS4GVX6rWgD3TJ66INDTPPtQcm6PK0lLXkf7qdQfYoDs
-        NpL024a9ANf/4uDFFnwv/eXfwcN72JFp3Vu4W2H8d9g9iC4j2VVfaII1Y7k96WfB9jfgHTCEgKYw+
-        pNba8XWg==;
+        bh=Ck8XI6FOcL/c7TqVyqB3yc/HgtoLpBSgdwyvYcXkFCU=; b=P2AIpD/LuehY+gImIx2Rp7NhQd
+        e/zJDoMVUYqp46XnN2pfK9hfhr3JIJGk6TzpDU+CquUaBOMPJtuid4tYjkClrwGrfabgYGYjtkdcP
+        e8S5eWns7Kha30FqJS4VUi0nsEDpiZzrYj+SHmwxuZTizF8T2QFiY9j7o5xncBDjLgAffDA0ZT27p
+        6RTz6UyMbqpeccydoulJ0V22nc4LU+Zp/xF5F7l7stIqwhyaXTNSE8WYUxp1tMH676KTtzOn5h/3t
+        UyxE6mxvKPo9x2FNYTMrhmcBcaNmCRsBtzSQAT85Ose/75LgyL7mwZMl9XUxhOfof6Y261i/crIds
+        y+gzX8xQ==;
 Received: from 54-240-197-239.amazon.com ([54.240.197.239] helo=freeip.amazon.com)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mhxYT-002Ukg-H3; Tue, 02 Nov 2021 17:26:37 +0000
-Message-ID: <8e9c8f9ecc492c6e3a57d539cc34da014ea8e568.camel@infradead.org>
-Subject: Re: [PATCH v2] KVM: x86: Fix recording of guest steal time /
- preempted status
+        id 1mhxiF-002W5J-2G; Tue, 02 Nov 2021 17:36:43 +0000
+Message-ID: <3645b9b889dac6438394194bb5586a46b68d581f.camel@infradead.org>
+Subject: [PATCH v3] KVM: x86: Fix recording of guest steal time / preempted
+ status
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>
 Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
@@ -40,7 +40,7 @@ Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
         "vkuznets@redhat.com" <vkuznets@redhat.com>,
         "mtosatti@redhat.com" <mtosatti@redhat.com>,
         "joro@8bytes.org" <joro@8bytes.org>, karahmed@amazon.com
-Date:   Tue, 02 Nov 2021 17:26:34 +0000
+Date:   Tue, 02 Nov 2021 17:36:39 +0000
 In-Reply-To: <1f326c33-3acf-911a-d1ef-c72f0a570761@redhat.com>
 References: <5d4002373c3ae614cb87b72ba5b7cdc161a0cd46.camel@infradead.org>
          <4369bbef7f0c2b239da419c917f9a9f2ca6a76f1.camel@infradead.org>
@@ -48,7 +48,7 @@ References: <5d4002373c3ae614cb87b72ba5b7cdc161a0cd46.camel@infradead.org>
          <0372987a52b5f43963721b517664830e7e6f1818.camel@infradead.org>
          <1f326c33-3acf-911a-d1ef-c72f0a570761@redhat.com>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-EaUtCpfKruATI3VM83xJ"
+        boundary="=-irBYnVDY+F7z0VaOn/0M"
 User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
@@ -57,27 +57,270 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-EaUtCpfKruATI3VM83xJ
+--=-irBYnVDY+F7z0VaOn/0M
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2021-11-02 at 18:19 +0100, Paolo Bonzini wrote:
-> Yes, I agree.  What I am saying is that:
->=20
-> - the map/unmap dance is not (entirely) about whether to pin the page
-> - the map/unmap API is not a bad API, just an incomplete implementation
->=20
+=46rom 187eaf32966670d11965e2e692de2ba8fdc037f4 Mon Sep 17 00:00:00 2001
+From: David Woodhouse <dwmw@amazon.co.uk>
+Date: Mon, 1 Nov 2021 11:55:07 +0000
+Subject: [PATCH 1/7] KVM: x86: Fix recording of guest steal time / preempte=
+d
+ status
+MIME-Version: 1.0
+Content-Type: text/plain; charset=3DUTF-8
+Content-Transfer-Encoding: 8bit
 
-Yep, fair enough. The Xen evtchn series contains what I believe is
-necessary to make it a complete implementation. But in *this* case it's
-fairly gratuitous since, as noted, we already *have* a perfectly
-serviceable mapping.
+In commit b043138246a4 ("x86/KVM: Make sure KVM_VCPU_FLUSH_TLB flag is
+not missed") we switched to using a gfn_to_pfn_cache for accessing the
+guest steal time structure in order to allow for an atomic xchg of the
+preempted field. This has a couple of problems.
 
-> The GFN _also_ has to be marked dirty.
+Firstly, kvm_map_gfn() doesn't work at all for IOMEM pages when the
+atomic flag is set, which it is in kvm_steal_time_set_preempted(). So a
+guest vCPU using an IOMEM page for its steal time would never have its
+preempted field set.
 
-Argh, yes. I forgot to do that. Will fix in v3. Thanks.
+Secondly, the gfn_to_pfn_cache is not invalidated in all cases where it
+should have been. There are two stages to the GFN =E2=86=92 PFN conversion;
+first the GFN is converted to a userspace HVA, and then that HVA is
+looked up in the process page tables to find the underlying host PFN.
+Correct invalidation of the latter would require being hooked up to the
+MMU notifiers, but that doesn't happen =E2=80=94 so it just keeps mapping a=
+nd
+unmapping the *wrong* PFN after the userspace page tables change.
 
---=-EaUtCpfKruATI3VM83xJ
+In the !IOMEM case at least the stale page *is* pinned all the time it's
+cached, so it won't be freed and reused by anyone else while still
+receiving the steal time updates. (This kind of makes a mockery of this
+repeated map/unmap dance which I thought was supposed to avoid pinning
+the page. AFAICT we might as well have just kept a kernel mapping of it
+all the time).
+
+But there's no point in a kernel mapping of it anyway, when in all cases
+we care about, we have a perfectly serviceable userspace HVA for it. We
+just need to implement the atomic xchg on the userspace address with
+appropriate exception handling, which is fairly trivial.
+
+Cc: stable@vger.kernel.org
+Fixes: b043138246a4 ("x86/KVM: Make sure KVM_VCPU_FLUSH_TLB flag is not mis=
+sed")
+Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+---
+v2: Fix asm constraints (err is an output). Rebase so that it applies clean=
+ly
+    before the Xen series (which changes the argument to kvm_map_gfn() that
+    is removed in this patch anyway.)
+v3: Mark the GFN dirty after writing it.
+
+ arch/x86/include/asm/kvm_host.h |   2 +-
+ arch/x86/kvm/x86.c              | 111 +++++++++++++++++++++++---------
+ 2 files changed, 82 insertions(+), 31 deletions(-)
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_hos=
+t.h
+index 13f64654dfff..750f74da9793 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -751,7 +751,7 @@ struct kvm_vcpu_arch {
+ 		u8 preempted;
+ 		u64 msr_val;
+ 		u64 last_steal;
+-		struct gfn_to_pfn_cache cache;
++		struct gfn_to_hva_cache cache;
+ 	} st;
+=20
+ 	u64 l1_tsc_offset;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index bfe0de3008a6..b49ab3188942 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3195,8 +3195,11 @@ static void kvm_vcpu_flush_tlb_guest(struct kvm_vcpu=
+ *vcpu)
+=20
+ static void record_steal_time(struct kvm_vcpu *vcpu)
+ {
+-	struct kvm_host_map map;
+-	struct kvm_steal_time *st;
++	struct gfn_to_hva_cache *ghc =3D &vcpu->arch.st.cache;
++	struct kvm_steal_time __user *st;
++	struct kvm_memslots *slots;
++	u64 steal;
++	u32 version;
+=20
+ 	if (kvm_xen_msr_enabled(vcpu->kvm)) {
+ 		kvm_xen_runstate_set_running(vcpu);
+@@ -3206,47 +3209,89 @@ static void record_steal_time(struct kvm_vcpu *vcpu=
+)
+ 	if (!(vcpu->arch.st.msr_val & KVM_MSR_ENABLED))
+ 		return;
+=20
+-	/* -EAGAIN is returned in atomic context so we can just return. */
+-	if (kvm_map_gfn(vcpu, vcpu->arch.st.msr_val >> PAGE_SHIFT,
+-			&map, &vcpu->arch.st.cache, false))
++	if (WARN_ON_ONCE(current->mm !=3D vcpu->kvm->mm))
+ 		return;
+=20
+-	st =3D map.hva +
+-		offset_in_page(vcpu->arch.st.msr_val & KVM_STEAL_VALID_BITS);
++	slots =3D kvm_memslots(vcpu->kvm);
++
++	if (unlikely(slots->generation !=3D ghc->generation ||
++		     kvm_is_error_hva(ghc->hva) || !ghc->memslot)) {
++		gfn_t gfn =3D vcpu->arch.st.msr_val & KVM_STEAL_VALID_BITS;
++
++		/* We rely on the fact that it fits in a single page. */
++		BUILD_BUG_ON((sizeof(*st) - 1) & KVM_STEAL_VALID_BITS);
++
++		if (kvm_gfn_to_hva_cache_init(vcpu->kvm, ghc, gfn, sizeof(*st)) ||
++		    kvm_is_error_hva(ghc->hva) || !ghc->memslot)
++			return;
++	}
++
++	st =3D (struct kvm_steal_time __user *)ghc->hva;
++	if (!user_access_begin(st, sizeof(*st)))
++		return;
+=20
+ 	/*
+ 	 * Doing a TLB flush here, on the guest's behalf, can avoid
+ 	 * expensive IPIs.
+ 	 */
+ 	if (guest_pv_has(vcpu, KVM_FEATURE_PV_TLB_FLUSH)) {
+-		u8 st_preempted =3D xchg(&st->preempted, 0);
++		u8 st_preempted =3D 0;
++		int err;
++
++		asm volatile("1:\t" LOCK_PREFIX "xchgb %0, %2\n"
++			     "\txor %1, %1\n"
++			     "2:\n"
++			     "\t.section .fixup,\"ax\"\n"
++			     "3:\tmovl %3, %1\n"
++			     "\tjmp\t2b\n"
++			     "\t.previous\n"
++			     _ASM_EXTABLE_UA(1b, 3b)
++			     : "=3Dr" (st_preempted),
++			       "=3Dr" (err)
++			     : "m" (st->preempted),
++			       "i" (-EFAULT),
++			       "0" (st_preempted));
++		if (err)
++			goto out;
++
++		user_access_end();
++
++		vcpu->arch.st.preempted =3D 0;
+=20
+ 		trace_kvm_pv_tlb_flush(vcpu->vcpu_id,
+ 				       st_preempted & KVM_VCPU_FLUSH_TLB);
+ 		if (st_preempted & KVM_VCPU_FLUSH_TLB)
+ 			kvm_vcpu_flush_tlb_guest(vcpu);
++
++		if (!user_access_begin(st, sizeof(*st)))
++			goto dirty;
+ 	} else {
+-		st->preempted =3D 0;
++		unsafe_put_user(0, &st->preempted, out);
++		vcpu->arch.st.preempted =3D 0;
+ 	}
+=20
+-	vcpu->arch.st.preempted =3D 0;
+-
+-	if (st->version & 1)
+-		st->version +=3D 1;  /* first time write, random junk */
++	unsafe_get_user(version, &st->version, out);
++	if (version & 1)
++		version +=3D 1;  /* first time write, random junk */
+=20
+-	st->version +=3D 1;
++	version +=3D 1;
++	unsafe_put_user(version, &st->version, out);
+=20
+ 	smp_wmb();
+=20
+-	st->steal +=3D current->sched_info.run_delay -
++	unsafe_get_user(steal, &st->steal, out);
++	steal +=3D current->sched_info.run_delay -
+ 		vcpu->arch.st.last_steal;
+ 	vcpu->arch.st.last_steal =3D current->sched_info.run_delay;
++	unsafe_put_user(steal, &st->steal, out);
+=20
+-	smp_wmb();
+-
+-	st->version +=3D 1;
++	version +=3D 1;
++	unsafe_put_user(version, &st->version, out);
+=20
+-	kvm_unmap_gfn(vcpu, &map, &vcpu->arch.st.cache, true, false);
++ out:
++	user_access_end();
++ dirty:
++	mark_page_dirty_in_slot(vcpu->kvm, ghc->memslot, gpa_to_gfn(ghc->gpa));
+ }
+=20
+ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+@@ -4285,8 +4330,10 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int c=
+pu)
+=20
+ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
+ {
+-	struct kvm_host_map map;
+-	struct kvm_steal_time *st;
++	struct gfn_to_hva_cache *ghc =3D &vcpu->arch.st.cache;
++	struct kvm_steal_time __user *st;
++	struct kvm_memslots *slots;
++	static const u8 preempted =3D KVM_VCPU_PREEMPTED;
+=20
+ 	if (!(vcpu->arch.st.msr_val & KVM_MSR_ENABLED))
+ 		return;
+@@ -4294,16 +4341,23 @@ static void kvm_steal_time_set_preempted(struct kvm=
+_vcpu *vcpu)
+ 	if (vcpu->arch.st.preempted)
+ 		return;
+=20
+-	if (kvm_map_gfn(vcpu, vcpu->arch.st.msr_val >> PAGE_SHIFT, &map,
+-			&vcpu->arch.st.cache, true))
++	/* This happens on process exit */
++	if (unlikely(current->mm !=3D vcpu->kvm->mm))
+ 		return;
+=20
+-	st =3D map.hva +
+-		offset_in_page(vcpu->arch.st.msr_val & KVM_STEAL_VALID_BITS);
++	slots =3D kvm_memslots(vcpu->kvm);
++
++	if (unlikely(slots->generation !=3D ghc->generation ||
++		     kvm_is_error_hva(ghc->hva) || !ghc->memslot))
++		return;
+=20
+-	st->preempted =3D vcpu->arch.st.preempted =3D KVM_VCPU_PREEMPTED;
++	st =3D (struct kvm_steal_time __user *)ghc->hva;
++	BUILD_BUG_ON(sizeof(st->preempted) !=3D sizeof(preempted));
+=20
+-	kvm_unmap_gfn(vcpu, &map, &vcpu->arch.st.cache, true, true);
++	if (!copy_to_user_nofault(&st->preempted, &preempted, sizeof(preempted)))
++		vcpu->arch.st.preempted =3D KVM_VCPU_PREEMPTED;
++
++	mark_page_dirty_in_slot(vcpu->kvm, ghc->memslot, gpa_to_gfn(ghc->gpa));
+ }
+=20
+ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+@@ -10817,11 +10871,8 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcp=
+u)
+=20
+ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+ {
+-	struct gfn_to_pfn_cache *cache =3D &vcpu->arch.st.cache;
+ 	int idx;
+=20
+-	kvm_release_pfn(cache->pfn, cache->dirty, cache);
+-
+ 	kvmclock_reset(vcpu);
+=20
+ 	static_call(kvm_x86_vcpu_free)(vcpu);
+--=20
+2.25.1
+
+
+--=-irBYnVDY+F7z0VaOn/0M
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -160,20 +403,20 @@ BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
 BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
 ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
 ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjEx
-MTAyMTcyNjM0WjAvBgkqhkiG9w0BCQQxIgQgMe42OP1rQUkP8M8Xk2y7gcxuVYdqtMoiiG93Tp2l
-/PQwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+MTAyMTczNjM5WjAvBgkqhkiG9w0BCQQxIgQg/V5vO2oiCEydDpaK89PQw8XsL81p+syuAnjVhKzt
+Wx8wgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
 TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
 PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
 aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
 A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
 bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBAJ/5BOd/zgPejtdnBYxv1T0SZzQwZWJelT7e1wkhrET4E6Yo3T9R/+1oYzKIOU7Y
-wN/Ds0TCeFpwUrH6P1d7FSBhP2LkgV4eJJ+hKRKJlQOuxl/iI15R1+0KlzcFEbXxbXDIZUnKO5h3
-yVgPAz3MtZ8FCFd0Q6uAZAS1Cc8qt8nILUZL7XAcMmNnRSYf0xU+cDiXcdDuPcQKAfnpv9OTgUty
-Di5D/uLrtytluebN0+LRebpz7kKmh9IPAWMKZYsoj+R055/dNe8Ne+duAuVuIEY10afvlVLQIQOB
-YKkvHIe3/09/gJr4UxPr/NDIHIDi21mzDRVq6ALHdY18h7mUwb0AAAAAAAA=
+DQEBAQUABIIBAF5lomQooq8qC6py/azsMN8mu7OGcdoFvHV3pA0PqKBWRY/4PdhFADaIIaLi8qUc
+TSf5zxnXRC9oVdXcC2lowXX2gKaupOWVwVJv4rwvEUDE+Z0epG7A/Jb1a5dHa206RbS2k8JnPOEP
+B2bPQo7E70c/oDVURLOZEhwiiJPnhD/O34x7UwKTX+tHUngWsxLZugReHCmWei9hHFpcKskHy7Af
+geV/R3wHg8GfmdmAul+uVdqs0ObyE476ccvvTLocZ0fJVeOgFO2VDChUOMWNVEpSk1dvVPuBzJot
+YPHmQMP7OcdKALs6D/F6vZB6SwivMBUELKUHo3gklwlL+TYhRdUAAAAAAAA=
 
 
---=-EaUtCpfKruATI3VM83xJ--
+--=-irBYnVDY+F7z0VaOn/0M--
 
