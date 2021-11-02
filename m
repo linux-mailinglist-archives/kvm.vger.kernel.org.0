@@ -2,19 +2,19 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 773F8442A2A
-	for <lists+kvm@lfdr.de>; Tue,  2 Nov 2021 10:15:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D489442A2F
+	for <lists+kvm@lfdr.de>; Tue,  2 Nov 2021 10:16:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231161AbhKBJSM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Nov 2021 05:18:12 -0400
-Received: from out30-131.freemail.mail.aliyun.com ([115.124.30.131]:34012 "EHLO
-        out30-131.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229720AbhKBJSL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 2 Nov 2021 05:18:11 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04423;MF=houwenlong93@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0UujaDv1_1635844534;
-Received: from localhost(mailfrom:houwenlong93@linux.alibaba.com fp:SMTPD_---0UujaDv1_1635844534)
+        id S231433AbhKBJSW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Nov 2021 05:18:22 -0400
+Received: from out30-42.freemail.mail.aliyun.com ([115.124.30.42]:33232 "EHLO
+        out30-42.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231232AbhKBJSO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 2 Nov 2021 05:18:14 -0400
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R231e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=houwenlong93@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0Uuk5J7D_1635844535;
+Received: from localhost(mailfrom:houwenlong93@linux.alibaba.com fp:SMTPD_---0Uuk5J7D_1635844535)
           by smtp.aliyun-inc.com(127.0.0.1);
-          Tue, 02 Nov 2021 17:15:35 +0800
+          Tue, 02 Nov 2021 17:15:36 +0800
 From:   Hou Wenlong <houwenlong93@linux.alibaba.com>
 To:     kvm@vger.kernel.org
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -27,9 +27,9 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 2/4] KVM: x86: Add an emulation type to handle completion of user exits
-Date:   Tue,  2 Nov 2021 17:15:30 +0800
-Message-Id: <8f8c8e268b65f31d55c2881a4b30670946ecfa0d.1635842679.git.houwenlong93@linux.alibaba.com>
+Subject: [PATCH v2 3/4] KVM: x86: Use different callback if msr access comes from the emulator
+Date:   Tue,  2 Nov 2021 17:15:31 +0800
+Message-Id: <34208da8f51580a06e45afefac95afea0e3f96e3.1635842679.git.houwenlong93@linux.alibaba.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <cover.1635842679.git.houwenlong93@linux.alibaba.com>
 References: <cover.1635842679.git.houwenlong93@linux.alibaba.com>
@@ -39,94 +39,180 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The next patch would use kvm_emulate_instruction() with
-EMULTYPE_SKIP in complete_userspace_io callback to fix a
-problem in msr access emulation. However, EMULTYPE_SKIP
-only updates RIP, more things like updating interruptibility
-state and injecting single-step #DBs would be done in the
-callback. Since the emulator also does those things after
-x86_emulate_insn(), add a new emulation type to pair with
-EMULTYPE_SKIP to do those things for completion of user exits
-within the emulator.
+If msr access triggers an exit to userspace, the
+complete_userspace_io callback would skip instruction by vendor
+callback for kvm_skip_emulated_instruction(). However, when msr
+access comes from the emulator, e.g. if kvm.force_emulation_prefix
+is enabled and the guest uses rdmsr/wrmsr with kvm prefix,
+VM_EXIT_INSTRUCTION_LEN in vmcs is invalid and
+kvm_emulate_instruction() should be used to skip instruction
+instead.
+
+As Sean noted, unlike the previous case, there's no #UD if
+unrestricted guest is disabled and the guest accesses an MSR in
+Big RM. So the correct way to fix this is to attach a different
+callback when the msr access comes from the emulator.
 
 Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Hou Wenlong <houwenlong93@linux.alibaba.com>
 ---
- arch/x86/include/asm/kvm_host.h |  8 +++++++-
- arch/x86/kvm/x86.c              | 13 ++++++++++---
- 2 files changed, 17 insertions(+), 4 deletions(-)
+ arch/x86/kvm/x86.c | 85 +++++++++++++++++++++++++++-------------------
+ 1 file changed, 50 insertions(+), 35 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 88fce6ab4bbd..b99e62b39097 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1635,7 +1635,8 @@ extern u64 kvm_mce_cap_supported;
-  *
-  * EMULTYPE_SKIP - Set when emulating solely to skip an instruction, i.e. to
-  *		   decode the instruction length.  For use *only* by
-- *		   kvm_x86_ops.skip_emulated_instruction() implementations.
-+ *		   kvm_x86_ops.skip_emulated_instruction() implementations if
-+ *		   EMULTYPE_COMPLETE_USER_EXIT is not set.
-  *
-  * EMULTYPE_ALLOW_RETRY_PF - Set when the emulator should resume the guest to
-  *			     retry native execution under certain conditions,
-@@ -1655,6 +1656,10 @@ extern u64 kvm_mce_cap_supported;
-  *
-  * EMULTYPE_PF - Set when emulating MMIO by way of an intercepted #PF, in which
-  *		 case the CR2/GPA value pass on the stack is valid.
-+ *
-+ * EMULTYPE_COMPLETE_USER_EXIT - Set when the emulator should update interruptibility
-+ *				 state and inject single-step #DBs after skipping
-+ *				 an instruction (after completing userspace I/O).
-  */
- #define EMULTYPE_NO_DECODE	    (1 << 0)
- #define EMULTYPE_TRAP_UD	    (1 << 1)
-@@ -1663,6 +1668,7 @@ extern u64 kvm_mce_cap_supported;
- #define EMULTYPE_TRAP_UD_FORCED	    (1 << 4)
- #define EMULTYPE_VMWARE_GP	    (1 << 5)
- #define EMULTYPE_PF		    (1 << 6)
-+#define EMULTYPE_COMPLETE_USER_EXIT (1 << 7)
- 
- int kvm_emulate_instruction(struct kvm_vcpu *vcpu, int emulation_type);
- int kvm_emulate_instruction_from_buffer(struct kvm_vcpu *vcpu,
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 3d7fc5c21ceb..a961b49c8c44 100644
+index a961b49c8c44..5eadf5ddba3e 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -8119,9 +8119,10 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+@@ -116,6 +116,7 @@ static void enter_smm(struct kvm_vcpu *vcpu);
+ static void __kvm_set_rflags(struct kvm_vcpu *vcpu, unsigned long rflags);
+ static void store_regs(struct kvm_vcpu *vcpu);
+ static int sync_regs(struct kvm_vcpu *vcpu);
++static int kvm_vcpu_do_singlestep(struct kvm_vcpu *vcpu);
+ 
+ static int __set_sregs2(struct kvm_vcpu *vcpu, struct kvm_sregs2 *sregs2);
+ static void __get_sregs2(struct kvm_vcpu *vcpu, struct kvm_sregs2 *sregs2);
+@@ -1814,18 +1815,45 @@ int kvm_set_msr(struct kvm_vcpu *vcpu, u32 index, u64 data)
+ }
+ EXPORT_SYMBOL_GPL(kvm_set_msr);
+ 
+-static int complete_emulated_rdmsr(struct kvm_vcpu *vcpu)
++static void __complete_emulated_rdmsr(struct kvm_vcpu *vcpu)
+ {
+-	int err = vcpu->run->msr.error;
+-	if (!err) {
++	if (!vcpu->run->msr.error) {
+ 		kvm_rax_write(vcpu, (u32)vcpu->run->msr.data);
+ 		kvm_rdx_write(vcpu, vcpu->run->msr.data >> 32);
+ 	}
++}
++
++static int complete_emulated_msr_access(struct kvm_vcpu *vcpu)
++{
++	if (vcpu->run->msr.error) {
++		kvm_inject_gp(vcpu, 0);
++		return 1;
++	}
++
++	return kvm_emulate_instruction(vcpu, EMULTYPE_NO_DECODE | EMULTYPE_SKIP |
++				       EMULTYPE_COMPLETE_USER_EXIT);
++}
++
++static int complete_emulated_rdmsr(struct kvm_vcpu *vcpu)
++{
++	__complete_emulated_rdmsr(vcpu);
+ 
+-	return static_call(kvm_x86_complete_emulated_msr)(vcpu, err);
++	return complete_emulated_msr_access(vcpu);
+ }
+ 
+ static int complete_emulated_wrmsr(struct kvm_vcpu *vcpu)
++{
++	return complete_emulated_msr_access(vcpu);
++}
++
++static int complete_fast_rdmsr(struct kvm_vcpu *vcpu)
++{
++	__complete_emulated_rdmsr(vcpu);
++
++	return static_call(kvm_x86_complete_emulated_msr)(vcpu, vcpu->run->msr.error);
++}
++
++static int complete_fast_wrmsr(struct kvm_vcpu *vcpu)
+ {
+ 	return static_call(kvm_x86_complete_emulated_msr)(vcpu, vcpu->run->msr.error);
+ }
+@@ -1864,18 +1892,6 @@ static int kvm_msr_user_space(struct kvm_vcpu *vcpu, u32 index,
+ 	return 1;
+ }
+ 
+-static int kvm_get_msr_user_space(struct kvm_vcpu *vcpu, u32 index, int r)
+-{
+-	return kvm_msr_user_space(vcpu, index, KVM_EXIT_X86_RDMSR, 0,
+-				   complete_emulated_rdmsr, r);
+-}
+-
+-static int kvm_set_msr_user_space(struct kvm_vcpu *vcpu, u32 index, u64 data, int r)
+-{
+-	return kvm_msr_user_space(vcpu, index, KVM_EXIT_X86_WRMSR, data,
+-				   complete_emulated_wrmsr, r);
+-}
+-
+ int kvm_emulate_rdmsr(struct kvm_vcpu *vcpu)
+ {
+ 	u32 ecx = kvm_rcx_read(vcpu);
+@@ -1884,18 +1900,16 @@ int kvm_emulate_rdmsr(struct kvm_vcpu *vcpu)
+ 
+ 	r = kvm_get_msr(vcpu, ecx, &data);
+ 
+-	/* MSR read failed? See if we should ask user space */
+-	if (r && kvm_get_msr_user_space(vcpu, ecx, r)) {
+-		/* Bounce to user space */
+-		return 0;
+-	}
+-
+ 	if (!r) {
+ 		trace_kvm_msr_read(ecx, data);
+ 
+ 		kvm_rax_write(vcpu, data & -1u);
+ 		kvm_rdx_write(vcpu, (data >> 32) & -1u);
+ 	} else {
++		/* MSR read failed? See if we should ask user space */
++		if (kvm_msr_user_space(vcpu, ecx, KVM_EXIT_X86_RDMSR, 0,
++				       complete_fast_rdmsr, r))
++			return 0;
+ 		trace_kvm_msr_read_ex(ecx);
  	}
  
- 	/*
--	 * Note, EMULTYPE_SKIP is intended for use *only* by vendor callbacks
--	 * for kvm_skip_emulated_instruction().  The caller is responsible for
--	 * updating interruptibility state and injecting single-step #DBs.
-+	 * EMULTYPE_SKIP without EMULTYPE_COMPLETE_USER_EXIT is intended for
-+	 * use *only* by vendor callbacks for kvm_skip_emulated_instruction().
-+	 * The caller is responsible for updating interruptibility state and
-+	 * injecting single-step #DBs.
- 	 */
- 	if (emulation_type & EMULTYPE_SKIP) {
- 		if (ctxt->mode != X86EMUL_MODE_PROT64)
-@@ -8129,6 +8130,11 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 		else
- 			ctxt->eip = ctxt->_eip;
+@@ -1911,19 +1925,18 @@ int kvm_emulate_wrmsr(struct kvm_vcpu *vcpu)
  
-+		if (emulation_type & EMULTYPE_COMPLETE_USER_EXIT) {
-+			r = 1;
-+			goto writeback;
-+		}
-+
- 		kvm_rip_write(vcpu, ctxt->eip);
- 		if (ctxt->eflags & X86_EFLAGS_RF)
- 			kvm_set_rflags(vcpu, ctxt->eflags & ~X86_EFLAGS_RF);
-@@ -8198,6 +8204,7 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 	else
- 		r = 1;
+ 	r = kvm_set_msr(vcpu, ecx, data);
  
-+writeback:
- 	if (writeback) {
- 		unsigned long rflags = static_call(kvm_x86_get_rflags)(vcpu);
- 		toggle_interruptibility(vcpu, ctxt->interruptibility);
+-	/* MSR write failed? See if we should ask user space */
+-	if (r && kvm_set_msr_user_space(vcpu, ecx, data, r))
+-		/* Bounce to user space */
+-		return 0;
+-
+-	/* Signal all other negative errors to userspace */
+-	if (r < 0)
+-		return r;
+-
+-	if (!r)
++	if (!r) {
+ 		trace_kvm_msr_write(ecx, data);
+-	else
++	} else {
++		/* MSR write failed? See if we should ask user space */
++		if (kvm_msr_user_space(vcpu, ecx, KVM_EXIT_X86_WRMSR, data,
++				       complete_fast_wrmsr, r))
++			return 0;
++		/* Signal all other negative errors to userspace */
++		if (r < 0)
++			return r;
+ 		trace_kvm_msr_write_ex(ecx, data);
++	}
+ 
+ 	return static_call(kvm_x86_complete_emulated_msr)(vcpu, r);
+ }
+@@ -7387,7 +7400,8 @@ static int emulator_get_msr(struct x86_emulate_ctxt *ctxt,
+ 
+ 	r = kvm_get_msr(vcpu, msr_index, pdata);
+ 
+-	if (r && kvm_get_msr_user_space(vcpu, msr_index, r)) {
++	if (r && kvm_msr_user_space(vcpu, msr_index, KVM_EXIT_X86_RDMSR, 0,
++				    complete_emulated_rdmsr, r)) {
+ 		/* Bounce to user space */
+ 		return X86EMUL_IO_NEEDED;
+ 	}
+@@ -7403,7 +7417,8 @@ static int emulator_set_msr(struct x86_emulate_ctxt *ctxt,
+ 
+ 	r = kvm_set_msr(vcpu, msr_index, data);
+ 
+-	if (r && kvm_set_msr_user_space(vcpu, msr_index, data, r)) {
++	if (r && kvm_msr_user_space(vcpu, msr_index, KVM_EXIT_X86_WRMSR, data,
++				    complete_emulated_wrmsr, r)) {
+ 		/* Bounce to user space */
+ 		return X86EMUL_IO_NEEDED;
+ 	}
 -- 
 2.31.1
 
