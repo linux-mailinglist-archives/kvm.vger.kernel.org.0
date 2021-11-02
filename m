@@ -2,216 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 31C4D443100
-	for <lists+kvm@lfdr.de>; Tue,  2 Nov 2021 15:57:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D75D4431F9
+	for <lists+kvm@lfdr.de>; Tue,  2 Nov 2021 16:46:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234752AbhKBPAH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Nov 2021 11:00:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:27577 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234918AbhKBO7c (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 2 Nov 2021 10:59:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635865017;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=rXNQNfiHB/PeLRGP+7hDt0wdDNq5SSU2T+fjB5p1Png=;
-        b=VZZ9CyimoikIKCDlT9nAj8VpXolG5t/VuNn2k9mVi0gnt/hvvnS1v2COpwYyOziL9thexT
-        /W7piohQPapyuKLiqFA3qx4gpOWVsJFHDf4Z0ukiIhttBdzTksGpMGF+ohMxc1GTEXCQMU
-        W4gORTxZ3v8GuOlTJhc4tLF8z8Mnnjg=
-Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com
- [209.85.161.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-424-muChOrdxM3ahk8rFcDNEHw-1; Tue, 02 Nov 2021 10:56:54 -0400
-X-MC-Unique: muChOrdxM3ahk8rFcDNEHw-1
-Received: by mail-oo1-f72.google.com with SMTP id o8-20020a4aabc8000000b002b601d1fb33so9920620oon.23
-        for <kvm@vger.kernel.org>; Tue, 02 Nov 2021 07:56:54 -0700 (PDT)
+        id S234291AbhKBPse (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Nov 2021 11:48:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59562 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231361AbhKBPsc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Nov 2021 11:48:32 -0400
+Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2031AC061714
+        for <kvm@vger.kernel.org>; Tue,  2 Nov 2021 08:45:57 -0700 (PDT)
+Received: by mail-qt1-x82b.google.com with SMTP id h16so14813058qtk.0
+        for <kvm@vger.kernel.org>; Tue, 02 Nov 2021 08:45:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=oBZS+B5OI/pNOurVNUNmHTLzU1LJ6vGeGI0SMtDtTqA=;
+        b=ZxvXyZ8G6um96czYq5NWq0JwiA0h3KQZiPg6jRZHGNFHRPslxY+VDPyuTaCEHNUULy
+         +pkbJHwaI9jQjaIW8qRyVebYqe2MOnXFruS8bmWxt5KLy3IZ+0AFirfA/DLeUcEl4HIX
+         TRgpSA0mp0MdbHJSKO7qkEMITA6Dw2dfICBp3n7qqNf/sBb+gB8edfdhV911nOhAOwHH
+         B6snqjnx7hhz3hn1quZHjYRnFA8fZTSIRSu4V/8qL24ItahLZWErZc2Foql8ePgzC/Vz
+         +nYzVDZGlH30T0pNHhnmKVJBhUCmIs7aHmo7nDOe0zezTbMGPCuSmMyaFmLIFYCq83rR
+         pJPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=rXNQNfiHB/PeLRGP+7hDt0wdDNq5SSU2T+fjB5p1Png=;
-        b=yrwpzFdKPSxrXRppu1Hlc+Kkc/A1Eh3jPVMgtE/FeFzfp1TXjdCjQKb+2V/HPmIGiF
-         IyGH8OJmdNzxDEq9yd1PsrCLCKfKM8QJj6k3zSRcZR1L63UR6it7wzK/BJan0rI95Nfj
-         zNk9VgwpJGTxKwBAcVG4yr3KEyyG7DeGgt0qSS3tT3LtWh04HjNCm6DclEJoxrFx6CQl
-         IBsGiuVtCuz1v2GzjinWb/G1SnUB9lFedSnSHP/cgLn6g06df//T8tAs3IH45PRmnj72
-         Yb8VOn73x6XAn6rkZVQXQQ6lj8LwXCUMaNUfz0H1h75s7xmJbYktF9bhOmV6urknlmQN
-         VFeg==
-X-Gm-Message-State: AOAM531P1YNXX8o6yniIifcMehGW/h4ocul2IknfuY9pwt41VqGzjZ95
-        QGxMUPCPs7B0z1US6Ot4MbRSnTSN8eU0DW9OEgXOJzWO0JIGYdJEwhUX5weWc/CyAE4EonueBkF
-        vHrhbeCl+VGXo
-X-Received: by 2002:a9d:2909:: with SMTP id d9mr16105611otb.187.1635865013960;
-        Tue, 02 Nov 2021 07:56:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJytw8wBjugPRoTH1oiXe4YvuMOLPdBjoz6aqSXNqQjkKkVHyT46/WIQqNFRBpB6ufxkPoDYvQ==
-X-Received: by 2002:a9d:2909:: with SMTP id d9mr16105590otb.187.1635865013678;
-        Tue, 02 Nov 2021 07:56:53 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id d24sm2423495otq.5.2021.11.02.07.56.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Nov 2021 07:56:53 -0700 (PDT)
-Date:   Tue, 2 Nov 2021 08:56:51 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
-        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
-        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH V2 mlx5-next 12/14] vfio/mlx5: Implement vfio_pci driver
- for mlx5 devices
-Message-ID: <20211102085651.28e0203c.alex.williamson@redhat.com>
-In-Reply-To: <20211101172506.GC2744544@nvidia.com>
-References: <20211025145646.GX2744544@nvidia.com>
-        <20211026084212.36b0142c.alex.williamson@redhat.com>
-        <20211026151851.GW2744544@nvidia.com>
-        <20211026135046.5190e103.alex.williamson@redhat.com>
-        <20211026234300.GA2744544@nvidia.com>
-        <20211027130520.33652a49.alex.williamson@redhat.com>
-        <20211027192345.GJ2744544@nvidia.com>
-        <20211028093035.17ecbc5d.alex.williamson@redhat.com>
-        <20211028234750.GP2744544@nvidia.com>
-        <20211029160621.46ca7b54.alex.williamson@redhat.com>
-        <20211101172506.GC2744544@nvidia.com>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=oBZS+B5OI/pNOurVNUNmHTLzU1LJ6vGeGI0SMtDtTqA=;
+        b=FxsOvJtDUA4wEwBOalnAZknlDKd4TkHD+GGkgGKdi+fPPbCuQM0fUEWhjni633yVqj
+         07gpDCBtNiL3GsIlCQutFD4mMU2ri3HYqroCs/Bs+E/kP5ErRPj7Dm+eR7Mb6GUtgVe4
+         urSPOEomAZ/fvUJ5Tyokf9IF2joGatiw+WHzHLBitIFlfsrxsSWGggw1b9+513CuDrZI
+         o3s6mGtXus8VROZpUj7yYLAfPqGz48hIQU9kWGn4PoQuFP4DWDuHoH7beJmNNz69kKq0
+         1szYyF3jPqgRVXqidow7zA8JP/qRK2BysYq8qyqr1nnNjBot8BgLoyCFXw/MI0ttpI2m
+         9/gA==
+X-Gm-Message-State: AOAM532QXdhLwv5dWbfNhFsm/I0xfAMRSgQZxfYEuH261PaqnBtIZ9XI
+        q8pA7QDc3p6WxAB0MN3xdh+nYIomYjhfZw==
+X-Google-Smtp-Source: ABdhPJx7asEmjavQwNXvLHtTNJJ4FS8uJKsNMq8MaQoG0lRsFCuUBJcFIhC2E0gsV2D1s47hX+9AHg==
+X-Received: by 2002:ac8:7f11:: with SMTP id f17mr31747889qtk.389.1635867956240;
+        Tue, 02 Nov 2021 08:45:56 -0700 (PDT)
+Received: from [172.20.81.179] (rrcs-172-254-253-57.nyc.biz.rr.com. [172.254.253.57])
+        by smtp.gmail.com with ESMTPSA id y8sm12807287qko.36.2021.11.02.08.45.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 02 Nov 2021 08:45:55 -0700 (PDT)
+Subject: Re: [PULL 00/20] Migration 20211031 patches
+To:     Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
+Cc:     Markus Armbruster <armbru@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        xen-devel@lists.xenproject.org,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Eric Blake <eblake@redhat.com>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+        kvm@vger.kernel.org, Peter Xu <peterx@redhat.com>,
+        =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+        Paul Durrant <paul@xen.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Anthony Perard <anthony.perard@citrix.com>
+References: <20211101220912.10039-1-quintela@redhat.com>
+From:   Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <709cabc0-95c3-27dd-e2ae-8834fc7b36b3@linaro.org>
+Date:   Tue, 2 Nov 2021 11:45:53 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20211101220912.10039-1-quintela@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 1 Nov 2021 14:25:06 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
-
-> On Fri, Oct 29, 2021 at 04:06:21PM -0600, Alex Williamson wrote:
+On 11/1/21 6:08 PM, Juan Quintela wrote:
+> The following changes since commit af531756d25541a1b3b3d9a14e72e7fedd941a2e:
 > 
-> > > Right now we are focused on the non-P2P cases, which I think is a
-> > > reasonable starting limitation.  
-> > 
-> > It's a reasonable starting point iff we know that we need to support
-> > devices that cannot themselves support a quiescent state.  Otherwise it
-> > would make sense to go back to work on the uAPI because I suspect the
-> > implications to userspace are not going to be as simple as "oops, can't
-> > migrate, there are two devices."  As you say, there's a universe of
-> > devices that run together that don't care about p2p and QEMU will be
-> > pressured to support migration of those configurations.  
+>    Merge remote-tracking branch 'remotes/philmd/tags/renesas-20211030' into staging (2021-10-30 11:31:41 -0700)
 > 
-> I agree with this, but I also think what I saw in the proposed hns
-> driver suggests it's HW cannot do quiescent, if so this is the first
-> counter-example to the notion it is a universal ability?
+> are available in the Git repository at:
 > 
-> hns people: Can you put your device in a state where it is operating,
-> able to accept and respond to MMIO, and yet guarentees it generates no
-> DMA transactions?
+>    https://github.com/juanquintela/qemu.git tags/migration-20211031-pull-request
 > 
-> > want migration.  If we ever want both migration and p2p, QEMU would
-> > need to reject any device that can't comply.  
+> for you to fetch changes up to 826b8bc80cb191557a4ce7cf0e155b436d2d1afa:
 > 
-> Yes, it looks like a complicated task on the qemu side to get this
-> resolved
+>    migration/dirtyrate: implement dirty-bitmap dirtyrate calculation (2021-11-01 22:56:44 +0100)
 > 
-> > > It is not a big deal to defer things to rc1, though merging a
-> > > leaf-driver that has been on-list over a month is certainly not
-> > > rushing either.  
-> > 
-> > If "on-list over a month" is meant to imply that it's well vetted, it
-> > does not.  That's a pretty quick time frame given the uAPI viability
-> > discussions that it's generated.  
+> ----------------------------------------------------------------
+> Migration Pull request
 > 
-> I only said rushed :)
-
-To push forward regardless of unresolved questions is rushing
-regardless of how long it's been on-list.
-
-> > I'm tending to agree that there's value in moving forward, but there's
-> > a lot we're defining here that's not in the uAPI, so I'd like to see
-> > those things become formalized.  
+> Hi
 > 
-> Ok, lets come up with a documentation patch then to define !RUNNING as
-> I outlined and start to come up with the allowed list of actions..
+> this includes pending bits of migration patches.
 > 
-> I think I would like to have a proper rst file for documenting the
-> uapi as well.
+> - virtio-mem support by David Hildenbrand
+> - dirtyrate improvements by Hyman Huang
+> - fix rdma wrid by Li Zhijian
+> - dump-guest-memory fixes by Peter Xu
 > 
-> > I think this version is defining that it's the user's responsibility to
-> > prevent external DMA to devices while in the !_RUNNING state.  This
-> > resolves the condition that we have no means to coordinate quiescing
-> > multiple devices.  We shouldn't necessarily prescribe a single device
-> > solution in the uAPI if the same can be equally achieved through
-> > configuration of DMA mapping.  
+> Pleas apply.
 > 
-> I'm not sure what this means?
-
-I'm just trying to avoid the uAPI calling out a single-device
-restriction if there are other ways that userspace can quiesce external
-DMA outside of the uAPI, such as by limiting p2p DMA mappings at the
-IOMMU, ie. define the userspace requirements but don't dictate a
-specific solution.
-
-> > I was almost on board with blocking MMIO, especially as p2p is just DMA
-> > mapping of MMIO, but what about MSI-X?  During _RESUME we must access
-> > the MSI-X vector table via the SET_IRQS ioctl to configure interrupts.
-> > Is this exempt because the access occurs in the host?    
+> Thanks, Juan.
 > 
-> s/in the host/in the kernel/ SET_IRQS is a kernel ioctl that uses the
-> core MSIX code to do the mmio, so it would not be impacted by MMIO
-> zap.
-
-AIUI, "zap" is just the proposed userspace manifestation that the
-device cannot accept MMIO writes while !_RUNNING, but these writes must
-occur in that state.
-
-> Looks like you've already marked these points with the
-> vfio_pci_memory_lock_and_enable(), so a zap for migration would have
-> to be a little different than a zap for reset.
+> ----------------------------------------------------------------
 > 
-> Still, this is something that needs clear definition, I would expect
-> the SET_IRQS to happen after resuming clears but before running sets
-> to give maximum HW flexibility and symmetry with saving.
-
-There's no requirement that the device enters a null state (!_RESUMING
-| !_SAVING | !_RUNNING), the uAPI even species the flows as _RESUMING
-transitioning to _RUNNING.  There's no point at which we can do
-SET_IRQS other than in the _RESUMING state.  Generally SET_IRQS
-ioctls are coordinated with the guest driver based on actions to the
-device, we can't be mucking with IRQs while the device is presumed
-running and already generating interrupt conditions.
-
-> And we should really define clearly what a device is supposed to do
-> with the interrupt vectors during migration. Obviously there are races
-> here.
-
-The device should not be generating interrupts while !_RUNNING, pending
-interrupts should be held until the device is _RUNNING.  To me this
-means the sequence must be that INTx/MSI/MSI-X are restored while in
-the !_RUNNING state.
-
-> > In any case, it requires that the device cannot be absolutely static
-> > while !_RUNNING.  Does (_RESUMING) have different rules than
-> > (_SAVING)?  
+> David Hildenbrand (8):
+>    memory: Introduce replay_discarded callback for RamDiscardManager
+>    virtio-mem: Implement replay_discarded RamDiscardManager callback
+>    migration/ram: Handle RAMBlocks with a RamDiscardManager on the
+>      migration source
+>    virtio-mem: Drop precopy notifier
+>    migration/postcopy: Handle RAMBlocks with a RamDiscardManager on the
+>      destination
+>    migration: Simplify alignment and alignment checks
+>    migration/ram: Factor out populating pages readable in
+>      ram_block_populate_pages()
+>    migration/ram: Handle RAMBlocks with a RamDiscardManager on background
+>      snapshots
 > 
-> I'd prever to avoid all device touches during both resuming and
-> saving, and do them during !RUNNING
-
-There's no such state required by the uAPI.
-
-> > So I'm still unclear how the uAPI needs to be updated relative to
-> > region access.  We need that list of what the user is allowed to
-> > access, which seems like minimally config space and MSI-X table space,
-> > but are these implicitly known for vfio-pci devices or do we need
-> > region flags or capabilities to describe?  We can't generally know the
-> > disposition of device specific regions relative to this access.  Thanks,  
+> Hyman Huang(é»„å‹‡) (6):
+>    KVM: introduce dirty_pages and kvm_dirty_ring_enabled
+>    memory: make global_dirty_tracking a bitmask
+>    migration/dirtyrate: introduce struct and adjust DirtyRateStat
+>    migration/dirtyrate: adjust order of registering thread
+>    migration/dirtyrate: move init step of calculation to main thread
+>    migration/dirtyrate: implement dirty-ring dirtyrate calculation
 > 
-> I'd prefer to be general and have the spec forbid
-> everything. Specifying things like VFIO_DEVICE_SET_IRQS1 covers all the
-> bus types.
+> Hyman Huang(黄勇) (2):
+>    memory: introduce total_dirty_pages to stat dirty pages
+>    migration/dirtyrate: implement dirty-bitmap dirtyrate calculation
+> 
+> Li Zhijian (1):
+>    migration/rdma: Fix out of order wrid
+> 
+> Peter Xu (3):
+>    migration: Make migration blocker work for snapshots too
+>    migration: Add migrate_add_blocker_internal()
+>    dump-guest-memory: Block live migration
+> 
+>   qapi/migration.json            |  48 ++++-
+>   include/exec/memory.h          |  41 +++-
+>   include/exec/ram_addr.h        |  13 +-
+>   include/hw/core/cpu.h          |   1 +
+>   include/hw/virtio/virtio-mem.h |   3 -
+>   include/migration/blocker.h    |  16 ++
+>   include/sysemu/kvm.h           |   1 +
+>   migration/dirtyrate.h          |  21 +-
+>   migration/ram.h                |   1 +
+>   accel/kvm/kvm-all.c            |   7 +
+>   accel/stubs/kvm-stub.c         |   5 +
+>   dump/dump.c                    |  19 ++
+>   hw/i386/xen/xen-hvm.c          |   4 +-
+>   hw/virtio/virtio-mem.c         |  92 ++++++---
+>   migration/dirtyrate.c          | 367 ++++++++++++++++++++++++++++++---
+>   migration/migration.c          |  30 +--
+>   migration/postcopy-ram.c       |  40 +++-
+>   migration/ram.c                | 180 ++++++++++++++--
+>   migration/rdma.c               | 138 +++++++++----
+>   softmmu/memory.c               |  43 +++-
+>   hmp-commands.hx                |   8 +-
+>   migration/trace-events         |   2 +
+>   softmmu/trace-events           |   1 +
+>   23 files changed, 909 insertions(+), 172 deletions(-)
 
-AFAICT, SET_IRQS while _RESUMING is a requirement, as is some degree of
-access to config space.  It seems you're proposing a new required null
-state which is contradictory to the existing uAPI.  Thanks,
+Applied, thanks.
 
-Alex
+r~
 
