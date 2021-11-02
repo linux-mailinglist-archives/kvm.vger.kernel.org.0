@@ -2,176 +2,165 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1243B442D47
-	for <lists+kvm@lfdr.de>; Tue,  2 Nov 2021 12:55:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 885D94430E4
+	for <lists+kvm@lfdr.de>; Tue,  2 Nov 2021 15:54:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230102AbhKBL55 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Nov 2021 07:57:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:29171 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229577AbhKBL54 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 2 Nov 2021 07:57:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635854121;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=fFshW3JLim2zFO9+vUC4D0dfCH/FT0qqDtGdoGlRVNk=;
-        b=LZC5mdTZ1s5hBaM9L1Ffsju82iev/pYV6Drp60gKicKOBaFB72qxJ9nCIKUui37fWuVkUQ
-        12dhe5bkn7q0zi78oEX6XlMeLxbR9GWcqDc3kJA0dU9eIy0fRmJNArSdBdJu00Dpczs2yV
-        7J3eanAmswI4hVsqOS+3PaUBtxd4G9k=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-292-h7TuBfjlP2yXU0gKZx9v2g-1; Tue, 02 Nov 2021 07:55:20 -0400
-X-MC-Unique: h7TuBfjlP2yXU0gKZx9v2g-1
-Received: by mail-wm1-f70.google.com with SMTP id 69-20020a1c0148000000b0033214e5b021so430002wmb.3
-        for <kvm@vger.kernel.org>; Tue, 02 Nov 2021 04:55:20 -0700 (PDT)
+        id S234365AbhKBO4s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Nov 2021 10:56:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47606 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233120AbhKBO4p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Nov 2021 10:56:45 -0400
+Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 120C4C061714
+        for <kvm@vger.kernel.org>; Tue,  2 Nov 2021 07:54:10 -0700 (PDT)
+Received: by mail-lj1-x22b.google.com with SMTP id i26so33459675ljg.7
+        for <kvm@vger.kernel.org>; Tue, 02 Nov 2021 07:54:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=tnGWO6De14brnYGPNkilMKJ5C7ikF6fltBLGDbtm+4I=;
+        b=n1oUGDjaHoDg098yqn+LHnoPMS4aHLuNVa5s6QfWlXEkLVxSnQXuM+v5Hyu0hZ3Ni5
+         OcnkPtRyYM4yHdSOysGEgIXfIeLHDR+LcTU7igKkfQKB2/3ddfz7o71ca5LerXkT7mTl
+         ahaRXfWLUm0LoGtiSGpyJZMISzzmHF2son9Ay7L/xHkSfZJ+cESQMXdcJ5rOVuR/G1TF
+         kTlnyqkYXOn1G3XiBF8PZMbo02rXf1M91TH534by95sMcgrFUK7A0gYDNGb0EfuFWI5A
+         1kRb1lv4E8O0nVPa1P5cyOVqJQ12+rk4bPsMcu6jNhrSZTfa9EXF2so/KNVyqKpAjAIA
+         u+ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent
-         :content-language:to:cc:references:from:organization:subject
-         :in-reply-to:content-transfer-encoding;
-        bh=fFshW3JLim2zFO9+vUC4D0dfCH/FT0qqDtGdoGlRVNk=;
-        b=A5w/UMmkrLrc+fsAtAbnM1wQDvU3d4aKLQVaYGuG5lLBfjtTkCPf45Wxoa1DE63/Gz
-         MM+km+yaOCZxvvcm5Kwvlu+efhB9Cmib3654vhuJqViqdoAol2Q+JWEAE1EPybzAQA/0
-         idgg2GCSpBlP/YjkdC1VVVTRkoFIslCyaQJhM+2qEEQgxCmi5vE5kh9JSRVjChjI2PlX
-         g5V3pwHuJA6nkTZq1xNL6r+dvb7TOB1orRtflxKP5BLM2MWXBddlnA5nKYI9bdNmUvA6
-         dBD42ZPEWb4M2wJeC74oNxh5S9/HiZshwIAQ3u4EaPdS1IeZnE+9E5f0v4FxxD/S0kyB
-         4n9Q==
-X-Gm-Message-State: AOAM532x9DQz6sS9h+3VJXp0KjlndcfWQMBJ1RZKyRJXrO93gV/EzVyc
-        6c1e+6tO3tC7R2aK3Nzy11oBq9xtm9qP5WgsZmBr4s6R+iW1sQ6QcZzZBlUn4rLTLd3QEFVhM9T
-        VwJnlsdQU2LNG
-X-Received: by 2002:adf:ee0c:: with SMTP id y12mr43852282wrn.82.1635854119067;
-        Tue, 02 Nov 2021 04:55:19 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxe7p+c9E/Dn4jS7oHad/sj2/GKi44Lr+SGhdT5gVBsStvYSoAer9B4vFXlfhkBnQwIjOvoKA==
-X-Received: by 2002:adf:ee0c:: with SMTP id y12mr43852238wrn.82.1635854118870;
-        Tue, 02 Nov 2021 04:55:18 -0700 (PDT)
-Received: from [192.168.3.132] (p5b0c6810.dip0.t-ipconnect.de. [91.12.104.16])
-        by smtp.gmail.com with ESMTPSA id l20sm2517148wmq.42.2021.11.02.04.55.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Nov 2021 04:55:18 -0700 (PDT)
-Message-ID: <171c8ed0-d55e-77ef-963b-6d836729ef4b@redhat.com>
-Date:   Tue, 2 Nov 2021 12:55:17 +0100
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=tnGWO6De14brnYGPNkilMKJ5C7ikF6fltBLGDbtm+4I=;
+        b=EhinrBzvZf22SWSypJYGqRkcdyFPrFZGQmtpMx/oc+SU0ixevTyCDgnjp6PpuOpCIy
+         hNdFKgGC1YAcGnFgGJNPfHFkRcr82P6PGLmjemY2oxA+Z63WIChBhyjdtkbVI4y3hvZ0
+         suj47bjfIrvxSVDXs0RZMP55k510Xwx6T8Mh8Od516dz14gYFJGW3LSFL2uPNK28CxUV
+         zysDx2eSoW1754981jG81Qd8xwcgyNmkkjr0eQ4HZfPQYJwiZ3VtaKP68uDC/ziiUYTW
+         EYb5TGQ0gRcQb6hc5oTjbVr9HysgxwU1IoYcViV7TNXi8UtFivSIpvpqTjcJXTRw/SAy
+         KsZQ==
+X-Gm-Message-State: AOAM533JOyk8Bi3+vvCrQP5iGgMG9+oBpYdI5Y1OZaU6vZb86y4hoyqN
+        B+dDffEoRwn5SUf8si7pKPED6i33TVLSRO6ObLbT/A==
+X-Google-Smtp-Source: ABdhPJxe3szcKlyys/NryzWwNDy9H79VGLc5m1/8ywBPPJ4/fdMKnezEBfFJQkuhbNkEahaMF5HZcIhSnGRq+r5T80E=
+X-Received: by 2002:a05:651c:2cf:: with SMTP id f15mr12460790ljo.170.1635864848055;
+ Tue, 02 Nov 2021 07:54:08 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Content-Language: en-US
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Ani Sinha <ani@anisinha.ca>, Peter Xu <peterx@redhat.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
-        Hui Zhu <teawater@gmail.com>,
-        Sebastien Boeuf <sebastien.boeuf@intel.com>,
-        kvm@vger.kernel.org
-References: <20211027124531.57561-1-david@redhat.com>
- <20211101181352-mutt-send-email-mst@kernel.org>
- <a5c94705-b66d-1b19-1c1f-52e99d9dacce@redhat.com>
- <20211102072843-mutt-send-email-mst@kernel.org>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-Subject: Re: [PATCH v1 00/12] virtio-mem: Expose device memory via multiple
- memslots
-In-Reply-To: <20211102072843-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20211102094651.2071532-1-oupton@google.com> <20211102094651.2071532-7-oupton@google.com>
+ <875ytaak5q.wl-maz@kernel.org>
+In-Reply-To: <875ytaak5q.wl-maz@kernel.org>
+From:   Oliver Upton <oupton@google.com>
+Date:   Tue, 2 Nov 2021 07:53:57 -0700
+Message-ID: <CAOQ_Qsgc7aA89OMBZTqYykbdKLypBhra0FNQZRPTEHpcaaqyhw@mail.gmail.com>
+Subject: Re: [PATCH v2 6/6] selftests: KVM: Test OS lock behavior
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <Alexandru.Elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Andrew Jones <drjones@redhat.com>,
+        Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Reiji Watanabe <reijiw@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02.11.21 12:35, Michael S. Tsirkin wrote:
-> On Tue, Nov 02, 2021 at 09:33:55AM +0100, David Hildenbrand wrote:
->> On 01.11.21 23:15, Michael S. Tsirkin wrote:
->>> On Wed, Oct 27, 2021 at 02:45:19PM +0200, David Hildenbrand wrote:
->>>> This is the follow-up of [1], dropping auto-detection and vhost-user
->>>> changes from the initial RFC.
->>>>
->>>> Based-on: 20211011175346.15499-1-david@redhat.com
->>>>
->>>> A virtio-mem device is represented by a single large RAM memory region
->>>> backed by a single large mmap.
->>>>
->>>> Right now, we map that complete memory region into guest physical addres
->>>> space, resulting in a very large memory mapping, KVM memory slot, ...
->>>> although only a small amount of memory might actually be exposed to the VM.
->>>>
->>>> For example, when starting a VM with a 1 TiB virtio-mem device that only
->>>> exposes little device memory (e.g., 1 GiB) towards the VM initialliy,
->>>> in order to hotplug more memory later, we waste a lot of memory on metadata
->>>> for KVM memory slots (> 2 GiB!) and accompanied bitmaps. Although some
->>>> optimizations in KVM are being worked on to reduce this metadata overhead
->>>> on x86-64 in some cases, it remains a problem with nested VMs and there are
->>>> other reasons why we would want to reduce the total memory slot to a
->>>> reasonable minimum.
->>>>
->>>> We want to:
->>>> a) Reduce the metadata overhead, including bitmap sizes inside KVM but also
->>>>    inside QEMU KVM code where possible.
->>>> b) Not always expose all device-memory to the VM, to reduce the attack
->>>>    surface of malicious VMs without using userfaultfd.
->>>
->>> I'm confused by the mention of these security considerations,
->>> and I expect users will be just as confused.
->>
->> Malicious VMs wanting to consume more memory than desired is only
->> relevant when running untrusted VMs in some environments, and it can be
->> caught differently, for example, by carefully monitoring and limiting
->> the maximum memory consumption of a VM. We have the same issue already
->> when using virtio-balloon to logically unplug memory. For me, it's a
->> secondary concern ( optimizing a is much more important ).
->>
->> Some users showed interest in having QEMU disallow access to unplugged
->> memory, because coming up with a maximum memory consumption for a VM is
->> hard. This is one step into that direction without having to run with
->> uffd enabled all of the time.
-> 
-> Sorry about missing the memo - is there a lot of overhead associated
-> with uffd then?
+Hey Marc,
 
-When used with huge/gigantic pages, we don't particularly care.
+On Tue, Nov 2, 2021 at 4:09 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> Hi Oliver,
+>
+> On Tue, 02 Nov 2021 09:46:51 +0000,
+> Oliver Upton <oupton@google.com> wrote:
+> >
+> > KVM now correctly handles the OS Lock for its guests. When set, KVM
+> > blocks all debug exceptions originating from the guest. Add test cases
+> > to the debug-exceptions test to assert that software breakpoint,
+> > hardware breakpoint, watchpoint, and single-step exceptions are in fact
+> > blocked.
+> >
+> > Signed-off-by: Oliver Upton <oupton@google.com>
+> > ---
+> >  .../selftests/kvm/aarch64/debug-exceptions.c  | 58 ++++++++++++++++++-
+> >  1 file changed, 56 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+> > index e5e6c92b60da..6b6ff81cdd23 100644
+> > --- a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+> > +++ b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+> > @@ -23,7 +23,7 @@
+> >  #define SPSR_D               (1 << 9)
+> >  #define SPSR_SS              (1 << 21)
+> >
+> > -extern unsigned char sw_bp, hw_bp, bp_svc, bp_brk, hw_wp, ss_start;
+> > +extern unsigned char sw_bp, hw_bp, hw_bp2, bp_svc, bp_brk, hw_wp, ss_start;
+> >  static volatile uint64_t sw_bp_addr, hw_bp_addr;
+> >  static volatile uint64_t wp_addr, wp_data_addr;
+> >  static volatile uint64_t svc_addr;
+> > @@ -47,6 +47,14 @@ static void reset_debug_state(void)
+> >       isb();
+> >  }
+> >
+> > +static void enable_os_lock(void)
+> > +{
+> > +     write_sysreg(oslar_el1, 1);
+> > +     isb();
+> > +
+> > +     GUEST_ASSERT(read_sysreg(oslsr_el1) & 2);
+> > +}
+> > +
+> >  static void install_wp(uint64_t addr)
+> >  {
+> >       uint32_t wcr;
+> > @@ -99,6 +107,7 @@ static void guest_code(void)
+> >       GUEST_SYNC(0);
+> >
+> >       /* Software-breakpoint */
+> > +     reset_debug_state();
+> >       asm volatile("sw_bp: brk #0");
+> >       GUEST_ASSERT_EQ(sw_bp_addr, PC(sw_bp));
+> >
+> > @@ -152,6 +161,51 @@ static void guest_code(void)
+> >       GUEST_ASSERT_EQ(ss_addr[1], PC(ss_start) + 4);
+> >       GUEST_ASSERT_EQ(ss_addr[2], PC(ss_start) + 8);
+> >
+> > +     GUEST_SYNC(6);
+> > +
+> > +     /* OS Lock blocking software-breakpoint */
+> > +     reset_debug_state();
+> > +     enable_os_lock();
+> > +     sw_bp_addr = 0;
+> > +     asm volatile("brk #0");
+> > +     GUEST_ASSERT_EQ(sw_bp_addr, 0);
+>
+> I haven't had a change to properly review the series, but this one
+> definitely caught my eye. My expectations are that BRK is *not*
+> affected by the OS Lock. The ARMv8 ARM goes as far as saying:
+>
+> <quote>
+> Breakpoint Instruction exceptions are enabled regardless of the state
+> of the OS Lock and the OS Double Lock.
+> </quote>
+>
+> as well as:
+>
+> <quote>
+> There is no enable control for Breakpoint Instruction exceptions. They
+> are always enabled, and cannot be masked.
+> </quote>
 
-For other memory backends, we'll have to route any population via the
-uffd handler: guest accesses a 4k page -> place a 4k page from user
-space. Instead of the kernel automatically placing a THP, we'd be
-placing single 4k pages and have to hope the kernel will collapse them
-into a THP later.
+/facepalm I had thought I read "Breakpoint Instruction exceptions" in
+the list on D2.5 "The effect of powerdown on debug exceptions",
+although on second read I most definitely did not. And if I had read
+the bottom of the section, I'd of seen one of the quotes.
 
-khugepagd will only collapse into a THP if all affected page table
-entries are present and don't map the zero page, though.
+> I wonder how your test succeeds, though.
 
-So we'll most certainly use less THP for our VM and VM startup time
-("first memory access after plugging memory") can be slower.
+Probably because the expectations I wrote match the non-architected
+behavior I implemented :-)
 
-I have prototypes for it, with some optimizations (e.g., on 4k guest
-access, populate the whole THP area), but we might not want to enable it
-all of the time. (interaction with postcopy has to be fixed, but it's
-not a fundamental issue)
-
-
-Extending uffd-based protection for virtio-mem to other processes
-(vhost-user), is a bit more complicated, and I am not 100% sure if it's
-worth the trouble for now. memslots provide at least some high-level
-protection for the important case of having a virtio-mem device to
-eventually hotplug a lot of memory later.
-
-> 
->> ("security is somewhat the wrong word. we won't be able to steal any
->> information from the hypervisor.)
-> 
-> Right. Let's just spell it out.
-> Further, removing memory still requires guest cooperation.
-
-Right.
-
-
--- 
+--
 Thanks,
-
-David / dhildenb
-
+Oliver
