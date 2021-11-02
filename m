@@ -2,59 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 847D34435B1
-	for <lists+kvm@lfdr.de>; Tue,  2 Nov 2021 19:37:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 533CF4435E5
+	for <lists+kvm@lfdr.de>; Tue,  2 Nov 2021 19:44:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235141AbhKBSj6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Nov 2021 14:39:58 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36282 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235128AbhKBSjz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Nov 2021 14:39:55 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 62A5360F90;
-        Tue,  2 Nov 2021 18:37:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1635878240;
-        bh=4k8zltF7QtFU40KJzcjW8RkZOwuYsAk/oXigcGixW3s=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=EKHJJqwPYPTclxE5smGYChekEQR+zI2ldTd3o/FXUgIUQGkJ+QOaUE4GGTYZyzl8Q
-         mOn92C2qReLA6tXi0ij2o/rXI60CtNU1CBdOz8hl6QOWPsD/hHStE7Xd6k2mRw34zt
-         fGllEqDl48PhrC2HJrRYzDd75RE5tInH21B0w4p88luHmsuEw238G8Jwff+q1mW+4s
-         hX8pcDJFiJZr1ux627JWjiiFfBQAmGAfMckYJEAR+l1ifBw37JnwhS4PYfSXEfswHm
-         N7g8mQZAAe+sRBzcXTxVye370wfIX5QhL0oMYgL/Wfzn9tULbwlkcOtZpaeVujuqkG
-         +H1gupkGSCVaA==
-Received: from pdx-korg-docbuild-2.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by pdx-korg-docbuild-2.ci.codeaurora.org (Postfix) with ESMTP id 5CD0260A90;
-        Tue,  2 Nov 2021 18:37:20 +0000 (UTC)
-Subject: Re: [GIT PULL] First batch of KVM changes for Linux 5.16
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20211102165331.599683-1-pbonzini@redhat.com>
-References: <20211102165331.599683-1-pbonzini@redhat.com>
-X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20211102165331.599683-1-pbonzini@redhat.com>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-X-PR-Tracked-Commit-Id: 52cf891d8dbd7592261fa30f373410b97f22b76c
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: d7e0a795bf37a13554c80cfc5ba97abedf53f391
-Message-Id: <163587824037.14475.14218836851153334665.pr-tracker-bot@kernel.org>
-Date:   Tue, 02 Nov 2021 18:37:20 +0000
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
+        id S230409AbhKBSqu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Nov 2021 14:46:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:33694 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230131AbhKBSqt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 2 Nov 2021 14:46:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635878654;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=Ke/apnUj6ltcvK88wrBZRr2HeoDo6T6P8MBaI3Hata4=;
+        b=gd+fvoPuAm2uOcTWYHI5U4i/ORtKqALgc46l4dXgp6Wck+JAr4doEkya7v8i/wvhdVz/V3
+        iZo0MKnhfpxVVwlP8jdeqMgW89ZHo1i9ow86sWXhvB7Fh8TELCcY7yMMSrHLP0mqTeNPOM
+        O8JRisyJsCNhyEJspdBND8RXSDK+UV4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-352-cwOPeDilM2ulBzv86LCrZg-1; Tue, 02 Nov 2021 14:44:11 -0400
+X-MC-Unique: cwOPeDilM2ulBzv86LCrZg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 87EC61B18BC0;
+        Tue,  2 Nov 2021 18:44:09 +0000 (UTC)
+Received: from scv.redhat.com (unknown [10.22.11.175])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5453519C59;
+        Tue,  2 Nov 2021 18:44:02 +0000 (UTC)
+From:   John Snow <jsnow@redhat.com>
+To:     qemu-devel@nongnu.org
+Cc:     Peter Maydell <peter.maydell@linaro.org>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+        Darren Kenny <darren.kenny@oracle.com>,
+        =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Qiuhao Li <Qiuhao.Li@outlook.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Eric Blake <eblake@redhat.com>,
+        Alexandre Iooss <erdnaxe@crans.org>,
+        Mahmoud Mandour <ma.mandourr@gmail.com>,
+        Alexander Bulekov <alxndr@bu.edu>,
+        Markus Armbruster <armbru@redhat.com>, kvm@vger.kernel.org,
+        Thomas Huth <thuth@redhat.com>, Bandan Das <bsd@redhat.com>,
+        John Snow <jsnow@redhat.com>
+Subject: [PATCH v5 0/4] docs/sphinx: change default `role` to "any"
+Date:   Tue,  2 Nov 2021 14:43:56 -0400
+Message-Id: <20211102184400.1168508-1-jsnow@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The pull request you sent on Tue,  2 Nov 2021 12:53:31 -0400:
+(Patches 1-3 can be squashed on merge, I just found it easier to tack on=0D
+new changes as part of the rebase so that reviewers can easily see=0D
+what's new each time.)=0D
+=0D
+V5: Rebased=0D
+V4: Rebased=0D
+V3: Removed bad rebase confetti=0D
+    fixed the OSS-Fuzz link to ... actually be a link.=0D
+=0D
+--js=0D
+=0D
+John Snow (4):=0D
+  docs: remove non-reference uses of single backticks=0D
+  docs: (further) remove non-reference uses of single backticks=0D
+  docs: (further further) remove non-reference uses of single backticks=0D
+  docs/sphinx: change default role to "any"=0D
+=0D
+ docs/conf.py                           |  5 +++++=0D
+ docs/devel/build-system.rst            | 21 +++++++++++----------=0D
+ docs/devel/fuzzing.rst                 |  9 +++++----=0D
+ docs/devel/tcg-plugins.rst             |  2 +-=0D
+ docs/interop/live-block-operations.rst |  2 +-=0D
+ docs/system/guest-loader.rst           |  2 +-=0D
+ docs/system/i386/sgx.rst               |  6 +++---=0D
+ qapi/block-core.json                   |  4 ++--=0D
+ include/qemu/module.h                  |  6 +++---=0D
+ qemu-options.hx                        |  4 ++--=0D
+ 10 files changed, 34 insertions(+), 27 deletions(-)=0D
+=0D
+-- =0D
+2.31.1=0D
+=0D
 
-> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/d7e0a795bf37a13554c80cfc5ba97abedf53f391
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
