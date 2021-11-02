@@ -2,105 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BB8594434B2
-	for <lists+kvm@lfdr.de>; Tue,  2 Nov 2021 18:41:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 65A34443538
+	for <lists+kvm@lfdr.de>; Tue,  2 Nov 2021 19:13:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234345AbhKBRoZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Nov 2021 13:44:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57938 "EHLO
+        id S234898AbhKBSQI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Nov 2021 14:16:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231702AbhKBRoV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Nov 2021 13:44:21 -0400
-Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25F76C061714
-        for <kvm@vger.kernel.org>; Tue,  2 Nov 2021 10:41:46 -0700 (PDT)
-Received: by mail-io1-xd35.google.com with SMTP id y73so1284246iof.4
-        for <kvm@vger.kernel.org>; Tue, 02 Nov 2021 10:41:46 -0700 (PDT)
+        with ESMTP id S231848AbhKBSQI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Nov 2021 14:16:08 -0400
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8ADBC061203
+        for <kvm@vger.kernel.org>; Tue,  2 Nov 2021 11:13:32 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id y26so265271lfa.11
+        for <kvm@vger.kernel.org>; Tue, 02 Nov 2021 11:13:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=+jt4U2mLEyx478NdaUuq1MspzT7e5TDgt4TvxlpltBw=;
-        b=kdGO6qqnrkLi8ZHdgX5rgE6naeVJUdaCcPSV+WQ6FEA5PUi6nMO5d6ar9+CNnR7oLu
-         P5CSnMmE8348s/AaWEmhSfgK2Qod0LHb/Z7iG4bWSTRGuWFse/Ye122Bg83WyRj8/F0G
-         bDly7HQ5pgvKIUbLq/Q+0vA1flY0MzUtoyJ1O+7NwuhLRO6L1bxuSJ7PFu3Oa6ks0QI4
-         09iWUm3U8/6aSKLpDI4nWn5cIkrDWjeJQwcGlJzHdx5tfGFmRRvbkiUjOFWEsunBcmGq
-         qRV764u77lk3kdh73S7BYz1RO1XFrW2bAkTd6Yu4JVpLk6DT4jgeU+gFKvfXGxZqoIsP
-         KtEA==
+        bh=3aAa2g6F5cEPDJn1H2dtRZP1YIEtghO4gfoLlk3Pcbw=;
+        b=GfYlX9OX1sXNX3bqVCRC2BllZhiCQ8NlGee8f88VSWYP2ig7CAf2Utra5o2oD74c2m
+         +LjbuarZU+QVe8722G9iG/Teg9V+KcqsX7jhPWSWsrMbt/+96RWuBKMlxbX1mZC6qwJL
+         8y5WE3+1DVmd5KG7eWHV5sNzPGKyrj+Xzf3WdLkvC/FYsEJtUniSvAYJm7MX6ewTxgOy
+         FDC2VdZZVY1yQ2bbhwySRoE9HsQ2vLGfsXW80jdTrOFsJ6EKRLaPDzinyL9R8o9A2CJL
+         nUvoPS7fgisBAp0eYwymB/TozwaXgxlAMK4KJ6zTIv36tvXmIoyBh1R/s72FpjxvNflN
+         aa4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=+jt4U2mLEyx478NdaUuq1MspzT7e5TDgt4TvxlpltBw=;
-        b=KQ5WMXytEVTYRh3gNty+pCF3KUo5WnjOLwDqkhJq+BbltgFiJGHE44sPvXDCf7iy2B
-         K1XlvwfONt29QTKA0qY3MzfAn5ocpSHr8U5SW4TlgnIlzl7sFy57Z297m3MpACIhH86E
-         sslJrW3aMMioMeChqBa3JDDQ/GHUTdtnL4umV3if9aBwzVRGSzrFiGUZFRMsdOZb3P0i
-         wzSQox2/2UK+3OfM3VSBg+cLi73mTo12HibcPl6jNeF6codt6cbF3nDLd64Ke/6OtsJS
-         Jrc6qu1amHTXBmx99qdJwwJS7utfzZus3tK/b3WFD9o411sdZO+POF58LOOchLW+vn5L
-         twgQ==
-X-Gm-Message-State: AOAM531wDYJwCC0XOIlbyIPRFJ/lTY2NeDvlSC50c5nOM1sfReRjxAbY
-        lS7/WNB9/VzzgD1GqCTAabm9zUdzx6VSezHz/hLLyw==
-X-Google-Smtp-Source: ABdhPJyPEiC/ZX2Obj1x89FuYihO6RiqMrNN+cmRHtjO5JehD4YZ8hOZ+v/F+M+9fnT+tbmRJ223ICdKnjoBtoNqhd8=
-X-Received: by 2002:a05:6602:14c7:: with SMTP id b7mr16422312iow.130.1635874905419;
- Tue, 02 Nov 2021 10:41:45 -0700 (PDT)
+        bh=3aAa2g6F5cEPDJn1H2dtRZP1YIEtghO4gfoLlk3Pcbw=;
+        b=hYxkQkoU8FXfqr/xwTYdwbkfg2dYzkRU+OM8a2+JQ05g8hSMC8XqxefPNEEQLh17PL
+         lY+Su7YF5sAm4vE1tu5h3PhTrUQufIE0qL1/gZ0vxN8h528FE0SawzGbpBP84DxCAT5T
+         /LWiaof6NU01v+Sq+bylH1SfGIjr3PEiD1/kqoctrSI0euRRyoGjF6m+fK10DliVojfy
+         pX+Hu79NcT7DFCfNo5vSmPLXQOOJxnr+rKizFoOEotampDL1ofbKwPP1M9BCsYVFZ/FE
+         Jhz9uYkkRY8SBXzaCTBpWehIGe4sjC+D1hhJKtx1UI5BU3PICoE7o70eltqNUzLtmFkR
+         YFdA==
+X-Gm-Message-State: AOAM5325lrdpqQtCPFVmD5V80Big+nWA7dfGXmHTmM1wAY46Uyaqa8wR
+        W0dHCPA//h1grSjL8S18Xooiz9/ZR2Ra8ZF/0Bvhww==
+X-Google-Smtp-Source: ABdhPJzQPbuMorJmK9nCRvVx6XoY1VFFKPA5GSxKNeEFkMIqDPnhiabLHyeOXvMUuFZ9AiY07W2nVcpOLfoYU8dKgiA=
+X-Received: by 2002:a05:6512:3c9e:: with SMTP id h30mr5245802lfv.93.1635876810700;
+ Tue, 02 Nov 2021 11:13:30 -0700 (PDT)
 MIME-Version: 1.0
-References: <20211102032900.1888262-1-junaids@google.com>
-In-Reply-To: <20211102032900.1888262-1-junaids@google.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Tue, 2 Nov 2021 10:41:34 -0700
-Message-ID: <CANgfPd-uJEm62kOri1pS6m4wm71H8yh=K-4WSgVOw3Z2wzccXA@mail.gmail.com>
-Subject: Re: [PATCH] kvm: mmu: Use fast PF path for access tracking of huge
- pages when possible
-To:     Junaid Shahid <junaids@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com,
-        seanjc@google.com
+References: <20211011194615.2955791-1-vipinsh@google.com> <YWSdTpkzNt3nppBc@google.com>
+ <CALMp9eRzPXg2WS6-Yy6U90+B8wXm=zhVSkmAym4Y924m7FM-7g@mail.gmail.com>
+ <YWhgxjAwHhy0POut@google.com> <CALMp9eQ4y+YO7THjfpHzJPmoODkUqoPUURaBvL+OdGjZhAMuTA@mail.gmail.com>
+In-Reply-To: <CALMp9eQ4y+YO7THjfpHzJPmoODkUqoPUURaBvL+OdGjZhAMuTA@mail.gmail.com>
+From:   Vipin Sharma <vipinsh@google.com>
+Date:   Tue, 2 Nov 2021 11:12:53 -0700
+Message-ID: <CAHVum0eMByJA5Yc0iom6w5+Web105cYoJ-94jxzLPTLVpYOHSw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: VMX: Add a wrapper for reading INVPCID/INVEPT/INVVPID
+ type
+To:     Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     pbonzini@redhat.com, dmatlack@google.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 1, 2021 at 8:30 PM Junaid Shahid <junaids@google.com> wrote:
->
-> The fast page fault path bails out on write faults to huge pages in
-> order to accommodate dirty logging. This change adds a check to do that
-> only when dirty logging is actually enabled, so that access tracking for
-> huge pages can still use the fast path for write faults in the common
-> case.
->
-> Signed-off-by: Junaid Shahid <junaids@google.com>
+Sorry for the late reply.
 
-Reviewed-by: Ben Gardon <bgardon@google.com>
+On Thu, Oct 14, 2021 at 10:05 AM Jim Mattson <jmattson@google.com> wrote:
+>
+> On Thu, Oct 14, 2021 at 9:54 AM Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > On Mon, Oct 11, 2021, Jim Mattson wrote:
+> > > On Mon, Oct 11, 2021 at 1:23 PM Sean Christopherson <seanjc@google.com> wrote:
+> > > >
+> > > > On Mon, Oct 11, 2021, Vipin Sharma wrote:
+> > > > > -     if (type > 3) {
+> > > > > +     if (type > INVPCID_TYPE_MAX) {
+> > > >
+> > > > Hrm, I don't love this because it's not auto-updating in the unlikely chance that
+> > > > a new type is added.  I definitely don't like open coding '3' either.  What about
+> > > > going with a verbose option of
+> > > >
+> > > >         if (type != INVPCID_TYPE_INDIV_ADDR &&
+> > > >             type != INVPCID_TYPE_SINGLE_CTXT &&
+> > > >             type != INVPCID_TYPE_ALL_INCL_GLOBAL &&
+> > > >             type != INVPCID_TYPE_ALL_NON_GLOBAL) {
+> > > >                 kvm_inject_gp(vcpu, 0);
+> > > >                 return 1;
+> > > >         }
+> > >
+> > > Better, perhaps, to introduce a new function, valid_invpcid_type(),
+> > > and squirrel away the ugliness there?
+> >
 
-> ---
->  arch/x86/kvm/mmu/mmu.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
+I might not have understood your auto-updating concern correctly, can
+I change these macros to an enum like:
+
+enum INVPCID_TYPE {
+        INVPCID_TYPE_INDIV_ADDR,
+        INVPCID_TYPE_SINGLE_CTXT,
+        INVPCID_TYPE_ALL_INCL_GLOBAL,
+        INVPCID_TYPE_ALL_NON_GLOBAL,
+        INVPCID_TYPE_MAX,
+};
+
+My check in the condition will be then "if (type >= INVPCID_TYPE_MAX) {}"
+This way if there is a new type added, max will be auto updated. Will
+this answers your concern?
+
+> > Oh, yeah, definitely.  I missed that SVM's invpcid_interception() has the same
+> > open-coded check.
+> >
+> > Alternatively, could we handle the invalid type in the main switch statement?  I
+> > don't see anything in the SDM or APM that architecturally _requires_ the type be
+> > checked before reading the INVPCID descriptor.  Hardware may operate that way,
+> > but that's uArch specific behavior unless there's explicit documentation.
 >
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 354d2ca92df4..5df9181c5082 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -3191,8 +3191,9 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
->                         new_spte |= PT_WRITABLE_MASK;
->
->                         /*
-> -                        * Do not fix write-permission on the large spte.  Since
-> -                        * we only dirty the first page into the dirty-bitmap in
-> +                        * Do not fix write-permission on the large spte when
-> +                        * dirty logging is enabled. Since we only dirty the
-> +                        * first page into the dirty-bitmap in
->                          * fast_pf_fix_direct_spte(), other pages are missed
->                          * if its slot has dirty logging enabled.
->                          *
-> @@ -3201,7 +3202,8 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
->                          *
->                          * See the comments in kvm_arch_commit_memory_region().
->                          */
-> -                       if (sp->role.level > PG_LEVEL_4K)
-> +                       if (sp->role.level > PG_LEVEL_4K &&
-> +                           kvm_slot_dirty_track_enabled(fault->slot))
->                                 break;
->                 }
->
-> --
-> 2.33.1.1089.g2158813163f-goog
->
+> Right. INVVPID and INVEPT are explicitly documented to check the type
+> first, but INVPCID is not.
+
+It seems to me that I can move type > 3 check to kvm_handle_invpcid()
+switch statement. I can replace BUG() in that switch statement with
+kvm_inject_gp for the default case, I won't even need INVPCID_TYPE_MAX
+in this case.
+
+If you are fine with this approach then I will send out a patch where
+invalid type is handled  in kvm_handle_invpcid() switch statement.
+
+Thanks
+Vipin
