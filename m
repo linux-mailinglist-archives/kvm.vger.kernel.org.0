@@ -2,175 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D75D4431F9
-	for <lists+kvm@lfdr.de>; Tue,  2 Nov 2021 16:46:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D640B44320D
+	for <lists+kvm@lfdr.de>; Tue,  2 Nov 2021 16:53:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234291AbhKBPse (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Nov 2021 11:48:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59562 "EHLO
+        id S234599AbhKBPzs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Nov 2021 11:55:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231361AbhKBPsc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 2 Nov 2021 11:48:32 -0400
-Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2031AC061714
-        for <kvm@vger.kernel.org>; Tue,  2 Nov 2021 08:45:57 -0700 (PDT)
-Received: by mail-qt1-x82b.google.com with SMTP id h16so14813058qtk.0
-        for <kvm@vger.kernel.org>; Tue, 02 Nov 2021 08:45:57 -0700 (PDT)
+        with ESMTP id S234610AbhKBPzq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Nov 2021 11:55:46 -0400
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B9DAC061203
+        for <kvm@vger.kernel.org>; Tue,  2 Nov 2021 08:53:10 -0700 (PDT)
+Received: by mail-pg1-x52e.google.com with SMTP id j9so12380653pgh.1
+        for <kvm@vger.kernel.org>; Tue, 02 Nov 2021 08:53:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=oBZS+B5OI/pNOurVNUNmHTLzU1LJ6vGeGI0SMtDtTqA=;
-        b=ZxvXyZ8G6um96czYq5NWq0JwiA0h3KQZiPg6jRZHGNFHRPslxY+VDPyuTaCEHNUULy
-         +pkbJHwaI9jQjaIW8qRyVebYqe2MOnXFruS8bmWxt5KLy3IZ+0AFirfA/DLeUcEl4HIX
-         TRgpSA0mp0MdbHJSKO7qkEMITA6Dw2dfICBp3n7qqNf/sBb+gB8edfdhV911nOhAOwHH
-         B6snqjnx7hhz3hn1quZHjYRnFA8fZTSIRSu4V/8qL24ItahLZWErZc2Foql8ePgzC/Vz
-         +nYzVDZGlH30T0pNHhnmKVJBhUCmIs7aHmo7nDOe0zezTbMGPCuSmMyaFmLIFYCq83rR
-         pJPA==
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=uXG46CNq1yzX39v2pBF3aSKlrNsVM6oau9TO8Y5/ynw=;
+        b=pAs2y+ijAdLSwVnN/iXoGJIDLS2TO7pznZDqrBgEiymfJ5fMb7bmsUqig8SFz/Xfz9
+         j6el+hpRpb/l8ztcGtA143m4jBw95nEruKEKLZflgyH0d2cKE1Vm3WPi9wOqO5i1+Got
+         XoLGG8E6DHHL/sQ7ohtI+bDXXVanHnKjoPPgFat2aSGVzvixVFf5qEt0Ofs/Rn/gfo/M
+         z0d3eH1FlZFlKYHdt3NTZ5BlT9ik94kSiECQBj3WqPjPXKf+mh8TnEQje+pknFsZ5NZd
+         i4H1RfdoBxpT3Fcp/BBPgnShbHpk6nXoYfhmhoGPoZS/pZcuC6RVsf3d2+Y8t8vBgnBj
+         9oPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=oBZS+B5OI/pNOurVNUNmHTLzU1LJ6vGeGI0SMtDtTqA=;
-        b=FxsOvJtDUA4wEwBOalnAZknlDKd4TkHD+GGkgGKdi+fPPbCuQM0fUEWhjni633yVqj
-         07gpDCBtNiL3GsIlCQutFD4mMU2ri3HYqroCs/Bs+E/kP5ErRPj7Dm+eR7Mb6GUtgVe4
-         urSPOEomAZ/fvUJ5Tyokf9IF2joGatiw+WHzHLBitIFlfsrxsSWGggw1b9+513CuDrZI
-         o3s6mGtXus8VROZpUj7yYLAfPqGz48hIQU9kWGn4PoQuFP4DWDuHoH7beJmNNz69kKq0
-         1szYyF3jPqgRVXqidow7zA8JP/qRK2BysYq8qyqr1nnNjBot8BgLoyCFXw/MI0ttpI2m
-         9/gA==
-X-Gm-Message-State: AOAM532QXdhLwv5dWbfNhFsm/I0xfAMRSgQZxfYEuH261PaqnBtIZ9XI
-        q8pA7QDc3p6WxAB0MN3xdh+nYIomYjhfZw==
-X-Google-Smtp-Source: ABdhPJx7asEmjavQwNXvLHtTNJJ4FS8uJKsNMq8MaQoG0lRsFCuUBJcFIhC2E0gsV2D1s47hX+9AHg==
-X-Received: by 2002:ac8:7f11:: with SMTP id f17mr31747889qtk.389.1635867956240;
-        Tue, 02 Nov 2021 08:45:56 -0700 (PDT)
-Received: from [172.20.81.179] (rrcs-172-254-253-57.nyc.biz.rr.com. [172.254.253.57])
-        by smtp.gmail.com with ESMTPSA id y8sm12807287qko.36.2021.11.02.08.45.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Nov 2021 08:45:55 -0700 (PDT)
-Subject: Re: [PULL 00/20] Migration 20211031 patches
-To:     Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org
-Cc:     Markus Armbruster <armbru@redhat.com>,
-        David Hildenbrand <david@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        xen-devel@lists.xenproject.org,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Eric Blake <eblake@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-        kvm@vger.kernel.org, Peter Xu <peterx@redhat.com>,
-        =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
-        Paul Durrant <paul@xen.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Anthony Perard <anthony.perard@citrix.com>
-References: <20211101220912.10039-1-quintela@redhat.com>
-From:   Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <709cabc0-95c3-27dd-e2ae-8834fc7b36b3@linaro.org>
-Date:   Tue, 2 Nov 2021 11:45:53 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=uXG46CNq1yzX39v2pBF3aSKlrNsVM6oau9TO8Y5/ynw=;
+        b=MbNIf+uYDCbxsUWgLRy5X/x5e+26q/K429foHX8XxWE9gfgRWnsTLzvf0jwzL3RBme
+         cqrto/y1rgh8UnzaFPaqFlJ//j7lRD4gw9Z+C9/W14y4Mj0AGkV7aNzw1OB1gbKRfE8z
+         K+mL3iPhxTV7aVGjwWRy029/isywfzFI9MwVprrx5+uzCrNhSWr2J7IhVQ2agrr1C2J6
+         Rx24fnO890nPGNgpLpmNnclGteSgSMdaBoZoEC1xRpJZQ9ZFbFTCXOQrSX4aJHcijMB8
+         7C2UF9chYqdEcgRVpf/zwNzjfe3kY1NK7Fv0CtBRGkVVOM+c8xdmy0l7simF3xZfS5PV
+         EMDw==
+X-Gm-Message-State: AOAM530/Rm0ogQU+WLiRxH1brt+TvX1fCe0geH0ho23GyGiEygDQFAJ5
+        XIGYQOyJ4Sd7FuMEKxClw1qv1A==
+X-Google-Smtp-Source: ABdhPJxNtDKLBpxoiRVYVgHQ8HO9yQL5vu6uWpAHtSkKWriSHm706e6zFB2nNeZItuHLc1BNhEWGrA==
+X-Received: by 2002:a63:e24b:: with SMTP id y11mr28060654pgj.452.1635868389352;
+        Tue, 02 Nov 2021 08:53:09 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id nr14sm2839945pjb.24.2021.11.02.08.53.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Nov 2021 08:53:08 -0700 (PDT)
+Date:   Tue, 2 Nov 2021 15:53:04 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Kieran Bingham <kbingham@kernel.org>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Johannes Berg <johannes.berg@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Jessica Yu <jeyu@kernel.org>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Yang Weijiang <weijiang.yang@intel.com>,
+        linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH v3 6/6] KVM: selftests: test KVM_GUESTDBG_BLOCKIRQ
+Message-ID: <YYFe4LKXiuV+DyZh@google.com>
+References: <20210811122927.900604-1-mlevitsk@redhat.com>
+ <20210811122927.900604-7-mlevitsk@redhat.com>
+ <137f2dcc-75d2-9d71-e259-dd66d43ad377@redhat.com>
+ <87sfwfkhk5.fsf@vitty.brq.redhat.com>
+ <b48210a35b3bc6d63beeb33c19b609b3014191dd.camel@redhat.com>
+ <YYB2l9bzFhKzobZB@google.com>
+ <87k0hqkf6p.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20211101220912.10039-1-quintela@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87k0hqkf6p.fsf@vitty.brq.redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/1/21 6:08 PM, Juan Quintela wrote:
-> The following changes since commit af531756d25541a1b3b3d9a14e72e7fedd941a2e:
+On Tue, Nov 02, 2021, Vitaly Kuznetsov wrote:
+> Sean Christopherson <seanjc@google.com> writes:
+> > I haven't verified on hardware, but my guess is that this code in vmx_vcpu_run()
+> >
+> > 	/* When single-stepping over STI and MOV SS, we must clear the
+> > 	 * corresponding interruptibility bits in the guest state. Otherwise
+> > 	 * vmentry fails as it then expects bit 14 (BS) in pending debug
+> > 	 * exceptions being set, but that's not correct for the guest debugging
+> > 	 * case. */
+> > 	if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP)
+> > 		vmx_set_interrupt_shadow(vcpu, 0);
+> >
+> > interacts badly with APICv=1.  It will kill the STI shadow and cause the IRQ in
+> > vmcs.GUEST_RVI to be recognized when it (micro-)architecturally should not.  My
+> > head is going in circles trying to sort out what would actually happen.  Maybe
+> > comment out that and/or disable APICv to see if either one makes the test pass?
+> >
 > 
->    Merge remote-tracking branch 'remotes/philmd/tags/renesas-20211030' into staging (2021-10-30 11:31:41 -0700)
+> Interestingly,
 > 
-> are available in the Git repository at:
+> loading 'kvm-intel' with 'enable_apicv=0' makes the test pass, however,
+> commenting out "vmx_set_interrupt_shadow()" as suggested gives a
+> different result (with enable_apicv=1):
 > 
->    https://github.com/juanquintela/qemu.git tags/migration-20211031-pull-request
-> 
-> for you to fetch changes up to 826b8bc80cb191557a4ce7cf0e155b436d2d1afa:
-> 
->    migration/dirtyrate: implement dirty-bitmap dirtyrate calculation (2021-11-01 22:56:44 +0100)
-> 
-> ----------------------------------------------------------------
-> Migration Pull request
-> 
-> Hi
-> 
-> this includes pending bits of migration patches.
-> 
-> - virtio-mem support by David Hildenbrand
-> - dirtyrate improvements by Hyman Huang
-> - fix rdma wrid by Li Zhijian
-> - dump-guest-memory fixes by Peter Xu
-> 
-> Pleas apply.
-> 
-> Thanks, Juan.
-> 
-> ----------------------------------------------------------------
-> 
-> David Hildenbrand (8):
->    memory: Introduce replay_discarded callback for RamDiscardManager
->    virtio-mem: Implement replay_discarded RamDiscardManager callback
->    migration/ram: Handle RAMBlocks with a RamDiscardManager on the
->      migration source
->    virtio-mem: Drop precopy notifier
->    migration/postcopy: Handle RAMBlocks with a RamDiscardManager on the
->      destination
->    migration: Simplify alignment and alignment checks
->    migration/ram: Factor out populating pages readable in
->      ram_block_populate_pages()
->    migration/ram: Handle RAMBlocks with a RamDiscardManager on background
->      snapshots
-> 
-> Hyman Huang(é»„å‹‡) (6):
->    KVM: introduce dirty_pages and kvm_dirty_ring_enabled
->    memory: make global_dirty_tracking a bitmask
->    migration/dirtyrate: introduce struct and adjust DirtyRateStat
->    migration/dirtyrate: adjust order of registering thread
->    migration/dirtyrate: move init step of calculation to main thread
->    migration/dirtyrate: implement dirty-ring dirtyrate calculation
-> 
-> Hyman Huang(黄勇) (2):
->    memory: introduce total_dirty_pages to stat dirty pages
->    migration/dirtyrate: implement dirty-bitmap dirtyrate calculation
-> 
-> Li Zhijian (1):
->    migration/rdma: Fix out of order wrid
-> 
-> Peter Xu (3):
->    migration: Make migration blocker work for snapshots too
->    migration: Add migrate_add_blocker_internal()
->    dump-guest-memory: Block live migration
-> 
->   qapi/migration.json            |  48 ++++-
->   include/exec/memory.h          |  41 +++-
->   include/exec/ram_addr.h        |  13 +-
->   include/hw/core/cpu.h          |   1 +
->   include/hw/virtio/virtio-mem.h |   3 -
->   include/migration/blocker.h    |  16 ++
->   include/sysemu/kvm.h           |   1 +
->   migration/dirtyrate.h          |  21 +-
->   migration/ram.h                |   1 +
->   accel/kvm/kvm-all.c            |   7 +
->   accel/stubs/kvm-stub.c         |   5 +
->   dump/dump.c                    |  19 ++
->   hw/i386/xen/xen-hvm.c          |   4 +-
->   hw/virtio/virtio-mem.c         |  92 ++++++---
->   migration/dirtyrate.c          | 367 ++++++++++++++++++++++++++++++---
->   migration/migration.c          |  30 +--
->   migration/postcopy-ram.c       |  40 +++-
->   migration/ram.c                | 180 ++++++++++++++--
->   migration/rdma.c               | 138 +++++++++----
->   softmmu/memory.c               |  43 +++-
->   hmp-commands.hx                |   8 +-
->   migration/trace-events         |   2 +
->   softmmu/trace-events           |   1 +
->   23 files changed, 909 insertions(+), 172 deletions(-)
+> # ./x86_64/debug_regs 
+> ==== Test Assertion Failure ====
+>   x86_64/debug_regs.c:179: run->exit_reason == KVM_EXIT_DEBUG && run->debug.arch.exception == DB_VECTOR && run->debug.arch.pc == target_rip && run->debug.arch.dr6 == target_dr6
+>   pid=16352 tid=16352 errno=0 - Success
+>      1	0x0000000000402b33: main at debug_regs.c:179 (discriminator 10)
+>      2	0x00007f36401bd554: ?? ??:0
+>      3	0x00000000004023a9: _start at ??:?
+>   SINGLE_STEP[1]: exit 9 exception -2147483615 rip 0x1 (should be 0x4024d9) dr6 0xffff4ff0 (should be 0xffff4ff0)
 
-Applied, thanks.
+Exit 9 is KVM_EXIT_FAIL_ENTRY, which in this case VM-Entry likely failed due to
+invalid guest state because there was STI blocking with single-step enabled but
+no pending BS #DB:
 
-r~
+  Bit 14 (BS) must be 1 if the TF flag (bit 8) in the RFLAGS field is 1 and the
+  BTF flag (bit 1) in the IA32_DEBUGCTL field is 0.
 
+Which is precisely what that hack-a-fix avoids.  There isn't really a clean
+solution for legacy single-step, AFAIK the only way to avoid this would be to
+switch KVM_GUESTDBG_SINGLESTEP to use MTF.
+
+But that mess is a red herring, the test fails with the same signature with APICv=1
+if the STI is replaced by PUSHF+BTS+POPFD (to avoid the STI shadow).  We all missed
+this key detail from Vitaly's report:
+
+SINGLE_STEP[1]: exit 8 exception 1 rip 0x402a25 (should be 0x402a27) dr6 0xffff4ff0 (should be 0xffff4ff0)
+                ^^^^^^
+
+Exit '8' is KVM_EXIT_SHUTDOWN, i.e. the arrival of the IRQ hosed the guest because
+the test doesn't invoke vm_init_descriptor_tables() to install event handlers.
+The "exception 1" shows up because the run page isn't sanitized by the test, i.e.
+it's stale data that happens to match.
+
+So I would fully expect this test to fail with AVIC=1.  The problem is that
+KVM_GUESTDBG_BLOCKIRQ does absolutely nothing to handle APICv interrupts.  And
+even if KVM does something to fudge that behavior in the emulated local APIC, the
+test will then fail miserably virtual IPIs (currently AVIC only).
+
+I stand by my original comment that "Deviating this far from architectural behavior
+will end in tears at some point."  Rather than try to "fix" APICv, I vote to instead
+either reject KVM_GUESTDBG_BLOCKIRQ if APICv=1, or log a debug message saying that
+KVM_GUESTDBG_BLOCKIRQ is ineffective with APICv=1.
