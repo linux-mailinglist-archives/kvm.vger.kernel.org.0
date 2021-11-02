@@ -2,96 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 536254435F9
-	for <lists+kvm@lfdr.de>; Tue,  2 Nov 2021 19:47:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 22A8D4435E8
+	for <lists+kvm@lfdr.de>; Tue,  2 Nov 2021 19:44:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235542AbhKBSth (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 2 Nov 2021 14:49:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:59484 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235918AbhKBStM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 2 Nov 2021 14:49:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635878797;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Sb+JrgSSp9WAPQnhdMXztmNWnmaSMiyfNN+rpG9Ac2w=;
-        b=P6IZ4jfm2sX26cpTGEsvbMz0iFkCecHqFNfyIMOcjV0krx7PMsM5238P4J5HzPTkIuQEui
-        ZFx5Mzn8FAEiI12ajZeDI3waOGUyGrsXb239fzM5/qX/aPrprPBqyGlJeHdQDa6NFjWh4A
-        slufl7/pRayRn9IRQSfysB4nq07zvnY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-125-IO3zarywPr6HtKTOBFc7oA-1; Tue, 02 Nov 2021 14:46:34 -0400
-X-MC-Unique: IO3zarywPr6HtKTOBFc7oA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S235093AbhKBSrC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 2 Nov 2021 14:47:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45566 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231164AbhKBSrB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 2 Nov 2021 14:47:01 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2186EC061714;
+        Tue,  2 Nov 2021 11:44:26 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f1dc300e1073f755e7fce47.dip0.t-ipconnect.de [IPv6:2003:ec:2f1d:c300:e107:3f75:5e7f:ce47])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7E79F8799E0;
-        Tue,  2 Nov 2021 18:46:32 +0000 (UTC)
-Received: from scv.redhat.com (unknown [10.22.11.175])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id AA28C19C79;
-        Tue,  2 Nov 2021 18:46:07 +0000 (UTC)
-From:   John Snow <jsnow@redhat.com>
-To:     qemu-devel@nongnu.org
-Cc:     Peter Maydell <peter.maydell@linaro.org>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-        Darren Kenny <darren.kenny@oracle.com>,
-        =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Qiuhao Li <Qiuhao.Li@outlook.com>,
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 4195F1EC0295;
+        Tue,  2 Nov 2021 19:44:24 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1635878664;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=AxuOw0DQ4Frl9MECG8Kper8H3T3XmCRerq6iet0JTvg=;
+        b=fnDosBtZdhTQHutSgr1/+RABVQIrAbm94J935ajx4Z9Kisycu7UocDnt8PckwIj3n3lTJx
+        BI19SipB4tqJQJUImPbytZWTapJ9GIoEiP27NptNIzkc92S11oTGUZeyuZe08xinQ4Gf7N
+        AyTH+RF5Fl4D+tugIqEWI0IxA6rfSSU=
+Date:   Tue, 2 Nov 2021 19:44:18 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Alexandre Iooss <erdnaxe@crans.org>,
-        Mahmoud Mandour <ma.mandourr@gmail.com>,
-        Alexander Bulekov <alxndr@bu.edu>,
-        Markus Armbruster <armbru@redhat.com>, kvm@vger.kernel.org,
-        Thomas Huth <thuth@redhat.com>, Bandan Das <bsd@redhat.com>,
-        John Snow <jsnow@redhat.com>
-Subject: [PATCH v5 4/4] docs/sphinx: change default role to "any"
-Date:   Tue,  2 Nov 2021 14:44:00 -0400
-Message-Id: <20211102184400.1168508-5-jsnow@redhat.com>
-In-Reply-To: <20211102184400.1168508-1-jsnow@redhat.com>
-References: <20211102184400.1168508-1-jsnow@redhat.com>
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH v6 14/42] x86/sev: Register GHCB memory when SEV-SNP is
+ active
+Message-ID: <YYGGv6EtWrw7cnLA@zn.tnic>
+References: <20211008180453.462291-1-brijesh.singh@amd.com>
+ <20211008180453.462291-15-brijesh.singh@amd.com>
+ <YYFs+5UUMfyDgh/a@zn.tnic>
+ <aea0e0c8-7f03-b9db-3084-f487a233c50b@amd.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aea0e0c8-7f03-b9db-3084-f487a233c50b@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This interprets single-backtick syntax in all of our Sphinx docs as a
-cross-reference to *something*, including Python symbols.
+On Tue, Nov 02, 2021 at 01:24:01PM -0500, Brijesh Singh wrote:
+> To answer your question, GHCB is registered at the time of first #VC
+> handling by the second exception handler.
 
-From here on out, new uses of `backticks` will cause a build failure if
-the target cannot be referenced.
+And this is what I don't like - register at use. Instead of init
+everything *before* use.
 
-Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
----
- docs/conf.py | 5 +++++
- 1 file changed, 5 insertions(+)
+> Mike can correct me, the CPUID page check is going to happen on first
+> #VC handling inside the early exception handler (i.e case 1).
 
-diff --git a/docs/conf.py b/docs/conf.py
-index ff6e92c6e2..4d9f56601f 100644
---- a/docs/conf.py
-+++ b/docs/conf.py
-@@ -85,6 +85,11 @@
- # The master toctree document.
- master_doc = 'index'
- 
-+# Interpret `single-backticks` to be a cross-reference to any kind of
-+# referenceable object. Unresolvable or ambiguous references will emit a
-+# warning at build time.
-+default_role = 'any'
-+
- # General information about the project.
- project = u'QEMU'
- copyright = u'2021, The QEMU Project Developers'
+What is the "CPUID page check"?
+
+And no, you don't want to do any detection when an exception happens -
+you want to detect *everything* *first* and then do exceptions.
+
+> See if my above explanation make sense. Based on it, I don't think it
+> makes sense to register the GHCB during the CPUID page detection. The
+> CPUID page detection will occur in early VC handling.
+
+See above. If this needs more discussion, we can talk on IRC.
+
 -- 
-2.31.1
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
