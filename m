@@ -2,99 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 51E4E44260C
-	for <lists+kvm@lfdr.de>; Tue,  2 Nov 2021 04:30:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CA10C442638
+	for <lists+kvm@lfdr.de>; Tue,  2 Nov 2021 04:52:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231882AbhKBDdI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 1 Nov 2021 23:33:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34464 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229526AbhKBDdH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 1 Nov 2021 23:33:07 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B91CC061714
-        for <kvm@vger.kernel.org>; Mon,  1 Nov 2021 20:30:33 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id k9-20020a170902ba8900b00141f601d5c8so2060065pls.1
-        for <kvm@vger.kernel.org>; Mon, 01 Nov 2021 20:30:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=ye4MJZGdJXUzlBLZMPQmwgLxbTVq+U0Mu9cS13H7GgM=;
-        b=obILo9tAzj7cKOsaBlCFqclsjvsZ7RoG31phN/Z/um9IycoLdowXakFskImfIcOgNf
-         Q0W/nbMyOpT1NCF4wV6IGgVmYs7WhJO9t8McPODG6dacnzaShQR0YtwMZ/JGC9j7GKBS
-         aWvCLKzwlGjSVkp6ivlmFcUXQP4xnyXuB8rvHJxw/IvvKF5TfbkNNWnFVxm5ovjx9k/S
-         exYmHD6KX38Cqy2FpLYIkNhnfeOp1COHvhq3d2hhTG47fhJMw0C1ylUiSHbIctu2VUO8
-         8NqF3x/X5iWEu3LUKr/ahx+Ix9v5Tg3K73HL+7QDnjTflp8O5v5p5dcnhoU3og7Q5cZK
-         cYBg==
+        id S232746AbhKBDzJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 1 Nov 2021 23:55:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53278 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232747AbhKBDzI (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 1 Nov 2021 23:55:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635825154;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=l5JQX7PK3bUB+fO7KCHuTs96kpHZCzUz5hWvhokA8Wo=;
+        b=RghOEjDL4afjnzXeL55cWpEv8TQnj+im4Xg6YL8Q9UZ8b7ywZC6RWYaVmoejXVlsUTxjML
+        n7dqZkUimmxIM9cufFuSp3odoS4C/14M80PXhaH24MEFexRj+cJBoCu02k9Iibw0XbVwGL
+        CZ0oKhiyg3N6AG4OyLVFjVRr3NKzuCU=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-575-_MIV_yw-O5euf_0USuBoAg-1; Mon, 01 Nov 2021 23:52:33 -0400
+X-MC-Unique: _MIV_yw-O5euf_0USuBoAg-1
+Received: by mail-lj1-f199.google.com with SMTP id h19-20020a2eb0f3000000b00211a00d15acso7102067ljl.12
+        for <kvm@vger.kernel.org>; Mon, 01 Nov 2021 20:52:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=ye4MJZGdJXUzlBLZMPQmwgLxbTVq+U0Mu9cS13H7GgM=;
-        b=ayFIAZe4aGVOav6GVN4gQ2DFSRGHe3l12WYawN9AplfwEf0VlAZ2gvUJXamYDPjBnz
-         BtDh2qAmk90hcHBQHseV2OU3YB6uzmAhiuwDEow+gmgsDpSehLlCyJPZ/4e3RD5PEYSA
-         hDSu7KvyYYc9XEvhdRWR8Gc8Mq4NfvVVHA4fD2XjhVa8fMqirQBJDXC1N3q5pluALidO
-         UK+GZdZ5HnD7LI9KVR1YF1hg94nyyedUMFN3Y4P0aw3HF9eVj5g53Fo1vBm9SQjMdOde
-         0ckk25yIbugNykcJRrOOf3Hd7IHHbEiHJv+nfKTwruWwNYayy6FfYdgiM1mVKDC3go3Z
-         AG0g==
-X-Gm-Message-State: AOAM533kolYdDSFPCEOL5XG+4n7C1J4LyF38LzGsGxPK/ZMr07IFzvs6
-        bDu1wTLTKGMa5CkJIiMcXNl2cFUjWlQtqXGQligcSKbR2ZqSqvkWia8v2Zw9p0IulP5YSQjvzEd
-        sz5hgXRpaW894S+KffNSc56A1Zq9L2K0U6DpfFy6pizHnot4tKzT8/uEJ5ZHa
-X-Google-Smtp-Source: ABdhPJzdjMU/BxuZZKzeWMY/WZu60hZwNZk48KFQZB/eoBLY9k+NmLgYlFHZ3/HZg9M8hDsZyhmkW4JB+Nt8
-X-Received: from js-desktop.svl.corp.google.com ([2620:15c:2cd:202:32f1:5593:ece6:4f8c])
- (user=junaids job=sendgmr) by 2002:a05:6a00:2ad:b0:480:fae5:2693 with SMTP id
- q13-20020a056a0002ad00b00480fae52693mr15683081pfs.37.1635823832347; Mon, 01
- Nov 2021 20:30:32 -0700 (PDT)
-Date:   Mon,  1 Nov 2021 20:29:00 -0700
-Message-Id: <20211102032900.1888262-1-junaids@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.33.1.1089.g2158813163f-goog
-Subject: [PATCH] kvm: mmu: Use fast PF path for access tracking of huge pages
- when possible
-From:   Junaid Shahid <junaids@google.com>
-To:     kvm@vger.kernel.org, pbonzini@redhat.com
-Cc:     jmattson@google.com, seanjc@google.com, bgardon@google.com
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=l5JQX7PK3bUB+fO7KCHuTs96kpHZCzUz5hWvhokA8Wo=;
+        b=t1s2qhfFepJzaplQDsIfQS9vkEPT2qOiSjTmgL9u2ZrBy3DRtIVShMn7yl/PiJJFg9
+         v4pdTW0aA3GpnjgWTDgJ9ScfXg+whPCbE/4LnLhy0dcUwmGIIHD3CftqKEv95kbos/L0
+         CfR45G8r/SMYzemH+9eAoM2yVMgW3gbLOznNXgd/11tsBfRmuhOcmRodG9oN6O0paIo5
+         hdY97+UFN+WViFLjeDDxOTlOHi1arYordRgT0iMGTHgbYiBZ3ij0GYqMwXyIaCnVgmao
+         BRjtl5P6vVlDOEShtGXapTHEGCEZwM2UNgd/VAfaXzK8DrT4TvJTkBmfNvISxjJuL4ys
+         I6wA==
+X-Gm-Message-State: AOAM5335kZdbV1k8UuEQ+z4fPA0T0ReHkUvCuVhsBOsW6LSDiq0lT49M
+        hKjyqsWJp7iPlj7sz+i0PbVOTfxAsmbp4qDR70xrvaEWrkSk7e+Unq6LLI01O4hCPuQXhcz/Ghc
+        E8fCZl7jyDftET7rDmidcyVmkOGKy
+X-Received: by 2002:a2e:a5c8:: with SMTP id n8mr34920399ljp.307.1635825151583;
+        Mon, 01 Nov 2021 20:52:31 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzFQk+sE0CmE+gyBZ9tANj3V6182Ct3x1qzy7cGmMP3hS/SewKac2u33kWWjZYVFWZ9SvqxSnBV3r7bPJN+SIk=
+X-Received: by 2002:a2e:a5c8:: with SMTP id n8mr34920347ljp.307.1635825151261;
+ Mon, 01 Nov 2021 20:52:31 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200326140125.19794-1-jasowang@redhat.com> <20200326140125.19794-8-jasowang@redhat.com>
+ <20211101141133.GA1073864@nvidia.com>
+In-Reply-To: <20211101141133.GA1073864@nvidia.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Tue, 2 Nov 2021 11:52:20 +0800
+Message-ID: <CACGkMEtbs3u7J7krpkusfqczTU00+6o_YtZjD8htC=+Un9cNew@mail.gmail.com>
+Subject: Re: [PATCH V9 7/9] vhost: introduce vDPA-based backend
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     mst <mst@redhat.com>, linux-kernel <linux-kernel@vger.kernel.org>,
+        kvm <kvm@vger.kernel.org>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev <netdev@vger.kernel.org>,
+        Maxime Coquelin <maxime.coquelin@redhat.com>,
+        "Liang, Cunming" <cunming.liang@intel.com>, zhihong.wang@intel.com,
+        rob.miller@broadcom.com, Xiao W Wang <xiao.w.wang@intel.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>,
+        eperezma <eperezma@redhat.com>, Cindy Lu <lulu@redhat.com>,
+        Parav Pandit <parav@mellanox.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Ariel Adam <aadam@redhat.com>, jiri@mellanox.com,
+        shahafs@mellanox.com, Harpreet Singh Anand <hanand@xilinx.com>,
+        mhabets@solarflare.com, Gautam Dawar <gdawar@xilinx.com>,
+        Saugat Mitra <saugatm@xilinx.com>, vmireyno@marvell.com,
+        zhangweining@ruijie.com.cn, Tiwei Bie <tiwei.bie@intel.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The fast page fault path bails out on write faults to huge pages in
-order to accommodate dirty logging. This change adds a check to do that
-only when dirty logging is actually enabled, so that access tracking for
-huge pages can still use the fast path for write faults in the common
-case.
+On Mon, Nov 1, 2021 at 10:11 PM Jason Gunthorpe <jgg@nvidia.com> wrote:
+>
+> On Thu, Mar 26, 2020 at 10:01:23PM +0800, Jason Wang wrote:
+> > From: Tiwei Bie <tiwei.bie@intel.com>
+> >
+> > This patch introduces a vDPA-based vhost backend. This backend is
+> > built on top of the same interface defined in virtio-vDPA and provides
+> > a generic vhost interface for userspace to accelerate the virtio
+> > devices in guest.
+> >
+> > This backend is implemented as a vDPA device driver on top of the same
+> > ops used in virtio-vDPA. It will create char device entry named
+> > vhost-vdpa-$index for userspace to use. Userspace can use vhost ioctls
+> > on top of this char device to setup the backend.
+> >
+> > Vhost ioctls are extended to make it type agnostic and behave like a
+> > virtio device, this help to eliminate type specific API like what
+> > vhost_net/scsi/vsock did:
+> >
+> > - VHOST_VDPA_GET_DEVICE_ID: get the virtio device ID which is defined
+> >   by virtio specification to differ from different type of devices
+> > - VHOST_VDPA_GET_VRING_NUM: get the maximum size of virtqueue
+> >   supported by the vDPA device
+> > - VHSOT_VDPA_SET/GET_STATUS: set and get virtio status of vDPA device
+> > - VHOST_VDPA_SET/GET_CONFIG: access virtio config space
+> > - VHOST_VDPA_SET_VRING_ENABLE: enable a specific virtqueue
+> >
+> > For memory mapping, IOTLB API is mandated for vhost-vDPA which means
+> > userspace drivers are required to use
+> > VHOST_IOTLB_UPDATE/VHOST_IOTLB_INVALIDATE to add or remove mapping for
+> > a specific userspace memory region.
+> >
+> > The vhost-vDPA API is designed to be type agnostic, but it allows net
+> > device only in current stage. Due to the lacking of control virtqueue
+> > support, some features were filter out by vhost-vdpa.
+> >
+> > We will enable more features and devices in the near future.
+>
+> [..]
+>
+> > +static int vhost_vdpa_alloc_domain(struct vhost_vdpa *v)
+> > +{
+> > +     struct vdpa_device *vdpa = v->vdpa;
+> > +     const struct vdpa_config_ops *ops = vdpa->config;
+> > +     struct device *dma_dev = vdpa_get_dma_dev(vdpa);
+> > +     struct bus_type *bus;
+> > +     int ret;
+> > +
+> > +     /* Device want to do DMA by itself */
+> > +     if (ops->set_map || ops->dma_map)
+> > +             return 0;
+> > +
+> > +     bus = dma_dev->bus;
+> > +     if (!bus)
+> > +             return -EFAULT;
+> > +
+> > +     if (!iommu_capable(bus, IOMMU_CAP_CACHE_COHERENCY))
+> > +             return -ENOTSUPP;
+> > +
+> > +     v->domain = iommu_domain_alloc(bus);
+> > +     if (!v->domain)
+> > +             return -EIO;
+> > +
+> > +     ret = iommu_attach_device(v->domain, dma_dev);
+> > +     if (ret)
+> > +             goto err_attach;
+> >
+>
+> I've been looking at the security of iommu_attach_device() users, and
+> I wonder if this is safe?
+>
+> The security question is if userspace is able to control the DMA
+> address the devices uses? Eg if any of the cpu to device ring's are in
+> userspace memory?
+>
+> For instance if userspace can tell the device to send a packet from an
+> arbitrary user controlled address.
 
-Signed-off-by: Junaid Shahid <junaids@google.com>
----
- arch/x86/kvm/mmu/mmu.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+The map is validated via pin_user_pages() which guarantees that the
+address is not arbitrary and must belong to userspace?
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 354d2ca92df4..5df9181c5082 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3191,8 +3191,9 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 			new_spte |= PT_WRITABLE_MASK;
- 
- 			/*
--			 * Do not fix write-permission on the large spte.  Since
--			 * we only dirty the first page into the dirty-bitmap in
-+			 * Do not fix write-permission on the large spte when
-+			 * dirty logging is enabled. Since we only dirty the
-+			 * first page into the dirty-bitmap in
- 			 * fast_pf_fix_direct_spte(), other pages are missed
- 			 * if its slot has dirty logging enabled.
- 			 *
-@@ -3201,7 +3202,8 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 			 *
- 			 * See the comments in kvm_arch_commit_memory_region().
- 			 */
--			if (sp->role.level > PG_LEVEL_4K)
-+			if (sp->role.level > PG_LEVEL_4K &&
-+			    kvm_slot_dirty_track_enabled(fault->slot))
- 				break;
- 		}
- 
--- 
-2.33.1.1089.g2158813163f-goog
+Thanks
+
+>
+> Thanks,
+> Jason
+>
 
