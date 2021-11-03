@@ -2,99 +2,191 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B4AC4443D0
-	for <lists+kvm@lfdr.de>; Wed,  3 Nov 2021 15:47:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C0B90444469
+	for <lists+kvm@lfdr.de>; Wed,  3 Nov 2021 16:12:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231517AbhKCOuc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Nov 2021 10:50:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34302 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230282AbhKCOuc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Nov 2021 10:50:32 -0400
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E113DC061203
-        for <kvm@vger.kernel.org>; Wed,  3 Nov 2021 07:47:55 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id u33so2567144pfg.8
-        for <kvm@vger.kernel.org>; Wed, 03 Nov 2021 07:47:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=C0wf2K0rKG8C1RSWcaFIUVVK/MmFwAdNj5eu/GP5eZg=;
-        b=B9VpNWuxUqohM9ynGgVOtGz8t7EVldEXvn3TpJhPxTpkMNfKclNBrxgJdXzCq0J3Ep
-         uWL792cWDfDzfIAEEqij34sAHWOzPFONgEN5oY3XdM3Z9T90FapJZn8rOwaJFelsuFXR
-         GNNBiMkKbp7bWV0FyPlxCmbbFyFs/FJC6AOWaqUo89Vce/oTS/6ZKuvmPV8J3HtPVW7j
-         de88q1nuq/CKP2qgl14Xr/dB72CqhnsXK7AcNa9DCMkHKx9I6wDsnCIGDHnDfpyaSmON
-         l3onlOy36NkkWlhejiCAwar3Jx/gMyH+GKDuHmP9AbS9gcqx/shdiJUH1yBB4AFvHC98
-         VjIQ==
+        id S231474AbhKCPOq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Nov 2021 11:14:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39499 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229603AbhKCPOo (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 3 Nov 2021 11:14:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635952327;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Q0kkUjDrPbxxe3vqZwu6SNDZQ57Gyckg2LuXgi6MtoI=;
+        b=WgD1k8XnR0Y5pwGZ2mo1DJR7FwW6HgIYtsnSr4Zd6mkhzboFIjI/n6INIDp9qRSV0JsUwl
+        7Avw8P1Jm4uxLpnT20xMoSUmK2IAzrSZNv2eaBmr2Y5KxTmJsBpWI4StSNDjp/x14tlE4m
+        QfMiLaRjcHtjkljeQIxIZ3SGJheNgqs=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-481-V8K9Wj7xP5iHsGbfDr8XBA-1; Wed, 03 Nov 2021 11:12:06 -0400
+X-MC-Unique: V8K9Wj7xP5iHsGbfDr8XBA-1
+Received: by mail-wm1-f69.google.com with SMTP id k5-20020a7bc3050000b02901e081f69d80so1179533wmj.8
+        for <kvm@vger.kernel.org>; Wed, 03 Nov 2021 08:12:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=C0wf2K0rKG8C1RSWcaFIUVVK/MmFwAdNj5eu/GP5eZg=;
-        b=S2WbcvuF0FccLXKiESuAQ9FQs+I5P10C8Tsc/GIWC70BJGV8emMliwHNzYGacCgRhu
-         7Nb/XJ2cnPfcLLusouPiQSdEx1lh/7KLBXr95OedrtaOgLDPxEuzRQ5fYytFHc35E8OK
-         fim6hPc+dYWCdI7Ks+RJVC9DcZQsP3uGVXwAYVkMfI88WIaw4sWgh+jJjM9Ysga4Cpw1
-         DexwnhqrNikQSIVcgjcq3WuyJV6bPobE2sL7DDIFtDIysTQ34qaMQDuHZ8qzTpBQsJFt
-         sOBxzh8dt+PMeAm5b2athsToDjrb4nmVAkEfiLHcN6X6/H5ZDKOlGauedkYC/SLVJBQP
-         xshQ==
-X-Gm-Message-State: AOAM532Qj1B+BKwWT9Ca0qlvx4lbchvApRgH+EhdrvZR2pvZS0p6RJWS
-        5kuva0gcxXPgDYJGZzrA3bxwJA==
-X-Google-Smtp-Source: ABdhPJzlbiudLiylGp+N6jM6RDpt8UXV/HrVtNYeDnS3T2Pwf6PWIN+DJCztrwLJs+wcqW2qDqMztw==
-X-Received: by 2002:a63:556:: with SMTP id 83mr22917640pgf.222.1635950874972;
-        Wed, 03 Nov 2021 07:47:54 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id e24sm2586994pfn.8.2021.11.03.07.47.54
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=Q0kkUjDrPbxxe3vqZwu6SNDZQ57Gyckg2LuXgi6MtoI=;
+        b=tPOpMNYkc2zYQ/fd5H79kzOe+0H/eTFExA9mv3XPHkKU0NbtcoGCMKoCGNb65yef/F
+         biFPgubmw2SWAKq4dOyP6U5auwW0JREgbIeOhNj9NVXSN/bPOQXcxd/rCnv14kxIucUK
+         4X3JJFvIfwHd1uCIR2RnkKC4mqk4ofxTR/i+T9cRLtl5cAixsrPKDJXdhAjQdOhNa8jG
+         lhR14+UmmMs0bmVzFzeMPP2TzxLoKtZQ1nGKdo9Ews7cAuhePe4DAOxSNUKF+t/DPNk5
+         GdhUWxQa9zkDIw54gWswcwUTKQWTpqsZ4p/KN7CjYnLTUZh7cmHLZFA8TqC2vQdUCeZ0
+         XRxg==
+X-Gm-Message-State: AOAM531+Njg+iF+VqNOdiso1TmvcPrcRGGow7fWcwKccQou+41ZDkWn3
+        9TGI4ljL4eUfgD05fi3EhnWJCdlBmf4i91n51LQc2jdBfx18aEqim5gXn5NsGjIVscau9C1WgKS
+        zxWZGR8vAdqFF3fz9nAoBAOEyzB7P/DGJdBfydMg+QBKD0ZfMdmQipWBICE4CLPSl
+X-Received: by 2002:a7b:c157:: with SMTP id z23mr16200004wmi.113.1635952324891;
+        Wed, 03 Nov 2021 08:12:04 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxneK8A+uMzpSWQRxthB2Qz5GIxq2FiIxn73+TFNRcp/rPhnzqO2+olwEKz8eJCCk5JFgRdxA==
+X-Received: by 2002:a7b:c157:: with SMTP id z23mr16199946wmi.113.1635952324589;
+        Wed, 03 Nov 2021 08:12:04 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id w17sm2251876wrp.79.2021.11.03.08.12.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Nov 2021 07:47:54 -0700 (PDT)
-Date:   Wed, 3 Nov 2021 14:47:50 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 01/13] KVM: x86: Cache total page count to avoid
- traversing the memslot array
-Message-ID: <YYKhFhoSa/8SHxJB@google.com>
-References: <cover.1632171478.git.maciej.szmigiero@oracle.com>
- <d07f07cdd545ab1a495a9a0da06e43ad97c069a2.1632171479.git.maciej.szmigiero@oracle.com>
- <YW9Fi128rYxiF1v3@google.com>
- <e618edce-b310-6d9a-3860-d7f4d8c0d98f@maciej.szmigiero.name>
- <YXBnn6ZaXbaqKvOo@google.com>
- <YYBqMipZT9qcwDMt@google.com>
- <8017cf9d-2b03-0c27-b78a-41b3d03c308b@maciej.szmigiero.name>
+        Wed, 03 Nov 2021 08:12:03 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Li RongQing <lirongqing@baidu.com>
+Cc:     lirongqing@baidu.com, pbonzini@redhat.com, seanjc@google.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, x86@kernel.org,
+        hpa@zytor.com, kvm@vger.kernel.org
+Subject: Re: [PATCH][v2] KVM: Clear pv eoi pending bit only when it is set
+In-Reply-To: <1634797513-11005-1-git-send-email-lirongqing@baidu.com>
+References: <1634797513-11005-1-git-send-email-lirongqing@baidu.com>
+Date:   Wed, 03 Nov 2021 16:12:02 +0100
+Message-ID: <87tugtmfy5.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8017cf9d-2b03-0c27-b78a-41b3d03c308b@maciej.szmigiero.name>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 03, 2021, Maciej S. Szmigiero wrote:
-> Capping total n_memslots_pages makes sense to me to avoid the (existing)
-> nr_mmu_pages wraparound issue, will update the next patchset version
-> accordingly.
+Li RongQing <lirongqing@baidu.com> writes:
 
-No need to do it yourself.  I have a reworked version of the series with a bunch
-of cleanups before and after the meat of your series, as well non-functional changes
-(hopefully) to the "Resolve memslot ID via a hash table" and "Keep memslots in
-tree-based structures" to avoid all the swap() behavior and to provide better
-continuity between the aforementioned patches.  Unless something goes sideways in
-the last few touchups, I'll get it posted today.
+> merge pv_eoi_get_pending and pv_eoi_clr_pending into a single
+> function pv_eoi_test_and_clear_pending, which returns and clear
+> the value of the pending bit.
+>
+> and clear pv eoi pending bit only when it is set, to avoid calling
+> pv_eoi_put_user(), this can speed about 300 nsec on AMD EPYC most
+> of the time
+>
+> and make pv_eoi_set_pending as inline as there is only one user
+
+Compiler is likely smart enough to inline static functions with a single
+user anyway.
+
+>
+> Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Li RongQing <lirongqing@baidu.com>
+> ---
+> diff with v1:
+>  merge as pv_eoi_test_and_clear_pending
+>  add inline for pv_eoi_set_pending
+>
+>  arch/x86/kvm/lapic.c |   47 +++++++++++++++++++++++------------------------
+>  1 files changed, 23 insertions(+), 24 deletions(-)
+>
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 76fb009..4da5db8 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -673,18 +673,7 @@ static inline bool pv_eoi_enabled(struct kvm_vcpu *vcpu)
+>  	return vcpu->arch.pv_eoi.msr_val & KVM_MSR_ENABLED;
+>  }
+>  
+> -static bool pv_eoi_get_pending(struct kvm_vcpu *vcpu)
+> -{
+> -	u8 val;
+> -	if (pv_eoi_get_user(vcpu, &val) < 0) {
+> -		printk(KERN_WARNING "Can't read EOI MSR value: 0x%llx\n",
+> -			   (unsigned long long)vcpu->arch.pv_eoi.msr_val);
+> -		return false;
+> -	}
+> -	return val & KVM_PV_EOI_ENABLED;
+> -}
+> -
+> -static void pv_eoi_set_pending(struct kvm_vcpu *vcpu)
+> +static inline void pv_eoi_set_pending(struct kvm_vcpu *vcpu)
+>  {
+>  	if (pv_eoi_put_user(vcpu, KVM_PV_EOI_ENABLED) < 0) {
+>  		printk(KERN_WARNING "Can't set EOI MSR value: 0x%llx\n",
+> @@ -694,14 +683,31 @@ static void pv_eoi_set_pending(struct kvm_vcpu *vcpu)
+>  	__set_bit(KVM_APIC_PV_EOI_PENDING, &vcpu->arch.apic_attention);
+>  }
+>  
+> -static void pv_eoi_clr_pending(struct kvm_vcpu *vcpu)
+> +static inline bool pv_eoi_test_and_clr_pending(struct kvm_vcpu *vcpu)
+>  {
+> -	if (pv_eoi_put_user(vcpu, KVM_PV_EOI_DISABLED) < 0) {
+> +	u8 val;
+> +
+> +	if (pv_eoi_get_user(vcpu, &val) < 0) {
+> +		printk(KERN_WARNING "Can't read EOI MSR value: 0x%llx\n",
+> +			   (unsigned long long)vcpu->arch.pv_eoi.msr_val);
+
+pr_warn() would probably be a better choice but looking at this makes me
+wonder: isn't it triggerable by the guest? I think it is when the value
+written to MSR_KVM_PV_EOI_EN is bogus and this is bad: we don't even
+ratelimit these messages! I think this printk() needs to be dropped.
+
+> +		return false;
+> +	}
+> +
+> +	val &= KVM_PV_EOI_ENABLED;
+> +
+> +	/*
+> +	 * Clear pending bit in any case: it will be set again on vmentry.
+> +	 * While this might not be ideal from performance point of view,
+> +	 * this makes sure pv eoi is only enabled when we know it's safe.
+> +	 */
+> +	if (val && pv_eoi_put_user(vcpu, KVM_PV_EOI_DISABLED) < 0) {
+>  		printk(KERN_WARNING "Can't clear EOI MSR value: 0x%llx\n",
+>  			   (unsigned long long)vcpu->arch.pv_eoi.msr_val);
+
+... and this one, probably, too.
+
+> -		return;
+> +		return false;
+>  	}
+>  	__clear_bit(KVM_APIC_PV_EOI_PENDING, &vcpu->arch.apic_attention);
+> +
+> +	return !!val;
+>  }
+>  
+>  static int apic_has_interrupt_for_ppr(struct kvm_lapic *apic, u32 ppr)
+> @@ -2673,7 +2679,6 @@ void __kvm_migrate_apic_timer(struct kvm_vcpu *vcpu)
+>  static void apic_sync_pv_eoi_from_guest(struct kvm_vcpu *vcpu,
+>  					struct kvm_lapic *apic)
+>  {
+> -	bool pending;
+>  	int vector;
+>  	/*
+>  	 * PV EOI state is derived from KVM_APIC_PV_EOI_PENDING in host
+> @@ -2687,14 +2692,8 @@ static void apic_sync_pv_eoi_from_guest(struct kvm_vcpu *vcpu,
+>  	 * 	-> host enabled PV EOI, guest executed EOI.
+>  	 */
+>  	BUG_ON(!pv_eoi_enabled(vcpu));
+> -	pending = pv_eoi_get_pending(vcpu);
+> -	/*
+> -	 * Clear pending bit in any case: it will be set again on vmentry.
+> -	 * While this might not be ideal from performance point of view,
+> -	 * this makes sure pv eoi is only enabled when we know it's safe.
+> -	 */
+> -	pv_eoi_clr_pending(vcpu);
+> -	if (pending)
+> +
+> +	if (pv_eoi_test_and_clr_pending(vcpu))
+>  		return;
+>  	vector = apic_set_eoi(apic);
+>  	trace_kvm_pv_eoi(apic, vector);
+
+-- 
+Vitaly
+
