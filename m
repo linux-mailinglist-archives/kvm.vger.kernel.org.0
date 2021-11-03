@@ -2,75 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6DF884444BA
-	for <lists+kvm@lfdr.de>; Wed,  3 Nov 2021 16:38:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9996F4444D3
+	for <lists+kvm@lfdr.de>; Wed,  3 Nov 2021 16:44:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231489AbhKCPlC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Nov 2021 11:41:02 -0400
-Received: from vps-vb.mhejs.net ([37.28.154.113]:59576 "EHLO vps-vb.mhejs.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229587AbhKCPlB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Nov 2021 11:41:01 -0400
-Received: from MUA
-        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <mail@maciej.szmigiero.name>)
-        id 1miIL9-0007Pv-Uy; Wed, 03 Nov 2021 16:38:15 +0100
-Subject: Re: [PATCH v5 01/13] KVM: x86: Cache total page count to avoid
- traversing the memslot array
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
+        id S231847AbhKCPqv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Nov 2021 11:46:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:47995 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229928AbhKCPqv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 3 Nov 2021 11:46:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635954254;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=tZiz8bgd2IYdJNUZ4cuGa9YeyGcuozlOPlontcI7tiE=;
+        b=QDe6SMLBD/t7dIlkpPUBoSkYKJXXpPleyONAuxSCI4S0VoVTMS6XNBoDHeoejAyY1zRlqv
+        DfMGcsyDMVX73PYccvZGLJNRSDxN9aByk54xrKKW73hhGeDeYh7B7N613bHECMVLcxyYwC
+        YNqNiHNt2b6IiYURgOA62PKyyuYHsaE=
+Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com
+ [209.85.210.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-538-oUjj7OcJPZmvtGzMhxsSXA-1; Wed, 03 Nov 2021 11:44:13 -0400
+X-MC-Unique: oUjj7OcJPZmvtGzMhxsSXA-1
+Received: by mail-ot1-f69.google.com with SMTP id c12-20020a056830348c00b00558501c76d7so1635378otu.4
+        for <kvm@vger.kernel.org>; Wed, 03 Nov 2021 08:44:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=tZiz8bgd2IYdJNUZ4cuGa9YeyGcuozlOPlontcI7tiE=;
+        b=oFp9h/MCzzLZ0gCCpigK1mum2G0ZPYDzIflvROSsryvsYPtQ56ue3qWFeCz5oyJYWY
+         S29CAwlv7692vg02SUkaTX3ClYq4+XjJghXtFwc7NK5C/fZV46GbicJm4I6Lu+3kb4h/
+         aVAJQVi8YR+bEcAJ6QnbsFvWdysOAT0wtBD6hA5GRdXCNi2A5/5YRTj6mXccG19i8HdI
+         Z2zyVTEZFlscOCfrPk0vBeh+pdsINhXRc2b8A6ZxL0hJ2DwzWPe0bggbfAGqHCrLnC7p
+         2joZ4kzLUilRf0WlLSf5a28vwVDzA/slXYOXZGAlThWV3VUT+eng2O/kduW5Tx8ocZh3
+         FvcA==
+X-Gm-Message-State: AOAM533BRYxxk3U5RPiMgIL4jxEdvxxT8a383YxHPQYBHxkv5VKzXkqI
+        iblM5HjfginiKQVX33PJrqCRtLJfmWT2G1fqRhO/hpwcSMUzlPhqX7GBksBiKffMLPsMU5SU40U
+        YBgUpfe4fg/Zr
+X-Received: by 2002:a05:6808:11c6:: with SMTP id p6mr11357416oiv.158.1635954252489;
+        Wed, 03 Nov 2021 08:44:12 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwqdNIwBbBjQaA0dktrX5jxvW3JQ5HKlh4yDvBgx+shkcepd/rNrVD0/YfjSkdaBx5uxUfMqQ==
+X-Received: by 2002:a05:6808:11c6:: with SMTP id p6mr11357391oiv.158.1635954252228;
+        Wed, 03 Nov 2021 08:44:12 -0700 (PDT)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id r13sm583837oot.41.2021.11.03.08.44.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Nov 2021 08:44:11 -0700 (PDT)
+Date:   Wed, 3 Nov 2021 09:44:09 -0600
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
         Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <cover.1632171478.git.maciej.szmigiero@oracle.com>
- <d07f07cdd545ab1a495a9a0da06e43ad97c069a2.1632171479.git.maciej.szmigiero@oracle.com>
- <YW9Fi128rYxiF1v3@google.com>
- <e618edce-b310-6d9a-3860-d7f4d8c0d98f@maciej.szmigiero.name>
- <YXBnn6ZaXbaqKvOo@google.com> <YYBqMipZT9qcwDMt@google.com>
- <8017cf9d-2b03-0c27-b78a-41b3d03c308b@maciej.szmigiero.name>
- <YYKhFhoSa/8SHxJB@google.com>
-From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Message-ID: <27ba659b-137e-863f-7892-b8968fd14e59@maciej.szmigiero.name>
-Date:   Wed, 3 Nov 2021 16:38:10 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
+        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
+        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH V2 mlx5-next 12/14] vfio/mlx5: Implement vfio_pci driver
+ for mlx5 devices
+Message-ID: <20211103094409.3ea180ab.alex.williamson@redhat.com>
+In-Reply-To: <20211103120955.GK2744544@nvidia.com>
+References: <20211027192345.GJ2744544@nvidia.com>
+        <20211028093035.17ecbc5d.alex.williamson@redhat.com>
+        <20211028234750.GP2744544@nvidia.com>
+        <20211029160621.46ca7b54.alex.williamson@redhat.com>
+        <20211101172506.GC2744544@nvidia.com>
+        <20211102085651.28e0203c.alex.williamson@redhat.com>
+        <20211102155420.GK2744544@nvidia.com>
+        <20211102102236.711dc6b5.alex.williamson@redhat.com>
+        <20211102163610.GG2744544@nvidia.com>
+        <20211102141547.6f1b0bb3.alex.williamson@redhat.com>
+        <20211103120955.GK2744544@nvidia.com>
+Organization: Red Hat
 MIME-Version: 1.0
-In-Reply-To: <YYKhFhoSa/8SHxJB@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 03.11.2021 15:47, Sean Christopherson wrote:
-> On Wed, Nov 03, 2021, Maciej S. Szmigiero wrote:
->> Capping total n_memslots_pages makes sense to me to avoid the (existing)
->> nr_mmu_pages wraparound issue, will update the next patchset version
->> accordingly.
-> 
-> No need to do it yourself.  I have a reworked version of the series with a bunch
-> of cleanups before and after the meat of your series, as well non-functional changes
-> (hopefully) to the "Resolve memslot ID via a hash table" and "Keep memslots in
-> tree-based structures" to avoid all the swap() behavior and to provide better
-> continuity between the aforementioned patches.  Unless something goes sideways in
-> the last few touchups, I'll get it posted today.
-> 
+On Wed, 3 Nov 2021 09:09:55 -0300
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-Thanks.
+> On Tue, Nov 02, 2021 at 02:15:47PM -0600, Alex Williamson wrote:
+> > On Tue, 2 Nov 2021 13:36:10 -0300
+> > Jason Gunthorpe <jgg@nvidia.com> wrote:
+> >   
+> > > On Tue, Nov 02, 2021 at 10:22:36AM -0600, Alex Williamson wrote:
+> > >   
+> > > > > > There's no point at which we can do SET_IRQS other than in the
+> > > > > > _RESUMING state.  Generally SET_IRQS ioctls are coordinated with the
+> > > > > > guest driver based on actions to the device, we can't be mucking
+> > > > > > with IRQs while the device is presumed running and already
+> > > > > > generating interrupt conditions.      
+> > > > > 
+> > > > > We need to do it in state 000
+> > > > > 
+> > > > > ie resume should go 
+> > > > > 
+> > > > >   000 -> 100 -> 000 -> 001
+> > > > > 
+> > > > > With SET_IRQS and any other fixing done during the 2nd 000, after the
+> > > > > migration data has been loaded into the device.    
+> > > > 
+> > > > Again, this is not how QEMU works today.    
+> > > 
+> > > I know, I think it is a poor choice to carve out certain changes to
+> > > the device that must be preserved across loading the migration state.
+> > >   
+> > > > > The uAPI comment does not define when to do the SET_IRQS, it seems
+> > > > > this has been missed.
+> > > > > 
+> > > > > We really should fix it, unless you feel strongly that the
+> > > > > experimental API in qemu shouldn't be changed.    
+> > > > 
+> > > > I think the QEMU implementation fills in some details of how the uAPI
+> > > > is expected to work.    
+> > > 
+> > > Well, we already know QEMU has problems, like the P2P thing. Is this a
+> > > bug, or a preferred limitation as designed?
+> > >   
+> > > > MSI/X is expected to be restored while _RESUMING based on the
+> > > > config space of the device, there is no intermediate step between
+> > > > _RESUMING and _RUNNING.  Introducing such a requirement precludes
+> > > > the option of a post-copy implementation of (_RESUMING | _RUNNING).    
+> > > 
+> > > Not precluded, a new state bit would be required to implement some
+> > > future post-copy.
+> > > 
+> > > 0000 -> 1100 -> 1000 -> 1001 -> 0001
+> > > 
+> > > Instead of overloading the meaning of RUNNING.
+> > > 
+> > > I think this is cleaner anyhow.
+> > > 
+> > > (though I don't know how we'd structure the save side to get two
+> > > bitstreams)  
+> > 
+> > The way this is supposed to work is that the device migration stream
+> > contains the device internal state.  QEMU is then responsible for
+> > restoring the external state of the device, including the DMA mappings,
+> > interrupts, and config space.  It's not possible for the migration
+> > driver to reestablish these things.  So there is a necessary division
+> > of device state between QEMU and the migration driver.
+> > 
+> > If we don't think the uAPI includes the necessary states, doesn't
+> > sufficiently define the states, and we're not following the existing
+> > QEMU implementation as the guide for the intentions of the uAPI spec,
+> > then what exactly is the proposed mlx5 migration driver implementing
+> > and why would we even considering including it at this point?  Thanks,  
+> 
+> The driver posting follows the undocumented behaviors of QEMU
+
+In one email I read that QEMU clearly should not be performing SET_IRQS
+while the device is _RESUMING (which it does) and we need to require an
+interim state before the device becomes _RUNNING to poke at the device
+(which QEMU doesn't do and the uAPI doesn't require), and the next I
+read that we should proceed with some useful quanta of work despite
+that we clearly don't intend to retain much of the protocol of the
+current uAPI long term...
+
+> You asked that these all be documented, evaluated and formalized as a
+> precondition to merging it.
+> 
+> So, what do you want? A critical review of the uAPI design or
+> documenting whatever behvaior is coded in qemu?
+
+Too much is in flux and we're only getting breadcrumbs of the changes
+to come.  It's becoming more evident that we're likely to sufficiently
+modify the uAPI to the point where I'd probably suggest a new "v2"
+subtype for the region.
+
+> A critical review suggest SET_IRQ should not happen during RESUMING,
+> but mlx5 today doesn't care either way.
+
+But if it can't happening during _RESUMING and once the device is
+_RUNNING it's too late, then we're demanding an interim state that is
+not required by the existing protocol.  We're redefining that existing
+operations on the device while in _RESUMING cannot occur in that device
+state.  That's more than uAPI clarification.  Thanks,
+
+Alex
+
