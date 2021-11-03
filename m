@@ -2,474 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BC15B443DD2
-	for <lists+kvm@lfdr.de>; Wed,  3 Nov 2021 08:49:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 10DEE443DD5
+	for <lists+kvm@lfdr.de>; Wed,  3 Nov 2021 08:51:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230293AbhKCHvx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Nov 2021 03:51:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52988 "EHLO
+        id S230352AbhKCHyO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Nov 2021 03:54:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22592 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230025AbhKCHvw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 3 Nov 2021 03:51:52 -0400
+        by vger.kernel.org with ESMTP id S230046AbhKCHyN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 3 Nov 2021 03:54:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635925754;
+        s=mimecast20190719; t=1635925896;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=lqgSFRKURbgASgWddL5XIQlSIfLH4x2twZXfMZ8afvA=;
-        b=DzlQ4iQCNHRULKFFpdeVwqGrclNnKvTVJGmCTe+wRqQz4zCvnFtdXeDkszIFEyxinz62h9
-        Z6paEX2koL43UY4RIva9DJTxlPj2+IbsItMZRLUpUfNTYa1WjXQIJYIFyVmFwtrR718k0Y
-        APHD+0c2+MW6t5dhVmf498rjf615vF4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-597-NgU_SNjMNGyfR4GGjUs2hA-1; Wed, 03 Nov 2021 03:49:13 -0400
-X-MC-Unique: NgU_SNjMNGyfR4GGjUs2hA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8DDC61923761;
-        Wed,  3 Nov 2021 07:49:12 +0000 (UTC)
-Received: from [10.39.192.84] (unknown [10.39.192.84])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DE6E85D6B1;
-        Wed,  3 Nov 2021 07:49:07 +0000 (UTC)
-Message-ID: <74901bd1-e69f-99d3-b11e-e0b541226d20@redhat.com>
-Date:   Wed, 3 Nov 2021 08:49:06 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
-        imbrenda@linux.ibm.com, drjones@redhat.com
+        bh=MQYcpSLYl/L8fCHyaW/oJA2kKY80+E8YAyZQVJ3eeDQ=;
+        b=fkO33P6Lri4Ccu/f72cKIFFG4gGXQ1ecOEWu+OBmIEdE3WL/TmWmO7tTWdlSySSf91ehW7
+        GhBAU6LbRBxcOWk/9vw960LFcCIJxSJm196DVPpPA56VJbLjEMMx/9a+bOtdZOfm+ELp+D
+        uCAkYZLLIiVf+hGr0h7ytmOGEcjMp9E=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-206-wQwubtqYMDmApFv6wYCtwg-1; Wed, 03 Nov 2021 03:51:34 -0400
+X-MC-Unique: wQwubtqYMDmApFv6wYCtwg-1
+Received: by mail-ed1-f70.google.com with SMTP id u10-20020a50d94a000000b003dc51565894so1633690edj.21
+        for <kvm@vger.kernel.org>; Wed, 03 Nov 2021 00:51:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=MQYcpSLYl/L8fCHyaW/oJA2kKY80+E8YAyZQVJ3eeDQ=;
+        b=AFZGcg3vmK9VWWEFfP/pI+xpOmdM3FNx/On+Hs5b5vcrESW1nysx9V78NQKdH+G0im
+         pQPRJIty0ctUcEkSiy3a2FPtUjPGfsxjvVXaIbLoISNc2F9AZigcse1sgvdlkVzh1QLA
+         ClaKFZnanZ+is9jo/AYyaZwBDwTAxGCqP29p1A4sNwexNI3g2PqNhfeKnb1qmF/Y4PY5
+         PnIe7GYZUrTRBf9XIed/VNGW3jGFS87miHRg06KHEuVgxU21t9BqsJhkkoG0Vck62tDL
+         0Cu5JCmE7dev8kX79IubKe4YO12BD1m/ZkGFp46jnUFK5tgal+NLAdjlRo9x0S3FDtwF
+         ZnSA==
+X-Gm-Message-State: AOAM530L5M45Rncy0zKIVio1VZIx0hUi/hsKBBdposLlLVuvj91x22b7
+        0uJ4VGE3MZG1gi76IAuM1rlBBItgchXNfN4i8b+T3siNdu2h2/wQ83opyZXrVigCGg8VwHBaSE+
+        +W0qhc+bCom/G
+X-Received: by 2002:aa7:ccc1:: with SMTP id y1mr59241122edt.177.1635925893708;
+        Wed, 03 Nov 2021 00:51:33 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJybvc9IpzVj/HY1JPWn1plkJqxVT+7kp08NozGqfvvrM/pJwLmhn9CuIRwh0g+9ZALKaUFfBg==
+X-Received: by 2002:aa7:ccc1:: with SMTP id y1mr59241099edt.177.1635925893529;
+        Wed, 03 Nov 2021 00:51:33 -0700 (PDT)
+Received: from gator.home (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
+        by smtp.gmail.com with ESMTPSA id o9sm698325ejy.8.2021.11.03.00.51.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Nov 2021 00:51:33 -0700 (PDT)
+Date:   Wed, 3 Nov 2021 08:51:31 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
+        thuth@redhat.com, cohuck@redhat.com, imbrenda@linux.ibm.com
+Subject: Re: [kvm-unit-tests PATCH 5/7] virtio: implement the
+ virtio_add_inbuf routine
+Message-ID: <20211103075131.xgnysvcfbal2r6z4@gator.home>
 References: <1630059440-15586-1-git-send-email-pmorel@linux.ibm.com>
- <1630059440-15586-4-git-send-email-pmorel@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH 3/7] s390x: virtio: CCW transport
- implementation
-In-Reply-To: <1630059440-15586-4-git-send-email-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+ <1630059440-15586-6-git-send-email-pmorel@linux.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1630059440-15586-6-git-send-email-pmorel@linux.ibm.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/08/2021 12.17, Pierre Morel wrote:
-> This is the implementation of the virtio-ccw transport level.
+On Fri, Aug 27, 2021 at 12:17:18PM +0200, Pierre Morel wrote:
+> To communicate in both directions with a VIRTIO device we need
+> to add the incoming communication to the VIRTIO level.
 > 
-> We only support VIRTIO revision 0.
-
-That means only legacy virtio? Wouldn't it be better to shoot for modern 
-virtio instead?
-
 > Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 > ---
->   lib/s390x/virtio-ccw.c | 374 +++++++++++++++++++++++++++++++++++++++++
->   lib/s390x/virtio-ccw.h | 111 ++++++++++++
->   lib/virtio-config.h    |  30 ++++
->   s390x/Makefile         |   2 +
->   4 files changed, 517 insertions(+)
->   create mode 100644 lib/s390x/virtio-ccw.c
->   create mode 100644 lib/s390x/virtio-ccw.h
->   create mode 100644 lib/virtio-config.h
+>  lib/virtio.c | 32 ++++++++++++++++++++++++++++++++
+>  lib/virtio.h |  2 ++
+>  2 files changed, 34 insertions(+)
 > 
-> diff --git a/lib/s390x/virtio-ccw.c b/lib/s390x/virtio-ccw.c
-> new file mode 100644
-> index 00000000..cf447de6
-> --- /dev/null
-> +++ b/lib/s390x/virtio-ccw.c
-> @@ -0,0 +1,374 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Virtio CCW Library
-> + *
-> + * Copyright (c) 2021 IBM Corp
-> + *
-> + * Authors:
-> + *  Pierre Morel <pmorel@linux.ibm.com>
-> + *
-> + */
-> +
-> +#include <libcflat.h>
-> +#include <alloc_page.h>
-> +#include <asm/page.h>
-> +#include <string.h>
-> +#include <interrupt.h>
-> +#include <asm/arch_def.h>
-> +#include <asm/facility.h>
-> +#include <asm/uv.h>
-> +
-> +#include <css.h>
-> +#include <virtio.h>
-> +#include <virtio-config.h>
-> +#include <virtio-ccw.h>
-> +#include <malloc_io.h>
-> +
-> +static struct linked_list vcdev_list = {
-> +	.prev = &vcdev_list,
-> +	.next = &vcdev_list
-> +};
-> +
-> +static inline uint32_t swap16(uint32_t b)
+> diff --git a/lib/virtio.c b/lib/virtio.c
+> index e10153b9..b84bc680 100644
+> --- a/lib/virtio.c
+> +++ b/lib/virtio.c
+> @@ -47,6 +47,38 @@ void vring_init_virtqueue(struct vring_virtqueue *vq, unsigned index,
+>  	vq->data[i] = NULL;
+>  }
+>  
+> +int virtqueue_add_inbuf(struct virtqueue *_vq, char *buf, unsigned int len)
 > +{
-> +		return (((b & 0xff00U) <<  8) |
-> +		((b & 0x00ff) >>  8));
-> +}
+> +	struct vring_virtqueue *vq = to_vvq(_vq);
+> +	unsigned int avail;
+> +	int head;
 > +
-> +static inline uint32_t swap32(uint32_t b)
-> +{
-> +	return (((b & 0x000000ffU) << 24) |
-> +		((b & 0x0000ff00U) <<  8) |
-> +		((b & 0x00ff0000U) >>  8) |
-> +		((b & 0xff000000U) >> 24));
-> +}
+> +	assert(buf);
+> +	assert(len);
 > +
-> +static inline uint64_t swap64(uint64_t x)
-> +{
-> +	return (((x & 0x00000000000000ffULL) << 56) |
-> +		((x & 0x000000000000ff00ULL) << 40) |
-> +		((x & 0x0000000000ff0000ULL) << 24) |
-> +		((x & 0x00000000ff000000ULL) <<  8) |
-> +		((x & 0x000000ff00000000ULL) >>  8) |
-> +		((x & 0x0000ff0000000000ULL) >> 24) |
-> +		((x & 0x00ff000000000000ULL) >> 40) |
-> +		((x & 0xff00000000000000ULL) >> 56));
-> +}
-
-We already have macros for swapping in lib/asm-generic/io.h ... could you 
-use those instead?
-
-> +/*
-> + * flags: flags for CCW
-> + * Returns !0 on failure
-> + * Returns 0 on success
-> + */
-> +int ccw_send(struct virtio_ccw_device *vcdev, int code, void *data, int count,
-> +	     unsigned char flags)
-> +{
-> +	struct ccw1 *ccw;
-> +	int ret = -1;
-> +
-> +	ccw = alloc_io_mem(sizeof(*ccw), 0);
-> +	if (!ccw)
-> +		return ret;
-> +
-> +	/* Build the CCW chain with a single CCW */
-> +	ccw->code = code;
-> +	ccw->flags = flags;
-> +	ccw->count = count;
-> +	ccw->data_address = (unsigned long)data;
-> +
-> +	ret = start_ccw1_chain(vcdev->schid, ccw);
-> +	if (!ret)
-> +		ret = wait_and_check_io_completion(vcdev->schid);
-> +
-> +	free_io_mem(ccw, sizeof(*ccw));
-> +	return ret;
-> +}
-> +
-> +int virtio_ccw_set_revision(struct virtio_ccw_device *vcdev)
-> +{
-> +	struct virtio_rev_info *rev_info;
-> +	int ret = -1;
-> +
-> +	rev_info = alloc_io_mem(sizeof(*rev_info), 0);
-> +	if (!rev_info)
-> +		return ret;
-> +
-> +	rev_info->revision = VIRTIO_CCW_REV_MAX;
-> +	rev_info->revision = 0;
-
-Either VIRTIO_CCW_REV_MAX or 0, but not both?
-
-> +	do {
-> +		ret = ccw_send(vcdev, CCW_CMD_SET_VIRTIO_REV, rev_info,
-> +			       sizeof(*rev_info), 0);
-> +	} while (ret && rev_info->revision--);
-> +
-> +	free_io_mem(rev_info, sizeof(*rev_info));
-> +
-> +	return ret ? -1 : rev_info->revision;
-> +}
-> +
-> +int virtio_ccw_reset(struct virtio_ccw_device *vcdev)
-> +{
-> +	return ccw_send(vcdev, CCW_CMD_VDEV_RESET, 0, 0, 0);
-> +}
-> +
-> +int virtio_ccw_read_status(struct virtio_ccw_device *vcdev)
-> +{
-> +	return ccw_send(vcdev, CCW_CMD_READ_STATUS, &vcdev->status,
-> +			sizeof(vcdev->status), 0);
-> +}
-> +
-> +int virtio_ccw_write_status(struct virtio_ccw_device *vcdev)
-> +{
-> +	return ccw_send(vcdev, CCW_CMD_WRITE_STATUS, &vcdev->status,
-> +			sizeof(vcdev->status), 0);
-> +}
-> +
-> +int virtio_ccw_read_features(struct virtio_ccw_device *vcdev, uint64_t *features)
-> +{
-> +	struct virtio_feature_desc *f_desc = &vcdev->f_desc;
-> +
-> +	f_desc->index = 0;
-> +	if (ccw_send(vcdev, CCW_CMD_READ_FEAT, f_desc, sizeof(*f_desc), 0))
-> +		return -1;
-> +	*features = swap32(f_desc->features);
-> +
-> +	f_desc->index = 1;
-> +	if (ccw_send(vcdev, CCW_CMD_READ_FEAT, f_desc, sizeof(*f_desc), 0))
-> +		return -1;
-> +	*features |= (uint64_t)swap32(f_desc->features) << 32;
-
-Weren't the upper feature bits only available for modern virtio anyway?
-
-> +	return 0;
-> +}
-> +
-> +int virtio_ccw_write_features(struct virtio_ccw_device *vcdev, uint64_t features)
-> +{
-> +	struct virtio_feature_desc *f_desc = &vcdev->f_desc;
-> +
-> +	f_desc->index = 0;
-> +	f_desc->features = swap32((uint32_t)features & 0xffffffff);
-> +	if (ccw_send(vcdev, CCW_CMD_WRITE_FEAT, &f_desc, sizeof(*f_desc), 0))
+> +	if (!vq->vq.num_free)
 > +		return -1;
 > +
-> +	f_desc->index = 1;
-> +	f_desc->features = swap32((uint32_t)(features >> 32) & 0xffffffff);
-> +	if (ccw_send(vcdev, CCW_CMD_WRITE_FEAT, &f_desc, sizeof(*f_desc), 0))
-> +		return -1;
+> +	--vq->vq.num_free;
+> +
+> +	head = vq->free_head;
+> +
+> +	vq->vring.desc[head].flags = 0;
+> +	vq->vring.desc[head].addr = virt_to_phys(buf);
+> +	vq->vring.desc[head].len = len;
+> +
+> +	vq->free_head = vq->vring.desc[head].next;
+> +
+> +	vq->data[head] = buf;
+> +
+> +	avail = (vq->vring.avail->idx & (vq->vring.num - 1));
+> +	vq->vring.avail->ring[avail] = head;
+> +	wmb();	/* be sure to update the ring before updating the idx */
+> +	vq->vring.avail->idx++;
+> +	vq->num_added++;
 > +
 > +	return 0;
 > +}
-> +
-> +int virtio_ccw_read_config(struct virtio_ccw_device *vcdev)
-> +{
-> +	return ccw_send(vcdev, CCW_CMD_READ_CONF, &vcdev->config,
-> +			sizeof(vcdev->config), 0);
-> +}
-> +
-> +int virtio_ccw_write_config(struct virtio_ccw_device *vcdev)
-> +{
-> +	return ccw_send(vcdev, CCW_CMD_WRITE_CONF, &vcdev->config,
-> +			sizeof(vcdev->config), 0);
-> +}
-> +
-> +int virtio_ccw_setup_indicators(struct virtio_ccw_device *vcdev)
-> +{
-> +	vcdev->ind = alloc_io_mem(sizeof(PAGE_SIZE), 0);
-> +	if (ccw_send(vcdev, CCW_CMD_SET_IND, &vcdev->ind,
-> +		     sizeof(vcdev->ind), 0))
-> +		return -1;
-> +
-> +	vcdev->conf_ind = alloc_io_mem(PAGE_SIZE, 0);
-> +	if (ccw_send(vcdev, CCW_CMD_SET_CONF_IND, &vcdev->conf_ind,
-> +		     sizeof(vcdev->conf_ind), 0))
-> +		return -1;
-> +
-> +	return 0;
-> +}
-> +
-> +static uint64_t virtio_ccw_notify_host(int schid, int queue, uint64_t cookie)
-> +{
-> +	register unsigned long nr asm("1") = 0x03;
-> +	register unsigned long s asm("2") = schid;
-> +	register unsigned long q asm("3") = queue;
-> +	register long rc asm("2");
+>  int virtqueue_add_outbuf(struct virtqueue *_vq, char *buf, unsigned int len)
+>  {
+>  	struct vring_virtqueue *vq = to_vvq(_vq);
+> diff --git a/lib/virtio.h b/lib/virtio.h
+> index 2c31fdc7..44b727f8 100644
+> --- a/lib/virtio.h
+> +++ b/lib/virtio.h
+> @@ -141,6 +141,8 @@ extern void vring_init_virtqueue(struct vring_virtqueue *vq, unsigned index,
+>  				 const char *name);
+>  extern int virtqueue_add_outbuf(struct virtqueue *vq, char *buf,
+>  				unsigned int len);
+> +extern int virtqueue_add_inbuf(struct virtqueue *vq, char *buf,
+> +			       unsigned int len);
+>  extern bool virtqueue_kick(struct virtqueue *vq);
+>  extern void detach_buf(struct vring_virtqueue *vq, unsigned head);
+>  extern void *virtqueue_get_buf(struct virtqueue *_vq, unsigned int *len);
+> -- 
+> 2.25.1
+>
 
-Using asm("2") for two variables looks somewhat weird ... but ok, as long as 
-it works... (otherwise you could also use only one variable and mark it as 
-input + output parameter below).
-
-> +	register long c asm("4") = cookie;
-> +
-> +	asm volatile ("diag 2,4,0x500\n"
-> +			: "=d" (rc)
-> +			: "d" (nr), "d" (s), "d" (q), "d"(c)
-> +			: "memory", "cc");
-> +	return rc;
-> +}
-> +
-> +static bool virtio_ccw_notify(struct virtqueue *vq)
-> +{
-> +	struct virtio_ccw_device *vcdev = to_vc_device(vq->vdev);
-> +	struct virtio_ccw_vq_info *info = vq->priv;
-> +
-> +	info->cookie = virtio_ccw_notify_host(vcdev->schid, vq->index,
-> +					      info->cookie);
-> +	if (info->cookie < 0)
-> +		return false;
-> +	return true;
-> +}
-> +
-> +/* allocates a vring_virtqueue but returns a pointer to the
-> + * virtqueue inside of it or NULL on error.
-> + */
-> +static struct virtqueue *setup_vq(struct virtio_device *vdev, int index,
-> +				  void (*callback)(struct virtqueue *vq),
-> +				  const char *name)
-> +{
-> +	struct virtio_ccw_device *vcdev = to_vc_device(vdev);
-> +	struct virtio_ccw_vq_info *info;
-> +	struct vring_virtqueue *vq;
-> +	struct vring *vr;
-> +	void *queue;
-> +
-> +	vq = alloc_io_mem(sizeof(*vq), 0);
-> +	info = alloc_io_mem(sizeof(*info), 0);
-> +	queue = alloc_io_mem(4 * PAGE_SIZE, 0);
-> +	assert(vq && queue && info);
-> +
-> +	info->info_block = alloc_io_mem(sizeof(*info->info_block), 0);
-> +	assert(info->info_block);
-> +
-> +	vcdev->vq_conf.index = index;
-> +	if (ccw_send(vcdev, CCW_CMD_READ_VQ_CONF, &vcdev->vq_conf,
-> +		     sizeof(vcdev->vq_conf), 0))
-> +		return NULL;
-> +
-> +	vring_init_virtqueue(vq, index, vcdev->vq_conf.max_num, PAGE_SIZE, vdev,
-> +			     queue, virtio_ccw_notify, callback, name);
-> +
-> +	vr = &vq->vring;
-> +	info->info_block->s.desc = vr->desc;
-> +	info->info_block->s.index = index;
-> +	info->info_block->s.num = vr->num;
-> +	info->info_block->s.avail = vr->avail;
-> +	info->info_block->s.used = vr->used;
-> +
-> +	info->info_block->l.desc = vr->desc;
-> +	info->info_block->l.index = index;
-> +	info->info_block->l.num = vr->num;
-> +	info->info_block->l.align = PAGE_SIZE;
-> +
-> +	if (ccw_send(vcdev, CCW_CMD_SET_VQ, info->info_block,
-> +		     sizeof(info->info_block->l), 0))
-> +		return NULL;
-> +
-> +	info->vq = &vq->vq;
-> +	vq->vq.priv = info;
-> +
-> +	return &vq->vq;
-> +}
-> +
-> +static int virtio_ccw_find_vqs(struct virtio_device *vdev, unsigned int nvqs,
-> +			       struct virtqueue *vqs[], vq_callback_t *callbacks[],
-> +			       const char *names[])
-> +{
-> +	int i;
-> +
-> +	for (i = 0; i < nvqs; ++i) {
-> +		vqs[i] = setup_vq(vdev, i,
-> +				  callbacks ? callbacks[i] : NULL,
-> +				  names ? names[i] : "");
-> +		if (!vqs[i])
-> +			return -1;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static void virtio_ccw_config_get(struct virtio_device *vdev,
-> +				  unsigned int offset, void *buf,
-> +				  unsigned int len)
-> +{
-> +	struct virtio_ccw_device *vcdev = to_vc_device(vdev);
-> +
-> +	if (virtio_ccw_read_config(vcdev))
-> +		return;
-> +	memcpy(buf, vcdev->config, len);
-> +}
-> +
-> +static void virtio_ccw_config_set(struct virtio_device *vdev,
-> +				  unsigned int offset, const void *buf,
-> +				  unsigned int len)
-> +{
-> +	struct virtio_ccw_device *vcdev = to_vc_device(vdev);
-> +
-> +	memcpy(vcdev->config, buf, len);
-> +	virtio_ccw_write_config(vcdev);
-> +}
-> +
-> +static const struct virtio_config_ops virtio_ccw_ops = {
-> +	.get = virtio_ccw_config_get,
-> +	.set = virtio_ccw_config_set,
-> +	.find_vqs = virtio_ccw_find_vqs,
-> +};
-> +
-> +const struct virtio_config_ops *virtio_ccw_register(void)
-> +{
-> +	return &virtio_ccw_ops;
-> +}
-> +
-> +static int sense(struct virtio_ccw_device *vcdev)
-> +{
-> +	struct senseid *senseid;
-> +
-> +	senseid = alloc_io_mem(sizeof(*senseid), 0);
-> +	assert(senseid);
-> +
-> +	assert(!ccw_send(vcdev, CCW_CMD_SENSE_ID, senseid, sizeof(*senseid), 0));
-> +
-> +	assert(senseid->reserved == 0xff);
-> +
-> +	vcdev->cu_type = senseid->cu_type;
-> +	vcdev->cu_model = senseid->cu_model;
-> +	vcdev->dev_type = senseid->dev_type;
-> +	vcdev->dev_model = senseid->dev_model;
-> +
-> +	return 0;
-> +}
-> +
-> +static struct virtio_ccw_device *find_vcdev_by_devid(int devid)
-> +{
-> +	struct virtio_ccw_device *dev;
-> +	struct linked_list *l;
-> +
-> +	for (l = vcdev_list.next; l != &vcdev_list; l = l->next) {
-> +		dev = container_of(l, struct virtio_ccw_device, list);
-> +		if (dev->cu_model == devid)
-> +			return dev;
-> +	}
-> +	return NULL;
-> +}
-> +
-> +struct virtio_device *virtio_bind(u32 devid)
-> +{
-> +	struct virtio_ccw_device *vcdev;
-> +
-> +	vcdev = find_vcdev_by_devid(devid);
-> +
-> +	return &vcdev->vdev;
-> +}
-> +
-> +static int virtio_enumerate(int schid)
-> +{
-> +	struct virtio_ccw_device *vcdev;
-> +
-> +	vcdev = alloc_io_mem(sizeof(*vcdev), 0);
-> +	assert(vcdev);
-> +	vcdev->schid = schid;
-> +
-> +	list_add(&vcdev_list, &vcdev->list);
-> +
-> +	assert(css_enable(schid, IO_SCH_ISC) == 0);
-> +	sense(vcdev);
-> +
-> +	return 0;
-> +}
-> +
-> +/* Must get a param */
-
-I don't understand that comment, could you elaborate?
-
-> +bool virtio_ccw_init(void)
-> +{
-> +	return css_enumerate(virtio_enumerate) != 0;
-> +}
-
-  Thomas
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 
