@@ -2,156 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A7834444266
-	for <lists+kvm@lfdr.de>; Wed,  3 Nov 2021 14:28:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B554944427F
+	for <lists+kvm@lfdr.de>; Wed,  3 Nov 2021 14:35:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231254AbhKCNbX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Nov 2021 09:31:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25144 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230282AbhKCNbU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 3 Nov 2021 09:31:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635946123;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=vMS7oHTgkCX9bZnQFpsagj1XvoC8N4CL6QUvFHOk+a8=;
-        b=i2bIqlkLnuPVdga5hr47NSrK+LSYRSo7WMsr9Dmj85BLYoz5FbDmTjkF2uJruei6NRMlsR
-        8R0xXjvpvNzzVPC9thkotC3Afz/cV2TzdcXFM9uEvgEPhZxLgfJNqilLXGQShlc7/Q0enn
-        cbzZwBjBaClTB6dhKC229uHcEq/RTZ4=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-591-ta2XxH73O5a9gdR1vJp9Sw-1; Wed, 03 Nov 2021 09:28:42 -0400
-X-MC-Unique: ta2XxH73O5a9gdR1vJp9Sw-1
-Received: by mail-wm1-f70.google.com with SMTP id 144-20020a1c0496000000b003305ac0e03aso2748396wme.8
-        for <kvm@vger.kernel.org>; Wed, 03 Nov 2021 06:28:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=vMS7oHTgkCX9bZnQFpsagj1XvoC8N4CL6QUvFHOk+a8=;
-        b=jpu4ANSKrnaFhbI8hZ72EZRUdbcWgzFSJoHFRjCKLjckd6JkH5UCuPgakIwL0ZjT3U
-         Ijzeg6T9asyalVSQBlX/xLSNSSRaDCx60qU/PgMzjkw5wkt2z6s27gCVpHYGBrwWbnzs
-         a4Ct1jFz9zGeBEJW3hYbzXP6nqeBCZgRYeInbkdu/JSr44807ap4gaweERz3/PAEjkgQ
-         f5/UsLz1W/iH9aUxrCSxQzZmoUMRyNVfaozJV5oGgSZ9BEBbOfCm8sQ//q070DXVsvVH
-         eyS34CMG+law9dIkFd6WYF0sO4jQKmPxt59/Lypl7ofdcEb+pgS0hSTFndFO1Httql5j
-         ElGw==
-X-Gm-Message-State: AOAM530wKMtIv6ETW/5PGa2KwK1VWdQOmP2vIdDtuyAJGJUwR8bkOrBs
-        L/71ZmJOxXNVYBW3k8etdWu2yR5WANjLwKGvrwWuaRnwueTYZeteLWpK4cifrIGcc7gLw+b9hP4
-        LYLPcPsDvHLnk
-X-Received: by 2002:a5d:604b:: with SMTP id j11mr33657974wrt.22.1635946121421;
-        Wed, 03 Nov 2021 06:28:41 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzJRal0gtOcYhkrlX+fWSK/Zij8Wr/Lzf7bKrSPyKYcdDmszMmp1xspWaMgtBwrJ5oXebJcsw==
-X-Received: by 2002:a5d:604b:: with SMTP id j11mr33657952wrt.22.1635946121250;
-        Wed, 03 Nov 2021 06:28:41 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id y7sm1917658wrw.55.2021.11.03.06.28.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Nov 2021 06:28:40 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
-        <linux-kernel@vger.kernel.org>, Borislav Petkov <bp@alien8.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Subject: Re: [PATCH v2] KVM: x86: inhibit APICv when KVM_GUESTDBG_BLOCKIRQ
- active
-In-Reply-To: <20211103094255.426573-1-mlevitsk@redhat.com>
-References: <20211103094255.426573-1-mlevitsk@redhat.com>
-Date:   Wed, 03 Nov 2021 14:28:39 +0100
-Message-ID: <871r3xnzaw.fsf@vitty.brq.redhat.com>
+        id S231721AbhKCNhw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Nov 2021 09:37:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45764 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230472AbhKCNhu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Nov 2021 09:37:50 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DC0BC061714
+        for <kvm@vger.kernel.org>; Wed,  3 Nov 2021 06:35:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
+        MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:Sender
+        :Reply-To:Content-ID:Content-Description;
+        bh=0LJucAAQBaYhgg/JrWDw3M4plEjCPiEzxYgionHmQd4=; b=eA4MkdXM8WrernEH/++rGeF8tT
+        8nctCOmSal/2WavHlhzq3OLWBCnFmiTriJQ7sTUuMn8YIxA6MkLqlZH9f4uJDlxGvnf60TVYBRRi4
+        DmbonWX8mIldRH3x4Zmgx4qgiUWhZR3vyh9mUz4KRVkQWq1h6t55s8c3KknYTXAHuTex+663hnqsn
+        06Inl53pwi2KOi+sHDjxaXcbUVoqCqIJL2q5JNu7r41tpph2kRWWxwMF3lvphyNNLGnLuiMozjvCb
+        oQFlKIM3CWd302t68PbSYtQbxdPnuBHg46ACHsq2Xtr/kEhty65bNWSLfOU60hDpLLha7MOVzMQs7
+        xVKm8CGg==;
+Received: from [213.205.240.92] (helo=[127.0.0.1])
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1miGOw-005E3L-23; Wed, 03 Nov 2021 13:34:17 +0000
+Date:   Wed, 03 Nov 2021 13:34:00 +0000
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>
+CC:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "mtosatti@redhat.com" <mtosatti@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>, karahmed@amazon.com
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v2=5D_KVM=3A_x86=3A_Fix_recording?= =?US-ASCII?Q?_of_guest_steal_time_/_preempted_status?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <69495972-c3b8-cad2-40d9-5044d2837043@redhat.com>
+References: <5d4002373c3ae614cb87b72ba5b7cdc161a0cd46.camel@infradead.org> <4369bbef7f0c2b239da419c917f9a9f2ca6a76f1.camel@infradead.org> <624bc910-1bec-e6dd-b09a-f86dc6cdbef0@redhat.com> <0372987a52b5f43963721b517664830e7e6f1818.camel@infradead.org> <1f326c33-3acf-911a-d1ef-c72f0a570761@redhat.com> <E4C6E3D6-E789-4F0A-99F7-554A0F852873@infradead.org> <e05809f3-46fa-8fdf-642d-66821465456e@redhat.com> <0FC7C414-418D-4EFC-93C3-BBB42176CB41@infradead.org> <69495972-c3b8-cad2-40d9-5044d2837043@redhat.com>
+Message-ID: <5EAEBFDC-2DA6-480B-BB79-AE9813A0FCF9@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Maxim Levitsky <mlevitsk@redhat.com> writes:
 
-> KVM_GUESTDBG_BLOCKIRQ relies on interrupts being injected using
-> standard kvm's inject_pending_event, and not via APICv/AVIC.
+
+On 3 November 2021 13:05:11 GMT, Paolo Bonzini <pbonzini@redhat=2Ecom> wro=
+te:
+>On 11/3/21 13:56, David Woodhouse wrote:
+>>> No need to resubmit, thanks!  I'll review the code later and
+>>> decide whether to include this in 5=2E16 or go for the "good"
+>>> solution in 5=2E16 and submit this one for 5=2E15 only=2E
+>> I would call this the good solution for steal time=2E We really do
+>> always have a userspace HVA for that when it matters, and we should
+>> use it=2E
+>>=20
+>> For Xen event channel delivery we have to do it from hardware
+>> interrupts under arbitrary current->mm and we need a kernel mapping,
+>> and we need the MMU notifiers and all that stuff=2E But for every
+>> mapping we do that way, we need extra checks in the MMU notifiers=2E
+>>=20
+>> For steal time there's just no need=2E
 >
-> Since this is a debug feature, just inhibit it while it
-> is in use.
+>Yes, but doing things by hand that it is slightly harder to get right,=20
+>between the asm and the manual user_access_{begin,end}=2E
+
+Right=2E When I embarked on this I had a fantasy that I could just use the=
+ futex asm helpers which do most of it for us=2E But it didn't turn out tha=
+t way=2E On the other hand, it's only needed for the *atomic* accesses (xch=
+g, bit set) and most of the time we can just use normal uaccess stuff (and =
+remember to mark the gfn dirty!)
+
+>The good solution would be to handle the remapping of _all_ gfn-to-pfn=20
+>caches from the MMU notifiers, so that you can still do map/unmap, keep=
+=20
+>the code simple, and get for free the KVM-specific details such as=20
+>marking the gfn as dirty=2E
 >
-> Fixes: 61e5f69ef0837 ("KVM: x86: implement KVM_GUESTDBG_BLOCKIRQ")
->
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->  arch/x86/include/asm/kvm_host.h | 1 +
->  arch/x86/kvm/svm/avic.c         | 3 ++-
->  arch/x86/kvm/vmx/vmx.c          | 3 ++-
->  arch/x86/kvm/x86.c              | 3 +++
->  4 files changed, 8 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 88fce6ab4bbd7..8f6e15b95a4d8 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1034,6 +1034,7 @@ struct kvm_x86_msr_filter {
->  #define APICV_INHIBIT_REASON_IRQWIN     3
->  #define APICV_INHIBIT_REASON_PIT_REINJ  4
->  #define APICV_INHIBIT_REASON_X2APIC	5
-> +#define APICV_INHIBIT_REASON_BLOCKIRQ	6
->  
->  struct kvm_arch {
->  	unsigned long n_used_mmu_pages;
-> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> index 8052d92069e01..affc0ea98d302 100644
-> --- a/arch/x86/kvm/svm/avic.c
-> +++ b/arch/x86/kvm/svm/avic.c
-> @@ -904,7 +904,8 @@ bool svm_check_apicv_inhibit_reasons(ulong bit)
->  			  BIT(APICV_INHIBIT_REASON_NESTED) |
->  			  BIT(APICV_INHIBIT_REASON_IRQWIN) |
->  			  BIT(APICV_INHIBIT_REASON_PIT_REINJ) |
-> -			  BIT(APICV_INHIBIT_REASON_X2APIC);
-> +			  BIT(APICV_INHIBIT_REASON_X2APIC) |
-> +			  BIT(APICV_INHIBIT_REASON_BLOCKIRQ);
->  
->  	return supported & BIT(bit);
->  }
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 71f54d85f104c..e4fc9ff7cd944 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -7565,7 +7565,8 @@ static void hardware_unsetup(void)
->  static bool vmx_check_apicv_inhibit_reasons(ulong bit)
->  {
->  	ulong supported = BIT(APICV_INHIBIT_REASON_DISABLE) |
-> -			  BIT(APICV_INHIBIT_REASON_HYPERV);
-> +			  BIT(APICV_INHIBIT_REASON_HYPERV) |
-> +			  BIT(APICV_INHIBIT_REASON_BLOCKIRQ);
->  
->  	return supported & BIT(bit);
->  }
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index ac83d873d65b0..dccf927baa4dd 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -10747,6 +10747,9 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
->  	if (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP)
->  		vcpu->arch.singlestep_rip = kvm_get_linear_rip(vcpu);
->  
-> +	kvm_request_apicv_update(vcpu->kvm,
-> +				 !(vcpu->guest_debug & KVM_GUESTDBG_BLOCKIRQ),
-> +				 APICV_INHIBIT_REASON_BLOCKIRQ);
->  	/*
->  	 * Trigger an rflags update that will inject or remove the trace
->  	 * flags.
+>When I was working on it before, I got stuck with wanting to do it not=20
+>just good but perfect, including the eVMCS page in it=2E  But that makes=
+=20
+>no sense because really all that needs to be fixed is the _current_=20
+>users of the gfn-to-pfn cache=2E
 
-This fixes the problem for me!
+Yeah=2E
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Well, let's take a look at how I've done it for the Xen event channel deli=
+very, in particular the rwlock that has to be held *while* doing the access=
+ via the mapped kernel address=2E Then we can ponder whether we want to off=
+er something along those lines as a generic facility=2E
 
--- 
-Vitaly
-
+--=20
+Sent from my Android device with K-9 Mail=2E Please excuse my brevity=2E
