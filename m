@@ -2,140 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 10DEE443DD5
-	for <lists+kvm@lfdr.de>; Wed,  3 Nov 2021 08:51:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4585E443DE1
+	for <lists+kvm@lfdr.de>; Wed,  3 Nov 2021 08:56:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230352AbhKCHyO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Nov 2021 03:54:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22592 "EHLO
+        id S231151AbhKCH7U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Nov 2021 03:59:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37678 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230046AbhKCHyN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 3 Nov 2021 03:54:13 -0400
+        by vger.kernel.org with ESMTP id S229504AbhKCH7T (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 3 Nov 2021 03:59:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635925896;
+        s=mimecast20190719; t=1635926203;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=MQYcpSLYl/L8fCHyaW/oJA2kKY80+E8YAyZQVJ3eeDQ=;
-        b=fkO33P6Lri4Ccu/f72cKIFFG4gGXQ1ecOEWu+OBmIEdE3WL/TmWmO7tTWdlSySSf91ehW7
-        GhBAU6LbRBxcOWk/9vw960LFcCIJxSJm196DVPpPA56VJbLjEMMx/9a+bOtdZOfm+ELp+D
-        uCAkYZLLIiVf+hGr0h7ytmOGEcjMp9E=
+        bh=LssBQDxynhbfvzN5x2P4avrYJEkv+IZ5dgH9H1mj5ic=;
+        b=ETqKy4GoA77rA61R2Tx/0W+ID+IAI1cSg998vgHSv9Y/J0tGPm24komI2EBYcajUg5d7g1
+        XXFsZh6jXMkmHPLyMvpLGYW6v5du1ovgtQpAMMDR2Jxn0QKQgSzHGQcR+g66GXK8EVsEQO
+        zdjFr0x1EKJXwQoqcWq0D6qlxLAzPUc=
 Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
  [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-206-wQwubtqYMDmApFv6wYCtwg-1; Wed, 03 Nov 2021 03:51:34 -0400
-X-MC-Unique: wQwubtqYMDmApFv6wYCtwg-1
-Received: by mail-ed1-f70.google.com with SMTP id u10-20020a50d94a000000b003dc51565894so1633690edj.21
-        for <kvm@vger.kernel.org>; Wed, 03 Nov 2021 00:51:34 -0700 (PDT)
+ us-mta-529-1u5_E8vVNTKGRRvOSUrZ7g-1; Wed, 03 Nov 2021 03:56:40 -0400
+X-MC-Unique: 1u5_E8vVNTKGRRvOSUrZ7g-1
+Received: by mail-ed1-f70.google.com with SMTP id y20-20020a056402359400b003e28c9bc02cso1706687edc.9
+        for <kvm@vger.kernel.org>; Wed, 03 Nov 2021 00:56:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=MQYcpSLYl/L8fCHyaW/oJA2kKY80+E8YAyZQVJ3eeDQ=;
-        b=AFZGcg3vmK9VWWEFfP/pI+xpOmdM3FNx/On+Hs5b5vcrESW1nysx9V78NQKdH+G0im
-         pQPRJIty0ctUcEkSiy3a2FPtUjPGfsxjvVXaIbLoISNc2F9AZigcse1sgvdlkVzh1QLA
-         ClaKFZnanZ+is9jo/AYyaZwBDwTAxGCqP29p1A4sNwexNI3g2PqNhfeKnb1qmF/Y4PY5
-         PnIe7GYZUrTRBf9XIed/VNGW3jGFS87miHRg06KHEuVgxU21t9BqsJhkkoG0Vck62tDL
-         0Cu5JCmE7dev8kX79IubKe4YO12BD1m/ZkGFp46jnUFK5tgal+NLAdjlRo9x0S3FDtwF
-         ZnSA==
-X-Gm-Message-State: AOAM530L5M45Rncy0zKIVio1VZIx0hUi/hsKBBdposLlLVuvj91x22b7
-        0uJ4VGE3MZG1gi76IAuM1rlBBItgchXNfN4i8b+T3siNdu2h2/wQ83opyZXrVigCGg8VwHBaSE+
-        +W0qhc+bCom/G
-X-Received: by 2002:aa7:ccc1:: with SMTP id y1mr59241122edt.177.1635925893708;
-        Wed, 03 Nov 2021 00:51:33 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJybvc9IpzVj/HY1JPWn1plkJqxVT+7kp08NozGqfvvrM/pJwLmhn9CuIRwh0g+9ZALKaUFfBg==
-X-Received: by 2002:aa7:ccc1:: with SMTP id y1mr59241099edt.177.1635925893529;
-        Wed, 03 Nov 2021 00:51:33 -0700 (PDT)
+        bh=LssBQDxynhbfvzN5x2P4avrYJEkv+IZ5dgH9H1mj5ic=;
+        b=oBcRzn/MQ5PeRs0xgs89XXbh9pvg1Y9AGQmLxONXBNwF2mtGlXR6LIfelnJYyTJQSk
+         8/diRqyXIOGWS0iUNuQ7CaJ8Ho6WT4YCaoMXJ0uYJll3RveYkUPWB3WqAqVYzT1SI5mj
+         kdiorZubRsohfAUr1XxDBqcYWfOPsj8mLncVUTepmE2fBVxeON6S0Fy+sPH+rfBZjx+6
+         i9qKZZ9/+Dw92dkOu/PwduZt5DLR3t1fpTmLsCfcQXEjKLe2AaB6j3dcPld/yO/85ITD
+         QZ/mQqqGpuCtSeH+IdPP/3o1WOpEYGDbMX+4xSXqRfpYSu03rdAMqWSkqcbN7hII/Ga9
+         PsBg==
+X-Gm-Message-State: AOAM533i5ObqUEoFO+jO9UtvgPGo9cP7ECRfFmCsIE07q9r9a3U3Plhc
+        T1bUjP36Zb98uqP/DmtOhTxH0SU4PktRNVc2RaXm4fijkO2710fiobwKDJkkFI8xkVhqwbV82PN
+        RSQX7KMjUQ2gB
+X-Received: by 2002:a05:6402:268f:: with SMTP id w15mr58484103edd.13.1635926199313;
+        Wed, 03 Nov 2021 00:56:39 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyl7lokiag5d7It+1k8Y/b4V9d9Bqx6swfrlwcRLGow9Lf8oQBEp3ugQdglmefjVqgI3FP9sQ==
+X-Received: by 2002:a05:6402:268f:: with SMTP id w15mr58484090edd.13.1635926199205;
+        Wed, 03 Nov 2021 00:56:39 -0700 (PDT)
 Received: from gator.home (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
-        by smtp.gmail.com with ESMTPSA id o9sm698325ejy.8.2021.11.03.00.51.32
+        by smtp.gmail.com with ESMTPSA id gv34sm680460ejc.104.2021.11.03.00.56.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Nov 2021 00:51:33 -0700 (PDT)
-Date:   Wed, 3 Nov 2021 08:51:31 +0100
+        Wed, 03 Nov 2021 00:56:38 -0700 (PDT)
+Date:   Wed, 3 Nov 2021 08:56:36 +0100
 From:   Andrew Jones <drjones@redhat.com>
 To:     Pierre Morel <pmorel@linux.ibm.com>
 Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
         thuth@redhat.com, cohuck@redhat.com, imbrenda@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH 5/7] virtio: implement the
- virtio_add_inbuf routine
-Message-ID: <20211103075131.xgnysvcfbal2r6z4@gator.home>
+Subject: Re: [kvm-unit-tests PATCH 6/7] s390x: virtio tests setup
+Message-ID: <20211103075636.hgxckmxs62bsdrha@gator.home>
 References: <1630059440-15586-1-git-send-email-pmorel@linux.ibm.com>
- <1630059440-15586-6-git-send-email-pmorel@linux.ibm.com>
+ <1630059440-15586-7-git-send-email-pmorel@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1630059440-15586-6-git-send-email-pmorel@linux.ibm.com>
+In-Reply-To: <1630059440-15586-7-git-send-email-pmorel@linux.ibm.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Aug 27, 2021 at 12:17:18PM +0200, Pierre Morel wrote:
-> To communicate in both directions with a VIRTIO device we need
-> to add the incoming communication to the VIRTIO level.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->  lib/virtio.c | 32 ++++++++++++++++++++++++++++++++
->  lib/virtio.h |  2 ++
->  2 files changed, 34 insertions(+)
-> 
-> diff --git a/lib/virtio.c b/lib/virtio.c
-> index e10153b9..b84bc680 100644
-> --- a/lib/virtio.c
-> +++ b/lib/virtio.c
-> @@ -47,6 +47,38 @@ void vring_init_virtqueue(struct vring_virtqueue *vq, unsigned index,
->  	vq->data[i] = NULL;
->  }
->  
-> +int virtqueue_add_inbuf(struct virtqueue *_vq, char *buf, unsigned int len)
-> +{
-> +	struct vring_virtqueue *vq = to_vvq(_vq);
-> +	unsigned int avail;
-> +	int head;
+On Fri, Aug 27, 2021 at 12:17:19PM +0200, Pierre Morel wrote:
 > +
-> +	assert(buf);
-> +	assert(len);
-> +
-> +	if (!vq->vq.num_free)
-> +		return -1;
-> +
-> +	--vq->vq.num_free;
-> +
-> +	head = vq->free_head;
-> +
-> +	vq->vring.desc[head].flags = 0;
-> +	vq->vring.desc[head].addr = virt_to_phys(buf);
-> +	vq->vring.desc[head].len = len;
-> +
-> +	vq->free_head = vq->vring.desc[head].next;
-> +
-> +	vq->data[head] = buf;
-> +
-> +	avail = (vq->vring.avail->idx & (vq->vring.num - 1));
-> +	vq->vring.avail->ring[avail] = head;
-> +	wmb();	/* be sure to update the ring before updating the idx */
-> +	vq->vring.avail->idx++;
-> +	vq->num_added++;
-> +
-> +	return 0;
-> +}
->  int virtqueue_add_outbuf(struct virtqueue *_vq, char *buf, unsigned int len)
->  {
->  	struct vring_virtqueue *vq = to_vvq(_vq);
-> diff --git a/lib/virtio.h b/lib/virtio.h
-> index 2c31fdc7..44b727f8 100644
-> --- a/lib/virtio.h
-> +++ b/lib/virtio.h
-> @@ -141,6 +141,8 @@ extern void vring_init_virtqueue(struct vring_virtqueue *vq, unsigned index,
->  				 const char *name);
->  extern int virtqueue_add_outbuf(struct virtqueue *vq, char *buf,
->  				unsigned int len);
-> +extern int virtqueue_add_inbuf(struct virtqueue *vq, char *buf,
-> +			       unsigned int len);
->  extern bool virtqueue_kick(struct virtqueue *vq);
->  extern void detach_buf(struct vring_virtqueue *vq, unsigned head);
->  extern void *virtqueue_get_buf(struct virtqueue *_vq, unsigned int *len);
-> -- 
-> 2.25.1
->
+> +#define VIRTIO_ID_PONG         30 /* virtio pong */
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+I take it this is a virtio test device that ping-pong's I/O. It sounds
+useful for other VIRTIO transports too. Can it be ported? Hmm, I can't
+find it in QEMU at all?
+
+Thanks,
+drew
 
