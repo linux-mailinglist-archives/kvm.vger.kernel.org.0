@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A73C4440DF
-	for <lists+kvm@lfdr.de>; Wed,  3 Nov 2021 12:53:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C50384440DE
+	for <lists+kvm@lfdr.de>; Wed,  3 Nov 2021 12:53:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232202AbhKCL42 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Nov 2021 07:56:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:59235 "EHLO
+        id S232011AbhKCL4Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Nov 2021 07:56:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:48201 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232033AbhKCL4Q (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 3 Nov 2021 07:56:16 -0400
+        by vger.kernel.org with ESMTP id S232098AbhKCL4T (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 3 Nov 2021 07:56:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635940419;
+        s=mimecast20190719; t=1635940422;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=cMRcAwfrUTUzjur/Cy5j57aorJS9O9vaCqDkzCUe56o=;
-        b=QfVxZ1789VMHpoNqLIs5O+hbXpwFhNk7Pqtw9KwICUTjI/k2XZW9RVCPlATup5aYnAd26R
-        OIiA0tnjN9DeTiY3fFcj93DnG1rAIe1biDOZJMS3DnqiOCgk/u9wjVQJWwxX69FjIpGy+h
-        47c2WT0AIFiu3HpbCPo8Pie7oAxikME=
+        bh=0jYCz14ecfJDHsUTqayK+KtW2G5KFbt6WEraS6u7RHk=;
+        b=EoYW0zFo8yCBczkd9mgVO77gS5VxpGRERPAEV1i5Cl1UpDXVpgiwpO57drGuSHfiAq/WNT
+        Y9+4amFsVukwobPFP9uw3V8NW2O1QxypZYKcEfFJUUFgLgp4P50nFBGtiHZ5XbhN5YuGJW
+        oUkMyh0kWpTHK11fYoT4q6i28S4d+aM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-464-TbN52wlVOp2OYSZKcLEUVQ-1; Wed, 03 Nov 2021 07:53:36 -0400
-X-MC-Unique: TbN52wlVOp2OYSZKcLEUVQ-1
+ us-mta-378-ZfB1fWS6Mye9GuQa0PXNLw-1; Wed, 03 Nov 2021 07:53:37 -0400
+X-MC-Unique: ZfB1fWS6Mye9GuQa0PXNLw-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED6898066EB;
-        Wed,  3 Nov 2021 11:53:34 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 28788874994;
+        Wed,  3 Nov 2021 11:53:36 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DCF58196E2;
-        Wed,  3 Nov 2021 11:53:33 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1394C19741;
+        Wed,  3 Nov 2021 11:53:35 +0000 (UTC)
 From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -47,9 +47,9 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
         linux-kernel@vger.kernel.org,
         Emanuele Giuseppe Esposito <eesposit@redhat.com>
-Subject: [PATCH v4 6/7] nSVM: introduce struct vmcb_ctrl_area_cached
-Date:   Wed,  3 Nov 2021 07:52:29 -0400
-Message-Id: <20211103115230.720154-7-eesposit@redhat.com>
+Subject: [PATCH v4 7/7] nSVM: use vmcb_ctrl_area_cached instead of vmcb_control_area in struct svm_nested_state
+Date:   Wed,  3 Nov 2021 07:52:30 -0400
+Message-Id: <20211103115230.720154-8-eesposit@redhat.com>
 In-Reply-To: <20211103115230.720154-1-eesposit@redhat.com>
 References: <20211103115230.720154-1-eesposit@redhat.com>
 MIME-Version: 1.0
@@ -59,118 +59,239 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This structure will replace vmcb_control_area in
-svm_nested_state, providing only the fields that are actually
-used by the nested state. This avoids having and copying around
-uninitialized fields. The cost of this, however, is that all
-functions (in this case vmcb_is_intercept) expect the old
-structure, so they need to be duplicated.
+This requires changing all vmcb_is_intercept(&svm->nested.ctl, ...)
+calls with vmcb12_is_intercept().
 
-Introduce also nested_copy_vmcb_cache_to_control(), useful to copy
-vmcb_ctrl_area_cached fields in vmcb_control_area. This will
-be used in the next patch.
+In addition, in svm_get_nested_state() user space expects a
+vmcb_control_area struct, so we need to copy back all fields
+in a temporary structure to provide to the user space.
 
 Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/x86/kvm/svm/nested.c | 34 ++++++++++++++++++++++++++++++++++
- arch/x86/kvm/svm/svm.h    | 31 +++++++++++++++++++++++++++++++
- 2 files changed, 65 insertions(+)
+ arch/x86/kvm/svm/nested.c | 48 +++++++++++++++++++++++++--------------
+ arch/x86/kvm/svm/svm.c    |  4 ++--
+ arch/x86/kvm/svm/svm.h    |  8 +++----
+ 3 files changed, 37 insertions(+), 23 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 1b60e6818836..7895ddf176ed 100644
+index 7895ddf176ed..27d0871de854 100644
 --- a/arch/x86/kvm/svm/nested.c
 +++ b/arch/x86/kvm/svm/nested.c
-@@ -1229,6 +1229,40 @@ int nested_svm_exit_special(struct vcpu_svm *svm)
- 	return NESTED_EXIT_CONTINUE;
+@@ -58,8 +58,9 @@ static void svm_inject_page_fault_nested(struct kvm_vcpu *vcpu, struct x86_excep
+        struct vcpu_svm *svm = to_svm(vcpu);
+        WARN_ON(!is_guest_mode(vcpu));
+ 
+-       if (vmcb_is_intercept(&svm->nested.ctl, INTERCEPT_EXCEPTION_OFFSET + PF_VECTOR) &&
+-	   !svm->nested.nested_run_pending) {
++	if (vmcb12_is_intercept(&svm->nested.ctl,
++				INTERCEPT_EXCEPTION_OFFSET + PF_VECTOR) &&
++	    !svm->nested.nested_run_pending) {
+                svm->vmcb->control.exit_code = SVM_EXIT_EXCP_BASE + PF_VECTOR;
+                svm->vmcb->control.exit_code_hi = 0;
+                svm->vmcb->control.exit_info_1 = fault->error_code;
+@@ -121,7 +122,8 @@ static void nested_svm_uninit_mmu_context(struct kvm_vcpu *vcpu)
+ 
+ void recalc_intercepts(struct vcpu_svm *svm)
+ {
+-	struct vmcb_control_area *c, *h, *g;
++	struct vmcb_control_area *c, *h;
++	struct vmcb_ctrl_area_cached *g;
+ 	unsigned int i;
+ 
+ 	vmcb_mark_dirty(svm->vmcb, VMCB_INTERCEPTS);
+@@ -172,7 +174,7 @@ static bool nested_svm_vmrun_msrpm(struct vcpu_svm *svm)
+ 	 */
+ 	int i;
+ 
+-	if (!(vmcb_is_intercept(&svm->nested.ctl, INTERCEPT_MSR_PROT)))
++	if (!(vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_MSR_PROT)))
+ 		return true;
+ 
+ 	for (i = 0; i < MSRPM_OFFSETS; i++) {
+@@ -208,9 +210,9 @@ static bool nested_svm_check_bitmap_pa(struct kvm_vcpu *vcpu, u64 pa, u32 size)
  }
  
-+/* Inverse operation of nested_copy_vmcb_control_to_cache(). asid is copied too. */
-+static void nested_copy_vmcb_cache_to_control(struct vmcb_control_area *dst,
-+					      struct vmcb_ctrl_area_cached *from)
-+{
-+	unsigned int i;
-+
-+	memset(dst, 0, sizeof(struct vmcb_control_area));
-+
-+	for (i = 0; i < MAX_INTERCEPT; i++)
-+		dst->intercepts[i] = from->intercepts[i];
-+
-+	dst->iopm_base_pa         = from->iopm_base_pa;
-+	dst->msrpm_base_pa        = from->msrpm_base_pa;
-+	dst->tsc_offset           = from->tsc_offset;
-+	dst->asid                 = from->asid;
-+	dst->tlb_ctl              = from->tlb_ctl;
-+	dst->int_ctl              = from->int_ctl;
-+	dst->int_vector           = from->int_vector;
-+	dst->int_state            = from->int_state;
-+	dst->exit_code            = from->exit_code;
-+	dst->exit_code_hi         = from->exit_code_hi;
-+	dst->exit_info_1          = from->exit_info_1;
-+	dst->exit_info_2          = from->exit_info_2;
-+	dst->exit_int_info        = from->exit_int_info;
-+	dst->exit_int_info_err    = from->exit_int_info_err;
-+	dst->nested_ctl           = from->nested_ctl;
-+	dst->event_inj            = from->event_inj;
-+	dst->event_inj_err        = from->event_inj_err;
-+	dst->nested_cr3           = from->nested_cr3;
-+	dst->virt_ext              = from->virt_ext;
-+	dst->pause_filter_count   = from->pause_filter_count;
-+	dst->pause_filter_thresh  = from->pause_filter_thresh;
-+}
-+
- static int svm_get_nested_state(struct kvm_vcpu *vcpu,
- 				struct kvm_nested_state __user *user_kvm_nested_state,
+ static bool nested_vmcb_check_controls(struct kvm_vcpu *vcpu,
+-				       struct vmcb_control_area *control)
++				       struct vmcb_ctrl_area_cached *control)
+ {
+-	if (CC(!vmcb_is_intercept(control, INTERCEPT_VMRUN)))
++	if (CC(!vmcb12_is_intercept(control, INTERCEPT_VMRUN)))
+ 		return false;
+ 
+ 	if (CC(control->asid == 0))
+@@ -273,7 +275,7 @@ static bool nested_vmcb_check_save(struct kvm_vcpu *vcpu)
+ }
+ 
+ static
+-void _nested_copy_vmcb_control_to_cache(struct vmcb_control_area *to,
++void _nested_copy_vmcb_control_to_cache(struct vmcb_ctrl_area_cached *to,
+ 					struct vmcb_control_area *from)
+ {
+ 	unsigned int i;
+@@ -976,7 +978,7 @@ static int nested_svm_exit_handled_msr(struct vcpu_svm *svm)
+ 	u32 offset, msr, value;
+ 	int write, mask;
+ 
+-	if (!(vmcb_is_intercept(&svm->nested.ctl, INTERCEPT_MSR_PROT)))
++	if (!(vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_MSR_PROT)))
+ 		return NESTED_EXIT_HOST;
+ 
+ 	msr    = svm->vcpu.arch.regs[VCPU_REGS_RCX];
+@@ -1003,7 +1005,7 @@ static int nested_svm_intercept_ioio(struct vcpu_svm *svm)
+ 	u8 start_bit;
+ 	u64 gpa;
+ 
+-	if (!(vmcb_is_intercept(&svm->nested.ctl, INTERCEPT_IOIO_PROT)))
++	if (!(vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_IOIO_PROT)))
+ 		return NESTED_EXIT_HOST;
+ 
+ 	port = svm->vmcb->control.exit_info_1 >> 16;
+@@ -1034,12 +1036,12 @@ static int nested_svm_intercept(struct vcpu_svm *svm)
+ 		vmexit = nested_svm_intercept_ioio(svm);
+ 		break;
+ 	case SVM_EXIT_READ_CR0 ... SVM_EXIT_WRITE_CR8: {
+-		if (vmcb_is_intercept(&svm->nested.ctl, exit_code))
++		if (vmcb12_is_intercept(&svm->nested.ctl, exit_code))
+ 			vmexit = NESTED_EXIT_DONE;
+ 		break;
+ 	}
+ 	case SVM_EXIT_READ_DR0 ... SVM_EXIT_WRITE_DR7: {
+-		if (vmcb_is_intercept(&svm->nested.ctl, exit_code))
++		if (vmcb12_is_intercept(&svm->nested.ctl, exit_code))
+ 			vmexit = NESTED_EXIT_DONE;
+ 		break;
+ 	}
+@@ -1057,7 +1059,7 @@ static int nested_svm_intercept(struct vcpu_svm *svm)
+ 		break;
+ 	}
+ 	default: {
+-		if (vmcb_is_intercept(&svm->nested.ctl, exit_code))
++		if (vmcb12_is_intercept(&svm->nested.ctl, exit_code))
+ 			vmexit = NESTED_EXIT_DONE;
+ 	}
+ 	}
+@@ -1135,7 +1137,7 @@ static void nested_svm_inject_exception_vmexit(struct vcpu_svm *svm)
+ 
+ static inline bool nested_exit_on_init(struct vcpu_svm *svm)
+ {
+-	return vmcb_is_intercept(&svm->nested.ctl, INTERCEPT_INIT);
++	return vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_INIT);
+ }
+ 
+ static int svm_check_nested_events(struct kvm_vcpu *vcpu)
+@@ -1268,6 +1270,8 @@ static int svm_get_nested_state(struct kvm_vcpu *vcpu,
  				u32 user_data_size)
+ {
+ 	struct vcpu_svm *svm;
++	struct vmcb_control_area *ctl;
++	unsigned long r;
+ 	struct kvm_nested_state kvm_state = {
+ 		.flags = 0,
+ 		.format = KVM_STATE_NESTED_FORMAT_SVM,
+@@ -1309,9 +1313,18 @@ static int svm_get_nested_state(struct kvm_vcpu *vcpu,
+ 	 */
+ 	if (clear_user(user_vmcb, KVM_STATE_NESTED_SVM_VMCB_SIZE))
+ 		return -EFAULT;
+-	if (copy_to_user(&user_vmcb->control, &svm->nested.ctl,
+-			 sizeof(user_vmcb->control)))
++
++	ctl = kzalloc(sizeof(*ctl), GFP_KERNEL);
++	if (!ctl)
++		return -ENOMEM;
++
++	nested_copy_vmcb_cache_to_control(ctl, &svm->nested.ctl);
++	r = copy_to_user(&user_vmcb->control, ctl,
++			 sizeof(user_vmcb->control));
++	kfree(ctl);
++	if (r)
+ 		return -EFAULT;
++
+ 	if (copy_to_user(&user_vmcb->save, &svm->vmcb01.ptr->save,
+ 			 sizeof(user_vmcb->save)))
+ 		return -EFAULT;
+@@ -1329,6 +1342,7 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
+ 	struct vmcb_control_area *ctl;
+ 	struct vmcb_save_area *save;
+ 	struct vmcb_save_area_cached save_cached;
++	struct vmcb_ctrl_area_cached ctl_cached;
+ 	unsigned long cr0;
+ 	int ret;
+ 
+@@ -1381,7 +1395,8 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
+ 		goto out_free;
+ 
+ 	ret = -EINVAL;
+-	if (!nested_vmcb_check_controls(vcpu, ctl))
++	_nested_copy_vmcb_control_to_cache(&ctl_cached, ctl);
++	if (!nested_vmcb_check_controls(vcpu, &ctl_cached))
+ 		goto out_free;
+ 
+ 	/*
+@@ -1438,7 +1453,6 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
+ 	svm->nested.vmcb12_gpa = kvm_state->hdr.svm.vmcb_pa;
+ 
+ 	svm_copy_vmrun_state(&svm->vmcb01.ptr->save, save);
+-	nested_copy_vmcb_control_to_cache(svm, ctl);
+ 
+ 	svm_switch_vmcb(svm, &svm->nested.vmcb02);
+ 	nested_vmcb02_prepare_control(svm);
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 4e586ce77591..86d966802bbc 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -2440,7 +2440,7 @@ static bool check_selective_cr0_intercepted(struct kvm_vcpu *vcpu,
+ 	bool ret = false;
+ 
+ 	if (!is_guest_mode(vcpu) ||
+-	    (!(vmcb_is_intercept(&svm->nested.ctl, INTERCEPT_SELECTIVE_CR0))))
++	    (!(vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_SELECTIVE_CR0))))
+ 		return false;
+ 
+ 	cr0 &= ~SVM_CR0_SELECTIVE_MASK;
+@@ -4158,7 +4158,7 @@ static int svm_check_intercept(struct kvm_vcpu *vcpu,
+ 		    info->intercept == x86_intercept_clts)
+ 			break;
+ 
+-		if (!(vmcb_is_intercept(&svm->nested.ctl,
++		if (!(vmcb12_is_intercept(&svm->nested.ctl,
+ 					INTERCEPT_SELECTIVE_CR0)))
+ 			break;
+ 
 diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 4346f6053432..49cc502986a9 100644
+index 49cc502986a9..5d1cdf90aa55 100644
 --- a/arch/x86/kvm/svm/svm.h
 +++ b/arch/x86/kvm/svm/svm.h
-@@ -116,6 +116,31 @@ struct vmcb_save_area_cached {
- 	u64 dr6;
- };
+@@ -156,7 +156,7 @@ struct svm_nested_state {
+ 	bool nested_run_pending;
  
-+struct vmcb_ctrl_area_cached {
-+	u32 intercepts[MAX_INTERCEPT];
-+	u16 pause_filter_thresh;
-+	u16 pause_filter_count;
-+	u64 iopm_base_pa;
-+	u64 msrpm_base_pa;
-+	u64 tsc_offset;
-+	u32 asid;
-+	u8 tlb_ctl;
-+	u32 int_ctl;
-+	u32 int_vector;
-+	u32 int_state;
-+	u32 exit_code;
-+	u32 exit_code_hi;
-+	u64 exit_info_1;
-+	u64 exit_info_2;
-+	u32 exit_int_info;
-+	u32 exit_int_info_err;
-+	u64 nested_ctl;
-+	u32 event_inj;
-+	u32 event_inj_err;
-+	u64 nested_cr3;
-+	u64 virt_ext;
-+};
-+
- struct svm_nested_state {
- 	struct kvm_vmcb_info vmcb02;
- 	u64 hsave_msr;
-@@ -308,6 +333,12 @@ static inline bool vmcb_is_intercept(struct vmcb_control_area *control, u32 bit)
- 	return test_bit(bit, (unsigned long *)&control->intercepts);
+ 	/* cache for control fields of the guest */
+-	struct vmcb_control_area ctl;
++	struct vmcb_ctrl_area_cached ctl;
+ 	struct vmcb_save_area_cached save;
+ 
+ 	bool initialized;
+@@ -491,17 +491,17 @@ static inline bool nested_svm_virtualize_tpr(struct kvm_vcpu *vcpu)
+ 
+ static inline bool nested_exit_on_smi(struct vcpu_svm *svm)
+ {
+-	return vmcb_is_intercept(&svm->nested.ctl, INTERCEPT_SMI);
++	return vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_SMI);
  }
  
-+static inline bool vmcb12_is_intercept(struct vmcb_ctrl_area_cached *control, u32 bit)
-+{
-+	WARN_ON_ONCE(bit >= 32 * MAX_INTERCEPT);
-+	return test_bit(bit, (unsigned long *)&control->intercepts);
-+}
-+
- static inline void set_dr_intercepts(struct vcpu_svm *svm)
+ static inline bool nested_exit_on_intr(struct vcpu_svm *svm)
  {
- 	struct vmcb *vmcb = svm->vmcb01.ptr;
+-	return vmcb_is_intercept(&svm->nested.ctl, INTERCEPT_INTR);
++	return vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_INTR);
+ }
+ 
+ static inline bool nested_exit_on_nmi(struct vcpu_svm *svm)
+ {
+-	return vmcb_is_intercept(&svm->nested.ctl, INTERCEPT_NMI);
++	return vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_NMI);
+ }
+ 
+ int enter_svm_guest_mode(struct kvm_vcpu *vcpu,
 -- 
 2.27.0
 
