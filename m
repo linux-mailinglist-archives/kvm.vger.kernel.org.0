@@ -2,187 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9996F4444D3
-	for <lists+kvm@lfdr.de>; Wed,  3 Nov 2021 16:44:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E6EE2444541
+	for <lists+kvm@lfdr.de>; Wed,  3 Nov 2021 17:05:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231847AbhKCPqv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Nov 2021 11:46:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:47995 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229928AbhKCPqv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 3 Nov 2021 11:46:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635954254;
+        id S232727AbhKCQHt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Nov 2021 12:07:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52132 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231340AbhKCQHs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Nov 2021 12:07:48 -0400
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9626C061714;
+        Wed,  3 Nov 2021 09:05:11 -0700 (PDT)
+Received: from zn.tnic (p200300ec2f132900b6e7f8d38363ddad.dip0.t-ipconnect.de [IPv6:2003:ec:2f13:2900:b6e7:f8d3:8363:ddad])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 28F7F1EC0521;
+        Wed,  3 Nov 2021 17:05:10 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1635955510;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=tZiz8bgd2IYdJNUZ4cuGa9YeyGcuozlOPlontcI7tiE=;
-        b=QDe6SMLBD/t7dIlkpPUBoSkYKJXXpPleyONAuxSCI4S0VoVTMS6XNBoDHeoejAyY1zRlqv
-        DfMGcsyDMVX73PYccvZGLJNRSDxN9aByk54xrKKW73hhGeDeYh7B7N613bHECMVLcxyYwC
-        YNqNiHNt2b6IiYURgOA62PKyyuYHsaE=
-Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com
- [209.85.210.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-538-oUjj7OcJPZmvtGzMhxsSXA-1; Wed, 03 Nov 2021 11:44:13 -0400
-X-MC-Unique: oUjj7OcJPZmvtGzMhxsSXA-1
-Received: by mail-ot1-f69.google.com with SMTP id c12-20020a056830348c00b00558501c76d7so1635378otu.4
-        for <kvm@vger.kernel.org>; Wed, 03 Nov 2021 08:44:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=tZiz8bgd2IYdJNUZ4cuGa9YeyGcuozlOPlontcI7tiE=;
-        b=oFp9h/MCzzLZ0gCCpigK1mum2G0ZPYDzIflvROSsryvsYPtQ56ue3qWFeCz5oyJYWY
-         S29CAwlv7692vg02SUkaTX3ClYq4+XjJghXtFwc7NK5C/fZV46GbicJm4I6Lu+3kb4h/
-         aVAJQVi8YR+bEcAJ6QnbsFvWdysOAT0wtBD6hA5GRdXCNi2A5/5YRTj6mXccG19i8HdI
-         Z2zyVTEZFlscOCfrPk0vBeh+pdsINhXRc2b8A6ZxL0hJ2DwzWPe0bggbfAGqHCrLnC7p
-         2joZ4kzLUilRf0WlLSf5a28vwVDzA/slXYOXZGAlThWV3VUT+eng2O/kduW5Tx8ocZh3
-         FvcA==
-X-Gm-Message-State: AOAM533BRYxxk3U5RPiMgIL4jxEdvxxT8a383YxHPQYBHxkv5VKzXkqI
-        iblM5HjfginiKQVX33PJrqCRtLJfmWT2G1fqRhO/hpwcSMUzlPhqX7GBksBiKffMLPsMU5SU40U
-        YBgUpfe4fg/Zr
-X-Received: by 2002:a05:6808:11c6:: with SMTP id p6mr11357416oiv.158.1635954252489;
-        Wed, 03 Nov 2021 08:44:12 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwqdNIwBbBjQaA0dktrX5jxvW3JQ5HKlh4yDvBgx+shkcepd/rNrVD0/YfjSkdaBx5uxUfMqQ==
-X-Received: by 2002:a05:6808:11c6:: with SMTP id p6mr11357391oiv.158.1635954252228;
-        Wed, 03 Nov 2021 08:44:12 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id r13sm583837oot.41.2021.11.03.08.44.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Nov 2021 08:44:11 -0700 (PDT)
-Date:   Wed, 3 Nov 2021 09:44:09 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
-        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
-        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH V2 mlx5-next 12/14] vfio/mlx5: Implement vfio_pci driver
- for mlx5 devices
-Message-ID: <20211103094409.3ea180ab.alex.williamson@redhat.com>
-In-Reply-To: <20211103120955.GK2744544@nvidia.com>
-References: <20211027192345.GJ2744544@nvidia.com>
-        <20211028093035.17ecbc5d.alex.williamson@redhat.com>
-        <20211028234750.GP2744544@nvidia.com>
-        <20211029160621.46ca7b54.alex.williamson@redhat.com>
-        <20211101172506.GC2744544@nvidia.com>
-        <20211102085651.28e0203c.alex.williamson@redhat.com>
-        <20211102155420.GK2744544@nvidia.com>
-        <20211102102236.711dc6b5.alex.williamson@redhat.com>
-        <20211102163610.GG2744544@nvidia.com>
-        <20211102141547.6f1b0bb3.alex.williamson@redhat.com>
-        <20211103120955.GK2744544@nvidia.com>
-Organization: Red Hat
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=hczvJZzWas23wFyZUVNmvw9Zj8/3CUViJtfJTHijkGQ=;
+        b=WuWqnChJtaZfbIdyIaFRlTP9ebA7RI0nBVfGARrUjHnzHhhAdFqR2tPRRtiG8E7t+2syA9
+        itIB92r5S6cLtEFpG2guTyITWprCY3GkvFvecGQssemG8oGFgu2Jlb8pOLgjKUw2ria9Fd
+        51DxGVfysKW9auz+L2byXY0CXAmsoXM=
+Date:   Wed, 3 Nov 2021 17:05:04 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Joerg Roedel <joro@8bytes.org>,
+        Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, Eric Biederman <ebiederm@xmission.com>,
+        kexec@lists.infradead.org, Joerg Roedel <jroedel@suse.de>,
+        hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v2 05/12] x86/sev: Use GHCB protocol version 2 if
+ supported
+Message-ID: <YYKzMMyhI1M72YIQ@zn.tnic>
+References: <20210913155603.28383-1-joro@8bytes.org>
+ <20210913155603.28383-6-joro@8bytes.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210913155603.28383-6-joro@8bytes.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 3 Nov 2021 09:09:55 -0300
-Jason Gunthorpe <jgg@nvidia.com> wrote:
-
-> On Tue, Nov 02, 2021 at 02:15:47PM -0600, Alex Williamson wrote:
-> > On Tue, 2 Nov 2021 13:36:10 -0300
-> > Jason Gunthorpe <jgg@nvidia.com> wrote:
-> >   
-> > > On Tue, Nov 02, 2021 at 10:22:36AM -0600, Alex Williamson wrote:
-> > >   
-> > > > > > There's no point at which we can do SET_IRQS other than in the
-> > > > > > _RESUMING state.  Generally SET_IRQS ioctls are coordinated with the
-> > > > > > guest driver based on actions to the device, we can't be mucking
-> > > > > > with IRQs while the device is presumed running and already
-> > > > > > generating interrupt conditions.      
-> > > > > 
-> > > > > We need to do it in state 000
-> > > > > 
-> > > > > ie resume should go 
-> > > > > 
-> > > > >   000 -> 100 -> 000 -> 001
-> > > > > 
-> > > > > With SET_IRQS and any other fixing done during the 2nd 000, after the
-> > > > > migration data has been loaded into the device.    
-> > > > 
-> > > > Again, this is not how QEMU works today.    
-> > > 
-> > > I know, I think it is a poor choice to carve out certain changes to
-> > > the device that must be preserved across loading the migration state.
-> > >   
-> > > > > The uAPI comment does not define when to do the SET_IRQS, it seems
-> > > > > this has been missed.
-> > > > > 
-> > > > > We really should fix it, unless you feel strongly that the
-> > > > > experimental API in qemu shouldn't be changed.    
-> > > > 
-> > > > I think the QEMU implementation fills in some details of how the uAPI
-> > > > is expected to work.    
-> > > 
-> > > Well, we already know QEMU has problems, like the P2P thing. Is this a
-> > > bug, or a preferred limitation as designed?
-> > >   
-> > > > MSI/X is expected to be restored while _RESUMING based on the
-> > > > config space of the device, there is no intermediate step between
-> > > > _RESUMING and _RUNNING.  Introducing such a requirement precludes
-> > > > the option of a post-copy implementation of (_RESUMING | _RUNNING).    
-> > > 
-> > > Not precluded, a new state bit would be required to implement some
-> > > future post-copy.
-> > > 
-> > > 0000 -> 1100 -> 1000 -> 1001 -> 0001
-> > > 
-> > > Instead of overloading the meaning of RUNNING.
-> > > 
-> > > I think this is cleaner anyhow.
-> > > 
-> > > (though I don't know how we'd structure the save side to get two
-> > > bitstreams)  
-> > 
-> > The way this is supposed to work is that the device migration stream
-> > contains the device internal state.  QEMU is then responsible for
-> > restoring the external state of the device, including the DMA mappings,
-> > interrupts, and config space.  It's not possible for the migration
-> > driver to reestablish these things.  So there is a necessary division
-> > of device state between QEMU and the migration driver.
-> > 
-> > If we don't think the uAPI includes the necessary states, doesn't
-> > sufficiently define the states, and we're not following the existing
-> > QEMU implementation as the guide for the intentions of the uAPI spec,
-> > then what exactly is the proposed mlx5 migration driver implementing
-> > and why would we even considering including it at this point?  Thanks,  
+On Mon, Sep 13, 2021 at 05:55:56PM +0200, Joerg Roedel wrote:
+> From: Joerg Roedel <jroedel@suse.de>
 > 
-> The driver posting follows the undocumented behaviors of QEMU
-
-In one email I read that QEMU clearly should not be performing SET_IRQS
-while the device is _RESUMING (which it does) and we need to require an
-interim state before the device becomes _RUNNING to poke at the device
-(which QEMU doesn't do and the uAPI doesn't require), and the next I
-read that we should proceed with some useful quanta of work despite
-that we clearly don't intend to retain much of the protocol of the
-current uAPI long term...
-
-> You asked that these all be documented, evaluated and formalized as a
-> precondition to merging it.
+> Check whether the hypervisor supports GHCB version 2 and use it if
+> available.
 > 
-> So, what do you want? A critical review of the uAPI design or
-> documenting whatever behvaior is coded in qemu?
+> Signed-off-by: Joerg Roedel <jroedel@suse.de>
+> ---
+>  arch/x86/boot/compressed/sev.c | 10 ++++++++--
+>  arch/x86/include/asm/sev.h     |  4 ++--
+>  arch/x86/kernel/sev-shared.c   | 17 ++++++++++++++---
+>  3 files changed, 24 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/x86/boot/compressed/sev.c b/arch/x86/boot/compressed/sev.c
+> index 101e08c67296..7f8416f76be7 100644
+> --- a/arch/x86/boot/compressed/sev.c
+> +++ b/arch/x86/boot/compressed/sev.c
+> @@ -119,16 +119,22 @@ static enum es_result vc_read_mem(struct es_em_ctxt *ctxt,
+>  /* Include code for early handlers */
+>  #include "../../kernel/sev-shared.c"
+>  
+> +static unsigned int ghcb_protocol;
 
-Too much is in flux and we're only getting breadcrumbs of the changes
-to come.  It's becoming more evident that we're likely to sufficiently
-modify the uAPI to the point where I'd probably suggest a new "v2"
-subtype for the region.
+I guess you need to sync up with Brijesh on what to use:
 
-> A critical review suggest SET_IRQ should not happen during RESUMING,
-> but mlx5 today doesn't care either way.
+https://lore.kernel.org/r/20211008180453.462291-7-brijesh.singh@amd.com
 
-But if it can't happening during _RESUMING and once the device is
-_RUNNING it's too late, then we're demanding an interim state that is
-not required by the existing protocol.  We're redefining that existing
-operations on the device while in _RESUMING cannot occur in that device
-state.  That's more than uAPI clarification.  Thanks,
+And if ghcb_version there is __ro_after_init I think that's perfectly
+fine and doesn't need an accessor...
 
-Alex
+Thx.
 
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
