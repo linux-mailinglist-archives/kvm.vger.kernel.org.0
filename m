@@ -2,127 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F1F52443D5E
-	for <lists+kvm@lfdr.de>; Wed,  3 Nov 2021 07:41:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 22CF7443D62
+	for <lists+kvm@lfdr.de>; Wed,  3 Nov 2021 07:45:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231958AbhKCGn6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Nov 2021 02:43:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46227 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231925AbhKCGn5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 3 Nov 2021 02:43:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635921681;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ic7/Tv8dzgxGzExYMNDYxIT6r0CNDDhkoEiObvfIC2Q=;
-        b=bUQ38015/ESqg62pYX1mKmFIqXP6RRAgbBUip92zZV27zCdotYNeKxe1cFSIu2m9p565Zf
-        9859F7wseZdUOQU1l4aNLxdHFBj+NxSzc+Vm/x/eF+gS/cYOHmn19PNJlexII5yyVFjYG8
-        4O2TeoIgjKJgX4EpufsufI5jw4BUXPc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-423-zL_Ra5R7M9-kXDtHSiRHnQ-1; Wed, 03 Nov 2021 02:41:18 -0400
-X-MC-Unique: zL_Ra5R7M9-kXDtHSiRHnQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8E43918A0744;
-        Wed,  3 Nov 2021 06:41:16 +0000 (UTC)
-Received: from [10.39.192.84] (unknown [10.39.192.84])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8C67F5D9D5;
-        Wed,  3 Nov 2021 06:41:07 +0000 (UTC)
-Message-ID: <ac937fd6-9db1-6db9-0a30-a3c7e4a16f0f@redhat.com>
-Date:   Wed, 3 Nov 2021 07:41:06 +0100
+        id S231760AbhKCGrk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Nov 2021 02:47:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36752 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230152AbhKCGrk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Nov 2021 02:47:40 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58EE1C061714;
+        Tue,  2 Nov 2021 23:45:04 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id om14so613784pjb.5;
+        Tue, 02 Nov 2021 23:45:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Mi8r83pUTBrcQ3MNCYSGeibYSRXnJ8qCuYpYc7RJ1PM=;
+        b=ZsNvY/1QZJqQwmSQD0ybdPyn4eJsxCZ886ZuEMim6DMxXNegPsZxY6Mmq4/5K/j0sa
+         7LnF4lcNyDBe3XmSDd+30N3idJn7j7+z/lGNM116lkLxv6RQbn6PyFnxYdLT0uF9K2j/
+         m554MJiuBAjQB5HoPtuBw7Q8XFTyt37bFkMoNa6ujxQxo4uLbtYfDTRGZmdsILGmOLXT
+         mxSbbkzDiSPtM80rdR/2krFfIFTQ0NSCBJ5qgUyNQyeacGz259zne9E767hBwXK1RySr
+         7Q2q9NGYSCDAQwkVL6yNC1LGn0nv0HmENdu69QlCdBm7fC9sFsWFIHvp8tbEcyfxrzlx
+         xRwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Mi8r83pUTBrcQ3MNCYSGeibYSRXnJ8qCuYpYc7RJ1PM=;
+        b=Qifd1BiaGGEeQM2OvSR4GcRJet3lWv8sMzQqr6XVMbaSdtJRPdsLMBrG3OF3lRLAE4
+         DvJ5eQpLxGkmdwEIvFkPXgmtE8K/2sXWVxS0MPRkapQQLr8YdrzlkbymxCS8ah8F9IFD
+         4IS5WVwQFfh8e21n1s+WgrOrescHKUEH7IJfYzHlrTzr1Nyk90tEF2piEGowjn4tdCtH
+         RxrEfGRcpN21T07TjVpBsapGtEg6ER0A1VhVtWW2obc6FpSodoBASWaYKjkqhC7s5RPN
+         jd2OImZo60IPqsYOXgKkBM6f6ZjiC71j1n6bwRRGC2wLzKSWcY1wcF9t+2nVfPBSSA/Z
+         rinQ==
+X-Gm-Message-State: AOAM5320e7DEopHoig+gDeRUo+W2YnuDux9CBH6/1b2SGQ5QJHSyWMEj
+        5ddxOThuDRPYEiEIkvnL8e0=
+X-Google-Smtp-Source: ABdhPJwyrnGs7LULTukmToIpcaU8jGvQcHTFD9U/AKD/YWHxNv+Au45UjpJy+CtAzY6Bamn4smnLBg==
+X-Received: by 2002:a17:902:c206:b0:142:631:5ffc with SMTP id 6-20020a170902c20600b0014206315ffcmr10004182pll.38.1635921903857;
+        Tue, 02 Nov 2021 23:45:03 -0700 (PDT)
+Received: from localhost.localdomain ([193.203.214.57])
+        by smtp.gmail.com with ESMTPSA id q32sm898389pja.4.2021.11.02.23.45.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Nov 2021 23:45:03 -0700 (PDT)
+From:   cgel.zte@gmail.com
+X-Google-Original-From: zhang.mingyu@zte.com.cn
+To:     anup.patel@wdc.com
+Cc:     atish.patra@wdc.com, paul.walmsley@sifive.com, palmer@dabbelt.com,
+        aou@eecs.berkeley.edu, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org,
+        Zhang Mingyu <zhang.mingyu@zte.com.cn>,
+        Zeal Robot <zealci@zte.com.cn>
+Subject: [PATCH] RISC-V: KVM:Remove unneeded semicolon
+Date:   Wed,  3 Nov 2021 06:44:58 +0000
+Message-Id: <20211103064458.26916-1-zhang.mingyu@zte.com.cn>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH v5 3/4] docs: (further further) remove non-reference uses
- of single backticks
-Content-Language: en-US
-To:     John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-Cc:     Peter Maydell <peter.maydell@linaro.org>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-        Darren Kenny <darren.kenny@oracle.com>,
-        =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Qiuhao Li <Qiuhao.Li@outlook.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Alexandre Iooss <erdnaxe@crans.org>,
-        Mahmoud Mandour <ma.mandourr@gmail.com>,
-        Alexander Bulekov <alxndr@bu.edu>,
-        Markus Armbruster <armbru@redhat.com>, kvm@vger.kernel.org,
-        Bandan Das <bsd@redhat.com>
-References: <20211102184400.1168508-1-jsnow@redhat.com>
- <20211102184400.1168508-4-jsnow@redhat.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20211102184400.1168508-4-jsnow@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02/11/2021 19.43, John Snow wrote:
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->   docs/devel/build-system.rst | 21 +++++++++++----------
->   1 file changed, 11 insertions(+), 10 deletions(-)
-> 
-> diff --git a/docs/devel/build-system.rst b/docs/devel/build-system.rst
-> index 7f106d2f1c..48e56d7ea9 100644
-> --- a/docs/devel/build-system.rst
-> +++ b/docs/devel/build-system.rst
-> @@ -47,16 +47,17 @@ command line options for which a same-named Meson option exists;
->   dashes in the command line are replaced with underscores.
->   
->   Many checks on the compilation environment are still found in configure
-> -rather than `meson.build`, but new checks should be added directly to
-> -`meson.build`.
-> +rather than ``meson.build``, but new checks should be added directly to
-> +``meson.build``.
->   
->   Patches are also welcome to move existing checks from the configure
-> -phase to `meson.build`.  When doing so, ensure that `meson.build` does
-> -not use anymore the keys that you have removed from `config-host.mak`.
-> -Typically these will be replaced in `meson.build` by boolean variables,
-> -``get_option('optname')`` invocations, or `dep.found()` expressions.
-> -In general, the remaining checks have little or no interdependencies,
-> -so they can be moved one by one.
-> +phase to ``meson.build``.  When doing so, ensure that ``meson.build``
-> +does not use anymore the keys that you have removed from
-> +``config-host.mak``.  Typically these will be replaced in
-> +``meson.build`` by boolean variables, ``get_option('optname')``
-> +invocations, or ``dep.found()`` expressions.  In general, the remaining
-> +checks have little or no interdependencies, so they can be moved one by
-> +one.
->   
->   Helper functions
->   ----------------
-> @@ -298,7 +299,7 @@ comprises the following tasks:
->   
->    - Add code to perform the actual feature check.
->   
-> - - Add code to include the feature status in `config-host.h`
-> + - Add code to include the feature status in ``config-host.h``
->   
->    - Add code to print out the feature status in the configure summary
->      upon completion.
-> @@ -334,7 +335,7 @@ The other supporting code is generally simple::
->   
->   For the configure script to parse the new option, the
->   ``scripts/meson-buildoptions.sh`` file must be up-to-date; ``make
-> -update-buildoptions`` (or just `make`) will take care of updating it.
-> +update-buildoptions`` (or just ``make``) will take care of updating it.
->   
->   
->   Support scripts
-> 
+From: Zhang Mingyu <zhang.mingyu@zte.com.cn>
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Eliminate the following coccinelle check warning:
+arch/riscv/kvm/vcpu.c:167:2-3
+arch/riscv/kvm/vcpu.c:204:2-3
+
+Reported-by: Zeal Robot <zealci@zte.com.cn>
+Signed-off-by: Zhang Mingyu <zhang.mingyu@zte.com.cn>
+---
+ arch/riscv/kvm/vcpu.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+index e92ba3e5db8c..e3d3aed46184 100644
+--- a/arch/riscv/kvm/vcpu.c
++++ b/arch/riscv/kvm/vcpu.c
+@@ -164,7 +164,7 @@ static int kvm_riscv_vcpu_get_reg_config(struct kvm_vcpu *vcpu,
+ 		break;
+ 	default:
+ 		return -EINVAL;
+-	};
++	}
+ 
+ 	if (copy_to_user(uaddr, &reg_val, KVM_REG_SIZE(reg->id)))
+ 		return -EFAULT;
+@@ -201,7 +201,7 @@ static int kvm_riscv_vcpu_set_reg_config(struct kvm_vcpu *vcpu,
+ 		break;
+ 	default:
+ 		return -EINVAL;
+-	};
++	}
+ 
+ 	return 0;
+ }
+-- 
+2.25.1
 
