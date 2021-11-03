@@ -2,77 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 127CC444B3E
-	for <lists+kvm@lfdr.de>; Thu,  4 Nov 2021 00:08:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5FC34444B8B
+	for <lists+kvm@lfdr.de>; Thu,  4 Nov 2021 00:20:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229907AbhKCXKh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Nov 2021 19:10:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35064 "EHLO
+        id S230168AbhKCXXP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Nov 2021 19:23:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229652AbhKCXKg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Nov 2021 19:10:36 -0400
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88593C06127A
-        for <kvm@vger.kernel.org>; Wed,  3 Nov 2021 16:07:59 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id y20so3946705pfi.4
-        for <kvm@vger.kernel.org>; Wed, 03 Nov 2021 16:07:59 -0700 (PDT)
+        with ESMTP id S229964AbhKCXXK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Nov 2021 19:23:10 -0400
+Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33127C06127A
+        for <kvm@vger.kernel.org>; Wed,  3 Nov 2021 16:20:33 -0700 (PDT)
+Received: by mail-pg1-x532.google.com with SMTP id t7so3712359pgl.9
+        for <kvm@vger.kernel.org>; Wed, 03 Nov 2021 16:20:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=8yaW7bzXe4yys7yTtEPfAvcvjjvX4R1Y6KiKrJ3surQ=;
-        b=BN9M8yhbhfPl4RAvGzgSz0yTDRbGdwqEAZn7Uqiqx8NtTEj7Z8oLPsEl16K3Bc78I2
-         8og91Xy589UPQHpUBVAwmehZTG0MfNE9IaqFxOms+QkBaG/ZRdjnwpn/q0/fLR8YnMaY
-         Bk1shaKheagMnMhdGSgVTJG4SvBUEbUTYmsz3LzLbA0201mcJykfcLpuU4kvz76tiPo+
-         bsA7Tcakz4ciVt62k9xcnasvyAwrUDVRxeR6k8uPIGBg4mcbbT/1m/dF/5lYkiAxF0jT
-         L+xVbDJWzwAGxXWaYZy+6QDOSxvX5IvxT9HgfX4gu9cCDsWqOxXTateWnqegjAYsB1Wg
-         5OsQ==
+        bh=/Y2S6Byxm0KbZa6sY2deNa9Jl5FKstAIjXV9nN4iMDk=;
+        b=K91RCxho56MVM9xkrEB3UKg+BWwwhcaLoHcPld8X+H1nqOstvWhabsJWdT86MzZbv7
+         oYqZLQrjvkH849hAVJZ2gX3z3qYj2UdkVjRVOf1PONjBt7BAw7bdI0IrQpUMqG5E28bI
+         2RjSQz8jt3phmu+OmeOnD8nIfgVc49b+0LoH9Vt+G7hZcEtEy7RR4CdCEeJtS6Nocs9H
+         MpO5GOPe8STy5QY0RmZA0cv4M9SiZF6+TN2V4hmGqbop68oXQXRFwvXRPh49V8XG8wJS
+         v9pqQ0qAZzxQfuN0eUwHeY91rh3DFXDFHHpyOgj10UE+5p3SwIqfQ5tns06PgJzkoTk/
+         cm1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=8yaW7bzXe4yys7yTtEPfAvcvjjvX4R1Y6KiKrJ3surQ=;
-        b=ErKUH1B2xwwyb8d4jRCdNmMXnBLTFEAhSay34WHeQRg76ZCd6FxzCvSdBj2DdQ6ElS
-         0AOHJJW4waQ9JycQ92VbWpHk2Qv7MMLTWyC5X3MPTRbMAw1RDocVO/nyS8Tu++PDp4Cz
-         sDhO4VFVTgQzwrHqkmuNRUAYc3hIdHW/EeQ1emzZsGmetfm1ggdZB1CHTiPGMLJ3x3mS
-         Lz9S8cbIzSAxFr6WV8ZznufBe/8NLh7ydt1qbqZgWEGDSEDd9EdGfFVFBbs/2ic06sMr
-         e144aNrMIMoaXyXeEPSpEQ0uiOyC0kjTYAdsapa+vdH1XurMLddFuav/UYs1cnqFpaYo
-         tEmw==
-X-Gm-Message-State: AOAM533lvzQ/Ir59yGymlMs0L0ttS8qtTcww40p7pPUsGnv/NBgpfAUi
-        pH0SOb0Oyc1J6Hpze1Vqa1xLgA==
-X-Google-Smtp-Source: ABdhPJxpfqJe3VGZemJkfTGPxc6se4YW+yh21PyNUGidR5vmQBrWCmxkc/4bTNFR3tgDcboY2DHE2g==
-X-Received: by 2002:a63:a801:: with SMTP id o1mr36104100pgf.23.1635980878910;
-        Wed, 03 Nov 2021 16:07:58 -0700 (PDT)
+        bh=/Y2S6Byxm0KbZa6sY2deNa9Jl5FKstAIjXV9nN4iMDk=;
+        b=Mg57vawbXqW1MaoK7oSaEUepNhsin6cqh/aRKUkvymcqWnlxZgs3JFr9xfm3Fzc3wk
+         f1wB7PQ6Ke00zfZfLMQrdwxSsccFNGtlHF9DECMxENNjjoFFey7sDqNsICdxQqYB7uHv
+         aKV3Uff0LccyqdZqZ0XteXLz5RCmreLQrxu2GwEY+9cqMO0RTNs/uwXlc7WuTIHKYj4M
+         23Cha28454YlwWS9Ytb2MD7z0mdLk4gSTh1DDfO14jGGtti4dgPCLU6iowsf6wn1ZsON
+         Q0lyuD9JHFzOJhL8EymMMOCv9ySaFw4DyGdg4d3SYwODO1vpamu7mGzx1GpZ9aKhUVPD
+         iodQ==
+X-Gm-Message-State: AOAM533FT82104uECmLdZtgVapxicN2FPrf/bcBBY00TgIhIa/cRZYIO
+        TVG5nRq5xah+Cvnw7d5wVa2A8w==
+X-Google-Smtp-Source: ABdhPJy4brD18aSZ3rwkyQEyhmNvGSzOxarylF5FcaeQ9OUCRHAS0uELEun5xfh8MoMWYe+r+G6K0A==
+X-Received: by 2002:a65:5082:: with SMTP id r2mr35784039pgp.353.1635981632525;
+        Wed, 03 Nov 2021 16:20:32 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id b10sm3291227pfi.122.2021.11.03.16.07.58
+        by smtp.gmail.com with ESMTPSA id n20sm2682378pgc.10.2021.11.03.16.20.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Nov 2021 16:07:58 -0700 (PDT)
-Date:   Wed, 3 Nov 2021 23:07:54 +0000
+        Wed, 03 Nov 2021 16:20:32 -0700 (PDT)
+Date:   Wed, 3 Nov 2021 23:20:28 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Vipin Sharma <vipinsh@google.com>
 Cc:     pbonzini@redhat.com, jmattson@google.com, dmatlack@google.com,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 0/2] Add wrapper to read GPR of INVPCID, INVVPID, and
- INVEPT
-Message-ID: <YYMWSvDlYZ26D4yU@google.com>
+Subject: Re: [PATCH v3 2/2] KVM: Move INVPCID type check from vmx and svm to
+ the common kvm_handle_invpcid()
+Message-ID: <YYMZPKPkk5dVJ6nZ@google.com>
 References: <20211103205911.1253463-1-vipinsh@google.com>
+ <20211103205911.1253463-3-vipinsh@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211103205911.1253463-1-vipinsh@google.com>
+In-Reply-To: <20211103205911.1253463-3-vipinsh@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Wed, Nov 03, 2021, Vipin Sharma wrote:
-> Hello,
+> Handle #GP on INVPCID due to an invalid type in the common switch
+> statement instead of relying on the callers (VMX and SVM) to manually
+> validate the type.
 > 
-> v3 is similar to v2 except that the commit message of "PATCH v3 2/2" is now
-> clearer and detailed.
+> Unlike INVVPID and INVEPT, INVPCID is not explicitly documented to check
+> the type before reading the operand from memory, so deferring the
+> type validity check until after that point is architecturally allowed.
+> 
+> Signed-off-by: Vipin Sharma <vipinsh@google.com>
+> ---
 
-Heh, please wait at _minimum_ one day before spinning a new version.  I know it's
-a bit weird/silly for such a small series, but even in this case I replied to the
-previous version because I circled back to the "series" while waiting for a build
-to complete.  For small series and/or single patches, unless there's a reason for
-urgency, it's polite to wait a few days between versions to give folks a reasonable
-chance to weigh in before getting hit with a new version.
+For future reference, a R-b that comes with qualifiers can be carried so long as
+the issues raised by the reviewer are addressed.  Obviously it can be somewhat
+subjective, but common sense usually goes a long ways, and most reviewers won't
+be too grumpy about mistakes so long as you had good intentions and remedy any
+mistakes.  And if you're in doubt, you can always add a blurb in the cover letter
+or ignored part of the patch to explicitly confirm that it was ok to add the tag,
+e.g. "Sean, I added your Reviewed-by in patch 02 after fixing the changelog, let
+me know if that's not what you intended".
+
+Thanks!
+
+Reviewed-by: Sean Christopherson <seanjc@google.com>
