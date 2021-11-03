@@ -2,305 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 033C3443E44
-	for <lists+kvm@lfdr.de>; Wed,  3 Nov 2021 09:17:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E8782443EF6
+	for <lists+kvm@lfdr.de>; Wed,  3 Nov 2021 10:05:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231925AbhKCIT5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Nov 2021 04:19:57 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:14710 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231511AbhKCITr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Nov 2021 04:19:47 -0400
-Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4HkfhS177NzZcbQ;
-        Wed,  3 Nov 2021 16:15:04 +0800 (CST)
-Received: from dggpeml100016.china.huawei.com (7.185.36.216) by
- dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.15; Wed, 3 Nov 2021 16:17:09 +0800
-Received: from DESKTOP-27KDQMV.china.huawei.com (10.174.148.223) by
- dggpeml100016.china.huawei.com (7.185.36.216) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.15; Wed, 3 Nov 2021 16:17:08 +0800
-From:   "Longpeng(Mike)" <longpeng2@huawei.com>
-To:     <alex.williamson@redhat.com>, <pbonzini@redhat.com>
-CC:     <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>,
-        <arei.gonglei@huawei.com>, "Longpeng(Mike)" <longpeng2@huawei.com>
-Subject: [PATCH v5 6/6] vfio: defer to commit kvm irq routing when enable msi/msix
-Date:   Wed, 3 Nov 2021 16:16:57 +0800
-Message-ID: <20211103081657.1945-7-longpeng2@huawei.com>
-X-Mailer: git-send-email 2.25.0.windows.1
-In-Reply-To: <20211103081657.1945-1-longpeng2@huawei.com>
-References: <20211103081657.1945-1-longpeng2@huawei.com>
+        id S231915AbhKCJH4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Nov 2021 05:07:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:54787 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231361AbhKCJHu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 3 Nov 2021 05:07:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1635930314;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=HNIClEriatvmMl3INQ2uHlDTK9i+KyCSVvF1TrYVckw=;
+        b=Y0jWwbQRxh4S2Q+VtfJsXCMesEwdGpO0JZAbSHNXzLDFwZ9X/RvGcTPbVsv9xe3Vr00O/v
+        PuJsfXtzSPjQiFBk7ZKwZ650OLiCxKxbLzpcy84YWUHEkU47c59e9SV3HQBYzInepdyVtE
+        Tq5SCwW4c7HRU0m9K+sSlcBHRJ5s3G8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-31-EzMAlgcBMS2J4iItP14udA-1; Wed, 03 Nov 2021 05:05:11 -0400
+X-MC-Unique: EzMAlgcBMS2J4iItP14udA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 265DA87180F;
+        Wed,  3 Nov 2021 09:05:08 +0000 (UTC)
+Received: from starship (unknown [10.40.194.243])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id CECEB5D9D3;
+        Wed,  3 Nov 2021 09:05:00 +0000 (UTC)
+Message-ID: <e508be0ecda6db330d83b954f4e4d1ad12c08c64.camel@redhat.com>
+Subject: Re: [PATCH v3 6/6] KVM: selftests: test KVM_GUESTDBG_BLOCKIRQ
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Kieran Bingham <kbingham@kernel.org>,
+        Jan Kiszka <jan.kiszka@siemens.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Johannes Berg <johannes.berg@intel.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Jessica Yu <jeyu@kernel.org>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Yang Weijiang <weijiang.yang@intel.com>,
+        linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        Shuah Khan <shuah@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>
+Date:   Wed, 03 Nov 2021 11:04:59 +0200
+In-Reply-To: <YYGHPyhFRHHQsX6a@google.com>
+References: <20210811122927.900604-1-mlevitsk@redhat.com>
+         <20210811122927.900604-7-mlevitsk@redhat.com>
+         <137f2dcc-75d2-9d71-e259-dd66d43ad377@redhat.com>
+         <87sfwfkhk5.fsf@vitty.brq.redhat.com>
+         <b48210a35b3bc6d63beeb33c19b609b3014191dd.camel@redhat.com>
+         <YYB2l9bzFhKzobZB@google.com> <87k0hqkf6p.fsf@vitty.brq.redhat.com>
+         <YYFe4LKXiuV+DyZh@google.com> <87fsseo7iu.fsf@vitty.brq.redhat.com>
+         <YYGHPyhFRHHQsX6a@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.174.148.223]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpeml100016.china.huawei.com (7.185.36.216)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In migration resume phase, all unmasked msix vectors need to be
-setup when loading the VF state. However, the setup operation would
-take longer if the VM has more VFs and each VF has more unmasked
-vectors.
+On Tue, 2021-11-02 at 18:45 +0000, Sean Christopherson wrote:
+> On Tue, Nov 02, 2021, Vitaly Kuznetsov wrote:
+> > Sean Christopherson <seanjc@google.com> writes:
+> > > But that mess is a red herring, the test fails with the same signature with APICv=1
+> > > if the STI is replaced by PUSHF+BTS+POPFD (to avoid the STI shadow).  We all missed
+> > > this key detail from Vitaly's report:
+> > > 
+> > > SINGLE_STEP[1]: exit 8 exception 1 rip 0x402a25 (should be 0x402a27) dr6 0xffff4ff0 (should be 0xffff4ff0)
+> > >                 ^^^^^^
+> > > 
+> > > Exit '8' is KVM_EXIT_SHUTDOWN, i.e. the arrival of the IRQ hosed the guest because
+> > > the test doesn't invoke vm_init_descriptor_tables() to install event handlers.
+> > > The "exception 1" shows up because the run page isn't sanitized by the test, i.e.
+> > > it's stale data that happens to match.
+> > > 
+> > > So I would fully expect this test to fail with AVIC=1.  The problem is that
+> > > KVM_GUESTDBG_BLOCKIRQ does absolutely nothing to handle APICv interrupts.  And
+> > > even if KVM does something to fudge that behavior in the emulated local APIC, the
+> > > test will then fail miserably virtual IPIs (currently AVIC only).
+> > 
+> > FWIW, the test doesn't seem to fail on my AMD EPYC system even with "avic=1" ...
+Its because AVIC is inhibited for many reasons. In this test x2apic is used,
+and having x2apic in CPUID inhibits AVIC.
 
-The hot spot is kvm_irqchip_commit_routes, it'll scan and update
-all irqfds that are already assigned each invocation, so more
-vectors means need more time to process them.
+> 
+> Huh.  Assuming the IRQ is pending in the vIRR and KVM didn't screw up elsewhere,
+> that seems like a CPU AVIC bug.  #DBs have priority over IRQs, but single-step
+> #DBs are trap-like and KVM (hopefully) isn't injecting a #DB, so a pending IRQ
+> should be taken on the current instruction in the guest when executing VMRUN with
+> guest.EFLAGS.IF=1,TF=1 since there will be a one-instruction delay before the
+> single-step #DB kicks in.
+> 
+We could inhibit AVIC/APICv when KVM_GUESTDBG_BLOCKIRQ is in use, I'll send patch for
+this soon.
 
-vfio_pci_load_config
-  vfio_msix_enable
-    msix_set_vector_notifiers
-      for (vector = 0; vector < dev->msix_entries_nr; vector++) {
-        vfio_msix_vector_do_use
-          vfio_add_kvm_msi_virq
-            kvm_irqchip_commit_routes <-- expensive
-      }
+Thanks a lot for finding out what is going on!
 
-We can reduce the cost by only committing once outside the loop.
-The routes are cached in kvm_state, we commit them first and then
-bind irqfd for each vector.
-
-The test VM has 128 vcpus and 8 VF (each one has 65 vectors),
-we measure the cost of the vfio_msix_enable for each VF, and
-we can see 90+% costs can be reduce.
-
-VF      Count of irqfds[*]  Original        With this patch
-
-1st           65            8               2
-2nd           130           15              2
-3rd           195           22              2
-4th           260           24              3
-5th           325           36              2
-6th           390           44              3
-7th           455           51              3
-8th           520           58              4
-Total                       258ms           21ms
-
-[*] Count of irqfds
-How many irqfds that already assigned and need to process in this
-round.
-
-The optimization can be applied to msi type too.
-
-Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
----
- hw/vfio/pci.c | 123 ++++++++++++++++++++++++++++++++++++++++++++--------------
- hw/vfio/pci.h |   1 +
- 2 files changed, 95 insertions(+), 29 deletions(-)
-
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 69ad081..5b3a86d 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -413,30 +413,37 @@ static int vfio_enable_vectors(VFIOPCIDevice *vdev, bool msix)
- static void vfio_add_kvm_msi_virq(VFIOPCIDevice *vdev, VFIOMSIVector *vector,
-                                   int vector_n, bool msix)
- {
--    int virq;
--
-     if ((msix && vdev->no_kvm_msix) || (!msix && vdev->no_kvm_msi)) {
-         return;
-     }
- 
--    if (event_notifier_init(&vector->kvm_interrupt, 0)) {
-+    vector->virq = kvm_irqchip_add_deferred_msi_route(kvm_state, vector_n,
-+                                                      &vdev->pdev);
-+}
-+
-+static void vfio_connect_kvm_msi_virq(VFIOMSIVector *vector)
-+{
-+    if (vector->virq < 0) {
-         return;
-     }
- 
--    virq = kvm_irqchip_add_msi_route(kvm_state, vector_n, &vdev->pdev);
--    if (virq < 0) {
--        event_notifier_cleanup(&vector->kvm_interrupt);
--        return;
-+    if (event_notifier_init(&vector->kvm_interrupt, 0)) {
-+        goto fail_notifier;
-     }
- 
-     if (kvm_irqchip_add_irqfd_notifier_gsi(kvm_state, &vector->kvm_interrupt,
--                                       NULL, virq) < 0) {
--        kvm_irqchip_release_virq(kvm_state, virq);
--        event_notifier_cleanup(&vector->kvm_interrupt);
--        return;
-+                                           NULL, vector->virq) < 0) {
-+        goto fail_kvm;
-     }
- 
--    vector->virq = virq;
-+    return;
-+
-+fail_kvm:
-+    event_notifier_cleanup(&vector->kvm_interrupt);
-+fail_notifier:
-+    kvm_irqchip_release_virq(kvm_state, vector->virq);
-+    vector->virq = -1;
-+    return;
- }
- 
- static void vfio_remove_kvm_msi_virq(VFIOMSIVector *vector)
-@@ -492,6 +499,10 @@ static int vfio_msix_vector_do_use(PCIDevice *pdev, unsigned int nr,
-     } else {
-         if (msg) {
-             vfio_add_kvm_msi_virq(vdev, vector, nr, true);
-+            if (!vdev->defer_kvm_irq_routing) {
-+                kvm_irqchip_commit_routes(kvm_state);
-+                vfio_connect_kvm_msi_virq(vector);
-+            }
-         }
-     }
- 
-@@ -501,11 +512,13 @@ static int vfio_msix_vector_do_use(PCIDevice *pdev, unsigned int nr,
-      * increase them as needed.
-      */
-     if (vdev->nr_vectors < nr + 1) {
--        vfio_disable_irqindex(&vdev->vbasedev, VFIO_PCI_MSIX_IRQ_INDEX);
-         vdev->nr_vectors = nr + 1;
--        ret = vfio_enable_vectors(vdev, true);
--        if (ret) {
--            error_report("vfio: failed to enable vectors, %d", ret);
-+        if (!vdev->defer_kvm_irq_routing) {
-+            vfio_disable_irqindex(&vdev->vbasedev, VFIO_PCI_MSIX_IRQ_INDEX);
-+            ret = vfio_enable_vectors(vdev, true);
-+            if (ret) {
-+                error_report("vfio: failed to enable vectors, %d", ret);
-+            }
-         }
-     } else {
-         Error *err = NULL;
-@@ -567,6 +580,30 @@ static void vfio_msix_vector_release(PCIDevice *pdev, unsigned int nr)
-     }
- }
- 
-+static void vfio_prepare_kvm_msi_virq_batch(VFIOPCIDevice *vdev)
-+{
-+    assert(!vdev->defer_kvm_irq_routing);
-+    vdev->defer_kvm_irq_routing = true;
-+}
-+
-+static void vfio_commit_kvm_msi_virq_batch(VFIOPCIDevice *vdev)
-+{
-+    int i;
-+
-+    assert(vdev->defer_kvm_irq_routing);
-+    vdev->defer_kvm_irq_routing = false;
-+
-+    if (!vdev->nr_vectors) {
-+        return;
-+    }
-+
-+    kvm_irqchip_commit_routes(kvm_state);
-+
-+    for (i = 0; i < vdev->nr_vectors; i++) {
-+        vfio_connect_kvm_msi_virq(&vdev->msi_vectors[i]);
-+    }
-+}
-+
- static void vfio_msix_enable(VFIOPCIDevice *vdev)
- {
-     vfio_disable_interrupts(vdev);
-@@ -576,26 +613,45 @@ static void vfio_msix_enable(VFIOPCIDevice *vdev)
-     vdev->interrupt = VFIO_INT_MSIX;
- 
-     /*
--     * Some communication channels between VF & PF or PF & fw rely on the
--     * physical state of the device and expect that enabling MSI-X from the
--     * guest enables the same on the host.  When our guest is Linux, the
--     * guest driver call to pci_enable_msix() sets the enabling bit in the
--     * MSI-X capability, but leaves the vector table masked.  We therefore
--     * can't rely on a vector_use callback (from request_irq() in the guest)
--     * to switch the physical device into MSI-X mode because that may come a
--     * long time after pci_enable_msix().  This code enables vector 0 with
--     * triggering to userspace, then immediately release the vector, leaving
--     * the physical device with no vectors enabled, but MSI-X enabled, just
--     * like the guest view.
-+     * Setting vector notifiers triggers synchronous vector-use
-+     * callbacks for each active vector.  Deferring to commit the KVM
-+     * routes once rather than per vector provides a substantial
-+     * performance improvement.
-      */
--    vfio_msix_vector_do_use(&vdev->pdev, 0, NULL, NULL);
--    vfio_msix_vector_release(&vdev->pdev, 0);
-+    vfio_prepare_kvm_msi_virq_batch(vdev);
- 
-     if (msix_set_vector_notifiers(&vdev->pdev, vfio_msix_vector_use,
-                                   vfio_msix_vector_release, NULL)) {
-         error_report("vfio: msix_set_vector_notifiers failed");
-     }
- 
-+    vfio_commit_kvm_msi_virq_batch(vdev);
-+
-+    if (vdev->nr_vectors) {
-+        int ret;
-+
-+        ret = vfio_enable_vectors(vdev, true);
-+        if (ret) {
-+            error_report("vfio: failed to enable vectors, %d", ret);
-+        }
-+    } else {
-+        /*
-+         * Some communication channels between VF & PF or PF & fw rely on the
-+         * physical state of the device and expect that enabling MSI-X from the
-+         * guest enables the same on the host.  When our guest is Linux, the
-+         * guest driver call to pci_enable_msix() sets the enabling bit in the
-+         * MSI-X capability, but leaves the vector table masked.  We therefore
-+         * can't rely on a vector_use callback (from request_irq() in the guest)
-+         * to switch the physical device into MSI-X mode because that may come a
-+         * long time after pci_enable_msix().  This code enables vector 0 with
-+         * triggering to userspace, then immediately release the vector, leaving
-+         * the physical device with no vectors enabled, but MSI-X enabled, just
-+         * like the guest view.
-+         */
-+        vfio_msix_vector_do_use(&vdev->pdev, 0, NULL, NULL);
-+        vfio_msix_vector_release(&vdev->pdev, 0);
-+    }
-+
-     trace_vfio_msix_enable(vdev->vbasedev.name);
- }
- 
-@@ -605,6 +661,13 @@ static void vfio_msi_enable(VFIOPCIDevice *vdev)
- 
-     vfio_disable_interrupts(vdev);
- 
-+    /*
-+     * Setting vector notifiers needs to enable route for each vector.
-+     * Deferring to commit the KVM routes once rather than per vector
-+     * provides a substantial performance improvement.
-+     */
-+    vfio_prepare_kvm_msi_virq_batch(vdev);
-+
-     vdev->nr_vectors = msi_nr_vectors_allocated(&vdev->pdev);
- retry:
-     vdev->msi_vectors = g_new0(VFIOMSIVector, vdev->nr_vectors);
-@@ -630,6 +693,8 @@ retry:
-         vfio_add_kvm_msi_virq(vdev, vector, i, false);
-     }
- 
-+    vfio_commit_kvm_msi_virq_batch(vdev);
-+
-     /* Set interrupt type prior to possible interrupts */
-     vdev->interrupt = VFIO_INT_MSI;
- 
-diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-index 6477751..d3c5177 100644
---- a/hw/vfio/pci.h
-+++ b/hw/vfio/pci.h
-@@ -171,6 +171,7 @@ struct VFIOPCIDevice {
-     bool no_kvm_ioeventfd;
-     bool no_vfio_ioeventfd;
-     bool enable_ramfb;
-+    bool defer_kvm_irq_routing;
-     VFIODisplay *dpy;
-     Notifier irqchip_change_notifier;
- };
--- 
-1.8.3.1
+Best regards,	Maxim Levitsky
 
