@@ -2,97 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BDF0D44446F
-	for <lists+kvm@lfdr.de>; Wed,  3 Nov 2021 16:13:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DF884444BA
+	for <lists+kvm@lfdr.de>; Wed,  3 Nov 2021 16:38:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231666AbhKCPQC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Nov 2021 11:16:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32406 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231211AbhKCPQB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 3 Nov 2021 11:16:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635952404;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=EcjS/U0esOcZt9aUj7QJ/b283I90hVCo2RapOPx/5rA=;
-        b=Ltmf8ABWzCBvg0QM2Fdt0Q54MjllwWtbtv0FgWi4as1xoDVKuWl7WKcSoLpNnVxlGIkclq
-        EfniUsgvW6E/KtNVDnKRxlXVHXfygacp1QIIXL+/IaFjOn/HnWvoP47b7lJxGplswHFaeu
-        qb6S+1lNz9Q74n/74ndiPv1tNrjs4oA=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-341-o2pNEwa1NSSJHItDcklF9g-1; Wed, 03 Nov 2021 11:13:23 -0400
-X-MC-Unique: o2pNEwa1NSSJHItDcklF9g-1
-Received: by mail-wr1-f72.google.com with SMTP id q17-20020adfcd91000000b0017bcb12ad4fso497216wrj.12
-        for <kvm@vger.kernel.org>; Wed, 03 Nov 2021 08:13:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=EcjS/U0esOcZt9aUj7QJ/b283I90hVCo2RapOPx/5rA=;
-        b=ombfLZdlfSjPn/HVPl4eH54oZJvsWRAlEOcGrUwz+dlg96AOYPVj7AK00E6aatk9s5
-         bqpYB/Lz1dFOzj/XLJFabvGDNYP3kZOCqYmCCcw+t84RpL36GVYDflrFv1m/A7UfMmSN
-         CR+g+Iwoo9ItcO/nAx0zP/R0Dq6xtoB1wRh7cLNyRtWY5qzfDnfyFIZXYZp/LTGITcHb
-         TZ0oUeKSh2NA+6w3l3beKH193AfA401DLX8tKf6IdYzWQRq0A2HM6J0zZtMkO42JTk+n
-         LvWvumoqkE/sBfZBCv9Ctl/4BaW8nOKcPoYFHQ0jTnRdiV9dA21ppGrK2DV5HfO/0ln5
-         b71Q==
-X-Gm-Message-State: AOAM532rh4JaV01tamlqMYMoRkq9DykDjOyaAmLBZlOymCUnAJHyCj9N
-        PlEx86Ehc1Tja7qFhj7Elx4DoMbosmkGgpEAVa6cBqmIIJ6vhZqw/zx5NFEj4xG3UUYRTN4Ky+0
-        6bQgtteNUOkgJ
-X-Received: by 2002:a05:600c:198d:: with SMTP id t13mr16116857wmq.21.1635952402184;
-        Wed, 03 Nov 2021 08:13:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJywJOfU5ytKMlivfLi6bw4DBBApAa9fqr7O37GSjz4t8SwMadSRVC41M824DZivE+K+jo0kcg==
-X-Received: by 2002:a05:600c:198d:: with SMTP id t13mr16116832wmq.21.1635952402009;
-        Wed, 03 Nov 2021 08:13:22 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id w1sm5574500wmc.19.2021.11.03.08.13.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Nov 2021 08:13:21 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
+        id S231489AbhKCPlC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Nov 2021 11:41:02 -0400
+Received: from vps-vb.mhejs.net ([37.28.154.113]:59576 "EHLO vps-vb.mhejs.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229587AbhKCPlB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Nov 2021 11:41:01 -0400
+Received: from MUA
+        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <mail@maciej.szmigiero.name>)
+        id 1miIL9-0007Pv-Uy; Wed, 03 Nov 2021 16:38:15 +0100
+Subject: Re: [PATCH v5 01/13] KVM: x86: Cache total page count to avoid
+ traversing the memslot array
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 0/4] KVM: nVMX: Enlightened MSR Bitmap feature for
- Hyper-V on KVM
-In-Reply-To: <20211013142258.1738415-1-vkuznets@redhat.com>
-References: <20211013142258.1738415-1-vkuznets@redhat.com>
-Date:   Wed, 03 Nov 2021 16:13:18 +0100
-Message-ID: <87r1bxmfw1.fsf@vitty.brq.redhat.com>
+References: <cover.1632171478.git.maciej.szmigiero@oracle.com>
+ <d07f07cdd545ab1a495a9a0da06e43ad97c069a2.1632171479.git.maciej.szmigiero@oracle.com>
+ <YW9Fi128rYxiF1v3@google.com>
+ <e618edce-b310-6d9a-3860-d7f4d8c0d98f@maciej.szmigiero.name>
+ <YXBnn6ZaXbaqKvOo@google.com> <YYBqMipZT9qcwDMt@google.com>
+ <8017cf9d-2b03-0c27-b78a-41b3d03c308b@maciej.szmigiero.name>
+ <YYKhFhoSa/8SHxJB@google.com>
+From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Message-ID: <27ba659b-137e-863f-7892-b8968fd14e59@maciej.szmigiero.name>
+Date:   Wed, 3 Nov 2021 16:38:10 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <YYKhFhoSa/8SHxJB@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Vitaly Kuznetsov <vkuznets@redhat.com> writes:
+On 03.11.2021 15:47, Sean Christopherson wrote:
+> On Wed, Nov 03, 2021, Maciej S. Szmigiero wrote:
+>> Capping total n_memslots_pages makes sense to me to avoid the (existing)
+>> nr_mmu_pages wraparound issue, will update the next patchset version
+>> accordingly.
+> 
+> No need to do it yourself.  I have a reworked version of the series with a bunch
+> of cleanups before and after the meat of your series, as well non-functional changes
+> (hopefully) to the "Resolve memslot ID via a hash table" and "Keep memslots in
+> tree-based structures" to avoid all the swap() behavior and to provide better
+> continuity between the aforementioned patches.  Unless something goes sideways in
+> the last few touchups, I'll get it posted today.
+> 
 
-> Changes since v2:
-> - Renamed 'msr_bitmap_changed' to 'msr_bitmap_force_recalc' [Paolo] and
->   expanded the comment near its definition explaining its limited 
->   usefulness [Sean].
->
-> Original description:
->
-> Updating MSR bitmap for L2 is not cheap and rearly needed. TLFS for Hyper-V
-> offers 'Enlightened MSR Bitmap' feature which allows L1 hypervisor to
-> inform L0 when it changes MSR bitmap, this eliminates the need to examine
-> L1's MSR bitmap for L2 every time when 'real' MSR bitmap for L2 gets
-> constructed.
->
-> When the feature is enabled for Win10+WSL2, it shaves off around 700 CPU
-> cycles from a nested vmexit cost (tight cpuid loop test).
->
-> First patch of the series is unrelated to the newly implemented feature,
-> it fixes a bug in Enlightened MSR Bitmap usage when KVM runs as a nested
-> hypervisor on top of Hyper-V.
->
-
-Ping?
-
--- 
-Vitaly
-
+Thanks.
