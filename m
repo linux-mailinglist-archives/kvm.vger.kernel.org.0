@@ -2,296 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C50384440DE
-	for <lists+kvm@lfdr.de>; Wed,  3 Nov 2021 12:53:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0CD5F4440F4
+	for <lists+kvm@lfdr.de>; Wed,  3 Nov 2021 12:59:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232011AbhKCL4Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Nov 2021 07:56:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:48201 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232098AbhKCL4T (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 3 Nov 2021 07:56:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635940422;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=0jYCz14ecfJDHsUTqayK+KtW2G5KFbt6WEraS6u7RHk=;
-        b=EoYW0zFo8yCBczkd9mgVO77gS5VxpGRERPAEV1i5Cl1UpDXVpgiwpO57drGuSHfiAq/WNT
-        Y9+4amFsVukwobPFP9uw3V8NW2O1QxypZYKcEfFJUUFgLgp4P50nFBGtiHZ5XbhN5YuGJW
-        oUkMyh0kWpTHK11fYoT4q6i28S4d+aM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-378-ZfB1fWS6Mye9GuQa0PXNLw-1; Wed, 03 Nov 2021 07:53:37 -0400
-X-MC-Unique: ZfB1fWS6Mye9GuQa0PXNLw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 28788874994;
-        Wed,  3 Nov 2021 11:53:36 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1394C19741;
-        Wed,  3 Nov 2021 11:53:35 +0000 (UTC)
-From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
-To:     kvm@vger.kernel.org
+        id S231816AbhKCMCV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Nov 2021 08:02:21 -0400
+Received: from vps-vb.mhejs.net ([37.28.154.113]:49726 "EHLO vps-vb.mhejs.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231476AbhKCMCU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Nov 2021 08:02:20 -0400
+Received: from MUA
+        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <mail@maciej.szmigiero.name>)
+        id 1miEvW-00070a-Rg; Wed, 03 Nov 2021 12:59:34 +0100
+To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        linux-kernel@vger.kernel.org,
-        Emanuele Giuseppe Esposito <eesposit@redhat.com>
-Subject: [PATCH v4 7/7] nSVM: use vmcb_ctrl_area_cached instead of vmcb_control_area in struct svm_nested_state
-Date:   Wed,  3 Nov 2021 07:52:30 -0400
-Message-Id: <20211103115230.720154-8-eesposit@redhat.com>
-In-Reply-To: <20211103115230.720154-1-eesposit@redhat.com>
-References: <20211103115230.720154-1-eesposit@redhat.com>
+        Igor Mammedov <imammedo@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <cover.1632171478.git.maciej.szmigiero@oracle.com>
+ <d07f07cdd545ab1a495a9a0da06e43ad97c069a2.1632171479.git.maciej.szmigiero@oracle.com>
+ <YW9Fi128rYxiF1v3@google.com>
+ <e618edce-b310-6d9a-3860-d7f4d8c0d98f@maciej.szmigiero.name>
+ <YXBnn6ZaXbaqKvOo@google.com> <YYBqMipZT9qcwDMt@google.com>
+From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Subject: Re: [PATCH v5 01/13] KVM: x86: Cache total page count to avoid
+ traversing the memslot array
+Message-ID: <8017cf9d-2b03-0c27-b78a-41b3d03c308b@maciej.szmigiero.name>
+Date:   Wed, 3 Nov 2021 12:59:27 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
+In-Reply-To: <YYBqMipZT9qcwDMt@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This requires changing all vmcb_is_intercept(&svm->nested.ctl, ...)
-calls with vmcb12_is_intercept().
+On 01.11.2021 23:29, Sean Christopherson wrote:
+> On Wed, Oct 20, 2021, Sean Christopherson wrote:
+>> On Wed, Oct 20, 2021, Maciej S. Szmigiero wrote:
+>>> On 20.10.2021 00:24, Sean Christopherson wrote:
+>>>> E.g. the whole thing can be
+>>>>
+>>>> 	if (!kvm->arch.n_requested_mmu_pages &&
+>>>> 	    (change == KVM_MR_CREATE || change == KVM_MR_DELETE)) {
+>>>> 		unsigned long nr_mmu_pages;
+>>>>
+>>>> 		if (change == KVM_MR_CREATE) {
+>>>> 			kvm->arch.n_memslots_pages += new->npages;
+>>>> 		} else {
+>>>> 			WARN_ON(kvm->arch.n_memslots_pages < old->npages);
+>>>> 			kvm->arch.n_memslots_pages -= old->npages;
+>>>> 		}
+>>>>
+>>>> 		nr_mmu_pages = (unsigned long)kvm->arch.n_memslots_pages;
+>>>> 		nr_mmu_pages *= (KVM_PERMILLE_MMU_PAGES / 1000);
+>>>
+>>> The above line will set nr_mmu_pages to zero since KVM_PERMILLE_MMU_PAGES
+>>> is 20, so when integer-divided by 1000 will result in a multiplication
+>>> coefficient of zero.
+>>
+>> Ugh, math.  And thus do_div() to avoid the whole 64-bit divide issue on 32-bit KVM.
+>> Bummer.
+> 
+> I was revisiting this today because (a) simply making n_memslots_pages a u64 doesn't
+> cleanly handle the case where the resulting nr_mmu_pages would wrap, 
 
-In addition, in svm_get_nested_state() user space expects a
-vmcb_control_area struct, so we need to copy back all fields
-in a temporary structure to provide to the user space.
+Handling this case without capping total n_memslots_pages would require
+either capping memslots_pages on 32-bit KVM to make it fit in 32-bits or
+changing kvm_mmu_change_mmu_pages() and all the logic further down to
+accept u64's.
 
-Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
----
- arch/x86/kvm/svm/nested.c | 48 +++++++++++++++++++++++++--------------
- arch/x86/kvm/svm/svm.c    |  4 ++--
- arch/x86/kvm/svm/svm.h    |  8 +++----
- 3 files changed, 37 insertions(+), 23 deletions(-)
+> (b) any fix
+> in that are should really go in a separate patch to fix
+> kvm_mmu_calculate_default_mmu_pages() and then carry that behavior forward
+> 
+> But as I dove deeper (and deeper), I came to the conclusion that supporting a
+> total number of memslot pages that doesn't fit in an unsigned long is a waste of
+> our time.  With a 32-bit kernel, userspace can at most address 3gb of virtual
+> memory, whereas wrapping the total number of pages would require 4tb+ of guest
+> physical memory.  Even with x86's second address space for SMM, that means userspace
+> would need to alias all of guest memory more than one _thousand_ times.  And on
+> older hardware with MAXPHYADDR < 43, the guest couldn't actually access any of those
+> aliases even if userspace lied about guest.MAXPHYADDR.
+> 
+> So unless I'm missing something, or PPC or MIPS has some crazy way for a 32-bit
+> host to support 4TB of guest memory, my vote would be to explicitly disallow
+> creating more memslot pages than can fit in an unsigned long.  Then x86 KVM could
+> reuse the cache nr_memslot_pages and x86's MMU wouldn't have to update a big pile
+> of code to support a scenario that practically speaking is useless.
+> 
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 72b329e82089..acabdbdef5cf 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -552,6 +552,7 @@ struct kvm {
+>           */
+>          struct mutex slots_arch_lock;
+>          struct mm_struct *mm; /* userspace tied to this vm */
+> +       unsigned long nr_memslot_pages;
+>          struct kvm_memslots __rcu *memslots[KVM_ADDRESS_SPACE_NUM];
+>          struct kvm_vcpu *vcpus[KVM_MAX_VCPUS];
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 8bf4b89cfa03..c63fc5c05322 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1567,6 +1567,15 @@ static void kvm_commit_memory_region(struct kvm *kvm,
+>                                       const struct kvm_memory_slot *new,
+>                                       enum kvm_mr_change change)
+>   {
+> +       /*
+> +        * Update the total number of memslot pages before calling the arch
+> +        * hook so that architectures can consume the result directly.
+> +        */
+> +       if (change == KVM_MR_DELETE)
+> +               kvm->nr_memslot_pages -= old->npages;
+> +       else if (change == KVM_MR_CREATE)
+> +               kvm->nr_memslot_pages += new->npages;
+> +
+>          kvm_arch_commit_memory_region(kvm, old, new, change);
+> 
+>          /*
+> @@ -1738,6 +1747,9 @@ int __kvm_set_memory_region(struct kvm *kvm,
+>                  if (!old || !old->npages)
+>                          return -EINVAL;
+> 
+> +               if (WARN_ON_ONCE(kvm->nr_memslot_pages < old->npages))
+> +                       return -EIO;
+> +
+>                  memset(&new, 0, sizeof(new));
+>                  new.id = id;
+>                  new.as_id = as_id;
+> @@ -1756,6 +1768,13 @@ int __kvm_set_memory_region(struct kvm *kvm,
+> 
+>          if (!old || !old->npages) {
+>                  change = KVM_MR_CREATE;
+> +
+> +               /*
+> +                * To simplify KVM internals, the total number of pages across
+> +                * all memslots must fit in an unsigned long.
+> +                */
+> +               if ((kvm->nr_memslot_pages + new.npages) < kvm->nr_memslot_pages)
+> +                       return -EINVAL;
+>          } else { /* Modify an existing slot. */
+>                  if ((new.userspace_addr != old->userspace_addr) ||
+>                      (new.npages != old->npages) ||
+> 
 
-diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 7895ddf176ed..27d0871de854 100644
---- a/arch/x86/kvm/svm/nested.c
-+++ b/arch/x86/kvm/svm/nested.c
-@@ -58,8 +58,9 @@ static void svm_inject_page_fault_nested(struct kvm_vcpu *vcpu, struct x86_excep
-        struct vcpu_svm *svm = to_svm(vcpu);
-        WARN_ON(!is_guest_mode(vcpu));
- 
--       if (vmcb_is_intercept(&svm->nested.ctl, INTERCEPT_EXCEPTION_OFFSET + PF_VECTOR) &&
--	   !svm->nested.nested_run_pending) {
-+	if (vmcb12_is_intercept(&svm->nested.ctl,
-+				INTERCEPT_EXCEPTION_OFFSET + PF_VECTOR) &&
-+	    !svm->nested.nested_run_pending) {
-                svm->vmcb->control.exit_code = SVM_EXIT_EXCP_BASE + PF_VECTOR;
-                svm->vmcb->control.exit_code_hi = 0;
-                svm->vmcb->control.exit_info_1 = fault->error_code;
-@@ -121,7 +122,8 @@ static void nested_svm_uninit_mmu_context(struct kvm_vcpu *vcpu)
- 
- void recalc_intercepts(struct vcpu_svm *svm)
- {
--	struct vmcb_control_area *c, *h, *g;
-+	struct vmcb_control_area *c, *h;
-+	struct vmcb_ctrl_area_cached *g;
- 	unsigned int i;
- 
- 	vmcb_mark_dirty(svm->vmcb, VMCB_INTERCEPTS);
-@@ -172,7 +174,7 @@ static bool nested_svm_vmrun_msrpm(struct vcpu_svm *svm)
- 	 */
- 	int i;
- 
--	if (!(vmcb_is_intercept(&svm->nested.ctl, INTERCEPT_MSR_PROT)))
-+	if (!(vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_MSR_PROT)))
- 		return true;
- 
- 	for (i = 0; i < MSRPM_OFFSETS; i++) {
-@@ -208,9 +210,9 @@ static bool nested_svm_check_bitmap_pa(struct kvm_vcpu *vcpu, u64 pa, u32 size)
- }
- 
- static bool nested_vmcb_check_controls(struct kvm_vcpu *vcpu,
--				       struct vmcb_control_area *control)
-+				       struct vmcb_ctrl_area_cached *control)
- {
--	if (CC(!vmcb_is_intercept(control, INTERCEPT_VMRUN)))
-+	if (CC(!vmcb12_is_intercept(control, INTERCEPT_VMRUN)))
- 		return false;
- 
- 	if (CC(control->asid == 0))
-@@ -273,7 +275,7 @@ static bool nested_vmcb_check_save(struct kvm_vcpu *vcpu)
- }
- 
- static
--void _nested_copy_vmcb_control_to_cache(struct vmcb_control_area *to,
-+void _nested_copy_vmcb_control_to_cache(struct vmcb_ctrl_area_cached *to,
- 					struct vmcb_control_area *from)
- {
- 	unsigned int i;
-@@ -976,7 +978,7 @@ static int nested_svm_exit_handled_msr(struct vcpu_svm *svm)
- 	u32 offset, msr, value;
- 	int write, mask;
- 
--	if (!(vmcb_is_intercept(&svm->nested.ctl, INTERCEPT_MSR_PROT)))
-+	if (!(vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_MSR_PROT)))
- 		return NESTED_EXIT_HOST;
- 
- 	msr    = svm->vcpu.arch.regs[VCPU_REGS_RCX];
-@@ -1003,7 +1005,7 @@ static int nested_svm_intercept_ioio(struct vcpu_svm *svm)
- 	u8 start_bit;
- 	u64 gpa;
- 
--	if (!(vmcb_is_intercept(&svm->nested.ctl, INTERCEPT_IOIO_PROT)))
-+	if (!(vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_IOIO_PROT)))
- 		return NESTED_EXIT_HOST;
- 
- 	port = svm->vmcb->control.exit_info_1 >> 16;
-@@ -1034,12 +1036,12 @@ static int nested_svm_intercept(struct vcpu_svm *svm)
- 		vmexit = nested_svm_intercept_ioio(svm);
- 		break;
- 	case SVM_EXIT_READ_CR0 ... SVM_EXIT_WRITE_CR8: {
--		if (vmcb_is_intercept(&svm->nested.ctl, exit_code))
-+		if (vmcb12_is_intercept(&svm->nested.ctl, exit_code))
- 			vmexit = NESTED_EXIT_DONE;
- 		break;
- 	}
- 	case SVM_EXIT_READ_DR0 ... SVM_EXIT_WRITE_DR7: {
--		if (vmcb_is_intercept(&svm->nested.ctl, exit_code))
-+		if (vmcb12_is_intercept(&svm->nested.ctl, exit_code))
- 			vmexit = NESTED_EXIT_DONE;
- 		break;
- 	}
-@@ -1057,7 +1059,7 @@ static int nested_svm_intercept(struct vcpu_svm *svm)
- 		break;
- 	}
- 	default: {
--		if (vmcb_is_intercept(&svm->nested.ctl, exit_code))
-+		if (vmcb12_is_intercept(&svm->nested.ctl, exit_code))
- 			vmexit = NESTED_EXIT_DONE;
- 	}
- 	}
-@@ -1135,7 +1137,7 @@ static void nested_svm_inject_exception_vmexit(struct vcpu_svm *svm)
- 
- static inline bool nested_exit_on_init(struct vcpu_svm *svm)
- {
--	return vmcb_is_intercept(&svm->nested.ctl, INTERCEPT_INIT);
-+	return vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_INIT);
- }
- 
- static int svm_check_nested_events(struct kvm_vcpu *vcpu)
-@@ -1268,6 +1270,8 @@ static int svm_get_nested_state(struct kvm_vcpu *vcpu,
- 				u32 user_data_size)
- {
- 	struct vcpu_svm *svm;
-+	struct vmcb_control_area *ctl;
-+	unsigned long r;
- 	struct kvm_nested_state kvm_state = {
- 		.flags = 0,
- 		.format = KVM_STATE_NESTED_FORMAT_SVM,
-@@ -1309,9 +1313,18 @@ static int svm_get_nested_state(struct kvm_vcpu *vcpu,
- 	 */
- 	if (clear_user(user_vmcb, KVM_STATE_NESTED_SVM_VMCB_SIZE))
- 		return -EFAULT;
--	if (copy_to_user(&user_vmcb->control, &svm->nested.ctl,
--			 sizeof(user_vmcb->control)))
-+
-+	ctl = kzalloc(sizeof(*ctl), GFP_KERNEL);
-+	if (!ctl)
-+		return -ENOMEM;
-+
-+	nested_copy_vmcb_cache_to_control(ctl, &svm->nested.ctl);
-+	r = copy_to_user(&user_vmcb->control, ctl,
-+			 sizeof(user_vmcb->control));
-+	kfree(ctl);
-+	if (r)
- 		return -EFAULT;
-+
- 	if (copy_to_user(&user_vmcb->save, &svm->vmcb01.ptr->save,
- 			 sizeof(user_vmcb->save)))
- 		return -EFAULT;
-@@ -1329,6 +1342,7 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
- 	struct vmcb_control_area *ctl;
- 	struct vmcb_save_area *save;
- 	struct vmcb_save_area_cached save_cached;
-+	struct vmcb_ctrl_area_cached ctl_cached;
- 	unsigned long cr0;
- 	int ret;
- 
-@@ -1381,7 +1395,8 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
- 		goto out_free;
- 
- 	ret = -EINVAL;
--	if (!nested_vmcb_check_controls(vcpu, ctl))
-+	_nested_copy_vmcb_control_to_cache(&ctl_cached, ctl);
-+	if (!nested_vmcb_check_controls(vcpu, &ctl_cached))
- 		goto out_free;
- 
- 	/*
-@@ -1438,7 +1453,6 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
- 	svm->nested.vmcb12_gpa = kvm_state->hdr.svm.vmcb_pa;
- 
- 	svm_copy_vmrun_state(&svm->vmcb01.ptr->save, save);
--	nested_copy_vmcb_control_to_cache(svm, ctl);
- 
- 	svm_switch_vmcb(svm, &svm->nested.vmcb02);
- 	nested_vmcb02_prepare_control(svm);
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 4e586ce77591..86d966802bbc 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -2440,7 +2440,7 @@ static bool check_selective_cr0_intercepted(struct kvm_vcpu *vcpu,
- 	bool ret = false;
- 
- 	if (!is_guest_mode(vcpu) ||
--	    (!(vmcb_is_intercept(&svm->nested.ctl, INTERCEPT_SELECTIVE_CR0))))
-+	    (!(vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_SELECTIVE_CR0))))
- 		return false;
- 
- 	cr0 &= ~SVM_CR0_SELECTIVE_MASK;
-@@ -4158,7 +4158,7 @@ static int svm_check_intercept(struct kvm_vcpu *vcpu,
- 		    info->intercept == x86_intercept_clts)
- 			break;
- 
--		if (!(vmcb_is_intercept(&svm->nested.ctl,
-+		if (!(vmcb12_is_intercept(&svm->nested.ctl,
- 					INTERCEPT_SELECTIVE_CR0)))
- 			break;
- 
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 49cc502986a9..5d1cdf90aa55 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -156,7 +156,7 @@ struct svm_nested_state {
- 	bool nested_run_pending;
- 
- 	/* cache for control fields of the guest */
--	struct vmcb_control_area ctl;
-+	struct vmcb_ctrl_area_cached ctl;
- 	struct vmcb_save_area_cached save;
- 
- 	bool initialized;
-@@ -491,17 +491,17 @@ static inline bool nested_svm_virtualize_tpr(struct kvm_vcpu *vcpu)
- 
- static inline bool nested_exit_on_smi(struct vcpu_svm *svm)
- {
--	return vmcb_is_intercept(&svm->nested.ctl, INTERCEPT_SMI);
-+	return vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_SMI);
- }
- 
- static inline bool nested_exit_on_intr(struct vcpu_svm *svm)
- {
--	return vmcb_is_intercept(&svm->nested.ctl, INTERCEPT_INTR);
-+	return vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_INTR);
- }
- 
- static inline bool nested_exit_on_nmi(struct vcpu_svm *svm)
- {
--	return vmcb_is_intercept(&svm->nested.ctl, INTERCEPT_NMI);
-+	return vmcb12_is_intercept(&svm->nested.ctl, INTERCEPT_NMI);
- }
- 
- int enter_svm_guest_mode(struct kvm_vcpu *vcpu,
--- 
-2.27.0
+Capping total n_memslots_pages makes sense to me to avoid the (existing)
+nr_mmu_pages wraparound issue, will update the next patchset version
+accordingly.
 
+Thanks,
+Maciej
