@@ -2,154 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BB154443BA
-	for <lists+kvm@lfdr.de>; Wed,  3 Nov 2021 15:39:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B4AC4443D0
+	for <lists+kvm@lfdr.de>; Wed,  3 Nov 2021 15:47:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231721AbhKCOmV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Nov 2021 10:42:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:37025 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231689AbhKCOmU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 3 Nov 2021 10:42:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635950383;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=ltYy3/c7hX+1J9DtMpENyj5YzNAPuaDoe4ar90ESlRI=;
-        b=PzY2Jq6UbOt6oQQQ0fqxNe2WmD4smuraOzphOqdkP4mXqcWiHRuEC1kEVoIL1d6ea66R92
-        FqCTrtkixGrERThAx3E1TEhSURkNISRYbI1cXveN3B3IhAiX/3MKJ+NdiAS2eBpYDbb6df
-        DHkfHVrmsEUoB5QDRilW1oM/V1s+0WE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-252-FRX-sqk8P8mNqL_u77v5Kw-1; Wed, 03 Nov 2021 10:39:40 -0400
-X-MC-Unique: FRX-sqk8P8mNqL_u77v5Kw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ABC31879515;
-        Wed,  3 Nov 2021 14:39:38 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.40.194.243])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3B9DC5D6B1;
-        Wed,  3 Nov 2021 14:39:31 +0000 (UTC)
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
+        id S231517AbhKCOuc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Nov 2021 10:50:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34302 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230282AbhKCOuc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Nov 2021 10:50:32 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E113DC061203
+        for <kvm@vger.kernel.org>; Wed,  3 Nov 2021 07:47:55 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id u33so2567144pfg.8
+        for <kvm@vger.kernel.org>; Wed, 03 Nov 2021 07:47:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=C0wf2K0rKG8C1RSWcaFIUVVK/MmFwAdNj5eu/GP5eZg=;
+        b=B9VpNWuxUqohM9ynGgVOtGz8t7EVldEXvn3TpJhPxTpkMNfKclNBrxgJdXzCq0J3Ep
+         uWL792cWDfDzfIAEEqij34sAHWOzPFONgEN5oY3XdM3Z9T90FapJZn8rOwaJFelsuFXR
+         GNNBiMkKbp7bWV0FyPlxCmbbFyFs/FJC6AOWaqUo89Vce/oTS/6ZKuvmPV8J3HtPVW7j
+         de88q1nuq/CKP2qgl14Xr/dB72CqhnsXK7AcNa9DCMkHKx9I6wDsnCIGDHnDfpyaSmON
+         l3onlOy36NkkWlhejiCAwar3Jx/gMyH+GKDuHmP9AbS9gcqx/shdiJUH1yBB4AFvHC98
+         VjIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=C0wf2K0rKG8C1RSWcaFIUVVK/MmFwAdNj5eu/GP5eZg=;
+        b=S2WbcvuF0FccLXKiESuAQ9FQs+I5P10C8Tsc/GIWC70BJGV8emMliwHNzYGacCgRhu
+         7Nb/XJ2cnPfcLLusouPiQSdEx1lh/7KLBXr95OedrtaOgLDPxEuzRQ5fYytFHc35E8OK
+         fim6hPc+dYWCdI7Ks+RJVC9DcZQsP3uGVXwAYVkMfI88WIaw4sWgh+jJjM9Ysga4Cpw1
+         DexwnhqrNikQSIVcgjcq3WuyJV6bPobE2sL7DDIFtDIysTQ34qaMQDuHZ8qzTpBQsJFt
+         sOBxzh8dt+PMeAm5b2athsToDjrb4nmVAkEfiLHcN6X6/H5ZDKOlGauedkYC/SLVJBQP
+         xshQ==
+X-Gm-Message-State: AOAM532Qj1B+BKwWT9Ca0qlvx4lbchvApRgH+EhdrvZR2pvZS0p6RJWS
+        5kuva0gcxXPgDYJGZzrA3bxwJA==
+X-Google-Smtp-Source: ABdhPJzlbiudLiylGp+N6jM6RDpt8UXV/HrVtNYeDnS3T2Pwf6PWIN+DJCztrwLJs+wcqW2qDqMztw==
+X-Received: by 2002:a63:556:: with SMTP id 83mr22917640pgf.222.1635950874972;
+        Wed, 03 Nov 2021 07:47:54 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id e24sm2586994pfn.8.2021.11.03.07.47.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Nov 2021 07:47:54 -0700 (PDT)
+Date:   Wed, 3 Nov 2021 14:47:50 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Borislav Petkov <bp@alien8.de>,
-        linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Sean Christopherson <seanjc@google.com>,
-        x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Subject: [PATCH v3] KVM: x86: inhibit APICv when KVM_GUESTDBG_BLOCKIRQ active
-Date:   Wed,  3 Nov 2021 16:39:29 +0200
-Message-Id: <20211103143929.15264-1-mlevitsk@redhat.com>
+        Jim Mattson <jmattson@google.com>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 01/13] KVM: x86: Cache total page count to avoid
+ traversing the memslot array
+Message-ID: <YYKhFhoSa/8SHxJB@google.com>
+References: <cover.1632171478.git.maciej.szmigiero@oracle.com>
+ <d07f07cdd545ab1a495a9a0da06e43ad97c069a2.1632171479.git.maciej.szmigiero@oracle.com>
+ <YW9Fi128rYxiF1v3@google.com>
+ <e618edce-b310-6d9a-3860-d7f4d8c0d98f@maciej.szmigiero.name>
+ <YXBnn6ZaXbaqKvOo@google.com>
+ <YYBqMipZT9qcwDMt@google.com>
+ <8017cf9d-2b03-0c27-b78a-41b3d03c308b@maciej.szmigiero.name>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8017cf9d-2b03-0c27-b78a-41b3d03c308b@maciej.szmigiero.name>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM_GUESTDBG_BLOCKIRQ relies on interrupts being injected using
-standard kvm's inject_pending_event, and not via APICv/AVIC.
+On Wed, Nov 03, 2021, Maciej S. Szmigiero wrote:
+> Capping total n_memslots_pages makes sense to me to avoid the (existing)
+> nr_mmu_pages wraparound issue, will update the next patchset version
+> accordingly.
 
-Since this is a debug feature, just inhibit APICv/AVIC while
-KVM_GUESTDBG_BLOCKIRQ is in use on at least one vCPU.
-
-Fixes: 61e5f69ef0837 ("KVM: x86: implement KVM_GUESTDBG_BLOCKIRQ")
-
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/svm/avic.c         |  3 ++-
- arch/x86/kvm/vmx/vmx.c          |  3 ++-
- arch/x86/kvm/x86.c              | 21 +++++++++++++++++++++
- 4 files changed, 26 insertions(+), 2 deletions(-)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 88fce6ab4bbd7..8f6e15b95a4d8 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1034,6 +1034,7 @@ struct kvm_x86_msr_filter {
- #define APICV_INHIBIT_REASON_IRQWIN     3
- #define APICV_INHIBIT_REASON_PIT_REINJ  4
- #define APICV_INHIBIT_REASON_X2APIC	5
-+#define APICV_INHIBIT_REASON_BLOCKIRQ	6
- 
- struct kvm_arch {
- 	unsigned long n_used_mmu_pages;
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index 8052d92069e01..affc0ea98d302 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -904,7 +904,8 @@ bool svm_check_apicv_inhibit_reasons(ulong bit)
- 			  BIT(APICV_INHIBIT_REASON_NESTED) |
- 			  BIT(APICV_INHIBIT_REASON_IRQWIN) |
- 			  BIT(APICV_INHIBIT_REASON_PIT_REINJ) |
--			  BIT(APICV_INHIBIT_REASON_X2APIC);
-+			  BIT(APICV_INHIBIT_REASON_X2APIC) |
-+			  BIT(APICV_INHIBIT_REASON_BLOCKIRQ);
- 
- 	return supported & BIT(bit);
- }
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 71f54d85f104c..e4fc9ff7cd944 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7565,7 +7565,8 @@ static void hardware_unsetup(void)
- static bool vmx_check_apicv_inhibit_reasons(ulong bit)
- {
- 	ulong supported = BIT(APICV_INHIBIT_REASON_DISABLE) |
--			  BIT(APICV_INHIBIT_REASON_HYPERV);
-+			  BIT(APICV_INHIBIT_REASON_HYPERV) |
-+			  BIT(APICV_INHIBIT_REASON_BLOCKIRQ);
- 
- 	return supported & BIT(bit);
- }
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index ac83d873d65b0..5d30cea58182e 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -10703,6 +10703,25 @@ int kvm_arch_vcpu_ioctl_set_sregs(struct kvm_vcpu *vcpu,
- 	return ret;
- }
- 
-+static void kvm_arch_vcpu_guestdbg_update_apicv_inhibit(struct kvm *kvm)
-+{
-+	struct kvm_vcpu *vcpu = NULL;
-+	int i;
-+	bool block_irq_used = false;
-+
-+	down_write(&kvm->arch.apicv_update_lock);
-+
-+	kvm_for_each_vcpu(i, vcpu, kvm) {
-+		if (vcpu->guest_debug & KVM_GUESTDBG_BLOCKIRQ) {
-+			block_irq_used = true;
-+			break;
-+		}
-+	}
-+	__kvm_request_apicv_update(kvm, !block_irq_used,
-+					       APICV_INHIBIT_REASON_BLOCKIRQ);
-+	up_write(&kvm->arch.apicv_update_lock);
-+}
-+
- int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
- 					struct kvm_guest_debug *dbg)
- {
-@@ -10755,6 +10774,8 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
- 
- 	static_call(kvm_x86_update_exception_bitmap)(vcpu);
- 
-+	kvm_arch_vcpu_guestdbg_update_apicv_inhibit(vcpu->kvm);
-+
- 	r = 0;
- 
- out:
--- 
-2.26.3
-
+No need to do it yourself.  I have a reworked version of the series with a bunch
+of cleanups before and after the meat of your series, as well non-functional changes
+(hopefully) to the "Resolve memslot ID via a hash table" and "Keep memslots in
+tree-based structures" to avoid all the swap() behavior and to provide better
+continuity between the aforementioned patches.  Unless something goes sideways in
+the last few touchups, I'll get it posted today.
