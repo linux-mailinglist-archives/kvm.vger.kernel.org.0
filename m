@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F0C9444308
-	for <lists+kvm@lfdr.de>; Wed,  3 Nov 2021 15:06:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 17C1744430B
+	for <lists+kvm@lfdr.de>; Wed,  3 Nov 2021 15:06:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232081AbhKCOJK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Nov 2021 10:09:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:59136 "EHLO
+        id S232160AbhKCOJN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Nov 2021 10:09:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28727 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231932AbhKCOJF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 3 Nov 2021 10:09:05 -0400
+        by vger.kernel.org with ESMTP id S231958AbhKCOJH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 3 Nov 2021 10:09:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1635948389;
+        s=mimecast20190719; t=1635948390;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=9QcVev1Ykpkrc32brdMrevNpi1w0zxnAXd00Dazz9is=;
-        b=O0N61zsS7RHUqZ91fCXGE901yw8MJML4Af/AOg0cdoFzLWi++u+gpewbf3avpVEK8hbFNX
-        n5CpBsXO0wctQinobZKKAcapGDNySuckKhpqcluVnxfjekC+O3kvk8YdXFeEnREYpJ+EQk
-        zcRQAPNJ4nvHuHrjn8JJUVxXyBLBo3c=
+        bh=TfPrvtwM19WIN0IdRHpwKBi+MFW2ozo1SwSCyDq526E=;
+        b=fvPQ4c5NrF5tMUf2xV8bLzX9lOKwHWoXruVySNMNE1tEFH17eqR5365OZqLmDbVE54awkM
+        2PnKcEr2apZ9B8MBVa7jgua9PFVUHhzeVL2aiRrIKa6iv3NMXkcuLrC+EBmJ9U/VN2QjhZ
+        zl1tXc1w3WtXkcn2/kGdc/zReEg0VGQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-111-JR-doC3aPiWFWe5aS_4eKg-1; Wed, 03 Nov 2021 10:06:25 -0400
-X-MC-Unique: JR-doC3aPiWFWe5aS_4eKg-1
+ us-mta-363-hrMdwZBDOsCY3P2RknSiZw-1; Wed, 03 Nov 2021 10:06:27 -0400
+X-MC-Unique: hrMdwZBDOsCY3P2RknSiZw-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C6244100CFB2;
-        Wed,  3 Nov 2021 14:06:23 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EDDAF80668E;
+        Wed,  3 Nov 2021 14:06:24 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B9DBE100239F;
-        Wed,  3 Nov 2021 14:06:22 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E04AB100EA05;
+        Wed,  3 Nov 2021 14:06:23 +0000 (UTC)
 From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -47,9 +47,9 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
         linux-kernel@vger.kernel.org,
         Emanuele Giuseppe Esposito <eesposit@redhat.com>
-Subject: [PATCH v5 4/7] nSVM: use vmcb_save_area_cached in nested_vmcb_valid_sregs()
-Date:   Wed,  3 Nov 2021 10:05:24 -0400
-Message-Id: <20211103140527.752797-5-eesposit@redhat.com>
+Subject: [PATCH v5 5/7] nSVM: use svm->nested.save to load vmcb12 registers and avoid TOC/TOU races
+Date:   Wed,  3 Nov 2021 10:05:25 -0400
+Message-Id: <20211103140527.752797-6-eesposit@redhat.com>
 In-Reply-To: <20211103140527.752797-1-eesposit@redhat.com>
 References: <20211103140527.752797-1-eesposit@redhat.com>
 MIME-Version: 1.0
@@ -59,81 +59,78 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now that struct vmcb_save_area_cached contains the required
-vmcb fields values (done in nested_load_save_from_vmcb12()),
-check them to see if they are correct in nested_vmcb_valid_sregs().
+Use the already checked svm->nested.save cached fields
+(EFER, CR0, CR4, ...) instead of vmcb12's in
+nested_vmcb02_prepare_save().
+This prevents from creating TOC/TOU races, since the
+guest could modify the vmcb12 fields.
 
-While at it, rename nested_vmcb_valid_sregs in nested_vmcb_check_save.
-_nested_vmcb_check_save takes the additional @save parameter, so it
-is helpful when we want to check a non-svm save state, like in
-svm_set_nested_state. The reason for that is that save is the L1
-state, not L2, so we just check it.
+This also avoids the need of force-setting EFER_SVME in
+nested_vmcb02_prepare_save.
 
 Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/x86/kvm/svm/nested.c | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+ arch/x86/kvm/svm/nested.c | 24 ++++++------------------
+ 1 file changed, 6 insertions(+), 18 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
-index 162b338a6c74..64fb43234e06 100644
+index 64fb43234e06..cdddd3258ddf 100644
 --- a/arch/x86/kvm/svm/nested.c
 +++ b/arch/x86/kvm/svm/nested.c
-@@ -245,8 +245,8 @@ static bool nested_vmcb_check_controls(struct kvm_vcpu *vcpu,
- }
- 
- /* Common checks that apply to both L1 and L2 state.  */
--static bool nested_vmcb_valid_sregs(struct kvm_vcpu *vcpu,
--				    struct vmcb_save_area *save)
-+static bool _nested_vmcb_check_save(struct kvm_vcpu *vcpu,
-+				     struct vmcb_save_area_cached *save)
+@@ -248,13 +248,6 @@ static bool nested_vmcb_check_controls(struct kvm_vcpu *vcpu,
+ static bool _nested_vmcb_check_save(struct kvm_vcpu *vcpu,
+ 				     struct vmcb_save_area_cached *save)
  {
- 	/*
- 	 * FIXME: these should be done after copying the fields,
-@@ -286,6 +286,14 @@ static bool nested_vmcb_valid_sregs(struct kvm_vcpu *vcpu,
- 	return true;
+-	/*
+-	 * FIXME: these should be done after copying the fields,
+-	 * to avoid TOC/TOU races.  For these save area checks
+-	 * the possible damage is limited since kvm_set_cr0 and
+-	 * kvm_set_cr4 handle failure; EFER_SVME is an exception
+-	 * so it is force-set later in nested_prepare_vmcb_save.
+-	 */
+ 	if (CC(!(save->efer & EFER_SVME)))
+ 		return false;
+ 
+@@ -511,15 +504,10 @@ static void nested_vmcb02_prepare_save(struct vcpu_svm *svm, struct vmcb *vmcb12
+ 
+ 	kvm_set_rflags(&svm->vcpu, vmcb12->save.rflags | X86_EFLAGS_FIXED);
+ 
+-	/*
+-	 * Force-set EFER_SVME even though it is checked earlier on the
+-	 * VMCB12, because the guest can flip the bit between the check
+-	 * and now.  Clearing EFER_SVME would call svm_free_nested.
+-	 */
+-	svm_set_efer(&svm->vcpu, vmcb12->save.efer | EFER_SVME);
++	svm_set_efer(&svm->vcpu, svm->nested.save.efer);
+ 
+-	svm_set_cr0(&svm->vcpu, vmcb12->save.cr0);
+-	svm_set_cr4(&svm->vcpu, vmcb12->save.cr4);
++	svm_set_cr0(&svm->vcpu, svm->nested.save.cr0);
++	svm_set_cr4(&svm->vcpu, svm->nested.save.cr4);
+ 
+ 	svm->vcpu.arch.cr2 = vmcb12->save.cr2;
+ 
+@@ -534,8 +522,8 @@ static void nested_vmcb02_prepare_save(struct vcpu_svm *svm, struct vmcb *vmcb12
+ 
+ 	/* These bits will be set properly on the first execution when new_vmc12 is true */
+ 	if (unlikely(new_vmcb12 || vmcb_is_dirty(vmcb12, VMCB_DR))) {
+-		svm->vmcb->save.dr7 = vmcb12->save.dr7 | DR7_FIXED_1;
+-		svm->vcpu.arch.dr6  = vmcb12->save.dr6 | DR6_ACTIVE_LOW;
++		svm->vmcb->save.dr7 = svm->nested.save.dr7 | DR7_FIXED_1;
++		svm->vcpu.arch.dr6  = svm->nested.save.dr6 | DR6_ACTIVE_LOW;
+ 		vmcb_mark_dirty(svm->vmcb, VMCB_DR);
+ 	}
  }
+@@ -649,7 +637,7 @@ int enter_svm_guest_mode(struct kvm_vcpu *vcpu, u64 vmcb12_gpa,
+ 	nested_vmcb02_prepare_control(svm);
+ 	nested_vmcb02_prepare_save(svm, vmcb12);
  
-+static bool nested_vmcb_check_save(struct kvm_vcpu *vcpu)
-+{
-+	struct vcpu_svm *svm = to_svm(vcpu);
-+	struct vmcb_save_area_cached *save = &svm->nested.save;
-+
-+	return _nested_vmcb_check_save(vcpu, save);
-+}
-+
- static
- void _nested_copy_vmcb_control_to_cache(struct vmcb_control_area *to,
- 					struct vmcb_control_area *from)
-@@ -694,7 +702,7 @@ int nested_svm_vmrun(struct kvm_vcpu *vcpu)
- 	nested_copy_vmcb_control_to_cache(svm, &vmcb12->control);
- 	nested_copy_vmcb_save_to_cache(svm, &vmcb12->save);
- 
--	if (!nested_vmcb_valid_sregs(vcpu, &vmcb12->save) ||
-+	if (!nested_vmcb_check_save(vcpu) ||
- 	    !nested_vmcb_check_controls(vcpu, &svm->nested.ctl)) {
- 		vmcb12->control.exit_code    = SVM_EXIT_ERR;
- 		vmcb12->control.exit_code_hi = 0;
-@@ -1330,6 +1338,7 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
- 		&user_kvm_nested_state->data.svm[0];
- 	struct vmcb_control_area *ctl;
- 	struct vmcb_save_area *save;
-+	struct vmcb_save_area_cached save_cached;
- 	unsigned long cr0;
- 	int ret;
- 
-@@ -1397,10 +1406,11 @@ static int svm_set_nested_state(struct kvm_vcpu *vcpu,
- 	 * Validate host state saved from before VMRUN (see
- 	 * nested_svm_check_permissions).
- 	 */
-+	_nested_copy_vmcb_save_to_cache(&save_cached, save);
- 	if (!(save->cr0 & X86_CR0_PG) ||
- 	    !(save->cr0 & X86_CR0_PE) ||
- 	    (save->rflags & X86_EFLAGS_VM) ||
--	    !nested_vmcb_valid_sregs(vcpu, save))
-+	    !_nested_vmcb_check_save(vcpu, &save_cached))
- 		goto out_free;
- 
- 	/*
+-	ret = nested_svm_load_cr3(&svm->vcpu, vmcb12->save.cr3,
++	ret = nested_svm_load_cr3(&svm->vcpu, svm->nested.save.cr3,
+ 				  nested_npt_enabled(svm), from_vmrun);
+ 	if (ret)
+ 		return ret;
 -- 
 2.27.0
 
