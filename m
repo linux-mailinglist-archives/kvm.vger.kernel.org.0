@@ -2,122 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 17696445466
-	for <lists+kvm@lfdr.de>; Thu,  4 Nov 2021 14:59:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E5CD3445537
+	for <lists+kvm@lfdr.de>; Thu,  4 Nov 2021 15:21:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231253AbhKDOBl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Nov 2021 10:01:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36768 "EHLO
+        id S231489AbhKDOYM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Nov 2021 10:24:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230511AbhKDOBk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Nov 2021 10:01:40 -0400
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFD1EC061714;
-        Thu,  4 Nov 2021 06:59:02 -0700 (PDT)
-Received: from zn.tnic (p200300ec2f0f2b00292987ac0c06fcda.dip0.t-ipconnect.de [IPv6:2003:ec:2f0f:2b00:2929:87ac:c06:fcda])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 07B031EC0570;
-        Thu,  4 Nov 2021 14:59:01 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1636034341;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=7LX03mAYK04otWZOoY71ALabwci0dk1MWKslK4zWu2I=;
-        b=KR+lLKKLVG+OimGX0G+TVfeAzPp3+DAiK71o99+TN8MKguX6+YMASSnyMiA33sWx6z9RXk
-        PtVWl2Hv+ntT4D5AF+ZUH0n29RNRaoDCwwzmVLEOIeXtzSFlfK82CoRS/vUfvkp7K/I00A
-        cmZCFAiEROjuNQ7+z/kvpv4vyBBOcTY=
-Date:   Thu, 4 Nov 2021 14:58:49 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        with ESMTP id S232093AbhKDOYJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Nov 2021 10:24:09 -0400
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E1C9C0432C7
+        for <kvm@vger.kernel.org>; Thu,  4 Nov 2021 07:18:31 -0700 (PDT)
+Received: by mail-pg1-x52f.google.com with SMTP id j9so5552562pgh.1
+        for <kvm@vger.kernel.org>; Thu, 04 Nov 2021 07:18:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=GgU1oUsck/kv7V8rA9YPXtLGsU5UGF/lzeg6fggjKVY=;
+        b=RTR1r+Ui0w7nUSHbbKl234uth/uzF1T7qF0sliOvvfsRTTb+Ux1LBt/ffQdTAY+/ec
+         E1O0cYaxUcP9JJO91gsHWRMciPl/F1cyjYk822jBCR9TBPiuByHH3wQyg8CO0RsG69s3
+         xxzxbxhqtVhFtR1IL3PwpUwYtMOSHDPFnwjUBiz3EACBzoEuXHLTOpHAkW6OfrqPvopQ
+         XlcXyGEUw7b6wzkLr4K8OvDzbhOksbBNbi3EmpkiMJmFBXoGv87f+9auU+g0UJJslfkq
+         YHd6yOra6jxs1gpwYkmD3+RM+zmhPNdO2qhY5Blp/Ql4/z42+YEAbgjAkELLYFLa2Wdb
+         1tBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=GgU1oUsck/kv7V8rA9YPXtLGsU5UGF/lzeg6fggjKVY=;
+        b=6AQTEV8t7qJMkw1R0j7dFx5xBwysaMudUkQ0mZPpOXK9cb7om/cLM/Q6I2apCoBIT5
+         1w27lwRNPMIoE+rpWEcHkETTr4zYRyelGquYenqgXzobs+K5hv5UdrJ8+LV9eSGa5/QK
+         FePAdEOVFkFc96GKNhkTBRRvPDywqsg7SoontiCBa0++XJSxxODdNkDuJ6wwSP1msc6W
+         0DjD6GoprsRCrqZMkmrRhnFtnVh/7Mgt/P0OuLRbSfiG9sq1OhKXmjN3NXqcvDm6uChI
+         UJlMgGAClMZBFpEzgyusN2mRYF1J24lU8a7b3+k4A3j6PVAG9ABeKDPZ12I5slFa6cu0
+         UNUQ==
+X-Gm-Message-State: AOAM530WreRkzEIiyARYCtmtIuJLqbEcJ2RMtBdx+JKl/0lQMkpVi/tX
+        AqvuQgwqRsoc1WuVyzMiFSlGaQ==
+X-Google-Smtp-Source: ABdhPJxdt1yraCn5ATAvpc1jCPrfM/2fIu0pWDknNbK+x2XDbxsbKhM1gzBOeaAuduFP4pk+NDgWGQ==
+X-Received: by 2002:a65:5b01:: with SMTP id y1mr22260090pgq.451.1636035510920;
+        Thu, 04 Nov 2021 07:18:30 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id c9sm4061004pgq.58.2021.11.04.07.18.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Nov 2021 07:18:30 -0700 (PDT)
+Date:   Thu, 4 Nov 2021 14:18:26 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Will Deacon <will@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v6 14/42] x86/sev: Register GHCB memory when SEV-SNP is
- active
-Message-ID: <YYPnGeW+8tlNgW34@zn.tnic>
-References: <20211008180453.462291-1-brijesh.singh@amd.com>
- <20211008180453.462291-15-brijesh.singh@amd.com>
- <YYFs+5UUMfyDgh/a@zn.tnic>
- <aea0e0c8-7f03-b9db-3084-f487a233c50b@amd.com>
- <YYGGv6EtWrw7cnLA@zn.tnic>
- <a975dfbf-f9bb-982e-9814-7259bc075b71@amd.com>
+        Joerg Roedel <joro@8bytes.org>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        linux-arm-kernel@lists.infradead.org,
+        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, linux-csky@vger.kernel.org,
+        linux-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        xen-devel@lists.xenproject.org,
+        Artem Kashkanov <artem.kashkanov@intel.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>,
+        Juergen Gross <jgross@suse.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Vincent Chen <deanbo422@gmail.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Greentime Hu <green.hu@gmail.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Marc Zyngier <maz@kernel.org>, Nick Hu <nickhu@andestech.com>,
+        Guo Ren <guoren@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>
+Subject: Re: [PATCH v3 01/16] perf: Ensure perf_guest_cbs aren't reloaded
+ between !NULL check and deref
+Message-ID: <YYPrst2CUBXLYc9h@google.com>
+References: <20210922000533.713300-1-seanjc@google.com>
+ <20210922000533.713300-2-seanjc@google.com>
+ <77e3a76a-016b-8945-a1d5-aae4075e2147@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a975dfbf-f9bb-982e-9814-7259bc075b71@amd.com>
+In-Reply-To: <77e3a76a-016b-8945-a1d5-aae4075e2147@gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 03, 2021 at 03:10:16PM -0500, Brijesh Singh wrote:
-> Looking at the secondary CPU bring up path it seems that we will not be
-> getting #VC until the early_setup_idt() is called. I am thinking to add
-> function to register the GHCB from the early_setup_idt()
+On Thu, Nov 04, 2021, Like Xu wrote:
+> On 22/9/2021 8:05 am, Sean Christopherson wrote:
+> > diff --git a/kernel/events/core.c b/kernel/events/core.c
+> > index 464917096e73..80ff050a7b55 100644
+> > --- a/kernel/events/core.c
+> > +++ b/kernel/events/core.c
+> > @@ -6491,14 +6491,21 @@ struct perf_guest_info_callbacks *perf_guest_cbs;
+> >   int perf_register_guest_info_callbacks(struct perf_guest_info_callbacks *cbs)
+> >   {
+> > -	perf_guest_cbs = cbs;
+> > +	if (WARN_ON_ONCE(perf_guest_cbs))
+> > +		return -EBUSY;
+> > +
+> > +	WRITE_ONCE(perf_guest_cbs, cbs);
 > 
-> early_setup_idt()
-> {
->   ...
->   if (IS_ENABLED(CONFIG_MEM_ENCRYPT))
->     sev_snp_register_ghcb()
->   ...
-> }
+> So per Paolo's comment [1], does it help to use
+> 	smp_store_release(perf_guest_cbs, cbs)
+> or
+> 	rcu_assign_pointer(perf_guest_cbs, cbs)
+> here?
+
+Heh, if by "help" you mean "required to prevent bad things on weakly ordered
+architectures", then yes, it helps :-)  If I'm interpeting Paolo's suggestion
+correctly, he's pointing out that oustanding stores to the function pointers in
+@cbs need to complete before assigning a non-NULL pointer to perf_guest_cbs,
+otherwise a perf event handler may see a valid pointer with half-baked callbacks.
+
+I think smp_store_release() with a comment would be appropriate, assuming my
+above interpretation is correct.
+
+> [1] https://lore.kernel.org/kvm/37afc465-c12f-01b9-f3b6-c2573e112d76@redhat.com/
 > 
-> The above will cover the APs
-
-That will cover the APs during early boot as that is being called from
-asm.
-
-> and for BSP case I can call the same function just after the final IDT
-> is loaded
-
-Why after and not before?
-
-> cpu_init_exception_handling()
-> {
->    ...
->    ...
->    /* Finally load the IDT */
->    load_current_idt();
-> 
->    if (IS_ENABLED(CONFIG_MEM_ENCRYPT))
->      sev_snp_register_ghcb()
-> 
-> }
-
-That is also called on the APs - not only the BSP. trap_init() calls it
-from start_kernel() which is the BSP and cpu_init_secondary() calls it
-too, which is ofc the APs.
-
-I guess that should be ok since you're calling the same function from
-both but WTH do I know...
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+> >   	return 0;
+> >   }
+> >   EXPORT_SYMBOL_GPL(perf_register_guest_info_callbacks);
+> >   int perf_unregister_guest_info_callbacks(struct perf_guest_info_callbacks *cbs)
+> >   {
+> > -	perf_guest_cbs = NULL;
+> > +	if (WARN_ON_ONCE(perf_guest_cbs != cbs))
+> > +		return -EINVAL;
+> > +
+> > +	WRITE_ONCE(perf_guest_cbs, NULL);
+> > +	synchronize_rcu();
+> >   	return 0;
+> >   }
+> >   EXPORT_SYMBOL_GPL(perf_unregister_guest_info_callbacks);
+> > 
