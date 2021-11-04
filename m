@@ -2,128 +2,253 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 74501445C56
-	for <lists+kvm@lfdr.de>; Thu,  4 Nov 2021 23:42:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AABB1445C61
+	for <lists+kvm@lfdr.de>; Thu,  4 Nov 2021 23:46:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232231AbhKDWoi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Nov 2021 18:44:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42578 "EHLO
+        id S231322AbhKDWsi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Nov 2021 18:48:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232227AbhKDWoh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Nov 2021 18:44:37 -0400
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91F8DC061205
-        for <kvm@vger.kernel.org>; Thu,  4 Nov 2021 15:41:58 -0700 (PDT)
-Received: by mail-pg1-x52a.google.com with SMTP id 75so6697444pga.3
-        for <kvm@vger.kernel.org>; Thu, 04 Nov 2021 15:41:58 -0700 (PDT)
+        with ESMTP id S230000AbhKDWsh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Nov 2021 18:48:37 -0400
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D043C061714
+        for <kvm@vger.kernel.org>; Thu,  4 Nov 2021 15:45:58 -0700 (PDT)
+Received: by mail-lf1-x133.google.com with SMTP id d21so14948172lfg.7
+        for <kvm@vger.kernel.org>; Thu, 04 Nov 2021 15:45:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=2cM+pc7RJOlLXf/kESM57DsH9Y+7ss4v2ISlVrw0au4=;
-        b=ooE6FbC1dphlseVcXYf6E54FhDQXALDT9cp9rkFbPJ4y3391PeZbY42Xq5zYAiM2X0
-         NdOPtJ6lkjBowxQXuPPYzsk/ImWUzRx84xa98kqJsQVBicjU2eDc5DVULiWpqnCKqxed
-         Ey2Ctp6iCrEN8zCtRphZ24isIw03JAvk0SfSWM0DA/73Pbf0h/QRbrwYHZfhgAzS25J9
-         xoJiSowrT7yhbflDyi/bGTCX/rlcA7okzQ8gpsTNHWowkIpirAi9P+owp8DITCHO+0RI
-         qztHqyk6DNOgAHnulQogAsMkvqtleYWLZNf20k/P+g9/YJ3n7yTI2IPueMQnaW5/KaTr
-         oILQ==
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=HdzgSvRlpxRgy4KHLhs0oht3okdf6XPc4WnFlS5YFsc=;
+        b=C9TCx2jYkcq4DKaI2wfNf9ADCrYq4FmsMehnl4+E7BzAJwu1i+FbnEHOjMCKWLo9GB
+         I5rGi3AvrTQomPejThvdOF5NCdGhiKsPZ1AlzVhUVX4NzE3jd8zHzAZ2I8LXO5rICaio
+         oRzrY62uUUmjY6s699bNsGQfEArCD0MQp8BPs+diekqMOLaEog/3sEd8ZNnuq5UQz3na
+         OrZOAEmdXRAVKJByEbUtiJ+KCIghS0yxBC7Wir9tKfNHbCmjAgq3Cj1m/kKwkIdF0lIa
+         tutCj7pKeJBbEAWVSfxnABr/lDQRrzWaXAQL8oqSWOBduSYrQCKGivfUU9UdX0RbUvrU
+         HuSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=2cM+pc7RJOlLXf/kESM57DsH9Y+7ss4v2ISlVrw0au4=;
-        b=Z0mSrEPrRS70PG0PIERIWo9rQLSmMnYX/O4okb8mqRhW/M8Q2fjvDVz01l3DnlyJXA
-         CjgDrG9lIfhcaJ4aKjpueS3Bm7Mh2o9Q5TQ8PWCtbeypgIBV0KK4jKBZMEz++45rTzs8
-         aAei8ekqUhOuqQnwAiOGuFcIDrB3lNOPIx8j4q3Rc0NKp1+Q7hdA5MJTm38GSWp4ykXI
-         vgdO3IAoYbLIa3JZuZPFxgA21VVVYrX6uwfOCZLdnIIBjYP77wdHwAqEDi2O/72OTV5b
-         3eLaG/HIhl4zsjBOwubBn6J8xYqhxq+89T7bgAMCR6uqfEldocUk+VitWJf8BrynrS7Y
-         diyQ==
-X-Gm-Message-State: AOAM53084rzbxTwAIB9/VHorkenaQuJCk//DE2mdHC4csF1wVjo4rXhG
-        DjHh3q9O9n9JhQcpbhCdUmNGIw==
-X-Google-Smtp-Source: ABdhPJxxNMKGv/NhLtIdMl/BRJOCT+zMUUqyt4AWTJHdlm9O9AHyBiNnpE4YQWobAiLulE4sZ0UvKQ==
-X-Received: by 2002:a05:6a00:21c2:b0:44c:fa0b:f72 with SMTP id t2-20020a056a0021c200b0044cfa0b0f72mr54948884pfj.13.1636065717795;
-        Thu, 04 Nov 2021 15:41:57 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id h2sm4707798pjk.44.2021.11.04.15.41.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Nov 2021 15:41:57 -0700 (PDT)
-Date:   Thu, 4 Nov 2021 22:41:53 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=HdzgSvRlpxRgy4KHLhs0oht3okdf6XPc4WnFlS5YFsc=;
+        b=0fGIepqobkfja82aQyMfF5ZLpagUE7zmUso0PMiMH0E93VloCYsdeaATbZ7Mmjg8as
+         mqnLqwFA8/hRmso/SMbuiePM8vvTjfL3OMiI6kdLq5u7RTtq3qnkDOb4g2Idmx3v6pJC
+         D1KOXlr58Xkta4VlqLKvHdhHB78x8ne+Hly6gC6jJtNlurvRHySLmWr4u99jH4qzNtEn
+         dcGWLUPi1e4RZav1fS1s57osIyhXLkX6OMrAInBiVFBoZqZ3pgvmX83jpaDgjpBv3AWR
+         7dKZNkcJpdvPlWaMdpXp6XhWoNcCImDtVgRWtSvBuxgmjoKQepmAvY637jofqjskkJtl
+         yt+g==
+X-Gm-Message-State: AOAM530L4Tp3v/11jN14JJoWNK0D8nGQdz4wB1G0rvcc7GdsvMUWJU14
+        +SugvW0wrOg/SqenYXJqOFpNbLW/0Jpt2w62MuZSHQ==
+X-Google-Smtp-Source: ABdhPJzCX5peoOLpwEBmpf+HjmsppYhCbkLJv9/WEFGivlOrVHth13vtBLYBV1quHYTFg4ToxAOCI9Tl4r/jM6h/I/I=
+X-Received: by 2002:a19:3844:: with SMTP id d4mr1617732lfj.64.1636065956434;
+ Thu, 04 Nov 2021 15:45:56 -0700 (PDT)
+MIME-Version: 1.0
+From:   David Matlack <dmatlack@google.com>
+Date:   Thu, 4 Nov 2021 15:45:30 -0700
+Message-ID: <CALzav=dV_U4r1K9oDq4esb4mpBQDQ2ROQ5zH5wV3KpOaZrRW-A@mail.gmail.com>
+Subject: RFC: KVM: x86/mmu: Eager Page Splitting
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm list <kvm@vger.kernel.org>, Ben Gardon <bgardon@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Harish Barathvajasankar <hbarath@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>
-Subject: Re: [PATCH v5.5 01/30] KVM: Ensure local memslot copies operate on
- up-to-date arch-specific data
-Message-ID: <YYRhsclZpZwilkE5@google.com>
-References: <20211104002531.1176691-1-seanjc@google.com>
- <20211104002531.1176691-2-seanjc@google.com>
- <CANgfPd-uuPFjAHk5kVNom2Qs=UU_GX6CQ0xDLg1h_iL8t8S2aQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANgfPd-uuPFjAHk5kVNom2Qs=UU_GX6CQ0xDLg1h_iL8t8S2aQ@mail.gmail.com>
+        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 04, 2021, Ben Gardon wrote:
-> > @@ -1597,6 +1596,26 @@ static int kvm_set_memslot(struct kvm *kvm,
-> >                 kvm_copy_memslots(slots, __kvm_memslots(kvm, as_id));
-> >         }
-> >
-> > +       /*
-> > +        * Make a full copy of the old memslot, the pointer will become stale
-> > +        * when the memslots are re-sorted by update_memslots(), and the old
-> > +        * memslot needs to be referenced after calling update_memslots(), e.g.
-> > +        * to free its resources and for arch specific behavior.  This needs to
-> > +        * happen *after* (re)acquiring slots_arch_lock.
-> > +        */
-> > +       slot = id_to_memslot(slots, new->id);
-> > +       if (slot) {
-> > +               old = *slot;
-> > +       } else {
-> > +               WARN_ON_ONCE(change != KVM_MR_CREATE);
-> > +               memset(&old, 0, sizeof(old));
-> > +               old.id = new->id;
-> > +               old.as_id = as_id;
-> > +       }
-> > +
-> > +       /* Copy the arch-specific data, again after (re)acquiring slots_arch_lock. */
-> > +       memcpy(&new->arch, &old.arch, sizeof(old.arch));
-> > +
-> 
-> Is new->arch not initialized before this function is called? Does this
-> need to be here, or could it be moved above into the first branch of
-> the if statement?
-> Oh I see you removed the memset below and replaced it with this. I
-> think this is fine, but it might be easier to reason about if we left
-> the memset and moved the memcopy into the if.
-> No point in doing a memcpy of zeros here.
+The goal of this RFC is to get feedback on "Eager Page Splitting", an
+optimization that has been in use in Google Cloud since 2016 to reduce
+the performance impact of live migration on customer workloads. We
+wanted to get feedback on the feature before delving too far into
+porting it to the latest upstream kernel for submission. If there is
+interest in adding this feature to KVM we plan to follow up in the
+coming months with patches.
 
-Hmm, good point.  I wrote it like this so that the "arch" part is more identifiable
-since that's what needs to be protected by the lock, but I completely agree that
-it's odd when viewed without that lens.
+Background
+==========
+When KVM is tracking writes for dirty logging it write-protects any
+2MiB or 1GiB pages that are mapped into the guest. When a vCPU writes
+to such a page a write-protection fault will occur which KVM handles
+by allocating lower level page tables, mapping in the faulting address
+with a PT-level (4KiB) SPTE, and recording the 4KiB page is dirty.
+Handling these faults is done under the MMU lock. In the TDP MMU,
+where the MMU lock is a rwlock rather than a spin lock, splitting is
+done while holding the lock in read (shared) mode and atomic
+compare-exchanges are used when modifying SPTEs to detect races and
+retry.
+
+Motivation
+==========
+The write-protection faults to break down 2MiB and 1GiB mappings into
+4KiB mappings are taken on the critical path of guest execution, which
+negatively impacts guest performance. The negative impact scales with
+the number of vCPUs, since each vCPU contends for the MMU lock.
+
+This overhead can be seen by running dirty_log_perf_test with 1GiB per
+vCPU and comparing the time it takes the test to dirty memory after
+enabling dirty logging when the backing source is `anonymous` (4KiB
+pages) and `anonymous_hugetlb_1gb` (1GiB pages).
+
+        |        First Pass Dirty Memory Time           |
+        |       tdp_mmu=N       |     tdp_mmu=Y         |
+vCPUs   | 4KiB      | 1GiB      | 4KiB      | 1GiB      |
+------- | --------- | --------- | --------- | --------- |
+1       | 0.063s    | 0.241s    | 0.061s    | 0.238s    |
+2       | 0.066s    | 0.280s    | 0.066s    | 0.278s    |
+4       | 0.069s    | 0.359s    | 0.070s    | 0.298s    |
+8       | 0.112s    | 0.982s    | 0.109s    | 0.345s    |
+16      | 0.197s    | 3.153s    | 0.183s    | 1.020s    |
+32      | 0.368s    | 9.293s    | 0.425s    | 2.610s    |
+64      | 0.456s    | 23.291s   | 0.354s    | 4.212s    |
+128     | 0.334s    | 55.030s   | 0.419s    | 7.169s    |
+256     | 0.576s    | 141.332s  | 0.492s    | 13.874s   |
+416     | 0.881s    | 338.185s  | 0.785s    | 14.582s   |
+
+The performance overhead is egregious with the legacy MMU, as
+expected, since every fault requires contending for exclusive access
+to MMU lock. However, even with the TDP MMU, where the MMU lock is
+held in read-mode, perf recording confirms there is still contention
+due to hammering of atomic operations that scales with the number of
+vCPUs:
+
++   28.16%  [k] _raw_read_lock
++   28.10%  [k] direct_page_fault
++   21.52%  [k] tdp_mmu_set_spte_atomic
++    6.90%  [k] __handle_changed_spte
++    3.93%  [k] __get_current_cr3_fast
++    3.47%  [k] lockless_pages_from_mm
+
+_raw_read_lock, direct_page_fault, tdp_mmu_set_spte_atomic, and
+__handle_changed_spte each spend 99+% of their time on atomic
+operations. Note the _raw_read_lock path specifically is pure
+reader/reader contention, it is not spinning waiting for writers.
+
+As of Nov 2021, Google Cloud supports live migrating VMs with up to
+416 vCPUs and 28 GiB per vCPU. The customers using large instances
+tend to run applications that are sensitive to abrupt performance
+degradations. For these VMs we use Eager Page Splitting in conjunction
+with the Direct MMU (our internal predecessor to the TDP MMU).
+
+Design
+======
+Eager Page Splitting occurs when dirty logging is enabled on a region
+of memory. Before KVM write-protects all large page mapping, we
+attempt the following two steps (*):
+
+1. Iterate through all 1GiB SPTEs and for each:
+    a. Allocate a new shadow page table.
+    b. Populate it with 2MiB SPTEs mapping the 1GiB page.
+    c. Replace the 1GiB SPTE with a link to the shadow page table.
+2. Iterate through all 2MiB SPTEs and for each:
+    a. Allocate a new shadow page table.
+    b. Populate it with 4KiB SPTEs mapping the 2MiB page.
+    c. Replace the 2MiB SPTE with a link to the shadow page table.
+
+(*) We could split 1G pages directly down to 4K, and then split 2MiB
+down to 4K. But the two step approach is a bit simpler to understand
+and implement.
+
+The implementation of splitting a 1GiB SPTE into 512 2MiB SPTEs and a
+2MiB SPTE into a 512 4KiB SPTEs is generalized into a new function
+that splits an SPTE into one level smaller.
+
+The lower level SPTEs receive the same set of permissions as the upper
+level SPTEs. The exception is execution permissions, which is granted
+for 4K SPTEs if the large SPTE was forced NX due to HugePage NX.
+
+Eager Page Splitting can gracefully fall back to write-protection, if
+we decide the complexity is not worth splitting in certain scenarios,
+since the existing write-protection logic runs after Eager Page
+Splitting. This makes it possible to build Eager Page Splitting
+iteratively (e.g. just supporting direct-map-only GFNs, then adding
+support for rmap, etc.). This also means that it is trivial to make
+Eager Page Splitting an optional capability if desired.
+
+Allocations
+-----------
+In order to avoid allocating while holding the MMU lock, vCPUs
+preallocate everything they need to handle the fault and store it in
+kvm_mmu_memory_cache structs. Eager Page Splitting does the same thing
+but since it runs outside of a vCPU thread it needs its own copies of
+kvm_mmu_memory_cache structs. This requires refactoring the way
+kvm_mmu_memory_cache structs are passed around in the MMU code and
+adding kvm_mmu_memory_cache structs to kvm_arch.
+
+Before splitting a large page, Eager Page Splitting checks if it has
+enough memory in its caches to fully split the page. If it doesn't, it
+flushes TLBs, drops the MMU lock, cond_rescheds, topups the caches,
+reacquires the MMU lock, and continue where it left off.
+
+Pros/Cons
+---------
+The benefits of Eager Page Splitting are:
+
+  * Eliminates the overhead of enabling dirty logging when using large
+pages. vCPUs will only take write-protection faults on 4KiB pages,
+which can be handled without acquiring the MMU lock (fast_page_fault),
+regardless of which page sizes were used before the migration started.
+  * Eager Page Splitting is more efficient overall. We do not have to
+pay the VM-exit and fault handling costs for every 4KiB of guest
+memory, the splitter benefits from cache locality, and TLB flushes can
+be batched. When using the tdp_mmu, the new child page table can be
+populated without atomics.
+
+The downsides of Eager Page Splitting are:
+
+  * Introduces a new and complex path for modifying KVM's page tables
+outside of the vCPU fault path.
+  * Increases the duration of the VM ioctls that enable dirty logging.
+This does not affect customer performance but may have unintended
+consequences depending on how userspace invokes the ioctl. For
+example, eagerly splitting a 1.5TB memslot takes 30 seconds.
+  * May increase memory usage since it allocates the worst case number
+of page tables in order to map all memory at 4KiB.
+
+Alternatives
+============
+"RFC: Split EPT huge pages in advance of dirty logging" [1] was a
+previous proposal to proactively split large pages off of the vCPU
+threads. However it required faulting in every page in the migration
+thread, a vCPU-like thread in QEMU, which requires extra userspace
+support and also is less efficient since it requires faulting.
+
+Another alternative is to modify the vCPU fault handler to map in the
+entire large page when handling write-protection faults on large
+pages, rather than just mapping in the faulting 4KiB region. This is a
+middle ground approach that would be more efficient than the current
+solution but has yet to be prototyped or proven in a production
+environment.
+
+The last alternative is to perform dirty tracking at a 2M granularity.
+This would reduce the amount of splitting work required by 512x,
+making the current approach of splitting on fault less impactful to
+customer performance. We are in the early stages of investigating 2M
+dirty tracking internally but it will be a while before it is proven
+and ready for production. Furthermore there may be scenarios where
+dirty tracking at 4K would be preferable to reduce the amount of
+memory that needs to be demand-faulted during precopy.
+
+Credit
+======
+Eager Page Splitting was originally designed and implemented by Peter
+Feiner <pfeiner@google.com> for Google's internal kernel in 2016.
+
+Appendix
+========
+In order to collect the performance results I ran the following
+commands on an Intel Cascade Lake host that is used to run Google
+Cloud's m2-ultramem-416 VMs:
+
+  echo Y > /sys/module/kvm/parameters/tdp_mmu
+  ./dirty_log_perf_test -v${vcpus} -s anonymous
+  ./dirty_log_perf_test -v${vcpus} -s anonymous_hugetlb_1gb
+  echo N > /sys/module/kvm/parameters/tdp_mmu
+  ./dirty_log_perf_test -v${vcpus} -s anonymous
+  ./dirty_log_perf_test -v${vcpus} -s anonymous_hugetlb_1gb
+
+[1] https://lists.gnu.org/archive/html/qemu-devel/2020-02/msg04774.html
