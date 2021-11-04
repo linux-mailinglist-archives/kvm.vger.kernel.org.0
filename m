@@ -2,166 +2,374 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F040B445BFC
-	for <lists+kvm@lfdr.de>; Thu,  4 Nov 2021 23:05:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 016EF445C02
+	for <lists+kvm@lfdr.de>; Thu,  4 Nov 2021 23:07:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232266AbhKDWIZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Nov 2021 18:08:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52798 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232172AbhKDWIZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 4 Nov 2021 18:08:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636063545;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ioLGo78Q2H5OCVLHqS6Gc52ME4lW3G+b/fKIEsBxo2U=;
-        b=A7EFybuY9o7DNTZhWEc9vsoSrTt7Qp8VTx42700eiltnp/yKdN+Y9z0sMYotNg/WHX9n0R
-        pJxsCeMNasHXZ+9oLxWZcBXLBeFR1wMX/uOn0E3ffrBmhZ6H+QB/R5L4vuinE+v2G8Hnhp
-        l+356tt6xhksCLsl1EWhWB9VNyFPBiE=
-Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com
- [209.85.167.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-337-nNGONPzBNdqQ9x0tYldbWQ-1; Thu, 04 Nov 2021 18:05:44 -0400
-X-MC-Unique: nNGONPzBNdqQ9x0tYldbWQ-1
-Received: by mail-oi1-f200.google.com with SMTP id s11-20020aca450b000000b0029a078ca751so4285204oia.3
-        for <kvm@vger.kernel.org>; Thu, 04 Nov 2021 15:05:44 -0700 (PDT)
+        id S232303AbhKDWKY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Nov 2021 18:10:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34930 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232002AbhKDWKX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Nov 2021 18:10:23 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00EAFC061714
+        for <kvm@vger.kernel.org>; Thu,  4 Nov 2021 15:07:44 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id o14so9613061plg.5
+        for <kvm@vger.kernel.org>; Thu, 04 Nov 2021 15:07:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=PamW47+b4tMqWw+sFDfzqtrHhdS+IOv79aGoo2p8uNY=;
+        b=GED2Ehm9Zi6y79Gi5Mm1sz6hmGvAyOmP6xLjj4vPjSlv5M0Uf+U34+gNa4y59w71je
+         B3vtzx3bXczA1+Cn/8XoCoUamSjqYuIJN6qMDqhxm+nfdRk1G+ionkQE/94jjx7SdxiW
+         kiiiuUE0YmyxXyTvX6WcrFf6oVloz+hPmNzQXI6nh23f27GrEPmQZS/zuF/aMz6z8Ynk
+         dGsEuSwQRC+F86Kfomkojp8PtdFKpqrRkV49fPFTXEqmOIOQLR60/UwY+87BL3h1s9dJ
+         tK4jzB7GGx76604HPXZnxXU5Ow64iHXqCv3hO8FBSznCBxE1oF72qBsVDR6MFNdIJW4S
+         ckag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=ioLGo78Q2H5OCVLHqS6Gc52ME4lW3G+b/fKIEsBxo2U=;
-        b=RMt735jfTnwIxtchP1IcOL3IK9sJcBXQH+BUFRyZAklWQsUXzlz0d5swHF3dV0phX6
-         I/4zPnltI+tVP1QSfAEWM+bPb8vS38VS7sMfppgyzFnFJ0JaR93/V1M/H79cS996yJhy
-         Fv8DzjLIa7mSps1Mobs1iDx/JdiD1R8xV+GRi6BlxyXguIMULuGA7F35CfaKR8ASdOeV
-         Driy2VKAJzdc98LMg8TgJScufS9WsgTrjWH7kF2BNvMbjDmNBfq9nHhR7Sj4fWUpg175
-         fcOxXDi1lI+sB0kOulds/T2ufW+faSFD06xihdiwEyXqi/CRl4zuiHT9EHzY+aoW5r+7
-         YWkg==
-X-Gm-Message-State: AOAM533BOzHg3zTcjEzmxW6gC1wKta1XL/FIaP3xko6r1txiDnaoQnom
-        GnGz6nwOCNFJajBnssB5Yoan3ZOAFpHAO8Q+avVtHp6JGiNOM7UvhFGT+j40rAS6QZ+kBmOYr0X
-        TLo1UjS+8Ovry
-X-Received: by 2002:a9d:5a9b:: with SMTP id w27mr4665588oth.337.1636063543928;
-        Thu, 04 Nov 2021 15:05:43 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx6ni+u9UTnb+zRRJcR39oUjj2OfNF70f3wnC/+24jb1PhSuPs3ioqBdmn7Zbjze9F56ntg5g==
-X-Received: by 2002:a9d:5a9b:: with SMTP id w27mr4665556oth.337.1636063543650;
-        Thu, 04 Nov 2021 15:05:43 -0700 (PDT)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id g94sm1655894otg.10.2021.11.04.15.05.42
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=PamW47+b4tMqWw+sFDfzqtrHhdS+IOv79aGoo2p8uNY=;
+        b=uyi21Lfpz38NJfvYz5lwSEGKCam0GsbUuma80YM+OANCF6H+rGpzfmcPCQ5c3B87Jk
+         35n+8o1qw5g8Ex6nwtoOT39wWalM7TF9cImpLOIAuyb643FX+PYn3yKwpd2mrZW4ooR5
+         Zk14kV5VON13U9XFmCGG35AgmFZjVHWZSwK+T5uL+3F3kMOW/bxOOplg47CF8gBRlXVk
+         2eXXnVHrJ/n5O6lFlem5GgvoGSzNY/quNGlrYv7ZJdqIigFUPxrt6wWLafZsDryQ5NsP
+         xq/oN+GnfihYvZE31h3LJpFDh0HP7xl+9hLkJeWxtx/wuGybQPNwp95mBhfUrKb2bq5Q
+         XZYw==
+X-Gm-Message-State: AOAM532MGazDFhRAM2T/ddzmaJnb64xJOxIlRgIYK8Oph4iHFOu96alu
+        mqFZIN3Fskf/woiabBZXQ1PTYn2yvKfujA==
+X-Google-Smtp-Source: ABdhPJw3ooQFr3oV3qEUDHIIHTYPrkenU3e32atxmCM38GiIadnH0I3IhF3Z1utMudLmA3UXqUmqbw==
+X-Received: by 2002:a17:90a:de0b:: with SMTP id m11mr25179200pjv.39.1636063664152;
+        Thu, 04 Nov 2021 15:07:44 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id s2sm4485755pgd.13.2021.11.04.15.07.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Nov 2021 15:05:43 -0700 (PDT)
-Date:   Thu, 4 Nov 2021 16:05:41 -0600
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Matthew Ruffell <matthew.ruffell@canonical.com>
-Cc:     linux-pci@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>,
-        kvm@vger.kernel.org, nathan.langford@xcelesunifiedtechnologies.com
-Subject: Re: [PROBLEM] Frequently get "irq 31: nobody cared" when passing
- through 2x GPUs that share same pci switch via vfio
-Message-ID: <20211104160541.4aedc593.alex.williamson@redhat.com>
-In-Reply-To: <CAKAwkKsoKELnR=--06sRZL3S6_rQVi5J_Kcv6iRQ6w2tY71WCQ@mail.gmail.com>
-References: <d4084296-9d36-64ec-8a79-77d82ac6d31c@canonical.com>
-        <20210914104301.48270518.alex.williamson@redhat.com>
-        <9e8d0e9e-1d94-35e8-be1f-cf66916c24b2@canonical.com>
-        <20210915103235.097202d2.alex.williamson@redhat.com>
-        <2fadf33d-8487-94c2-4460-2a20fdb2ea12@canonical.com>
-        <20211005171326.3f25a43a.alex.williamson@redhat.com>
-        <CAKAwkKtJQ1mE3=iaDA1B_Dkn1+ZbN0jTSWrQon0=SAszRv5xFw@mail.gmail.com>
-        <20211012140516.6838248b.alex.williamson@redhat.com>
-        <CAKAwkKsF3Kn1HLAg55cBVmPmo2y0QAf7g6Zc7q6ZsQZBXGW9bg@mail.gmail.com>
-        <CAKAwkKsoKELnR=--06sRZL3S6_rQVi5J_Kcv6iRQ6w2tY71WCQ@mail.gmail.com>
-Organization: Red Hat
+        Thu, 04 Nov 2021 15:07:43 -0700 (PDT)
+Date:   Thu, 4 Nov 2021 22:07:39 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Peter Gonda <pgonda@google.com>
+Cc:     kvm@vger.kernel.org, Marc Orr <marcorr@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        David Rientjes <rientjes@google.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V11 2/5] KVM: SEV: Add support for SEV intra host
+ migration
+Message-ID: <YYRZq+Zt52FSyjVW@google.com>
+References: <20211021174303.385706-1-pgonda@google.com>
+ <20211021174303.385706-3-pgonda@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211021174303.385706-3-pgonda@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 1 Nov 2021 17:35:04 +1300
-Matthew Ruffell <matthew.ruffell@canonical.com> wrote:
+Paolo and anyone else, any thoughts before I lead Peter on an even longer wild
+goose chase?
 
-> Hi Alex,
+On Thu, Oct 21, 2021, Peter Gonda wrote:
+> @@ -6706,6 +6706,21 @@ MAP_SHARED mmap will result in an -EINVAL return.
+>  When enabled the VMM may make use of the ``KVM_ARM_MTE_COPY_TAGS`` ioctl to
+>  perform a bulk copy of tags to/from the guest.
+>  
+> +7.29 KVM_CAP_VM_MIGRATE_PROTECTED_VM_FROM
+> +-------------------------------------
+> +
+> +Architectures: x86 SEV enabled
+
+I'd drop the "SEV enabled" part.  In a way, it's technically a lie for this one
+patch since an SEV-ES VM is also an SEV VM, but doesn't support this capability.
+And AFAICT no other ioctl()/capability provides this level of granularity.
+
+> +Type: vm
+> +Parameters: args[0] is the fd of the source vm
+> +Returns: 0 on success
+> +
+> +This capability enables userspace to migrate the encryption context from the VM
+> +indicated by the fd to the VM this is called on.
+> +
+> +This is intended to support intra-host migration of VMs between userspace VMMs.
+> +in-guest workloads scheduled by the host. This allows for upgrading the VMM
+> +process without interrupting the guest.
+> +
+
+...
+
+> +static void sev_unlock_vcpus_for_migration(struct kvm *kvm)
+> +{
+> +	struct kvm_vcpu *vcpu;
+> +	int i;
+> +
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+
+Braces not needed.
+
+> +		mutex_unlock(&vcpu->mutex);
+> +	}
+> +}
+> +
+> +static void sev_migrate_from(struct kvm_sev_info *dst,
+> +			      struct kvm_sev_info *src)
+> +{
+> +	dst->active = true;
+> +	dst->asid = src->asid;
+> +	dst->misc_cg = src->misc_cg;
+
+Ah, this is not correct.  If @dst is in a different cgroup, then @dst needs to
+be charged and @src needs to be uncharged.
+
+That would also provide a good opportunity to more tightly couple ->asid and
+->misc_cg in the form of a helper.  Looking at the code, there's an invariant
+that misc_cg is NULL if an ASID is not assigned.  I.e. these three lines belong
+in a helper, irrespective of this code.
+
+	misc_cg_uncharge(type, sev->misc_cg, 1);
+	put_misc_cg(sev->misc_cg);
+	sev->misc_cg = NULL;
+
+> +	dst->handle = src->handle;
+> +	dst->pages_locked = src->pages_locked;
+> +
+> +	src->asid = 0;
+> +	src->active = false;
+> +	src->handle = 0;
+> +	src->pages_locked = 0;
+> +	src->misc_cg = NULL;
+> +	INIT_LIST_HEAD(&dst->regions_list);
+> +	list_replace_init(&src->regions_list, &dst->regions_list);
+> +}
+> +
+> +int svm_vm_migrate_from(struct kvm *kvm, unsigned int source_fd)
+> +{
+> +	struct kvm_sev_info *dst_sev = &to_kvm_svm(kvm)->sev_info;
+> +	struct file *source_kvm_file;
+> +	struct kvm *source_kvm;
+> +	struct kvm_vcpu *vcpu;
+> +	int i, ret;
+> +
+> +	ret = sev_lock_for_migration(kvm);
+> +	if (ret)
+> +		return ret;
+> +
+> +	if (sev_guest(kvm)) {
+> +		ret = -EINVAL;
+> +		goto out_unlock;
+> +	}
+> +
+> +	source_kvm_file = fget(source_fd);
+> +	if (!file_is_kvm(source_kvm_file)) {
+> +		ret = -EBADF;
+> +		goto out_fput;
+> +	}
+> +
+> +	source_kvm = source_kvm_file->private_data;
+> +	ret = sev_lock_for_migration(source_kvm);
+> +	if (ret)
+> +		goto out_fput;
+> +
+> +	if (!sev_guest(source_kvm) || sev_es_guest(source_kvm)) {
+> +		ret = -EINVAL;
+> +		goto out_source;
+> +	}
+> +	ret = sev_lock_vcpus_for_migration(kvm);
+> +	if (ret)
+> +		goto out_dst_vcpu;
+> +	ret = sev_lock_vcpus_for_migration(source_kvm);
+> +	if (ret)
+> +		goto out_source_vcpu;
+> +
+> +	sev_migrate_from(dst_sev, &to_kvm_svm(source_kvm)->sev_info);
+> +	kvm_for_each_vcpu(i, vcpu, source_kvm) {
+
+Braces not needed.
+
+> +		kvm_vcpu_reset(vcpu, /* init_event= */ false);
+
+Phooey.  I made this suggestion, but in hindsight, it's a bad suggestion as KVM
+doesn't currently have a true RESET path; there are quite a few blobs of code
+that assume the vCPU has never been run if init_event=false.
+
+And to go through kvm_vcpu_reset(), the vcpu needs to be loaded, not just locked.
+It won't fail as hard as VMX, where KVM would write the wrong VMCS, but odds are
+good something will eventually go sideways.
+
+Aha!  An idea.  Marking the VM bugged doesn't work because "we need to keep using
+the  source VM even after the state is transfered"[*], but the core idea is sound,
+it just needs to add a different flag to more precisely prevent kvm_vcpu_ioctl().
+
+If we rename KVM_REQ_VM_BUGGED=>KVM_REQ_VM_DEAD in a prep patch (see below), then
+this patch can add something here (can't think of a good name)
+
+	source_kvm->??? = true;
+	kvm_make_all_cpus_request(kvm, KVM_REQ_VM_DEAD);
+
+and then check it in kvm_vcpu_ioctl()
+
+	struct kvm *kvm = vcpu->kvm;
+
+	if (kvm->mm != current->mm || kvm->vm_bugged || kvm->???)
+		return -EIO;
+
+That way the source vCPUs don't need to be locked and all vCPU ioctls() are
+blocked, which I think is ideal since the vCPUs are in a frankenstate and really
+should just die.
+
+Maybe we can call the flag "zombie", or "mostly_dead" :-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index c80fa1d378c9..e3f49ca01f95 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9423,7 +9423,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+        }
+
+        if (kvm_request_pending(vcpu)) {
+-               if (kvm_check_request(KVM_REQ_VM_BUGGED, vcpu)) {
++               if (kvm_check_request(KVM_REQ_VM_DEAD, vcpu)) {
+                        r = -EIO;
+                        goto out;
+                }
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 0f18df7fe874..de8d25cef183 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -150,7 +150,7 @@ static inline bool is_error_page(struct page *page)
+ #define KVM_REQ_MMU_RELOAD        (1 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+ #define KVM_REQ_UNBLOCK           2
+ #define KVM_REQ_UNHALT            3
+-#define KVM_REQ_VM_BUGGED         (4 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
++#define KVM_REQ_VM_DEAD                  (4 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+ #define KVM_REQUEST_ARCH_BASE     8
+
+ #define KVM_ARCH_REQ_FLAGS(nr, flags) ({ \
+@@ -654,7 +654,7 @@ struct kvm {
+ static inline void kvm_vm_bugged(struct kvm *kvm)
+ {
+        kvm->vm_bugged = true;
+-       kvm_make_all_cpus_request(kvm, KVM_REQ_VM_BUGGED);
++       kvm_make_all_cpus_request(kvm, KVM_REQ_VM_DEAD);
+ }
+
+ #define KVM_BUG(cond, kvm, fmt...)
+
+
+Back when I made this bad suggestion in v7, you said "we need to keep using the
+source VM even after the state is transfered"[*].  What all do you need to do
+after the migration?  I assume it's mostly memory related per-VM ioctls?
+
+
+[*] https://lkml.kernel.org/r/CAMkAt6q3as414YMZco6UyCycY+jKbaYS5BUdC+U+8iWmBft3+A@mail.gmail.com
+
+> +	}
+> +	ret = 0;
+> +
+> +out_source_vcpu:
+> +	sev_unlock_vcpus_for_migration(source_kvm);
+> +
+> +out_dst_vcpu:
+> +	sev_unlock_vcpus_for_migration(kvm);
+> +
+> +out_source:
+> +	sev_unlock_after_migration(source_kvm);
+> +out_fput:
+> +	if (source_kvm_file)
+> +		fput(source_kvm_file);
+> +out_unlock:
+> +	sev_unlock_after_migration(kvm);
+> +	return ret;
+> +}
+> +
+>  int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
+>  {
+>  	struct kvm_sev_cmd sev_cmd;
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 68294491c23d..c2e25ae4757f 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -4637,6 +4637,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+>  	.mem_enc_unreg_region = svm_unregister_enc_region,
+>  
+>  	.vm_copy_enc_context_from = svm_vm_copy_asid_from,
+> +	.vm_migrate_protected_vm_from = svm_vm_migrate_from,
+>  
+>  	.can_emulate_instruction = svm_can_emulate_instruction,
+>  
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index 6d8d762d208f..d7b44b37dfcf 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -80,6 +80,7 @@ struct kvm_sev_info {
+>  	u64 ap_jump_table;	/* SEV-ES AP Jump Table address */
+>  	struct kvm *enc_context_owner; /* Owner of copied encryption context */
+>  	struct misc_cg *misc_cg; /* For misc cgroup accounting */
+> +	atomic_t migration_in_progress;
+>  };
+>  
+>  struct kvm_svm {
+> @@ -557,6 +558,7 @@ int svm_register_enc_region(struct kvm *kvm,
+>  int svm_unregister_enc_region(struct kvm *kvm,
+>  			      struct kvm_enc_region *range);
+>  int svm_vm_copy_asid_from(struct kvm *kvm, unsigned int source_fd);
+> +int svm_vm_migrate_from(struct kvm *kvm, unsigned int source_fd);
+>  void pre_sev_run(struct vcpu_svm *svm, int cpu);
+>  void __init sev_set_cpu_caps(void);
+>  void __init sev_hardware_setup(void);
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 0c8b5129effd..c80fa1d378c9 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -5665,6 +5665,12 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+>  		if (kvm_x86_ops.vm_copy_enc_context_from)
+>  			r = kvm_x86_ops.vm_copy_enc_context_from(kvm, cap->args[0]);
+>  		return r;
+> +	case KVM_CAP_VM_MIGRATE_PROTECTED_VM_FROM:
+
+I wonder... would it make sense to hedge and just call this KVM_CAP_VM_MIGRATE_VM_FROM?
+I can't think of a use case where KVM would "need" to do this for a non-protected
+VM, but I also don't see a huge naming problem if the "PROTECTED" is omitted.
+
+> +		r = -EINVAL;
+> +		if (kvm_x86_ops.vm_migrate_protected_vm_from)
+> +			r = kvm_x86_ops.vm_migrate_protected_vm_from(
+> +				kvm, cap->args[0]);
+
+Either let that poke out and/or refactor to avoid the indentation.  E.g.
+
+		r = -EINVAL;
+		if (!kvm_x86_ops.vm_migrate_protected_vm_from)
+			break;
+
+		return kvm_x86_ops.vm_migrate_protected_vm_from(kvm, cap->args[0]);
+
+		
+> +		return r;
+>  	case KVM_CAP_EXIT_HYPERCALL:
+>  		if (cap->args[0] & ~KVM_EXIT_HYPERCALL_VALID_MASK) {
+>  			r = -EINVAL;
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index a067410ebea5..77b292ed01c1 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1112,6 +1112,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_BINARY_STATS_FD 203
+>  #define KVM_CAP_EXIT_ON_EMULATION_FAILURE 204
+>  #define KVM_CAP_ARM_MTE 205
+> +#define KVM_CAP_VM_MIGRATE_PROTECTED_VM_FROM 206
+>  
+>  #ifdef KVM_CAP_IRQ_ROUTING
+>  
+> -- 
+> 2.33.0.1079.g6e70778dc9-goog
 > 
-> Nathan has been running a workload on the 5.14 kernel + the test patch, and has
-> ran into some interesting softlockups and hardlockups.
-> 
-> The first, happened on a secondary server running a Windows VM, with 7 (of 10)
-> 1080TI GPUs passed through.
-> 
-> Full dmesg:
-> https://paste.ubuntu.com/p/Wx5hCBBXKb/
-> 
-> There isn't any "irq x: nobody cared" messages, and the crashkernel gets stuck
-> in the usual copying IR tables from dmar, which suggests an ongoing interrupt
-> storm.
-> 
-> Nathan disabled "kernel.hardlockup_panic = 1" sysctl, and managed to reproduce
-> the issue again, suggesting that we get stuck in kernel space for too long
-> without the ability for interrupts to be serviced.
-> 
-> It starts with the NIC hitting a tx queue timeout, and then does a NMI to unwind
-> the stack of each CPU, although the stacks don't appear to indicate where things
-> are stuck. The server then remains softlocked, and keeps unwinding stacks every
-> 26 seconds or so, until it eventually hardlockups.
-
-Google finds numerous complaints about transmit queue time outs on igb
-devices, bad NICs, bad cabling, bad drivers(?).  I also see some
-hearsay related specifically to supermicro compatibility.  I'd also
-suspect that a dual 1GbE NIC is sub-par for anything involving 7+ GPUs.
-Time for an upgrade?
-
-It's not clear to me how this would be related to the GPU assignment
-perhaps other than the elevated workload on the host.
-
-> The next interesting thing to report is when Nathan started the same Windows VM
-> on the primary host we have been debugging on, with the 8x 2080TI GPUs. Nathan
-> experienced a stuck VM, with the host responding just fine. When Nathan reset
-> the VM, he got 4x "irq xx: nobody cared" messages on IRQs 25, 27, 29 and 31,
-> which at the time corresponded to the PEX 8747 upstream PCI switches.
-> 
-> Interestingly, Nathan also observed 2x GPU Audio devices sharing the same IRQ
-> line as the upstream PCI switch, although Nathan mentioned this only occured
-> very briefly, and the GPU audio devices were re-assigned different IRQs shortly
-> afterward.
-
-IME, the legacy interrupt support on NVIDIA GPU audio devices is
-marginal for assignment.  We don't claim to support assignment of the
-audio function, even for Quadro cards on RHEL due to this.  I can't
-remember the details off the top of my head, but even with the hacky
-safeguards added in the test patch, we still rely on hardware to both
-honor the INTx disable bit in the command register and accurately report
-if the device is asserting INTx is the status register.  It seems like
-one of these was a bit dicey in this controller.
-
-Now that I think about it more, I recall that the issue was
-predominantly with Linux guests, where the snd_intel_hda driver
-includes:
-
-/* quirks for Nvidia */
-#define AZX_DCAPS_PRESET_NVIDIA \
-        (AZX_DCAPS_NO_MSI | AZX_DCAPS_CORBRP_SELF_CLEAR |\
-         AZX_DCAPS_SNOOP_TYPE(NVIDIA))
-
-And the device table includes:
-
-        { PCI_DEVICE(PCI_VENDOR_ID_NVIDIA, PCI_ANY_ID),
-          .class = PCI_CLASS_MULTIMEDIA_HD_AUDIO << 8,
-          .class_mask = 0xffffff,
-          .driver_data = AZX_DRIVER_NVIDIA | AZX_DCAPS_PRESET_NVIDIA },
-
-That NO_MSI quirk forces the sound driver to use legacy interrupts for
-all NVIDIA HD audio devices.  I think this made audio function
-assignment to Linux guests essentially unusable without using the
-snd_hda_intel.enable_msi=1 driver option to re-enable MSI.  Windows
-uses MSI for these devices, so it works better by default, but when
-we're resetting the VM we're still transitioning through this mode
-where I don't have a good opinion that the hardware behaves in a
-manageable way.
-
-My PCIe switch configuration with NVIDIA GPUs only has Tesla cards, so
-I don't have a way to reproduce this specific shared INTx issue, but it
-may be time to revisit examining the register behavior while running in
-INTx mode.  Thanks,
-
-Alex
-
