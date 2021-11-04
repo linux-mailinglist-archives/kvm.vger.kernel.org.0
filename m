@@ -2,84 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5EA154451F3
-	for <lists+kvm@lfdr.de>; Thu,  4 Nov 2021 12:07:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 98C0E44522C
+	for <lists+kvm@lfdr.de>; Thu,  4 Nov 2021 12:26:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230511AbhKDLKX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Nov 2021 07:10:23 -0400
-Received: from mx314.baidu.com ([180.101.52.172]:39222 "EHLO
-        njjs-sys-mailin07.njjs.baidu.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S229809AbhKDLKT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 4 Nov 2021 07:10:19 -0400
+        id S229960AbhKDL2k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Nov 2021 07:28:40 -0400
+Received: from mx417.baidu.com ([124.64.200.157]:41471 "EHLO mx419.baidu.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229705AbhKDL2k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Nov 2021 07:28:40 -0400
+X-Greylist: delayed 601 seconds by postgrey-1.27 at vger.kernel.org; Thu, 04 Nov 2021 07:28:39 EDT
 Received: from bjhw-sys-rpm015653cc5.bjhw.baidu.com (bjhw-sys-rpm015653cc5.bjhw.baidu.com [10.227.53.39])
-        by njjs-sys-mailin07.njjs.baidu.com (Postfix) with ESMTP id 5BF051948004A;
+        by mx419.baidu.com (Postfix) with ESMTP id 4B12C18180516;
         Thu,  4 Nov 2021 19:07:39 +0800 (CST)
 Received: from localhost (localhost [127.0.0.1])
-        by bjhw-sys-rpm015653cc5.bjhw.baidu.com (Postfix) with ESMTP id 3F210D9932;
+        by bjhw-sys-rpm015653cc5.bjhw.baidu.com (Postfix) with ESMTP id 42895D9933;
         Thu,  4 Nov 2021 19:07:39 +0800 (CST)
 From:   Li RongQing <lirongqing@baidu.com>
 To:     kvm@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com,
         vkuznets@redhat.com, lirongqing@baidu.com
-Subject: [v3][PATCH 1/2] KVM: x86: don't print when fail to read/write pv eoi memory
-Date:   Thu,  4 Nov 2021 19:07:38 +0800
-Message-Id: <1636024059-53855-1-git-send-email-lirongqing@baidu.com>
+Subject: [v3][PATCH 2/2] KVM: Clear pv eoi pending bit only when it is set
+Date:   Thu,  4 Nov 2021 19:07:39 +0800
+Message-Id: <1636024059-53855-2-git-send-email-lirongqing@baidu.com>
 X-Mailer: git-send-email 1.7.1
+In-Reply-To: <1636024059-53855-1-git-send-email-lirongqing@baidu.com>
+References: <1636024059-53855-1-git-send-email-lirongqing@baidu.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If guest gives MSR_KVM_PV_EOI_EN a wrong value, this printk() will
-be trigged, and kernel log is spammed with the useless message
+merge pv_eoi_get_pending and pv_eoi_clr_pending into a single
+function pv_eoi_test_and_clear_pending, which returns and clear
+the value of the pending bit.
 
-Fixes: 0d88800d5472 ("kvm: x86: ioapic and apic debug macros cleanup")
-Reported-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+and clear pv eoi pending bit only when it is set, to avoid calling
+pv_eoi_put_user(), this can speed about 300 nsec on AMD EPYC most
+of the time
+
+Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Li RongQing <lirongqing@baidu.com>
 ---
- arch/x86/kvm/lapic.c |   18 ++++++------------
- 1 files changed, 6 insertions(+), 12 deletions(-)
+diff v2: merge as pv_eoi_test_and_clear_pending
+diff v3: remove printk with a new patch
+ arch/x86/kvm/lapic.c |   39 ++++++++++++++++++---------------------
+ 1 files changed, 18 insertions(+), 21 deletions(-)
 
 diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index d6ac32f..752c48e 100644
+index 752c48e..9c3b1b3 100644
 --- a/arch/x86/kvm/lapic.c
 +++ b/arch/x86/kvm/lapic.c
-@@ -676,31 +676,25 @@ static inline bool pv_eoi_enabled(struct kvm_vcpu *vcpu)
- static bool pv_eoi_get_pending(struct kvm_vcpu *vcpu)
- {
- 	u8 val;
--	if (pv_eoi_get_user(vcpu, &val) < 0) {
--		printk(KERN_WARNING "Can't read EOI MSR value: 0x%llx\n",
--			   (unsigned long long)vcpu->arch.pv_eoi.msr_val);
-+	if (pv_eoi_get_user(vcpu, &val) < 0)
- 		return false;
--	}
-+
- 	return val & KVM_PV_EOI_ENABLED;
+@@ -673,15 +673,6 @@ static inline bool pv_eoi_enabled(struct kvm_vcpu *vcpu)
+ 	return vcpu->arch.pv_eoi.msr_val & KVM_MSR_ENABLED;
  }
  
+-static bool pv_eoi_get_pending(struct kvm_vcpu *vcpu)
+-{
+-	u8 val;
+-	if (pv_eoi_get_user(vcpu, &val) < 0)
+-		return false;
+-
+-	return val & KVM_PV_EOI_ENABLED;
+-}
+-
  static void pv_eoi_set_pending(struct kvm_vcpu *vcpu)
  {
--	if (pv_eoi_put_user(vcpu, KVM_PV_EOI_ENABLED) < 0) {
--		printk(KERN_WARNING "Can't set EOI MSR value: 0x%llx\n",
--			   (unsigned long long)vcpu->arch.pv_eoi.msr_val);
-+	if (pv_eoi_put_user(vcpu, KVM_PV_EOI_ENABLED) < 0)
- 		return;
--	}
-+
+ 	if (pv_eoi_put_user(vcpu, KVM_PV_EOI_ENABLED) < 0)
+@@ -690,12 +681,25 @@ static void pv_eoi_set_pending(struct kvm_vcpu *vcpu)
  	__set_bit(KVM_APIC_PV_EOI_PENDING, &vcpu->arch.apic_attention);
  }
  
- static void pv_eoi_clr_pending(struct kvm_vcpu *vcpu)
+-static void pv_eoi_clr_pending(struct kvm_vcpu *vcpu)
++static bool pv_eoi_test_and_clr_pending(struct kvm_vcpu *vcpu)
  {
--	if (pv_eoi_put_user(vcpu, KVM_PV_EOI_DISABLED) < 0) {
--		printk(KERN_WARNING "Can't clear EOI MSR value: 0x%llx\n",
--			   (unsigned long long)vcpu->arch.pv_eoi.msr_val);
-+	if (pv_eoi_put_user(vcpu, KVM_PV_EOI_DISABLED) < 0)
- 		return;
--	}
+-	if (pv_eoi_put_user(vcpu, KVM_PV_EOI_DISABLED) < 0)
+-		return;
++	u8 val;
 +
++	if (pv_eoi_get_user(vcpu, &val) < 0)
++		return false;
++
++	val &= KVM_PV_EOI_ENABLED;
+ 
++	/*
++	 * Clear pending bit in any case: it will be set again on vmentry.
++	 * While this might not be ideal from performance point of view,
++	 * this makes sure pv eoi is only enabled when we know it's safe.
++	 */
++	if (val && pv_eoi_put_user(vcpu, KVM_PV_EOI_DISABLED) < 0)
++		return false;
  	__clear_bit(KVM_APIC_PV_EOI_PENDING, &vcpu->arch.apic_attention);
++
++	return !!val;
  }
  
+ static int apic_has_interrupt_for_ppr(struct kvm_lapic *apic, u32 ppr)
+@@ -2671,7 +2675,6 @@ void __kvm_migrate_apic_timer(struct kvm_vcpu *vcpu)
+ static void apic_sync_pv_eoi_from_guest(struct kvm_vcpu *vcpu,
+ 					struct kvm_lapic *apic)
+ {
+-	bool pending;
+ 	int vector;
+ 	/*
+ 	 * PV EOI state is derived from KVM_APIC_PV_EOI_PENDING in host
+@@ -2685,14 +2688,8 @@ static void apic_sync_pv_eoi_from_guest(struct kvm_vcpu *vcpu,
+ 	 * 	-> host enabled PV EOI, guest executed EOI.
+ 	 */
+ 	BUG_ON(!pv_eoi_enabled(vcpu));
+-	pending = pv_eoi_get_pending(vcpu);
+-	/*
+-	 * Clear pending bit in any case: it will be set again on vmentry.
+-	 * While this might not be ideal from performance point of view,
+-	 * this makes sure pv eoi is only enabled when we know it's safe.
+-	 */
+-	pv_eoi_clr_pending(vcpu);
+-	if (pending)
++
++	if (pv_eoi_test_and_clr_pending(vcpu))
+ 		return;
+ 	vector = apic_set_eoi(apic);
+ 	trace_kvm_pv_eoi(apic, vector);
 -- 
 1.7.1
 
