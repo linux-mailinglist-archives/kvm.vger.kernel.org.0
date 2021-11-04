@@ -2,112 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EB5B4445AEE
-	for <lists+kvm@lfdr.de>; Thu,  4 Nov 2021 21:08:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 63A03445B5D
+	for <lists+kvm@lfdr.de>; Thu,  4 Nov 2021 21:57:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232124AbhKDUKp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Nov 2021 16:10:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36706 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231998AbhKDUKo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Nov 2021 16:10:44 -0400
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C1BFC061714
-        for <kvm@vger.kernel.org>; Thu,  4 Nov 2021 13:08:06 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id h74so6919888pfe.0
-        for <kvm@vger.kernel.org>; Thu, 04 Nov 2021 13:08:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=FCy7XmM3hO8fuNRRbZcDcJH+zhxWlYN4gDh9J8+Gr8Y=;
-        b=i5FCB5yRnjsLmIeeLD+iM/48P6iRRBb5/VRgshHlVonSkwBfqOn7mKOOpkzAWa3d+X
-         PKSQ3LKxLmU5TahEA0iAsYFe0/FgMn9qDEgQkQEqi5mAczxFwc1Cn8dBnQS3Hv0y+CnZ
-         hJDpKn8/cUzWWP643aGY1oRkLzdX767kG/i9NUqhtJxYNm+XoN9nlkNUzMzXe8yzKVEF
-         duEfBqvALTNuvmh1IrSc/nyUEA6tzE+2IzaryS3bHVoBmOsDqouXb6PH/74iv7ttaB2U
-         s4AL14g2cyov6EqiKyVn48Z/2pU7KF2XOeY+qTvKKtuXPmDbmtZy7QpAeDO8olzGq95w
-         rzoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=FCy7XmM3hO8fuNRRbZcDcJH+zhxWlYN4gDh9J8+Gr8Y=;
-        b=pggqLEnio19R5pRU/0HyY/4ZrQxwNO+pxQhSsVR/yhY0Bd7GAOr7w9YZa0iIvGng/O
-         bSt+6g49X4YYWEWgF6Ym2YaGCFzDmCFjrdCRbFnEF4jjwi/eJ12zQQD3vAWGbvbKEjBB
-         sU3l9c1Suh6V9PUS73nqhZWQG5bhCXG6n/5jfZH5zCm5oRyv7M62oYbGNqtbnWEVS0OS
-         d3Cv/S+AITHaph8ezWuetLuc93KMB02tlUyrCBeO1YtUf50oCrjavUEIoYOpVobecYwG
-         KlEV8B3HX0bixwmFx+L6M83votmerz0Fj8AQCj+s06UBSMbMKnOkUxcYUyHlPwCYoH4R
-         ylYA==
-X-Gm-Message-State: AOAM531vbVRkivXvMMHYvKoIWLP/S8gUBcYBOCdk1tQtCwkU5cu5vTZw
-        VdXkmavPLneMgChBwUFxAIdzl6QODcPhSw==
-X-Google-Smtp-Source: ABdhPJw1QIFV3CAI2UcbFZ2VrNW++pdmjxY1ykPw3mNFNIEDqRH5ndwZEhZedIX0vx5gIhpYebrvWA==
-X-Received: by 2002:a63:c4e:: with SMTP id 14mr10917845pgm.454.1636056485715;
-        Thu, 04 Nov 2021 13:08:05 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id h1sm5941243pfi.168.2021.11.04.13.08.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Nov 2021 13:08:05 -0700 (PDT)
-Date:   Thu, 4 Nov 2021 20:08:01 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Durrant, Paul" <pdurrant@amazon.co.uk>
-Cc:     Paul Durrant <paul@xen.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        id S232167AbhKDU6r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Nov 2021 16:58:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22795 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231826AbhKDU6q (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 4 Nov 2021 16:58:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1636059367;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=IfcsgPcnlI/5XKJkTvjUo3gZAIv46LvfuSL2K44V28E=;
+        b=E+GlgoTrurMjNLoiwiLBJwIJuYPeIDB2ruTvzl0HVcx6KajwxG/564tnS4AjeH6IvvJdpz
+        wJBb8E24V0+yMu1jhxOZ0q9LH+b0zJID47Z/U6s07ikeJvCdNLKCGx7PMTeOUYDBp3J64O
+        JClb2WVMj7vs4oObf3xdqzSemONGMXY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-593-E_i9VflPPPOlxP1i9h_oYw-1; Thu, 04 Nov 2021 16:56:06 -0400
+X-MC-Unique: E_i9VflPPPOlxP1i9h_oYw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5A3121006AA3;
+        Thu,  4 Nov 2021 20:56:03 +0000 (UTC)
+Received: from redhat.com (ovpn-112-104.phx2.redhat.com [10.3.112.104])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6D6EB1017CF5;
+        Thu,  4 Nov 2021 20:54:30 +0000 (UTC)
+Date:   Thu, 4 Nov 2021 15:54:28 -0500
+From:   Eric Blake <eblake@redhat.com>
+To:     Juan Quintela <quintela@redhat.com>
+Cc:     qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+        David Hildenbrand <david@redhat.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        xen-devel@lists.xenproject.org,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+        kvm@vger.kernel.org, Peter Xu <peterx@redhat.com>,
+        =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+        Paul Durrant <paul@xen.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Subject: Re: [PATCH] KVM: x86: Make sure KVM_CPUID_FEATURES really are
- KVM_CPUID_FEATURES
-Message-ID: <YYQ9ofrIKDxbgbu3@google.com>
-References: <20211104183020.4341-1-paul@xen.org>
- <YYQzDLLE4WavR2Q6@google.com>
- <90c513d31a1b41daae1a642d2f5c72b0@EX13D32EUC003.ant.amazon.com>
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Anthony Perard <anthony.perard@citrix.com>,
+        Hyman =?utf-8?B?SHVhbmcow6nCu+KAnsOl4oC54oChKQ==?= 
+        <huangy81@chinatelecom.cn>
+Subject: Re: [PULL 04/20] migration/dirtyrate: introduce struct and adjust
+ DirtyRateStat
+Message-ID: <20211104205428.stcjcd54moksfep2@redhat.com>
+References: <20211101220912.10039-1-quintela@redhat.com>
+ <20211101220912.10039-5-quintela@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <90c513d31a1b41daae1a642d2f5c72b0@EX13D32EUC003.ant.amazon.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20211101220912.10039-5-quintela@redhat.com>
+User-Agent: NeoMutt/20211029-10-fe244a
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 04, 2021, Durrant, Paul wrote:
-> > -----Original Message-----
-> > From: Sean Christopherson <seanjc@google.com>
-> > Sent: 04 November 2021 19:23
-> > To: Paul Durrant <paul@xen.org>
-> > Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org; Durrant, Paul <pdurrant@amazon.co.uk>; Paolo
-> > Bonzini <pbonzini@redhat.com>; Vitaly Kuznetsov <vkuznets@redhat.com>; Wanpeng Li
-> > <wanpengli@tencent.com>; Jim Mattson <jmattson@google.com>; Joerg Roedel <joro@8bytes.org>
-> > Subject: RE: [EXTERNAL] [PATCH] KVM: x86: Make sure KVM_CPUID_FEATURES really are KVM_CPUID_FEATURES
-> > 
-> > On Thu, Nov 04, 2021, Paul Durrant wrote:
-> > > From: Paul Durrant <pdurrant@amazon.com>
-> > >
-> > > Currently when kvm_update_cpuid_runtime() runs, it assumes that the
-> > > KVM_CPUID_FEATURES leaf is located at 0x40000001. This is not true,
-> > > however, if Hyper-V support is enabled. In this case the KVM leaves will
-> > > be offset.
-> > >
-> > > This patch introdues as new 'kvm_cpuid_base' field into struct
-> > > kvm_vcpu_arch to track the location of the KVM leaves and function
-> > > kvm_update_cpuid_base() (called from kvm_update_cpuid_runtime()) to locate
-> > > the leaves using the 'KVMKVMKVM\0\0\0' signature. Adjustment of
-> > > KVM_CPUID_FEATURES will hence now target the correct leaf.
-> > >
-> > > Signed-off-by: Paul Durrant <pdurrant@amazon.com>
-> > > ---
-> > > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > > Cc: Sean Christopherson <seanjc@google.com>
-> > > Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-> > > Cc: Wanpeng Li <wanpengli@tencent.com>
-> > > Cc: Jim Mattson <jmattson@google.com>
-> > > Cc: Joerg Roedel <joro@8bytes.org>
-> > 
-> > scripts/get_maintainer.pl is your friend :-)
+On Mon, Nov 01, 2021 at 11:08:56PM +0100, Juan Quintela wrote:
+> From: Hyman Huang(é»„å‹‡) <huangy81@chinatelecom.cn>
 > 
-> That's what I used, but thought it prudent to trim the list to just KVM reviewers.
+> introduce "DirtyRateMeasureMode" to specify what method should be
+> used to calculate dirty rate, introduce "DirtyRateVcpu" to store
+> dirty rate for each vcpu.
+> 
+> use union to store stat data of specific mode
+> 
+> Signed-off-by: Hyman Huang(é»„å‹‡) <huangy81@chinatelecom.cn>
+> Message-Id: <661c98c40f40e163aa58334337af8f3ddf41316a.1624040308.git.huangy81@chinatelecom.cn>
+> Reviewed-by: Peter Xu <peterx@redhat.com>
+> Reviewed-by: Juan Quintela <quintela@redhat.com>
+> Signed-off-by: Juan Quintela <quintela@redhat.com>
+> ---
+>  qapi/migration.json   | 30 +++++++++++++++++++++++++++
+>  migration/dirtyrate.h | 21 +++++++++++++++----
+>  migration/dirtyrate.c | 48 +++++++++++++++++++++++++------------------
+>  3 files changed, 75 insertions(+), 24 deletions(-)
+> 
+> diff --git a/qapi/migration.json b/qapi/migration.json
+> index 9aa8bc5759..94eece16e1 100644
+> --- a/qapi/migration.json
+> +++ b/qapi/migration.json
+> @@ -1731,6 +1731,21 @@
+>  { 'event': 'UNPLUG_PRIMARY',
+>    'data': { 'device-id': 'str' } }
+>  
+> +##
+> +# @DirtyRateVcpu:
+> +#
+> +# Dirty rate of vcpu.
+> +#
+> +# @id: vcpu index.
+> +#
+> +# @dirty-rate: dirty rate.
+> +#
+> +# Since: 6.1
 
-Ah, yeah, I run get_maintainer.pl with "--pattern-depth=1" when I'm sending KVM
-patches/series.  That tells the script to stop recursing once its found a match.
+I'm a bit late on the review, since this pull request is already in.
+We'll want a followup patch that changes this to mention 6.2, to
+correctly match the release that will first have it.  Such a followup
+is safe during freeze, since it is doc-only.
+
+> +#
+> +##
+> +{ 'struct': 'DirtyRateVcpu',
+> +  'data': { 'id': 'int', 'dirty-rate': 'int64' } }
+> +
+>  ##
+>  # @DirtyRateStatus:
+>  #
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
