@@ -2,94 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A6E59444E24
-	for <lists+kvm@lfdr.de>; Thu,  4 Nov 2021 06:19:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0CB99444E57
+	for <lists+kvm@lfdr.de>; Thu,  4 Nov 2021 06:25:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230202AbhKDFUn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Nov 2021 01:20:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60380 "EHLO
+        id S230059AbhKDF1x (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Nov 2021 01:27:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229824AbhKDFUm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Nov 2021 01:20:42 -0400
-Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC693C061714
-        for <kvm@vger.kernel.org>; Wed,  3 Nov 2021 22:18:04 -0700 (PDT)
-Received: by mail-lj1-x234.google.com with SMTP id a10so67735ljk.13
-        for <kvm@vger.kernel.org>; Wed, 03 Nov 2021 22:18:04 -0700 (PDT)
+        with ESMTP id S230011AbhKDF1w (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Nov 2021 01:27:52 -0400
+Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D910AC06127A
+        for <kvm@vger.kernel.org>; Wed,  3 Nov 2021 22:25:14 -0700 (PDT)
+Received: by mail-yb1-xb30.google.com with SMTP id t127so11755350ybf.13
+        for <kvm@vger.kernel.org>; Wed, 03 Nov 2021 22:25:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=1i2ArK/DuUH+8zzvoUDR5kWhCGaxJs+6ozvmTXq3KK8=;
-        b=UHIbzIzQ1BtxF5gJfTpEOGoz5NyoOTK6Ll+Tu1A5W4GCmzV2IKgvn53W9V0mG2Uap5
-         PoDvCYiy4SsEZkkADAiH4AwUgZ2J3tv8y09mTPK3nk4gRy4yreS9YE8RcGXNs6h44LGZ
-         jKvtMxAoE0x3RBpBKTj+1v17lGc4Drx8Oc8v0gVSjiYM+x6EuE/4IEKNPCcog6eeyDHe
-         cv/5PEZ8ERI8lOiPS/waDl1su7Rmy3LVo3vLz5l39vot+RwJneQ6saFjzl6zTSHQrr4a
-         dsD/3BVbAE5nk8fKATtycJODmWyHcLmGz8qZUkjrq0EsjT7eZMNHG3MBCFnitxvIinoL
-         xjmQ==
+        bh=OtBceSJb428ILPrgAIwLW6HZ5uojQDi2g0yPmI7b2cQ=;
+        b=Eiqy/Mt0qrguQhqd0jsEW9qkY8Q25PX+ioLaqmK/8C29vQ+LJza+En5XMIJ7bDoVyY
+         8NMnIRI5x22mBTsLnbzkztCtAXHu+iZdfyZOwpY3p5D3XuynIc06r4BAkyl974AdBiF3
+         U0B9M3ryrOWnB8LBMvHx/jPsqmvFqW2jiBxkqXLJyonR4aR+SLkrzXL4spfXm5Gb7B1s
+         aV29j9wgXVbQX1pYaXpB8NTedUqDsM/fTNJvpLB5PhREhttxKffuERtfHXaIRnI8jh94
+         3xSvbfoirN1QLkcQzvBNLdQriNiN1JYDjHAE9j7GbsDv/xsot4wBC7SyE5Abrqmpy/73
+         +oNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=1i2ArK/DuUH+8zzvoUDR5kWhCGaxJs+6ozvmTXq3KK8=;
-        b=mj/NZ2PXd/AfyzRn7KPmM1ee5FuF0WRuuwDcjGj3HbrtQxv29lUZHIXcH+Zy16/5KH
-         StRpwGkHNwuo8RdAWdjVKr9xqAhOhZo088F5ijLY+eiDxJR+BL6lWiRSnFd629kyxCqW
-         baTpZDcDyefL1DWWuaIWdPBF/P7EGgDCWTqld8l0Xq39ZX6Z6yslt5Ul4kQCmAAfqWp/
-         N+NnXyLvxrpdFTxVi4KLm9K1zLErX46y9Yli7n0ElBpnkXBFtXCEB9j/JyKcxoGLeu8D
-         ZToT3qzKiM6Vf30yKW0RMfY5qyiDHVB6Av5dPMsTyJxGklQizfPZLeZiqEcoXUjb0sZ2
-         srhw==
-X-Gm-Message-State: AOAM530eRcwkaC5BANcigmduWEV1qHi3R+FWtu4tijujOfWL3/oQQos7
-        Xn9JpJgiYhXt9U6cC3Xo8SGIlcA8Q/o0P5oI4kntTA==
-X-Google-Smtp-Source: ABdhPJzQZSoC4A3NWrvzR7sdaoKUiV/q5Xy3qUQi0/b+nqASUfy2A97b28r0pC9HLcxKCyMSUDkX8eI3sOT/96BONDc=
-X-Received: by 2002:a2e:bf06:: with SMTP id c6mr50574945ljr.405.1636003082804;
- Wed, 03 Nov 2021 22:18:02 -0700 (PDT)
+        bh=OtBceSJb428ILPrgAIwLW6HZ5uojQDi2g0yPmI7b2cQ=;
+        b=Beiyw9M9/vqfOg9+qQXPEeMUlv+vlX4yIu6i7SdzjNDTEG9JIH21OmRKPYXFBHHcHi
+         jxA1qg1o/TZ6AwX+niFQSIHET7YFMyFxBn7xjjM7o9NUYhsuov47mF6VJC9dLqEi0Vfa
+         NGFOJVU3LH7DVlkVw6MnaYpajRNcTQJ1/WQEbldva7qQK3L5T/6kMNnX1rHLZFhZZ19+
+         bi7yrwJ6xG585CwKqoeQckaYk43KGVvOgLvt5W/+gIg7wgTVKExGGdiZumKLSwR+rdMl
+         eI/JaY7ZJW/XfyT9bFbAk8nw2RSMgW7fBsduRa3KHO/dKAB3VgBjc4rHetnYyvFybT3y
+         yFLA==
+X-Gm-Message-State: AOAM530trpBXM//Slmqmr35rzzDlnb7NlNzTUM5U1w8B9G/LsDq94ari
+        fU2+aC+erwN+yg5hOSmN2QEE60dErfcX0TXPXoHbcQ==
+X-Google-Smtp-Source: ABdhPJzyZRyz+P/9gdUPVZ2JsSGreOqCWZF1woTxfMn3Tgx7LW6epzWNKfujPYCHXJKB/3LlgasNGr1WrHXIQcRH7GE=
+X-Received: by 2002:a25:d4d5:: with SMTP id m204mr19280771ybf.418.1636003513823;
+ Wed, 03 Nov 2021 22:25:13 -0700 (PDT)
 MIME-Version: 1.0
-References: <20211103205911.1253463-1-vipinsh@google.com> <20211103205911.1253463-3-vipinsh@google.com>
- <YYMZPKPkk5dVJ6nZ@google.com>
-In-Reply-To: <YYMZPKPkk5dVJ6nZ@google.com>
-From:   Vipin Sharma <vipinsh@google.com>
-Date:   Wed, 3 Nov 2021 22:17:26 -0700
-Message-ID: <CAHVum0eFwgM-Pj6xHt0gkFCf1OZGjYD7K0xttswbAaGMo6zpJQ@mail.gmail.com>
-Subject: Re: [PATCH v3 2/2] KVM: Move INVPCID type check from vmx and svm to
- the common kvm_handle_invpcid()
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     pbonzini@redhat.com, jmattson@google.com, dmatlack@google.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20211005234459.430873-1-michael.roth@amd.com> <20211006203710.13326-1-michael.roth@amd.com>
+ <CAA03e5EmnbpKOwfNJUV7fog-7UpJJNpu7mQYmCODpk=tYfXxig@mail.gmail.com> <20211012011537.q7dwebcistxddyyj@amd.com>
+In-Reply-To: <20211012011537.q7dwebcistxddyyj@amd.com>
+From:   Mingwei Zhang <mizhang@google.com>
+Date:   Wed, 3 Nov 2021 22:25:02 -0700
+Message-ID: <CAL715WKBBXNpJFK-3254ox_GU=v04RdYC=uXu4S5kbf=1R9aYA@mail.gmail.com>
+Subject: Re: [RFC 06/16] KVM: selftests: add library for creating/interacting
+ with SEV guests
+To:     Michael Roth <Michael.Roth@amd.com>
+Cc:     Marc Orr <marcorr@google.com>, linux-kselftest@vger.kernel.org,
+        kvm list <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, x86 <x86@kernel.org>,
+        Nathan Tempelman <natet@google.com>,
+        Steve Rutherford <srutherford@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        Varad Gautam <varad.gautam@suse.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 3, 2021 at 4:20 PM Sean Christopherson <seanjc@google.com> wrote:
 >
-> On Wed, Nov 03, 2021, Vipin Sharma wrote:
-> > Handle #GP on INVPCID due to an invalid type in the common switch
-> > statement instead of relying on the callers (VMX and SVM) to manually
-> > validate the type.
 > >
-> > Unlike INVVPID and INVEPT, INVPCID is not explicitly documented to check
-> > the type before reading the operand from memory, so deferring the
-> > type validity check until after that point is architecturally allowed.
+> > > +#define SEV_FW_REQ_VER_MAJOR   1
+> > > +#define SEV_FW_REQ_VER_MINOR   30
 > >
-> > Signed-off-by: Vipin Sharma <vipinsh@google.com>
-> > ---
+> > Where does the requirement for this minimum version come from? Maybe
+> > add a comment?
+> >
+> > Edit: Is this for patches later on in the series that exercise SNP? If
+> > so, I think it would be better to add a check like this in the test
+> > itself, rather than globally. I happened to test this on a machine
+> > with a very old PSP FW, 0.22, and the SEV test added in patch #7 seems
+> > to work fine with this ancient PSP FW.
 >
-> For future reference, a R-b that comes with qualifiers can be carried so long as
-> the issues raised by the reviewer are addressed.  Obviously it can be somewhat
-> subjective, but common sense usually goes a long ways, and most reviewers won't
-> be too grumpy about mistakes so long as you had good intentions and remedy any
-> mistakes.  And if you're in doubt, you can always add a blurb in the cover letter
-> or ignored part of the patch to explicitly confirm that it was ok to add the tag,
-> e.g. "Sean, I added your Reviewed-by in patch 02 after fixing the changelog, let
-> me know if that's not what you intended".
+> Ah, yes, this was mostly for SNP support. I'll implement a separate minimum
+> version for SEV/SEV-ES.
 >
-> Thanks!
->
-> Reviewed-by: Sean Christopherson <seanjc@google.com>
 
-I was not sure if I can add R-b as it was only for the code and not
-changelog. Good to know that I can ask such things in the cover letter
-or the ignored part of the patch.
+I want to ask the same thing, I tried to run the sev selftest today
+and I was blocked by this minimum version number... BTW: I suspect if
+I want to update the SEV firmware I have to update the BIOS myself?
+So, it would be good to know what is the actual minimum for SEV.
 
-Thanks
-Vipin
+In addition, maybe that's side effect, I see a warning when building the kernel:
+
+"module ccp.ko requires firmware amd/amd_sev_fam19h_model0xh.sbin"
+
+Maybe I need some hints from you? Or maybe it is just harmless. I did
+double checked and it looks like I was using either
+amd_sev_fam17h_model3xh.sbin or amd_sev_fam17h_model0xh.sbin
+
+Thanks.
+-Mingwei
