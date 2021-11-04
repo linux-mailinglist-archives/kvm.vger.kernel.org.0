@@ -2,126 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 98C0E44522C
-	for <lists+kvm@lfdr.de>; Thu,  4 Nov 2021 12:26:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 74E8B445219
+	for <lists+kvm@lfdr.de>; Thu,  4 Nov 2021 12:19:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229960AbhKDL2k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Nov 2021 07:28:40 -0400
-Received: from mx417.baidu.com ([124.64.200.157]:41471 "EHLO mx419.baidu.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229705AbhKDL2k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Nov 2021 07:28:40 -0400
-X-Greylist: delayed 601 seconds by postgrey-1.27 at vger.kernel.org; Thu, 04 Nov 2021 07:28:39 EDT
-Received: from bjhw-sys-rpm015653cc5.bjhw.baidu.com (bjhw-sys-rpm015653cc5.bjhw.baidu.com [10.227.53.39])
-        by mx419.baidu.com (Postfix) with ESMTP id 4B12C18180516;
-        Thu,  4 Nov 2021 19:07:39 +0800 (CST)
-Received: from localhost (localhost [127.0.0.1])
-        by bjhw-sys-rpm015653cc5.bjhw.baidu.com (Postfix) with ESMTP id 42895D9933;
-        Thu,  4 Nov 2021 19:07:39 +0800 (CST)
-From:   Li RongQing <lirongqing@baidu.com>
-To:     kvm@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, lirongqing@baidu.com
-Subject: [v3][PATCH 2/2] KVM: Clear pv eoi pending bit only when it is set
-Date:   Thu,  4 Nov 2021 19:07:39 +0800
-Message-Id: <1636024059-53855-2-git-send-email-lirongqing@baidu.com>
-X-Mailer: git-send-email 1.7.1
-In-Reply-To: <1636024059-53855-1-git-send-email-lirongqing@baidu.com>
-References: <1636024059-53855-1-git-send-email-lirongqing@baidu.com>
+        id S230365AbhKDLWR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Nov 2021 07:22:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:59789 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229809AbhKDLWQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 4 Nov 2021 07:22:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1636024778;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=CGsR36Tf8Zco3ONitbn6lIwM0U71XOPWuuitVNowbAQ=;
+        b=BVEWfm/FfxCExXv6GTpJUWsDUYqcW5tX0j3T9aAGGdVokoYkuhdpWkSEsMVWxBEh8Bzsjo
+        OS2xWeQ7Ix/018mXeD6C62bdANTL1jtPiUa2fickIi4RBGV1jhfbwax9apfetVHHDHkCbp
+        fY4adSaxb3wzdbMJnHM7xtmsKkIxZ5Y=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-204-a8X7VlfGNP-YhpQlYX9_-g-1; Thu, 04 Nov 2021 07:19:34 -0400
+X-MC-Unique: a8X7VlfGNP-YhpQlYX9_-g-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D102800053;
+        Thu,  4 Nov 2021 11:19:33 +0000 (UTC)
+Received: from localhost (unknown [10.39.193.3])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 62E1D6F951;
+        Thu,  4 Nov 2021 11:19:13 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
+        Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
+        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
+        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH V2 mlx5-next 12/14] vfio/mlx5: Implement vfio_pci driver
+ for mlx5 devices
+In-Reply-To: <20211103120411.3a470501.alex.williamson@redhat.com>
+Organization: Red Hat GmbH
+References: <20211028234750.GP2744544@nvidia.com>
+ <20211029160621.46ca7b54.alex.williamson@redhat.com>
+ <20211101172506.GC2744544@nvidia.com>
+ <20211102085651.28e0203c.alex.williamson@redhat.com>
+ <20211102155420.GK2744544@nvidia.com>
+ <20211102102236.711dc6b5.alex.williamson@redhat.com>
+ <20211102163610.GG2744544@nvidia.com>
+ <20211102141547.6f1b0bb3.alex.williamson@redhat.com>
+ <20211103120955.GK2744544@nvidia.com>
+ <20211103094409.3ea180ab.alex.williamson@redhat.com>
+ <20211103161019.GR2744544@nvidia.com>
+ <20211103120411.3a470501.alex.williamson@redhat.com>
+User-Agent: Notmuch/0.32.1 (https://notmuchmail.org)
+Date:   Thu, 04 Nov 2021 12:19:12 +0100
+Message-ID: <877ddob233.fsf@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-merge pv_eoi_get_pending and pv_eoi_clr_pending into a single
-function pv_eoi_test_and_clear_pending, which returns and clear
-the value of the pending bit.
 
-and clear pv eoi pending bit only when it is set, to avoid calling
-pv_eoi_put_user(), this can speed about 300 nsec on AMD EPYC most
-of the time
+So, I doubt that I'm the only person trying to follow this discussion
+who has lost the overview about issues and possible solutions here. I
+think it would be a good idea to summarize what has been brought up so
+far outside of this thread.
 
-Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Li RongQing <lirongqing@baidu.com>
----
-diff v2: merge as pv_eoi_test_and_clear_pending
-diff v3: remove printk with a new patch
- arch/x86/kvm/lapic.c |   39 ++++++++++++++++++---------------------
- 1 files changed, 18 insertions(+), 21 deletions(-)
-
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 752c48e..9c3b1b3 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -673,15 +673,6 @@ static inline bool pv_eoi_enabled(struct kvm_vcpu *vcpu)
- 	return vcpu->arch.pv_eoi.msr_val & KVM_MSR_ENABLED;
- }
- 
--static bool pv_eoi_get_pending(struct kvm_vcpu *vcpu)
--{
--	u8 val;
--	if (pv_eoi_get_user(vcpu, &val) < 0)
--		return false;
--
--	return val & KVM_PV_EOI_ENABLED;
--}
--
- static void pv_eoi_set_pending(struct kvm_vcpu *vcpu)
- {
- 	if (pv_eoi_put_user(vcpu, KVM_PV_EOI_ENABLED) < 0)
-@@ -690,12 +681,25 @@ static void pv_eoi_set_pending(struct kvm_vcpu *vcpu)
- 	__set_bit(KVM_APIC_PV_EOI_PENDING, &vcpu->arch.apic_attention);
- }
- 
--static void pv_eoi_clr_pending(struct kvm_vcpu *vcpu)
-+static bool pv_eoi_test_and_clr_pending(struct kvm_vcpu *vcpu)
- {
--	if (pv_eoi_put_user(vcpu, KVM_PV_EOI_DISABLED) < 0)
--		return;
-+	u8 val;
-+
-+	if (pv_eoi_get_user(vcpu, &val) < 0)
-+		return false;
-+
-+	val &= KVM_PV_EOI_ENABLED;
- 
-+	/*
-+	 * Clear pending bit in any case: it will be set again on vmentry.
-+	 * While this might not be ideal from performance point of view,
-+	 * this makes sure pv eoi is only enabled when we know it's safe.
-+	 */
-+	if (val && pv_eoi_put_user(vcpu, KVM_PV_EOI_DISABLED) < 0)
-+		return false;
- 	__clear_bit(KVM_APIC_PV_EOI_PENDING, &vcpu->arch.apic_attention);
-+
-+	return !!val;
- }
- 
- static int apic_has_interrupt_for_ppr(struct kvm_lapic *apic, u32 ppr)
-@@ -2671,7 +2675,6 @@ void __kvm_migrate_apic_timer(struct kvm_vcpu *vcpu)
- static void apic_sync_pv_eoi_from_guest(struct kvm_vcpu *vcpu,
- 					struct kvm_lapic *apic)
- {
--	bool pending;
- 	int vector;
- 	/*
- 	 * PV EOI state is derived from KVM_APIC_PV_EOI_PENDING in host
-@@ -2685,14 +2688,8 @@ static void apic_sync_pv_eoi_from_guest(struct kvm_vcpu *vcpu,
- 	 * 	-> host enabled PV EOI, guest executed EOI.
- 	 */
- 	BUG_ON(!pv_eoi_enabled(vcpu));
--	pending = pv_eoi_get_pending(vcpu);
--	/*
--	 * Clear pending bit in any case: it will be set again on vmentry.
--	 * While this might not be ideal from performance point of view,
--	 * this makes sure pv eoi is only enabled when we know it's safe.
--	 */
--	pv_eoi_clr_pending(vcpu);
--	if (pending)
-+
-+	if (pv_eoi_test_and_clr_pending(vcpu))
- 		return;
- 	vector = apic_set_eoi(apic);
- 	trace_kvm_pv_eoi(apic, vector);
--- 
-1.7.1
+To that effect, I've created an etherpad at
+https://etherpad.opendev.org/p/VFIOMigrationDiscussions and started
+filling it with some points. It would be great if others could fill in
+the blanks so that everyone has a chance to see what is on the table so
+far, so that we can hopefully discuss this on-list and come up with
+something that works.
 
