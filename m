@@ -2,111 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CB99444E57
-	for <lists+kvm@lfdr.de>; Thu,  4 Nov 2021 06:25:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 22FB0444FB4
+	for <lists+kvm@lfdr.de>; Thu,  4 Nov 2021 08:34:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230059AbhKDF1x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Nov 2021 01:27:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33736 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230011AbhKDF1w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Nov 2021 01:27:52 -0400
-Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D910AC06127A
-        for <kvm@vger.kernel.org>; Wed,  3 Nov 2021 22:25:14 -0700 (PDT)
-Received: by mail-yb1-xb30.google.com with SMTP id t127so11755350ybf.13
-        for <kvm@vger.kernel.org>; Wed, 03 Nov 2021 22:25:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=OtBceSJb428ILPrgAIwLW6HZ5uojQDi2g0yPmI7b2cQ=;
-        b=Eiqy/Mt0qrguQhqd0jsEW9qkY8Q25PX+ioLaqmK/8C29vQ+LJza+En5XMIJ7bDoVyY
-         8NMnIRI5x22mBTsLnbzkztCtAXHu+iZdfyZOwpY3p5D3XuynIc06r4BAkyl974AdBiF3
-         U0B9M3ryrOWnB8LBMvHx/jPsqmvFqW2jiBxkqXLJyonR4aR+SLkrzXL4spfXm5Gb7B1s
-         aV29j9wgXVbQX1pYaXpB8NTedUqDsM/fTNJvpLB5PhREhttxKffuERtfHXaIRnI8jh94
-         3xSvbfoirN1QLkcQzvBNLdQriNiN1JYDjHAE9j7GbsDv/xsot4wBC7SyE5Abrqmpy/73
-         +oNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=OtBceSJb428ILPrgAIwLW6HZ5uojQDi2g0yPmI7b2cQ=;
-        b=Beiyw9M9/vqfOg9+qQXPEeMUlv+vlX4yIu6i7SdzjNDTEG9JIH21OmRKPYXFBHHcHi
-         jxA1qg1o/TZ6AwX+niFQSIHET7YFMyFxBn7xjjM7o9NUYhsuov47mF6VJC9dLqEi0Vfa
-         NGFOJVU3LH7DVlkVw6MnaYpajRNcTQJ1/WQEbldva7qQK3L5T/6kMNnX1rHLZFhZZ19+
-         bi7yrwJ6xG585CwKqoeQckaYk43KGVvOgLvt5W/+gIg7wgTVKExGGdiZumKLSwR+rdMl
-         eI/JaY7ZJW/XfyT9bFbAk8nw2RSMgW7fBsduRa3KHO/dKAB3VgBjc4rHetnYyvFybT3y
-         yFLA==
-X-Gm-Message-State: AOAM530trpBXM//Slmqmr35rzzDlnb7NlNzTUM5U1w8B9G/LsDq94ari
-        fU2+aC+erwN+yg5hOSmN2QEE60dErfcX0TXPXoHbcQ==
-X-Google-Smtp-Source: ABdhPJzyZRyz+P/9gdUPVZ2JsSGreOqCWZF1woTxfMn3Tgx7LW6epzWNKfujPYCHXJKB/3LlgasNGr1WrHXIQcRH7GE=
-X-Received: by 2002:a25:d4d5:: with SMTP id m204mr19280771ybf.418.1636003513823;
- Wed, 03 Nov 2021 22:25:13 -0700 (PDT)
+        id S230229AbhKDHhf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Nov 2021 03:37:35 -0400
+Received: from mx24.baidu.com ([111.206.215.185]:50656 "EHLO baidu.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S230084AbhKDHhe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Nov 2021 03:37:34 -0400
+Received: from BJHW-Mail-Ex13.internal.baidu.com (unknown [10.127.64.36])
+        by Forcepoint Email with ESMTPS id 59B90584E743CCB44ECB;
+        Thu,  4 Nov 2021 15:34:52 +0800 (CST)
+Received: from BJHW-Mail-Ex15.internal.baidu.com (10.127.64.38) by
+ BJHW-Mail-Ex13.internal.baidu.com (10.127.64.36) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.14; Thu, 4 Nov 2021 15:34:52 +0800
+Received: from BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) by
+ BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) with mapi id
+ 15.01.2308.014; Thu, 4 Nov 2021 15:34:52 +0800
+From:   "Li,Rongqing" <lirongqing@baidu.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: =?gb2312?B?tPC4tDogW1BBVENIXVt2Ml0gS1ZNOiBDbGVhciBwdiBlb2kgcGVuZGluZyBi?=
+ =?gb2312?Q?it_only_when_it_is_set?=
+Thread-Topic: [PATCH][v2] KVM: Clear pv eoi pending bit only when it is set
+Thread-Index: AQHXxkRnWBEkvjcRrUaSKLj7TUgvtavxd6kAgAGXPmA=
+Date:   Thu, 4 Nov 2021 07:34:52 +0000
+Message-ID: <f347f259051e4091a5a5e0bb7e8e0dbc@baidu.com>
+References: <1634797513-11005-1-git-send-email-lirongqing@baidu.com>
+ <87tugtmfy5.fsf@vitty.brq.redhat.com>
+In-Reply-To: <87tugtmfy5.fsf@vitty.brq.redhat.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [172.22.207.33]
+x-baidu-bdmsfe-datecheck: 1_BJHW-Mail-Ex13_2021-11-04 15:34:52:441
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20211005234459.430873-1-michael.roth@amd.com> <20211006203710.13326-1-michael.roth@amd.com>
- <CAA03e5EmnbpKOwfNJUV7fog-7UpJJNpu7mQYmCODpk=tYfXxig@mail.gmail.com> <20211012011537.q7dwebcistxddyyj@amd.com>
-In-Reply-To: <20211012011537.q7dwebcistxddyyj@amd.com>
-From:   Mingwei Zhang <mizhang@google.com>
-Date:   Wed, 3 Nov 2021 22:25:02 -0700
-Message-ID: <CAL715WKBBXNpJFK-3254ox_GU=v04RdYC=uXu4S5kbf=1R9aYA@mail.gmail.com>
-Subject: Re: [RFC 06/16] KVM: selftests: add library for creating/interacting
- with SEV guests
-To:     Michael Roth <Michael.Roth@amd.com>
-Cc:     Marc Orr <marcorr@google.com>, linux-kselftest@vger.kernel.org,
-        kvm list <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, x86 <x86@kernel.org>,
-        Nathan Tempelman <natet@google.com>,
-        Steve Rutherford <srutherford@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <Thomas.Lendacky@amd.com>,
-        Varad Gautam <varad.gautam@suse.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>
-Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
->
-> >
-> > > +#define SEV_FW_REQ_VER_MAJOR   1
-> > > +#define SEV_FW_REQ_VER_MINOR   30
-> >
-> > Where does the requirement for this minimum version come from? Maybe
-> > add a comment?
-> >
-> > Edit: Is this for patches later on in the series that exercise SNP? If
-> > so, I think it would be better to add a check like this in the test
-> > itself, rather than globally. I happened to test this on a machine
-> > with a very old PSP FW, 0.22, and the SEV test added in patch #7 seems
-> > to work fine with this ancient PSP FW.
->
-> Ah, yes, this was mostly for SNP support. I'll implement a separate minimum
-> version for SEV/SEV-ES.
->
-
-I want to ask the same thing, I tried to run the sev selftest today
-and I was blocked by this minimum version number... BTW: I suspect if
-I want to update the SEV firmware I have to update the BIOS myself?
-So, it would be good to know what is the actual minimum for SEV.
-
-In addition, maybe that's side effect, I see a warning when building the kernel:
-
-"module ccp.ko requires firmware amd/amd_sev_fam19h_model0xh.sbin"
-
-Maybe I need some hints from you? Or maybe it is just harmless. I did
-double checked and it looks like I was using either
-amd_sev_fam17h_model3xh.sbin or amd_sev_fam17h_model0xh.sbin
-
-Thanks.
--Mingwei
+DQoNCj4gLS0tLS3Tyrz+1K28/i0tLS0tDQo+ILeivP7IyzogVml0YWx5IEt1em5ldHNvdiA8dmt1
+em5ldHNAcmVkaGF0LmNvbT4NCj4gt6LLzcqxvOQ6IDIwMjHE6jEx1MIzyNUgMjM6MTINCj4gytW8
+/sjLOiBMaSxSb25ncWluZyA8bGlyb25ncWluZ0BiYWlkdS5jb20+DQo+ILOty806IExpLFJvbmdx
+aW5nIDxsaXJvbmdxaW5nQGJhaWR1LmNvbT47IHBib256aW5pQHJlZGhhdC5jb207DQo+IHNlYW5q
+Y0Bnb29nbGUuY29tOyB3YW5wZW5nbGlAdGVuY2VudC5jb207IGptYXR0c29uQGdvb2dsZS5jb207
+DQo+IGpvcm9AOGJ5dGVzLm9yZzsgdGdseEBsaW51dHJvbml4LmRlOyBtaW5nb0ByZWRoYXQuY29t
+OyBicEBhbGllbjguZGU7DQo+IHg4NkBrZXJuZWwub3JnOyBocGFAenl0b3IuY29tOyBrdm1Admdl
+ci5rZXJuZWwub3JnDQo+INb3zOI6IFJlOiBbUEFUQ0hdW3YyXSBLVk06IENsZWFyIHB2IGVvaSBw
+ZW5kaW5nIGJpdCBvbmx5IHdoZW4gaXQgaXMgc2V0DQo+IA0KPiBMaSBSb25nUWluZyA8bGlyb25n
+cWluZ0BiYWlkdS5jb20+IHdyaXRlczoNCj4gDQo+ID4gbWVyZ2UgcHZfZW9pX2dldF9wZW5kaW5n
+IGFuZCBwdl9lb2lfY2xyX3BlbmRpbmcgaW50byBhIHNpbmdsZSBmdW5jdGlvbg0KPiA+IHB2X2Vv
+aV90ZXN0X2FuZF9jbGVhcl9wZW5kaW5nLCB3aGljaCByZXR1cm5zIGFuZCBjbGVhciB0aGUgdmFs
+dWUgb2YNCj4gPiB0aGUgcGVuZGluZyBiaXQuDQo+ID4NCj4gPiBhbmQgY2xlYXIgcHYgZW9pIHBl
+bmRpbmcgYml0IG9ubHkgd2hlbiBpdCBpcyBzZXQsIHRvIGF2b2lkIGNhbGxpbmcNCj4gPiBwdl9l
+b2lfcHV0X3VzZXIoKSwgdGhpcyBjYW4gc3BlZWQgYWJvdXQgMzAwIG5zZWMgb24gQU1EIEVQWUMg
+bW9zdCBvZg0KPiA+IHRoZSB0aW1lDQo+ID4NCj4gPiBhbmQgbWFrZSBwdl9lb2lfc2V0X3BlbmRp
+bmcgYXMgaW5saW5lIGFzIHRoZXJlIGlzIG9ubHkgb25lIHVzZXINCj4gDQo+IENvbXBpbGVyIGlz
+IGxpa2VseSBzbWFydCBlbm91Z2ggdG8gaW5saW5lIHN0YXRpYyBmdW5jdGlvbnMgd2l0aCBhIHNp
+bmdsZSB1c2VyDQo+IGFueXdheS4NCj4gDQo+ID4NCj4gPiBTdWdnZXN0ZWQtYnk6IFZpdGFseSBL
+dXpuZXRzb3YgPHZrdXpuZXRzQHJlZGhhdC5jb20+DQo+ID4gU3VnZ2VzdGVkLWJ5OiBQYW9sbyBC
+b256aW5pIDxwYm9uemluaUByZWRoYXQuY29tPg0KPiA+IFNpZ25lZC1vZmYtYnk6IExpIFJvbmdR
+aW5nIDxsaXJvbmdxaW5nQGJhaWR1LmNvbT4NCj4gPiAtLS0NCj4gPiBkaWZmIHdpdGggdjE6DQo+
+ID4gIG1lcmdlIGFzIHB2X2VvaV90ZXN0X2FuZF9jbGVhcl9wZW5kaW5nICBhZGQgaW5saW5lIGZv
+cg0KPiA+IHB2X2VvaV9zZXRfcGVuZGluZw0KPiA+DQo+ID4gIGFyY2gveDg2L2t2bS9sYXBpYy5j
+IHwgICA0NyArKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0K
+PiA+ICAxIGZpbGVzIGNoYW5nZWQsIDIzIGluc2VydGlvbnMoKyksIDI0IGRlbGV0aW9ucygtKQ0K
+PiA+DQo+ID4gZGlmZiAtLWdpdCBhL2FyY2gveDg2L2t2bS9sYXBpYy5jIGIvYXJjaC94ODYva3Zt
+L2xhcGljLmMgaW5kZXgNCj4gPiA3NmZiMDA5Li40ZGE1ZGI4IDEwMDY0NA0KPiA+IC0tLSBhL2Fy
+Y2gveDg2L2t2bS9sYXBpYy5jDQo+ID4gKysrIGIvYXJjaC94ODYva3ZtL2xhcGljLmMNCj4gPiBA
+QCAtNjczLDE4ICs2NzMsNyBAQCBzdGF0aWMgaW5saW5lIGJvb2wgcHZfZW9pX2VuYWJsZWQoc3Ry
+dWN0IGt2bV92Y3B1DQo+ICp2Y3B1KQ0KPiA+ICAJcmV0dXJuIHZjcHUtPmFyY2gucHZfZW9pLm1z
+cl92YWwgJiBLVk1fTVNSX0VOQUJMRUQ7ICB9DQo+ID4NCj4gPiAtc3RhdGljIGJvb2wgcHZfZW9p
+X2dldF9wZW5kaW5nKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkgLXsNCj4gPiAtCXU4IHZhbDsNCj4g
+PiAtCWlmIChwdl9lb2lfZ2V0X3VzZXIodmNwdSwgJnZhbCkgPCAwKSB7DQo+ID4gLQkJcHJpbnRr
+KEtFUk5fV0FSTklORyAiQ2FuJ3QgcmVhZCBFT0kgTVNSIHZhbHVlOiAweCVsbHhcbiIsDQo+ID4g
+LQkJCSAgICh1bnNpZ25lZCBsb25nIGxvbmcpdmNwdS0+YXJjaC5wdl9lb2kubXNyX3ZhbCk7DQo+
+ID4gLQkJcmV0dXJuIGZhbHNlOw0KPiA+IC0JfQ0KPiA+IC0JcmV0dXJuIHZhbCAmIEtWTV9QVl9F
+T0lfRU5BQkxFRDsNCj4gPiAtfQ0KPiA+IC0NCj4gPiAtc3RhdGljIHZvaWQgcHZfZW9pX3NldF9w
+ZW5kaW5nKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkNCj4gPiArc3RhdGljIGlubGluZSB2b2lkIHB2
+X2VvaV9zZXRfcGVuZGluZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpDQo+ID4gIHsNCj4gPiAgCWlm
+IChwdl9lb2lfcHV0X3VzZXIodmNwdSwgS1ZNX1BWX0VPSV9FTkFCTEVEKSA8IDApIHsNCj4gPiAg
+CQlwcmludGsoS0VSTl9XQVJOSU5HICJDYW4ndCBzZXQgRU9JIE1TUiB2YWx1ZTogMHglbGx4XG4i
+LCBAQA0KPiAtNjk0LDE0DQo+ID4gKzY4MywzMSBAQCBzdGF0aWMgdm9pZCBwdl9lb2lfc2V0X3Bl
+bmRpbmcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQ0KPiA+ICAJX19zZXRfYml0KEtWTV9BUElDX1BW
+X0VPSV9QRU5ESU5HLCAmdmNwdS0+YXJjaC5hcGljX2F0dGVudGlvbik7ICB9DQo+ID4NCj4gPiAt
+c3RhdGljIHZvaWQgcHZfZW9pX2Nscl9wZW5kaW5nKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkNCj4g
+PiArc3RhdGljIGlubGluZSBib29sIHB2X2VvaV90ZXN0X2FuZF9jbHJfcGVuZGluZyhzdHJ1Y3Qg
+a3ZtX3ZjcHUgKnZjcHUpDQo+ID4gIHsNCj4gPiAtCWlmIChwdl9lb2lfcHV0X3VzZXIodmNwdSwg
+S1ZNX1BWX0VPSV9ESVNBQkxFRCkgPCAwKSB7DQo+ID4gKwl1OCB2YWw7DQo+ID4gKw0KPiA+ICsJ
+aWYgKHB2X2VvaV9nZXRfdXNlcih2Y3B1LCAmdmFsKSA8IDApIHsNCj4gPiArCQlwcmludGsoS0VS
+Tl9XQVJOSU5HICJDYW4ndCByZWFkIEVPSSBNU1IgdmFsdWU6IDB4JWxseFxuIiwNCj4gPiArCQkJ
+ICAgKHVuc2lnbmVkIGxvbmcgbG9uZyl2Y3B1LT5hcmNoLnB2X2VvaS5tc3JfdmFsKTsNCj4gDQo+
+IHByX3dhcm4oKSB3b3VsZCBwcm9iYWJseSBiZSBhIGJldHRlciBjaG9pY2UgYnV0IGxvb2tpbmcg
+YXQgdGhpcyBtYWtlcyBtZQ0KPiB3b25kZXI6IGlzbid0IGl0IHRyaWdnZXJhYmxlIGJ5IHRoZSBn
+dWVzdD8gSSB0aGluayBpdCBpcyB3aGVuIHRoZSB2YWx1ZSB3cml0dGVuIHRvDQo+IE1TUl9LVk1f
+UFZfRU9JX0VOIGlzIGJvZ3VzIGFuZCB0aGlzIGlzIGJhZDogd2UgZG9uJ3QgZXZlbiByYXRlbGlt
+aXQgdGhlc2UNCj4gbWVzc2FnZXMhIEkgdGhpbmsgdGhpcyBwcmludGsoKSBuZWVkcyB0byBiZSBk
+cm9wcGVkLg0KPiANCg0KVHJ1ZSwgaXQgbmVlZHMgdG8gYmUgcmVtb3ZlZC4NCkFuZCBpdCBpcyBp
+bnRyb2R1Y2VkIGJ5IHRoaXMgYmVsb3cgcGF0Y2ggOyBJIHRoaW5rIGl0IHNob3VsZCBiZSBhIG5l
+dyBwYXRjaCB0byBmaXggaXQuIA0KDQoNCmNvbW1pdCAwZDg4ODAwZDU0NzIxMWNlMDdiZTM1NTFj
+ODEyZDQwNGNmMmJlM2E4DQpBdXRob3I6IFlpIFdhbmcgPHdhbmcueWk1OUB6dGUuY29tLmNuPg0K
+RGF0ZTogICBTYXQgSnVsIDYgMDE6MDg6NDggMjAxOSArMDgwMA0KDQogICAga3ZtOiB4ODY6IGlv
+YXBpYyBhbmQgYXBpYyBkZWJ1ZyBtYWNyb3MgY2xlYW51cA0KDQoNCnRoYW5rcw0KDQotTGkNCg0K
+DQo+ID4gKwkJcmV0dXJuIGZhbHNlOw0KPiA+ICsJfQ0KPiA+ICsNCj4gPiArCXZhbCAmPSBLVk1f
+UFZfRU9JX0VOQUJMRUQ7DQo+ID4gKw0KPiA+ICsJLyoNCj4gPiArCSAqIENsZWFyIHBlbmRpbmcg
+Yml0IGluIGFueSBjYXNlOiBpdCB3aWxsIGJlIHNldCBhZ2FpbiBvbiB2bWVudHJ5Lg0KPiA+ICsJ
+ICogV2hpbGUgdGhpcyBtaWdodCBub3QgYmUgaWRlYWwgZnJvbSBwZXJmb3JtYW5jZSBwb2ludCBv
+ZiB2aWV3LA0KPiA+ICsJICogdGhpcyBtYWtlcyBzdXJlIHB2IGVvaSBpcyBvbmx5IGVuYWJsZWQg
+d2hlbiB3ZSBrbm93IGl0J3Mgc2FmZS4NCj4gPiArCSAqLw0KPiA+ICsJaWYgKHZhbCAmJiBwdl9l
+b2lfcHV0X3VzZXIodmNwdSwgS1ZNX1BWX0VPSV9ESVNBQkxFRCkgPCAwKSB7DQo+ID4gIAkJcHJp
+bnRrKEtFUk5fV0FSTklORyAiQ2FuJ3QgY2xlYXIgRU9JIE1TUiB2YWx1ZTogMHglbGx4XG4iLA0K
+PiA+ICAJCQkgICAodW5zaWduZWQgbG9uZyBsb25nKXZjcHUtPmFyY2gucHZfZW9pLm1zcl92YWwp
+Ow0KPiANCj4gLi4uIGFuZCB0aGlzIG9uZSwgcHJvYmFibHksIHRvby4NCj4gDQo+ID4gLQkJcmV0
+dXJuOw0KPiA+ICsJCXJldHVybiBmYWxzZTsNCj4gPiAgCX0NCj4gPiAgCV9fY2xlYXJfYml0KEtW
+TV9BUElDX1BWX0VPSV9QRU5ESU5HLCAmdmNwdS0+YXJjaC5hcGljX2F0dGVudGlvbik7DQo+ID4g
+Kw0KPiA+ICsJcmV0dXJuICEhdmFsOw0KPiA+ICB9DQo+ID4NCj4gPiAgc3RhdGljIGludCBhcGlj
+X2hhc19pbnRlcnJ1cHRfZm9yX3BwcihzdHJ1Y3Qga3ZtX2xhcGljICphcGljLCB1MzINCj4gPiBw
+cHIpIEBAIC0yNjczLDcgKzI2NzksNiBAQCB2b2lkIF9fa3ZtX21pZ3JhdGVfYXBpY190aW1lcihz
+dHJ1Y3QNCj4gPiBrdm1fdmNwdSAqdmNwdSkgIHN0YXRpYyB2b2lkIGFwaWNfc3luY19wdl9lb2lf
+ZnJvbV9ndWVzdChzdHJ1Y3Qga3ZtX3ZjcHUNCj4gKnZjcHUsDQo+ID4gIAkJCQkJc3RydWN0IGt2
+bV9sYXBpYyAqYXBpYykNCj4gPiAgew0KPiA+IC0JYm9vbCBwZW5kaW5nOw0KPiA+ICAJaW50IHZl
+Y3RvcjsNCj4gPiAgCS8qDQo+ID4gIAkgKiBQViBFT0kgc3RhdGUgaXMgZGVyaXZlZCBmcm9tIEtW
+TV9BUElDX1BWX0VPSV9QRU5ESU5HIGluIGhvc3QgQEANCj4gPiAtMjY4NywxNCArMjY5Miw4IEBA
+IHN0YXRpYyB2b2lkIGFwaWNfc3luY19wdl9lb2lfZnJvbV9ndWVzdChzdHJ1Y3QNCj4ga3ZtX3Zj
+cHUgKnZjcHUsDQo+ID4gIAkgKiAJLT4gaG9zdCBlbmFibGVkIFBWIEVPSSwgZ3Vlc3QgZXhlY3V0
+ZWQgRU9JLg0KPiA+ICAJICovDQo+ID4gIAlCVUdfT04oIXB2X2VvaV9lbmFibGVkKHZjcHUpKTsN
+Cj4gPiAtCXBlbmRpbmcgPSBwdl9lb2lfZ2V0X3BlbmRpbmcodmNwdSk7DQo+ID4gLQkvKg0KPiA+
+IC0JICogQ2xlYXIgcGVuZGluZyBiaXQgaW4gYW55IGNhc2U6IGl0IHdpbGwgYmUgc2V0IGFnYWlu
+IG9uIHZtZW50cnkuDQo+ID4gLQkgKiBXaGlsZSB0aGlzIG1pZ2h0IG5vdCBiZSBpZGVhbCBmcm9t
+IHBlcmZvcm1hbmNlIHBvaW50IG9mIHZpZXcsDQo+ID4gLQkgKiB0aGlzIG1ha2VzIHN1cmUgcHYg
+ZW9pIGlzIG9ubHkgZW5hYmxlZCB3aGVuIHdlIGtub3cgaXQncyBzYWZlLg0KPiA+IC0JICovDQo+
+ID4gLQlwdl9lb2lfY2xyX3BlbmRpbmcodmNwdSk7DQo+ID4gLQlpZiAocGVuZGluZykNCj4gPiAr
+DQo+ID4gKwlpZiAocHZfZW9pX3Rlc3RfYW5kX2Nscl9wZW5kaW5nKHZjcHUpKQ0KPiA+ICAJCXJl
+dHVybjsNCj4gPiAgCXZlY3RvciA9IGFwaWNfc2V0X2VvaShhcGljKTsNCj4gPiAgCXRyYWNlX2t2
+bV9wdl9lb2koYXBpYywgdmVjdG9yKTsNCj4gDQo+IC0tDQo+IFZpdGFseQ0KDQo=
