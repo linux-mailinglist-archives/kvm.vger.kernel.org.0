@@ -2,359 +2,182 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2887044522E
-	for <lists+kvm@lfdr.de>; Thu,  4 Nov 2021 12:27:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CA1A344523F
+	for <lists+kvm@lfdr.de>; Thu,  4 Nov 2021 12:32:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230478AbhKDLaF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Nov 2021 07:30:05 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40534 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229705AbhKDLaE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 4 Nov 2021 07:30:04 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1A4AlOJ6004589;
-        Thu, 4 Nov 2021 11:27:24 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=fYrXFm65Klb4z912RpG/K9fLuFdTpkSX+Z6cVddfAuo=;
- b=M6VutEAuJMXJaksC+Fwe+t9Deahob9fuEFo7mRtgIajada0TZTrfkFSDDpDOz5G7+y5e
- 9uZtWFnG/cb81tk63U0MV2c98iznnC5SBXPwsWKnktloRv3vAGMzOI10f7VFpsqLjaNn
- tV7v95WILojj76jDzXM2IXEdB7msPHIRwfLI4xPjncxk1HVOcxksmSiorEK1/+Bob1kh
- 3KdMoeCYaybRjRgSBHIu0Q65r+i/l2OQ1vrQwA0ZK/v5oKnCt0X09Ma0MeHVVLhLxfuv
- ly2B+SWEwFsLxH5OpADuwTvZMOmpOInEQerrn2ddayEhvygiu8Y+pctCT4qxo7IlfZRX FQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3c4e2x0pgy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 04 Nov 2021 11:27:24 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1A4BRLhW005056;
-        Thu, 4 Nov 2021 11:27:24 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3c4e2x0pge-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 04 Nov 2021 11:27:23 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1A4BD4Av016087;
-        Thu, 4 Nov 2021 11:27:21 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma04ams.nl.ibm.com with ESMTP id 3c0wpb6e4n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 04 Nov 2021 11:27:21 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1A4BRHRK48693710
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 4 Nov 2021 11:27:17 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A5043AE04D;
-        Thu,  4 Nov 2021 11:27:17 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BCB29AE053;
-        Thu,  4 Nov 2021 11:27:16 +0000 (GMT)
-Received: from funtu.home (unknown [9.145.185.82])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  4 Nov 2021 11:27:16 +0000 (GMT)
-Subject: Re: [PATCH v17 11/15] s390/ap: driver callback to indicate resource
- in use
-To:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     jjherne@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
-        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com
-References: <20211021152332.70455-1-akrowiak@linux.ibm.com>
- <20211021152332.70455-12-akrowiak@linux.ibm.com>
-From:   Harald Freudenberger <freude@linux.ibm.com>
-Message-ID: <15a87038-a88c-b29e-f7d7-760ca27c87cf@linux.ibm.com>
-Date:   Thu, 4 Nov 2021 12:27:17 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        id S229960AbhKDLfY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Nov 2021 07:35:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:41551 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229705AbhKDLfX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 4 Nov 2021 07:35:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1636025565;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=9hfDzJRzFXBzyVbPrAxTW9kn1j9dpX7mBcx6PiiipR8=;
+        b=R/mPz1miR4vm/Al6qoj8d9jbkhQKb3ggiaAYJuV08c6OPavX/E8sT0CiY4g0BqX0PoLnX4
+        R/QY6f8h6fASy9jrFO6xKQUtZmA+2/4vSFofDgDsM4V3/cGvJVInxT3jGll0KjOekmrH3m
+        gfT5lL1b0TQRXramCGjjYnqlRq+Csvw=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-10-kunNeY80O_WVmfre_bTp8w-1; Thu, 04 Nov 2021 07:32:43 -0400
+X-MC-Unique: kunNeY80O_WVmfre_bTp8w-1
+Received: by mail-wr1-f72.google.com with SMTP id d13-20020adf9b8d000000b00160a94c235aso925183wrc.2
+        for <kvm@vger.kernel.org>; Thu, 04 Nov 2021 04:32:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=9hfDzJRzFXBzyVbPrAxTW9kn1j9dpX7mBcx6PiiipR8=;
+        b=Med6ynYd0n+K/8/fYvPcoD0VfaxHoS+J8lf4RsB8l1KkxvJmOSPbXyd/u8cijrUG6Y
+         9q/gu+qFpYJgVI1w2cGt3yHku29gavo58zzkUoFU2Rad+hIcc7wAdHU/L5zjXJlBvQ6K
+         HfqcQtUs0938IUVeNnvHMz7xmatxjtq6oHxKDo2rDZ8zfnd2gHjvkbJKWpbq4Mpa/V5P
+         lz1HbJEokxJgyF4FUp5SeIu5Oi+1om7w93Xp+EQkBqhwRQcj5rkMhOZAZepNZC+Xa0Ns
+         TXzA9j+7JDCg1T/C9eWD9jLA/4zfxM74QkIEIYIH/bLPFwh5T8bxQ7YxmEo6o74NyKTq
+         8r6g==
+X-Gm-Message-State: AOAM531QW1IoJA1gHGUDEdG5hQqGCwfgYv79Fcp96ssjj+smHkNImxTU
+        OzT0PJDllEMD5fGYOOUBhsjBzTIN+yueIisrY/uxzJvknD+Wistn5uyexz+7Rx9GdvyyXJMYkqU
+        eW8nsm+sLnuex
+X-Received: by 2002:adf:9147:: with SMTP id j65mr63657785wrj.163.1636025562626;
+        Thu, 04 Nov 2021 04:32:42 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwGEzgUHrLGorqMUUmENA20P95eLb+2+s9kV+rdirboiaivoyuJ/rFbRwsT58IQ5h9roEJjlw==
+X-Received: by 2002:adf:9147:: with SMTP id j65mr63657761wrj.163.1636025562406;
+        Thu, 04 Nov 2021 04:32:42 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id f15sm4691079wrt.26.2021.11.04.04.32.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Nov 2021 04:32:41 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Li RongQing <lirongqing@baidu.com>, kvm@vger.kernel.org,
+        pbonzini@redhat.com
+Cc:     seanjc@google.com, lirongqing@baidu.com
+Subject: Re: [v3][PATCH 2/2] KVM: Clear pv eoi pending bit only when it is set
+In-Reply-To: <1636024059-53855-2-git-send-email-lirongqing@baidu.com>
+References: <1636024059-53855-1-git-send-email-lirongqing@baidu.com>
+ <1636024059-53855-2-git-send-email-lirongqing@baidu.com>
+Date:   Thu, 04 Nov 2021 12:32:41 +0100
+Message-ID: <87a6ikma06.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20211021152332.70455-12-akrowiak@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: I7kePiBWxLWjtZ-2rJ0_zfjY3we0LjZi
-X-Proofpoint-ORIG-GUID: fFhU-mOVSMVqNVErIZ8T1mOeZ9s1xZ8Q
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-11-04_03,2021-11-03_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
- lowpriorityscore=0 spamscore=0 bulkscore=0 malwarescore=0 impostorscore=0
- suspectscore=0 priorityscore=1501 clxscore=1011 adultscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
- definitions=main-2111040046
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 21.10.21 17:23, Tony Krowiak wrote:
-> Introduces a new driver callback to prevent a root user from re-assigning
-> the APQN of a queue that is in use by a non-default host device driver to
-> a default host device driver and vice versa. The callback will be invoked
-> whenever a change to the AP bus's sysfs apmask or aqmask attributes would
-> result in one or more APQNs being re-assigned. If the callback responds
-> in the affirmative for any driver queried, the change to the apmask or
-> aqmask will be rejected with a device busy error.
+Li RongQing <lirongqing@baidu.com> writes:
+
+> merge pv_eoi_get_pending and pv_eoi_clr_pending into a single
+> function pv_eoi_test_and_clear_pending, which returns and clear
+> the value of the pending bit.
 >
-> For this patch, only non-default drivers will be queried. Currently,
-> there is only one non-default driver, the vfio_ap device driver. The
-> vfio_ap device driver facilitates pass-through of an AP queue to a
-> guest. The idea here is that a guest may be administered by a different
-> sysadmin than the host and we don't want AP resources to unexpectedly
-> disappear from a guest's AP configuration (i.e., adapters and domains
-> assigned to the matrix mdev). This will enforce the proper procedure for
-> removing AP resources intended for guest usage which is to
-> first unassign them from the matrix mdev, then unbind them from the
-> vfio_ap device driver.
+> and clear pv eoi pending bit only when it is set, to avoid calling
+> pv_eoi_put_user(), this can speed about 300 nsec on AMD EPYC most
+> of the time
 >
-> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
-> Reviewed-by: Harald Freudenberger <freude@linux.ibm.com>
-> Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+> Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Li RongQing <lirongqing@baidu.com>
 > ---
->  drivers/s390/crypto/ap_bus.c | 160 ++++++++++++++++++++++++++++++++---
->  drivers/s390/crypto/ap_bus.h |   4 +
->  2 files changed, 154 insertions(+), 10 deletions(-)
+> diff v2: merge as pv_eoi_test_and_clear_pending
+> diff v3: remove printk with a new patch
+>  arch/x86/kvm/lapic.c |   39 ++++++++++++++++++---------------------
+>  1 files changed, 18 insertions(+), 21 deletions(-)
 >
-> diff --git a/drivers/s390/crypto/ap_bus.c b/drivers/s390/crypto/ap_bus.c
-> index d9b804943d19..15886610f61a 100644
-> --- a/drivers/s390/crypto/ap_bus.c
-> +++ b/drivers/s390/crypto/ap_bus.c
-> @@ -36,6 +36,7 @@
->  #include <linux/mod_devicetable.h>
->  #include <linux/debugfs.h>
->  #include <linux/ctype.h>
-> +#include <linux/module.h>
->  
->  #include "ap_bus.h"
->  #include "ap_debug.h"
-> @@ -1060,6 +1061,23 @@ static int modify_bitmap(const char *str, unsigned long *bitmap, int bits)
->  	return 0;
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 752c48e..9c3b1b3 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -673,15 +673,6 @@ static inline bool pv_eoi_enabled(struct kvm_vcpu *vcpu)
+>  	return vcpu->arch.pv_eoi.msr_val & KVM_MSR_ENABLED;
 >  }
 >  
-> +static int ap_parse_bitmap_str(const char *str, unsigned long *bitmap, int bits,
-> +			       unsigned long *newmap)
-> +{
-> +	unsigned long size;
-> +	int rc;
-> +
-> +	size = BITS_TO_LONGS(bits) * sizeof(unsigned long);
-> +	if (*str == '+' || *str == '-') {
-> +		memcpy(newmap, bitmap, size);
-> +		rc = modify_bitmap(str, newmap, bits);
-> +	} else {
-> +		memset(newmap, 0, size);
-> +		rc = hex2bitmap(str, newmap, bits);
-> +	}
-> +	return rc;
-> +}
-> +
->  int ap_parse_mask_str(const char *str,
->  		      unsigned long *bitmap, int bits,
->  		      struct mutex *lock)
-> @@ -1079,14 +1097,7 @@ int ap_parse_mask_str(const char *str,
->  		kfree(newmap);
->  		return -ERESTARTSYS;
->  	}
+> -static bool pv_eoi_get_pending(struct kvm_vcpu *vcpu)
+> -{
+> -	u8 val;
+> -	if (pv_eoi_get_user(vcpu, &val) < 0)
+> -		return false;
 > -
-> -	if (*str == '+' || *str == '-') {
-> -		memcpy(newmap, bitmap, size);
-> -		rc = modify_bitmap(str, newmap, bits);
-> -	} else {
-> -		memset(newmap, 0, size);
-> -		rc = hex2bitmap(str, newmap, bits);
-> -	}
-> +	rc = ap_parse_bitmap_str(str, bitmap, bits, newmap);
->  	if (rc == 0)
->  		memcpy(bitmap, newmap, size);
->  	mutex_unlock(lock);
-> @@ -1278,12 +1289,76 @@ static ssize_t apmask_show(struct bus_type *bus, char *buf)
->  	return rc;
+> -	return val & KVM_PV_EOI_ENABLED;
+> -}
+> -
+>  static void pv_eoi_set_pending(struct kvm_vcpu *vcpu)
+>  {
+>  	if (pv_eoi_put_user(vcpu, KVM_PV_EOI_ENABLED) < 0)
+> @@ -690,12 +681,25 @@ static void pv_eoi_set_pending(struct kvm_vcpu *vcpu)
+>  	__set_bit(KVM_APIC_PV_EOI_PENDING, &vcpu->arch.apic_attention);
 >  }
 >  
-> +static int __verify_card_reservations(struct device_driver *drv, void *data)
-> +{
-> +	int rc = 0;
-> +	struct ap_driver *ap_drv = to_ap_drv(drv);
-> +	unsigned long *newapm = (unsigned long *)data;
-> +
-> +	/*
-> +	 * No need to verify whether the driver is using the queues if it is the
-> +	 * default driver.
-> +	 */
-> +	if (ap_drv->flags & AP_DRIVER_FLAG_DEFAULT)
-> +		return 0;
-> +
-> +	/*
-> +	 * increase the driver's module refcounter to be sure it is not
-> +	 * going away when we invoke the callback function.
-> +	 */
-> +	if (!try_module_get(drv->owner))
-> +		return 0;
-> +
-> +	if (ap_drv->in_use) {
-> +		rc = ap_drv->in_use(newapm, ap_perms.aqm);
-> +		if (rc)
-> +			rc = -EBUSY;
-> +	}
-> +
-> +	/* release the driver's module */
-> +	module_put(drv->owner);
-> +
-> +	return rc;
-> +}
-> +
-> +static int apmask_commit(unsigned long *newapm)
-> +{
-> +	int rc;
-> +	unsigned long reserved[BITS_TO_LONGS(AP_DEVICES)];
-> +
-> +	/*
-> +	 * Check if any bits in the apmask have been set which will
-> +	 * result in queues being removed from non-default drivers
-> +	 */
-> +	if (bitmap_andnot(reserved, newapm, ap_perms.apm, AP_DEVICES)) {
-> +		rc = bus_for_each_drv(&ap_bus_type, NULL, reserved,
-> +				      __verify_card_reservations);
-> +		if (rc)
-> +			return rc;
-> +	}
-> +
-> +	memcpy(ap_perms.apm, newapm, APMASKSIZE);
-> +
-> +	return 0;
-> +}
-> +
->  static ssize_t apmask_store(struct bus_type *bus, const char *buf,
->  			    size_t count)
+> -static void pv_eoi_clr_pending(struct kvm_vcpu *vcpu)
+> +static bool pv_eoi_test_and_clr_pending(struct kvm_vcpu *vcpu)
 >  {
->  	int rc;
-> +	DECLARE_BITMAP(newapm, AP_DEVICES);
+> -	if (pv_eoi_put_user(vcpu, KVM_PV_EOI_DISABLED) < 0)
+> -		return;
+> +	u8 val;
+> +
+> +	if (pv_eoi_get_user(vcpu, &val) < 0)
+> +		return false;
+> +
+> +	val &= KVM_PV_EOI_ENABLED;
 >  
-> -	rc = ap_parse_mask_str(buf, ap_perms.apm, AP_DEVICES, &ap_perms_mutex);
-> +	if (mutex_lock_interruptible(&ap_perms_mutex))
-> +		return -ERESTARTSYS;
+> +	/*
+> +	 * Clear pending bit in any case: it will be set again on vmentry.
+> +	 * While this might not be ideal from performance point of view,
+> +	 * this makes sure pv eoi is only enabled when we know it's safe.
+> +	 */
+
+This comment is misplaced now, as one may read it as we're clearing the
+bit in guest's memory while in fact it refers to a bit in
+'vcpu->arch.apic_attention'. Moreover, we're now checking 'val' so 'in
+any case' above is certainly misleading.
+
+We can add a 
+
+	"Disable PV EOI in guest's memory in case it was previously
+	enabled" (or something like that)
+
+comment here (but I don't think it gives much value to be honest).
+
+> +	if (val && pv_eoi_put_user(vcpu, KVM_PV_EOI_DISABLED) < 0)
+> +		return false;
+
+Let's move the original comment here.
+
+>  	__clear_bit(KVM_APIC_PV_EOI_PENDING, &vcpu->arch.apic_attention);
 > +
-> +	rc = ap_parse_bitmap_str(buf, ap_perms.apm, AP_DEVICES, newapm);
-> +	if (rc)
-> +		goto done;
-> +
-> +	rc = apmask_commit(newapm);
-> +
-> +done:
-> +	mutex_unlock(&ap_perms_mutex);
->  	if (rc)
->  		return rc;
->  
-> @@ -1309,12 +1384,77 @@ static ssize_t aqmask_show(struct bus_type *bus, char *buf)
->  	return rc;
+> +	return !!val;
+
+('!!' is not really needed, the function returns bool)
+
 >  }
 >  
-> +static int __verify_queue_reservations(struct device_driver *drv, void *data)
-> +{
-> +	int rc = 0;
-> +	struct ap_driver *ap_drv = to_ap_drv(drv);
-> +	unsigned long *newaqm = (unsigned long *)data;
-> +
-> +	/*
-> +	 * If the reserved bits do not identify queues reserved for use by the
-> +	 * non-default driver, there is no need to verify the driver is using
-> +	 * the queues.
-> +	 */
-> +	if (ap_drv->flags & AP_DRIVER_FLAG_DEFAULT)
-> +		return 0;
-> +
-> +	/*
-> +	 * increase the driver's module refcounter to be sure it is not
-> +	 * going away when we invoke the callback function.
-> +	 */
-> +	if (!try_module_get(drv->owner))
-> +		return 0;
-> +
-> +	if (ap_drv->in_use) {
-> +		rc = ap_drv->in_use(ap_perms.apm, newaqm);
-> +		if (rc)
-> +			return -EBUSY;
-> +	}
-> +
-> +	/* release the driver's module */
-> +	module_put(drv->owner);
-> +
-> +	return rc;
-> +}
-> +
-> +static int aqmask_commit(unsigned long *newaqm)
-> +{
-> +	int rc;
-> +	unsigned long reserved[BITS_TO_LONGS(AP_DOMAINS)];
-> +
-> +	/*
-> +	 * Check if any bits in the aqmask have been set which will
-> +	 * result in queues being removed from non-default drivers
-> +	 */
-> +	if (bitmap_andnot(reserved, newaqm, ap_perms.aqm, AP_DOMAINS)) {
-> +		rc = bus_for_each_drv(&ap_bus_type, NULL, reserved,
-> +				      __verify_queue_reservations);
-> +		if (rc)
-> +			return rc;
-> +	}
-> +
-> +	memcpy(ap_perms.aqm, newaqm, AQMASKSIZE);
-> +
-> +	return 0;
-> +}
-> +
->  static ssize_t aqmask_store(struct bus_type *bus, const char *buf,
->  			    size_t count)
+>  static int apic_has_interrupt_for_ppr(struct kvm_lapic *apic, u32 ppr)
+> @@ -2671,7 +2675,6 @@ void __kvm_migrate_apic_timer(struct kvm_vcpu *vcpu)
+>  static void apic_sync_pv_eoi_from_guest(struct kvm_vcpu *vcpu,
+>  					struct kvm_lapic *apic)
 >  {
->  	int rc;
-> +	DECLARE_BITMAP(newaqm, AP_DOMAINS);
+> -	bool pending;
+>  	int vector;
+>  	/*
+>  	 * PV EOI state is derived from KVM_APIC_PV_EOI_PENDING in host
+> @@ -2685,14 +2688,8 @@ static void apic_sync_pv_eoi_from_guest(struct kvm_vcpu *vcpu,
+>  	 * 	-> host enabled PV EOI, guest executed EOI.
+>  	 */
+>  	BUG_ON(!pv_eoi_enabled(vcpu));
+> -	pending = pv_eoi_get_pending(vcpu);
+> -	/*
+> -	 * Clear pending bit in any case: it will be set again on vmentry.
+> -	 * While this might not be ideal from performance point of view,
+> -	 * this makes sure pv eoi is only enabled when we know it's safe.
+> -	 */
+> -	pv_eoi_clr_pending(vcpu);
+> -	if (pending)
 > +
-> +	if (mutex_lock_interruptible(&ap_perms_mutex))
-> +		return -ERESTARTSYS;
-> +
-> +	rc = ap_parse_bitmap_str(buf, ap_perms.aqm, AP_DOMAINS, newaqm);
-> +	if (rc)
-> +		goto done;
-> +
-> +	rc = aqmask_commit(newaqm);
->  
-> -	rc = ap_parse_mask_str(buf, ap_perms.aqm, AP_DOMAINS, &ap_perms_mutex);
-> +done:
-> +	mutex_unlock(&ap_perms_mutex);
->  	if (rc)
->  		return rc;
->  
-> diff --git a/drivers/s390/crypto/ap_bus.h b/drivers/s390/crypto/ap_bus.h
-> index 95b577754b35..67c1bef60ad5 100644
-> --- a/drivers/s390/crypto/ap_bus.h
-> +++ b/drivers/s390/crypto/ap_bus.h
-> @@ -142,6 +142,7 @@ struct ap_driver {
->  
->  	int (*probe)(struct ap_device *);
->  	void (*remove)(struct ap_device *);
-> +	int (*in_use)(unsigned long *apm, unsigned long *aqm);
->  };
->  
->  #define to_ap_drv(x) container_of((x), struct ap_driver, driver)
-> @@ -289,6 +290,9 @@ void ap_queue_init_state(struct ap_queue *aq);
->  struct ap_card *ap_card_create(int id, int queue_depth, int raw_type,
->  			       int comp_type, unsigned int functions, int ml);
->  
-> +#define APMASKSIZE (BITS_TO_LONGS(AP_DEVICES) * sizeof(unsigned long))
-> +#define AQMASKSIZE (BITS_TO_LONGS(AP_DOMAINS) * sizeof(unsigned long))
-> +
->  struct ap_perms {
->  	unsigned long ioctlm[BITS_TO_LONGS(AP_IOCTLS)];
->  	unsigned long apm[BITS_TO_LONGS(AP_DEVICES)];
-reviewed again. I still don't like this as it introduces an unbalanced weighting for the
-vfio dd but ... We could consider removing the
+> +	if (pv_eoi_test_and_clr_pending(vcpu))
+>  		return;
+>  	vector = apic_set_eoi(apic);
+>  	trace_kvm_pv_eoi(apic, vector);
 
-if (ap_drv->flags & AP_DRIVER_FLAG_DEFAULT)
-		return 0;
-
-in function __verify_queue_reservations. It would still work as the 'default device
-drivers' do not implement the in_use() callback and thus do not disagree about
-the upcoming change.
+-- 
+Vitaly
 
