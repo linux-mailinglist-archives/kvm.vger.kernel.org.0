@@ -2,111 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9440744575F
-	for <lists+kvm@lfdr.de>; Thu,  4 Nov 2021 17:41:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 618F4445761
+	for <lists+kvm@lfdr.de>; Thu,  4 Nov 2021 17:41:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231587AbhKDQnm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Nov 2021 12:43:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45510 "EHLO
+        id S231725AbhKDQn4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Nov 2021 12:43:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230420AbhKDQnl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Nov 2021 12:43:41 -0400
-Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5273C061714
-        for <kvm@vger.kernel.org>; Thu,  4 Nov 2021 09:41:03 -0700 (PDT)
-Received: by mail-io1-xd33.google.com with SMTP id d70so6664433iof.7
-        for <kvm@vger.kernel.org>; Thu, 04 Nov 2021 09:41:03 -0700 (PDT)
+        with ESMTP id S231636AbhKDQny (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Nov 2021 12:43:54 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0B5DC061203
+        for <kvm@vger.kernel.org>; Thu,  4 Nov 2021 09:41:15 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id e6-20020a637446000000b002993ba24bbaso4117675pgn.12
+        for <kvm@vger.kernel.org>; Thu, 04 Nov 2021 09:41:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=n89uubugbDSS31fmjZBPGlZmDbloGpPz8qHQD795FjI=;
-        b=KNVu5VlvLHC8LhEZJ1GeRcJxuhRBVKjlxW5S2JjtSy5YETOQgBq1h80cs+LZg6Jrqq
-         66dkdvi1vERwy7tSwNjJJVnGC2YPONc/uMbJ8F9Wt//VhGN6Bgfy8P2/BCYZxXwZk3R1
-         7jjndXad3DE+ZzFuwchi2YDL6NCF1UmgjvK3EPTDCGF0KzmaGIJ/cw9u2JnrLEGcIgDg
-         cihXdT1LQ2nQkR3V/olZ2iTMpBSX9YF6CSg3qCUxleBhwC0c3O7A8Lxw++Oo16bEWP0T
-         uWk4JRKXYmVcJKvDWra+KeLtBtGZVMafA4/kDPlmmu698FI0WE5rTmE9w86bcHEGsQeS
-         mO2g==
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=B/Zu1r2lWoaGRs4vZ4DYzM83YZYEZ7XIPjfjvmaVSuQ=;
+        b=ki3AaxqFOvGvvbJJZVr35PCVsFHsUCxZqbsEF1iDWMjKZKRWHNVpZlaeyll1xDRuqZ
+         Fe9NsSq5NdIlDhb0JLDZfyM4lzNAJm+sMyKu7XG3OZnwhCX0lDAr0jFvnCTVlBd7Rlcf
+         91yoEX88+q6nDsjG+XcTr8pjIQnVgIspEYZF36luc29Bya+BC7bNTBu763VhyOSfxu1/
+         ZjYG+aZ9p9yMtavbux/GVKKU3aGIISPuiv5jHwBtGmAL06kN/HT7OfW5saTVeBTigG3Q
+         3Ld0kCq2NzU5RRSSR7+xT2EDJ1GsS8+HpmW85Q3Hm2ukUg6jrEEJgklHclpTDmpPrHOL
+         OSCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=n89uubugbDSS31fmjZBPGlZmDbloGpPz8qHQD795FjI=;
-        b=QpUZCliC/KBaJn9pHwUAPT46E4QYIqWX8/RpMmrSZrwDvrMlOe6WLvpwBSOXt+HH0V
-         nynkEN4W52V9v+R7p4R8Zb0jM7rZkW0FaOvhrg/pyEz0If8qv/P+r/6LMXnyTjTncMud
-         Io8ktO1xPWILCtrYLjkEnLuAROwzL3VyPnsWYzitNFa7536UKEWd6PREFQA/LtmjW0Qf
-         gZ68qdpU0sc6hO5WlZMy7HuJ77dU+ahZaWR8xaotZ+alBKh9NpaYctq1as9k/6EzQk2U
-         aTnaUM6ts8xbHB0ISpMBVQWGh7Z1uqr+0hDUGPx6Huzp3TdMHK/7OD3h7liLjpO8yVrM
-         IZFg==
-X-Gm-Message-State: AOAM533S7AdGxlkNARTVPIXEuTCvxL3cUq3bEXMmemFToGxU/yOPjXFp
-        D39/iPZQx+c7g0UYiTKbpsKceQ==
-X-Google-Smtp-Source: ABdhPJzhfKc56+AGehB6rwlydFBdwcHeviUbHIFnDTRU6KIyTbtZIkuuDhw1XuIj5pRTYfxo6B4M8Q==
-X-Received: by 2002:a5e:8c05:: with SMTP id n5mr6480970ioj.0.1636044062919;
-        Thu, 04 Nov 2021 09:41:02 -0700 (PDT)
-Received: from google.com (194.225.68.34.bc.googleusercontent.com. [34.68.225.194])
-        by smtp.gmail.com with ESMTPSA id u12sm1074124iop.52.2021.11.04.09.41.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Nov 2021 09:41:02 -0700 (PDT)
-Date:   Thu, 4 Nov 2021 16:40:58 +0000
-From:   Oliver Upton <oupton@google.com>
-To:     Reiji Watanabe <reijiw@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Peng Liang <liangpeng10@huawei.com>,
-        Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>
-Subject: Re: [RFC PATCH v2 18/28] KVM: arm64: Introduce
- KVM_CAP_ARM_ID_REG_WRITABLE capability
-Message-ID: <YYQNGqpy1NiUEXYD@google.com>
-References: <20211103062520.1445832-1-reijiw@google.com>
- <20211103062520.1445832-19-reijiw@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211103062520.1445832-19-reijiw@google.com>
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=B/Zu1r2lWoaGRs4vZ4DYzM83YZYEZ7XIPjfjvmaVSuQ=;
+        b=2eiLcRR1nKNidXnutFZKDsqbvabjdf7W19Yxg1LN/qHOvxavUlRN/boE/0Q4hJdKc4
+         bkaKg10V+PnMr/4cfm/HRFAQFhDcOSyiF+CIf/GabjyreIACqSBQqSqYqmoRH+N96Gfp
+         DLE4+1ctCRpLtdwwmYF6U1EmXbT5qBNX2guhR88aZyPzVUx/yAJKvKMCZVDCMlSctaxS
+         zu9d4fBBx2fho5FmBHzLznaFlY/RaL8N2BZ398+Azr8Ujc5XRlFFt145jdBm7pXj84aG
+         9RbOGK4Z8YAemYsHAigkGZE9h+b3+JwIY0uZLYItjk1MkERpuLTW09H9/cjMWuqzS6Kj
+         DDMQ==
+X-Gm-Message-State: AOAM5300qs090qTqiCx+kZw1hmHfA3I96S+T9HrVXs8jwZyGNUofvwLP
+        5PKBdc3w7xfJ9UR4W4fGUom43ngFepA=
+X-Google-Smtp-Source: ABdhPJyhpgJIbP/ZAmnJDHk9Tyo9aV2ayAs3W7Wg+/tcco9KaG6KLs6a+BwMRjVfrIktXi2iqzXjnoCxBEk=
+X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
+ (user=seanjc job=sendgmr) by 2002:a62:1bcc:0:b0:480:fcb7:76a9 with SMTP id
+ b195-20020a621bcc000000b00480fcb776a9mr34631165pfb.22.1636044075227; Thu, 04
+ Nov 2021 09:41:15 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Thu,  4 Nov 2021 16:41:05 +0000
+Message-Id: <20211104164107.1291793-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.34.0.rc0.344.g81b53c2807-goog
+Subject: [PATCH 0/2] KVM: RISC-V: MMU bug fix and cleanup
+From:   Sean Christopherson <seanjc@google.com>
+To:     Anup Patel <anup.patel@wdc.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>
+Cc:     Atish Patra <atish.patra@wdc.com>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 02, 2021 at 11:25:10PM -0700, Reiji Watanabe wrote:
-> Introduce a new capability KVM_CAP_ARM_ID_REG_WRITABLE to indicate
-> that ID registers are writable by userspace.
-> 
-> Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> ---
->  Documentation/virt/kvm/api.rst | 8 ++++++++
->  arch/arm64/kvm/arm.c           | 1 +
->  include/uapi/linux/kvm.h       | 1 +
->  3 files changed, 10 insertions(+)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index a6729c8cf063..f7dfb5127310 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -7265,3 +7265,11 @@ The argument to KVM_ENABLE_CAP is also a bitmask, and must be a subset
->  of the result of KVM_CHECK_EXTENSION.  KVM will forward to userspace
->  the hypercalls whose corresponding bit is in the argument, and return
->  ENOSYS for the others.
-> +
-> +8.35 KVM_CAP_ARM_ID_REG_WRITABLE
-> +--------------------------------
+Bug fix and a cleanup for things I noticed by inspection when working on
+the scalable memslots series.  Regarding the fix, unless there's a magic
+unmapping hiding in the corners of the MMU, RISC-V completely fails to
+handle memslot DELETE or MOVE.
 
-ID registers are technically already writable, KVM just rejects any
-value other than what it derives from sanitising the host ID registers.
-I agree that the nuance being added warrants a KVM_CAP, as it informs
-userspace it can deliberately configure ID registers with a more limited
-value than what KVM returns.
+Compile tested only.
 
-KVM_CAP_ARM_ID_REG_CONFIGURABLE maybe? Naming is hard :)
+Sean Christopherson (2):
+  KVM: RISC-V: Unmap stage2 mapping when deleting/moving a memslot
+  KVM: RISC-V: Use common KVM implementation of MMU memory caches
 
---
-Thanks,
-Oliver
+ arch/riscv/include/asm/kvm_host.h  | 10 +----
+ arch/riscv/include/asm/kvm_types.h |  2 +-
+ arch/riscv/kvm/mmu.c               | 70 ++++++++----------------------
+ arch/riscv/kvm/vcpu.c              |  5 ++-
+ 4 files changed, 22 insertions(+), 65 deletions(-)
+
+-- 
+2.34.0.rc0.344.g81b53c2807-goog
+
