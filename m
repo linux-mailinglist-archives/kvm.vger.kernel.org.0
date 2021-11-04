@@ -2,184 +2,208 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 821794455E7
-	for <lists+kvm@lfdr.de>; Thu,  4 Nov 2021 15:59:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E16D4445650
+	for <lists+kvm@lfdr.de>; Thu,  4 Nov 2021 16:27:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231340AbhKDPCb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Nov 2021 11:02:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39414 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231293AbhKDPC2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 4 Nov 2021 11:02:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636037989;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=OywEmERAjqnp3xpD/xphVv+JsaHYOpWwlE+ARSZcRms=;
-        b=Kg0LnSrrmk8Sc8Dit+39rjPpTjkCwKgZn/U633klJb9AHr/L4ZoryiqX2/UDHIkdzssKEk
-        D3foMJN0AdVCQxoOTRlyCbqnMfuzPCyx5JS6MJGju9NIjvnQgZA/54aIokh69A8P3w9sM8
-        vKrjn2bBNQHeNAQbyo2eirpUDDs9q9I=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-513-Ok9cUBdtMSqGR5gsnAhyLA-1; Thu, 04 Nov 2021 10:59:48 -0400
-X-MC-Unique: Ok9cUBdtMSqGR5gsnAhyLA-1
-Received: by mail-wm1-f69.google.com with SMTP id 69-20020a1c0148000000b0033214e5b021so2586443wmb.3
-        for <kvm@vger.kernel.org>; Thu, 04 Nov 2021 07:59:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent
-         :content-language:to:cc:references:from:organization:subject
-         :in-reply-to:content-transfer-encoding;
-        bh=OywEmERAjqnp3xpD/xphVv+JsaHYOpWwlE+ARSZcRms=;
-        b=5Hc9dmdIE05sXXwlnSte4AklBUxnCbi2DqO3KdfhbUMeHibQPPzyhqkt658dvdbejO
-         TBWr4+FMYb5th4j+opG5VwfDnKnNrom5jPY8fC6s/JA2fXUb87ZI71h5FOH0SkgRDg9d
-         EAxuq9UtDT6cnHb6zGBsYj/TsbWPJbhynbwUctcLsXMmzvqgiaWfxJZWFp6M4YZdUfWk
-         MYjABts6SMIbBjoSCT9nt18S2AHeVkCwe6NJpROa+sulLgU7Uknu/hFrBFwL+3CV6vgd
-         THBYPDQgzeBRpwEqyCHag6JXokOreGZNqm1oqG7Jkd7DUuhWaCp7WlFvV2T57hehbLL2
-         3U5A==
-X-Gm-Message-State: AOAM533Fj0cloTtLESPjuP0OUC0QI2Py7pKOsdcMHrugnNHdD7j/ZDwm
-        GrwemhO+wFKRExjEIvjKwUMrkC9OD/zVtjmXW/w8GLIa/0rUYRkWRPs9uJxYLUYOYbQ1MeueITF
-        YJ5TS7g0I0Hht
-X-Received: by 2002:adf:e9c5:: with SMTP id l5mr47132644wrn.218.1636037987505;
-        Thu, 04 Nov 2021 07:59:47 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyZnsIUY59kEITzrweyjZxsCu4IT4tZhpy5RuLH2jpOCXwxIFNchYDAG95YngTbQOPWFa1y1Q==
-X-Received: by 2002:adf:e9c5:: with SMTP id l5mr47132543wrn.218.1636037987209;
-        Thu, 04 Nov 2021 07:59:47 -0700 (PDT)
-Received: from [192.168.3.132] (p4ff23c9c.dip0.t-ipconnect.de. [79.242.60.156])
-        by smtp.gmail.com with ESMTPSA id u2sm5033198wrr.35.2021.11.04.07.59.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Nov 2021 07:59:46 -0700 (PDT)
-Message-ID: <655b3473-ccbd-f198-6566-c23a0ec20940@redhat.com>
-Date:   Thu, 4 Nov 2021 15:59:45 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Content-Language: en-US
-To:     Eric Farman <farman@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>
-Cc:     Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
+        id S231420AbhKDP3v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Nov 2021 11:29:51 -0400
+Received: from mail-bn7nam10on2044.outbound.protection.outlook.com ([40.107.92.44]:35937
+        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S231283AbhKDP3u (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Nov 2021 11:29:50 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mJ5OdIj7JgpTteaC4/UzQE4F1MGpqI91rIEV6MYr9rTXoJmHCIbuxQnFNUprGGHTs8o4ZwNEv3LKGYb7asanyCxpjWGDYbqZkHTSNAxKZ9ejYSJyJsQZeVgxMh6fcNcSw4MHG6z2zxAOP3HCGFB8FkkLkBngjCQJK1mTqSe3ZO54dCZnFy59HhrS16MLEnSSvpOJcMVXi12xPBZtVGYrE6dTqJ1epqY9nfgvf6CdQpWr+DiU1qQ24sGMB3d3GiHo4SvkYe516nfiuVG0SAxZj6iYORNbgQvlKTosjYafEdSOtL0c5Ndhk8yA3RogWBDZpYKcRAkF5ZntQkJIcu8QyQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=EdNgwUUDwYoVPZvgtQsnCWst5JcubBw/XiOq40DJgJs=;
+ b=DYScDGfnWIJokBirhT7YadDHaaLEzV4QdI7eKGWtEMBzpw0ml+ewAYJqe7/G/BjXba9pYr6jmeLLu7mchVnyvV1fc6vXtwXZOljEfLSpFj7MHHdtlSrz7UrcKq6glt+RIPJyb0VN1XFV8W6QrMeBbUlIPQ5tu1GbwJTuAhx4EXBYfj1E3GZM93cVyVan/f3bPM2+nix8X68IgVgWBJd8maW97eXiN6fTEI5GjoYagGxzNxq44rXiqJmm9DW63jeGnvcMDpYslGgvNwAGUzPf2u9Gvi4Cfs7+YwVRXbPm7sDCVcSLLEHPVWh5jVPzFXh8b0T/H6TJt0wcheCxROJXpQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EdNgwUUDwYoVPZvgtQsnCWst5JcubBw/XiOq40DJgJs=;
+ b=oFybe2xGyo8XF7KTjZT63x9Ptxea/cpRB3RtJ05Kr9VkeF7uLEyEtn5pOqWsjnWUcxqWRI9pgD1gNfzfuxUSz0sWMVmuOgcxFSW8RF42+EWEKAyMznkpnd0lRMcIJksNpeojw1DW9h+hgm14Bz9Zf4cvBf7irP0kd2EQaGvlGeY=
+Authentication-Results: linux.intel.com; dkim=none (message not signed)
+ header.d=none;linux.intel.com; dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
+ by SA0PR12MB4384.namprd12.prod.outlook.com (2603:10b6:806:9f::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4669.10; Thu, 4 Nov
+ 2021 15:27:09 +0000
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::e4da:b3ea:a3ec:761c]) by SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::e4da:b3ea:a3ec:761c%7]) with mapi id 15.20.4649.021; Thu, 4 Nov 2021
+ 15:27:09 +0000
+Cc:     brijesh.singh@amd.com, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-References: <20211102194652.2685098-1-farman@linux.ibm.com>
- <20211102194652.2685098-3-farman@linux.ibm.com>
- <7e98f659-32ac-9b4e-0ddd-958086732c8d@redhat.com>
- <2ad9bef6b39a5a6c9b634cab7d70d110064d8f04.camel@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-Subject: Re: [RFC PATCH v2 2/2] KVM: s390: Extend the USER_SIGP capability
-In-Reply-To: <2ad9bef6b39a5a6c9b634cab7d70d110064d8f04.camel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH v6 14/42] x86/sev: Register GHCB memory when SEV-SNP is
+ active
+To:     Borislav Petkov <bp@alien8.de>
+References: <20211008180453.462291-1-brijesh.singh@amd.com>
+ <20211008180453.462291-15-brijesh.singh@amd.com> <YYFs+5UUMfyDgh/a@zn.tnic>
+ <aea0e0c8-7f03-b9db-3084-f487a233c50b@amd.com> <YYGGv6EtWrw7cnLA@zn.tnic>
+ <a975dfbf-f9bb-982e-9814-7259bc075b71@amd.com> <YYPnGeW+8tlNgW34@zn.tnic>
+From:   Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <47815dd4-f9ac-b141-2852-8f48c8299a5e@amd.com>
+Date:   Thu, 4 Nov 2021 10:26:56 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
+In-Reply-To: <YYPnGeW+8tlNgW34@zn.tnic>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MN2PR02CA0018.namprd02.prod.outlook.com
+ (2603:10b6:208:fc::31) To SN6PR12MB2718.namprd12.prod.outlook.com
+ (2603:10b6:805:6f::22)
+MIME-Version: 1.0
+Received: from [10.236.30.107] (165.204.77.1) by MN2PR02CA0018.namprd02.prod.outlook.com (2603:10b6:208:fc::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4669.10 via Frontend Transport; Thu, 4 Nov 2021 15:26:59 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 09d7f62c-b76c-487a-dac6-08d99fa79125
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4384:
+X-Microsoft-Antispam-PRVS: <SA0PR12MB4384A7FD748D5CCA981A09FBE58D9@SA0PR12MB4384.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: G0ksSp/bh+J82Y9NwYM52i6BiuRZPH7Y7b4HOQLM8oZ3G75D3EswxDQJfiK/h6ycJpfwxGPQ0Ce8UxQSSqMjMUzVAj5Ct2vaUEouwrXpIWK/Idg6bo8HJq5RVsF6hk52uzuwEA3/YqX23QHnVSmOLdHnt8aYSx4lW9MpHrpG9mQqVcN/nzhvYdHr95sO/rzDCsXhfDZTbdW61a+1cvSYvVveDS7dDvdIEz2UD5uqY0BRDHPP8msspwt6/gdvAAlCrt9ZknGXlGAIDSb5iW/j7T8Z+3qIlKCi3tl5EpmUao2OFB5AY2TPohCE90VydnVr5jlgjkW4X1x9Z4pt7h7RffId8YnWd65lnuxxd3447M9Ia9xBWuE5BOx0UUKd+8vGksJAge6TDtAR0i080cGE1NOKg2T5X2arrmJes8DhQXRaSbqBofddSIx6SZ76HUYktWQ8ak/Ei555pgRBn4vfULGiuyhPXNf4XlNNiJtlEpJGM/ZlNJtcpX9JaH1skoXQdkFmxBf/50Y4ThBuf/8JrGW+I/lrNeTu/1mcKRYq95ozRzXBshoL4TEirYFGa8mZ16XeBRIW4veE6Fn96gwsoJ/ExnlzSVJXnMeOBF71kMn2JsIsTRgDzIO2IFg6tP22tK6uxHMgDrYgowB0QzDbdb9ck0DGc/F4ovGIqwKz0kBM2CEyC4BuAqYu2Tc8gftErkgyCUiV+JZ4txEyCaY0YfYqn+LnwS4W9dy7NrhL5Wo=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(2906002)(66476007)(66556008)(66946007)(26005)(5660300002)(31696002)(8676002)(8936002)(53546011)(508600001)(316002)(86362001)(38100700002)(6916009)(36756003)(16576012)(44832011)(2616005)(4326008)(54906003)(6666004)(956004)(186003)(31686004)(6486002)(7416002)(7406005)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?b0dRL3pvcURUanFxOWRIeVdKMXJhQ0hFa2hMVHpMMVZ3OCt5d1l0LzNySGVT?=
+ =?utf-8?B?M0VjM2hEWi9mNmxPSkRBYXZOdVpqMVRyL2JTVEhXQWJVYmFQNS9ReHZxNmtX?=
+ =?utf-8?B?eFBNanBqYzk3eVgzUFJydk1HU2xmdS8vWWh3dll2VkhNYW9vWnBPdDRXc2k2?=
+ =?utf-8?B?UWdnbHk2L1R0UGVFRHQrWWhLMjVRQWZSbXhGb3M3b0dDOWhpUHFsQ2owenN2?=
+ =?utf-8?B?Q3FFVW1ERTNKWEdlcnhCeVNtazk2ME1odjJ0ZXNaK2ZCVFpPR3RZODhoVXll?=
+ =?utf-8?B?Y1B4ekZweTAwUm1OMHdIZmlTeTBZVVIrcW4wWkxlNVFSY2NzTW9ORlhpcmQ1?=
+ =?utf-8?B?bHJyOHBaUW1wVWRLVXRHbEF1bVV4V01ZcUt3WkxpbGwybWc0T3Z0azVMVXRV?=
+ =?utf-8?B?TUx6eWJMN0VJS1hWRWlvZ0hham1ESE03dmFiVGFqMG1iYTRTVElxMzRTUEcx?=
+ =?utf-8?B?YnVzbzlMK290UENCY0I0dGxSTW9RUExYcEQ3RnFnaEJFRUhlbjVBSTNZQXRN?=
+ =?utf-8?B?b1BFcVlrM2VQNllWRkJRck5RNVBsQTlvNEtlZnJaTlJhdzlwNHhCZ1lPK1pn?=
+ =?utf-8?B?anNiY29wa2doNDFQbkh4RGRyZzhuQXZoV2tVSyszSzFtaTJvaDdtMTVickZM?=
+ =?utf-8?B?c3JtZkM4YVdpaDhqb0d4WlFidVpVK3MzRVZRT3pBZWhXMDRQMGRPZmlWeDFy?=
+ =?utf-8?B?VnA1eXJrYVJZUkxJbVZwNVdYZ1ZRdmIzbm9Ya3NXaDNHZjJzOW9WK2QzQzV3?=
+ =?utf-8?B?eVNmYllVRHQxMGpnaWFXY20vVStYd3JpUEpqeHlYU01FSnJzV3luZ3ZpTm15?=
+ =?utf-8?B?ZEluanZqMkdTR3ZkUFFQYlFWaUVGREkxdkRFM3lTdWJkOFA3SnAwTFNOcVd4?=
+ =?utf-8?B?UmFzMVdPdVdjelNYOHJPTkNZeU1FUElXc05GUlRDelN5M0h6OElMRHJWNDhQ?=
+ =?utf-8?B?azA5MFhsdm40UTZPOVk2R253ZjZRZitrNS9PSzk2Y2ROYm1wMVd3NFFnRG9Z?=
+ =?utf-8?B?UUZrOG53L1JtK1dBSUpLb3dmRlM2SWVzMEVzK0JzSkFoUFNCZmVLcDg1Q1VN?=
+ =?utf-8?B?c1pqSEI4NDlYcnduUUxtdlUyVXVzMFlLQS85ZkxBMmorL0tZZndNY2E4T3lJ?=
+ =?utf-8?B?R3pJN0hXd2grejFGbk5qdEN0SWZVZzB4c2x5eEdkVUlSOUYvcDJ5TXhjNy85?=
+ =?utf-8?B?Rms4eVlGMktuM1VaNU1nR0taZWJJU3RZU1Y0QytyU1Q4U3BpZFZOakNxR1Uw?=
+ =?utf-8?B?b2hOcHB6TVV6NlVBcVBJMjRaWTBYWm4wYzF3ZENNTWZ3NlNBSVFZQ29PZ0dx?=
+ =?utf-8?B?WFNPNndLZXlkeG5zaUdCTVRkUVRlU1ZlYWxXbjdiWlk1YjREUk9YZWtmR3Zj?=
+ =?utf-8?B?OXZKcXdQcHpnNXRzdHVwNVU5WUdtMEhrR0xVRmx5aFMxWjBmb1orNzI0RzNX?=
+ =?utf-8?B?bUE2RzlzZER0QUNDTVUxcHcxQm1TenUwOGNkVWJ2N1VQbDZUemtscCtGMzNh?=
+ =?utf-8?B?RW55MTdhNzBjY2lwVTBXaGlBd21Pc2l0WTU0TDk2Q01kd21SMTIzRmtPSFlL?=
+ =?utf-8?B?ZEo1YXl0dXcyQmJ6Y3lsQUdRMnRlTkNIY2NoaDN6SEViUXNOT3hkeXdnV3dL?=
+ =?utf-8?B?STdmd01mamo2WDU3TktQaFlDelRRSm84RGlSQ1NIU005akRFQWswazFvZUlB?=
+ =?utf-8?B?aVVxZjZtSjNkeHljb0xmYWFzOXpPd2EyRzVTaldzMVY2WHAzcXl1M0FMenlB?=
+ =?utf-8?B?YUtTZllhY1VGUHhENTgySDBaUElhR0NOT1lJVVZidnFhK1E1aHN2VVN3bEJy?=
+ =?utf-8?B?cXl1bjZDeE5FZmFsaVV6ZGNUUE10UTJMMTNJTnZvRG43bHBJd1pNekhEQVNX?=
+ =?utf-8?B?ZlRTWWhkK1h0c2JBaWhaNWhHMDliejVZeDhFUStoSE9TQmlmVXUxSHQ4a3cy?=
+ =?utf-8?B?ZUN4ZzlqQXZkYVFJMGNRa3NRUUUzUXNla2F2VGRkcW40YzlQeVIya1FoaUZO?=
+ =?utf-8?B?Q29MOGsvcHF1aCtYYm9xMFAvR3FuTTFkbDlqTUtXOHEzdTZoK1VOSGVqNE5X?=
+ =?utf-8?B?RWZNNWl6UlRwQzhxTHJnaWx1NEdSK0dVRXk2am50UVFyN0RrVENRSDJxdUVv?=
+ =?utf-8?B?a1NuNjRCVHFVdG5aTGZoNXZ5Tkg1QnlucUFsU0FYQ0ozVHV0RTV0UHdoR3lt?=
+ =?utf-8?Q?T1taD091p2kkWtY6753+6I8=3D?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 09d7f62c-b76c-487a-dac6-08d99fa79125
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Nov 2021 15:27:09.6425
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: iJzsrvtEWx/TB6O9zaghZX83If1WSLGhaCZp9wzFsFIGUZ4OnKCmwJrYJZqxw/9CFZMH4q/rhpsozMyAW2fRtQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4384
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
->> For example, we don't care about concurrent SIGP SENSE. We only care
->> about "lightweight" SIGP orders with concurrent "heavy weight" SIGP
->> orders.
+
+
+On 11/4/21 8:58 AM, Borislav Petkov wrote:
+> On Wed, Nov 03, 2021 at 03:10:16PM -0500, Brijesh Singh wrote:
+>> Looking at the secondary CPU bring up path it seems that we will not be
+>> getting #VC until the early_setup_idt() is called. I am thinking to add
+>> function to register the GHCB from the early_setup_idt()
+>>
+>> early_setup_idt()
+>> {
+>>    ...
+>>    if (IS_ENABLED(CONFIG_MEM_ENCRYPT))
+>>      sev_snp_register_ghcb()
+>>    ...
+>> }
+>>
+>> The above will cover the APs
 > 
-> I very much care about concurrent SIGP SENSE (a "lightweight" order
-> handled in-kernel) and how that interacts with the "heavy weight" SIGP
-> orders (handled in userspace). SIGP SENSE might return CC0 (accepted)
-> if a vcpu is operating normally, or CC1 (status stored) with status
-> bits indicating an external call is pending and/or the vcpu is stopped.
-> This means that the actual response will depend on whether userspace
-> has picked up the sigp order and processed it or not. Giving CC0 when
-> userspace is actively processing a SIGP STOP/STOP AND STORE STATUS
-> would be misleading for the SIGP SENSE. (Did the STOP order get lost?
-> Failed? Not yet dispatched? Blocked?)
-
-But that would only visible when concurrently SIGP STOP'ing from one
-VCPU and SIGP SENSE'ing from another VCPU. But in that case, there are
-already no guarantees, because it's inherently racy:
-
-VCPU #2: SIGP STOP #3
-VCPU #1: SIGP SENSE #3
-
-There is no guarantee who ends up first
-a) In the kernel
-b) On the final destination (SENSE -> kernel; STOP -> QEMU)
-
-They could be rescheduled/delayed in various ways.
-
-
-The important part is that orders from the *same* CPU are properly
-handled, right?
-
-VCPU #1: SIGP STOP #3
-VCPU #1: SIGP SENSE #3
-
-SENSE must return BUSY in case the STOP was not successful yet, correct?
-
-And that can be achieved by setting the VCPU #3 busy when landing in
-user space to trigger the SIGP STOP, before returning to the kernel and
-processing the SIGP SENSE.
-
-
-Or am I missing something important?
-
+> That will cover the APs during early boot as that is being called from
+> asm.
 > 
-> Meanwhile, the Principles of Operation (SA22-7832-12) page 4-95
-> describes a list of orders that would generate a CC2 (busy) when the
-> order is still "active" in userspace:
+>> and for BSP case I can call the same function just after the final IDT
+>> is loaded
 > 
-> """
-> A previously issued start, stop, restart, stop-
-> and-store-status, set-prefix, store-status-at-
-> address order, or store-additional-status-at-
-> address has been accepted by the
-> addressed CPU, and execution of the func-
-> tion requested by the order has not yet been
-> completed.
-
-Right, but my take is that the order has not been accepted by the target
-CPU before we're actually in user space to e.g., trigger SIGP STOP.
-
-> ...
-> If the currently specified order is sense, external
-> call, emergency signal, start, stop, restart, stop
-> and store status, set prefix, store status at
-> address, set architecture, set multithreading, or
-> store additional status at address, then the order
-> is rejected, and condition code 2 is set. If the cur-
-> rently specified order is one of the reset orders,
-> or an unassigned or not-implemented order, the
-> order code is interpreted as described in “Status
-> Bits” on page 4-96.
-> """
+> Why after and not before?
 > 
-> (There is another entry for the reset orders; not copied here for sake
-> of keeping my novella manageable.)
 
-Yes, these have to be special because we can have CPUs that never stop
-(endless program interruption stream).
+I just looked at load_current_idt() and we should not get #VC before 
+loading the new idt, so, its safe to do is before.
 
+
+>> cpu_init_exception_handling()
+>> {
+>>     ...
+>>     ...
+>>     /* Finally load the IDT */
+>>     load_current_idt();
+>>
+>>     if (IS_ENABLED(CONFIG_MEM_ENCRYPT))
+>>       sev_snp_register_ghcb()
+>>
+>> }
 > 
-> So, you're right that I could be more precise in terms how QEMU handles
-> a SIGP order while it's already busy handling one, and only limit the
-> CC2 from the kernel to those in-kernel orders. But I did say I took
-> this simplified approach in the cover letter. :)
+> That is also called on the APs - not only the BSP. trap_init() calls it
+> from start_kernel() which is the BSP and cpu_init_secondary() calls it
+> too, which is ofc the APs.
 > 
-> Regardless, because of the above I really do want/need a way to give
-> the kernel a clue that userspace is doing something, without waiting
-> for userspace to say "hey, that order you kicked back to me? I'm
-> working on it now, I'll let you know when it's done!" Otherwise, SIGP
-> SENSE (and other lightweight friends) is still racing with the receipt
-> of a "start the sigp" ioctl.
+> I guess that should be ok since you're calling the same function from
+> both but WTH do I know...
+> 
 
-And my point is that it's only visible when two VCPUs are involved and
-there are absolutely no guarantees regarding that. (see my first reply)
+For AP case, we will be registering the same GHCB GPA twice, that should 
+not be an issue. The GHCB spec does not restrict us on registering the 
+GPA twice.
 
+Of course, the current patch does not suffer with it. Let me know your 
+preference.
 
--- 
-Thanks,
-
-David / dhildenb
-
+thanks
