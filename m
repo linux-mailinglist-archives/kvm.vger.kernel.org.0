@@ -2,151 +2,309 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 22FB0444FB4
-	for <lists+kvm@lfdr.de>; Thu,  4 Nov 2021 08:34:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 773A1444FFB
+	for <lists+kvm@lfdr.de>; Thu,  4 Nov 2021 09:14:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230229AbhKDHhf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Nov 2021 03:37:35 -0400
-Received: from mx24.baidu.com ([111.206.215.185]:50656 "EHLO baidu.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230084AbhKDHhe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Nov 2021 03:37:34 -0400
-Received: from BJHW-Mail-Ex13.internal.baidu.com (unknown [10.127.64.36])
-        by Forcepoint Email with ESMTPS id 59B90584E743CCB44ECB;
-        Thu,  4 Nov 2021 15:34:52 +0800 (CST)
-Received: from BJHW-Mail-Ex15.internal.baidu.com (10.127.64.38) by
- BJHW-Mail-Ex13.internal.baidu.com (10.127.64.36) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2308.14; Thu, 4 Nov 2021 15:34:52 +0800
-Received: from BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) by
- BJHW-Mail-Ex15.internal.baidu.com ([100.100.100.38]) with mapi id
- 15.01.2308.014; Thu, 4 Nov 2021 15:34:52 +0800
-From:   "Li,Rongqing" <lirongqing@baidu.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>, "x86@kernel.org" <x86@kernel.org>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: =?gb2312?B?tPC4tDogW1BBVENIXVt2Ml0gS1ZNOiBDbGVhciBwdiBlb2kgcGVuZGluZyBi?=
- =?gb2312?Q?it_only_when_it_is_set?=
-Thread-Topic: [PATCH][v2] KVM: Clear pv eoi pending bit only when it is set
-Thread-Index: AQHXxkRnWBEkvjcRrUaSKLj7TUgvtavxd6kAgAGXPmA=
-Date:   Thu, 4 Nov 2021 07:34:52 +0000
-Message-ID: <f347f259051e4091a5a5e0bb7e8e0dbc@baidu.com>
-References: <1634797513-11005-1-git-send-email-lirongqing@baidu.com>
- <87tugtmfy5.fsf@vitty.brq.redhat.com>
-In-Reply-To: <87tugtmfy5.fsf@vitty.brq.redhat.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.22.207.33]
-x-baidu-bdmsfe-datecheck: 1_BJHW-Mail-Ex13_2021-11-04 15:34:52:441
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+        id S230344AbhKDIRD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Nov 2021 04:17:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42878 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230084AbhKDIRC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Nov 2021 04:17:02 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47441C061714;
+        Thu,  4 Nov 2021 01:14:25 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id o14so5972544plg.5;
+        Thu, 04 Nov 2021 01:14:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:content-language:to:cc
+         :references:from:organization:subject:in-reply-to
+         :content-transfer-encoding;
+        bh=SAq8tD4DBoE3zQ0QNHeM3XJV9O+xxvOJcQbpkBGQ/QI=;
+        b=ogBPcafYnohY+X0IkauFiFrd62W+8zx2i9/Bgsszkgnj59qqRBG1k8E46LN1p0hDL7
+         wp6BHMQubFVSbMv0RY9UurAR/fNcmRfzt5cFBoEl7AfTk1RBEr5hrSxyxVXsEnY9bJV6
+         zMHDIyNUrHF292nrHTaukcrQh2rvAdueabi8+KXdArN6KRHd/cqMom/DSM9BK5QzRHRx
+         2ak2obT2xZQ4NEXrKOhhjmMtbjDsGuz6knPy1UTO2svTPuSmZq9mrUqEbym6GFMfcBcN
+         tZuJndwd8N8k12obUgBSptqplE0rx1DPnF6dAUpSIGm+dcAGokc7tcIuP43borlfEYqW
+         0sgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:cc:references:from:organization:subject
+         :in-reply-to:content-transfer-encoding;
+        bh=SAq8tD4DBoE3zQ0QNHeM3XJV9O+xxvOJcQbpkBGQ/QI=;
+        b=GWNVp7mozWhUv7uGF7myXhXAqdurawyvMGwn8GG95PVKsPsyE0y4fHUWw8MkemfOEX
+         fBhv/WRoQ2rOtfpXmF1stuXotjcToRXFnUi45st++OknvwQ8vYLMplzO/6rK6A8UwyE6
+         ymQRvicyEIpZuGWmq0JpIrEyJeKhiiaC0nwVT/4nYsB3FWeDxA6cn7MZ9sm39UnUrMkl
+         t6eQlN4wn3+0LxGdAEEJ1GELwvoNsAXXXGde0s6VvzgzEqE0k4Ei2HHiJCeOx6DZNdKb
+         ZZYw5kc3sr7KdZ8IaUhn9n2g1u0+g6nrR1L1PvczRRap5OkrInBhwVCpLQcMfe9l/WwH
+         YPcA==
+X-Gm-Message-State: AOAM533HREzFCK8AiY2Wq9wKlxnM8Kp4SsjUJfCt7wfNb+h7VwmjkBt9
+        ZS/yBUs7H2ZyqQZ4MtJfdKw=
+X-Google-Smtp-Source: ABdhPJxGJVzcX+tivat/qlF387+EdHwzTiMdSlJB2v3eJcn2hMJkloGdcMabPjxhkgdAEvP6dxhMvw==
+X-Received: by 2002:a17:90b:4f4c:: with SMTP id pj12mr20603923pjb.217.1636013664764;
+        Thu, 04 Nov 2021 01:14:24 -0700 (PDT)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id b7sm4568651pfm.28.2021.11.04.01.14.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 04 Nov 2021 01:14:23 -0700 (PDT)
+Message-ID: <d70ed6da-443e-f279-326e-9c3963f341b5@gmail.com>
+Date:   Thu, 4 Nov 2021 16:14:13 +0800
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.2.1
+Content-Language: en-US
+To:     Yao Yuan <yaoyuan0329os@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20211103070310.43380-1-likexu@tencent.com>
+ <20211103070310.43380-4-likexu@tencent.com>
+ <20211103120854.w73q476jk7rvopkt@sapienza>
+From:   Like Xu <like.xu.linux@gmail.com>
+Organization: Tencent
+Subject: Re: [PATCH 3/3] KVM: x86: Use static calls to reduce kvm_pmu_ops
+ overhead
+In-Reply-To: <20211103120854.w73q476jk7rvopkt@sapienza>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQoNCj4gLS0tLS3Tyrz+1K28/i0tLS0tDQo+ILeivP7IyzogVml0YWx5IEt1em5ldHNvdiA8dmt1
-em5ldHNAcmVkaGF0LmNvbT4NCj4gt6LLzcqxvOQ6IDIwMjHE6jEx1MIzyNUgMjM6MTINCj4gytW8
-/sjLOiBMaSxSb25ncWluZyA8bGlyb25ncWluZ0BiYWlkdS5jb20+DQo+ILOty806IExpLFJvbmdx
-aW5nIDxsaXJvbmdxaW5nQGJhaWR1LmNvbT47IHBib256aW5pQHJlZGhhdC5jb207DQo+IHNlYW5q
-Y0Bnb29nbGUuY29tOyB3YW5wZW5nbGlAdGVuY2VudC5jb207IGptYXR0c29uQGdvb2dsZS5jb207
-DQo+IGpvcm9AOGJ5dGVzLm9yZzsgdGdseEBsaW51dHJvbml4LmRlOyBtaW5nb0ByZWRoYXQuY29t
-OyBicEBhbGllbjguZGU7DQo+IHg4NkBrZXJuZWwub3JnOyBocGFAenl0b3IuY29tOyBrdm1Admdl
-ci5rZXJuZWwub3JnDQo+INb3zOI6IFJlOiBbUEFUQ0hdW3YyXSBLVk06IENsZWFyIHB2IGVvaSBw
-ZW5kaW5nIGJpdCBvbmx5IHdoZW4gaXQgaXMgc2V0DQo+IA0KPiBMaSBSb25nUWluZyA8bGlyb25n
-cWluZ0BiYWlkdS5jb20+IHdyaXRlczoNCj4gDQo+ID4gbWVyZ2UgcHZfZW9pX2dldF9wZW5kaW5n
-IGFuZCBwdl9lb2lfY2xyX3BlbmRpbmcgaW50byBhIHNpbmdsZSBmdW5jdGlvbg0KPiA+IHB2X2Vv
-aV90ZXN0X2FuZF9jbGVhcl9wZW5kaW5nLCB3aGljaCByZXR1cm5zIGFuZCBjbGVhciB0aGUgdmFs
-dWUgb2YNCj4gPiB0aGUgcGVuZGluZyBiaXQuDQo+ID4NCj4gPiBhbmQgY2xlYXIgcHYgZW9pIHBl
-bmRpbmcgYml0IG9ubHkgd2hlbiBpdCBpcyBzZXQsIHRvIGF2b2lkIGNhbGxpbmcNCj4gPiBwdl9l
-b2lfcHV0X3VzZXIoKSwgdGhpcyBjYW4gc3BlZWQgYWJvdXQgMzAwIG5zZWMgb24gQU1EIEVQWUMg
-bW9zdCBvZg0KPiA+IHRoZSB0aW1lDQo+ID4NCj4gPiBhbmQgbWFrZSBwdl9lb2lfc2V0X3BlbmRp
-bmcgYXMgaW5saW5lIGFzIHRoZXJlIGlzIG9ubHkgb25lIHVzZXINCj4gDQo+IENvbXBpbGVyIGlz
-IGxpa2VseSBzbWFydCBlbm91Z2ggdG8gaW5saW5lIHN0YXRpYyBmdW5jdGlvbnMgd2l0aCBhIHNp
-bmdsZSB1c2VyDQo+IGFueXdheS4NCj4gDQo+ID4NCj4gPiBTdWdnZXN0ZWQtYnk6IFZpdGFseSBL
-dXpuZXRzb3YgPHZrdXpuZXRzQHJlZGhhdC5jb20+DQo+ID4gU3VnZ2VzdGVkLWJ5OiBQYW9sbyBC
-b256aW5pIDxwYm9uemluaUByZWRoYXQuY29tPg0KPiA+IFNpZ25lZC1vZmYtYnk6IExpIFJvbmdR
-aW5nIDxsaXJvbmdxaW5nQGJhaWR1LmNvbT4NCj4gPiAtLS0NCj4gPiBkaWZmIHdpdGggdjE6DQo+
-ID4gIG1lcmdlIGFzIHB2X2VvaV90ZXN0X2FuZF9jbGVhcl9wZW5kaW5nICBhZGQgaW5saW5lIGZv
-cg0KPiA+IHB2X2VvaV9zZXRfcGVuZGluZw0KPiA+DQo+ID4gIGFyY2gveDg2L2t2bS9sYXBpYy5j
-IHwgICA0NyArKysrKysrKysrKysrKysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0K
-PiA+ICAxIGZpbGVzIGNoYW5nZWQsIDIzIGluc2VydGlvbnMoKyksIDI0IGRlbGV0aW9ucygtKQ0K
-PiA+DQo+ID4gZGlmZiAtLWdpdCBhL2FyY2gveDg2L2t2bS9sYXBpYy5jIGIvYXJjaC94ODYva3Zt
-L2xhcGljLmMgaW5kZXgNCj4gPiA3NmZiMDA5Li40ZGE1ZGI4IDEwMDY0NA0KPiA+IC0tLSBhL2Fy
-Y2gveDg2L2t2bS9sYXBpYy5jDQo+ID4gKysrIGIvYXJjaC94ODYva3ZtL2xhcGljLmMNCj4gPiBA
-QCAtNjczLDE4ICs2NzMsNyBAQCBzdGF0aWMgaW5saW5lIGJvb2wgcHZfZW9pX2VuYWJsZWQoc3Ry
-dWN0IGt2bV92Y3B1DQo+ICp2Y3B1KQ0KPiA+ICAJcmV0dXJuIHZjcHUtPmFyY2gucHZfZW9pLm1z
-cl92YWwgJiBLVk1fTVNSX0VOQUJMRUQ7ICB9DQo+ID4NCj4gPiAtc3RhdGljIGJvb2wgcHZfZW9p
-X2dldF9wZW5kaW5nKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkgLXsNCj4gPiAtCXU4IHZhbDsNCj4g
-PiAtCWlmIChwdl9lb2lfZ2V0X3VzZXIodmNwdSwgJnZhbCkgPCAwKSB7DQo+ID4gLQkJcHJpbnRr
-KEtFUk5fV0FSTklORyAiQ2FuJ3QgcmVhZCBFT0kgTVNSIHZhbHVlOiAweCVsbHhcbiIsDQo+ID4g
-LQkJCSAgICh1bnNpZ25lZCBsb25nIGxvbmcpdmNwdS0+YXJjaC5wdl9lb2kubXNyX3ZhbCk7DQo+
-ID4gLQkJcmV0dXJuIGZhbHNlOw0KPiA+IC0JfQ0KPiA+IC0JcmV0dXJuIHZhbCAmIEtWTV9QVl9F
-T0lfRU5BQkxFRDsNCj4gPiAtfQ0KPiA+IC0NCj4gPiAtc3RhdGljIHZvaWQgcHZfZW9pX3NldF9w
-ZW5kaW5nKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkNCj4gPiArc3RhdGljIGlubGluZSB2b2lkIHB2
-X2VvaV9zZXRfcGVuZGluZyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpDQo+ID4gIHsNCj4gPiAgCWlm
-IChwdl9lb2lfcHV0X3VzZXIodmNwdSwgS1ZNX1BWX0VPSV9FTkFCTEVEKSA8IDApIHsNCj4gPiAg
-CQlwcmludGsoS0VSTl9XQVJOSU5HICJDYW4ndCBzZXQgRU9JIE1TUiB2YWx1ZTogMHglbGx4XG4i
-LCBAQA0KPiAtNjk0LDE0DQo+ID4gKzY4MywzMSBAQCBzdGF0aWMgdm9pZCBwdl9lb2lfc2V0X3Bl
-bmRpbmcoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KQ0KPiA+ICAJX19zZXRfYml0KEtWTV9BUElDX1BW
-X0VPSV9QRU5ESU5HLCAmdmNwdS0+YXJjaC5hcGljX2F0dGVudGlvbik7ICB9DQo+ID4NCj4gPiAt
-c3RhdGljIHZvaWQgcHZfZW9pX2Nscl9wZW5kaW5nKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkNCj4g
-PiArc3RhdGljIGlubGluZSBib29sIHB2X2VvaV90ZXN0X2FuZF9jbHJfcGVuZGluZyhzdHJ1Y3Qg
-a3ZtX3ZjcHUgKnZjcHUpDQo+ID4gIHsNCj4gPiAtCWlmIChwdl9lb2lfcHV0X3VzZXIodmNwdSwg
-S1ZNX1BWX0VPSV9ESVNBQkxFRCkgPCAwKSB7DQo+ID4gKwl1OCB2YWw7DQo+ID4gKw0KPiA+ICsJ
-aWYgKHB2X2VvaV9nZXRfdXNlcih2Y3B1LCAmdmFsKSA8IDApIHsNCj4gPiArCQlwcmludGsoS0VS
-Tl9XQVJOSU5HICJDYW4ndCByZWFkIEVPSSBNU1IgdmFsdWU6IDB4JWxseFxuIiwNCj4gPiArCQkJ
-ICAgKHVuc2lnbmVkIGxvbmcgbG9uZyl2Y3B1LT5hcmNoLnB2X2VvaS5tc3JfdmFsKTsNCj4gDQo+
-IHByX3dhcm4oKSB3b3VsZCBwcm9iYWJseSBiZSBhIGJldHRlciBjaG9pY2UgYnV0IGxvb2tpbmcg
-YXQgdGhpcyBtYWtlcyBtZQ0KPiB3b25kZXI6IGlzbid0IGl0IHRyaWdnZXJhYmxlIGJ5IHRoZSBn
-dWVzdD8gSSB0aGluayBpdCBpcyB3aGVuIHRoZSB2YWx1ZSB3cml0dGVuIHRvDQo+IE1TUl9LVk1f
-UFZfRU9JX0VOIGlzIGJvZ3VzIGFuZCB0aGlzIGlzIGJhZDogd2UgZG9uJ3QgZXZlbiByYXRlbGlt
-aXQgdGhlc2UNCj4gbWVzc2FnZXMhIEkgdGhpbmsgdGhpcyBwcmludGsoKSBuZWVkcyB0byBiZSBk
-cm9wcGVkLg0KPiANCg0KVHJ1ZSwgaXQgbmVlZHMgdG8gYmUgcmVtb3ZlZC4NCkFuZCBpdCBpcyBp
-bnRyb2R1Y2VkIGJ5IHRoaXMgYmVsb3cgcGF0Y2ggOyBJIHRoaW5rIGl0IHNob3VsZCBiZSBhIG5l
-dyBwYXRjaCB0byBmaXggaXQuIA0KDQoNCmNvbW1pdCAwZDg4ODAwZDU0NzIxMWNlMDdiZTM1NTFj
-ODEyZDQwNGNmMmJlM2E4DQpBdXRob3I6IFlpIFdhbmcgPHdhbmcueWk1OUB6dGUuY29tLmNuPg0K
-RGF0ZTogICBTYXQgSnVsIDYgMDE6MDg6NDggMjAxOSArMDgwMA0KDQogICAga3ZtOiB4ODY6IGlv
-YXBpYyBhbmQgYXBpYyBkZWJ1ZyBtYWNyb3MgY2xlYW51cA0KDQoNCnRoYW5rcw0KDQotTGkNCg0K
-DQo+ID4gKwkJcmV0dXJuIGZhbHNlOw0KPiA+ICsJfQ0KPiA+ICsNCj4gPiArCXZhbCAmPSBLVk1f
-UFZfRU9JX0VOQUJMRUQ7DQo+ID4gKw0KPiA+ICsJLyoNCj4gPiArCSAqIENsZWFyIHBlbmRpbmcg
-Yml0IGluIGFueSBjYXNlOiBpdCB3aWxsIGJlIHNldCBhZ2FpbiBvbiB2bWVudHJ5Lg0KPiA+ICsJ
-ICogV2hpbGUgdGhpcyBtaWdodCBub3QgYmUgaWRlYWwgZnJvbSBwZXJmb3JtYW5jZSBwb2ludCBv
-ZiB2aWV3LA0KPiA+ICsJICogdGhpcyBtYWtlcyBzdXJlIHB2IGVvaSBpcyBvbmx5IGVuYWJsZWQg
-d2hlbiB3ZSBrbm93IGl0J3Mgc2FmZS4NCj4gPiArCSAqLw0KPiA+ICsJaWYgKHZhbCAmJiBwdl9l
-b2lfcHV0X3VzZXIodmNwdSwgS1ZNX1BWX0VPSV9ESVNBQkxFRCkgPCAwKSB7DQo+ID4gIAkJcHJp
-bnRrKEtFUk5fV0FSTklORyAiQ2FuJ3QgY2xlYXIgRU9JIE1TUiB2YWx1ZTogMHglbGx4XG4iLA0K
-PiA+ICAJCQkgICAodW5zaWduZWQgbG9uZyBsb25nKXZjcHUtPmFyY2gucHZfZW9pLm1zcl92YWwp
-Ow0KPiANCj4gLi4uIGFuZCB0aGlzIG9uZSwgcHJvYmFibHksIHRvby4NCj4gDQo+ID4gLQkJcmV0
-dXJuOw0KPiA+ICsJCXJldHVybiBmYWxzZTsNCj4gPiAgCX0NCj4gPiAgCV9fY2xlYXJfYml0KEtW
-TV9BUElDX1BWX0VPSV9QRU5ESU5HLCAmdmNwdS0+YXJjaC5hcGljX2F0dGVudGlvbik7DQo+ID4g
-Kw0KPiA+ICsJcmV0dXJuICEhdmFsOw0KPiA+ICB9DQo+ID4NCj4gPiAgc3RhdGljIGludCBhcGlj
-X2hhc19pbnRlcnJ1cHRfZm9yX3BwcihzdHJ1Y3Qga3ZtX2xhcGljICphcGljLCB1MzINCj4gPiBw
-cHIpIEBAIC0yNjczLDcgKzI2NzksNiBAQCB2b2lkIF9fa3ZtX21pZ3JhdGVfYXBpY190aW1lcihz
-dHJ1Y3QNCj4gPiBrdm1fdmNwdSAqdmNwdSkgIHN0YXRpYyB2b2lkIGFwaWNfc3luY19wdl9lb2lf
-ZnJvbV9ndWVzdChzdHJ1Y3Qga3ZtX3ZjcHUNCj4gKnZjcHUsDQo+ID4gIAkJCQkJc3RydWN0IGt2
-bV9sYXBpYyAqYXBpYykNCj4gPiAgew0KPiA+IC0JYm9vbCBwZW5kaW5nOw0KPiA+ICAJaW50IHZl
-Y3RvcjsNCj4gPiAgCS8qDQo+ID4gIAkgKiBQViBFT0kgc3RhdGUgaXMgZGVyaXZlZCBmcm9tIEtW
-TV9BUElDX1BWX0VPSV9QRU5ESU5HIGluIGhvc3QgQEANCj4gPiAtMjY4NywxNCArMjY5Miw4IEBA
-IHN0YXRpYyB2b2lkIGFwaWNfc3luY19wdl9lb2lfZnJvbV9ndWVzdChzdHJ1Y3QNCj4ga3ZtX3Zj
-cHUgKnZjcHUsDQo+ID4gIAkgKiAJLT4gaG9zdCBlbmFibGVkIFBWIEVPSSwgZ3Vlc3QgZXhlY3V0
-ZWQgRU9JLg0KPiA+ICAJICovDQo+ID4gIAlCVUdfT04oIXB2X2VvaV9lbmFibGVkKHZjcHUpKTsN
-Cj4gPiAtCXBlbmRpbmcgPSBwdl9lb2lfZ2V0X3BlbmRpbmcodmNwdSk7DQo+ID4gLQkvKg0KPiA+
-IC0JICogQ2xlYXIgcGVuZGluZyBiaXQgaW4gYW55IGNhc2U6IGl0IHdpbGwgYmUgc2V0IGFnYWlu
-IG9uIHZtZW50cnkuDQo+ID4gLQkgKiBXaGlsZSB0aGlzIG1pZ2h0IG5vdCBiZSBpZGVhbCBmcm9t
-IHBlcmZvcm1hbmNlIHBvaW50IG9mIHZpZXcsDQo+ID4gLQkgKiB0aGlzIG1ha2VzIHN1cmUgcHYg
-ZW9pIGlzIG9ubHkgZW5hYmxlZCB3aGVuIHdlIGtub3cgaXQncyBzYWZlLg0KPiA+IC0JICovDQo+
-ID4gLQlwdl9lb2lfY2xyX3BlbmRpbmcodmNwdSk7DQo+ID4gLQlpZiAocGVuZGluZykNCj4gPiAr
-DQo+ID4gKwlpZiAocHZfZW9pX3Rlc3RfYW5kX2Nscl9wZW5kaW5nKHZjcHUpKQ0KPiA+ICAJCXJl
-dHVybjsNCj4gPiAgCXZlY3RvciA9IGFwaWNfc2V0X2VvaShhcGljKTsNCj4gPiAgCXRyYWNlX2t2
-bV9wdl9lb2koYXBpYywgdmVjdG9yKTsNCj4gDQo+IC0tDQo+IFZpdGFseQ0KDQo=
+On 3/11/2021 8:08 pm, Yao Yuan wrote:
+> On Wed, Nov 03, 2021 at 03:03:10PM +0800, Like Xu wrote:
+>> Convert kvm_pmu_ops to use static calls.
+>>
+>> Here are the worst sched_clock() nanosecond numbers for the kvm_pmu_ops
+>> functions that is most often called (up to 7 digits of calls) when running
+>> a single perf test case in a guest on an ICX 2.70GHz host (mitigations=on):
+>>
+>>        |	legacy	|	static call
+>> ------------------------------------------------------------
+>> .pmc_idx_to_pmc	|	10946	|	10047 (8%)
+>> .pmc_is_enabled	|	11291	|	11175 (1%)
+>> .msr_idx_to_pmc	|	13526	|	12346 (8%)
+>> .is_valid_msr	|	10895	|	10484 (3%)
+>>
+>> Signed-off-by: Like Xu <likexu@tencent.com>
+>> ---
+>>   arch/x86/kvm/pmu.c        | 36 +++++++++++++++++-------------------
+>>   arch/x86/kvm/pmu.h        |  2 +-
+>>   arch/x86/kvm/vmx/nested.c |  2 +-
+>>   arch/x86/kvm/x86.c        |  4 +++-
+>>   4 files changed, 22 insertions(+), 22 deletions(-)
+>>
+>> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+>> index b6f08c719125..193f925e2064 100644
+>> --- a/arch/x86/kvm/pmu.c
+>> +++ b/arch/x86/kvm/pmu.c
+>> @@ -224,7 +224,7 @@ void reprogram_gp_counter(struct kvm_pmc *pmc, u64 eventsel)
+>>              ARCH_PERFMON_EVENTSEL_CMASK |
+>>              HSW_IN_TX |
+>>              HSW_IN_TX_CHECKPOINTED))) {
+>> -		config = kvm_pmu_ops.find_arch_event(pmc_to_pmu(pmc),
+>> +		config = static_call(kvm_x86_pmu_find_arch_event)(pmc_to_pmu(pmc),
+> 
+> Why you need change them into kvm_pmu_ops.XXX then convert
+> them into static call ? Move the instance definition of
+> kvm_pmu_ops from patch 1 into patch 3 and then drop patch 1,
+> will this work ?
+
+You may git squash all commits to get it *work*.
+
+With reference to afaf0b2f9b801c6eb2278b52d49e6a7d7b659cf1[1],
+doing one thing at a time will make things go smoother.
+
+[1] 
+https://lore.kernel.org/lkml/20200321202603.19355-7-sean.j.christopherson@intel.com/
+
+> 
+>>                              event_select,
+>>                              unit_mask);
+>>        if (config != PERF_COUNT_HW_MAX)
+>> @@ -278,7 +278,7 @@ void reprogram_fixed_counter(struct kvm_pmc *pmc, u8 ctrl, int idx)
+>>
+>>    pmc->current_config = (u64)ctrl;
+>>    pmc_reprogram_counter(pmc, PERF_TYPE_HARDWARE,
+>> -               kvm_pmu_ops.find_fixed_event(idx),
+>> +               static_call(kvm_x86_pmu_find_fixed_event)(idx),
+>>                  !(en_field & 0x2), /* exclude user */
+>>                  !(en_field & 0x1), /* exclude kernel */
+>>                  pmi, false, false);
+>> @@ -287,7 +287,7 @@ EXPORT_SYMBOL_GPL(reprogram_fixed_counter);
+>>
+>>   void reprogram_counter(struct kvm_pmu *pmu, int pmc_idx)
+>>   {
+>> -	struct kvm_pmc *pmc = kvm_pmu_ops.pmc_idx_to_pmc(pmu, pmc_idx);
+>> +	struct kvm_pmc *pmc = static_call(kvm_x86_pmu_pmc_idx_to_pmc)(pmu, pmc_idx);
+>>
+>>    if (!pmc)
+>>        return;
+>> @@ -309,7 +309,7 @@ void kvm_pmu_handle_event(struct kvm_vcpu *vcpu)
+>>    int bit;
+>>
+>>    for_each_set_bit(bit, pmu->reprogram_pmi, X86_PMC_IDX_MAX) {
+>> -		struct kvm_pmc *pmc = kvm_pmu_ops.pmc_idx_to_pmc(pmu, bit);
+>> +		struct kvm_pmc *pmc = static_call(kvm_x86_pmu_pmc_idx_to_pmc)(pmu, bit);
+>>
+>>        if (unlikely(!pmc || !pmc->perf_event)) {
+>>            clear_bit(bit, pmu->reprogram_pmi);
+>> @@ -331,7 +331,7 @@ void kvm_pmu_handle_event(struct kvm_vcpu *vcpu)
+>>   /* check if idx is a valid index to access PMU */
+>>   int kvm_pmu_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
+>>   {
+>> -	return kvm_pmu_ops.is_valid_rdpmc_ecx(vcpu, idx);
+>> +	return static_call(kvm_x86_pmu_is_valid_rdpmc_ecx)(vcpu, idx);
+>>   }
+>>
+>>   bool is_vmware_backdoor_pmc(u32 pmc_idx)
+>> @@ -381,7 +381,7 @@ int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned idx, u64 *data)
+>>    if (is_vmware_backdoor_pmc(idx))
+>>        return kvm_pmu_rdpmc_vmware(vcpu, idx, data);
+>>
+>> -	pmc = kvm_pmu_ops.rdpmc_ecx_to_pmc(vcpu, idx, &mask);
+>> +	pmc = static_call(kvm_x86_pmu_rdpmc_ecx_to_pmc)(vcpu, idx, &mask);
+>>    if (!pmc)
+>>        return 1;
+>>
+>> @@ -397,22 +397,21 @@ int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned idx, u64 *data)
+>>   void kvm_pmu_deliver_pmi(struct kvm_vcpu *vcpu)
+>>   {
+>>    if (lapic_in_kernel(vcpu)) {
+>> -		if (kvm_pmu_ops.deliver_pmi)
+>> -			kvm_pmu_ops.deliver_pmi(vcpu);
+>> +		static_call_cond(kvm_x86_pmu_deliver_pmi)(vcpu);
+>>        kvm_apic_local_deliver(vcpu->arch.apic, APIC_LVTPC);
+>>    }
+>>   }
+>>
+>>   bool kvm_pmu_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr)
+>>   {
+>> -	return kvm_pmu_ops.msr_idx_to_pmc(vcpu, msr) ||
+>> -		kvm_pmu_ops.is_valid_msr(vcpu, msr);
+>> +	return static_call(kvm_x86_pmu_msr_idx_to_pmc)(vcpu, msr) ||
+>> +		static_call(kvm_x86_pmu_is_valid_msr)(vcpu, msr);
+>>   }
+>>
+>>   static void kvm_pmu_mark_pmc_in_use(struct kvm_vcpu *vcpu, u32 msr)
+>>   {
+>>    struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+>> -	struct kvm_pmc *pmc = kvm_pmu_ops.msr_idx_to_pmc(vcpu, msr);
+>> +	struct kvm_pmc *pmc = static_call(kvm_x86_pmu_msr_idx_to_pmc)(vcpu, msr);
+>>
+>>    if (pmc)
+>>        __set_bit(pmc->idx, pmu->pmc_in_use);
+>> @@ -420,13 +419,13 @@ static void kvm_pmu_mark_pmc_in_use(struct kvm_vcpu *vcpu, u32 msr)
+>>
+>>   int kvm_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>>   {
+>> -	return kvm_pmu_ops.get_msr(vcpu, msr_info);
+>> +	return static_call(kvm_x86_pmu_get_msr)(vcpu, msr_info);
+>>   }
+>>
+>>   int kvm_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>>   {
+>>    kvm_pmu_mark_pmc_in_use(vcpu, msr_info->index);
+>> -	return kvm_pmu_ops.set_msr(vcpu, msr_info);
+>> +	return static_call(kvm_x86_pmu_set_msr)(vcpu, msr_info);
+>>   }
+>>
+>>   /* refresh PMU settings. This function generally is called when underlying
+>> @@ -435,7 +434,7 @@ int kvm_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>>    */
+>>   void kvm_pmu_refresh(struct kvm_vcpu *vcpu)
+>>   {
+>> -	kvm_pmu_ops.refresh(vcpu);
+>> +	static_call(kvm_x86_pmu_refresh)(vcpu);
+>>   }
+>>
+>>   void kvm_pmu_reset(struct kvm_vcpu *vcpu)
+>> @@ -443,7 +442,7 @@ void kvm_pmu_reset(struct kvm_vcpu *vcpu)
+>>    struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+>>
+>>    irq_work_sync(&pmu->irq_work);
+>> -	kvm_pmu_ops.reset(vcpu);
+>> +	static_call(kvm_x86_pmu_reset)(vcpu);
+>>   }
+>>
+>>   void kvm_pmu_init(struct kvm_vcpu *vcpu)
+>> @@ -451,7 +450,7 @@ void kvm_pmu_init(struct kvm_vcpu *vcpu)
+>>    struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+>>
+>>    memset(pmu, 0, sizeof(*pmu));
+>> -	kvm_pmu_ops.init(vcpu);
+>> +	static_call(kvm_x86_pmu_init)(vcpu);
+>>    init_irq_work(&pmu->irq_work, kvm_pmi_trigger_fn);
+>>    pmu->event_count = 0;
+>>    pmu->need_cleanup = false;
+>> @@ -483,14 +482,13 @@ void kvm_pmu_cleanup(struct kvm_vcpu *vcpu)
+>>              pmu->pmc_in_use, X86_PMC_IDX_MAX);
+>>
+>>    for_each_set_bit(i, bitmask, X86_PMC_IDX_MAX) {
+>> -		pmc = kvm_pmu_ops.pmc_idx_to_pmc(pmu, i);
+>> +		pmc = static_call(kvm_x86_pmu_pmc_idx_to_pmc)(pmu, i);
+>>
+>>        if (pmc && pmc->perf_event && !pmc_speculative_in_use(pmc))
+>>            pmc_stop_counter(pmc);
+>>    }
+>>
+>> -	if (kvm_pmu_ops.cleanup)
+>> -		kvm_pmu_ops.cleanup(vcpu);
+>> +	static_call_cond(kvm_x86_pmu_cleanup)(vcpu);
+>>
+>>    bitmap_zero(pmu->pmc_in_use, X86_PMC_IDX_MAX);
+>>   }
+>> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+>> index e5550d4acf14..1818d1371ece 100644
+>> --- a/arch/x86/kvm/pmu.h
+>> +++ b/arch/x86/kvm/pmu.h
+>> @@ -109,7 +109,7 @@ static inline bool pmc_is_fixed(struct kvm_pmc *pmc)
+>>
+>>   static inline bool pmc_is_enabled(struct kvm_pmc *pmc)
+>>   {
+>> -	return kvm_pmu_ops.pmc_is_enabled(pmc);
+>> +	return static_call(kvm_x86_pmu_pmc_is_enabled)(pmc);
+>>   }
+>>
+>>   static inline bool kvm_valid_perf_global_ctrl(struct kvm_pmu *pmu,
+>> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+>> index 1e793e44b5ff..a61661de1f39 100644
+>> --- a/arch/x86/kvm/vmx/nested.c
+>> +++ b/arch/x86/kvm/vmx/nested.c
+>> @@ -4796,7 +4796,7 @@ void nested_vmx_pmu_entry_exit_ctls_update(struct kvm_vcpu *vcpu)
+>>        return;
+>>
+>>    vmx = to_vmx(vcpu);
+>> -	if (kvm_pmu_ops.is_valid_msr(vcpu, MSR_CORE_PERF_GLOBAL_CTRL)) {
+>> +	if (static_call(kvm_x86_pmu_is_valid_msr)(vcpu, MSR_CORE_PERF_GLOBAL_CTRL)) {
+>>        vmx->nested.msrs.entry_ctls_high |=
+>>                VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL;
+>>        vmx->nested.msrs.exit_ctls_high |=
+>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>> index 72d286595012..88a3ef809c98 100644
+>> --- a/arch/x86/kvm/x86.c
+>> +++ b/arch/x86/kvm/x86.c
+>> @@ -11317,8 +11317,10 @@ int kvm_arch_hardware_setup(void *opaque)
+>>    memcpy(&kvm_x86_ops, ops->runtime_ops, sizeof(kvm_x86_ops));
+>>    kvm_ops_static_call_update();
+>>
+>> -	if (kvm_x86_ops.hardware_enable)
+>> +	if (kvm_x86_ops.hardware_enable) {
+>>        memcpy(&kvm_pmu_ops, kvm_x86_ops.pmu_ops, sizeof(kvm_pmu_ops));
+>> +		kvm_pmu_ops_static_call_update();
+>> +	}
+>>
+>>    if (!kvm_cpu_cap_has(X86_FEATURE_XSAVES))
+>>        supported_xss = 0;
+>> --
+>> 2.33.0
+>>
+> 
