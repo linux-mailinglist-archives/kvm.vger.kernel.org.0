@@ -2,277 +2,193 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E36664450E1
-	for <lists+kvm@lfdr.de>; Thu,  4 Nov 2021 10:07:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EADC64450EB
+	for <lists+kvm@lfdr.de>; Thu,  4 Nov 2021 10:11:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230329AbhKDJJi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Nov 2021 05:09:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:52688 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230335AbhKDJJh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 4 Nov 2021 05:09:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636016819;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=J72mhiqGRFYRvygHvcw0ArqPSiFW1B/A7lz2bTwCWPc=;
-        b=FKFqnK7CjjY4L9U+049Fm3faeQ18+s78YQI/ECzHPgSNJPAE96GE/QEJH/10Nb37cDCK/e
-        mBdHG4rFzehVMfNiYLfD6p0rQz5yw+T1Y8KFx+JKU1JFC20vfcKCHtzp06ekkZT3FMA6G1
-        TFahYRs5s8sb4JKSxSHhBSDnPRTHjvM=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-241-J1ogxmFbM4-CRoQxE3NHdA-1; Thu, 04 Nov 2021 05:06:58 -0400
-X-MC-Unique: J1ogxmFbM4-CRoQxE3NHdA-1
-Received: by mail-wm1-f69.google.com with SMTP id k6-20020a7bc306000000b0030d92a6bdc7so2421214wmj.3
-        for <kvm@vger.kernel.org>; Thu, 04 Nov 2021 02:06:58 -0700 (PDT)
+        id S230410AbhKDJNr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Nov 2021 05:13:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55746 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230344AbhKDJNq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Nov 2021 05:13:46 -0400
+Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50166C061714
+        for <kvm@vger.kernel.org>; Thu,  4 Nov 2021 02:11:08 -0700 (PDT)
+Received: by mail-lj1-x22a.google.com with SMTP id j5so8344861lja.9
+        for <kvm@vger.kernel.org>; Thu, 04 Nov 2021 02:11:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ip4jIKzplcPRjOqExcXRBQqPqAPXrq235jk6EqfK8sA=;
+        b=Ajj9xGu0eMeaOm/pl+F3O4w34Y56ucIS1YivaQBUsztCkIODJSzEomzA8LyYwWDhIv
+         gL4GafSII/OrRNlmeVnclC/zVYk+T//wrPlyD/ksgrxvgeA82um0lcBr8G4qDc3xCJsQ
+         HpK4IiT/8yrDHY95CZO0fe4r0yALgFqeTpFBQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent
-         :content-language:to:cc:references:from:organization:subject
-         :in-reply-to:content-transfer-encoding;
-        bh=J72mhiqGRFYRvygHvcw0ArqPSiFW1B/A7lz2bTwCWPc=;
-        b=Y9LJhTVKY8XzWpwBTbCyCdV4EdfzTRVggCoS80QiBisW4nSTXA5vECxNCjI4pBiTN7
-         85JTBhBrD6lExbZSvYKkrYDNcXKkErxLdvJl+IvhMiWlzkyQ3/JhSGNQoFm+0/2/C7FH
-         RmCjRwmBZOluDcbomKa4BM6NdnNzDPd+AodXwqMWme5cPMXjPTsftYNYyid9ERmmkISh
-         LkFn6EuGIo3EhXOCDCOG2J6ni5SDPQ3TNYFQ4tI0Eu5kVo2qvhTu4rGCKBOVugcnNmBK
-         itYL9m9Wnt7GTjsK9a9oeh89pw+DlBmG9G7Br7ymXhO+Z839CXZDwd54T2+5EeO7g6mI
-         EKUw==
-X-Gm-Message-State: AOAM532JmmQQJ0/GKK8+zlsmuaGPZEvMu8DSpYMDmFMFJEfUsKHNU0dd
-        V1zQiMVIEyCBLCqyCUAww+0u46PmcvHGff0o/qeZmNXfTTP7MPbzDf4YuA0oAERxOsuJUFWtS/P
-        rJGnSaCmcltLa
-X-Received: by 2002:a7b:c1cb:: with SMTP id a11mr22646547wmj.30.1636016816972;
-        Thu, 04 Nov 2021 02:06:56 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwQ0lgfUYPAkjQEu60+Z8xXY1dE1yv97Q2JMx7qvT+BLZRqsn2kN4RDPs4+NZNyizZLvDEiBw==
-X-Received: by 2002:a7b:c1cb:: with SMTP id a11mr22646517wmj.30.1636016816694;
-        Thu, 04 Nov 2021 02:06:56 -0700 (PDT)
-Received: from [192.168.3.132] (p4ff23c9c.dip0.t-ipconnect.de. [79.242.60.156])
-        by smtp.gmail.com with ESMTPSA id t11sm4359988wrz.97.2021.11.04.02.06.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Nov 2021 02:06:55 -0700 (PDT)
-Message-ID: <7e98f659-32ac-9b4e-0ddd-958086732c8d@redhat.com>
-Date:   Thu, 4 Nov 2021 10:06:54 +0100
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ip4jIKzplcPRjOqExcXRBQqPqAPXrq235jk6EqfK8sA=;
+        b=xr1E1wfnGRVKKdDnh2u9v8VGDSbgnFEzA0/N3a5HZAZ7XUk0Yskh0HjVyBf7GsMGEv
+         +gAFYNwGe5VVMIMTeYFHQd7Rusv6vKzAbFkuBr+lWcbP+wvguT8DQ2KB2eM0i6+bVufF
+         kefdxe+Mc41pqzQ5BBB6BGVg0KjIWf1PRyS5KPg1bqQhD2He7ophrVAvAzKGwf/fwS7L
+         Vy0F8Zl1jOMXdF/l8vUmVwDzUVolfXpWgNDksGpx7WHpwGo7jFzTkEvqUGjDo1GMIl/S
+         UpUauPG7zgE215jGyXuHXXOrxCZHhDXREkarn4vwWRCfZP7kk1Zgzhr5/MXHEwMfqjKA
+         ywCA==
+X-Gm-Message-State: AOAM530ES7JPfVml/Ij8Tnt3+867cxSfHqoW5hYLLdY+xlrhD3SXBLpw
+        nqboQLSlb8CN7vxrvgcfK7HAj07YkR/Yh8qdx7t4aw==
+X-Google-Smtp-Source: ABdhPJy8fhKodASuD5SKo5rDH8OmLdPRdEwIa15ljtPKQs6a7cExLx0VBmUmWvEB+7WHB09t29utQs4L5T2n+YQsf8E=
+X-Received: by 2002:a2e:b5d2:: with SMTP id g18mr18870481ljn.282.1636017066544;
+ Thu, 04 Nov 2021 02:11:06 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Content-Language: en-US
-To:     Eric Farman <farman@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>
-Cc:     Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-References: <20211102194652.2685098-1-farman@linux.ibm.com>
- <20211102194652.2685098-3-farman@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-Subject: Re: [RFC PATCH v2 2/2] KVM: s390: Extend the USER_SIGP capability
-In-Reply-To: <20211102194652.2685098-3-farman@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20211020120431.776494-1-hikalium@chromium.org> <874k9bdcrk.wl-maz@kernel.org>
+In-Reply-To: <874k9bdcrk.wl-maz@kernel.org>
+From:   Hikaru Nishida <hikalium@chromium.org>
+Date:   Thu, 4 Nov 2021 18:10:55 +0900
+Message-ID: <CACTzKb+vVU0Ymh2Nx5B6kSydBsJ6AgrbQMF39RFvqoHpvL_riw@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 0/5] x86/kvm: Virtual suspend time injection support
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     linux-kernel@vger.kernel.org, dme@dme.org, tglx@linutronix.de,
+        mlevitsk@redhat.com, linux@roeck-us.net, pbonzini@redhat.com,
+        vkuznets@redhat.com, will@kernel.org, suleiman@google.com,
+        senozhatsky@google.com, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org,
+        Andy Lutomirski <luto@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        John Stultz <john.stultz@linaro.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        Lai Jiangshan <laijs@linux.alibaba.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02.11.21 20:46, Eric Farman wrote:
-> With commit 2444b352c3ac ("KVM: s390: forward most SIGP orders to user
-> space") we have a capability that allows the "fast" SIGP orders (as
-> defined by the Programming Notes for the SIGNAL PROCESSOR instruction in
-> the Principles of Operation) to be handled in-kernel, while all others are
-> sent to userspace for processing.
-> 
-> This works fine but it creates a situation when, for example, a SIGP SENSE
-> might return CC1 (STATUS STORED, and status bits indicating the vcpu is
-> stopped), when in actuality userspace is still processing a SIGP STOP AND
-> STORE STATUS order, and the vcpu is not yet actually stopped. Thus, the
-> SIGP SENSE should actually be returning CC2 (busy) instead of CC1.
-> 
-> To fix this, add another CPU capability, dependent on the USER_SIGP one,
-> that will mark a vcpu as "busy" processing a SIGP order, and a
-> corresponding IOCTL that userspace can call to indicate it has finished
-> its work and the SIGP operation is completed.
-> 
-> Signed-off-by: Eric Farman <farman@linux.ibm.com>
-> ---
->  arch/s390/include/asm/kvm_host.h |  2 ++
->  arch/s390/kvm/kvm-s390.c         | 18 ++++++++++++++
->  arch/s390/kvm/kvm-s390.h         | 10 ++++++++
->  arch/s390/kvm/sigp.c             | 40 ++++++++++++++++++++++++++++++++
->  4 files changed, 70 insertions(+)
-> 
-> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-> index a604d51acfc8..bd202bb3acb5 100644
-> --- a/arch/s390/include/asm/kvm_host.h
-> +++ b/arch/s390/include/asm/kvm_host.h
-> @@ -746,6 +746,7 @@ struct kvm_vcpu_arch {
->  	__u64 cputm_start;
->  	bool gs_enabled;
->  	bool skey_enabled;
-> +	atomic_t sigp_busy;
->  	struct kvm_s390_pv_vcpu pv;
->  	union diag318_info diag318_info;
->  };
-> @@ -941,6 +942,7 @@ struct kvm_arch{
->  	int user_sigp;
->  	int user_stsi;
->  	int user_instr0;
-> +	int user_sigp_busy;
->  	struct s390_io_adapter *adapters[MAX_S390_IO_ADAPTERS];
->  	wait_queue_head_t ipte_wq;
->  	int ipte_lock_count;
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 5f52e7eec02f..ff23a46288cc 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -564,6 +564,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_S390_VCPU_RESETS:
->  	case KVM_CAP_SET_GUEST_DEBUG:
->  	case KVM_CAP_S390_DIAG318:
-> +	case KVM_CAP_S390_USER_SIGP_BUSY:
->  		r = 1;
->  		break;
->  	case KVM_CAP_SET_GUEST_DEBUG2:
-> @@ -706,6 +707,15 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
->  		kvm->arch.user_sigp = 1;
->  		r = 0;
->  		break;
-> +	case KVM_CAP_S390_USER_SIGP_BUSY:
-> +		r = -EINVAL;
-> +		if (kvm->arch.user_sigp) {
-> +			kvm->arch.user_sigp_busy = 1;
-> +			r = 0;
-> +		}
-> +		VM_EVENT(kvm, 3, "ENABLE: CAP_S390_USER_SIGP_BUSY %s",
-> +			 r ? "(not available)" : "(success)");
-> +		break;
->  	case KVM_CAP_S390_VECTOR_REGISTERS:
->  		mutex_lock(&kvm->lock);
->  		if (kvm->created_vcpus) {
-> @@ -4825,6 +4835,14 @@ long kvm_arch_vcpu_async_ioctl(struct file *filp,
->  			return -EINVAL;
->  		return kvm_s390_inject_vcpu(vcpu, &s390irq);
->  	}
-> +	case KVM_S390_VCPU_RESET_SIGP_BUSY: {
-> +		if (!vcpu->kvm->arch.user_sigp_busy)
-> +			return -EFAULT;
-> +
-> +		VCPU_EVENT(vcpu, 3, "SIGP: CPU %x reset busy", vcpu->vcpu_id);
-> +		kvm_s390_vcpu_clear_sigp_busy(vcpu);
-> +		return 0;
-> +	}
->  	}
->  	return -ENOIOCTLCMD;
->  }
-> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
-> index c07a050d757d..9ce97832224b 100644
-> --- a/arch/s390/kvm/kvm-s390.h
-> +++ b/arch/s390/kvm/kvm-s390.h
-> @@ -82,6 +82,16 @@ static inline int is_vcpu_idle(struct kvm_vcpu *vcpu)
->  	return test_bit(vcpu->vcpu_idx, vcpu->kvm->arch.idle_mask);
->  }
->  
-> +static inline bool kvm_s390_vcpu_set_sigp_busy(struct kvm_vcpu *vcpu)
-> +{
-> +	return (atomic_cmpxchg(&vcpu->arch.sigp_busy, 0, 1) == 0);
-> +}
-> +
-> +static inline void kvm_s390_vcpu_clear_sigp_busy(struct kvm_vcpu *vcpu)
-> +{
-> +	atomic_set(&vcpu->arch.sigp_busy, 0);
-> +}
-> +
->  static inline int kvm_is_ucontrol(struct kvm *kvm)
->  {
->  #ifdef CONFIG_KVM_S390_UCONTROL
-> diff --git a/arch/s390/kvm/sigp.c b/arch/s390/kvm/sigp.c
-> index 5ad3fb4619f1..034ea72e098a 100644
-> --- a/arch/s390/kvm/sigp.c
-> +++ b/arch/s390/kvm/sigp.c
-> @@ -341,9 +341,42 @@ static int handle_sigp_dst(struct kvm_vcpu *vcpu, u8 order_code,
->  			   "sigp order %u -> cpu %x: handled in user space",
->  			   order_code, dst_vcpu->vcpu_id);
->  
-> +	kvm_s390_vcpu_clear_sigp_busy(dst_vcpu);
-> +
->  	return rc;
->  }
->  
-> +static int handle_sigp_order_busy(struct kvm_vcpu *vcpu, u8 order_code,
-> +				  u16 cpu_addr)
-> +{
-> +	struct kvm_vcpu *dst_vcpu = kvm_get_vcpu_by_id(vcpu->kvm, cpu_addr);
-> +
-> +	if (!vcpu->kvm->arch.user_sigp_busy)
-> +		return 0;
-> +
-> +	/*
-> +	 * Just see if the target vcpu exists; the CC3 will be set wherever
-> +	 * the SIGP order is processed directly.
-> +	 */
-> +	if (!dst_vcpu)
-> +		return 0;
-> +
-> +	/* Reset orders will be accepted, regardless if target vcpu is busy */
-> +	if (order_code == SIGP_INITIAL_CPU_RESET ||
-> +	    order_code == SIGP_CPU_RESET)
-> +		return 0;
-> +
-> +	/* Orders that affect multiple vcpus should not flag one vcpu busy */
-> +	if (order_code == SIGP_SET_ARCHITECTURE)
-> +		return 0;
-> +
-> +	/* If this fails, the vcpu is already busy processing another SIGP */
-> +	if (!kvm_s390_vcpu_set_sigp_busy(dst_vcpu))
-> +		return -EBUSY;
-> +
-> +	return 0;
-> +}
-> +
->  static int handle_sigp_order_in_user_space(struct kvm_vcpu *vcpu, u8 order_code,
->  					   u16 cpu_addr)
->  {
-> @@ -408,6 +441,13 @@ int kvm_s390_handle_sigp(struct kvm_vcpu *vcpu)
->  		return kvm_s390_inject_program_int(vcpu, PGM_PRIVILEGED_OP);
->  
->  	order_code = kvm_s390_get_base_disp_rs(vcpu, NULL);
-> +
-> +	rc = handle_sigp_order_busy(vcpu, order_code, cpu_addr);
-> +	if (rc) {
-> +		kvm_s390_set_psw_cc(vcpu, SIGP_CC_BUSY);
-> +		return 0;
-> +	}
-> +
->  	if (handle_sigp_order_in_user_space(vcpu, order_code, cpu_addr))
->  		return -EOPNOTSUPP;
+Hi Marc,
+
+Thanks for the comments! (Sorry for the late reply)
+
+On Wed, Oct 20, 2021 at 10:52 PM Marc Zyngier <maz@kernel.org> wrote:
+>
+> Hi Hikaru,
+>
+> On Wed, 20 Oct 2021 13:04:25 +0100,
+> Hikaru Nishida <hikalium@chromium.org> wrote:
+> >
+> >
+> > Hi,
+> >
+> > This patch series adds virtual suspend time injection support to KVM.
+> > It is an updated version of the following series:
+> > v2:
+> > https://lore.kernel.org/kvm/20210806100710.2425336-1-hikalium@chromium.org/
+> > v1:
+> > https://lore.kernel.org/kvm/20210426090644.2218834-1-hikalium@chromium.org/
+> >
+> > Please take a look again.
+> >
+> > To kvm/arm64 folks:
+> > I'm going to implement this mechanism to ARM64 as well but not
+> > sure which function should be used to make an IRQ (like kvm_apic_set_irq
+> > in x86) and if it is okay to use kvm_gfn_to_hva_cache /
+> > kvm_write_guest_cached for sharing the suspend duration.
+>
+> Before we discuss interrupt injection, I want to understand what this
+> is doing, and how this is doing it. And more precisely, I want to find
+> out how you solve the various problems described by Thomas here [1].
+
+The problems described by Thomas in the thread was:
+- User space or kernel space can observe the stale timestamp before
+the adjustment
+  - Moving CLOCK_MONOTONIC forward will trigger all sorts of timeouts,
+watchdogs, etc...
+- The last attempt to make CLOCK_MONOTONIC behave like CLOCK_BOOTTIME
+was reverted within 3 weeks. a3ed0e4393d6 ("Revert: Unify
+CLOCK_MONOTONIC and CLOCK_BOOTTIME")
+  - CLOCK_MONOTONIC correctness (stops during the suspend) should be maintained.
+
+I agree with the points above. And, the current CLOCK_MONOTONIC
+behavior in the KVM guest is not aligned with the statements above.
+(it advances during the host's suspension.)
+This causes the problems described above (triggering watchdog
+timeouts, etc...) so my patches are going to fix this by 2 steps
+roughly:
+1. Stopping the guest's clocks during the host's suspension
+2. Adjusting CLOCK_BOOTTIME later
+This will make the clocks behave like the host does, not making
+CLOCK_MONOTONIC behave like CLOCK_BOOTTIME.
+
+First one is a bit tricky since the guest can use a timestamp counter
+in each CPUs (TSC in x86) and we need to adjust it without stale
+values are observed by the guest kernel to prevent rewinding of
+CLOCK_MONOTONIC (which is our top priority to make the kernel happy).
+To achieve this, my patch adjusts TSCs (and a kvm-clock) before the
+first vcpu runs of each vcpus after the resume.
+
+Second one is relatively safe: since jumping CLOCK_BOOTTIME forward
+can happen even before my patches when suspend/resume happens, and
+that will not break the monotonicity of the clocks, we can do that
+through IRQ.
+
+[1] shows the flow of the adjustment logic, and [2] shows how the
+clocks behave in the guest and the host before/after my patches.
+The numbers on each step in [1] corresponds to the timing shown in [2].
+The left side of [2] is showing the behavior of the clocks before the
+patches, and the right side shows after the patches. Also, upper
+charts show the guest clocks, and bottom charts are host clocks.
+
+Before the patches(left side), CLOCK_MONOTONIC seems to be jumped from
+the guest's perspective after the host's suspension. As Thomas says,
+large jumps of CLOCK_MONOTONIC may lead to watchdog timeouts and other
+bad things that we want to avoid.
+With the patches(right side), both clocks will be adjusted (t=4,5) as
+if they are stopped during the suspension. This adjustment is done by
+the host side and invisible to the guest since it is done before the
+first vcpu run after the resume. After that, CLOCK_BOOTTIME will be
+adjusted from the guest side, triggered by the IRQ sent from the host.
+
+[1]: https://hikalium.com/files/kvm_virt_suspend_time_seq.png
+[2]: https://hikalium.com/files/kvm_virt_suspend_time_clocks.png
 
 
-After looking at the QEMU side, I wonder if we should instead:
+>
+> Assuming you solve these, you should model the guest memory access
+> similarly to what we do for stolen time. As for injecting an
+> interrupt, why can't this be a userspace thing?
 
-a) Let user space always set/reset SIGP busy. Don't set/reset it in the
-   kernel automatically. All "heavy weight" SIGP orders are carried out
-   in user space nowadays either way.
-b) Reject all in-kernel SIGP orders targeting a CPU if marked BUSY by
-   user space. (i.e., SIGP SENSE)
-c) Don't reject SIGP orders that will be handled in QEMU from the
-   kernel. Just let user space deal with it -- especially with the
-   "problematic" ones like RESET and SET_ARCHITECTURE.
+Since CLOCK_BOOTTIME is calculated by adding a gap
+(tk->monotonic_to_boot) to CLOCK_MONOTONIC, and there are no way to
+change the value from the outside of the guest kernel, we should
+implement some mechanism in the kernel to adjust it.
+(Actually, I tried to add a sysfs interface to modify the gap [3], but
+I learned that that is not a good idea...)
 
-For example, we don't care about concurrent SIGP SENSE. We only care
-about "lightweight" SIGP orders with concurrent "heavy weight" SIGP orders.
+[3]: https://lore.kernel.org/lkml/87eehoax14.fsf@nanos.tec.linutronix.de/
 
-This should simplify this code and avoid having to clear the the BUSY
-flag in QEMU (that might be bogus) when detecting another BUSY situation
-(the trylock thingy, see my QEMU reply). The downside is that we have to
-issue yet another IOCTL to set the CPU busy for SIGP -- not sure if we
-really care.
+Thank you,
 
--- 
-Thanks,
+Hikaru Nishida
 
-David / dhildenb
-
+>
+> Thanks,
+>
+>         M.
+>
+> [1] https://lore.kernel.org/all/871r557jls.ffs@tglx
+>
+>
+> --
+> Without deviation from the norm, progress is not possible.
