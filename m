@@ -2,104 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C3F3A444CA2
-	for <lists+kvm@lfdr.de>; Thu,  4 Nov 2021 01:34:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D2F34444D5A
+	for <lists+kvm@lfdr.de>; Thu,  4 Nov 2021 03:40:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232957AbhKDAgy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 3 Nov 2021 20:36:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54236 "EHLO
+        id S229918AbhKDCnY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 3 Nov 2021 22:43:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233048AbhKDAgv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 3 Nov 2021 20:36:51 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 197F5C06120A
-        for <kvm@vger.kernel.org>; Wed,  3 Nov 2021 17:34:09 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id g36-20020a25ae64000000b005c1f46f7ee6so6393976ybe.8
-        for <kvm@vger.kernel.org>; Wed, 03 Nov 2021 17:34:09 -0700 (PDT)
+        with ESMTP id S229541AbhKDCnT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 3 Nov 2021 22:43:19 -0400
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA112C061714
+        for <kvm@vger.kernel.org>; Wed,  3 Nov 2021 19:40:41 -0700 (PDT)
+Received: by mail-pg1-x535.google.com with SMTP id e65so4119653pgc.5
+        for <kvm@vger.kernel.org>; Wed, 03 Nov 2021 19:40:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=70PiLzmA7ox44qCXyRrZgqr9sV1MO+32uzvR0pDHqiM=;
-        b=MQnFxn3zvjzlOlEgDeF34DtlBLic5gTwYERVnYw/QGQ5Aib5S9G73CYdM9ziPIgmyM
-         txAPvKLIheB1WLYzUGvHNpfF0iq2q9QXbxQHJncld95bLg0uYx1hA2rYh/cXmsW2xXxL
-         cnliz/H3noUbEzb+vAI7/0U9yR2LGP6vXdD6Jc3Dggsicx6wUtx3GmwjRBiIIZHs2VwI
-         +uq9T/334lyh1GIXBCy/IHXLdQcZpFBkkCxUZP1JhePNPdvoMa5P4DPfSMqJL4TL255J
-         lfGS11GOxoL2+LrYRPtJqpDahwUHMwpg2yd97XT7oygrQz49yKXTYD2zDGi/VzJvStUI
-         6N/g==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=l1LBkVxSub6LJ5OnLwtZ2Go/f73Tx/9aZenvySQfHeI=;
+        b=ZW8TrfFoTH/tYASAAkeV0eDaMdGL/LctDxidEfV+xRUTyZ7KwSxyi9DKFFPXnB2FlC
+         A8nkvWWExDP3moWXZOmtv0Mzi0B2KKbU/alkNtxkfSWl53CI7HNkvCgVfPJGPT1jq/7k
+         uK3TOZvwYLbnPkDd5WYsiH4a0TYXOrk7JONuOJO8yCBh316ScLDOZ7sxmEeg7I9/wKYs
+         /7xZtZbZ41/h8OweuhfMUXyXw074W/J06ZCLcVTR/XMjTFFRPaW63EkLQcFMrJwnziyh
+         FseFp37H5yPIjowS70gHcwa0IocAqPcfoJvJvhG+kyIma5tVLbiwGbWe/qRFC1KJoyHt
+         XMjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=70PiLzmA7ox44qCXyRrZgqr9sV1MO+32uzvR0pDHqiM=;
-        b=wKCxyRRfv0GfcUukMrBIHVY2zNu2rG0gA7kDIChAAD+6WRrnhpMa+8qg5bggcDOo79
-         dJb384IEAcQQ8/FQ4YTLKxFUyPZFa5JI4GKbL9oqRimGZ637wVMfUPX5xvHETGto8b4i
-         tfwyuTQF+0GsL2pxBrk5i7tPJi3yEIx33Tnnp6wB4ZNAhsJjLX00xCMPT7Jf3wIPG9ir
-         8l5dcD+xU7i38ioGlmn/S4AZP7ZElA6lPoNG4t3bVPT79iGL+m/TcFU1XUv8Rzt8pU40
-         MVTR4SeOo50K7U0QNDZm8cVBAO7TAgHn8DbXloLWHjzhj00FQcp1DfEofFcGgU0Ylqca
-         xPxA==
-X-Gm-Message-State: AOAM5310s+8pLOsrA4jTioPE6fAtMhB0ZY8uCOGl3Lfd725DtDiGnJig
-        vph5xGwQl6uiFuHEkSxh9Rqp0VGmt9budhGff61ESi987V8CMb0Bo3Sy5dTyUwHaYzv4kHH/YGX
-        tm81kz4FrEA5WCiuyR+B047pe3JvzSF3mf77f6br4csl3eE/AvIRNlQXQ3V6X
-X-Google-Smtp-Source: ABdhPJxtMvym8qubxWVRk8j2dc3T5SYxkJkHkWtqZVS6uc5Mo2rBkFxnCri7+9SNo+ud0d9cVsc/SRmx1m4M
-X-Received: from js-desktop.svl.corp.google.com ([2620:15c:2cd:202:47a:193a:6575:2692])
- (user=junaids job=sendgmr) by 2002:a25:37ce:: with SMTP id
- e197mr53231627yba.485.1635986048289; Wed, 03 Nov 2021 17:34:08 -0700 (PDT)
-Date:   Wed,  3 Nov 2021 17:33:59 -0700
-Message-Id: <20211104003359.2201967-1-junaids@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.33.1.1089.g2158813163f-goog
-Subject: [PATCH v2] kvm: mmu: Use fast PF path for access tracking of huge
- pages when possible
-From:   Junaid Shahid <junaids@google.com>
-To:     kvm@vger.kernel.org, pbonzini@redhat.com
-Cc:     jmattson@google.com, seanjc@google.com, bgardon@google.com
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=l1LBkVxSub6LJ5OnLwtZ2Go/f73Tx/9aZenvySQfHeI=;
+        b=1ijN8zxHhFjcHoeKGTJmAHFR7dUt6Jf5uBXv3Gw1eoixV95Wiif3eRL8STo7JSAY+e
+         O8OnMdi+K+1EPF8aIduz6dcOvoFdZu9qkukyYIWIo0QlPT0OMCV2GfCoI414d5eMVW/c
+         xNOdF6hOMaaWLYX4UH7Kef3wcBtDnNx5brMtaeAvlMzPCE7b7xAf7YaYKf6pkctx3wQF
+         MTmwK249H83ER5SZcovXOU8IR+2jer5S3XDqzyeNxIvN/dclvOID4ZiX8JsMKprq+RPC
+         wmbC8/Ycv6Y8uMlBGZ4vA9XMjw6QyOPqkN5t8wC7a/FXlIACrq5kwxc5mBml9bA/5Q9c
+         ci9A==
+X-Gm-Message-State: AOAM5311hlrwyhecseM0zhnuHB++fKYOg6CFIp4fnjTiPNfWY3JI0dZb
+        IlW3iBGDxrrSF+0fuRIatWTNCaSNiJn+Gp21rMQilA==
+X-Google-Smtp-Source: ABdhPJzAFkFqwjuIjHc0h9oKGkvOHRgsFxGKfJBRuHvvwWYY2QLB2+GCOWAkaMHse2lngZcp/lkw0B+Edbhnyr1mOCI=
+X-Received: by 2002:a63:c158:: with SMTP id p24mr5456974pgi.53.1635993641104;
+ Wed, 03 Nov 2021 19:40:41 -0700 (PDT)
+MIME-Version: 1.0
+References: <20211102094651.2071532-1-oupton@google.com> <20211102094651.2071532-2-oupton@google.com>
+In-Reply-To: <20211102094651.2071532-2-oupton@google.com>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Wed, 3 Nov 2021 19:40:25 -0700
+Message-ID: <CAAeT=FwDep0irwYauX8kyRKfOOtdpqm_CAntDu_COYa6zJAvDg@mail.gmail.com>
+Subject: Re: [PATCH v2 1/6] KVM: arm64: Correctly treat writes to OSLSR_EL1 as undefined
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Andrew Jones <drjones@redhat.com>,
+        Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The fast page fault path bails out on write faults to huge pages in
-order to accommodate dirty logging. This change adds a check to do that
-only when dirty logging is actually enabled, so that access tracking for
-huge pages can still use the fast path for write faults in the common
-case.
+On Tue, Nov 2, 2021 at 2:47 AM Oliver Upton <oupton@google.com> wrote:
+>
+> Any valid implementation of the architecture should generate an
+> undefined exception for writes to a read-only register, such as
+> OSLSR_EL1. Nonetheless, the KVM handler actually implements write-ignore
+> behavior.
+>
+> Align the trap handler for OSLSR_EL1 with hardware behavior. If such a
+> write ever traps to EL2, inject an undef into the guest and print a
+> warning.
+>
+> Signed-off-by: Oliver Upton <oupton@google.com>
 
-Signed-off-by: Junaid Shahid <junaids@google.com>
-Reviewed-by: Ben Gardon <bgardon@google.com>
-Reviewed-by: Sean Christopherson <seanjc@google.com>
----
-v2:
- - Removed a stale comment
+Reviewed-by: Reiji Watanabe <reijiw@google.com>
 
- arch/x86/kvm/mmu/mmu.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 354d2ca92df4..04c00c34517e 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3191,17 +3191,17 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 			new_spte |= PT_WRITABLE_MASK;
- 
- 			/*
--			 * Do not fix write-permission on the large spte.  Since
--			 * we only dirty the first page into the dirty-bitmap in
-+			 * Do not fix write-permission on the large spte when
-+			 * dirty logging is enabled. Since we only dirty the
-+			 * first page into the dirty-bitmap in
- 			 * fast_pf_fix_direct_spte(), other pages are missed
- 			 * if its slot has dirty logging enabled.
- 			 *
- 			 * Instead, we let the slow page fault path create a
- 			 * normal spte to fix the access.
--			 *
--			 * See the comments in kvm_arch_commit_memory_region().
- 			 */
--			if (sp->role.level > PG_LEVEL_4K)
-+			if (sp->role.level > PG_LEVEL_4K &&
-+			    kvm_slot_dirty_track_enabled(fault->slot))
- 				break;
- 		}
- 
--- 
-2.33.1.1089.g2158813163f-goog
-
+Thanks,
+Reiji
