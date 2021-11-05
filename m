@@ -2,110 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D5E19445F07
-	for <lists+kvm@lfdr.de>; Fri,  5 Nov 2021 05:07:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A9908445F77
+	for <lists+kvm@lfdr.de>; Fri,  5 Nov 2021 06:37:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229995AbhKEEKV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Nov 2021 00:10:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58050 "EHLO
+        id S232235AbhKEFj2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Nov 2021 01:39:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48950 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229884AbhKEEKU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Nov 2021 00:10:20 -0400
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0090DC061714
-        for <kvm@vger.kernel.org>; Thu,  4 Nov 2021 21:07:41 -0700 (PDT)
-Received: by mail-pg1-x52c.google.com with SMTP id b4so7317086pgh.10
-        for <kvm@vger.kernel.org>; Thu, 04 Nov 2021 21:07:41 -0700 (PDT)
+        with ESMTP id S229620AbhKEFj0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Nov 2021 01:39:26 -0400
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A721AC061714
+        for <kvm@vger.kernel.org>; Thu,  4 Nov 2021 22:36:47 -0700 (PDT)
+Received: by mail-lf1-x130.google.com with SMTP id g29so2416001lfv.4
+        for <kvm@vger.kernel.org>; Thu, 04 Nov 2021 22:36:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=llkuSb5L0jD6uE3X1Ynlqc/ho6/ZjfVGOP1jb8IlvtY=;
-        b=CgwWzLxvp/Ys6iQTLaSFINNjrWrsZdvERBVFUf3pSsp/7dAeAcEh26sO9s5OX7LKIn
-         /tvZ5i96zuyLM5qyJ5VLuq2/eadmyISfLgq4vOTCoWAgXLTMRQifAlFsL0wOys+sI84c
-         F7Xi7LQvdqEk8Y4KVvMA0q1XtBCYw4kJLHh7z/Ll7t4JeGUbn9POCmevvBusXDpooJ+B
-         k2wKoTf5Hcocrh8CB678iONSG3+zGZhYpXmyQlahA8bwRu96JYhMK8CdopRjBCDYUOdd
-         92dr6qBNNDMj2LwqJzYGedCU6jdT87c/LF61IlnuEnPCIIHAECe13I+ozU9X4MzRwszn
-         R2qg==
+        bh=5Le5Akq/lLNHfW+ACWvF/lDzejDp+WOssI/Klk1stMA=;
+        b=OgQLhazLrEPYEDYrelueE2X8jJx+zu4fuCkHALRCPejgs1CpaggSdEXEgHypuwb4VV
+         IMxR8yZ6H/Mwdd3PLdL+DDU6QCVLAp89GfqMxK3AXc/tCb61yW+Q9JRL+lYTidew4VOV
+         uwyEEh4Gwei+J9krQwGqe9hXSamizJG7/34871VA242B1qLqkFCwJTjZOoN5KDv438h1
+         63WVF7bqoknA9qybq7EecyKKk7r0OqPN+fxGUNnmLVYwlm+XT98b0I9H2hnQAqzczj0N
+         IWfC4INooR51z83b2QmXsdxV/h8tDZNzYA3gPTDfU9YlfVB1raXjuziX8v2m+adlAh/8
+         23bA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=llkuSb5L0jD6uE3X1Ynlqc/ho6/ZjfVGOP1jb8IlvtY=;
-        b=wWjttyCnKao2xqU4AzfYz6ril49YQRv+sqUGeU3au1u1uqXIkJlWB//NdHtC76Tg/W
-         E4yzmBZP2n3EDI2nyG3CO22xji33IqdLyZDklGz7YXffAjGYOpvg6brjxnHy0lvzikzQ
-         QIJ5NMlXMoPhr32OhTHi4YFOaqosoMROTU7J5+Ra59WFCb/M8lghIveX5siGeRuxdsN6
-         AbBukPE1Gyg3VZCjuaGarEpWHLEnTt1JdONLcU6cWLaQj+7PsIErD/OQyogJAsOzo0k5
-         4Swe5NmuuruWISdsLaLPiffbZMMXwWsmzbElHW3OKQ4cifIekVFXXRdoXmsjNiYERij+
-         kpfw==
-X-Gm-Message-State: AOAM5315m2aUYrYU6rdPQkCVPXj5wymmkRC4D8brrLgHBOqwisRF7N1A
-        8Ya2VSphHiFSs0iErEBjqVFnD0E2O34pk6qJzREqDA==
-X-Google-Smtp-Source: ABdhPJxVWPCzurrkxGOQvESM60+vz35M7q2DOzwppoBNuuLOlob6+tQKsQpwQXnfvWq5G62psSFMc58PWrB/iRPN4HM=
-X-Received: by 2002:a65:4889:: with SMTP id n9mr1402858pgs.303.1636085261047;
- Thu, 04 Nov 2021 21:07:41 -0700 (PDT)
+        bh=5Le5Akq/lLNHfW+ACWvF/lDzejDp+WOssI/Klk1stMA=;
+        b=RZxmLRyclq73mzxVhBlJ5GAcIsl3mTtO2MJwg32IUgY4GlCUsLQUJi/iEZ3e+KZPV0
+         I4jL8bEs2MhtqonIAmaWDLdwDQCKRQRNpcEqIHAjvj9FWh9ek+ahIwIcspfD1x6n6DZI
+         iXV8IkOnKI//Kr2ypjakKTd2ov1fA0eWKyMm0jTCWhAPEOq+kPB//AKXcxsJJyHnhN8E
+         T8IdkaIpPkLlTpoi7pNiPzoiyV7Wl0cDLpzHYVaeMFqAPxdAiLgLyPokrpP37R7Yg0R0
+         SNoDbJmt01jia8H4X2645Nn/4vZX+yd3TstoTPUADV0mN8UmsM0w/Fgg/XaHWEufvhgP
+         ptWQ==
+X-Gm-Message-State: AOAM530VNS07+cugH6yQo/2b3ejw2dVR1r4YQcpqdLc1/kiZvG8Xydmr
+        0o08Kgrm0+nJSB3VDkLhfOY12I9sV3Yrat4zW6YNPQ==
+X-Google-Smtp-Source: ABdhPJyNUuISSdEPBd3M4w6ZjW+jtk9a314Xeh6niI4f9CO4Jdi23JUL/bOS8pQ1DFehgvxl9D6sizD87Y+0y+M0SYM=
+X-Received: by 2002:a05:6512:3d90:: with SMTP id k16mr4911113lfv.361.1636090605698;
+ Thu, 04 Nov 2021 22:36:45 -0700 (PDT)
 MIME-Version: 1.0
-References: <20211103062520.1445832-1-reijiw@google.com> <20211103062520.1445832-19-reijiw@google.com>
- <YYQNGqpy1NiUEXYD@google.com>
-In-Reply-To: <YYQNGqpy1NiUEXYD@google.com>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Thu, 4 Nov 2021 21:07:25 -0700
-Message-ID: <CAAeT=FyowLxUTpLDoAxrETbOyCTCcfc1==hy-Q4F5fdswqS-yg@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 18/28] KVM: arm64: Introduce KVM_CAP_ARM_ID_REG_WRITABLE
- capability
-To:     Oliver Upton <oupton@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+References: <20211102094651.2071532-1-oupton@google.com> <20211102094651.2071532-5-oupton@google.com>
+ <CAAeT=FwKJLaxNU+2BGWZh=HdTY=NWBzGdN=cTDPKv3x6cG2UsA@mail.gmail.com>
+In-Reply-To: <CAAeT=FwKJLaxNU+2BGWZh=HdTY=NWBzGdN=cTDPKv3x6cG2UsA@mail.gmail.com>
+From:   Oliver Upton <oupton@google.com>
+Date:   Thu, 4 Nov 2021 22:36:34 -0700
+Message-ID: <CAOQ_QshXAzRkKXJjp5Q6KEHQ8vFkc1hVnktEj82nBLN8+=_42w@mail.gmail.com>
+Subject: Re: [PATCH v2 4/6] KVM: arm64: Emulate the OS Lock
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Marc Zyngier <maz@kernel.org>,
         James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Alexandru Elisei <Alexandru.Elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>,
+        linux-arm-kernel@lists.infradead.org,
         Andrew Jones <drjones@redhat.com>,
-        Peng Liang <liangpeng10@huawei.com>,
         Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>
+        Ricardo Koller <ricarkol@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 4, 2021 at 9:41 AM Oliver Upton <oupton@google.com> wrote:
+On Thu, Nov 4, 2021 at 8:56 PM Reiji Watanabe <reijiw@google.com> wrote:
 >
-> On Tue, Nov 02, 2021 at 11:25:10PM -0700, Reiji Watanabe wrote:
-> > Introduce a new capability KVM_CAP_ARM_ID_REG_WRITABLE to indicate
-> > that ID registers are writable by userspace.
+> Hi Oliver,
+>
+> On Tue, Nov 2, 2021 at 2:47 AM Oliver Upton <oupton@google.com> wrote:
 > >
-> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > The OS lock blocks all debug exceptions at every EL. To date, KVM has
+> > not implemented the OS lock for its guests, despite the fact that it is
+> > mandatory per the architecture. Simple context switching between the
+> > guest and host is not appropriate, as its effects are not constrained to
+> > the guest context.
+> >
+> > Emulate the OS Lock by clearing MDE and SS in MDSCR_EL1, thereby
+> > blocking all but software breakpoint instructions. To handle breakpoint
+> > instructions, trap debug exceptions to EL2 and skip the instruction.
+> >
+> > Signed-off-by: Oliver Upton <oupton@google.com>
 > > ---
-> >  Documentation/virt/kvm/api.rst | 8 ++++++++
-> >  arch/arm64/kvm/arm.c           | 1 +
-> >  include/uapi/linux/kvm.h       | 1 +
-> >  3 files changed, 10 insertions(+)
+> >  arch/arm64/include/asm/kvm_host.h |  4 ++++
+> >  arch/arm64/kvm/debug.c            | 20 +++++++++++++++-----
+> >  arch/arm64/kvm/handle_exit.c      |  8 ++++++++
+> >  arch/arm64/kvm/sys_regs.c         |  6 +++---
+> >  4 files changed, 30 insertions(+), 8 deletions(-)
 > >
-> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> > index a6729c8cf063..f7dfb5127310 100644
-> > --- a/Documentation/virt/kvm/api.rst
-> > +++ b/Documentation/virt/kvm/api.rst
-> > @@ -7265,3 +7265,11 @@ The argument to KVM_ENABLE_CAP is also a bitmask, and must be a subset
-> >  of the result of KVM_CHECK_EXTENSION.  KVM will forward to userspace
-> >  the hypercalls whose corresponding bit is in the argument, and return
-> >  ENOSYS for the others.
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index c98f65c4a1f7..f13b8b79b06d 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -724,6 +724,10 @@ void kvm_arm_vcpu_init_debug(struct kvm_vcpu *vcpu);
+> >  void kvm_arm_setup_debug(struct kvm_vcpu *vcpu);
+> >  void kvm_arm_clear_debug(struct kvm_vcpu *vcpu);
+> >  void kvm_arm_reset_debug_ptr(struct kvm_vcpu *vcpu);
 > > +
-> > +8.35 KVM_CAP_ARM_ID_REG_WRITABLE
-> > +--------------------------------
+> > +#define kvm_vcpu_os_lock_enabled(vcpu)         \
+> > +       (__vcpu_sys_reg(vcpu, OSLSR_EL1) & SYS_OSLSR_OSLK)
 >
-> ID registers are technically already writable, KVM just rejects any
-> value other than what it derives from sanitising the host ID registers.
-> I agree that the nuance being added warrants a KVM_CAP, as it informs
-> userspace it can deliberately configure ID registers with a more limited
-> value than what KVM returns.
+> I would think the name of this macro might sound like it generates
+> a code that is evaluated as bool :)
+
+Hey! Nobody ever said this would coerce the returned value into a bool :-P
+
+In all seriousness, good point. I agree that the statement should
+obviously evaluate to a bool, given the naming of the macro.
+
 >
-> KVM_CAP_ARM_ID_REG_CONFIGURABLE maybe? Naming is hard :)
+> > +
+> >  int kvm_arm_vcpu_arch_set_attr(struct kvm_vcpu *vcpu,
+> >                                struct kvm_device_attr *attr);
+> >  int kvm_arm_vcpu_arch_get_attr(struct kvm_vcpu *vcpu,
+> > diff --git a/arch/arm64/kvm/debug.c b/arch/arm64/kvm/debug.c
+> > index db9361338b2a..5690a9c99c89 100644
+> > --- a/arch/arm64/kvm/debug.c
+> > +++ b/arch/arm64/kvm/debug.c
+> > @@ -95,8 +95,11 @@ static void kvm_arm_setup_mdcr_el2(struct kvm_vcpu *vcpu)
+> >                                 MDCR_EL2_TDRA |
+> >                                 MDCR_EL2_TDOSA);
+> >
+> > -       /* Is the VM being debugged by userspace? */
+> > -       if (vcpu->guest_debug)
+> > +       /*
+> > +        * Check if the VM is being debugged by userspace or the guest has
+> > +        * enabled the OS lock.
+> > +        */
+> > +       if (vcpu->guest_debug || kvm_vcpu_os_lock_enabled(vcpu))
+>
+> IMHO, it might be nicer to create a macro or function that abstracts the
+> condition that needs save_guest_debug_regs/restore_guest_debug_regs.
+> (rather than putting those conditions in each part of codes where they
+> are needed)
+>
 
-Thank you for the suggestion.  Yes, that sounds better.
-I will change the name as you suggested.
+I completely agree, and it comes with the added benefit that the
+macro/function can be named something informative so as to suggest the
+purpose for saving guest registers.
 
-Regards,
-Reiji
+Thanks for the review!
+
+--
+Oliver
