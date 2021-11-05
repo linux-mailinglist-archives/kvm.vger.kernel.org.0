@@ -2,111 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 55CAE4464EB
-	for <lists+kvm@lfdr.de>; Fri,  5 Nov 2021 15:28:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 238F2446538
+	for <lists+kvm@lfdr.de>; Fri,  5 Nov 2021 15:50:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233193AbhKEObL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Nov 2021 10:31:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55108 "EHLO
+        id S230518AbhKEOwn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Nov 2021 10:52:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233105AbhKEObK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Nov 2021 10:31:10 -0400
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00716C061714
-        for <kvm@vger.kernel.org>; Fri,  5 Nov 2021 07:28:30 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id m14so9014132pfc.9
-        for <kvm@vger.kernel.org>; Fri, 05 Nov 2021 07:28:30 -0700 (PDT)
+        with ESMTP id S229613AbhKEOwm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Nov 2021 10:52:42 -0400
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 791EAC061714
+        for <kvm@vger.kernel.org>; Fri,  5 Nov 2021 07:50:02 -0700 (PDT)
+Received: by mail-pf1-x42d.google.com with SMTP id k2so9050715pff.11
+        for <kvm@vger.kernel.org>; Fri, 05 Nov 2021 07:50:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=6VOsn4mMFoeIpWQu2tEjJSqUu/jwqRBM5pT3S++VzdI=;
-        b=XiyvkvqawwmKSqbr6vdIUBXiQC1cfJn1vgIyTfwpitSY0+4E6fSaF93z849+RwCj8S
-         Ex0FHHCMA7sy9lOiTRZwF0KEuGO569VhInFavlOBCppDT29OEbHRFS4WhydMiuUPLl6C
-         Q9949q//FEzvM/LEb71LH3RXYR2UYuSDEpuHyUevgVGF66RMB7CiCtud470kF2m4jc+0
-         zpkwmj/vgznbhqeuefUMEIsiCYZMXy5yBMtivvmlpOqWJx7WpcVQV+PP3o73dT0GNHo1
-         Y+z63NkNTs0uca57NwO6LKhHrgdrjIDgzpqSXxSXob5HMXdU0IuhDHbI9TDl/Hkoh8dv
-         9hXg==
+        bh=ZlK7YTT985O4M+opuoeF3giYxNoBTymwdWlIEsVVWuA=;
+        b=ShJBqpgpg6+unQtvJMrQ8Fhfuh8RSFlYfOI4A0mlmDFM6ugOfGg3IQLd+q9qcWRnso
+         iNzLK3UyTPJ71KvYGe6BZBTvH0SEXptWx01FRS2yFQYl4KcBZ+k6Dk51ZfJKjnFKaAmN
+         /fmi+llUzQBKl6jDjhfzpzDwYW41NxGNPzpAN6jV/pbbDX5gEasvr+F1LYQyNrETVLXp
+         mvs43Y7m/in2ATV7c3ZNMf5qLZAcvQJa6B/jj5OnKXHqhzx9lcYXPJbJe8V7SSeoPT+z
+         HcupYq++82NTKY+KiQr+htPcYxN6s2jIS/ur749qRJr9ILPaMsamtK5wybH1QE2qqe8l
+         3BOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=6VOsn4mMFoeIpWQu2tEjJSqUu/jwqRBM5pT3S++VzdI=;
-        b=yP4eSXn/xiV0rChvGQ+cxH40ChWEe53dnzByB+zk8X3lJDQ4miHiaK5Yy7bFLqR+2E
-         nl2lJXQPIZ8FDWbxIxdUibAbp/uxi4vz5rEXmTr5RrYnJvWqzOjY2SJn2rZ4WHsvk4mg
-         KWy+v7bQVjNg7ohc9rUQpVSjEX2FHQhUwIE/kWGuy+zPft8KtAAKXyqClEdmL+zy+owZ
-         2t3Z5bvzBPSDNM8h8hayFX3TfJih6ckiZ/dNU1Y6qaxibzwOWlb9CpDNVC4pS55wvWaM
-         yy+4yO6uaIiYuGYYlHR791J5EpTqwpG4SrqsWlv/0Ftm44QAb74Dt/tL01EZGBic2CnN
-         os1Q==
-X-Gm-Message-State: AOAM531bUp3PcU0La1baw9eM1pRWo/RGbA9UtD8BUePBXevjd5GplUK1
-        r88VjIZ/iXLCMKiOUfIPjeAneg==
-X-Google-Smtp-Source: ABdhPJylVGegWkkSA0YXLTmS35LbNL+nGjfJbkH+KHjlMdPQu/IG4VPB10tM6rOLC8rVBwrBWi1JCQ==
-X-Received: by 2002:a05:6a00:1906:b0:44c:b35d:71a8 with SMTP id y6-20020a056a00190600b0044cb35d71a8mr60181918pfi.51.1636122510325;
-        Fri, 05 Nov 2021 07:28:30 -0700 (PDT)
+        bh=ZlK7YTT985O4M+opuoeF3giYxNoBTymwdWlIEsVVWuA=;
+        b=FRq9ChwCy/sn+pS9pOxkFYEmNKuWTTCPdLakGVQ3uiAfMY+ZTqkdV/Q8ptINYTz1dv
+         EOrTGBVYBC3rVkBUvLg90KJ/v1vk/bXq22gTnNZSybR7HGok88FObaoQdRTLUFKMaZnU
+         OTJA/DpdVGLZSkaAl1mqfPplP5gE+67wvqt/Ks8V4FNjpoLOvG36GdXpJ7NCPgL9NzsF
+         6UhCJFa0meED5jETwoZgagesX3O1cVg4ZlgATmrpBiVJArmOFIn/j0v9Wa6gwzRt2U4m
+         FKtFbUKnMdGJCN0r01KFU25bySGjYamaJv749loe8KI7YeCs/7kw6N4K/yo7ZT8Fta8v
+         yYsQ==
+X-Gm-Message-State: AOAM530qIy5yIhTDP0qZ8eN0lGwJOUfsbxOwedqyvTw8oeRFBobzsQ24
+        ydxAsnRAHOvaxEQv3D+RNalu9A==
+X-Google-Smtp-Source: ABdhPJz9IWo1xPiB6N2+RPTVp6A5NpQUzdaQiipdBeFMIU2yLkoLwsxHBecmtwNqfmGtNyxHhoUidQ==
+X-Received: by 2002:a63:8ac2:: with SMTP id y185mr30739749pgd.205.1636123801792;
+        Fri, 05 Nov 2021 07:50:01 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id fw21sm9722729pjb.25.2021.11.05.07.28.29
+        by smtp.gmail.com with ESMTPSA id b2sm6333032pgh.33.2021.11.05.07.50.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Nov 2021 07:28:29 -0700 (PDT)
-Date:   Fri, 5 Nov 2021 14:28:25 +0000
+        Fri, 05 Nov 2021 07:50:00 -0700 (PDT)
+Date:   Fri, 5 Nov 2021 14:49:57 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 3/4] KVM: nVMX: Track whether changes in L0 require
- MSR bitmap for L2 to be rebuilt
-Message-ID: <YYU/iQCQJosjTKVs@google.com>
-References: <20211013142258.1738415-1-vkuznets@redhat.com>
- <20211013142258.1738415-4-vkuznets@redhat.com>
- <YYSDbljJgpEOnx+W@google.com>
- <875yt6lscj.fsf@vitty.brq.redhat.com>
+To:     Nicholas Piggin <npiggin@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Juergen Gross <jgross@suse.com>,
+        Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH] KVM: move struct kvm_vcpu * array to the bottom of
+ struct kvm
+Message-ID: <YYVElU6u22qxgQIz@google.com>
+References: <20211105034949.1397997-1-npiggin@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <875yt6lscj.fsf@vitty.brq.redhat.com>
+In-Reply-To: <20211105034949.1397997-1-npiggin@gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 05, 2021, Vitaly Kuznetsov wrote:
-> Sean Christopherson <seanjc@google.com> writes:
++Juergen and Marc
+
+On Fri, Nov 05, 2021, Nicholas Piggin wrote:
+> Increasing the max VCPUs on powerpc makes the kvm_arch member offset
+> great enough that some assembly breaks due to addressing constants
+> overflowing field widths.
 > 
-> > On Wed, Oct 13, 2021, Vitaly Kuznetsov wrote:
-> >> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-> >> index 592217fd7d92..2cdf66e6d1b0 100644
-> >> --- a/arch/x86/kvm/vmx/vmx.h
-> >> +++ b/arch/x86/kvm/vmx/vmx.h
-> >> @@ -148,6 +148,15 @@ struct nested_vmx {
-> >>  	bool need_vmcs12_to_shadow_sync;
-> >>  	bool dirty_vmcs12;
-> >>  
-> >> +	/*
-> >> +	 * Indicates whether MSR bitmap for L2 needs to be rebuilt due to
-> >> +	 * changes in MSR bitmap for L1 or switching to a different L2. Note,
-> >> +	 * this flag can only be used reliably in conjunction with a paravirt L1
-> >> +	 * which informs L0 whether any changes to MSR bitmap for L2 were done
-> >> +	 * on its side.
-> >> +	 */
-> >> +	bool msr_bitmap_force_recalc;
-> >
-> > Belated bikeshedding...  What about need_msr_bitmap_recalc to follow the above
-> > need_vmcs12_to_shadow_sync?
-> >
+> Moving the vcpus array to the end of struct kvm prevents this from
+> happening. It has the side benefit that moving the large array out
+> from the middle of the structure should help keep other commonly
+> accessed fields in the same or adjacent cache lines.
 > 
-> 'msr_bitmap_force_recalc' was suggested by Paolo but
-> 'need_msr_bitmap_recalc' sounds equally good to me.
+> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> ---
+> 
+> It would next be possible to now make this a dynamically sized array,
+> and make the KVM_MAX_VCPUS more dynamic
 
-Ah, actually, Paolo's is better.  "!need" implies that the recalc can be skipped
-regardless of any other behavior, whereas "!force" provides the hint that a recalc
-may still be needed for other reasons.
+Marc has a mostly-baked series to use an xarray[1][2] that AFAICT would be well
+received.  That has my vote, assuming it can get into 5.16.  Marc or Juergen,
+are either of you actively working on that?
 
-Can we move the "force" to the front though, i.e. force_msr_bitmap_recalc?  The
-other fields in nested_vmx all have the verb at the front.
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/vcpu-xarray
+[2] https://lkml.kernel.org/r/871r65wwk7.wl-maz@kernel.org
 
-	bool need_vmcs12_to_shadow_sync;
-	bool need_sync_vmcs02_to_vmcs12_rare;
-	bool change_vmcs01_virtual_apic_mode;
-	bool reload_vmcs01_apic_access_page;
-	bool update_vmcs01_cpu_dirty_logging;
+> however x86 kvm_svm uses its own scheme rather than kvm_arch for some reason.
+
+What's the problem in kvm_svm?
+
+> Thanks,
+> Nick
+> 
+>  include/linux/kvm_host.h | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 0f18df7fe874..78cd9b63a6a5 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -553,7 +553,6 @@ struct kvm {
+>  	struct mutex slots_arch_lock;
+>  	struct mm_struct *mm; /* userspace tied to this vm */
+>  	struct kvm_memslots __rcu *memslots[KVM_ADDRESS_SPACE_NUM];
+> -	struct kvm_vcpu *vcpus[KVM_MAX_VCPUS];
+>  
+>  	/* Used to wait for completion of MMU notifiers.  */
+>  	spinlock_t mn_invalidate_lock;
+> @@ -623,6 +622,9 @@ struct kvm {
+>  	struct notifier_block pm_notifier;
+>  #endif
+>  	char stats_id[KVM_STATS_NAME_SIZE];
+> +
+> +	/* This array can be very large, so keep it at the bottom */
+> +	struct kvm_vcpu *vcpus[KVM_MAX_VCPUS];
+>  };
+>  
+>  #define kvm_err(fmt, ...) \
+> -- 
+> 2.23.0
+> 
