@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1EA42446318
-	for <lists+kvm@lfdr.de>; Fri,  5 Nov 2021 13:03:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E790D446322
+	for <lists+kvm@lfdr.de>; Fri,  5 Nov 2021 13:06:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232837AbhKEMFr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Nov 2021 08:05:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:35673 "EHLO
+        id S232898AbhKEMJF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Nov 2021 08:09:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58050 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232823AbhKEMFq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 5 Nov 2021 08:05:46 -0400
+        by vger.kernel.org with ESMTP id S232837AbhKEMJE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 5 Nov 2021 08:09:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636113787;
+        s=mimecast20190719; t=1636113984;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=6QFtRJa6fXxJb5Blssvwh+XqvE8JdPrEz8mODr6e1JI=;
-        b=QZDiRzTBvRSqb1wKTQSbwBqCzn/e7Q3TLc2uEnXknyCTgmWLUtchDlf+KNV6YzGKOlV9l9
-        7efkag2PiOZKlphWCfXNR6PLqDVhZz7M3ObHVuxQnw+NdLONSjDQj9D2WXfqeYP4KbfRTx
-        PgF16VrMfvOpTCPpOwEW8QRbkPmjp4k=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-279-s8pL1YoLMMWm5aULhFLNvQ-1; Fri, 05 Nov 2021 08:03:06 -0400
-X-MC-Unique: s8pL1YoLMMWm5aULhFLNvQ-1
-Received: by mail-wm1-f71.google.com with SMTP id 67-20020a1c0046000000b0032cd88916e5so3202403wma.6
-        for <kvm@vger.kernel.org>; Fri, 05 Nov 2021 05:03:05 -0700 (PDT)
+        bh=4JEVL9kaZ5YWgWyM6e1AP/E44Yg0OSeQJGoU0yyFJn4=;
+        b=Nf65vuYYta31fnfrSpWXHYgeLEMXRTxPxCluEHSko8fLl+W07UC+JhfiPfXFmruPqTTu9J
+        3/uAnWWp64t/HlN+Opph+u9H8eMZAhV07f6Tb8V558IJSh8SsPbi8iVBlIPQFY3jgcFbR9
+        8sUpfTzbvXKdWzJ7iD1CXPLDLiCvi3w=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-236-y_5g0r4YM_-JM_S_FUSNAA-1; Fri, 05 Nov 2021 08:06:22 -0400
+X-MC-Unique: y_5g0r4YM_-JM_S_FUSNAA-1
+Received: by mail-wm1-f69.google.com with SMTP id v10-20020a1cf70a000000b00318203a6bd1so3183295wmh.6
+        for <kvm@vger.kernel.org>; Fri, 05 Nov 2021 05:06:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
          :message-id:mime-version;
-        bh=6QFtRJa6fXxJb5Blssvwh+XqvE8JdPrEz8mODr6e1JI=;
-        b=Bssgp0hzHX1z+VWU+4Wjrsgn5G2wzUDb/OSaiWLXAFqjpJMsbr8e3Eev41fG50sWWh
-         TVgOrl4YuQzrfBHI0eThj2klTxRFWRc/ie2tY86iRuVOfghUi+qDX7IofpRq76GZ1bZu
-         T++P1uPdGtvh+EomkAqekMqRtUVtDePUUUt6NO7uLW7xOHzG2Wb1pcNnb8xxQuN2vtKI
-         WjTRANHvlnoXpdTKAPN9ynwfsIyoy4xxSE57ycJ0jkcJKnGZEgMReRo1DOFUccJ0i4Jr
-         xttCnsiGjh7qsR65QlqfotXTikVNc+h8bzofIKfYg10BLLt6gA0qGLTNedzV5uQvPloR
-         8CaQ==
-X-Gm-Message-State: AOAM532/vOJ0DL0MX0sDfgT4vH4kpUl3orW58+VlDNs73zsVCRK4FvUn
-        C0nYDELNNjIA3Z/ATosigg2IHwpAHFWp98dYuhfioiMbYxHYs7/D4Krj9tdc3WGyNVU+G74jMUk
-        aoANfWWWTsqt4
-X-Received: by 2002:a5d:6d8c:: with SMTP id l12mr31663567wrs.435.1636113784971;
-        Fri, 05 Nov 2021 05:03:04 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyAU17O16GODKHSlfRSZLi1fwRykHnh0clQnHPHKuuFcA+KlkO2tvGWAb2k2FPeYYS0DnWXCA==
-X-Received: by 2002:a5d:6d8c:: with SMTP id l12mr31663532wrs.435.1636113784798;
-        Fri, 05 Nov 2021 05:03:04 -0700 (PDT)
+        bh=4JEVL9kaZ5YWgWyM6e1AP/E44Yg0OSeQJGoU0yyFJn4=;
+        b=enQWfEteCXBOBdxJiGftF68BbNGTprhiDRl4D5GXgKEtTDEEeVtqHoaX2kBdxOpRHB
+         2CrTQPYvTtrOX0ghmJyy71x8m6Ai1nDh4Heh+Zw/p0esVvSpgoFD3NvKc9qdx1+BK9P6
+         qH6NGTKPIO2Ks+fD0a5xDstmYUJhteWhZMdrDlg2qGYH1VCPU2HtR9y7xZiP4ogki4/9
+         AtiZbOj+oaY5z/bPwntqafFhjqlWREpYgdrORlQqvA9kAsNJHvVjhZXYj0Z3ZfMQCz2+
+         gfUZtNX/iXKEZb+xQthlOnVhOIakkxP0//Xx8Mr/UkP27BKKaGSeYzU43lUn2//08cic
+         YNaA==
+X-Gm-Message-State: AOAM5308FVX973RBxVFF0IA8keOBu90UzKMQFU9QsAEUgX1zV2WY0F1Z
+        yk9YJMX6ORNLEmEX8EpHYCq52AsI+kXgJ5REhGzNO2uIwQDpl2dBi+w6gYnPiNofra3hHUiBG6M
+        SNmAt8T2lflhv
+X-Received: by 2002:a05:600c:4ec7:: with SMTP id g7mr8999944wmq.138.1636113981692;
+        Fri, 05 Nov 2021 05:06:21 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwxVGb6OVsbfH4wjAEiB5USq1IGqLSb7//D+Ranuv7y7/+oIc7B9YN0mcWZvlV9LAlGYyNpgg==
+X-Received: by 2002:a05:600c:4ec7:: with SMTP id g7mr8999921wmq.138.1636113981528;
+        Fri, 05 Nov 2021 05:06:21 -0700 (PDT)
 Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id r8sm9166846wrz.43.2021.11.05.05.03.03
+        by smtp.gmail.com with ESMTPSA id l4sm7494011wrv.94.2021.11.05.05.06.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Nov 2021 05:03:04 -0700 (PDT)
+        Fri, 05 Nov 2021 05:06:20 -0700 (PDT)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
@@ -56,13 +56,14 @@ Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Jim Mattson <jmattson@google.com>,
         Maxim Levitsky <mlevitsk@redhat.com>,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 1/4] KVM: nVMX: Don't use Enlightened MSR Bitmap for L3
-In-Reply-To: <YYSAPotqLVIScunK@google.com>
+Subject: Re: [PATCH v3 3/4] KVM: nVMX: Track whether changes in L0 require
+ MSR bitmap for L2 to be rebuilt
+In-Reply-To: <YYSDbljJgpEOnx+W@google.com>
 References: <20211013142258.1738415-1-vkuznets@redhat.com>
- <20211013142258.1738415-2-vkuznets@redhat.com>
- <YYSAPotqLVIScunK@google.com>
-Date:   Fri, 05 Nov 2021 13:03:03 +0100
-Message-ID: <878ry2lsi0.fsf@vitty.brq.redhat.com>
+ <20211013142258.1738415-4-vkuznets@redhat.com>
+ <YYSDbljJgpEOnx+W@google.com>
+Date:   Fri, 05 Nov 2021 13:06:20 +0100
+Message-ID: <875yt6lscj.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Precedence: bulk
@@ -72,93 +73,34 @@ X-Mailing-List: kvm@vger.kernel.org
 Sean Christopherson <seanjc@google.com> writes:
 
 > On Wed, Oct 13, 2021, Vitaly Kuznetsov wrote:
->> 3-level nesting is also not a very common setup nowadays.
->
-> Says who? :-D
->
-
-The one who wants to sleep well at night ;-)
-
->> Don't enable 'Enlightened MSR Bitmap' feature for KVM's L2s (real L3s) for
->> now.
->> 
->> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
->> ---
->>  arch/x86/kvm/vmx/vmx.c | 21 ++++++++++++---------
->>  1 file changed, 12 insertions(+), 9 deletions(-)
->> 
->> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
->> index 1c8b2b6e7ed9..e82cdde58119 100644
->> --- a/arch/x86/kvm/vmx/vmx.c
->> +++ b/arch/x86/kvm/vmx/vmx.c
->> @@ -2655,15 +2655,6 @@ int alloc_loaded_vmcs(struct loaded_vmcs *loaded_vmcs)
->>  		if (!loaded_vmcs->msr_bitmap)
->>  			goto out_vmcs;
->>  		memset(loaded_vmcs->msr_bitmap, 0xff, PAGE_SIZE);
->> -
->> -		if (IS_ENABLED(CONFIG_HYPERV) &&
->> -		    static_branch_unlikely(&enable_evmcs) &&
->> -		    (ms_hyperv.nested_features & HV_X64_NESTED_MSR_BITMAP)) {
->> -			struct hv_enlightened_vmcs *evmcs =
->> -				(struct hv_enlightened_vmcs *)loaded_vmcs->vmcs;
->> -
->> -			evmcs->hv_enlightenments_control.msr_bitmap = 1;
->> -		}
->>  	}
->>  
->>  	memset(&loaded_vmcs->host_state, 0, sizeof(struct vmcs_host_state));
->> @@ -6903,6 +6894,18 @@ static int vmx_create_vcpu(struct kvm_vcpu *vcpu)
->>  
->>  	vmx->loaded_vmcs = &vmx->vmcs01;
+>> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+>> index 592217fd7d92..2cdf66e6d1b0 100644
+>> --- a/arch/x86/kvm/vmx/vmx.h
+>> +++ b/arch/x86/kvm/vmx/vmx.h
+>> @@ -148,6 +148,15 @@ struct nested_vmx {
+>>  	bool need_vmcs12_to_shadow_sync;
+>>  	bool dirty_vmcs12;
 >>  
 >> +	/*
->> +	 * Use Hyper-V 'Enlightened MSR Bitmap' feature when KVM runs as a
->> +	 * nested (L1) hypervisor and Hyper-V in L0 supports it.
->
-> And maybe call out specifically that KVM intentionally uses this only for vmcs02?
->
+>> +	 * Indicates whether MSR bitmap for L2 needs to be rebuilt due to
+>> +	 * changes in MSR bitmap for L1 or switching to a different L2. Note,
+>> +	 * this flag can only be used reliably in conjunction with a paravirt L1
+>> +	 * which informs L0 whether any changes to MSR bitmap for L2 were done
+>> +	 * on its side.
 >> +	 */
->> +	if (IS_ENABLED(CONFIG_HYPERV) && static_branch_unlikely(&enable_evmcs)
->> +	    && (ms_hyperv.nested_features & HV_X64_NESTED_MSR_BITMAP)) {
+>> +	bool msr_bitmap_force_recalc;
 >
-> && on the previous line, I think we'll survive the 82 char line :-)
+> Belated bikeshedding...  What about need_msr_bitmap_recalc to follow the above
+> need_vmcs12_to_shadow_sync?
 >
->> +		struct hv_enlightened_vmcs *evmcs =
->> +			(struct hv_enlightened_vmcs *)vmx->loaded_vmcs->vmcs;
->
-> Hmm, what about landing this right after vmcs01's VMCS is allocated?  It's kinda
-> weird, but it makes it more obvious that ->vmcs is not NULL.  And if the cast is
-> simply via a "void *" it all fits on one line.
->
-> 	err = alloc_loaded_vmcs(&vmx->vmcs01);
-> 	if (err < 0)
-> 		goto free_pml;
->
-> 	/*
-> 	 * Use Hyper-V 'Enlightened MSR Bitmap' feature when KVM runs as a
-> 	 * nested (L1) hypervisor and Hyper-V in L0 supports it.  Enable an
-> 	 * enlightened bitmap only for vmcs01, KVM currently isn't equipped to
-> 	 * realize any performance benefits from enabling it for vmcs02.
-> 	 */ 
-> 	if (IS_ENABLED(CONFIG_HYPERV) && static_branch_unlikely(&enable_evmcs) &&
-> 	    (ms_hyperv.nested_features & HV_X64_NESTED_MSR_BITMAP)) {
-> 		struct hv_enlightened_vmcs *evmcs = (void *)vmx->vmcs01.vmcs;
 
-(void *) usually smells a bit fishy to me but it seems to fit here.
-
->
-> 		evmcs->hv_enlightenments_control.msr_bitmap = 1;
-> 	}
->
+'msr_bitmap_force_recalc' was suggested by Paolo but
+'need_msr_bitmap_recalc' sounds equally good to me.
 
 >> +
->> +		evmcs->hv_enlightenments_control.msr_bitmap = 1;
->> +	}
->> +
->>  	if (cpu_need_virtualize_apic_accesses(vcpu)) {
->>  		err = alloc_apic_access_page(vcpu->kvm);
->>  		if (err)
+>>  	/*
+>>  	 * Indicates lazily loaded guest state has not yet been decached from
+>>  	 * vmcs02.
 >> -- 
 >> 2.31.1
 >> 
