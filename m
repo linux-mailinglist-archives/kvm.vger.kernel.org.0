@@ -2,155 +2,220 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A4AE4460D5
-	for <lists+kvm@lfdr.de>; Fri,  5 Nov 2021 09:45:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 21791446125
+	for <lists+kvm@lfdr.de>; Fri,  5 Nov 2021 10:08:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232771AbhKEIrj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Nov 2021 04:47:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23120 "EHLO
+        id S231890AbhKEJK5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Nov 2021 05:10:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22098 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229473AbhKEIrh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 5 Nov 2021 04:47:37 -0400
+        by vger.kernel.org with ESMTP id S229923AbhKEJK4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 5 Nov 2021 05:10:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636101898;
+        s=mimecast20190719; t=1636103297;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ILMiQoA9N1ZZHarQUH3yJ1BzVlW0gt9hlPE7t59A3Pw=;
-        b=ZE3qjOZIRJyZQbQzHvr7qHMHmttqxIlBE/FZ7YNhLCKisrHt22kfieRR+T+XRp3KicbNvt
-        floP+2+MD0bEXr4CFc2nUK0Vtxf16SmiBEaebJQ8GtIs1EL63xAncW+SO4yLfE4razUcK9
-        Qe7IsbBL01W6i06lN6te56tRKHBfBHY=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-487-QRhjP_tQN2iwLT1S-FaJhg-1; Fri, 05 Nov 2021 04:44:55 -0400
-X-MC-Unique: QRhjP_tQN2iwLT1S-FaJhg-1
-Received: by mail-wr1-f71.google.com with SMTP id w14-20020adfbace000000b001884bf6e902so1371773wrg.3
-        for <kvm@vger.kernel.org>; Fri, 05 Nov 2021 01:44:55 -0700 (PDT)
+        bh=9RnbKgFe+rSKHY36srJ1aoAiwQRKbM9Dlp4WWP49cUg=;
+        b=gss3vxJMr/2dJoI/RNpK8oQv83HmbhpZA+qm2gDslEglVU/tfgtcvRmam5zZoe/EmqBi1T
+        a88m7Z9LmcxMnT50qiX+hj01MVIhhDVzFa4CE14HbdLBAYU0wal6p5QLZeLD540UpZ1EQG
+        xEBFFFSjHiNnOJOzE/PIvZ30D7tMjMw=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-274-UR9QrfBtPriAD0KWSC15vQ-1; Fri, 05 Nov 2021 05:08:16 -0400
+X-MC-Unique: UR9QrfBtPriAD0KWSC15vQ-1
+Received: by mail-wr1-f69.google.com with SMTP id q17-20020adfcd91000000b0017bcb12ad4fso2088174wrj.12
+        for <kvm@vger.kernel.org>; Fri, 05 Nov 2021 02:08:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=ILMiQoA9N1ZZHarQUH3yJ1BzVlW0gt9hlPE7t59A3Pw=;
-        b=dafIw57mRQEPO1xCod5u9afiqDwh8tyJ6NnOa/YM/M+6FLJ6UGVKacWaTxGCw01VfX
-         KVs95YVYDplnRW3GYxdzzzFohcAoS6r8wxkbQlyC923NZ/lLiKEgpHCQivgrkSXaCTb6
-         vcFhlap23OOqT0gE7Erj5wQX/DnwPkURtHob9SzmK8Zt+myUDysCAdAWbJFd4UOjw645
-         xGsOv7odIEm1Hnd/B/3wudeXBqjrWS0MI1duxOrH33Wpm1sIchjAD3eC3u60C/umdHKn
-         NJWAfU8Mb7AImJO+z/LbkfirL0xW/1VVofZn0i1rVvKWnUMw1JRJbbzUC93tVa29J1p1
-         RTlg==
-X-Gm-Message-State: AOAM532gKZC0W8E+QA0ikmHnQRpG8WAM5VgiSG1EByMmbXVeOhyT45bC
-        BIkkOn9ieQibztiv8SSnLt/kimlzURjPvZyZ2ggES13Z9Dd5Sqw6EgkylziVn77RHl2rrNjpg8d
-        YuBo36fQMUKc4
-X-Received: by 2002:adf:bd8a:: with SMTP id l10mr71441136wrh.159.1636101894215;
-        Fri, 05 Nov 2021 01:44:54 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwUYl+88kzXLPjQo33rtPM4xQCktiHkNFHkzUCA5+RxLTr+Hy/vtCp1QgFxmdJaBTKvgNy6Eg==
-X-Received: by 2002:adf:bd8a:: with SMTP id l10mr71441108wrh.159.1636101894003;
-        Fri, 05 Nov 2021 01:44:54 -0700 (PDT)
-Received: from [192.168.43.15] (93-33-2-31.ip42.fastwebnet.it. [93.33.2.31])
-        by smtp.gmail.com with ESMTPSA id h7sm7103976wrt.64.2021.11.05.01.44.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 05 Nov 2021 01:44:53 -0700 (PDT)
-Message-ID: <c9bd3bca-f901-d8db-c23d-5292ab7bd247@redhat.com>
-Date:   Fri, 5 Nov 2021 09:44:14 +0100
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=9RnbKgFe+rSKHY36srJ1aoAiwQRKbM9Dlp4WWP49cUg=;
+        b=gjuHJfh0b4uEQjH+/RW9ug19cvEy0DoMPKnfgvrT8QQIF1CtSbWUwSEEtVAcWgr63V
+         41fdqezxwMtTwAeZl47PN6XzKvdc77J8UU39OyTN4zDu25gCaUXQ8Fd2dCmAyQOOauTs
+         N5FeYX5vo0qepACNCxNF6onBIhO9DvupwPSTSdZWC3KpsEm/FUMdpAHSJCU/Lv4Mi00D
+         bzGinb5Z3bQqQfGmlTVJazNQ2N8bBv1m6junu9LH2JdsUAqwjqUQ0GAx/LQ6xGRxDQ0/
+         JankxXbzOPbqeEfNtn6HaBW/Wwsjyk4CpFwTdBeP+gZOdsT5ouK3/8ePIooG4AKDVSaS
+         gQyw==
+X-Gm-Message-State: AOAM530uHnaOG3QWYszzLKAaWFgiuMW7ZCj1Ze2ttS6RuG1mO4UCcjM3
+        k3zijR3imhbvFBUplkpen+rmrO4Tq6tUgLHRkFPv5uEZt1PxDHLLV7H2VY0gvpqAhlmKJa/o3u4
+        v0wLBE6wA7qOS
+X-Received: by 2002:a5d:598c:: with SMTP id n12mr51878496wri.250.1636103295105;
+        Fri, 05 Nov 2021 02:08:15 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwTJqYEZVPBgYpfgpO+zjGDBDWDUvmpjmRZWzpVkG2YSDJV3pF23+CjRwaf+lnNOZKHr5wxfg==
+X-Received: by 2002:a5d:598c:: with SMTP id n12mr51878468wri.250.1636103294840;
+        Fri, 05 Nov 2021 02:08:14 -0700 (PDT)
+Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id r10sm7605990wrl.92.2021.11.05.02.08.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Nov 2021 02:08:14 -0700 (PDT)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Li RongQing <lirongqing@baidu.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        lirongqing@baidu.com
+Subject: Re: [PATCH] KVM: x86: disable pv eoi if guest gives a wrong address
+In-Reply-To: <1636078404-48617-1-git-send-email-lirongqing@baidu.com>
+References: <1636078404-48617-1-git-send-email-lirongqing@baidu.com>
+Date:   Fri, 05 Nov 2021 10:08:13 +0100
+Message-ID: <87v917km0y.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: RFC: KVM: x86/mmu: Eager Page Splitting
-Content-Language: en-US
-To:     David Matlack <dmatlack@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>, Ben Gardon <bgardon@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Harish Barathvajasankar <hbarath@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>
-References: <CALzav=dV_U4r1K9oDq4esb4mpBQDQ2ROQ5zH5wV3KpOaZrRW-A@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <CALzav=dV_U4r1K9oDq4esb4mpBQDQ2ROQ5zH5wV3KpOaZrRW-A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/4/21 23:45, David Matlack wrote:
-> The goal of this RFC is to get feedback on "Eager Page Splitting",
-> an optimization that has been in use in Google Cloud since 2016 to 
-> reduce the performance impact of live migration on customer 
-> workloads. We wanted to get feedback on the feature before delving 
-> too far into porting it to the latest upstream kernel for submission.
-> If there is interest in adding this feature to KVM we plan to follow
-> up in the coming months with patches.
+Li RongQing <lirongqing@baidu.com> writes:
 
-Hi David!
+> disable pv eoi if guest gives a wrong address, this can reduces
+> the attacked possibility for a malicious guest, and can avoid
+> unnecessary write/read pv eoi memory
+>
+> Signed-off-by: Li RongQing <lirongqing@baidu.com>
+> ---
+>  arch/x86/kvm/lapic.c |    9 ++++++++-
+>  1 files changed, 8 insertions(+), 1 deletions(-)
+>
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index b1de23e..0f37a8d 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -2853,6 +2853,7 @@ int kvm_lapic_enable_pv_eoi(struct kvm_vcpu *vcpu, u64 data, unsigned long len)
+>  	u64 addr = data & ~KVM_MSR_ENABLED;
+>  	struct gfn_to_hva_cache *ghc = &vcpu->arch.pv_eoi.data;
+>  	unsigned long new_len;
+> +	int ret;
+>  
+>  	if (!IS_ALIGNED(addr, 4))
+>  		return 1;
+> @@ -2866,7 +2867,13 @@ int kvm_lapic_enable_pv_eoi(struct kvm_vcpu *vcpu, u64 data, unsigned long len)
+>  	else
+>  		new_len = len;
+>  
+> -	return kvm_gfn_to_hva_cache_init(vcpu->kvm, ghc, addr, new_len);
+> +	ret = kvm_gfn_to_hva_cache_init(vcpu->kvm, ghc, addr, new_len);
+> +
+> +	if (ret && (vcpu->arch.pv_eoi.msr_val & KVM_MSR_ENABLED)) {
+> +		vcpu->arch.pv_eoi.msr_val &= ~KVM_MSR_ENABLED;
+> +		pr_warn_once("Disabled PV EOI during wrong address\n");
 
-I'm definitely interested in eager page splitting upstream, but with a
-twist: in order to limit the proliferation of knobs, I would rather
-enable it only when KVM_DIRTY_LOG_INITIALLY_SET is set, and do the split
-on the first KVM_CLEAR_DIRTY_LOG ioctl.
+Personally, I see little value in this message: it's not easy to say
+which particular guest triggered it so it's unclear what system
+administrator is supposed to do upon seeing this message. 
 
-Initially-all-set does not require write protection when dirty logging
-is enabled; instead, it delays write protection to the first
-KVM_CLEAR_DIRTY_LOG.  In fact, I believe that eager page splitting can
-be enabled unconditionally for initial-all-set.  You would still have
-the benefit of moving the page splitting out of the vCPU run
-path; and because you can smear the cost of splitting over multiple
-calls, most of the disadvantages go away.
+Also, while on it, I think kvm_lapic_enable_pv_eoi() is misnamed: it is
+also used for *disabling* PV EOI.
 
-Initially-all-set is already the best-performing method for bitmap-based
-dirty page tracking, so it makes sense to focus on it.  Even if Google
-might not be using initial-all-set internally, adding eager page
-splitting to the upstream code would remove most of the delta related to
-it.  The rest of the delta can be tackled later; I'm not super
-interested in adding eager page splitting for the older methods (clear
-on KVM_GET_DIRTY_LOG, and manual-clear without initially-all-set), but
-it should be useful for the ring buffer method and that *should* share
-most of the code with the older methods.
+Instead of dropping KVM_MSR_ENABLED bit, I'd suggest we only set
+vcpu->arch.pv_eoi.msr_val in case of success. In case
+kvm_gfn_to_hva_cache_init() fails, we inject #GP so it's reasonable to
+expect that MSR's value didn't change.
 
-> In order to avoid allocating while holding the MMU lock, vCPUs 
-> preallocate everything they need to handle the fault and store it in 
-> kvm_mmu_memory_cache structs. Eager Page Splitting does the same 
-> thing but since it runs outside of a vCPU thread it needs its own 
-> copies of kvm_mmu_memory_cache structs. This requires refactoring the
-> way kvm_mmu_memory_cache structs are passed around in the MMU code
-> and adding kvm_mmu_memory_cache structs to kvm_arch.
+Completely untested:
 
-That's okay, we can move more arguments to structs if needed in the same
-was as struct kvm_page_fault; or we can use kvm_get_running_vcpu() if
-it's easier or more appropriate.
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index 1cdcf3ad5684..9fe5e2a2df25 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -1472,7 +1472,7 @@ static int kvm_hv_set_msr(struct kvm_vcpu *vcpu, u32 msr, u64 data, bool host)
+ 
+ 		if (!(data & HV_X64_MSR_VP_ASSIST_PAGE_ENABLE)) {
+ 			hv_vcpu->hv_vapic = data;
+-			if (kvm_lapic_enable_pv_eoi(vcpu, 0, 0))
++			if (kvm_lapic_set_pv_eoi(vcpu, 0, 0))
+ 				return 1;
+ 			break;
+ 		}
+@@ -1490,9 +1490,9 @@ static int kvm_hv_set_msr(struct kvm_vcpu *vcpu, u32 msr, u64 data, bool host)
+ 			return 1;
+ 		hv_vcpu->hv_vapic = data;
+ 		kvm_vcpu_mark_page_dirty(vcpu, gfn);
+-		if (kvm_lapic_enable_pv_eoi(vcpu,
+-					    gfn_to_gpa(gfn) | KVM_MSR_ENABLED,
+-					    sizeof(struct hv_vp_assist_page)))
++		if (kvm_lapic_set_pv_eoi(vcpu,
++					 gfn_to_gpa(gfn) | KVM_MSR_ENABLED,
++					 sizeof(struct hv_vp_assist_page)))
+ 			return 1;
+ 		break;
+ 	}
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 4da5db83736f..38b9cb26a81d 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -2851,25 +2851,31 @@ int kvm_hv_vapic_msr_read(struct kvm_vcpu *vcpu, u32 reg, u64 *data)
+ 	return 0;
+ }
+ 
+-int kvm_lapic_enable_pv_eoi(struct kvm_vcpu *vcpu, u64 data, unsigned long len)
++int kvm_lapic_set_pv_eoi(struct kvm_vcpu *vcpu, u64 data, unsigned long len)
+ {
+ 	u64 addr = data & ~KVM_MSR_ENABLED;
+ 	struct gfn_to_hva_cache *ghc = &vcpu->arch.pv_eoi.data;
+ 	unsigned long new_len;
++	int ret;
+ 
+ 	if (!IS_ALIGNED(addr, 4))
+ 		return 1;
+ 
+-	vcpu->arch.pv_eoi.msr_val = data;
+-	if (!pv_eoi_enabled(vcpu))
+-		return 0;
++	if (data & KVM_MSR_ENABLED) {
++		if (addr == ghc->gpa && len <= ghc->len)
++			new_len = ghc->len;
++		else
++			new_len = len;
+ 
+-	if (addr == ghc->gpa && len <= ghc->len)
+-		new_len = ghc->len;
+-	else
+-		new_len = len;
++		ret = kvm_gfn_to_hva_cache_init(vcpu->kvm, ghc, addr, new_len);
+ 
+-	return kvm_gfn_to_hva_cache_init(vcpu->kvm, ghc, addr, new_len);
++		if (ret)
++			return ret;
++	}
++
++	vcpu->arch.pv_eoi.msr_val = data;
++
++	return 0;
+ }
+ 
+ int kvm_apic_accept_events(struct kvm_vcpu *vcpu)
+diff --git a/arch/x86/kvm/lapic.h b/arch/x86/kvm/lapic.h
+index d7c25d0c1354..2b44e533fc8d 100644
+--- a/arch/x86/kvm/lapic.h
++++ b/arch/x86/kvm/lapic.h
+@@ -127,7 +127,7 @@ int kvm_x2apic_msr_read(struct kvm_vcpu *vcpu, u32 msr, u64 *data);
+ int kvm_hv_vapic_msr_write(struct kvm_vcpu *vcpu, u32 msr, u64 data);
+ int kvm_hv_vapic_msr_read(struct kvm_vcpu *vcpu, u32 msr, u64 *data);
+ 
+-int kvm_lapic_enable_pv_eoi(struct kvm_vcpu *vcpu, u64 data, unsigned long len);
++int kvm_lapic_set_pv_eoi(struct kvm_vcpu *vcpu, u64 data, unsigned long len);
+ void kvm_lapic_exit(void);
+ 
+ #define VEC_POS(v) ((v) & (32 - 1))
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index dccf927baa4d..7d9bc8c185da 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3517,7 +3517,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		if (!guest_pv_has(vcpu, KVM_FEATURE_PV_EOI))
+ 			return 1;
+ 
+-		if (kvm_lapic_enable_pv_eoi(vcpu, data, sizeof(u8)))
++		if (kvm_lapic_set_pv_eoi(vcpu, data, sizeof(u8)))
+ 			return 1;
+ 		break;
+ 
 
-> * Increases the duration of the VM ioctls that enable dirty logging. 
-> This does not affect customer performance but may have unintended 
-> consequences depending on how userspace invokes the ioctl. For 
-> example, eagerly splitting a 1.5TB memslot takes 30 seconds.
+> +	}
+> +	return ret;
+>  }
+>  
+>  int kvm_apic_accept_events(struct kvm_vcpu *vcpu)
 
-This issue goes away (or becomes easier to manage) if it's done in
-KVM_CLEAR_DIRTY_LOG.
-
-> "RFC: Split EPT huge pages in advance of dirty logging" [1] was a 
-> previous proposal to proactively split large pages off of the vCPU 
-> threads. However it required faulting in every page in the migration 
-> thread, a vCPU-like thread in QEMU, which requires extra userspace 
-> support and also is less efficient since it requires faulting.
-
-Yeah, this is best done on the kernel side.
-
-> The last alternative is to perform dirty tracking at a 2M 
-> granularity. This would reduce the amount of splitting work required
->  by 512x, making the current approach of splitting on fault less 
-> impactful to customer performance. We are in the early stages of 
-> investigating 2M dirty tracking internally but it will be a while 
-> before it is proven and ready for production. Furthermore there may 
-> be scenarios where dirty tracking at 4K would be preferable to reduce
-> the amount of memory that needs to be demand-faulted during precopy.
-
-Granularity of dirty tracking is somewhat orthogonal to this anyway,
-since you'd have to split 1G pages down to 2M.  So please let me know if
-you're okay with the above twist, and let's go ahead with the plan!
-
-Paolo
+-- 
+Vitaly
 
