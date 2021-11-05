@@ -2,115 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 31E64446972
-	for <lists+kvm@lfdr.de>; Fri,  5 Nov 2021 21:12:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0553A446991
+	for <lists+kvm@lfdr.de>; Fri,  5 Nov 2021 21:21:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233375AbhKEUO5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Nov 2021 16:14:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48672 "EHLO
+        id S233394AbhKEUXn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Nov 2021 16:23:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233226AbhKEUO5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Nov 2021 16:14:57 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 669EEC061714
-        for <kvm@vger.kernel.org>; Fri,  5 Nov 2021 13:12:17 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id u17so11720995plg.9
-        for <kvm@vger.kernel.org>; Fri, 05 Nov 2021 13:12:17 -0700 (PDT)
+        with ESMTP id S233369AbhKEUXm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Nov 2021 16:23:42 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B279C061714
+        for <kvm@vger.kernel.org>; Fri,  5 Nov 2021 13:21:03 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id z7-20020a63c047000000b0026b13e40309so6275724pgi.19
+        for <kvm@vger.kernel.org>; Fri, 05 Nov 2021 13:21:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=qri/F8nrhMHPEDYa4uQBt3JEMiHHv9C5/Jmdnno/6TE=;
-        b=cIEyP8aWcsIt4l1x4nbkEBmKTwuf4VKIqebtH0CamXLLrZvDTlRgHn6uwPaIY1qdYN
-         Fgiy/kNzJgL6/SmGcy37HITOWEPVyIdCiclDP5nOj+WydYi2O63mGY95RUeOrxL9PvWh
-         Gfm1SPQHjJDMZsGGN4DcnnN4SM2ODaCqT/kJ/VZE7yvR3zhk2fJEFqV9YFGRTqZ+jsnj
-         Pgh/W1HeccTmRVlizmn2ItiqkKcXfVUFRASIjGOCbR0SyLm177P2qgIaXEww6aWSnQar
-         T5v/4lUFkU6kuCFZ6hk4p9nBXBYb6gEsGdXh01NXvay8YV3v3E29TKauFH/h+FbOOdHd
-         GGHw==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=Acm3W6P3G/EKd5a5NgXSPpEvbFfzMcEulYRpGh5d/Kc=;
+        b=ivqyKZgTMEo22zPYPKqteHurvQuSZtZSidzo6GgjraHdzq8feXyMdYI5EmaUCdXw4y
+         TX/v+Xb42NNZdIawcLR4BAdIn8Tgv6K8UAKFiJU2kwpVwoyMNUHVIW/5W3gfwqFjOnsH
+         H8W0j64A19LJ10gm8AyaXK2ikIWUDgrwdzN9yHgNFPZBJ5jeDvu0Srx1idUDVURgwNhC
+         Efls524i5owz8PpZKQcYia7tn/Vz2xXzr7Wzvc4UI4SW2VFzi4xmhU/ngCZuzE9RsFtR
+         ug8ItAYwO3EDAfcY8SMJTebU0YQ5eK+1E55ktO5fuLPL1lZf9zaPtV6PnFuTXaheXlMO
+         40/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=qri/F8nrhMHPEDYa4uQBt3JEMiHHv9C5/Jmdnno/6TE=;
-        b=T0rYbnrVdZYPaAj7zJrDVhZnwba9SDOSoKf4inoA26THUpOVZTHT8fERlP7/vwdKri
-         /5sRfiRkxBnG3VfT1iRk6hv7FA7WcFg5vJ8D6G1hD/Ytb2H1wnWsmlv61xqW744hqz+N
-         iVPEAhLfCCaK7LshdKKI7p7C1IMBFxnir3K4ye3QVP3eyOp8bnxnPXh0ONb83nSlYiJu
-         ryRkhbMsK7IxyYHGIju0tHpPy8fVfUZEEacrelayfZos4jMOrFhB1Sc7XFkshU1V8xwz
-         3De+kw4qAG3sysUl/NFF0FRozfEo/A2krUA3NZEDW9Sf5cDxeK+UXZPBmaDmqsQviDux
-         nwTw==
-X-Gm-Message-State: AOAM532HEpjY3Amb05GMRlJsWeYiuMmcvwLCvzvD5+eWjoEblHqOyuB0
-        bpxMeXJkQYxsDh5cU4VHmyjnl/2lXDKGiw==
-X-Google-Smtp-Source: ABdhPJw8Bn6P+IE+Qzeo9KqPziiJGvYCB1J6tl8vP7MYz520ZFYD+Cv/5edLbN+g+nahR9ZSMbCUMA==
-X-Received: by 2002:a17:902:758b:b0:13e:8b1:e49f with SMTP id j11-20020a170902758b00b0013e08b1e49fmr53627978pll.6.1636143136683;
-        Fri, 05 Nov 2021 13:12:16 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id a20sm7760762pff.57.2021.11.05.13.12.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Nov 2021 13:12:16 -0700 (PDT)
-Date:   Fri, 5 Nov 2021 20:12:12 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvm@vger.kernel.org, linux-mips@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, linuxppc-dev@lists.ozlabs.org,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup.patel@wdc.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Juergen Gross <jgross@suse.com>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        kernel-team@android.com
-Subject: Re: [PATCH 1/5] KVM: Move wiping of the kvm->vcpus array to common
- code
-Message-ID: <YYWQHBwD4nBLo9qi@google.com>
-References: <20211105192101.3862492-1-maz@kernel.org>
- <20211105192101.3862492-2-maz@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211105192101.3862492-2-maz@kernel.org>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=Acm3W6P3G/EKd5a5NgXSPpEvbFfzMcEulYRpGh5d/Kc=;
+        b=bI9GRWgUBBXqRiippuS9GgmgEe5iyErohwYknw+7P/goiz9BV8uNNmBuQN90rD4dYp
+         KrQEoTOFEkiahngO2c/XcUyAMM20WNkBZ23BloOXEuAMXPyAI4a1xNwLyreHVLXB3K8n
+         D8lKTAgeC68IUDRtPu4dLMYLPkgmTKGsO6PnIKEqBP4Q6Stj9P3mGTk+FfIhO7LmQXKk
+         lOolNUzb4U2laYNsONjtqhsLDKFxvXGrDM42QcBbb6MossxwQG83s5GiE8/htXBQyUiU
+         IL5Sx0SlDus0XzylgLXJE2iYM1z7hWEukmIIPM2+r+AFGHiOkRTK7YOalizoruWcoKTH
+         /+Wg==
+X-Gm-Message-State: AOAM532g2iqG3UMt1kqWPcOpI+rJ2nCNuvYlIJpwxg80N8DF2Ov6J2Ea
+        1sMOHIQu0HvoY/9XJCnJS+jncA7j06bb8DbNi5/Y26l943iUnoma53AXo9zXu7eAhAyElJ8Vr0b
+        NMoZcaPoILLvHGYA/y9h+NfEAa7z2xA6cDLVtkmYWLcyZJS9I6gWB81xF/wV5leQ=
+X-Google-Smtp-Source: ABdhPJyTdszcOBhaBOrIzsEnShqafG/guabOXth81uwRD0ZWeOsTZ6WYQj2Hqi+QyYkC1+Pv3paFi7rBOqu/UA==
+X-Received: from tortoise.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1a0d])
+ (user=jmattson job=sendgmr) by 2002:a17:902:a70a:b0:140:44f9:6d75 with SMTP
+ id w10-20020a170902a70a00b0014044f96d75mr52715330plq.58.1636143662392; Fri,
+ 05 Nov 2021 13:21:02 -0700 (PDT)
+Date:   Fri,  5 Nov 2021 13:20:58 -0700
+Message-Id: <20211105202058.1048757-1-jmattson@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.34.0.rc0.344.g81b53c2807-goog
+Subject: [PATCH v2] kvm: x86: Convert return type of *is_valid_rdpmc_ecx() to bool
+From:   Jim Mattson <jmattson@google.com>
+To:     kvm@vger.kernel.org, pbonzini@redhat.com
+Cc:     Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 05, 2021, Marc Zyngier wrote:
-> All architectures have similar loops iterating over the vcpus,
-> freeing one vcpu at a time, and eventually wiping the reference
-> off the vcpus array. They are also inconsistently taking
-> the kvm->lock mutex when wiping the references from the array.
+These function names sound like predicates, and they have siblings,
+*is_valid_msr(), which _are_ predicates. Moreover, there are comments
+that essentially warn that these functions behave unexpectedly.
 
-...
+Flip the polarity of the return values, so that they become
+predicates, and convert the boolean result to a success/failure code
+at the outer call site.
 
-> +void kvm_destroy_vcpus(struct kvm *kvm)
-> +{
-> +	unsigned int i;
-> +	struct kvm_vcpu *vcpu;
-> +
-> +	kvm_for_each_vcpu(i, vcpu, kvm)
-> +		kvm_vcpu_destroy(vcpu);
-> +
-> +	mutex_lock(&kvm->lock);
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Jim Mattson <jmattson@google.com>
+Reviewed-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/pmu.c           | 2 +-
+ arch/x86/kvm/pmu.h           | 4 ++--
+ arch/x86/kvm/svm/pmu.c       | 5 ++---
+ arch/x86/kvm/vmx/pmu_intel.c | 7 +++----
+ arch/x86/kvm/x86.c           | 4 +++-
+ 5 files changed, 11 insertions(+), 11 deletions(-)
 
-But why is kvm->lock taken here?  Unless I'm overlooking an arch, everyone calls
-this from kvm_arch_destroy_vm(), in which case this is the only remaining reference
-to @kvm.  And if there's some magic path for which that's not true, I don't see how
-it can possibly be safe to call kvm_vcpu_destroy() without holding kvm->lock, or
-how this would guarantee that all vCPUs have actually been destroyed before nullifying
-the array.
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index 0772bad9165c..09873f6488f7 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -319,7 +319,7 @@ void kvm_pmu_handle_event(struct kvm_vcpu *vcpu)
+ }
+ 
+ /* check if idx is a valid index to access PMU */
+-int kvm_pmu_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
++bool kvm_pmu_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
+ {
+ 	return kvm_x86_ops.pmu_ops->is_valid_rdpmc_ecx(vcpu, idx);
+ }
+diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+index 0e4f2b1fa9fb..59d6b76203d5 100644
+--- a/arch/x86/kvm/pmu.h
++++ b/arch/x86/kvm/pmu.h
+@@ -32,7 +32,7 @@ struct kvm_pmu_ops {
+ 	struct kvm_pmc *(*rdpmc_ecx_to_pmc)(struct kvm_vcpu *vcpu,
+ 		unsigned int idx, u64 *mask);
+ 	struct kvm_pmc *(*msr_idx_to_pmc)(struct kvm_vcpu *vcpu, u32 msr);
+-	int (*is_valid_rdpmc_ecx)(struct kvm_vcpu *vcpu, unsigned int idx);
++	bool (*is_valid_rdpmc_ecx)(struct kvm_vcpu *vcpu, unsigned int idx);
+ 	bool (*is_valid_msr)(struct kvm_vcpu *vcpu, u32 msr);
+ 	int (*get_msr)(struct kvm_vcpu *vcpu, struct msr_data *msr_info);
+ 	int (*set_msr)(struct kvm_vcpu *vcpu, struct msr_data *msr_info);
+@@ -149,7 +149,7 @@ void reprogram_counter(struct kvm_pmu *pmu, int pmc_idx);
+ void kvm_pmu_deliver_pmi(struct kvm_vcpu *vcpu);
+ void kvm_pmu_handle_event(struct kvm_vcpu *vcpu);
+ int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned pmc, u64 *data);
+-int kvm_pmu_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx);
++bool kvm_pmu_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx);
+ bool kvm_pmu_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr);
+ int kvm_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info);
+ int kvm_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info);
+diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
+index fdf587f19c5f..871c426ec389 100644
+--- a/arch/x86/kvm/svm/pmu.c
++++ b/arch/x86/kvm/svm/pmu.c
+@@ -181,14 +181,13 @@ static struct kvm_pmc *amd_pmc_idx_to_pmc(struct kvm_pmu *pmu, int pmc_idx)
+ 	return get_gp_pmc_amd(pmu, base + pmc_idx, PMU_TYPE_COUNTER);
+ }
+ 
+-/* returns 0 if idx's corresponding MSR exists; otherwise returns 1. */
+-static int amd_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
++static bool amd_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
+ {
+ 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+ 
+ 	idx &= ~(3u << 30);
+ 
+-	return (idx >= pmu->nr_arch_gp_counters);
++	return idx < pmu->nr_arch_gp_counters;
+ }
+ 
+ /* idx is the ECX register of RDPMC instruction */
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index b8e0d21b7c8a..1b7456b2177b 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -118,16 +118,15 @@ static struct kvm_pmc *intel_pmc_idx_to_pmc(struct kvm_pmu *pmu, int pmc_idx)
+ 	}
+ }
+ 
+-/* returns 0 if idx's corresponding MSR exists; otherwise returns 1. */
+-static int intel_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
++static bool intel_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
+ {
+ 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+ 	bool fixed = idx & (1u << 30);
+ 
+ 	idx &= ~(3u << 30);
+ 
+-	return (!fixed && idx >= pmu->nr_arch_gp_counters) ||
+-		(fixed && idx >= pmu->nr_arch_fixed_counters);
++	return fixed ? idx < pmu->nr_arch_fixed_counters
++		     : idx < pmu->nr_arch_gp_counters;
+ }
+ 
+ static struct kvm_pmc *intel_rdpmc_ecx_to_pmc(struct kvm_vcpu *vcpu,
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index c1c4e2b05a63..d7def720227d 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -7328,7 +7328,9 @@ static void emulator_set_smbase(struct x86_emulate_ctxt *ctxt, u64 smbase)
+ static int emulator_check_pmc(struct x86_emulate_ctxt *ctxt,
+ 			      u32 pmc)
+ {
+-	return kvm_pmu_is_valid_rdpmc_ecx(emul_to_vcpu(ctxt), pmc);
++	if (kvm_pmu_is_valid_rdpmc_ecx(emul_to_vcpu(ctxt), pmc))
++		return 0;
++	return -EINVAL;
+ }
+ 
+ static int emulator_read_pmc(struct x86_emulate_ctxt *ctxt,
+-- 
+2.34.0.rc0.344.g81b53c2807-goog
 
-> +	for (i = 0; i < atomic_read(&kvm->online_vcpus); i++)
-> +		kvm->vcpus[i] = NULL;
-> +
-> +	atomic_set(&kvm->online_vcpus, 0);
-> +	mutex_unlock(&kvm->lock);
-> +}
-> +EXPORT_SYMBOL_GPL(kvm_destroy_vcpus);
