@@ -2,175 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D9A0244632A
-	for <lists+kvm@lfdr.de>; Fri,  5 Nov 2021 13:08:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E30664463EC
+	for <lists+kvm@lfdr.de>; Fri,  5 Nov 2021 14:15:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232907AbhKEMLh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Nov 2021 08:11:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59872 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231927AbhKEMLg (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 5 Nov 2021 08:11:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636114136;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Z96ltttEMI7xDMFWWKjBYprOf7tFQRkGV8p2r4IJRn8=;
-        b=CNyGI3HuzEVcZFMXNzKc2RQK551FSq4GeQ3PMpC/q6tXBnd9TCBsj4McHGaQzayrWRtZ08
-        Ah9Xy+LuUjRiua4UeMZPBPRyqcCHM5zt3ATTbyq8aNpF1YTQ7PFSfem1vGNJPMCoDjriga
-        GNjlzRT4AMuTbnVEyk8t/kYA1Bp9+ao=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-379-eigThe6yMGmnVhdmZYtSsA-1; Fri, 05 Nov 2021 08:08:55 -0400
-X-MC-Unique: eigThe6yMGmnVhdmZYtSsA-1
-Received: by mail-wm1-f69.google.com with SMTP id o10-20020a05600c4fca00b0033312e1ed8bso513637wmq.2
-        for <kvm@vger.kernel.org>; Fri, 05 Nov 2021 05:08:55 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=Z96ltttEMI7xDMFWWKjBYprOf7tFQRkGV8p2r4IJRn8=;
-        b=htahiFMoDkHKBI+B9+9ljTm9uxSt4el3Nw/+/84DwiIgrB0NJl1IMN7xZHYRej7QSV
-         3yyPTgSZe/slN3awX8nA81KFFe3sYig6sOZe2/tH6qP+dwDki1hPP3UGCVWzuJknjKYy
-         nNF/FwXnCLiJexnRU8dw6L/HTHeBjuDui3b6xwULzOG1nsIasdQRVDqj8qRMYK3XxOdi
-         uvy16nwDpOoe1X88GnF6M1uX4gH9RGC3jZyWbg3KwUuVMWStUx1EfiTiLuqm7Ryzwrjr
-         4xTuvXNkgArRa5pmTt77QVhq8D1oz/zmok7yjYkNfp9wHRmbvyQe+gxTBmi7ETYAi4bA
-         xsKg==
-X-Gm-Message-State: AOAM532qagumNG6m1nR9WTt7TyP+mo0PECLtYw+FYjvrXazoxhfmV4y3
-        UtBXOMtzKHHvadvWrayZUABWpcv/IsllzQSPdVZ1+ZIWnZNpB55CozBVvoUCfMbpq5N/SSVIaJl
-        RM1QXRxiLaWHG
-X-Received: by 2002:a7b:ca4c:: with SMTP id m12mr27584562wml.119.1636114133440;
-        Fri, 05 Nov 2021 05:08:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwiI8uK5l1z6MEdD2zH8CJe0sZv403aDV4qAB5NUTSetjGcYY165o55UgPye3ySTHuKBhLE2Q==
-X-Received: by 2002:a7b:ca4c:: with SMTP id m12mr27584466wml.119.1636114132643;
-        Fri, 05 Nov 2021 05:08:52 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id f18sm7751308wre.7.2021.11.05.05.08.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Nov 2021 05:08:52 -0700 (PDT)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 4/4] KVM: nVMX: Implement Enlightened MSR Bitmap feature
-In-Reply-To: <YYSEYY4h6NN7FGbR@google.com>
-References: <20211013142258.1738415-1-vkuznets@redhat.com>
- <20211013142258.1738415-5-vkuznets@redhat.com>
- <YYSEYY4h6NN7FGbR@google.com>
-Date:   Fri, 05 Nov 2021 13:08:51 +0100
-Message-ID: <8735oals8c.fsf@vitty.brq.redhat.com>
+        id S232718AbhKENSD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Nov 2021 09:18:03 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:7516 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231149AbhKENR4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 5 Nov 2021 09:17:56 -0400
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1A5CW7a0027897;
+        Fri, 5 Nov 2021 13:15:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : from : to : cc
+ : references : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=P40BYvr21zMMRQqDpp9OB7z7Xr5NMjDkrx+CF3Uv6gc=;
+ b=gp3sStFTpo9yzE0lR9BHoAiFSI04GNPgt32OpP2gjzI2oBSHvpyCurVGf1326KLLzXSp
+ 5WsfqmjhcWgrcaIpU4Mbk7r/GqOwLOXy2uMT3KioLq6iMfTHjnmXqk3vT3qBwspKka33
+ Zdn3RhJ1DbowIVqC5XC+WKh+apAlSRnLHASJc644AcSG+qhwT3716ee2fPe1X5ZpyNba
+ 6EbGPk5Z8GxEcNHa8d/XDmu+QIm7cgLN/4kyxIIRLVDjEvhydFbyp2gx7Xz77lbn6n23
+ d9SkSZk+wgJd7Uetzn6Ct/EWAXIRru2Kk55WDGMVglUO35dh4YMv9ilca73fLZFPKuK3 qA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3c4xuhyv34-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 05 Nov 2021 13:15:15 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1A5CZSoY015709;
+        Fri, 5 Nov 2021 13:15:14 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3c4xuhyv1y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 05 Nov 2021 13:15:14 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1A5D7V8N013147;
+        Fri, 5 Nov 2021 13:15:11 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma03fra.de.ibm.com with ESMTP id 3c4t4fmg4g-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 05 Nov 2021 13:15:11 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1A5DF8fF9896262
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 5 Nov 2021 13:15:08 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 86C6B4C059;
+        Fri,  5 Nov 2021 13:15:08 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2CB334C05E;
+        Fri,  5 Nov 2021 13:15:08 +0000 (GMT)
+Received: from funtu.home (unknown [9.145.42.227])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri,  5 Nov 2021 13:15:08 +0000 (GMT)
+Subject: Re: [PATCH v17 14/15] s390/ap: notify drivers on config changed and
+ scan complete callbacks
+From:   Harald Freudenberger <freude@linux.ibm.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     jjherne@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
+        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com
+References: <20211021152332.70455-1-akrowiak@linux.ibm.com>
+ <20211021152332.70455-15-akrowiak@linux.ibm.com>
+ <11b72236-34fe-4d65-0da1-033050c75a87@linux.ibm.com>
+ <77a4b43b-940e-0321-9ebf-3249a8d8513a@linux.ibm.com>
+ <bb676730-a1b1-3bbe-116e-7d20ab6e8a58@linux.ibm.com>
+Message-ID: <559ed7e4-d36a-4145-7fe4-eefba3484901@linux.ibm.com>
+Date:   Fri, 5 Nov 2021 14:15:08 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <bb676730-a1b1-3bbe-116e-7d20ab6e8a58@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: IKXFbpc20EQOI-4hNWJEHM-AgUX_1ywM
+X-Proofpoint-ORIG-GUID: 2yR4bwplzqZ9x2P7bWo0BWk3GUk7j2er
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
+ definitions=2021-11-05_02,2021-11-03_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
+ bulkscore=0 clxscore=1015 malwarescore=0 spamscore=0 lowpriorityscore=0
+ phishscore=0 adultscore=0 impostorscore=0 mlxlogscore=999
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2111050076
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
-
-> On Wed, Oct 13, 2021, Vitaly Kuznetsov wrote:
->> Updating MSR bitmap for L2 is not cheap and rearly needed. TLFS for Hyper-V
->> offers 'Enlightened MSR Bitmap' feature which allows L1 hypervisor to
->> inform L0 when it changes MSR bitmap, this eliminates the need to examine
->> L1's MSR bitmap for L2 every time when 'real' MSR bitmap for L2 gets
->> constructed.
->> 
->> Use 'vmx->nested.msr_bitmap_changed' flag to implement the feature.
->> 
->> Note, KVM already uses 'Enlightened MSR bitmap' feature when it runs as a
->> nested hypervisor on top of Hyper-V. The newly introduced feature is going
->> to be used by Hyper-V guests on KVM.
->> 
->> When the feature is enabled for Win10+WSL2, it shaves off around 700 CPU
->> cycles from a nested vmexit cost (tight cpuid loop test).
->> 
->> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> ---
->>  arch/x86/kvm/hyperv.c     |  2 ++
->>  arch/x86/kvm/vmx/nested.c | 20 ++++++++++++++++++--
->>  2 files changed, 20 insertions(+), 2 deletions(-)
->> 
->> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
->> index 6f11cda2bfa4..a00de1dbec57 100644
->> --- a/arch/x86/kvm/hyperv.c
->> +++ b/arch/x86/kvm/hyperv.c
->> @@ -2516,6 +2516,8 @@ int kvm_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
->>  
->>  		case HYPERV_CPUID_NESTED_FEATURES:
->>  			ent->eax = evmcs_ver;
->> +			if (evmcs_ver)
->> +				ent->eax |= HV_X64_NESTED_MSR_BITMAP;
->>  
->>  			break;
->>  
->> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
->> index bf4fa63ed371..7cd0c20d4557 100644
->> --- a/arch/x86/kvm/vmx/nested.c
->> +++ b/arch/x86/kvm/vmx/nested.c
->> @@ -608,15 +608,30 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
->>  						 struct vmcs12 *vmcs12)
->>  {
->>  	int msr;
->> +	struct vcpu_vmx *vmx = to_vmx(vcpu);
->>  	unsigned long *msr_bitmap_l1;
->> -	unsigned long *msr_bitmap_l0 = to_vmx(vcpu)->nested.vmcs02.msr_bitmap;
->> -	struct kvm_host_map *map = &to_vmx(vcpu)->nested.msr_bitmap_map;
->> +	unsigned long *msr_bitmap_l0 = vmx->nested.vmcs02.msr_bitmap;
->> +	struct hv_enlightened_vmcs *evmcs = vmx->nested.hv_evmcs;
->> +	struct kvm_host_map *map = &vmx->nested.msr_bitmap_map;
->
-> That reminds me, can my nested bitmap fixes get merged?  Superficial conflicts,
-> but still conflicts that I'd rather not have to resolve :-)
->
-> https://lkml.kernel.org/r/20210924204907.1111817-1-seanjc@google.com
->
-
-From my side I can suggest to combine these two series in v4)
-
->>  
->>  	/* Nothing to do if the MSR bitmap is not in use.  */
->>  	if (!cpu_has_vmx_msr_bitmap() ||
->>  	    !nested_cpu_has(vmcs12, CPU_BASED_USE_MSR_BITMAPS))
->>  		return false;
->>  
->> +	/*
->> +	 * MSR bitmap update can be skipped when:
->> +	 * - MSR bitmap for L1 hasn't changed.
->> +	 * - Nested hypervisor (L1) is attempting to launch the same L2 as
->> +	 *   before.
->> +	 * - Nested hypervisor (L1) has enabled 'Enlightened MSR Bitmap' feature
->> +	 *   and tells KVM (L0) there were no changes in MSR bitmap for L2.
->> +	 */
->> +	if (!vmx->nested.msr_bitmap_force_recalc && evmcs &&
->> +	    evmcs->hv_enlightenments_control.msr_bitmap &&
->> +	    evmcs->hv_clean_fields & HV_VMX_ENLIGHTENED_CLEAN_FIELD_MSR_BITMAP)
->> +		goto out_clear_msr_bitmap_force_recalc;
->
-> Huh?  Why clear it, it's already clear.  Any reason not to simply return true?
->
-
-No need indeed, will drop in v4.
-
->> +
->>  	if (kvm_vcpu_map(vcpu, gpa_to_gfn(vmcs12->msr_bitmap), map))
->>  		return false;
->>  
->> @@ -700,6 +715,7 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
->>  
->>  	kvm_vcpu_unmap(vcpu, &to_vmx(vcpu)->nested.msr_bitmap_map, false);
->>  
->> +out_clear_msr_bitmap_force_recalc:
->>  	vmx->nested.msr_bitmap_force_recalc = false;
->>  
->>  	return true;
->> -- 
->> 2.31.1
->> 
->
-
--- 
-Vitaly
-
+On 05.11.21 09:23, Harald Freudenberger wrote:
+> On 04.11.21 16:50, Tony Krowiak wrote:
+>>
+>> On 11/4/21 8:06 AM, Harald Freudenberger wrote:
+>>> Tony as this is v17, if you may do jet another loop, I would pick the ap parts of your patch series and
+>>> apply them to the devel branch as separate patches.
+>> Are you suggesting I do this now, or when this is finally ready to go upstream?
+>>
+>>
+> I am suggesting picking all the ap related stuff into one patch and commit it to the devel branch now (well in the next days).
+> So the ap stuff is then prepared for your patches and it gives your patch series some relief.
+Of course I would do this if you agree to this procedure.
