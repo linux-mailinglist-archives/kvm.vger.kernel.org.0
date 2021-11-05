@@ -2,172 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E304E4465E8
-	for <lists+kvm@lfdr.de>; Fri,  5 Nov 2021 16:40:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 22C90446666
+	for <lists+kvm@lfdr.de>; Fri,  5 Nov 2021 16:48:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231843AbhKEPmx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Nov 2021 11:42:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:33266 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231133AbhKEPmw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 5 Nov 2021 11:42:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636126812;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=oy5dLZ284BPxjfWFSZAw1huCzFf9EBGFoWcl998xsQY=;
-        b=Ii5k03UHQkb4SwFAeLTEL9mB00bsopr48zfCphFTf/s4w+RnPG0kYDFr9NoUiS5LEqHeLD
-        C1+HlNr7U7g7YyeOZhxp8J2LQb0m9+pw7CHPKVx2p79WbAKtyNOHVn+LnP+59BoXodZg7R
-        X+FmUx0WQQ6d7n8VjP8XbJ69B8JkwbE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-304-50unf0LYMwKFYaxfjWr_gg-1; Fri, 05 Nov 2021 11:40:09 -0400
-X-MC-Unique: 50unf0LYMwKFYaxfjWr_gg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C27421927803;
-        Fri,  5 Nov 2021 15:40:08 +0000 (UTC)
-Received: from starship (unknown [10.40.194.243])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4929679457;
-        Fri,  5 Nov 2021 15:39:51 +0000 (UTC)
-Message-ID: <e36298eaa7f6663a9afd5045a0ee02398f05dd1b.camel@redhat.com>
-Subject: Re: [PATCH v3 1/4] KVM: nVMX: Don't use Enlightened MSR Bitmap for
- L3
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        id S233654AbhKEPv3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Nov 2021 11:51:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45542 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229529AbhKEPv2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Nov 2021 11:51:28 -0400
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2815C061714
+        for <kvm@vger.kernel.org>; Fri,  5 Nov 2021 08:48:48 -0700 (PDT)
+Received: by mail-pg1-x52d.google.com with SMTP id p8so7383355pgh.11
+        for <kvm@vger.kernel.org>; Fri, 05 Nov 2021 08:48:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=BQvAChtGkGopxkASFYsDwmXZHmFC6+xDduRNBAB5e/o=;
+        b=thcOmkTShq9Bj+tVLe+cwd6h3zcbAFPcJkJmzQdKhBNgKCY0vYLnO4CWPof9vab67N
+         aPiQmqFs9U1sTyPYwAtbOcpQ9uQrua8mQHuNm2X2pcMfp9zzSEjuyqMNxm9BRNcZpK10
+         dTElB6AgVPcof8XDSgFPwjxa4XpeBuQVNbF2IH3OoyHYlOFMWnuN9x7Mre3fKmmVHSXy
+         gOKVS3HJ+EyZe7nnuQT72uASNAUyZvP3OGgzuS8Nm9x+2XSfq+mYj8tA/evJa8mSmNnS
+         +GvFivhfjdC5gr7ATBpR1XCdBRTNFOC92qcmnLfdSMi5s/NJiS1dDXekDmRiyqPAEgx7
+         jT7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=BQvAChtGkGopxkASFYsDwmXZHmFC6+xDduRNBAB5e/o=;
+        b=pdtlcwGyBSLlElBnuDe07GjRfezjNFsdW1KVC2bzOHcZLSCILOYTGdnv47/7rMUIk7
+         /riDh4BVETkIoeqPHY4jFDOgQhI+8c/c3dt/zsKRepvGu8/vsdvLESxCbWWLT3tc7kdi
+         AaOoU/Sf1nLjrsMr+H+oVOK7Dm3RkUaTXvgQXPiQqPkrWFzF5zs/zb3nBU2Gprq/n1Nf
+         0hXk/BszORnofFTRpoIf8NADylrA4so4hyQjgA73mui551ae9NBnaq7tFD6/duOSfEH/
+         QstU7J2dGwROOtrSSNJFsfcnOWfNedAVJmL8YkMj8IKtLLlnMXmmH3EVSTDjHTir51BU
+         +EWQ==
+X-Gm-Message-State: AOAM532RNghS6AP00BL9LYrTpEE2MykYGLfXxKXvtq22RulcVNl5PiY6
+        JY7aLNgEyO/7mUfe+GjRVaN6Zw==
+X-Google-Smtp-Source: ABdhPJwXas/ahUMjBO+7ij7kGm7PUrKGVTLhKaKoZjF9MnmCtV5p81sAuZ0C1I0ZWjOOHbbl7b3Bug==
+X-Received: by 2002:aa7:8883:0:b0:49f:9e4b:3047 with SMTP id z3-20020aa78883000000b0049f9e4b3047mr4187915pfe.48.1636127328031;
+        Fri, 05 Nov 2021 08:48:48 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id lw1sm10743182pjb.38.2021.11.05.08.48.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Nov 2021 08:48:47 -0700 (PDT)
+Date:   Fri, 5 Nov 2021 15:48:43 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
-Date:   Fri, 05 Nov 2021 17:39:50 +0200
-In-Reply-To: <8942e8892b1567354c7e3f3269c0c7baefb9d8c2.camel@redhat.com>
-References: <20211013142258.1738415-1-vkuznets@redhat.com>
-         <20211013142258.1738415-2-vkuznets@redhat.com>
-         <YYSAPotqLVIScunK@google.com>
-         <8942e8892b1567354c7e3f3269c0c7baefb9d8c2.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/3] KVM: x86: Introduce definitions to support static
+ calls for kvm_pmu_ops
+Message-ID: <YYVSW4Jr75oJ6MhC@google.com>
+References: <20211103070310.43380-1-likexu@tencent.com>
+ <20211103070310.43380-3-likexu@tencent.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211103070310.43380-3-likexu@tencent.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2021-11-05 at 17:38 +0200, Maxim Levitsky wrote:
-> On Fri, 2021-11-05 at 00:52 +0000, Sean Christopherson wrote:
-> > On Wed, Oct 13, 2021, Vitaly Kuznetsov wrote:
-> > > 3-level nesting is also not a very common setup nowadays.
-> > 
-> > Says who? :-D
-> 
-> I regularly test 4 level nesting :P
-> It's KVM all the way down.... 
+On Wed, Nov 03, 2021, Like Xu wrote:
+> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> index 0db1887137d9..b6f08c719125 100644
+> --- a/arch/x86/kvm/pmu.c
+> +++ b/arch/x86/kvm/pmu.c
+> @@ -50,6 +50,13 @@
+>  struct kvm_pmu_ops kvm_pmu_ops __read_mostly;
+>  EXPORT_SYMBOL_GPL(kvm_pmu_ops);
 >  
-> But jokes aside 3 level nesting will start to happen occasionally more and more often,
-> IMHO with windows guests which have accidently/or on purpose enabled HypoerV/Core isolation/WSL3 inside,
+> +#define	KVM_X86_PMU_OP(func)	\
+> +	DEFINE_STATIC_CALL_NULL(kvm_x86_pmu_##func,	\
+> +				*(((struct kvm_pmu_ops *)0)->func))
+> +#define	KVM_X86_PMU_OP_NULL	KVM_X86_PMU_OP
 
-*insert some joke about coffee here* 
+More of a question for the existing code, what's the point of KVM_X86_OP_NULL?
+AFAICT, it always resolves to KVM_X86_OP.  Unless there's some magic I'm missing,
+I vote we remove KVM_X86_OP_NULL and then not introduce KVM_X86_PMU_OP_NULL.
+And I'm pretty sure it's useless, e.g. get_cs_db_l_bits is defined with the NULL
+variant, but it's never NULL and its calls aren't guarded with anything.  And if
+KVM_X86_OP_NULL is intended to aid in documenting behavior, it's doing a pretty
+miserable job of that :-)
 
-I mean HyperV/Core Isolation/WSL2. There is no WSL3 yet :)
+> +#include <asm/kvm-x86-pmu-ops.h>
+> +EXPORT_STATIC_CALL_GPL(kvm_x86_pmu_is_valid_msr);
 
-Best regards,
-	Maxim Levitsky
-> and that are run nested on KVM.
+I'll double down on my nVMX suggestion so that this export can be avoided.
+
+>  static void kvm_pmi_trigger_fn(struct irq_work *irq_work)
+>  {
+>  	struct kvm_pmu *pmu = container_of(irq_work, struct kvm_pmu, irq_work);
+> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+> index b2fe135d395a..e5550d4acf14 100644
+> --- a/arch/x86/kvm/pmu.h
+> +++ b/arch/x86/kvm/pmu.h
+> @@ -3,6 +3,8 @@
+>  #define __KVM_X86_PMU_H
 >  
-> Just FYI. I have a patch series pending (reviews are welcome!) which implement nested vVMLOAD/vVMSAVE and
-> vGIF which allows L1 to use these optional SVM features to run its nested guests (that is L3s) faster.
-> (This series is the reason I was recently stress testing 3/4 level nesting. 
+>  #include <linux/nospec.h>
+> +#include <linux/static_call_types.h>
+> +#include <linux/static_call.h>
 >  
-> 4 levels usually work so slow that VM doesn't boot and timeouts in various systemd settings).
-> 3rd level works not that bad IMHO.
-> 
-> All that said I don't have any objections to the patch itself.
-> 
-> 
-> Best regards,
-> 	Maxim Levitsky
-> > > Don't enable 'Enlightened MSR Bitmap' feature for KVM's L2s (real L3s) for
-> > > now.
-> > > 
-> > > Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> > > Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > > ---
-> > >  arch/x86/kvm/vmx/vmx.c | 21 ++++++++++++---------
-> > >  1 file changed, 12 insertions(+), 9 deletions(-)
-> > > 
-> > > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > > index 1c8b2b6e7ed9..e82cdde58119 100644
-> > > --- a/arch/x86/kvm/vmx/vmx.c
-> > > +++ b/arch/x86/kvm/vmx/vmx.c
-> > > @@ -2655,15 +2655,6 @@ int alloc_loaded_vmcs(struct loaded_vmcs *loaded_vmcs)
-> > >  		if (!loaded_vmcs->msr_bitmap)
-> > >  			goto out_vmcs;
-> > >  		memset(loaded_vmcs->msr_bitmap, 0xff, PAGE_SIZE);
-> > > -
-> > > -		if (IS_ENABLED(CONFIG_HYPERV) &&
-> > > -		    static_branch_unlikely(&enable_evmcs) &&
-> > > -		    (ms_hyperv.nested_features & HV_X64_NESTED_MSR_BITMAP)) {
-> > > -			struct hv_enlightened_vmcs *evmcs =
-> > > -				(struct hv_enlightened_vmcs *)loaded_vmcs->vmcs;
-> > > -
-> > > -			evmcs->hv_enlightenments_control.msr_bitmap = 1;
-> > > -		}
-> > >  	}
-> > >  
-> > >  	memset(&loaded_vmcs->host_state, 0, sizeof(struct vmcs_host_state));
-> > > @@ -6903,6 +6894,18 @@ static int vmx_create_vcpu(struct kvm_vcpu *vcpu)
-> > >  
-> > >  	vmx->loaded_vmcs = &vmx->vmcs01;
-> > >  
-> > > +	/*
-> > > +	 * Use Hyper-V 'Enlightened MSR Bitmap' feature when KVM runs as a
-> > > +	 * nested (L1) hypervisor and Hyper-V in L0 supports it.
-> > 
-> > And maybe call out specifically that KVM intentionally uses this only for vmcs02?
-> > 
-> > > +	 */
-> > > +	if (IS_ENABLED(CONFIG_HYPERV) && static_branch_unlikely(&enable_evmcs)
-> > > +	    && (ms_hyperv.nested_features & HV_X64_NESTED_MSR_BITMAP)) {
-> > 
-> > && on the previous line, I think we'll survive the 82 char line :-)
-> > 
-> > > +		struct hv_enlightened_vmcs *evmcs =
-> > > +			(struct hv_enlightened_vmcs *)vmx->loaded_vmcs->vmcs;
-> > 
-> > Hmm, what about landing this right after vmcs01's VMCS is allocated?  It's kinda
-> > weird, but it makes it more obvious that ->vmcs is not NULL.  And if the cast is
-> > simply via a "void *" it all fits on one line.
-> > 
-> > 	err = alloc_loaded_vmcs(&vmx->vmcs01);
-> > 	if (err < 0)
-> > 		goto free_pml;
-> > 
-> > 	/*
-> > 	 * Use Hyper-V 'Enlightened MSR Bitmap' feature when KVM runs as a
-> > 	 * nested (L1) hypervisor and Hyper-V in L0 supports it.  Enable an
-> > 	 * enlightened bitmap only for vmcs01, KVM currently isn't equipped to
-> > 	 * realize any performance benefits from enabling it for vmcs02.
-> > 	 */ 
-> > 	if (IS_ENABLED(CONFIG_HYPERV) && static_branch_unlikely(&enable_evmcs) &&
-> > 	    (ms_hyperv.nested_features & HV_X64_NESTED_MSR_BITMAP)) {
-> > 		struct hv_enlightened_vmcs *evmcs = (void *)vmx->vmcs01.vmcs;
-> > 
-> > 		evmcs->hv_enlightenments_control.msr_bitmap = 1;
-> > 	}
-> > 
-> > > +
-> > > +		evmcs->hv_enlightenments_control.msr_bitmap = 1;
-> > > +	}
-> > > +
-> > >  	if (cpu_need_virtualize_apic_accesses(vcpu)) {
-> > >  		err = alloc_apic_access_page(vcpu->kvm);
-> > >  		if (err)
-> > > -- 
-> > > 2.31.1
-> > > 
+>  #define vcpu_to_pmu(vcpu) (&(vcpu)->arch.pmu)
+>  #define pmu_to_vcpu(pmu)  (container_of((pmu), struct kvm_vcpu, arch.pmu))
+> @@ -45,6 +47,19 @@ struct kvm_pmu_ops {
+>  	void (*cleanup)(struct kvm_vcpu *vcpu);
+>  };
+>  
+> +#define	KVM_X86_PMU_OP(func)	\
+> +	DECLARE_STATIC_CALL(kvm_x86_pmu_##func, *(((struct kvm_pmu_ops *)0)->func))
+> +#define	KVM_X86_PMU_OP_NULL	KVM_X86_PMU_OP
+> +#include <asm/kvm-x86-pmu-ops.h>
+> +
+> +static inline void kvm_pmu_ops_static_call_update(void)
+> +{
+> +#define	KVM_X86_PMU_OP(func)	\
+> +	static_call_update(kvm_x86_pmu_##func, kvm_pmu_ops.func)
+> +#define	KVM_X86_PMU_OP_NULL	KVM_X86_PMU_OP
+> +#include <asm/kvm-x86-pmu-ops.h>
+> +}
 
+As alluded to in patch 01, I'd prefer these go in kvm_ops_static_call_update()
+to keep the static call magic somewhat contained.
 
+> +
+>  static inline u64 pmc_bitmask(struct kvm_pmc *pmc)
+>  {
+>  	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
+> -- 
+> 2.33.0
+> 
