@@ -2,176 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0553A446991
-	for <lists+kvm@lfdr.de>; Fri,  5 Nov 2021 21:21:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 054B8446995
+	for <lists+kvm@lfdr.de>; Fri,  5 Nov 2021 21:21:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233394AbhKEUXn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Nov 2021 16:23:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50668 "EHLO
+        id S233479AbhKEUYV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Nov 2021 16:24:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233369AbhKEUXm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Nov 2021 16:23:42 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B279C061714
-        for <kvm@vger.kernel.org>; Fri,  5 Nov 2021 13:21:03 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id z7-20020a63c047000000b0026b13e40309so6275724pgi.19
-        for <kvm@vger.kernel.org>; Fri, 05 Nov 2021 13:21:03 -0700 (PDT)
+        with ESMTP id S233511AbhKEUYU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Nov 2021 16:24:20 -0400
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D99CC061714
+        for <kvm@vger.kernel.org>; Fri,  5 Nov 2021 13:21:41 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id n85so5356250pfd.10
+        for <kvm@vger.kernel.org>; Fri, 05 Nov 2021 13:21:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=Acm3W6P3G/EKd5a5NgXSPpEvbFfzMcEulYRpGh5d/Kc=;
-        b=ivqyKZgTMEo22zPYPKqteHurvQuSZtZSidzo6GgjraHdzq8feXyMdYI5EmaUCdXw4y
-         TX/v+Xb42NNZdIawcLR4BAdIn8Tgv6K8UAKFiJU2kwpVwoyMNUHVIW/5W3gfwqFjOnsH
-         H8W0j64A19LJ10gm8AyaXK2ikIWUDgrwdzN9yHgNFPZBJ5jeDvu0Srx1idUDVURgwNhC
-         Efls524i5owz8PpZKQcYia7tn/Vz2xXzr7Wzvc4UI4SW2VFzi4xmhU/ngCZuzE9RsFtR
-         ug8ItAYwO3EDAfcY8SMJTebU0YQ5eK+1E55ktO5fuLPL1lZf9zaPtV6PnFuTXaheXlMO
-         40/A==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=FChUXutBpeRG92vMItY2zirb2KiX64mqNa6lRjXS4/o=;
+        b=XhJq67XOVehGKyOlop0ZgXHOTZHwcQNzObFkCi6/KagxRodpEZ8yllo88wcXd9u5A4
+         JyHn3eOSHm71QE0Ho4vu+PMzSC+hk/kpLn0XoWAl+sEDJCXJH8yRiSGn+WDU3uzo/0Jz
+         vKuoP+xD9+dM6PIdOwrxBIcZiSTMvIRnKJ1ZTnCiCFNuTdGdR0au4APz76smsdf0FTJU
+         MNMzCzzdiPQ0CIWIuM2KFOvXL49l2ImI8P3640AzVXeG075F7RRRDlC4KR+jmtTfyE56
+         DSWnC2bV/xJ5K5cAgxAaKeJQrMHJdJxDe+n/OzOHw9DBQw6HJa62AhCnvmDdn0hwLrnK
+         Xi4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=Acm3W6P3G/EKd5a5NgXSPpEvbFfzMcEulYRpGh5d/Kc=;
-        b=bI9GRWgUBBXqRiippuS9GgmgEe5iyErohwYknw+7P/goiz9BV8uNNmBuQN90rD4dYp
-         KrQEoTOFEkiahngO2c/XcUyAMM20WNkBZ23BloOXEuAMXPyAI4a1xNwLyreHVLXB3K8n
-         D8lKTAgeC68IUDRtPu4dLMYLPkgmTKGsO6PnIKEqBP4Q6Stj9P3mGTk+FfIhO7LmQXKk
-         lOolNUzb4U2laYNsONjtqhsLDKFxvXGrDM42QcBbb6MossxwQG83s5GiE8/htXBQyUiU
-         IL5Sx0SlDus0XzylgLXJE2iYM1z7hWEukmIIPM2+r+AFGHiOkRTK7YOalizoruWcoKTH
-         /+Wg==
-X-Gm-Message-State: AOAM532g2iqG3UMt1kqWPcOpI+rJ2nCNuvYlIJpwxg80N8DF2Ov6J2Ea
-        1sMOHIQu0HvoY/9XJCnJS+jncA7j06bb8DbNi5/Y26l943iUnoma53AXo9zXu7eAhAyElJ8Vr0b
-        NMoZcaPoILLvHGYA/y9h+NfEAa7z2xA6cDLVtkmYWLcyZJS9I6gWB81xF/wV5leQ=
-X-Google-Smtp-Source: ABdhPJyTdszcOBhaBOrIzsEnShqafG/guabOXth81uwRD0ZWeOsTZ6WYQj2Hqi+QyYkC1+Pv3paFi7rBOqu/UA==
-X-Received: from tortoise.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1a0d])
- (user=jmattson job=sendgmr) by 2002:a17:902:a70a:b0:140:44f9:6d75 with SMTP
- id w10-20020a170902a70a00b0014044f96d75mr52715330plq.58.1636143662392; Fri,
- 05 Nov 2021 13:21:02 -0700 (PDT)
-Date:   Fri,  5 Nov 2021 13:20:58 -0700
-Message-Id: <20211105202058.1048757-1-jmattson@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.34.0.rc0.344.g81b53c2807-goog
-Subject: [PATCH v2] kvm: x86: Convert return type of *is_valid_rdpmc_ecx() to bool
-From:   Jim Mattson <jmattson@google.com>
-To:     kvm@vger.kernel.org, pbonzini@redhat.com
-Cc:     Jim Mattson <jmattson@google.com>,
-        Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=FChUXutBpeRG92vMItY2zirb2KiX64mqNa6lRjXS4/o=;
+        b=6kjtwiCBEMzsjBB0HR3g/J6DcLI8Sf4TnHJPq4luXR3WzziEFyW700ngt/G4SpwdBn
+         c9mQXTKpMyLsbzu+jpG8TSG1B1pdD+NtMKccGaKpLICvkX6rjj0yq4Aa9BIHXfhtgngR
+         LGL1yEShdFevLDiRyBb0AtBNqhXveNkWUOUk8GC5Ywlftiie37osjrl25da5F+FTygVA
+         I+BLUoDlhtGQGrk6K2fTuEEG65kiPa7l2DZSR8mxbiUZ7AKlEJLvyFRzvuTqOAZ0QNXw
+         HRyKqmvTurCuutJCLZ2Z1WKUA17CFkIXGHg9Ez0o0cpNMTzYInR9p8Igm8h+qp1xq+MA
+         T8Qg==
+X-Gm-Message-State: AOAM531yzanY8AgWdCkn2vVvgCJztuXhscThCYaD2BojI9fiRI9L8Pzo
+        6o0Y005pnZj10HKoZbrKeuhltA==
+X-Google-Smtp-Source: ABdhPJwJsyZkhGzgEWjIobCpYAvoWgic/EqtGUxZtysje8E+26IpZ1/HH08l9V0rneyI5sI9Ep2Vgg==
+X-Received: by 2002:a05:6a00:c8f:b0:481:20a8:7c61 with SMTP id a15-20020a056a000c8f00b0048120a87c61mr32575696pfv.8.1636143700318;
+        Fri, 05 Nov 2021 13:21:40 -0700 (PDT)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id c12sm5054054pfm.50.2021.11.05.13.21.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 05 Nov 2021 13:21:39 -0700 (PDT)
+Date:   Fri, 5 Nov 2021 20:21:36 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvm@vger.kernel.org, linux-mips@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, linuxppc-dev@lists.ozlabs.org,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup.patel@wdc.com>,
+        Atish Patra <atish.patra@wdc.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Juergen Gross <jgross@suse.com>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kernel-team@android.com
+Subject: Re: [PATCH 5/5] KVM: Convert the kvm->vcpus array to a xarray
+Message-ID: <YYWSUJ1qzhfqjQow@google.com>
+References: <20211105192101.3862492-1-maz@kernel.org>
+ <20211105192101.3862492-6-maz@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211105192101.3862492-6-maz@kernel.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-These function names sound like predicates, and they have siblings,
-*is_valid_msr(), which _are_ predicates. Moreover, there are comments
-that essentially warn that these functions behave unexpectedly.
+On Fri, Nov 05, 2021, Marc Zyngier wrote:
+> At least on arm64 and x86, the vcpus array is pretty huge (512 entries),
+> and is mostly empty in most cases (running 512 vcpu VMs is not that
+> common). This mean that we end-up with a 4kB block of unused memory
+> in the middle of the kvm structure.
 
-Flip the polarity of the return values, so that they become
-predicates, and convert the boolean result to a success/failure code
-at the outer call site.
+Heh, x86 is now up to 1024 entries.
+ 
+> Instead of wasting away this memory, let's use an xarray instead,
+> which gives us almost the same flexibility as a normal array, but
+> with a reduced memory usage with smaller VMs.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+> @@ -693,7 +694,7 @@ static inline struct kvm_vcpu *kvm_get_vcpu(struct kvm *kvm, int i)
+>  
+>  	/* Pairs with smp_wmb() in kvm_vm_ioctl_create_vcpu.  */
+>  	smp_rmb();
+> -	return kvm->vcpus[i];
+> +	return xa_load(&kvm->vcpu_array, i);
+>  }
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Jim Mattson <jmattson@google.com>
-Reviewed-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/pmu.c           | 2 +-
- arch/x86/kvm/pmu.h           | 4 ++--
- arch/x86/kvm/svm/pmu.c       | 5 ++---
- arch/x86/kvm/vmx/pmu_intel.c | 7 +++----
- arch/x86/kvm/x86.c           | 4 +++-
- 5 files changed, 11 insertions(+), 11 deletions(-)
+It'd be nice for this series to convert kvm_for_each_vcpu() to use xa_for_each()
+as well.  Maybe as a patch on top so that potential explosions from that are
+isolated from the initiali conversion?
 
-diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index 0772bad9165c..09873f6488f7 100644
---- a/arch/x86/kvm/pmu.c
-+++ b/arch/x86/kvm/pmu.c
-@@ -319,7 +319,7 @@ void kvm_pmu_handle_event(struct kvm_vcpu *vcpu)
- }
- 
- /* check if idx is a valid index to access PMU */
--int kvm_pmu_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
-+bool kvm_pmu_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
- {
- 	return kvm_x86_ops.pmu_ops->is_valid_rdpmc_ecx(vcpu, idx);
- }
-diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-index 0e4f2b1fa9fb..59d6b76203d5 100644
---- a/arch/x86/kvm/pmu.h
-+++ b/arch/x86/kvm/pmu.h
-@@ -32,7 +32,7 @@ struct kvm_pmu_ops {
- 	struct kvm_pmc *(*rdpmc_ecx_to_pmc)(struct kvm_vcpu *vcpu,
- 		unsigned int idx, u64 *mask);
- 	struct kvm_pmc *(*msr_idx_to_pmc)(struct kvm_vcpu *vcpu, u32 msr);
--	int (*is_valid_rdpmc_ecx)(struct kvm_vcpu *vcpu, unsigned int idx);
-+	bool (*is_valid_rdpmc_ecx)(struct kvm_vcpu *vcpu, unsigned int idx);
- 	bool (*is_valid_msr)(struct kvm_vcpu *vcpu, u32 msr);
- 	int (*get_msr)(struct kvm_vcpu *vcpu, struct msr_data *msr_info);
- 	int (*set_msr)(struct kvm_vcpu *vcpu, struct msr_data *msr_info);
-@@ -149,7 +149,7 @@ void reprogram_counter(struct kvm_pmu *pmu, int pmc_idx);
- void kvm_pmu_deliver_pmi(struct kvm_vcpu *vcpu);
- void kvm_pmu_handle_event(struct kvm_vcpu *vcpu);
- int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned pmc, u64 *data);
--int kvm_pmu_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx);
-+bool kvm_pmu_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx);
- bool kvm_pmu_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr);
- int kvm_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info);
- int kvm_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info);
-diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-index fdf587f19c5f..871c426ec389 100644
---- a/arch/x86/kvm/svm/pmu.c
-+++ b/arch/x86/kvm/svm/pmu.c
-@@ -181,14 +181,13 @@ static struct kvm_pmc *amd_pmc_idx_to_pmc(struct kvm_pmu *pmu, int pmc_idx)
- 	return get_gp_pmc_amd(pmu, base + pmc_idx, PMU_TYPE_COUNTER);
- }
- 
--/* returns 0 if idx's corresponding MSR exists; otherwise returns 1. */
--static int amd_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
-+static bool amd_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
- {
- 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
- 
- 	idx &= ~(3u << 30);
- 
--	return (idx >= pmu->nr_arch_gp_counters);
-+	return idx < pmu->nr_arch_gp_counters;
- }
- 
- /* idx is the ECX register of RDPMC instruction */
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index b8e0d21b7c8a..1b7456b2177b 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -118,16 +118,15 @@ static struct kvm_pmc *intel_pmc_idx_to_pmc(struct kvm_pmu *pmu, int pmc_idx)
- 	}
- }
- 
--/* returns 0 if idx's corresponding MSR exists; otherwise returns 1. */
--static int intel_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
-+static bool intel_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
- {
- 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
- 	bool fixed = idx & (1u << 30);
- 
- 	idx &= ~(3u << 30);
- 
--	return (!fixed && idx >= pmu->nr_arch_gp_counters) ||
--		(fixed && idx >= pmu->nr_arch_fixed_counters);
-+	return fixed ? idx < pmu->nr_arch_fixed_counters
-+		     : idx < pmu->nr_arch_gp_counters;
- }
- 
- static struct kvm_pmc *intel_rdpmc_ecx_to_pmc(struct kvm_vcpu *vcpu,
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index c1c4e2b05a63..d7def720227d 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -7328,7 +7328,9 @@ static void emulator_set_smbase(struct x86_emulate_ctxt *ctxt, u64 smbase)
- static int emulator_check_pmc(struct x86_emulate_ctxt *ctxt,
- 			      u32 pmc)
- {
--	return kvm_pmu_is_valid_rdpmc_ecx(emul_to_vcpu(ctxt), pmc);
-+	if (kvm_pmu_is_valid_rdpmc_ecx(emul_to_vcpu(ctxt), pmc))
-+		return 0;
-+	return -EINVAL;
- }
- 
- static int emulator_read_pmc(struct x86_emulate_ctxt *ctxt,
--- 
-2.34.0.rc0.344.g81b53c2807-goog
+Or maybe even use xa_for_each_range() to cap at online_vcpus?  That's technically
+a functional change, but IMO it's easier to reason about iterating over a snapshot
+of vCPUs as opposed to being able to iterate over vCPUs as their being added.  In
+practice I doubt it matters.
 
+#define kvm_for_each_vcpu(idx, vcpup, kvm) \
+	xa_for_each_range(&kvm->vcpu_array, idx, vcpup, 0, atomic_read(&kvm->online_vcpus))
