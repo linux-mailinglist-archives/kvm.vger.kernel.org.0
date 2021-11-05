@@ -2,90 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6666D44675E
-	for <lists+kvm@lfdr.de>; Fri,  5 Nov 2021 17:54:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AE8A04467A7
+	for <lists+kvm@lfdr.de>; Fri,  5 Nov 2021 18:17:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234109AbhKEQ4h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Nov 2021 12:56:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:42076 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234101AbhKEQ4h (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 5 Nov 2021 12:56:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636131237;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=akKdH9HbFFjAn593OExPRv0KSG0Y+eS7KHle5vuF5I8=;
-        b=Uwk37Q47fTQTGRUv+axS4QNJAax5TlbmRIx0DZAzwMObwja1Q+dl7WNjUibhd4/HUjHy/Z
-        C7V7bCwfRsGtuuXbKPJwRRxP/VAsePhOXsArcf6e7iFdCKR8AFIk9Ot2qXhyJoEcAmnjC5
-        3+h07vnEvAffpFwfIRdUbeLxKICST2g=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-10-sA2cZVqlPOKk-vpzbHRZYg-1; Fri, 05 Nov 2021 12:53:51 -0400
-X-MC-Unique: sA2cZVqlPOKk-vpzbHRZYg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 109128070F0;
-        Fri,  5 Nov 2021 16:53:50 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.41])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0660668388;
-        Fri,  5 Nov 2021 16:53:48 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-        Yishai Hadas <yishaih@nvidia.com>, bhelgaas@google.com,
-        saeedm@nvidia.com, linux-pci@vger.kernel.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, kuba@kernel.org, leonro@nvidia.com,
-        kwankhede@nvidia.com, mgurtovoy@nvidia.com, maorg@nvidia.com,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH V2 mlx5-next 12/14] vfio/mlx5: Implement vfio_pci driver
- for mlx5 devices
-In-Reply-To: <877ddob233.fsf@redhat.com>
-Organization: Red Hat GmbH
-References: <20211028234750.GP2744544@nvidia.com>
- <20211029160621.46ca7b54.alex.williamson@redhat.com>
- <20211101172506.GC2744544@nvidia.com>
- <20211102085651.28e0203c.alex.williamson@redhat.com>
- <20211102155420.GK2744544@nvidia.com>
- <20211102102236.711dc6b5.alex.williamson@redhat.com>
- <20211102163610.GG2744544@nvidia.com>
- <20211102141547.6f1b0bb3.alex.williamson@redhat.com>
- <20211103120955.GK2744544@nvidia.com>
- <20211103094409.3ea180ab.alex.williamson@redhat.com>
- <20211103161019.GR2744544@nvidia.com>
- <20211103120411.3a470501.alex.williamson@redhat.com>
- <877ddob233.fsf@redhat.com>
-User-Agent: Notmuch/0.32.1 (https://notmuchmail.org)
-Date:   Fri, 05 Nov 2021 17:53:47 +0100
-Message-ID: <878ry2a6hw.fsf@redhat.com>
+        id S232254AbhKERU2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Nov 2021 13:20:28 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:4290 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229569AbhKERU1 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 5 Nov 2021 13:20:27 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1A5ErEMQ028764;
+        Fri, 5 Nov 2021 17:17:18 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=TYuZMz/GRHunKpGVJtFn/ggrv7zxgIZrPeNPZjKSLT0=;
+ b=Qy2VpLlio98Vjcnj/1A66rjTEewneXN3/bf1MvSZiTGRNfdGiEt6ROm0oqGcc7OpYafc
+ 3h0d27/jM9+asPKM4xEy1ZQKFGNA+/cHcTZJ9clUQFmsx6b7MIzgjdqQnlNKHGyxUDFJ
+ qv3uxl1/Lc54updkFlrMs+v5si7e1QHKQdhb5p3DgInl9+DM82oXsf/u9qRPiqUUANU3
+ 25cyjf91PfYVrcshcG/qBkyAtA0CPGg0HU4RDVz8kwcERbqALW0mR+WsbLrw2fEF3Pd7
+ /MZLw6vHQJoNnRaWskjIac88MettqRKphjI4jS9SJREZn6RFiV4gGfAseckR/20XMzTr jw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3c4t5d1yx5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 05 Nov 2021 17:17:17 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1A5H9dnW004322;
+        Fri, 5 Nov 2021 17:17:17 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3c4t5d1ywh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 05 Nov 2021 17:17:17 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1A5HDKw5010480;
+        Fri, 5 Nov 2021 17:17:15 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma06ams.nl.ibm.com with ESMTP id 3c4t4devm6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 05 Nov 2021 17:17:14 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1A5HHCRQ64422324
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 5 Nov 2021 17:17:12 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 687EB5204F;
+        Fri,  5 Nov 2021 17:17:12 +0000 (GMT)
+Received: from [9.171.41.66] (unknown [9.171.41.66])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id A18C052063;
+        Fri,  5 Nov 2021 17:17:11 +0000 (GMT)
+Message-ID: <bc06dd82-06e1-b455-b2c1-59125b530dda@linux.vnet.ibm.com>
+Date:   Fri, 5 Nov 2021 18:17:11 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: RFC: KVM: x86/mmu: Eager Page Splitting
+Content-Language: en-US
+To:     David Matlack <dmatlack@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm list <kvm@vger.kernel.org>, Ben Gardon <bgardon@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Harish Barathvajasankar <hbarath@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>
+References: <CALzav=dV_U4r1K9oDq4esb4mpBQDQ2ROQ5zH5wV3KpOaZrRW-A@mail.gmail.com>
+From:   Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>
+In-Reply-To: <CALzav=dV_U4r1K9oDq4esb4mpBQDQ2ROQ5zH5wV3KpOaZrRW-A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: LRvqoi4N8NyUTBMmgNMV7OrETYjz-Urp
+X-Proofpoint-ORIG-GUID: QTqJdycscF51xHjxo47GCvqhzR2f2HPV
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
+ definitions=2021-11-05_02,2021-11-03_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ bulkscore=0 mlxlogscore=999 malwarescore=0 adultscore=0 clxscore=1011
+ spamscore=0 mlxscore=0 phishscore=0 lowpriorityscore=0 impostorscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2111050095
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 04 2021, Cornelia Huck <cohuck@redhat.com> wrote:
+On 11/4/21 23:45, David Matlack wrote:
 
-> So, I doubt that I'm the only person trying to follow this discussion
-> who has lost the overview about issues and possible solutions here. I
-> think it would be a good idea to summarize what has been brought up so
-> far outside of this thread.
->
-> To that effect, I've created an etherpad at
-> https://etherpad.opendev.org/p/VFIOMigrationDiscussions and started
-> filling it with some points. It would be great if others could fill in
-> the blanks so that everyone has a chance to see what is on the table so
-> far, so that we can hopefully discuss this on-list and come up with
-> something that works.
+[...]
+> 
+> The last alternative is to perform dirty tracking at a 2M granularity.
+> This would reduce the amount of splitting work required by 512x,
+> making the current approach of splitting on fault less impactful to
+> customer performance. We are in the early stages of investigating 2M
+> dirty tracking internally but it will be a while before it is proven
+> and ready for production. Furthermore there may be scenarios where
+> dirty tracking at 4K would be preferable to reduce the amount of
+> memory that needs to be demand-faulted during precopy.
 
-...just to clarify, my idea was that we could have a writeup of the
-various issues and proposed solutions on the etherpad, and then post the
-contents on-list next week as a starting point for a discussion that is
-not hidden deeply inside the discussion on a patch set.
-
-So, please continue adding points :)
-
+I'm curious how you're going about evaluating this, as I've experimented with
+2M dirty tracking in the past, in a continuous checkpointing context however.
+I suspect it's very sensitive to the workload. If the coarser granularity
+leads to more memory being considered dirty, the length of pre-copy rounds
+increases, giving the workload more time to dirty even more memory.
+Ideally large pages would be used only for regions that won't be dirty or
+regions that would also be pretty much completely dirty when tracking at 4K.
+But deciding the granularity adaptively is hard, doing 2M tracking instead
+of 4K robs you of the very information you'd need to judge that. 
