@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4948E445D23
-	for <lists+kvm@lfdr.de>; Fri,  5 Nov 2021 02:01:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 114E8445D2D
+	for <lists+kvm@lfdr.de>; Fri,  5 Nov 2021 02:06:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230493AbhKEBDQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Nov 2021 21:03:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44804 "EHLO
+        id S231270AbhKEBIf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Nov 2021 21:08:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229647AbhKEBDP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 4 Nov 2021 21:03:15 -0400
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0F18C061714
-        for <kvm@vger.kernel.org>; Thu,  4 Nov 2021 18:00:36 -0700 (PDT)
-Received: by mail-pg1-x531.google.com with SMTP id p8so5611185pgh.11
-        for <kvm@vger.kernel.org>; Thu, 04 Nov 2021 18:00:36 -0700 (PDT)
+        with ESMTP id S230493AbhKEBIf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Nov 2021 21:08:35 -0400
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 901E6C061714
+        for <kvm@vger.kernel.org>; Thu,  4 Nov 2021 18:05:56 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id x131so2254687pfc.12
+        for <kvm@vger.kernel.org>; Thu, 04 Nov 2021 18:05:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=5AsWWG+WUfnRqvVdyPwSZBhohM0u6yD1mbjUY07UvQQ=;
-        b=Wj40ttb1/f0Ni3Dpwwh7PGzp2tLlAieYFhg2e0JliymKZdTTkMOcSEFRRoj+Ib0ovO
-         53a8oGpagVSYUJ2EDzfDDMIP9dWw7v7B6SHv6tNJRlIK2c2wAsMmoveDumSYQQWtrm0y
-         fINgTFun54Lvd9P5jVSwIoRUGiJb0PDOsFmY5eYpvPq+1A5s3xnewtCOeh602K0Ix6OY
-         LCTuOpJR0j4R+24aoLXoAJkaZx76qgAUcjqhhIUgUk3vx4s8LYpJi/jc4v9cwC5PJ7Rx
-         twcjNa8a3sVZtUSwK+fqkt9ljf5nSGpfX14uoZXp6nNjdc4ZEuLWQUeADLbXImDG0gPK
-         1lcQ==
+        bh=G/nhaOd9Dv5dMVPfxGxOacbJh3HbdybN9D3Bt3gtDl4=;
+        b=nvfkNvU5Z8xadZEfrQs+mun09ht1fvHcLrH2DxUG/3DX7gUnwMzAJkexDG2eYTXZcT
+         nXC0KbqPvC1tK0JQgs5hCtnmTYToVQpMf8nCU56R48NFvVb6s3m/Ngv/UjYCmArWyqT5
+         p0SUqwKjeQQxCQt0zc0As36KIH4BAIyfNYMeM36s0WzO5Q1J/xrc07u8scp9QxgFseUx
+         dQ59ZAkYjl9GQ/mNW/WJt9rhnODEtXi5DZG6vgO1qHgTfVwOKU3kDPsIgbbN9rzZyOjx
+         2mxK9OAGR8TorHdShQM7kemuuxLfv77EOifqsz29EGFHH4GQs7sBLdkOTDN1ZVWUEahZ
+         b+Wg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=5AsWWG+WUfnRqvVdyPwSZBhohM0u6yD1mbjUY07UvQQ=;
-        b=yUgUYPsIQMhR6cGFzxP9VcQ6nEdWvuWcKdigK+UDCVo46tvFqeUrDpBQLw8lj76gNZ
-         PI3Vx3eJhmU2ILpe16YxXXd4HU87JzvnPhDnsrI5MrwMR2x86XOx/Rst1OlYMdEoPYIO
-         v/ceT7NFpELwpZ15RfYwLQT1xWcU0VM2iVwrRxjPI45BYoDmvof6xeuEWT5xWYLi5/M5
-         fkUBBGOcdKa3gysXzxZAum/2qa1776D5fv1UvXHsSCt6aTf5OxU/xp/1uuw3Qk9uF+9l
-         aNMEV40PS965XSf7lanOaUGN0Ml8a3+ldMTjl4uFyI4o0jXFWua1LhTERIEjw1Zh2RCp
-         It/w==
-X-Gm-Message-State: AOAM532QaOSy0EHrcf2OPJV2P3V67fWUUUKQmWxtYIZzhNC4SeyEu0/2
-        8sJHa9g4sfqpXZ0Gf0tnnSEuHg==
-X-Google-Smtp-Source: ABdhPJyExLrTk4AQNxZbAzjzFbNCCrY3MFN/MzFs3b2RpbUmtepP+C6fRZhxyvs07zJxE6TSksmFCg==
-X-Received: by 2002:a63:1d53:: with SMTP id d19mr41014133pgm.85.1636074036255;
-        Thu, 04 Nov 2021 18:00:36 -0700 (PDT)
+        bh=G/nhaOd9Dv5dMVPfxGxOacbJh3HbdybN9D3Bt3gtDl4=;
+        b=apAVoX1RnIrR1MbCwQdUXXtB0LeKheaT/sX2m6Y1HSZjDXA5vlNltUIgBWZiSTWJ9d
+         1Zfn5F2+Sr+JpgpXwZWOkSBcft1Gt62JeolFUMUjZG3QV+qu6PfjBmMKj/iKqefFkoud
+         mZvWR8KbTepSfaVJKQ9F8jYEJ3CAiGSbzLwmPSHOhIHi7RjWNsGH1abUXCaFc9IGX+c1
+         cPQ89owy/Bzi3Y+lUNUjQH6QCyvG1pvzIdFYrVJyHU9IOk62vNnvSqUxigVqpE1KPCVY
+         KC5/wQZ/O5rq6oeoOYfYLFrhhatsfJYXLvv2+E+spJPmxHYR9D+shaO66v65wVkJzT5c
+         WgWg==
+X-Gm-Message-State: AOAM532y/wU2jX+ZxcvWr+VqQ9FKbpV0IaB5k/tObJupd4c0qbexlEBk
+        WfKSS4nr3DZPf36Lmkvzrv7tRw==
+X-Google-Smtp-Source: ABdhPJxRK/fTi3PW003l6+S9tkKhBsOPyaIXk2qUrZkoR1F5QCgcD/FeTTDil/grcsUm+sPO+IkX/A==
+X-Received: by 2002:a05:6a00:c94:b0:480:fcc2:bb2c with SMTP id a20-20020a056a000c9400b00480fcc2bb2cmr37089927pfv.30.1636074355284;
+        Thu, 04 Nov 2021 18:05:55 -0700 (PDT)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id m10sm5124833pfk.152.2021.11.04.18.00.35
+        by smtp.gmail.com with ESMTPSA id u22sm4846371pfi.78.2021.11.04.18.05.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Nov 2021 18:00:35 -0700 (PDT)
-Date:   Fri, 5 Nov 2021 01:00:31 +0000
+        Thu, 04 Nov 2021 18:05:54 -0700 (PDT)
+Date:   Fri, 5 Nov 2021 01:05:50 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Vitaly Kuznetsov <vkuznets@redhat.com>
 Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
@@ -55,32 +55,44 @@ Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Jim Mattson <jmattson@google.com>,
         Maxim Levitsky <mlevitsk@redhat.com>,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 2/4] KVM: VMX: Introduce vmx_msr_bitmap_l01_changed()
- helper
-Message-ID: <YYSCL2dum2be1rei@google.com>
+Subject: Re: [PATCH v3 3/4] KVM: nVMX: Track whether changes in L0 require
+ MSR bitmap for L2 to be rebuilt
+Message-ID: <YYSDbljJgpEOnx+W@google.com>
 References: <20211013142258.1738415-1-vkuznets@redhat.com>
- <20211013142258.1738415-3-vkuznets@redhat.com>
+ <20211013142258.1738415-4-vkuznets@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211013142258.1738415-3-vkuznets@redhat.com>
+In-Reply-To: <20211013142258.1738415-4-vkuznets@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Wed, Oct 13, 2021, Vitaly Kuznetsov wrote:
-> In preparation to enabling 'Enlightened MSR Bitmap' feature for Hyper-V
-> guests move MSR bitmap update tracking to a dedicated helper.
-> 
-> Note: vmx_msr_bitmap_l01_changed() is called when MSR bitmap might be
-> updated. KVM doesn't check if the bit we're trying to set is already set
-> (or the bit it's trying to clear is already cleared). Such situations
-> should not be common and a few false positives should not be a problem.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
+> diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+> index 592217fd7d92..2cdf66e6d1b0 100644
+> --- a/arch/x86/kvm/vmx/vmx.h
+> +++ b/arch/x86/kvm/vmx/vmx.h
+> @@ -148,6 +148,15 @@ struct nested_vmx {
+>  	bool need_vmcs12_to_shadow_sync;
+>  	bool dirty_vmcs12;
+>  
+> +	/*
+> +	 * Indicates whether MSR bitmap for L2 needs to be rebuilt due to
+> +	 * changes in MSR bitmap for L1 or switching to a different L2. Note,
+> +	 * this flag can only be used reliably in conjunction with a paravirt L1
+> +	 * which informs L0 whether any changes to MSR bitmap for L2 were done
+> +	 * on its side.
+> +	 */
+> +	bool msr_bitmap_force_recalc;
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+Belated bikeshedding...  What about need_msr_bitmap_recalc to follow the above
+need_vmcs12_to_shadow_sync?
+
+> +
+>  	/*
+>  	 * Indicates lazily loaded guest state has not yet been decached from
+>  	 * vmcs02.
+> -- 
+> 2.31.1
+> 
