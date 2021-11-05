@@ -2,104 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 304A5445E0D
-	for <lists+kvm@lfdr.de>; Fri,  5 Nov 2021 03:50:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 226DC445EDB
+	for <lists+kvm@lfdr.de>; Fri,  5 Nov 2021 04:50:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231980AbhKECvc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 4 Nov 2021 22:51:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:58168 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231201AbhKECva (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 4 Nov 2021 22:51:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636080531;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xCcEqsnBhifvXkjiVwnMz5H8oH0AK0pj5dvEeQNewCw=;
-        b=Z56Ektxzm4bVbmPGjcDRlgCgTC5cIsKVxfE4AizwcJqHN03bfOrSx2LCZVuei1z40zdMGz
-        is2534BQAgTzUEYlDosjMC2Ll9ntHjc6F1m93Zcnwz6zgKLMtSLu4ODlDlFzhy5MPfzm3J
-        E0IZNyS6aKFXsWcwbKu76GbCW68gm8U=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-330-SBKu1mRfNU2uRgHXxfr9GQ-1; Thu, 04 Nov 2021 22:48:49 -0400
-X-MC-Unique: SBKu1mRfNU2uRgHXxfr9GQ-1
-Received: by mail-lf1-f70.google.com with SMTP id i34-20020a0565123e2200b0040019ae61d5so2856215lfv.20
-        for <kvm@vger.kernel.org>; Thu, 04 Nov 2021 19:48:49 -0700 (PDT)
+        id S231927AbhKEDwj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 4 Nov 2021 23:52:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54140 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231627AbhKEDwi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 4 Nov 2021 23:52:38 -0400
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E79BFC061714;
+        Thu,  4 Nov 2021 20:49:59 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id k4so10293684plx.8;
+        Thu, 04 Nov 2021 20:49:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=TqMPoo1kUSiUVo3cNnEi6zuytFVpbUMxm1ejQKcH6w4=;
+        b=MT/eZTmAae9ZJn80kntiBHYYCu73+UJ3Ob5saGuwItNVGe2giHo7hPAeKx0BS84yCt
+         j5istB0R/t7gydVtNEh6zHA9aPLnD0YZBlMu+ptYPbLkp3O18iFki1rwIpa6pxJjMx+k
+         Tz2rC/XMN7wyImNy+wI6qMfyFDvkuVxHLDY5Wf2BUK0iZXFBY/aSGQrWhCK6KjT9H3ld
+         zVejrImLHAsdxxoyVSBd2BZODLJ8No/91BgwjbU43VfcFuhK4AQNWO0hKZpy2E34mEe0
+         1VAiUTXchBtk1N3D7ZYMyv5BIEQJXGt8ogP/0RpZElFPM6+rQUepy6xMATyWI5ISt+ef
+         2JEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=xCcEqsnBhifvXkjiVwnMz5H8oH0AK0pj5dvEeQNewCw=;
-        b=zKjAzQEL1DoTDaTkZj1BOZh4/vd0udZNduahQtjWIqFIU9cwKEDylcbeTSS++2CtRm
-         QUpvTXJKWDQW4ooqbAwC2mDjYPjqzrTq6iCnLTRU1MHOaQNQj2P3qNVbbeJUaoNTZ2GC
-         gRGT92KuX74kXhbfguVypW8ZOacPV1jUUEBwyPBUGFC2o7c8L3lWx+zp2R6SAVsAetp2
-         pxQZZpiXTFQs2i13wfpbZ68bKeZ8CLK+DgCIk8iywDe/1HYNVWicKcAIP+h0jwgInq6c
-         26KIvG8c1tWvjztw4hzl4Mj81QVtIITJFVB6D/x7K+m+pV6n5Z0MvmjSD6ovPc73Tqzc
-         fAAQ==
-X-Gm-Message-State: AOAM530Qy23KrTaPWo8kEAJBKl97Ld2QTjliBMDZIJEhc/j26POzdobF
-        BgSZEpRqxbEzsa/DG5cn7ntbXEAQwDWeRIkfvnOkFIo7bPDE9NNwwlxRhOCohhWx0xrDnKr4Jlo
-        FZGlgIUg5Fr7363XKCjlqKMIW3Pkh
-X-Received: by 2002:ac2:4e68:: with SMTP id y8mr52932390lfs.348.1636080528101;
-        Thu, 04 Nov 2021 19:48:48 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzS1jRGe/qTBDl1fmwuB1InzojHnj32ucWekjQLu2yHsikj5gNhAUpYDb19ZeRf/IO8Jf3Qu4zH8GujGcXFofc=
-X-Received: by 2002:ac2:4e68:: with SMTP id y8mr52932379lfs.348.1636080527953;
- Thu, 04 Nov 2021 19:48:47 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=TqMPoo1kUSiUVo3cNnEi6zuytFVpbUMxm1ejQKcH6w4=;
+        b=AURAzWVe0shGNb4CmxAtmM3le1ZXtllclK0KW9LCLBajJFchiM3bXWc3Ssx6tRcD7b
+         pj/Vo0WUKa9MEk6p//7lfZ6ceeUaEUUmjJMPoAy1nFk6oP1+qwaW/8IKJ+8gl5/hNqDJ
+         x6P6t1P6MzWXgc4xmcA6By5syrrnS1gd+L8YI0s0SYXIb0taXXTP5gyvSpiVxlWBmqy7
+         gRWhlDjOCnEXPOlOswuGBMx1ExtNqnYW7sc7CIhsi5xqK3y5tUk8Wk/7AQkb3e8drmx/
+         YdYiiL22SW/UnGR1fL1nN8XdUR6G+Lh6dMuTL1eBOIjLY4lRpQD00R6GbNvgF2pTKgmb
+         SN+Q==
+X-Gm-Message-State: AOAM531lwStKS6cY6jCCVeCO3xA9IgdQ7nIsu+rPCd6mvPD0qrRIJVbZ
+        RfeT41pmRtoDPAw/UjV8MWUrH8LwNV0=
+X-Google-Smtp-Source: ABdhPJxUczS1Jjov+LBZ0a+AuFZUqmrBdu16zg5YKOREOJRsBUqW3avRPVF6QpQ8tcSHIr29i4tRFw==
+X-Received: by 2002:a17:90b:1d0e:: with SMTP id on14mr27195572pjb.119.1636084199359;
+        Thu, 04 Nov 2021 20:49:59 -0700 (PDT)
+Received: from bobo.ozlabs.ibm.com (60-241-46-56.tpgi.com.au. [60.241.46.56])
+        by smtp.gmail.com with ESMTPSA id mi3sm5807412pjb.35.2021.11.04.20.49.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Nov 2021 20:49:59 -0700 (PDT)
+From:   Nicholas Piggin <npiggin@gmail.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Nicholas Piggin <npiggin@gmail.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: move struct kvm_vcpu * array to the bottom of struct kvm
+Date:   Fri,  5 Nov 2021 13:49:49 +1000
+Message-Id: <20211105034949.1397997-1-npiggin@gmail.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-References: <20211104195833.2089796-1-eperezma@redhat.com>
-In-Reply-To: <20211104195833.2089796-1-eperezma@redhat.com>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Fri, 5 Nov 2021 10:48:37 +0800
-Message-ID: <CACGkMEug9Ci=mmQcwPwD0rKo4Lp8Vkz87i5X6H9Y0MfgQNc53g@mail.gmail.com>
-Subject: Re: [PATCH] vdpa: Avoid duplicate call to vp_vdpa get_status
-To:     =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>
-Cc:     linux-kernel <linux-kernel@vger.kernel.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>, kvm <kvm@vger.kernel.org>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 5, 2021 at 3:58 AM Eugenio P=C3=A9rez <eperezma@redhat.com> wro=
-te:
->
-> It has no sense to call get_status twice, since we already have a
-> variable for that.
->
-> Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+Increasing the max VCPUs on powerpc makes the kvm_arch member offset
+great enough that some assembly breaks due to addressing constants
+overflowing field widths.
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+Moving the vcpus array to the end of struct kvm prevents this from
+happening. It has the side benefit that moving the large array out
+from the middle of the structure should help keep other commonly
+accessed fields in the same or adjacent cache lines.
 
-> ---
->  drivers/vhost/vdpa.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> index 01c59ce7e250..10676ea0348b 100644
-> --- a/drivers/vhost/vdpa.c
-> +++ b/drivers/vhost/vdpa.c
-> @@ -167,13 +167,13 @@ static long vhost_vdpa_set_status(struct vhost_vdpa=
- *v, u8 __user *statusp)
->         status_old =3D ops->get_status(vdpa);
->
->         /*
->          * Userspace shouldn't remove status bits unless reset the
->          * status to 0.
->          */
-> -       if (status !=3D 0 && (ops->get_status(vdpa) & ~status) !=3D 0)
-> +       if (status !=3D 0 && (status_old & ~status) !=3D 0)
->                 return -EINVAL;
->
->         if ((status_old & VIRTIO_CONFIG_S_DRIVER_OK) && !(status & VIRTIO=
-_CONFIG_S_DRIVER_OK))
->                 for (i =3D 0; i < nvqs; i++)
->                         vhost_vdpa_unsetup_vq_irq(v, i);
->
-> --
-> 2.27.0
->
+Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+---
+
+It would next be possible to now make this a dynamically sized array,
+and make the KVM_MAX_VCPUS more dynamic, however x86 kvm_svm uses its
+own scheme rather than kvm_arch for some reason.
+
+Thanks,
+Nick
+
+ include/linux/kvm_host.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 0f18df7fe874..78cd9b63a6a5 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -553,7 +553,6 @@ struct kvm {
+ 	struct mutex slots_arch_lock;
+ 	struct mm_struct *mm; /* userspace tied to this vm */
+ 	struct kvm_memslots __rcu *memslots[KVM_ADDRESS_SPACE_NUM];
+-	struct kvm_vcpu *vcpus[KVM_MAX_VCPUS];
+ 
+ 	/* Used to wait for completion of MMU notifiers.  */
+ 	spinlock_t mn_invalidate_lock;
+@@ -623,6 +622,9 @@ struct kvm {
+ 	struct notifier_block pm_notifier;
+ #endif
+ 	char stats_id[KVM_STATS_NAME_SIZE];
++
++	/* This array can be very large, so keep it at the bottom */
++	struct kvm_vcpu *vcpus[KVM_MAX_VCPUS];
+ };
+ 
+ #define kvm_err(fmt, ...) \
+-- 
+2.23.0
 
