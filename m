@@ -2,149 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F1C03446B04
-	for <lists+kvm@lfdr.de>; Fri,  5 Nov 2021 23:47:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B17BF446B66
+	for <lists+kvm@lfdr.de>; Sat,  6 Nov 2021 00:59:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233975AbhKEWtx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 5 Nov 2021 18:49:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54896 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230400AbhKEWtu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 5 Nov 2021 18:49:50 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D663C061570
-        for <kvm@vger.kernel.org>; Fri,  5 Nov 2021 15:47:10 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id f8so11890391plo.12
-        for <kvm@vger.kernel.org>; Fri, 05 Nov 2021 15:47:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=OxUqrQOKE5rz2Yy9rGFxDjQ64K2p6FbsasTsNrHPkGY=;
-        b=oaRJRNUL2SeshzXw5yVr3ynQ87l1WCM717Ekxc3C6L/t2VOi9zgkRI9+8hunUnhNY+
-         0msWk0cT4U5n99XcAvfOnCW/Cj2ZMX0HW0XqYw2n2baHGwSd+r0BqxWkJGOeWPcRnCRJ
-         aGUE41MrHdgdkXSuZ3EQC+Nz7d+IXcNkJOnIkO2KmNR4z/l2OZ+njSV5O6KHdT6aYcbY
-         ZBYX46mufxAAXdVuydJSwdZH300owuXKd0BPFcE0losc9dPeXD5YZBGQd7shvZXvReSC
-         fbYPmxHsrrO0XrCG7dBjkChiiU7yzvrnmtABfUE9sqKQXhaAjQsUhpgMl/hrIEon9BXC
-         JUTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=OxUqrQOKE5rz2Yy9rGFxDjQ64K2p6FbsasTsNrHPkGY=;
-        b=RQMzxf3wncTv5OTkNTiKMoEq12sswMOYpPtlmMu5uO61K/a/S8Bh9vahFsINQAOKhB
-         90YZKG4DvaQQ9qeKXoiZmYT5GgDHYTYPXrQus1w1tAmeF7qsVLll5SEkIGs3H8bAzBY/
-         bekfj0BA/PHM9RgxuXTRvcu70B7e4KrpG54mKRZHhZZiGGbtYdBWHfdo98iFEWivEW7C
-         wmeEUv4KYQZ75iwSj6T5w01D8T/R/265dojY1g2ru2wlSjDlpXwWc/wGuBLUMMKXOJsn
-         SK1aiTww41L3hTaYVu3CVn/dpPfXeCKmI6RzN088EA0UAmE9jSfcqWHkfEObSuo7mfb4
-         Nyng==
-X-Gm-Message-State: AOAM531EYfXkNcWwRvsvPtWWhns8tLNpIv0ZrJb4oNv4PQ3zw9+LWwxH
-        ZpEfkdrakpahqqO7DDIViTkBGw==
-X-Google-Smtp-Source: ABdhPJw/vX5xoimWxW7XMyz2ihPOstRLNm8ajQj2qZQu+nXqI+ZsbMHHvfcgSeq6uyqWjYEbfLauKQ==
-X-Received: by 2002:a17:902:db07:b0:141:ea12:218b with SMTP id m7-20020a170902db0700b00141ea12218bmr35627640plx.46.1636152429333;
-        Fri, 05 Nov 2021 15:47:09 -0700 (PDT)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id s2sm11157690pjs.56.2021.11.05.15.47.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Nov 2021 15:47:08 -0700 (PDT)
-Date:   Fri, 5 Nov 2021 22:47:04 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Peter Gonda <pgonda@google.com>
-Cc:     kvm@vger.kernel.org, Marc Orr <marcorr@google.com>,
-        David Rientjes <rientjes@google.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH V11 4/5] selftest: KVM: Add open sev dev helper
-Message-ID: <YYW0aPKZLT6FyUnT@google.com>
-References: <20211021174303.385706-1-pgonda@google.com>
- <20211021174303.385706-5-pgonda@google.com>
+        id S233489AbhKFABn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 5 Nov 2021 20:01:43 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:4775 "EHLO
+        esa3.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230262AbhKFABm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 5 Nov 2021 20:01:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1636156740; x=1667692740;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=99tlQEW6k3Si5SmCi7kC9BJb5Z29vH7T9LwAGl2NsGA=;
+  b=TNzYxJLymz+dQU54aQ7dEL7wxUlc90yPp/p3/sdynWwSCLaLrRbgc5Nl
+   vTYYm6M94070Rb6UibXDL1WJgf/TkiG/IoVaHlDOnfR3aHlNB8rOfVYPB
+   SHv4kIr+g0TqmMoS4zkGRjiqqtXY8vbsqykdrwHAdf9LZdQDV8xwl61Xx
+   Zsfvl1HwjepShNkEG9pY/GLZVkvdZP4+oe8gnhWaIpQv9sIwZyqxJ13G8
+   FARAf+X5qcT+7y3FvH+bOpO51v9ezSsA4mTJrTkvaBFey02cZPVajoEQa
+   IkUWcj+WVz55bbhTkBz1hV5jUl0h9da5+b7rg9ChJzd0xLgDZNRE8VAzi
+   Q==;
+X-IronPort-AV: E=Sophos;i="5.87,212,1631548800"; 
+   d="scan'208";a="189637757"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 06 Nov 2021 07:58:59 +0800
+IronPort-SDR: tpPdT7I7QRjQCapy5EBR/qH5XrGutVGU9/oMVnsZFeTjiNCx/MYsLx3u8qicwIPI+ke+KzO+s2
+ bGxot8Nsk/L6L/M1av8/61L8xkZYvMCk+H/FbInmKUjkKZGTAXZcN2/2CX0lIeffbHIxOo19Qr
+ xtRz+fXGCoR1S9gqYZyZIdem4gFgX+V3aXsySAhQ9E8I8HYaaJHjuPw+XJdJtoEHsdrrRDkxsX
+ VEk5zxOx27gd/ObWX6ALG9hdZwtE2cBxpaBnus6WUzXMOA2JoyBbKm5phxCgPQikpcpMf6pBeJ
+ SbgFzkMYiMwpHylTADgosUHi
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2021 16:32:45 -0700
+IronPort-SDR: Mp7jK/DwqabApqMFT4YQ7uvsQsRaOpx8l+aziVIk3tgrEOjpwBNQRlOwK1xks2tETfJheuqooL
+ ijNN7igjkGgsosM5ZsHurYMnUSeepWtvRpHvt6E8b3qf6y49Ibxn2F9bhvZUJo2KyMH7pPikYi
+ yOdTIGXQ73LfH2/w6z3zXS4S5mFU9dtstzhu0tgZnkiWYpbHUDOdh9xG9pXI3An40sXrvnT3sa
+ Jua4FPQUjNqLzEPG0iDM7TdAqzI+JD716RII9ttKBG7jnB3xGkL4BvJ25nX40vfTXrepP8dtPq
+ bPk=
+WDCIronportException: Internal
+Received: from unknown (HELO hulk.wdc.com) ([10.225.167.48])
+  by uls-op-cesaip02.wdc.com with ESMTP; 05 Nov 2021 16:59:01 -0700
+From:   Atish Patra <atish.patra@wdc.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Atish Patra <atish.patra@wdc.com>, Anup Patel <anup.patel@wdc.com>,
+        Heinrich Schuchardt <xypron.glpk@gmx.de>,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        linux-riscv@lists.infradead.org,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Vincent Chen <vincent.chen@sifive.com>, pbonzini@redhat.com,
+        Sean Christopherson <seanjc@google.com>
+Subject: [PATCH v4 0/5] Add SBI v0.2 support for KVM
+Date:   Fri,  5 Nov 2021 16:58:47 -0700
+Message-Id: <20211105235852.3011900-1-atish.patra@wdc.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211021174303.385706-5-pgonda@google.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 21, 2021, Peter Gonda wrote:
-> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-> index 10a8ed691c66..06a6c04010fb 100644
-> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> @@ -31,6 +31,19 @@ static void *align(void *x, size_t size)
->  	return (void *) (((size_t) x + mask) & ~mask);
->  }
->  
-> +int open_path_or_exit(const char *path, int flags)
-> +{
-> +	int fd;
-> +
-> +	fd = open(path, flags);
-> +	if (fd < 0) {
-> +		print_skip("%s not available (errno: %d)", path, errno);
+The Supervisor Binary Interface(SBI) specification[1] now defines a
+base extension that provides extendability to add future extensions
+while maintaining backward compatibility with previous versions.
+The new version is defined as 0.2 and older version is marked as 0.1.
 
-While you're here, can you add the strerror(errno) as well?  There are some other
-enhancements I'd like to make as some failure modes are really annoying, e.g. if
-the max vCPUs test fails/skips due to ulimits, but printing the human friendly
-version is an easy one to pick off.
+This series adds following features to RISC-V Linux KVM.
+1. Adds support for SBI v0.2 in KVM
+2. SBI Hart state management extension (HSM) in KVM
+3. Ordered booting of guest vcpus in guest Linux
 
-> +		exit(KSFT_SKIP);
-> +	}
-> +
-> +	return fd;
-> +}
-> +
->  /*
->   * Open KVM_DEV_PATH if available, otherwise exit the entire program.
->   *
-> @@ -42,16 +55,7 @@ static void *align(void *x, size_t size)
->   */
->  static int _open_kvm_dev_path_or_exit(int flags)
->  {
-> -	int fd;
-> -
-> -	fd = open(KVM_DEV_PATH, flags);
-> -	if (fd < 0) {
-> -		print_skip("%s not available, is KVM loaded? (errno: %d)",
-> -			   KVM_DEV_PATH, errno);
-> -		exit(KSFT_SKIP);
-> -	}
-> -
-> -	return fd;
-> +	return open_path_or_exit(KVM_DEV_PATH, flags);
->  }
->  
->  int open_kvm_dev_path_or_exit(void)
-> diff --git a/tools/testing/selftests/kvm/lib/x86_64/svm.c b/tools/testing/selftests/kvm/lib/x86_64/svm.c
-> index 2ac98d70d02b..14a8618efa9c 100644
-> --- a/tools/testing/selftests/kvm/lib/x86_64/svm.c
-> +++ b/tools/testing/selftests/kvm/lib/x86_64/svm.c
-> @@ -13,6 +13,8 @@
->  #include "processor.h"
->  #include "svm_util.h"
->  
-> +#define SEV_DEV_PATH "/dev/sev"
-> +
->  struct gpr64_regs guest_regs;
->  u64 rflags;
->  
-> @@ -160,3 +162,14 @@ void nested_svm_check_supported(void)
->  		exit(KSFT_SKIP);
->  	}
->  }
-> +
-> +/*
-> + * Open SEV_DEV_PATH if available, otherwise exit the entire program.
-> + *
-> + * Return:
-> + *   The opened file descriptor of /dev/sev.
-> + */
-> +int open_sev_dev_path_or_exit(void)
-> +{
-> +	return open_path_or_exit(SEV_DEV_PATH, 0);
-> +}
-> -- 
-> 2.33.0.1079.g6e70778dc9-goog
-> 
+This series is based on base KVM series which is already part of the kvm-next[2]. 
+
+Guest kernel needs to also support SBI v0.2 and HSM extension in Kernel
+to boot multiple vcpus. Linux kernel supports both starting v5.7.
+In absense of that, guest can only boot 1 vcpu.
+
+Changes from v3->v4:
+1. Fixed the commit text title.
+2. Removed a redundant memory barrier from patch 4.
+3. Replaced preempt_enable/disable with get_cpu/put_cpu.
+4. Renamed the exixting implementation as v01 instead of legacy.
+
+Changes from v2->v3:
+1. Rebased on the latest merged kvm series.
+2. Dropped the reset extension patch because reset extension is not merged in kernel. 
+However, my tree[3] still contains it in case anybody wants to test it.
+
+Changes from v1->v2:
+1. Sent the patch 1 separately as it can merged independently.
+2. Added Reset extension functionality.
+
+Tested on Qemu and Rocket core FPGA.
+
+[1] https://github.com/riscv/riscv-sbi-doc/blob/master/riscv-sbi.adoc
+[3] https://github.com/atishp04/linux/tree/kvm_sbi_v03_reset
+[4] https://github.com/atishp04/linux/tree/kvm_sbi_v03
+
+Atish Patra (5):
+RISC-V: KVM: Mark the existing SBI implementation as v01
+RISC-V: KVM: Reorganize SBI code by moving SBI v0.1 to its own file
+RISC-V: KVM: Add SBI v0.2 base extension
+RISC-V: KVM: Add v0.1 replacement SBI extensions defined in v02
+RISC-V: KVM: Add SBI HSM extension in KVM
+
+arch/riscv/include/asm/kvm_vcpu_sbi.h |  33 +++++
+arch/riscv/include/asm/sbi.h          |   9 ++
+arch/riscv/kvm/Makefile               |   4 +
+arch/riscv/kvm/vcpu.c                 |  23 +++
+arch/riscv/kvm/vcpu_sbi.c             | 206 ++++++++++++--------------
+arch/riscv/kvm/vcpu_sbi_base.c        |  73 +++++++++
+arch/riscv/kvm/vcpu_sbi_hsm.c         | 107 +++++++++++++
+arch/riscv/kvm/vcpu_sbi_replace.c     | 136 +++++++++++++++++
+arch/riscv/kvm/vcpu_sbi_v01.c         | 129 ++++++++++++++++
+9 files changed, 609 insertions(+), 111 deletions(-)
+create mode 100644 arch/riscv/include/asm/kvm_vcpu_sbi.h
+create mode 100644 arch/riscv/kvm/vcpu_sbi_base.c
+create mode 100644 arch/riscv/kvm/vcpu_sbi_hsm.c
+create mode 100644 arch/riscv/kvm/vcpu_sbi_replace.c
+create mode 100644 arch/riscv/kvm/vcpu_sbi_v01.c
+
+--
+2.31.1
+
