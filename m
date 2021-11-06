@@ -2,30 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7530A446DB2
-	for <lists+kvm@lfdr.de>; Sat,  6 Nov 2021 12:48:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 91C1E446ED4
+	for <lists+kvm@lfdr.de>; Sat,  6 Nov 2021 16:56:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234075AbhKFLvc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 6 Nov 2021 07:51:32 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36922 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229968AbhKFLv2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 6 Nov 2021 07:51:28 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 480FD60E05;
-        Sat,  6 Nov 2021 11:48:47 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1mjKBg-003oWA-Ui; Sat, 06 Nov 2021 11:48:45 +0000
-Date:   Sat, 06 Nov 2021 11:48:39 +0000
-Message-ID: <87mtmhec88.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-mips@vger.kernel.org,
+        id S233935AbhKFP7Q convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Sat, 6 Nov 2021 11:59:16 -0400
+Received: from mail-ot1-f48.google.com ([209.85.210.48]:34743 "EHLO
+        mail-ot1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231435AbhKFP7P (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 6 Nov 2021 11:59:15 -0400
+Received: by mail-ot1-f48.google.com with SMTP id s7-20020a056830148700b0055ad72acb7eso16895568otq.1;
+        Sat, 06 Nov 2021 08:56:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=eBDSUIjOttiaXGIBqHqfJQJUcKgBFvtaHFb5EhflaV4=;
+        b=b1txsNtE1JejwznR1IbZ4kkCbvfvlKIfgfptuuOkWmUw9ebT8Q2lPtaTwqflAdH2/d
+         tJv4fpwYb/b9RIEvy1ZN6rB23DhSBR1EZ+ThFVKSTV7gM6XzXQZNGw71vZXHXUa75oR0
+         PmhmSqISBD06IDkNnLjPl4685jKCuEiRZdlblYY4B8ptLiFioR4rsvumnPivuuFjZwFj
+         +WkiXku1jiEaykWv6BB/Y43gj4x/YnpmLPaYZk0fNcMz882ADq7f/4bq93Gw55kPX6f2
+         HVOn0YIEHPSSmwCymdEowOssm8yg4jf84AVW/gzuUiOdu63QcFSGb/n/mv4MsUn5L3T9
+         pZbg==
+X-Gm-Message-State: AOAM531pJY+MFHm18LkEsfIjW85nUVxAGpLzt49CxFAbh/9waSRlvobX
+        jOXKsjLtXAaE0h8Ek+fgRk56i9Ab6mlvAET0Mws=
+X-Google-Smtp-Source: ABdhPJxwhCJyC+uhck/vVYoIRwMhWus9uJyoYA8q1C4DG6hFBkzj6XG5LHI4onqLHXxXLvHpBvFJjhBzstBp2T8d+3A=
+X-Received: by 2002:a9d:4e97:: with SMTP id v23mr20053935otk.190.1636214193915;
+ Sat, 06 Nov 2021 08:56:33 -0700 (PDT)
+MIME-Version: 1.0
+References: <20211105192101.3862492-1-maz@kernel.org> <20211105192101.3862492-3-maz@kernel.org>
+In-Reply-To: <20211105192101.3862492-3-maz@kernel.org>
+From:   =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date:   Sat, 6 Nov 2021 16:56:22 +0100
+Message-ID: <CAAdtpL4UKw2s7ekxKjKy8XxPR5acq0u1qLR5ontL3T9MWJ5VPQ@mail.gmail.com>
+Subject: Re: [PATCH 2/5] KVM: mips: Use kvm_get_vcpu() instead of open-coded access
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvm <kvm@vger.kernel.org>,
+        "open list:BROADCOM NVRAM DRIVER" <linux-mips@vger.kernel.org>,
         kvmarm@lists.cs.columbia.edu, linuxppc-dev@lists.ozlabs.org,
         Huacai Chen <chenhuacai@kernel.org>,
         Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
@@ -38,86 +51,28 @@ Cc:     kvm@vger.kernel.org, linux-mips@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
         Juergen Gross <jgross@suse.com>,
         Nicholas Piggin <npiggin@gmail.com>,
+        Sean Christopherson <seanjc@google.com>,
         Paul Mackerras <paulus@samba.org>,
         Michael Ellerman <mpe@ellerman.id.au>,
         James Morse <james.morse@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         kernel-team@android.com
-Subject: Re: [PATCH 5/5] KVM: Convert the kvm->vcpus array to a xarray
-In-Reply-To: <YYWSUJ1qzhfqjQow@google.com>
-References: <20211105192101.3862492-1-maz@kernel.org>
-        <20211105192101.3862492-6-maz@kernel.org>
-        <YYWSUJ1qzhfqjQow@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: seanjc@google.com, kvm@vger.kernel.org, linux-mips@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linuxppc-dev@lists.ozlabs.org, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, anup.patel@wdc.com, atish.patra@wdc.com, borntraeger@de.ibm.com, frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com, pbonzini@redhat.com, jgross@suse.com, npiggin@gmail.com, paulus@samba.org, mpe@ellerman.id.au, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 05 Nov 2021 20:21:36 +0000,
-Sean Christopherson <seanjc@google.com> wrote:
-> 
-> On Fri, Nov 05, 2021, Marc Zyngier wrote:
-> > At least on arm64 and x86, the vcpus array is pretty huge (512 entries),
-> > and is mostly empty in most cases (running 512 vcpu VMs is not that
-> > common). This mean that we end-up with a 4kB block of unused memory
-> > in the middle of the kvm structure.
-> 
-> Heh, x86 is now up to 1024 entries.
-
-Humph. I don't want to know whether people are actually using that in
-practice. The only time I create VMs with 512 vcpus is to check
-whether it still works...
-
->  
-> > Instead of wasting away this memory, let's use an xarray instead,
-> > which gives us almost the same flexibility as a normal array, but
-> > with a reduced memory usage with smaller VMs.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> > @@ -693,7 +694,7 @@ static inline struct kvm_vcpu *kvm_get_vcpu(struct kvm *kvm, int i)
-> >  
-> >  	/* Pairs with smp_wmb() in kvm_vm_ioctl_create_vcpu.  */
-> >  	smp_rmb();
-> > -	return kvm->vcpus[i];
-> > +	return xa_load(&kvm->vcpu_array, i);
-> >  }
-> 
-> It'd be nice for this series to convert kvm_for_each_vcpu() to use
-> xa_for_each() as well.  Maybe as a patch on top so that potential
-> explosions from that are isolated from the initiali conversion?
-> 
-> Or maybe even use xa_for_each_range() to cap at online_vcpus?
-> That's technically a functional change, but IMO it's easier to
-> reason about iterating over a snapshot of vCPUs as opposed to being
-> able to iterate over vCPUs as their being added.  In practice I
-> doubt it matters.
-> 
-> #define kvm_for_each_vcpu(idx, vcpup, kvm) \
-> 	xa_for_each_range(&kvm->vcpu_array, idx, vcpup, 0, atomic_read(&kvm->online_vcpus))
+On Fri, Nov 5, 2021 at 9:14 PM Marc Zyngier <maz@kernel.org> wrote:
 >
+> As we are about to change the way vcpus are allocated, mandate
+> the use of kvm_get_vcpu() instead of open-coding the access.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/mips/kvm/loongson_ipi.c | 4 ++--
+>  arch/mips/kvm/mips.c         | 2 +-
+>  2 files changed, 3 insertions(+), 3 deletions(-)
 
-I think that's already the behaviour of this iterator (we stop at the
-first empty slot capped to online_vcpus. The only change in behaviour
-is that vcpup currently holds a pointer to the last vcpu in no empty
-slot has been encountered. xa_for_each{,_range}() would set the
-pointer to NULL at all times.
-
-I doubt anyone relies on that, but it is probably worth eyeballing
-some of the use cases...
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
