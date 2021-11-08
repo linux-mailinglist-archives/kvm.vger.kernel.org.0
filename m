@@ -2,148 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 00D1F447FB7
-	for <lists+kvm@lfdr.de>; Mon,  8 Nov 2021 13:46:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 17027447FC4
+	for <lists+kvm@lfdr.de>; Mon,  8 Nov 2021 13:49:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239801AbhKHMsi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Nov 2021 07:48:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45054 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239825AbhKHMsV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Nov 2021 07:48:21 -0500
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B015DC061746;
-        Mon,  8 Nov 2021 04:45:36 -0800 (PST)
-Received: by mail-pg1-x529.google.com with SMTP id r28so15053976pga.0;
-        Mon, 08 Nov 2021 04:45:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=Ds5oAZuKgLL1xXWixp9LhgaW7VT7IJj7unEHWE7U3AA=;
-        b=lyKdXi1LAjXqUBVHalP53qi4+ETLcq5PAJ4GFZ1LzlOPGPpqLC5O3NART0Ot2AZf9J
-         tPoYgIWjfjsGZ+V4Kej4yrY0cUUdgClfcEsWrqlMdmrfPHMxyNOzQSQsd+lWG9z79vjU
-         v8PZWeQmmGfTo6AiZtOzNHgGPNKivghpOfW+PNp0uJ6TKOzdnLdIdxg5qNL5707wAgc+
-         Pu7/7FwETwHzFlJXFsCc5j6zK/KEFHTOB4jkrfDjgVwRT5TUaf1BZZJOF/jkYH7ZAliW
-         2No7GURKjYhcGSjNrdnaObknT/IqGwR7sMf8I2o13ck+TSPcI/g+zFWRVEiHHs9zkzig
-         NRdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=Ds5oAZuKgLL1xXWixp9LhgaW7VT7IJj7unEHWE7U3AA=;
-        b=SSMQnLXjkmYQPimnaIkTS5swpL4IMe20E354VvP81J+fO5gi6r8HWJC8AoAjqm9EgM
-         TUYa5t/Utv3+fW2VFaNKIPjQ9rc82PMXLHP5IlzD7QeWlbrM5A9sRitP1iONOJxRO/qH
-         YHiHNJr9D5Vd/9o3X67JfCcWahbz0LXFNF6DSLuA5R91U8PKb222h/1jMM3bCDLmi3PN
-         lziPDYs9/HHe54ymbmZhFS41YzRGha/LR2BzpmIvPoE69fEOoqvUzR3MSFUXKsbTcMhJ
-         bnS3ThxdgDyiIIYYe9JfklKlsmHq+KtG00yE3bb9xRlsEyTb3/lnKe6Z0Tljpp+a/CrR
-         /o8g==
-X-Gm-Message-State: AOAM532VSPRPZB/UsGvESVw2mDTZPRhDX0IEVvk534CWGQHMiKoDUB7o
-        RYM+LUTn9iCWDrlpj5GqVTWWUvlF+Lo=
-X-Google-Smtp-Source: ABdhPJy9KW5BcL4gCTCvaGKr1La4X3SLYlC6REo6VDucO+mKTFycxjA50D3cfXvv13u6RDHa+nrOdg==
-X-Received: by 2002:a63:3543:: with SMTP id c64mr28825166pga.443.1636375536060;
-        Mon, 08 Nov 2021 04:45:36 -0800 (PST)
-Received: from localhost ([47.88.60.64])
-        by smtp.gmail.com with ESMTPSA id b8sm15424651pfi.103.2021.11.08.04.45.34
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 08 Nov 2021 04:45:35 -0800 (PST)
-From:   Lai Jiangshan <jiangshanlai@gmail.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>
-Subject: [PATCH 15/15] KVM: nVMX: Always write vmcs.GUEST_CR3 during nested VM-Exit
-Date:   Mon,  8 Nov 2021 20:44:07 +0800
-Message-Id: <20211108124407.12187-16-jiangshanlai@gmail.com>
-X-Mailer: git-send-email 2.19.1.6.gb485710b
-In-Reply-To: <20211108124407.12187-1-jiangshanlai@gmail.com>
-References: <20211108124407.12187-1-jiangshanlai@gmail.com>
+        id S238426AbhKHMvU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Nov 2021 07:51:20 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:46706 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236033AbhKHMvT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 8 Nov 2021 07:51:19 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1A8BCeqB023167;
+        Mon, 8 Nov 2021 12:48:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : to : cc : references : from : subject : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=BvQHyQ+4NxbwuzlVf/NGd2GAOHhAWAXolb/HFm1xssI=;
+ b=CoGdrv3pVle/ALRPAOvV9DHyviCrGyjm+JEJvCvDHgLe48vj+bGCAcaJfuoXpDO/nwI0
+ 26Dvaf4LUHGHC3wWIBTDWcQUwQ0nZBOQ9YjTBNd0q8/nDHos3n8VHERp+M60j4iB5m7E
+ sdU6uXFy36S+s3IsWHW5V4In0Tp+1FftWLBMA/euVr4ciHZZYZ9aPjNY89FA5Q3qFJE+
+ kxcBHrdMm7FVi/D0VNbgpRwpMefzq2kAkZZmz2mkbYMep5e67q7K4CiachF0JcvqTuj4
+ BtZLztEjzliMwAfhSnyVxP2FDgZKJiN3Dkg0uQ+WifRWAcCxTqB1DO6V4ktmvhNIHd9l 8g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3c6qeygrma-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 08 Nov 2021 12:48:34 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1A8CU6UD025572;
+        Mon, 8 Nov 2021 12:48:34 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3c6qeygrkk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 08 Nov 2021 12:48:34 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1A8CbnTn023609;
+        Mon, 8 Nov 2021 12:48:31 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma04ams.nl.ibm.com with ESMTP id 3c5hb9x21x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 08 Nov 2021 12:48:31 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1A8CfpIp65077608
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 8 Nov 2021 12:41:51 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6C30852059;
+        Mon,  8 Nov 2021 12:48:28 +0000 (GMT)
+Received: from [9.145.83.128] (unknown [9.145.83.128])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id E9CFA5205A;
+        Mon,  8 Nov 2021 12:48:27 +0000 (GMT)
+Message-ID: <7e785ecc-1ddb-9357-e961-4498d1bf59fd@linux.ibm.com>
+Date:   Mon, 8 Nov 2021 13:48:27 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Content-Language: en-US
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Collin Walling <walling@linux.ibm.com>,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     david@redhat.com, imbrenda@linux.ibm.com
+References: <20211027025451.290124-1-walling@linux.ibm.com>
+ <4488b572-11bf-72ff-86c0-395dfc7b3f71@linux.ibm.com>
+ <28d90d6f-b481-3588-cd33-39624710b7bd@de.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH] KVM: s390x: add debug statement for diag 318 CPNC data
+In-Reply-To: <28d90d6f-b481-3588-cd33-39624710b7bd@de.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 6aoC9tvGgBVpHIecjwrkEaJ64bW29rv2
+X-Proofpoint-ORIG-GUID: lSPzCiz1L1Esf9Tc_-ntxDgrVIG9cXLL
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
+ definitions=2021-11-08_04,2021-11-08_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
+ priorityscore=1501 mlxscore=0 clxscore=1015 mlxlogscore=999 suspectscore=0
+ lowpriorityscore=0 malwarescore=0 impostorscore=0 bulkscore=0 spamscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2111080079
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Lai Jiangshan <laijs@linux.alibaba.com>
-
-For VM-Enter, vmcs.GUEST_CR3 and vcpu->arch.cr3 are synced and it is
-better to mark VCPU_EXREG_CR3 available rather than dirty to reduce a
-redundant vmwrite(GUEST_CR3) in vmx_load_mmu_pgd().
-
-But nested_vmx_load_cr3() is also served for VM-Exit which doesn't
-set vmcs.GUEST_CR3.
-
-This patch moves writing to vmcs.GUEST_CR3 into nested_vmx_load_cr3()
-for both nested VM-Eneter/Exit and use kvm_register_mark_available().
-
-This patch doesn't cause any extra writing to vmcs.GUEST_CR3 and if
-userspace is modifying CR3 with KVM_SET_SREGS later, the dirty info
-for VCPU_EXREG_CR3 would be set for next writing to vmcs.GUEST_CR3
-and no update will be lost.
-
-Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
----
- arch/x86/kvm/vmx/nested.c | 32 +++++++++++++++++++++-----------
- 1 file changed, 21 insertions(+), 11 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index ee5a68c2ea3a..4ddd4b1b0503 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -1133,8 +1133,28 @@ static int nested_vmx_load_cr3(struct kvm_vcpu *vcpu, unsigned long cr3,
- 	if (!nested_ept)
- 		kvm_mmu_new_pgd(vcpu, cr3);
- 
-+	/*
-+	 * Immediately write vmcs.GUEST_CR3 when changing vcpu->arch.cr3.
-+	 *
-+	 * VCPU_EXREG_CR3 is marked available rather than dirty because
-+	 * vcpu->arch.cr3 and vmcs.GUEST_CR3 are synced when enable_ept and
-+	 * vmcs.GUEST_CR3 is irrelevant to vcpu->arch.cr3 when !enable_ept.
-+	 *
-+	 * For VM-Enter case, it will be propagated to vmcs12 on nested
-+	 * VM-Exit, which can occur without actually running L2 and thus
-+	 * without hitting vmx_load_mmu_pgd(), e.g. if L1 is entering L2 with
-+	 * vmcs12.GUEST_ACTIVITYSTATE=HLT, in which case KVM will intercept
-+	 * the transition to HLT instead of running L2.
-+	 *
-+	 * For VM-Exit case, it is likely that vmcs.GUEST_CR3 == cr3 here, but
-+	 * L1 may set HOST_CR3 to a value other than its CR3 before VM-Entry,
-+	 * so we just update it unconditionally.
-+	 */
-+	if (enable_ept)
-+		vmcs_writel(GUEST_CR3, cr3);
-+
- 	vcpu->arch.cr3 = cr3;
--	kvm_register_mark_dirty(vcpu, VCPU_EXREG_CR3);
-+	kvm_register_mark_available(vcpu, VCPU_EXREG_CR3);
- 
- 	/* Re-initialize the MMU, e.g. to pick up CR4 MMU role changes. */
- 	kvm_init_mmu(vcpu);
-@@ -2600,16 +2620,6 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
- 				from_vmentry, entry_failure_code))
- 		return -EINVAL;
- 
--	/*
--	 * Immediately write vmcs02.GUEST_CR3.  It will be propagated to vmcs12
--	 * on nested VM-Exit, which can occur without actually running L2 and
--	 * thus without hitting vmx_load_mmu_pgd(), e.g. if L1 is entering L2 with
--	 * vmcs12.GUEST_ACTIVITYSTATE=HLT, in which case KVM will intercept the
--	 * transition to HLT instead of running L2.
--	 */
--	if (enable_ept)
--		vmcs_writel(GUEST_CR3, vmcs12->guest_cr3);
--
- 	/* Late preparation of GUEST_PDPTRs now that EFER and CRs are set. */
- 	if (load_guest_pdptrs_vmcs12 && nested_cpu_has_ept(vmcs12) &&
- 	    is_pae_paging(vcpu)) {
--- 
-2.19.1.6.gb485710b
-
+T24gMTEvOC8yMSAxMzowNCwgQ2hyaXN0aWFuIEJvcm50cmFlZ2VyIHdyb3RlOg0KPiANCj4g
+DQo+IEFtIDA4LjExLjIxIHVtIDEyOjEyIHNjaHJpZWIgSmFub3NjaCBGcmFuazoNCj4+IE9u
+IDEwLzI3LzIxIDA0OjU0LCBDb2xsaW4gV2FsbGluZyB3cm90ZToNCj4+PiBUaGUgZGlhZyAz
+MTggZGF0YSBjb250YWlucyB2YWx1ZXMgdGhhdCBkZW5vdGUgaW5mb3JtYXRpb24gcmVnYXJk
+aW5nIHRoZQ0KPj4+IGd1ZXN0J3MgZW52aXJvbm1lbnQuIEN1cnJlbnRseSwgaXQgaXMgdW5l
+Y2Vzc2FyaWx5IGRpZmZpY3VsdCB0byBvYnNlcnZlDQo+Pj4gdGhpcyB2YWx1ZSAoZWl0aGVy
+IG1hbnVhbGx5LWluc2VydGVkIGRlYnVnIHN0YXRlbWVudHMsIGdkYiBzdGVwcGluZywgbWVt
+DQo+Pj4gZHVtcGluZyBldGMpLiBJdCdzIHVzZWZ1bCB0byBvYnNlcnZlIHRoaXMgaW5mb3Jt
+YXRpb24gdG8gb2J0YWluIGFuDQo+Pj4gYXQtYS1nbGFuY2UgdmlldyBvZiB0aGUgZ3Vlc3Qn
+cyBlbnZpcm9ubWVudCwgc28gbGV0cyBhZGQgYSBzaW1wbGUgVkNQVQ0KPj4+IGV2ZW50IHRo
+YXQgcHJpbnRzIHRoZSBDUE5DIHRvIHRoZSBzMzkwZGJmIGxvZ3MuDQo+Pj4NCj4+PiBTaWdu
+ZWQtb2ZmLWJ5OiBDb2xsaW4gV2FsbGluZyA8d2FsbGluZ0BsaW51eC5pYm0uY29tPg0KPj4+
+IC0tLQ0KPj4+ICDCoCBhcmNoL3MzOTAva3ZtL2t2bS1zMzkwLmMgfCAxICsNCj4+PiAgwqAg
+MSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspDQo+Pj4NCj4+PiBkaWZmIC0tZ2l0IGEv
+YXJjaC9zMzkwL2t2bS9rdm0tczM5MC5jIGIvYXJjaC9zMzkwL2t2bS9rdm0tczM5MC5jDQo+
+Pj4gaW5kZXggNmE2ZGQ1ZTFkYWY2Li5kYTNmZjI0ZWFiZDAgMTAwNjQ0DQo+Pj4gLS0tIGEv
+YXJjaC9zMzkwL2t2bS9rdm0tczM5MC5jDQo+Pj4gKysrIGIvYXJjaC9zMzkwL2t2bS9rdm0t
+czM5MC5jDQo+Pj4gQEAgLTQyNTQsNiArNDI1NCw3IEBAIHN0YXRpYyB2b2lkIHN5bmNfcmVn
+c19mbXQyKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkNCj4+PiAgwqDCoMKgwqDCoCBpZiAoa3Zt
+X3J1bi0+a3ZtX2RpcnR5X3JlZ3MgJiBLVk1fU1lOQ19ESUFHMzE4KSB7DQo+Pj4gIMKgwqDC
+oMKgwqDCoMKgwqDCoCB2Y3B1LT5hcmNoLmRpYWczMThfaW5mby52YWwgPSBrdm1fcnVuLT5z
+LnJlZ3MuZGlhZzMxODsNCj4+PiAgwqDCoMKgwqDCoMKgwqDCoMKgIHZjcHUtPmFyY2guc2ll
+X2Jsb2NrLT5jcG5jID0gdmNwdS0+YXJjaC5kaWFnMzE4X2luZm8uY3BuYzsNCj4+PiArwqDC
+oMKgwqDCoMKgwqAgVkNQVV9FVkVOVCh2Y3B1LCAyLCAic2V0dGluZyBjcG5jIHRvICVkIiwg
+dmNwdS0+YXJjaC5kaWFnMzE4X2luZm8uY3BuYyk7DQo+Pj4gIMKgwqDCoMKgwqAgfQ0KPj4+
+ICDCoMKgwqDCoMKgIC8qDQo+Pj4gIMKgwqDCoMKgwqDCoCAqIElmIHVzZXJzcGFjZSBzZXRz
+IHRoZSByaWNjYiAoZS5nLiBhZnRlciBtaWdyYXRpb24pIHRvIGEgdmFsaWQgc3RhdGUsDQo+
+Pj4NCj4+DQo+PiBXb24ndCB0aGF0IHR1cm4gdXAgZm9yIGV2ZXJ5IHZjcHUgYW5kIHNwYW0g
+dGhlIGxvZz8NCj4gDQo+IG9ubHkgaWYgdGhlIHVzZXJzcGFjZSBhbHdheXMgc2V0cyB0aGUg
+ZGlydHkgYml0ICh3aGljaCBpdCBzaG91bGQgbm90KS4NCj4gDQoNCkJ1dCB0aGF0J3MgZXhh
+Y3RseSB3aGF0IGl0IGRvZXMsIG5vPw0KV2UgZG8gYSBsb29wIG92ZXIgYWxsIHZjcHVzIGFu
+ZCBjYWxsIGt2bV9zMzkwX3NldF9kaWFnMzE4KCkgd2hpY2ggc2V0cyANCnRoZSBpbmZvIGlu
+IGt2bV9ydW4gYW5kIHNldHMgdGhlIGRpYWczMTggYml0IGluIHRoZSBrdm1fZGlydHlfcmVn
+cy4NCg0KQENvbGxpbjogQ291bGQgeW91IGNoZWNrIHRoYXQgcGxlYXNlPw0K
