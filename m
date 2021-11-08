@@ -2,103 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E129E449DA1
-	for <lists+kvm@lfdr.de>; Mon,  8 Nov 2021 22:07:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 08EC3449E41
+	for <lists+kvm@lfdr.de>; Mon,  8 Nov 2021 22:31:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239325AbhKHVKl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Nov 2021 16:10:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47206 "EHLO
+        id S240390AbhKHVec (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Nov 2021 16:34:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52704 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231996AbhKHVKk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Nov 2021 16:10:40 -0500
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D97C9C061570
-        for <kvm@vger.kernel.org>; Mon,  8 Nov 2021 13:07:55 -0800 (PST)
-Received: by mail-pl1-x62c.google.com with SMTP id u17so16813796plg.9
-        for <kvm@vger.kernel.org>; Mon, 08 Nov 2021 13:07:55 -0800 (PST)
+        with ESMTP id S238057AbhKHVea (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Nov 2021 16:34:30 -0500
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6656BC061570
+        for <kvm@vger.kernel.org>; Mon,  8 Nov 2021 13:31:45 -0800 (PST)
+Received: by mail-pg1-x52f.google.com with SMTP id p8so15038433pgh.11
+        for <kvm@vger.kernel.org>; Mon, 08 Nov 2021 13:31:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=Cp6vZetKpkElyiBtPgIxgukktZ0AkdM63MCzBnzruM8=;
-        b=loCOngRzFgnpjgKErGCHanLkYaFws6XxH7f8cuIK3LMmyu/jdKIBLIgLsWkUGdqgiT
-         WLSeHTk9CoYl4RKa+F8t/Wy45ErkLb3Oq8Ce/6czE9pUqwYm9CbPTne2M8TdVoERpzlQ
-         gN7wVIBCaVEjhUoXXqhrf25GkkyZGgNMP57ysh0mMHZ2KkMWJeKhBbfCDv2iLOrU3D1V
-         z2GA4i/nPm2uUwxueFc4oWzsk73CrHBcOuBKIo5nT2L72lvB4aYBP9xXn0eMEf+zkScw
-         pSuBis7myHejZzAvWqJLnHIcwM/+K5m0RRSHgnWzWdZ2+iQuowtdAnzP12baGhPTP+a3
-         VsZw==
+        bh=IoCUy0ckLTOFUid7Iy+BX/Hk13faaLcXTZhF2jkBuiI=;
+        b=sPc/XZpVz19bKX0gCpMfnJqHnHPZTZQoluFvw3APki3n2cKwA1Ge8GfHYO8w9Ke7WH
+         01LCzn86g4nTjJQTMYv/gCAAQtYP9X5hy8VmAqT9qqWY68Vgl+DFDXz97UchzAt/oKP0
+         JQYFADxNuPhY1brHfNwCNEsLwJIwJQVjRvCNmP8xruoW7x2kgL31W98KnHCu0g69PKQy
+         tvANGY/wEJwuJscViJg159D0+7LNRuxxOqyssLzWjNq0D8UvmKuZaM2vL3Fu0AMDaRIi
+         0GRTOQO2z7jh23YyjSAdfYxYyXDrS5ti4LA8wr0Tm1O0AB74VyDKUhPuK3z+g/nRJIg7
+         h/TA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=Cp6vZetKpkElyiBtPgIxgukktZ0AkdM63MCzBnzruM8=;
-        b=0cjOxNWSEaklHZjDXaSboQK7lzCZ0bnLYedbAW5OFL8rStQLuOR9TeRDgY3yGCBLZt
-         zhqXkepu4l4uH/hxP4hvvKllTJsdAOhftQCLAPqRCGjAvZ7c/LqF5RAc1qjdTRwYpedE
-         CLmK8mpXih3IvHRT9HWXF4/31NGM1vVQQoLOMwL9fP+K3Ta+AN66RbBFKJXaRbcgDn2D
-         ayoNgxRsYL+W2qG8RMx2bgvUIXsglmhIri/4z6pweBxBHsL53hF1w5olwif1miHGRqLz
-         JjcFZ6TliBkKpZiHudDULlM1m2gZYq+QkTR+79AcDMlYNw2boeI4d0alD/uqFfOkSWI9
-         +73Q==
-X-Gm-Message-State: AOAM533u4AHlpFComzRMthhCidCDhJzCecP3xIOIsF5ED2nkaUaXg9pA
-        qy8IDKJ1iXoI2Ao+5CD7XHxVoA==
-X-Google-Smtp-Source: ABdhPJyWTSDzju6o4BQzR4xICT/TvND+ogsMpwV3gEVGphv7H/u0foelXIz3p0faAFwN8mtDr+naxQ==
-X-Received: by 2002:a17:902:b18b:b0:13a:354a:3e9d with SMTP id s11-20020a170902b18b00b0013a354a3e9dmr2284442plr.36.1636405675175;
-        Mon, 08 Nov 2021 13:07:55 -0800 (PST)
-Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
-        by smtp.gmail.com with ESMTPSA id fh3sm241723pjb.8.2021.11.08.13.07.54
+        bh=IoCUy0ckLTOFUid7Iy+BX/Hk13faaLcXTZhF2jkBuiI=;
+        b=ftS9UJpi11SIUyQbG7Pzipcv1S7S0CmJOaPqwv3cn2ZJPtP4icsK9Q3f3rgziXSJY7
+         XDQCN+xI0ytN5kJVnz+1DBulnhAKcbjscYDUUI1gGjJbo2BL3jGDHn6quzutboXj0G6x
+         ULb9ZD5ijomoPFCm99xVMbJjhNexQQXjQB/Qj3uWJ+pSVbl+CfHKHxT+2VS1vCPw1XwB
+         Ci/e72cii17eWlUYZbZAFSeVZ9jQQrk3oIHLBGK92DZop2QvhuqKGAtFtphKNVSOoYoE
+         qG78PYMrE2ljZFz80qa9BNPqILme7NJvfCZablT83el2hWQ+DuYwtbB9/EhaRhyzdVYy
+         Ujog==
+X-Gm-Message-State: AOAM531Zf8s8sEe6/e+d0TyM7lVQCoAHTa6EsDwnbxYXC2FKRfMxpeso
+        Qw7xtlGeU5MmwZjRdGwWorRZiQ==
+X-Google-Smtp-Source: ABdhPJykBxJsO3lt/l2H3w3eMF0RzDf+q/D8UKOuN74GOHiY+muFWNxDtsMWZtXqU+QdDq9XNTq/dg==
+X-Received: by 2002:a05:6a00:70e:b0:480:be26:6240 with SMTP id 14-20020a056a00070e00b00480be266240mr2107586pfl.30.1636407104668;
+        Mon, 08 Nov 2021 13:31:44 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id v10sm4657125pfg.162.2021.11.08.13.31.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Nov 2021 13:07:54 -0800 (PST)
-Date:   Mon, 8 Nov 2021 21:07:51 +0000
-From:   David Matlack <dmatlack@google.com>
-To:     Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>
+        Mon, 08 Nov 2021 13:31:43 -0800 (PST)
+Date:   Mon, 8 Nov 2021 21:31:39 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Chenyi Qiang <chenyi.qiang@intel.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Ben Gardon <bgardon@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Harish Barathvajasankar <hbarath@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>
-Subject: Re: RFC: KVM: x86/mmu: Eager Page Splitting
-Message-ID: <YYmRpz4dQgli3GKM@google.com>
-References: <CALzav=dV_U4r1K9oDq4esb4mpBQDQ2ROQ5zH5wV3KpOaZrRW-A@mail.gmail.com>
- <bc06dd82-06e1-b455-b2c1-59125b530dda@linux.vnet.ibm.com>
+        Joerg Roedel <joro@8bytes.org>,
+        Xiaoyao Li <xiaoyao.li@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 6/7] KVM: VMX: Expose PKS to guest
+Message-ID: <YYmXO2WQpydWVro0@google.com>
+References: <20210811101126.8973-1-chenyi.qiang@intel.com>
+ <20210811101126.8973-7-chenyi.qiang@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <bc06dd82-06e1-b455-b2c1-59125b530dda@linux.vnet.ibm.com>
+In-Reply-To: <20210811101126.8973-7-chenyi.qiang@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 05, 2021 at 06:17:11PM +0100, Janis Schoetterl-Glausch wrote:
-> On 11/4/21 23:45, David Matlack wrote:
-> 
-> [...]
-> > 
-> > The last alternative is to perform dirty tracking at a 2M granularity.
-> > This would reduce the amount of splitting work required by 512x,
-> > making the current approach of splitting on fault less impactful to
-> > customer performance. We are in the early stages of investigating 2M
-> > dirty tracking internally but it will be a while before it is proven
-> > and ready for production. Furthermore there may be scenarios where
-> > dirty tracking at 4K would be preferable to reduce the amount of
-> > memory that needs to be demand-faulted during precopy.
+On Wed, Aug 11, 2021, Chenyi Qiang wrote:
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 739be5da3bca..dbee0d639db3 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -458,7 +458,7 @@ void kvm_set_cpu_caps(void)
+>  		F(AVX512_VPOPCNTDQ) | F(UMIP) | F(AVX512_VBMI2) | F(GFNI) |
+>  		F(VAES) | F(VPCLMULQDQ) | F(AVX512_VNNI) | F(AVX512_BITALG) |
+>  		F(CLDEMOTE) | F(MOVDIRI) | F(MOVDIR64B) | 0 /*WAITPKG*/ |
+> -		F(SGX_LC) | F(BUS_LOCK_DETECT)
+> +		F(SGX_LC) | F(BUS_LOCK_DETECT) | 0 /*PKS*/
 
-Oops I meant to say "demand-faulted during post-copy" here.
+...
 
-> I'm curious how you're going about evaluating this, as I've experimented with
-> 2M dirty tracking in the past, in a continuous checkpointing context however.
-> I suspect it's very sensitive to the workload. If the coarser granularity
-> leads to more memory being considered dirty, the length of pre-copy rounds
-> increases, giving the workload more time to dirty even more memory.
-> Ideally large pages would be used only for regions that won't be dirty or
-> regions that would also be pretty much completely dirty when tracking at 4K.
-> But deciding the granularity adaptively is hard, doing 2M tracking instead
-> of 4K robs you of the very information you'd need to judge that.
+>  	);
+>  	/* Set LA57 based on hardware capability. */
+>  	if (cpuid_ecx(7) & F(LA57))
 
-We're planning to look at how 2M tracking affects the amount of memory
-that needs to be demand-faulted during the post-copy phase for different
-workloads.
+...
+
+> @@ -7311,6 +7312,14 @@ static __init void vmx_set_cpu_caps(void)
+>  
+>  	if (cpu_has_vmx_waitpkg())
+>  		kvm_cpu_cap_check_and_set(X86_FEATURE_WAITPKG);
+> +
+> +	/*
+> +	 * PKS is not yet implemented for shadow paging.
+> +	 * If not support VM_{ENTRY, EXIT}_LOAD_IA32_PKRS,
+> +	 * don't expose the PKS as well.
+> +	 */
+> +	if (enable_ept && cpu_has_load_ia32_pkrs())
+> +		kvm_cpu_cap_check_and_set(X86_FEATURE_PKS);
+
+I would rather handle the !TDP case in cpuid.c alongside the PKU.  The decision
+to not support Protection Keys with legacy shadow paging is an x86 decision, not
+a VMX decision.
+
+And VMX's extra restriction on the VMCS support should not bleed into common x86.
+
+Can you also opportunistically update the comment (see below) to explain _why_
+OSPKE needs to be enabled in order to advertise PKU?
+
+Thanks!
+
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 2d70edb0f323..c4ed6881857c 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -439,18 +439,23 @@ void kvm_set_cpu_caps(void)
+                F(AVX512_VPOPCNTDQ) | F(UMIP) | F(AVX512_VBMI2) | F(GFNI) |
+                F(VAES) | F(VPCLMULQDQ) | F(AVX512_VNNI) | F(AVX512_BITALG) |
+                F(CLDEMOTE) | F(MOVDIRI) | F(MOVDIR64B) | 0 /*WAITPKG*/ |
+-               F(SGX_LC) | F(BUS_LOCK_DETECT)
++               F(SGX_LC) | F(BUS_LOCK_DETECT) | F(PKS)
+        );
+        /* Set LA57 based on hardware capability. */
+        if (cpuid_ecx(7) & F(LA57))
+                kvm_cpu_cap_set(X86_FEATURE_LA57);
+
+        /*
+-        * PKU not yet implemented for shadow paging and requires OSPKE
+-        * to be set on the host. Clear it if that is not the case
++        * Protection Keys are not supported for shadow paging.  PKU further
++        * requires OSPKE to be set on the host in order to use {RD,WR}PKRU to
++        * save/restore the guests PKRU.
+         */
+-       if (!tdp_enabled || !boot_cpu_has(X86_FEATURE_OSPKE))
++       if (!tdp_enabled) {
+                kvm_cpu_cap_clear(X86_FEATURE_PKU);
++               kvm_cpu_cap_clear(X86_FEATURE_PKS);
++       } else if (!boot_cpu_has(X86_FEATURE_OSPKE)) {
++               kvm_cpu_cap_clear(X86_FEATURE_PKU);
++       }
+
+        kvm_cpu_cap_mask(CPUID_7_EDX,
+                F(AVX512_4VNNIW) | F(AVX512_4FMAPS) | F(SPEC_CTRL) |
+
+
+and then vmx.c only needs to handle clearing PKS when the VMCS controls aren't
+available.
