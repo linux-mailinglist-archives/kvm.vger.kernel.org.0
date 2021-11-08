@@ -2,128 +2,253 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D2D9447BB9
-	for <lists+kvm@lfdr.de>; Mon,  8 Nov 2021 09:23:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0105B447BCA
+	for <lists+kvm@lfdr.de>; Mon,  8 Nov 2021 09:27:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237933AbhKHI0G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Nov 2021 03:26:06 -0500
-Received: from mail.kernel.org ([198.145.29.99]:57456 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237926AbhKHI0F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Nov 2021 03:26:05 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 972326124D;
-        Mon,  8 Nov 2021 08:23:21 +0000 (UTC)
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1mjzvz-0046FA-EY; Mon, 08 Nov 2021 08:23:19 +0000
+        id S237961AbhKHIa3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Nov 2021 03:30:29 -0500
+Received: from szxga08-in.huawei.com ([45.249.212.255]:27121 "EHLO
+        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235532AbhKHIa1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Nov 2021 03:30:27 -0500
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.56])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4Hnkh7665gz1DJGd;
+        Mon,  8 Nov 2021 16:25:27 +0800 (CST)
+Received: from dggpeml500013.china.huawei.com (7.185.36.41) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.15; Mon, 8 Nov 2021 16:27:38 +0800
+Received: from [10.174.187.161] (10.174.187.161) by
+ dggpeml500013.china.huawei.com (7.185.36.41) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
+ 15.1.2308.15; Mon, 8 Nov 2021 16:27:38 +0800
+Subject: Re: [PATCH V10 05/18] KVM: x86/pmu: Set MSR_IA32_MISC_ENABLE_EMON bit
+ when vPMU is enabled
+To:     Like Xu <like.xu.linux@gmail.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>
+References: <20210806133802.3528-1-lingshan.zhu@intel.com>
+ <20210806133802.3528-6-lingshan.zhu@intel.com> <6187A6F9.5030401@huawei.com>
+ <5aa115ab-d22c-098d-0591-36c7ab15f8b6@gmail.com>
+ <6188A28B.2020302@huawei.com>
+ <276febe3-f61c-8c3d-b069-bbcea4217660@gmail.com>
+CC:     <seanjc@google.com>, <vkuznets@redhat.com>,
+        <wanpengli@tencent.com>, <jmattson@google.com>, <joro@8bytes.org>,
+        <kan.liang@linux.intel.com>, <ak@linux.intel.com>,
+        <wei.w.wang@intel.com>, <eranian@google.com>,
+        <linux-kernel@vger.kernel.org>, <x86@kernel.org>,
+        <kvm@vger.kernel.org>, <boris.ostrvsky@oracle.com>,
+        Yao Yuan <yuan.yao@intel.com>,
+        "Venkatesh Srinivas" <venkateshs@chromium.org>,
+        "Fangyi (Eric)" <eric.fangyi@huawei.com>,
+        Xiexiangyou <xiexiangyou@huawei.com>
+From:   Liuxiangdong <liuxiangdong5@huawei.com>
+Message-ID: <6188DF79.7010405@huawei.com>
+Date:   Mon, 8 Nov 2021 16:27:37 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:38.0) Gecko/20100101
+ Thunderbird/38.1.0
 MIME-Version: 1.0
-Date:   Mon, 08 Nov 2021 08:23:19 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-mips@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, linuxppc-dev@lists.ozlabs.org,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup.patel@wdc.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Juergen Gross <jgross@suse.com>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        kernel-team@android.com
-Subject: Re: [PATCH 5/5] KVM: Convert the kvm->vcpus array to a xarray
-In-Reply-To: <87mtmhec88.wl-maz@kernel.org>
-References: <20211105192101.3862492-1-maz@kernel.org>
- <20211105192101.3862492-6-maz@kernel.org> <YYWSUJ1qzhfqjQow@google.com>
- <87mtmhec88.wl-maz@kernel.org>
-User-Agent: Roundcube Webmail/1.4.11
-Message-ID: <8400fc5dfa13c89c8786bfc809011a54@kernel.org>
-X-Sender: maz@kernel.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+In-Reply-To: <276febe3-f61c-8c3d-b069-bbcea4217660@gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: seanjc@google.com, kvm@vger.kernel.org, linux-mips@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linuxppc-dev@lists.ozlabs.org, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, anup.patel@wdc.com, atish.patra@wdc.com, borntraeger@de.ibm.com, frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com, pbonzini@redhat.com, jgross@suse.com, npiggin@gmail.com, paulus@samba.org, mpe@ellerman.id.au, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Originating-IP: [10.174.187.161]
+X-ClientProxiedBy: dggeme712-chm.china.huawei.com (10.1.199.108) To
+ dggpeml500013.china.huawei.com (7.185.36.41)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021-11-06 11:48, Marc Zyngier wrote:
-> On Fri, 05 Nov 2021 20:21:36 +0000,
-> Sean Christopherson <seanjc@google.com> wrote:
->> 
->> On Fri, Nov 05, 2021, Marc Zyngier wrote:
->> > At least on arm64 and x86, the vcpus array is pretty huge (512 entries),
->> > and is mostly empty in most cases (running 512 vcpu VMs is not that
->> > common). This mean that we end-up with a 4kB block of unused memory
->> > in the middle of the kvm structure.
->> 
->> Heh, x86 is now up to 1024 entries.
-> 
-> Humph. I don't want to know whether people are actually using that in
-> practice. The only time I create VMs with 512 vcpus is to check
-> whether it still works...
-> 
->> 
->> > Instead of wasting away this memory, let's use an xarray instead,
->> > which gives us almost the same flexibility as a normal array, but
->> > with a reduced memory usage with smaller VMs.
->> >
->> > Signed-off-by: Marc Zyngier <maz@kernel.org>
->> > ---
->> > @@ -693,7 +694,7 @@ static inline struct kvm_vcpu *kvm_get_vcpu(struct kvm *kvm, int i)
->> >
->> >  	/* Pairs with smp_wmb() in kvm_vm_ioctl_create_vcpu.  */
->> >  	smp_rmb();
->> > -	return kvm->vcpus[i];
->> > +	return xa_load(&kvm->vcpu_array, i);
->> >  }
->> 
->> It'd be nice for this series to convert kvm_for_each_vcpu() to use
->> xa_for_each() as well.  Maybe as a patch on top so that potential
->> explosions from that are isolated from the initiali conversion?
->> 
->> Or maybe even use xa_for_each_range() to cap at online_vcpus?
->> That's technically a functional change, but IMO it's easier to
->> reason about iterating over a snapshot of vCPUs as opposed to being
->> able to iterate over vCPUs as their being added.  In practice I
->> doubt it matters.
->> 
->> #define kvm_for_each_vcpu(idx, vcpup, kvm) \
->> 	xa_for_each_range(&kvm->vcpu_array, idx, vcpup, 0, 
->> atomic_read(&kvm->online_vcpus))
->> 
-> 
-> I think that's already the behaviour of this iterator (we stop at the
-> first empty slot capped to online_vcpus. The only change in behaviour
-> is that vcpup currently holds a pointer to the last vcpu in no empty
-> slot has been encountered. xa_for_each{,_range}() would set the
-> pointer to NULL at all times.
-> 
-> I doubt anyone relies on that, but it is probably worth eyeballing
-> some of the use cases...
 
-This turned out to be an interesting exercise, as we always use an
-int for the index, and the xarray iterators insist on an unsigned
-long (and even on a pointer to it). On the other hand, I couldn't
-spot any case where we'd rely on the last value of the vcpu pointer.
 
-I'll repost the series once we have a solution for patch #4, and
-we can then decide whether we want the iterator churn.
--- 
-Jazz is not dead. It just smells funny...
+On 2021/11/8 12:11, Like Xu wrote:
+> On 8/11/2021 12:07 pm, Liuxiangdong wrote:
+>>
+>>
+>> On 2021/11/8 11:06, Like Xu wrote:
+>>> On 7/11/2021 6:14 pm, Liuxiangdong wrote:
+>>>> Hi, like and lingshan.
+>>>>
+>>>> As said,  IA32_MISC_ENABLE[7] bit depends on the PMU is enabled for 
+>>>> the guest, so a software
+>>>> write openration to this bit will be ignored.
+>>>>
+>>>> But, in this patch, all the openration that writes 
+>>>> msr_ia32_misc_enable in guest could make this bit become 0.
+>>>>
+>>>> Suppose:
+>>>> When we start vm with "enable_pmu", vcpu->arch.ia32_misc_enable_msr 
+>>>> may be 0x80 first.
+>>>> And next, guest writes msr_ia32_misc_enable value 0x1.
+>>>> What we want could be 0x81, but unfortunately, it will be 0x1 
+>>>> because of
+>>>> "data &= ~MSR_IA32_MISC_ENABLE_EMON;"
+>>>> And even if guest writes msr_ia32_misc_enable value 0x81, it will 
+>>>> be 0x1 also.
+>>>>
+>>>
+>>> Yes and thank you. The fix has been committed on my private tree for 
+>>> a long time.
+>>>
+>>>>
+>>>> What we want is write operation will not change this bit. So, how 
+>>>> about this?
+>>>>
+>>>> --- a/arch/x86/kvm/x86.c
+>>>> +++ b/arch/x86/kvm/x86.c
+>>>> @@ -3321,6 +3321,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, 
+>>>> struct msr_data *msr_info)
+>>>>           }
+>>>>           break;
+>>>>       case MSR_IA32_MISC_ENABLE:
+>>>> +        data &= ~MSR_IA32_MISC_ENABLE_EMON;
+>>>> +        data |= (vcpu->arch.ia32_misc_enable_msr & 
+>>>> MSR_IA32_MISC_ENABLE_EMON);
+>>>>           if (!kvm_check_has_quirk(vcpu->kvm, 
+>>>> KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT) &&
+>>>>               ((vcpu->arch.ia32_misc_enable_msr ^ data) & 
+>>>> MSR_IA32_MISC_ENABLE_MWAIT)) {
+>>>>               if (!guest_cpuid_has(vcpu, X86_FEATURE_XMM3))
+>>>>
+>>>>
+>>>
+>>> How about this for the final state considering PEBS enabling:
+>>>
+>>>     case MSR_IA32_MISC_ENABLE: {
+>>>         u64 old_val = vcpu->arch.ia32_misc_enable_msr;
+>>>         u64 pmu_mask = MSR_IA32_MISC_ENABLE_EMON |
+>>>             MSR_IA32_MISC_ENABLE_EMON;
+>>>
+>>          u64 pmu_mask = MSR_IA32_MISC_ENABLE_EMON |
+>>              MSR_IA32_MISC_ENABLE_EMON;
+>>
+>> Repetitive "MSR_IA32_MISC_ENABLE_EMON" ?
+>
+> Oops,
+>
+>     u64 pmu_mask = MSR_IA32_MISC_ENABLE_EMON |
+>             MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL;
+>
+
+Yes. bit[12] is also read-only, so we can keep this bit unchanged also.
+
+And, because write operation will not change this bit by "pmu_mask", do 
+we still need this if statement?
+
+         /* RO bits */
+         if (!msr_info->host_initiated &&
+             ((old_val ^ data) & MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL))
+             return 1;
+
+"(old_val ^ data) & MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL" means some 
+operation tries to change this bit,
+so we cannot allow it.
+But, if there is no this judgement, "pmu_mask" will still make this 
+bit[12] no change.
+
+The only difference is that we can not change other bit (except bit 12 
+and bit 7) once "old_val[12] != data[12]" if there exists this statement
+and we can change other bit if there is no judgement.
+
+For both MSR_IA32_MISC_ENABLE_EMON and MSR_IA32_MISC_ENABLE_EMON are 
+read-only, maybe we can keep
+their behavioral consistency. Either both judge, or neither.
+
+Do you think so?
+
+
+> I'll send the fix after sync with Lingshan.
+>
+>>
+>>>         /* RO bits */
+>>>         if (!msr_info->host_initiated &&
+>>>             ((old_val ^ data) & MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL))
+>>>             return 1;
+>>>
+>>>         /*
+>>>          * For a dummy user space, the order of setting vPMU 
+>>> capabilities and
+>>>          * initialising MSR_IA32_MISC_ENABLE is not strictly 
+>>> guaranteed, so to
+>>>          * avoid inconsistent functionality we keep the vPMU bits 
+>>> unchanged here.
+>>>          */
+>> Yes. It's a little clearer with comments.
+>
+> Thanks for your feedback! Enjoy the feature.
+>
+>>>         data &= ~pmu_mask;
+>>>         data |= old_val & pmu_mask;
+>>>         if (!kvm_check_has_quirk(vcpu->kvm, 
+>>> KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT) &&
+>>>             ((old_val ^ data) & MSR_IA32_MISC_ENABLE_MWAIT)) {
+>>>             if (!guest_cpuid_has(vcpu, X86_FEATURE_XMM3))
+>>>                 return 1;
+>>>             vcpu->arch.ia32_misc_enable_msr = data;
+>>>             kvm_update_cpuid_runtime(vcpu);
+>>>         } else {
+>>>             vcpu->arch.ia32_misc_enable_msr = data;
+>>>         }
+>>>         break;
+>>>     }
+>>>
+>>>> Or is there anything in your design intention I don't understand?
+>>>>
+>>>> Thanks!
+>>>>
+>>>> Xiangdong Liu
+>>>>
+>>>>
+>>>> On 2021/8/6 21:37, Zhu Lingshan wrote:
+>>>>> From: Like Xu <like.xu@linux.intel.com>
+>>>>>
+>>>>> On Intel platforms, the software can use the IA32_MISC_ENABLE[7] 
+>>>>> bit to
+>>>>> detect whether the processor supports performance monitoring 
+>>>>> facility.
+>>>>>
+>>>>> It depends on the PMU is enabled for the guest, and a software write
+>>>>> operation to this available bit will be ignored. The proposal to 
+>>>>> ignore
+>>>>> the toggle in KVM is the way to go and that behavior matches bare 
+>>>>> metal.
+>>>>>
+>>>>> Cc: Yao Yuan <yuan.yao@intel.com>
+>>>>> Signed-off-by: Like Xu <like.xu@linux.intel.com>
+>>>>> Reviewed-by: Venkatesh Srinivas <venkateshs@chromium.org>
+>>>>> Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+>>>>> Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+>>>>> ---
+>>>>>   arch/x86/kvm/vmx/pmu_intel.c | 1 +
+>>>>>   arch/x86/kvm/x86.c           | 1 +
+>>>>>   2 files changed, 2 insertions(+)
+>>>>>
+>>>>> diff --git a/arch/x86/kvm/vmx/pmu_intel.c 
+>>>>> b/arch/x86/kvm/vmx/pmu_intel.c
+>>>>> index 9efc1a6b8693..d9dbebe03cae 100644
+>>>>> --- a/arch/x86/kvm/vmx/pmu_intel.c
+>>>>> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+>>>>> @@ -488,6 +488,7 @@ static void intel_pmu_refresh(struct kvm_vcpu 
+>>>>> *vcpu)
+>>>>>       if (!pmu->version)
+>>>>>           return;
+>>>>> +    vcpu->arch.ia32_misc_enable_msr |= MSR_IA32_MISC_ENABLE_EMON;
+>>>>>       perf_get_x86_pmu_capability(&x86_pmu);
+>>>>>       pmu->nr_arch_gp_counters = min_t(int, eax.split.num_counters,
+>>>>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>>>>> index efd11702465c..f6b6984e26ef 100644
+>>>>> --- a/arch/x86/kvm/x86.c
+>>>>> +++ b/arch/x86/kvm/x86.c
+>>>>> @@ -3321,6 +3321,7 @@ int kvm_set_msr_common(struct kvm_vcpu 
+>>>>> *vcpu, struct msr_data *msr_info)
+>>>>>           }
+>>>>>           break;
+>>>>>       case MSR_IA32_MISC_ENABLE:
+>>>>> +        data &= ~MSR_IA32_MISC_ENABLE_EMON;
+>>>>>           if (!kvm_check_has_quirk(vcpu->kvm, 
+>>>>> KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT) &&
+>>>>>               ((vcpu->arch.ia32_misc_enable_msr ^ data) & 
+>>>>> MSR_IA32_MISC_ENABLE_MWAIT)) {
+>>>>>               if (!guest_cpuid_has(vcpu, X86_FEATURE_XMM3))
+>>>>
+>>
+
