@@ -2,110 +2,210 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 30A18447E9E
-	for <lists+kvm@lfdr.de>; Mon,  8 Nov 2021 12:12:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D811447EB2
+	for <lists+kvm@lfdr.de>; Mon,  8 Nov 2021 12:16:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239066AbhKHLPF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Nov 2021 06:15:05 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:64840 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237275AbhKHLPE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 8 Nov 2021 06:15:04 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1A8A5jDX032137;
-        Mon, 8 Nov 2021 11:12:20 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=vrlk0DS0skMbOGcYGgIPcDTU+NzVsDROiDGC5k5glBc=;
- b=i30LgdhnRa1eWremX06x7eF3/0wJZ2VXe03AjfpIC70lu7sw4aQLgwuB2v0cCbz/uePV
- KAOvpQWk6zj3RcuK3xJsUUgEgH5oK/DLxLDLEfeTUJGcygVnhaIELjXV0XIlrqJf23Bp
- JfUK6FTLQnXFdmoeqlEovo37lj0iM/wsjj6WTDcNadEunE7THb15+lijKaRD140GnigL
- p9nEuEL7ZIc7ZL8d/eP/JwP1VhcJUNJkblw0BIkVFRjrP/AAnvJqALKXJJFvv5DAiA1S
- etXCf7xc0sbcnr3pOI917S983xhHx16X3tmVa7YW7umMz8iTF3DnCrWWDI1j0Wlvy2B9 Sw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3c6gxdcdah-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 08 Nov 2021 11:12:19 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1A8Awshf002043;
-        Mon, 8 Nov 2021 11:12:19 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3c6gxdcd9w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 08 Nov 2021 11:12:19 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1A8B8CkW022035;
-        Mon, 8 Nov 2021 11:12:17 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma03fra.de.ibm.com with ESMTP id 3c5hb9uyrm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 08 Nov 2021 11:12:17 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1A8B5dLj64815458
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 8 Nov 2021 11:05:40 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3E7D452050;
-        Mon,  8 Nov 2021 11:12:14 +0000 (GMT)
-Received: from [9.145.83.128] (unknown [9.145.83.128])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id B8F0152059;
-        Mon,  8 Nov 2021 11:12:13 +0000 (GMT)
-Message-ID: <4488b572-11bf-72ff-86c0-395dfc7b3f71@linux.ibm.com>
-Date:   Mon, 8 Nov 2021 12:12:13 +0100
+        id S238003AbhKHLTb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Nov 2021 06:19:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53422 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237955AbhKHLT3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Nov 2021 06:19:29 -0500
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B35C6C061570
+        for <kvm@vger.kernel.org>; Mon,  8 Nov 2021 03:16:45 -0800 (PST)
+Received: by mail-pj1-x1034.google.com with SMTP id n15-20020a17090a160f00b001a75089daa3so2446675pja.1
+        for <kvm@vger.kernel.org>; Mon, 08 Nov 2021 03:16:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=vwKn8A78nbxh1bT4nrrDsinal0xZprUrg1oMka+P7PM=;
+        b=NtiPFd+5N8XEr1a/xdNsTVcfmD/2APTPDe1Wj+sYaKyn+Cyd2eek0LmuKVCVmmdk15
+         /mDYBMPOBdDKjUPyok6e0ZI7SW6i5NKqBnctc0RtDFQmGZRyzTlBVZN3bTxC6xO36quR
+         yj+IQfKFvRyxxKGN1YK96IHqXXMwJTM0vf/FP8BLn1gpT86MoxWxCBlOe/w92OaAd0Y2
+         5+e0p7d8TLpqX+xdsmMx1o5yT5s0zna6oEvuRm2hpULRriS/mjE6EzqPmtpP0iZOCzT/
+         eemKmVpRD0YOEHH4KSoJvg8RQCuUMPS2oAPH/v1WE5XMLZ+f3kQx9xHyq2PHtIZaAOUf
+         NWKg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=vwKn8A78nbxh1bT4nrrDsinal0xZprUrg1oMka+P7PM=;
+        b=RM439UBeEsBs6B1Q5crDOycjhLnmqhdm2/kGVCV895yKBFpXgGemHtZZzv5vXjSyRm
+         UbbpJKlqdiLzr1H0kWAJRxKHqaXnv2Goerxl46Irj9J8j9nd7WBKGp9SWYe5EtmiVDGf
+         zVrOARL/m3dlpKJVHhaK8v+ZcqBnTQ+G3D+gHIlS0lOOWJe6jBuUy3VTo9SQxqtdZaZz
+         ++qqOCLQ5UPjaqiCIbUsyLkgl48rkC47i3UPS41YncWKZgilbvE67mMr2/eX3tkuVk9T
+         GDoniS+D5gJcUu8sR113GVGh6nG1x219lEQDfXTRyy8SwziDiPuoBsmgGa5qopsBjSsS
+         N32w==
+X-Gm-Message-State: AOAM530RtlRtuJ7C7lmCqEXT1Q8Ci4J+cgTAk8DB/EL33kaG2bUUQgZl
+        6sKMsehk2q/vZJo6EWObczQXKA==
+X-Google-Smtp-Source: ABdhPJwT9OALjA7XUOHAUqMWCDd7RxGUBBT74K9E+6FkOYMtJyjbAwop3cCVdj3F8B78r9nsEmkMvA==
+X-Received: by 2002:a17:90b:4d86:: with SMTP id oj6mr49859606pjb.101.1636370205218;
+        Mon, 08 Nov 2021 03:16:45 -0800 (PST)
+Received: from [10.2.24.177] ([61.120.150.70])
+        by smtp.gmail.com with ESMTPSA id b18sm13187422pjo.31.2021.11.08.03.16.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 08 Nov 2021 03:16:44 -0800 (PST)
+Subject: Re: Re: [RFC] KVM: x86: SVM: don't expose PV_SEND_IPI feature with
+ AVIC
+To:     Maxim Levitsky <mlevitsk@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Kele Huang <huangkele@bytedance.com>
+Cc:     chaiwen.cc@bytedance.com, xieyongji@bytedance.com,
+        dengliang.1214@bytedance.com, wanpengli@tencent.com,
+        seanjc@google.com, Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20211108095931.618865-1-huangkele@bytedance.com>
+ <a991bbb4-b507-a2f6-ec0f-fce23d4379ce@redhat.com>
+ <f93612f54a5cde53fd9342f703ccbaf3c9edbc9c.camel@redhat.com>
+From:   zhenwei pi <pizhenwei@bytedance.com>
+Message-ID: <ad6b3ef5-4928-681c-a0cf-5a1095654566@bytedance.com>
+Date:   Mon, 8 Nov 2021 19:14:49 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.0
-Subject: Re: [PATCH] KVM: s390x: add debug statement for diag 318 CPNC data
+In-Reply-To: <f93612f54a5cde53fd9342f703ccbaf3c9edbc9c.camel@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-To:     Collin Walling <walling@linux.ibm.com>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     borntraeger@de.ibm.com, david@redhat.com, imbrenda@linux.ibm.com
-References: <20211027025451.290124-1-walling@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <20211027025451.290124-1-walling@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: yL9cOTcnWbK5eDssAy75CIaSZgiIOHR4
-X-Proofpoint-GUID: nxJhD1ra3RzQ9TPpFGZHEPHC-GpJT9q3
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-11-08_03,2021-11-08_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
- priorityscore=1501 clxscore=1011 lowpriorityscore=0 mlxlogscore=999
- bulkscore=0 phishscore=0 adultscore=0 mlxscore=0 suspectscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2111080070
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/27/21 04:54, Collin Walling wrote:
-> The diag 318 data contains values that denote information regarding the
-> guest's environment. Currently, it is unecessarily difficult to observe
-> this value (either manually-inserted debug statements, gdb stepping, mem
-> dumping etc). It's useful to observe this information to obtain an
-> at-a-glance view of the guest's environment, so lets add a simple VCPU
-> event that prints the CPNC to the s390dbf logs.
+On 11/8/21 7:08 PM, Maxim Levitsky wrote:
+> On Mon, 2021-11-08 at 11:30 +0100, Paolo Bonzini wrote:
+>> On 11/8/21 10:59, Kele Huang wrote:
+>>> Currently, AVIC is disabled if x2apic feature is exposed to guest
+>>> or in-kernel PIT is in re-injection mode.
+>>>
+>>> We can enable AVIC with options:
+>>>
+>>>     Kmod args:
+>>>     modprobe kvm_amd avic=1 nested=0 npt=1
+>>>     QEMU args:
+>>>     ... -cpu host,-x2apic -global kvm-pit.lost_tick_policy=discard ...
+>>>
+>>> When LAPIC works in xapic mode, both AVIC and PV_SEND_IPI feature
+>>> can accelerate IPI operations for guest. However, the relationship
+>>> between AVIC and PV_SEND_IPI feature is not sorted out.
+>>>
+>>> In logical, AVIC accelerates most of frequently IPI operations
+>>> without VMM intervention, while the re-hooking of apic->send_IPI_xxx
+>>> from PV_SEND_IPI feature masks out it. People can get confused
+>>> if AVIC is enabled while getting lots of hypercall kvm_exits
+>>> from IPI.
+>>>
+>>> In performance, benchmark tool
+>>> https://lore.kernel.org/kvm/20171219085010.4081-1-ynorov@caviumnetworks.com/
+>>> shows below results:
+>>>
+>>>     Test env:
+>>>     CPU: AMD EPYC 7742 64-Core Processor
+>>>     2 vCPUs pinned 1:1
+>>>     idle=poll
+>>>
+>>>     Test result (average ns per IPI of lots of running):
+>>>     PV_SEND_IPI 	: 1860
+>>>     AVIC 		: 1390
+>>>
+>>> Besides, disscussions in https://lkml.org/lkml/2021/10/20/423
+>>> do have some solid performance test results to this.
+>>>
+>>> This patch fixes this by masking out PV_SEND_IPI feature when
+>>> AVIC is enabled in setting up of guest vCPUs' CPUID.
+>>>
+>>> Signed-off-by: Kele Huang <huangkele@bytedance.com>
+>>
+>> AVIC can change across migration.  I think we should instead use a new
+>> KVM_HINTS_* bit (KVM_HINTS_ACCELERATED_LAPIC or something like that).
+>> The KVM_HINTS_* bits are intended to be changeable across migration,
+>> even though we don't have for now anything equivalent to the Hyper-V
+>> reenlightenment interrupt.
 > 
-> Signed-off-by: Collin Walling <walling@linux.ibm.com>
-> ---
->   arch/s390/kvm/kvm-s390.c | 1 +
->   1 file changed, 1 insertion(+)
+> Note that the same issue exists with HyperV. It also has PV APIC,
+> which is harmful when AVIC is enabled (that is guest uses it instead
+> of using AVIC, negating AVIC benefits).
 > 
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 6a6dd5e1daf6..da3ff24eabd0 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -4254,6 +4254,7 @@ static void sync_regs_fmt2(struct kvm_vcpu *vcpu)
->   	if (kvm_run->kvm_dirty_regs & KVM_SYNC_DIAG318) {
->   		vcpu->arch.diag318_info.val = kvm_run->s.regs.diag318;
->   		vcpu->arch.sie_block->cpnc = vcpu->arch.diag318_info.cpnc;
-> +		VCPU_EVENT(vcpu, 2, "setting cpnc to %d", vcpu->arch.diag318_info.cpnc);
->   	}
->   	/*
->   	 * If userspace sets the riccb (e.g. after migration) to a valid state,
+> Also note that Intel recently posted IPI virtualizaion, which
+> will make this issue relevant to APICv too soon.
+> 
+> I don't yet know if there is a solution to this which doesn't
+> involve some management software decision (e.g libvirt or higher).
+> 
+> Best regards,
+> 	Maxim Levitsky
 > 
 
-Won't that turn up for every vcpu and spam the log?
+For QEMU, "-cpu host,kvm-pv-ipi=off" can disable kvm-pv-ipi.
+And for libvirt, I posted a patch to disable kvm-pv-ipi by libvirt xml, 
+link:
+https://github.com/libvirt/libvirt/commit/b2757b697e29fa86972a4638a5879dccc8add2ad
+
+>>
+>> Paolo
+>>
+>>> ---
+>>>    arch/x86/kvm/cpuid.c   |  4 ++--
+>>>    arch/x86/kvm/svm/svm.c | 13 +++++++++++++
+>>>    2 files changed, 15 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+>>> index 2d70edb0f323..cc22975e2ac5 100644
+>>> --- a/arch/x86/kvm/cpuid.c
+>>> +++ b/arch/x86/kvm/cpuid.c
+>>> @@ -194,8 +194,6 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+>>>    		best->ecx |= XFEATURE_MASK_FPSSE;
+>>>    	}
+>>>    
+>>> -	kvm_update_pv_runtime(vcpu);
+>>> -
+>>>    	vcpu->arch.maxphyaddr = cpuid_query_maxphyaddr(vcpu);
+>>>    	vcpu->arch.reserved_gpa_bits = kvm_vcpu_reserved_gpa_bits_raw(vcpu);
+>>>    
+>>> @@ -208,6 +206,8 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+>>>    	/* Invoke the vendor callback only after the above state is updated. */
+>>>    	static_call(kvm_x86_vcpu_after_set_cpuid)(vcpu);
+>>>    
+>>> +	kvm_update_pv_runtime(vcpu);
+>>> +
+>>>    	/*
+>>>    	 * Except for the MMU, which needs to do its thing any vendor specific
+>>>    	 * adjustments to the reserved GPA bits.
+>>> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+>>> index b36ca4e476c2..b13bcfb2617c 100644
+>>> --- a/arch/x86/kvm/svm/svm.c
+>>> +++ b/arch/x86/kvm/svm/svm.c
+>>> @@ -4114,6 +4114,19 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+>>>    		if (nested && guest_cpuid_has(vcpu, X86_FEATURE_SVM))
+>>>    			kvm_request_apicv_update(vcpu->kvm, false,
+>>>    						 APICV_INHIBIT_REASON_NESTED);
+>>> +
+>>> +		if (!guest_cpuid_has(vcpu, X86_FEATURE_X2APIC) &&
+>>> +				!(nested && guest_cpuid_has(vcpu, X86_FEATURE_SVM))) {
+>>> +			/*
+>>> +			 * PV_SEND_IPI feature masks out AVIC acceleration to IPI.
+>>> +			 * So, we do not expose PV_SEND_IPI feature to guest when
+>>> +			 * AVIC is enabled.
+>>> +			 */
+>>> +			best = kvm_find_cpuid_entry(vcpu, KVM_CPUID_FEATURES, 0);
+>>> +			if (best && enable_apicv &&
+>>> +					(best->eax & (1 << KVM_FEATURE_PV_SEND_IPI)))
+>>> +				best->eax &= ~(1 << KVM_FEATURE_PV_SEND_IPI);
+>>> +		}
+>>>    	}
+>>>    	init_vmcb_after_set_cpuid(vcpu);
+>>>    }
+>>>
+> 
+> 
+
+-- 
+zhenwei pi
