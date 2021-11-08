@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D9B60447FB1
-	for <lists+kvm@lfdr.de>; Mon,  8 Nov 2021 13:45:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 98D2C447FB3
+	for <lists+kvm@lfdr.de>; Mon,  8 Nov 2021 13:46:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239688AbhKHMsZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Nov 2021 07:48:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45006 "EHLO
+        id S239672AbhKHMsc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Nov 2021 07:48:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239766AbhKHMsD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Nov 2021 07:48:03 -0500
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC77EC061205;
-        Mon,  8 Nov 2021 04:45:18 -0800 (PST)
-Received: by mail-pf1-x42e.google.com with SMTP id o4so1818104pfp.13;
-        Mon, 08 Nov 2021 04:45:18 -0800 (PST)
+        with ESMTP id S239780AbhKHMsI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Nov 2021 07:48:08 -0500
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A66DC061225;
+        Mon,  8 Nov 2021 04:45:24 -0800 (PST)
+Received: by mail-pf1-x435.google.com with SMTP id x131so10689058pfc.12;
+        Mon, 08 Nov 2021 04:45:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=A67VzkmpsIFHrMc7f+Wcqjp1h4M3PhJUyuzd6es3l8k=;
-        b=ior0MqkaAdyC8qtt4GdN3bBd5naygoiB1I5aUn42nUjZf+//ZMNgD4wkZjz3LkIX5t
-         Em5k2wmYSIeBFaBawG5yyh3K+ttB1S3+Tu4lMrybruJdbMLVS0i4wVR0A++h5LVD/x/q
-         g1NEZXGjrw9e974izCJYxAsW3+F9uEEQlnP0NxIwRsajB3MHDs1BiricEaCkVTDWbGwA
-         HdpgqPVUJW97Gab3DDMd2eOaaQYJ622BfOakQ5HW5Cj6gQK1YM2ZqPis+Nr80suZkRI1
-         6UU+NMovtTEJ3UKYNGlwKBSOEPFa3Fk2dHMQec2d96H3tiAWQD1tNsfBRjNIo6lM2v5H
-         USGA==
+        bh=TmKbYqg9m5arRUZ1yoqUsfhIjoLn2jM25Bi3woDZ7Y0=;
+        b=TS5T3BOEfcFbwXedPw5SQlHGYER9dzbE2MGMUzpOVp61wtiNOlSDGyfFphYYW7e8vv
+         kvwIcTAWC5SS0AZWQVjfYHvRF8OYfkoT6pkY4Fq625e4xYQY0kEFjFHPfNR4ewKPGuXG
+         es6pdEQ0d1BsjUlTvoV45pyunHhU5rwgOrZHrZo+Bdd4XrHU++n+Op+mCINNvW0cHkhz
+         AzPUlIk9uL3JOkCqcuBhH/hpIkq2TCRqd3n4EMjDbLre75QbAU+5gr8lMvw/4LOd971P
+         hWmjGAf+mVnzOXTtDLUUwPBMkCM/bnKRreL0cLfBhq7VvDTZdKy9VgqgAWUP6WjvLsVz
+         ydlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=A67VzkmpsIFHrMc7f+Wcqjp1h4M3PhJUyuzd6es3l8k=;
-        b=kGBT6TKzJkaAnzz5qVCYT901HNzyrd6Ed/qrQlDHzBA2Mkz0PA8lXckcpw9FEAT5ad
-         YeS3e9v0Xo4fK5honVtXOVlQs9oq/g+wey7eQ4A7kgMDKCJ7y831OmrXtnOaFo0vhHCz
-         gjT13X9SOjboe2xpG7uIBfGrzBmB33jyVIFdhu7eTVMKLbytpar2HaqOjTVxDWuxFoNt
-         ufai7sSpKICY5yle5mHvvtB4fpa0jDhrtZq2Wu+SH/HUnHkphZ1xmNCRy3nARFFGPwHp
-         ln9F1fPlShtbV5sB5b/7AzfcKxbUThsTjkPsAnrzKWct+U9yO8fx468sKQB91QllRQq3
-         uC0A==
-X-Gm-Message-State: AOAM533DemuEaqcez63mQPfaTTA7gUTtwZDg4wIzLzoGtttEeFxzPj5U
-        3wVMM/GPsyo3iUGS32b8dY1LkSkx2xk=
-X-Google-Smtp-Source: ABdhPJyrCaHCoYJa/M4qW3UJPuMmHCWK9221dY7LSGNAk5BYlEYMpTA+Uuyd/R1XdMbfTKqgH7ZpXg==
-X-Received: by 2002:a63:6a43:: with SMTP id f64mr88271pgc.393.1636375518181;
-        Mon, 08 Nov 2021 04:45:18 -0800 (PST)
+        bh=TmKbYqg9m5arRUZ1yoqUsfhIjoLn2jM25Bi3woDZ7Y0=;
+        b=2HXzObYLNQdSX07lYDqAsjS9/9MZbkkFIINFU5maENJPiaJRT9LpZpq9Mk6YLNmNWH
+         1r9zVgMmgcEMcu0W55Oown/eECV2avgoqZw9Rb+nzyKGr28x8lWkpRO2sTZtNyCJvMjx
+         wdq9bxWEm7L9Upe0R9nMX7p+O2v1Rm8vDbwHtU7GkQWQey7W128TkX++G0o10f3Jy8+K
+         iQtD0/9K5INgN5WFFqRB8Q2KYZoGFh7MFyUd5L00nd2FN6jqKpHrEwPlxt9hduTLyu3G
+         mLVwGRQ+rXnsSpxDRFqmB787BW2Yl8A6vnroTXIcnTf6QtlC/VgPL33KunQlFKqLXgc0
+         KJWA==
+X-Gm-Message-State: AOAM532bjTOHGx7Xrc6QOoMsA8mCfhADxn9Dm1EC9MasFR0+UDpt3TKS
+        kxlpkmMelkEwCZmvsRk0Igmhf3hai6g=
+X-Google-Smtp-Source: ABdhPJyFsaYpfmszc9hhnb+Dy6cSfwkjtylHDvxvBq5PdoJUz0xbxZV8tvxJsYgWyHuDu0vlA/nMzQ==
+X-Received: by 2002:a63:6881:: with SMTP id d123mr43841319pgc.68.1636375523761;
+        Mon, 08 Nov 2021 04:45:23 -0800 (PST)
 Received: from localhost ([47.88.60.64])
-        by smtp.gmail.com with ESMTPSA id z30sm5607212pfg.30.2021.11.08.04.45.17
+        by smtp.gmail.com with ESMTPSA id k14sm12709952pga.65.2021.11.08.04.45.22
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 08 Nov 2021 04:45:17 -0800 (PST)
+        Mon, 08 Nov 2021 04:45:23 -0800 (PST)
 From:   Lai Jiangshan <jiangshanlai@gmail.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -59,9 +59,9 @@ Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>
-Subject: [PATCH 12/15] KVM: VMX: Reset the bits that are meaningful to be reset in vmx_register_cache_reset()
-Date:   Mon,  8 Nov 2021 20:44:04 +0800
-Message-Id: <20211108124407.12187-13-jiangshanlai@gmail.com>
+Subject: [PATCH 13/15] KVM: SVM: Add and use svm_register_cache_reset()
+Date:   Mon,  8 Nov 2021 20:44:05 +0800
+Message-Id: <20211108124407.12187-14-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 In-Reply-To: <20211108124407.12187-1-jiangshanlai@gmail.com>
 References: <20211108124407.12187-1-jiangshanlai@gmail.com>
@@ -73,61 +73,65 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Lai Jiangshan <laijs@linux.alibaba.com>
 
-Add meaningful bits as VMX_REGS_AVAIL_SET and VMX_REGS_DIRTY_SET.
+It resets all the appropriate bits like vmx.
 
 Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
 ---
- arch/x86/kvm/vmx/vmx.h | 37 +++++++++++++++++++++++++++----------
- 1 file changed, 27 insertions(+), 10 deletions(-)
+ arch/x86/kvm/svm/svm.c |  3 +--
+ arch/x86/kvm/svm/svm.h | 26 ++++++++++++++++++++++++++
+ 2 files changed, 27 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index e7db42e3b0ce..465aa415c3cb 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -437,16 +437,33 @@ BUILD_CONTROLS_SHADOW(secondary_exec, SECONDARY_VM_EXEC_CONTROL)
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index b7da66935e72..ba9cfddd2875 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3969,8 +3969,7 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
  
- static inline void vmx_register_cache_reset(struct kvm_vcpu *vcpu)
- {
--	vcpu->arch.regs_avail = ~((1 << VCPU_REGS_RIP) | (1 << VCPU_REGS_RSP)
--				  | (1 << VCPU_EXREG_RFLAGS)
--				  | (1 << VCPU_EXREG_PDPTR)
--				  | (1 << VCPU_EXREG_SEGMENTS)
--				  | (1 << VCPU_EXREG_CR0)
--				  | (1 << VCPU_EXREG_CR3)
--				  | (1 << VCPU_EXREG_CR4)
--				  | (1 << VCPU_EXREG_EXIT_INFO_1)
--				  | (1 << VCPU_EXREG_EXIT_INFO_2));
--	vcpu->arch.regs_dirty = 0;
+ 	svm->vmcb->control.tlb_ctl = TLB_CONTROL_DO_NOTHING;
+ 	vmcb_mark_all_clean(svm->vmcb);
+-
+-	kvm_register_clear_available(vcpu, VCPU_EXREG_PDPTR);
++	svm_register_cache_reset(vcpu);
+ 
+ 	/*
+ 	 * We need to handle MC intercepts here before the vcpu has a chance to
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 0d7bbe548ac3..1cf5d5e2d0cd 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -274,6 +274,32 @@ static inline bool vmcb_is_dirty(struct vmcb *vmcb, int bit)
+         return !test_bit(bit, (unsigned long *)&vmcb->control.clean);
+ }
+ 
++static inline void svm_register_cache_reset(struct kvm_vcpu *vcpu)
++{
 +/*
-+ * VMX_REGS_AVAIL_SET - The set of registers that will be updated in cache on
++ * SVM_REGS_AVAIL_SET - The set of registers that will be updated in cache on
 + *			demand.  Other registers not listed here are synced to
 + *			the cache immediately after VM-Exit.
 + *
-+ * VMX_REGS_DIRTY_SET - The set of registers that might be outdated in
++ * SVM_REGS_DIRTY_SET - The set of registers that might be outdated in
 + *			architecture. Other registers not listed here are synced
 + *			to the architecture immediately when modifying.
++ *
++ *			Special case: VCPU_EXREG_CR3 should be in this set due
++ *			to the fact.  But KVM_REQ_LOAD_MMU_PGD is always
++ *			requested when the cache vcpu->arch.cr3 is changed and
++ *			svm_load_mmu_pgd() always syncs the new CR3 value into
++ *			the architecture.  So the dirty information of
++ *			VCPU_EXREG_CR3 is not used which means VCPU_EXREG_CR3
++ *			isn't required to be put in this set.
 + */
-+#define VMX_REGS_AVAIL_SET	((1 << VCPU_REGS_RIP) |\
-+				(1 << VCPU_REGS_RSP) |\
-+				(1 << VCPU_EXREG_RFLAGS) |\
-+				(1 << VCPU_EXREG_PDPTR) |\
-+				(1 << VCPU_EXREG_SEGMENTS) |\
-+				(1 << VCPU_EXREG_CR0) |\
-+				(1 << VCPU_EXREG_CR3) |\
-+				(1 << VCPU_EXREG_CR4) |\
-+				(1 << VCPU_EXREG_EXIT_INFO_1) |\
-+				(1 << VCPU_EXREG_EXIT_INFO_2))
++#define SVM_REGS_AVAIL_SET	(1 << VCPU_EXREG_PDPTR)
++#define SVM_REGS_DIRTY_SET	(0)
 +
-+#define VMX_REGS_DIRTY_SET	((1 << VCPU_REGS_RIP) |\
-+				(1 << VCPU_REGS_RSP) |\
-+				(1 << VCPU_EXREG_PDPTR) |\
-+				(1 << VCPU_EXREG_CR3))
++	vcpu->arch.regs_avail &= ~SVM_REGS_AVAIL_SET;
++	vcpu->arch.regs_dirty &= ~SVM_REGS_DIRTY_SET;
++}
 +
-+	vcpu->arch.regs_avail &= ~VMX_REGS_AVAIL_SET;
-+	vcpu->arch.regs_dirty &= ~VMX_REGS_DIRTY_SET;
- }
- 
- static inline struct kvm_vmx *to_kvm_vmx(struct kvm *kvm)
+ static inline struct vcpu_svm *to_svm(struct kvm_vcpu *vcpu)
+ {
+ 	return container_of(vcpu, struct vcpu_svm, vcpu);
 -- 
 2.19.1.6.gb485710b
 
