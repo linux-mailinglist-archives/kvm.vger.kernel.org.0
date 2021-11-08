@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 94F13447E8F
-	for <lists+kvm@lfdr.de>; Mon,  8 Nov 2021 12:11:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9EEA3447E92
+	for <lists+kvm@lfdr.de>; Mon,  8 Nov 2021 12:11:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239047AbhKHLNs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Nov 2021 06:13:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51912 "EHLO
+        id S239057AbhKHLNu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Nov 2021 06:13:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239024AbhKHLNm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Nov 2021 06:13:42 -0500
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F7EBC061764;
-        Mon,  8 Nov 2021 03:10:58 -0800 (PST)
-Received: by mail-pj1-x1036.google.com with SMTP id n11-20020a17090a2bcb00b001a1e7a0a6a6so8541803pje.0;
-        Mon, 08 Nov 2021 03:10:58 -0800 (PST)
+        with ESMTP id S239020AbhKHLNo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Nov 2021 06:13:44 -0500
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDFB7C061570;
+        Mon,  8 Nov 2021 03:11:00 -0800 (PST)
+Received: by mail-pf1-x431.google.com with SMTP id s13so1388067pfd.7;
+        Mon, 08 Nov 2021 03:11:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=FWDD7U5T1WcrJwl6pQa+h0PSq1RnVU3eKyaFAF8L5xY=;
-        b=FOGfOXSbF3NETUtUwFL6yABlqXRXPJm7+TmBzYElCbewOKUX988Kh8HQfAS9g9ZqWY
-         waBn0zjOPnKm2JI/vq903BGJ0r0rbsueqc+T1hn5uzUpOewmu5YoBfCwDkimwDeXlqVK
-         7aDYS+vDFMoUOJkxZaWGQBwNGZnpnhU3PfZckanfVzG/55/nXBgxCqFSgUSeh9aR0qQT
-         9Ah2x9exvVQw5+/JES0uwItahKiuBJyZG3TPwENNc2pXlCRnbG9xH839/6FHNrVa12K2
-         pzQeNSHfZK8nuGm2EeKLbgoZ263ShByPcWvsl7OmQf0JsWngk3GSwdgRHrkpcdbF2z9f
-         ZdWQ==
+        bh=gavCSuL1t3IJ6cNjx1GF8/Zg+Uk5+9JidRW6NUy4gzQ=;
+        b=pHKLgCrCRCn/9efAstnxPLP/BbSrdHgo8pq4qptZiSvxYkXfzpr9NrpCSc+LAfLP4u
+         HwAIR8Ow1IxfCqyecP4i/nNbSp70bVfs+oc55thLD1M838F+WrMF63QePFIp1xwKgWZF
+         G0ZDLpq4CAeLjF2AX78IHddpJoiLs0OVByjsmpOduGcVnHtjy7uJ4Z3jqLd7zm3sxXJV
+         FkDmqJ241A30dBRQbHn+7Wl6yHo29C52e/ndkYsssuUNN2SmAMUB0WWnQ+9rldTURr3y
+         OO7O9Vw5PIt091luPJIIKcV7Eo5+87EYMhjE3DKLZsRR2YLMOvTjrEDF3G2b01WAYZuy
+         p3ug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=FWDD7U5T1WcrJwl6pQa+h0PSq1RnVU3eKyaFAF8L5xY=;
-        b=GSPxtcYVDgMamNsrR9QeWSe6G6P9Dbq/EJidwGR/aI31ZvCWEdLKt37ihExX+87QqS
-         d3yJqIBMjGuJgX5J9HNo3AptfNxg35/h1Fz0bMKeE/AxUWptEKMrBM000YNp82REZ9NL
-         z72aGae/vmOAmkiOUK6QJ6vvFr/YjnlmYCIN4EnO7LMLDBO3SJfNNOm7JxTnvZ0m6x57
-         XiG98K5yrCCequ+AdOK9eW7GtnyRcLCInPQM+WMIA1oPHhiHZkk/m+HCzOBmI7yJbJ3O
-         kCOoFFSBhP1xBudvAGZ9yiRlwsRRgHeJm3B/M6TgsjsLMfscbuafoWeB6H3ZnUxNaLxd
-         WT3A==
-X-Gm-Message-State: AOAM530KLYJtRThJyCrPsXo68B6GTS4QS3H28s1FK/klBJdcovUmBH9j
-        /7wtFlWMwSr3Imj64ezwSIM=
-X-Google-Smtp-Source: ABdhPJxTBZGnQqvy/uNTvHf1dPikXZ+3SMPWqLBbIGbFxXhzRXIaV2TnzAs7CzsVjdrOC/o74UewAw==
-X-Received: by 2002:a17:902:6b47:b0:142:82e1:6c92 with SMTP id g7-20020a1709026b4700b0014282e16c92mr4725669plt.84.1636369857815;
-        Mon, 08 Nov 2021 03:10:57 -0800 (PST)
+        bh=gavCSuL1t3IJ6cNjx1GF8/Zg+Uk5+9JidRW6NUy4gzQ=;
+        b=yd+Dxt4S7kJJsJ9H0/IF33YHJIc0ucUB7SQhAJN+cA8VVP36lXxaH5rHcmEEnRn7h0
+         N/LlT+UfVBas3F9PsjswK8NY5DsCf4osM82CKaCrqLPXT7T18fu8r4S8xU52xLikONhg
+         EwrgMpgm4tZW51Vr1LyE5yGY53zElRBDRQUGiVhnbfDjC1zxwahaCD8R+AQc5bmhFr5G
+         UrlqgB1EKYiQZouA2DIaqYRkQFpifzoOswrxAdOaOmbjxxUjCphDrK8hE4kBHYc92OAo
+         QZypiKHlY+pMf3Y9GWDu0G/S8HPqnBBNehBtIfAOth/SgDJNWH8Ts0VW7nGIywpSpMs2
+         Rp8g==
+X-Gm-Message-State: AOAM531irQj/ANEPntBSmrUNDZaJvpcEQ8kJ+MF8GrIVeIoiOCumDULK
+        suONh01ncr2jn36H3wzGANBkt0s4osk=
+X-Google-Smtp-Source: ABdhPJzD3D0h1+Y17yTAygoSu70TFGj9obOC44TLynUMBFVhlTsV0al22glG78QBEWMIIZRwtCdR4A==
+X-Received: by 2002:a63:3c4c:: with SMTP id i12mr58896041pgn.447.1636369860305;
+        Mon, 08 Nov 2021 03:11:00 -0800 (PST)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id ne7sm16559483pjb.36.2021.11.08.03.10.55
+        by smtp.gmail.com with ESMTPSA id ne7sm16559483pjb.36.2021.11.08.03.10.58
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 08 Nov 2021 03:10:57 -0800 (PST)
+        Mon, 08 Nov 2021 03:11:00 -0800 (PST)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -55,9 +55,9 @@ Cc:     kvm@vger.kernel.org, Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Joerg Roedel <joro@8bytes.org>, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 5/7] KVM: x86: Move .pmu_ops to kvm_x86_init_ops and tagged as __initdata
-Date:   Mon,  8 Nov 2021 19:10:30 +0800
-Message-Id: <20211108111032.24457-6-likexu@tencent.com>
+Subject: [PATCH v2 6/7] KVM: x86: Introduce definitions to support static calls for kvm_pmu_ops
+Date:   Mon,  8 Nov 2021 19:10:31 +0800
+Message-Id: <20211108111032.24457-7-likexu@tencent.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20211108111032.24457-1-likexu@tencent.com>
 References: <20211108111032.24457-1-likexu@tencent.com>
@@ -69,123 +69,95 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <likexu@tencent.com>
 
-The pmu_ops should be moved to kvm_x86_init_ops and tagged as __initdata.
-That'll save those precious few bytes, and more importantly make
-the original ops unreachable, i.e. make it harder to sneak in post-init
-modification bugs.
+Use static calls to improve kvm_pmu_ops performance. Introduce the
+definitions that will be used by a subsequent patch to actualize the
+savings. Add a new kvm-x86-pmu-ops.h header that can be used for the
+definition of static calls. This header is also intended to be
+used to simplify the defition of amd_pmu_ops and intel_pmu_ops.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
+Like what we did for kvm_x86_ops, 'pmu_ops' can be covered by
+static calls in a simlilar manner for insignificant but not
+negligible performance impact, especially on older models.
+
 Signed-off-by: Like Xu <likexu@tencent.com>
 ---
- arch/x86/include/asm/kvm_host.h | 4 ++--
- arch/x86/kvm/svm/pmu.c          | 2 +-
- arch/x86/kvm/svm/svm.c          | 2 +-
- arch/x86/kvm/vmx/pmu_intel.c    | 2 +-
- arch/x86/kvm/vmx/vmx.c          | 2 +-
- arch/x86/kvm/x86.c              | 2 +-
- 6 files changed, 7 insertions(+), 7 deletions(-)
+ arch/x86/include/asm/kvm-x86-pmu-ops.h | 32 ++++++++++++++++++++++++++
+ arch/x86/kvm/pmu.c                     |  6 +++++
+ arch/x86/kvm/pmu.h                     |  5 ++++
+ 3 files changed, 43 insertions(+)
+ create mode 100644 arch/x86/include/asm/kvm-x86-pmu-ops.h
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index c2d4ee2973c5..00760a3ac88c 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1436,8 +1436,7 @@ struct kvm_x86_ops {
- 	int cpu_dirty_log_size;
- 	void (*update_cpu_dirty_logging)(struct kvm_vcpu *vcpu);
+diff --git a/arch/x86/include/asm/kvm-x86-pmu-ops.h b/arch/x86/include/asm/kvm-x86-pmu-ops.h
+new file mode 100644
+index 000000000000..b7713b16d21d
+--- /dev/null
++++ b/arch/x86/include/asm/kvm-x86-pmu-ops.h
+@@ -0,0 +1,32 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#if !defined(KVM_X86_PMU_OP) || !defined(KVM_X86_PMU_OP_NULL)
++BUILD_BUG_ON(1)
++#endif
++
++/*
++ * KVM_X86_PMU_OP() and KVM_X86_PMU_OP_NULL() are used to
++ * help generate "static_call()"s. They are also intended for use when defining
++ * the amd/intel KVM_X86_PMU_OPs. KVM_X86_PMU_OP() can be used
++ * for those functions that follow the [amd|intel]_func_name convention.
++ * KVM_X86_PMU_OP_NULL() can leave a NULL definition for the
++ * case where there is no definition or a function name that
++ * doesn't match the typical naming convention is supplied.
++ */
++KVM_X86_PMU_OP(find_arch_event);
++KVM_X86_PMU_OP(find_fixed_event);
++KVM_X86_PMU_OP(pmc_is_enabled);
++KVM_X86_PMU_OP(pmc_idx_to_pmc);
++KVM_X86_PMU_OP(rdpmc_ecx_to_pmc);
++KVM_X86_PMU_OP(msr_idx_to_pmc);
++KVM_X86_PMU_OP(is_valid_rdpmc_ecx);
++KVM_X86_PMU_OP(is_valid_msr);
++KVM_X86_PMU_OP(get_msr);
++KVM_X86_PMU_OP(set_msr);
++KVM_X86_PMU_OP(refresh);
++KVM_X86_PMU_OP(init);
++KVM_X86_PMU_OP(reset);
++KVM_X86_PMU_OP_NULL(deliver_pmi);
++KVM_X86_PMU_OP_NULL(cleanup);
++
++#undef KVM_X86_PMU_OP
++#undef KVM_X86_PMU_OP_NULL
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index 353989bf0102..bfdd9f2bc0fa 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -50,6 +50,12 @@
+ struct kvm_pmu_ops kvm_pmu_ops __read_mostly;
+ EXPORT_SYMBOL_GPL(kvm_pmu_ops);
  
--	/* pmu operations of sub-arch */
--	const struct kvm_pmu_ops *pmu_ops;
-+	/* nested operations of sub-arch */
- 	const struct kvm_x86_nested_ops *nested_ops;
- 
- 	/*
-@@ -1516,6 +1515,7 @@ struct kvm_x86_init_ops {
- 	int (*hardware_setup)(void);
- 
- 	struct kvm_x86_ops *runtime_ops;
-+	struct kvm_pmu_ops *pmu_ops;
++#define	KVM_X86_PMU_OP(func)	\
++	DEFINE_STATIC_CALL_NULL(kvm_x86_pmu_##func,	\
++				*(((struct kvm_pmu_ops *)0)->func))
++#define	KVM_X86_PMU_OP_NULL	KVM_X86_PMU_OP
++#include <asm/kvm-x86-pmu-ops.h>
++
+ static void kvm_pmi_trigger_fn(struct irq_work *irq_work)
+ {
+ 	struct kvm_pmu *pmu = container_of(irq_work, struct kvm_pmu, irq_work);
+diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+index b2fe135d395a..40e0b523637b 100644
+--- a/arch/x86/kvm/pmu.h
++++ b/arch/x86/kvm/pmu.h
+@@ -45,6 +45,11 @@ struct kvm_pmu_ops {
+ 	void (*cleanup)(struct kvm_vcpu *vcpu);
  };
  
- struct kvm_arch_async_pf {
-diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-index fdf587f19c5f..4554cbc3820c 100644
---- a/arch/x86/kvm/svm/pmu.c
-+++ b/arch/x86/kvm/svm/pmu.c
-@@ -319,7 +319,7 @@ static void amd_pmu_reset(struct kvm_vcpu *vcpu)
- 	}
- }
- 
--struct kvm_pmu_ops amd_pmu_ops = {
-+struct kvm_pmu_ops amd_pmu_ops __initdata = {
- 	.find_arch_event = amd_find_arch_event,
- 	.find_fixed_event = amd_find_fixed_event,
- 	.pmc_is_enabled = amd_pmc_is_enabled,
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 21bb81710e0f..8834d7d2b991 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4681,7 +4681,6 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 
- 	.sched_in = svm_sched_in,
- 
--	.pmu_ops = &amd_pmu_ops,
- 	.nested_ops = &svm_nested_ops,
- 
- 	.deliver_posted_interrupt = svm_deliver_avic_intr,
-@@ -4717,6 +4716,7 @@ static struct kvm_x86_init_ops svm_init_ops __initdata = {
- 	.check_processor_compatibility = svm_check_processor_compat,
- 
- 	.runtime_ops = &svm_x86_ops,
-+	.pmu_ops = &amd_pmu_ops,
- };
- 
- static int __init svm_init(void)
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index b8e0d21b7c8a..c0b905d032c8 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -703,7 +703,7 @@ static void intel_pmu_cleanup(struct kvm_vcpu *vcpu)
- 		intel_pmu_release_guest_lbr_event(vcpu);
- }
- 
--struct kvm_pmu_ops intel_pmu_ops = {
-+struct kvm_pmu_ops intel_pmu_ops __initdata = {
- 	.find_arch_event = intel_find_arch_event,
- 	.find_fixed_event = intel_find_fixed_event,
- 	.pmc_is_enabled = intel_pmc_is_enabled,
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 71f54d85f104..ce787d2e8e08 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7680,7 +7680,6 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
- 	.pre_block = vmx_pre_block,
- 	.post_block = vmx_post_block,
- 
--	.pmu_ops = &intel_pmu_ops,
- 	.nested_ops = &vmx_nested_ops,
- 
- 	.update_pi_irte = pi_update_irte,
-@@ -7922,6 +7921,7 @@ static struct kvm_x86_init_ops vmx_init_ops __initdata = {
- 	.hardware_setup = hardware_setup,
- 
- 	.runtime_ops = &vmx_x86_ops,
-+	.pmu_ops = &intel_pmu_ops,
- };
- 
- static void vmx_cleanup_l1d_flush(void)
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index ca9a76abb6ba..70dc8f41329c 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11323,7 +11323,7 @@ int kvm_arch_hardware_setup(void *opaque)
- 		return r;
- 
- 	memcpy(&kvm_x86_ops, ops->runtime_ops, sizeof(kvm_x86_ops));
--	memcpy(&kvm_pmu_ops, kvm_x86_ops.pmu_ops, sizeof(kvm_pmu_ops));
-+	memcpy(&kvm_pmu_ops, ops->pmu_ops, sizeof(kvm_pmu_ops));
- 	kvm_ops_static_call_update();
- 
- 	if (!kvm_cpu_cap_has(X86_FEATURE_XSAVES))
++#define	KVM_X86_PMU_OP(func)	\
++	DECLARE_STATIC_CALL(kvm_x86_pmu_##func, *(((struct kvm_pmu_ops *)0)->func))
++#define	KVM_X86_PMU_OP_NULL	KVM_X86_PMU_OP
++#include <asm/kvm-x86-pmu-ops.h>
++
+ static inline u64 pmc_bitmask(struct kvm_pmc *pmc)
+ {
+ 	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
 -- 
 2.33.0
 
