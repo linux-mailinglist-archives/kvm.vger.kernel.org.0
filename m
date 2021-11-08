@@ -2,103 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F0D08449847
-	for <lists+kvm@lfdr.de>; Mon,  8 Nov 2021 16:31:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DDC50449885
+	for <lists+kvm@lfdr.de>; Mon,  8 Nov 2021 16:35:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240802AbhKHPbR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Nov 2021 10:31:17 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:32958 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238982AbhKHPbP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 8 Nov 2021 10:31:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636385309;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Hi00ablbtPW4mDM5Uzsd1+FtR4HNpZDQEP+LPADyONk=;
-        b=di/OfKhBrslPptf+Tf4F5ucnaFYBIpd7HAL2qmAHZz1OVC/Tk9MFzsi1qY3t+YsEpiYt1/
-        Vpnu1Tru2b2tlNnUrH96kIjirXtzzmiH5pMhj1f5YCN7cPHjE6eJJ+v6Ve0iT1LH20dqFC
-        9+9msY9IdodVSxznMCh4BZKJv8+o4fY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-86-8SyeynDTN6eRrKzcpJdleg-1; Mon, 08 Nov 2021 10:28:28 -0500
-X-MC-Unique: 8SyeynDTN6eRrKzcpJdleg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4F48B87D542;
-        Mon,  8 Nov 2021 15:28:27 +0000 (UTC)
-Received: from vitty.brq.redhat.com (unknown [10.40.192.207])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 891E6794A4;
-        Mon,  8 Nov 2021 15:28:25 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Li RongQing <lirongqing@baidu.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] KVM: x86: Don't update vcpu->arch.pv_eoi.msr_val when a bogus value was written to MSR_KVM_PV_EOI_EN
-Date:   Mon,  8 Nov 2021 16:28:19 +0100
-Message-Id: <20211108152819.12485-3-vkuznets@redhat.com>
-In-Reply-To: <20211108152819.12485-1-vkuznets@redhat.com>
-References: <20211108152819.12485-1-vkuznets@redhat.com>
+        id S240974AbhKHPiB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Nov 2021 10:38:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56234 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238345AbhKHPiA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Nov 2021 10:38:00 -0500
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41A3AC061570
+        for <kvm@vger.kernel.org>; Mon,  8 Nov 2021 07:35:16 -0800 (PST)
+Received: by mail-pf1-x433.google.com with SMTP id b68so5733454pfg.11
+        for <kvm@vger.kernel.org>; Mon, 08 Nov 2021 07:35:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=g+TozlKCVWdcHVzGWzpBk1sUQFToW4UpLiB6BmuVVDs=;
+        b=I2tfnJ6LdUvapJ4sB79+ELNSXj7rrt0P5HulOe9k+SF2LYtAn9mrYcSHgDdU37/dxj
+         Z2r7kXy+qb3sd0IZepoRvaGpF6bO0VAC0XwXClDM95sP4ZABB0lX9z+8sri0HCW/YPJO
+         Sto/iaS/GHDKX7j15sDA4uY1kttrFfC9ZBc4GTg/T2YXCcvAiOU/Wi26VfccSOqPHVcw
+         VM2l66O/4GXhR1rzsWaM6kFhRWfaExtCOKNn3YAoXc8kcYF+TLlQAbc9fOclmnhsJVZX
+         XyvW9XUNjPH02Keaydvd7XBTUf/NcBjKL+Ryie7PJaXvG8iOz4UTMtqJWebViItKzbme
+         Prtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=g+TozlKCVWdcHVzGWzpBk1sUQFToW4UpLiB6BmuVVDs=;
+        b=bhkbzhjqzb3JI5CUsRZ1Zfx/4lMVEbFjXmBKoW2p/2MDFQxKP8kGyLcG5wCN+gTaCJ
+         F1xi9FzQuPtqqDqefDfnDgTFOPI0U1QR1qt6/sre4WEkJyCU8pvLGOyBhYalH/MqI/6i
+         of9o3tej4kcKJiAuH7PHlWjQfV+GLuUEpzk1+IR9VhgLOaEOBT8MOeHbqCLxgCMjvPKG
+         sfzxhqZ6uhRQR/NYPQZ87+D+3Pmgl6MQhtS+Bg0Tl3jeL2QG9yjh3isNtI3gjWNwun7H
+         6RZ2UYz0B9MdGu6NdCPPCizFGfewycI5QjTmHEyY7R4pdIMzjYNFxyNvfPg+D4ZOXNVD
+         JmVQ==
+X-Gm-Message-State: AOAM530ccpUGo+q9rD6aIpTq9fyt1jxWHe+sHbVbqF4Bl9eluHy5PsAE
+        EGjrwEVFP1yPoQry7/QA+C+sdw==
+X-Google-Smtp-Source: ABdhPJz/N2PKU0Wh+IpEZ/3JJyow3AdbpQWj07aBzUnRqbvMRZh153dSt+8IcFyWXGhPeZfTIBFr4g==
+X-Received: by 2002:a63:8448:: with SMTP id k69mr244166pgd.298.1636385715575;
+        Mon, 08 Nov 2021 07:35:15 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id b15sm16939315pfm.203.2021.11.08.07.35.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Nov 2021 07:35:14 -0800 (PST)
+Date:   Mon, 8 Nov 2021 15:35:11 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Nicholas Piggin <npiggin@gmail.com>
+Cc:     Juergen Gross <jgross@suse.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] KVM: move struct kvm_vcpu * array to the bottom of
+ struct kvm
+Message-ID: <YYlDr2HLI/eULoDy@google.com>
+References: <20211105034949.1397997-1-npiggin@gmail.com>
+ <YYVElU6u22qxgQIz@google.com>
+ <1636158401.g3t5cp0jke.astroid@bobo.none>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1636158401.g3t5cp0jke.astroid@bobo.none>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When kvm_gfn_to_hva_cache_init() call from kvm_lapic_set_pv_eoi() fails,
-MSR write to MSR_KVM_PV_EOI_EN results in #GP so it is reasonable to
-expect that the value we keep internally in KVM wasn't updated.
+On Sat, Nov 06, 2021, Nicholas Piggin wrote:
+> Excerpts from Sean Christopherson's message of November 6, 2021 12:49 am:
+> >> It would next be possible to now make this a dynamically sized array,
+> >> and make the KVM_MAX_VCPUS more dynamic
+> > 
+> > Marc has a mostly-baked series to use an xarray[1][2] that AFAICT would be well
+> > received.  That has my vote, assuming it can get into 5.16.  Marc or Juergen,
+> > are either of you actively working on that?
+> > 
+> > [1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/vcpu-xarray
+> > [2] https://lkml.kernel.org/r/871r65wwk7.wl-maz@kernel.org
+> 
+> Seems like a good idea if it can allow vcpu structs to be allocated to 
+> preferred nodes.
+> 
+> >> however x86 kvm_svm uses its own scheme rather than kvm_arch for some reason.
+> > 
+> > What's the problem in kvm_svm?
+> 
+> It embeds a struct kvm so it couldn't be variable sized.
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- arch/x86/kvm/lapic.c | 21 +++++++++++++--------
- 1 file changed, 13 insertions(+), 8 deletions(-)
+Oooh, when you said "dynamically sized" I thought you meant
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 3573b50d9036..4388d22df500 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -2857,20 +2857,25 @@ int kvm_lapic_set_pv_eoi(struct kvm_vcpu *vcpu, u64 data, unsigned long len)
- 	u64 addr = data & ~KVM_MSR_ENABLED;
- 	struct gfn_to_hva_cache *ghc = &vcpu->arch.pv_eoi.data;
- 	unsigned long new_len;
-+	int ret;
- 
- 	if (!IS_ALIGNED(addr, 4))
- 		return 1;
- 
--	vcpu->arch.pv_eoi.msr_val = data;
--	if (!pv_eoi_enabled(vcpu))
--		return 0;
-+	if (data & KVM_MSR_ENABLED) {
-+		if (addr == ghc->gpa && len <= ghc->len)
-+			new_len = ghc->len;
-+		else
-+			new_len = len;
- 
--	if (addr == ghc->gpa && len <= ghc->len)
--		new_len = ghc->len;
--	else
--		new_len = len;
-+		ret = kvm_gfn_to_hva_cache_init(vcpu->kvm, ghc, addr, new_len);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	vcpu->arch.pv_eoi.msr_val = data;
- 
--	return kvm_gfn_to_hva_cache_init(vcpu->kvm, ghc, addr, new_len);
-+	return 0;
- }
- 
- int kvm_apic_accept_events(struct kvm_vcpu *vcpu)
--- 
-2.31.1
+	struct kvm_vcpu *vcpus;
 
+...
+
+	kvm->vcpus = kcalloc(...);
+
+Anyways, SVM and VMX are quite different despited both being x86, to keep them
+separated without requiring an extra allocation, kvm_svm and kvm_vmx embed kvm.
+Ditto for vcpu_vmx and vmx_svm.  Obviously not a hard requirement, but there also
+hasn't been a reason not to do embed kvm/kvm_vcpu.
