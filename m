@@ -2,129 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E075449AB9
-	for <lists+kvm@lfdr.de>; Mon,  8 Nov 2021 18:25:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 06607449AF8
+	for <lists+kvm@lfdr.de>; Mon,  8 Nov 2021 18:44:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239701AbhKHR1o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Nov 2021 12:27:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53078 "EHLO
+        id S237689AbhKHRrd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Nov 2021 12:47:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231368AbhKHR1n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Nov 2021 12:27:43 -0500
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67B01C061714
-        for <kvm@vger.kernel.org>; Mon,  8 Nov 2021 09:24:59 -0800 (PST)
-Received: by mail-pj1-x1035.google.com with SMTP id y14-20020a17090a2b4e00b001a5824f4918so9336660pjc.4
-        for <kvm@vger.kernel.org>; Mon, 08 Nov 2021 09:24:59 -0800 (PST)
+        with ESMTP id S236862AbhKHRrd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Nov 2021 12:47:33 -0500
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9050C061714
+        for <kvm@vger.kernel.org>; Mon,  8 Nov 2021 09:44:48 -0800 (PST)
+Received: by mail-pf1-x42a.google.com with SMTP id g19so10751995pfb.8
+        for <kvm@vger.kernel.org>; Mon, 08 Nov 2021 09:44:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=4EbD7aqTQKxclsPLCjVFRazOOf7SVm4FlHdT4M8Q2OE=;
-        b=UJm8tlekg3RcDJN6+qUt+cpMTkF4V/Hj+tnGbZFokcB4SAQcj3P6+RI/2cLOYGqTC5
-         bCzuHg8QbDSjgI2zeVkvP9HVJWKs17hjbDs9+kt0rALTnmBPHce6tq8pHh7CDN2piT9n
-         9OwAqtKhOEBQvAw8eMCmPOqKEU9O2fvB7caD2N3d38GnhYlW+XChRzNd4HPEClxkA/QP
-         nk8aRKuAysvXR6jYDvC11oc2qJr3ATPSy/IO3dfxS0tPhk2CCWjL7HbpwRoVsycH2a+Z
-         9DOSeKbufz52wK6GOc5E7tNdBvICz0zV+AsyvDO045LarEbbiHRc/0guA0a45WahOxso
-         Eheg==
+        bh=T7qOXVmH67t3UjgmC9OBAXcO6+4+TuLqSP9SMFrXUKA=;
+        b=aw5xWNjO2HIMl8DL3l5ICwkJLmnsxQv7NBXLJWfXOxPWdOyG3/SJ3qNmiVHwqnqhti
+         YPsr3U15WdTXcWP9izb2z0Us9dCrx9o4s3vAfSAG4bcHK+wGiBuePvsStG7wRfCpZWZD
+         aDITPrejfoVadqTZRV+6g6D0JKldtHMEihJBgP1b98/ZELEjau0mw6walrIe94y6de1k
+         Ab+o4bf8YZ2DUoLVnCi63nSqEYB7nu8FgUdiPATLbUsryzN+USnemKDeU6hfdfc0+90J
+         kXP1iu82afzVciTwNR97nN3bAVSP8E13Zq5gNeiu184vny7+cnoKv5Iz/xcOsvb0dv4R
+         IGaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=4EbD7aqTQKxclsPLCjVFRazOOf7SVm4FlHdT4M8Q2OE=;
-        b=XorOYb1FlhL12nwVwGhMCzOTCYLOdAdycppp1D++OMnB7ClVvI/ZOrfB8fVhg41OBU
-         4eSoD5qm6YUYH+V5a7/h8vCxTa5Yx9eRXvubtDBufh8XH7IYVRvR0i5il+pB/VNkvQjD
-         I7QBHv0E4hm6kKn38ChNAtLsv0lXM2P/KWJuFd3JSrnOo3lCQwRrwGP/mtP9ST1hUdE6
-         9va7Jh+eIuldgS59LNWVU8fjgOES1zizxRguA8E0w37yOTfYZvUqubPkp2bHTmDzeoDd
-         2gZzxlvKfSc9HUAx1Nvad8e18WQ/UGarjn/4J8AFQd9ObsyEjHW6tGYnIQecDHQwQF6e
-         EaVA==
-X-Gm-Message-State: AOAM530c9nP3CfSA1suyFTGryOMl5g4da5k54dbobEeSaqG4MmdXZhnG
-        SCmXoKvIZ3yO92pYPZd8icN6nagdDENXSw==
-X-Google-Smtp-Source: ABdhPJzzJsPhO6l9Wzpus0ydSjqjfOxWycpAvNYAImmWhmgSVDVbcAmYrgi+e+A2wwKWC+cYPJFipg==
-X-Received: by 2002:a17:902:e547:b0:141:ddbc:a8d6 with SMTP id n7-20020a170902e54700b00141ddbca8d6mr812890plf.27.1636392298669;
-        Mon, 08 Nov 2021 09:24:58 -0800 (PST)
+        bh=T7qOXVmH67t3UjgmC9OBAXcO6+4+TuLqSP9SMFrXUKA=;
+        b=r2+MLjQUUtHztHNxgeCfX4mBJoAs1RSCcPmc9taxgK0SJ60pxxZSiMw4lWfEQWssYt
+         iJKxX3RQ30v0Y4SElhW8KpZk9z4w6eyOqpdfRphK0fdCrcbbxusV0CGTQMogIq7717vf
+         /fXMl+q13Xerdbn6iaVlonuf8tZJJUzuD8tumVOT2Oy3naDcg36LRG3nfvTBwf79/bLW
+         zpr1e5vwGODQM5HC4e+ZzkYQyedC1URL+E4J0L54PeQvMx6Xt56dDFWItyP2EPnS/Vbv
+         owN6W0+3g42WB1lIVdBpY6fr4ZFdQCIF0gwef2TgPNFwnknblEJtAF2Qj+MigKvVvm4K
+         8bPQ==
+X-Gm-Message-State: AOAM53391npO/oX94RAQ6p5L/1IKAhjH7/NoR7hWvGxVwPWMf6GNJvrP
+        ER8ZsRdK71IGyA3Km5OWDgri1A==
+X-Google-Smtp-Source: ABdhPJwjw6K4kqrSPpv/9FjxKMKy7T04f7UYLZ7U+X1Vx74XuXD0QZkSCLiZ1aVqbFHbCHItZTjfdw==
+X-Received: by 2002:a05:6a00:7cc:b0:49f:9cf1:2969 with SMTP id n12-20020a056a0007cc00b0049f9cf12969mr1153867pfu.12.1636393488024;
+        Mon, 08 Nov 2021 09:44:48 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id v22sm16321575pff.93.2021.11.08.09.24.58
+        by smtp.gmail.com with ESMTPSA id y22sm16825866pfi.206.2021.11.08.09.44.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Nov 2021 09:24:58 -0800 (PST)
-Date:   Mon, 8 Nov 2021 17:24:54 +0000
+        Mon, 08 Nov 2021 09:44:47 -0800 (PST)
+Date:   Mon, 8 Nov 2021 17:44:43 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
+To:     Chenyi Qiang <chenyi.qiang@intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Alexander Graf <graf@amazon.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v3 1/3] KVM: nVMX: Handle dynamic MSR intercept toggling
-Message-ID: <YYldZjBA0YOHjUdZ@google.com>
-References: <20210924204907.1111817-1-seanjc@google.com>
- <20210924204907.1111817-2-seanjc@google.com>
- <87k0hioasv.fsf@vitty.brq.redhat.com>
+        Joerg Roedel <joro@8bytes.org>,
+        Xiaoyao Li <xiaoyao.li@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 3/7] KVM: X86: Expose IA32_PKRS MSR
+Message-ID: <YYliC1kdT9ssX/f7@google.com>
+References: <20210811101126.8973-1-chenyi.qiang@intel.com>
+ <20210811101126.8973-4-chenyi.qiang@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87k0hioasv.fsf@vitty.brq.redhat.com>
+In-Reply-To: <20210811101126.8973-4-chenyi.qiang@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 08, 2021, Vitaly Kuznetsov wrote:
-> Sean Christopherson <seanjc@google.com> writes:
-> > @@ -6749,7 +6686,9 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
-> >  	 * If the L02 MSR bitmap does not intercept the MSR, then we need to
-> >  	 * save it.
-> >  	 */
-> > -	if (unlikely(!msr_write_intercepted(vcpu, MSR_IA32_SPEC_CTRL)))
-> > +	if (unlikely(cpu_has_vmx_msr_bitmap() &&
-> > +		     vmx_test_msr_bitmap_write(vmx->loaded_vmcs->msr_bitmap,
-> > +					       MSR_IA32_SPEC_CTRL)))
+On Wed, Aug 11, 2021, Chenyi Qiang wrote:
+> +	u32           pkrs;
 
-Ugh, I inverted the check, '1' == intercept.  IIRC, I open coded the intercept
-check because SPEC_CTRL is really the only case where should be reading _only_
-the current VMCS's MSR bitmap.
+...
 
-I'll spin a new version of the series and test with SPEC_CTRL disabled in a VM,
-and maybe revist my reasoning for this.
+> @@ -1115,6 +1117,7 @@ void vmx_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
+>  #endif
+>  	unsigned long fs_base, gs_base;
+>  	u16 fs_sel, gs_sel;
+> +	u32 host_pkrs;
 
-Thanks!
+As mentioned in the previosu patch, I think it makes sense to track this as a u64
+so that the only place in KVM that deas with the u64<=>u32 conversion is the below
 
-> >  		vmx->spec_ctrl = native_read_msr(MSR_IA32_SPEC_CTRL);
-> 
-> I smoke-tested this patch by running (unrelated) selftests when I tried
-> to put in into my 'Enlightened MSR Bitmap v4' series and my dmesg got
-> flooded with:
-> 
-> [   87.210214] unchecked MSR access error: RDMSR from 0x48 at rIP: 0xffffffffc04e0284 (native_read_msr+0x4/0x30 [kvm_intel])
-> [   87.210325] Call Trace:
-> [   87.210355]  vmx_vcpu_run+0xcc7/0x12b0 [kvm_intel]
-> [   87.210405]  ? vmx_prepare_switch_to_guest+0x138/0x1f0 [kvm_intel]
-> [   87.210466]  vcpu_enter_guest+0x98c/0x1380 [kvm]
-> [   87.210631]  ? vmx_vcpu_put+0x2e/0x1f0 [kvm_intel]
-> [   87.210678]  ? vmx_vcpu_load+0x21/0x60 [kvm_intel]
-> [   87.210729]  kvm_arch_vcpu_ioctl_run+0xdf/0x580 [kvm]
-> [   87.210844]  kvm_vcpu_ioctl+0x274/0x660 [kvm]
-> [   87.210950]  __x64_sys_ioctl+0x83/0xb0
-> [   87.210996]  do_syscall_64+0x3b/0x90
-> [   87.211039]  entry_SYSCALL_64_after_hwframe+0x44/0xae
-> [   87.211093] RIP: 0033:0x7f6ef7f9a307
-> [   87.211134] Code: 44 00 00 48 8b 05 69 1b 2d 00 64 c7 00 26 00 00 00 48 c7 c0 ff ff ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 b8 10 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 39 1b 2d 00 f7 d8 64 89 01 48
-> [   87.211293] RSP: 002b:00007ffcacfb3b18 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-> [   87.211367] RAX: ffffffffffffffda RBX: 0000000000a2f300 RCX: 00007f6ef7f9a307
-> [   87.211434] RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000007
-> [   87.211500] RBP: 0000000000000000 R08: 000000000040e769 R09: 0000000000000000
-> [   87.211559] R10: 0000000000a2f001 R11: 0000000000000246 R12: 0000000000a2d010
-> [   87.211622] R13: 0000000000a2d010 R14: 0000000000402a15 R15: 00000000ffff0ff0
-> [   87.212520] Call Trace:
-> [   87.212597]  vmx_vcpu_run+0xcc7/0x12b0 [kvm_intel]
-> [   87.212683]  ? vmx_prepare_switch_to_guest+0x138/0x1f0 [kvm_intel]
-> [   87.212789]  vcpu_enter_guest+0x98c/0x1380 [kvm]
-> [   87.213059]  ? vmx_vcpu_put+0x2e/0x1f0 [kvm_intel]
-> [   87.213141]  ? schedule+0x44/0xa0
-> [   87.213200]  kvm_arch_vcpu_ioctl_run+0xdf/0x580 [kvm]
-> [   87.213428]  kvm_vcpu_ioctl+0x274/0x660 [kvm]
-> [   87.213633]  __x64_sys_ioctl+0x83/0xb0
-> [   87.213705]  do_syscall_64+0x3b/0x90
-> [   87.213766]  entry_SYSCALL_64_after_hwframe+0x44/0xae
-> ...
-> 
-> this was an old 'E5-2603 v3' CPU. Any idea what's wrong?
+	host_pkrs = get_current_pkrs();
+
+>  	int i;
+>  
+>  	vmx->req_immediate_exit = false;
+> @@ -1150,6 +1153,20 @@ void vmx_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
+>  	 */
+>  	host_state->ldt_sel = kvm_read_ldt();
+>  
+> +	/*
+> +	 * Update the host pkrs vmcs field before vcpu runs.
+> +	 * The setting of VM_EXIT_LOAD_IA32_PKRS can ensure
+> +	 * kvm_cpu_cap_has(X86_FEATURE_PKS) &&
+> +	 * guest_cpuid_has(vcpu, X86_FEATURE_PKS)
+> +	 */
+> +	if (vm_exit_controls_get(vmx) & VM_EXIT_LOAD_IA32_PKRS) {
+> +		host_pkrs = get_current_pkrs();
+> +		if (unlikely(host_pkrs != host_state->pkrs)) {
+> +			vmcs_write64(HOST_IA32_PKRS, host_pkrs);
+> +			host_state->pkrs = host_pkrs;
+> +		}
+> +	}
+> +
+>  #ifdef CONFIG_X86_64
+>  	savesegment(ds, host_state->ds_sel);
+>  	savesegment(es, host_state->es_sel);
+> @@ -1371,6 +1388,15 @@ void vmx_set_rflags(struct kvm_vcpu *vcpu, unsigned long rflags)
+>  		vmx->emulation_required = emulation_required(vcpu);
+>  }
+>  
+> +static void vmx_set_pkrs(struct kvm_vcpu *vcpu, u64 pkrs)
+> +{
+
+Hrm.  Ideally this would be open coded in vmx_set_msr().  Long term, the RESET/INIT
+paths should really treat MSR updates as "normal" host_initiated writes instead of
+having to manually handle every MSR.
+
+That would be a bit gross to handle in vmx_vcpu_reset() since it would have to
+create a struct msr_data (because __kvm_set_msr() isn't exposed to vendor code),
+but since vcpu->arch.pkrs is relevant to the MMU I think it makes sense to
+initiate the write from common x86.
+
+E.g. this way there's not out-of-band special code, vmx_vcpu_reset() is kept clean,
+and if/when SVM gains support for PKRS this particular path Just Works.  And it would
+be an easy conversion for my pipe dream plan of handling MSRs at RESET/INIT via a
+list of MSRs+values.
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index ac83d873d65b..55881d13620f 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -11147,6 +11147,9 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+        kvm_set_rflags(vcpu, X86_EFLAGS_FIXED);
+        kvm_rip_write(vcpu, 0xfff0);
+
++       if (kvm_cpu_cap_has(X86_FEATURE_PKS))
++               __kvm_set_msr(vcpu, MSR_IA32_PKRS, 0, true);
++
+        vcpu->arch.cr3 = 0;
+        kvm_register_mark_dirty(vcpu, VCPU_EXREG_CR3);
+
+> +	if (kvm_cpu_cap_has(X86_FEATURE_PKS)) {
+> +		vcpu->arch.pkrs = pkrs;
+> +		kvm_register_mark_available(vcpu, VCPU_EXREG_PKRS);
+> +		vmcs_write64(GUEST_IA32_PKRS, pkrs);
+> +	}
+> +}
