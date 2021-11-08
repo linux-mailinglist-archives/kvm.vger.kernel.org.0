@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AAB21447FAD
-	for <lists+kvm@lfdr.de>; Mon,  8 Nov 2021 13:45:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4877F447FAF
+	for <lists+kvm@lfdr.de>; Mon,  8 Nov 2021 13:45:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239759AbhKHMsB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Nov 2021 07:48:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45040 "EHLO
+        id S238412AbhKHMsX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Nov 2021 07:48:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239680AbhKHMrv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Nov 2021 07:47:51 -0500
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09C9AC061570;
-        Mon,  8 Nov 2021 04:45:07 -0800 (PST)
-Received: by mail-pf1-x42f.google.com with SMTP id m26so15895652pff.3;
-        Mon, 08 Nov 2021 04:45:07 -0800 (PST)
+        with ESMTP id S239728AbhKHMr4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Nov 2021 07:47:56 -0500
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA390C061746;
+        Mon,  8 Nov 2021 04:45:12 -0800 (PST)
+Received: by mail-pf1-x433.google.com with SMTP id m14so15870604pfc.9;
+        Mon, 08 Nov 2021 04:45:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=SwT7uyweM/6H8d06K/3A14sKRVp4dNL6BHRY2Yy/FP4=;
-        b=Nv5XZq7JeTOHeffsZV/2wKloiGtmx0O40yZLK2N0R1m0TTEcD9+WElywK4Dq9R6OFp
-         O0m7IJieV1kWqJyLmLTi5GwypbS09sBPeRRDaPxePGRYFQqenfsF8xz/46iVlUsbHRV3
-         8YiZu6pRVGYIJNjWRbp3jRpP2A27PHiaiBzFebNMPewnoYqvBkDU2zoIv3W6U9umArHx
-         KrfUo8je9N+B4g0pTwB+nkOcLaLDTAE/scpOS8++vuof8x8Yzaj3s/z/KL4p5nUB2Q+g
-         T21Nve8jt4zlKP904IYyv6fzuPZlksZB1tZq1nSu78bXdmfjmnNvKCY8FVWGYiJChpJ2
-         QN9Q==
+        bh=453AXFvM7ls/vHkcEqDha9O8TvC50FNFpYyfW5EvhIs=;
+        b=NbGzmf+mbIipAHgHj2T8JRa9A2PbUU0NAn5LQvviB078PItSyUmE5SijqcqplGA3XS
+         alAT1wxn8EqferEnrXUoOHDQdYvPT7dQyh8b1dvkTQb8yPa+GGt2RdbtfAt36SFvWa/s
+         FZbH8V6n1FrGIU4zgw94Pj08trtree/1ZleRFgiSuhdQV21mN2Q6QHdw2/9TRRgixiSB
+         8LwiO/C+IrLCuUWen6S1b1MYXp7rWIg0LC9aa+knSY/GDNMk9AIgNN6aw9Yqu2XGMFY/
+         JTGDI+54nxbaDMBid11Fu/D2Ta4eaVbFpTRzWGxZLNOxRk4NjKT6rb5YwatyNCBt1wz6
+         DGCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=SwT7uyweM/6H8d06K/3A14sKRVp4dNL6BHRY2Yy/FP4=;
-        b=Yqscm4vA17W4LNsHIWiHVs/o7mY27B3hjcGhlN4dYh6olpl4B7vcGYFnDJY2pUQVic
-         fGCUmBkAUuGNexEZEhIcnZl2sUmubE2XiCVHEY/Rx3hGqSdMKWm1uqwh76kgcWTix+JX
-         mPBdncCKNIeq7puW7XjXm1evr7BAGRPDehscmx3UBgFo7RcE/GwRVl+T6iiSy6sQZY0t
-         cPevBQ3m7Ki//ToWJ+5lbm6BLJ403siso9ZSHqMLM1uRCmpxWCPPMtGFSNO+vFq1EowT
-         B+gHKaKdwjYwwvaMlac+8DNIaM79NcdcPeQc9xS+kqX/UjKBqN+zDisbxLtnXSt6a1S1
-         vLbw==
-X-Gm-Message-State: AOAM530KznUwWbEKj7uPkBMjARNw9fVv+MfkzameQVyiu584GBXk4Knb
-        zF/AAKtIjxrSKcVYxP5zu+cdJBrTv2E=
-X-Google-Smtp-Source: ABdhPJwI0hM8F6x840FJ7BWuQEoQ0aC1YyGV0LGxeJf7wt6kVJiy33evxlFOD+dVtYrq7lX/rG1IMw==
-X-Received: by 2002:a63:2aca:: with SMTP id q193mr60804765pgq.211.1636375506400;
-        Mon, 08 Nov 2021 04:45:06 -0800 (PST)
+        bh=453AXFvM7ls/vHkcEqDha9O8TvC50FNFpYyfW5EvhIs=;
+        b=OyrdR3jgwhWLEUuqFamfa41QuiUo5rdrck5y5GBBF+S3TkzF8uRzMgMO3AP2/161rF
+         ebrMsrbH84szDav4QMIWGnvd3RmOTDvx3RopJ9oJfE79irPay2LNUqNjhou80NTx7mh2
+         73ku7qRN8uz0oG9ntIgCow0oeANuQUYlsc9+IGGCvjXCzhI2YukOjMFEexsOHDNN7Ave
+         Y150UGnNNsEMPk7S1YcEK5HOTuGhXedlDKwPnk9YvqZ0f5kfGG6AZLRfCnbdb+a5oXCc
+         10kxnQD1JUyx0EH4efw3EAVOi14fpXPXxdSL94FrlKNJ1Sp2BLg2gVuF2DTI6YEUZiFR
+         34qg==
+X-Gm-Message-State: AOAM532ioWW8Q3BJDPhjng77oD3LTCgdqGna/YLzdgSkBQcD1ndhy1fL
+        JP6Xw/r9Qubi31H9YrbhAj7jhK5ziuc=
+X-Google-Smtp-Source: ABdhPJyc4vIsxwlCNzoB79MjjatwWka2mvuy2+/SXLBTZv1nW4SvOI6z9p2qOiXQnxKgUVfd93qnGw==
+X-Received: by 2002:a63:2317:: with SMTP id j23mr21090873pgj.41.1636375512099;
+        Mon, 08 Nov 2021 04:45:12 -0800 (PST)
 Received: from localhost ([47.88.60.64])
-        by smtp.gmail.com with ESMTPSA id i6sm4905360pfu.173.2021.11.08.04.45.05
+        by smtp.gmail.com with ESMTPSA id j6sm12280076pgf.60.2021.11.08.04.45.11
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 08 Nov 2021 04:45:06 -0800 (PST)
+        Mon, 08 Nov 2021 04:45:11 -0800 (PST)
 From:   Lai Jiangshan <jiangshanlai@gmail.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -59,9 +59,9 @@ Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>
-Subject: [PATCH 10/15] KVM: X86: Mark CR3 dirty when vcpu->arch.cr3 is changed
-Date:   Mon,  8 Nov 2021 20:44:02 +0800
-Message-Id: <20211108124407.12187-11-jiangshanlai@gmail.com>
+Subject: [PATCH 11/15] KVM: VMX: Update vmcs.GUEST_CR3 only when the guest CR3 is dirty
+Date:   Mon,  8 Nov 2021 20:44:03 +0800
+Message-Id: <20211108124407.12187-12-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 In-Reply-To: <20211108124407.12187-1-jiangshanlai@gmail.com>
 References: <20211108124407.12187-1-jiangshanlai@gmail.com>
@@ -73,59 +73,30 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Lai Jiangshan <laijs@linux.alibaba.com>
 
-When vcpu->arch.cr3 is changed, it should be marked dirty unless it
-is being updated to the value of the architecture guest CR3 (i.e.
-VMX.GUEST_CR3 or vmcb->save.cr3 when tdp is enabled).
-
-This patch has no functionality changed because
-kvm_register_mark_dirty(vcpu, VCPU_EXREG_CR3) is superset of
-kvm_register_mark_available(vcpu, VCPU_EXREG_CR3) with additional
-change to vcpu->arch.regs_dirty, but no code uses regs_dirty for
-VCPU_EXREG_CR3.  (vmx_load_mmu_pgd() uses vcpu->arch.regs_avail instead
-to test if VCPU_EXREG_CR3 dirty which means current code (ab)uses
-regs_avail for VCPU_EXREG_CR3 dirty information.)
+When vcpu->arch.cr3 is changed, it is marked dirty, so vmcs.GUEST_CR3
+can be updated only when kvm_register_is_dirty(vcpu, VCPU_EXREG_CR3).
 
 Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
 ---
- arch/x86/kvm/vmx/nested.c | 2 +-
- arch/x86/kvm/x86.c        | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index dc0e5f80715d..ee5a68c2ea3a 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -1134,7 +1134,7 @@ static int nested_vmx_load_cr3(struct kvm_vcpu *vcpu, unsigned long cr3,
- 		kvm_mmu_new_pgd(vcpu, cr3);
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index d94e51e9c08f..38b65b97fb7b 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -3126,9 +3126,9 @@ static void vmx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa,
  
- 	vcpu->arch.cr3 = cr3;
--	kvm_register_mark_available(vcpu, VCPU_EXREG_CR3);
-+	kvm_register_mark_dirty(vcpu, VCPU_EXREG_CR3);
- 
- 	/* Re-initialize the MMU, e.g. to pick up CR4 MMU role changes. */
- 	kvm_init_mmu(vcpu);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index e5f5042d4842..6ca19cac4aff 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1159,7 +1159,7 @@ int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
- 		kvm_mmu_new_pgd(vcpu, cr3);
- 
- 	vcpu->arch.cr3 = cr3;
--	kvm_register_mark_available(vcpu, VCPU_EXREG_CR3);
-+	kvm_register_mark_dirty(vcpu, VCPU_EXREG_CR3);
- 
- handle_tlb_flush:
- 	/*
-@@ -10591,7 +10591,7 @@ static int __set_sregs_common(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs,
- 	vcpu->arch.cr2 = sregs->cr2;
- 	*mmu_reset_needed |= kvm_read_cr3(vcpu) != sregs->cr3;
- 	vcpu->arch.cr3 = sregs->cr3;
--	kvm_register_mark_available(vcpu, VCPU_EXREG_CR3);
-+	kvm_register_mark_dirty(vcpu, VCPU_EXREG_CR3);
- 
- 	kvm_set_cr8(vcpu, sregs->cr8);
- 
+ 		if (!enable_unrestricted_guest && !is_paging(vcpu))
+ 			guest_cr3 = to_kvm_vmx(kvm)->ept_identity_map_addr;
+-		else if (test_bit(VCPU_EXREG_CR3, (ulong *)&vcpu->arch.regs_avail))
++		else if (kvm_register_is_dirty(vcpu, VCPU_EXREG_CR3))
+ 			guest_cr3 = vcpu->arch.cr3;
+-		else /* vmcs01.GUEST_CR3 is already up-to-date. */
++		else /* vmcs.GUEST_CR3 is already up-to-date. */
+ 			update_guest_cr3 = false;
+ 		vmx_ept_load_pdptrs(vcpu);
+ 	} else {
 -- 
 2.19.1.6.gb485710b
 
