@@ -2,146 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A6E6A44A425
-	for <lists+kvm@lfdr.de>; Tue,  9 Nov 2021 02:41:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2195444A4CF
+	for <lists+kvm@lfdr.de>; Tue,  9 Nov 2021 03:39:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241613AbhKIBng (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Nov 2021 20:43:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51484 "EHLO
+        id S240526AbhKICmA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Nov 2021 21:42:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235733AbhKIBnW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 8 Nov 2021 20:43:22 -0500
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCFDAC01CB33
-        for <kvm@vger.kernel.org>; Mon,  8 Nov 2021 17:34:29 -0800 (PST)
-Received: by mail-pl1-x62c.google.com with SMTP id o14so17936059plg.5
-        for <kvm@vger.kernel.org>; Mon, 08 Nov 2021 17:34:29 -0800 (PST)
+        with ESMTP id S238491AbhKICl7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Nov 2021 21:41:59 -0500
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E84EBC061570
+        for <kvm@vger.kernel.org>; Mon,  8 Nov 2021 18:39:13 -0800 (PST)
+Received: by mail-pg1-x54a.google.com with SMTP id i25-20020a631319000000b002cce0a43e94so11316858pgl.0
+        for <kvm@vger.kernel.org>; Mon, 08 Nov 2021 18:39:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=1YRNoCeeCQqxDvBnoZCtovzT6k/QbqjejEhDlgxJ1xE=;
-        b=pNVpk+rCV3HDgb16D6KNssN4BA5U8FFOZNcV6kT2A3hGuTm+OeROOwB3Gc25RBu5yd
-         X4Uhm2QzCn6VeLOQwzmDpP+LvkACbbM7DOiiN1F9FMFmdBDaNGhlXPS6Id8TxlqFveUv
-         ykpl9sKIWGUMRi9cWNOq4NVL7iOrhHfOKikKZQ1aYP9i+ytWzFlBD/awLiOZyTwIbWYd
-         XQYDPLCQNX3Mp2Ht8drmEm0GVWUVRwAlw4IodZrpKgzHqAjOAs0439do5Z+7ssrDyIK1
-         8md3BDizbcDwWCcQYcShMQ13fICVIj7mwm722Rbu19AAPS5eH2kbVej7sO/fO5BfTAlH
-         wWLQ==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=9kfjkwh0XeCTSxvEq2rSuYCXrCO8cNiwIU3519UtjQc=;
+        b=pbf3M2iVHeF14qUsyMIOeVLd7BZ2/YXwEev0iQZ8Ka2isZ/J6/aNkE7JsSKGZ5CL1a
+         KW3irQLhsUmxsH4Aej+wgE3bwRDbLmkjryi9TDCn7Zprx3NBlvp9vE1G5AVm57AzNNRu
+         IYi0RnfKi4BUwdDJetDZ6IFtmAFkAULwJkXBWgC7bJy0HMawJsMGsIVq2BE+AqBEOejk
+         DsPvZRvl8dz9C9AePdbR+Hiszj3zQVcBhwXLHL98xo+dw7lbn0vCqUEL7flYw+uMYHK+
+         BG+h56ap9V2LLRjiHIlSB2/cnlA9HdmSBcHPg2U96CFQOeFKxoblQnlP9XXtnhVYJ1rt
+         pzRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=1YRNoCeeCQqxDvBnoZCtovzT6k/QbqjejEhDlgxJ1xE=;
-        b=P1dPx0KYUt8i1Q4v6XM/QvlGt7wKbOG1Yk2TlWPNmrCFDAvCPWk9Nwfiz9ahm1gTpf
-         MUlWXLoHz+CRqE+cm2YXBMruYsxCNg8zWNkit0D+s7JODTIA8aw8a3BfAFZhJJ/dPoMp
-         Odn5o+b6MGlxFGGD1oqxsgCsTHrTG0rnYnv6RC4CNGA9tlyufYESpuSMjwLw1ieDyhvz
-         /WsrT9tYRTBfG6NevQ7xidizK/b8c+8u9D1XQWSJGDZFdIXJAk8Lq6vTjZUrBUbCsz04
-         Uj8lYgRUH65aFGwzu0EBVseNnrJs4NBblxv+1SJlvg1ykcEk9hXV50d8HEsLd4i5HLKZ
-         mZGQ==
-X-Gm-Message-State: AOAM531W0ZuAXD3QsdBE4jemFU/8NuNXSxPjWdoUtfbwn9TozqKcQEPX
-        suL64b0X67DS857qgvbmqDAvLQ==
-X-Google-Smtp-Source: ABdhPJy0HaVA5X41obakvoewrsg+dddMWtR8SRrwlCTWxcj9Z8BfUyvzJbNA9mrSzEmNcuMJfGzR8Q==
-X-Received: by 2002:a17:90b:1c02:: with SMTP id oc2mr2968763pjb.65.1636421669237;
-        Mon, 08 Nov 2021 17:34:29 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id h36sm307891pgb.9.2021.11.08.17.34.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Nov 2021 17:34:28 -0800 (PST)
-Date:   Tue, 9 Nov 2021 01:34:25 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
-Cc:     James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Ben Gardon <bgardon@google.com>, Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v5.5 20/30] KVM: x86: Use nr_memslot_pages to avoid
- traversing the memslots array
-Message-ID: <YYnQIYdsb3wwg86j@google.com>
-References: <20211104002531.1176691-1-seanjc@google.com>
- <20211104002531.1176691-21-seanjc@google.com>
- <88d64cd0-4db1-34a8-96af-6661a55e971e@oracle.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <88d64cd0-4db1-34a8-96af-6661a55e971e@oracle.com>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=9kfjkwh0XeCTSxvEq2rSuYCXrCO8cNiwIU3519UtjQc=;
+        b=449FJx+5qFRhJh/9GEGLDymdSwJFH0l9JKQvo5akwc8+ghLbsMpyp7PyfV1Q3EFzLZ
+         y+O1scDDjIjdhcWGbiiCRhqk930rYch5iu5ZaLQfVkZMUvNnwQhKNLUGX3vJiyjv2VEU
+         frDOGEoP6MyHttJSteKii/jY2OVIDN3hr2CFSWVuLLhqe39A/kitALdZx85pK7T1xofx
+         Qc41qpF4hthP+XMJwYVqSPJnikfyyJHlZPFEry6XVhlP7JBYo6pnDKBlQZ6pqc6amdxR
+         9MWLpHcSoycksd2NQmC8yQyY6Wo8xifcVzrdutY9lVvfIyFbEzIHz2X0TnsV3FO7vP/v
+         6JAA==
+X-Gm-Message-State: AOAM530JAO6j0IdEWAkEGg9LBqz0ArL6MibRhDt8ucHtFoeP+lsi3pz/
+        UnWurWFaZF0Zg4mhKyNkzyQGnvzawnWX+JYPXBfKFLQ+Q+CWTUqw7DcrX6hdkinuiELCo7Xa5mZ
+        h826BzVRQmtzyaUdcmdKje/njXoRoERNGPKt/x+jx+Vio2ed2arvccDPgwib69co=
+X-Google-Smtp-Source: ABdhPJyEaUpzC3JP/YSAblsMH687yjvwYd2dNYq5Vd9uD22fsk3Uu1dvR2/eGxjJjXIibqlAla0BEREdORMgdA==
+X-Received: from ricarkol2.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
+ (user=ricarkol job=sendgmr) by 2002:a17:902:e789:b0:140:801:1262 with SMTP id
+ cp9-20020a170902e78900b0014008011262mr4046586plb.42.1636425552990; Mon, 08
+ Nov 2021 18:39:12 -0800 (PST)
+Date:   Mon,  8 Nov 2021 18:38:49 -0800
+Message-Id: <20211109023906.1091208-1-ricarkol@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.34.0.rc0.344.g81b53c2807-goog
+Subject: [PATCH 00/17] KVM: selftests: aarch64: Test userspace IRQ injection
+From:   Ricardo Koller <ricarkol@google.com>
+To:     kvm@vger.kernel.org, maz@kernel.org, kvmarm@lists.cs.columbia.edu,
+        drjones@redhat.com, eric.auger@redhat.com, alexandru.elisei@arm.com
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, oupton@google.com,
+        james.morse@arm.com, suzuki.poulose@arm.com, shuah@kernel.org,
+        jingzhangos@google.com, pshier@google.com, rananta@google.com,
+        reijiw@google.com, Ricardo Koller <ricarkol@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 09, 2021, Maciej S. Szmigiero wrote:
-> On 04.11.2021 01:25, Sean Christopherson wrote:
-> > From: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
-> > 
-> > There is no point in recalculating from scratch the total number of pages
-> > in all memslots each time a memslot is created or deleted.  Use KVM's
-> > cached nr_memslot_pages to compute the default max number of MMU pages.
-> > 
-> > Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
-> > [sean: use common KVM field and rework changelog accordingly]
+This series adds a new test, aarch64/vgic-irq, that validates the injection of
+different types of IRQs from userspace using various methods and configurations
+(when applicable):
 
-Heh, and I forgot to add "and introduce bugs"
+    Intid        Method     |       |          Configuration
+                            |       |
+               IRQ_LINE     |       |
+    SGI        LEVEL_INFO   |       |
+    PPI    x   IRQFD        |   x   | level-sensitive  x  EOIR + DIR
+    SPI        ISPENDR      |       | edge-triggered      EOIR only
+    bogus      ISACTIVER    |       |
+                            |       |
 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >   arch/x86/include/asm/kvm_host.h |  1 -
-> >   arch/x86/kvm/mmu/mmu.c          | 24 ------------------------
-> >   arch/x86/kvm/x86.c              | 11 ++++++++---
-> >   3 files changed, 8 insertions(+), 28 deletions(-)
-> > 
-> (..)
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -11837,9 +11837,14 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
-> >   				enum kvm_mr_change change)
-> >   {
-> >   	if (!kvm->arch.n_requested_mmu_pages &&
-> > -	    (change == KVM_MR_CREATE || change == KVM_MR_DELETE))
-> > -		kvm_mmu_change_mmu_pages(kvm,
-> > -				kvm_mmu_calculate_default_mmu_pages(kvm));
-> > +	    (change == KVM_MR_CREATE || change == KVM_MR_DELETE)) {
-> > +		unsigned long nr_mmu_pages;
-> > +
-> > +		nr_mmu_pages = kvm->nr_memslot_pages * KVM_PERMILLE_MMU_PAGES;
-> 
-> Unfortunately, even if kvm->nr_memslot_pages is capped at ULONG_MAX then
-> this value multiplied by 20 can still overflow an unsigned long variable.
+vgic-irq is implemented by having a single vcpu started in any of the 4 (2x2)
+configurations above.  The guest then "asks" userspace to inject all intids of
+a given IRQ type using each applicable method via a GUEST_SYNC call.  The
+applicable methods and intids for a given configuration are specified in tables
+like this one:
 
-Doh.  And that likely subtly avoided by the compiler collapsing the "* 20 / 1000"
-into "/ 50".
+    /* edge-triggered */
+    static struct kvm_inject_desc inject_edge_fns[] = {
+            /*                            sgi    ppi    spi */
+            { KVM_IRQ_LINE,               false, false, true },
+            { IRQFD,                      false, false, true },
+            { ISPENDR,                    true,  false, true },
+    };
 
-Any objection to adding a patch to cut out the multiplication entirely?  Well, cut
-it from the source code, looks like gcc generates some fancy SHR+MUL to do the
-divide.
+Based on the (example) table above, a guest running in an edge-triggered
+configuration will try injecting SGIs and SPIs.  The specific methods are also
+given in the table, e.g.: SGIs are injected from userspace by writing into the
+ISPENDR register.
 
-I'm thinking this:
+This test also adds some extra edge tests like: IRQ preemption, restoring
+active IRQs, trying to inject bogus intid's (e.g., above the configured KVM
+nr_irqs).
 
-#define KVM_MEMSLOT_PAGES_TO_MMU_PAGES_RATIO 50
+Note that vgic-irq is currently limited to a single vcpu, GICv3, and does not
+test the vITS (no MSIs).
 
+- Commits 1-3 add some GICv3 library functions on the guest side, e.g.: set the
+  priority of an IRQ.
+- Commits 4-5 add some vGICv3 library functions on the userspace side, e.g.: a
+  wrapper for KVM_IRQ_LINE.
+- Commit 6 adds the basic version of this test: inject an SPI using
+  KVM_IRQ_LINE.
+- Commits 7-17 add other IRQs types, methods and configurations.
 
-	...
+Ricardo Koller (17):
+  KVM: selftests: aarch64: move gic_v3.h to shared headers
+  KVM: selftests: aarch64: add function for accessing GICv3 dist and
+    redist registers
+  KVM: selftests: aarch64: add GICv3 register accessor library functions
+  KVM: selftests: add kvm_irq_line library function
+  KVM: selftests: aarch64: add vGIC library functions to deal with vIRQ
+    state
+  KVM: selftests: aarch64: add vgic_irq to test userspace IRQ injection
+  KVM: selftests: aarch64: abstract the injection functions in vgic_irq
+  KVM: selftests: aarch64: cmdline arg to set number of IRQs in vgic_irq
+    test
+  KVM: selftests: aarch64: cmdline arg to set EOI mode in vgic_irq
+  KVM: selftests: aarch64: add preemption tests in vgic_irq
+  KVM: selftests: aarch64: level-sensitive interrupts tests in vgic_irq
+  KVM: selftests: aarch64: add tests for LEVEL_INFO in vgic_irq
+  KVM: selftests: aarch64: add test_inject_fail to vgic_irq
+  KVM: selftests: add IRQ GSI routing library functions
+  KVM: selftests: aarch64: add tests for IRQFD in vgic_irq
+  KVM: selftests: aarch64: add ISPENDR write tests in vgic_irq
+  KVM: selftests: aarch64: add test for restoring active IRQs
 
-	nr_mmu_pages = nr_pages / KVM_MEMSLOT_PAGES_TO_MMU_PAGES_RATIO;
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/aarch64/arch_timer.c        |   2 +-
+ .../testing/selftests/kvm/aarch64/vgic_irq.c  | 853 ++++++++++++++++++
+ .../selftests/kvm/include/aarch64/gic.h       |  26 +
+ .../kvm/{lib => include}/aarch64/gic_v3.h     |  12 +
+ .../selftests/kvm/include/aarch64/vgic.h      |  18 +-
+ .../testing/selftests/kvm/include/kvm_util.h  |  10 +
+ tools/testing/selftests/kvm/lib/aarch64/gic.c |  66 ++
+ .../selftests/kvm/lib/aarch64/gic_private.h   |  11 +
+ .../selftests/kvm/lib/aarch64/gic_v3.c        | 206 ++++-
+ .../testing/selftests/kvm/lib/aarch64/vgic.c  | 103 ++-
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  72 ++
+ 13 files changed, 1352 insertions(+), 29 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/vgic_irq.c
+ rename tools/testing/selftests/kvm/{lib => include}/aarch64/gic_v3.h (80%)
 
+-- 
+2.34.0.rc0.344.g81b53c2807-goog
 
