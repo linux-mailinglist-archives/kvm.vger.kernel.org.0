@@ -2,75 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C7DFB44B204
-	for <lists+kvm@lfdr.de>; Tue,  9 Nov 2021 18:33:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C8B344B21C
+	for <lists+kvm@lfdr.de>; Tue,  9 Nov 2021 18:44:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241090AbhKIRgD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Nov 2021 12:36:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42814 "EHLO
+        id S241220AbhKIRrS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Nov 2021 12:47:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238382AbhKIRgC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Nov 2021 12:36:02 -0500
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5532C061766
-        for <kvm@vger.kernel.org>; Tue,  9 Nov 2021 09:33:16 -0800 (PST)
-Received: by mail-pl1-x633.google.com with SMTP id b11so8982484pld.12
-        for <kvm@vger.kernel.org>; Tue, 09 Nov 2021 09:33:16 -0800 (PST)
+        with ESMTP id S231550AbhKIRrR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Nov 2021 12:47:17 -0500
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C356CC061764
+        for <kvm@vger.kernel.org>; Tue,  9 Nov 2021 09:44:31 -0800 (PST)
+Received: by mail-pg1-x549.google.com with SMTP id u5-20020a63d3450000b029023a5f6e6f9bso12943002pgi.21
+        for <kvm@vger.kernel.org>; Tue, 09 Nov 2021 09:44:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=dAQ4ipHe6mj+S5wNiendTeS5LEXc10OoPefcaaMxaM4=;
-        b=X7XoFdgKxoUfdExi/8T7fGzwE8la73btPlIVP+HuJp9bL/hU85oxlA3kUHjSzaYQnh
-         G8u/08InsEZY6n/6bNf2eaHu8J6OjiMTJb4+lTqFTeGQMG7T11GPhWMNQcMMMiyJ0niT
-         8AgmYxmn59QNW5izfAmer0EqCiPfHEL8DmNA/Izq+7vBo+tgvTWXBvSjW5lYxxlsj+Dp
-         0/HVF+Xfe2uHl/7T9J88HV2/3miPiM5PAkS6piL2Bqz+4kcqp5rlYbZYrLyTekzvKZJA
-         cDACERmR3UvLKrzkkM1tjgp4FE6PQl0xnSzpkesf5czQEfMFMFDmuDyuAuOoJre11REA
-         NKQA==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=FN6HjG0tcv6VU84KzdC+5qqXmqwIf4ja4qG1uH2h6QI=;
+        b=GP1yB+DXfQHn6aAWpkWj5hv/quucEvUQASEDNfG9t8E21/ixJumDrMQTCMamtqNaTw
+         7rCHcTEf2qWaYMCeYPFpmGCyLqIE3CMiFD+NZw9Ayr5AX5JSui3Puokv9spWTPPOmWIv
+         e+p+ZGx9L9S/zRKycprY459PmLrmFpNAXm34uYkqnIWtrW2jbVQwvPHzaXZyxMJW38AT
+         iz3fm9aHwg3nhbq/8uqZmTlCGUM+liWFHHAs4+dR1w0nDtC2tWbXOZGbAbZB8xPyL9HZ
+         Ri7X1WTVjCSaggNP29msvjyC8qGHRM1ZgVkh3pGbKysEr25EhrctEmNsZCIm+1igiArl
+         NoLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=dAQ4ipHe6mj+S5wNiendTeS5LEXc10OoPefcaaMxaM4=;
-        b=wYCwSq2EE4yjpy9vx/BQeElj4ClsAeNjk6VX2UedzlTk5G3Fu4HcNlXxdeO2KsjICv
-         ayzXAdV6841G0etb7c8oaBYJoRbXu5G+kNNo6pJxesIrZEeASemY4awy+wpRGZPKdb54
-         4JqZLTrSejbvMxoTzk0rPACM7oMN6l0WdP8rs4sMUxaIPajdmIMoawvNDlxj6aS7174Q
-         hokLbzMIMd8Om3BoILrttn4OUjGfiLAh0lvhXCnp8esqA3/27IUcw4DkO65sjLrR7rH+
-         MPVugtphaTZHmPAG+l+SlT4AEbq8AQ9Fk2PcnxMwCiK4AHYocVRDct7TYXRiV7/iXHg6
-         coJA==
-X-Gm-Message-State: AOAM532bSweNkkOXXO7vowt3noAzUx89RUiywDnEcyiduawco2fgkc/c
-        CgOgzHexHm0Q57r+yL0V9OOp5w==
-X-Google-Smtp-Source: ABdhPJxcCsg0NSzFuffu/U0QqNGykfFjyw0u+oK5KaYzr61kSayzkoK+RJCyWGZvV9MiERP2Zg40yQ==
-X-Received: by 2002:a17:90b:1a87:: with SMTP id ng7mr9146277pjb.230.1636479195981;
-        Tue, 09 Nov 2021 09:33:15 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id p16sm15460419pgd.78.2021.11.09.09.33.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Nov 2021 09:33:15 -0800 (PST)
-Date:   Tue, 9 Nov 2021 17:33:11 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 0/8] KVM: nVMX: Enlightened MSR Bitmap feature for
- Hyper-V on KVM (+ KVM: x86: MSR filtering and related fixes)
-Message-ID: <YYqw15a/Z+eDvuEv@google.com>
-References: <20211109162835.99475-1-vkuznets@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211109162835.99475-1-vkuznets@redhat.com>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=FN6HjG0tcv6VU84KzdC+5qqXmqwIf4ja4qG1uH2h6QI=;
+        b=0ms8rvf+U3SNWLj8+qzoY/dvSo5Tf0HDv7aIV5Z5a6Px6rMr4zaYrnxaoJ0pYrJfmv
+         vhFS31jhdjhfC/AYFZ4TO5bScnaFh5/v/C2aIdXgsQMExtB3HeODtKnjs+NG5gLuBKt2
+         8a0X2thCfiunOC6Tqqx+yUFqVWARxNBm9PXLOHNL6GgPLTO8VRJIUOyZosUN7j7ZWnmB
+         QJRyqCA/jhzV+WpkxZs8FUKwGGlW0EB8UGTbFIbUb8AxW7hBChF3I+KGo5fVTAFEI/MS
+         hkzjCXYTFWOvSJKS/kFFGk+cReAYBkq4+wJWO3+p6tWRvn2En+pnbHLfg1Jen/lVlMoA
+         MnPg==
+X-Gm-Message-State: AOAM533wp/3h4Kdzfd7ejf3aYkVGLI1XPdqTSJdsRs4k9NYpPkCNFvNT
+        mV1ByoL8dlEKHVw3S4gYn96hxDz19VF2
+X-Google-Smtp-Source: ABdhPJxlWuiqZzuRC8gbqXKOO5ZT6HmKZbwnztkngDeq5qs3gRtGA5GbP3zrKElQjNabzUwe+YS/Dk6CbriU
+X-Received: from vipinsh.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:36b0])
+ (user=vipinsh job=sendgmr) by 2002:a17:90b:4c0d:: with SMTP id
+ na13mr9179482pjb.206.1636479871208; Tue, 09 Nov 2021 09:44:31 -0800 (PST)
+Date:   Tue,  9 Nov 2021 17:44:24 +0000
+Message-Id: <20211109174426.2350547-1-vipinsh@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.34.0.rc0.344.g81b53c2807-goog
+Subject: [PATCH v4 0/2] Add a helper to read GPR index and move INVPCID
+ validation to a common place
+From:   Vipin Sharma <vipinsh@google.com>
+To:     pbonzini@redhat.com, seanjc@google.com, jmattson@google.com
+Cc:     dmatlack@google.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Vipin Sharma <vipinsh@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 09, 2021, Vitaly Kuznetsov wrote:
-> This series combines "Enlightened MSR Bitmap feature for Hyper-V on KVM v4"
-> and Sean's "KVM: x86: MSR filtering and related fixes v4" 
-> (https://lore.kernel.org/kvm/20211109013047.2041518-1-seanjc@google.com/)
-> series as they're code dependent.
+INVPCID, INVVPID, and INVEPT instructions retrieve the GPR index
+similarly to find the invalidation type. Patch 1 moves the shift and
+mask magic to a single place.
 
-Series as a whole looks good, thanks for doing the dirty work!
+INVPCID invalidation type check is same for both VMX and SVM. This
+instruction is not documented to verify the type before reading the
+operand from memory. So, moving the check to a common place in patch 2.
+
+v4:
+- Changed commit message of the patch 1
+
+v3:
+- https://lore.kernel.org/lkml/20211103205911.1253463-1-vipinsh@google.com/
+- Patch 2's commit message is more detailed now.
+
+v2:
+- https://lore.kernel.org/lkml/20211103183232.1213761-1-vipinsh@google.com/
+- Keeping the register read visible in the functions.
+- Removed INVPCID type check hardcoding and moved error condition to common 
+  function.
+
+v1: https://lore.kernel.org/lkml/20211011194615.2955791-1-vipinsh@google.com/
+
+Vipin Sharma (2):
+  KVM: VMX: Add a helper function to retrieve the GPR index for INVPCID,
+    INVVPID, and INVEPT
+  KVM: Move INVPCID type check from vmx and svm to the common
+    kvm_handle_invpcid()
+
+ arch/x86/kvm/svm/svm.c    |  5 -----
+ arch/x86/kvm/vmx/nested.c | 10 ++++++----
+ arch/x86/kvm/vmx/vmx.c    |  9 +++------
+ arch/x86/kvm/vmx/vmx.h    |  5 +++++
+ arch/x86/kvm/x86.c        |  3 ++-
+ 5 files changed, 16 insertions(+), 16 deletions(-)
+
+-- 
+2.34.0.rc0.344.g81b53c2807-goog
+
