@@ -2,250 +2,237 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7530B449FE6
-	for <lists+kvm@lfdr.de>; Tue,  9 Nov 2021 01:45:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BDA4844A014
+	for <lists+kvm@lfdr.de>; Tue,  9 Nov 2021 01:58:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235670AbhKIAsZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 8 Nov 2021 19:48:25 -0500
-Received: from mx0b-00069f02.pphosted.com ([205.220.177.32]:57800 "EHLO
-        mx0b-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235349AbhKIAsJ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 8 Nov 2021 19:48:09 -0500
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1A902vuQ019145;
-        Tue, 9 Nov 2021 00:44:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : subject : to :
- cc : references : message-id : date : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2021-07-09;
- bh=gi4omwCWikStnBVOOGZ1Qw9XggCqfKgmEeCJma7yYys=;
- b=SMXjcqUVzIhllnxrm3iKskB6LGX8B7gMi41mQd4BsBk5nvim4zG/ItGhGJt9joRvkHf0
- yN50h4YBLWhOKynfR3BPDiduak726B5Pe+53UBUxkuGpkSlThlPHY4O7guyY6Wy6SzCV
- MyNsNPu1cIvQrOmkyJanI82VBLXg5NVw5UN+a0mNOOmxAfTntnCZ449W8xMVRVhdi855
- rl/+VOvJQ8xlFaeTW2FoflUqUc1OpxyOtZGCkyVgf2yOz4PRFpgjH1Va1RfNLXfjwx6C
- 82L+THgeT5T532PZtldLDR/0rBOIu9m5MeZA4tafFwrAX9UQzi5n5v5icCurajywXPg+ tA== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3c6sbk7ctx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 09 Nov 2021 00:44:27 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 1A90ab4M054251;
-        Tue, 9 Nov 2021 00:43:15 GMT
-Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2101.outbound.protection.outlook.com [104.47.55.101])
-        by userp3020.oracle.com with ESMTP id 3c63fs5j3x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 09 Nov 2021 00:43:14 +0000
+        id S236505AbhKIBBO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 8 Nov 2021 20:01:14 -0500
+Received: from mga05.intel.com ([192.55.52.43]:7953 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236348AbhKIBBO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 8 Nov 2021 20:01:14 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10162"; a="318551970"
+X-IronPort-AV: E=Sophos;i="5.87,218,1631602800"; 
+   d="scan'208";a="318551970"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2021 16:58:28 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.87,218,1631602800"; 
+   d="scan'208";a="451689416"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orsmga006.jf.intel.com with ESMTP; 08 Nov 2021 16:58:28 -0800
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.12; Mon, 8 Nov 2021 16:58:27 -0800
+Received: from fmsmsx608.amr.corp.intel.com (10.18.126.88) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.12; Mon, 8 Nov 2021 16:58:27 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx608.amr.corp.intel.com (10.18.126.88) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.12 via Frontend Transport; Mon, 8 Nov 2021 16:58:27 -0800
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.103)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2242.12; Mon, 8 Nov 2021 16:58:27 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=l73QnIPi5zi3OIJCIDVucVRuThc087vw0A10Xmrrb0yRm3VTDDYigSRAnVLcCXYHZoQOkGzzz/K0lAj/Jl+oDgcLtEHAGyDpMSP+b6aANatVhesMCkaxXNuL7aIMLAfZJmEiAOJtodYpjyCTs31uEPPpYjN/xwOtvf0yeTExhsgpEEOH5L0CC5v3yGubT/sX36ElpXXbkWzO4NGnuiOdy3HGGGutCjuj6oIV6HcayjGPOoRs1T7Qs1X8JI2ZALjcfQ6sr1Z9ld6tZnaASnlEd+fXxCAXi3hWVRlyq6Sh3DEykXg3a0NnagQqjeqULZnOK45P2w6eilws3jbRw/dZuw==
+ b=XNq/PrRLDuoXkKfjBTVzKWQmh2z00TjwLqQlv5HOXNrETonAMMbUZQieVn7xY18C7vVF61CAM9+B1ZODrSz+UjNNllV/8AK7efogLTVIzHK3cp4sy0eghCTagVsR5w54zyiWI0VA1LTfzd4VcWBoeGlpcUZ7CmXzrp80v4HnW2sEOP1abpfiEeLDhxivrNJwS8SxTs8JrYhyFCNzktng0fCYWYC4cD25/9GD3urM8fuyZyRLyCpzpLrWm0mkLPRbTEWGk1t7W9x00788CucG85ISCS/y38Yuum4S4xuaj6U3TWc1yUGiE6PzRtI4X1ao1pD0O47ZDzF4/W8+01ZyPQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gi4omwCWikStnBVOOGZ1Qw9XggCqfKgmEeCJma7yYys=;
- b=TGGpX1NiGaFD/vIaxS8amChip4O3vc0sLo+OJQiJgszS4r7uuv+JBEAYyYZKTxU2o9uLvXXeTq5Tuu4BvwDSxDmRpSXv3jGaZu+x4jwLun2ba2LomocQACnqSybGlX7qfohdMRkJyqD3qEEG96NtEp3ObBkT1qByHLqs09x5JjjGta9gb95HXaLMwav/Cvgs5+YpyGcvPXvunoX5Dv4ZU+HJpNcKBhOtn8xU1obfcGYEeQSeaLgYNHr3P7e/ApSa6lRu9i41Z8b1xCoxH0HIveDZkLyleLachV/v1F1OIRRHTg9hkl/gHBaqYmwpl3604sHEEaXIVgpONw8r5HLCFw==
+ bh=vrHBClRDT6z+VXR5CQBdBU4ogHGur29WIWQ47STYwQE=;
+ b=c8u3O7MlME/z85VGOYM06UKe5opthnoy3hvtqvT1SlOiRT2dUGhdoSwUYtuKNRdbhySEJUm2fJARlvWKuyagNd6RIc+tmE/PVn2z8fI8o3ZZLViFKPxFalKXR4Io1bonAmlfdxXsIMfZT05Ybiu2mH78ZUuhCQcc1XPSbqPybfRIVtnn8pHf0JNWYTRQv9aep6Pl3AKobfoww7AY5G8aa9IkZkNRe/FRjTvylT13/vGSRpRi9wYKToep6k4YqKHGo64B9+GQePcmsqAXmGyBbUYWhzlcFhscnV5L5i8zyThCJ7Havtqo0unLaLl2sYF75cGxBswly9x39ODx3HlR8Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gi4omwCWikStnBVOOGZ1Qw9XggCqfKgmEeCJma7yYys=;
- b=Imtf2NajxdgXcuQR/Uss9kyERmI1+74tXpE5tjWREGbIMFTMhxohN1xY4RjQ2JaEXgRkaJPYPATJn6gCAFOk48XVI50TDaVbr3G2SXOsBdOSSEgLkh6HhhzTAexDpeNTM3eEmVL4rCmc9/qbQb0wG/YLwOAtxuM+vQ0H/PDkQAo=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=oracle.com;
-Received: from CH2PR10MB4008.namprd10.prod.outlook.com (2603:10b6:610:c::22)
- by CH0PR10MB5273.namprd10.prod.outlook.com (2603:10b6:610:db::16) with
+ bh=vrHBClRDT6z+VXR5CQBdBU4ogHGur29WIWQ47STYwQE=;
+ b=R2sOWuVHlPXB6Cvf1H+jv32n2h02+2I1895MxQz/xrPLuNwz2ixHX5Er9TMUh2oyB/07VZCoRCuFjQmFvIx2VbuIKr4q05Kzc49CskPz8C+gIqOZlvkCdRi5OXm21389M+dSyhI1wCCD3g+ryh4t4C20aU7J2PYJKMbex+nyopg=
+Received: from BN9PR11MB5433.namprd11.prod.outlook.com (2603:10b6:408:11e::13)
+ by BN9PR11MB5420.namprd11.prod.outlook.com (2603:10b6:408:101::6) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4669.11; Tue, 9 Nov
- 2021 00:43:12 +0000
-Received: from CH2PR10MB4008.namprd10.prod.outlook.com
- ([fe80::74b8:818d:18e5:e6c6]) by CH2PR10MB4008.namprd10.prod.outlook.com
- ([fe80::74b8:818d:18e5:e6c6%6]) with mapi id 15.20.4669.016; Tue, 9 Nov 2021
- 00:43:12 +0000
-From:   "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
-Subject: Re: [PATCH v5.5 00/30] KVM: Scalable memslots implementation
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        David Hildenbrand <david@redhat.com>,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4669.10; Tue, 9 Nov
+ 2021 00:58:26 +0000
+Received: from BN9PR11MB5433.namprd11.prod.outlook.com
+ ([fe80::ecad:62e1:bab9:ac81]) by BN9PR11MB5433.namprd11.prod.outlook.com
+ ([fe80::ecad:62e1:bab9:ac81%9]) with mapi id 15.20.4669.016; Tue, 9 Nov 2021
+ 00:58:26 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     Alex Williamson <alex.williamson@redhat.com>,
         Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Ben Gardon <bgardon@google.com>, Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20211104002531.1176691-1-seanjc@google.com>
-Message-ID: <cb4f5d6e-9535-dd57-d8ee-3b593a81f3a6@oracle.com>
-Date:   Tue, 9 Nov 2021 01:43:01 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
-In-Reply-To: <20211104002531.1176691-1-seanjc@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+        Yishai Hadas <yishaih@nvidia.com>,
+        "bhelgaas@google.com" <bhelgaas@google.com>,
+        "saeedm@nvidia.com" <saeedm@nvidia.com>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "leonro@nvidia.com" <leonro@nvidia.com>,
+        "kwankhede@nvidia.com" <kwankhede@nvidia.com>,
+        "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>,
+        "maorg@nvidia.com" <maorg@nvidia.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: RE: [PATCH V2 mlx5-next 12/14] vfio/mlx5: Implement vfio_pci driver
+ for mlx5 devices
+Thread-Topic: [PATCH V2 mlx5-next 12/14] vfio/mlx5: Implement vfio_pci driver
+ for mlx5 devices
+Thread-Index: AQHXxNiiQv8W8p5Om0G/XtAgyw28t6vaqNQAgAALEQCAABqsAIAAIxaAgACddQCAAIzwAIAAI26AgAAjuICAANCqAIAAzO+AgAWtdwCAACFWgIAAB8YAgAGYuJeAE/f4kIAASI+AgADKufA=
+Date:   Tue, 9 Nov 2021 00:58:26 +0000
+Message-ID: <BN9PR11MB5433435CAAAB23EAE085C3128C929@BN9PR11MB5433.namprd11.prod.outlook.com>
+References: <20211020185919.GH2744544@nvidia.com>
+ <20211020150709.7cff2066.alex.williamson@redhat.com>
+ <87o87isovr.fsf@redhat.com>
+ <20211021154729.0e166e67.alex.williamson@redhat.com>
+ <20211025122938.GR2744544@nvidia.com>
+ <20211025082857.4baa4794.alex.williamson@redhat.com>
+ <20211025145646.GX2744544@nvidia.com>
+ <20211026084212.36b0142c.alex.williamson@redhat.com>
+ <20211026151851.GW2744544@nvidia.com>
+ <BN9PR11MB5433ACFD8418D888F9E1BCAE8C919@BN9PR11MB5433.namprd11.prod.outlook.com>
+ <20211108123547.GS2744544@nvidia.com>
+In-Reply-To: <20211108123547.GS2744544@nvidia.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM5PR0601CA0075.eurprd06.prod.outlook.com
- (2603:10a6:206::40) To CH2PR10MB4008.namprd10.prod.outlook.com
- (2603:10b6:610:c::22)
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: nvidia.com; dkim=none (message not signed)
+ header.d=none;nvidia.com; dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 9c1e8c1e-808b-4ced-85dd-08d9a31c096f
+x-ms-traffictypediagnostic: BN9PR11MB5420:
+x-microsoft-antispam-prvs: <BN9PR11MB54203E25617F6B101AF720088C929@BN9PR11MB5420.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: qfFsQcpJMNq1nyt5BfGWy+9CAnQaofQH0WLTVkXoBqKCCgX+BzpB/BAK59raE/ewpZFN0pttneRDvZEFQ6TGveaIG1jVOf/PK4DMsYDmVCSmYQgijzc84G6ClBZX9CqG2yX8XFkaym53lHy0toSFRZ90WDiYXMsDf2KJgHXkJeNErUMpbeE8bLW5mpaBVKj1mwWCZgzZQm/wwwGuB5sHNRQvy0lNYP0OSvcsm/ArECwYekvNjBVS9G51vhW+G2RRtBky0scSxWKpMLEB2IaF4/0wmNT7MJEIz8qjlgUxQHZIbxPQvMgV0jn1EyQg0XGVd9gfIOH+9niqhlvENp/FdkmUm612LSeePZy9V1v41bJY07nkGELR2zs70/MjHPy4UaWwW6Hr58eT5h+9YheUuQiuB/1PeTAGgTyQXU71sxWvjg9biaCR/a29eTFwjYq9EliTRKEzJIZgVbrgCYN19wlgzr8FCyx7jozqawVneTKYeNW+JAF+e8ENzkZXNAkSEcgwkgRDrmfB+lXvqoQvItdjzfFVE0eX1ZitpRM5KEUNOP/PvAz7j2TP2tBfVWcWHnQu2yOL6YVCMxNutn/xZxJg/meRimTGi1fxbLIM05wLRy7exaqxsOB9SaSU22mfWorxQ5SgXfhsJK3AN9WBadBuIot6PXL2xsU85xMHvIaFwxMum1yZtDc7HxKc+oFWWzF2FgSRFsbk0gsqtf6/Vw==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5433.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(2906002)(8676002)(76116006)(122000001)(7416002)(71200400001)(83380400001)(5660300002)(26005)(52536014)(54906003)(38070700005)(6916009)(186003)(86362001)(7696005)(66476007)(8936002)(316002)(64756008)(6506007)(82960400001)(55016002)(9686003)(508600001)(33656002)(38100700002)(66946007)(66446008)(66556008)(4326008);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?tOsNuNrb2CeNDcned1jNMbdsSvHmzpa2oxi6vjtgqQhyK5BLJNgzlR7tJesr?=
+ =?us-ascii?Q?rq2btwldCuDcOkaefWAXikADCrmsrqL3t/CeNiBZezoYFHtnh3EPQFeSMNtL?=
+ =?us-ascii?Q?5/yDkEuklztv1lNVIXqpEie1zQ+xzNSzLTYF27QNvan8RNimdiNYaMYN5fGT?=
+ =?us-ascii?Q?4OjKut8eqqnaT24mL8TAUVVr7olKGW9oKJQ1WtkOUbSlXJSgkqUTdFNb444O?=
+ =?us-ascii?Q?hn6f18Z/e3Y5tLKbVq+tF+uwDaifPDEsOFineOaT78Ec09D2D5FN8EWd/aaK?=
+ =?us-ascii?Q?bfeQwqGuB1MeC3U6p5zWSb7WtIqSYG84NX5MSDnPeC1OSINz7wuHCr8OFPro?=
+ =?us-ascii?Q?U7AsTjaL9twuFHchn57+X/Zyklct26aLmwQmoe59zzG/YeEwQ4mpjbWvEQTO?=
+ =?us-ascii?Q?+2yr2kQnrPyUokWpNZXe3f6VW9Fb2NEWArUwE35HViF8koQyQyHVhgSU3Yw0?=
+ =?us-ascii?Q?OhnML+KfYawGVq0Zbu37GkwBbKy5zBghJ8gAV6tjckV26hj4VB4q3umECMJe?=
+ =?us-ascii?Q?WnC0yBZzrV/JYDnthNLpLtHysvNG2Ke28DdA8gic2UQBa1raVxdMVrnHtQ3c?=
+ =?us-ascii?Q?Vp9yNHfZpdrVXpJ85DFqlEkHSA0zzBZpzxQ5tLETvhS/em4fmRy8D64GyGTh?=
+ =?us-ascii?Q?gbEOMGKwdLaIQQjZ4cK7TNX8cW6tunKKv03Zm9kKpBJkPp2WBoSYvoxkKNui?=
+ =?us-ascii?Q?RtukxbbU35GjdmYxtW9qPapbmFyWjth4ilTfuB4Eoyxw5TP+lL+wVTS9NHCm?=
+ =?us-ascii?Q?JmOauuZQebXe4Ba8WbVwPj/19N2Of1NFUpv/yYy0CAy6EpIbJjjH7BeQ4BAr?=
+ =?us-ascii?Q?LlFYHr+L/wk3+vto1UySoS2zhrHzMOW3GIZhd57j1IcwfcYdrIZYMvszF98I?=
+ =?us-ascii?Q?rOxOhTKyKmx4tS0owzgpR0ik4KJamUj12eAixhA+fueGfxxc2IJOSQ8ivuT2?=
+ =?us-ascii?Q?+GmrkrnOcymct5FnpNl21aXR2QvLrhPBalJ5DwEjgz1Zu8aZEvHKzQ7XjTZa?=
+ =?us-ascii?Q?vjwFCs/BPTaI68rNtsSy69pPufXkjxaZAOCFob56h2+Blf0f2Hr/X/ek2PoE?=
+ =?us-ascii?Q?bKcsWYBjmsMdH9zqEPFVaSDc8uSVVUXYYuBG01ijITJkuhyC3ftrLK4uPgX1?=
+ =?us-ascii?Q?mV6ZxEiGm1yY2fe99C7Nn8n7/rT9Trtwn+2nEWZQ1HMg9nr5kz6YBggyx7kv?=
+ =?us-ascii?Q?3Rr8roT8yeB9BTC2egRprp04jRg1KRQW9lQ4KrJwj5EYxmHtpQiGoGi9cCCi?=
+ =?us-ascii?Q?b00BhbzsX+6nadmC5Paqxs+6HqLMzHOPqlMuqCBJs7exy+pnvNqH1cwkf/lQ?=
+ =?us-ascii?Q?AtYgtWiQ7ye5sr/GrF8yDG5ON+piowoOIvbm+hLQ+po3bfO/junpRJSuoENN?=
+ =?us-ascii?Q?oal8cmxrH5dPBvS+BsgE9QQqCQB2fqkGRZ1dFHWGFrasi5GUB7CyDMGYsu6m?=
+ =?us-ascii?Q?fDhf9T2SFWc37xtErWaO1hzljZCYdbI34piSIHeJkxwhVHHL8cDJpor/9hk+?=
+ =?us-ascii?Q?2trruoq6swv39vthX9rNOwk0rJMaSq/Y8J2NWsmTBF22oqcp4LX8uvTYkjHv?=
+ =?us-ascii?Q?BroLf74Au8A1vG5uvs/F2Id9UCWLUDzjpGQFkMRYyGa4D/DsDLkgSyV7xJYo?=
+ =?us-ascii?Q?OZEOPsT/MH1+csQlVWp+KoE=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Received: from [172.20.10.2] (37.248.218.22) by AM5PR0601CA0075.eurprd06.prod.outlook.com (2603:10a6:206::40) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4669.11 via Frontend Transport; Tue, 9 Nov 2021 00:43:06 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: c0295772-27f8-442c-1af3-08d9a319e86a
-X-MS-TrafficTypeDiagnostic: CH0PR10MB5273:
-X-Microsoft-Antispam-PRVS: <CH0PR10MB52739339EC881A3917C545ADFF929@CH0PR10MB5273.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 8tPilmumMsaMapdlIA/7MpDKfZNx82L0xPCaFgKdOrbJRaKGotNtR5+/+Nsam24Ds1jUPHd09UyfU2bBRMLFsCzQ3sCggc1tXKPxWOGy9Kw73j0e10mVuSaR4jhW2EPu6aQmBf5sbmt0Ns3x75wA8WeuuxaVW84po/CkUkLXiUjn91fjkns/e2AGNVFu6S19zU4zmxp/IsSjOn6yudK1NeZsSczZBe1ffRLOJecFjRxegcWRnnUtR8BFkQ7W19k8u2dNXlHtZcZaE/Ka4JOALFxhDJMYXgxX320dnir2Svt/T9IGz9XDELqDYtt2N8G7jsI9NBTCmAnfYqdK9/Q1HRxMkOhSgiRj0gmGk9P6BRwSmT8hQtGT9Vfdxr3I3qXDrj+Q2x0fU8Zpjqsc+drtKL3Xm81mqCHl96YCgyKUgCbBUZ38b5p0djbhoZz7O4ygtBtz+pQQHR9UGIxIOZBXr4HL8+EiP/g/6P7NFR7qgWAi8Wg59ssnjUCmpDyHghAjocpD6DxQ+PGesr6ZxFzw5Y9HZDrkB+sJIKPFPT7dpblPVNtZTsCxQErMxHKFlyen0nsA8pHBFqvs0Fs8+j7B2WusIyTsPIS8Gt75n845xTcCtJ8P6qWqeD+D/0ER2kn1r26aziYmMK4Q0/Uopf0mba4nq0thqhjlWvTTusSfxl8OvuPaxMLGHc91shC+cQK06bXJH7lhCX/mT3rxgYx5UYvF6BZ6O6a+WDbj1uq6BNw=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR10MB4008.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(6666004)(83380400001)(8936002)(7416002)(508600001)(2906002)(316002)(7406005)(38100700002)(86362001)(186003)(53546011)(5660300002)(6916009)(31686004)(4326008)(956004)(31696002)(6486002)(66946007)(36756003)(54906003)(26005)(2616005)(66476007)(66556008)(16576012)(8676002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TDlMb2VaWkJOM1pwQXcxbGNJaW5iTmYrMVFKYi9YVElRRzFpbW5rNTRCL2Y0?=
- =?utf-8?B?VWhSK3IrbTJhYlVWcSs0ZXBCbFFPR1FISHlkVG9lNW9mV2lCVnVwQTQ5TG81?=
- =?utf-8?B?SUhqZm90TnNqTXBSOTdSYWxSQVhwaWxhZjJZOFkvN3g1MlpjaUdCeEc2VmJY?=
- =?utf-8?B?dThvMFlRTTFFK3F2cUE1VzRNa1dFRHgrQU9tcVl1SzBMd3lGWDU3djQvVnh5?=
- =?utf-8?B?REFiU3N0dXg2WW1ORElZWGNRUlMzbmdqVWFIYVJyeU1OMG9ZQ3lFdWloaTFC?=
- =?utf-8?B?Z2d6dHFwVnRKbEdJVnV0VTM5bGRYdmRxYW5iVDVtdmUrYm9ycnlsaTVqNW8y?=
- =?utf-8?B?OXF5UEIwcHR1aUxlSFdNM0lXRDY5T3NPemJqTXlOckNWYU5UWDVpK25uWE1Y?=
- =?utf-8?B?WC9pekhIR1poTkFmT2EvTGxkQ3JZZXZ1ZE5UcDY0MG1JUEowYjNsNGROcmkv?=
- =?utf-8?B?SXo3ZURYV3l2N21hVWJZT3JGODU1UG92Yjk4QytJdnh1U3pyb2xiR3Jtak13?=
- =?utf-8?B?R25ZYmZIdmVxMEtQTThLRkN0UjkyNnl5NU9qazRocVZNVnBoYXlwZEowRWJq?=
- =?utf-8?B?cWZNV2E0WFlyMnBsTC9EaWwzRXcyblBFdjdOQzJqNHk3Ritmd2FaTDhKRWpy?=
- =?utf-8?B?eldlYUErbnArZWZNc01iTWdzZzJadTJkZjFadDZaOVI0bjVaUnFTcVRta21s?=
- =?utf-8?B?VXN5dlRuSU1HdWVPb0kyNUp0UXovRUV4R0ZJL0E4OHg0OThTWCtYeGlGb0xr?=
- =?utf-8?B?OGRPL2oycUJjaWpxZ3VrZGNvSno3RVd5S3ZjZUhnbS9SMC9ZSHhiZHllbUJV?=
- =?utf-8?B?ZjVaZU04ejFnRXpjMkZDK0xOd3RENitHeWxhYjZuZENMUmRDc3lzd0lFeExD?=
- =?utf-8?B?WFEydUl6anZTWTRWd2t3bTNrSEI1cys5VmJPeno3aXB6NlFHLzZxNnc2VkJp?=
- =?utf-8?B?bUVNMWMvd1Z0eklUN1lENlMxRVVZaVFQcjF3UHdDNFFpS0FucWVWUnNvck9O?=
- =?utf-8?B?RU9pWHpWQzR2ZjdRWlRxc3F0ay9SUFZ5cTB4Mld5bDAvZzkrcjhBVFJwYXlD?=
- =?utf-8?B?Ylg5MnVOYW1RWjhFSFhsY0g0c21mUGxjMzFObXpMK3RDYmc5SGlFU2N4RnNs?=
- =?utf-8?B?WkRkTmFEWmFIejkwSEZxdzJPRFlYMGZqWEtVVzlhQzFoU1dKQXU1eHNKYXF0?=
- =?utf-8?B?Tlp2MHo2T0VhUUJwTXRUWlFqbUhIUzZpRXNTcy9tU1FLWkFuNWZCQ1VrWUhH?=
- =?utf-8?B?NUlJd2tONXR6eXJjL3VRWnJQL0NxZUNSZWY1c2YxamxFTFlkRTF6dUpzYkpY?=
- =?utf-8?B?RUZqN29YYmFzZVdxM3E1TmF2VnVsZ29TVFdTeURMeEVRWGcyVk9LUXNvZkVl?=
- =?utf-8?B?TFhDTHQ0RWRZZ3N6c1dQZTc3VGJoKzVpbGlFeDA3RTlBcHNGRmd3NTQvQndR?=
- =?utf-8?B?ay93c1RIUTVxdE9IeXZJZnpJSTlsanpnVkJUeFRyZGpodEJzSUg4ZkFkN25h?=
- =?utf-8?B?aXRPczF1b3dSSjZuaXd1cGp5L1pCTzR3ZndKSDUrZjh0aXk3VWJocWY2a2Zv?=
- =?utf-8?B?WUZXQ3lPM1pZdFZBanNaMmQyb2JZWTVsS2o1WEU2WTZ0dmUwV0gycmdEY1pp?=
- =?utf-8?B?aUN5U24rTWc3dmgzdjNvS0lyQ0FiK04zRjdMWEZqTEV2ekxZdXU5dnJqNHVT?=
- =?utf-8?B?VUd6d3RmdFhnSUp2dWdkU1luMzZvL3doS0VPaDFZRVNrMjQrZ1BCYmJsZzRu?=
- =?utf-8?B?dkw3M0RZd0daRXlhcW40Nmpsdm5HYXFRNHFkSnNqaUh3Qmx2MHlodkF4Sm5i?=
- =?utf-8?B?OVc1OU5TV3h6enFKNTFkSXp5RkZvYSs5bGZQTmxUVHFGOFMwZ1U4alphU1JU?=
- =?utf-8?B?dWVISHpCOWNPdjlkeCs1cTZKZ2Ntd21Xc0QzOHVadXZjMHFDOUJzcU14WXdq?=
- =?utf-8?B?SXZKVll5V2F5a0tjak11ZEVjek9reWpKR2VRMXY2ZkFMOHRuaXJZYWhMMmdj?=
- =?utf-8?B?UXF0cUNudG9ERENOczVjM0c3bk1LTVdrTHdicG1PY1MrTXM3ZzFPamJTUC9P?=
- =?utf-8?B?SDZWSDlXYy92Ukc4Ukd6Nm1qM1RPRlcyV3BFdXRhaWIrWCtaQVNNdnRrQnlh?=
- =?utf-8?B?VWxSczVndzg4d050ZmdkemtNdXV1YWU2M2hoZG4vRStNOHBZNmZreUFCeUZh?=
- =?utf-8?B?dDE2aHhWRkRaWGxBOUJyMi9pUVhhenlCSG5xZmdLVVNNam5SRDdiWGNoeE82?=
- =?utf-8?B?VXdFNkoxTmVYbE5PMTBYaWZFSkZ3PT0=?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c0295772-27f8-442c-1af3-08d9a319e86a
-X-MS-Exchange-CrossTenant-AuthSource: CH2PR10MB4008.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Nov 2021 00:43:11.9902
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5433.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9c1e8c1e-808b-4ced-85dd-08d9a31c096f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Nov 2021 00:58:26.1057
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: GY3NyjCklfBPx0NLlG6jY0+3TymEHaJL4baSyDgVc6TSOA4lwxhgY6Z8dISlsgBJnc40psGOQQOcYjGupejYGsDCJjwd9GN6vSK4fcs4fHI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR10MB5273
-X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10162 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 spamscore=0 mlxscore=0
- bulkscore=0 phishscore=0 suspectscore=0 adultscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
- definitions=main-2111090001
-X-Proofpoint-GUID: o8MDst9-JhB_tcd3WQyku-EzuaRshyOO
-X-Proofpoint-ORIG-GUID: o8MDst9-JhB_tcd3WQyku-EzuaRshyOO
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: dNqAO+QpOEwuYGDLPuf/WmRMohfqNNDPTH5lHnZYn+maxGVE+WPsbkXbiUc7C5Uqkpu81X9Lng1VQvHhT3tdLg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR11MB5420
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04.11.2021 01:25, Sean Christopherson wrote:
-> This series is an iteration of Maciej's scalable memslots work.  It
-> addresses most, but not all, of my feedback from v5, hence the "5.5"
-> moniker.  Specifically, I did not touch the iteration over gfn and hva
-> ranges as I would likely do more harm than good, especially in the gfn
-> iterator.
-> 
-> The core functionality of the series is unchanged from v5 (or at least,
-> it should be).  Patches "Resolve memslot ID via a hash table" and "Keep
-> memslots in tree-based structures" are heavily reworked (the latter in
-> particular) to provide better continuity between patches and to avoid
-> the swap() logic when working with the "inactive" set of memslots.  But
-> again, the changes are intended to be purely cosmetic.
-> 
-> Paolo, ideally I'd like get to patch 03 (and therefore patch 02) into 5.16.
-> The patch technically breaks backwards compatibility with 32-bit KVM, but
-> I'm quite confident none of the existing 32-bit architectures can possibly
-> work.  RISC-V is the one exception where it's not obvious that creating
-> more guest memslot pages than can fit in an unsigned long won't fall on its
-> face.  Since RISC-V is new in 5.16, I'd like to get that change in before
-> RISC-V can gain any users doing bizarre things.
-> 
-> s390 folks, please look closely at patch 11, "KVM: s390: Use "new" memslot
-> instead of userspace memory region".  There's a subtle/weird functional
-> change in there that I can't imagine would negatively affect userspace,
-> but the end result is odd nonetheless.
-> 
-> Claudio, I dropped your R-b from "KVM: Integrate gfn_to_memslot_approx()
-> into search_memslots()" because I changed the code enough to break the s390
-> build at least once :-)
-> 
-> Patches 01 and 02 are bug fixes.
-> 
-> Patch 03 is fix of sorts to require that the total number of pages across
-> all memslots fit in an unsigned long.  The existing 32-bit KVM
-> architectures don't correctly handle this case, and fixing those issues
-> would quite gross and a waste of time.
-> 
-> Patches 04-18 are cleanups throughout common KVM and all architectures
-> to fix some warts in the memslot APIs that allow for a cleaner (IMO)
-> of the tree-based memslots code.  They also prep for more improvements
-> that are realized in the final patch.
-> 
-> Patches 19-28 are the core of Maciej's scalable memslots work.
-> 
-> Patches 29-30 take advantage of the tree-based memslots to avoid creating
-> a dummy "new" memslot on the stack, which simplifies the MOVE case and
-> aligns it with the other three memslot update cases.
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Monday, November 8, 2021 8:36 PM
+>=20
+> On Mon, Nov 08, 2021 at 08:53:20AM +0000, Tian, Kevin wrote:
+> > > From: Jason Gunthorpe <jgg@nvidia.com>
+> > > Sent: Tuesday, October 26, 2021 11:19 PM
+> > >
+> > > On Tue, Oct 26, 2021 at 08:42:12AM -0600, Alex Williamson wrote:
+> > >
+> > > > > This is also why I don't like it being so transparent as it is
+> > > > > something userspace needs to care about - especially if the HW
+> cannot
+> > > > > support such a thing, if we intend to allow that.
+> > > >
+> > > > Userspace does need to care, but userspace's concern over this shou=
+ld
+> > > > not be able to compromise the platform and therefore making VF
+> > > > assignment more susceptible to fatal error conditions to comply wit=
+h a
+> > > > migration uAPI is troublesome for me.
+> > >
+> > > It is an interesting scenario.
+> > >
+> > > I think it points that we are not implementing this fully properly.
+> > >
+> > > The !RUNNING state should be like your reset efforts.
+> > >
+> > > All access to the MMIO memories from userspace should be revoked
+> > > during !RUNNING
+> >
+> > This assumes that vCPUs must be stopped before !RUNNING is entered
+> > in virtualization case. and it is true today.
+> >
+> > But it may not hold when talking about guest SVA and I/O page fault [1]=
+.
+> > The problem is that the pending requests may trigger I/O page faults
+> > on guest page tables. W/o running vCPUs to handle those faults, the
+> > quiesce command cannot complete draining the pending requests
+> > if the device doesn't support preempt-on-fault (at least it's the case =
+for
+> > some Intel and Huawei devices, possibly true for most initial SVA
+> > implementations).
+>=20
+> It cannot be ordered any other way.
+>=20
+> vCPUs must be stopped first, then the PCI devices must be stopped
+> after, otherwise the vCPU can touch a stopped a device while handling
+> a fault which is unreasonable.
+>=20
+> However, migrating a pending IOMMU fault does seem unreasonable as well.
+>=20
+> The NDA state can potentially solve this:
+>=20
+>   RUNNING | VCPU RUNNING - Normal
+>   NDMA | RUNNING | VCPU RUNNING - Halt and flush DMA, and thus all
+> faults
+>   NDMA | RUNNING - Halt all MMIO access
 
-Thanks for the updated series Sean - that's an impressive amount of
-cleanups for the existing KVM code.
+should be two steps?
 
-I've reviewed the non-arch-specific and x86-specific patches till patch 22
-(inclusive).
-Further patches are more invasive and require a more through review -
-will try to do this in coming days.
+NDMA | RUNNING - vCPU stops access to the device
+NDMA - halt all MMIO access by revoking mapping
 
-The arch-specific but non-x86-ones patches look OK to me, too, at the
-first glance but here it would be better if maintainers or reviewers
-from particular arch gave their acks.
+>   0 - Halted everything
 
-By the way, do you want your patches and my non-invasive patches (patches
-below number 23) merged without waiting for the rest of the series to be
-fully ready?
+yes, adding a new state sounds better than reordering the vcpu/device
+stop sequence.
 
-This way there is less risk of conflicting changes to KVM being merged
-in meantime while we are still discussing the remaining patches.
-Or worse - changes that don't conflict but subtly break some assumptions
-that the code relies on.
+>=20
+> Though this may be more disruptive to the vCPUs as they could spin on
+> DMA/interrupts that will not come.
 
-For this reason I am strongly for merging them independently from the
-more invasive parts.
+it's inevitable regardless how we define the migration states. the
+actual impact depends on how long 'Halt and flush DMA' will take.
 
-Thanks,
-Maciej
+Thanks
+Kevin
