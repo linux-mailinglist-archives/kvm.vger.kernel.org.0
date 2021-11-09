@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D0A1844B134
-	for <lists+kvm@lfdr.de>; Tue,  9 Nov 2021 17:29:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F216944B132
+	for <lists+kvm@lfdr.de>; Tue,  9 Nov 2021 17:29:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240316AbhKIQcB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Nov 2021 11:32:01 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:28789 "EHLO
+        id S240186AbhKIQby (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Nov 2021 11:31:54 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52555 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240188AbhKIQby (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 9 Nov 2021 11:31:54 -0500
+        by vger.kernel.org with ESMTP id S240006AbhKIQbv (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 9 Nov 2021 11:31:51 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636475348;
+        s=mimecast20190719; t=1636475344;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=BB3UIYbnA4Ji0bx8wPWublQM/E8aCMN+I+lrsS3uABM=;
-        b=GdNGx/QyfmmOOwReqNVjijNvzIPpGFqEId2XrPU/kkYBs4uTD1lt2wD9KZy3OGeoqIaBS3
-        /q3everTdj7Dvuu9usEu9OEoLf0NvPCspz04jCrMO9vp0FHNJ8QFv76WvG7SuePrbA3frj
-        28utPlqTSyz/3vAYAz/GyJx+YM9/4tk=
+        bh=iKy55mKV1NzfbvfbGh+De+/qOmp0zhljJZrMrc5hoRw=;
+        b=IkGTYOHkM2AI3AgtGnAmYf0G+BrDE9aGytlaH7xnAW1+dApZbVQUzVGVNxCGgptQwWGiZw
+        rUZ5s34MkCIGyk801gSQQ4yutnxxUZiCx/5wu4Mr5G05c1FuDdMZP2fPcQ79tSk5R4Z0d1
+        A/vyKB5dxEy9Oj0sCzAT7IHq2vtoLrU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-219-qLkAQkEWOH24r3hfrDkSZg-1; Tue, 09 Nov 2021 11:28:59 -0500
-X-MC-Unique: qLkAQkEWOH24r3hfrDkSZg-1
+ us-mta-411-8F0seZgEO-WRBFhDrbImKQ-1; Tue, 09 Nov 2021 11:29:01 -0500
+X-MC-Unique: 8F0seZgEO-WRBFhDrbImKQ-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CF58915720;
-        Tue,  9 Nov 2021 16:28:57 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3B2B415722;
+        Tue,  9 Nov 2021 16:29:00 +0000 (UTC)
 Received: from vitty.brq.redhat.com (unknown [10.40.192.207])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id ABF2264188;
-        Tue,  9 Nov 2021 16:28:55 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3953A62A44;
+        Tue,  9 Nov 2021 16:28:58 +0000 (UTC)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -40,9 +40,9 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Jim Mattson <jmattson@google.com>,
         Maxim Levitsky <mlevitsk@redhat.com>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v4 6/8] KVM: VMX: Introduce vmx_msr_bitmap_l01_changed() helper
-Date:   Tue,  9 Nov 2021 17:28:33 +0100
-Message-Id: <20211109162835.99475-7-vkuznets@redhat.com>
+Subject: [PATCH v4 7/8] KVM: nVMX: Track whether changes in L0 require MSR bitmap for L2 to be rebuilt
+Date:   Tue,  9 Nov 2021 17:28:34 +0100
+Message-Id: <20211109162835.99475-8-vkuznets@redhat.com>
 In-Reply-To: <20211109162835.99475-1-vkuznets@redhat.com>
 References: <20211109162835.99475-1-vkuznets@redhat.com>
 MIME-Version: 1.0
@@ -52,65 +52,103 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In preparation to enabling 'Enlightened MSR Bitmap' feature for Hyper-V
-guests move MSR bitmap update tracking to a dedicated helper.
+Introduce a flag to keep track of whether MSR bitmap for L2 needs to be
+rebuilt due to changes in MSR bitmap for L1 or switching to a different
+L2. This information will be used for Enlightened MSR Bitmap feature for
+Hyper-V guests.
 
-Note: vmx_msr_bitmap_l01_changed() is called when MSR bitmap might be
-updated. KVM doesn't check if the bit we're trying to set is already set
-(or the bit it's trying to clear is already cleared). Such situations
-should not be common and a few false positives should not be a problem.
+Note, setting msr_bitmap_changed to 'true' from set_current_vmptr() is
+not really needed for Enlightened MSR Bitmap as the feature can only
+be used in conjunction with Enlightened VMCS but let's keep tracking
+information complete, it's cheap and in the future similar PV feature can
+easily be implemented for KVM on KVM too.
 
 No functional change intended.
 
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-Reviewed-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 17 +++++++++++++----
- 1 file changed, 13 insertions(+), 4 deletions(-)
+ arch/x86/kvm/vmx/nested.c | 9 ++++++++-
+ arch/x86/kvm/vmx/vmx.c    | 2 ++
+ arch/x86/kvm/vmx/vmx.h    | 9 +++++++++
+ 3 files changed, 19 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index fc87b6bbd277..1e6bf2cd7be0 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -3677,6 +3677,17 @@ void free_vpid(int vpid)
- 	spin_unlock(&vmx_vpid_lock);
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 341c50816822..f02e846c944a 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -664,6 +664,8 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
+ 
+ 	kvm_vcpu_unmap(vcpu, &vmx->nested.msr_bitmap_map, false);
+ 
++	vmx->nested.force_msr_bitmap_recalc = false;
++
+ 	return true;
  }
  
-+static void vmx_msr_bitmap_l01_changed(struct vcpu_vmx *vmx)
-+{
-+	/*
-+	 * When KVM is a nested hypervisor on top of Hyper-V and uses
-+	 * 'Enlightened MSR Bitmap' feature L0 needs to know that MSR
-+	 * bitmap has changed.
-+	 */
-+	if (static_branch_unlikely(&enable_evmcs))
-+		evmcs_touch_msr_bitmap();
-+}
+@@ -2018,10 +2020,13 @@ static enum nested_evmptrld_status nested_vmx_handle_enlightened_vmptrld(
+ 	 * Clean fields data can't be used on VMLAUNCH and when we switch
+ 	 * between different L2 guests as KVM keeps a single VMCS12 per L1.
+ 	 */
+-	if (from_launch || evmcs_gpa_changed)
++	if (from_launch || evmcs_gpa_changed) {
+ 		vmx->nested.hv_evmcs->hv_clean_fields &=
+ 			~HV_VMX_ENLIGHTENED_CLEAN_FIELD_ALL;
+ 
++		vmx->nested.force_msr_bitmap_recalc = true;
++	}
 +
+ 	return EVMPTRLD_SUCCEEDED;
+ }
+ 
+@@ -5238,6 +5243,7 @@ static void set_current_vmptr(struct vcpu_vmx *vmx, gpa_t vmptr)
+ 		vmx->nested.need_vmcs12_to_shadow_sync = true;
+ 	}
+ 	vmx->nested.dirty_vmcs12 = true;
++	vmx->nested.force_msr_bitmap_recalc = true;
+ }
+ 
+ /* Emulate the VMPTRLD instruction */
+@@ -6364,6 +6370,7 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
+ 		goto error_guest_mode;
+ 
+ 	vmx->nested.dirty_vmcs12 = true;
++	vmx->nested.force_msr_bitmap_recalc = true;
+ 	ret = nested_vmx_enter_non_root_mode(vcpu, false);
+ 	if (ret)
+ 		goto error_guest_mode;
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 1e6bf2cd7be0..ec6635d1bcc4 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -3686,6 +3686,8 @@ static void vmx_msr_bitmap_l01_changed(struct vcpu_vmx *vmx)
+ 	 */
+ 	if (static_branch_unlikely(&enable_evmcs))
+ 		evmcs_touch_msr_bitmap();
++
++	vmx->nested.force_msr_bitmap_recalc = true;
+ }
+ 
  void vmx_disable_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr, int type)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
-@@ -3685,8 +3696,7 @@ void vmx_disable_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr, int type)
- 	if (!cpu_has_vmx_msr_bitmap())
- 		return;
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index 86c093da0d63..8ad23f94917d 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -148,6 +148,15 @@ struct nested_vmx {
+ 	bool need_vmcs12_to_shadow_sync;
+ 	bool dirty_vmcs12;
  
--	if (static_branch_unlikely(&enable_evmcs))
--		evmcs_touch_msr_bitmap();
-+	vmx_msr_bitmap_l01_changed(vmx);
- 
++	/*
++	 * Indicates whether MSR bitmap for L2 needs to be rebuilt due to
++	 * changes in MSR bitmap for L1 or switching to a different L2. Note,
++	 * this flag can only be used reliably in conjunction with a paravirt L1
++	 * which informs L0 whether any changes to MSR bitmap for L2 were done
++	 * on its side.
++	 */
++	bool force_msr_bitmap_recalc;
++
  	/*
- 	 * Mark the desired intercept state in shadow bitmap, this is needed
-@@ -3730,8 +3740,7 @@ void vmx_enable_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr, int type)
- 	if (!cpu_has_vmx_msr_bitmap())
- 		return;
- 
--	if (static_branch_unlikely(&enable_evmcs))
--		evmcs_touch_msr_bitmap();
-+	vmx_msr_bitmap_l01_changed(vmx);
- 
- 	/*
- 	 * Mark the desired intercept state in shadow bitmap, this is needed
+ 	 * Indicates lazily loaded guest state has not yet been decached from
+ 	 * vmcs02.
 -- 
 2.31.1
 
