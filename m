@@ -2,95 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1954244A6E8
-	for <lists+kvm@lfdr.de>; Tue,  9 Nov 2021 07:36:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 51FE544A6FC
+	for <lists+kvm@lfdr.de>; Tue,  9 Nov 2021 07:43:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243056AbhKIGjW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Nov 2021 01:39:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33698 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232513AbhKIGjV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Nov 2021 01:39:21 -0500
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FAA5C061766
-        for <kvm@vger.kernel.org>; Mon,  8 Nov 2021 22:36:36 -0800 (PST)
-Received: by mail-pl1-x62b.google.com with SMTP id o14so19135040plg.5
-        for <kvm@vger.kernel.org>; Mon, 08 Nov 2021 22:36:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=AATbywRIxzxNd7Dax4ALazPHnAkn6LmLQvylgIQIjyU=;
-        b=FAgrJIcp9K/wuOKtdkRL4PckOjCABsXpUO4MPD5n4K5Vj1gP1nmXD/DTYI2omaAPKd
-         IPEDkGcxSS26vD88hXHjuAeUq39e7y13F3jFltUBvm7RA/sKHC3qPkTB29A/IAWmTlKO
-         eLvOadXS51ygn8mx16s6rdM1q3tA4dlcMxD4lxSjK+m5UG04FTIutq6Wp6re2bFU2VcF
-         sa7u0zJmghqP5KTPmHXyWqWLXAG+4njMABiZ7lbA1J5bfZS2s4NdUuQhyizKTCEuQfPV
-         +SCglyyaiPDFkspKrNaQqCF22eKwrNDxnfwEgdFHKjVQIAQlqRs9jiw4rW75/WWZW1q5
-         Db8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=AATbywRIxzxNd7Dax4ALazPHnAkn6LmLQvylgIQIjyU=;
-        b=703jSb9qNggLuFmUAa5FTSn6Ts1Ya1XZcIJXtd8pd1E1IjuCGAfVtZElgQmtSX2XfN
-         5Dliey5MF4uJ11Hjti3zjuNNE1fV62e1mSrTV2s3vpuPKM0kvl2IBlecST9NXU2rq7iJ
-         3ABJ4oLvGL1vXwSjVYXCh0Ah3jGGugQz4HM1AvxdixvDgPv9imp4QHiRsXEVnU/ZTheE
-         RB6h6LgDEkrzimiRZHVeiKSYFLPrE1a81HRkh1v8vN8KpisZjUfiAlpnjIDYzD2rqCji
-         a7WyVGGeY9PVklPqNT6xSp/kDYCrLYUIKNE1jVDFO6HfDv5X4SNvGYdYWyOx4zqE0Rvh
-         dj9g==
-X-Gm-Message-State: AOAM532+xFxJjNSaqZofgvzZHkdA7QdCWA+05pylahZdkHj7eK3fCQsi
-        EGFJlo9wJLZ/smyO9uohthE7EwWPnfRzwyb7LwCPbA==
-X-Google-Smtp-Source: ABdhPJw+hzZesb2M2vFbROCco526ACzQd7hh9Ygg7UDBQjJf0od5fbsPy4di9D+tqraqr5p9fkIf1Il82INo7scjgvk=
-X-Received: by 2002:a17:90b:380d:: with SMTP id mq13mr4771617pjb.110.1636439795842;
- Mon, 08 Nov 2021 22:36:35 -0800 (PST)
+        id S240679AbhKIGpv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Nov 2021 01:45:51 -0500
+Received: from mga09.intel.com ([134.134.136.24]:8779 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229591AbhKIGpu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Nov 2021 01:45:50 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10162"; a="232233343"
+X-IronPort-AV: E=Sophos;i="5.87,219,1631602800"; 
+   d="scan'208";a="232233343"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2021 22:43:05 -0800
+X-IronPort-AV: E=Sophos;i="5.87,219,1631602800"; 
+   d="scan'208";a="451769174"
+Received: from cqiang-mobl.ccr.corp.intel.com (HELO [10.238.2.71]) ([10.238.2.71])
+  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2021 22:43:00 -0800
+Message-ID: <0adf7bec-2b99-99fc-e5e6-e7f393cdbd94@intel.com>
+Date:   Tue, 9 Nov 2021 14:42:58 +0800
 MIME-Version: 1.0
-References: <20211104002531.1176691-1-seanjc@google.com> <20211104002531.1176691-9-seanjc@google.com>
-In-Reply-To: <20211104002531.1176691-9-seanjc@google.com>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Mon, 8 Nov 2021 22:36:19 -0800
-Message-ID: <CAAeT=FxcFq2SoM5xRYJfB=bBzGrY1uuEUhvFd+6sb86y-rg_Yw@mail.gmail.com>
-Subject: Re: [PATCH v5.5 08/30] KVM: arm64: Use "new" memslot instead of
- userspace memory region
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.3.0
+Subject: Re: [PATCH v5 5/7] KVM: MMU: Add support for PKS emulation
+Content-Language: en-US
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
-        David Hildenbrand <david@redhat.com>,
-        linux-kernel@vger.kernel.org, Atish Patra <atish.patra@wdc.com>,
-        Ben Gardon <bgardon@google.com>,
-        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        linux-riscv@lists.infradead.org, Joerg Roedel <joro@8bytes.org>,
-        kvmarm@lists.cs.columbia.edu, kvm-ppc@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Cornelia Huck <cohuck@redhat.com>, linux-mips@vger.kernel.org,
-        kvm-riscv@lists.infradead.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+        Joerg Roedel <joro@8bytes.org>,
+        Xiaoyao Li <xiaoyao.li@intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20210811101126.8973-1-chenyi.qiang@intel.com>
+ <20210811101126.8973-6-chenyi.qiang@intel.com> <YYl+k3VbEieh9X2H@google.com>
+From:   Chenyi Qiang <chenyi.qiang@intel.com>
+In-Reply-To: <YYl+k3VbEieh9X2H@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 3, 2021 at 5:26 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> Get the slot ID, hva, etc... from the "new" memslot instead of the
-> userspace memory region when preparing/committing a memory region.  This
-> will allow a future commit to drop @mem from the prepare/commit hooks
-> once all architectures convert to using "new".
->
-> Opportunistically wait to get the hva begin+end until after filtering out
-> the DELETE case in anticipation of a future commit passing NULL for @new
-> when deleting a memslot.
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-Reviewed-by: Reiji Watanabe <reijiw@google.com>
+
+On 11/9/2021 3:46 AM, Sean Christopherson wrote:
+> On Wed, Aug 11, 2021, Chenyi Qiang wrote:
+>>   * In particular the following conditions come from the error code, the
+>>   * page tables and the machine state:
+>> -* - PK is always zero unless CR4.PKE=1 and EFER.LMA=1
+>> +* - PK is always zero unless CR4.PKE=1/CR4.PKS=1 and EFER.LMA=1
+>>   * - PK is always zero if RSVD=1 (reserved bit set) or F=1 (instruction fetch)
+>> -* - PK is always zero if U=0 in the page tables
+>> -* - PKRU.WD is ignored if CR0.WP=0 and the access is a supervisor access.
+>> +* - PK is always zero if
+>> +*       - U=0 in the page tables and CR4.PKS=0
+>> +*       - U=1 in the page tables and CR4.PKU=0
+> 
+> I think it makes sense to completely rewrite this "table" or drop it altogether.
+> The "always zero" wording is nonsensical when there are multiple conditions for
+> "always".  And IMO the whole "PK is ... zero" thing is a bit awkward because it
+> leaves the uninitiated wondering what PK=0 even means ('1' == disabled is not the
+> most intuitive thing since most PTE bits are '1' = allowed).  Ugh, and re-reading
+> with context, that's not even what "PK" means here, this is actually referring to
+> PFEC.PK, which is all kinds of confusing because PFEC.PK is merely a "symptom" of
+> a #PF to due a protection key violation, not the other way 'round.
+> 
+> IMO this entire comment could use a good overhaul.  It never explicitly documents
+> the "access-disable" and "write-disable" behavior.  More below.
+> 
+>> +* - (PKRU/PKRS).WD is ignored if CR0.WP=0 and the access is a supervisor access.
+> 
+> Hrm.  The SDM contradicts itself.
+> 
+> Section 4.6.1 "Determination of Access Rights" says this for supervisor-mode accesses:
+> 
+>    If CR0.WP = 0, data may be written to any supervisor-mode address with a protection
+>    key for which write access is permitted.
+> 
+> but section 4.6.2 "Protection Keys" says:
+> 
+>    If WDi = 1, write accesses are not permitted if CR0.WP = 1. (If CR0.WP = 0,
+>    IA32_PKRS.WDi does not affect write accesses to supervisor-mode addresses with
+>    protection key i.)
+> 
+> I believe 4.6.1 is subtly wrong and should be "data access", not "write access".
+> 
+>    If CR0.WP = 0, data may be written to any supervisor-mode address with a protection
+>    key for which data access is permitted.
+>                  ^^^^
+> 
+> Can you follow-up with someone to get the SDM fixed?  This stuff is subtle and
+> confusing enough as it is :-)
+> 
+
+Nice catch. I'll mention it internally to fix it.
+
+> And on a very related topic, it would be helpful to clarify user-mode vs. supervisor-mode
+> and access vs. address.
+> 
+> How about this for a comment?
+> 
+> /*
+>   * Protection Key Rights (PKR) is an additional mechanism by which data accesses
+>   * with 4-level or 5-level paging (EFER.LMA=1) may be disabled based on the
+>   * Protection Key Rights Userspace (PRKU) or Protection Key Rights Supervisor
+>   * (PKRS) registers.  The Protection Key (PK) used for an access is a 4-bit
+>   * value specified in bits 62:59 of the leaf PTE used to translate the address.
+>   *
+>   * PKRU and PKRS are 32-bit registers, with 16 2-bit entries consisting of an
+>   * access-disable (AD) and write-disable (WD) bit.  The PK from the leaf PTE is
+>   * used to index the approriate PKR (see below), e.g. PK=1 would consume bits
+>   * 3:2 (bit 3 == write-disable, bit 2 == access-disable).
+>   *
+>   * The PK register (PKRU vs. PKRS) indexed by the PK depends on the type of
+>   * _address_ (not access type!).  For a user-mode address, PKRU is used; for a
+>   * supervisor-mode address, PKRS is used.  An address is supervisor-mode if the
+>   * U/S flag (bit 2) is 0 in at least one of the paging-structure entries, i.e.
+>   * an address is user-mode if the U/S flag is 0 in _all_ entries.  Again, this
+>   * is the address type, not the the access type, e.g. a supervisor-mode _access_
+>   * will consume PKRU if the _address_ is a user-mode address.
+>   *
+>   * As alluded to above, PKR checks are only performed for data accesses; code
+>   * fetches are not subject to PKR checks.  Terminal page faults (!PRESENT or
+>   * PFEC.RSVD=1) are also not subject to PKR checks.
+>   *
+>   * PKR write-disable checks for superivsor-mode _accesses_ are performed if and
+>   * only if CR0.WP=1 (though access-disable checks still apply).
+>   *
+>   * In summary, PKR checks are based on (a) EFER.LMA, (b) CR4.PKE or CR4.PKS,
+>   * (c) CR4.WP, (d) the PK in the leaf PTE, (e) two bits from the corresponding
+>   * PKR{S,U} entry, (f) the access type (derived from the other PFEC bits), and
+>   * (g) the address type (retrieved from the paging-structure entries).
+>   *
+>   * To avoid conditional branches in permission_fault(), the PKR bitmask caches
+>   * the above inputs, except for (e) the PKR{S,U} entry.  The FETCH, USER, and
+>   * WRITE bits of the PFEC and the effective value of the paging-structures' U/S
+>   * bit (slotted into the PFEC.RSVD position, bit 3) are used to index into the
+>   * PKR bitmask (similar to the 4-bit Protection Key itself).  The two bits of
+>   * the PKR bitmask "entry" are then extracted and ANDed with the two bits of
+>   * the PKR{S,U{} register corresponding to the address type and protection key.
+>   *
+>   * E.g. for all values where PFEC.FETCH=1, the corresponding pkr_bitmask bits
+>   * will be 00b, thus masking away the AD and WD bits from the PKR{S,U} register
+>   * to suppress PKR checks on code fetches.
+> */
+
+Very clear comment. I'll clean it up and change in next version.
+
+> 
