@@ -2,139 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B4F0844A679
-	for <lists+kvm@lfdr.de>; Tue,  9 Nov 2021 06:54:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1954244A6E8
+	for <lists+kvm@lfdr.de>; Tue,  9 Nov 2021 07:36:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240780AbhKIF5X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Nov 2021 00:57:23 -0500
-Received: from mga07.intel.com ([134.134.136.100]:42959 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S240634AbhKIF5W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Nov 2021 00:57:22 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10162"; a="295822729"
-X-IronPort-AV: E=Sophos;i="5.87,219,1631602800"; 
-   d="scan'208";a="295822729"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2021 21:54:26 -0800
-X-IronPort-AV: E=Sophos;i="5.87,219,1631602800"; 
-   d="scan'208";a="451756053"
-Received: from cqiang-mobl.ccr.corp.intel.com (HELO [10.238.2.71]) ([10.238.2.71])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2021 21:54:23 -0800
-Message-ID: <85414ca6-e135-2371-cbce-0f595a7b7a26@intel.com>
-Date:   Tue, 9 Nov 2021 13:54:21 +0800
+        id S243056AbhKIGjW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Nov 2021 01:39:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33698 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232513AbhKIGjV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Nov 2021 01:39:21 -0500
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FAA5C061766
+        for <kvm@vger.kernel.org>; Mon,  8 Nov 2021 22:36:36 -0800 (PST)
+Received: by mail-pl1-x62b.google.com with SMTP id o14so19135040plg.5
+        for <kvm@vger.kernel.org>; Mon, 08 Nov 2021 22:36:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=AATbywRIxzxNd7Dax4ALazPHnAkn6LmLQvylgIQIjyU=;
+        b=FAgrJIcp9K/wuOKtdkRL4PckOjCABsXpUO4MPD5n4K5Vj1gP1nmXD/DTYI2omaAPKd
+         IPEDkGcxSS26vD88hXHjuAeUq39e7y13F3jFltUBvm7RA/sKHC3qPkTB29A/IAWmTlKO
+         eLvOadXS51ygn8mx16s6rdM1q3tA4dlcMxD4lxSjK+m5UG04FTIutq6Wp6re2bFU2VcF
+         sa7u0zJmghqP5KTPmHXyWqWLXAG+4njMABiZ7lbA1J5bfZS2s4NdUuQhyizKTCEuQfPV
+         +SCglyyaiPDFkspKrNaQqCF22eKwrNDxnfwEgdFHKjVQIAQlqRs9jiw4rW75/WWZW1q5
+         Db8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=AATbywRIxzxNd7Dax4ALazPHnAkn6LmLQvylgIQIjyU=;
+        b=703jSb9qNggLuFmUAa5FTSn6Ts1Ya1XZcIJXtd8pd1E1IjuCGAfVtZElgQmtSX2XfN
+         5Dliey5MF4uJ11Hjti3zjuNNE1fV62e1mSrTV2s3vpuPKM0kvl2IBlecST9NXU2rq7iJ
+         3ABJ4oLvGL1vXwSjVYXCh0Ah3jGGugQz4HM1AvxdixvDgPv9imp4QHiRsXEVnU/ZTheE
+         RB6h6LgDEkrzimiRZHVeiKSYFLPrE1a81HRkh1v8vN8KpisZjUfiAlpnjIDYzD2rqCji
+         a7WyVGGeY9PVklPqNT6xSp/kDYCrLYUIKNE1jVDFO6HfDv5X4SNvGYdYWyOx4zqE0Rvh
+         dj9g==
+X-Gm-Message-State: AOAM532+xFxJjNSaqZofgvzZHkdA7QdCWA+05pylahZdkHj7eK3fCQsi
+        EGFJlo9wJLZ/smyO9uohthE7EwWPnfRzwyb7LwCPbA==
+X-Google-Smtp-Source: ABdhPJw+hzZesb2M2vFbROCco526ACzQd7hh9Ygg7UDBQjJf0od5fbsPy4di9D+tqraqr5p9fkIf1Il82INo7scjgvk=
+X-Received: by 2002:a17:90b:380d:: with SMTP id mq13mr4771617pjb.110.1636439795842;
+ Mon, 08 Nov 2021 22:36:35 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.3.0
-Subject: Re: [PATCH v5 3/7] KVM: X86: Expose IA32_PKRS MSR
-Content-Language: en-US
+References: <20211104002531.1176691-1-seanjc@google.com> <20211104002531.1176691-9-seanjc@google.com>
+In-Reply-To: <20211104002531.1176691-9-seanjc@google.com>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Mon, 8 Nov 2021 22:36:19 -0800
+Message-ID: <CAAeT=FxcFq2SoM5xRYJfB=bBzGrY1uuEUhvFd+6sb86y-rg_Yw@mail.gmail.com>
+Subject: Re: [PATCH v5.5 08/30] KVM: arm64: Use "new" memslot instead of
+ userspace memory region
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Anup Patel <anup.patel@wdc.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>, kvm@vger.kernel.org,
+        David Hildenbrand <david@redhat.com>,
+        linux-kernel@vger.kernel.org, Atish Patra <atish.patra@wdc.com>,
+        Ben Gardon <bgardon@google.com>,
+        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        linux-riscv@lists.infradead.org, Joerg Roedel <joro@8bytes.org>,
+        kvmarm@lists.cs.columbia.edu, kvm-ppc@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Xiaoyao Li <xiaoyao.li@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20210811101126.8973-1-chenyi.qiang@intel.com>
- <20210811101126.8973-4-chenyi.qiang@intel.com> <YYliC1kdT9ssX/f7@google.com>
-From:   Chenyi Qiang <chenyi.qiang@intel.com>
-In-Reply-To: <YYliC1kdT9ssX/f7@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        Cornelia Huck <cohuck@redhat.com>, linux-mips@vger.kernel.org,
+        kvm-riscv@lists.infradead.org,
+        Vitaly Kuznetsov <vkuznets@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Nov 3, 2021 at 5:26 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> Get the slot ID, hva, etc... from the "new" memslot instead of the
+> userspace memory region when preparing/committing a memory region.  This
+> will allow a future commit to drop @mem from the prepare/commit hooks
+> once all architectures convert to using "new".
+>
+> Opportunistically wait to get the hva begin+end until after filtering out
+> the DELETE case in anticipation of a future commit passing NULL for @new
+> when deleting a memslot.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-
-On 11/9/2021 1:44 AM, Sean Christopherson wrote:
-> On Wed, Aug 11, 2021, Chenyi Qiang wrote:
->> +	u32           pkrs;
-> 
-> ...
-> 
->> @@ -1115,6 +1117,7 @@ void vmx_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
->>   #endif
->>   	unsigned long fs_base, gs_base;
->>   	u16 fs_sel, gs_sel;
->> +	u32 host_pkrs;
-> 
-> As mentioned in the previosu patch, I think it makes sense to track this as a u64
-> so that the only place in KVM that deas with the u64<=>u32 conversion is the below
-> 
-> 	host_pkrs = get_current_pkrs();
-> 
->>   	int i;
->>   
->>   	vmx->req_immediate_exit = false;
->> @@ -1150,6 +1153,20 @@ void vmx_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
->>   	 */
->>   	host_state->ldt_sel = kvm_read_ldt();
->>   
->> +	/*
->> +	 * Update the host pkrs vmcs field before vcpu runs.
->> +	 * The setting of VM_EXIT_LOAD_IA32_PKRS can ensure
->> +	 * kvm_cpu_cap_has(X86_FEATURE_PKS) &&
->> +	 * guest_cpuid_has(vcpu, X86_FEATURE_PKS)
->> +	 */
->> +	if (vm_exit_controls_get(vmx) & VM_EXIT_LOAD_IA32_PKRS) {
->> +		host_pkrs = get_current_pkrs();
->> +		if (unlikely(host_pkrs != host_state->pkrs)) {
->> +			vmcs_write64(HOST_IA32_PKRS, host_pkrs);
->> +			host_state->pkrs = host_pkrs;
->> +		}
->> +	}
->> +
->>   #ifdef CONFIG_X86_64
->>   	savesegment(ds, host_state->ds_sel);
->>   	savesegment(es, host_state->es_sel);
->> @@ -1371,6 +1388,15 @@ void vmx_set_rflags(struct kvm_vcpu *vcpu, unsigned long rflags)
->>   		vmx->emulation_required = emulation_required(vcpu);
->>   }
->>   
->> +static void vmx_set_pkrs(struct kvm_vcpu *vcpu, u64 pkrs)
->> +{
-> 
-> Hrm.  Ideally this would be open coded in vmx_set_msr().  Long term, the RESET/INIT
-> paths should really treat MSR updates as "normal" host_initiated writes instead of
-> having to manually handle every MSR.
-> 
-> That would be a bit gross to handle in vmx_vcpu_reset() since it would have to
-> create a struct msr_data (because __kvm_set_msr() isn't exposed to vendor code),
-> but since vcpu->arch.pkrs is relevant to the MMU I think it makes sense to
-> initiate the write from common x86.
-> 
-> E.g. this way there's not out-of-band special code, vmx_vcpu_reset() is kept clean,
-> and if/when SVM gains support for PKRS this particular path Just Works.  And it would
-> be an easy conversion for my pipe dream plan of handling MSRs at RESET/INIT via a
-> list of MSRs+values.
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index ac83d873d65b..55881d13620f 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -11147,6 +11147,9 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
->          kvm_set_rflags(vcpu, X86_EFLAGS_FIXED);
->          kvm_rip_write(vcpu, 0xfff0);
-> 
-> +       if (kvm_cpu_cap_has(X86_FEATURE_PKS))
-> +               __kvm_set_msr(vcpu, MSR_IA32_PKRS, 0, true);
-> +
-
-Got it. In addition, is it necessary to add on-INIT check? like:
-
-if (kvm_cpu_cap_has(X86_FEATURE_PKS) && !init_event)
-	__kvm_set_msr(vcpu, MSR_IA32_PKRS, 0, true);
-
-PKRS should be preserved on INIT, not cleared. The SDM doesn't make this 
-clear either.
-
->          vcpu->arch.cr3 = 0;
->          kvm_register_mark_dirty(vcpu, VCPU_EXREG_CR3);
-> 
->> +	if (kvm_cpu_cap_has(X86_FEATURE_PKS)) {
->> +		vcpu->arch.pkrs = pkrs;
->> +		kvm_register_mark_available(vcpu, VCPU_EXREG_PKRS);
->> +		vmcs_write64(GUEST_IA32_PKRS, pkrs);
->> +	}
->> +}
+Reviewed-by: Reiji Watanabe <reijiw@google.com>
