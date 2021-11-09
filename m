@@ -2,368 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B80144B34D
-	for <lists+kvm@lfdr.de>; Tue,  9 Nov 2021 20:34:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 02FB644B4EE
+	for <lists+kvm@lfdr.de>; Tue,  9 Nov 2021 22:53:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243772AbhKIThC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Nov 2021 14:37:02 -0500
-Received: from mail.skyhub.de ([5.9.137.197]:38554 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S240056AbhKIThB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Nov 2021 14:37:01 -0500
-Received: from zn.tnic (p200300ec2f18aa00db849a68730b2e8f.dip0.t-ipconnect.de [IPv6:2003:ec:2f18:aa00:db84:9a68:730b:2e8f])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id EDEAD1EC0554;
-        Tue,  9 Nov 2021 20:34:13 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1636486454;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=KhtFVkNBZztZBSOG6R4znpcmvwj9RF4NACfyH31lgkw=;
-        b=P9e581KpKmShm1XCx9yMh3YHQySDN6OJJvb/2TyNhxV+E/JhKkSDcwG8EA0fmKZgRn0Td5
-        +koW5+CZClj1mGSeGXW2KU2+J3RfKCOITdTAMC4CqFnlQLBqOU3IGVNyp+LAaGaYS+ZXLf
-        CJHlGY7Ero55fBepCBsp5+VG79pEW1c=
-Date:   Tue, 9 Nov 2021 20:34:07 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
+        id S244219AbhKIV4A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Nov 2021 16:56:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45048 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244174AbhKIVz7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Nov 2021 16:55:59 -0500
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FBA8C061766
+        for <kvm@vger.kernel.org>; Tue,  9 Nov 2021 13:53:13 -0800 (PST)
+Received: by mail-pf1-x44a.google.com with SMTP id x14-20020a627c0e000000b0049473df362dso624086pfc.12
+        for <kvm@vger.kernel.org>; Tue, 09 Nov 2021 13:53:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=vm1/z3g+vC5w97J0eeG7Qsh9oIK8ruQ0iTlwWy8IP/o=;
+        b=nhL/yS0M61GJlon3p6dXxcIr4UVG+0uj1/At1dwAiHCoqBacwzrP2P0dLop0ZpsrZC
+         nFboVlEnVXLv3Rui8x9TdT7WMd+3X4uHT1cdJIif3/drVrPAKH4fPqvRsBpil1GasrFu
+         N+AWCyLhVhUdq9BEvEaAjEcpOLpmF9A0ffbkUpWHjzGqup5BBtQtabu0cF5CR8yqDjPa
+         GzHfk5jM4NyFJ9QPnTvOpPicpW1OKbdOO5DZ4W+FSPVyBeH5lDPBuwQJFM1raQ7DU96V
+         jsw2ToHIjvAWMRiF1x1jnti21gQz0b0oXWOqJH3yasMTxayEucOjiTYaLykxoYo60Yld
+         4bow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=vm1/z3g+vC5w97J0eeG7Qsh9oIK8ruQ0iTlwWy8IP/o=;
+        b=yzC1swai6Le8OXl9s3JYfSUp7Rgc/p5G5ImXQ8gKSFRxQ0k6OcamxAy/EC/HXFIX+H
+         +lNv913+h3W1aHQkjLdv5BAy7rxaeNqusVcTW31hTBr/rSpXBCipc0RtLeC0FZ23u027
+         8Awq4dEjPmVeDN51Q6dXt4rORH54YODX63jkf/b0+ZXnZrZU2DHpowg1wcpLXJqGRnU/
+         iJRg5gM+Hn014Gj49CFTvB/FfN4ZNlfajhj1YFUj3aC70r5Zvdbfcp3oKOYyJDEIA70/
+         9LulmQSnVs6Mebl+ZoTeoCez5yoicBOThWRRfEwpyOBMHyYO5mSzCs+LOOIQ1U3rkExc
+         ujrA==
+X-Gm-Message-State: AOAM530B8XMHa3r39TDajzzUobjZB9R2Q9YTd/nQVp4EBsiqdf/nq2GZ
+        77FO+PdJ1EwFpzwpATpufgRWmf59pVc=
+X-Google-Smtp-Source: ABdhPJyDUdDMkIA9Rexpi4xCcoy4cvsHlm4kiDyB4KxpLmnrUwx9UalA3ivmLSsUuphJn7dJqv71a2GxVRo=
+X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:284f:: with SMTP id
+ p15mr119733pjf.1.1636494792437; Tue, 09 Nov 2021 13:53:12 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Tue,  9 Nov 2021 21:50:55 +0000
+Message-Id: <20211109215101.2211373-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.34.0.rc0.344.g81b53c2807-goog
+Subject: [PATCH 0/6] KVM: SEV: Bug fix, cleanups and enhancements
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v6 19/42] x86/mm: Add support to validate memory when
- changing C-bit
-Message-ID: <YYrNL7U07SxeUQ3E@zn.tnic>
-References: <20211008180453.462291-1-brijesh.singh@amd.com>
- <20211008180453.462291-20-brijesh.singh@amd.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20211008180453.462291-20-brijesh.singh@amd.com>
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Peter Gonda <pgonda@google.com>,
+        Marc Orr <marcorr@google.com>,
+        Nathan Tempelman <natet@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 08, 2021 at 01:04:30PM -0500, Brijesh Singh wrote:
-> +static int vmgexit_psc(struct snp_psc_desc *desc)
-> +{
-> +	int cur_entry, end_entry, ret;
-> +	struct snp_psc_desc *data;
-> +	struct ghcb_state state;
-> +	struct ghcb *ghcb;
-> +	struct psc_hdr *hdr;
-> +	unsigned long flags;
+Bug fix for COPY_ENC_CONTEXT_FROM that IIRC is very belated feedback (git
+says its been sitting in my local repo since at least early September).
 
-        int cur_entry, end_entry, ret;
-        struct snp_psc_desc *data;
-        struct ghcb_state state;
-        struct psc_hdr *hdr;
-        unsigned long flags;
-        struct ghcb *ghcb;
+The other patches are tangentially related cleanups and enhancements for
+the SEV and SEV-ES info, e.g. active flag, ASID, etc...
 
-that's properly sorted.
+Booted an SEV guest, otherwise it's effectively all compile-tested only.
 
-> +
-> +	local_irq_save(flags);
+Sean Christopherson (6):
+  KVM: SEV: Disallow COPY_ENC_CONTEXT_FROM if target has created vCPUs
+  KVM: SEV: Explicitly document that there are no TOCTOU races in copy
+    ASID
+  KVM: SEV: Set sev_info.active after initial checks in sev_guest_init()
+  KVM: SEV: WARN if SEV-ES is marked active but SEV is not
+  KVM: SEV: Drop a redundant setting of sev->asid during initialization
+  KVM: SEV: Fix typo in and tweak name of cmd_allowed_from_miror()
 
-What is that protecting against? Comment about it?
-
-Aha, __sev_get_ghcb() needs to run with IRQs disabled because it is
-using the per-CPU GHCB.
-
-> +
-> +	ghcb = __sev_get_ghcb(&state);
-> +	if (unlikely(!ghcb))
-> +		panic("SEV-SNP: Failed to get GHCB\n");
-> +
-> +	/* Copy the input desc into GHCB shared buffer */
-> +	data = (struct snp_psc_desc *)ghcb->shared_buffer;
-> +	memcpy(ghcb->shared_buffer, desc, sizeof(*desc));
-
-That shared buffer has a size - check it vs the size of the desc thing.
-
-> +
-> +	hdr = &data->hdr;
-
-Why do you need this and why can't you use data->hdr simply?
-
-/me continues reading and realizes why
-
-Oh no, this is tricky. The HV call will modify what @data points to and
-thus @hdr will point to new contents. Only then your backwards processing
-check below makes sense.
-
-So then you *absoulutely* want to use data->hdr everywhere and then also
-write why in the comment above the check that data gets updated by the
-HV call.
-
-> +	cur_entry = hdr->cur_entry;
-> +	end_entry = hdr->end_entry;
-> +
-> +	/*
-> +	 * As per the GHCB specification, the hypervisor can resume the guest
-> +	 * before processing all the entries. Checks whether all the entries
-
-					      Check
-
-> +	 * are processed. If not, then keep retrying.
-> +	 *
-> +	 * The stragtegy here is to wait for the hypervisor to change the page
-> +	 * state in the RMP table before guest access the memory pages. If the
-
-					       accesses
-
-> +	 * page state was not successful, then later memory access will result
-
-"If the page state *change* was not ..."
-
-> +	 * in the crash.
-
-	"in a crash."
-
-> +	 */
-> +	while (hdr->cur_entry <= hdr->end_entry) {
-> +		ghcb_set_sw_scratch(ghcb, (u64)__pa(data));
-> +
-> +		ret = sev_es_ghcb_hv_call(ghcb, NULL, SVM_VMGEXIT_PSC, 0, 0);
-
-This should be
-
-		ret = sev_es_ghcb_hv_call(ghcb, true, NULL, SVM_VMGEXIT_PSC, 0, 0);
-
-as we changed it in the meantime to accomodate HyperV isolation VMs.
-
-> +
-> +		/*
-> +		 * Page State Change VMGEXIT can pass error code through
-> +		 * exit_info_2.
-> +		 */
-> +		if (WARN(ret || ghcb->save.sw_exit_info_2,
-> +			 "SEV-SNP: PSC failed ret=%d exit_info_2=%llx\n",
-> +			 ret, ghcb->save.sw_exit_info_2)) {
-> +			ret = 1;
-
-That ret = 1 goes unused with that "return 0" at the end. It should be
-"return ret" at the end.. Ditto for the others. Audit all your exit
-paths in this function.
-
-> +			goto out;
-> +		}
-> +
-> +		/*
-> +		 * Sanity check that entry processing is not going backward.
-> +		 * This will happen only if hypervisor is tricking us.
-> +		 */
-> +		if (WARN(hdr->end_entry > end_entry || cur_entry > hdr->cur_entry,
-> +"SEV-SNP:  PSC processing going backward, end_entry %d (got %d) cur_entry %d (got %d)\n",
-> +			 end_entry, hdr->end_entry, cur_entry, hdr->cur_entry)) {
-> +			ret = 1;
-> +			goto out;
-> +		}
-> +
-> +		/* Verify that reserved bit is not set */
-> +		if (WARN(hdr->reserved, "Reserved bit is set in the PSC header\n")) {
-
-Shouldn't that thing happen first after the HV call?
-
-> +			ret = 1;
-> +			goto out;
-> +		}
-> +	}
-> +
-> +out:
-> +	__sev_put_ghcb(&state);
-> +	local_irq_restore(flags);
-> +
-> +	return 0;
-> +}
-> +
-> +static void __set_page_state(struct snp_psc_desc *data, unsigned long vaddr,
-> +			     unsigned long vaddr_end, int op)
-> +{
-> +	struct psc_hdr *hdr;
-> +	struct psc_entry *e;
-> +	unsigned long pfn;
-> +	int i;
-> +
-> +	hdr = &data->hdr;
-> +	e = data->entries;
-> +
-> +	memset(data, 0, sizeof(*data));
-> +	i = 0;
-> +
-> +	while (vaddr < vaddr_end) {
-> +		if (is_vmalloc_addr((void *)vaddr))
-> +			pfn = vmalloc_to_pfn((void *)vaddr);
-> +		else
-> +			pfn = __pa(vaddr) >> PAGE_SHIFT;
-> +
-> +		e->gfn = pfn;
-> +		e->operation = op;
-> +		hdr->end_entry = i;
-> +
-> +		/*
-> +		 * The GHCB specification provides the flexibility to
-> +		 * use either 4K or 2MB page size in the RMP table.
-> +		 * The current SNP support does not keep track of the
-> +		 * page size used in the RMP table. To avoid the
-> +		 * overlap request,
-
-"avoid overlap request"?
-
-No clue what that means. In general, that comment is talking about
-something in the future and is more confusing than explaining stuff.
-
-> use the 4K page size in the RMP
-> +		 * table.
-> +		 */
-> +		e->pagesize = RMP_PG_SIZE_4K;
-> +
-> +		vaddr = vaddr + PAGE_SIZE;
-> +		e++;
-> +		i++;
-> +	}
-> +
-> +	if (vmgexit_psc(data))
-> +		sev_es_terminate(SEV_TERM_SET_LINUX, GHCB_TERM_PSC);
-> +}
-> +
-> +static void set_page_state(unsigned long vaddr, unsigned int npages, int op)
-
-Yeah, so this should be named
-
-set_pages_state - notice the plural "pages"
-
-because it works on multiple pages, @npages exactly.
-
-> +{
-> +	unsigned long vaddr_end, next_vaddr;
-> +	struct snp_psc_desc *desc;
-> +
-> +	vaddr = vaddr & PAGE_MASK;
-> +	vaddr_end = vaddr + (npages << PAGE_SHIFT);
-
-Take those two...
-
-> +
-> +	desc = kmalloc(sizeof(*desc), GFP_KERNEL_ACCOUNT);
-> +	if (!desc)
-> +		panic("SEV-SNP: failed to allocate memory for PSC descriptor\n");
-
-
-... and put them here.
-
-<--- 
-
-> +
-> +	while (vaddr < vaddr_end) {
-> +		/*
-> +		 * Calculate the last vaddr that can be fit in one
-> +		 * struct snp_psc_desc.
-> +		 */
-> +		next_vaddr = min_t(unsigned long, vaddr_end,
-> +				   (VMGEXIT_PSC_MAX_ENTRY * PAGE_SIZE) + vaddr);
-> +
-> +		__set_page_state(desc, vaddr, next_vaddr, op);
-> +
-> +		vaddr = next_vaddr;
-> +	}
-> +
-> +	kfree(desc);
-> +}
-> +
-> +void snp_set_memory_shared(unsigned long vaddr, unsigned int npages)
-> +{
-> +	if (!cc_platform_has(CC_ATTR_SEV_SNP))
-> +		return;
-> +
-> +	pvalidate_pages(vaddr, npages, 0);
-> +
-> +	set_page_state(vaddr, npages, SNP_PAGE_STATE_SHARED);
-> +}
-> +
-> +void snp_set_memory_private(unsigned long vaddr, unsigned int npages)
-> +{
-> +	if (!cc_platform_has(CC_ATTR_SEV_SNP))
-> +		return;
-> +
-> +	set_page_state(vaddr, npages, SNP_PAGE_STATE_PRIVATE);
-> +
-> +	pvalidate_pages(vaddr, npages, 1);
-> +}
-> +
->  int sev_es_setup_ap_jump_table(struct real_mode_header *rmh)
->  {
->  	u16 startup_cs, startup_ip;
-> diff --git a/arch/x86/mm/pat/set_memory.c b/arch/x86/mm/pat/set_memory.c
-> index 527957586f3c..ffe51944606a 100644
-> --- a/arch/x86/mm/pat/set_memory.c
-> +++ b/arch/x86/mm/pat/set_memory.c
-> @@ -30,6 +30,7 @@
->  #include <asm/proto.h>
->  #include <asm/memtype.h>
->  #include <asm/set_memory.h>
-> +#include <asm/sev.h>
->  
->  #include "../mm_internal.h"
->  
-> @@ -2010,8 +2011,22 @@ static int __set_memory_enc_dec(unsigned long addr, int numpages, bool enc)
->  	 */
->  	cpa_flush(&cpa, !this_cpu_has(X86_FEATURE_SME_COHERENT));
->  
-> +	/*
-> +	 * To maintain the security gurantees of SEV-SNP guest invalidate the memory
-
-"guarantees"
-
-Your spellchecker broke again.
-
-> +	 * before clearing the encryption attribute.
-> +	 */
-> +	if (!enc)
-> +		snp_set_memory_shared(addr, numpages);
-> +
->  	ret = __change_page_attr_set_clr(&cpa, 1);
->  
-> +	/*
-> +	 * Now that memory is mapped encrypted in the page table, validate it
-> +	 * so that is consistent with the above page state.
-> +	 */
-> +	if (!ret && enc)
-> +		snp_set_memory_private(addr, numpages);
-> +
->  	/*
->  	 * After changing the encryption attribute, we need to flush TLBs again
->  	 * in case any speculative TLB caching occurred (but no need to flush
-> -- 
-> 2.25.1
-> 
+ arch/x86/kvm/svm/sev.c | 42 +++++++++++++++++++++++++++---------------
+ arch/x86/kvm/svm/svm.h |  2 +-
+ 2 files changed, 28 insertions(+), 16 deletions(-)
 
 -- 
-Regards/Gruss,
-    Boris.
+2.34.0.rc0.344.g81b53c2807-goog
 
-https://people.kernel.org/tglx/notes-about-netiquette
