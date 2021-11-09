@@ -2,101 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C48C644B1CE
-	for <lists+kvm@lfdr.de>; Tue,  9 Nov 2021 18:15:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D58B44B1D1
+	for <lists+kvm@lfdr.de>; Tue,  9 Nov 2021 18:16:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238271AbhKIRSb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Nov 2021 12:18:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38750 "EHLO
+        id S239808AbhKIRTc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Nov 2021 12:19:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239285AbhKIRSZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Nov 2021 12:18:25 -0500
-Received: from mail-il1-x12e.google.com (mail-il1-x12e.google.com [IPv6:2607:f8b0:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5D9EC0613F5
-        for <kvm@vger.kernel.org>; Tue,  9 Nov 2021 09:15:39 -0800 (PST)
-Received: by mail-il1-x12e.google.com with SMTP id x9so21367691ilu.6
-        for <kvm@vger.kernel.org>; Tue, 09 Nov 2021 09:15:39 -0800 (PST)
+        with ESMTP id S239433AbhKIRTc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Nov 2021 12:19:32 -0500
+Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD794C061764
+        for <kvm@vger.kernel.org>; Tue,  9 Nov 2021 09:16:45 -0800 (PST)
+Received: by mail-lj1-x22d.google.com with SMTP id 207so19478477ljf.10
+        for <kvm@vger.kernel.org>; Tue, 09 Nov 2021 09:16:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
+        d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=PYl/0RFwOVcvzV5FJNNc8TPk6OF3cF1Os+dfyzaR2sc=;
-        b=kkML1A+9NWE2na1XNjUxPeSc3GWNNqJ9ssD/HEhYNryUJ22ut3IKWAdXmYPaCX+MpQ
-         CE72bmzyaKD2hx7qGkts4/B3zbUMQNCJ8AMi5LUAQZXysiLvg6qrpG289EB3APFfHjWL
-         vFssi7WrVjLh32AoOXqYwgHHqkBovgB7OsgPpyHr3sfqnnpXZYk1Hpn+pvWsSU/2VL0b
-         2AKlYnHxNLsQw3+kiTYcYXMAy0EtXgZWXt3WuCGMJGN3BvrPUsl2+0yiaGfVDz0Fn6By
-         qF3+jMQyVAX0+rBdrI93JM+gNiYXdUEqEqEfiquYUFMPR8D4VRkAuSJzmd2hQ8FbUaQI
-         uPvg==
+        bh=Q35c4TBKqxH8jpY3YlDH+A9sBZRnoj0usOTREmmIMGg=;
+        b=PLxYuMMfyVFe9r7QMyiTV5P78gnjpA2IO8uyonA+ra9ni5lupMi0xwNsPF6JwZrDd9
+         oh10PtSfVlLKB6ibdgqtze1W4pKxSocQ/vxFWFJtONYH7vRuIO6eB9Lh4/sKStgbJIPG
+         EkkemhyQy9OP7JYTRowsovTSlazG2hlZ+8NMbGtir4pRTkRlIuUlXkHgY6xsMyETus9p
+         7S6pSSzZx1UYxQnj8HUzUTVuUEZysxLhn7wm0Kul0EidYEJvPIkHKgSMGxlcEuBOUSLV
+         te5F6RYTqEnVBqNOCiznsqspLS2jYFV8WTv+y4q1cxMasLaumQeNAwzMhB3ZXW0pU0y9
+         RALw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=PYl/0RFwOVcvzV5FJNNc8TPk6OF3cF1Os+dfyzaR2sc=;
-        b=Kvgt3VZRNNj1mvh+jAVhyvRVk5ReCVqjRNMZgiuycI2xGNsxfC6lHe38ZYR3JNnxUA
-         qE6+IMCQYandvRGgHgkqox+bG5C8DZkPtgFMcIYF6Xlgr0bbPC1J0KAQOpV7zRiG6zQp
-         LGUzGtD5YpTNRPKZLxZBFgNGXfCn1TeZiYPPDIjGzYtaJIJ20SWNZKz0vpTupuNfIUho
-         LLZjTBGv6mF9fF2nlnWqMVJBisjjUGWVtVlPgJwGGBBKVFT+FbcA5VXEiKGdAtGvaGAu
-         JSftbikU+/orfiT4F2rRkyX/RJ8ymGMptkIT9h6AQ0JnSTPwxlrabW2pG7OrESUNFHf6
-         5b+g==
-X-Gm-Message-State: AOAM533Dbc/l/3SjWpD5F/XuvF9Sp+fVOkXlx25c0hIADSGz06yYU6uT
-        79YdxYRoLZ8lsRLevTIJ6FrNUKabiG7t7Tjqa1+spQ==
-X-Google-Smtp-Source: ABdhPJwjNTgvbLy1g224mg+aP1u4fbve1xo1WmmvV5DGlp3Q3vRrl6HubYy1Hp6u3SiArybZKdMLa7wYNLBGwtV45fw=
-X-Received: by 2002:a92:cda2:: with SMTP id g2mr6190318ild.2.1636478138921;
- Tue, 09 Nov 2021 09:15:38 -0800 (PST)
+        bh=Q35c4TBKqxH8jpY3YlDH+A9sBZRnoj0usOTREmmIMGg=;
+        b=e4aMQdHFTAuaMP0/eTLJW0ZtPaw5oP/bJVwLikKqSo2+nN3yezBfZziBV4tMQ8zZYD
+         KSAsuy4FD585VqirugpAjKG5Akya5DNkNIH9o6YGXpM7iYXmv02BRNszP1eSVWNemd43
+         uGLrJlsuIsQodmSBVHBtxjgAfsi5IgtZpYG9M7/rc/anERkCkZ9Feu494HFdjmmrQESD
+         l+6gAMGsrkhmOBpiOdtdReOLgEMvQscjnKVJbDHL5W0uFKsODQI8GehDPNaZb8m6/uc+
+         hN8jeY9s/Qk/CYHDsdLsqjbnfwU78AnNNaXuGg79MKFHZQieZNAzUGhmQc3rmBZMdG46
+         OupQ==
+X-Gm-Message-State: AOAM531EO5PZSW7gKZl+fAHCOJ+vKAU/bXDzbOiSw92F13pUruO+r3Si
+        RQh6T1fe/uafLSuLmFBpLl/xdRQXkGOJ2fnyz7U=
+X-Google-Smtp-Source: ABdhPJz1H9PpeYbAd+OJbS9asLpJiPci5T1n3SAgTw197BH/NIyQDlvLaDm43Mw3gOxmvscU5LVADSsCGYMnSis5zA8=
+X-Received: by 2002:a2e:9708:: with SMTP id r8mr9809182lji.36.1636478204236;
+ Tue, 09 Nov 2021 09:16:44 -0800 (PST)
 MIME-Version: 1.0
-References: <20210913135745.13944-1-jgross@suse.com> <20210913135745.13944-2-jgross@suse.com>
- <CANgfPd-DjawJpZDAFzwS54yukPSsUAU+rWsais2_FCeLCZuY0A@mail.gmail.com>
- <CANgfPd-njeSYSiytAYEXLG8wwTmLBA6viV7YAHj5uVeukPde=g@mail.gmail.com> <c4f051e2-2c85-d367-549a-d5ad34af7a13@suse.com>
-In-Reply-To: <c4f051e2-2c85-d367-549a-d5ad34af7a13@suse.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Tue, 9 Nov 2021 09:15:25 -0800
-Message-ID: <CANgfPd_+B6SZ0sPNDguCic1Q0SG+XL8-4+xModzcYu9d1-puBw@mail.gmail.com>
-Subject: Re: [PATCH 1/2] x86/kvm: revert commit 76b4f357d0e7d8f6f00
-To:     Juergen Gross <jgross@suse.com>
-Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
+References: <20211031055634.894263-1-zxwang42@gmail.com> <20211031055634.894263-3-zxwang42@gmail.com>
+ <YYV9ztwl/7Z5LqyT@google.com>
+In-Reply-To: <YYV9ztwl/7Z5LqyT@google.com>
+From:   Zixuan Wang <zxwang42@gmail.com>
+Date:   Tue, 9 Nov 2021 09:16:00 -0800
+Message-ID: <CAEDJ5ZSVk=oMAxubgvzcmc7G6DGCbf6hJAnPtxKeLcfyXHChaQ@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH v1 2/7] x86 UEFI: Refactor set up process
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm list <kvm@vger.kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Eduardo Habkost <ehabkost@redhat.com>
+        Andrew Jones <drjones@redhat.com>,
+        Marc Orr <marcorr@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        David Rientjes <rientjes@google.com>,
+        "Singh, Brijesh" <brijesh.singh@amd.com>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        Varad Gautam <varad.gautam@suse.com>,
+        Joerg Roedel <jroedel@suse.de>, bp@suse.de
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 9, 2021 at 12:47 AM Juergen Gross <jgross@suse.com> wrote:
+On Fri, Nov 5, 2021 at 11:54 AM Sean Christopherson <seanjc@google.com> wrote:
 >
-> On 08.11.21 21:15, Ben Gardon wrote:
-> > On Mon, Nov 8, 2021 at 12:14 PM Ben Gardon <bgardon@google.com> wrote:
-> >>
-> >> On Mon, Sep 13, 2021 at 7:51 AM Juergen Gross <jgross@suse.com> wrote:
-> >>>
-> >>> Commit 76b4f357d0e7d8f6f00 ("x86/kvm: fix vcpu-id indexed array sizes")
-> >>> has wrong reasoning, as KVM_MAX_VCPU_ID is not defining the maximum
-> >>> allowed vcpu-id as its name suggests, but the number of vcpu-ids.
-> >>>
-> >>> So revert this patch again.
-> >>>
-> >>> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-> >>> Signed-off-by: Juergen Gross <jgross@suse.com>
-> >>
-> >> The original commit 76b4f357d0e7d8f6f00 CC'ed Stable but this revert
-> >> does not. Looking at the stable branches, I see the original has been
-> >> reverted but this hasn't. Should this be added to Stable as well?
-> >
-> > *the original has been incorporated into the stable branches but this hasn't.
+> On Sat, Oct 30, 2021, Zixuan Wang wrote:
+> > +efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
+> >  {
+> > +     efi_status_t status;
+> > +
+> > +     status = setup_memory_allocator(efi_bootinfo);
+> > +     if (status != EFI_SUCCESS) {
+> > +             printf("Failed to set up memory allocator: ");
+> > +             switch (status) {
+> > +             case EFI_OUT_OF_RESOURCES:
+> > +                     printf("No free memory region\n");
+> > +                     break;
+> > +             default:
+> > +                     printf("Unknown error\n");
+> > +                     break;
+> > +             }
+> > +             return status;
+> > +     }
+> > +
+> > +     status = setup_rsdp(efi_bootinfo);
+> > +     if (status != EFI_SUCCESS) {
+> > +             printf("Cannot find RSDP in EFI system table\n");
+> > +             return status;
+> > +     }
+> > +
+> > +     status = setup_amd_sev();
+> > +     if (status != EFI_SUCCESS) {
+> > +             switch (status) {
+> > +             case EFI_UNSUPPORTED:
+> > +                     /* Continue if AMD SEV is not supported */
+> > +                     break;
+> > +             default:
+> > +                     printf("Set up AMD SEV failed\n");
+> > +                     return status;
+> > +             }
+> > +     }
 >
-> Just yesterday I received mails that this patch has been added to the
-> stable branches.
+> Looks like this is pre-existing behavior, but the switch is quite gratuituous,
+> and arguably does the wrong thing for EFI_UNSUPPORTED here as attempting to setup
+> SEV-ES without SEV is guaranteed to fail.  And it'd be really nice if the printf()
+> actually provided the error (below might be wrong, I don't know the type of
+> efi_status-t).
 >
+>         status = setup_amd_sev();
 >
-> Juergen
+>         /* Continue on if AMD SEV isn't supported, but skip SEV-ES setup. */
+>         if (status == EFI_UNSUPPORTED)
+>                 goto continue_setup;
+>
+>         if (status != EFI_SUCCESS) {
+>                 printf("AMD SEV setup failed, error = %d\n", status);
+>                 return status;
+>         }
+>
+>         /* Same as above, lack of SEV-ES is not a fatal error. */
+>         status = setup_amd_sev_es();
+>         if (status != EFI_SUCCESS && status != EFI_UNSUPPORTED) {
+>                 printf("AMD SEV-ES setup failed, error = %d\n", status);
+>                 return status;
+>         }
+>
+> continue_setup:
+>
 
-Oh wonderful, what a coincidence!
-Thanks,
-Ben
+I agree. The current setup_amd_sev_es() checks if SEV is available and
+returns EFI_UNSUPPORTED if not, so it does no harm if called after
+setup_amd_sev() fails. But I think we should not rely on these
+underlying implementation details. I will include this part in the
+next version.
+
+Best regards,
+Zixuan
