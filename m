@@ -2,142 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D58B44B1D1
-	for <lists+kvm@lfdr.de>; Tue,  9 Nov 2021 18:16:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C7DFB44B204
+	for <lists+kvm@lfdr.de>; Tue,  9 Nov 2021 18:33:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239808AbhKIRTc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Nov 2021 12:19:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39044 "EHLO
+        id S241090AbhKIRgD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Nov 2021 12:36:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239433AbhKIRTc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Nov 2021 12:19:32 -0500
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD794C061764
-        for <kvm@vger.kernel.org>; Tue,  9 Nov 2021 09:16:45 -0800 (PST)
-Received: by mail-lj1-x22d.google.com with SMTP id 207so19478477ljf.10
-        for <kvm@vger.kernel.org>; Tue, 09 Nov 2021 09:16:45 -0800 (PST)
+        with ESMTP id S238382AbhKIRgC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Nov 2021 12:36:02 -0500
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5532C061766
+        for <kvm@vger.kernel.org>; Tue,  9 Nov 2021 09:33:16 -0800 (PST)
+Received: by mail-pl1-x633.google.com with SMTP id b11so8982484pld.12
+        for <kvm@vger.kernel.org>; Tue, 09 Nov 2021 09:33:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Q35c4TBKqxH8jpY3YlDH+A9sBZRnoj0usOTREmmIMGg=;
-        b=PLxYuMMfyVFe9r7QMyiTV5P78gnjpA2IO8uyonA+ra9ni5lupMi0xwNsPF6JwZrDd9
-         oh10PtSfVlLKB6ibdgqtze1W4pKxSocQ/vxFWFJtONYH7vRuIO6eB9Lh4/sKStgbJIPG
-         EkkemhyQy9OP7JYTRowsovTSlazG2hlZ+8NMbGtir4pRTkRlIuUlXkHgY6xsMyETus9p
-         7S6pSSzZx1UYxQnj8HUzUTVuUEZysxLhn7wm0Kul0EidYEJvPIkHKgSMGxlcEuBOUSLV
-         te5F6RYTqEnVBqNOCiznsqspLS2jYFV8WTv+y4q1cxMasLaumQeNAwzMhB3ZXW0pU0y9
-         RALw==
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=dAQ4ipHe6mj+S5wNiendTeS5LEXc10OoPefcaaMxaM4=;
+        b=X7XoFdgKxoUfdExi/8T7fGzwE8la73btPlIVP+HuJp9bL/hU85oxlA3kUHjSzaYQnh
+         G8u/08InsEZY6n/6bNf2eaHu8J6OjiMTJb4+lTqFTeGQMG7T11GPhWMNQcMMMiyJ0niT
+         8AgmYxmn59QNW5izfAmer0EqCiPfHEL8DmNA/Izq+7vBo+tgvTWXBvSjW5lYxxlsj+Dp
+         0/HVF+Xfe2uHl/7T9J88HV2/3miPiM5PAkS6piL2Bqz+4kcqp5rlYbZYrLyTekzvKZJA
+         cDACERmR3UvLKrzkkM1tjgp4FE6PQl0xnSzpkesf5czQEfMFMFDmuDyuAuOoJre11REA
+         NKQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Q35c4TBKqxH8jpY3YlDH+A9sBZRnoj0usOTREmmIMGg=;
-        b=e4aMQdHFTAuaMP0/eTLJW0ZtPaw5oP/bJVwLikKqSo2+nN3yezBfZziBV4tMQ8zZYD
-         KSAsuy4FD585VqirugpAjKG5Akya5DNkNIH9o6YGXpM7iYXmv02BRNszP1eSVWNemd43
-         uGLrJlsuIsQodmSBVHBtxjgAfsi5IgtZpYG9M7/rc/anERkCkZ9Feu494HFdjmmrQESD
-         l+6gAMGsrkhmOBpiOdtdReOLgEMvQscjnKVJbDHL5W0uFKsODQI8GehDPNaZb8m6/uc+
-         hN8jeY9s/Qk/CYHDsdLsqjbnfwU78AnNNaXuGg79MKFHZQieZNAzUGhmQc3rmBZMdG46
-         OupQ==
-X-Gm-Message-State: AOAM531EO5PZSW7gKZl+fAHCOJ+vKAU/bXDzbOiSw92F13pUruO+r3Si
-        RQh6T1fe/uafLSuLmFBpLl/xdRQXkGOJ2fnyz7U=
-X-Google-Smtp-Source: ABdhPJz1H9PpeYbAd+OJbS9asLpJiPci5T1n3SAgTw197BH/NIyQDlvLaDm43Mw3gOxmvscU5LVADSsCGYMnSis5zA8=
-X-Received: by 2002:a2e:9708:: with SMTP id r8mr9809182lji.36.1636478204236;
- Tue, 09 Nov 2021 09:16:44 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=dAQ4ipHe6mj+S5wNiendTeS5LEXc10OoPefcaaMxaM4=;
+        b=wYCwSq2EE4yjpy9vx/BQeElj4ClsAeNjk6VX2UedzlTk5G3Fu4HcNlXxdeO2KsjICv
+         ayzXAdV6841G0etb7c8oaBYJoRbXu5G+kNNo6pJxesIrZEeASemY4awy+wpRGZPKdb54
+         4JqZLTrSejbvMxoTzk0rPACM7oMN6l0WdP8rs4sMUxaIPajdmIMoawvNDlxj6aS7174Q
+         hokLbzMIMd8Om3BoILrttn4OUjGfiLAh0lvhXCnp8esqA3/27IUcw4DkO65sjLrR7rH+
+         MPVugtphaTZHmPAG+l+SlT4AEbq8AQ9Fk2PcnxMwCiK4AHYocVRDct7TYXRiV7/iXHg6
+         coJA==
+X-Gm-Message-State: AOAM532bSweNkkOXXO7vowt3noAzUx89RUiywDnEcyiduawco2fgkc/c
+        CgOgzHexHm0Q57r+yL0V9OOp5w==
+X-Google-Smtp-Source: ABdhPJxcCsg0NSzFuffu/U0QqNGykfFjyw0u+oK5KaYzr61kSayzkoK+RJCyWGZvV9MiERP2Zg40yQ==
+X-Received: by 2002:a17:90b:1a87:: with SMTP id ng7mr9146277pjb.230.1636479195981;
+        Tue, 09 Nov 2021 09:33:15 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id p16sm15460419pgd.78.2021.11.09.09.33.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Nov 2021 09:33:15 -0800 (PST)
+Date:   Tue, 9 Nov 2021 17:33:11 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 0/8] KVM: nVMX: Enlightened MSR Bitmap feature for
+ Hyper-V on KVM (+ KVM: x86: MSR filtering and related fixes)
+Message-ID: <YYqw15a/Z+eDvuEv@google.com>
+References: <20211109162835.99475-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-References: <20211031055634.894263-1-zxwang42@gmail.com> <20211031055634.894263-3-zxwang42@gmail.com>
- <YYV9ztwl/7Z5LqyT@google.com>
-In-Reply-To: <YYV9ztwl/7Z5LqyT@google.com>
-From:   Zixuan Wang <zxwang42@gmail.com>
-Date:   Tue, 9 Nov 2021 09:16:00 -0800
-Message-ID: <CAEDJ5ZSVk=oMAxubgvzcmc7G6DGCbf6hJAnPtxKeLcfyXHChaQ@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH v1 2/7] x86 UEFI: Refactor set up process
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm list <kvm@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Marc Orr <marcorr@google.com>,
-        Erdem Aktas <erdemaktas@google.com>,
-        David Rientjes <rientjes@google.com>,
-        "Singh, Brijesh" <brijesh.singh@amd.com>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        Varad Gautam <varad.gautam@suse.com>,
-        Joerg Roedel <jroedel@suse.de>, bp@suse.de
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211109162835.99475-1-vkuznets@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 5, 2021 at 11:54 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Sat, Oct 30, 2021, Zixuan Wang wrote:
-> > +efi_status_t setup_efi(efi_bootinfo_t *efi_bootinfo)
-> >  {
-> > +     efi_status_t status;
-> > +
-> > +     status = setup_memory_allocator(efi_bootinfo);
-> > +     if (status != EFI_SUCCESS) {
-> > +             printf("Failed to set up memory allocator: ");
-> > +             switch (status) {
-> > +             case EFI_OUT_OF_RESOURCES:
-> > +                     printf("No free memory region\n");
-> > +                     break;
-> > +             default:
-> > +                     printf("Unknown error\n");
-> > +                     break;
-> > +             }
-> > +             return status;
-> > +     }
-> > +
-> > +     status = setup_rsdp(efi_bootinfo);
-> > +     if (status != EFI_SUCCESS) {
-> > +             printf("Cannot find RSDP in EFI system table\n");
-> > +             return status;
-> > +     }
-> > +
-> > +     status = setup_amd_sev();
-> > +     if (status != EFI_SUCCESS) {
-> > +             switch (status) {
-> > +             case EFI_UNSUPPORTED:
-> > +                     /* Continue if AMD SEV is not supported */
-> > +                     break;
-> > +             default:
-> > +                     printf("Set up AMD SEV failed\n");
-> > +                     return status;
-> > +             }
-> > +     }
->
-> Looks like this is pre-existing behavior, but the switch is quite gratuituous,
-> and arguably does the wrong thing for EFI_UNSUPPORTED here as attempting to setup
-> SEV-ES without SEV is guaranteed to fail.  And it'd be really nice if the printf()
-> actually provided the error (below might be wrong, I don't know the type of
-> efi_status-t).
->
->         status = setup_amd_sev();
->
->         /* Continue on if AMD SEV isn't supported, but skip SEV-ES setup. */
->         if (status == EFI_UNSUPPORTED)
->                 goto continue_setup;
->
->         if (status != EFI_SUCCESS) {
->                 printf("AMD SEV setup failed, error = %d\n", status);
->                 return status;
->         }
->
->         /* Same as above, lack of SEV-ES is not a fatal error. */
->         status = setup_amd_sev_es();
->         if (status != EFI_SUCCESS && status != EFI_UNSUPPORTED) {
->                 printf("AMD SEV-ES setup failed, error = %d\n", status);
->                 return status;
->         }
->
-> continue_setup:
->
+On Tue, Nov 09, 2021, Vitaly Kuznetsov wrote:
+> This series combines "Enlightened MSR Bitmap feature for Hyper-V on KVM v4"
+> and Sean's "KVM: x86: MSR filtering and related fixes v4" 
+> (https://lore.kernel.org/kvm/20211109013047.2041518-1-seanjc@google.com/)
+> series as they're code dependent.
 
-I agree. The current setup_amd_sev_es() checks if SEV is available and
-returns EFI_UNSUPPORTED if not, so it does no harm if called after
-setup_amd_sev() fails. But I think we should not rely on these
-underlying implementation details. I will include this part in the
-next version.
-
-Best regards,
-Zixuan
+Series as a whole looks good, thanks for doing the dirty work!
