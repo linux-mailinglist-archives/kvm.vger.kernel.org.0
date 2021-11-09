@@ -2,111 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 94E5D44B1CA
-	for <lists+kvm@lfdr.de>; Tue,  9 Nov 2021 18:15:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C48C644B1CE
+	for <lists+kvm@lfdr.de>; Tue,  9 Nov 2021 18:15:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231907AbhKIRST (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Nov 2021 12:18:19 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33861 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235527AbhKIRSQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 9 Nov 2021 12:18:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636478130;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=AGhgPsu0z2GFCYg9O+d6y/Kg2u3fb1TKd+Ptumf/b6w=;
-        b=YTz5qXA7uHfCo3dP5ba0aUZzsEYSKszn5bZ57o3LHqvLwgtjJd4CT5XoNRzOOYgDfoId3J
-        TQvMGCsmC37JA3kBUXvzbcrRr26kU2bC/ZN29PtmVy03b64u+MsnlwyTJTP5PzG3pcrkj6
-        CBb4CWFT04w4Gb6CKGxft6zYKMUPg8I=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-591-6UTedRVKPwy9cJfBs_kMgw-1; Tue, 09 Nov 2021 12:15:28 -0500
-X-MC-Unique: 6UTedRVKPwy9cJfBs_kMgw-1
-Received: by mail-ed1-f70.google.com with SMTP id s6-20020a056402520600b003e2dea4f9b4so15527425edd.12
-        for <kvm@vger.kernel.org>; Tue, 09 Nov 2021 09:15:28 -0800 (PST)
+        id S238271AbhKIRSb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Nov 2021 12:18:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38750 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239285AbhKIRSZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Nov 2021 12:18:25 -0500
+Received: from mail-il1-x12e.google.com (mail-il1-x12e.google.com [IPv6:2607:f8b0:4864:20::12e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5D9EC0613F5
+        for <kvm@vger.kernel.org>; Tue,  9 Nov 2021 09:15:39 -0800 (PST)
+Received: by mail-il1-x12e.google.com with SMTP id x9so21367691ilu.6
+        for <kvm@vger.kernel.org>; Tue, 09 Nov 2021 09:15:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=PYl/0RFwOVcvzV5FJNNc8TPk6OF3cF1Os+dfyzaR2sc=;
+        b=kkML1A+9NWE2na1XNjUxPeSc3GWNNqJ9ssD/HEhYNryUJ22ut3IKWAdXmYPaCX+MpQ
+         CE72bmzyaKD2hx7qGkts4/B3zbUMQNCJ8AMi5LUAQZXysiLvg6qrpG289EB3APFfHjWL
+         vFssi7WrVjLh32AoOXqYwgHHqkBovgB7OsgPpyHr3sfqnnpXZYk1Hpn+pvWsSU/2VL0b
+         2AKlYnHxNLsQw3+kiTYcYXMAy0EtXgZWXt3WuCGMJGN3BvrPUsl2+0yiaGfVDz0Fn6By
+         qF3+jMQyVAX0+rBdrI93JM+gNiYXdUEqEqEfiquYUFMPR8D4VRkAuSJzmd2hQ8FbUaQI
+         uPvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=AGhgPsu0z2GFCYg9O+d6y/Kg2u3fb1TKd+Ptumf/b6w=;
-        b=PwWF071jXm39yemjMr4D/eLnx1z3anT1lMHto0Xjx+BO4fxvtTwKabdkdGkG37FKfj
-         SoTHd9txOQ/DuX/eI+GHHhYEJUCO+bJ5RG8nwR9vAkLYL+kG/p0WJsm8Yje+k190aZyH
-         qvjDdFXw7kySh3+t1QccYe4ftqAxOcDseuld3xnjQ9m5YpzaI4HI85VeX4bz30z2sIuN
-         Ut+4RWGAvMKkfHqsWoPLvt4uYin5K3iWOXmdNojXDiNrgePGumpR7HMu+p7Nq8vIld3k
-         S57/2cn/39alKM4nat0539H/XICKNmbl4vvUiwWoTHGHFvh/jhk0obi7bNBt6kBLvmxP
-         UY5Q==
-X-Gm-Message-State: AOAM532D6IjGPqZYuJdtp6dNG7RCDDbl+Ze/mxldoPXwT3SBnNE0yGp2
-        CoCK2sSTVGLJvGReXzVL+4IB2tjltiDwmH0nkCO7l751xg5yh7jF4FHhLAEvpWOkc1SHD4PYHjg
-        ZwYXWnLV0s85o
-X-Received: by 2002:a17:906:7304:: with SMTP id di4mr11366147ejc.474.1636478126747;
-        Tue, 09 Nov 2021 09:15:26 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyMlrtNZLLC+LMoCplKRl736/WYqV75KfF9PMIgfwt9lgWe8WiRGO0qDW9yGOAmKphSgesVAg==
-X-Received: by 2002:a17:906:7304:: with SMTP id di4mr11366104ejc.474.1636478126547;
-        Tue, 09 Nov 2021 09:15:26 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.gmail.com with ESMTPSA id nd36sm10045328ejc.17.2021.11.09.09.15.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Nov 2021 09:15:25 -0800 (PST)
-Message-ID: <3966eaf0-ed8e-c356-97dd-f8c5c3057439@redhat.com>
-Date:   Tue, 9 Nov 2021 18:15:24 +0100
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=PYl/0RFwOVcvzV5FJNNc8TPk6OF3cF1Os+dfyzaR2sc=;
+        b=Kvgt3VZRNNj1mvh+jAVhyvRVk5ReCVqjRNMZgiuycI2xGNsxfC6lHe38ZYR3JNnxUA
+         qE6+IMCQYandvRGgHgkqox+bG5C8DZkPtgFMcIYF6Xlgr0bbPC1J0KAQOpV7zRiG6zQp
+         LGUzGtD5YpTNRPKZLxZBFgNGXfCn1TeZiYPPDIjGzYtaJIJ20SWNZKz0vpTupuNfIUho
+         LLZjTBGv6mF9fF2nlnWqMVJBisjjUGWVtVlPgJwGGBBKVFT+FbcA5VXEiKGdAtGvaGAu
+         JSftbikU+/orfiT4F2rRkyX/RJ8ymGMptkIT9h6AQ0JnSTPwxlrabW2pG7OrESUNFHf6
+         5b+g==
+X-Gm-Message-State: AOAM533Dbc/l/3SjWpD5F/XuvF9Sp+fVOkXlx25c0hIADSGz06yYU6uT
+        79YdxYRoLZ8lsRLevTIJ6FrNUKabiG7t7Tjqa1+spQ==
+X-Google-Smtp-Source: ABdhPJwjNTgvbLy1g224mg+aP1u4fbve1xo1WmmvV5DGlp3Q3vRrl6HubYy1Hp6u3SiArybZKdMLa7wYNLBGwtV45fw=
+X-Received: by 2002:a92:cda2:: with SMTP id g2mr6190318ild.2.1636478138921;
+ Tue, 09 Nov 2021 09:15:38 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [RFC PATCH v2 24/69] KVM: x86: Introduce "protected guest"
- concept and block disallowed ioctls
-Content-Language: en-US
-To:     Xiaoyao Li <xiaoyao.li@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     isaku.yamahata@gmail.com,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>, x86@kernel.org,
-        Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>,
+References: <20210913135745.13944-1-jgross@suse.com> <20210913135745.13944-2-jgross@suse.com>
+ <CANgfPd-DjawJpZDAFzwS54yukPSsUAU+rWsais2_FCeLCZuY0A@mail.gmail.com>
+ <CANgfPd-njeSYSiytAYEXLG8wwTmLBA6viV7YAHj5uVeukPde=g@mail.gmail.com> <c4f051e2-2c85-d367-549a-d5ad34af7a13@suse.com>
+In-Reply-To: <c4f051e2-2c85-d367-549a-d5ad34af7a13@suse.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Tue, 9 Nov 2021 09:15:25 -0800
+Message-ID: <CANgfPd_+B6SZ0sPNDguCic1Q0SG+XL8-4+xModzcYu9d1-puBw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] x86/kvm: revert commit 76b4f357d0e7d8f6f00
+To:     Juergen Gross <jgross@suse.com>
+Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, erdemaktas@google.com,
-        Connor Kuehl <ckuehl@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <cover.1625186503.git.isaku.yamahata@intel.com>
- <482264f17fa0652faad9bd5364d652d11cb2ecb8.1625186503.git.isaku.yamahata@intel.com>
- <02ca73b2-7f04-813d-5bb7-649c0edafa06@redhat.com>
- <209a57e9-ca9c-3939-4aaa-4602e3dd7cdd@amd.com>
- <6f0d243c-4f40-d608-3309-5c37536ab866@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <6f0d243c-4f40-d608-3309-5c37536ab866@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Eduardo Habkost <ehabkost@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/9/21 14:37, Xiaoyao Li wrote:
-> 
-> Tom,
-> 
-> I think what you did in this commit is not so correct. It just silently 
-> ignores the ioctls insteaf of returning an error to userspace to tell 
-> this IOCTL is not invalid to this VM. E.g., for 
-> kvm_arch_vcpu_ioctl_get_fpu(), QEMU just gets it succesful with fpu 
-> being all zeros.
+On Tue, Nov 9, 2021 at 12:47 AM Juergen Gross <jgross@suse.com> wrote:
+>
+> On 08.11.21 21:15, Ben Gardon wrote:
+> > On Mon, Nov 8, 2021 at 12:14 PM Ben Gardon <bgardon@google.com> wrote:
+> >>
+> >> On Mon, Sep 13, 2021 at 7:51 AM Juergen Gross <jgross@suse.com> wrote:
+> >>>
+> >>> Commit 76b4f357d0e7d8f6f00 ("x86/kvm: fix vcpu-id indexed array sizes")
+> >>> has wrong reasoning, as KVM_MAX_VCPU_ID is not defining the maximum
+> >>> allowed vcpu-id as its name suggests, but the number of vcpu-ids.
+> >>>
+> >>> So revert this patch again.
+> >>>
+> >>> Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+> >>> Signed-off-by: Juergen Gross <jgross@suse.com>
+> >>
+> >> The original commit 76b4f357d0e7d8f6f00 CC'ed Stable but this revert
+> >> does not. Looking at the stable branches, I see the original has been
+> >> reverted but this hasn't. Should this be added to Stable as well?
+> >
+> > *the original has been incorporated into the stable branches but this hasn't.
+>
+> Just yesterday I received mails that this patch has been added to the
+> stable branches.
+>
+>
+> Juergen
 
-Yes, it's a "cop out" that removes the need for more complex changes in 
-QEMU.
-
-I think for the get/set registers ioctls 
-KVM_GET/SET_{REGS,SREGS,FPU,XSAVE,XCRS} we need to consider SEV-ES 
-backwards compatibility.  This means, at least for now, only apply the 
-restriction to TDX (using a bool-returning function, see the review for 
-28/69).
-
-For SMM, MCE, vCPU events and for kvm_valid/dirty_regs, it can be done 
-as in this patch.
-
-Paolo
-
+Oh wonderful, what a coincidence!
+Thanks,
+Ben
