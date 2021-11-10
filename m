@@ -2,290 +2,231 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7078B44C5A8
-	for <lists+kvm@lfdr.de>; Wed, 10 Nov 2021 18:03:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2604644C5EC
+	for <lists+kvm@lfdr.de>; Wed, 10 Nov 2021 18:21:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232305AbhKJRG2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Nov 2021 12:06:28 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:20118 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232203AbhKJRGZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 10 Nov 2021 12:06:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636563817;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=FQBQ5GV6gdxpV3LZ1YIPdhUG1JWyAiTVUj8IYWvvfMw=;
-        b=afLcOD3BhFQy8Syr3vv5idnYSn1dzEw0+usQXgrbSdxvwVZNMr+I2B7nRbyjs13c5wr5IH
-        1beGPIrjdCnEb9bDgvuKUy/92yrsvUKjD5xcZBT+5DNSMeP3e53sy/cmXdp+bDUCq5wic4
-        Hn/2zqY0LTgOyLUZJzNak1c3GgDcnaQ=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-286-S0VIsMH1OoSL6uxBOw_acQ-1; Wed, 10 Nov 2021 12:03:36 -0500
-X-MC-Unique: S0VIsMH1OoSL6uxBOw_acQ-1
-Received: by mail-wr1-f72.google.com with SMTP id y10-20020adffa4a000000b0017eea6cb05dso561315wrr.6
-        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 09:03:35 -0800 (PST)
+        id S231675AbhKJRYI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Nov 2021 12:24:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53386 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230362AbhKJRYH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Nov 2021 12:24:07 -0500
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA4EAC061764
+        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 09:21:19 -0800 (PST)
+Received: by mail-pj1-x1036.google.com with SMTP id gt5so2114976pjb.1
+        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 09:21:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=WhfnS5vDybFADKwJoIkInKN8uBvc9V9SVt1xhdhXjr0=;
+        b=mviWWb54Tvs91XunxpR2VKWXKV8OKLf+7Zd+S0AxzaRTeXof8Qo67kU5v/yHXACjzb
+         ndzkGHWfBfOcC9xCxRyE+AVDiubjJZuPMIpSyttUT81SYix85GU8W5mOFJR+meuzXsSK
+         mheN4g1J1Fuw9uOi181c+KYQ960M6PSSxmzyut8lC4mULgENWxrwZdX5X1ra7dwT8qWs
+         JZ4EU96iCUGvmvEQDBv5Bz3zwdH7IEJrhVmpWjLwkY8CT/d6QmmXkfnkiqygSIK95s8U
+         fA8zpV2aLPVzaDgWLDXXJWLk07Q4liNaL5qJLChpHrp01dOhx++eo2Yd2acD0kV6d7Bj
+         +1LA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=FQBQ5GV6gdxpV3LZ1YIPdhUG1JWyAiTVUj8IYWvvfMw=;
-        b=RliwSdEK9Q781q3pwp9IUFu//4TKSBZK2Xdbbm2u17I3VV8YRj5+ivrCdf76WNMgBd
-         S9tvhIHWW+R43ldJGKuv9tStcepmfoGJIJIIUosBPxRQK09R895nMM4qS7Ns+RjXm1ys
-         P6KCxAJu19SWgg4Nb6NihCvWq6Ak1+X7NTcebnef0SFzuIyuEKVJFM8CcB+w3jeB3srv
-         AqffspsXai+nUMmv1aIZTW3PkDq13FA2UMyMtDc2lHxmu8ZeTBAIoeZxd/MrMa2UrmYS
-         VMeLxIZe88sR0yac6fe83RI9btOj5tsuZmUfvx72Z0AY8fU1x1+wF9LDJCFtz/UMOIEX
-         UiLQ==
-X-Gm-Message-State: AOAM530KuV5oj3iSU2YXfuHq9bCKD+YJvorb5mjJBGsYVgQGf4yXq8le
-        3N2AKu74jALZP5lklouKeKCHLip/LEOtXeyJo16hv50Htl1X86tQVaqIZDm9subAflYnB1PO6uJ
-        6+ThJx/jhbAF6
-X-Received: by 2002:adf:ce0e:: with SMTP id p14mr551581wrn.423.1636563814649;
-        Wed, 10 Nov 2021 09:03:34 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyrsIiuV6DLoUx3vhu7fe0Z8vzAwRCp5SwwfYqbhWvnsnUeDV0lvT6ihmH7onVoe32Y3qScgA==
-X-Received: by 2002:adf:ce0e:: with SMTP id p14mr551532wrn.423.1636563814405;
-        Wed, 10 Nov 2021 09:03:34 -0800 (PST)
-Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id p2sm6723185wmq.23.2021.11.10.09.03.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Nov 2021 09:03:33 -0800 (PST)
-Subject: Re: [PATCH v4 04/15] KVM: x86: Use generic async PF slot management
-To:     Gavin Shan <gshan@redhat.com>, kvmarm@lists.cs.columbia.edu
-Cc:     kvm@vger.kernel.org, maz@kernel.org, linux-kernel@vger.kernel.org,
-        shan.gavin@gmail.com, Jonathan.Cameron@huawei.com,
-        pbonzini@redhat.com, vkuznets@redhat.com, will@kernel.org
-References: <20210815005947.83699-1-gshan@redhat.com>
- <20210815005947.83699-5-gshan@redhat.com>
-From:   Eric Auger <eauger@redhat.com>
-Message-ID: <a3b0e70a-eddd-9a85-2c9c-ba5446ac542b@redhat.com>
-Date:   Wed, 10 Nov 2021 18:03:30 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=WhfnS5vDybFADKwJoIkInKN8uBvc9V9SVt1xhdhXjr0=;
+        b=XRSJGXRM1oGIa1Ant9g7ZB7iDhSGMhzaM6PYZbMbremDrt5XksX+zf/E2g1LxSr+Yw
+         QybKj36y914Y+55pDJdMcALscgH6xzDi7exb1OFNtY3GGqXFwq6Q9EPxQZgdAlLkUXC+
+         a00S6AWvBBbMF3+8K9XpLx4zmRPcq/1YYTpvkcHZvqBJdF3kfa+VhED7iAni4EOIb63N
+         F1EHYrf+Lg3n7D6UXuX5xD244wM/qZ5UsnZeJb2U5v5KjrzNFRtmNTUMmPRr3Ca0PO1C
+         6fjdgdUZ4EYbzO86JV6w0J7iYiY9C2jaY2OTI4ZhSEpAebB5K5NMk9DnGix+1QwAJ4zB
+         OjJg==
+X-Gm-Message-State: AOAM533GatAedhglE3iNNiiXoq8rSh64IJe81ESOkhGxP4s9PHBiS1bx
+        u90F7d0avLC7qWQv3ri5dR5XJw==
+X-Google-Smtp-Source: ABdhPJwhlqd0soHh6LmSwzTPlDK9wZquvzpB+xZU0CYE7gLNQcVlsfWVdAmcmt/nfMFmMqlxKdot7w==
+X-Received: by 2002:a17:902:7fc5:b0:143:6d84:88eb with SMTP id t5-20020a1709027fc500b001436d8488ebmr237200plb.61.1636564878541;
+        Wed, 10 Nov 2021 09:21:18 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id l21sm237004pfu.213.2021.11.10.09.21.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Nov 2021 09:21:16 -0800 (PST)
+Date:   Wed, 10 Nov 2021 17:21:12 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        Joerg Roedel <joro@8bytes.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>
+Subject: Re: [PATCH 3/3] KVM: x86/mmu: don't skip mmu initialization when mmu
+ root level changes
+Message-ID: <YYv/iH4M7vzmcj5u@google.com>
+References: <20211110100018.367426-1-mlevitsk@redhat.com>
+ <20211110100018.367426-4-mlevitsk@redhat.com>
+ <87r1bom5h3.fsf@vitty.brq.redhat.com>
+ <18d77c7a10f283848c4efe0370401c436869f3a2.camel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20210815005947.83699-5-gshan@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <18d77c7a10f283848c4efe0370401c436869f3a2.camel@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Gavin,
+On Wed, Nov 10, 2021, Maxim Levitsky wrote:
+> On Wed, 2021-11-10 at 15:48 +0100, Vitaly Kuznetsov wrote:
+> > Maxim Levitsky <mlevitsk@redhat.com> writes:
+> > 
+> > > When running mix of 32 and 64 bit guests, it is possible to have mmu
+> > > reset with same mmu role but different root level (32 bit vs 64 bit paging)
 
-On 8/15/21 2:59 AM, Gavin Shan wrote:
-> This uses the generic slot management mechanism for asynchronous
-Now we have moved the hash table management in the generic code, Use
-this latter ...
-> page fault by enabling CONFIG_KVM_ASYNC_PF_SLOT because the private
-> implementation is totally duplicate to the generic one.
-> 
-> The changes introduced by this is pretty mechanical and shouldn't
-> cause any logical changes.
-suggest: No functional change intended.
-> 
-> Signed-off-by: Gavin Shan <gshan@redhat.com>
-> ---
->  arch/x86/include/asm/kvm_host.h |  2 -
->  arch/x86/kvm/Kconfig            |  1 +
->  arch/x86/kvm/mmu/mmu.c          |  2 +-
->  arch/x86/kvm/x86.c              | 86 +++------------------------------
->  4 files changed, 8 insertions(+), 83 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 974cbfb1eefe..409c1e7137cd 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -810,7 +810,6 @@ struct kvm_vcpu_arch {
->  
->  	struct {
->  		bool halted;
-> -		gfn_t gfns[ASYNC_PF_PER_VCPU];
->  		struct gfn_to_hva_cache data;
->  		u64 msr_en_val; /* MSR_KVM_ASYNC_PF_EN */
->  		u64 msr_int_val; /* MSR_KVM_ASYNC_PF_INT */
-> @@ -1878,7 +1877,6 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu,
->  			       struct kvm_async_pf *work);
->  void kvm_arch_async_page_present_queued(struct kvm_vcpu *vcpu);
->  bool kvm_arch_can_dequeue_async_page_present(struct kvm_vcpu *vcpu);
-> -extern bool kvm_find_async_pf_gfn(struct kvm_vcpu *vcpu, gfn_t gfn);
->  
->  int kvm_skip_emulated_instruction(struct kvm_vcpu *vcpu);
->  int kvm_complete_insn_gp(struct kvm_vcpu *vcpu, int err);
-> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-> index ac69894eab88..53a6ef30b6ee 100644
-> --- a/arch/x86/kvm/Kconfig
-> +++ b/arch/x86/kvm/Kconfig
-> @@ -32,6 +32,7 @@ config KVM
->  	select HAVE_KVM_IRQ_ROUTING
->  	select HAVE_KVM_EVENTFD
->  	select KVM_ASYNC_PF
-> +	select KVM_ASYNC_PF_SLOT
->  	select USER_RETURN_NOTIFIER
->  	select KVM_MMIO
->  	select SCHED_INFO
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index c4f4fa23320e..cd8aaa662ac2 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -3799,7 +3799,7 @@ static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
->  
->  	if (!prefault && kvm_can_do_async_pf(vcpu)) {
->  		trace_kvm_try_async_get_page(cr2_or_gpa, gfn);
-> -		if (kvm_find_async_pf_gfn(vcpu, gfn)) {
-> +		if (kvm_async_pf_find_slot(vcpu, gfn)) {
->  			trace_kvm_async_pf_doublefault(cr2_or_gpa, gfn);
->  			kvm_make_request(KVM_REQ_APF_HALT, vcpu);
->  			return true;
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 7f35d9324b99..a5f7d6122178 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -332,13 +332,6 @@ static struct kmem_cache *kvm_alloc_emulator_cache(void)
->  
->  static int emulator_fix_hypercall(struct x86_emulate_ctxt *ctxt);
->  
-> -static inline void kvm_async_pf_hash_reset(struct kvm_vcpu *vcpu)
-> -{
-> -	int i;
-> -	for (i = 0; i < ASYNC_PF_PER_VCPU; i++)
-> -		vcpu->arch.apf.gfns[i] = ~0;
-> -}
-> -
->  static void kvm_on_user_return(struct user_return_notifier *urn)
->  {
->  	unsigned slot;
-> @@ -854,7 +847,7 @@ void kvm_post_set_cr0(struct kvm_vcpu *vcpu, unsigned long old_cr0, unsigned lon
->  {
->  	if ((cr0 ^ old_cr0) & X86_CR0_PG) {
->  		kvm_clear_async_pf_completion_queue(vcpu);
-> -		kvm_async_pf_hash_reset(vcpu);
-> +		kvm_async_pf_reset_slot(vcpu);
->  	}
->  
->  	if ((cr0 ^ old_cr0) & KVM_MMU_CR0_ROLE_BITS)
-> @@ -3118,7 +3111,7 @@ static int kvm_pv_enable_async_pf(struct kvm_vcpu *vcpu, u64 data)
->  
->  	if (!kvm_pv_async_pf_enabled(vcpu)) {
->  		kvm_clear_async_pf_completion_queue(vcpu);
-> -		kvm_async_pf_hash_reset(vcpu);
-> +		kvm_async_pf_reset_slot(vcpu);
->  		return 0;
->  	}
->  
-> @@ -10704,7 +10697,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->  
->  	vcpu->arch.pat = MSR_IA32_CR_PAT_DEFAULT;
->  
-> -	kvm_async_pf_hash_reset(vcpu);
-> +	kvm_async_pf_reset_slot(vcpu);
->  	kvm_pmu_init(vcpu);
->  
->  	vcpu->arch.pending_external_vector = -1;
-> @@ -10828,7 +10821,7 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
->  	kvmclock_reset(vcpu);
->  
->  	kvm_clear_async_pf_completion_queue(vcpu);
-> -	kvm_async_pf_hash_reset(vcpu);
-> +	kvm_async_pf_reset_slot(vcpu);
->  	vcpu->arch.apf.halted = false;
->  
->  	if (vcpu->arch.guest_fpu && kvm_mpx_supported()) {
-> @@ -11737,73 +11730,6 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
->  	kvm_mmu_do_page_fault(vcpu, work->cr2_or_gpa, 0, true);
->  }
->  
-> -static inline u32 kvm_async_pf_hash_fn(gfn_t gfn)
-> -{
-> -	BUILD_BUG_ON(!is_power_of_2(ASYNC_PF_PER_VCPU));
-> -
-> -	return hash_32(gfn & 0xffffffff, order_base_2(ASYNC_PF_PER_VCPU));
-> -}
-> -
-> -static inline u32 kvm_async_pf_next_probe(u32 key)
-> -{
-> -	return (key + 1) & (ASYNC_PF_PER_VCPU - 1);
-> -}
-> -
-> -static void kvm_add_async_pf_gfn(struct kvm_vcpu *vcpu, gfn_t gfn)
-> -{
-> -	u32 key = kvm_async_pf_hash_fn(gfn);
-> -
-> -	while (vcpu->arch.apf.gfns[key] != ~0)
-> -		key = kvm_async_pf_next_probe(key);
-> -
-> -	vcpu->arch.apf.gfns[key] = gfn;
-> -}
-> -
-> -static u32 kvm_async_pf_gfn_slot(struct kvm_vcpu *vcpu, gfn_t gfn)
-> -{
-> -	int i;
-> -	u32 key = kvm_async_pf_hash_fn(gfn);
-> -
-> -	for (i = 0; i < ASYNC_PF_PER_VCPU &&
-> -		     (vcpu->arch.apf.gfns[key] != gfn &&
-> -		      vcpu->arch.apf.gfns[key] != ~0); i++)
-> -		key = kvm_async_pf_next_probe(key);
-> -
-> -	return key;
-> -}
-> -
-> -bool kvm_find_async_pf_gfn(struct kvm_vcpu *vcpu, gfn_t gfn)
-> -{
-> -	return vcpu->arch.apf.gfns[kvm_async_pf_gfn_slot(vcpu, gfn)] == gfn;
-> -}
-> -
-> -static void kvm_del_async_pf_gfn(struct kvm_vcpu *vcpu, gfn_t gfn)
-> -{
-> -	u32 i, j, k;
-> -
-> -	i = j = kvm_async_pf_gfn_slot(vcpu, gfn);
-> -
-> -	if (WARN_ON_ONCE(vcpu->arch.apf.gfns[i] != gfn))
-> -		return;
-> -
-> -	while (true) {
-> -		vcpu->arch.apf.gfns[i] = ~0;
-> -		do {
-> -			j = kvm_async_pf_next_probe(j);
-> -			if (vcpu->arch.apf.gfns[j] == ~0)
-> -				return;
-> -			k = kvm_async_pf_hash_fn(vcpu->arch.apf.gfns[j]);
-> -			/*
-> -			 * k lies cyclically in ]i,j]
-> -			 * |    i.k.j |
-> -			 * |....j i.k.| or  |.k..j i...|
-> -			 */
-> -		} while ((i <= j) ? (i < k && k <= j) : (i < k || k <= j));
-> -		vcpu->arch.apf.gfns[i] = vcpu->arch.apf.gfns[j];
-> -		i = j;
-> -	}
-> -}
-> -
->  static inline int apf_put_user_notpresent(struct kvm_vcpu *vcpu)
->  {
->  	u32 reason = KVM_PV_REASON_PAGE_NOT_PRESENT;
-> @@ -11867,7 +11793,7 @@ bool kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
->  	struct x86_exception fault;
->  
->  	trace_kvm_async_pf_not_present(work->arch.token, work->cr2_or_gpa);
-> -	kvm_add_async_pf_gfn(vcpu, work->arch.gfn);
-> +	kvm_async_pf_add_slot(vcpu, work->arch.gfn);
->  
->  	if (kvm_can_deliver_async_pf(vcpu) &&
->  	    !apf_put_user_notpresent(vcpu)) {
-> @@ -11904,7 +11830,7 @@ void kvm_arch_async_page_present(struct kvm_vcpu *vcpu,
->  	if (work->wakeup_all)
->  		work->arch.token = ~0; /* broadcast wakeup */
->  	else
-> -		kvm_del_async_pf_gfn(vcpu, work->arch.gfn);
-> +		kvm_async_pf_remove_slot(vcpu, work->arch.gfn);
->  	trace_kvm_async_pf_ready(work->arch.token, work->cr2_or_gpa);
->  
->  	if ((work->wakeup_all || work->notpresent_injected) &&
-> 
-Looks good to me
+Hmm, no, it's far more nuanced than just "running a mix of 32 and 64 bit guests".
+The changelog needs a much more in-depth explanation of exactly what and how
+things go awry.  I suspect that whatever bug is being hit is unique to the
+migration path.
 
-Eric
+This needs a Fixes and Cc: stable@vger.kernel.org, but which commit is fixed is
+TBD.
 
+Simply running 32 and 64 bit guests is not sufficient to cause problems.  In
+that case, they are different VMs entirely, where as the MMU context is per-vCPU.
+So at minimum, this require running a mix of 32-bit and 64-bit _nested_ guests.
+
+But even that isn't sufficient.  Ignoring migration for the moment:
+
+  a) If shadow paging is enabled in L0, then EFER.LMA is captured in
+     kvm_mmu_page_role.level.  Ergo this flaw doesn't affect legacy shadow paging.
+
+  b) If EPT is enabled in L0 _and_ L1, kvm_mmu_page_role.level tracks L1's EPT
+     level.  Ergo, this flaw doesn't affect nested EPT.
+
+  c) If NPT is enabled in L0 _and_ L1, then this flaw can does apply as
+     kvm_mmu_page_role.level tracks L0's NPT level, which does not incorporate
+     L1's NPT level because of the limitations of NPT.  But the cover letter
+     states these bugs are specific to VMX.  I suspect that's incorrect and that
+     in theory this particular bug does apply to SVM, but that it hasn't been
+     hit due to not running with nNPT and both 32-bit and 64-bit L2s on a single
+     vCPU.
+
+  d) If TDP is enabled in L0 but _not_ L1, then L1 and L2 share an MMU context,
+     and that context is guaranteed to be reset on every nested transition due
+     to kvm_mmu_page_role.guest_mode.  Ergo this flaw doesn't affect this combo
+     since it's impossible to switch between two L2 vCPUs on a single L1 vCPU
+     without a context reset.
+
+The cover letter says:
+
+  The second issue is that L2 IA32_EFER makes L1's mmu be initialized incorrectly
+  (with PAE paging). This itself isn't an immediate problem as we are going into the L2,
+  but when we exit it, we don't reset the L1's mmu back to 64 bit mode because,
+  It so happens that the mmu role doesn't change and the 64 bitness isn't part of the mmu role.
+
+But that should be impossible because of kvm_mmu_page_role.guest_mode.  If that
+doesn't trigger a reset, then presumably is_guest_mode() is stale?
+
+Regarding (c), I believe this can be hit by running a 32-bit L2 and 64-bit L2 on
+SVM with nNPT.  I don't think that's a combination I've tested much, if at all.
+
+Regarding (d), I believe the bug can rear its head if guest state is stuffed
+via KVM_SET_SREGS{2}.  kvm_mmu_reset_context() will re-init the MMU, but it
+doesn't purge the previous context.  I.e. the assumption that a switch between
+"two" L2s can be broken.
+
+> > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > > ---
+> > >  arch/x86/kvm/mmu/mmu.c | 14 ++++++++++----
+> > >  1 file changed, 10 insertions(+), 4 deletions(-)
+> > > 
+> > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > > index 354d2ca92df4d..763867475860f 100644
+> > > --- a/arch/x86/kvm/mmu/mmu.c
+> > > +++ b/arch/x86/kvm/mmu/mmu.c
+> > > @@ -4745,7 +4745,10 @@ static void init_kvm_tdp_mmu(struct kvm_vcpu *vcpu)
+> > >  	union kvm_mmu_role new_role =
+> > >  		kvm_calc_tdp_mmu_root_page_role(vcpu, &regs, false);
+> > >  
+> > > -	if (new_role.as_u64 == context->mmu_role.as_u64)
+> > > +	u8 new_root_level = role_regs_to_root_level(&regs);
+> > > +
+> > > +	if (new_role.as_u64 == context->mmu_role.as_u64 &&
+> > > +	    context->root_level == new_root_level)
+> > >  		return;
+> > 
+> > role_regs_to_root_level() uses 3 things: CR0.PG, EFER.LMA and CR4.PAE
+> > and two of these three are already encoded into extended mmu role
+> > (kvm_calc_mmu_role_ext()). Could we achieve the same result by adding
+> > EFER.LMA there?
+> 
+> Absolutely. I just wanted your feedback on this to see if there is any reason
+> to not do this.
+
+Assuming my assessment above is correct, incorporating EFER.LMA into the
+extended role is the correct fix.  That will naturally do the right thing for
+nested EPT in the sense that kvm_calc_shadow_ept_root_page_role() will ignore
+EFER.LMA entirely.
+
+> Also it seems that only basic role is compared here.
+
+No, it's the full role.  "as_u64" is the overlay for the combined base+ext.
+
+union kvm_mmu_role {
+	u64 as_u64;
+	struct {
+		union kvm_mmu_page_role base;
+		union kvm_mmu_extended_role ext;
+	};
+};
+
+> I don't 100% know the reason why we have basic and extended roles - there is a
+> comment about basic/extended mmu role to minimize the size of arch.gfn_track,
+> but I haven't yet studied in depth why.
+
+The "base" role is used to identify which individual shadow pages are compatible
+with the current shadow/TDP paging context.  Using TDP as an example, KVM can
+reuse SPs at the correct level regardless of guest LA57.  The gfn_track thing
+tracks ever SP in existence for a given gfn.  To minimize the number of possible
+SPs, and thus minimize the storage capacity needed for gfn_track, the "base" role
+is kept as tiny as possible.
+
+> > >  	context->mmu_role.as_u64 = new_role.as_u64;
+> > > @@ -4757,7 +4760,7 @@ static void init_kvm_tdp_mmu(struct kvm_vcpu *vcpu)
+> > >  	context->get_guest_pgd = get_cr3;
+> > >  	context->get_pdptr = kvm_pdptr_read;
+> > >  	context->inject_page_fault = kvm_inject_page_fault;
+> > > -	context->root_level = role_regs_to_root_level(&regs);
+> > > +	context->root_level = new_root_level;
+> > >  
+> > >  	if (!is_cr0_pg(context))
+> > >  		context->gva_to_gpa = nonpaging_gva_to_gpa;
+> > > @@ -4806,7 +4809,10 @@ static void shadow_mmu_init_context(struct kvm_vcpu *vcpu, struct kvm_mmu *conte
+> > >  				    struct kvm_mmu_role_regs *regs,
+> > >  				    union kvm_mmu_role new_role)
+> > >  {
+> > > -	if (new_role.as_u64 == context->mmu_role.as_u64)
+> > > +	u8 new_root_level = role_regs_to_root_level(regs);
+> > > +
+> > > +	if (new_role.as_u64 == context->mmu_role.as_u64 &&
+> > > +	    context->root_level == new_root_level)
+
+Doesn't matter if EFER.LMA is added to the role, but this extra check shouldn't
+be necessary for shadow paging as LMA is factored into role.base.level in that
+case.  TDP is problematic because role.base.level holds the TDP root level, which
+doesn't depend on guest.EFER.LMA.
+
+Nested EPT is also ok because shadow_root_level == root_level in that case.
+
+> > >  		return;
+> > >  
+> > >  	context->mmu_role.as_u64 = new_role.as_u64;
+> > > @@ -4817,8 +4823,8 @@ static void shadow_mmu_init_context(struct kvm_vcpu *vcpu, struct kvm_mmu *conte
+> > >  		paging64_init_context(context);
+> > >  	else
+> > >  		paging32_init_context(context);
+> > > -	context->root_level = role_regs_to_root_level(regs);
+> > >  
+> > > +	context->root_level = new_root_level;
+> > >  	reset_guest_paging_metadata(vcpu, context);
+> > >  	context->shadow_root_level = new_role.base.level;
+> 
+> 
