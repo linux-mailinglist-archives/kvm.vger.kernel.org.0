@@ -2,248 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3951544CAAC
-	for <lists+kvm@lfdr.de>; Wed, 10 Nov 2021 21:33:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 342C044CB37
+	for <lists+kvm@lfdr.de>; Wed, 10 Nov 2021 22:20:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232734AbhKJUgU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Nov 2021 15:36:20 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:29576 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S232195AbhKJUgT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 10 Nov 2021 15:36:19 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1AAKHHO7030585;
-        Wed, 10 Nov 2021 20:33:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=6KbIXiLRJmyt0fsQNO6TkuxA2HkoQKC/dV0ie44YzAk=;
- b=MY40PGud4Z0HpqWq8oJFShGZZK/ydTq03q3RVAeIOXzfJJ6aU5rLyMaZZD3fel45w/JR
- hKaan8A4L5cZSqPCuDZ0mswv53Jho6+MZIXLmyGqQP1vLPHxlj6x9ZoHrInWnAQMCdKL
- mNNnBpV3zr9ADiEIP6fRRFtfPXvWgMyr7L5z+dx/qIPG7B4fJCxBLWUiZi8rDFKyAvxU
- S+HO5TDAEoy82t35eGOC7rP0Tpy660NFUax0ZcK+yLCwWHkmXZbrIv1CPMwiZfnRMmKR
- xBC+tR/k/4mEqheFctGwhVRVOxGdgKRc0yKIwmwLA27eGpT8VdjECXid05g+Z8TSOkb0 EA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3c8n00rane-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 10 Nov 2021 20:33:30 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1AAKHCjx030453;
-        Wed, 10 Nov 2021 20:33:30 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3c8n00ramx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 10 Nov 2021 20:33:30 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1AAKUKVD015914;
-        Wed, 10 Nov 2021 20:33:28 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma02fra.de.ibm.com with ESMTP id 3c5hb9va04-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 10 Nov 2021 20:33:28 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1AAKXPuh54133030
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 10 Nov 2021 20:33:25 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 29AF74203F;
-        Wed, 10 Nov 2021 20:33:25 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 132DD4204B;
-        Wed, 10 Nov 2021 20:33:25 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Wed, 10 Nov 2021 20:33:25 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
-        id B02A7E03A2; Wed, 10 Nov 2021 21:33:24 +0100 (CET)
-From:   Eric Farman <farman@linux.ibm.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>
-Cc:     Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, Eric Farman <farman@linux.ibm.com>
-Subject: [RFC PATCH v3 2/2] KVM: s390: Extend the USER_SIGP capability
-Date:   Wed, 10 Nov 2021 21:33:22 +0100
-Message-Id: <20211110203322.1374925-3-farman@linux.ibm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20211110203322.1374925-1-farman@linux.ibm.com>
-References: <20211110203322.1374925-1-farman@linux.ibm.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: KAPIjQ_KfVkcFAOC3w14PBAzaSNEPElg
-X-Proofpoint-ORIG-GUID: odu7gxdH_n6cV5siOCflBy-e-Sh1KDaI
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-11-10_13,2021-11-08_02,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- phishscore=0 malwarescore=0 clxscore=1015 mlxscore=0 priorityscore=1501
- spamscore=0 adultscore=0 suspectscore=0 impostorscore=0 mlxlogscore=999
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2111100098
+        id S233433AbhKJVW7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Nov 2021 16:22:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51148 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233434AbhKJVW4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Nov 2021 16:22:56 -0500
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8C52C061766
+        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 13:20:06 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id h62-20020a25a544000000b005c5d9b06e57so5928629ybi.6
+        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 13:20:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=mpoSypm/slJD1LNgKUFtixX1m5JXkGVzyzCFlMc0bmU=;
+        b=Ctozo/aeEoEn4s+WiskNc0i5I1ufyPkFuAOcNdaUBxhul5t9/FmhTHOTUqGQeoFcAO
+         Y5e+WqDsyDAp0aFmw/Tt8aiu9WkQ6sJur8dr57F5ZxXAneTTeFf2NcHUCrg9/RF61HX4
+         F2RYdbbuyE2es/Kl7CYm9g45HiZiyjFwG7rynpyv3yZQ40DLNdh5ag1/rTXYy9p2z5Py
+         xwhNZJGVx+4o9iiUcOBvMRDobiwwBa3dr74hz7GszVOnMUTPSut1gpkR1yyk/osdaNJv
+         /Zjm2YfKyfdONBCpzDdngwubfCIwPKDFuucL/39nZC49S7yUwUN205eXyx5fkV1UIMNU
+         giiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=mpoSypm/slJD1LNgKUFtixX1m5JXkGVzyzCFlMc0bmU=;
+        b=qI7diaU2MZWKWdH2eiTa237ShlLy6xDzGIA814HOcFXJiJqdZed456NK8mVpjSckwd
+         0K8hnKlVGB+g5k+aJBG1xdbpU29S9talvmcSMDfmAAD6o34rhJZJVUXjEbQB39d9F8ST
+         GjJ5l1GZ6njaQSY/5X7YXNyXJ9mxoXgxhD4TRMCgDpmTtWt/8f3SEGnKDfmfmk3LatcO
+         fqlx10Av8FW5tDikhyQXYoGfkYT7rGFR+YDSEyp4WmpF5DC0BIXCtyaNOrQKT05PHU9Z
+         PNCSaOcfc+Do1WUOf3WkB1DKcLrvhnItqQPDJPMxCFMYRHoIv7sAanKPJ8b8Nf1N4SZO
+         mIHw==
+X-Gm-Message-State: AOAM530VXd4vTlEMTFe3o4cQp70FFEzevAeCNm8MZ4b8kkrusLrYAyck
+        5ILwpgRZDh6wNskiocuri8KY/YRl5sKnHspzcPvCRE5BFaZkFHUf1ZwDRo5bkrflx3lBIBjVnSa
+        l1cbmsNpBcr1xpDYSWl8YxKzY9lId0CxNSo5L+NTre51fKA/ZxZ7jX35BPS68nG6CtVlS
+X-Google-Smtp-Source: ABdhPJyep1VzL1Gy0TpFupm8xlRry392a+l/2YQMVOSHaaZVA097o0aYKAeCOUUihYgSJwmHpUqz93OyHR9WWW+G
+X-Received: from aaronlewis.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2675])
+ (user=aaronlewis job=sendgmr) by 2002:a25:db45:: with SMTP id
+ g66mr2733708ybf.243.1636579205989; Wed, 10 Nov 2021 13:20:05 -0800 (PST)
+Date:   Wed, 10 Nov 2021 21:19:47 +0000
+Message-Id: <20211110212001.3745914-1-aaronlewis@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.34.0.rc1.387.gb447b232ab-goog
+Subject: [kvm-unit-tests PATCH 00/14] Run access test in an L2 guest
+From:   Aaron Lewis <aaronlewis@google.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
+        Aaron Lewis <aaronlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-With commit 2444b352c3ac ("KVM: s390: forward most SIGP orders to user
-space") we have a capability that allows the "fast" SIGP orders (as
-defined by the Programming Notes for the SIGNAL PROCESSOR instruction in
-the Principles of Operation) to be handled in-kernel, while all others are
-sent to userspace for processing.
+The motivation behind this change is to test the routing logic when an
+exception occurs in an L2 guest and ensure the exception goes to the
+correct place.  For example, if an exception occurs in L2, does L1 want
+to get involved, or L0, or do niether of them care about it and leave
+it to L2 to handle.  Test that the exception doesn't end up going to L1
+When L1 didn't ask for it.  This was occurring before commit 18712c13709d
+("KVM: nVMX: Use vmx_need_pf_intercept() when deciding if L0 wants a #PF")
+fixed the issue.  Without that fix, running
+vmx_pf_exception_test_reduced_maxphyaddr with allow_smaller_maxphyaddr=Y
+would have resulted in the test failing with the following error:
 
-This works fine but it creates a situation when, for example, a SIGP SENSE
-might return CC1 (STATUS STORED, and status bits indicating the vcpu is
-stopped), when in actuality userspace is still processing a SIGP STOP AND
-STORE STATUS order, and the vcpu is not yet actually stopped. Thus, the
-SIGP SENSE should actually be returning CC2 (busy) instead of CC1.
+x86/vmx_tests.c:10698: assert failed: false: Unexpected exit to L1,
+exit_reason: VMX_EXC_NMI (0x0)
 
-To fix this, add another CPU capability, dependent on the USER_SIGP one,
-and two associated IOCTLs. One IOCTL will be used by userspace to mark a
-vcpu "busy" processing a SIGP order, and cause concurrent orders handled
-in-kernel to be returned with CC2 (busy). Another IOCTL will be used by
-userspace to mark the SIGP "finished", and the vcpu free to process
-additional orders.
+This series only tests the routing logic for #PFs.  A future
+series will address other exceptions, however, getting #PF testing in
+place is a big enough chunk that the other exceptions will be submitted
+seperately (in a future series).
 
-Signed-off-by: Eric Farman <farman@linux.ibm.com>
----
- arch/s390/include/asm/kvm_host.h |  2 ++
- arch/s390/kvm/kvm-s390.c         | 29 +++++++++++++++++++++++++++++
- arch/s390/kvm/kvm-s390.h         | 16 ++++++++++++++++
- arch/s390/kvm/sigp.c             | 10 ++++++++++
- 4 files changed, 57 insertions(+)
+This series is dependant on Paolo's changes (inlcuded). Without them,
+running ac_test_run() on one of the userspace test fails.  Of note:  the
+commit ("x86: get rid of ring0stacktop") has been updated to include a fix
+for a compiler error to get it building on clang.
 
-diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-index a604d51acfc8..c93271557de3 100644
---- a/arch/s390/include/asm/kvm_host.h
-+++ b/arch/s390/include/asm/kvm_host.h
-@@ -748,6 +748,7 @@ struct kvm_vcpu_arch {
- 	bool skey_enabled;
- 	struct kvm_s390_pv_vcpu pv;
- 	union diag318_info diag318_info;
-+	atomic_t sigp_busy;
- };
- 
- struct kvm_vm_stat {
-@@ -941,6 +942,7 @@ struct kvm_arch{
- 	int user_sigp;
- 	int user_stsi;
- 	int user_instr0;
-+	int user_sigp_busy;
- 	struct s390_io_adapter *adapters[MAX_S390_IO_ADAPTERS];
- 	wait_queue_head_t ipte_wq;
- 	int ipte_lock_count;
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 5f52e7eec02f..06d188dd2c89 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -564,6 +564,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_S390_VCPU_RESETS:
- 	case KVM_CAP_SET_GUEST_DEBUG:
- 	case KVM_CAP_S390_DIAG318:
-+	case KVM_CAP_S390_USER_SIGP_BUSY:
- 		r = 1;
- 		break;
- 	case KVM_CAP_SET_GUEST_DEBUG2:
-@@ -706,6 +707,15 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
- 		kvm->arch.user_sigp = 1;
- 		r = 0;
- 		break;
-+	case KVM_CAP_S390_USER_SIGP_BUSY:
-+		r = -EINVAL;
-+		if (kvm->arch.user_sigp) {
-+			kvm->arch.user_sigp_busy = 1;
-+			r = 0;
-+		}
-+		VM_EVENT(kvm, 3, "ENABLE: CAP_S390_USER_SIGP_BUSY %s",
-+			 r ? "(not available)" : "(success)");
-+		break;
- 	case KVM_CAP_S390_VECTOR_REGISTERS:
- 		mutex_lock(&kvm->lock);
- 		if (kvm->created_vcpus) {
-@@ -4825,6 +4835,25 @@ long kvm_arch_vcpu_async_ioctl(struct file *filp,
- 			return -EINVAL;
- 		return kvm_s390_inject_vcpu(vcpu, &s390irq);
- 	}
-+	case KVM_S390_VCPU_SET_SIGP_BUSY: {
-+		int rc;
-+
-+		if (!vcpu->kvm->arch.user_sigp_busy)
-+			return -EFAULT;
-+
-+		rc = kvm_s390_vcpu_set_sigp_busy(vcpu);
-+		VCPU_EVENT(vcpu, 3, "SIGP: CPU %x set busy rc %x", vcpu->vcpu_id, rc);
-+
-+		return rc;
-+	}
-+	case KVM_S390_VCPU_RESET_SIGP_BUSY: {
-+		if (!vcpu->kvm->arch.user_sigp_busy)
-+			return -EFAULT;
-+
-+		VCPU_EVENT(vcpu, 3, "SIGP: CPU %x reset busy", vcpu->vcpu_id);
-+		kvm_s390_vcpu_clear_sigp_busy(vcpu);
-+		return 0;
-+	}
- 	}
- 	return -ENOIOCTLCMD;
- }
-diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
-index c07a050d757d..54371cede485 100644
---- a/arch/s390/kvm/kvm-s390.h
-+++ b/arch/s390/kvm/kvm-s390.h
-@@ -82,6 +82,22 @@ static inline int is_vcpu_idle(struct kvm_vcpu *vcpu)
- 	return test_bit(vcpu->vcpu_idx, vcpu->kvm->arch.idle_mask);
- }
- 
-+static inline bool kvm_s390_vcpu_is_sigp_busy(struct kvm_vcpu *vcpu)
-+{
-+	return (atomic_read(&vcpu->arch.sigp_busy) == 1);
-+}
-+
-+static inline bool kvm_s390_vcpu_set_sigp_busy(struct kvm_vcpu *vcpu)
-+{
-+	/* Return zero for success, or -EBUSY if another vcpu won */
-+	return (atomic_cmpxchg(&vcpu->arch.sigp_busy, 0, 1) == 0) ? 0 : -EBUSY;
-+}
-+
-+static inline void kvm_s390_vcpu_clear_sigp_busy(struct kvm_vcpu *vcpu)
-+{
-+	atomic_set(&vcpu->arch.sigp_busy, 0);
-+}
-+
- static inline int kvm_is_ucontrol(struct kvm *kvm)
- {
- #ifdef CONFIG_KVM_S390_UCONTROL
-diff --git a/arch/s390/kvm/sigp.c b/arch/s390/kvm/sigp.c
-index 5ad3fb4619f1..a37496ea6dfa 100644
---- a/arch/s390/kvm/sigp.c
-+++ b/arch/s390/kvm/sigp.c
-@@ -276,6 +276,10 @@ static int handle_sigp_dst(struct kvm_vcpu *vcpu, u8 order_code,
- 	if (!dst_vcpu)
- 		return SIGP_CC_NOT_OPERATIONAL;
- 
-+	if (kvm_s390_vcpu_is_sigp_busy(dst_vcpu)) {
-+		return SIGP_CC_BUSY;
-+	}
-+
- 	switch (order_code) {
- 	case SIGP_SENSE:
- 		vcpu->stat.instruction_sigp_sense++;
-@@ -411,6 +415,12 @@ int kvm_s390_handle_sigp(struct kvm_vcpu *vcpu)
- 	if (handle_sigp_order_in_user_space(vcpu, order_code, cpu_addr))
- 		return -EOPNOTSUPP;
- 
-+	/* Check the current vcpu, if it was a target from another vcpu */
-+	if (kvm_s390_vcpu_is_sigp_busy(vcpu)) {
-+		kvm_s390_set_psw_cc(vcpu, SIGP_CC_BUSY);
-+		return 0;
-+	}
-+
- 	if (r1 % 2)
- 		parameter = vcpu->run->s.regs.gprs[r1];
- 	else
+This series is also dependant on the commit ("x86: Look up the PTEs rather
+than assuming them").  This was sent out for review seperately, however,
+it is needed to get ac_test_run() running on a different cr3 than the one
+access_test runs on, so it is included here as well.  This is also v2 of
+that commit.  While preparing this series a review came in, so I just
+included the changes here.
+
+Paolo Bonzini (9):
+  x86: cleanup handling of 16-byte GDT descriptors
+  x86: fix call to set_gdt_entry
+  unify field names and definitions for GDT descriptors
+  replace tss_descr global with a function
+  x86: Move IDT to desc.c
+  x86: unify name of 32-bit and 64-bit GDT
+  x86: get rid of ring0stacktop
+  x86: Move 64-bit GDT and TSS to desc.c
+  x86: Move 32-bit GDT and TSS to desc.c
+
+Aaron Lewis (5):
+  x86: Look up the PTEs rather than assuming them (v2)
+  x86: Prepare access test for running in L2
+  x86: Fix tabs in access.c
+  x86: Clean up the global, page_table_levels, in access.c
+  x86: Add tests to run ac_test_run() in an L2 guest
+
+ lib/libcflat.h         |    1 +
+ lib/x86/asm/setup.h    |    6 +
+ lib/x86/desc.c         |  116 +++-
+ lib/x86/desc.h         |   31 +-
+ lib/x86/setup.c        |   49 ++
+ lib/x86/usermode.c     |    9 +-
+ lib/x86/vm.c           |   21 +
+ lib/x86/vm.h           |    3 +
+ x86/Makefile.common    |    4 +
+ x86/Makefile.x86_64    |    2 +-
+ x86/access.c           | 1447 ++++++++++++++++++++--------------------
+ x86/access.h           |    9 +
+ x86/access_test.c      |   20 +
+ x86/cstart.S           |  115 +---
+ x86/cstart64.S         |   98 +--
+ x86/flat.lds           |    1 +
+ x86/smap.c             |    2 +-
+ x86/svm_tests.c        |   15 +-
+ x86/taskswitch.c       |    4 +-
+ x86/umip.c             |   19 +-
+ x86/unittests.cfg      |   17 +-
+ x86/vmware_backdoors.c |   22 +-
+ x86/vmx.c              |   17 +-
+ x86/vmx_tests.c        |   53 +-
+ 24 files changed, 1080 insertions(+), 1001 deletions(-)
+ create mode 100644 lib/x86/asm/setup.h
+ create mode 100644 x86/access.h
+ create mode 100644 x86/access_test.c
+
 -- 
-2.25.1
+2.34.0.rc1.387.gb447b232ab-goog
 
