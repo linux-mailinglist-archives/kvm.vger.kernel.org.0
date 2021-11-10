@@ -2,130 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F62744C90F
-	for <lists+kvm@lfdr.de>; Wed, 10 Nov 2021 20:39:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2418C44C965
+	for <lists+kvm@lfdr.de>; Wed, 10 Nov 2021 20:48:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232935AbhKJTmF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Nov 2021 14:42:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56308 "EHLO
+        id S230451AbhKJTvP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Nov 2021 14:51:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232502AbhKJTmE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Nov 2021 14:42:04 -0500
-Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0C30C061766
-        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 11:39:16 -0800 (PST)
-Received: by mail-io1-xd2c.google.com with SMTP id c3so4151390iob.6
-        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 11:39:16 -0800 (PST)
+        with ESMTP id S230195AbhKJTvO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Nov 2021 14:51:14 -0500
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7F3CC061764
+        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 11:48:26 -0800 (PST)
+Received: by mail-pg1-x530.google.com with SMTP id s136so3165948pgs.4
+        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 11:48:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=3SMO6CvmxSEBfAp8KRqD5IqUtmLkFi+eG/hFeuiApP8=;
-        b=iWKXYgP9R3gSr4gDRcARv/crjntS2rM0iP2PE/LljM8uKwf0j1yR5MlUvbJg8d/xTD
-         +9yLepHT95qJ7Fwacjeek0WliLgYmr2VKtLQ9ZcbooDP5LgbMBUO2sBAdfbyeYUaa+LK
-         ingTWUTI0t/8h1OB4pQs1fkjtOkwdO5dPDRUS0BRal0usDL3P7Egah95an25GExQxmWj
-         99AZ1yLqaRMP4vpmsqNt+sonVhYvyYt+INZQeGJyoLrjVxOhMSiLA6yFPqTp6lzYqPm3
-         ZX2x5WB/AeJtabBly0XYS9Czdz1mB3cQsbTKS6XVMHzJFgRngnen5+dosoWpYFSOIre8
-         EAHg==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=qWWY/WFn1LBOS2/O0/NN84UY90autzk0HN9I5jipZ5A=;
+        b=TdtMLeoOs4YDDP9l/fDTv+mYOridUBpGzMra6tDgeLO2nGc3a/uuZBFtru6h2oRDo/
+         WIuFnpZTxPppVFkgZOgc2RaLFngZq+Gx4/NwhKP3P4y7S7YANx6F0zcwYfEWz+X1su3h
+         sY2T8/s/9S5yhC+BeiZvu1NadcxylBrH+SKDiQMd/41jQzs1cBGNwAeYhbrMvH84m5Vi
+         SZBWhWSs9llt6YiVjJzj57KKlFEl1WVqKU6lxkNpi8snMQKfHi+iTWiFHO6iEEp/dVDK
+         itA4dJe0iL4Ca7wB/4RjqQp733DyK0hDQP0pRFAfvUmRs7fXWa8/ls3eqwWqzV15CWMK
+         ntxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=3SMO6CvmxSEBfAp8KRqD5IqUtmLkFi+eG/hFeuiApP8=;
-        b=XVVoPugEgi4kYybMr//SWJTftFupZuUoOkaWtVkvKzp7CLZkKaCYPPvfOOxa/KlY/J
-         Sa0DXSZhHTNlr1Fmzb8Yp4CNVCYyikrnMpFwynToi0yq91UlB0oja7TWjKY6S88k1OiE
-         p/f1Ps21xh7uHSwl47i5chfS8AcG5SMdzZU/y0/oqFq4p/kRyZgCiSy95bXmTtvt5LW9
-         2KtOLiQQubA/r+s14lAxX3rwpIr3OJPlQaLaoifT+SS9BjfUKmw27thg5CgiRDB9NThT
-         PzkcT5pl7TnIjyjl0+gurk+jwWTTTC4IIKkR2olJfKektdXR6nC7lKIxiBGgskekcsJ/
-         mzpw==
-X-Gm-Message-State: AOAM531XB/Zfc/DrrDPEzPQRhAWUVF5zgKqEvRxgqp+0aESZ5jBkZJrd
-        yRUsyhOtHcIFHNvyO4jeom4nmbsNWJLt1YPgkqe4Cg==
-X-Google-Smtp-Source: ABdhPJwVnD0vAGqngGi1Bc5alFWYVWNyYEvf9pOTUc2f5EnygsxhdxmMwhBXDb8EVLNsL6FIhsyRL5X672qOA8Iglpo=
-X-Received: by 2002:a6b:2cc5:: with SMTP id s188mr1078380ios.218.1636573155950;
- Wed, 10 Nov 2021 11:39:15 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=qWWY/WFn1LBOS2/O0/NN84UY90autzk0HN9I5jipZ5A=;
+        b=UhIARL913RRBBouZW+YYDOUx1p0b8JHZNHr6+o6We6bfD0uZ4nnrB5ht6RIRZKNOFE
+         jlaJ+de5ctX/olkwtGrI792riVhTwYdAN7AisQIqvuQzxrV+kl8SlAKa4LsuAtmKDJpq
+         c1ecadjn3Nn3b3WIjZP3kqEoXEKc8UgUjR8GMVZZv/l7DUVBalsCNhYWL1fxI/yrNB9l
+         z6zXzeAbp7c+nsR77qjPkhnf2JtmLSUDfYavtL0Bm0diD/dSJ8Eussp8Jp7S3gKF7DxM
+         bk/QCZXVqZL3eHed0jDvyj999id/aXSY5gbV9raTpc43161UNRYX8dr17gs0WfA4T7/4
+         VbAQ==
+X-Gm-Message-State: AOAM532BKWNCIOjC19Fp9vptdDjEwg/rQUWTMPf6khKkgaylyY9OZ7vI
+        +ROry1EseZA9edGbbt8R5dR5jQ==
+X-Google-Smtp-Source: ABdhPJzC5p22wmi8/04JU3OHJvwZiRpWURdZ0hDXX9GmLLjx79g6w1p1MV8F3X+/3ntVGIcAw0a+HQ==
+X-Received: by 2002:a05:6a00:1a43:b0:49f:ef23:a358 with SMTP id h3-20020a056a001a4300b0049fef23a358mr1686299pfv.50.1636573705988;
+        Wed, 10 Nov 2021 11:48:25 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id u38sm504559pfg.0.2021.11.10.11.48.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Nov 2021 11:48:25 -0800 (PST)
+Date:   Wed, 10 Nov 2021 19:48:21 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
+        pbonzini@redhat.com, joro@8bytes.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, peterz@infradead.org,
+        hpa@zytor.com, thomas.lendacky@amd.com, jon.grimm@amd.com
+Subject: Re: [PATCH 2/2] KVM: SVM: Extend host physical APIC ID field to
+ support more than 8-bit
+Message-ID: <YYwiBbyUINIcGXp3@google.com>
+References: <20211110101805.16343-1-suravee.suthikulpanit@amd.com>
+ <20211110101805.16343-3-suravee.suthikulpanit@amd.com>
 MIME-Version: 1.0
-References: <YUixqL+SRVaVNF07@google.com> <20210921095838.GA17357@ashkalra_ubuntu_server>
- <YUnjEU+1icuihmbR@google.com> <YUnxa2gy4DzEI2uY@zn.tnic> <YUoDJxfNZgNjY8zh@google.com>
- <YUr5gCgNe7tT0U/+@zn.tnic> <20210922121008.GA18744@ashkalra_ubuntu_server>
- <YUs1ejsDB4W4wKGF@zn.tnic> <CABayD+eFeu1mWG-UGXC0QZuYu68B9wJNWJhjUo=HHgc_jsfBag@mail.gmail.com>
- <2213EC9B-E3EC-4F23-BC1A-B11DF6288EE3@amd.com> <YVRRsEgjID4CbbRS@zn.tnic>
-In-Reply-To: <YVRRsEgjID4CbbRS@zn.tnic>
-From:   Steve Rutherford <srutherford@google.com>
-Date:   Wed, 10 Nov 2021 11:38:39 -0800
-Message-ID: <CABayD+dM8OafXkw6_Af17uvthnNG+k3majitc3uGwsm+Lr8DAQ@mail.gmail.com>
-Subject: Re: [PATCH v6 1/5] x86/kvm: Add AMD SEV specific Hypercall3
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     "Kalra, Ashish" <Ashish.Kalra@amd.com>,
-        Sean Christopherson <seanjc@google.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "Lendacky, Thomas" <thomas.lendacky@amd.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Singh, Brijesh" <brijesh.singh@amd.com>,
-        "dovmurik@linux.ibm.com" <dovmurik@linux.ibm.com>,
-        "tobin@linux.ibm.com" <tobin@linux.ibm.com>,
-        "jejb@linux.ibm.com" <jejb@linux.ibm.com>,
-        "dgilbert@redhat.com" <dgilbert@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211110101805.16343-3-suravee.suthikulpanit@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Sep 29, 2021 at 4:44 AM Borislav Petkov <bp@alien8.de> wrote:
->
-> On Tue, Sep 28, 2021 at 07:26:32PM +0000, Kalra, Ashish wrote:
-> > Yes that=E2=80=99s what I mentioned to Boris.
->
-> Right, and as far as I'm concerned, the x86 bits look ok to me and I'm
-> fine with this going through the kvm tree.
->
-> There will be a conflict with this:
->
-> https://lkml.kernel.org/r/20210928191009.32551-1-bp@alien8.de
->
-> resulting in:
->
-> arch/x86/kernel/kvm.c: In function =E2=80=98setup_efi_kvm_sev_migration=
-=E2=80=99:
-> arch/x86/kernel/kvm.c:563:7: error: implicit declaration of function =E2=
-=80=98sev_active=E2=80=99; did you mean =E2=80=98cpu_active=E2=80=99? [-Wer=
-ror=3Dimplicit-function-declaration]
->   563 |  if (!sev_active() ||
->       |       ^~~~~~~~~~
->       |       cpu_active
-> cc1: some warnings being treated as errors
-> make[2]: *** [scripts/Makefile.build:277: arch/x86/kernel/kvm.o] Error 1
-> make[2]: *** Waiting for unfinished jobs....
-> make[1]: *** [scripts/Makefile.build:540: arch/x86/kernel] Error 2
-> make: *** [Makefile:1868: arch/x86] Error 2
-> make: *** Waiting for unfinished jobs....
->
-> but Paolo and I will figure out what to do - I'll likely have a separate
-> branch out which he can merge and that sev_active() will need to be
-> converted to
->
->         if (!cc_platform_has(CC_ATTR_GUEST_MEM_ENCRYPT))
->
-> which is trivial.
->
-> Thx.
->
-> --
-> Regards/Gruss,
->     Boris.
->
-> https://people.kernel.org/tglx/notes-about-netiquette
+On Wed, Nov 10, 2021, Suravee Suthikulpanit wrote:
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 989685098b3e..0b066bb5149d 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -1031,6 +1031,12 @@ static __init int svm_hardware_setup(void)
+>  			nrips = false;
+>  	}
+>  
+> +	if (avic) {
+> +		r = avic_init_host_physical_apicid_mask();
+> +		if (r)
+> +			avic = false;
+> +	}
 
-Hey All,
+Haven't yet dedicated any brain cells to the rest of the patch, but this can be
+written as
 
-Bumping this thread again, since I believe these patches are good to go.
+	if (avic && avic_init_host_physical_apicid_mask())
+		avic = false;
 
-Let me know if there is anything I can do to help here,
-Thanks,
-Steve
+or 
+
+	avic = avic && !avic_init_host_physical_apicid_mask();
+
+But looking at the context below, combining everything would be preferable.  I
+would say split out the enable_apicv part to make it more obvious that enable_apicv
+is merely a reflection of avic.
+
+	avic = avic && npt_enabled && boot_cpu_has(X86_FEATURE_AVIC) &&
+	       !avic_init_host_physical_apicid_mask();
+	enable_apicv = avic;
+
+> +
+>  	enable_apicv = avic = avic && npt_enabled && boot_cpu_has(X86_FEATURE_AVIC);
+>  
+>  	if (enable_apicv) {
