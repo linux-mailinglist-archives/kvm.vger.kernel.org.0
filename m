@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AFC2544CB45
-	for <lists+kvm@lfdr.de>; Wed, 10 Nov 2021 22:20:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E34E44CB46
+	for <lists+kvm@lfdr.de>; Wed, 10 Nov 2021 22:21:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233511AbhKJVXn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Nov 2021 16:23:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51384 "EHLO
+        id S233520AbhKJVXr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Nov 2021 16:23:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233495AbhKJVXg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S233496AbhKJVXg (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 10 Nov 2021 16:23:36 -0500
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FFFEC061226
-        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 13:20:37 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id p12-20020a17090b010c00b001a65bfe8054so1723219pjz.8
-        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 13:20:37 -0800 (PST)
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B402DC061230
+        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 13:20:39 -0800 (PST)
+Received: by mail-pg1-x549.google.com with SMTP id v63-20020a632f42000000b002cc65837088so2157447pgv.1
+        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 13:20:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=JiXicHEorTD0W0ogbHs6tJnf0LcMa3Cy3C2YtlUwBjQ=;
-        b=HRwG4ZjIx3xWJJo4dvUkSljuoPWs7AvFpKsfDZBdie/XltQdzUG/gnh20fCALTdE26
-         OcMXByYAUp/H83RsPq0Mrpfy8HVWvoA0hYdecG9Uty5oSZRXnHSggT5A/RvTU8ofTgKf
-         WXdIgwx/778sCMAFFEyl4Pb745s+QLUE+rlL+jzHhr01iJkuH/4xTdyQCYJHFiSG5All
-         NOgUx6BAxEWh0v8LSIvPtv+KzdWj5tRqLdbZgnloWWpVmnP1Emw5w+GewpwMqQ6WUES7
-         uI4bwytM8885lSUQcvaFQpsNjnwILZDw1WC2uBuEPabuz09Vbw0b5h6kNhi/YFolKzfM
-         BXtg==
+        bh=NlDToowUudOyKNakNM8rv9+vrJ6Y0uZ/gFEZLkAMb+4=;
+        b=DGbTCaCzcdaTHYDKXNqd7IPLM0VycaoyhS/YNg48aoCd06J7rw+iti0RviugRo2NVS
+         3jRaHEOJ/BSVFyS7JWHosRYyk6mt6aOIbrGgvhE8zlewlxgg+Tk2+MTtn9By9zrstyEJ
+         SRCA0IDvysR1axUP/BZIJmIHohwMQ3xGXgQzcOScZZx1MiLnddIyuuYHUGZgWk62fFgi
+         vCI+VQGTO6Km8VzfFGeM4T0nYeVHBEi/mEriqYrxCTVhaIGh84zU3yb/ZZ59YhMjcs/k
+         oksmOYfORlZmAgAgvGS3O3Fkzxxaa/bFJc/mmdUOPesGzsg+PsQK4etknn9cV0dUwx65
+         mGag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=JiXicHEorTD0W0ogbHs6tJnf0LcMa3Cy3C2YtlUwBjQ=;
-        b=DXKdbFtL0ELfRctJEMteMUavPWpBFywGX7aUN292ghu4AYRMcp9Gs51U/+zumJLJW1
-         8iQh14PtKZkKkgnUdgKFif+pnze1yhKRMLKjICInIRiKv6DwCUXbKYqL9p2Zzooh460w
-         6K47oADMo5JT9u6PnyXqCjmY8km5ijONBm0/+hU8jPw9vEIZduUcHgVJu59UxqaDjA7M
-         HGpvPJc3ORsJUgqnOAL0VM4AI4tsh77neikwj/xeqU7Rhlr9p3s5SqDFUls5AkYhgvXW
-         qO22yG4+KDuYv7fpSPz5Wf536hPWSaSPdribg18Ae5OEijx0/xIHKH3k/O3frvZl5u0r
-         S/wA==
-X-Gm-Message-State: AOAM531k4b3257bIiaNQvWOtMEoAP7lU8iG6a8Jh6ZgTlrGlfbn0BmyI
-        CEjG5sYDWLbRGnp6coRJ/ntAPJowXkuWzUtmI4VezmSYSJWWHDXgtZDM71hQQMMlHZl89NdpuQW
-        JiqY70XTW5YYfqiVfkLlxFHHq5uYILXCIVhNwt0cTqkTDq0okSXCmFEb62dbIau566+gK
-X-Google-Smtp-Source: ABdhPJzN7nSOLibM+XPsF5o01UO1BnBwcmw7LG7bd0pucMtVbhZ7cr6ZaxIMTp4xFIcX7dkly1VMA2BwmrntEmK8
+        bh=NlDToowUudOyKNakNM8rv9+vrJ6Y0uZ/gFEZLkAMb+4=;
+        b=UZZJETX/eRWdcRjnxaIJDkapp4eV9ZUBGq1458JdHmrRoM/6pqQORFhhjYXHfVjmsY
+         +qVM2dCyuHcC+5G5Ggq9ccnTzz06e60jBLOA5i//BkpUb9CQAEySihzIZMtJhkiTm8Dw
+         y/AWeuBLWq5MoX9fKUujmYET+iQWm85vtVXb389XCz/y1AWr9x44A/3wBqJ5zE7zIbnR
+         kwpvrfiKk4oHxPBYWzFe4SkAvnzydvtTgkwGAU3b1zjA974eXUqTRJDDvnrBYLPZVN4u
+         RaPY4f4I3UV+txsXoDR018/nV1cja0LhsfaQUkbVMJXT+mgWvLsP+dDaS3H0yPGNlqvX
+         2hnQ==
+X-Gm-Message-State: AOAM5302yAdhSLqQdLGX/+cgtsMd+axinzW8O0cWY+UKhSYqTSW+xQXs
+        BdQGfVo8rzc0g3sRaHxgoEfXiNgmg5ddhbYLfl1wsUCZ25Q13HHTemXTFQQhO0oBKznVt+LfR9j
+        UFKuS1UYYLaDNlHfzxBTn/iWPPWKbUuOXz5NLqsulzZa9RDcS0S9eqjw8Omqhw2jZmn76
+X-Google-Smtp-Source: ABdhPJwn5FfpSg5rHKgry9E8WnfpM8Q0GPpMgxAeNxO7U1ss+7p+s9TBfpO1efTfgksAJX/zqpR/tcjBOITe+7A0
 X-Received: from aaronlewis.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2675])
- (user=aaronlewis job=sendgmr) by 2002:a05:6a00:a8b:b0:44d:ef7c:94b9 with SMTP
- id b11-20020a056a000a8b00b0044def7c94b9mr2112017pfl.36.1636579236669; Wed, 10
- Nov 2021 13:20:36 -0800 (PST)
-Date:   Wed, 10 Nov 2021 21:20:00 +0000
+ (user=aaronlewis job=sendgmr) by 2002:a17:90b:350c:: with SMTP id
+ ls12mr2317718pjb.197.1636579239141; Wed, 10 Nov 2021 13:20:39 -0800 (PST)
+Date:   Wed, 10 Nov 2021 21:20:01 +0000
 In-Reply-To: <20211110212001.3745914-1-aaronlewis@google.com>
-Message-Id: <20211110212001.3745914-14-aaronlewis@google.com>
+Message-Id: <20211110212001.3745914-15-aaronlewis@google.com>
 Mime-Version: 1.0
 References: <20211110212001.3745914-1-aaronlewis@google.com>
 X-Mailer: git-send-email 2.34.0.rc1.387.gb447b232ab-goog
-Subject: [kvm-unit-tests PATCH 13/14] x86: Clean up the global,
- page_table_levels, in access.c
+Subject: [kvm-unit-tests PATCH 14/14] x86: Add tests that run ac_test_run() in
+ an L2 guest
 From:   Aaron Lewis <aaronlewis@google.com>
 To:     kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
@@ -63,247 +62,135 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Remove the global, page table levels, from access.c and store it in the
-test struct ac_test_t instead.
+Add tests vmx_pf_exception_test and vmx_pf_exception_test_reduced_maxphyaddr
+to vmx_tests.c.
+
+The purpose of these tests are to test the reflection logic in KVM to
+ensure exceptions are being routed to were they are intended to go.  For
+example, it will test that we are not accidentally reflecting exceptions
+into L1 when L1 isn't expecting them.  Commit 18712c13709d ("KVM: nVMX:
+Use vmx_need_pf_intercept() when deciding if L0 wants a #PF") fixed an
+issue related to this which went undetected because there was no testing
+in place.  This adds testing to ensure there is coverage for such
+issues.
 
 Signed-off-by: Aaron Lewis <aaronlewis@google.com>
 ---
- x86/access.c      | 50 ++++++++++++++++++++++++-----------------------
- x86/access.h      |  5 +++--
- x86/access_test.c |  6 ++----
- 3 files changed, 31 insertions(+), 30 deletions(-)
+ x86/Makefile.common |  2 ++
+ x86/unittests.cfg   | 13 ++++++++++++
+ x86/vmx_tests.c     | 49 +++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 64 insertions(+)
 
-diff --git a/x86/access.c b/x86/access.c
-index f832385..c5e71db 100644
---- a/x86/access.c
-+++ b/x86/access.c
-@@ -14,7 +14,6 @@ static _Bool verbose = false;
+diff --git a/x86/Makefile.common b/x86/Makefile.common
+index a665854..461de51 100644
+--- a/x86/Makefile.common
++++ b/x86/Makefile.common
+@@ -74,6 +74,8 @@ $(TEST_DIR)/realmode.o: bits = $(if $(call cc-option,-m16,""),16,32)
  
- typedef unsigned long pt_element_t;
- static int invalid_mask;
--int page_table_levels;
+ $(TEST_DIR)/access_test.elf: $(TEST_DIR)/access.o
  
- #define PT_BASE_ADDR_MASK ((pt_element_t)((((pt_element_t)1 << 36) - 1) & PAGE_MASK))
- #define PT_PSE_BASE_ADDR_MASK (PT_BASE_ADDR_MASK & ~(1ull << 21))
-@@ -174,6 +173,7 @@ typedef struct {
- 	pt_element_t ignore_pde;
- 	int expected_fault;
- 	unsigned expected_error;
-+	int page_table_levels;
- } ac_test_t;
++$(TEST_DIR)/vmx.elf: $(TEST_DIR)/access.o
++
+ $(TEST_DIR)/kvmclock_test.elf: $(TEST_DIR)/kvmclock.o
  
- typedef struct {
-@@ -278,13 +278,14 @@ static void ac_env_int(ac_pool_t *pool)
- 	pool->pt_pool_current = 0;
+ $(TEST_DIR)/hyperv_synic.elf: $(TEST_DIR)/hyperv.o
+diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+index dbeb8a2..4069e4c 100644
+--- a/x86/unittests.cfg
++++ b/x86/unittests.cfg
+@@ -347,6 +347,19 @@ extra_params = -cpu max,+vmx -append vmx_vmcs_shadow_test
+ arch = x86_64
+ groups = vmx
+ 
++[vmx_pf_exception_test]
++file = vmx.flat
++extra_params = -cpu max,+vmx -append vmx_pf_exception_test
++arch = x86_64
++groups = vmx nested_exception
++
++[vmx_pf_exception_test_reduced_maxphyaddr]
++file = vmx.flat
++extra_params = -cpu IvyBridge,phys-bits=36,host-phys-bits=off,+vmx -append vmx_pf_exception_test
++arch = x86_64
++groups = vmx nested_exception
++check = /sys/module/kvm_intel/parameters/allow_smaller_maxphyaddr=Y
++
+ [debug]
+ file = debug.flat
+ arch = x86_64
+diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+index 9ee6653..8cf3543 100644
+--- a/x86/vmx_tests.c
++++ b/x86/vmx_tests.c
+@@ -20,6 +20,7 @@
+ #include "alloc_page.h"
+ #include "smp.h"
+ #include "delay.h"
++#include "access.h"
+ 
+ #define VPID_CAP_INVVPID_TYPES_SHIFT 40
+ 
+@@ -10658,6 +10659,53 @@ static void atomic_switch_overflow_msrs_test(void)
+ 		test_skip("Test is only supported on KVM");
  }
  
--static void ac_test_init(ac_test_t *at, void *virt)
-+static void ac_test_init(ac_test_t *at, void *virt, int page_table_levels)
- {
- 	set_efer_nx(1);
- 	set_cr0_wp(1);
- 	at->flags = 0;
- 	at->virt = virt;
- 	at->phys = 32 * 1024 * 1024;
-+	at->page_table_levels = page_table_levels;
- }
++static void vmx_pf_exception_test_guest(void)
++{
++	ac_test_run(PT_LEVEL_PML4);
++}
++
++static void vmx_pf_exception_test(void)
++{
++	u64 efer;
++	struct cpuid cpuid;
++
++	test_set_guest(vmx_pf_exception_test_guest);
++
++	enter_guest();
++
++	while (vmcs_read(EXI_REASON) != VMX_VMCALL) {
++		switch (vmcs_read(EXI_REASON)) {
++		case VMX_RDMSR:
++			assert(regs.rcx == MSR_EFER);
++			efer = vmcs_read(GUEST_EFER);
++			regs.rdx = efer >> 32;
++			regs.rax = efer & 0xffffffff;
++			break;
++		case VMX_WRMSR:
++			assert(regs.rcx == MSR_EFER);
++			efer = regs.rdx << 32 | (regs.rax & 0xffffffff);
++			vmcs_write(GUEST_EFER, efer);
++			break;
++		case VMX_CPUID:
++			cpuid = (struct cpuid) {0, 0, 0, 0};
++			cpuid = raw_cpuid(regs.rax, regs.rcx);
++			regs.rax = cpuid.a;
++			regs.rbx = cpuid.b;
++			regs.rcx = cpuid.c;
++			regs.rdx = cpuid.d;
++			break;
++		default:
++			assert_msg(false,
++				"Unexpected exit to L1, exit_reason: %s (0x%lx)",
++				exit_reason_description(vmcs_read(EXI_REASON)),
++				vmcs_read(EXI_REASON));
++		}
++		skip_exit_insn();
++		enter_guest();
++	}
++
++	assert_exit_reason(VMX_VMCALL);
++}
+ #define TEST(name) { #name, .v2 = name }
  
- static int ac_test_bump_one(ac_test_t *at)
-@@ -518,7 +519,7 @@ static void __ac_setup_specific_pages(ac_test_t *at, ac_pool_t *pool, bool reuse
- 		ac_test_reset_pt_pool(pool);
- 
- 	at->ptep = 0;
--	for (int i = page_table_levels; i >= 1 && (i >= 2 || !F(AC_PDE_PSE)); --i) {
-+	for (int i = at->page_table_levels; i >= 1 && (i >= 2 || !F(AC_PDE_PSE)); --i) {
- 		pt_element_t *vroot = va(root & PT_BASE_ADDR_MASK);
- 		unsigned index = PT_INDEX((unsigned long)at->virt, i);
- 		pt_element_t pte = 0;
-@@ -635,7 +636,7 @@ static void dump_mapping(ac_test_t *at)
- 	int i;
- 
- 	printf("Dump mapping: address: %p\n", at->virt);
--	for (i = page_table_levels; i >= 1 && (i >= 2 || !F(AC_PDE_PSE)); --i) {
-+	for (i = at->page_table_levels; i >= 1 && (i >= 2 || !F(AC_PDE_PSE)); --i) {
- 		pt_element_t *vroot = va(root & PT_BASE_ADDR_MASK);
- 		unsigned index = PT_INDEX((unsigned long)at->virt, i);
- 		pt_element_t pte = vroot[index];
-@@ -812,12 +813,12 @@ static void ac_test_show(ac_test_t *at)
-  * This test case is used to triger the bug which is fixed by
-  * commit e09e90a5 in the kvm tree
-  */
--static int corrupt_hugepage_triger(ac_pool_t *pool)
-+static int corrupt_hugepage_triger(ac_pool_t *pool, int page_table_levels)
- {
- 	ac_test_t at1, at2;
- 
--	ac_test_init(&at1, (void *)(0x123400000000));
--	ac_test_init(&at2, (void *)(0x666600000000));
-+	ac_test_init(&at1, (void *)(0x123400000000), page_table_levels);
-+	ac_test_init(&at2, (void *)(0x666600000000), page_table_levels);
- 
- 	at2.flags = AC_CPU_CR0_WP_MASK | AC_PDE_PSE_MASK | AC_PDE_PRESENT_MASK;
- 	ac_test_setup_pte(&at2, pool);
-@@ -850,12 +851,12 @@ err:
-  * This test case is used to triger the bug which is fixed by
-  * commit 3ddf6c06e13e in the kvm tree
-  */
--static int check_pfec_on_prefetch_pte(ac_pool_t *pool)
-+static int check_pfec_on_prefetch_pte(ac_pool_t *pool, int page_table_levels)
- {
- 	ac_test_t at1, at2;
- 
--	ac_test_init(&at1, (void *)(0x123406001000));
--	ac_test_init(&at2, (void *)(0x123406003000));
-+	ac_test_init(&at1, (void *)(0x123406001000), page_table_levels);
-+	ac_test_init(&at2, (void *)(0x123406003000), page_table_levels);
- 
- 	at1.flags = AC_PDE_PRESENT_MASK | AC_PTE_PRESENT_MASK;
- 	ac_setup_specific_pages(&at1, pool, 30 * 1024 * 1024, 30 * 1024 * 1024);
-@@ -895,12 +896,12 @@ err:
-  *
-  * Note: to trigger this bug, hugepage should be disabled on host.
-  */
--static int check_large_pte_dirty_for_nowp(ac_pool_t *pool)
-+static int check_large_pte_dirty_for_nowp(ac_pool_t *pool, int page_table_levels)
- {
- 	ac_test_t at1, at2;
- 
--	ac_test_init(&at1, (void *)(0x123403000000));
--	ac_test_init(&at2, (void *)(0x666606000000));
-+	ac_test_init(&at1, (void *)(0x123403000000), page_table_levels);
-+	ac_test_init(&at2, (void *)(0x666606000000), page_table_levels);
- 
- 	at2.flags = AC_PDE_PRESENT_MASK | AC_PDE_PSE_MASK;
- 	ac_test_setup_pte(&at2, pool);
-@@ -929,7 +930,7 @@ err:
- 	return 0;
- }
- 
--static int check_smep_andnot_wp(ac_pool_t *pool)
-+static int check_smep_andnot_wp(ac_pool_t *pool, int page_table_levels)
- {
- 	ac_test_t at1;
- 	int err_prepare_andnot_wp, err_smep_andnot_wp;
-@@ -938,7 +939,7 @@ static int check_smep_andnot_wp(ac_pool_t *pool)
- 		return 1;
- 	}
- 
--	ac_test_init(&at1, (void *)(0x123406001000));
-+	ac_test_init(&at1, (void *)(0x123406001000), page_table_levels);
- 
- 	at1.flags = AC_PDE_PRESENT_MASK | AC_PTE_PRESENT_MASK |
- 		    AC_PDE_USER_MASK | AC_PTE_USER_MASK |
-@@ -979,7 +980,7 @@ err:
- 	return 0;
- }
- 
--static int check_effective_sp_permissions(ac_pool_t *pool)
-+static int check_effective_sp_permissions(ac_pool_t *pool, int page_table_levels)
- {
- 	unsigned long ptr1 = 0x123480000000;
- 	unsigned long ptr2 = ptr1 + SZ_2M;
-@@ -1000,22 +1001,22 @@ static int check_effective_sp_permissions(ac_pool_t *pool)
- 	 * pud1 and pud2 point to the same pmd page.
- 	 */
- 
--	ac_test_init(&at1, (void *)(ptr1));
-+	ac_test_init(&at1, (void *)(ptr1), page_table_levels);
- 	at1.flags = AC_PDE_PRESENT_MASK | AC_PTE_PRESENT_MASK |
- 		    AC_PDE_USER_MASK | AC_PTE_USER_MASK |
- 		    AC_PDE_ACCESSED_MASK | AC_PTE_ACCESSED_MASK |
- 		    AC_PTE_WRITABLE_MASK | AC_ACCESS_USER_MASK;
- 	__ac_setup_specific_pages(&at1, pool, false, pmd, 0);
- 
--	ac_test_init(&at2, (void *)(ptr2));
-+	ac_test_init(&at2, (void *)(ptr2), page_table_levels);
- 	at2.flags = at1.flags | AC_PDE_WRITABLE_MASK | AC_PTE_DIRTY_MASK | AC_ACCESS_WRITE_MASK;
- 	__ac_setup_specific_pages(&at2, pool, true, pmd, 0);
- 
--	ac_test_init(&at3, (void *)(ptr3));
-+	ac_test_init(&at3, (void *)(ptr3), page_table_levels);
- 	at3.flags = AC_PDPTE_NO_WRITABLE_MASK | at1.flags;
- 	__ac_setup_specific_pages(&at3, pool, true, pmd, 0);
- 
--	ac_test_init(&at4, (void *)(ptr4));
-+	ac_test_init(&at4, (void *)(ptr4), page_table_levels);
- 	at4.flags = AC_PDPTE_NO_WRITABLE_MASK | at2.flags;
- 	__ac_setup_specific_pages(&at4, pool, true, pmd, 0);
- 
-@@ -1058,7 +1059,7 @@ static int ac_test_exec(ac_test_t *at, ac_pool_t *pool)
- 	return r;
- }
- 
--typedef int (*ac_test_fn)(ac_pool_t *pool);
-+typedef int (*ac_test_fn)(ac_pool_t *pool, int page_table_levels);
- const ac_test_fn ac_test_cases[] =
- {
- 	corrupt_hugepage_triger,
-@@ -1068,7 +1069,7 @@ const ac_test_fn ac_test_cases[] =
- 	check_effective_sp_permissions,
+ /* name/init/guest_main/exit_handler/syscall_handler/guest_regs */
+@@ -10763,5 +10811,6 @@ struct vmx_test vmx_tests[] = {
+ 	TEST(rdtsc_vmexit_diff_test),
+ 	TEST(vmx_mtf_test),
+ 	TEST(vmx_mtf_pdpte_test),
++	TEST(vmx_pf_exception_test),
+ 	{ NULL, NULL, NULL, NULL, NULL, {0} },
  };
- 
--int ac_test_run()
-+int ac_test_run(int page_table_levels)
- {
- 	ac_test_t at;
- 	ac_pool_t pool;
-@@ -1134,7 +1135,8 @@ int ac_test_run()
- 	}
- 
- 	ac_env_int(&pool);
--	ac_test_init(&at, (void *)(0x123400000000 + 16 * smp_id()));
-+	ac_test_init(&at, (void *)(0x123400000000 + 16 * smp_id()),
-+		page_table_levels);
- 	do {
- 		++tests;
- 		successes += ac_test_exec(&at, &pool);
-@@ -1142,7 +1144,7 @@ int ac_test_run()
- 
- 	for (i = 0; i < ARRAY_SIZE(ac_test_cases); i++) {
- 		++tests;
--		successes += ac_test_cases[i](&pool);
-+		successes += ac_test_cases[i](&pool, page_table_levels);
- 	}
- 
- 	printf("\n%d tests, %d failures\n", tests, tests - successes);
-diff --git a/x86/access.h b/x86/access.h
-index 4f67b62..bcfa7b2 100644
---- a/x86/access.h
-+++ b/x86/access.h
-@@ -1,8 +1,9 @@
- #ifndef X86_ACCESS_H
- #define X86_ACCESS_H
- 
--int ac_test_run(void);
-+#define PT_LEVEL_PML4 4
-+#define PT_LEVEL_PML5 5
- 
--extern int page_table_levels;
-+int ac_test_run(int page_table_levels);
- 
- #endif // X86_ACCESS_H
-\ No newline at end of file
-diff --git a/x86/access_test.c b/x86/access_test.c
-index 497f286..991f333 100644
---- a/x86/access_test.c
-+++ b/x86/access_test.c
-@@ -8,14 +8,12 @@ int main(void)
-     int r;
- 
-     printf("starting test\n\n");
--    page_table_levels = 4;
--    r = ac_test_run();
-+    r = ac_test_run(PT_LEVEL_PML4);
- 
-     if (this_cpu_has(X86_FEATURE_LA57)) {
--        page_table_levels = 5;
-         printf("starting 5-level paging test.\n\n");
-         setup_5level_page_table();
--        r = ac_test_run();
-+        r = ac_test_run(PT_LEVEL_PML5);
-     }
- 
-     return r ? 0 : 1;
 -- 
 2.34.0.rc1.387.gb447b232ab-goog
 
