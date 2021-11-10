@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 59D0544CB3D
-	for <lists+kvm@lfdr.de>; Wed, 10 Nov 2021 22:20:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DED1A44CB3E
+	for <lists+kvm@lfdr.de>; Wed, 10 Nov 2021 22:20:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233469AbhKJVXK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Nov 2021 16:23:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51216 "EHLO
+        id S233453AbhKJVXL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Nov 2021 16:23:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233451AbhKJVXJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Nov 2021 16:23:09 -0500
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE5F6C061766
-        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 13:20:20 -0800 (PST)
-Received: by mail-pg1-x54a.google.com with SMTP id i25-20020a631319000000b002cce0a43e94so2182603pgl.0
-        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 13:20:20 -0800 (PST)
+        with ESMTP id S233462AbhKJVXL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Nov 2021 16:23:11 -0500
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3297EC061766
+        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 13:20:23 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id x18-20020a17090a789200b001a7317f995cso1880435pjk.4
+        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 13:20:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=yaQDhfDTxVkBn2c4lDmED/e+OxEisDXW6FuxukyAWe4=;
-        b=B+AqmLNwuwgrGG/g5IKMB3AsyJvsgiFDRpoAeFAsd7Er21A7WgvgOZLnr9CMsQCpE+
-         HbVUOttT0hZhXcWsPEMtbIg30Wi/SOtwdjloEHO09rVEq2ETpLWcX13CLaZCwKDPzOG5
-         Vtsx2KV9fRXA7QGgLTyfTf31dbNT+yS1EHZ2h1wix9EcD6QsBYF07YMa3ST4zumVFnWy
-         uw+f3El49k11AmenBdvkDDylHLyEV/OQ9ddv5gKkhrkP+8E5/S6JjqAK91N1X5rtsy5F
-         wOiHzwcAgZciL+OicguUN+ajOLm2HNxflABk5TRGx5UPS9eVu04FZEntKnd92IK7Rh1f
-         oFFA==
+        bh=0Mn3/0vsl/BqcHzl4h7JC934taELWq7FYXUNRPu9fe4=;
+        b=VGLGjfYD/RZA7DWwdCiVpo1kuvYiLVAxgr74Y2PXnz8Sst5Aafg/T66OX1SAxojGFC
+         kO+vXF4+8B14E3aE5eVORO0vq5Kzwt8g3GlqHOpVOfC+PqTCZd0NO34HhbgFm5WudgfI
+         UbVzn2ZGmxEJen2+cK/5W3nKkhlB7D9X8g9Qzov4qfMIh+Gw8xuRVe7JYSql1j7zohOg
+         8kwwlARnbUdE7nUNA2/eW+3cDTA2rfTeRc9ve8CL/FedXBB8mwEOM24ZzTDJs8NpBXlc
+         OdKnOLw1kbRQ3RRqVM0Gfe7pGC3ALKTfHqLnie/LPnJGU+qYde5Ew4pH0UVufkAEBl0o
+         BoGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=yaQDhfDTxVkBn2c4lDmED/e+OxEisDXW6FuxukyAWe4=;
-        b=AFAvJsh6jXjwlfiV0Yj5YGsqIn1c3Su67Ci5QpG5cm0Ll3Q9wUrxnk6p+pYG5OObGg
-         a4lIvodBgKshD0hID65wOl4LEXJW4tfBgav4bEyuraJuembgWRhvfvG8yu7y9pYX4xG7
-         qRq+5keWoR1uZI3ZYtM0fcY3LxHhmfnkIk0/QAs938DYaPqOXJmyir964/6GIz1PK601
-         FGA2+YwefjlM7yUNUNdg9N1JxVQFhZyoc/ASDZKib3fGjvphGxUVUJXCdFyE4bHYMPD1
-         KGgy2k6oU67MdsluAvOkiJFgjDuzLnCDIS/KY4t81ZJqB2tOAgt5o6wUyL5mtr/NbHD7
-         1ycw==
-X-Gm-Message-State: AOAM530LfIJJuqyTxg4vyCaWjQQtsShy1wmpofV+Szh+XielDiFGFAS+
-        hf+6AG54/TlsmM9Qmm4lUL1MZx84yfqC7K+L/NGhgKpZUAqOvAD7bWGczIBBjAt1HhcYHmv25gB
-        MOoPSSvf7beply3uaEEpVXLarvbG2aYaT0Iu6DIpJjhRxSM/pGveKgxY6BRBM0TDo2bia
-X-Google-Smtp-Source: ABdhPJxwZh4k+mWQE0I9JR46vP1HLvWNaLXNCw7FodHk+skRTlJVxfA2AvOOJlgvVsRZ81ZBIT4JlMhAXVtCySdp
+        bh=0Mn3/0vsl/BqcHzl4h7JC934taELWq7FYXUNRPu9fe4=;
+        b=3mQ3/KTvkSzlaGBimlPaBpmPzE5009zghtKkuERnXKqxMYP+G2fNGXkQwB3Ch4m6kw
+         J7breFHdOQ/K/dgNjZ+UB93UY1O1Vh+r3XoetTDZSKKVVtBP1ZC6S0bKtt1VTA0K2Yes
+         D1Gv24h4OhWN1HDtUEwmuV7kZ1yx/DZvdqfExa7VJvYGIhC01xnW1mz0YaC0iWnFgP8G
+         pgmfXMcupT01msih/1mf1Xi4aFgmyEDBmu3tN2BvQWj+aXpJqTHOP2LqsyMf7zjuVRbD
+         tdeIGa49tR1qCJccPkLa28sJxJLi4TvVCyTqs/GiAFaGM88OMgdNx8ba8j5NoMBSQ2A2
+         Ttog==
+X-Gm-Message-State: AOAM530S4TWJjbWpoYo+mDpOgGNTt1Vok8xWwn3DcdsdjIXI0G8S/zXH
+        wYFHCQdnytfJkHQzyE6Wo5FamiwzKt74/tzsZVpcpQS8tcw3/u09iqEvTPpX/k4MCGsDzCAo1RH
+        rUMKXyvj0RrcXY3HUI+f8xYKNC1PckrgcBGR/HfMg7jpfeck6D/d40v1DmT4JNgdn0z+n
+X-Google-Smtp-Source: ABdhPJz/KzX2+dGq3iFCuJzmY3Se5ybolVrQyLT5Cj0cvtMnXrPA+uOLG+V+TUENjPYJZcexxhZw5xGbtOVxRwIt
 X-Received: from aaronlewis.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2675])
- (user=aaronlewis job=sendgmr) by 2002:a05:6a00:2ab:b0:49f:997e:23e2 with SMTP
- id q11-20020a056a0002ab00b0049f997e23e2mr2057051pfs.22.1636579220158; Wed, 10
- Nov 2021 13:20:20 -0800 (PST)
-Date:   Wed, 10 Nov 2021 21:19:53 +0000
+ (user=aaronlewis job=sendgmr) by 2002:a17:902:778a:b0:13f:672c:103a with SMTP
+ id o10-20020a170902778a00b0013f672c103amr1965298pll.55.1636579222611; Wed, 10
+ Nov 2021 13:20:22 -0800 (PST)
+Date:   Wed, 10 Nov 2021 21:19:54 +0000
 In-Reply-To: <20211110212001.3745914-1-aaronlewis@google.com>
-Message-Id: <20211110212001.3745914-7-aaronlewis@google.com>
+Message-Id: <20211110212001.3745914-8-aaronlewis@google.com>
 Mime-Version: 1.0
 References: <20211110212001.3745914-1-aaronlewis@google.com>
 X-Mailer: git-send-email 2.34.0.rc1.387.gb447b232ab-goog
-Subject: [kvm-unit-tests PATCH 06/14] x86: unify name of 32-bit and 64-bit GDT
+Subject: [kvm-unit-tests PATCH 07/14] x86: get rid of ring0stacktop
 From:   Aaron Lewis <aaronlewis@google.com>
 To:     kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
@@ -62,254 +62,204 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There's no need to distinguish gdt32 and gdt64, since the same C functions
-operate on both and selector numbers are mostly unified between 32-
-and 64-bit versions.
+The ring3 switch code relied on a special stack page that was used
+for the ring0 stack during the ring3 part of the test.  This special
+stack page was used if an exception handler ran during the ring3 part
+of the test.
+
+This method is quite complex; it is easier to just use the same
+stack for the "outer" part of the test and the exception handler.
+To do so, store esp/rsp in the TSS just before doing the PUSH/IRET
+sequence.  On 64-bit, the TSS can also be used to restore rsp after
+coming back from ring3.
+
+Unifying the three copies of the ring switching code is left as an
+exercise to the reader.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+[aaron: removed commas after (tss.rsp0) in usermode.c and umips.c]
+Signed-off-by: Aaron Lewis <aaronlewis@google.com>
 ---
- lib/x86/desc.c   | 12 ++++++------
- lib/x86/desc.h   |  2 +-
- x86/cstart.S     | 20 ++++++++++----------
- x86/cstart64.S   | 17 +++++++++--------
- x86/taskswitch.c |  2 +-
- x86/vmx.c        |  8 ++++----
- x86/vmx_tests.c  |  4 ++--
- 7 files changed, 33 insertions(+), 32 deletions(-)
+ lib/x86/usermode.c |  9 +++++----
+ x86/access.c       | 16 ++++++++--------
+ x86/cstart.S       |  6 +-----
+ x86/cstart64.S     |  6 +-----
+ x86/umip.c         | 19 ++++++++++++-------
+ 5 files changed, 27 insertions(+), 29 deletions(-)
 
-diff --git a/lib/x86/desc.c b/lib/x86/desc.c
-index 2ef5aad..ac167d0 100644
---- a/lib/x86/desc.c
-+++ b/lib/x86/desc.c
-@@ -292,16 +292,16 @@ static char intr_alt_stack[4096];
- #ifndef __x86_64__
- void set_gdt_entry(int sel, u32 base,  u32 limit, u8 type, u8 flags)
- {
--	int num = sel >> 3;
-+	gdt_entry_t *entry = &gdt[sel >> 3];
+diff --git a/lib/x86/usermode.c b/lib/x86/usermode.c
+index f032523..49b87b2 100644
+--- a/lib/x86/usermode.c
++++ b/lib/x86/usermode.c
+@@ -47,8 +47,8 @@ uint64_t run_in_user(usermode_func func, unsigned int fault_vector,
+ 	}
  
- 	/* Setup the descriptor base address */
--	gdt32[num].base1 = (base & 0xFFFF);
--	gdt32[num].base2 = (base >> 16) & 0xFF;
--	gdt32[num].base3 = (base >> 24) & 0xFF;
-+	entry->base1 = (base & 0xFFFF);
-+	entry->base2 = (base >> 16) & 0xFF;
-+	entry->base3 = (base >> 24) & 0xFF;
+ 	asm volatile (
+-			/* Backing Up Stack in rdi */
+-			"mov %%rsp, %%rdi\n\t"
++			/* Prepare kernel SP for exception handlers */
++			"mov %%rsp, %[rsp0]\n\t"
+ 			/* Load user_ds to DS and ES */
+ 			"mov %[user_ds], %%ax\n\t"
+ 			"mov %%ax, %%ds\n\t"
+@@ -92,9 +92,10 @@ uint64_t run_in_user(usermode_func func, unsigned int fault_vector,
+ 			"int %[kernel_entry_vector]\n\t"
+ 			/* Kernel Mode */
+ 			"ret_to_kernel:\n\t"
+-			"mov %%rdi, %%rsp\n\t"
++			"mov %[rsp0], %%rsp\n\t"
+ 			:
+-			"+a"(rax)
++			"+a"(rax),
++			[rsp0]"=m"(tss.rsp0)
+ 			:
+ 			[arg1]"m"(arg1),
+ 			[arg2]"m"(arg2),
+diff --git a/x86/access.c b/x86/access.c
+index 4725bbd..49d31b1 100644
+--- a/x86/access.c
++++ b/x86/access.c
+@@ -711,7 +711,7 @@ static int ac_test_do_access(ac_test_t *at)
+     }
  
- 	/* Setup the descriptor limits, type and flags */
--	gdt32[num].limit1 = (limit & 0xFFFF);
--	gdt32[num].type_limit_flags = ((limit & 0xF0000) >> 8) | ((flags & 0xF0) << 8) | type;
-+	entry->limit1 = (limit & 0xFFFF);
-+	entry->type_limit_flags = ((limit & 0xF0000) >> 8) | ((flags & 0xF0) << 8) | type;
- }
+     asm volatile ("mov $fixed1, %%rsi \n\t"
+-		  "mov %%rsp, %%rdx \n\t"
++		  "mov %%rsp, %[rsp0] \n\t"
+ 		  "cmp $0, %[user] \n\t"
+ 		  "jz do_access \n\t"
+ 		  "push %%rax; mov %[user_ds], %%ax; mov %%ax, %%ds; pop %%rax  \n\t"
+@@ -734,8 +734,14 @@ static int ac_test_do_access(ac_test_t *at)
+ 		  "done: \n"
+ 		  "fixed1: \n"
+ 		  "int %[kernel_entry_vector] \n\t"
++		  ".section .text.entry \n\t"
++		  "kernel_entry: \n\t"
++		  "mov %[rsp0], %%rsp \n\t"
++		  "jmp back_to_kernel \n\t"
++		  ".section .text \n\t"
+ 		  "back_to_kernel:"
+-		  : [reg]"+r"(r), "+a"(fault), "=b"(e), "=&d"(rsp)
++		  : [reg]"+r"(r), "+a"(fault), "=b"(e), "=&d"(rsp),
++		    [rsp0]"=m"(tss.rsp0)
+ 		  : [addr]"r"(at->virt),
+ 		    [write]"r"(F(AC_ACCESS_WRITE)),
+ 		    [user]"r"(F(AC_ACCESS_USER)),
+@@ -754,12 +760,6 @@ static int ac_test_do_access(ac_test_t *at)
+ 		  "iretq \n\t"
+ 		  ".section .text");
  
- void set_gdt_task_gate(u16 sel, u16 tss_sel)
-diff --git a/lib/x86/desc.h b/lib/x86/desc.h
-index 51148d1..c0817d8 100644
---- a/lib/x86/desc.h
-+++ b/lib/x86/desc.h
-@@ -197,7 +197,6 @@ struct system_desc64 {
- extern idt_entry_t boot_idt[256];
- 
- #ifndef __x86_64__
--extern gdt_entry_t gdt32[];
- extern tss32_t tss;
- extern tss32_t tss_intr;
- void set_gdt_task_gate(u16 tss_sel, u16 sel);
-@@ -207,6 +206,7 @@ void setup_tss32(void);
- #else
- extern tss64_t tss;
- #endif
-+extern gdt_entry_t gdt[];
- 
- unsigned exception_vector(void);
- int write_cr4_checking(unsigned long val);
+-    asm volatile (".section .text.entry \n\t"
+-		  "kernel_entry: \n\t"
+-		  "mov %rdx, %rsp \n\t"
+-		  "jmp back_to_kernel \n\t"
+-		  ".section .text");
+-
+     ac_test_check(at, &success, fault && !at->expected_fault,
+                   "unexpected fault");
+     ac_test_check(at, &success, !fault && at->expected_fault,
 diff --git a/x86/cstart.S b/x86/cstart.S
-index 4461c38..5e925d8 100644
+index 5e925d8..e9100a4 100644
 --- a/x86/cstart.S
 +++ b/x86/cstart.S
-@@ -27,8 +27,8 @@ i = 0
-         i = i + 1
-         .endr
+@@ -13,10 +13,6 @@ max_cpus = MAX_TEST_CPUS
+ 	.align 16
+ stacktop:
  
--.globl gdt32
--gdt32:
-+.globl gdt
-+gdt:
- 	.quad 0
- 	.quad 0x00cf9b000000ffff // flat 32-bit code segment
- 	.quad 0x00cf93000000ffff // flat 32-bit data segment
-@@ -55,7 +55,7 @@ percpu_descr:
-         .rept max_cpus
-         .quad 0x00cf93000000ffff // 32-bit data segment for perCPU area
-         .endr
--gdt32_end:
-+gdt_end:
- 
- i = 0
- .globl tss
-@@ -94,7 +94,7 @@ mb_cmdline = 16
- 	mov %al, percpu_descr+4(,%ecx,8)
- 	mov %ah, percpu_descr+7(,%ecx,8)
- 
--	lea percpu_descr-gdt32(,%ecx,8), %eax
-+	lea percpu_descr-gdt(,%ecx,8), %eax
- 	mov %ax, %gs
- 
- .endm
-@@ -110,7 +110,7 @@ mb_cmdline = 16
- 
- .globl start
- start:
--        lgdtl gdt32_descr
-+        lgdtl gdt_descr
-         setup_segments
-         mov $stacktop, %esp
-         setup_percpu_area
-@@ -195,7 +195,7 @@ load_tss:
- 	shr $16, %eax
- 	mov %al, tss_descr+4(,%ebx,8)
- 	mov %ah, tss_descr+7(,%ebx,8)
--	lea tss_descr-gdt32(,%ebx,8), %eax
-+	lea tss_descr-gdt(,%ebx,8), %eax
- 	ltr %ax
- 	ret
- 
-@@ -224,11 +224,11 @@ sipi_entry:
- 	mov %cr0, %eax
- 	or $1, %eax
- 	mov %eax, %cr0
--	lgdtl gdt32_descr - sipi_entry
-+	lgdtl gdt_descr - sipi_entry
- 	ljmpl $8, $ap_start32
- 
--gdt32_descr:
--	.word gdt32_end - gdt32 - 1
--	.long gdt32
-+gdt_descr:
-+	.word gdt_end - gdt - 1
-+	.long gdt
- 
- sipi_end:
-diff --git a/x86/cstart64.S b/x86/cstart64.S
-index b98a0d3..46b9d9b 100644
---- a/x86/cstart64.S
-+++ b/x86/cstart64.S
-@@ -1,7 +1,8 @@
- 
- #include "apic-defs.h"
- 
--.globl gdt64_desc
-+.globl gdt
-+.globl gdt_descr
- .globl online_cpus
- .globl cpu_online_count
- 
-@@ -47,11 +48,11 @@ ptl5:
+-	. = . + 4096
+-	.align 16
+-ring0stacktop:
+-
+ .data
  
  .align 4096
+@@ -62,7 +58,7 @@ i = 0
+ tss:
+         .rept max_cpus
+         .long 0
+-        .long ring0stacktop - i * 4096
++        .long 0
+         .long 16
+         .quad 0, 0
+         .quad 0, 0, 0, 0, 0, 0, 0, 0
+diff --git a/x86/cstart64.S b/x86/cstart64.S
+index 46b9d9b..18c7457 100644
+--- a/x86/cstart64.S
++++ b/x86/cstart64.S
+@@ -16,10 +16,6 @@ max_cpus = MAX_TEST_CPUS
+ 	.align 16
+ stacktop:
  
--gdt64_desc:
--	.word gdt64_end - gdt64 - 1
--	.quad gdt64
-+gdt_descr:
-+	.word gdt_end - gdt - 1
-+	.quad gdt
+-	. = . + 4096 * max_cpus
+-	.align 16
+-ring0stacktop:
+-
+ .data
  
--gdt64:
-+gdt:
- 	.quad 0
- 	.quad 0x00af9b000000ffff // 64-bit code segment
- 	.quad 0x00cf93000000ffff // 32/64-bit data segment
-@@ -75,7 +76,7 @@ tss_descr:
- 	.quad 0x000089000000ffff // 64-bit avail tss
- 	.quad 0                  // tss high addr
- 	.endr
--gdt64_end:
-+gdt_end:
- 
- i = 0
- .globl tss
-@@ -162,7 +163,7 @@ switch_to_5level:
- 	jmpl $8, $lvl5
- 
- prepare_64:
--	lgdt gdt64_desc
-+	lgdt gdt_descr
- 	setup_segments
- 
- 	xor %eax, %eax
-@@ -300,7 +301,7 @@ load_tss:
- 	mov %al, tss_descr+7(%rbx)
- 	shr $8, %rax
- 	mov %eax, tss_descr+8(%rbx)
--	lea tss_descr-gdt64(%rbx), %rax
-+	lea tss_descr-gdt(%rbx), %rax
- 	ltr %ax
- 	ret
- 
-diff --git a/x86/taskswitch.c b/x86/taskswitch.c
-index 0fa818d..1d6e6e2 100644
---- a/x86/taskswitch.c
-+++ b/x86/taskswitch.c
-@@ -21,7 +21,7 @@ fault_handler(unsigned long error_code)
- 
- 	tss.eip += 2;
- 
--	gdt32[TSS_MAIN / 8].type &= ~DESC_BUSY;
-+	gdt[TSS_MAIN / 8].type &= ~DESC_BUSY;
- 
- 	set_gdt_task_gate(TSS_RETURN, tss_intr.prev);
- }
-diff --git a/x86/vmx.c b/x86/vmx.c
-index d45c6de..7a2f7a3 100644
---- a/x86/vmx.c
-+++ b/x86/vmx.c
-@@ -73,7 +73,7 @@ union vmx_ctrl_msr ctrl_exit_rev;
- union vmx_ctrl_msr ctrl_enter_rev;
- union vmx_ept_vpid  ept_vpid;
- 
--extern struct descriptor_table_ptr gdt64_desc;
-+extern struct descriptor_table_ptr gdt_descr;
- extern struct descriptor_table_ptr idt_descr;
- extern void *vmx_return;
- extern void *entry_sysenter;
-@@ -1275,7 +1275,7 @@ static void init_vmcs_host(void)
- 	vmcs_write(HOST_SEL_GS, KERNEL_DS);
- 	vmcs_write(HOST_SEL_TR, TSS_MAIN);
- 	vmcs_write(HOST_BASE_TR, get_gdt_entry_base(get_tss_descr()));
--	vmcs_write(HOST_BASE_GDTR, gdt64_desc.base);
-+	vmcs_write(HOST_BASE_GDTR, gdt_descr.base);
- 	vmcs_write(HOST_BASE_IDTR, idt_descr.base);
- 	vmcs_write(HOST_BASE_FS, 0);
- 	vmcs_write(HOST_BASE_GS, 0);
-@@ -1354,9 +1354,9 @@ static void init_vmcs_guest(void)
- 	vmcs_write(GUEST_AR_TR, 0x8b);
- 
- 	/* 26.3.1.3 */
--	vmcs_write(GUEST_BASE_GDTR, gdt64_desc.base);
-+	vmcs_write(GUEST_BASE_GDTR, gdt_descr.base);
- 	vmcs_write(GUEST_BASE_IDTR, idt_descr.base);
--	vmcs_write(GUEST_LIMIT_GDTR, gdt64_desc.limit);
-+	vmcs_write(GUEST_LIMIT_GDTR, gdt_descr.limit);
- 	vmcs_write(GUEST_LIMIT_IDTR, idt_descr.limit);
- 
- 	/* 26.3.1.4 */
-diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index ac2b0b4..9ee6653 100644
---- a/x86/vmx_tests.c
-+++ b/x86/vmx_tests.c
-@@ -797,8 +797,8 @@ asm(
- 	"insn_wbinvd: wbinvd;ret\n\t"
- 	"insn_cpuid: mov $10, %eax; cpuid;ret\n\t"
- 	"insn_invd: invd;ret\n\t"
--	"insn_sgdt: sgdt gdt64_desc;ret\n\t"
--	"insn_lgdt: lgdt gdt64_desc;ret\n\t"
-+	"insn_sgdt: sgdt gdt_descr;ret\n\t"
-+	"insn_lgdt: lgdt gdt_descr;ret\n\t"
- 	"insn_sidt: sidt idt_descr;ret\n\t"
- 	"insn_lidt: lidt idt_descr;ret\n\t"
- 	"insn_sldt: sldt %ax;ret\n\t"
+ .align 4096
+@@ -83,7 +79,7 @@ i = 0
+ tss:
+ 	.rept max_cpus
+ 	.long 0
+-	.quad ring0stacktop - i * 4096
++	.quad 0
+ 	.quad 0, 0
+ 	.quad 0, 0, 0, 0, 0, 0, 0, 0
+ 	.long 0, 0, 0
+diff --git a/x86/umip.c b/x86/umip.c
+index 0fc1f65..1936989 100644
+--- a/x86/umip.c
++++ b/x86/umip.c
+@@ -124,7 +124,7 @@ static noinline int do_ring3(void (*fn)(const char *), const char *arg)
+ 		  "mov %%dx, %%es\n\t"
+ 		  "mov %%dx, %%fs\n\t"
+ 		  "mov %%dx, %%gs\n\t"
+-		  "mov %%" R "sp, %%" R "cx\n\t"
++		  "mov %%" R "sp, %[sp0]\n\t" /* kernel sp for exception handlers */
+ 		  "push" W " %%" R "dx \n\t"
+ 		  "lea %[user_stack_top], %%" R "dx \n\t"
+ 		  "push" W " %%" R "dx \n\t"
+@@ -133,8 +133,6 @@ static noinline int do_ring3(void (*fn)(const char *), const char *arg)
+ 		  "push" W " $1f \n\t"
+ 		  "iret" W "\n"
+ 		  "1: \n\t"
+-		  "push %%" R "cx\n\t"   /* save kernel SP */
+-
+ #ifndef __x86_64__
+ 		  "push %[arg]\n\t"
+ #endif
+@@ -142,13 +140,15 @@ static noinline int do_ring3(void (*fn)(const char *), const char *arg)
+ #ifndef __x86_64__
+ 		  "pop %%ecx\n\t"
+ #endif
+-
+-		  "pop %%" R "cx\n\t"
+ 		  "mov $1f, %%" R "dx\n\t"
+ 		  "int %[kernel_entry_vector]\n\t"
+ 		  ".section .text.entry \n\t"
+ 		  "kernel_entry: \n\t"
+-		  "mov %%" R "cx, %%" R "sp \n\t"
++#ifdef __x86_64__
++		  "mov %[sp0], %%" R "sp\n\t"
++#else
++		  "add $(5 * " S "), %%esp\n\t"
++#endif
+ 		  "mov %[kernel_ds], %%cx\n\t"
+ 		  "mov %%cx, %%ds\n\t"
+ 		  "mov %%cx, %%es\n\t"
+@@ -157,7 +157,12 @@ static noinline int do_ring3(void (*fn)(const char *), const char *arg)
+ 		  "jmp *%%" R "dx \n\t"
+ 		  ".section .text\n\t"
+ 		  "1:\n\t"
+-		  : [ret] "=&a" (ret)
++		  : [ret] "=&a" (ret),
++#ifdef __x86_64__
++		    [sp0] "=m" (tss.rsp0)
++#else
++		    [sp0] "=m" (tss.esp0)
++#endif
+ 		  : [user_ds] "i" (USER_DS),
+ 		    [user_cs] "i" (USER_CS),
+ 		    [user_stack_top]"m"(user_stack[sizeof(user_stack) -
 -- 
 2.34.0.rc1.387.gb447b232ab-goog
 
