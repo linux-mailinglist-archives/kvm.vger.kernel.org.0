@@ -2,36 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BE6D744BE30
-	for <lists+kvm@lfdr.de>; Wed, 10 Nov 2021 11:00:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DFD7D44BE34
+	for <lists+kvm@lfdr.de>; Wed, 10 Nov 2021 11:00:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230455AbhKJKDb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Nov 2021 05:03:31 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:38736 "EHLO
+        id S231174AbhKJKDi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Nov 2021 05:03:38 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:40343 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229653AbhKJKDa (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 10 Nov 2021 05:03:30 -0500
+        by vger.kernel.org with ESMTP id S230456AbhKJKDg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 10 Nov 2021 05:03:36 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636538443;
+        s=mimecast20190719; t=1636538449;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=86aMXmKzAawqKTKO1WhU1TxCzGNukAcU5Mte3VBLD7I=;
-        b=bZhm6HdnhnSfymP9Pfix9aqLNApw3PsrclDgEwU3An0cZYI6UcefvPjVoY/qhlHEZsZCde
-        zgOBpFgyc1qccxUCST81SFxrEugSVkrDLVvv3b9wp9bVCi4JEB6+e8+TKoQaLY3V4efqtc
-        h2EOsev2VXa8I63lI703ivaCxMbNS14=
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=SXmw4UL6pUw7vk0K53uGHVrES63lbb9L++9ywYEo/w4=;
+        b=Q4+Sbra6wlfpPnFNDjVd3DKgKDeFPLij8hEVm7DwwQNsiWUiwXPSU+Z+Bj4plzTwWMGPN/
+        YqkMgc4x/2Gz9iDG58czQbwKt1qqwuNQXN1pTQsMWzygdjx2JnbfMFgicl3Fue7abU78wp
+        z+kB5fFIER7BHSGPCGlukR7JlZ9f1B4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-346-TfdYpu-fNRGt3NcYkLxIjg-1; Wed, 10 Nov 2021 05:00:41 -0500
-X-MC-Unique: TfdYpu-fNRGt3NcYkLxIjg-1
+ us-mta-311-59RoaI07MfWnaGe3rf7pdQ-1; Wed, 10 Nov 2021 05:00:46 -0500
+X-MC-Unique: 59RoaI07MfWnaGe3rf7pdQ-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B5DAF824F88;
-        Wed, 10 Nov 2021 10:00:39 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8971E845F2C;
+        Wed, 10 Nov 2021 10:00:44 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.40.194.243])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 28A3610495BA;
-        Wed, 10 Nov 2021 10:00:19 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 303891045EBC;
+        Wed, 10 Nov 2021 10:00:39 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     Wanpeng Li <wanpengli@tencent.com>, Borislav Petkov <bp@alien8.de>,
@@ -45,81 +46,67 @@ Cc:     Wanpeng Li <wanpengli@tencent.com>, Borislav Petkov <bp@alien8.de>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Jim Mattson <jmattson@google.com>,
         Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH 0/3] VMX: nested migration fixes for 32 bit nested guests
-Date:   Wed, 10 Nov 2021 12:00:15 +0200
-Message-Id: <20211110100018.367426-1-mlevitsk@redhat.com>
-Content-Type: text/plain; charset="utf-8"
+Subject: [PATCH 1/3] KVM: nVMX: extract calculation of the L1's EFER
+Date:   Wed, 10 Nov 2021 12:00:16 +0200
+Message-Id: <20211110100018.367426-2-mlevitsk@redhat.com>
+In-Reply-To: <20211110100018.367426-1-mlevitsk@redhat.com>
+References: <20211110100018.367426-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is hopefully the last issue I was tracking in regard to nested migrati=
-on,=0D
-as far as I know.=0D
-=0D
-The issue is that migration of L1 which is normal 64 bit guest,=0D
-but is running a 32 bit nested guest is broken on VMX and I finally found o=
-ut why.=0D
-=0D
-There are two bugs, both related to the fact that qemu first restores SREGS=
-=0D
-of L2, and only then sets the nested state. That haunts us till this day.=0D
-=0D
-First issue is that vmx_set_nested_state does some checks on the host=0D
-state stored in vmcs12, but it uses the current IA32_EFER which is from L2.=
-=0D
-Thus, consistency checks fail.=0D
-=0D
-I fixed this by restoring L1's efer from vmcs12, letting these checks pass,=
-=0D
-which is somewhat hacky so I am open for better suggestions on how to do th=
-is.=0D
-One option is to pass explicit value of the L1's IA32_EFER to the consisten=
-cy=0D
-check code, and leave L2's IA32_EFER alone.=0D
-=0D
-The second issue is that L2 IA32_EFER makes L1's mmu be initialized incorre=
-ctly=0D
-(with PAE paging). This itself isn't an immediate problem as we are going i=
-nto the L2,=0D
-but when we exit it, we don't reset the L1's mmu back to 64 bit mode becaus=
-e,=0D
-It so happens that the mmu role doesn't change and the 64 bitness isn't par=
-t of the mmu role.=0D
-=0D
-I fixed this also with somewhat a hack by checking that mmu's level didn't =
-change,=0D
-but there is also an option to make 64 bitness be part of the mmu role.=0D
-=0D
-Also when restoring the L1's IA32_EFER, it is possible to reset L1's mmu,=0D
-so that it is setup correctly, which isn't strictly needed but does=0D
-make it more bug proof.=0D
-The 3rd patch is still needed as resetting the mmu right after restoring=0D
-IA32_EFER does nothing without this patch as well.=0D
-=0D
-SVM in theory has both issues, but restoring L1's EFER into vcpu->arch.efer=
-=0D
-isn't needed there as the code explicitly checks the L1's save area instead=
-=0D
-for consistency.=0D
-=0D
-Best regards,=0D
-	Maxim Levitsky=0D
-=0D
-Maxim Levitsky (3):=0D
-  KVM: nVMX: extract calculation of the L1's EFER=0D
-  KVM: nVMX: restore L1's EFER prior to setting the nested state=0D
-  KVM: x86/mmu: don't skip mmu initialization when mmu root level=0D
-    changes=0D
-=0D
- arch/x86/kvm/mmu/mmu.c    | 14 ++++++++++----=0D
- arch/x86/kvm/vmx/nested.c | 33 +++++++++++++++++++++++++++------=0D
- 2 files changed, 37 insertions(+), 10 deletions(-)=0D
-=0D
--- =0D
-2.26.3=0D
-=0D
+This will be useful in the next patch.
+
+No functional change intended.
+
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+---
+ arch/x86/kvm/vmx/nested.c | 22 ++++++++++++++++------
+ 1 file changed, 16 insertions(+), 6 deletions(-)
+
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index b4ee5e9f9e201..49ae96c0cc4d1 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -4228,6 +4228,21 @@ static void prepare_vmcs12(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+ 	kvm_clear_interrupt_queue(vcpu);
+ }
+ 
++/*
++ * Given vmcs12, return the expected L1 value of IA32_EFER
++ * after VM exit from that vmcs12
++ */
++static inline u64 nested_vmx_get_vmcs12_host_efer(struct kvm_vcpu *vcpu,
++						  struct vmcs12 *vmcs12)
++{
++	if (vmcs12->vm_exit_controls & VM_EXIT_LOAD_IA32_EFER)
++		return vmcs12->host_ia32_efer;
++	else if (vmcs12->vm_exit_controls & VM_EXIT_HOST_ADDR_SPACE_SIZE)
++		return vcpu->arch.efer | (EFER_LMA | EFER_LME);
++	else
++		return vcpu->arch.efer & ~(EFER_LMA | EFER_LME);
++}
++
+ /*
+  * A part of what we need to when the nested L2 guest exits and we want to
+  * run its L1 parent, is to reset L1's guest state to the host state specified
+@@ -4243,12 +4258,7 @@ static void load_vmcs12_host_state(struct kvm_vcpu *vcpu,
+ 	enum vm_entry_failure_code ignored;
+ 	struct kvm_segment seg;
+ 
+-	if (vmcs12->vm_exit_controls & VM_EXIT_LOAD_IA32_EFER)
+-		vcpu->arch.efer = vmcs12->host_ia32_efer;
+-	else if (vmcs12->vm_exit_controls & VM_EXIT_HOST_ADDR_SPACE_SIZE)
+-		vcpu->arch.efer |= (EFER_LMA | EFER_LME);
+-	else
+-		vcpu->arch.efer &= ~(EFER_LMA | EFER_LME);
++	vcpu->arch.efer = nested_vmx_get_vmcs12_host_efer(vcpu, vmcs12);
+ 	vmx_set_efer(vcpu, vcpu->arch.efer);
+ 
+ 	kvm_rsp_write(vcpu, vmcs12->host_rsp);
+-- 
+2.26.3
 
