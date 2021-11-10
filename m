@@ -2,117 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E1E844BE38
-	for <lists+kvm@lfdr.de>; Wed, 10 Nov 2021 11:01:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E05844BE74
+	for <lists+kvm@lfdr.de>; Wed, 10 Nov 2021 11:18:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231215AbhKJKDu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Nov 2021 05:03:50 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50385 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231180AbhKJKDq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 10 Nov 2021 05:03:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636538459;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=s0kl1pu5e8AfuwOD4EByN8Bid0Hy0Ge+6FEAJzOlZXk=;
-        b=R9Aw1LfSv6Lfd49DGrI0whfIYF9bdi2Of/+iW4WtdLOwepriKhiSIUfZMRdgs3cx7CU7p/
-        wQGgRk6gvZHz6qs6lANKocMCGo08tLsJNq1oV5qvvkkyBew7+2/bL12THD7oP6jnCORhHT
-        R4hgm6FLE2BqK+8bHbksk8HQP6ZFgKE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-567-PH1IkTukNJmEqYxRhlid-A-1; Wed, 10 Nov 2021 05:00:55 -0500
-X-MC-Unique: PH1IkTukNJmEqYxRhlid-A-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 34F9B87D541;
-        Wed, 10 Nov 2021 10:00:53 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.40.194.243])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4B0DD1037F3B;
-        Wed, 10 Nov 2021 10:00:49 +0000 (UTC)
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Wanpeng Li <wanpengli@tencent.com>, Borislav Petkov <bp@alien8.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH 3/3] KVM: x86/mmu: don't skip mmu initialization when mmu root level changes
-Date:   Wed, 10 Nov 2021 12:00:18 +0200
-Message-Id: <20211110100018.367426-4-mlevitsk@redhat.com>
-In-Reply-To: <20211110100018.367426-1-mlevitsk@redhat.com>
-References: <20211110100018.367426-1-mlevitsk@redhat.com>
+        id S231347AbhKJKV1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Nov 2021 05:21:27 -0500
+Received: from mail-dm6nam11on2086.outbound.protection.outlook.com ([40.107.223.86]:43008
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S231301AbhKJKVY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Nov 2021 05:21:24 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=V89wRff+Ee9H2nae6+azjrWAkzua/rBFjlUP4wu1vJ2f3xyCFNe9VwyxBLHfM5RXp1Njomz7LBL9TgZDhn9vQRDEOVmX5R2+2Nq9dpUmDXVS1NX8eB6B8BZ8w0eJgozne6tugB2kEAvJgRiePbVxkIXmzU3X/mNK4YTEQCivoivGwoAqugmXqzRjnvcmZ5DJdzy0hYXdEbJDCvfCWX/56YL6WYWQZI/QC81QzmSZQe5Gx+D8ql74j3hRL4Kd/gVTAVGMA+7SVRPeHAaqHtj3b+RwDop0EAWlMg1Hf1PcJhhzsSc1UYJBLQorNyhmXWCJgQprLV9/HAYpf2Vcs9OfsQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=H5J8ssTIU/OU5qPUZiOrKmwTeNzk6kwInLYfpFmL0uA=;
+ b=nxidZqLNjR2uxeGZOsdJHotdv+kGD3Z8Yz7y/WpsDuCd9YTXDYw7buarkogXkQUlL8tZO77PHNx/KXI3yMBdCoqxlJ+cweh1z89eBsInzfJZLBIzWEa3UlT1H6YP4HW2pJkjls+94sq2OjXxRiKBPZNn6euCsL6P6GaMcMdokXd/MIGNljAhAuyE985sK9dcWqMvcmt9avlP2zh1gNChVMvgvC2M/EaK4qRJHOtXFf81Zftk3R39Um8JXDnavK+7maEGx18u2PwH8E7klLo6YvmDOwJWDw/cvboeYCgT43HVxuYxO6TerR27xcx/3QsFQgWSiWbskUmFlT6mWK/Yag==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=H5J8ssTIU/OU5qPUZiOrKmwTeNzk6kwInLYfpFmL0uA=;
+ b=vseLOa/EdOX329Jn7GZuK4ctV1TgHTldvFNdEM4PK1EKqBOK0619qvr31wETH1PjyH62q1vMJ49XyE98cUzyaxNG7tKsFsFsuNvSIvuLBUEBqP5SUt2IjloTazd0tk/kxgyKMO26CM233SaeAZDW7Q+w0djv5TvuYmz8DFmc20Y=
+Received: from DM6PR13CA0024.namprd13.prod.outlook.com (2603:10b6:5:bc::37) by
+ BY5PR12MB4641.namprd12.prod.outlook.com (2603:10b6:a03:1f7::29) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4690.16; Wed, 10 Nov
+ 2021 10:18:35 +0000
+Received: from DM6NAM11FT021.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:bc:cafe::29) by DM6PR13CA0024.outlook.office365.com
+ (2603:10b6:5:bc::37) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4690.6 via Frontend
+ Transport; Wed, 10 Nov 2021 10:18:34 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com;
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ DM6NAM11FT021.mail.protection.outlook.com (10.13.173.76) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.4690.15 via Frontend Transport; Wed, 10 Nov 2021 10:18:34 +0000
+Received: from sos-ubuntu2004-quartz01.amd.com (10.180.168.240) by
+ SATLEXMB04.amd.com (10.181.40.145) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.17; Wed, 10 Nov 2021 04:18:33 -0600
+From:   Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+To:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
+        <x86@kernel.org>
+CC:     <pbonzini@redhat.com>, <joro@8bytes.org>, <tglx@linutronix.de>,
+        <mingo@redhat.com>, <bp@alien8.de>, <peterz@infradead.org>,
+        <hpa@zytor.com>, <thomas.lendacky@amd.com>, <jon.grimm@amd.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+Subject: [PATCH 0/2] svm: avic: Allow AVIC support on system w/ physical APIC ID > 255
+Date:   Wed, 10 Nov 2021 04:18:03 -0600
+Message-ID: <20211110101805.16343-1-suravee.suthikulpanit@amd.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: a92f3ed0-0a96-459b-e702-08d9a4337420
+X-MS-TrafficTypeDiagnostic: BY5PR12MB4641:
+X-Microsoft-Antispam-PRVS: <BY5PR12MB4641384B9611E16339E695F0F3939@BY5PR12MB4641.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: X6l3Iq50ctwPx7SBd72OGl5fDZus3uA9QSMMhchl4oLi5xRYw2SzaiFuXriwRssTnBQ+sRq/jgSG5DN8dGgeLe4ysW0b5dK5kn3RFwMxmiqykzzOjuHM+o0BsM1SjRID3uT+4KCblLcOHWJxKe2R3UjcVoAti1J+G4K25hfn13bN0FJqRJRJ+ezv7ambkvZv7ntUcqc1d91Ut7tunFo54JLA+5DJjotRXtMTuI693/dCSP8cQQd+11GIc+DLMgUSsCaN+W6yiQQdsu8RH/A1D9YDQBquHwzd6G3i/DpUI6AvxiBlFVhPQBouzHZ4p46TtKYxw1MqTCSldQU87rvVnmooveVOB8loBeVAhJkSBENOFczwXXp64bi/caBPaibpiH/lSEPuW42qfQfLO1C5xVRZ+oIATjJHYrbhfmTHhOPF/f+zneaiVSbQbZbX8kZmcwTCq2ryS7L+qXw4Hj0tPfpQ0h+ddjC4Sn4pbbHnzAqYk0os9xhw+Mi9Lul+Vr6B/0SyQwAkXzLLq80Mg7oqaLShZoFo5os6c0T10A13mTe9TLE1dMfS/WF7dcr+i6jrVDlphQuHETwngXtoxPxNnbpnpYRtKQVE22ryz49cRVxrMDHhSXWXSXDrzFDYwA0Qa9bLCZET18BuM5PJZK4DpIEFZ8eTqanR+5IzS8CIe19vgV0D/JHLIPYbDCeuNRQtCFg3bYL/jsvVa5mJToYCoqvoYCc+h7oOvFvnSI2d5Rg=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(4636009)(36840700001)(46966006)(8936002)(1076003)(336012)(186003)(508600001)(16526019)(83380400001)(316002)(7696005)(4744005)(110136005)(2616005)(70586007)(70206006)(26005)(82310400003)(356005)(5660300002)(6666004)(4326008)(44832011)(47076005)(36756003)(36860700001)(2906002)(86362001)(8676002)(7416002)(426003)(81166007)(54906003)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Nov 2021 10:18:34.7506
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: a92f3ed0-0a96-459b-e702-08d9a4337420
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT021.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4641
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When running mix of 32 and 64 bit guests, it is possible to have mmu
-reset with same mmu role but different root level (32 bit vs 64 bit paging)
+Originally, AMD SVM AVIC supports 8-bit host physical APIC ID.
+However, newer AMD systems can have physical APIC ID larger than 255,
+and AVIC hardware has been extended to support upto the maximum physical
+APIC ID available in the system.
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- arch/x86/kvm/mmu/mmu.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+This series introduces a helper function in the APIC subsystem to get
+the maximum physical APIC ID allowing the SVM AVIC driver to calculate
+the number of bits to program the host physical APIC ID in the AVIC
+physical APIC ID table entry.
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 354d2ca92df4d..763867475860f 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -4745,7 +4745,10 @@ static void init_kvm_tdp_mmu(struct kvm_vcpu *vcpu)
- 	union kvm_mmu_role new_role =
- 		kvm_calc_tdp_mmu_root_page_role(vcpu, &regs, false);
- 
--	if (new_role.as_u64 == context->mmu_role.as_u64)
-+	u8 new_root_level = role_regs_to_root_level(&regs);
-+
-+	if (new_role.as_u64 == context->mmu_role.as_u64 &&
-+	    context->root_level == new_root_level)
- 		return;
- 
- 	context->mmu_role.as_u64 = new_role.as_u64;
-@@ -4757,7 +4760,7 @@ static void init_kvm_tdp_mmu(struct kvm_vcpu *vcpu)
- 	context->get_guest_pgd = get_cr3;
- 	context->get_pdptr = kvm_pdptr_read;
- 	context->inject_page_fault = kvm_inject_page_fault;
--	context->root_level = role_regs_to_root_level(&regs);
-+	context->root_level = new_root_level;
- 
- 	if (!is_cr0_pg(context))
- 		context->gva_to_gpa = nonpaging_gva_to_gpa;
-@@ -4806,7 +4809,10 @@ static void shadow_mmu_init_context(struct kvm_vcpu *vcpu, struct kvm_mmu *conte
- 				    struct kvm_mmu_role_regs *regs,
- 				    union kvm_mmu_role new_role)
- {
--	if (new_role.as_u64 == context->mmu_role.as_u64)
-+	u8 new_root_level = role_regs_to_root_level(regs);
-+
-+	if (new_role.as_u64 == context->mmu_role.as_u64 &&
-+	    context->root_level == new_root_level)
- 		return;
- 
- 	context->mmu_role.as_u64 = new_role.as_u64;
-@@ -4817,8 +4823,8 @@ static void shadow_mmu_init_context(struct kvm_vcpu *vcpu, struct kvm_mmu *conte
- 		paging64_init_context(context);
- 	else
- 		paging32_init_context(context);
--	context->root_level = role_regs_to_root_level(regs);
- 
-+	context->root_level = new_root_level;
- 	reset_guest_paging_metadata(vcpu, context);
- 	context->shadow_root_level = new_role.base.level;
- 
+Regards,
+Suravee Suthikulpanit
+
+Suravee Suthikulpanit (2):
+  x86/apic: Add helper function to get maximum physical APIC ID
+  KVM: SVM: Extend host physical APIC ID field to support more than
+    8-bit
+
+ arch/x86/include/asm/apic.h |  1 +
+ arch/x86/kernel/apic/apic.c |  6 +++++
+ arch/x86/kvm/svm/avic.c     | 53 +++++++++++++++++++++++++++++++------
+ arch/x86/kvm/svm/svm.c      |  6 +++++
+ arch/x86/kvm/svm/svm.h      |  2 +-
+ 5 files changed, 59 insertions(+), 9 deletions(-)
+
 -- 
-2.26.3
+2.25.1
 
