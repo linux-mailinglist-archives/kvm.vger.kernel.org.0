@@ -2,103 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D60B44B9D0
-	for <lists+kvm@lfdr.de>; Wed, 10 Nov 2021 01:56:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9FFF544BA0F
+	for <lists+kvm@lfdr.de>; Wed, 10 Nov 2021 02:45:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229699AbhKJA7f (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 9 Nov 2021 19:59:35 -0500
-Received: from mga09.intel.com ([134.134.136.24]:29430 "EHLO mga09.intel.com"
+        id S229741AbhKJBso (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 9 Nov 2021 20:48:44 -0500
+Received: from mga01.intel.com ([192.55.52.88]:24355 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229506AbhKJA7e (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 9 Nov 2021 19:59:34 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10163"; a="232417678"
-X-IronPort-AV: E=Sophos;i="5.87,221,1631602800"; 
-   d="scan'208";a="232417678"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2021 16:56:47 -0800
-X-IronPort-AV: E=Sophos;i="5.87,221,1631602800"; 
-   d="scan'208";a="491894028"
-Received: from cqiang-mobl.ccr.corp.intel.com (HELO [10.238.2.71]) ([10.238.2.71])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2021 16:56:44 -0800
-Message-ID: <0b1ac54e-5706-4864-a4a9-1d1a2cff354a@intel.com>
-Date:   Wed, 10 Nov 2021 08:56:41 +0800
+        id S229473AbhKJBso (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 9 Nov 2021 20:48:44 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10163"; a="256262318"
+X-IronPort-AV: E=Sophos;i="5.87,222,1631602800"; 
+   d="scan'208";a="256262318"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2021 17:45:57 -0800
+X-IronPort-AV: E=Sophos;i="5.87,222,1631602800"; 
+   d="scan'208";a="503752418"
+Received: from unknown (HELO [10.239.13.123]) ([10.239.13.123])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Nov 2021 17:45:52 -0800
+Message-ID: <82145eab-5b0b-bc26-8f8e-2bd68b9e7b28@intel.com>
+Date:   Wed, 10 Nov 2021 09:45:50 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
  Firefox/91.0 Thunderbird/91.3.0
-Subject: Re: [PATCH v5 3/7] KVM: X86: Expose IA32_PKRS MSR
+Subject: Re: [RFC PATCH v2 24/69] KVM: x86: Introduce "protected guest"
+ concept and block disallowed ioctls
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     isaku.yamahata@gmail.com,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>, x86@kernel.org,
         Joerg Roedel <joro@8bytes.org>,
-        Xiaoyao Li <xiaoyao.li@intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20210811101126.8973-1-chenyi.qiang@intel.com>
- <20210811101126.8973-4-chenyi.qiang@intel.com> <YYliC1kdT9ssX/f7@google.com>
- <85414ca6-e135-2371-cbce-0f595a7b7a26@intel.com>
- <YYqT/cOm3Psf1gj1@google.com>
-From:   Chenyi Qiang <chenyi.qiang@intel.com>
-In-Reply-To: <YYqT/cOm3Psf1gj1@google.com>
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, erdemaktas@google.com,
+        Connor Kuehl <ckuehl@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <cover.1625186503.git.isaku.yamahata@intel.com>
+ <482264f17fa0652faad9bd5364d652d11cb2ecb8.1625186503.git.isaku.yamahata@intel.com>
+ <02ca73b2-7f04-813d-5bb7-649c0edafa06@redhat.com>
+ <209a57e9-ca9c-3939-4aaa-4602e3dd7cdd@amd.com>
+ <6f0d243c-4f40-d608-3309-5c37536ab866@intel.com>
+ <3966eaf0-ed8e-c356-97dd-f8c5c3057439@redhat.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <3966eaf0-ed8e-c356-97dd-f8c5c3057439@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 11/10/2021 1:15 AM, Paolo Bonzini wrote:
+> On 11/9/21 14:37, Xiaoyao Li wrote:
+>>
+>> Tom,
+>>
+>> I think what you did in this commit is not so correct. It just 
+>> silently ignores the ioctls insteaf of returning an error to userspace 
+>> to tell this IOCTL is not invalid to this VM. E.g., for 
+>> kvm_arch_vcpu_ioctl_get_fpu(), QEMU just gets it succesful with fpu 
+>> being all zeros.
+> 
+> Yes, it's a "cop out" that removes the need for more complex changes in 
+> QEMU.
+> 
+> I think for the get/set registers ioctls 
+> KVM_GET/SET_{REGS,SREGS,FPU,XSAVE,XCRS} we need to consider SEV-ES 
+> backwards compatibility.  This means, at least for now, only apply the 
+> restriction to TDX (using a bool-returning function, see the review for 
+> 28/69).
+> 
+> For SMM, MCE, vCPU events and for kvm_valid/dirty_regs, it can be done 
+> as in this patch.
+> 
+
+thank you Paolo,
+
+I will go with this direction.
 
 
-On 11/9/2021 11:30 PM, Sean Christopherson wrote:
-> On Tue, Nov 09, 2021, Chenyi Qiang wrote:
->>
->> On 11/9/2021 1:44 AM, Sean Christopherson wrote:
->>> Hrm.  Ideally this would be open coded in vmx_set_msr().  Long term, the RESET/INIT
->>> paths should really treat MSR updates as "normal" host_initiated writes instead of
->>> having to manually handle every MSR.
->>>
->>> That would be a bit gross to handle in vmx_vcpu_reset() since it would have to
->>> create a struct msr_data (because __kvm_set_msr() isn't exposed to vendor code),
->>> but since vcpu->arch.pkrs is relevant to the MMU I think it makes sense to
->>> initiate the write from common x86.
->>>
->>> E.g. this way there's not out-of-band special code, vmx_vcpu_reset() is kept clean,
->>> and if/when SVM gains support for PKRS this particular path Just Works.  And it would
->>> be an easy conversion for my pipe dream plan of handling MSRs at RESET/INIT via a
->>> list of MSRs+values.
->>>
->>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->>> index ac83d873d65b..55881d13620f 100644
->>> --- a/arch/x86/kvm/x86.c
->>> +++ b/arch/x86/kvm/x86.c
->>> @@ -11147,6 +11147,9 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
->>>           kvm_set_rflags(vcpu, X86_EFLAGS_FIXED);
->>>           kvm_rip_write(vcpu, 0xfff0);
->>>
->>> +       if (kvm_cpu_cap_has(X86_FEATURE_PKS))
->>> +               __kvm_set_msr(vcpu, MSR_IA32_PKRS, 0, true);
->>> +
->>
->> Got it. In addition, is it necessary to add on-INIT check? like:
->>
->> if (kvm_cpu_cap_has(X86_FEATURE_PKS) && !init_event)
->> 	__kvm_set_msr(vcpu, MSR_IA32_PKRS, 0, true);
->>
->> PKRS should be preserved on INIT, not cleared. The SDM doesn't make this
->> clear either.
-> 
-> Hmm, but your cover letter says:
-> 
->    To help patches review, one missing info in SDM is that PKSR will be
->    cleared on Powerup/INIT/RESET, which should be listed in Table 9.1
->    "IA-32 and Intel 64 Processor States Following Power-up, Reset, or INIT"
-> 
-> Which honestly makes me a little happy because I thought I was making stuff up
-> for a minute :-)
-> 
-> So which is it?
-
-Sorry about the confusion. PKRS is preserved on INIT. I tried to correct 
-my statement in previous ping mail but seems not so obvious.
-
-> 
