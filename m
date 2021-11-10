@@ -2,108 +2,269 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 96D4B44CCF7
-	for <lists+kvm@lfdr.de>; Wed, 10 Nov 2021 23:45:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DE7D644CDB7
+	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 00:19:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233661AbhKJWrs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Nov 2021 17:47:48 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45858 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233606AbhKJWrr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 10 Nov 2021 17:47:47 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636584299;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=uSmqrlgPiKChWo5c33MTnXOthA4T/vd9DTc7OgLD2e4=;
-        b=ZZRMne158GhvkdSE5lhBQuAf1QkhI+SJbA1dSD7lU3qZSxNbxOoNMiSBmUfN76k5qReL/A
-        yinDdQeoAZKvuDLyqPkguXmxdZwPULAdvwjSHK9AiszdM+PPTS5wj977lqnyLl2HsZPZDw
-        oi99N+kFHx/jt90JAHLIxa+3QxGzTSU=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-550-u6UkiKHANn-g5Zt4JUGWOA-1; Wed, 10 Nov 2021 17:44:57 -0500
-X-MC-Unique: u6UkiKHANn-g5Zt4JUGWOA-1
-Received: by mail-ed1-f69.google.com with SMTP id h18-20020a056402281200b003e2e9ea00edso3640068ede.16
-        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 14:44:57 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=uSmqrlgPiKChWo5c33MTnXOthA4T/vd9DTc7OgLD2e4=;
-        b=sHVGvYOVoOpktCTGCG2MFbWaxMthGXKZFmfwDJyNK5e1MMaXttxfSu6TXxMbGW14BB
-         SpdRIZ+0iiiKODDjfFLpwDGlRNohTlbVIwEaYLXc/46R+QzJQ7lM2ItbpJhnOfl7YiyD
-         83Oeg3H99cxByu2VyAivlX6ubPQLE7ZuU4KeKMNEc6w9jmS+IUfgbKidT9djKM0Tbq3O
-         ub51Mhp5Ib9Iu9I1z+kLbnUpuLSQY5UaG0nKwRNVbzYb2SFmMFZ9cky2ssk9WBXL+UV4
-         ZCTqF17oNcZ4gN4PsNoHXQ9ZTfSEjLf8c8o8X4l2lioUKPCrsb/9TZDTkNL3YPHjuw/l
-         eMEg==
-X-Gm-Message-State: AOAM530s4GDzK3qAuz4fzNXPPaTrnwc6+whMCZ6yvDgfct97SHY8g1MB
-        AVS2HYZDm9Ixf6+lLcrobcqKCTCyk3pnwlyD34Ssz/a9pKWm6QmJPy2dC458pFJL3oTtnH4KtGh
-        XpfQYZDzkDD33
-X-Received: by 2002:a17:907:3ea7:: with SMTP id hs39mr3581484ejc.164.1636584296670;
-        Wed, 10 Nov 2021 14:44:56 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwzqO8sPtFDtNmiynR1h4PWHzluTQnK55FNEyoRgrmsJDHLh7W+j4c0z6fxQPp/wGsRhNBveQ==
-X-Received: by 2002:a17:907:3ea7:: with SMTP id hs39mr3581448ejc.164.1636584296430;
-        Wed, 10 Nov 2021 14:44:56 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id go10sm452325ejc.115.2021.11.10.14.44.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Nov 2021 14:44:55 -0800 (PST)
-Message-ID: <80407e4a-36e1-e606-ed9f-74429f850e77@redhat.com>
-Date:   Wed, 10 Nov 2021 23:44:54 +0100
+        id S234019AbhKJXWb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Nov 2021 18:22:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50698 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229470AbhKJXWa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Nov 2021 18:22:30 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFB1AC061766;
+        Wed, 10 Nov 2021 15:19:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:
+        Subject:Sender:Reply-To:Content-ID:Content-Description;
+        bh=xEqDTWAFLmx5Cn/nPzkjs/40QqO/RwaitF32KXxu59A=; b=0N1jHe9g2Kx7FDMkvMd+aqWqTd
+        ES864jTKdeSH502Te2dAQgD5o074jRrvrbfjNkWxI7NeCcTG+DelqjTctGQwtF6QbU9P2Vca8O3PI
+        tNPZtp37cfZrrdfpxFOZr5ErY8z+DFMafGmP38iNl8O5DbeFmSFg8ODoGBfOe1L6BpLlQoai3sBBv
+        9rb5+2tOb3oz8QafYu+mSItUn7fhTy6oK05Ij3jE7B2Hw3+BNWTHfooGyZhgvETbi21/tvA+02TGt
+        qqw3OzIqIOzOQVvmnn/U4/OBYvGnJ0g0RfaXAuIjRI8z/3WWAGa7/n9StQyJcRjtiCIXnQtCtNhXa
+        gWTGaCbQ==;
+Received: from [2601:1c0:6280:3f0::aa0b]
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mkwsW-006cCF-Md; Wed, 10 Nov 2021 23:19:40 +0000
+Subject: Re: drivers/vfio/vfio.c:293: warning: expecting prototype for
+ Container objects(). Prototype was for vfio_container_get() instead
+To:     Jason Gunthorpe <jgg@nvidia.com>, kernel test robot <lkp@intel.com>
+Cc:     kbuild-all@lists.01.org, linux-kernel@vger.kernel.org,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org
+References: <202111102328.WDUm0Bl7-lkp@intel.com>
+ <20211110164256.GY1740502@nvidia.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <38a9cb92-a473-40bf-b8f9-85cc5cfc2da4@infradead.org>
+Date:   Wed, 10 Nov 2021 15:19:40 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [RFC 11/19] KVM: x86/mmu: Factor shadow_zero_check out of
- make_spte
+In-Reply-To: <20211110164256.GY1740502@nvidia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-To:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Shier <pshier@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Keqian Zhu <zhukeqian1@huawei.com>,
-        David Hildenbrand <david@redhat.com>
-References: <20211110223010.1392399-1-bgardon@google.com>
- <20211110223010.1392399-12-bgardon@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211110223010.1392399-12-bgardon@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/10/21 23:30, Ben Gardon wrote:
-> -	WARN_ONCE(is_rsvd_spte(&vcpu->arch.mmu->shadow_zero_check, spte, level),
-> +	WARN_ONCE(is_rsvd_spte(shadow_zero_check, spte, level),
->   		  "spte = 0x%llx, level = %d, rsvd bits = 0x%llx", spte, level,
-> -		  get_rsvd_bits(&vcpu->arch.mmu->shadow_zero_check, spte, level));
-> +		  get_rsvd_bits(shadow_zero_check, spte, level));
+On 11/10/21 8:42 AM, Jason Gunthorpe wrote:
+> On Wed, Nov 10, 2021 at 11:12:39PM +0800, kernel test robot wrote:
+>> Hi Jason,
+>>
+>> FYI, the error/warning still remains.
+> 
+> This is just a long standing kdoc misuse.
+> 
+> vfio is not W=1 kdoc clean.
+> 
+> Until someone takes a project to fix this comprehensively there is not
+> much point in reporting new complaints related the existing mis-use..
 
-Hmm, there is a deeper issue here, in that when using EPT/NPT (on either 
-the legacy aka shadow or the TDP MMU) large parts of vcpu->arch.mmu are 
-really the same for all vCPUs.  The only thing that varies is those 
-parts that actually depend on the guest's paging mode---the extended 
-role, the reserved bits, etc.  Those are needed by the emulator, but 
-don't really belong in vcpu->arch.mmu when EPT/NPT is in use.
+Hi,
 
-I wonder if there's room for splitting kvm_mmu in two parts, such as 
-kvm_mmu and kvm_guest_paging_context, and possibly change the walk_mmu 
-pointer into a pointer to kvm_guest_paging_context.  This way the 
-EPT/NPT MMU (again either shadow or TDP) can be moved to kvm->arch.  It 
-should simplify this series and also David's work on eager page splitting.
+Can we just remove all misused "/**" comments in vfio.c until
+someone cares enough to use proper kernel-doc there?
 
-I'm not asking you to do this, of course, but perhaps I can trigger 
-Sean's itch to refactor stuff. :)
+---
+From: Randy Dunlap <rdunlap@infradead.org>
+Subject: [PATCH] vfio/vfio: remove all kernel-doc notation
 
-Paolo
+vfio.c abuses (misuses) "/**", which indicates the beginning of
+kernel-doc notation in the kernel tree. This causes a bunch of
+kernel-doc complaints about this source file, so quieten all of
+them by changing all "/**" to "/*".
+
+vfio.c:236: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
+  * IOMMU driver registration
+vfio.c:236: warning: missing initial short description on line:
+  * IOMMU driver registration
+vfio.c:295: warning: expecting prototype for Container objects(). Prototype was for vfio_container_get() instead
+vfio.c:317: warning: expecting prototype for Group objects(). Prototype was for __vfio_group_get_from_iommu() instead
+vfio.c:496: warning: Function parameter or member 'device' not described in 'vfio_device_put'
+vfio.c:496: warning: expecting prototype for Device objects(). Prototype was for vfio_device_put() instead
+vfio.c:599: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
+  * Async device support
+vfio.c:599: warning: missing initial short description on line:
+  * Async device support
+vfio.c:693: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
+  * VFIO driver API
+vfio.c:693: warning: missing initial short description on line:
+  * VFIO driver API
+vfio.c:835: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
+  * Get a reference to the vfio_device for a device.  Even if the
+vfio.c:835: warning: missing initial short description on line:
+  * Get a reference to the vfio_device for a device.  Even if the
+vfio.c:969: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
+  * VFIO base fd, /dev/vfio/vfio
+vfio.c:969: warning: missing initial short description on line:
+  * VFIO base fd, /dev/vfio/vfio
+vfio.c:1187: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
+  * VFIO Group fd, /dev/vfio/$GROUP
+vfio.c:1187: warning: missing initial short description on line:
+  * VFIO Group fd, /dev/vfio/$GROUP
+vfio.c:1540: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
+  * VFIO Device fd
+vfio.c:1540: warning: missing initial short description on line:
+  * VFIO Device fd
+vfio.c:1615: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
+  * External user API, exported by symbols to be linked dynamically.
+vfio.c:1615: warning: missing initial short description on line:
+  * External user API, exported by symbols to be linked dynamically.
+vfio.c:1663: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
+  * External user API, exported by symbols to be linked dynamically.
+vfio.c:1663: warning: missing initial short description on line:
+  * External user API, exported by symbols to be linked dynamically.
+vfio.c:1742: warning: Function parameter or member 'caps' not described in 'vfio_info_cap_add'
+vfio.c:1742: warning: Function parameter or member 'size' not described in 'vfio_info_cap_add'
+vfio.c:1742: warning: Function parameter or member 'id' not described in 'vfio_info_cap_add'
+vfio.c:1742: warning: Function parameter or member 'version' not described in 'vfio_info_cap_add'
+vfio.c:1742: warning: expecting prototype for Sub(). Prototype was for vfio_info_cap_add() instead
+vfio.c:2276: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
+  * Module/class support
+vfio.c:2276: warning: missing initial short description on line:
+  * Module/class support
+
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Reported-by: kernel test robot <lkp@intel.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>
+Cc: Eric Auger <eric.auger@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>
+Cc: kvm@vger.kernel.org
+---
+  drivers/vfio/vfio.c |   28 ++++++++++++++--------------
+  1 file changed, 14 insertions(+), 14 deletions(-)
+
+--- linux-next-20211110.orig/drivers/vfio/vfio.c
++++ linux-next-20211110/drivers/vfio/vfio.c
+@@ -232,7 +232,7 @@ static inline bool vfio_iommu_driver_all
+  }
+  #endif /* CONFIG_VFIO_NOIOMMU */
+  
+-/**
++/*
+   * IOMMU driver registration
+   */
+  int vfio_register_iommu_driver(const struct vfio_iommu_driver_ops *ops)
+@@ -285,7 +285,7 @@ static int vfio_iommu_group_notifier(str
+  				     unsigned long action, void *data);
+  static void vfio_group_get(struct vfio_group *group);
+  
+-/**
++/*
+   * Container objects - containers are created when /dev/vfio/vfio is
+   * opened, but their lifecycle extends until the last user is done, so
+   * it's freed via kref.  Must support container/group/device being
+@@ -309,7 +309,7 @@ static void vfio_container_put(struct vf
+  	kref_put(&container->kref, vfio_container_release);
+  }
+  
+-/**
++/*
+   * Group objects - create, release, get, put, search
+   */
+  static struct vfio_group *
+@@ -488,7 +488,7 @@ static struct vfio_group *vfio_group_get
+  	return group;
+  }
+  
+-/**
++/*
+   * Device objects - create, release, get, put, search
+   */
+  /* Device reference always implies a group reference */
+@@ -595,7 +595,7 @@ static int vfio_dev_viable(struct device
+  	return ret;
+  }
+  
+-/**
++/*
+   * Async device support
+   */
+  static int vfio_group_nb_add_dev(struct vfio_group *group, struct device *dev)
+@@ -689,7 +689,7 @@ static int vfio_iommu_group_notifier(str
+  	return NOTIFY_OK;
+  }
+  
+-/**
++/*
+   * VFIO driver API
+   */
+  void vfio_init_group_dev(struct vfio_device *device, struct device *dev,
+@@ -831,7 +831,7 @@ int vfio_register_emulated_iommu_dev(str
+  }
+  EXPORT_SYMBOL_GPL(vfio_register_emulated_iommu_dev);
+  
+-/**
++/*
+   * Get a reference to the vfio_device for a device.  Even if the
+   * caller thinks they own the device, they could be racing with a
+   * release call path, so we can't trust drvdata for the shortcut.
+@@ -965,7 +965,7 @@ void vfio_unregister_group_dev(struct vf
+  }
+  EXPORT_SYMBOL_GPL(vfio_unregister_group_dev);
+  
+-/**
++/*
+   * VFIO base fd, /dev/vfio/vfio
+   */
+  static long vfio_ioctl_check_extension(struct vfio_container *container,
+@@ -1183,7 +1183,7 @@ static const struct file_operations vfio
+  	.compat_ioctl	= compat_ptr_ioctl,
+  };
+  
+-/**
++/*
+   * VFIO Group fd, /dev/vfio/$GROUP
+   */
+  static void __vfio_group_unset_container(struct vfio_group *group)
+@@ -1536,7 +1536,7 @@ static const struct file_operations vfio
+  	.release	= vfio_group_fops_release,
+  };
+  
+-/**
++/*
+   * VFIO Device fd
+   */
+  static int vfio_device_fops_release(struct inode *inode, struct file *filep)
+@@ -1611,7 +1611,7 @@ static const struct file_operations vfio
+  	.mmap		= vfio_device_fops_mmap,
+  };
+  
+-/**
++/*
+   * External user API, exported by symbols to be linked dynamically.
+   *
+   * The protocol includes:
+@@ -1659,7 +1659,7 @@ struct vfio_group *vfio_group_get_extern
+  }
+  EXPORT_SYMBOL_GPL(vfio_group_get_external_user);
+  
+-/**
++/*
+   * External user API, exported by symbols to be linked dynamically.
+   * The external user passes in a device pointer
+   * to verify that:
+@@ -1725,7 +1725,7 @@ long vfio_external_check_extension(struc
+  }
+  EXPORT_SYMBOL_GPL(vfio_external_check_extension);
+  
+-/**
++/*
+   * Sub-module support
+   */
+  /*
+@@ -2272,7 +2272,7 @@ struct iommu_domain *vfio_group_iommu_do
+  }
+  EXPORT_SYMBOL_GPL(vfio_group_iommu_domain);
+  
+-/**
++/*
+   * Module/class support
+   */
+  static char *vfio_devnode(struct device *dev, umode_t *mode)
+
 
