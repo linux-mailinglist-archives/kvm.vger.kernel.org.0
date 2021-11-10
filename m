@@ -2,95 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BE3344C986
-	for <lists+kvm@lfdr.de>; Wed, 10 Nov 2021 20:51:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 20FAE44CAAF
+	for <lists+kvm@lfdr.de>; Wed, 10 Nov 2021 21:33:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232018AbhKJTxV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Nov 2021 14:53:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59004 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231984AbhKJTxU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Nov 2021 14:53:20 -0500
-Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03DF3C061764
-        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 11:50:31 -0800 (PST)
-Received: by mail-oi1-x22b.google.com with SMTP id o83so7307559oif.4
-        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 11:50:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=tJKTPrK6u5HNWo1Jtzs/NEObBhL/iPYlTnu4f8tMjxc=;
-        b=NDGaL+pt4BIMWrbp8LoeCbhTArnmkUJI16CFRL8w1QDQuAf+wJG5I8ukqIrIdZe5z7
-         Xis9uzQX6zxl7ld8rk8TXi77XaUGWan9Q0U4E4NW8tFbVNCHdX2qdOGz0i88/H1G/vs3
-         hkdKhERE4mfCE4Wsj3TEaXbyXVvmEtTLsRIT64gv0hkajWggTM188IiMuys6wOIFlxe+
-         pOqncd5FuqF5EjWuGmdkpUQ5fzbrc4edDszcRR7vDvVNpj5fFF/9YaEBjSPF0oqWEySv
-         IIuiCY700Mny+X5L89hrrpPn84wAS0w1Ki1S7TdDKeUVUqgX0FcuH1xZTwM51I4KtTly
-         5Gug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=tJKTPrK6u5HNWo1Jtzs/NEObBhL/iPYlTnu4f8tMjxc=;
-        b=ijCVcnA79AQUOrLugWR1RAJLwnzG/GtJtP87TWy8N+yZQziUPwVJZj1Q+zkA9ciTjW
-         zqx7sGj8uA4GyBMRNwTiUC+CWrk/ZKEYdYbBaXB50LDYjDO03MLO55XiANr7UwhpgvxE
-         IDZcaLFDVjCVHomqEG/d6LERyH1bqpkXfU4VkN2+HVwrN/5Vdsc/TqtIZW9Bd5CENw9u
-         YYgGyg/yj4TeE+rdc3L5V4MZkn5C4YihJGsBfnOJQR5Yjg8hHN4RHXA6/u39Cq2lNE+G
-         P/0M+7TA6efy5MS6lB1k3xGwfiLnazmVteQENWbq6zWl8WgFg31iiP3Vfr39j1tXrelV
-         iaxg==
-X-Gm-Message-State: AOAM531gtmbCP6rjlvmhrrvaYB8PSugm9prLGdH7ZWO7OpkLPy98pqWp
-        lzPc8xAjLKEpCIT9AZSUCphMRLRw0li4U2QxcA0tIROa3zw=
-X-Google-Smtp-Source: ABdhPJwVOBm3MTvvTSkxRfhxG4uj6+IVr4gRHs7nnRG/INayKIozt/inV2EH98220KAYqJGKvDv3zjpFkePrTGfSubk=
-X-Received: by 2002:aca:c654:: with SMTP id w81mr1516867oif.66.1636573830027;
- Wed, 10 Nov 2021 11:50:30 -0800 (PST)
+        id S232854AbhKJUgW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Nov 2021 15:36:22 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:63614 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S232558AbhKJUgT (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 10 Nov 2021 15:36:19 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1AAIlMwU010423;
+        Wed, 10 Nov 2021 20:33:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=8xpW20Ka9IHDoHVZ093lB2bUsXlWv3s4cHNXxIacuNI=;
+ b=ndvk/OgSKsf68d8xB9TdIgdUQvVu/0J03nrZ3enVLGI+d1mo6buJwJPYTfH4JfqrLoll
+ 6Cg4k4d1wNErgHWeE12e3zCauCHp2iTbfWbbnAId1a2vr+9KuM1MuvO5q1z5XxhYwyAf
+ 3J1tiVq/lMjh+VsveCXhlG7HFkPF++YZU2YOaDRKPPWd+46g7noHVIetO1AyyX7sOBFl
+ 65byLk2BaHpYPt0D23mQQiOisI6dSh6SkvC1/q50u58veuzPcdLSbwjTktsSUsRFNDJb
+ KhMJLFK6EhUxEVElA//wc/Jyyhd7N9GXPZ5tODI6C+fejwquxoeVCqxGlKezKrfcmbzY hg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3c8knua7ak-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 10 Nov 2021 20:33:30 +0000
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1AAJY2lY003634;
+        Wed, 10 Nov 2021 20:33:30 GMT
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3c8knua79x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 10 Nov 2021 20:33:30 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1AAKVMYN004148;
+        Wed, 10 Nov 2021 20:33:28 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma01fra.de.ibm.com with ESMTP id 3c5hba4aqy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 10 Nov 2021 20:33:28 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1AAKQjHA47644972
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 10 Nov 2021 20:26:45 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 258C1AE057;
+        Wed, 10 Nov 2021 20:33:25 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 13897AE055;
+        Wed, 10 Nov 2021 20:33:25 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Wed, 10 Nov 2021 20:33:25 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
+        id AC0D1E02A5; Wed, 10 Nov 2021 21:33:24 +0100 (CET)
+From:   Eric Farman <farman@linux.ibm.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>
+Cc:     Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, Eric Farman <farman@linux.ibm.com>
+Subject: [RFC PATCH v3 0/2] s390x: Improvements to SIGP handling [KVM]
+Date:   Wed, 10 Nov 2021 21:33:20 +0100
+Message-Id: <20211110203322.1374925-1-farman@linux.ibm.com>
+X-Mailer: git-send-email 2.25.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: eHhRxwc9cIVeHSgr7IDf59P5LiTG1IIQ
+X-Proofpoint-ORIG-GUID: w6vWBhYyDoeRb3yaLsHuphrZzO6TjN4o
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-References: <20211015195530.301237-1-jmattson@google.com>
-In-Reply-To: <20211015195530.301237-1-jmattson@google.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 10 Nov 2021 11:50:18 -0800
-Message-ID: <CALMp9eSFFQP9HVuScsatmmazLkNhure=8qwABAaJs8yr9+udVg@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH v2 0/3] Regression test for L1 LDTR
- persistence bug
-To:     kvm@vger.kernel.org, pbonzini@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
+ definitions=2021-11-10_12,2021-11-08_02,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
+ malwarescore=0 bulkscore=0 clxscore=1015 lowpriorityscore=0
+ mlxlogscore=999 adultscore=0 phishscore=0 impostorscore=0 spamscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2111100098
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Oct 15, 2021 at 12:55 PM Jim Mattson <jmattson@google.com> wrote:
->
-> In Linux commit afc8de0118be ("KVM: nVMX: Set LDTR to its
-> architecturally defined value on nested VM-Exit"), Sean suggested that
-> this bug was likely benign, but it turns out that--for us, at
-> least--it can result in live migration failures. On restore, we call
-> KVM_SET_SREGS before KVM_SET_NESTED_STATE, so when L2 is active at the
-> time of save/restore, the target vmcs01 is temporarily populated with
-> L2 values. Hence, the LDTR visible to L1 after the next emulated
-> VM-exit is L2's, rather than its own.
->
-> This issue is significant enough that it warrants a regression
-> test. Unfortunately, at the moment, the best we can do is check for
-> the LDTR persistence bug. I'd like to be able to trigger a
-> save/restore from within the L2 guest, but AFAICT, there's no way to
-> do that under qemu. Does anyone want to implement a qemu ISA test
-> device that triggers a save/restore when its configured I/O port is
-> written to?
->
-> Jim Mattson (3):
->   x86: Fix operand size for lldt
->   x86: Make set_gdt_entry usable in 64-bit mode
->   x86: Add a regression test for L1 LDTR persistence bug
->
-> v1 -> v2:
->   Reworded report messages at Sean's suggestion.
->
->  lib/x86/desc.c      | 41 +++++++++++++++++++++++++++++++----------
->  lib/x86/desc.h      |  3 ++-
->  lib/x86/processor.h |  2 +-
->  x86/cstart64.S      |  1 +
->  x86/vmx_tests.c     | 39 +++++++++++++++++++++++++++++++++++++++
->  5 files changed, 74 insertions(+), 12 deletions(-)
->
-> --
-> 2.33.0.1079.g6e70778dc9-goog
->
-Ping.
+Here is an update to the handling of SIGP between kernel and userspace.
+
+As before, I'm looking at problems encountered when a SIGP order that is
+processed in the kernel (for example, SIGP SENSE) is run concurrently
+with another one is processed in userspace (for example, SIGP STOP).
+Being able to provide an honest answer in the SIGP SENSE as to whether
+the targeted VCPU is/not stopped is important to provide a consistent
+answer while a guest OS is bringing its configuration online.
+
+Version 2 of this series instructed the kernel to automatically flag
+a vcpu busy for a SIGP order, and provided an IOCTL for userspace to
+mark the order as completed (suggested here [1]). But now, the
+suggestion is that the kernel shouldn't be marking the vcpu busy,
+and userspace should be doing both sides of the operation [2].
+So this version has two IOCTLs, tied to one capability.
+
+As with v2, I've left the CAP/IOCTL definitions as a standalone
+patch, so I see it easier when working with the QEMU code.
+Ultimately this would be squashed together, and might have some
+refit after the merge window anyway. 
+
+I'll send the QEMU series shortly, which takes advantage of this.
+
+Thoughts?
+
+[1] https://lore.kernel.org/r/3e3b38d1-b338-0211-04ab-91f913c1f557@redhat.com/
+[2] https://lore.kernel.org/r/7e98f659-32ac-9b4e-0ddd-958086732c8d@redhat.com/
+
+Previous RFCs:
+v1: https://lore.kernel.org/r/20211008203112.1979843-1-farman@linux.ibm.com/
+v2: https://lore.kernel.org/r/20211102194652.2685098-1-farman@linux.ibm.com/
+
+Eric Farman (2):
+  Capability/IOCTL/Documentation
+  KVM: s390: Extend the USER_SIGP capability
+
+ Documentation/virt/kvm/api.rst   | 39 ++++++++++++++++++++++++++++++++
+ arch/s390/include/asm/kvm_host.h |  2 ++
+ arch/s390/kvm/kvm-s390.c         | 29 ++++++++++++++++++++++++
+ arch/s390/kvm/kvm-s390.h         | 16 +++++++++++++
+ arch/s390/kvm/sigp.c             | 10 ++++++++
+ include/uapi/linux/kvm.h         |  5 ++++
+ 6 files changed, 101 insertions(+)
+
+-- 
+2.25.1
+
