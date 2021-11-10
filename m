@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 25F8C44CCC3
-	for <lists+kvm@lfdr.de>; Wed, 10 Nov 2021 23:30:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7097644CCC5
+	for <lists+kvm@lfdr.de>; Wed, 10 Nov 2021 23:31:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233905AbhKJWda (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Nov 2021 17:33:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39038 "EHLO
+        id S233962AbhKJWdh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Nov 2021 17:33:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233751AbhKJWdZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Nov 2021 17:33:25 -0500
+        with ESMTP id S233898AbhKJWd1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Nov 2021 17:33:27 -0500
 Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6C8DC061766
-        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 14:30:37 -0800 (PST)
-Received: by mail-pj1-x1049.google.com with SMTP id t7-20020a17090a5d8700b001a7604b85f5so1763146pji.8
-        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 14:30:37 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F12F7C061767
+        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 14:30:39 -0800 (PST)
+Received: by mail-pj1-x1049.google.com with SMTP id jx2-20020a17090b46c200b001a62e9db321so1803894pjb.7
+        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 14:30:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=HxuPuqGkbTjSIg2Su8P7hCQVY2FZaCOTe+WC7xPaI7c=;
-        b=nYv5Z9KofpdEzDPn8k6Dj3N3h4bGmdGBZSObIUm5pHTaj8GTpoM67DnJHAd17YOjSD
-         S35CPXcrZXckEjm1mfZHXhTRkR0G6NuvdspFlthNlpEhNTubVhN6oK4ldmQkebEBnbkz
-         gfZz3ei6yhgmd/BRb0Zojc0lIP+9Lnl43zs6Q3j6cIaNgCCSUZGO9mKrPP8sMlqB443X
-         EP27exc5uIjp0as5AoSktWMHiEVQwmHSBjSrCCraUZkl1A2L0m74ICzb0xL4jAdbdGEV
-         HXE+/F1b61tSCGhPD1UIWxO8KsX5c26c1BsSlntNdndzNNHm9S/szCyKvGnNGPPBA3DW
-         CZgA==
+        bh=H/hrjKdAmnuRrFMgl5Un/XSJex+ZkUQ49X9d7368gt8=;
+        b=CM75Xt0UbPSnEvDj7QGIpqerK2dVIwF+BTCLhc+zNB5qz635kbUa+ymQal6lN5FSlG
+         Y+8b2Qh9X9h6ndsLsRsPWysbEMxJ8p48i2KfYTwkem2iJtvo/N436BbyHq5c2LFGiZaU
+         9XdLcZ/JKlMaiWMRei0pYq7xgccdC+VKq3bJoE5/bUd+BxGFAEWXiPhO+Enkz5UrmG3F
+         V13V0uEPZyOufRjUs/qDZjYBcX/P/gDlBrCCezUFn1qMmjIW02noaj48croBilvz61wL
+         V4T9g7FiKnlyQ/3KiS26/DcRW2YCrgK98PFWWWKgplSustRgYM1Ww2iRCYOBD9yFVMTk
+         /AEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=HxuPuqGkbTjSIg2Su8P7hCQVY2FZaCOTe+WC7xPaI7c=;
-        b=0/R75OnygqYz7oFlD7LdJNHsE1R+KB8kS508rNQhyvDV7ug516DY9yd2XdQ3S9dUpN
-         5csSUR5JaS3jYhugepY9ec0CAQjW/FAV3UCAjVTYXwxYk6rs/afUnazHNJbrPy9pmdMO
-         e8xKW5/BIiDs6uIUjiBz586At8WyAR/KLqiY5cwSouHax7oK76ulVMe/NTMTAusDOQxn
-         JabFZUl9PEWSImFcfgmTVm37XXBdHedF+M4CPq/aYqN4FFg42ZPnZ/e6N+kpZrs7HMl1
-         e80u/t45POJMZJ/pS5JYH5hMDfdlzT2W8bZ0aZtIdLhnuj7EKkBexGMA6QFEd8TH2TDY
-         qqCQ==
-X-Gm-Message-State: AOAM531tIzo93eQSiUDNLbxOHKx2VXPNDt07/Mc96mj17XTyzg8M+9Ug
-        ouq6ISAxFz6qhujDRuXUV8TfeCV/YiHP
-X-Google-Smtp-Source: ABdhPJyo8uAV/k8H7CE2MqwmQTT8qNVtaTXISNS2gn9aK+hCVK8iTqvWvCYXG02UbdAOde0Tyl+J7KMn/Fj6
+        bh=H/hrjKdAmnuRrFMgl5Un/XSJex+ZkUQ49X9d7368gt8=;
+        b=QbYm4s9shXPwZ8ZLv4ZIqaoaGM3DftUSAeMhlVs0e/040Tiu021yn2FKbyi0H9jmNp
+         KwRYfUVRezywdkGQhjyXtpsLciqcNpOL4tNmHGMyz2X+LRC/MXquuMPI2uku7R3CN73c
+         QA1DaMSYzot+CgkBMcs4Rp4TYt6YrDpMZh+A1s9e2EG3hE1HKe/n+vzztu8KudGW69fY
+         ERi/HZBx6Lh6uXMeCNdZLUfbAz1o65601+4uO72LGDk8tAiP6XjM9foCojHTvGuRNsLG
+         vD4wjYRniPlytJGUkW9fhWVWSlFS7/s7PK/4UqVHHqrTpon5W4d0SkDvqyqQSiKM9ZC/
+         d3Bw==
+X-Gm-Message-State: AOAM530+ljlxHzsSQvQHkuHvX9R8UTF5dqbNliTggTSDMPSO7BWajWiB
+        LOGMUtLHMGP+wl9KqAhICt5f/jWLN+73
+X-Google-Smtp-Source: ABdhPJzvpchAFkdO6Ltc3OqLhz49Vv4vJURrfktF1X47fDD4EErNeXPCFqjdVBDd7YVzY5cy3IEgk4EAc8lK
 X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:6586:7b2f:b259:2011])
- (user=bgardon job=sendgmr) by 2002:a17:90a:284f:: with SMTP id
- p15mr48426pjf.1.1636583436858; Wed, 10 Nov 2021 14:30:36 -0800 (PST)
-Date:   Wed, 10 Nov 2021 14:29:56 -0800
+ (user=bgardon job=sendgmr) by 2002:aa7:9101:0:b0:49f:af85:b72c with SMTP id
+ 1-20020aa79101000000b0049faf85b72cmr2297562pfh.53.1636583439486; Wed, 10 Nov
+ 2021 14:30:39 -0800 (PST)
+Date:   Wed, 10 Nov 2021 14:29:57 -0800
 In-Reply-To: <20211110223010.1392399-1-bgardon@google.com>
-Message-Id: <20211110223010.1392399-6-bgardon@google.com>
+Message-Id: <20211110223010.1392399-7-bgardon@google.com>
 Mime-Version: 1.0
 References: <20211110223010.1392399-1-bgardon@google.com>
 X-Mailer: git-send-email 2.34.0.rc0.344.g81b53c2807-goog
-Subject: [RFC 05/19] KVM: x86/mmu: Remove redundant flushes when disabling
- dirty logging
+Subject: [RFC 06/19] KVM: x86/mmu: Introduce vcpu_make_spte
 From:   Ben Gardon <bgardon@google.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
@@ -71,111 +71,128 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-tdp_mmu_zap_spte_atomic flushes on every zap already, so no need to
-flush again after it's done.
+Add a wrapper around make_spte which conveys the vCPU-specific context of
+the function. This will facilitate factoring out all uses of the vCPU
+pointer from make_spte in subsequent commits.
+
+No functional change intended.
 
 
 Signed-off-by: Ben Gardon <bgardon@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c     |  4 +---
- arch/x86/kvm/mmu/tdp_mmu.c | 21 ++++++---------------
- arch/x86/kvm/mmu/tdp_mmu.h |  5 ++---
- 3 files changed, 9 insertions(+), 21 deletions(-)
+ arch/x86/kvm/mmu/mmu.c         |  2 +-
+ arch/x86/kvm/mmu/paging_tmpl.h |  6 +++---
+ arch/x86/kvm/mmu/spte.c        | 17 +++++++++++++----
+ arch/x86/kvm/mmu/spte.h        | 12 ++++++++----
+ arch/x86/kvm/mmu/tdp_mmu.c     |  7 ++++---
+ 5 files changed, 29 insertions(+), 15 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 354d2ca92df4..baa94acab516 100644
+index baa94acab516..2ada6dee920a 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -5870,9 +5870,7 @@ void kvm_mmu_zap_collapsible_sptes(struct kvm *kvm,
- 
- 	if (is_tdp_mmu_enabled(kvm)) {
- 		read_lock(&kvm->mmu_lock);
--		flush = kvm_tdp_mmu_zap_collapsible_sptes(kvm, slot, flush);
--		if (flush)
--			kvm_arch_flush_remote_tlbs_memslot(kvm, slot);
-+		kvm_tdp_mmu_zap_collapsible_sptes(kvm, slot);
- 		read_unlock(&kvm->mmu_lock);
+@@ -2723,7 +2723,7 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
+ 			was_rmapped = 1;
  	}
+ 
+-	wrprot = make_spte(vcpu, sp, slot, pte_access, gfn, pfn, *sptep, prefetch,
++	wrprot = vcpu_make_spte(vcpu, sp, slot, pte_access, gfn, pfn, *sptep, prefetch,
+ 			   true, host_writable, &spte);
+ 
+ 	if (*sptep == spte) {
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index f87d36898c44..edb8ebd1a775 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -1129,9 +1129,9 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
+ 		spte = *sptep;
+ 		host_writable = spte & shadow_host_writable_mask;
+ 		slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
+-		make_spte(vcpu, sp, slot, pte_access, gfn,
+-			  spte_to_pfn(spte), spte, true, false,
+-			  host_writable, &spte);
++		vcpu_make_spte(vcpu, sp, slot, pte_access, gfn,
++			       spte_to_pfn(spte), spte, true, false,
++			       host_writable, &spte);
+ 
+ 		flush |= mmu_spte_update(sptep, spte);
+ 	}
+diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+index 0c76c45fdb68..04d26e913941 100644
+--- a/arch/x86/kvm/mmu/spte.c
++++ b/arch/x86/kvm/mmu/spte.c
+@@ -90,10 +90,9 @@ static bool kvm_is_mmio_pfn(kvm_pfn_t pfn)
  }
+ 
+ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+-	       struct kvm_memory_slot *slot,
+-	       unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
+-	       u64 old_spte, bool prefetch, bool can_unsync,
+-	       bool host_writable, u64 *new_spte)
++	       struct kvm_memory_slot *slot, unsigned int pte_access,
++	       gfn_t gfn, kvm_pfn_t pfn, u64 old_spte, bool prefetch,
++	       bool can_unsync, bool host_writable, u64 *new_spte)
+ {
+ 	int level = sp->role.level;
+ 	u64 spte = SPTE_MMU_PRESENT_MASK;
+@@ -191,6 +190,16 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+ 	return wrprot;
+ }
+ 
++bool vcpu_make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
++		    struct kvm_memory_slot *slot, unsigned int pte_access,
++		    gfn_t gfn, kvm_pfn_t pfn, u64 old_spte, bool prefetch,
++		    bool can_unsync, bool host_writable, u64 *new_spte)
++{
++	return make_spte(vcpu, sp, slot, pte_access, gfn, pfn, old_spte,
++			 prefetch, can_unsync, host_writable, new_spte);
++
++}
++
+ u64 make_nonleaf_spte(u64 *child_pt, bool ad_disabled)
+ {
+ 	u64 spte = SPTE_MMU_PRESENT_MASK;
+diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+index cc432f9a966b..14f18082d505 100644
+--- a/arch/x86/kvm/mmu/spte.h
++++ b/arch/x86/kvm/mmu/spte.h
+@@ -330,10 +330,14 @@ static inline u64 get_mmio_spte_generation(u64 spte)
+ }
+ 
+ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+-	       struct kvm_memory_slot *slot,
+-	       unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
+-	       u64 old_spte, bool prefetch, bool can_unsync,
+-	       bool host_writable, u64 *new_spte);
++	       struct kvm_memory_slot *slot, unsigned int pte_access,
++	       gfn_t gfn, kvm_pfn_t pfn, u64 old_spte, bool prefetch,
++	       bool can_unsync, bool host_writable, u64 *new_spte);
++bool vcpu_make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
++		    struct kvm_memory_slot *slot,
++		    unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
++		    u64 old_spte, bool prefetch, bool can_unsync,
++		    bool host_writable, u64 *new_spte);
+ u64 make_nonleaf_spte(u64 *child_pt, bool ad_disabled);
+ u64 make_mmio_spte(struct kvm_vcpu *vcpu, u64 gfn, unsigned int access);
+ u64 mark_spte_for_access_track(u64 spte);
 diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index c2a9f7acf8ef..1ece645e737f 100644
+index 1ece645e737f..836eadd4e73a 100644
 --- a/arch/x86/kvm/mmu/tdp_mmu.c
 +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -1438,10 +1438,9 @@ void kvm_tdp_mmu_clear_dirty_pt_masked(struct kvm *kvm,
-  * Clear leaf entries which could be replaced by large mappings, for
-  * GFNs within the slot.
-  */
--static bool zap_collapsible_spte_range(struct kvm *kvm,
-+static void zap_collapsible_spte_range(struct kvm *kvm,
- 				       struct kvm_mmu_page *root,
--				       const struct kvm_memory_slot *slot,
--				       bool flush)
-+				       const struct kvm_memory_slot *slot)
- {
- 	gfn_t start = slot->base_gfn;
- 	gfn_t end = start + slot->npages;
-@@ -1452,10 +1451,8 @@ static bool zap_collapsible_spte_range(struct kvm *kvm,
+@@ -980,9 +980,10 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
+ 	if (unlikely(!fault->slot))
+ 		new_spte = make_mmio_spte(vcpu, iter->gfn, ACC_ALL);
+ 	else
+-		wrprot = make_spte(vcpu, sp, fault->slot, ACC_ALL, iter->gfn,
+-					 fault->pfn, iter->old_spte, fault->prefetch, true,
+-					 fault->map_writable, &new_spte);
++		wrprot = vcpu_make_spte(vcpu, sp, fault->slot, ACC_ALL,
++					iter->gfn, fault->pfn, iter->old_spte,
++					fault->prefetch, true,
++					fault->map_writable, &new_spte);
  
- 	tdp_root_for_each_pte(iter, root, start, end) {
- retry:
--		if (tdp_mmu_iter_cond_resched(kvm, &iter, flush, true)) {
--			flush = false;
-+		if (tdp_mmu_iter_cond_resched(kvm, &iter, false, true))
- 			continue;
--		}
- 
- 		if (!is_shadow_present_pte(iter.old_spte) ||
- 		    !is_last_spte(iter.old_spte, iter.level))
-@@ -1475,30 +1472,24 @@ static bool zap_collapsible_spte_range(struct kvm *kvm,
- 			iter.old_spte = READ_ONCE(*rcu_dereference(iter.sptep));
- 			goto retry;
- 		}
--		flush = true;
- 	}
- 
- 	rcu_read_unlock();
--
--	return flush;
- }
- 
- /*
-  * Clear non-leaf entries (and free associated page tables) which could
-  * be replaced by large mappings, for GFNs within the slot.
-  */
--bool kvm_tdp_mmu_zap_collapsible_sptes(struct kvm *kvm,
--				       const struct kvm_memory_slot *slot,
--				       bool flush)
-+void kvm_tdp_mmu_zap_collapsible_sptes(struct kvm *kvm,
-+				       const struct kvm_memory_slot *slot)
- {
- 	struct kvm_mmu_page *root;
- 
- 	lockdep_assert_held_read(&kvm->mmu_lock);
- 
- 	for_each_tdp_mmu_root_yield_safe(kvm, root, slot->as_id, true)
--		flush = zap_collapsible_spte_range(kvm, root, slot, flush);
--
--	return flush;
-+		zap_collapsible_spte_range(kvm, root, slot);
- }
- 
- /*
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-index 476b133544dd..3899004a5d91 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.h
-+++ b/arch/x86/kvm/mmu/tdp_mmu.h
-@@ -64,9 +64,8 @@ void kvm_tdp_mmu_clear_dirty_pt_masked(struct kvm *kvm,
- 				       struct kvm_memory_slot *slot,
- 				       gfn_t gfn, unsigned long mask,
- 				       bool wrprot);
--bool kvm_tdp_mmu_zap_collapsible_sptes(struct kvm *kvm,
--				       const struct kvm_memory_slot *slot,
--				       bool flush);
-+void kvm_tdp_mmu_zap_collapsible_sptes(struct kvm *kvm,
-+				       const struct kvm_memory_slot *slot);
- 
- bool kvm_tdp_mmu_write_protect_gfn(struct kvm *kvm,
- 				   struct kvm_memory_slot *slot, gfn_t gfn,
+ 	if (new_spte == iter->old_spte)
+ 		ret = RET_PF_SPURIOUS;
 -- 
 2.34.0.rc0.344.g81b53c2807-goog
 
