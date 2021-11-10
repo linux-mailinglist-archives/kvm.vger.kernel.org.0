@@ -2,250 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B95E44BE78
-	for <lists+kvm@lfdr.de>; Wed, 10 Nov 2021 11:19:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8642344BFD7
+	for <lists+kvm@lfdr.de>; Wed, 10 Nov 2021 12:08:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231215AbhKJKVb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Nov 2021 05:21:31 -0500
-Received: from mail-co1nam11on2073.outbound.protection.outlook.com ([40.107.220.73]:61701
-        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S231209AbhKJKV1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Nov 2021 05:21:27 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UW9MugQ+GUYdfdjf5yYIJGfpPwihrQy43QZ49XOTtAXZYmg6Sj8FVDyRCOf10l7Zuj0S0HmNU6vk+JLl6ooNrD6USWUk67SSP8Z0/MWDW/Yls3tdQFabwCBCWGavonNM7tFeajH/dmaJaO1RaA3xbIPzBU7DErIGIH2gpWLZtSFsWk9iuesBgLwCDk5dRDWXFJ1YEZblFAHYda64a1z3wQmwIjZ+/G4Pz+EE1bUpvattFhsL3aQyzKgpjSjlOYWtaXstwZVfOjv0bYk9Mwc8ZAiEXKFO1vbVnE+pGdfFNvxUg6Y6K1LcR97hLqphnTZzpT67MuLUswmS37UonTSuvg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sN3KTU2T3+BSLdubD5iCle52NOu4cmjSf5Z5AGhMixQ=;
- b=DDHF8RwDvN/fpZobLSAtuc0eC1Sigyvjce4Kiu4xo3EgoEYK1QCbo2KPHqKBjG5dj4sXiA8af03FdpdDk7WMKyyLrhltAViGxh7QbmuH+asDoJQcGhPHlJjm3k5QlBf9FPdDIwh2VuYn+jygWNID+UQWSG6dj5yw6K/FoeqvoO+/81jlxuT7SDBNnuZy97putpmPxtBMouYR5SV9uL2NYeERt+nLP+cmj5UBl3i8gGi7x40FmkIjwge5mSdAiLPcZsJcTU/EaLPqa3tGtjgXTdsPLODrUrEQFXjDZ8qepOxiKEIaYMk0qM+41E/znD7rlk02GImEn23wPS9rvUq40Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sN3KTU2T3+BSLdubD5iCle52NOu4cmjSf5Z5AGhMixQ=;
- b=qGU7TzOXDAxHRWUGgZi8kINTTz6cQmbD5dUtsF8Mr/7qPvzsacN3FqKs7m6oawcGbxiMMafbbs3OPERbMqD/dAOxAyccl4HwgqVEXiFhjmZwo3EwCSWY3ai0XpofgpG0lLyxtEK0+haVB+nQjhfrsEzYHb52iUVouvlGc5O/zd0=
-Received: from DM6PR14CA0043.namprd14.prod.outlook.com (2603:10b6:5:18f::20)
- by SJ0PR12MB5405.namprd12.prod.outlook.com (2603:10b6:a03:3af::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4649.15; Wed, 10 Nov
- 2021 10:18:36 +0000
-Received: from DM6NAM11FT010.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:18f:cafe::ae) by DM6PR14CA0043.outlook.office365.com
- (2603:10b6:5:18f::20) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4669.11 via Frontend
- Transport; Wed, 10 Nov 2021 10:18:36 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com;
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DM6NAM11FT010.mail.protection.outlook.com (10.13.172.222) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.4690.15 via Frontend Transport; Wed, 10 Nov 2021 10:18:36 +0000
-Received: from sos-ubuntu2004-quartz01.amd.com (10.180.168.240) by
- SATLEXMB04.amd.com (10.181.40.145) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.17; Wed, 10 Nov 2021 04:18:35 -0600
-From:   Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-To:     <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <x86@kernel.org>
-CC:     <pbonzini@redhat.com>, <joro@8bytes.org>, <tglx@linutronix.de>,
-        <mingo@redhat.com>, <bp@alien8.de>, <peterz@infradead.org>,
-        <hpa@zytor.com>, <thomas.lendacky@amd.com>, <jon.grimm@amd.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Subject: [PATCH 2/2] KVM: SVM: Extend host physical APIC ID field to support more than 8-bit
-Date:   Wed, 10 Nov 2021 04:18:05 -0600
-Message-ID: <20211110101805.16343-3-suravee.suthikulpanit@amd.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20211110101805.16343-1-suravee.suthikulpanit@amd.com>
-References: <20211110101805.16343-1-suravee.suthikulpanit@amd.com>
+        id S231489AbhKJLKy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Nov 2021 06:10:54 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57261 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231441AbhKJLKt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 10 Nov 2021 06:10:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1636542481;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=48dRn8RRnq7Fx6Bqaf9CAoNN40en8LqbHxW41Xnziw0=;
+        b=dpWL7meooMgtBAmdDfRcE8M23Cvi9RojMiz0s6vfwne6xMgsHhy5yvRUBJSzSbnpT+vZE7
+        UtCi2D18EuXvv1RNmj8iYDIBbQ1c3dwPweBTrUq4Kyiep81DMsIqjoi0EQBaFMqGXHjyw5
+        9ddfqP0gd5Ejvqk0mMic57gjbIsJyWo=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-469-7vhAhTnzOjOpcTWaEm8lxw-1; Wed, 10 Nov 2021 06:08:00 -0500
+X-MC-Unique: 7vhAhTnzOjOpcTWaEm8lxw-1
+Received: by mail-ed1-f71.google.com with SMTP id h13-20020a05640250cd00b003e35ea5357fso2036376edb.2
+        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 03:08:00 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=48dRn8RRnq7Fx6Bqaf9CAoNN40en8LqbHxW41Xnziw0=;
+        b=GJCubdkWpW1ntYqql6LQMoEiaRsEaGPOaxMXFLwJJq7CietgoBGTpxfYHr1hL9BY1a
+         vpJ+F6NO2/7CAeKN4FjZSbd8qHaZEP44nkeU15mnnSEJ80CHQyuOXfDAjTv1Bhg4/PZp
+         ceT3oqXXifky+Ip6BNdggkMlz4W3boE8R4bmmYGj88rBTrcUgTfqDDyk+rrFOx90ljLP
+         ksJ988CBz6r4Ji4nVBsnlo3i0B6C4y5RAymyeW1Mp4OgVo1iMYGYe/2oAH4hr2fHIlPv
+         K4sVsjeKieoPtvVDtAbJv9Po8EjGfUZmEVxdFTAyiOLEbXDrWMwyOWQI5D9q9kOgYB/w
+         71dg==
+X-Gm-Message-State: AOAM530oa4gw88uW1FvIzU+1IIYwFTm5f51mGTNqwLlSbbSyNvhkEUXR
+        UWcqKz+rjhQyA2QLJj16AexT/SBYPtKGe8xIVi2v0LgPey64BZoqcF20UPy8PqE8JemG8MjM/tP
+        /rtBNyytsCC1F
+X-Received: by 2002:a17:907:86a6:: with SMTP id qa38mr18779869ejc.286.1636542479456;
+        Wed, 10 Nov 2021 03:07:59 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxIY9E3GGXDTMKNhG94s7x2qpu4nLPlWqmcyoHulhCMNs+PGo9+5ZlP1mG10EA68G9ox4DyaA==
+X-Received: by 2002:a17:907:86a6:: with SMTP id qa38mr18779839ejc.286.1636542479231;
+        Wed, 10 Nov 2021 03:07:59 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.gmail.com with ESMTPSA id g21sm9257171edb.89.2021.11.10.03.07.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 10 Nov 2021 03:07:58 -0800 (PST)
+Message-ID: <f86fe9cb-bf4b-1c10-e0da-276fbb3f62ee@redhat.com>
+Date:   Wed, 10 Nov 2021 12:07:54 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 6b4dfdbd-ea52-48be-b4bc-08d9a4337523
-X-MS-TrafficTypeDiagnostic: SJ0PR12MB5405:
-X-Microsoft-Antispam-PRVS: <SJ0PR12MB540503C30710DF8A127C4E12F3939@SJ0PR12MB5405.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4502;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 99Zz3j+GREiMM8R+5+red5bd+hQQSeClHVRk29uUK4nknsZE0cLbSvZe4qXe5vbsFl17O6ydfPZUry/Dtv2aFkAByuPCwN5Uq2EckcsSlzlYRav2fXriEQO+08THMcQJL4vcUmKB0RBMRyTPfTJEogT/PI/VHDKaVZWO2YodkG30YkfFaoyXIP17mbq1bYDOqxRNycLqgLT5Vj+4p0jHtJiispCQzntNA9vwPqiW1tBrk0Md5t/iDeFI690HyU6g10t6LBy73+Vf9q+ld2Go2Wf3KBUOrt0oyPogfg9W/3Dz5Fl17vVIQVs3G1m1w9S/kIu0xUFT0HGPNlfYjmmj2lOtBEgxdv7aKXbDGRJt+jUPH+thjWNrXFtbtWeL4sf1Cjczu8ErpbO29td9FT0Q03JDBHFIEBqmpuvzLI6a81/kzxv61sgiaCoGGsZ90UaGKlL4JTA/J2uHGVWpk1sNESe6NB0mx4FrOdudKMzMtT9cV91FE1Z7ZOzRYCnetVQqcvf+vCPkrUvOkTydLlDIZlLvawl45brtsXmipA4dn4RVuuZWUU/XAdpWYLdQ8i+hoveYi7hX9uX7q4CuxXs3okP/NCzJvydi/lG3rRpKeu56Fd+wRPLtbtIoD0Iko4DWkiwd+UrYG/6/VjjF4OOiBpG7w6LR7llcxgd91vh7gq1cUYcZKtae4Bhn6SpgF4puqaHKZ+tSHSdPc+ooAsHC8/Y6hpflvv4vSOQD/RchuXM=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(4636009)(46966006)(36840700001)(356005)(186003)(70586007)(1076003)(5660300002)(16526019)(83380400001)(26005)(86362001)(36860700001)(47076005)(2906002)(8936002)(44832011)(2616005)(70206006)(36756003)(316002)(7416002)(7696005)(82310400003)(336012)(426003)(8676002)(54906003)(6666004)(110136005)(81166007)(4326008)(508600001)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Nov 2021 10:18:36.4198
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6b4dfdbd-ea52-48be-b4bc-08d9a4337523
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT010.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB5405
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH v3 01/16] perf: Ensure perf_guest_cbs aren't reloaded
+ between !NULL check and deref
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>,
+        Like Xu <like.xu.linux@gmail.com>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Will Deacon <will@kernel.org>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        linux-arm-kernel@lists.infradead.org,
+        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, linux-csky@vger.kernel.org,
+        linux-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        xen-devel@lists.xenproject.org,
+        Artem Kashkanov <artem.kashkanov@intel.com>,
+        Zhu Lingshan <lingshan.zhu@intel.com>,
+        Juergen Gross <jgross@suse.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Vincent Chen <deanbo422@gmail.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Greentime Hu <green.hu@gmail.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Marc Zyngier <maz@kernel.org>, Nick Hu <nickhu@andestech.com>,
+        Guo Ren <guoren@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>
+References: <20210922000533.713300-1-seanjc@google.com>
+ <20210922000533.713300-2-seanjc@google.com>
+ <77e3a76a-016b-8945-a1d5-aae4075e2147@gmail.com>
+ <YYPrst2CUBXLYc9h@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <YYPrst2CUBXLYc9h@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The AVIC physical APIC ID table entry contains the host physical
-APIC ID field, which the hardware uses to keep track of where each
-vCPU is running. Originally, the field is an 8-bit value, which can
-only support physical APIC ID up to 255.
+On 11/4/21 15:18, Sean Christopherson wrote:
+> If I'm interpeting Paolo's suggestion
+> correctly, he's pointing out that oustanding stores to the function pointers in
+> @cbs need to complete before assigning a non-NULL pointer to perf_guest_cbs,
+> otherwise a perf event handler may see a valid pointer with half-baked callbacks.
+> 
+> I think smp_store_release() with a comment would be appropriate, assuming my
+> above interpretation is correct.
+> 
 
-To support system with larger APIC ID, the AVIC hardware extends
-this field to support up to the largest possible physical APIC ID
-available on the system.
+Yes, exactly.  It should even be rcu_assign_pointer(), matching the 
+synchronize_rcu() in patch 1 (and the change can be done in patch 1, too).
 
-Therefore, replace the hard-coded mask value with the value
-calculated from the maximum possible physical APIC ID in the system.
-
-Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
-Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-
----
- arch/x86/kvm/svm/avic.c | 53 ++++++++++++++++++++++++++++++++++-------
- arch/x86/kvm/svm/svm.c  |  6 +++++
- arch/x86/kvm/svm/svm.h  |  2 +-
- 3 files changed, 52 insertions(+), 9 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index 8052d92069e0..0b073f63dabd 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -19,6 +19,7 @@
- #include <linux/amd-iommu.h>
- #include <linux/kvm_host.h>
- 
-+#include <asm/apic.h>
- #include <asm/irq_remapping.h>
- 
- #include "trace.h"
-@@ -63,6 +64,7 @@
- static DEFINE_HASHTABLE(svm_vm_data_hash, SVM_VM_DATA_HASH_BITS);
- static u32 next_vm_id = 0;
- static bool next_vm_id_wrapped = 0;
-+static u64 avic_host_physical_id_mask;
- static DEFINE_SPINLOCK(svm_vm_data_hash_lock);
- 
- /*
-@@ -133,6 +135,46 @@ void avic_vm_destroy(struct kvm *kvm)
- 	spin_unlock_irqrestore(&svm_vm_data_hash_lock, flags);
- }
- 
-+int avic_init_host_physical_apicid_mask(void)
-+{
-+	unsigned int eax, ebx, ecx, edx;
-+	u32 level_type, core_mask_width, max_phys_mask_width;
-+
-+	/*
-+	 * Calculate minimum number of bits required to represent
-+	 * host physical APIC ID for each processor (level type 2)
-+	 * using CPUID leaf 0xb sub-leaf 0x1.
-+	 */
-+	cpuid_count(0xb, 0x1, &eax, &ebx, &ecx, &edx);
-+	level_type = (ecx >> 8) & 0xff;
-+
-+	/*
-+	 * If level-type 2 (i.e. processor type) not available,
-+	 * or host is in xAPIC mode, default to only 8-bit mask.
-+	 */
-+	if (level_type != 2 || !x2apic_mode) {
-+		avic_host_physical_id_mask = 0xffULL;
-+		goto out;
-+	}
-+
-+	core_mask_width = eax & 0xF;
-+
-+	max_phys_mask_width = get_count_order(apic_get_max_phys_apicid());
-+
-+	/*
-+	 * Sanity check to ensure core_mask_width for a processor does not
-+	 * exceed the calculated mask.
-+	 */
-+	if (WARN_ON(core_mask_width > max_phys_mask_width))
-+		return -EINVAL;
-+
-+	avic_host_physical_id_mask = BIT(max_phys_mask_width) - 1;
-+out:
-+	pr_debug("Using AVIC host physical APIC ID mask %#0llx\n",
-+		 avic_host_physical_id_mask);
-+	return 0;
-+}
-+
- int avic_vm_init(struct kvm *kvm)
- {
- 	unsigned long flags;
-@@ -943,22 +985,17 @@ avic_update_iommu_vcpu_affinity(struct kvm_vcpu *vcpu, int cpu, bool r)
- void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- {
- 	u64 entry;
--	/* ID = 0xff (broadcast), ID > 0xff (reserved) */
- 	int h_physical_id = kvm_cpu_get_apicid(cpu);
- 	struct vcpu_svm *svm = to_svm(vcpu);
- 
--	/*
--	 * Since the host physical APIC id is 8 bits,
--	 * we can support host APIC ID upto 255.
--	 */
--	if (WARN_ON(h_physical_id > AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK))
-+	if (WARN_ON(h_physical_id > avic_host_physical_id_mask))
- 		return;
- 
- 	entry = READ_ONCE(*(svm->avic_physical_id_cache));
- 	WARN_ON(entry & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK);
- 
--	entry &= ~AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK;
--	entry |= (h_physical_id & AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK);
-+	entry &= ~avic_host_physical_id_mask;
-+	entry |= h_physical_id;
- 
- 	entry &= ~AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK;
- 	if (svm->avic_is_running)
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 989685098b3e..0b066bb5149d 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1031,6 +1031,12 @@ static __init int svm_hardware_setup(void)
- 			nrips = false;
- 	}
- 
-+	if (avic) {
-+		r = avic_init_host_physical_apicid_mask();
-+		if (r)
-+			avic = false;
-+	}
-+
- 	enable_apicv = avic = avic && npt_enabled && boot_cpu_has(X86_FEATURE_AVIC);
- 
- 	if (enable_apicv) {
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 5d30db599e10..e215092d0411 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -497,7 +497,6 @@ extern struct kvm_x86_nested_ops svm_nested_ops;
- #define AVIC_LOGICAL_ID_ENTRY_VALID_BIT			31
- #define AVIC_LOGICAL_ID_ENTRY_VALID_MASK		(1 << 31)
- 
--#define AVIC_PHYSICAL_ID_ENTRY_HOST_PHYSICAL_ID_MASK	(0xFFULL)
- #define AVIC_PHYSICAL_ID_ENTRY_BACKING_PAGE_MASK	(0xFFFFFFFFFFULL << 12)
- #define AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK		(1ULL << 62)
- #define AVIC_PHYSICAL_ID_ENTRY_VALID_MASK		(1ULL << 63)
-@@ -525,6 +524,7 @@ int avic_init_vcpu(struct vcpu_svm *svm);
- void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu);
- void avic_vcpu_put(struct kvm_vcpu *vcpu);
- void avic_post_state_restore(struct kvm_vcpu *vcpu);
-+int avic_init_host_physical_apicid_mask(void);
- void svm_set_virtual_apic_mode(struct kvm_vcpu *vcpu);
- void svm_refresh_apicv_exec_ctrl(struct kvm_vcpu *vcpu);
- bool svm_check_apicv_inhibit_reasons(ulong bit);
--- 
-2.25.1
+Paolo
 
