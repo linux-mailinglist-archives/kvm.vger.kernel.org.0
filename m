@@ -2,56 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1643944CCCA
+	by mail.lfdr.de (Postfix) with ESMTP id A744044CCCC
 	for <lists+kvm@lfdr.de>; Wed, 10 Nov 2021 23:31:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234013AbhKJWdo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Nov 2021 17:33:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39092 "EHLO
+        id S233959AbhKJWdp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Nov 2021 17:33:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233911AbhKJWdh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Nov 2021 17:33:37 -0500
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC132C061766
-        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 14:30:48 -0800 (PST)
-Received: by mail-pf1-x44a.google.com with SMTP id y124-20020a623282000000b0047a09271e49so2701303pfy.16
-        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 14:30:48 -0800 (PST)
+        with ESMTP id S233947AbhKJWdk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Nov 2021 17:33:40 -0500
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04325C061208
+        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 14:30:52 -0800 (PST)
+Received: by mail-pg1-x54a.google.com with SMTP id 65-20020a630344000000b002d9865f61efso2198985pgd.16
+        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 14:30:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=HnZqtlOQ63wNQv89kCvwlZXyDDrYIYxEA2ngT/q/LPk=;
-        b=SiP3qz5fosLZDiKoqRIEqpSSPNPujrrnDHdmqmki+XBhmlrA6Mo4LFT21Wyh7HNGh2
-         KYjigbtNUZ0oEpp+En0Cw1iizfZ+tw5zJYqIEbK01Ok0TVIPHG7d1637lXz0wzi5WjQ1
-         aEcbY4qEfUn8BgV2LSmQvJOZFalNxMhlRmvuIZCE43c8q9ml0wnw9KEVa+znQBpmOgcW
-         MQa48NfdHZii4bky+VlPw6YQ05geOw7UVVdyKz6RZjwvvW56eVIAaA+A2dlYu25CzTCw
-         l52ERhDGsxK/AOe5HJaHBAnoprA0MwvtV6aJ8GMbD3u6YND+tlDgtb4xkHS6i+FP8YMp
-         7lwQ==
+        bh=42+d8YjAZxClfWgdhFomXy37B3KIO2GCLS50eyLEhmM=;
+        b=Io7wOvgnheuOgfMytVU2lNhyzaqT1yMo7DnIxxVjg3AiREAoEdMqEOYFJEwc8qusVi
+         brk8qH7Hn8m+rhZrHwzYHFlDS/t96TGUkgWbNW7tlbOm51sf/irvYkVc+3agDMVaYvwa
+         LS4KSwNLvyXPv52GJHfxArHXpSGdD2EtuHSyAhfOupFdyWmw/uLz+qN2YoAzSpOUarwY
+         W3CvNk1Kg1ifL3rbu0n7cY6OjCThFfEQqxkY8b1tyLhdfvdEzLnZd69DN7cg2JADv1vN
+         LkHLSkdh5Ro5vtGgPwoUOZbJ+3fxG5dudh4JnMzyhbNIy9pF6VIQ69KdQvtgnR32oBnf
+         Hc7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=HnZqtlOQ63wNQv89kCvwlZXyDDrYIYxEA2ngT/q/LPk=;
-        b=NSzAjeTFETNLw/p6/f/ZPnG2isk8SNpWcqd7YxTpPKBUwZwqEhelNDnRSuS+Qez+R9
-         8NhGZaPAF/4j74QLv5/nPdeRXMp2o/LOghWlFYV00A1TfF2CBQ4Mtq4WUMFOgC9OmE3L
-         85mfjL274HfX+x5W+XK8XvMx+OAlvQe0OHMrUkpIEsOUTNs7t3Ib5mDH75Vy/F0zCl/C
-         1dpg2AFKPv9kRzAenvykAC0ntiaAchcRT6rxQ3iTGuEvKUKcRt41tbg+6Mf+H7Ot+LLe
-         VlCc81+yaNHPcwhKouARDVa9fA8okBD/VWY9EnAIBeFkHv4+tLny+81WnRsbShRC5KJM
-         PLRQ==
-X-Gm-Message-State: AOAM531Zwr0tf5piUjI7GWKhsDwErUVoZ5dDRHl0NNA1RXUteAIHlO43
-        wNwHdh0EoSlgQLBhZd7ABtPbfcsNVIU0
-X-Google-Smtp-Source: ABdhPJxZRHSUHtHsNtP0gv5OKCFs+Ww73ld1gIG8wmXR7CC0f7LvNYe4mKbiCbH6Z+LjVmW5vyN6rKt9gvzi
+        bh=42+d8YjAZxClfWgdhFomXy37B3KIO2GCLS50eyLEhmM=;
+        b=MftPl+2LXX2w5xbZU5JwTlg3evuYHlDVlLrITk57Dn0YiF6pxbLj+KEQ3Tk5XSROrB
+         7YReleOc6ivMnFnLP6aBH01fgSK/MRIooOBhsKfbaJVUf41/L7rccYgTtJycmZ69KLTi
+         jJrSvnzKwgRRe+obterTguxYDdpWgrhJLFuChw+JnrRM8/4Q93dFMWeIlE6WkZVzDlUA
+         C7brm/rwCtTuvcraypIpQZnCZpKOWEcZyy6f24y48gp3Wmfy4J2AU1f8anTewe41wHPZ
+         ghxkRuRV7OVRwvjI8+3JpGdU2PSG74d/U9kqgtGSRKO2lardtylBbtu0VeUmmrs31/dV
+         +n6g==
+X-Gm-Message-State: AOAM533ZpMGRniE9uf3X88BP5aAufrZKw3nywnkCfgVdynqNxAleN2Vw
+        03jSgm6oA3/lt/G8LDCPQdTBQc/ypcKS
+X-Google-Smtp-Source: ABdhPJwwo4pGevtCowaRTd49LsoEZHU1m3kSXl8vfKEeqFOgmriW6TQS89bHjWS2JWZtAPzyZnz/XH5+2dK+
 X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:6586:7b2f:b259:2011])
- (user=bgardon job=sendgmr) by 2002:a17:902:c202:b0:142:2441:aa25 with SMTP id
- 2-20020a170902c20200b001422441aa25mr2672775pll.68.1636583448361; Wed, 10 Nov
- 2021 14:30:48 -0800 (PST)
-Date:   Wed, 10 Nov 2021 14:30:00 -0800
+ (user=bgardon job=sendgmr) by 2002:a17:90a:284f:: with SMTP id
+ p15mr48592pjf.1.1636583451110; Wed, 10 Nov 2021 14:30:51 -0800 (PST)
+Date:   Wed, 10 Nov 2021 14:30:01 -0800
 In-Reply-To: <20211110223010.1392399-1-bgardon@google.com>
-Message-Id: <20211110223010.1392399-10-bgardon@google.com>
+Message-Id: <20211110223010.1392399-11-bgardon@google.com>
 Mime-Version: 1.0
 References: <20211110223010.1392399-1-bgardon@google.com>
 X-Mailer: git-send-email 2.34.0.rc0.344.g81b53c2807-goog
-Subject: [RFC 09/19] KVM: x86/mmu: Remove need for a vcpu from kvm_slot_page_track_is_active
+Subject: [RFC 10/19] KVM: x86/mmu: Remove need for a vcpu from mmu_try_to_unsync_pages
 From:   Ben Gardon <bgardon@google.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
@@ -71,77 +70,110 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-kvm_slot_page_track_is_active only uses its vCPU argument to get a
-pointer to the assoicated struct kvm, so just pass in the struct KVM to
-remove the need for a vCPU pointer.
-
-No functional change intended.
+The vCPU argument to mmu_try_to_unsync_pages is now only used to get a
+pointer to the associated struct kvm, so pass in the kvm pointer from
+the beginning to remove the need for a vCPU when calling the function.
 
 
 Signed-off-by: Ben Gardon <bgardon@google.com>
 ---
- arch/x86/include/asm/kvm_page_track.h | 2 +-
- arch/x86/kvm/mmu/mmu.c                | 4 ++--
- arch/x86/kvm/mmu/page_track.c         | 4 ++--
- 3 files changed, 5 insertions(+), 5 deletions(-)
+ arch/x86/kvm/mmu/mmu.c          | 16 ++++++++--------
+ arch/x86/kvm/mmu/mmu_internal.h |  2 +-
+ arch/x86/kvm/mmu/spte.c         |  2 +-
+ 3 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_page_track.h b/arch/x86/include/asm/kvm_page_track.h
-index 9d4a3b1b25b9..e99a30a4d38b 100644
---- a/arch/x86/include/asm/kvm_page_track.h
-+++ b/arch/x86/include/asm/kvm_page_track.h
-@@ -63,7 +63,7 @@ void kvm_slot_page_track_add_page(struct kvm *kvm,
- void kvm_slot_page_track_remove_page(struct kvm *kvm,
- 				     struct kvm_memory_slot *slot, gfn_t gfn,
- 				     enum kvm_page_track_mode mode);
--bool kvm_slot_page_track_is_active(struct kvm_vcpu *vcpu,
-+bool kvm_slot_page_track_is_active(struct kvm *kvm,
- 				   struct kvm_memory_slot *slot, gfn_t gfn,
- 				   enum kvm_page_track_mode mode);
- 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 2ada6dee920a..7d0da79668c0 100644
+index 7d0da79668c0..1e890509b93f 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
+@@ -2561,10 +2561,10 @@ static int kvm_mmu_unprotect_page_virt(struct kvm_vcpu *vcpu, gva_t gva)
+ 	return r;
+ }
+ 
+-static void kvm_unsync_page(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
++static void kvm_unsync_page(struct kvm *kvm, struct kvm_mmu_page *sp)
+ {
+ 	trace_kvm_mmu_unsync_page(sp);
+-	++vcpu->kvm->stat.mmu_unsync;
++	++kvm->stat.mmu_unsync;
+ 	sp->unsync = 1;
+ 
+ 	kvm_mmu_mark_parents_unsync(sp);
+@@ -2576,7 +2576,7 @@ static void kvm_unsync_page(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
+  * were marked unsync (or if there is no shadow page), -EPERM if the SPTE must
+  * be write-protected.
+  */
+-int mmu_try_to_unsync_pages(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
++int mmu_try_to_unsync_pages(struct kvm *kvm, struct kvm_memory_slot *slot,
+ 			    gfn_t gfn, bool can_unsync, bool prefetch)
+ {
+ 	struct kvm_mmu_page *sp;
 @@ -2587,7 +2587,7 @@ int mmu_try_to_unsync_pages(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
  	 * track machinery is used to write-protect upper-level shadow pages,
  	 * i.e. this guards the role.level == 4K assertion below!
  	 */
--	if (kvm_slot_page_track_is_active(vcpu, slot, gfn, KVM_PAGE_TRACK_WRITE))
-+	if (kvm_slot_page_track_is_active(vcpu->kvm, slot, gfn, KVM_PAGE_TRACK_WRITE))
+-	if (kvm_slot_page_track_is_active(vcpu->kvm, slot, gfn, KVM_PAGE_TRACK_WRITE))
++	if (kvm_slot_page_track_is_active(kvm, slot, gfn, KVM_PAGE_TRACK_WRITE))
  		return -EPERM;
  
  	/*
-@@ -3884,7 +3884,7 @@ static bool page_fault_handle_page_track(struct kvm_vcpu *vcpu,
- 	 * guest is writing the page which is write tracked which can
- 	 * not be fixed by page fault handler.
+@@ -2596,7 +2596,7 @@ int mmu_try_to_unsync_pages(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
+ 	 * that case, KVM must complete emulation of the guest TLB flush before
+ 	 * allowing shadow pages to become unsync (writable by the guest).
  	 */
--	if (kvm_slot_page_track_is_active(vcpu, fault->slot, fault->gfn, KVM_PAGE_TRACK_WRITE))
-+	if (kvm_slot_page_track_is_active(vcpu->kvm, fault->slot, fault->gfn, KVM_PAGE_TRACK_WRITE))
- 		return true;
+-	for_each_gfn_indirect_valid_sp(vcpu->kvm, sp, gfn) {
++	for_each_gfn_indirect_valid_sp(kvm, sp, gfn) {
+ 		if (!can_unsync)
+ 			return -EPERM;
  
- 	return false;
-diff --git a/arch/x86/kvm/mmu/page_track.c b/arch/x86/kvm/mmu/page_track.c
-index cc4eb5b7fb76..35c221d5f6ce 100644
---- a/arch/x86/kvm/mmu/page_track.c
-+++ b/arch/x86/kvm/mmu/page_track.c
-@@ -173,7 +173,7 @@ EXPORT_SYMBOL_GPL(kvm_slot_page_track_remove_page);
- /*
-  * check if the corresponding access on the specified guest page is tracked.
-  */
--bool kvm_slot_page_track_is_active(struct kvm_vcpu *vcpu,
-+bool kvm_slot_page_track_is_active(struct kvm *kvm,
- 				   struct kvm_memory_slot *slot, gfn_t gfn,
- 				   enum kvm_page_track_mode mode)
- {
-@@ -186,7 +186,7 @@ bool kvm_slot_page_track_is_active(struct kvm_vcpu *vcpu,
- 		return false;
+@@ -2615,7 +2615,7 @@ int mmu_try_to_unsync_pages(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
+ 		 */
+ 		if (!locked) {
+ 			locked = true;
+-			spin_lock(&vcpu->kvm->arch.mmu_unsync_pages_lock);
++			spin_lock(&kvm->arch.mmu_unsync_pages_lock);
  
- 	if (mode == KVM_PAGE_TRACK_WRITE &&
--	    !kvm_page_track_write_tracking_enabled(vcpu->kvm))
-+	    !kvm_page_track_write_tracking_enabled(kvm))
- 		return false;
+ 			/*
+ 			 * Recheck after taking the spinlock, a different vCPU
+@@ -2630,10 +2630,10 @@ int mmu_try_to_unsync_pages(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
+ 		}
  
- 	index = gfn_to_index(gfn, slot->base_gfn, PG_LEVEL_4K);
+ 		WARN_ON(sp->role.level != PG_LEVEL_4K);
+-		kvm_unsync_page(vcpu, sp);
++		kvm_unsync_page(kvm, sp);
+ 	}
+ 	if (locked)
+-		spin_unlock(&vcpu->kvm->arch.mmu_unsync_pages_lock);
++		spin_unlock(&kvm->arch.mmu_unsync_pages_lock);
+ 
+ 	/*
+ 	 * We need to ensure that the marking of unsync pages is visible
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index 52c6527b1a06..1073d10cce91 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -118,7 +118,7 @@ static inline bool kvm_vcpu_ad_need_write_protect(struct kvm_vcpu *vcpu)
+ 	       kvm_x86_ops.cpu_dirty_log_size;
+ }
+ 
+-int mmu_try_to_unsync_pages(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
++int mmu_try_to_unsync_pages(struct kvm *kvm, struct kvm_memory_slot *slot,
+ 			    gfn_t gfn, bool can_unsync, bool prefetch);
+ 
+ void kvm_mmu_gfn_disallow_lpage(const struct kvm_memory_slot *slot, gfn_t gfn);
+diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+index 75c666d3e7f1..b7271daa06c5 100644
+--- a/arch/x86/kvm/mmu/spte.c
++++ b/arch/x86/kvm/mmu/spte.c
+@@ -160,7 +160,7 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+ 		 * e.g. it's write-tracked (upper-level SPs) or has one or more
+ 		 * shadow pages and unsync'ing pages is not allowed.
+ 		 */
+-		if (mmu_try_to_unsync_pages(vcpu, slot, gfn, can_unsync, prefetch)) {
++		if (mmu_try_to_unsync_pages(vcpu->kvm, slot, gfn, can_unsync, prefetch)) {
+ 			pgprintk("%s: found shadow page for %llx, marking ro\n",
+ 				 __func__, gfn);
+ 			wrprot = true;
 -- 
 2.34.0.rc0.344.g81b53c2807-goog
 
