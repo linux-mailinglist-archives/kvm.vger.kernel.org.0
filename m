@@ -2,51 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B2F444CE0C
+	by mail.lfdr.de (Postfix) with ESMTP id D4E9C44CE0D
 	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 01:03:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234265AbhKKAGF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Nov 2021 19:06:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60406 "EHLO
+        id S234278AbhKKAGH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Nov 2021 19:06:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234143AbhKKAGF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Nov 2021 19:06:05 -0500
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1ECFEC061766
-        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 16:03:17 -0800 (PST)
-Received: by mail-pj1-x1049.google.com with SMTP id hg9-20020a17090b300900b001a6aa0b7d8cso1910243pjb.2
-        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 16:03:17 -0800 (PST)
+        with ESMTP id S234143AbhKKAGG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Nov 2021 19:06:06 -0500
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 923BCC061766
+        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 16:03:18 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id jx2-20020a17090b46c200b001a62e9db321so1909455pjb.7
+        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 16:03:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=puRYWI4avhociHSaO6PkBsC+dGQfbUhSErR9iQtcCYQ=;
-        b=nlNwE7YgCBPh78a/AcfjEYEuim6GEuEGfYmro28Ir27clTxpwW2jfsEWx1RefhS0Qy
-         LqrQMSLkjzGdPIwz7sBaW6IJHHf+BAZ7wP2k65qeSU6cJZxiUjPZt91yn1Q7GrT/mhVu
-         AHdCfFRd6xvIAX9nmCgygutO3o+yrk+AGPOuNYBMOKpZr8IHyLbZzYaSyaefAXxdEwZl
-         /DV8cdvsXk7qq+VD1xBcU9gjGssL0nPZww5ltgubFdPpGCwlX3hpwqkUCj5xQIcnd4vy
-         EoQUg7k4PYbnFEwJ1nWJlquK0ycTn0FfoKgAmjdCoPtuSuzaNGyauSfU80jvIEofPuJf
-         3hZQ==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=UZSxYvi0qVP1F++cVUOnkEBRLDYe6xqDOy+3nDoOuSU=;
+        b=Nu4Xe1RNrAHjwd8Y9T19r7uxMhVbmeFSDxMLfs+feMXLVSp991YAqWJrGC2Osm4M4q
+         ANRopmYWxfUAR6GPOELfEQCgaTy1pZjGTQtfO3OaH1DoOxjxiJZ6elEaediRI3/r70R8
+         gIBBhnd+h8uUjkTNVJNdLlisXByH5CNDp7xtOETQrFKtYjImReiNMIJHGYAcfof6UA1G
+         Z0QAmF1j0LXrbC6zTd9wmD6HLeGp+8Vrp1HV1nWt+xMjBvJJHMjDU29ErmLnBJd58xZb
+         g15/gpSSOnsXrTlj01Mqi12DhCIhtlDCygRHtSZMkh2GETe7q+9WeKE8NaELFK1ymuIu
+         NfUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=puRYWI4avhociHSaO6PkBsC+dGQfbUhSErR9iQtcCYQ=;
-        b=HfyDyN2BEYcyuGzY/1crwORsqIyPKU1E0gUN2Ze2tLKGC9i/RFd/LMgRS13AI/uV+s
-         yVcpgv18y0DrtD1kgQDQOQvOvhfCUY0bydX5iGG20lH7eDp9rv2aSHMKkRyjFhBGyJN0
-         RuNamsPJ7vipdtEcZyTlez7lS2vlQi4cL9PiWgivqKDl8sNcjPPor7Yebyl3QtcfW84D
-         SVb3UfkTbwg//f2O6cVXPezuaMhMHY0cE/Dl3GmXQI8/MEasMF7hr7a3Y/P5U1wPHu+f
-         JEfKPaF+2dhnzys0E49dlykKEMdacevVrCxfZIR14+JPnOAcF8qjEMdUqjqHdxHggZKn
-         KV7A==
-X-Gm-Message-State: AOAM533mJj+N/XQ86OrL6qtbu78wb6t7+L2flx4RAFcRVS5y8juwQ1fl
-        cF09uuTU9OtEDbdMP5bx7o4fbu2FL9WNMg==
-X-Google-Smtp-Source: ABdhPJwY6xm0J03NNsrdqX4WgtwPbNRpFk8tJDyLWOrN8jKExT3rZTRL7KwrTHRqBAbFST7fpm4H3oELCvuXUg==
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=UZSxYvi0qVP1F++cVUOnkEBRLDYe6xqDOy+3nDoOuSU=;
+        b=Q/sdKNf9yH82CIeUYRwVJCGSU7YMRibCO6EMXbc5ai6w3rENU6+6i+BxUZrH+pX+b5
+         8fDT4JjptwCBBKmOAhCNwxEVXoIy1LF+IhcuYBBRYgJbQQABN5DEy1S3lhBlK2mXKdpX
+         ScsaqeC2LZelWTcqHeIsqnSdy1kK3a3/SL+IxkzUe0/ukEH/sTIlfyDTb6x6d1FIOboK
+         ulGGbigif8+LGb8PUdcVpwfKhBBWezF8LwP3BT/Y0vxKSEwPS5cvBCbbLI5EGnV8C1Yf
+         lx0CeENm5pW0WbLXtsFWRFN4mdsONZwPPi0UP/TdxiTUa4Z6CQfoQ1QIj/e/iCtfF/0n
+         j7Iw==
+X-Gm-Message-State: AOAM532hWbPgbLlyXe6I4LvqavXiCi0K5UoKbcXEk3RzHL/T+eZBYFmq
+        k+bmgEC4jMi/ylKzFqY6aHJt1z5gnx8Iuw==
+X-Google-Smtp-Source: ABdhPJyzQxB4rxgT/wTBpDIrco6bFSolY9rdi0OTTQ91XYSKRxdfvQS3XXpAi1KKLSjsMnPDwuMMRGb1p+tAwA==
 X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a17:90a:284f:: with SMTP id
- p15mr89872pjf.1.1636588996159; Wed, 10 Nov 2021 16:03:16 -0800 (PST)
-Date:   Thu, 11 Nov 2021 00:02:58 +0000
-Message-Id: <20211111000310.1435032-1-dmatlack@google.com>
+ (user=dmatlack job=sendgmr) by 2002:a05:6a00:1a8e:b0:49f:a4a9:8f1e with SMTP
+ id e14-20020a056a001a8e00b0049fa4a98f1emr2860990pfv.67.1636588998080; Wed, 10
+ Nov 2021 16:03:18 -0800 (PST)
+Date:   Thu, 11 Nov 2021 00:02:59 +0000
+In-Reply-To: <20211111000310.1435032-1-dmatlack@google.com>
+Message-Id: <20211111000310.1435032-2-dmatlack@google.com>
 Mime-Version: 1.0
+References: <20211111000310.1435032-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.34.0.rc1.387.gb447b232ab-goog
-Subject: [PATCH v2 00/12] KVM: selftests: Hugepage fixes and cleanups
+Subject: [PATCH v2 01/12] KVM: selftests: Explicitly state indicies for
+ vm_guest_mode_params array
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
@@ -62,66 +68,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fix hugepage bugs in the KVM selftests that specifically affect dirty
-logging and demand paging tests.  Found while attempting to verify KVM
-changes/fixes related to hugepages and dirty logging (patches incoming in
-a separate series).
+From: Sean Christopherson <seanjc@google.com>
 
-Clean up the perf_test_args util on top of the hugepage fixes to clarify
-what "page size" means, and to improve confidence in the code doing what
-it thinks it's doing.  In a few cases, users of perf_test_args were
-duplicating (approximating?) calculations made by perf_test_args, and it
-wasn't obvious that both pieces of code were guaranteed to end up with the
-same result.
+Explicitly state the indices when populating vm_guest_mode_params to
+make it marginally easier to visualize what's going on.
 
-v2:
-- Add separate align up/down helpers and use the throughout the series
-  rather than openly coding the bitwise math [Ben, Paolo]
-- Do no pad HugeTLB mmaps [Yanan]
-- Drop "[PATCH 04/15] KVM: selftests: Force stronger HVA alignment (1gb)
-  for hugepages" since HugeTLB does not require manual HVA alignment
-  [David]
-- Drop "[PATCH 15/15] KVM: selftests: Get rid of gorilla math in memslots
-  modification test" since the gorilla math no longer exists [David]
-- Drop "[PATCH 14/15] KVM: selftests: Track size of per-VM memslot in
-  perf_test_args" since it was just a prep patch for [PATCH 15/15]
-  [David]
-- Update the series to kvm/next [David]
+No functional change intended.
 
-v1: https://lore.kernel.org/kvm/20210210230625.550939-1-seanjc@google.com/.
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Ben Gardon <bgardon@google.com>
+[Added indices for new guest modes.]
+Signed-off-by: David Matlack <dmatlack@google.com>
+---
+ tools/testing/selftests/kvm/lib/kvm_util.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-Sean Christopherson (12):
-  KVM: selftests: Explicitly state indicies for vm_guest_mode_params
-    array
-  KVM: selftests: Expose align() helpers to tests
-  KVM: selftests: Assert mmap HVA is aligned when using HugeTLB
-  KVM: selftests: Require GPA to be aligned when backed by hugepages
-  KVM: selftests: Use shorthand local var to access struct
-    perf_tests_args
-  KVM: selftests: Capture per-vCPU GPA in perf_test_vcpu_args
-  KVM: selftests: Use perf util's per-vCPU GPA/pages in demand paging
-    test
-  KVM: selftests: Move per-VM GPA into perf_test_args
-  KVM: selftests: Remove perf_test_args.host_page_size
-  KVM: selftests: Create VM with adjusted number of guest pages for perf
-    tests
-  KVM: selftests: Fill per-vCPU struct during "perf_test" VM creation
-  KVM: selftests: Sync perf_test_args to guest during VM creation
-
- .../selftests/kvm/access_tracking_perf_test.c |   8 +-
- .../selftests/kvm/demand_paging_test.c        |  31 +----
- .../selftests/kvm/dirty_log_perf_test.c       |  10 +-
- tools/testing/selftests/kvm/dirty_log_test.c  |   6 +-
- .../selftests/kvm/include/perf_test_util.h    |  18 +--
- .../testing/selftests/kvm/include/test_util.h |  26 ++++
- .../selftests/kvm/kvm_page_table_test.c       |   2 +-
- tools/testing/selftests/kvm/lib/elf.c         |   3 +-
- tools/testing/selftests/kvm/lib/kvm_util.c    |  44 +++---
- .../selftests/kvm/lib/perf_test_util.c        | 126 ++++++++++--------
- tools/testing/selftests/kvm/lib/test_util.c   |   5 +
- .../kvm/memslot_modification_stress_test.c    |  13 +-
- 12 files changed, 153 insertions(+), 139 deletions(-)
-
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index 041004c0fda7..b624c24290dd 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -187,15 +187,15 @@ const char *vm_guest_mode_string(uint32_t i)
+ }
+ 
+ const struct vm_guest_mode_params vm_guest_mode_params[] = {
+-	{ 52, 48,  0x1000, 12 },
+-	{ 52, 48, 0x10000, 16 },
+-	{ 48, 48,  0x1000, 12 },
+-	{ 48, 48, 0x10000, 16 },
+-	{ 40, 48,  0x1000, 12 },
+-	{ 40, 48, 0x10000, 16 },
+-	{  0,  0,  0x1000, 12 },
+-	{ 47, 64,  0x1000, 12 },
+-	{ 44, 64,  0x1000, 12 },
++	[VM_MODE_P52V48_4K]	= { 52, 48,  0x1000, 12 },
++	[VM_MODE_P52V48_64K]	= { 52, 48, 0x10000, 16 },
++	[VM_MODE_P48V48_4K]	= { 48, 48,  0x1000, 12 },
++	[VM_MODE_P48V48_64K]	= { 48, 48, 0x10000, 16 },
++	[VM_MODE_P40V48_4K]	= { 40, 48,  0x1000, 12 },
++	[VM_MODE_P40V48_64K]	= { 40, 48, 0x10000, 16 },
++	[VM_MODE_PXXV48_4K]	= {  0,  0,  0x1000, 12 },
++	[VM_MODE_P47V64_4K]	= { 47, 64,  0x1000, 12 },
++	[VM_MODE_P44V64_4K]	= { 44, 64,  0x1000, 12 },
+ };
+ _Static_assert(sizeof(vm_guest_mode_params)/sizeof(struct vm_guest_mode_params) == NUM_VM_MODES,
+ 	       "Missing new mode params?");
 -- 
 2.34.0.rc1.387.gb447b232ab-goog
 
