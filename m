@@ -2,120 +2,246 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 612C544DA81
-	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 17:32:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 665D644DB33
+	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 18:43:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234129AbhKKQe6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Nov 2021 11:34:58 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:25666 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232033AbhKKQe5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 11 Nov 2021 11:34:57 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636648327;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xONcWka4yJg1UQhheAmGmQGTeSz62+BFAMVpGU5MQlM=;
-        b=ZFk/12Nj960PWgtq5aTi8SV3sqMq8o+Mx1XZWpnHefGW9PTsRlbsUAsKmjOuxEgoGHdpJU
-        1WXY9Ik2MjHBAi/DS192hyAEJ/CX1m8kRVgtY31pPdAsecJ4atNTYqD4gTSPocg9aS4hAX
-        zpr4gO3srTFIAzjEwMN2jfeuKmrduJI=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-496-wVstpIejNXqLJmwqLmIXjQ-1; Thu, 11 Nov 2021 11:32:06 -0500
-X-MC-Unique: wVstpIejNXqLJmwqLmIXjQ-1
-Received: by mail-wr1-f70.google.com with SMTP id p17-20020adff211000000b0017b902a7701so1105887wro.19
-        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 08:32:06 -0800 (PST)
+        id S232777AbhKKRqN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Nov 2021 12:46:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44534 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229710AbhKKRqM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Nov 2021 12:46:12 -0500
+Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E3D9C061766
+        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 09:43:23 -0800 (PST)
+Received: by mail-io1-xd35.google.com with SMTP id e144so7926620iof.3
+        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 09:43:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=5l5PkD//IvgvNQIs7jK0WhBYA7t8wndNOeYxzbrv78U=;
+        b=O5JdeUHKwk20qHQInw9u+Ysed+uwSEjiiYbP74pYNNEfqIPTgVMtNlEGpuMAV6ZK4v
+         PRf0MCFfdLtYG5Ht0Q/xrpjkPWzqLF0hdxwSz6NdVpREVJjg6lOU02DGaoOFgp7HuBsb
+         iBxTOGCPQLM9P+WkP4cWp9GynDvJiZkl/gTpg6HRDgEId/jqaRf+IymfyyEyP2jAyd/0
+         2b8p9KvRgrvpmxwy24g5hFAPcjMbzKMD+xzcBz4beSSHQCD1OxfVF0zu36W9pM4599W6
+         Z64VL7BXcWANrYSBSTJ6hzeFmOrRlrfliwBHMrcD5+Wy0sfZ76cvr5R6kPOoZyfqrAFM
+         g1Ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=xONcWka4yJg1UQhheAmGmQGTeSz62+BFAMVpGU5MQlM=;
-        b=glZD5Q9BS81QUT8ASesK1owzieVv2S9NTh7YHo+O2qOJEvMSGKo07PJ8eXM6OdhkCk
-         Pu0y4TimXmJWUc70dTDZ6IjRpZoDgODJo0DpY2b8eGwiN8LCGNN5VgYBcyuRfTZpmbtX
-         0BWPXUvt/vO/ojRD0xIPkWw5TrUms0KzDj4R81yk4bQulQiczn4a/Dwr+b5q62l6hskV
-         qD/m79USKGcvHz7HuC58BhM6yj+Cj4XvopHT2hqq1u+L2L2Ep7+N5v5C3srYwBK4qsoh
-         g7EBRIXAj2k6Abimp/NS2WZkXXdYN0dr70E6NqlpgHWpZMdyA+hwR4ZC0YcIojOf1IYv
-         qGEA==
-X-Gm-Message-State: AOAM532dADRwRnH2IsYaMfxZ3gmuW+qOoL54hKicf17sjhJyi+AXUr/8
-        a/mAhTEw0iaPvhUbVsW9pLRTn42sqSiT2FXo26QAMbNAIWVNrkRWMVHESuPbsCdOOhrbXWqjkEz
-        WkucXG/mrjUov
-X-Received: by 2002:a05:600c:3553:: with SMTP id i19mr26522386wmq.97.1636648325380;
-        Thu, 11 Nov 2021 08:32:05 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxnDkUP6eGDmwtDENl8am0CL9MrNcHh26P8buehu4QWyCT5kMI7SNPBa0SKMZxtky6JcBjzZg==
-X-Received: by 2002:a05:600c:3553:: with SMTP id i19mr26522360wmq.97.1636648325165;
-        Thu, 11 Nov 2021 08:32:05 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id l22sm3253329wmp.34.2021.11.11.08.32.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Nov 2021 08:32:04 -0800 (PST)
-Message-ID: <4a3c7be7-12fa-6e47-64eb-02e6c5be5dbc@redhat.com>
-Date:   Thu, 11 Nov 2021 17:32:00 +0100
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=5l5PkD//IvgvNQIs7jK0WhBYA7t8wndNOeYxzbrv78U=;
+        b=y2CAyhmMHcRJHP5H8tRiAHSoRC37i51v2pllExwo8JFGXyXdA4MmuwUI0ARQYFRw37
+         P1Lib6t2isQyVvehX1erh4/LUkHwXsp2++umAaTIJB/1Xp5MH7Y7iflsG2S97CLQj4Yt
+         +xd4yhBH2D8++v2Nsb4BXMSbOOguw0lQqVaKRjfyN5kucrNl2QVgaPw6Tl8pZDxVWLG/
+         k3v/wms24Medtpa+PCjKd9jtGOoTYsQGekkxS84Gbm5iydMnf5i4UEiLXCDq/U2YEfSW
+         HMwMG80leXcLnerQ0VNH3Jw8XG4SqjPY8Wv/DMI9Wh/ubwtOPtUWpwkRQqnIuBtD9QR5
+         hPVQ==
+X-Gm-Message-State: AOAM533pDs4mWM2NE0LdRPq0j8t8ANX9OgwHE3BuIac1DYMeUHOV7oZB
+        s60JnDvbZzzFWb8/ASYAXVSrL0xXu96/1xC3zexUjQ==
+X-Google-Smtp-Source: ABdhPJz8Hv0jzIu2HEbjQivT3Adylyc6uc3JGR95qsPLxNAK8A55Y+auRwgl+TZE4mHeu8Rop6uIzXxPcOkwxOofrWI=
+X-Received: by 2002:a02:624c:: with SMTP id d73mr6816048jac.32.1636652602554;
+ Thu, 11 Nov 2021 09:43:22 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH 0/5] KVM: Cap KVM_CAP_NR_VCPUS by KVM_CAP_MAX_VCPUS and
- re-purpose it on x86
-Content-Language: en-US
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
+References: <20211111000310.1435032-1-dmatlack@google.com> <20211111000310.1435032-3-dmatlack@google.com>
+In-Reply-To: <20211111000310.1435032-3-dmatlack@google.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Thu, 11 Nov 2021 09:43:11 -0800
+Message-ID: <CANgfPd82cPXjsAgLVMhmgjpSpiomWvYdn+x_CVFoc-=wAT0fPQ@mail.gmail.com>
+Subject: Re: [PATCH v2 02/12] KVM: selftests: Expose align() helpers to tests
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
         Andrew Jones <drjones@redhat.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Michael Ellerman <mpe@ellerman.id.au>, kvm-ppc@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Christian Borntraeger <borntraeger@de.ibm.com>
-References: <20211111162746.100598-1-vkuznets@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211111162746.100598-1-vkuznets@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        Jim Mattson <jmattson@google.com>,
+        Yanan Wang <wangyanan55@huawei.com>,
+        Peter Xu <peterx@redhat.com>,
+        Aaron Lewis <aaronlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/11/21 17:27, Vitaly Kuznetsov wrote:
-> This is a comtinuation of "KVM: x86: Drop arbitraty KVM_SOFT_MAX_VCPUS"
-> (https://lore.kernel.org/kvm/20211111134733.86601-1-vkuznets@redhat.com/)
-> work.
-> 
-> 1) Enforce KVM_CAP_NR_VCPUS <= KVM_CAP_MAX_VCPUS rule on all
->   architectures. [Sean Christopherson]
-> 2) Make KVM_CAP_NR_VCPUS return num_online_cpus() and not an arbitrary
->   value of '710' on x86.
-> 
-> Everything but x86 was only 'eyeball tested', the change is trivial
-> but sorry in advance if I screwed up)
+On Wed, Nov 10, 2021 at 4:03 PM David Matlack <dmatlack@google.com> wrote:
+>
+> From: Sean Christopherson <seanjc@google.com>
+>
+> Refactor align() to work with non-pointers and split into separate
+> helpers for aligning up vs. down. Add align_ptr_up() for use with
+> pointers. Expose all helpers so that they can be used by tests and/or
+> other utilities.  The align_down() helper in particular will be used to
+> ensure gpa alignment for hugepages.
+>
+> No functional change intended.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> [Added sepearate up/down helpers and replaced open-coded alignment
 
-Christian, can you look at this for s390?  Returning a fixed value seems 
-wrong for KVM_CAP_NR_VCPUS.
+Nit: separate
 
-Thanks,
+>  bit math throughout the KVM selftests.]
+> Signed-off-by: David Matlack <dmatlack@google.com>
 
-Paolo
+Reviewed-by: Ben Gardon <bgardon@google.com>
 
-> Vitaly Kuznetsov (5):
->    KVM: arm64: Cap KVM_CAP_NR_VCPUS by KVM_CAP_MAX_VCPUS
->    KVM: MIPS: Cap KVM_CAP_NR_VCPUS by KVM_CAP_MAX_VCPUS
->    KVM: PPC: Cap KVM_CAP_NR_VCPUS by KVM_CAP_MAX_VCPUS
->    KVM: RISC-V: Cap KVM_CAP_NR_VCPUS by KVM_CAP_MAX_VCPUS
->    KVM: x86: Drop arbitraty KVM_SOFT_MAX_VCPUS
-> 
->   arch/arm64/kvm/arm.c            | 7 ++++++-
->   arch/mips/kvm/mips.c            | 2 +-
->   arch/powerpc/kvm/powerpc.c      | 4 ++--
->   arch/riscv/kvm/vm.c             | 2 +-
->   arch/x86/include/asm/kvm_host.h | 1 -
->   arch/x86/kvm/x86.c              | 2 +-
->   6 files changed, 11 insertions(+), 7 deletions(-)
-> 
+This is wonderful.
 
+> ---
+>  tools/testing/selftests/kvm/dirty_log_test.c  |  6 ++---
+>  .../testing/selftests/kvm/include/test_util.h | 25 +++++++++++++++++++
+>  .../selftests/kvm/kvm_page_table_test.c       |  2 +-
+>  tools/testing/selftests/kvm/lib/elf.c         |  3 +--
+>  tools/testing/selftests/kvm/lib/kvm_util.c    | 13 ++--------
+>  .../selftests/kvm/lib/perf_test_util.c        |  4 +--
+>  6 files changed, 34 insertions(+), 19 deletions(-)
+>
+> diff --git a/tools/testing/selftests/kvm/dirty_log_test.c b/tools/testing/selftests/kvm/dirty_log_test.c
+> index 792c60e1b17d..3fcd89e195c7 100644
+> --- a/tools/testing/selftests/kvm/dirty_log_test.c
+> +++ b/tools/testing/selftests/kvm/dirty_log_test.c
+> @@ -115,7 +115,7 @@ static void guest_code(void)
+>                         addr = guest_test_virt_mem;
+>                         addr += (READ_ONCE(random_array[i]) % guest_num_pages)
+>                                 * guest_page_size;
+> -                       addr &= ~(host_page_size - 1);
+> +                       addr = align_down(addr, host_page_size);
+>                         *(uint64_t *)addr = READ_ONCE(iteration);
+>                 }
+>
+> @@ -737,14 +737,14 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>         if (!p->phys_offset) {
+>                 guest_test_phys_mem = (vm_get_max_gfn(vm) -
+>                                        guest_num_pages) * guest_page_size;
+> -               guest_test_phys_mem &= ~(host_page_size - 1);
+> +               guest_test_phys_mem = align_down(guest_test_phys_mem, host_page_size);
+>         } else {
+>                 guest_test_phys_mem = p->phys_offset;
+>         }
+>
+>  #ifdef __s390x__
+>         /* Align to 1M (segment size) */
+> -       guest_test_phys_mem &= ~((1 << 20) - 1);
+> +       guest_test_phys_mem = align_down(guest_test_phys_mem, 1 << 20);
+>  #endif
+>
+>         pr_info("guest physical test memory offset: 0x%lx\n", guest_test_phys_mem);
+> diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
+> index f8fddc84c0d3..78c06310cc0e 100644
+> --- a/tools/testing/selftests/kvm/include/test_util.h
+> +++ b/tools/testing/selftests/kvm/include/test_util.h
+> @@ -117,4 +117,29 @@ static inline bool backing_src_is_shared(enum vm_mem_backing_src_type t)
+>         return vm_mem_backing_src_alias(t)->flag & MAP_SHARED;
+>  }
+>
+> +/* Aligns x up to the next multiple of size. Size must be a power of 2. */
+> +static inline uint64_t align_up(uint64_t x, uint64_t size)
+> +{
+> +       uint64_t mask = size - 1;
+> +
+> +       TEST_ASSERT(size != 0 && !(size & (size - 1)),
+> +                   "size not a power of 2: %lu", size);
+> +       return ((x + mask) & ~mask);
+> +}
+> +
+> +static inline uint64_t align_down(uint64_t x, uint64_t size)
+> +{
+> +       uint64_t x_aligned_up = align_up(x, size);
+> +
+> +       if (x == x_aligned_up)
+> +               return x;
+> +       else
+> +               return x_aligned_up - size;
+> +}
+> +
+> +static inline void *align_ptr_up(void *x, size_t size)
+> +{
+> +       return (void *)align_up((unsigned long)x, size);
+> +}
+> +
+>  #endif /* SELFTEST_KVM_TEST_UTIL_H */
+> diff --git a/tools/testing/selftests/kvm/kvm_page_table_test.c b/tools/testing/selftests/kvm/kvm_page_table_test.c
+> index 36407cb0ec85..3836322add00 100644
+> --- a/tools/testing/selftests/kvm/kvm_page_table_test.c
+> +++ b/tools/testing/selftests/kvm/kvm_page_table_test.c
+> @@ -280,7 +280,7 @@ static struct kvm_vm *pre_init_before_test(enum vm_guest_mode mode, void *arg)
+>  #ifdef __s390x__
+>         alignment = max(0x100000, alignment);
+>  #endif
+> -       guest_test_phys_mem &= ~(alignment - 1);
+> +       guest_test_phys_mem = align_down(guest_test_virt_mem, alignment);
+>
+>         /* Set up the shared data structure test_args */
+>         test_args.vm = vm;
+> diff --git a/tools/testing/selftests/kvm/lib/elf.c b/tools/testing/selftests/kvm/lib/elf.c
+> index eac44f5d0db0..13e8e3dcf984 100644
+> --- a/tools/testing/selftests/kvm/lib/elf.c
+> +++ b/tools/testing/selftests/kvm/lib/elf.c
+> @@ -157,8 +157,7 @@ void kvm_vm_elf_load(struct kvm_vm *vm, const char *filename)
+>                         "memsize of 0,\n"
+>                         "  phdr index: %u p_memsz: 0x%" PRIx64,
+>                         n1, (uint64_t) phdr.p_memsz);
+> -               vm_vaddr_t seg_vstart = phdr.p_vaddr;
+> -               seg_vstart &= ~(vm_vaddr_t)(vm->page_size - 1);
+> +               vm_vaddr_t seg_vstart = align_down(phdr.p_vaddr, vm->page_size);
+>                 vm_vaddr_t seg_vend = phdr.p_vaddr + phdr.p_memsz - 1;
+>                 seg_vend |= vm->page_size - 1;
+>                 size_t seg_size = seg_vend - seg_vstart + 1;
+> diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+> index b624c24290dd..63375118d48f 100644
+> --- a/tools/testing/selftests/kvm/lib/kvm_util.c
+> +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+> @@ -22,15 +22,6 @@
+>
+>  static int vcpu_mmap_sz(void);
+>
+> -/* Aligns x up to the next multiple of size. Size must be a power of 2. */
+> -static void *align(void *x, size_t size)
+> -{
+> -       size_t mask = size - 1;
+> -       TEST_ASSERT(size != 0 && !(size & (size - 1)),
+> -                   "size not a power of 2: %lu", size);
+> -       return (void *) (((size_t) x + mask) & ~mask);
+> -}
+> -
+>  /*
+>   * Open KVM_DEV_PATH if available, otherwise exit the entire program.
+>   *
+> @@ -911,7 +902,7 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm,
+>                     region->mmap_start, errno);
+>
+>         /* Align host address */
+> -       region->host_mem = align(region->mmap_start, alignment);
+> +       region->host_mem = align_ptr_up(region->mmap_start, alignment);
+>
+>         /* As needed perform madvise */
+>         if ((src_type == VM_MEM_SRC_ANONYMOUS ||
+> @@ -954,7 +945,7 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm,
+>                             "mmap of alias failed, errno: %i", errno);
+>
+>                 /* Align host alias address */
+> -               region->host_alias = align(region->mmap_alias, alignment);
+> +               region->host_alias = align_ptr_up(region->mmap_alias, alignment);
+>         }
+>  }
+>
+> diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
+> index 0ef80dbdc116..6b8d5020dc54 100644
+> --- a/tools/testing/selftests/kvm/lib/perf_test_util.c
+> +++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
+> @@ -92,10 +92,10 @@ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int vcpus,
+>
+>         guest_test_phys_mem = (vm_get_max_gfn(vm) - guest_num_pages) *
+>                               perf_test_args.guest_page_size;
+> -       guest_test_phys_mem &= ~(perf_test_args.host_page_size - 1);
+> +       guest_test_phys_mem = align_down(guest_test_phys_mem, perf_test_args.host_page_size);
+>  #ifdef __s390x__
+>         /* Align to 1M (segment size) */
+> -       guest_test_phys_mem &= ~((1 << 20) - 1);
+> +       guest_test_phys_mem = align_down(guest_test_phys_mem, 1 << 20);
+>  #endif
+>         pr_info("guest physical test memory offset: 0x%lx\n", guest_test_phys_mem);
+>
+> --
+> 2.34.0.rc1.387.gb447b232ab-goog
+>
