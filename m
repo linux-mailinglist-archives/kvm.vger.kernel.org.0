@@ -2,192 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D7BE44DBA1
-	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 19:31:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E703A44DBC5
+	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 19:48:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234200AbhKKSeT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Nov 2021 13:34:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55524 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232930AbhKKSeS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Nov 2021 13:34:18 -0500
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA6BBC061767
-        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 10:31:28 -0800 (PST)
-Received: by mail-pl1-x630.google.com with SMTP id q17so6382109plr.11
-        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 10:31:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=s8jf/tX5jyrIo31YjXHUFlHnOpiUaJPDt9RQiWaokMM=;
-        b=Z+KAKlex/6ZhLa9BoSJPqzXvqRiKe7hN+fDeZZ1JVshM75MPHZ8jSb7OB5bSHGPkuV
-         RVt0kNhVio7qz+MvilBmIPLG4YggyRiMOft8PE9P/yTsRy3U93NTC5RdfTzjC4VR2S0F
-         OXzyxt9W42nM3znUclcO+YS4law6AZtwSapHbvfQ0MXfSiU72Ac4csNy/RCIUFxePzB7
-         8rDk4j2mzuez+d5OVYZcSh1Ok9Tsfq+yQGqhYXQUyOXNwn6TYfphATOdtxgE1XsR6DNJ
-         k4TeKJpgmpHH2ZIdl+DezIAzuxE0aNz9Y1hbAir10vnMsCKyYbYh/j/bsLSS+E6X49R1
-         lF+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=s8jf/tX5jyrIo31YjXHUFlHnOpiUaJPDt9RQiWaokMM=;
-        b=g0q9+VvqA/AiJ3IvjvLeLcEiS3C71Ll+RilvAur7BUw7lDxFBOG+wkl6GrqTXieIzO
-         pHYL/RShcC59UZxh8AmB+4/EIUg+5o9bY2mhxxMHDSG1PEqN59MPhPTqOyjyxkGb/Dba
-         9KQKcVn9MAIKswqIqZuxMgveiRGa4SvdkzzQVoEHdf8cETwjAOyUfgLfIFH+nr9d2qvl
-         F1FIuFywepjbOsrzDHAb+81WnSpS7iRvjrpELvPBP9Okw3DL/0/YnF9bsxxcMolQOIOf
-         yl9Jc4dy4oXJQ1LDNmw+w0RU3Yuq9HcP1jOiabUrtp6vblYUVFkxO4ZzNg1NbolS4GVM
-         i0mQ==
-X-Gm-Message-State: AOAM530iFaPqNTzyQW1jWbbPLR/Ho+jIK42lEmxUAIrLJh11X+o1LraJ
-        4w4MmrJmCig/LzoGFawuPcZ8Kg==
-X-Google-Smtp-Source: ABdhPJw5atYngTb3DppEu5M72mop+gP4FS1YgwLKHn3XrApXI6KVOKiIGKphwWxkrAl24185f0809A==
-X-Received: by 2002:a17:90b:218:: with SMTP id fy24mr29047971pjb.187.1636655488268;
-        Thu, 11 Nov 2021 10:31:28 -0800 (PST)
-Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
-        by smtp.gmail.com with ESMTPSA id h4sm9317189pjm.14.2021.11.11.10.31.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Nov 2021 10:31:27 -0800 (PST)
-Date:   Thu, 11 Nov 2021 18:31:23 +0000
-From:   David Matlack <dmatlack@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Shier <pshier@google.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Keqian Zhu <zhukeqian1@huawei.com>,
-        David Hildenbrand <david@redhat.com>
-Subject: Re: [RFC 03/19] KVM: x86/mmu: Factor flush and free up when zapping
- under MMU write lock
-Message-ID: <YY1he0lCLRNUofuw@google.com>
-References: <20211110223010.1392399-1-bgardon@google.com>
- <20211110223010.1392399-4-bgardon@google.com>
+        id S233575AbhKKSvD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Nov 2021 13:51:03 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33468 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233245AbhKKSvC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 11 Nov 2021 13:51:02 -0500
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1ABH8PJN031101
+        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 18:48:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=4JGzWKYd99Nn3BjwvwKYURHBiC/emTDyhDqhV+nview=;
+ b=iqKbUSFkjz646hQyrgl3LGxchNaODRPdAoSmnhpCb3Jfut4MxU0zqHGS/b8ijfuNRwN/
+ VXcQNZdY/EeQP3HMhU+btclzRosCH/kPEyqT8WYjmsze2kM9w8hjjlsZXeKIwmtNwy8X
+ s9g7qKxkFBoihqeUmUOLck1PY6moIyrEKMf3HuOP2YQMWNz0nXaGVtGd9X6V1kCyCWBb
+ ziBdTAffQUcev5MWse70yA+XErgZNnbwlS15EIdyFCUf76Iok5mrNCcMo0X55x2vRNrd
+ R61I/RHnMET1fKDeTV0IFUulqaji3piuP6I+lG0+0Sx8VXp7Nn2JXcUW1qcPTGkYYJvA 4w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3c955gx867-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 18:48:12 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1ABIEsKf004622
+        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 18:48:12 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3c955gx856-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 11 Nov 2021 18:48:12 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1ABIRC11018957;
+        Thu, 11 Nov 2021 18:48:09 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma04ams.nl.ibm.com with ESMTP id 3c5hbb1363-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 11 Nov 2021 18:48:09 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1ABIfLoo63308126
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 11 Nov 2021 18:41:21 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 74ABEAE045;
+        Thu, 11 Nov 2021 18:48:06 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 11148AE056;
+        Thu, 11 Nov 2021 18:48:06 +0000 (GMT)
+Received: from li-c6ac47cc-293c-11b2-a85c-d421c8e4747b.ibm.com.com (unknown [9.171.69.58])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 11 Nov 2021 18:48:05 +0000 (GMT)
+From:   Pierre Morel <pmorel@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, imbrenda@linux.ibm.com
+Subject: [kvm-unit-tests PATCH] s390x: io: declare s390x CPU as big endian
+Date:   Thu, 11 Nov 2021 19:48:35 +0100
+Message-Id: <20211111184835.113648-1-pmorel@linux.ibm.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211110223010.1392399-4-bgardon@google.com>
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: NqrIg29VxyV3bj79qKZJm97ode8Djvf0
+X-Proofpoint-ORIG-GUID: mYN4Wb1AO25w_ktkbtuMry-JCOrxsoVy
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
+ definitions=2021-11-11_06,2021-11-11_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ suspectscore=0 spamscore=0 impostorscore=0 adultscore=0 mlxscore=0
+ phishscore=0 mlxlogscore=819 clxscore=1015 bulkscore=0 malwarescore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2111110098
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 10, 2021 at 02:29:54PM -0800, Ben Gardon wrote:
-> When zapping a GFN range under the MMU write lock, there is no need to
-> flush the TLBs for every zap. Instead, follow the lead of the Legacy MMU
-> can collect disconnected sps to be freed after a flush at the end of
-> the routine.
-> 
-> 
-> Signed-off-by: Ben Gardon <bgardon@google.com>
+To use the swap byte transformations we need to declare
+the s390x architecture as big endian.
 
-Reviewed-by: David Matlack <dmatlack@google.com>
+Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+---
+ lib/s390x/asm/io.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-> ---
->  arch/x86/kvm/mmu/tdp_mmu.c | 28 +++++++++++++++++++---------
->  1 file changed, 19 insertions(+), 9 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 5b31d046df78..a448f0f2d993 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -623,10 +623,9 @@ static inline bool tdp_mmu_zap_spte_atomic(struct kvm *kvm,
->   */
->  static inline void __tdp_mmu_set_spte(struct kvm *kvm, struct tdp_iter *iter,
->  				      u64 new_spte, bool record_acc_track,
-> -				      bool record_dirty_log)
-> +				      bool record_dirty_log,
-> +				      struct list_head *disconnected_sps)
->  {
-> -	LIST_HEAD(disconnected_sps);
-> -
->  	lockdep_assert_held_write(&kvm->mmu_lock);
->  
->  	/*
-> @@ -641,7 +640,7 @@ static inline void __tdp_mmu_set_spte(struct kvm *kvm, struct tdp_iter *iter,
->  	WRITE_ONCE(*rcu_dereference(iter->sptep), new_spte);
->  
->  	__handle_changed_spte(kvm, iter->as_id, iter->gfn, iter->old_spte,
-> -			      new_spte, iter->level, false, &disconnected_sps);
-> +			      new_spte, iter->level, false, disconnected_sps);
->  	if (record_acc_track)
->  		handle_changed_spte_acc_track(iter->old_spte, new_spte,
->  					      iter->level);
-> @@ -649,28 +648,32 @@ static inline void __tdp_mmu_set_spte(struct kvm *kvm, struct tdp_iter *iter,
->  		handle_changed_spte_dirty_log(kvm, iter->as_id, iter->gfn,
->  					      iter->old_spte, new_spte,
->  					      iter->level);
-> +}
->  
-> -	handle_disconnected_sps(kvm, &disconnected_sps);
-> +static inline void tdp_mmu_zap_spte(struct kvm *kvm, struct tdp_iter *iter,
-> +				    struct list_head *disconnected_sps)
-> +{
-> +	__tdp_mmu_set_spte(kvm, iter, 0, true, true, disconnected_sps);
->  }
->  
->  static inline void tdp_mmu_set_spte(struct kvm *kvm, struct tdp_iter *iter,
->  				    u64 new_spte)
->  {
-> -	__tdp_mmu_set_spte(kvm, iter, new_spte, true, true);
-> +	__tdp_mmu_set_spte(kvm, iter, new_spte, true, true, NULL);
->  }
->  
->  static inline void tdp_mmu_set_spte_no_acc_track(struct kvm *kvm,
->  						 struct tdp_iter *iter,
->  						 u64 new_spte)
->  {
-> -	__tdp_mmu_set_spte(kvm, iter, new_spte, false, true);
-> +	__tdp_mmu_set_spte(kvm, iter, new_spte, false, true, NULL);
->  }
->  
->  static inline void tdp_mmu_set_spte_no_dirty_log(struct kvm *kvm,
->  						 struct tdp_iter *iter,
->  						 u64 new_spte)
->  {
-> -	__tdp_mmu_set_spte(kvm, iter, new_spte, true, false);
-> +	__tdp_mmu_set_spte(kvm, iter, new_spte, true, false, NULL);
->  }
->  
->  #define tdp_root_for_each_pte(_iter, _root, _start, _end) \
-> @@ -757,6 +760,7 @@ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
->  	gfn_t max_gfn_host = 1ULL << (shadow_phys_bits - PAGE_SHIFT);
->  	bool zap_all = (start == 0 && end >= max_gfn_host);
->  	struct tdp_iter iter;
-> +	LIST_HEAD(disconnected_sps);
->  
->  	/*
->  	 * No need to try to step down in the iterator when zapping all SPTEs,
-> @@ -799,7 +803,7 @@ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
->  			continue;
->  
->  		if (!shared) {
-> -			tdp_mmu_set_spte(kvm, &iter, 0);
-> +			tdp_mmu_zap_spte(kvm, &iter, &disconnected_sps);
->  			flush = true;
->  		} else if (!tdp_mmu_zap_spte_atomic(kvm, &iter)) {
->  			/*
-> @@ -811,6 +815,12 @@ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
->  		}
->  	}
->  
-> +	if (!list_empty(&disconnected_sps)) {
-> +		kvm_flush_remote_tlbs(kvm);
-> +		handle_disconnected_sps(kvm, &disconnected_sps);
+diff --git a/lib/s390x/asm/io.h b/lib/s390x/asm/io.h
+index 1dc6283b..b5e661cf 100644
+--- a/lib/s390x/asm/io.h
++++ b/lib/s390x/asm/io.h
+@@ -10,6 +10,7 @@
+ #define _ASMS390X_IO_H_
+ 
+ #define __iomem
++#define __cpu_is_be() (1)
+ 
+ #include <asm-generic/io.h>
+ 
+-- 
+2.25.1
 
-It might be worth adding a comment that we purposely do not process
-disconnected_sps during the cond resched earlier in the loop because it
-is an expensive call and it itself needs to cond resched (next patch).
-
-> +		flush = false;
-> +	}
-> +
->  	rcu_read_unlock();
->  	return flush;
->  }
-> -- 
-> 2.34.0.rc0.344.g81b53c2807-goog
-> 
