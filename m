@@ -2,142 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1C0BB44D727
-	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 14:23:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E85144D728
+	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 14:24:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232883AbhKKN0V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Nov 2021 08:26:21 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:23970 "EHLO
+        id S233071AbhKKN1C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Nov 2021 08:27:02 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:23858 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231380AbhKKN0O (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 11 Nov 2021 08:26:14 -0500
+        by vger.kernel.org with ESMTP id S231380AbhKKN1B (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 11 Nov 2021 08:27:01 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636637004;
+        s=mimecast20190719; t=1636637052;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=2d1AOX9BF7Ab22e6a+P4VCFkUC1sqx1Ef017ZVlrdd0=;
-        b=LBE7bWhWEMm/yoq68SoD7i4MliAyq6eD+/k2cUCnR9OwSkNbfw7lLmrH0h+qzzLx1nBI/G
-        PS2vCwVC4uNTPW2nfTIde3RujEF5/MwAf+LQfkE6/i96dmlwTSLoTiHTDWkw3bp4vtNPbg
-        /iNgvWPZ3ghJD5ZBv/6gFBTQZIS1QYY=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-321-51-xdfW3MEme0-gl1hXRRQ-1; Thu, 11 Nov 2021 08:23:23 -0500
-X-MC-Unique: 51-xdfW3MEme0-gl1hXRRQ-1
-Received: by mail-ed1-f70.google.com with SMTP id t20-20020a056402525400b003e2ad6b5ee7so5392994edd.8
-        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 05:23:23 -0800 (PST)
+        bh=8y1i26z9W/6KGoFrwymr+lNrACQa7pZ4kY4aM7mHvas=;
+        b=UFyvOLU46fPuMuZTeaX4sWw552vv6qCJG3YMRVckzofpoRcPiiiuUIKnqjMf8UVtI6q494
+        4JClVJK9lU5idKFL6i+T4FeqOr+gjc6jfvjI5nWM5p21lve2tOdaFyvzuiRv3SVKRYwN3h
+        JgzA/KG0QG3ElpYsUA90kJCe5Vu6si4=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-125-GIk_Pij2PH6hwyyclsho1g-1; Thu, 11 Nov 2021 08:24:11 -0500
+X-MC-Unique: GIk_Pij2PH6hwyyclsho1g-1
+Received: by mail-ed1-f71.google.com with SMTP id o15-20020a056402438f00b003e32b274b24so5349002edc.21
+        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 05:24:10 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=2d1AOX9BF7Ab22e6a+P4VCFkUC1sqx1Ef017ZVlrdd0=;
-        b=zSngyYlTVf9CSWMnUZJNSKau5UW0qp3WxDqyvcm5zbNqKS7HGNQ32Cm/90tPinXyqR
-         naKzHzkCnxlCEYPx+wD0OAXMKf5S80nids/Krffqq/QCZ/RAgUyze1C+P9wk4TO1pDPN
-         UCmxqmtNdXQtqs0jQ2FfYqffYud8+Fou5EXnJmIgBQQOm4q166QHsiXfQjGG883cQd9X
-         YyCBB+bWMGl1dEuaCqlKL7baqWTD7dGguICplyZeAaEPEvtl0bTZGcLXdo8upsu0/dgQ
-         htkV1xGGSL5hRlDEuRW0C3sa3d5mMDT+Mf5i4CaI2CAKOsGyaEykjegH/s1OdO7+AKbB
-         XvXA==
-X-Gm-Message-State: AOAM531FflEWY9JzJ7Cet9XOBzvu+9PLZvBmsrL0yydZb8zGhfwvGLbf
-        9kReAM3G4L35YtcVbYdtSrnK4HA32tXbqcw5PD/eGbrSDnXBVxLVpjfHXZabEKMRrbG0wS69v7H
-        SRt3OwKecTjSB
-X-Received: by 2002:a17:906:64a:: with SMTP id t10mr9543391ejb.5.1636637002019;
-        Thu, 11 Nov 2021 05:23:22 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzfn4PNoZyWu/ndZ8qjd92igJVajcz6MTs5ST/g/kSh88E6/x2hmpkBjihhvb7yJbAqgnpd5g==
-X-Received: by 2002:a17:906:64a:: with SMTP id t10mr9543359ejb.5.1636637001815;
-        Thu, 11 Nov 2021 05:23:21 -0800 (PST)
+        bh=8y1i26z9W/6KGoFrwymr+lNrACQa7pZ4kY4aM7mHvas=;
+        b=ZH0rjk1wPeRirfZlLL0BB9b7IuF0kmKB9NwuViARfUFn0WlMaXm18w5I8wLn7FPUo7
+         GaZsPzaPV2+VN89bIELrK9R4D2jcXop8AgIKxjJBOma4jARyPOEsMGnn4/mw0F+AAtLg
+         4PCB03GjgU2StqqNmAXlS6S7kXatnSy+xxPb/x5v+cnNitlz7JUKiMvXKQZ+j1gMXnm0
+         oB6f/4Lp4KZYe0Z57ohQwSLAXUGAqhWfswwfEysNSzVyxSfIvYwVGveUloEKiF7gt4YM
+         xHbP/xG3dOmieCXVd+iPE5FsM0kL4gCPlQrcDP8LhXdRukgwUCcXP57TEDdOUfyMza7Z
+         foIw==
+X-Gm-Message-State: AOAM531JsM5wjkOsOOYr+h5Gtjkmju8aNZ1DEACAleX/0Obg+XW4a0jf
+        jGqT3XyrFICc+M2tcW97s4snLbFwttVOda/PWMfw2kWNxm/JY3r4E7a0ksu54CqIbHZ9j8mupFg
+        4SiPBMn1cMY7x
+X-Received: by 2002:a05:6402:148:: with SMTP id s8mr9903215edu.221.1636637049887;
+        Thu, 11 Nov 2021 05:24:09 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzbVah5ywxQHSq8/Pew3Ppf4Hx2baZmMNT8S6/h/YWBv/jTwmO8wYk/64ctVL0s3FtcQLV5IA==
+X-Received: by 2002:a05:6402:148:: with SMTP id s8mr9903182edu.221.1636637049659;
+        Thu, 11 Nov 2021 05:24:09 -0800 (PST)
 Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id l3sm904178edq.19.2021.11.11.05.23.17
+        by smtp.gmail.com with ESMTPSA id sb19sm1386368ejc.120.2021.11.11.05.24.08
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Nov 2021 05:23:21 -0800 (PST)
-Message-ID: <309f61f7-72fd-06a2-84b4-97dfc3fab587@redhat.com>
-Date:   Thu, 11 Nov 2021 14:23:16 +0100
+        Thu, 11 Nov 2021 05:24:08 -0800 (PST)
+Message-ID: <eacffa80-3aac-1221-4cdb-fb69f5ddf474@redhat.com>
+Date:   Thu, 11 Nov 2021 14:24:07 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.2.0
-Subject: Re: [PATCH v3] KVM: x86: Fix recording of guest steal time /
- preempted status
+Subject: Re: [PATCH v2] kvm: x86: Convert return type of *is_valid_rdpmc_ecx()
+ to bool
 Content-Language: en-US
-To:     David Woodhouse <dwmw2@infradead.org>, kvm <kvm@vger.kernel.org>
-Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "mtosatti@redhat.com" <mtosatti@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>, karahmed@amazon.com
-References: <5d4002373c3ae614cb87b72ba5b7cdc161a0cd46.camel@infradead.org>
- <4369bbef7f0c2b239da419c917f9a9f2ca6a76f1.camel@infradead.org>
- <624bc910-1bec-e6dd-b09a-f86dc6cdbef0@redhat.com>
- <0372987a52b5f43963721b517664830e7e6f1818.camel@infradead.org>
- <1f326c33-3acf-911a-d1ef-c72f0a570761@redhat.com>
- <3645b9b889dac6438394194bb5586a46b68d581f.camel@infradead.org>
+To:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>
+References: <20211105202058.1048757-1-jmattson@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <3645b9b889dac6438394194bb5586a46b68d581f.camel@infradead.org>
+In-Reply-To: <20211105202058.1048757-1-jmattson@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/2/21 18:36, David Woodhouse wrote:
+On 11/5/21 21:20, Jim Mattson wrote:
+> These function names sound like predicates, and they have siblings,
+> *is_valid_msr(), which _are_ predicates. Moreover, there are comments
+> that essentially warn that these functions behave unexpectedly.
+> 
+> Flip the polarity of the return values, so that they become
+> predicates, and convert the boolean result to a success/failure code
+> at the outer call site.
+> 
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Jim Mattson <jmattson@google.com>
+> Reviewed-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   arch/x86/kvm/pmu.c           | 2 +-
+>   arch/x86/kvm/pmu.h           | 4 ++--
+>   arch/x86/kvm/svm/pmu.c       | 5 ++---
+>   arch/x86/kvm/vmx/pmu_intel.c | 7 +++----
+>   arch/x86/kvm/x86.c           | 4 +++-
+>   5 files changed, 11 insertions(+), 11 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> index 0772bad9165c..09873f6488f7 100644
+> --- a/arch/x86/kvm/pmu.c
+> +++ b/arch/x86/kvm/pmu.c
+> @@ -319,7 +319,7 @@ void kvm_pmu_handle_event(struct kvm_vcpu *vcpu)
+>   }
+>   
+>   /* check if idx is a valid index to access PMU */
+> -int kvm_pmu_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
+> +bool kvm_pmu_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
+>   {
+>   	return kvm_x86_ops.pmu_ops->is_valid_rdpmc_ecx(vcpu, idx);
+>   }
+> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+> index 0e4f2b1fa9fb..59d6b76203d5 100644
+> --- a/arch/x86/kvm/pmu.h
+> +++ b/arch/x86/kvm/pmu.h
+> @@ -32,7 +32,7 @@ struct kvm_pmu_ops {
+>   	struct kvm_pmc *(*rdpmc_ecx_to_pmc)(struct kvm_vcpu *vcpu,
+>   		unsigned int idx, u64 *mask);
+>   	struct kvm_pmc *(*msr_idx_to_pmc)(struct kvm_vcpu *vcpu, u32 msr);
+> -	int (*is_valid_rdpmc_ecx)(struct kvm_vcpu *vcpu, unsigned int idx);
+> +	bool (*is_valid_rdpmc_ecx)(struct kvm_vcpu *vcpu, unsigned int idx);
+>   	bool (*is_valid_msr)(struct kvm_vcpu *vcpu, u32 msr);
+>   	int (*get_msr)(struct kvm_vcpu *vcpu, struct msr_data *msr_info);
+>   	int (*set_msr)(struct kvm_vcpu *vcpu, struct msr_data *msr_info);
+> @@ -149,7 +149,7 @@ void reprogram_counter(struct kvm_pmu *pmu, int pmc_idx);
+>   void kvm_pmu_deliver_pmi(struct kvm_vcpu *vcpu);
+>   void kvm_pmu_handle_event(struct kvm_vcpu *vcpu);
+>   int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned pmc, u64 *data);
+> -int kvm_pmu_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx);
+> +bool kvm_pmu_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx);
+>   bool kvm_pmu_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr);
+>   int kvm_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info);
+>   int kvm_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info);
+> diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
+> index fdf587f19c5f..871c426ec389 100644
+> --- a/arch/x86/kvm/svm/pmu.c
+> +++ b/arch/x86/kvm/svm/pmu.c
+> @@ -181,14 +181,13 @@ static struct kvm_pmc *amd_pmc_idx_to_pmc(struct kvm_pmu *pmu, int pmc_idx)
+>   	return get_gp_pmc_amd(pmu, base + pmc_idx, PMU_TYPE_COUNTER);
+>   }
+>   
+> -/* returns 0 if idx's corresponding MSR exists; otherwise returns 1. */
+> -static int amd_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
+> +static bool amd_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
+>   {
+>   	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+>   
+>   	idx &= ~(3u << 30);
+>   
+> -	return (idx >= pmu->nr_arch_gp_counters);
+> +	return idx < pmu->nr_arch_gp_counters;
+>   }
+>   
+>   /* idx is the ECX register of RDPMC instruction */
+> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+> index b8e0d21b7c8a..1b7456b2177b 100644
+> --- a/arch/x86/kvm/vmx/pmu_intel.c
+> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+> @@ -118,16 +118,15 @@ static struct kvm_pmc *intel_pmc_idx_to_pmc(struct kvm_pmu *pmu, int pmc_idx)
+>   	}
+>   }
+>   
+> -/* returns 0 if idx's corresponding MSR exists; otherwise returns 1. */
+> -static int intel_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
+> +static bool intel_is_valid_rdpmc_ecx(struct kvm_vcpu *vcpu, unsigned int idx)
+>   {
+>   	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+>   	bool fixed = idx & (1u << 30);
+>   
+>   	idx &= ~(3u << 30);
+>   
+> -	return (!fixed && idx >= pmu->nr_arch_gp_counters) ||
+> -		(fixed && idx >= pmu->nr_arch_fixed_counters);
+> +	return fixed ? idx < pmu->nr_arch_fixed_counters
+> +		     : idx < pmu->nr_arch_gp_counters;
+>   }
+>   
+>   static struct kvm_pmc *intel_rdpmc_ecx_to_pmc(struct kvm_vcpu *vcpu,
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index c1c4e2b05a63..d7def720227d 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -7328,7 +7328,9 @@ static void emulator_set_smbase(struct x86_emulate_ctxt *ctxt, u64 smbase)
+>   static int emulator_check_pmc(struct x86_emulate_ctxt *ctxt,
+>   			      u32 pmc)
+>   {
+> -	return kvm_pmu_is_valid_rdpmc_ecx(emul_to_vcpu(ctxt), pmc);
+> +	if (kvm_pmu_is_valid_rdpmc_ecx(emul_to_vcpu(ctxt), pmc))
+> +		return 0;
+> +	return -EINVAL;
+>   }
+>   
+>   static int emulator_read_pmc(struct x86_emulate_ctxt *ctxt,
+> 
 
-> +		asm volatile("1:\t" LOCK_PREFIX "xchgb %0, %2\n"
-> +			     "\txor %1, %1\n"
-> +			     "2:\n"
-> +			     "\t.section .fixup,\"ax\"\n"
-> +			     "3:\tmovl %3, %1\n"
-> +			     "\tjmp\t2b\n"
-> +			     "\t.previous\n"
-> +			     _ASM_EXTABLE_UA(1b, 3b)
-> +			     : "=r" (st_preempted),
-> +			       "=r" (err)
-> +			     : "m" (st->preempted),
-> +			       "i" (-EFAULT),
-> +			       "0" (st_preempted));
-
-Since Peter is removing custom fixups, I'm going for code that is
-slightly suboptimal (though just by one extra instruction) but doesn't
-interfere with him.
-
-Also, xchg doesn't need a lock prefix.
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3301,21 +3301,15 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
-  	 */
-  	if (guest_pv_has(vcpu, KVM_FEATURE_PV_TLB_FLUSH)) {
-  		u8 st_preempted = 0;
--		int err;
-+		int err = -EFAULT;
-  
--		asm volatile("1:\t" LOCK_PREFIX "xchgb %0, %2\n"
--			     "\txor %1, %1\n"
-+		asm volatile("1: xchgb %0, %2\n"
-+			     "xor %1, %1\n"
-  			     "2:\n"
--			     "\t.section .fixup,\"ax\"\n"
--			     "3:\tmovl %3, %1\n"
--			     "\tjmp\t2b\n"
--			     "\t.previous\n"
--			     _ASM_EXTABLE_UA(1b, 3b)
--			     : "=r" (st_preempted),
--			       "=r" (err)
--			     : "m" (st->preempted),
--			       "i" (-EFAULT),
--			       "0" (st_preempted));
-+			     _ASM_EXTABLE_UA(1b, 2b)
-+			     : "+r" (st_preempted),
-+			       "+&r" (err)
-+			     : "m" (st->preempted));
-  		if (err)
-  			goto out;
-  
-
-Queued with these changes.
+Queued, thanks.
 
 Paolo
 
