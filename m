@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DC9B644CFC2
-	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 03:11:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E55EC44CFC5
+	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 03:11:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234286AbhKKCL5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Nov 2021 21:11:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60296 "EHLO
+        id S234374AbhKKCMF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Nov 2021 21:12:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234287AbhKKCL2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Nov 2021 21:11:28 -0500
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8057DC0797B6
-        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 18:08:02 -0800 (PST)
-Received: by mail-pj1-x1049.google.com with SMTP id n2-20020a17090a2fc200b001a1bafb59bfso2019251pjm.1
-        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 18:08:02 -0800 (PST)
+        with ESMTP id S234372AbhKKCLh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Nov 2021 21:11:37 -0500
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 452E5C0797BE
+        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 18:08:04 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id x1-20020a17090a294100b001a6e7ba6b4eso2074651pjf.9
+        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 18:08:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=fHeYagzJUlx8WvSWOWzAacKfteJvqH26iwX6/BL5oRM=;
-        b=I1iMFlsTKJ7I9ZBlooH8LUuysl6kvigdxx570TJkSRxR5Epl554X0SupugqMgxooRa
-         Js7Gd3LnB4f/Od2LdYQfjJvJrd7Jj5SR+bgYd/KsVTHaX78qwBxLzlhPNrgrGQW9HBZM
-         Gf+2IkKjJau7mgLZiDcv4KWoS8FOEgdksbSmIKXguTp9uiLzYV0qE4TCK48GTJ0xK34S
-         pPAdtQowal2kVffJJ8FkMF2ePQNvYgo/wLvddDptRGq7iTfLonp7DuFAyOF+gUabTETs
-         Um+LI0mma5pdcsVh0PUQ0Cq0ms/rh1QbrsfaYQV7RfZ7Xi1vwzyVVaWe1zMfes0/v0pu
-         VVEw==
+        bh=mw+8kRBMaigpdPoQg441qk6T9IEU8krLENLSjCCr4zw=;
+        b=SrMofVJY/GjIpbuhbq5Q0NchE90Iee1Zg/DXzrBAL+84O+9mkb6Cvy4kbuTgC9NQoK
+         tBqW8VuJ90++OLutVCiS1ya3l32W+JKb2BOUzxT4CfsJTbL/puTXQsav1euvT3+gukG2
+         yS7t4ZuH8QzI7fhcSd7lINxxYvVsKg3i3FXbG+Q8gteNmUbpj11OvRbe8kbh++awXIwA
+         lQ4l1HocfEVizMh2041kgc72dvgbUqXNAgsThfb0ZWYRAHAJLmF2dzBFcQYmNC3B4SgG
+         os87bSDOwQmR/d7G3NMYHAuPjpmsSI+LJUHPF3mp7ZDo3cMuuRvUGMBLZ8TO5A0n/acG
+         yo8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=fHeYagzJUlx8WvSWOWzAacKfteJvqH26iwX6/BL5oRM=;
-        b=BDlUNWQGrBp192cZr0eWgaMPcOAL9aG+PK4t081vl1xjxxGJHojTRSVTnuoDcsrb+L
-         iiN9g0I6+Bwkl69yR5AMCp3eyiakJimEeDgdbMZVSjA73nRo6jQEk0WrzFENMVPa6ik2
-         QjXq5mC8tEiYtY3eE3whJON/V12Mof3VJ21A4/t2b1O43WrCYZLX0dtxtTXI8zOHgtqX
-         Yum0zp2+dx68Xol5Xx0N3bssN9mcPpxpcvu6RAUDGGdN9JoF+KJQgsnbQz8QEwy/Y+Dc
-         1HZ6wjW3fuIISOWpXihkw1emq9TiD0uXBRTDE96SclWtrxELh1yzZBI0p5ukxjunWux6
-         ycNw==
-X-Gm-Message-State: AOAM530r35BtHW6nu6Uoo12aKiNjwlakcTBcNeH/X/3++MTJIvhF07Gt
-        AYT/pBlXPuQS0OG6EAPdel/pFedh3gU=
-X-Google-Smtp-Source: ABdhPJwlj+RL95wDPLaJIcjI0VzoyEr26DB5cELwjkd8PtU9zdr9HE6g2qmDfqx1IbL5j6HU26ZztAJb2Z8=
+        bh=mw+8kRBMaigpdPoQg441qk6T9IEU8krLENLSjCCr4zw=;
+        b=ORf+rB5NigajoT6TiBGaxzgce16c2y2+s1jNqU4CJkCFygkW15qI2W1i9q71P1EWnZ
+         wq3EfdkVwlk4uEXOIZZ20WYVBH+b7BU4Oyg3b8HqqGrGBrLPFcbiVjb0det0MKTXnZZI
+         ArtBWJIsMe/8VVzh2MmZJzWKWF8VtlsaRXlYD4tJzVNfhCCJCJpSZ2dBA1IC8GGvpIts
+         /6SaanN4PDXpiqJLFG+5v1iiKAIWtCxYU2QsjrLzM2zD/zUsfmkj7lAwpgGMaVYH/q1V
+         fF6kUVfaBRSl1isUuq3/m2WatzbkBg6utN6sSVn0gV0bL2Leu7UhL7Fv6eI4SKAcBPot
+         90Sw==
+X-Gm-Message-State: AOAM5305JquWLR7rMclhlIAVwPRF0KeBPn5QXgzBRHkKwRqAqfCfeAmv
+        dHDmUxSLu3+gB40iHQMn+646NMjLIQI=
+X-Google-Smtp-Source: ABdhPJz67wmixiDyySBDTYDOJ0Ka4b7LxO+H1fUSrGnT0BW1K6fuhepd8JhPlaHMI6pEBAJMacMWw56NTRg=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:aa7:808e:0:b0:493:f071:274f with SMTP id
- v14-20020aa7808e000000b00493f071274fmr3568138pff.37.1636596481978; Wed, 10
- Nov 2021 18:08:01 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:902:e789:b0:140:801:1262 with SMTP id
+ cp9-20020a170902e78900b0014008011262mr4254554plb.42.1636596483663; Wed, 10
+ Nov 2021 18:08:03 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 11 Nov 2021 02:07:34 +0000
+Date:   Thu, 11 Nov 2021 02:07:35 +0000
 In-Reply-To: <20211111020738.2512932-1-seanjc@google.com>
-Message-Id: <20211111020738.2512932-14-seanjc@google.com>
+Message-Id: <20211111020738.2512932-15-seanjc@google.com>
 Mime-Version: 1.0
 References: <20211111020738.2512932-1-seanjc@google.com>
 X-Mailer: git-send-email 2.34.0.rc0.344.g81b53c2807-goog
-Subject: [PATCH v4 13/17] KVM: x86: Move Intel Processor Trace interrupt
- handler to vmx.c
+Subject: [PATCH v4 14/17] KVM: arm64: Convert to the generic perf callbacks
 From:   Sean Christopherson <seanjc@google.com>
 To:     Peter Zijlstra <peterz@infradead.org>,
         Ingo Molnar <mingo@redhat.com>,
@@ -101,122 +100,64 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now that all state needed for VMX's PT interrupt handler is exposed to
-vmx.c (specifically the currently running vCPU), move the handler into
-vmx.c where it belongs.
+Drop arm64's version of the callbacks in favor of the callbacks provided
+by generic KVM, which are semantically identical.
 
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/include/asm/kvm_host.h |  2 +-
- arch/x86/kvm/vmx/vmx.c          | 22 +++++++++++++++++++++-
- arch/x86/kvm/x86.c              | 20 +-------------------
- 3 files changed, 23 insertions(+), 21 deletions(-)
+ arch/arm64/kvm/perf.c | 34 ++--------------------------------
+ 1 file changed, 2 insertions(+), 32 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index ec16f645cb8c..621bedff0aa5 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1515,7 +1515,7 @@ struct kvm_x86_init_ops {
- 	int (*disabled_by_bios)(void);
- 	int (*check_processor_compatibility)(void);
- 	int (*hardware_setup)(void);
--	bool (*intel_pt_intr_in_guest)(void);
-+	unsigned int (*handle_intel_pt_intr)(void);
+diff --git a/arch/arm64/kvm/perf.c b/arch/arm64/kvm/perf.c
+index dfa9bce8559e..374c496a3f1d 100644
+--- a/arch/arm64/kvm/perf.c
++++ b/arch/arm64/kvm/perf.c
+@@ -13,42 +13,12 @@
  
- 	struct kvm_x86_ops *runtime_ops;
- };
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 36098eb9a7f9..7cb7f261f7dc 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7708,6 +7708,20 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
- 	.vcpu_deliver_sipi_vector = kvm_vcpu_deliver_sipi_vector,
- };
+ DEFINE_STATIC_KEY_FALSE(kvm_arm_pmu_available);
  
-+static unsigned int vmx_handle_intel_pt_intr(void)
-+{
-+	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
-+
-+	/* '0' on failure so that the !PT case can use a RET0 static call. */
-+	if (!kvm_arch_pmi_in_guest(vcpu))
-+		return 0;
-+
-+	kvm_make_request(KVM_REQ_PMI, vcpu);
-+	__set_bit(MSR_CORE_PERF_GLOBAL_OVF_CTRL_TRACE_TOPA_PMI_BIT,
-+		  (unsigned long *)&vcpu->arch.pmu.global_status);
-+	return 1;
-+}
-+
- static __init void vmx_setup_user_return_msrs(void)
- {
- 
-@@ -7734,6 +7748,8 @@ static __init void vmx_setup_user_return_msrs(void)
- 		kvm_add_user_return_msr(vmx_uret_msrs_list[i]);
- }
- 
-+static struct kvm_x86_init_ops vmx_init_ops __initdata;
-+
- static __init int hardware_setup(void)
- {
- 	unsigned long host_bndcfgs;
-@@ -7892,6 +7908,10 @@ static __init int hardware_setup(void)
- 		return -EINVAL;
- 	if (!enable_ept || !cpu_has_vmx_intel_pt())
- 		pt_mode = PT_MODE_SYSTEM;
-+	if (pt_mode == PT_MODE_HOST_GUEST)
-+		vmx_init_ops.handle_intel_pt_intr = vmx_handle_intel_pt_intr;
-+	else
-+		vmx_init_ops.handle_intel_pt_intr = NULL;
- 
- 	setup_default_sgx_lepubkeyhash();
- 
-@@ -7920,7 +7940,7 @@ static struct kvm_x86_init_ops vmx_init_ops __initdata = {
- 	.disabled_by_bios = vmx_disabled_by_bios,
- 	.check_processor_compatibility = vmx_check_processor_compat,
- 	.hardware_setup = hardware_setup,
--	.intel_pt_intr_in_guest = vmx_pt_mode_is_host_guest,
-+	.handle_intel_pt_intr = NULL,
- 
- 	.runtime_ops = &vmx_x86_ops,
- };
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index bafd2e78ad04..a4d25d0587e6 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -8410,20 +8410,6 @@ static void kvm_timer_init(void)
- 			  kvmclock_cpu_online, kvmclock_cpu_down_prep);
- }
- 
--static unsigned int kvm_handle_intel_pt_intr(void)
+-static unsigned int kvm_guest_state(void)
+-{
+-	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
+-	unsigned int state;
+-
+-	if (!vcpu)
+-		return 0;
+-
+-	state = PERF_GUEST_ACTIVE;
+-	if (!vcpu_mode_priv(vcpu))
+-		state |= PERF_GUEST_USER;
+-
+-	return state;
+-}
+-
+-static unsigned long kvm_get_guest_ip(void)
 -{
 -	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
 -
--	/* '0' on failure so that the !PT case can use a RET0 static call. */
--	if (!kvm_arch_pmi_in_guest(vcpu))
+-	if (WARN_ON_ONCE(!vcpu))
 -		return 0;
 -
--	kvm_make_request(KVM_REQ_PMI, vcpu);
--	__set_bit(MSR_CORE_PERF_GLOBAL_OVF_CTRL_TRACE_TOPA_PMI_BIT,
--			(unsigned long *)&vcpu->arch.pmu.global_status);
--	return 1;
+-	return *vcpu_pc(vcpu);
 -}
 -
- #ifdef CONFIG_X86_64
- static void pvclock_gtod_update_fn(struct work_struct *work)
+-static struct perf_guest_info_callbacks kvm_guest_cbs = {
+-	.state		= kvm_guest_state,
+-	.get_ip		= kvm_get_guest_ip,
+-};
+-
+ void kvm_perf_init(void)
  {
-@@ -11116,11 +11102,7 @@ int kvm_arch_hardware_setup(void *opaque)
- 	memcpy(&kvm_x86_ops, ops->runtime_ops, sizeof(kvm_x86_ops));
- 	kvm_ops_static_call_update();
+-	perf_register_guest_info_callbacks(&kvm_guest_cbs);
++	kvm_register_perf_callbacks(NULL);
+ }
  
--	/* Temporary ugliness. */
--	if (ops->intel_pt_intr_in_guest && ops->intel_pt_intr_in_guest())
--		kvm_register_perf_callbacks(kvm_handle_intel_pt_intr);
--	else
--		kvm_register_perf_callbacks(NULL);
-+	kvm_register_perf_callbacks(ops->handle_intel_pt_intr);
- 
- 	if (!kvm_cpu_cap_has(X86_FEATURE_XSAVES))
- 		supported_xss = 0;
+ void kvm_perf_teardown(void)
+ {
+-	perf_unregister_guest_info_callbacks(&kvm_guest_cbs);
++	kvm_unregister_perf_callbacks();
+ }
 -- 
 2.34.0.rc0.344.g81b53c2807-goog
 
