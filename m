@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D8BB44DD49
-	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 22:49:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3801644DD4C
+	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 22:49:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234001AbhKKVwG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Nov 2021 16:52:06 -0500
-Received: from mail.kernel.org ([198.145.29.99]:53406 "EHLO mail.kernel.org"
+        id S234194AbhKKVw2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Nov 2021 16:52:28 -0500
+Received: from mail.kernel.org ([198.145.29.99]:53644 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231825AbhKKVwF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Nov 2021 16:52:05 -0500
+        id S231825AbhKKVw2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Nov 2021 16:52:28 -0500
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id EE03B61211;
-        Thu, 11 Nov 2021 21:49:15 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id AE6CE6124C;
+        Thu, 11 Nov 2021 21:49:38 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1mlHwX-004u5l-Kw; Thu, 11 Nov 2021 21:49:13 +0000
-Date:   Thu, 11 Nov 2021 21:49:12 +0000
-Message-ID: <87k0hee52f.wl-maz@kernel.org>
+        id 1mlHwp-004u6W-9n; Thu, 11 Nov 2021 21:49:31 +0000
+Date:   Thu, 11 Nov 2021 21:49:30 +0000
+Message-ID: <87ilwye51x.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Peter Zijlstra <peterz@infradead.org>,
@@ -64,10 +64,10 @@ Cc:     Peter Zijlstra <peterz@infradead.org>,
         Like Xu <like.xu.linux@gmail.com>,
         Like Xu <like.xu@linux.intel.com>,
         Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: Re: [PATCH v4 15/17] KVM: arm64: Hide kvm_arm_pmu_available behind CONFIG_HW_PERF_EVENTS=y
-In-Reply-To: <20211111020738.2512932-16-seanjc@google.com>
+Subject: Re: [PATCH v4 16/17] KVM: arm64: Drop perf.c and fold its tiny bits of code into arm.c
+In-Reply-To: <20211111020738.2512932-17-seanjc@google.com>
 References: <20211111020738.2512932-1-seanjc@google.com>
-        <20211111020738.2512932-16-seanjc@google.com>
+        <20211111020738.2512932-17-seanjc@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -82,13 +82,13 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 11 Nov 2021 02:07:36 +0000,
+On Thu, 11 Nov 2021 02:07:37 +0000,
 Sean Christopherson <seanjc@google.com> wrote:
 > 
-> Move the definition of kvm_arm_pmu_available to pmu-emul.c and, out of
-> "necessity", hide it behind CONFIG_HW_PERF_EVENTS.  Provide a stub for
-> the key's wrapper, kvm_arm_support_pmu_v3().  Moving the key's definition
-> out of perf.c will allow a future commit to delete perf.c entirely.
+> Call KVM's (un)register perf callbacks helpers directly from arm.c and
+> delete perf.c
+> 
+> No functional change intended.
 > 
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 
