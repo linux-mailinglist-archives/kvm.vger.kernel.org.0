@@ -2,265 +2,413 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5909044D8F5
-	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 16:14:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CB19C44D90F
+	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 16:17:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234086AbhKKPRR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Nov 2021 10:17:17 -0500
-Received: from mail-bn8nam11on2050.outbound.protection.outlook.com ([40.107.236.50]:10983
-        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S234057AbhKKPRP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Nov 2021 10:17:15 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=O+JyUM110HpwNztI1E/+1k8NMBea1SQun0L3Sb4LZZoy7Wnf+CuEiLTIBnB5cExEZPwopmqHmwTVKbR0Jj3ONEU32nTzj7/ehFpTynZWaJD7PTMuHjZYslynX8UXVUs50m2ATC+8RmvfFyR5qXLZFhBYnMylnOsK03Tt7qK0SIzKdGbvdpUjC9FHyNIawmM5VlNquJSKofMlUT0HJ+//Pmf6Zq3Gl4E030vAHUwqLVOeEdtRFttjp0u9aviAn4PMJOVYcksAp5AxgJcrpFQyn2nAfn4EA5lfvwH4F15bOGNXZWNVTSXY02p5at8+kPXUg244yi/01mkDZIwwfqTLQg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2iY+sXa4T5iglHdDZq3jj3L3RmBcAO2UYvP3NF/rd2M=;
- b=ff9FymUbDXuRkxvxfgZTaTG/9w4D/rVGzlXHSYaZoC26KkVKAdyQ1V7drZNRyS71WFzMKYXt0z4JRnwIO5MM13YsRB98yDwsM0mnXBCPFT8lLw/De+Ij8V4au/jCAZ7GF7ujjtHz+FhiGSWPfNkQqtMbOhU3pjaJJKOollbWtDKGrqWgtMuLlVKpyc9uPMs2YkoaYB4m215Nc8dy4w4KaIiEikMplNG+Pbzf8jLQq7XlpjAGY0Jh5JiUn0ujC4scpbEHRSbVbP9gYmFGZWsd43vpICIfHhuUdBseE3H3IWVwkgY7pMZb9kNe9KLMDjJOmKYdEMUynYg1XUx05kAeEw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2iY+sXa4T5iglHdDZq3jj3L3RmBcAO2UYvP3NF/rd2M=;
- b=ScvS2DR1xA/hk9qsxdiEWG8UUlc0FGRiXVhhj9Pkkqdxbw8jOuiQbpaWrUsqUrFHpwmqlaAS9vb2R/W+roK9P4VUPPdd2EqKXn5qQD5skjzuy5Kz/lbZNBvbXiqX+SuG4a817vpPl9kc6iGOTxHmezyzPbsEslM3e/+zoD2/7fg=
-Authentication-Results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
- by DM8PR12MB5480.namprd12.prod.outlook.com (2603:10b6:8:24::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4669.10; Thu, 11 Nov
- 2021 15:14:24 +0000
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::a87d:568d:994f:c5f9]) by DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::a87d:568d:994f:c5f9%9]) with mapi id 15.20.4690.020; Thu, 11 Nov 2021
- 15:14:24 +0000
-Subject: Re: [PATCH 1/2] KVM: SEV: Return appropriate error codes if SEV-ES
- scratch setup fails
+        id S233909AbhKKPUf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Nov 2021 10:20:35 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39578 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233746AbhKKPUe (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 11 Nov 2021 10:20:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1636643865;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=svjHyjzQ7VAcc5T4gHqBKsZL9dmjawAUG7iPlCYGOBg=;
+        b=IVcpQJRdbHW+4O5fFAhL++fpuI/uMcfdbVSX75hetjgG5+osOgpv3iEWFh/FsW1MpxKh8j
+        Ptd1KWRcUcKKkrT0kLe4MxY73DsMU6H3jiLFG+Aj//Y1czqZynjHZYQEz/Tcw5ZS/9YJk7
+        USuXOqUY+ZP8AYDZWlV5WIj/jsE5jTU=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-597-D4ltL8KJNCOpX65zqvzUhg-1; Thu, 11 Nov 2021 10:17:43 -0500
+X-MC-Unique: D4ltL8KJNCOpX65zqvzUhg-1
+Received: by mail-wr1-f70.google.com with SMTP id r12-20020adfdc8c000000b0017d703c07c0so1074420wrj.0
+        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 07:17:43 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=svjHyjzQ7VAcc5T4gHqBKsZL9dmjawAUG7iPlCYGOBg=;
+        b=UHp23LoV+/wPmHuqJK1qNhij2j6ICRHpQ5MsXou69uTOIK1HKMCwIM8WX1as9K4/Vx
+         owjKZ4A2JoYAApCJDN2shQlEWOsIeaPDLlbd+WYHKtVCTH6HbeXWUhX2h/QNJRVvbxuH
+         T1NqioVoeOSGKmMYMCodKyWco4koruYo/jWVkekmyXB8TXxG+OTjPMG77ggwPnJS0x8c
+         tdHao3ykeJwQ1Qxcj7fD5fbRKg2etagnPPBQ+BlqAbtQ8rT5LK98htgZTWWtkWZiLvH1
+         dm0h22yio3puqeNarzAK/VSVr3HjxmL6JPmjNxvy0C0KzN10EBCrojGboRDVtHoi/KaF
+         RUTA==
+X-Gm-Message-State: AOAM533EckaqO3gLZgWgZu4D8GnPmG91YhB/VaysZ9kvB/i2f1+z1Yfa
+        JEt9zNs3i9CpTZGkGFm8aPxVf5C6wO3Mb71slogOYXcps1H76BXX1BjWju2bNtnScDZ0jSmczKU
+        Iv+TzK3rLenkV
+X-Received: by 2002:a7b:cf0f:: with SMTP id l15mr9176412wmg.92.1636643862708;
+        Thu, 11 Nov 2021 07:17:42 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyvN43VVbPmqMqwsW1EL01shLxTONh5ZnEEZ+HuuEZ0oidamWSIzdkWNf3qofGECrc4T5fMlQ==
+X-Received: by 2002:a7b:cf0f:: with SMTP id l15mr9176361wmg.92.1636643862378;
+        Thu, 11 Nov 2021 07:17:42 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.gmail.com with ESMTPSA id j11sm3199336wrt.3.2021.11.11.07.17.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 11 Nov 2021 07:17:41 -0800 (PST)
+Message-ID: <7ad12d6e-0caa-c0ab-9920-f11f4c7801f5@redhat.com>
+Date:   Thu, 11 Nov 2021 16:17:40 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH V11 2/5] KVM: SEV: Add support for SEV intra host
+ migration
+Content-Language: en-US
 To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Peter Gonda <pgonda@google.com>
+Cc:     kvm@vger.kernel.org, Marc Orr <marcorr@google.com>,
+        David Rientjes <rientjes@google.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20211109222350.2266045-1-seanjc@google.com>
- <20211109222350.2266045-2-seanjc@google.com>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-Message-ID: <fc56edb6-5154-4532-242f-4acb8b448330@amd.com>
-Date:   Thu, 11 Nov 2021 09:14:22 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-In-Reply-To: <20211109222350.2266045-2-seanjc@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+References: <20211021174303.385706-1-pgonda@google.com>
+ <20211021174303.385706-3-pgonda@google.com> <YYRZq+Zt52FSyjVW@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <YYRZq+Zt52FSyjVW@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA9PR11CA0017.namprd11.prod.outlook.com
- (2603:10b6:806:6e::22) To DM4PR12MB5229.namprd12.prod.outlook.com
- (2603:10b6:5:398::12)
-MIME-Version: 1.0
-Received: from office-ryzen.texastahm.com (67.79.209.213) by SA9PR11CA0017.namprd11.prod.outlook.com (2603:10b6:806:6e::22) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4690.15 via Frontend Transport; Thu, 11 Nov 2021 15:14:23 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 39a249f1-915b-498e-8f7d-08d9a525f1f4
-X-MS-TrafficTypeDiagnostic: DM8PR12MB5480:
-X-Microsoft-Antispam-PRVS: <DM8PR12MB5480E4BD1C7B556459F4E575EC949@DM8PR12MB5480.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: jTY6ym7SicatD4bXfaU/1BN1E/AZseMxMYC4PBOTQPquLbPuK/p9zZNL2WD83HZiFBB/0NZprNDhqYM6cbbfdDcMw+gB8YbPDIZLmwFHfZHdCqFeUlXBgpbR/0padQ0o4jMrzG9FWsOgnukoMlcf4RPoi0KU+4RymGBxrJN05YztzzNiynabkD4vukdzoDdvBV8nN6o+2nXYileJ0CClBE77UXp0XD9L/hotVIOea5V5fU6HCD0W75nOmf1j9aEPwpdS4TxYT2NWMFA6ninHuWcHg3ejvugknpqjQDTFe7uPjb3F0SOJklKEV+rJlxaPPi0srdszLi1K+koxAa90TvgzFyxYNL/FMR0ZnKgByxv35N+pR5Rb7G83nGjcKdVbfrqrwfMJgygpo6UG0KjVbiPdN2ZTV1eNWcsp996WK3aQbRYTC44Rgkgxb91Oo+brffbYku/I1ucnJTvdVAj1g1ofnIhsEx/CHvvIxqo74LNh+d2fSve+hrf8vdre/6wbbJaWxi7BQs9x2eupecyncI0elSqHoXcSCoreBXB24HGuG9ZX6n5uMUbFvUwJCy59kQ+m7wgR+MvyUyw5A9guBeDg+s53mWnYDcJ5ItMOuU6OvieWt1uHosAy79lJsKys/GZSnIWjba1ed9tKLOdkJTV9q7+TpRenN1zP80v4qR+jPfVPv6xsoGC3DkKUkcylBYIpf/nD4GnCPLFO8Tdpu/FoRVHn20qn/y3XpSH11M/TBx8vb5LU+ztrVCWjT9Fs
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(316002)(54906003)(956004)(66556008)(38100700002)(31696002)(508600001)(8676002)(110136005)(5660300002)(53546011)(2616005)(31686004)(2906002)(83380400001)(26005)(6486002)(86362001)(8936002)(6506007)(4326008)(66476007)(66946007)(6512007)(186003)(36756003)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?djgyT1B6dFM3UDUwT1FPNDZOQXVndTgwaTExcm4xT212OUMvcnRIYXM5ZlU5?=
- =?utf-8?B?N1BiYjlQZWNMYVdBRmpxTEtKcnZScUtHZW5wU0V4MHIvSTFZdWhVQ1JvMEZY?=
- =?utf-8?B?cTRwT005YTAyOHJYemQ0OVEreFIvQm9FeUlMb1lzWWxBeHVwbkpjelFua3Bv?=
- =?utf-8?B?K2VwelR3bGxPYmxTempDWUY4aDcvMTRlTUkwUzVzK3JDdllDc3JwZ1VjOEMz?=
- =?utf-8?B?U1ZTOVZWZmlSeGUrbGQ3VEVydS8xM1FoWDJUMXVhVnRCcXVvMEcrVEhScWEz?=
- =?utf-8?B?SE1lL2ppQmpPWGlnbE5oUzVYdHN0VlV2QkZjTzVQVzVlV2VsTmtWYzVlWC9X?=
- =?utf-8?B?RXBnWW5YY3J6RGs3VitBYlVmT0ZLUTBMUDJocVpmM01ja29PZWR4TERLUmRn?=
- =?utf-8?B?aWo3MFZOVUIyMHVQWXR3YnBVa0FQanZrZUV3VFVtL3J5aDZsUWQ3dHJib3Nu?=
- =?utf-8?B?aWhlSEhpRkNuemw4VE1QZXZFSWlPYkNxbXc4N0grR09lWGZLQk04VXArY01p?=
- =?utf-8?B?VVdOSUlqVEo0VlJoSndZQ1U3aTJHL1R5eGJhRTJkT0ZBVjY4MkExM2VCSXI5?=
- =?utf-8?B?MEtWLzdMdWhGR3FyTkloR2VycG1rRTdLWHo1dDBFdlBibEx2cXBHK2IyNWRK?=
- =?utf-8?B?U1VyLy8xWFV5d1NiOW5vRVNwUVQ2bS8yWVJkakt5ZUlDR29MK05sSDcvUHJO?=
- =?utf-8?B?cEpXMmY3SVo5cnhzSW1WWGFJM1NBNkxCZUJoeU8yckVlV3kzOFNENjgvSnpO?=
- =?utf-8?B?c1lhMDhONmoxYWpXWENNWkI0SFFkeGEyaFluR0NEeFVOQWhLclNYWThOWjY4?=
- =?utf-8?B?V1JNR3R6WjZnZXU2d1MyNmh4blVLeG9ySmVIVkx0b3FxeE05NzhUcFN0MUlY?=
- =?utf-8?B?N2lWY0tVamVPZE1zZCtodnNoTmQ3UmhqcHJ1Mk9sanFsZzNuRnY4MHlTOUpy?=
- =?utf-8?B?UEduMERTTi9tOXJjalh4eS8wemhpT3pGT3BEbUpuNVRYZ3BrWmdGV3BHZ3Uw?=
- =?utf-8?B?aUV6SmlML2ZlcFM3RHhrbndiQS80bTByZGFoWXBpeVNjOFZQSlEzakRzQnhs?=
- =?utf-8?B?VngyL2dVaXZFSXRLWlFVdC9yWElYb2NXT2x3ZlZ1Z3JkT2R5QkJkRE14eWV0?=
- =?utf-8?B?Y3FNdnZKaHVNWVZzd1lOT1lGRllXM0Q2Y0doNTFQTDREUTg3Q0VKdkpBNWgz?=
- =?utf-8?B?OFJNMkNKUnFKSFVoTkVpa0RDSXQ3amNtMkhBTi94MnlpQ2dSQ3lBT0ZnVEVt?=
- =?utf-8?B?Z1dmQ3dxYXlLM20reFpxaEUvWnhINE04bk5JY3dSSnIzdjFNY2NLWmxocVo2?=
- =?utf-8?B?QUNQbDV6eGswT1REaUwwWk9RL2cvK0I1dE02NTJrVGM0SGJpYkVzSlFSM1k2?=
- =?utf-8?B?TDNvYjk5TG5RZkhoWmZ5bEZXOTNwbDhXUlh0dDFUTkZiSWVuZlBicHpZYU16?=
- =?utf-8?B?YVIvSllrVVZaUjZkV09NVXFiWGpOWllKNG1scjB6M1NEUG84VEMzVGcydEVy?=
- =?utf-8?B?VkYyN0pPSUo3NFlEL05jWmx3SWFxOWpPaTE3U2JVUUNmZkZNdDBNSU5BK0xv?=
- =?utf-8?B?aUdTSFNTVkhVaWF1TzhKdVcwbUk5VGxTcDRxN0k1eGxBYkVwNHJ5bmFwNDFI?=
- =?utf-8?B?N3dmUGR1S3c3c0tZUE5tVy9Sc09qZFF6WFQzK05vWnZWdVZLczA3Y3ZZcUcz?=
- =?utf-8?B?K21xeUZNZG5oWDBhL2c4Y29JM1NNYkszZEVEUEtSMUtxZTYwdXMyeGpPc1lK?=
- =?utf-8?B?WGZMTlV2Q0JBNW5kSmIzVHp2ZVJGemd2WVdrN3RNZTUwUVF1L1BtRHRiaUt3?=
- =?utf-8?B?VXZkWUd4dVVsZUZrL2xPWGd1MU1WMThXdkRsMCtyWE5XcG9OWFZ2ZXRMdU81?=
- =?utf-8?B?bTgxNDJEZlk1UjJBMHUxU3hVNzdraDVBdXFNUC9zV3VndjczNXZxVXAyVGYz?=
- =?utf-8?B?NjU0cGxDbmpFNjE2eVdvckVneG5zRDVKbGhBNFJBUjYyN3V5OCt1clVzRWFu?=
- =?utf-8?B?V2Z0RjdHby9oQWZURDhMNHQ1QXliTTNzbEZIdGxIUWNIV0xpVGRIRSt3dGgv?=
- =?utf-8?B?N1FOc05BU3pXYzcxNFNEYjhOTGhhNndYSUdNY0NVUDhOOWVKMDcwdThWT1dT?=
- =?utf-8?B?c1NZd2ZDNFNyTE1wWndPakY4WnBhcU5oZFBaVGVuUk0vZFA1SlR5c2l1bGxY?=
- =?utf-8?Q?VSI9gyMfAOhaNpznaYSRYqw=3D?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 39a249f1-915b-498e-8f7d-08d9a525f1f4
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Nov 2021 15:14:24.4571
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jmdVPRiHazBEdD2a8qgWTUuj6svYONIgJoLZNvoezRVTfZRlxpHr5PaQ7gXIKdqVjruuSgMLP+lApA6SV0VDJQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR12MB5480
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/9/21 4:23 PM, Sean Christopherson wrote:
-> Return appropriate error codes if setting up the GHCB scratch area for an
-> SEV-ES guest fails.  In particular, returning -EINVAL instead of -ENOMEM
-> when allocating the kernel buffer could be confusing as userspace would
-> likely suspect a guest issue.
-
-Based on previous feedback and to implement the changes to the GHCB 
-specification, I'm planning on submitting a patch that will return an 
-error code back to the guest, instead of terminating the guest, if the 
-scratch area fails to be setup properly. So you could hold off on this 
-patch if you want.
-
-Thanks,
-Tom
-
+On 11/4/21 23:07, Sean Christopherson wrote:
 > 
-> Fixes: 8f423a80d299 ("KVM: SVM: Support MMIO for an SEV-ES guest")
-> Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   arch/x86/kvm/svm/sev.c | 31 ++++++++++++++++++-------------
->   1 file changed, 18 insertions(+), 13 deletions(-)
+> That would also provide a good opportunity to more tightly couple ->asid and
+> ->misc_cg in the form of a helper.  Looking at the code, there's an invariant
+> that misc_cg is NULL if an ASID is not assigned.  I.e. these three lines belong
+> in a helper, irrespective of this code.
 > 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 3e2769855e51..ea8069c9b5cb 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -2299,7 +2299,7 @@ void pre_sev_run(struct vcpu_svm *svm, int cpu)
->   }
->   
->   #define GHCB_SCRATCH_AREA_LIMIT		(16ULL * PAGE_SIZE)
-> -static bool setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
-> +static int setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
->   {
->   	struct vmcb_control_area *control = &svm->vmcb->control;
->   	struct ghcb *ghcb = svm->ghcb;
-> @@ -2310,14 +2310,14 @@ static bool setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
->   	scratch_gpa_beg = ghcb_get_sw_scratch(ghcb);
->   	if (!scratch_gpa_beg) {
->   		pr_err("vmgexit: scratch gpa not provided\n");
-> -		return false;
-> +		return -EINVAL;
->   	}
->   
->   	scratch_gpa_end = scratch_gpa_beg + len;
->   	if (scratch_gpa_end < scratch_gpa_beg) {
->   		pr_err("vmgexit: scratch length (%#llx) not valid for scratch address (%#llx)\n",
->   		       len, scratch_gpa_beg);
-> -		return false;
-> +		return -EINVAL;
->   	}
->   
->   	if ((scratch_gpa_beg & PAGE_MASK) == control->ghcb_gpa) {
-> @@ -2335,7 +2335,7 @@ static bool setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
->   		    scratch_gpa_end > ghcb_scratch_end) {
->   			pr_err("vmgexit: scratch area is outside of GHCB shared buffer area (%#llx - %#llx)\n",
->   			       scratch_gpa_beg, scratch_gpa_end);
-> -			return false;
-> +			return -EINVAL;
->   		}
->   
->   		scratch_va = (void *)svm->ghcb;
-> @@ -2348,18 +2348,18 @@ static bool setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
->   		if (len > GHCB_SCRATCH_AREA_LIMIT) {
->   			pr_err("vmgexit: scratch area exceeds KVM limits (%#llx requested, %#llx limit)\n",
->   			       len, GHCB_SCRATCH_AREA_LIMIT);
-> -			return false;
-> +			return -EINVAL;
->   		}
->   		scratch_va = kzalloc(len, GFP_KERNEL_ACCOUNT);
->   		if (!scratch_va)
-> -			return false;
-> +			return -ENOMEM;
->   
->   		if (kvm_read_guest(svm->vcpu.kvm, scratch_gpa_beg, scratch_va, len)) {
->   			/* Unable to copy scratch area from guest */
->   			pr_err("vmgexit: kvm_read_guest for scratch area failed\n");
->   
->   			kfree(scratch_va);
-> -			return false;
-> +			return -EFAULT;
->   		}
->   
->   		/*
-> @@ -2375,7 +2375,7 @@ static bool setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
->   	svm->ghcb_sa = scratch_va;
->   	svm->ghcb_sa_len = len;
->   
-> -	return true;
-> +	return 0;
->   }
->   
->   static void set_ghcb_msr_bits(struct vcpu_svm *svm, u64 value, u64 mask,
-> @@ -2514,10 +2514,10 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
->   	ghcb_set_sw_exit_info_1(ghcb, 0);
->   	ghcb_set_sw_exit_info_2(ghcb, 0);
->   
-> -	ret = -EINVAL;
->   	switch (exit_code) {
->   	case SVM_VMGEXIT_MMIO_READ:
-> -		if (!setup_vmgexit_scratch(svm, true, control->exit_info_2))
-> +		ret = setup_vmgexit_scratch(svm, true, control->exit_info_2);
-> +		if (ret)
->   			break;
->   
->   		ret = kvm_sev_es_mmio_read(vcpu,
-> @@ -2526,7 +2526,8 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
->   					   svm->ghcb_sa);
->   		break;
->   	case SVM_VMGEXIT_MMIO_WRITE:
-> -		if (!setup_vmgexit_scratch(svm, false, control->exit_info_2))
-> +		ret = setup_vmgexit_scratch(svm, false, control->exit_info_2);
-> +		if (ret)
->   			break;
->   
->   		ret = kvm_sev_es_mmio_write(vcpu,
-> @@ -2569,6 +2570,7 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
->   		vcpu_unimpl(vcpu,
->   			    "vmgexit: unsupported event - exit_info_1=%#llx, exit_info_2=%#llx\n",
->   			    control->exit_info_1, control->exit_info_2);
-> +		ret = -EINVAL;
->   		break;
->   	default:
->   		ret = svm_invoke_exit_handler(vcpu, exit_code);
-> @@ -2579,8 +2581,11 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
->   
->   int sev_es_string_io(struct vcpu_svm *svm, int size, unsigned int port, int in)
->   {
-> -	if (!setup_vmgexit_scratch(svm, in, svm->vmcb->control.exit_info_2))
-> -		return -EINVAL;
-> +	int r;
-> +
-> +	r = setup_vmgexit_scratch(svm, in, svm->vmcb->control.exit_info_2);
-> +	if (r)
-> +		return r;
->   
->   	return kvm_sev_es_string_io(&svm->vcpu, size, port,
->   				    svm->ghcb_sa, svm->ghcb_sa_len / size, in);
-> 
+> 	misc_cg_uncharge(type, sev->misc_cg, 1);
+> 	put_misc_cg(sev->misc_cg);
+> 	sev->misc_cg = NULL;
+
+Agreed.  Though it's a bit more complicated because if dst->misc_cg ==
+src->misc_cg you should *not* charge and uncharge, because charging
+could fail.  So I'm going for just simple charge/uncharge helpers for
+now:
+
+ From 0ac1004d9e15e9460b51651bd095e6c5ee9cf4f9 Mon Sep 17 00:00:00 2001
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 11 Nov 2021 10:02:26 -0500
+Subject: [PATCH 1/2] KVM: SEV: provide helpers to charge/uncharge misc_cg
+
+Avoid code duplication across all callers of misc_cg_try_charge and
+misc_cg_uncharge.  The resource type for KVM is always derived from
+sev->es_active, and the quantity is always 1.
+
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 7c94fe307b39..5bafa4bf7c49 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -120,16 +120,26 @@ static bool __sev_recycle_asids(int min_asid, int max_asid)
+  	return true;
+  }
+  
++static int sev_misc_cg_try_charge(struct kvm_sev_info *sev)
++{
++	enum misc_res_type type = sev->es_active ? MISC_CG_RES_SEV_ES : MISC_CG_RES_SEV;
++	return misc_cg_try_charge(type, sev->misc_cg, 1);
++}
++
++static void sev_misc_cg_uncharge(struct kvm_sev_info *sev)
++{
++	enum misc_res_type type = sev->es_active ? MISC_CG_RES_SEV_ES : MISC_CG_RES_SEV;
++	misc_cg_uncharge(type, sev->misc_cg, 1);
++}
++
+  static int sev_asid_new(struct kvm_sev_info *sev)
+  {
+  	int asid, min_asid, max_asid, ret;
+  	bool retry = true;
+-	enum misc_res_type type;
+  
+-	type = sev->es_active ? MISC_CG_RES_SEV_ES : MISC_CG_RES_SEV;
+  	WARN_ON(sev->misc_cg);
+  	sev->misc_cg = get_current_misc_cg();
+-	ret = misc_cg_try_charge(type, sev->misc_cg, 1);
++	ret = sev_misc_cg_try_charge(sev);
+  	if (ret) {
+  		put_misc_cg(sev->misc_cg);
+  		sev->misc_cg = NULL;
+@@ -162,7 +172,7 @@ static int sev_asid_new(struct kvm_sev_info *sev)
+  
+  	return asid;
+  e_uncharge:
+-	misc_cg_uncharge(type, sev->misc_cg, 1);
++	sev_misc_cg_uncharge(sev);
+  	put_misc_cg(sev->misc_cg);
+  	sev->misc_cg = NULL;
+  	return ret;
+@@ -179,7 +189,6 @@ static void sev_asid_free(struct kvm_sev_info *sev)
+  {
+  	struct svm_cpu_data *sd;
+  	int cpu;
+-	enum misc_res_type type;
+  
+  	mutex_lock(&sev_bitmap_lock);
+  
+@@ -192,8 +201,7 @@ static void sev_asid_free(struct kvm_sev_info *sev)
+  
+  	mutex_unlock(&sev_bitmap_lock);
+  
+-	type = sev->es_active ? MISC_CG_RES_SEV_ES : MISC_CG_RES_SEV;
+-	misc_cg_uncharge(type, sev->misc_cg, 1);
++	sev_misc_cg_uncharge(sev);
+  	put_misc_cg(sev->misc_cg);
+  	sev->misc_cg = NULL;
+  }
+
+
+
+ From 5214132ae7e8310de26d5791f7fe913085a8e53c Mon Sep 17 00:00:00 2001
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 11 Nov 2021 10:08:32 -0500
+Subject: [PATCH] fix cgroup charging
+
+
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 5bafa4bf7c49..97048ff7c2ad 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -1594,7 +1594,6 @@ static void sev_migrate_from(struct kvm_sev_info *dst,
+  {
+  	dst->active = true;
+  	dst->asid = src->asid;
+-	dst->misc_cg = src->misc_cg;
+  	dst->handle = src->handle;
+  	dst->pages_locked = src->pages_locked;
+  
+@@ -1602,6 +1601,11 @@ static void sev_migrate_from(struct kvm_sev_info *dst,
+  	src->active = false;
+  	src->handle = 0;
+  	src->pages_locked = 0;
++
++	if (dst->misc_cg != src->misc_cg)
++		sev_misc_cg_uncharge(src);
++
++	put_misc_cg(src->misc_cg);
+  	src->misc_cg = NULL;
+  
+  	INIT_LIST_HEAD(&dst->regions_list);
+@@ -1611,6 +1615,7 @@ static void sev_migrate_from(struct kvm_sev_info *dst,
+  int svm_vm_migrate_from(struct kvm *kvm, unsigned int source_fd)
+  {
+  	struct kvm_sev_info *dst_sev = &to_kvm_svm(kvm)->sev_info;
++	struct kvm_sev_info *src_sev;
+  	struct file *source_kvm_file;
+  	struct kvm *source_kvm;
+  	struct kvm_vcpu *vcpu;
+@@ -1640,25 +1645,39 @@ int svm_vm_migrate_from(struct kvm *kvm, unsigned int source_fd)
+  		ret = -EINVAL;
+  		goto out_source;
+  	}
++
++	src_sev = &to_kvm_svm(source_kvm)->sev_info;
++	dst_sev->misc_cg = get_current_misc_cg();
++	if (dst_sev->misc_cg != src_sev->misc_cg) {
++		ret = sev_misc_cg_try_charge(dst_sev);
++		if (ret)
++			goto out_dst_put_cgroup;
++	}
++
+  	ret = sev_lock_vcpus_for_migration(kvm);
+  	if (ret)
+-		goto out_dst_vcpu;
++		goto out_dst_cgroup;
+  	ret = sev_lock_vcpus_for_migration(source_kvm);
+  	if (ret)
+-		goto out_source_vcpu;
++		goto out_dst_vcpu;
+  
+-	sev_migrate_from(dst_sev, &to_kvm_svm(source_kvm)->sev_info);
++	sev_migrate_from(dst_sev, src_sev);
+  	kvm_for_each_vcpu(i, vcpu, source_kvm) {
+  		kvm_vcpu_reset(vcpu, /* init_event= */ false);
+  	}
+  	ret = 0;
+  
+-out_source_vcpu:
+  	sev_unlock_vcpus_for_migration(source_kvm);
+  
+  out_dst_vcpu:
+  	sev_unlock_vcpus_for_migration(kvm);
+-
++out_dst_cgroup:
++	if (ret < 0) {
++		sev_misc_cg_uncharge(dst_sev);
++out_dst_put_cgroup:
++		put_misc_cg(dst_sev->misc_cg);
++		dst_sev->misc_cg = NULL;
++	}
+  out_source:
+  	sev_unlock_after_migration(source_kvm);
+  out_fput:
+
+
+
+ From 943ba93c57ee25f85538decd68dca6e4ebdaf2c1 Mon Sep 17 00:00:00 2001
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 11 Nov 2021 10:13:38 -0500
+Subject: [PATCH] KVM: generalize "bugged" VM to "dead" VM
+
+Generalize KVM_REQ_VM_BUGGED so that it can be called even in cases
+where it is by design that the VM cannot be operated upon.  In this
+case any KVM_BUG_ON should still warn, so introduce a new flag
+kvm->vm_dead that is separate from kvm->vm_bugged.
+
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index ca9693d3436b..185094eb86b6 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -9660,7 +9660,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+  	}
+  
+  	if (kvm_request_pending(vcpu)) {
+-		if (kvm_check_request(KVM_REQ_VM_BUGGED, vcpu)) {
++		if (kvm_check_request(KVM_REQ_VM_DEAD, vcpu)) {
+  			r = -EIO;
+  			goto out;
+  		}
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 60a35d9fe259..9e0667e3723e 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -150,7 +150,7 @@ static inline bool is_error_page(struct page *page)
+  #define KVM_REQ_MMU_RELOAD        (1 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+  #define KVM_REQ_UNBLOCK           2
+  #define KVM_REQ_UNHALT            3
+-#define KVM_REQ_VM_BUGGED         (4 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
++#define KVM_REQ_VM_DEAD           (4 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+  #define KVM_REQUEST_ARCH_BASE     8
+  
+  #define KVM_ARCH_REQ_FLAGS(nr, flags) ({ \
+@@ -617,6 +617,7 @@ struct kvm {
+  	unsigned int max_halt_poll_ns;
+  	u32 dirty_ring_size;
+  	bool vm_bugged;
++	bool vm_dead;
+  
+  #ifdef CONFIG_HAVE_KVM_PM_NOTIFIER
+  	struct notifier_block pm_notifier;
+@@ -650,12 +651,19 @@ struct kvm {
+  #define vcpu_err(vcpu, fmt, ...)					\
+  	kvm_err("vcpu%i " fmt, (vcpu)->vcpu_id, ## __VA_ARGS__)
+  
++static inline void kvm_vm_dead(struct kvm *kvm)
++{
++	kvm->vm_dead = true;
++	kvm_make_all_cpus_request(kvm, KVM_REQ_VM_DEAD);
++}
++
+  static inline void kvm_vm_bugged(struct kvm *kvm)
+  {
+  	kvm->vm_bugged = true;
+-	kvm_make_all_cpus_request(kvm, KVM_REQ_VM_BUGGED);
++	kvm_vm_dead(kvm);
+  }
+  
++
+  #define KVM_BUG(cond, kvm, fmt...)				\
+  ({								\
+  	int __ret = (cond);					\
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 3f6d450355f0..d31724500501 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -3747,7 +3747,7 @@ static long kvm_vcpu_ioctl(struct file *filp,
+  	struct kvm_fpu *fpu = NULL;
+  	struct kvm_sregs *kvm_sregs = NULL;
+  
+-	if (vcpu->kvm->mm != current->mm || vcpu->kvm->vm_bugged)
++	if (vcpu->kvm->mm != current->mm || vcpu->kvm->vm_dead)
+  		return -EIO;
+  
+  	if (unlikely(_IOC_TYPE(ioctl) != KVMIO))
+@@ -3957,7 +3957,7 @@ static long kvm_vcpu_compat_ioctl(struct file *filp,
+  	void __user *argp = compat_ptr(arg);
+  	int r;
+  
+-	if (vcpu->kvm->mm != current->mm || vcpu->kvm->vm_bugged)
++	if (vcpu->kvm->mm != current->mm || vcpu->kvm->vm_dead)
+  		return -EIO;
+  
+  	switch (ioctl) {
+@@ -4023,7 +4023,7 @@ static long kvm_device_ioctl(struct file *filp, unsigned int ioctl,
+  {
+  	struct kvm_device *dev = filp->private_data;
+  
+-	if (dev->kvm->mm != current->mm || dev->kvm->vm_bugged)
++	if (dev->kvm->mm != current->mm || dev->kvm->vm_dead)
+  		return -EIO;
+  
+  	switch (ioctl) {
+@@ -4345,7 +4345,7 @@ static long kvm_vm_ioctl(struct file *filp,
+  	void __user *argp = (void __user *)arg;
+  	int r;
+  
+-	if (kvm->mm != current->mm || kvm->vm_bugged)
++	if (kvm->mm != current->mm || kvm->vm_dead)
+  		return -EIO;
+  	switch (ioctl) {
+  	case KVM_CREATE_VCPU:
+@@ -4556,7 +4556,7 @@ static long kvm_vm_compat_ioctl(struct file *filp,
+  	struct kvm *kvm = filp->private_data;
+  	int r;
+  
+-	if (kvm->mm != current->mm || kvm->vm_bugged)
++	if (kvm->mm != current->mm || kvm->vm_dead)
+  		return -EIO;
+  	switch (ioctl) {
+  #ifdef CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT
+
+
+
+ From fb168352e16a4dbd95a7c0d1e6add18f0496ac97 Mon Sep 17 00:00:00 2001
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 11 Nov 2021 10:14:49 -0500
+Subject: [PATCH] mark src vm as dead
+
+
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 97048ff7c2ad..2403aea3dbd3 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -1662,12 +1662,9 @@ int svm_vm_migrate_from(struct kvm *kvm, unsigned int source_fd)
+  		goto out_dst_vcpu;
+  
+  	sev_migrate_from(dst_sev, src_sev);
+-	kvm_for_each_vcpu(i, vcpu, source_kvm) {
+-		kvm_vcpu_reset(vcpu, /* init_event= */ false);
+-	}
+-	ret = 0;
+-
++	kvm_vm_dead(source_kvm);
+  	sev_unlock_vcpus_for_migration(source_kvm);
++	ret = 0;
+  
+  out_dst_vcpu:
+  	sev_unlock_vcpus_for_migration(kvm);
+
+
+I'll send it out properly when I finish reviewing.
+
+Paolo
+
