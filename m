@@ -2,109 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4551B44DB36
-	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 18:44:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CD6E144DB38
+	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 18:44:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234380AbhKKRrW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Nov 2021 12:47:22 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:37113 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229710AbhKKRrT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 11 Nov 2021 12:47:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636652668;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=sX6B0wyq8HXK/qZ80X8Qyra7US9S5w1/aYmWEs7Zq+o=;
-        b=Jj+034szHR6fItQrKYRqoVCNJL/33yXLcJD2wzo6jr/Q62E/tv9hifC7yD5LDG+41LdaZ3
-        wHIfOzwSApfc6UWUyfGmKCLipGHqR/xodd2Qq9n0nI/zq0xs5VOBQBdQGYcFZ304q+3YY1
-        fC90iggha62yIi1IaFQ9krD//itvWeE=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-522-dnevnGT0Nd6kbuZpE-6fsw-1; Thu, 11 Nov 2021 12:44:26 -0500
-X-MC-Unique: dnevnGT0Nd6kbuZpE-6fsw-1
-Received: by mail-ed1-f71.google.com with SMTP id m8-20020a056402510800b003e29de5badbso6011626edd.18
-        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 09:44:26 -0800 (PST)
+        id S234393AbhKKRrk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Nov 2021 12:47:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44878 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234376AbhKKRrj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Nov 2021 12:47:39 -0500
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C59CC061767
+        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 09:44:50 -0800 (PST)
+Received: by mail-pj1-x1029.google.com with SMTP id np3so4690335pjb.4
+        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 09:44:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=7MaSOuEOp+CoiKDEE7sxnGw6C1tJ0+8FkGqNIXlaeOA=;
+        b=FnGpm3IF6H65QzbG3rCh8MmyvtNek0vSeOME3psBrfAVG3939I40wIxO2yosG1b+8B
+         Sad+hM2t4c7Fq3IyDGA/ZDs33DIANmy1v1UZ54FX49PnBvzAxDKGDiXxnKre5ZnZ2EHx
+         GBikptqHMGmMR1fbZe0CQDEHVxRj3jTEf6WAKF3OPOsO+6gGWOD8DLUg/cPexe3hcdQK
+         sokXOYi8CE4wwfpRZoSyOcV66zPu/K1RiporWSt6FZl3UrIwnHSqlY/o76+s1n7s/sHP
+         oRoqRk9VS3n4HdrD3JnlDvI76ep9sqJu43l+5FKoM2fsaI3n4pbsO9lB+R2XzlXMGlRO
+         oDkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=sX6B0wyq8HXK/qZ80X8Qyra7US9S5w1/aYmWEs7Zq+o=;
-        b=Gjz1D5rnFoK7S7GR73sy5nRK0YSJ2vRACbEdptv+pbzzHSgqkiJ71Ew+YvL9hlOoNH
-         y/U6emYSvpccND5es9QBE/wS7DWtqNOxRUr6hLe8msnsFhKZSn1SpTito5xBD4Yqf9O7
-         wMKwgll1cIY3besNzmSmP48vCia7BAaw1OUt80uMMjG0h+nsiy+bg8mnt7Ya0j4Ogm4L
-         J4NAXJfg5hCJukzO9zvO98Ct3lHu+W+qvjU0wMSL9lNBJLkBkqB1uW6pZ31xR5X9/nCV
-         eNmFMTJT67fnNcBPRCIhZVYkL62tWNnbkLQbSPbTMPQ+GMXQ0fZNcaf2nkRoljmZGb3e
-         lRVA==
-X-Gm-Message-State: AOAM530KbYirrOzfzg5av6fFh2IC9X4SAB8Cr5mvYRYPJxRttPOmyUFd
-        IGaM5WhfwVMXs3QIs6PYq8+NdEWUNr9IDnt3NQUJ7uVpTj/GtLSPRam58b4L1/z0W3gN/q5pWW0
-        dMFh8vAigOEKr
-X-Received: by 2002:a17:907:97d4:: with SMTP id js20mr11645113ejc.416.1636652664863;
-        Thu, 11 Nov 2021 09:44:24 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwdkCpqIpkvubDcpdA5m395LNP8ARB3mV6RpcSqRqiKVzoQRjs09kHpMw3c9AwsjokND/kS/w==
-X-Received: by 2002:a17:907:97d4:: with SMTP id js20mr11645080ejc.416.1636652664630;
-        Thu, 11 Nov 2021 09:44:24 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id hr11sm1589279ejc.108.2021.11.11.09.44.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Nov 2021 09:44:24 -0800 (PST)
-Message-ID: <4b2a99db-bd7e-fde8-695a-5d198da45f3e@redhat.com>
-Date:   Thu, 11 Nov 2021 18:44:22 +0100
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=7MaSOuEOp+CoiKDEE7sxnGw6C1tJ0+8FkGqNIXlaeOA=;
+        b=yQGZtjq5ZsbU4rLm4X2WlAEIg8GkLGzxwMzziPqZdX1Y3NCQQ4aAxTwpQ7iQrPOk1w
+         Dte92Jaz1ETPYO72jsPt2hzaDMKnI56C4+jHhmbLp/yufpNN5Z5R/lzGppaVdyWklp7B
+         XT/QPD6c52N9xVPp6Dn9QQ164QKOTHgAqQqhgvXvhdFtXgSVwEXn7vvMOTa9az1/cgUW
+         hpdyDapYYxvwfV9+4Hw4PjcKFvG1ULjn/+bwg604QSszfJVyM4snFNZF8wlXL1e5Nisi
+         5uPaGFinJqiaXfzUeFGnZUaVRB/qQg7tYxSwEl4ll5W/aNsOMrpaqPvsUBXnpCuGYVJp
+         eaxA==
+X-Gm-Message-State: AOAM5327xVEb6oJO/oDiyHP+faHQm7vcu2fzsP8so5gevcN7cHRqSoHp
+        m4BN5cWZKoNN7QMQAiTuWfMPqQ==
+X-Google-Smtp-Source: ABdhPJwsH3mjR1to/+eMgCPxKJRq74DHSnHEnWS89IVB3LZ0yYHt/FcM8e3ZoCMzCoQVNiPxhxvi5Q==
+X-Received: by 2002:a17:90a:6e41:: with SMTP id s1mr28492721pjm.166.1636652689846;
+        Thu, 11 Nov 2021 09:44:49 -0800 (PST)
+Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
+        by smtp.gmail.com with ESMTPSA id f21sm4393355pfc.85.2021.11.11.09.44.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Nov 2021 09:44:49 -0800 (PST)
+Date:   Thu, 11 Nov 2021 17:44:45 +0000
+From:   David Matlack <dmatlack@google.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Peter Shier <pshier@google.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Keqian Zhu <zhukeqian1@huawei.com>,
+        David Hildenbrand <david@redhat.com>, stable@vger.kernel.org
+Subject: Re: [RFC 01/19] KVM: x86/mmu: Fix TLB flush range when handling
+ disconnected pt
+Message-ID: <YY1Wje9zNEch6XvG@google.com>
+References: <20211110223010.1392399-1-bgardon@google.com>
+ <20211110223010.1392399-2-bgardon@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [kvm-unit-tests PATCH v2 0/3] Regression test for L1 LDTR
- persistence bug
-Content-Language: en-US
-To:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org
-References: <20211015195530.301237-1-jmattson@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211015195530.301237-1-jmattson@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211110223010.1392399-2-bgardon@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/15/21 21:55, Jim Mattson wrote:
-> In Linux commit afc8de0118be ("KVM: nVMX: Set LDTR to its
-> architecturally defined value on nested VM-Exit"), Sean suggested that
-> this bug was likely benign, but it turns out that--for us, at
-> least--it can result in live migration failures. On restore, we call
-> KVM_SET_SREGS before KVM_SET_NESTED_STATE, so when L2 is active at the
-> time of save/restore, the target vmcs01 is temporarily populated with
-> L2 values. Hence, the LDTR visible to L1 after the next emulated
-> VM-exit is L2's, rather than its own.
+On Wed, Nov 10, 2021 at 02:29:52PM -0800, Ben Gardon wrote:
+> When recursively clearing out disconnected pts, the range based TLB
+> flush in handle_removed_tdp_mmu_page uses the wrong starting GFN,
+> resulting in the flush mostly missing the affected range. Fix this by
+> using base_gfn for the flush.
 > 
-> This issue is significant enough that it warrants a regression
-> test. Unfortunately, at the moment, the best we can do is check for
-> the LDTR persistence bug. I'd like to be able to trigger a
-> save/restore from within the L2 guest, but AFAICT, there's no way to
-> do that under qemu. Does anyone want to implement a qemu ISA test
-> device that triggers a save/restore when its configured I/O port is
-> written to?
+> Fixes: a066e61f13cf ("KVM: x86/mmu: Factor out handling of removed page tables")
+> CC: stable@vger.kernel.org
 > 
-> Jim Mattson (3):
->    x86: Fix operand size for lldt
->    x86: Make set_gdt_entry usable in 64-bit mode
->    x86: Add a regression test for L1 LDTR persistence bug
+> Signed-off-by: Ben Gardon <bgardon@google.com>
+> ---
+>  arch/x86/kvm/mmu/tdp_mmu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> v1 -> v2:
->    Reworded report messages at Sean's suggestion.
->    
->   lib/x86/desc.c      | 41 +++++++++++++++++++++++++++++++----------
->   lib/x86/desc.h      |  3 ++-
->   lib/x86/processor.h |  2 +-
->   x86/cstart64.S      |  1 +
->   x86/vmx_tests.c     | 39 +++++++++++++++++++++++++++++++++++++++
->   5 files changed, 74 insertions(+), 12 deletions(-)
-> 
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 7c5dd83e52de..866c2b191e1e 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -374,7 +374,7 @@ static void handle_removed_tdp_mmu_page(struct kvm *kvm, tdp_ptep_t pt,
+>  				    shared);
+>  	}
+>  
+> -	kvm_flush_remote_tlbs_with_address(kvm, gfn,
+> +	kvm_flush_remote_tlbs_with_address(kvm, base_gfn,
 
-Queued patches 1 and 3; the function of 2 is also done by my own GDT/IDT 
-cleanup series, which is also present in Aaron's #PF tests.
+Suggest pulling the definition of gfn into the for loop as well (along
+with sptep and old_child_spte for that matter) so that referencing it
+here isn't even possible.
 
-Paolo
-
+>  					   KVM_PAGES_PER_HPAGE(level + 1));
+>  
+>  	call_rcu(&sp->rcu_head, tdp_mmu_free_sp_rcu_callback);
+> -- 
+> 2.34.0.rc0.344.g81b53c2807-goog
+> 
