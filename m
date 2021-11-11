@@ -2,152 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9BBE744D2C5
-	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 08:56:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3DF0D44D334
+	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 09:29:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231880AbhKKH7r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Nov 2021 02:59:47 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:43515 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229543AbhKKH7p (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 11 Nov 2021 02:59:45 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636617416;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=IsiWJOCukmBcK7kCfQJuDEL0VlH6Lf2OFetW684iiSs=;
-        b=UuiD86hBsmGmJnXwGB4IhH+blp2wEAx2nznVu1AUFdw2zhFFpPB1ttxPnbgrdz3d3fY0oi
-        lbPuKZX0dQ5ymdwzkl1GtXCWoiyZaWPrZAErGvEzcTo30ht9tSshJKsQPhVKM+Q0S+IdMd
-        iAyh1PRodnu3EB4u8meFIDcTzdRZ6/c=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-456-npEDT5IMMd-nhiWZMui2aQ-1; Thu, 11 Nov 2021 02:56:55 -0500
-X-MC-Unique: npEDT5IMMd-nhiWZMui2aQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C6AD919251A2;
-        Thu, 11 Nov 2021 07:56:53 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.105])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A7CE45C1B4;
-        Thu, 11 Nov 2021 07:56:46 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Randy Dunlap <rdunlap@infradead.org>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        kernel test robot <lkp@intel.com>
-Cc:     kbuild-all@lists.01.org, linux-kernel@vger.kernel.org,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>, kvm@vger.kernel.org
-Subject: Re: drivers/vfio/vfio.c:293: warning: expecting prototype for
- Container objects(). Prototype was for vfio_container_get() instead
-In-Reply-To: <38a9cb92-a473-40bf-b8f9-85cc5cfc2da4@infradead.org>
-Organization: Red Hat GmbH
-References: <202111102328.WDUm0Bl7-lkp@intel.com>
- <20211110164256.GY1740502@nvidia.com>
- <38a9cb92-a473-40bf-b8f9-85cc5cfc2da4@infradead.org>
-User-Agent: Notmuch/0.33.1 (https://notmuchmail.org)
-Date:   Thu, 11 Nov 2021 08:56:45 +0100
-Message-ID: <87v90z86rm.fsf@redhat.com>
+        id S232396AbhKKIb5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Nov 2021 03:31:57 -0500
+Received: from mga14.intel.com ([192.55.52.115]:31653 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232257AbhKKIb4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Nov 2021 03:31:56 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10164"; a="233119652"
+X-IronPort-AV: E=Sophos;i="5.87,225,1631602800"; 
+   d="scan'208";a="233119652"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2021 00:29:08 -0800
+X-IronPort-AV: E=Sophos;i="5.87,225,1631602800"; 
+   d="scan'208";a="504341359"
+Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.239.13.123]) ([10.239.13.123])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2021 00:29:03 -0800
+Message-ID: <7733a5fe-6284-fe1d-a09d-cc22be8b3887@intel.com>
+Date:   Thu, 11 Nov 2021 16:29:01 +0800
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.3.0
+Subject: Re: [RFC PATCH v2 22/69] KVM: x86: Add vm_type to differentiate
+ legacy VMs from protected VMs
+Content-Language: en-US
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "erdemaktas@google.com" <erdemaktas@google.com>,
+        Connor Kuehl <ckuehl@redhat.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>
+References: <cover.1625186503.git.isaku.yamahata@intel.com>
+ <8eb87cd52a89d957af03f93a9ece5634426a7757.1625186503.git.isaku.yamahata@intel.com>
+ <e2270f66-abd8-db17-c3bd-b6d9459624ec@redhat.com>
+ <YO356ni0SjPsLsSo@google.com>
+ <5689dc7e-b0e0-1733-f00f-66dc7b62b960@intel.com>
+ <055d924e-2117-247f-8339-7487153e284b@redhat.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <055d924e-2117-247f-8339-7487153e284b@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 10 2021, Randy Dunlap <rdunlap@infradead.org> wrote:
-
-> On 11/10/21 8:42 AM, Jason Gunthorpe wrote:
->> On Wed, Nov 10, 2021 at 11:12:39PM +0800, kernel test robot wrote:
->>> Hi Jason,
+On 11/11/2021 3:28 PM, Paolo Bonzini wrote:
+> On 11/11/21 04:28, Xiaoyao Li wrote:
 >>>
->>> FYI, the error/warning still remains.
->> 
->> This is just a long standing kdoc misuse.
->> 
->> vfio is not W=1 kdoc clean.
->> 
->> Until someone takes a project to fix this comprehensively there is not
->> much point in reporting new complaints related the existing mis-use..
->
-> Hi,
->
-> Can we just remove all misused "/**" comments in vfio.c until
-> someone cares enough to use proper kernel-doc there?
->
-> ---
-> From: Randy Dunlap <rdunlap@infradead.org>
-> Subject: [PATCH] vfio/vfio: remove all kernel-doc notation
->
-> vfio.c abuses (misuses) "/**", which indicates the beginning of
-> kernel-doc notation in the kernel tree. This causes a bunch of
-> kernel-doc complaints about this source file, so quieten all of
-> them by changing all "/**" to "/*".
->
-> vfio.c:236: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
->   * IOMMU driver registration
-> vfio.c:236: warning: missing initial short description on line:
->   * IOMMU driver registration
-> vfio.c:295: warning: expecting prototype for Container objects(). Prototype was for vfio_container_get() instead
-> vfio.c:317: warning: expecting prototype for Group objects(). Prototype was for __vfio_group_get_from_iommu() instead
-> vfio.c:496: warning: Function parameter or member 'device' not described in 'vfio_device_put'
-> vfio.c:496: warning: expecting prototype for Device objects(). Prototype was for vfio_device_put() instead
-> vfio.c:599: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
->   * Async device support
-> vfio.c:599: warning: missing initial short description on line:
->   * Async device support
-> vfio.c:693: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
->   * VFIO driver API
-> vfio.c:693: warning: missing initial short description on line:
->   * VFIO driver API
-> vfio.c:835: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
->   * Get a reference to the vfio_device for a device.  Even if the
-> vfio.c:835: warning: missing initial short description on line:
->   * Get a reference to the vfio_device for a device.  Even if the
-> vfio.c:969: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
->   * VFIO base fd, /dev/vfio/vfio
-> vfio.c:969: warning: missing initial short description on line:
->   * VFIO base fd, /dev/vfio/vfio
-> vfio.c:1187: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
->   * VFIO Group fd, /dev/vfio/$GROUP
-> vfio.c:1187: warning: missing initial short description on line:
->   * VFIO Group fd, /dev/vfio/$GROUP
-> vfio.c:1540: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
->   * VFIO Device fd
-> vfio.c:1540: warning: missing initial short description on line:
->   * VFIO Device fd
-> vfio.c:1615: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
->   * External user API, exported by symbols to be linked dynamically.
-> vfio.c:1615: warning: missing initial short description on line:
->   * External user API, exported by symbols to be linked dynamically.
-> vfio.c:1663: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
->   * External user API, exported by symbols to be linked dynamically.
-> vfio.c:1663: warning: missing initial short description on line:
->   * External user API, exported by symbols to be linked dynamically.
-> vfio.c:1742: warning: Function parameter or member 'caps' not described in 'vfio_info_cap_add'
-> vfio.c:1742: warning: Function parameter or member 'size' not described in 'vfio_info_cap_add'
-> vfio.c:1742: warning: Function parameter or member 'id' not described in 'vfio_info_cap_add'
-> vfio.c:1742: warning: Function parameter or member 'version' not described in 'vfio_info_cap_add'
-> vfio.c:1742: warning: expecting prototype for Sub(). Prototype was for vfio_info_cap_add() instead
-> vfio.c:2276: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
->   * Module/class support
-> vfio.c:2276: warning: missing initial short description on line:
->   * Module/class support
->
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> Reported-by: kernel test robot <lkp@intel.com>
-> Cc: Jason Gunthorpe <jgg@nvidia.com>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Eric Auger <eric.auger@redhat.com>
-> Cc: Cornelia Huck <cohuck@redhat.com>
-> Cc: kvm@vger.kernel.org
-> ---
->   drivers/vfio/vfio.c |   28 ++++++++++++++--------------
->   1 file changed, 14 insertions(+), 14 deletions(-)
+>>> Heh, because kvm_dev_ioctl_create_vm() takes an "unsigned long" for 
+>>> the type and
+>>> it felt wrong to store it as something else.  Storing it as a smaller 
+>>> field should
+>>> be fine, I highly doubt we'll get to 256 types anytime soon :-)
+>>
+>> It's the bit position. We can get only 8 types with u8 actually.
+> 
+> Every architecture defines the meaning, and for x86 we can say it's not 
+> a bit position.
 
-It's been like that since the code was introduced, these were probably
-never intended to be kerneldoc comments.
+Sorry, I find I was wrong. The types are not bit position but value.
 
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+KVM_CAP_VM_TYPES reports the supported vm types using bitmap that bit n 
+represents type value n.
+
+> Paolo
+> 
 
