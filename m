@@ -2,96 +2,289 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 74C8F44DB81
-	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 19:19:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B82644DB9D
+	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 19:29:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234360AbhKKSV7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Nov 2021 13:21:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52692 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233717AbhKKSVu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Nov 2021 13:21:50 -0500
-Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C9F0C061766
-        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 10:19:01 -0800 (PST)
-Received: by mail-io1-xd2a.google.com with SMTP id x10so8034225ioj.9
-        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 10:19:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Xx4rnLukH63BA1dsCAAfgQ0vMXXRjT66zoQDivL5INE=;
-        b=UfGiPPORZYo7oNRFti+yU3zFk1Pg7REobC38MITBnSxw7i4nByt2LTQM6Xi4WrLEDB
-         OHdF4pIJxR78Nm0Bl2v7qiMJZpk3w6AJ+iCRfhFdbAXLjWihdscg3rt1Gk8iE27TxWAb
-         cDNBA85SwHI03oQnxg+GWYLynZLfshZ60u/5AyUgx1KSqaZgdz22zyqvPTHEb1fDENoY
-         +dIYJzWcXAhOvzlU5/TxHizUs9k460fdqc45TtUzJV2Lz1g1tfD2rrr5l+n54sF2cAHN
-         Y2fEDIx5Js+Dcq87aSxKOxB4AmGQaeA8MjEuwzX6vpiRztRD6mfQE7E1oEnNQh+kA1Db
-         fRmA==
+        id S234441AbhKKSc3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Nov 2021 13:32:29 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:60082 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234125AbhKKSc2 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 11 Nov 2021 13:32:28 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1636655379;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=x4RdaO9C0fWKiyKfKgHDoJGk0IKqUwuwGJqXNy2InYM=;
+        b=Wl7GcckIsiJo1tcuG6W05A0w2KAQQ48YlVgb8e3qzjPd9SNIfnbibhvLoNGF3OGEWcZIVD
+        A/AcXRzK36CjbM4OElNilWVb+rt2AC7RyhUmIJBjsMRitpTXJhiRSUowZXEYoZwCXdZgm3
+        UCDyIc6XDjPzfZzN8qkYD39c85FLTVA=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-86-cmWXJ487OR--J3bevs9uHg-1; Thu, 11 Nov 2021 13:29:37 -0500
+X-MC-Unique: cmWXJ487OR--J3bevs9uHg-1
+Received: by mail-wm1-f72.google.com with SMTP id l187-20020a1c25c4000000b0030da46b76daso5125036wml.9
+        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 10:29:37 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Xx4rnLukH63BA1dsCAAfgQ0vMXXRjT66zoQDivL5INE=;
-        b=jpXQn/HbRCVLb1Byt9dnmfnH41SZuWRWGMU/KyWnbnAAxpeHLVOqBjVfHjVOMvIRYf
-         av1wWmH3c57UdTYjnvYdv9KdVeRku/DKGMdr6kr2dAipayQ+SQYNHdSWRK3nmfOkqQ0Q
-         njKIHCN6NELOY9AEI1D3i90CDQx7Jj0oO5NnWkULLeDvBvPWcwyCFpmF5ynrRStqgmpl
-         4m2RQPrtaMwF+5ixJ4wGptD8pRBSNuFnlfll95Y1egbRvHmd50U0rpOXBv2xYCqwg92B
-         jnd0ACiPr+80QhwpbRJHDt3bT6IxNj/VyUT+lGieYvmueJfGgw08ceLeC01JLGfHQbdw
-         Qljg==
-X-Gm-Message-State: AOAM532Kc0D9TsAKgGgyszmDGuAnW/aj16K3VRIO115+aloNI0/EZ/Ic
-        yVJCN0PhZ6S5QUFyjgrv6A/Sl4d+6dVZjcRetnm3cw==
-X-Google-Smtp-Source: ABdhPJym1kXVuIwUPlwHWc97aEsoc9OP4IWka2OeUEM3LoKeLQsnw5DVlFo6wycMAcZz02hIrLBK3LxQBllCGAPTAJk=
-X-Received: by 2002:a05:6638:35a0:: with SMTP id v32mr6881399jal.61.1636654740441;
- Thu, 11 Nov 2021 10:19:00 -0800 (PST)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:organization:in-reply-to
+         :content-transfer-encoding;
+        bh=x4RdaO9C0fWKiyKfKgHDoJGk0IKqUwuwGJqXNy2InYM=;
+        b=WlGUAHKDOPrCqkm1vi0cMDO7vEHk9OERrjQchcrCIVNg6vzK29UQ/EDHkFWR9LlaLd
+         pIPqTYYCuRBh36rLDih5osY4ZPjQw+6ihdvcmSc+pK0UVJzH9DQIuZsesMjXym9u2po3
+         kJCYBKrX5UajWxekTiI+QotDl+V6q47spsFYY0FgWO6VgUB6B6+hNxV78Lt/Gu5NGM8+
+         Maf++FmOkH2bbCmXVRsUZT78pH7QZWoA9vaIA4N23TDqXnJDfc3/V4PFNk0d/k5x4hYf
+         3c0eZr51SY1A84E8yQTu4dlS+WTlMiWvpRcx5ZPkwhT/rjSpQpW+IC8AymWi6XlODaGQ
+         n+Fw==
+X-Gm-Message-State: AOAM533utjBph8aldqNtry72+5YiOqj/2RwhJXk0G+qISJJK+zR9MM6l
+        ltTfLDOU5BTAbUKg4uUtd8Htj1bTONpM+4GjgN8uRcV8ZNG2ULERsg2CoJ9Le5fblG2A/SLdPRx
+        tw8YMB2rSHl9a
+X-Received: by 2002:a7b:c155:: with SMTP id z21mr26933442wmi.107.1636655376142;
+        Thu, 11 Nov 2021 10:29:36 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJw1oA07qmf0h+6D+TrmQJRkrvDhEglM2CchjN0NqWqCV/vgvnsQlvhajgVQXi71BDXp0pO64w==
+X-Received: by 2002:a7b:c155:: with SMTP id z21mr26933394wmi.107.1636655375766;
+        Thu, 11 Nov 2021 10:29:35 -0800 (PST)
+Received: from [192.168.3.132] (p4ff23ee8.dip0.t-ipconnect.de. [79.242.62.232])
+        by smtp.gmail.com with ESMTPSA id p19sm3957136wmq.4.2021.11.11.10.29.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 11 Nov 2021 10:29:35 -0800 (PST)
+Message-ID: <85ba9fa3-ca25-b598-aecd-5e0c6a0308f2@redhat.com>
+Date:   Thu, 11 Nov 2021 19:29:34 +0100
 MIME-Version: 1.0
-References: <20211111001257.1446428-1-dmatlack@google.com> <20211111001257.1446428-5-dmatlack@google.com>
-In-Reply-To: <20211111001257.1446428-5-dmatlack@google.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Thu, 11 Nov 2021 10:18:49 -0800
-Message-ID: <CANgfPd-sWiOEHiDzGLwGYZSMEShiMAXCyPj7z40jgXyDt0j1Ww@mail.gmail.com>
-Subject: Re: [PATCH 4/4] KVM: selftests: Use perf_test_destroy_vm in memslot_modification_stress_test
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        Peter Xu <peterx@redhat.com>,
-        Aaron Lewis <aaronlewis@google.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [RFC PATCH v3 2/2] KVM: s390: Extend the USER_SIGP capability
+Content-Language: en-US
+To:     Eric Farman <farman@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>
+Cc:     Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+References: <20211110203322.1374925-1-farman@linux.ibm.com>
+ <20211110203322.1374925-3-farman@linux.ibm.com>
+ <dd8a8b49-da6d-0ab8-dc47-b24f5604767f@redhat.com>
+ <ab82e68051674ea771e2cb5371ca2a204effab40.camel@linux.ibm.com>
+ <32836eb5-532f-962d-161a-faa2213a0691@linux.ibm.com>
+ <b116e738d8f9b185867ab28395012aaddd58af31.camel@linux.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+In-Reply-To: <b116e738d8f9b185867ab28395012aaddd58af31.camel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 10, 2021 at 4:13 PM David Matlack <dmatlack@google.com> wrote:
->
-> Change memslot_modification_stress_test to use perf_test_destroy_vm
-> instead of manually calling ucall_uninit and kvm_vm_free.
->
-> No functional change intended.
->
-> Signed-off-by: David Matlack <dmatlack@google.com>
+On 11.11.21 18:48, Eric Farman wrote:
+> On Thu, 2021-11-11 at 17:13 +0100, Janosch Frank wrote:
+>> On 11/11/21 16:03, Eric Farman wrote:
+>>> On Thu, 2021-11-11 at 10:15 +0100, David Hildenbrand wrote:
+>>>> On 10.11.21 21:33, Eric Farman wrote:
+>>>>> With commit 2444b352c3ac ("KVM: s390: forward most SIGP orders
+>>>>> to
+>>>>> user
+>>>>> space") we have a capability that allows the "fast" SIGP orders
+>>>>> (as
+>>>>> defined by the Programming Notes for the SIGNAL PROCESSOR
+>>>>> instruction in
+>>>>> the Principles of Operation) to be handled in-kernel, while all
+>>>>> others are
+>>>>> sent to userspace for processing.
+>>>>>
+>>>>> This works fine but it creates a situation when, for example, a
+>>>>> SIGP SENSE
+>>>>> might return CC1 (STATUS STORED, and status bits indicating the
+>>>>> vcpu is
+>>>>> stopped), when in actuality userspace is still processing a
+>>>>> SIGP
+>>>>> STOP AND
+>>>>> STORE STATUS order, and the vcpu is not yet actually stopped.
+>>>>> Thus,
+>>>>> the
+>>>>> SIGP SENSE should actually be returning CC2 (busy) instead of
+>>>>> CC1.
+>>>>>
+>>>>> To fix this, add another CPU capability, dependent on the
+>>>>> USER_SIGP
+>>>>> one,
+>>>>> and two associated IOCTLs. One IOCTL will be used by userspace
+>>>>> to
+>>>>> mark a
+>>>>> vcpu "busy" processing a SIGP order, and cause concurrent
+>>>>> orders
+>>>>> handled
+>>>>> in-kernel to be returned with CC2 (busy). Another IOCTL will be
+>>>>> used by
+>>>>> userspace to mark the SIGP "finished", and the vcpu free to
+>>>>> process
+>>>>> additional orders.
+>>>>>
+>>>>
+>>>> This looks much cleaner to me, thanks!
+>>>>
+>>>> [...]
+>>>>
+>>>>> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-
+>>>>> s390.h
+>>>>> index c07a050d757d..54371cede485 100644
+>>>>> --- a/arch/s390/kvm/kvm-s390.h
+>>>>> +++ b/arch/s390/kvm/kvm-s390.h
+>>>>> @@ -82,6 +82,22 @@ static inline int is_vcpu_idle(struct
+>>>>> kvm_vcpu
+>>>>> *vcpu)
+>>>>>   	return test_bit(vcpu->vcpu_idx, vcpu->kvm-
+>>>>>> arch.idle_mask);
+>>>>>   }
+>>>>>   
+>>>>> +static inline bool kvm_s390_vcpu_is_sigp_busy(struct kvm_vcpu
+>>>>> *vcpu)
+>>>>> +{
+>>>>> +	return (atomic_read(&vcpu->arch.sigp_busy) == 1);
+>>>>
+>>>> You can drop ()
+>>>>
+>>>>> +}
+>>>>> +
+>>>>> +static inline bool kvm_s390_vcpu_set_sigp_busy(struct kvm_vcpu
+>>>>> *vcpu)
+>>>>> +{
+>>>>> +	/* Return zero for success, or -EBUSY if another vcpu
+>>>>> won */
+>>>>> +	return (atomic_cmpxchg(&vcpu->arch.sigp_busy, 0, 1) ==
+>>>>> 0) ? 0 :
+>>>>> -EBUSY;
+>>>>
+>>>> You can drop () as well.
+>>>>
+>>>> We might not need the -EBUSY semantics after all. User space can
+>>>> just
+>>>> track if it was set, because it's in charge of setting it.
+>>>
+>>> Hrm, I added this to distinguish a newer kernel with an older QEMU,
+>>> but
+>>> of course an older QEMU won't know the difference either. I'll
+>>> doublecheck that this is works fine in the different permutations.
+>>>
+>>>>> +}
+>>>>> +
+>>>>> +static inline void kvm_s390_vcpu_clear_sigp_busy(struct
+>>>>> kvm_vcpu
+>>>>> *vcpu)
+>>>>> +{
+>>>>> +	atomic_set(&vcpu->arch.sigp_busy, 0);
+>>>>> +}
+>>>>> +
+>>>>>   static inline int kvm_is_ucontrol(struct kvm *kvm)
+>>>>>   {
+>>>>>   #ifdef CONFIG_KVM_S390_UCONTROL
+>>>>> diff --git a/arch/s390/kvm/sigp.c b/arch/s390/kvm/sigp.c
+>>>>> index 5ad3fb4619f1..a37496ea6dfa 100644
+>>>>> --- a/arch/s390/kvm/sigp.c
+>>>>> +++ b/arch/s390/kvm/sigp.c
+>>>>> @@ -276,6 +276,10 @@ static int handle_sigp_dst(struct kvm_vcpu
+>>>>> *vcpu, u8 order_code,
+>>>>>   	if (!dst_vcpu)
+>>>>>   		return SIGP_CC_NOT_OPERATIONAL;
+>>>>>   
+>>>>> +	if (kvm_s390_vcpu_is_sigp_busy(dst_vcpu)) {
+>>>>> +		return SIGP_CC_BUSY;
+>>>>> +	}
+>>>>
+>>>> You can drop {}
+>>>
+>>> Arg, I had some debug in there which needed the braces, and of
+>>> course
+>>> it's unnecessary now. Thanks.
+>>>
+>>>>> +
+>>>>>   	switch (order_code) {
+>>>>>   	case SIGP_SENSE:
+>>>>>   		vcpu->stat.instruction_sigp_sense++;
+>>>>> @@ -411,6 +415,12 @@ int kvm_s390_handle_sigp(struct kvm_vcpu
+>>>>> *vcpu)
+>>>>>   	if (handle_sigp_order_in_user_space(vcpu, order_code,
+>>>>> cpu_addr))
+>>>>>   		return -EOPNOTSUPP;
+>>>>>   
+>>>>> +	/* Check the current vcpu, if it was a target from
+>>>>> another vcpu
+>>>>> */
+>>>>> +	if (kvm_s390_vcpu_is_sigp_busy(vcpu)) {
+>>>>> +		kvm_s390_set_psw_cc(vcpu, SIGP_CC_BUSY);
+>>>>> +		return 0;
+>>>>> +	}
+>>>>
+>>>> I don't think we need this. I think the above (checking the
+>>>> target of
+>>>> a
+>>>> SIGP order) is sufficient. Or which situation do you have in
+>>>> mind?
+>>>>
+>>>
+>>> Hrm... I think you're right. I was thinking of this:
+>>>
+>>> VCPU 1 - SIGP STOP CPU 2
+>>> VCPU 2 - SIGP SENSE CPU 1
+>>>
+>>> But of course either CPU2 is going to be marked "busy" first, and
+>>> the
+>>> sense doesn't get processed until it's reset, or the sense arrives
+>>> first, and the busy/notbusy doesn't matter. Let me doublecheck my
+>>> tests
+>>> for the non-RFC version.
+>>>
+>>>>
+>>>> I do wonder if we want to make this a kvm_arch_vcpu_ioctl()
+>>>> instead,
+>>>
+>>> In one of my original attempts between v1 and v2, I had put this
+>>> there.
+>>> This reliably deadlocks my guest, because the caller
+>>> (kvm_vcpu_ioctl())
+>>> tries to acquire vcpu->mutex, and racing SIGPs (via KVM_RUN) might
+>>> already be holding it. Thus, it's an async ioctl. I could fold it
+>>> into
+>>> the existing interrupt ioctl, but as those are architected structs
+>>> it
+>>> seems more natural do it this way. Or I have mis-understood
+>>> something
+>>> along the way?
+>>>
+>>>> essentially just providing a KVM_S390_SET_SIGP_BUSY *and*
+>>>> providing
+>>>> the
+>>>> order. "order == 0" sets it to !busy.
+>>>
+>>> I'd tried this too, since it provided some nice debug-ability.
+>>> Unfortunately, I have a testcase (which I'll eventually get folded
+>>> into
+>>> kvm-unit-tests :)) that picks a random order between 0-255, knowing
+>>> that there's only a couple handfuls of valid orders, to check the
+>>> response. Zero is valid architecturally (POPS figure 4-29), even if
+>>> it's unassigned. The likelihood of it becoming assigned is probably
+>>> quite low, but I'm not sure that I like special-casing an order of
+>>> zero
+>>> in this way.
+>>>
+>>
+>> Looking at the API I'd like to avoid having two IOCTLs 
+> 
+> Since the order is a single byte, we could have the payload of an ioctl
+> say "0-255 is an order that we're busy processing, anything higher than
+> that resets the busy" or something. That would remove the need for a
+> second IOCTL.
 
-Reviewed-by: Ben Gardon <bgardon@google.com>
+Maybe just pass an int and treat a negative (or just -1) value as
+clearing the order.
 
-> ---
->  tools/testing/selftests/kvm/memslot_modification_stress_test.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->
-> diff --git a/tools/testing/selftests/kvm/memslot_modification_stress_test.c b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-> index 5bd0b076f57f..1410d0a9141a 100644
-> --- a/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-> +++ b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
-> @@ -116,8 +116,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->         perf_test_join_vcpu_threads(nr_vcpus);
->         pr_info("All vCPU threads joined\n");
->
-> -       ucall_uninit(vm);
-> -       kvm_vm_free(vm);
-> +       perf_test_destroy_vm(vm);
->  }
->
->  static void help(char *name)
-> --
-> 2.34.0.rc1.387.gb447b232ab-goog
->
+-- 
+Thanks,
+
+David / dhildenb
+
