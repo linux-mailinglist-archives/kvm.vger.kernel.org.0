@@ -2,289 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B82644DB9D
-	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 19:29:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D7BE44DBA1
+	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 19:31:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234441AbhKKSc3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Nov 2021 13:32:29 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:60082 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234125AbhKKSc2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 11 Nov 2021 13:32:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636655379;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=x4RdaO9C0fWKiyKfKgHDoJGk0IKqUwuwGJqXNy2InYM=;
-        b=Wl7GcckIsiJo1tcuG6W05A0w2KAQQ48YlVgb8e3qzjPd9SNIfnbibhvLoNGF3OGEWcZIVD
-        A/AcXRzK36CjbM4OElNilWVb+rt2AC7RyhUmIJBjsMRitpTXJhiRSUowZXEYoZwCXdZgm3
-        UCDyIc6XDjPzfZzN8qkYD39c85FLTVA=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-86-cmWXJ487OR--J3bevs9uHg-1; Thu, 11 Nov 2021 13:29:37 -0500
-X-MC-Unique: cmWXJ487OR--J3bevs9uHg-1
-Received: by mail-wm1-f72.google.com with SMTP id l187-20020a1c25c4000000b0030da46b76daso5125036wml.9
-        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 10:29:37 -0800 (PST)
+        id S234200AbhKKSeT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Nov 2021 13:34:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55524 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232930AbhKKSeS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Nov 2021 13:34:18 -0500
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA6BBC061767
+        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 10:31:28 -0800 (PST)
+Received: by mail-pl1-x630.google.com with SMTP id q17so6382109plr.11
+        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 10:31:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=s8jf/tX5jyrIo31YjXHUFlHnOpiUaJPDt9RQiWaokMM=;
+        b=Z+KAKlex/6ZhLa9BoSJPqzXvqRiKe7hN+fDeZZ1JVshM75MPHZ8jSb7OB5bSHGPkuV
+         RVt0kNhVio7qz+MvilBmIPLG4YggyRiMOft8PE9P/yTsRy3U93NTC5RdfTzjC4VR2S0F
+         OXzyxt9W42nM3znUclcO+YS4law6AZtwSapHbvfQ0MXfSiU72Ac4csNy/RCIUFxePzB7
+         8rDk4j2mzuez+d5OVYZcSh1Ok9Tsfq+yQGqhYXQUyOXNwn6TYfphATOdtxgE1XsR6DNJ
+         k4TeKJpgmpHH2ZIdl+DezIAzuxE0aNz9Y1hbAir10vnMsCKyYbYh/j/bsLSS+E6X49R1
+         lF+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=x4RdaO9C0fWKiyKfKgHDoJGk0IKqUwuwGJqXNy2InYM=;
-        b=WlGUAHKDOPrCqkm1vi0cMDO7vEHk9OERrjQchcrCIVNg6vzK29UQ/EDHkFWR9LlaLd
-         pIPqTYYCuRBh36rLDih5osY4ZPjQw+6ihdvcmSc+pK0UVJzH9DQIuZsesMjXym9u2po3
-         kJCYBKrX5UajWxekTiI+QotDl+V6q47spsFYY0FgWO6VgUB6B6+hNxV78Lt/Gu5NGM8+
-         Maf++FmOkH2bbCmXVRsUZT78pH7QZWoA9vaIA4N23TDqXnJDfc3/V4PFNk0d/k5x4hYf
-         3c0eZr51SY1A84E8yQTu4dlS+WTlMiWvpRcx5ZPkwhT/rjSpQpW+IC8AymWi6XlODaGQ
-         n+Fw==
-X-Gm-Message-State: AOAM533utjBph8aldqNtry72+5YiOqj/2RwhJXk0G+qISJJK+zR9MM6l
-        ltTfLDOU5BTAbUKg4uUtd8Htj1bTONpM+4GjgN8uRcV8ZNG2ULERsg2CoJ9Le5fblG2A/SLdPRx
-        tw8YMB2rSHl9a
-X-Received: by 2002:a7b:c155:: with SMTP id z21mr26933442wmi.107.1636655376142;
-        Thu, 11 Nov 2021 10:29:36 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJw1oA07qmf0h+6D+TrmQJRkrvDhEglM2CchjN0NqWqCV/vgvnsQlvhajgVQXi71BDXp0pO64w==
-X-Received: by 2002:a7b:c155:: with SMTP id z21mr26933394wmi.107.1636655375766;
-        Thu, 11 Nov 2021 10:29:35 -0800 (PST)
-Received: from [192.168.3.132] (p4ff23ee8.dip0.t-ipconnect.de. [79.242.62.232])
-        by smtp.gmail.com with ESMTPSA id p19sm3957136wmq.4.2021.11.11.10.29.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Nov 2021 10:29:35 -0800 (PST)
-Message-ID: <85ba9fa3-ca25-b598-aecd-5e0c6a0308f2@redhat.com>
-Date:   Thu, 11 Nov 2021 19:29:34 +0100
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=s8jf/tX5jyrIo31YjXHUFlHnOpiUaJPDt9RQiWaokMM=;
+        b=g0q9+VvqA/AiJ3IvjvLeLcEiS3C71Ll+RilvAur7BUw7lDxFBOG+wkl6GrqTXieIzO
+         pHYL/RShcC59UZxh8AmB+4/EIUg+5o9bY2mhxxMHDSG1PEqN59MPhPTqOyjyxkGb/Dba
+         9KQKcVn9MAIKswqIqZuxMgveiRGa4SvdkzzQVoEHdf8cETwjAOyUfgLfIFH+nr9d2qvl
+         F1FIuFywepjbOsrzDHAb+81WnSpS7iRvjrpELvPBP9Okw3DL/0/YnF9bsxxcMolQOIOf
+         yl9Jc4dy4oXJQ1LDNmw+w0RU3Yuq9HcP1jOiabUrtp6vblYUVFkxO4ZzNg1NbolS4GVM
+         i0mQ==
+X-Gm-Message-State: AOAM530iFaPqNTzyQW1jWbbPLR/Ho+jIK42lEmxUAIrLJh11X+o1LraJ
+        4w4MmrJmCig/LzoGFawuPcZ8Kg==
+X-Google-Smtp-Source: ABdhPJw5atYngTb3DppEu5M72mop+gP4FS1YgwLKHn3XrApXI6KVOKiIGKphwWxkrAl24185f0809A==
+X-Received: by 2002:a17:90b:218:: with SMTP id fy24mr29047971pjb.187.1636655488268;
+        Thu, 11 Nov 2021 10:31:28 -0800 (PST)
+Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
+        by smtp.gmail.com with ESMTPSA id h4sm9317189pjm.14.2021.11.11.10.31.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Nov 2021 10:31:27 -0800 (PST)
+Date:   Thu, 11 Nov 2021 18:31:23 +0000
+From:   David Matlack <dmatlack@google.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Peter Shier <pshier@google.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Keqian Zhu <zhukeqian1@huawei.com>,
+        David Hildenbrand <david@redhat.com>
+Subject: Re: [RFC 03/19] KVM: x86/mmu: Factor flush and free up when zapping
+ under MMU write lock
+Message-ID: <YY1he0lCLRNUofuw@google.com>
+References: <20211110223010.1392399-1-bgardon@google.com>
+ <20211110223010.1392399-4-bgardon@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [RFC PATCH v3 2/2] KVM: s390: Extend the USER_SIGP capability
-Content-Language: en-US
-To:     Eric Farman <farman@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>
-Cc:     Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-References: <20211110203322.1374925-1-farman@linux.ibm.com>
- <20211110203322.1374925-3-farman@linux.ibm.com>
- <dd8a8b49-da6d-0ab8-dc47-b24f5604767f@redhat.com>
- <ab82e68051674ea771e2cb5371ca2a204effab40.camel@linux.ibm.com>
- <32836eb5-532f-962d-161a-faa2213a0691@linux.ibm.com>
- <b116e738d8f9b185867ab28395012aaddd58af31.camel@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <b116e738d8f9b185867ab28395012aaddd58af31.camel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211110223010.1392399-4-bgardon@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11.11.21 18:48, Eric Farman wrote:
-> On Thu, 2021-11-11 at 17:13 +0100, Janosch Frank wrote:
->> On 11/11/21 16:03, Eric Farman wrote:
->>> On Thu, 2021-11-11 at 10:15 +0100, David Hildenbrand wrote:
->>>> On 10.11.21 21:33, Eric Farman wrote:
->>>>> With commit 2444b352c3ac ("KVM: s390: forward most SIGP orders
->>>>> to
->>>>> user
->>>>> space") we have a capability that allows the "fast" SIGP orders
->>>>> (as
->>>>> defined by the Programming Notes for the SIGNAL PROCESSOR
->>>>> instruction in
->>>>> the Principles of Operation) to be handled in-kernel, while all
->>>>> others are
->>>>> sent to userspace for processing.
->>>>>
->>>>> This works fine but it creates a situation when, for example, a
->>>>> SIGP SENSE
->>>>> might return CC1 (STATUS STORED, and status bits indicating the
->>>>> vcpu is
->>>>> stopped), when in actuality userspace is still processing a
->>>>> SIGP
->>>>> STOP AND
->>>>> STORE STATUS order, and the vcpu is not yet actually stopped.
->>>>> Thus,
->>>>> the
->>>>> SIGP SENSE should actually be returning CC2 (busy) instead of
->>>>> CC1.
->>>>>
->>>>> To fix this, add another CPU capability, dependent on the
->>>>> USER_SIGP
->>>>> one,
->>>>> and two associated IOCTLs. One IOCTL will be used by userspace
->>>>> to
->>>>> mark a
->>>>> vcpu "busy" processing a SIGP order, and cause concurrent
->>>>> orders
->>>>> handled
->>>>> in-kernel to be returned with CC2 (busy). Another IOCTL will be
->>>>> used by
->>>>> userspace to mark the SIGP "finished", and the vcpu free to
->>>>> process
->>>>> additional orders.
->>>>>
->>>>
->>>> This looks much cleaner to me, thanks!
->>>>
->>>> [...]
->>>>
->>>>> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-
->>>>> s390.h
->>>>> index c07a050d757d..54371cede485 100644
->>>>> --- a/arch/s390/kvm/kvm-s390.h
->>>>> +++ b/arch/s390/kvm/kvm-s390.h
->>>>> @@ -82,6 +82,22 @@ static inline int is_vcpu_idle(struct
->>>>> kvm_vcpu
->>>>> *vcpu)
->>>>>   	return test_bit(vcpu->vcpu_idx, vcpu->kvm-
->>>>>> arch.idle_mask);
->>>>>   }
->>>>>   
->>>>> +static inline bool kvm_s390_vcpu_is_sigp_busy(struct kvm_vcpu
->>>>> *vcpu)
->>>>> +{
->>>>> +	return (atomic_read(&vcpu->arch.sigp_busy) == 1);
->>>>
->>>> You can drop ()
->>>>
->>>>> +}
->>>>> +
->>>>> +static inline bool kvm_s390_vcpu_set_sigp_busy(struct kvm_vcpu
->>>>> *vcpu)
->>>>> +{
->>>>> +	/* Return zero for success, or -EBUSY if another vcpu
->>>>> won */
->>>>> +	return (atomic_cmpxchg(&vcpu->arch.sigp_busy, 0, 1) ==
->>>>> 0) ? 0 :
->>>>> -EBUSY;
->>>>
->>>> You can drop () as well.
->>>>
->>>> We might not need the -EBUSY semantics after all. User space can
->>>> just
->>>> track if it was set, because it's in charge of setting it.
->>>
->>> Hrm, I added this to distinguish a newer kernel with an older QEMU,
->>> but
->>> of course an older QEMU won't know the difference either. I'll
->>> doublecheck that this is works fine in the different permutations.
->>>
->>>>> +}
->>>>> +
->>>>> +static inline void kvm_s390_vcpu_clear_sigp_busy(struct
->>>>> kvm_vcpu
->>>>> *vcpu)
->>>>> +{
->>>>> +	atomic_set(&vcpu->arch.sigp_busy, 0);
->>>>> +}
->>>>> +
->>>>>   static inline int kvm_is_ucontrol(struct kvm *kvm)
->>>>>   {
->>>>>   #ifdef CONFIG_KVM_S390_UCONTROL
->>>>> diff --git a/arch/s390/kvm/sigp.c b/arch/s390/kvm/sigp.c
->>>>> index 5ad3fb4619f1..a37496ea6dfa 100644
->>>>> --- a/arch/s390/kvm/sigp.c
->>>>> +++ b/arch/s390/kvm/sigp.c
->>>>> @@ -276,6 +276,10 @@ static int handle_sigp_dst(struct kvm_vcpu
->>>>> *vcpu, u8 order_code,
->>>>>   	if (!dst_vcpu)
->>>>>   		return SIGP_CC_NOT_OPERATIONAL;
->>>>>   
->>>>> +	if (kvm_s390_vcpu_is_sigp_busy(dst_vcpu)) {
->>>>> +		return SIGP_CC_BUSY;
->>>>> +	}
->>>>
->>>> You can drop {}
->>>
->>> Arg, I had some debug in there which needed the braces, and of
->>> course
->>> it's unnecessary now. Thanks.
->>>
->>>>> +
->>>>>   	switch (order_code) {
->>>>>   	case SIGP_SENSE:
->>>>>   		vcpu->stat.instruction_sigp_sense++;
->>>>> @@ -411,6 +415,12 @@ int kvm_s390_handle_sigp(struct kvm_vcpu
->>>>> *vcpu)
->>>>>   	if (handle_sigp_order_in_user_space(vcpu, order_code,
->>>>> cpu_addr))
->>>>>   		return -EOPNOTSUPP;
->>>>>   
->>>>> +	/* Check the current vcpu, if it was a target from
->>>>> another vcpu
->>>>> */
->>>>> +	if (kvm_s390_vcpu_is_sigp_busy(vcpu)) {
->>>>> +		kvm_s390_set_psw_cc(vcpu, SIGP_CC_BUSY);
->>>>> +		return 0;
->>>>> +	}
->>>>
->>>> I don't think we need this. I think the above (checking the
->>>> target of
->>>> a
->>>> SIGP order) is sufficient. Or which situation do you have in
->>>> mind?
->>>>
->>>
->>> Hrm... I think you're right. I was thinking of this:
->>>
->>> VCPU 1 - SIGP STOP CPU 2
->>> VCPU 2 - SIGP SENSE CPU 1
->>>
->>> But of course either CPU2 is going to be marked "busy" first, and
->>> the
->>> sense doesn't get processed until it's reset, or the sense arrives
->>> first, and the busy/notbusy doesn't matter. Let me doublecheck my
->>> tests
->>> for the non-RFC version.
->>>
->>>>
->>>> I do wonder if we want to make this a kvm_arch_vcpu_ioctl()
->>>> instead,
->>>
->>> In one of my original attempts between v1 and v2, I had put this
->>> there.
->>> This reliably deadlocks my guest, because the caller
->>> (kvm_vcpu_ioctl())
->>> tries to acquire vcpu->mutex, and racing SIGPs (via KVM_RUN) might
->>> already be holding it. Thus, it's an async ioctl. I could fold it
->>> into
->>> the existing interrupt ioctl, but as those are architected structs
->>> it
->>> seems more natural do it this way. Or I have mis-understood
->>> something
->>> along the way?
->>>
->>>> essentially just providing a KVM_S390_SET_SIGP_BUSY *and*
->>>> providing
->>>> the
->>>> order. "order == 0" sets it to !busy.
->>>
->>> I'd tried this too, since it provided some nice debug-ability.
->>> Unfortunately, I have a testcase (which I'll eventually get folded
->>> into
->>> kvm-unit-tests :)) that picks a random order between 0-255, knowing
->>> that there's only a couple handfuls of valid orders, to check the
->>> response. Zero is valid architecturally (POPS figure 4-29), even if
->>> it's unassigned. The likelihood of it becoming assigned is probably
->>> quite low, but I'm not sure that I like special-casing an order of
->>> zero
->>> in this way.
->>>
->>
->> Looking at the API I'd like to avoid having two IOCTLs 
+On Wed, Nov 10, 2021 at 02:29:54PM -0800, Ben Gardon wrote:
+> When zapping a GFN range under the MMU write lock, there is no need to
+> flush the TLBs for every zap. Instead, follow the lead of the Legacy MMU
+> can collect disconnected sps to be freed after a flush at the end of
+> the routine.
 > 
-> Since the order is a single byte, we could have the payload of an ioctl
-> say "0-255 is an order that we're busy processing, anything higher than
-> that resets the busy" or something. That would remove the need for a
-> second IOCTL.
+> 
+> Signed-off-by: Ben Gardon <bgardon@google.com>
 
-Maybe just pass an int and treat a negative (or just -1) value as
-clearing the order.
+Reviewed-by: David Matlack <dmatlack@google.com>
 
--- 
-Thanks,
+> ---
+>  arch/x86/kvm/mmu/tdp_mmu.c | 28 +++++++++++++++++++---------
+>  1 file changed, 19 insertions(+), 9 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 5b31d046df78..a448f0f2d993 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -623,10 +623,9 @@ static inline bool tdp_mmu_zap_spte_atomic(struct kvm *kvm,
+>   */
+>  static inline void __tdp_mmu_set_spte(struct kvm *kvm, struct tdp_iter *iter,
+>  				      u64 new_spte, bool record_acc_track,
+> -				      bool record_dirty_log)
+> +				      bool record_dirty_log,
+> +				      struct list_head *disconnected_sps)
+>  {
+> -	LIST_HEAD(disconnected_sps);
+> -
+>  	lockdep_assert_held_write(&kvm->mmu_lock);
+>  
+>  	/*
+> @@ -641,7 +640,7 @@ static inline void __tdp_mmu_set_spte(struct kvm *kvm, struct tdp_iter *iter,
+>  	WRITE_ONCE(*rcu_dereference(iter->sptep), new_spte);
+>  
+>  	__handle_changed_spte(kvm, iter->as_id, iter->gfn, iter->old_spte,
+> -			      new_spte, iter->level, false, &disconnected_sps);
+> +			      new_spte, iter->level, false, disconnected_sps);
+>  	if (record_acc_track)
+>  		handle_changed_spte_acc_track(iter->old_spte, new_spte,
+>  					      iter->level);
+> @@ -649,28 +648,32 @@ static inline void __tdp_mmu_set_spte(struct kvm *kvm, struct tdp_iter *iter,
+>  		handle_changed_spte_dirty_log(kvm, iter->as_id, iter->gfn,
+>  					      iter->old_spte, new_spte,
+>  					      iter->level);
+> +}
+>  
+> -	handle_disconnected_sps(kvm, &disconnected_sps);
+> +static inline void tdp_mmu_zap_spte(struct kvm *kvm, struct tdp_iter *iter,
+> +				    struct list_head *disconnected_sps)
+> +{
+> +	__tdp_mmu_set_spte(kvm, iter, 0, true, true, disconnected_sps);
+>  }
+>  
+>  static inline void tdp_mmu_set_spte(struct kvm *kvm, struct tdp_iter *iter,
+>  				    u64 new_spte)
+>  {
+> -	__tdp_mmu_set_spte(kvm, iter, new_spte, true, true);
+> +	__tdp_mmu_set_spte(kvm, iter, new_spte, true, true, NULL);
+>  }
+>  
+>  static inline void tdp_mmu_set_spte_no_acc_track(struct kvm *kvm,
+>  						 struct tdp_iter *iter,
+>  						 u64 new_spte)
+>  {
+> -	__tdp_mmu_set_spte(kvm, iter, new_spte, false, true);
+> +	__tdp_mmu_set_spte(kvm, iter, new_spte, false, true, NULL);
+>  }
+>  
+>  static inline void tdp_mmu_set_spte_no_dirty_log(struct kvm *kvm,
+>  						 struct tdp_iter *iter,
+>  						 u64 new_spte)
+>  {
+> -	__tdp_mmu_set_spte(kvm, iter, new_spte, true, false);
+> +	__tdp_mmu_set_spte(kvm, iter, new_spte, true, false, NULL);
+>  }
+>  
+>  #define tdp_root_for_each_pte(_iter, _root, _start, _end) \
+> @@ -757,6 +760,7 @@ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
+>  	gfn_t max_gfn_host = 1ULL << (shadow_phys_bits - PAGE_SHIFT);
+>  	bool zap_all = (start == 0 && end >= max_gfn_host);
+>  	struct tdp_iter iter;
+> +	LIST_HEAD(disconnected_sps);
+>  
+>  	/*
+>  	 * No need to try to step down in the iterator when zapping all SPTEs,
+> @@ -799,7 +803,7 @@ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
+>  			continue;
+>  
+>  		if (!shared) {
+> -			tdp_mmu_set_spte(kvm, &iter, 0);
+> +			tdp_mmu_zap_spte(kvm, &iter, &disconnected_sps);
+>  			flush = true;
+>  		} else if (!tdp_mmu_zap_spte_atomic(kvm, &iter)) {
+>  			/*
+> @@ -811,6 +815,12 @@ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
+>  		}
+>  	}
+>  
+> +	if (!list_empty(&disconnected_sps)) {
+> +		kvm_flush_remote_tlbs(kvm);
+> +		handle_disconnected_sps(kvm, &disconnected_sps);
 
-David / dhildenb
+It might be worth adding a comment that we purposely do not process
+disconnected_sps during the cond resched earlier in the loop because it
+is an expensive call and it itself needs to cond resched (next patch).
 
+> +		flush = false;
+> +	}
+> +
+>  	rcu_read_unlock();
+>  	return flush;
+>  }
+> -- 
+> 2.34.0.rc0.344.g81b53c2807-goog
+> 
