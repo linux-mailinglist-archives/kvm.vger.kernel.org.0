@@ -2,120 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6FCF544D635
-	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 12:55:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B661044D645
+	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 13:02:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233311AbhKKL5r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Nov 2021 06:57:47 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42830 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233245AbhKKL5r (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 11 Nov 2021 06:57:47 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1ABAvnsD021890
-        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 11:54:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=muRukBJ8i0haFQjSTGNVrEoJbGz5jxx8cYxIWGNvG4w=;
- b=Z+HprmeyH/SPkTCnr1rBV2hUSmdpjwybJDmp33JsLVha4nw1U1nl+By/WRlXvQ5IlnA/
- 8YzumBsb64sDZMSxFJFg9uf7JSN/0wjJWVZuLh8K41lH4fjeIklX0w2HlqE1LSmopWwU
- F2n5N1nk1I8GLD9cWS7Ezl3g5OFvgeB9BNOM5B2WrykIh5ILlbU9TDrHjmbOIUrxvj/n
- 9o/A70rzQKdwunls9rEZX+RlgD+oIDI1mGPBgx81QMmbV79I2jOnvp6xhydVH7GfHzqJ
- FePbXF7yLw/UYri0sVaD8bqJuQOeI6N5ahttFmD8lW7zZwDEbpRML4lmpwXBumBRoSOM gA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3c8wbp8jq0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 11:54:58 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1ABBfYvZ025400
-        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 11:54:57 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3c8wbp8jp8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 11 Nov 2021 11:54:57 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1ABBqrT9013321;
-        Thu, 11 Nov 2021 11:54:55 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma03ams.nl.ibm.com with ESMTP id 3c5hbaw95x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 11 Nov 2021 11:54:55 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1ABBsqlA59179410
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 11 Nov 2021 11:54:52 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 31A9C4C04A;
-        Thu, 11 Nov 2021 11:54:52 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C22B44C050;
-        Thu, 11 Nov 2021 11:54:51 +0000 (GMT)
-Received: from [9.171.69.58] (unknown [9.171.69.58])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 11 Nov 2021 11:54:51 +0000 (GMT)
-Message-ID: <8f8d6807-1ab4-3782-b448-f1c629876194@linux.ibm.com>
-Date:   Thu, 11 Nov 2021 12:55:21 +0100
+        id S232815AbhKKMFl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Nov 2021 07:05:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51010 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230358AbhKKMFk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Nov 2021 07:05:40 -0500
+Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87335C061766
+        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 04:02:51 -0800 (PST)
+Received: by mail-wr1-x436.google.com with SMTP id u18so9403409wrg.5
+        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 04:02:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=7m+OpQtxzW/txd8CCI8RgHsDlwT0VoSBD46AL8PSlZk=;
+        b=i6koRGKJM92uFr+BYasecYTBAxI0pas7Ia+FXRdhox67EnUwgr1PWMuOrD8n5Kbvfy
+         hwNjJ8YQxA5c/sHSflfopF+JP2EcajUuOtN6v2PlL4+/cl+yEPu1YCrkIu1pVMRdop/n
+         FcZeBFRvzUxZ9nkl7Kdpvp11d+UnjtMeJGGwbyKyLmjkFSolAj7VZiA7MlDDOx/k8piE
+         DOy9Sjy0AfNBeNmtW/hWvnb7/DPgzbDn/t5Vbx8uP1i13kPYzx/mmsKinlCaczRmB8ZD
+         g7afiM78PaZyEWvQp4XxDyuhEy/nBgpFEGJ4X/b2m9jJh4zvXlh5IAJ6WxnSdQDwLPdV
+         /u5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=7m+OpQtxzW/txd8CCI8RgHsDlwT0VoSBD46AL8PSlZk=;
+        b=QsgnO1pp7Z+fen9czGMToflmlE5/Vb88/cTTyl7dsumkoRYvJtLmO2IUGB94VJEst6
+         j6/0oOTgFRqNcr5WZmeEsk/RnmBTzidTV6b+DUTZn4/EzDv8m0wA3xueR6eF2vGdXfVX
+         Q8Zv/FoLgqLLXGK/EIGAt4cTYQz98RrsJr3Tnl/MGsxHH4wtLo2GqrpMTTHldHGYLYmc
+         pjyZi5XUwn52RnEHXwrP0e9s3NvjlqChme4DayADXgBHBoYfN5kfviDzeK1v2D9dqu2K
+         HPc2sLTQewv2plRrduFZAQaQIQHX1otA5SPWv0gfu5jxDemte5MND6VuC9bS44dwms9w
+         y1og==
+X-Gm-Message-State: AOAM533p95Za9HGWWu5/s8JmvJedX2zIkOqALSU2fyA9yOLfhXGBlAWz
+        G+1IRur+KYAOp0APY8JSIiY=
+X-Google-Smtp-Source: ABdhPJxO37kDr7wXdQxlByzxI0iiYviHup6/27ELDK8SJ+fLvfoaSO/IB22TPkGvuqJg2UbH30LQWg==
+X-Received: by 2002:a05:6000:1688:: with SMTP id y8mr8256765wrd.420.1636632169751;
+        Thu, 11 Nov 2021 04:02:49 -0800 (PST)
+Received: from localhost.localdomain (cpc92698-cmbg18-2-0-cust123.5-4.cable.virginm.net. [82.30.113.124])
+        by smtp.gmail.com with ESMTPSA id o4sm10778343wmq.31.2021.11.11.04.02.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Nov 2021 04:02:49 -0800 (PST)
+From:   Sathyam Panda <panda.sathyam9@gmail.com>
+X-Google-Original-From: Sathyam Panda <sathyam.panda@arm.com>
+To:     will@kernel.org, julien.thierry.kdev@gmail.com, kvm@vger.kernel.org
+Cc:     andre.przywara@arm.com, alexandru.elisei@arm.com,
+        jean-philippe@linaro.org, vivek.gautam@arm.com,
+        sathyam.panda@arm.com
+Subject: [PATCH kvmtool RESENT] arm/pci: update interrupt-map only for legacy interrupts
+Date:   Thu, 11 Nov 2021 12:02:31 +0000
+Message-Id: <20211111120231.5468-1-sathyam.panda@arm.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [kvm-unit-tests PATCH v2] s390x: fixing I/O memory allocation
-Content-Language: en-US
-To:     David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com,
-        cohuck@redhat.com
-References: <20211111100153.86088-1-pmorel@linux.ibm.com>
- <31f51c84-c7f9-8251-39a8-3ff38496ae5e@redhat.com>
- <20211111112806.50e4d22a@p-imbrenda>
- <4828bb9d-6bfe-a9da-51a4-77f4e78f7556@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <4828bb9d-6bfe-a9da-51a4-77f4e78f7556@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 13Id2sbF1GuB_SLn-GIJSkqHJPF8tFhW
-X-Proofpoint-GUID: j1dOmtuc89YYbXe2NBMBd1n7OMBMebyw
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-11-11_03,2021-11-08_02,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
- malwarescore=0 spamscore=0 phishscore=0 lowpriorityscore=0
- priorityscore=1501 adultscore=0 impostorscore=0 suspectscore=0 bulkscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2111110066
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+The interrupt pin cell in "interrupt-map" property
+is defined only for legacy interrupts with a valid
+range in [1-4] corrspoding to INTA#..INTD#. And the
+PCI endpoint devices that support advance interrupt
+mechanism like MSI or MSI-X should not have an entry
+with value 0 in "interrupt-map". This patch takes
+care of this problem by avoiding redundant entries.
 
+Signed-off-by: Sathyam Panda <sathyam.panda@arm.com>
+Reviewed-by: Vivek Kumar Gautam <vivek.gautam@arm.com>
+---
+ arm/pci.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-On 11/11/21 11:39, David Hildenbrand wrote:
-> On 11.11.21 11:28, Claudio Imbrenda wrote:
->> On Thu, 11 Nov 2021 11:14:53 +0100
->> David Hildenbrand <david@redhat.com> wrote:
->>
->>> On 11.11.21 11:01, Pierre Morel wrote:
->>>> The allocator allocate pages it follows the size must be rounded
->>>> to pages before the allocation.
->>>>
->>>> Fixes: b0fe3988 "s390x: define UV compatible I/O allocation"
->>>>    
->>>
->>> What's the symptom of this? A failing test? Or is this just a pro-activ fix?
->>
->> if size < PAGE_SIZE then we would allocate 0, and in general we are
->> rounding down instead of up, which is obviously wrong.
->>
-> 
-> I know, but is this fixing a failing test or is this just a pro-activ fix?
-> 
-
-It is not fixing an existing test but it must be fixed before the VIRTIO 
-test that I am currently developing.
-In the current tests we do not allocate sizes greater than 1 page that 
-are no multiple of pages.
-
+diff --git a/arm/pci.c b/arm/pci.c
+index 2251f62..e44e453 100644
+--- a/arm/pci.c
++++ b/arm/pci.c
+@@ -80,6 +80,16 @@ void pci__generate_fdt_nodes(void *fdt)
+ 		u8 irq = pci_hdr->irq_line;
+ 		u32 irq_flags = pci_hdr->irq_type;
+ 
++		/*
++		 * Avoid adding entries in "interrupt-map" for devices that
++		 * will be using advance interrupt mechanisms like MSI or
++		 * MSI-X instead of legacy interrupt pins INTA#..INTD#
++		 */
++		if (pin == 0) {
++			dev_hdr = device__next_dev(dev_hdr);
++			continue;
++		}
++
+ 		*entry = (struct of_interrupt_map_entry) {
+ 			.pci_irq_mask = {
+ 				.pci_addr = {
 -- 
-Pierre Morel
-IBM Lab Boeblingen
+2.25.1
+
