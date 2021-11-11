@@ -2,56 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 723D244CE13
-	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 01:03:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 18BFA44CE14
+	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 01:03:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234331AbhKKAGS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Nov 2021 19:06:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60466 "EHLO
+        id S234347AbhKKAGT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Nov 2021 19:06:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234287AbhKKAGQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Nov 2021 19:06:16 -0500
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EEC8C061766
-        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 16:03:28 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id t24-20020a252d18000000b005c225ae9e16so6602743ybt.15
-        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 16:03:28 -0800 (PST)
+        with ESMTP id S234321AbhKKAGR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Nov 2021 19:06:17 -0500
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E7CDC061766
+        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 16:03:29 -0800 (PST)
+Received: by mail-pg1-x54a.google.com with SMTP id h35-20020a63f923000000b002d5262fdfc4so2342361pgi.2
+        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 16:03:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=BnDYr7XeHG59cPA98gYZELhabwdzUR4OfVOWYOyZ6EU=;
-        b=sdOEnVAJx8GbSLGQSvAV1rJl6GRwRVQrZiW9VTo26tMd8jFVcv5Ol48U79d8/enJSq
-         wdlAHGAxz3wLd9A7PVO2bdaiTh7HbW9ElMLBX1lByNluz3pb9UCBtZ4e7ySTRD+pJeB1
-         Sh4BV6Ni0bYmEwOU3kf/VUTZa6vGs9ECMjiRQb/SfFMfF5prrx+CqsBEuS1JWpiH90l5
-         fuGr+C7Zg+7kAXkZPKU7xMS/X/XrDaOUteC+9o3qzIJyR9aIXhfITOrVUF/vFy9x8hSn
-         oFovH5y1oTuqfJrcp9Ud/EES+aQswnpFNzIT01zvdh0UhVkHdwiz59re5RdfvAaiEq2O
-         xEAQ==
+        bh=lq+Ydb05ASTFOfpIegkfapvb1bR6QTHCEmkE3rw574Q=;
+        b=KGIe8YCYy1RvGRhVtiuQgWOCZA4MTGxgCAfNEuwQHkxa2UG9RG3nV1KUFkREUHGZf7
+         lBtVkJWKlJwFj6Rz5UOwB3zNPt1tbphHV6jLZSyDGWfUP6BDjSZqln7Dnm+KkATfpkWv
+         vXatnx0cbKRsWkmtDB6K1pdWWWWYzSVDBU54ZuCPSZXlF9sYprzcEpXSmiFkXbLl6UJM
+         0w2IgZdd2LevLAdN/N1QWiYGmwEkGJyq64XPmgRRVIO6QvZzl4uJ8pwL0gqaiIyhaNkV
+         Z+IO6TDon5/vb+enHoX5qp+m0TwMiRU4YrV9LwiNtUYuLFFfdwlr/04iBu1xG75TZk1E
+         K0+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=BnDYr7XeHG59cPA98gYZELhabwdzUR4OfVOWYOyZ6EU=;
-        b=IpvwRuks6ITkutNxXNCp2SghptqMda2YCUaZbOz1Qchc+S7TXXDmVjtVsPlEINTZiV
-         45o3XEETd++bxn2YaU7B566wSuR1RczyNry0uELH4eMswDXrzgiwvY8jMGpzHxOTIMMR
-         2YYMQU9TpFjAMRl3OIZZL32JS/DglwNtVf/hY0IjoLQpeHI+9WXHiCUWqiLhmOuJBfop
-         BeKnzxehkMSD1RbxvLmnMspQlG0NjJ3Qim4aSigypamLkViZAD3Gtbsi9T7mrLk81/L9
-         Jo18mGKBmjsnl2MLyXMveqQtamqBG2GdFhMx1Tzdml8fE7s7PqvGycyoRXZwwJhGf2Hh
-         OLsw==
-X-Gm-Message-State: AOAM530kCPrhLh9dfB3ci050po7q8ddzWgWqSkjWEhcgo693EjhImRfC
-        r/xxSUYWsh/t4+ybU1MUJMihSU4ySXIUcQ==
-X-Google-Smtp-Source: ABdhPJw4KmYhJehCaO58EiAB8UZRtWym1d/vti55KXrbtM6qhbk60HDJlXidasiZR+EiQ5ScjqBjjh3ahQusng==
+        bh=lq+Ydb05ASTFOfpIegkfapvb1bR6QTHCEmkE3rw574Q=;
+        b=A4Nod6vuvh+m7up1r0V9KpyW8KONsRxz51sJ9VGH5wAxvi+ijPZ06Itz9VstuVqxZI
+         Ck20LpDb2z0pk8lc7t9PdAr1aTMlOhI8/cf6lmnupUAju7IXT88So9u47fhSH59qrsx4
+         ueLm0g3UWEVQ2gRCh8O8Pmm78iHOH1NjW9N3VNSqS7+26AH1gaWlMkMB/sB8aJ81hclP
+         iHPmN6TTX9azZ+cZMzZim5rBadIv0Q4r1wQa+5yHqCVsTziifeX9V9dxIbr/ml0CEhGp
+         0MBudOl4WNiezd7ciqr74gFIeHxg+Pjaf4S0oeN8KvC2o+GXhhxhJgOB4SZ5rGRur7OA
+         L8vA==
+X-Gm-Message-State: AOAM5335jAqoEZcZ5Di+6xnFjA9hG0mt99LkZk8wVnvHdM0FiV1HYTPX
+        HzyoFKYN4TmikGv34WVHWx9djwfpsSFAVw==
+X-Google-Smtp-Source: ABdhPJwuCOVEViwhvkIcBY9LKBt6z6Hutnz9K4/e6AYko7uQZDJixzhFLByvnza6IJ4OURip1Tq6lIKeDnSExw==
 X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a25:748a:: with SMTP id
- p132mr3421484ybc.207.1636589007776; Wed, 10 Nov 2021 16:03:27 -0800 (PST)
-Date:   Thu, 11 Nov 2021 00:03:05 +0000
+ (user=dmatlack job=sendgmr) by 2002:a17:90a:db81:: with SMTP id
+ h1mr22160549pjv.46.1636589009128; Wed, 10 Nov 2021 16:03:29 -0800 (PST)
+Date:   Thu, 11 Nov 2021 00:03:06 +0000
 In-Reply-To: <20211111000310.1435032-1-dmatlack@google.com>
-Message-Id: <20211111000310.1435032-8-dmatlack@google.com>
+Message-Id: <20211111000310.1435032-9-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20211111000310.1435032-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.34.0.rc1.387.gb447b232ab-goog
-Subject: [PATCH v2 07/12] KVM: selftests: Use perf util's per-vCPU GPA/pages
- in demand paging test
+Subject: [PATCH v2 08/12] KVM: selftests: Move per-VM GPA into perf_test_args
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
@@ -69,64 +68,124 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Sean Christopherson <seanjc@google.com>
 
-Grab the per-vCPU GPA and number of pages from perf_util in the demand
-paging test instead of duplicating perf_util's calculations.
+Move the per-VM GPA into perf_test_args instead of storing it as a
+separate global variable.  It's not obvious that guest_test_phys_mem
+holds a GPA, nor that it's connected/coupled with per_vcpu->gpa.
 
-Note, this may or may not result in a functional change.  It's not clear
-that the test's calculations are guaranteed to yield the same value as
-perf_util, e.g. if guest_percpu_mem_size != vcpu_args->pages.
+No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 Reviewed-by: Ben Gardon <bgardon@google.com>
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- .../selftests/kvm/demand_paging_test.c        | 21 +++++--------------
- 1 file changed, 5 insertions(+), 16 deletions(-)
+ .../selftests/kvm/include/perf_test_util.h    |  8 +------
+ .../selftests/kvm/lib/perf_test_util.c        | 21 +++++++------------
+ .../kvm/memslot_modification_stress_test.c    |  2 +-
+ 3 files changed, 10 insertions(+), 21 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
-index 1510b21e6306..3c729a0a1ab1 100644
---- a/tools/testing/selftests/kvm/demand_paging_test.c
-+++ b/tools/testing/selftests/kvm/demand_paging_test.c
-@@ -322,26 +322,15 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 		TEST_ASSERT(pipefds, "Unable to allocate memory for pipefd");
+diff --git a/tools/testing/selftests/kvm/include/perf_test_util.h b/tools/testing/selftests/kvm/include/perf_test_util.h
+index 20aec72fe7b8..d7cde1ab2a85 100644
+--- a/tools/testing/selftests/kvm/include/perf_test_util.h
++++ b/tools/testing/selftests/kvm/include/perf_test_util.h
+@@ -29,6 +29,7 @@ struct perf_test_vcpu_args {
+ struct perf_test_args {
+ 	struct kvm_vm *vm;
+ 	uint64_t host_page_size;
++	uint64_t gpa;
+ 	uint64_t guest_page_size;
+ 	int wr_fract;
  
- 		for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++) {
--			vm_paddr_t vcpu_gpa;
-+			struct perf_test_vcpu_args *vcpu_args;
- 			void *vcpu_hva;
- 			void *vcpu_alias;
--			uint64_t vcpu_mem_size;
+@@ -37,13 +38,6 @@ struct perf_test_args {
  
+ extern struct perf_test_args perf_test_args;
+ 
+-/*
+- * Guest physical memory offset of the testing memory slot.
+- * This will be set to the topmost valid physical address minus
+- * the test memory size.
+- */
+-extern uint64_t guest_test_phys_mem;
 -
--			if (p->partition_vcpu_memory_access) {
--				vcpu_gpa = guest_test_phys_mem +
--					   (vcpu_id * guest_percpu_mem_size);
--				vcpu_mem_size = guest_percpu_mem_size;
--			} else {
--				vcpu_gpa = guest_test_phys_mem;
--				vcpu_mem_size = guest_percpu_mem_size * nr_vcpus;
--			}
--			PER_VCPU_DEBUG("Added VCPU %d with test mem gpa [%lx, %lx)\n",
--				       vcpu_id, vcpu_gpa, vcpu_gpa + vcpu_mem_size);
-+			vcpu_args = &perf_test_args.vcpu_args[vcpu_id];
+ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int vcpus,
+ 				   uint64_t vcpu_memory_bytes, int slots,
+ 				   enum vm_mem_backing_src_type backing_src);
+diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
+index d9c6bcb7964d..0fc2d834c1c7 100644
+--- a/tools/testing/selftests/kvm/lib/perf_test_util.c
++++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
+@@ -10,8 +10,6 @@
  
- 			/* Cache the host addresses of the region */
--			vcpu_hva = addr_gpa2hva(vm, vcpu_gpa);
--			vcpu_alias = addr_gpa2alias(vm, vcpu_gpa);
-+			vcpu_hva = addr_gpa2hva(vm, vcpu_args->gpa);
-+			vcpu_alias = addr_gpa2alias(vm, vcpu_args->gpa);
+ struct perf_test_args perf_test_args;
  
- 			/*
- 			 * Set up user fault fd to handle demand paging
-@@ -355,7 +344,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 					    pipefds[vcpu_id * 2], p->uffd_mode,
- 					    p->uffd_delay, &uffd_args[vcpu_id],
- 					    vcpu_hva, vcpu_alias,
--					    vcpu_mem_size);
-+					    vcpu_args->pages * perf_test_args.guest_page_size);
- 		}
+-uint64_t guest_test_phys_mem;
+-
+ /*
+  * Guest virtual memory offset of the testing memory slot.
+  * Must not conflict with identity mapped test code.
+@@ -97,20 +95,18 @@ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int vcpus,
+ 		    guest_num_pages, vm_get_max_gfn(vm), vcpus,
+ 		    vcpu_memory_bytes);
+ 
+-	guest_test_phys_mem = (vm_get_max_gfn(vm) - guest_num_pages) *
+-			      pta->guest_page_size;
+-	guest_test_phys_mem = align_down(guest_test_phys_mem, backing_src_pagesz);
++	pta->gpa = (vm_get_max_gfn(vm) - guest_num_pages) * pta->guest_page_size;
++	pta->gpa = align_down(pta->gpa, backing_src_pagesz);
+ #ifdef __s390x__
+ 	/* Align to 1M (segment size) */
+-	guest_test_phys_mem = align_down(guest_test_phys_mem, 1 << 20);
++	pta->gpa = align_down(pta->gpa, 1 << 20);
+ #endif
+-	pr_info("guest physical test memory offset: 0x%lx\n", guest_test_phys_mem);
++	pr_info("guest physical test memory offset: 0x%lx\n", pta->gpa);
+ 
+ 	/* Add extra memory slots for testing */
+ 	for (i = 0; i < slots; i++) {
+ 		uint64_t region_pages = guest_num_pages / slots;
+-		vm_paddr_t region_start = guest_test_phys_mem +
+-			region_pages * pta->guest_page_size * i;
++		vm_paddr_t region_start = pta->gpa + region_pages * pta->guest_page_size * i;
+ 
+ 		vm_userspace_mem_region_add(vm, backing_src, region_start,
+ 					    PERF_TEST_MEM_SLOT_INDEX + i,
+@@ -118,7 +114,7 @@ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int vcpus,
  	}
  
+ 	/* Do mapping for the demand paging memory slot */
+-	virt_map(vm, guest_test_virt_mem, guest_test_phys_mem, guest_num_pages);
++	virt_map(vm, guest_test_virt_mem, pta->gpa, guest_num_pages);
+ 
+ 	ucall_init(vm, NULL);
+ 
+@@ -148,13 +144,12 @@ void perf_test_setup_vcpus(struct kvm_vm *vm, int vcpus,
+ 					 (vcpu_id * vcpu_memory_bytes);
+ 			vcpu_args->pages = vcpu_memory_bytes /
+ 					   pta->guest_page_size;
+-			vcpu_args->gpa = guest_test_phys_mem +
+-					 (vcpu_id * vcpu_memory_bytes);
++			vcpu_args->gpa = pta->gpa + (vcpu_id * vcpu_memory_bytes);
+ 		} else {
+ 			vcpu_args->gva = guest_test_virt_mem;
+ 			vcpu_args->pages = (vcpus * vcpu_memory_bytes) /
+ 					   pta->guest_page_size;
+-			vcpu_args->gpa = guest_test_phys_mem;
++			vcpu_args->gpa = pta->gpa;
+ 		}
+ 
+ 		vcpu_args_set(vm, vcpu_id, 1, vcpu_id);
+diff --git a/tools/testing/selftests/kvm/memslot_modification_stress_test.c b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
+index 4cfcafea9f5a..d105180d5e8c 100644
+--- a/tools/testing/selftests/kvm/memslot_modification_stress_test.c
++++ b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
+@@ -80,7 +80,7 @@ static void add_remove_memslot(struct kvm_vm *vm, useconds_t delay,
+ 	 * Add the dummy memslot just below the perf_test_util memslot, which is
+ 	 * at the top of the guest physical address space.
+ 	 */
+-	gpa = guest_test_phys_mem - pages * vm_get_page_size(vm);
++	gpa = perf_test_args.gpa - pages * vm_get_page_size(vm);
+ 
+ 	for (i = 0; i < nr_modifications; i++) {
+ 		usleep(delay);
 -- 
 2.34.0.rc1.387.gb447b232ab-goog
 
