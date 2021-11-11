@@ -2,102 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B46244D787
-	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 14:47:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A82D544D795
+	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 14:52:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233546AbhKKNup (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Nov 2021 08:50:45 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22217 "EHLO
+        id S233299AbhKKNz0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Nov 2021 08:55:26 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46445 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233320AbhKKNup (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 11 Nov 2021 08:50:45 -0500
+        by vger.kernel.org with ESMTP id S232513AbhKKNzZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 11 Nov 2021 08:55:25 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636638476;
+        s=mimecast20190719; t=1636638756;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=xahSpUdRnqSm12epmOAhtr6bKCO9iTR18R9pvrUHXh8=;
-        b=Mxcm5Nch1Zg0kZfuDnhtGfG6oZvAbRUtOJOvaVZXYyVIJ9MCkj1P+N8peEio2xJH4Hw9eC
-        +3nQL/u6k0z1GeaMa9hBMXjPN7Dv7dKGQbr8dUwunTVs4sERtv8hcZr7FshshH7JAiPRsQ
-        jVDUoQLLcF9IrCMegmYw/PNZhBX6GLE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-528-h4VG2NzdPL6IpNGT5rgpxw-1; Thu, 11 Nov 2021 08:47:52 -0500
-X-MC-Unique: h4VG2NzdPL6IpNGT5rgpxw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9CEF3871810;
-        Thu, 11 Nov 2021 13:47:51 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.40.192.82])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D9AA556A97;
-        Thu, 11 Nov 2021 13:47:34 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=wKsmhhE87NncsEB4OeLA0vuGnBO/DIw9o6OFCfgf5e0=;
+        b=aYbiMci/Vnwv/1JoLu4knYpBtLxb96iudS09+ING2vGQtFmJQVP5kErJ9UESGO9hpvhVjP
+        xRPOZhYwmwx/jfSsRZPAm0TlrpOfpgfHtPpNlbWIAKUi8KUbuVKxgrsNSOeV0snOOxyFd7
+        NDXRk72THlBCYFkFOL0E63Zct4XpDqg=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-108-r_GyGHesPduXI8c0xfNWjQ-1; Thu, 11 Nov 2021 08:52:35 -0500
+X-MC-Unique: r_GyGHesPduXI8c0xfNWjQ-1
+Received: by mail-ed1-f70.google.com with SMTP id y12-20020a056402270c00b003e28de6e995so5438678edd.11
+        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 05:52:34 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=wKsmhhE87NncsEB4OeLA0vuGnBO/DIw9o6OFCfgf5e0=;
+        b=w+WRxYrf5izMUuJUF94eqJkm+9Pped8xtqMZB+wTL5jwX8gIsL+bm46txlM36XAULh
+         L/Bl0ALPPbNAD9yEjJ3XKjR1GeMK5c0eNaqewz6x5PcXkBhPcvceyvc0hbsckpxyMERy
+         v3MiSPojh3nShMhwd0Y3o6V4FLVIqQR6C+LuB66nqrnKSFtrLykf0w/XmScjUOpyX/mD
+         tsjru6GQMzzHa8y3Gu0QW3w0gwt17vdzaKwk6yzcuiqsek5/OYDUfGiiuCZjo5JlBbgp
+         JVhvgFymdfOlKMExZyHaPgouyaGzp0MAvwUpBnOWKtB+tDlOePLE/mcpnZHh6sshzG31
+         ERjg==
+X-Gm-Message-State: AOAM531VQZE4D5Ssay7okS9EEYhFowGJckOrn+9I/3ov+qVmWP/lXcTN
+        +yZsRusqNDmfGl5Z4DwA9O9E9lLQ6Qt76o1mnoaikskWN34/qXZbw6lN5s8RilRb7lqLvnUZGUq
+        NWqOGpMU94Jic
+X-Received: by 2002:a17:906:2ada:: with SMTP id m26mr4098595eje.571.1636638753908;
+        Thu, 11 Nov 2021 05:52:33 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJz6tAm1LlFb1d15hHhP2P4MAOZSTk71Uf2lUs5DC6h5peV/1U8KiWmiR0dBTcZYlldhiwQCEw==
+X-Received: by 2002:a17:906:2ada:: with SMTP id m26mr4098555eje.571.1636638753733;
+        Thu, 11 Nov 2021 05:52:33 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.gmail.com with ESMTPSA id q8sm1648831edd.26.2021.11.11.05.52.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 11 Nov 2021 05:52:33 -0800 (PST)
+Message-ID: <49852dbc-548d-5bf1-6254-ec69d3041961@redhat.com>
+Date:   Thu, 11 Nov 2021 14:52:31 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH v5 2/7] nSVM: introduce smv->nested.save to cache save
+ area fields
+Content-Language: en-US
+To:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        kvm@vger.kernel.org
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH RFC] KVM: x86: Drop arbitraty KVM_SOFT_MAX_VCPUS
-Date:   Thu, 11 Nov 2021 14:47:33 +0100
-Message-Id: <20211111134733.86601-1-vkuznets@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+References: <20211103140527.752797-1-eesposit@redhat.com>
+ <20211103140527.752797-3-eesposit@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20211103140527.752797-3-eesposit@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM_CAP_NR_VCPUS is used to get the "recommended" maximum number of
-VCPUs and arm64/mips/riscv report num_online_cpus(). Powerpc reports
-either num_online_cpus() or num_present_cpus(), s390 has multiple
-constants depending on hardware features. On x86, KVM reports an
-arbitrary value of '710' which is supposed to be the maximum tested
-value but it's possible to test all KVM_MAX_VCPUS even when there are
-less physical CPUs available.
+On 11/3/21 15:05, Emanuele Giuseppe Esposito wrote:
+> Note that in svm_set_nested_state() we want to cache the L2
+> save state only if we are in normal non guest mode, because
+> otherwise it is not touched.
 
-Drop the arbitrary '710' value and return num_online_cpus() on x86 as
-well. The recommendation will match other architectures and will mean
-'no CPU overcommit'.
+I think that call to nested_copy_vmcb_save_to_cache is not necessary at 
+all, because svm->nested.save is not used afterwards and is not valid 
+after VMRUN.
 
-For reference, QEMU only queries KVM_CAP_NR_VCPUS to print a warning
-when the requested vCPU number exceeds it. The static limit of '710'
-is quite weird as smaller systems with just a few physical CPUs should
-certainly "recommend" less.
+The relevant checks have already been done before:
 
-Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- arch/x86/include/asm/kvm_host.h | 1 -
- arch/x86/kvm/x86.c              | 2 +-
- 2 files changed, 1 insertion(+), 2 deletions(-)
+         if (!(vcpu->arch.efer & EFER_SVME)) {
+                 /* GIF=1 and no guest mode are required if SVME=0.  */
+                 if (kvm_state->flags != KVM_STATE_NESTED_GIF_SET)
+                         return -EINVAL;
+         }
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 88fce6ab4bbd..0232a00598f2 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -38,7 +38,6 @@
- #define __KVM_HAVE_ARCH_VCPU_DEBUGFS
- 
- #define KVM_MAX_VCPUS 1024
--#define KVM_SOFT_MAX_VCPUS 710
- 
- /*
-  * In x86, the VCPU ID corresponds to the APIC ID, and APIC IDs
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index ac83d873d65b..91ef1b872b90 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4137,7 +4137,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		r = !static_call(kvm_x86_cpu_has_accelerated_tpr)();
- 		break;
- 	case KVM_CAP_NR_VCPUS:
--		r = KVM_SOFT_MAX_VCPUS;
-+		r = num_online_cpus();
- 		break;
- 	case KVM_CAP_MAX_VCPUS:
- 		r = KVM_MAX_VCPUS;
--- 
-2.33.1
+	...
+
+         /*
+          * Processor state contains L2 state.  Check that it is
+          * valid for guest mode (see nested_vmcb_check_save).
+          */
+         cr0 = kvm_read_cr0(vcpu);
+         if (((cr0 & X86_CR0_CD) == 0) && (cr0 & X86_CR0_NW))
+                 goto out_free;
+
+(and all other checks are done by KVM_SET_SREGS, KVM_SET_DEBUGREGS etc.)
+
+Paolo
 
