@@ -2,118 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0155E44D5B8
-	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 12:20:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6FCF544D635
+	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 12:55:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233098AbhKKLXA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Nov 2021 06:23:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41410 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229668AbhKKLW7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Nov 2021 06:22:59 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74BAFC061766;
-        Thu, 11 Nov 2021 03:20:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Rwfbmkoas7VebHdsAPeFky9gQjs68+546BvuzLh8KOw=; b=nYW2D8WwDzTJBO/3hqaCnKl+rG
-        Juv9WqI4u6yj05w2X63ioSsTn5cEdV6jDA351V4/q9yydOsa7FW1hSEMYTFCpYM+34h+eLD05vIuf
-        aJw4KwauVgbsmZhkliH2C6iKJqojPUXuWEPcd38B1dtT88o84f5Sp/oMWfV8h9DaHJOesh+0xGqtP
-        n4R4aYuGwPrCobAnDwuTl24Bkv/pjQsvWW5g0gG3sYG1rBE7VdaHTNsjeZ1KJKR5jtxxyS54nzBQU
-        j+XeoDvq2JxdCtTPVCSG+YQMQo1n/omY8trwJKb2fdS0v2mWaEEA6whxFBt8nI2ZCCfGYmM487YiO
-        s2UIUTPg==;
-Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1ml873-002g98-8m; Thu, 11 Nov 2021 11:19:26 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 627DF3000D5;
-        Thu, 11 Nov 2021 12:19:22 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id 304F0201EC1CF; Thu, 11 Nov 2021 12:19:21 +0100 (CET)
-Date:   Thu, 11 Nov 2021 12:19:21 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Will Deacon <will@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Russell King <linux@armlinux.org.uk>,
-        Marc Zyngier <maz@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Guo Ren <guoren@kernel.org>, Nick Hu <nickhu@andestech.com>,
-        Greentime Hu <green.hu@gmail.com>,
-        Vincent Chen <deanbo422@gmail.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Juergen Gross <jgross@suse.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        linux-perf-users@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-csky@vger.kernel.org, linux-riscv@lists.infradead.org,
-        kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
-        Artem Kashkanov <artem.kashkanov@intel.com>,
-        Like Xu <like.xu.linux@gmail.com>,
-        Like Xu <like.xu@linux.intel.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: Re: [PATCH v4 00/17] perf: KVM: Fix, optimize, and clean up callbacks
-Message-ID: <YYz8OTWtkcFUkvbZ@hirez.programming.kicks-ass.net>
-References: <20211111020738.2512932-1-seanjc@google.com>
+        id S233311AbhKKL5r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Nov 2021 06:57:47 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:42830 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233245AbhKKL5r (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 11 Nov 2021 06:57:47 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1ABAvnsD021890
+        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 11:54:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=muRukBJ8i0haFQjSTGNVrEoJbGz5jxx8cYxIWGNvG4w=;
+ b=Z+HprmeyH/SPkTCnr1rBV2hUSmdpjwybJDmp33JsLVha4nw1U1nl+By/WRlXvQ5IlnA/
+ 8YzumBsb64sDZMSxFJFg9uf7JSN/0wjJWVZuLh8K41lH4fjeIklX0w2HlqE1LSmopWwU
+ F2n5N1nk1I8GLD9cWS7Ezl3g5OFvgeB9BNOM5B2WrykIh5ILlbU9TDrHjmbOIUrxvj/n
+ 9o/A70rzQKdwunls9rEZX+RlgD+oIDI1mGPBgx81QMmbV79I2jOnvp6xhydVH7GfHzqJ
+ FePbXF7yLw/UYri0sVaD8bqJuQOeI6N5ahttFmD8lW7zZwDEbpRML4lmpwXBumBRoSOM gA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3c8wbp8jq0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 11:54:58 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1ABBfYvZ025400
+        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 11:54:57 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3c8wbp8jp8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 11 Nov 2021 11:54:57 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1ABBqrT9013321;
+        Thu, 11 Nov 2021 11:54:55 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma03ams.nl.ibm.com with ESMTP id 3c5hbaw95x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 11 Nov 2021 11:54:55 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1ABBsqlA59179410
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 11 Nov 2021 11:54:52 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 31A9C4C04A;
+        Thu, 11 Nov 2021 11:54:52 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C22B44C050;
+        Thu, 11 Nov 2021 11:54:51 +0000 (GMT)
+Received: from [9.171.69.58] (unknown [9.171.69.58])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu, 11 Nov 2021 11:54:51 +0000 (GMT)
+Message-ID: <8f8d6807-1ab4-3782-b448-f1c629876194@linux.ibm.com>
+Date:   Thu, 11 Nov 2021 12:55:21 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211111020738.2512932-1-seanjc@google.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [kvm-unit-tests PATCH v2] s390x: fixing I/O memory allocation
+Content-Language: en-US
+To:     David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com,
+        cohuck@redhat.com
+References: <20211111100153.86088-1-pmorel@linux.ibm.com>
+ <31f51c84-c7f9-8251-39a8-3ff38496ae5e@redhat.com>
+ <20211111112806.50e4d22a@p-imbrenda>
+ <4828bb9d-6bfe-a9da-51a4-77f4e78f7556@redhat.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <4828bb9d-6bfe-a9da-51a4-77f4e78f7556@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 13Id2sbF1GuB_SLn-GIJSkqHJPF8tFhW
+X-Proofpoint-GUID: j1dOmtuc89YYbXe2NBMBd1n7OMBMebyw
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
+ definitions=2021-11-11_03,2021-11-08_02,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
+ malwarescore=0 spamscore=0 phishscore=0 lowpriorityscore=0
+ priorityscore=1501 adultscore=0 impostorscore=0 suspectscore=0 bulkscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2111110066
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 11, 2021 at 02:07:21AM +0000, Sean Christopherson wrote:
 
-> Like Xu (1):
->   perf/core: Rework guest callbacks to prepare for static_call support
+
+On 11/11/21 11:39, David Hildenbrand wrote:
+> On 11.11.21 11:28, Claudio Imbrenda wrote:
+>> On Thu, 11 Nov 2021 11:14:53 +0100
+>> David Hildenbrand <david@redhat.com> wrote:
+>>
+>>> On 11.11.21 11:01, Pierre Morel wrote:
+>>>> The allocator allocate pages it follows the size must be rounded
+>>>> to pages before the allocation.
+>>>>
+>>>> Fixes: b0fe3988 "s390x: define UV compatible I/O allocation"
+>>>>    
+>>>
+>>> What's the symptom of this? A failing test? Or is this just a pro-activ fix?
+>>
+>> if size < PAGE_SIZE then we would allocate 0, and in general we are
+>> rounding down instead of up, which is obviously wrong.
+>>
 > 
-> Sean Christopherson (16):
->   perf: Protect perf_guest_cbs with RCU
->   KVM: x86: Register perf callbacks after calling vendor's
->     hardware_setup()
->   KVM: x86: Register Processor Trace interrupt hook iff PT enabled in
->     guest
->   perf: Stop pretending that perf can handle multiple guest callbacks
->   perf: Drop dead and useless guest "support" from arm, csky, nds32 and
->     riscv
->   perf: Add wrappers for invoking guest callbacks
->   perf: Force architectures to opt-in to guest callbacks
->   perf/core: Use static_call to optimize perf_guest_info_callbacks
->   KVM: x86: Drop current_vcpu for kvm_running_vcpu + kvm_arch_vcpu
->     variable
->   KVM: x86: More precisely identify NMI from guest when handling PMI
->   KVM: Move x86's perf guest info callbacks to generic KVM
->   KVM: x86: Move Intel Processor Trace interrupt handler to vmx.c
->   KVM: arm64: Convert to the generic perf callbacks
->   KVM: arm64: Hide kvm_arm_pmu_available behind CONFIG_HW_PERF_EVENTS=y
->   KVM: arm64: Drop perf.c and fold its tiny bits of code into arm.c
->   perf: Drop guest callback (un)register stubs
+> I know, but is this fixing a failing test or is this just a pro-activ fix?
+> 
 
-Thanks!, I'll queue them up and push them into tip/perf/core once -rc1
-happens.
+It is not fixing an existing test but it must be fixed before the VIRTIO 
+test that I am currently developing.
+In the current tests we do not allocate sizes greater than 1 page that 
+are no multiple of pages.
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
