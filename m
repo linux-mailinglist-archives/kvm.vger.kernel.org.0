@@ -2,122 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E30344DB49
-	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 18:50:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5162244DB4C
+	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 18:52:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234416AbhKKRxI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Nov 2021 12:53:08 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59228 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233361AbhKKRxC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 11 Nov 2021 12:53:02 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1ABHD2w8006939;
-        Thu, 11 Nov 2021 17:50:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=V9yVX6IY4CPqCaNqAgLBefqe37sdzWCTZT6eUzc7CPk=;
- b=TMB1+yW8v0gUOG06nd2F4gHeatozPORib4hQqwIamMtlzK07msYUtAldiFrvkRbvmQsb
- Jo8lKNcQfnFbvWyYGovPFP4dYl33vU55AeTWZZUa0L2vKycWHLJEudJUKG2DNN/gmOmG
- +6rwcm2fW70HWMSznmC6PSEf6mVMPvKqxVrRwv+8GyNhr5BAyat5Aevfk1CBWf1fTzFk
- 0c3pG4KhVdjBsUvaYVOzv2FdlslWH0tcupAp0mETlG4/I+ms2KlDo8dqUAXVClf4Ovtr
- YgR6baCIExjAAsnpZgCMVgEoPyFy7n9TMiigLbqP9LYZRckf4ZkV50qgDHPC3LmyaSWq sg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3c97cpgrr2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 11 Nov 2021 17:50:12 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1ABHY8Yh004772;
-        Thu, 11 Nov 2021 17:50:12 GMT
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3c97cpgrqm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 11 Nov 2021 17:50:12 +0000
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1ABHlmWb025833;
-        Thu, 11 Nov 2021 17:50:11 GMT
-Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
-        by ppma03dal.us.ibm.com with ESMTP id 3c5hbd5097-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 11 Nov 2021 17:50:11 +0000
-Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
-        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1ABHo9C134210290
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 11 Nov 2021 17:50:09 GMT
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C5C1912405A;
-        Thu, 11 Nov 2021 17:50:09 +0000 (GMT)
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2A3DC124055;
-        Thu, 11 Nov 2021 17:50:07 +0000 (GMT)
-Received: from farman-thinkpad-t470p (unknown [9.211.106.148])
-        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
-        Thu, 11 Nov 2021 17:50:06 +0000 (GMT)
-Message-ID: <5c061ba86d5f542380d3d99ce54c5d2331a98b8d.camel@linux.ibm.com>
-Subject: Re: [RFC PATCH v3 2/2] KVM: s390: Extend the USER_SIGP capability
-From:   Eric Farman <farman@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>
-Cc:     Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Date:   Thu, 11 Nov 2021 12:50:05 -0500
-In-Reply-To: <55653464-8a84-d741-1b7e-eb4a163f121f@linux.ibm.com>
-References: <20211110203322.1374925-1-farman@linux.ibm.com>
-         <20211110203322.1374925-3-farman@linux.ibm.com>
-         <55653464-8a84-d741-1b7e-eb4a163f121f@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-16.el8) 
-Mime-Version: 1.0
+        id S233717AbhKKRyu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Nov 2021 12:54:50 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:56529 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233361AbhKKRyu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 11 Nov 2021 12:54:50 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1636653120;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+jq8wGq2890McAb97SRyc2p1x5wYZX4e7vFXhMT4Yzs=;
+        b=ONJQ2s5HnqxN4YIqt+NPeK0/hL8OlXQrYIzrEObUi67NvNiWWrfB9g4yYg7Zq60NWxId/m
+        nPMFX5VJ96m29DrGYQAmWxCmO0gHRLgMMdO7/Q2kD/L0HjYESt1TayHHLru5zcrK7D/kEN
+        KhUjCgN0iAqXy1gFsi+okuZV3rslnw4=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-324-HKzjXsq7NMWtJwZDjwM1sA-1; Thu, 11 Nov 2021 12:51:59 -0500
+X-MC-Unique: HKzjXsq7NMWtJwZDjwM1sA-1
+Received: by mail-wm1-f70.google.com with SMTP id a67-20020a1c7f46000000b00333629ed22dso1548010wmd.6
+        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 09:51:58 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=+jq8wGq2890McAb97SRyc2p1x5wYZX4e7vFXhMT4Yzs=;
+        b=yxoL/j6hrOKcrvo+5wvA0HlVxl347wZaEv2NJFPKxiJKxGBQI6PNjBZr5phBAE6VaC
+         eAZ6O7mKQKFqItUQlBiqdZ98JBjouq0xWZ1B2FUCsgcpiSKTQ+CUzyx/4koYhA696wYE
+         lQ8E8dwcLmpagC/yuJ/xdGMf2tEzxhhEq5hm1MhjHVxJSC1IyZzfMNXRGltqre42sWnt
+         ViBWR/otoQ9O+is6pYuXDXV+jW9CFPHNcYmiUg8nBFbmGYVaYVOx43s42+RYVgNr6XY5
+         GYXQU9CUKGsVHE6bInJh3WiawRy3Lai3kvbXR8v+STD+VByL9PV1q1GGwzagM9UWsnyP
+         NhrA==
+X-Gm-Message-State: AOAM530/da5qHQF5LRwEa/kmbmAS0LipOV+TOn6sfbgXf4qafgB0szMA
+        kWMPRJq650Ap65ZKhTBrNKkDNbEM4YzyLJ7Ym/bv2wDZ4LRlipcPPeZcRL0CtfOWNkS1cubr0lf
+        d+7ymEh/h+Vqk
+X-Received: by 2002:a05:600c:a55:: with SMTP id c21mr27404928wmq.191.1636653117948;
+        Thu, 11 Nov 2021 09:51:57 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwx8pvz+OZOZYRwRviIiEBR9CIg42Cnxv/B8GOna7UMplCeGaoyJlMuGSARvnCJ2Uobov5TIA==
+X-Received: by 2002:a05:600c:a55:: with SMTP id c21mr27404899wmq.191.1636653117678;
+        Thu, 11 Nov 2021 09:51:57 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.gmail.com with ESMTPSA id h18sm4037740wre.46.2021.11.11.09.51.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 11 Nov 2021 09:51:57 -0800 (PST)
+Message-ID: <682754b9-a402-e992-7318-48844a3da20c@redhat.com>
+Date:   Thu, 11 Nov 2021 18:51:54 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [kvm-unit-tests PATCH 00/14] Run access test in an L2 guest
+Content-Language: en-US
+To:     Aaron Lewis <aaronlewis@google.com>, kvm@vger.kernel.org
+Cc:     jmattson@google.com, seanjc@google.com
+References: <20211110212001.3745914-1-aaronlewis@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20211110212001.3745914-1-aaronlewis@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 6QokH7enDQWahZun9lYXc9SsjMFx-5rJ
-X-Proofpoint-ORIG-GUID: _17TGEG1ID6gqBzjV1NEbHAIEsUZcfos
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-11-11_06,2021-11-11_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=999
- lowpriorityscore=0 spamscore=0 clxscore=1015 malwarescore=0 suspectscore=0
- impostorscore=0 priorityscore=1501 phishscore=0 mlxscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
- definitions=main-2111110093
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2021-11-11 at 17:16 +0100, Janosch Frank wrote:
-> On 11/10/21 21:33, Eric Farman wrote:
+On 11/10/21 22:19, Aaron Lewis wrote:
+> The motivation behind this change is to test the routing logic when an
+> exception occurs in an L2 guest and ensure the exception goes to the
+> correct place.  For example, if an exception occurs in L2, does L1 want
+> to get involved, or L0, or do niether of them care about it and leave
+> it to L2 to handle.  Test that the exception doesn't end up going to L1
+> When L1 didn't ask for it.  This was occurring before commit 18712c13709d
+> ("KVM: nVMX: Use vmx_need_pf_intercept() when deciding if L0 wants a #PF")
+> fixed the issue.  Without that fix, running
+> vmx_pf_exception_test_reduced_maxphyaddr with allow_smaller_maxphyaddr=Y
+> would have resulted in the test failing with the following error:
+> 
+> x86/vmx_tests.c:10698: assert failed: false: Unexpected exit to L1,
+> exit_reason: VMX_EXC_NMI (0x0)
+> 
+> This series only tests the routing logic for #PFs.  A future
+> series will address other exceptions, however, getting #PF testing in
+> place is a big enough chunk that the other exceptions will be submitted
+> seperately (in a future series).
+> 
+> This series is dependant on Paolo's changes (inlcuded). Without them,
+> running ac_test_run() on one of the userspace test fails.  Of note:  the
+> commit ("x86: get rid of ring0stacktop") has been updated to include a fix
+> for a compiler error to get it building on clang.
+> 
+> This series is also dependant on the commit ("x86: Look up the PTEs rather
+> than assuming them").  This was sent out for review seperately, however,
+> it is needed to get ac_test_run() running on a different cr3 than the one
+> access_test runs on, so it is included here as well.  This is also v2 of
+> that commit.  While preparing this series a review came in, so I just
+> included the changes here.
 
-...snip...
+Queued, thanks.
 
-> > +	case KVM_S390_VCPU_SET_SIGP_BUSY: {
-> > +		int rc;
-> > +
-> > +		if (!vcpu->kvm->arch.user_sigp_busy)
-> > +			return -EFAULT;
-> 
-> Huh?
-> This should be EINVAL, no?
-
-Of course; my mistake.
-
-> 
-> > +
-> > +		rc = kvm_s390_vcpu_set_sigp_busy(vcpu);
-> > +		VCPU_EVENT(vcpu, 3, "SIGP: CPU %x set busy rc %x",
-> > vcpu->vcpu_id, rc);
-> > +
-> > +		return rc;
-> > +	}
-> > +	case KVM_S390_VCPU_RESET_SIGP_BUSY: {
-> > +		if (!vcpu->kvm->arch.user_sigp_busy)
-> > +			return -EFAULT;
-> 
-> Same
-> 
-> 
+Paolo
 
