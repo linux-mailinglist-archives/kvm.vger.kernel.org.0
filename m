@@ -2,51 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 67A6C44CE25
-	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 01:13:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3171444CE26
+	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 01:13:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234315AbhKKAPv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Nov 2021 19:15:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34502 "EHLO
+        id S234321AbhKKAPx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Nov 2021 19:15:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234172AbhKKAPu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Nov 2021 19:15:50 -0500
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE59DC061766
-        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 16:13:01 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id d27-20020a25addb000000b005c2355d9052so6612733ybe.3
-        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 16:13:01 -0800 (PST)
+        with ESMTP id S234329AbhKKAPw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Nov 2021 19:15:52 -0500
+Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D610C061766
+        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 16:13:03 -0800 (PST)
+Received: by mail-qt1-x849.google.com with SMTP id v17-20020a05622a131100b002aea167e24aso3402433qtk.5
+        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 16:13:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=DvX+f98zUPARZOebeQ12qND+w4xTLP+FUu/nmbytG5o=;
-        b=rbuD+x6csa+0SDQyvZimvz9cHlNUDR0WDM6WokzGhpVHXLChBLIDPjUT0fZWwtMifu
-         lDwvBOCJVss6s2HcGly7PvVtXwpKskndqugPzPKy9W30RkEEe7uM+6HIttv3JjMFTJKI
-         3ZsX/C0qGdNeWL01Wm+hLV7CwMW0ZZsPETod/K89sfAATXEfhSoElSw4AlU9GZu0OjXT
-         eiyZGhZaUHpY1JJB6aCy7Tj5DN7dboGQ9sPcr7/5e09HBgIj2/GwhOMXLWwZlwhDd1vL
-         eOzXOI0lI6U8XNfQnY7vbpf446640RMxFFBI9RL/bUqLLMDNi34cBpIU3wFdWLmbyK0K
-         bhtw==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=rboAKObAxco0O538iL45UDaisqHTUFArK2npanIYyBc=;
+        b=TYnYE/ai6EXGXXeZAZE2mm4I4nJ+4WjxTaWEl3ASTbrM2qENzvEsA9Pm/YEXouEKA+
+         mlNKZSoUr4L2Kq9R9TE4vITChjrKwFRIsUa2Fck0qtlzJv053uhE4CtXM9yARSTx3jws
+         w2HVqPdpZMuVgHtijGVb+Yl2P4sE2PJvlFcfH3Hj+Yt4MAmqdFoi2Yb2Iqs0jfsx+NL6
+         hNSN3fTBl+L639HggZn2sw5BQtyV5h9CYGpnZZZHGnBVegmWvEOiH2Hpz+lGrzqUPhiX
+         xpKspgFtfLqkNgPf3aoLe8t+JwoR5sTtiE9FQ7mp0nwqc8p31mwnDwV8RjxIo0J3mBgG
+         BgRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=DvX+f98zUPARZOebeQ12qND+w4xTLP+FUu/nmbytG5o=;
-        b=T6xABxjAydDklhnlNQJ55aEHYBGYVZSVsOlMwPhWclC/VRLs/o+8Jo5IjcYLRDEDJ4
-         mx8/CesVHFVes5N/GVtKwoDXBqMpArq8NpjsOGtY9eOw/eCDnJl8OmBzOgXwYX4DFYm+
-         wttaprjFjN/Us8lsII7N2+OVwFVLgsWLJyGVDDijOMu+itcP80IVaQX8zxc6tKD5eSzm
-         gHCjF7qgE7yHiRaonZfMAIVXPinRT0cyijuXFPkBYXzqC5jUtPogl1HrK0YRv8N1dxkA
-         Mz1NkiSuKeEGinoieYUvvS+f7ATZC4yq3ih2CwXdgQsPGowlPIKTzsQjQcyWT16PRQxe
-         lVww==
-X-Gm-Message-State: AOAM530DGUpHufS6yrUmYLnwaVBnXvi3i+kEXi6aF2Qk6vSmGADrB/T2
-        Cl99PphmNjel3jFigULB2NO3qMsYOfcfAA==
-X-Google-Smtp-Source: ABdhPJws3YFXo0VqBvOPMfALsAy4uqzBB3QnwWyCUdCVR/nI3kBRya8K91uWNCYxNpawwxHbhJZB0MaK0hCC8Q==
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=rboAKObAxco0O538iL45UDaisqHTUFArK2npanIYyBc=;
+        b=Bvg/Nt7BaCQFcg1K8wPrcFC5HiHS/IZBtgf6DMvpChNj+YLhcHbzhWrHhSNH5MTf8W
+         tkWECMmJnBtbxFIRadyG2PFuFbkKCK2JSfAl1xV/XYi6Wr05KaX9XHyCApn5DAyROggW
+         u+douXx92IRaiB+kCrsJKIiyNvzD8j0yXIrwiN8/1O40c05l5630LE6EgG8WiyxSVuVQ
+         mCwF511HxJfuTRmVtX8A4b5aBEMMLu6k9y8Q1P1+5K9qVybzbWzqLSgE3vlo9EYxVexg
+         Ip10n/X4jGu/N59OaHEJiiAtGaUJZOrhugp7oeeD8ND2kQlmfAWG+mJqXYwyBeGmDBAo
+         eTkw==
+X-Gm-Message-State: AOAM533FRY3tkNgbB3DFg2vLeUHwabaivebO1xLLQXTcCZlkyBMf9Mgz
+        U0SXwj/6gF9JKbe2PPWKEAAkvv71nW+0qA==
+X-Google-Smtp-Source: ABdhPJxIT/p99QD/g1fVBXPENF6MMMn5Z+hiIJfARLTE5lOOrif82gHbHHSctBiz/iyjvLsoIDuPFdX8Go/2Rg==
 X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a25:bbc2:: with SMTP id
- c2mr3860162ybk.42.1636589581142; Wed, 10 Nov 2021 16:13:01 -0800 (PST)
-Date:   Thu, 11 Nov 2021 00:12:53 +0000
-Message-Id: <20211111001257.1446428-1-dmatlack@google.com>
+ (user=dmatlack job=sendgmr) by 2002:a05:622a:307:: with SMTP id
+ q7mr3399342qtw.330.1636589582587; Wed, 10 Nov 2021 16:13:02 -0800 (PST)
+Date:   Thu, 11 Nov 2021 00:12:54 +0000
+In-Reply-To: <20211111001257.1446428-1-dmatlack@google.com>
+Message-Id: <20211111001257.1446428-2-dmatlack@google.com>
 Mime-Version: 1.0
+References: <20211111001257.1446428-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.34.0.rc1.387.gb447b232ab-goog
-Subject: [PATCH 0/4] KVM: selftests: Avoid mmap_sem contention during memory population
+Subject: [PATCH 1/4] KVM: selftests: Start at iteration 0 instead of -1
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
@@ -62,41 +66,53 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This series fixes a performance issue in the KVM selftests, specifically
-those that use perf_test_util. These tests create vCPU threads which
-immediately enter guest mode and start faulting in memory. Creating
-vCPU threads while faulting in memory is a recipe for generating a lot
-of contention on the mmap_sem, as thread creation requires acquiring the
-mmap_sem in write mode.
+Start at iteration 0 instead of -1 to avoid having to initialize
+vcpu_last_completed_iteration when setting up vCPU threads. This
+simplifies the next commit where we move vCPU thread initialization
+out to a common helper.
 
-This series fixes this issue by ensuring that all vCPUs threads are
-created before entering guest mode. As part of fixing this issue I
-consolidated the code to create and join vCPU threads across all users
-of perf_test_util.
+No functional change intended.
 
-The last commit is an unrelated perf_test_util cleanup.
+Signed-off-by: David Matlack <dmatlack@google.com>
+---
+ tools/testing/selftests/kvm/access_tracking_perf_test.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-Note: This series applies on top of
-https://lore.kernel.org/kvm/20211111000310.1435032-1-dmatlack@google.com/,
-although the dependency on the series is just cosmetic.
-
-David Matlack (4):
-  KVM: selftests: Start at iteration 0 instead of -1
-  KVM: selftests: Move vCPU thread creation and joining to common
-    helpers
-  KVM: selftests: Wait for all vCPU to be created before entering guest
-    mode
-  KVM: selftests: Use perf_test_destroy_vm in
-    memslot_modification_stress_test
-
- .../selftests/kvm/access_tracking_perf_test.c | 46 +++---------
- .../selftests/kvm/demand_paging_test.c        | 25 +------
- .../selftests/kvm/dirty_log_perf_test.c       | 19 ++---
- .../selftests/kvm/include/perf_test_util.h    |  5 ++
- .../selftests/kvm/lib/perf_test_util.c        | 72 +++++++++++++++++++
- .../kvm/memslot_modification_stress_test.c    | 25 ++-----
- 6 files changed, 96 insertions(+), 96 deletions(-)
-
+diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+index 5364a2ed7c68..7f25a06e19c9 100644
+--- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
++++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+@@ -47,7 +47,7 @@
+ #include "guest_modes.h"
+ 
+ /* Global variable used to synchronize all of the vCPU threads. */
+-static int iteration = -1;
++static int iteration;
+ 
+ /* Defines what vCPU threads should do during a given iteration. */
+ static enum {
+@@ -220,7 +220,7 @@ static void *vcpu_thread_main(void *arg)
+ 	struct perf_test_vcpu_args *vcpu_args = arg;
+ 	struct kvm_vm *vm = perf_test_args.vm;
+ 	int vcpu_id = vcpu_args->vcpu_id;
+-	int current_iteration = -1;
++	int current_iteration = 0;
+ 
+ 	while (spin_wait_for_next_iteration(&current_iteration)) {
+ 		switch (READ_ONCE(iteration_work)) {
+@@ -303,11 +303,9 @@ static pthread_t *create_vcpu_threads(int vcpus)
+ 	vcpu_threads = malloc(vcpus * sizeof(vcpu_threads[0]));
+ 	TEST_ASSERT(vcpu_threads, "Failed to allocate vcpu_threads.");
+ 
+-	for (i = 0; i < vcpus; i++) {
+-		vcpu_last_completed_iteration[i] = iteration;
++	for (i = 0; i < vcpus; i++)
+ 		pthread_create(&vcpu_threads[i], NULL, vcpu_thread_main,
+ 			       &perf_test_args.vcpu_args[i]);
+-	}
+ 
+ 	return vcpu_threads;
+ }
 -- 
 2.34.0.rc1.387.gb447b232ab-goog
 
