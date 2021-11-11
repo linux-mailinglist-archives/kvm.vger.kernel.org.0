@@ -2,43 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 84CE244D97A
-	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 16:49:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C2CBB44D982
+	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 16:50:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234026AbhKKPw3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Nov 2021 10:52:29 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:46225 "EHLO
+        id S234103AbhKKPwi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Nov 2021 10:52:38 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22188 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234004AbhKKPw2 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 11 Nov 2021 10:52:28 -0500
+        by vger.kernel.org with ESMTP id S234085AbhKKPwc (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 11 Nov 2021 10:52:32 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636645779;
+        s=mimecast20190719; t=1636645783;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=tchgW1G/woqY+v0B8S2W3vnChWM23Uhw3AARV7UMWNI=;
-        b=RAQ12KT9uarcuNyDHyYB7M3trKpaLg/KF8xwvA3e1gg1rk4mfvkLAw0S9KZxM+AiXxNPHg
-        VbcwzyAQ+X646Ql+Q2Jt7m42uxbnbbZef6oH+r0I3BPh/znrql2SKagkZin7fXnZ4XgNAq
-        VqjvuV0kz6BAzkdq5CoS8Kq+LE3zdcA=
+        bh=UHfO+IWLDyBmg3/813qfaQtsMPxCPwrkDucytwn2kd8=;
+        b=RW/cNiPOpobC2nQ/6AqGwjxQFcd3Q8cGUC/PER9gSTaq8GfDP6zFQrn8aWB/8CZlbEIfUi
+        nhqVMU4c7c7Fm7gphHyXhp6bdWCnjm+LkJm809HllRBIjBxslv5z3xrkBLzbONhWt3JyBd
+        f/SgxLWnZCKhO1VeLuPXL6Y/jpNnNRg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-26-bfgxgoheNfy87bxFCc4S0Q-1; Thu, 11 Nov 2021 10:49:35 -0500
-X-MC-Unique: bfgxgoheNfy87bxFCc4S0Q-1
+ us-mta-510-g8aikeCxPM-VP5OVl5AAyg-1; Thu, 11 Nov 2021 10:49:39 -0500
+X-MC-Unique: g8aikeCxPM-VP5OVl5AAyg-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B93C9814248;
-        Thu, 11 Nov 2021 15:49:34 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AAF3D100C610;
+        Thu, 11 Nov 2021 15:49:37 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5A3505E26A;
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D2B085E26A;
         Thu, 11 Nov 2021 15:49:34 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     pgonda@google.com, seanjc@google.com
-Subject: [PATCH 3/7] KVM: SEV: provide helpers to charge/uncharge misc_cg
-Date:   Thu, 11 Nov 2021 10:49:26 -0500
-Message-Id: <20211111154930.3603189-4-pbonzini@redhat.com>
+Cc:     pgonda@google.com, seanjc@google.com,
+        Marc Orr <marcorr@google.com>,
+        David Rientjes <rientjes@google.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>
+Subject: [PATCH 4/7] KVM: SEV: Add support for SEV intra host migration
+Date:   Thu, 11 Nov 2021 10:49:27 -0500
+Message-Id: <20211111154930.3603189-5-pbonzini@redhat.com>
 In-Reply-To: <20211111154930.3603189-1-pbonzini@redhat.com>
 References: <20211111154930.3603189-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -48,76 +60,307 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Avoid code duplication across all callers of misc_cg_try_charge and
-misc_cg_uncharge.  The resource type for KVM is always derived from
-sev->es_active, and the quantity is always 1.
+From: Peter Gonda <pgonda@google.com>
 
+For SEV to work with intra host migration, contents of the SEV info struct
+such as the ASID (used to index the encryption key in the AMD SP) and
+the list of memory regions need to be transferred to the target VM.
+This change adds a commands for a target VMM to get a source SEV VM's sev
+info.
+
+Signed-off-by: Peter Gonda <pgonda@google.com>
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Marc Orr <marcorr@google.com>
+Cc: Marc Orr <marcorr@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: David Rientjes <rientjes@google.com>
+Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Cc: Brijesh Singh <brijesh.singh@amd.com>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Wanpeng Li <wanpengli@tencent.com>
+Cc: Jim Mattson <jmattson@google.com>
+Cc: Joerg Roedel <joro@8bytes.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: kvm@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Message-Id: <20211021174303.385706-3-pgonda@google.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/kvm/svm/sev.c | 22 +++++++++++++++-------
- 1 file changed, 15 insertions(+), 7 deletions(-)
+ Documentation/virt/kvm/api.rst  |  15 ++++
+ arch/x86/include/asm/kvm_host.h |   1 +
+ arch/x86/kvm/svm/sev.c          | 152 ++++++++++++++++++++++++++++++++
+ arch/x86/kvm/svm/svm.c          |   1 +
+ arch/x86/kvm/svm/svm.h          |   2 +
+ arch/x86/kvm/x86.c              |   6 ++
+ include/uapi/linux/kvm.h        |   1 +
+ 7 files changed, 178 insertions(+)
 
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 3b093d6dbe22..d9797c6d4b1d 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -6911,6 +6911,20 @@ MAP_SHARED mmap will result in an -EINVAL return.
+ When enabled the VMM may make use of the ``KVM_ARM_MTE_COPY_TAGS`` ioctl to
+ perform a bulk copy of tags to/from the guest.
+ 
++7.29 KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM
++-------------------------------------
++
++Architectures: x86 SEV enabled
++Type: vm
++Parameters: args[0] is the fd of the source vm
++Returns: 0 on success
++
++This capability enables userspace to migrate the encryption context from the VM
++indicated by the fd to the VM this is called on.
++
++This is intended to support intra-host migration of VMs between userspace VMMs,
++upgrading the VMM process without interrupting the guest.
++
+ 8. Other capabilities.
+ ======================
+ 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 88fce6ab4bbd..34e50b5c3a48 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1476,6 +1476,7 @@ struct kvm_x86_ops {
+ 	int (*mem_enc_reg_region)(struct kvm *kvm, struct kvm_enc_region *argp);
+ 	int (*mem_enc_unreg_region)(struct kvm *kvm, struct kvm_enc_region *argp);
+ 	int (*vm_copy_enc_context_from)(struct kvm *kvm, unsigned int source_fd);
++	int (*vm_move_enc_context_from)(struct kvm *kvm, unsigned int source_fd);
+ 
+ 	int (*get_msr_feature)(struct kvm_msr_entry *entry);
+ 
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index d53f71054475..227becd93cb6 100644
+index 227becd93cb6..8b529022f0cf 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -120,16 +120,26 @@ static bool __sev_recycle_asids(int min_asid, int max_asid)
- 	return true;
+@@ -1532,6 +1532,158 @@ static bool cmd_allowed_from_miror(u32 cmd_id)
+ 	return false;
  }
  
-+static int sev_misc_cg_try_charge(struct kvm_sev_info *sev)
++static int sev_lock_for_migration(struct kvm *kvm)
 +{
-+	enum misc_res_type type = sev->es_active ? MISC_CG_RES_SEV_ES : MISC_CG_RES_SEV;
-+	return misc_cg_try_charge(type, sev->misc_cg, 1);
++	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
++
++	/*
++	 * Bail if this VM is already involved in a migration to avoid deadlock
++	 * between two VMs trying to migrate to/from each other.
++	 */
++	if (atomic_cmpxchg_acquire(&sev->migration_in_progress, 0, 1))
++		return -EBUSY;
++
++	mutex_lock(&kvm->lock);
++
++	return 0;
 +}
 +
-+static void sev_misc_cg_uncharge(struct kvm_sev_info *sev)
++static void sev_unlock_after_migration(struct kvm *kvm)
 +{
-+	enum misc_res_type type = sev->es_active ? MISC_CG_RES_SEV_ES : MISC_CG_RES_SEV;
-+	misc_cg_uncharge(type, sev->misc_cg, 1);
++	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
++
++	mutex_unlock(&kvm->lock);
++	atomic_set_release(&sev->migration_in_progress, 0);
 +}
 +
- static int sev_asid_new(struct kvm_sev_info *sev)
++
++static int sev_lock_vcpus_for_migration(struct kvm *kvm)
++{
++	struct kvm_vcpu *vcpu;
++	int i, j;
++
++	kvm_for_each_vcpu(i, vcpu, kvm) {
++		if (mutex_lock_killable(&vcpu->mutex))
++			goto out_unlock;
++	}
++
++	return 0;
++
++out_unlock:
++	kvm_for_each_vcpu(j, vcpu, kvm) {
++		if (i == j)
++			break;
++
++		mutex_unlock(&vcpu->mutex);
++	}
++	return -EINTR;
++}
++
++static void sev_unlock_vcpus_for_migration(struct kvm *kvm)
++{
++	struct kvm_vcpu *vcpu;
++	int i;
++
++	kvm_for_each_vcpu(i, vcpu, kvm) {
++		mutex_unlock(&vcpu->mutex);
++	}
++}
++
++static void sev_migrate_from(struct kvm_sev_info *dst,
++			      struct kvm_sev_info *src)
++{
++	dst->active = true;
++	dst->asid = src->asid;
++	dst->handle = src->handle;
++	dst->pages_locked = src->pages_locked;
++
++	src->asid = 0;
++	src->active = false;
++	src->handle = 0;
++	src->pages_locked = 0;
++
++	if (dst->misc_cg != src->misc_cg)
++		sev_misc_cg_uncharge(src);
++
++	put_misc_cg(src->misc_cg);
++	src->misc_cg = NULL;
++
++	INIT_LIST_HEAD(&dst->regions_list);
++	list_replace_init(&src->regions_list, &dst->regions_list);
++}
++
++int svm_vm_migrate_from(struct kvm *kvm, unsigned int source_fd)
++{
++	struct kvm_sev_info *dst_sev = &to_kvm_svm(kvm)->sev_info;
++	struct kvm_sev_info *src_sev;
++	struct file *source_kvm_file;
++	struct kvm *source_kvm;
++	int ret;
++
++	ret = sev_lock_for_migration(kvm);
++	if (ret)
++		return ret;
++
++	if (sev_guest(kvm)) {
++		ret = -EINVAL;
++		goto out_unlock;
++	}
++
++	source_kvm_file = fget(source_fd);
++	if (!file_is_kvm(source_kvm_file)) {
++		ret = -EBADF;
++		goto out_fput;
++	}
++
++	source_kvm = source_kvm_file->private_data;
++	ret = sev_lock_for_migration(source_kvm);
++	if (ret)
++		goto out_fput;
++
++	if (!sev_guest(source_kvm) || sev_es_guest(source_kvm)) {
++		ret = -EINVAL;
++		goto out_source;
++	}
++
++	src_sev = &to_kvm_svm(source_kvm)->sev_info;
++	dst_sev->misc_cg = get_current_misc_cg();
++	if (dst_sev->misc_cg != src_sev->misc_cg) {
++		ret = sev_misc_cg_try_charge(dst_sev);
++		if (ret)
++			goto out_dst_put_cgroup;
++	}
++
++	ret = sev_lock_vcpus_for_migration(kvm);
++	if (ret)
++		goto out_dst_cgroup;
++	ret = sev_lock_vcpus_for_migration(source_kvm);
++	if (ret)
++		goto out_dst_vcpu;
++
++	sev_migrate_from(dst_sev, src_sev);
++	kvm_vm_dead(source_kvm);
++	ret = 0;
++
++	sev_unlock_vcpus_for_migration(source_kvm);
++out_dst_vcpu:
++	sev_unlock_vcpus_for_migration(kvm);
++out_dst_cgroup:
++	if (ret < 0) {
++		sev_misc_cg_uncharge(dst_sev);
++out_dst_put_cgroup:
++		put_misc_cg(dst_sev->misc_cg);
++		dst_sev->misc_cg = NULL;
++	}
++out_source:
++	sev_unlock_after_migration(source_kvm);
++out_fput:
++	if (source_kvm_file)
++		fput(source_kvm_file);
++out_unlock:
++	sev_unlock_after_migration(kvm);
++	return ret;
++}
++
+ int svm_mem_enc_op(struct kvm *kvm, void __user *argp)
  {
- 	int asid, min_asid, max_asid, ret;
- 	bool retry = true;
--	enum misc_res_type type;
+ 	struct kvm_sev_cmd sev_cmd;
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 1143b4ac900d..4a40c8876ade 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -4699,6 +4699,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+ 	.mem_enc_unreg_region = svm_unregister_enc_region,
  
--	type = sev->es_active ? MISC_CG_RES_SEV_ES : MISC_CG_RES_SEV;
- 	WARN_ON(sev->misc_cg);
- 	sev->misc_cg = get_current_misc_cg();
--	ret = misc_cg_try_charge(type, sev->misc_cg, 1);
-+	ret = sev_misc_cg_try_charge(sev);
- 	if (ret) {
- 		put_misc_cg(sev->misc_cg);
- 		sev->misc_cg = NULL;
-@@ -162,7 +172,7 @@ static int sev_asid_new(struct kvm_sev_info *sev)
+ 	.vm_copy_enc_context_from = svm_vm_copy_asid_from,
++	.vm_move_enc_context_from = svm_vm_migrate_from,
  
- 	return asid;
- e_uncharge:
--	misc_cg_uncharge(type, sev->misc_cg, 1);
-+	sev_misc_cg_uncharge(sev);
- 	put_misc_cg(sev->misc_cg);
- 	sev->misc_cg = NULL;
- 	return ret;
-@@ -179,7 +189,6 @@ static void sev_asid_free(struct kvm_sev_info *sev)
- {
- 	struct svm_cpu_data *sd;
- 	int cpu;
--	enum misc_res_type type;
+ 	.can_emulate_instruction = svm_can_emulate_instruction,
  
- 	mutex_lock(&sev_bitmap_lock);
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 80048841cad9..d4eae06b0695 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -80,6 +80,7 @@ struct kvm_sev_info {
+ 	u64 ap_jump_table;	/* SEV-ES AP Jump Table address */
+ 	struct kvm *enc_context_owner; /* Owner of copied encryption context */
+ 	struct misc_cg *misc_cg; /* For misc cgroup accounting */
++	atomic_t migration_in_progress;
+ };
  
-@@ -192,8 +201,7 @@ static void sev_asid_free(struct kvm_sev_info *sev)
+ struct kvm_svm {
+@@ -562,6 +563,7 @@ int svm_register_enc_region(struct kvm *kvm,
+ int svm_unregister_enc_region(struct kvm *kvm,
+ 			      struct kvm_enc_region *range);
+ int svm_vm_copy_asid_from(struct kvm *kvm, unsigned int source_fd);
++int svm_vm_migrate_from(struct kvm *kvm, unsigned int source_fd);
+ void pre_sev_run(struct vcpu_svm *svm, int cpu);
+ void __init sev_set_cpu_caps(void);
+ void __init sev_hardware_setup(void);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 622cb75f5e75..185094eb86b6 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -5845,6 +5845,12 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 		if (kvm_x86_ops.vm_copy_enc_context_from)
+ 			r = kvm_x86_ops.vm_copy_enc_context_from(kvm, cap->args[0]);
+ 		return r;
++	case KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM:
++		r = -EINVAL;
++		if (kvm_x86_ops.vm_move_enc_context_from)
++			r = kvm_x86_ops.vm_move_enc_context_from(
++				kvm, cap->args[0]);
++		return r;
+ 	case KVM_CAP_EXIT_HYPERCALL:
+ 		if (cap->args[0] & ~KVM_EXIT_HYPERCALL_VALID_MASK) {
+ 			r = -EINVAL;
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 78f0719cc2a3..d29ce9dc7a2f 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1130,6 +1130,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_BINARY_STATS_FD 203
+ #define KVM_CAP_EXIT_ON_EMULATION_FAILURE 204
+ #define KVM_CAP_ARM_MTE 205
++#define KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM 206
  
- 	mutex_unlock(&sev_bitmap_lock);
+ #ifdef KVM_CAP_IRQ_ROUTING
  
--	type = sev->es_active ? MISC_CG_RES_SEV_ES : MISC_CG_RES_SEV;
--	misc_cg_uncharge(type, sev->misc_cg, 1);
-+	sev_misc_cg_uncharge(sev);
- 	put_misc_cg(sev->misc_cg);
- 	sev->misc_cg = NULL;
- }
 -- 
 2.27.0
 
