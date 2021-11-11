@@ -2,315 +2,482 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EB88D44DB6D
-	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 19:07:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 60B1544DB70
+	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 19:08:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234382AbhKKSJx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Nov 2021 13:09:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50038 "EHLO
+        id S234400AbhKKSLV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Nov 2021 13:11:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229710AbhKKSJw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Nov 2021 13:09:52 -0500
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 853C1C061766
-        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 10:07:03 -0800 (PST)
-Received: by mail-pg1-x52d.google.com with SMTP id b4so5813722pgh.10
-        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 10:07:03 -0800 (PST)
+        with ESMTP id S229872AbhKKSLU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Nov 2021 13:11:20 -0500
+Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EFC0C061766
+        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 10:08:31 -0800 (PST)
+Received: by mail-io1-xd2a.google.com with SMTP id v65so8012888ioe.5
+        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 10:08:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=VlfGpDAkRviM2DVO5xIl1d3FwMzKVRmFuBWIxyHCNbY=;
-        b=qKT0Hc7Ui73R9h4jeqlWLLHP8M7l5q9V2tBE0Vplu0epYZf3Hc8Av7hvHNkzM2e0+a
-         AJmTFebdOLURByAgpPMT1HNhcICmdzY5Ip3mxLxnZG8No0lB7eMRqZuyO0WzGyNrdmov
-         7sfoHdPFwF1yQWvhRKKhNlNrhE1g/ygflmEfCutK4kX6VVFrn0oaQnKK0cIoEzwIJk8w
-         yevLAx0qTFYnq3hz+L9I6yVScJntRSyjK7RsjLnlJD4QzFw22JqpmABFhp98JegfaRBw
-         RPHgKnmMTdJ6yKxZTmPnL4e2G/3M2exEm8SvS0GdVHo2xltMm6NKC8Xf0vdS9u3KjfsM
-         fJhg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=wc8wVuyllMwo0lnM7TPkweV+Cba6Ocdlg0W2n7tr84I=;
+        b=ZgDZUEGofw5o9DSYwjZsDUAZGIMjP9Nl5JVFUiz9F7I2LjZgKdHIkECi0DrYyv6iUj
+         lfhFKkQoU0fhDH5/BfiYeRU54H5v2IfNaGZkL6VROOKPCwiztkY1IVfglMzHrBpsSeWg
+         V/tOu673VHov7wrnAvK38nRcRMAvbR43jKBBZW2u8jFuX1d3ZJh7+SonUNUXrX2MilRP
+         BJPAJoWVVTcIBbSufIWtz27nsL6kKHCI+T2dI2jtpCq2OZIrwqjAS+0YdAe99JrX+KEU
+         Zo5xTSdLP0WS2gz3oyhcSwVZ7SavOZSwr34vFgN3SNYma7T+PaIMwTBkFacYgqJwpI/L
+         s/Xw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=VlfGpDAkRviM2DVO5xIl1d3FwMzKVRmFuBWIxyHCNbY=;
-        b=0Yi74oZEP/xMvAKj34i6qwWi5IFeJMjqICBRaRZtiXw+69YgmlwqPaga87iLoP00G5
-         E5LfXGUxnYPE0IjY0Xuj8ukfT7zCfed78IJlobe41kCZMUdGXzET/MUrOGFUxUb0R/+A
-         iCnKbYkh5F4XrkuJ7YwJzM8nF+DHdLT8Fhbz9GTs9XqPMk6EgDfiOEazh1amF2DUaoRE
-         OK/vJB4i2dSA9g9MpKpSzOLIjwS1byQLo8hHivEVJcOYRUbyiicEzqfHoEi0/W+jzo6e
-         Q5FSnt/boAAt/QxckTC8P1F+yJNneL+rzow3QF1B07tM5vI//WHzWH/FMxtwau1uHjqR
-         Bc/Q==
-X-Gm-Message-State: AOAM533P3rIZ3zdq2N5UfB/81MLhjYSFAtrW+VPPcUEUGaKMuM1yOSbd
-        3YSGoMyb1vKV5nEooi0+QpIbNg==
-X-Google-Smtp-Source: ABdhPJywQy7nM0Cv/9NStBCGr90clwvx+Ms3VKy155bEKV/lJgw9eXmQafjSlhviWCbIPoZSyzRLag==
-X-Received: by 2002:a63:77c2:: with SMTP id s185mr4474106pgc.422.1636654022721;
-        Thu, 11 Nov 2021 10:07:02 -0800 (PST)
-Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
-        by smtp.gmail.com with ESMTPSA id t4sm4039337pfj.13.2021.11.11.10.07.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Nov 2021 10:07:01 -0800 (PST)
-Date:   Thu, 11 Nov 2021 18:06:57 +0000
-From:   David Matlack <dmatlack@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Shier <pshier@google.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Keqian Zhu <zhukeqian1@huawei.com>,
-        David Hildenbrand <david@redhat.com>
-Subject: Re: [RFC 02/19] KVM: x86/mmu: Batch TLB flushes for a single zap
-Message-ID: <YY1bweJeOLaBtbA0@google.com>
-References: <20211110223010.1392399-1-bgardon@google.com>
- <20211110223010.1392399-3-bgardon@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=wc8wVuyllMwo0lnM7TPkweV+Cba6Ocdlg0W2n7tr84I=;
+        b=fKgiMTzvvfTDE9+BD1NxRV9xnka1WsO1UvupMatSY0Dh7tLk2zOjTLwxfRuban8wMS
+         vuScxVuxpD7EUHkM7YJdeD1KrEDJzjsqFCz+Lojp74vCmKCP9cGYhPemLDOKLbP7tWQc
+         pWZXPNPAYteU/fdBmFbmSXcyIlvbHccahZ+QIDMLs5rvUzgYZPzIfL4CaX/82pO6Np5R
+         qsFlNIcUinE0j2wEnaMMrMu/fCFvGmUpJgWIyoA7sa33xkFDu9yqNWc3497khIM9yts4
+         QoQu+SI65faaoo4n5eybBNHgcd9nyf5eBTav+EiJyZF+SdLApcJglsq1ziJi7mIH/0MH
+         6AiQ==
+X-Gm-Message-State: AOAM533eZa6j8tKcwe3ukfuNeg43C9FRgUz20SA1bYZXt23Af/hk2s+L
+        1n4xbNY0uTIJU9fL15bB4k1/iD8C84q+6i+8M1nVzg==
+X-Google-Smtp-Source: ABdhPJwRv1/1IflGvdRq67ZOQVwSxfM43JgW5IpD8QXDb9mYHymWsn1OQX0+cacZqShnkNxRr0ez8sfaaAbYZ7mf4W8=
+X-Received: by 2002:a02:70cf:: with SMTP id f198mr6759121jac.124.1636654110509;
+ Thu, 11 Nov 2021 10:08:30 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211110223010.1392399-3-bgardon@google.com>
+References: <20211111001257.1446428-1-dmatlack@google.com> <20211111001257.1446428-3-dmatlack@google.com>
+In-Reply-To: <20211111001257.1446428-3-dmatlack@google.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Thu, 11 Nov 2021 10:08:19 -0800
+Message-ID: <CANgfPd-vkHxW+CdXRWVHQturF2GTC4mjyKVsAL_AkBXGXpy_DA@mail.gmail.com>
+Subject: Re: [PATCH 2/4] KVM: selftests: Move vCPU thread creation and joining
+ to common helpers
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Yanan Wang <wangyanan55@huawei.com>,
+        Peter Xu <peterx@redhat.com>,
+        Aaron Lewis <aaronlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 10, 2021 at 02:29:53PM -0800, Ben Gardon wrote:
-> When recursively handling a removed TDP page table, the TDP MMU will
-> flush the TLBs and queue an RCU callback to free the PT. If the original
-> change zapped a non-leaf SPTE at PG_LEVEL_1G or above, that change will
-> result in many unnecessary TLB flushes when one would suffice. Queue all
-> the PTs which need to be freed on a list and wait to queue RCU callbacks
-> to free them until after all the recursive callbacks are done.
-> 
-> 
-> Signed-off-by: Ben Gardon <bgardon@google.com>
+On Wed, Nov 10, 2021 at 4:13 PM David Matlack <dmatlack@google.com> wrote:
+>
+> Move vCPU thread creation and joining to common helper functions. This
+> is in preparation for the next commit which ensures that all vCPU
+> threads are fully created before entering guest mode on any one
+> vCPU.
+>
+> No functional change intended.
+>
+> Signed-off-by: David Matlack <dmatlack@google.com>
+
+Reviewed-by: Ben Gardon <bgardon@google.com>
+
+Besides one comment below, this is an awesome cleanup!
+
 > ---
->  arch/x86/kvm/mmu/tdp_mmu.c | 88 ++++++++++++++++++++++++++++++--------
->  1 file changed, 70 insertions(+), 18 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 866c2b191e1e..5b31d046df78 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -220,7 +220,8 @@ hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
->  
->  static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
->  				u64 old_spte, u64 new_spte, int level,
-> -				bool shared);
-> +				bool shared,
-> +				struct list_head *disconnected_sps);
->  
->  static void handle_changed_spte_acc_track(u64 old_spte, u64 new_spte, int level)
+>  .../selftests/kvm/access_tracking_perf_test.c | 40 +++-------------
+>  .../selftests/kvm/demand_paging_test.c        | 25 ++--------
+>  .../selftests/kvm/dirty_log_perf_test.c       | 19 ++------
+>  .../selftests/kvm/include/perf_test_util.h    |  5 ++
+>  .../selftests/kvm/lib/perf_test_util.c        | 46 +++++++++++++++++++
+>  .../kvm/memslot_modification_stress_test.c    | 22 ++-------
+>  6 files changed, 67 insertions(+), 90 deletions(-)
+>
+> diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+> index 7f25a06e19c9..d8909032317a 100644
+> --- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
+> +++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
+> @@ -215,9 +215,8 @@ static bool spin_wait_for_next_iteration(int *current_iteration)
+>         return true;
+>  }
+>
+> -static void *vcpu_thread_main(void *arg)
+> +static void vcpu_thread_main(struct perf_test_vcpu_args *vcpu_args)
 >  {
-> @@ -302,6 +303,11 @@ static void tdp_mmu_unlink_page(struct kvm *kvm, struct kvm_mmu_page *sp,
->   * @shared: This operation may not be running under the exclusive use
->   *	    of the MMU lock and the operation must synchronize with other
->   *	    threads that might be modifying SPTEs.
-> + * @disconnected_sps: If null, the TLBs will be flushed and the disconnected
-> + *		      TDP MMU page will be queued to be freed after an RCU
-> + *		      callback. If non-null the page will be added to the list
-> + *		      and flushing the TLBs and queueing an RCU callback to
-> + *		      free the page will be the caller's responsibility.
->   *
->   * Given a page table that has been removed from the TDP paging structure,
->   * iterates through the page table to clear SPTEs and free child page tables.
-> @@ -312,7 +318,8 @@ static void tdp_mmu_unlink_page(struct kvm *kvm, struct kvm_mmu_page *sp,
->   * early rcu_dereferences in the function.
->   */
->  static void handle_removed_tdp_mmu_page(struct kvm *kvm, tdp_ptep_t pt,
-> -					bool shared)
-> +					bool shared,
-
->  {
->  	struct kvm_mmu_page *sp = sptep_to_sp(rcu_dereference(pt));
->  	int level = sp->role.level;
-> @@ -371,13 +378,16 @@ static void handle_removed_tdp_mmu_page(struct kvm *kvm, tdp_ptep_t pt,
->  		}
->  		handle_changed_spte(kvm, kvm_mmu_page_as_id(sp), gfn,
->  				    old_child_spte, REMOVED_SPTE, level,
-> -				    shared);
-> +				    shared, disconnected_sps);
->  	}
->  
-> -	kvm_flush_remote_tlbs_with_address(kvm, base_gfn,
-> -					   KVM_PAGES_PER_HPAGE(level + 1));
+> -       struct perf_test_vcpu_args *vcpu_args = arg;
+>         struct kvm_vm *vm = perf_test_args.vm;
+>         int vcpu_id = vcpu_args->vcpu_id;
+>         int current_iteration = 0;
+> @@ -235,8 +234,6 @@ static void *vcpu_thread_main(void *arg)
+>
+>                 vcpu_last_completed_iteration[vcpu_id] = current_iteration;
+>         }
 > -
-> -	call_rcu(&sp->rcu_head, tdp_mmu_free_sp_rcu_callback);
-> +	if (disconnected_sps) {
-> +		list_add_tail(&sp->link, disconnected_sps);
-> +	} else {
-> +		kvm_flush_remote_tlbs_with_address(kvm, base_gfn,
-> +						   KVM_PAGES_PER_HPAGE(level + 1));
-> +		call_rcu(&sp->rcu_head, tdp_mmu_free_sp_rcu_callback);
-> +	}
+> -       return NULL;
 >  }
->  
->  /**
-> @@ -391,13 +401,21 @@ static void handle_removed_tdp_mmu_page(struct kvm *kvm, tdp_ptep_t pt,
->   * @shared: This operation may not be running under the exclusive use of
->   *	    the MMU lock and the operation must synchronize with other
->   *	    threads that might be modifying SPTEs.
-> + * @disconnected_sps: Only used if a page of page table memory has been
-> + *		      removed from the paging structure by this change.
-> + *		      If null, the TLBs will be flushed and the disconnected
-> + *		      TDP MMU page will be queued to be freed after an RCU
-> + *		      callback. If non-null the page will be added to the list
-> + *		      and flushing the TLBs and queueing an RCU callback to
-> + *		      free the page will be the caller's responsibility.
->   *
->   * Handle bookkeeping that might result from the modification of a SPTE.
->   * This function must be called for all TDP SPTE modifications.
+>
+>  static void spin_wait_for_vcpu(int vcpu_id, int target_iteration)
+> @@ -295,43 +292,16 @@ static void mark_memory_idle(struct kvm_vm *vm, int vcpus)
+>         run_iteration(vm, vcpus, "Mark memory idle");
+>  }
+>
+> -static pthread_t *create_vcpu_threads(int vcpus)
+> -{
+> -       pthread_t *vcpu_threads;
+> -       int i;
+> -
+> -       vcpu_threads = malloc(vcpus * sizeof(vcpu_threads[0]));
+> -       TEST_ASSERT(vcpu_threads, "Failed to allocate vcpu_threads.");
+> -
+> -       for (i = 0; i < vcpus; i++)
+> -               pthread_create(&vcpu_threads[i], NULL, vcpu_thread_main,
+> -                              &perf_test_args.vcpu_args[i]);
+> -
+> -       return vcpu_threads;
+> -}
+> -
+> -static void terminate_vcpu_threads(pthread_t *vcpu_threads, int vcpus)
+> -{
+> -       int i;
+> -
+> -       /* Set done to signal the vCPU threads to exit */
+> -       done = true;
+> -
+> -       for (i = 0; i < vcpus; i++)
+> -               pthread_join(vcpu_threads[i], NULL);
+> -}
+> -
+>  static void run_test(enum vm_guest_mode mode, void *arg)
+>  {
+>         struct test_params *params = arg;
+>         struct kvm_vm *vm;
+> -       pthread_t *vcpu_threads;
+>         int vcpus = params->vcpus;
+>
+>         vm = perf_test_create_vm(mode, vcpus, params->vcpu_memory_bytes, 1,
+>                                  params->backing_src, !overlap_memory_access);
+>
+> -       vcpu_threads = create_vcpu_threads(vcpus);
+> +       perf_test_start_vcpu_threads(vcpus, vcpu_thread_main);
+>
+>         pr_info("\n");
+>         access_memory(vm, vcpus, ACCESS_WRITE, "Populating memory");
+> @@ -346,8 +316,10 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>         mark_memory_idle(vm, vcpus);
+>         access_memory(vm, vcpus, ACCESS_READ, "Reading from idle memory");
+>
+> -       terminate_vcpu_threads(vcpu_threads, vcpus);
+> -       free(vcpu_threads);
+> +       /* Set done to signal the vCPU threads to exit */
+> +       done = true;
+> +
+> +       perf_test_join_vcpu_threads(vcpus);
+>         perf_test_destroy_vm(vm);
+>  }
+>
+> diff --git a/tools/testing/selftests/kvm/demand_paging_test.c b/tools/testing/selftests/kvm/demand_paging_test.c
+> index 26f8fd8a57ec..6a719d065599 100644
+> --- a/tools/testing/selftests/kvm/demand_paging_test.c
+> +++ b/tools/testing/selftests/kvm/demand_paging_test.c
+> @@ -42,10 +42,9 @@ static uint64_t guest_percpu_mem_size = DEFAULT_PER_VCPU_MEM_SIZE;
+>  static size_t demand_paging_size;
+>  static char *guest_data_prototype;
+>
+> -static void *vcpu_worker(void *data)
+> +static void vcpu_worker(struct perf_test_vcpu_args *vcpu_args)
+>  {
+>         int ret;
+> -       struct perf_test_vcpu_args *vcpu_args = (struct perf_test_vcpu_args *)data;
+>         int vcpu_id = vcpu_args->vcpu_id;
+>         struct kvm_vm *vm = perf_test_args.vm;
+>         struct kvm_run *run;
+> @@ -68,8 +67,6 @@ static void *vcpu_worker(void *data)
+>         ts_diff = timespec_elapsed(start);
+>         PER_VCPU_DEBUG("vCPU %d execution time: %ld.%.9lds\n", vcpu_id,
+>                        ts_diff.tv_sec, ts_diff.tv_nsec);
+> -
+> -       return NULL;
+>  }
+>
+>  static int handle_uffd_page_request(int uffd_mode, int uffd, uint64_t addr)
+> @@ -282,7 +279,6 @@ struct test_params {
+>  static void run_test(enum vm_guest_mode mode, void *arg)
+>  {
+>         struct test_params *p = arg;
+> -       pthread_t *vcpu_threads;
+>         pthread_t *uffd_handler_threads = NULL;
+>         struct uffd_handler_args *uffd_args = NULL;
+>         struct timespec start;
+> @@ -302,9 +298,6 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>                     "Failed to allocate buffer for guest data pattern");
+>         memset(guest_data_prototype, 0xAB, demand_paging_size);
+>
+> -       vcpu_threads = malloc(nr_vcpus * sizeof(*vcpu_threads));
+> -       TEST_ASSERT(vcpu_threads, "Memory allocation failed");
+> -
+>         if (p->uffd_mode) {
+>                 uffd_handler_threads =
+>                         malloc(nr_vcpus * sizeof(*uffd_handler_threads));
+> @@ -346,22 +339,11 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>         pr_info("Finished creating vCPUs and starting uffd threads\n");
+>
+>         clock_gettime(CLOCK_MONOTONIC, &start);
+> -
+> -       for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++) {
+> -               pthread_create(&vcpu_threads[vcpu_id], NULL, vcpu_worker,
+> -                              &perf_test_args.vcpu_args[vcpu_id]);
+> -       }
+> -
+> +       perf_test_start_vcpu_threads(nr_vcpus, vcpu_worker);
+>         pr_info("Started all vCPUs\n");
+>
+> -       /* Wait for the vcpu threads to quit */
+> -       for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++) {
+> -               pthread_join(vcpu_threads[vcpu_id], NULL);
+> -               PER_VCPU_DEBUG("Joined thread for vCPU %d\n", vcpu_id);
+> -       }
+> -
+> +       perf_test_join_vcpu_threads(nr_vcpus);
+>         ts_diff = timespec_elapsed(start);
+> -
+>         pr_info("All vCPU threads joined\n");
+>
+>         if (p->uffd_mode) {
+> @@ -385,7 +367,6 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>         perf_test_destroy_vm(vm);
+>
+>         free(guest_data_prototype);
+> -       free(vcpu_threads);
+>         if (p->uffd_mode) {
+>                 free(uffd_handler_threads);
+>                 free(uffd_args);
+> diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+> index 583b4d95aa98..1954b964d1cf 100644
+> --- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
+> +++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+> @@ -31,7 +31,7 @@ static bool host_quit;
+>  static int iteration;
+>  static int vcpu_last_completed_iteration[KVM_MAX_VCPUS];
+>
+> -static void *vcpu_worker(void *data)
+> +static void vcpu_worker(struct perf_test_vcpu_args *vcpu_args)
+>  {
+>         int ret;
+>         struct kvm_vm *vm = perf_test_args.vm;
+> @@ -41,7 +41,6 @@ static void *vcpu_worker(void *data)
+>         struct timespec ts_diff;
+>         struct timespec total = (struct timespec){0};
+>         struct timespec avg;
+> -       struct perf_test_vcpu_args *vcpu_args = (struct perf_test_vcpu_args *)data;
+>         int vcpu_id = vcpu_args->vcpu_id;
+>
+>         run = vcpu_state(vm, vcpu_id);
+> @@ -83,8 +82,6 @@ static void *vcpu_worker(void *data)
+>         pr_debug("\nvCPU %d dirtied 0x%lx pages over %d iterations in %ld.%.9lds. (Avg %ld.%.9lds/iteration)\n",
+>                 vcpu_id, pages_count, vcpu_last_completed_iteration[vcpu_id],
+>                 total.tv_sec, total.tv_nsec, avg.tv_sec, avg.tv_nsec);
+> -
+> -       return NULL;
+>  }
+>
+>  struct test_params {
+> @@ -170,7 +167,6 @@ static void free_bitmaps(unsigned long *bitmaps[], int slots)
+>  static void run_test(enum vm_guest_mode mode, void *arg)
+>  {
+>         struct test_params *p = arg;
+> -       pthread_t *vcpu_threads;
+>         struct kvm_vm *vm;
+>         unsigned long **bitmaps;
+>         uint64_t guest_num_pages;
+> @@ -204,20 +200,15 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>                 vm_enable_cap(vm, &cap);
+>         }
+>
+> -       vcpu_threads = malloc(nr_vcpus * sizeof(*vcpu_threads));
+> -       TEST_ASSERT(vcpu_threads, "Memory allocation failed");
+> -
+>         /* Start the iterations */
+>         iteration = 0;
+>         host_quit = false;
+>
+>         clock_gettime(CLOCK_MONOTONIC, &start);
+> -       for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++) {
+> +       for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++)
+>                 vcpu_last_completed_iteration[vcpu_id] = -1;
+
+Did you miss this in the previous commit or mean to leave it here?
+
+>
+> -               pthread_create(&vcpu_threads[vcpu_id], NULL, vcpu_worker,
+> -                              &perf_test_args.vcpu_args[vcpu_id]);
+> -       }
+> +       perf_test_start_vcpu_threads(nr_vcpus, vcpu_worker);
+>
+>         /* Allow the vCPUs to populate memory */
+>         pr_debug("Starting iteration %d - Populating\n", iteration);
+> @@ -286,8 +277,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>
+>         /* Tell the vcpu thread to quit */
+>         host_quit = true;
+> -       for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++)
+> -               pthread_join(vcpu_threads[vcpu_id], NULL);
+> +       perf_test_join_vcpu_threads(nr_vcpus);
+>
+>         avg = timespec_div(get_dirty_log_total, p->iterations);
+>         pr_info("Get dirty log over %lu iterations took %ld.%.9lds. (Avg %ld.%.9lds/iteration)\n",
+> @@ -302,7 +292,6 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>         }
+>
+>         free_bitmaps(bitmaps, p->slots);
+> -       free(vcpu_threads);
+>         perf_test_destroy_vm(vm);
+>  }
+>
+> diff --git a/tools/testing/selftests/kvm/include/perf_test_util.h b/tools/testing/selftests/kvm/include/perf_test_util.h
+> index 74e3622b3a6e..a86f953d8d36 100644
+> --- a/tools/testing/selftests/kvm/include/perf_test_util.h
+> +++ b/tools/testing/selftests/kvm/include/perf_test_util.h
+> @@ -8,6 +8,8 @@
+>  #ifndef SELFTEST_KVM_PERF_TEST_UTIL_H
+>  #define SELFTEST_KVM_PERF_TEST_UTIL_H
+>
+> +#include <pthread.h>
+> +
+>  #include "kvm_util.h"
+>
+>  /* Default guest test virtual memory offset */
+> @@ -45,4 +47,7 @@ void perf_test_destroy_vm(struct kvm_vm *vm);
+>
+>  void perf_test_set_wr_fract(struct kvm_vm *vm, int wr_fract);
+>
+> +void perf_test_start_vcpu_threads(int vcpus, void (*vcpu_fn)(struct perf_test_vcpu_args *));
+> +void perf_test_join_vcpu_threads(int vcpus);
+> +
+>  #endif /* SELFTEST_KVM_PERF_TEST_UTIL_H */
+> diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
+> index 77f9eb5667c9..d646477ed16a 100644
+> --- a/tools/testing/selftests/kvm/lib/perf_test_util.c
+> +++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
+> @@ -16,6 +16,20 @@ struct perf_test_args perf_test_args;
 >   */
->  static void __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
->  				  u64 old_spte, u64 new_spte, int level,
-> -				  bool shared)
-> +				  bool shared,
-> +				  struct list_head *disconnected_sps)
->  {
->  	bool was_present = is_shadow_present_pte(old_spte);
->  	bool is_present = is_shadow_present_pte(new_spte);
-> @@ -475,22 +493,39 @@ static void __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
->  	 */
->  	if (was_present && !was_leaf && (pfn_changed || !is_present))
->  		handle_removed_tdp_mmu_page(kvm,
-> -				spte_to_child_pt(old_spte, level), shared);
-> +				spte_to_child_pt(old_spte, level), shared,
-> +				disconnected_sps);
->  }
->  
->  static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
->  				u64 old_spte, u64 new_spte, int level,
-> -				bool shared)
-> +				bool shared, struct list_head *disconnected_sps)
->  {
->  	__handle_changed_spte(kvm, as_id, gfn, old_spte, new_spte, level,
-> -			      shared);
-> +			      shared, disconnected_sps);
->  	handle_changed_spte_acc_track(old_spte, new_spte, level);
->  	handle_changed_spte_dirty_log(kvm, as_id, gfn, old_spte,
->  				      new_spte, level);
->  }
->  
+>  static uint64_t guest_test_virt_mem = DEFAULT_GUEST_TEST_MEM;
+>
+> +struct vcpu_thread {
+> +       /* The id of the vCPU. */
+> +       int vcpu_id;
+> +
+> +       /* The pthread backing the vCPU. */
+> +       pthread_t thread;
+> +};
+> +
+> +/* The vCPU threads involved in this test. */
+> +static struct vcpu_thread vcpu_threads[KVM_MAX_VCPUS];
+> +
+> +/* The function run by each vCPU thread, as provided by the test. */
+> +static void (*vcpu_thread_fn)(struct perf_test_vcpu_args *);
+> +
 >  /*
-> - * tdp_mmu_set_spte_atomic - Set a TDP MMU SPTE atomically
-> + * The TLBs must be flushed between the pages linked from disconnected_sps
-> + * being removed from the paging structure and this function being called.
-> + */
-> +static void handle_disconnected_sps(struct kvm *kvm,
-> +				    struct list_head *disconnected_sps)
-
-handle_disconnected_sps() does a very specific task so I think we could
-go with a more specific function name to make the code more readable.
-
-How about free_sps_rcu() or call_rcu_free_sps()?
-
-> +{
-> +	struct kvm_mmu_page *sp;
-> +	struct kvm_mmu_page *next;
+>   * Continuously write to the first 8 bytes of each page in the
+>   * specified region.
+> @@ -177,3 +191,35 @@ void perf_test_set_wr_fract(struct kvm_vm *vm, int wr_fract)
+>         perf_test_args.wr_fract = wr_fract;
+>         sync_global_to_guest(vm, perf_test_args);
+>  }
 > +
-> +	list_for_each_entry_safe(sp, next, disconnected_sps, link) {
-> +		list_del(&sp->link);
-> +		call_rcu(&sp->rcu_head, tdp_mmu_free_sp_rcu_callback);
-> +	}
+> +static void *vcpu_thread_main(void *data)
+> +{
+> +       struct vcpu_thread *vcpu = data;
+> +
+> +       vcpu_thread_fn(&perf_test_args.vcpu_args[vcpu->vcpu_id]);
+> +
+> +       return NULL;
 > +}
 > +
-> +/*
-> + * __tdp_mmu_set_spte_atomic - Set a TDP MMU SPTE atomically
->   * and handle the associated bookkeeping.  Do not mark the page dirty
->   * in KVM's dirty bitmaps.
->   *
-> @@ -500,9 +535,10 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
->   * Returns: true if the SPTE was set, false if it was not. If false is returned,
->   *	    this function will have no side-effects.
->   */
-> -static inline bool tdp_mmu_set_spte_atomic(struct kvm *kvm,
-> -					   struct tdp_iter *iter,
-> -					   u64 new_spte)
-> +static inline bool __tdp_mmu_set_spte_atomic(struct kvm *kvm,
-> +					     struct tdp_iter *iter,
-> +					     u64 new_spte,
-> +					     struct list_head *disconnected_sps)
->  {
->  	lockdep_assert_held_read(&kvm->mmu_lock);
->  
-> @@ -522,22 +558,32 @@ static inline bool tdp_mmu_set_spte_atomic(struct kvm *kvm,
->  		return false;
->  
->  	__handle_changed_spte(kvm, iter->as_id, iter->gfn, iter->old_spte,
-> -			      new_spte, iter->level, true);
-> +			      new_spte, iter->level, true, disconnected_sps);
->  	handle_changed_spte_acc_track(iter->old_spte, new_spte, iter->level);
->  
->  	return true;
->  }
->  
-> +static inline bool tdp_mmu_set_spte_atomic(struct kvm *kvm,
-> +					   struct tdp_iter *iter,
-> +					   u64 new_spte)
+> +void perf_test_start_vcpu_threads(int vcpus, void (*vcpu_fn)(struct perf_test_vcpu_args *))
 > +{
-> +	return __tdp_mmu_set_spte_atomic(kvm, iter, new_spte, NULL);
-
-Why not leverage disconnected_sps here as well? Then you can remove the
-NULL case (and comments) from handle_removed_tdp_mmu_page.
-
+> +       int vcpu_id;
+> +
+> +       vcpu_thread_fn = vcpu_fn;
+> +
+> +       for (vcpu_id = 0; vcpu_id < vcpus; vcpu_id++) {
+> +               struct vcpu_thread *vcpu = &vcpu_threads[vcpu_id];
+> +
+> +               vcpu->vcpu_id = vcpu_id;
+> +
+> +               pthread_create(&vcpu->thread, NULL, vcpu_thread_main, vcpu);
+> +       }
 > +}
 > +
->  static inline bool tdp_mmu_zap_spte_atomic(struct kvm *kvm,
->  					   struct tdp_iter *iter)
+> +void perf_test_join_vcpu_threads(int vcpus)
+> +{
+> +       int vcpu_id;
+> +
+> +       for (vcpu_id = 0; vcpu_id < vcpus; vcpu_id++)
+> +               pthread_join(vcpu_threads[vcpu_id].thread, NULL);
+> +}
+> diff --git a/tools/testing/selftests/kvm/memslot_modification_stress_test.c b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
+> index df431d0da1ee..5bd0b076f57f 100644
+> --- a/tools/testing/selftests/kvm/memslot_modification_stress_test.c
+> +++ b/tools/testing/selftests/kvm/memslot_modification_stress_test.c
+> @@ -36,11 +36,9 @@ static uint64_t guest_percpu_mem_size = DEFAULT_PER_VCPU_MEM_SIZE;
+>
+>  static bool run_vcpus = true;
+>
+> -static void *vcpu_worker(void *data)
+> +static void vcpu_worker(struct perf_test_vcpu_args *vcpu_args)
 >  {
-> +	LIST_HEAD(disconnected_sps);
-> +
->  	/*
->  	 * Freeze the SPTE by setting it to a special,
->  	 * non-present value. This will stop other threads from
->  	 * immediately installing a present entry in its place
->  	 * before the TLBs are flushed.
->  	 */
-> -	if (!tdp_mmu_set_spte_atomic(kvm, iter, REMOVED_SPTE))
-> +	if (!__tdp_mmu_set_spte_atomic(kvm, iter, REMOVED_SPTE,
-> +				       &disconnected_sps))
->  		return false;
->  
->  	kvm_flush_remote_tlbs_with_address(kvm, iter->gfn,
-> @@ -553,6 +599,8 @@ static inline bool tdp_mmu_zap_spte_atomic(struct kvm *kvm,
->  	 */
->  	WRITE_ONCE(*rcu_dereference(iter->sptep), 0);
->  
-> +	handle_disconnected_sps(kvm, &disconnected_sps);
-> +
->  	return true;
+>         int ret;
+> -       struct perf_test_vcpu_args *vcpu_args =
+> -               (struct perf_test_vcpu_args *)data;
+>         int vcpu_id = vcpu_args->vcpu_id;
+>         struct kvm_vm *vm = perf_test_args.vm;
+>         struct kvm_run *run;
+> @@ -59,8 +57,6 @@ static void *vcpu_worker(void *data)
+>                             "Invalid guest sync status: exit_reason=%s\n",
+>                             exit_reason_str(run->exit_reason));
+>         }
+> -
+> -       return NULL;
 >  }
->  
-> @@ -577,6 +625,8 @@ static inline void __tdp_mmu_set_spte(struct kvm *kvm, struct tdp_iter *iter,
->  				      u64 new_spte, bool record_acc_track,
->  				      bool record_dirty_log)
+>
+>  struct memslot_antagonist_args {
+> @@ -100,22 +96,15 @@ struct test_params {
+>  static void run_test(enum vm_guest_mode mode, void *arg)
 >  {
-> +	LIST_HEAD(disconnected_sps);
-> +
->  	lockdep_assert_held_write(&kvm->mmu_lock);
->  
->  	/*
-> @@ -591,7 +641,7 @@ static inline void __tdp_mmu_set_spte(struct kvm *kvm, struct tdp_iter *iter,
->  	WRITE_ONCE(*rcu_dereference(iter->sptep), new_spte);
->  
->  	__handle_changed_spte(kvm, iter->as_id, iter->gfn, iter->old_spte,
-> -			      new_spte, iter->level, false);
-> +			      new_spte, iter->level, false, &disconnected_sps);
->  	if (record_acc_track)
->  		handle_changed_spte_acc_track(iter->old_spte, new_spte,
->  					      iter->level);
-> @@ -599,6 +649,8 @@ static inline void __tdp_mmu_set_spte(struct kvm *kvm, struct tdp_iter *iter,
->  		handle_changed_spte_dirty_log(kvm, iter->as_id, iter->gfn,
->  					      iter->old_spte, new_spte,
->  					      iter->level);
-> +
-> +	handle_disconnected_sps(kvm, &disconnected_sps);
-
-Where is the TLB flush for these disconnected_sps?
-
+>         struct test_params *p = arg;
+> -       pthread_t *vcpu_threads;
+>         struct kvm_vm *vm;
+> -       int vcpu_id;
+>
+>         vm = perf_test_create_vm(mode, nr_vcpus, guest_percpu_mem_size, 1,
+>                                  VM_MEM_SRC_ANONYMOUS,
+>                                  p->partition_vcpu_memory_access);
+>
+> -       vcpu_threads = malloc(nr_vcpus * sizeof(*vcpu_threads));
+> -       TEST_ASSERT(vcpu_threads, "Memory allocation failed");
+> -
+>         pr_info("Finished creating vCPUs\n");
+>
+> -       for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++)
+> -               pthread_create(&vcpu_threads[vcpu_id], NULL, vcpu_worker,
+> -                              &perf_test_args.vcpu_args[vcpu_id]);
+> +       perf_test_start_vcpu_threads(nr_vcpus, vcpu_worker);
+>
+>         pr_info("Started all vCPUs\n");
+>
+> @@ -124,16 +113,11 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>
+>         run_vcpus = false;
+>
+> -       /* Wait for the vcpu threads to quit */
+> -       for (vcpu_id = 0; vcpu_id < nr_vcpus; vcpu_id++)
+> -               pthread_join(vcpu_threads[vcpu_id], NULL);
+> -
+> +       perf_test_join_vcpu_threads(nr_vcpus);
+>         pr_info("All vCPU threads joined\n");
+>
+>         ucall_uninit(vm);
+>         kvm_vm_free(vm);
+> -
+> -       free(vcpu_threads);
 >  }
->  
->  static inline void tdp_mmu_set_spte(struct kvm *kvm, struct tdp_iter *iter,
-> -- 
-> 2.34.0.rc0.344.g81b53c2807-goog
-> 
+>
+>  static void help(char *name)
+> --
+> 2.34.0.rc1.387.gb447b232ab-goog
+>
