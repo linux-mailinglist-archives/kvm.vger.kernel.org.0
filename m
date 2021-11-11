@@ -2,154 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0704C44DDE5
-	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 23:31:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CEF3744DE0A
+	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 23:58:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233752AbhKKWen (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Nov 2021 17:34:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52964 "EHLO
+        id S233752AbhKKXBT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Nov 2021 18:01:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230487AbhKKWem (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Nov 2021 17:34:42 -0500
-Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0EFCC061767
-        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 14:31:52 -0800 (PST)
-Received: by mail-io1-xd2c.google.com with SMTP id 14so8822052ioe.2
-        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 14:31:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=9jxsh3Vr1ILkY408znq3RjyZcHNwlIUdMXYI2IYlrGU=;
-        b=UnXmAdLi6qJbe3qsi1O8ebNKssghra1ZYBjpXuNSt4FXL1myT3+3jDC7yKjYsY89us
-         npmlLnFns9yl8/RwVgoFZpIOK4x/JDpVFl5cgCylyjCVnVfi4AtDW5yXEftsBBvZ+A7J
-         uD1Eh7lgaQZLMVN/SmpAhUaEQ6xsrkEmeeu25u+4UNr0NCWhX4hcOZcrqe7/s8iUAmBj
-         ZKiVFD/jWd0YCo4Q+qbxUr2Fc8l7szP527e9qbt81DZof4T7SNa+dt7Rpwf7yXWwoGab
-         Is1xIvJouNSVXtRHluenSXVohiZHSxzOQTEhdnTgVz3g/H7lEQZ66qxfmnAmyczAQwpj
-         we5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=9jxsh3Vr1ILkY408znq3RjyZcHNwlIUdMXYI2IYlrGU=;
-        b=0RmyPGUHri9HIYCRF66Is+dk59PfeBZzM5yWnkV3NNZcPAhbCfDOSMA17HJTWnzr9v
-         0U5kQ2kDb4vcpn5EwwLLfWJBZTOMfbiS6rqdxtQ+YD7r4zRi0gCVHLA8x4Ivvh0p3Iee
-         rBaCiE9DXHNjNs05JfUv29olb2gwYnuWSiFZyf/b7eARcohhVLgEgIusgKM/RfTTuFep
-         6M2JMxdrZFib5+8JiWv8ktJtAnhot1gIw3smclzLZRA1NW9OksFgO/Wt52BF0C4LNjQa
-         zP2HlqwT3RF/rggSoKOe47QOwwJ/FgrooOOR0098gdpUbPGD0JTJ+aTc52inFR9yA3K6
-         dQjg==
-X-Gm-Message-State: AOAM531elO5leiUmNttrMsmIcRioW24+2v7smuyV3OIdpPuZTPBHjmvZ
-        sCceZ1uHKOOdkHme+A5piNPSHJYLqwcPLdi4AqoG+g==
-X-Google-Smtp-Source: ABdhPJwCdFxNWnkFb253Hq+786YEWOphPB4Wk8TDadQALvSmrfizAxT//yY0R2GoWmHu7iu/2JNab1RUluf3aWgqwWY=
-X-Received: by 2002:a02:624c:: with SMTP id d73mr8145648jac.32.1636669912047;
- Thu, 11 Nov 2021 14:31:52 -0800 (PST)
-MIME-Version: 1.0
-References: <20211111221448.2683827-1-seanjc@google.com>
-In-Reply-To: <20211111221448.2683827-1-seanjc@google.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Thu, 11 Nov 2021 14:31:41 -0800
-Message-ID: <CANgfPd98+K-ELe0eAN0d+eqFjSa6ypOOP3MDb_nSwfrCZzpdCw@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86/mmu: Update number of zapped pages even if page
- list is stable
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        with ESMTP id S229835AbhKKXBS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Nov 2021 18:01:18 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABFA6C061766;
+        Thu, 11 Nov 2021 14:58:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:
+        Subject:Sender:Reply-To:Content-ID:Content-Description;
+        bh=4VEbIBkqcGJ3l7Zgq/uZwytuUTxQjnyHYFTzYLajeFM=; b=TRKP74wrJUWYaJp4HuEvwVy7CF
+        YTjoRR5QTzBEeBxq3PCrmmtk8OoH2yjaSangsFbsIzdeSF3SLaE56izUwg7fntdvR2wOK/SS+BBoW
+        mlw1ocs5fd6xel1vUL09N1TKuP894s35YGVDEpjPgpVFbveFsZ22oH/jfhCfNxY8cANsFbTSLGVAx
+        K2DBb0Cg0FcItQGhKOg0hYwZVpeswRgpzsjAb1ohwaQTwk1JI+3g3tjD+fcTGOK18WGrRiP2XgaLJ
+        80qxVMKle/wX4S20DP1RY6pgKSTZD0GwVGh8FXexqBMDy9+bYRS3kt0g4B2yElOISKUDDoO4fTzVX
+        z6FuMwhQ==;
+Received: from [2601:1c0:6280:3f0::aa0b]
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mlJ17-008w1k-MP; Thu, 11 Nov 2021 22:58:01 +0000
+Subject: Re: [PATCH v7 43/45] virt: Add SEV-SNP guest driver
+To:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+References: <20211110220731.2396491-1-brijesh.singh@amd.com>
+ <20211110220731.2396491-44-brijesh.singh@amd.com>
+ <e8baf85f-8f17-d43e-4656-ed9003affaa8@infradead.org>
+ <38e5047c-43a9-400b-c507-337011e0e605@amd.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <e6b412e4-f38e-d212-f52a-e7bdc9a26eff@infradead.org>
+Date:   Thu, 11 Nov 2021 14:57:59 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
+MIME-Version: 1.0
+In-Reply-To: <38e5047c-43a9-400b-c507-337011e0e605@amd.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 11, 2021 at 2:14 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> When zapping obsolete pages, update the running count of zapped pages
-> regardless of whether or not the list has become unstable due to zapping
-> a shadow page with its own child shadow pages.  If the VM is backed by
-> mostly 4kb pages, KVM can zap an absurd number of SPTEs without bumping
-> the batch count and thus without yielding.  In the worst case scenario,
-> this can cause an RCU stall.
->
->   rcu: INFO: rcu_sched self-detected stall on CPU
->   rcu:     52-....: (20999 ticks this GP) idle=7be/1/0x4000000000000000
->                                           softirq=15759/15759 fqs=5058
->    (t=21016 jiffies g=66453 q=238577)
->   NMI backtrace for cpu 52
->   Call Trace:
->    ...
->    mark_page_accessed+0x266/0x2f0
->    kvm_set_pfn_accessed+0x31/0x40
->    handle_removed_tdp_mmu_page+0x259/0x2e0
->    __handle_changed_spte+0x223/0x2c0
->    handle_removed_tdp_mmu_page+0x1c1/0x2e0
->    __handle_changed_spte+0x223/0x2c0
->    handle_removed_tdp_mmu_page+0x1c1/0x2e0
->    __handle_changed_spte+0x223/0x2c0
->    zap_gfn_range+0x141/0x3b0
->    kvm_tdp_mmu_zap_invalidated_roots+0xc8/0x130
->    kvm_mmu_zap_all_fast+0x121/0x190
->    kvm_mmu_invalidate_zap_pages_in_memslot+0xe/0x10
->    kvm_page_track_flush_slot+0x5c/0x80
->    kvm_arch_flush_shadow_memslot+0xe/0x10
->    kvm_set_memslot+0x172/0x4e0
->    __kvm_set_memory_region+0x337/0x590
->    kvm_vm_ioctl+0x49c/0xf80
->
-> Fixes: fbb158cb88b6 ("KVM: x86/mmu: Revert "Revert "KVM: MMU: zap pages in batch""")
-> Reported-by: David Matlack <dmatlack@google.com>
-> Cc: Ben Gardon <bgardon@google.com>
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+On 11/11/21 11:27 AM, Brijesh Singh wrote:
+> Hi Randy,
+> 
+> On 11/10/21 4:27 PM, Randy Dunlap wrote:
+>> Hi,
+>>
+>> On 11/10/21 2:07 PM, Brijesh Singh wrote:
+>>> diff --git a/drivers/virt/coco/sevguest/Kconfig b/drivers/virt/coco/sevguest/Kconfig
+>>> new file mode 100644
+>>> index 000000000000..96190919cca8
+>>> --- /dev/null
+>>> +++ b/drivers/virt/coco/sevguest/Kconfig
+>>> @@ -0,0 +1,9 @@
+>>> +config SEV_GUEST
+>>> +    tristate "AMD SEV Guest driver"
+>>> +    default y
+>>
+>> For this to remain as "default y", you need to justify it.
+>> E.g., if a board cannot boot with an interrupt controller,
+>> the driver for the interrupt controller can be "default y".
+>>
+>> So why is this default y?
+>> No other drivers in drivers/virt/ are default y.
+>>
+> 
+> I choose the default "y" for two reasons:
+> 
+> 1.  The driver is built if the user enables the AMD memory encryption support. If the user has selected the AMD memory encryption support, they will be querying an attestation report to verify that the guest is running on AMD memory encryption enabled hardware.
 
-Reviewed-by: Ben Gardon <bgardon@google.com>
+OK, I see. I'm OK with this.
 
-While I can see this fixing the above stall, there's still a potential
-issue where zapped_obsolete_pages can accumulate an arbitrary number
-of pages from multiple batches of zaps. If this list gets very large,
-we could see a stall after the loop while trying to free the pages.
-I'm not aware of this ever happening, but it could be worth yielding
-during that freeing process as well.
+> 2. Typically, an attestation report is retrieved from an initial ramdisk (before mounting the disk). IIUC, the standard initramfs build tools may not include the driver by default and requires the user to go through hoops.
+> 
+> However, I have no strong reason to keep it to "y" if other prefers "m".
 
-> ---
->
-> I haven't actually verified this makes David's RCU stall go away, but I did
-> verify that "batch" stays at "0" before and increments as expected after,
-> and that KVM does yield as expected after.
->
->  arch/x86/kvm/mmu/mmu.c | 10 ++++++----
->  1 file changed, 6 insertions(+), 4 deletions(-)
->
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 33794379949e..89480fab09c6 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -5575,6 +5575,7 @@ static void kvm_zap_obsolete_pages(struct kvm *kvm)
->  {
->         struct kvm_mmu_page *sp, *node;
->         int nr_zapped, batch = 0;
-> +       bool unstable;
->
->  restart:
->         list_for_each_entry_safe_reverse(sp, node,
-> @@ -5606,11 +5607,12 @@ static void kvm_zap_obsolete_pages(struct kvm *kvm)
->                         goto restart;
->                 }
->
-> -               if (__kvm_mmu_prepare_zap_page(kvm, sp,
-> -                               &kvm->arch.zapped_obsolete_pages, &nr_zapped)) {
-> -                       batch += nr_zapped;
-> +               unstable = __kvm_mmu_prepare_zap_page(kvm, sp,
-> +                               &kvm->arch.zapped_obsolete_pages, &nr_zapped);
-> +               batch += nr_zapped;
-> +
-> +               if (unstable)
->                         goto restart;
-> -               }
->         }
->
->         /*
-> --
-> 2.34.0.rc1.387.gb447b232ab-goog
->
+"m" is no better than "y" in this case.
+
+thanks.
+-- 
+~Randy
