@@ -2,96 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5678044D7B6
-	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 14:59:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A47BD44D7CD
+	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 15:06:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233425AbhKKOBz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Nov 2021 09:01:55 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25512 "EHLO
+        id S233500AbhKKOJI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Nov 2021 09:09:08 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26499 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232513AbhKKOBy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 11 Nov 2021 09:01:54 -0500
+        by vger.kernel.org with ESMTP id S231739AbhKKOJH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 11 Nov 2021 09:09:07 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636639145;
+        s=mimecast20190719; t=1636639577;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ESUXrCbNuii7JSa0LxmJs7Rc4Q6PMtXE/VioZv4aHGg=;
-        b=Q7gx5XduY5XEgPjHyCWO6mu/B1LE/ev5GBcIQCtwB5/CPMNCKiM0HSkpKuQ/XTG4h/3mQX
-        HVwaV5uuOKWfirtxJhcNbzLZMuALfzIU34VMMub6aKPPr+HKHe8Rjv8W2jb5U97C6xJZ0B
-        qBwcxasWCGP/JV7TRvrAIjD2aqMs7Lw=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-97-hETf1E91NrKVlvl6dlEvdg-1; Thu, 11 Nov 2021 08:59:04 -0500
-X-MC-Unique: hETf1E91NrKVlvl6dlEvdg-1
-Received: by mail-wr1-f71.google.com with SMTP id h7-20020adfaa87000000b001885269a937so1017497wrc.17
-        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 05:59:03 -0800 (PST)
+        bh=mz051CqN1il+dA+L7pOpHy4Rh5epXYb1k7VG3Plo7Yk=;
+        b=BqlK+2ysHJrwUxzdrqkV/NseB4mbuax7LgGuBUaczS9OKfvGjLW1p3R5oohGfLSYgVPWrT
+        akhz8dIWtLIxP+DoZKFpPgR/m38dU7deI27CMB4DRPvQRGJ+NFz+YEuSsWs6ARbHK744/j
+        5J2bSGRlVhfni07oRewwx9b+hvCxBHQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-510-f7BwpHOXPTG9l8k492Rnyw-1; Thu, 11 Nov 2021 09:06:16 -0500
+X-MC-Unique: f7BwpHOXPTG9l8k492Rnyw-1
+Received: by mail-wm1-f71.google.com with SMTP id 67-20020a1c0046000000b0032cd88916e5so2772005wma.6
+        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 06:06:16 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=ESUXrCbNuii7JSa0LxmJs7Rc4Q6PMtXE/VioZv4aHGg=;
-        b=atA7A3B6TAiKxLsTLrT7scLzYc07ZnBTam1fQ/jMNpen7TXDuYCnDba4lRaRWyZ6Da
-         YP2eL7DEz66TQLJWdAeF8Gu5Z1JU1991O4TyINZlciXT4Wc5JZcZ0bN9PaCa/NR6hBjc
-         pMXEVPKWoNWz4sVTf4ODEwKO8VdtEaw1MbebklhKeag5IYVHOKj2NqU4PqwUqzBqVK9Y
-         iD9sLa0t8WLwj6PWCT8Ge7vBi3yp/r6nq5vNFd0fg/PduaQGCF5L3WyL9RJCcRt1bJn9
-         R4ZTgaF1oMH7n9e9emXLzF/fDgaNmO5ABeNX8Dk+tsnGyCNZ3k8UHKJCjQRJzrXahiOO
-         wvWg==
-X-Gm-Message-State: AOAM531UtUOOjF4KVy1k/fFTzdODUq67Nndm+YcTaTcDCaOe4zldeFU1
-        zUhl2MhuWHnpPZ322KQmds832alkj//RwIVwIBn/+6CiF6d7xUZYsCedGLjTWIRPFlIRdqbTO6v
-        YmGI95nmw2GNR
-X-Received: by 2002:adf:c70b:: with SMTP id k11mr8727180wrg.154.1636639142630;
-        Thu, 11 Nov 2021 05:59:02 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyNPT+SEiz5ns3CHBP3dPEYod/0tJHhdmafwryzWp3IhR0o00/k/QCTEV+3ZYi0oxKXVDMwnQ==
-X-Received: by 2002:adf:c70b:: with SMTP id k11mr8727143wrg.154.1636639142358;
-        Thu, 11 Nov 2021 05:59:02 -0800 (PST)
+        bh=mz051CqN1il+dA+L7pOpHy4Rh5epXYb1k7VG3Plo7Yk=;
+        b=2gXQMtE395WKtyhBy4GYFrqgDfGy0cqZIBwQFCbOECWWN18Z9GyvzJQg+VQkUtvL52
+         KsGck7DCpuKxrg6/E0jWyVv9oAniltxksJ5oq6SXO7AMVUSY9LT1ncFaBTD0g+oGnohS
+         vzP7ESZsnYXMVkugEr089uvDQFa+dtNzWRvnKchqCgepRWdw2HiZcy8O5/yuc4/GEyWs
+         EzRjgko7gplu5WQgQu1Sb4n23JQLV4ofN9/LkDw2a5cAStIujKRubaNFw6MiarwB0FCL
+         XWkgAdMi/on6qB9Kln9IEhh3c/Iy95g3ZDDzaJSJAJj7F0KAaxaRN/QNaFJL3317sbqc
+         /0Zw==
+X-Gm-Message-State: AOAM5323fR5mlihAwCX1cl3To564nU7NVGMJ9nTj9DbTEJvr9j2eFvU/
+        blUag/cEpiFt/VJnCTXo+d4P5L3v+/xCQjUBzWpolvX4MCu1P8BpwU2D+EPG1ENunqZWL0ms04l
+        ckcu8zVmPa48Q
+X-Received: by 2002:a1c:4686:: with SMTP id t128mr8412187wma.194.1636639575404;
+        Thu, 11 Nov 2021 06:06:15 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxnmeV/GdfwYMLdDvm0j8NSwj/h0xEUckijmROHxrHDUhEC4Xmn+LcBSDQ6FmrRmXjqroy88Q==
+X-Received: by 2002:a1c:4686:: with SMTP id t128mr8412162wma.194.1636639575187;
+        Thu, 11 Nov 2021 06:06:15 -0800 (PST)
 Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.gmail.com with ESMTPSA id d11sm2943517wrs.38.2021.11.11.05.59.01
+        by smtp.gmail.com with ESMTPSA id t9sm3273302wrx.72.2021.11.11.06.06.14
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Nov 2021 05:59:01 -0800 (PST)
-Message-ID: <ba60bedf-77e0-10e7-5857-faa1279d29ab@redhat.com>
-Date:   Thu, 11 Nov 2021 14:59:00 +0100
+        Thu, 11 Nov 2021 06:06:14 -0800 (PST)
+Message-ID: <15d22245-16be-9665-4d3d-91b643ff044d@redhat.com>
+Date:   Thu, 11 Nov 2021 15:06:13 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.2.0
-Subject: Re: [PATCH 0/2] KVM: x86: Sanitize writes to MSR_KVM_PV_EOI_EN
+Subject: Re: [PATCH v4 0/4] KVM: x86: MSR filtering and related fixes
 Content-Language: en-US
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Li RongQing <lirongqing@baidu.com>,
-        linux-kernel@vger.kernel.org
-References: <20211108152819.12485-1-vkuznets@redhat.com>
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Alexander Graf <graf@amazon.com>
+References: <20211109013047.2041518-1-seanjc@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211108152819.12485-1-vkuznets@redhat.com>
+In-Reply-To: <20211109013047.2041518-1-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/8/21 16:28, Vitaly Kuznetsov wrote:
-> This is a continuation of work started by Li RongQing with
-> "[PATCH] KVM: x86: disable pv eoi if guest gives a wrong address":
-> https://lore.kernel.org/kvm/1636078404-48617-1-git-send-email-lirongqing@baidu.com/
+On 11/9/21 02:30, Sean Christopherson wrote:
+> Fix a nVMX MSR interception check bug, fix two intertwined nVMX bugs bugs
+> related to MSR filtering (one directly, one indirectly), and additional
+> cleanup on top.  The main SRCU fix from the original series was merged,
+> but these got left behind (luckily, becaues the main fix was buggy).
 > 
-> Instead of resetting 'KVM_MSR_ENABLED' when a bogus address was written to
-> MSR_KVM_PV_EOI_EN I suggest we refuse to update MSR at all, this aligns
-> with #GP which is being injected on such writes.
+> Side topic, getting a VM to actually barf on RDMSR(SPEC_CTRL) is comically
+> difficult: -spec-ctrl,-stibp,-ssbd,-ibrs-all,-ibpb,-amd-stibp,-amd-ssbd.
+> QEMU and KVM really, really want to expose SPEC_CTRL to the guest :-)
 > 
-> Vitaly Kuznetsov (2):
->    KVM: x86: Rename kvm_lapic_enable_pv_eoi()
->    KVM: x86: Don't update vcpu->arch.pv_eoi.msr_val when a bogus value
->      was written to MSR_KVM_PV_EOI_EN
+> v4:
+>    - Rebase to 0d7d84498fb4 ("KVM: x86: SGX must obey the ... protocol")
+>    - Fix inverted passthrough check for SPEC_CTRL. [Vitaly]
+>    - Add patch to fix MSR bitmap enabling check in helper.
 > 
->   arch/x86/kvm/hyperv.c |  4 ++--
->   arch/x86/kvm/lapic.c  | 23 ++++++++++++++---------
->   arch/x86/kvm/lapic.h  |  2 +-
->   arch/x86/kvm/x86.c    |  2 +-
->   4 files changed, 18 insertions(+), 13 deletions(-)
+> v3:
+>    - Rebase to 9f6090b09d66 ("KVM: MMU: make spte .... in make_spte")
+> 
+> v2:
+>    - https://lkml.kernel.org/r/20210318224310.3274160-1-seanjc@google.com
+>    - Make the macro insanity slightly less insane. [Paolo]
+> 
+> v1: https://lkml.kernel.org/r/20210316184436.2544875-1-seanjc@google.com
+> 
+> Sean Christopherson (4):
+>    KVM: nVMX: Query current VMCS when determining if MSR bitmaps are in
+>      use
+>    KVM: nVMX: Handle dynamic MSR intercept toggling
+>    KVM: VMX: Macrofy the MSR bitmap getters and setters
+>    KVM: nVMX: Clean up x2APIC MSR handling for L2
+> 
+>   arch/x86/kvm/vmx/nested.c | 164 +++++++++++++++-----------------------
+>   arch/x86/kvm/vmx/vmx.c    |  61 ++------------
+>   arch/x86/kvm/vmx/vmx.h    |  28 +++++++
+>   3 files changed, 97 insertions(+), 156 deletions(-)
 > 
 
 Queued, thanks.
