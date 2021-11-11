@@ -2,55 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 611BC44CE15
-	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 01:03:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7EA9E44CE16
+	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 01:03:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234332AbhKKAGU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Nov 2021 19:06:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60484 "EHLO
+        id S234346AbhKKAGX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Nov 2021 19:06:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234336AbhKKAGT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Nov 2021 19:06:19 -0500
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29377C061766
-        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 16:03:31 -0800 (PST)
-Received: by mail-pg1-x549.google.com with SMTP id u6-20020a63f646000000b002dbccd46e61so2291596pgj.18
-        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 16:03:31 -0800 (PST)
+        with ESMTP id S234350AbhKKAGU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Nov 2021 19:06:20 -0500
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1F3AC061766
+        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 16:03:32 -0800 (PST)
+Received: by mail-pl1-x64a.google.com with SMTP id u22-20020a170902a61600b00141ab5dd25dso2131203plq.5
+        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 16:03:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=XiTkYX7gs0cLKe9ierAcN63ncrzHniZEt0Nt4vaBoqs=;
-        b=JBJkO23NlOtRou8jWV8NlOEgxzCIshAAQZq5bce81gfGX4Hpv540AszFP9S5VakCwy
-         gDPDp018GQ8uwFuwmY2xmZ4sL6vuwkY4KxM2HuB73CnybL22gGJ8GBCEvJ7XywhnhT/1
-         ZqcUW+DmxC/LN1RvQXpHMFU73qUAjvHRpkDuCkmSg50A8o3r6anfoliN/xFw7ut2TRQ6
-         O+YrykxF3YW4sncE6DYm4ufmec6+2YzyfJpqD8uhL1C4PsR/7bPcYj4QyiuU7vYINHYu
-         hAo+hyFRXoKhWjucow9qk2TPQ4Wes7pfiixn/zl1yBt5X+KDrnRmY9kSQJSMCwJWj0Be
-         EviQ==
+        bh=lMvpWUPWJPTO9CE1xh06Zz7pIPVSd/jSPrFlRpXLV78=;
+        b=P6Szp+uGt8cjVKSc1jKri6+P9Ocp+G6101tjHladzRC8SeATPnb3LBwo4NgxNLq5U0
+         xyJXKn0IvnjJk3jJyJOdHFwr4gj6GRTMUuB02DGkhYGThOgGjDkxip5z8wLrEySSUL4u
+         sGkhSSkIwLkuMkxqE8DGikkZaBgU9P3fEnmCXm/ILzwXKVQnd4Z8RIpuhoXiaPPIua5b
+         ckkOpJ/Ilq0xx15kSxSsuu7Aj3Q5joufCFK6erKdEcDRVvNbf9WPc1eZ6lonkX5IDaWD
+         Njye0+NDbPiyCfRhGejBvH0tJ/Gmeyya/P6nhk+8ZCVyTYI9MSMhz3WHlwgvAADsh4i8
+         ovKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=XiTkYX7gs0cLKe9ierAcN63ncrzHniZEt0Nt4vaBoqs=;
-        b=sfvAT6CFUQtUojcA0oTFF2Cf6naFYasrkJtkjbyxt6hUbFuwn9QATjAkBK+eoJ4QwP
-         Nv9T5UZIv8XoenVqAi3Q/dvmC/Fes5S9FRw/uY8Ehd4lO0N/sTh/ehiKbX7zZau2hGZq
-         5XWKKql9LieUZHmgVO7ajxiLV2MnTG6dZ2iP3yLR+auwQNmVWWIL9nVy/SZDDl6BR4Xm
-         X7SfGTBHDnjfVoIXLw2qElp6rRgdKYt28x/vDpyStaOLG7E16jX+mur0ik6a2Dc6S9ok
-         CZrqhad+G8ldCv/+oVnDhUIyQR96OOfdzHsVf0wLorKQcQdsQgZHTE2JbyFt4c+bh1iH
-         Z3Lg==
-X-Gm-Message-State: AOAM531u7X49+6jY12dziiqmu0EK2Yb2QTzK275GWkD3/BbTVAxA3pc+
-        KLbFx0OL71Q1kMi90+DYnGgtVBkD3NZw7A==
-X-Google-Smtp-Source: ABdhPJyMr0H+YuRUYMr4wmg60T2bvcMvrDXEp9td7Ksv7NbJyW8gwgowgEf6TyKo5Qgjk7XvbCop0wsBmgVp5A==
+        bh=lMvpWUPWJPTO9CE1xh06Zz7pIPVSd/jSPrFlRpXLV78=;
+        b=1aPSfmva8nWUfye8dXLFEIVj12ejtcn/+QDYJcB9yAlt3CJD8yPlctis7uPThaXinO
+         HQSW3rNJ2rcSNReb97HhMbMmIMoxlmBH6IuFnAQn5KnEXzhU10u0Pc5tuovliDJPZAys
+         SHwb3QK9ObDlYig5Ld1PPDYIR5xy2WTt3+PHUl7N/K8RuUQFWFFpRWF2TAP/hMX9TR30
+         +jb3GOcqv0GEp2XlYJHgeu6qLcbifdo8HC9RWx4oRAZpawEVoy5VGid0chLaCHP/D8aY
+         0OvKZfLmBbLfpAG8gy/XRX2PIpLTtvJIiAHq0Pu0j6PuGcjv0NVwrBtxZS6HGWPIBaso
+         dgkQ==
+X-Gm-Message-State: AOAM530cFkNz9wGpP8/1Uo2pifS6lxQui7Yk+cjHdmJ+vhCO5it/NZ2e
+        oJVP3j6wFuNCDA4VUrkZo4lyW5bQ1te80g==
+X-Google-Smtp-Source: ABdhPJw/AskE7qHLjkCoROJAnZzjRNrnq3OgfLJLgU7Tq67mKw6KK803jFjceOmbVedTpDBHo88TGwPf0/oanA==
 X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a63:2a93:: with SMTP id
- q141mr1793040pgq.45.1636589010693; Wed, 10 Nov 2021 16:03:30 -0800 (PST)
-Date:   Thu, 11 Nov 2021 00:03:07 +0000
+ (user=dmatlack job=sendgmr) by 2002:a05:6a00:21c6:b0:44c:937:fbf3 with SMTP
+ id t6-20020a056a0021c600b0044c0937fbf3mr2949121pfj.2.1636589012300; Wed, 10
+ Nov 2021 16:03:32 -0800 (PST)
+Date:   Thu, 11 Nov 2021 00:03:08 +0000
 In-Reply-To: <20211111000310.1435032-1-dmatlack@google.com>
-Message-Id: <20211111000310.1435032-10-dmatlack@google.com>
+Message-Id: <20211111000310.1435032-11-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20211111000310.1435032-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.34.0.rc1.387.gb447b232ab-goog
-Subject: [PATCH v2 09/12] KVM: selftests: Remove perf_test_args.host_page_size
+Subject: [PATCH v2 10/12] KVM: selftests: Create VM with adjusted number of
+ guest pages for perf tests
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
@@ -68,54 +70,37 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Sean Christopherson <seanjc@google.com>
 
-Remove perf_test_args.host_page_size and instead use getpagesize() so
-that it's somewhat obvious that, for tests that care about the host page
-size, they care about the system page size, not the hardware page size,
-e.g. that the logic is unchanged if hugepages are in play.
-
-No functional change intended.
+Use the already computed guest_num_pages when creating the so called
+extra VM pages for a perf test, and add a comment explaining why the
+pages are allocated as extra pages.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 Reviewed-by: Ben Gardon <bgardon@google.com>
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- tools/testing/selftests/kvm/include/perf_test_util.h | 1 -
- tools/testing/selftests/kvm/lib/perf_test_util.c     | 3 +--
- 2 files changed, 1 insertion(+), 3 deletions(-)
+ tools/testing/selftests/kvm/lib/perf_test_util.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/include/perf_test_util.h b/tools/testing/selftests/kvm/include/perf_test_util.h
-index d7cde1ab2a85..9348580dc5be 100644
---- a/tools/testing/selftests/kvm/include/perf_test_util.h
-+++ b/tools/testing/selftests/kvm/include/perf_test_util.h
-@@ -28,7 +28,6 @@ struct perf_test_vcpu_args {
- 
- struct perf_test_args {
- 	struct kvm_vm *vm;
--	uint64_t host_page_size;
- 	uint64_t gpa;
- 	uint64_t guest_page_size;
- 	int wr_fract;
 diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
-index 0fc2d834c1c7..a0aded8cfce3 100644
+index a0aded8cfce3..b3154b5b0cfd 100644
 --- a/tools/testing/selftests/kvm/lib/perf_test_util.c
 +++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
-@@ -60,7 +60,6 @@ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int vcpus,
+@@ -77,9 +77,13 @@ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int vcpus,
+ 		    "Guest memory cannot be evenly divided into %d slots.",
+ 		    slots);
  
- 	pr_info("Testing guest mode: %s\n", vm_guest_mode_string(mode));
++	/*
++	 * Pass guest_num_pages to populate the page tables for test memory.
++	 * The memory is also added to memslot 0, but that's a benign side
++	 * effect as KVM allows aliasing HVAs in meslots.
++	 */
+ 	vm = vm_create_with_vcpus(mode, vcpus, DEFAULT_GUEST_PHY_PAGES,
+-				  (vcpus * vcpu_memory_bytes) / pta->guest_page_size,
+-				  0, guest_code, NULL);
++				  guest_num_pages, 0, guest_code, NULL);
  
--	pta->host_page_size = getpagesize();
- 	/*
- 	 * Snapshot the non-huge page size.  This is used by the guest code to
- 	 * access/dirty pages at the logging granularity.
-@@ -70,7 +69,7 @@ struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int vcpus,
- 	guest_num_pages = vm_adjust_num_guest_pages(mode,
- 				(vcpus * vcpu_memory_bytes) / pta->guest_page_size);
+ 	pta->vm = vm;
  
--	TEST_ASSERT(vcpu_memory_bytes % pta->host_page_size == 0,
-+	TEST_ASSERT(vcpu_memory_bytes % getpagesize() == 0,
- 		    "Guest memory size is not host page size aligned.");
- 	TEST_ASSERT(vcpu_memory_bytes % pta->guest_page_size == 0,
- 		    "Guest memory size is not guest page size aligned.");
 -- 
 2.34.0.rc1.387.gb447b232ab-goog
 
