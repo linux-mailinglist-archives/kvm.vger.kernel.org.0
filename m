@@ -2,104 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DB65244CE06
-	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 00:49:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B2F444CE0C
+	for <lists+kvm@lfdr.de>; Thu, 11 Nov 2021 01:03:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234299AbhKJXwp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 10 Nov 2021 18:52:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57476 "EHLO
+        id S234265AbhKKAGF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 10 Nov 2021 19:06:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60406 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234143AbhKJXwo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 10 Nov 2021 18:52:44 -0500
-Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8529DC061766
-        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 15:49:56 -0800 (PST)
-Received: by mail-il1-x12a.google.com with SMTP id h2so4143438ili.11
-        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 15:49:56 -0800 (PST)
+        with ESMTP id S234143AbhKKAGF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 10 Nov 2021 19:06:05 -0500
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1ECFEC061766
+        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 16:03:17 -0800 (PST)
+Received: by mail-pj1-x1049.google.com with SMTP id hg9-20020a17090b300900b001a6aa0b7d8cso1910243pjb.2
+        for <kvm@vger.kernel.org>; Wed, 10 Nov 2021 16:03:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=3MGQph/Z9WoRyVfqL+556HAUG2iGxUtw9Bgst+PEKgs=;
-        b=b1QfPiuoqB3cMdbfOoHfXZ9BQX+TRuDwV8p1coJLgStoQy0+ZFC+DS05y+TMTq041M
-         0uUAiJqWTyYDi25qJSYP13zZ+6sosYn+aika+A/QrR+02Z7yuCuOPlCTHkkt0Zm0u0Pe
-         RGgL135xif+erKk6ILrGPd8T55ppk/8BqFTowa5AvLoKq8u1Nz8SNjtYaFrmmRqW5zzM
-         srr0/YedPxztwHFpzLd0OsvBb2FJm8837tcLG72W3pkSYsHCS8K2Fu1dJc/K8czZBSXW
-         dBugD3b3wTiz/3ft/gAQXd2p9pKO4WGOf9PKwW06jWLjhcZat08gbDR5nn5Pt1Vz4zrJ
-         GY9A==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=puRYWI4avhociHSaO6PkBsC+dGQfbUhSErR9iQtcCYQ=;
+        b=nlNwE7YgCBPh78a/AcfjEYEuim6GEuEGfYmro28Ir27clTxpwW2jfsEWx1RefhS0Qy
+         LqrQMSLkjzGdPIwz7sBaW6IJHHf+BAZ7wP2k65qeSU6cJZxiUjPZt91yn1Q7GrT/mhVu
+         AHdCfFRd6xvIAX9nmCgygutO3o+yrk+AGPOuNYBMOKpZr8IHyLbZzYaSyaefAXxdEwZl
+         /DV8cdvsXk7qq+VD1xBcU9gjGssL0nPZww5ltgubFdPpGCwlX3hpwqkUCj5xQIcnd4vy
+         EoQUg7k4PYbnFEwJ1nWJlquK0ycTn0FfoKgAmjdCoPtuSuzaNGyauSfU80jvIEofPuJf
+         3hZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=3MGQph/Z9WoRyVfqL+556HAUG2iGxUtw9Bgst+PEKgs=;
-        b=6lE2B5SDO94q6AQ5KRzhlafAAbl6kmVvifDEUTTHj81iegve/RR0nHoRhO9XbAcflZ
-         ze032Grw3ZXyqd2Dtiz/E4hXP3GoHPMgH4H/j3n19lcbbM8Oj5is4RKuIDVy+RSKjOZb
-         tcrzoMKniVVLGj463dZV5PlrtFlIm1YVxOkahGgvRnZ6eggEE4QsWEeuNozr0PJFLl6x
-         LretV2JyP24OQ27+qwlHJwtUe8hB9ZlyQqZcYql0JIzKRd7aC5hEgsAv5W8kCXtJdtwo
-         ybTX+jtOB+ScZzc/lkE8BmvC5kGhw/vVkoMLbza9EUOWHkoGg8XEtI30h9Fner28nO0J
-         auOA==
-X-Gm-Message-State: AOAM5307NvyRYCJNWUN6GvSpwtOhNyRKj8I8oR9hEk39XM0UVGBLptIi
-        fWD5b4ADLbm6Cb5s4KDC6+Chd5kiXuPlDVQWCNz2gg==
-X-Google-Smtp-Source: ABdhPJx2fbhg7NXM7GAmsiVfClUjuYAJaTbZDQ20OJSvQl3H1sQHeegwJw2ERdD7pMnhXwYblG7RNRyXKPEEMqK9LqE=
-X-Received: by 2002:a05:6e02:1809:: with SMTP id a9mr1712736ilv.203.1636588195845;
- Wed, 10 Nov 2021 15:49:55 -0800 (PST)
-MIME-Version: 1.0
-References: <20211110223010.1392399-1-bgardon@google.com> <20211110223010.1392399-12-bgardon@google.com>
- <80407e4a-36e1-e606-ed9f-74429f850e77@redhat.com>
-In-Reply-To: <80407e4a-36e1-e606-ed9f-74429f850e77@redhat.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Wed, 10 Nov 2021 15:49:44 -0800
-Message-ID: <CANgfPd8hzDU+v52t9Kr=b48utC1p_j3yJ8gHzo-uifAxHbh-eQ@mail.gmail.com>
-Subject: Re: [RFC 11/19] KVM: x86/mmu: Factor shadow_zero_check out of make_spte
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=puRYWI4avhociHSaO6PkBsC+dGQfbUhSErR9iQtcCYQ=;
+        b=HfyDyN2BEYcyuGzY/1crwORsqIyPKU1E0gUN2Ze2tLKGC9i/RFd/LMgRS13AI/uV+s
+         yVcpgv18y0DrtD1kgQDQOQvOvhfCUY0bydX5iGG20lH7eDp9rv2aSHMKkRyjFhBGyJN0
+         RuNamsPJ7vipdtEcZyTlez7lS2vlQi4cL9PiWgivqKDl8sNcjPPor7Yebyl3QtcfW84D
+         SVb3UfkTbwg//f2O6cVXPezuaMhMHY0cE/Dl3GmXQI8/MEasMF7hr7a3Y/P5U1wPHu+f
+         JEfKPaF+2dhnzys0E49dlykKEMdacevVrCxfZIR14+JPnOAcF8qjEMdUqjqHdxHggZKn
+         KV7A==
+X-Gm-Message-State: AOAM533mJj+N/XQ86OrL6qtbu78wb6t7+L2flx4RAFcRVS5y8juwQ1fl
+        cF09uuTU9OtEDbdMP5bx7o4fbu2FL9WNMg==
+X-Google-Smtp-Source: ABdhPJwY6xm0J03NNsrdqX4WgtwPbNRpFk8tJDyLWOrN8jKExT3rZTRL7KwrTHRqBAbFST7fpm4H3oELCvuXUg==
+X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
+ (user=dmatlack job=sendgmr) by 2002:a17:90a:284f:: with SMTP id
+ p15mr89872pjf.1.1636588996159; Wed, 10 Nov 2021 16:03:16 -0800 (PST)
+Date:   Thu, 11 Nov 2021 00:02:58 +0000
+Message-Id: <20211111000310.1435032-1-dmatlack@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.34.0.rc1.387.gb447b232ab-goog
+Subject: [PATCH v2 00/12] KVM: selftests: Hugepage fixes and cleanups
+From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Yanan Wang <wangyanan55@huawei.com>,
         Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Peter Shier <pshier@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Keqian Zhu <zhukeqian1@huawei.com>,
-        David Hildenbrand <david@redhat.com>
+        Aaron Lewis <aaronlewis@google.com>,
+        David Matlack <dmatlack@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 10, 2021 at 2:45 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 11/10/21 23:30, Ben Gardon wrote:
-> > -     WARN_ONCE(is_rsvd_spte(&vcpu->arch.mmu->shadow_zero_check, spte, level),
-> > +     WARN_ONCE(is_rsvd_spte(shadow_zero_check, spte, level),
-> >                 "spte = 0x%llx, level = %d, rsvd bits = 0x%llx", spte, level,
-> > -               get_rsvd_bits(&vcpu->arch.mmu->shadow_zero_check, spte, level));
-> > +               get_rsvd_bits(shadow_zero_check, spte, level));
->
-> Hmm, there is a deeper issue here, in that when using EPT/NPT (on either
-> the legacy aka shadow or the TDP MMU) large parts of vcpu->arch.mmu are
-> really the same for all vCPUs.  The only thing that varies is those
-> parts that actually depend on the guest's paging mode---the extended
-> role, the reserved bits, etc.  Those are needed by the emulator, but
-> don't really belong in vcpu->arch.mmu when EPT/NPT is in use.
->
-> I wonder if there's room for splitting kvm_mmu in two parts, such as
-> kvm_mmu and kvm_guest_paging_context, and possibly change the walk_mmu
-> pointer into a pointer to kvm_guest_paging_context.  This way the
-> EPT/NPT MMU (again either shadow or TDP) can be moved to kvm->arch.  It
-> should simplify this series and also David's work on eager page splitting.
->
-> I'm not asking you to do this, of course, but perhaps I can trigger
-> Sean's itch to refactor stuff. :)
->
-> Paolo
->
+Fix hugepage bugs in the KVM selftests that specifically affect dirty
+logging and demand paging tests.  Found while attempting to verify KVM
+changes/fixes related to hugepages and dirty logging (patches incoming in
+a separate series).
 
-I think that's a great idea. I'm frequently confused as to why the
-struct kvm_mmu is a per-vcpu construct as opposed to being VM-global.
-Moving part of the struct to be a member for struct kvm would also
-open the door to formalizing the MMU interface a little better and
-perhaps even reveal more MMU code that can be consolidated across
-architectures.
+Clean up the perf_test_args util on top of the hugepage fixes to clarify
+what "page size" means, and to improve confidence in the code doing what
+it thinks it's doing.  In a few cases, users of perf_test_args were
+duplicating (approximating?) calculations made by perf_test_args, and it
+wasn't obvious that both pieces of code were guaranteed to end up with the
+same result.
+
+v2:
+- Add separate align up/down helpers and use the throughout the series
+  rather than openly coding the bitwise math [Ben, Paolo]
+- Do no pad HugeTLB mmaps [Yanan]
+- Drop "[PATCH 04/15] KVM: selftests: Force stronger HVA alignment (1gb)
+  for hugepages" since HugeTLB does not require manual HVA alignment
+  [David]
+- Drop "[PATCH 15/15] KVM: selftests: Get rid of gorilla math in memslots
+  modification test" since the gorilla math no longer exists [David]
+- Drop "[PATCH 14/15] KVM: selftests: Track size of per-VM memslot in
+  perf_test_args" since it was just a prep patch for [PATCH 15/15]
+  [David]
+- Update the series to kvm/next [David]
+
+v1: https://lore.kernel.org/kvm/20210210230625.550939-1-seanjc@google.com/.
+
+Sean Christopherson (12):
+  KVM: selftests: Explicitly state indicies for vm_guest_mode_params
+    array
+  KVM: selftests: Expose align() helpers to tests
+  KVM: selftests: Assert mmap HVA is aligned when using HugeTLB
+  KVM: selftests: Require GPA to be aligned when backed by hugepages
+  KVM: selftests: Use shorthand local var to access struct
+    perf_tests_args
+  KVM: selftests: Capture per-vCPU GPA in perf_test_vcpu_args
+  KVM: selftests: Use perf util's per-vCPU GPA/pages in demand paging
+    test
+  KVM: selftests: Move per-VM GPA into perf_test_args
+  KVM: selftests: Remove perf_test_args.host_page_size
+  KVM: selftests: Create VM with adjusted number of guest pages for perf
+    tests
+  KVM: selftests: Fill per-vCPU struct during "perf_test" VM creation
+  KVM: selftests: Sync perf_test_args to guest during VM creation
+
+ .../selftests/kvm/access_tracking_perf_test.c |   8 +-
+ .../selftests/kvm/demand_paging_test.c        |  31 +----
+ .../selftests/kvm/dirty_log_perf_test.c       |  10 +-
+ tools/testing/selftests/kvm/dirty_log_test.c  |   6 +-
+ .../selftests/kvm/include/perf_test_util.h    |  18 +--
+ .../testing/selftests/kvm/include/test_util.h |  26 ++++
+ .../selftests/kvm/kvm_page_table_test.c       |   2 +-
+ tools/testing/selftests/kvm/lib/elf.c         |   3 +-
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  44 +++---
+ .../selftests/kvm/lib/perf_test_util.c        | 126 ++++++++++--------
+ tools/testing/selftests/kvm/lib/test_util.c   |   5 +
+ .../kvm/memslot_modification_stress_test.c    |  13 +-
+ 12 files changed, 153 insertions(+), 139 deletions(-)
+
+-- 
+2.34.0.rc1.387.gb447b232ab-goog
+
