@@ -2,76 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1663544E77D
-	for <lists+kvm@lfdr.de>; Fri, 12 Nov 2021 14:37:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AAD7D44E80D
+	for <lists+kvm@lfdr.de>; Fri, 12 Nov 2021 15:02:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232429AbhKLNkm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Nov 2021 08:40:42 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52171 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231436AbhKLNkl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 12 Nov 2021 08:40:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636724271;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=YU5hfpJqAc3Pn3MPWNMlEEHUbhpJegaxPbnsaOM3Lug=;
-        b=XskL8DJJscVNG+etvHNhlAJy5TAuBO9tt8YEkDWpCiZtJiXoqCA0mXNL7ZoCQ6K3aSR2cP
-        ceTCqetcYVgyKazOi1W9DQGp8fKVeG+2rQm3Brq0wfKv7cM4NeqBYtyv35qwUqTdID8xCa
-        b12J0rQb010d0zV34xt73xvsDKKDHPw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-473-P0JlMuxEM86-9VV5HAQXwg-1; Fri, 12 Nov 2021 08:37:47 -0500
-X-MC-Unique: P0JlMuxEM86-9VV5HAQXwg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S235049AbhKLOE5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Nov 2021 09:04:57 -0500
+Received: from mail.kernel.org ([198.145.29.99]:47218 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231617AbhKLOE4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Nov 2021 09:04:56 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D6519420E4;
-        Fri, 12 Nov 2021 13:37:46 +0000 (UTC)
-Received: from gator.redhat.com (unknown [10.40.194.50])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1CEB660862;
-        Fri, 12 Nov 2021 13:37:44 +0000 (UTC)
-From:   Andrew Jones <drjones@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, thuth@redhat.com, marcorr@google.com,
-        zxwang42@gmail.com
-Subject: [PATCH kvm-unit-tests 2/2] runtime: Use find_word with groups
-Date:   Fri, 12 Nov 2021 14:37:39 +0100
-Message-Id: <20211112133739.103327-3-drjones@redhat.com>
-In-Reply-To: <20211112133739.103327-1-drjones@redhat.com>
-References: <20211112133739.103327-1-drjones@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+        by mail.kernel.org (Postfix) with ESMTPSA id 0148060F4F;
+        Fri, 12 Nov 2021 14:02:06 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mlX7z-0051uE-PW; Fri, 12 Nov 2021 14:02:03 +0000
+Date:   Fri, 12 Nov 2021 14:02:03 +0000
+Message-ID: <87k0hd8obo.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup.patel@wdc.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Michael Ellerman <mpe@ellerman.id.au>, kvm-ppc@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/5] KVM: arm64: Cap KVM_CAP_NR_VCPUS by KVM_CAP_MAX_VCPUS
+In-Reply-To: <875ysxg0s1.fsf@redhat.com>
+References: <20211111162746.100598-1-vkuznets@redhat.com>
+        <20211111162746.100598-2-vkuznets@redhat.com>
+        <a5cdff6878b7157587e92ebe4d5af362@kernel.org>
+        <875ysxg0s1.fsf@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: vkuznets@redhat.com, kvm@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com, wanpengli@tencent.com, jmattson@google.com, ehabkost@redhat.com, drjones@redhat.com, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, anup.patel@wdc.com, paulus@ozlabs.org, mpe@ellerman.id.au, kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Groups are space separated, so we can remove the 'grep -w', which has
-caused problems in the past with testnames, see b373304853a0
-("scripts: Fix the check whether testname is in the only_tests list")
-and use find_word.
+On Fri, 12 Nov 2021 09:51:10 +0000,
+Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
+> 
+> Marc Zyngier <maz@kernel.org> writes:
+> 
+> > Hi Vitaly,
+> >
+> > On 2021-11-11 16:27, Vitaly Kuznetsov wrote:
+> >> It doesn't make sense to return the recommended maximum number of
+> >> vCPUs which exceeds the maximum possible number of vCPUs.
+> >> 
+> >> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> >> ---
+> >>  arch/arm64/kvm/arm.c | 7 ++++++-
+> >>  1 file changed, 6 insertions(+), 1 deletion(-)
+> >> 
+> >> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> >> index 7838e9fb693e..391dc7a921d5 100644
+> >> --- a/arch/arm64/kvm/arm.c
+> >> +++ b/arch/arm64/kvm/arm.c
+> >> @@ -223,7 +223,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, 
+> >> long ext)
+> >>  		r = 1;
+> >>  		break;
+> >>  	case KVM_CAP_NR_VCPUS:
+> >> -		r = num_online_cpus();
+> >> +		if (kvm)
+> >> +			r = min_t(unsigned int, num_online_cpus(),
+> >> +				  kvm->arch.max_vcpus);
+> >> +		else
+> >> +			r = min_t(unsigned int, num_online_cpus(),
+> >> +				  kvm_arm_default_max_vcpus());
+> >>  		break;
+> >>  	case KVM_CAP_MAX_VCPUS:
+> >>  	case KVM_CAP_MAX_VCPU_ID:
+> >
+> > This looks odd. This means that depending on the phase userspace is
+> > in while initialising the VM, KVM_CAP_NR_VCPUS can return one thing
+> > or the other.
+> >
+> > For example, I create a VM on a 32 CPU system, NR_VCPUS says 32.
+> > I create a GICv2 interrupt controller, it now says 8.
+> >
+> > That's a change in behaviour that is visible by userspace
+> 
+> Yes, I realize this is a userspace visible change. The reason I suggest
+> it is that logically, it seems very odd that the maximum recommended
+> number of vCPUs (KVM_CAP_NR_VCPUS) can be higher, than the maximum
+> supported number of vCPUs (KVM_CAP_MAX_VCPUS).
 
-Signed-off-by: Andrew Jones <drjones@redhat.com>
----
- scripts/runtime.bash | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I'm all for this change.
 
-diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-index 132389c7dd59..4deb41ca251c 100644
---- a/scripts/runtime.bash
-+++ b/scripts/runtime.bash
-@@ -132,7 +132,7 @@ function run()
-     }
- 
-     cmdline=$(get_cmdline $kernel)
--    if grep -qw "migration" <<<$groups ; then
-+    if find_word "migration" "$groups"; then
-         cmdline="MIGRATION=yes $cmdline"
-     fi
-     if [ "$verbose" = "yes" ]; then
+> All userspaces which use
+> this information somehow should already contain some workaround for this
+> case. (maybe it's a rare one and nobody hit it yet or maybe there are no
+> userspaces using KVM_CAP_NR_VCPUS for anything besides complaining --
+> like QEMU).
+> 
+> I'd like KVM to be consistent across architectures and have the same
+> (similar) meaning for KVM_CAP_NR_VCPUS.
+
+Sure, but this is a pretty useless piece of information anyway. As
+Andrew pointed out, the information is available somewhere else, and
+all we need to do is to cap it to the number of supported vcpus, which
+is effectively a KVM limitation.
+
+Also, we are talking about representing the architecture to userspace.
+No amount of massaging is going to make an arm64 box look like an x86.
+
+> > which I'm keen on avoiding. I'd rather have the kvm and !kvm cases
+> > return the same thing.
+> 
+> Forgive me my (ARM?) ignorance but what would it be then? If we go for
+> min(num_online_cpus(), kvm_arm_default_max_vcpus()) in both cases, cat
+> this can still go above KVM_CAP_MAX_VCPUS after vGIC is created?
+
+"min(num_online_cpus(), kvm_arm_default_max_vcpus())" is probably the
+right thing in all cases. Yes, KVM_CAP_NR_VCPUS will keep reporting
+more than the VM can actually support. But that's why we have
+KVM_CAP_MAX_VCPUS, which tells you now many vcpus you can create for a
+given configuration.
+
+This shows how useless KVM_CAP_NR_VCPUS is, and I wouldn't mind a
+documentation patch stating this.
+
+Thanks,
+
+	M.
+
 -- 
-2.31.1
-
+Without deviation from the norm, progress is not possible.
