@@ -2,180 +2,413 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 89C4544EDEA
-	for <lists+kvm@lfdr.de>; Fri, 12 Nov 2021 21:30:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E4BC144EDEE
+	for <lists+kvm@lfdr.de>; Fri, 12 Nov 2021 21:30:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235554AbhKLUdV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Nov 2021 15:33:21 -0500
-Received: from mail-co1nam11on2058.outbound.protection.outlook.com ([40.107.220.58]:13472
-        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230235AbhKLUdU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Nov 2021 15:33:20 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OXgVfQdor5CyD5+ZEtxYyPFLhzP1XK2m0EOTQooW/EBwVDkLO4e+Vw3DXnDCRV6w8jGc34K67f5SBD1rkNitTI1OB+sRX7KShbpqoeTIr2K+NGi/xqIY5tuXjPIjthfPYEe0W8L8HSB+KhBHlW012UaAAl1RFOhmy/B8c8fCjhwwOY0hYSu+KOE8bGEoKFI2Q3fDrBSxsJ/7hvmMJeM8JFYsb5I5G+clJA/sZuPV6t0U9MTugwHXKB1Mk5t4rWQseuCRg4wJqeaSygy194ayPZJ8ZcVJOqhOh4BHErGQlIgDUN7uZFJzFTYP2prK7bbOWKqbujRORBQMCYXH1bcAhQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=f/rfx4+lP7CRAXPHJoz+UOHVIQp38Gp2HChcztc2fqw=;
- b=HYn2a9nyEip+QofTzpB/shC3XSzFwzrdazNaBFaz8NPzTNMKfCTe8bqnhMRqVJO+VhV7ya8LgnR0la5lqPfPkSgqORQgVXJjOkGUIgPlXU2CA2SdKVTp42tnoasdmItmLP5ZaweesDoYRjru84XBfN2I9MpUnjIYcJ9XM4/Xenw3EPjEaAibCYrSTnIkC+fOJ+PcNwdBIz54tFJvgK8k3MBd7DRW2ItttDCU1QE08r5IRcYGA/GL5tr7KaW9jmWt/iRv6KKeQfqILlZs/AcaNhqUmlsudqqsOwBvk75j/PkSoxbE2TK4OXGWOgT0Z54drhPX7gvKZGPZjbj3N4SzmQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=alien8.de smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=f/rfx4+lP7CRAXPHJoz+UOHVIQp38Gp2HChcztc2fqw=;
- b=o8P4uBhBlOqeAwAR71CaxagB4FpaoCknNTj+ztEMYQizNCWt3fvA7yOcHA2srwHPrhNJnQ+kDIrA3bnVW2AGvgpKhlb3fcKrNlh+HR4iGiUhqRC+QoqTJz1vVtbG0H4YOJQDgUOJn3PIqOJBmg9nr6diooXgwUgFJmBLTzLIZ08=
-Received: from BN9PR03CA0879.namprd03.prod.outlook.com (2603:10b6:408:13c::14)
- by DM6PR12MB3162.namprd12.prod.outlook.com (2603:10b6:5:15c::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4669.15; Fri, 12 Nov
- 2021 20:30:25 +0000
-Received: from BN8NAM11FT019.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:13c:cafe::1b) by BN9PR03CA0879.outlook.office365.com
- (2603:10b6:408:13c::14) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4669.16 via Frontend
- Transport; Fri, 12 Nov 2021 20:30:25 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; alien8.de; dkim=none (message not signed)
- header.d=none;alien8.de; dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com;
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BN8NAM11FT019.mail.protection.outlook.com (10.13.176.158) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.4690.15 via Frontend Transport; Fri, 12 Nov 2021 20:30:24 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.17; Fri, 12 Nov
- 2021 14:30:21 -0600
-Date:   Fri, 12 Nov 2021 14:30:01 -0600
-From:   Michael Roth <michael.roth@amd.com>
-To:     Borislav Petkov <bp@alien8.de>
-CC:     Brijesh Singh <brijesh.singh@amd.com>, <x86@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <linux-efi@vger.kernel.org>, <platform-driver-x86@vger.kernel.org>,
-        <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        "Andy Lutomirski" <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        "Peter Zijlstra" <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        <tony.luck@intel.com>, <marcorr@google.com>,
-        <sathyanarayanan.kuppuswamy@linux.intel.com>
-Subject: Re: [PATCH v7 01/45] x86/compressed/64: detect/setup SEV/SME
- features earlier in boot
-Message-ID: <20211112203001.kdzhpgp3uqcr2dy5@amd.com>
-References: <20211110220731.2396491-1-brijesh.singh@amd.com>
- <20211110220731.2396491-2-brijesh.singh@amd.com>
- <YY6b4y8Shi5dBlCK@zn.tnic>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <YY6b4y8Shi5dBlCK@zn.tnic>
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 9e0d02b3-6906-4750-1800-08d9a61b41b6
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3162:
-X-Microsoft-Antispam-PRVS: <DM6PR12MB3162AB9A07FE0E51C567F22795959@DM6PR12MB3162.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: l6Vs41jjXNa8fdImwJcDfz+L77M6wmTAHmeaN8fFttbYE9jvfQPC96bYAaf0uSrz6OE2zmfrqiPLl/R4xdCLST0aVaCplj0jokyIoMS6w7oQH7NmnJUV7yUAcNWAd4I4LWseB2X6U95r+jma0lFMXYHHvOu3YN4p449F2Vy2fP3VF2w70EMzp9M0IRI1Vg7jYWcRwqxK3TVsMnm0zBIcLRlyc+NIgL7CHLJsgNZsLT2g0CVg4Ge3bpEC2Z2NcZGR+Kgw3U6huvx/wbFAzVx5DtMQ4PTvMqtnSKJsvAqh/bOny8GngwUkiiXyQBMFO7BqTK234i72qgQPi2lHO+pPp3chdYDvmTP5RS8as000YpbfCVEq5EFKpDx6aG56u8ftlJsinkDRyeCNEmN1GPprtd9f82y/sKmb/PyMGKsrSgTKBJH9pH04S41ULHWxtp5Jvvd/zqWrGXyOFufXJ7zNcaYmYwgMQXot9GuamcvN5jwX7Bja/axAKn0/W6XoSNFsC95xoJu/kbp6PgKx6UhsN2Rn0dqbfJG93yq6cWosT0KlQ7ZDi5KLKKMPCB0VYCow/TDvXbdT+bvi/yBkX3iJXr9DHWeLuGMw4X6Yt1L7roipP3Hn30GeovRKy8uUYdYLKcdjiCGEbZ+2gMwzQsMoa98l+8eW02xxVwp0fZxAc1sbeMU7pG6xUynmmG0TG4gEmXL4/2XOU0bpPuy3EF2fepzWPal70oDJ9tsTbC04QRJe/VlA9fo3UiLGARwv0gqsAawyRiACRJZClRQS5+Ble6pru1I45V6Q53OiyY3d8s0E5/KT6XMrLpB1d7cmEUO+
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(4636009)(46966006)(36840700001)(336012)(8936002)(86362001)(54906003)(8676002)(2906002)(44832011)(316002)(426003)(1076003)(81166007)(6916009)(6666004)(70206006)(83380400001)(82310400003)(5660300002)(7416002)(356005)(2616005)(4326008)(508600001)(7406005)(26005)(36756003)(186003)(47076005)(16526019)(45080400002)(36860700001)(70586007)(966005)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Nov 2021 20:30:24.5966
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9e0d02b3-6906-4750-1800-08d9a61b41b6
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT019.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3162
+        id S235588AbhKLUdX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Nov 2021 15:33:23 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:20136 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235566AbhKLUdV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 12 Nov 2021 15:33:21 -0500
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1ACK1Mfx019739;
+        Fri, 12 Nov 2021 20:30:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=H9jBni5o8aAIn1SRgIb4guqF9Uy7rRrv0OJImUWLU0c=;
+ b=ZW5H/EdDw9kqk9BNfKY1rKeVmzCuakpKah9oUcblHq/CMDjIpAr/aT2PhkvXZWB1eGUu
+ ogzGDQaPVGmp7q5L24mCHuLFzgKqaYgQjqABHZ9J/DAgMxLF9tddELBsXfw7YeJIKDUP
+ OS0Y2J6GGanlQmANAdnfuf4sQwh/Md3JJm8zozem+zLD0wh2TbUcIFSeYDsAsVGHu2z+
+ xsr20/c31jYLNjqNBEZa1z6Uf9GC+N1Q9SF+1fCbF7UQ2X+Z2X3tvxAQz2Sslx6o7Ujg
+ GcFHtUHL1rurQ2BvuubNmanqrh/pJvhV4Gm0EMSHVqjKnZwXubqCGASpiP2WyaHnD5VK +g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3c9xnwruv2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 12 Nov 2021 20:30:30 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1ACKUTNS007845;
+        Fri, 12 Nov 2021 20:30:29 GMT
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3c9xnwruum-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 12 Nov 2021 20:30:29 +0000
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1ACKBu5L026957;
+        Fri, 12 Nov 2021 20:30:29 GMT
+Received: from b03cxnp08028.gho.boulder.ibm.com (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
+        by ppma03dal.us.ibm.com with ESMTP id 3c5hbe3c88-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 12 Nov 2021 20:30:28 +0000
+Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1ACKUR5F47382888
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 12 Nov 2021 20:30:27 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5E5037805C;
+        Fri, 12 Nov 2021 20:30:27 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 790487806A;
+        Fri, 12 Nov 2021 20:30:26 +0000 (GMT)
+Received: from farman-thinkpad-t470p (unknown [9.163.6.3])
+        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Fri, 12 Nov 2021 20:30:26 +0000 (GMT)
+Message-ID: <b206e7b73696907328bc4338664dea1ef572e8aa.camel@linux.ibm.com>
+Subject: Re: [RFC PATCH v3 2/2] KVM: s390: Extend the USER_SIGP capability
+From:   Eric Farman <farman@linux.ibm.com>
+To:     Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>
+Cc:     Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Date:   Fri, 12 Nov 2021 15:30:25 -0500
+In-Reply-To: <42b1d53a11106f9f8e9d9b34a41b6bba738eb410.camel@linux.ibm.com>
+References: <20211110203322.1374925-1-farman@linux.ibm.com>
+         <20211110203322.1374925-3-farman@linux.ibm.com>
+         <dd8a8b49-da6d-0ab8-dc47-b24f5604767f@redhat.com>
+         <ab82e68051674ea771e2cb5371ca2a204effab40.camel@linux.ibm.com>
+         <32836eb5-532f-962d-161a-faa2213a0691@linux.ibm.com>
+         <b116e738d8f9b185867ab28395012aaddd58af31.camel@linux.ibm.com>
+         <97f3e32d-e4e4-e54e-1269-1ff66828f04f@linux.ibm.com>
+         <42b1d53a11106f9f8e9d9b34a41b6bba738eb410.camel@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-16.el8) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: FVgfbzMUYNmyWS97KWXYBsdDqqNyiTgN
+X-Proofpoint-ORIG-GUID: 31CA-xlCyhARm0iBuMjzDw0ezdTSaM53
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
+ definitions=2021-11-12_05,2021-11-12_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 suspectscore=0
+ impostorscore=0 phishscore=0 spamscore=0 adultscore=0 clxscore=1015
+ mlxscore=0 mlxlogscore=999 priorityscore=1501 malwarescore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2111120107
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 12, 2021 at 05:52:51PM +0100, Borislav Petkov wrote:
-> On Wed, Nov 10, 2021 at 04:06:47PM -0600, Brijesh Singh wrote:
-> > +void sev_enable(struct boot_params *bp)
-> > +{
-> > +	unsigned int eax, ebx, ecx, edx;
-> > +
-> > +	/* Check for the SME/SEV support leaf */
-> > +	eax = 0x80000000;
-> > +	ecx = 0;
-> > +	native_cpuid(&eax, &ebx, &ecx, &edx);
-> > +	if (eax < 0x8000001f)
-> > +		return;
-> > +
-> > +	/*
-> > +	 * Check for the SME/SEV feature:
-> > +	 *   CPUID Fn8000_001F[EAX]
-> > +	 *   - Bit 0 - Secure Memory Encryption support
-> > +	 *   - Bit 1 - Secure Encrypted Virtualization support
-> > +	 *   CPUID Fn8000_001F[EBX]
-> > +	 *   - Bits 5:0 - Pagetable bit position used to indicate encryption
-> > +	 */
-> > +	eax = 0x8000001f;
-> > +	ecx = 0;
-> > +	native_cpuid(&eax, &ebx, &ecx, &edx);
-> > +	/* Check whether SEV is supported */
-> > +	if (!(eax & BIT(1)))
-> > +		return;
-> > +
-> > +	/* Check the SEV MSR whether SEV or SME is enabled */
-> > +	sev_status   = rd_sev_status_msr();
-> > +
-> > +	if (!(sev_status & MSR_AMD64_SEV_ENABLED))
-> > +		error("SEV support indicated by CPUID, but not SEV status MSR.");
+On Fri, 2021-11-12 at 11:09 -0500, Eric Farman wrote:
+> On Fri, 2021-11-12 at 09:49 +0100, Janosch Frank wrote:
+> > On 11/11/21 18:48, Eric Farman wrote:
+> > > On Thu, 2021-11-11 at 17:13 +0100, Janosch Frank wrote:
+> > > > On 11/11/21 16:03, Eric Farman wrote:
+> > > > > On Thu, 2021-11-11 at 10:15 +0100, David Hildenbrand wrote:
+> > > > > > On 10.11.21 21:33, Eric Farman wrote:
+> > > > > > > With commit 2444b352c3ac ("KVM: s390: forward most SIGP
+> > > > > > > orders
+> > > > > > > to
+> > > > > > > user
+> > > > > > > space") we have a capability that allows the "fast" SIGP
+> > > > > > > orders
+> > > > > > > (as
+> > > > > > > defined by the Programming Notes for the SIGNAL PROCESSOR
+> > > > > > > instruction in
+> > > > > > > the Principles of Operation) to be handled in-kernel,
+> > > > > > > while
+> > > > > > > all
+> > > > > > > others are
+> > > > > > > sent to userspace for processing.
+> > > > > > > 
+> > > > > > > This works fine but it creates a situation when, for
+> > > > > > > example, a
+> > > > > > > SIGP SENSE
+> > > > > > > might return CC1 (STATUS STORED, and status bits
+> > > > > > > indicating
+> > > > > > > the
+> > > > > > > vcpu is
+> > > > > > > stopped), when in actuality userspace is still processing
+> > > > > > > a
+> > > > > > > SIGP
+> > > > > > > STOP AND
+> > > > > > > STORE STATUS order, and the vcpu is not yet actually
+> > > > > > > stopped.
+> > > > > > > Thus,
+> > > > > > > the
+> > > > > > > SIGP SENSE should actually be returning CC2 (busy)
+> > > > > > > instead
+> > > > > > > of
+> > > > > > > CC1.
+> > > > > > > 
+> > > > > > > To fix this, add another CPU capability, dependent on the
+> > > > > > > USER_SIGP
+> > > > > > > one,
+> > > > > > > and two associated IOCTLs. One IOCTL will be used by
+> > > > > > > userspace
+> > > > > > > to
+> > > > > > > mark a
+> > > > > > > vcpu "busy" processing a SIGP order, and cause concurrent
+> > > > > > > orders
+> > > > > > > handled
+> > > > > > > in-kernel to be returned with CC2 (busy). Another IOCTL
+> > > > > > > will be
+> > > > > > > used by
+> > > > > > > userspace to mark the SIGP "finished", and the vcpu free
+> > > > > > > to
+> > > > > > > process
+> > > > > > > additional orders.
+> > > > > > > 
+> > > > > > 
+> > > > > > This looks much cleaner to me, thanks!
+> > > > > > 
+> > > > > > [...]
+> > > > > > 
+> > > > > > > diff --git a/arch/s390/kvm/kvm-s390.h
+> > > > > > > b/arch/s390/kvm/kvm-
+> > > > > > > s390.h
+> > > > > > > index c07a050d757d..54371cede485 100644
+> > > > > > > --- a/arch/s390/kvm/kvm-s390.h
+> > > > > > > +++ b/arch/s390/kvm/kvm-s390.h
+> > > > > > > @@ -82,6 +82,22 @@ static inline int is_vcpu_idle(struct
+> > > > > > > kvm_vcpu
+> > > > > > > *vcpu)
+> > > > > > >    	return test_bit(vcpu->vcpu_idx, vcpu->kvm-
+> > > > > > > > arch.idle_mask);
+> > > > > > >    }
+> > > > > > >    
+> > > > > > > +static inline bool kvm_s390_vcpu_is_sigp_busy(struct
+> > > > > > > kvm_vcpu
+> > > > > > > *vcpu)
+> > > > > > > +{
+> > > > > > > +	return (atomic_read(&vcpu->arch.sigp_busy) == 1);
+> > > > > > 
+> > > > > > You can drop ()
+> > > > > > 
+> > > > > > > +}
+> > > > > > > +
+> > > > > > > +static inline bool kvm_s390_vcpu_set_sigp_busy(struct
+> > > > > > > kvm_vcpu
+> > > > > > > *vcpu)
+> > > > > > > +{
+> > > > > > > +	/* Return zero for success, or -EBUSY if another vcpu
+> > > > > > > won */
+> > > > > > > +	return (atomic_cmpxchg(&vcpu->arch.sigp_busy, 0, 1) ==
+> > > > > > > 0) ? 0 :
+> > > > > > > -EBUSY;
+> > > > > > 
+> > > > > > You can drop () as well.
+> > > > > > 
+> > > > > > We might not need the -EBUSY semantics after all. User
+> > > > > > space
+> > > > > > can
+> > > > > > just
+> > > > > > track if it was set, because it's in charge of setting it.
+> > > > > 
+> > > > > Hrm, I added this to distinguish a newer kernel with an older
+> > > > > QEMU,
+> > > > > but
+> > > > > of course an older QEMU won't know the difference either.
+> > > > > I'll
+> > > > > doublecheck that this is works fine in the different
+> > > > > permutations.
+> > > > > 
+> > > > > > > +}
+> > > > > > > +
+> > > > > > > +static inline void kvm_s390_vcpu_clear_sigp_busy(struct
+> > > > > > > kvm_vcpu
+> > > > > > > *vcpu)
+> > > > > > > +{
+> > > > > > > +	atomic_set(&vcpu->arch.sigp_busy, 0);
+> > > > > > > +}
+> > > > > > > +
+> > > > > > >    static inline int kvm_is_ucontrol(struct kvm *kvm)
+> > > > > > >    {
+> > > > > > >    #ifdef CONFIG_KVM_S390_UCONTROL
+> > > > > > > diff --git a/arch/s390/kvm/sigp.c b/arch/s390/kvm/sigp.c
+> > > > > > > index 5ad3fb4619f1..a37496ea6dfa 100644
+> > > > > > > --- a/arch/s390/kvm/sigp.c
+> > > > > > > +++ b/arch/s390/kvm/sigp.c
+> > > > > > > @@ -276,6 +276,10 @@ static int handle_sigp_dst(struct
+> > > > > > > kvm_vcpu
+> > > > > > > *vcpu, u8 order_code,
+> > > > > > >    	if (!dst_vcpu)
+> > > > > > >    		return SIGP_CC_NOT_OPERATIONAL;
+> > > > > > >    
+> > > > > > > +	if (kvm_s390_vcpu_is_sigp_busy(dst_vcpu)) {
+> > > > > > > +		return SIGP_CC_BUSY;
+> > > > > > > +	}
+> > > > > > 
+> > > > > > You can drop {}
+> > > > > 
+> > > > > Arg, I had some debug in there which needed the braces, and
+> > > > > of
+> > > > > course
+> > > > > it's unnecessary now. Thanks.
+> > > > > 
+> > > > > > > +
+> > > > > > >    	switch (order_code) {
+> > > > > > >    	case SIGP_SENSE:
+> > > > > > >    		vcpu->stat.instruction_sigp_sense++;
+> > > > > > > @@ -411,6 +415,12 @@ int kvm_s390_handle_sigp(struct
+> > > > > > > kvm_vcpu
+> > > > > > > *vcpu)
+> > > > > > >    	if (handle_sigp_order_in_user_space(vcpu,
+> > > > > > > order_code,
+> > > > > > > cpu_addr))
+> > > > > > >    		return -EOPNOTSUPP;
+> > > > > > >    
+> > > > > > > +	/* Check the current vcpu, if it was a target from
+> > > > > > > another vcpu
+> > > > > > > */
+> > > > > > > +	if (kvm_s390_vcpu_is_sigp_busy(vcpu)) {
+> > > > > > > +		kvm_s390_set_psw_cc(vcpu, SIGP_CC_BUSY);
+> > > > > > > +		return 0;
+> > > > > > > +	}
+> > > > > > 
+> > > > > > I don't think we need this. I think the above (checking the
+> > > > > > target of
+> > > > > > a
+> > > > > > SIGP order) is sufficient. Or which situation do you have
+> > > > > > in
+> > > > > > mind?
+> > > > > > 
+> > > > > 
+> > > > > Hrm... I think you're right. I was thinking of this:
+> > > > > 
+> > > > > VCPU 1 - SIGP STOP CPU 2
+> > > > > VCPU 2 - SIGP SENSE CPU 1
+> > > > > 
+> > > > > But of course either CPU2 is going to be marked "busy" first,
+> > > > > and
+> > > > > the
+> > > > > sense doesn't get processed until it's reset, or the sense
+> > > > > arrives
+> > > > > first, and the busy/notbusy doesn't matter. Let me
+> > > > > doublecheck
+> > > > > my
+> > > > > tests
+> > > > > for the non-RFC version.
+> > > > > 
+> > > > > > I do wonder if we want to make this a kvm_arch_vcpu_ioctl()
+> > > > > > instead,
+> > > > > 
+> > > > > In one of my original attempts between v1 and v2, I had put
+> > > > > this
+> > > > > there.
+> > > > > This reliably deadlocks my guest, because the caller
+> > > > > (kvm_vcpu_ioctl())
+> > > > > tries to acquire vcpu->mutex, and racing SIGPs (via KVM_RUN)
+> > > > > might
+> > > > > already be holding it. Thus, it's an async ioctl. I could
+> > > > > fold
+> > > > > it
+> > > > > into
+> > > > > the existing interrupt ioctl, but as those are architected
+> > > > > structs
+> > > > > it
+> > > > > seems more natural do it this way. Or I have mis-understood
+> > > > > something
+> > > > > along the way?
+> > > > > 
+> > > > > > essentially just providing a KVM_S390_SET_SIGP_BUSY *and*
+> > > > > > providing
+> > > > > > the
+> > > > > > order. "order == 0" sets it to !busy.
+> > > > > 
+> > > > > I'd tried this too, since it provided some nice debug-
+> > > > > ability.
+> > > > > Unfortunately, I have a testcase (which I'll eventually get
+> > > > > folded
+> > > > > into
+> > > > > kvm-unit-tests :)) that picks a random order between 0-255,
+> > > > > knowing
+> > > > > that there's only a couple handfuls of valid orders, to check
+> > > > > the
+> > > > > response. Zero is valid architecturally (POPS figure 4-29),
+> > > > > even if
+> > > > > it's unassigned. The likelihood of it becoming assigned is
+> > > > > probably
+> > > > > quite low, but I'm not sure that I like special-casing an
+> > > > > order
+> > > > > of
+> > > > > zero
+> > > > > in this way.
+> > > > > 
+> > > > 
+> > > > Looking at the API I'd like to avoid having two IOCTLs
+> > > 
+> > > Since the order is a single byte, we could have the payload of an
+> > > ioctl
+> > > say "0-255 is an order that we're busy processing, anything
+> > > higher
+> > > than
+> > > that resets the busy" or something. That would remove the need
+> > > for
+> > > a
+> > > second IOCTL.
+> > > 
+> > > > and I'd love to
+> > > > see some way to extend this without the need for a whole new
+> > > > IOCTL.
+> > > > 
+> > > 
+> > > Do you mean zero IOCTLs? Because... I think the only way we can
+> > > do
+> > > that
+> > > is to get rid of USER_SIGP altogether, and handle everything in-
+> > > kernel.
+> > > Some weeks ago I played with QEMU not enabling USER_SIGP, but I
+> > > can't
+> > > say I've tried it since we went down this "mark a vcpu busy"
+> > > path.
+> > > If I
+> > > do that busy/not-busy tagging in the kernel for !USER_SIGP, that
+> > > might
+> > > not be a bad thing anyway. But I don't know how we get the
+> > > behavior
+> > > straightened out for USER_SIGP without some type of handshake.
+> > 
+> > I'd move over to a very small struct argument with a command and a
+> > flags 
+> > field so we can extend the IOCTL at a later time without the need
+> > to 
+> > introduce a new IOCTL.
+> > IMHO there's no real need to make this IOCTL as small as possible
+> > and 
+> > only handle an int as the argument with < 0 shenanigans. We should 
+> > rather focus on making this a nice and sane API if we have the
+> > option
+> > to 
+> > do so.
+> > 
 > 
-> What is the practical purpose of this test?
-
-In the current QEMU/KVM implementation the SEV* CPUID bits are only
-exposed for SEV guests, so this was more of a sanity check on that. But
-looking at things more closely: that's more of a VMM-specific behavior
-and isn't necessarily an invalid guest configuration as far as the spec
-is concerned, so I think this check should be dropped.
-
+> So then naming this as "USER_SIGP_BUSY" is too narrow. What about
+> just
+> "USER_BUSY" and something like this?
 > 
-> > +	sme_me_mask = 1UL << (ebx & 0x3f);
+> enum user_busy_function {
+> 	SET,
+> 	RESET,
+> }
 > 
-> 	sme_me_mask = BIT_ULL(ebx & 0x3f);
-
-Will do.
-
-Thanks,
-
-Mike
-
+> enum user_busy_reason {
+> 	SIGP,
+> }
 > 
-> Thx.
+> struct user_busy {
+> 	int function;
+> 	int reason;
+> 	long payload;		// Optional? In our case, SIGP order
+> }
 > 
-> -- 
-> Regards/Gruss,
->     Boris.
-> 
-> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fpeople.kernel.org%2Ftglx%2Fnotes-about-netiquette&amp;data=04%7C01%7Cmichael.roth%40amd.com%7Ca6bf3479fffa4b5eee8b08d9a5fce2e2%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637723327924654730%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C1000&amp;sdata=SRy8YSe8a2njNc6IT8CGKv0hUefSOW55DJV%2Fi2Lhkic%3D&amp;reserved=0
+
+Looking at this further, rather than pile on as its own thing, why
+couldn't this be added as an IRQ type and embed such a structure into
+kvm_s390_irq? Then the ioctl is moot.
+
+> > > > > > Not that we would need the value
+> > > > > > right now, but who knows for what we might reuse that
+> > > > > > interface
+> > > > > > in
+> > > > > > the
+> > > > > > future.
+> > > > > > 
+> > > > > > Thanks!
+> > > > > > 
+
