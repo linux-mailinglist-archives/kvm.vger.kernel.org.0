@@ -2,144 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C1A5A44E42C
-	for <lists+kvm@lfdr.de>; Fri, 12 Nov 2021 10:51:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E17644E430
+	for <lists+kvm@lfdr.de>; Fri, 12 Nov 2021 10:51:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234823AbhKLJyL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Nov 2021 04:54:11 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:44995 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234803AbhKLJyK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 12 Nov 2021 04:54:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636710679;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Q3tNE6PVDp1t883O718wrcDgXu0HBWeQVivnEf04yl8=;
-        b=RkO3qVub/Trsy4BlS9rHaB1lpRaw7zBkJbbB8wb7OJVsi7FSN2IAu1qTQRVwDxKnCEYBEr
-        Z4bZY6LxqGIHdWnRNwGp1oMIUrmnuUlaD2rYAoCiCHHowtkpfIWZojrYfVYIm/UD4GBCId
-        FgB/XfwUoyJQkALDpUgsbnFKrmIVlIw=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-35-l-feSVDEPmOYlPHeaSVo4g-1; Fri, 12 Nov 2021 04:51:13 -0500
-X-MC-Unique: l-feSVDEPmOYlPHeaSVo4g-1
-Received: by mail-ed1-f72.google.com with SMTP id i9-20020a508709000000b003dd4b55a3caso7800393edb.19
-        for <kvm@vger.kernel.org>; Fri, 12 Nov 2021 01:51:13 -0800 (PST)
+        id S234837AbhKLJym (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Nov 2021 04:54:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34012 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234675AbhKLJyk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Nov 2021 04:54:40 -0500
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01A95C061766;
+        Fri, 12 Nov 2021 01:51:50 -0800 (PST)
+Received: by mail-pj1-x1033.google.com with SMTP id j5-20020a17090a318500b001a6c749e697so5849743pjb.1;
+        Fri, 12 Nov 2021 01:51:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=PDKtx93jd8fAz2Pl35IpGMs1LZTHCC9vpdHi3HQr1lQ=;
+        b=cG7jFK44F37B90w8Zvdzv7553lc2wv3hpVN3o+e0xNCKmb8nYg56sY3NQBlgUMg97e
+         ZKx0S+8X1e9zPNfeFjDnrE8yGTcQWwsGuklmY4HckeJ21vkjFvUL+HDhdd6+z0unV90n
+         uQJLJsfiCZhfrjULCmLhUg96ooMFhglIOhZ6hlIFhPIcA4/LjIowlywwI1ZZ1Id9nmTr
+         Q0bSx5MYdAgMmO7/Z8qO7uucC+/1fcLHQBMAv2Ljt/+xR1XGWq4Giz0qx4E4W0VM4Tfg
+         arg+hkEjI8V7IQ38RE7lKV6oK4wfBFgYxwjR8t5CrBLVA6R6DB5R+vvsVTUBCIfgqoNP
+         xC/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=Q3tNE6PVDp1t883O718wrcDgXu0HBWeQVivnEf04yl8=;
-        b=4MgH3WWJR5WJBgddzz5mxscd5WRgaYvu20WtN2OOQqY3rFsAkWIVVBBwu6ttiDDaRd
-         lesNJFDtnVZglvBjH9Uofx74sv6FC83Dv6B1oBBCkhRVxNC4TKwkHBePpQKu5gT/LyFc
-         CeuKbCWALPWDrZFTJlpzwVkSgu7T8o5Xthv2NwJfE4wexZ5lhEYrJGHobb7UXh1LXwh8
-         r4bo49lqsFGl7m8pMcAHcfh4EKmUp9lo+8gmeHmH9jNSViHjrTjss+H08iFHTO9s+9yu
-         0no4kqPYHBdOi/mkZnXp41mZroYlLbLORwQn1CwTTLZAKQLRoN/PvDCQdGUyaoXHBvVj
-         aacw==
-X-Gm-Message-State: AOAM5330DPVxZ9pXMxrwTHP9wIzbwEcq8lJC81i+eSwYv5zHRAqYcgiJ
-        t+7JhB6HB0E/PNjBN7tnl1YzIPbmBCeFY3sGDhIJBR1oFbaRX4PwpSy/YK35IPY9rN56TPm4+X0
-        VEJwpMRaGqJe0
-X-Received: by 2002:a05:6402:27d3:: with SMTP id c19mr19433476ede.2.1636710672859;
-        Fri, 12 Nov 2021 01:51:12 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzLDjahuFseIZ7e+RowWVF5yMybji+/f1TpttlCU7zwauHRgLTGqMPciQsWHxQYl16h4+En2Q==
-X-Received: by 2002:a05:6402:27d3:: with SMTP id c19mr19433437ede.2.1636710672630;
-        Fri, 12 Nov 2021 01:51:12 -0800 (PST)
-Received: from fedora (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id q14sm2845328edj.42.2021.11.12.01.51.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Nov 2021 01:51:12 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=PDKtx93jd8fAz2Pl35IpGMs1LZTHCC9vpdHi3HQr1lQ=;
+        b=Ou8FWQLeUDsFnMV0RLALhwesPdP0aSNNggHm/LwaAqUdca4QClIRXSctvDd7yKf1hi
+         566+0kCCmY7WwZtd+EtIPkg4QK7onfn8X0HMzQxi6j/Cn+UyEwxyLdGe0HulJ4Wn23y5
+         Cri7Bz5EujrpmyCg5ENxEDcD/VnYd2eONGabQNN5bFYWbH+HHRgueSAIykYrjyJnI6zN
+         gaHiY8mm33g5J8jSN3JT0R6qoR9itsBX3p9AjbrV+pPYm5bKmHGexhw/f/qDr4ORFk1n
+         O0xRxp64vv9It4KidwHXWOL+3mKZwEOPQwIsDjSdv0jsCU4+LCpdkEwcLsxDc1IMXB4C
+         HThA==
+X-Gm-Message-State: AOAM533y/L8SEeP4WAGNIosxdAMzfsXtFO4iPo1XGzF8uN3YFLqVLpy5
+        bRb04p2j4C9ye4vvxGVaFt0uarYuWJE=
+X-Google-Smtp-Source: ABdhPJxQeYQmc2sLh/020us9gJNoXCLIUdNnLNo5nuO3r8W4k4KqSK/kNsh97MJKi/ThES/RpA/Mzw==
+X-Received: by 2002:a17:90b:155:: with SMTP id em21mr35183316pjb.12.1636710709545;
+        Fri, 12 Nov 2021 01:51:49 -0800 (PST)
+Received: from localhost.localdomain ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id f3sm5799403pfg.167.2021.11.12.01.51.46
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 12 Nov 2021 01:51:48 -0800 (PST)
+From:   Like Xu <like.xu.linux@gmail.com>
+X-Google-Original-From: Like Xu <likexu@tencent.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Michael Ellerman <mpe@ellerman.id.au>, kvm-ppc@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/5] KVM: arm64: Cap KVM_CAP_NR_VCPUS by KVM_CAP_MAX_VCPUS
-In-Reply-To: <a5cdff6878b7157587e92ebe4d5af362@kernel.org>
-References: <20211111162746.100598-1-vkuznets@redhat.com>
- <20211111162746.100598-2-vkuznets@redhat.com>
- <a5cdff6878b7157587e92ebe4d5af362@kernel.org>
-Date:   Fri, 12 Nov 2021 10:51:10 +0100
-Message-ID: <875ysxg0s1.fsf@redhat.com>
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>
+Subject: [PATCH 0/7] KVM: x86/pmu: Four functional fixes
+Date:   Fri, 12 Nov 2021 17:51:32 +0800
+Message-Id: <20211112095139.21775-1-likexu@tencent.com>
+X-Mailer: git-send-email 2.33.0
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Marc Zyngier <maz@kernel.org> writes:
+Hi,
 
-> Hi Vitaly,
->
-> On 2021-11-11 16:27, Vitaly Kuznetsov wrote:
->> It doesn't make sense to return the recommended maximum number of
->> vCPUs which exceeds the maximum possible number of vCPUs.
->> 
->> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->> ---
->>  arch/arm64/kvm/arm.c | 7 ++++++-
->>  1 file changed, 6 insertions(+), 1 deletion(-)
->> 
->> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
->> index 7838e9fb693e..391dc7a921d5 100644
->> --- a/arch/arm64/kvm/arm.c
->> +++ b/arch/arm64/kvm/arm.c
->> @@ -223,7 +223,12 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, 
->> long ext)
->>  		r = 1;
->>  		break;
->>  	case KVM_CAP_NR_VCPUS:
->> -		r = num_online_cpus();
->> +		if (kvm)
->> +			r = min_t(unsigned int, num_online_cpus(),
->> +				  kvm->arch.max_vcpus);
->> +		else
->> +			r = min_t(unsigned int, num_online_cpus(),
->> +				  kvm_arm_default_max_vcpus());
->>  		break;
->>  	case KVM_CAP_MAX_VCPUS:
->>  	case KVM_CAP_MAX_VCPU_ID:
->
-> This looks odd. This means that depending on the phase userspace is
-> in while initialising the VM, KVM_CAP_NR_VCPUS can return one thing
-> or the other.
->
-> For example, I create a VM on a 32 CPU system, NR_VCPUS says 32.
-> I create a GICv2 interrupt controller, it now says 8.
->
-> That's a change in behaviour that is visible by userspace
+The first one (patch 01) is to fix my childish code about the disallowed
+fixed ctr3. 
 
-Yes, I realize this is a userspace visible change. The reason I suggest
-it is that logically, it seems very odd that the maximum recommended
-number of vCPUs (KVM_CAP_NR_VCPUS) can be higher, than the maximum
-supported number of vCPUs (KVM_CAP_MAX_VCPUS). All userspaces which use
-this information somehow should already contain some workaround for this
-case. (maybe it's a rare one and nobody hit it yet or maybe there are no
-userspaces using KVM_CAP_NR_VCPUS for anything besides complaining --
-like QEMU).
+The second one (patch 02) is to fix the aged inconsistent behaviour
+about CPUID 0AH.EBX. 
 
-I'd like KVM to be consistent across architectures and have the same
-(similar) meaning for KVM_CAP_NR_VCPUS.
+The third one (patch 03/04) is to avoid perf_event creation for
+unavailable Intel CPUID events.
 
-> which I'm keen on avoiding. I'd rather have the kvm and !kvm cases
-> return the same thing.
+Finally a new way is proposed to
+fix amd_event_mapping[] for new AMD platforms.
 
-Forgive me my (ARM?) ignorance but what would it be then? If we go for
-min(num_online_cpus(), kvm_arm_default_max_vcpus()) in both cases, cat
-this can still go above KVM_CAP_MAX_VCPUS after vGIC is created?
+Please check each commit message for more details
+and let me know if there is any room for improvement,
 
-Thanks for the feedback!
+Thanks.
+
+Like Xu (7):
+  KVM: x86/pmu: Make top-down.slots event unavailable in supported leaf
+  KVM: x86/pmu: Fix available_event_types check for REF_CPU_CYCLES event
+  KVM: x86/pmu: Pass "struct kvm_pmu *" to the find_fixed_event()
+  KVM: x86/pmu: Avoid perf_event creation for invalid counter config
+  KVM: x86/pmu: Refactor pmu->available_event_types field using BITMAP
+  perf: x86/core: Add interface to query perfmon_event_map[] directly
+  KVM: x86/pmu: Setup the {inte|amd}_event_mapping[] when hardware_setup
+
+ arch/x86/events/core.c            |   9 +++
+ arch/x86/include/asm/kvm_host.h   |   2 +-
+ arch/x86/include/asm/perf_event.h |   5 ++
+ arch/x86/kvm/cpuid.c              |  14 ++++
+ arch/x86/kvm/pmu.c                |  35 +++++++++-
+ arch/x86/kvm/pmu.h                |   4 +-
+ arch/x86/kvm/svm/pmu.c            |  24 ++-----
+ arch/x86/kvm/vmx/pmu_intel.c      | 106 +++++++++++++++++++++++-------
+ arch/x86/kvm/x86.c                |   1 +
+ 9 files changed, 153 insertions(+), 47 deletions(-)
 
 -- 
-Vitaly
+2.33.0
 
