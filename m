@@ -2,111 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F08D44EFF3
-	for <lists+kvm@lfdr.de>; Sat, 13 Nov 2021 00:12:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4232D44F017
+	for <lists+kvm@lfdr.de>; Sat, 13 Nov 2021 00:52:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233128AbhKLXPO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Nov 2021 18:15:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47460 "EHLO
+        id S231688AbhKLXzr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Nov 2021 18:55:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231320AbhKLXPL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Nov 2021 18:15:11 -0500
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53D84C061766
-        for <kvm@vger.kernel.org>; Fri, 12 Nov 2021 15:12:20 -0800 (PST)
-Received: by mail-lj1-x232.google.com with SMTP id h11so21484337ljk.1
-        for <kvm@vger.kernel.org>; Fri, 12 Nov 2021 15:12:20 -0800 (PST)
+        with ESMTP id S231261AbhKLXzq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Nov 2021 18:55:46 -0500
+Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A73CC061766
+        for <kvm@vger.kernel.org>; Fri, 12 Nov 2021 15:52:55 -0800 (PST)
+Received: by mail-qk1-x74a.google.com with SMTP id h8-20020a05620a284800b0045ec745583cso7594292qkp.6
+        for <kvm@vger.kernel.org>; Fri, 12 Nov 2021 15:52:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=iMTvT7NsOtiVrtb1ierayNB1hBIVaQnurs1N94fLgF8=;
-        b=ersYV9JSN6rOg3zxZlrbNSTpFEgDl1UVqBfTJhN1zQ3nZ/fL+Uz/r80g3jc1Y4wCcj
-         6CEDOJyZGpVJPgR6W+Y3rlx/AljcLlvRUYImunH3HBi6IgN4HgHbbJU3MkEJ/+JUiiSx
-         Yb99wopDfmk2MEBWI564gXfQQbK56cb2l3NPARPHdu4GklGGSZ7F6/mVwNHKjcGJ6zk4
-         OPii0OdHtbiSUNbqdM7RF9CZ8Vf09USAcWTVVaI0F4vJvtKoDwcQKgmgQgdRObJtD4Yk
-         4TYgzvcyiuoyX55Lk5nn5oFssD40zA3OqYmbdymWqBIuVfObmph5EghMhDh7lma+39oF
-         ZA2g==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=N82n/Qfw0LA8CZqdiHx/4o/4vJjX7O/QxZFdGuCj9A8=;
+        b=brbLt+aIzarvy/QrtCwTdYmWHYvK5wCNnv/DVt6eyjsyuTxYg1Nc7z8M2rAbIw6V2D
+         XSFd7RssRslLL2bGMQM6AMoyEMyuVIyAo+x88WNPudY/f2U0qjPzmh7/wTTRbFcNzQsF
+         3seR6xBiJjiyzZgZH04xlXoksI4OWS+Zs+Vo+MPIXWYqK4v4Om1WS+kTIXMIMkJiwaCX
+         6Zap0+horzyvLKSlNFg29DOdJEUWsqc//3/LmGYdurZvt2WzlLd5b/KD9v0GsFfn46fC
+         k59BWRbJGuDhqM841C4S5dy6LEnpcaWRdt2PbR/v0W7K9q4xCJJ0GoqIYchWdqJdxIg9
+         N03w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=iMTvT7NsOtiVrtb1ierayNB1hBIVaQnurs1N94fLgF8=;
-        b=AEPeFNaaqMvPK54BL14CVp03zDrvi3ru4NgPkdt5ZIzEcHm8oeMg0gCrd75z1zyoIY
-         7VJEuK3yZhAr5RZ3SMwrR1rPMxK+I3Is8l6W2wfD2iBGkTmdmqSM6TB/+Y/d72oxuLVB
-         AJuuYPaUKdU/BWJ2+KCJNgw5DNXasE/aBUflnfJJ3gVrwszi3XyhA1/8QvhxWglh3OcO
-         EQoH3c0oIfzs663nL5LT8dOda0GJqul5CIG1yVtIMH4mYO6huTiU8wXQvrvDio5so5L+
-         PFcVH3HZCUvNv1io6YHi7cwkm5HQM8tom5vb0uZxdiNSyxhtKOO8eZASpzkT782CA76P
-         FKuw==
-X-Gm-Message-State: AOAM532hSDeaA5MfCvKktKoGCxdFPN+M6JQyoG4jHXmQ/2DWdPDE0iGp
-        6jcmEgzRAOs7Y9BZj5LidIi/J2QJISrlr2xKKxelSQ==
-X-Google-Smtp-Source: ABdhPJydU+hzM9MotqBxJ2F97X4iN4bm+1rkOt+Kax0ud7PwjIKZFoahzTavEcVxq70QB9KNwcWvpJ5XcjMWnenIhzY=
-X-Received: by 2002:a05:651c:1507:: with SMTP id e7mr11130345ljf.83.1636758738318;
- Fri, 12 Nov 2021 15:12:18 -0800 (PST)
-MIME-Version: 1.0
-References: <20211111154930.3603189-1-pbonzini@redhat.com>
-In-Reply-To: <20211111154930.3603189-1-pbonzini@redhat.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Fri, 12 Nov 2021 16:12:06 -0700
-Message-ID: <CAMkAt6qtNcOSP93SYsj_s4EfbyV9L5K0aHgTBT+PJ5uJ-zjM1g@mail.gmail.com>
-Subject: Re: [PATCH v12 0/7] Add AMD SEV and SEV-ES intra host migration support
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        seanjc@google.com
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=N82n/Qfw0LA8CZqdiHx/4o/4vJjX7O/QxZFdGuCj9A8=;
+        b=L/jrXmMavxE/H2DRUc9KT5F3LX+Vs6hvOmOF3GGXCbyy+IkqOjLVuevn5OcYyIhCEX
+         GvmARZn0z/niNZS3DkLCdnd+ZX49RZ0uYRPDiEFZ082FYboiq4YqTjMyZmlj3T84tQpP
+         3pC7OMDBWpuEEvXtIEDIUxF6x/Y2ZXwmjV3GiyZdPyiLnAlLzYn71vHckFASiyiazZC7
+         dCPV4B9c9biT34t9ojxy/CGeR443STl6+2BKDIgGCs7w3OrF0838Nrew3O7PtsJIwsh0
+         ftJb0vsJfx4/zYUTDTmUrd64RHgI9XYC141O2Sp09JHwHh9NZWrhz3KYbQ4vdjvMJfgR
+         3cow==
+X-Gm-Message-State: AOAM532WS7LtHZIRafabyNEkiztx0Ci0MoSsCiTkW188vmFzOz6L6IOk
+        LwO0ZlGhGipVZ2EZoTllDmOhvDk3PszS0tj+U7DzpAv12S97pDn4v5ZIeyU+r9FVfPPmtVcrOFU
+        9fr5JqZOcRbtsssEezTKXC5W4wd6KS70Z7PEgRNrvl0FZLBmyyckVTm5kfpWzd2s=
+X-Google-Smtp-Source: ABdhPJyUbjTw3E7Gct9aQpKO/XFLeYW+mnciKyaA1ifqlnuGeDUReX+BXsZSNriTGT7+iC8Natt2wsem/n2ueg==
+X-Received: from tortoise.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1a0d])
+ (user=jmattson job=sendgmr) by 2002:a05:622a:1102:: with SMTP id
+ e2mr20006837qty.171.1636761174462; Fri, 12 Nov 2021 15:52:54 -0800 (PST)
+Date:   Fri, 12 Nov 2021 15:52:33 -0800
+Message-Id: <20211112235235.1125060-1-jmattson@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.34.0.rc1.387.gb447b232ab-goog
+Subject: [PATCH 0/2] kvm: x86: Fix PMU virtualization for some basic events
+From:   Jim Mattson <jmattson@google.com>
+To:     kvm@vger.kernel.org, pbonzini@redhat.com
+Cc:     Jim Mattson <jmattson@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 11, 2021 at 8:49 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> This is a fixed version of Peter Gonda's series.  The main change is
-> that it uses the "bugged" VM implementation (now renamed to "dead")
-> to ensure the source VM is inoperational, and that it correctly
-> charges the current cgroup for the ASID.
->
-> I also renamed the capability to KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM,
-> since it is similar to KVM_CAP_VM_COPY_ENC_CONTEXT_FROM.
->
-> Paolo Bonzini (2):
->   KVM: generalize "bugged" VM to "dead" VM
->   KVM: SEV: provide helpers to charge/uncharge misc_cg
+Google Cloud has a customer that needs accurate virtualization of two
+architected PMU events on Intel hardware: "instructions retired" and
+"branch instructions retired." The existing PMU virtualization code
+fails to account for instructions that are emulated by kvm.
 
-Thanks for these Paolo! I took a quick look through these. I can send
-some additional testing for the new "dead" VM functionality on the
-source side VM and I'll try to test when the cgroup is maxed out we
-can still do an intra-host migration (make sure we aren't charging
-double during the migration) in a follow up patch. I guess the cgroup
-stuff in general could use some testing.
+Accurately virtualizing all PMU events for all microarchitectures is a
+herculean task, but there are only 8 architected events, so maybe we
+can at least try to get those right.
 
-Also thanks for the detailed reviews Sean.
+Eric Hankland wrote this code originally, but his plate is full, so
+I've volunteered to shepherd the changes through upstream acceptance.
 
->
-> Peter Gonda (5):
->   KVM: SEV: Refactor out sev_es_state struct
->   KVM: SEV: Add support for SEV intra host migration
->   KVM: SEV: Add support for SEV-ES intra host migration
->   selftest: KVM: Add open sev dev helper
->   selftest: KVM: Add intra host migration tests
->
->  Documentation/virt/kvm/api.rst                |  15 +
->  arch/x86/include/asm/kvm_host.h               |   1 +
->  arch/x86/kvm/svm/sev.c                        | 303 +++++++++++++++---
->  arch/x86/kvm/svm/svm.c                        |   9 +-
->  arch/x86/kvm/svm/svm.h                        |  28 +-
->  arch/x86/kvm/x86.c                            |   8 +-
->  include/linux/kvm_host.h                      |  12 +-
->  include/uapi/linux/kvm.h                      |   1 +
->  tools/testing/selftests/kvm/Makefile          |   3 +-
->  .../testing/selftests/kvm/include/kvm_util.h  |   1 +
->  .../selftests/kvm/include/x86_64/svm_util.h   |   2 +
->  tools/testing/selftests/kvm/lib/kvm_util.c    |  24 +-
->  tools/testing/selftests/kvm/lib/x86_64/svm.c  |  13 +
->  .../selftests/kvm/x86_64/sev_migrate_tests.c  | 203 ++++++++++++
->  virt/kvm/kvm_main.c                           |  10 +-
->  15 files changed, 551 insertions(+), 82 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c
->
-> --
-> 2.27.0
->
+Jim Mattson (2):
+  KVM: x86: Update vPMCs when retiring instructions
+  KVM: x86: Update vPMCs when retiring branch instructions
+
+ arch/x86/kvm/emulate.c     | 57 +++++++++++++++++++++-----------------
+ arch/x86/kvm/kvm_emulate.h |  1 +
+ arch/x86/kvm/pmu.c         | 31 +++++++++++++++++++++
+ arch/x86/kvm/pmu.h         |  1 +
+ arch/x86/kvm/vmx/nested.c  |  6 +++-
+ arch/x86/kvm/x86.c         |  5 ++++
+ 6 files changed, 75 insertions(+), 26 deletions(-)
+
+-- 
+2.34.0.rc1.387.gb447b232ab-goog
+
