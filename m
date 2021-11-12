@@ -2,272 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 18FA944ED7B
-	for <lists+kvm@lfdr.de>; Fri, 12 Nov 2021 20:44:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3954244ED86
+	for <lists+kvm@lfdr.de>; Fri, 12 Nov 2021 20:48:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232735AbhKLTra (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Nov 2021 14:47:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56776 "EHLO
+        id S235326AbhKLTvN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Nov 2021 14:51:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229810AbhKLTra (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Nov 2021 14:47:30 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1228EC061766
-        for <kvm@vger.kernel.org>; Fri, 12 Nov 2021 11:44:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=xrPZwVz8kaTHa9gBIpxe6TGbAInUeXcfIQYCaPM++fk=; b=ZWPmdH5RNjP89NiLTKrpn/JmIX
-        6yJM5PobDImnrhcjt8+sIQcXbpeT22fbT8YZKAqDeBdANst/t8F5Alr3f2zbWH/BGrfT0mZBTj0JH
-        Vv4Dccx5Agqi6qmwjwKJBRbCPpXDaoscW2sXG34v46Nzfe8wptIyDJRjlRGoNnY2jOGs9i+P0VZd3
-        x5Tz1hbna3r4xK4c/bNgHEq70WHzKT9QNaxx6s/MGwHW6hCoPQunIsH9n3sMOJmJWaK4CnSbYPZYY
-        7PqF2LlVPbp4TzOmf2/jvpYwIS56awveUah7FDOoEhX+NkORtoRqV/oHtC0mQoHuq4A6aHtYVxoW1
-        7E4qSc6w==;
-Received: from [2001:8b0:10b:1::3ae] (helo=u3832b3a9db3152.infradead.org)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mlcTP-00BUjF-TW; Fri, 12 Nov 2021 19:44:32 +0000
-Message-ID: <fb5efe2aa6424750d0ed2277f72c44101f4c57ba.camel@infradead.org>
-Subject: Re: [PATCH v3] KVM: x86: Fix recording of guest steal time /
- preempted status
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>
-Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "mtosatti@redhat.com" <mtosatti@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>, karahmed@amazon.com
-Date:   Fri, 12 Nov 2021 19:44:28 +0000
-In-Reply-To: <40d7d808-dce6-a541-18dc-b0c7f4d6586c@redhat.com>
-References: <5d4002373c3ae614cb87b72ba5b7cdc161a0cd46.camel@infradead.org>
-         <4369bbef7f0c2b239da419c917f9a9f2ca6a76f1.camel@infradead.org>
-         <624bc910-1bec-e6dd-b09a-f86dc6cdbef0@redhat.com>
-         <0372987a52b5f43963721b517664830e7e6f1818.camel@infradead.org>
-         <1f326c33-3acf-911a-d1ef-c72f0a570761@redhat.com>
-         <3645b9b889dac6438394194bb5586a46b68d581f.camel@infradead.org>
-         <309f61f7-72fd-06a2-84b4-97dfc3fab587@redhat.com>
-         <96cef64bf7927b6a0af2173b0521032f620551e4.camel@infradead.org>
-         <40d7d808-dce6-a541-18dc-b0c7f4d6586c@redhat.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-izUM9Fdrq6/SMxzfqk6C"
-User-Agent: Evolution 3.36.5-0ubuntu1 
+        with ESMTP id S232474AbhKLTvM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Nov 2021 14:51:12 -0500
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF1F5C061766
+        for <kvm@vger.kernel.org>; Fri, 12 Nov 2021 11:48:21 -0800 (PST)
+Received: by mail-pl1-x636.google.com with SMTP id n8so9265373plf.4
+        for <kvm@vger.kernel.org>; Fri, 12 Nov 2021 11:48:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=zr5FgjktMhow+NOFcAQVViEc+ANJI2M0r6r48QGgVI4=;
+        b=ju07XZYoPBdZerGoypJVNunlreP0szj3eP3wBUKtjj3PgeSmreG3NLWofDNDwV6K29
+         FsSfNhHPjnLQwrYJbcInKVbPImCmeaSbNg1PrGgCt/txR88PNm1nU0RTbPjM3JdC3wf3
+         uZ85zCueTnCAB+k9Pw+WeIIKYWLJn2vZxUaWaMXx1CvRCQcsZjqW9kwUlCANJLD9YPbf
+         TOq6qB/AcWNguhQgpAU6PKmtZwvGrzVt2V5i98njwxtUv/Qc7NCreMhve1otMefuO7y8
+         W2WfbjoI5XZ/n45uufMVitUf7PZW+0Okf36r5AIHuD1vpBBTL6m1a0mtY/OWfjjaOpfP
+         oGnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=zr5FgjktMhow+NOFcAQVViEc+ANJI2M0r6r48QGgVI4=;
+        b=ArTUv2urKhddqLXOu+DCzA5XCU/BZWeXr2fsU4Fv8tjH8gSffeGi+uwHpGILUprF1U
+         9JSvY3EsN7e/aK6N1SMIRYdDruWv+t2ocpNsesZ1OdiWDxSyBtRAzB6IxPCfR039kJzh
+         9Z5wQ54Nux9rmh3rNta7RsY4ZLjUkelz1uT033PGdD8+QqUDLAGrWUh1ECwmnPbuDvOf
+         zXQy8HT/TJ50bX4cxIo7dRkfSv21dT0Te8pLhHzXwt2iC7HOtkNv+Wbhg2CnkermwB+s
+         xcu9bnyaJbRaRXrOrP+EWdFXqwDsu0lah9TNWCCpG290mr2/2A0Cnak1g0liNmyD8e5/
+         ML5A==
+X-Gm-Message-State: AOAM533kTeiR33nDhzV1h7osF0wqnrg+qxlFpdH1BFhWaafPB4WwjXFU
+        QH6ZIi9UYkvZ1u3tMHL+VbPVKw==
+X-Google-Smtp-Source: ABdhPJy4Qx6b+7+ByFpOdO4v0MJjsrHOwn6ocVpZeRM8XbBpXpi+sLPnEs6oezsNOzfZQuqOUI4/kw==
+X-Received: by 2002:a17:90b:1b07:: with SMTP id nu7mr21351128pjb.140.1636746501253;
+        Fri, 12 Nov 2021 11:48:21 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id y6sm7644847pfi.154.2021.11.12.11.48.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Nov 2021 11:48:20 -0800 (PST)
+Date:   Fri, 12 Nov 2021 19:48:17 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Dave Hansen <dave.hansen@intel.com>,
+        Peter Gonda <pgonda@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
+ Hypervisor Support
+Message-ID: <YY7FAW5ti7YMeejj@google.com>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
+ <061ccd49-3b9f-d603-bafd-61a067c3f6fa@intel.com>
+ <YY6z5/0uGJmlMuM6@zn.tnic>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <YY6z5/0uGJmlMuM6@zn.tnic>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Fri, Nov 12, 2021, Borislav Petkov wrote:
+> On Fri, Nov 12, 2021 at 09:59:46AM -0800, Dave Hansen wrote:
+> > Or, is there some mechanism that prevent guest-private memory from being
+> > accessed in random host kernel code?
 
---=-izUM9Fdrq6/SMxzfqk6C
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Or random host userspace code...
 
-On Fri, 2021-11-12 at 10:31 +0100, Paolo Bonzini wrote:
-> Yes, that's also where I got stuck in my first attempt a few months ago.=
-=20
->   I agree that it can be changed to use gfn-to-hva caches, except for=20
-> the vmcs12->posted_intr_desc_addr and vmcs12->virtual_apic_page_addr.
+> So I'm currently under the impression that random host->guest accesses
+> should not happen if not previously agreed upon by both.
 
-Let's start with the low-hanging fruit... what are the recommended
-tests for this kibnd of thing? I don't think we have kernel self-tests
-that exercise this, do we?
+Key word "should".
 
-As before, this is at
-https://git.infradead.org/users/dwmw2/linux.git/shortlog/refs/heads/xen-evt=
-chn
+> Because, as explained on IRC, if host touches a private guest page,
+> whatever the host does to that page, the next time the guest runs, it'll
+> get a #VC where it will see that that page doesn't belong to it anymore
+> and then, out of paranoia, it will simply terminate to protect itself.
+> 
+> So cloud providers should have an interest to prevent such random stray
+> accesses if they wanna have guests. :)
 
+Yes, but IMO inducing a fault in the guest because of _host_ bug is wrong.
 
-From: David Woodhouse <dwmw@amazon.co.uk>
-Subject: [PATCH] KVM: nVMX: Use kvm_{read,write}_guest_cached() for shadow_=
-vmcs12
+On Fri, Nov 12, 2021, Peter Gonda wrote:
+> Here is an alternative to the current approach: On RMP violation (host
+> or userspace) the page fault handler converts the page from private to
+> shared to allow the write to continue. This pulls from s390’s error
+> handling which does exactly this. See ‘arch_make_page_accessible()’.
 
-Using kvm_vcpu_map() for reading from the guest is entirely gratuitous,
-when all we do is a single memcpy and unmap it again. Fix it up to use
-kvm_read_guest()... but in fact I couldn't bring myself to do that
-without also making it use a gfn_to_hva_cache for both that *and* the
-copy in the other direction.
+Ah, after further reading, s390 does _not_ do implicit private=>shared conversions.
 
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
----
- arch/x86/kvm/vmx/nested.c | 24 +++++++++++++++---------
- arch/x86/kvm/vmx/vmx.h    |  5 +++++
- 2 files changed, 20 insertions(+), 9 deletions(-)
+s390's arch_make_page_accessible() is somewhat similar, but it is not a direct
+comparison.  IIUC, it exports and integrity protects the data and thus preserves
+the guest's data in an encrypted form, e.g. so that it can be swapped to disk.
+And if the host corrupts the data, attempting to convert it back to secure on a
+subsequent guest access will fail.
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index b213ca966d41..7e2a99f435b6 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -670,33 +670,39 @@ static inline bool nested_vmx_prepare_msr_bitmap(stru=
-ct kvm_vcpu *vcpu,
- static void nested_cache_shadow_vmcs12(struct kvm_vcpu *vcpu,
- 				       struct vmcs12 *vmcs12)
- {
--	struct kvm_host_map map;
--	struct vmcs12 *shadow;
-+	struct vcpu_vmx *vmx =3D to_vmx(vcpu);
-+	struct gfn_to_hva_cache *ghc =3D &vmx->nested.shadow_vmcs12_cache;
-=20
- 	if (!nested_cpu_has_shadow_vmcs(vmcs12) ||
- 	    vmcs12->vmcs_link_pointer =3D=3D INVALID_GPA)
- 		return;
-=20
--	shadow =3D get_shadow_vmcs12(vcpu);
--
--	if (kvm_vcpu_map(vcpu, gpa_to_gfn(vmcs12->vmcs_link_pointer), &map))
-+	if (ghc->gpa !=3D vmcs12->vmcs_link_pointer &&
-+	    kvm_gfn_to_hva_cache_init(vcpu->kvm, ghc,
-+				      vmcs12->vmcs_link_pointer, VMCS12_SIZE))
- 		return;
-=20
--	memcpy(shadow, map.hva, VMCS12_SIZE);
--	kvm_vcpu_unmap(vcpu, &map, false);
-+	kvm_read_guest_cached(vmx->vcpu.kvm, ghc, get_shadow_vmcs12(vcpu),
-+			      VMCS12_SIZE);
- }
-=20
- static void nested_flush_cached_shadow_vmcs12(struct kvm_vcpu *vcpu,
- 					      struct vmcs12 *vmcs12)
- {
- 	struct vcpu_vmx *vmx =3D to_vmx(vcpu);
-+	struct gfn_to_hva_cache *ghc =3D &vmx->nested.shadow_vmcs12_cache;
-=20
- 	if (!nested_cpu_has_shadow_vmcs(vmcs12) ||
- 	    vmcs12->vmcs_link_pointer =3D=3D INVALID_GPA)
- 		return;
-=20
--	kvm_write_guest(vmx->vcpu.kvm, vmcs12->vmcs_link_pointer,
--			get_shadow_vmcs12(vcpu), VMCS12_SIZE);
-+	if (ghc->gpa !=3D vmcs12->vmcs_link_pointer &&
-+	    kvm_gfn_to_hva_cache_init(vcpu->kvm, ghc,
-+				      vmcs12->vmcs_link_pointer, VMCS12_SIZE))
-+		return;
-+
-+	kvm_write_guest_cached(vmx->vcpu.kvm, ghc, get_shadow_vmcs12(vcpu),
-+			       VMCS12_SIZE);
- }
-=20
- /*
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index a4ead6023133..cdadbd5dc0ca 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -141,6 +141,11 @@ struct nested_vmx {
- 	 */
- 	struct vmcs12 *cached_shadow_vmcs12;
-=20
-+	/*
-+	 * GPA to HVA cache for accessing vmcs12->vmcs_link_pointer
-+	 */
-+	struct gfn_to_hva_cache shadow_vmcs12_cache;
-+
- 	/*
- 	 * Indicates if the shadow vmcs or enlightened vmcs must be updated
- 	 * with the data held by struct vmcs12.
---=20
-2.31.1
+The host kernel's handling of the "convert to secure" failures doesn't appear to
+be all that robust, e.g. it looks like there are multiple paths where the error
+is dropped on the floor and the guest is resumed , but IMO soft hanging the guest 
+is still better than inducing a fault in the guest, and far better than potentially
+coercing the guest into reading corrupted memory ("spurious" PVALIDATE).  And s390's
+behavior is fixable since it's purely a host error handling problem.
 
+To truly make a page shared, s390 requires the guest to call into the ultravisor
+to make a page shared.  And on the host side, the host can pin a page as shared
+to prevent the guest from unsharing it while the host is accessing it as a shared
+page.
 
+So, inducing #VC is similar in the sense that a malicious s390 can also DoS itself,
+but is quite different in that (AFAICT) s390 does not create an attack surface where
+a malicious or buggy host userspace can induce faults in the guest, or worst case in
+SNP, exploit a buggy guest into accepting and accessing corrupted data.
 
---=-izUM9Fdrq6/SMxzfqk6C
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+It's also different in that s390 doesn't implicitly convert between shared and
+private.  Functionally, it doesn't really change the end result because a buggy
+host that writes guest private memory will DoS the guest (by inducing a #VC or
+corrupting exported data), but at least for s390 there's a sane, legitimate use
+case for accessing guest private memory (swap and maybe migration?), whereas for
+SNP, IMO implicitly converting to shared on a host access is straight up wrong.
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCECow
-ggUcMIIEBKADAgECAhEA4rtJSHkq7AnpxKUY8ZlYZjANBgkqhkiG9w0BAQsFADCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTkwMTAyMDAwMDAwWhcNMjIwMTAxMjM1
-OTU5WjAkMSIwIAYJKoZIhvcNAQkBFhNkd213MkBpbmZyYWRlYWQub3JnMIIBIjANBgkqhkiG9w0B
-AQEFAAOCAQ8AMIIBCgKCAQEAsv3wObLTCbUA7GJqKj9vHGf+Fa+tpkO+ZRVve9EpNsMsfXhvFpb8
-RgL8vD+L133wK6csYoDU7zKiAo92FMUWaY1Hy6HqvVr9oevfTV3xhB5rQO1RHJoAfkvhy+wpjo7Q
-cXuzkOpibq2YurVStHAiGqAOMGMXhcVGqPuGhcVcVzVUjsvEzAV9Po9K2rpZ52FE4rDkpDK1pBK+
-uOAyOkgIg/cD8Kugav5tyapydeWMZRJQH1vMQ6OVT24CyAn2yXm2NgTQMS1mpzStP2ioPtTnszIQ
-Ih7ASVzhV6csHb8Yrkx8mgllOyrt9Y2kWRRJFm/FPRNEurOeNV6lnYAXOymVJwIDAQABo4IB0zCC
-Ac8wHwYDVR0jBBgwFoAUgq9sjPjF/pZhfOgfPStxSF7Ei8AwHQYDVR0OBBYEFLfuNf820LvaT4AK
-xrGK3EKx1DE7MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUF
-BwMEBggrBgEFBQcDAjBGBgNVHSAEPzA9MDsGDCsGAQQBsjEBAgEDBTArMCkGCCsGAQUFBwIBFh1o
-dHRwczovL3NlY3VyZS5jb21vZG8ubmV0L0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3Js
-LmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWls
-Q0EuY3JsMIGLBggrBgEFBQcBAQR/MH0wVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuY29tb2RvY2Eu
-Y29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYI
-KwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmNvbW9kb2NhLmNvbTAeBgNVHREEFzAVgRNkd213MkBpbmZy
-YWRlYWQub3JnMA0GCSqGSIb3DQEBCwUAA4IBAQALbSykFusvvVkSIWttcEeifOGGKs7Wx2f5f45b
-nv2ghcxK5URjUvCnJhg+soxOMoQLG6+nbhzzb2rLTdRVGbvjZH0fOOzq0LShq0EXsqnJbbuwJhK+
-PnBtqX5O23PMHutP1l88AtVN+Rb72oSvnD+dK6708JqqUx2MAFLMevrhJRXLjKb2Mm+/8XBpEw+B
-7DisN4TMlLB/d55WnT9UPNHmQ+3KFL7QrTO8hYExkU849g58Dn3Nw3oCbMUgny81ocrLlB2Z5fFG
-Qu1AdNiBA+kg/UxzyJZpFbKfCITd5yX49bOriL692aMVDyqUvh8fP+T99PqorH4cIJP6OxSTdxKM
-MIIFHDCCBASgAwIBAgIRAOK7SUh5KuwJ6cSlGPGZWGYwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTE5MDEwMjAwMDAwMFoXDTIyMDEwMTIz
-NTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCASIwDQYJKoZIhvcN
-AQEBBQADggEPADCCAQoCggEBALL98Dmy0wm1AOxiaio/bxxn/hWvraZDvmUVb3vRKTbDLH14bxaW
-/EYC/Lw/i9d98CunLGKA1O8yogKPdhTFFmmNR8uh6r1a/aHr301d8YQea0DtURyaAH5L4cvsKY6O
-0HF7s5DqYm6tmLq1UrRwIhqgDjBjF4XFRqj7hoXFXFc1VI7LxMwFfT6PStq6WedhROKw5KQytaQS
-vrjgMjpICIP3A/CroGr+bcmqcnXljGUSUB9bzEOjlU9uAsgJ9sl5tjYE0DEtZqc0rT9oqD7U57My
-ECIewElc4VenLB2/GK5MfJoJZTsq7fWNpFkUSRZvxT0TRLqznjVepZ2AFzsplScCAwEAAaOCAdMw
-ggHPMB8GA1UdIwQYMBaAFIKvbIz4xf6WYXzoHz0rcUhexIvAMB0GA1UdDgQWBBS37jX/NtC72k+A
-CsaxitxCsdQxOzAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEF
-BQcDBAYIKwYBBQUHAwIwRgYDVR0gBD8wPTA7BgwrBgEEAbIxAQIBAwUwKzApBggrBgEFBQcCARYd
-aHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9DUFMwWgYDVR0fBFMwUTBPoE2gS4ZJaHR0cDovL2Ny
-bC5jb21vZG9jYS5jb20vQ09NT0RPUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFp
-bENBLmNybDCBiwYIKwYBBQUHAQEEfzB9MFUGCCsGAQUFBzAChklodHRwOi8vY3J0LmNvbW9kb2Nh
-LmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3J0MCQG
-CCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAC20spBbrL71ZEiFrbXBHonzhhirO1sdn+X+O
-W579oIXMSuVEY1LwpyYYPrKMTjKECxuvp24c829qy03UVRm742R9Hzjs6tC0oatBF7KpyW27sCYS
-vj5wbal+TttzzB7rT9ZfPALVTfkW+9qEr5w/nSuu9PCaqlMdjABSzHr64SUVy4ym9jJvv/FwaRMP
-gew4rDeEzJSwf3eeVp0/VDzR5kPtyhS+0K0zvIWBMZFPOPYOfA59zcN6AmzFIJ8vNaHKy5QdmeXx
-RkLtQHTYgQPpIP1Mc8iWaRWynwiE3ecl+PWzq4i+vdmjFQ8qlL4fHz/k/fT6qKx+HCCT+jsUk3cS
-jDCCBeYwggPOoAMCAQICEGqb4Tg7/ytrnwHV2binUlYwDQYJKoZIhvcNAQEMBQAwgYUxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMSswKQYDVQQDEyJDT01PRE8gUlNBIENlcnRpZmljYXRp
-b24gQXV0aG9yaXR5MB4XDTEzMDExMDAwMDAwMFoXDTI4MDEwOTIzNTk1OVowgZcxCzAJBgNVBAYT
-AkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNV
-BAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAvrOeV6wodnVAFsc4A5jTxhh2IVDzJXkLTLWg0X06WD6cpzEup/Y0dtmEatrQPTRI5Or1u6zf
-+bGBSyD9aH95dDSmeny1nxdlYCeXIoymMv6pQHJGNcIDpFDIMypVpVSRsivlJTRENf+RKwrB6vcf
-WlP8dSsE3Rfywq09N0ZfxcBa39V0wsGtkGWC+eQKiz4pBZYKjrc5NOpG9qrxpZxyb4o4yNNwTqza
-aPpGRqXB7IMjtf7tTmU2jqPMLxFNe1VXj9XB1rHvbRikw8lBoNoSWY66nJN/VCJv5ym6Q0mdCbDK
-CMPybTjoNCQuelc0IAaO4nLUXk0BOSxSxt8kCvsUtQIDAQABo4IBPDCCATgwHwYDVR0jBBgwFoAU
-u69+Aj36pvE8hI6t7jiY7NkyMtQwHQYDVR0OBBYEFIKvbIz4xf6WYXzoHz0rcUhexIvAMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMBEGA1UdIAQKMAgwBgYEVR0gADBMBgNVHR8E
-RTBDMEGgP6A9hjtodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDZXJ0aWZpY2F0aW9u
-QXV0aG9yaXR5LmNybDBxBggrBgEFBQcBAQRlMGMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9jcnQuY29t
-b2RvY2EuY29tL0NPTU9ET1JTQUFkZFRydXN0Q0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2Nz
-cC5jb21vZG9jYS5jb20wDQYJKoZIhvcNAQEMBQADggIBAHhcsoEoNE887l9Wzp+XVuyPomsX9vP2
-SQgG1NgvNc3fQP7TcePo7EIMERoh42awGGsma65u/ITse2hKZHzT0CBxhuhb6txM1n/y78e/4ZOs
-0j8CGpfb+SJA3GaBQ+394k+z3ZByWPQedXLL1OdK8aRINTsjk/H5Ns77zwbjOKkDamxlpZ4TKSDM
-KVmU/PUWNMKSTvtlenlxBhh7ETrN543j/Q6qqgCWgWuMAXijnRglp9fyadqGOncjZjaaSOGTTFB+
-E2pvOUtY+hPebuPtTbq7vODqzCM6ryEhNhzf+enm0zlpXK7q332nXttNtjv7VFNYG+I31gnMrwfH
-M5tdhYF/8v5UY5g2xANPECTQdu9vWPoqNSGDt87b3gXb1AiGGaI06vzgkejL580ul+9hz9D0S0U4
-jkhJiA7EuTecP/CFtR72uYRBcunwwH3fciPjviDDAI9SnC/2aPY8ydehzuZutLbZdRJ5PDEJM/1t
-yZR2niOYihZ+FCbtf3D9mB12D4ln9icgc7CwaxpNSCPt8i/GqK2HsOgkL3VYnwtx7cJUmpvVdZ4o
-gnzgXtgtdk3ShrtOS1iAN2ZBXFiRmjVzmehoMof06r1xub+85hFQzVxZx5/bRaTKTlL8YXLI8nAb
-R9HWdFqzcOoB/hxfEyIQpx9/s81rgzdEZOofSlZHynoSMYIDyjCCA8YCAQEwga0wgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
-ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjEx
-MTEyMTk0NDI4WjAvBgkqhkiG9w0BCQQxIgQgZyiTnSkYtxoVUsRJsFrbAS5KHAV2tllEfkSAEp/k
-ANIwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
-TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
-PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
-aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBAGlhbZHNYh6ci046fLfA+QCYxnIs1Rwsuii1dlKuqp+oGjCVM7j/OJ/DJTJDgKHD
-t1nOxMnKGnbqqzQxT5JhqGYIfRPZs+vA3JM1hgphx9w4zwvyOnDlui/xdJbugpup7iL4sfh7J7ET
-oJqilQPjhWTajOv50pp+mKv862KLiciXrvil2Nz4YOzbViO/pVYGjJWn9o17F0yChFVZkq2ltu1x
-aDtdSCB4Lx5h6+Pg2eh8URr5TF7A5azy5Aem4aGqhOuaWNV1YGRYoe07QJJZkm5AvLt2d5gIgKFZ
-bFkHoz9IpEmnRRs5XU3C4Rd5mpf3VpxiBmbnPOoWA9Un74FXyFgAAAAAAAA=
+> Additionally it adds less complexity to the SNP kernel patches, and
+> requires no new ABI.
 
-
---=-izUM9Fdrq6/SMxzfqk6C--
-
+I disagree, this would require "new" ABI in the sense that it commits KVM to
+supporting SNP without requiring userspace to initiate any and all conversions
+between shared and private.  Which in my mind is the big elephant in the room:
+do we want to require new KVM (and kernel?) ABI to allow/force userspace to
+explicitly declare guest private memory for TDX _and_ SNP, or just TDX?
