@@ -2,213 +2,328 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BC51544E2F8
-	for <lists+kvm@lfdr.de>; Fri, 12 Nov 2021 09:28:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9728144E37D
+	for <lists+kvm@lfdr.de>; Fri, 12 Nov 2021 09:49:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233916AbhKLIbq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Nov 2021 03:31:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43382 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231173AbhKLIbp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Nov 2021 03:31:45 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C10BC061766
-        for <kvm@vger.kernel.org>; Fri, 12 Nov 2021 00:28:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=xTjhQpjW6odTf/Vhsad95IirZjT7Jb30zqOab/hND7c=; b=CPnlN0ERGLeEqyB5xT3sZ3sNgz
-        zH7IxqICSWThVloO43OuLfI4yPQ6iXBsJNlBdiULgwKpBPwyUnZVGi+ni1cYB5HdeeCYK2yM48QAq
-        /m6FFRz4LtA1McxiQ9IZvwl2i0AF9KpOwKCJpAL9Elqqu7xQZxHuiVWXe6gXNGv0jyMnP9sgeKXmZ
-        Kn6NOTk4M/OkSknqgwKN/MUeYMrfQkUS6Pycdyf19oYh2tQ9h7sBlPAidaaKkAJr9v8OxmDjK/sy+
-        CC2SfPYHAqB8TjbTGvtIFifV2QEwcbxvbRRpK23DdKUz19/RLHJHV1PDfZ1Kb7WnIgGeCgZzJZnuN
-        RRTY/xiQ==;
-Received: from [2001:8b0:10b:1::3ae] (helo=u3832b3a9db3152.ant.amazon.com)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mlRvU-009gGd-Tm; Fri, 12 Nov 2021 08:28:49 +0000
-Message-ID: <96cef64bf7927b6a0af2173b0521032f620551e4.camel@infradead.org>
-Subject: Re: [PATCH v3] KVM: x86: Fix recording of guest steal time /
- preempted status
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>
-Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "mtosatti@redhat.com" <mtosatti@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>, karahmed@amazon.com
-Date:   Fri, 12 Nov 2021 08:28:45 +0000
-In-Reply-To: <309f61f7-72fd-06a2-84b4-97dfc3fab587@redhat.com>
-References: <5d4002373c3ae614cb87b72ba5b7cdc161a0cd46.camel@infradead.org>
-         <4369bbef7f0c2b239da419c917f9a9f2ca6a76f1.camel@infradead.org>
-         <624bc910-1bec-e6dd-b09a-f86dc6cdbef0@redhat.com>
-         <0372987a52b5f43963721b517664830e7e6f1818.camel@infradead.org>
-         <1f326c33-3acf-911a-d1ef-c72f0a570761@redhat.com>
-         <3645b9b889dac6438394194bb5586a46b68d581f.camel@infradead.org>
-         <309f61f7-72fd-06a2-84b4-97dfc3fab587@redhat.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-9mW91ouzp7iaHsl43Q5W"
-User-Agent: Evolution 3.36.5-0ubuntu1 
+        id S234559AbhKLIwS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Nov 2021 03:52:18 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:20936 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S230464AbhKLIwQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 12 Nov 2021 03:52:16 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1AC8gK5W001926;
+        Fri, 12 Nov 2021 08:49:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : to : cc : references : from : subject : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=vTmn5wbrDo69xnbW1VURq7rwNR4P4yHfndanawqUSLE=;
+ b=aiHOmyts78fXn48RuSwplK7ItAX5g1wg+T9leD3ANQkLVunALsu/vIZrZNmqSFOEMhlm
+ PMsGV/f19wSJWSRotOYMYX44tKSUsCUKFdAqBPdzWjSofsqvC76eUKSURzWzIghdA4+P
+ DA9OVvXISN28JIMs5gmA7k0zgZAW2zIQIlsegBDyAMci3Ijqs5GVB1Wo63xb6E9Toqv0
+ DOeVGtnb8IFYLVlWKkvoAWWmStHyBbQic41ZaI10G1kudsNHS6mBmb6voaN5clenmbae
+ aW4N8LwoSkGpeaYfCyyPjyREQHqYSTUUKdGCtJ+79S1GEwYlASOgphgj9IkiuZRzvUcZ DQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3c9n0ag43h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 12 Nov 2021 08:49:25 +0000
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1AC8hDnc005111;
+        Fri, 12 Nov 2021 08:49:25 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3c9n0ag431-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 12 Nov 2021 08:49:24 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1AC8lgHj032134;
+        Fri, 12 Nov 2021 08:49:23 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma05fra.de.ibm.com with ESMTP id 3c5hbab6gp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 12 Nov 2021 08:49:22 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1AC8nI0e59441472
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 12 Nov 2021 08:49:18 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 65561A4068;
+        Fri, 12 Nov 2021 08:49:18 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D4510A405C;
+        Fri, 12 Nov 2021 08:49:17 +0000 (GMT)
+Received: from [9.145.17.97] (unknown [9.145.17.97])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 12 Nov 2021 08:49:17 +0000 (GMT)
+Message-ID: <97f3e32d-e4e4-e54e-1269-1ff66828f04f@linux.ibm.com>
+Date:   Fri, 12 Nov 2021 09:49:17 +0100
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Content-Language: en-US
+To:     Eric Farman <farman@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>
+Cc:     Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+References: <20211110203322.1374925-1-farman@linux.ibm.com>
+ <20211110203322.1374925-3-farman@linux.ibm.com>
+ <dd8a8b49-da6d-0ab8-dc47-b24f5604767f@redhat.com>
+ <ab82e68051674ea771e2cb5371ca2a204effab40.camel@linux.ibm.com>
+ <32836eb5-532f-962d-161a-faa2213a0691@linux.ibm.com>
+ <b116e738d8f9b185867ab28395012aaddd58af31.camel@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [RFC PATCH v3 2/2] KVM: s390: Extend the USER_SIGP capability
+In-Reply-To: <b116e738d8f9b185867ab28395012aaddd58af31.camel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: NltQ7r6qBAwCt65KmYuW6AHrABur6-oD
+X-Proofpoint-ORIG-GUID: ClaDWKI4C5io1NMFYg8CdOPyWitVNdL7
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
+ definitions=2021-11-12_03,2021-11-11_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ clxscore=1015 impostorscore=0 lowpriorityscore=0 suspectscore=0
+ mlxlogscore=999 bulkscore=0 mlxscore=0 malwarescore=0 phishscore=0
+ spamscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2111120046
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 11/11/21 18:48, Eric Farman wrote:
+> On Thu, 2021-11-11 at 17:13 +0100, Janosch Frank wrote:
+>> On 11/11/21 16:03, Eric Farman wrote:
+>>> On Thu, 2021-11-11 at 10:15 +0100, David Hildenbrand wrote:
+>>>> On 10.11.21 21:33, Eric Farman wrote:
+>>>>> With commit 2444b352c3ac ("KVM: s390: forward most SIGP orders
+>>>>> to
+>>>>> user
+>>>>> space") we have a capability that allows the "fast" SIGP orders
+>>>>> (as
+>>>>> defined by the Programming Notes for the SIGNAL PROCESSOR
+>>>>> instruction in
+>>>>> the Principles of Operation) to be handled in-kernel, while all
+>>>>> others are
+>>>>> sent to userspace for processing.
+>>>>>
+>>>>> This works fine but it creates a situation when, for example, a
+>>>>> SIGP SENSE
+>>>>> might return CC1 (STATUS STORED, and status bits indicating the
+>>>>> vcpu is
+>>>>> stopped), when in actuality userspace is still processing a
+>>>>> SIGP
+>>>>> STOP AND
+>>>>> STORE STATUS order, and the vcpu is not yet actually stopped.
+>>>>> Thus,
+>>>>> the
+>>>>> SIGP SENSE should actually be returning CC2 (busy) instead of
+>>>>> CC1.
+>>>>>
+>>>>> To fix this, add another CPU capability, dependent on the
+>>>>> USER_SIGP
+>>>>> one,
+>>>>> and two associated IOCTLs. One IOCTL will be used by userspace
+>>>>> to
+>>>>> mark a
+>>>>> vcpu "busy" processing a SIGP order, and cause concurrent
+>>>>> orders
+>>>>> handled
+>>>>> in-kernel to be returned with CC2 (busy). Another IOCTL will be
+>>>>> used by
+>>>>> userspace to mark the SIGP "finished", and the vcpu free to
+>>>>> process
+>>>>> additional orders.
+>>>>>
+>>>>
+>>>> This looks much cleaner to me, thanks!
+>>>>
+>>>> [...]
+>>>>
+>>>>> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-
+>>>>> s390.h
+>>>>> index c07a050d757d..54371cede485 100644
+>>>>> --- a/arch/s390/kvm/kvm-s390.h
+>>>>> +++ b/arch/s390/kvm/kvm-s390.h
+>>>>> @@ -82,6 +82,22 @@ static inline int is_vcpu_idle(struct
+>>>>> kvm_vcpu
+>>>>> *vcpu)
+>>>>>    	return test_bit(vcpu->vcpu_idx, vcpu->kvm-
+>>>>>> arch.idle_mask);
+>>>>>    }
+>>>>>    
+>>>>> +static inline bool kvm_s390_vcpu_is_sigp_busy(struct kvm_vcpu
+>>>>> *vcpu)
+>>>>> +{
+>>>>> +	return (atomic_read(&vcpu->arch.sigp_busy) == 1);
+>>>>
+>>>> You can drop ()
+>>>>
+>>>>> +}
+>>>>> +
+>>>>> +static inline bool kvm_s390_vcpu_set_sigp_busy(struct kvm_vcpu
+>>>>> *vcpu)
+>>>>> +{
+>>>>> +	/* Return zero for success, or -EBUSY if another vcpu
+>>>>> won */
+>>>>> +	return (atomic_cmpxchg(&vcpu->arch.sigp_busy, 0, 1) ==
+>>>>> 0) ? 0 :
+>>>>> -EBUSY;
+>>>>
+>>>> You can drop () as well.
+>>>>
+>>>> We might not need the -EBUSY semantics after all. User space can
+>>>> just
+>>>> track if it was set, because it's in charge of setting it.
+>>>
+>>> Hrm, I added this to distinguish a newer kernel with an older QEMU,
+>>> but
+>>> of course an older QEMU won't know the difference either. I'll
+>>> doublecheck that this is works fine in the different permutations.
+>>>
+>>>>> +}
+>>>>> +
+>>>>> +static inline void kvm_s390_vcpu_clear_sigp_busy(struct
+>>>>> kvm_vcpu
+>>>>> *vcpu)
+>>>>> +{
+>>>>> +	atomic_set(&vcpu->arch.sigp_busy, 0);
+>>>>> +}
+>>>>> +
+>>>>>    static inline int kvm_is_ucontrol(struct kvm *kvm)
+>>>>>    {
+>>>>>    #ifdef CONFIG_KVM_S390_UCONTROL
+>>>>> diff --git a/arch/s390/kvm/sigp.c b/arch/s390/kvm/sigp.c
+>>>>> index 5ad3fb4619f1..a37496ea6dfa 100644
+>>>>> --- a/arch/s390/kvm/sigp.c
+>>>>> +++ b/arch/s390/kvm/sigp.c
+>>>>> @@ -276,6 +276,10 @@ static int handle_sigp_dst(struct kvm_vcpu
+>>>>> *vcpu, u8 order_code,
+>>>>>    	if (!dst_vcpu)
+>>>>>    		return SIGP_CC_NOT_OPERATIONAL;
+>>>>>    
+>>>>> +	if (kvm_s390_vcpu_is_sigp_busy(dst_vcpu)) {
+>>>>> +		return SIGP_CC_BUSY;
+>>>>> +	}
+>>>>
+>>>> You can drop {}
+>>>
+>>> Arg, I had some debug in there which needed the braces, and of
+>>> course
+>>> it's unnecessary now. Thanks.
+>>>
+>>>>> +
+>>>>>    	switch (order_code) {
+>>>>>    	case SIGP_SENSE:
+>>>>>    		vcpu->stat.instruction_sigp_sense++;
+>>>>> @@ -411,6 +415,12 @@ int kvm_s390_handle_sigp(struct kvm_vcpu
+>>>>> *vcpu)
+>>>>>    	if (handle_sigp_order_in_user_space(vcpu, order_code,
+>>>>> cpu_addr))
+>>>>>    		return -EOPNOTSUPP;
+>>>>>    
+>>>>> +	/* Check the current vcpu, if it was a target from
+>>>>> another vcpu
+>>>>> */
+>>>>> +	if (kvm_s390_vcpu_is_sigp_busy(vcpu)) {
+>>>>> +		kvm_s390_set_psw_cc(vcpu, SIGP_CC_BUSY);
+>>>>> +		return 0;
+>>>>> +	}
+>>>>
+>>>> I don't think we need this. I think the above (checking the
+>>>> target of
+>>>> a
+>>>> SIGP order) is sufficient. Or which situation do you have in
+>>>> mind?
+>>>>
+>>>
+>>> Hrm... I think you're right. I was thinking of this:
+>>>
+>>> VCPU 1 - SIGP STOP CPU 2
+>>> VCPU 2 - SIGP SENSE CPU 1
+>>>
+>>> But of course either CPU2 is going to be marked "busy" first, and
+>>> the
+>>> sense doesn't get processed until it's reset, or the sense arrives
+>>> first, and the busy/notbusy doesn't matter. Let me doublecheck my
+>>> tests
+>>> for the non-RFC version.
+>>>
+>>>>
+>>>> I do wonder if we want to make this a kvm_arch_vcpu_ioctl()
+>>>> instead,
+>>>
+>>> In one of my original attempts between v1 and v2, I had put this
+>>> there.
+>>> This reliably deadlocks my guest, because the caller
+>>> (kvm_vcpu_ioctl())
+>>> tries to acquire vcpu->mutex, and racing SIGPs (via KVM_RUN) might
+>>> already be holding it. Thus, it's an async ioctl. I could fold it
+>>> into
+>>> the existing interrupt ioctl, but as those are architected structs
+>>> it
+>>> seems more natural do it this way. Or I have mis-understood
+>>> something
+>>> along the way?
+>>>
+>>>> essentially just providing a KVM_S390_SET_SIGP_BUSY *and*
+>>>> providing
+>>>> the
+>>>> order. "order == 0" sets it to !busy.
+>>>
+>>> I'd tried this too, since it provided some nice debug-ability.
+>>> Unfortunately, I have a testcase (which I'll eventually get folded
+>>> into
+>>> kvm-unit-tests :)) that picks a random order between 0-255, knowing
+>>> that there's only a couple handfuls of valid orders, to check the
+>>> response. Zero is valid architecturally (POPS figure 4-29), even if
+>>> it's unassigned. The likelihood of it becoming assigned is probably
+>>> quite low, but I'm not sure that I like special-casing an order of
+>>> zero
+>>> in this way.
+>>>
+>>
+>> Looking at the API I'd like to avoid having two IOCTLs
+> 
+> Since the order is a single byte, we could have the payload of an ioctl
+> say "0-255 is an order that we're busy processing, anything higher than
+> that resets the busy" or something. That would remove the need for a
+> second IOCTL.
+> 
+>> and I'd love to
+>> see some way to extend this without the need for a whole new IOCTL.
+>>
+> 
+> Do you mean zero IOCTLs? Because... I think the only way we can do that
+> is to get rid of USER_SIGP altogether, and handle everything in-kernel.
+> Some weeks ago I played with QEMU not enabling USER_SIGP, but I can't
+> say I've tried it since we went down this "mark a vcpu busy" path. If I
+> do that busy/not-busy tagging in the kernel for !USER_SIGP, that might
+> not be a bad thing anyway. But I don't know how we get the behavior
+> straightened out for USER_SIGP without some type of handshake.
 
---=-9mW91ouzp7iaHsl43Q5W
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+I'd move over to a very small struct argument with a command and a flags 
+field so we can extend the IOCTL at a later time without the need to 
+introduce a new IOCTL.
 
-On Thu, 2021-11-11 at 14:23 +0100, Paolo Bonzini wrote:
-> Queued with these changes.
+IMHO there's no real need to make this IOCTL as small as possible and 
+only handle an int as the argument with < 0 shenanigans. We should 
+rather focus on making this a nice and sane API if we have the option to 
+do so.
 
-Thanks. I note...
-
-    [I didn't entirely agree with David's assessment of the
-     usefulness of the gfn_to_pfn cache, and integrated the outcome
-     of the discussion in the above commit message. - Paolo]
-
- ... the key change being the 'Until' in:
-
-    Until the gfn_to_pfn cache handles the remapping automatically by
-    integrating with the MMU notifiers, we might as well not get a
-    kernel mapping of it...
-
-I do not recall that we'd actually reached a conclusion that we *will*
-make the gfn_to_pfn cache generally usable in that fashion. The latest
-I knew of that discussion was my message at=20
-https://lore.kernel.org/kvm/55a5d4e3fbd29dd55e276b97eeaefd0411b3290b.camel@=
-infradead.org/
-in which I said I'd be a whole lot happier with that if we could do it
-with RCU instead of an rwlock =E2=80=94 but I don't think we can because we=
-'d
-need to call synchronize_srcu() in the MMU notifier callback that might
-not be permitted to sleep?
-
-I'm also slightly less comfortable with having the MMU notifier work
-through an arbitrary *list* of gfn_to_pfn caches that it potentially
-needs to invalidate, but that is very much a minor concern compared
-with the first.
-
-I started looking through the nested code which is the big user of this
-facility. The important part of the gfn_to_pfn mapping as I've used it
-for Xen event channel delivery is the fast path in the common case,
-falling back to a slow path that needs to sleep, to revalidate the
-mapping. That fast vs. slow path (with a workqueue) already existed for
-irqfd delivery and I just needed to hook into it in the right places.
-
-I didn't see anything in nested code that would benefit from that same
-setup, and AFAICT it should all be running with current->mm =3D=3D kvm->mm
-so surely it ought to be able to just access things using the userspace
-HVA and sleep if necessary?
-
-(There's an *entirely* gratuitous one in nested_cache_shadow_vmcs12()
-which does a map/memcpy/unmap that really ought to be kvm_read_guest().
-I'll send a patch for that shortly)
-
-
-
---=-9mW91ouzp7iaHsl43Q5W
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCECow
-ggUcMIIEBKADAgECAhEA4rtJSHkq7AnpxKUY8ZlYZjANBgkqhkiG9w0BAQsFADCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTkwMTAyMDAwMDAwWhcNMjIwMTAxMjM1
-OTU5WjAkMSIwIAYJKoZIhvcNAQkBFhNkd213MkBpbmZyYWRlYWQub3JnMIIBIjANBgkqhkiG9w0B
-AQEFAAOCAQ8AMIIBCgKCAQEAsv3wObLTCbUA7GJqKj9vHGf+Fa+tpkO+ZRVve9EpNsMsfXhvFpb8
-RgL8vD+L133wK6csYoDU7zKiAo92FMUWaY1Hy6HqvVr9oevfTV3xhB5rQO1RHJoAfkvhy+wpjo7Q
-cXuzkOpibq2YurVStHAiGqAOMGMXhcVGqPuGhcVcVzVUjsvEzAV9Po9K2rpZ52FE4rDkpDK1pBK+
-uOAyOkgIg/cD8Kugav5tyapydeWMZRJQH1vMQ6OVT24CyAn2yXm2NgTQMS1mpzStP2ioPtTnszIQ
-Ih7ASVzhV6csHb8Yrkx8mgllOyrt9Y2kWRRJFm/FPRNEurOeNV6lnYAXOymVJwIDAQABo4IB0zCC
-Ac8wHwYDVR0jBBgwFoAUgq9sjPjF/pZhfOgfPStxSF7Ei8AwHQYDVR0OBBYEFLfuNf820LvaT4AK
-xrGK3EKx1DE7MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUF
-BwMEBggrBgEFBQcDAjBGBgNVHSAEPzA9MDsGDCsGAQQBsjEBAgEDBTArMCkGCCsGAQUFBwIBFh1o
-dHRwczovL3NlY3VyZS5jb21vZG8ubmV0L0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3Js
-LmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWls
-Q0EuY3JsMIGLBggrBgEFBQcBAQR/MH0wVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuY29tb2RvY2Eu
-Y29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYI
-KwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmNvbW9kb2NhLmNvbTAeBgNVHREEFzAVgRNkd213MkBpbmZy
-YWRlYWQub3JnMA0GCSqGSIb3DQEBCwUAA4IBAQALbSykFusvvVkSIWttcEeifOGGKs7Wx2f5f45b
-nv2ghcxK5URjUvCnJhg+soxOMoQLG6+nbhzzb2rLTdRVGbvjZH0fOOzq0LShq0EXsqnJbbuwJhK+
-PnBtqX5O23PMHutP1l88AtVN+Rb72oSvnD+dK6708JqqUx2MAFLMevrhJRXLjKb2Mm+/8XBpEw+B
-7DisN4TMlLB/d55WnT9UPNHmQ+3KFL7QrTO8hYExkU849g58Dn3Nw3oCbMUgny81ocrLlB2Z5fFG
-Qu1AdNiBA+kg/UxzyJZpFbKfCITd5yX49bOriL692aMVDyqUvh8fP+T99PqorH4cIJP6OxSTdxKM
-MIIFHDCCBASgAwIBAgIRAOK7SUh5KuwJ6cSlGPGZWGYwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTE5MDEwMjAwMDAwMFoXDTIyMDEwMTIz
-NTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCASIwDQYJKoZIhvcN
-AQEBBQADggEPADCCAQoCggEBALL98Dmy0wm1AOxiaio/bxxn/hWvraZDvmUVb3vRKTbDLH14bxaW
-/EYC/Lw/i9d98CunLGKA1O8yogKPdhTFFmmNR8uh6r1a/aHr301d8YQea0DtURyaAH5L4cvsKY6O
-0HF7s5DqYm6tmLq1UrRwIhqgDjBjF4XFRqj7hoXFXFc1VI7LxMwFfT6PStq6WedhROKw5KQytaQS
-vrjgMjpICIP3A/CroGr+bcmqcnXljGUSUB9bzEOjlU9uAsgJ9sl5tjYE0DEtZqc0rT9oqD7U57My
-ECIewElc4VenLB2/GK5MfJoJZTsq7fWNpFkUSRZvxT0TRLqznjVepZ2AFzsplScCAwEAAaOCAdMw
-ggHPMB8GA1UdIwQYMBaAFIKvbIz4xf6WYXzoHz0rcUhexIvAMB0GA1UdDgQWBBS37jX/NtC72k+A
-CsaxitxCsdQxOzAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEF
-BQcDBAYIKwYBBQUHAwIwRgYDVR0gBD8wPTA7BgwrBgEEAbIxAQIBAwUwKzApBggrBgEFBQcCARYd
-aHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9DUFMwWgYDVR0fBFMwUTBPoE2gS4ZJaHR0cDovL2Ny
-bC5jb21vZG9jYS5jb20vQ09NT0RPUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFp
-bENBLmNybDCBiwYIKwYBBQUHAQEEfzB9MFUGCCsGAQUFBzAChklodHRwOi8vY3J0LmNvbW9kb2Nh
-LmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3J0MCQG
-CCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAC20spBbrL71ZEiFrbXBHonzhhirO1sdn+X+O
-W579oIXMSuVEY1LwpyYYPrKMTjKECxuvp24c829qy03UVRm742R9Hzjs6tC0oatBF7KpyW27sCYS
-vj5wbal+TttzzB7rT9ZfPALVTfkW+9qEr5w/nSuu9PCaqlMdjABSzHr64SUVy4ym9jJvv/FwaRMP
-gew4rDeEzJSwf3eeVp0/VDzR5kPtyhS+0K0zvIWBMZFPOPYOfA59zcN6AmzFIJ8vNaHKy5QdmeXx
-RkLtQHTYgQPpIP1Mc8iWaRWynwiE3ecl+PWzq4i+vdmjFQ8qlL4fHz/k/fT6qKx+HCCT+jsUk3cS
-jDCCBeYwggPOoAMCAQICEGqb4Tg7/ytrnwHV2binUlYwDQYJKoZIhvcNAQEMBQAwgYUxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMSswKQYDVQQDEyJDT01PRE8gUlNBIENlcnRpZmljYXRp
-b24gQXV0aG9yaXR5MB4XDTEzMDExMDAwMDAwMFoXDTI4MDEwOTIzNTk1OVowgZcxCzAJBgNVBAYT
-AkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNV
-BAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAvrOeV6wodnVAFsc4A5jTxhh2IVDzJXkLTLWg0X06WD6cpzEup/Y0dtmEatrQPTRI5Or1u6zf
-+bGBSyD9aH95dDSmeny1nxdlYCeXIoymMv6pQHJGNcIDpFDIMypVpVSRsivlJTRENf+RKwrB6vcf
-WlP8dSsE3Rfywq09N0ZfxcBa39V0wsGtkGWC+eQKiz4pBZYKjrc5NOpG9qrxpZxyb4o4yNNwTqza
-aPpGRqXB7IMjtf7tTmU2jqPMLxFNe1VXj9XB1rHvbRikw8lBoNoSWY66nJN/VCJv5ym6Q0mdCbDK
-CMPybTjoNCQuelc0IAaO4nLUXk0BOSxSxt8kCvsUtQIDAQABo4IBPDCCATgwHwYDVR0jBBgwFoAU
-u69+Aj36pvE8hI6t7jiY7NkyMtQwHQYDVR0OBBYEFIKvbIz4xf6WYXzoHz0rcUhexIvAMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMBEGA1UdIAQKMAgwBgYEVR0gADBMBgNVHR8E
-RTBDMEGgP6A9hjtodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDZXJ0aWZpY2F0aW9u
-QXV0aG9yaXR5LmNybDBxBggrBgEFBQcBAQRlMGMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9jcnQuY29t
-b2RvY2EuY29tL0NPTU9ET1JTQUFkZFRydXN0Q0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2Nz
-cC5jb21vZG9jYS5jb20wDQYJKoZIhvcNAQEMBQADggIBAHhcsoEoNE887l9Wzp+XVuyPomsX9vP2
-SQgG1NgvNc3fQP7TcePo7EIMERoh42awGGsma65u/ITse2hKZHzT0CBxhuhb6txM1n/y78e/4ZOs
-0j8CGpfb+SJA3GaBQ+394k+z3ZByWPQedXLL1OdK8aRINTsjk/H5Ns77zwbjOKkDamxlpZ4TKSDM
-KVmU/PUWNMKSTvtlenlxBhh7ETrN543j/Q6qqgCWgWuMAXijnRglp9fyadqGOncjZjaaSOGTTFB+
-E2pvOUtY+hPebuPtTbq7vODqzCM6ryEhNhzf+enm0zlpXK7q332nXttNtjv7VFNYG+I31gnMrwfH
-M5tdhYF/8v5UY5g2xANPECTQdu9vWPoqNSGDt87b3gXb1AiGGaI06vzgkejL580ul+9hz9D0S0U4
-jkhJiA7EuTecP/CFtR72uYRBcunwwH3fciPjviDDAI9SnC/2aPY8ydehzuZutLbZdRJ5PDEJM/1t
-yZR2niOYihZ+FCbtf3D9mB12D4ln9icgc7CwaxpNSCPt8i/GqK2HsOgkL3VYnwtx7cJUmpvVdZ4o
-gnzgXtgtdk3ShrtOS1iAN2ZBXFiRmjVzmehoMof06r1xub+85hFQzVxZx5/bRaTKTlL8YXLI8nAb
-R9HWdFqzcOoB/hxfEyIQpx9/s81rgzdEZOofSlZHynoSMYIDyjCCA8YCAQEwga0wgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
-ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjEx
-MTEyMDgyODQ1WjAvBgkqhkiG9w0BCQQxIgQgSn6ByWLc4ub3Bn6jhsLeyhWwwE590DGCi8TL+ywS
-c4cwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
-TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
-PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
-aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBAF0wwxQdQbAiorlXK1yzBuzRtoLvM3n64B9iMU7O0yROZj+HQ5XFDrnaB5//WRsJ
-ewsqOZZChwPSbKETOFm58xZCLoL/CA9Gzv4LzqzoSqPtnpXY2njX9vzSAmQZ9ycFfc7C0jX1uV4r
-IFlhpQtEMvImggLcPSQCZcniAJTvHjAAcxZYloX92VgbX///q2gVCiOmb79ucBQD/ThHzUwtbCto
-lPcvfVL/tC5VYSoHWD9URGLOj7BcYUYUVh4l+CAZBwVEHgXy2MTk4dAbrogPCqI6/1P6LoOFoqqi
-BUJ4Lj4w2jsD0Qv3aLcSLHyx6Hg+FgLCu7YqW/Qsy3TRMMUO7hQAAAAAAAA=
-
-
---=-9mW91ouzp7iaHsl43Q5W--
+> 
+>>
+>>
+>>>> Not that we would need the value
+>>>> right now, but who knows for what we might reuse that interface
+>>>> in
+>>>> the
+>>>> future.
+>>>>
+>>>> Thanks!
+>>>>
+> 
 
