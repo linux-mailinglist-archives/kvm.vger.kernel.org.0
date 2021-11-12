@@ -2,105 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 26B9C44EA79
-	for <lists+kvm@lfdr.de>; Fri, 12 Nov 2021 16:38:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4AE3D44EA78
+	for <lists+kvm@lfdr.de>; Fri, 12 Nov 2021 16:38:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235372AbhKLPkw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Nov 2021 10:40:52 -0500
-Received: from mga03.intel.com ([134.134.136.65]:34471 "EHLO mga03.intel.com"
+        id S235345AbhKLPkt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Nov 2021 10:40:49 -0500
+Received: from mail.kernel.org ([198.145.29.99]:38536 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235315AbhKLPkd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Nov 2021 10:40:33 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10165"; a="233093140"
-X-IronPort-AV: E=Sophos;i="5.87,229,1631602800"; 
-   d="scan'208";a="233093140"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2021 07:37:38 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.87,229,1631602800"; 
-   d="scan'208";a="453182022"
-Received: from lxy-dell.sh.intel.com ([10.239.159.55])
-  by orsmga006.jf.intel.com with ESMTP; 12 Nov 2021 07:37:34 -0800
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Cc:     xiaoyao.li@intel.com, erdemaktas@google.com,
-        Connor Kuehl <ckuehl@redhat.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        isaku.yamahata@intel.com, Kai Huang <kai.huang@intel.com>
-Subject: [PATCH 00/11] KVM: x86: TDX preparation of introducing vm_type and blocking ioctls based on vm_type
-Date:   Fri, 12 Nov 2021 23:37:22 +0800
-Message-Id: <20211112153733.2767561-1-xiaoyao.li@intel.com>
-X-Mailer: git-send-email 2.27.0
+        id S235492AbhKLPkT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Nov 2021 10:40:19 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id D4A2A60F41;
+        Fri, 12 Nov 2021 15:37:27 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mlYcH-0053Av-KL; Fri, 12 Nov 2021 15:37:25 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        James Morse <james.morse@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Quentin Perret <qperret@google.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        YueHaibing <yuehaibing@huawei.com>, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+Subject: [GIT PULL] KVM/arm64 fixes for 5.16, take #1
+Date:   Fri, 12 Nov 2021 15:37:22 +0000
+Message-Id: <20211112153722.4010408-1-maz@kernel.org>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: pbonzini@redhat.com, alexandru.elisei@arm.com, catalin.marinas@arm.com, tabba@google.com, james.morse@arm.com, mark.rutland@arm.com, qperret@google.com, rdunlap@infradead.org, suzuki.poulose@arm.com, will@kernel.org, yuehaibing@huawei.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patchset is split from the TDX series[1].
-
-It introduces vm_type for x86 at Patch 1, which leaves vaule 0 for normal
-VM and adds a new type KVM_X86_TDX_VM for upcoming TDX guest. Following
-patches (2, 4 - 11) block the ioctls that doesn't support for TDX from
-userspace for TDX by checking the VM type.
-
-Patch 3 is a cleanup.
-
-Note, it doesn't block the ioctls for SEV-ES at all because I'm not sure
-if each one applied to SEV-ES or not. Folks can introduce new vm_type for
-SEV-* and extend each helper function kvm_xxx_feature_disallowed() for
-SEV-* vm type. 
+[this went out as a series instead of a PR yesterday, my bad]
 
 Paolo,
 
-Please let us know if you want this series sent together with whole
-TDX support.
+Here's the first set of fixes for 5.16. The main items are a fix for a
+host S2 issue for protected VM, as well as a correctness fix when
+extracting the exception class from assembly code. The rest is
+strictly cosmetic.
 
-[1] https://lore.kernel.org/all/cover.1625186503.git.isaku.yamahata@intel.com/T/#u
+Please pull,
 
-Isaku Yamahata (1):
-  KVM: Disallow read-only memory for x86 TDX
+	M.
 
-Kai Huang (1):
-  KVM: x86: Disable in-kernel I/O APIC and level routes for TDX
+The following changes since commit 5a2acbbb0179a7ffbb5440b9fa46689f619705ac:
 
-Sean Christopherson (6):
-  KVM: x86: Introduce vm_type to differentiate normal VMs from
-    confidential VMs
-  KVM: x86: Disable direct IRQ injection for TDX
-  KVM: x86: Disable MCE related stuff for TDX
-  KVM: x86: Disallow tsc manipulation for TDX
-  KVM: x86: Block ioctls to access guest state for TDX
-  KVM: Disallow dirty logging for x86 TDX
+  Merge branch kvm/selftests/memslot into kvmarm-master/next (2021-10-21 11:40:03 +0100)
 
-Xiaoyao Li (3):
-  KVM: x86: Clean up kvm_vcpu_ioctl_x86_setup_mce()
-  KVM: x86: Disable SMM for TDX
-  KVM: x86: Disable INIT/SIPI for TDX
+are available in the Git repository at:
 
- Documentation/virt/kvm/api.rst        |  15 ++
- arch/x86/include/asm/kvm-x86-ops.h    |   1 +
- arch/x86/include/asm/kvm_host.h       |   2 +
- arch/x86/include/uapi/asm/kvm.h       |   3 +
- arch/x86/kvm/ioapic.c                 |   5 +
- arch/x86/kvm/irq_comm.c               |  13 +-
- arch/x86/kvm/lapic.c                  |   3 +-
- arch/x86/kvm/svm/svm.c                |   6 +
- arch/x86/kvm/vmx/vmx.c                |   6 +
- arch/x86/kvm/x86.c                    | 199 +++++++++++++++++++++-----
- arch/x86/kvm/x86.h                    |  35 +++++
- include/linux/kvm_host.h              |   2 +
- include/uapi/linux/kvm.h              |   1 +
- tools/arch/x86/include/uapi/asm/kvm.h |   3 +
- tools/include/uapi/linux/kvm.h        |   1 +
- virt/kvm/kvm_main.c                   |  25 +++-
- 16 files changed, 278 insertions(+), 42 deletions(-)
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.16-1
 
--- 
-2.27.0
+for you to fetch changes up to 50a8d3315960c74095c59e204db44abd937d4b5d:
 
+  KVM: arm64: Fix host stage-2 finalization (2021-11-08 18:07:48 +0000)
+
+----------------------------------------------------------------
+KVM/arm64 fixes for 5.16, take #1
+
+- Fix the host S2 finalization by solely iterating over the memblocks
+  instead of the whole IPA space
+
+- Tighten the return value of kvm_vcpu_preferred_target() now that
+  32bit support is long gone
+
+- Make sure the extraction of ESR_ELx.EC is limited to the architected
+  bits
+
+- Comment fixups
+
+----------------------------------------------------------------
+Mark Rutland (1):
+      KVM: arm64: Extract ESR_ELx.EC only
+
+Quentin Perret (1):
+      KVM: arm64: Fix host stage-2 finalization
+
+Randy Dunlap (1):
+      KVM: arm64: nvhe: Fix a non-kernel-doc comment
+
+YueHaibing (1):
+      KVM: arm64: Change the return type of kvm_vcpu_preferred_target()
+
+ arch/arm64/include/asm/esr.h       |  1 +
+ arch/arm64/include/asm/kvm_host.h  |  2 +-
+ arch/arm64/kvm/arm.c               |  5 +----
+ arch/arm64/kvm/guest.c             |  7 +------
+ arch/arm64/kvm/hyp/hyp-entry.S     |  2 +-
+ arch/arm64/kvm/hyp/nvhe/host.S     |  2 +-
+ arch/arm64/kvm/hyp/nvhe/setup.c    | 14 ++++++++++++--
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c |  2 +-
+ 8 files changed, 19 insertions(+), 16 deletions(-)
