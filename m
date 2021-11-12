@@ -2,193 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C7B2A44DF59
-	for <lists+kvm@lfdr.de>; Fri, 12 Nov 2021 01:52:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DC68D44DF82
+	for <lists+kvm@lfdr.de>; Fri, 12 Nov 2021 02:03:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234595AbhKLAzG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 11 Nov 2021 19:55:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56084 "EHLO
+        id S234642AbhKLBGs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 11 Nov 2021 20:06:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234519AbhKLAzF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Nov 2021 19:55:05 -0500
-Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59FFBC061766
-        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 16:52:15 -0800 (PST)
-Received: by mail-lj1-x22b.google.com with SMTP id e7so738066ljq.12
-        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 16:52:15 -0800 (PST)
+        with ESMTP id S234605AbhKLBGr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 11 Nov 2021 20:06:47 -0500
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7624CC06127A
+        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 17:03:57 -0800 (PST)
+Received: by mail-pf1-x42c.google.com with SMTP id g18so7060065pfk.5
+        for <kvm@vger.kernel.org>; Thu, 11 Nov 2021 17:03:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=WrlBdyULknRIKwIm3EIvAheCMwIk+3VqMQRUIZGkFS4=;
-        b=Qq4ew42BXjP0Lt7BFuh9h5Gxyqk2IiVFP2rmnbLz794HFjhsCMb0jOkhaTY832BFH+
-         qVb9E2aOaD/hSVz5gIj0uMr0O0sNL03r0rXQ9F9/h8duOup01Fo73B4W6IIYKrj9rgdj
-         Z8wxdEUJoyKPbL6uVQaAomETW+ql7ZW0BhcGkFNnqOOotzoS5S1FR/AwYik7Lq8kztsk
-         N4/hNjfkHaWEP/T1kKUjvRlR399sdDK016jppAv0Ma22PbzIs0kPgSfiLOyetPj3Q+AP
-         3CGImudR5iAbS8wibS7O2eg3NRq5nGayX76oDF6wAKB4kw2gwFtNoZ8oyXe57Q8gAEVY
-         z8dw==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=OqiUBkPNwVtm2ZpjSEzoYhMNAp4tNbVTba3KEv6WN8w=;
+        b=pc7ejE9G9f2/DNPzPS7XIXvJtmGfBaF2LxIzkZwFvEfuQOri3Y1155wjk7xjt2PNCJ
+         kE24TIPjCcGgUSYiX3UWCA1DBdTKkT1C74bahVgNb9tmSS/hJEwGE9hxKY7yJMJ5/gnk
+         kd+TrPPKr0MuJqBAypaAOFEn7+cRqbZm+iMfctLBeivKDevpGMITf+s6vQitBcPNGTgw
+         /amQnFMW1BnWMyjEaECoc/twxm/ddAt9qLXsEQJ21ZE/S+ANAhdIOkrMWTDwWGDr9sqH
+         T2DNYEPOqsm0H4/svC1i15A5EDGrV+fHlrcxZdbN2PUtjvWHGe4Hnq190TEFtTm6CJzc
+         ynvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=WrlBdyULknRIKwIm3EIvAheCMwIk+3VqMQRUIZGkFS4=;
-        b=YVhJVhBcNYPiRi0a+akhF/z3EJ1A2ukPgHxzlkrI/4GkIx+dW77PrJb87HVJAmF7zb
-         3geLh15JlkQUzugVvyJ8FEarprL9z/h02POns+nBk7DVTugBXCslEakoLHaPXv2GlDAH
-         MLhsoFAOuSu6E9wb+wxhfdA4wlcA65iFT6gAkQCSnYc/MgEX0cEfvjuA0MD0hOUxla8O
-         H1kYGw3yEGxck60uIBk9ahBbPbpDYtyhmViFUBPFSBNRSxYqhKdTJExK6R4rKQwKV28Q
-         L6Lv/zDdg5hTxSW+OhJh1vYHO8ZwHuaL8vb7UkaFY4LTFmRFzRhiO8DyQjrvK+I0P2eS
-         C3qA==
-X-Gm-Message-State: AOAM533LVYqwRDi0x67GEge1FIpDkjC8yMsNC2vaFwjDm8lBXyvI5O5F
-        bMdecdlhA0ITBqcWViiTXj0b4shdkE8oNhihgEy9pA==
-X-Google-Smtp-Source: ABdhPJxIvCe8xMy055XVewCYPrE4zQnCcgj2mGakbJ1eDefxvLWAWiELgqxod3x8P9ryc49+2XEM8263HxZZIa6beP8=
-X-Received: by 2002:a2e:a22a:: with SMTP id i10mr11274500ljm.16.1636678333529;
- Thu, 11 Nov 2021 16:52:13 -0800 (PST)
-MIME-Version: 1.0
-References: <20211111001257.1446428-1-dmatlack@google.com> <20211111001257.1446428-4-dmatlack@google.com>
- <CANgfPd-Gzjvhs0HxCZZtJqmG31rNJ71XFo_SXD9Bbpa3S2E-gg@mail.gmail.com>
-In-Reply-To: <CANgfPd-Gzjvhs0HxCZZtJqmG31rNJ71XFo_SXD9Bbpa3S2E-gg@mail.gmail.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Thu, 11 Nov 2021 16:51:47 -0800
-Message-ID: <CALzav=e3hjSf_RDM3WUuv=n0gnL_6XGrqBcP99BtAQ_mHZOpdw@mail.gmail.com>
-Subject: Re: [PATCH 3/4] KVM: selftests: Wait for all vCPU to be created
- before entering guest mode
-To:     Ben Gardon <bgardon@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>,
-        Andrew Jones <drjones@redhat.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=OqiUBkPNwVtm2ZpjSEzoYhMNAp4tNbVTba3KEv6WN8w=;
+        b=Zn2bHGCznabKqLSfrBEyNE9/klV4Frtz93enf1mJfY6JD5tzin0IL0paPCIu6UsI46
+         wnTaYm0jRSRYNp7MkKUzE2sqEdGQTv/ZkD3iLE/qIWxKJb7qvfY7/V3/8nckVyqiby42
+         xhfH91sQcbsMarTSvjYS54VivepOOToxpehcfAPsx1NSqvF6x6EBhDwXTlVpBj944q89
+         mMoKVetBN1jq2GK1mZPXpQdYC1RWYN2IzjkLmyehY5b9z6IGiardV4FUQarmNY7C87tY
+         eMW+p2VfulEYb05Ep1wfLF9OKYazsgBuvmEXZecFGvFMxgYoWErDCaeUKJjJP2it+Jts
+         vD/A==
+X-Gm-Message-State: AOAM5304F4QSrM+rvCRFbV3GFA9V+AfriSSThFuOKmU0C0EcyXKXYYmu
+        DiHt7I9uYxrrzbA86ZwAFy4ywA==
+X-Google-Smtp-Source: ABdhPJxMgoJUa9ek+o+tvzW6z5WeFQCDZekoSsl946lRj2FCOsMM6fcE3+3c50Ng/MtZ8Re7BsLCDg==
+X-Received: by 2002:a63:1441:: with SMTP id 1mr7559189pgu.66.1636679035969;
+        Thu, 11 Nov 2021 17:03:55 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id t13sm4096818pfl.214.2021.11.11.17.03.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Nov 2021 17:03:55 -0800 (PST)
+Date:   Fri, 12 Nov 2021 01:03:51 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+Cc:     James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Atish Patra <atish.patra@wdc.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        Peter Xu <peterx@redhat.com>,
-        Aaron Lewis <aaronlewis@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Ben Gardon <bgardon@google.com>, Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Anup Patel <anup.patel@wdc.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v5.5 23/30] KVM: Resolve memslot ID via a hash table
+ instead of via a static array
+Message-ID: <YY29d7Vb6aiv93mu@google.com>
+References: <20211104002531.1176691-1-seanjc@google.com>
+ <20211104002531.1176691-24-seanjc@google.com>
+ <f0b364ed-bf9e-5de9-0449-6d7ba3682405@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f0b364ed-bf9e-5de9-0449-6d7ba3682405@oracle.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 11, 2021 at 10:17 AM Ben Gardon <bgardon@google.com> wrote:
->
-> On Wed, Nov 10, 2021 at 4:13 PM David Matlack <dmatlack@google.com> wrote:
-> >
-> > Thread creation requires taking the mmap_sem in write mode, which causes
-> > vCPU threads running in guest mode to block while they are populating
-> > memory. Fix this by waiting for all vCPU threads to be created and start
-> > running before entering guest mode on any one vCPU thread.
-> >
-> > This substantially improves the "Populate memory time" when using 1GiB
-> > pages since it allows all vCPUs to zero pages in parallel rather than
-> > blocking because a writer is waiting (which is waiting for another vCPU
-> > that is busy zeroing a 1GiB page).
-> >
-> > Before:
-> >
-> >   $ ./dirty_log_perf_test -v256 -s anonymous_hugetlb_1gb
-> >   ...
-> >   Populate memory time: 52.811184013s
-> >
-> > After:
-> >
-> >   $ ./dirty_log_perf_test -v256 -s anonymous_hugetlb_1gb
-> >   ...
-> >   Populate memory time: 10.204573342s
-> >
-> > Signed-off-by: David Matlack <dmatlack@google.com>
+On Fri, Nov 12, 2021, Maciej S. Szmigiero wrote:
+> On 04.11.2021 01:25, Sean Christopherson wrote:
+> > From: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+> > 
+> > Memslot ID to the corresponding memslot mappings are currently kept as
+> > indices in static id_to_index array.
+> > The size of this array depends on the maximum allowed memslot count
+> > (regardless of the number of memslots actually in use).
+> > 
+> > This has become especially problematic recently, when memslot count cap was
+> > removed, so the maximum count is now full 32k memslots - the maximum
+> > allowed by the current KVM API.
+> > 
+> > Keeping these IDs in a hash table (instead of an array) avoids this
+> > problem.
+> > 
+> > Resolving a memslot ID to the actual memslot (instead of its index) will
+> > also enable transitioning away from an array-based implementation of the
+> > whole memslots structure in a later commit.
+> > 
+> > Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+> > Co-developed-by: Sean Christopherson <seanjc@google.com>
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > > ---
-> >  .../selftests/kvm/lib/perf_test_util.c        | 26 +++++++++++++++++++
-> >  1 file changed, 26 insertions(+)
-> >
-> > diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
-> > index d646477ed16a..722df3a28791 100644
-> > --- a/tools/testing/selftests/kvm/lib/perf_test_util.c
-> > +++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
-> > @@ -22,6 +22,9 @@ struct vcpu_thread {
-> >
-> >         /* The pthread backing the vCPU. */
-> >         pthread_t thread;
+> >   include/linux/kvm_host.h | 16 +++----
+> >   virt/kvm/kvm_main.c      | 96 +++++++++++++++++++++++++++++++---------
+> >   2 files changed, 84 insertions(+), 28 deletions(-)
+> > 
+> (..)
+> > @@ -1259,17 +1257,49 @@ static int kvm_alloc_dirty_bitmap(struct kvm_memory_slot *memslot)
+> >   	return 0;
+> >   }
+> > +static void kvm_replace_memslot(struct kvm_memslots *slots,
+> > +				struct kvm_memory_slot *old,
+> > +				struct kvm_memory_slot *new)
+> > +{
+> > +	/*
+> > +	 * Remove the old memslot from the hash list, copying the node data
+> > +	 * would corrupt the list.
+> > +	 */
+> > +	if (old) {
+> > +		hash_del(&old->id_node);
 > > +
-> > +       /* Set to true once the vCPU thread is up and running. */
-> > +       bool running;
-> >  };
-> >
-> >  /* The vCPU threads involved in this test. */
-> > @@ -30,6 +33,9 @@ static struct vcpu_thread vcpu_threads[KVM_MAX_VCPUS];
-> >  /* The function run by each vCPU thread, as provided by the test. */
-> >  static void (*vcpu_thread_fn)(struct perf_test_vcpu_args *);
-> >
-> > +/* Set to true once all vCPU threads are up and running. */
-> > +static bool all_vcpu_threads_running;
+> > +		if (!new)
+> > +			return;
+> > +	}
 > > +
-> >  /*
-> >   * Continuously write to the first 8 bytes of each page in the
-> >   * specified region.
-> > @@ -196,6 +202,17 @@ static void *vcpu_thread_main(void *data)
-> >  {
-> >         struct vcpu_thread *vcpu = data;
-> >
-> > +       WRITE_ONCE(vcpu->running, true);
-> > +
-> > +       /*
-> > +        * Wait for all vCPU threads to be up and running before calling the test-
-> > +        * provided vCPU thread function. This prevents thread creation (which
-> > +        * requires taking the mmap_sem in write mode) from interfering with the
-> > +        * guest faulting in its memory.
-> > +        */
-> > +       while (!READ_ONCE(all_vcpu_threads_running))
-> > +               ;
-> > +
->
-> I can never remember the rules on this so I could be wrong, but you
-> may want a cpu_relax() in that loop to prevent it from being optimized
-> out. Maybe the READ_ONCE is sufficient though.
+> > +	/* Copy the source *data*, not the pointer, to the destination. */
+> > +	if (old)
+> > +		*new = *old;
+> 
+> This way of writing it (that, is re-checking whether "old" is not-NULL)
+> suggests that it could have been set to NULL inside the previous block
+> (since the last check), which isn't true.
 
-READ_ONCE is sufficient to prevent the loop from being optimized out
-but cpu_relax() is nice to have to play nice with our hyperthread
-buddy.
-
-On that note there are a lot of spin waits in the KVM selftests and
-none of the ones I've seen use cpu_relax().
-
-I'll take a look at adding cpu_relax() throughout the selftests in v2.
-
->
-> >         vcpu_thread_fn(&perf_test_args.vcpu_args[vcpu->vcpu_id]);
-> >
-> >         return NULL;
-> > @@ -206,14 +223,23 @@ void perf_test_start_vcpu_threads(int vcpus, void (*vcpu_fn)(struct perf_test_vc
-> >         int vcpu_id;
-> >
-> >         vcpu_thread_fn = vcpu_fn;
-> > +       WRITE_ONCE(all_vcpu_threads_running, false);
-> >
-> >         for (vcpu_id = 0; vcpu_id < vcpus; vcpu_id++) {
-> >                 struct vcpu_thread *vcpu = &vcpu_threads[vcpu_id];
-> >
-> >                 vcpu->vcpu_id = vcpu_id;
-> > +               WRITE_ONCE(vcpu->running, false);
->
-> Do these need to be WRITE_ONCE? I don't think WRITE_ONCE provides any
-> extra memory ordering guarantees and I don't know why the compiler
-> would optimize these out. If they do need to be WRITE_ONCE, they
-> probably merit comments.
-
-To be completely honest I'm not sure. I included WRITE_ONCE out of
-caution to ensure the compiler does not reorder the writes with
-respect to the READ_ONCE. I'll need to do a bit more research to
-confirm if it's really necessary.
-
->
-> >
-> >                 pthread_create(&vcpu->thread, NULL, vcpu_thread_main, vcpu);
-> >         }
-> > +
-> > +       for (vcpu_id = 0; vcpu_id < vcpus; vcpu_id++) {
-> > +               while (!READ_ONCE(vcpu_threads[vcpu_id].running))
-> > +                       ;
-> > +       }
-> > +
-> > +       WRITE_ONCE(all_vcpu_threads_running, true);
-> >  }
-> >
-> >  void perf_test_join_vcpu_threads(int vcpus)
-> > --
-> > 2.34.0.rc1.387.gb447b232ab-goog
-> >
+Yeah, I think I was trying to minimize the logic delta in future patches, but
+looking back at the diffs, that didn't pan out.  I've no objection to folding
+the two together.
