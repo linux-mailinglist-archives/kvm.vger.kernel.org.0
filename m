@@ -2,506 +2,272 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8FD4944ED42
-	for <lists+kvm@lfdr.de>; Fri, 12 Nov 2021 20:28:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 18FA944ED7B
+	for <lists+kvm@lfdr.de>; Fri, 12 Nov 2021 20:44:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235142AbhKLTbL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Nov 2021 14:31:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53156 "EHLO
+        id S232735AbhKLTra (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Nov 2021 14:47:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229810AbhKLTbL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Nov 2021 14:31:11 -0500
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D360FC061767
-        for <kvm@vger.kernel.org>; Fri, 12 Nov 2021 11:28:19 -0800 (PST)
-Received: by mail-lf1-x133.google.com with SMTP id b40so24822587lfv.10
-        for <kvm@vger.kernel.org>; Fri, 12 Nov 2021 11:28:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shutemov-name.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=I3Jdyl4A835mRDu9LUSfQLFNXVClr48PpVSr6STmYrA=;
-        b=eylhe87rQBFCmqeyt0zrJzoAi5Wcq4n3o0yZWwV/5GRf5REIWbmkWhSGyMPjqHOVcQ
-         zAyDiRbBQ4Jd14YkJXhM1+g91KFPPLXlCpLtg6nugKchpf6rgZpNug8N9CPlaT6pGVUN
-         qX0V2BfRAPbrTZEnV0oGXKAUwsTlZS2ObctfgFU6LCMvAVQtefnmhzn0FzDj2OxOZGlU
-         YKkfVtJgyOwscxqXq4+y4M2Uz0/9xvs65RzfU3gWFR4lrzQMWPFuf28eKQkK4etGvvSH
-         HgQfsqK5fVYxiWR97k2yD9c5dfg/I2OwOuEVuEfEBtifkuwaOCURZ6hhSV7cgFMNF5T+
-         NVgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=I3Jdyl4A835mRDu9LUSfQLFNXVClr48PpVSr6STmYrA=;
-        b=qWJMLrJPXBzHtTJi1ye7gWzUctZydjzgJfawu6wR3GwpakA7+V8fcK83tsXlwAeX3M
-         lDRs7oM4RrMT5r8pv9z3iwjHETw5t/q44ay38tZTHqp7t/3wyofP709GaVJPqeIBYX/4
-         HnGMjW8GpSzRDgd+Detp1DnPtaRhRv2yWnMIZsc5JLiRRwxNPGxCFxUxdOTPyDT0QRSL
-         EgCHGzZiaqWt5X8C64AjC8HejQjLq4a8N0aiVnV62NIPxJllYzNZp/8kRzi15Ti79HYq
-         +ztR7CQrwEonviV1oRYvJweKO39qL5pAEFIj1tKGrwM+nuORkUXjhJOjrlV/5Wr9eZkI
-         hsvw==
-X-Gm-Message-State: AOAM530+s0otm6fzrivsr93BntUJu0aaElrSV2oVRwKl4g6Gi5xWuhRA
-        uqwbpQKKNt542CtowEktIFmsFQ==
-X-Google-Smtp-Source: ABdhPJwHDhdQu8nxYifvWVA1Ipkf/IYlwAyXfsb7DgYQ5qbB9BC6t8i3+ipPUJDJ+C9Hu7Qo3FCK0Q==
-X-Received: by 2002:ac2:4c4d:: with SMTP id o13mr2675889lfk.196.1636745298130;
-        Fri, 12 Nov 2021 11:28:18 -0800 (PST)
-Received: from box.localdomain ([86.57.175.117])
-        by smtp.gmail.com with ESMTPSA id e10sm645855lfr.213.2021.11.12.11.28.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Nov 2021 11:28:17 -0800 (PST)
-Received: by box.localdomain (Postfix, from userid 1000)
-        id AE1FE1034DC; Fri, 12 Nov 2021 22:28:20 +0300 (+03)
-Date:   Fri, 12 Nov 2021 22:28:20 +0300
-From:   "Kirill A. Shutemov" <kirill@shutemov.name>
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, john.ji@intel.com, susie.li@intel.com,
-        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
-        david@redhat.com
-Subject: Re: [RFC PATCH 1/6] mm: Add F_SEAL_GUEST to shmem/memfd
-Message-ID: <20211112192820.dbxxnqhgnqaz6dgn@box.shutemov.name>
-References: <20211111141352.26311-1-chao.p.peng@linux.intel.com>
- <20211111141352.26311-2-chao.p.peng@linux.intel.com>
+        with ESMTP id S229810AbhKLTra (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Nov 2021 14:47:30 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1228EC061766
+        for <kvm@vger.kernel.org>; Fri, 12 Nov 2021 11:44:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=xrPZwVz8kaTHa9gBIpxe6TGbAInUeXcfIQYCaPM++fk=; b=ZWPmdH5RNjP89NiLTKrpn/JmIX
+        6yJM5PobDImnrhcjt8+sIQcXbpeT22fbT8YZKAqDeBdANst/t8F5Alr3f2zbWH/BGrfT0mZBTj0JH
+        Vv4Dccx5Agqi6qmwjwKJBRbCPpXDaoscW2sXG34v46Nzfe8wptIyDJRjlRGoNnY2jOGs9i+P0VZd3
+        x5Tz1hbna3r4xK4c/bNgHEq70WHzKT9QNaxx6s/MGwHW6hCoPQunIsH9n3sMOJmJWaK4CnSbYPZYY
+        7PqF2LlVPbp4TzOmf2/jvpYwIS56awveUah7FDOoEhX+NkORtoRqV/oHtC0mQoHuq4A6aHtYVxoW1
+        7E4qSc6w==;
+Received: from [2001:8b0:10b:1::3ae] (helo=u3832b3a9db3152.infradead.org)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mlcTP-00BUjF-TW; Fri, 12 Nov 2021 19:44:32 +0000
+Message-ID: <fb5efe2aa6424750d0ed2277f72c44101f4c57ba.camel@infradead.org>
+Subject: Re: [PATCH v3] KVM: x86: Fix recording of guest steal time /
+ preempted status
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>
+Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "mtosatti@redhat.com" <mtosatti@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>, karahmed@amazon.com
+Date:   Fri, 12 Nov 2021 19:44:28 +0000
+In-Reply-To: <40d7d808-dce6-a541-18dc-b0c7f4d6586c@redhat.com>
+References: <5d4002373c3ae614cb87b72ba5b7cdc161a0cd46.camel@infradead.org>
+         <4369bbef7f0c2b239da419c917f9a9f2ca6a76f1.camel@infradead.org>
+         <624bc910-1bec-e6dd-b09a-f86dc6cdbef0@redhat.com>
+         <0372987a52b5f43963721b517664830e7e6f1818.camel@infradead.org>
+         <1f326c33-3acf-911a-d1ef-c72f0a570761@redhat.com>
+         <3645b9b889dac6438394194bb5586a46b68d581f.camel@infradead.org>
+         <309f61f7-72fd-06a2-84b4-97dfc3fab587@redhat.com>
+         <96cef64bf7927b6a0af2173b0521032f620551e4.camel@infradead.org>
+         <40d7d808-dce6-a541-18dc-b0c7f4d6586c@redhat.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-izUM9Fdrq6/SMxzfqk6C"
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211111141352.26311-2-chao.p.peng@linux.intel.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 11, 2021 at 10:13:40PM +0800, Chao Peng wrote:
-> The new seal is only allowed if there's no pre-existing pages in the fd
-> and there's no existing mapping of the file. After the seal is set, no
-> read/write/mmap from userspace is allowed.
-> 
-> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
 
-Below is replacement patch with fallocate callback support.
+--=-izUM9Fdrq6/SMxzfqk6C
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I also replaced page_level if order of the page because PG_LEVEL_2M/4K is
-x86-specific can cannot be used in the generic code.
+On Fri, 2021-11-12 at 10:31 +0100, Paolo Bonzini wrote:
+> Yes, that's also where I got stuck in my first attempt a few months ago.=
+=20
+>   I agree that it can be changed to use gfn-to-hva caches, except for=20
+> the vmcs12->posted_intr_desc_addr and vmcs12->virtual_apic_page_addr.
 
-There's also bugix in guest_invalidate_page().
+Let's start with the low-hanging fruit... what are the recommended
+tests for this kibnd of thing? I don't think we have kernel self-tests
+that exercise this, do we?
+
+As before, this is at
+https://git.infradead.org/users/dwmw2/linux.git/shortlog/refs/heads/xen-evt=
+chn
 
 
-From 9419ccb4bc3c1df4cc88f6c8ba212f4b16955559 Mon Sep 17 00:00:00 2001
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Date: Fri, 12 Nov 2021 21:27:40 +0300
-Subject: [PATCH] mm/shmem: Introduce F_SEAL_GUEST
+From: David Woodhouse <dwmw@amazon.co.uk>
+Subject: [PATCH] KVM: nVMX: Use kvm_{read,write}_guest_cached() for shadow_=
+vmcs12
 
-The new seal type provides semantics required for KVM guest private
-memory support. A file descriptor with the seal set is going to be used
-as source of guest memory in confidential computing environments such as
-Intel TDX and AMD SEV.
+Using kvm_vcpu_map() for reading from the guest is entirely gratuitous,
+when all we do is a single memcpy and unmap it again. Fix it up to use
+kvm_read_guest()... but in fact I couldn't bring myself to do that
+without also making it use a gfn_to_hva_cache for both that *and* the
+copy in the other direction.
 
-F_SEAL_GUEST can only be set on empty memfd. After the seal is set
-userspace cannot read, write or mmap the memfd.
-
-Userspace is in charge of guest memory lifecycle: it can allocate the
-memory with falloc or punch hole to free memory from the guest.
-
-The file descriptor passed down to KVM as guest memory backend. KVM
-register itself as the owner of the memfd via memfd_register_guest().
-
-KVM provides callback that needed to be called on fallocate and punch
-hole.
-
-memfd_register_guest() returns callbacks that need be used for
-requesting a new page from memfd.
-
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 ---
- include/linux/memfd.h      |  24 ++++++++
- include/linux/shmem_fs.h   |   9 +++
- include/uapi/linux/fcntl.h |   1 +
- mm/memfd.c                 |  32 +++++++++-
- mm/shmem.c                 | 117 ++++++++++++++++++++++++++++++++++++-
- 5 files changed, 179 insertions(+), 4 deletions(-)
+ arch/x86/kvm/vmx/nested.c | 24 +++++++++++++++---------
+ arch/x86/kvm/vmx/vmx.h    |  5 +++++
+ 2 files changed, 20 insertions(+), 9 deletions(-)
 
-diff --git a/include/linux/memfd.h b/include/linux/memfd.h
-index 4f1600413f91..500dfe88043e 100644
---- a/include/linux/memfd.h
-+++ b/include/linux/memfd.h
-@@ -4,13 +4,37 @@
- 
- #include <linux/file.h>
- 
-+struct guest_ops {
-+	void (*invalidate_page_range)(struct inode *inode, void *owner,
-+				      pgoff_t start, pgoff_t end);
-+	void (*fallocate)(struct inode *inode, void *owner,
-+			  pgoff_t start, pgoff_t end);
-+};
-+
-+struct guest_mem_ops {
-+	unsigned long (*get_lock_pfn)(struct inode *inode, pgoff_t offset,
-+				      int *order);
-+	void (*put_unlock_pfn)(unsigned long pfn);
-+
-+};
-+
- #ifdef CONFIG_MEMFD_CREATE
- extern long memfd_fcntl(struct file *file, unsigned int cmd, unsigned long arg);
-+
-+extern inline int memfd_register_guest(struct inode *inode, void *owner,
-+				       const struct guest_ops *guest_ops,
-+				       const struct guest_mem_ops **guest_mem_ops);
- #else
- static inline long memfd_fcntl(struct file *f, unsigned int c, unsigned long a)
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index b213ca966d41..7e2a99f435b6 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -670,33 +670,39 @@ static inline bool nested_vmx_prepare_msr_bitmap(stru=
+ct kvm_vcpu *vcpu,
+ static void nested_cache_shadow_vmcs12(struct kvm_vcpu *vcpu,
+ 				       struct vmcs12 *vmcs12)
  {
- 	return -EINVAL;
+-	struct kvm_host_map map;
+-	struct vmcs12 *shadow;
++	struct vcpu_vmx *vmx =3D to_vmx(vcpu);
++	struct gfn_to_hva_cache *ghc =3D &vmx->nested.shadow_vmcs12_cache;
+=20
+ 	if (!nested_cpu_has_shadow_vmcs(vmcs12) ||
+ 	    vmcs12->vmcs_link_pointer =3D=3D INVALID_GPA)
+ 		return;
+=20
+-	shadow =3D get_shadow_vmcs12(vcpu);
+-
+-	if (kvm_vcpu_map(vcpu, gpa_to_gfn(vmcs12->vmcs_link_pointer), &map))
++	if (ghc->gpa !=3D vmcs12->vmcs_link_pointer &&
++	    kvm_gfn_to_hva_cache_init(vcpu->kvm, ghc,
++				      vmcs12->vmcs_link_pointer, VMCS12_SIZE))
+ 		return;
+=20
+-	memcpy(shadow, map.hva, VMCS12_SIZE);
+-	kvm_vcpu_unmap(vcpu, &map, false);
++	kvm_read_guest_cached(vmx->vcpu.kvm, ghc, get_shadow_vmcs12(vcpu),
++			      VMCS12_SIZE);
  }
-+static inline int memfd_register_guest(struct inode *inode, void *owner,
-+				       const struct guest_ops *guest_ops,
-+				       const struct guest_mem_ops **guest_mem_ops)
-+{
-+	return -EINVAL;
-+}
- #endif
- 
- #endif /* __LINUX_MEMFD_H */
-diff --git a/include/linux/shmem_fs.h b/include/linux/shmem_fs.h
-index 8e775ce517bb..265d0c13bc5e 100644
---- a/include/linux/shmem_fs.h
-+++ b/include/linux/shmem_fs.h
-@@ -12,6 +12,9 @@
- 
- /* inode in-kernel data */
- 
-+struct guest_ops;
-+struct guest_mem_ops;
-+
- struct shmem_inode_info {
- 	spinlock_t		lock;
- 	unsigned int		seals;		/* shmem seals */
-@@ -24,6 +27,8 @@ struct shmem_inode_info {
- 	struct simple_xattrs	xattrs;		/* list of xattrs */
- 	atomic_t		stop_eviction;	/* hold when working on inode */
- 	struct inode		vfs_inode;
-+	void			*guest_owner;
-+	const struct guest_ops	*guest_ops;
- };
- 
- struct shmem_sb_info {
-@@ -90,6 +95,10 @@ extern unsigned long shmem_swap_usage(struct vm_area_struct *vma);
- extern unsigned long shmem_partial_swap_usage(struct address_space *mapping,
- 						pgoff_t start, pgoff_t end);
- 
-+extern int shmem_register_guest(struct inode *inode, void *owner,
-+				const struct guest_ops *guest_ops,
-+				const struct guest_mem_ops **guest_mem_ops);
-+
- /* Flag allocation requirements to shmem_getpage */
- enum sgp_type {
- 	SGP_READ,	/* don't exceed i_size, don't allocate page */
-diff --git a/include/uapi/linux/fcntl.h b/include/uapi/linux/fcntl.h
-index 2f86b2ad6d7e..c79bc8572721 100644
---- a/include/uapi/linux/fcntl.h
-+++ b/include/uapi/linux/fcntl.h
-@@ -43,6 +43,7 @@
- #define F_SEAL_GROW	0x0004	/* prevent file from growing */
- #define F_SEAL_WRITE	0x0008	/* prevent writes */
- #define F_SEAL_FUTURE_WRITE	0x0010  /* prevent future writes while mapped */
-+#define F_SEAL_GUEST		0x0020
- /* (1U << 31) is reserved for signed error codes */
- 
- /*
-diff --git a/mm/memfd.c b/mm/memfd.c
-index 081dd33e6a61..ae43454789f4 100644
---- a/mm/memfd.c
-+++ b/mm/memfd.c
-@@ -130,11 +130,24 @@ static unsigned int *memfd_file_seals_ptr(struct file *file)
- 	return NULL;
- }
- 
-+int memfd_register_guest(struct inode *inode, void *owner,
-+			 const struct guest_ops *guest_ops,
-+			 const struct guest_mem_ops **guest_mem_ops)
-+{
-+	if (shmem_mapping(inode->i_mapping)) {
-+		return shmem_register_guest(inode, owner,
-+					    guest_ops, guest_mem_ops);
-+	}
-+
-+	return -EINVAL;
-+}
-+
- #define F_ALL_SEALS (F_SEAL_SEAL | \
- 		     F_SEAL_SHRINK | \
- 		     F_SEAL_GROW | \
- 		     F_SEAL_WRITE | \
--		     F_SEAL_FUTURE_WRITE)
-+		     F_SEAL_FUTURE_WRITE | \
-+		     F_SEAL_GUEST)
- 
- static int memfd_add_seals(struct file *file, unsigned int seals)
+=20
+ static void nested_flush_cached_shadow_vmcs12(struct kvm_vcpu *vcpu,
+ 					      struct vmcs12 *vmcs12)
  {
-@@ -203,10 +216,27 @@ static int memfd_add_seals(struct file *file, unsigned int seals)
- 		}
- 	}
- 
-+	if (seals & F_SEAL_GUEST) {
-+		i_mmap_lock_read(inode->i_mapping);
+ 	struct vcpu_vmx *vmx =3D to_vmx(vcpu);
++	struct gfn_to_hva_cache *ghc =3D &vmx->nested.shadow_vmcs12_cache;
+=20
+ 	if (!nested_cpu_has_shadow_vmcs(vmcs12) ||
+ 	    vmcs12->vmcs_link_pointer =3D=3D INVALID_GPA)
+ 		return;
+=20
+-	kvm_write_guest(vmx->vcpu.kvm, vmcs12->vmcs_link_pointer,
+-			get_shadow_vmcs12(vcpu), VMCS12_SIZE);
++	if (ghc->gpa !=3D vmcs12->vmcs_link_pointer &&
++	    kvm_gfn_to_hva_cache_init(vcpu->kvm, ghc,
++				      vmcs12->vmcs_link_pointer, VMCS12_SIZE))
++		return;
 +
-+		if (!RB_EMPTY_ROOT(&inode->i_mapping->i_mmap.rb_root)) {
-+			error = -EBUSY;
-+			goto unlock;
-+		}
-+
-+		if (i_size_read(inode)) {
-+			error = -EBUSY;
-+			goto unlock;
-+		}
-+	}
-+
- 	*file_seals |= seals;
- 	error = 0;
- 
- unlock:
-+	if (seals & F_SEAL_GUEST)
-+		i_mmap_unlock_read(inode->i_mapping);
-+
- 	inode_unlock(inode);
- 	return error;
++	kvm_write_guest_cached(vmx->vcpu.kvm, ghc, get_shadow_vmcs12(vcpu),
++			       VMCS12_SIZE);
  }
-diff --git a/mm/shmem.c b/mm/shmem.c
-index dacda7463d54..5d8ea4f02a94 100644
---- a/mm/shmem.c
-+++ b/mm/shmem.c
-@@ -80,6 +80,7 @@ static struct vfsmount *shm_mnt;
- #include <linux/userfaultfd_k.h>
- #include <linux/rmap.h>
- #include <linux/uuid.h>
-+#include <linux/memfd.h>
- 
- #include <linux/uaccess.h>
- 
-@@ -883,6 +884,18 @@ static bool shmem_punch_compound(struct page *page, pgoff_t start, pgoff_t end)
- 	return split_huge_page(page) >= 0;
- }
- 
-+static void guest_invalidate_page(struct inode *inode,
-+				  struct page *page, pgoff_t start, pgoff_t end)
-+{
-+	struct shmem_inode_info *info = SHMEM_I(inode);
-+
-+	start = max(start, page->index);
-+	end = min(end, page->index + thp_nr_pages(page)) - 1;
-+
-+	info->guest_ops->invalidate_page_range(inode, info->guest_owner,
-+					       start, end);
-+}
-+
+=20
  /*
-  * Remove range of pages and swap entries from page cache, and free them.
-  * If !unfalloc, truncate or punch hole; if unfalloc, undo failed fallocate.
-@@ -923,6 +936,8 @@ static void shmem_undo_range(struct inode *inode, loff_t lstart, loff_t lend,
- 			}
- 			index += thp_nr_pages(page) - 1;
- 
-+			guest_invalidate_page(inode, page, start, end);
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index a4ead6023133..cdadbd5dc0ca 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -141,6 +141,11 @@ struct nested_vmx {
+ 	 */
+ 	struct vmcs12 *cached_shadow_vmcs12;
+=20
++	/*
++	 * GPA to HVA cache for accessing vmcs12->vmcs_link_pointer
++	 */
++	struct gfn_to_hva_cache shadow_vmcs12_cache;
 +
- 			if (!unfalloc || !PageUptodate(page))
- 				truncate_inode_page(mapping, page);
- 			unlock_page(page);
-@@ -999,6 +1014,9 @@ static void shmem_undo_range(struct inode *inode, loff_t lstart, loff_t lend,
- 					index--;
- 					break;
- 				}
-+
-+				guest_invalidate_page(inode, page, start, end);
-+
- 				VM_BUG_ON_PAGE(PageWriteback(page), page);
- 				if (shmem_punch_compound(page, start, end))
- 					truncate_inode_page(mapping, page);
-@@ -1074,6 +1092,9 @@ static int shmem_setattr(struct user_namespace *mnt_userns,
- 		    (newsize > oldsize && (info->seals & F_SEAL_GROW)))
- 			return -EPERM;
- 
-+		if ((info->seals & F_SEAL_GUEST) && (newsize & ~PAGE_MASK))
-+			return -EINVAL;
-+
- 		if (newsize != oldsize) {
- 			error = shmem_reacct_size(SHMEM_I(inode)->flags,
- 					oldsize, newsize);
-@@ -1348,6 +1369,8 @@ static int shmem_writepage(struct page *page, struct writeback_control *wbc)
- 		goto redirty;
- 	if (!total_swap_pages)
- 		goto redirty;
-+	if (info->seals & F_SEAL_GUEST)
-+		goto redirty;
- 
  	/*
- 	 * Our capabilities prevent regular writeback or sync from ever calling
-@@ -2274,6 +2297,9 @@ static int shmem_mmap(struct file *file, struct vm_area_struct *vma)
- 	if (ret)
- 		return ret;
- 
-+	if (info->seals & F_SEAL_GUEST)
-+		return -EPERM;
-+
- 	/* arm64 - allow memory tagging on RAM-based files */
- 	vma->vm_flags |= VM_MTE_ALLOWED;
- 
-@@ -2471,12 +2497,14 @@ shmem_write_begin(struct file *file, struct address_space *mapping,
- 	pgoff_t index = pos >> PAGE_SHIFT;
- 
- 	/* i_mutex is held by caller */
--	if (unlikely(info->seals & (F_SEAL_GROW |
--				   F_SEAL_WRITE | F_SEAL_FUTURE_WRITE))) {
-+	if (unlikely(info->seals & (F_SEAL_GROW | F_SEAL_WRITE |
-+				    F_SEAL_FUTURE_WRITE | F_SEAL_GUEST))) {
- 		if (info->seals & (F_SEAL_WRITE | F_SEAL_FUTURE_WRITE))
- 			return -EPERM;
- 		if ((info->seals & F_SEAL_GROW) && pos + len > inode->i_size)
- 			return -EPERM;
-+		if (info->seals & F_SEAL_GUEST)
-+			return -EPERM;
- 	}
- 
- 	return shmem_getpage(inode, index, pagep, SGP_WRITE);
-@@ -2550,6 +2578,20 @@ static ssize_t shmem_file_read_iter(struct kiocb *iocb, struct iov_iter *to)
- 		end_index = i_size >> PAGE_SHIFT;
- 		if (index > end_index)
- 			break;
-+
-+		/*
-+		 * inode_lock protects setting up seals as well as write to
-+		 * i_size. Setting F_SEAL_GUEST only allowed with i_size == 0.
-+		 *
-+		 * Check F_SEAL_GUEST after i_size. It effectively serialize
-+		 * read vs. setting F_SEAL_GUEST without taking inode_lock in
-+		 * read path.
-+		 */
-+		if (SHMEM_I(inode)->seals & F_SEAL_GUEST) {
-+			error = -EPERM;
-+			break;
-+		}
-+
- 		if (index == end_index) {
- 			nr = i_size & ~PAGE_MASK;
- 			if (nr <= offset)
-@@ -2675,6 +2717,12 @@ static long shmem_fallocate(struct file *file, int mode, loff_t offset,
- 			goto out;
- 		}
- 
-+		if ((info->seals & F_SEAL_GUEST) &&
-+		    (offset & ~PAGE_MASK || len & ~PAGE_MASK)) {
-+			error = -EINVAL;
-+			goto out;
-+		}
-+
- 		shmem_falloc.waitq = &shmem_falloc_waitq;
- 		shmem_falloc.start = (u64)unmap_start >> PAGE_SHIFT;
- 		shmem_falloc.next = (unmap_end + 1) >> PAGE_SHIFT;
-@@ -2771,6 +2819,7 @@ static long shmem_fallocate(struct file *file, int mode, loff_t offset,
- 	if (!(mode & FALLOC_FL_KEEP_SIZE) && offset + len > inode->i_size)
- 		i_size_write(inode, offset + len);
- 	inode->i_ctime = current_time(inode);
-+	info->guest_ops->fallocate(inode, info->guest_owner, start, end);
- undone:
- 	spin_lock(&inode->i_lock);
- 	inode->i_private = NULL;
-@@ -3761,6 +3810,20 @@ static void shmem_destroy_inodecache(void)
- 	kmem_cache_destroy(shmem_inode_cachep);
- }
- 
-+#ifdef CONFIG_MIGRATION
-+int shmem_migrate_page(struct address_space *mapping,
-+		struct page *newpage, struct page *page,
-+		enum migrate_mode mode)
-+{
-+	struct inode *inode = mapping->host;
-+	struct shmem_inode_info *info = SHMEM_I(inode);
-+
-+	if (info->seals & F_SEAL_GUEST)
-+		return -ENOTSUPP;
-+	return migrate_page(mapping, newpage, page, mode);
-+}
-+#endif
-+
- const struct address_space_operations shmem_aops = {
- 	.writepage	= shmem_writepage,
- 	.set_page_dirty	= __set_page_dirty_no_writeback,
-@@ -3769,12 +3832,60 @@ const struct address_space_operations shmem_aops = {
- 	.write_end	= shmem_write_end,
- #endif
- #ifdef CONFIG_MIGRATION
--	.migratepage	= migrate_page,
-+	.migratepage	= shmem_migrate_page,
- #endif
- 	.error_remove_page = generic_error_remove_page,
- };
- EXPORT_SYMBOL(shmem_aops);
- 
-+static unsigned long shmem_get_lock_pfn(struct inode *inode, pgoff_t offset,
-+					int *order)
-+{
-+	struct page *page;
-+	int ret;
-+
-+	ret = shmem_getpage(inode, offset, &page, SGP_WRITE);
-+	if (ret)
-+		return ret;
-+
-+	*order = thp_order(thp_head(page));
-+
-+	return page_to_pfn(page);
-+}
-+
-+static void shmem_put_unlock_pfn(unsigned long pfn)
-+{
-+	struct page *page = pfn_to_page(pfn);
-+
-+	VM_BUG_ON_PAGE(!PageLocked(page), page);
-+
-+	set_page_dirty(page);
-+	unlock_page(page);
-+	put_page(page);
-+}
-+
-+static const struct guest_mem_ops shmem_guest_ops = {
-+	.get_lock_pfn = shmem_get_lock_pfn,
-+	.put_unlock_pfn = shmem_put_unlock_pfn,
-+};
-+
-+int shmem_register_guest(struct inode *inode, void *owner,
-+			 const struct guest_ops *guest_ops,
-+			 const struct guest_mem_ops **guest_mem_ops)
-+{
-+	struct shmem_inode_info *info = SHMEM_I(inode);
-+
-+	if (!owner)
-+		return -EINVAL;
-+
-+	if (info->guest_owner && info->guest_owner != owner)
-+		return -EPERM;
-+
-+	info->guest_ops = guest_ops;
-+	*guest_mem_ops = &shmem_guest_ops;
-+	return 0;
-+}
-+
- static const struct file_operations shmem_file_operations = {
- 	.mmap		= shmem_mmap,
- 	.get_unmapped_area = shmem_get_unmapped_area,
--- 
- Kirill A. Shutemov
+ 	 * Indicates if the shadow vmcs or enlightened vmcs must be updated
+ 	 * with the data held by struct vmcs12.
+--=20
+2.31.1
+
+
+
+--=-izUM9Fdrq6/SMxzfqk6C
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCECow
+ggUcMIIEBKADAgECAhEA4rtJSHkq7AnpxKUY8ZlYZjANBgkqhkiG9w0BAQsFADCBlzELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
+A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
+bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTkwMTAyMDAwMDAwWhcNMjIwMTAxMjM1
+OTU5WjAkMSIwIAYJKoZIhvcNAQkBFhNkd213MkBpbmZyYWRlYWQub3JnMIIBIjANBgkqhkiG9w0B
+AQEFAAOCAQ8AMIIBCgKCAQEAsv3wObLTCbUA7GJqKj9vHGf+Fa+tpkO+ZRVve9EpNsMsfXhvFpb8
+RgL8vD+L133wK6csYoDU7zKiAo92FMUWaY1Hy6HqvVr9oevfTV3xhB5rQO1RHJoAfkvhy+wpjo7Q
+cXuzkOpibq2YurVStHAiGqAOMGMXhcVGqPuGhcVcVzVUjsvEzAV9Po9K2rpZ52FE4rDkpDK1pBK+
+uOAyOkgIg/cD8Kugav5tyapydeWMZRJQH1vMQ6OVT24CyAn2yXm2NgTQMS1mpzStP2ioPtTnszIQ
+Ih7ASVzhV6csHb8Yrkx8mgllOyrt9Y2kWRRJFm/FPRNEurOeNV6lnYAXOymVJwIDAQABo4IB0zCC
+Ac8wHwYDVR0jBBgwFoAUgq9sjPjF/pZhfOgfPStxSF7Ei8AwHQYDVR0OBBYEFLfuNf820LvaT4AK
+xrGK3EKx1DE7MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUF
+BwMEBggrBgEFBQcDAjBGBgNVHSAEPzA9MDsGDCsGAQQBsjEBAgEDBTArMCkGCCsGAQUFBwIBFh1o
+dHRwczovL3NlY3VyZS5jb21vZG8ubmV0L0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3Js
+LmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWls
+Q0EuY3JsMIGLBggrBgEFBQcBAQR/MH0wVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuY29tb2RvY2Eu
+Y29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYI
+KwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmNvbW9kb2NhLmNvbTAeBgNVHREEFzAVgRNkd213MkBpbmZy
+YWRlYWQub3JnMA0GCSqGSIb3DQEBCwUAA4IBAQALbSykFusvvVkSIWttcEeifOGGKs7Wx2f5f45b
+nv2ghcxK5URjUvCnJhg+soxOMoQLG6+nbhzzb2rLTdRVGbvjZH0fOOzq0LShq0EXsqnJbbuwJhK+
+PnBtqX5O23PMHutP1l88AtVN+Rb72oSvnD+dK6708JqqUx2MAFLMevrhJRXLjKb2Mm+/8XBpEw+B
+7DisN4TMlLB/d55WnT9UPNHmQ+3KFL7QrTO8hYExkU849g58Dn3Nw3oCbMUgny81ocrLlB2Z5fFG
+Qu1AdNiBA+kg/UxzyJZpFbKfCITd5yX49bOriL692aMVDyqUvh8fP+T99PqorH4cIJP6OxSTdxKM
+MIIFHDCCBASgAwIBAgIRAOK7SUh5KuwJ6cSlGPGZWGYwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
+ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTE5MDEwMjAwMDAwMFoXDTIyMDEwMTIz
+NTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCASIwDQYJKoZIhvcN
+AQEBBQADggEPADCCAQoCggEBALL98Dmy0wm1AOxiaio/bxxn/hWvraZDvmUVb3vRKTbDLH14bxaW
+/EYC/Lw/i9d98CunLGKA1O8yogKPdhTFFmmNR8uh6r1a/aHr301d8YQea0DtURyaAH5L4cvsKY6O
+0HF7s5DqYm6tmLq1UrRwIhqgDjBjF4XFRqj7hoXFXFc1VI7LxMwFfT6PStq6WedhROKw5KQytaQS
+vrjgMjpICIP3A/CroGr+bcmqcnXljGUSUB9bzEOjlU9uAsgJ9sl5tjYE0DEtZqc0rT9oqD7U57My
+ECIewElc4VenLB2/GK5MfJoJZTsq7fWNpFkUSRZvxT0TRLqznjVepZ2AFzsplScCAwEAAaOCAdMw
+ggHPMB8GA1UdIwQYMBaAFIKvbIz4xf6WYXzoHz0rcUhexIvAMB0GA1UdDgQWBBS37jX/NtC72k+A
+CsaxitxCsdQxOzAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEF
+BQcDBAYIKwYBBQUHAwIwRgYDVR0gBD8wPTA7BgwrBgEEAbIxAQIBAwUwKzApBggrBgEFBQcCARYd
+aHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9DUFMwWgYDVR0fBFMwUTBPoE2gS4ZJaHR0cDovL2Ny
+bC5jb21vZG9jYS5jb20vQ09NT0RPUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFp
+bENBLmNybDCBiwYIKwYBBQUHAQEEfzB9MFUGCCsGAQUFBzAChklodHRwOi8vY3J0LmNvbW9kb2Nh
+LmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3J0MCQG
+CCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAC20spBbrL71ZEiFrbXBHonzhhirO1sdn+X+O
+W579oIXMSuVEY1LwpyYYPrKMTjKECxuvp24c829qy03UVRm742R9Hzjs6tC0oatBF7KpyW27sCYS
+vj5wbal+TttzzB7rT9ZfPALVTfkW+9qEr5w/nSuu9PCaqlMdjABSzHr64SUVy4ym9jJvv/FwaRMP
+gew4rDeEzJSwf3eeVp0/VDzR5kPtyhS+0K0zvIWBMZFPOPYOfA59zcN6AmzFIJ8vNaHKy5QdmeXx
+RkLtQHTYgQPpIP1Mc8iWaRWynwiE3ecl+PWzq4i+vdmjFQ8qlL4fHz/k/fT6qKx+HCCT+jsUk3cS
+jDCCBeYwggPOoAMCAQICEGqb4Tg7/ytrnwHV2binUlYwDQYJKoZIhvcNAQEMBQAwgYUxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMSswKQYDVQQDEyJDT01PRE8gUlNBIENlcnRpZmljYXRp
+b24gQXV0aG9yaXR5MB4XDTEzMDExMDAwMDAwMFoXDTI4MDEwOTIzNTk1OVowgZcxCzAJBgNVBAYT
+AkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNV
+BAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAvrOeV6wodnVAFsc4A5jTxhh2IVDzJXkLTLWg0X06WD6cpzEup/Y0dtmEatrQPTRI5Or1u6zf
++bGBSyD9aH95dDSmeny1nxdlYCeXIoymMv6pQHJGNcIDpFDIMypVpVSRsivlJTRENf+RKwrB6vcf
+WlP8dSsE3Rfywq09N0ZfxcBa39V0wsGtkGWC+eQKiz4pBZYKjrc5NOpG9qrxpZxyb4o4yNNwTqza
+aPpGRqXB7IMjtf7tTmU2jqPMLxFNe1VXj9XB1rHvbRikw8lBoNoSWY66nJN/VCJv5ym6Q0mdCbDK
+CMPybTjoNCQuelc0IAaO4nLUXk0BOSxSxt8kCvsUtQIDAQABo4IBPDCCATgwHwYDVR0jBBgwFoAU
+u69+Aj36pvE8hI6t7jiY7NkyMtQwHQYDVR0OBBYEFIKvbIz4xf6WYXzoHz0rcUhexIvAMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMBEGA1UdIAQKMAgwBgYEVR0gADBMBgNVHR8E
+RTBDMEGgP6A9hjtodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDZXJ0aWZpY2F0aW9u
+QXV0aG9yaXR5LmNybDBxBggrBgEFBQcBAQRlMGMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9jcnQuY29t
+b2RvY2EuY29tL0NPTU9ET1JTQUFkZFRydXN0Q0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2Nz
+cC5jb21vZG9jYS5jb20wDQYJKoZIhvcNAQEMBQADggIBAHhcsoEoNE887l9Wzp+XVuyPomsX9vP2
+SQgG1NgvNc3fQP7TcePo7EIMERoh42awGGsma65u/ITse2hKZHzT0CBxhuhb6txM1n/y78e/4ZOs
+0j8CGpfb+SJA3GaBQ+394k+z3ZByWPQedXLL1OdK8aRINTsjk/H5Ns77zwbjOKkDamxlpZ4TKSDM
+KVmU/PUWNMKSTvtlenlxBhh7ETrN543j/Q6qqgCWgWuMAXijnRglp9fyadqGOncjZjaaSOGTTFB+
+E2pvOUtY+hPebuPtTbq7vODqzCM6ryEhNhzf+enm0zlpXK7q332nXttNtjv7VFNYG+I31gnMrwfH
+M5tdhYF/8v5UY5g2xANPECTQdu9vWPoqNSGDt87b3gXb1AiGGaI06vzgkejL580ul+9hz9D0S0U4
+jkhJiA7EuTecP/CFtR72uYRBcunwwH3fciPjviDDAI9SnC/2aPY8ydehzuZutLbZdRJ5PDEJM/1t
+yZR2niOYihZ+FCbtf3D9mB12D4ln9icgc7CwaxpNSCPt8i/GqK2HsOgkL3VYnwtx7cJUmpvVdZ4o
+gnzgXtgtdk3ShrtOS1iAN2ZBXFiRmjVzmehoMof06r1xub+85hFQzVxZx5/bRaTKTlL8YXLI8nAb
+R9HWdFqzcOoB/hxfEyIQpx9/s81rgzdEZOofSlZHynoSMYIDyjCCA8YCAQEwga0wgZcxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
+ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
+ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjEx
+MTEyMTk0NDI4WjAvBgkqhkiG9w0BCQQxIgQgZyiTnSkYtxoVUsRJsFrbAS5KHAV2tllEfkSAEp/k
+ANIwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
+PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
+aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
+A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
+bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
+DQEBAQUABIIBAGlhbZHNYh6ci046fLfA+QCYxnIs1Rwsuii1dlKuqp+oGjCVM7j/OJ/DJTJDgKHD
+t1nOxMnKGnbqqzQxT5JhqGYIfRPZs+vA3JM1hgphx9w4zwvyOnDlui/xdJbugpup7iL4sfh7J7ET
+oJqilQPjhWTajOv50pp+mKv862KLiciXrvil2Nz4YOzbViO/pVYGjJWn9o17F0yChFVZkq2ltu1x
+aDtdSCB4Lx5h6+Pg2eh8URr5TF7A5azy5Aem4aGqhOuaWNV1YGRYoe07QJJZkm5AvLt2d5gIgKFZ
+bFkHoz9IpEmnRRs5XU3C4Rd5mpf3VpxiBmbnPOoWA9Un74FXyFgAAAAAAAA=
+
+
+--=-izUM9Fdrq6/SMxzfqk6C--
+
