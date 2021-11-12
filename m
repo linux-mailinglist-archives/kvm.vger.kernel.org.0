@@ -2,156 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1CC7944E1B6
-	for <lists+kvm@lfdr.de>; Fri, 12 Nov 2021 06:51:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 15EAD44E269
+	for <lists+kvm@lfdr.de>; Fri, 12 Nov 2021 08:38:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231156AbhKLFy1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Nov 2021 00:54:27 -0500
-Received: from mga14.intel.com ([192.55.52.115]:36075 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229910AbhKLFy0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Nov 2021 00:54:26 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10165"; a="233325187"
-X-IronPort-AV: E=Sophos;i="5.87,228,1631602800"; 
-   d="scan'208";a="233325187"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2021 21:51:36 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.87,228,1631602800"; 
-   d="scan'208";a="492855072"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.101])
-  by orsmga007.jf.intel.com with ESMTP; 11 Nov 2021 21:51:27 -0800
-Date:   Fri, 12 Nov 2021 13:50:38 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     Mika =?iso-8859-1?Q?Penttil=E4?= <mika.penttila@nextfour.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        qemu-devel@nongnu.org, Wanpeng Li <wanpengli@tencent.com>,
-        luto@kernel.org, david@redhat.com,
-        "J . Bruce Fields" <bfields@fieldses.org>, dave.hansen@intel.com,
-        "H . Peter Anvin" <hpa@zytor.com>, ak@linux.intel.com,
-        Jonathan Corbet <corbet@lwn.net>,
-        Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
-        Hugh Dickins <hughd@google.com>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        jun.nakajima@intel.com, Thomas Gleixner <tglx@linutronix.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Sean Christopherson <seanjc@google.com>, susie.li@intel.com,
-        Jeff Layton <jlayton@kernel.org>, john.ji@intel.com,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: Re: [RFC PATCH 5/6] kvm: x86: add KVM_EXIT_MEMORY_ERROR exit
-Message-ID: <20211112055038.GB27969@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20211111141352.26311-1-chao.p.peng@linux.intel.com>
- <20211111141352.26311-6-chao.p.peng@linux.intel.com>
- <f7155c5b-fc87-c1a6-9ee7-06f08a25bdb4@nextfour.com>
+        id S233351AbhKLHlj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Nov 2021 02:41:39 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:57545 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232346AbhKLHlh (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 12 Nov 2021 02:41:37 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1636702726;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=xNi/87i983IT8LoHuNZjW6Y3OWNabGFCpYAA5infiiE=;
+        b=ZwsHaFxNrTkZF68l/wnAdmg02BqsAvuw5nBhaKiK4acFLNk/fKEqIeB+2yShKq0YkH6UpP
+        z2T/QO7Dj22IEoGn6Bn2pbcf2g//6iRturtgL5gZn5Mtmh0SUkBbaEG0knLURSY85m6PwT
+        MgwJu0f13jmK2MWH/KIwkAJFr36X/n0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-400-qufA0f_tO8yTLeWjCwbNKg-1; Fri, 12 Nov 2021 02:38:45 -0500
+X-MC-Unique: qufA0f_tO8yTLeWjCwbNKg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7D37619200C0;
+        Fri, 12 Nov 2021 07:38:44 +0000 (UTC)
+Received: from [10.33.192.183] (dhcp-192-183.str.redhat.com [10.33.192.183])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1D22577E26;
+        Fri, 12 Nov 2021 07:38:38 +0000 (UTC)
+Message-ID: <6b28a9e3-6129-0202-fb2c-6398c3363f28@redhat.com>
+Date:   Fri, 12 Nov 2021 08:38:38 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <f7155c5b-fc87-c1a6-9ee7-06f08a25bdb4@nextfour.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [kvm-unit-tests PATCH] s390x: io: declare s390x CPU as big endian
+Content-Language: en-US
+To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
+        imbrenda@linux.ibm.com
+References: <20211111184835.113648-1-pmorel@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <20211111184835.113648-1-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 11, 2021 at 05:08:47PM +0200, Mika Penttilä wrote:
+On 11/11/2021 19.48, Pierre Morel wrote:
+> To use the swap byte transformations we need to declare
+> the s390x architecture as big endian.
 > 
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>   lib/s390x/asm/io.h | 1 +
+>   1 file changed, 1 insertion(+)
 > 
-> On 11.11.2021 16.13, Chao Peng wrote:
-> > Currently support to exit to userspace for private/shared memory
-> > conversion.
-> > 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> > ---
-> >   arch/x86/kvm/mmu/mmu.c   | 20 ++++++++++++++++++++
-> >   include/uapi/linux/kvm.h | 15 +++++++++++++++
-> >   2 files changed, 35 insertions(+)
-> > 
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index af5ecf4ef62a..780868888aa8 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -3950,6 +3950,17 @@ static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
-> >   	slot = __kvm_vcpu_gfn_to_memslot(vcpu, gfn, private);
-> > +	/*
-> > +	 * Exit to userspace to map the requested private/shared memory region
-> > +	 * if there is no memslot and (a) the access is private or (b) there is
-> > +	 * an existing private memslot.  Emulated MMIO must be accessed through
-> > +	 * shared GPAs, thus a memslot miss on a private GPA is always handled
-> > +	 * as an implicit conversion "request".
-> > +	 */
-> > +	if (!slot &&
-> > +	    (private || __kvm_vcpu_gfn_to_memslot(vcpu, gfn, true)))
-> > +		goto out_convert;
-> > +
-> >   	/* Don't expose aliases for no slot GFNs or private memslots */
-> >   	if ((cr2_or_gpa & vcpu_gpa_stolen_mask(vcpu)) &&
-> >   	    !kvm_is_visible_memslot(slot)) {
-> > @@ -3994,6 +4005,15 @@ static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
-> >   	*pfn = __gfn_to_pfn_memslot(slot, gfn, false, NULL,
-> >   				    write, writable, hva);
-> >   	return false;
-> > +
-> > +out_convert:
-> > +	vcpu->run->exit_reason = KVM_EXIT_MEMORY_ERROR;
-> > +	vcpu->run->mem.type = private ? KVM_EXIT_MEM_MAP_PRIVATE
-> > +				      : KVM_EXIT_MEM_MAP_SHARE;
-> > +	vcpu->run->mem.u.map.gpa = cr2_or_gpa;
-> > +	vcpu->run->mem.u.map.size = PAGE_SIZE;
-> > +	return true;
-> > +
-> I think this does just retry, no exit to user space?
+> diff --git a/lib/s390x/asm/io.h b/lib/s390x/asm/io.h
+> index 1dc6283b..b5e661cf 100644
+> --- a/lib/s390x/asm/io.h
+> +++ b/lib/s390x/asm/io.h
+> @@ -10,6 +10,7 @@
+>   #define _ASMS390X_IO_H_
+>   
+>   #define __iomem
+> +#define __cpu_is_be() (1)
+>   
+>   #include <asm-generic/io.h>
+>   
+> 
 
-Good catch, thanks.
-Chao
-> 
-> 
-> 
-> 
-> > }
-> >   static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
-> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> > index 8d20caae9180..470c472a9451 100644
-> > --- a/include/uapi/linux/kvm.h
-> > +++ b/include/uapi/linux/kvm.h
-> > @@ -233,6 +233,18 @@ struct kvm_xen_exit {
-> >   	} u;
-> >   };
-> > +struct kvm_memory_exit {
-> > +#define KVM_EXIT_MEM_MAP_SHARE          1
-> > +#define KVM_EXIT_MEM_MAP_PRIVATE        2
-> > +	__u32 type;
-> > +	union {
-> > +		struct {
-> > +			__u64 gpa;
-> > +			__u64 size;
-> > +		} map;
-> > +	} u;
-> > +};
-> > +
-> >   #define KVM_S390_GET_SKEYS_NONE   1
-> >   #define KVM_S390_SKEYS_MAX        1048576
-> > @@ -272,6 +284,7 @@ struct kvm_xen_exit {
-> >   #define KVM_EXIT_X86_BUS_LOCK     33
-> >   #define KVM_EXIT_XEN              34
-> >   #define KVM_EXIT_TDVMCALL         35
-> > +#define KVM_EXIT_MEMORY_ERROR	  36
-> >   /* For KVM_EXIT_INTERNAL_ERROR */
-> >   /* Emulate instruction failed. */
-> > @@ -455,6 +468,8 @@ struct kvm_run {
-> >   			__u64 subfunc;
-> >   			__u64 param[4];
-> >   		} tdvmcall;
-> > +		/* KVM_EXIT_MEMORY_ERROR */
-> > +		struct kvm_memory_exit mem;
-> >   		/* Fix the size of the union. */
-> >   		char padding[256];
-> >   	};
-> 
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+
+Alternatively, I think you could also move this sequence from 
+lib/ppc64/asm/io.h into lib/asm-generic/io.h:
+
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define __cpu_is_be() (0)
+#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#define __cpu_is_be() (1)
+#else
+#error Undefined byte order
+#endif
+
+(replacing the hardcoded __cpu_is_be() in the generic code).
+
+  Thomas
+
