@@ -2,155 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B35744E3D9
-	for <lists+kvm@lfdr.de>; Fri, 12 Nov 2021 10:32:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DCDCF44E3E4
+	for <lists+kvm@lfdr.de>; Fri, 12 Nov 2021 10:34:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234747AbhKLJfH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Nov 2021 04:35:07 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:33810 "EHLO
+        id S234696AbhKLJhn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Nov 2021 04:37:43 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:37412 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230510AbhKLJfG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 12 Nov 2021 04:35:06 -0500
+        by vger.kernel.org with ESMTP id S234763AbhKLJhm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 12 Nov 2021 04:37:42 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636709535;
+        s=mimecast20190719; t=1636709692;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=IGqIOaYOVVDlA03zMXxsS+TDWYGOiD9fi9k1v1Jwf24=;
-        b=iac0JBD7z7g36i075NHQp5n8Vf5lzcTydWTNBSLyBtV9sb81CvZu2UD5vfDI+FEj5zMwiF
-        2lpAPjA4ktigaaf7QZaLuLY9fuWuPaxVQrl17aKdyN6gHZ8nUhQEmCuJlAugBmTvHwdzo8
-        tLapUyNRIdOhQ6uoith/gWVw+lfbDjI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-338-8yFnRX0hPP6zcb2Y9QfxAA-1; Fri, 12 Nov 2021 04:32:12 -0500
-X-MC-Unique: 8yFnRX0hPP6zcb2Y9QfxAA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AA66D101F004;
-        Fri, 12 Nov 2021 09:32:10 +0000 (UTC)
-Received: from [10.39.193.118] (unknown [10.39.193.118])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1BA035F4F5;
-        Fri, 12 Nov 2021 09:31:50 +0000 (UTC)
-Message-ID: <e4b6e45f-dddd-8401-8d7b-9d9cc4f1def0@redhat.com>
-Date:   Fri, 12 Nov 2021 10:31:50 +0100
+        bh=zxpcSnWKWAX26f0exTrc0C5AcatqZuzCnik5e/vhTMg=;
+        b=QzIQ5+ctWOuJUWZJvlStQpPY4MpMTeZhDONJcFfAV+4+UZneYIA/d6KYi40qblxvlmYCNy
+        s3L+OhUFpdDlxIX186bHfbXC4ffMln7rzWkuXSJeOKKQ410lyss1rMySLXGyIErHgc0/eO
+        NXGovXB3EmCo32j+lxLdoYmA5NrAhyY=
+Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
+ [209.85.167.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-8-L_npPkeLPHiXrcJXANOBtw-1; Fri, 12 Nov 2021 04:34:50 -0500
+X-MC-Unique: L_npPkeLPHiXrcJXANOBtw-1
+Received: by mail-lf1-f71.google.com with SMTP id n18-20020a0565120ad200b004036c43a0ddso3565779lfu.2
+        for <kvm@vger.kernel.org>; Fri, 12 Nov 2021 01:34:50 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=zxpcSnWKWAX26f0exTrc0C5AcatqZuzCnik5e/vhTMg=;
+        b=DR5sqIw/kTP2roHFMYmXltqJYtM28TimTJP5KAjMBxADhHLXAxqEYZ1yMTF1rtoKGe
+         wNVQtiZ+/MGkGHXx8V5gmffRlwZ31XtZda0zDqZAEn6TiuQw49EluA39EpIlra5lUC/o
+         OZmOlDIUO2j0fVoUz0Dd4XmO5qKvyJLrVG8RGHCXeF07zo1B8XAXxwSnXQpBEcpW9AE8
+         N/zdbnGZfZLe1T6izrgOTe4iLcT70hZWN/YVwKGbiQf7DxP3yE5staZc4bEAc3yEo7S+
+         Ie2Pcf/JFK5yTg3XWcqdVhngeMl5OdZ58cbNeZh8BinS0mReFhXAYv2Fvyt0/FZyq7yZ
+         fEzg==
+X-Gm-Message-State: AOAM531Pbs331ywisrrgrn+LkawIdGBG+PLA2pGe1HIfx/IPvEgTDLl+
+        3ZPCTipBZHar4DSLXlET8m2vAb9h9PkNGyDrl85Lgjdvey/ltBmCXzbXtxkpKPkn34dCgAHAxOw
+        xqRU6EzUyiXpViZpL4q2hF123GbF1
+X-Received: by 2002:a05:651c:54d:: with SMTP id q13mr14095540ljp.498.1636709689306;
+        Fri, 12 Nov 2021 01:34:49 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxPq5eZKYTUIJgtGo89zamrAE9TJk8OW8ctgHJM8VP8te70PDsioJzwZiAwfBx7HdIOawV5hHvaEzsGybltG8Y=
+X-Received: by 2002:a05:651c:54d:: with SMTP id q13mr14095517ljp.498.1636709689060;
+ Fri, 12 Nov 2021 01:34:49 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH v5 4/6] kvm: irqchip: extract
- kvm_irqchip_add_deferred_msi_route
-Content-Language: en-US
-To:     "Longpeng(Mike)" <longpeng2@huawei.com>, alex.williamson@redhat.com
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, arei.gonglei@huawei.com
-References: <20211103081657.1945-1-longpeng2@huawei.com>
- <20211103081657.1945-5-longpeng2@huawei.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211103081657.1945-5-longpeng2@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+References: <20211110203322.1374925-1-farman@linux.ibm.com>
+ <20211110203322.1374925-3-farman@linux.ibm.com> <dd8a8b49-da6d-0ab8-dc47-b24f5604767f@redhat.com>
+ <ab82e68051674ea771e2cb5371ca2a204effab40.camel@linux.ibm.com>
+ <32836eb5-532f-962d-161a-faa2213a0691@linux.ibm.com> <b116e738d8f9b185867ab28395012aaddd58af31.camel@linux.ibm.com>
+ <85ba9fa3-ca25-b598-aecd-5e0c6a0308f2@redhat.com> <19a2543b24015873db736bddb14d0e4d97712086.camel@linux.ibm.com>
+ <ff344676-0c37-610b-eafb-b1477db0f6a1@redhat.com> <006980fd7d0344b0258aa87128891fcd81c005b7.camel@linux.ibm.com>
+In-Reply-To: <006980fd7d0344b0258aa87128891fcd81c005b7.camel@linux.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Date:   Fri, 12 Nov 2021 10:34:37 +0100
+Message-ID: <CADFyXm7XM96yUEU_5Xf-nT8D5E0+sji2AwfKCvr_yvx6fZrf2g@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 2/2] KVM: s390: Extend the USER_SIGP capability
+To:     Eric Farman <farman@linux.ibm.com>
+Cc:     Janosch Frank <frankja@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, KVM <kvm@vger.kernel.org>,
+        linux-s390 <linux-s390@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/3/21 09:16, Longpeng(Mike) wrote:
-> Extract a common helper that add MSI route for specific vector
-> but does not commit immediately.
-> 
-> Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
+> > > Right, that's exactly what I had at one point. I thought it was too
+> > > cumbersome, but maybe not. Will dust it off, pending my question to
+> > > Janosch about 0-vs-1 IOCTLs.
+> >
+> > As we really only care about the SIGP STOP case,
+>
+> Is that really true? SIGP RESTART does an inject back to KVM, ditto the
+> (INITIAL) CPU RESET orders. It's true that SIGP SENSE is getting
+> tripped up on whether a vcpu is actually stopped or not, but I believe
+> that SIGP SENSE saying "everything's fine" when a vcpu is still busy processing an order isn't great either.
 
-I think adding the new function is not necessary; I have no problem 
-moving the call to kvm_irqchip_commit_routes to the callers.  Perhaps 
-you can have an API like this:
+The general rule is "if the guest can detect that it violates the
+spec, it needs fixing".
 
-typedef struct KVMRouteChange {
-     KVMState *s;
-     int changes;
-} KVMRouteChange;
+That is true right now when a single VCPU does:
 
-KVMRouteChange kvm_irqchip_begin_route_changes(KVMState *s)
-{
-     return (KVMRouteChange) { .s = s, .changes = 0 };
-}
+#1: SIGP STOP AND STORE #2
+#1: SIGP SENSE #2
 
-void kvm_irqchip_commit_route_changes(KVMRouteChange *c)
-{
-     if (c->changes) {
-         kvm_irqchip_commit_routes(c->s);
-         c->changes = 0;
-    }
-}
+Because according to the spec, the SIGP SENSE has to return either
+BUSY or indicated STOPPED. And if it indicates STOPPED, the STORE has
+to be fully processed.
 
-int kvm_irqchip_add_msi_route(KVMRouteChange *c, int vector, PCIDevice *dev)
-{
-     KVMState *s = c->s;
-     ...
-     kvm_add_routing_entry(s, &kroute);
-     kvm_arch_add_msi_route_post(&kroute, vector, dev);
-     c->changes++;
 
-     return virq;
-}
+Can you construct something similar with SIGP INITIAL CPU RESET and
+e.g., SIGP SENSE? From a single CPU not:
 
-so it's harder for the callers to "forget" kvm_irqchip_commit_route_changes.
+#1: SIGP INITIAL CPU RESET #2
+#1: SIGP SENSE #2
 
-Paolo
+As the SIGP INITIAL CPU RESET is processed fully asynchronous.
 
-> ---
->   accel/kvm/kvm-all.c  | 15 +++++++++++++--
->   include/sysemu/kvm.h |  6 ++++++
->   2 files changed, 19 insertions(+), 2 deletions(-)
-> 
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index db8d83b..8627f7c 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -1953,7 +1953,7 @@ int kvm_irqchip_send_msi(KVMState *s, MSIMessage msg)
->       return kvm_set_irq(s, route->kroute.gsi, 1);
->   }
->   
-> -int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
-> +int kvm_irqchip_add_deferred_msi_route(KVMState *s, int vector, PCIDevice *dev)
->   {
->       struct kvm_irq_routing_entry kroute = {};
->       int virq;
-> @@ -1996,7 +1996,18 @@ int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
->   
->       kvm_add_routing_entry(s, &kroute);
->       kvm_arch_add_msi_route_post(&kroute, vector, dev);
-> -    kvm_irqchip_commit_routes(s);
-> +
-> +    return virq;
-> +}
-> +
-> +int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
-> +{
-> +    int virq;
-> +
-> +    virq = kvm_irqchip_add_deferred_msi_route(s, vector, dev);
-> +    if (virq >= 0) {
-> +        kvm_irqchip_commit_routes(s);
-> +    }
->   
->       return virq;
->   }
-> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-> index a1ab1ee..8de0d9a 100644
-> --- a/include/sysemu/kvm.h
-> +++ b/include/sysemu/kvm.h
-> @@ -476,6 +476,12 @@ void kvm_init_cpu_signals(CPUState *cpu);
->    * @return: virq (>=0) when success, errno (<0) when failed.
->    */
->   int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev);
-> +/**
-> + * Add MSI route for specific vector but does not commit to KVM
-> + * immediately
-> + */
-> +int kvm_irqchip_add_deferred_msi_route(KVMState *s, int vector,
-> +                                       PCIDevice *dev);
->   int kvm_irqchip_update_msi_route(KVMState *s, int virq, MSIMessage msg,
->                                    PCIDevice *dev);
->   void kvm_irqchip_commit_routes(KVMState *s);
-> 
+Can you come up with an example where using another VCPU we could
+reliably detect a difference between
+
+#1: SIGP INITIAL CPU RESET #2
+#3: SIGP SENSE #2
+
+and
+
+#3: SIGP SENSE #2
+#1: SIGP INITIAL CPU RESET #2
+
+and
+
+#3: SIGP SENSE #2 [and concurrent] #1: SIGP INITIAL CPU RESET #2
+
+If yes, it needs fixing, if not, we can happily ignore it.
 
