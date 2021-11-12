@@ -2,138 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B7B4B44E0ED
-	for <lists+kvm@lfdr.de>; Fri, 12 Nov 2021 04:59:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1CC7944E1B6
+	for <lists+kvm@lfdr.de>; Fri, 12 Nov 2021 06:51:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233920AbhKLECj convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Thu, 11 Nov 2021 23:02:39 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:14738 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229698AbhKLECi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 11 Nov 2021 23:02:38 -0500
-Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.57])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Hr4Y66YfzzZd1X;
-        Fri, 12 Nov 2021 11:57:30 +0800 (CST)
-Received: from dggpemm100007.china.huawei.com (7.185.36.116) by
- dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.15; Fri, 12 Nov 2021 11:59:47 +0800
-Received: from dggpeml100016.china.huawei.com (7.185.36.216) by
- dggpemm100007.china.huawei.com (7.185.36.116) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.15; Fri, 12 Nov 2021 11:59:46 +0800
-Received: from dggpeml100016.china.huawei.com ([7.185.36.216]) by
- dggpeml100016.china.huawei.com ([7.185.36.216]) with mapi id 15.01.2308.015;
- Fri, 12 Nov 2021 11:59:46 +0800
-From:   "Longpeng (Mike, Cloud Infrastructure Service Product Dept.)" 
-        <longpeng2@huawei.com>
-To:     "pbonzini@redhat.com" <pbonzini@redhat.com>
-CC:     "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Gonglei (Arei)" <arei.gonglei@huawei.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>
-Subject: RE: [PATCH v5 4/6] kvm: irqchip: extract
- kvm_irqchip_add_deferred_msi_route
-Thread-Topic: [PATCH v5 4/6] kvm: irqchip: extract
- kvm_irqchip_add_deferred_msi_route
-Thread-Index: AQHX0IsxWviLXRP53kGau6vBqNcnCav/UFjg
-Date:   Fri, 12 Nov 2021 03:59:46 +0000
-Message-ID: <dcdeba83881c4fe289092ed55cb9500b@huawei.com>
-References: <20211103081657.1945-1-longpeng2@huawei.com>
- <20211103081657.1945-5-longpeng2@huawei.com>
-In-Reply-To: <20211103081657.1945-5-longpeng2@huawei.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.174.148.223]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        id S231156AbhKLFy1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Nov 2021 00:54:27 -0500
+Received: from mga14.intel.com ([192.55.52.115]:36075 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229910AbhKLFy0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Nov 2021 00:54:26 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10165"; a="233325187"
+X-IronPort-AV: E=Sophos;i="5.87,228,1631602800"; 
+   d="scan'208";a="233325187"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2021 21:51:36 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.87,228,1631602800"; 
+   d="scan'208";a="492855072"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.101])
+  by orsmga007.jf.intel.com with ESMTP; 11 Nov 2021 21:51:27 -0800
+Date:   Fri, 12 Nov 2021 13:50:38 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     Mika =?iso-8859-1?Q?Penttil=E4?= <mika.penttila@nextfour.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        qemu-devel@nongnu.org, Wanpeng Li <wanpengli@tencent.com>,
+        luto@kernel.org, david@redhat.com,
+        "J . Bruce Fields" <bfields@fieldses.org>, dave.hansen@intel.com,
+        "H . Peter Anvin" <hpa@zytor.com>, ak@linux.intel.com,
+        Jonathan Corbet <corbet@lwn.net>,
+        Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
+        Hugh Dickins <hughd@google.com>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        jun.nakajima@intel.com, Thomas Gleixner <tglx@linutronix.de>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <seanjc@google.com>, susie.li@intel.com,
+        Jeff Layton <jlayton@kernel.org>, john.ji@intel.com,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: Re: [RFC PATCH 5/6] kvm: x86: add KVM_EXIT_MEMORY_ERROR exit
+Message-ID: <20211112055038.GB27969@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <20211111141352.26311-1-chao.p.peng@linux.intel.com>
+ <20211111141352.26311-6-chao.p.peng@linux.intel.com>
+ <f7155c5b-fc87-c1a6-9ee7-06f08a25bdb4@nextfour.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f7155c5b-fc87-c1a6-9ee7-06f08a25bdb4@nextfour.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+On Thu, Nov 11, 2021 at 05:08:47PM +0200, Mika Penttilä wrote:
+> 
+> 
+> On 11.11.2021 16.13, Chao Peng wrote:
+> > Currently support to exit to userspace for private/shared memory
+> > conversion.
+> > 
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> > ---
+> >   arch/x86/kvm/mmu/mmu.c   | 20 ++++++++++++++++++++
+> >   include/uapi/linux/kvm.h | 15 +++++++++++++++
+> >   2 files changed, 35 insertions(+)
+> > 
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index af5ecf4ef62a..780868888aa8 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -3950,6 +3950,17 @@ static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
+> >   	slot = __kvm_vcpu_gfn_to_memslot(vcpu, gfn, private);
+> > +	/*
+> > +	 * Exit to userspace to map the requested private/shared memory region
+> > +	 * if there is no memslot and (a) the access is private or (b) there is
+> > +	 * an existing private memslot.  Emulated MMIO must be accessed through
+> > +	 * shared GPAs, thus a memslot miss on a private GPA is always handled
+> > +	 * as an implicit conversion "request".
+> > +	 */
+> > +	if (!slot &&
+> > +	    (private || __kvm_vcpu_gfn_to_memslot(vcpu, gfn, true)))
+> > +		goto out_convert;
+> > +
+> >   	/* Don't expose aliases for no slot GFNs or private memslots */
+> >   	if ((cr2_or_gpa & vcpu_gpa_stolen_mask(vcpu)) &&
+> >   	    !kvm_is_visible_memslot(slot)) {
+> > @@ -3994,6 +4005,15 @@ static bool try_async_pf(struct kvm_vcpu *vcpu, bool prefault, gfn_t gfn,
+> >   	*pfn = __gfn_to_pfn_memslot(slot, gfn, false, NULL,
+> >   				    write, writable, hva);
+> >   	return false;
+> > +
+> > +out_convert:
+> > +	vcpu->run->exit_reason = KVM_EXIT_MEMORY_ERROR;
+> > +	vcpu->run->mem.type = private ? KVM_EXIT_MEM_MAP_PRIVATE
+> > +				      : KVM_EXIT_MEM_MAP_SHARE;
+> > +	vcpu->run->mem.u.map.gpa = cr2_or_gpa;
+> > +	vcpu->run->mem.u.map.size = PAGE_SIZE;
+> > +	return true;
+> > +
+> I think this does just retry, no exit to user space?
 
-Ping...
-
-Do you have any suggestions about this change ? It seems Alex has no
-objection on this series now, but we need your ACK, thanks.
-
-
-> -----Original Message-----
-> From: Longpeng (Mike, Cloud Infrastructure Service Product Dept.)
-> Sent: Wednesday, November 3, 2021 4:17 PM
-> To: alex.williamson@redhat.com; pbonzini@redhat.com
-> Cc: qemu-devel@nongnu.org; kvm@vger.kernel.org; Gonglei (Arei)
-> <arei.gonglei@huawei.com>; Longpeng (Mike, Cloud Infrastructure Service
-> Product Dept.) <longpeng2@huawei.com>
-> Subject: [PATCH v5 4/6] kvm: irqchip: extract
-> kvm_irqchip_add_deferred_msi_route
+Good catch, thanks.
+Chao
 > 
-> Extract a common helper that add MSI route for specific vector
-> but does not commit immediately.
 > 
-> Signed-off-by: Longpeng(Mike) <longpeng2@huawei.com>
-> ---
->  accel/kvm/kvm-all.c  | 15 +++++++++++++--
->  include/sysemu/kvm.h |  6 ++++++
->  2 files changed, 19 insertions(+), 2 deletions(-)
 > 
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index db8d83b..8627f7c 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -1953,7 +1953,7 @@ int kvm_irqchip_send_msi(KVMState *s, MSIMessage msg)
->      return kvm_set_irq(s, route->kroute.gsi, 1);
->  }
 > 
-> -int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
-> +int kvm_irqchip_add_deferred_msi_route(KVMState *s, int vector, PCIDevice
-> *dev)
->  {
->      struct kvm_irq_routing_entry kroute = {};
->      int virq;
-> @@ -1996,7 +1996,18 @@ int kvm_irqchip_add_msi_route(KVMState *s, int vector,
-> PCIDevice *dev)
+> > }
+> >   static int direct_page_fault(struct kvm_vcpu *vcpu, gpa_t gpa, u32 error_code,
+> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> > index 8d20caae9180..470c472a9451 100644
+> > --- a/include/uapi/linux/kvm.h
+> > +++ b/include/uapi/linux/kvm.h
+> > @@ -233,6 +233,18 @@ struct kvm_xen_exit {
+> >   	} u;
+> >   };
+> > +struct kvm_memory_exit {
+> > +#define KVM_EXIT_MEM_MAP_SHARE          1
+> > +#define KVM_EXIT_MEM_MAP_PRIVATE        2
+> > +	__u32 type;
+> > +	union {
+> > +		struct {
+> > +			__u64 gpa;
+> > +			__u64 size;
+> > +		} map;
+> > +	} u;
+> > +};
+> > +
+> >   #define KVM_S390_GET_SKEYS_NONE   1
+> >   #define KVM_S390_SKEYS_MAX        1048576
+> > @@ -272,6 +284,7 @@ struct kvm_xen_exit {
+> >   #define KVM_EXIT_X86_BUS_LOCK     33
+> >   #define KVM_EXIT_XEN              34
+> >   #define KVM_EXIT_TDVMCALL         35
+> > +#define KVM_EXIT_MEMORY_ERROR	  36
+> >   /* For KVM_EXIT_INTERNAL_ERROR */
+> >   /* Emulate instruction failed. */
+> > @@ -455,6 +468,8 @@ struct kvm_run {
+> >   			__u64 subfunc;
+> >   			__u64 param[4];
+> >   		} tdvmcall;
+> > +		/* KVM_EXIT_MEMORY_ERROR */
+> > +		struct kvm_memory_exit mem;
+> >   		/* Fix the size of the union. */
+> >   		char padding[256];
+> >   	};
 > 
->      kvm_add_routing_entry(s, &kroute);
->      kvm_arch_add_msi_route_post(&kroute, vector, dev);
-> -    kvm_irqchip_commit_routes(s);
-> +
-> +    return virq;
-> +}
-> +
-> +int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
-> +{
-> +    int virq;
-> +
-> +    virq = kvm_irqchip_add_deferred_msi_route(s, vector, dev);
-> +    if (virq >= 0) {
-> +        kvm_irqchip_commit_routes(s);
-> +    }
-> 
->      return virq;
->  }
-> diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-> index a1ab1ee..8de0d9a 100644
-> --- a/include/sysemu/kvm.h
-> +++ b/include/sysemu/kvm.h
-> @@ -476,6 +476,12 @@ void kvm_init_cpu_signals(CPUState *cpu);
->   * @return: virq (>=0) when success, errno (<0) when failed.
->   */
->  int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev);
-> +/**
-> + * Add MSI route for specific vector but does not commit to KVM
-> + * immediately
-> + */
-> +int kvm_irqchip_add_deferred_msi_route(KVMState *s, int vector,
-> +                                       PCIDevice *dev);
->  int kvm_irqchip_update_msi_route(KVMState *s, int virq, MSIMessage msg,
->                                   PCIDevice *dev);
->  void kvm_irqchip_commit_routes(KVMState *s);
-> --
-> 1.8.3.1
-
