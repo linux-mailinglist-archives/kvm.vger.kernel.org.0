@@ -2,202 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7055D44EFC9
-	for <lists+kvm@lfdr.de>; Fri, 12 Nov 2021 23:54:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F08D44EFF3
+	for <lists+kvm@lfdr.de>; Sat, 13 Nov 2021 00:12:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231320AbhKLW5P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Nov 2021 17:57:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43416 "EHLO
+        id S233128AbhKLXPO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Nov 2021 18:15:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47460 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231968AbhKLW5O (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Nov 2021 17:57:14 -0500
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7852C061766
-        for <kvm@vger.kernel.org>; Fri, 12 Nov 2021 14:54:22 -0800 (PST)
-Received: by mail-lf1-x134.google.com with SMTP id k37so25893016lfv.3
-        for <kvm@vger.kernel.org>; Fri, 12 Nov 2021 14:54:22 -0800 (PST)
+        with ESMTP id S231320AbhKLXPL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Nov 2021 18:15:11 -0500
+Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53D84C061766
+        for <kvm@vger.kernel.org>; Fri, 12 Nov 2021 15:12:20 -0800 (PST)
+Received: by mail-lj1-x232.google.com with SMTP id h11so21484337ljk.1
+        for <kvm@vger.kernel.org>; Fri, 12 Nov 2021 15:12:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=3NQdFGcDVG2JjfnOpdeoQHmcElnD9tk5T9TB7oLbDK4=;
-        b=r3dDCXEZkM+k571XU2EKqa8ZvMbUOqLaG1ZtJYrepKQf1i4VLU14Meciy3mRyhJeG7
-         LND2XIG9Sn7tH7eOksKceNqEl33+9Z3Hie5MLtCFe3USQ58kEJQRO+TOnK2fLyei96CS
-         2GpIhnPedfVj1vjes0bI3QKfemARHgiAd9apcHUetJ0YZNaxNeOMo6oFY6YfQ7sisleU
-         Bqzc1xTxUDDZQ3xMSeu596xH9bM60Q80ut4BDpwGFdNul8WE6p+5v0rR7Vc9d5q/i6Dz
-         ON9huOgL4kbnru8b17TxqW1+yOokAZC4L647o37nuR9pCz5XCSGhNWqjSjddfDfAxuEX
-         ZH3w==
+         :cc;
+        bh=iMTvT7NsOtiVrtb1ierayNB1hBIVaQnurs1N94fLgF8=;
+        b=ersYV9JSN6rOg3zxZlrbNSTpFEgDl1UVqBfTJhN1zQ3nZ/fL+Uz/r80g3jc1Y4wCcj
+         6CEDOJyZGpVJPgR6W+Y3rlx/AljcLlvRUYImunH3HBi6IgN4HgHbbJU3MkEJ/+JUiiSx
+         Yb99wopDfmk2MEBWI564gXfQQbK56cb2l3NPARPHdu4GklGGSZ7F6/mVwNHKjcGJ6zk4
+         OPii0OdHtbiSUNbqdM7RF9CZ8Vf09USAcWTVVaI0F4vJvtKoDwcQKgmgQgdRObJtD4Yk
+         4TYgzvcyiuoyX55Lk5nn5oFssD40zA3OqYmbdymWqBIuVfObmph5EghMhDh7lma+39oF
+         ZA2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=3NQdFGcDVG2JjfnOpdeoQHmcElnD9tk5T9TB7oLbDK4=;
-        b=3MW0Vm8PN2ItUfK1f6IgBemxtDM85wXr/6gq7BveUwy0wU1addYAbedxKH+QJ+nJGe
-         KF4I/tOgJRxIlloNzNEgHyhW5t4Z5lkkV3oiF/aG16Fq8JBMdD3XVEi0c/AzFzY7lQaI
-         kg/a5AVZDGBLEXscNdVGqeBb3tdtCpCw+Pt83xkatINuMAJ2xhdArj3j1aa4UFO9H1IP
-         3YtzFWj2O3RN1Qpz8aM/Zh8SIqSTGmx2+4cgudXnwUZfH5MkbxJ5k+0t9gELgv1ZFOKy
-         Qz2VWerNYzSqC7CgTlnMSrtapS3lfb8YBkEVLPaOWHbcUr2uJU9g0T/7mvNO7DEY91Y6
-         oECw==
-X-Gm-Message-State: AOAM5321ylVSmJn56zsRZbLxedWrDtmilo5mpe4VjlgX0SmWO55jd1sw
-        y7m5TpzMDTV497dbltlRUz+1JXfQCb+WtJwN3tz2Cw==
-X-Google-Smtp-Source: ABdhPJynmFltlI6U1GhsgqUrEbW7pfoilOaw0qhDblA/+afTrHXkohHbxH17eNpN4smESxrgB/7qd3uMp8uwDBdwFok=
-X-Received: by 2002:a19:7902:: with SMTP id u2mr17022058lfc.644.1636757660891;
- Fri, 12 Nov 2021 14:54:20 -0800 (PST)
+         :message-id:subject:to:cc;
+        bh=iMTvT7NsOtiVrtb1ierayNB1hBIVaQnurs1N94fLgF8=;
+        b=AEPeFNaaqMvPK54BL14CVp03zDrvi3ru4NgPkdt5ZIzEcHm8oeMg0gCrd75z1zyoIY
+         7VJEuK3yZhAr5RZ3SMwrR1rPMxK+I3Is8l6W2wfD2iBGkTmdmqSM6TB/+Y/d72oxuLVB
+         AJuuYPaUKdU/BWJ2+KCJNgw5DNXasE/aBUflnfJJ3gVrwszi3XyhA1/8QvhxWglh3OcO
+         EQoH3c0oIfzs663nL5LT8dOda0GJqul5CIG1yVtIMH4mYO6huTiU8wXQvrvDio5so5L+
+         PFcVH3HZCUvNv1io6YHi7cwkm5HQM8tom5vb0uZxdiNSyxhtKOO8eZASpzkT782CA76P
+         FKuw==
+X-Gm-Message-State: AOAM532hSDeaA5MfCvKktKoGCxdFPN+M6JQyoG4jHXmQ/2DWdPDE0iGp
+        6jcmEgzRAOs7Y9BZj5LidIi/J2QJISrlr2xKKxelSQ==
+X-Google-Smtp-Source: ABdhPJydU+hzM9MotqBxJ2F97X4iN4bm+1rkOt+Kax0ud7PwjIKZFoahzTavEcVxq70QB9KNwcWvpJ5XcjMWnenIhzY=
+X-Received: by 2002:a05:651c:1507:: with SMTP id e7mr11130345ljf.83.1636758738318;
+ Fri, 12 Nov 2021 15:12:18 -0800 (PST)
 MIME-Version: 1.0
-References: <20210820155918.7518-1-brijesh.singh@amd.com> <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
- <061ccd49-3b9f-d603-bafd-61a067c3f6fa@intel.com> <YY6z5/0uGJmlMuM6@zn.tnic>
- <YY7FAW5ti7YMeejj@google.com> <YY7I6sgqIPubTrtA@zn.tnic> <YY7Qp8c/gTD1rT86@google.com>
- <CAA03e5GwHMPYHHq3Nkkq1HnEJUUsw-Vk+5wFCott3pmJY7WuAw@mail.gmail.com>
- <2cb3217b-8af5-4349-b59f-ca4a3703a01a@www.fastmail.com> <CAA03e5Fw9cRnb=+eJmzEB+0QmdgaGZ7=fPTUYx7f55mGVXLRMA@mail.gmail.com>
-In-Reply-To: <CAA03e5Fw9cRnb=+eJmzEB+0QmdgaGZ7=fPTUYx7f55mGVXLRMA@mail.gmail.com>
+References: <20211111154930.3603189-1-pbonzini@redhat.com>
+In-Reply-To: <20211111154930.3603189-1-pbonzini@redhat.com>
 From:   Peter Gonda <pgonda@google.com>
-Date:   Fri, 12 Nov 2021 15:54:09 -0700
-Message-ID: <CAMkAt6q9Wsw_KYypyZxhA1gkd=kFepk5rC5QeZ6Vo==P6=EAxg@mail.gmail.com>
-Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
- Hypervisor Support
-To:     Marc Orr <marcorr@google.com>
-Cc:     Andy Lutomirski <luto@kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <Thomas.Lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>
+Date:   Fri, 12 Nov 2021 16:12:06 -0700
+Message-ID: <CAMkAt6qtNcOSP93SYsj_s4EfbyV9L5K0aHgTBT+PJ5uJ-zjM1g@mail.gmail.com>
+Subject: Re: [PATCH v12 0/7] Add AMD SEV and SEV-ES intra host migration support
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        seanjc@google.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 12, 2021 at 2:43 PM Marc Orr <marcorr@google.com> wrote:
+On Thu, Nov 11, 2021 at 8:49 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
-> On Fri, Nov 12, 2021 at 1:39 PM Andy Lutomirski <luto@kernel.org> wrote:
-> >
-> >
-> >
-> > On Fri, Nov 12, 2021, at 1:30 PM, Marc Orr wrote:
-> > > On Fri, Nov 12, 2021 at 12:38 PM Sean Christopherson <seanjc@google.c=
-om> wrote:
-> > >>
-> > >> On Fri, Nov 12, 2021, Borislav Petkov wrote:
-> > >> > On Fri, Nov 12, 2021 at 07:48:17PM +0000, Sean Christopherson wrot=
-e:
-> > >> > > Yes, but IMO inducing a fault in the guest because of _host_ bug=
- is wrong.
-> > >> >
-> > >> > What do you suggest instead?
-> > >>
-> > >> Let userspace decide what is mapped shared and what is mapped privat=
-e.  The kernel
-> > >> and KVM provide the APIs/infrastructure to do the actual conversions=
- in a thread-safe
-> > >> fashion and also to enforce the current state, but userspace is the =
-control plane.
-> > >>
-> > >> It would require non-trivial changes in userspace if there are multi=
-ple processes
-> > >> accessing guest memory, e.g. Peter's networking daemon example, but =
-it _is_ fully
-> > >> solvable.  The exit to userspace means all three components (guest, =
-kernel,
-> > >> and userspace) have full knowledge of what is shared and what is pri=
-vate.  There
-> > >> is zero ambiguity:
-> > >>
-> > >>   - if userspace accesses guest private memory, it gets SIGSEGV or w=
-hatever.
-> > >>   - if kernel accesses guest private memory, it does BUG/panic/oops[=
-*]
-> > >>   - if guest accesses memory with the incorrect C/SHARED-bit, it get=
-s killed.
-> > >>
-> > >> This is the direction KVM TDX support is headed, though it's obvious=
-ly still a WIP.
-> > >>
-> > >> And ideally, to avoid implicit conversions at any level, hardware ve=
-ndors' ABIs
-> > >> define that:
-> > >>
-> > >>   a) All convertible memory, i.e. RAM, starts as private.
-> > >>   b) Conversions between private and shared must be done via explici=
-t hypercall.
-> > >>
-> > >> Without (b), userspace and thus KVM have to treat guest accesses to =
-the incorrect
-> > >> type as implicit conversions.
-> > >>
-> > >> [*] Sadly, fully preventing kernel access to guest private is not po=
-ssible with
-> > >>     TDX, especially if the direct map is left intact.  But maybe in =
-the future
-> > >>     TDX will signal a fault instead of poisoning memory and leaving =
-a #MC mine.
-> > >
-> > > In this proposal, consider a guest driver instructing a device to DMA
-> > > write a 1 GB memory buffer. A well-behaved guest driver will ensure
-> > > that the entire 1 GB is marked shared. But what about a malicious or
-> > > buggy guest? Let's assume a bad guest driver instructs the device to
-> > > write guest private memory.
-> > >
-> > > So now, the virtual device, which might be implemented as some host
-> > > side process, needs to (1) check and lock all 4k constituent RMP
-> > > entries (so they're not converted to private while the DMA write is
-> > > taking palce), (2) write the 1 GB buffer, and (3) unlock all 4 k
-> > > constituent RMP entries? If I'm understanding this correctly, then th=
-e
-> > > synchronization will be prohibitively expensive.
-> >
-> > Let's consider a very very similar scenario: consider a guest driver se=
-tting up a 1 GB DMA buffer.  The virtual device, implemented as host proces=
-s, needs to (1) map (and thus lock *or* be prepared for faults) in 1GB / 4k=
- pages of guest memory (so they're not *freed* while the DMA write is takin=
-g place), (2) write the buffer, and (3) unlock all the pages.  Or it can lo=
-ck them at setup time and keep them locked for a long time if that's approp=
-riate.
-> >
-> > Sure, the locking is expensive, but it's nonnegotiable.  The RMP issue =
-is just a special case of the more general issue that the host MUST NOT ACC=
-ESS GUEST MEMORY AFTER IT'S FREED.
+> This is a fixed version of Peter Gonda's series.  The main change is
+> that it uses the "bugged" VM implementation (now renamed to "dead")
+> to ensure the source VM is inoperational, and that it correctly
+> charges the current cgroup for the ASID.
 >
-> Good point.
+> I also renamed the capability to KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM,
+> since it is similar to KVM_CAP_VM_COPY_ENC_CONTEXT_FROM.
+>
+> Paolo Bonzini (2):
+>   KVM: generalize "bugged" VM to "dead" VM
+>   KVM: SEV: provide helpers to charge/uncharge misc_cg
 
-Thanks for the responses Andy.
+Thanks for these Paolo! I took a quick look through these. I can send
+some additional testing for the new "dead" VM functionality on the
+source side VM and I'll try to test when the cgroup is maxed out we
+can still do an intra-host migration (make sure we aren't charging
+double during the migration) in a follow up patch. I guess the cgroup
+stuff in general could use some testing.
 
-Having a way for userspace to lock pages as shared was an idea I just
-proposed the simplest solution to start the conversation. So what we
-could do here is change map to error if the selected region has
-private pages, if the region is mapped we can then lock the pages
-shared. Now processes mapping guest memory that are well behaved can
-be safe from RMP violations. That seems like a reasonable solution for
-allowing userspace to know if guest memory is accessible or not. Or do
-you have other ideas to meet your other comment:
+Also thanks for the detailed reviews Sean.
 
-> SEV-SNP, TDX, and any reasonable software solution all require that the
-> host know which pages are private and which pages are shared.  Sure, the
-> old SEV-ES Linux host implementation was very simple, but it's nasty and
-> fundamentally can't support migration.
+>
+> Peter Gonda (5):
+>   KVM: SEV: Refactor out sev_es_state struct
+>   KVM: SEV: Add support for SEV intra host migration
+>   KVM: SEV: Add support for SEV-ES intra host migration
+>   selftest: KVM: Add open sev dev helper
+>   selftest: KVM: Add intra host migration tests
+>
+>  Documentation/virt/kvm/api.rst                |  15 +
+>  arch/x86/include/asm/kvm_host.h               |   1 +
+>  arch/x86/kvm/svm/sev.c                        | 303 +++++++++++++++---
+>  arch/x86/kvm/svm/svm.c                        |   9 +-
+>  arch/x86/kvm/svm/svm.h                        |  28 +-
+>  arch/x86/kvm/x86.c                            |   8 +-
+>  include/linux/kvm_host.h                      |  12 +-
+>  include/uapi/linux/kvm.h                      |   1 +
+>  tools/testing/selftests/kvm/Makefile          |   3 +-
+>  .../testing/selftests/kvm/include/kvm_util.h  |   1 +
+>  .../selftests/kvm/include/x86_64/svm_util.h   |   2 +
+>  tools/testing/selftests/kvm/lib/kvm_util.c    |  24 +-
+>  tools/testing/selftests/kvm/lib/x86_64/svm.c  |  13 +
+>  .../selftests/kvm/x86_64/sev_migrate_tests.c  | 203 ++++++++++++
+>  virt/kvm/kvm_main.c                           |  10 +-
+>  15 files changed, 551 insertions(+), 82 deletions(-)
+>  create mode 100644 tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c
+>
+> --
+> 2.27.0
+>
