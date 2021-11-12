@@ -2,153 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D4A6B44F01A
-	for <lists+kvm@lfdr.de>; Sat, 13 Nov 2021 00:53:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C836C44F01D
+	for <lists+kvm@lfdr.de>; Sat, 13 Nov 2021 00:56:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234058AbhKLX4G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Nov 2021 18:56:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56356 "EHLO
+        id S232341AbhKLX7s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Nov 2021 18:59:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231261AbhKLX4F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Nov 2021 18:56:05 -0500
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5CC4C061766
-        for <kvm@vger.kernel.org>; Fri, 12 Nov 2021 15:53:13 -0800 (PST)
-Received: by mail-pl1-x62d.google.com with SMTP id q17so9616372plr.11
-        for <kvm@vger.kernel.org>; Fri, 12 Nov 2021 15:53:13 -0800 (PST)
+        with ESMTP id S231261AbhKLX7s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Nov 2021 18:59:48 -0500
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2601C061766
+        for <kvm@vger.kernel.org>; Fri, 12 Nov 2021 15:56:56 -0800 (PST)
+Received: by mail-pf1-x449.google.com with SMTP id g142-20020a625294000000b004946d789d14so6503359pfb.3
+        for <kvm@vger.kernel.org>; Fri, 12 Nov 2021 15:56:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=gojtBW/r/xf8g2//78l2TEMOnJOiXV3waj3qkECVeqU=;
-        b=cPdRbXCvdzWASSXvVHD7Rc/r30jMYD5c7cQeFJIk1Ww78VP3OjZXIBBwjWfp1gh9K5
-         o6BM6uiLSvYqTimqPrqerL7mdyCNlV6Qm97YgzD1OAomTJVQJLawjbSSYT8rGXcfDRNT
-         fgpvRVRdDEyOvbgCB+Q8fwo/QLCo01tdhJuDx5duYaWnS2QkEG5vNUOSnRnv8d8lPnSo
-         TdAPS2b3JnIr4EJd7A4X94oJ7ZWoo2i1j6EHEITZY3gM6PcwPwqi174GN7N7ioW3UeRm
-         ymBult5TNbzcAvXW4DWxunqHKI3o9ylCHRyD4px0YOY+n9dRSf/pa/vBJdwXXaZAVHZv
-         +C7w==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=l7xQsaxv5sxUj0+hALtV5qXlMcVkfZThwYuBhUpNLxM=;
+        b=CIZYRb0//pvhNU7aFsKCbNsZC9PvL9ZmhQ+5AcXZXEtH0kTrmlwEIJ2Fy+BPl4nmBN
+         OqezmQWzMASZzDytowoMDKbPslaFOiM4TSK82dz3LuNf8Z75wNL23oTg3fH0/OyZjwD8
+         mBA2NiAsh3+g6U9RoTZqg5mMMV423BGsuW6bOMUpUSfI005wQs43ZNYjVV4V4i9JmyeK
+         ZPzLHNfMk5EeG58/6p/UASEzVCYXDFdkY6TTTOmJisBFcQczTniSrDnCDlLJy6mez2fb
+         D8OPcZ41mTnqT4wB7TKKvV8c7QxxZpwxLDzmGQG/FI7pD0sIvhUdx7QTUimT+LrVoj1l
+         iKVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=gojtBW/r/xf8g2//78l2TEMOnJOiXV3waj3qkECVeqU=;
-        b=O5juzri0VtvE2CGXtU+GZPhGr4AsOWPnvOG4ywDF1PY38ZDT/EbZZxylUXrf2Aywg2
-         OQ7cuFwaFPFRlqsDfu8572ZOKrdnuGOyhEP/phQc7ceE7rcSrPXPWZ7HGDiV7DpVUyv5
-         fvqOYGjD7075IG8JbYREKO7ZqodO5YjYiGMO3BFohQuKgUz0QtFgKvIKtUNgBLLxBWvm
-         5WslUbRrxz0VsqO4ArayC1nWyQ88H5r7aHeZjLb4aZESLyTI3hcJaHeQpw9U7dxgK5oI
-         aGrd71DJWX53OeYBhQf5+e7uYk38bsGL/HIWONR+AmxgNim6E7sxXbcLkiWtUX4pk1f7
-         7RiQ==
-X-Gm-Message-State: AOAM5319dITH9q95OrUrK4ejgITNd2Q+9punbDrsJcTSWSQNOxAODww0
-        YoNWBixt8NM6phBolo83qpgdIg==
-X-Google-Smtp-Source: ABdhPJwU07AJSZ2zDITrDqE5QeTuOZmtItO8muoN5QPSoPbBBJPmnQtrCEPjVLpFM1x45iewkiYAbA==
-X-Received: by 2002:a17:90a:aa0e:: with SMTP id k14mr23007162pjq.88.1636761193271;
-        Fri, 12 Nov 2021 15:53:13 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id t21sm5525037pgo.12.2021.11.12.15.53.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Nov 2021 15:53:12 -0800 (PST)
-Date:   Fri, 12 Nov 2021 23:53:08 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Keqian Zhu <zhukeqian1@huawei.com>,
-        David Hildenbrand <david@redhat.com>
-Subject: Re: [RFC 02/19] KVM: x86/mmu: Batch TLB flushes for a single zap
-Message-ID: <YY7+ZARmQV+eWbDL@google.com>
-References: <20211110223010.1392399-1-bgardon@google.com>
- <20211110223010.1392399-3-bgardon@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211110223010.1392399-3-bgardon@google.com>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=l7xQsaxv5sxUj0+hALtV5qXlMcVkfZThwYuBhUpNLxM=;
+        b=WhkKqHVbfjJhKmEHXhhCDioviCP+F+sgaT7kcIHbtKFSxZRngFds7OYxBfK72vK+e9
+         1J+15gc86xpLUmKqoQdtq7GSAVolWsLmfAinH5dbza+E9gKTcKpTyxEstwiL59icJ7TZ
+         Vp1FoO/nCB58+EBYHcoamLajKb/HKSxkGAPrT3TIc8FKo7JD0gHZbd8isZAm4GnYwHJp
+         klQZ8r84P+HqIamAfFwZRFiLsBDu9ls08nsF1NO62nBS1sUR1pKEWxBpTUd9laX6yr3d
+         nsCbiBvTO7y8I5A3ZJHH/DCVaLLHbtMV5QtG9oEWxsKv40i77pp8Sp9isi6bghe5Wis/
+         l6ng==
+X-Gm-Message-State: AOAM530HMF+eSuVklrrv9lV4JQUeT8AFIzNFPK+VpMKsKK5EtLuTERrr
+        wOTqsWKJ/UEPfSoqkxS/DbjvUGio3dBMXQZ79lnV/V5US6BfHn3QM6JtBMEt8fdm3rqKt16yauX
+        VqrDOOuDrTjxGKxg3mcF+qL6SB/+BHBYvp/Cg8P8fnvXrGsep0vDPTZEtFwkLIm4=
+X-Google-Smtp-Source: ABdhPJzz3odUurIFKtEPFAXuCCY+3Ms0ET8wt1AkwuLwISbovLReojtWUDOXdCtW3nmliNwIohSM/NnYXcBtTA==
+X-Received: from tortoise.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1a0d])
+ (user=jmattson job=sendgmr) by 2002:a17:903:2445:b0:142:2471:644e with SMTP
+ id l5-20020a170903244500b001422471644emr12420220pls.48.1636761416173; Fri, 12
+ Nov 2021 15:56:56 -0800 (PST)
+Date:   Fri, 12 Nov 2021 15:56:52 -0800
+Message-Id: <20211112235652.1127814-1-jmattson@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.34.0.rc1.387.gb447b232ab-goog
+Subject: [kvm-unit-tests PATCH] x86/pmu: Test PMU virtualization on emulated instructions
+From:   Jim Mattson <jmattson@google.com>
+To:     kvm@vger.kernel.org, pbonzini@redhat.com
+Cc:     Jim Mattson <jmattson@google.com>,
+        Eric Hankland <ehankland@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 10, 2021, Ben Gardon wrote:
-> When recursively handling a removed TDP page table, the TDP MMU will
-> flush the TLBs and queue an RCU callback to free the PT. If the original
-> change zapped a non-leaf SPTE at PG_LEVEL_1G or above, that change will
-> result in many unnecessary TLB flushes when one would suffice. Queue all
-> the PTs which need to be freed on a list and wait to queue RCU callbacks
-> to free them until after all the recursive callbacks are done.
+Add tests of "instructions retired" and "branch instructions retired,"
+to ensure that these events count emulated instructions.
 
-I'm pretty sure we can do this without tracking disconnected SPs.  The whole point
-of protecting TDP MMU with RCU is to wait until _all_ CPUs are guaranateed to have
-dropped references.  Emphasis on "all" because that also includes the CPU that's
-doing the zapping/replacement!
+Signed-off-by: Eric Hankland <ehankland@google.com>
+[jmattson:
+  - Added command-line parameter to conditionally run the new tests.
+  - Added pmu-emulation test to unittests.cfg
+]
+Signed-off-by: Jim Mattson <jmattson@google.com>
+---
+ x86/pmu.c         | 80 +++++++++++++++++++++++++++++++++++++++++++++++
+ x86/unittests.cfg |  7 +++++
+ 2 files changed, 87 insertions(+)
 
-And since the current CPU is required to hold RCU, we can use its RCU lock as a
-proxy for all vCPUs executing in the guest.  That will require either flushing in
-zap_gfn_range() or requiring callers to hold, or more likely a mix of both so that
-flows that zap multiple roots or both TDP and legacy MMU pages can batch flushes
-
-If this doesn't sound completely bonkers, I'd like to pick this up next week, I
-wandered into KVM's handling of invalidated roots and have patches that would
-conflict in weird ways with this idea.
-
-So I think this can simply be (sans zap_gfn_range() changes):
-
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 4e226cdb40d9..d2303bca4449 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -431,9 +431,6 @@ static void handle_removed_tdp_mmu_page(struct kvm *kvm, tdp_ptep_t pt,
-                                    shared);
-        }
+diff --git a/x86/pmu.c b/x86/pmu.c
+index ec61ac956a55..a159333b0c73 100644
+--- a/x86/pmu.c
++++ b/x86/pmu.c
+@@ -33,6 +33,12 @@
  
--       kvm_flush_remote_tlbs_with_address(kvm, gfn,
--                                          KVM_PAGES_PER_HPAGE(level + 1));
--
-        call_rcu(&sp->rcu_head, tdp_mmu_free_sp_rcu_callback);
- }
+ #define N 1000000
  
-@@ -716,11 +713,11 @@ static inline bool tdp_mmu_iter_cond_resched(struct kvm *kvm,
-                return false;
- 
-        if (need_resched() || rwlock_needbreak(&kvm->mmu_lock)) {
--               rcu_read_unlock();
--
-                if (flush)
-                        kvm_flush_remote_tlbs(kvm);
- 
-+               rcu_read_unlock();
++#define KVM_FEP "ud2; .byte 'k', 'v', 'm';"
++// These values match the number of instructions and branches in the
++// assembly block in check_emulated_instr().
++#define EXPECTED_INSTR 17
++#define EXPECTED_BRNCH 5
 +
-                if (shared)
-                        cond_resched_rwlock_read(&kvm->mmu_lock);
-                else
-@@ -817,7 +814,6 @@ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
-        }
- 
-        rcu_read_unlock();
--       return flush;
+ typedef struct {
+ 	uint32_t ctr;
+ 	uint32_t config;
+@@ -468,6 +474,77 @@ static void check_running_counter_wrmsr(void)
+ 	report_prefix_pop();
  }
  
- /*
-@@ -954,6 +950,8 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
-                ret = RET_PF_SPURIOUS;
-        else if (!tdp_mmu_set_spte_atomic(vcpu->kvm, iter, new_spte))
-                return RET_PF_RETRY;
-+       else if (<old spte was present shadow page>)
-+               kvm_flush_remote_tlbs(kvm);
++static void check_emulated_instr(void)
++{
++	uint64_t status, instr_start, brnch_start;
++	pmu_counter_t brnch_cnt = {
++		.ctr = MSR_IA32_PERFCTR0,
++		/* branch instructions */
++		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[5].unit_sel,
++		.count = 0,
++	};
++	pmu_counter_t instr_cnt = {
++		.ctr = MSR_IA32_PERFCTR0 + 1,
++		/* instructions */
++		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[1].unit_sel,
++		.count = 0,
++	};
++	report_prefix_push("emulated instruction");
++
++	wrmsr(MSR_CORE_PERF_GLOBAL_OVF_CTRL,
++	      rdmsr(MSR_CORE_PERF_GLOBAL_STATUS));
++
++	start_event(&brnch_cnt);
++	start_event(&instr_cnt);
++
++	brnch_start = -EXPECTED_BRNCH;
++	instr_start = -EXPECTED_INSTR;
++	wrmsr(MSR_IA32_PERFCTR0, brnch_start);
++	wrmsr(MSR_IA32_PERFCTR0 + 1, instr_start);
++	// KVM_FEP is a magic prefix that forces emulation so
++	// 'KVM_FEP "jne label\n"' just counts as a single instruction.
++	asm volatile(
++		"mov $0x0, %%eax\n"
++		"cmp $0x0, %%eax\n"
++		KVM_FEP "jne label\n"
++		KVM_FEP "jne label\n"
++		KVM_FEP "jne label\n"
++		KVM_FEP "jne label\n"
++		KVM_FEP "jne label\n"
++		"mov $0xa, %%eax\n"
++		"cpuid\n"
++		"mov $0xa, %%eax\n"
++		"cpuid\n"
++		"mov $0xa, %%eax\n"
++		"cpuid\n"
++		"mov $0xa, %%eax\n"
++		"cpuid\n"
++		"mov $0xa, %%eax\n"
++		"cpuid\n"
++		"label:\n"
++		:
++		:
++		: "eax", "ebx", "ecx", "edx");
++
++	wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, 0);
++
++	stop_event(&brnch_cnt);
++	stop_event(&instr_cnt);
++
++	// Check that the end count - start count is at least the expected
++	// number of instructions and branches.
++	report(instr_cnt.count - instr_start >= EXPECTED_INSTR,
++	       "instruction count");
++	report(brnch_cnt.count - brnch_start >= EXPECTED_BRNCH,
++	       "branch count");
++	// Additionally check that those counters overflowed properly.
++	status = rdmsr(MSR_CORE_PERF_GLOBAL_STATUS);
++	report(status & 1, "instruction counter overflow");
++	report(status & 2, "branch counter overflow");
++
++	report_prefix_pop();
++}
++
+ static void check_counters(void)
+ {
+ 	check_gp_counters();
+@@ -563,6 +640,9 @@ int main(int ac, char **av)
  
-        /*
-         * If the page fault was caused by a write but the page is write
+ 	check_counters();
+ 
++	if (ac > 1 && !strcmp(av[1], "emulation"))
++		check_emulated_instr();
++
+ 	if (rdmsr(MSR_IA32_PERF_CAPABILITIES) & PMU_CAP_FW_WRITES) {
+ 		gp_counter_base = MSR_IA32_PMC0;
+ 		report_prefix_push("full-width writes");
+diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+index 3000e53c790f..2aedb24dc4ff 100644
+--- a/x86/unittests.cfg
++++ b/x86/unittests.cfg
+@@ -185,6 +185,13 @@ extra_params = -cpu host,migratable=no
+ check = /sys/module/kvm/parameters/ignore_msrs=N
+ check = /proc/sys/kernel/nmi_watchdog=0
+ 
++[pmu_emulation]
++file = pmu.flat
++arch = x86_64
++extra_params = -cpu max -append emulation
++check = /sys/module/kvm_intel/parameters/force_emulation_prefix=Y
++check = /proc/sys/kernel/nmi_watchdog=0
++
+ [vmware_backdoors]
+ file = vmware_backdoors.flat
+ extra_params = -machine vmport=on -cpu max
+-- 
+2.34.0.rc1.387.gb447b232ab-goog
 
-
-> +static inline bool tdp_mmu_set_spte_atomic(struct kvm *kvm,
-> +					   struct tdp_iter *iter,
-> +					   u64 new_spte)
-> +{
-> +	return __tdp_mmu_set_spte_atomic(kvm, iter, new_spte, NULL);
-
-This helper and refactoring belongs in patch 19.  It is impossible to review without
-the context of its user(s).
