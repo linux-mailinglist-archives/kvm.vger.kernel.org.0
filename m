@@ -2,180 +2,216 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A0E744EEC6
-	for <lists+kvm@lfdr.de>; Fri, 12 Nov 2021 22:43:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 843CE44EF03
+	for <lists+kvm@lfdr.de>; Fri, 12 Nov 2021 23:03:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235783AbhKLVqR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Nov 2021 16:46:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55372 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235729AbhKLVqQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Nov 2021 16:46:16 -0500
-Received: from mail-oi1-x231.google.com (mail-oi1-x231.google.com [IPv6:2607:f8b0:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09984C061767
-        for <kvm@vger.kernel.org>; Fri, 12 Nov 2021 13:43:25 -0800 (PST)
-Received: by mail-oi1-x231.google.com with SMTP id bf8so20340200oib.6
-        for <kvm@vger.kernel.org>; Fri, 12 Nov 2021 13:43:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=p6BJgAR2dKpdI5PQSFC6gOgUXqAUQZJtadmObr7tjTY=;
-        b=AnRQXnEvNzvr8lmbdoVBi472Kzz/I2xvy53cquSxtFszpAe3zph3LuOPEc5/48deXh
-         xzvEzM60QjlA+Vpeqcr5k2Xs9hIpwxJHjlaBy+UJ+tVrUBkcD59RCdQ+/DT38Ot+4p9h
-         v0AIhXq1nE9873XX18Cuk0CjaQh/m87fMJI7jgMcSqhzslXXtaw6E3pz1r6NeJVqvqhN
-         K7/P/WRPlJwR11gNsOk5JE/VBsulqTP5MhsyHwJIlWm8Cg31Kz6C4pLrDMcWcLhAv+2h
-         1h3Rk1x09vCadHQBu9BU9p2uxYWPHVizVC0N06lkIufqe7Tq8CJVeVZLg5AIwOIU7Q0y
-         7plA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=p6BJgAR2dKpdI5PQSFC6gOgUXqAUQZJtadmObr7tjTY=;
-        b=Qd7KYpQNrRF2W5rlITiY2DXIAkDLE5vfLUcAh1VWxNUfRFthlVUZZxnuDXZ2qR7Rb+
-         GYq1Kc6brkyDVbZ2p3Lpt1sj9UlA4RoaI2GkkvXBE/Pyyw8p115blKzBip1vlnv8DJlr
-         Qw1vZbZV/0pKEGqCpTGbGtF0uPkcj5tnMQmOvKA9XDsMWBQa9+WxYux/5UjHnXdkszzh
-         R9YFhjphbMh8q/gpo2fMbWLzJP8jL40D3/d4XMLATb/BzUMPXXClphV2R9e+g/1x35Fa
-         9kczPEXSuGCl5CZU9LAlM6GXfiOVZUX7YoQkDF8+dIxbUzFi7H/Ccn32o1lYjZcV04BI
-         zzGw==
-X-Gm-Message-State: AOAM530ziRoKJRKdDKqtetg0mgOPxo5bHpu/YiLcHsML3pPsysHw6ZMF
-        1yHPPujpUo221eiGdn9zydD2etL+WiSY4X/hJ5F34w==
-X-Google-Smtp-Source: ABdhPJwN1DMFj8lwZlramd1I0OGWe2kSl7QSbL+hhwnl5gfxV3O28d9EPTR8alNht5b3hCsOpj1PmUPMkqmyQaJMInE=
-X-Received: by 2002:aca:2319:: with SMTP id e25mr28956699oie.164.1636753404063;
- Fri, 12 Nov 2021 13:43:24 -0800 (PST)
+        id S235415AbhKLWGS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Nov 2021 17:06:18 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:45063 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234266AbhKLWGN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 12 Nov 2021 17:06:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1636754601;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=aHecVeHqCvAtGHYXk6Nr/Lq6X6UdkK02UVclA5l2QwU=;
+        b=Yw4zvIPNN+hd8mNiyR8qcjEzo91kkzf38OVoKLdyXG2AShqs7NVlt6FnJxj8GS6yRMZ13r
+        uJnFtTjQrwI5s+WAfGYYr6JyjKwT9rYcbP1haLwOo97QwS8TvGnz0WgACUZYd0A3IEc3nW
+        NgQ3gL4I+IxfG2+MQDVXWHNB3RKh+a0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-351-d0ZG5qS7NwOr-8O_bHKLHg-1; Fri, 12 Nov 2021 17:03:18 -0500
+X-MC-Unique: d0ZG5qS7NwOr-8O_bHKLHg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0B592875109;
+        Fri, 12 Nov 2021 22:03:17 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B02185D9D3;
+        Fri, 12 Nov 2021 22:03:16 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [GIT PULL] Second batch of KVM changes for Linux 5.16 merge window
+Date:   Fri, 12 Nov 2021 17:03:15 -0500
+Message-Id: <20211112220315.3995734-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-References: <20210820155918.7518-1-brijesh.singh@amd.com> <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
- <061ccd49-3b9f-d603-bafd-61a067c3f6fa@intel.com> <YY6z5/0uGJmlMuM6@zn.tnic>
- <YY7FAW5ti7YMeejj@google.com> <YY7I6sgqIPubTrtA@zn.tnic> <YY7Qp8c/gTD1rT86@google.com>
- <CAA03e5GwHMPYHHq3Nkkq1HnEJUUsw-Vk+5wFCott3pmJY7WuAw@mail.gmail.com> <2cb3217b-8af5-4349-b59f-ca4a3703a01a@www.fastmail.com>
-In-Reply-To: <2cb3217b-8af5-4349-b59f-ca4a3703a01a@www.fastmail.com>
-From:   Marc Orr <marcorr@google.com>
-Date:   Fri, 12 Nov 2021 13:43:13 -0800
-Message-ID: <CAA03e5Fw9cRnb=+eJmzEB+0QmdgaGZ7=fPTUYx7f55mGVXLRMA@mail.gmail.com>
-Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
- Hypervisor Support
-To:     Andy Lutomirski <luto@kernel.org>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Peter Gonda <pgonda@google.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <Thomas.Lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <Michael.Roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 12, 2021 at 1:39 PM Andy Lutomirski <luto@kernel.org> wrote:
->
->
->
-> On Fri, Nov 12, 2021, at 1:30 PM, Marc Orr wrote:
-> > On Fri, Nov 12, 2021 at 12:38 PM Sean Christopherson <seanjc@google.com=
-> wrote:
-> >>
-> >> On Fri, Nov 12, 2021, Borislav Petkov wrote:
-> >> > On Fri, Nov 12, 2021 at 07:48:17PM +0000, Sean Christopherson wrote:
-> >> > > Yes, but IMO inducing a fault in the guest because of _host_ bug i=
-s wrong.
-> >> >
-> >> > What do you suggest instead?
-> >>
-> >> Let userspace decide what is mapped shared and what is mapped private.=
-  The kernel
-> >> and KVM provide the APIs/infrastructure to do the actual conversions i=
-n a thread-safe
-> >> fashion and also to enforce the current state, but userspace is the co=
-ntrol plane.
-> >>
-> >> It would require non-trivial changes in userspace if there are multipl=
-e processes
-> >> accessing guest memory, e.g. Peter's networking daemon example, but it=
- _is_ fully
-> >> solvable.  The exit to userspace means all three components (guest, ke=
-rnel,
-> >> and userspace) have full knowledge of what is shared and what is priva=
-te.  There
-> >> is zero ambiguity:
-> >>
-> >>   - if userspace accesses guest private memory, it gets SIGSEGV or wha=
-tever.
-> >>   - if kernel accesses guest private memory, it does BUG/panic/oops[*]
-> >>   - if guest accesses memory with the incorrect C/SHARED-bit, it gets =
-killed.
-> >>
-> >> This is the direction KVM TDX support is headed, though it's obviously=
- still a WIP.
-> >>
-> >> And ideally, to avoid implicit conversions at any level, hardware vend=
-ors' ABIs
-> >> define that:
-> >>
-> >>   a) All convertible memory, i.e. RAM, starts as private.
-> >>   b) Conversions between private and shared must be done via explicit =
-hypercall.
-> >>
-> >> Without (b), userspace and thus KVM have to treat guest accesses to th=
-e incorrect
-> >> type as implicit conversions.
-> >>
-> >> [*] Sadly, fully preventing kernel access to guest private is not poss=
-ible with
-> >>     TDX, especially if the direct map is left intact.  But maybe in th=
-e future
-> >>     TDX will signal a fault instead of poisoning memory and leaving a =
-#MC mine.
-> >
-> > In this proposal, consider a guest driver instructing a device to DMA
-> > write a 1 GB memory buffer. A well-behaved guest driver will ensure
-> > that the entire 1 GB is marked shared. But what about a malicious or
-> > buggy guest? Let's assume a bad guest driver instructs the device to
-> > write guest private memory.
-> >
-> > So now, the virtual device, which might be implemented as some host
-> > side process, needs to (1) check and lock all 4k constituent RMP
-> > entries (so they're not converted to private while the DMA write is
-> > taking palce), (2) write the 1 GB buffer, and (3) unlock all 4 k
-> > constituent RMP entries? If I'm understanding this correctly, then the
-> > synchronization will be prohibitively expensive.
->
-> Let's consider a very very similar scenario: consider a guest driver sett=
-ing up a 1 GB DMA buffer.  The virtual device, implemented as host process,=
- needs to (1) map (and thus lock *or* be prepared for faults) in 1GB / 4k p=
-ages of guest memory (so they're not *freed* while the DMA write is taking =
-place), (2) write the buffer, and (3) unlock all the pages.  Or it can lock=
- them at setup time and keep them locked for a long time if that's appropri=
-ate.
->
-> Sure, the locking is expensive, but it's nonnegotiable.  The RMP issue is=
- just a special case of the more general issue that the host MUST NOT ACCES=
-S GUEST MEMORY AFTER IT'S FREED.
+Linus,
 
-Good point.
+The following changes since commit debe436e77c72fcee804fb867f275e6d31aa999c:
+
+  Merge tag 'ext4_for_linus' of git://git.kernel.org/pub/scm/linux/kernel/git/tytso/ext4 (2021-11-10 17:05:37 -0800)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+
+for you to fetch changes up to 84886c262ebcfa40751ed508268457af8a20c1aa:
+
+  Merge tag 'kvmarm-fixes-5.16-1' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into kvm-master (2021-11-12 16:01:55 -0500)
+
+----------------------------------------------------------------
+New x86 features:
+
+* Guest API and guest kernel support for SEV live migration
+
+* SEV and SEV-ES intra-host migration
+
+Bugfixes and cleanups for x86:
+
+* Fix misuse of gfn-to-pfn cache when recording guest steal time / preempted status
+
+* Fix selftests on APICv machines
+
+* Fix sparse warnings
+
+* Fix detection of KVM features in CPUID
+
+* Cleanups for bogus writes to MSR_KVM_PV_EOI_EN
+
+* Fixes and cleanups for MSR bitmap handling
+
+* Cleanups for INVPCID
+
+* Make x86 KVM_SOFT_MAX_VCPUS consistent with other architectures
+
+Bugfixes for ARM:
+
+* Fix finalization of host stage2 mappings
+
+* Tighten the return value of kvm_vcpu_preferred_target()
+
+* Make sure the extraction of ESR_ELx.EC is limited to architected bits
+
+----------------------------------------------------------------
+Ashish Kalra (3):
+      EFI: Introduce the new AMD Memory Encryption GUID.
+      x86/kvm: Add guest support for detecting and enabling SEV Live Migration feature.
+      x86/kvm: Add kexec support for SEV Live Migration.
+
+Brijesh Singh (2):
+      x86/kvm: Add AMD SEV specific Hypercall3
+      mm: x86: Invoke hypercall when page encryption status is changed
+
+David Woodhouse (1):
+      KVM: x86: Fix recording of guest steal time / preempted status
+
+Jim Mattson (1):
+      kvm: x86: Convert return type of *is_valid_rdpmc_ecx() to bool
+
+Junaid Shahid (1):
+      kvm: mmu: Use fast PF path for access tracking of huge pages when possible
+
+Mark Rutland (1):
+      KVM: arm64: Extract ESR_ELx.EC only
+
+Maxim Levitsky (1):
+      KVM: x86: inhibit APICv when KVM_GUESTDBG_BLOCKIRQ active
+
+Paolo Bonzini (8):
+      Merge branch 'kvm-guest-sev-migration' into kvm-master
+      KVM: generalize "bugged" VM to "dead" VM
+      KVM: SEV: provide helpers to charge/uncharge misc_cg
+      Merge branch 'kvm-sev-move-context' into kvm-master
+      Merge branch 'kvm-5.16-fixes' into kvm-master
+      KVM: x86: move guest_pv_has out of user_access section
+      KVM: SEV: unify cgroup cleanup code for svm_vm_migrate_from
+      Merge tag 'kvmarm-fixes-5.16-1' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into kvm-master
+
+Paul Durrant (1):
+      KVM: x86: Make sure KVM_CPUID_FEATURES really are KVM_CPUID_FEATURES
+
+Peter Gonda (5):
+      KVM: SEV: Refactor out sev_es_state struct
+      KVM: SEV: Add support for SEV intra host migration
+      KVM: SEV: Add support for SEV-ES intra host migration
+      selftest: KVM: Add open sev dev helper
+      selftest: KVM: Add intra host migration tests
+
+Quentin Perret (1):
+      KVM: arm64: Fix host stage-2 finalization
+
+Randy Dunlap (1):
+      KVM: arm64: nvhe: Fix a non-kernel-doc comment
+
+Sean Christopherson (6):
+      KVM: x86/mmu: Properly dereference rcu-protected TDP MMU sptep iterator
+      KVM: x86: Add helper to consolidate core logic of SET_CPUID{2} flows
+      KVM: nVMX: Query current VMCS when determining if MSR bitmaps are in use
+      KVM: nVMX: Handle dynamic MSR intercept toggling
+      KVM: VMX: Macrofy the MSR bitmap getters and setters
+      KVM: nVMX: Clean up x2APIC MSR handling for L2
+
+Vipin Sharma (2):
+      KVM: VMX: Add a helper function to retrieve the GPR index for INVPCID, INVVPID, and INVEPT
+      KVM: Move INVPCID type check from vmx and svm to the common kvm_handle_invpcid()
+
+Vitaly Kuznetsov (3):
+      KVM: x86: Rename kvm_lapic_enable_pv_eoi()
+      KVM: x86: Don't update vcpu->arch.pv_eoi.msr_val when a bogus value was written to MSR_KVM_PV_EOI_EN
+      KVM: x86: Drop arbitrary KVM_SOFT_MAX_VCPUS
+
+YueHaibing (1):
+      KVM: arm64: Change the return type of kvm_vcpu_preferred_target()
+
+ Documentation/virt/kvm/api.rst                     |  14 +
+ arch/arm64/include/asm/esr.h                       |   1 +
+ arch/arm64/include/asm/kvm_host.h                  |   2 +-
+ arch/arm64/kvm/arm.c                               |   5 +-
+ arch/arm64/kvm/guest.c                             |   7 +-
+ arch/arm64/kvm/hyp/hyp-entry.S                     |   2 +-
+ arch/arm64/kvm/hyp/nvhe/host.S                     |   2 +-
+ arch/arm64/kvm/hyp/nvhe/setup.c                    |  14 +-
+ arch/arm64/kvm/hyp/nvhe/sys_regs.c                 |   2 +-
+ arch/x86/include/asm/kvm_host.h                    |   6 +-
+ arch/x86/include/asm/kvm_para.h                    |  12 +
+ arch/x86/include/asm/mem_encrypt.h                 |   4 +
+ arch/x86/include/asm/paravirt.h                    |   6 +
+ arch/x86/include/asm/paravirt_types.h              |   1 +
+ arch/x86/include/asm/processor.h                   |   5 +-
+ arch/x86/include/asm/set_memory.h                  |   1 +
+ arch/x86/include/uapi/asm/kvm_para.h               |   1 +
+ arch/x86/kernel/kvm.c                              | 109 +++++++-
+ arch/x86/kernel/paravirt.c                         |   1 +
+ arch/x86/kvm/cpuid.c                               |  93 +++++--
+ arch/x86/kvm/hyperv.c                              |   4 +-
+ arch/x86/kvm/lapic.c                               |  23 +-
+ arch/x86/kvm/lapic.h                               |   2 +-
+ arch/x86/kvm/mmu/mmu.c                             |  10 +-
+ arch/x86/kvm/mmu/tdp_mmu.c                         |   2 +-
+ arch/x86/kvm/pmu.c                                 |   2 +-
+ arch/x86/kvm/pmu.h                                 |   4 +-
+ arch/x86/kvm/svm/avic.c                            |   3 +-
+ arch/x86/kvm/svm/pmu.c                             |   5 +-
+ arch/x86/kvm/svm/sev.c                             | 299 +++++++++++++++++----
+ arch/x86/kvm/svm/svm.c                             |  14 +-
+ arch/x86/kvm/svm/svm.h                             |  28 +-
+ arch/x86/kvm/vmx/nested.c                          | 166 +++++-------
+ arch/x86/kvm/vmx/pmu_intel.c                       |   7 +-
+ arch/x86/kvm/vmx/vmx.c                             |  73 +----
+ arch/x86/kvm/vmx/vmx.h                             |  33 +++
+ arch/x86/kvm/x86.c                                 | 147 +++++++---
+ arch/x86/mm/mem_encrypt.c                          |  72 ++++-
+ arch/x86/mm/pat/set_memory.c                       |   6 +
+ include/linux/efi.h                                |   1 +
+ include/linux/kvm_host.h                           |  12 +-
+ include/uapi/linux/kvm.h                           |   1 +
+ tools/testing/selftests/kvm/Makefile               |   3 +-
+ tools/testing/selftests/kvm/include/kvm_util.h     |   1 +
+ .../selftests/kvm/include/x86_64/svm_util.h        |   2 +
+ tools/testing/selftests/kvm/lib/kvm_util.c         |  24 +-
+ tools/testing/selftests/kvm/lib/x86_64/svm.c       |  13 +
+ .../selftests/kvm/x86_64/sev_migrate_tests.c       | 203 ++++++++++++++
+ virt/kvm/kvm_main.c                                |  10 +-
+ 49 files changed, 1088 insertions(+), 370 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c
+
