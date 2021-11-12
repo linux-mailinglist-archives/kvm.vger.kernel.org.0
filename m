@@ -2,253 +2,317 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A766444EB67
-	for <lists+kvm@lfdr.de>; Fri, 12 Nov 2021 17:32:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2575544EB75
+	for <lists+kvm@lfdr.de>; Fri, 12 Nov 2021 17:33:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235142AbhKLQfA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Nov 2021 11:35:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41738 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230019AbhKLQe7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Nov 2021 11:34:59 -0500
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0F8EC061766
-        for <kvm@vger.kernel.org>; Fri, 12 Nov 2021 08:32:08 -0800 (PST)
-Received: by mail-pj1-x102a.google.com with SMTP id p18-20020a17090ad31200b001a78bb52876so7463960pju.3
-        for <kvm@vger.kernel.org>; Fri, 12 Nov 2021 08:32:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=AOGD3KRHTD+DVsnVQDWLy4b40DVugq6sLN1c4JOanrY=;
-        b=Ku52ls4HytULudGDqs9o7vDtqD/tXWsFJCBNsTmQK2ruYPvlTmxUNpOGz0L+Pn3DfG
-         r+qkz/c9To9HClV0qJxm1k6qqQd4bKEMdvrMxWlOKM1+p67CAZR4fHj5MuTCBAv7oINz
-         o6Xp85sfnz9PBVqOVip7Xi81Gcpn3NZp0TesaxNh0pyIWLMzf1SGQbou+2Eq5KDaVLJO
-         RfDD2MFFZ8+2WkZ8GdIUgR8LENafV4LCgPcdUqjzph/Y5Xfd/C1rph0RdgLg5giIO78e
-         gHISHjiKCgEy89cPOs1hMOk7a7P5E3YaeynaL5+Gt5LgXAzDAel//9Yaqc9XHrzPl24T
-         pBmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=AOGD3KRHTD+DVsnVQDWLy4b40DVugq6sLN1c4JOanrY=;
-        b=KIXt3Dq1B8L2yCFId7/TMZy8V29kPxSJIlAvObDi65MQy46rEa2qGfH2e9BPc3CcMK
-         MlnZEWyL1Zwe9jsRJMJM95OXGwlT/MvXyQcrEOmDrV+xrFKAtUSvqgMapeihQVm2DmCv
-         qtN3o5FjPcheHVk936rkAMtSKV+THbCwvn7sIVXFTNLT4TuL2MhgOD9KXtOjwQSQKGvx
-         W37tmSeTw6GltZ0rXMY41/A7e3d1wIa9gceCRbTBhAZGg+ft2IqIqIDYfCBE0oiXUWFh
-         PiD3BZ1MbACukhww2hpUiSLQxWVIkl+ACMD/mjVvgPcsy8gyLo19tOeyqZUX+4eiw/PH
-         urNw==
-X-Gm-Message-State: AOAM532joR927a9gbyb/NJdXcYCAUdK6QmIWrcSYd3n3FDtu/RgSv3jC
-        uUX2pOtYKEOA6dc71whEJQg3IQ==
-X-Google-Smtp-Source: ABdhPJzlZ2m+LsuM/R8t85T3syLLyAKU7QFbF6vpT9iXKqSA7OFbYJdPH6aNGDA984MxxZ45iDSATw==
-X-Received: by 2002:a17:90a:49:: with SMTP id 9mr37635775pjb.80.1636734727989;
-        Fri, 12 Nov 2021 08:32:07 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id v2sm6364648pfg.115.2021.11.12.08.32.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Nov 2021 08:32:07 -0800 (PST)
-Date:   Fri, 12 Nov 2021 16:32:03 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Ben Gardon <bgardon@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Andrew Jones <drjones@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        Peter Xu <peterx@redhat.com>,
-        Aaron Lewis <aaronlewis@google.com>
-Subject: Re: [PATCH 3/4] KVM: selftests: Wait for all vCPU to be created
- before entering guest mode
-Message-ID: <YY6XA4U1hRcbaG32@google.com>
-References: <20211111001257.1446428-1-dmatlack@google.com>
- <20211111001257.1446428-4-dmatlack@google.com>
- <CANgfPd-Gzjvhs0HxCZZtJqmG31rNJ71XFo_SXD9Bbpa3S2E-gg@mail.gmail.com>
- <CALzav=e3hjSf_RDM3WUuv=n0gnL_6XGrqBcP99BtAQ_mHZOpdw@mail.gmail.com>
- <CALzav=fxuU9_jP7q3=qm5LYXbVkR-qUORR=EeiiOqa_GneZVdQ@mail.gmail.com>
+        id S235474AbhKLQgI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Nov 2021 11:36:08 -0500
+Received: from mail.skyhub.de ([5.9.137.197]:42906 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S235488AbhKLQgF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Nov 2021 11:36:05 -0500
+Received: from zn.tnic (p200300ec2f10ce00d18a941e5c4028b8.dip0.t-ipconnect.de [IPv6:2003:ec:2f10:ce00:d18a:941e:5c40:28b8])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 91C131EC02AD;
+        Fri, 12 Nov 2021 17:33:13 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1636734793;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=h/TsHncJjdrq8Ez3Mrrmi4mEIhgDAK1/8P0J9kgkQaw=;
+        b=etVAmwzzxO+maMIwttxgi5haSSvcNfD8F0QuOkxZyuizIvkNwjkJbWs1VP1ViyZ8eE0GEa
+        vP/ea6wrz0yV63EHwXzkTuoDnpeppdeuj2hqJWlilXs7tiz2JSvCX1x4af05hYLQPpdkWT
+        5SsndWm1PWqG8t+Y3vXs/iIg1id1UXY=
+Date:   Fri, 12 Nov 2021 17:33:05 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     x86@kernel.org, Eric Biederman <ebiederm@xmission.com>,
+        kexec@lists.infradead.org, Joerg Roedel <jroedel@suse.de>,
+        hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v2 08/12] x86/sev: Park APs on AP Jump Table with GHCB
+ protocol version 2
+Message-ID: <YY6XQfmvmpmUiIGj@zn.tnic>
+References: <20210913155603.28383-1-joro@8bytes.org>
+ <20210913155603.28383-9-joro@8bytes.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CALzav=fxuU9_jP7q3=qm5LYXbVkR-qUORR=EeiiOqa_GneZVdQ@mail.gmail.com>
+In-Reply-To: <20210913155603.28383-9-joro@8bytes.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 11, 2021, David Matlack wrote:
-> On Thu, Nov 11, 2021 at 4:51 PM David Matlack <dmatlack@google.com> wrote:
-> > > > @@ -196,6 +202,17 @@ static void *vcpu_thread_main(void *data)
-> > > >  {
-> > > >         struct vcpu_thread *vcpu = data;
-> > > >
-> > > > +       WRITE_ONCE(vcpu->running, true);
-> > > > +
-> > > > +       /*
-> > > > +        * Wait for all vCPU threads to be up and running before calling the test-
-> > > > +        * provided vCPU thread function. This prevents thread creation (which
-> > > > +        * requires taking the mmap_sem in write mode) from interfering with the
-> > > > +        * guest faulting in its memory.
-> > > > +        */
-> > > > +       while (!READ_ONCE(all_vcpu_threads_running))
-
-This is way more convoluted than it needs to be:
-
-	atomic_inc(&perf_test_args.nr_running_vcpus);
-
-	while (atomic_read(&perf_test_args.nr_running_vcpus) < perf_test_args.nr_vcpus)
-		cpu_relax();
-
-diff --git a/tools/testing/selftests/kvm/include/perf_test_util.h b/tools/testing/selftests/kvm/include/perf_test_util.h
-index df9f1a3a3ffb..ce9039ec8c18 100644
---- a/tools/testing/selftests/kvm/include/perf_test_util.h
-+++ b/tools/testing/selftests/kvm/include/perf_test_util.h
-@@ -30,6 +30,8 @@ struct perf_test_args {
-        uint64_t host_page_size;
-        uint64_t guest_page_size;
-        int wr_fract;
-+       int nr_vcpus;
-+       atomic_t nr_running_vcpus;
- 
-        struct perf_test_vcpu_args vcpu_args[KVM_MAX_VCPUS];
- };
-
-
-Alternatively it could be a countdown to zero so that only the atomic_t is needed.
-
-
-> > > I can never remember the rules on this so I could be wrong, but you
-> > > may want a cpu_relax() in that loop to prevent it from being optimized
-> > > out. Maybe the READ_ONCE is sufficient though.
-> >
-> > READ_ONCE is sufficient to prevent the loop from being optimized out
-> > but cpu_relax() is nice to have to play nice with our hyperthread
-> > buddy.
-> >
-> > On that note there are a lot of spin waits in the KVM selftests and
-> > none of the ones I've seen use cpu_relax().
-> >
-> > I'll take a look at adding cpu_relax() throughout the selftests in v2.
-> >
-> > >
-> > > >         vcpu_thread_fn(&perf_test_args.vcpu_args[vcpu->vcpu_id]);
-> > > >
-> > > >         return NULL;
-> > > > @@ -206,14 +223,23 @@ void perf_test_start_vcpu_threads(int vcpus, void (*vcpu_fn)(struct perf_test_vc
-> > > >         int vcpu_id;
-> > > >
-> > > >         vcpu_thread_fn = vcpu_fn;
-> > > > +       WRITE_ONCE(all_vcpu_threads_running, false);
-> > > >
-> > > >         for (vcpu_id = 0; vcpu_id < vcpus; vcpu_id++) {
-> > > >                 struct vcpu_thread *vcpu = &vcpu_threads[vcpu_id];
-> > > >
-> > > >                 vcpu->vcpu_id = vcpu_id;
-> > > > +               WRITE_ONCE(vcpu->running, false);
-> > >
-> > > Do these need to be WRITE_ONCE? I don't think WRITE_ONCE provides any
-> > > extra memory ordering guarantees and I don't know why the compiler
-> > > would optimize these out. If they do need to be WRITE_ONCE, they
-> > > probably merit comments.
-> >
-> > To be completely honest I'm not sure. I included WRITE_ONCE out of
-> > caution to ensure the compiler does not reorder the writes with
-> > respect to the READ_ONCE. I'll need to do a bit more research to
-> > confirm if it's really necessary.
+On Mon, Sep 13, 2021 at 05:55:59PM +0200, Joerg Roedel wrote:
+> From: Joerg Roedel <jroedel@suse.de>
 > 
-> FWIW removing WRITE_ONCE and bumping the optimization level up to O3
-> did not cause any problems. But this is no proof of course.
+> GHCB protocol version 2 adds the MSR-based AP-reset-hold VMGEXIT which
+> does not need a GHCB. Use that to park APs in 16-bit protected mode on
+> the AP Jump Table.
 > 
-> This quote from memory-barries.txt makes me think it'd be prudent to
-> keep the WRITE_ONCE:
+> Signed-off-by: Joerg Roedel <jroedel@suse.de>
+> ---
+>  arch/x86/include/asm/realmode.h    |  3 +
+>  arch/x86/kernel/sev.c              | 48 ++++++++++++++--
+>  arch/x86/realmode/rm/Makefile      | 11 ++--
+>  arch/x86/realmode/rm/header.S      |  3 +
+>  arch/x86/realmode/rm/sev_ap_park.S | 89 ++++++++++++++++++++++++++++++
+>  5 files changed, 144 insertions(+), 10 deletions(-)
+>  create mode 100644 arch/x86/realmode/rm/sev_ap_park.S
 > 
->      You should assume that the compiler can move READ_ONCE() and
->      WRITE_ONCE() past code not containing READ_ONCE(), WRITE_ONCE(),
->      barrier(), or similar primitives.
+> diff --git a/arch/x86/include/asm/realmode.h b/arch/x86/include/asm/realmode.h
+> index 29590a4ddf24..668de0a8b1ae 100644
+> --- a/arch/x86/include/asm/realmode.h
+> +++ b/arch/x86/include/asm/realmode.h
+> @@ -23,6 +23,9 @@ struct real_mode_header {
+>  	u32	trampoline_header;
+>  #ifdef CONFIG_AMD_MEM_ENCRYPT
+>  	u32	sev_es_trampoline_start;
+> +	u32	sev_real_ap_park_asm;
+
+sev_ap_park;
+
+> +	u32	sev_real_ap_park_seg;
+
+sev_ap_park_seg;
+
+> +	u32	sev_ap_park_gdt;
+
+Yap, like thist one.
+
+>  #endif
+>  #ifdef CONFIG_X86_64
+>  	u32	trampoline_pgd;
+> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+> index a98eab926682..20b439986d86 100644
+> --- a/arch/x86/kernel/sev.c
+> +++ b/arch/x86/kernel/sev.c
+> @@ -27,6 +27,7 @@
+>  #include <asm/fpu/internal.h>
+>  #include <asm/processor.h>
+>  #include <asm/realmode.h>
+> +#include <asm/tlbflush.h>
+>  #include <asm/traps.h>
+>  #include <asm/svm.h>
+>  #include <asm/smp.h>
+> @@ -695,6 +696,35 @@ static bool __init sev_es_setup_ghcb(void)
+>  }
+>  
+>  #ifdef CONFIG_HOTPLUG_CPU
+> +void __noreturn sev_jumptable_ap_park(void)
+> +{
+> +	local_irq_disable();
+> +
+> +	write_cr3(real_mode_header->trampoline_pgd);
+> +
+> +	/* Exiting long mode will fail if CR4.PCIDE is set. */
+> +	if (boot_cpu_has(X86_FEATURE_PCID))
+
+cpu_feature_enabled() is what we use everywhere now.
+
+> +		cr4_clear_bits(X86_CR4_PCIDE);
+> +
+> +	asm volatile("xorq	%%r15, %%r15\n"
+> +		     "xorq	%%r14, %%r14\n"
+> +		     "xorq	%%r13, %%r13\n"
+> +		     "xorq	%%r12, %%r12\n"
+> +		     "xorq	%%r11, %%r11\n"
+> +		     "xorq	%%r10, %%r10\n"
+> +		     "xorq	%%r9,  %%r9\n"
+> +		     "xorq	%%r8,  %%r8\n"
+> +		     "xorq	%%rsi, %%rsi\n"
+> +		     "xorq	%%rdi, %%rdi\n"
+> +		     "xorq	%%rsp, %%rsp\n"
+> +		     "xorq	%%rbp, %%rbp\n"
+
+Use xorl and the 32-bit regs is enough - zero extension.
+
+> +		     "ljmpl	*%0" : :
+> +		     "m" (real_mode_header->sev_real_ap_park_asm),
+> +		     "b" (sev_es_jump_table_pa >> 4));
+
+In any case, this asm needs comments: why those regs, why
+sev_es_jump_table_pa >> 4 in rbx (I found later in the patch why) and so
+on.
+
+> diff --git a/arch/x86/realmode/rm/header.S b/arch/x86/realmode/rm/header.S
+> index 8c1db5bf5d78..6c17f8fd1eb4 100644
+> --- a/arch/x86/realmode/rm/header.S
+> +++ b/arch/x86/realmode/rm/header.S
+> @@ -22,6 +22,9 @@ SYM_DATA_START(real_mode_header)
+>  	.long	pa_trampoline_header
+>  #ifdef CONFIG_AMD_MEM_ENCRYPT
+>  	.long	pa_sev_es_trampoline_start
+> +	.long	pa_sev_ap_park_asm
+> +	.long	__KERNEL32_CS
+> +	.long	pa_sev_ap_park_gdt;
+>  #endif
+>  #ifdef CONFIG_X86_64
+>  	.long	pa_trampoline_pgd;
+> diff --git a/arch/x86/realmode/rm/sev_ap_park.S b/arch/x86/realmode/rm/sev_ap_park.S
+
+arch/x86/realmode/rm/sev.S
+
+is perfectly fine I guess.
+
+> new file mode 100644
+> index 000000000000..0b63d0569d4d
+> --- /dev/null
+> +++ b/arch/x86/realmode/rm/sev_ap_park.S
+> @@ -0,0 +1,89 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +#include <linux/linkage.h>
+> +#include <asm/segment.h>
+> +#include <asm/page_types.h>
+> +#include <asm/processor-flags.h>
+> +#include <asm/msr-index.h>
+> +#include <asm/sev-ap-jumptable.h>
+> +#include "realmode.h"
+> +
+> +	.section ".text32", "ax"
+> +	.code32
+> +/*
+
+"This is executed by ... when ... "
+
+> + * The following code switches to 16-bit protected mode and sets up the
+> + * execution environment for the AP Jump Table blob. Then it jumps to the AP
+> + * Jump Table to park the AP.
+> + *
+> + * The code was copied from reboot.S and modified to fit the SEV-ES requirements
+> + * for AP parking.
+
+That sentence belongs at most in the commit message.
+
+> When this code is entered, all registers except %EAX-%EDX are
+
+%eax, etc. Lowercase pls.
+
+> + * in reset state.
+> + *
+> + * The AP Jump Table physical base address is in %EBX upon entry.
+> + *
+> + * %EAX, %ECX, %EDX and EFLAGS are undefined. Only use registers %EAX-%EDX and
+> + * %ESP in this code.
+> + */
+> +SYM_CODE_START(sev_ap_park_asm)
+
+sev_ap_park
+
+> +
+> +	/* Switch to trampoline GDT as it is guaranteed < 4 GiB */
+> +	movl	$__KERNEL_DS, %eax
+> +	movl	%eax, %ds
+> +	lgdt	pa_tr_gdt
+> +
+> +	/* Disable paging to drop us out of long mode */
+> +	movl	%cr0, %eax
+> +	btcl	$X86_CR0_PG_BIT, %eax
+> +	movl	%eax, %cr0
+> +
+
+	/* Start executing from 32-bit addresses or so, I guess...
+
+> +	ljmpl	$__KERNEL32_CS, $pa_sev_ap_park_paging_off
+
+Please add a comment also about those pa_ things because they look like
+magic but they're sed-generated into arch/x86/realmode/rm/pasyms.h by
+the Makefile in that same dir.
+
+> +SYM_INNER_LABEL(sev_ap_park_paging_off, SYM_L_GLOBAL)
+
+Global symbol but used only in this file. .L-prefix then?
+
+> +	/* Clear EFER */
+> +	movl	$0, %eax
+> +	movl	$0, %edx
+
+both:	xorl
+
+> +	movl	$MSR_EFER, %ecx
+> +	wrmsr
+> +
+> +	/* Clear CR3 */
+> +	movl	$0, %ecx
+
+ditto
+
+> +	movl	%ecx, %cr3
+> +
+> +	/* Set up the IDT for real mode. */
+> +	lidtl	pa_machine_real_restart_idt
+> +
+> +	/*
+> +	 * Load the GDT with the 16-bit segments for the AP Jump Table
+> +	 */
+
+	/* Load the GDT with the 16-bit segments for the AP Jump Table  */
+
+works too.
+
+> +	lgdtl	pa_sev_ap_park_gdt
+> +
+> +	/* Setup Code and Data segments for AP Jump Table */
+
+	... code and data segments ...
+
+you have been reading too much vendor text where they love to capitalize
+everything.
+
+> +	movw	$SEV_APJT_DS16, %ax
+> +	movw	%ax, %ds
+> +	movw	%ax, %ss
+> +
+> +	/* Jump to the AP Jump Table into 16 bit protected mode */
+> +	ljmpw	$SEV_APJT_CS16, $SEV_APJT_ENTRY
+> +SYM_CODE_END(sev_ap_park_asm)
+> +
+> +	.data
+> +	.balign	16
+> +SYM_DATA_START(sev_ap_park_gdt)
+> +	/* Self-pointer */
+> +	.word	sev_ap_park_gdt_end - sev_ap_park_gdt - 1
+> +	.long	pa_sev_ap_park_gdt
+> +	.word	0
+> +
+> +	/*
+> +	 * Offset 0x8
+> +	 * 32 bit code segment descriptor pointing to AP Jump table base
+> +	 * Setup at runtime in sev_es_setup_ap_jump_table_data().
+> +	 */
+> +	.quad	0
+> +
+> +	/*
+> +	 * Offset 0x10
+> +	 * 32 bit data segment descriptor pointing to AP Jump table base
+> +	 * Setup at runtime in sev_es_setup_ap_jump_table_data().
+> +	 */
+> +	.quad	0
+> +SYM_DATA_END_LABEL(sev_ap_park_gdt, SYM_L_GLOBAL, sev_ap_park_gdt_end)
+> -- 
+> 2.33.0
 > 
-> So, for example, the compiler could potentially re-order READ_ONCE
-> loop below after the write to all_vcpu_threads_running if we did not
-> include WRITE_ONCE?
 
-Practically speaking, no.  pthread_create() undoubtedly has barriers galore, so
-unless @vcpus==0, all_vcpu_threads_running won't get re-ordered.
+-- 
+Regards/Gruss,
+    Boris.
 
-As noted above, READ_ONCE/WRITE_ONCE do provide _some_ guarantees about memory
-ordering with respect to the _compiler_.  Notably, the compiler is allowed to
-reorder non-ONCE loads/stores around {READ,WRITE}_ONCE.  And emphasis on "compiler".
-On x86, that's effectively the same as memory ordering in hardware, because ignoring
-WC memory, x86 is strongy ordered.  But arm64 and others are weakly ordered, in
-which case {READ,WRITE}_ONCE do not provide any guarantees about how loads/stores
-will complete when run on the CPU.
-
-This is a bad example because there's not really a race to be had, e.g. aside from
-pthread_create(), there's also the fact that all_vcpu_threads_running=false is a
-likely nop since it's zero initialized.  
-
-Here's a contrived example:
-
-static void *vcpu_thread_main(void *data)
-{
-	while (!READ_ONCE(test_stage))
-		cpu_relax();
-
-	READ_ONCE(test_fn)();
-}
-
-
-int main(...)
-{
-	for (vcpu_id = 0; vcpu_id < vcpus; vcpu_id++)
-		pthread_create(&vcpu->thread, NULL, vcpu_thread_main, vcpu);
-
-	test_fn = do_work;
-
-	WRITE_ONCE(test_stage, 1);
-}
-
-On any architecture, the thread could observe a NULL test_fn because it's allowed
-to reorder the store to test_fn around the store to test_stage.  Making it
-
-	WRITE_ONCE(test_fn, do_work);
-	WRITE_ONCE(test_stage, 1);
-
-would solve the problem on x86 as it would effectively force the compiler to emit:
-
-	test_stage = 0
-	barrier() // because of pthread_create()
-	test_fn    = do_work
-	test_stage = 1
-
-but on arm64 and others, hardware can complete the second store to test_stage
-_before_ the store to test_fn, and so the threads could observe a NULL test_fn
-even though the compiler was forced to generate a specific order of operations.
-
-To ensure something like the above works on weakly-ordered architctures, the code
-would should instead be something like:
-
-static void *vcpu_thread_main(void *data)
-{
-        while (!READ_ONCE(test_stage))
-                cpu_relax();
-
-	smp_rmb();
-        test_fn();
-}
-
-int main(...)
-{
-        for (vcpu_id = 0; vcpu_id < vcpus; vcpu_id++)
-                pthread_create(&vcpu->thread, NULL, vcpu_thread_main, vcpu);
-
-        test_fn = do_work;
-	smp_wmb();
-        test_stage = 1;
-}
-
-Final note, the READ_ONCE() in the while loop is still necessary because without
-that the compiler would be allowed to assume that test_stage can't be changed
-in that loop, e.g. on x86 could generate the following hang the task:
-
-	mov [test_stage], %rax
-1:	test %rax, %rax
-	jnz 2f
-	pause
-	jmp 1b
-2:
+https://people.kernel.org/tglx/notes-about-netiquette
