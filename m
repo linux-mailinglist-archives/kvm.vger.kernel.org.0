@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C65DB44E43A
-	for <lists+kvm@lfdr.de>; Fri, 12 Nov 2021 10:52:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 660E944E43C
+	for <lists+kvm@lfdr.de>; Fri, 12 Nov 2021 10:52:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234934AbhKLJy5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Nov 2021 04:54:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34088 "EHLO
+        id S234921AbhKLJzH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Nov 2021 04:55:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234904AbhKLJyy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Nov 2021 04:54:54 -0500
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE748C061767;
-        Fri, 12 Nov 2021 01:52:03 -0800 (PST)
-Received: by mail-pl1-x634.google.com with SMTP id y8so2526777plg.1;
-        Fri, 12 Nov 2021 01:52:03 -0800 (PST)
+        with ESMTP id S234914AbhKLJy4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Nov 2021 04:54:56 -0500
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F8CCC061767;
+        Fri, 12 Nov 2021 01:52:06 -0800 (PST)
+Received: by mail-pj1-x102a.google.com with SMTP id t5-20020a17090a4e4500b001a0a284fcc2so6853998pjl.2;
+        Fri, 12 Nov 2021 01:52:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=brF0DYStxhXsEwWOD3vo3umgC7ANl99kGXbRW01P4QQ=;
-        b=BiXjxnFznhn0VPGM+CYzVXjHRwEI61w+t+lu6SBfLfItCUWsbqp2CGyNIDopwrO1tf
-         h49aiM44xxZ7IVHugKTBk9ystV/Jin5L14fe4ekwSICw/UXcs3+5EbLnfhfclLucMWST
-         hcvQY6X56sLbBNf5aiNfoTxmWc7xWb857nAAOGFq8XvOPuvipOQm1OzBHoWAGLnL/RFg
-         5nrCSxm5C9Vplghfd2kt5Dl8epbQAnsyNZUQ4cTbURrkMiWExhAtUbVv3vmIQJyf6iqD
-         a3S3ndocL7QboFmzkKafNNSmjUwm0TNSokA60+vdU02po/oPpVbNOZLemSnzEf5pkq64
-         9NEQ==
+        bh=/GEAKHOTJvbS3IgOKWf3Q6MVeHzRCDLEfVOLNTMcwPg=;
+        b=FJFqrTnwPEuLtvQGIWc1XYBDmelqiGH2Mx60N5A6KyhcghAo9lOw+HSm04iREm4lwP
+         Jv5+l5Nf6U/ifpewJ5N+XGkUNuegN0qKpNocKs4eNSFmJTXAfWMLaB+BupalCrH/e0Dg
+         C7zHSJfwIsoICsc24dbakO1IE02D9VDI0SupaqRLBFphsIx7kQWSKEdAFrfrSz8MZPEu
+         f6CHyPxwtlfs4X4tqsHVLOcEqGo8cSU/YIb3X9eqtjkn0hiC6wm/8mECRDM8hLm8RmcN
+         /vtB552ru+41YMQhg3+ldMnE+XA2ydotW8xWWTWw5f5QUNjjZSIY1jD1Eji3rx26FHdb
+         znkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=brF0DYStxhXsEwWOD3vo3umgC7ANl99kGXbRW01P4QQ=;
-        b=WqDTuLP9JgkOiJpp4VD1m9be6Gtm++IPAhkOj/1OjofznE5YnnF6P65WU8Gmes+7Qt
-         NwlUqxQHkHYe63u5AFf+4acE9dsRg29LQJ2mU1OIkPYUu8PSpM1Tz/YJrgrgOlzV9JFR
-         rNDYqxAh9yw5NFgLLBWldvPmuibsU5dKXFSzu+OvRkn3tAz8qBA6V1FgaJMlkrbVjhba
-         8wgJcFXUAruZKSliUQi5WgcvYyW3GuPX3odNx4WVIQBZiAbgfdku0Wemlcw2IqfbhtMS
-         JhrZJI5XMDlHxdNw0Qu4THX6dLyUDJnrj9McH3MsHR51ehHewNe+mMKXXgxyJPQFLxQy
-         q45A==
-X-Gm-Message-State: AOAM531figlC3j/jtx8lA/yqz3JljZf+8Tb93Vs/SyfYKD74pLBerAGf
-        AR0m4cEllWf3hFvAHcPLoOs=
-X-Google-Smtp-Source: ABdhPJyYoqKIPQzpRIiNiQsOdb8WvtW6rv8Vf5Dv56c8Im29o+e7rps8PHgzQg1E3xa9dIOx/lZI6A==
-X-Received: by 2002:a17:90b:124d:: with SMTP id gx13mr34600093pjb.106.1636710723481;
-        Fri, 12 Nov 2021 01:52:03 -0800 (PST)
+        bh=/GEAKHOTJvbS3IgOKWf3Q6MVeHzRCDLEfVOLNTMcwPg=;
+        b=VdBKSsgn9rByRind745dszysAg20yROvldYxeObPpdsPtPwbuLK29RkBZ/c0yoDCvU
+         DA067iJdt7RNcGT6Vj8oHVCremxJFs0ZL6kvWdOGgFIOwlo17NErVo923tIdqt9tugil
+         hqFwasa4SqEGcAePfMvQJfIU/9hBqVTeY1gtvZXbKpn4tijLBd0nJx+yUEgZ5J8GyCOy
+         yy3oLae3nb7dS9pgz5MSbVs4SNrK8HAXKSiEwJ0S6OHveF9626c4wUJT4gWmTC98mQOU
+         NCyHIB6exQrk98rCIsIieMxcU8cGEkNYh5U5NjdsYj0GP05+VZomSc8bbmx3x9hq8Ds8
+         U4pg==
+X-Gm-Message-State: AOAM5328vyL+ZyfYZ79fWNacnJFPoMgpVAV7QjJO8uL+4ItTX5MlM/21
+        PKzVewzEzroDgUK5fNzc8ps=
+X-Google-Smtp-Source: ABdhPJzE7V0Wq/g/ND3xAvRBQ3tIRjdvBkwQ43iKJ9Dwq2bQ/lzMKnzidVUmmfSLQwEMkOiEVQfwJQ==
+X-Received: by 2002:a17:90a:9f93:: with SMTP id o19mr34183778pjp.136.1636710726076;
+        Fri, 12 Nov 2021 01:52:06 -0800 (PST)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id f3sm5799403pfg.167.2021.11.12.01.52.01
+        by smtp.gmail.com with ESMTPSA id f3sm5799403pfg.167.2021.11.12.01.52.03
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 12 Nov 2021 01:52:03 -0800 (PST)
+        Fri, 12 Nov 2021 01:52:05 -0800 (PST)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
@@ -55,10 +55,11 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>
-Subject: [PATCH 5/7] KVM: x86/pmu: Refactor pmu->available_event_types field using BITMAP
-Date:   Fri, 12 Nov 2021 17:51:37 +0800
-Message-Id: <20211112095139.21775-6-likexu@tencent.com>
+        linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>,
+        Peter Zijlstra <peterz@infradead.org>
+Subject: [PATCH 6/7] perf: x86/core: Add interface to query perfmon_event_map[] directly
+Date:   Fri, 12 Nov 2021 17:51:38 +0800
+Message-Id: <20211112095139.21775-7-likexu@tencent.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20211112095139.21775-1-likexu@tencent.com>
 References: <20211112095139.21775-1-likexu@tencent.com>
@@ -70,79 +71,64 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <likexu@tencent.com>
 
-Replace the explicit declaration of "unsigned available_event_types" with
-the generic macro DECLARE_BITMAP and rename it to "avail_cpuid_events"
-for better self-explanation.
+Currently, we have [intel|knc|p4|p6]_perfmon_event_map on the Intel
+platforms and amd_[f17h]_perfmon_event_map on the AMD platforms.
 
+Early clumsy KVM code or other potential perf_event users may have
+hard-coded these perfmon_maps (e.g., arch/x86/kvm/svm/pmu.c), so
+it would not make sense to program a common hardware event based
+on the generic "enum perf_hw_id" once the two tables do not match.
+
+Let's provide an interface for callers outside the perf subsystem to get
+the counter config based on the perfmon_event_map currently in use,
+and it also helps to save bytes.
+
+Cc: Peter Zijlstra <peterz@infradead.org>
 Signed-off-by: Like Xu <likexu@tencent.com>
 ---
- arch/x86/include/asm/kvm_host.h |  2 +-
- arch/x86/kvm/vmx/pmu_intel.c    | 11 +++++++----
- 2 files changed, 8 insertions(+), 5 deletions(-)
+ arch/x86/events/core.c            | 9 +++++++++
+ arch/x86/include/asm/perf_event.h | 5 +++++
+ 2 files changed, 14 insertions(+)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 88fce6ab4bbd..2e69dec3ad7b 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -495,7 +495,6 @@ struct kvm_pmc {
- struct kvm_pmu {
- 	unsigned nr_arch_gp_counters;
- 	unsigned nr_arch_fixed_counters;
--	unsigned available_event_types;
- 	u64 fixed_ctr_ctrl;
- 	u64 global_ctrl;
- 	u64 global_status;
-@@ -510,6 +509,7 @@ struct kvm_pmu {
- 	DECLARE_BITMAP(reprogram_pmi, X86_PMC_IDX_MAX);
- 	DECLARE_BITMAP(all_valid_pmc_idx, X86_PMC_IDX_MAX);
- 	DECLARE_BITMAP(pmc_in_use, X86_PMC_IDX_MAX);
-+	DECLARE_BITMAP(avail_cpuid_events, X86_PMC_IDX_MAX);
+diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
+index 2a57dbed4894..dc88d39cec1b 100644
+--- a/arch/x86/events/core.c
++++ b/arch/x86/events/core.c
+@@ -691,6 +691,15 @@ void x86_pmu_disable_all(void)
+ 	}
+ }
  
- 	/*
- 	 * The gate to release perf_events not marked in
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 4f58c14efa61..db36e743c3cc 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -96,7 +96,7 @@ static unsigned intel_find_arch_event(struct kvm_pmu *pmu,
- 			continue;
- 
- 		if (is_intel_cpuid_event(event_select, unit_mask) &&
--		    !(pmu->available_event_types & BIT_ULL(i)))
-+		    !test_bit(i, pmu->avail_cpuid_events))
- 			return PERF_COUNT_HW_MAX + 1;
- 
- 		break;
-@@ -125,7 +125,7 @@ static unsigned int intel_find_fixed_event(struct kvm_pmu *pmu, int idx)
- 	event_type = intel_arch_events[event].event_type;
- 
- 	if (is_intel_cpuid_event(event_select, unit_mask) &&
--	    !(pmu->available_event_types & BIT_ULL(event_type)))
-+	    !test_bit(event_type, pmu->avail_cpuid_events))
- 		return PERF_COUNT_HW_MAX + 1;
- 
- 	return event_type;
-@@ -497,6 +497,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
++u64 perf_get_hw_event_config(int perf_hw_id)
++{
++	if (perf_hw_id < x86_pmu.max_events)
++		return x86_pmu.event_map(perf_hw_id);
++
++	return 0;
++}
++EXPORT_SYMBOL_GPL(perf_get_hw_event_config);
++
+ struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr)
  {
- 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
- 	struct lbr_desc *lbr_desc = vcpu_to_lbr_desc(vcpu);
-+	unsigned long avail_cpuid_events;
+ 	return static_call(x86_pmu_guest_get_msrs)(nr);
+diff --git a/arch/x86/include/asm/perf_event.h b/arch/x86/include/asm/perf_event.h
+index 8fc1b5003713..11a93cb1198b 100644
+--- a/arch/x86/include/asm/perf_event.h
++++ b/arch/x86/include/asm/perf_event.h
+@@ -492,9 +492,14 @@ static inline void perf_check_microcode(void) { }
  
- 	struct x86_pmu_capability x86_pmu;
- 	struct kvm_cpuid_entry2 *entry;
-@@ -527,8 +528,10 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- 	eax.split.bit_width = min_t(int, eax.split.bit_width, x86_pmu.bit_width_gp);
- 	pmu->counter_bitmask[KVM_PMC_GP] = ((u64)1 << eax.split.bit_width) - 1;
- 	eax.split.mask_length = min_t(int, eax.split.mask_length, x86_pmu.events_mask_len);
--	pmu->available_event_types = ~entry->ebx &
--					((1ull << eax.split.mask_length) - 1);
-+	avail_cpuid_events = ~entry->ebx & ((1ull << eax.split.mask_length) - 1);
-+	bitmap_copy(pmu->avail_cpuid_events,
-+		    (unsigned long *)&avail_cpuid_events,
-+		    eax.split.mask_length);
- 
- 	if (pmu->version == 1) {
- 		pmu->nr_arch_fixed_counters = 0;
+ #if defined(CONFIG_PERF_EVENTS) && defined(CONFIG_CPU_SUP_INTEL)
+ extern struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr);
++extern u64 perf_get_hw_event_config(int perf_hw_id);
+ extern int x86_perf_get_lbr(struct x86_pmu_lbr *lbr);
+ #else
+ struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr);
++u64 perf_get_hw_event_config(int perf_hw_id);
++{
++	return 0;
++}
+ static inline int x86_perf_get_lbr(struct x86_pmu_lbr *lbr)
+ {
+ 	return -1;
 -- 
 2.33.0
 
