@@ -2,55 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D2A2244F025
-	for <lists+kvm@lfdr.de>; Sat, 13 Nov 2021 01:00:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 46E9844F031
+	for <lists+kvm@lfdr.de>; Sat, 13 Nov 2021 01:10:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233316AbhKMADh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 12 Nov 2021 19:03:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58042 "EHLO
+        id S233745AbhKMANX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 12 Nov 2021 19:13:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231576AbhKMADf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 12 Nov 2021 19:03:35 -0500
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A075C061766
-        for <kvm@vger.kernel.org>; Fri, 12 Nov 2021 16:00:44 -0800 (PST)
-Received: by mail-pl1-x62a.google.com with SMTP id y8so4208957plg.1
-        for <kvm@vger.kernel.org>; Fri, 12 Nov 2021 16:00:44 -0800 (PST)
+        with ESMTP id S232571AbhKMANW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 12 Nov 2021 19:13:22 -0500
+Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 530D5C0613F5
+        for <kvm@vger.kernel.org>; Fri, 12 Nov 2021 16:10:31 -0800 (PST)
+Received: by mail-oi1-x22b.google.com with SMTP id q124so20913872oig.3
+        for <kvm@vger.kernel.org>; Fri, 12 Nov 2021 16:10:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=/T22u9uiXYSbjw4vUr/c0mCt/SzIILWdyE5tNdh2BGw=;
-        b=VhQZsgvI1uZu/qRt1rBhl5uQ6ruHuXkwfFJUbOu/8oflm8Y8IjTfdrFpF5l4XDHMfw
-         hNujv6cx9lgJ/C687c0csRkaZMgbMie5C4wI4UJn+h3SunYyBWEiUavPrYnyyBmgmypl
-         U1v0ayQcKxxOxnWtaehUJOJ94L9U6hqLQBpJ1UKCUvsSfWv4j7QA2BzyLC2R76HJhpCp
-         jH8Y7lsynNB8tRXk59LIf6m0nHpYJWaX7L/79Et5TybhPnccFu33hBQUB2JKrxjsWxoh
-         hUaykcrY5mFgXt/znGHUGIqrt8hSXn/SZ318s9vC+/0BLbMS9RCdUVDk542SlhCeEoey
-         k3xQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=eKWR0Y85NN7RyQ3kGVx0D7iJn85BJCX0K42JtUXarAU=;
+        b=JYfrhOhYB5iowTwOaEQsAuvCl/7R6EpEwANtkrLj6rABd0tsys3aea7mOPld/+PLvS
+         lnZ9icq3oa1InotU4n42ZayV+SYueUbrC0oGp1+SPmpM39juy6KfrNpk1Pf4rBTRANq0
+         Ucn/np3CXWU1FoBpNmNZ8oi//yUyN/x933NJXo+85Fd/x+GNxvPpqyLiRHiNizgHYyDC
+         wViGb08gcQ7pCgch4yZJlEhogV7AxCAo1x/Wlq7EnDSnSk3ihoFnZqaHvnc2z1KqTYDQ
+         H01Zkd7mlwdp8BHlR+MLHR1KlyTNIvJFFqa4rFh80ZZu5DtDqNwaO1HIid09OxqCERZT
+         gGfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=/T22u9uiXYSbjw4vUr/c0mCt/SzIILWdyE5tNdh2BGw=;
-        b=ypuGVwd7TrMJY5Qmlu0+jRGxAtpjERB3Z6ar2ynsNtk/ovDXNSf28V4EtbteMEnOI3
-         H+WjZgLxyu3YRU8DyhVE8fvK+3mVfFnWpqITGWjrsO7Gpb8O9t5rBfsw2f6HJ6+Q0sKu
-         lrdGTXqcxrlel6ANurvcZMmX+282JhP8ttS+I7XLiNYZ9qoCPSZMBR6wHw5OUlN3UR88
-         eqinJQAWPutfqbGTBaTfZtlocBZhQJTDmAfCixVjDG/58oSzTlVM9sN85K/J2UNusXIh
-         6WikEcvPeydxrMCE1ABb7dtqWulCKPCOP+3U5emwKWJ8BkOlm8+AQhHdAgds+v6BZqkh
-         SXDQ==
-X-Gm-Message-State: AOAM5302SpzSd0lGCIpvIHwNeUeia8lmDJROcb+Ppmb3NqRIE3RIRNS3
-        uzITxBt2EMAVkoG+CTWTpOAJ6u+vPPcMIg==
-X-Google-Smtp-Source: ABdhPJw0L5nRV7A2TEQulq2d+qnpOxthRLSY8VdwXH4zCv0Xvd9k+FIidmAI6gWHtGbettKqVbDWxQ==
-X-Received: by 2002:a17:90b:1bcf:: with SMTP id oa15mr41527726pjb.161.1636761643547;
-        Fri, 12 Nov 2021 16:00:43 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id l6sm8544982pfc.126.2021.11.12.16.00.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Nov 2021 16:00:42 -0800 (PST)
-Date:   Sat, 13 Nov 2021 00:00:38 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Peter Gonda <pgonda@google.com>
-Cc:     Borislav Petkov <bp@alien8.de>,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=eKWR0Y85NN7RyQ3kGVx0D7iJn85BJCX0K42JtUXarAU=;
+        b=PLKPJTsR+T4knZq5BuoVtwbirKwlpmJJzMTw47P6g63Xb+0T1f+tQHfVnqsNQO+wZd
+         +eUU0vXgZWUyK2OVhzHIfJaKh6TUKdqTVi0swdkTwHVpxpT1VcT2Xpdl8bVhyda+J/Bd
+         8RE7ccKRA7J73JyzsjfKgWxYMCau39/ceGoE0p2R+LARQpYMYiC/65aPGWuzkh5pRD81
+         HmY0jb4EHH7yxZgcA+w58IL9E1xxiYKOLDSBvZkdsws63B2PR94L2135DgdeEf1jux5k
+         61W7WDY1dEPLwLTrx/aR+On119fcO2TTcEEKH/rBKXlnCeiN6ewTGjnf+1+Mgz6OsudL
+         LN5A==
+X-Gm-Message-State: AOAM533JMh34MR0Jxz5GHBXE6m4vgjGZZ4bsFjczMMuLPraxDjwlOkCE
+        pH4sbOozm5NVb47auyPSn486N1TbXShLGxhxY7orZA==
+X-Google-Smtp-Source: ABdhPJx9yxkxXBkwcUqi9sbNpn5OrCz3LM/gA5pbKkH6GuxZuW6RD9lgnKKdhAxYNPawJLvgPOHidPn+AyZzaBVvkWQ=
+X-Received: by 2002:aca:2319:: with SMTP id e25mr29645817oie.164.1636762230285;
+ Fri, 12 Nov 2021 16:10:30 -0800 (PST)
+MIME-Version: 1.0
+References: <20210820155918.7518-1-brijesh.singh@amd.com> <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
+ <061ccd49-3b9f-d603-bafd-61a067c3f6fa@intel.com> <YY6z5/0uGJmlMuM6@zn.tnic>
+ <YY7FAW5ti7YMeejj@google.com> <YY7I6sgqIPubTrtA@zn.tnic> <YY7Qp8c/gTD1rT86@google.com>
+ <YY7USItsMPNbuSSG@zn.tnic> <CAMkAt6o909yYq3NfRboF3U3V8k-2XGb9p_WcQuvSjOKokmMzMA@mail.gmail.com>
+ <YY8AJnMo9nh3tyPB@google.com>
+In-Reply-To: <YY8AJnMo9nh3tyPB@google.com>
+From:   Marc Orr <marcorr@google.com>
+Date:   Fri, 12 Nov 2021 16:10:18 -0800
+Message-ID: <CAA03e5G=fY7_qESCuoHW3_VdVbDWekqQxmvLPzWNepBqJjyCXg@mail.gmail.com>
+Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
+ Hypervisor Support
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Peter Gonda <pgonda@google.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@intel.com>,
         Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -71,77 +77,40 @@ Cc:     Borislav Petkov <bp@alien8.de>,
         David Rientjes <rientjes@google.com>,
         Dov Murik <dovmurik@linux.ibm.com>,
         Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
+        Michael Roth <Michael.Roth@amd.com>,
         Vlastimil Babka <vbabka@suse.cz>,
         "Kirill A . Shutemov" <kirill@shutemov.name>,
         Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
- Hypervisor Support
-Message-ID: <YY8AJnMo9nh3tyPB@google.com>
-References: <20210820155918.7518-1-brijesh.singh@amd.com>
- <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
- <061ccd49-3b9f-d603-bafd-61a067c3f6fa@intel.com>
- <YY6z5/0uGJmlMuM6@zn.tnic>
- <YY7FAW5ti7YMeejj@google.com>
- <YY7I6sgqIPubTrtA@zn.tnic>
- <YY7Qp8c/gTD1rT86@google.com>
- <YY7USItsMPNbuSSG@zn.tnic>
- <CAMkAt6o909yYq3NfRboF3U3V8k-2XGb9p_WcQuvSjOKokmMzMA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMkAt6o909yYq3NfRboF3U3V8k-2XGb9p_WcQuvSjOKokmMzMA@mail.gmail.com>
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 12, 2021, Peter Gonda wrote:
-> On Fri, Nov 12, 2021 at 1:55 PM Borislav Petkov <bp@alien8.de> wrote:
+> > > If *it* is the host kernel, then you probably shouldn't do that -
+> > > otherwise you just killed the host kernel on which all those guests are
+> > > running.
 > >
-> > On Fri, Nov 12, 2021 at 08:37:59PM +0000, Sean Christopherson wrote:
-> > > Let userspace decide what is mapped shared and what is mapped private.
+> > I agree, it seems better to terminate the single guest with an issue.
+> > Rather than killing the host (and therefore all guests). So I'd
+> > suggest even in this case we do the 'convert to shared' approach or
+> > just outright terminate the guest.
 > >
-> > With "userspace", you mean the *host* userspace?
+> > Are there already examples in KVM of a KVM bug in servicing a VM's
+> > request results in a BUG/panic/oops? That seems not ideal ever.
+>
+> Plenty of examples.  kvm_spurious_fault() is the obvious one.  Any NULL pointer
+> deref will lead to a BUG, etc...  And it's not just KVM, e.g. it's possible, if
+> unlikely, for the core kernel to run into guest private memory (e.g. if the kernel
+> botches an RMP change), and if that happens there's no guarantee that the kernel
+> can recover.
+>
+> I fully agree that ideally KVM would have a better sense of self-preservation,
+> but IMO that's an orthogonal discussion.
 
-Yep.
-
-> > > The kernel and KVM provide the APIs/infrastructure to do the actual
-> > > conversions in a thread-safe fashion and also to enforce the current
-> > > state, but userspace is the control plane.
-> > >
-> > > It would require non-trivial changes in userspace if there are multiple processes
-> > > accessing guest memory, e.g. Peter's networking daemon example, but it _is_ fully
-> > > solvable.  The exit to userspace means all three components (guest, kernel,
-> > > and userspace) have full knowledge of what is shared and what is private.  There
-> > > is zero ambiguity:
-> > >
-> > >   - if userspace accesses guest private memory, it gets SIGSEGV or whatever.
-> >
-> > That SIGSEGV is generated by the host kernel, I presume, after it checks
-> > whether the memory belongs to the guest?
-
-Yep.
-
-> > >   - if kernel accesses guest private memory, it does BUG/panic/oops[*]
-> >
-> > If *it* is the host kernel, then you probably shouldn't do that -
-> > otherwise you just killed the host kernel on which all those guests are
-> > running.
-> 
-> I agree, it seems better to terminate the single guest with an issue.
-> Rather than killing the host (and therefore all guests). So I'd
-> suggest even in this case we do the 'convert to shared' approach or
-> just outright terminate the guest.
-> 
-> Are there already examples in KVM of a KVM bug in servicing a VM's
-> request results in a BUG/panic/oops? That seems not ideal ever.
-
-Plenty of examples.  kvm_spurious_fault() is the obvious one.  Any NULL pointer
-deref will lead to a BUG, etc...  And it's not just KVM, e.g. it's possible, if
-unlikely, for the core kernel to run into guest private memory (e.g. if the kernel
-botches an RMP change), and if that happens there's no guarantee that the kernel
-can recover.
-
-I fully agree that ideally KVM would have a better sense of self-preservation,
-but IMO that's an orthogonal discussion.
+I don't think we should treat the possibility of crashing the host
+with live VMs nonchalantly. It's a big deal. Doing so has big
+implications on the probability that any cloud vendor wil bee able to
+deploy this code to production. And aren't cloud vendors one of the
+main use cases for all of this confidential compute stuff? I'm
+honestly surprised that so many people are OK with crashing the host.
