@@ -2,131 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E7DD44F492
-	for <lists+kvm@lfdr.de>; Sat, 13 Nov 2021 19:35:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B51744F4CC
+	for <lists+kvm@lfdr.de>; Sat, 13 Nov 2021 20:15:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235918AbhKMShv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 13 Nov 2021 13:37:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44824 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233692AbhKMShu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 13 Nov 2021 13:37:50 -0500
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C078C061767
-        for <kvm@vger.kernel.org>; Sat, 13 Nov 2021 10:34:57 -0800 (PST)
-Received: by mail-pg1-x533.google.com with SMTP id q126so10851047pgq.13
-        for <kvm@vger.kernel.org>; Sat, 13 Nov 2021 10:34:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=zSxj8eRX0cnZYbcOeH01JUaZh5KPAX40UEWt0+2IJiM=;
-        b=NGgVBK0eIHprea6mvLCk+5HiStmbJEiIRPJQRX+o5aC3tSlJkXN3kamK5bFgym//aa
-         6KOd4p512Oy5/fNf3MbduQ39nKhukOr7CCnKpuyi3YhCyWaEAc6Dd2TIM9s0HuaItkbq
-         vNfddajdmOPiGl0PyNKqY2hon4hYsuQHJvhuqfG5uxdLPfAW6rOrZBLLlaSWlNhQss1q
-         BCI7DLCqDKJv+wkROMwzJQ+xn2NZF6njWm8eA0hhyzjuuElnSrWIsaN92o+K/j7sRM3v
-         bcz/TnaZabI69pok77atryvFxVbqUynR3hethfIzf4yQMntzJm86GsFwEMwKmoogd9Em
-         tdfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=zSxj8eRX0cnZYbcOeH01JUaZh5KPAX40UEWt0+2IJiM=;
-        b=dIWAB0HcVfHn/c161g9pqCB0LpgTxSiGewHxRIYntId3ej85PK4Tk9nRh2Et5pXGLc
-         +piiS0ajmpfS1/kZBO/z58T8rpr25TRRFIuMIuQFkonK/OfjuKGzPv/9vfDPiPHB1O4G
-         QP9zBH3BE76KknyMw6MzKO+N8JZltblJWcmBHsbJaavVHEev8+2PHAB3U8eY1cng7m0Y
-         49D/md8a8t+O3ipvy+kKR1wkYzFk8ILTHP48PwxV7j9tvAmaBkYGqYzTnS3DdMvWlk90
-         zfUFREZDKEuK/V63ZxgGc6bA/wI+a8YrFj8aKazb9iM1c/hTi2iK4nTns5RoWY4ezB2G
-         5dLw==
-X-Gm-Message-State: AOAM531puA2nQNgcMOxn86RJx4CXA3qFSZSAUUJSzGcCvWmDCsWi1ii8
-        /EkDA9X9A+4buSAPKt21/puqRg==
-X-Google-Smtp-Source: ABdhPJxeDdCpGqvSMmznYnDhqmjUQVZ7YRfHUv6xQxIKfIgqzs5xPqbn0hQnNT4ChktEWJKfOne+lQ==
-X-Received: by 2002:a63:86c1:: with SMTP id x184mr14326986pgd.469.1636828496852;
-        Sat, 13 Nov 2021 10:34:56 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id ml24sm8101994pjb.16.2021.11.13.10.34.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 13 Nov 2021 10:34:56 -0800 (PST)
-Date:   Sat, 13 Nov 2021 18:34:52 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Marc Orr <marcorr@google.com>
-Cc:     Peter Gonda <pgonda@google.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <Thomas.Lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <Michael.Roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
- Hypervisor Support
-Message-ID: <YZAFTBXtC/yS7xtq@google.com>
-References: <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
- <061ccd49-3b9f-d603-bafd-61a067c3f6fa@intel.com>
- <YY6z5/0uGJmlMuM6@zn.tnic>
- <YY7FAW5ti7YMeejj@google.com>
- <YY7I6sgqIPubTrtA@zn.tnic>
- <YY7Qp8c/gTD1rT86@google.com>
- <YY7USItsMPNbuSSG@zn.tnic>
- <CAMkAt6o909yYq3NfRboF3U3V8k-2XGb9p_WcQuvSjOKokmMzMA@mail.gmail.com>
- <YY8AJnMo9nh3tyPB@google.com>
- <CAA03e5G=fY7_qESCuoHW3_VdVbDWekqQxmvLPzWNepBqJjyCXg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAA03e5G=fY7_qESCuoHW3_VdVbDWekqQxmvLPzWNepBqJjyCXg@mail.gmail.com>
+        id S236138AbhKMTSV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 13 Nov 2021 14:18:21 -0500
+Received: from mail.kernel.org ([198.145.29.99]:54474 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236096AbhKMTSS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 13 Nov 2021 14:18:18 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPS id 71455611EE;
+        Sat, 13 Nov 2021 19:15:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1636830925;
+        bh=tfzTtNy72HuvUkMo0//95tonC/+HNaj2B9WkA50DDoQ=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=jAjGyqF0G9azvaphb37IRXsw+nEGwdRFhcXJQHZdwoCciOWxoZvgOKZdI8tSlVfgd
+         /AlTbkocW5yYhYbx8VlmRzmT2wxCOe/Dla2tM2CEtqiZImfYHZPvqtWxKFcJCsdV0j
+         adyGEXk+Xvx1a4kq5HTi0cAQR2gDta1Y3FCA28RGfArQ2ncx0jJKahwvwUs93QhXLL
+         bWIDiUXkq9U8AAhddu+JYQDW1ilHNjUCsY0Erh8JqBmNcNKXfg92KDbDR23P7uvsSm
+         st14J9FFJELYIVdFR5sXVWclPSafZwlMqJfmQQg55cDp2ibU01HaHtB7Ar7RF7PgGS
+         33sMwfgD11MGw==
+Received: from pdx-korg-docbuild-2.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by pdx-korg-docbuild-2.ci.codeaurora.org (Postfix) with ESMTP id 6B83F60987;
+        Sat, 13 Nov 2021 19:15:25 +0000 (UTC)
+Subject: Re: [GIT PULL] Second batch of KVM changes for Linux 5.16 merge window
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <20211112220315.3995734-1-pbonzini@redhat.com>
+References: <20211112220315.3995734-1-pbonzini@redhat.com>
+X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20211112220315.3995734-1-pbonzini@redhat.com>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+X-PR-Tracked-Commit-Id: 84886c262ebcfa40751ed508268457af8a20c1aa
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 4d6fe79fdeccb8f3968d71bc633e622d43f1309c
+Message-Id: <163683092543.10343.8830796288766749205.pr-tracker-bot@kernel.org>
+Date:   Sat, 13 Nov 2021 19:15:25 +0000
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 12, 2021, Marc Orr wrote:
-> > > > If *it* is the host kernel, then you probably shouldn't do that -
-> > > > otherwise you just killed the host kernel on which all those guests are
-> > > > running.
-> > >
-> > > I agree, it seems better to terminate the single guest with an issue.
-> > > Rather than killing the host (and therefore all guests). So I'd
-> > > suggest even in this case we do the 'convert to shared' approach or
-> > > just outright terminate the guest.
-> > >
-> > > Are there already examples in KVM of a KVM bug in servicing a VM's
-> > > request results in a BUG/panic/oops? That seems not ideal ever.
-> >
-> > Plenty of examples.  kvm_spurious_fault() is the obvious one.  Any NULL pointer
-> > deref will lead to a BUG, etc...  And it's not just KVM, e.g. it's possible, if
-> > unlikely, for the core kernel to run into guest private memory (e.g. if the kernel
-> > botches an RMP change), and if that happens there's no guarantee that the kernel
-> > can recover.
-> >
-> > I fully agree that ideally KVM would have a better sense of self-preservation,
-> > but IMO that's an orthogonal discussion.
-> 
-> I don't think we should treat the possibility of crashing the host
-> with live VMs nonchalantly. It's a big deal. Doing so has big
-> implications on the probability that any cloud vendor wil bee able to
-> deploy this code to production. And aren't cloud vendors one of the
-> main use cases for all of this confidential compute stuff? I'm
-> honestly surprised that so many people are OK with crashing the host.
+The pull request you sent on Fri, 12 Nov 2021 17:03:15 -0500:
 
-I'm not treating it nonchalantly, merely acknowledging that (a) some flavors of kernel
-bugs (or hardware issues!) are inherently fatal to the system, and (b) crashing the
-host may be preferable to continuing on in certain cases, e.g. if continuing on has a
-high probablity of corrupting guest data.
+> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/4d6fe79fdeccb8f3968d71bc633e622d43f1309c
+
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
