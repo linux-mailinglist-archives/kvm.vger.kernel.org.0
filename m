@@ -2,59 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B51744F4CC
-	for <lists+kvm@lfdr.de>; Sat, 13 Nov 2021 20:15:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 180FE44F658
+	for <lists+kvm@lfdr.de>; Sun, 14 Nov 2021 04:44:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236138AbhKMTSV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 13 Nov 2021 14:18:21 -0500
-Received: from mail.kernel.org ([198.145.29.99]:54474 "EHLO mail.kernel.org"
+        id S233621AbhKNDqF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 13 Nov 2021 22:46:05 -0500
+Received: from mga18.intel.com ([134.134.136.126]:22361 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236096AbhKMTSS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 13 Nov 2021 14:18:18 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPS id 71455611EE;
-        Sat, 13 Nov 2021 19:15:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1636830925;
-        bh=tfzTtNy72HuvUkMo0//95tonC/+HNaj2B9WkA50DDoQ=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=jAjGyqF0G9azvaphb37IRXsw+nEGwdRFhcXJQHZdwoCciOWxoZvgOKZdI8tSlVfgd
-         /AlTbkocW5yYhYbx8VlmRzmT2wxCOe/Dla2tM2CEtqiZImfYHZPvqtWxKFcJCsdV0j
-         adyGEXk+Xvx1a4kq5HTi0cAQR2gDta1Y3FCA28RGfArQ2ncx0jJKahwvwUs93QhXLL
-         bWIDiUXkq9U8AAhddu+JYQDW1ilHNjUCsY0Erh8JqBmNcNKXfg92KDbDR23P7uvsSm
-         st14J9FFJELYIVdFR5sXVWclPSafZwlMqJfmQQg55cDp2ibU01HaHtB7Ar7RF7PgGS
-         33sMwfgD11MGw==
-Received: from pdx-korg-docbuild-2.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by pdx-korg-docbuild-2.ci.codeaurora.org (Postfix) with ESMTP id 6B83F60987;
-        Sat, 13 Nov 2021 19:15:25 +0000 (UTC)
-Subject: Re: [GIT PULL] Second batch of KVM changes for Linux 5.16 merge window
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20211112220315.3995734-1-pbonzini@redhat.com>
-References: <20211112220315.3995734-1-pbonzini@redhat.com>
-X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20211112220315.3995734-1-pbonzini@redhat.com>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-X-PR-Tracked-Commit-Id: 84886c262ebcfa40751ed508268457af8a20c1aa
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 4d6fe79fdeccb8f3968d71bc633e622d43f1309c
-Message-Id: <163683092543.10343.8830796288766749205.pr-tracker-bot@kernel.org>
-Date:   Sat, 13 Nov 2021 19:15:25 +0000
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
+        id S230441AbhKNDqF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 13 Nov 2021 22:46:05 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10167"; a="220186334"
+X-IronPort-AV: E=Sophos;i="5.87,233,1631602800"; 
+   d="scan'208";a="220186334"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2021 19:43:11 -0800
+X-IronPort-AV: E=Sophos;i="5.87,233,1631602800"; 
+   d="scan'208";a="505432270"
+Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.255.28.38]) ([10.255.28.38])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Nov 2021 19:43:08 -0800
+Message-ID: <33598dac-d91c-c9b8-4f70-b3a0f9f20c23@intel.com>
+Date:   Sun, 14 Nov 2021 11:43:06 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.3.0
+Subject: Re: [PATCH 10/11] KVM: Disallow read-only memory for x86 TDX
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, erdemaktas@google.com,
+        Connor Kuehl <ckuehl@redhat.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        isaku.yamahata@intel.com, Kai Huang <kai.huang@intel.com>
+References: <20211112153733.2767561-1-xiaoyao.li@intel.com>
+ <20211112153733.2767561-11-xiaoyao.li@intel.com>
+ <YY6b4n8xPaKspoNI@google.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <YY6b4n8xPaKspoNI@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The pull request you sent on Fri, 12 Nov 2021 17:03:15 -0500:
+On 11/13/2021 12:52 AM, Sean Christopherson wrote:
+> On Fri, Nov 12, 2021, Xiaoyao Li wrote:
+>> From: Isaku Yamahata <isaku.yamahata@intel.com>
+>>
+>> TDX doesn't expose permission bits to the VMM in the SEPT tables, i.e.,
+>> doesn't support read-only private memory.
+>>
+>> Introduce kvm_arch_support_readonly_mem(), which returns true except for
+>> x86. x86 has its own implementation based on vm_type that returns faluse
+>> for TDX VM.
+>>
+>> Propagate it to KVM_CAP_READONLY_MEM to allow reporting on a per-VM
+>> basis.
+> 
+> Assuming KVM gains support for private memslots (or memslots that _may_ be mapped
+> private), this is incorrect, the restriction on read-only memory only applies to
+> private memory.  Userspace should still be allowed to create read-only shared memory.
+> Ditto for dirty-logging in the next patch.
 
-> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+Yes. I had the same concern before sending it out. :)
+But I forgot to mention it.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/4d6fe79fdeccb8f3968d71bc633e622d43f1309c
+> When this patch was originally created, it was "correct" because there was no
+> (proposed) concept of a private memslot or of a memslot that can be mapped private.
+> 
+> So these two patches at least need to wait until KVM has a defind ABI for managing
+> guest private memory.
+> 
 
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+I'll drop the two patches for next submission.
