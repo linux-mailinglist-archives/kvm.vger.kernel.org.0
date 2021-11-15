@@ -2,111 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E51645075B
-	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 15:43:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3ACE9450802
+	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 16:15:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231947AbhKOOpx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Nov 2021 09:45:53 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:58152 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232156AbhKOOpo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Nov 2021 09:45:44 -0500
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id E53D3212BE;
-        Mon, 15 Nov 2021 14:42:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1636987367; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=CurHMBKJtGDElStoPcZcZiFRey4p43QkUhyCC85DQy8=;
-        b=pxkXvCMQv5Aw/Dwj11Q1Yc61t5roI2OFQiwgMiOI56i7+CFiexIBAJMvBvB1/+c5/vhE/Y
-        s58fOGRNhnOL9UQXVl4FmLw4iXuSY4HwqmtGcxuz5wr/kSfudc/1zFe6x5vr/TCVFhwS+O
-        Pd+yrrNxBVpVig+F0x26RzQJeuoky8E=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1636987367;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=CurHMBKJtGDElStoPcZcZiFRey4p43QkUhyCC85DQy8=;
-        b=CX/tmvhzVt1su/AdrYGXZ7EY04Z2tin5GBffGXKCePBskL8D1T22oMvRd4mX1yEX2nzdJs
-        b6ak9mMTuAoFh5Aw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 87AC713A66;
-        Mon, 15 Nov 2021 14:42:46 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id vTH+HuZxkmGXMQAAMHmgww
-        (envelope-from <jroedel@suse.de>); Mon, 15 Nov 2021 14:42:46 +0000
-Date:   Mon, 15 Nov 2021 15:42:44 +0100
-From:   Joerg Roedel <jroedel@suse.de>
-To:     "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Peter Gonda <pgonda@google.com>,
-        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Tom Lendacky <Thomas.Lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
- Hypervisor Support
-Message-ID: <YZJx5PcBZ/izVg8L@suse.de>
-References: <20210820155918.7518-1-brijesh.singh@amd.com>
- <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
- <061ccd49-3b9f-d603-bafd-61a067c3f6fa@intel.com>
- <YY6z5/0uGJmlMuM6@zn.tnic>
- <YY7FAW5ti7YMeejj@google.com>
- <YZJTA1NyLCmVtGtY@work-vm>
+        id S236488AbhKOPRw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Nov 2021 10:17:52 -0500
+Received: from foss.arm.com ([217.140.110.172]:56492 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232398AbhKOPRt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Nov 2021 10:17:49 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AD01E6D;
+        Mon, 15 Nov 2021 07:14:53 -0800 (PST)
+Received: from [10.57.82.45] (unknown [10.57.82.45])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3E86B3F766;
+        Mon, 15 Nov 2021 07:14:51 -0800 (PST)
+Message-ID: <495c65e4-bd97-5f29-d39b-43671acfec78@arm.com>
+Date:   Mon, 15 Nov 2021 15:14:49 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YZJTA1NyLCmVtGtY@work-vm>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH 03/11] PCI: pci_stub: Suppress kernel DMA ownership
+ auto-claiming
+Content-Language: en-GB
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>
+Cc:     Kevin Tian <kevin.tian@intel.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Ashok Raj <ashok.raj@intel.com>, kvm@vger.kernel.org,
+        rafael@kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Will Deacon <will@kernel.org>, linux-kernel@vger.kernel.org,
+        iommu@lists.linux-foundation.org,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        linux-pci@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>
+References: <20211115020552.2378167-1-baolu.lu@linux.intel.com>
+ <20211115020552.2378167-4-baolu.lu@linux.intel.com>
+ <YZJe1jquP+osF+Wn@infradead.org> <20211115133107.GB2379906@nvidia.com>
+From:   Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <20211115133107.GB2379906@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 15, 2021 at 12:30:59PM +0000, Dr. David Alan Gilbert wrote:
-> Still; I wonder if it's best to kill the guest - maybe it's best for
-> the host to kill the guest and leave behind diagnostics of what
-> happened; for someone debugging the crash, it's going to be less useful
-> to know that page X was wrongly accessed (which is what the guest would
-> see), and more useful to know that it was the kernel's vhost-... driver
-> that accessed it.
+On 2021-11-15 13:31, Jason Gunthorpe via iommu wrote:
+> On Mon, Nov 15, 2021 at 05:21:26AM -0800, Christoph Hellwig wrote:
+>> On Mon, Nov 15, 2021 at 10:05:44AM +0800, Lu Baolu wrote:
+>>> pci_stub allows the admin to block driver binding on a device and make
+>>> it permanently shared with userspace. Since pci_stub does not do DMA,
+>>> it is safe.
+>>
+>> If an IOMMU is setup and dma-iommu or friends are not used nothing is
+>> unsafe anyway, it just is that IOMMU won't work..
+>>
+>>> However the admin must understand that using pci_stub allows
+>>> userspace to attack whatever device it was bound to.
+>>
+>> I don't understand this sentence at all.
+> 
+> If userspace has control of device A and can cause A to issue DMA to
+> arbitary DMA addresses then there are certain PCI topologies where A
+> can now issue peer to peer DMA and manipulate the MMMIO registers in
+> device B.
+> 
+> A kernel driver on device B is thus subjected to concurrent
+> manipulation of the device registers from userspace.
+> 
+> So, a 'safe' kernel driver is one that can tolerate this, and an
+> 'unsafe' driver is one where userspace can break kernel integrity.
 
-I is best to let the guest #VC on the page when this happens. If it
-happened because of a guest bug all necessary debugging data is in the
-guest and only the guest owner can obtain it.
+You mean in the case where the kernel driver is trying to use device B 
+in a purely PIO mode, such that userspace might potentially be able to 
+interfere with data being transferred in and out of the kernel? Perhaps 
+it's not so clear to put that under a notion of "DMA ownership", since 
+device B's DMA is irrelevant and it's really much more equivalent to 
+/dev/mem access or mmaping BARs to userspace while a driver is bound.
 
-Then the guest owner can do a kdump on this unexpected #VC and collect
-the data to debug the issue. With just killing the guest from the host
-side this data would be lost.
+> The second issue is DMA - because there is only one iommu_domain
+> underlying many devices if we give that iommu_domain to userspace it
+> means the kernel DMA API on other devices no longer works.
 
-Regards,
+Actually, the DMA API itself via iommu-dma will "work" just fine in the 
+sense that it will still successfully perform all its operations in the 
+unattached default domain, it's just that if the driver then programs 
+the device to access the returned DMA address, the device is likely to 
+get a nasty surprise.
 
-	Joerg
+> So no kernel driver doing DMA can work at all, under any PCI topology,
+> if userspace owns the IO page table.
+
+This isn't really about userspace at all - it's true of any case where a 
+kernel driver wants to attach a grouped device to its own unmanaged 
+domain. The fact that the VFIO kernel driver uses its unmanaged domains 
+to map user pages upon user requests is merely a VFIO detail, and VFIO 
+happens to be the only common case where unmanaged domains and 
+non-singleton groups intersect. I'd say that, logically, if you want to 
+put policy on mutual driver/usage compatibility anywhere it should be in 
+iommu_attach_group().
+
+Robin.
