@@ -2,73 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5CE97450A80
-	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 18:07:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5BA14450D1D
+	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 18:48:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231500AbhKORKA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Nov 2021 12:10:00 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:50212 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231862AbhKORJ3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 15 Nov 2021 12:09:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636995983;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=RzHfOtlOwL/xRZgmhHoEsdUmvHa8Hhdv3GzxS4wRJOw=;
-        b=Z6iDim6FyOkS4/aOxhoHEICq39er4tLGVotnByhl9uzrQIjEDwtk1voW3lFDNw7D4gR9+U
-        Vsu5BHVQXFzYA2EKw0czOXiGnBAwV5WO7Tu8qI0qCtH1QqBKuS+NE0EWcKIPxnuJlKAnff
-        Ovt3W3EOzVdx2imvaXnOPo+Dd4YTztY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-520-sUFKmz8COQy55XjLkSNE8Q-1; Mon, 15 Nov 2021 12:06:20 -0500
-X-MC-Unique: sUFKmz8COQy55XjLkSNE8Q-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7ABEF1572D;
-        Mon, 15 Nov 2021 17:06:18 +0000 (UTC)
-Received: from [10.39.195.133] (unknown [10.39.195.133])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C7717100164A;
-        Mon, 15 Nov 2021 17:06:09 +0000 (UTC)
-Message-ID: <ab419d8b-3e5d-2879-274c-ee609254890c@redhat.com>
-Date:   Mon, 15 Nov 2021 18:06:08 +0100
+        id S238217AbhKORtk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Nov 2021 12:49:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44308 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238824AbhKORrl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Nov 2021 12:47:41 -0500
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 392A5C079794
+        for <kvm@vger.kernel.org>; Mon, 15 Nov 2021 09:25:49 -0800 (PST)
+Received: by mail-pg1-x529.google.com with SMTP id r5so9254506pgi.6
+        for <kvm@vger.kernel.org>; Mon, 15 Nov 2021 09:25:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=zTcl/CA5Ev6UODKtmHkLeIkZrDlcXRolMIEi+XRmo/4=;
+        b=Ecl0cR1xR7V7WnPSUzOs7tEPw8P6cyZ335nnh7QMRz62gsdjjFoubmdkPQZg9HWsC6
+         V/p1WnKw07yMKVmnJmySSdDW4RE2A8/YHpHDZkgGWtFrFcjQxO8t5+Aqi/pjzl1GgOkC
+         hrDk+k2oXpUzuuJwg1XiLvM/suOqVOj/YAIJU+NLl0gyY5fArOTbfTJhWw1CjosHBRdR
+         FpLALiKVdw8LRNvx5HjfNzYxjm9es2xaaoMx8A7aRY5FWbzRyNhpQ2IH7aBoPzPLBnoY
+         CfbfwKnxMlD3rKWI+D0BUnzoJghtxM0gtp8RpaEsc8Hno8aJzxPRsck0OCTmhfDuEdJV
+         gMJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=zTcl/CA5Ev6UODKtmHkLeIkZrDlcXRolMIEi+XRmo/4=;
+        b=XWEohQCIxHB3NEJZeIwzSFly5E/3rQwrjDtjZh+LgVr4w5GluIRDrUAIwYu0QB/ROP
+         2ODNvwlU3qbqGR/tvGSN2Rm80htcyf7rPhnDaJgaU3jvbUWuNgQB540wIWWcUr9vkE5y
+         0BO16tgxcLmvWOuQpLx1OH5zZYHjiv13eX8WPucPJ+VRuzalFNvWG5FX0lnM+/RzStvP
+         34im3JRdU49YvD0uI7i05WgxImC6hzmb16eLmW1rLNwhDWFDdb784dTlae0tQZ0aEZj6
+         4EpbGrbbqIgQfb3P7tf2aO+zq4IGtj+DChWbBTKRMMP9WzcwGgs0OhBb8QhTADMI057u
+         x/2A==
+X-Gm-Message-State: AOAM530JOhV1Muqp1zItoCffnOUk2rNvlMVddcvSW6uOLZtJ9Fd2lyCs
+        NWZ1PKopHyoKJz4Z0JbC8XyXEg==
+X-Google-Smtp-Source: ABdhPJxWeWGi2U9i9fC6X4OCa+G3zMGesVsvaMbNPJ+jfguhVVFtD+RJxF8y7Z6fLKMDMarAgB7c6Q==
+X-Received: by 2002:aa7:888d:0:b0:47c:128b:ee57 with SMTP id z13-20020aa7888d000000b0047c128bee57mr34630009pfe.81.1636997148447;
+        Mon, 15 Nov 2021 09:25:48 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id j6sm12238880pgf.60.2021.11.15.09.25.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Nov 2021 09:25:47 -0800 (PST)
+Date:   Mon, 15 Nov 2021 17:25:43 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Joerg Roedel <jroedel@suse.de>
+Cc:     Marc Orr <marcorr@google.com>, Peter Gonda <pgonda@google.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <Michael.Roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
+ Hypervisor Support
+Message-ID: <YZKYF5DSjUmWJDEI@google.com>
+References: <YY6z5/0uGJmlMuM6@zn.tnic>
+ <YY7FAW5ti7YMeejj@google.com>
+ <YY7I6sgqIPubTrtA@zn.tnic>
+ <YY7Qp8c/gTD1rT86@google.com>
+ <YY7USItsMPNbuSSG@zn.tnic>
+ <CAMkAt6o909yYq3NfRboF3U3V8k-2XGb9p_WcQuvSjOKokmMzMA@mail.gmail.com>
+ <YY8AJnMo9nh3tyPB@google.com>
+ <CAA03e5G=fY7_qESCuoHW3_VdVbDWekqQxmvLPzWNepBqJjyCXg@mail.gmail.com>
+ <YZAFTBXtC/yS7xtq@google.com>
+ <YZKMmciB+wJyrmFI@suse.de>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH] KVM: x86: fix cocci warnings
-Content-Language: en-US
-To:     Peter Zijlstra <peterz@infradead.org>,
-        Vihas Mak <makvihas@gmail.com>
-Cc:     seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20211114164312.GA28736@makvihas>
- <YZJH0Hd/ETYWJGTX@hirez.programming.kicks-ass.net>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YZJH0Hd/ETYWJGTX@hirez.programming.kicks-ass.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YZKMmciB+wJyrmFI@suse.de>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/15/21 12:43, Peter Zijlstra wrote:
-> On Sun, Nov 14, 2021 at 10:13:12PM +0530, Vihas Mak wrote:
->> change 0 to false and 1 to true to fix following cocci warnings:
->>
->>          arch/x86/kvm/mmu/mmu.c:1485:9-10: WARNING: return of 0/1 in function 'kvm_set_pte_rmapp' with return type bool
->>          arch/x86/kvm/mmu/mmu.c:1636:10-11: WARNING: return of 0/1 in function 'kvm_test_age_rmapp' with return type bool
+On Mon, Nov 15, 2021, Joerg Roedel wrote:
+> On Sat, Nov 13, 2021 at 06:34:52PM +0000, Sean Christopherson wrote:
+> > I'm not treating it nonchalantly, merely acknowledging that (a) some flavors of kernel
+> > bugs (or hardware issues!) are inherently fatal to the system, and (b) crashing the
+> > host may be preferable to continuing on in certain cases, e.g. if continuing on has a
+> > high probablity of corrupting guest data.
 > 
-> That script should be deleted, it's absolute garbage.
+> The problem here is that for SNP host-side RMP faults it will often not
+> be clear at fault-time if it was caused by wrong guest or host behavior. 
 > 
+> I agree with Marc that crashing the host is not the right thing to do in
+> this situation. Instead debug data should be collected to do further
+> post-mortem analysis.
 
-Only a Sith deals in absolutes.
+Again, I am not saying that any RMP #PF violation is an immediate, "crash the
+host".  It should be handled exactly like any other #PF due to permission violation.
+The only wrinkle added by the RMP is that the #PF can be due to permissions on the
+GPA itself, but even that is not unique, e.g. see the proposed KVM XO support that
+will hopefully still land someday.
 
-Paolo
+If the guest violates the current permissions, it (indirectly) gets a #VC.  If host
+userspace violates permissions, it gets SIGSEGV.  If the host kernel violates
+permissions, then it reacts to the #PF in whatever way it can.  What I am saying is
+that in some cases, there is _zero_ chance of recovery in the host and so crashing
+the entire system is inevitable.   E.g. if the host kernel hits an RMP #PF when
+vectoring a #GP because the IDT lookup somehow triggers an RMP violation, then the
+host is going into triple fault shutdown.
 
+[*] https://lore.kernel.org/linux-mm/20191003212400.31130-1-rick.p.edgecombe@intel.com/
