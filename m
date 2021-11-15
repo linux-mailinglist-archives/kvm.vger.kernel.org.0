@@ -2,157 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F16945208E
+	by mail.lfdr.de (Postfix) with ESMTP id B46C645208F
 	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 01:52:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345595AbhKPAzi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Nov 2021 19:55:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35696 "EHLO
+        id S1350159AbhKPAzk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Nov 2021 19:55:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343584AbhKOTVX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Nov 2021 14:21:23 -0500
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5787C07DE4D
-        for <kvm@vger.kernel.org>; Mon, 15 Nov 2021 10:17:56 -0800 (PST)
-Received: by mail-pl1-x62f.google.com with SMTP id v19so4440203plo.7
-        for <kvm@vger.kernel.org>; Mon, 15 Nov 2021 10:17:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=zVIigt5hFRhwoHdnPkqdezNkgtT3bQVD+JV1TZ0yBQk=;
-        b=aIFb+Bg2kAQ6u2avnkXgX+2F+XsjwU8PJbAILzNG66y0Npi9zFLasu3DiaXqW2vnUq
-         XQn2eLnu4wHnrtJsF/JKd/GXTb/hXXs1b1tvMaulKoZJJG/RKlWLZNxsr6DJPAMgyhyQ
-         gLSA7I+KjaST0YMZnMn+HI9FW40+/+MwqE+2nhY8Y+6N2j7cMXMxniw6Tf0yVSTkiE3U
-         w1EBeHcm/riM8DRmyCdwozujjMclAB0IhtYBKO4J4uioDIWabX2Ng1GO2HH+mbCJlpC9
-         38U5GlMY9tw62ZR1mlT3p0jLcsVoNuP7Qbvh/lSUuU7SQnhyzDLppN9qLlWFSqBZZGwk
-         +MGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=zVIigt5hFRhwoHdnPkqdezNkgtT3bQVD+JV1TZ0yBQk=;
-        b=kL8DwqZZ7xQ2gGio5Fz0oC4wlO37tR5tamJo+7OJY0JqpjE6tSAZQEzHBcc+dP03Hc
-         WGm5fZTrNsijCO5Rw9ak7lU+DOKZzQb6B1EC+Poj1EmntWxWKdoPBSj7MLurl1DxugpU
-         o+b714FFMRa4egh0g942yJ4kyZVUrPWFKwvjbe5k9fstkfmCc+o1YCUKXT09lzdiKOW9
-         qwtAQcaxUEgmXAFhwNbPoLWdTrEVF5CNuSF8lzVG3LFEOTS8ZofuTjX4cFSAGsdY3aeF
-         hejULMdO8snRj+fJWyrWNANooYRS7uCxQb1O/Uh4XhCXWvL5H7Uk6nUWeTqWGTlZI1L3
-         BM0A==
-X-Gm-Message-State: AOAM532BuYAeOBeXL44usXn1bV7OKP6l8dSVYxJP5jVopIqU1fg00Yrj
-        UQKXv3F0fYq03LQJhQ7+98SX+Q==
-X-Google-Smtp-Source: ABdhPJyEk01A4cEBJRk2IJwMDA9ufuQA+Un9JScTgr2yhZJMzSPbmQlcRKUkuJ1yVS564FPMQwEnDg==
-X-Received: by 2002:a17:90b:4b04:: with SMTP id lx4mr647925pjb.11.1637000276010;
-        Mon, 15 Nov 2021 10:17:56 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id c3sm11160202pgk.16.2021.11.15.10.17.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Nov 2021 10:17:55 -0800 (PST)
-Date:   Mon, 15 Nov 2021 18:17:51 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Marc Orr <marcorr@google.com>
-Cc:     Peter Gonda <pgonda@google.com>, Andy Lutomirski <luto@kernel.org>,
-        Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@intel.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <Thomas.Lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <Michael.Roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Sathyanarayanan Kuppuswamy 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>
-Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
- Hypervisor Support
-Message-ID: <YZKkT1jwfGbkrGqu@google.com>
-References: <YY7I6sgqIPubTrtA@zn.tnic>
- <YY7Qp8c/gTD1rT86@google.com>
- <CAA03e5GwHMPYHHq3Nkkq1HnEJUUsw-Vk+5wFCott3pmJY7WuAw@mail.gmail.com>
- <2cb3217b-8af5-4349-b59f-ca4a3703a01a@www.fastmail.com>
- <CAA03e5Fw9cRnb=+eJmzEB+0QmdgaGZ7=fPTUYx7f55mGVXLRMA@mail.gmail.com>
- <CAMkAt6q9Wsw_KYypyZxhA1gkd=kFepk5rC5QeZ6Vo==P6=EAxg@mail.gmail.com>
- <YY8Mi36N/e4PzGP0@google.com>
- <CAA03e5F=7T3TcJBksiJ9ovafX65YfzAc0S+uYu5LjfTQ60yC7w@mail.gmail.com>
- <YZADwHxsx5cZ6m47@google.com>
- <CAA03e5HwYtn+eG1f5eP-SrZPyE4D2uf0v10=VkVoTNQQk87Kew@mail.gmail.com>
+        with ESMTP id S1343652AbhKOTVd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Nov 2021 14:21:33 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D1D2C07DE6F;
+        Mon, 15 Nov 2021 10:19:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=zVrBoirh2EF9+XPhCgtoyIlYq2wX2tx0m7p7r3K4JDE=; b=c0jPYjEJ2+8cqRIOPjmMalFRsM
+        wIuGdLyprIZWo22GRu4eRakSjo+en3lVr5mXfg6fN3FoeQAO9uG73Nb7nfxGxONrnUAR+UwqISNpn
+        oIGSMHGZKvoxd9uy7f4SLVMVKetQqzPSfg8jTxKb7zyRHVnOS/smfK4Hxe09WYAndcx5BqAXJMuP3
+        +7iO0yXz9x/J7Hi5O4CGiXlGExg8uJ37Lc3dbw4LUbR/qiISVUuSWAqWIELHG+RSGpQfkRcY5HvJf
+        sZkm4QHh4nad9xygINeOfTg3M9efb3+RI1XRq/Dwnqo7XPQxin/AvQry0RbC2Wv25PLusqyXo4a1g
+        F1X0B+lw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mmgZL-00GeVC-IN; Mon, 15 Nov 2021 18:19:03 +0000
+Date:   Mon, 15 Nov 2021 10:19:03 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Robin Murphy <robin.murphy@arm.com>
+Cc:     Jason Gunthorpe <jgg@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Ashok Raj <ashok.raj@intel.com>, kvm@vger.kernel.org,
+        rafael@kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Will Deacon <will@kernel.org>, linux-kernel@vger.kernel.org,
+        iommu@lists.linux-foundation.org,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        linux-pci@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>
+Subject: Re: [PATCH 03/11] PCI: pci_stub: Suppress kernel DMA ownership
+ auto-claiming
+Message-ID: <YZKkl/1GN+KgjYs6@infradead.org>
+References: <20211115020552.2378167-1-baolu.lu@linux.intel.com>
+ <20211115020552.2378167-4-baolu.lu@linux.intel.com>
+ <YZJe1jquP+osF+Wn@infradead.org>
+ <20211115133107.GB2379906@nvidia.com>
+ <495c65e4-bd97-5f29-d39b-43671acfec78@arm.com>
+ <20211115161756.GP2105516@nvidia.com>
+ <e9db18d3-dea3-187a-d58a-31a913d95211@arm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAA03e5HwYtn+eG1f5eP-SrZPyE4D2uf0v10=VkVoTNQQk87Kew@mail.gmail.com>
+In-Reply-To: <e9db18d3-dea3-187a-d58a-31a913d95211@arm.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Nov 13, 2021, Marc Orr wrote:
-> On Sat, Nov 13, 2021 at 10:28 AM Sean Christopherson <seanjc@google.com> wrote:
-> > The behavior is no different than it is today for regular VMs.
+On Mon, Nov 15, 2021 at 05:54:42PM +0000, Robin Murphy wrote:
+> > s/PIO/MMIO, but yes basically. And not just data trasnfer but
+> > userspace can interfere with the device state as well.
 > 
-> Isn't this counter to the sketch you laid out earlier where you wrote:
-> 
-> --- QUOTE START ---
->   - if userspace accesses guest private memory, it gets SIGSEGV or whatever.
->   - if kernel accesses guest private memory, it does BUG/panic/oops[*]
->   - if guest accesses memory with the incorrect C/SHARED-bit, it gets killed.
-> --- QUOTE END ---
-> 
-> Here, the guest does not get killed. Which seems hard to debug.
+> Sure, but unexpected changes in device state could happen for any number of
+> reasons - uncorrected ECC error, surprise removal, etc. - so if that can
+> affect "kernel integrity" I'm considering it an independent problem.
 
-No, it does contradict that statement.
- 
-  If the guest requests a conversion from shared=>private without first ensuring
-  the gfn is unused (by a host "device"), the host will side will continue accessing
-  the old, shared memory, which it locked, while the guest will be doing who knows
-  what.
+Well, most DMA is triggered by the host requesting it through MMIO.
+So having access to the BAR can turn many devices into somewhat
+arbitrary DMA engines.
 
-In this case, the guest will have converted a GPA from shared=>private, i.e. changed
-the effective GFN for a e.g. a shared queue, without informing host userspace that
-the GFN, and thus the associated HVA in the host, has changed. For TDX that is
-literally the same bug as the guest changing the GFN without informing the host, as
-the SHARED bit is just an address bit with some extra meaning piled on top.  For SNP,
-it's slightly different because the C-bit isn't strictly required to be an address
-bit, but for all intents and purposes it's the same type of bug.
+> I can see the argument from that angle, but you can equally look at it
+> another way and say that a device with kernel ownership is incompatible with
+> a kernel driver, if userspace can call write() on "/sys/devices/B/resource0"
+> such that device A's kernel driver DMAs all over it. Maybe that particular
+> example lands firmly under "just don't do that", but I'd like to figure out
+> where exactly we should draw the line between "DMA" and "ability to mess
+> with a device".
 
-I phrased it "guest will be doing who knows what" because from a host userspace
-perspective, it can't know what the guest behavior will be, and more importantly,
-it doesn't care because (a) the guest is buggy and (b) the host itself  is _not_ in
-danger.
-
-Yes, those types of bugs suck to debug.  But they really should be few and far
-between.  The only reason I called out this specific scenario was to note that host
-userspace doesn't need to take extra steps to guard against bogus shared=>private
-conversions, because host userspace already needs to have such guards in place.  In
-prior (offline?) conversations, we had assumed that host userspace would need to
-propagate the shared vs. private status to any and all processes that map guest
-memory, i.e. would require substantial enabling, but that assumption was wrong.
-
-> If allowing userspace to inject #VC into the guest means that the host
-> can continue to serve other guests, that seems like a win. The
-> alternative, to blow up the host, essentially expands the blast radius
-> from a single guest to all guests.
-
-As mentioned in other threads of this conversation, when I say "host crashes", I
-am specifically talking about scenarios where it is simply not possible for the
-host kernel to recover, e.g. an RMP #PF violation on the IDT.
-
-Setting that aside, injecting a #VC into the guest is not in anyway necessary for
-a buggy host userspace to terminate a single guest, host userspace can simply stop
-running that specific guest.
+Userspace writing to the resourceN files with a bound driver is a mive
+receipe for trouble.  Do we really allow this currently?
