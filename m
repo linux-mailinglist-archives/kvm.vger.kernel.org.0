@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 81CD445286F
+	by mail.lfdr.de (Postfix) with ESMTP id CA7E2452870
 	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 04:17:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244648AbhKPDTy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Nov 2021 22:19:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55536 "EHLO
+        id S1346295AbhKPDT5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Nov 2021 22:19:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238823AbhKPDSH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Nov 2021 22:18:07 -0500
+        with ESMTP id S238944AbhKPDSI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Nov 2021 22:18:08 -0500
 Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80BF9C125D64
-        for <kvm@vger.kernel.org>; Mon, 15 Nov 2021 15:46:31 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id hg9-20020a17090b300900b001a6aa0b7d8cso685271pjb.2
-        for <kvm@vger.kernel.org>; Mon, 15 Nov 2021 15:46:31 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E43F9C125D66
+        for <kvm@vger.kernel.org>; Mon, 15 Nov 2021 15:46:32 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id p12-20020a17090b010c00b001a65bfe8054so677619pjz.8
+        for <kvm@vger.kernel.org>; Mon, 15 Nov 2021 15:46:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=Dlsx6G0Aa6YAW2eF9MRy8C2GdRBAN+E2yIu8b7+b9gE=;
-        b=AEPSb9gB9X+mcoeEkrhUu6b+vkvNQpe19neoqdvuZtdk8rgBcyqmFEQqDZoShMgBCu
-         HREY/EiiIwsModnlEeROFHIQBCUq8L9TIJmwLikrEdzt361/YGsezjGOKqfuowRZtoK5
-         SS4gsvFbD606g0JsRcmIj2deIeblTjqimUdvAxUhiZ9Dk6MoEao7lPnuQ0qj+C07aQVt
-         CiBZCpRJdTH1X0Ybb6PtPVmtrS5v0+60kQZ6vpM6x5Xa6ybC/I8Iw940CH7vD2nA4RTV
-         4XaSQzbfht6xxSyB9CLzmuSLQBZSFmvGE/1Cjtv4I+zt6A+TElEvfa9ivyC49Iiy2zEX
-         cORg==
+        bh=z5GMv6NbiMRoCg4DiG3eqEEOfHTG8i5CBe13GQYa+1k=;
+        b=A2uLziMDfGCU+rrQ2OKXdWg6gzg6DIqlGF5SKsaSoBg7uWPPxDJY0s748vK6+QQSOT
+         xVg/6WqCuaWnBf1aaRCxe9xf7+yvVjEDPObAjPhySWzzmEz3J9u6ElblqUWlvjVY7gwQ
+         9vmqP0gILIWkpqZSxKMwhFsYVRsxmzG1kGVsOQ9RkVhdZp5YZlMfLwDa9/owMnejuIjF
+         Z/lLZlFfojUzhd72kFpUzI+tuPxreNL6xJRK2UkPOweqdhf/ZuW4ZbOZV0w9qjWt/Iav
+         94QkxePOPuEsMnQQXmsxrwGip68cpaX8/znoVlNLgXNzuZrx410YEZT+0NYZ0TcODjgj
+         S1PA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=Dlsx6G0Aa6YAW2eF9MRy8C2GdRBAN+E2yIu8b7+b9gE=;
-        b=MrW6tCN4yfYWhba2HNNqh1DefVRjokMdsqNC10x/Ok1yhzJuV1HVykcDDm9LK6PE8j
-         DtMsryC0ecn2iwMH3dSVNwJB5qhM4LBTCP3hEIbo06uPxmz5Se8Gjojkt+Kx9CPsPgq2
-         w330aWyi5uD3vZcJ+GJ7S4kzruUWdzDpEhGS5WvSEQOFdTdzAu6usm05jicxq5BgDaka
-         YKD8CLL7Svac+nEe8w0YCfPcwk0REZWAl1+V6e6HSWf6ljWn7ZcDYGIRD2l4W6LeNkR2
-         elvzcEoKLqnpjtojwi85CftfAxcwEfuG2T5Wa9ZXFWv3eV/6QIDSkCBzX8/vsHpzAzro
-         egYA==
-X-Gm-Message-State: AOAM530/0s47hrzOabeLnPWmR1+gKXX437aNa9FzfX3QUGlOOPUEGJfb
-        s2mbKzPrOsqYVIWm6J2qbSZBFkI2NqFR
-X-Google-Smtp-Source: ABdhPJxR7BgjoBwQ9B89WxUa2H67v65qgcqcKHTSHeJIPSHgSFYipbBYjqUIToRFiR6eHE45WHICziu1KB4s
+        bh=z5GMv6NbiMRoCg4DiG3eqEEOfHTG8i5CBe13GQYa+1k=;
+        b=HibSbj7L+EXtO5ZPynPtb6Eik2wwrkd/yPaelbBIIHXmO1bt+qCK4ikCicKb3IfQAB
+         jXahyn2tDI4rETLyhXhzyWTpGQDPHU9NVGWEhkR1R/VL6+WbG5MJ7u4Jy1anrLVg0Ze7
+         RHG3PNqumr/bHCHBNlfbKGDUfFZGDzLuQAqfsO2VFqM2wAHmUGw5NHdcjKX4J9wbkuLW
+         JeGHQv69PQTCdRySvkMPQeDU12EthrgDrTsiXke5yl+5zYcmMb9QCQHAAGD3C9s9BEzM
+         58Btyg/5QrZD9NCmO6Ng9x4w8abDkRl25hBOCUvHQTTVvxIj2327KuQktrIwA/BC3kB5
+         yaMw==
+X-Gm-Message-State: AOAM533DuEwIlWANQ+s1BHPIqRRV9HBTxPtJ+sYIOO8PQ13Qbj6dd7cs
+        Q6WAJImWJooB8CkTAomhHoXJf5JWizTM
+X-Google-Smtp-Source: ABdhPJxHaYh7TLQhMk8Ll5lZtJAQgEuc1s0oBzh/SNTUN5Q0ypeYOJUqaOndyUFkEtIVwn11rQrJFTghwIqK
 X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:916d:2253:5849:9965])
- (user=bgardon job=sendgmr) by 2002:a17:90a:284f:: with SMTP id
- p15mr5719pjf.1.1637019990603; Mon, 15 Nov 2021 15:46:30 -0800 (PST)
-Date:   Mon, 15 Nov 2021 15:46:01 -0800
+ (user=bgardon job=sendgmr) by 2002:a17:90b:1b4a:: with SMTP id
+ nv10mr3225743pjb.118.1637019992439; Mon, 15 Nov 2021 15:46:32 -0800 (PST)
+Date:   Mon, 15 Nov 2021 15:46:02 -0800
 In-Reply-To: <20211115234603.2908381-1-bgardon@google.com>
-Message-Id: <20211115234603.2908381-14-bgardon@google.com>
+Message-Id: <20211115234603.2908381-15-bgardon@google.com>
 Mime-Version: 1.0
 References: <20211115234603.2908381-1-bgardon@google.com>
 X-Mailer: git-send-email 2.34.0.rc1.387.gb447b232ab-goog
-Subject: [PATCH 13/15] KVM: x86/mmu: Add try_get_mt_mask to x86_ops
+Subject: [PATCH 14/15] KVM: x86/mmu: Make kvm_is_mmio_pfn usable outside of spte.c
 From:   Ben Gardon <bgardon@google.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
@@ -70,85 +70,39 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add another function for getting the memory type mask to x86_ops.
-This version of the function can fail, but it does not require a vCPU
-pointer. It will be used in a subsequent commit for in-place large page
-promotion when disabling dirty logging.
-
-No functional change intended.
+Export kvm_is_mmio_pfn from spte.c. It will be used in a subsequent
+commit for in-place lpage promotion when disabling dirty logging.
 
 
 Signed-off-by: Ben Gardon <bgardon@google.com>
 ---
- arch/x86/include/asm/kvm-x86-ops.h | 1 +
- arch/x86/include/asm/kvm_host.h    | 2 ++
- arch/x86/kvm/svm/svm.c             | 8 ++++++++
- arch/x86/kvm/vmx/vmx.c             | 1 +
- 4 files changed, 12 insertions(+)
+ arch/x86/kvm/mmu/spte.c | 2 +-
+ arch/x86/kvm/mmu/spte.h | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-index cefe1d81e2e8..c86e9629ff1a 100644
---- a/arch/x86/include/asm/kvm-x86-ops.h
-+++ b/arch/x86/include/asm/kvm-x86-ops.h
-@@ -84,6 +84,7 @@ KVM_X86_OP_NULL(sync_pir_to_irr)
- KVM_X86_OP(set_tss_addr)
- KVM_X86_OP(set_identity_map_addr)
- KVM_X86_OP(get_mt_mask)
-+KVM_X86_OP(try_get_mt_mask)
- KVM_X86_OP(load_mmu_pgd)
- KVM_X86_OP_NULL(has_wbinvd_exit)
- KVM_X86_OP(get_l2_tsc_offset)
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 88fce6ab4bbd..ae13075f4d4c 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1400,6 +1400,8 @@ struct kvm_x86_ops {
- 	int (*set_tss_addr)(struct kvm *kvm, unsigned int addr);
- 	int (*set_identity_map_addr)(struct kvm *kvm, u64 ident_addr);
- 	u64 (*get_mt_mask)(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio);
-+	bool (*try_get_mt_mask)(struct kvm *kvm, gfn_t gfn,
-+				bool is_mmio, u64 *mask);
- 
- 	void (*load_mmu_pgd)(struct kvm_vcpu *vcpu, hpa_t root_hpa,
- 			     int root_level);
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 21bb81710e0f..d073cc3985e6 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4067,6 +4067,13 @@ static bool svm_has_emulated_msr(struct kvm *kvm, u32 index)
- 	return true;
+diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+index 7be41d2dbb02..13b6143f6333 100644
+--- a/arch/x86/kvm/mmu/spte.c
++++ b/arch/x86/kvm/mmu/spte.c
+@@ -68,7 +68,7 @@ u64 make_mmio_spte(struct kvm_vcpu *vcpu, u64 gfn, unsigned int access)
+ 	return spte;
  }
  
-+static bool svm_try_get_mt_mask(struct kvm *kvm, gfn_t gfn,
-+				bool is_mmio, u64 *mask)
-+{
-+	*mask = 0;
-+	return true;
-+}
-+
- static u64 svm_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
+-static bool kvm_is_mmio_pfn(kvm_pfn_t pfn)
++bool kvm_is_mmio_pfn(kvm_pfn_t pfn)
  {
- 	return 0;
-@@ -4660,6 +4667,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.set_tss_addr = svm_set_tss_addr,
- 	.set_identity_map_addr = svm_set_identity_map_addr,
- 	.get_mt_mask = svm_get_mt_mask,
-+	.try_get_mt_mask = svm_try_get_mt_mask,
+ 	if (pfn_valid(pfn))
+ 		return !is_zero_pfn(pfn) && PageReserved(pfn_to_page(pfn)) &&
+diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+index d7598506fbad..909c24c733c4 100644
+--- a/arch/x86/kvm/mmu/spte.h
++++ b/arch/x86/kvm/mmu/spte.h
+@@ -347,4 +347,5 @@ u64 kvm_mmu_changed_pte_notifier_make_spte(u64 old_spte, kvm_pfn_t new_pfn);
  
- 	.get_exit_info = svm_get_exit_info,
+ void kvm_mmu_reset_all_pte_masks(void);
  
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 4129614262e8..8cd6c1f50d3e 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7658,6 +7658,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
- 	.set_tss_addr = vmx_set_tss_addr,
- 	.set_identity_map_addr = vmx_set_identity_map_addr,
- 	.get_mt_mask = vmx_get_mt_mask,
-+	.try_get_mt_mask = vmx_try_get_mt_mask,
- 
- 	.get_exit_info = vmx_get_exit_info,
- 
++bool kvm_is_mmio_pfn(kvm_pfn_t pfn);
+ #endif
 -- 
 2.34.0.rc1.387.gb447b232ab-goog
 
