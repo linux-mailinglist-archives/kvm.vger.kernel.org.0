@@ -2,87 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 35E83451084
-	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 19:47:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E7C74510D6
+	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 19:52:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242782AbhKOStw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Nov 2021 13:49:52 -0500
-Received: from foss.arm.com ([217.140.110.172]:59746 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S242924AbhKOSrd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Nov 2021 13:47:33 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 158CF1FB;
-        Mon, 15 Nov 2021 10:44:37 -0800 (PST)
-Received: from [10.57.82.45] (unknown [10.57.82.45])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 930603F70D;
-        Mon, 15 Nov 2021 10:44:34 -0800 (PST)
-Message-ID: <055c0ccb-7676-8e04-9d8f-a49dc3e8fc0a@arm.com>
-Date:   Mon, 15 Nov 2021 18:44:27 +0000
+        id S242865AbhKOSzj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Nov 2021 13:55:39 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:60494 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S243153AbhKOSwZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 15 Nov 2021 13:52:25 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1637002165;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=CUpVDfHC73r5/yQsY2zBw03ZHeFo5b5N2lfCLDkM3Z4=;
+        b=Z88ucPitCTuoUo8VfoqdkuLnSv5jo531Ju3bOxwgrQi6g6U0uy2eYXi/h7dezJya3Y58fn
+        7H8KojvdRXEZy+DbQoAubCaOQ7yYo+0O2uTk72xklBCS8mIxmxDduAiomt1eHWBGHMbaLS
+        9ETgayJ8Pbgfayfhh2XwgqIlzcS5SkY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-385-r2rWgYYTMru98kwWoPDy7w-1; Mon, 15 Nov 2021 13:49:20 -0500
+X-MC-Unique: r2rWgYYTMru98kwWoPDy7w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AA42510144E0;
+        Mon, 15 Nov 2021 18:49:18 +0000 (UTC)
+Received: from [10.39.195.133] (unknown [10.39.195.133])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 478BA60BE5;
+        Mon, 15 Nov 2021 18:49:16 +0000 (UTC)
+Message-ID: <0858131c-2116-13c3-4e63-600ff2083675@redhat.com>
+Date:   Mon, 15 Nov 2021 19:49:15 +0100
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH 03/11] PCI: pci_stub: Suppress kernel DMA ownership
- auto-claiming
-Content-Language: en-GB
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Ashok Raj <ashok.raj@intel.com>, kvm@vger.kernel.org,
-        rafael@kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Will Deacon <will@kernel.org>, linux-kernel@vger.kernel.org,
-        iommu@lists.linux-foundation.org,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Jacob jun Pan <jacob.jun.pan@intel.com>,
-        linux-pci@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>,
-        Diana Craciun <diana.craciun@oss.nxp.com>
-References: <20211115020552.2378167-1-baolu.lu@linux.intel.com>
- <20211115020552.2378167-4-baolu.lu@linux.intel.com>
- <YZJe1jquP+osF+Wn@infradead.org> <20211115133107.GB2379906@nvidia.com>
- <495c65e4-bd97-5f29-d39b-43671acfec78@arm.com>
- <20211115161756.GP2105516@nvidia.com>
- <e9db18d3-dea3-187a-d58a-31a913d95211@arm.com>
- <YZKkl/1GN+KgjYs6@infradead.org>
-From:   Robin Murphy <robin.murphy@arm.com>
-In-Reply-To: <YZKkl/1GN+KgjYs6@infradead.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH 11/11] KVM: x86/xen: Add KVM_IRQ_ROUTING_XEN_EVTCHN and
+ event channel delivery
+Content-Language: en-US
+To:     David Woodhouse <dwmw2@infradead.org>, kvm <kvm@vger.kernel.org>
+Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        "jmattson @ google . com" <jmattson@google.com>,
+        "wanpengli @ tencent . com" <wanpengli@tencent.com>,
+        "seanjc @ google . com" <seanjc@google.com>,
+        "vkuznets @ redhat . com" <vkuznets@redhat.com>,
+        "mtosatti @ redhat . com" <mtosatti@redhat.com>,
+        "joro @ 8bytes . org" <joro@8bytes.org>, karahmed@amazon.com
+References: <95fae9cf56b1a7f0a5f2b9a1934e29e924908ff2.camel@infradead.org>
+ <20211115165030.7422-1-dwmw2@infradead.org>
+ <20211115165030.7422-11-dwmw2@infradead.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20211115165030.7422-11-dwmw2@infradead.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021-11-15 18:19, Christoph Hellwig wrote:
-> On Mon, Nov 15, 2021 at 05:54:42PM +0000, Robin Murphy wrote:
->>> s/PIO/MMIO, but yes basically. And not just data trasnfer but
->>> userspace can interfere with the device state as well.
->>
->> Sure, but unexpected changes in device state could happen for any number of
->> reasons - uncorrected ECC error, surprise removal, etc. - so if that can
->> affect "kernel integrity" I'm considering it an independent problem.
-> 
-> Well, most DMA is triggered by the host requesting it through MMIO.
-> So having access to the BAR can turn many devices into somewhat
-> arbitrary DMA engines.
+On 11/15/21 17:50, David Woodhouse wrote:
+> +			asm volatile("1:\t" LOCK_PREFIX "orq %0, %1\n"
+> +				     "\tnotq %0\n"
+> +				     "\t" LOCK_PREFIX "andq %0, %2\n"
+> +				     "2:\n"
+> +				     "\t.section .fixup,\"ax\"\n"
+> +				     "3:\tjmp\t2b\n"
+> +				     "\t.previous\n"
+> +				     _ASM_EXTABLE_UA(1b, 3b)
+> +				     : "=r" (evtchn_pending_sel)
+> +				     : "m" (vi->evtchn_pending_sel),
+> +				       "m" (v->arch.xen.evtchn_pending_sel),
 
-Yup, but as far as I understand we're talking about the situation where 
-the overall group is already attached to the VFIO domain by virtue of 
-device A, so any unsolicited DMA by device B could only be to 
-userspace's own memory.
+These need to be "+m", I think?
 
->> I can see the argument from that angle, but you can equally look at it
->> another way and say that a device with kernel ownership is incompatible with
->> a kernel driver, if userspace can call write() on "/sys/devices/B/resource0"
->> such that device A's kernel driver DMAs all over it. Maybe that particular
->> example lands firmly under "just don't do that", but I'd like to figure out
->> where exactly we should draw the line between "DMA" and "ability to mess
->> with a device".
-> 
-> Userspace writing to the resourceN files with a bound driver is a mive
-> receipe for trouble.  Do we really allow this currently?
+And same for st->preempted actually.
 
-No idea - I just want to make sure we don't get blinkered on VFIO at 
-this point and consider the potential problem space fully :)
+Paolo
 
-Robin.
+> +				       "0" (evtchn_pending_sel));
+
