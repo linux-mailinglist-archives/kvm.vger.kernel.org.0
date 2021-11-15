@@ -2,106 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 555DF4504DA
-	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 14:02:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 66739450524
+	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 14:14:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231500AbhKONFH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Nov 2021 08:05:07 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:32023 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231508AbhKONEm (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 15 Nov 2021 08:04:42 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636981252;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=fNHR/4EKA1J8JSmTNFejCsQ+Ytekp9kmZceJTflwDKc=;
-        b=K71Dz7PS+WUylpAV2iwXBgm2kkvmz41PDjnIT3gMJ64TJ6lzPCiHF1bCI9prAresrqWSBu
-        32xtgKorLNdd6XXcJt1sDEZiclrSY6//SFEHpCTPicy5DH8qPzTT6Ci87GsqARfhEWt23q
-        JitsW9CFL6GyBCAwFON8klsVPGnk2w8=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-320-TqJHyn1qNVGkA0lR0ADlGA-1; Mon, 15 Nov 2021 08:00:51 -0500
-X-MC-Unique: TqJHyn1qNVGkA0lR0ADlGA-1
-Received: by mail-wr1-f70.google.com with SMTP id r12-20020adfdc8c000000b0017d703c07c0so3540098wrj.0
-        for <kvm@vger.kernel.org>; Mon, 15 Nov 2021 05:00:51 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version:content-transfer-encoding;
-        bh=fNHR/4EKA1J8JSmTNFejCsQ+Ytekp9kmZceJTflwDKc=;
-        b=GIgrqNoMbndFgfF0zyheZnU1MvPAyq7ZLccBBycNSTYMG29A1X4zVERFLtrjqHFpwe
-         gWwOATRH2Zv9uWrb9fYCViSdnWPWQtuR7yvIWGpXCMTBo79hBSKvmoRjH6OYFzIp8GjE
-         rDS0Gvlxsjnw7JKcafAcdrEf4WFo957umh8+wd+h7QB5zwSrUm5//knW0pJ29vrUkPCg
-         bhE5nVrYXDUZ8t7+a/vJftL4wziX2idEq3fXE3588J/IQ7aqTH3zxCS2H+k8PDAi0qer
-         TjKyZBmdczDcMmFpAooAsJLw68A/8peFKwmttqtQRcOu/Fz2RLSiMmMIRgbULoyYKF5y
-         2JsA==
-X-Gm-Message-State: AOAM533/ZZIYgfpDt/hpQ3nEA+MdJCuPR+6mYsANArT8xVLQaeQNH4SV
-        jLmYUBKIwd07cRTJgW1HHVCUFXgixhX07T8B22TpKWibX1lsx3oTe1WPA25Et1H/edhd8uYympg
-        ij0KoQ847gs9Z
-X-Received: by 2002:a5d:6902:: with SMTP id t2mr48286154wru.317.1636981250404;
-        Mon, 15 Nov 2021 05:00:50 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyksSkAyNqlPH0unAflPwLe/0xyM9aEOqPn8ztJiP3iIOBdvhurRV64rjvGcWEiuYSq5VU+dQ==
-X-Received: by 2002:a5d:6902:: with SMTP id t2mr48286129wru.317.1636981250253;
-        Mon, 15 Nov 2021 05:00:50 -0800 (PST)
-Received: from fedora (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id o25sm15107809wms.17.2021.11.15.05.00.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Nov 2021 05:00:49 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     =?utf-8?B?6buE5LmQ?= <huangle1@jd.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: Re: [PATCH] KVM: x86: Fix uninitialized eoi_exit_bitmap usage
- in vcpu_load_eoi_exitmap()
-In-Reply-To: <567b276444f841519e42c91f43f5acd7@jd.com>
-References: <567b276444f841519e42c91f43f5acd7@jd.com>
-Date:   Mon, 15 Nov 2021 14:00:48 +0100
-Message-ID: <877dd9efpb.fsf@redhat.com>
+        id S231601AbhKONR0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Nov 2021 08:17:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38240 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229998AbhKONRX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Nov 2021 08:17:23 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C74FC061570;
+        Mon, 15 Nov 2021 05:14:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Ijx7ygrsbGB8DaiDlZgsojxI26SKNZNZbgP3dg36cpY=; b=FAnpyplCWUHBo7vCQHkFDFzoub
+        WU+vsiZ5NN0CSB47F5895O6ji7tOk+uOsz23e4WjzUjiaJK/50tSPMC6Q72PjCDSA+sGJ8h4HXxZq
+        h/eL8/TPwp9a1MIV3OuFuWf5XN9CmcAVg9IlUloz4HYB39yBcZyZhLoDO4B2+upeIF222LRVAXznT
+        +rtbzf8Wbyor7puFccsX56b2JYRCR6LsRmIColzUmz7IUfZLtLh+ShIBpS/JsP7uPHBGWD5G/ua3I
+        K26+oZiG4YmoxJ9lb0zZt1NkvvqqD0Z+r7iKd3DAEE2zE1zwfcOZB90y9clEeWchSXLpivkQ9wsq4
+        IeJ4L3Eg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mmboK-00FchT-TG; Mon, 15 Nov 2021 13:14:12 +0000
+Date:   Mon, 15 Nov 2021 05:14:12 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Lu Baolu <baolu.lu@linux.intel.com>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>, kvm@vger.kernel.org,
+        rafael@kernel.org, linux-pci@vger.kernel.org,
+        Cornelia Huck <cohuck@redhat.com>,
+        linux-kernel@vger.kernel.org, iommu@lists.linux-foundation.org,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 01/11] iommu: Add device dma ownership set/release
+ interfaces
+Message-ID: <YZJdJH4AS+vm0j06@infradead.org>
+References: <20211115020552.2378167-1-baolu.lu@linux.intel.com>
+ <20211115020552.2378167-2-baolu.lu@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211115020552.2378167-2-baolu.lu@linux.intel.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-=E9=BB=84=E4=B9=90 <huangle1@jd.com> writes:
+On Mon, Nov 15, 2021 at 10:05:42AM +0800, Lu Baolu wrote:
+> +enum iommu_dma_owner {
+> +	DMA_OWNER_NONE,
+> +	DMA_OWNER_KERNEL,
+> +	DMA_OWNER_USER,
+> +};
+> +
 
->> =E9=BB=84=E4=B9=90 <huangle1@jd.com> writes:
->>=20
->> > In vcpu_load_eoi_exitmap(), currently the eoi_exit_bitmap[4] array is
->> > initialized only when Hyper-V context is available, in other path it is
->> > just passed to kvm_x86_ops.load_eoi_exitmap() directly from on the sta=
-ck,
->> > which would cause unexpected interrupt delivery/handling issues, e.g. =
-an
->> > *old* linux kernel that relies on PIT to do clock calibration on KVM m=
-ight
->> > randomly fail to boot.
->> >
->> > Fix it by passing ioapic_handled_vectors to load_eoi_exitmap() when Hy=
-per-V
->> > context is not available.
->> >
->> > Signed-off-by: Huang Le <huangle1@jd.com>
->>=20
->> Fixes: f2bc14b69c38 ("KVM: x86: hyper-v: Prepare to meet unallocated Hyp=
-er-V context")
->> Cc: stable@vger.kernel.org
->
-> Commit f2bc14b69c38 is not in stable tree I guess, it was merged in from =
-5.12,
-> do we still need Cc this patch to stable maintainers?
->
+> +	enum iommu_dma_owner dma_owner;
+> +	refcount_t owner_cnt;
+> +	struct file *owner_user_file;
 
-There are multiple stable trees, one for each major release. Not all of
-them are still supported but you don't need to care about it, 'Cc:
-stable@vger.kernel.org' is just an indication for everyone who has
-f2bc14b69c38 in his tree (5.12+) that there's a fix available.
+I'd just overload the ownership into owner_user_file,
 
---=20
-Vitaly
+ NULL			-> no owner
+ (struct file *)1UL)	-> kernel
+ real pointer		-> user
 
+Which could simplify a lot of the code dealing with the owner.
