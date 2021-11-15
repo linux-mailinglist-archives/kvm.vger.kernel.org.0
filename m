@@ -2,250 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BC7BC4508DF
-	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 16:46:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 90F564508EB
+	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 16:51:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236741AbhKOPtD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Nov 2021 10:49:03 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:30578 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236668AbhKOPss (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 15 Nov 2021 10:48:48 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1AFFCLm1013356;
-        Mon, 15 Nov 2021 15:45:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=D869qusUm/SUz9M/E6cbWv40amW1zruyiiVrsI6CyBY=;
- b=HuibcslNwDCfIdp2TE5ovD803XpA3XIZi80MAlNuqo/yRv7j44GO+5iD9QuFxhiwgsoa
- Jgzz7FtazdmPJTQqDeOG07FFtdYISh7tkqJdcFj9aakBNSMoQqC5+teCsizbGUvCCLuz
- gp+PD4Fa6rAFjWvoidPDqIKL6PWFbQhtntbA1fmJEHCcbOVkG1mz1XEiG5AO9EU8A92a
- VI6g8XKLa9e3Aa5VmjeJvYJWJfHdtNZ+QYXikQoTmKqUODL3wzy0PQJZmE5H8NXKHVkn
- rgfaeXaKFQV98J1GcUjAYXwFQqq+T3Y28IVIelx1Jh0bgdM5sGOIQXtgJ4t3LigFNWPf 0g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cbt04rrrc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 15 Nov 2021 15:45:49 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1AFFCOuQ013951;
-        Mon, 15 Nov 2021 15:45:49 GMT
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cbt04rrqu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 15 Nov 2021 15:45:49 +0000
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1AFFIwHQ026341;
-        Mon, 15 Nov 2021 15:45:48 GMT
-Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com [9.57.198.23])
-        by ppma02wdc.us.ibm.com with ESMTP id 3ca50a8w2f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 15 Nov 2021 15:45:48 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1AFFjl9k54067470
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 15 Nov 2021 15:45:47 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 87EBDAC068;
-        Mon, 15 Nov 2021 15:45:47 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 22EF1AC05E;
-        Mon, 15 Nov 2021 15:45:44 +0000 (GMT)
-Received: from cpe-172-100-181-211.stny.res.rr.com (unknown [9.160.15.195])
-        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
-        Mon, 15 Nov 2021 15:45:43 +0000 (GMT)
-Subject: Re: [PATCH v17 00/15] s390/vfio-ap: dynamic configuration support
-To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     jjherne@linux.ibm.com, freude@linux.ibm.com,
-        borntraeger@de.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com,
-        pasic@linux.ibm.com, alex.williamson@redhat.com,
-        kwankhede@nvidia.com, fiuczy@linux.ibm.com
-References: <20211021152332.70455-1-akrowiak@linux.ibm.com>
-From:   Tony Krowiak <akrowiak@linux.ibm.com>
-Message-ID: <46922cf6-cc99-4f5b-7070-e0f2c40ace33@linux.ibm.com>
-Date:   Mon, 15 Nov 2021 10:45:43 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        id S232385AbhKOPyF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Nov 2021 10:54:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46502 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236543AbhKOPx4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Nov 2021 10:53:56 -0500
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99B29C0613B9
+        for <kvm@vger.kernel.org>; Mon, 15 Nov 2021 07:50:58 -0800 (PST)
+Received: by mail-pl1-x62b.google.com with SMTP id u11so14850193plf.3
+        for <kvm@vger.kernel.org>; Mon, 15 Nov 2021 07:50:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=BME1fSm2ROoLW7jWsWBGz1p8OXFk8JxNq5V1TauLp5Q=;
+        b=HLvcHQp96QuOXyuPkCmhG2g+hcaPjiFRwauPLK//j87Y8hIfIJCg2yJtpLe6zKLUtz
+         wmHI9JKK53uxNOBhREJNRGMMO1WAUt1qAiQlZ0GlSWqw5dR8zZ5hMwtHXmHL19rzoJPh
+         X8X7pAkulAeWcuzJu8LGJE4zzTk4eGKX9EnwVyunm12PqycouX4nkBcZXdgKlxXNDUVn
+         xz8+KQhL2Y4xVqqmDcPwRJC66+Aq7Q/LGx0TRytcv9s67zx1DBu3Kt3G2UoYLqzLat5a
+         wmFg58k56pIJsp/BLajEadwgSrqZaSfxzCqwRV3BhY49uKpOFvI47q19MJhBQjzireUw
+         1ZDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=BME1fSm2ROoLW7jWsWBGz1p8OXFk8JxNq5V1TauLp5Q=;
+        b=jWDenZKXxq1Onr6BK2bTq6JQXXe0rXSyJwL1IniQXSdBFos15UBgpjVdef1k4XmNTs
+         Pwnqi3B5tM0HltzOplFNxjod5uNqP9vAXNAU6EI9w8S0/2MGK+z2etf369DC5hL4l6P+
+         yPIawp+jUrjQjtzOL4z8g4qmez/QiXbBqEpcpB5p2rzsiMZvsanhlaAcBacw/wll+vHI
+         heo6y3HEwSbTGiHCjTlKyo4RrWTiSVzrbqCdzc+VCWG0LECQtq/2ki4h0eaRzkw5qg1z
+         zZ76xA3v6QMKzJxOnhCoydul6roM0u2vR6DPaRStFxmTf4qnB4hJFOhGxUz8YTKweH+x
+         hoGg==
+X-Gm-Message-State: AOAM531F6oqwlEniRQz+GoUbTRdQWm7ISuhZMs5cHfLtkEW3dG3snMV8
+        X/wV+Jplz9rLS6fSwChbcNBI3A==
+X-Google-Smtp-Source: ABdhPJzkfNPFqJ2eOjVOjj++a8Q9aY0YzRwahIlHWylknHl5m6qCJ7esoFXilZ+0DUMiswsVTzJoWA==
+X-Received: by 2002:a17:902:6acb:b0:142:76c3:d35f with SMTP id i11-20020a1709026acb00b0014276c3d35fmr36151012plt.89.1636991457936;
+        Mon, 15 Nov 2021 07:50:57 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id v16sm12279434pgo.71.2021.11.15.07.50.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Nov 2021 07:50:57 -0800 (PST)
+Date:   Mon, 15 Nov 2021 15:50:53 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
+        <linux-kernel@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH v2 1/2] KVM: nVMX: don't use vcpu->arch.efer when
+ checking host state on nested state load
+Message-ID: <YZKB3Q1ZMsPD6hHl@google.com>
+References: <20211115131837.195527-1-mlevitsk@redhat.com>
+ <20211115131837.195527-2-mlevitsk@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20211021152332.70455-1-akrowiak@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: hzcQ_Iy-roWswUUpLmZBBvHWBBRL8i8V
-X-Proofpoint-GUID: pmfb_pBr_eEGFrX7dl6G39RMq-_G_mHj
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-11-15_10,2021-11-15_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 phishscore=0
- priorityscore=1501 mlxscore=0 lowpriorityscore=0 suspectscore=0
- impostorscore=0 adultscore=0 malwarescore=0 bulkscore=0 mlxlogscore=999
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2111150082
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211115131837.195527-2-mlevitsk@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PING!
+On Mon, Nov 15, 2021, Maxim Levitsky wrote:
+> When loading the nested state, due to the way qemu loads
+> the nested state, vcpu->arch.efer contains L2' IA32_EFER which
+> can be completely different from L1's IA32_EFER, thus it is
+> wrong to do consistency check of it vs the vmcs12 exit fields.
 
-On 10/21/21 11:23 AM, Tony Krowiak wrote:
-> The current design for AP pass-through does not support making dynamic
-> changes to the AP matrix of a running guest resulting in a few
-> deficiencies this patch series is intended to mitigate:
->
-> 1. Adapters, domains and control domains can not be added to or removed
->      from a running guest. In order to modify a guest's AP configuration,
->      the guest must be terminated; only then can AP resources be assigned
->      to or unassigned from the guest's matrix mdev. The new AP
->      configuration becomes available to the guest when it is subsequently
->      restarted.
->
-> 2. The AP bus's /sys/bus/ap/apmask and /sys/bus/ap/aqmask interfaces can
->      be modified by a root user without any restrictions. A change to
->      either mask can result in AP queue devices being unbound from the
->      vfio_ap device driver and bound to a zcrypt device driver even if a
->      guest is using the queues, thus giving the host access to the guest's
->      private crypto data and vice versa.
->
-> 3. The APQNs derived from the Cartesian product of the APIDs of the
->      adapters and APQIs of the domains assigned to a matrix mdev must
->      reference an AP queue device bound to the vfio_ap device driver. The
->      AP architecture allows assignment of AP resources that are not
->      available to the system, so this artificial restriction is not
->      compliant with the architecture.
->
-> 4. The AP configuration profile can be dynamically changed for the linux
->      host after a KVM guest is started. For example, a new domain can be
->      dynamically added to the configuration profile via the SE or an HMC
->      connected to a DPM enabled lpar. Likewise, AP adapters can be
->      dynamically configured (online state) and deconfigured (standby state)
->      using the SE, an SCLP command or an HMC connected to a DPM enabled
->      lpar. This can result in inadvertent sharing of AP queues between the
->      guest and host.
->
-> 5. A root user can manually unbind an AP queue device representing a
->      queue in use by a KVM guest via the vfio_ap device driver's sysfs
->      unbind attribute. In this case, the guest will be using a queue that
->      is not bound to the driver which violates the device model.
->
-> This patch series introduces the following changes to the current design
-> to alleviate the shortcomings described above as well as to implement
-> more of the AP architecture:
->
-> 1. A root user will be prevented from making edits to the AP bus's
->      /sys/bus/ap/apmask or /sys/bus/ap/aqmask if the change would transfer
->      ownership of an APQN from the vfio_ap device driver to a zcrypt driver
->      while the APQN is assigned to a matrix mdev.
->
-> 2. Allow a root user to hot plug/unplug AP adapters, domains and control
->      domains for a KVM guest using the matrix mdev via its sysfs
->      assign/unassign attributes.
->
-> 4. Allow assignment of an AP adapter or domain to a matrix mdev even if
->      it results in assignment of an APQN that does not reference an AP
->      queue device bound to the vfio_ap device driver, as long as the APQN
->      is not reserved for use by the default zcrypt drivers (also known as
->      over-provisioning of AP resources). Allowing over-provisioning of AP
->      resources better models the architecture which does not preclude
->      assigning AP resources that are not yet available in the system. Such
->      APQNs, however, will not be assigned to the guest using the matrix
->      mdev; only APQNs referencing AP queue devices bound to the vfio_ap
->      device driver will actually get assigned to the guest.
->
-> 5. Handle dynamic changes to the AP device model.
->
-> 1. Rationale for changes to AP bus's apmask/aqmask interfaces:
-> ----------------------------------------------------------
-> Due to the extremely sensitive nature of cryptographic data, it is
-> imperative that great care be taken to ensure that such data is secured.
-> Allowing a root user, either inadvertently or maliciously, to configure
-> these masks such that a queue is shared between the host and a guest is
-> not only avoidable, it is advisable. It was suggested that this scenario
-> is better handled in user space with management software, but that does
-> not preclude a malicious administrator from using the sysfs interfaces
-> to gain access to a guest's crypto data. It was also suggested that this
-> scenario could be avoided by taking access to the adapter away from the
-> guest and zeroing out the queues prior to the vfio_ap driver releasing the
-> device; however, stealing an adapter in use from a guest as a by-product
-> of an operation is bad and will likely cause problems for the guest
-> unnecessarily. It was decided that the most effective solution with the
-> least number of negative side effects is to prevent the situation at the
-> source.
->
-> 2. Rationale for hot plug/unplug using matrix mdev sysfs interfaces:
-> ----------------------------------------------------------------
-> Allowing a user to hot plug/unplug AP resources using the matrix mdev
-> sysfs interfaces circumvents the need to terminate the guest in order to
-> modify its AP configuration. Allowing dynamic configuration makes
-> reconfiguring a guest's AP matrix much less disruptive.
->
-> 3. Rationale for allowing over-provisioning of AP resources:
-> -----------------------------------------------------------
-> Allowing assignment of AP resources to a matrix mdev and ultimately to a
-> guest better models the AP architecture. The architecture does not
-> preclude assignment of unavailable AP resources. If a queue subsequently
-> becomes available while a guest using the matrix mdev to which its APQN
-> is assigned, the guest will be given access to it. If an APQN
-> is dynamically unassigned from the underlying host system, it will
-> automatically become unavailable to the guest.
->
-> Change log v16-v17:
-> ------------------
-> * Introduced a new patch (patch 1) to remove the setting of the pqap hook
->    in the group notifier callback. It is now set when the vfio_ap device
->    driver is loaded.
->
-> * Patch 6:
->      - Split the filtering of the APQNs and the control domains into
->        two functions and consolidated the vfio_ap_mdev_refresh_apcb and
->        vfio_ap_mdev_filter_apcb into one function named
->        vfio_ap_mdev_filter_matrix because the matrix is actually what is
->        being filtered.
->
->      - Removed ACK by Halil Pasic because of changes above; needs re-review.
->
-> * Introduced a new patch (patch 8) to keep track of active guests.
->
-> * Patch 9 (patch 8 in v16):
->      - Refactored locking to ensure KVM lock is taken before
->        matrix_dev->lock when hot plugging adapters, domains and
->        control domains.
->
->      - Removed ACK by Halil because of changes above; needs re-review.
->
-> * Patch 14 (patch 13 in v16):
->      - This patch has been redesigned to ensure proper locking order (i.e.,
->        taking kvm->lock before matrix_dev->lock).
->
->      - Removed Halil's Removed-by because of changes above; needs re-review.
->
-> Tony Krowiak (15):
->    s390/vfio-ap: Set pqap hook when vfio_ap module is loaded
->    s390/vfio-ap: use new AP bus interface to search for queue devices
->    s390/vfio-ap: move probe and remove callbacks to vfio_ap_ops.c
->    s390/vfio-ap: manage link between queue struct and matrix mdev
->    s390/vfio-ap: introduce shadow APCB
->    s390/vfio-ap: refresh guest's APCB by filtering APQNs assigned to mdev
->    s390/vfio-ap: allow assignment of unavailable AP queues to mdev device
->    s390/vfio-ap: keep track of active guests
->    s390/vfio-ap: allow hot plug/unplug of AP resources using mdev device
->    s390/vfio-ap: reset queues after adapter/domain unassignment
->    s390/ap: driver callback to indicate resource in use
->    s390/vfio-ap: implement in-use callback for vfio_ap driver
->    s390/vfio-ap: sysfs attribute to display the guest's matrix
->    s390/ap: notify drivers on config changed and scan complete callbacks
->    s390/vfio-ap: update docs to include dynamic config support
->
->   Documentation/s390/vfio-ap.rst        |  492 ++++++---
->   arch/s390/include/asm/kvm_host.h      |   10 +-
->   arch/s390/kvm/kvm-s390.c              |    1 -
->   arch/s390/kvm/priv.c                  |   45 +-
->   drivers/s390/crypto/ap_bus.c          |  241 ++++-
->   drivers/s390/crypto/ap_bus.h          |   16 +
->   drivers/s390/crypto/vfio_ap_drv.c     |   52 +-
->   drivers/s390/crypto/vfio_ap_ops.c     | 1379 ++++++++++++++++++-------
->   drivers/s390/crypto/vfio_ap_private.h |   66 +-
->   9 files changed, 1714 insertions(+), 588 deletions(-)
->
+This is not sufficient justification.  It makes it sound like KVM is hacking
+around a bug in its ABI, which it is not, but that fact is _very_ subtle.  The
+"trust" blurb in bullet (3) in particular is misleading.
 
+Instead, I would like something like:
+
+  When loading nested state, don't use check vcpu->arch.efer to get the
+  L1 host's 64-bit vs. 32-bit state and don't check it for consistency
+  with respect to VM_EXIT_HOST_ADDR_SPACE_SIZE, as register state in vCPU
+  may be stale when KVM_SET_NESTED_STATE is called and conceptually does
+  not exist.  When the CPU is in non-root mode, i.e. when restoring L2
+  state in KVM, there is no snapshot of L1 host state, it is (conditionally)
+  loaded on VM-Exit.  E.g. EFER is either preserved on exit, loaded from the
+  VMCS (vmcs12 in this case), or loaded from the MSR load list.
+
+  Use vmcs12.VM_EXIT_HOST_ADDR_SPACE_SIZE to determine the target mode of
+  the L1 host, as it is the source of truth in this case.  Perform the EFER
+  vs. vmcs12.VM_EXIT_HOST_ADDR_SPACE_SIZE consistency check only on VM-Enter,
+  as conceptually there's no "current" L1 EFER to check.
+
+  Note, KVM still checks vmcs12.HOST_EFER for consistency if
+  if vmcs12.VM_EXIT_LOAD_IA32_EFER is set, i.e. this skips only the check
+  against current vCPU state, which does not exist, when loading nested state.
+
+> To fix this
+> 
+> 1. Split the host state consistency check
+> between current IA32_EFER.LMA and 'host address space' bit in VMCS12 into
+> nested_vmx_check_address_state_size.
+> 
+> 2. Call this check only on a normal VM entry, while skipping this call
+> on loading the nested state.
+> 
+> 3. Trust the 'host address space' bit to contain correct ia32e
+> value on loading the nested state as it is the best value of
+> it at that point.
+> Still do a consistency check of it vs host_ia32_efer in vmcs12.
+> 
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+>  arch/x86/kvm/vmx/nested.c | 22 +++++++++++++++++-----
+>  1 file changed, 17 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index b4ee5e9f9e201..7b1d5510a7cdc 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -2866,6 +2866,17 @@ static int nested_vmx_check_controls(struct kvm_vcpu *vcpu,
+>  	return 0;
+>  }
+>  
+> +static int nested_vmx_check_address_state_size(struct kvm_vcpu *vcpu,
+> +				       struct vmcs12 *vmcs12)
+
+Bad indentation.
+
+> +{
+> +#ifdef CONFIG_X86_64
+> +	if (CC(!!(vmcs12->vm_exit_controls & VM_EXIT_HOST_ADDR_SPACE_SIZE) !=
+> +		!!(vcpu->arch.efer & EFER_LMA)))
+
+Bad indentation.  The number of !'s is also unnecessary.  This also needs a comment
+explaining why it's not included in the KVM_SET_NESTED_STATE path.
+
+> +		return -EINVAL;
+> +#endif
+> +	return 0;
+> +}
+> +
+>  static int nested_vmx_check_host_state(struct kvm_vcpu *vcpu,
+>  				       struct vmcs12 *vmcs12)
+>  {
+> @@ -2890,18 +2901,16 @@ static int nested_vmx_check_host_state(struct kvm_vcpu *vcpu,
+>  		return -EINVAL;
+>  
+>  #ifdef CONFIG_X86_64
+> -	ia32e = !!(vcpu->arch.efer & EFER_LMA);
+> +	ia32e = !!(vmcs12->vm_exit_controls & VM_EXIT_HOST_ADDR_SPACE_SIZE);
+
+
+>  #else
+>  	ia32e = false;
+>  #endif
+>  
+>  	if (ia32e) {
+> -		if (CC(!(vmcs12->vm_exit_controls & VM_EXIT_HOST_ADDR_SPACE_SIZE)) ||
+> -		    CC(!(vmcs12->host_cr4 & X86_CR4_PAE)))
+> +		if (CC(!(vmcs12->host_cr4 & X86_CR4_PAE)))
+>  			return -EINVAL;
+>  	} else {
+> -		if (CC(vmcs12->vm_exit_controls & VM_EXIT_HOST_ADDR_SPACE_SIZE) ||
+> -		    CC(vmcs12->vm_entry_controls & VM_ENTRY_IA32E_MODE) ||
+> +		if (CC(vmcs12->vm_entry_controls & VM_ENTRY_IA32E_MODE) ||
+>  		    CC(vmcs12->host_cr4 & X86_CR4_PCIDE) ||
+>  		    CC((vmcs12->host_rip) >> 32))
+>  			return -EINVAL;
+> @@ -3571,6 +3580,9 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
+>  	if (nested_vmx_check_controls(vcpu, vmcs12))
+>  		return nested_vmx_fail(vcpu, VMXERR_ENTRY_INVALID_CONTROL_FIELD);
+>  
+> +	if (nested_vmx_check_address_state_size(vcpu, vmcs12))
+> +		return nested_vmx_fail(vcpu, VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
+> +
+>  	if (nested_vmx_check_host_state(vcpu, vmcs12))
+>  		return nested_vmx_fail(vcpu, VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
+>  
+> -- 
+> 2.26.3
+> 
