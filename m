@@ -2,138 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4E93D450443
-	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 13:17:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9EF2B450473
+	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 13:31:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231467AbhKOMUF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Nov 2021 07:20:05 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:11238 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231329AbhKOMUB (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 15 Nov 2021 07:20:01 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1AFAxUCu022822;
-        Mon, 15 Nov 2021 12:16:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=FGzXDLCIzbaoG6sA4ktZGlkzV+djpIiRQi2B3Z+NZpU=;
- b=VkmEBZBwPQVnrCbrtLJb8LuBfFST5QxmvLrYBaM72yIcJNpUAlxoqB+W1Gq1748d2HFm
- 2zdB31SnbilqF1+4UBGMFY2+14xwMPfy5oGyW/zIJb9uBGlkXWZ1F3d3c55WYUZYv4d6
- i4r5BTucQ1+7dHZBCnx/FB7zB6oNuzgxiE0ZpB0ClRIXL0vDf85TPvX2I0JEkhWrc0lM
- ub8VOO17c5lsBAandpfVJ07IxsLkWsFcc5nPByXLXcozU2JnYJSc5Lfevpuq8dkEPdaQ
- a3v0oqKymdSBjCInG7CRu/LeRk1s2S6iwQWKhr/JGatmWJ2rbt6kZ5s0x3k605lsK4/U eQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cbcw1ce98-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 15 Nov 2021 12:16:18 +0000
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1AFC0I4n005497;
-        Mon, 15 Nov 2021 12:16:17 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cbcw1ce8g-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 15 Nov 2021 12:16:17 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1AFCDkOB002455;
-        Mon, 15 Nov 2021 12:16:14 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma03fra.de.ibm.com with ESMTP id 3ca509mh6b-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 15 Nov 2021 12:16:14 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1AFC9Lml64815552
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 15 Nov 2021 12:09:21 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2429F42049;
-        Mon, 15 Nov 2021 12:16:12 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3E5E442042;
-        Mon, 15 Nov 2021 12:16:11 +0000 (GMT)
-Received: from [9.171.56.111] (unknown [9.171.56.111])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 15 Nov 2021 12:16:11 +0000 (GMT)
-Message-ID: <b581f056-e7ea-befa-8c13-50644105c042@de.ibm.com>
-Date:   Mon, 15 Nov 2021 13:16:10 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH 0/5] KVM: Cap KVM_CAP_NR_VCPUS by KVM_CAP_MAX_VCPUS and
- re-purpose it on x86
-Content-Language: en-US
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
+        id S230132AbhKOMeW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Nov 2021 07:34:22 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:25263 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231168AbhKOMeE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 15 Nov 2021 07:34:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1636979466;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=bmrvKUYAASjH6mIRSwiOSO3Soa8eQXTmOOyvhFqgyNs=;
+        b=NYhNPrytHyLARe6T3SH9dQV1z2j0dTmW4NSeaPb9ytosqBJKzvCi7KtI2aC435cRl3dYFU
+        OpcP492Nm/nqF1EdQL4xG08rnC9sf7qOfcVaxiOwCenN8yyNuaAVoHfK4gO8CJl3Q5ufr3
+        prJg+1We1f/anXnOMC8iJLvb2PN/I+4=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-124-bNaYmKLENKqikKMWPnIVxg-1; Mon, 15 Nov 2021 07:31:04 -0500
+X-MC-Unique: bNaYmKLENKqikKMWPnIVxg-1
+Received: by mail-wm1-f69.google.com with SMTP id o18-20020a05600c511200b00332fa17a02eso7817937wms.5
+        for <kvm@vger.kernel.org>; Mon, 15 Nov 2021 04:31:04 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=bmrvKUYAASjH6mIRSwiOSO3Soa8eQXTmOOyvhFqgyNs=;
+        b=Ec144O7yLqDPLToyXdS07HHK8VtLstZRfhAba6HYnGvjPELP6cW0O3JysekjDFvo+k
+         asSeVa/Sl8c7uCw4iVVdKXGJwad/Hxcm7gs0+bQGyVjorzXVJsT7AImFiO1D2P0K+CAJ
+         p35J45kgkdCUlOJZsbBS46bWrCPslO0w9iljv80K1gIytf7N2tWeriZmFFmk8JdNEsta
+         OMhepPhKi03IWwJLMMV3FbqeM1AqJEAGCly5UvAEVjf4lthcsmjVePP0hk0f297RFMLh
+         edDE6GwN0PvzH9u0lnhFKQ3yb4rRyqcVaRcI6R6wSNjwhPYwodHAxzna2mjpGKOG0whY
+         xttQ==
+X-Gm-Message-State: AOAM533y+fmZlkpxHK06oSKkHxCwL3aBW2L0n+31ew7nodg8vJ2um1KS
+        xapvhWWi0oh5CpqXKWS+RRFGLbNkXzm/7kkhsq6SXspXMIoVuyU67+SJDrwahsrJdI7FdZDkCH8
+        vY0byb8OVWQ6z
+X-Received: by 2002:adf:f708:: with SMTP id r8mr46380730wrp.198.1636979463371;
+        Mon, 15 Nov 2021 04:31:03 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzH7dBVhHzposGOZpkUWZ27MvoJHO6QECzLEU5yEXHaBNIHFbfvFOSCbhtiEPuokaDOzbkyRg==
+X-Received: by 2002:adf:f708:: with SMTP id r8mr46380675wrp.198.1636979463157;
+        Mon, 15 Nov 2021 04:31:03 -0800 (PST)
+Received: from work-vm (cpc109025-salf6-2-0-cust480.10-2.cable.virginm.net. [82.30.61.225])
+        by smtp.gmail.com with ESMTPSA id f7sm22666208wmg.6.2021.11.15.04.31.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Nov 2021 04:31:02 -0800 (PST)
+Date:   Mon, 15 Nov 2021 12:30:59 +0000
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Peter Gonda <pgonda@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Michael Ellerman <mpe@ellerman.id.au>, kvm-ppc@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20211111162746.100598-1-vkuznets@redhat.com>
- <4a3c7be7-12fa-6e47-64eb-02e6c5be5dbc@redhat.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-In-Reply-To: <4a3c7be7-12fa-6e47-64eb-02e6c5be5dbc@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 4GM4n7HdUC8wY57Y8aQbGHZR4IYkcALh
-X-Proofpoint-ORIG-GUID: 8BYV8Df_CMNWb7XWAnYRT1TEmZU4UwBJ
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
+ Hypervisor Support
+Message-ID: <YZJTA1NyLCmVtGtY@work-vm>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
+ <061ccd49-3b9f-d603-bafd-61a067c3f6fa@intel.com>
+ <YY6z5/0uGJmlMuM6@zn.tnic>
+ <YY7FAW5ti7YMeejj@google.com>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-11-15_10,2021-11-15_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 clxscore=1011
- priorityscore=1501 malwarescore=0 spamscore=0 bulkscore=0 mlxlogscore=999
- phishscore=0 mlxscore=0 adultscore=0 suspectscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
- definitions=main-2111150067
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <YY7FAW5ti7YMeejj@google.com>
+User-Agent: Mutt/2.0.7 (2021-05-04)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Am 11.11.21 um 17:32 schrieb Paolo Bonzini:
-> On 11/11/21 17:27, Vitaly Kuznetsov wrote:
->> This is a comtinuation of "KVM: x86: Drop arbitraty KVM_SOFT_MAX_VCPUS"
->> (https://lore.kernel.org/kvm/20211111134733.86601-1-vkuznets@redhat.com/)
->> work.
->>
->> 1) Enforce KVM_CAP_NR_VCPUS <= KVM_CAP_MAX_VCPUS rule on all
->>   architectures. [Sean Christopherson]
->> 2) Make KVM_CAP_NR_VCPUS return num_online_cpus() and not an arbitrary
->>   value of '710' on x86.
->>
->> Everything but x86 was only 'eyeball tested', the change is trivial
->> but sorry in advance if I screwed up)
+* Sean Christopherson (seanjc@google.com) wrote:
+> On Fri, Nov 12, 2021, Borislav Petkov wrote:
+> > On Fri, Nov 12, 2021 at 09:59:46AM -0800, Dave Hansen wrote:
+> > > Or, is there some mechanism that prevent guest-private memory from being
+> > > accessed in random host kernel code?
 > 
-> Christian, can you look at this for s390?  Returning a fixed value seems wrong for KVM_CAP_NR_VCPUS.
+> Or random host userspace code...
+> 
+> > So I'm currently under the impression that random host->guest accesses
+> > should not happen if not previously agreed upon by both.
+> 
+> Key word "should".
+> 
+> > Because, as explained on IRC, if host touches a private guest page,
+> > whatever the host does to that page, the next time the guest runs, it'll
+> > get a #VC where it will see that that page doesn't belong to it anymore
+> > and then, out of paranoia, it will simply terminate to protect itself.
+> > 
+> > So cloud providers should have an interest to prevent such random stray
+> > accesses if they wanna have guests. :)
+> 
+> Yes, but IMO inducing a fault in the guest because of _host_ bug is wrong.
 
-will do. (Sorry I was OOO the last days).
+Would it necessarily have been a host bug?  A guest telling the host a
+bad GPA to DMA into would trigger this wouldn't it?
+
+Still; I wonder if it's best to kill the guest - maybe it's best for
+the host to kill the guest and leave behind diagnostics of what
+happened; for someone debugging the crash, it's going to be less useful
+to know that page X was wrongly accessed (which is what the guest would
+see), and more useful to know that it was the kernel's vhost-... driver
+that accessed it.
+
+Dave
+
+> On Fri, Nov 12, 2021, Peter Gonda wrote:
+> > Here is an alternative to the current approach: On RMP violation (host
+> > or userspace) the page fault handler converts the page from private to
+> > shared to allow the write to continue. This pulls from s390’s error
+> > handling which does exactly this. See ‘arch_make_page_accessible()’.
 > 
-> Thanks,
+> Ah, after further reading, s390 does _not_ do implicit private=>shared conversions.
 > 
-> Paolo
+> s390's arch_make_page_accessible() is somewhat similar, but it is not a direct
+> comparison.  IIUC, it exports and integrity protects the data and thus preserves
+> the guest's data in an encrypted form, e.g. so that it can be swapped to disk.
+> And if the host corrupts the data, attempting to convert it back to secure on a
+> subsequent guest access will fail.
 > 
->> Vitaly Kuznetsov (5):
->>    KVM: arm64: Cap KVM_CAP_NR_VCPUS by KVM_CAP_MAX_VCPUS
->>    KVM: MIPS: Cap KVM_CAP_NR_VCPUS by KVM_CAP_MAX_VCPUS
->>    KVM: PPC: Cap KVM_CAP_NR_VCPUS by KVM_CAP_MAX_VCPUS
->>    KVM: RISC-V: Cap KVM_CAP_NR_VCPUS by KVM_CAP_MAX_VCPUS
->>    KVM: x86: Drop arbitraty KVM_SOFT_MAX_VCPUS
->>
->>   arch/arm64/kvm/arm.c            | 7 ++++++-
->>   arch/mips/kvm/mips.c            | 2 +-
->>   arch/powerpc/kvm/powerpc.c      | 4 ++--
->>   arch/riscv/kvm/vm.c             | 2 +-
->>   arch/x86/include/asm/kvm_host.h | 1 -
->>   arch/x86/kvm/x86.c              | 2 +-
->>   6 files changed, 11 insertions(+), 7 deletions(-)
->>
+> The host kernel's handling of the "convert to secure" failures doesn't appear to
+> be all that robust, e.g. it looks like there are multiple paths where the error
+> is dropped on the floor and the guest is resumed , but IMO soft hanging the guest 
+> is still better than inducing a fault in the guest, and far better than potentially
+> coercing the guest into reading corrupted memory ("spurious" PVALIDATE).  And s390's
+> behavior is fixable since it's purely a host error handling problem.
 > 
+> To truly make a page shared, s390 requires the guest to call into the ultravisor
+> to make a page shared.  And on the host side, the host can pin a page as shared
+> to prevent the guest from unsharing it while the host is accessing it as a shared
+> page.
+> 
+> So, inducing #VC is similar in the sense that a malicious s390 can also DoS itself,
+> but is quite different in that (AFAICT) s390 does not create an attack surface where
+> a malicious or buggy host userspace can induce faults in the guest, or worst case in
+> SNP, exploit a buggy guest into accepting and accessing corrupted data.
+> 
+> It's also different in that s390 doesn't implicitly convert between shared and
+> private.  Functionally, it doesn't really change the end result because a buggy
+> host that writes guest private memory will DoS the guest (by inducing a #VC or
+> corrupting exported data), but at least for s390 there's a sane, legitimate use
+> case for accessing guest private memory (swap and maybe migration?), whereas for
+> SNP, IMO implicitly converting to shared on a host access is straight up wrong.
+> 
+> > Additionally it adds less complexity to the SNP kernel patches, and
+> > requires no new ABI.
+> 
+> I disagree, this would require "new" ABI in the sense that it commits KVM to
+> supporting SNP without requiring userspace to initiate any and all conversions
+> between shared and private.  Which in my mind is the big elephant in the room:
+> do we want to require new KVM (and kernel?) ABI to allow/force userspace to
+> explicitly declare guest private memory for TDX _and_ SNP, or just TDX?
+> 
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+
