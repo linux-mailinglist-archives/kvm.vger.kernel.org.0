@@ -2,209 +2,202 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B95145096A
-	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 17:18:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AF0C3450978
+	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 17:20:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236354AbhKOQVD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Nov 2021 11:21:03 -0500
-Received: from mail-bn8nam12on2060.outbound.protection.outlook.com ([40.107.237.60]:36704
-        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
+        id S235593AbhKOQWx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Nov 2021 11:22:53 -0500
+Received: from mail-dm6nam12on2064.outbound.protection.outlook.com ([40.107.243.64]:34144
+        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S236656AbhKOQU4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Nov 2021 11:20:56 -0500
+        id S236776AbhKOQVT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Nov 2021 11:21:19 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=H4TL/fEqblqcPME6MbeQ6IrLmIhRk9pN1xGaFH2VZYxs4LDr+j4jUTSfJHFCs51XZ10ggbgXjkq6HFqdXH9nXBIdGawFUzlOzxh/T4H0iI1kFqCmChKy2tT6NNtRW0yRl9Zbce2wez+QsDHAXQkOL3Jhg63U7fhE4nMrJWwUeFDIE5qdwCXc0NM1203b+jRVB0uu9L4bv7ikqpTyrdoKyi7VYVwXVNZgR75+LaVNQSi4c9G7utPk2b0Qw33bYfFFX4ChJjN6DaQiiYzOQBWcU55K/qpK4wVJUynWdUQQ6cg4PGu0SH6+0tNAGebaB5uqFZTXQ0y9BXVKbiLWQ3cZ4w==
+ b=eSWofc28M5qtMllr0wWab+BGqyxctikJlKJdbvOqdgtdg+/zyeqzwe0M4AZGUfCjylHRt+DD7N1QOkmVKIrPiO5Wxrm9oLnby5JDRiWsflNRarA+bwFlqaKtBG/zKu5HV1yBhWn32LXac9uV3rZZ+TmfkSputbFm13w6NsoFc0vxdE+V58u4bmGE3HzDo51a3BJvTn+sKyKoDmdxKJ66/wFc0Ko7XNCSR0s3BWKG4NFIuvqX0fKbozsUdPeH9MJ7uV/ktNWbVOCcegOBuAP9a25cik01KUZIFItuu7ZeFqi/z9a1gme8pi7H8KXup9GKPuAlk6S9Z4JffDP+EXvWNQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7u6I72VA86inSpslU8RfEuvmcDMb3jjxoffhhv+53eg=;
- b=FyzbRGpdrNkZYera4eP5H5VZrIVxTNNo3yM5cuJxkObyfoxv6BCRsNJvLiKJalzGslth4/tSTmE7xNg4iaxiyz0moqyFpLjgezUTZYJJggtZ0yI6IJiBBVyLc5DV4p4iqxfMUkmgIXOs0BPlJ1gx7nB/bTFrOeIJiFo7F4vEkMPXOuqjY2DLBLu+iwDaQ0b5arzs0OXytIUvHRmWbG4mkWzyyxueZO0fQWAe137SAJejL9pH9lQrOAm60dyOch+o+tggZytai9XqkDbeGpnhb0xPJTXwhCRJPZDPqxZK11XUM5iMrl20exZd0xdZDSvxWldDuRXeJWWkVDp02sZ8rw==
+ bh=tivI8Qu5pG9d6fXLx/d5xWiunRbr4pYSWDPcWprdzfY=;
+ b=Ei3BOGQdX8shBdFdBZCsHcgfPEYn3DMwFCIncgWChXnOHPg+weRXzLG79I9jtcfUOvvY7Ane8qrWrFNOyeiqZU7zFXuMjRmM6oh2/CfgV8yjdpXeLJ1PBK8gntrfAYSxtwNFlaszGI73mcjuAPdsQIEQHqI8EIdgBstGDlwZhQYi8Cf6NlUElK7c+WyTJaZSXfqjsVoaTtLBWyunstb6osgQ8slXkIEfcGzhT++vXphjZx/xGOa6ST9cQw9lIUEcMZMqBQpO/C7Bi6cNoJ+s7to4n9WmwWKzvVv9PeW9kAV66U+/RjSlPmkjw2bESGwtIs/Rt7g6YfkmCxgzWbOxRA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7u6I72VA86inSpslU8RfEuvmcDMb3jjxoffhhv+53eg=;
- b=QgHpZL5gIhvD5bVrG1GnquJX+ISErQa8ScVjiU6MZliAHcD8hDCVso7nyXACPr5JizE0YIe5M+LgEP/a7RwIrB2GFjkZcosOKPG29TjJ8D/VsY50h7s4V1pScnouILvYBxTd/X4CBautjW8EfhIU9sww8fZi0zFfFwmgzRXRPC1cqjcbTUG8rwVXe3fiKLxpVtY+/ndh4H8dXm6RbJTZhTUoSku8CX/H52/edf16b4IfDpJaREGUHsHmJ58bDYIXLzIX1N6/20SaM6tbpt1Fl0Y4H65pSTitbG7q10cddhtTXhB2J+SBwa045qpEuB8CjrgyntdHxia19GBd9Oz4vw==
+ bh=tivI8Qu5pG9d6fXLx/d5xWiunRbr4pYSWDPcWprdzfY=;
+ b=1YFw1l5s/Q4c6vP3a+nh+ahwg+0T347vT0BbUffcs5BIAnbIe63w9mx1E8QdcQGZKcdlDt1uo4YXozaR4joOxtCg8IhTPDt45Q7Dqxuy/28RkwIla1vxKgmhTeseHQpmkxj34V15xm2/3oTo8qIlGA7OuEH5XtZOXKCH40kUXzk=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5159.namprd12.prod.outlook.com (2603:10b6:208:318::6) with
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
+ by SN6PR12MB2638.namprd12.prod.outlook.com (2603:10b6:805:6f::15) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4690.16; Mon, 15 Nov
- 2021 16:17:58 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::5897:83b2:a704:7909]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::5897:83b2:a704:7909%7]) with mapi id 15.20.4690.027; Mon, 15 Nov 2021
- 16:17:58 +0000
-Date:   Mon, 15 Nov 2021 12:17:56 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Robin Murphy <robin.murphy@arm.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Ashok Raj <ashok.raj@intel.com>, kvm@vger.kernel.org,
-        rafael@kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Will Deacon <will@kernel.org>, linux-kernel@vger.kernel.org,
-        iommu@lists.linux-foundation.org,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Jacob jun Pan <jacob.jun.pan@intel.com>,
-        linux-pci@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>,
-        Diana Craciun <diana.craciun@oss.nxp.com>
-Subject: Re: [PATCH 03/11] PCI: pci_stub: Suppress kernel DMA ownership
- auto-claiming
-Message-ID: <20211115161756.GP2105516@nvidia.com>
-References: <20211115020552.2378167-1-baolu.lu@linux.intel.com>
- <20211115020552.2378167-4-baolu.lu@linux.intel.com>
- <YZJe1jquP+osF+Wn@infradead.org>
- <20211115133107.GB2379906@nvidia.com>
- <495c65e4-bd97-5f29-d39b-43671acfec78@arm.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <495c65e4-bd97-5f29-d39b-43671acfec78@arm.com>
-X-ClientProxiedBy: YTOPR0101CA0008.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b00:15::21) To BL0PR12MB5506.namprd12.prod.outlook.com
- (2603:10b6:208:1cb::22)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4690.26; Mon, 15 Nov
+ 2021 16:18:22 +0000
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::e4da:b3ea:a3ec:761c]) by SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::e4da:b3ea:a3ec:761c%7]) with mapi id 15.20.4690.027; Mon, 15 Nov 2021
+ 16:18:22 +0000
+Cc:     brijesh.singh@amd.com, Dave Hansen <dave.hansen@intel.com>,
+        Peter Gonda <pgonda@google.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
+ Hypervisor Support
+To:     Sean Christopherson <seanjc@google.com>,
+        Borislav Petkov <bp@alien8.de>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
+ <061ccd49-3b9f-d603-bafd-61a067c3f6fa@intel.com> <YY6z5/0uGJmlMuM6@zn.tnic>
+ <YY7FAW5ti7YMeejj@google.com> <YY7I6sgqIPubTrtA@zn.tnic>
+ <YY7Qp8c/gTD1rT86@google.com>
+From:   Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <f2edf71e-f3b5-f8e3-a75e-e0f811fe6a14@amd.com>
+Date:   Mon, 15 Nov 2021 10:18:16 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
+In-Reply-To: <YY7Qp8c/gTD1rT86@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MN2PR10CA0015.namprd10.prod.outlook.com
+ (2603:10b6:208:120::28) To SN6PR12MB2718.namprd12.prod.outlook.com
+ (2603:10b6:805:6f::22)
 MIME-Version: 1.0
-Received: from mlx.ziepe.ca (206.223.160.26) by YTOPR0101CA0008.CANPRD01.PROD.OUTLOOK.COM (2603:10b6:b00:15::21) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4690.26 via Frontend Transport; Mon, 15 Nov 2021 16:17:58 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mmeg8-00A1pv-NG; Mon, 15 Nov 2021 12:17:56 -0400
+Received: from [10.236.30.107] (165.204.77.1) by MN2PR10CA0015.namprd10.prod.outlook.com (2603:10b6:208:120::28) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4690.15 via Frontend Transport; Mon, 15 Nov 2021 16:18:18 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 2a49121b-c1fa-4fcc-728f-08d9a8537ce9
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5159:
-X-Microsoft-Antispam-PRVS: <BL1PR12MB5159AF0A43A63737A4943A49C2989@BL1PR12MB5159.namprd12.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 94e6f560-b357-417a-91e5-08d9a8538b09
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2638:
+X-Microsoft-Antispam-PRVS: <SN6PR12MB2638C951E520FFC3B63D03B9E5989@SN6PR12MB2638.namprd12.prod.outlook.com>
 X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: J++W6ry/Kpg7sRNsUsLfNXxHYePW2FpHm+oF0ajZdOlZitUtUWIESrFj/vZx0dzxdNafyHgsPLobo8RKjR1o7iT2A8Dl7AgL5BUUACl7/e+Oyy/NMA0Lbbl+VXig83n+9h5f3ZQwXFZ7hd8HgLikMxbVr0MXzVN7x8UEQdUyArxxjnhnTRnPQmyM5Jn1U/VtEGPLho6b8T1h18E+x1NvLiOPQH+kqCpGuZYPEkllHAXFccq9sARh7KHTu93fgamC/pxGf1/Xni29lkHN3oE+H46y0DOipoDvIvkhpyz9PVObDRHuQhQNGMLnphKfuxs/6YVU49IUwCNMtJAjU4ExlZCpG/48z0rI49cT745p2iPu2EAWppBfLiQ8YmpiOl2emoK+IzhZ8rLKJ3VjB3So5X4J7w6AYOTzsX8+iPEUGGe8fyTTDEkOicvcHYGKEAxsQmad+Si9+XZSgmcKWmdrhaDXwna+GNYNtGx+9gtA3ewKsb8PFn55pJKxROaQUo21j7RyjQHHat8XhlMp6VKsFPDgIQ64W6gQXy1xtBxlnboxV1/jhp+BfWlSvjFiojE1jJuR+u1nKhWheJLIqy4bDMGBh1f95TvchUmUJaXgpYKAbn1ijtrehHkb8Sm9btpog8MD6QrmGbpcoeiDHBZ/eg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(316002)(2616005)(54906003)(5660300002)(508600001)(38100700002)(2906002)(86362001)(1076003)(186003)(426003)(8936002)(6916009)(83380400001)(4326008)(26005)(9746002)(66556008)(66476007)(9786002)(8676002)(7416002)(66946007)(33656002)(36756003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: 2+I3BgfQukXILTyiv6eLc3aKYIqKB+HM7LB6mJKrXMtZa3NbXUGkw3IcS4BRU0Rw7MMB/UUTuffYhelU4Rqg+U4Y05QIxdJiul+imVP5FF0AjZSWw1MgqDmRedKi/uSEepAQoEE/tJXESp472BKg/I0PTOKo76f+2FCkbz0ARM7ZbV0wzWl57MIJFNiyHt+t9LplFNVralqUSno8LEGgWeg3AS8SwpVl+CtPZsAbjxBROMeXL/muLsoaHJAlPh0tvBfaDyFO85I4+DfxwYR7uos6GpfVbPwdkxiJTKkQuuZ8bZcTrJJilNpBMEY66BDl2Cff0oe2qmcpbKMlUL7x/rOvBa4hCWcyFrV+wOtzavFcuom6ph2PC836jZimEIPdbNanWGTo70Bg5ScOKAgz9ZCU051Try4Qzh4o6aafS6k8bfasNsry6G8g55SyX5pBxNDwY8e84ATIxY2jqlTEwNww97bSZ3UU+gyBwYKu55BVENsB3bnYcMqXSSjHGV9CtXzjn2b2NlFwfhquVxpHBPDCqx+RW0KjgKqzMmIFKrT24krv7vVAr8H9+eC9Gwq1nJ/vG1Q5N0GKjsSgSbDJM1iEBoL4QcL/NaQ56vZzt493BOHzsQxlVNWkVMKu7BLqfwSzYsN5zMnrhnzUe+WBE8AwteTWk2E/u0RiCnehmckxqsAVw9+lxWQctu0Xg3+gFzjmA7JsA8kk6m+M9RSowh4R+/3/yx6DhnHS098CNKblgAOSkUqmSP2FJJaylJJ0
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(44832011)(38100700002)(8676002)(316002)(6486002)(53546011)(186003)(66946007)(66476007)(66556008)(110136005)(31686004)(956004)(31696002)(54906003)(2616005)(2906002)(508600001)(7416002)(8936002)(16576012)(86362001)(7406005)(5660300002)(4326008)(26005)(83380400001)(36756003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?mmmgaWLdcAw7nT1ACPaWrZq2Wb/x+zbIk3U0Ai79HgdVf6DM5gqVSEXTyHNn?=
- =?us-ascii?Q?t6Efqtr3avr+MyqYv5ivHncpjG6+6Wgu5WW3C+8xhKt4fvF2sGJPAq8+dATy?=
- =?us-ascii?Q?Ur9I8OqPLPDiDM3YXKwWGFayioVXNnX0bPY5g0P8tKZr2mVFajws86cINP9Y?=
- =?us-ascii?Q?tAU2bDQOqqgvk0yD7HYnqncmrlCg64+eTNoWIQAPfzaZKQuC0zzEDaJf1xjm?=
- =?us-ascii?Q?YsBgdc8aetMSOGybXbCfrsw+4MKukK3Sc402qSc+nIsFGH371P3/Fx/aYep6?=
- =?us-ascii?Q?Pto7KRqlh5bvQLyph80aXmAXzAR3t/pbNwz4hgPca7Z9NV6DC/rXHlgssE93?=
- =?us-ascii?Q?uFRhXumk0UKRkrZF92lk8jHRzuY/jagQtielRdWu4zhxmnMQOtB8nHqQZgZm?=
- =?us-ascii?Q?wwjgHAG0fT+aTjDCHgSe/yCmLXoPMAWhX4cj7Y80s0MaBiOYx8eU0Cxrjvcc?=
- =?us-ascii?Q?Z9/gDIja9e9b1iAvLlbQrHmxd5VzDKGXahML5Xz0sJmxoxivgMXHXiFARU2A?=
- =?us-ascii?Q?/Mz1vkMeRLwDMRxhCMEvHkllIpMazd61Xd1lE7bIRDgAnrsW9mPZCqvI6KXI?=
- =?us-ascii?Q?0X4JYFHB7xT1x73DyaITzAGDWIxF0D/IcTn50ibYhcRqDBGCJys9OwdLnBZl?=
- =?us-ascii?Q?2I9xS+kvbNYPRcRDTo8PrRCND5t0y3bH6PwDb3Nt1anSUJ4hYHICRVXbt/x9?=
- =?us-ascii?Q?ng/WdPYea2FmFQxhiYojY0JeDPQVcxaAbwwcZt1nZB14hXYdl2fdH0W+WngO?=
- =?us-ascii?Q?1s6F+iJWPTySGr6v5PAa9hWB3jPHmK8okx3kNfup689I07wjIqrFv2wVrwCW?=
- =?us-ascii?Q?zSfyA49EECGPuFpv+LC1LmPEjfNOFZ0Jg3uhO0eHApDBiYJnW88c3YPRPi2/?=
- =?us-ascii?Q?Q/vkR+sM9o1yg6182wSce1JL9NHTSUvaRN526oTQtO7l/aJ+bEyWjN52vCHe?=
- =?us-ascii?Q?qODQkQtI1G6YXkSD8LNmYEGsRB0M1KWVSZ8Esd0mfIrRn9ChIY/5bhOnszW8?=
- =?us-ascii?Q?4WIwkH6LSPXnTjA2cRRa27YLr+qwHIKS4YsOa51u0o2GYjQylNvztuaEopor?=
- =?us-ascii?Q?3JVT41Kjicvdrr5Dr3NgMdAdK3uAls7c9ONvhYr8+SkD575IqvpjMntGJzHR?=
- =?us-ascii?Q?x2UWzMVihZzUvA+yjfPUmRy+NJnjJFKLfofT4zTEh4geZ9OmUxdvvGIa55Lf?=
- =?us-ascii?Q?NeBUlKRvhp1xeG3tzfzGHACOzPEtCTy8PKAVrCljJYZaaHbNYQyfbuDbpZTN?=
- =?us-ascii?Q?LFw5APgioDPtMquIUZUpM/+BbNPaqkI2pczOg4YX14cevskD0Q8TxCyd2Uyx?=
- =?us-ascii?Q?hvRqyQGf++rFtvP1oMeMfThjhVJGCcF1zUR41AX2sA6F44ALuXLhdP3Hn4+9?=
- =?us-ascii?Q?G/OFXFwO5pH2GTBVwRg/l5jofRDKHsjfnARTcJ4YdF21brwHUFkkgCVlEejP?=
- =?us-ascii?Q?F1fMNHG8ak7hd4O3/AiJYVAoWSbO+wnwoFYKZoGctHXqrQLZSzpFE/OCMbvk?=
- =?us-ascii?Q?0ZivRPF/WIR1kLy9krKgAL0YCNo7TdXKRT8q3VlSx1a++YbuxsEcsKmSuStO?=
- =?us-ascii?Q?SbGyF5ZcLY78uAnLVGc=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2a49121b-c1fa-4fcc-728f-08d9a8537ce9
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Y3hsT1ZYTnRQRXFSUFpPY25mT1pNQmQrVldpdHZic0xWK05FL25NdFpGcnpm?=
+ =?utf-8?B?NlJyaFdCa2hycWpnWUtFdjI0MlhkQXJLSmxkTElDeitoU04zZEYxR2pKTzBS?=
+ =?utf-8?B?NG1YYm52L1kvRGNIK0tlMVc5TzZRMFJiT0VSNmRpdFJ2Nis2NDFHcGFGdXE4?=
+ =?utf-8?B?c0FvYnV2ajBrbUF6MGsvcE1XakRqaWdVQlFzZnVKaWFMd2lTK2Ywei9odEJ4?=
+ =?utf-8?B?dlJCTXlYOGtuRTNkb0dZb1ZkMkFPMFFCZkhxUlFaV0NzR0dGWEdhYTY4UTdi?=
+ =?utf-8?B?dVl4eEdrWVp3dWtBUU9yS09RdmZ1NGI2akpUbmNhQ3VBaG0xY3lrSnU3L2ho?=
+ =?utf-8?B?ZmhtQ0xjY2dSMkhXMW5XUFIxMDRsU2kwK09SUi9Ra3NRRk1nZ0F6bU14aUE1?=
+ =?utf-8?B?ODFsZ2txMnE3ZWd0VlAxYW1hS0ZRaTl2TXcyU2FZYUlhS1QrWXpNZ0dTR2lo?=
+ =?utf-8?B?akFaYS85MkVkWjNsTm5YYm9xcFhPTE1iYWpvZEhvbldCSUEzNEpuSjczTHZQ?=
+ =?utf-8?B?SHRTUUlHS3dYME05VjJoRWFHeXhzS3VrQkp5WGhlekZlYWJLbmZRaUhibVFC?=
+ =?utf-8?B?TGFIbTdocXozbHlHMnkzc0VZUHRXcnRjbHM1aHRUNzFVNmFkNHRSZmJyYVlu?=
+ =?utf-8?B?ZWZha2ZDNktjK2l4akxrcjFhcHV6aGg1ZFdIa2hPNmdQblhkK09WRURvOHdm?=
+ =?utf-8?B?cE1Tdi9tcmpnRnlaQzR2Q2RXTndOYmpmaHZtREdHZ2lOdS91TUVEUlVhT3ZF?=
+ =?utf-8?B?MG5CTG1JZi8rUGNxZzIrMkFhek1rdmZDQnV0dzUyVDRpaXJrUXYxRHlreXhC?=
+ =?utf-8?B?Qm5BTEJEeFRhcExFRm9oRDJFV2tWSkREQzJOSkFGZW1icFE0VzdrbDY4SVZt?=
+ =?utf-8?B?cllNRGRrU0xQb3ZKeUdwc2J5R0cvaXFkZDBlS1pHSnZmR29mQVNwalNTSXZD?=
+ =?utf-8?B?MzE3ZWNINkRaaFpETGNnZWRabFl0S0ZIWjhyNkJhNU9mdlBmNkIyRW5VcWJa?=
+ =?utf-8?B?cER5ZUZKS1F2RFUxYU5KQW15UjZZNktyUU5JVnRIaCtYVUsxY0Fma2lvV283?=
+ =?utf-8?B?Y2k0TmFQb2lQb1ZOVmZobGp4YmVGak1UVW1VN0E5Zytsd1I0dE8yWFFOdnBR?=
+ =?utf-8?B?dERFUzdxbkVkTjNWMVErbFBoa3QwVzhVc0tnZ0Y2M0MxbGlwKzVueU5iWHJw?=
+ =?utf-8?B?cURBRUxrVGxYaW1XWXNQRWZjNFZVVkhta2VSVEZDY0R4bm5EeWxaRXdBcVlL?=
+ =?utf-8?B?eVBKaGNWRDNLWnA4bG1xYXExNmxHQkIyYUYweUxiY2d0eEZTUDNsVjdIa01O?=
+ =?utf-8?B?SzV1bjhtUTZxaDJNVVVOVW5pOWcvendLZEh2dFVMRUZJUG5ZYXNNR3NVdllj?=
+ =?utf-8?B?eC9KWDlta1dZZ2tFR25OdWsyZWIyVEs5RWloL09OSEVkb1lrUnRkajR0L2RD?=
+ =?utf-8?B?K1dqend2c2twOHZBQ3pLREVHNFdBY3lvNTdlY2xpUlNaUlNuK1hxbnU5Ykx6?=
+ =?utf-8?B?Z1BJNXB6emZ5cTBITXplSS92d3FIRU5hYUpFSkFNMTc4NlYvcXdVckJhK0Z6?=
+ =?utf-8?B?QVFrdUdwbXNaZG05R3c2VXBPa20zYmR5ZVZzblpDa1gxWExjWTJ6NDVRWmxz?=
+ =?utf-8?B?NXhibzRFeE9nTmxMRVYrblZOWXNoaFA1cWJXdEl5ZGY4ejQ3MFVtOGlZSzlN?=
+ =?utf-8?B?Sm1tclhzZ1kydWFjYnRhV0NRZUZpckZXR25USWUvbVRyU3l1VzFxaFlzckY0?=
+ =?utf-8?B?dExhTjJOcGZhWEZPU09qTFhQRmpDcGdqV2YyS3FGTW0zZmZUTU5ZL0VxZzNO?=
+ =?utf-8?B?YnN3Nm5MRFptM0Q3dGdUREdoU00vZDZLRUlPdzVIV1JVMUtncDJheFhuN2Za?=
+ =?utf-8?B?SFRORFllSm41VjlqZnlTMlR1Q0RwVWtpZy9HWDVieG1XSTRpZjlZcUJzN2pj?=
+ =?utf-8?B?N0JxRjViNG5Oek1JVzlwRTVMalZmSGhQV0VXTkpVTWx6dGYzZEMwU0RyZy9I?=
+ =?utf-8?B?UVdmWlRGWnljZFFkb1poTHNYb3YyeXVoOXdPMGtkSW1Pa2cySEZWemNSdWRO?=
+ =?utf-8?B?dkVyNitQa0IxbGpqSFJ3dCtOUEJ1Wlgrdm9HeDRoTHlGOStSMVZJaElMcURv?=
+ =?utf-8?B?QU9Mb085OWhiWjFzSE9Sd2pYYlV2VXhJVTBPMDVhY3RQSG5tN25qbFVtZDJa?=
+ =?utf-8?Q?UAwOsJyjwQTaO7zTAzMigbA=3D?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 94e6f560-b357-417a-91e5-08d9a8538b09
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Nov 2021 16:17:58.3730
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Nov 2021 16:18:21.9826
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6ps1ntis6aLGPuhdcX5bYEG+WZqFK0408ZiHnjxeRsSj5rL/pYTuqdhttgwx5flD
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5159
+X-MS-Exchange-CrossTenant-UserPrincipalName: vhtTEh24lBUgAlfTI9N+vqElHQYsIDpGSrVUsKqkFj5f7JQw3+92mlyV91mJgOXw4r7uoGO6iDC/6XQSUSyZ5w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2638
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 15, 2021 at 03:14:49PM +0000, Robin Murphy wrote:
 
-> > If userspace has control of device A and can cause A to issue DMA to
-> > arbitary DMA addresses then there are certain PCI topologies where A
-> > can now issue peer to peer DMA and manipulate the MMMIO registers in
-> > device B.
-> > 
-> > A kernel driver on device B is thus subjected to concurrent
-> > manipulation of the device registers from userspace.
-> > 
-> > So, a 'safe' kernel driver is one that can tolerate this, and an
-> > 'unsafe' driver is one where userspace can break kernel integrity.
+On 11/12/21 2:37 PM, Sean Christopherson wrote:
+> On Fri, Nov 12, 2021, Borislav Petkov wrote:
+>> On Fri, Nov 12, 2021 at 07:48:17PM +0000, Sean Christopherson wrote:
+>>> Yes, but IMO inducing a fault in the guest because of _host_ bug is wrong.
+>>
+
+In the automatic change proposal, both the the host and a guest bug will 
+cause a guest to get the #VC and then the guest can decide whether it 
+wants to proceed or terminate. If it chooses to move, it can poison the 
+page and log it for future examination.
+
+>> What do you suggest instead?
 > 
-> You mean in the case where the kernel driver is trying to use device B in a
-> purely PIO mode, such that userspace might potentially be able to interfere
-> with data being transferred in and out of the kernel?
-
-s/PIO/MMIO, but yes basically. And not just data trasnfer but
-userspace can interfere with the device state as well.
-
-> Perhaps it's not so clear to put that under a notion of "DMA
-> ownership", since device B's DMA is irrelevant and it's really much
-> more equivalent to /dev/mem access or mmaping BARs to userspace
-> while a driver is bound.
-
-It is DMA ownership because device A's DMA is what is relevant
-here. device A's DMA compromises device B. So device A asserts it has
-USER ownership for DMA.
-
-Any device in a group with USER ownership is incompatible with a
-kernel driver.
-
-> > The second issue is DMA - because there is only one iommu_domain
-> > underlying many devices if we give that iommu_domain to userspace it
-> > means the kernel DMA API on other devices no longer works.
+> Let userspace decide what is mapped shared and what is mapped private.  The kernel
+> and KVM provide the APIs/infrastructure to do the actual conversions in a thread-safe
+> fashion and also to enforce the current state, but userspace is the control plane.
 > 
-> Actually, the DMA API itself via iommu-dma will "work" just fine in the
-> sense that it will still successfully perform all its operations in the
-> unattached default domain, it's just that if the driver then programs the
-> device to access the returned DMA address, the device is likely to get a
-> nasty surprise.
-
-A DMA API that returns an dma_ddr_t that does not result in data
-transfer to the specified buffers is not working, in my book - it
-breaks the API contract.
-
-> > So no kernel driver doing DMA can work at all, under any PCI topology,
-> > if userspace owns the IO page table.
+> It would require non-trivial changes in userspace if there are multiple processes
+> accessing guest memory, e.g. Peter's networking daemon example, but it _is_ fully
+> solvable.  The exit to userspace means all three components (guest, kernel,
+> and userspace) have full knowledge of what is shared and what is private.  There
+> is zero ambiguity:
 > 
-> This isn't really about userspace at all - it's true of any case where a
-> kernel driver wants to attach a grouped device to its own unmanaged
-> domain.
+>    - if userspace accesses guest private memory, it gets SIGSEGV or whatever.
+>    - if kernel accesses guest private memory, it does BUG/panic/oops[*]
+>    - if guest accesses memory with the incorrect C/SHARED-bit, it gets killed.
+> 
+> This is the direction KVM TDX support is headed, though it's obviously still a WIP.
+> 
 
-This is true for the dma api issue in isolation.
+Just curious, in this approach, how do you propose handling the host 
+kexec/kdump? If a kexec/kdump occurs while the VM is still active, the 
+new kernel will encounter the #PF (RMP violation) because some pages are 
+still marked 'private' in the RMP table.
 
-I think if we have a user someday it would make sense to add another
-API DMA_OWNER_DRIVER_DOMAIN that captures how the dma API doesn't work
-but DMA MMIO attacks are not possible.
 
-> The fact that the VFIO kernel driver uses its unmanaged domains to map user
-> pages upon user requests is merely a VFIO detail, and VFIO happens to be the
-> only common case where unmanaged domains and non-singleton groups intersect.
-> I'd say that, logically, if you want to put policy on mutual driver/usage
-> compatibility anywhere it should be in iommu_attach_group().
 
-It would make sense for iommu_attach_group() to require that the
-DMA_OWNERSHIP is USER or DRIVER_DOMAIN.
+> And ideally, to avoid implicit conversions at any level, hardware vendors' ABIs
+> define that:
+> 
+>    a) All convertible memory, i.e. RAM, starts as private.
+>    b) Conversions between private and shared must be done via explicit hypercall.
+> 
+> Without (b), userspace and thus KVM have to treat guest accesses to the incorrect
+> type as implicit conversions.
+> 
+> [*] Sadly, fully preventing kernel access to guest private is not possible with
+>      TDX, especially if the direct map is left intact.  But maybe in the future
+>      TDX will signal a fault instead of poisoning memory and leaving a #MC mine.
+> 
 
-That has a nice symmetry with iommu_attach_device() already requiring
-that the group has a single device. For a driver to use these APIs it
-must ensure security, one way or another.
-
-That is a good idea, but requires understanding what tegra is
-doing. Maybe tegra is that DMA_OWNER_DRIVER_DOMAIN user?
-
-I wouldn't want to see iommu_attach_group() change the DMA_OWNERSHIP,
-I think ownership is cleaner as a dedicated API. Adding a file * and
-probably the enum to iommu_attach_group() feels weird.
-
-We need the dedicated API for the dma_configure op, and keeping
-ownership split from the current domain makes more sense with the
-design in the iommfd RFC.
-
-Thanks,
-Jason
+thanks
