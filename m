@@ -2,118 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 70B42451599
-	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 21:45:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 18AEA45159C
+	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 21:45:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351245AbhKOUoD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Nov 2021 15:44:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40300 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347399AbhKOTjt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Nov 2021 14:39:49 -0500
-Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA698C06120C
-        for <kvm@vger.kernel.org>; Mon, 15 Nov 2021 11:30:08 -0800 (PST)
-Received: by mail-lj1-x22f.google.com with SMTP id k2so30299245lji.4
-        for <kvm@vger.kernel.org>; Mon, 15 Nov 2021 11:30:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=JlBg5LtyqKvrpUdGEugnNnbVsAfgz6T1HCSvSGsjlZk=;
-        b=GM4JCZ3y0BLNP/TxHX2RKDzwzQXrmBW3C2YVhDU0aTewQCnpDjP3k3KVYqcP9gtkkf
-         a0vY7CrJ3Ao7m/3NH2aReiYRb0ktb4y8NsVCnG8VB9RLC1M/an8/s1yLEu+HLbf8rcFN
-         iLQ+vuqBDlgbWLjd+SpjFNoacndfywNLpTnxuoMP9sz4B7oDAlkOkYvWzWi2XbmuE1z0
-         l9Nd620wI7fij/Jfc1YZFf2aNuGYvBnJIAcQwBZk+ig/TCXePlNpJuUe7hheKF8RB9Ia
-         X/Iwogst9O0aHNxoC716dOFOdcH49ifqcHR6Zx3s0khksOrtpHwaG7fHh1TqjX9/ZjYw
-         Z5wQ==
+        id S1352249AbhKOUoM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Nov 2021 15:44:12 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:56621 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1347671AbhKOTlO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 15 Nov 2021 14:41:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1637005093;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=jvsTDbSkpArzLNDx9ej91qEx5bE3E1FzwXhbMgPLJjE=;
+        b=MwbvrQ0zpuxPYVWZKUzh6DkF7m+x83ZLn6DGeZ/5PJxwPo56trQPFKPz+0bBjCix5xyGkO
+        AxrUjCUwZFM3ELVSeMcHIaZpDHr4p9+bkQMJVjcPEY5cX4QZhp1BA8fODjDAtCd0TYJqgN
+        u48K99FjA1W+25RQJ+sAVh7DHfDR4nk=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-188-LRfy3_uaNz6pD4YnZMAzjw-1; Mon, 15 Nov 2021 14:38:12 -0500
+X-MC-Unique: LRfy3_uaNz6pD4YnZMAzjw-1
+Received: by mail-qk1-f199.google.com with SMTP id bq9-20020a05620a468900b004681cdb3483so6871567qkb.23
+        for <kvm@vger.kernel.org>; Mon, 15 Nov 2021 11:38:12 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=JlBg5LtyqKvrpUdGEugnNnbVsAfgz6T1HCSvSGsjlZk=;
-        b=sJSFvlblvn2biB/hO9EYrzyHc+uGvsW8Kyzm+NCcW876kSt8rYS3b1mBpzZdSH0hxE
-         3tcpadstOrNMxrur53vzvJAtPb1t8jD8T1tn1CHitzlG1O+QJJrt1mj/XpWds92SjlG2
-         WCe7G/eHhSLQ46jJNTFD0dJ4MPbKAzUrVhSvxpfVNo2EDK/w6br4f5R5d9E7TKJfMSsh
-         e1CIG1mTWLDI+wTpH5XxWNvV7kQzRA36NzLr4sQ6hZrJJ3Cy1ApJzOc4VSgGNm8Gl8T7
-         qCMISQqCVBfJgSSSeSQruhmx6zwdBXuED4jkwviYrwbr5FjF4+lg/iNnk3nK7enYluuF
-         cpkQ==
-X-Gm-Message-State: AOAM530tJiR+JhH6Vo4j1GC3z9JKsDC6Vfs086uN4AkCH6wJ1NMk7uhT
-        ea+hWSkmLxlSASRcW+wl7Uhq1fuUvHwDn/1tij3+2A==
-X-Google-Smtp-Source: ABdhPJzE8zq/IQ4W4/8Y/EEjilAn9vCsEXb84iRBWktB/ycTLjv28nMT0r/8iAKgJiA4OXYHBe6L2zu42b2iPQv+NNU=
-X-Received: by 2002:a2e:8895:: with SMTP id k21mr1005211lji.331.1637004607113;
- Mon, 15 Nov 2021 11:30:07 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=jvsTDbSkpArzLNDx9ej91qEx5bE3E1FzwXhbMgPLJjE=;
+        b=OtBCIgCQj+NT4ioNUQXpJkjImrhEjqL5OU+Dlj0KA34lbvMF7KjszNg6okfT6MTDqu
+         nfSgNVdm2W/MelIMXn3Szrcf34cm2GtpcQEkhAqJlL3S5ccfMQ+sZKYozlEyNTIq+wn1
+         Piy9ZlOy0oQNMgCkgC8EeQZpDYh7dJMgJCkcXsZmw+9fJwfBLvp/qY2FDXJHjggaTnh3
+         ex7GTHsaEGdzxxhP2waC+fAlH7WrCDGUcGwlULwSMbKjYlsLRCBmDLa4JcphNgTAKI09
+         KrBSiJeupsEreLag1bsUxNlzQ3wan/XFjEUPTIs935ENEHA0z8jfWuxJfiymV2/BAe/h
+         qHbQ==
+X-Gm-Message-State: AOAM530+ZYeRXMarUCiY/wbxnKqhrzMuL8DtTDecUgmBRtzo7BYOPcNj
+        ddPqbfxp42riTUavKEF2O4ecTtFTypFIQOnDcf24HfIXxh0+qBS034Pn6n2bR027+Y4IuPRoIyj
+        PM1G9aXjhkJ6M
+X-Received: by 2002:a05:622a:1050:: with SMTP id f16mr1438611qte.311.1637005092245;
+        Mon, 15 Nov 2021 11:38:12 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwQTZIZ+FxFZ6dwOuu7ePVqgoQBxNcWiErRyPXiahT0HGiP6naPvYDQlT4HNQYMJuPyVLoOSw==
+X-Received: by 2002:a05:622a:1050:: with SMTP id f16mr1438591qte.311.1637005092057;
+        Mon, 15 Nov 2021 11:38:12 -0800 (PST)
+Received: from fedora.myfiosgateway.com (pool-71-175-3-221.phlapa.fios.verizon.net. [71.175.3.221])
+        by smtp.gmail.com with ESMTPSA id l1sm2929724qkp.125.2021.11.15.11.38.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Nov 2021 11:38:11 -0800 (PST)
+From:   Tyler Fanelli <tfanelli@redhat.com>
+To:     qemu-devel@nongnu.org
+Cc:     pbonzini@redhat.com, mtosatti@redhat.com, kvm@vger.kernel.org,
+        eblake@redhat.com, armbru@redhat.com,
+        Tyler Fanelli <tfanelli@redhat.com>
+Subject: [PATCH] sev: allow capabilities to check for SEV-ES support
+Date:   Mon, 15 Nov 2021 14:38:04 -0500
+Message-Id: <20211115193804.294529-1-tfanelli@redhat.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-References: <20211111221448.2683827-1-seanjc@google.com> <CALzav=dpzzKgaNRLrSBy71WBvybWmRJ39eDv4hPXsbU_DSS-fA@mail.gmail.com>
- <YZKzr4mn1jJ3vdqK@google.com>
-In-Reply-To: <YZKzr4mn1jJ3vdqK@google.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Mon, 15 Nov 2021 11:29:40 -0800
-Message-ID: <CALzav=fKycSowAyaymt9a9hpffbWnFeXvACC5pE5-rMpx+4H4g@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86/mmu: Update number of zapped pages even if page
- list is stable
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 15, 2021 at 11:23 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Mon, Nov 15, 2021, David Matlack wrote:
-> > On Thu, Nov 11, 2021 at 2:14 PM Sean Christopherson <seanjc@google.com> wrote:
-> > >
-> > > When zapping obsolete pages, update the running count of zapped pages
-> > > regardless of whether or not the list has become unstable due to zapping
-> > > a shadow page with its own child shadow pages.  If the VM is backed by
-> > > mostly 4kb pages, KVM can zap an absurd number of SPTEs without bumping
-> > > the batch count and thus without yielding.  In the worst case scenario,
-> > > this can cause an RCU stall.
-> > >
-> > >   rcu: INFO: rcu_sched self-detected stall on CPU
-> > >   rcu:     52-....: (20999 ticks this GP) idle=7be/1/0x4000000000000000
-> > >                                           softirq=15759/15759 fqs=5058
-> > >    (t=21016 jiffies g=66453 q=238577)
-> > >   NMI backtrace for cpu 52
-> > >   Call Trace:
-> > >    ...
-> > >    mark_page_accessed+0x266/0x2f0
-> > >    kvm_set_pfn_accessed+0x31/0x40
-> > >    handle_removed_tdp_mmu_page+0x259/0x2e0
-> > >    __handle_changed_spte+0x223/0x2c0
-> > >    handle_removed_tdp_mmu_page+0x1c1/0x2e0
-> > >    __handle_changed_spte+0x223/0x2c0
-> > >    handle_removed_tdp_mmu_page+0x1c1/0x2e0
-> > >    __handle_changed_spte+0x223/0x2c0
-> > >    zap_gfn_range+0x141/0x3b0
-> > >    kvm_tdp_mmu_zap_invalidated_roots+0xc8/0x130
-> >
-> > This is a useful patch but I don't see the connection with this stall.
-> > The stall is detected in kvm_tdp_mmu_zap_invalidated_roots, which runs
-> > after kvm_zap_obsolete_pages. How would rescheduling during
-> > kvm_zap_obsolete_pages help?
->
-> Ah shoot, I copy+pasted the wrong splat.  The correct, revelant backtrace is:
+Probe for SEV-ES and SEV-SNP capabilities to distinguish between Rome,
+Naples, and Milan processors. Use the CPUID function to probe if a
+processor is capable of running SEV-ES or SEV-SNP, rather than if it
+actually is running SEV-ES or SEV-SNP.
 
-Ok that makes more sense :). Also that was a soft lockup rather than
-an RCU stall.
->
->    mark_page_accessed+0x266/0x2e0
->    kvm_set_pfn_accessed+0x31/0x40
->    mmu_spte_clear_track_bits+0x136/0x1c0
->    drop_spte+0x1a/0xc0
->    mmu_page_zap_pte+0xef/0x120
->    __kvm_mmu_prepare_zap_page+0x205/0x5e0
->    kvm_mmu_zap_all_fast+0xd7/0x190
->    kvm_mmu_invalidate_zap_pages_in_memslot+0xe/0x10
->    kvm_page_track_flush_slot+0x5c/0x80
->    kvm_arch_flush_shadow_memslot+0xe/0x10
->    kvm_set_memslot+0x1a8/0x5d0
->    __kvm_set_memory_region+0x337/0x590
->    kvm_vm_ioctl+0xb08/0x1040
+Signed-off-by: Tyler Fanelli <tfanelli@redhat.com>
+---
+ qapi/misc-target.json | 11 +++++++++--
+ target/i386/sev.c     |  6 ++++--
+ 2 files changed, 13 insertions(+), 4 deletions(-)
+
+diff --git a/qapi/misc-target.json b/qapi/misc-target.json
+index 5aa2b95b7d..c3e9bce12b 100644
+--- a/qapi/misc-target.json
++++ b/qapi/misc-target.json
+@@ -182,13 +182,19 @@
+ # @reduced-phys-bits: Number of physical Address bit reduction when SEV is
+ #                     enabled
+ #
++# @es: SEV-ES capability of the machine.
++#
++# @snp: SEV-SNP capability of the machine.
++#
+ # Since: 2.12
+ ##
+ { 'struct': 'SevCapability',
+   'data': { 'pdh': 'str',
+             'cert-chain': 'str',
+             'cbitpos': 'int',
+-            'reduced-phys-bits': 'int'},
++            'reduced-phys-bits': 'int',
++            'es': 'bool',
++            'snp': 'bool'},
+   'if': 'TARGET_I386' }
+ 
+ ##
+@@ -205,7 +211,8 @@
+ #
+ # -> { "execute": "query-sev-capabilities" }
+ # <- { "return": { "pdh": "8CCDD8DDD", "cert-chain": "888CCCDDDEE",
+-#                  "cbitpos": 47, "reduced-phys-bits": 5}}
++#                  "cbitpos": 47, "reduced-phys-bits": 5
++#                  "es": false, "snp": false}}
+ #
+ ##
+ { 'command': 'query-sev-capabilities', 'returns': 'SevCapability',
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index eede07f11d..6d78dcd744 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -506,7 +506,7 @@ static SevCapability *sev_get_capabilities(Error **errp)
+     guchar *pdh_data = NULL;
+     guchar *cert_chain_data = NULL;
+     size_t pdh_len = 0, cert_chain_len = 0;
+-    uint32_t ebx;
++    uint32_t eax, ebx;
+     int fd;
+ 
+     if (!kvm_enabled()) {
+@@ -534,8 +534,10 @@ static SevCapability *sev_get_capabilities(Error **errp)
+     cap->pdh = g_base64_encode(pdh_data, pdh_len);
+     cap->cert_chain = g_base64_encode(cert_chain_data, cert_chain_len);
+ 
+-    host_cpuid(0x8000001F, 0, NULL, &ebx, NULL, NULL);
++    host_cpuid(0x8000001F, 0, &eax, &ebx, NULL, NULL);
+     cap->cbitpos = ebx & 0x3f;
++    cap->es = (eax & 0x8) ? true : false;
++    cap->snp = (eax & 0x10) ? true : false;
+ 
+     /*
+      * When SEV feature is enabled, we loose one bit in guest physical
+-- 
+2.31.1
+
