@@ -2,55 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 22DAE452858
-	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 04:15:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E2E47452859
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 04:15:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238784AbhKPDSH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Nov 2021 22:18:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56010 "EHLO
+        id S238574AbhKPDSo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Nov 2021 22:18:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237958AbhKPDR4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Nov 2021 22:17:56 -0500
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31E94C043195
-        for <kvm@vger.kernel.org>; Mon, 15 Nov 2021 15:46:07 -0800 (PST)
-Received: by mail-pf1-x44a.google.com with SMTP id x25-20020aa79199000000b0044caf0d1ba8so10793449pfa.1
-        for <kvm@vger.kernel.org>; Mon, 15 Nov 2021 15:46:07 -0800 (PST)
+        with ESMTP id S238487AbhKPDR7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Nov 2021 22:17:59 -0500
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DC71C043197
+        for <kvm@vger.kernel.org>; Mon, 15 Nov 2021 15:46:09 -0800 (PST)
+Received: by mail-pg1-x54a.google.com with SMTP id k8-20020a6555c8000000b002e32ed2a021so6143230pgs.1
+        for <kvm@vger.kernel.org>; Mon, 15 Nov 2021 15:46:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=eIOcgrBn4CjI7X3tvXpG1QRuiuHXTTvzXh1UFqCSqJk=;
-        b=SQng2vu+fWuCz9L8qbb8p5gwV0sDDFS1pWJLtH4SQFRhFcpvfJOp9blL4dxWn1hBwt
-         kImQ7SkjvhsFV+ybn+YVULZq7YC5zt0bjHId3lLaIfn8qzyYvMvp0I9dzs/1siiisdAV
-         xd2bqqGNrHTKZLPMa3IeiNikwmGSRnJth8lGGKSLPo4OE4UTiWHaqGYr+17u3GY5Wv/S
-         49M6OYhzND8Jqk+mLmZNNGufBc0e14sPQyKPgmlj2ilMx3B3i0+vVVdgjLy5b+D0yWNb
-         dfYHHiVB4A16JH61dVcD7iaESrA1YORHeywSa3CcB92gPqd6a+wh3tYQb7DEh3B7BzEb
-         DlRA==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=nyFgzVEyCb72eNk2VPGomrdPJdYxRfeEzI0NSb6F/8s=;
+        b=FhwSo+AeArEwiboUCjKrKMx7ZmN/9qUIupIm2aZQAugw8dJDwnhnLiP3VJTF8bT1AK
+         jayIojnrkZaa7jiUDGHwFP7G3QBGerYyLehza9KYtn8XtebTX01R5RVExHPxf9O3VPcS
+         1Awn5+p8ZnWwEfsh4oDQWZV7LTQGB/cEkZ2Gk1na4VJavTk+NtbQTNu8HhfgMEkQi+wc
+         1prwoPhZvdYbcDDATxT5EL6XEMkTG2w+aS0u+jtU8+uBwLBVMtxgzO37bzqj5A/g9lgl
+         kerfqBf+QDMqIvG+mMaXL01J3WBJy1tC9gZzHhi7Sy5SXotbfNiC2tIU1O9NgYsxdMLM
+         HDag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=eIOcgrBn4CjI7X3tvXpG1QRuiuHXTTvzXh1UFqCSqJk=;
-        b=H9MpvXXdf0MiP0c53dY9Gl8GLG+QfjD8JK/sH6I4LpRJwL1Ndz0BgtMWAgnqigE8RB
-         GSsDE08L8jOSn6DubcUg8gVajbpvMNEmT36V3Col2MQb1Qy+KvAkCmd/hI7whUCqXYcV
-         EBIFVx+K7B9SCItMasUE4YA6s4X1rum1bsYi4o9UaGUt0C/KbaDsjxNkGmgwME7M61kJ
-         0ygKl47YnzE5lS2vnLO16TvAnbpPvL6F/r0SXBKM1RmvYu0RzyYY4aiaIVF5nT+Oj/jG
-         BVtzjQxbljXM5XxMd7vKFlenjldyyiuxrwJFlnQXrf5qTm7D//gWW7Z8bCfe09NNesEf
-         xVpQ==
-X-Gm-Message-State: AOAM532nhq0QjqqjAskq55XOvsCGh23aa06lZAFFREDyE7lXVJ3a3aB2
-        7bci6WawMx88VhpTrHxuVQsX7lHd++iW
-X-Google-Smtp-Source: ABdhPJwKcBWmJJfS1GjWoDoFkEhyrYjgDmD22gej497BAcM7EpQCW2gmIwyF4mcVrBZKiKvVdj6IsIftLtOW
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=nyFgzVEyCb72eNk2VPGomrdPJdYxRfeEzI0NSb6F/8s=;
+        b=aT/14r7gRcC3QuxLR3qFSYGR6X3ZJD7fER8rfqF6jNohoLql1k+BUpVveKh9X1zM0q
+         08ISMhFu2hue9XH52HHRRsYezgFxh0S0RfsUd1XZ47MD7lKYRGUeNKo0iV1c7Dd/NK+U
+         dDONk5mewMeOko4RiW0csKz5YKnKpBONYHNr6hOjsmyk7T4e7PuaUax/Ynd2ZUXUYwuc
+         qiXrD9/Qj6EBMCNRlgl2NST7qWpcZ9jYJHsKPlQjZSj/CAWQMEw/wB7gRp9mtfB4bBZa
+         T4qAETJSDUMv9MbwnimM0Fr1KGpAtefF6fT6R3v6r4hO4xD0nXEImYLP3Dtag+WIn+xf
+         u94A==
+X-Gm-Message-State: AOAM533UejZq1EcjO7JZAqEcVaLsO9yEERU0vCP+JqYAF2/X+QsazWr/
+        xZIlSMnshtw9oGPxjXbatieR5NAKKRde
+X-Google-Smtp-Source: ABdhPJyUpLKPY0hJHdO9XvEjt/lnw3HVEnRL357TT0PU6WuDTHxaiDtzi5W6QrLBfSrYf6aop5hTIjuD5YGG
 X-Received: from bgardon.sea.corp.google.com ([2620:15c:100:202:916d:2253:5849:9965])
- (user=bgardon job=sendgmr) by 2002:a17:90a:ca11:: with SMTP id
- x17mr22800482pjt.61.1637019966650; Mon, 15 Nov 2021 15:46:06 -0800 (PST)
-Date:   Mon, 15 Nov 2021 15:45:48 -0800
-Message-Id: <20211115234603.2908381-1-bgardon@google.com>
+ (user=bgardon job=sendgmr) by 2002:a17:902:6a8a:b0:143:905f:aec7 with SMTP id
+ n10-20020a1709026a8a00b00143905faec7mr40786543plk.8.1637019968545; Mon, 15
+ Nov 2021 15:46:08 -0800 (PST)
+Date:   Mon, 15 Nov 2021 15:45:49 -0800
+In-Reply-To: <20211115234603.2908381-1-bgardon@google.com>
+Message-Id: <20211115234603.2908381-2-bgardon@google.com>
 Mime-Version: 1.0
+References: <20211115234603.2908381-1-bgardon@google.com>
 X-Mailer: git-send-email 2.34.0.rc1.387.gb447b232ab-goog
-Subject: [PATCH 00/15] Currently disabling dirty logging with the TDP MMU is
- extremely slow. On a 96 vCPU / 96G VM it takes ~45 seconds to disable dirty
- logging with the TDP MMU, as opposed to ~3.5 seconds with the legacy MMU.
- This series optimizes TLB flushes and introduces in-place large page
- promotion, to bring the disable dirty log time down to ~2 seconds.
+Subject: [PATCH 01/15] KVM: x86/mmu: Remove redundant flushes when disabling
+ dirty logging
 From:   Ben Gardon <bgardon@google.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
@@ -70,119 +72,112 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Testing:
-Ran KVM selftests and kvm-unit-tests on an Intel Skylake. This
-series introduced no new failures.
+tdp_mmu_zap_spte_atomic flushes on every zap already, so no need to
+flush again after it's done.
 
-Performance:
-To collect these results I needed to apply Mingwei's patch
-"selftests: KVM: align guest physical memory base address to 1GB"
-https://lkml.org/lkml/2021/8/29/310
-David Matlack is going to send out an updated version of that patch soon.
+Reviewed-by: David Matlack <dmatlack@google.com>
 
-Without this series, TDP MMU:
-> ./dirty_log_perf_test -v 96 -s anonymous_hugetlb_1gb
-Test iterations: 2
-Testing guest mode: PA-bits:ANY, VA-bits:48,  4K pages
-guest physical test memory offset: 0x3fe7c0000000
-Populate memory time: 10.966500447s
-Enabling dirty logging time: 0.002068737s
+Signed-off-by: Ben Gardon <bgardon@google.com>
+---
+ arch/x86/kvm/mmu/mmu.c     |  4 +---
+ arch/x86/kvm/mmu/tdp_mmu.c | 21 ++++++---------------
+ arch/x86/kvm/mmu/tdp_mmu.h |  5 ++---
+ 3 files changed, 9 insertions(+), 21 deletions(-)
 
-Iteration 1 dirty memory time: 0.047556280s
-Iteration 1 get dirty log time: 0.001253914s
-Iteration 1 clear dirty log time: 0.049716661s
-Iteration 2 dirty memory time: 3.679662016s
-Iteration 2 get dirty log time: 0.000659546s
-Iteration 2 clear dirty log time: 1.834329322s
-Disabling dirty logging time: 45.738439510s
-Get dirty log over 2 iterations took 0.001913460s. (Avg 0.000956730s/iteration)
-Clear dirty log over 2 iterations took 1.884045983s. (Avg 0.942022991s/iteration)
-
-Without this series, Legacy MMU:
-> ./dirty_log_perf_test -v 96 -s anonymous_hugetlb_1gb
-Test iterations: 2
-Testing guest mode: PA-bits:ANY, VA-bits:48,  4K pages
-guest physical test memory offset: 0x3fe7c0000000
-Populate memory time: 12.664750666s
-Enabling dirty logging time: 0.002025510s
-
-Iteration 1 dirty memory time: 0.046240875s
-Iteration 1 get dirty log time: 0.001864342s
-Iteration 1 clear dirty log time: 0.170243637s
-Iteration 2 dirty memory time: 31.571088701s
-Iteration 2 get dirty log time: 0.000626245s
-Iteration 2 clear dirty log time: 1.294817729s
-Disabling dirty logging time: 3.566831573s
-Get dirty log over 2 iterations took 0.002490587s. (Avg 0.001245293s/iteration)
-Clear dirty log over 2 iterations took 1.465061366s. (Avg 0.732530683s/iteration)
-
-With this series, TDP MMU:
-(Updated since RFC. Pulling out patches 1-4 could have a performance impact.)
-> ./dirty_log_perf_test -v 96 -s anonymous_hugetlb_1gb
-Test iterations: 2
-Testing guest mode: PA-bits:ANY, VA-bits:48,  4K pages
-guest physical test memory offset: 0x3fe7c0000000
-Populate memory time: 12.225242366s
-Enabling dirty logging time: 0.002063442s
-
-Iteration 1 dirty memory time: 0.047598123s
-Iteration 1 get dirty log time: 0.001247702s
-Iteration 1 clear dirty log time: 0.051062420s
-Iteration 2 dirty memory time: 3.660439803s
-Iteration 2 get dirty log time: 0.000736229s
-Iteration 2 clear dirty log time: 1.043469951s
-Disabling dirty logging time: 1.400549627s
-Get dirty log over 2 iterations took 0.001983931s. (Avg 0.000991965s/iteration)
-Clear dirty log over 2 iterations took 1.094532371s. (Avg 0.547266185s/iteration)
-
-Patch breakdown:
-Patches 1 eliminates extra TLB flushes while disabling dirty logging.
-Patches 2-8 remove the need for a vCPU pointer to make_spte
-Patches 9-14 are small refactors in perparation for patch 19
-Patch 15 implements in-place largepage promotion when disabling dirty logging
-
-Changelog:
-RFC -> v1:
-	Dropped the first 4 patches from the series. Patch 1 was sent
-	separately, patches 2-4 will be taken over by Sean Christopherson.
-	Incorporated David Matlack's Reviewed-by.
-
-Ben Gardon (15):
-  KVM: x86/mmu: Remove redundant flushes when disabling dirty logging
-  KVM: x86/mmu: Introduce vcpu_make_spte
-  KVM: x86/mmu: Factor wrprot for nested PML out of make_spte
-  KVM: x86/mmu: Factor mt_mask out of make_spte
-  KVM: x86/mmu: Remove need for a vcpu from
-    kvm_slot_page_track_is_active
-  KVM: x86/mmu: Remove need for a vcpu from mmu_try_to_unsync_pages
-  KVM: x86/mmu: Factor shadow_zero_check out of make_spte
-  KVM: x86/mmu: Replace vcpu argument with kvm pointer in make_spte
-  KVM: x86/mmu: Factor out the meat of reset_tdp_shadow_zero_bits_mask
-  KVM: x86/mmu: Propagate memslot const qualifier
-  KVM: x86/MMU: Refactor vmx_get_mt_mask
-  KVM: x86/mmu: Factor out part of vmx_get_mt_mask which does not depend
-    on vcpu
-  KVM: x86/mmu: Add try_get_mt_mask to x86_ops
-  KVM: x86/mmu: Make kvm_is_mmio_pfn usable outside of spte.c
-  KVM: x86/mmu: Promote pages in-place when disabling dirty logging
-
- arch/x86/include/asm/kvm-x86-ops.h    |  1 +
- arch/x86/include/asm/kvm_host.h       |  2 +
- arch/x86/include/asm/kvm_page_track.h |  6 +-
- arch/x86/kvm/mmu/mmu.c                | 45 +++++++------
- arch/x86/kvm/mmu/mmu_internal.h       |  6 +-
- arch/x86/kvm/mmu/page_track.c         |  8 +--
- arch/x86/kvm/mmu/paging_tmpl.h        |  6 +-
- arch/x86/kvm/mmu/spte.c               | 43 ++++++++----
- arch/x86/kvm/mmu/spte.h               | 17 +++--
- arch/x86/kvm/mmu/tdp_mmu.c            | 97 +++++++++++++++++++++------
- arch/x86/kvm/mmu/tdp_mmu.h            |  5 +-
- arch/x86/kvm/svm/svm.c                |  8 +++
- arch/x86/kvm/vmx/vmx.c                | 40 ++++++-----
- include/linux/kvm_host.h              | 10 +--
- virt/kvm/kvm_main.c                   | 12 ++--
- 15 files changed, 205 insertions(+), 101 deletions(-)
-
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 354d2ca92df4..baa94acab516 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -5870,9 +5870,7 @@ void kvm_mmu_zap_collapsible_sptes(struct kvm *kvm,
+ 
+ 	if (is_tdp_mmu_enabled(kvm)) {
+ 		read_lock(&kvm->mmu_lock);
+-		flush = kvm_tdp_mmu_zap_collapsible_sptes(kvm, slot, flush);
+-		if (flush)
+-			kvm_arch_flush_remote_tlbs_memslot(kvm, slot);
++		kvm_tdp_mmu_zap_collapsible_sptes(kvm, slot);
+ 		read_unlock(&kvm->mmu_lock);
+ 	}
+ }
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 7c5dd83e52de..b3c78568ae60 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -1364,10 +1364,9 @@ void kvm_tdp_mmu_clear_dirty_pt_masked(struct kvm *kvm,
+  * Clear leaf entries which could be replaced by large mappings, for
+  * GFNs within the slot.
+  */
+-static bool zap_collapsible_spte_range(struct kvm *kvm,
++static void zap_collapsible_spte_range(struct kvm *kvm,
+ 				       struct kvm_mmu_page *root,
+-				       const struct kvm_memory_slot *slot,
+-				       bool flush)
++				       const struct kvm_memory_slot *slot)
+ {
+ 	gfn_t start = slot->base_gfn;
+ 	gfn_t end = start + slot->npages;
+@@ -1378,10 +1377,8 @@ static bool zap_collapsible_spte_range(struct kvm *kvm,
+ 
+ 	tdp_root_for_each_pte(iter, root, start, end) {
+ retry:
+-		if (tdp_mmu_iter_cond_resched(kvm, &iter, flush, true)) {
+-			flush = false;
++		if (tdp_mmu_iter_cond_resched(kvm, &iter, false, true))
+ 			continue;
+-		}
+ 
+ 		if (!is_shadow_present_pte(iter.old_spte) ||
+ 		    !is_last_spte(iter.old_spte, iter.level))
+@@ -1401,30 +1398,24 @@ static bool zap_collapsible_spte_range(struct kvm *kvm,
+ 			iter.old_spte = READ_ONCE(*rcu_dereference(iter.sptep));
+ 			goto retry;
+ 		}
+-		flush = true;
+ 	}
+ 
+ 	rcu_read_unlock();
+-
+-	return flush;
+ }
+ 
+ /*
+  * Clear non-leaf entries (and free associated page tables) which could
+  * be replaced by large mappings, for GFNs within the slot.
+  */
+-bool kvm_tdp_mmu_zap_collapsible_sptes(struct kvm *kvm,
+-				       const struct kvm_memory_slot *slot,
+-				       bool flush)
++void kvm_tdp_mmu_zap_collapsible_sptes(struct kvm *kvm,
++				       const struct kvm_memory_slot *slot)
+ {
+ 	struct kvm_mmu_page *root;
+ 
+ 	lockdep_assert_held_read(&kvm->mmu_lock);
+ 
+ 	for_each_tdp_mmu_root_yield_safe(kvm, root, slot->as_id, true)
+-		flush = zap_collapsible_spte_range(kvm, root, slot, flush);
+-
+-	return flush;
++		zap_collapsible_spte_range(kvm, root, slot);
+ }
+ 
+ /*
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
+index 476b133544dd..3899004a5d91 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.h
++++ b/arch/x86/kvm/mmu/tdp_mmu.h
+@@ -64,9 +64,8 @@ void kvm_tdp_mmu_clear_dirty_pt_masked(struct kvm *kvm,
+ 				       struct kvm_memory_slot *slot,
+ 				       gfn_t gfn, unsigned long mask,
+ 				       bool wrprot);
+-bool kvm_tdp_mmu_zap_collapsible_sptes(struct kvm *kvm,
+-				       const struct kvm_memory_slot *slot,
+-				       bool flush);
++void kvm_tdp_mmu_zap_collapsible_sptes(struct kvm *kvm,
++				       const struct kvm_memory_slot *slot);
+ 
+ bool kvm_tdp_mmu_write_protect_gfn(struct kvm *kvm,
+ 				   struct kvm_memory_slot *slot, gfn_t gfn,
 -- 
 2.34.0.rc1.387.gb447b232ab-goog
 
