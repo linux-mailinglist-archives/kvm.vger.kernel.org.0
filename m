@@ -2,150 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E51844FEE9
-	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 07:59:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EE4134501E4
+	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 10:59:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230351AbhKOHCQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Nov 2021 02:02:16 -0500
-Received: from mail.kernel.org ([198.145.29.99]:47698 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230166AbhKOHCI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Nov 2021 02:02:08 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 1323763218;
-        Mon, 15 Nov 2021 06:59:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1636959553;
-        bh=luIbbrf+LzBgsq1Go6fjN5SrA/F8WMRXUbE4fwqbwaI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=hrHE7vAk9f+9cu3ciMZN1IeE8B/nOoBK5QdMMQW6QfsL6ynlGKHtPbh42Sn/7o2nO
-         ckWInmEMUTG3joNbBg71N3N0nuYz6i3HCgHFGqg3gij0L4vA/cvwSARDeM0aBk+3JY
-         zvz+GzdhOCTUpJEOEbTHv7x2uSVveGQkoScDVTa4=
-Date:   Mon, 15 Nov 2021 07:59:10 +0100
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Lu Baolu <baolu.lu@linux.intel.com>
-Cc:     Joerg Roedel <joro@8bytes.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Ashok Raj <ashok.raj@intel.com>, Will Deacon <will@kernel.org>,
-        rafael@kernel.org, Diana Craciun <diana.craciun@oss.nxp.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Liu Yi L <yi.l.liu@intel.com>,
-        Jacob jun Pan <jacob.jun.pan@intel.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 02/11] driver core: Set DMA ownership during driver
- bind/unbind
-Message-ID: <YZIFPv7BpsTibxE/@kroah.com>
-References: <20211115020552.2378167-1-baolu.lu@linux.intel.com>
- <20211115020552.2378167-3-baolu.lu@linux.intel.com>
+        id S230512AbhKOKCo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Nov 2021 05:02:44 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33099 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230466AbhKOKCn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 15 Nov 2021 05:02:43 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1636970388;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=B/SvcVH7YGPEpdGy0kldgGpabVd0LqF8PKRRi3YrNP0=;
+        b=OV0fmFC1X1F4fhZlZXh+EtFcYHf/ZIip1Q4FE6QGf6xMbXgXnu1X1xfKvby+r9wqVnUU1S
+        Dp3ra/pzcxZ6OxK1ScNAK/hyKatbkBAEe38I+daUWFJUddOiWlvydoUotWUUd5c4klyjmg
+        DJn45V8/0Zn5gHLtA1wJMrETCdvmGdE=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-425-AmzmbT5CNKCWuWvw0l1v9A-1; Mon, 15 Nov 2021 04:59:46 -0500
+X-MC-Unique: AmzmbT5CNKCWuWvw0l1v9A-1
+Received: by mail-wr1-f71.google.com with SMTP id f3-20020a5d50c3000000b00183ce1379feso3331262wrt.5
+        for <kvm@vger.kernel.org>; Mon, 15 Nov 2021 01:59:46 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=B/SvcVH7YGPEpdGy0kldgGpabVd0LqF8PKRRi3YrNP0=;
+        b=lXc40rSIJSBkqRWVo91WJ84SW//zTfZOGkxEqAYozozZT9t5T2LH8Ihd9FsvYk2P/J
+         e7LluKqpaFNDkFFvJo4LiRHSAC7xQj1pzM63nVYbc5SD/Dcwjg0mKA4c1rC7lxeRKra6
+         0Y5sTfVaGa51c8f5PpPygbuULsM31SI1xS3tY/kstaGzcKa59UcWltVHcccCGrgq9qlh
+         d5aCeTML6y1QX+4BzNQT7MwZmwSXZX/AfJWv7E63z5Wd8FtaemuwcVKBQHAfU0YpXgWD
+         A7Xla6wcMsmVuUe8gwPvGtAvz0XxEhCuTHZulbqAu8xyNN+W5r+yEKSoPwIYnQGLs42p
+         2ybQ==
+X-Gm-Message-State: AOAM531UCNS6pq1mgj6WJ5tewE3IU2SByt+EcRlKrOC7+G1ewN7AulPw
+        xGF5es3xjxact6Mq3Eg8qXCUurLDTKNug6XRMZhDCD3hTNywIzZRKQ3gmevXAbJ+qZr4rHDfT+K
+        iN1SNUT4gpVT9
+X-Received: by 2002:a5d:6a4d:: with SMTP id t13mr45338958wrw.104.1636970385746;
+        Mon, 15 Nov 2021 01:59:45 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxET7RTckB554LQIAx6+HrM6N8Dg2rkSK6DQZ3M5guhyRvwKp4nwnmtbibpn9DS93s70y3/RQ==
+X-Received: by 2002:a5d:6a4d:: with SMTP id t13mr45338930wrw.104.1636970385596;
+        Mon, 15 Nov 2021 01:59:45 -0800 (PST)
+Received: from fedora (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id m20sm21093886wmq.11.2021.11.15.01.59.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Nov 2021 01:59:45 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Vihas Mak <makvihas@gmail.com>, pbonzini@redhat.com
+Cc:     seanjc@google.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+        hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86: fix cocci warnings
+In-Reply-To: <20211114164312.GA28736@makvihas>
+References: <20211114164312.GA28736@makvihas>
+Date:   Mon, 15 Nov 2021 10:59:43 +0100
+Message-ID: <87o86leo34.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211115020552.2378167-3-baolu.lu@linux.intel.com>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 15, 2021 at 10:05:43AM +0800, Lu Baolu wrote:
-> This extends really_probe() to allow checking for dma ownership conflict
-> during the driver binding process. By default, the DMA_OWNER_KERNEL is
-> claimed for the bound driver before calling its .probe() callback. If this
-> operation fails (e.g. the iommu group of the target device already has the
-> DMA_OWNER_USER set), the binding process is aborted to avoid breaking the
-> security contract for devices in the iommu group.
-> 
-> Without this change, the vfio driver has to listen to a bus BOUND_DRIVER
-> event and then BUG_ON() in case of dma ownership conflict. This leads to
-> bad user experience since careless driver binding operation may crash the
-> system if the admin overlooks the group restriction.
-> 
-> Aside from bad design, this leads to a security problem as a root user,
-> even with lockdown=integrity, can force the kernel to BUG.
-> 
-> Driver may set a new flag (suppress_auto_claim_dma_owner) to disable auto
-> claim in the binding process. Examples include kernel drivers (pci_stub,
-> PCI bridge drivers, etc.) which don't trigger DMA at all thus can be safely
-> exempted in DMA ownership check and userspace framework drivers (vfio/vdpa
-> etc.) which need to manually claim DMA_OWNER_USER when assigning a device
-> to userspace.
-> 
-> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
-> Link: https://lore.kernel.org/linux-iommu/20210922123931.GI327412@nvidia.com/
-> Link: https://lore.kernel.org/linux-iommu/20210928115751.GK964074@nvidia.com/
-> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+Vihas Mak <makvihas@gmail.com> writes:
+
+> change 0 to false and 1 to true to fix following cocci warnings:
+>
+>         arch/x86/kvm/mmu/mmu.c:1485:9-10: WARNING: return of 0/1 in function 'kvm_set_pte_rmapp' with return type bool
+>         arch/x86/kvm/mmu/mmu.c:1636:10-11: WARNING: return of 0/1 in function 'kvm_test_age_rmapp' with return type bool
+>
+> Signed-off-by: Vihas Mak <makvihas@gmail.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Cc: Wanpeng Li <wanpengli@tencent.com>
+> Cc: Jim Mattson <jmattson@google.com>
+> Cc: Joerg Roedel <joro@8bytes.org>
 > ---
->  include/linux/device/driver.h |  7 ++++++-
->  drivers/base/dd.c             | 12 ++++++++++++
->  2 files changed, 18 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/linux/device/driver.h b/include/linux/device/driver.h
-> index a498ebcf4993..25d39c64c4d9 100644
-> --- a/include/linux/device/driver.h
-> +++ b/include/linux/device/driver.h
-> @@ -54,6 +54,10 @@ enum probe_type {
->   * @owner:	The module owner.
->   * @mod_name:	Used for built-in modules.
->   * @suppress_bind_attrs: Disables bind/unbind via sysfs.
-> + * @suppress_auto_claim_dma_owner: Disable auto claiming of kernel DMA owner.
-> + *		Drivers which don't require DMA or want to manually claim the
-> + *		owner type (e.g. userspace driver frameworks) could set this
-> + *		flag.
->   * @probe_type:	Type of the probe (synchronous or asynchronous) to use.
->   * @of_match_table: The open firmware table.
->   * @acpi_match_table: The ACPI match table.
-> @@ -99,7 +103,8 @@ struct device_driver {
->  	struct module		*owner;
->  	const char		*mod_name;	/* used for built-in modules */
+>  arch/x86/kvm/mmu/mmu.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+>
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 337943799..2fcea4a78 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -1454,7 +1454,7 @@ static bool kvm_set_pte_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+>  {
+>  	u64 *sptep;
+>  	struct rmap_iterator iter;
+> -	int need_flush = 0;
+> +	bool need_flush = false;
+>  	u64 new_spte;
+>  	kvm_pfn_t new_pfn;
 >  
-> -	bool suppress_bind_attrs;	/* disables bind/unbind via sysfs */
-> +	bool suppress_bind_attrs:1;	/* disables bind/unbind via sysfs */
-> +	bool suppress_auto_claim_dma_owner:1;
-
-Can a bool be a bitfield?  Is that valid C?
-
-And why is that even needed?
-
->  	enum probe_type probe_type;
+> @@ -1466,7 +1466,7 @@ static bool kvm_set_pte_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+>  		rmap_printk("spte %p %llx gfn %llx (%d)\n",
+>  			    sptep, *sptep, gfn, level);
 >  
->  	const struct of_device_id	*of_match_table;
-> diff --git a/drivers/base/dd.c b/drivers/base/dd.c
-> index 68ea1f949daa..ab3333351f19 100644
-> --- a/drivers/base/dd.c
-> +++ b/drivers/base/dd.c
-> @@ -28,6 +28,7 @@
->  #include <linux/pm_runtime.h>
->  #include <linux/pinctrl/devinfo.h>
->  #include <linux/slab.h>
-> +#include <linux/iommu.h>
+> -		need_flush = 1;
+> +		need_flush = true;
 >  
->  #include "base.h"
->  #include "power/power.h"
-> @@ -566,6 +567,12 @@ static int really_probe(struct device *dev, struct device_driver *drv)
->  		goto done;
+>  		if (pte_write(pte)) {
+>  			pte_list_remove(kvm, rmap_head, sptep);
+> @@ -1482,7 +1482,7 @@ static bool kvm_set_pte_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+>  
+>  	if (need_flush && kvm_available_flush_tlb_with_range()) {
+>  		kvm_flush_remote_tlbs_with_address(kvm, gfn, 1);
+> -		return 0;
+> +		return false;
 >  	}
 >  
-> +	if (!drv->suppress_auto_claim_dma_owner) {
-> +		ret = iommu_device_set_dma_owner(dev, DMA_OWNER_KERNEL, NULL);
-> +		if (ret)
-> +			return ret;
-> +	}
-> +
+>  	return need_flush;
+> @@ -1623,8 +1623,8 @@ static bool kvm_test_age_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+>  
+>  	for_each_rmap_spte(rmap_head, &iter, sptep)
+>  		if (is_accessed_spte(*sptep))
+> -			return 1;
+> -	return 0;
+> +			return true;
+> +	return false;
+>  }
+>  
+>  #define RMAP_RECYCLE_THRESHOLD 1000
 
-This feels wrong to be doing it in the driver core, why doesn't the bus
-that cares about this handle it instead?
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-You just caused all drivers in the kernel today to set and release this
-ownership, as none set this flag.  Shouldn't it be the other way around?
+One minor remark: 'kvm_set_pte_rmapp()' handler is passed to
+'kvm_handle_gfn_range()' which does
 
-And again, why not in the bus that cares?
+        bool ret = false;
 
-You only have problems with 1 driver out of thousands, this feels wrong
-to abuse the driver core this way for just that one.
+        for_each_slot_rmap_range(...)
+                ret |= handler(...);
 
-thanks,
+and I find '|=' to not be very natural with booleans. I'm not sure it's
+worth changing though.
 
-greg k-h
+-- 
+Vitaly
+
