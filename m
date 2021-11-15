@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DDEAF44FD09
-	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 03:14:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C2CA444FCFE
+	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 03:13:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236550AbhKOCRk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 14 Nov 2021 21:17:40 -0500
-Received: from mga03.intel.com ([134.134.136.65]:15446 "EHLO mga03.intel.com"
+        id S236344AbhKOCQV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 14 Nov 2021 21:16:21 -0500
+Received: from mga05.intel.com ([192.55.52.43]:53953 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236378AbhKOCNw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 14 Nov 2021 21:13:52 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10168"; a="233307253"
+        id S236329AbhKOCOR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 14 Nov 2021 21:14:17 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10168"; a="319573952"
 X-IronPort-AV: E=Sophos;i="5.87,235,1631602800"; 
-   d="scan'208";a="233307253"
+   d="scan'208";a="319573952"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2021 18:10:57 -0800
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2021 18:11:03 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.87,235,1631602800"; 
-   d="scan'208";a="505714623"
+   d="scan'208";a="505714658"
 Received: from allen-box.sh.intel.com ([10.239.159.118])
-  by orsmga008.jf.intel.com with ESMTP; 14 Nov 2021 18:10:52 -0800
+  by orsmga008.jf.intel.com with ESMTP; 14 Nov 2021 18:10:58 -0800
 From:   Lu Baolu <baolu.lu@linux.intel.com>
 To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Joerg Roedel <joro@8bytes.org>,
@@ -39,9 +39,9 @@ Cc:     Will Deacon <will@kernel.org>, rafael@kernel.org,
         iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Lu Baolu <baolu.lu@linux.intel.com>
-Subject: [PATCH 06/11] iommu: Expose group variants of dma ownership interfaces
-Date:   Mon, 15 Nov 2021 10:05:47 +0800
-Message-Id: <20211115020552.2378167-7-baolu.lu@linux.intel.com>
+Subject: [PATCH 07/11] vfio: Use DMA_OWNER_USER to declaim passthrough devices
+Date:   Mon, 15 Nov 2021 10:05:48 +0800
+Message-Id: <20211115020552.2378167-8-baolu.lu@linux.intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20211115020552.2378167-1-baolu.lu@linux.intel.com>
 References: <20211115020552.2378167-1-baolu.lu@linux.intel.com>
@@ -51,127 +51,104 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The vfio needs to set DMA_OWNER_USER for the entire group when attaching
-it to a vfio container. So expose group variants of setting/releasing dma
-ownership for this purpose.
-
-This also exposes the helper iommu_group_dma_owner_unclaimed() for vfio
-report to userspace if the group is viable to user assignment, for
-compatibility with VFIO_GROUP_FLAGS_VIABLE.
+Set DMA_OWNER_USER when an iommu group is set to a container, and
+release DMA_OWNER_USER once the iommu group is unset from a container.
 
 Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
 ---
- include/linux/iommu.h | 21 ++++++++++++++++
- drivers/iommu/iommu.c | 57 +++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 78 insertions(+)
+ drivers/vfio/fsl-mc/vfio_fsl_mc.c     |  1 +
+ drivers/vfio/pci/vfio_pci.c           |  3 +++
+ drivers/vfio/platform/vfio_amba.c     |  1 +
+ drivers/vfio/platform/vfio_platform.c |  1 +
+ drivers/vfio/vfio.c                   | 12 +++++++++++-
+ 5 files changed, 17 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index f77eb9e7788a..3d2dfd220d3c 100644
---- a/include/linux/iommu.h
-+++ b/include/linux/iommu.h
-@@ -696,6 +696,10 @@ u32 iommu_sva_get_pasid(struct iommu_sva *handle);
- int iommu_device_set_dma_owner(struct device *dev, enum iommu_dma_owner owner,
- 			       struct file *user_file);
- void iommu_device_release_dma_owner(struct device *dev, enum iommu_dma_owner owner);
-+int iommu_group_set_dma_owner(struct iommu_group *group, enum iommu_dma_owner owner,
-+			      struct file *user_file);
-+void iommu_group_release_dma_owner(struct iommu_group *group, enum iommu_dma_owner owner);
-+bool iommu_group_dma_owner_unclaimed(struct iommu_group *group);
+diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc.c b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+index 6e2e62c6f47a..b749d092a185 100644
+--- a/drivers/vfio/fsl-mc/vfio_fsl_mc.c
++++ b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
+@@ -587,6 +587,7 @@ static struct fsl_mc_driver vfio_fsl_mc_driver = {
+ 	.driver	= {
+ 		.name	= "vfio-fsl-mc",
+ 		.owner	= THIS_MODULE,
++		.suppress_auto_claim_dma_owner = true,
+ 	},
+ };
  
- #else /* CONFIG_IOMMU_API */
+diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
+index a5ce92beb655..8961bfaf0eb5 100644
+--- a/drivers/vfio/pci/vfio_pci.c
++++ b/drivers/vfio/pci/vfio_pci.c
+@@ -193,6 +193,9 @@ static struct pci_driver vfio_pci_driver = {
+ 	.remove			= vfio_pci_remove,
+ 	.sriov_configure	= vfio_pci_sriov_configure,
+ 	.err_handler		= &vfio_pci_core_err_handlers,
++	.driver = {
++		.suppress_auto_claim_dma_owner = true,
++	},
+ };
  
-@@ -1112,6 +1116,23 @@ static inline void iommu_device_release_dma_owner(struct device *dev,
- 						  enum iommu_dma_owner owner)
- {
- }
-+
-+static inline int iommu_group_set_dma_owner(struct iommu_group *group,
-+					    enum iommu_dma_owner owner,
-+					    struct file *user_file)
-+{
-+	return -EINVAL;
-+}
-+
-+static inline void iommu_group_release_dma_owner(struct iommu_group *group,
-+						 enum iommu_dma_owner owner)
-+{
-+}
-+
-+static inline bool iommu_group_dma_owner_unclaimed(struct iommu_group *group)
-+{
-+	return false;
-+}
- #endif /* CONFIG_IOMMU_API */
+ static void __init vfio_pci_fill_ids(void)
+diff --git a/drivers/vfio/platform/vfio_amba.c b/drivers/vfio/platform/vfio_amba.c
+index badfffea14fb..2146ee52901a 100644
+--- a/drivers/vfio/platform/vfio_amba.c
++++ b/drivers/vfio/platform/vfio_amba.c
+@@ -94,6 +94,7 @@ static struct amba_driver vfio_amba_driver = {
+ 	.drv = {
+ 		.name = "vfio-amba",
+ 		.owner = THIS_MODULE,
++		.suppress_auto_claim_dma_owner = true,
+ 	},
+ };
  
- /**
-diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-index 916a4d448150..3dcd3fc4290a 100644
---- a/drivers/iommu/iommu.c
-+++ b/drivers/iommu/iommu.c
-@@ -3431,6 +3431,63 @@ static void __iommu_group_release_dma_owner(struct iommu_group *group,
+diff --git a/drivers/vfio/platform/vfio_platform.c b/drivers/vfio/platform/vfio_platform.c
+index 68a1c87066d7..5ef06e668192 100644
+--- a/drivers/vfio/platform/vfio_platform.c
++++ b/drivers/vfio/platform/vfio_platform.c
+@@ -75,6 +75,7 @@ static struct platform_driver vfio_platform_driver = {
+ 	.remove		= vfio_platform_remove,
+ 	.driver	= {
+ 		.name	= "vfio-platform",
++		.suppress_auto_claim_dma_owner = true,
+ 	},
+ };
+ 
+diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
+index 82fb75464f92..4e21b37e0ea8 100644
+--- a/drivers/vfio/vfio.c
++++ b/drivers/vfio/vfio.c
+@@ -1198,6 +1198,8 @@ static void __vfio_group_unset_container(struct vfio_group *group)
+ 		driver->ops->detach_group(container->iommu_data,
+ 					  group->iommu_group);
+ 
++	iommu_group_release_dma_owner(group->iommu_group, DMA_OWNER_USER);
++
+ 	group->container = NULL;
+ 	wake_up(&group->container_q);
+ 	list_del(&group->container_next);
+@@ -1282,13 +1284,21 @@ static int vfio_group_set_container(struct vfio_group *group, int container_fd)
+ 		goto unlock_out;
  	}
- }
  
-+/**
-+ * iommu_group_set_dma_owner() - Set DMA ownership of a group
-+ * @group: The group.
-+ * @owner: DMA_OWNER_KERNEL or DMA_OWNER_USER.
-+ * @user_file: The device fd when set USER ownership.
-+ *
-+ * This is to support backward compatibility for legacy vfio which manages
-+ * dma ownership in group level. New invocations on this interface should be
-+ * prohibited. Instead, please turn to iommu_device_set_dma_owner().
-+ */
-+int iommu_group_set_dma_owner(struct iommu_group *group, enum iommu_dma_owner owner,
-+			      struct file *user_file)
-+{
-+	int ret;
++	ret = iommu_group_set_dma_owner(group->iommu_group,
++					DMA_OWNER_USER, f.file);
++	if (ret)
++		goto unlock_out;
 +
-+	mutex_lock(&group->mutex);
-+	ret = __iommu_group_set_dma_owner(group, owner, user_file);
-+	mutex_unlock(&group->mutex);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(iommu_group_set_dma_owner);
-+
-+/**
-+ * iommu_group_release_dma_owner() - Release DMA ownership of a group
-+ * @group: The group.
-+ * @owner: DMA_OWNER_KERNEL or DMA_OWNER_USER.
-+ *
-+ * Release the DMA ownership claimed by iommu_group_set_dma_owner().
-+ */
-+void iommu_group_release_dma_owner(struct iommu_group *group, enum iommu_dma_owner owner)
-+{
-+	mutex_lock(&group->mutex);
-+	__iommu_group_release_dma_owner(group, owner);
-+	mutex_unlock(&group->mutex);
-+}
-+EXPORT_SYMBOL_GPL(iommu_group_release_dma_owner);
-+
-+/**
-+ * iommu_group_dma_owner_unclaimed() - Is group dma ownership claimed
-+ * @group: The group.
-+ *
-+ * This provides status check on a given group. It is racey and only for
-+ * non-binding status reporting.
-+ */
-+bool iommu_group_dma_owner_unclaimed(struct iommu_group *group)
-+{
-+	enum iommu_dma_owner owner;
-+
-+	mutex_lock(&group->mutex);
-+	owner = group->dma_owner;
-+	mutex_unlock(&group->mutex);
-+
-+	return owner == DMA_OWNER_NONE;
-+}
-+EXPORT_SYMBOL_GPL(iommu_group_dma_owner_unclaimed);
-+
- /**
-  * iommu_device_set_dma_owner() - Set DMA ownership of a device
-  * @dev: The device.
+ 	driver = container->iommu_driver;
+ 	if (driver) {
+ 		ret = driver->ops->attach_group(container->iommu_data,
+ 						group->iommu_group,
+ 						group->type);
+-		if (ret)
++		if (ret) {
++			iommu_group_release_dma_owner(group->iommu_group,
++						      DMA_OWNER_USER);
+ 			goto unlock_out;
++		}
+ 	}
+ 
+ 	group->container = container;
 -- 
 2.25.1
 
