@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 22D46450A17
-	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 17:51:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EADAF450A20
+	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 17:51:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231582AbhKOQyB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Nov 2021 11:54:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60288 "EHLO
+        id S231458AbhKOQyj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Nov 2021 11:54:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229740AbhKOQxm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Nov 2021 11:53:42 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EAA7C061746
-        for <kvm@vger.kernel.org>; Mon, 15 Nov 2021 08:50:46 -0800 (PST)
+        with ESMTP id S230399AbhKOQxn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Nov 2021 11:53:43 -0500
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A5DFC0613B9
+        for <kvm@vger.kernel.org>; Mon, 15 Nov 2021 08:50:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
+        d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=HwiPKnZL4j3tPps0I6gs9w+5zHq9re6+4gY1NvEU4Y8=; b=qEmMfjgFpyuOwdSJ9qvSRMOqct
-        55j9V5I/onget/SkeYlVZPKaAwV3uDdxPMHkPMofhMlV32lgFMnt1T5UBuVGhKNJg+O3CZO4dX/0R
-        grGopOVE3Sftr+rnFxDrKQqdjPs/c9QXoZN4jVIfB3dPQM59qbLT/HWRfENhpaPpQ916oWKODgPC4
-        xiORjBHBE/Xmiqn2BNduTKwgwSocP1eCswsjnnidBVNGzWjbkkVZa9KN3IVBTjlUANEFq2uqSWijI
-        9/7480EWlKbP9XrHNdLUAOsEWFLs9y7zb/qaIC4yo+xLGFvpSCLfxiLOkdI5LCQAc6p3vn4EGeIgf
-        9TUMkleQ==;
+        bh=FGlrcKv+6PnWgwSYWzEFbjgJm9dWdxrZzn3wiX/4PMI=; b=XxaivnWyowOpkVShYGSjsBoh7q
+        svB8P1awBr0/B3VX26wJbKQtYQ9aimDtyZGWzj4fnFkNJiB6Jch1kHvOUUrlCJ045uJVQt+CZVnqu
+        Ki+F3zKqIMVMrwgbvpj1r61zAMjcBJQfgHNsPX72uhuo5G/JZkVWpCzbDWHg2TJiWmd9S851nqSmC
+        LaU7StdMJrAPc40N3fokxswoTsVTSxQya6Xmmg0Frv5/O2kC/DRu0qmBaHHjGF8x6BU1AKLItnxIQ
+        aR2oh8/QESi1r73RgS/hT8J2SWGGli4dhGcSWuq7L18PwMEE/LPfQcYEuwMkvNCa14bDUMU4XMc9B
+        1itMlmMg==;
 Received: from i7.infradead.org ([2001:8b0:10b:1:21e:67ff:fecb:7a92])
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mmfBe-005qz1-CD; Mon, 15 Nov 2021 16:50:31 +0000
+        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mmfBf-00GAgA-13; Mon, 15 Nov 2021 16:50:31 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mmfBe-0001we-J4; Mon, 15 Nov 2021 16:50:30 +0000
+        id 1mmfBe-0001wi-Mr; Mon, 15 Nov 2021 16:50:30 +0000
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>
 Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
@@ -39,9 +39,9 @@ Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
         "vkuznets @ redhat . com" <vkuznets@redhat.com>,
         "mtosatti @ redhat . com" <mtosatti@redhat.com>,
         "joro @ 8bytes . org" <joro@8bytes.org>, karahmed@amazon.com
-Subject: [PATCH 04/11] KVM: x86/xen: Use sizeof_field() instead of open-coding it
-Date:   Mon, 15 Nov 2021 16:50:23 +0000
-Message-Id: <20211115165030.7422-4-dwmw2@infradead.org>
+Subject: [PATCH 05/11] KVM: nVMX: Use kvm_{read,write}_guest_cached() for shadow_vmcs12
+Date:   Mon, 15 Nov 2021 16:50:24 +0000
+Message-Id: <20211115165030.7422-5-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20211115165030.7422-1-dwmw2@infradead.org>
 References: <95fae9cf56b1a7f0a5f2b9a1934e29e924908ff2.camel@infradead.org>
@@ -49,71 +49,94 @@ References: <95fae9cf56b1a7f0a5f2b9a1934e29e924908ff2.camel@infradead.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: David Woodhouse <dwmw2@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 From: David Woodhouse <dwmw@amazon.co.uk>
 
+Using kvm_vcpu_map() for reading from the guest is entirely gratuitous,
+when all we do is a single memcpy and unmap it again. Fix it up to use
+kvm_read_guest()... but in fact I couldn't bring myself to do that
+without also making it use a gfn_to_hva_cache for both that *and* the
+copy in the other direction.
+
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 ---
- arch/x86/kvm/xen.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ arch/x86/kvm/vmx/nested.c | 24 +++++++++++++++---------
+ arch/x86/kvm/vmx/vmx.h    |  5 +++++
+ 2 files changed, 20 insertions(+), 9 deletions(-)
 
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index 6dd3d687cf04..565da9c3853b 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -127,9 +127,9 @@ void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, int state)
- 	state_entry_time = vx->runstate_entry_time;
- 	state_entry_time |= XEN_RUNSTATE_UPDATE;
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index b213ca966d41..7e2a99f435b6 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -670,33 +670,39 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
+ static void nested_cache_shadow_vmcs12(struct kvm_vcpu *vcpu,
+ 				       struct vmcs12 *vmcs12)
+ {
+-	struct kvm_host_map map;
+-	struct vmcs12 *shadow;
++	struct vcpu_vmx *vmx = to_vmx(vcpu);
++	struct gfn_to_hva_cache *ghc = &vmx->nested.shadow_vmcs12_cache;
  
--	BUILD_BUG_ON(sizeof(((struct vcpu_runstate_info *)0)->state_entry_time) !=
-+	BUILD_BUG_ON(sizeof_field(struct vcpu_runstate_info, state_entry_time) !=
- 		     sizeof(state_entry_time));
--	BUILD_BUG_ON(sizeof(((struct compat_vcpu_runstate_info *)0)->state_entry_time) !=
-+	BUILD_BUG_ON(sizeof_field(struct compat_vcpu_runstate_info, state_entry_time) !=
- 		     sizeof(state_entry_time));
+ 	if (!nested_cpu_has_shadow_vmcs(vmcs12) ||
+ 	    vmcs12->vmcs_link_pointer == INVALID_GPA)
+ 		return;
  
- 	if (kvm_write_guest_offset_cached(v->kvm, &v->arch.xen.runstate_cache,
-@@ -144,9 +144,9 @@ void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, int state)
+-	shadow = get_shadow_vmcs12(vcpu);
+-
+-	if (kvm_vcpu_map(vcpu, gpa_to_gfn(vmcs12->vmcs_link_pointer), &map))
++	if (ghc->gpa != vmcs12->vmcs_link_pointer &&
++	    kvm_gfn_to_hva_cache_init(vcpu->kvm, ghc,
++				      vmcs12->vmcs_link_pointer, VMCS12_SIZE))
+ 		return;
+ 
+-	memcpy(shadow, map.hva, VMCS12_SIZE);
+-	kvm_vcpu_unmap(vcpu, &map, false);
++	kvm_read_guest_cached(vmx->vcpu.kvm, ghc, get_shadow_vmcs12(vcpu),
++			      VMCS12_SIZE);
+ }
+ 
+ static void nested_flush_cached_shadow_vmcs12(struct kvm_vcpu *vcpu,
+ 					      struct vmcs12 *vmcs12)
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
++	struct gfn_to_hva_cache *ghc = &vmx->nested.shadow_vmcs12_cache;
+ 
+ 	if (!nested_cpu_has_shadow_vmcs(vmcs12) ||
+ 	    vmcs12->vmcs_link_pointer == INVALID_GPA)
+ 		return;
+ 
+-	kvm_write_guest(vmx->vcpu.kvm, vmcs12->vmcs_link_pointer,
+-			get_shadow_vmcs12(vcpu), VMCS12_SIZE);
++	if (ghc->gpa != vmcs12->vmcs_link_pointer &&
++	    kvm_gfn_to_hva_cache_init(vcpu->kvm, ghc,
++				      vmcs12->vmcs_link_pointer, VMCS12_SIZE))
++		return;
++
++	kvm_write_guest_cached(vmx->vcpu.kvm, ghc, get_shadow_vmcs12(vcpu),
++			       VMCS12_SIZE);
+ }
+ 
+ /*
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index a4ead6023133..cdadbd5dc0ca 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -141,6 +141,11 @@ struct nested_vmx {
  	 */
- 	BUILD_BUG_ON(offsetof(struct vcpu_runstate_info, state) !=
- 		     offsetof(struct compat_vcpu_runstate_info, state));
--	BUILD_BUG_ON(sizeof(((struct vcpu_runstate_info *)0)->state) !=
-+	BUILD_BUG_ON(sizeof_field(struct vcpu_runstate_info, state) !=
- 		     sizeof(vx->current_runstate));
--	BUILD_BUG_ON(sizeof(((struct compat_vcpu_runstate_info *)0)->state) !=
-+	BUILD_BUG_ON(sizeof_field(struct compat_vcpu_runstate_info, state) !=
- 		     sizeof(vx->current_runstate));
+ 	struct vmcs12 *cached_shadow_vmcs12;
  
- 	if (kvm_write_guest_offset_cached(v->kvm, &v->arch.xen.runstate_cache,
-@@ -163,9 +163,9 @@ void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, int state)
- 		     offsetof(struct vcpu_runstate_info, time) - sizeof(u64));
- 	BUILD_BUG_ON(offsetof(struct compat_vcpu_runstate_info, state_entry_time) !=
- 		     offsetof(struct compat_vcpu_runstate_info, time) - sizeof(u64));
--	BUILD_BUG_ON(sizeof(((struct vcpu_runstate_info *)0)->time) !=
--		     sizeof(((struct compat_vcpu_runstate_info *)0)->time));
--	BUILD_BUG_ON(sizeof(((struct vcpu_runstate_info *)0)->time) !=
-+	BUILD_BUG_ON(sizeof_field(struct vcpu_runstate_info, time) !=
-+		     sizeof_field(struct compat_vcpu_runstate_info, time));
-+	BUILD_BUG_ON(sizeof_field(struct vcpu_runstate_info, time) !=
- 		     sizeof(vx->runstate_times));
- 
- 	if (kvm_write_guest_offset_cached(v->kvm, &v->arch.xen.runstate_cache,
-@@ -205,9 +205,9 @@ int __kvm_xen_has_interrupt(struct kvm_vcpu *v)
- 	BUILD_BUG_ON(offsetof(struct vcpu_info, evtchn_upcall_pending) !=
- 		     offsetof(struct compat_vcpu_info, evtchn_upcall_pending));
- 	BUILD_BUG_ON(sizeof(rc) !=
--		     sizeof(((struct vcpu_info *)0)->evtchn_upcall_pending));
-+		     sizeof_field(struct vcpu_info, evtchn_upcall_pending));
- 	BUILD_BUG_ON(sizeof(rc) !=
--		     sizeof(((struct compat_vcpu_info *)0)->evtchn_upcall_pending));
-+		     sizeof_field(struct compat_vcpu_info, evtchn_upcall_pending));
- 
++	/*
++	 * GPA to HVA cache for accessing vmcs12->vmcs_link_pointer
++	 */
++	struct gfn_to_hva_cache shadow_vmcs12_cache;
++
  	/*
- 	 * For efficiency, this mirrors the checks for using the valid
+ 	 * Indicates if the shadow vmcs or enlightened vmcs must be updated
+ 	 * with the data held by struct vmcs12.
 -- 
 2.31.1
 
