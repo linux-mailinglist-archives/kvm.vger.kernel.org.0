@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D84244FD0A
-	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 03:14:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DDEAF44FD09
+	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 03:14:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236413AbhKOCRp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 14 Nov 2021 21:17:45 -0500
-Received: from mga17.intel.com ([192.55.52.151]:40570 "EHLO mga17.intel.com"
+        id S236550AbhKOCRk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 14 Nov 2021 21:17:40 -0500
+Received: from mga03.intel.com ([134.134.136.65]:15446 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236341AbhKOCNw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S236378AbhKOCNw (ORCPT <rfc822;kvm@vger.kernel.org>);
         Sun, 14 Nov 2021 21:13:52 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10168"; a="214088760"
+X-IronPort-AV: E=McAfee;i="6200,9189,10168"; a="233307253"
 X-IronPort-AV: E=Sophos;i="5.87,235,1631602800"; 
-   d="scan'208";a="214088760"
+   d="scan'208";a="233307253"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2021 18:10:52 -0800
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2021 18:10:57 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.87,235,1631602800"; 
-   d="scan'208";a="505714599"
+   d="scan'208";a="505714623"
 Received: from allen-box.sh.intel.com ([10.239.159.118])
-  by orsmga008.jf.intel.com with ESMTP; 14 Nov 2021 18:10:47 -0800
+  by orsmga008.jf.intel.com with ESMTP; 14 Nov 2021 18:10:52 -0800
 From:   Lu Baolu <baolu.lu@linux.intel.com>
 To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Joerg Roedel <joro@8bytes.org>,
@@ -39,9 +39,9 @@ Cc:     Will Deacon <will@kernel.org>, rafael@kernel.org,
         iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Lu Baolu <baolu.lu@linux.intel.com>
-Subject: [PATCH 05/11] iommu: Add security context management for assigned devices
-Date:   Mon, 15 Nov 2021 10:05:46 +0800
-Message-Id: <20211115020552.2378167-6-baolu.lu@linux.intel.com>
+Subject: [PATCH 06/11] iommu: Expose group variants of dma ownership interfaces
+Date:   Mon, 15 Nov 2021 10:05:47 +0800
+Message-Id: <20211115020552.2378167-7-baolu.lu@linux.intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20211115020552.2378167-1-baolu.lu@linux.intel.com>
 References: <20211115020552.2378167-1-baolu.lu@linux.intel.com>
@@ -51,93 +51,127 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When an iommu group has DMA_OWNER_USER set for the first time, it is a
-contract that the group could be assigned to userspace from now on. It
-must be detached from the default iommu domain and all devices in this
-group are blocked from doing DMA until it is attached to a user I/O
-address space. Vice versa, the default domain should be re-attached to
-the group after the last DMA_OWNER_USER is released.
+The vfio needs to set DMA_OWNER_USER for the entire group when attaching
+it to a vfio container. So expose group variants of setting/releasing dma
+ownership for this purpose.
+
+This also exposes the helper iommu_group_dma_owner_unclaimed() for vfio
+report to userspace if the group is viable to user assignment, for
+compatibility with VFIO_GROUP_FLAGS_VIABLE.
 
 Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
 ---
- drivers/iommu/iommu.c | 36 +++++++++++++++++++++++++++++++++---
- 1 file changed, 33 insertions(+), 3 deletions(-)
+ include/linux/iommu.h | 21 ++++++++++++++++
+ drivers/iommu/iommu.c | 57 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 78 insertions(+)
 
+diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+index f77eb9e7788a..3d2dfd220d3c 100644
+--- a/include/linux/iommu.h
++++ b/include/linux/iommu.h
+@@ -696,6 +696,10 @@ u32 iommu_sva_get_pasid(struct iommu_sva *handle);
+ int iommu_device_set_dma_owner(struct device *dev, enum iommu_dma_owner owner,
+ 			       struct file *user_file);
+ void iommu_device_release_dma_owner(struct device *dev, enum iommu_dma_owner owner);
++int iommu_group_set_dma_owner(struct iommu_group *group, enum iommu_dma_owner owner,
++			      struct file *user_file);
++void iommu_group_release_dma_owner(struct iommu_group *group, enum iommu_dma_owner owner);
++bool iommu_group_dma_owner_unclaimed(struct iommu_group *group);
+ 
+ #else /* CONFIG_IOMMU_API */
+ 
+@@ -1112,6 +1116,23 @@ static inline void iommu_device_release_dma_owner(struct device *dev,
+ 						  enum iommu_dma_owner owner)
+ {
+ }
++
++static inline int iommu_group_set_dma_owner(struct iommu_group *group,
++					    enum iommu_dma_owner owner,
++					    struct file *user_file)
++{
++	return -EINVAL;
++}
++
++static inline void iommu_group_release_dma_owner(struct iommu_group *group,
++						 enum iommu_dma_owner owner)
++{
++}
++
++static inline bool iommu_group_dma_owner_unclaimed(struct iommu_group *group)
++{
++	return false;
++}
+ #endif /* CONFIG_IOMMU_API */
+ 
+ /**
 diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-index 39493b1b3edf..916a4d448150 100644
+index 916a4d448150..3dcd3fc4290a 100644
 --- a/drivers/iommu/iommu.c
 +++ b/drivers/iommu/iommu.c
-@@ -293,7 +293,11 @@ int iommu_probe_device(struct device *dev)
- 	mutex_lock(&group->mutex);
- 	iommu_alloc_default_domain(group, dev);
- 
--	if (group->default_domain) {
-+	/*
-+	 * If any device in the group has been initialized for user dma,
-+	 * avoid attaching the default domain.
-+	 */
-+	if (group->default_domain && group->dma_owner != DMA_OWNER_USER) {
- 		ret = __iommu_attach_device(group->default_domain, dev);
- 		if (ret) {
- 			mutex_unlock(&group->mutex);
-@@ -2325,7 +2329,7 @@ static int __iommu_attach_group(struct iommu_domain *domain,
- {
- 	int ret;
- 
--	if (group->default_domain && group->domain != group->default_domain)
-+	if (group->domain && group->domain != group->default_domain)
- 		return -EBUSY;
- 
- 	ret = __iommu_group_for_each_dev(group, domain,
-@@ -2362,7 +2366,11 @@ static void __iommu_detach_group(struct iommu_domain *domain,
- {
- 	int ret;
- 
--	if (!group->default_domain) {
-+	/*
-+	 * If any device in the group has been initialized for user dma,
-+	 * avoid re-attaching the default domain.
-+	 */
-+	if (!group->default_domain || group->dma_owner == DMA_OWNER_USER) {
- 		__iommu_group_for_each_dev(group, domain,
- 					   iommu_group_do_detach_device);
- 		group->domain = NULL;
-@@ -3377,6 +3385,21 @@ static int __iommu_group_set_dma_owner(struct iommu_group *group,
- 		refcount_set(&group->owner_cnt, 1);
- 
- 		if (owner == DMA_OWNER_USER) {
-+			/*
-+			 * The UNMANAGED domain shouldn't be attached before
-+			 * claiming the USER ownership for the first time.
-+			 */
-+			if (group->domain) {
-+				if (group->domain != group->default_domain) {
-+					group->dma_owner = DMA_OWNER_NONE;
-+					refcount_set(&group->owner_cnt, 0);
-+
-+					return -EBUSY;
-+				}
-+
-+				__iommu_detach_group(group->domain, group);
-+			}
-+
- 			get_file(user_file);
- 			group->owner_user_file = user_file;
- 		}
-@@ -3397,6 +3420,13 @@ static void __iommu_group_release_dma_owner(struct iommu_group *group,
- 		if (owner == DMA_OWNER_USER) {
- 			fput(group->owner_user_file);
- 			group->owner_user_file = NULL;
-+
-+			/*
-+			 * The UNMANAGED domain should be detached before all USER
-+			 * owners have been released.
-+			 */
-+			if (!WARN_ON(group->domain) && group->default_domain)
-+				__iommu_attach_group(group->default_domain, group);
- 		}
+@@ -3431,6 +3431,63 @@ static void __iommu_group_release_dma_owner(struct iommu_group *group,
  	}
  }
+ 
++/**
++ * iommu_group_set_dma_owner() - Set DMA ownership of a group
++ * @group: The group.
++ * @owner: DMA_OWNER_KERNEL or DMA_OWNER_USER.
++ * @user_file: The device fd when set USER ownership.
++ *
++ * This is to support backward compatibility for legacy vfio which manages
++ * dma ownership in group level. New invocations on this interface should be
++ * prohibited. Instead, please turn to iommu_device_set_dma_owner().
++ */
++int iommu_group_set_dma_owner(struct iommu_group *group, enum iommu_dma_owner owner,
++			      struct file *user_file)
++{
++	int ret;
++
++	mutex_lock(&group->mutex);
++	ret = __iommu_group_set_dma_owner(group, owner, user_file);
++	mutex_unlock(&group->mutex);
++
++	return ret;
++}
++EXPORT_SYMBOL_GPL(iommu_group_set_dma_owner);
++
++/**
++ * iommu_group_release_dma_owner() - Release DMA ownership of a group
++ * @group: The group.
++ * @owner: DMA_OWNER_KERNEL or DMA_OWNER_USER.
++ *
++ * Release the DMA ownership claimed by iommu_group_set_dma_owner().
++ */
++void iommu_group_release_dma_owner(struct iommu_group *group, enum iommu_dma_owner owner)
++{
++	mutex_lock(&group->mutex);
++	__iommu_group_release_dma_owner(group, owner);
++	mutex_unlock(&group->mutex);
++}
++EXPORT_SYMBOL_GPL(iommu_group_release_dma_owner);
++
++/**
++ * iommu_group_dma_owner_unclaimed() - Is group dma ownership claimed
++ * @group: The group.
++ *
++ * This provides status check on a given group. It is racey and only for
++ * non-binding status reporting.
++ */
++bool iommu_group_dma_owner_unclaimed(struct iommu_group *group)
++{
++	enum iommu_dma_owner owner;
++
++	mutex_lock(&group->mutex);
++	owner = group->dma_owner;
++	mutex_unlock(&group->mutex);
++
++	return owner == DMA_OWNER_NONE;
++}
++EXPORT_SYMBOL_GPL(iommu_group_dma_owner_unclaimed);
++
+ /**
+  * iommu_device_set_dma_owner() - Set DMA ownership of a device
+  * @dev: The device.
 -- 
 2.25.1
 
