@@ -2,92 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 48A32451688
-	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 22:27:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F097145168D
+	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 22:28:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346472AbhKOVam (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Nov 2021 16:30:42 -0500
-Received: from mail.kernel.org ([198.145.29.99]:52354 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1352978AbhKOUvT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Nov 2021 15:51:19 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 29D5C63240;
-        Mon, 15 Nov 2021 20:48:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1637009303;
-        bh=Ab04UsOLuYDaWgm25keP0dnQCwf2wKgMMT8FZu0wdU4=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:From;
-        b=p+hZZ1wwOqkazM54o6HvrGw9tCG0HCBtef7yJtD1WKlY1aVo0bn1uDBS3uH2zcTum
-         F1hwf/F/+qWGyMrgMbPGJi3/MaQbqVkcJiSJTP7Sso6dp1MeM62oJ6EbZ0dqqUw8RC
-         XDutK2ZgWNduVzYoxkXW4dPZOz4gnxdL+xd0lKnEVHgxdeeSml/+l35jc0SDOg+tOe
-         XjdyGPwy4QyA/zVawD0Ox/ObYmU2s2nOfF+1SSCB8gE/nxeeyG6SjuroobyovNR3PQ
-         /jaXEC8b1Lzdog7PhMV6IudqpvicpbPfktdvROHIVrrIIgzgZ/vQ+E8qQd9+N/mJoL
-         fEZElHCplMLLw==
-Date:   Mon, 15 Nov 2021 14:48:21 -0600
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     Lu Baolu <baolu.lu@linux.intel.com>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Ashok Raj <ashok.raj@intel.com>, Will Deacon <will@kernel.org>,
-        rafael@kernel.org, Diana Craciun <diana.craciun@oss.nxp.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Liu Yi L <yi.l.liu@intel.com>,
-        Jacob jun Pan <jacob.jun.pan@intel.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 03/11] PCI: pci_stub: Suppress kernel DMA ownership
- auto-claiming
-Message-ID: <20211115204821.GA1587269@bhelgaas>
+        id S1350343AbhKOVbL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Nov 2021 16:31:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56968 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243142AbhKOU4o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Nov 2021 15:56:44 -0500
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A174C043198;
+        Mon, 15 Nov 2021 12:49:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=glXmaer1AnnsfLnkd+NXbLGw5JwITPEc81+nOuesJi8=; b=ib+jo5QH8uDApJ7acX0QE3l17d
+        8LEf3XvuGBpsmLmk1AHzbwJYsBpsUIneu/DEo4DNgGRBJPSVF+zT6G/LkaTuhjQhh6E3cJWCjxWP0
+        84ywMk9ku9heTsi6z4CYZ0/0TuA0vV9Xm2QFcapJzU6ddpq+ofh13Lx6/dwxhPnfp+YYwP475vJ5A
+        JDzqdgVFLsOQFHoHj6fsIXNGg9/Om8oVsQNUIrTyJOi1gv9srCtn1MiNQu41V/S70+m05w+8XPa5i
+        piovS0/DMUh8ChtxdV2yzUyqftvh/7Zr3R1K0nGOA4E7A+5917Rb0LzMlvgvAIplxaTN1uP25W2Ho
+        cViCzkqg==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=worktop.programming.kicks-ass.net)
+        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mmiuY-00GCFq-5c; Mon, 15 Nov 2021 20:49:06 +0000
+Received: by worktop.programming.kicks-ass.net (Postfix, from userid 1000)
+        id BC989986687; Mon, 15 Nov 2021 21:49:05 +0100 (CET)
+Date:   Mon, 15 Nov 2021 21:49:05 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vihas Mak <makvihas@gmail.com>, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+        hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86: fix cocci warnings
+Message-ID: <20211115204905.GQ174703@worktop.programming.kicks-ass.net>
+References: <20211114164312.GA28736@makvihas>
+ <YZJH0Hd/ETYWJGTX@hirez.programming.kicks-ass.net>
+ <ab419d8b-3e5d-2879-274c-ee609254890c@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211115020552.2378167-4-baolu.lu@linux.intel.com>
+In-Reply-To: <ab419d8b-3e5d-2879-274c-ee609254890c@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 15, 2021 at 10:05:44AM +0800, Lu Baolu wrote:
-> pci_stub allows the admin to block driver binding on a device and make
-> it permanently shared with userspace. Since pci_stub does not do DMA,
-> it is safe. 
-
-Can you elaborate on what "permanently shared with userspace" means
-here?  I assume it's only permanent as long as pci-stub is bound to
-the device?
-
-Also, a few words about what "it is safe" means here would be helpful.
-
-> However the admin must understand that using pci_stub allows
-> userspace to attack whatever device it was bound to.
-
-The admin isn't going to read this sentence.  Should there be a doc
-update related to this?  What sort of attack does this refer to?
-
-> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
-> ---
->  drivers/pci/pci-stub.c | 3 +++
->  1 file changed, 3 insertions(+)
+On Mon, Nov 15, 2021 at 06:06:08PM +0100, Paolo Bonzini wrote:
+> On 11/15/21 12:43, Peter Zijlstra wrote:
+> > On Sun, Nov 14, 2021 at 10:13:12PM +0530, Vihas Mak wrote:
+> > > change 0 to false and 1 to true to fix following cocci warnings:
+> > > 
+> > >          arch/x86/kvm/mmu/mmu.c:1485:9-10: WARNING: return of 0/1 in function 'kvm_set_pte_rmapp' with return type bool
+> > >          arch/x86/kvm/mmu/mmu.c:1636:10-11: WARNING: return of 0/1 in function 'kvm_test_age_rmapp' with return type bool
+> > 
+> > That script should be deleted, it's absolute garbage.
+> > 
 > 
-> diff --git a/drivers/pci/pci-stub.c b/drivers/pci/pci-stub.c
-> index e408099fea52..6324c68602b4 100644
-> --- a/drivers/pci/pci-stub.c
-> +++ b/drivers/pci/pci-stub.c
-> @@ -36,6 +36,9 @@ static struct pci_driver stub_driver = {
->  	.name		= "pci-stub",
->  	.id_table	= NULL,	/* only dynamic id's */
->  	.probe		= pci_stub_probe,
-> +	.driver		= {
-> +		.suppress_auto_claim_dma_owner = true,
-> +	},
->  };
->  
->  static int __init pci_stub_init(void)
-> -- 
-> 2.25.1
-> 
+> Only a Sith deals in absolutes.
+
+Is that a star-wars thingy?
+
+In C 0 is a valid way to spell false, equally, any non-0 value is a
+valid way to spell true. Why would this rate a warn?
+
+In fact, when casting _Bool to integer, you get 0 and 1. When looking at
+the memory content of the _Bool variable, you'll get 0 and 1. But we're
+not allowed to write 0 and 1?
+
