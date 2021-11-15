@@ -2,124 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F19C44F91F
-	for <lists+kvm@lfdr.de>; Sun, 14 Nov 2021 17:43:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CD3A844FCE0
+	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 03:10:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234325AbhKNQqL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 14 Nov 2021 11:46:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48206 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229725AbhKNQqK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 14 Nov 2021 11:46:10 -0500
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85A09C061746;
-        Sun, 14 Nov 2021 08:43:15 -0800 (PST)
-Received: by mail-pj1-x102b.google.com with SMTP id y14-20020a17090a2b4e00b001a5824f4918so11215977pjc.4;
-        Sun, 14 Nov 2021 08:43:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:mime-version:content-disposition;
-        bh=Yx8d6qiTYuCnN0n/4csVjohFQlFV+Cv5r3+Yrax2t30=;
-        b=a8QTZr46AwVtz5PUDxyaqXCUa/jm7B3dWkrhGhxBCEwi+owkmomrrt6MnRIr8Dymi1
-         378Qjas4ER7lzBVfSQebkYha+1w0V09zvl863scqZ0N5uhY9G2gRAbm0YxkUy73m8+ST
-         yHyQtUP5ztJZRqoAlrI0DAqNK6SoToQ0rHGCEhUWNeOmTCwQLJ4z78hokc3r0JH1cfm1
-         1Snue/MP1iYZAPucvHVpnp86+QN7OgmM3uQ4g3pFGzX8TchEA+luJQEnL/2Kc7Ue7nhh
-         XftHTxdT5tPkefsetqBUgYLo/B18u+yZnmZfZobwGnZG9jzYu9LmNZgy+ijuTKrS96o4
-         xoow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=Yx8d6qiTYuCnN0n/4csVjohFQlFV+Cv5r3+Yrax2t30=;
-        b=b6WeVVA2Us0Cd6OmOpeFbkvih5pjNVm/Pt4Qhzyx4eE50bthn/152CFbEuELEFPYZe
-         wIUqnWiQ4q0be9RvPKHDwUJCpUZU4gW3yS9eK7NWseeYF+NYXHwNr4gfY3u7BZSvLHHI
-         2dtu9VXtkEjB5CdDA2L+dOxNBWd1socTOjnxgHRS/Wh8zSFyv1VbwaUTtwFqT7W47Qso
-         gcD3Or6O1IK3bGk/nyoKnKYn517v0lP7qrlf0exS2HlmFrPjE65KByUVi4xX30h95ZCo
-         U8c57mH3x6TLV+xs4yJO5/2dan/O+zdQ8+iaao2KSiRc7cHegfLNSJaAYi5+UzhqezZK
-         t8KQ==
-X-Gm-Message-State: AOAM531GeSwKSgVx+vWWlwuSJrs43XMq6mbs93zOYPvyNGyRpq8btTt+
-        xKsibp2ecwvASqnh5tYZI7nFPEE50D/kIQjA
-X-Google-Smtp-Source: ABdhPJxnjjKc9stt3/5ghte6UGoRioJVJR72NxEBsPFrhxajNCwAus173Nv6r+zoayrGnlAd5QyGuQ==
-X-Received: by 2002:a17:90b:3a83:: with SMTP id om3mr38875639pjb.0.1636908194902;
-        Sun, 14 Nov 2021 08:43:14 -0800 (PST)
-Received: from makvihas ([103.81.92.175])
-        by smtp.gmail.com with ESMTPSA id t15sm12217143pfl.186.2021.11.14.08.43.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 14 Nov 2021 08:43:14 -0800 (PST)
-Date:   Sun, 14 Nov 2021 22:13:12 +0530
-From:   Vihas Mak <makvihas@gmail.com>
-To:     pbonzini@redhat.com
-Cc:     seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: x86: fix cocci warnings
-Message-ID: <20211114164312.GA28736@makvihas>
+        id S234884AbhKOCNY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 14 Nov 2021 21:13:24 -0500
+Received: from mga03.intel.com ([134.134.136.65]:15410 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230395AbhKOCNV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 14 Nov 2021 21:13:21 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10168"; a="233307209"
+X-IronPort-AV: E=Sophos;i="5.87,235,1631602800"; 
+   d="scan'208";a="233307209"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2021 18:10:26 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.87,235,1631602800"; 
+   d="scan'208";a="505714518"
+Received: from allen-box.sh.intel.com ([10.239.159.118])
+  by orsmga008.jf.intel.com with ESMTP; 14 Nov 2021 18:10:21 -0800
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>
+Cc:     Will Deacon <will@kernel.org>, rafael@kernel.org,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Liu Yi L <yi.l.liu@intel.com>,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Lu Baolu <baolu.lu@linux.intel.com>
+Subject: [PATCH 00/11] Fix BUG_ON in vfio_iommu_group_notifier()
+Date:   Mon, 15 Nov 2021 10:05:41 +0800
+Message-Id: <20211115020552.2378167-1-baolu.lu@linux.intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-change 0 to false and 1 to true to fix following cocci warnings:
+Hi folks,
 
-        arch/x86/kvm/mmu/mmu.c:1485:9-10: WARNING: return of 0/1 in function 'kvm_set_pte_rmapp' with return type bool
-        arch/x86/kvm/mmu/mmu.c:1636:10-11: WARNING: return of 0/1 in function 'kvm_test_age_rmapp' with return type bool
+The iommu group is the minimal isolation boundary for DMA. Devices in
+a group can access each other's MMIO registers via peer to peer DMA
+and also need share the same I/O address space.
 
-Signed-off-by: Vihas Mak <makvihas@gmail.com>
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: Wanpeng Li <wanpengli@tencent.com>
-Cc: Jim Mattson <jmattson@google.com>
-Cc: Joerg Roedel <joro@8bytes.org>
----
- arch/x86/kvm/mmu/mmu.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+Once the I/O address space is assigned to user control it is no longer
+available to the dma_map* API, which effectively makes the DMA API
+non-working.
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 337943799..2fcea4a78 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1454,7 +1454,7 @@ static bool kvm_set_pte_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
- {
- 	u64 *sptep;
- 	struct rmap_iterator iter;
--	int need_flush = 0;
-+	bool need_flush = false;
- 	u64 new_spte;
- 	kvm_pfn_t new_pfn;
- 
-@@ -1466,7 +1466,7 @@ static bool kvm_set_pte_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
- 		rmap_printk("spte %p %llx gfn %llx (%d)\n",
- 			    sptep, *sptep, gfn, level);
- 
--		need_flush = 1;
-+		need_flush = true;
- 
- 		if (pte_write(pte)) {
- 			pte_list_remove(kvm, rmap_head, sptep);
-@@ -1482,7 +1482,7 @@ static bool kvm_set_pte_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
- 
- 	if (need_flush && kvm_available_flush_tlb_with_range()) {
- 		kvm_flush_remote_tlbs_with_address(kvm, gfn, 1);
--		return 0;
-+		return false;
- 	}
- 
- 	return need_flush;
-@@ -1623,8 +1623,8 @@ static bool kvm_test_age_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
- 
- 	for_each_rmap_spte(rmap_head, &iter, sptep)
- 		if (is_accessed_spte(*sptep))
--			return 1;
--	return 0;
-+			return true;
-+	return false;
- }
- 
- #define RMAP_RECYCLE_THRESHOLD 1000
+Second, userspace can use DMA initiated by a device that it controls
+to access the MMIO spaces of other devices in the group. This allows
+userspace to indirectly attack any kernel owned device and it's driver.
+
+Therefore groups must either be entirely under kernel control or
+userspace control, never a mixture. Unfortunately some systems have
+problems with the granularity of groups and there are a couple of
+important exceptions:
+
+ - pci_stub allows the admin to block driver binding on a device and
+   make it permanently shared with userspace. Since PCI stub does not
+   do DMA it is safe, however the admin must understand that using
+   pci_stub allows userspace to attack whatever device it was bound
+   it.
+
+ - PCI bridges are sometimes included in groups. Typically PCI bridges
+   do not use DMA, and generally do not have MMIO regions.
+
+Generally any device that does not have any MMIO registers is a
+possible candidate for an exception.
+
+Currently vfio adopts a workaround to detect violations of the above
+restrictions by monitoring the driver core BOUND event, and hardwiring
+the above exceptions. Since there is no way for vfio to reject driver
+binding at this point, BUG_ON() is triggered if a violation is
+captured (kernel driver BOUND event on a group which already has some
+devices assigned to userspace). Aside from the bad user experience
+this opens a way for root userspace to crash the kernel, even in high
+integrity configurations, by manipulating the module binding and
+triggering the BUG_ON.
+
+This series solves this problem by making the user/kernel ownership a
+core concept at the IOMMU layer. The driver core enforces kernel
+ownership while drivers are bound and violations now result in a error
+codes during probe, not BUG_ON failures.
+
+Patch partitions:
+  [PATCH 1-2]: Detect DMA ownership conflicts during driver binding;
+  [PATCH 3-6]: Add security context management for assigned devices;
+  [PATCH 7-11]: Various cleanups.
+
+Ideas contributed by:
+  Jason Gunthorpe <jgg@nvidia.com>
+  Kevin Tian <kevin.tian@intel.com>
+  Ashok Raj <ashok.raj@intel.com>
+  Lu Baolu <baolu.lu@linux.intel.com>
+
+Review contributors:
+  Jason Gunthorpe <jgg@nvidia.com>
+  Kevin Tian <kevin.tian@intel.com>
+  Ashok Raj <ashok.raj@intel.com>
+  Liu Yi L <yi.l.liu@intel.com>
+  Jacob jun Pan <jacob.jun.pan@intel.com>
+  Chaitanya Kulkarni <kch@nvidia.com>
+
+This also is part one of three initial series for IOMMUFD:
+ * Move IOMMU Group security into the iommu layer
+ - Generic IOMMUFD implementation
+ - VFIO ability to consume IOMMUFD
+
+This is based on v5.16-rc1 and available on github:
+https://github.com/LuBaolu/intel-iommu/commits/iommu-dma-ownership-v1
+
+Best regards,
+baolu
+
+Jason Gunthorpe (1):
+  vfio: Delete the unbound_list
+
+Lu Baolu (10):
+  iommu: Add device dma ownership set/release interfaces
+  driver core: Set DMA ownership during driver bind/unbind
+  PCI: pci_stub: Suppress kernel DMA ownership auto-claiming
+  PCI: portdrv: Suppress kernel DMA ownership auto-claiming
+  iommu: Add security context management for assigned devices
+  iommu: Expose group variants of dma ownership interfaces
+  vfio: Use DMA_OWNER_USER to declaim passthrough devices
+  vfio: Remove use of vfio_group_viable()
+  vfio: Remove iommu group notifier
+  iommu: Remove iommu group changes notifier
+
+ include/linux/device/driver.h         |   7 +-
+ include/linux/iommu.h                 |  75 ++++---
+ drivers/base/dd.c                     |  12 ++
+ drivers/iommu/iommu.c                 | 274 ++++++++++++++++++--------
+ drivers/pci/pci-stub.c                |   3 +
+ drivers/pci/pcie/portdrv_pci.c        |   2 +
+ drivers/vfio/fsl-mc/vfio_fsl_mc.c     |   1 +
+ drivers/vfio/pci/vfio_pci.c           |   3 +
+ drivers/vfio/platform/vfio_amba.c     |   1 +
+ drivers/vfio/platform/vfio_platform.c |   1 +
+ drivers/vfio/vfio.c                   | 247 ++---------------------
+ 11 files changed, 294 insertions(+), 332 deletions(-)
+
 -- 
 2.25.1
 
