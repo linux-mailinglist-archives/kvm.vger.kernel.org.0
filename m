@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 460AB44FCFC
-	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 03:13:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D84244FD0A
+	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 03:14:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236455AbhKOCPH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 14 Nov 2021 21:15:07 -0500
-Received: from mga04.intel.com ([192.55.52.120]:50553 "EHLO mga04.intel.com"
+        id S236413AbhKOCRp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 14 Nov 2021 21:17:45 -0500
+Received: from mga17.intel.com ([192.55.52.151]:40570 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236253AbhKOCNm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 14 Nov 2021 21:13:42 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10168"; a="232086645"
+        id S236341AbhKOCNw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 14 Nov 2021 21:13:52 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10168"; a="214088760"
 X-IronPort-AV: E=Sophos;i="5.87,235,1631602800"; 
-   d="scan'208";a="232086645"
+   d="scan'208";a="214088760"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2021 18:10:47 -0800
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2021 18:10:52 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.87,235,1631602800"; 
-   d="scan'208";a="505714581"
+   d="scan'208";a="505714599"
 Received: from allen-box.sh.intel.com ([10.239.159.118])
-  by orsmga008.jf.intel.com with ESMTP; 14 Nov 2021 18:10:42 -0800
+  by orsmga008.jf.intel.com with ESMTP; 14 Nov 2021 18:10:47 -0800
 From:   Lu Baolu <baolu.lu@linux.intel.com>
 To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Joerg Roedel <joro@8bytes.org>,
@@ -39,9 +39,9 @@ Cc:     Will Deacon <will@kernel.org>, rafael@kernel.org,
         iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Lu Baolu <baolu.lu@linux.intel.com>
-Subject: [PATCH 04/11] PCI: portdrv: Suppress kernel DMA ownership auto-claiming
-Date:   Mon, 15 Nov 2021 10:05:45 +0800
-Message-Id: <20211115020552.2378167-5-baolu.lu@linux.intel.com>
+Subject: [PATCH 05/11] iommu: Add security context management for assigned devices
+Date:   Mon, 15 Nov 2021 10:05:46 +0800
+Message-Id: <20211115020552.2378167-6-baolu.lu@linux.intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20211115020552.2378167-1-baolu.lu@linux.intel.com>
 References: <20211115020552.2378167-1-baolu.lu@linux.intel.com>
@@ -51,47 +51,93 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-IOMMU grouping on PCI necessitates that if we lack isolation on a bridge
-then all of the downstream devices will be part of the same IOMMU group
-as the bridge. As long as the bridge kernel driver doesn't map and
-access any PCI mmio bar, it's safe to bind it to the device in a USER-
-owned group. Hence, safe to suppress the kernel DMA ownership auto-
-claiming.
+When an iommu group has DMA_OWNER_USER set for the first time, it is a
+contract that the group could be assigned to userspace from now on. It
+must be detached from the default iommu domain and all devices in this
+group are blocked from doing DMA until it is attached to a user I/O
+address space. Vice versa, the default domain should be re-attached to
+the group after the last DMA_OWNER_USER is released.
 
-The commit 5f096b14d421b ("vfio: Whitelist PCI bridges") permitted a
-class of kernel drivers. This is not always safe. For example, the SHPC
-system design requires that it must be integrated into a PCI-to-PCI
-bridge or a host bridge. The shpchp_core driver relies on the PCI mmio
-bar access for the controller functionality. Binding it to the device
-belonging to a USER-owned group will allow the user to change the
-controller via p2p transactions which is unknown to the hot-plug driver
-and could lead to some unpredictable consequences.
-
-Now that we have driver self-declaration of safety we should rely on that.
-This change may cause regression on some platforms, since all bridges were
-exempted before, but now they have to be manually audited before doing so.
-This is actually the desired outcome anyway.
-
-Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
-Suggested-by: Kevin Tian <kevin.tian@intel.com>
 Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
 ---
- drivers/pci/pcie/portdrv_pci.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/iommu/iommu.c | 36 +++++++++++++++++++++++++++++++++---
+ 1 file changed, 33 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/pci/pcie/portdrv_pci.c b/drivers/pci/pcie/portdrv_pci.c
-index 35eca6277a96..1285862a9aa8 100644
---- a/drivers/pci/pcie/portdrv_pci.c
-+++ b/drivers/pci/pcie/portdrv_pci.c
-@@ -203,6 +203,8 @@ static struct pci_driver pcie_portdriver = {
- 	.err_handler	= &pcie_portdrv_err_handler,
+diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+index 39493b1b3edf..916a4d448150 100644
+--- a/drivers/iommu/iommu.c
++++ b/drivers/iommu/iommu.c
+@@ -293,7 +293,11 @@ int iommu_probe_device(struct device *dev)
+ 	mutex_lock(&group->mutex);
+ 	iommu_alloc_default_domain(group, dev);
  
- 	.driver.pm	= PCIE_PORTDRV_PM_OPS,
+-	if (group->default_domain) {
++	/*
++	 * If any device in the group has been initialized for user dma,
++	 * avoid attaching the default domain.
++	 */
++	if (group->default_domain && group->dma_owner != DMA_OWNER_USER) {
+ 		ret = __iommu_attach_device(group->default_domain, dev);
+ 		if (ret) {
+ 			mutex_unlock(&group->mutex);
+@@ -2325,7 +2329,7 @@ static int __iommu_attach_group(struct iommu_domain *domain,
+ {
+ 	int ret;
+ 
+-	if (group->default_domain && group->domain != group->default_domain)
++	if (group->domain && group->domain != group->default_domain)
+ 		return -EBUSY;
+ 
+ 	ret = __iommu_group_for_each_dev(group, domain,
+@@ -2362,7 +2366,11 @@ static void __iommu_detach_group(struct iommu_domain *domain,
+ {
+ 	int ret;
+ 
+-	if (!group->default_domain) {
++	/*
++	 * If any device in the group has been initialized for user dma,
++	 * avoid re-attaching the default domain.
++	 */
++	if (!group->default_domain || group->dma_owner == DMA_OWNER_USER) {
+ 		__iommu_group_for_each_dev(group, domain,
+ 					   iommu_group_do_detach_device);
+ 		group->domain = NULL;
+@@ -3377,6 +3385,21 @@ static int __iommu_group_set_dma_owner(struct iommu_group *group,
+ 		refcount_set(&group->owner_cnt, 1);
+ 
+ 		if (owner == DMA_OWNER_USER) {
++			/*
++			 * The UNMANAGED domain shouldn't be attached before
++			 * claiming the USER ownership for the first time.
++			 */
++			if (group->domain) {
++				if (group->domain != group->default_domain) {
++					group->dma_owner = DMA_OWNER_NONE;
++					refcount_set(&group->owner_cnt, 0);
 +
-+	.driver.suppress_auto_claim_dma_owner = true,
- };
- 
- static int __init dmi_pcie_pme_disable_msi(const struct dmi_system_id *d)
++					return -EBUSY;
++				}
++
++				__iommu_detach_group(group->domain, group);
++			}
++
+ 			get_file(user_file);
+ 			group->owner_user_file = user_file;
+ 		}
+@@ -3397,6 +3420,13 @@ static void __iommu_group_release_dma_owner(struct iommu_group *group,
+ 		if (owner == DMA_OWNER_USER) {
+ 			fput(group->owner_user_file);
+ 			group->owner_user_file = NULL;
++
++			/*
++			 * The UNMANAGED domain should be detached before all USER
++			 * owners have been released.
++			 */
++			if (!WARN_ON(group->domain) && group->default_domain)
++				__iommu_attach_group(group->default_domain, group);
+ 		}
+ 	}
+ }
 -- 
 2.25.1
 
