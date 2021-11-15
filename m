@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 04B844527CB
-	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 03:38:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D91054527EC
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 03:47:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356036AbhKPClM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Nov 2021 21:41:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46646 "EHLO
+        id S244732AbhKPCuf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Nov 2021 21:50:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343660AbhKPCeZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Nov 2021 21:34:25 -0500
+        with ESMTP id S1356776AbhKPCsW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Nov 2021 21:48:22 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B12FC0D8DAB
-        for <kvm@vger.kernel.org>; Mon, 15 Nov 2021 15:22:37 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0962C0E2825
+        for <kvm@vger.kernel.org>; Mon, 15 Nov 2021 15:25:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=lr+nyBGSO+ShVhKPtMQhFHuxTtfV/+er2fgeiL/1Rew=; b=UXmLSFHMZOpcK53B1OwEfueh2U
-        0pBf2a9ABt3tyBGNeun+VEv6VWy6s+ruNI+SE4DFRRTmTHbas2qXSy9gn0prhmAf5pRlAJVgIeWMd
-        pRC44cI7iw+LCRfVxstVsoojRIqxff+e8X3ml5MWKDs5f+zXmaYJ/1MRk5/2+qlsHpRYay5M4QPqy
-        JHWq3hCdyavgEM+JE0qNkQnSv7ldm9oimd3L+1mKNo7SB3I0RzHxVQcMfZclnKNau9K/96UGhR3Qy
-        W8wX20eTbKFPQj9WXeRa364gqN3l73CWDRj2q1HQtIhWrz4ONrVHmUfA+65eOvgE/exdCTYJ8CWl9
-        0GuXJSbQ==;
+        bh=Lmv1M38eswRvtBiwzYoZZTBtnMbUA4c0Lyi5etWpi+g=; b=y/xjgTO397pdebHNrQmB/dk94A
+        eHowTv5KZ+BAa17WHJNNFkgzBqbKG6O7s7upjF4IIGLouUDn4H+utRQUIrhJ6rEzPAyg4mRUKGi+x
+        DXezjWOmM4kTwtytQNz8aWLO9Hpd8BTvu0dAW4OiD/9+MPgVPAgy7jKdv016IBr+VLbMdYSlvEGR7
+        b38D5By9QOu+1gEJs5GliZ6FPSe2UPCqrxVchzUuxMq820wgfGCHcW/an16am/Zz/iWnUnW2e5lRB
+        9YDyhRQzqApwkTgjKmDGz4ahrASVrBvrjSZAkZ2675bvFNFttMGWicocss3Voxr43+iqHBqlurv3L
+        D49RjxDQ==;
 Received: from 54-240-197-235.amazon.com ([54.240.197.235] helo=freeip.amazon.com)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mmlIt-00HHRn-Ky; Mon, 15 Nov 2021 23:22:24 +0000
-Message-ID: <57d599584ace8ab410b9b14569f434028e2cf642.camel@infradead.org>
+        id 1mmlLI-00HHft-2z; Mon, 15 Nov 2021 23:24:52 +0000
+Message-ID: <3e2846d7aa3647ce0374160c3580a7c020f47b5f.camel@infradead.org>
 Subject: Re: [RFC PATCH 0/11] Rework gfn_to_pfn_cache
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     Sean Christopherson <seanjc@google.com>,
@@ -40,7 +40,7 @@ Cc:     kvm <kvm@vger.kernel.org>,
         "vkuznets@redhat.com" <vkuznets@redhat.com>,
         "mtosatti@redhat.com" <mtosatti@redhat.com>,
         "joro@8bytes.org" <joro@8bytes.org>, karahmed@amazon.com
-Date:   Mon, 15 Nov 2021 23:22:20 +0000
+Date:   Mon, 15 Nov 2021 23:24:48 +0000
 In-Reply-To: <YZLmapmzs7sLpu/L@google.com>
 References: <2b400dbb16818da49fb599b9182788ff9896dcda.camel@infradead.org>
          <32b00203-e093-8ffc-a75b-27557b5ee6b1@redhat.com>
@@ -54,7 +54,7 @@ References: <2b400dbb16818da49fb599b9182788ff9896dcda.camel@infradead.org>
          <537a1d4e-9168-cd4a-cd2f-cddfd8733b05@redhat.com>
          <YZLmapmzs7sLpu/L@google.com>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-QF8m7c70sojF+DDEHVNM"
+        boundary="=-5jp9SZy/gJr4jBwSZyyI"
 User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
@@ -63,102 +63,21 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-QF8m7c70sojF+DDEHVNM
+--=-5jp9SZy/gJr4jBwSZyyI
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Mon, 2021-11-15 at 22:59 +0000, Sean Christopherson wrote:
-> On Mon, Nov 15, 2021, Paolo Bonzini wrote:
-> > On 11/15/21 20:11, David Woodhouse wrote:
-> > > > Changing mn_memslots_update_rcuwait to a waitq (and renaming it to
-> > > > mn_invalidate_waitq) is of course also a possibility.
-> > > I suspect that's the answer.
-> > >=20
-> > > I think the actual*invalidation*  of the cache still lives in the
-> > > invalidate_range() callback where I have it at the moment.
->=20
-> Oooh!  [finally had a lightbulb moment about ->invalidate_range() after y=
-ears of
-> befuddlement].
->=20
-> Two things:
->=20
->   1. Using _only_ ->invalidate_range() is not correct.  ->invalidate_rang=
-e() is
->      required if and only if the old PFN needs to be _unmapped_.  Specifi=
-cally,
->      if the protections are being downgraded without changing the PFN, it=
- doesn't
->      need to be called.  E.g. from hugetlb_change_protection():
+> > That would in theory shave a bit of time off walking
+> > gfn ranges (maybe even moreso with the scalable memslots implementation=
+?),=20
 
-OK, that's kind of important to realise. Thanks.
+(Sorry, missed that bit)
 
-So, I had just split the atomic and guest-mode invalidations apart:
-https://git.infradead.org/users/dwmw2/linux.git/commitdiff/6cf5fe318fd
-but will go back to doing it all in invalidate_range_start from a
-single list.
+I don't care about memslots anyway for this case as I can just compare
+against the cached hva.
 
-And just deal with the fact that the atomic users now have to
-loop/retry/wait for there *not* to be an MMU notification in progress.
-
->      I believe we could use ->invalidate_range() to handle the unmap case=
- if KVM's
->      ->invalidate_range_start() hook is enhanced to handle the RW=3D>R ca=
-se.  The
->      "struct mmu_notifier_range" provides the event type, IIUC we could h=
-ave the
->      _start() variant handle MMU_NOTIFY_PROTECTION_{VMA,PAGE} (and maybe
->      MMU_NOTIFY_SOFT_DIRTY?), and let the more precise unmap-only variant=
- handle
->      everything else.
-
-Not sure that helps us much. It was the termination condition on the
-"when should we keep retrying, and when should we give up?" that was
-painful, and a mixed mode doesn't that problem it go away.
-
-I'll go back and have another look in the morning, with something much
-closer to what I showed in
-https://lore.kernel.org/kvm/040d61dad066eb2517c108232efb975bc1cda780.camel@=
-infradead.org/
-
->   2. If we do split the logic across the two hooks, we should (a) do it i=
-n a separate
->      series and (b) make the logic common to the gfn_to_pfn cache and to =
-the standard
->      kvm_unmap_gfn_range().=20
-> >=20
-> > Yes, I think sooner or later we also want all pfn stuff in one file
-> > (together with MMU notifiers) and all hva stuff in another; so for now =
-you
-> > can create virt/kvm/hva_to_pfn.h, or virt/kvm/mm.h, or whatever color o=
-f the
-> > bikeshed you prefer.
->=20
-> Preemptive bikeshed strike... the MMU notifiers aren't strictly "pfn stuf=
-f", as
-> they operate on HVAs.  I don't know exactly what Paolo has in mind, but k=
-vm/mm.h
-> or kvm/kvm_mm.h seems like it's less likely to become stale in the future=
-.
-
-I'd moved kvm/mmu_lock.h to kvm/kvm_mm.h and added to it.
-https://git.infradead.org/users/dwmw2/linux.git/commitdiff/a247bc2d0d9
-(which I'll make retrospective as I rework the series).
-
-After frowning a little at all the different architectures' Makefiles
-that all add the same(ish) list of $(KVM)/foobar.o I ended up punting
-that problem by only adding pfncache.o on x86 anyway.
-
-If we're going to split other parts of kvm_main.c out into smaller
-files, providing a Makefile snippet in virt/kvm/Makefile.kvm that gives
-the *list* of those files would be a useful thing to do. But
-arch/powerpc/kvm/Makefile makes my head hurt too much for me to be
-shaving that particular yak tonight (why is $(KVM)/irqchip.o handled
-differently to the rest...?)
-
-
-
---=-QF8m7c70sojF+DDEHVNM
+--=-5jp9SZy/gJr4jBwSZyyI
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -241,20 +160,20 @@ BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
 BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
 ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
 ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjEx
-MTE1MjMyMjIwWjAvBgkqhkiG9w0BCQQxIgQgefWUB5cmzGN6fUMkwhZdxDLc+Mctld1dLgqV3Mb2
-/DEwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+MTE1MjMyNDQ4WjAvBgkqhkiG9w0BCQQxIgQgMnkDN1SsIF5Nl27+iKVe46GfzD2771FYYbDzZMp5
+J9Awgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
 TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
 PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
 aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
 A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
 bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBAIZwoMTO298bBW6P0AyoZGAQQsBrBexI0IEm160gr+xQzUxsruQCkKD/7dNosrIB
-zaCmCXvA4LqLyQq84b/AJiV3WASmqzpnIKmSk7iYexBkza+drZmpLDgeOqEwueRvjwl1LgHN9W3S
-4/5/pIQzEG4soT99So7gRAqvJf228r2BzJKJYdh1e/epOdzw/Zq45gYUaI6g417Icn2i815OITQg
-3myecUsqWAltMR4cyHPdThgog7h3kNwelLjM9FFGf5K5LBOpMK3n01wqq/mIp/CZ3AvKAilmFqAV
-zsRfyKjsZX+V3TS/tN04OoFJOpy8oR1QA2hDn//eTTpe0vG0e3wAAAAAAAA=
+DQEBAQUABIIBAHZjg8o1nRXJ1ilsyx0qx4rEqdfRqQzL0dwaNqhCpnowJS48aW/O5kLuGSgRpwis
+nfj7tRd64ooXKxpktlXEaCV8sVMbyXJR7YHyy59VRKu8dVnHHC7hyF3MXTMZa65E1X2Tmj16Zykh
+4L61KPyv6KQH2e7tXLcvtqc9KubYH2b7W6Mj2CRVRQG1hksZ4IjsTEXJm1vEvfuvg4ZL19fxMFCs
+I7/W6JzYIHMp0MFmjyNw+vQeLjpI4amJliFwE1jencCHOqdS0RQFNG2HwKspILokSOyLEwH5NT8e
+kupM3+9w017xL5+E+QHI4/k8vqyTwOFdu3S6h1zwlyOBV/awleIAAAAAAAA=
 
 
---=-QF8m7c70sojF+DDEHVNM--
+--=-5jp9SZy/gJr4jBwSZyyI--
 
