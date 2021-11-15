@@ -2,136 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 68B9345026F
-	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 11:24:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BEB3B450387
+	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 12:33:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237465AbhKOK1l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Nov 2021 05:27:41 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:27939 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230504AbhKOK1h (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 15 Nov 2021 05:27:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636971881;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=TwtcFyd6ql0hO6iKR4LS73eBi5ZzVBYQw3fdQh2W27I=;
-        b=J+t9Aw9Rc9Rc1aDJZOW0oVnvNqhT5h/Zu7J1IRIKyZcrn0IoHFyo7LQrQFAhE46/cySp12
-        V3TI9YrWXDvTMo8lL1R8uo1WckSat6PyxSNO4BLSSxVXoSo+HsgJSisQeblXr5JKlXNPnZ
-        zkyDRW1ytLZXYHLzv1ewqu+Pa0N0tnE=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-191-TQqDBugwOoaRt-UuVITbRw-1; Mon, 15 Nov 2021 05:24:39 -0500
-X-MC-Unique: TQqDBugwOoaRt-UuVITbRw-1
-Received: by mail-wr1-f72.google.com with SMTP id h13-20020adfa4cd000000b001883fd029e8so3385556wrb.11
-        for <kvm@vger.kernel.org>; Mon, 15 Nov 2021 02:24:38 -0800 (PST)
+        id S230516AbhKOLge (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Nov 2021 06:36:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43468 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230498AbhKOLg0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Nov 2021 06:36:26 -0500
+Received: from mail-oi1-x230.google.com (mail-oi1-x230.google.com [IPv6:2607:f8b0:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E84E6C061746;
+        Mon, 15 Nov 2021 03:33:30 -0800 (PST)
+Received: by mail-oi1-x230.google.com with SMTP id s139so34070504oie.13;
+        Mon, 15 Nov 2021 03:33:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=TosILRA7RKaPNlvAEEPHYc2XtXbrS4wfssZDLHQY1kU=;
+        b=TqRbFVwlKmOFpU+H9GDPhv1LKFQZDdPlnI+QYpcSwc8pcjEVCXrsNBSKE/7FeVzvcK
+         rBS5Tklh8qvP5Kq4aQytUM/2dnahwo4vILCODJUC5Yn49zu5eNjpMEeWaKQ/foEpBe4b
+         5d0p+9xMqVDTpG/kdqOIGm5f2rj7b6ILCKyWITxjmCEajD6RjPmfriuJC2azJ65rRgZU
+         Hxtx/FHToELfe8c83NS7pxre1zwaGmXoGYUCU0wiXU4SUxiNPLUZXPkHq4l+F1+W3f80
+         CHqAzXD0fR7o4bRpQ68XVcR8IIGiQKrpuKG7mPCEhsVMD3+mud2/qN1gMar84SkO+dSj
+         Rf8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version:content-transfer-encoding;
-        bh=TwtcFyd6ql0hO6iKR4LS73eBi5ZzVBYQw3fdQh2W27I=;
-        b=dEkblV0jwSFc5BJA8xmAGM39wZK1ImhRAvE2Xq0TozrU9sBasiaYjy85iEdkFIpzRJ
-         c+XF99rwGIFnApdZMK0GbO/I8i27orvNtYnAZADWNU1QzXmbNNqC/TgDOM97t10ezXIC
-         24bWkBAGAQqQZuiAY8SuFLmnfZpvKy8BIEUctM3Wx+e+gFH+VPp914lHJu5XtH2p8haB
-         qaBFfZ9HfVyW7Ev6Q4GuY+PQJtlN4vHrRmdednC7DSZ5eDt48lonsypPQnLTUuj6TUOn
-         XPTxbpMGRBqI5M3dum7pN6UPS4focfKwEM4LNwCjXJAvyJaKkqbhfr1bLqJIS4ZwctwA
-         0tEQ==
-X-Gm-Message-State: AOAM530Ap2Ge/WXMGdCHsI0w1+uBS/CB5VXQyBbgGhplwLvR27+jmYMa
-        5qF1lz41qGR8ZTTE+m8cG6CWLw0hpljP1ABZhO5fJBrSGxl2b5FgAnxrDy5tfvhH+VSAKX6hkrk
-        D+f1WGp6HJCcr
-X-Received: by 2002:a05:600c:511c:: with SMTP id o28mr42507462wms.96.1636971878034;
-        Mon, 15 Nov 2021 02:24:38 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJx6y5d3IjWmOUY33xtRIVMgM+WTD8xBjZJMote7hd3vnw7p5znSYbhvK8ZKa/PniTo7KqWhEw==
-X-Received: by 2002:a05:600c:511c:: with SMTP id o28mr42507437wms.96.1636971877859;
-        Mon, 15 Nov 2021 02:24:37 -0800 (PST)
-Received: from fedora (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id b14sm17366185wrd.24.2021.11.15.02.24.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Nov 2021 02:24:37 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     =?utf-8?B?6buE5LmQ?= <huangle1@jd.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] KVM: x86: Fix uninitialized eoi_exit_bitmap usage in
- vcpu_load_eoi_exitmap()
-In-Reply-To: <1300eda19bce40d5a539bc431446da5e@jd.com>
-References: <1300eda19bce40d5a539bc431446da5e@jd.com>
-Date:   Mon, 15 Nov 2021 11:24:36 +0100
-Message-ID: <87fsrxemxn.fsf@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=TosILRA7RKaPNlvAEEPHYc2XtXbrS4wfssZDLHQY1kU=;
+        b=OlvIfHJGSIJrlbdn4rHyqT2d72JPYpfnLgL6btalSGq1aym2KoUe6kLV3gMKAQ+BVn
+         E9QREHXa2MWUTG9NhXP/gp1GerxC9mXXYFkDBLmRd5aA5vu9/rdrJ2mFItQ7lP8wP2sU
+         x9uoL9e1nxjip2qCPmz55+z3Zqbb16PANa/hy0t4IU9lDNOc8HB7K2MYoFcj0g+ykPST
+         uKPYzW6tJx2A9thE90uaW8iqsRdPfBzjSA3lvDnXHMh4z10cCk7kqSaQevPzJpV1WXAV
+         zk7epoFZNQ3O5Th0016q8V+JIBE0TI3jPAoUQz4bLM0BOLV9oatIJQ32VgBtKPEgwD+w
+         2bUw==
+X-Gm-Message-State: AOAM5302+L3LNLWcAvFHR4H1nonXcAx33gbGr5vethO8YfgXcfn0ve5o
+        /9U6JLLtyCuMVLhU3vOkq7z+2q4Y1wJ6yUbNhlk=
+X-Google-Smtp-Source: ABdhPJxyVQy/sHJZgZ4KvZEkvizBX0kZDKhCmgE7dJHGPhJHuh2wOeYIp+hUtH63bEwm2aiq4onVCaX5EsLeNGrkOVg=
+X-Received: by 2002:a54:4486:: with SMTP id v6mr31506038oiv.90.1636976010344;
+ Mon, 15 Nov 2021 03:33:30 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+References: <20211114164312.GA28736@makvihas> <87o86leo34.fsf@redhat.com>
+In-Reply-To: <87o86leo34.fsf@redhat.com>
+From:   Vihas Mak <makvihas@gmail.com>
+Date:   Mon, 15 Nov 2021 17:03:18 +0530
+Message-ID: <CAH1kMwSvLj8oK46V8m+FUM=t8h5Zch_Pi+zui+AYq6efDR0Sgw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: fix cocci warnings
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     pbonzini@redhat.com, seanjc@google.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-=E9=BB=84=E4=B9=90 <huangle1@jd.com> writes:
+> and I find '|=' to not be very natural with booleans. I'm not sure it's
+> worth changing though.
 
-> In vcpu_load_eoi_exitmap(), currently the eoi_exit_bitmap[4] array is
-> initialized only when Hyper-V context is available, in other path it is
-> just passed to kvm_x86_ops.load_eoi_exitmap() directly from on the stack,
-> which would cause unexpected interrupt delivery/handling issues, e.g. an
-> *old* linux kernel that relies on PIT to do clock calibration on KVM might
-> randomly fail to boot.
+I see. But there are many functions in which '|=' is used on booleans.
+get_mmio_spte(), __rmap_write_protect(), kvm_handle_gfn_range and many more.
+That's why I thought it would be better if the code follows the same convention.
+
+Thanks,
+Vihas
+
+
+On Mon, Nov 15, 2021 at 3:29 PM Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
 >
-> Fix it by passing ioapic_handled_vectors to load_eoi_exitmap() when Hyper=
--V
-> context is not available.
+> Vihas Mak <makvihas@gmail.com> writes:
 >
-> Signed-off-by: Huang Le <huangle1@jd.com>
-
-Fixes: f2bc14b69c38 ("KVM: x86: hyper-v: Prepare to meet unallocated Hyper-=
-V context")
-Cc: stable@vger.kernel.org
-
-> ---
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index dc7eb5fddfd3..0699832504c9 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -9547,11 +9547,14 @@ static void vcpu_load_eoi_exitmap(struct kvm_vcpu=
- *vcpu)
->  	if (!kvm_apic_hw_enabled(vcpu->arch.apic))
->  		return;
->=20=20
-> -	if (to_hv_vcpu(vcpu))
-> -		bitmap_or((ulong *)eoi_exit_bitmap,
-> -			  vcpu->arch.ioapic_handled_vectors,
-> -			  to_hv_synic(vcpu)->vec_bitmap, 256);
-> +	if (!to_hv_vcpu(vcpu)) {
-> +		static_call(kvm_x86_load_eoi_exitmap)(
-> +			vcpu, (u64 *)vcpu->arch.ioapic_handled_vectors);
-> +		return;
-> +	}
->=20=20
-> +	bitmap_or((ulong *)eoi_exit_bitmap, vcpu->arch.ioapic_handled_vectors,
-> +		  to_hv_synic(vcpu)->vec_bitmap, 256);
->  	static_call(kvm_x86_load_eoi_exitmap)(vcpu, eoi_exit_bitmap);
->  }
->=20=20
-
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-
-My personal preference, however, would be to keep 'if
-(to_hv_vcpu(vcpu))' check and not invert it, i.e.:
-
-	if (to_hv_vcpu(vcpu)) {
-		bitmap_or((ulong *)eoi_exit_bitmap,
-                	vcpu->arch.ioapic_handled_vectors,
-                	to_hv_synic(vcpu)->vec_bitmap, 256);
-                static_call(...)(vcpu, eoi_exit_bitmap)
-                return;
-        }
-
-	static_call(...)(vcpu, (u64 *)vcpu->arch.ioapic_handled_vectors);
-
-to slightly reduce the code churn but it doesn't matter much.
-
-Thanks!
-
---=20
-Vitaly
-
+> > change 0 to false and 1 to true to fix following cocci warnings:
+> >
+> >         arch/x86/kvm/mmu/mmu.c:1485:9-10: WARNING: return of 0/1 in function 'kvm_set_pte_rmapp' with return type bool
+> >         arch/x86/kvm/mmu/mmu.c:1636:10-11: WARNING: return of 0/1 in function 'kvm_test_age_rmapp' with return type bool
+> >
+> > Signed-off-by: Vihas Mak <makvihas@gmail.com>
+> > Cc: Sean Christopherson <seanjc@google.com>
+> > Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
+> > Cc: Wanpeng Li <wanpengli@tencent.com>
+> > Cc: Jim Mattson <jmattson@google.com>
+> > Cc: Joerg Roedel <joro@8bytes.org>
+> > ---
+> >  arch/x86/kvm/mmu/mmu.c | 10 +++++-----
+> >  1 file changed, 5 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index 337943799..2fcea4a78 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -1454,7 +1454,7 @@ static bool kvm_set_pte_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+> >  {
+> >       u64 *sptep;
+> >       struct rmap_iterator iter;
+> > -     int need_flush = 0;
+> > +     bool need_flush = false;
+> >       u64 new_spte;
+> >       kvm_pfn_t new_pfn;
+> >
+> > @@ -1466,7 +1466,7 @@ static bool kvm_set_pte_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+> >               rmap_printk("spte %p %llx gfn %llx (%d)\n",
+> >                           sptep, *sptep, gfn, level);
+> >
+> > -             need_flush = 1;
+> > +             need_flush = true;
+> >
+> >               if (pte_write(pte)) {
+> >                       pte_list_remove(kvm, rmap_head, sptep);
+> > @@ -1482,7 +1482,7 @@ static bool kvm_set_pte_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+> >
+> >       if (need_flush && kvm_available_flush_tlb_with_range()) {
+> >               kvm_flush_remote_tlbs_with_address(kvm, gfn, 1);
+> > -             return 0;
+> > +             return false;
+> >       }
+> >
+> >       return need_flush;
+> > @@ -1623,8 +1623,8 @@ static bool kvm_test_age_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+> >
+> >       for_each_rmap_spte(rmap_head, &iter, sptep)
+> >               if (is_accessed_spte(*sptep))
+> > -                     return 1;
+> > -     return 0;
+> > +                     return true;
+> > +     return false;
+> >  }
+> >
+> >  #define RMAP_RECYCLE_THRESHOLD 1000
+>
+> Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>
+> One minor remark: 'kvm_set_pte_rmapp()' handler is passed to
+> 'kvm_handle_gfn_range()' which does
+>
+>         bool ret = false;
+>
+>         for_each_slot_rmap_range(...)
+>                 ret |= handler(...);
+>
+> and I find '|=' to not be very natural with booleans. I'm not sure it's
+> worth changing though.
+>
+> --
+> Vitaly
+>
