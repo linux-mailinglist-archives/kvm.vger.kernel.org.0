@@ -2,127 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C0E2450884
-	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 16:32:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 411CA45089B
+	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 16:33:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236712AbhKOPfQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Nov 2021 10:35:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42050 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236667AbhKOPfB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Nov 2021 10:35:01 -0500
-X-Greylist: delayed 101 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 15 Nov 2021 07:32:02 PST
-Received: from forwardcorp1o.mail.yandex.net (forwardcorp1o.mail.yandex.net [IPv6:2a02:6b8:0:1a2d::193])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D70C9C061766;
-        Mon, 15 Nov 2021 07:31:59 -0800 (PST)
-Received: from iva8-d2cd82b7433e.qloud-c.yandex.net (iva8-d2cd82b7433e.qloud-c.yandex.net [IPv6:2a02:6b8:c0c:a88e:0:640:d2cd:82b7])
-        by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id 8D3A02E101C;
-        Mon, 15 Nov 2021 18:30:17 +0300 (MSK)
-Received: from iva4-f06c35e68a0a.qloud-c.yandex.net (iva4-f06c35e68a0a.qloud-c.yandex.net [2a02:6b8:c0c:152e:0:640:f06c:35e6])
-        by iva8-d2cd82b7433e.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id 7dSigTEJay-UGsqMU5B;
-        Mon, 15 Nov 2021 18:30:17 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.com; s=default;
-        t=1636990217; bh=hD/D+1kSstlQTTh1W7AK2gOCb2Yqt/7WhBUur9GwPEE=;
-        h=In-Reply-To:Message-Id:References:Date:Subject:To:From:Cc;
-        b=fPA/J5cJ+KSQ2lo7J8Yek4Rba35NcqCckCHG+gypfrbfShMPMcSb7M/+iOHWOziDh
-         QjFWAOYYtoAtQSBdBSmWqxrbCY6ATECDFFzn3x6zwIefxT/JjBS1G5Z1YGMw3o8pyr
-         5602p2DrL5l2GnzbcUl7r41teYHZxGLlIThyKr74=
-Authentication-Results: iva8-d2cd82b7433e.qloud-c.yandex.net; dkim=pass header.i=@yandex-team.com
-Received: from dellarbn.yandex.net (dynamic-red3.dhcp.yndx.net [2a02:6b8:0:107:3e85:844d:5b1d:60a])
-        by iva4-f06c35e68a0a.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPS id wuqDqjnGag-UGxaT0Z8;
-        Mon, 15 Nov 2021 18:30:16 +0300
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-        (Client certificate not present)
-X-Yandex-Fwd: 2
-From:   Andrey Ryabinin <arbn@yandex-team.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Andrey Ryabinin <arbn@yandex-team.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Subject: [PATCH 6/6] vhost_net: use RCU callbacks instead of synchronize_rcu()
-Date:   Mon, 15 Nov 2021 18:30:03 +0300
-Message-Id: <20211115153003.9140-6-arbn@yandex-team.com>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20211115153003.9140-1-arbn@yandex-team.com>
-References: <20211115153003.9140-1-arbn@yandex-team.com>
+        id S236815AbhKOPge (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Nov 2021 10:36:34 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:31403 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236639AbhKOPgI (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 15 Nov 2021 10:36:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1636990389;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=APBRR/Tu29EEMq5VPRu2UikpYWd3k5GAcRpc7iagv8Y=;
+        b=iSq5dZ11iKlabDh5S81yAjysNZaK05j+T/3Db3PfuPoWHz+O2DDtCbLnJNoL5Bmm3bf+e3
+        PYnvmk2ruRsjVyrFhr6BCYnvHOx9eCpptvzazpmLTWqq1qwvhX6aHMj1O7ax00tAynE1DY
+        t1MJZUC5uszmBAnOmVeBfxEJeB2nF/k=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-157-NKfOAKyGNb-Cs_NAv18RAQ-1; Mon, 15 Nov 2021 10:33:07 -0500
+X-MC-Unique: NKfOAKyGNb-Cs_NAv18RAQ-1
+Received: by mail-wm1-f70.google.com with SMTP id o18-20020a05600c511200b00332fa17a02eso61891wms.5
+        for <kvm@vger.kernel.org>; Mon, 15 Nov 2021 07:33:07 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=APBRR/Tu29EEMq5VPRu2UikpYWd3k5GAcRpc7iagv8Y=;
+        b=dBMvIrGQBBfhwp8gvgdXyS5MQfCDsydLWTPCEH9WbkXueSKAZeZjn9ttKYHi7YTFfs
+         H3tVohUZ943hLrTi00xYBx3VTCrRaalm0TrKbrLo/gdG5OpBYQw95lk6EArbvFe8Rxcd
+         ACtd4iuieaiEBOQqkveJAmXoEG6F5GkB5zEAeLATsJOLvDGPgZlCbNK4J/RoTcfne72/
+         efxLYcZjlP6gw7rrdPd/Pxd8DQnVp4CmQ0gIJRvQze9VaH7xv/wCWH5a7AZQprTZalNe
+         LpNbf99ncfheKlXcgCu+UMuXHYNWqrro093UIhf3Qo21F600Zi0Apnz+PtOqMHwnahOP
+         xaZQ==
+X-Gm-Message-State: AOAM533qKEWrhYetPfpD+JHzszQhIZE9XcyDG0h2uKxK15gRusj4zA/y
+        BN5V2JrtCEEoviBk3QNy6mhvTGCEc2Q3yNvw75MnNDifRo+gf//styMLDSRNwvSrz/pihqSPXbq
+        ovfgklD58KA2i
+X-Received: by 2002:a1c:f416:: with SMTP id z22mr3828161wma.121.1636990386548;
+        Mon, 15 Nov 2021 07:33:06 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzVEfAw7ZxqSyPXBoql05G+DuRg+Mia/ijEWI8l4vzLqLBTzBiaKW9nePq93987lkPciDsGDA==
+X-Received: by 2002:a1c:f416:: with SMTP id z22mr3828132wma.121.1636990386389;
+        Mon, 15 Nov 2021 07:33:06 -0800 (PST)
+Received: from work-vm (cpc109025-salf6-2-0-cust480.10-2.cable.virginm.net. [82.30.61.225])
+        by smtp.gmail.com with ESMTPSA id t8sm17359470wmq.32.2021.11.15.07.33.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Nov 2021 07:33:05 -0800 (PST)
+Date:   Mon, 15 Nov 2021 15:33:03 +0000
+From:   "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To:     Joerg Roedel <jroedel@suse.de>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Peter Gonda <pgonda@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
+ Hypervisor Support
+Message-ID: <YZJ9rzNOllCwvNEv@work-vm>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
+ <061ccd49-3b9f-d603-bafd-61a067c3f6fa@intel.com>
+ <YY6z5/0uGJmlMuM6@zn.tnic>
+ <YY7FAW5ti7YMeejj@google.com>
+ <YZJTA1NyLCmVtGtY@work-vm>
+ <YZJx5PcBZ/izVg8L@suse.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YZJx5PcBZ/izVg8L@suse.de>
+User-Agent: Mutt/2.0.7 (2021-05-04)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently vhost_net_release() uses synchronize_rcu() to synchronize
-freeing with vhost_zerocopy_callback(). However synchronize_rcu()
-is quite costly operation. It take more than 10 seconds
-to shutdown qemu launched with couple net devices like this:
-	-netdev tap,id=tap0,..,vhost=on,queues=80
-because we end up calling synchronize_rcu() netdev_count*queues times.
+* Joerg Roedel (jroedel@suse.de) wrote:
+> On Mon, Nov 15, 2021 at 12:30:59PM +0000, Dr. David Alan Gilbert wrote:
+> > Still; I wonder if it's best to kill the guest - maybe it's best for
+> > the host to kill the guest and leave behind diagnostics of what
+> > happened; for someone debugging the crash, it's going to be less useful
+> > to know that page X was wrongly accessed (which is what the guest would
+> > see), and more useful to know that it was the kernel's vhost-... driver
+> > that accessed it.
+> 
+> I is best to let the guest #VC on the page when this happens. If it
+> happened because of a guest bug all necessary debugging data is in the
+> guest and only the guest owner can obtain it.
+> 
+> Then the guest owner can do a kdump on this unexpected #VC and collect
+> the data to debug the issue. With just killing the guest from the host
+> side this data would be lost.
 
-Free vhost net structures in rcu callback instead of using
-synchronize_rcu() to fix the problem.
+How would you debug an unexpected access by the host kernel using a
+guests kdump?
 
-Signed-off-by: Andrey Ryabinin <arbn@yandex-team.com>
----
- drivers/vhost/net.c | 22 ++++++++++++++--------
- 1 file changed, 14 insertions(+), 8 deletions(-)
+Dave
 
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index 97a209d6a527..0699d30e83d5 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -132,6 +132,7 @@ struct vhost_net {
- 	struct vhost_dev dev;
- 	struct vhost_net_virtqueue vqs[VHOST_NET_VQ_MAX];
- 	struct vhost_poll poll[VHOST_NET_VQ_MAX];
-+	struct rcu_head rcu;
- 	/* Number of TX recently submitted.
- 	 * Protected by tx vq lock. */
- 	unsigned tx_packets;
-@@ -1389,6 +1390,18 @@ static void vhost_net_flush(struct vhost_net *n)
- 	}
- }
- 
-+static void vhost_net_free(struct rcu_head *rcu_head)
-+{
-+	struct vhost_net *n = container_of(rcu_head, struct vhost_net, rcu);
-+
-+	kfree(n->vqs[VHOST_NET_VQ_RX].rxq.queue);
-+	kfree(n->vqs[VHOST_NET_VQ_TX].xdp);
-+	kfree(n->dev.vqs);
-+	if (n->page_frag.page)
-+		__page_frag_cache_drain(n->page_frag.page, n->refcnt_bias);
-+	kvfree(n);
-+}
-+
- static int vhost_net_release(struct inode *inode, struct file *f)
- {
- 	struct vhost_net *n = f->private_data;
-@@ -1404,15 +1417,8 @@ static int vhost_net_release(struct inode *inode, struct file *f)
- 		sockfd_put(tx_sock);
- 	if (rx_sock)
- 		sockfd_put(rx_sock);
--	/* Make sure no callbacks are outstanding */
--	synchronize_rcu();
- 
--	kfree(n->vqs[VHOST_NET_VQ_RX].rxq.queue);
--	kfree(n->vqs[VHOST_NET_VQ_TX].xdp);
--	kfree(n->dev.vqs);
--	if (n->page_frag.page)
--		__page_frag_cache_drain(n->page_frag.page, n->refcnt_bias);
--	kvfree(n);
-+	call_rcu(&n->rcu, vhost_net_free);
- 	return 0;
- }
- 
+> Regards,
+> 
+> 	Joerg
+> 
 -- 
-2.32.0
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
