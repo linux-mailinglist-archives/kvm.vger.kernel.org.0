@@ -2,106 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E450345183A
-	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 23:53:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D8BC24520D5
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 01:54:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238945AbhKOWzv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Nov 2021 17:55:51 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:51748 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1347055AbhKOWvZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 15 Nov 2021 17:51:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637016461;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=toQcFguJghihTlHdbzEa3FVNR9IDFpLArQlk0uC6kXk=;
-        b=IKXV1RfxSe1YSMs64k/uLrzYEHVZWJQsJeaonLuK3AKlsfedigF8nFxKaU86flS4iAula1
-        vOkgzH+rpoSExkPwkOH3rSYedsLffGnYLX8vaoo66PduJYkOmdaqumoEod0OyDPpjYlNju
-        VwPPPPQJIaYCNLb4254TXy7TR3EYrF0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-384-BLKbRg-JOHKPMPzsXuR1HA-1; Mon, 15 Nov 2021 17:47:40 -0500
-X-MC-Unique: BLKbRg-JOHKPMPzsXuR1HA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B52F515721;
-        Mon, 15 Nov 2021 22:47:39 +0000 (UTC)
-Received: from redhat.com (ovpn-114-146.phx2.redhat.com [10.3.114.146])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9CE9019729;
-        Mon, 15 Nov 2021 22:47:29 +0000 (UTC)
-Date:   Mon, 15 Nov 2021 16:47:27 -0600
-From:   Eric Blake <eblake@redhat.com>
-To:     Tyler Fanelli <tfanelli@redhat.com>
-Cc:     qemu-devel@nongnu.org, pbonzini@redhat.com, mtosatti@redhat.com,
-        kvm@vger.kernel.org, armbru@redhat.com
-Subject: Re: [PATCH] sev: allow capabilities to check for SEV-ES support
-Message-ID: <20211115224727.p7g5ydntncvvm5k3@redhat.com>
-References: <20211115193804.294529-1-tfanelli@redhat.com>
+        id S1347437AbhKPA4o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Nov 2021 19:56:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36130 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S245615AbhKOTUv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Nov 2021 14:20:51 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17BECC077949;
+        Mon, 15 Nov 2021 10:15:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=/j1kGg3Y3gXXMCKBT/FlrMPEzAkt4b0LfzEg1w0LaRY=; b=MiHTez0Qf+wX+jRQ5B/3EkMeSB
+        TvxNL1Ov34NgD3bwoIg17g3//hLJW1J9conA8mIU+92DauDmRpeOBfGqiA+NBBYGONoovgPDaaoeT
+        E9hbRqrey5lkoxXaOlQSqb3RveB7VNobb8j6oZMXpGtHVa1EjZvb84ijRMjafDoYjn/qi06lzFIA4
+        t08ygSB4+Hxt81yRGLr3p5uBd+TEtPKsvy2hqjw+oLQ+qHd5zgxTZAGfK6xvoDdQihW4H2ydtA27R
+        ylOo0xgaDgmTlW9rxr1QiFESRAn1mAZ7WrFwnQuCKV/52trgg6FZ6tiCPD0OlfG2au6V0ORG4Dkg6
+        C8px0TLw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mmgVX-00Ge06-LZ; Mon, 15 Nov 2021 18:15:07 +0000
+Date:   Mon, 15 Nov 2021 10:15:07 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Robin Murphy <robin.murphy@arm.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Ashok Raj <ashok.raj@intel.com>, kvm@vger.kernel.org,
+        rafael@kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Will Deacon <will@kernel.org>, linux-kernel@vger.kernel.org,
+        iommu@lists.linux-foundation.org,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        linux-pci@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>
+Subject: Re: [PATCH 02/11] driver core: Set DMA ownership during driver
+ bind/unbind
+Message-ID: <YZKjq3sXb9+UTDSz@infradead.org>
+References: <20211115020552.2378167-1-baolu.lu@linux.intel.com>
+ <20211115020552.2378167-3-baolu.lu@linux.intel.com>
+ <YZJeRomcJjDqDv9q@infradead.org>
+ <20211115132442.GA2379906@nvidia.com>
+ <8499f0ab-9701-2ca2-ac7a-842c36c54f8a@arm.com>
+ <20211115155613.GA2388278@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211115193804.294529-1-tfanelli@redhat.com>
-User-Agent: NeoMutt/20211029-16-b680fe
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20211115155613.GA2388278@nvidia.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 15, 2021 at 02:38:04PM -0500, Tyler Fanelli wrote:
-> Probe for SEV-ES and SEV-SNP capabilities to distinguish between Rome,
-> Naples, and Milan processors. Use the CPUID function to probe if a
-> processor is capable of running SEV-ES or SEV-SNP, rather than if it
-> actually is running SEV-ES or SEV-SNP.
+On Mon, Nov 15, 2021 at 11:56:13AM -0400, Jason Gunthorpe wrote:
+> drivers/base/platform.c:        .dma_configure  = platform_dma_configure,
+> drivers/bus/fsl-mc/fsl-mc-bus.c:        .dma_configure  = fsl_mc_dma_configure,
+> drivers/pci/pci-driver.c:       .dma_configure  = pci_dma_configure,
+> drivers/gpu/host1x/bus.c:       .dma_configure = host1x_dma_configure,
 > 
-> Signed-off-by: Tyler Fanelli <tfanelli@redhat.com>
-> ---
->  qapi/misc-target.json | 11 +++++++++--
->  target/i386/sev.c     |  6 ++++--
->  2 files changed, 13 insertions(+), 4 deletions(-)
+> Other than host1x they all work with VFIO.
 > 
-> diff --git a/qapi/misc-target.json b/qapi/misc-target.json
-> index 5aa2b95b7d..c3e9bce12b 100644
-> --- a/qapi/misc-target.json
-> +++ b/qapi/misc-target.json
-> @@ -182,13 +182,19 @@
->  # @reduced-phys-bits: Number of physical Address bit reduction when SEV is
->  #                     enabled
->  #
-> +# @es: SEV-ES capability of the machine.
-> +#
-> +# @snp: SEV-SNP capability of the machine.
-> +#
+> Also, there is no bus->dma_unconfigure() which would be needed to
+> restore the device as well.
+> 
+> So, would you rather see duplicated code into the 4 drivers, and a new
+> bus op to 'unconfigure dma'
 
-Missing '(since 7.0)' tags on the new members.
+The tend to mostly call into common helpers eventually.
 
->  # Since: 2.12
->  ##
->  { 'struct': 'SevCapability',
->    'data': { 'pdh': 'str',
->              'cert-chain': 'str',
->              'cbitpos': 'int',
-> -            'reduced-phys-bits': 'int'},
-> +            'reduced-phys-bits': 'int',
-> +            'es': 'bool',
-> +            'snp': 'bool'},
->    'if': 'TARGET_I386' }
->  
->  ##
-> @@ -205,7 +211,8 @@
->  #
->  # -> { "execute": "query-sev-capabilities" }
->  # <- { "return": { "pdh": "8CCDD8DDD", "cert-chain": "888CCCDDDEE",
-> -#                  "cbitpos": 47, "reduced-phys-bits": 5}}
-> +#                  "cbitpos": 47, "reduced-phys-bits": 5
-> +#                  "es": false, "snp": false}}
+> 
+> Or, a 'dev_configure_dma()' function that is roughly:
+> 
+>         if (dev->bus->dma_configure) {
+>                 ret = dev->bus->dma_configure(dev);
+>                 if (ret)
+>                         return ret;
+>                 if (!drv->suppress_auto_claim_dma_owner) {
+>                        ret = iommu_device_set_dma_owner(dev, DMA_OWNER_KERNEL,
+>                                                         NULL);
+>                        if (ret)
+>                                ret;
+>                 }
+>          }
+> 
+> And a pair'd undo.
 
-Invalid JSON, as you missed the comma needed after 5.
-
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3266
-Virtualization:  qemu.org | libvirt.org
-
+But that seems like an even better idea to me.  Even better with an
+early return and avoiding the pointless indentation.
