@@ -2,139 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3762945241A
-	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 02:33:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 43B67452404
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 02:32:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354286AbhKPBft (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Nov 2021 20:35:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57566 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242935AbhKOSsN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Nov 2021 13:48:13 -0500
-Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6836EC036F93
-        for <kvm@vger.kernel.org>; Mon, 15 Nov 2021 09:51:16 -0800 (PST)
-Received: by mail-oi1-x233.google.com with SMTP id bf8so36470333oib.6
-        for <kvm@vger.kernel.org>; Mon, 15 Nov 2021 09:51:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=9xlnMRyeRrwqZbGMs0R7rHUJzwnKp9w0F+3XQjwF9Zk=;
-        b=KkGPReuch8Z8/OVUCdA+5RNJfCLXCRJk2wbcjnp6w8fmmj5flUtPlUclw8oyGHS1NB
-         KZkkJSCa3BtwtOrfMVzRkiohuTBdhDMy6XHEmQye6x9sAMW6c9ojBRLB6JttzpqFfoER
-         ftXuStR98AI+P6OCfBFxLaAyVShQChyPGhcfiGm891MCUeB0zudZsAhNqNze9j/blm9v
-         tL1Yxq8MkIWziZ563wIiIXzxt9Ep+szE3REup1IyZhT2goWqa1ia2iPo2sTsibhpGrFj
-         f3O9T3jjkl0RHMVeXh0VjWc81uniGK65Z3H8zf5JYSVsslFaqF7iz6YGjd8g2iMzf+9A
-         2WAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=9xlnMRyeRrwqZbGMs0R7rHUJzwnKp9w0F+3XQjwF9Zk=;
-        b=dmlicTXsxf0K7Z6eIJh+bFVqSsJt/dTgCzkKqULWcnEZkXXZ89j40bi8SpYJAZj/00
-         9CF4CoWtWA+qI1u2CkR52sa1uyOme8bbQHF89vQtGgd5/CmjQQK1j/F3xohcOo+AobG2
-         LtyLEq0epW2KOp/1mYnIWoYyh7HGJN92aA6rTVoWKMwORK2qm9+31tQfz13guBvJKVTh
-         59HIuK2jgrGtsIR2hjBqRhx2SAfOzsYBNoGvNCwjT/2ypGZnRERi+iiVdHlkW4Ni0NIh
-         eo60VLILANCWJSAWSQQmK4X8YHpcVi3EhC+VcVV3BR8S8Plttv8TrhSjq3TrRgEufnbw
-         gOww==
-X-Gm-Message-State: AOAM53337K/gRMp7iDAWc34E2eSOO9Te4ScgD12oBoTEJ5XMNOnSkbsj
-        xGQJeKmMBASFt3efUqGseiSpdfC8W8DgFVx9HR/YDA==
-X-Google-Smtp-Source: ABdhPJxN2cbfAn0wDKGPhacJ+VB/zVS9wH5tOXzJVnghC4nr/Z3n/IovkyYexDgrP+6puBqr5B0Gv8mQJzKHBzokTBo=
-X-Received: by 2002:aca:3055:: with SMTP id w82mr44473114oiw.2.1636998675456;
- Mon, 15 Nov 2021 09:51:15 -0800 (PST)
+        id S1349549AbhKPBfr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Nov 2021 20:35:47 -0500
+Received: from mail.skyhub.de ([5.9.137.197]:45462 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S242340AbhKOSrU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Nov 2021 13:47:20 -0500
+Received: from zn.tnic (p200300ec2f0b5600329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ec:2f0b:5600:329c:23ff:fea6:a903])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 786911EC0298;
+        Mon, 15 Nov 2021 19:44:17 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1637001857;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=dw18rrJWiFMio+f81TkozWlG8A/iKVxyS5zqokyoOIY=;
+        b=Dd/Fwrtnl1uGZiaWkMGZr+MuIA+r4cXwdAOsGb4gW5L9WCr54FaUiBJ6ijdhzKVchrkwr7
+        H2euF1CH6Z7Kw63ePiaRIve/VdIpKgUibVEL+06FxH1ktfvFsacTnl/2rzuuM9NPWXUv9f
+        gHdYxW8TqNvuMpNY3T7pHtvAcVRdXpY=
+Date:   Mon, 15 Nov 2021 19:44:14 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     x86@kernel.org, Eric Biederman <ebiederm@xmission.com>,
+        kexec@lists.infradead.org, Joerg Roedel <jroedel@suse.de>,
+        hpa@zytor.com, Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>,
+        Kees Cook <keescook@chromium.org>,
+        David Rientjes <rientjes@google.com>,
+        Cfir Cohen <cfir@google.com>,
+        Erdem Aktas <erdemaktas@google.com>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mike Stunes <mstunes@vmware.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Martin Radev <martin.b.radev@gmail.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v2 09/12] x86/sev: Use AP Jump Table blob to stop CPU
+Message-ID: <YZKqfsZCxCQCyyeb@zn.tnic>
+References: <20210913155603.28383-1-joro@8bytes.org>
+ <20210913155603.28383-10-joro@8bytes.org>
 MIME-Version: 1.0
-References: <20211112235235.1125060-1-jmattson@google.com> <d4f3b54a-3298-cec3-3193-da46ae9a1f09@gmail.com>
-In-Reply-To: <d4f3b54a-3298-cec3-3193-da46ae9a1f09@gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Mon, 15 Nov 2021 09:51:04 -0800
-Message-ID: <CALMp9eQ+dy4TmuNRDipN6XWb4Q0KoEMv6u+-E8b4ypbkpJxdXA@mail.gmail.com>
-Subject: Re: [PATCH 0/2] kvm: x86: Fix PMU virtualization for some basic events
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     kvm@vger.kernel.org,
-        "Inc. (kernel-recipes.org)" <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20210913155603.28383-10-joro@8bytes.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Nov 14, 2021 at 7:43 PM Like Xu <like.xu.linux@gmail.com> wrote:
->
-> On 13/11/2021 7:52 am, Jim Mattson wrote:
-> > Google Cloud has a customer that needs accurate virtualization of two
-> > architected PMU events on Intel hardware: "instructions retired" and
-> > "branch instructions retired." The existing PMU virtualization code
-> > fails to account for instructions that are emulated by kvm.
->
-> Does this customer need to set force_emulation_prefix=Y ?
+On Mon, Sep 13, 2021 at 05:56:00PM +0200, Joerg Roedel wrote:
+> diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+> index 134a7c9d91b6..cd14b6e10f12 100644
+> --- a/arch/x86/include/asm/sev.h
+> +++ b/arch/x86/include/asm/sev.h
+> @@ -81,12 +81,19 @@ static __always_inline void sev_es_nmi_complete(void)
+>  		__sev_es_nmi_complete();
+>  }
+>  extern int __init sev_es_efi_map_ghcbs(pgd_t *pgd);
+> +void __sev_es_stop_this_cpu(void);
+> +static __always_inline void sev_es_stop_this_cpu(void)
 
-No. That module parameter does make it easier to write the test, though.
+What's that for?
 
-It's possible that the L0 hypervisor will never emulate a branch
-instruction for this use case. However, since the code being
-instrumented is potential malware, one can't make the usual
-assumptions about "well-behaved" code. For example, it is quite
-possible that the code in question deliberately runs with the TLBs and
-in-memory page tables out of sync. Therefore, it's hard to prove that
-the "branch instructions retired" patch isn't needed.
+IOW, the below seems to build too:
 
-> Is this "accurate statistics" capability fatal to the use case ?
+---
+diff --git a/arch/x86/include/asm/sev.h b/arch/x86/include/asm/sev.h
+index 1f16fc907636..398105580862 100644
+--- a/arch/x86/include/asm/sev.h
++++ b/arch/x86/include/asm/sev.h
+@@ -87,12 +87,7 @@ extern enum es_result sev_es_ghcb_hv_call(struct ghcb *ghcb,
+ 					  struct es_em_ctxt *ctxt,
+ 					  u64 exit_code, u64 exit_info_1,
+ 					  u64 exit_info_2);
+-void __sev_es_stop_this_cpu(void);
+-static __always_inline void sev_es_stop_this_cpu(void)
+-{
+-	if (static_branch_unlikely(&sev_es_enable_key))
+-		__sev_es_stop_this_cpu();
+-}
++void sev_es_stop_this_cpu(void);
+ #else
+ static inline void sev_es_ist_enter(struct pt_regs *regs) { }
+ static inline void sev_es_ist_exit(void) { }
+diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+index 39378357dc5a..7a74b3273f1a 100644
+--- a/arch/x86/kernel/sev.c
++++ b/arch/x86/kernel/sev.c
+@@ -694,8 +694,11 @@ void __noreturn sev_jumptable_ap_park(void)
+ }
+ STACK_FRAME_NON_STANDARD(sev_jumptable_ap_park);
+ 
+-void __sev_es_stop_this_cpu(void)
++void sev_es_stop_this_cpu(void)
+ {
++	if (!static_branch_unlikely(&sev_es_enable_key))
++		return;
++
+ 	/* Only park in the AP Jump Table when the code has been installed */
+ 	if (!sev_ap_jumptable_blob_installed)
+ 		return;
 
-Yes, that is my understanding.
+---
 
-> >
-> > Accurately virtualizing all PMU events for all microarchitectures is a
-> > herculean task, but there are only 8 architected events, so maybe we
-> > can at least try to get those right.
->
-> I assume you mean the architectural events "Instruction Retired"
-> and "Branch Instruction Retired" defined by the Intel CPUID
-> since it looks we don't have a similar concept on AMD.
+And as previously mentioned s/sev_es/sev/ if those are going to be used
+on SNP guests too.
 
-Yes.
+-- 
+Regards/Gruss,
+    Boris.
 
-> This patch set opens Pandora's Box, especially when we have
-> the real accurate Guest PEBS facility, and things get even
-> more complicated for just some PMU corner use cases.
-
-KVM's PMU virtualization is rife with bugs, but this patch set doesn't
-make that worse. It actually makes things better by fixing two of
-those bugs.
-
-> >
-> > Eric Hankland wrote this code originally, but his plate is full, so
-> > I've volunteered to shepherd the changes through upstream acceptance.
->
-> Does Eric have more code to implement
-> accurate virtualization on the following events ?
-
-No. We only offer PMU virtualization to one customer, and that
-customer is only interested in the two events addressed by this patch
-set.
-
-> "UnHalted Core Cycles"
-> "UnHalted Reference Cycles"
-> "LLC Reference"
-> "LLC Misses"
-> "Branch Misses Retired"
-> "Topdown Slots" (unimplemented)
->
-> Obviously, it's difficult, even absurd, to emulate these.
-
-Sorry; I should not have mentioned the eight architected events. It's
-not entirely clear what some of these events mean in a virtual
-environment. Let's just stick to the two events covered by this patch
-set.
-
-> > Jim Mattson (2):
-> >    KVM: x86: Update vPMCs when retiring instructions
-> >    KVM: x86: Update vPMCs when retiring branch instructions
-> >
-> >   arch/x86/kvm/emulate.c     | 57 +++++++++++++++++++++-----------------
-> >   arch/x86/kvm/kvm_emulate.h |  1 +
-> >   arch/x86/kvm/pmu.c         | 31 +++++++++++++++++++++
-> >   arch/x86/kvm/pmu.h         |  1 +
-> >   arch/x86/kvm/vmx/nested.c  |  6 +++-
-> >   arch/x86/kvm/x86.c         |  5 ++++
-> >   6 files changed, 75 insertions(+), 26 deletions(-)
-> >
+https://people.kernel.org/tglx/notes-about-netiquette
