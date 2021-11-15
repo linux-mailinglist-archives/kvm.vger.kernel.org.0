@@ -2,155 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 376A345092C
-	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 17:04:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4240745095F
+	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 17:17:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236612AbhKOQHL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Nov 2021 11:07:11 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31655 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231674AbhKOQHK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 15 Nov 2021 11:07:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636992252;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        id S232381AbhKOQTv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Nov 2021 11:19:51 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:37430 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231374AbhKOQTh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Nov 2021 11:19:37 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id DFA26212BF;
+        Mon, 15 Nov 2021 16:16:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1636992993; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=kNZ2k+Bbqs2mU+HEeYXnMycgNMTgeh9stKyx+F+r/jk=;
-        b=MA8PFkhEMozot1pMpcMbQMRbhdLbNmE1Up1nSpDsuVJgo+jms07b9LrSYhbZ77sZwt+3Wj
-        ZH4ZP/JsANWxPMEABGWuknxT7DjTWerHWRFoiQR1HBUQ11vJmLzuuZ59Gzo43DpS64JHtW
-        +C7Zk9s/U16y/ZP+IISAvBlNW59ogSg=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-500-n62ZDU3BMy63bcVjdzQYBA-1; Mon, 15 Nov 2021 11:04:08 -0500
-X-MC-Unique: n62ZDU3BMy63bcVjdzQYBA-1
-Received: by mail-wm1-f72.google.com with SMTP id g11-20020a1c200b000000b003320d092d08so6340671wmg.9
-        for <kvm@vger.kernel.org>; Mon, 15 Nov 2021 08:04:08 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version:content-transfer-encoding;
-        bh=kNZ2k+Bbqs2mU+HEeYXnMycgNMTgeh9stKyx+F+r/jk=;
-        b=ovfD0bgMawW/21dl1xsfVzdKNbm9EIcNYlUWzto0q4a/sUIEHIFOwFH2ZBRVQdtGzs
-         9jcdUYeaORtbozo4DnRWk3DAGiOupdOrA4HZ+wCmQs2MSSAAZG2qjKl/id4mbYa5JGq8
-         NM3YkRar3owW2WPY9pgwXyVDe5ix/tizVR/wmgNRjefH3vdJaLS9x2I439bMGqYvkxNh
-         m6ZzhumXPJk4xQu/VSQyXYDK5cxRIN/u5a7G38WuJ1l6DTRV8jiWeVCW6lTldK6WB7pN
-         /ZLDoWclq9JPJgrWAX9LN/eRfE8gfHZPPcn+DRHgc/vHa4qXnzqqeWBqU10BA1Xaljxi
-         68Jw==
-X-Gm-Message-State: AOAM5332pc6tdb02l+2rFegnsa4gEzkLwpsq1mT6GX1HgtiQlL883Y35
-        xQJaIX/cUQEhGdcjF01i39G9QGULzZDyibkKFudBvmEO5/PrWrD+UuD9TuPHcWTFbckI020gBHl
-        q6K88Wy/N9o41
-X-Received: by 2002:a1c:cc09:: with SMTP id h9mr45662401wmb.191.1636992245606;
-        Mon, 15 Nov 2021 08:04:05 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwz1gqovDpiBG7rQwvXN0J5DRj1u8GplrLX76hoeAAMPE/ExRbSHuZD82FzagUh/Q8svxu6iw==
-X-Received: by 2002:a1c:cc09:: with SMTP id h9mr45662049wmb.191.1636992243301;
-        Mon, 15 Nov 2021 08:04:03 -0800 (PST)
-Received: from fedora (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id h27sm22065673wmc.43.2021.11.15.08.04.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Nov 2021 08:04:02 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
+        bh=7b7eH+fwmM30RusUMjRrdf/DCj90saq7UtYZ8DAMnVE=;
+        b=PK/wWoUiH56BbJbfG6JFCeIiStKIJWdxb5ZDv/piXk065YE6yywS9Bfdk2pqZ5Euf6DbkX
+        iB1AudlevlB2SVlVd2wuW6+GgrPSLyXciMm7fJ8HZNPJz1A0KlynGFhnfHpkHg/lm/xk5P
+        eM2Mla4Kct4DF1At+fRfQSrNczrqeQg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1636992993;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7b7eH+fwmM30RusUMjRrdf/DCj90saq7UtYZ8DAMnVE=;
+        b=EtSwPakln53v33h6PvPpBNHLN4ca1UjxiDmIwWirzpQeCkMCqu/6QcQ5xnLJChPfnaFUzl
+        nYjnxcD5gyDk3+DA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id B510A139EC;
+        Mon, 15 Nov 2021 16:16:32 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id VwdfKuCHkmH+eAAAMHmgww
+        (envelope-from <jroedel@suse.de>); Mon, 15 Nov 2021 16:16:32 +0000
+Date:   Mon, 15 Nov 2021 17:16:31 +0100
+From:   Joerg Roedel <jroedel@suse.de>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Peter Gonda <pgonda@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Michael Ellerman <mpe@ellerman.id.au>, kvm-ppc@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/5] KVM: Cap KVM_CAP_NR_VCPUS by KVM_CAP_MAX_VCPUS and
- re-purpose it on x86
-In-Reply-To: <ecd55383-7089-b3cd-30cc-3f9feb7eadb4@de.ibm.com>
-References: <20211111162746.100598-1-vkuznets@redhat.com>
- <4a3c7be7-12fa-6e47-64eb-02e6c5be5dbc@redhat.com>
- <ecd55383-7089-b3cd-30cc-3f9feb7eadb4@de.ibm.com>
-Date:   Mon, 15 Nov 2021 17:04:01 +0100
-Message-ID: <877dd9pfri.fsf@redhat.com>
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
+ Hypervisor Support
+Message-ID: <YZKH35J2GjIZ9JXS@suse.de>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
+ <061ccd49-3b9f-d603-bafd-61a067c3f6fa@intel.com>
+ <YY6z5/0uGJmlMuM6@zn.tnic>
+ <YY7FAW5ti7YMeejj@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <YY7FAW5ti7YMeejj@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Christian Borntraeger <borntraeger@de.ibm.com> writes:
+On Fri, Nov 12, 2021 at 07:48:17PM +0000, Sean Christopherson wrote:
+> Yes, but IMO inducing a fault in the guest because of _host_ bug is wrong.
 
-> Am 11.11.21 um 17:32 schrieb Paolo Bonzini:
->> On 11/11/21 17:27, Vitaly Kuznetsov wrote:
->>> This is a comtinuation of "KVM: x86: Drop arbitraty KVM_SOFT_MAX_VCPUS"
->>> (https://lore.kernel.org/kvm/20211111134733.86601-1-vkuznets@redhat.com=
-/)
->>> work.
->>>
->>> 1) Enforce KVM_CAP_NR_VCPUS <=3D KVM_CAP_MAX_VCPUS rule on all
->>> =C2=A0 architectures. [Sean Christopherson]
->>> 2) Make KVM_CAP_NR_VCPUS return num_online_cpus() and not an arbitrary
->>> =C2=A0 value of '710' on x86.
->>>
->>> Everything but x86 was only 'eyeball tested', the change is trivial
->>> but sorry in advance if I screwed up)
->>=20
->> Christian, can you look at this for s390?=C2=A0 Returning a fixed value =
-seems wrong for KVM_CAP_NR_VCPUS.
->
-> If we talk about recommended number, then num_online_cpus() also seems to=
- make sense on s390 so
-> if you change that for s390 as well I can ACK this.
+And what is the plan with handling this host bug? Can it be handled in a
+way that keeps the guest running?
 
-Thanks!
+IMO the best way to handle this is to do it the way Peter proposed:
 
-For KVM_CAP_MAX_VCPUS s390 code returns one of the three things:
-KVM_S390_BSCA_CPU_SLOTS(64), KVM_MAX_VCPUS(255) or
-KVM_S390_ESCA_CPU_SLOTS(248).
+	* Convert the page from private to shared on host write access
+	  and log this event on the host side (e.g. via a trace event)
+	* The guest will notice what happened and can decide on its own
+	  what to do, either poison the page or panic with doing a
+	  kdump that can be used for bug analysis by guest and host
+	  owner
 
-For KVM_CAP_NR_VCPUS, would it be better to return raw
-num_online_cpus():
+At the time the fault happens we can not reliably find the reason. It
+can be a host bug, a guest bug (or attack), or whatnot. So the best that
+can be done is collecting debug data without impacting other guests.
 
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 6a6dd5e1daf6..fcecbb762a1a 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -578,6 +578,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long =
-ext)
-                r =3D MEM_OP_MAX_SIZE;
-                break;
-        case KVM_CAP_NR_VCPUS:
-+               r =3D num_online_cpus();
-+               break;
-        case KVM_CAP_MAX_VCPUS:
-        case KVM_CAP_MAX_VCPU_ID:
-                r =3D KVM_S390_BSCA_CPU_SLOTS;
+This also saves lots of code for avoiding these faults when the outcome
+would be the same: A dead VM.
 
-or cap KVM_CAP_MAX_VCPUS value with num_online_cpus(), e.g.
+> I disagree, this would require "new" ABI in the sense that it commits KVM to
+> supporting SNP without requiring userspace to initiate any and all conversions
+> between shared and private.  Which in my mind is the big elephant in the room:
+> do we want to require new KVM (and kernel?) ABI to allow/force userspace to
+> explicitly declare guest private memory for TDX _and_ SNP, or just TDX?
 
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 6a6dd5e1daf6..1cfe36f6432e 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -585,6 +585,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long =
-ext)
-                        r =3D KVM_MAX_VCPUS;
-                else if (sclp.has_esca && sclp.has_64bscao)
-                        r =3D KVM_S390_ESCA_CPU_SLOTS;
-+               if (ext =3D=3D KVM_CAP_NR_VCPUS)
-+                       r =3D min_t(unsigned int, num_online_cpus(), r);
-                break;
-        case KVM_CAP_S390_COW:
-                r =3D MACHINE_HAS_ESOP;
+No, not for SNP. User-space has no say in what guest memory is private
+and shared, that should fundamentally be the guests decision. The host
+has no idea about the guests workload and how much shared memory it
+needs. It might be that the guest temporarily needs to share more
+memory. I see no reason to cut this flexibility out for SNP guests.
 
-For reference, see our ARM discussion:
-https://lore.kernel.org/kvm/20211111162746.100598-2-vkuznets@redhat.com/
-though 390's situation is different, the returned value for
-KVM_CAP_MAX_VCPUS is not VM-dependent.
+Regards,
 
---=20
-Vitaly
+-- 
+Jörg Rödel
+jroedel@suse.de
+
+SUSE Software Solutions Germany GmbH
+Maxfeldstr. 5
+90409 Nürnberg
+Germany
+ 
+(HRB 36809, AG Nürnberg)
+Geschäftsführer: Ivo Totev
 
