@@ -2,95 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8DE83451789
-	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 23:30:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E450345183A
+	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 23:53:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348717AbhKOWc4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Nov 2021 17:32:56 -0500
-Received: from mail.kernel.org ([198.145.29.99]:43016 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1344287AbhKOWUs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Nov 2021 17:20:48 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 96FA561AD2;
-        Mon, 15 Nov 2021 22:17:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1637014668;
-        bh=O3XWXpuP4JyzBpAnL/WOSpf8m8SFaojzS7K+2Ae5RZo=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:From;
-        b=km/LghMuevoo8pewpHoaepFIkXTw+JY5kSemLdsSd/WNU9oyMsKve+s0YIjjAglss
-         vlgxo1iJb2GAMkAHvbCJLidq1dpdAO+IxmV5v16pVbdM+athvPzsLQ+0/ReU28wnmO
-         QOqbuQCv97q1aYNECVRhKlNgu5oiGDh2AqzF3ppuiBdttPDU1SUcYlUeWwWFmEMvig
-         n1mVNEKc8pFKkj3BMEio9QX9SAhekriQvtPvR0cm0JIVyw3DITrSCi4e9WX0enpF2f
-         V4MXczkaxJqtk7t5xtn1PSIGdiviCqz36wVPPktfv1ENLaelF7f3R3DS49EmeVlK4f
-         XuO+mHaVSfJPw==
-Date:   Mon, 15 Nov 2021 16:17:47 -0600
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     Lu Baolu <baolu.lu@linux.intel.com>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Ashok Raj <ashok.raj@intel.com>, Will Deacon <will@kernel.org>,
-        rafael@kernel.org, Diana Craciun <diana.craciun@oss.nxp.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Liu Yi L <yi.l.liu@intel.com>,
-        Jacob jun Pan <jacob.jun.pan@intel.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 03/11] PCI: pci_stub: Suppress kernel DMA ownership
- auto-claiming
-Message-ID: <20211115221747.GA1587608@bhelgaas>
+        id S238945AbhKOWzv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Nov 2021 17:55:51 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:51748 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1347055AbhKOWvZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 15 Nov 2021 17:51:25 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1637016461;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=toQcFguJghihTlHdbzEa3FVNR9IDFpLArQlk0uC6kXk=;
+        b=IKXV1RfxSe1YSMs64k/uLrzYEHVZWJQsJeaonLuK3AKlsfedigF8nFxKaU86flS4iAula1
+        vOkgzH+rpoSExkPwkOH3rSYedsLffGnYLX8vaoo66PduJYkOmdaqumoEod0OyDPpjYlNju
+        VwPPPPQJIaYCNLb4254TXy7TR3EYrF0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-384-BLKbRg-JOHKPMPzsXuR1HA-1; Mon, 15 Nov 2021 17:47:40 -0500
+X-MC-Unique: BLKbRg-JOHKPMPzsXuR1HA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B52F515721;
+        Mon, 15 Nov 2021 22:47:39 +0000 (UTC)
+Received: from redhat.com (ovpn-114-146.phx2.redhat.com [10.3.114.146])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9CE9019729;
+        Mon, 15 Nov 2021 22:47:29 +0000 (UTC)
+Date:   Mon, 15 Nov 2021 16:47:27 -0600
+From:   Eric Blake <eblake@redhat.com>
+To:     Tyler Fanelli <tfanelli@redhat.com>
+Cc:     qemu-devel@nongnu.org, pbonzini@redhat.com, mtosatti@redhat.com,
+        kvm@vger.kernel.org, armbru@redhat.com
+Subject: Re: [PATCH] sev: allow capabilities to check for SEV-ES support
+Message-ID: <20211115224727.p7g5ydntncvvm5k3@redhat.com>
+References: <20211115193804.294529-1-tfanelli@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211115020552.2378167-4-baolu.lu@linux.intel.com>
+In-Reply-To: <20211115193804.294529-1-tfanelli@redhat.com>
+User-Agent: NeoMutt/20211029-16-b680fe
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 15, 2021 at 10:05:44AM +0800, Lu Baolu wrote:
-> pci_stub allows the admin to block driver binding on a device and make
-> it permanently shared with userspace. Since pci_stub does not do DMA,
-> it is safe. However the admin must understand that using pci_stub allows
-> userspace to attack whatever device it was bound to.
-
-This commit log doesn't say what the patch does.  I think it tells us
-something about what pci-stub *already* does ("allows admin to block
-driver binding") and something about why that is safe ("does not do
-DMA").
-
-But it doesn't say what this patch changes.  Based on the subject
-line, I expected something like:
-
-  As of ("<commit subject>"), <some function>() marks the iommu_group
-  as containing only devices with kernel drivers that manage DMA.
-
-  Avoid this default behavior for pci-stub because it does not program
-  any DMA itself.  This allows <some desirable behavior>.
-
-> Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
+On Mon, Nov 15, 2021 at 02:38:04PM -0500, Tyler Fanelli wrote:
+> Probe for SEV-ES and SEV-SNP capabilities to distinguish between Rome,
+> Naples, and Milan processors. Use the CPUID function to probe if a
+> processor is capable of running SEV-ES or SEV-SNP, rather than if it
+> actually is running SEV-ES or SEV-SNP.
+> 
+> Signed-off-by: Tyler Fanelli <tfanelli@redhat.com>
 > ---
->  drivers/pci/pci-stub.c | 3 +++
->  1 file changed, 3 insertions(+)
+>  qapi/misc-target.json | 11 +++++++++--
+>  target/i386/sev.c     |  6 ++++--
+>  2 files changed, 13 insertions(+), 4 deletions(-)
 > 
-> diff --git a/drivers/pci/pci-stub.c b/drivers/pci/pci-stub.c
-> index e408099fea52..6324c68602b4 100644
-> --- a/drivers/pci/pci-stub.c
-> +++ b/drivers/pci/pci-stub.c
-> @@ -36,6 +36,9 @@ static struct pci_driver stub_driver = {
->  	.name		= "pci-stub",
->  	.id_table	= NULL,	/* only dynamic id's */
->  	.probe		= pci_stub_probe,
-> +	.driver		= {
-> +		.suppress_auto_claim_dma_owner = true,
-> +	},
->  };
+> diff --git a/qapi/misc-target.json b/qapi/misc-target.json
+> index 5aa2b95b7d..c3e9bce12b 100644
+> --- a/qapi/misc-target.json
+> +++ b/qapi/misc-target.json
+> @@ -182,13 +182,19 @@
+>  # @reduced-phys-bits: Number of physical Address bit reduction when SEV is
+>  #                     enabled
+>  #
+> +# @es: SEV-ES capability of the machine.
+> +#
+> +# @snp: SEV-SNP capability of the machine.
+> +#
+
+Missing '(since 7.0)' tags on the new members.
+
+>  # Since: 2.12
+>  ##
+>  { 'struct': 'SevCapability',
+>    'data': { 'pdh': 'str',
+>              'cert-chain': 'str',
+>              'cbitpos': 'int',
+> -            'reduced-phys-bits': 'int'},
+> +            'reduced-phys-bits': 'int',
+> +            'es': 'bool',
+> +            'snp': 'bool'},
+>    'if': 'TARGET_I386' }
 >  
->  static int __init pci_stub_init(void)
-> -- 
-> 2.25.1
-> 
+>  ##
+> @@ -205,7 +211,8 @@
+>  #
+>  # -> { "execute": "query-sev-capabilities" }
+>  # <- { "return": { "pdh": "8CCDD8DDD", "cert-chain": "888CCCDDDEE",
+> -#                  "cbitpos": 47, "reduced-phys-bits": 5}}
+> +#                  "cbitpos": 47, "reduced-phys-bits": 5
+> +#                  "es": false, "snp": false}}
+
+Invalid JSON, as you missed the comma needed after 5.
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3266
+Virtualization:  qemu.org | libvirt.org
+
