@@ -2,86 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 44F7F450476
-	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 13:34:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 854CD450495
+	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 13:41:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230368AbhKOMhc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Nov 2021 07:37:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57440 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229714AbhKOMhX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 15 Nov 2021 07:37:23 -0500
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F247C061570
-        for <kvm@vger.kernel.org>; Mon, 15 Nov 2021 04:34:27 -0800 (PST)
-Received: by mail-ed1-x530.google.com with SMTP id b15so70862169edd.7
-        for <kvm@vger.kernel.org>; Mon, 15 Nov 2021 04:34:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:sender:from:date:message-id:subject:to;
-        bh=ePYZWHXANTLAfCGNIrDqR/tKQ8RPUIxsEL1GS7U8994=;
-        b=ipDv6ZAIbDsRiIYjhlxXhIFL+uTXxbNPiTT9x8faacNDQHpV0mRj3yhuopweZl5IvR
-         aExkTIy9jidA8ZydJbjHmwZVpVLvbKewok+VLEIBXTpbMr+dBECYU1Bgl+1VzoYY2xST
-         LZurJjXfiiaLixT+HPzHOIWwjawpACvc/5xVkCw5qsXVR2ugLFRpm2KbB/rqNy0LBk+j
-         udVcF6FMatdUdlTEjE+BVtCJ+yovpP1YE4lpF7GK1NICkDcQTQ9b1N59Baaqha4+4Nbg
-         jlyTUmdKPhP5HnnxxzFCYR3xt+PruYh8Q4ZW9WZzORpsSvLwnqNEgjw9zaajHxldY+HQ
-         iQIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:sender:from:date:message-id:subject
-         :to;
-        bh=ePYZWHXANTLAfCGNIrDqR/tKQ8RPUIxsEL1GS7U8994=;
-        b=v2Jf9R0ij+6M8Q6cSsZMdUEIyvEK9rjZSMCGkzjEtSVE0Cv259hZHfw6N+D0j8PA9A
-         Cf0wxevXG1i4kfOTMgsxdT97+uTe5Du8rXxoHx6xxNxJKFElIWMgOlOfDFeJSyGrnLQP
-         X8mHCaWKUgpYPywSeEvHfM3u96rSSH2lkfaSyjQpoj7uC7Z7QO9UYcyn37RQ2KmJtITA
-         9YmG4amF+JYbcwgNRT80aEyB03mZLtUdRigvg8A9Psy2ICM74G6jY5/AJ9eerMcX3IY9
-         2kOMCMXUu0TKq4PLA4f7duH49GIn88BtQk+kSy8gy3GExidaSP1nyjxLjwZKSjxJ4b+M
-         58Ww==
-X-Gm-Message-State: AOAM5307oVCbBNFoQ13AE1L6b7AxQ+jcFpx7YtPUyq2WZi1F0F15LOf1
-        5X5jnUvqEGYMpKzoC/bPm3xEM6c74RRix0Bv9SU=
-X-Google-Smtp-Source: ABdhPJzJzFp8WbUGeHikLoR3iKEBV3MJObobPiZnY4P84Kb2zTLcRHFL1P78sE0+BTCEZB2ZCFmtuvtGqzyW0JQYgkk=
-X-Received: by 2002:a50:bf48:: with SMTP id g8mr53714217edk.10.1636979665592;
- Mon, 15 Nov 2021 04:34:25 -0800 (PST)
+        id S230438AbhKOMoM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Nov 2021 07:44:12 -0500
+Received: from smtp4.jd.com ([59.151.64.78]:2050 "EHLO smtp4.jd.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230306AbhKOMoG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 15 Nov 2021 07:44:06 -0500
+Received: from JDCloudMail06.360buyAD.local (172.31.68.39) by
+ JDCloudMail07.360buyAD.local (172.31.68.40) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.7; Mon, 15 Nov 2021 20:41:00 +0800
+Received: from JDCloudMail06.360buyAD.local ([fe80::643e:3192:cad7:c913]) by
+ JDCloudMail06.360buyAD.local ([fe80::643e:3192:cad7:c913%5]) with mapi id
+ 15.01.2375.007; Mon, 15 Nov 2021 20:41:00 +0800
+From:   =?gb2312?B?u8bA1g==?= <huangle1@jd.com>
+To:     "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>
+CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: Re: [PATCH] KVM: x86: Fix uninitialized eoi_exit_bitmap usage in
+ vcpu_load_eoi_exitmap()
+Thread-Topic: Re: [PATCH] KVM: x86: Fix uninitialized eoi_exit_bitmap usage in
+ vcpu_load_eoi_exitmap()
+Thread-Index: AQHX2h3F2UztZsEppUOwyzlbNRwZtQ==
+Date:   Mon, 15 Nov 2021 12:41:00 +0000
+Message-ID: <567b276444f841519e42c91f43f5acd7@jd.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.31.14.18]
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Sender: elisabethjohn415@gmail.com
-Received: by 2002:a17:907:2382:0:0:0:0 with HTTP; Mon, 15 Nov 2021 04:34:24
- -0800 (PST)
-From:   Anderson Thereza <anderson.thereza24@gmail.com>
-Date:   Mon, 15 Nov 2021 04:34:24 -0800
-X-Google-Sender-Auth: iWXB-fhdQN2Do5g4Rm9ed7Z9NnU
-Message-ID: <CAOGA6VAfrCVYcRknG-v1R0nrXO6V7SojZaTm+BXOOLgeLTqS3g@mail.gmail.com>
-Subject: Re: Greetings My Dear,
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Greetings,
-
-I sent this mail praying it will find you in a good condition, since I
-myself am in a very critical health condition in which I sleep every
-night without knowing if I may be alive to see the next day. I am
-mrs.theresa anderson, a widow suffering from a long time illness. I
-have some funds I inherited from my late husband, the sum of
-($11,000,000.00, Eleven Million Dollars) my Doctor told me recently
-that I have serious sickness which is a cancer problem. What disturbs
-me most is my stroke sickness. Having known my condition, I decided to
-donate this fund to a good person that will utilize it the way I am
-going to instruct herein. I need a very honest God.
-
-fearing a person who can claim this money and use it for Charity
-works, for orphanages, widows and also build schools for less
-privileges that will be named after my late husband if possible and to
-promote the word of God and the effort that the house of God is
-maintained. I do not want a situation where this money will be used in
-an ungodly manner. That's why I' making this decision. I'm not afraid
-of death so I know where I'm going. I accept this decision because I
-do not have any child who will inherit this money after I die. Please
-I want your sincere and urgent answer to know if you will be able to
-execute this project, and I will give you more information on how the
-fund will be transferred to your bank account. I am waiting for your
-reply.
-
-May God Bless you,
-mrs.theresa anderson.
+PiC7xsDWIDxodWFuZ2xlMUBqZC5jb20+IHdyaXRlczoNCj4gDQo+ID4gSW4gdmNwdV9sb2FkX2Vv
+aV9leGl0bWFwKCksIGN1cnJlbnRseSB0aGUgZW9pX2V4aXRfYml0bWFwWzRdIGFycmF5IGlzDQo+
+ID4gaW5pdGlhbGl6ZWQgb25seSB3aGVuIEh5cGVyLVYgY29udGV4dCBpcyBhdmFpbGFibGUsIGlu
+IG90aGVyIHBhdGggaXQgaXMNCj4gPiBqdXN0IHBhc3NlZCB0byBrdm1feDg2X29wcy5sb2FkX2Vv
+aV9leGl0bWFwKCkgZGlyZWN0bHkgZnJvbSBvbiB0aGUgc3RhY2ssDQo+ID4gd2hpY2ggd291bGQg
+Y2F1c2UgdW5leHBlY3RlZCBpbnRlcnJ1cHQgZGVsaXZlcnkvaGFuZGxpbmcgaXNzdWVzLCBlLmcu
+IGFuDQo+ID4gKm9sZCogbGludXgga2VybmVsIHRoYXQgcmVsaWVzIG9uIFBJVCB0byBkbyBjbG9j
+ayBjYWxpYnJhdGlvbiBvbiBLVk0gbWlnaHQNCj4gPiByYW5kb21seSBmYWlsIHRvIGJvb3QuDQo+
+ID4NCj4gPiBGaXggaXQgYnkgcGFzc2luZyBpb2FwaWNfaGFuZGxlZF92ZWN0b3JzIHRvIGxvYWRf
+ZW9pX2V4aXRtYXAoKSB3aGVuIEh5cGVyLVYNCj4gPiBjb250ZXh0IGlzIG5vdCBhdmFpbGFibGUu
+DQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBIdWFuZyBMZSA8aHVhbmdsZTFAamQuY29tPg0KPiAN
+Cj4gRml4ZXM6IGYyYmMxNGI2OWMzOCAoIktWTTogeDg2OiBoeXBlci12OiBQcmVwYXJlIHRvIG1l
+ZXQgdW5hbGxvY2F0ZWQgSHlwZXItViBjb250ZXh0IikNCj4gQ2M6IHN0YWJsZUB2Z2VyLmtlcm5l
+bC5vcmcNCg0KQ29tbWl0IGYyYmMxNGI2OWMzOCBpcyBub3QgaW4gc3RhYmxlIHRyZWUgSSBndWVz
+cywgaXQgd2FzIG1lcmdlZCBpbiBmcm9tIDUuMTIsDQpkbyB3ZSBzdGlsbCBuZWVkIENjIHRoaXMg
+cGF0Y2ggdG8gc3RhYmxlIG1haW50YWluZXJzPw0KDQo+IA0KPiA+IC0tLQ0KPiA+IGRpZmYgLS1n
+aXQgYS9hcmNoL3g4Ni9rdm0veDg2LmMgYi9hcmNoL3g4Ni9rdm0veDg2LmMNCj4gPiBpbmRleCBk
+YzdlYjVmZGRmZDMuLjA2OTk4MzI1MDRjOSAxMDA2NDQNCj4gPiAtLS0gYS9hcmNoL3g4Ni9rdm0v
+eDg2LmMNCj4gPiArKysgYi9hcmNoL3g4Ni9rdm0veDg2LmMNCj4gPiBAQCAtOTU0NywxMSArOTU0
+NywxNCBAQCBzdGF0aWMgdm9pZCB2Y3B1X2xvYWRfZW9pX2V4aXRtYXAoc3RydWN0IGt2bV92Y3B1
+ICp2Y3B1KQ0KPiA+ICAgICAgICBpZiAoIWt2bV9hcGljX2h3X2VuYWJsZWQodmNwdS0+YXJjaC5h
+cGljKSkNCj4gPiAgICAgICAgICAgICAgICByZXR1cm47DQo+ID4gDQo+ID4gLSAgICAgaWYgKHRv
+X2h2X3ZjcHUodmNwdSkpDQo+ID4gLSAgICAgICAgICAgICBiaXRtYXBfb3IoKHVsb25nICopZW9p
+X2V4aXRfYml0bWFwLA0KPiA+IC0gICAgICAgICAgICAgICAgICAgICAgIHZjcHUtPmFyY2guaW9h
+cGljX2hhbmRsZWRfdmVjdG9ycywNCj4gPiAtICAgICAgICAgICAgICAgICAgICAgICB0b19odl9z
+eW5pYyh2Y3B1KS0+dmVjX2JpdG1hcCwgMjU2KTsNCj4gPiArICAgICBpZiAoIXRvX2h2X3ZjcHUo
+dmNwdSkpIHsNCj4gPiArICAgICAgICAgICAgIHN0YXRpY19jYWxsKGt2bV94ODZfbG9hZF9lb2lf
+ZXhpdG1hcCkoDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgIHZjcHUsICh1NjQgKil2Y3B1LT5h
+cmNoLmlvYXBpY19oYW5kbGVkX3ZlY3RvcnMpOw0KPiA+ICsgICAgICAgICAgICAgcmV0dXJuOw0K
+PiA+ICsgICAgIH0NCj4gPiANCj4gPiArICAgICBiaXRtYXBfb3IoKHVsb25nICopZW9pX2V4aXRf
+Yml0bWFwLCB2Y3B1LT5hcmNoLmlvYXBpY19oYW5kbGVkX3ZlY3RvcnMsDQo+ID4gKyAgICAgICAg
+ICAgICAgIHRvX2h2X3N5bmljKHZjcHUpLT52ZWNfYml0bWFwLCAyNTYpOw0KPiA+ICAgICAgICBz
+dGF0aWNfY2FsbChrdm1feDg2X2xvYWRfZW9pX2V4aXRtYXApKHZjcHUsIGVvaV9leGl0X2JpdG1h
+cCk7DQo+ID4gIH0NCj4gPiANCj4gDQo+IFJldmlld2VkLWJ5OiBWaXRhbHkgS3V6bmV0c292IDx2
+a3V6bmV0c0ByZWRoYXQuY29tPg0KPiANCj4gTXkgcGVyc29uYWwgcHJlZmVyZW5jZSwgaG93ZXZl
+ciwgd291bGQgYmUgdG8ga2VlcCAnaWYNCj4gKHRvX2h2X3ZjcHUodmNwdSkpJyBjaGVjayBhbmQg
+bm90IGludmVydCBpdCwgaS5lLjoNCj4gDQo+ICAgICAgICAgaWYgKHRvX2h2X3ZjcHUodmNwdSkp
+IHsNCj4gICAgICAgICAgICAgICAgIGJpdG1hcF9vcigodWxvbmcgKillb2lfZXhpdF9iaXRtYXAs
+DQo+ICAgICAgICAgICAgICAgICAgdmNwdS0+YXJjaC5pb2FwaWNfaGFuZGxlZF92ZWN0b3JzLA0K
+PiAgICAgICAgICAgICAgICAgIHRvX2h2X3N5bmljKHZjcHUpLT52ZWNfYml0bWFwLCAyNTYpOw0K
+PiAgICAgICAgICAgICAgICAgc3RhdGljX2NhbGwoLi4uKSh2Y3B1LCBlb2lfZXhpdF9iaXRtYXAp
+DQo+ICAgICAgICAgICAgICAgICByZXR1cm47DQo+ICAgICAgICAgfQ0KPiANCj4gICAgICAgICBz
+dGF0aWNfY2FsbCguLi4pKHZjcHUsICh1NjQgKil2Y3B1LT5hcmNoLmlvYXBpY19oYW5kbGVkX3Zl
+Y3RvcnMpOw0KPiANCj4gdG8gc2xpZ2h0bHkgcmVkdWNlIHRoZSBjb2RlIGNodXJuIGJ1dCBpdCBk
+b2Vzbid0IG1hdHRlciBtdWNoLg0KDQpHb3QgaXQuICBXaWxsIHNlbmQgYW4gdXBkYXRlZCBvbmUg
+bGF0ZXIuICBUaGFua3MgZm9yIHN1Z2dlc3Rpb24hDQoNCj4gDQo+IFRoYW5rcyENCj4gDQo+IC0t
+DQo+IFZpdGFseQ0K
