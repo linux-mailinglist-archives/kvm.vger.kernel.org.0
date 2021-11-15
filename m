@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 21CF445053B
-	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 14:19:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6824245053C
+	for <lists+kvm@lfdr.de>; Mon, 15 Nov 2021 14:19:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231693AbhKONWi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 15 Nov 2021 08:22:38 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:24457 "EHLO
+        id S231827AbhKONWo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 15 Nov 2021 08:22:44 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:34195 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231785AbhKONWE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 15 Nov 2021 08:22:04 -0500
+        by vger.kernel.org with ESMTP id S231537AbhKONWC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 15 Nov 2021 08:22:02 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1636982349;
+        s=mimecast20190719; t=1636982341;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=b4Qg6bfidHi2+sodhiuBIHeJQiQW8HkDiV/qzCDxdG0=;
-        b=cc+R53VT35cucFIsYKf4H+Ue3F3f6scjCmAYy+IfvQurlK8BCeUJOrN/NN8Om409q2oZWe
-        frfsR4/G9c69J00GZygfVqkr2vFDYNUqRFnU14pEoEeSOvSkZpqALZ1jRlZ+qUtNqcUUuM
-        ZPEVQXLQBZXmiI/buX26Ma07YD0wEpo=
+        bh=wL8FL6L5F6hP13kAfLAHnZ2vlwmdadJMBOWtZ6gOEW4=;
+        b=jBIrG/Y6cxFH2HF2WZjCrqLI9DFzSOZOYZubBjXJ1aps8YDAFsQb8gEK3UmU7UMIUwWGBa
+        jmhvTn1dTJzm5Ti33EzAfckE91CTSDkvbIhmd01dzOPYIaqArNkwpiQQb1gBNKbww6j1Gq
+        qD7DlOpltkLrkPvjj3zrD91WlvsXxlE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-298-Ekj_pfIIPD6EyO097D0W3w-1; Mon, 15 Nov 2021 08:18:53 -0500
-X-MC-Unique: Ekj_pfIIPD6EyO097D0W3w-1
+ us-mta-213-nS0e7JEPMd2tmFYpoF4B9Q-1; Mon, 15 Nov 2021 08:18:58 -0500
+X-MC-Unique: nS0e7JEPMd2tmFYpoF4B9Q-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4F3DC9F92A;
-        Mon, 15 Nov 2021 13:18:52 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8489B9F93B;
+        Mon, 15 Nov 2021 13:18:56 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.40.194.243])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 893181017E37;
-        Mon, 15 Nov 2021 13:18:48 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BDC0E10016F5;
+        Mon, 15 Nov 2021 13:18:52 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -48,9 +48,9 @@ Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Borislav Petkov <bp@alien8.de>,
         Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH v2 1/2] KVM: nVMX: don't use vcpu->arch.efer when checking host state on nested state load
-Date:   Mon, 15 Nov 2021 15:18:36 +0200
-Message-Id: <20211115131837.195527-2-mlevitsk@redhat.com>
+Subject: [PATCH v2 2/2] KVM: x86/mmu: include efer.lma in extended mmu role
+Date:   Mon, 15 Nov 2021 15:18:37 +0200
+Message-Id: <20211115131837.195527-3-mlevitsk@redhat.com>
 In-Reply-To: <20211115131837.195527-1-mlevitsk@redhat.com>
 References: <20211115131837.195527-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -60,85 +60,54 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When loading the nested state, due to the way qemu loads
-the nested state, vcpu->arch.efer contains L2' IA32_EFER which
-can be completely different from L1's IA32_EFER, thus it is
-wrong to do consistency check of it vs the vmcs12 exit fields.
+When the host is running with normal TDP mmu (EPT/NPT),
+and it is running a nested 32 bit guest, then after a migration,
+the host mmu (aka root_mmu) is first initialized with
+nested guest's IA32_EFER, due to the way userspace restores
+the nested state.
 
-To fix this
+When later, this is corrected on first nested VM exit to the host,
+when host EFER is loaded from vmcs12,
+the root_mmu is not reset, because the role.base.level
+in this case, reflects the level of the TDP mmu which is
+always 4 (or 5) on EPT, and usually 4 or even 5 on AMD
+(when we have 64 bit host).
 
-1. Split the host state consistency check
-between current IA32_EFER.LMA and 'host address space' bit in VMCS12 into
-nested_vmx_check_address_state_size.
+Since most of the paging state is already captured in
+the extended mmu role, just add the EFER.LMA there to
+force that reset.
 
-2. Call this check only on a normal VM entry, while skipping this call
-on loading the nested state.
-
-3. Trust the 'host address space' bit to contain correct ia32e
-value on loading the nested state as it is the best value of
-it at that point.
-Still do a consistency check of it vs host_ia32_efer in vmcs12.
-
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/x86/kvm/vmx/nested.c | 22 +++++++++++++++++-----
- 1 file changed, 17 insertions(+), 5 deletions(-)
+ arch/x86/include/asm/kvm_host.h | 1 +
+ arch/x86/kvm/mmu/mmu.c          | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index b4ee5e9f9e201..7b1d5510a7cdc 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -2866,6 +2866,17 @@ static int nested_vmx_check_controls(struct kvm_vcpu *vcpu,
- 	return 0;
- }
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 88fce6ab4bbd7..a44b9eb7d4d6d 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -364,6 +364,7 @@ union kvm_mmu_extended_role {
+ 		unsigned int cr4_smap:1;
+ 		unsigned int cr4_smep:1;
+ 		unsigned int cr4_la57:1;
++		unsigned int efer_lma:1;
+ 	};
+ };
  
-+static int nested_vmx_check_address_state_size(struct kvm_vcpu *vcpu,
-+				       struct vmcs12 *vmcs12)
-+{
-+#ifdef CONFIG_X86_64
-+	if (CC(!!(vmcs12->vm_exit_controls & VM_EXIT_HOST_ADDR_SPACE_SIZE) !=
-+		!!(vcpu->arch.efer & EFER_LMA)))
-+		return -EINVAL;
-+#endif
-+	return 0;
-+}
-+
- static int nested_vmx_check_host_state(struct kvm_vcpu *vcpu,
- 				       struct vmcs12 *vmcs12)
- {
-@@ -2890,18 +2901,16 @@ static int nested_vmx_check_host_state(struct kvm_vcpu *vcpu,
- 		return -EINVAL;
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 354d2ca92df4d..5c4a41697a717 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4682,6 +4682,7 @@ static union kvm_mmu_extended_role kvm_calc_mmu_role_ext(struct kvm_vcpu *vcpu,
+ 		/* PKEY and LA57 are active iff long mode is active. */
+ 		ext.cr4_pke = ____is_efer_lma(regs) && ____is_cr4_pke(regs);
+ 		ext.cr4_la57 = ____is_efer_lma(regs) && ____is_cr4_la57(regs);
++		ext.efer_lma = ____is_efer_lma(regs);
+ 	}
  
- #ifdef CONFIG_X86_64
--	ia32e = !!(vcpu->arch.efer & EFER_LMA);
-+	ia32e = !!(vmcs12->vm_exit_controls & VM_EXIT_HOST_ADDR_SPACE_SIZE);
- #else
- 	ia32e = false;
- #endif
- 
- 	if (ia32e) {
--		if (CC(!(vmcs12->vm_exit_controls & VM_EXIT_HOST_ADDR_SPACE_SIZE)) ||
--		    CC(!(vmcs12->host_cr4 & X86_CR4_PAE)))
-+		if (CC(!(vmcs12->host_cr4 & X86_CR4_PAE)))
- 			return -EINVAL;
- 	} else {
--		if (CC(vmcs12->vm_exit_controls & VM_EXIT_HOST_ADDR_SPACE_SIZE) ||
--		    CC(vmcs12->vm_entry_controls & VM_ENTRY_IA32E_MODE) ||
-+		if (CC(vmcs12->vm_entry_controls & VM_ENTRY_IA32E_MODE) ||
- 		    CC(vmcs12->host_cr4 & X86_CR4_PCIDE) ||
- 		    CC((vmcs12->host_rip) >> 32))
- 			return -EINVAL;
-@@ -3571,6 +3580,9 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
- 	if (nested_vmx_check_controls(vcpu, vmcs12))
- 		return nested_vmx_fail(vcpu, VMXERR_ENTRY_INVALID_CONTROL_FIELD);
- 
-+	if (nested_vmx_check_address_state_size(vcpu, vmcs12))
-+		return nested_vmx_fail(vcpu, VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
-+
- 	if (nested_vmx_check_host_state(vcpu, vmcs12))
- 		return nested_vmx_fail(vcpu, VMXERR_ENTRY_INVALID_HOST_STATE_FIELD);
- 
+ 	ext.valid = 1;
 -- 
 2.26.3
 
