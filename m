@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 82E22453B1A
-	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 21:41:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A8F05453B1B
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 21:41:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230525AbhKPUoA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Nov 2021 15:44:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40994 "EHLO
+        id S231138AbhKPUoC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Nov 2021 15:44:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41004 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230494AbhKPUn7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Nov 2021 15:43:59 -0500
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F88EC061570
-        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 12:41:02 -0800 (PST)
-Received: by mail-pf1-x42c.google.com with SMTP id g18so502865pfk.5
-        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 12:41:02 -0800 (PST)
+        with ESMTP id S231127AbhKPUoA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Nov 2021 15:44:00 -0500
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6AB0C061746
+        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 12:41:03 -0800 (PST)
+Received: by mail-pl1-x629.google.com with SMTP id u11so224806plf.3
+        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 12:41:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=1AE+HQrLi6BxdLK3n3GfzMpS9PYJGXdqFTYhG0I5PN4=;
-        b=CQNFR7NOP7hkZb7c0hL0VBiZNje2CdB/E2DvYx6r9Jn2i8RZ0BVM+KlK2PK1hkMglY
-         AjFvlfEl9D0dRuBXG7y8mUfAG2SsEFzI+na8Xl80FGNnvGQ/15cJB/S09Exrv0nGOIgS
-         90UV9LhfgtYVtxmFub5q+YnEZrmgXvUSIGUMJlPnT21ESJtV17L+KWn7u/VDk2sW/ZVX
-         dOjyu4LVfdvQIglSeK+Jx0lUE2gEN6+UFkC+gqHGbLDhMh36wvdrzi++XrT/h46o2dhZ
-         CzxwZz6Nn1wQhDfr0KMdPsOoUnjYhAGnVhcLzTwDun9rwULs8jMWmp43b7idj0uB5SFU
-         t7vg==
+        bh=2/AVP8Zq6uyC9VI9QdGVIbCSITCn5Jm+/LDPwBstTZI=;
+        b=WX160uVdk/xuIB9uLy0b0H+DyP+zM7foNxBbH0AYRv55ROUdDBHzx8KxrfwtAmlfCi
+         eKsCiSE0fkhz1qnBxuKl21+K2ep8AEI7jmIuRRFHRsdIc+1LConDtXZEBTx2LYCX012+
+         RmzH5yJOSKE6TaziOHSm+KHrXBcc6lKhf2dSnv4mTBNHTsoY9qf0HDxYFwwUkgnbiC68
+         e6Y0JzNRt94gnsPl26QYiqxVlpVMYmGZJ/aEZGLP9ivLU2JCrdVf2idkys3gpK5zpkVc
+         7+nV3272PweDftZO3Mj/1ed3jddNYY/5Z1MZysx2ZPnn+rEmsO2vPbdIwL2UK8M+4A2g
+         tNrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=1AE+HQrLi6BxdLK3n3GfzMpS9PYJGXdqFTYhG0I5PN4=;
-        b=iBDUXa+veB8Hz8PJMdGpGo0UphIu0YKOTCtWN2zB1Cf+hoBS3cSdtvMgkfu7n1k4HE
-         FPI8YiSJeQyfBH6CCMacntHLBM6iBXc85dKNtyDMVxxTa6+kPI0DzBJBgHakX/EYViZ3
-         TnydyDKaFkUyx5FRtnGDH4mM3G6r5Hwq6yZhn/pI2MmsYdKb2yJuaITWMmSoO1PfTbPm
-         /Ga9rblL6q4tNnJCXDsKjs+oCGY7b3OzbRdeXU/AkxQZwx7lR+q030FBTWHiplBBVCde
-         nmrTFPfwoXP5rpTzmL3p6GOsD70Mlg9Y36nKSxfsLRf+mMZJkWUIbPvUfcLwvdtMoH/N
-         nMtg==
-X-Gm-Message-State: AOAM532FL2J+c6YGwgxthGUEktKewsY6oI0lbn67tbZVVnraFw6WWF4b
-        VwuyK4kl2D15L6g0IkBzai2E/CTBTWy6fw==
-X-Google-Smtp-Source: ABdhPJwE8Dsms2V2K60CmGEakBLb7kONv0fZsLxvGQPl51bmBvzafVbOxLWw16Rh7PVypS3lUCeyPg==
-X-Received: by 2002:a05:6a00:847:b0:49f:9d3c:9b4b with SMTP id q7-20020a056a00084700b0049f9d3c9b4bmr2025839pfk.16.1637095261623;
-        Tue, 16 Nov 2021 12:41:01 -0800 (PST)
+        bh=2/AVP8Zq6uyC9VI9QdGVIbCSITCn5Jm+/LDPwBstTZI=;
+        b=2mVwnGV9ei2I1uXMKB3AzyErMeBAgcKX1MQLykR0byxSnUEe0Ah9ZJY8uwHg1SfZZU
+         wvYQnK/rw8qKUfA+OzJ/jZvCnd2IPiE1b4ZgTgeHHIWH3EuAuIsLYqhGOz7ZDZPEbpkg
+         hU8iu2uNFrHMnD8KDNyCna/Amo19VcBAvfKWNZ5kM9D6EMGhh6EpvsM7g6p44k31/tlS
+         YPj+SUprBVYp/Jizhs1+9aVW67dIfjJ4wAQ/147LT4ibSEfV4Ftl0O5MR58wAipoTCwr
+         j+yjEOk28XjtX13pYuPHNZytUsJPoMF2ABLSIo0nAwoarSYLgASquzYbdRfsxHhzyOXy
+         OZlQ==
+X-Gm-Message-State: AOAM531mp6XVoMl6iNDrO31rdhHiSv1t2ZsSb2G3igJ4uYtfUPh+71MA
+        gROELhmF2QDt/CDvGbrno0Wu2Z9Foms0fA==
+X-Google-Smtp-Source: ABdhPJwAyHMKvuHqedpYzwySrVsT8yYr2QixIEc8+/ADken5WbWK16XVLouVPGo5nKmW3wgKzPudYg==
+X-Received: by 2002:a17:90a:fa18:: with SMTP id cm24mr2295112pjb.241.1637095262855;
+        Tue, 16 Nov 2021 12:41:02 -0800 (PST)
 Received: from localhost.localdomain (netadmin.ucsd.edu. [137.110.160.224])
-        by smtp.gmail.com with ESMTPSA id lp12sm3652359pjb.24.2021.11.16.12.41.00
+        by smtp.gmail.com with ESMTPSA id lp12sm3652359pjb.24.2021.11.16.12.41.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Nov 2021 12:41:01 -0800 (PST)
+        Tue, 16 Nov 2021 12:41:02 -0800 (PST)
 From:   Zixuan Wang <zxwang42@gmail.com>
 To:     kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com
 Cc:     marcorr@google.com, erdemaktas@google.com, rientjes@google.com,
         seanjc@google.com, brijesh.singh@amd.com, Thomas.Lendacky@amd.com,
         varad.gautam@suse.com, jroedel@suse.de, bp@suse.de
-Subject: [kvm-unit-tests PATCH v2 05/10] x86 UEFI: Set UEFI OVMF as readonly
-Date:   Tue, 16 Nov 2021 12:40:48 -0800
-Message-Id: <20211116204053.220523-6-zxwang42@gmail.com>
+Subject: [kvm-unit-tests PATCH v2 06/10] x86 UEFI: Exit QEMU with return code
+Date:   Tue, 16 Nov 2021 12:40:49 -0800
+Message-Id: <20211116204053.220523-7-zxwang42@gmail.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20211116204053.220523-1-zxwang42@gmail.com>
 References: <20211116204053.220523-1-zxwang42@gmail.com>
@@ -66,26 +66,57 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Zixuan Wang <zxwang42@gmail.com>
 
-Set readonly for UEFI OVMF image.
+kvm-unit-tests runner scripts parse QEMU exit code to determine if a
+test case runs successfully. But the UEFI 'reset_system' function always
+exits QEMU with code 0, even if the test case returns a non-zero code.
+
+This commit fixes this issue by calling 'exit' function to exit QEMU
+with the correct code.
 
 Signed-off-by: Zixuan Wang <zxwang42@gmail.com>
 ---
- x86/efi/run | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ lib/efi.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
-diff --git a/x86/efi/run b/x86/efi/run
-index a47c0d5..922b266 100755
---- a/x86/efi/run
-+++ b/x86/efi/run
-@@ -54,7 +54,7 @@ popd || exit 2
- # UEFI's largest allocatable memory region is large enough.
- EFI_RUN=y \
- "$TEST_DIR/run" \
--	-drive file="$EFI_UEFI",format=raw,if=pflash \
-+	-drive file="$EFI_UEFI",format=raw,if=pflash,readonly=on \
- 	-drive file.dir="$EFI_TEST/$EFI_CASE/",file.driver=vvfat,file.rw=on,format=raw,if=virtio \
- 	-net none \
- 	-nographic \
+diff --git a/lib/efi.c b/lib/efi.c
+index 99eb00c..64cc978 100644
+--- a/lib/efi.c
++++ b/lib/efi.c
+@@ -85,6 +85,17 @@ efi_status_t efi_get_system_config_table(efi_guid_t table_guid, void **table)
+ 	return EFI_NOT_FOUND;
+ }
+ 
++static void efi_exit(efi_status_t code)
++{
++	exit(code);
++
++	/*
++	 * Fallback to UEFI reset_system() service, in case testdev is
++	 * missing and exit() does not properly exit.
++	 */
++	efi_rs_call(reset_system, EFI_RESET_SHUTDOWN, code, 0, NULL);
++}
++
+ efi_status_t efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
+ {
+ 	int ret;
+@@ -134,14 +145,14 @@ efi_status_t efi_main(efi_handle_t handle, efi_system_table_t *sys_tab)
+ 	ret = main(__argc, __argv, __environ);
+ 
+ 	/* Shutdown the guest VM */
+-	efi_rs_call(reset_system, EFI_RESET_SHUTDOWN, ret, 0, NULL);
++	efi_exit(ret);
+ 
+ 	/* Unreachable */
+ 	return EFI_UNSUPPORTED;
+ 
+ efi_main_error:
+ 	/* Shutdown the guest with error EFI status */
+-	efi_rs_call(reset_system, EFI_RESET_SHUTDOWN, status, 0, NULL);
++	efi_exit(status);
+ 
+ 	/* Unreachable */
+ 	return EFI_UNSUPPORTED;
 -- 
 2.33.0
 
