@@ -2,171 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 77E1D4529F4
-	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 06:44:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8DAFD452958
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 06:02:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236063AbhKPFrT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Nov 2021 00:47:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60198 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236022AbhKPFrJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Nov 2021 00:47:09 -0500
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EC80C04A53A
-        for <kvm@vger.kernel.org>; Mon, 15 Nov 2021 19:22:42 -0800 (PST)
-Received: by mail-pj1-x102b.google.com with SMTP id o6-20020a17090a0a0600b001a64b9a11aeso1580089pjo.3
-        for <kvm@vger.kernel.org>; Mon, 15 Nov 2021 19:22:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:content-language:to:cc
-         :references:from:organization:subject:in-reply-to
-         :content-transfer-encoding;
-        bh=PhZPKoJfbVoRS8bFL10GXiWbSMVHmrDdqtwYLPzmlFU=;
-        b=lhy8Qqkre/oDSSVt/DZwL+6QyPpFhsonCyFjggeLQyaYiTW+vz5de3jHqYBPGU6nqf
-         x4aSzXEO0CISBfleoYzlH4m5WPcchgti5ul+9YD61bcBeXdRfTE7W/HjFM2WWYNJwktj
-         c0TqGSZWbuXeaxuC8IVGZCIbEvLis+cfcgwZmqUKbkWSbsJMndP1JVTxh0iFKPEEngHq
-         Ms+o/AlPtV5HFtHooaM2mId3KMbnBLqtsBVClNCx2MbF3IhIhfcv+KF6hk77PDXsva0n
-         cIydg8VNDA/Cked9AxxHvcwGkQwkvxkLmzHVG5u9U77TzNhLFisoxoWrOUdc/3U/Pvo+
-         Ptxg==
+        id S237206AbhKPFEi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Nov 2021 00:04:38 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:38160 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237191AbhKPFEK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 16 Nov 2021 00:04:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1637038865;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=NZbJVFSsiYxk6JEYO0Xpu55G92qAXMwmH+tm+8XpReU=;
+        b=NB6hh+FGiPwku2/wiMi9NwyVVAOUiF0fgCnPHoVcYd5m58moRIvgAwxc3353c1JTRFTtyF
+        GraPW4LObSO39nkBALnG0bs40jyU4YxWJ+cxIh1e2UyhZ+wwVHT1nwQU9Y1Qw2C6Xf11Je
+        7afVPm3/KXbo+7bUD0pByy6wy9EpsGo=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-103-MStrXWspOz29i_y5STOCIA-1; Tue, 16 Nov 2021 00:01:02 -0500
+X-MC-Unique: MStrXWspOz29i_y5STOCIA-1
+Received: by mail-lf1-f70.google.com with SMTP id s18-20020ac25c52000000b004016bab6a12so7754872lfp.21
+        for <kvm@vger.kernel.org>; Mon, 15 Nov 2021 21:01:02 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent
-         :content-language:to:cc:references:from:organization:subject
-         :in-reply-to:content-transfer-encoding;
-        bh=PhZPKoJfbVoRS8bFL10GXiWbSMVHmrDdqtwYLPzmlFU=;
-        b=8AaGj4cUE62vqoiT58g/0IGYd6TgOPwikWrtKjEBu7YWssld7zel4J9AyAoNU40kIo
-         R2KLskJx6EGdrS1G8g4V71qxv+OZpO21peIcqc+0pq+VRG0hxwAAV6MJltf5EwUJlabl
-         60A1uB3G1TndgyP825JDTY4jGcrZCjmQsRfJLH5CVN+eKBRlPTidUAPfMMrBoF8sTTzG
-         YptRMn3NovfyStPrXvS/w68dCu7mGA7xcHX+cBTPYGGCwNsl1LhmHXBb/w9lfd4LlJOR
-         yv8U+fjF2hI0R2baRzX5o3l7IgeDLP0Wyg0P69/FusyQh6QzS5BGbXd3OFJ1vST3Dzqw
-         VWZg==
-X-Gm-Message-State: AOAM531CL+qN39TXRuMCx6HV6a1jmA/rKs6c9U0KSLabGJfmZr3gifl/
-        fFM9skxukWPQ4zGK4DdErHA=
-X-Google-Smtp-Source: ABdhPJy2g72XCIFfUfr6x0IxtytRu1Wa0QUPp0jOcvEl2CS8pNPeNECeDVu6G8QNrTrijAPi5RXSrQ==
-X-Received: by 2002:a17:902:8544:b0:142:66e7:afbb with SMTP id d4-20020a170902854400b0014266e7afbbmr41990186plo.62.1637032962203;
-        Mon, 15 Nov 2021 19:22:42 -0800 (PST)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id oj11sm643764pjb.46.2021.11.15.19.22.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 15 Nov 2021 19:22:41 -0800 (PST)
-Message-ID: <96170437-1e00-7841-260e-39d181e7886d@gmail.com>
-Date:   Tue, 16 Nov 2021 11:22:31 +0800
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=NZbJVFSsiYxk6JEYO0Xpu55G92qAXMwmH+tm+8XpReU=;
+        b=m8z4LTqyWtn5gNyKdSw5aXTIKhohGSSOPNflVR+WSSDziFji7WJ9T+SKnE8ug2tTfy
+         LQrFL4UySrEjRfIHL656CC4LX/EiVk1ctDJD9puXfRK41299NmwXo0tGQX3fq/cozepo
+         1pD4wWeatsEGUEOYGbrtWsmdAzjORQsllmGXmAjIE66/aMMmOkzqch/pint9J5LFoD3H
+         wpsddzc7h7e+HO1LE9q/Kgld2zCBLbLEMHXSx4B9MyAUwoPfZJ9+5A0PbyC27a7G08/Q
+         lUZVlaXGDJJ/pt1azSgQA2xmuq0uglFmJivlFwXhGTY/d6SBmiTunqUMYmSxYO/xF7uf
+         wh2A==
+X-Gm-Message-State: AOAM532nAVtgixW09OMuvJrhHwvqpz4Y7bG/q8Rp3enQJ086Gd3THgmD
+        ctYKA2/zSeyxVX+4mplSQ8T3ArrWuRPhv81JgA4x/LYGMaijcrQlbtxeka1FaZXplqxhicATR5G
+        LgKDv2DDGdvyewRGfE/nLCuPovHNS
+X-Received: by 2002:ac2:518b:: with SMTP id u11mr3980747lfi.498.1637038861020;
+        Mon, 15 Nov 2021 21:01:01 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwmwi8ZBJDwkdhthf+6U7z0+K409Zl2U1G1z4cKoLh4WJGn9JeAOqnszcmQh+p5V5nQXwNj+ySZvlSCNDXcV2U=
+X-Received: by 2002:ac2:518b:: with SMTP id u11mr3980732lfi.498.1637038860836;
+ Mon, 15 Nov 2021 21:01:00 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.3.0
-Content-Language: en-US
-To:     Jim Mattson <jmattson@google.com>
-Cc:     kvm@vger.kernel.org,
-        "Inc. (kernel-recipes.org)" <pbonzini@redhat.com>
-References: <20211112235235.1125060-1-jmattson@google.com>
- <d4f3b54a-3298-cec3-3193-da46ae9a1f09@gmail.com>
- <CALMp9eQ+dy4TmuNRDipN6XWb4Q0KoEMv6u+-E8b4ypbkpJxdXA@mail.gmail.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-Organization: Tencent
-Subject: Re: [PATCH 0/2] kvm: x86: Fix PMU virtualization for some basic
- events
-In-Reply-To: <CALMp9eQ+dy4TmuNRDipN6XWb4Q0KoEMv6u+-E8b4ypbkpJxdXA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20211115153003.9140-1-arbn@yandex-team.com> <20211115153003.9140-6-arbn@yandex-team.com>
+In-Reply-To: <20211115153003.9140-6-arbn@yandex-team.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Tue, 16 Nov 2021 13:00:50 +0800
+Message-ID: <CACGkMEumax9RFVNgWLv5GyoeQAmwo-UgAq=DrUd4yLxPAUUqBw@mail.gmail.com>
+Subject: Re: [PATCH 6/6] vhost_net: use RCU callbacks instead of synchronize_rcu()
+To:     Andrey Ryabinin <arbn@yandex-team.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        kvm <kvm@vger.kernel.org>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev <netdev@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jim,
+On Mon, Nov 15, 2021 at 11:32 PM Andrey Ryabinin <arbn@yandex-team.com> wrote:
+>
+> Currently vhost_net_release() uses synchronize_rcu() to synchronize
+> freeing with vhost_zerocopy_callback(). However synchronize_rcu()
+> is quite costly operation. It take more than 10 seconds
+> to shutdown qemu launched with couple net devices like this:
+>         -netdev tap,id=tap0,..,vhost=on,queues=80
+> because we end up calling synchronize_rcu() netdev_count*queues times.
+>
+> Free vhost net structures in rcu callback instead of using
+> synchronize_rcu() to fix the problem.
 
-On 16/11/2021 1:51 am, Jim Mattson wrote:
-> On Sun, Nov 14, 2021 at 7:43 PM Like Xu <like.xu.linux@gmail.com> wrote:
->>
->> On 13/11/2021 7:52 am, Jim Mattson wrote:
->>> Google Cloud has a customer that needs accurate virtualization of two
->>> architected PMU events on Intel hardware: "instructions retired" and
->>> "branch instructions retired." The existing PMU virtualization code
->>> fails to account for instructions that are emulated by kvm.
->>
->> Does this customer need to set force_emulation_prefix=Y ?
-> 
-> No. That module parameter does make it easier to write the test, though.
-> 
-> It's possible that the L0 hypervisor will never emulate a branch
-> instruction for this use case. However, since the code being
-> instrumented is potential malware, one can't make the usual
-> assumptions about "well-behaved" code. For example, it is quite
-> possible that the code in question deliberately runs with the TLBs and
-> in-memory page tables out of sync. Therefore, it's hard to prove that
-> the "branch instructions retired" patch isn't needed.
+I admit the release code is somehow hard to understand. But I wonder
+if the following case can still happen with this:
 
-Thanks for your input.
+CPU 0 (vhost_dev_cleanup)   CPU1
+(vhost_net_zerocopy_callback()->vhost_work_queue())
+                                                if (!dev->worker)
+dev->worker = NULL
 
-> 
->> Is this "accurate statistics" capability fatal to the use case ?
-> 
-> Yes, that is my understanding.
+wake_up_process(dev->worker)
 
-Uh, looks like it's right time to do this.
+If this is true. It seems the fix is to move RCU synchronization stuff
+in vhost_net_ubuf_put_and_wait()?
 
-> 
->>>
->>> Accurately virtualizing all PMU events for all microarchitectures is a
->>> herculean task, but there are only 8 architected events, so maybe we
->>> can at least try to get those right.
->>
->> I assume you mean the architectural events "Instruction Retired"
->> and "Branch Instruction Retired" defined by the Intel CPUID
->> since it looks we don't have a similar concept on AMD.
-> 
-> Yes.
-> 
->> This patch set opens Pandora's Box, especially when we have
->> the real accurate Guest PEBS facility, and things get even
->> more complicated for just some PMU corner use cases.
-> 
-> KVM's PMU virtualization is rife with bugs, but this patch set doesn't
-> make that worse. It actually makes things better by fixing two of
-> those bugs.
+Thanks
 
-Yes, I can't agree more.
+>
+> Signed-off-by: Andrey Ryabinin <arbn@yandex-team.com>
+> ---
+>  drivers/vhost/net.c | 22 ++++++++++++++--------
+>  1 file changed, 14 insertions(+), 8 deletions(-)
+>
+> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> index 97a209d6a527..0699d30e83d5 100644
+> --- a/drivers/vhost/net.c
+> +++ b/drivers/vhost/net.c
+> @@ -132,6 +132,7 @@ struct vhost_net {
+>         struct vhost_dev dev;
+>         struct vhost_net_virtqueue vqs[VHOST_NET_VQ_MAX];
+>         struct vhost_poll poll[VHOST_NET_VQ_MAX];
+> +       struct rcu_head rcu;
+>         /* Number of TX recently submitted.
+>          * Protected by tx vq lock. */
+>         unsigned tx_packets;
+> @@ -1389,6 +1390,18 @@ static void vhost_net_flush(struct vhost_net *n)
+>         }
+>  }
+>
+> +static void vhost_net_free(struct rcu_head *rcu_head)
+> +{
+> +       struct vhost_net *n = container_of(rcu_head, struct vhost_net, rcu);
+> +
+> +       kfree(n->vqs[VHOST_NET_VQ_RX].rxq.queue);
+> +       kfree(n->vqs[VHOST_NET_VQ_TX].xdp);
+> +       kfree(n->dev.vqs);
+> +       if (n->page_frag.page)
+> +               __page_frag_cache_drain(n->page_frag.page, n->refcnt_bias);
+> +       kvfree(n);
+> +}
+> +
+>  static int vhost_net_release(struct inode *inode, struct file *f)
+>  {
+>         struct vhost_net *n = f->private_data;
+> @@ -1404,15 +1417,8 @@ static int vhost_net_release(struct inode *inode, struct file *f)
+>                 sockfd_put(tx_sock);
+>         if (rx_sock)
+>                 sockfd_put(rx_sock);
+> -       /* Make sure no callbacks are outstanding */
+> -       synchronize_rcu();
+>
+> -       kfree(n->vqs[VHOST_NET_VQ_RX].rxq.queue);
+> -       kfree(n->vqs[VHOST_NET_VQ_TX].xdp);
+> -       kfree(n->dev.vqs);
+> -       if (n->page_frag.page)
+> -               __page_frag_cache_drain(n->page_frag.page, n->refcnt_bias);
+> -       kvfree(n);
+> +       call_rcu(&n->rcu, vhost_net_free);
+>         return 0;
+>  }
+>
+> --
+> 2.32.0
+>
 
-> 
->>>
->>> Eric Hankland wrote this code originally, but his plate is full, so
->>> I've volunteered to shepherd the changes through upstream acceptance.
->>
->> Does Eric have more code to implement
->> accurate virtualization on the following events ?
-> 
-> No. We only offer PMU virtualization to one customer, and that
-> customer is only interested in the two events addressed by this patch
-> set.
-
-Fine to me and I'll start looking at the code.
-
-> 
->> "UnHalted Core Cycles"
->> "UnHalted Reference Cycles"
->> "LLC Reference"
->> "LLC Misses"
->> "Branch Misses Retired"
->> "Topdown Slots" (unimplemented)
->>
->> Obviously, it's difficult, even absurd, to emulate these.
-> 
-> Sorry; I should not have mentioned the eight architected events. It's
-> not entirely clear what some of these events mean in a virtual
-> environment. Let's just stick to the two events covered by this patch
-> set.
-
-Thanks for the clarification.
-
-> 
->>> Jim Mattson (2):
->>>     KVM: x86: Update vPMCs when retiring instructions
->>>     KVM: x86: Update vPMCs when retiring branch instructions
->>>
->>>    arch/x86/kvm/emulate.c     | 57 +++++++++++++++++++++-----------------
->>>    arch/x86/kvm/kvm_emulate.h |  1 +
->>>    arch/x86/kvm/pmu.c         | 31 +++++++++++++++++++++
->>>    arch/x86/kvm/pmu.h         |  1 +
->>>    arch/x86/kvm/vmx/nested.c  |  6 +++-
->>>    arch/x86/kvm/x86.c         |  5 ++++
->>>    6 files changed, 75 insertions(+), 26 deletions(-)
->>>
