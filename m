@@ -2,44 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 79CA04533C5
-	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 15:11:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E75D94533C4
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 15:11:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237188AbhKPOOJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Nov 2021 09:14:09 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:34974 "EHLO
+        id S237194AbhKPOOG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Nov 2021 09:14:06 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:35000 "EHLO
         smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237089AbhKPON5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S237118AbhKPON5 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 16 Nov 2021 09:13:57 -0500
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 1BC0F218D5;
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 83C9B218D6;
         Tue, 16 Nov 2021 14:10:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
         t=1637071859; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=h0GqcIGnpnR5B9HyGlsx+oTHLVuArYpMacK/DwciFDc=;
-        b=JLI528ddhXdlmWaAfmOcV+nFAhQ983BYWg/HQSMHWnDKIg8+lmhU3kDHz/5fbG1QLgGgwI
-        n3Jv+WKpft/4U+HUjkyIIn76RqHGRPawwbMAO8guPegV+Bvdf48L9f3nYjnnSWL1FetLN2
-        DShVOpFkPARcM8AQTu4nNOFrQh7vVNs=
+        bh=1/Kjxk7P20z4/cSuq8O5K4p1sb9GgHDo99aesOCdltE=;
+        b=H+10kwp1qpOcdlUGsbjydeY2SvSwTR63zx6MPMxsVhYLf/Ce8R8rBzvhFpJPm1Gmet14q5
+        omJsyKflcLJ+lFVScy0QyuRJy6srJRRRImQ7qoQJvdwwShYuBbe65CtrtaC/683MZzkAIq
+        dwQM7KlpLjoT3DPSSQklBGWPvgUTOxg=
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 9BF5213F75;
-        Tue, 16 Nov 2021 14:10:58 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 1F72913BAE;
+        Tue, 16 Nov 2021 14:10:59 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id YGTfJPK7k2ExEQAAMHmgww
-        (envelope-from <jgross@suse.com>); Tue, 16 Nov 2021 14:10:58 +0000
+        id uJ9qBvO7k2ExEQAAMHmgww
+        (envelope-from <jgross@suse.com>); Tue, 16 Nov 2021 14:10:59 +0000
 From:   Juergen Gross <jgross@suse.com>
-To:     kvm@vger.kernel.org, x86@kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     Juergen Gross <jgross@suse.com>, Jonathan Corbet <corbet@lwn.net>,
+To:     kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org
+Cc:     Juergen Gross <jgross@suse.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -50,9 +49,9 @@ Cc:     Juergen Gross <jgross@suse.com>, Jonathan Corbet <corbet@lwn.net>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         "H. Peter Anvin" <hpa@zytor.com>
-Subject: [PATCH v3 1/4] x86/kvm: add boot parameter for adding vcpu-id bits
-Date:   Tue, 16 Nov 2021 15:10:51 +0100
-Message-Id: <20211116141054.17800-2-jgross@suse.com>
+Subject: [PATCH v3 2/4] x86/kvm: introduce a per cpu vcpu mask
+Date:   Tue, 16 Nov 2021 15:10:52 +0100
+Message-Id: <20211116141054.17800-3-jgross@suse.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20211116141054.17800-1-jgross@suse.com>
 References: <20211116141054.17800-1-jgross@suse.com>
@@ -62,205 +61,176 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Today the maximum vcpu-id of a kvm guest's vcpu on x86 systems is set
-via a #define in a header file.
+In order to support high vcpu numbers per guest don't use an on stack
+vcpu bitmask. As this currently used bitmask is not used in functions
+subject to recursion it is fairly easy to replace it with a percpu
+bitmask.
 
-In order to support higher vcpu-ids without generally increasing the
-memory consumption of guests on the host (some guest structures contain
-arrays sized by KVM_MAX_VCPU_IDS) add a boot parameter for adding some
-bits to the vcpu-id. Additional bits are needed as the vcpu-id is
-constructed via bit-wise concatenation of socket-id, core-id, etc.
-As those ids maximum values are not always a power of 2, the vcpu-ids
-are sparse.
+Allocate this bitmask dynamically in order to support boot time
+specified max number of vcpus in future.
 
-The additional number of bits needed is basically the number of
-topology levels with a non-power-of-2 maximum value, excluding the top
-most level.
+Disable preemption while such a bitmask is being used in order to
+avoid double usage in case we'd switch cpus.
 
-The default value of the new parameter will be 2 in order to support
-today's possible topologies. The special value of -1 will use the
-number of bits needed for a guest with the current host's topology.
-
-Calculating the maximum vcpu-id dynamically requires to allocate the
-arrays using KVM_MAX_VCPU_IDS as the size dynamically.
-
-Signed-of-by: Juergen Gross <jgross@suse.com>
----
-V2:
-- switch to specifying additional bits (based on comment by Vitaly
-  Kuznetsov)
-V3:
-- set default of new parameter to 2 (Eduardo Habkost)
-- deliberately NOT add another bit for topology_max_die_per_package()
-  == 1 AND parameter being -1, as this would make this parameter
-  setting always equivalent to specifying "2"
+Note that this doesn't apply to vcpu bitmasks used in hyperv.c, as
+there the max number of vcpus is architecturally limited to 4096 and
+that bitmask can remain on the stack.
 
 Signed-off-by: Juergen Gross <jgross@suse.com>
 ---
- .../admin-guide/kernel-parameters.txt         | 18 ++++++++++++
- arch/x86/include/asm/kvm_host.h               | 16 ++--------
- arch/x86/kvm/ioapic.c                         | 12 +++++++-
- arch/x86/kvm/ioapic.h                         |  4 +--
- arch/x86/kvm/x86.c                            | 29 +++++++++++++++++++
- 5 files changed, 63 insertions(+), 16 deletions(-)
+V2:
+- use local_lock() instead of preempt_disable() (Paolo Bonzini)
+V3:
+- drop hyperv.c related changes (Eduardo Habkost)
+---
+ arch/x86/include/asm/kvm_host.h |  7 +++++++
+ arch/x86/kvm/ioapic.c           |  8 +++++++-
+ arch/x86/kvm/irq_comm.c         |  9 +++++++--
+ arch/x86/kvm/x86.c              | 18 +++++++++++++++++-
+ 4 files changed, 38 insertions(+), 4 deletions(-)
 
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index 9725c546a0d4..e269c3f66ba4 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -2445,6 +2445,24 @@
- 			feature (tagged TLBs) on capable Intel chips.
- 			Default is 1 (enabled)
- 
-+	kvm.vcpu_id_add_bits=
-+			[KVM,X86] The vcpu-ids of guests are sparse, as they
-+			are constructed by bit-wise concatenation of the ids of
-+			the different topology levels (sockets, cores, threads).
-+
-+			This parameter specifies how many additional bits the
-+			maximum vcpu-id needs compared to the maximum number of
-+			vcpus.
-+
-+			Normally this value is the number of topology levels
-+			without the threads level and without the highest
-+			level.
-+
-+			The special value -1 can be used to support guests
-+			with the same topology is the host.
-+
-+			Default: 2
-+
- 	l1d_flush=	[X86,INTEL]
- 			Control mitigation for L1D based snooping vulnerability.
- 
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index e5d8700319cc..bcef56f1039a 100644
+index bcef56f1039a..886930ec8264 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -38,19 +38,7 @@
- #define __KVM_HAVE_ARCH_VCPU_DEBUGFS
+@@ -15,6 +15,7 @@
+ #include <linux/cpumask.h>
+ #include <linux/irq_work.h>
+ #include <linux/irq.h>
++#include <linux/local_lock.h>
  
- #define KVM_MAX_VCPUS 1024
--
--/*
-- * In x86, the VCPU ID corresponds to the APIC ID, and APIC IDs
-- * might be larger than the actual number of VCPUs because the
-- * APIC ID encodes CPU topology information.
-- *
-- * In the worst case, we'll need less than one extra bit for the
-- * Core ID, and less than one extra bit for the Package (Die) ID,
-- * so ratio of 4 should be enough.
-- */
--#define KVM_VCPU_ID_RATIO 4
--#define KVM_MAX_VCPU_IDS (KVM_MAX_VCPUS * KVM_VCPU_ID_RATIO)
--
-+#define KVM_MAX_VCPU_IDS kvm_max_vcpu_ids()
- /* memory slots that are not exposed to userspace */
- #define KVM_PRIVATE_MEM_SLOTS 3
+ #include <linux/kvm.h>
+ #include <linux/kvm_para.h>
+@@ -1612,6 +1613,12 @@ extern bool kvm_has_bus_lock_exit;
+ /* maximum vcpu-id */
+ unsigned int kvm_max_vcpu_ids(void);
  
-@@ -1621,6 +1609,8 @@ extern u64  kvm_max_tsc_scaling_ratio;
- extern u64  kvm_default_tsc_scaling_ratio;
- /* bus lock detection supported? */
- extern bool kvm_has_bus_lock_exit;
-+/* maximum vcpu-id */
-+unsigned int kvm_max_vcpu_ids(void);
- 
++/* per cpu vcpu bitmask, protected by kvm_pcpu_mask_lock */
++DECLARE_PER_CPU(local_lock_t, kvm_pcpu_mask_lock);
++extern unsigned long __percpu *kvm_pcpu_vcpu_mask;
++#define KVM_VCPU_MASK_SZ	\
++	(sizeof(*kvm_pcpu_vcpu_mask) * BITS_TO_LONGS(KVM_MAX_VCPUS))
++
  extern u64 kvm_mce_cap_supported;
  
+ /*
 diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
-index 816a82515dcd..64ba9b1c8b3d 100644
+index 64ba9b1c8b3d..c81963a27594 100644
 --- a/arch/x86/kvm/ioapic.c
 +++ b/arch/x86/kvm/ioapic.c
-@@ -685,11 +685,21 @@ static const struct kvm_io_device_ops ioapic_mmio_ops = {
- int kvm_ioapic_init(struct kvm *kvm)
+@@ -320,7 +320,7 @@ static void ioapic_write_indirect(struct kvm_ioapic *ioapic, u32 val)
+ 	bool mask_before, mask_after;
+ 	union kvm_ioapic_redirect_entry *e;
+ 	int old_remote_irr, old_delivery_status, old_dest_id, old_dest_mode;
+-	DECLARE_BITMAP(vcpu_bitmap, KVM_MAX_VCPUS);
++	unsigned long *vcpu_bitmap;
+ 
+ 	switch (ioapic->ioregsel) {
+ 	case IOAPIC_REG_VERSION:
+@@ -384,6 +384,10 @@ static void ioapic_write_indirect(struct kvm_ioapic *ioapic, u32 val)
+ 			irq.shorthand = APIC_DEST_NOSHORT;
+ 			irq.dest_id = e->fields.dest_id;
+ 			irq.msi_redir_hint = false;
++
++			local_lock(&kvm_pcpu_mask_lock);
++
++			vcpu_bitmap = this_cpu_ptr(kvm_pcpu_vcpu_mask);
+ 			bitmap_zero(vcpu_bitmap, KVM_MAX_VCPUS);
+ 			kvm_bitmap_or_dest_vcpus(ioapic->kvm, &irq,
+ 						 vcpu_bitmap);
+@@ -403,6 +407,8 @@ static void ioapic_write_indirect(struct kvm_ioapic *ioapic, u32 val)
+ 			}
+ 			kvm_make_scan_ioapic_request_mask(ioapic->kvm,
+ 							  vcpu_bitmap);
++
++			local_unlock(&kvm_pcpu_mask_lock);
+ 		} else {
+ 			kvm_make_scan_ioapic_request(ioapic->kvm);
+ 		}
+diff --git a/arch/x86/kvm/irq_comm.c b/arch/x86/kvm/irq_comm.c
+index d5b72a08e566..c331204de007 100644
+--- a/arch/x86/kvm/irq_comm.c
++++ b/arch/x86/kvm/irq_comm.c
+@@ -47,7 +47,7 @@ int kvm_irq_delivery_to_apic(struct kvm *kvm, struct kvm_lapic *src,
  {
- 	struct kvm_ioapic *ioapic;
-+	size_t sz;
- 	int ret;
+ 	int i, r = -1;
+ 	struct kvm_vcpu *vcpu, *lowest = NULL;
+-	unsigned long dest_vcpu_bitmap[BITS_TO_LONGS(KVM_MAX_VCPUS)];
++	unsigned long *dest_vcpu_bitmap;
+ 	unsigned int dest_vcpus = 0;
  
--	ioapic = kzalloc(sizeof(struct kvm_ioapic), GFP_KERNEL_ACCOUNT);
-+	sz = sizeof(struct kvm_ioapic) +
-+	     sizeof(*ioapic->rtc_status.dest_map.map) *
-+		    BITS_TO_LONGS(KVM_MAX_VCPU_IDS) +
-+	     sizeof(*ioapic->rtc_status.dest_map.vectors) *
-+		    (KVM_MAX_VCPU_IDS);
-+	ioapic = kzalloc(sz, GFP_KERNEL_ACCOUNT);
- 	if (!ioapic)
- 		return -ENOMEM;
-+	ioapic->rtc_status.dest_map.map = (void *)(ioapic + 1);
-+	ioapic->rtc_status.dest_map.vectors =
-+		(void *)(ioapic->rtc_status.dest_map.map +
-+			 BITS_TO_LONGS(KVM_MAX_VCPU_IDS));
- 	spin_lock_init(&ioapic->lock);
- 	INIT_DELAYED_WORK(&ioapic->eoi_inject, kvm_ioapic_eoi_inject_work);
- 	kvm->arch.vioapic = ioapic;
-diff --git a/arch/x86/kvm/ioapic.h b/arch/x86/kvm/ioapic.h
-index e66e620c3bed..623a3c5afad7 100644
---- a/arch/x86/kvm/ioapic.h
-+++ b/arch/x86/kvm/ioapic.h
-@@ -39,13 +39,13 @@ struct kvm_vcpu;
+ 	if (kvm_irq_delivery_to_apic_fast(kvm, src, irq, &r, dest_map))
+@@ -59,7 +59,10 @@ int kvm_irq_delivery_to_apic(struct kvm *kvm, struct kvm_lapic *src,
+ 		irq->delivery_mode = APIC_DM_FIXED;
+ 	}
  
- struct dest_map {
- 	/* vcpu bitmap where IRQ has been sent */
--	DECLARE_BITMAP(map, KVM_MAX_VCPU_IDS);
-+	unsigned long *map;
+-	memset(dest_vcpu_bitmap, 0, sizeof(dest_vcpu_bitmap));
++	local_lock(&kvm_pcpu_mask_lock);
++	dest_vcpu_bitmap = this_cpu_ptr(kvm_pcpu_vcpu_mask);
++
++	memset(dest_vcpu_bitmap, 0, KVM_VCPU_MASK_SZ);
  
- 	/*
- 	 * Vector sent to a given vcpu, only valid when
- 	 * the vcpu's bit in map is set
- 	 */
--	u8 vectors[KVM_MAX_VCPU_IDS];
-+	u8 *vectors;
- };
+ 	kvm_for_each_vcpu(i, vcpu, kvm) {
+ 		if (!kvm_apic_present(vcpu))
+@@ -93,6 +96,8 @@ int kvm_irq_delivery_to_apic(struct kvm *kvm, struct kvm_lapic *src,
+ 		lowest = kvm_get_vcpu(kvm, idx);
+ 	}
  
++	local_unlock(&kvm_pcpu_mask_lock);
++
+ 	if (lowest)
+ 		r = kvm_apic_set_irq(lowest, irq, dest_map);
  
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 259f719014c9..61bab2bdeefb 100644
+index 61bab2bdeefb..a388acdc5eb0 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -80,6 +80,7 @@
- #include <asm/intel_pt.h>
- #include <asm/emulate_prefix.h>
- #include <asm/sgx.h>
-+#include <asm/topology.h>
- #include <clocksource/hyperv_timer.h>
+@@ -215,6 +215,10 @@ unsigned int kvm_max_vcpu_ids(void)
+ }
+ EXPORT_SYMBOL_GPL(kvm_max_vcpu_ids);
  
- #define CREATE_TRACE_POINTS
-@@ -186,6 +187,34 @@ module_param(force_emulation_prefix, bool, S_IRUGO);
- int __read_mostly pi_inject_timer = -1;
- module_param(pi_inject_timer, bint, S_IRUGO | S_IWUSR);
- 
-+static int __read_mostly vcpu_id_add_bits = 2;
-+module_param(vcpu_id_add_bits, int, S_IRUGO);
-+
-+unsigned int kvm_max_vcpu_ids(void)
-+{
-+	int n_bits = fls(KVM_MAX_VCPUS - 1);
-+
-+	if (vcpu_id_add_bits < -1 || vcpu_id_add_bits > (32 - n_bits)) {
-+		pr_err("Invalid value of vcpu_id_add_bits=%d parameter!\n",
-+		       vcpu_id_add_bits);
-+		vcpu_id_add_bits = 2;
-+	}
-+
-+	if (vcpu_id_add_bits >= 0) {
-+		n_bits += vcpu_id_add_bits;
-+	} else {
-+		n_bits++;		/* One additional bit for core level. */
-+		if (topology_max_die_per_package() > 1)
-+			n_bits++;	/* One additional bit for die level. */
-+	}
-+
-+	if (!n_bits)
-+		n_bits = 1;
-+
-+	return 1U << n_bits;
-+}
-+EXPORT_SYMBOL_GPL(kvm_max_vcpu_ids);
++DEFINE_PER_CPU(local_lock_t, kvm_pcpu_mask_lock) =
++	INIT_LOCAL_LOCK(kvm_pcpu_mask_lock);
++unsigned long __percpu *kvm_pcpu_vcpu_mask;
 +
  /*
   * Restoring the host value for MSRs that are only consumed when running in
   * usermode, e.g. SYSCALL MSRs and TSC_AUX, can be deferred until the CPU
+@@ -11247,9 +11251,16 @@ int kvm_arch_hardware_setup(void *opaque)
+ 	if (boot_cpu_has(X86_FEATURE_XSAVES))
+ 		rdmsrl(MSR_IA32_XSS, host_xss);
+ 
++	kvm_pcpu_vcpu_mask = __alloc_percpu(KVM_VCPU_MASK_SZ,
++					    sizeof(unsigned long));
++	if (!kvm_pcpu_vcpu_mask) {
++		r = -ENOMEM;
++		goto err;
++	}
++
+ 	r = ops->hardware_setup();
+ 	if (r != 0)
+-		return r;
++		goto err;
+ 
+ 	memcpy(&kvm_x86_ops, ops->runtime_ops, sizeof(kvm_x86_ops));
+ 	kvm_ops_static_call_update();
+@@ -11277,11 +11288,16 @@ int kvm_arch_hardware_setup(void *opaque)
+ 
+ 	kvm_init_msr_list();
+ 	return 0;
++
++ err:
++	free_percpu(kvm_pcpu_vcpu_mask);
++	return r;
+ }
+ 
+ void kvm_arch_hardware_unsetup(void)
+ {
+ 	static_call(kvm_x86_hardware_unsetup)();
++	free_percpu(kvm_pcpu_vcpu_mask);
+ }
+ 
+ int kvm_arch_check_processor_compat(void *opaque)
 -- 
 2.26.2
 
