@@ -2,170 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 44A2945347B
-	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 15:41:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1588A453486
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 15:42:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237492AbhKPOni (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Nov 2021 09:43:38 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:37170 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237634AbhKPOmu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Nov 2021 09:42:50 -0500
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 45AB02171F;
-        Tue, 16 Nov 2021 14:39:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1637073591; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
+        id S237716AbhKPOpT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Nov 2021 09:45:19 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22458 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237796AbhKPOoY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 16 Nov 2021 09:44:24 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1637073685;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=5Emkp3ncKzdkgLkKn49m2PKxs/r574HeH3hwAVh72iw=;
-        b=o6p+tfWoQjEX7Tf0zL7HstYS41Q25rGUCkRxy2fZC57AXkmLEJ5Tp1yv4dDlL3MrmYhWxa
-        lr+rDs7a9JYIQAB0v2IyeOEL2SyguOnJwTfXqzimKwkW/P/AR3iT16pQPRWteQox79HVJt
-        BjPYEMohRiaWxxBn+TeOf0VjwEU7quo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1637073591;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5Emkp3ncKzdkgLkKn49m2PKxs/r574HeH3hwAVh72iw=;
-        b=oSNyWbiaffOLqZbxHTHtqG94j8F5n4l34KDHIN4lglj2R9OkOcY2Z9pHpT1L5Y9TNvidnI
-        qw0SNz5TglyxdkBQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 9DE7313C25;
-        Tue, 16 Nov 2021 14:39:50 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 2/UQIrbCk2HhHQAAMHmgww
-        (envelope-from <dkirjanov@suse.de>); Tue, 16 Nov 2021 14:39:50 +0000
-Subject: Re: [PATCH 1/6] vhost: get rid of vhost_poll_flush() wrapper
-To:     Andrey Ryabinin <arbn@yandex-team.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>, kvm@vger.kernel.org,
+        bh=AfHc271RXOUnz4mYvex1noJIxI7ZHKxUfmBIzMbPzoE=;
+        b=iPAQuoLAgIFKF32cXr6pC+7DmO4BOT/c3Bx82OAq8x68XvsDlEgFPzF+f6hwfm7Ruix08k
+        w2GRV1Jg/CCbPIciXFdJojbgGu8e3PiPjIdKOvxO0VMFaI0cPi378OnqZvuWh9SOgEGfIQ
+        +2i682iPuNB42P85Te9OqXaV5rcMOjc=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-236-ocHARUJ4MqK-PQUhRGSIPg-1; Tue, 16 Nov 2021 09:41:24 -0500
+X-MC-Unique: ocHARUJ4MqK-PQUhRGSIPg-1
+Received: by mail-ed1-f71.google.com with SMTP id w13-20020a05640234cd00b003e2fde5ff8aso17305929edc.14
+        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 06:41:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=AfHc271RXOUnz4mYvex1noJIxI7ZHKxUfmBIzMbPzoE=;
+        b=5hGQeETnZXTL5TNF0nAaQO8cTFNXlni0PZoOwxd4b+CzuntcMCuc1yw6A9PF6kiHxZ
+         lTbdbD8W6/sRbGUXN6LKIUNHXFvtkclKzKH2I/DXjw528qMj5EF+IHWxWvYiVn9PUH34
+         Cfw+cPAPfd/E4GHMVZbgcVzcI7OTEVzvFWCGNMwZ2z1nB/qoRQkxi1IuCAQoJCtob+Eu
+         ATRHFCqmPMbBe3vacwUUh5U8+ekkgbPpimBXC3QNZOso2QOHlQuVX6AEm+E11QZpA0eS
+         o0bgpKYAiKj3grU9Wv+8BVo4ou102zLm4TfXJ0O1jna8JKpY7DRQaSls07z1lGwPjn3T
+         hxvA==
+X-Gm-Message-State: AOAM532fXrwqtOAC035X0NakN1d5EvTn67OCluhPQDZOGznIcxNs9Jlt
+        MZutiuHW3gIgDtxwNoKuONBPWE/KgshnG81SJHiwCRUZcsgRF9a58CpDrqN01lwSkcFsYHtmoJH
+        C8dzLdwsBmd9m
+X-Received: by 2002:a50:f18a:: with SMTP id x10mr10933211edl.193.1637073683466;
+        Tue, 16 Nov 2021 06:41:23 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxB2sbwGvYxWKbC+UMKYgg2LVMQ3q254bvGdk6QiC2h+UbWm6XEbEkZoXht5LV0mMQvzs1Y0Q==
+X-Received: by 2002:a50:f18a:: with SMTP id x10mr10933184edl.193.1637073683291;
+        Tue, 16 Nov 2021 06:41:23 -0800 (PST)
+Received: from steredhat (host-87-10-72-39.retail.telecomitalia.it. [87.10.72.39])
+        by smtp.gmail.com with ESMTPSA id hv13sm8368872ejc.75.2021.11.16.06.41.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Nov 2021 06:41:22 -0800 (PST)
+Date:   Tue, 16 Nov 2021 15:41:19 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Andrey Ryabinin <arbn@yandex-team.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/6] vhost: get rid of vhost_poll_flush() wrapper
+Message-ID: <20211116144119.56ph52twuyc4jtdr@steredhat>
 References: <20211115153003.9140-1-arbn@yandex-team.com>
-From:   Denis Kirjanov <dkirjanov@suse.de>
-Message-ID: <02b1d549-9c67-7d05-0bb6-4d018106eff5@suse.de>
-Date:   Tue, 16 Nov 2021 17:39:49 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
 In-Reply-To: <20211115153003.9140-1-arbn@yandex-team.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: ru
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Nov 15, 2021 at 06:29:58PM +0300, Andrey Ryabinin wrote:
+>vhost_poll_flush() is a simple wrapper around vhost_work_dev_flush().
+>It gives wrong impression that we are doing some work over vhost_poll,
+>while in fact it flushes vhost_poll->dev.
+>It only complicate understanding of the code and leads to mistakes
+>like flushing the same vhost_dev several times in a row.
+>
+>Just remove vhost_poll_flush() and call vhost_work_dev_flush() directly.
+>
+>Signed-off-by: Andrey Ryabinin <arbn@yandex-team.com>
+>---
+> drivers/vhost/net.c   |  4 ++--
+> drivers/vhost/test.c  |  2 +-
+> drivers/vhost/vhost.c | 12 ++----------
+> drivers/vhost/vsock.c |  2 +-
+> 4 files changed, 6 insertions(+), 14 deletions(-)
+>
+>diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+>index 28ef323882fb..11221f6d11b8 100644
+>--- a/drivers/vhost/net.c
+>+++ b/drivers/vhost/net.c
+>@@ -1375,8 +1375,8 @@ static void vhost_net_stop(struct vhost_net *n, struct socket **tx_sock,
+>
+> static void vhost_net_flush_vq(struct vhost_net *n, int index)
+> {
+>-	vhost_poll_flush(n->poll + index);
+>-	vhost_poll_flush(&n->vqs[index].vq.poll);
+>+	vhost_work_dev_flush(n->poll[index].dev);
+>+	vhost_work_dev_flush(n->vqs[index].vq.poll.dev);
+> }
+>
+> static void vhost_net_flush(struct vhost_net *n)
+>diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
+>index a09dedc79f68..1a8ab1d8cb1c 100644
+>--- a/drivers/vhost/test.c
+>+++ b/drivers/vhost/test.c
+>@@ -146,7 +146,7 @@ static void vhost_test_stop(struct vhost_test *n, void **privatep)
+>
+> static void vhost_test_flush_vq(struct vhost_test *n, int index)
+> {
+>-	vhost_poll_flush(&n->vqs[index].poll);
+>+	vhost_work_dev_flush(n->vqs[index].poll.dev);
+> }
+>
+> static void vhost_test_flush(struct vhost_test *n)
+>diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+>index 59edb5a1ffe2..ca088481da0e 100644
+>--- a/drivers/vhost/vhost.c
+>+++ b/drivers/vhost/vhost.c
+>@@ -245,14 +245,6 @@ void vhost_work_dev_flush(struct vhost_dev *dev)
+> }
+> EXPORT_SYMBOL_GPL(vhost_work_dev_flush);
+>
+>-/* Flush any work that has been scheduled. When calling this, don't hold any
+>- * locks that are also used by the callback. */
+>-void vhost_poll_flush(struct vhost_poll *poll)
+>-{
+>-	vhost_work_dev_flush(poll->dev);
+>-}
+>-EXPORT_SYMBOL_GPL(vhost_poll_flush);
+>-
+> void vhost_work_queue(struct vhost_dev *dev, struct vhost_work *work)
+> {
+> 	if (!dev->worker)
+>@@ -663,7 +655,7 @@ void vhost_dev_stop(struct vhost_dev *dev)
+> 	for (i = 0; i < dev->nvqs; ++i) {
+> 		if (dev->vqs[i]->kick && dev->vqs[i]->handle_kick) {
+> 			vhost_poll_stop(&dev->vqs[i]->poll);
+>-			vhost_poll_flush(&dev->vqs[i]->poll);
+>+			vhost_work_dev_flush(dev->vqs[i]->poll.dev);
 
+Not related to this patch, but while looking at vhost-vsock I'm 
+wondering if we can do the same here in vhost_dev_stop(), I mean move 
+vhost_work_dev_flush() outside the loop and and call it once. (In 
+another patch eventually)
 
-11/15/21 6:29 PM, Andrey Ryabinin пишет:
-> vhost_poll_flush() is a simple wrapper around vhost_work_dev_flush().
-> It gives wrong impression that we are doing some work over vhost_poll,
-> while in fact it flushes vhost_poll->dev.
-> It only complicate understanding of the code and leads to mistakes
-> like flushing the same vhost_dev several times in a row.
-> 
-> Just remove vhost_poll_flush() and call vhost_work_dev_flush() directly.
+Stefano
 
-Then you should send the series prefixed with net-next
-
-> 
-> Signed-off-by: Andrey Ryabinin <arbn@yandex-team.com>
-> ---
->   drivers/vhost/net.c   |  4 ++--
->   drivers/vhost/test.c  |  2 +-
->   drivers/vhost/vhost.c | 12 ++----------
->   drivers/vhost/vsock.c |  2 +-
->   4 files changed, 6 insertions(+), 14 deletions(-)
-> 
-> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-> index 28ef323882fb..11221f6d11b8 100644
-> --- a/drivers/vhost/net.c
-> +++ b/drivers/vhost/net.c
-> @@ -1375,8 +1375,8 @@ static void vhost_net_stop(struct vhost_net *n, struct socket **tx_sock,
->   
->   static void vhost_net_flush_vq(struct vhost_net *n, int index)
->   {
-> -	vhost_poll_flush(n->poll + index);
-> -	vhost_poll_flush(&n->vqs[index].vq.poll);
-> +	vhost_work_dev_flush(n->poll[index].dev);
-> +	vhost_work_dev_flush(n->vqs[index].vq.poll.dev);
->   }
->   
->   static void vhost_net_flush(struct vhost_net *n)
-> diff --git a/drivers/vhost/test.c b/drivers/vhost/test.c
-> index a09dedc79f68..1a8ab1d8cb1c 100644
-> --- a/drivers/vhost/test.c
-> +++ b/drivers/vhost/test.c
-> @@ -146,7 +146,7 @@ static void vhost_test_stop(struct vhost_test *n, void **privatep)
->   
->   static void vhost_test_flush_vq(struct vhost_test *n, int index)
->   {
-> -	vhost_poll_flush(&n->vqs[index].poll);
-> +	vhost_work_dev_flush(n->vqs[index].poll.dev);
->   }
->   
->   static void vhost_test_flush(struct vhost_test *n)
-> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> index 59edb5a1ffe2..ca088481da0e 100644
-> --- a/drivers/vhost/vhost.c
-> +++ b/drivers/vhost/vhost.c
-> @@ -245,14 +245,6 @@ void vhost_work_dev_flush(struct vhost_dev *dev)
->   }
->   EXPORT_SYMBOL_GPL(vhost_work_dev_flush);
->   
-> -/* Flush any work that has been scheduled. When calling this, don't hold any
-> - * locks that are also used by the callback. */
-> -void vhost_poll_flush(struct vhost_poll *poll)
-> -{
-> -	vhost_work_dev_flush(poll->dev);
-> -}
-> -EXPORT_SYMBOL_GPL(vhost_poll_flush);
-> -
->   void vhost_work_queue(struct vhost_dev *dev, struct vhost_work *work)
->   {
->   	if (!dev->worker)
-> @@ -663,7 +655,7 @@ void vhost_dev_stop(struct vhost_dev *dev)
->   	for (i = 0; i < dev->nvqs; ++i) {
->   		if (dev->vqs[i]->kick && dev->vqs[i]->handle_kick) {
->   			vhost_poll_stop(&dev->vqs[i]->poll);
-> -			vhost_poll_flush(&dev->vqs[i]->poll);
-> +			vhost_work_dev_flush(dev->vqs[i]->poll.dev);
->   		}
->   	}
->   }
-> @@ -1712,7 +1704,7 @@ long vhost_vring_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *arg
->   	mutex_unlock(&vq->mutex);
->   
->   	if (pollstop && vq->handle_kick)
-> -		vhost_poll_flush(&vq->poll);
-> +		vhost_work_dev_flush(vq->poll.dev);
->   	return r;
->   }
->   EXPORT_SYMBOL_GPL(vhost_vring_ioctl);
-> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-> index 938aefbc75ec..b0361ebbd695 100644
-> --- a/drivers/vhost/vsock.c
-> +++ b/drivers/vhost/vsock.c
-> @@ -711,7 +711,7 @@ static void vhost_vsock_flush(struct vhost_vsock *vsock)
->   
->   	for (i = 0; i < ARRAY_SIZE(vsock->vqs); i++)
->   		if (vsock->vqs[i].handle_kick)
-> -			vhost_poll_flush(&vsock->vqs[i].poll);
-> +			vhost_work_dev_flush(vsock->vqs[i].poll.dev);
->   	vhost_work_dev_flush(&vsock->dev);
->   }
->   
-> 
