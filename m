@@ -2,123 +2,189 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 450FD452C8A
-	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 09:16:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CBF28452D4B
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 09:56:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231774AbhKPITM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Nov 2021 03:19:12 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47244 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231405AbhKPITM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 16 Nov 2021 03:19:12 -0500
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1AG7KZHF024383;
-        Tue, 16 Nov 2021 08:15:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=CfrWYVK/WWUx2FkE6O2ernHb54WT2Dsdlt0HTCGPt+w=;
- b=f0TBohjdWu+iuJrqMrr3R+j6zBNzfqH8j7EEQO7V49x7A5Pll0a6HHEijwy/4eZuLrFF
- BRG1zq9QewkxR7PY0vPizivDqBVB5z/vmi7CeXawPgV8W/+NyMraum4+4EL5L9CB/0Cn
- vqSJl8S6UVr9bF790zrEpVgBMEM2e7zZM3e0OPBsW378Js0iJBKmQCex5bVPzHItEyzl
- 0kUGt8FgsE5FX2e+9nZPgGPCqPsiguv8V8dBj9k60QN3JLBf678bdC1CaDVgGIeBPugb
- BwJzbTdm1liutRvChFPAxtost/N44Cs2Qh5ozJqgYILooTJ5aWLsY2Y/HWWqGHPh8Ki1 ZA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cc4j2mu6r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 16 Nov 2021 08:15:51 +0000
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1AG7c4OW006712;
-        Tue, 16 Nov 2021 08:15:51 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cc4j2mu5p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 16 Nov 2021 08:15:51 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1AG8C17h001896;
-        Tue, 16 Nov 2021 08:15:48 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma04ams.nl.ibm.com with ESMTP id 3ca50avrcx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 16 Nov 2021 08:15:48 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1AG8FirP4522606
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 16 Nov 2021 08:15:44 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AC33E52054;
-        Tue, 16 Nov 2021 08:15:44 +0000 (GMT)
-Received: from [9.171.18.51] (unknown [9.171.18.51])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 588DA52051;
-        Tue, 16 Nov 2021 08:15:43 +0000 (GMT)
-Message-ID: <d7547cab-88d6-18a9-8307-bf2cc5d61163@de.ibm.com>
-Date:   Tue, 16 Nov 2021 09:15:43 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH 0/5] KVM: Cap KVM_CAP_NR_VCPUS by KVM_CAP_MAX_VCPUS and
- re-purpose it on x86
-Content-Language: en-US
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
+        id S232678AbhKPI7R (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Nov 2021 03:59:17 -0500
+Received: from mga09.intel.com ([134.134.136.24]:47301 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232690AbhKPI7O (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Nov 2021 03:59:14 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10169"; a="233487248"
+X-IronPort-AV: E=Sophos;i="5.87,238,1631602800"; 
+   d="scan'208";a="233487248"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2021 00:56:17 -0800
+X-IronPort-AV: E=Sophos;i="5.87,238,1631602800"; 
+   d="scan'208";a="494382847"
+Received: from gao-cwp.sh.intel.com (HELO gao-cwp) ([10.239.159.99])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2021 00:56:12 -0800
+Date:   Tue, 16 Nov 2021 17:06:05 +0800
+From:   Chao Gao <chao.gao@intel.com>
+To:     zhenwei pi <pizhenwei@bytedance.com>
+Cc:     Wanpeng Li <kernellwp@gmail.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Kele Huang <huangkele@bytedance.com>, chaiwen.cc@bytedance.com,
+        xieyongji@bytedance.com, dengliang.1214@bytedance.com,
         Wanpeng Li <wanpengli@tencent.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Jim Mattson <jmattson@google.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Michael Ellerman <mpe@ellerman.id.au>, kvm-ppc@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-References: <20211111162746.100598-1-vkuznets@redhat.com>
- <4a3c7be7-12fa-6e47-64eb-02e6c5be5dbc@redhat.com>
- <ecd55383-7089-b3cd-30cc-3f9feb7eadb4@de.ibm.com> <877dd9pfri.fsf@redhat.com>
-From:   Christian Borntraeger <borntraeger@de.ibm.com>
-In-Reply-To: <877dd9pfri.fsf@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: LcLtdeI1wcxvnUw1x1mtWpHDxGmneBxm
-X-Proofpoint-ORIG-GUID: q5QSO4swu95OL1X3UIEGk2E0NE9OQf1Y
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-11-15_16,2021-11-15_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 impostorscore=0
- adultscore=0 clxscore=1015 priorityscore=1501 phishscore=0 malwarescore=0
- mlxscore=0 mlxlogscore=999 suspectscore=0 lowpriorityscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
- definitions=main-2111160041
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Subject: Re: Re: [RFC] KVM: x86: SVM: don't expose PV_SEND_IPI feature with
+ AVIC
+Message-ID: <20211116090604.GA12758@gao-cwp>
+References: <20211108095931.618865-1-huangkele@bytedance.com>
+ <a991bbb4-b507-a2f6-ec0f-fce23d4379ce@redhat.com>
+ <f93612f54a5cde53fd9342f703ccbaf3c9edbc9c.camel@redhat.com>
+ <CANRm+Cze_b0PJzOGB4-tPdrz-iHcJj-o7QL1t1Pf1083nJDQKQ@mail.gmail.com>
+ <d65fbd73-7612-8348-2fd8-8da0f5e2a3c0@bytedance.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d65fbd73-7612-8348-2fd8-8da0f5e2a3c0@bytedance.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Nov 16, 2021 at 10:56:25AM +0800, zhenwei pi wrote:
+>
+>
+>On 11/16/21 10:48 AM, Wanpeng Li wrote:
+>> On Mon, 8 Nov 2021 at 22:09, Maxim Levitsky <mlevitsk@redhat.com> wrote:
+>> > 
+>> > On Mon, 2021-11-08 at 11:30 +0100, Paolo Bonzini wrote:
+>> > > On 11/8/21 10:59, Kele Huang wrote:
+>> > > > Currently, AVIC is disabled if x2apic feature is exposed to guest
+>> > > > or in-kernel PIT is in re-injection mode.
+>> > > > 
+>> > > > We can enable AVIC with options:
+>> > > > 
+>> > > >     Kmod args:
+>> > > >     modprobe kvm_amd avic=1 nested=0 npt=1
+>> > > >     QEMU args:
+>> > > >     ... -cpu host,-x2apic -global kvm-pit.lost_tick_policy=discard ...
+>> > > > 
+>> > > > When LAPIC works in xapic mode, both AVIC and PV_SEND_IPI feature
+>> > > > can accelerate IPI operations for guest. However, the relationship
+>> > > > between AVIC and PV_SEND_IPI feature is not sorted out.
+>> > > > 
+>> > > > In logical, AVIC accelerates most of frequently IPI operations
+>> > > > without VMM intervention, while the re-hooking of apic->send_IPI_xxx
+>> > > > from PV_SEND_IPI feature masks out it. People can get confused
+>> > > > if AVIC is enabled while getting lots of hypercall kvm_exits
+>> > > > from IPI.
+>> > > > 
+>> > > > In performance, benchmark tool
+>> > > > https://lore.kernel.org/kvm/20171219085010.4081-1-ynorov@caviumnetworks.com/
+>> > > > shows below results:
+>> > > > 
+>> > > >     Test env:
+>> > > >     CPU: AMD EPYC 7742 64-Core Processor
+>> > > >     2 vCPUs pinned 1:1
+>> > > >     idle=poll
+>> > > > 
+>> > > >     Test result (average ns per IPI of lots of running):
+>> > > >     PV_SEND_IPI      : 1860
+>> > > >     AVIC             : 1390
+>> > > > 
+>> > > > Besides, disscussions in https://lkml.org/lkml/2021/10/20/423
+>> > > > do have some solid performance test results to this.
+>> > > > 
+>> > > > This patch fixes this by masking out PV_SEND_IPI feature when
+>> > > > AVIC is enabled in setting up of guest vCPUs' CPUID.
+>> > > > 
+>> > > > Signed-off-by: Kele Huang <huangkele@bytedance.com>
+>> > > 
+>> > > AVIC can change across migration.  I think we should instead use a new
+>> > > KVM_HINTS_* bit (KVM_HINTS_ACCELERATED_LAPIC or something like that).
+>> > > The KVM_HINTS_* bits are intended to be changeable across migration,
+>> > > even though we don't have for now anything equivalent to the Hyper-V
+>> > > reenlightenment interrupt.
+>> > 
+>> > Note that the same issue exists with HyperV. It also has PV APIC,
+>> > which is harmful when AVIC is enabled (that is guest uses it instead
+>> > of using AVIC, negating AVIC benefits).
+>> > 
+>> > Also note that Intel recently posted IPI virtualizaion, which
+>> > will make this issue relevant to APICv too soon.
+>> 
+>> The recently posted Intel IPI virtualization will accelerate unicast
+>> ipi but not broadcast ipis, AMD AVIC accelerates unicast ipi well but
+>> accelerates broadcast ipis worse than pv ipis. Could we just handle
+>> unicast ipi here?
+>> 
+>>      Wanpeng
+>> 
+>Depend on the number of target vCPUs, broadcast IPIs gets unstable
+>performance on AVIC, and usually worse than PV Send IPI.
+>So agree with Wanpeng's point, is it possible to separate single IPI and
+>broadcast IPI on a hardware acceleration platform?
+
+Actually, this is how kernel works in x2apic mode: use PV interface
+(hypercall) to send multi-cast IPIs and write ICR MSR directly to send
+unicast IPIs.
+
+But if guest works in xapic mode, both unicast and multi-cast are issued
+via PV interface. It is a side-effect introduced by commit aaffcfd1e82d.
+
+how about just correcting the logic for xapic:
+
+From 13447b221252b64cd85ed1329f7d917afa54efc8 Mon Sep 17 00:00:00 2001
+From: Jiaqing Zhao <jiaqing.zhao@intel.com>
+Date: Fri, 9 Apr 2021 13:53:39 +0800
+Subject: [PATCH 1/2] x86/apic/flat: Add specific send IPI logic
+
+Currently, apic_flat.send_IPI() uses default_send_IPI_single(), which
+is a wrapper of apic->send_IPI_mask(). Since commit aaffcfd1e82d
+("KVM: X86: Implement PV IPIs in linux guest"), KVM PV IPI driver will
+override apic->send_IPI_mask(), and may cause unwated side effects.
+
+This patch removes such side effects by creating a specific send_IPI
+method.
+
+Signed-off-by: Jiaqing Zhao <jiaqing.zhao@intel.com>
+---
+ arch/x86/kernel/apic/apic_flat_64.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/kernel/apic/apic_flat_64.c b/arch/x86/kernel/apic/apic_flat_64.c
+index 8f72b4351c9f..3196bf220230 100644
+--- a/arch/x86/kernel/apic/apic_flat_64.c
++++ b/arch/x86/kernel/apic/apic_flat_64.c
+@@ -64,6 +64,13 @@ static void flat_send_IPI_mask(const struct cpumask *cpumask, int vector)
+ 	_flat_send_IPI_mask(mask, vector);
+ }
+
++static void flat_send_IPI_single(int cpu, int vector)
++{
++	unsigned long mask = cpumask_bits(cpumask_of(cpu))[0];
++
++	_flat_send_IPI_mask(mask, vector);
++}
++
+ static void
+ flat_send_IPI_mask_allbutself(const struct cpumask *cpumask, int vector)
+ {
+@@ -132,7 +139,7 @@ static struct apic apic_flat __ro_after_init = {
+
+ 	.calc_dest_apicid		= apic_flat_calc_apicid,
+
+-	.send_IPI			= default_send_IPI_single,
++	.send_IPI			= flat_send_IPI_single,
+ 	.send_IPI_mask			= flat_send_IPI_mask,
+ 	.send_IPI_mask_allbutself	= flat_send_IPI_mask_allbutself,
+ 	.send_IPI_allbutself		= default_send_IPI_allbutself,
+--
+2.27.0
 
 
-Am 15.11.21 um 17:04 schrieb Vitaly Kuznetsov:
-[...]
-> or cap KVM_CAP_MAX_VCPUS value with num_online_cpus(), e.g.
-> 
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 6a6dd5e1daf6..1cfe36f6432e 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -585,6 +585,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->                          r = KVM_MAX_VCPUS;
->                  else if (sclp.has_esca && sclp.has_64bscao)
->                          r = KVM_S390_ESCA_CPU_SLOTS;
-> +               if (ext == KVM_CAP_NR_VCPUS)
-> +                       r = min_t(unsigned int, num_online_cpus(), r);
->                  break;
->          case KVM_CAP_S390_COW:
->                  r = MACHINE_HAS_ESOP;
-
-Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
-
-
-I think this is the better variant. Thanks.
