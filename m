@@ -2,122 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 43250453ABD
-	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 21:14:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C4A1B453AD0
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 21:19:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229877AbhKPURh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Nov 2021 15:17:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35042 "EHLO
+        id S229563AbhKPUW2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Nov 2021 15:22:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229447AbhKPURh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Nov 2021 15:17:37 -0500
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07972C061746
-        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 12:14:40 -0800 (PST)
-Received: by mail-pg1-x52d.google.com with SMTP id b4so140480pgh.10
-        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 12:14:40 -0800 (PST)
+        with ESMTP id S229441AbhKPUW1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Nov 2021 15:22:27 -0500
+Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4316BC061570
+        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 12:19:30 -0800 (PST)
+Received: by mail-wr1-x436.google.com with SMTP id n29so77041wra.11
+        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 12:19:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=7yrz1CWUd+4P4ldThWioPJyhOtCTVO4W1naFTnjYxys=;
-        b=FyDrtGq5haDbqgqZ+gfAxvoBsl5cLfYJxhHfPqH+UDQGjdS5fDBtiNdn0IqPlHY54b
-         v05Ne3kzZWy4gGpxupnJgDjKMfStvZSNwg3bLBceN0zN+VPGA6gX4Hs/f9fFbbhf90pX
-         OiBe/hicATMHqHuvkfd0QvEZp4R5EzJ4Ww1vlsuvnw1GtYyV9Gwt8dV1HVu4WvsLSPfi
-         UKUK8mY6HAFgL1x5k0to2V4khgsq0WSLi8Tyx+P3nNdFNmEVPWEgs3BjAYTx8+eGmffE
-         K31dPTlRSUgbOK0WuBYJedEhLh/r4RueUZLf/7hXkxLOuUwx3KJPfb2Bpo+NYZfHQKEA
-         5zow==
+        d=linaro.org; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=hMPomJZFY13K7tAKVfm9YLhauB0H1d36Rn3Wgp4Dl6M=;
+        b=hUO+GaDJQMTExeq1pDunh1kWtWzfozweqYuE2gknjpDkF/ppfCfoNjkiNTS0IAMgXa
+         /gzZxjoY3u4uaNDXEqEAp2g1oy4ycNYDXdG401Soed+3PEw+pyvMr83Yjmhsvp9lPDvJ
+         7Qviq64fJy7sI8VDLUnxbxReYmVcAr6EkBhLPx4B0Oiw7/xJe7FDhaTycmB3q4AZBcME
+         O/H1CIOoKDk8xEyRkR1JcIdzBvUAVLv3HuvMrNilIluuICF3bWtjakjf0hMQmarpuyT1
+         ahYZpkMQ4CV/Mtx6tMwCgFnq6EcKa2iOYC5SjAu5su4X/cCoRhVkqmK9gEP+NB35/SIG
+         VdrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=7yrz1CWUd+4P4ldThWioPJyhOtCTVO4W1naFTnjYxys=;
-        b=anTKNpO5UldreGCDa4E80qLIzCfUy10kVYHCqpuKWgHF5nuEFXCnDl3F2Dg/QL8jK4
-         beG/Y9hxLhUS4hyVvYtmChNvqxxWrsKcI1yvMWhi60lVsnQn7scOpvUFFTCrg3gHVr5r
-         wLGvNO0TWtLXKjw38RWnlrLWi56Cfmbvm9t4F1bwvJG7Li+O17yivq59Fgb68gR66trZ
-         Pio18tGLhbzep+OI2na94ngSb+NBzJym1ZIk4sb49sV467UzKDqLzrzxyTxZtX8lx7le
-         ob7UgOD6pSDmgQMA/hs0r771p1HdTg7CiahOcEUi8RNhQdh2+fB1jYaFkkpcbl3uAM9s
-         xxUg==
-X-Gm-Message-State: AOAM530tcjyTepAVh95L5yCQJ22+AsV8p5nNpMwQBS89am/BR/qjLVKz
-        rCzfN++LuBjs+/yTSWzPGkmI2A==
-X-Google-Smtp-Source: ABdhPJy0qqczmU3dj3Vf1DoJfDEJeVsv8C7UwdZfRh8Af0kNEg9ad9xaHMXT4OyUxgm5zASxBM8MZg==
-X-Received: by 2002:a05:6a00:c81:b029:30e:21bf:4c15 with SMTP id a1-20020a056a000c81b029030e21bf4c15mr1800627pfv.70.1637093679397;
-        Tue, 16 Nov 2021 12:14:39 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id f19sm13219209pgj.7.2021.11.16.12.14.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Nov 2021 12:14:38 -0800 (PST)
-Date:   Tue, 16 Nov 2021 20:14:35 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        "Liu, Jing2" <jing2.liu@intel.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Arjan van de Ven <arjan@linux.intel.com>,
-        Jing Liu <jing2.liu@linux.intel.com>,
-        "Cooper, Andrew" <andrew.cooper3@citrix.com>,
-        "Bae, Chang Seok" <chang.seok.bae@intel.com>
-Subject: Re: Thoughts of AMX KVM support based on latest kernel
-Message-ID: <YZQRK2EUyhy/I7n1@google.com>
-References: <BYAPR11MB325685AB8E3DFD245846F854A9939@BYAPR11MB3256.namprd11.prod.outlook.com>
- <87k0h85m65.ffs@tglx>
- <YZPWsICdDTZ02UDu@google.com>
- <87ee7g53rp.ffs@tglx>
- <04978d6d-8e1a-404d-b30d-402a7569c1f0@redhat.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=hMPomJZFY13K7tAKVfm9YLhauB0H1d36Rn3Wgp4Dl6M=;
+        b=zloGwDdc/KlFfnOcYYJuA+sk34FSuCG1ceCfkj0mHs+P3tuUlJXCUexlVlPyc9ybu6
+         MOVG2LkcKTK5cIYeyak41xMvde422WYmpfaXD1g9Y8xsLiNsKkCLYShEz5cvWrNxG5lP
+         c3z7RubOpMocDHJtSkzYJ8mZMNRjyPSVQP3x7GENPhY/xh88dE7Sv14Ju58lvlpEwFbI
+         pVG9qSTNQFG3Ptp4DNIIkvzDHKrG2xLoXe/v2KEKICmVjEdvVkpojcwVsuBxSESKBtx+
+         h60mhxsbBKErwL/+b1sOwR5PmVKr3J9ipclSokHalIcBc1dyIvaTyM8JbuyqSRZ9V/JF
+         ITNw==
+X-Gm-Message-State: AOAM532trIO7QMLnliOl5ltrtYQNOUnau0fsdlivcymwYxo16h7dgN1c
+        dmP8cv7O7+bN6iVNm5s6uzT6CEKV2OZfYFAcuzc=
+X-Google-Smtp-Source: ABdhPJwrid7kWuZi0Os4I48lNe2Tg9bUykZ63UCszaXLkydXpv4tCayDpavmdbyPCYcvWQSoVo550A==
+X-Received: by 2002:adf:f947:: with SMTP id q7mr12558641wrr.260.1637093968902;
+        Tue, 16 Nov 2021 12:19:28 -0800 (PST)
+Received: from [192.168.8.105] (145.red-37-158-173.dynamicip.rima-tde.net. [37.158.173.145])
+        by smtp.gmail.com with ESMTPSA id t8sm3197057wmn.44.2021.11.16.12.19.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 16 Nov 2021 12:19:28 -0800 (PST)
+Subject: Re: [PATCH-for-7.0] target/i386/kvm: Replace use of __u32 type
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+        qemu-devel@nongnu.org
+Cc:     qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org
+References: <20211116193955.2793171-1-philmd@redhat.com>
+From:   Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <a2628496-ff7a-e684-ee5e-93531790e998@linaro.org>
+Date:   Tue, 16 Nov 2021 21:19:21 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <04978d6d-8e1a-404d-b30d-402a7569c1f0@redhat.com>
+In-Reply-To: <20211116193955.2793171-1-philmd@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 16, 2021, Paolo Bonzini wrote:
-> On 11/16/21 19:55, Thomas Gleixner wrote:
-> > We can do that, but I'm unhappy about this conditional in schedule(). So
-> > I was asking for doing a simple KVM only solution first:
-> > 
-> > vcpu_run()
-> >          kvm_load_guest_fpu()
-> >              wrmsrl(XFD, guest_fpstate->xfd);
-> >              XRSTORS
-> >          do {
-> > 
-> >             local_irq_disable();
-> > 
-> >             if (test_thread_flag(TIF_NEED_FPU_LOAD))
-> > 		switch_fpu_return()
-> >                    wrmsrl(XFD, guest_fpstate->xfd);
-> > 
-> >             do {
-> >                  vmenter();              // Guest modifies XFD
-> >             } while (reenter);
-> > 
-> >             update_xfd_state();          // Restore consistency
-> > 
-> >             local_irq_enable();
-> > 
-> > and check how bad that is for KVM in terms of overhead on AMX systems.
+On 11/16/21 8:39 PM, Philippe Mathieu-Daudé wrote:
+> QEMU coding style mandates to not use Linux kernel internal
+> types for scalars types. Replace __u32 by uint32_t.
 > 
-> I agree, this is how we handle SPEC_CTRL for example and it can be extended
-> to XFD.  We should first do that, then switch to the MSR lists.  Hacking
-> into schedule() should really be the last resort.
+> Signed-off-by: Philippe Mathieu-Daudé<philmd@redhat.com>
+> ---
+>   target/i386/kvm/kvm.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 
-Agreed as well.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-> >            local_irq_enable();     <- Problem starts here
-> > 
-> >            preempt_enable();	   <- Becomes wider here
-> 
-> It doesn't become that much wider because there's always preempt notifiers.
-> So if it's okay to save XFD in the XSAVES wrapper and in
-> kvm_arch_vcpu_put(), that might be already remove the need to do it
-> schedule().
-
-Assuming AMX can be accessed from (soft) IRQ context, hooking the preempt notifiers
-isn't sufficient.  That's also why KVM waits until IRQs are disabled before
-handling TIF_NEED_FPU_LOAD.
+r~
