@@ -2,210 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 57F96453891
-	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 18:32:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1069F4538B6
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 18:42:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238818AbhKPRfe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Nov 2021 12:35:34 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55781 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238754AbhKPRfe (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 16 Nov 2021 12:35:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637083956;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=wMFCuemyxiuT6X/YrJG6Ua24xJxiATlq7pLWpytdHUk=;
-        b=hGqV+lhALeWg6oHSQDrkxfvY7gje2twyCVhMNGf6UHCXNJN60IqqI8wiyBS8GBbvE+iJm9
-        knvpPDVERjEE8U44DoLMBHCAsmIuuxTqT65dOc5MBzrEdDxWCmzn9OEA4L7xhzEloniPgJ
-        hq+T/KIHAM42JbVTXenGUB+o6kIMmgs=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-529-EINQ7oO-PTedlHHlpvOkkA-1; Tue, 16 Nov 2021 12:32:35 -0500
-X-MC-Unique: EINQ7oO-PTedlHHlpvOkkA-1
-Received: by mail-qt1-f197.google.com with SMTP id o12-20020a05622a008c00b002aff5552c89so15597042qtw.23
-        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 09:32:34 -0800 (PST)
+        id S239012AbhKPRpc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Nov 2021 12:45:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56496 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239003AbhKPRpc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Nov 2021 12:45:32 -0500
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49514C061764
+        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 09:42:35 -0800 (PST)
+Received: by mail-pl1-x636.google.com with SMTP id t21so18053770plr.6
+        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 09:42:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=sRP9ret+j9GM8SwkphIfdmLvAPXmHIsrlNLspioLslY=;
+        b=aakaVBEdAVGwvD4uT2VFp1F3GnlWegHkSrNhZkvdNQhw/0KFS56fK/FXKpoZpoqaW/
+         ks57SnnQqDIAhkNzgg/3/qm+2QtEnDzihtZg64upedmBE0N8bG3Wz3aMZ6IcPPkfbWJ7
+         Odr8FTytQNLXbll9XzJf0Djin5Tfz8TLNhJ6bh4FXKVr2e8uG4++PS+DTJSSbVRsWfz+
+         t5LgfPUnmjjk1OKazSXWK00JYV0wqzhGzMfljui9t6eIKeJvmyS6IubMHslN8NFkXm6u
+         cO/p1ZreH9LaBW4GjnnliGC5qXJGZRFztrhsY5O6+uwQPTVgmqu7CenrvqWeWmsKj2O8
+         Ru+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=wMFCuemyxiuT6X/YrJG6Ua24xJxiATlq7pLWpytdHUk=;
-        b=0Tb2EDSUSgtTYwDp3czWqh2KujY6zCzgjjTNLDIBMpjQdMnbuuDkdZuAgsV1/PXvA7
-         2aSW7aF+b9laQ9sdskkc5q5hAXL8v6LDt1P0AfwXqG/fayWpBPxQLhC4lZIN3F2B8Jl7
-         g/0oWyJaMe/E04onYtu81ZtPe8t2vQbw4pFCzQMgKzLVbz88iND7X9R1HfREuJD2v+hE
-         aWZwSicF7TU76lqw8qy/RIM0HrV4MLWP6rY2qtMBRzFeHSRXR1BVN99y/S0WpRQuOXKY
-         YMFlzzIS8Rnzs0yKVICK/NNAI744ECPQ/Lq7Eg/w9YDMh4tNx6NyxgQ8v+8ugaR8Kx1o
-         rMew==
-X-Gm-Message-State: AOAM531QltNrMcdAlWemu2qle0K1XI7zVzgHeJGYkr3jIBUDVqTFr9kQ
-        VclTillRiWLSYCba/Vpdcf9ekm+GrSsbMlEEfNyc9zDxA9LGP9Aj8IGh3l25F3UMVXYzC7FJKUF
-        qIUzR7ev2x2ox
-X-Received: by 2002:a05:622a:1d5:: with SMTP id t21mr9131077qtw.119.1637083954458;
-        Tue, 16 Nov 2021 09:32:34 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzezM4FCRHuvBKXwDVY3iInlzwMOFBh2uP2gsROc/jxlX3APhk0jfOlNCeEwLp+vKAIl0HCHg==
-X-Received: by 2002:a05:622a:1d5:: with SMTP id t21mr9131044qtw.119.1637083954222;
-        Tue, 16 Nov 2021 09:32:34 -0800 (PST)
-Received: from [192.168.1.234] (pool-71-175-3-221.phlapa.fios.verizon.net. [71.175.3.221])
-        by smtp.gmail.com with ESMTPSA id v7sm8687700qki.98.2021.11.16.09.32.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 16 Nov 2021 09:32:34 -0800 (PST)
-Message-ID: <bcb591d1-5ce6-8222-2ced-e60d8bf0947d@redhat.com>
-Date:   Tue, 16 Nov 2021 12:32:33 -0500
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=sRP9ret+j9GM8SwkphIfdmLvAPXmHIsrlNLspioLslY=;
+        b=OXQmUgGy927dh4CA3zjNfmQnWE/Lok+aF4qHPysyrkq8SZqWYXWXzoGiZCQc7n6ccI
+         OzTOmdhQQBXOewVsc5lWE8Q/jqBeFqJ7GTyEKd1hZGAPA/cf/cSZEc/sgaamwK3osNE9
+         4l/WtMre09+xnHppgQzxlfdE4g9szCr3GzbtPhpTDdH6g/C8iTVA7+zsowOtQklWSMGz
+         9V/OBAERjm/hrKPuzuwHFz+hHoONSiSUJUYJpq5hNtyQV/R6zqylVBezRd7V+h6nlPNG
+         iB/ilOr5TsJ3dNHeO+lHfRvOSMMEXyMcL++DLAMkoC949vwIGOwGXy/W3TZLCiIRYR1i
+         oD2w==
+X-Gm-Message-State: AOAM533ws5U/WB5V477nsOMHBafHQ7tOBi53ubzWc5bON3XL9eYoteSO
+        pZXqEVgK1TBFdvta5qOfHQWBPu5sq+e/yg==
+X-Google-Smtp-Source: ABdhPJyyXIcTrfZEJwR/YjR6Bdl41yqSXG5bJwrpZnpwuDRmhl/B4sdaeksWzjqfOJyaFKACyqUAxg==
+X-Received: by 2002:a17:90b:1812:: with SMTP id lw18mr938276pjb.196.1637084554564;
+        Tue, 16 Nov 2021 09:42:34 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id f4sm18773282pfg.34.2021.11.16.09.42.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Nov 2021 09:42:33 -0800 (PST)
+Date:   Tue, 16 Nov 2021 17:42:29 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, jgross@suse.com,
+        stable@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86: Use a stable condition around all VT-d PI paths
+Message-ID: <YZPtheR+pShP+CX6@google.com>
+References: <20211116142205.719375-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH] sev: allow capabilities to check for SEV-ES support
-Content-Language: en-US
-To:     =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, mtosatti@redhat.com,
-        armbru@redhat.com, pbonzini@redhat.com, eblake@redhat.com
-References: <20211115193804.294529-1-tfanelli@redhat.com>
- <YZN3OECfHBXd55M5@redhat.com>
- <26204690-493f-67a8-1791-c9c9d38c0240@redhat.com>
- <YZPT3ojgzdmH3lkq@redhat.com>
- <02e72302-8cb3-9268-32bd-57e9423f1590@redhat.com>
- <YZPpGSFMQZBx71QN@redhat.com>
-From:   Tyler Fanelli <tfanelli@redhat.com>
-In-Reply-To: <YZPpGSFMQZBx71QN@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211116142205.719375-1-pbonzini@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/16/21 12:23 PM, Daniel P. Berrangé wrote:
-> On Tue, Nov 16, 2021 at 11:58:12AM -0500, Tyler Fanelli wrote:
->> On 11/16/21 10:53 AM, Daniel P. Berrangé wrote:
->>> On Tue, Nov 16, 2021 at 10:29:35AM -0500, Tyler Fanelli wrote:
->>>> On 11/16/21 4:17 AM, Daniel P. Berrangé wrote:
->>>>> On Mon, Nov 15, 2021 at 02:38:04PM -0500, Tyler Fanelli wrote:
->>>>>> Probe for SEV-ES and SEV-SNP capabilities to distinguish between Rome,
->>>>>> Naples, and Milan processors. Use the CPUID function to probe if a
->>>>>> processor is capable of running SEV-ES or SEV-SNP, rather than if it
->>>>>> actually is running SEV-ES or SEV-SNP.
->>>>>>
->>>>>> Signed-off-by: Tyler Fanelli <tfanelli@redhat.com>
->>>>>> ---
->>>>>>     qapi/misc-target.json | 11 +++++++++--
->>>>>>     target/i386/sev.c     |  6 ++++--
->>>>>>     2 files changed, 13 insertions(+), 4 deletions(-)
->>>>>>
->>>>>> diff --git a/qapi/misc-target.json b/qapi/misc-target.json
->>>>>> index 5aa2b95b7d..c3e9bce12b 100644
->>>>>> --- a/qapi/misc-target.json
->>>>>> +++ b/qapi/misc-target.json
->>>>>> @@ -182,13 +182,19 @@
->>>>>>     # @reduced-phys-bits: Number of physical Address bit reduction when SEV is
->>>>>>     #                     enabled
->>>>>>     #
->>>>>> +# @es: SEV-ES capability of the machine.
->>>>>> +#
->>>>>> +# @snp: SEV-SNP capability of the machine.
->>>>>> +#
->>>>>>     # Since: 2.12
->>>>>>     ##
->>>>>>     { 'struct': 'SevCapability',
->>>>>>       'data': { 'pdh': 'str',
->>>>>>                 'cert-chain': 'str',
->>>>>>                 'cbitpos': 'int',
->>>>>> -            'reduced-phys-bits': 'int'},
->>>>>> +            'reduced-phys-bits': 'int',
->>>>>> +            'es': 'bool',
->>>>>> +            'snp': 'bool'},
->>>>>>       'if': 'TARGET_I386' }
->>>>>>     ##
->>>>>> @@ -205,7 +211,8 @@
->>>>>>     #
->>>>>>     # -> { "execute": "query-sev-capabilities" }
->>>>>>     # <- { "return": { "pdh": "8CCDD8DDD", "cert-chain": "888CCCDDDEE",
->>>>>> -#                  "cbitpos": 47, "reduced-phys-bits": 5}}
->>>>>> +#                  "cbitpos": 47, "reduced-phys-bits": 5
->>>>>> +#                  "es": false, "snp": false}}
->>>>> We've previously had patches posted to support SNP in QEMU
->>>>>
->>>>>      https://lists.gnu.org/archive/html/qemu-devel/2021-08/msg04761.html
->>>>>
->>>>> and this included an update to query-sev for reporting info
->>>>> about the VM instance.
->>>>>
->>>>> Your patch is updating query-sev-capabilities, which is a
->>>>> counterpart for detecting host capabilities separate from
->>>>> a guest instance.
->>>> Yes, that's because with this patch, I'm more interested in determining
->>>> which AMD processor is running on a host, and less if ES or SNP is actually
->>>> running on a guest instance or not.
->>>>> None the less I wonder if the same design questions from
->>>>> query-sev apply. ie do we need to have the ability to
->>>>> report any SNP specific information fields, if so we need
->>>>> to use a discriminated union of structs, not just bool
->>>>> flags.
->>>>>
->>>>> More generally I'm some what wary of adding this to
->>>>> query-sev-capabilities at all, unless it is part of the
->>>>> main SEV-SNP series.
->>>>>
->>>>> Also what's the intended usage for the mgmt app from just
->>>>> having these boolean fields ? Are they other more explicit
->>>>> feature flags we should be reporting, instead of what are
->>>>> essentially SEV generation codenames.
->>>> If by "mgmt app" you're referring to sevctl, in order to determine which
->>>> certificate chain to use (Naples vs Rome vs Milan ARK/ASK) we must query
->>>> which processor we are running on. Although sevctl has a feature which can
->>>> do this already, we cannot guarantee that sevctl is running on the same host
->>>> that a VM is running on, so we must query this capability from QEMU. My
->>>> logic was determining the processor would have been the following:
->>> I'm not really talking about a specific, rather any tool which wants
->>> to deal with SEV and QEMU, whether libvirt or an app using libvirt,
->>> or something else using QEMU directly.
->> Ah, my mistake.
->>
->>> Where does the actual cert chain payload come from ? Is that something
->>> the app has to acquire out of band, or can the full cert chain be
->>> acquired from the hardware itself ?
->> The cert chain (or the ARK/ASK specifically) comes from AMD's KDS, yet
->> sevctl is able to cache the values, and has them on-hand when needed. This
->> patch would tell sevctl *which* of the cert chains to use (Naples vs Rome vs
->> Milan chain). If need be, I could just focus on Naples and Rome processors
->> for now and bring support for SNP (Milan processors) later on when it is
->> more mature.
->>
->>>> !es && !snp --> Naples
->>>>
->>>> es && !snp --> Rome
->>>>
->>>> es && snp --> Milan
->>> This approach isn't future proof if subsequent generations introduce
->>> new certs. It feels like we should be explicitly reporting something
->>> about the certs rather than relying on every app to re-implement tihs
->>> logic.
->> Alright, like an encoding of which processor generation the host is running
->> on?
-> IIUC (from looking at sev-tool), the certificates can be acquired
-> from
->
->     https://developer.amd.com/wp-content/resources/ask_ark_{gen}.cert
->
-> where {gen} is one of "milan", "naples", "rome".
->
-> With this in mind, I'd think that query-sev-capabilities could just
-> report the required certificate name. e.g.
->
->    { 'enum': 'SevAskArkCertName',
->      'data': ['milan', 'naples', 'rome'] }
->
-> and then report it in SevCapability struct with
->
->      "ask-ark-cert-name":  "SevAskArkCertName"
+On Tue, Nov 16, 2021, Paolo Bonzini wrote:
+> Currently, checks for whether VT-d PI can be used refer to the current
+> status of the feature in the current vCPU; or they more or less pick
+> vCPU 0 in case a specific vCPU is not available.
+> 
+> However, these checks do not attempt to synchronize with changes to
+> the IRTE.  In particular, there is no path that updates the IRTE when
+> APICv is re-activated on vCPU 0; and there is no path to wakeup a CPU
+> that has APICv disabled, if the wakeup occurs because of an IRTE
+> that points to a posted interrupt.
 
-That seems reasonable to me, I'll give it a try and submit a v2 patch.
+Ooooh, I think I get it now.  You're saying that if pi_update_irte() configured
+the IRQ to post the IRQ to a vCPU, and then that vCPU disables APICv, because KVM
+doesn't go back and fixup the IRTE, the device will send the IRQ to the current
+posted interrupt vector, not to the non-posted vector.  That makes sense.
 
->
-> Regards,
-> Daniel
+> To fix this, always go through the VT-d PI path as long as there are
+> assigned devices and APICv is available on both the host and the VM side.
+> Since the relevant condition was copied over three times, take the hint
+> and factor it into a separate function.
+> 
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/kvm/vmx/posted_intr.c | 20 +++++++++++---------
+>  1 file changed, 11 insertions(+), 9 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
+> index 5f81ef092bd4..b64dd1374ed9 100644
+> --- a/arch/x86/kvm/vmx/posted_intr.c
+> +++ b/arch/x86/kvm/vmx/posted_intr.c
+> @@ -5,6 +5,7 @@
+>  #include <asm/cpu.h>
+>  
+>  #include "lapic.h"
+> +#include "irq.h"
+>  #include "posted_intr.h"
+>  #include "trace.h"
+>  #include "vmx.h"
+> @@ -77,13 +78,18 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
+>  		pi_set_on(pi_desc);
+>  }
+>  
+> +static bool vmx_can_use_vtd_pi(struct kvm *kvm)
+> +{
+> +	return kvm_arch_has_assigned_device(kvm) &&
+> +		irq_remapping_cap(IRQ_POSTING_CAP) &&
+> +		irqchip_in_kernel(kvm) && enable_apicv;
 
+Bad indentation/alignment.
 
--- 
-Tyler Fanelli (tfanelli)
+Not that it's likely to matter, but would it make sense to invert the checks so
+that they're short-circuited on the faster KVM checks?  E.g. fastest to slowest:
 
+	return irqchip_in_kernel(kvm) && enable_apic &&
+	       kvm_arch_has_assigned_device(kvm) &&
+	       irq_remapping_cap(IRQ_POSTING_CAP);
+
+Nits aside,
+
+Reviewed-by: Sean Christopherson <seanjc@google.com>
