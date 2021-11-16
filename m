@@ -2,101 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D20A453407
-	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 15:21:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 37A4D45340D
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 15:22:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237277AbhKPOY1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Nov 2021 09:24:27 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60406 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S237357AbhKPOYE (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 16 Nov 2021 09:24:04 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1AGDamYd021120;
-        Tue, 16 Nov 2021 14:21:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=tLeuFLjwj/uR/Lpm1a39bM0xOu/zyT2p4Tr6cd+2NrI=;
- b=aM0ofw5CJP1g/y+Uo7bxOJQ1AtpDxqDOXwG07ERmamle8wINQMgqHH3RInCCF0Cai3i+
- wKazSEfpwqLFUMgt5+4OivJSN9oIfmeXaaurpHXg6p3piW2g1IShxnEZlovCDInSFqmb
- RzB6DebEArwykkA5PCvYtH0/hiWOL669+fBaL3UA1Wkyztx1w7qFPW/DukadFMokeG38
- beWrD0rQY/UTw5rnR/YWM7RbcdI5yDmhMzL8JOfX4Up3AcEiDo6JfNFe4VmiNrprtgoA
- icc+pcb6+Ri6cYmwWBnZ16QMbdlUQvqaCd/SP9B0QrnGwuFvz126xX7Hk8etUn9Y5Slc jQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3cc6tbj9du-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 16 Nov 2021 14:21:06 +0000
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1AGDxNfm018723;
-        Tue, 16 Nov 2021 14:21:06 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3cc6tbj9d9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 16 Nov 2021 14:21:06 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1AGE8isi005603;
-        Tue, 16 Nov 2021 14:21:04 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma03fra.de.ibm.com with ESMTP id 3ca509ydm4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 16 Nov 2021 14:21:04 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1AGEE81643450772
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 16 Nov 2021 14:14:08 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8AD6442042;
-        Tue, 16 Nov 2021 14:21:01 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 32F4F4203F;
-        Tue, 16 Nov 2021 14:21:01 +0000 (GMT)
-Received: from osiris (unknown [9.145.93.200])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Tue, 16 Nov 2021 14:21:01 +0000 (GMT)
-Date:   Tue, 16 Nov 2021 15:20:59 +0100
-From:   Heiko Carstens <hca@linux.ibm.com>
-To:     Christian Borntraeger <borntraeger@linux.ibm.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, KVM <kvm@vger.kernel.org>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>
-Subject: Re: [PATCH 1/1] MAINTAINERS: update email address of borntraeger
-Message-ID: <YZO+S5bXJxPD/jgg@osiris>
-References: <20211116135803.119489-1-borntraeger@linux.ibm.com>
- <20211116135803.119489-2-borntraeger@linux.ibm.com>
+        id S237236AbhKPOZJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Nov 2021 09:25:09 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:20392 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237377AbhKPOZF (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 16 Nov 2021 09:25:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1637072527;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7lWWPWi0Wsw1vOClqmw0uD7Kp+n7bnIBYYv23z0XPl4=;
+        b=L0io7zGs9BF6ABFiSyPGmOqoizpKVU9JanN+82x7ASHVdcqGdFFsW2G4oj3TeWgjnKkzUs
+        OzXaesPvB77Ft2OZdIbarkY09wIF9zgdua1MWWwom8H8UD0RjRj2lUMsH/WiAiZgWoHMkJ
+        PfbGeb0h7Pmx6VvmWouSr6l74G+kYa0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-346-rGoQUqOlPDaEPcwErS8TUQ-1; Tue, 16 Nov 2021 09:22:01 -0500
+X-MC-Unique: rGoQUqOlPDaEPcwErS8TUQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 18284BBEEF;
+        Tue, 16 Nov 2021 14:21:59 +0000 (UTC)
+Received: from [10.39.192.245] (unknown [10.39.192.245])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4179B1F429;
+        Tue, 16 Nov 2021 14:21:40 +0000 (UTC)
+Message-ID: <d0f41b9f-9307-3694-59c8-5a009a2f06a2@redhat.com>
+Date:   Tue, 16 Nov 2021 15:21:39 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211116135803.119489-2-borntraeger@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: oJ77AIJ1AkFTYLm2hm2-ZQjZSAMaI1dV
-X-Proofpoint-ORIG-GUID: Ki5GOeQKdXzb2275KxDMBtUdzZExKrKV
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-11-16_02,2021-11-16_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
- priorityscore=1501 mlxscore=0 impostorscore=0 adultscore=0 suspectscore=0
- malwarescore=0 clxscore=1011 lowpriorityscore=0 bulkscore=0 spamscore=0
- mlxlogscore=769 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2111160070
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH 0/5] KVM: Turn the vcpu array into an xarray
+Content-Language: en-US
+To:     Juergen Gross <jgross@suse.com>, Marc Zyngier <maz@kernel.org>,
+        kvm@vger.kernel.org, linux-mips@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, linuxppc-dev@lists.ozlabs.org
+Cc:     Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup.patel@wdc.com>,
+        Atish Patra <atish.patra@wdc.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paul Mackerras <paulus@samba.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kernel-team@android.com
+References: <20211105192101.3862492-1-maz@kernel.org>
+ <6232cbcb-b2e2-e79f-a520-43d552f35243@suse.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <6232cbcb-b2e2-e79f-a520-43d552f35243@suse.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 16, 2021 at 02:58:03PM +0100, Christian Borntraeger wrote:
-> My borntraeger@de.ibm.com email is just a forwarder to the
-> linux.ibm.com address. Let us remove the extra hop to avoid
-> a potential source of errors.
+On 11/16/21 15:13, Juergen Gross wrote:
+> On 05.11.21 20:20, Marc Zyngier wrote:
+>> The kvm structure is pretty large. A large portion of it is the vcpu
+>> array, which is 4kB on x86_64 and arm64 as they deal with 512 vcpu
+>> VMs. Of course, hardly anyone runs VMs this big, so this is often a
+>> net waste of memory and cache locality.
+>>
+>> A possible approach is to turn the fixed-size array into an xarray,
+>> which results in a net code deletion after a bit of cleanup.
+>>
+>> This series is on top of the current linux/master as it touches the
+>> RISC-V implementation. Only tested on arm64.
+>>
+>> Marc Zyngier (5):
+>>    KVM: Move wiping of the kvm->vcpus array to common code
+>>    KVM: mips: Use kvm_get_vcpu() instead of open-coded access
+>>    KVM: s390: Use kvm_get_vcpu() instead of open-coded access
+>>    KVM: x86: Use kvm_get_vcpu() instead of open-coded access
+>>    KVM: Convert the kvm->vcpus array to a xarray
+>>
+>>   arch/arm64/kvm/arm.c           | 10 +---------
+>>   arch/mips/kvm/loongson_ipi.c   |  4 ++--
+>>   arch/mips/kvm/mips.c           | 23 ++---------------------
+>>   arch/powerpc/kvm/powerpc.c     | 10 +---------
+>>   arch/riscv/kvm/vm.c            | 10 +---------
+>>   arch/s390/kvm/kvm-s390.c       | 26 ++++++--------------------
+>>   arch/x86/kvm/vmx/posted_intr.c |  2 +-
+>>   arch/x86/kvm/x86.c             |  9 +--------
+>>   include/linux/kvm_host.h       |  7 ++++---
+>>   virt/kvm/kvm_main.c            | 33 ++++++++++++++++++++++++++-------
+>>   10 files changed, 45 insertions(+), 89 deletions(-)
+>>
 > 
-> While at it, add the relevant email addresses to mailmap.
+> For x86 you can add my:
 > 
-> Signed-off-by: Christian Borntraeger <borntraeger@linux.ibm.com>
-> ---
->  .mailmap    | 3 +++
->  MAINTAINERS | 4 ++--
->  2 files changed, 5 insertions(+), 2 deletions(-)
+> Tested-by: Juergen Gross <jgross@suse.com>
 
-Applied, thanks!
+Heh, unfortunately x86 is the only one that needs a change in patch 4. 
+I'll Cc you on my version.
+
+Paolo
+
