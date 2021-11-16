@@ -2,106 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0080B453A69
-	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 20:49:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B8E4453A7D
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 21:00:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235941AbhKPTwP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Nov 2021 14:52:15 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34829 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229815AbhKPTwO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 16 Nov 2021 14:52:14 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637092156;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=C3b5knlYZX1AIJ216JlJ+2mMKUoVtkxyIscJTP+T4Ew=;
-        b=GiJb5xRcEG16RuuUCuLiccaPeJhQU8sYFD3w0d1ogLg4eSAd5Ih5+5sYw5EiNav45IRQHr
-        hbDebUQwVi6GtVzjZPLHhqojsJFUt3nyjlfZqTsScL6HbQo6nnkVYnRl+VjflwjlYKZJ5w
-        3GWGdwOipqmVeXAAfKowXsHZx0I/7EM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-382-N8_baTvXPKWn_z9raQc8Rw-1; Tue, 16 Nov 2021 14:49:13 -0500
-X-MC-Unique: N8_baTvXPKWn_z9raQc8Rw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D498D423B9;
-        Tue, 16 Nov 2021 19:49:11 +0000 (UTC)
-Received: from [10.39.192.245] (unknown [10.39.192.245])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 466F960BD8;
-        Tue, 16 Nov 2021 19:49:09 +0000 (UTC)
-Message-ID: <04978d6d-8e1a-404d-b30d-402a7569c1f0@redhat.com>
-Date:   Tue, 16 Nov 2021 20:49:08 +0100
+        id S239518AbhKPUDu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Nov 2021 15:03:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60122 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234090AbhKPUDt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Nov 2021 15:03:49 -0500
+Received: from mail-oo1-xc2c.google.com (mail-oo1-xc2c.google.com [IPv6:2607:f8b0:4864:20::c2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C844C061570
+        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 12:00:52 -0800 (PST)
+Received: by mail-oo1-xc2c.google.com with SMTP id v30-20020a4a315e000000b002c52d555875so112043oog.12
+        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 12:00:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=C+YvmVLDar2wIMJlc4AAxoy423H+HZT3m/tlup75iWo=;
+        b=rhFRvAdU518GzEh3OEeFL19fpXC049w6kv4hYOF1fCjujQFt7tq2iByHg3Ub42S/XX
+         vpSSJ1NQvu7MVdFe7Me4UdW4a4n5DP3kCyiGBgyDP2rbbM0MupGt5HF9vHOhFYthE1Hh
+         HNHvLqkBxHIvkXFvsQQXsxdzfROdD9/9+OMKCj9fkghMKX8UDAsuCEQbbTM/ghDq3S+P
+         JtzluDMahafLtEgbWLWkVCPLM61AMrrL1zIk0EOaMb72s4+i9NTRlM8s/oUOpS8JeXnI
+         aoB8bpb5aMdTs4LqY5a6kv6WU+lsi1Dg+xEgitEg/Vt+6rI4k/n33xdYNyQkWTiDAA1w
+         0rrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=C+YvmVLDar2wIMJlc4AAxoy423H+HZT3m/tlup75iWo=;
+        b=mfXzQZOPP0kji7hJzlMdYb8vgpkLU0vCdu7/EvqBAhjBnAxnTRVwb2f9ctUiWTnf0s
+         DhHb6ifmpPXFOjZ5C+CS5FqP2DRIOzZOlBtffn3mIE8Sf25tjY4vwm8zWMhZs3regzgE
+         54Cxkpe8JNze62PfFdZ0PqCvs/aJceNbOC6Set9aXX+J9Y2njx0QGkzS57DbENJgMxJE
+         TkUh/1MCMXy3+OL72NdGXmvt0Z9mkvr0KzLxEtUH4KwmpTJvguzowAk3G2Ue5hHgAXnh
+         x/yrkN74UqBdkNTqkJvmAfK2SwGftaHSPX1xnrdgPSKdDPlbaCWtNDIpTSCGPhppZuUK
+         +xRA==
+X-Gm-Message-State: AOAM532zCF7U6KMyx9ptl5QLZre6CR+attHmVy4Em0nwUyi1Hlw3qYYn
+        mfaTpP18qZExsQcxvER7a2OHPyNtKqxMpRborN+lQF7dh34=
+X-Google-Smtp-Source: ABdhPJz/v/uegN6I+tgHVvvoa5wgxC8gF4qG63xDwe/dhfK9OASSt26hmk1Gcc5u4IquZiwjRqpf8TkwtvV8pjecZaw=
+X-Received: by 2002:a4a:5b85:: with SMTP id g127mr5343601oob.86.1637092851545;
+ Tue, 16 Nov 2021 12:00:51 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: Thoughts of AMX KVM support based on latest kernel
-Content-Language: en-US
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     "Liu, Jing2" <jing2.liu@intel.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Arjan van de Ven <arjan@linux.intel.com>,
-        Jing Liu <jing2.liu@linux.intel.com>,
-        "Cooper, Andrew" <andrew.cooper3@citrix.com>,
-        "Bae, Chang Seok" <chang.seok.bae@intel.com>
-References: <BYAPR11MB325685AB8E3DFD245846F854A9939@BYAPR11MB3256.namprd11.prod.outlook.com>
- <87k0h85m65.ffs@tglx> <YZPWsICdDTZ02UDu@google.com> <87ee7g53rp.ffs@tglx>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <87ee7g53rp.ffs@tglx>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+References: <20211116105038.683627-1-pbonzini@redhat.com> <CALMp9eSy7-ziFeOrz+zsdBPOC7AqULYRSrP1kKSMWkFwrmzy8w@mail.gmail.com>
+ <ea98ccf5-059b-11b3-e071-a46bad687699@redhat.com>
+In-Reply-To: <ea98ccf5-059b-11b3-e071-a46bad687699@redhat.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Tue, 16 Nov 2021 12:00:40 -0800
+Message-ID: <CALMp9eQ09Gkd=H=wWkwZicB7=6VywkL-R8dZhJHusuzBRdDh3A@mail.gmail.com>
+Subject: Re: [PATCH kvm-unit-tests] pmu: fix conditions for emulation test
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Like Xu <like.xu.linux@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/16/21 19:55, Thomas Gleixner wrote:
-> We can do that, but I'm unhappy about this conditional in schedule(). So
-> I was asking for doing a simple KVM only solution first:
-> 
-> vcpu_run()
->          kvm_load_guest_fpu()
->              wrmsrl(XFD, guest_fpstate->xfd);
->              XRSTORS
->            
->          do {
-> 
->             local_irq_disable();
-> 
->             if (test_thread_flag(TIF_NEED_FPU_LOAD))
-> 		switch_fpu_return()
->                    wrmsrl(XFD, guest_fpstate->xfd);
-> 
->             do {
->                  vmenter();              // Guest modifies XFD
->             } while (reenter);
-> 
->             update_xfd_state();          // Restore consistency
-> 
->             local_irq_enable();
-> 
-> and check how bad that is for KVM in terms of overhead on AMX systems.
+On Tue, Nov 16, 2021 at 10:03 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 11/16/21 18:49, Jim Mattson wrote:
+> > Thanks for fixing this. By the way, one of the reasons that we don't
+> > expose a virtual PMU to more customers is the conflict with the NMI
+> > watchdog. We aren't willing to give up the NMI watchdog on the host,
+> > and we don't really want to report a reduced number of general purpose
+> > counters to the guest. (On AMD, we *can't* report a reduced number of
+> > counters to the guest; the architectural specification doesn't allow
+> > it.)
+>
+> FWIW we also generally use the PMU emulation only for debugging of guest
+> performance issues.
 
-I agree, this is how we handle SPEC_CTRL for example and it can be 
-extended to XFD.  We should first do that, then switch to the MSR lists. 
-  Hacking into schedule() should really be the last resort.
+We do have quite a few customers who want it, but I'm not sure that
+they really know what it is they will be getting. :-)
 
->            local_irq_enable();     <- Problem starts here
-> 
->            preempt_enable();	   <- Becomes wider here
-
-It doesn't become that much wider because there's always preempt 
-notifiers.  So if it's okay to save XFD in the XSAVES wrapper and in 
-kvm_arch_vcpu_put(), that might be already remove the need to do it 
-schedule().
-
-Paolo
-
+> > We can't be the only ones running with the NMI watchdog enabled. How
+> > do others deal with this? Is there any hope of suspending the NMI
+> > watchdog while in VMX non-root mode (or guest mode on AMD)?
+>
+> Like, what do you think?
+>
+> Paolo
+>
+> >> This also hid a typo for the force_emulation_prefix module parameter,
+> >> which is part of the kvm module rather than the kvm_intel module,
+> >> so fix that.
+> >>
+> >> Reported-by: Like Xu <like.xu.linux@gmail.com>
+> >> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> > Reviewed-by: Jim Mattson <jmattson@google.com>
+> >
+>
