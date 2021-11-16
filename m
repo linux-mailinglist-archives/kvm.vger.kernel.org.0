@@ -2,225 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EA0EC4536B5
-	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 17:03:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4783F4536CE
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 17:06:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238762AbhKPQGZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Nov 2021 11:06:25 -0500
-Received: from mail-bn7nam10on2073.outbound.protection.outlook.com ([40.107.92.73]:46113
-        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S238744AbhKPQGN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Nov 2021 11:06:13 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bRS8o4socwULaGDwxo7eba262gGj0PPC3S5X75+smG0m8TZSkuTCmgea/Ggw0xUJ339MdIskMHEnadCJO08e1ZFpIkUnXAWdU4SYWvTksRcWaOunyqX0/0mpcQyNxY/JB2+4ZaWCrkXlxIo3K7mPXoqbPkuAtHR1l5dVbaV9yI4rLJ1/D6Dv8IXal+P39pWLBHJDxh5sCcIWA8jAIvcqm2A0HRuB17QX0S3KNM8t13w+P6KOyZVXX3mfVmkW0WfARecHp4da0gtEFuAxriuUYehR3iNZSkmJQ1mcglBNBH3gTtsNxv+0AALQ/+e1S4cQQJhaPwEXmhOQb/VBhL9K7w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9Xog9J4J97BAFZGoYcavuLSQBCDG7n1ieGmduIflrE8=;
- b=UcalXS7FCw3a+08QkC4Z6UxGQVstDOfm6ZDts30TE0TDLKezH39YrZTeZ+dwSci3NT1I7mxJR6TMTMHsaCmOBOdJtmSAPGsYcGNjK2l28OmsQJH5D8+aOlvezQ4kOAo1AxB4rA4KCroTLVct0CYYMoStGSB+rBxTTnyGyqQ9/YgJkPZpheLlpwE2yoKLJJWknoEPt9sHUvEQVend66OlGlGIfwP/6lGgn0+eQzkuBVWs8d92M1Z0cRgcW3xU7DPd1mQkoLGc9R4Mu2CW22l7dxijwtmrv+BMvr84iwhNs8B8IHbgKbMsLXDChua3JyeJ+6a1WPEkS7/iUaVHJQPwIg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9Xog9J4J97BAFZGoYcavuLSQBCDG7n1ieGmduIflrE8=;
- b=dntmcj2uvdxAWw9oWxDCJifUbJBo6Htemi0/8WXzwulptmAKuGihJoFQ75WPaAatfQw7WoiO7Uj5IP/WkYbio6KMsP7y27c3TLArVgZ0zfiBwbXehXJ+iHpG068dvOP5QWkrpX3mwYFq7TDMS66+gPCGIEP3U+EgVB9APlaZ0mE=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SN6PR12MB2686.namprd12.prod.outlook.com (2603:10b6:805:72::30) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4690.26; Tue, 16 Nov
- 2021 16:03:13 +0000
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::e4da:b3ea:a3ec:761c]) by SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::e4da:b3ea:a3ec:761c%7]) with mapi id 15.20.4690.027; Tue, 16 Nov 2021
- 16:03:13 +0000
-Cc:     brijesh.singh@amd.com, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        id S238830AbhKPQHo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Nov 2021 11:07:44 -0500
+Received: from mail.kernel.org ([198.145.29.99]:33854 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S238658AbhKPQHJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Nov 2021 11:07:09 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 82F2761504;
+        Tue, 16 Nov 2021 16:04:11 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mn0wL-005sTB-FV; Tue, 16 Nov 2021 16:04:09 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     kvm@vger.kernel.org, linux-mips@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, linuxppc-dev@lists.ozlabs.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup.patel@wdc.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Juergen Gross <jgross@suse.com>,
+        Nicholas Piggin <npiggin@gmail.com>,
         Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v7 00/45] Add AMD Secure Nested Paging (SEV-SNP) Guest
- Support
-To:     Venu Busireddy <venu.busireddy@oracle.com>
-References: <20211110220731.2396491-1-brijesh.singh@amd.com>
- <YZKDGKOgHKNWq8s2@dt> <a631d02a-c99e-a0d6-444a-3574609c7a25@amd.com>
- <YZKMvjEIGarn8RrR@dt> <88aa149c-5fbe-b5c4-5979-6b01d4e79bee@amd.com>
- <YZKRBOl9UkTJE4jx@dt> <YZPSN1Ctl6H8lxsR@dt>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <3ab027b9-9a9a-119d-7fc2-3551bffe6811@amd.com>
-Date:   Tue, 16 Nov 2021 10:03:08 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
-In-Reply-To: <YZPSN1Ctl6H8lxsR@dt>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MN2PR15CA0016.namprd15.prod.outlook.com
- (2603:10b6:208:1b4::29) To SN6PR12MB2718.namprd12.prod.outlook.com
- (2603:10b6:805:6f::22)
+        Paul Mackerras <paulus@samba.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        kernel-team@android.com
+Subject: [PATCH v2 0/7] KVM: Turn the vcpu array into an xarray
+Date:   Tue, 16 Nov 2021 16:03:56 +0000
+Message-Id: <20211116160403.4074052-1-maz@kernel.org>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Received: from [10.236.30.107] (165.204.77.1) by MN2PR15CA0016.namprd15.prod.outlook.com (2603:10b6:208:1b4::29) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4713.19 via Frontend Transport; Tue, 16 Nov 2021 16:03:10 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 6e0b3b73-d29a-4211-6475-08d9a91a9828
-X-MS-TrafficTypeDiagnostic: SN6PR12MB2686:
-X-Microsoft-Antispam-PRVS: <SN6PR12MB26865AB344DD4EEF162790F6E5999@SN6PR12MB2686.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:580;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: CK8lbtlSRJ36AHceN8rNM6UCOMOcGf6fN28916snJrK6Y7KgqxdCraRL1bzpjb9D+gxrI18zqdqKeTMfEFAKksAqTDiglb0lniySdhMllWQdzRtmdIW2ZNWeHn/wi4VaMBRHcSw5QiL7rcqmjzOkaXUmiEZ2x0byAIDNoPbRZ+KNvh5oBoS5SvSVWGp6xU1ThEORTO1PPWh5GnXJDWkL/jrKEI56mxZ06UUNuiIM6lzfK9UEK47KJNv3/yU85VRxl+moiWWQ91jPybHZUMHefLimFPeQ8jjoECtdqyqhB/NVWOcyxT+ZssCzuwsfh50ljxIxZivzIvYWDt8ZieD1C107ioWi2hDP+9eQBerylCDBZ04F66LKKl6hcQPjFhwC8NVirzdP56H++d53f6W080aSOusqKIteAGFb2MSU1ISSMF1BejCNJJ1RquqEd4BD5ALJxAiOZ6LLmPHvCxKBtekDw4hkeVYg34CorRCoafNbk1UgLIHM+bkp08aK1c/+xNidLZOj2vlV419cY+p9Lk+uUVOAns1LcWA1ZwbqJYjWowDABpjmBLA9Cb42p80vH4QK04w+zZqYq9TtsKXkKZ0OosynRtWtNwpDO5SBjETPkbB73bF4Zpf3hbl3rQ3ZjgDgesXNMXLNaLK7f3k6oLZYQh3S6G0N3Zq9qIwbLzpcHRaUxiSM7E6KXIhpfsKETMxWg9b5L7F323DvVih3uj4TKJUkqZz7SYz2daIVhTkhnc8VJBErah39MBeKYWgxj/SkWmxP7eCr4Ji4Ko7xGRkI3S8groiNhEzgcpv3E7c2TMYmxqb6w7H/y+DqI/SXrafqa1gp1BV/neQ7wEPRTBG7kmNKCiQV1w593PerZQ9tx30c2TS2hesW88sVAC/v
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(86362001)(66556008)(66476007)(66946007)(8676002)(2906002)(5660300002)(45080400002)(966005)(44832011)(16576012)(4001150100001)(2616005)(956004)(31686004)(38100700002)(508600001)(8936002)(316002)(6486002)(186003)(54906003)(7406005)(7416002)(83380400001)(6916009)(26005)(53546011)(4326008)(31696002)(36756003)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cU0ydE1pV3N1Z3hDY1JHZWYyMDRrUHFHLzh0UzVhdTdLaUJPb0xMQ3NDTU5t?=
- =?utf-8?B?TGFiekZvb2ZqaGRIRjA1QlowdXloUmp2Mjl0bytSUTRNOVpTbVJXd3ZDK3BO?=
- =?utf-8?B?RGpXczk0MGZNa3I0dGllV2tyakJrMnc4RXBMb1orN3VXbVl3SWlMTjk0aTdI?=
- =?utf-8?B?ZDdwd2UzTk52MnBISlZ3SG94TjA4VGF2eTJZUEFUdUJLeS9Da0pGZyt0QVZj?=
- =?utf-8?B?aDJnUGc3aDRjZk9uaWpxVEJxTWlmMmp1RWpySzdNREpxNGt3dm50cW1BZ3FY?=
- =?utf-8?B?bHpIL3hpKzZZN2M5ZUFSQ3hVY1ZaeXAxZW9ReEhpVFEva3hxaTVIYURKZ3Vu?=
- =?utf-8?B?akV3LzlweFMwbFJDUWFmckVQcU9meFpOTHVQQ3RzWFR5SmE3RXhOVS94aEs1?=
- =?utf-8?B?dVVIUi9Qb042U2JmTXFWdHM0YWF6SmtpWXNieFNwamlNWUVsMlllaUxrTUx4?=
- =?utf-8?B?akNBa2xFNVo3NER2U09OSTF2ZS9ZR3N0aUxaMXpyaTRqd081V0hSWUx0cUNN?=
- =?utf-8?B?QVJlUHZORjRrRlZBYU5UbDQwcUVVRUkzbHlnbUpBN2QvNWtGdWo3NVlzL0hl?=
- =?utf-8?B?UHRvdkUxVkllUnZIN3RabDNPU2hMckRwRWVrd1BMQmZ2b2Jsdk04RHNxck1E?=
- =?utf-8?B?eDNoOTlVUGpFTGlaM1dBSmdBd2ZReDVQZEo1U0NxODN5UnJGb25VemhsdlNi?=
- =?utf-8?B?UHNVVU91c0VSZjloYjVuekN5eXlqUnFGUmpPaXRCODlvWE1kTnQ3cExmcE5n?=
- =?utf-8?B?aStIblNEc240QlN1NDlvWTh1cG91VG54TFpBbTVHWm9YOWF5eHlKRHNtZWdV?=
- =?utf-8?B?Uno0Mkt6OVpCdHl3Sjd6eit3NzRMNGNORE8vQVkybmFuTmJkNytJaGdjaU9a?=
- =?utf-8?B?VEkzQ2Rjbmp2TjR6SVl0ZFVHbUpwL0trTXd2NlpIYStWSTI3N0tXVEZzSUI5?=
- =?utf-8?B?WkVvNjRqdlFKK0NYWlVzUEhqUkFQZ1cycWx6NlY2bFE4Ti9XZWVQVE55a2k0?=
- =?utf-8?B?NlR5VFRaZm9TVExnWWlZU2J6R1ppcVZiWWhLWFhaS05rdWlzR2JVZGEvUUZM?=
- =?utf-8?B?NTFYdkJsL01WTXUrZHdCenRxQytRa3FaV25SbkpVRm1GMlpWK3VySGJnY09B?=
- =?utf-8?B?TDJYVWRMNDJzU1kyYnBXd05mbVU5SDZIakV1NjlBZ2x4L3hhZGRzOGZJMUVE?=
- =?utf-8?B?ZzNRMGhtY3lSSzBoOG8wZ3E2VFlXOEJpNGMzckxJZjdSQlhFb2dXYityZXFJ?=
- =?utf-8?B?VkIwRjI2SUJBeVhjQzhPbUU2Vm4rZmtJblAyNTRYNC94aThXQXQwWVVHZTVS?=
- =?utf-8?B?OHlTM21ma0tCRnhZYzYyODV1ZG5ZZzNWQ1IvK3FjYmNTV1ZEUHVTU05JcmhI?=
- =?utf-8?B?MEFyc3ZkamdOakpVa0ZwUkZBRXgxejlnN08vd3paY2NFTElZZi84djZMQ0pJ?=
- =?utf-8?B?a1pCZVRZVi9BUWdSUVNocDZLWWVKZGJsMkUwcmdMQVpuVXF2RUh3K2dld0U4?=
- =?utf-8?B?M2dGVEtaMGlwbEROaFBnMGo1WGZ1K0RFaWQ0bkh4NmZOR2J3QXl5ZGpjenY2?=
- =?utf-8?B?dDdrY2tTSWlKTllKYzR3YTYzdXg2OFg3RTN5d0FFcVY0emQ1VzJvMWdWNlVM?=
- =?utf-8?B?WHFiSE4vakM3YVNQckx4amZtQytuT0hCYmNleUUrZWdZRjFaaGpQMjBTTWFx?=
- =?utf-8?B?R20ySUlId0E2anRVSlBFSHNLQnJmT0FsYkxlNERmSDF2Nm9tTCtkbm9uUmRX?=
- =?utf-8?B?ZERsWmx3bFkvVXVtMGNMZTIxaDJMbGpkeUM1SDUzTElzNWZSODRiaEx3ckNT?=
- =?utf-8?B?ZlFWUkJOZFkzT1V4YmFweFdHOGZxcC9rTkdSbStBMWhNTFdZaWExUExweXh5?=
- =?utf-8?B?KytpVjRLMjQwekpLYXVFL1RSUC8yRGYvd0tjR3dSRUsrS2hJRGNZZi8zQlk2?=
- =?utf-8?B?d1BMbGFpMDZYMnRhcnUxbUJXZzA4MHJ0amVHNlJTN3ZsTHBISDhqdGd1cnFN?=
- =?utf-8?B?KzFXcUtVaUZLdTRPOUtWcjg3Y29SUXFld2R4eHkzRGF4NVprODh3TmlxZll2?=
- =?utf-8?B?RGJzQlg4L1RJMnBBeTMybDJQWjNEMkdlWXlQMTNiWnlNeUs5Q2xQUjQ1TjUr?=
- =?utf-8?B?NDM5VmVhNEcvb09zZHJtVFJHRDM4NHhSUDRrVlVvYnRMVlU3Mmw4Y1FlWlI3?=
- =?utf-8?Q?cu/QMLNIAdRAWH9T0dmWmPs=3D?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6e0b3b73-d29a-4211-6475-08d9a91a9828
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Nov 2021 16:03:13.7832
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1Sbvz33co2UfBb6izIgQFYfVYyLLJPk9/RqHMCNtVMquOBcNUsrGA0qIzWMadpL8hWTqNwZMpMp0B81X/y2ioQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2686
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvm@vger.kernel.org, linux-mips@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linuxppc-dev@lists.ozlabs.org, pbonzini@redhat.com, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, anup.patel@wdc.com, borntraeger@de.ibm.com, frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com, jgross@suse.com, npiggin@gmail.com, seanjc@google.com, paulus@samba.org, mpe@ellerman.id.au, f4bug@amsat.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+The kvm structure is pretty large. A large portion of it is the vcpu
+array, which is 4kB on arm64 with 512 vcpu, double that on x86-64.  Of
+course, hardly anyone runs VMs this big, so this is often a net waste
+of memory and cache locality.
 
+A possible approach is to turn the fixed-size array into an xarray,
+which results in a net code deletion after a bit of cleanup.
 
-On 11/16/21 9:45 AM, Venu Busireddy wrote:
-> On 2021-11-15 10:55:32 -0600, Venu Busireddy wrote:
->> On 2021-11-15 10:45:48 -0600, Brijesh Singh wrote:
->>>
->>>
->>> On 11/15/21 10:37 AM, Venu Busireddy wrote:
->>>> On 2021-11-15 10:02:24 -0600, Brijesh Singh wrote:
->>>>>
->>>>>
->>>>> On 11/15/21 9:56 AM, Venu Busireddy wrote:
->>>>> ...
->>>>>
->>>>>>> The series is based on tip/master
->>>>>>>      ea79c24a30aa (origin/master, origin/HEAD, master) Merge branch 'timers/urgent'
->>>>>>
->>>>>> I am looking at
->>>>>> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgit.kernel.org%2Fpub%2Fscm%2Flinux%2Fkernel%2Fgit%2Ftorvalds%2Flinux.git&amp;data=04%7C01%7Cbrijesh.singh%40amd.com%7C527b875208904981677108d9a9183dba%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637726744508270539%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000&amp;sdata=hfqoF4d95hWAY8%2BKW4t5UyrWIPAUuHOTvzTQGXyxQik%3D&amp;reserved=0,
->>>>>> and I cannot find the commit ea79c24a30aa there. Am I looking at the
->>>>>> wrong tree?
->>>>>>
->>>>>
->>>>> Yes.
->>>>>
->>>>> You should use the tip [1] tree .
->>>>>
->>>>> [1] https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgit.kernel.org%2Fpub%2Fscm%2Flinux%2Fkernel%2Fgit%2Ftip%2Ftip.git%2F&amp;data=04%7C01%7Cbrijesh.singh%40amd.com%7C527b875208904981677108d9a9183dba%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637726744508270539%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000&amp;sdata=TDbL2dnzCp%2FlFHv6Tr%2Fn6QhFKL2kL3DFWj5BT6Abcms%3D&amp;reserved=0
->>>>
->>>> Same problem with tip.git too.
->>>>
->>>> bash-4.2$ git remote -v
->>>> origin  https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgit.kernel.org%2Fpub%2Fscm%2Flinux%2Fkernel%2Fgit%2Ftip%2Ftip.git&amp;data=04%7C01%7Cbrijesh.singh%40amd.com%7C527b875208904981677108d9a9183dba%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637726744508270539%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000&amp;sdata=0qPjqphHSBSnpxOrPGDyJ7BF5O3fnTJtXQgnO0ZwCXY%3D&amp;reserved=0 (fetch)
->>>> origin  https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgit.kernel.org%2Fpub%2Fscm%2Flinux%2Fkernel%2Fgit%2Ftip%2Ftip.git&amp;data=04%7C01%7Cbrijesh.singh%40amd.com%7C527b875208904981677108d9a9183dba%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637726744508270539%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000&amp;sdata=0qPjqphHSBSnpxOrPGDyJ7BF5O3fnTJtXQgnO0ZwCXY%3D&amp;reserved=0 (push)
->>>> bash-4.2$ git branch
->>>> * master
->>>> bash-4.2$ git log --oneline | grep ea79c24a30aa
->>>> bash-4.2$
->>>>
->>>> Still missing something?
->>>>
->>>
->>> I can see the base commit on my local clone and also on web interface
->>
->> But can you see the commit ea79c24a30aa if you clone
->> git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git?
->>
->>> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgit.kernel.org%2Fpub%2Fscm%2Flinux%2Fkernel%2Fgit%2Ftip%2Ftip.git%2Fcommit%2F%3Fid%3Dea79c24a30aa27ccc4aac26be33f8b73f3f1f59c&amp;data=04%7C01%7Cbrijesh.singh%40amd.com%7C527b875208904981677108d9a9183dba%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637726744508270539%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000&amp;sdata=mG4i3ZNHgyrS3Xkdxw%2BhkmfxvzFkS%2FpX0B3xHlxN0Nc%3D&amp;reserved=0
->>
->> The web interface has the weird warning "Notice: this object is not
->> reachable from any branch." Don't know what to make of that.
-> 
-> Just wanted to clarify. I am not interested in the commit ea79c24a30aa
-> per se. I am trying to apply this patch series to a local copy of the
-> tip. I tried applying to the top of the tree, and that failed. I tried
-> to apply on top of commit ca7752caeaa7 (which appeared to be the closest
-> commit to your description), and that also failed. I just need a commit
-> on which I can successfully apply this series.
-> 
+* From v1:
+  - Rebased on v5.16-rc1
+  - Dropped the dubious locking on teardown
+  - Converted kvm_for_each_vcpu() to xa_for_each_range(), together with
+    an invasive change converting the index to an unsigned long
 
-At the time I pulled the tip, the said commit was valid and my entire 
-series was generated against it. Its possible that commit is no longer 
-valid in the recent tip (maybe due to force push). You can grab a 
-staging tree from here https://github.com/AMDESE/linux/tree/snp-part1-v7.
+Marc Zyngier (7):
+  KVM: Move wiping of the kvm->vcpus array to common code
+  KVM: mips: Use kvm_get_vcpu() instead of open-coded access
+  KVM: s390: Use kvm_get_vcpu() instead of open-coded access
+  KVM: x86: Use kvm_get_vcpu() instead of open-coded access
+  KVM: Convert the kvm->vcpus array to a xarray
+  KVM: Use 'unsigned long' as kvm_for_each_vcpu()'s index
+  KVM: Convert kvm_for_each_vcpu() to using xa_for_each_range()
 
+ arch/arm64/kvm/arch_timer.c           |  8 ++---
+ arch/arm64/kvm/arm.c                  | 16 +++------
+ arch/arm64/kvm/pmu-emul.c             |  2 +-
+ arch/arm64/kvm/psci.c                 |  6 ++--
+ arch/arm64/kvm/reset.c                |  2 +-
+ arch/arm64/kvm/vgic/vgic-init.c       | 10 +++---
+ arch/arm64/kvm/vgic/vgic-kvm-device.c |  2 +-
+ arch/arm64/kvm/vgic/vgic-mmio-v2.c    |  3 +-
+ arch/arm64/kvm/vgic/vgic-mmio-v3.c    |  7 ++--
+ arch/arm64/kvm/vgic/vgic-v3.c         |  4 +--
+ arch/arm64/kvm/vgic/vgic-v4.c         |  5 +--
+ arch/arm64/kvm/vgic/vgic.c            |  2 +-
+ arch/mips/kvm/loongson_ipi.c          |  4 +--
+ arch/mips/kvm/mips.c                  | 23 ++-----------
+ arch/powerpc/kvm/book3s_32_mmu.c      |  2 +-
+ arch/powerpc/kvm/book3s_64_mmu.c      |  2 +-
+ arch/powerpc/kvm/book3s_hv.c          |  8 ++---
+ arch/powerpc/kvm/book3s_pr.c          |  2 +-
+ arch/powerpc/kvm/book3s_xics.c        |  6 ++--
+ arch/powerpc/kvm/book3s_xics.h        |  2 +-
+ arch/powerpc/kvm/book3s_xive.c        | 15 +++++----
+ arch/powerpc/kvm/book3s_xive.h        |  4 +--
+ arch/powerpc/kvm/book3s_xive_native.c |  8 ++---
+ arch/powerpc/kvm/e500_emulate.c       |  2 +-
+ arch/powerpc/kvm/powerpc.c            | 10 +-----
+ arch/riscv/kvm/vcpu_sbi.c             |  2 +-
+ arch/riscv/kvm/vm.c                   | 10 +-----
+ arch/riscv/kvm/vmid.c                 |  2 +-
+ arch/s390/kvm/interrupt.c             |  2 +-
+ arch/s390/kvm/kvm-s390.c              | 47 ++++++++++-----------------
+ arch/s390/kvm/kvm-s390.h              |  4 +--
+ arch/x86/kvm/hyperv.c                 |  7 ++--
+ arch/x86/kvm/i8254.c                  |  2 +-
+ arch/x86/kvm/i8259.c                  |  5 +--
+ arch/x86/kvm/ioapic.c                 |  4 +--
+ arch/x86/kvm/irq_comm.c               |  7 ++--
+ arch/x86/kvm/kvm_onhyperv.c           |  3 +-
+ arch/x86/kvm/lapic.c                  |  6 ++--
+ arch/x86/kvm/svm/avic.c               |  2 +-
+ arch/x86/kvm/svm/sev.c                |  3 +-
+ arch/x86/kvm/vmx/posted_intr.c        |  2 +-
+ arch/x86/kvm/x86.c                    | 30 +++++++----------
+ include/linux/kvm_host.h              | 17 +++++-----
+ virt/kvm/kvm_main.c                   | 41 ++++++++++++++++-------
+ 44 files changed, 158 insertions(+), 193 deletions(-)
 
-> Thanks,
-> 
-> Venu
-> 
->>
->> Venu
->>
->>>
->>> thanks
+-- 
+2.30.2
+
