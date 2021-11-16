@@ -2,102 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7CFBE45339D
-	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 15:05:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 860954533C0
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 15:11:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237093AbhKPOH7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Nov 2021 09:07:59 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:56761 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237094AbhKPOH7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 16 Nov 2021 09:07:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637071501;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hBtk2aPZbU2pteLbgMkZkjDkjfuxdJX2rybR87y4uZ4=;
-        b=fQXchlOqjb3ZCi5ZqTO8/iS2U2Kyj7GLqNkRqkJ3CXNPR6wXL9PwSq6li9PZX3POzy1/7R
-        a5W94jTjDkiXPIat8kohq+6E2mtFTkLd41AOpT6flVzYCWr4vLQ3UEd7T7Fe+n8HBfnd0x
-        wxFQjQ4C6+yc5GmS4nnDHjcBAYMNzVA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-574-L8W_GkDdPby-uiSCgnu-Aw-1; Tue, 16 Nov 2021 09:05:00 -0500
-X-MC-Unique: L8W_GkDdPby-uiSCgnu-Aw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S237102AbhKPOOA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Nov 2021 09:14:00 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:40680 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233147AbhKPON4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Nov 2021 09:13:56 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 85E8880DDE4;
-        Tue, 16 Nov 2021 14:04:57 +0000 (UTC)
-Received: from [10.39.192.245] (unknown [10.39.192.245])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A662F10023B8;
-        Tue, 16 Nov 2021 14:04:48 +0000 (UTC)
-Message-ID: <330eb780-1963-ac1f-aaad-908346112f28@redhat.com>
-Date:   Tue, 16 Nov 2021 15:04:47 +0100
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 9BFEE1FD26;
+        Tue, 16 Nov 2021 14:10:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1637071858; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=hNvmd1HYHY5JfEMQ6fzIS8YO9/2TVmGFsGgW8qyoxik=;
+        b=NczuAT1a/me+nyICZpVlNDx8Jsu8fTP95KmU+/1RCttl7YYjIcTBsvD1VQ6heaEI+Q/+KG
+        QP2+VVMckCPbFAehUo5pCU+X3UKuH/uANQbPuH6fjPkwnd1ebmyZ5Uu89jk00TCuQrqIFA
+        ZRXCpj9DROxS5HLAOCcg594P4LjTcxk=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id F0A5B13BAE;
+        Tue, 16 Nov 2021 14:10:57 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id k6tBOfG7k2ExEQAAMHmgww
+        (envelope-from <jgross@suse.com>); Tue, 16 Nov 2021 14:10:57 +0000
+From:   Juergen Gross <jgross@suse.com>
+To:     kvm@vger.kernel.org, x86@kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Juergen Gross <jgross@suse.com>, Jonathan Corbet <corbet@lwn.net>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>
+Subject: [PATCH v3 0/4] x86/kvm: add boot parameters for max vcpu configs
+Date:   Tue, 16 Nov 2021 15:10:50 +0100
+Message-Id: <20211116141054.17800-1-jgross@suse.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH 4/5] KVM: x86: Use kvm_get_vcpu() instead of open-coded
- access
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>
-Cc:     kvm@vger.kernel.org, linux-mips@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, linuxppc-dev@lists.ozlabs.org,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup.patel@wdc.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Juergen Gross <jgross@suse.com>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        kernel-team@android.com
-References: <20211105192101.3862492-1-maz@kernel.org>
- <20211105192101.3862492-5-maz@kernel.org> <YYWOKTYHhJywwCRk@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YYWOKTYHhJywwCRk@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/5/21 21:03, Sean Christopherson wrote:
-> But I think even that is flawed, as APICv can be dynamically deactivated and
-> re-activated while the VM is running, and I don't see a path that re-updates
-> the IRTE when APICv is re-activated.  So I think a more conservative check is
-> needed, e.g.
-> 
-> diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-> index 5f81ef092bd4..6cf5b2e86118 100644
-> --- a/arch/x86/kvm/vmx/posted_intr.c
-> +++ b/arch/x86/kvm/vmx/posted_intr.c
-> @@ -272,7 +272,7 @@ int pi_update_irte(struct kvm *kvm, unsigned int host_irq, uint32_t guest_irq,
-> 
->          if (!kvm_arch_has_assigned_device(kvm) ||
->              !irq_remapping_cap(IRQ_POSTING_CAP) ||
-> -           !kvm_vcpu_apicv_active(kvm->vcpus[0]))
-> +           !irqchip_in_kernel(kvm) || !enable_apicv)
->                  return 0;
-> 
->          idx = srcu_read_lock(&kvm->irq_srcu);
+In order to be able to have a single kernel for supporting even huge
+numbers of vcpus per guest some arrays should be sized dynamically.
 
-What happens then if pi_pre_block is called and the IRTE denotes a 
-posted interrupt?
+The easiest way to do that is to add boot parameters for the maximum
+number of vcpus and to calculate the maximum vcpu-id from that using
+either the host topology or a topology hint via another boot parameter.
 
-I might be wrong, but it seems to me that you have to change all of the 
-occurrences this way.  As soon as enable_apicv is set, you need to go 
-through the POSTED_INTR_WAKEUP_VECTOR just in case.
+This patch series is doing that for x86. The same scheme can be easily
+adapted to other architectures, but I don't want to do that in the
+first iteration.
 
-Paolo
+I've tested the series not to break normal guest operation and the new
+parameters to be effective on x86.
+
+This series is based on Marc Zyngier's xarray series:
+https://lore.kernel.org/kvm/20211105192101.3862492-1-maz@kernel.org/
+
+Changes in V2:
+- removed old patch 1, as already applied
+- patch 1 (old patch 2) only for reference, as the patch is already in
+  the kvm tree
+- switch patch 2 (old patch 3) to calculate vcpu-id
+- added patch 4
+
+Changes in V3:
+- removed V2 patches 1 and 4, as already applied
+- removed V2 patch 5, as replaced by Marc Zyngier's xarray series
+- removed hyperv handling from patch 2
+- new patch 3 handling hyperv specifics
+- comments addressed
+
+Juergen Gross (4):
+  x86/kvm: add boot parameter for adding vcpu-id bits
+  x86/kvm: introduce a per cpu vcpu mask
+  x86/kvm: add max number of vcpus for hyperv emulation
+  x86/kvm: add boot parameter for setting max number of vcpus per guest
+
+ .../admin-guide/kernel-parameters.txt         | 25 +++++++++
+ arch/x86/include/asm/kvm_host.h               | 29 +++++-----
+ arch/x86/kvm/hyperv.c                         | 15 +++---
+ arch/x86/kvm/ioapic.c                         | 20 ++++++-
+ arch/x86/kvm/ioapic.h                         |  4 +-
+ arch/x86/kvm/irq_comm.c                       |  9 +++-
+ arch/x86/kvm/x86.c                            | 54 ++++++++++++++++++-
+ 7 files changed, 128 insertions(+), 28 deletions(-)
+
+-- 
+2.26.2
 
