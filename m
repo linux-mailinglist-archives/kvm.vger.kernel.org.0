@@ -2,113 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CCABD4534BF
-	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 15:58:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 72D264534E3
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 16:04:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237677AbhKPPAy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Nov 2021 10:00:54 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34590 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233685AbhKPPAr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 16 Nov 2021 10:00:47 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637074670;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=J9ZGbcfgP1zFzA+Vk6QiIz3QS4KTU9mznjiqf2bI91I=;
-        b=YVcLdbg3NtMa6FopCJZF5DHMznOy4qFnSuuU82yZRsUJI7MzL9qfgNcS/d5GZAggvs45sK
-        XG1qLiKwOwhTGTfyeFK5cJ/3Y0zSbTOxRzwXXNhZNuFVVkPJrXg/mC9G2HqrfJ39IJJnsi
-        mL+UA9QN9ClbA0DhmiypoA1zZjYWa8E=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-563-gWdK6xN2P7eS0tB9DWAPug-1; Tue, 16 Nov 2021 09:57:46 -0500
-X-MC-Unique: gWdK6xN2P7eS0tB9DWAPug-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71F4ACC625;
-        Tue, 16 Nov 2021 14:57:42 +0000 (UTC)
-Received: from [10.39.192.245] (unknown [10.39.192.245])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BE3245C1D5;
-        Tue, 16 Nov 2021 14:57:39 +0000 (UTC)
-Message-ID: <ad0648ac-b72a-1692-c608-b37109b3d250@redhat.com>
-Date:   Tue, 16 Nov 2021 15:57:38 +0100
+        id S237892AbhKPPHT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Nov 2021 10:07:19 -0500
+Received: from mail.kernel.org ([198.145.29.99]:56846 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S237921AbhKPPG0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Nov 2021 10:06:26 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 1D79261178;
+        Tue, 16 Nov 2021 15:03:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1637075009;
+        bh=fd+4IpcckmJCv5DVzDaeYbY9dErPRQQTYtd2HeahSA8=;
+        h=Date:From:To:Cc:Subject:From;
+        b=qhl3jHBkzwuB+n3VI36UupE17lubHYyXDAFpKGYBTnoypaRXPeSFXUQJ1m73IBnvN
+         0ruMIVcShLlpzZpfWHPzZDhZYcyPV6TqTrEP6KTU18ZlmaNlUmDvwPdVo2kgTyH9oN
+         nWMAWiYYKX83dIVS4m+BrGeEpuh9uiwF0dN6f4URphlU/zQCCT08Yi3mbCEnXlclpL
+         e7VCE/wiAqgEJBYT327806y2UOZpySyj5rmI5ab8Df9cULUA6rR4rFV4c1YdDirTM1
+         peEIl/mJyD/c/Eo+8xpv+dWnvbQpe2igdsdiuMFVZ4cVkmlGOq08s4nJHQnC76JUcR
+         92IHsEFnFKykg==
+Received: by quaco.ghostprotocols.net (Postfix, from userid 1000)
+        id 8086C4088E; Tue, 16 Nov 2021 12:03:25 -0300 (-03)
+Date:   Tue, 16 Nov 2021 12:03:25 -0300
+From:   Arnaldo Carvalho de Melo <acme@kernel.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>,
+        David Rientjes <rientjes@google.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Marc Orr <marcorr@google.com>, Peter Gonda <pgonda@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 1/1] selftests: KVM: Add /x86_64/sev_migrate_tests to
+ .gitignore
+Message-ID: <YZPIPfvYgRDCZi/w@kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [RFC PATCH 0/11] Rework gfn_to_pfn_cache
-Content-Language: en-US
-To:     David Woodhouse <dwmw2@infradead.org>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     kvm <kvm@vger.kernel.org>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "mtosatti@redhat.com" <mtosatti@redhat.com>,
-        "joro@8bytes.org" <joro@8bytes.org>, karahmed@amazon.com
-References: <2b400dbb16818da49fb599b9182788ff9896dcda.camel@infradead.org>
- <32b00203-e093-8ffc-a75b-27557b5ee6b1@redhat.com>
- <28435688bab2dc1e272acc02ce92ba9a7589074f.camel@infradead.org>
- <4c37db19-14ed-46b8-eabe-0381ba879e5c@redhat.com>
- <537fdcc6af80ba6285ae0cdecdb615face25426f.camel@infradead.org>
- <7e4b895b-8f36-69cb-10a9-0b4139b9eb79@redhat.com>
- <95fae9cf56b1a7f0a5f2b9a1934e29e924908ff2.camel@infradead.org>
- <3a2a9a8c-db98-b770-78e2-79f5880ce4ed@redhat.com>
- <2c7eee5179d67694917a5a0d10db1bce24af61bf.camel@infradead.org>
- <537a1d4e-9168-cd4a-cd2f-cddfd8733b05@redhat.com>
- <YZLmapmzs7sLpu/L@google.com>
- <57d599584ace8ab410b9b14569f434028e2cf642.camel@infradead.org>
- <94bb55e117287e07ba74de2034800da5ba4398d2.camel@infradead.org>
- <04bf7e8b-d0d7-0eb6-4d15-bfe4999f42f8@redhat.com>
- <19bf769ef623e0392016975b12133d9a3be210b3.camel@infradead.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <19bf769ef623e0392016975b12133d9a3be210b3.camel@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/16/21 15:25, David Woodhouse wrote:
-> +       /*
-> +        * If the guest requires direct access to mapped L1 pages, check
-> +        * the caches are valid. Will raise KVM_REQ_GET_NESTED_STATE_PAGES
-> +        * to go and revalidate them, if necessary.
-> +        */
-> +       if (is_guest_mode(vcpu) && kvm_x86_ops.nested_ops->check_guest_maps)
-> +               kvm_x86_ops.nested_ops->check_guest_maps();
-> +
+  $ git status
+  nothing to commit, working tree clean
+  $
+  $ make -C tools/testing/selftests/kvm/ > /dev/null 2>&1
+  $ git status
 
-This should not be needed, should it?  As long as the gfn-to-pfn
-cache's vcpu field is handled properly, the request will just cause
-the vCPU not to enter.  It would have to take the gpc->lock around
-changes to gpc->vcpu though (meaning: it's probably best to add a
-function gfn_to_pfn_cache_set_vcpu).
+  Untracked files:
+    (use "git add <file>..." to include in what will be committed)
+  	tools/testing/selftests/kvm/x86_64/sev_migrate_tests
 
-Doing it lockless would be harder; I cannot think of any well-known
-pattern that is good for this scenario.
+  nothing added to commit but untracked files present (use "git add" to track)
+  $
 
-> That check_guest_maps() function can validate the caches which the L2
-> guest is actually using in the VMCS02, and if they need to be refreshed
-> then raising a req will immediately break out of vcpu_enter_guest() to
-> allow that to happen.
-> 
-> I*think*  we can just use KVM_REQ_GET_NESTED_STATE_PAGES for that and
-> don't need to invent a new one?
+Fixes: 6a58150859fdec76 ("selftest: KVM: Add intra host migration tests")
+Cc: Brijesh Singh <brijesh.singh@amd.com>
+Cc: David Rientjes <rientjes@google.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Marc Orr <marcorr@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Gonda <pgonda@google.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Signed-off-by: Arnaldo Carvalho de Melo <acme@redhat.com>
+---
+ tools/testing/selftests/kvm/.gitignore | 1 +
+ 1 file changed, 1 insertion(+)
 
-Yes, maybe even do it unconditionally?
-
--                if (kvm_check_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu)) {
-+                if (kvm_check_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu) ||
-		     kvm_check_request(KVM_REQ_GPC_INVALIDATE, vcpu))
-
-if the gfn-to-pfn cache's vcpu field is set/reset properly across nested
-VM entry and exit.
-
-Paolo
+diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+index d4a8301396833fc8..3763105029fb3b3c 100644
+--- a/tools/testing/selftests/kvm/.gitignore
++++ b/tools/testing/selftests/kvm/.gitignore
+@@ -23,6 +23,7 @@
+ /x86_64/platform_info_test
+ /x86_64/set_boot_cpu_id
+ /x86_64/set_sregs_test
++/x86_64/sev_migrate_tests
+ /x86_64/smm_test
+ /x86_64/state_test
+ /x86_64/svm_vmcall_test
+-- 
+2.31.1
 
