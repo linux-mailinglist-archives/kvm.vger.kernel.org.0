@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A654B45320A
-	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 13:21:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DFEC845320C
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 13:22:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236072AbhKPMYk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Nov 2021 07:24:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38572 "EHLO
+        id S236092AbhKPMYo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Nov 2021 07:24:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234468AbhKPMYc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Nov 2021 07:24:32 -0500
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 265C4C061570;
-        Tue, 16 Nov 2021 04:21:35 -0800 (PST)
-Received: by mail-pg1-x534.google.com with SMTP id 200so17437103pga.1;
-        Tue, 16 Nov 2021 04:21:35 -0800 (PST)
+        with ESMTP id S236059AbhKPMYf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Nov 2021 07:24:35 -0500
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9876C061570;
+        Tue, 16 Nov 2021 04:21:38 -0800 (PST)
+Received: by mail-pf1-x432.google.com with SMTP id z6so18024300pfe.7;
+        Tue, 16 Nov 2021 04:21:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=A24B6Kw+DAeOeTujXR8lsbEq3f37mSZd7N0cbao9X0U=;
-        b=jCX73OaRWtw1hUFBZnxzdGMBOFH+MENghgyEbI714jIyK+yFLwiaQpdo5MjwJHLCOR
-         buCFUnsM+JEV4Y0YjMw8vCp33U+BI3uRIG7oIeFcde9U82YF9QKOZZDVH7ClHuQmFvqO
-         sX+2eQ4MV7SGDF3ByT8R2uQSWyiOdWqgdOM7+zi/rdlbNNGD1xWZ+5E7V3HNo4WIEe/V
-         C4XovblKj7xZMdpAoI0pOdqEOETWrhcrCpWhp/lyp8Q4c3cMJKEUGyLe2ys10bvo4FL+
-         OP0jcj6tcikjZ9skSu2nTPQzEC1kW3SHLmeMtWaKZMdtaX60jOtk5GmV9Xd3UYVRXbGL
-         6FEw==
+        bh=xuC7ZB2yxcgOU60z+OpXfks9WN9+4gTePeFFLFNtjWA=;
+        b=iZrd7FzvW9ZHF1ZjHuKYCYUM5ZrrbIRtIljZA1hlsNOuxidO6KZzgo3GSMXcuMN6BY
+         Mzj6M6VSCjlsrIfj77FAGSHrW1vYhrPDrnpNd8H74KV1IWPuFmwoyZNRluQKuwA/JH0z
+         er7GOEL/iY3A8zx83pTFdU/KzjGY0pi0sadagy+MxW1v0OE+oVgKPRWA+lutedq08PN/
+         ZuQAvnhU1p2yDntc58MOk5IGfrHflliB6r6PhdXpkIMmYvNpxfUP1CBPQRHGAbuuOh0e
+         L0Stc5qOFc+pujvHaanAiOogzgALH0cOrlO4GjLg4RLO65+fadRuE5hfbqi4+u3NoHIY
+         JADw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=A24B6Kw+DAeOeTujXR8lsbEq3f37mSZd7N0cbao9X0U=;
-        b=8LxzOCYW1dGdIo/F9Joa0O18Jsc+e+/ir+Q8CslI6vDWt2wsk0XLxokyuk16SFvQTi
-         iCIn5mYwvqXcn5VQujNLAopA/2RE5hZKsKIW7LOLIiEag4i/dnuN5pXODANWweO6WE2F
-         5mPJTVtFCA1p6vUwrnpt0KykdtxDSp9RoC+E3J+DiEziLy+7sJ1mWfk4OsUPO7FDn7wb
-         kAEDQKmBaDj9qaLUVhZoyZmIrDdbtUPgw/6E4/Jw1l9fDTflqz855CMFG8DidATBhXCd
-         klAq/OKsC4Jf9w+bY64+L1XWwzJ2BGTcZikxWqeHof9WK+5fjS81Pbv0Jj2ZYFvNMSGA
-         7pPw==
-X-Gm-Message-State: AOAM531L+dabOHftbi988OIx/06KRaSrNeIKBHp9cLKxCXETDd9ZVg+S
-        r22LX1sIuwKvq2mJaU5aC1c=
-X-Google-Smtp-Source: ABdhPJw6l2iEiJ9uQx9c9+5ewKOFnrjN05Rwhw1xt7hcU+jSOzGos91uJB/Z9IIA4eJGHL5Ty67t6Q==
-X-Received: by 2002:a05:6a00:188a:b0:481:2c54:4ace with SMTP id x10-20020a056a00188a00b004812c544acemr38820262pfh.20.1637065294758;
-        Tue, 16 Nov 2021 04:21:34 -0800 (PST)
+        bh=xuC7ZB2yxcgOU60z+OpXfks9WN9+4gTePeFFLFNtjWA=;
+        b=eFzISv/+8GUZIu250AZ6SEURcZzxjfJGm7Ah92rDxguDWMLQGdgydL8HX70vMlrhOY
+         M4sEEUB7JPhZvcatr8BApGPoHkspcTXnP+EJ4GGXyAOoLy36AvBYNtGrxkcx3TP5aIrS
+         nN5vvHXpILn0VF/joPUdn3t1kgMdKC5br6ygGDEIWB4ek7SIimfCtlhJCdHWxa/s8QD+
+         afk7mxFjff5deTeqo14m0OLGSs55303v6Ik6MHxSiP5UOX53tgAfW8rgMTv5W137IZt8
+         DeD8jq0pIqpZv0yDYsKW+UEIEk++cuTMWuY1muFuHNjQ/cB6k1Hy3yXA7GX7gUVYJbVr
+         tpFA==
+X-Gm-Message-State: AOAM533YskmButq2VjAzpynIx/s6o98pU7yHT49hxqHS4VT2DKEV5EP8
+        9jffkauLj/4BNesDsIz5GwU=
+X-Google-Smtp-Source: ABdhPJwC6zx9TaYnwjCFjqm9fnR+Tw0Q+JHb7RPX7Lxnn8zrmlQ6M6npXwsQy6218+GXg8vaGkPGQQ==
+X-Received: by 2002:a62:760a:0:b0:494:6fa0:60a2 with SMTP id r10-20020a62760a000000b004946fa060a2mr40001157pfc.39.1637065298339;
+        Tue, 16 Nov 2021 04:21:38 -0800 (PST)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id i67sm18557613pfg.189.2021.11.16.04.21.28
+        by smtp.gmail.com with ESMTPSA id i67sm18557613pfg.189.2021.11.16.04.21.35
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 16 Nov 2021 04:21:33 -0800 (PST)
+        Tue, 16 Nov 2021 04:21:37 -0800 (PST)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -56,9 +56,9 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 2/4] KVM: x86/pmu: Refactoring find_arch_event() to find_perf_hw_id()
-Date:   Tue, 16 Nov 2021 20:20:28 +0800
-Message-Id: <20211116122030.4698-3-likexu@tencent.com>
+Subject: [PATCH 3/4] KVM: x86/pmu: Reuse find_perf_hw_id() and drop find_fixed_event()
+Date:   Tue, 16 Nov 2021 20:20:29 +0800
+Message-Id: <20211116122030.4698-4-likexu@tencent.com>
 X-Mailer: git-send-email 2.33.1
 In-Reply-To: <20211116122030.4698-1-likexu@tencent.com>
 References: <20211116122030.4698-1-likexu@tencent.com>
@@ -70,122 +70,141 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <likexu@tencent.com>
 
-The find_arch_event() returns a "unsigned int" value,
-which is used by the pmc_reprogram_counter() to
-program a PERF_TYPE_HARDWARE type perf_event.
-
-The returned value is actually the kernel defined gernic
-perf_hw_id, let's rename it to find_perf_hw_id() with simpler
-incoming parameters for better self-explanation.
+Since we set the same semantic event value for the fixed counter in
+pmc->eventsel, returning the perf_hw_id for the fixed counter via
+find_fixed_event() can be painlessly replaced by find_perf_hw_id()
+with the help of pmc_is_fixed() check.
 
 Signed-off-by: Like Xu <likexu@tencent.com>
 ---
- arch/x86/kvm/pmu.c           | 8 +-------
- arch/x86/kvm/pmu.h           | 3 +--
- arch/x86/kvm/svm/pmu.c       | 8 ++++----
- arch/x86/kvm/vmx/pmu_intel.c | 9 +++++----
- 4 files changed, 11 insertions(+), 17 deletions(-)
+ arch/x86/kvm/pmu.c           |  2 +-
+ arch/x86/kvm/pmu.h           |  1 -
+ arch/x86/kvm/svm/pmu.c       | 11 ++++-------
+ arch/x86/kvm/vmx/pmu_intel.c | 29 ++++++++++++++++-------------
+ 4 files changed, 21 insertions(+), 22 deletions(-)
 
 diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index 0772bad9165c..903dc6a532cc 100644
+index 903dc6a532cc..3c45467b4275 100644
 --- a/arch/x86/kvm/pmu.c
 +++ b/arch/x86/kvm/pmu.c
-@@ -174,7 +174,6 @@ static bool pmc_resume_counter(struct kvm_pmc *pmc)
- void reprogram_gp_counter(struct kvm_pmc *pmc, u64 eventsel)
- {
- 	unsigned config, type = PERF_TYPE_RAW;
--	u8 event_select, unit_mask;
- 	struct kvm *kvm = pmc->vcpu->kvm;
- 	struct kvm_pmu_event_filter *filter;
- 	int i;
-@@ -206,17 +205,12 @@ void reprogram_gp_counter(struct kvm_pmc *pmc, u64 eventsel)
- 	if (!allow_event)
- 		return;
+@@ -262,7 +262,7 @@ void reprogram_fixed_counter(struct kvm_pmc *pmc, u8 ctrl, int idx)
  
--	event_select = eventsel & ARCH_PERFMON_EVENTSEL_EVENT;
--	unit_mask = (eventsel & ARCH_PERFMON_EVENTSEL_UMASK) >> 8;
--
- 	if (!(eventsel & (ARCH_PERFMON_EVENTSEL_EDGE |
- 			  ARCH_PERFMON_EVENTSEL_INV |
- 			  ARCH_PERFMON_EVENTSEL_CMASK |
- 			  HSW_IN_TX |
- 			  HSW_IN_TX_CHECKPOINTED))) {
--		config = kvm_x86_ops.pmu_ops->find_arch_event(pmc_to_pmu(pmc),
--						      event_select,
--						      unit_mask);
-+		config = kvm_x86_ops.pmu_ops->find_perf_hw_id(pmc);
- 		if (config != PERF_COUNT_HW_MAX)
- 			type = PERF_TYPE_HARDWARE;
- 	}
+ 	pmc->current_config = (u64)ctrl;
+ 	pmc_reprogram_counter(pmc, PERF_TYPE_HARDWARE,
+-			      kvm_x86_ops.pmu_ops->find_fixed_event(idx),
++			      kvm_x86_ops.pmu_ops->find_perf_hw_id(pmc),
+ 			      !(en_field & 0x2), /* exclude user */
+ 			      !(en_field & 0x1), /* exclude kernel */
+ 			      pmi, false, false);
 diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-index 0e4f2b1fa9fb..e7a5d4b6fa94 100644
+index e7a5d4b6fa94..354339710d0d 100644
 --- a/arch/x86/kvm/pmu.h
 +++ b/arch/x86/kvm/pmu.h
-@@ -24,8 +24,7 @@ struct kvm_event_hw_type_mapping {
- };
+@@ -25,7 +25,6 @@ struct kvm_event_hw_type_mapping {
  
  struct kvm_pmu_ops {
--	unsigned (*find_arch_event)(struct kvm_pmu *pmu, u8 event_select,
--				    u8 unit_mask);
-+	unsigned int (*find_perf_hw_id)(struct kvm_pmc *pmc);
- 	unsigned (*find_fixed_event)(int idx);
+ 	unsigned int (*find_perf_hw_id)(struct kvm_pmc *pmc);
+-	unsigned (*find_fixed_event)(int idx);
  	bool (*pmc_is_enabled)(struct kvm_pmc *pmc);
  	struct kvm_pmc *(*pmc_idx_to_pmc)(struct kvm_pmu *pmu, int pmc_idx);
+ 	struct kvm_pmc *(*rdpmc_ecx_to_pmc)(struct kvm_vcpu *vcpu,
 diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-index fdf587f19c5f..1d31bd5c6803 100644
+index 1d31bd5c6803..eeaeb58d501b 100644
 --- a/arch/x86/kvm/svm/pmu.c
 +++ b/arch/x86/kvm/svm/pmu.c
-@@ -134,10 +134,10 @@ static inline struct kvm_pmc *get_gp_pmc_amd(struct kvm_pmu *pmu, u32 msr,
- 	return &pmu->gp_counters[msr_to_index(msr)];
- }
- 
--static unsigned amd_find_arch_event(struct kvm_pmu *pmu,
--				    u8 event_select,
--				    u8 unit_mask)
-+static unsigned int amd_find_perf_hw_id(struct kvm_pmc *pmc)
- {
-+	u8 event_select = pmc->eventsel & ARCH_PERFMON_EVENTSEL_EVENT;
-+	u8 unit_mask = (pmc->eventsel & ARCH_PERFMON_EVENTSEL_UMASK) >> 8;
+@@ -140,6 +140,10 @@ static unsigned int amd_find_perf_hw_id(struct kvm_pmc *pmc)
+ 	u8 unit_mask = (pmc->eventsel & ARCH_PERFMON_EVENTSEL_UMASK) >> 8;
  	int i;
  
++	/* return PERF_COUNT_HW_MAX as AMD doesn't have fixed events */
++	if (pmc_is_fixed(pmc))
++		return PERF_COUNT_HW_MAX;
++
  	for (i = 0; i < ARRAY_SIZE(amd_event_mapping); i++)
-@@ -320,7 +320,7 @@ static void amd_pmu_reset(struct kvm_vcpu *vcpu)
+ 		if (amd_event_mapping[i].eventsel == event_select
+ 		    && amd_event_mapping[i].unit_mask == unit_mask)
+@@ -151,12 +155,6 @@ static unsigned int amd_find_perf_hw_id(struct kvm_pmc *pmc)
+ 	return amd_event_mapping[i].event_type;
  }
  
+-/* return PERF_COUNT_HW_MAX as AMD doesn't have fixed events */
+-static unsigned amd_find_fixed_event(int idx)
+-{
+-	return PERF_COUNT_HW_MAX;
+-}
+-
+ /* check if a PMC is enabled by comparing it against global_ctrl bits. Because
+  * AMD CPU doesn't have global_ctrl MSR, all PMCs are enabled (return TRUE).
+  */
+@@ -321,7 +319,6 @@ static void amd_pmu_reset(struct kvm_vcpu *vcpu)
+ 
  struct kvm_pmu_ops amd_pmu_ops = {
--	.find_arch_event = amd_find_arch_event,
-+	.find_perf_hw_id = amd_find_perf_hw_id,
- 	.find_fixed_event = amd_find_fixed_event,
+ 	.find_perf_hw_id = amd_find_perf_hw_id,
+-	.find_fixed_event = amd_find_fixed_event,
  	.pmc_is_enabled = amd_pmc_is_enabled,
  	.pmc_idx_to_pmc = amd_pmc_idx_to_pmc,
+ 	.rdpmc_ecx_to_pmc = amd_rdpmc_ecx_to_pmc,
 diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 51b00dbb2d1e..f1cc6192ead7 100644
+index f1cc6192ead7..8ba8b4ab1fb7 100644
 --- a/arch/x86/kvm/vmx/pmu_intel.c
 +++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -68,10 +68,11 @@ static void global_ctrl_changed(struct kvm_pmu *pmu, u64 data)
+@@ -68,6 +68,19 @@ static void global_ctrl_changed(struct kvm_pmu *pmu, u64 data)
  		reprogram_counter(pmu, bit);
  }
  
--static unsigned intel_find_arch_event(struct kvm_pmu *pmu,
--				      u8 event_select,
--				      u8 unit_mask)
-+static unsigned int intel_find_perf_hw_id(struct kvm_pmc *pmc)
++static inline unsigned int intel_find_fixed_event(int idx)
++{
++	u32 event;
++	size_t size = ARRAY_SIZE(fixed_pmc_events);
++
++	if (idx >= size)
++		return PERF_COUNT_HW_MAX;
++
++	event = fixed_pmc_events[array_index_nospec(idx, size)];
++	return intel_arch_events[event].event_type;
++}
++
++
+ static unsigned int intel_find_perf_hw_id(struct kvm_pmc *pmc)
  {
-+	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
-+	u8 event_select = pmc->eventsel & ARCH_PERFMON_EVENTSEL_EVENT;
-+	u8 unit_mask = (pmc->eventsel & ARCH_PERFMON_EVENTSEL_UMASK) >> 8;
+ 	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
+@@ -75,6 +88,9 @@ static unsigned int intel_find_perf_hw_id(struct kvm_pmc *pmc)
+ 	u8 unit_mask = (pmc->eventsel & ARCH_PERFMON_EVENTSEL_UMASK) >> 8;
  	int i;
  
++	if (pmc_is_fixed(pmc))
++		return intel_find_fixed_event(pmc->idx - INTEL_PMC_IDX_FIXED);
++
  	for (i = 0; i < ARRAY_SIZE(intel_arch_events); i++)
-@@ -720,7 +721,7 @@ static void intel_pmu_cleanup(struct kvm_vcpu *vcpu)
+ 		if (intel_arch_events[i].eventsel == event_select
+ 		    && intel_arch_events[i].unit_mask == unit_mask
+@@ -87,18 +103,6 @@ static unsigned int intel_find_perf_hw_id(struct kvm_pmc *pmc)
+ 	return intel_arch_events[i].event_type;
  }
  
+-static unsigned intel_find_fixed_event(int idx)
+-{
+-	u32 event;
+-	size_t size = ARRAY_SIZE(fixed_pmc_events);
+-
+-	if (idx >= size)
+-		return PERF_COUNT_HW_MAX;
+-
+-	event = fixed_pmc_events[array_index_nospec(idx, size)];
+-	return intel_arch_events[event].event_type;
+-}
+-
+ /* check if a PMC is enabled by comparing it with globl_ctrl bits. */
+ static bool intel_pmc_is_enabled(struct kvm_pmc *pmc)
+ {
+@@ -722,7 +726,6 @@ static void intel_pmu_cleanup(struct kvm_vcpu *vcpu)
+ 
  struct kvm_pmu_ops intel_pmu_ops = {
--	.find_arch_event = intel_find_arch_event,
-+	.find_perf_hw_id = intel_find_perf_hw_id,
- 	.find_fixed_event = intel_find_fixed_event,
+ 	.find_perf_hw_id = intel_find_perf_hw_id,
+-	.find_fixed_event = intel_find_fixed_event,
  	.pmc_is_enabled = intel_pmc_is_enabled,
  	.pmc_idx_to_pmc = intel_pmc_idx_to_pmc,
+ 	.rdpmc_ecx_to_pmc = intel_rdpmc_ecx_to_pmc,
 -- 
 2.33.1
 
