@@ -2,164 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C9E6C452F14
-	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 11:30:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0096A452F16
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 11:30:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234065AbhKPKdF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Nov 2021 05:33:05 -0500
-Received: from mail-bn7nam10on2078.outbound.protection.outlook.com ([40.107.92.78]:63201
-        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S233028AbhKPKc6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Nov 2021 05:32:58 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IW5k1E0OS0gWWqp+KKbskm4Wb9/u8Ry5Faxc/NCBvF/xSlOlGZGOnWsxuvzTerEyBfAPlKoKM558gPKTVf6qV6y+YaP750fWUIi/k7fwiOeAVdVc2ICg2kKKlYTHJl2IQGMkAjsjpHfPQS4UX8cYn7tiNW/7WZyj96rsaCDhOtjRqNlLobrRmlzLi895saCI5nXOfh4K2R/+RtroCb/dmFzUpnGRUC29YTSG22eDhCnLVV8kuCUF11yAkLmITl8Hn+KSLBXSQzwr7P4FHkMpk2bcAo5Y0vhfNa2evotrkm4kymdsnkTHo7gZjXzV+6nLDGs6TmTdXHvSlbZTLfru2Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=m9/WH8RMykgxH4HQ2KMjxSg6Iq7CuMlzD5+WMogbh0I=;
- b=iQ0/3rYpx++5X9Dwu3ncH4bYko2TRVzexbfZLovdhym0pO4FjiRvkDbVH5cfbpTfVVGzCeBzyP4HPPaUw0TMOsUIhp5KrT2CvKlj5nP5E+jPIGC1LdcpB42EsMTgzLbdvqVF2sIzWxdq6cj7/yGDh5zjQQoweNHFChEsKdr/ZKKJD7iVZmNPt6771iwRSg88Zx9pei7tgh6K4XcRAQTwxcx5I3HhWmWJodG4CEKf1W+OfMGFxQdQugbIvpkA3B7qbMrot6nEeQz7ELmTINVzVB8zScM7eCsBEDVgIM1vLJpSwcn6mpDHaj3CiApHF0CeJJpElZWqTAKTFNUQBwVz7w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=m9/WH8RMykgxH4HQ2KMjxSg6Iq7CuMlzD5+WMogbh0I=;
- b=G84f/S764soMamLQXQpr0K0Ryt2EmYnGsr2SS0SXgQV1wmFsYZnaX4eXf9gBjjyQQMP+a0T/UtNV/+fvIZSIl4VwJ4N2OwZll85WVrOrSIePFNreyTTW4JDQ9D+NXM8OengLHYGrU6hzUUC6EnNfGzLLO1kKq/Pb3Oo/OqlWpWI=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM8PR12MB5445.namprd12.prod.outlook.com (2603:10b6:8:24::7) by
- DM4PR12MB5117.namprd12.prod.outlook.com (2603:10b6:5:390::15) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4690.15; Tue, 16 Nov 2021 10:30:00 +0000
-Received: from DM8PR12MB5445.namprd12.prod.outlook.com
- ([fe80::c884:b4ad:6c93:3f86]) by DM8PR12MB5445.namprd12.prod.outlook.com
- ([fe80::c884:b4ad:6c93:3f86%9]) with mapi id 15.20.4669.016; Tue, 16 Nov 2021
- 10:30:00 +0000
-Message-ID: <34b8a586-d64e-01d0-eb95-93b7be241a4f@amd.com>
-Date:   Tue, 16 Nov 2021 02:29:46 -0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH 2/2] KVM: SVM: Extend host physical APIC ID field to
- support more than 8-bit
+        id S234106AbhKPKdG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Nov 2021 05:33:06 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:41044 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234080AbhKPKdG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 16 Nov 2021 05:33:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1637058608;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=0HL/aUpmK12MV0NqhjZ/BCNTIxGMV93d3ybqH4nzJRo=;
+        b=DBCataU7H+xkeHvGxTcIJaHcVl0maNH0iXH0AKq+92aaD3kaZ/S7kTkOUe/HASGQaRVBC4
+        1+v4nBtw09O/He20Gd3Yr9qW5+zkm2VB/wO7+iEGY9NYRuLOh83YNqMO5kMegyZsogIMgn
+        ZY1+0ApLjQNnEk+qhKQll0Eo2lXOlYM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-253-VfBFNv_VNpmrZGMBdn1FAg-1; Tue, 16 Nov 2021 05:30:05 -0500
+X-MC-Unique: VfBFNv_VNpmrZGMBdn1FAg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6BB4C1851722;
+        Tue, 16 Nov 2021 10:30:04 +0000 (UTC)
+Received: from [10.39.192.245] (unknown [10.39.192.245])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6D7E59808;
+        Tue, 16 Nov 2021 10:30:03 +0000 (UTC)
+Message-ID: <5ce937a9-5c14-189a-2aff-08476fb942f2@redhat.com>
+Date:   Tue, 16 Nov 2021 11:30:02 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH 1/2] KVM: x86: Update vPMCs when retiring instructions
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org,
-        pbonzini@redhat.com, joro@8bytes.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, peterz@infradead.org,
-        hpa@zytor.com, thomas.lendacky@amd.com, jon.grimm@amd.com
-References: <20211110101805.16343-1-suravee.suthikulpanit@amd.com>
- <20211110101805.16343-3-suravee.suthikulpanit@amd.com>
- <YYwiBbyUINIcGXp3@google.com>
-From:   "Suthikulpanit, Suravee" <suravee.suthikulpanit@amd.com>
-In-Reply-To: <YYwiBbyUINIcGXp3@google.com>
+To:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org
+Cc:     Eric Hankland <ehankland@google.com>
+References: <20211112235235.1125060-1-jmattson@google.com>
+ <20211112235235.1125060-2-jmattson@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20211112235235.1125060-2-jmattson@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SI2P153CA0011.APCP153.PROD.OUTLOOK.COM
- (2603:1096:4:140::14) To DM8PR12MB5445.namprd12.prod.outlook.com
- (2603:10b6:8:24::7)
-MIME-Version: 1.0
-Received: from [10.252.132.84] (165.204.140.250) by SI2P153CA0011.APCP153.PROD.OUTLOOK.COM (2603:1096:4:140::14) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4734.6 via Frontend Transport; Tue, 16 Nov 2021 10:29:55 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 72b222e6-78ce-44e1-a39d-08d9a8ec0ab5
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5117:
-X-Microsoft-Antispam-PRVS: <DM4PR12MB5117D888D597708742B0D7C3F3999@DM4PR12MB5117.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 0zsBNrJkj7vBmVGaSomQLN9oOn084+2LnihBfrNmQchcUPiZgNrhWpK2H6mwfW5G4Fs1BW15sfBTpAKn4pDg+v3YKS0czhY8EnLPW84x7I4NAYrl8m9w3QFliIR5lZaV0eEIIiHl6vqbIFcw0enGy2jTBjZdnzDIIutqXjRf9fGIw0uxuy6GSzZjIc9YhKbb3IYXeA7KX77qOMoC10ct+x5skMHdEt59W6OffsWlaKS5MIoS9XADpnZZEtcx2Hk6Si0DnrC9O9CviANMqShFnZVIPWnnRQdLtrwXEchZ0pv7yT8iRgwclH66WqH1XGo66uD2qGg+tCWyiQkGV7Mt7LmSH+qjNgMYBcIx+HvN3HhS0WV+RmZcljvUOT7y2X/v5r36GUdf/1geui2XnnaxpAKmncgttqgk7hMVQUDbKp85bd+BV3jYOe/0gsImYqR1A0BiJT8cypmw/jJslOY5JGkWP/AI89eEtxD+kU66Q+3zdT6Zh196VFqF1yeThzZb6qNpeGKEjZp8hUmClgMSFs7vcE9vRW2EDsHNchrl9C201BXLXmskmFIJC5IT6FdRepTXhdXWhIgMqGN9tC3LLymBTOgmndkwmkM3+NxiMsb813xKhOn+1bPULX/fFyhY2EbRhO3xXW6B6QsKrgwYx4R/DJfcz4LB2xx5aCILZdz9zk7FFpKHw98crtySr9GR8JkJdEnCkHwixFZr/SMFV5A5IE6fNFK/wo7nLOwwtNHWw02B1zKbu+l9YpaHRWJf
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR12MB5445.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(31696002)(31686004)(66556008)(53546011)(36756003)(186003)(86362001)(38100700002)(4326008)(8936002)(316002)(83380400001)(6666004)(7416002)(6486002)(2906002)(66946007)(5660300002)(6916009)(2616005)(8676002)(508600001)(66476007)(956004)(26005)(16576012)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UEVWQWxoT0x2a1B5djFxQUNPWm1QWksvRFRkOFZrdXhFbDlvMEx2QmswbWU5?=
- =?utf-8?B?TXRYMzkzUFNRamE4TU9uNG92M0pIYzlQbXlSdnpOOHNTVy9RSTA0Rk1XNy9q?=
- =?utf-8?B?am91VFpDUGNmYnRCM2ZMS09EWjdKTWpZWE9CMWp0UUhUekJqZ1JqbWc2Q3ZE?=
- =?utf-8?B?RHRtMkZSa3ptOG05ZjRjWi9JcE1VSTA2YjJTZXVFbWcrZ3lKNDJjZUprc0dY?=
- =?utf-8?B?R28xL0d5NENUSjFNbTAxMWFYZllKOVltajVYdks3Z0RNRkl4ZzhRSXBHK0lr?=
- =?utf-8?B?bGM1ZWtDODlUNFlJLzFQcjN4eGxnNitxUEpCaVlvRm5xNGJGWGtndDg1TkVn?=
- =?utf-8?B?dVIzTFdsUWdoNEh6b2JGM3NwSVA4THRhcEZVMEFVZmdLbFdreFlERTFtckNa?=
- =?utf-8?B?aTdYaHVvbTFJY0U2U2RGY05zbnBTMGRNVEozenpiRVFuMy9TMnhoT21ISitU?=
- =?utf-8?B?Yi9hbkZPOVU2OGNSdHFDdG55anVlczlTakh1NzI2ZEZjKzFRbTAybUJDd3BN?=
- =?utf-8?B?TXRMS0tPY3JYOTNNWnZMTXJZcEo3SWkzMHdJcXJodzFIMTZvbll5RVBuK05m?=
- =?utf-8?B?UjlrY3p2NWtTWktDSFlOYng0MUFPZjBBM1dVNWhPc0tFanB3ODV3N2FFSlRL?=
- =?utf-8?B?L2lORnFuNFg2TVhPaTR4cVA0ejFmSjVmZHFtd3NOVng0aVV5aUJoTjF0SkNZ?=
- =?utf-8?B?ZFFZRHE1b004VEV3ZGN1WHk5V1B2SDdITWNmTHBiS1RGZmZqL2NzVkVxTjlo?=
- =?utf-8?B?OU1KelhDSUZnZ1BUU1VmMGM4a0ZJS1gwZ1BLcUxHMU52VlRIdlhoVSt6OFY1?=
- =?utf-8?B?NmhZcENsSE5QcGJOeWNXaGlKaHlRSjFiVEVQS0FucjNZZHVEVnI3a25HSG04?=
- =?utf-8?B?ejRJdnY0TGM4RTJ3QzQ0ZUxUZVI1eFBtZEh6ODM0QkZXS3kxcE8zQ1hRN01M?=
- =?utf-8?B?K0RNQTJJOGVyRCtSMGk4d1hsL0FBWjVXb2NQQTcrWUtwS2FuTC9ZRVh4YW9r?=
- =?utf-8?B?bGlaZTg5bFU4UXE2ZmMyT0p1TCthL0lEOUQ3WTBlOUFuRWtVelJHUHBhUFFJ?=
- =?utf-8?B?ZUExejR1MHlLRmV2dVZNOUZmR200K1RMdy9IUm9rdnQ3c2xLeEcxMXh0NzY3?=
- =?utf-8?B?ZzlRNlo2K0U2MnlwdG8xdzJpcHFhSS9NTWRGc1JNNnpBRmhsRlJOVFl4OVBl?=
- =?utf-8?B?RGp4VXBEbEVYWncwbHV5cEpZYlFuL2FvcWFSL1ZLamozWGg4a2p4eXNxU1RX?=
- =?utf-8?B?dlhtNlRYWnN5VWhXKzlsVUQvaUlZSjA4dGtvR05hbmluZEF5RGpITnYrSDE5?=
- =?utf-8?B?TVloV2NZNTZwWmRnbFNpYWNtY3ozaVg5Nk9iejBmS3dPbTEyUEgya0w4UGNE?=
- =?utf-8?B?Nm9uL25Pc3BDZXRabGxjMkdEQWxBdi9VQkc1RnMydDg0a09CdUUrVHN1V24z?=
- =?utf-8?B?bTZ6YTluN1JIQ0E3MVR1SlltRkVNZjRvUDJNTURwQ1BWdGJ4cW43U1UxY2p3?=
- =?utf-8?B?SmtPSjFrSzBaeTFlTVdWZUN2ZlpFY0I2VXkvTlNqaGhaNnJ6YWhqRWtMQ095?=
- =?utf-8?B?ZnkwTGF0S0o1YnhnRjVZOTZScmtnUS9FUlZXQVBkRmJ3YkJzMDB1Qk9NZ1Qz?=
- =?utf-8?B?WW5XYktWdE5YRUVZOXlNQjd1TGhvcnJHQ1JWdlcvdVRMUEdMc2ovM25Sek1u?=
- =?utf-8?B?akZnOEhKanAwVnhUcGJQTnhYeGdSOE5RYTdzcEJKM0RHdGRJa3NWT2JLbTBD?=
- =?utf-8?B?UTl4azRZRkg5MGFrd2E0ajBtMTFkVHBqOWovY1o3Z2V0RHdRRitPcXlSek1v?=
- =?utf-8?B?YWtiUjNUUnBRTmpNSlFZaG4vaC9Jc1RVOWN4aG9iUG01TE5DWW1FMk1aL1o1?=
- =?utf-8?B?cEhzYVIzZFA1bXZCTjhndU5nTk1WTiswcGZuMXIvTG82S2kyWUFGMVgyajEv?=
- =?utf-8?B?L1JOV1p3Ky9LQ040emprY1Q3Q3ZYZmdFMWp5czFrYVVzZXd1aUpWZy9HVTFD?=
- =?utf-8?B?NUJlaVphS21WaENZTWREeVpqRWwxTjNEb2EyMyszR0dYNW5pS0wzNGxibGZa?=
- =?utf-8?B?SXFTVG1WQ3J3UnB6UC9FSEVmQXJzK2NWbEltNytWbnZtUGlBM20rdnFnYXhW?=
- =?utf-8?B?YXBLS2U3RXJhek5mblRVdlZrSlVUZi9LSnVLS2t6V3pQVEhpTm9VV3NmT1lv?=
- =?utf-8?Q?1wdu578o4SZSkIplkUuAews=3D?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 72b222e6-78ce-44e1-a39d-08d9a8ec0ab5
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR12MB5445.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Nov 2021 10:30:00.2278
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1gIpkVt0s6qs/ZGtVBPXoZGPzHRPlrOJTt5qzRO9zJGCK3jRpreHQkpa3xRGrA0ZA8vKsvqDabMqTs8V2mLOIQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5117
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 11/13/21 00:52, Jim Mattson wrote:
+> When KVM retires a guest instruction through emulation, increment any
+> vPMCs that are configured to monitor "instructions retired," and
+> update the sample period of those counters so that they will overflow
+> at the right time.
+> 
+> Signed-off-by: Eric Hankland <ehankland@google.com>
+> [jmattson:
+>    - Split the code to increment "branch instructions retired" into a
+>      separate commit.
+>    - Added 'static' to kvm_pmu_incr_counter() definition.
+>    - Modified kvm_pmu_incr_counter() to check pmc->perf_event->state ==
+>      PERF_EVENT_STATE_ACTIVE.
+> ]
+> Signed-off-by: Jim Mattson <jmattson@google.com>
+> Fixes: f5132b01386b ("KVM: Expose a version 2 architectural PMU to a guests")
 
+Queued both, with the addition of an
 
-On 11/10/2021 11:48 AM, Sean Christopherson wrote:
->   Wed, Nov 10, 2021, Suravee Suthikulpanit wrote:
->> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
->> index 989685098b3e..0b066bb5149d 100644
->> --- a/arch/x86/kvm/svm/svm.c
->> +++ b/arch/x86/kvm/svm/svm.c
->> @@ -1031,6 +1031,12 @@ static __init int svm_hardware_setup(void)
->>   			nrips = false;
->>   	}
->>   
->> +	if (avic) {
->> +		r = avic_init_host_physical_apicid_mask();
->> +		if (r)
->> +			avic = false;
->> +	}
-> Haven't yet dedicated any brain cells to the rest of the patch, but this can be
-> written as
++	if (!pmu->event_count)
++		return;
+
+check in kvm_pmu_record_event.
+
+Paolo
+
+> ---
+>   arch/x86/kvm/pmu.c | 31 +++++++++++++++++++++++++++++++
+>   arch/x86/kvm/pmu.h |  1 +
+>   arch/x86/kvm/x86.c |  3 +++
+>   3 files changed, 35 insertions(+)
 > 
-> 	if (avic && avic_init_host_physical_apicid_mask())
-> 		avic = false;
-> 
-> or
-> 
-> 	avic = avic && !avic_init_host_physical_apicid_mask();
-> 
-> But looking at the context below, combining everything would be preferable.  I
-> would say split out the enable_apicv part to make it more obvious that enable_apicv
-> is merely a reflection of avic.
-> 
-> 	avic = avic && npt_enabled && boot_cpu_has(X86_FEATURE_AVIC) &&
-> 	       !avic_init_host_physical_apicid_mask();
-> 	enable_apicv = avic;
+> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> index 09873f6488f7..153c488032a5 100644
+> --- a/arch/x86/kvm/pmu.c
+> +++ b/arch/x86/kvm/pmu.c
+> @@ -490,6 +490,37 @@ void kvm_pmu_destroy(struct kvm_vcpu *vcpu)
+>   	kvm_pmu_reset(vcpu);
+>   }
+>   
+> +static void kvm_pmu_incr_counter(struct kvm_pmc *pmc, u64 evt)
+> +{
+> +	u64 counter_value, sample_period;
+> +
+> +	if (pmc->perf_event &&
+> +	    pmc->perf_event->attr.type == PERF_TYPE_HARDWARE &&
+> +	    pmc->perf_event->state == PERF_EVENT_STATE_ACTIVE &&
+> +	    pmc->perf_event->attr.config == evt) {
+> +		pmc->counter++;
+> +		counter_value = pmc_read_counter(pmc);
+> +		sample_period = get_sample_period(pmc, counter_value);
+> +		if (!counter_value)
+> +			perf_event_overflow(pmc->perf_event, NULL, NULL);
+> +		if (local64_read(&pmc->perf_event->hw.period_left) >
+> +		    sample_period)
+> +			perf_event_period(pmc->perf_event, sample_period);
+> +	}
+> +}
+> +
+> +void kvm_pmu_record_event(struct kvm_vcpu *vcpu, u64 evt)
+> +{
+> +	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+> +	int i;
+> +
+> +	for (i = 0; i < pmu->nr_arch_gp_counters; i++)
+> +		kvm_pmu_incr_counter(&pmu->gp_counters[i], evt);
+> +	for (i = 0; i < pmu->nr_arch_fixed_counters; i++)
+> +		kvm_pmu_incr_counter(&pmu->fixed_counters[i], evt);
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_pmu_record_event);
+> +
+>   int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp)
+>   {
+>   	struct kvm_pmu_event_filter tmp, *filter;
+> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+> index 59d6b76203d5..d1dd2294f8fb 100644
+> --- a/arch/x86/kvm/pmu.h
+> +++ b/arch/x86/kvm/pmu.h
+> @@ -159,6 +159,7 @@ void kvm_pmu_init(struct kvm_vcpu *vcpu);
+>   void kvm_pmu_cleanup(struct kvm_vcpu *vcpu);
+>   void kvm_pmu_destroy(struct kvm_vcpu *vcpu);
+>   int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp);
+> +void kvm_pmu_record_event(struct kvm_vcpu *vcpu, u64 evt);
+>   
+>   bool is_vmware_backdoor_pmc(u32 pmc_idx);
+>   
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index d7def720227d..bd49e2a204d5 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -7854,6 +7854,8 @@ int kvm_skip_emulated_instruction(struct kvm_vcpu *vcpu)
+>   	if (unlikely(!r))
+>   		return 0;
+>   
+> +	kvm_pmu_record_event(vcpu, PERF_COUNT_HW_INSTRUCTIONS);
+> +
+>   	/*
+>   	 * rflags is the old, "raw" value of the flags.  The new value has
+>   	 * not been saved yet.
+> @@ -8101,6 +8103,7 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>   		vcpu->arch.emulate_regs_need_sync_to_vcpu = false;
+>   		if (!ctxt->have_exception ||
+>   		    exception_type(ctxt->exception.vector) == EXCPT_TRAP) {
+> +			kvm_pmu_record_event(vcpu, PERF_COUNT_HW_INSTRUCTIONS);
+>   			kvm_rip_write(vcpu, ctxt->eip);
+>   			if (r && (ctxt->tf || (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP)))
+>   				r = kvm_vcpu_do_singlestep(vcpu);
 > 
 
-Yes, we can do that. I'll update the logic in V2.
-
-Thanks,
-Suravee
