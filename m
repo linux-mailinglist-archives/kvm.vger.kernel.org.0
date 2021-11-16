@@ -2,117 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 74E6A4532D2
-	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 14:24:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6569A4532E0
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 14:30:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236712AbhKPN0i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Nov 2021 08:26:38 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:54969 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236710AbhKPN01 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 16 Nov 2021 08:26:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637069010;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        id S236780AbhKPNdT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Nov 2021 08:33:19 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:38282 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236752AbhKPNdP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Nov 2021 08:33:15 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 8D75C1FCA1;
+        Tue, 16 Nov 2021 13:30:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1637069417; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=7QB9Djd7unSuWFppJ6ryGSoufF2SRnNHGOPyI0tESn4=;
-        b=ZIstAnW0E0rBi5YPmzUSbyRKpnq0DuO6PR50Jh4JD3q9SQe/gbMGDETnNGnz20QqQ7PKKd
-        6kLe4ilGFg11hvIySMDKfQ88SS7dHDVNQTQcFU6i/jqtJpfB9fYTj10LmjIGH7yr0JoyvK
-        vf7oU3SyUiZQX2B1YsEZQD29hSCh41c=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-406-ql0MOcIINMSzqxLPuy-m0A-1; Tue, 16 Nov 2021 08:23:29 -0500
-X-MC-Unique: ql0MOcIINMSzqxLPuy-m0A-1
-Received: by mail-wm1-f71.google.com with SMTP id o22-20020a1c7516000000b0030d6f9c7f5fso7363963wmc.1
-        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 05:23:28 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=7QB9Djd7unSuWFppJ6ryGSoufF2SRnNHGOPyI0tESn4=;
-        b=DFy8dHOgE5+HGpB+EMWzFbT4vxAsKEF2UGvs6Zv+dVCshYkGhSqlg64TRI3dAXwxDT
-         1vi3NN70+cUnM4CnV65+YpYqinvYlUsKR+XDyRpFvOVy5ZRHSWeftWOBTQPoBimJK+Gd
-         QxwIu+VHnZwtXZQtj2/Sfr17oTlDtNBzHd2AJ49ZXeyCKxQzEOKzkJ301vsHtS6iq/db
-         huMuwmbIKJxE3X5ITcRY7gkwACPnlvvf2pIiTIFUtOfjdCSlRqYiiNRcm/kSUvVFJjuW
-         RFWd5LN0uOn85dxN4HLUab0O3UO/bi8SVwl4ScNwRXrQTDKVnFNYZIccNwhFdYjzZAtn
-         cbYA==
-X-Gm-Message-State: AOAM531/pyJTTzvSEqezrZkokAq4r8iOhpmCha7HEU7NZ6qofACblHSK
-        mDn4+NHbIbhT++2MwAb9lF6EaWn2/v5r5W3rxF8u0BkkfkXfbPAc/sC08oYfkgX4GxCTqcI3yuR
-        IACyC+Y0lJcV1
-X-Received: by 2002:adf:fd90:: with SMTP id d16mr9035261wrr.385.1637069007897;
-        Tue, 16 Nov 2021 05:23:27 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJypb9wLmwBU+C8U60E20ALWxdPmsGCyP6NgX66fxkM73bNsY5mStZduwVGh4q0guawc8+jIEQ==
-X-Received: by 2002:adf:fd90:: with SMTP id d16mr9035209wrr.385.1637069007612;
-        Tue, 16 Nov 2021 05:23:27 -0800 (PST)
-Received: from fedora (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id n7sm17311363wro.68.2021.11.16.05.23.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Nov 2021 05:23:27 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>
-Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
+        bh=EhqKr+rTsEmqBNBggfpFhbL56OGP4vni1d1wCyRo57Y=;
+        b=rymaTROeGH/pyQVBNtUZZ4A6YEQsJKKm+0bgDaoQGMCYvLX7XUoYzjqrwrxNZRXMlycuKW
+        kdpu86PEQXgubdrvCNjfcToCW8pVmFutyMOLv1SGR8sAXmhwNYUQLSg0hi6G//+PoidWXe
+        FAUM2/Ga6iYi4jGiMfPn16Rhtomldz4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1637069417;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=EhqKr+rTsEmqBNBggfpFhbL56OGP4vni1d1wCyRo57Y=;
+        b=hhlqvIWuVv9L8+jAEaQkXrsPBgFTZnECcR35/rNdP5aQ3UWSvxsUQ94dXiwi6cVs2zSxDE
+        8K5I5/v9+eLSFOAA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 417BB13C1B;
+        Tue, 16 Nov 2021 13:30:16 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id u3/dDWiyk2HWfAAAMHmgww
+        (envelope-from <jroedel@suse.de>); Tue, 16 Nov 2021 13:30:16 +0000
+Date:   Tue, 16 Nov 2021 14:30:14 +0100
+From:   Joerg Roedel <jroedel@suse.de>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Marc Orr <marcorr@google.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Peter Gonda <pgonda@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Andrew Jones <drjones@redhat.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Michael Ellerman <mpe@ellerman.id.au>, kvm-ppc@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/5] KVM: arm64: Cap KVM_CAP_NR_VCPUS by KVM_CAP_MAX_VCPUS
-In-Reply-To: <ad3534bc-fe3a-55f5-b022-4dbec5f29798@redhat.com>
-References: <20211111162746.100598-1-vkuznets@redhat.com>
- <20211111162746.100598-2-vkuznets@redhat.com>
- <a5cdff6878b7157587e92ebe4d5af362@kernel.org> <875ysxg0s1.fsf@redhat.com>
- <87k0hd8obo.wl-maz@kernel.org>
- <ad3534bc-fe3a-55f5-b022-4dbec5f29798@redhat.com>
-Date:   Tue, 16 Nov 2021 14:23:25 +0100
-Message-ID: <87y25onsj6.fsf@redhat.com>
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <Michael.Roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com,
+        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        Quentin Perret <qperret@google.com>
+Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
+ Hypervisor Support
+Message-ID: <YZOyZhSbMK/mfnXA@suse.de>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
+ <061ccd49-3b9f-d603-bafd-61a067c3f6fa@intel.com>
+ <YY6z5/0uGJmlMuM6@zn.tnic>
+ <YY7FAW5ti7YMeejj@google.com>
+ <YZJTA1NyLCmVtGtY@work-vm>
+ <YZKmSDQJgCcR06nE@google.com>
+ <CAA03e5E3Rvx0t8_ZrbNMZwBkjPivGKOg5HCShSFYwfkKDDHWtA@mail.gmail.com>
+ <YZKxuxZurFW6BVZJ@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <YZKxuxZurFW6BVZJ@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+On Mon, Nov 15, 2021 at 07:15:07PM +0000, Sean Christopherson wrote:
+> It creates a new attack surface, e.g. if the guest mishandles the #VC and does
+> PVALIDATE on memory that it previously accepted, then userspace can attack the
+> guest by accessing guest private memory to coerce the guest into consuming corrupted
+> data.
 
-> On 11/12/21 15:02, Marc Zyngier wrote:
->>> I'd like KVM to be consistent across architectures and have the same
->>> (similar) meaning for KVM_CAP_NR_VCPUS.
->> Sure, but this is a pretty useless piece of information anyway. As
->> Andrew pointed out, the information is available somewhere else, and
->> all we need to do is to cap it to the number of supported vcpus, which
->> is effectively a KVM limitation.
->> 
->> Also, we are talking about representing the architecture to userspace.
->> No amount of massaging is going to make an arm64 box look like an x86.
->
-> Not sure what you mean?  The API is about providing a piece of 
-> information independent of the architecture, while catering for a ppc 
-> weirdness.  Yes it's mostly useless if you don't care about ppc, but 
-> it's not about making arm64 look like x86 or ppc; it's about not having 
-> to special case ppc in userspace.
->
-> If anything, if KVM_CAP_NR_VCPUS returns the same for kvm and !kvm, then 
-> *that* is making an arm64 box look like an x86.  On ARM the max vCPUs 
-> depends on VM's GIC configuration, so KVM_CAP_NR_VCPUS should take that 
-> into account.
+If a guest can be tricked into a double PVALIDATE or otherwise
+misbehaves on a #VC exception, then it is a guest bug and needs to be
+fixed there.
 
-(I'm about to send v2 as we have s390 sorted out.)
+It is a core requirement to the #VC handler that it can not be tricked
+that way.
 
-So what do we decide about ARM? 
-- Current approach (kvm->arch.max_vcpus/kvm_arm_default_max_vcpus()
- depending on 'if (kvm)') - that would be my preference.
-- Always kvm_arm_default_max_vcpus to make the output independent on 'if
- (kvm)'.
-- keep the status quo (drop the patch).
-
-Please advise)
+Regards,
 
 -- 
-Vitaly
+Jörg Rödel
+jroedel@suse.de
+
+SUSE Software Solutions Germany GmbH
+Maxfeldstr. 5
+90409 Nürnberg
+Germany
+ 
+(HRB 36809, AG Nürnberg)
+Geschäftsführer: Ivo Totev
 
