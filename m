@@ -2,89 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 14CC94538CF
-	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 18:50:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A3494538EF
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 18:55:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234308AbhKPRxG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Nov 2021 12:53:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58290 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232659AbhKPRxC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Nov 2021 12:53:02 -0500
-Received: from mail-oi1-x236.google.com (mail-oi1-x236.google.com [IPv6:2607:f8b0:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41024C061570
-        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 09:50:05 -0800 (PST)
-Received: by mail-oi1-x236.google.com with SMTP id n66so158875oia.9
-        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 09:50:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qWZ0A57noz7jZT+MU2iLOJI+3i1wAxru93hWvuMXPWU=;
-        b=EHYBQEnU02+ZEletqEhaLyP20h0DVqt+p5BuTFqmWkY3V26dmaCwqg+hp0r5xodwKe
-         fQaMaFfKMmEs+jQPz5bsTqD7fnxRnhXvlaSCk8lrKnzEnazOEFSlqE1jFp8DebD1MeRk
-         p9N1nvrsxxeQQep72GEWsX7HLkzUIx6PEUD8noqp0HqsCyaU7Z05ghtIX95VPegeqUwf
-         OAWXjp6lDIQo23tTwSAibnxx9ILF7we+QNCO1H/Aq/o12+FaZlH4O0dzz1ppG92+gn4A
-         lZj1beYJ2tT2Lg70MMLR4dCyL+OWWgMMg/FmB4nUwY3FA/Oc8ZzLzHx1L5Kug4KbEeG5
-         HjHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qWZ0A57noz7jZT+MU2iLOJI+3i1wAxru93hWvuMXPWU=;
-        b=TUrIGg0BF+MKtVxVXpSzZ/ZyNULHitJBQL2p+HLqINUPd3eLmecWV6knHUZ2ljtWOB
-         XGoGhtHYRhuV9+ACVWtn0AGqVw6ONaS3E/fcAtvYV5RQ+Rmm8m4116Avf+BvHSkZcK1F
-         v4eEgg1jfjVv3Nj7VWMKq1iCvARPaSfMo1l31HgYTFDkSxx9iBN3HSF7k9N0ttkXg+AH
-         qi9WsJrQo/Tm09AA6oiNWHmyGVf+Qwt+MHRixJvcPy1fY7orAgGr3NC/hh8ekVYU7kI7
-         BbakIF4IbNVL+KpVjZVZQ/Kx2u0eUOLIvYW/pk7ntCzdKQzx4myRqQvhk8WMfE9CyBTy
-         hSOA==
-X-Gm-Message-State: AOAM533NIwPeZ+RbY9YMc8kimLuJLhXzZvQGyE2F3kxfjDE+b2vgjJy9
-        iA7lGLm3cz/fUJclDGYtkcKInhGRyM7WQNWZ0z74ug==
-X-Google-Smtp-Source: ABdhPJwnMzKVR2uE26JhYz4hfRuSmlxyijPh8zh6MEINZD8syf8PcKA1OeakAoRZYHvfp5yV2KzX/c1354TDZiCooIw=
-X-Received: by 2002:aca:3055:: with SMTP id w82mr51740540oiw.2.1637085004338;
- Tue, 16 Nov 2021 09:50:04 -0800 (PST)
+        id S239202AbhKPR6Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Nov 2021 12:58:24 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35313 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S239191AbhKPR6V (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 16 Nov 2021 12:58:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1637085323;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kuOkTmnmzpEcWTaBUi8Ivg0rAjuxlq5HIO8I27HgTWE=;
+        b=eUU93m+0zwNoDwunWjmnrlFNGJxxCwS17NIoeRhdSKTEca5UKSR4HVZ9Xro2FSl4Ql0x9C
+        h37CtHNDz76FWaczbrr5rjDq5WqaESVS3zgaG2qv0TK8rvusd5g7TZkmtD/w7oOt320VUR
+        ChCDcBTrtpSORuAcC5MBxmVw9uTIaTo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-570-cdZrgpfMMvaygJcB_XCkUw-1; Tue, 16 Nov 2021 12:55:20 -0500
+X-MC-Unique: cdZrgpfMMvaygJcB_XCkUw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E4D068042E6;
+        Tue, 16 Nov 2021 17:55:17 +0000 (UTC)
+Received: from [10.39.192.245] (unknown [10.39.192.245])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6D4205D9DE;
+        Tue, 16 Nov 2021 17:55:14 +0000 (UTC)
+Message-ID: <31ab6220-b8e8-5a5d-494a-b1bad7eff818@redhat.com>
+Date:   Tue, 16 Nov 2021 18:55:13 +0100
 MIME-Version: 1.0
-References: <20211116105038.683627-1-pbonzini@redhat.com>
-In-Reply-To: <20211116105038.683627-1-pbonzini@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 16 Nov 2021 09:49:53 -0800
-Message-ID: <CALMp9eSy7-ziFeOrz+zsdBPOC7AqULYRSrP1kKSMWkFwrmzy8w@mail.gmail.com>
-Subject: Re: [PATCH kvm-unit-tests] pmu: fix conditions for emulation test
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Like Xu <like.xu.linux@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH 1/1] KVM: x86/mmu: Fix TLB flush range when handling
+ disconnected pt
+Content-Language: en-US
+To:     Ben Gardon <bgardon@google.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Keqian Zhu <zhukeqian1@huawei.com>,
+        David Hildenbrand <david@redhat.com>, stable@vger.kernel.org
+References: <20211115211704.2621644-1-bgardon@google.com>
+ <YZL1ZiKQVRQd8rZi@google.com>
+ <CANgfPd-UQKbnkoKGS0yoQvTtMAyPc0Xa2=o7ics2vQ50-KGQHA@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <CANgfPd-UQKbnkoKGS0yoQvTtMAyPc0Xa2=o7ics2vQ50-KGQHA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 16, 2021 at 2:50 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+On 11/16/21 18:29, Ben Gardon wrote:
+>> TL;DR: this type of optional refactoring doesn't belong in a patch Cc'd for stable,
+>> and my personal preference is to always declare variables at function scope (it's
+>> not a hard rule though, Paolo has overruled me at least once:-)  ).
 >
-> Right now, unittests.cfg only supports a single check line.  Multiple
-> checks must be space separated.
->
-> However, the pmu_emulation test does not really need nmi_watchdog=0;
-> it is only needed by the PMU counters test because Linux reserves one
-> counter if nmi_watchdog=1, but the pmu_emulation test does not
-> allocate all counters in the same way.  By removing the counters
-> tests from pmu_emulation, the check on nmi_watchdog=0 can be
-> removed.
+> That makes sense. I don't have a preference either way. Paolo, if you
+> want the version without the refactor, the version I sent in the RFC
+> should be good. If the refactor is desired, I can separate it out into
+> another patch and send a v2 of this patch as a mini series, tagging
+> only the fix for stable.
 
-Thanks for fixing this. By the way, one of the reasons that we don't
-expose a virtual PMU to more customers is the conflict with the NMI
-watchdog. We aren't willing to give up the NMI watchdog on the host,
-and we don't really want to report a reduced number of general purpose
-counters to the guest. (On AMD, we *can't* report a reduced number of
-counters to the guest; the architectural specification doesn't allow
-it.)
+It's really a damned-if-you-do/damned-if-you-don't situation.  And also 
+keeping the patch as similar as possible in stable has the advantage 
+that future backports have a slightly lower chance of breaking due to 
+shadowed variables.
 
-We can't be the only ones running with the NMI watchdog enabled. How
-do others deal with this? Is there any hope of suspending the NMI
-watchdog while in VMX non-root mode (or guest mode on AMD)?
+In the end I agree with both of you :) and in this case I tend to accept 
+the patch as written.  So I queued it, though it probably will not be in 
+the immediately next pull request.
 
-> This also hid a typo for the force_emulation_prefix module parameter,
-> which is part of the kvm module rather than the kvm_intel module,
-> so fix that.
->
-> Reported-by: Like Xu <like.xu.linux@gmail.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
+My plan for the next couple days is to send a pull request and finally 
+move the development tree to 5.16-rc1, so that I can push to kvm/next 
+all the SVM, memslot and xarray stuff that's pending.  Then I'll go back 
+to this one.
+
+Paolo
+
+> I've generally preferred declaring variables at function scope too
+> since that seems like the overwhelming convention, but it's always
+> struck me as a bit of a waste to not make use of scoping rules more.
+> It does make it nice and clear how things should be laid out when
+> debugging the kernel with GDB or something though.
+> 
+> In any case, please let me know how you'd like the changes organized
+> and I can send up follow ups as needed, or we can just move forward
+> with the RFC version.
+> 
+
