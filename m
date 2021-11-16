@@ -2,194 +2,282 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 52DCA453872
-	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 18:24:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AE78E45388C
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 18:30:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238576AbhKPR0z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Nov 2021 12:26:55 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31233 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235906AbhKPR0z (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 16 Nov 2021 12:26:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637083437;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2NZ/bQb6pXmOARjezvrKo/KDHB+GdPermNVE2URZCtA=;
-        b=NQOhyuwPors7cZ6ZJU3801WoZ0Rn2h/Sr31I4BzhKkjnpthc5dIMutbDMF3UHQtldQm13U
-        Sq+KEeSCcr1dMCHZbuodn70f2/M+JlMijvhizCfGE247JEDAeB2vaT4Orku98Oqt2FSNdk
-        3TsOuzfC1c8KN6OU7faRs1X9kbIEQ3A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-374-OdIWl95jNxKcseZbzML-Iw-1; Tue, 16 Nov 2021 12:23:54 -0500
-X-MC-Unique: OdIWl95jNxKcseZbzML-Iw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3219C804142;
-        Tue, 16 Nov 2021 17:23:53 +0000 (UTC)
-Received: from redhat.com (unknown [10.33.36.48])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 33C2260C0F;
-        Tue, 16 Nov 2021 17:23:40 +0000 (UTC)
-Date:   Tue, 16 Nov 2021 17:23:37 +0000
-From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To:     Tyler Fanelli <tfanelli@redhat.com>
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, mtosatti@redhat.com,
-        armbru@redhat.com, pbonzini@redhat.com, eblake@redhat.com
-Subject: Re: [PATCH] sev: allow capabilities to check for SEV-ES support
-Message-ID: <YZPpGSFMQZBx71QN@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20211115193804.294529-1-tfanelli@redhat.com>
- <YZN3OECfHBXd55M5@redhat.com>
- <26204690-493f-67a8-1791-c9c9d38c0240@redhat.com>
- <YZPT3ojgzdmH3lkq@redhat.com>
- <02e72302-8cb3-9268-32bd-57e9423f1590@redhat.com>
+        id S238912AbhKPRdD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Nov 2021 12:33:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53648 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238904AbhKPRdA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Nov 2021 12:33:00 -0500
+Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B965C061570
+        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 09:30:03 -0800 (PST)
+Received: by mail-io1-xd35.google.com with SMTP id e144so27140791iof.3
+        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 09:30:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=UFXLUrqt2nWjnEKxs8dvNrPBWJOzGCmF0MKcZw+tO+E=;
+        b=dluHkotYDKJNPQxe/aYzm9VcuvkPHtOj3GlbfBPZ2Fva+bWRx4a7xEHBEvIwoQuymZ
+         QG1A+X0KpRfscM20AKXTdDqYKRAA92U1vvMLN05x3hSc5lMqh6tlFDa84vX6jES+4fCq
+         f87jWtAGxkpCyyY0I+2Fqiyny61PdCUyVlvRtfNWZPuMQVUmHIF1CfkaoZtzhVSXRHpS
+         SyiD9HuuTDkKEDC7tUpQPvUjSoXrl6a2GTvB4RnMZNupDCpgSEl2PJJFLxDx+woy3eg6
+         fHGW80Wrakaz0W+60xgpJlz4tG+A4TWJxQTjQjDurY9fIQ+hKv+qxFPU/KTKxGO7qcY8
+         reaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=UFXLUrqt2nWjnEKxs8dvNrPBWJOzGCmF0MKcZw+tO+E=;
+        b=mo72qrnk7PjwBpDSy4ChCywuOjMAr0btQgB02yOIk4M5bBmw5f/o8Pc22WnYvHFjYv
+         hppv5EvB2N83g0jJ48BAWjw2JEoD2pB6sZA3Y4LzbjGbhNRZVGvM9Fx1ojUm8rYdlP5a
+         PXaXl3Ed9vW6X32mnFNGxMPqeaew6EZtP0wEDDqfiFKZS94T8o22EC/znTQWMSYpQHo9
+         ZYfvqXZyK7hLI2jvBTY0rhL/bXF59kcRlHTWHzPwOe/cEfjHmI033DcYUQanLO3imdxK
+         3PfNlwbUsz+R86U10BO5d+EHmrnOXzFvZN9U+UNh0ISDS7FCO5rDmZA8esFa1P+hxYtH
+         Fv5w==
+X-Gm-Message-State: AOAM533zkbfGFiu4Osc5H0ml/jpEE+SEtveK9bZGgpGj6G3vH/yAntbQ
+        t+GNL9PoS60mGKyp/tr9N3zECvPydDunteF94Pnw3Q==
+X-Google-Smtp-Source: ABdhPJzYH+IIPNW2qbWehRxVmvJb0UAszoUsv5tmhNjRZ4u918O1kNBkkesQHn3b3tc5ZiH7sRY06sN8IUPwh7WWF3A=
+X-Received: by 2002:a02:70cf:: with SMTP id f198mr7017013jac.124.1637083802289;
+ Tue, 16 Nov 2021 09:30:02 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <02e72302-8cb3-9268-32bd-57e9423f1590@redhat.com>
-User-Agent: Mutt/2.0.7 (2021-05-04)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+References: <20211115211704.2621644-1-bgardon@google.com> <YZL1ZiKQVRQd8rZi@google.com>
+In-Reply-To: <YZL1ZiKQVRQd8rZi@google.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Tue, 16 Nov 2021 09:29:50 -0800
+Message-ID: <CANgfPd-UQKbnkoKGS0yoQvTtMAyPc0Xa2=o7ics2vQ50-KGQHA@mail.gmail.com>
+Subject: Re: [PATCH 1/1] KVM: x86/mmu: Fix TLB flush range when handling
+ disconnected pt
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Keqian Zhu <zhukeqian1@huawei.com>,
+        David Hildenbrand <david@redhat.com>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 16, 2021 at 11:58:12AM -0500, Tyler Fanelli wrote:
-> On 11/16/21 10:53 AM, Daniel P. Berrangé wrote:
-> > On Tue, Nov 16, 2021 at 10:29:35AM -0500, Tyler Fanelli wrote:
-> > > On 11/16/21 4:17 AM, Daniel P. Berrangé wrote:
-> > > > On Mon, Nov 15, 2021 at 02:38:04PM -0500, Tyler Fanelli wrote:
-> > > > > Probe for SEV-ES and SEV-SNP capabilities to distinguish between Rome,
-> > > > > Naples, and Milan processors. Use the CPUID function to probe if a
-> > > > > processor is capable of running SEV-ES or SEV-SNP, rather than if it
-> > > > > actually is running SEV-ES or SEV-SNP.
-> > > > > 
-> > > > > Signed-off-by: Tyler Fanelli <tfanelli@redhat.com>
-> > > > > ---
-> > > > >    qapi/misc-target.json | 11 +++++++++--
-> > > > >    target/i386/sev.c     |  6 ++++--
-> > > > >    2 files changed, 13 insertions(+), 4 deletions(-)
-> > > > > 
-> > > > > diff --git a/qapi/misc-target.json b/qapi/misc-target.json
-> > > > > index 5aa2b95b7d..c3e9bce12b 100644
-> > > > > --- a/qapi/misc-target.json
-> > > > > +++ b/qapi/misc-target.json
-> > > > > @@ -182,13 +182,19 @@
-> > > > >    # @reduced-phys-bits: Number of physical Address bit reduction when SEV is
-> > > > >    #                     enabled
-> > > > >    #
-> > > > > +# @es: SEV-ES capability of the machine.
-> > > > > +#
-> > > > > +# @snp: SEV-SNP capability of the machine.
-> > > > > +#
-> > > > >    # Since: 2.12
-> > > > >    ##
-> > > > >    { 'struct': 'SevCapability',
-> > > > >      'data': { 'pdh': 'str',
-> > > > >                'cert-chain': 'str',
-> > > > >                'cbitpos': 'int',
-> > > > > -            'reduced-phys-bits': 'int'},
-> > > > > +            'reduced-phys-bits': 'int',
-> > > > > +            'es': 'bool',
-> > > > > +            'snp': 'bool'},
-> > > > >      'if': 'TARGET_I386' }
-> > > > >    ##
-> > > > > @@ -205,7 +211,8 @@
-> > > > >    #
-> > > > >    # -> { "execute": "query-sev-capabilities" }
-> > > > >    # <- { "return": { "pdh": "8CCDD8DDD", "cert-chain": "888CCCDDDEE",
-> > > > > -#                  "cbitpos": 47, "reduced-phys-bits": 5}}
-> > > > > +#                  "cbitpos": 47, "reduced-phys-bits": 5
-> > > > > +#                  "es": false, "snp": false}}
-> > > > We've previously had patches posted to support SNP in QEMU
-> > > > 
-> > > >     https://lists.gnu.org/archive/html/qemu-devel/2021-08/msg04761.html
-> > > > 
-> > > > and this included an update to query-sev for reporting info
-> > > > about the VM instance.
-> > > > 
-> > > > Your patch is updating query-sev-capabilities, which is a
-> > > > counterpart for detecting host capabilities separate from
-> > > > a guest instance.
-> > > Yes, that's because with this patch, I'm more interested in determining
-> > > which AMD processor is running on a host, and less if ES or SNP is actually
-> > > running on a guest instance or not.
-> > > > None the less I wonder if the same design questions from
-> > > > query-sev apply. ie do we need to have the ability to
-> > > > report any SNP specific information fields, if so we need
-> > > > to use a discriminated union of structs, not just bool
-> > > > flags.
-> > > > 
-> > > > More generally I'm some what wary of adding this to
-> > > > query-sev-capabilities at all, unless it is part of the
-> > > > main SEV-SNP series.
-> > > > 
-> > > > Also what's the intended usage for the mgmt app from just
-> > > > having these boolean fields ? Are they other more explicit
-> > > > feature flags we should be reporting, instead of what are
-> > > > essentially SEV generation codenames.
-> > > If by "mgmt app" you're referring to sevctl, in order to determine which
-> > > certificate chain to use (Naples vs Rome vs Milan ARK/ASK) we must query
-> > > which processor we are running on. Although sevctl has a feature which can
-> > > do this already, we cannot guarantee that sevctl is running on the same host
-> > > that a VM is running on, so we must query this capability from QEMU. My
-> > > logic was determining the processor would have been the following:
-> > I'm not really talking about a specific, rather any tool which wants
-> > to deal with SEV and QEMU, whether libvirt or an app using libvirt,
-> > or something else using QEMU directly.
-> 
-> Ah, my mistake.
-> 
-> > Where does the actual cert chain payload come from ? Is that something
-> > the app has to acquire out of band, or can the full cert chain be
-> > acquired from the hardware itself ?
-> 
-> The cert chain (or the ARK/ASK specifically) comes from AMD's KDS, yet
-> sevctl is able to cache the values, and has them on-hand when needed. This
-> patch would tell sevctl *which* of the cert chains to use (Naples vs Rome vs
-> Milan chain). If need be, I could just focus on Naples and Rome processors
-> for now and bring support for SNP (Milan processors) later on when it is
-> more mature.
-> 
-> > > !es && !snp --> Naples
-> > > 
-> > > es && !snp --> Rome
-> > > 
-> > > es && snp --> Milan
-> > This approach isn't future proof if subsequent generations introduce
-> > new certs. It feels like we should be explicitly reporting something
-> > about the certs rather than relying on every app to re-implement tihs
-> > logic.
-> 
-> Alright, like an encoding of which processor generation the host is running
-> on?
+On Mon, Nov 15, 2021 at 4:03 PM Sean Christopherson <seanjc@google.com> wro=
+te:
+>
+> On Mon, Nov 15, 2021, Ben Gardon wrote:
+> > When recursively clearing out disconnected pts, the range based TLB
+> > flush in handle_removed_tdp_mmu_page uses the wrong starting GFN,
+> > resulting in the flush mostly missing the affected range. Fix this by
+> > using base_gfn for the flush.
+> >
+> > In response to feedback from David Matlack on the RFC version of this
+> > patch, also move a few definitions into the for loop in the function to
+> > prevent unintended references to them in the future.
+>
+> Rats, I didn't read David's feedback or I would've responded there.
+>
+> > Fixes: a066e61f13cf ("KVM: x86/mmu: Factor out handling of removed page=
+ tables")
+> > CC: stable@vger.kernel.org
+> >
+> > Signed-off-by: Ben Gardon <bgardon@google.com>
+> > ---
+> >  arch/x86/kvm/mmu/tdp_mmu.c | 10 ++++------
+> >  1 file changed, 4 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> > index 7c5dd83e52de..4bd541050d21 100644
+> > --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> > @@ -317,9 +317,6 @@ static void handle_removed_tdp_mmu_page(struct kvm =
+*kvm, tdp_ptep_t pt,
+> >       struct kvm_mmu_page *sp =3D sptep_to_sp(rcu_dereference(pt));
+> >       int level =3D sp->role.level;
+> >       gfn_t base_gfn =3D sp->gfn;
+> > -     u64 old_child_spte;
+> > -     u64 *sptep;
+> > -     gfn_t gfn;
+> >       int i;
+> >
+> >       trace_kvm_mmu_prepare_zap_page(sp);
+> > @@ -327,8 +324,9 @@ static void handle_removed_tdp_mmu_page(struct kvm =
+*kvm, tdp_ptep_t pt,
+> >       tdp_mmu_unlink_page(kvm, sp, shared);
+> >
+> >       for (i =3D 0; i < PT64_ENT_PER_PAGE; i++) {
+> > -             sptep =3D rcu_dereference(pt) + i;
+> > -             gfn =3D base_gfn + i * KVM_PAGES_PER_HPAGE(level);
+> > +             u64 *sptep =3D rcu_dereference(pt) + i;
+> > +             gfn_t gfn =3D base_gfn + i * KVM_PAGES_PER_HPAGE(level);
+> > +             u64 old_child_spte;
+>
+> TL;DR: this type of optional refactoring doesn't belong in a patch Cc'd f=
+or stable,
+> and my personal preference is to always declare variables at function sco=
+pe (it's
+> not a hard rule though, Paolo has overruled me at least once :-) ).
 
-IIUC (from looking at sev-tool), the certificates can be acquired
-from
+That makes sense. I don't have a preference either way. Paolo, if you
+want the version without the refactor, the version I sent in the RFC
+should be good. If the refactor is desired, I can separate it out into
+another patch and send a v2 of this patch as a mini series, tagging
+only the fix for stable.
 
-   https://developer.amd.com/wp-content/resources/ask_ark_{gen}.cert
+I've generally preferred declaring variables at function scope too
+since that seems like the overwhelming convention, but it's always
+struck me as a bit of a waste to not make use of scoping rules more.
+It does make it nice and clear how things should be laid out when
+debugging the kernel with GDB or something though.
 
-where {gen} is one of "milan", "naples", "rome".
+In any case, please let me know how you'd like the changes organized
+and I can send up follow ups as needed, or we can just move forward
+with the RFC version.
 
-With this in mind, I'd think that query-sev-capabilities could just
-report the required certificate name. e.g.
-
-  { 'enum': 'SevAskArkCertName',
-    'data': ['milan', 'naples', 'rome'] }
-
-and then report it in SevCapability struct with
-
-    "ask-ark-cert-name":  "SevAskArkCertName"
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+>
+> Declaring variables in an inner scope is not always "better".  In particu=
+lar, it
+> can lead to variable shadowing, which can lead to functional issues of a =
+different
+> sort.  Most shadowing is fairly obvious, and truly egregious bugs will of=
+ten result
+> in the compiler complaining about consuming an uninitialized variable.
+>
+> But the worst-case scenario is if the inner scope shadows a function para=
+meter, in
+> which the case the compiler will not complain and will even consume an un=
+initialized
+> variable without warning.  IIRC, we actually had a Hyper-V bug of that na=
+ture
+> where an incoming @vcpu was shadowed.  Examples below.
+>
+> So yes, on one hand moving the declarations inside the loop avoid potenti=
+al flavor
+> of bug, but they create the possibility for an entirely different class o=
+f bugs.
+> The main reason I prefer declaring at function scope is that I find it ea=
+sier to
+> visually detect using variables after a for loop, versus detecting that a=
+ variable
+> is being shadowed, especially if the function is largish and the two decl=
+arations
+> don't fit on the screen.
+>
+> There are of course counter-examples, e.g. commit 5c49d1850ddd ("KVM: VMX=
+: Fix a
+> TSX_CTRL_CPUID_CLEAR field mask issue") immediately jumps to mind, so the=
+re's
+> certainly an element of personal preference.
+>
+> E.g. this will fail with "error: =E2=80=98sptep=E2=80=99 redeclared as di=
+fferent kind of symbol
+>
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 4e226cdb40d9..011639bf633c 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -369,7 +369,7 @@ static void tdp_mmu_unlink_page(struct kvm *kvm, stru=
+ct kvm_mmu_page *sp,
+>   * early rcu_dereferences in the function.
+>   */
+>  static void handle_removed_tdp_mmu_page(struct kvm *kvm, tdp_ptep_t pt,
+> -                                       bool shared)
+> +                                       bool shared, u64 *sptep)
+>  {
+>         struct kvm_mmu_page *sp =3D sptep_to_sp(rcu_dereference(pt));
+>         int level =3D sp->role.level;
+> @@ -431,8 +431,9 @@ static void handle_removed_tdp_mmu_page(struct kvm *k=
+vm, tdp_ptep_t pt,
+>                                     shared);
+>         }
+>
+> -       kvm_flush_remote_tlbs_with_address(kvm, gfn,
+> -                                          KVM_PAGES_PER_HPAGE(level + 1)=
+);
+> +       if (sptep)
+> +               kvm_flush_remote_tlbs_with_address(kvm, gfn,
+> +                                                  KVM_PAGES_PER_HPAGE(le=
+vel + 1));
+>
+>         call_rcu(&sp->rcu_head, tdp_mmu_free_sp_rcu_callback);
+>  }
+> @@ -532,7 +533,7 @@ static void __handle_changed_spte(struct kvm *kvm, in=
+t as_id, gfn_t gfn,
+>          */
+>         if (was_present && !was_leaf && (is_leaf || !is_present))
+>                 handle_removed_tdp_mmu_page(kvm,
+> -                               spte_to_child_pt(old_spte, level), shared=
+);
+> +                               spte_to_child_pt(old_spte, level), shared=
+, NULL);
+>  }
+>
+>  static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+>
+>
+> whereas moving the second declaration into the loop will compile happily.
+>
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 4e226cdb40d9..3e83fd66c0dc 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -369,13 +369,12 @@ static void tdp_mmu_unlink_page(struct kvm *kvm, st=
+ruct kvm_mmu_page *sp,
+>   * early rcu_dereferences in the function.
+>   */
+>  static void handle_removed_tdp_mmu_page(struct kvm *kvm, tdp_ptep_t pt,
+> -                                       bool shared)
+> +                                       bool shared, u64 *sptep)
+>  {
+>         struct kvm_mmu_page *sp =3D sptep_to_sp(rcu_dereference(pt));
+>         int level =3D sp->role.level;
+>         gfn_t base_gfn =3D sp->gfn;
+>         u64 old_child_spte;
+> -       u64 *sptep;
+>         gfn_t gfn;
+>         int i;
+>
+> @@ -384,7 +383,7 @@ static void handle_removed_tdp_mmu_page(struct kvm *k=
+vm, tdp_ptep_t pt,
+>         tdp_mmu_unlink_page(kvm, sp, shared);
+>
+>         for (i =3D 0; i < PT64_ENT_PER_PAGE; i++) {
+> -               sptep =3D rcu_dereference(pt) + i;
+> +               u64 *sptep =3D rcu_dereference(pt) + i;
+>                 gfn =3D base_gfn + i * KVM_PAGES_PER_HPAGE(level);
+>
+>                 if (shared) {
+> @@ -431,8 +430,9 @@ static void handle_removed_tdp_mmu_page(struct kvm *k=
+vm, tdp_ptep_t pt,
+>                                     shared);
+>         }
+>
+> -       kvm_flush_remote_tlbs_with_address(kvm, gfn,
+> -                                          KVM_PAGES_PER_HPAGE(level + 1)=
+);
+> +       if (sptep)
+> +               kvm_flush_remote_tlbs_with_address(kvm, gfn,
+> +                                                  KVM_PAGES_PER_HPAGE(le=
+vel + 1));
+>
+>         call_rcu(&sp->rcu_head, tdp_mmu_free_sp_rcu_callback);
+>  }
+> @@ -532,7 +532,7 @@ static void __handle_changed_spte(struct kvm *kvm, in=
+t as_id, gfn_t gfn,
+>          */
+>         if (was_present && !was_leaf && (is_leaf || !is_present))
+>                 handle_removed_tdp_mmu_page(kvm,
+> -                               spte_to_child_pt(old_spte, level), shared=
+);
+> +                               spte_to_child_pt(old_spte, level), shared=
+, NULL);
+>  }
+>
+>  static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
