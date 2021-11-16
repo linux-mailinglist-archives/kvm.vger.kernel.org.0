@@ -2,63 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 50D2A452E06
+	by mail.lfdr.de (Postfix) with ESMTP id E2AE6452E08
 	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 10:32:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233132AbhKPJdz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Nov 2021 04:33:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55784 "EHLO
+        id S233242AbhKPJeF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Nov 2021 04:34:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233127AbhKPJdu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Nov 2021 04:33:50 -0500
-Received: from mail-yb1-xb2b.google.com (mail-yb1-xb2b.google.com [IPv6:2607:f8b0:4864:20::b2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF5A3C061764
-        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 01:30:53 -0800 (PST)
-Received: by mail-yb1-xb2b.google.com with SMTP id v64so55580975ybi.5
-        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 01:30:53 -0800 (PST)
+        with ESMTP id S233180AbhKPJeD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Nov 2021 04:34:03 -0500
+Received: from mail-ot1-x32d.google.com (mail-ot1-x32d.google.com [IPv6:2607:f8b0:4864:20::32d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69490C061764;
+        Tue, 16 Nov 2021 01:31:06 -0800 (PST)
+Received: by mail-ot1-x32d.google.com with SMTP id z2-20020a9d71c2000000b0055c6a7d08b8so32499762otj.5;
+        Tue, 16 Nov 2021 01:31:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=yNyi2RRQSAsxPbeJbzxrhSJQkKoSMh4ynwDBEELejP0=;
-        b=f99TQ1VVzWFQfFEnJgH3L2TQl9Z9An6MytDZirJ0JiIsz36VVssawVRykd4oGEyMAe
-         kT/zq60ajJZ6idJMMdBfzYsxk2S3MKX5qc4wKOy8rfre/mZfeAQpC8HDy0Yj7ygd3KxT
-         2gLs0opM8la+MfuHIZrHpNoOgjPijf7N3M5HrjjChF93KffCpGXj3vTShsUbRO28a+CW
-         OBfMxZ2avEJCgIdL/3kVv8v76yJ0wGSAN+DS/q+GdCReWGRR3j5O05IqXQ52lcesT+kz
-         3qLzOhT3tdts3RUCPltIvZG3B9nRk8GEh5y1UMRdgd9HLi7hevrwo0qi/+s24hwDw44d
-         v15Q==
+        bh=ERqD3wgji1bqpuYnyKO5vsp/sXZh2S2bbfRVsJntGIk=;
+        b=CEzr8i2Ao1fccI/sT87CPrT8nvdEVhnDuboaD0DXaNJelrU0p621JdkHtvaEArPBSL
+         MhzmyKJ6z0AcsbkCK46MnlFY2p7V4+d/8XFvQJOnJ+/Cc+L8nw9HQbfIbX68nV8J5pYU
+         JiGfXMqSQjvF6ftloMXWKEZ0mYBfgg8uWusYHWwwnaG5ih5wNiNVD4Ak9/nLbnJDsCzt
+         iOlk+AJ3Esm4MloV8gacKOF6K/TDODA/WYU2AHIZE8OTF3Gv9vSGHgOg3BNhfFpo+crE
+         1p6Na6JIIpO/3IgXIL3NjsAJOFI2N0DGjK/ZtQ24p8I36tCDYFmPqXlgvIM1O5gxyJJn
+         e4CQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=yNyi2RRQSAsxPbeJbzxrhSJQkKoSMh4ynwDBEELejP0=;
-        b=T17R66SDSad+NS04mVplN7rHtGlRO/NUNLAmQSxrWBq3aeg0pXwHOhK8hETCHwJI7d
-         90eLm5Hc8RKKeJiogMDM3ZsOKeBncMn1gpgSUMfM65+X441rcrd/V+Ua4gK+6Ci5IPXG
-         /kDEdrlfHjFK+Dbp8pMqkBDHE8aGlUFghlM3dTZRuAAZogQFrT8Z+OuL6Sywi6kW1ryx
-         QHGvWcj262Pz5CPgZjY45veSxKwykt+kKX+w0VAVKKG5VwVMDgqrzmHGCJYROxJITr2I
-         rcJT+AXSaKTUSEWDoEghEGTuGmwXxO79OS9yH95NQ2dURM8J4CjQIFjxezsqR6M6mRAn
-         VvVg==
-X-Gm-Message-State: AOAM533xNXgCwW/AsUxEwupLuiExc8tGQxz308C2m+a+XeMEwaniPz1F
-        RpBlqquq7UjzVk6QUn3pYecdDnNLxFJkToiTqxi3jA==
-X-Google-Smtp-Source: ABdhPJxF0F/WNM1NIUSbBqToQA0eVY5Gza1NTnyqGsuoEAtnDmo8yd+xw0l223mIxhw6kLlEm42Gqj30Ws/VRE79H9Y=
-X-Received: by 2002:a25:f20e:: with SMTP id i14mr6942380ybe.366.1637055053123;
- Tue, 16 Nov 2021 01:30:53 -0800 (PST)
+        bh=ERqD3wgji1bqpuYnyKO5vsp/sXZh2S2bbfRVsJntGIk=;
+        b=H4VgzZ4f0x6MrfPxxlNdsky+qWqJ7StqnyTwDJ8fOKFp04OqJjDL5V46ybieKqfgyR
+         cRv6WTQOuM6J2cVvnTEYwgPMaHOo/CKZnRywmSF68TEyhqbvjHYLijkyy1UGfTCRjlvU
+         oVUE4IvpU5on3WJxtRF73xTiJ4ERnkKVN6nMK7twIVP2UFJlYKRR8Mya/7HFz2H6R7qx
+         Jc3ZqSqf9wtDOP5Qh88qFwk6c3NuY1dArelTtQ3FUJYQEFZIWXycWmVH1F9f4wSIse+w
+         55uCFFHatIGDryhaOhfUtT+ShSXMVZVMgz4lxwHFzfM8gQm8tVUSUmxV7ebnUB54vI24
+         wMtA==
+X-Gm-Message-State: AOAM533JBe9dhKZ43Dn1BZssy/6r48/phVIOBU6DyEfhRkbuZF3OAodT
+        OLVsPPrYrwwTy0R7rxry08/gpo7Dggl9ypOq+FI=
+X-Google-Smtp-Source: ABdhPJyKAF3So171wKhUqhVXeRpr2qiHN6yBG0gAlqB0GSpdsJ8qRX5CY9qfulrLJ+MuJXfpi7qLGqQrRch9/JEe8xY=
+X-Received: by 2002:a9d:6559:: with SMTP id q25mr4869540otl.0.1637055065823;
+ Tue, 16 Nov 2021 01:31:05 -0800 (PST)
 MIME-Version: 1.0
 References: <20211108095931.618865-1-huangkele@bytedance.com>
  <a991bbb4-b507-a2f6-ec0f-fce23d4379ce@redhat.com> <f93612f54a5cde53fd9342f703ccbaf3c9edbc9c.camel@redhat.com>
  <CANRm+Cze_b0PJzOGB4-tPdrz-iHcJj-o7QL1t1Pf1083nJDQKQ@mail.gmail.com>
  <d65fbd73-7612-8348-2fd8-8da0f5e2a3c0@bytedance.com> <20211116090604.GA12758@gao-cwp>
 In-Reply-To: <20211116090604.GA12758@gao-cwp>
-From:   =?UTF-8?B?6buE56eR5LmQ?= <huangkele@bytedance.com>
-Date:   Tue, 16 Nov 2021 17:30:40 +0800
-Message-ID: <CAKUug90-FaD7ufOkn2E0D-nP3=YqgnbhXLDjFyfCHUN2O5AuCg@mail.gmail.com>
-Subject: Re: [External] Re: Re: [RFC] KVM: x86: SVM: don't expose PV_SEND_IPI
- feature with AVIC
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Tue, 16 Nov 2021 17:30:54 +0800
+Message-ID: <CANRm+Cx24kjw8kk7XSTGsyTn56cQf2rKayCPb5bg814BwoneKg@mail.gmail.com>
+Subject: Re: Re: [RFC] KVM: x86: SVM: don't expose PV_SEND_IPI feature with AVIC
 To:     Chao Gao <chao.gao@intel.com>
 Cc:     zhenwei pi <pizhenwei@bytedance.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
         Maxim Levitsky <mlevitsk@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, chaiwen.cc@bytedance.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Kele Huang <huangkele@bytedance.com>, chaiwen.cc@bytedance.com,
         xieyongji@bytedance.com, dengliang.1214@bytedance.com,
         Wanpeng Li <wanpengli@tencent.com>,
         Sean Christopherson <seanjc@google.com>,
@@ -76,48 +75,7 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> The recently posted Intel IPI virtualization will accelerate unicast
-> ipi but not broadcast ipis, AMD AVIC accelerates unicast ipi well but
-> accelerates broadcast ipis worse than pv ipis. Could we just handle
-> unicast ipi here?
-
-Thanks for the explanation! It is true that AVIC does not always perform better
-than PV IPI, actually not even swx2apic.
-
-> So agree with Wanpeng's point, is it possible to separate single IPI and
-> broadcast IPI on a hardware acceleration platform?
-
-
-> how about just correcting the logic for xapic:
-
-> From 13447b221252b64cd85ed1329f7d917afa54efc8 Mon Sep 17 00:00:00 2001
-> From: Jiaqing Zhao <jiaqing.zhao@intel.com>
-> Date: Fri, 9 Apr 2021 13:53:39 +0800
-> Subject: [PATCH 1/2] x86/apic/flat: Add specific send IPI logic
-
-> Currently, apic_flat.send_IPI() uses default_send_IPI_single(), which
-> is a wrapper of apic->send_IPI_mask(). Since commit aaffcfd1e82d
-> ("KVM: X86: Implement PV IPIs in linux guest"), KVM PV IPI driver will
-> override apic->send_IPI_mask(), and may cause unwated side effects.
-
-> This patch removes such side effects by creating a specific send_IPI
-> method.
-
-> Signed-off-by: Jiaqing Zhao <jiaqing.zhao@intel.com>
-
-Actually, I think this issue is more about how to sort out the relationship
-between AVIC and PV IPI. As far as I understand, currently, no matter
-the option from userspace or the determination made in kernel works
-in some way, but not in the migration scenario. For instance, migration with
-AVIC feature changes can make guests lose the PV IPI feature needlessly.
-Besides, the current patch is not consistent with
-KVM_CAP_ENFORCE_PV_FEATURE_CPUID.
-Paolo's advice about using a new hint shall work well. Currently try
-working on it.
-Best regards,
-Kele
-
-On Tue, Nov 16, 2021 at 4:56 PM Chao Gao <chao.gao@intel.com> wrote:
+On Tue, 16 Nov 2021 at 16:56, Chao Gao <chao.gao@intel.com> wrote:
 >
 > On Tue, Nov 16, 2021 at 10:56:25AM +0800, zhenwei pi wrote:
 > >
@@ -214,39 +172,7 @@ On Tue, Nov 16, 2021 at 4:56 PM Chao Gao <chao.gao@intel.com> wrote:
 >
 > This patch removes such side effects by creating a specific send_IPI
 > method.
->
-> Signed-off-by: Jiaqing Zhao <jiaqing.zhao@intel.com>
-> ---
->  arch/x86/kernel/apic/apic_flat_64.c | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kernel/apic/apic_flat_64.c b/arch/x86/kernel/apic/apic_flat_64.c
-> index 8f72b4351c9f..3196bf220230 100644
-> --- a/arch/x86/kernel/apic/apic_flat_64.c
-> +++ b/arch/x86/kernel/apic/apic_flat_64.c
-> @@ -64,6 +64,13 @@ static void flat_send_IPI_mask(const struct cpumask *cpumask, int vector)
->         _flat_send_IPI_mask(mask, vector);
->  }
->
-> +static void flat_send_IPI_single(int cpu, int vector)
-> +{
-> +       unsigned long mask = cpumask_bits(cpumask_of(cpu))[0];
-> +
-> +       _flat_send_IPI_mask(mask, vector);
-> +}
-> +
->  static void
->  flat_send_IPI_mask_allbutself(const struct cpumask *cpumask, int vector)
->  {
-> @@ -132,7 +139,7 @@ static struct apic apic_flat __ro_after_init = {
->
->         .calc_dest_apicid               = apic_flat_calc_apicid,
->
-> -       .send_IPI                       = default_send_IPI_single,
-> +       .send_IPI                       = flat_send_IPI_single,
->         .send_IPI_mask                  = flat_send_IPI_mask,
->         .send_IPI_mask_allbutself       = flat_send_IPI_mask_allbutself,
->         .send_IPI_allbutself            = default_send_IPI_allbutself,
-> --
-> 2.27.0
->
+
+This looks reasonable to me.
+
+    Wanpeng
