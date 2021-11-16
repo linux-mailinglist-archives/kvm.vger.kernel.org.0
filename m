@@ -2,164 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D9754531FB
-	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 13:18:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C6308453206
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 13:21:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235758AbhKPMVN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Nov 2021 07:21:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37750 "EHLO
+        id S235813AbhKPMYS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Nov 2021 07:24:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232503AbhKPMVK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Nov 2021 07:21:10 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C36EBC061570;
-        Tue, 16 Nov 2021 04:18:13 -0800 (PST)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1637065091;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to; bh=y0AnlWyuEUnPajzTCoPH+v+k3YtippXNdn9iPNtWse4=;
-        b=Icx3tUY/78DAZIDNkszJcXjq1YUbOEDTdkM+yNboOa+3mAF1iwdCrt43yN+Cz9NGlkIcQQ
-        fD7zdRx1elOky6zOPCCbzf1MX4ODvugCo6D1HBZYkw/WbQaDVMwClc2plsCyYCV0kBljcS
-        /vmi5KG4ynnilKSx0qR+otoS0RN7oxq8XgHhLvYPyHPZGzxXmT2/J4ydaF5arB52JEtqHi
-        0RW81SsDDlNIHBxQwDeLJ0vi2cptEU3uquUlAgtXxS5SXHBHRzKeZsMdzQlat2t3l9a+S/
-        x3iX/eD5Fyq27Hu02PQQEZkUlttx/Kum7te8ZFe9lXi0ZK8s1/hI2LGBo6T/0w==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1637065091;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to; bh=y0AnlWyuEUnPajzTCoPH+v+k3YtippXNdn9iPNtWse4=;
-        b=mNK5LJ3MxkZ4HBypdr8PI3qB9weR+7G+L9vtJONUY74fpcg70oeB9UkSUld43aiWLZb02a
-        Lsdx9ru+5yzSdRAA==
-To:     "Liu, Jing2" <jing2.liu@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Arjan van de Ven <arjan@linux.intel.com>,
-        Jing Liu <jing2.liu@linux.intel.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "Cooper, Andrew" <andrew.cooper3@citrix.com>,
-        "Liu, Jing2" <jing2.liu@intel.com>,
-        "Bae, Chang Seok" <chang.seok.bae@intel.com>
-Subject: Re: Thoughts of AMX KVM support based on latest kernel
-In-Reply-To: <BYAPR11MB325685AB8E3DFD245846F854A9939@BYAPR11MB3256.namprd11.prod.outlook.com>
-Date:   Tue, 16 Nov 2021 13:18:10 +0100
-Message-ID: <87k0h85m65.ffs@tglx>
+        with ESMTP id S234427AbhKPMYS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Nov 2021 07:24:18 -0500
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA66AC061570;
+        Tue, 16 Nov 2021 04:21:21 -0800 (PST)
+Received: by mail-pj1-x102f.google.com with SMTP id iq11so15620741pjb.3;
+        Tue, 16 Nov 2021 04:21:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=MGunNnA0ehqJBZXzMtKjllq/AXIDZHQK3zRwqjaEorw=;
+        b=iYsibB7z4Ip5qrb9o0dLivJ+TFnOnFslqjDmKwAFoPZcYTP/rqbP3AplBlNPNbOlcl
+         RtV+VqasUO8GvQT6zf1FhTcJdc30uA0BFb7+pm+VAehBkhTchEbeoyzZbvmD0plIR4Ei
+         xcVmzAKrXKGw3Bvq8G8E3I9vGmvXWA7SB4n2Lky1YdERX/rBj99vdEhwa8w3ceRtorWQ
+         XorYF9hsTsTrEMIPtYT0201pnS7L9TlHbShg02t48h6G7EeiinBYkQ5Tsa9/Hewe1zqs
+         MVJRw9bh1vplzoF3Q41GTUa1Kr1kHSbda5DmC/IriNo3xUu2Qvi/NFmH0+gCZR3kC0lL
+         eHtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=MGunNnA0ehqJBZXzMtKjllq/AXIDZHQK3zRwqjaEorw=;
+        b=pREV61xx7bYQTfit/uiknDNYXpTkb67Y9lo6UTfKg7KYJTggMb/3IWfIRGlhNnEfk5
+         e1wsg/UWJ1/Q2qEHzs/u/DiRyAaVR/4Tg+K1NyyHy9vjpksW9ciO9NXh1xfRxj/rGpBd
+         JNFf1gH5g4p19K0vYVa5LKfrD1U+BgZAnzpRp57Zrvegm39qsk06PbiYNf+tUEqUhxy9
+         EeIsT35A5cDJ4SHS5iPvLXK2zIErrgrOA1IWCeskR3zqUpIPKr+2mY8LMKNneJqFWuoJ
+         Sk0cVxy7WheS3XyyQxptjOueuylwTpKh517QK6uX6OkncHUpVPh0kU16gELSr2aQLVvc
+         MU7w==
+X-Gm-Message-State: AOAM531Ap671rlLGahynzfc2ZaMWLL3vnn7Ex9WvAgrMEUz9iebdpggR
+        3ar4xu3OQbz+NTI3nbIzyWc=
+X-Google-Smtp-Source: ABdhPJzgiFbkF2ly462apig3kWTJllNzQf1adcNZK3/mxuDL/SJGSZRjeh3fiCL6VlCCMPlDKZ1MZQ==
+X-Received: by 2002:a17:902:d88b:b0:142:8acf:615b with SMTP id b11-20020a170902d88b00b001428acf615bmr44900441plz.62.1637065281224;
+        Tue, 16 Nov 2021 04:21:21 -0800 (PST)
+Received: from localhost.localdomain ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id i67sm18557613pfg.189.2021.11.16.04.21.06
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 16 Nov 2021 04:21:13 -0800 (PST)
+From:   Like Xu <like.xu.linux@gmail.com>
+X-Google-Original-From: Like Xu <likexu@tencent.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 0/4] KVM: x86/pmu: An insightful refactoring of vPMU code
+Date:   Tue, 16 Nov 2021 20:20:26 +0800
+Message-Id: <20211116122030.4698-1-likexu@tencent.com>
+X-Mailer: git-send-email 2.33.1
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Jing,
+Hi,
 
-On Wed, Nov 10 2021 at 13:01, Jing2 Liu wrote:
-> Triggering of a reallocation request and error handling 
->
-> First, we want to avoid weird guest failures at runtime due to (more likely) 
-> permission failures of a reallocation request, checking the permissions of the
-> vcpu (for the extend features) at kvm_vcpu_ioctl_set_cpuid2() time, when
-> QEMU wants to advertise the extended features (e.g. AMX) for the first
-> time.
+This patch set is essentially triggered by Jim's patch set[1]
+(especially patch 01 and 04).
 
-That's the right thing to do. If there is no permission for the guest
-granted via the prctl() extension I suggested then exposing AMX should
-be rejected.
+The new idea to set up and maintain pmc->eventsel for fixed counters.
+This would unify all fixed/gp code logic based on the same semantics
+"pmc->eventse". (I demonstrated this in patch 01-03, more can be done)
 
-> We have no idea at vcpu_create() time whether QEMU wants to enable AMX
-> or not at that time. If kvm_vcpu_ioctl_set_cpuid2() succeeds, then there is 
-> no need to further check permission in reallocation path.
+[1] https://lore.kernel.org/kvm/96170437-1e00-7841-260e-39d181e7886d@gmail.com/T/#t
 
-That's correct.
+Please check each commit message for more details
+and let me know if there is any room for improvement,
 
-> Upon detection (interception) of an attempt by a vcpu to write to XCR0 (XSETBV)
-> and XFD (WRMSR), we check if the write is valid, and we start passthrough of 
-> the XFD MSRs if the dynamic feature[i] meets the condition
-> XCR0[i]=1 && XFD[i]=0. And we make a reallocation request to the FPU core.  
->
-> We simplify the KVM implementation by assuming that the reallocation 
-> request was successful when the vcpu comes back to KVM. For such VM exit
-> handling that requires a buffer-reallocation request, we don't resume the
-> guest immediately. Instead, we go back to the userspace, to rely on the 
-> userspace VMM (e.g. QEMU) for handling error cases. The actual reallocation
-> happens when control is transferred from KVM to the kernel (FPU core). If 
-> no error, QEMU will come back to KVM by repeating vcpu_ioctl_run(). 
->
-> Potential failures there are due to lack of memory. But this would not be
-> interesting cases; the host should have more resource problems at that 
-> time if that is the case.
+Thanks.
 
-Indeed.
+Like Xu (4):
+  KVM: x86/pmu: Setup pmc->eventsel for fixed PMCs
+  KVM: x86/pmu: Refactoring find_arch_event() to find_perf_hw_id()
+  KVM: x86/pmu: Reuse find_perf_hw_id() and drop find_fixed_event()
+  KVM: x86/pmu: Refactoring kvm_perf_overflow{_intr}()
 
-> One of potential drawbacks of the Option 2 might be additional 
-> checks in the host, although we can minimize the impact by having
-> CONFIG_KVM_TBD. We believe that the case
-> "XFD != 0 and XINUSE != 0" should be very infrequent.
+ arch/x86/kvm/pmu.c           | 74 ++++++++++++++++++------------------
+ arch/x86/kvm/pmu.h           |  4 +-
+ arch/x86/kvm/svm/pmu.c       | 19 ++++-----
+ arch/x86/kvm/vmx/pmu_intel.c | 54 +++++++++++++++++---------
+ 4 files changed, 83 insertions(+), 68 deletions(-)
 
-I really don't like the idea of having an extra check in switch_to().
-
-Can we start simple and do something like the uncompiled below and see
-how much overhead it creates?
-
-Thanks,
-
-        tglx
----
-diff --git a/arch/x86/include/asm/fpu/xstate.h b/arch/x86/include/asm/fpu/xstate.h
-index 0f8b90ab18c9..6175a78e0be8 100644
---- a/arch/x86/include/asm/fpu/xstate.h
-+++ b/arch/x86/include/asm/fpu/xstate.h
-@@ -122,4 +122,12 @@ static __always_inline __pure bool fpu_state_size_dynamic(void)
- }
- #endif
- 
-+void fpu_update_guest_xfd_state(void);
-+
-+static inline void kvm_update_guest_xfd_state(void)
-+{
-+	if (fpu_state_size_dynamic())
-+		fpu_update_guest_xfd_state();
-+}
-+
- #endif
-diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
-index 8ea306b1bf8e..161db48c9052 100644
---- a/arch/x86/kernel/fpu/core.c
-+++ b/arch/x86/kernel/fpu/core.c
-@@ -199,6 +199,17 @@ void fpu_reset_from_exception_fixup(void)
- }
- 
- #if IS_ENABLED(CONFIG_KVM)
-+void fpu_update_guest_xfd_state(void)
-+{
-+	u64 xfd;
-+
-+	/* FIXME: Add debug */
-+	rdmsrl(MSR_IA32_XFD, xfd);
-+	current->thread.fpu.fpstate->xfd = xfd;
-+	__this_cpu_write(xfd_state, xfd);
-+}
-+EXPORT_SYMBOL_GPL(fpu_update_guest_xfd_state);
-+
- static void __fpstate_reset(struct fpstate *fpstate);
- 
- bool fpu_alloc_guest_fpstate(struct fpu_guest *gfpu)
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 2686f2edb47c..9425fdbb4806 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9576,6 +9576,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 	vcpu->arch.last_vmentry_cpu = vcpu->cpu;
- 	vcpu->arch.last_guest_tsc = kvm_read_l1_tsc(vcpu, rdtsc());
- 
-+	kvm_update_guest_xfd_state();
-+
- 	vcpu->mode = OUTSIDE_GUEST_MODE;
- 	smp_wmb();
- 
-
+-- 
+2.33.1
 
