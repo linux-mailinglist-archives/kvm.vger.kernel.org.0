@@ -2,103 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A52345394C
-	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 19:17:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EED2845395F
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 19:26:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239362AbhKPSTf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Nov 2021 13:19:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36168 "EHLO
+        id S239446AbhKPS3c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Nov 2021 13:29:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231484AbhKPSTe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Nov 2021 13:19:34 -0500
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0410EC061570
-        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 10:16:37 -0800 (PST)
-Received: by mail-lf1-x135.google.com with SMTP id y26so55526665lfa.11
-        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 10:16:36 -0800 (PST)
+        with ESMTP id S234047AbhKPS3b (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Nov 2021 13:29:31 -0500
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3279DC061764
+        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 10:26:34 -0800 (PST)
+Received: by mail-pl1-x635.google.com with SMTP id b11so18129652pld.12
+        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 10:26:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=wD4FHaq/A31lK/F/hM3HFoBBxkhquyn2APzkV6254nc=;
-        b=rGrA37i63tbk+RPlyXgWrmx2if/sLivGebBLR5iAG68tirdyCcGo3fixQJpJp3hdRN
-         cWJwr1UwAxLsrqe0aOsa8zoLlTilWf2OWjIut5lqBRPHwraYM7e7/8ag4qzsNOkJ3zoQ
-         twHbTUz/JcFB1OKnimgjPjuoLXoZS3D753rPo9rjRX6xKJt5vaemP+PTIMIlpY6uFdUq
-         2PJ+vJV0yYoUYUfvTzbBNrwtZ5evQU4qwhzn/+3MqlR6xJwwV2uHrLsJf/ewTfsEYV86
-         /wtMEJXHUhi9B8Unf2MkyxYvgZ8htvkg7r+VaV6y/0YrhZvspPeMu0i3AbyiaBa4fZBc
-         Wf5Q==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=U0muw/pk5BQDok3Q5lPpJXidVuYkuyrdzH8jZXEAbNc=;
+        b=awbmYI68su+KL24wmN9QlTGjCxBVTsbebJn6HnREIiE1hcieUyaSquNCC1P7Q0EKIc
+         QoTOxpNQOxGZr9EgcoHfrTl9WlDQaYLHND+B0ej4SbEPnLsNvB90eGdle+cdGPlJNqX2
+         dnS0gZo+9kHQQrzVBEmJs2HirTQ3F7492T7YGy2stGJxRAOO8JpVY1N7vJFwyfnEqbCf
+         W/t8ZlLALbLhAVx5p3ozRSDSeyPedenNTuA1o39ssb0eZUJhqKtmArMydGjGWczJ4oRA
+         wzu63aLTDcEhWxXPSc9jmisFBRo+HtRa5HS1sQwswAPl2NCnBF9ZFnCQoixIyJDBN8RP
+         qlJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=wD4FHaq/A31lK/F/hM3HFoBBxkhquyn2APzkV6254nc=;
-        b=otAb6J/I/ZOgmiPso80nwDzqqAj1lW6hM2JYfe3QbnasQRgg3TtqrHay+zsrL0AtC1
-         k4bFks7YH7SChpU6vtzo2sGONyp6wb+/AJg93N0sqcOcPy+pDkB2QdSxBWhXSM0ea3np
-         yTlUP2Lu+9YBZsKtwgqWitEiMlf2fhLa9X3FqvQygwoHeBL3JSK3hnKKKEj10ku7amx4
-         MaQKxlIleeQ/zaxZxVH0ta2FJ55Q8BIv1LsmNmlA7JlYe3Zzakar/n5DvGAKm55Tp2w4
-         X+VwjHpEQeSCpBLTfE0Y8Gbpcl3IMJMPmMFWGzPtbqG7uSDRY2nADXlxEVoMGyomGi3V
-         8nJQ==
-X-Gm-Message-State: AOAM530VFoQlbslnIBhhNuCeMBxqCNIXHoquEKUuXQhvrL6nG9jcunt8
-        50VW2eGfvSoKOn9yw4R/R04alRX2dHXwYl+CxNErfw==
-X-Google-Smtp-Source: ABdhPJz22M5YHyoZufeoG88HGxpDeWcfc9qHrxrb/dVyH0ozZxs2JGFSJRmo2M32UCRrmxCQ+fJO5I5u1DpyGu/dHWE=
-X-Received: by 2002:a05:6512:3d16:: with SMTP id d22mr8286468lfv.523.1637086595150;
- Tue, 16 Nov 2021 10:16:35 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=U0muw/pk5BQDok3Q5lPpJXidVuYkuyrdzH8jZXEAbNc=;
+        b=SyB6pUFoa35oDjkiwJ0CMsb/wbq/VUXmd3YJJwMQzSQygaldEkHanBETiDjygRd+1U
+         CMdj8vgj3PVTP12L8asknJwbCNDuhOCjyIHlMfGiujlHIicuubTNdYyLpQ3r5Rxnlc4y
+         1VWi4mES6VZuBaUq4kbpJji6tN+v7DfopiPzTFtNQkojcVwKl97O1xcmBx1rIASa34TQ
+         zf+y5m+6lca6aTaKTR38aqHPkptyI5BIHRyUqZBmD5D8fZMCo+cwJQHWJkjCRPjdPtWf
+         scTBnpR1el1GFlToUrHJGFvQdbLEdxDaittIZ6AepMVhCr8JDXTGuEGqVgSrCVvK6WzC
+         UFXw==
+X-Gm-Message-State: AOAM531mKvk1idy9n7RCGoGyM0AqHuNzsbT4KogOrFkZwdo1Tjkv5Kai
+        9GfVmPfTkNjy+KBsOK4dImThcA==
+X-Google-Smtp-Source: ABdhPJw8HRH8xYD3IacFC4bFZ9REYP2/8EOdbVoGt1XfjR4JZepz4sWi/UhJMw10juH4zM+78SNn7g==
+X-Received: by 2002:a17:90b:357:: with SMTP id fh23mr1422161pjb.238.1637087193552;
+        Tue, 16 Nov 2021 10:26:33 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id w189sm2148500pfd.164.2021.11.16.10.26.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Nov 2021 10:26:32 -0800 (PST)
+Date:   Tue, 16 Nov 2021 18:26:29 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Joerg Roedel <jroedel@suse.de>
+Cc:     Andy Lutomirski <luto@kernel.org>, Marc Orr <marcorr@google.com>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@intel.com>,
+        Peter Gonda <pgonda@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        kvm list <kvm@vger.kernel.org>, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <Michael.Roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Sathyanarayanan Kuppuswamy 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>,
+        Quentin Perret <qperret@google.com>
+Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
+ Hypervisor Support
+Message-ID: <YZP31a8acsfD+snJ@google.com>
+References: <061ccd49-3b9f-d603-bafd-61a067c3f6fa@intel.com>
+ <YY6z5/0uGJmlMuM6@zn.tnic>
+ <YY7FAW5ti7YMeejj@google.com>
+ <YZJTA1NyLCmVtGtY@work-vm>
+ <YZKmSDQJgCcR06nE@google.com>
+ <CAA03e5E3Rvx0t8_ZrbNMZwBkjPivGKOg5HCShSFYwfkKDDHWtA@mail.gmail.com>
+ <YZKxuxZurFW6BVZJ@google.com>
+ <CAA03e5GBajwRJBuTJLPjji7o8QD2daEUJU7DpPJBxtWsf-DE8g@mail.gmail.com>
+ <8a244d34-2b10-4cf8-894a-1bf12b59cf92@www.fastmail.com>
+ <YZOwbjGVEfa/wLaS@suse.de>
 MIME-Version: 1.0
-References: <20211114164312.GA28736@makvihas> <87o86leo34.fsf@redhat.com> <04b7e240-8e1d-1402-3cef-e65469bd9317@redhat.com>
-In-Reply-To: <04b7e240-8e1d-1402-3cef-e65469bd9317@redhat.com>
-From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Tue, 16 Nov 2021 10:16:22 -0800
-Message-ID: <CAKwvOdmy6Fo-FvximsRN+i0sZ5ZgWjWdD-m2fLN-rhvBuqO9mw@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: fix cocci warnings
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        David Bolvansky <david.bolvansky@gmail.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Vihas Mak <makvihas@gmail.com>, seanjc@google.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YZOwbjGVEfa/wLaS@suse.de>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 16, 2021 at 1:50 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 11/15/21 10:59, Vitaly Kuznetsov wrote:
-> > One minor remark: 'kvm_set_pte_rmapp()' handler is passed to
-> > 'kvm_handle_gfn_range()' which does
-> >
-> >          bool ret = false;
-> >
-> >          for_each_slot_rmap_range(...)
-> >                  ret |= handler(...);
-> >
-> > and I find '|=' to not be very natural with booleans. I'm not sure it's
-> > worth changing though.
->
-> Changing that would be "harder" than it seems because "ret = ret ||
-> handler(...)" is wrong, and "|" is even more unnatural than "|=" (so
-> much that clang warns about it).
->
-> In fact I wonder if "|=" with a bool might end up warning with clang,
-> which we should check before applying this patch.  It doesn't seem to be
-> in the original commit[1], but better safe than sorry: Nick, does clang
-> intend to warn also about "ret |= fn()" and "ret &= fn()"?  Technically,
-> it is a bitwise operation with side-effects in the RHS.
+On Tue, Nov 16, 2021, Joerg Roedel wrote:
+> But as Marc already pointed out, the kernel needs a plan B when an RMP
+> happens anyway due to some bug.
 
-I think that warning had more to due with typo's where `||` or `&&`
-was meant (to short circuit the side effects) but `|` or `&` was typed
-by accident, keeping both side effects.  I'm not sure what the typo
-would be in `ret |= fn();`.
-
->
-> Paolo
->
-> [1] https://github.com/llvm/llvm-project/commit/f59cc9542bfb461
->
-
-
--- 
-Thanks,
-~Nick Desaulniers
+I don't see why unexpected RMP #PF is a special snowflake that needs a different
+plan than literally every other type of unexpected #PF in the kernel.
