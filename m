@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F6534536D1
-	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 17:06:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 158674536D6
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 17:06:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238836AbhKPQHr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Nov 2021 11:07:47 -0500
-Received: from mail.kernel.org ([198.145.29.99]:34004 "EHLO mail.kernel.org"
+        id S238821AbhKPQHt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Nov 2021 11:07:49 -0500
+Received: from mail.kernel.org ([198.145.29.99]:34056 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238841AbhKPQHK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Nov 2021 11:07:10 -0500
+        id S238760AbhKPQHL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Nov 2021 11:07:11 -0500
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 900D561929;
-        Tue, 16 Nov 2021 16:04:13 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4F46C61A0C;
+        Tue, 16 Nov 2021 16:04:14 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1mn0wN-005sTB-P0; Tue, 16 Nov 2021 16:04:11 +0000
+        id 1mn0wO-005sTB-Fm; Tue, 16 Nov 2021 16:04:12 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvm@vger.kernel.org, linux-mips@vger.kernel.org,
         kvmarm@lists.cs.columbia.edu, linuxppc-dev@lists.ozlabs.org,
@@ -42,9 +42,9 @@ Cc:     Huacai Chen <chenhuacai@kernel.org>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         kernel-team@android.com
-Subject: [PATCH v2 3/7] KVM: s390: Use kvm_get_vcpu() instead of open-coded access
-Date:   Tue, 16 Nov 2021 16:03:59 +0000
-Message-Id: <20211116160403.4074052-4-maz@kernel.org>
+Subject: [PATCH v2 4/7] KVM: x86: Use kvm_get_vcpu() instead of open-coded access
+Date:   Tue, 16 Nov 2021 16:04:00 +0000
+Message-Id: <20211116160403.4074052-5-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211116160403.4074052-1-maz@kernel.org>
 References: <20211116160403.4074052-1-maz@kernel.org>
@@ -61,39 +61,24 @@ X-Mailing-List: kvm@vger.kernel.org
 As we are about to change the way vcpus are allocated, mandate
 the use of kvm_get_vcpu() instead of open-coding the access.
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/s390/kvm/kvm-s390.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ arch/x86/kvm/vmx/posted_intr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 7af53b8788fa..4a0f62b03964 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -4572,7 +4572,7 @@ int kvm_s390_vcpu_start(struct kvm_vcpu *vcpu)
- 	}
+diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
+index 5f81ef092bd4..82a49720727d 100644
+--- a/arch/x86/kvm/vmx/posted_intr.c
++++ b/arch/x86/kvm/vmx/posted_intr.c
+@@ -272,7 +272,7 @@ int pi_update_irte(struct kvm *kvm, unsigned int host_irq, uint32_t guest_irq,
  
- 	for (i = 0; i < online_vcpus; i++) {
--		if (!is_vcpu_stopped(vcpu->kvm->vcpus[i]))
-+		if (!is_vcpu_stopped(kvm_get_vcpu(vcpu->kvm, i)))
- 			started_vcpus++;
- 	}
+ 	if (!kvm_arch_has_assigned_device(kvm) ||
+ 	    !irq_remapping_cap(IRQ_POSTING_CAP) ||
+-	    !kvm_vcpu_apicv_active(kvm->vcpus[0]))
++	    !kvm_vcpu_apicv_active(kvm_get_vcpu(kvm, 0)))
+ 		return 0;
  
-@@ -4634,9 +4634,11 @@ int kvm_s390_vcpu_stop(struct kvm_vcpu *vcpu)
- 	__disable_ibs_on_vcpu(vcpu);
- 
- 	for (i = 0; i < online_vcpus; i++) {
--		if (!is_vcpu_stopped(vcpu->kvm->vcpus[i])) {
-+		struct kvm_vcpu *tmp = kvm_get_vcpu(vcpu->kvm, i);
-+
-+		if (!is_vcpu_stopped(tmp)) {
- 			started_vcpus++;
--			started_vcpu = vcpu->kvm->vcpus[i];
-+			started_vcpu = tmp;
- 		}
- 	}
- 
+ 	idx = srcu_read_lock(&kvm->irq_srcu);
 -- 
 2.30.2
 
