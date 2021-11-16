@@ -2,165 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 001B6453668
-	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 16:53:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C34F945367A
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 16:56:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238455AbhKPP4P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Nov 2021 10:56:15 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39298 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238507AbhKPP4K (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 16 Nov 2021 10:56:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637077992;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=8FaFGs8nf3xBlk5dpJT8caEOeoHk5nOorg1mQkaa9f8=;
-        b=aF0e7BDVH522CsrxeSzAB5m8VemcFRk62WmW0XrRMXLAlMpiyuGdAsvbZy52B03eLbgPsh
-        Xh5iohvyeJadSO9gqWCwnHKnEstD7qo56Ne4k3obMCuMwNsuG0QxxO357/2vL7Zd3DPbOI
-        jDrNmAoHXCnUhVK29Pee3k7XBD6LNqs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-425-Smg062Q2OvOtMCQaSioZZA-1; Tue, 16 Nov 2021 10:53:09 -0500
-X-MC-Unique: Smg062Q2OvOtMCQaSioZZA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S238255AbhKPP6j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Nov 2021 10:58:39 -0500
+Received: from mail.kernel.org ([198.145.29.99]:58408 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S238671AbhKPP6L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Nov 2021 10:58:11 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2CAC91DE1D;
-        Tue, 16 Nov 2021 15:53:08 +0000 (UTC)
-Received: from redhat.com (unknown [10.33.36.48])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A28035D9DE;
-        Tue, 16 Nov 2021 15:53:05 +0000 (UTC)
-Date:   Tue, 16 Nov 2021 15:53:02 +0000
-From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To:     Tyler Fanelli <tfanelli@redhat.com>
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org, mtosatti@redhat.com,
-        armbru@redhat.com, pbonzini@redhat.com, eblake@redhat.com
-Subject: Re: [PATCH] sev: allow capabilities to check for SEV-ES support
-Message-ID: <YZPT3ojgzdmH3lkq@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20211115193804.294529-1-tfanelli@redhat.com>
- <YZN3OECfHBXd55M5@redhat.com>
- <26204690-493f-67a8-1791-c9c9d38c0240@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <26204690-493f-67a8-1791-c9c9d38c0240@redhat.com>
-User-Agent: Mutt/2.0.7 (2021-05-04)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+        by mail.kernel.org (Postfix) with ESMTPSA id CC8B061929;
+        Tue, 16 Nov 2021 15:55:13 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mn0nf-005sK1-QH; Tue, 16 Nov 2021 15:55:11 +0000
+Date:   Tue, 16 Nov 2021 15:55:11 +0000
+Message-ID: <875yss859c.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Andrew Jones <drjones@redhat.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup.patel@wdc.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Michael Ellerman <mpe@ellerman.id.au>, kvm-ppc@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/5] KVM: arm64: Cap KVM_CAP_NR_VCPUS by KVM_CAP_MAX_VCPUS
+In-Reply-To: <87y25onsj6.fsf@redhat.com>
+References: <20211111162746.100598-1-vkuznets@redhat.com>
+        <20211111162746.100598-2-vkuznets@redhat.com>
+        <a5cdff6878b7157587e92ebe4d5af362@kernel.org>
+        <875ysxg0s1.fsf@redhat.com>
+        <87k0hd8obo.wl-maz@kernel.org>
+        <ad3534bc-fe3a-55f5-b022-4dbec5f29798@redhat.com>
+        <87y25onsj6.fsf@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: vkuznets@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org, seanjc@google.com, wanpengli@tencent.com, jmattson@google.com, ehabkost@redhat.com, drjones@redhat.com, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, anup.patel@wdc.com, paulus@ozlabs.org, mpe@ellerman.id.au, kvm-ppc@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 16, 2021 at 10:29:35AM -0500, Tyler Fanelli wrote:
-> On 11/16/21 4:17 AM, Daniel P. Berrangé wrote:
-> > On Mon, Nov 15, 2021 at 02:38:04PM -0500, Tyler Fanelli wrote:
-> > > Probe for SEV-ES and SEV-SNP capabilities to distinguish between Rome,
-> > > Naples, and Milan processors. Use the CPUID function to probe if a
-> > > processor is capable of running SEV-ES or SEV-SNP, rather than if it
-> > > actually is running SEV-ES or SEV-SNP.
-> > > 
-> > > Signed-off-by: Tyler Fanelli <tfanelli@redhat.com>
-> > > ---
-> > >   qapi/misc-target.json | 11 +++++++++--
-> > >   target/i386/sev.c     |  6 ++++--
-> > >   2 files changed, 13 insertions(+), 4 deletions(-)
-> > > 
-> > > diff --git a/qapi/misc-target.json b/qapi/misc-target.json
-> > > index 5aa2b95b7d..c3e9bce12b 100644
-> > > --- a/qapi/misc-target.json
-> > > +++ b/qapi/misc-target.json
-> > > @@ -182,13 +182,19 @@
-> > >   # @reduced-phys-bits: Number of physical Address bit reduction when SEV is
-> > >   #                     enabled
-> > >   #
-> > > +# @es: SEV-ES capability of the machine.
-> > > +#
-> > > +# @snp: SEV-SNP capability of the machine.
-> > > +#
-> > >   # Since: 2.12
-> > >   ##
-> > >   { 'struct': 'SevCapability',
-> > >     'data': { 'pdh': 'str',
-> > >               'cert-chain': 'str',
-> > >               'cbitpos': 'int',
-> > > -            'reduced-phys-bits': 'int'},
-> > > +            'reduced-phys-bits': 'int',
-> > > +            'es': 'bool',
-> > > +            'snp': 'bool'},
-> > >     'if': 'TARGET_I386' }
-> > >   ##
-> > > @@ -205,7 +211,8 @@
-> > >   #
-> > >   # -> { "execute": "query-sev-capabilities" }
-> > >   # <- { "return": { "pdh": "8CCDD8DDD", "cert-chain": "888CCCDDDEE",
-> > > -#                  "cbitpos": 47, "reduced-phys-bits": 5}}
-> > > +#                  "cbitpos": 47, "reduced-phys-bits": 5
-> > > +#                  "es": false, "snp": false}}
-> > We've previously had patches posted to support SNP in QEMU
-> > 
-> >    https://lists.gnu.org/archive/html/qemu-devel/2021-08/msg04761.html
-> > 
-> > and this included an update to query-sev for reporting info
-> > about the VM instance.
-> > 
-> > Your patch is updating query-sev-capabilities, which is a
-> > counterpart for detecting host capabilities separate from
-> > a guest instance.
+On Tue, 16 Nov 2021 13:23:25 +0000,
+Vitaly Kuznetsov <vkuznets@redhat.com> wrote:
 > 
-> Yes, that's because with this patch, I'm more interested in determining
-> which AMD processor is running on a host, and less if ES or SNP is actually
-> running on a guest instance or not.
-
-> > None the less I wonder if the same design questions from
-> > query-sev apply. ie do we need to have the ability to
-> > report any SNP specific information fields, if so we need
-> > to use a discriminated union of structs, not just bool
-> > flags.
-> > 
-> > More generally I'm some what wary of adding this to
-> > query-sev-capabilities at all, unless it is part of the
-> > main SEV-SNP series.
-> > 
-> > Also what's the intended usage for the mgmt app from just
-> > having these boolean fields ? Are they other more explicit
-> > feature flags we should be reporting, instead of what are
-> > essentially SEV generation codenames.
+> Paolo Bonzini <pbonzini@redhat.com> writes:
 > 
-> If by "mgmt app" you're referring to sevctl, in order to determine which
-> certificate chain to use (Naples vs Rome vs Milan ARK/ASK) we must query
-> which processor we are running on. Although sevctl has a feature which can
-> do this already, we cannot guarantee that sevctl is running on the same host
-> that a VM is running on, so we must query this capability from QEMU. My
-> logic was determining the processor would have been the following:
-
-I'm not really talking about a specific, rather any tool which wants
-to deal with SEV and QEMU, whether libvirt or an app using libvirt,
-or something else using QEMU directly.
-
-Where does the actual cert chain payload come from ? Is that something
-the app has to acquire out of band, or can the full cert chain be
-acquired from the hardware itself ? 
-
-> !es && !snp --> Naples
+> > On 11/12/21 15:02, Marc Zyngier wrote:
+> >>> I'd like KVM to be consistent across architectures and have the same
+> >>> (similar) meaning for KVM_CAP_NR_VCPUS.
+> >> Sure, but this is a pretty useless piece of information anyway. As
+> >> Andrew pointed out, the information is available somewhere else, and
+> >> all we need to do is to cap it to the number of supported vcpus, which
+> >> is effectively a KVM limitation.
+> >> 
+> >> Also, we are talking about representing the architecture to userspace.
+> >> No amount of massaging is going to make an arm64 box look like an x86.
+> >
+> > Not sure what you mean?  The API is about providing a piece of 
+> > information independent of the architecture, while catering for a ppc 
+> > weirdness.  Yes it's mostly useless if you don't care about ppc, but 
+> > it's not about making arm64 look like x86 or ppc; it's about not having 
+> > to special case ppc in userspace.
+> >
+> > If anything, if KVM_CAP_NR_VCPUS returns the same for kvm and !kvm, then 
+> > *that* is making an arm64 box look like an x86.  On ARM the max vCPUs 
+> > depends on VM's GIC configuration, so KVM_CAP_NR_VCPUS should take that 
+> > into account.
 > 
-> es && !snp --> Rome
+> (I'm about to send v2 as we have s390 sorted out.)
 > 
-> es && snp --> Milan
+> So what do we decide about ARM? 
 
-This approach isn't future proof if subsequent generations introduce
-new certs. It feels like we should be explicitly reporting something
-about the certs rather than relying on every app to re-implement tihs
-logic.
+[...]
 
-Regards,
-Daniel
+> - Always kvm_arm_default_max_vcpus to make the output independent on 'if
+>  (kvm)'.
+
+This. Between two useless numbers, I prefer the one that doesn't
+introduce any userspace visible changes.
+
+Thanks,
+
+	M.
+
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+Without deviation from the norm, progress is not possible.
