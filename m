@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B05CE452991
-	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 06:24:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9BF71452993
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 06:24:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234044AbhKPF06 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Nov 2021 00:26:58 -0500
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:46810 "EHLO
-        esa1.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233928AbhKPFZj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S234069AbhKPF1K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Nov 2021 00:27:10 -0500
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:25814 "EHLO
+        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233941AbhKPFZj (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 16 Nov 2021 00:25:39 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
   t=1637040162; x=1668576162;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:content-transfer-encoding:mime-version;
-  bh=QMxnsZYmEZ308Oh86vNfSbeNNa42FMCLFimTUPcGoTg=;
-  b=C9d9HwAuvrrekQ3wjNvqYlgVgD4YOu7z0cPPPVb03kBc8xzWMMKJW3kF
-   0VnYyFX2nxTQmZTBv5E5zMNzufYAx94n5M7KvE/nQmeswWnnYOnBE70K8
-   RA9AZ7vNR8Tf6Qyr+mkC/lb6zx+nRHTZOZe1MpiCN8ARcEEayXRXo2UZb
-   Mc9Sz345rxZ3jjGQHNvUJRL758wpvzroE5Qh6EGaPS8BBN5AUzneV9Qxs
-   saj8Py+BlLOujnCcuuVcGeBmzyakJdbDMnjAaDdFDV0plv54tk5uVqaa9
-   eVcEFaO1z6NnJZdA1P+6/UPOQ4ZcKrNqvOYXqBA8Sky1OTZx6lXkwGxfc
+  bh=lDq+FKo7RmMLlDr7OA4J8sRiNlAUgKGsONyvb6DEe/M=;
+  b=a9ysgpO/uFTPUTvjjILbMJ3mOIEwylA6DfF6r3xr+tvqug30o/dU6fDh
+   Xi9CSijCPAUzxj3IXI1gS5eqpHD9lzRGZxrThvSH1nacdcnJtGs4kwqrU
+   KPBqgc9QKkJszmZbIF2GuxMN2c4y4nNOT6pgUZJdmsRsTuG82zKovbUJr
+   inRfSEQwva7hgG25/hr3i441wGR5sim0dYWqNJNn8uhO10jgpFMH+dJZ1
+   OC6xP9iFWHYhMil9FvH7q+zQBn2UC+HXCVfCWMl6syvFp99ojmbC+rLef
+   K++VSTJZURiVGbgQqgmcfkU0amXk4K/9DRg6Qlihj3jJ1/Vk5yQ8rHaYs
    Q==;
 X-IronPort-AV: E=Sophos;i="5.87,237,1631548800"; 
-   d="scan'208";a="297516502"
-Received: from mail-bn1nam07lp2048.outbound.protection.outlook.com (HELO NAM02-BN1-obe.outbound.protection.outlook.com) ([104.47.51.48])
-  by ob1.hgst.iphmx.com with ESMTP; 16 Nov 2021 13:22:20 +0800
+   d="scan'208";a="184696445"
+Received: from mail-bn1nam07lp2044.outbound.protection.outlook.com (HELO NAM02-BN1-obe.outbound.protection.outlook.com) ([104.47.51.44])
+  by ob1.hgst.iphmx.com with ESMTP; 16 Nov 2021 13:22:23 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TlFF5kxjGZrwzaiBVlJTgEAiHwHp1+mjE6EhIU1s0Zwjtvecr5gklnt1YhpCQD44POeo7q85XdOzGINtDykXP+Wq3PTOzEazc8EaJBBtBMQ1esSYJyw7S67nMttXFeCAcP+UOCYo0xXa/TxaKa4RMgBi7WIJtZ9snzT714n6ByZOyuc13px87pQoa7g1PaBDOwVJ88ua8chjIgbBhvKln63zygYGgpiXvtnvZYLKIBnCyAEk9enxJaVB98/8MOBWMfWSJEbFfNHNS17Y6dMXLrUC1syh9GE/+qxlp9ZsxhVNIhTREDA/33DU2zSmQOEHeDee5WNxuXZ2p6vLarfvnQ==
+ b=WY3Bc5LeH6e9am1yewYd/HYtt/ccccBaCMeXRNIA3+M/nXH3iFR12X9Bcl8emPfCb0614IlO/oBSkQm/nRxsAKkVKO1foTQoe/0pulyq2jDaqDAWzvcnEdlU0mWLnCfJ+/9MNl1nKkVxybhony066uOFmGeHnH+SGvCiwfYzdurzVE7baADAWW3G4v1ElsZXYtgONE/LJM3XAnuB7G0Ihk7aXPhF3aM/6E3pUi9jH+XCmird7REqKMwpzNgYAGF0kTcn+X3MLM4tfT6FOgMA1icjrzEhdroVgC40IBEG0OfFQwi9fRM+9RW2o4az50LduYBU6a0VYZINpnStzeb0yg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=s5BpwQvjVLMODXK/OR6C/VGdnfYPWEqutDq7Z6wEfME=;
- b=lWp4rDa0PhU5MlScYC4eDAVQFtQfCWjDzGmSGIQ7c77XdHY8fxI02wV8hOpB5NyYhin0mCuZzPf+gWFK089Taa3Np7TxvJA8A4jbFSMeehuI4zP6sE1Ujj7QcjHYDElwxti2sJIAgJHdRKgbdSpn5CZGOhitibZBkuuYLJhVlwxor7o+0bVgph36KbaAW9AcbPEgPrO87VTV14Fh58hFe+kGDuPuvbxYaOaZcL1EpO0W2SJ3dm8PwNpnIOcQYviXTTdCk5pMFJTqibvQzy0wQw7bcjHeKoRDKIsJQywMuNahK9fwcM6+AR+bbKwmc884nk06iyQbOGWKZYjvbG3SdA==
+ bh=yrurI0CrHyGTFt1VaTothhQZAEntRUm1BYM8Wyf5F+M=;
+ b=jgwSfuiEIWB1m+qJyJJ7wy1mZwC2yAbVSkFbyFpYVMGJ3+7BNusUy2V7bxGkJlqmp2YcGagsn6Rr7Q6Cg3pMakgf5rIgy9ejyIX+tkuHp8wTWevAxcLtTGkiN1Jmlj0r1rAMvlbyOwCtkMYm4KJtWLjKsCfT0cqsB4QEI3099Ftgy7YdfJOkTKEMphJn9abyCkMin9m85/H/HUJujP4aiDa1KWvKdbcHNNm0qNKXiB1E5/1lfkoWb3inJ56PIcwhxmMsCp9uTNq1Dej4xBCglI+uqew8Og09s7T8jY24UqLGVkf/Xddt3PcU2Vn+1Yx+7W5mvm+FO46lMWqVZtK28Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=s5BpwQvjVLMODXK/OR6C/VGdnfYPWEqutDq7Z6wEfME=;
- b=GCgsa5BGE/fFQew+MgepHtq5V8HMCEeYJ4m3xwXOaUvebEOpxPkz46dFsGWcNrkS/8SE7mxhIBSHRdSRB8yjCBoKsei4q8bDtmSuZ9mfBiJBWAnOhqB7lMlvSxQ7zBchjCBDPE+4UjespxEHncc5iAFIhzk6Te8Pejw06KDiyeA=
+ bh=yrurI0CrHyGTFt1VaTothhQZAEntRUm1BYM8Wyf5F+M=;
+ b=Febzx7P4STp3eVKC31bs4tIdtkMtGBdt9+BrKKkG6J+9X3M2kOkEky+4aAq0zKXD9P2YDJCIB1ZYxW8g2w1QZmHzBCNvoUk3uibHGdEtXURCNotOi/arvQ9xZwPsUtSNxtwOsCFDoGWvRo2xFKGDAdBCk37nI+BttDQqXvLDLe4=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=wdc.com;
 Received: from CO6PR04MB7812.namprd04.prod.outlook.com (2603:10b6:303:138::6)
  by CO6PR04MB7843.namprd04.prod.outlook.com (2603:10b6:5:35f::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4690.17; Tue, 16 Nov
- 2021 05:22:19 +0000
+ 2021 05:22:22 +0000
 Received: from CO6PR04MB7812.namprd04.prod.outlook.com
  ([fe80::8100:4308:5b21:8d97]) by CO6PR04MB7812.namprd04.prod.outlook.com
  ([fe80::8100:4308:5b21:8d97%9]) with mapi id 15.20.4690.027; Tue, 16 Nov 2021
- 05:22:19 +0000
+ 05:22:22 +0000
 From:   Anup Patel <anup.patel@wdc.com>
 To:     Will Deacon <will@kernel.org>, julien.thierry.kdev@gmail.com,
         maz@kernel.org
@@ -63,9 +63,9 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
         kvm-riscv@lists.infradead.org, Anup Patel <anup.patel@wdc.com>,
         Atish Patra <atish.patra@wdc.com>
-Subject: [PATCH v10 kvmtool 6/8] riscv: Generate FDT at runtime for Guest/VM
-Date:   Tue, 16 Nov 2021 10:51:28 +0530
-Message-Id: <20211116052130.173679-7-anup.patel@wdc.com>
+Subject: [PATCH v10 kvmtool 7/8] riscv: Handle SBI calls forwarded to user space
+Date:   Tue, 16 Nov 2021 10:51:29 +0530
+Message-Id: <20211116052130.173679-8-anup.patel@wdc.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20211116052130.173679-1-anup.patel@wdc.com>
 References: <20211116052130.173679-1-anup.patel@wdc.com>
@@ -75,408 +75,202 @@ X-ClientProxiedBy: MA1PR01CA0166.INDPRD01.PROD.OUTLOOK.COM
  (2603:1096:a00:71::36) To CO6PR04MB7812.namprd04.prod.outlook.com
  (2603:10b6:303:138::6)
 MIME-Version: 1.0
-Received: from wdc.com (223.182.253.112) by MA1PR01CA0166.INDPRD01.PROD.OUTLOOK.COM (2603:1096:a00:71::36) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4690.25 via Frontend Transport; Tue, 16 Nov 2021 05:22:16 +0000
+Received: from wdc.com (223.182.253.112) by MA1PR01CA0166.INDPRD01.PROD.OUTLOOK.COM (2603:1096:a00:71::36) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4690.25 via Frontend Transport; Tue, 16 Nov 2021 05:22:19 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: be796629-fb03-49cb-795d-08d9a8c10f7c
+X-MS-Office365-Filtering-Correlation-Id: 1f196a90-f50f-4057-74c3-08d9a8c11175
 X-MS-TrafficTypeDiagnostic: CO6PR04MB7843:
 X-LD-Processed: b61c8803-16f3-4c35-9b17-6f65f441df86,ExtAddr
-X-Microsoft-Antispam-PRVS: <CO6PR04MB7843977AC5B4D4CEED99CF7E8D999@CO6PR04MB7843.namprd04.prod.outlook.com>
+X-Microsoft-Antispam-PRVS: <CO6PR04MB7843376E553783FCAAC7FB478D999@CO6PR04MB7843.namprd04.prod.outlook.com>
 WDCIPOUTBOUND: EOP-TRUE
-X-MS-Oob-TLC-OOBClassifiers: OLM:31;
+X-MS-Oob-TLC-OOBClassifiers: OLM:2803;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: mPwThQTbAJ2FReErpveV52IHaQqg2vnS6kUtIIxwZVI1bE9KkbnvH0IylgiFuYYeXXMNrUcsB8SxjN7pHxD79qbp9rdq2h8BfN5iX+6lOfL36SwOgMS2Mk9oLFh7aZ16zZHsolhZCZ9Ys0uvJfk6N1biHKLEXYjITaniAp6yw0X518aiZfD+zt1hpGbOIpW6Mwt/ad7MoeIRo50IVVegkRRXWLX5NaCb/bRetKN+74tHuzxUPHR1tkNh0qAidFgRWX4Z5Lzxvj/1FvLXv9pw7GOqsc3whnK8Ahx7ViIu73pCljhStXuH5U8KmYd3WcJVSrdy9VvsPmPljqtJuO6vK8HyU2vdJ7qqzoMFKzByYiqSbbDWX/7CBHA2d7TSElLz8Uy+ip0aJhCIIAIIo31+hMUy2PZMbgoVtYApyMeLbCOBZyCo6zcdGyVWjL1uKkZ0mfKeA5zvKDu5zSXmunFfhdOeEp06FqnihdYsCVz4mquCpZgHYicwydVQ4P95eLyJAn31Yb2tcwsgcfLnEroTr+cPBW8vuMvdPg/pchHpi2hgPTT8Z4AXUq8x5Vx6D6uJvLnjJnyIf+SYj1blbY1vS2tEkGnnvJBPN7BFWWeSajneOlTOaCYqlv6qtxHTCzKJUGMk2UZVpj1hAughqbf59vvRgf4RB+bs0e/Z8LXqmbgISQrlrsxUP20XxwsOwjyvgp49g2x6ZkDcKDakOh7LPQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO6PR04MB7812.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(7696005)(4326008)(52116002)(66556008)(8936002)(30864003)(66946007)(83380400001)(6666004)(186003)(86362001)(8676002)(82960400001)(2616005)(66476007)(8886007)(38350700002)(36756003)(44832011)(38100700002)(956004)(26005)(1076003)(55016002)(54906003)(5660300002)(2906002)(316002)(508600001);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: xmNEXgzL9+2R3NkNXCvQyQfM+xHIMOfAPHKm8hpKjElk6UD/RijID6pnMbMxgRDYJZTN972ynI7Kmll/jIwUwG/Rk/L3vzyc8HmgQNt0oo8EMEGxi67sj1rdkPABlMvUID8EIUmSS5BoC1hmkL7NVcmXwZWThJENMzEFbgFhZNHbKXdc/g2S5CFVbO+B6DEnMWyw1qZHxaXrn9dymwpyIOCzpvm99jOJFA/dpum5Ye7FGpa49HU7OGLxdbO9FTC1yJdzlnWKiy1AXxXcUAbOI1FKfaaJcJMZlQWa7eKlnS2S+c0rcyUO5X6PPzxGh0TFXIGUJk8BbUKtVMymnOQA02cnBywrdlvD5F/HmaXYSq5bU2VrYiS8Zt7GOlkcQhqXL88EaGI+k/tJrPh9shWKodKSKda4Tu69JwGO6OmMgXmgARd7ajIzNowaRYpkCJDTTGLpBHvi73bmL7hAsq74FeqxIuURFQVAywo5x/Y0RIWakojie5Ezqk3eGYoD2KeA6ZoLGkn1RZMb8OAFy3O8VqSKtMXLYkWFuiB/VP0DoD3qwB7/x2zYoz3Ii7064asgtB53X8HVhgHNROvZWQF2GODfOGDnrPmsguTMQRx2Y9q9HZTDeoitoxBrvxAlAOqVfNiLXKKet4J69cgZ9YKv/ky64YaiIwGFWkhdZNLzF3PCYTkMKNdS0fX+5yYmNk9V+QxGaKD1Se2VVIy3wB9D0g==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO6PR04MB7812.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(7696005)(4326008)(52116002)(66556008)(8936002)(66946007)(83380400001)(6666004)(186003)(86362001)(8676002)(82960400001)(2616005)(66476007)(8886007)(38350700002)(36756003)(44832011)(38100700002)(956004)(26005)(1076003)(55016002)(54906003)(5660300002)(2906002)(316002)(508600001);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?mMfeOHfEEAe/th7Bi9fAY6tR34IAxd3lcEKxRySF21ww3zqYnnORXJVfrFT+?=
- =?us-ascii?Q?zkOQhia4Wxpjoa/kH3mmnP9CtAKQ0OOnXhH8aISg8vbash+mZO58UnCO+DtE?=
- =?us-ascii?Q?TyaxYjP6ogYLyhXf/xV2yY4sjk4uZMUan9HZnvfghMVO3iN22VLKOElmWyJE?=
- =?us-ascii?Q?rkblVft8bgnc9AoaCf+lkgXJnQF+ahtS7Ez4OgKQ6fLos2URQGqazg9lkW6J?=
- =?us-ascii?Q?qLwE0gG5ihAy0r3uv8KZQRaSvLwDq2k4jUwtAlpkxOJwiM5RL8/w3qc9ToD7?=
- =?us-ascii?Q?ZDUd4Y9TUM9BDBQzeDN7S5E8RBzExYA8Vi5x3EftdSNph0RfdK4Ql1TgBhSq?=
- =?us-ascii?Q?7fp7mwymovXCSx/LUwOWFPJ6OFCgxC1N2zADix4yQuwLZUB8sOACnoQl0kos?=
- =?us-ascii?Q?24YM5RaVI54Peq/mBGqf87dB92wyijp5KlhRdLanr+rnnTgT0K6fiAKLbF+v?=
- =?us-ascii?Q?rjm7sL/g9r3Qq5LYQijAOqej4sD9/BpUmZZMfgBw4Pzl7U/e+lUpZjsf2Eqf?=
- =?us-ascii?Q?uZfklQ2Z53kO5ixfZhPsGN+AoOP1r2YxwOf7TkcPV7y4anjxOO4x3jYLflte?=
- =?us-ascii?Q?Ty/+CTu35JbzsUX73b4MraKm3va7EPk+iwi3roCjdLAbw9hoEzvF5pToICn/?=
- =?us-ascii?Q?itmi69eZ53SkzL/yTrYvOoAMk6qPzpubodXGl2vbT/DL/eqJhpvZdGa047f2?=
- =?us-ascii?Q?okN3So8fSZy3Em9xFhwZASTyLYbUpovgUwPmQMk5WTm6u5R/gAe09xEIniZX?=
- =?us-ascii?Q?2rsr/Xh84tzAWLQ6aV1sWclgBMGEUEj3Z8Pc9qZiZfglT4wlWAcvDJf+kwhp?=
- =?us-ascii?Q?6HTZUYIml3AzqBr2xQXE3yTw+SFKiMnlf13YabaJXNhVvr058eWm58iMHDfR?=
- =?us-ascii?Q?k2+v/Z1nuzCh4CrQnAYs3NwJxlmlRwNi4Jomyjsy1C48Idhicp/ecsEHf/Ue?=
- =?us-ascii?Q?D56X/WNZfjwdyC21vyohIi1K/ERsm/nWbqA74J+cgCs/QLGZwSi8TFnh+ksx?=
- =?us-ascii?Q?1H6ztPbKFWJs4HAnF2vhXBsgPkIf8bBeAcbfaaAvZR17eIWwn44RYaw/CnJM?=
- =?us-ascii?Q?FxdWakUIeB7Aip2/KDIwkO+bSSJNXH/RFx/78nHYtDH7bjdiO0C95CNGAQJk?=
- =?us-ascii?Q?OiIp48cAeQDarPD/QZ3/eWFOSy4CzOneLtetL/e9Eq9zxv7IF8K0xd3KstC8?=
- =?us-ascii?Q?CKxk2Jyoya9Em9V5GiaTPcHMNYc1bTCW8bAyLikeZi9ted3DV/rX2Ab+S44E?=
- =?us-ascii?Q?7NUsQSso06bJ6NzIQI3EX+sLeGrIzdeHRl7/Ighlbf+9XKNCtg+h6KVUj8Cg?=
- =?us-ascii?Q?ONF9OLQ4t6RCM0NFcdMW/CcLmEV7ATHvX2NdBvIT4TOKm5iIIvNQOAjLVyrT?=
- =?us-ascii?Q?riecXsp7fMDxpWjVC/QB3aZTJ7ZuU6vF0p3voRH2n1jzfatNvskVt8exa3dP?=
- =?us-ascii?Q?J3rpl71kOSweTwaWZ+U0dSxnK5StBtDSBnhq28zR2ceB7qm7FZPFr0aNpUog?=
- =?us-ascii?Q?+7Hs9KDHgChNlSRHqCFl8/qWEZvTpdKb6jWH7WYPUdpEph1kLdAgdnj9g+p1?=
- =?us-ascii?Q?nIdacjIAVPZ1mE5kUwsRLpxLtZen9qOXEQwMgLwzn6WUjFEWUhoxc5pAlFVW?=
- =?us-ascii?Q?+82ub8owDMgCLuCJDpbX2Ww=3D?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?zAAB7g2bm3FRye2/gQ7NPVnYsFoNhGxRFnFpmbGzF0v2MkgcTdwj9uPFBAsK?=
+ =?us-ascii?Q?oaHoiSpUky6X19qUD82BBvudAkf5eiI1FsXiuupNGSX19QQTvZwnx0C4ftep?=
+ =?us-ascii?Q?BnIGwwJTDhF/jBcGNH+iKszoWvid1QmHRQf8mnEwbJlCg202z2NFN009hT3N?=
+ =?us-ascii?Q?GARNqr2Cc35xFKpRZmvhlVMyT9HE96zZt/fjAdo6zPQWfqoQ+w62F59nmjO4?=
+ =?us-ascii?Q?tK5kztEvWMftsO4vHqZCiJtDXvYX4QBaSnzNlOsvI4B5XFu04ygiU5Vvoqa/?=
+ =?us-ascii?Q?71lesRPR1GXpF6egJ3/tqUxgSoXAK0evHyybexwC42nAGxDRFCHw3Px90xf4?=
+ =?us-ascii?Q?qA1HVgI0RWhkSTyEVzyamdTjfNaBKdv/L6r8u4DUPGJuhJqN/s9C96fJ/j1M?=
+ =?us-ascii?Q?pvTPdMKi4uJKs4cyKLxxpvTcmFzsXzwcq+fPGL908c0M26Wgr9FZFL+bqOpx?=
+ =?us-ascii?Q?ybBPQ0SLYzlilvGJdmAiMGVtlyMCRbEwS9GKrb4YqcOGxRXUXRrglbUDrKTj?=
+ =?us-ascii?Q?F9ump+kHYN/NpVH9yP2dTp04VxtQ9Km8aGW5BOFezD/m1cYFnkKs07WABo2k?=
+ =?us-ascii?Q?xJ/w8iLtG1yllwvwSvkQLJP2gUf2gWrgJvQRNzcehkzyU0sbuJFr3U0luKWb?=
+ =?us-ascii?Q?R7DvjfaYpXTODEYo07cqFhC62ki1z+dOkvUhRBESFufW8MvLSXfGvKFM404e?=
+ =?us-ascii?Q?4sRcSCLiAL53/RGS+I3iu9L2UIG5yP9rb7R0tnFEihlZ1nVNnUv1n85tOJhe?=
+ =?us-ascii?Q?QB72WSG/GyD1Z6z6u7ortbSGnF5lYoSEYvM5NlFM8CWLNCpYSaaajoVX0Ino?=
+ =?us-ascii?Q?Cw9BDB6dTdEJQIb9EWyh1hD6cFKzSA86QCdDABgbJgtHP4z0m2wFxTceQR90?=
+ =?us-ascii?Q?CSM3VFFDZlmlV1/GyE/GZHd6Ok6zvm2+IIqMNeA5Xhw8QL8D6fR+yw8Eemm6?=
+ =?us-ascii?Q?6+p144d75gvTgyHce4x3e4ZZku47lbcBCtKlVkU6+4pjlskwAPJg2QdqdtDV?=
+ =?us-ascii?Q?04hZIpIwO93Ox3glCNZPkMYDlxWDZYIOGRCTz45FcgEFslVvnR9GNFP/lZh+?=
+ =?us-ascii?Q?gF7r2P+dceUjACsIpO6gGQlMOpU8hJY/ItUsT71Gu6QSGC6RHeKjj1v84TPD?=
+ =?us-ascii?Q?ByutYgNp/947c2aAIMr04moQ4getWlOee9A80fyfPfqVoQbn5KHV6BFVpRvw?=
+ =?us-ascii?Q?NqUz2PVshBlwvNJ0vvNEe5HgCq/GmaOHo+aQE6s2ltRT8f+X1d2aPry49uM/?=
+ =?us-ascii?Q?rqB/awkC3QjPJJXP4XZv8gWo64EiAwXanL9/RTa0kNP7yFLUdGPpf0yO6rzf?=
+ =?us-ascii?Q?ygo5A3RiFZXllZH5a7egYDF16VhfKy9uysnT0d5+j6DPKtDV1B0zsUOzbOKs?=
+ =?us-ascii?Q?gkVl+j1GUvYLmStHE9pX5BZTaBzVkUVVps4QOAZzQkY8A36J0qBMckfb8GU2?=
+ =?us-ascii?Q?CvvPgCoqAYnS20KdW72H6+U5rGx+7EYjmLu4bSlceIipgogc2vJDVqRp5Jft?=
+ =?us-ascii?Q?EJ+Th2Huu4fDUfUnEK9MAO9DS6LIESSnq4ET5WVB6DrXgeXNP/coe0Gps1iQ?=
+ =?us-ascii?Q?tLDXiQFIHI9aTqA2+V7uELMZ2LuBiSteBQ+IHfyz8qaKzrAoWtO90c4PwNNR?=
+ =?us-ascii?Q?y6lpzePm2av/Cgt9GVZjuS8=3D?=
 X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: be796629-fb03-49cb-795d-08d9a8c10f7c
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1f196a90-f50f-4057-74c3-08d9a8c11175
 X-MS-Exchange-CrossTenant-AuthSource: CO6PR04MB7812.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Nov 2021 05:22:19.4383
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Nov 2021 05:22:22.5546
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: vg5HJiYCymEphS+AgiN2JISP/5eV8DJs636BSeOG3p2vZyrk0V2I3vWpmDUgjn+BM83OgQO7Iz9OKvkuZU3mCg==
+X-MS-Exchange-CrossTenant-UserPrincipalName: TYERBCC52475fidyB95tQHKGeV8rj54aU8GUf0/ToJosx6iDFMvLaRfl9WKINnUWcS7zrvF2AmXAQDTwCAsnLA==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR04MB7843
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We generate FDT at runtime for RISC-V Guest/VM so that KVMTOOL users
-don't have to pass FDT separately via command-line parameters.
+The kernel KVM RISC-V module will forward certain SBI calls
+to user space. These forwared SBI calls will usually be the
+SBI calls which cannot be emulated in kernel space such as
+PUTCHAR and GETCHAR calls.
 
-Also, we provide "--dump-dtb <filename>" command-line option to dump
-generated FDT into a file for debugging purpose.
+This patch extends kvm_cpu__handle_exit() to handle SBI calls
+forwarded to user space.
 
 Signed-off-by: Atish Patra <atish.patra@wdc.com>
 Signed-off-by: Anup Patel <anup.patel@wdc.com>
 ---
- Makefile                            |   1 +
- riscv/fdt.c                         | 192 ++++++++++++++++++++++++++++
- riscv/include/kvm/fdt-arch.h        |   4 +
- riscv/include/kvm/kvm-arch.h        |   2 +
- riscv/include/kvm/kvm-config-arch.h |   6 +
- riscv/plic.c                        |  50 ++++++++
- 6 files changed, 255 insertions(+)
- create mode 100644 riscv/fdt.c
+ riscv/include/kvm/sbi.h | 48 ++++++++++++++++++++++++++++++++++++++++
+ riscv/kvm-cpu.c         | 49 ++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 96 insertions(+), 1 deletion(-)
+ create mode 100644 riscv/include/kvm/sbi.h
 
-diff --git a/Makefile b/Makefile
-index eacf766..e4e1184 100644
---- a/Makefile
-+++ b/Makefile
-@@ -199,6 +199,7 @@ endif
- ifeq ($(ARCH),riscv)
- 	DEFINES		+= -DCONFIG_RISCV
- 	ARCH_INCLUDE	:= riscv/include
-+	OBJS		+= riscv/fdt.o
- 	OBJS		+= riscv/ioport.o
- 	OBJS		+= riscv/irq.o
- 	OBJS		+= riscv/kvm.o
-diff --git a/riscv/fdt.c b/riscv/fdt.c
+diff --git a/riscv/include/kvm/sbi.h b/riscv/include/kvm/sbi.h
 new file mode 100644
-index 0000000..6527ef7
+index 0000000..f4b4182
 --- /dev/null
-+++ b/riscv/fdt.c
-@@ -0,0 +1,192 @@
-+#include "kvm/devices.h"
-+#include "kvm/fdt.h"
-+#include "kvm/kvm.h"
-+#include "kvm/kvm-cpu.h"
++++ b/riscv/include/kvm/sbi.h
+@@ -0,0 +1,48 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++/*
++ * Common SBI related defines and macros to be used by RISC-V kernel,
++ * RISC-V KVM and userspace.
++ *
++ * Copyright (c) 2019 Western Digital Corporation or its affiliates.
++ */
 +
-+#include <stdbool.h>
++#ifndef __RISCV_SBI_H__
++#define __RISCV_SBI_H__
 +
-+#include <linux/byteorder.h>
-+#include <linux/kernel.h>
-+#include <linux/sizes.h>
++enum sbi_ext_id {
++	SBI_EXT_0_1_SET_TIMER = 0x0,
++	SBI_EXT_0_1_CONSOLE_PUTCHAR = 0x1,
++	SBI_EXT_0_1_CONSOLE_GETCHAR = 0x2,
++	SBI_EXT_0_1_CLEAR_IPI = 0x3,
++	SBI_EXT_0_1_SEND_IPI = 0x4,
++	SBI_EXT_0_1_REMOTE_FENCE_I = 0x5,
++	SBI_EXT_0_1_REMOTE_SFENCE_VMA = 0x6,
++	SBI_EXT_0_1_REMOTE_SFENCE_VMA_ASID = 0x7,
++	SBI_EXT_0_1_SHUTDOWN = 0x8,
++	SBI_EXT_BASE = 0x10,
++};
 +
-+static void dump_fdt(const char *dtb_file, void *fdt)
-+{
-+	int count, fd;
++enum sbi_ext_base_fid {
++	SBI_BASE_GET_SPEC_VERSION = 0,
++	SBI_BASE_GET_IMP_ID,
++	SBI_BASE_GET_IMP_VERSION,
++	SBI_BASE_PROBE_EXT,
++	SBI_BASE_GET_MVENDORID,
++	SBI_BASE_GET_MARCHID,
++	SBI_BASE_GET_MIMPID,
++};
 +
-+	fd = open(dtb_file, O_CREAT | O_TRUNC | O_RDWR, 0666);
-+	if (fd < 0)
-+		die("Failed to write dtb to %s", dtb_file);
++#define SBI_SPEC_VERSION_DEFAULT	0x1
++#define SBI_SPEC_VERSION_MAJOR_OFFSET	24
++#define SBI_SPEC_VERSION_MAJOR_MASK	0x7f
++#define SBI_SPEC_VERSION_MINOR_MASK	0xffffff
 +
-+	count = write(fd, fdt, FDT_MAX_SIZE);
-+	if (count < 0)
-+		die_perror("Failed to dump dtb");
++/* SBI return error codes */
++#define SBI_SUCCESS		0
++#define SBI_ERR_FAILURE		-1
++#define SBI_ERR_NOT_SUPPORTED	-2
++#define SBI_ERR_INVALID_PARAM   -3
++#define SBI_ERR_DENIED		-4
++#define SBI_ERR_INVALID_ADDRESS -5
 +
-+	pr_debug("Wrote %d bytes to dtb %s", count, dtb_file);
-+	close(fd);
-+}
-+
-+#define CPU_NAME_MAX_LEN 15
-+#define CPU_ISA_MAX_LEN 128
-+static void generate_cpu_nodes(void *fdt, struct kvm *kvm)
-+{
-+	int cpu, pos, i, index, valid_isa_len;
-+	const char *valid_isa_order = "IEMAFDQCLBJTPVNSUHKORWXYZG";
-+
-+	_FDT(fdt_begin_node(fdt, "cpus"));
-+	_FDT(fdt_property_cell(fdt, "#address-cells", 0x1));
-+	_FDT(fdt_property_cell(fdt, "#size-cells", 0x0));
-+	_FDT(fdt_property_cell(fdt, "timebase-frequency",
-+				kvm->cpus[0]->riscv_timebase));
-+
-+	for (cpu = 0; cpu < kvm->nrcpus; ++cpu) {
-+		char cpu_name[CPU_NAME_MAX_LEN];
-+		char cpu_isa[CPU_ISA_MAX_LEN];
-+		struct kvm_cpu *vcpu = kvm->cpus[cpu];
-+
-+		snprintf(cpu_name, CPU_NAME_MAX_LEN, "cpu@%x", cpu);
-+
-+		snprintf(cpu_isa, CPU_ISA_MAX_LEN, "rv%ld", vcpu->riscv_xlen);
-+		pos = strlen(cpu_isa);
-+		valid_isa_len = strlen(valid_isa_order);
-+		for (i = 0; i < valid_isa_len; i++) {
-+			index = valid_isa_order[i] - 'A';
-+			if (vcpu->riscv_isa & (1 << (index)))
-+				cpu_isa[pos++] = 'a' + index;
-+		}
-+		cpu_isa[pos] = '\0';
-+
-+		_FDT(fdt_begin_node(fdt, cpu_name));
-+		_FDT(fdt_property_string(fdt, "device_type", "cpu"));
-+		_FDT(fdt_property_string(fdt, "compatible", "riscv"));
-+		if (vcpu->riscv_xlen == 64)
-+			_FDT(fdt_property_string(fdt, "mmu-type",
-+						 "riscv,sv48"));
-+		else
-+			_FDT(fdt_property_string(fdt, "mmu-type",
-+						 "riscv,sv32"));
-+		_FDT(fdt_property_string(fdt, "riscv,isa", cpu_isa));
-+		_FDT(fdt_property_cell(fdt, "reg", cpu));
-+		_FDT(fdt_property_string(fdt, "status", "okay"));
-+
-+		_FDT(fdt_begin_node(fdt, "interrupt-controller"));
-+		_FDT(fdt_property_string(fdt, "compatible", "riscv,cpu-intc"));
-+		_FDT(fdt_property_cell(fdt, "#interrupt-cells", 1));
-+		_FDT(fdt_property(fdt, "interrupt-controller", NULL, 0));
-+		_FDT(fdt_property_cell(fdt, "phandle",
-+					PHANDLE_CPU_INTC_BASE + cpu));
-+		_FDT(fdt_end_node(fdt));
-+
-+		_FDT(fdt_end_node(fdt));
-+	}
-+
-+	_FDT(fdt_end_node(fdt));
-+}
-+
-+static int setup_fdt(struct kvm *kvm)
-+{
-+	struct device_header *dev_hdr;
-+	u8 staging_fdt[FDT_MAX_SIZE];
-+	u64 mem_reg_prop[]	= {
-+		cpu_to_fdt64(kvm->arch.memory_guest_start),
-+		cpu_to_fdt64(kvm->ram_size),
-+	};
-+	void *fdt		= staging_fdt;
-+	void *fdt_dest		= guest_flat_to_host(kvm,
-+						     kvm->arch.dtb_guest_start);
-+	void (*generate_mmio_fdt_nodes)(void *, struct device_header *,
-+					void (*)(void *, u8, enum irq_type));
-+
-+	/* Create new tree without a reserve map */
-+	_FDT(fdt_create(fdt, FDT_MAX_SIZE));
-+	_FDT(fdt_finish_reservemap(fdt));
-+
-+	/* Header */
-+	_FDT(fdt_begin_node(fdt, ""));
-+	_FDT(fdt_property_string(fdt, "compatible", "linux,dummy-virt"));
-+	_FDT(fdt_property_cell(fdt, "#address-cells", 0x2));
-+	_FDT(fdt_property_cell(fdt, "#size-cells", 0x2));
-+
-+	/* /chosen */
-+	_FDT(fdt_begin_node(fdt, "chosen"));
-+
-+	/* Pass on our amended command line to a Linux kernel only. */
-+	if (kvm->cfg.firmware_filename) {
-+		if (kvm->cfg.kernel_cmdline)
-+			_FDT(fdt_property_string(fdt, "bootargs",
-+						 kvm->cfg.kernel_cmdline));
-+	} else
-+		_FDT(fdt_property_string(fdt, "bootargs",
-+					 kvm->cfg.real_cmdline));
-+
-+	_FDT(fdt_property_string(fdt, "stdout-path", "serial0"));
-+
-+	/* Initrd */
-+	if (kvm->arch.initrd_size != 0) {
-+		u64 ird_st_prop = cpu_to_fdt64(kvm->arch.initrd_guest_start);
-+		u64 ird_end_prop = cpu_to_fdt64(kvm->arch.initrd_guest_start +
-+					       kvm->arch.initrd_size);
-+
-+		_FDT(fdt_property(fdt, "linux,initrd-start",
-+				   &ird_st_prop, sizeof(ird_st_prop)));
-+		_FDT(fdt_property(fdt, "linux,initrd-end",
-+				   &ird_end_prop, sizeof(ird_end_prop)));
-+	}
-+
-+	_FDT(fdt_end_node(fdt));
-+
-+	/* Memory */
-+	_FDT(fdt_begin_node(fdt, "memory"));
-+	_FDT(fdt_property_string(fdt, "device_type", "memory"));
-+	_FDT(fdt_property(fdt, "reg", mem_reg_prop, sizeof(mem_reg_prop)));
-+	_FDT(fdt_end_node(fdt));
-+
-+	/* CPUs */
-+	generate_cpu_nodes(fdt, kvm);
-+
-+	/* Simple Bus */
-+	_FDT(fdt_begin_node(fdt, "smb"));
-+	_FDT(fdt_property_string(fdt, "compatible", "simple-bus"));
-+	_FDT(fdt_property_cell(fdt, "#address-cells", 0x2));
-+	_FDT(fdt_property_cell(fdt, "#size-cells", 0x2));
-+	_FDT(fdt_property_cell(fdt, "interrupt-parent", PHANDLE_PLIC));
-+	_FDT(fdt_property(fdt, "ranges", NULL, 0));
-+
-+	/* Virtio MMIO devices */
-+	dev_hdr = device__first_dev(DEVICE_BUS_MMIO);
-+	while (dev_hdr) {
-+		generate_mmio_fdt_nodes = dev_hdr->data;
-+		generate_mmio_fdt_nodes(fdt, dev_hdr, plic__generate_irq_prop);
-+		dev_hdr = device__next_dev(dev_hdr);
-+	}
-+
-+	/* IOPORT devices */
-+	dev_hdr = device__first_dev(DEVICE_BUS_IOPORT);
-+	while (dev_hdr) {
-+		generate_mmio_fdt_nodes = dev_hdr->data;
-+		generate_mmio_fdt_nodes(fdt, dev_hdr, plic__generate_irq_prop);
-+		dev_hdr = device__next_dev(dev_hdr);
-+	}
-+
-+	_FDT(fdt_end_node(fdt));
-+
-+	if (fdt_stdout_path) {
-+		_FDT(fdt_begin_node(fdt, "aliases"));
-+		_FDT(fdt_property_string(fdt, "serial0", fdt_stdout_path));
-+		_FDT(fdt_end_node(fdt));
-+
-+		free(fdt_stdout_path);
-+		fdt_stdout_path = NULL;
-+	}
-+
-+	/* Finalise. */
-+	_FDT(fdt_end_node(fdt));
-+	_FDT(fdt_finish(fdt));
-+
-+	_FDT(fdt_open_into(fdt, fdt_dest, FDT_MAX_SIZE));
-+	_FDT(fdt_pack(fdt_dest));
-+
-+	if (kvm->cfg.arch.dump_dtb_filename)
-+		dump_fdt(kvm->cfg.arch.dump_dtb_filename, fdt_dest);
-+	return 0;
-+}
-+late_init(setup_fdt);
-diff --git a/riscv/include/kvm/fdt-arch.h b/riscv/include/kvm/fdt-arch.h
-index 9450fc5..f7548e8 100644
---- a/riscv/include/kvm/fdt-arch.h
-+++ b/riscv/include/kvm/fdt-arch.h
-@@ -1,4 +1,8 @@
- #ifndef KVM__KVM_FDT_H
- #define KVM__KVM_FDT_H
- 
-+enum phandles {PHANDLE_RESERVED = 0, PHANDLE_PLIC, PHANDLES_MAX};
-+
-+#define PHANDLE_CPU_INTC_BASE	PHANDLES_MAX
-+
- #endif /* KVM__KVM_FDT_H */
-diff --git a/riscv/include/kvm/kvm-arch.h b/riscv/include/kvm/kvm-arch.h
-index 25b80b3..d0be965 100644
---- a/riscv/include/kvm/kvm-arch.h
-+++ b/riscv/include/kvm/kvm-arch.h
-@@ -80,6 +80,8 @@ static inline bool riscv_addr_in_ioport_region(u64 phys_addr)
- 
- enum irq_type;
- 
-+void plic__generate_irq_prop(void *fdt, u8 irq, enum irq_type irq_type);
-+
- void plic__irq_trig(struct kvm *kvm, int irq, int level, bool edge);
- 
- #endif /* KVM__KVM_ARCH_H */
-diff --git a/riscv/include/kvm/kvm-config-arch.h b/riscv/include/kvm/kvm-config-arch.h
-index 60c7333..526fca2 100644
---- a/riscv/include/kvm/kvm-config-arch.h
-+++ b/riscv/include/kvm/kvm-config-arch.h
-@@ -4,6 +4,12 @@
- #include "kvm/parse-options.h"
- 
- struct kvm_config_arch {
-+	const char	*dump_dtb_filename;
- };
- 
-+#define OPT_ARCH_RUN(pfx, cfg)						\
-+	pfx,								\
-+	OPT_STRING('\0', "dump-dtb", &(cfg)->dump_dtb_filename,		\
-+		   ".dtb file", "Dump generated .dtb to specified file"),
-+
- #endif /* KVM__KVM_CONFIG_ARCH_H */
-diff --git a/riscv/plic.c b/riscv/plic.c
-index d71226e..9344202 100644
---- a/riscv/plic.c
-+++ b/riscv/plic.c
-@@ -1,5 +1,6 @@
- 
- #include "kvm/devices.h"
-+#include "kvm/fdt.h"
- #include "kvm/ioeventfd.h"
- #include "kvm/ioport.h"
++#endif
+diff --git a/riscv/kvm-cpu.c b/riscv/kvm-cpu.c
+index 8adaddd..df90c7b 100644
+--- a/riscv/kvm-cpu.c
++++ b/riscv/kvm-cpu.c
+@@ -1,6 +1,7 @@
+ #include "kvm/kvm-cpu.h"
  #include "kvm/kvm.h"
-@@ -460,6 +461,54 @@ static void plic__mmio_callback(struct kvm_cpu *vcpu,
- 	}
+ #include "kvm/virtio.h"
++#include "kvm/sbi.h"
+ #include "kvm/term.h"
+ 
+ #include <asm/ptrace.h>
+@@ -110,9 +111,55 @@ void kvm_cpu__delete(struct kvm_cpu *vcpu)
+ 	free(vcpu);
  }
  
-+void plic__generate_irq_prop(void *fdt, u8 irq, enum irq_type irq_type)
++static bool kvm_cpu_riscv_sbi(struct kvm_cpu *vcpu)
 +{
-+	u32 irq_prop[] = {
-+		cpu_to_fdt32(irq)
++	char ch;
++	bool ret = true;
++	int dfd = kvm_cpu__get_debug_fd();
++
++	switch (vcpu->kvm_run->riscv_sbi.extension_id) {
++	case SBI_EXT_0_1_CONSOLE_PUTCHAR:
++		ch = vcpu->kvm_run->riscv_sbi.args[0];
++		term_putc(&ch, 1, 0);
++		vcpu->kvm_run->riscv_sbi.ret[0] = 0;
++		break;
++	case SBI_EXT_0_1_CONSOLE_GETCHAR:
++		if (term_readable(0))
++			vcpu->kvm_run->riscv_sbi.ret[0] =
++					term_getc(vcpu->kvm, 0);
++		else
++			vcpu->kvm_run->riscv_sbi.ret[0] = SBI_ERR_FAILURE;
++		break;
++	default:
++		dprintf(dfd, "Unhandled SBI call\n");
++		dprintf(dfd, "extension_id=0x%lx function_id=0x%lx\n",
++			vcpu->kvm_run->riscv_sbi.extension_id,
++			vcpu->kvm_run->riscv_sbi.function_id);
++		dprintf(dfd, "args[0]=0x%lx args[1]=0x%lx\n",
++			vcpu->kvm_run->riscv_sbi.args[0],
++			vcpu->kvm_run->riscv_sbi.args[1]);
++		dprintf(dfd, "args[2]=0x%lx args[3]=0x%lx\n",
++			vcpu->kvm_run->riscv_sbi.args[2],
++			vcpu->kvm_run->riscv_sbi.args[3]);
++		dprintf(dfd, "args[4]=0x%lx args[5]=0x%lx\n",
++			vcpu->kvm_run->riscv_sbi.args[4],
++			vcpu->kvm_run->riscv_sbi.args[5]);
++		ret = false;
++		break;
 +	};
 +
-+	_FDT(fdt_property(fdt, "interrupts", irq_prop, sizeof(irq_prop)));
++	return ret;
 +}
 +
-+static void plic__generate_fdt_node(void *fdt,
-+				    struct device_header *dev_hdr,
-+				    void (*generate_irq_prop)(void *fdt,
-+							      u8 irq,
-+							      enum irq_type))
-+{
-+	u32 i;
-+	u32 reg_cells[4], *irq_cells;
-+
-+	reg_cells[0] = 0;
-+	reg_cells[1] = cpu_to_fdt32(RISCV_PLIC);
-+	reg_cells[2] = 0;
-+	reg_cells[3] = cpu_to_fdt32(RISCV_PLIC_SIZE);
-+
-+	irq_cells = calloc(plic.num_context * 2, sizeof(u32));
-+	if (!irq_cells)
-+		die("Failed to alloc irq_cells");
-+
-+	_FDT(fdt_begin_node(fdt, "interrupt-controller@0c000000"));
-+	_FDT(fdt_property_string(fdt, "compatible", "riscv,plic0"));
-+	_FDT(fdt_property(fdt, "reg", reg_cells, sizeof(reg_cells)));
-+	_FDT(fdt_property_cell(fdt, "#interrupt-cells", 1));
-+	_FDT(fdt_property(fdt, "interrupt-controller", NULL, 0));
-+	_FDT(fdt_property_cell(fdt, "riscv,max-priority", plic.max_prio));
-+	_FDT(fdt_property_cell(fdt, "riscv,ndev", MAX_DEVICES - 1));
-+	_FDT(fdt_property_cell(fdt, "phandle", PHANDLE_PLIC));
-+	for (i = 0; i < (plic.num_context / 2); i++) {
-+		irq_cells[4*i + 0] = cpu_to_fdt32(PHANDLE_CPU_INTC_BASE + i);
-+		irq_cells[4*i + 1] = cpu_to_fdt32(0xffffffff);
-+		irq_cells[4*i + 2] = cpu_to_fdt32(PHANDLE_CPU_INTC_BASE + i);
-+		irq_cells[4*i + 3] = cpu_to_fdt32(9);
-+	}
-+	_FDT(fdt_property(fdt, "interrupts-extended", irq_cells,
-+			  sizeof(u32) * plic.num_context * 2));
-+	_FDT(fdt_end_node(fdt));
-+
-+	free(irq_cells);
-+}
-+
- static int plic__init(struct kvm *kvm)
+ bool kvm_cpu__handle_exit(struct kvm_cpu *vcpu)
  {
- 	u32 i;
-@@ -469,6 +518,7 @@ static int plic__init(struct kvm *kvm)
- 	plic.kvm = kvm;
- 	plic.dev_hdr = (struct device_header) {
- 		.bus_type	= DEVICE_BUS_MMIO,
-+		.data		= plic__generate_fdt_node,
- 	};
+-	/* TODO: */
++	switch (vcpu->kvm_run->exit_reason) {
++	case KVM_EXIT_RISCV_SBI:
++		return kvm_cpu_riscv_sbi(vcpu);
++	default:
++		break;
++	};
++
+ 	return false;
+ }
  
- 	plic.num_irq = MAX_DEVICES;
 -- 
 2.25.1
 
