@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E75D94533C4
-	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 15:11:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 516274533C7
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 15:11:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237194AbhKPOOG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Nov 2021 09:14:06 -0500
-Received: from smtp-out1.suse.de ([195.135.220.28]:35000 "EHLO
-        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237118AbhKPON5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S237221AbhKPOOO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Nov 2021 09:14:14 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:40732 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237168AbhKPON5 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 16 Nov 2021 09:13:57 -0500
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 83C9B218D6;
-        Tue, 16 Nov 2021 14:10:59 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 076851FD29;
+        Tue, 16 Nov 2021 14:11:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1637071859; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1637071860; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1/Kjxk7P20z4/cSuq8O5K4p1sb9GgHDo99aesOCdltE=;
-        b=H+10kwp1qpOcdlUGsbjydeY2SvSwTR63zx6MPMxsVhYLf/Ce8R8rBzvhFpJPm1Gmet14q5
-        omJsyKflcLJ+lFVScy0QyuRJy6srJRRRImQ7qoQJvdwwShYuBbe65CtrtaC/683MZzkAIq
-        dwQM7KlpLjoT3DPSSQklBGWPvgUTOxg=
+        bh=Tjy1v3vITNPwlNOSQc088H+Lg3ARv2JRHzBDzbf0ttw=;
+        b=WiJzx+hNhCEeO+55fKFOz4pL3UrZ+NbTtzPpdrjjnQLjlRW79v/KNunUfrUHN/tfsC2Ugs
+        jDQ70Tqk0Qn9ANDgp79L6V9Xrml4ea1OcK9IRCe98LnVzat8Ek7dBCS8Ud+DlafpUpHGEf
+        SrHEWz7d6yEesMtUeusVi9QU+DvI3vg=
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 1F72913BAE;
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 8AF8F13BAE;
         Tue, 16 Nov 2021 14:10:59 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id uJ9qBvO7k2ExEQAAMHmgww
+        id AE+VIPO7k2ExEQAAMHmgww
         (envelope-from <jgross@suse.com>); Tue, 16 Nov 2021 14:10:59 +0000
 From:   Juergen Gross <jgross@suse.com>
 To:     kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org
@@ -49,9 +49,9 @@ Cc:     Juergen Gross <jgross@suse.com>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         "H. Peter Anvin" <hpa@zytor.com>
-Subject: [PATCH v3 2/4] x86/kvm: introduce a per cpu vcpu mask
-Date:   Tue, 16 Nov 2021 15:10:52 +0100
-Message-Id: <20211116141054.17800-3-jgross@suse.com>
+Subject: [PATCH v3 3/4] x86/kvm: add max number of vcpus for hyperv emulation
+Date:   Tue, 16 Nov 2021 15:10:53 +0100
+Message-Id: <20211116141054.17800-4-jgross@suse.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20211116141054.17800-1-jgross@suse.com>
 References: <20211116141054.17800-1-jgross@suse.com>
@@ -61,176 +61,112 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-In order to support high vcpu numbers per guest don't use an on stack
-vcpu bitmask. As this currently used bitmask is not used in functions
-subject to recursion it is fairly easy to replace it with a percpu
-bitmask.
+When emulating Hyperv the theoretical maximum of vcpus supported is
+4096, as this is the architectural limit for sending IPIs via the PV
+interface.
 
-Allocate this bitmask dynamically in order to support boot time
-specified max number of vcpus in future.
+For restricting the actual supported number of vcpus for that case
+introduce another define KVM_MAX_HYPERV_VCPUS and set it to 1024, like
+today's KVM_MAX_VCPUS. Make both values unsigned ones as this will be
+needed later.
 
-Disable preemption while such a bitmask is being used in order to
-avoid double usage in case we'd switch cpus.
+The actual number of supported vcpus for Hyperv emulation will be the
+lower value of both defines.
 
-Note that this doesn't apply to vcpu bitmasks used in hyperv.c, as
-there the max number of vcpus is architecturally limited to 4096 and
-that bitmask can remain on the stack.
+This is a preparation for a future boot parameter support of the max
+number of vcpus for a KVM guest.
 
 Signed-off-by: Juergen Gross <jgross@suse.com>
 ---
-V2:
-- use local_lock() instead of preempt_disable() (Paolo Bonzini)
 V3:
-- drop hyperv.c related changes (Eduardo Habkost)
+- new patch
 ---
- arch/x86/include/asm/kvm_host.h |  7 +++++++
- arch/x86/kvm/ioapic.c           |  8 +++++++-
- arch/x86/kvm/irq_comm.c         |  9 +++++++--
- arch/x86/kvm/x86.c              | 18 +++++++++++++++++-
- 4 files changed, 38 insertions(+), 4 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  3 ++-
+ arch/x86/kvm/hyperv.c           | 15 ++++++++-------
+ 2 files changed, 10 insertions(+), 8 deletions(-)
 
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index bcef56f1039a..886930ec8264 100644
+index 886930ec8264..8ea03ff01c45 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -15,6 +15,7 @@
- #include <linux/cpumask.h>
- #include <linux/irq_work.h>
- #include <linux/irq.h>
-+#include <linux/local_lock.h>
+@@ -38,7 +38,8 @@
  
- #include <linux/kvm.h>
- #include <linux/kvm_para.h>
-@@ -1612,6 +1613,12 @@ extern bool kvm_has_bus_lock_exit;
- /* maximum vcpu-id */
- unsigned int kvm_max_vcpu_ids(void);
+ #define __KVM_HAVE_ARCH_VCPU_DEBUGFS
  
-+/* per cpu vcpu bitmask, protected by kvm_pcpu_mask_lock */
-+DECLARE_PER_CPU(local_lock_t, kvm_pcpu_mask_lock);
-+extern unsigned long __percpu *kvm_pcpu_vcpu_mask;
-+#define KVM_VCPU_MASK_SZ	\
-+	(sizeof(*kvm_pcpu_vcpu_mask) * BITS_TO_LONGS(KVM_MAX_VCPUS))
-+
- extern u64 kvm_mce_cap_supported;
+-#define KVM_MAX_VCPUS 1024
++#define KVM_MAX_VCPUS 1024U
++#define KVM_MAX_HYPERV_VCPUS 1024U
+ #define KVM_MAX_VCPU_IDS kvm_max_vcpu_ids()
+ /* memory slots that are not exposed to userspace */
+ #define KVM_PRIVATE_MEM_SLOTS 3
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index 4a555f32885a..c0fa837121f1 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -41,7 +41,7 @@
+ /* "Hv#1" signature */
+ #define HYPERV_CPUID_SIGNATURE_EAX 0x31237648
  
- /*
-diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
-index 64ba9b1c8b3d..c81963a27594 100644
---- a/arch/x86/kvm/ioapic.c
-+++ b/arch/x86/kvm/ioapic.c
-@@ -320,7 +320,7 @@ static void ioapic_write_indirect(struct kvm_ioapic *ioapic, u32 val)
- 	bool mask_before, mask_after;
- 	union kvm_ioapic_redirect_entry *e;
- 	int old_remote_irr, old_delivery_status, old_dest_id, old_dest_mode;
--	DECLARE_BITMAP(vcpu_bitmap, KVM_MAX_VCPUS);
-+	unsigned long *vcpu_bitmap;
+-#define KVM_HV_MAX_SPARSE_VCPU_SET_BITS DIV_ROUND_UP(KVM_MAX_VCPUS, 64)
++#define KVM_HV_MAX_SPARSE_VCPU_SET_BITS DIV_ROUND_UP(KVM_MAX_HYPERV_VCPUS, 64)
  
- 	switch (ioapic->ioregsel) {
- 	case IOAPIC_REG_VERSION:
-@@ -384,6 +384,10 @@ static void ioapic_write_indirect(struct kvm_ioapic *ioapic, u32 val)
- 			irq.shorthand = APIC_DEST_NOSHORT;
- 			irq.dest_id = e->fields.dest_id;
- 			irq.msi_redir_hint = false;
-+
-+			local_lock(&kvm_pcpu_mask_lock);
-+
-+			vcpu_bitmap = this_cpu_ptr(kvm_pcpu_vcpu_mask);
- 			bitmap_zero(vcpu_bitmap, KVM_MAX_VCPUS);
- 			kvm_bitmap_or_dest_vcpus(ioapic->kvm, &irq,
- 						 vcpu_bitmap);
-@@ -403,6 +407,8 @@ static void ioapic_write_indirect(struct kvm_ioapic *ioapic, u32 val)
- 			}
- 			kvm_make_scan_ioapic_request_mask(ioapic->kvm,
- 							  vcpu_bitmap);
-+
-+			local_unlock(&kvm_pcpu_mask_lock);
- 		} else {
- 			kvm_make_scan_ioapic_request(ioapic->kvm);
- 		}
-diff --git a/arch/x86/kvm/irq_comm.c b/arch/x86/kvm/irq_comm.c
-index d5b72a08e566..c331204de007 100644
---- a/arch/x86/kvm/irq_comm.c
-+++ b/arch/x86/kvm/irq_comm.c
-@@ -47,7 +47,7 @@ int kvm_irq_delivery_to_apic(struct kvm *kvm, struct kvm_lapic *src,
- {
- 	int i, r = -1;
- 	struct kvm_vcpu *vcpu, *lowest = NULL;
--	unsigned long dest_vcpu_bitmap[BITS_TO_LONGS(KVM_MAX_VCPUS)];
-+	unsigned long *dest_vcpu_bitmap;
- 	unsigned int dest_vcpus = 0;
+ static void stimer_mark_pending(struct kvm_vcpu_hv_stimer *stimer,
+ 				bool vcpu_kick);
+@@ -166,7 +166,7 @@ static struct kvm_vcpu *get_vcpu_by_vpidx(struct kvm *kvm, u32 vpidx)
+ 	struct kvm_vcpu *vcpu = NULL;
+ 	int i;
  
- 	if (kvm_irq_delivery_to_apic_fast(kvm, src, irq, &r, dest_map))
-@@ -59,7 +59,10 @@ int kvm_irq_delivery_to_apic(struct kvm *kvm, struct kvm_lapic *src,
- 		irq->delivery_mode = APIC_DM_FIXED;
+-	if (vpidx >= KVM_MAX_VCPUS)
++	if (vpidx >= min(KVM_MAX_VCPUS, KVM_MAX_HYPERV_VCPUS))
+ 		return NULL;
+ 
+ 	vcpu = kvm_get_vcpu(kvm, vpidx);
+@@ -1446,7 +1446,8 @@ static int kvm_hv_set_msr(struct kvm_vcpu *vcpu, u32 msr, u64 data, bool host)
+ 		struct kvm_hv *hv = to_kvm_hv(vcpu->kvm);
+ 		u32 new_vp_index = (u32)data;
+ 
+-		if (!host || new_vp_index >= KVM_MAX_VCPUS)
++		if (!host ||
++		    new_vp_index >= min(KVM_MAX_VCPUS, KVM_MAX_HYPERV_VCPUS))
+ 			return 1;
+ 
+ 		if (new_vp_index == hv_vcpu->vp_index)
+@@ -1729,7 +1730,7 @@ static __always_inline unsigned long *sparse_set_to_vcpu_mask(
+ 		return (unsigned long *)vp_bitmap;
  	}
  
--	memset(dest_vcpu_bitmap, 0, sizeof(dest_vcpu_bitmap));
-+	local_lock(&kvm_pcpu_mask_lock);
-+	dest_vcpu_bitmap = this_cpu_ptr(kvm_pcpu_vcpu_mask);
-+
-+	memset(dest_vcpu_bitmap, 0, KVM_VCPU_MASK_SZ);
- 
+-	bitmap_zero(vcpu_bitmap, KVM_MAX_VCPUS);
++	bitmap_zero(vcpu_bitmap, min(KVM_MAX_VCPUS, KVM_MAX_HYPERV_VCPUS));
  	kvm_for_each_vcpu(i, vcpu, kvm) {
- 		if (!kvm_apic_present(vcpu))
-@@ -93,6 +96,8 @@ int kvm_irq_delivery_to_apic(struct kvm *kvm, struct kvm_lapic *src,
- 		lowest = kvm_get_vcpu(kvm, idx);
- 	}
+ 		if (test_bit(kvm_hv_get_vpindex(vcpu), (unsigned long *)vp_bitmap))
+ 			__set_bit(i, vcpu_bitmap);
+@@ -1757,7 +1758,7 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc, bool
+ 	struct hv_tlb_flush_ex flush_ex;
+ 	struct hv_tlb_flush flush;
+ 	u64 vp_bitmap[KVM_HV_MAX_SPARSE_VCPU_SET_BITS];
+-	DECLARE_BITMAP(vcpu_bitmap, KVM_MAX_VCPUS);
++	DECLARE_BITMAP(vcpu_bitmap, KVM_MAX_HYPERV_VCPUS);
+ 	unsigned long *vcpu_mask;
+ 	u64 valid_bank_mask;
+ 	u64 sparse_banks[64];
+@@ -1880,7 +1881,7 @@ static u64 kvm_hv_send_ipi(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc, bool
+ 	struct hv_send_ipi_ex send_ipi_ex;
+ 	struct hv_send_ipi send_ipi;
+ 	u64 vp_bitmap[KVM_HV_MAX_SPARSE_VCPU_SET_BITS];
+-	DECLARE_BITMAP(vcpu_bitmap, KVM_MAX_VCPUS);
++	DECLARE_BITMAP(vcpu_bitmap, KVM_MAX_HYPERV_VCPUS);
+ 	unsigned long *vcpu_mask;
+ 	unsigned long valid_bank_mask;
+ 	u64 sparse_banks[64];
+@@ -2505,7 +2506,7 @@ int kvm_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
  
-+	local_unlock(&kvm_pcpu_mask_lock);
-+
- 	if (lowest)
- 		r = kvm_apic_set_irq(lowest, irq, dest_map);
- 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 61bab2bdeefb..a388acdc5eb0 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -215,6 +215,10 @@ unsigned int kvm_max_vcpu_ids(void)
- }
- EXPORT_SYMBOL_GPL(kvm_max_vcpu_ids);
- 
-+DEFINE_PER_CPU(local_lock_t, kvm_pcpu_mask_lock) =
-+	INIT_LOCAL_LOCK(kvm_pcpu_mask_lock);
-+unsigned long __percpu *kvm_pcpu_vcpu_mask;
-+
- /*
-  * Restoring the host value for MSRs that are only consumed when running in
-  * usermode, e.g. SYSCALL MSRs and TSC_AUX, can be deferred until the CPU
-@@ -11247,9 +11251,16 @@ int kvm_arch_hardware_setup(void *opaque)
- 	if (boot_cpu_has(X86_FEATURE_XSAVES))
- 		rdmsrl(MSR_IA32_XSS, host_xss);
- 
-+	kvm_pcpu_vcpu_mask = __alloc_percpu(KVM_VCPU_MASK_SZ,
-+					    sizeof(unsigned long));
-+	if (!kvm_pcpu_vcpu_mask) {
-+		r = -ENOMEM;
-+		goto err;
-+	}
-+
- 	r = ops->hardware_setup();
- 	if (r != 0)
--		return r;
-+		goto err;
- 
- 	memcpy(&kvm_x86_ops, ops->runtime_ops, sizeof(kvm_x86_ops));
- 	kvm_ops_static_call_update();
-@@ -11277,11 +11288,16 @@ int kvm_arch_hardware_setup(void *opaque)
- 
- 	kvm_init_msr_list();
- 	return 0;
-+
-+ err:
-+	free_percpu(kvm_pcpu_vcpu_mask);
-+	return r;
- }
- 
- void kvm_arch_hardware_unsetup(void)
- {
- 	static_call(kvm_x86_hardware_unsetup)();
-+	free_percpu(kvm_pcpu_vcpu_mask);
- }
- 
- int kvm_arch_check_processor_compat(void *opaque)
+ 		case HYPERV_CPUID_IMPLEMENT_LIMITS:
+ 			/* Maximum number of virtual processors */
+-			ent->eax = KVM_MAX_VCPUS;
++			ent->eax = min(KVM_MAX_VCPUS, KVM_MAX_HYPERV_VCPUS);
+ 			/*
+ 			 * Maximum number of logical processors, matches
+ 			 * HyperV 2016.
 -- 
 2.26.2
 
