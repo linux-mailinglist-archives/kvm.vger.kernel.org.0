@@ -2,46 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A2E8B4531E7
-	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 13:12:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E929D4531DF
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 13:12:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233436AbhKPMOj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Nov 2021 07:14:39 -0500
-Received: from mail.kernel.org ([198.145.29.99]:50844 "EHLO mail.kernel.org"
+        id S235980AbhKPMOb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Nov 2021 07:14:31 -0500
+Received: from mail.kernel.org ([198.145.29.99]:50820 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235927AbhKPMOX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S233974AbhKPMOX (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 16 Nov 2021 07:14:23 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id CED3F61B3F;
+Received: by mail.kernel.org (Postfix) with ESMTPSA id BF40261B39;
         Tue, 16 Nov 2021 12:11:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1637064686;
-        bh=vq95HKLfHO9piwN5lsf/MCq9657Jh2pFENCGhyxmjLo=;
-        h=From:To:Cc:Subject:Date:From;
-        b=SGZM9xNJKSSd9zG64wbGKiexBM6w+eZXR08apIpufSrM9cni6UGZ7lPrrHiB75CeL
-         rHJb+z39/th7FCQuXO5pPiitXv0fw12QpxOsxiKREduVjglCmDJgitnVlnmSBRLw/x
-         us3Sy7Hnu2QaYoNqizRvyAP22VcHW1DCdSQxQ/jdqnRn859aNByM6HQAl5TXZbZKcl
-         8WoeJoRFFXs6EbSE/a1jePnDacyUUKxLnbXmh5WMn1vtB5AJCH9cBk4duqW6cRERv7
-         J5C5zQM47FcF0zSNe/lN8hjKpBpmtjpQSDKeLh3GtuB+CXQ492809BlXN9w9JOnBS6
-         BEURxXLKLvNnA==
+        bh=n19PeZU2LLuo2IYYfWPaoxt6iBWjGOzxM2A7Hzh8IFY=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=ug6fs3RRoPZhimt0+m9Po/TJeUUSn/FpTkvaEMogRWZ7DB6UE0v3nl3Xsf6+iesp9
+         2uG7+JtqFBv9x69AQL1MrMTd2NhopHcS/uySnwaT5v2ZaizPqb6y8drYKfkjssTSPV
+         5sBFhf38UBtvkX/eMRVKWvhDL9DS/KN2PI6qcEOXOHTAqtEP9TRmtKtt1al5TenRyG
+         6Y82rUwwo4fVZ4EXlEBoF+2cTmASqALH2KUQ6cCkQ0gl7Wg3+n1IEDT2selgFgZ0Io
+         helbnK4wO1IXd0IZeAO9rQCHwDxnADhWyZ+PtO3DhErPDsfVYkFu7Sk1b71UMrhz6D
+         vjtDm8BEW25wg==
 Received: by mail.kernel.org with local (Exim 4.94.2)
         (envelope-from <mchehab@kernel.org>)
-        id 1mmxJ6-00A9LO-AD; Tue, 16 Nov 2021 12:11:24 +0000
+        id 1mmxJ6-00A9LX-CG; Tue, 16 Nov 2021 12:11:24 +0000
 From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 To:     Linux Doc Mailing List <linux-doc@vger.kernel.org>,
         Jonathan Corbet <corbet@lwn.net>
 Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-        linux-kernel@vger.kernel.org, Anup Patel <anup.patel@wdc.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Anup Patel <anup.patel@wdc.com>,
         Atish Patra <atish.patra@wdc.com>,
-        John Fastabend <john.fastabend@gmail.com>,
-        KP Singh <kpsingh@kernel.org>, Martin KaFai Lau <kafai@fb.com>,
-        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
-        bpf@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        kvm@vger.kernel.org, linux-riscv@lists.infradead.org,
-        netdev@vger.kernel.org
-Subject: [PATCH 0/4] Address some bad references to Kernel docs
-Date:   Tue, 16 Nov 2021 12:11:19 +0000
-Message-Id: <cover.1637064577.git.mchehab+huawei@kernel.org>
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org
+Subject: [PATCH 3/4] Documentation: update vcpu-requests.rst reference
+Date:   Tue, 16 Nov 2021 12:11:22 +0000
+Message-Id: <32b3693314f3914f10a42dea97ad6e06292fcd4a.1637064577.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.33.1
+In-Reply-To: <cover.1637064577.git.mchehab+huawei@kernel.org>
+References: <cover.1637064577.git.mchehab+huawei@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: Mauro Carvalho Chehab <mchehab@kernel.org>
@@ -49,28 +51,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Jon,
+Changeset 2f5947dfcaec ("Documentation: move Documentation/virtual to Documentation/virt")
+renamed: Documentation/virtual/kvm/vcpu-requests.rst
+to: Documentation/virt/kvm/vcpu-requests.rst.
 
-It follows 4 patches addressing some issues during the 5.16 Kernel development
-cycle that were sent to the MLs but weren't merged yet. 
+Update its cross-reference accordingly.
 
-They apply cleanly on the top of 5.16-rc1.
+Fixes: 2f5947dfcaec ("Documentation: move Documentation/virtual to Documentation/virt")
+Reviewed-by: Anup Patel <anup.patel@wdc.com>
+Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+---
 
-Regards,
+To mailbombing on a large number of people, only mailing lists were C/C on the cover.
+See [PATCH 0/4] at: https://lore.kernel.org/all/cover.1637064577.git.mchehab+huawei@kernel.org/
 
-Mauro Carvalho Chehab (4):
-  libbpf: update index.rst reference
-  docs: accounting: update delay-accounting.rst reference
-  Documentation: update vcpu-requests.rst reference
-  Documentation/process: fix a cross reference
+ arch/riscv/kvm/vcpu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- Documentation/admin-guide/sysctl/kernel.rst  | 2 +-
- Documentation/bpf/index.rst                  | 2 +-
- Documentation/process/submitting-patches.rst | 4 ++--
- arch/riscv/kvm/vcpu.c                        | 2 +-
- 4 files changed, 5 insertions(+), 5 deletions(-)
-
+diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+index e3d3aed46184..fb84619df012 100644
+--- a/arch/riscv/kvm/vcpu.c
++++ b/arch/riscv/kvm/vcpu.c
+@@ -740,7 +740,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 		 * Ensure we set mode to IN_GUEST_MODE after we disable
+ 		 * interrupts and before the final VCPU requests check.
+ 		 * See the comment in kvm_vcpu_exiting_guest_mode() and
+-		 * Documentation/virtual/kvm/vcpu-requests.rst
++		 * Documentation/virt/kvm/vcpu-requests.rst
+ 		 */
+ 		vcpu->mode = IN_GUEST_MODE;
+ 
 -- 
 2.33.1
-
 
