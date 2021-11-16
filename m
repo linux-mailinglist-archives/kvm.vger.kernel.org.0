@@ -2,93 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 18DB3452BAF
-	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 08:39:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 450FD452C8A
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 09:16:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230447AbhKPHlv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Nov 2021 02:41:51 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:41158 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230425AbhKPHlq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 16 Nov 2021 02:41:46 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637048328;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=++lDESyr6yuN4aQ/v0rHUKTc0CEKFV+XvirR0Pe552k=;
-        b=HaUnPAaEpMmnnDYOVg9/j1H4WH7ZVNIJzfkjdCejq1ZsH5e/w2DPOthPAupHh179WR2Yhp
-        gMHtgV79E9mZijq9hwlLCyJfgOm+K63ULHPAP7fQLNPR0x8O1+rr1LFo+cZ1LvZI4KU6m/
-        ZgDB4O1chu16BgB7fHnyJFW//jqD5RU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-14-EfwjcWvDM8iCt7JQf7QlDQ-1; Tue, 16 Nov 2021 02:38:43 -0500
-X-MC-Unique: EfwjcWvDM8iCt7JQf7QlDQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 353F21851731;
-        Tue, 16 Nov 2021 07:38:41 +0000 (UTC)
-Received: from [10.39.192.245] (unknown [10.39.192.245])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C9EA41B42C;
-        Tue, 16 Nov 2021 07:38:35 +0000 (UTC)
-Message-ID: <ce66f713-3d5f-cf3f-8813-d25ee1d2cec7@redhat.com>
-Date:   Tue, 16 Nov 2021 08:38:34 +0100
+        id S231774AbhKPITM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Nov 2021 03:19:12 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47244 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231405AbhKPITM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 16 Nov 2021 03:19:12 -0500
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1AG7KZHF024383;
+        Tue, 16 Nov 2021 08:15:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=CfrWYVK/WWUx2FkE6O2ernHb54WT2Dsdlt0HTCGPt+w=;
+ b=f0TBohjdWu+iuJrqMrr3R+j6zBNzfqH8j7EEQO7V49x7A5Pll0a6HHEijwy/4eZuLrFF
+ BRG1zq9QewkxR7PY0vPizivDqBVB5z/vmi7CeXawPgV8W/+NyMraum4+4EL5L9CB/0Cn
+ vqSJl8S6UVr9bF790zrEpVgBMEM2e7zZM3e0OPBsW378Js0iJBKmQCex5bVPzHItEyzl
+ 0kUGt8FgsE5FX2e+9nZPgGPCqPsiguv8V8dBj9k60QN3JLBf678bdC1CaDVgGIeBPugb
+ BwJzbTdm1liutRvChFPAxtost/N44Cs2Qh5ozJqgYILooTJ5aWLsY2Y/HWWqGHPh8Ki1 ZA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cc4j2mu6r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 16 Nov 2021 08:15:51 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1AG7c4OW006712;
+        Tue, 16 Nov 2021 08:15:51 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cc4j2mu5p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 16 Nov 2021 08:15:51 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1AG8C17h001896;
+        Tue, 16 Nov 2021 08:15:48 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma04ams.nl.ibm.com with ESMTP id 3ca50avrcx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 16 Nov 2021 08:15:48 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1AG8FirP4522606
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 16 Nov 2021 08:15:44 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id AC33E52054;
+        Tue, 16 Nov 2021 08:15:44 +0000 (GMT)
+Received: from [9.171.18.51] (unknown [9.171.18.51])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 588DA52051;
+        Tue, 16 Nov 2021 08:15:43 +0000 (GMT)
+Message-ID: <d7547cab-88d6-18a9-8307-bf2cc5d61163@de.ibm.com>
+Date:   Tue, 16 Nov 2021 09:15:43 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.2.0
-Subject: Re: [PATCH] KVM: x86: fix cocci warnings
+Subject: Re: [PATCH 0/5] KVM: Cap KVM_CAP_NR_VCPUS by KVM_CAP_MAX_VCPUS and
+ re-purpose it on x86
 Content-Language: en-US
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Vihas Mak <makvihas@gmail.com>, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20211114164312.GA28736@makvihas>
- <YZJH0Hd/ETYWJGTX@hirez.programming.kicks-ass.net>
- <ab419d8b-3e5d-2879-274c-ee609254890c@redhat.com>
- <20211115204905.GQ174703@worktop.programming.kicks-ass.net>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211115204905.GQ174703@worktop.programming.kicks-ass.net>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Eduardo Habkost <ehabkost@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup.patel@wdc.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Michael Ellerman <mpe@ellerman.id.au>, kvm-ppc@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+References: <20211111162746.100598-1-vkuznets@redhat.com>
+ <4a3c7be7-12fa-6e47-64eb-02e6c5be5dbc@redhat.com>
+ <ecd55383-7089-b3cd-30cc-3f9feb7eadb4@de.ibm.com> <877dd9pfri.fsf@redhat.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+In-Reply-To: <877dd9pfri.fsf@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: LcLtdeI1wcxvnUw1x1mtWpHDxGmneBxm
+X-Proofpoint-ORIG-GUID: q5QSO4swu95OL1X3UIEGk2E0NE9OQf1Y
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
+ definitions=2021-11-15_16,2021-11-15_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 impostorscore=0
+ adultscore=0 clxscore=1015 priorityscore=1501 phishscore=0 malwarescore=0
+ mlxscore=0 mlxlogscore=999 suspectscore=0 lowpriorityscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
+ definitions=main-2111160041
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/15/21 21:49, Peter Zijlstra wrote:
-> On Mon, Nov 15, 2021 at 06:06:08PM +0100, Paolo Bonzini wrote:
->> On 11/15/21 12:43, Peter Zijlstra wrote:
->>> On Sun, Nov 14, 2021 at 10:13:12PM +0530, Vihas Mak wrote:
->>>> change 0 to false and 1 to true to fix following cocci warnings:
->>>>
->>>>           arch/x86/kvm/mmu/mmu.c:1485:9-10: WARNING: return of 0/1 in function 'kvm_set_pte_rmapp' with return type bool
->>>>           arch/x86/kvm/mmu/mmu.c:1636:10-11: WARNING: return of 0/1 in function 'kvm_test_age_rmapp' with return type bool
->>>
->>> That script should be deleted, it's absolute garbage.
->>
->> Only a Sith deals in absolutes.
+
+
+Am 15.11.21 um 17:04 schrieb Vitaly Kuznetsov:
+[...]
+> or cap KVM_CAP_MAX_VCPUS value with num_online_cpus(), e.g.
 > 
-> Is that a star-wars thingy?
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 6a6dd5e1daf6..1cfe36f6432e 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -585,6 +585,8 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>                          r = KVM_MAX_VCPUS;
+>                  else if (sclp.has_esca && sclp.has_64bscao)
+>                          r = KVM_S390_ESCA_CPU_SLOTS;
+> +               if (ext == KVM_CAP_NR_VCPUS)
+> +                       r = min_t(unsigned int, num_online_cpus(), r);
+>                  break;
+>          case KVM_CAP_S390_COW:
+>                  r = MACHINE_HAS_ESOP;
 
-Yes, it is.  "If you're not with me, then you're my enemy!" "Only a Sith 
-deals in absolutes". :)
+Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
 
-> In C 0 is a valid way to spell false, equally, any non-0 value is a
-> valid way to spell true. Why would this rate a warn?
 
-Because often 0 means success (if -errno means failure).  So if you 
-write false/true consistently for bool and 0 only for int, it's one less 
-thing that one can get wrong.  At least that's the rationale.
-
-Paolo
-
-> In fact, when casting _Bool to integer, you get 0 and 1. When looking at
-> the memory content of the _Bool variable, you'll get 0 and 1. But we're
-> not allowed to write 0 and 1?
-> 
-
+I think this is the better variant. Thanks.
