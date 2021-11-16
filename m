@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BE3C845298C
-	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 06:23:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 057A945298E
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 06:23:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233957AbhKPFZn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Nov 2021 00:25:43 -0500
-Received: from esa2.hgst.iphmx.com ([68.232.143.124]:41796 "EHLO
+        id S234004AbhKPF0G (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Nov 2021 00:26:06 -0500
+Received: from esa2.hgst.iphmx.com ([68.232.143.124]:41812 "EHLO
         esa2.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233769AbhKPFY7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Nov 2021 00:24:59 -0500
+        with ESMTP id S233859AbhKPFZH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Nov 2021 00:25:07 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1637040123; x=1668576123;
-  h=from:to:cc:subject:date:message-id:
-   content-transfer-encoding:mime-version;
-  bh=rIKvnIeIzUXYTl12+uy0gb+NFCL9CaDxsw6HIRzb1lg=;
-  b=XzYkCE783EsZVmvnekMqpeV9a+2TjhZIlrGtcwLAJYwxyaBMLHbsIJOr
-   xrTSAvshWpPq+YTEj9hEe+g2AjGZzXXrMQkz8YIAVyBHnWFKYOKvdQFZb
-   7kmI0PERbJYzxkPmphByr4//bOXO4ekATVZHfTyM+t0n2gfJHYxhESYAv
-   XP96CKc11P4vokv87lKokkutBlrhyxVmTMkCegoHU7jfE8naGwLk77q7m
-   CP/p5ddUj//gR/XgCJ1Xguupryfw25KvebuRFt8SzwhkhBcgA/gM42aOh
-   I14quGK06qVCm+oWS0RhxaZbRF3B7DR12uv4DPiRSTwi/65/4XugO6cmO
-   g==;
+  t=1637040131; x=1668576131;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=LQ5vtTe+J3NzdyRuMmNH8ttjld6+cEZfNiKUZUBkh6w=;
+  b=N6r64DyVfBcQfB6/UpE2Ia/LA8ZEnXte0gPwJjd4hByxTiMBy+NydW2l
+   Z8M2C2X3V6yauG0aZAIrYDhUhrVNmgiIJ+9tWaDBXjg7s5sPj5yXvPLQg
+   lGHK6BeGX/pAtUr32JrXaK6P3EcugdS+dHumee/HmQjLEfWhyHjz+OFJm
+   ej270YtuxmLBshoYOKliyGf2JlHMkDZCHj6R9h5L3leVAWIHrkI30N+2/
+   oaRQnnyHSM4UW/1lLeEhuLB5HBZe7MtV5v16oHRso1AD6hX77QySpZnRX
+   hQo2U4srlmMBA26cKMMpOuFuBQiVxVN/PMI1bwPki79WE7FsMdfdWP712
+   A==;
 X-IronPort-AV: E=Sophos;i="5.87,237,1631548800"; 
-   d="scan'208";a="289638103"
-Received: from mail-bn8nam08lp2049.outbound.protection.outlook.com (HELO NAM04-BN8-obe.outbound.protection.outlook.com) ([104.47.74.49])
-  by ob1.hgst.iphmx.com with ESMTP; 16 Nov 2021 13:22:01 +0800
+   d="scan'208";a="289638113"
+Received: from mail-bn8nam08lp2041.outbound.protection.outlook.com (HELO NAM04-BN8-obe.outbound.protection.outlook.com) ([104.47.74.41])
+  by ob1.hgst.iphmx.com with ESMTP; 16 Nov 2021 13:22:05 +0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Pum7MkVmjhHr07HHHK04q9aEuJL7fe/yglQEYcEA0OG4r+1VbaySJqP08WmAhaEZ1cqfFEHpQ2vKqnC4FCDK/M3ygr3jIrVmjBctng77WswSuFxszjV8ekakkY/otLHDBQX9B9iS6Mc+6N/sQrzcEQ1nmQmmLH1cQgc4s0qGgHpRbM20X6s2ChkPs2Gdv1F1/oQfnfkpidfpSNWfQbH7NnQvu5XiM9L/LAFEevgbde2x4kpfPUlCJd5u8M/HG0RkqLg7Ak1Gr8BmWmZWd5Phc1M6nBC66tB0jxYo+cPBRtfPlQLNN+FEr4X2JSdDQ2wX2P6Fo4a9820r34pF4utbhw==
+ b=D3WxP5dRP9rPJUMOrW5IXWs1JrWONkcd9Ds98wECRC915uwxvzsoTB2Y9DYkuGa7Zflo31X7cK1amivFa+qeTcug8hZ28uV/NbiuQiOzBXTLPCxg8l1nY2PTTJc95QQWvFgyYVV/JAXga+s1SVex4GLt1Ei1WuEpd3/JG2o5ieIe2eSPY6637hTOvfusET/79Xl2o9o8MC4AFvZAMEYpTvybZbx6YXPbzeKf6s1gb1iv4U9rnMKepJwO/ujD8PUXCa/PrRy9edqozKtNaTImrPs57RfHYCuBmxbWn5YtkzP6rHBAou2MWaHfFHAR4MEjBTKFOg55d5KF5HJ6OP4/Cg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Ummkn/3l8KzoQKDLo7A63orQtEvs7y2kxPxbSZ6mKz8=;
- b=A9NTaOFsGi3+6laSovp1h60ZmMqH78ZEYsmsP1kw0QYG/h750x7fsM62cwEnTXADkuHkRqGPYfoLXqx6DYiXyN2fwqcQHumH8eP0yKxRbvQNOwk5Ua8DtuhVXuKqojyaD6mr4NMr5QvDTs1+0DKHu/lHqMSIy6QvVSoR8AjKdV2iqviMzFQJ6j1OfR8Ss/SWWH/GxT91D/ePDemsbsCmWWqy4ug7NmZ0vR1qRCWVizLR1ep9/zKCYOrsoo01K8wUkcfs4snWdqV2wtpsuOOPO+t2vOGZP2ivkK2mWyGEdqox7idM5r1gJaf0+aR9uTBDwhFEKNKHNNXJBrrTLJH3nw==
+ bh=NFOsJSod51Ofx71FMMF9pIltdNrgBntk9DkKghmN4MU=;
+ b=iA24nOdFs7mNvPvD1muSUgD3sPTPBPVuLkKFTVQNSa6gXsmPweU9AV/RDl+cFFJG2yVttnPjpn4yTR2+PbvfvbZjJu69FWHJKRMRfQBTEiNmvpUGeu1TD2KRJriQhWL30WaCpOQjO5b9U6j7mkqKx3a7Nr+QhQHz8Zk5f794/EMIytqhXTjgnbL6FnaVnWXoDyJyUJXvZWn9mweu8r11N2GE2RLPbGtizb114NK3TfYlifd9/uhdf6qxyd+6LyWJJXt+5HMoOebKQNcSodmfWWhYBXF39RmjyvGqwKhwNlaDSyOhG2yrVGGSvYRznXENKzuwKbjQdwW8UKaZOl6mbg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
  header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ummkn/3l8KzoQKDLo7A63orQtEvs7y2kxPxbSZ6mKz8=;
- b=AyUpUF+v1QvlDo6B/ce7QQLPYSJrBIKLyeAgvFBZZgUI9bd5sR2iHT2Eh9JpB2uJVy5DjUJTsCcnHcojGOcLxdUVcn8KdH47JSxKIil7LWMp9Tv0Ob9hbWI7xBAvoPEOzCTu7Hm1d1A1kfDIMhkINaakf7barVFhHXVOiewgnxY=
+ bh=NFOsJSod51Ofx71FMMF9pIltdNrgBntk9DkKghmN4MU=;
+ b=Rf/To/5R7jZ+H81BGisjNLDh9T+eLmVuiwkjXNj3rPemF+kwlElfqOccYv1BZwb0q0Fgps+zcDfCIc9H3u8ncdWrNX2oBtOVHs2FFm0mB3eRMV8RO8aiKlBkAK8ZI70nbNthATI+MkaDZM10PRL5RWh82luWr3aHTvllm/vFjr0=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=wdc.com;
 Received: from CO6PR04MB7812.namprd04.prod.outlook.com (2603:10b6:303:138::6)
  by CO6PR04MB8347.namprd04.prod.outlook.com (2603:10b6:303:136::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4690.15; Tue, 16 Nov
- 2021 05:22:00 +0000
+ 2021 05:22:03 +0000
 Received: from CO6PR04MB7812.namprd04.prod.outlook.com
  ([fe80::8100:4308:5b21:8d97]) by CO6PR04MB7812.namprd04.prod.outlook.com
  ([fe80::8100:4308:5b21:8d97%9]) with mapi id 15.20.4690.027; Tue, 16 Nov 2021
- 05:22:00 +0000
+ 05:22:03 +0000
 From:   Anup Patel <anup.patel@wdc.com>
 To:     Will Deacon <will@kernel.org>, julien.thierry.kdev@gmail.com,
         maz@kernel.org
@@ -62,171 +62,997 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Alistair Francis <Alistair.Francis@wdc.com>,
         Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
         kvm-riscv@lists.infradead.org, Anup Patel <anup.patel@wdc.com>
-Subject: [PATCH v10 kvmtool 0/8] KVMTOOL RISC-V Support
-Date:   Tue, 16 Nov 2021 10:51:22 +0530
-Message-Id: <20211116052130.173679-1-anup.patel@wdc.com>
+Subject: [PATCH v10 kvmtool 1/8] update_headers: Sync-up ABI headers with Linux-5.16-rc1
+Date:   Tue, 16 Nov 2021 10:51:23 +0530
+Message-Id: <20211116052130.173679-2-anup.patel@wdc.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20211116052130.173679-1-anup.patel@wdc.com>
+References: <20211116052130.173679-1-anup.patel@wdc.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-ClientProxiedBy: MA1PR01CA0166.INDPRD01.PROD.OUTLOOK.COM
  (2603:1096:a00:71::36) To CO6PR04MB7812.namprd04.prod.outlook.com
  (2603:10b6:303:138::6)
 MIME-Version: 1.0
-Received: from wdc.com (223.182.253.112) by MA1PR01CA0166.INDPRD01.PROD.OUTLOOK.COM (2603:1096:a00:71::36) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4690.25 via Frontend Transport; Tue, 16 Nov 2021 05:21:57 +0000
+Received: from wdc.com (223.182.253.112) by MA1PR01CA0166.INDPRD01.PROD.OUTLOOK.COM (2603:1096:a00:71::36) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4690.25 via Frontend Transport; Tue, 16 Nov 2021 05:22:00 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a6c1da14-5018-4a38-1902-08d9a8c1043a
+X-MS-Office365-Filtering-Correlation-Id: 3a9ee238-7d52-43e1-fc72-08d9a8c1060f
 X-MS-TrafficTypeDiagnostic: CO6PR04MB8347:
-X-Microsoft-Antispam-PRVS: <CO6PR04MB83478F4FF28D73EE6CD4A7DC8D999@CO6PR04MB8347.namprd04.prod.outlook.com>
+X-Microsoft-Antispam-PRVS: <CO6PR04MB8347E4F474E8B9669EDD6E5D8D999@CO6PR04MB8347.namprd04.prod.outlook.com>
 WDCIPOUTBOUND: EOP-TRUE
-X-MS-Oob-TLC-OOBClassifiers: OLM:2201;
+X-MS-Oob-TLC-OOBClassifiers: OLM:2803;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: AEysQdOuHHKYLDw4KRXNYlWNBdaRDQqWYuq/PGx5Q26gyNbTEBUouj6Q4rmQeHxsGq2g0n00fnQW6B2f0ojhMx+4xZI9eBtwlE3G8jW4dgVr1RzB3326HBGHManEEz6Bm+igu/1Sy86tqMcBsucLPdcM3xHuTjLCwswq4bf0vKz+NHhak+EINaO46IhPjLHH+ygi2mmTy0lNVkmPvVaKa3Qdo+h9XdobQpeLvEovGR9YKTj1y27pVYAMWMZ8sCHwevIZjWiAwteUbb3BIs1jJSdwR2iq86UhxrFK5IbIHzog6VyengtR+vjtP8hPkQGHwPX6051abaI2SRjTJzH7FrEMsHa+UZYiu7LUtI39AqcnH8QmpnjXzPpIztS60LOrqz7IIaxGCFh+2l5nRdnSJzKlIhRAiaBRJTL2jC56nMQKoren2vW5BpOdMtIdJ0oAPPxK81xclUetChbgXGojREZEMCGRt72eNkYn3pdOExX8i9zJFEhkuHFmpT91HfCKoS/7l2cS6VAHXPFR6btz9ithX0AKDzwAhCru6d/e0Eswb+mMxh1LRzxEKaLXK6laF0VukkU1PfQIJn/9lfMapVt2aLcx41D5BWC2Zmf2IMN+vH4sZMSsOcLaRg3lp1435E4CypegjoEiT7ZTV0W70qt5mHKpGgFAaOMbBJz1KSgpeDtL8TiU41OJOhL3oSDlQqsKJYj+Vi6wxMJ+HlSVKV8zlLLY6O2NaJX/W46RkaP2q45DlpIIN2Mm6zqC+tFSfsAymukmknAEsgIIWjKQ3oKwWcSFlw55it1qzPfnb+7+cRSbo74k+EHYAwprqAFNZrM73+ZovhAO45g95k5PNQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO6PR04MB7812.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(55016002)(186003)(4326008)(54906003)(956004)(6666004)(1076003)(2616005)(26005)(38350700002)(508600001)(86362001)(38100700002)(82960400001)(36756003)(52116002)(7696005)(8676002)(66556008)(2906002)(8936002)(83380400001)(5660300002)(316002)(66476007)(66946007)(8886007)(44832011)(42580500001);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: mVM0j0/QSt5dATL0cse5GmXcsr5Z3KLiWlwDg0rlP1TCxfm1brMH8noui4osiSGduKW/3Fm8f4vm3HgNg2xIJAt1ewpFxOWSXLIrqthxI/NgsAyWrbc8qrgAfPa5U4e4jodriokmBUqXaHGqXNM3PUHBPo5bzIrRLdAUpsZ57oxJSdUq1y0qEnvnafXJAUlF4wsDFfFmYcaWcaHUxykLcAi+hhE7UWzsyG/+yjSaGeRhpS0EpCe4r2wB3A321slRcyxlSNbWx1Nk90ZOzcSNSU0rbVYeN9Te7qTNZ38o+AGWqz+sK/+LoeigqbIaeUoV8i+DtJUp8Sy8d8Aam8lcJtuEmco8MXEppdaIuzEeDCxnElO7suFDLzSlaP2Q9McTRNh0r+DpJ7iczr/e+pdKzVskcRcqPiElbsdQ4uymxxpib7a/nq8SKVe3ATVgetKkxe3vtzO3SgGX7V6zCbn8K9nkKwFSkXnFV8JPNBdhW7phcXSX3ucVTFHLBMPtEqB0G1a2TNc3DiwPsLBZO/n4xB7BEXpUscsfmDqHJ/dPAyVoB4QcxqdHcUyVdkJV0IS6GAtl2k2e4smQcxG5G5oNVaN8JgREANlYWmolsLx9X4mTDBsz9PdvdyoIv8e/n25jgH0ZfRlbX0H6uFjMW38XEo0W05NRovVnrm/1s2yzykLqcDuyIKwLGSs+KW9kzfX7ZHN0Qm+tP2WUDSVgJM4fSA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO6PR04MB7812.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(15650500001)(55016002)(186003)(4326008)(54906003)(956004)(6666004)(1076003)(2616005)(26005)(38350700002)(508600001)(86362001)(38100700002)(82960400001)(36756003)(52116002)(7696005)(8676002)(66556008)(2906002)(8936002)(83380400001)(5660300002)(316002)(66476007)(66946007)(8886007)(30864003)(44832011);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?DP0Cc+/ioCeUEsundg9r81EUwygJ2w4gS2e13z4PEpl+zWOVs1Hl2MLT+muH?=
- =?us-ascii?Q?eyS1CAn4zVwyR+F0NmD8EW0hE0YEHTg5Bv5s4EY0VmygWqw/1WnaJNqNQ/sg?=
- =?us-ascii?Q?74sqeXmkTwizBxhVzhkpdnPNmUMWcRiXVSJlS9NFunNkm6MYVAmX4UKR+W+E?=
- =?us-ascii?Q?WuJmXQtJ8DZPX9HdWsPs+K+FS2nZ8dYy1eAuSRTtW6RKHt2Ks1ATrQoRgQnS?=
- =?us-ascii?Q?gEbcGzJqO+dig/HRsGW7ZnbdmQUIm1Wpw0R5XId3dqLnhUm/7o+RzGFwt1TE?=
- =?us-ascii?Q?qnbxXqaFat6uXVlT/NBWllKOk1JfaaMsFaOBe9f0mgEpQ4D9hAuh7acB22T0?=
- =?us-ascii?Q?NtGuvL0dzBZBiaFT/OS1VW9mXqgmsFTB5R9i9dwbwNBpFR2mgQoYerTDiGfj?=
- =?us-ascii?Q?SIrWvXtw1bdtGng5pIewpcrku1KMTAcB1Fr9/Ik0KVvIoWdkSmmkI2XwR3KR?=
- =?us-ascii?Q?YqiogTVSPDUV9V3FQwG668aSfSxHIT73KObVL5PXR9YaSKCiUOF3/Nwykxu4?=
- =?us-ascii?Q?TGVsPHwJ281ZQRhjkZIv3qtGJNI4ZeD5LpihF8Z6PBFln70m8JZbVNY2bGz6?=
- =?us-ascii?Q?4v6iP1+JqhRqnlD478Ph7heQnbHOD0UlyrQc3wMpZLQJsJh71euAYcGS4f7x?=
- =?us-ascii?Q?ZZu3w0XD6Q7GUEIf8Fyv19HmaFpQOZKG/moO8uKg00vuh/wftKf1PSZoj8nz?=
- =?us-ascii?Q?gwpBhPpReXMgC5MB6cg92VnZBjWYTVYadElnEhGYfReeF320W8wpieEA/xS8?=
- =?us-ascii?Q?LUn/EYS5VJbi/4x3VKd9qDoY+k9f8H5RRG8p9pqHFNEPasPXiPNRhjPGi2kF?=
- =?us-ascii?Q?EiS4WaLDUGTpbn8BSvngWdg7jk1m9be8u0nWeASopBGFl8+TgJeM6NSXSvrq?=
- =?us-ascii?Q?g5CVDgITkPxmEl90Sx7+wpkGoTEFnv3f/2QPZ5DetEG89Lz1I2W/Nd7GKS8Z?=
- =?us-ascii?Q?8J52I+jhQvJFXZb+zp/sEUhLpfgM1WtC16bHZ2rXJN5y8xLeMt8a/0iliycM?=
- =?us-ascii?Q?uxKOeLQ/knt0PkcJgIfErph95WLsRYSxnEg5uHNnltD/IXN9O+NAlYgaImrF?=
- =?us-ascii?Q?EzHPWSpFvo+YQvjTsVIBdMndj1/bRo51onRrzCPiAxpsR3M0jvh9KGY76qmD?=
- =?us-ascii?Q?VZBgRHfqaSIoTZUZJopEJNBy2PQErCDl8WzlbijL9TnOHKMECi61rqyQFDBn?=
- =?us-ascii?Q?Lju+DpXbeVWuGJ0VZCQOYjst2RJ2aaWRblEdayqYMFIilXk/v6gryr1m8bwf?=
- =?us-ascii?Q?Zxf93MeukMKVopy4bYhbiAF6eCZp1as7YLvve9LgHrQ00qY6IUhnVn9SH6qu?=
- =?us-ascii?Q?qoIqwKuWEpIg7e3ydrSQKQOoRnLjdGfxIbarGJRuCYoAxenGaci4rfYCibVS?=
- =?us-ascii?Q?3RkIr6YS8oPjwIMHH7SRcXm4fFgO+XLmj9qsiNcLIy5VmksgiPuDHjlEuieI?=
- =?us-ascii?Q?abSOWAV60gVte/pWoM7oiqy0t76FWit+SomN7rt/W+86TtrDLu+J3Zvq5HCr?=
- =?us-ascii?Q?auJAskQUOPpOj57SCmn8VyCfvxHKAuhHUXp/u5wDxAoBYc6P3y6/4KVkEaNJ?=
- =?us-ascii?Q?TTVOY1CmmjxEMyoSPkawXmyHKJ3tZLb4eTOWwiSmpK59c0GNf7x/A6H9Clf9?=
- =?us-ascii?Q?vzTJGv7AiyiphtjzOzz6Fq8=3D?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?uwKhQTZ3PW4q6bIinH5IR7QCL4TCZobSHOkVYiDJ9hKa6xV+G9vS85r7jpx/?=
+ =?us-ascii?Q?lf31eU+Afc6JlXImX2jieQiauG1blp1okuvNXrg1c4LfSid2tFSNPRY4Kmq+?=
+ =?us-ascii?Q?RF8WVH9pbFZy3u0trDL1PnM6Bu25aAXU+amQPCihPDGcWLBiAG4PNx7C1Sjw?=
+ =?us-ascii?Q?kRAOG9OkgNh7FrUweZEsKpUAjokqg71Etr/3BF/oEG4ptOAZmh04AesE+2Dg?=
+ =?us-ascii?Q?eG2XX7T9lZYnD4m4f0tNMxa8aqZ5O0eCn4KTU2a0qTM0+4Vxx035SrCDHJ+m?=
+ =?us-ascii?Q?w9Ql7XBIfriC79hFa1MjAeVHFgzcQp0TqvOktWLD0F5eZzevuhwtOQKALV9z?=
+ =?us-ascii?Q?eZ7ineDV+vbvqRUJ78XYBanmnhXNIDiyK/Yvp+N0B1NjoRTtp80JVVGMAvia?=
+ =?us-ascii?Q?YvuFbT1PZBJ3cZXI2ZchcDokk2pOJUu9vcOVmGreIX5rFw6PMGSCHKfszfld?=
+ =?us-ascii?Q?foRKkYQhyqdNPLOju8HuvL9Qgl3gE1N/eyvMKrMODEetz0lSRQNGT00mcwht?=
+ =?us-ascii?Q?8+u62328mRwHMFpDJa415W9ELM4rHMod3gbLuqRQ7Y73elfaM71MaEnGYqQJ?=
+ =?us-ascii?Q?wsgj3an4gL4mEM/9C+A1Lfh+u3dal0eM5TbfB0wSn3Z1XbldKOKjGwV/jKv/?=
+ =?us-ascii?Q?c/VqgqS59Ggl8B3U9W1QkYS0DGs5OVx2YI7zafA4ycYuKHNvFDPmhW41R482?=
+ =?us-ascii?Q?tOr9vHh2TtrkFS7runFOHu71Xa79+Y4In32Wo+iYSV1TPuBtm5zEouj62l1H?=
+ =?us-ascii?Q?Sfeh3xrh/2rgH5xRo9lhPAkICjkidSii2ICO5P8bbKAOSRaLlvktXtsHISSP?=
+ =?us-ascii?Q?uPw8O9bAvXlf5dcVZZ72p7p9CQYTDAAKu3zZA4nG+UQHMU1PkxuVa5w2crL2?=
+ =?us-ascii?Q?WAYJQRwKMJerOj8j0Zc0e16Aj0iVWplmYGkneIDNfRPcXL7DpknYCk7DDwqN?=
+ =?us-ascii?Q?bHd3zlvttxOx+uD7NeRkPJnnU8+xPd8PRzLKVVyyNJfDzyR9BoCPebVztXRG?=
+ =?us-ascii?Q?RSnnfdSy5BRtp5vthEa75B3Grk17Ez1vu4YYqcl4PdK8paShedVpmOzKxTEx?=
+ =?us-ascii?Q?9s8FY6uGGuGbE8A7hKyoGzbwV9XYbUBEMwef79wRypAcJ98ctrljNcV3quAR?=
+ =?us-ascii?Q?w5i1awrIEJLwsgp5wCPaMs6LWR62iffZDsTNfJpPQmYq9WtzeMWd6G+5xQ07?=
+ =?us-ascii?Q?Ip0FV8EOrljgwzmUtdvAIHNHexdQEFpOH3sD0X1cR1UfM0VLctR4EnJ52DB3?=
+ =?us-ascii?Q?LkTdUHhCeoytGo9E9fw213suIFFr9jph/v2lIyfoTffANw7p2wyVsHMyD5V6?=
+ =?us-ascii?Q?QS7QxGoGWZcz5aHKPXvsMA0Vwtwap1TO0otmjg8Jr3YsbHC7GB8buYDZkJ4b?=
+ =?us-ascii?Q?Z14qh6qpF553viuH0qkZoFe4c1LaUV0NrE44fDfPzpXFuLYKuv87P3lCEA8h?=
+ =?us-ascii?Q?9QrFObvMtzYJ97y/jJAbi1+PnJ0Sf6sGTXtZeBUQBr0dGxdaVzURQiL5WpSb?=
+ =?us-ascii?Q?XeXrVPIWqjOLguyobrlo72QgxH2n1GyIm6rA1OsxOt23e2gY9QlxacvcDElf?=
+ =?us-ascii?Q?hghXYE9uyUo7GvO/wgXMfLHGLRNEwWltUybgbrNJ8EKMHnskFpqrA2MctHem?=
+ =?us-ascii?Q?eF3SOJ3pF9gG7/NHQBAWa2A=3D?=
 X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a6c1da14-5018-4a38-1902-08d9a8c1043a
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3a9ee238-7d52-43e1-fc72-08d9a8c1060f
 X-MS-Exchange-CrossTenant-AuthSource: CO6PR04MB7812.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Nov 2021 05:22:00.4926
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Nov 2021 05:22:03.6667
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: m0GDClaFRADHb50rQDGiJTXu7wPjdIDXjR2+8BJVNnbQJXQDvnUdJLM/7GGYtICs8hrQihyFlkmoHYUMxE68EQ==
+X-MS-Exchange-CrossTenant-UserPrincipalName: XUIkCGW8lpc28+vYXxqUUcJu3p0WurP+lGINd682KRQikwA6AelKFdgBKYghJ8o8ee+tnQrLPIjOYsZPCSHdgQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR04MB8347
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This series adds RISC-V support for KVMTOOL and it is based on the
-Linux-5.16-rc1. The KVM RISC-V patches have been merged in the Linux
-kernel since 5.16-rc1.
+We sync-up all ABI headers with Linux-5.16-rc1 so that RISC-V
+specfic changes in include/linux/kvm.h are available.
 
-The KVMTOOL RISC-V patches can be found in riscv_master branch at:
-https//github.com/kvm-riscv/kvmtool.git
+Signed-off-by: Anup Patel <anup.patel@wdc.com>
+---
+ arm/aarch64/include/asm/kvm.h |  56 ++++-
+ include/linux/kvm.h           | 441 +++++++++++++++++++++++++++++++++-
+ powerpc/include/asm/kvm.h     |  10 +
+ x86/include/asm/kvm.h         |  64 ++++-
+ 4 files changed, 557 insertions(+), 14 deletions(-)
 
-Changes since v9:
- - Rebased on recent commit 39181fc6429f4e9e71473284940e35857b42772a
- - Sync-up headers with Linux-5.16-rc1
-
-Changes since v8:
- - Rebased on recent commit 2e7380db438defbc5aa24652fe10b7bf99822355
- - Sync-up headers with latest KVM RISC-V v20 series which is based
-   on Linux-5.15-rc3
- - Fixed PLIC context CLAIM register emulation in PATCH5
-
-Changes since v7:
- - Rebased on recent commit 25c1dc6c4942ff0949c08780fcad6b324fec6bf7
- - Sync-up headers with latest KVM RISC-V v19 series which is based
-   on Linux-5.14-rc3
-
-Changes since v6:
- - Rebased on recent commit 117d64953228afa90b52f6e1b4873770643ffdc9
- - Sync-up headers with latest KVM RISC-V v17 series which is based
-   on Linux-5.12-rc5
-
-Changes since v5:
- - Sync-up headers with latest KVM RISC-V v16 series which is based
-   on Linux-5.11-rc3
-
-Changes since v4:
- - Rebased on recent commit 90b2d3adadf218dfc6bdfdfcefe269843360223c
- - Sync-up headers with latest KVM RISC-V v15 series which is based
-   on Linux-5.10-rc3
-
-Changes since v3:
- - Rebased on recent commit 351d931f496aeb2e97b8daa44c943d8b59351d07
- - Improved kvm_cpu__show_registers() implementation
-
-Changes since v2:
- - Support compiling KVMTOOL for both RV32 and RV64 systems using
-   a multilib toolchain
- - Fix kvm_cpu__arch_init() for RV32 system
-
-Changes since v1:
- - Use linux/sizes.h in kvm/kvm-arch.h
- - Added comment in kvm/kvm-arch.h about why PCI config space is 256M
- - Remove forward declaration of "struct kvm" from kvm/kvm-cpu-arch.h
- - Fixed placement of DTB and INITRD in guest RAM
- - Use __riscv_xlen instead of sizeof(unsigned long) in __kvm_reg_id()
-
-Anup Patel (8):
-  update_headers: Sync-up ABI headers with Linux-5.16-rc1
-  riscv: Initial skeletal support
-  riscv: Implement Guest/VM arch functions
-  riscv: Implement Guest/VM VCPU arch functions
-  riscv: Add PLIC device emulation
-  riscv: Generate FDT at runtime for Guest/VM
-  riscv: Handle SBI calls forwarded to user space
-  riscv: Generate PCI host DT node
-
- INSTALL                             |   7 +-
- Makefile                            |  24 +-
- arm/aarch64/include/asm/kvm.h       |  56 ++-
- include/linux/kvm.h                 | 441 ++++++++++++++++++++-
- powerpc/include/asm/kvm.h           |  10 +
- riscv/fdt.c                         | 195 ++++++++++
- riscv/include/asm/kvm.h             | 128 +++++++
- riscv/include/kvm/barrier.h         |  14 +
- riscv/include/kvm/fdt-arch.h        |   8 +
- riscv/include/kvm/kvm-arch.h        |  89 +++++
- riscv/include/kvm/kvm-config-arch.h |  15 +
- riscv/include/kvm/kvm-cpu-arch.h    |  51 +++
- riscv/include/kvm/sbi.h             |  48 +++
- riscv/ioport.c                      |   7 +
- riscv/irq.c                         |  13 +
- riscv/kvm-cpu.c                     | 490 ++++++++++++++++++++++++
- riscv/kvm.c                         | 174 +++++++++
- riscv/pci.c                         | 109 ++++++
- riscv/plic.c                        | 568 ++++++++++++++++++++++++++++
- util/update_headers.sh              |   2 +-
- x86/include/asm/kvm.h               |  64 +++-
- 21 files changed, 2494 insertions(+), 19 deletions(-)
- create mode 100644 riscv/fdt.c
- create mode 100644 riscv/include/asm/kvm.h
- create mode 100644 riscv/include/kvm/barrier.h
- create mode 100644 riscv/include/kvm/fdt-arch.h
- create mode 100644 riscv/include/kvm/kvm-arch.h
- create mode 100644 riscv/include/kvm/kvm-config-arch.h
- create mode 100644 riscv/include/kvm/kvm-cpu-arch.h
- create mode 100644 riscv/include/kvm/sbi.h
- create mode 100644 riscv/ioport.c
- create mode 100644 riscv/irq.c
- create mode 100644 riscv/kvm-cpu.c
- create mode 100644 riscv/kvm.c
- create mode 100644 riscv/pci.c
- create mode 100644 riscv/plic.c
-
+diff --git a/arm/aarch64/include/asm/kvm.h b/arm/aarch64/include/asm/kvm.h
+index 9a50771..b3edde6 100644
+--- a/arm/aarch64/include/asm/kvm.h
++++ b/arm/aarch64/include/asm/kvm.h
+@@ -156,7 +156,19 @@ struct kvm_sync_regs {
+ 	__u64 device_irq_level;
+ };
+ 
+-struct kvm_arch_memory_slot {
++/*
++ * PMU filter structure. Describe a range of events with a particular
++ * action. To be used with KVM_ARM_VCPU_PMU_V3_FILTER.
++ */
++struct kvm_pmu_event_filter {
++	__u16	base_event;
++	__u16	nevents;
++
++#define KVM_PMU_EVENT_ALLOW	0
++#define KVM_PMU_EVENT_DENY	1
++
++	__u8	action;
++	__u8	pad[3];
+ };
+ 
+ /* for KVM_GET/SET_VCPU_EVENTS */
+@@ -164,13 +176,25 @@ struct kvm_vcpu_events {
+ 	struct {
+ 		__u8 serror_pending;
+ 		__u8 serror_has_esr;
++		__u8 ext_dabt_pending;
+ 		/* Align it to 8 bytes */
+-		__u8 pad[6];
++		__u8 pad[5];
+ 		__u64 serror_esr;
+ 	} exception;
+ 	__u32 reserved[12];
+ };
+ 
++struct kvm_arm_copy_mte_tags {
++	__u64 guest_ipa;
++	__u64 length;
++	void __user *addr;
++	__u64 flags;
++	__u64 reserved[2];
++};
++
++#define KVM_ARM_TAGS_TO_GUEST		0
++#define KVM_ARM_TAGS_FROM_GUEST		1
++
+ /* If you need to interpret the index values, here is the key: */
+ #define KVM_REG_ARM_COPROC_MASK		0x000000000FFF0000
+ #define KVM_REG_ARM_COPROC_SHIFT	16
+@@ -219,10 +243,18 @@ struct kvm_vcpu_events {
+ #define KVM_REG_ARM_PTIMER_CVAL		ARM64_SYS_REG(3, 3, 14, 2, 2)
+ #define KVM_REG_ARM_PTIMER_CNT		ARM64_SYS_REG(3, 3, 14, 0, 1)
+ 
+-/* EL0 Virtual Timer Registers */
++/*
++ * EL0 Virtual Timer Registers
++ *
++ * WARNING:
++ *      KVM_REG_ARM_TIMER_CVAL and KVM_REG_ARM_TIMER_CNT are not defined
++ *      with the appropriate register encodings.  Their values have been
++ *      accidentally swapped.  As this is set API, the definitions here
++ *      must be used, rather than ones derived from the encodings.
++ */
+ #define KVM_REG_ARM_TIMER_CTL		ARM64_SYS_REG(3, 3, 14, 3, 1)
+-#define KVM_REG_ARM_TIMER_CNT		ARM64_SYS_REG(3, 3, 14, 3, 2)
+ #define KVM_REG_ARM_TIMER_CVAL		ARM64_SYS_REG(3, 3, 14, 0, 2)
++#define KVM_REG_ARM_TIMER_CNT		ARM64_SYS_REG(3, 3, 14, 3, 2)
+ 
+ /* KVM-as-firmware specific pseudo-registers */
+ #define KVM_REG_ARM_FW			(0x0014 << KVM_REG_ARM_COPROC_SHIFT)
+@@ -233,6 +265,15 @@ struct kvm_vcpu_events {
+ #define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_AVAIL		0
+ #define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_AVAIL		1
+ #define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_REQUIRED	2
++
++/*
++ * Only two states can be presented by the host kernel:
++ * - NOT_REQUIRED: the guest doesn't need to do anything
++ * - NOT_AVAIL: the guest isn't mitigated (it can still use SSBS if available)
++ *
++ * All the other values are deprecated. The host still accepts all
++ * values (they are ABI), but will narrow them to the above two.
++ */
+ #define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2	KVM_REG_ARM_FW_REG(2)
+ #define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL		0
+ #define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_UNKNOWN		1
+@@ -320,13 +361,18 @@ struct kvm_vcpu_events {
+ #define KVM_ARM_VCPU_PMU_V3_CTRL	0
+ #define   KVM_ARM_VCPU_PMU_V3_IRQ	0
+ #define   KVM_ARM_VCPU_PMU_V3_INIT	1
++#define   KVM_ARM_VCPU_PMU_V3_FILTER	2
+ #define KVM_ARM_VCPU_TIMER_CTRL		1
+ #define   KVM_ARM_VCPU_TIMER_IRQ_VTIMER		0
+ #define   KVM_ARM_VCPU_TIMER_IRQ_PTIMER		1
++#define KVM_ARM_VCPU_PVTIME_CTRL	2
++#define   KVM_ARM_VCPU_PVTIME_IPA	0
+ 
+ /* KVM_IRQ_LINE irq field index values */
++#define KVM_ARM_IRQ_VCPU2_SHIFT		28
++#define KVM_ARM_IRQ_VCPU2_MASK		0xf
+ #define KVM_ARM_IRQ_TYPE_SHIFT		24
+-#define KVM_ARM_IRQ_TYPE_MASK		0xff
++#define KVM_ARM_IRQ_TYPE_MASK		0xf
+ #define KVM_ARM_IRQ_VCPU_SHIFT		16
+ #define KVM_ARM_IRQ_VCPU_MASK		0xff
+ #define KVM_ARM_IRQ_NUM_SHIFT		0
+diff --git a/include/linux/kvm.h b/include/linux/kvm.h
+index 5e3f12d..1daa452 100644
+--- a/include/linux/kvm.h
++++ b/include/linux/kvm.h
+@@ -8,6 +8,7 @@
+  * Note: you must update KVM_API_VERSION if you change this interface.
+  */
+ 
++#include <linux/const.h>
+ #include <linux/types.h>
+ #include <linux/compiler.h>
+ #include <linux/ioctl.h>
+@@ -116,7 +117,7 @@ struct kvm_irq_level {
+ 	 * ACPI gsi notion of irq.
+ 	 * For IA-64 (APIC model) IOAPIC0: irq 0-23; IOAPIC1: irq 24-47..
+ 	 * For X86 (standard AT mode) PIC0/1: irq 0-15. IOAPIC0: 0-23..
+-	 * For ARM: See Documentation/virt/kvm/api.txt
++	 * For ARM: See Documentation/virt/kvm/api.rst
+ 	 */
+ 	union {
+ 		__u32 irq;
+@@ -188,10 +189,13 @@ struct kvm_s390_cmma_log {
+ struct kvm_hyperv_exit {
+ #define KVM_EXIT_HYPERV_SYNIC          1
+ #define KVM_EXIT_HYPERV_HCALL          2
++#define KVM_EXIT_HYPERV_SYNDBG         3
+ 	__u32 type;
++	__u32 pad1;
+ 	union {
+ 		struct {
+ 			__u32 msr;
++			__u32 pad2;
+ 			__u64 control;
+ 			__u64 evt_page;
+ 			__u64 msg_page;
+@@ -201,6 +205,29 @@ struct kvm_hyperv_exit {
+ 			__u64 result;
+ 			__u64 params[2];
+ 		} hcall;
++		struct {
++			__u32 msr;
++			__u32 pad2;
++			__u64 control;
++			__u64 status;
++			__u64 send_page;
++			__u64 recv_page;
++			__u64 pending_page;
++		} syndbg;
++	} u;
++};
++
++struct kvm_xen_exit {
++#define KVM_EXIT_XEN_HCALL          1
++	__u32 type;
++	union {
++		struct {
++			__u32 longmode;
++			__u32 cpl;
++			__u64 input;
++			__u64 result;
++			__u64 params[6];
++		} hcall;
+ 	} u;
+ };
+ 
+@@ -235,6 +262,14 @@ struct kvm_hyperv_exit {
+ #define KVM_EXIT_S390_STSI        25
+ #define KVM_EXIT_IOAPIC_EOI       26
+ #define KVM_EXIT_HYPERV           27
++#define KVM_EXIT_ARM_NISV         28
++#define KVM_EXIT_X86_RDMSR        29
++#define KVM_EXIT_X86_WRMSR        30
++#define KVM_EXIT_DIRTY_RING_FULL  31
++#define KVM_EXIT_AP_RESET_HOLD    32
++#define KVM_EXIT_X86_BUS_LOCK     33
++#define KVM_EXIT_XEN              34
++#define KVM_EXIT_RISCV_SBI        35
+ 
+ /* For KVM_EXIT_INTERNAL_ERROR */
+ /* Emulate instruction failed. */
+@@ -243,6 +278,11 @@ struct kvm_hyperv_exit {
+ #define KVM_INTERNAL_ERROR_SIMUL_EX	2
+ /* Encounter unexpected vm-exit due to delivery event. */
+ #define KVM_INTERNAL_ERROR_DELIVERY_EV	3
++/* Encounter unexpected vm-exit reason */
++#define KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON	4
++
++/* Flags that describe what fields in emulation_failure hold valid data. */
++#define KVM_INTERNAL_ERROR_EMULATION_FLAG_INSTRUCTION_BYTES (1ULL << 0)
+ 
+ /* for KVM_RUN, returned by mmap(vcpu_fd, offset=0) */
+ struct kvm_run {
+@@ -274,6 +314,7 @@ struct kvm_run {
+ 		/* KVM_EXIT_FAIL_ENTRY */
+ 		struct {
+ 			__u64 hardware_entry_failure_reason;
++			__u32 cpu;
+ 		} fail_entry;
+ 		/* KVM_EXIT_EXCEPTION */
+ 		struct {
+@@ -346,6 +387,35 @@ struct kvm_run {
+ 			__u32 ndata;
+ 			__u64 data[16];
+ 		} internal;
++		/*
++		 * KVM_INTERNAL_ERROR_EMULATION
++		 *
++		 * "struct emulation_failure" is an overlay of "struct internal"
++		 * that is used for the KVM_INTERNAL_ERROR_EMULATION sub-type of
++		 * KVM_EXIT_INTERNAL_ERROR.  Note, unlike other internal error
++		 * sub-types, this struct is ABI!  It also needs to be backwards
++		 * compatible with "struct internal".  Take special care that
++		 * "ndata" is correct, that new fields are enumerated in "flags",
++		 * and that each flag enumerates fields that are 64-bit aligned
++		 * and sized (so that ndata+internal.data[] is valid/accurate).
++		 *
++		 * Space beyond the defined fields may be used to store arbitrary
++		 * debug information relating to the emulation failure. It is
++		 * accounted for in "ndata" but the format is unspecified and is
++		 * not represented in "flags". Any such information is *not* ABI!
++		 */
++		struct {
++			__u32 suberror;
++			__u32 ndata;
++			__u64 flags;
++			union {
++				struct {
++					__u8  insn_size;
++					__u8  insn_bytes[15];
++				};
++			};
++			/* Arbitrary debug data may follow. */
++		} emulation_failure;
+ 		/* KVM_EXIT_OSI */
+ 		struct {
+ 			__u64 gprs[32];
+@@ -392,6 +462,31 @@ struct kvm_run {
+ 		} eoi;
+ 		/* KVM_EXIT_HYPERV */
+ 		struct kvm_hyperv_exit hyperv;
++		/* KVM_EXIT_ARM_NISV */
++		struct {
++			__u64 esr_iss;
++			__u64 fault_ipa;
++		} arm_nisv;
++		/* KVM_EXIT_X86_RDMSR / KVM_EXIT_X86_WRMSR */
++		struct {
++			__u8 error; /* user -> kernel */
++			__u8 pad[7];
++#define KVM_MSR_EXIT_REASON_INVAL	(1 << 0)
++#define KVM_MSR_EXIT_REASON_UNKNOWN	(1 << 1)
++#define KVM_MSR_EXIT_REASON_FILTER	(1 << 2)
++			__u32 reason; /* kernel -> user */
++			__u32 index; /* kernel -> user */
++			__u64 data; /* kernel <-> user */
++		} msr;
++		/* KVM_EXIT_XEN */
++		struct kvm_xen_exit xen;
++		/* KVM_EXIT_RISCV_SBI */
++		struct {
++			unsigned long extension_id;
++			unsigned long function_id;
++			unsigned long args[6];
++			unsigned long ret[2];
++		} riscv_sbi;
+ 		/* Fix the size of the union. */
+ 		char padding[256];
+ 	};
+@@ -466,12 +561,17 @@ struct kvm_s390_mem_op {
+ 	__u32 size;		/* amount of bytes */
+ 	__u32 op;		/* type of operation */
+ 	__u64 buf;		/* buffer in userspace */
+-	__u8 ar;		/* the access register number */
+-	__u8 reserved[31];	/* should be set to 0 */
++	union {
++		__u8 ar;	/* the access register number */
++		__u32 sida_offset; /* offset into the sida */
++		__u8 reserved[32]; /* should be set to 0 */
++	};
+ };
+ /* types for kvm_s390_mem_op->op */
+ #define KVM_S390_MEMOP_LOGICAL_READ	0
+ #define KVM_S390_MEMOP_LOGICAL_WRITE	1
++#define KVM_S390_MEMOP_SIDA_READ	2
++#define KVM_S390_MEMOP_SIDA_WRITE	3
+ /* flags for kvm_s390_mem_op->flags */
+ #define KVM_S390_MEMOP_F_CHECK_ONLY		(1ULL << 0)
+ #define KVM_S390_MEMOP_F_INJECT_EXCEPTION	(1ULL << 1)
+@@ -533,6 +633,7 @@ struct kvm_vapic_addr {
+ #define KVM_MP_STATE_CHECK_STOP        6
+ #define KVM_MP_STATE_OPERATING         7
+ #define KVM_MP_STATE_LOAD              8
++#define KVM_MP_STATE_AP_RESET_HOLD     9
+ 
+ struct kvm_mp_state {
+ 	__u32 mp_state;
+@@ -764,9 +865,10 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_VM_PPC_HV 1
+ #define KVM_VM_PPC_PR 2
+ 
+-/* on MIPS, 0 forces trap & emulate, 1 forces VZ ASE */
+-#define KVM_VM_MIPS_TE		0
++/* on MIPS, 0 indicates auto, 1 forces VZ ASE, 2 forces trap & emulate */
++#define KVM_VM_MIPS_AUTO	0
+ #define KVM_VM_MIPS_VZ		1
++#define KVM_VM_MIPS_TE		2
+ 
+ #define KVM_S390_SIE_PAGE_OFFSET 1
+ 
+@@ -996,6 +1098,39 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_ARM_PTRAUTH_ADDRESS 171
+ #define KVM_CAP_ARM_PTRAUTH_GENERIC 172
+ #define KVM_CAP_PMU_EVENT_FILTER 173
++#define KVM_CAP_ARM_IRQ_LINE_LAYOUT_2 174
++#define KVM_CAP_HYPERV_DIRECT_TLBFLUSH 175
++#define KVM_CAP_PPC_GUEST_DEBUG_SSTEP 176
++#define KVM_CAP_ARM_NISV_TO_USER 177
++#define KVM_CAP_ARM_INJECT_EXT_DABT 178
++#define KVM_CAP_S390_VCPU_RESETS 179
++#define KVM_CAP_S390_PROTECTED 180
++#define KVM_CAP_PPC_SECURE_GUEST 181
++#define KVM_CAP_HALT_POLL 182
++#define KVM_CAP_ASYNC_PF_INT 183
++#define KVM_CAP_LAST_CPU 184
++#define KVM_CAP_SMALLER_MAXPHYADDR 185
++#define KVM_CAP_S390_DIAG318 186
++#define KVM_CAP_STEAL_TIME 187
++#define KVM_CAP_X86_USER_SPACE_MSR 188
++#define KVM_CAP_X86_MSR_FILTER 189
++#define KVM_CAP_ENFORCE_PV_FEATURE_CPUID 190
++#define KVM_CAP_SYS_HYPERV_CPUID 191
++#define KVM_CAP_DIRTY_LOG_RING 192
++#define KVM_CAP_X86_BUS_LOCK_EXIT 193
++#define KVM_CAP_PPC_DAWR1 194
++#define KVM_CAP_SET_GUEST_DEBUG2 195
++#define KVM_CAP_SGX_ATTRIBUTE 196
++#define KVM_CAP_VM_COPY_ENC_CONTEXT_FROM 197
++#define KVM_CAP_PTP_KVM 198
++#define KVM_CAP_HYPERV_ENFORCE_CPUID 199
++#define KVM_CAP_SREGS2 200
++#define KVM_CAP_EXIT_HYPERCALL 201
++#define KVM_CAP_PPC_RPT_INVALIDATE 202
++#define KVM_CAP_BINARY_STATS_FD 203
++#define KVM_CAP_EXIT_ON_EMULATION_FAILURE 204
++#define KVM_CAP_ARM_MTE 205
++#define KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM 206
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+@@ -1069,6 +1204,11 @@ struct kvm_x86_mce {
+ #endif
+ 
+ #ifdef KVM_CAP_XEN_HVM
++#define KVM_XEN_HVM_CONFIG_HYPERCALL_MSR	(1 << 0)
++#define KVM_XEN_HVM_CONFIG_INTERCEPT_HCALL	(1 << 1)
++#define KVM_XEN_HVM_CONFIG_SHARED_INFO		(1 << 2)
++#define KVM_XEN_HVM_CONFIG_RUNSTATE		(1 << 3)
++
+ struct kvm_xen_hvm_config {
+ 	__u32 flags;
+ 	__u32 msr;
+@@ -1086,7 +1226,7 @@ struct kvm_xen_hvm_config {
+  *
+  * KVM_IRQFD_FLAG_RESAMPLE indicates resamplefd is valid and specifies
+  * the irqfd to operate in resampling mode for level triggered interrupt
+- * emulation.  See Documentation/virt/kvm/api.txt.
++ * emulation.  See Documentation/virt/kvm/api.rst.
+  */
+ #define KVM_IRQFD_FLAG_RESAMPLE (1 << 1)
+ 
+@@ -1102,11 +1242,16 @@ struct kvm_irqfd {
+ 
+ /* Do not use 1, KVM_CHECK_EXTENSION returned it before we had flags.  */
+ #define KVM_CLOCK_TSC_STABLE		2
++#define KVM_CLOCK_REALTIME		(1 << 2)
++#define KVM_CLOCK_HOST_TSC		(1 << 3)
+ 
+ struct kvm_clock_data {
+ 	__u64 clock;
+ 	__u32 flags;
+-	__u32 pad[9];
++	__u32 pad0;
++	__u64 realtime;
++	__u64 host_tsc;
++	__u32 pad[4];
+ };
+ 
+ /* For KVM_CAP_SW_TLB */
+@@ -1142,6 +1287,7 @@ struct kvm_dirty_tlb {
+ #define KVM_REG_S390		0x5000000000000000ULL
+ #define KVM_REG_ARM64		0x6000000000000000ULL
+ #define KVM_REG_MIPS		0x7000000000000000ULL
++#define KVM_REG_RISCV		0x8000000000000000ULL
+ 
+ #define KVM_REG_SIZE_SHIFT	52
+ #define KVM_REG_SIZE_MASK	0x00f0000000000000ULL
+@@ -1222,6 +1368,8 @@ enum kvm_device_type {
+ #define KVM_DEV_TYPE_ARM_VGIC_ITS	KVM_DEV_TYPE_ARM_VGIC_ITS
+ 	KVM_DEV_TYPE_XIVE,
+ #define KVM_DEV_TYPE_XIVE		KVM_DEV_TYPE_XIVE
++	KVM_DEV_TYPE_ARM_PV_TIME,
++#define KVM_DEV_TYPE_ARM_PV_TIME	KVM_DEV_TYPE_ARM_PV_TIME
+ 	KVM_DEV_TYPE_MAX,
+ };
+ 
+@@ -1332,6 +1480,8 @@ struct kvm_s390_ucas_mapping {
+ #define KVM_PPC_GET_CPU_CHAR	  _IOR(KVMIO,  0xb1, struct kvm_ppc_cpu_char)
+ /* Available with KVM_CAP_PMU_EVENT_FILTER */
+ #define KVM_SET_PMU_EVENT_FILTER  _IOW(KVMIO,  0xb2, struct kvm_pmu_event_filter)
++#define KVM_PPC_SVM_OFF		  _IO(KVMIO,  0xb3)
++#define KVM_ARM_MTE_COPY_TAGS	  _IOR(KVMIO,  0xb4, struct kvm_arm_copy_mte_tags)
+ 
+ /* ioctl for vm fd */
+ #define KVM_CREATE_DEVICE	  _IOWR(KVMIO,  0xe0, struct kvm_create_device)
+@@ -1450,12 +1600,109 @@ struct kvm_enc_region {
+ /* Available with KVM_CAP_MANUAL_DIRTY_LOG_PROTECT_2 */
+ #define KVM_CLEAR_DIRTY_LOG          _IOWR(KVMIO, 0xc0, struct kvm_clear_dirty_log)
+ 
+-/* Available with KVM_CAP_HYPERV_CPUID */
++/* Available with KVM_CAP_HYPERV_CPUID (vcpu) / KVM_CAP_SYS_HYPERV_CPUID (system) */
+ #define KVM_GET_SUPPORTED_HV_CPUID _IOWR(KVMIO, 0xc1, struct kvm_cpuid2)
+ 
+ /* Available with KVM_CAP_ARM_SVE */
+ #define KVM_ARM_VCPU_FINALIZE	  _IOW(KVMIO,  0xc2, int)
+ 
++/* Available with  KVM_CAP_S390_VCPU_RESETS */
++#define KVM_S390_NORMAL_RESET	_IO(KVMIO,   0xc3)
++#define KVM_S390_CLEAR_RESET	_IO(KVMIO,   0xc4)
++
++struct kvm_s390_pv_sec_parm {
++	__u64 origin;
++	__u64 length;
++};
++
++struct kvm_s390_pv_unp {
++	__u64 addr;
++	__u64 size;
++	__u64 tweak;
++};
++
++enum pv_cmd_id {
++	KVM_PV_ENABLE,
++	KVM_PV_DISABLE,
++	KVM_PV_SET_SEC_PARMS,
++	KVM_PV_UNPACK,
++	KVM_PV_VERIFY,
++	KVM_PV_PREP_RESET,
++	KVM_PV_UNSHARE_ALL,
++};
++
++struct kvm_pv_cmd {
++	__u32 cmd;	/* Command to be executed */
++	__u16 rc;	/* Ultravisor return code */
++	__u16 rrc;	/* Ultravisor return reason code */
++	__u64 data;	/* Data or address */
++	__u32 flags;    /* flags for future extensions. Must be 0 for now */
++	__u32 reserved[3];
++};
++
++/* Available with KVM_CAP_S390_PROTECTED */
++#define KVM_S390_PV_COMMAND		_IOWR(KVMIO, 0xc5, struct kvm_pv_cmd)
++
++/* Available with KVM_CAP_X86_MSR_FILTER */
++#define KVM_X86_SET_MSR_FILTER	_IOW(KVMIO,  0xc6, struct kvm_msr_filter)
++
++/* Available with KVM_CAP_DIRTY_LOG_RING */
++#define KVM_RESET_DIRTY_RINGS		_IO(KVMIO, 0xc7)
++
++/* Per-VM Xen attributes */
++#define KVM_XEN_HVM_GET_ATTR	_IOWR(KVMIO, 0xc8, struct kvm_xen_hvm_attr)
++#define KVM_XEN_HVM_SET_ATTR	_IOW(KVMIO,  0xc9, struct kvm_xen_hvm_attr)
++
++struct kvm_xen_hvm_attr {
++	__u16 type;
++	__u16 pad[3];
++	union {
++		__u8 long_mode;
++		__u8 vector;
++		struct {
++			__u64 gfn;
++		} shared_info;
++		__u64 pad[8];
++	} u;
++};
++
++/* Available with KVM_CAP_XEN_HVM / KVM_XEN_HVM_CONFIG_SHARED_INFO */
++#define KVM_XEN_ATTR_TYPE_LONG_MODE		0x0
++#define KVM_XEN_ATTR_TYPE_SHARED_INFO		0x1
++#define KVM_XEN_ATTR_TYPE_UPCALL_VECTOR		0x2
++
++/* Per-vCPU Xen attributes */
++#define KVM_XEN_VCPU_GET_ATTR	_IOWR(KVMIO, 0xca, struct kvm_xen_vcpu_attr)
++#define KVM_XEN_VCPU_SET_ATTR	_IOW(KVMIO,  0xcb, struct kvm_xen_vcpu_attr)
++
++#define KVM_GET_SREGS2             _IOR(KVMIO,  0xcc, struct kvm_sregs2)
++#define KVM_SET_SREGS2             _IOW(KVMIO,  0xcd, struct kvm_sregs2)
++
++struct kvm_xen_vcpu_attr {
++	__u16 type;
++	__u16 pad[3];
++	union {
++		__u64 gpa;
++		__u64 pad[8];
++		struct {
++			__u64 state;
++			__u64 state_entry_time;
++			__u64 time_running;
++			__u64 time_runnable;
++			__u64 time_blocked;
++			__u64 time_offline;
++		} runstate;
++	} u;
++};
++
++/* Available with KVM_CAP_XEN_HVM / KVM_XEN_HVM_CONFIG_SHARED_INFO */
++#define KVM_XEN_VCPU_ATTR_TYPE_VCPU_INFO	0x0
++#define KVM_XEN_VCPU_ATTR_TYPE_VCPU_TIME_INFO	0x1
++#define KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_ADDR	0x2
++#define KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_CURRENT	0x3
++#define KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_DATA	0x4
++#define KVM_XEN_VCPU_ATTR_TYPE_RUNSTATE_ADJUST	0x5
++
+ /* Secure Encrypted Virtualization command */
+ enum sev_cmd_id {
+ 	/* Guest initialization commands */
+@@ -1484,6 +1731,10 @@ enum sev_cmd_id {
+ 	KVM_SEV_DBG_ENCRYPT,
+ 	/* Guest certificates commands */
+ 	KVM_SEV_CERT_EXPORT,
++	/* Attestation report */
++	KVM_SEV_GET_ATTESTATION_REPORT,
++	/* Guest Migration Extension */
++	KVM_SEV_SEND_CANCEL,
+ 
+ 	KVM_SEV_NR_MAX,
+ };
+@@ -1536,6 +1787,51 @@ struct kvm_sev_dbg {
+ 	__u32 len;
+ };
+ 
++struct kvm_sev_attestation_report {
++	__u8 mnonce[16];
++	__u64 uaddr;
++	__u32 len;
++};
++
++struct kvm_sev_send_start {
++	__u32 policy;
++	__u64 pdh_cert_uaddr;
++	__u32 pdh_cert_len;
++	__u64 plat_certs_uaddr;
++	__u32 plat_certs_len;
++	__u64 amd_certs_uaddr;
++	__u32 amd_certs_len;
++	__u64 session_uaddr;
++	__u32 session_len;
++};
++
++struct kvm_sev_send_update_data {
++	__u64 hdr_uaddr;
++	__u32 hdr_len;
++	__u64 guest_uaddr;
++	__u32 guest_len;
++	__u64 trans_uaddr;
++	__u32 trans_len;
++};
++
++struct kvm_sev_receive_start {
++	__u32 handle;
++	__u32 policy;
++	__u64 pdh_uaddr;
++	__u32 pdh_len;
++	__u64 session_uaddr;
++	__u32 session_len;
++};
++
++struct kvm_sev_receive_update_data {
++	__u64 hdr_uaddr;
++	__u32 hdr_len;
++	__u64 guest_uaddr;
++	__u32 guest_len;
++	__u64 trans_uaddr;
++	__u32 trans_len;
++};
++
+ #define KVM_DEV_ASSIGN_ENABLE_IOMMU	(1 << 0)
+ #define KVM_DEV_ASSIGN_PCI_2_3		(1 << 1)
+ #define KVM_DEV_ASSIGN_MASK_INTX	(1 << 2)
+@@ -1606,4 +1902,133 @@ struct kvm_hyperv_eventfd {
+ #define KVM_HYPERV_CONN_ID_MASK		0x00ffffff
+ #define KVM_HYPERV_EVENTFD_DEASSIGN	(1 << 0)
+ 
++#define KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE    (1 << 0)
++#define KVM_DIRTY_LOG_INITIALLY_SET            (1 << 1)
++
++/*
++ * Arch needs to define the macro after implementing the dirty ring
++ * feature.  KVM_DIRTY_LOG_PAGE_OFFSET should be defined as the
++ * starting page offset of the dirty ring structures.
++ */
++#ifndef KVM_DIRTY_LOG_PAGE_OFFSET
++#define KVM_DIRTY_LOG_PAGE_OFFSET 0
++#endif
++
++/*
++ * KVM dirty GFN flags, defined as:
++ *
++ * |---------------+---------------+--------------|
++ * | bit 1 (reset) | bit 0 (dirty) | Status       |
++ * |---------------+---------------+--------------|
++ * |             0 |             0 | Invalid GFN  |
++ * |             0 |             1 | Dirty GFN    |
++ * |             1 |             X | GFN to reset |
++ * |---------------+---------------+--------------|
++ *
++ * Lifecycle of a dirty GFN goes like:
++ *
++ *      dirtied         harvested        reset
++ * 00 -----------> 01 -------------> 1X -------+
++ *  ^                                          |
++ *  |                                          |
++ *  +------------------------------------------+
++ *
++ * The userspace program is only responsible for the 01->1X state
++ * conversion after harvesting an entry.  Also, it must not skip any
++ * dirty bits, so that dirty bits are always harvested in sequence.
++ */
++#define KVM_DIRTY_GFN_F_DIRTY           _BITUL(0)
++#define KVM_DIRTY_GFN_F_RESET           _BITUL(1)
++#define KVM_DIRTY_GFN_F_MASK            0x3
++
++/*
++ * KVM dirty rings should be mapped at KVM_DIRTY_LOG_PAGE_OFFSET of
++ * per-vcpu mmaped regions as an array of struct kvm_dirty_gfn.  The
++ * size of the gfn buffer is decided by the first argument when
++ * enabling KVM_CAP_DIRTY_LOG_RING.
++ */
++struct kvm_dirty_gfn {
++	__u32 flags;
++	__u32 slot;
++	__u64 offset;
++};
++
++#define KVM_BUS_LOCK_DETECTION_OFF             (1 << 0)
++#define KVM_BUS_LOCK_DETECTION_EXIT            (1 << 1)
++
++/**
++ * struct kvm_stats_header - Header of per vm/vcpu binary statistics data.
++ * @flags: Some extra information for header, always 0 for now.
++ * @name_size: The size in bytes of the memory which contains statistics
++ *             name string including trailing '\0'. The memory is allocated
++ *             at the send of statistics descriptor.
++ * @num_desc: The number of statistics the vm or vcpu has.
++ * @id_offset: The offset of the vm/vcpu stats' id string in the file pointed
++ *             by vm/vcpu stats fd.
++ * @desc_offset: The offset of the vm/vcpu stats' descriptor block in the file
++ *               pointd by vm/vcpu stats fd.
++ * @data_offset: The offset of the vm/vcpu stats' data block in the file
++ *               pointed by vm/vcpu stats fd.
++ *
++ * This is the header userspace needs to read from stats fd before any other
++ * readings. It is used by userspace to discover all the information about the
++ * vm/vcpu's binary statistics.
++ * Userspace reads this header from the start of the vm/vcpu's stats fd.
++ */
++struct kvm_stats_header {
++	__u32 flags;
++	__u32 name_size;
++	__u32 num_desc;
++	__u32 id_offset;
++	__u32 desc_offset;
++	__u32 data_offset;
++};
++
++#define KVM_STATS_TYPE_SHIFT		0
++#define KVM_STATS_TYPE_MASK		(0xF << KVM_STATS_TYPE_SHIFT)
++#define KVM_STATS_TYPE_CUMULATIVE	(0x0 << KVM_STATS_TYPE_SHIFT)
++#define KVM_STATS_TYPE_INSTANT		(0x1 << KVM_STATS_TYPE_SHIFT)
++#define KVM_STATS_TYPE_PEAK		(0x2 << KVM_STATS_TYPE_SHIFT)
++#define KVM_STATS_TYPE_LINEAR_HIST	(0x3 << KVM_STATS_TYPE_SHIFT)
++#define KVM_STATS_TYPE_LOG_HIST		(0x4 << KVM_STATS_TYPE_SHIFT)
++#define KVM_STATS_TYPE_MAX		KVM_STATS_TYPE_LOG_HIST
++
++#define KVM_STATS_UNIT_SHIFT		4
++#define KVM_STATS_UNIT_MASK		(0xF << KVM_STATS_UNIT_SHIFT)
++#define KVM_STATS_UNIT_NONE		(0x0 << KVM_STATS_UNIT_SHIFT)
++#define KVM_STATS_UNIT_BYTES		(0x1 << KVM_STATS_UNIT_SHIFT)
++#define KVM_STATS_UNIT_SECONDS		(0x2 << KVM_STATS_UNIT_SHIFT)
++#define KVM_STATS_UNIT_CYCLES		(0x3 << KVM_STATS_UNIT_SHIFT)
++#define KVM_STATS_UNIT_MAX		KVM_STATS_UNIT_CYCLES
++
++#define KVM_STATS_BASE_SHIFT		8
++#define KVM_STATS_BASE_MASK		(0xF << KVM_STATS_BASE_SHIFT)
++#define KVM_STATS_BASE_POW10		(0x0 << KVM_STATS_BASE_SHIFT)
++#define KVM_STATS_BASE_POW2		(0x1 << KVM_STATS_BASE_SHIFT)
++#define KVM_STATS_BASE_MAX		KVM_STATS_BASE_POW2
++
++/**
++ * struct kvm_stats_desc - Descriptor of a KVM statistics.
++ * @flags: Annotations of the stats, like type, unit, etc.
++ * @exponent: Used together with @flags to determine the unit.
++ * @size: The number of data items for this stats.
++ *        Every data item is of type __u64.
++ * @offset: The offset of the stats to the start of stat structure in
++ *          structure kvm or kvm_vcpu.
++ * @bucket_size: A parameter value used for histogram stats. It is only used
++ *		for linear histogram stats, specifying the size of the bucket;
++ * @name: The name string for the stats. Its size is indicated by the
++ *        &kvm_stats_header->name_size.
++ */
++struct kvm_stats_desc {
++	__u32 flags;
++	__s16 exponent;
++	__u16 size;
++	__u32 offset;
++	__u32 bucket_size;
++	char name[];
++};
++
++#define KVM_GET_STATS_FD  _IO(KVMIO,  0xce)
++
+ #endif /* __LINUX_KVM_H */
+diff --git a/powerpc/include/asm/kvm.h b/powerpc/include/asm/kvm.h
+index b0f72de..9f18fa0 100644
+--- a/powerpc/include/asm/kvm.h
++++ b/powerpc/include/asm/kvm.h
+@@ -640,6 +640,13 @@ struct kvm_ppc_cpu_char {
+ #define KVM_REG_PPC_ONLINE	(KVM_REG_PPC | KVM_REG_SIZE_U32 | 0xbf)
+ #define KVM_REG_PPC_PTCR	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc0)
+ 
++/* POWER10 registers */
++#define KVM_REG_PPC_MMCR3	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc1)
++#define KVM_REG_PPC_SIER2	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc2)
++#define KVM_REG_PPC_SIER3	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc3)
++#define KVM_REG_PPC_DAWR1	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc4)
++#define KVM_REG_PPC_DAWRX1	(KVM_REG_PPC | KVM_REG_SIZE_U64 | 0xc5)
++
+ /* Transactional Memory checkpointed state:
+  * This is all GPRs, all VSX regs and a subset of SPRs
+  */
+@@ -667,6 +674,8 @@ struct kvm_ppc_cpu_char {
+ 
+ /* PPC64 eXternal Interrupt Controller Specification */
+ #define KVM_DEV_XICS_GRP_SOURCES	1	/* 64-bit source attributes */
++#define KVM_DEV_XICS_GRP_CTRL		2
++#define   KVM_DEV_XICS_NR_SERVERS	1
+ 
+ /* Layout of 64-bit source attribute values */
+ #define  KVM_XICS_DESTINATION_SHIFT	0
+@@ -683,6 +692,7 @@ struct kvm_ppc_cpu_char {
+ #define KVM_DEV_XIVE_GRP_CTRL		1
+ #define   KVM_DEV_XIVE_RESET		1
+ #define   KVM_DEV_XIVE_EQ_SYNC		2
++#define   KVM_DEV_XIVE_NR_SERVERS	3
+ #define KVM_DEV_XIVE_GRP_SOURCE		2	/* 64-bit source identifier */
+ #define KVM_DEV_XIVE_GRP_SOURCE_CONFIG	3	/* 64-bit source identifier */
+ #define KVM_DEV_XIVE_GRP_EQ_CONFIG	4	/* 64-bit EQ identifier */
+diff --git a/x86/include/asm/kvm.h b/x86/include/asm/kvm.h
+index 503d3f4..5a776a0 100644
+--- a/x86/include/asm/kvm.h
++++ b/x86/include/asm/kvm.h
+@@ -12,6 +12,7 @@
+ 
+ #define KVM_PIO_PAGE_OFFSET 1
+ #define KVM_COALESCED_MMIO_PAGE_OFFSET 2
++#define KVM_DIRTY_LOG_PAGE_OFFSET 64
+ 
+ #define DE_VECTOR 0
+ #define DB_VECTOR 1
+@@ -111,6 +112,7 @@ struct kvm_ioapic_state {
+ #define KVM_NR_IRQCHIPS          3
+ 
+ #define KVM_RUN_X86_SMM		 (1 << 0)
++#define KVM_RUN_X86_BUS_LOCK     (1 << 1)
+ 
+ /* for KVM_GET_REGS and KVM_SET_REGS */
+ struct kvm_regs {
+@@ -157,6 +159,19 @@ struct kvm_sregs {
+ 	__u64 interrupt_bitmap[(KVM_NR_INTERRUPTS + 63) / 64];
+ };
+ 
++struct kvm_sregs2 {
++	/* out (KVM_GET_SREGS2) / in (KVM_SET_SREGS2) */
++	struct kvm_segment cs, ds, es, fs, gs, ss;
++	struct kvm_segment tr, ldt;
++	struct kvm_dtable gdt, idt;
++	__u64 cr0, cr2, cr3, cr4, cr8;
++	__u64 efer;
++	__u64 apic_base;
++	__u64 flags;
++	__u64 pdptrs[4];
++};
++#define KVM_SREGS2_FLAGS_PDPTRS_VALID 1
++
+ /* for KVM_GET_FPU and KVM_SET_FPU */
+ struct kvm_fpu {
+ 	__u8  fpr[8][16];
+@@ -192,6 +207,26 @@ struct kvm_msr_list {
+ 	__u32 indices[0];
+ };
+ 
++/* Maximum size of any access bitmap in bytes */
++#define KVM_MSR_FILTER_MAX_BITMAP_SIZE 0x600
++
++/* for KVM_X86_SET_MSR_FILTER */
++struct kvm_msr_filter_range {
++#define KVM_MSR_FILTER_READ  (1 << 0)
++#define KVM_MSR_FILTER_WRITE (1 << 1)
++	__u32 flags;
++	__u32 nmsrs; /* number of msrs in bitmap */
++	__u32 base;  /* MSR index the bitmap starts at */
++	__u8 *bitmap; /* a 1 bit allows the operations in flags, 0 denies */
++};
++
++#define KVM_MSR_FILTER_MAX_RANGES 16
++struct kvm_msr_filter {
++#define KVM_MSR_FILTER_DEFAULT_ALLOW (0 << 0)
++#define KVM_MSR_FILTER_DEFAULT_DENY  (1 << 0)
++	__u32 flags;
++	struct kvm_msr_filter_range ranges[KVM_MSR_FILTER_MAX_RANGES];
++};
+ 
+ struct kvm_cpuid_entry {
+ 	__u32 function;
+@@ -260,6 +295,7 @@ struct kvm_debug_exit_arch {
+ #define KVM_GUESTDBG_USE_HW_BP		0x00020000
+ #define KVM_GUESTDBG_INJECT_DB		0x00040000
+ #define KVM_GUESTDBG_INJECT_BP		0x00080000
++#define KVM_GUESTDBG_BLOCKIRQ		0x00100000
+ 
+ /* for KVM_SET_GUEST_DEBUG */
+ struct kvm_guest_debug_arch {
+@@ -385,17 +421,23 @@ struct kvm_sync_regs {
+ #define KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT (1 << 4)
+ 
+ #define KVM_STATE_NESTED_FORMAT_VMX	0
+-#define KVM_STATE_NESTED_FORMAT_SVM	1	/* unused */
++#define KVM_STATE_NESTED_FORMAT_SVM	1
+ 
+ #define KVM_STATE_NESTED_GUEST_MODE	0x00000001
+ #define KVM_STATE_NESTED_RUN_PENDING	0x00000002
+ #define KVM_STATE_NESTED_EVMCS		0x00000004
++#define KVM_STATE_NESTED_MTF_PENDING	0x00000008
++#define KVM_STATE_NESTED_GIF_SET	0x00000100
+ 
+ #define KVM_STATE_NESTED_SMM_GUEST_MODE	0x00000001
+ #define KVM_STATE_NESTED_SMM_VMXON	0x00000002
+ 
+ #define KVM_STATE_NESTED_VMX_VMCS_SIZE	0x1000
+ 
++#define KVM_STATE_NESTED_SVM_VMCB_SIZE	0x1000
++
++#define KVM_STATE_VMX_PREEMPTION_TIMER_DEADLINE	0x00000001
++
+ struct kvm_vmx_nested_state_data {
+ 	__u8 vmcs12[KVM_STATE_NESTED_VMX_VMCS_SIZE];
+ 	__u8 shadow_vmcs12[KVM_STATE_NESTED_VMX_VMCS_SIZE];
+@@ -408,6 +450,20 @@ struct kvm_vmx_nested_state_hdr {
+ 	struct {
+ 		__u16 flags;
+ 	} smm;
++
++	__u16 pad;
++
++	__u32 flags;
++	__u64 preemption_timer_deadline;
++};
++
++struct kvm_svm_nested_state_data {
++	/* Save area only used if KVM_STATE_NESTED_RUN_PENDING.  */
++	__u8 vmcb12[KVM_STATE_NESTED_SVM_VMCB_SIZE];
++};
++
++struct kvm_svm_nested_state_hdr {
++	__u64 vmcb_pa;
+ };
+ 
+ /* for KVM_CAP_NESTED_STATE */
+@@ -418,6 +474,7 @@ struct kvm_nested_state {
+ 
+ 	union {
+ 		struct kvm_vmx_nested_state_hdr vmx;
++		struct kvm_svm_nested_state_hdr svm;
+ 
+ 		/* Pad the header to 128 bytes.  */
+ 		__u8 pad[120];
+@@ -430,6 +487,7 @@ struct kvm_nested_state {
+ 	 */
+ 	union {
+ 		struct kvm_vmx_nested_state_data vmx[0];
++		struct kvm_svm_nested_state_data svm[0];
+ 	} data;
+ };
+ 
+@@ -446,4 +504,8 @@ struct kvm_pmu_event_filter {
+ #define KVM_PMU_EVENT_ALLOW 0
+ #define KVM_PMU_EVENT_DENY 1
+ 
++/* for KVM_{GET,SET,HAS}_DEVICE_ATTR */
++#define KVM_VCPU_TSC_CTRL 0 /* control group for the timestamp counter (TSC) */
++#define   KVM_VCPU_TSC_OFFSET 0 /* attribute for the TSC offset */
++
+ #endif /* _ASM_X86_KVM_H */
 -- 
 2.25.1
 
