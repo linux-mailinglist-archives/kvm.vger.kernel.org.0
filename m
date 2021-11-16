@@ -2,135 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 978CE453682
-	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 16:57:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 78D8B453688
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 16:58:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238406AbhKPP7d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Nov 2021 10:59:33 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:49236 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238600AbhKPP7Z (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 16 Nov 2021 10:59:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637078188;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=IYjmDSV8dzVk4xxOpkYTr8JcJ3dKIZk0CzJQ1P41h54=;
-        b=QLZhkerjMuiJalVA/vKV4NpouehHrnKPCzMiAnFWmF0y1fzaA2E6Gnqa6sR6gyMMSfCvy/
-        yylLETNTFHAlW5Fw6OeyjsiERnYIEma0Ul7U5YPVnTbdvnxsVqU6x44ZpWHOWPZ3Fg66zb
-        F//sxosPZi61YZnyG+pBVIrjqqAQnwo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-452-fsGljFwzPNmdcylU3ASwkQ-1; Tue, 16 Nov 2021 10:56:26 -0500
-X-MC-Unique: fsGljFwzPNmdcylU3ASwkQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E8F16420E7;
-        Tue, 16 Nov 2021 15:56:25 +0000 (UTC)
-Received: from [10.39.192.245] (unknown [10.39.192.245])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0048C5F4EE;
-        Tue, 16 Nov 2021 15:56:24 +0000 (UTC)
-Message-ID: <8881d7b4-0c31-cafd-1158-0d42c1c7f43a@redhat.com>
-Date:   Tue, 16 Nov 2021 16:56:23 +0100
+        id S238662AbhKPQA4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Nov 2021 11:00:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60576 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238636AbhKPQAz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Nov 2021 11:00:55 -0500
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7A7EC061746
+        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 07:57:57 -0800 (PST)
+Received: by mail-pf1-x42e.google.com with SMTP id n85so18567482pfd.10
+        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 07:57:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=mctdfT/mLWAUfvZZLvhHazXaY3Gm15pDMZVIQeirzJs=;
+        b=jRvz3gtPvFWZ5WeAmF5DynWdAlHppEXPCykwNGOhANQ4d2QvZpMm0FziEYiDqg9PJ5
+         XKk+6nC+XqK71O57sDxaPsuYZq/bKwyCwlVUXYP9A5W1CNFUu4XltPI/vjLdIFys1iOW
+         9O7zeIAHG3s7iwvKEB3ycWW4fdccXZ/yVD9TC69Hjcl/ivd6BKPO3jyq0r39p+4HcbVL
+         zUfj1U3RoNgvaft+JGK/PJVP9S4wkTDCvI5/7d+sYuhSe5r7wMxyCFB2JrXgVJJF5iae
+         EEYQ69hdQVMtIKs5EX29ZgiI+RiXaj+KJFwoFKzi7kqz08jzgzcdHLGpXNjqe7VOfoPr
+         2Row==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=mctdfT/mLWAUfvZZLvhHazXaY3Gm15pDMZVIQeirzJs=;
+        b=5LV8kBnTO+Goy8b7ZyBJNcuEU1swcoQTL7tGjfKmMc+m7yKeEAUe+HrpWBhwtE3sd0
+         aGH8gjbi4saKTNELRozFKIkGH2ocRqidyI4qEpMixtgKQgOtYtY2owMxa9DVmkHP4dLY
+         x5Z2Cg7oW3UyKDMSNHS6OtiUEfS3S9hRSz9marWPb7Go1NBwHBT/w74uraJ9LfcuUiyN
+         Vw63tjZxybSBpwHT8IfdtG0HL/ZqxKwteBH2WzdpH4oLXQP0eMsccoHspHG5P2ekS+Sx
+         WoVscmWHbvapqvjP2b9i/bfFKqEoezCS+fo2Upycx7FhNRXOQWzN/v+F8+ancLRggKnv
+         qLCg==
+X-Gm-Message-State: AOAM530NG6CPKwiWlmaXD91AS/lCqvBMpeGLmZ2xf6z6GJ3TXPtPtIEC
+        7YnkM12WDMDNpI0rzolLyXx+3g==
+X-Google-Smtp-Source: ABdhPJy3mhqLa0tkkmoYF+8en/twKJl1RoDR89VUSxeBiCMGX+MXuH8mKcqVvkbnWIizd4zB4uhPAw==
+X-Received: by 2002:aa7:9d1e:0:b0:494:6dec:6425 with SMTP id k30-20020aa79d1e000000b004946dec6425mr104681pfp.83.1637078276989;
+        Tue, 16 Nov 2021 07:57:56 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id p19sm21785939pfo.92.2021.11.16.07.57.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Nov 2021 07:57:55 -0800 (PST)
+Date:   Tue, 16 Nov 2021 15:57:52 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     =?utf-8?B?6buE56eR5LmQ?= <huangkele@bytedance.com>
+Cc:     Chao Gao <chao.gao@intel.com>,
+        zhenwei pi <pizhenwei@bytedance.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, chaiwen.cc@bytedance.com,
+        xieyongji@bytedance.com, dengliang.1214@bytedance.com,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [External] Re: Re: [RFC] KVM: x86: SVM: don't expose PV_SEND_IPI
+ feature with AVIC
+Message-ID: <YZPVAHMp+aIaEkXT@google.com>
+References: <20211108095931.618865-1-huangkele@bytedance.com>
+ <a991bbb4-b507-a2f6-ec0f-fce23d4379ce@redhat.com>
+ <f93612f54a5cde53fd9342f703ccbaf3c9edbc9c.camel@redhat.com>
+ <CANRm+Cze_b0PJzOGB4-tPdrz-iHcJj-o7QL1t1Pf1083nJDQKQ@mail.gmail.com>
+ <d65fbd73-7612-8348-2fd8-8da0f5e2a3c0@bytedance.com>
+ <20211116090604.GA12758@gao-cwp>
+ <CAKUug92xp7mU_KB66jGtdYRhgQpgfCm67r+3kMOMdbrGOrTQcA@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH] KVM: Fix the warning by the min()
-Content-Language: en-US
-To:     zhaoxiao <zhaoxiao@uniontech.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20211116121014.1675-1-zhaoxiao@uniontech.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211116121014.1675-1-zhaoxiao@uniontech.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAKUug92xp7mU_KB66jGtdYRhgQpgfCm67r+3kMOMdbrGOrTQcA@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/16/21 13:10, zhaoxiao wrote:
-> Fix following coccicheck warning:
-> virt/kvm/kvm_main.c:4995:10-11: WARNING opportunity for min()
-> virt/kvm/kvm_main.c:4924:10-11: WARNING opportunity for min()
+On Tue, Nov 16, 2021, 黄科乐 wrote:
+> > The recently posted Intel IPI virtualization will accelerate unicast
+> > ipi but not broadcast ipis, AMD AVIC accelerates unicast ipi well but
+> > accelerates broadcast ipis worse than pv ipis. Could we just handle
+> > unicast ipi here?
 > 
-> Signed-off-by: zhaoxiao <zhaoxiao@uniontech.com>
-
-No, this is unreadable for two reasons:
-
-First, the code in parentheses for min(func(), 0) is very long.  Usually 
-min has very short arguments. By the time you have reached the closing 
-parentheses, you have completely forgotten that there was a min() at the 
-beginning.  So perhaps one possibility could be
-
-	return min(r, 0);
-
-However, the second reason is that "r < 0" is a very common way to 
-express "if there was an error".  In this case that would be
-
-	r = __kvm_io_bus_write(vcpu, bus, &range, val);
-	if (r < 0)		// "if __kvm_io_bus_write failed"
-		return r;
-
-	return 0;
-
-That "r < 0" is what will catch the attention of the person that is 
-reading the code, no matter if it is an "if" or (as in the existing 
-code), a "return".  Using "min" removes the idiom that tells the person 
-"this is checking for errors".
-
-Thanks,
-
-Paolo
-
-> ---
->   virt/kvm/kvm_main.c | 10 ++++------
->   1 file changed, 4 insertions(+), 6 deletions(-)
+> Thanks for the explanation! It is true that AVIC does not always perform
+> better
+> than PV IPI, actually not even swx2apic.
 > 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index d31724500501..bd646c64722d 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -4910,7 +4910,6 @@ int kvm_io_bus_write(struct kvm_vcpu *vcpu, enum kvm_bus bus_idx, gpa_t addr,
->   {
->   	struct kvm_io_bus *bus;
->   	struct kvm_io_range range;
-> -	int r;
->   
->   	range = (struct kvm_io_range) {
->   		.addr = addr,
-> @@ -4920,8 +4919,8 @@ int kvm_io_bus_write(struct kvm_vcpu *vcpu, enum kvm_bus bus_idx, gpa_t addr,
->   	bus = srcu_dereference(vcpu->kvm->buses[bus_idx], &vcpu->kvm->srcu);
->   	if (!bus)
->   		return -ENOMEM;
-> -	r = __kvm_io_bus_write(vcpu, bus, &range, val);
-> -	return r < 0 ? r : 0;
-> +
-> +	return min(__kvm_io_bus_write(vcpu, bus, &range, val), 0);
->   }
->   EXPORT_SYMBOL_GPL(kvm_io_bus_write);
->   
-> @@ -4981,7 +4980,6 @@ int kvm_io_bus_read(struct kvm_vcpu *vcpu, enum kvm_bus bus_idx, gpa_t addr,
->   {
->   	struct kvm_io_bus *bus;
->   	struct kvm_io_range range;
-> -	int r;
->   
->   	range = (struct kvm_io_range) {
->   		.addr = addr,
-> @@ -4991,8 +4989,8 @@ int kvm_io_bus_read(struct kvm_vcpu *vcpu, enum kvm_bus bus_idx, gpa_t addr,
->   	bus = srcu_dereference(vcpu->kvm->buses[bus_idx], &vcpu->kvm->srcu);
->   	if (!bus)
->   		return -ENOMEM;
-> -	r = __kvm_io_bus_read(vcpu, bus, &range, val);
-> -	return r < 0 ? r : 0;
-> +
-> +	return min(__kvm_io_bus_read(vcpu, bus, &range, val), 0);
->   }
->   
->   /* Caller must hold slots_lock. */
+> > So agree with Wanpeng's point, is it possible to separate single IPI and
+> > broadcast IPI on a hardware acceleration platform?
 > 
+> 
+> > how about just correcting the logic for xapic:
+> 
+> > From 13447b221252b64cd85ed1329f7d917afa54efc8 Mon Sep 17 00:00:00 2001
+> > From: Jiaqing Zhao <jiaqing.zhao@intel.com>
+> > Date: Fri, 9 Apr 2021 13:53:39 +0800
+> > Subject: [PATCH 1/2] x86/apic/flat: Add specific send IPI logic
+> 
+> > Currently, apic_flat.send_IPI() uses default_send_IPI_single(), which
+> > is a wrapper of apic->send_IPI_mask(). Since commit aaffcfd1e82d
+> > ("KVM: X86: Implement PV IPIs in linux guest"), KVM PV IPI driver will
+> > override apic->send_IPI_mask(), and may cause unwated side effects.
+> 
+> > This patch removes such side effects by creating a specific send_IPI
+> > method.
+> 
+> > Signed-off-by: Jiaqing Zhao <jiaqing.zhao@intel.com>
+> 
+> Actually, I think this issue is more about how to sort out the relationship
+> between AVIC and PV IPI. As far as I understand, currently, no matter
+> the option from userspace or the determination made in kernel works
+> in some way, but not in the migration scenario. For instance, migration with
+> AVIC feature changes can make guests lose the PV IPI feature needlessly.
+> Besides, the current patch is not consistent with
+> KVM_CAP_ENFORCE_PV_FEATURE_CPUID.
+> Paolo's advice about using a new hint shall work well. Currently try
+> working on it.
 
+IIUC, you want to have the guest switch between AVIC and PV IPI when the guest
+is migrated?  That doesn't require a new hint, it would be just as easy for the
+host to manipulate CPUID.KVM_FEATURE_PV_SEND_IPI as it would a new CPUID hint.
+
+The real trick will be getting the guest to be aware of the CPUID and reconfigure
+it's APIC setup on the fly.
+
+Or did I misundersetand what you meant by "migration with AVIC feature changes"?
