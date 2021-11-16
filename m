@@ -2,126 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EBA99453B04
-	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 21:36:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A2E99453B15
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 21:41:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230386AbhKPUjE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Nov 2021 15:39:04 -0500
-Received: from Galois.linutronix.de ([193.142.43.55]:54912 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229614AbhKPUjD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Nov 2021 15:39:03 -0500
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1637094964;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=7XMMD+98XQDTijC1O0p6zbcme1OE0jdwczk1KLw1JOs=;
-        b=dDyO7+EvG86gufOoXYubDHjIlCmeX7/aFLtNX3uXfQ1QgrHOH5HvpJLGXPsXXe0fUD+Onq
-        7RmcbsX/Qt+hpjVjXGMhXV80UXqyICDbKlG87iWP0ByR12OI9gBglVlGtiO3LUGWOIVRi0
-        2pYJ4y69bIT1hhgxLPggZfPiw3Z0pIOYUFnCm4/T+pQ70/Xw1uOeGjop3eExghq19xVfwt
-        ZI6O0KspUX0/PVsJZtc5uF+Dbw4tpb+7wG+d2DUlxx6jwnPcpPWsPQa/wHaKK6ebGGPs5S
-        81qwR9jhkxuNQiKEwaFhHyaWs/18T0yCsC3mPwE3749CgqcgOQwGNbBUMCB2Jg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1637094964;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=7XMMD+98XQDTijC1O0p6zbcme1OE0jdwczk1KLw1JOs=;
-        b=YoB9wfk7mpwxAgN6yqjfyuMAPnyAegQGDqaIuBzPmClN9HKGYOc7Vud2LI7/EsYUrPvD74
-        UpMa4UPU8vDDBrDg==
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     "Liu, Jing2" <jing2.liu@intel.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Arjan van de Ven <arjan@linux.intel.com>,
-        Jing Liu <jing2.liu@linux.intel.com>,
-        "Cooper, Andrew" <andrew.cooper3@citrix.com>,
-        "Bae, Chang Seok" <chang.seok.bae@intel.com>
-Subject: Re: Thoughts of AMX KVM support based on latest kernel
-In-Reply-To: <04978d6d-8e1a-404d-b30d-402a7569c1f0@redhat.com>
-References: <BYAPR11MB325685AB8E3DFD245846F854A9939@BYAPR11MB3256.namprd11.prod.outlook.com>
- <87k0h85m65.ffs@tglx> <YZPWsICdDTZ02UDu@google.com> <87ee7g53rp.ffs@tglx>
- <04978d6d-8e1a-404d-b30d-402a7569c1f0@redhat.com>
-Date:   Tue, 16 Nov 2021 21:36:03 +0100
-Message-ID: <87zgq34z4c.ffs@tglx>
+        id S230473AbhKPUny (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Nov 2021 15:43:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40958 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229614AbhKPUnx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Nov 2021 15:43:53 -0500
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59D5AC061570
+        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 12:40:56 -0800 (PST)
+Received: by mail-pj1-x102a.google.com with SMTP id p18-20020a17090ad31200b001a78bb52876so3276166pju.3
+        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 12:40:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=IYlzWtfhj+H2J4I4xba+I971s3h/h8xoWb8A++Men0M=;
+        b=Sa3tbgA2z8xflXdmveknWjQyDnR/4JtAMT6St0Dk4Bo9IBK6sqPiEBybvLdrrhvoFO
+         2zz/IBuiULgppYWInHhOFClHLUbUMWtyef46rjEBJPTEcK09w6acWzqTY4eSrP1twZos
+         HmJ/yAgV+cp+7ROfOH6tTMH1SuVJy8PoZOqTiUEb0D5MpZ1x6wgAV4UWVGmn4OFDVzSx
+         yIEDZOKVNCQKiH7y7vMTwIvOZIt/EykbOv7F562F/Rp8/D5ULsSs0iG7Uw6v77eIyQB0
+         nA5zt3bS6mAEVxPxok4N7rb+p9ED+Si4HUnBgiy5FWhcXm9it6i2wFvNTIhZL7i3KP/j
+         ywNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=IYlzWtfhj+H2J4I4xba+I971s3h/h8xoWb8A++Men0M=;
+        b=gVPbthhT2wRy0WhN7vJK1255XDUSn30onzTk7u5MhKC/WhnIOdn1MK6Yj5MVab+O7F
+         N2FjiuORh7IytnXotPpSh9CQh8GAQUWzdSFziRfjjIerfOfMRhjJJae3XXrefck6viZf
+         gZ5j9QA97mviMwGdEwkSEFMYsqQKPhlAhZCnQNJy1Cr3Kc7IISFJ8ftH+yhTRFg3ETWI
+         9opgEIfu6R7IKAmNZxRjN/jCV9Q6dmZQResckBMd1ZRpzlIQf0aNyTcxmihwyYEW0sA9
+         jXPyd+ZPzbtstq5/RqDD5NcEiXsBf2UPh4CFdJna/afcGKVe/bKlVhNtQS0kcvSTtJur
+         aoWA==
+X-Gm-Message-State: AOAM533QQobm/Wj7cqxUL7TpFinSed9YZENyoAhBOq3lBdU+86HZ5h/R
+        wpapctVmmhxliMlmEvqsSmO5iHISFzriNg==
+X-Google-Smtp-Source: ABdhPJwYuN6HbUyNh+bJKAKL8yRNZ0RpWurFgI/HhmVQPpoy2hfFYAsh2a1yYSa4830RPiv7ZtWo8A==
+X-Received: by 2002:a17:90b:4b4e:: with SMTP id mi14mr2421836pjb.122.1637095255424;
+        Tue, 16 Nov 2021 12:40:55 -0800 (PST)
+Received: from localhost.localdomain (netadmin.ucsd.edu. [137.110.160.224])
+        by smtp.gmail.com with ESMTPSA id lp12sm3652359pjb.24.2021.11.16.12.40.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Nov 2021 12:40:54 -0800 (PST)
+From:   Zixuan Wang <zxwang42@gmail.com>
+To:     kvm@vger.kernel.org, pbonzini@redhat.com, drjones@redhat.com
+Cc:     marcorr@google.com, erdemaktas@google.com, rientjes@google.com,
+        seanjc@google.com, brijesh.singh@amd.com, Thomas.Lendacky@amd.com,
+        varad.gautam@suse.com, jroedel@suse.de, bp@suse.de
+Subject: [kvm-unit-tests PATCH v2 00/10] x86_64 UEFI set up process refactor and scripts fixes
+Date:   Tue, 16 Nov 2021 12:40:43 -0800
+Message-Id: <20211116204053.220523-1-zxwang42@gmail.com>
+X-Mailer: git-send-email 2.33.0
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo,
+Hello,
 
-On Tue, Nov 16 2021 at 20:49, Paolo Bonzini wrote:
-> On 11/16/21 19:55, Thomas Gleixner wrote:
->> We can do that, but I'm unhappy about this conditional in schedule(). So
->> I was asking for doing a simple KVM only solution first:
->> 
->> vcpu_run()
->>          kvm_load_guest_fpu()
->>              wrmsrl(XFD, guest_fpstate->xfd);
->>              XRSTORS
->>            
->>          do {
->> 
->>             local_irq_disable();
->> 
->>             if (test_thread_flag(TIF_NEED_FPU_LOAD))
->> 		switch_fpu_return()
->>                    wrmsrl(XFD, guest_fpstate->xfd);
->> 
->>             do {
->>                  vmenter();              // Guest modifies XFD
->>             } while (reenter);
->> 
->>             update_xfd_state();          // Restore consistency
->> 
->>             local_irq_enable();
->> 
->> and check how bad that is for KVM in terms of overhead on AMX systems.
->
-> I agree, this is how we handle SPEC_CTRL for example and it can be 
-> extended to XFD.
+This patch series refactors the x86_64 UEFI set up process, fixes the
+`run-tests.sh` script to run under UEFI, and improves the boot speed
+under UEFI. The patches are organized as four parts.
 
-SPEC_CTRL is different because it's done right after each VMEXIT.
+The first part (patches 1-3) refactors the x86_64 UEFI set up process.
+The previous UEFI setup calls arch-specific setup functions twice and
+generates arch-specific data structure. As Andrew suggested [1], we
+refactor this process to make only one call to the arch-specific
+function and generate arch-neutral data structures. This simplifies the
+set up process and makes it easier to develop UEFI support for other
+architectures.
 
-XFD can be done lazy when breaking out of the exit fastpath loop before
-enabling interrupts.
+The second part (patch 4) converts several x86 test cases to
+position-independent code (PIC) to run under UEFI. This patch is ported
+from the initial UEFI support patchset [2] with fixes to the 32-bit
+compilation.
 
-> We should first do that, then switch to the MSR lists. 
->   Hacking into schedule() should really be the last resort.
->
->>            local_irq_enable();     <- Problem starts here
->> 
->>            preempt_enable();	   <- Becomes wider here
->
-> It doesn't become that much wider because there's always preempt 
-> notifiers.  So if it's okay to save XFD in the XSAVES wrapper and in 
-> kvm_arch_vcpu_put(), that might be already remove the need to do it 
-> schedule().
+The third part (patches 5-8) fixes the UEFI runner scripts. Patch 5
+sets UEFI OVMF image as read-only. Patch 6 fixes test cases' return
+code under UEFI, enabling Patch 7-8 to fix the `run-tests.sh` script
+under UEFI.
 
-Did not think about preemption notifiers. Probably because I hate
-notifiers with a passion since I had to deal with the CPU hotplug
-notifier trainwreck.
+The fourth part (patches 9-10) improves the boot speed under UEFI.
+Patch 9 renames the EFI executables to EFI/BOOT/BOOTX64.EFI. UEFI OVMF
+recognizes this file by default and skips the 5-second user input
+waiting. Patch 10 makes `run-tests.sh` work with this new EFI
+executable filename.
 
-But yes that would work. So the places to do that would be:
+This patchset is based on the `uefi` branch.
 
-1) kvm_sched_out() -> kvm_arch_vcpu_put()
-2) kernel_fpu_begin_mask()
-3) kvm_put_guest_fpu()
+Changes since V1:
+V2 Patch #  Changes
+----------  -------
+     03/10  (New patch from Sean) Skip SEV-ES setup if SEV is not
+            available
+     04/10  Add more details to the commit message
+     06/10  Add UEFI shutdown in case exit() doesn't work
+     07/10  Simplify variable usages in scripts
+     08/10  Simplify variable usages in scripts
+     09/10  (New patch) Improve UEFI boot speed
+     10/10  (New patch) Update run-tests.sh
 
-But I really would start with the trivial version I suggested because
-that's already in the slow path and not at every VMEXIT.
+Best regards,
+Zixuan Wang and Marc Orr
 
-I'd be really surprised if that RDMSR is truly noticeable within all the
-other crud this path is doing.
+[1] https://lore.kernel.org/kvm/20211005060549.clar5nakynz2zecl@gator.home/
+[2] https://lore.kernel.org/kvm/20211004204931.1537823-1-zxwang42@gmail.com/
 
-Thanks,
 
-        tglx
+Marc Orr (3):
+  scripts: Generalize EFI check
+  x86 UEFI: Make run_tests.sh (mostly) work under UEFI
+  x86 UEFI: Make _NO_FILE_4Uhere_ work w/ BOOTX64.EFI
+
+Sean Christopherson (1):
+  x86 AMD SEV: Skip SEV-ES if SEV is unsupported
+
+Zixuan Wang (6):
+  x86 UEFI: Remove mixed_mode
+  x86 UEFI: Refactor set up process
+  x86 UEFI: Convert x86 test cases to PIC
+  x86 UEFI: Set UEFI OVMF as readonly
+  x86 UEFI: Exit QEMU with return code
+  x86 UEFI: Improve Boot Speed
+
+ lib/efi.c            |  63 +++++++--
+ lib/efi.h            |  19 ++-
+ lib/linux/efi.h      | 317 ++++++++++++++-----------------------------
+ lib/x86/acpi.c       |  36 +++--
+ lib/x86/acpi.h       |   5 +-
+ lib/x86/asm/setup.h  |  16 +--
+ lib/x86/setup.c      | 145 +++++++++-----------
+ lib/x86/usermode.c   |   3 +-
+ scripts/runtime.bash |  14 +-
+ x86/Makefile.common  |  10 +-
+ x86/Makefile.x86_64  |   7 +-
+ x86/access.c         |   9 +-
+ x86/cet.c            |   8 +-
+ x86/efi/run          |  45 +++---
+ x86/emulator.c       |   5 +-
+ x86/eventinj.c       |   8 ++
+ x86/run              |   6 +-
+ x86/smap.c           |  13 +-
+ x86/umip.c           |  26 +++-
+ 19 files changed, 361 insertions(+), 394 deletions(-)
+
+-- 
+2.33.0
+
