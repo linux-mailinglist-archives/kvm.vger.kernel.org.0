@@ -2,89 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 676C0453626
-	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 16:43:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F9E445362E
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 16:43:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238441AbhKPPot (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Nov 2021 10:44:49 -0500
-Received: from mail.kernel.org ([198.145.29.99]:50948 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238631AbhKPPnw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Nov 2021 10:43:52 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id D1BF160F38;
-        Tue, 16 Nov 2021 15:40:53 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1mn0Zn-005s77-F7; Tue, 16 Nov 2021 15:40:51 +0000
-Date:   Tue, 16 Nov 2021 15:40:50 +0000
-Message-ID: <877dd885x9.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
+        id S238459AbhKPPps (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Nov 2021 10:45:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56710 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238500AbhKPPo4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Nov 2021 10:44:56 -0500
+Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E18BC061207;
+        Tue, 16 Nov 2021 07:41:59 -0800 (PST)
+Received: by mail-yb1-xb29.google.com with SMTP id e136so58644193ybc.4;
+        Tue, 16 Nov 2021 07:41:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=JeB67wKKYkmYpABTeJ3dUTEOLmNuPtc5YikBcZnWqdY=;
+        b=ne++BIx1ByaGEvgTfsJ30VTSG+XVIrvdceUggDGwQphTLUvDL3VSTQ3fwG4JZatnkm
+         PD3cHUZSUdxryzmfSQukjiI7HLe3EjwiThbdTzoAhUIDJWJ88pYpOXXMwM3J87JIUZsT
+         9t6fo0nNfFHE7+7kw+lWJbkCrNc1BqAZrNxFs5tNNLbbDy8IPaH921n6Fcl3hkYMZ280
+         vSr2CPs7tSYVHuLdqFNu8N6gn15k4pdOHhH/VRuHmKwnQ4aJN7WNnnWQ8/opxCT3bFbg
+         ernX1vuyj3wpJquqid/B/xio84FubTKdupMEW7JigqEbTRQNwZTO3/mewg+pdWuN3azz
+         1LaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=JeB67wKKYkmYpABTeJ3dUTEOLmNuPtc5YikBcZnWqdY=;
+        b=uLRCuIpOA09edkGr0dA1UVz/bI/a7H+ZtyJwYU5avr3Vw52/FXM/nfI/jXAIo3VGao
+         rhy/+fkiv1wcbn9jNdcWXc3goEN5cW2Kr5BJfjMgzXZTic9ZieLaZXkG4QRIf7EdmGdT
+         NCt3Yau3OY98sL7VqFczDAk46aGovBFgl4qmSZtsJmk95eMeIeAmNkGdR4Nzvc2FfHb/
+         wLGOjadB7nEkqVhaGdDuvsUJ8V3FnyztnEhzpTzgv+1TlfhfE8NmqpxxwETacIJ6cLKX
+         7wrJGuriL9EAFkz66yMRkurZnTilWsFt0F91lOs2DA/0qbn6T4yCCGQB+SFGdbRMdurH
+         WaOw==
+X-Gm-Message-State: AOAM5316VIpSNMzC9zHrg5l2Uvpl/Yvlby1RrVqZaICyLf9Mq/596KTC
+        SAAGlGMHnntHVnol02NvuH8PCt2RLdvPcEwJ1hs=
+X-Google-Smtp-Source: ABdhPJzacMZbfRM0BT4keVhfVbuX+teU+iXirl6LpwV6iont1LhweuIu4SyVn/0rIg16Z4BJ0p6ClJZhT15WwRLAaIg=
+X-Received: by 2002:a25:cb12:: with SMTP id b18mr9533751ybg.139.1637077318358;
+ Tue, 16 Nov 2021 07:41:58 -0800 (PST)
+MIME-Version: 1.0
+References: <CAFcO6XOmoS7EacN_n6v4Txk7xL7iqRa2gABg3F7E3Naf5uG94g@mail.gmail.com>
+ <9eb83cdd-9314-0d1f-0d4b-0cf4432e1e84@redhat.com>
+In-Reply-To: <9eb83cdd-9314-0d1f-0d4b-0cf4432e1e84@redhat.com>
+From:   butt3rflyh4ck <butterflyhuangxx@gmail.com>
+Date:   Tue, 16 Nov 2021 23:41:48 +0800
+Message-ID: <CAFcO6XMyBDU8hYNAa7s9sGHEntTz5iJmLF2QbRN-S8PPpYd_ZQ@mail.gmail.com>
+Subject: Re: There is a null-ptr-deref bug in kvm_dirty_ring_get in virt/kvm/dirty_ring.c
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-mips@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, linuxppc-dev@lists.ozlabs.org,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup.patel@wdc.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Juergen Gross <jgross@suse.com>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        kernel-team@android.com
-Subject: Re: [PATCH 0/5] KVM: Turn the vcpu array into an xarray
-In-Reply-To: <dd5292e5-7387-9797-2d74-6a3350cbe4f5@redhat.com>
-References: <20211105192101.3862492-1-maz@kernel.org>
-        <dd5292e5-7387-9797-2d74-6a3350cbe4f5@redhat.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, kvm@vger.kernel.org, linux-mips@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linuxppc-dev@lists.ozlabs.org, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, anup.patel@wdc.com, atish.patra@wdc.com, borntraeger@de.ibm.com, frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com, jgross@suse.com, npiggin@gmail.com, seanjc@google.com, paulus@samba.org, mpe@ellerman.id.au, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Cc:     "Woodhouse, David" <dwmw@amazon.co.uk>, kvm@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 16 Nov 2021 15:03:40 +0000,
-Paolo Bonzini <pbonzini@redhat.com> wrote:
-> 
-> On 11/5/21 20:20, Marc Zyngier wrote:
-> > The kvm structure is pretty large. A large portion of it is the vcpu
-> > array, which is 4kB on x86_64 and arm64 as they deal with 512 vcpu
-> > VMs. Of course, hardly anyone runs VMs this big, so this is often a
-> > net waste of memory and cache locality.
-> > 
-> > A possible approach is to turn the fixed-size array into an xarray,
-> > which results in a net code deletion after a bit of cleanup.
-> > 
-> > This series is on top of the current linux/master as it touches the
-> > RISC-V implementation. Only tested on arm64.
-> 
-> Queued, only locally until I get a review for my replacement of patch
-> 4 (see
-> https://lore.kernel.org/kvm/20211116142205.719375-1-pbonzini@redhat.com/T/).
+ For this issue, I have reviewed the implementation code of vm
+creating,vCPU creating and dirty_ring creating,
+ I have some ideas.If only judge kvm->dirty_ring_size, determine
+whether to call kvm_dirty_ring_push(), this condition  is not
+sufficient.
+can we add a judgement on kvm->created_vcpus. kvm->created_vcpus is not NULL.
+After all, there is a situation, no vCPU was created, but
+kvm->dirty_ring_size has a value.
 
-In which case, let me send a v2 with the changes that we discussed
-with Sean. It will still have my version of patch 4, but that's
-nothing you can't fix.
+Regards,
+ butt3rflyh4ck.
 
-	M.
+On Fri, Oct 22, 2021 at 4:08 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 18/10/21 19:14, butt3rflyh4ck wrote:
+> > {
+> > struct kvm_vcpu *vcpu = kvm_get_running_vcpu();  //-------> invoke
+> > kvm_get_running_vcpu() to get a vcpu.
+> >
+> > WARN_ON_ONCE(vcpu->kvm != kvm); [1]
+> >
+> > return &vcpu->dirty_ring;
+> > }
+> > ```
+> > but we had not called KVM_CREATE_VCPU ioctl to create a kvm_vcpu so
+> > vcpu is NULL.
+>
+> It's not just because there was no call to KVM_CREATE_VCPU; in general
+> kvm->dirty_ring_size only works if all writes are associated to a
+> specific vCPU, which is not the case for the one of
+> kvm_xen_shared_info_init.
+>
+> David, what do you think?  Making dirty-page ring buffer incompatible
+> with Xen is ugly and I'd rather avoid it; taking the mutex for vcpu 0 is
+> not an option because, as the reporter said, you might not have even
+> created a vCPU yet when you call KVM_XEN_HVM_SET_ATTR.  The remaining
+> option would be just "do not mark the page as dirty if the ring buffer
+> is active".  This is feasible because userspace itself has passed the
+> shared info gfn; but again, it's ugly...
+>
+> Paolo
+>
+
 
 -- 
-Without deviation from the norm, progress is not possible.
+Active Defense Lab of Venustech
