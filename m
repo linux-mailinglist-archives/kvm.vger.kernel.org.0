@@ -2,96 +2,227 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 20363452EA1
-	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 11:03:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C6139452EA4
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 11:04:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233761AbhKPKGv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Nov 2021 05:06:51 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31789 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233673AbhKPKGo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 16 Nov 2021 05:06:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637057027;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=tYYl6vgvaDE4CzC6E4lkhaBh50OJahnR36Yzvrw/SDw=;
-        b=IZq2KL1g/RV/3SoVMqwMId2s4gXHnivxKW5i68pYvHagA+QRVxNCKi/a2OU1OIVW4Wr4IR
-        vfTWpYdsosidSG7+rAxW/3SCMT0Wa35lcckLxN+/GculUKDU5fbVHFbEWWNcG+3PMzxoaq
-        t2Hx/g6mhv6ZYhbQKwCTfsBnJZko7T8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-168-UVLan-wwO4ei1Ne2pyX79Q-1; Tue, 16 Nov 2021 05:03:44 -0500
-X-MC-Unique: UVLan-wwO4ei1Ne2pyX79Q-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7827B9F92A;
-        Tue, 16 Nov 2021 10:03:41 +0000 (UTC)
-Received: from [10.39.192.245] (unknown [10.39.192.245])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7255557CAD;
-        Tue, 16 Nov 2021 10:03:31 +0000 (UTC)
-Message-ID: <e48b533f-8930-ab48-cbc3-660e2827b031@redhat.com>
-Date:   Tue, 16 Nov 2021 11:03:30 +0100
+        id S233820AbhKPKHs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Nov 2021 05:07:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35304 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233829AbhKPKH0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Nov 2021 05:07:26 -0500
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAAE2C061767
+        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 02:04:28 -0800 (PST)
+Received: by mail-pg1-x536.google.com with SMTP id q12so5448001pgh.5
+        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 02:04:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:organization:in-reply-to
+         :content-transfer-encoding;
+        bh=oG9TWqcJEpyFfu54m5HeL8IeDLpFQAxLKB8I8m0eRnY=;
+        b=RIAaWguwxRMGjVcj2BYVVqFwWnkbamDddh7nNKOJIsrPTdv4DmVY5f+/IHVRgFw4pK
+         FWQZxjwuIBUDZezfr3pC5n9NoyO0tGR9tjIYlqm6tWztKBcUmAcELwxylpsQna9WqkYf
+         N1/noulTbxLHdYujXy8ug8g9bFUYCw5ofVYDi9tFi4QBe3Oi0Aap2wf1r7VcjZJvPhbC
+         8v0LUVQ3EmWw5uZpwUypGTyPuFW660FBi/nrmRy/T2V5iLiS24rQD8zXvyurGGrVHkkt
+         pZG02Fvjv1td2Wg90X7LEaW6yQUR4TCh44pd4K+U/lMCu+FHmwbcRD8M1n2pvoabFN3L
+         0zjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:organization:in-reply-to
+         :content-transfer-encoding;
+        bh=oG9TWqcJEpyFfu54m5HeL8IeDLpFQAxLKB8I8m0eRnY=;
+        b=4GejYaQo7+AG+gla9Y8U/3i0hmHYp4sHjByUgG7QHSINYayeDr573xMrxSNUDwo8px
+         0iChqZpefmf29UDHkMV7DyaDy6bLwOTSLXRb3uZ6DV4KwXJ8LeBIbMmLijAzKDJI/zlM
+         eQticj8cQ20Xb/3m7cTK3oY4X4otIAJBEls8UKuN0JFxFC8V5e63EoLxaPJ1Y3aZLTQ5
+         8XQ0HHo8KRe+Pga5oxCsloz2f1iZvnegDkYjRJJ7S278zdie8P1fD14eanxz5Ewe+/Jw
+         mnCqCM8PBxI6nDHwv8Agp2G1yz7LQxY0JufhXeJEIe0BGV5bzjsTEFOAi4WvBRi26t9l
+         r9EQ==
+X-Gm-Message-State: AOAM531Ye7WAnOGLKaznQJ7rDg2/o8vmmn3qPjZFRpXHLsK7O4sUFCpv
+        2CDxBY9kA0FdrnLtcaZgECHkmo/rsWI=
+X-Google-Smtp-Source: ABdhPJwFWLeOzDYl7QdeA+arpympgVtAZf418hOFrzXw1TbYL6TlcsGvlbGrtRFSUb4W9b+Dsg5Sdg==
+X-Received: by 2002:a62:1c58:0:b0:49f:d674:e506 with SMTP id c85-20020a621c58000000b0049fd674e506mr39069936pfc.66.1637057068286;
+        Tue, 16 Nov 2021 02:04:28 -0800 (PST)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id d6sm17242358pfh.190.2021.11.16.02.04.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 16 Nov 2021 02:04:27 -0800 (PST)
+Message-ID: <d0e12764-d426-d38f-5530-a1ee9795a285@gmail.com>
+Date:   Tue, 16 Nov 2021 18:04:21 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH v2 1/2] KVM: nVMX: don't use vcpu->arch.efer when checking
- host state on nested state load
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.3.0
+Subject: Re: [kvm-unit-tests PATCH] x86/pmu: Test PMU virtualization on
+ emulated instructions
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     kvm@vger.kernel.org, Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
-        <linux-kernel@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Jim Mattson <jmattson@google.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>
-References: <20211115131837.195527-1-mlevitsk@redhat.com>
- <20211115131837.195527-2-mlevitsk@redhat.com> <YZKB3Q1ZMsPD6hHl@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YZKB3Q1ZMsPD6hHl@google.com>
+To:     Jim Mattson <jmattson@google.com>
+Cc:     Eric Hankland <ehankland@google.com>, kvm@vger.kernel.org,
+        "Paolo Bonzini - Distinguished Engineer (kernel-recipes.org)" 
+        <pbonzini@redhat.com>
+References: <20211112235652.1127814-1-jmattson@google.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+Organization: Tencent
+In-Reply-To: <20211112235652.1127814-1-jmattson@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/15/21 16:50, Sean Christopherson wrote:
->    When loading nested state, don't use check vcpu->arch.efer to get the
->    L1 host's 64-bit vs. 32-bit state and don't check it for consistency
->    with respect to VM_EXIT_HOST_ADDR_SPACE_SIZE, as register state in vCPU
->    may be stale when KVM_SET_NESTED_STATE is called and conceptually does
->    not exist.  When the CPU is in non-root mode, i.e. when restoring L2
->    state in KVM, there is no snapshot of L1 host state, it is (conditionally)
->    loaded on VM-Exit.  E.g. EFER is either preserved on exit, loaded from the
->    VMCS (vmcs12 in this case), or loaded from the MSR load list.
+On 13/11/2021 7:56 am, Jim Mattson wrote:
+> Add tests of "instructions retired" and "branch instructions retired,"
+> to ensure that these events count emulated instructions.
 > 
->    Use vmcs12.VM_EXIT_HOST_ADDR_SPACE_SIZE to determine the target mode of
->    the L1 host, as it is the source of truth in this case.  Perform the EFER
->    vs. vmcs12.VM_EXIT_HOST_ADDR_SPACE_SIZE consistency check only on VM-Enter,
->    as conceptually there's no "current" L1 EFER to check.
+> Signed-off-by: Eric Hankland <ehankland@google.com>
+> [jmattson:
+>    - Added command-line parameter to conditionally run the new tests.
+>    - Added pmu-emulation test to unittests.cfg
+> ]
+> Signed-off-by: Jim Mattson <jmattson@google.com>
+> ---
+>   x86/pmu.c         | 80 +++++++++++++++++++++++++++++++++++++++++++++++
+>   x86/unittests.cfg |  7 +++++
+>   2 files changed, 87 insertions(+)
 > 
->    Note, KVM still checks vmcs12.HOST_EFER for consistency if
->    if vmcs12.VM_EXIT_LOAD_IA32_EFER is set, i.e. this skips only the check
->    against current vCPU state, which does not exist, when loading nested state.
+> diff --git a/x86/pmu.c b/x86/pmu.c
+> index ec61ac956a55..a159333b0c73 100644
+> --- a/x86/pmu.c
+> +++ b/x86/pmu.c
+> @@ -33,6 +33,12 @@
+>   
+>   #define N 1000000
+>   
+> +#define KVM_FEP "ud2; .byte 'k', 'v', 'm';"
+> +// These values match the number of instructions and branches in the
+> +// assembly block in check_emulated_instr().
+> +#define EXPECTED_INSTR 17
+> +#define EXPECTED_BRNCH 5
+> +
+>   typedef struct {
+>   	uint32_t ctr;
+>   	uint32_t config;
+> @@ -468,6 +474,77 @@ static void check_running_counter_wrmsr(void)
+>   	report_prefix_pop();
+>   }
+>   
+> +static void check_emulated_instr(void)
+> +{
+> +	uint64_t status, instr_start, brnch_start;
+> +	pmu_counter_t brnch_cnt = {
+> +		.ctr = MSR_IA32_PERFCTR0,
+> +		/* branch instructions */
+> +		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[5].unit_sel,
+> +		.count = 0,
+> +	};
+> +	pmu_counter_t instr_cnt = {
+> +		.ctr = MSR_IA32_PERFCTR0 + 1,
+> +		/* instructions */
+> +		.config = EVNTSEL_OS | EVNTSEL_USR | gp_events[1].unit_sel,
+> +		.count = 0,
+> +	};
+> +	report_prefix_push("emulated instruction");
+> +
+> +	wrmsr(MSR_CORE_PERF_GLOBAL_OVF_CTRL,
+> +	      rdmsr(MSR_CORE_PERF_GLOBAL_STATUS));
+> +
+> +	start_event(&brnch_cnt);
+> +	start_event(&instr_cnt);
+> +
+> +	brnch_start = -EXPECTED_BRNCH;
+> +	instr_start = -EXPECTED_INSTR;
+> +	wrmsr(MSR_IA32_PERFCTR0, brnch_start);
+> +	wrmsr(MSR_IA32_PERFCTR0 + 1, instr_start);
+> +	// KVM_FEP is a magic prefix that forces emulation so
+> +	// 'KVM_FEP "jne label\n"' just counts as a single instruction.
+> +	asm volatile(
+> +		"mov $0x0, %%eax\n"
+> +		"cmp $0x0, %%eax\n"
+> +		KVM_FEP "jne label\n"
+> +		KVM_FEP "jne label\n"
+> +		KVM_FEP "jne label\n"
+> +		KVM_FEP "jne label\n"
+> +		KVM_FEP "jne label\n"
+> +		"mov $0xa, %%eax\n"
+> +		"cpuid\n"
+> +		"mov $0xa, %%eax\n"
+> +		"cpuid\n"
+> +		"mov $0xa, %%eax\n"
+> +		"cpuid\n"
+> +		"mov $0xa, %%eax\n"
+> +		"cpuid\n"
+> +		"mov $0xa, %%eax\n"
+> +		"cpuid\n"
+> +		"label:\n"
+> +		:
+> +		:
+> +		: "eax", "ebx", "ecx", "edx");
+> +
+> +	wrmsr(MSR_CORE_PERF_GLOBAL_CTRL, 0);
+> +
+> +	stop_event(&brnch_cnt);
+> +	stop_event(&instr_cnt);
+> +
+> +	// Check that the end count - start count is at least the expected
+> +	// number of instructions and branches.
+> +	report(instr_cnt.count - instr_start >= EXPECTED_INSTR,
+> +	       "instruction count");
+> +	report(brnch_cnt.count - brnch_start >= EXPECTED_BRNCH,
+> +	       "branch count");
+> +	// Additionally check that those counters overflowed properly.
+> +	status = rdmsr(MSR_CORE_PERF_GLOBAL_STATUS);
+> +	report(status & 1, "instruction counter overflow");
+> +	report(status & 2, "branch counter overflow");
+> +
+> +	report_prefix_pop();
+> +}
+> +
+>   static void check_counters(void)
+>   {
+>   	check_gp_counters();
+> @@ -563,6 +640,9 @@ int main(int ac, char **av)
+>   
+>   	check_counters();
+>   
+> +	if (ac > 1 && !strcmp(av[1], "emulation"))
+> +		check_emulated_instr();
+> +
+>   	if (rdmsr(MSR_IA32_PERF_CAPABILITIES) & PMU_CAP_FW_WRITES) {
+>   		gp_counter_base = MSR_IA32_PMC0;
+>   		report_prefix_push("full-width writes");
+> diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+> index 3000e53c790f..2aedb24dc4ff 100644
+> --- a/x86/unittests.cfg
+> +++ b/x86/unittests.cfg
+> @@ -185,6 +185,13 @@ extra_params = -cpu host,migratable=no
+>   check = /sys/module/kvm/parameters/ignore_msrs=N
+>   check = /proc/sys/kernel/nmi_watchdog=0
+>   
+> +[pmu_emulation]
+> +file = pmu.flat
+> +arch = x86_64
+> +extra_params = -cpu max -append emulation
+> +check = /sys/module/kvm_intel/parameters/force_emulation_prefix=Y
 
-Queued with some further edits and nested_vmx_check_address_state_size 
-renamed to nested_vmx_check_address_*space*_size.
+It's "/sys/module/kvm/parameters/force_emulation_prefix=Y",
 
-I think the "!!" are best left in place though, because "!!(a & b)" is 
-idiomatic. Comparing "!(a & b)" would leave the reader wondering about 
-the inversion, and "(bool)(a & b)" is just too ugly and magic.  The 
-compiler anyway converts the "!!" to "!= 0" very early on, and never 
-performs back-to-back logical NOTs.
+If it's N, we need a output like "FAIL: check_emulated_instr"
+rather than:
 
-Paolo
+Unhandled exception 6 #UD at ip 0000000000401387
+error_code=0000      rflags=00010046      cs=00000008
+rax=0000000000000000 rcx=00000000000000c2 rdx=00000000ffffffff rbx=00000000009509f4
+rbp=0000000000513730 rsi=0000000000000020 rdi=0000000000000034
+  r8=0000000000000000  r9=0000000000000020 r10=000000000000000d r11=0000000000000000
+r12=000000000000038e r13=0000000000000002 r14=0000000000513d80 r15=0000000000008603
+cr0=0000000080010011 cr2=0000000000000000 cr3=0000000001007000 cr4=0000000000000020
+cr8=0000000000000000
+	STACK: @401387 400384
 
+> +check = /proc/sys/kernel/nmi_watchdog=0
+> +
+>   [vmware_backdoors]
+>   file = vmware_backdoors.flat
+>   extra_params = -machine vmport=on -cpu max
+> 
