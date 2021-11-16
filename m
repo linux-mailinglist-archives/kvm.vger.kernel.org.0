@@ -2,112 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A709453927
-	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 19:05:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1A52345394C
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 19:17:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239314AbhKPSIg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Nov 2021 13:08:36 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:41961 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236111AbhKPSIf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 16 Nov 2021 13:08:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637085938;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=An3R7sbO8BRoRTtSuF9+W/xtuCKLYLtDnsHgmi8nBG0=;
-        b=fnNiffaeID5Rhi3KkLbWbTiWP3SCVVwwSujkh2duPfpemEbZ2LpVHWeh/yenqLAh/eH+2A
-        Fgw2/hCpsv8t+aPXOrM4zDvAPvogbmTQeZYobE+V7YZA7bP20vQmccQFNsJyfaVUspm9w9
-        BWFlXMeh6ibuOYGciudMRTnf1Z524PE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-70-2889ANNLNnuXdKbCUVQxIw-1; Tue, 16 Nov 2021 13:05:36 -0500
-X-MC-Unique: 2889ANNLNnuXdKbCUVQxIw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D326D102CC41;
-        Tue, 16 Nov 2021 18:05:34 +0000 (UTC)
-Received: from [10.39.192.245] (unknown [10.39.192.245])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0EEFE5DF56;
-        Tue, 16 Nov 2021 18:05:29 +0000 (UTC)
-Message-ID: <8a762a6b-4ad8-211f-f350-ba65f8e77b64@redhat.com>
-Date:   Tue, 16 Nov 2021 19:05:28 +0100
+        id S239362AbhKPSTf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Nov 2021 13:19:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36168 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231484AbhKPSTe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Nov 2021 13:19:34 -0500
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0410EC061570
+        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 10:16:37 -0800 (PST)
+Received: by mail-lf1-x135.google.com with SMTP id y26so55526665lfa.11
+        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 10:16:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=wD4FHaq/A31lK/F/hM3HFoBBxkhquyn2APzkV6254nc=;
+        b=rGrA37i63tbk+RPlyXgWrmx2if/sLivGebBLR5iAG68tirdyCcGo3fixQJpJp3hdRN
+         cWJwr1UwAxLsrqe0aOsa8zoLlTilWf2OWjIut5lqBRPHwraYM7e7/8ag4qzsNOkJ3zoQ
+         twHbTUz/JcFB1OKnimgjPjuoLXoZS3D753rPo9rjRX6xKJt5vaemP+PTIMIlpY6uFdUq
+         2PJ+vJV0yYoUYUfvTzbBNrwtZ5evQU4qwhzn/+3MqlR6xJwwV2uHrLsJf/ewTfsEYV86
+         /wtMEJXHUhi9B8Unf2MkyxYvgZ8htvkg7r+VaV6y/0YrhZvspPeMu0i3AbyiaBa4fZBc
+         Wf5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=wD4FHaq/A31lK/F/hM3HFoBBxkhquyn2APzkV6254nc=;
+        b=otAb6J/I/ZOgmiPso80nwDzqqAj1lW6hM2JYfe3QbnasQRgg3TtqrHay+zsrL0AtC1
+         k4bFks7YH7SChpU6vtzo2sGONyp6wb+/AJg93N0sqcOcPy+pDkB2QdSxBWhXSM0ea3np
+         yTlUP2Lu+9YBZsKtwgqWitEiMlf2fhLa9X3FqvQygwoHeBL3JSK3hnKKKEj10ku7amx4
+         MaQKxlIleeQ/zaxZxVH0ta2FJ55Q8BIv1LsmNmlA7JlYe3Zzakar/n5DvGAKm55Tp2w4
+         X+VwjHpEQeSCpBLTfE0Y8Gbpcl3IMJMPmMFWGzPtbqG7uSDRY2nADXlxEVoMGyomGi3V
+         8nJQ==
+X-Gm-Message-State: AOAM530VFoQlbslnIBhhNuCeMBxqCNIXHoquEKUuXQhvrL6nG9jcunt8
+        50VW2eGfvSoKOn9yw4R/R04alRX2dHXwYl+CxNErfw==
+X-Google-Smtp-Source: ABdhPJz22M5YHyoZufeoG88HGxpDeWcfc9qHrxrb/dVyH0ozZxs2JGFSJRmo2M32UCRrmxCQ+fJO5I5u1DpyGu/dHWE=
+X-Received: by 2002:a05:6512:3d16:: with SMTP id d22mr8286468lfv.523.1637086595150;
+ Tue, 16 Nov 2021 10:16:35 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH 3/4] Documentation: update vcpu-requests.rst reference
-Content-Language: en-US
-To:     Anup Patel <anup@brainfault.org>
-Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Anup Patel <anup.patel@wdc.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        kvm-riscv@lists.infradead.org, KVM General <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>
-References: <cover.1637064577.git.mchehab+huawei@kernel.org>
- <32b3693314f3914f10a42dea97ad6e06292fcd4a.1637064577.git.mchehab+huawei@kernel.org>
- <34e691ec-a58d-c86b-a2ef-6fa4f0385b69@redhat.com>
- <CAAhSdy0JRTwmr+EdSEr3ng1gfDpqnF7m3ejC2AydjAgu0mEQLw@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <CAAhSdy0JRTwmr+EdSEr3ng1gfDpqnF7m3ejC2AydjAgu0mEQLw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+References: <20211114164312.GA28736@makvihas> <87o86leo34.fsf@redhat.com> <04b7e240-8e1d-1402-3cef-e65469bd9317@redhat.com>
+In-Reply-To: <04b7e240-8e1d-1402-3cef-e65469bd9317@redhat.com>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Tue, 16 Nov 2021 10:16:22 -0800
+Message-ID: <CAKwvOdmy6Fo-FvximsRN+i0sZ5ZgWjWdD-m2fLN-rhvBuqO9mw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: fix cocci warnings
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        David Bolvansky <david.bolvansky@gmail.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Vihas Mak <makvihas@gmail.com>, seanjc@google.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/16/21 15:01, Anup Patel wrote:
-> On Tue, Nov 16, 2021 at 6:24 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->>
->> On 11/16/21 13:11, Mauro Carvalho Chehab wrote:
->>> Changeset 2f5947dfcaec ("Documentation: move Documentation/virtual to Documentation/virt")
->>> renamed: Documentation/virtual/kvm/vcpu-requests.rst
->>> to: Documentation/virt/kvm/vcpu-requests.rst.
->>>
->>> Update its cross-reference accordingly.
->>>
->>> Fixes: 2f5947dfcaec ("Documentation: move Documentation/virtual to Documentation/virt")
->>> Reviewed-by: Anup Patel <anup.patel@wdc.com>
->>> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
->>> ---
->>>
->>> To mailbombing on a large number of people, only mailing lists were C/C on the cover.
->>> See [PATCH 0/4] at: https://lore.kernel.org/all/cover.1637064577.git.mchehab+huawei@kernel.org/
->>>
->>>    arch/riscv/kvm/vcpu.c | 2 +-
->>>    1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
->>> index e3d3aed46184..fb84619df012 100644
->>> --- a/arch/riscv/kvm/vcpu.c
->>> +++ b/arch/riscv/kvm/vcpu.c
->>> @@ -740,7 +740,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->>>                 * Ensure we set mode to IN_GUEST_MODE after we disable
->>>                 * interrupts and before the final VCPU requests check.
->>>                 * See the comment in kvm_vcpu_exiting_guest_mode() and
->>> -              * Documentation/virtual/kvm/vcpu-requests.rst
->>> +              * Documentation/virt/kvm/vcpu-requests.rst
->>>                 */
->>>                vcpu->mode = IN_GUEST_MODE;
->>>
->>>
->>
->> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-> 
-> Thanks Paolo, let me know if you want me to include this patch
-> as part of the fixes I have collected.
+On Tue, Nov 16, 2021 at 1:50 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 11/15/21 10:59, Vitaly Kuznetsov wrote:
+> > One minor remark: 'kvm_set_pte_rmapp()' handler is passed to
+> > 'kvm_handle_gfn_range()' which does
+> >
+> >          bool ret = false;
+> >
+> >          for_each_slot_rmap_range(...)
+> >                  ret |= handler(...);
+> >
+> > and I find '|=' to not be very natural with booleans. I'm not sure it's
+> > worth changing though.
+>
+> Changing that would be "harder" than it seems because "ret = ret ||
+> handler(...)" is wrong, and "|" is even more unnatural than "|=" (so
+> much that clang warns about it).
+>
+> In fact I wonder if "|=" with a bool might end up warning with clang,
+> which we should check before applying this patch.  It doesn't seem to be
+> in the original commit[1], but better safe than sorry: Nick, does clang
+> intend to warn also about "ret |= fn()" and "ret &= fn()"?  Technically,
+> it is a bitwise operation with side-effects in the RHS.
 
-I think Mauro will handle it, but you can pick it as well.
+I think that warning had more to due with typo's where `||` or `&&`
+was meant (to short circuit the side effects) but `|` or `&` was typed
+by accident, keeping both side effects.  I'm not sure what the typo
+would be in `ret |= fn();`.
 
-Paolo
+>
+> Paolo
+>
+> [1] https://github.com/llvm/llvm-project/commit/f59cc9542bfb461
+>
 
+
+-- 
+Thanks,
+~Nick Desaulniers
