@@ -2,124 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7503B45398B
-	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 19:44:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C457453994
+	for <lists+kvm@lfdr.de>; Tue, 16 Nov 2021 19:46:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239449AbhKPSq6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Nov 2021 13:46:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42458 "EHLO
+        id S239186AbhKPStF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Nov 2021 13:49:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239515AbhKPSqz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Nov 2021 13:46:55 -0500
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34886C061570
-        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 10:43:58 -0800 (PST)
-Received: by mail-pl1-x62e.google.com with SMTP id b13so18265287plg.2
-        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 10:43:58 -0800 (PST)
+        with ESMTP id S229539AbhKPStD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Nov 2021 13:49:03 -0500
+Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1144BC061570
+        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 10:46:06 -0800 (PST)
+Received: by mail-ed1-x530.google.com with SMTP id t5so6599836edd.0
+        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 10:46:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=GcGOJgSWz7oEIbfl5QNUvPpuAyaNetXEQN0oWs9ap2w=;
-        b=NfWEHKgpp9hvAVj4IrdvyWcutj+oRm5oA4DhrzE5j01yRw6SEr+OqI8zdgqPehlHuc
-         lvLy/whsET41Ju6UmVvOInCo7Ww6t6yLH5qUrncwy6VAmxauCnt99O3r1yirLCVccCfN
-         0Gay6uTBhe2zfp68q3FXHdSVfO1Z/lBlR6uw3b9mZM9XbPEBfKBoCa/a9sEvB1P9oZqk
-         5YTcHvsnOOA5rsa3JP9041e/6BOvKA/Xr3X/sbaLIuC63lGrovFZ7b1eudI5InxTZkUr
-         CdOzfVuUVUCDHbMPcWrZAb1YNJexcHENRayQEJiryVfwYQQPdJtpV9LDoK9LoF2MR12X
-         8enQ==
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=wlme9Vu6LOpFH3vZ4zLx5iBLJ/IVmnpXe5AaDfQWBPI=;
+        b=coMHiYQLowf1qs9I+Et8Rj+WyqWj6htDkH5dTi6nkWnAIWLkO+dhHDs0OQROGj0Ou7
+         XcAc+Qvj3rKfOlaZFDgTVSmnh1dCTeBRniytdQz/fvW89wYq3/HXBqYtTiOowOMo+Cut
+         o7kZsvE/ABF0eGCuoIx1KAtQvDnuHfEOcYo+Y5looILym1kcF19+4cWmtb4MjHzBFLCx
+         304FSTdeJ12Gj+h/gfJZqR3Ieq0R1N/Jv3T4GujtBaNXi1uElL+QhsXPOhmoUPv4QylD
+         qSauFvT+LH7YkK2Pq+++0/hn/doZrfefM/dVGGLE1LjSPYNy1bwFH00fUIB05qSnrnK2
+         Dy5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=GcGOJgSWz7oEIbfl5QNUvPpuAyaNetXEQN0oWs9ap2w=;
-        b=ha3jyQsqePPrFLYe2emVfOzkFy3fbk89w2WpruPwyEJeTnU2Lv7DjLsTedfN9WvNsR
-         t1DWF57MCkAKZWs0vvAs7heqvHvpzPCweIV0LR5pycMkuByLfbnSM4qoEoUl7hNAZuHz
-         4Q6Nugp7VlrsyhitHKRq9jB8K8weFPNoeh4brqZIPADCidHdL6RtJk4gjljEjmdYR2nq
-         S7K0Va8StQYHvOwoK7RvjwWjB8SqV63LZ7JRI1UIodieXK9bu9HX2SrJYK5q3xKIpjVg
-         lk3dfB6NjJ/Tz9Wi9d05vUYJR1BH09a0OlYsRlccxMP8Cua9MhV4FbqPSxmTH+IJzonI
-         jYNQ==
-X-Gm-Message-State: AOAM533Gu3GYllZWomzpxY/td+2pmlC4SUoa/jDqXUQZIaqjKPkHIme7
-        GMLnRcRuwRTY6sWlT4e26A8AGg==
-X-Google-Smtp-Source: ABdhPJy95F12FbARJJuG3RP+KItNypekR2/l+xifaD1kKSsYtJFW/+wQ/332xG0BY0Bxhx2ISOUtlQ==
-X-Received: by 2002:a17:90b:4b46:: with SMTP id mi6mr1449604pjb.188.1637088237573;
-        Tue, 16 Nov 2021 10:43:57 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id r8sm15237754pgp.30.2021.11.16.10.43.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Nov 2021 10:43:56 -0800 (PST)
-Date:   Tue, 16 Nov 2021 18:43:53 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>,
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=wlme9Vu6LOpFH3vZ4zLx5iBLJ/IVmnpXe5AaDfQWBPI=;
+        b=XGmhlPK66G6S7mPMhWoq2nAIgKkcosmD0UluaPYGKjf3W4XvdtO1d+HQk5s7pzaDeX
+         M7CgSEutGNbxvRvH5wpGzwH37Z7NP7g1u4/1SuzFiTHLC0cGE9j18r/jN8t4bV2ThvRQ
+         QEggw9XXX0HqLlGz83j4pHKZBmyh4rJ3THcLTiNA7KVVaGPC3e7Am4TBPqWd71MORFip
+         Z9nvxuZfMzr7rubVoUOIXWBQnVlpx1E+BS8fBvfz0rO3ZkE+bt0ucJM1CbkpmtMwYlte
+         gYGc2OecKz4cgbHNQ4RI6PPLxI64OzESa2rI1FhQkig4xzmpEiJ2gYMle7r44aCpWLpC
+         iyWA==
+X-Gm-Message-State: AOAM532sQnncGkTVal9WP+4cE4KdnRKxPGj14m30RLQC8BPwh5OFtIwI
+        fyGjfLtccpYUFvPRCU6TYPo=
+X-Google-Smtp-Source: ABdhPJze/cSzon/weyxHLIEFfzPJ52f1Jk2j6w0pMOWnJ0tgRpHLYyN3rr0fnW0hyV6Epl3WGCpUSA==
+X-Received: by 2002:a17:906:1396:: with SMTP id f22mr13071064ejc.228.1637088364620;
+        Tue, 16 Nov 2021 10:46:04 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id m6sm3195890edc.36.2021.11.16.10.46.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 16 Nov 2021 10:46:04 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <cfa1a13d-5ad2-3ca4-147e-84273ffa2f38@gnu.org>
+Date:   Tue, 16 Nov 2021 19:46:03 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [RFC PATCH 0/11] Rework gfn_to_pfn_cache
+Content-Language: en-US
+To:     David Woodhouse <dwmw2@infradead.org>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     kvm <kvm@vger.kernel.org>,
         Boris Ostrovsky <boris.ostrovsky@oracle.com>,
         Joao Martins <joao.m.martins@oracle.com>,
-        "jmattson @ google . com" <jmattson@google.com>,
-        "wanpengli @ tencent . com" <wanpengli@tencent.com>,
-        "vkuznets @ redhat . com" <vkuznets@redhat.com>,
-        "mtosatti @ redhat . com" <mtosatti@redhat.com>,
-        "joro @ 8bytes . org" <joro@8bytes.org>, karahmed@amazon.com,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org
-Subject: Re: [PATCH 6/7] KVM: powerpc: Use Makefile.kvm for common files
-Message-ID: <YZP76Un0mip17E1K@google.com>
-References: <5047c2591310e503491850ef683f251395247d50.camel@infradead.org>
- <20211116115051.119956-1-dwmw2@infradead.org>
- <20211116115051.119956-6-dwmw2@infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20211116115051.119956-6-dwmw2@infradead.org>
+        "jmattson@google.com" <jmattson@google.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "mtosatti@redhat.com" <mtosatti@redhat.com>,
+        "joro@8bytes.org" <joro@8bytes.org>, karahmed@amazon.com
+References: <2b400dbb16818da49fb599b9182788ff9896dcda.camel@infradead.org>
+ <7e4b895b-8f36-69cb-10a9-0b4139b9eb79@redhat.com>
+ <95fae9cf56b1a7f0a5f2b9a1934e29e924908ff2.camel@infradead.org>
+ <3a2a9a8c-db98-b770-78e2-79f5880ce4ed@redhat.com>
+ <2c7eee5179d67694917a5a0d10db1bce24af61bf.camel@infradead.org>
+ <537a1d4e-9168-cd4a-cd2f-cddfd8733b05@redhat.com>
+ <YZLmapmzs7sLpu/L@google.com>
+ <57d599584ace8ab410b9b14569f434028e2cf642.camel@infradead.org>
+ <94bb55e117287e07ba74de2034800da5ba4398d2.camel@infradead.org>
+ <04bf7e8b-d0d7-0eb6-4d15-bfe4999f42f8@redhat.com>
+ <19bf769ef623e0392016975b12133d9a3be210b3.camel@infradead.org>
+ <ad0648ac-b72a-1692-c608-b37109b3d250@redhat.com>
+ <126b7fcbfa78988b0fceb35f86588bd3d5aae837.camel@infradead.org>
+ <02cdb0b0-c7b0-34c5-63c1-aec0e0b14cf7@redhat.com>
+ <9733f477bada4cc311078be529b7118f1dec25bb.camel@infradead.org>
+ <1b8af2ad-17f8-8c22-d0d5-35332e919104@gnu.org>
+ <7bcb9dafa55c283f9f9d0b841f4a53f0b6b3286d.camel@infradead.org>
+From:   Paolo Bonzini <bonzini@gnu.org>
+In-Reply-To: <7bcb9dafa55c283f9f9d0b841f4a53f0b6b3286d.camel@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 16, 2021, David Woodhouse wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
+On 11/16/21 18:57, David Woodhouse wrote:
+>>> +		read_lock(&gpc->lock);
+>>> +		if (!kvm_gfn_to_pfn_cache_check(vcpu->kvm, gpc, gpc->gpa, PAGE_SIZE)) {
+>>> +			read_unlock(&gpc->lock);
+>>>    			goto mmio_needed;
+>>> +		}
+>>> +
+>>> +		vapic_page = gpc->khva;
+>> If we know this gpc is of the synchronous kind, I think we can skip the
+>> read_lock/read_unlock here?!?
+> Er... this one was OUTSIDE_GUEST_MODE and is the atomic kind, which
+> means it needs to hold the lock for the duration of the access in order
+> to prevent (preemption and) racing with the invalidate?
 > 
-> It's all fairly baroque but in the end, I don't think there's any reason
-> for $(KVM)/irqchip.o to have been handled differently, as they all end
-> up in $(kvm-y) in the end anyway, regardless of whether they get there
-> via $(common-objs-y) and the CPU-specific object lists.
-> 
-> The generic Makefile.kvm uses HAVE_KVM_IRQCHIP for irqchip.o instead of
-> HAVE_KVM_IRQ_ROUTING. That change is fine (and arguably correct) because
-> they are both set together for KVM_MPIC, or neither is set.
+> It's the IN_GUEST_MODE one (in my check_guest_maps()) where we might
+> get away without the lock, perhaps?
 
-Nope.
+Ah, this is check_nested_events which is mostly IN_GUEST_MODE but not 
+always (and that sucks for other reasons).  I'll think a bit more about 
+it when I actually do the work.
 
-  Symbol: HAVE_KVM_IRQCHIP [=y]
-  Type  : bool
-  Defined at virt/kvm/Kconfig:7
-  Selected by [m]:
-    - KVM_XICS [=y] && VIRTUALIZATION [=y] && KVM_BOOK3S_64 [=m] && !KVM_MPIC [=n]
-  Selected by [n]:
-    - KVM_MPIC [=n] && VIRTUALIZATION [=y] && KVM [=y] && E500 [=n]
+>>>    		__kvm_apic_update_irr(vmx->nested.pi_desc->pir,
+>>>    			vapic_page, &max_irr);
+>>> @@ -3749,6 +3783,7 @@ static int vmx_complete_nested_posted_interrupt(struct kvm_vcpu *vcpu)
+>>>    			status |= (u8)max_irr;
+>>>    			vmcs_write16(GUEST_INTR_STATUS, status);
+>>>    		}
+>>> +		read_unlock(&gpc->lock);
+>>>    	}
+>>>    
+> I just realised that the mark_page_dirty() on invalidation and when the
+> the irqfd workqueue refreshes the gpc might fall foul of the same
+> dirty_ring problem that I belatedly just spotted with the Xen shinfo
+> clock write. I'll fix it up to*always*  require a vcpu (to be
+> associated with the writes), and reinstate the guest_uses_pa flag since
+> that can no longer in implicit in (vcpu!=NULL).
 
-leads to this and a whole pile of other errors
+Okay.
 
-arch/powerpc/kvm/../../../virt/kvm/irqchip.c: In function ‘kvm_irq_map_gsi’:
-arch/powerpc/kvm/../../../virt/kvm/irqchip.c:31:35: error: invalid use of undefined type ‘struct kvm_irq_routing_table’
-   31 |         if (irq_rt && gsi < irq_rt->nr_rt_entries) {
-      |                                   ^~
+> I may leave the actual task of fixing nesting to you, if that's OK, as
+> long as we consider the new gfn_to_pfn_cache sufficient to address the
+> problem? I think it's mostly down to how we*use*  it now, rather than
+> the fundamental design of cache itself?
 
+Yes, I agree.  Just stick whatever you have for nesting as an extra 
+patch at the end, and I'll take it from there.
 
-Side topic, please don't post a new version/series in-reply-to a different series.
-b4 also gets confused in this case, e.g. it tried to grab the original patch.  b4
-has also made me really lazy, heaven forbid I actually had to manually grab these
-from mutt :-)
+Paolo
