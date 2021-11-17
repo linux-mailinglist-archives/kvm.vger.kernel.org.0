@@ -2,110 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 26E7F454B49
-	for <lists+kvm@lfdr.de>; Wed, 17 Nov 2021 17:46:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 867F1454B5B
+	for <lists+kvm@lfdr.de>; Wed, 17 Nov 2021 17:49:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239216AbhKQQtG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Nov 2021 11:49:06 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45154 "EHLO
+        id S233627AbhKQQwX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Nov 2021 11:52:23 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:38473 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238922AbhKQQtF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 17 Nov 2021 11:49:05 -0500
+        by vger.kernel.org with ESMTP id S239269AbhKQQwU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 17 Nov 2021 11:52:20 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637167566;
+        s=mimecast20190719; t=1637167761;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=fhLSkq7C8N1ez43dYmKR5gusfkLEVqMLGom5ncEvLCA=;
-        b=T2BJKNGzQxkXTHOQBx8L3qHNFvcqiiGe+aaapQm/xUui5/F/e4s20bpulP1S2kYrJRqRyQ
-        7NDNVj9teaWE3MbZayVJ0eT9si+8wBgIt8vywoyM/YfBSxz3R1F1LwREGVzAnPt5CRhtbe
-        teHfF0MVqOix5TIe8cfxzBOqAHKEycQ=
+        bh=5r31ohO67CMQ07xbtqMClO0q3GCnOKbm6lne2ReCfu4=;
+        b=LDc2fhjWTmW89Z3xlrjzOKoA9WbVHJlJ1KG7jtklFpATxNk2z1dMDLcb58G54ZZxOFaXmv
+        rgERmvWj0c7fcG8bbcjrz2xBr2YpWi0jYk7Yek50UiP/TNGXVK2w/vfw5KTEU7tjaAScZU
+        dYkFuRSY9+84q/e4BR3DSzTHYDeRWOU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-222-FYk1g7h7M023ldpfNuw1uQ-1; Wed, 17 Nov 2021 11:46:01 -0500
-X-MC-Unique: FYk1g7h7M023ldpfNuw1uQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-598-FhPu6gN2MEi6jY6JEq2JfQ-1; Wed, 17 Nov 2021 11:49:17 -0500
+X-MC-Unique: FhPu6gN2MEi6jY6JEq2JfQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D63B180DDEB;
-        Wed, 17 Nov 2021 16:45:58 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD1FA87D541;
+        Wed, 17 Nov 2021 16:49:16 +0000 (UTC)
 Received: from [10.39.192.245] (unknown [10.39.192.245])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CD74F5D9DE;
-        Wed, 17 Nov 2021 16:45:55 +0000 (UTC)
-Message-ID: <d95f29e5-efef-4a58-420c-a446c3a684e9@redhat.com>
-Date:   Wed, 17 Nov 2021 17:45:54 +0100
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A7BF560C13;
+        Wed, 17 Nov 2021 16:49:15 +0000 (UTC)
+Message-ID: <20eddd70-7abb-e1a8-a003-62ed08fc1cac@redhat.com>
+Date:   Wed, 17 Nov 2021 17:49:14 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.2.0
-Subject: Re: [PATCH 1/2] KVM: x86/mmu: Skip tlb flush if it has been done in
- zap_gfn_range()
+Subject: Re: There is a null-ptr-deref bug in kvm_dirty_ring_get in
+ virt/kvm/dirty_ring.c
 Content-Language: en-US
-To:     Hou Wenlong <houwenlong93@linux.alibaba.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        linux-kernel@vger.kernel.org
-References: <5e16546e228877a4d974f8c0e448a93d52c7a5a9.1637140154.git.houwenlong93@linux.alibaba.com>
+To:     "Woodhouse, David" <dwmw@amazon.co.uk>,
+        "butterflyhuangxx@gmail.com" <butterflyhuangxx@gmail.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <CAFcO6XOmoS7EacN_n6v4Txk7xL7iqRa2gABg3F7E3Naf5uG94g@mail.gmail.com>
+ <9eb83cdd-9314-0d1f-0d4b-0cf4432e1e84@redhat.com>
+ <4b739ed0ce31e459eb8af9f5b0e2b1516d8e4517.camel@amazon.co.uk>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <5e16546e228877a4d974f8c0e448a93d52c7a5a9.1637140154.git.houwenlong93@linux.alibaba.com>
+In-Reply-To: <4b739ed0ce31e459eb8af9f5b0e2b1516d8e4517.camel@amazon.co.uk>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/17/21 10:20, Hou Wenlong wrote:
-> If the parameter flush is set, zap_gfn_range() would flush remote tlb
-> when yield, then tlb flush is not needed outside. So use the return
-> value of zap_gfn_range() directly instead of OR on it in
-> kvm_unmap_gfn_range() and kvm_tdp_mmu_unmap_gfn_range().
+On 11/17/21 10:46, Woodhouse, David wrote:
+>> The remaining
+>> option would be just "do not mark the page as dirty if the ring buffer
+>> is active".  This is feasible because userspace itself has passed the
+>> shared info gfn; but again, it's ugly...
+> I think I am coming to quite like that 'remaining option' as long as we
+> rephrase it as follows:
 > 
-> Fixes: 3039bcc744980 ("KVM: Move x86's MMU notifier memslot walkers to generic code")
-> Signed-off-by: Hou Wenlong <houwenlong93@linux.alibaba.com>
-> ---
->   arch/x86/kvm/mmu/mmu.c     | 2 +-
->   arch/x86/kvm/mmu/tdp_mmu.c | 4 ++--
->   2 files changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 354d2ca92df4..d57319e596a9 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -1582,7 +1582,7 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
->   		flush = kvm_handle_gfn_range(kvm, range, kvm_unmap_rmapp);
->   
->   	if (is_tdp_mmu_enabled(kvm))
-> -		flush |= kvm_tdp_mmu_unmap_gfn_range(kvm, range, flush);
-> +		flush = kvm_tdp_mmu_unmap_gfn_range(kvm, range, flush);
->   
->   	return flush;
->   }
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 7c5dd83e52de..9d03f5b127dc 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -1034,8 +1034,8 @@ bool kvm_tdp_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range,
->   	struct kvm_mmu_page *root;
->   
->   	for_each_tdp_mmu_root(kvm, root, range->slot->as_id)
-> -		flush |= zap_gfn_range(kvm, root, range->start, range->end,
-> -				       range->may_block, flush, false);
-> +		flush = zap_gfn_range(kvm, root, range->start, range->end,
-> +				      range->may_block, flush, false);
->   
->   	return flush;
->   }
-> 
+>   KVM does not mark the shared_info page as dirty, and userspace is
+>   expected to*assume*  that it is dirty at all times. It's used for
+>   delivering event channel interrupts and the overhead of marking it
+>   dirty each time is just pointless.
 
-Queued both, thanks.
+For the case of dirty-bitmap, one solution could be to only set a bool 
+and actually mark the page dirty lazily, at the time of 
+KVM_GET_DIRTY_LOG.  For dirty-ring, I agree that it's easiest if 
+userspace just "knows" the page is dirty.
 
 Paolo
 
