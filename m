@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 13C8545416F
+	by mail.lfdr.de (Postfix) with ESMTP id 5C4A6454170
 	for <lists+kvm@lfdr.de>; Wed, 17 Nov 2021 07:54:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234010AbhKQG4t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Nov 2021 01:56:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36960 "EHLO
+        id S233996AbhKQG4w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Nov 2021 01:56:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233993AbhKQG4q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Nov 2021 01:56:46 -0500
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5F44C061746
-        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 22:53:48 -0800 (PST)
-Received: by mail-pl1-x649.google.com with SMTP id v23-20020a170902bf9700b001421d86afc4so569289pls.9
-        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 22:53:48 -0800 (PST)
+        with ESMTP id S233993AbhKQG4u (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Nov 2021 01:56:50 -0500
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 651C4C061206
+        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 22:53:50 -0800 (PST)
+Received: by mail-pg1-x549.google.com with SMTP id z5-20020a631905000000b002e79413f1caso718139pgl.8
+        for <kvm@vger.kernel.org>; Tue, 16 Nov 2021 22:53:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=ap+PS7CD+HFBr7r8+vNbRPns4hwGZn9RZNY8Os9x/I8=;
-        b=ME8TBN6HNLGOmfWdS07tu+6rYpz8jFnzNkaM3AZinIB5Y5rSPGGpQSiFoHOMsTPTgR
-         KB+BXxWvxfUtevsqjCwhMzybSqT2HJRuVPaCCd/iP0EHRDDmNTDBaeXD6IeucnltyX5V
-         8wnPTb44HXZ181eXmc6VngO8oBOrDFP/wOdDuIZ/b2iUw1nXOCxe/qQQDzlTxnRj9lWe
-         PPrXTJyGtiFWiEThG9Z1i55BWOYWpWgTv911tEvlcAKzKXMTlxqzPfA2Mu/keixChqpF
-         HDJwXVj3GrfQzaJ0SeyfC97K4M+g6d/bN1Vn2cnoPn7etEJqpn3cb/dJU0o0svqJNUax
-         y3NA==
+        bh=l9cL+44fLGdDyYUFjHlYq+dL32isCwZtQcuWO6mBjWA=;
+        b=o36k6i54cI44CkxNoyng06/1cnBbAHYmtiCr8v2I/KDJLlWFA9DKoh2o8QlHJ4ioDR
+         ZBxEhJYYuxUj3CTLSPaVa+LdwzJtLW5vmimI7ZyOL/v2EdkMBv8s7Zb8aNQg1qDNc1Ji
+         0DxExQLqbrEaTySPkb4iHM10iwaD6drKdifBiW/5Im3Zz2e/K9hPnXG1khJlse+zcZfe
+         e1gO5CpHsd0NA0rBCs8UNOzB5v4100BqKNd+PqC7I11geGCXteo1kcbBCX3QdXqmulGu
+         Uet1f3rbkcNvy1NTGYTYO05MVb+WFisTpVESqHDn9yTzGcCfcX+q2hF+HlQKq8DvKfbW
+         rToA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=ap+PS7CD+HFBr7r8+vNbRPns4hwGZn9RZNY8Os9x/I8=;
-        b=Bns02ssL5xUfwQqXXtDci11Eqo2i18iTL31K0k3XmOuCL8PJlKABy38VT0PhmZZFib
-         ap8l5vkwE1hnAb9Laq9ZV6mIz+Zus6MMmH+cnIF9AOmRJI7XrBVpKdQAQbAhRZ6+68/x
-         YYElzP1d220NZmXihDhShAb5UdiVrbUDgX42CAofkm3ZUkW+4AvOd/K4pMLA2PpIn9QE
-         pnuJi+2djHuobIxOLsYk6+TuTa3LFhFB3xJmYlEWLT6Jt5FttRmBdV1If3ORIcLOz7vK
-         wPMWi6hVt8ziI+12dmy3LlqNrsA/A/SCDwgSpvUatCvBH58Vvh/ypuZKWwdGaUda46ab
-         gYUw==
-X-Gm-Message-State: AOAM532e76CRIIWClhuaR8sxRs3DkMUF+HBYKkmGOVIGhd1I2Fwjm0Gj
-        yQ4dG2+MM5FizszwMaKFGLV5yngi7H8=
-X-Google-Smtp-Source: ABdhPJx22jUgmf1vQhrGDnEI3IA2ofCSFdssKrHCARSsL9OdUAakMfgccLuH/dwXswlHbXm2xj+dGZ0IezE=
+        bh=l9cL+44fLGdDyYUFjHlYq+dL32isCwZtQcuWO6mBjWA=;
+        b=hyTnUANKrk1YEBLzaehGsYmkL7agstakPfgm4t06NZq6n6X+T0r7IoO0RL/AR1HhV6
+         LSpis4x6cEiubedCjTwdjwpArlZIkMNcGYMAfSxmTxQbXVSmvLoni5o6vEiJc5bOJnFv
+         KpO4gAK6TsBUkcopDNU4uDR5gU3PZ8J52hD/zsppVtT1iaPB/yVmI3ucFyiG5Xlviv2E
+         wwaoWmZnXyF5gf583du2Ww45LmyercPrGcvXXwsighS/sdtb9g9YtjrchF2GYPEUwfhj
+         o3T5EXXkZK3AuwL8olNRFk/qFd5kgq5QMjZmeHfFMW65q7H5mRGfFOQbDpJlacrt3Sax
+         m3jQ==
+X-Gm-Message-State: AOAM532NgviNuVm4lzQFDKa0yshVVLD5TvPhQaKvs/xu5obPszMYs+Id
+        0SYxyv18aIx0HDfU2910G6bBHodCuu0=
+X-Google-Smtp-Source: ABdhPJx9DDeQMUXc6095SOTfgNA0s7/GlZiDRs9vbKaSt1H48YgTnr7zDO2ifTxH2Q2Olse8b10fDPjrRfI=
 X-Received: from reiji-vws-sp.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3d59])
- (user=reijiw job=sendgmr) by 2002:a17:90b:3509:: with SMTP id
- ls9mr6754492pjb.99.1637132028334; Tue, 16 Nov 2021 22:53:48 -0800 (PST)
-Date:   Tue, 16 Nov 2021 22:43:55 -0800
+ (user=reijiw job=sendgmr) by 2002:a17:90a:df97:: with SMTP id
+ p23mr6831251pjv.3.1637132029846; Tue, 16 Nov 2021 22:53:49 -0800 (PST)
+Date:   Tue, 16 Nov 2021 22:43:56 -0800
 In-Reply-To: <20211117064359.2362060-1-reijiw@google.com>
-Message-Id: <20211117064359.2362060-26-reijiw@google.com>
+Message-Id: <20211117064359.2362060-27-reijiw@google.com>
 Mime-Version: 1.0
 References: <20211117064359.2362060-1-reijiw@google.com>
 X-Mailer: git-send-email 2.34.0.rc1.387.gb447b232ab-goog
-Subject: [RFC PATCH v3 25/29] KVM: arm64: Trap disabled features of ID_AA64MMFR1_EL1
+Subject: [RFC PATCH v3 26/29] KVM: arm64: Trap disabled features of ID_AA64ISAR1_EL1
 From:   Reiji Watanabe <reijiw@google.com>
 To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu
 Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
@@ -72,75 +72,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add feature_config_ctrl for LORegions, which is indicated in
-ID_AA64MMFR1_EL1, to program configuration register to trap
+Add feature_config_ctrl for PTRAUTH, which is indicated in
+ID_AA64ISAR1_EL1, to program configuration register to trap
 guest's using the feature when it is not exposed to the guest.
-
-Change trap_loregion() to use vcpu_feature_is_available()
-to simplify checking of the feature's availability.
 
 Signed-off-by: Reiji Watanabe <reijiw@google.com>
 ---
- arch/arm64/kvm/sys_regs.c | 23 +++++++++++++++++++++--
- 1 file changed, 21 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index cb18d1fe0658..3d3b29515b8b 100644
+index 3d3b29515b8b..f1f975ce7b07 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -469,6 +469,17 @@ static struct feature_config_ctrl ftr_ctrl_tracefilt = {
- 	.cfg_val = MDCR_EL2_TTRF,
+@@ -376,6 +376,30 @@ static int arm64_check_features(u64 check_types, u64 val, u64 lim)
+ 	(cpuid_feature_extract_unsigned_field(val, ID_AA64ISAR1_GPI_SHIFT) >= \
+ 	 ID_AA64ISAR1_GPI_IMP_DEF)
+ 
++/*
++ * Return true if ptrauth needs to be trapped.
++ * (i.e. if ptrauth is supported on the host but not exposed to the guest)
++ */
++static bool vcpu_need_trap_ptrauth(struct kvm_vcpu *vcpu)
++{
++	u64 val;
++	bool generic, address;
++
++	if (!system_has_full_ptr_auth())
++		/* The feature is not supported. */
++		return false;
++
++	val = __read_id_reg(vcpu, SYS_ID_AA64ISAR1_EL1);
++	generic = aa64isar1_has_gpi(val) || aa64isar1_has_gpa(val);
++	address = aa64isar1_has_api(val) || aa64isar1_has_apa(val);
++	if (generic && address)
++		/* The feature is available. */
++		return false;
++
++	/* The feature is supported but hidden. */
++	return true;
++}
++
+ enum vcpu_config_reg {
+ 	VCPU_HCR_EL2 = 1,
+ 	VCPU_MDCR_EL2,
+@@ -480,6 +504,14 @@ static struct feature_config_ctrl ftr_ctrl_lor = {
+ 	.cfg_val = HCR_TLOR,
  };
  
-+/* For ID_AA64MMFR1_EL1 */
-+static struct feature_config_ctrl ftr_ctrl_lor = {
-+	.ftr_reg = SYS_ID_AA64MMFR1_EL1,
-+	.ftr_shift = ID_AA64MMFR1_LOR_SHIFT,
-+	.ftr_min = 1,
-+	.ftr_signed = FTR_UNSIGNED,
++/* For SYS_ID_AA64ISAR1_EL1 */
++static struct feature_config_ctrl ftr_ctrl_ptrauth = {
++	.ftr_need_trap = vcpu_need_trap_ptrauth,
 +	.cfg_reg = VCPU_HCR_EL2,
-+	.cfg_mask = HCR_TLOR,
-+	.cfg_val = HCR_TLOR,
++	.cfg_mask = (HCR_API | HCR_APK),
++	.cfg_val = 0,
 +};
 +
  struct id_reg_info {
  	u32	sys_reg;	/* Register ID */
  	u64	sys_val;	/* Sanitized system value */
-@@ -992,6 +1003,14 @@ static struct id_reg_info id_aa64dfr0_el1_info = {
- 	},
- };
- 
-+static struct id_reg_info id_aa64mmfr1_el1_info = {
-+	.sys_reg = SYS_ID_AA64MMFR1_EL1,
+@@ -977,6 +1009,10 @@ static struct id_reg_info id_aa64isar1_el1_info = {
+ 	.init = init_id_aa64isar1_el1_info,
+ 	.validate = validate_id_aa64isar1_el1,
+ 	.get_reset_val = get_reset_id_aa64isar1_el1,
 +	.trap_features = &(const struct feature_config_ctrl *[]) {
-+		&ftr_ctrl_lor,
++		&ftr_ctrl_ptrauth,
 +		NULL,
 +	},
-+};
-+
- static struct id_reg_info id_dfr0_el1_info = {
- 	.sys_reg = SYS_ID_DFR0_EL1,
- 	.init = init_id_dfr0_el1_info,
-@@ -1034,6 +1053,7 @@ static struct id_reg_info *id_reg_info_table[KVM_ARM_ID_REG_MAX_NUM] = {
- 	[IDREG_IDX(SYS_ID_AA64ISAR0_EL1)] = &id_aa64isar0_el1_info,
- 	[IDREG_IDX(SYS_ID_AA64ISAR1_EL1)] = &id_aa64isar1_el1_info,
- 	[IDREG_IDX(SYS_ID_AA64MMFR0_EL1)] = &id_aa64mmfr0_el1_info,
-+	[IDREG_IDX(SYS_ID_AA64MMFR1_EL1)] = &id_aa64mmfr1_el1_info,
  };
  
- static int validate_id_reg(struct kvm_vcpu *vcpu,
-@@ -1128,10 +1148,9 @@ static bool trap_loregion(struct kvm_vcpu *vcpu,
- 			  struct sys_reg_params *p,
- 			  const struct sys_reg_desc *r)
- {
--	u64 val = __read_id_reg(vcpu, SYS_ID_AA64MMFR1_EL1);
- 	u32 sr = reg_to_encoding(r);
- 
--	if (!(val & (0xfUL << ID_AA64MMFR1_LOR_SHIFT))) {
-+	if (!vcpu_feature_is_available(vcpu, &ftr_ctrl_lor)) {
- 		kvm_inject_undefined(vcpu);
- 		return false;
- 	}
+ static struct id_reg_info id_aa64mmfr0_el1_info = {
 -- 
 2.34.0.rc1.387.gb447b232ab-goog
 
