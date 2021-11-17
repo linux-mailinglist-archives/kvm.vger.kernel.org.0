@@ -2,331 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 00DAA454A38
-	for <lists+kvm@lfdr.de>; Wed, 17 Nov 2021 16:42:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 77AE3454A5D
+	for <lists+kvm@lfdr.de>; Wed, 17 Nov 2021 16:56:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238714AbhKQPpc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Nov 2021 10:45:32 -0500
-Received: from foss.arm.com ([217.140.110.172]:59282 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238369AbhKQPpR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Nov 2021 10:45:17 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8072911B3;
-        Wed, 17 Nov 2021 07:42:18 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 91E7D3F5A1;
-        Wed, 17 Nov 2021 07:42:16 -0800 (PST)
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     will@kernel.org, julien.thierry.kdev@gmail.com, maz@kernel.org,
-        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
-Cc:     Sudeep Holla <sudeep.holla@arm.com>,
-        Andrew Murray <andrew.murray@arm.com>
-Subject: [RFC PATCH v5 kvmtool 4/4] arm64: Add SPE support
-Date:   Wed, 17 Nov 2021 15:43:56 +0000
-Message-Id: <20211117154356.303039-5-alexandru.elisei@arm.com>
-X-Mailer: git-send-email 2.33.1
-In-Reply-To: <20211117154356.303039-1-alexandru.elisei@arm.com>
-References: <20211117154356.303039-1-alexandru.elisei@arm.com>
+        id S238803AbhKQP7E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Nov 2021 10:59:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48872 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229815AbhKQP7E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Nov 2021 10:59:04 -0500
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0910C061764
+        for <kvm@vger.kernel.org>; Wed, 17 Nov 2021 07:56:05 -0800 (PST)
+Received: by mail-pj1-x1031.google.com with SMTP id np6-20020a17090b4c4600b001a90b011e06so2950655pjb.5
+        for <kvm@vger.kernel.org>; Wed, 17 Nov 2021 07:56:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=m9J3GBVAIZFZGi0XXHxUVPqugO9FTJB0JnBQ/K1xQms=;
+        b=n3Yg+RFlsYoNf+IeW9+Y0IS9Y85tdUMEvNnklLZ20twSkUzFZl1K+t6UAVXra2Ss8m
+         NZrC9cx5JXcgJbQapuIDznZSvV2yUvKZXTxuQPVq7yG5lpBGATWRHP/Y5iuRcKDAhfOa
+         ONhGF8KxqB5xro2PENWRZdxgrBFWOWVzbG/X8a/2+KbrfuQVX3b9U9sMnjy9g7lY3nxf
+         S7u1CteYISimNVvuz/s6zp1slTFfbcIScmqmuI0r21o/iKytnH+E8R3koNj9fD8IJJvB
+         hBsbsU9ulAGltRlvUGjBCpKjWWHlMapjuohePs9hgLKvBtl75klzDMZR97Q/mC2k3m+R
+         Lyug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=m9J3GBVAIZFZGi0XXHxUVPqugO9FTJB0JnBQ/K1xQms=;
+        b=McRU8YA5F+1ZNTtJZdG533bdk1kRIecrUdTOeGJuZ/R1RCvEF7mF1evnDrs8jW8uWN
+         VPujbNGVqiF8CxYkT+nlViNTLCP4DRRVhpE6PQHyGW+0XYuF8RNuGlVEE2TKenXrG8TZ
+         EhpEjItEGJZP3ng1d+/24v3WVRt7JUY2Y60X8DLtuXsTOMCJGLLsODL6VNq/cP24uUeZ
+         nZ4qF1pqhHLXT6sLhgabNcszksh0HHEY4dpBBBRvsX5rV6H/e0kT93SPxdS5ildxN9P4
+         BUnK1BIeCPbD2EPgii14EBWs4bw0YMTD53VnuBfhib62pK+unsWpNqPd6RXr5kNDdaLi
+         3k2A==
+X-Gm-Message-State: AOAM532SMx+wG6ZDccsFON7P418xkOZ2egpPTXl3gMtuDq5mVM/ot2ee
+        1ZhXhZFX7XBDDFx8B0j2q5+YqActYUyCvw==
+X-Google-Smtp-Source: ABdhPJz2X15ilt4+tq6jfQ6bUTy4rzYV43+NVsGdegDpvtMFGx0QZwaLWYvTs00OhvCoTunsg8+1dw==
+X-Received: by 2002:a17:90a:384d:: with SMTP id l13mr848984pjf.104.1637164564540;
+        Wed, 17 Nov 2021 07:56:04 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id t40sm107973pfg.107.2021.11.17.07.56.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Nov 2021 07:56:03 -0800 (PST)
+Date:   Wed, 17 Nov 2021 15:56:00 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Hou Wenlong <houwenlong93@linux.alibaba.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] KVM: x86/mmu: Skip tlb flush if it has been done in
+ zap_gfn_range()
+Message-ID: <YZUmEHx6iE9Mr3Ls@google.com>
+References: <5e16546e228877a4d974f8c0e448a93d52c7a5a9.1637140154.git.houwenlong93@linux.alibaba.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5e16546e228877a4d974f8c0e448a93d52c7a5a9.1637140154.git.houwenlong93@linux.alibaba.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sudeep Holla <sudeep.holla@arm.com>
+On Wed, Nov 17, 2021, Hou Wenlong wrote:
+> If the parameter flush is set, zap_gfn_range() would flush remote tlb
+> when yield, then tlb flush is not needed outside. So use the return
+> value of zap_gfn_range() directly instead of OR on it in
+> kvm_unmap_gfn_range() and kvm_tdp_mmu_unmap_gfn_range().
+> 
+> Fixes: 3039bcc744980 ("KVM: Move x86's MMU notifier memslot walkers to generic code")
+> Signed-off-by: Hou Wenlong <houwenlong93@linux.alibaba.com>
+> ---
 
-Add a runtime configurable for kvmtool to enable SPE (Statistical
-Profiling Extensions) for each vcpu and to create a corresponding DT node.
-SPE is enabled at runtime with the --spe option.
+Ha, I fixed this in my local repo just yesterday :-)
 
-SPE is last to be initialized because it requires the VGIC to be
-initialized, which is done late in the initialization process.
+Reviewed-by: Sean Christopherson <seanjc@google.com>
 
-[ Andrew M: Add SPE to init features ]
-[ Alexandru E: Reworked patch ]
+>  arch/x86/kvm/mmu/mmu.c     | 2 +-
+>  arch/x86/kvm/mmu/tdp_mmu.c | 4 ++--
+>  2 files changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 354d2ca92df4..d57319e596a9 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -1582,7 +1582,7 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+>  		flush = kvm_handle_gfn_range(kvm, range, kvm_unmap_rmapp);
+>  
+>  	if (is_tdp_mmu_enabled(kvm))
+> -		flush |= kvm_tdp_mmu_unmap_gfn_range(kvm, range, flush);
+> +		flush = kvm_tdp_mmu_unmap_gfn_range(kvm, range, flush);
+>  
+>  	return flush;
+>  }
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 7c5dd83e52de..9d03f5b127dc 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -1034,8 +1034,8 @@ bool kvm_tdp_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range,
+>  	struct kvm_mmu_page *root;
+>  
+>  	for_each_tdp_mmu_root(kvm, root, range->slot->as_id)
 
-Signed-off-by: Sudeep Holla <sudeep.holla@arm.com>
-Signed-off-by: Andrew Murray <andrew.murray@arm.com>
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
----
- Makefile                                  |   1 +
- arm/aarch64/arm-cpu.c                     |   2 +
- arm/aarch64/include/kvm/kvm-config-arch.h |   2 +
- arm/aarch64/include/kvm/spe.h             |   7 ++
- arm/aarch64/kvm-cpu.c                     |   5 +
- arm/aarch64/kvm.c                         |  13 +++
- arm/aarch64/spe.c                         | 129 ++++++++++++++++++++++
- arm/include/arm-common/kvm-config-arch.h  |   1 +
- arm/kvm-cpu.c                             |   4 +
- 9 files changed, 164 insertions(+)
- create mode 100644 arm/aarch64/include/kvm/spe.h
- create mode 100644 arm/aarch64/spe.c
+Another issue is that this should be for_each_tdp_mmu_root_yield_safe().  I'll get
+a patch out for that later today.
 
-diff --git a/Makefile b/Makefile
-index 313fdc3c0201..3c53a5784f45 100644
---- a/Makefile
-+++ b/Makefile
-@@ -181,6 +181,7 @@ ifeq ($(ARCH), arm64)
- 	OBJS		+= arm/aarch64/arm-cpu.o
- 	OBJS		+= arm/aarch64/kvm-cpu.o
- 	OBJS		+= arm/aarch64/kvm.o
-+	OBJS		+= arm/aarch64/spe.o
- 	ARCH_INCLUDE	:= $(HDRS_ARM_COMMON)
- 	ARCH_INCLUDE	+= -Iarm/aarch64/include
- 
-diff --git a/arm/aarch64/arm-cpu.c b/arm/aarch64/arm-cpu.c
-index d7572b7790b1..d3a03161e961 100644
---- a/arm/aarch64/arm-cpu.c
-+++ b/arm/aarch64/arm-cpu.c
-@@ -1,6 +1,7 @@
- #include "kvm/fdt.h"
- #include "kvm/kvm.h"
- #include "kvm/kvm-cpu.h"
-+#include "kvm/spe.h"
- #include "kvm/util.h"
- 
- #include "arm-common/gic.h"
-@@ -17,6 +18,7 @@ static void generate_fdt_nodes(void *fdt, struct kvm *kvm)
- 	gic__generate_fdt_nodes(fdt, kvm->cfg.arch.irqchip);
- 	timer__generate_fdt_nodes(fdt, kvm, timer_interrupts);
- 	pmu__generate_fdt_nodes(fdt, kvm);
-+	spe__generate_fdt_nodes(fdt, kvm);
- }
- 
- static int arm_cpu__vcpu_init(struct kvm_cpu *vcpu)
-diff --git a/arm/aarch64/include/kvm/kvm-config-arch.h b/arm/aarch64/include/kvm/kvm-config-arch.h
-index 04be43dfa9b2..9f618cd9d2c1 100644
---- a/arm/aarch64/include/kvm/kvm-config-arch.h
-+++ b/arm/aarch64/include/kvm/kvm-config-arch.h
-@@ -6,6 +6,8 @@
- 			"Run AArch32 guest"),				\
- 	OPT_BOOLEAN('\0', "pmu", &(cfg)->has_pmuv3,			\
- 			"Create PMUv3 device"),				\
-+	OPT_BOOLEAN('\0', "spe", &(cfg)->has_spe,			\
-+			"Create SPE device"),				\
- 	OPT_U64('\0', "kaslr-seed", &(cfg)->kaslr_seed,			\
- 			"Specify random seed for Kernel Address Space "	\
- 			"Layout Randomization (KASLR)"),
-diff --git a/arm/aarch64/include/kvm/spe.h b/arm/aarch64/include/kvm/spe.h
-new file mode 100644
-index 000000000000..c9814270321f
---- /dev/null
-+++ b/arm/aarch64/include/kvm/spe.h
-@@ -0,0 +1,7 @@
-+#ifndef KVM__KVM_SPE_H
-+#define KVM__KVM_SPE_H
-+
-+#define KVM_ARM_SPE_IRQ	21
-+
-+void spe__generate_fdt_nodes(void *fdt, struct kvm *kvm);
-+#endif /* KVM__KVM_SPE_H */
-diff --git a/arm/aarch64/kvm-cpu.c b/arm/aarch64/kvm-cpu.c
-index 9f3e8586880c..9b67c5f1d2e2 100644
---- a/arm/aarch64/kvm-cpu.c
-+++ b/arm/aarch64/kvm-cpu.c
-@@ -140,6 +140,11 @@ void kvm_cpu__select_features(struct kvm *kvm, struct kvm_vcpu_init *init)
- 	/* Enable SVE if available */
- 	if (kvm__supports_extension(kvm, KVM_CAP_ARM_SVE))
- 		init->features[0] |= 1UL << KVM_ARM_VCPU_SVE;
-+
-+	/* Enable SPE if requested */
-+	if (kvm->cfg.arch.has_spe &&
-+	    kvm__supports_extension(kvm, KVM_CAP_ARM_SPE))
-+		init->features[0] |= 1UL << KVM_ARM_VCPU_SPE;
- }
- 
- int kvm_cpu__configure_features(struct kvm_cpu *vcpu)
-diff --git a/arm/aarch64/kvm.c b/arm/aarch64/kvm.c
-index a61266e32085..bdfc8238fea1 100644
---- a/arm/aarch64/kvm.c
-+++ b/arm/aarch64/kvm.c
-@@ -1,4 +1,5 @@
- #include "kvm/kvm.h"
-+#include "kvm/spe.h"
- 
- #include <asm/image.h>
- #include <sys/mman.h>
-@@ -85,5 +86,17 @@ int kvm__get_vm_type(struct kvm *kvm)
- 
- void kvm__arch_delete_ram(struct kvm *kvm)
- {
-+	struct kvm_enable_cap unlock_mem = {
-+		.cap = KVM_CAP_ARM_LOCK_USER_MEMORY_REGION,
-+		.flags = KVM_ARM_LOCK_USER_MEMORY_REGION_FLAGS_UNLOCK,
-+		.args[1] = KVM_ARM_UNLOCK_MEM_ALL,
-+	};
-+	int ret;
-+
-+	if (kvm->cfg.arch.has_spe) {
-+		ret = ioctl(kvm->vm_fd, KVM_ENABLE_CAP, &unlock_mem);
-+		if (ret == -1)
-+			perror("KVM_CAP_ARM_LOCK_USER_MEMORY_REGION");
-+	}
- 	munmap(kvm->arch.ram_alloc_start, kvm->arch.ram_alloc_size);
- }
-diff --git a/arm/aarch64/spe.c b/arm/aarch64/spe.c
-new file mode 100644
-index 000000000000..a3f9947ce3b2
---- /dev/null
-+++ b/arm/aarch64/spe.c
-@@ -0,0 +1,129 @@
-+#include <stdio.h>
-+
-+#include <sys/resource.h>
-+
-+#include <linux/kvm.h>
-+#include <linux/list.h>
-+
-+#include "kvm/fdt.h"
-+#include "kvm/kvm.h"
-+#include "kvm/kvm-cpu.h"
-+#include "kvm/spe.h"
-+#include "kvm/util.h"
-+
-+#include "arm-common/gic.h"
-+
-+void spe__generate_fdt_nodes(void *fdt, struct kvm *kvm)
-+{
-+	const char compatible[] = "arm,statistical-profiling-extension-v1";
-+	int irq = KVM_ARM_SPE_IRQ;
-+
-+	u32 cpu_mask = (((1 << kvm->nrcpus) - 1) << GIC_FDT_IRQ_PPI_CPU_SHIFT) \
-+		       & GIC_FDT_IRQ_PPI_CPU_MASK;
-+	u32 irq_prop[] = {
-+		cpu_to_fdt32(GIC_FDT_IRQ_TYPE_PPI),
-+		cpu_to_fdt32(irq - 16),
-+		cpu_to_fdt32(cpu_mask | IRQ_TYPE_LEVEL_HIGH),
-+	};
-+
-+	if (!kvm->cfg.arch.has_spe)
-+		return;
-+
-+	_FDT(fdt_begin_node(fdt, "spe"));
-+	_FDT(fdt_property(fdt, "compatible", compatible, sizeof(compatible)));
-+	_FDT(fdt_property(fdt, "interrupts", irq_prop, sizeof(irq_prop)));
-+	_FDT(fdt_end_node(fdt));
-+}
-+
-+static void spe_set_vcpu_ctrl_attr(struct kvm_cpu *vcpu, u64 attr, void *addr)
-+{
-+	struct kvm_device_attr spe_attr = {
-+		.group	= KVM_ARM_VCPU_SPE_CTRL,
-+		.addr	= (u64)addr,
-+		.attr	= attr,
-+	};
-+	int ret;
-+
-+	ret = ioctl(vcpu->vcpu_fd, KVM_HAS_DEVICE_ATTR, &spe_attr);
-+	if (ret < 0)
-+		die_perror("SPE KVM_HAS_DEVICE_ATTR");
-+
-+	ret = ioctl(vcpu->vcpu_fd, KVM_SET_DEVICE_ATTR, &spe_attr);
-+	if (ret < 0)
-+		die_perror("SPE KVM_SET_DEVICE_ATTR");
-+}
-+
-+static void spe_try_increase_mlock_limit(struct kvm *kvm)
-+{
-+	u64 size = kvm->ram_size;
-+	struct rlimit mlock_limit, new_limit;
-+
-+	if (getrlimit(RLIMIT_MEMLOCK, &mlock_limit)) {
-+		perror("getrlimit(RLIMIT_MEMLOCK)");
-+		return;
-+	}
-+
-+	if (mlock_limit.rlim_cur > size)
-+		return;
-+
-+	new_limit.rlim_cur = size;
-+	new_limit.rlim_max = max((rlim_t)size, mlock_limit.rlim_max);
-+	/* Requires CAP_SYS_RESOURCE capability. */
-+	setrlimit(RLIMIT_MEMLOCK, &new_limit);
-+}
-+
-+static void spe_lock_memory(struct kvm *kvm)
-+{
-+	struct kvm_mem_bank *bank;
-+	struct kvm_enable_cap lock_mem = {
-+		.cap = KVM_CAP_ARM_LOCK_USER_MEMORY_REGION,
-+		.flags = KVM_ARM_LOCK_USER_MEMORY_REGION_FLAGS_LOCK,
-+		.args[1] = KVM_ARM_LOCK_MEM_READ | KVM_ARM_LOCK_MEM_WRITE,
-+	};
-+	u64 slot;
-+	int ret;
-+
-+	if (!kvm__supports_extension(kvm, KVM_CAP_ARM_LOCK_USER_MEMORY_REGION))
-+		die("KVM_CAP_ARM_LOCK_USER_MEMORY_REGION not supported");
-+
-+	slot = (u64)-1;
-+	list_for_each_entry(bank, &kvm->mem_banks, list) {
-+		if (bank->host_addr == kvm->ram_start) {
-+			BUG_ON(bank->type != KVM_MEM_TYPE_RAM);
-+			slot = bank->slot;
-+			break;
-+		}
-+	}
-+
-+	if (slot == (u64)-1)
-+		die("RAM bank not found");
-+
-+	spe_try_increase_mlock_limit(kvm);
-+
-+	lock_mem.args[0] = slot;
-+	ret = ioctl(kvm->vm_fd, KVM_ENABLE_CAP, &lock_mem);
-+	if (ret == -1)
-+		die_perror("KVM_CAP_ARM_LOCK_USER_MEMORY_REGION");
-+
-+}
-+
-+static int spe__init(struct kvm *kvm)
-+{
-+	int irq = KVM_ARM_SPE_IRQ;
-+	struct kvm_cpu *vcpu;
-+	int i;
-+
-+	if (!kvm->cfg.arch.has_spe)
-+		return 0;
-+
-+	spe_lock_memory(kvm);
-+
-+	for (i = 0; i < kvm->nrcpus; i++) {
-+		vcpu = kvm->cpus[i];
-+		spe_set_vcpu_ctrl_attr(vcpu, KVM_ARM_VCPU_SPE_IRQ, &irq);
-+		spe_set_vcpu_ctrl_attr(vcpu, KVM_ARM_VCPU_SPE_INIT, NULL);
-+	}
-+
-+	return 0;
-+}
-+last_init(spe__init);
-diff --git a/arm/include/arm-common/kvm-config-arch.h b/arm/include/arm-common/kvm-config-arch.h
-index 5734c46ab9e6..08d8bfd3f7e0 100644
---- a/arm/include/arm-common/kvm-config-arch.h
-+++ b/arm/include/arm-common/kvm-config-arch.h
-@@ -9,6 +9,7 @@ struct kvm_config_arch {
- 	bool		virtio_trans_pci;
- 	bool		aarch32_guest;
- 	bool		has_pmuv3;
-+	bool		has_spe;
- 	u64		kaslr_seed;
- 	enum irqchip_type irqchip;
- 	u64		fw_addr;
-diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
-index 6a2408c632df..2c0189fec622 100644
---- a/arm/kvm-cpu.c
-+++ b/arm/kvm-cpu.c
-@@ -54,6 +54,10 @@ struct kvm_cpu *kvm_cpu__arch_init(struct kvm *kvm, unsigned long cpu_id)
- 	    !kvm__supports_extension(kvm, KVM_CAP_ARM_PMU_V3))
- 		die("PMUv3 is not supported");
- 
-+	if (kvm->cfg.arch.has_spe &&
-+	    !kvm__supports_extension(kvm, KVM_CAP_ARM_SPE))
-+		die("SPE is not supported");
-+
- 	vcpu = calloc(1, sizeof(struct kvm_cpu));
- 	if (!vcpu)
- 		return NULL;
--- 
-2.33.1
-
+> -		flush |= zap_gfn_range(kvm, root, range->start, range->end,
+> -				       range->may_block, flush, false);
+> +		flush = zap_gfn_range(kvm, root, range->start, range->end,
+> +				      range->may_block, flush, false);
+>  
+>  	return flush;
+>  }
+> -- 
+> 2.31.1
+> 
