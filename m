@@ -2,96 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BF9214546F5
-	for <lists+kvm@lfdr.de>; Wed, 17 Nov 2021 14:11:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 80BFF4546FB
+	for <lists+kvm@lfdr.de>; Wed, 17 Nov 2021 14:13:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235644AbhKQNO3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Nov 2021 08:14:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38562 "EHLO
+        id S237300AbhKQNPx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Nov 2021 08:15:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230174AbhKQNO2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Nov 2021 08:14:28 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E627C061570;
-        Wed, 17 Nov 2021 05:11:30 -0800 (PST)
-Received: from zn.tnic (p200300ec2f13a300a559e3e7ac095ca4.dip0.t-ipconnect.de [IPv6:2003:ec:2f13:a300:a559:e3e7:ac09:5ca4])
+        with ESMTP id S230174AbhKQNPw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Nov 2021 08:15:52 -0500
+Received: from ms.lwn.net (ms.lwn.net [IPv6:2600:3c01:e000:3a1::42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3ADF9C061570;
+        Wed, 17 Nov 2021 05:12:54 -0800 (PST)
+Received: from localhost (unknown [151.68.164.85])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 8086E1EC051E;
-        Wed, 17 Nov 2021 14:11:28 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1637154688;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=ALEk0hpWexx1uJP+VlOkANLAH949xQs8c0lPv5drCRk=;
-        b=eE5HYa8PJYy2qraGlEjSQ3OwljdXLGSLLo/wYzi+AKx+gDrhTQil/J35E0iAq2850IYc/p
-        z7Ihif2mEgnblXMZbsWL5Q5Ql9Ab1Ep9l7ZHeWAVVQyVdMdZ9qdO4jqhu5RvNGtF5evPaS
-        8h9ClG6c2q0yv1sMhabGOXo+3zZN0AU=
-Date:   Wed, 17 Nov 2021 14:11:20 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v7 02/45] x86/sev: detect/setup SEV/SME features earlier
- in boot
-Message-ID: <YZT/eBLQnQOVejzp@zn.tnic>
-References: <20211110220731.2396491-1-brijesh.singh@amd.com>
- <20211110220731.2396491-3-brijesh.singh@amd.com>
- <YZKxCdhaFTTlSHAJ@zn.tnic>
- <20211115201715.gv24iugujwhxmrdp@amd.com>
+        by ms.lwn.net (Postfix) with ESMTPSA id EF7A666F1;
+        Wed, 17 Nov 2021 13:12:51 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net EF7A666F1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
+        t=1637154773; bh=RqOZ23BhV9RO5xXgnmEiwuWQ5dgdsqUxxSkLw87co+4=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=fSzeC/7YkG5oReHXjPQMMOcz6IPgAo298LUNP+2NVVrj4T84sWjraHJ+Y0Cs0HLRQ
+         Pjjo1/20Zo0kfsdSFjDMh4BnwMUPeCdLG1wywJl0ZqlNAq85D4BVThIFby3fD+wbRj
+         hKWUi3XVS2WA9MDMW/kroHha5/a4ysDR/b8/Qb0fSqzwB/lME+VYlGLUgtcgIit1pV
+         Izr4YlWvBYKbmIBcQQmr4crURcJ7u8bzZ1ciiBmKIzAjurwcD7MNkXcblG0Cf99DHJ
+         CBJ61e0Pd5/n40QAaGd15jwjKx15lBgVtbwqKJQ3FG4cIQNpO7RV7gHG5BPz/NrfSY
+         8KA6EVFt3Lp3Q==
+From:   Jonathan Corbet <corbet@lwn.net>
+To:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+        Linux Doc Mailing List <linux-doc@vger.kernel.org>
+Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+        linux-kernel@vger.kernel.org, Anup Patel <anup.patel@wdc.com>,
+        Atish Patra <atish.patra@wdc.com>,
+        John Fastabend <john.fastabend@gmail.com>,
+        KP Singh <kpsingh@kernel.org>, Martin KaFai Lau <kafai@fb.com>,
+        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
+        bpf@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        kvm@vger.kernel.org, linux-riscv@lists.infradead.org,
+        netdev@vger.kernel.org
+Subject: Re: [PATCH 0/4] Address some bad references to Kernel docs
+In-Reply-To: <cover.1637064577.git.mchehab+huawei@kernel.org>
+References: <cover.1637064577.git.mchehab+huawei@kernel.org>
+Date:   Wed, 17 Nov 2021 06:12:48 -0700
+Message-ID: <87r1bfexin.fsf@meer.lwn.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20211115201715.gv24iugujwhxmrdp@amd.com>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 15, 2021 at 02:17:15PM -0600, Michael Roth wrote:
-> but in order for that to happen soon enough to make use of the CPUID
-> table for all CPUID intructions, it needs to be moved to just after the first
-> #VC handler is setup (where snp_cpuid_init() used to be in v6).
+Mauro Carvalho Chehab <mchehab+huawei@kernel.org> writes:
 
-So, it needs to happen after the initial IDT is loaded on the BSP in
-startup_64_setup_env().
+> Hi Jon,
+>
+> It follows 4 patches addressing some issues during the 5.16 Kernel development
+> cycle that were sent to the MLs but weren't merged yet. 
+>
+> They apply cleanly on the top of 5.16-rc1.
 
-So why don't you call sme_enable() right after the
-startup_64_setup_env() call and add a comment above it to explain why
-this call needs to happen there?
+I've applied the set, thanks.
 
-Instead of sticking that call in startup_64_setup_env() where it doesn't
-belong conceptually - enabling SME doesn't really have anything to do
-with setting up early environment...
-
-Hmm.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+jon
