@@ -2,303 +2,204 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AAD29454C3D
-	for <lists+kvm@lfdr.de>; Wed, 17 Nov 2021 18:40:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A1A2454C68
+	for <lists+kvm@lfdr.de>; Wed, 17 Nov 2021 18:47:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239550AbhKQRnn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Nov 2021 12:43:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44678 "EHLO
+        id S239601AbhKQRuB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Nov 2021 12:50:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239502AbhKQRn1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Nov 2021 12:43:27 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53E5DC061204;
-        Wed, 17 Nov 2021 09:40:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
-        Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=eYEJTlBVGxltT2NzJ6/7zGLAmt3YN9Zzb7n+Z8fpPnA=; b=QoKVabAoprXDMLjFPmE2tTDWYl
-        29mw2nz7CyayYR1ncE0U/5srLQw6S6U2i2b9tzJk5S4dFVUmReu+QHL3d6ZYssl0/BXQTMKI0dFc3
-        IzxQOewGKtZHk+Bp74TlNdaTIuzTa9MsSlll/N8F+S/KtFndUg+grDj8ruQvZu+oTMSON0uuOFLdP
-        7e04xsHQ8mzCDmbBVnNRnQ9qALLndizJ5hlsZ/z7cxm/9pTvqANBSLLbXFqSthcTeQZhhaaS6fmJv
-        xmzdhwMyv5sthP+CDuopq6BrXvGAqLbpzuM0GDee6APTHTvYFTd5oaZKoeGxvXHiAZzlLMn9gXlU1
-        srwEDbBQ==;
-Received: from i7.infradead.org ([2001:8b0:10b:1:21e:67ff:fecb:7a92])
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mnOum-007nnN-EJ; Wed, 17 Nov 2021 17:40:09 +0000
-Received: from dwoodhou by i7.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mnOum-001Gxx-La; Wed, 17 Nov 2021 17:40:08 +0000
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>
-Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        "jmattson @ google . com" <jmattson@google.com>,
-        "wanpengli @ tencent . com" <wanpengli@tencent.com>,
-        "seanjc @ google . com" <seanjc@google.com>,
-        "vkuznets @ redhat . com" <vkuznets@redhat.com>,
-        "mtosatti @ redhat . com" <mtosatti@redhat.com>,
-        "joro @ 8bytes . org" <joro@8bytes.org>, karahmed@amazon.com,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org
-Subject: [PATCH v3 12/12] KVM: x86: First attempt at converting nested virtual APIC page to gpc
-Date:   Wed, 17 Nov 2021 17:40:03 +0000
-Message-Id: <20211117174003.297096-13-dwmw2@infradead.org>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20211117174003.297096-1-dwmw2@infradead.org>
-References: <20211117174003.297096-1-dwmw2@infradead.org>
+        with ESMTP id S232034AbhKQRuB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Nov 2021 12:50:01 -0500
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4BEAC061570
+        for <kvm@vger.kernel.org>; Wed, 17 Nov 2021 09:47:02 -0800 (PST)
+Received: by mail-pl1-x629.google.com with SMTP id y8so2838852plg.1
+        for <kvm@vger.kernel.org>; Wed, 17 Nov 2021 09:47:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=HSLtB6Q7QNH9F1W7qlW0Hp58Qwigu0M5uYUCRsiHwC8=;
+        b=i91S0zxnZ2YjxCPE0ezujuZtsD9n0tH0L43A/22KOp7ipN94InVR2Wn0r3oyPNEke2
+         9U36PmooJOjzVOMUgdHQUrGD+/HUbs9bDIUbqrIcPIucW/CT/hXC4E17CNHwGF9gsA6Q
+         n39tnJHoumxIa4IUC5lQqVHghzCUZb8Gj1I7JRn0oqu+yFbTDItRaizjIVARrMXsV9zx
+         29QUfojA+FKZBQoT/AQVPGKHXn5tHivqH8FxcTMyPpg5YR9McwJz/iPoRol57/V5xgAd
+         2TE7zpV127mIdx4KGSDkFbt6yuGtMMp9ytLEjLtJJR3x2TRLd7mBU5e10xqBtV7TOTFx
+         pr5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=HSLtB6Q7QNH9F1W7qlW0Hp58Qwigu0M5uYUCRsiHwC8=;
+        b=LazzroL+duHf8drZDy94nQNeVy29Bc74lcRa3Xi2PILGf8b3iLJrCgaACZo5EmSwwK
+         do/5+kJw6gfKfdd8boAS/LUJqdqtsvA8PjZ7f5dpzkN+zhK/dVwy1wB64Xm0f4+sbKOB
+         2zJwervhwCsjRbrjtWVPUDiiScWujhTi+MgLtBnAXboUua57QfTzBqX6QMbJsG9ossT/
+         E8qYPI2Solh+/4+DzEeKzu7kei2N2N+qs9NCfI1q5rpE9ZQyW8cT8+IE/Ye99zRQUO/5
+         GGTYQ5Xq1CcXMCSgetO8RUWyOsCXT+TTaAQK5nzSwwP+zOHZ/x7otn3WbyY909P/WiZd
+         +Slg==
+X-Gm-Message-State: AOAM531Y4sVF2jPWWLxVk3SRt6Ve1l2QuJfwDy5XJbv4VcDNWRIPMjk8
+        /wrO9cBaKpp0DdMSfGxuc4jnvQVanRw1e3G6P8kGnQ==
+X-Google-Smtp-Source: ABdhPJzuoVg8TZNtBfzM3itZiL5K5WGkgTiWXW2BerW+z4FhVVCEGPuw+dKwS7itfZfVHqVMZTme1WDz3avKyVVCez4=
+X-Received: by 2002:a17:90a:b88d:: with SMTP id o13mr1693460pjr.39.1637171221769;
+ Wed, 17 Nov 2021 09:47:01 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Sender: David Woodhouse <dwmw2@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+References: <20211117163809.1441845-1-pbonzini@redhat.com> <20211117163809.1441845-5-pbonzini@redhat.com>
+In-Reply-To: <20211117163809.1441845-5-pbonzini@redhat.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Wed, 17 Nov 2021 10:46:48 -0700
+Message-ID: <CAMkAt6odbAGZ-LgK7yefnNRgoAAs3ekvR2_sZpjTiv_6mfwRKg@mail.gmail.com>
+Subject: Re: [PATCH 4/4] KVM: SEV: Do COPY_ENC_CONTEXT_FROM with both VMs locked
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        seanjc@google.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: David Woodhouse <dwmw@amazon.co.uk>
+On Wed, Nov 17, 2021 at 9:38 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> Now that we have a facility to lock two VMs with deadlock
+> protection, use it for the creation of mirror VMs as well.  One of
+> COPY_ENC_CONTEXT_FROM(dst, src) and COPY_ENC_CONTEXT_FROM(src, dst)
+> would always fail, so the combination is nonsensical and it is okay to
+> return -EBUSY if it is attempted.
+>
+> This sidesteps the question of what happens if a VM is
+> MOVE_ENC_CONTEXT_FROM'd at the same time as it is
+> COPY_ENC_CONTEXT_FROM'd: the locking prevents that from
+> happening.
+>
+> Cc: Peter Gonda <pgonda@google.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-This is what evolved during the discussion at
-https://lore.kernel.org/kvm/960E233F-EC0B-4FB5-BA2E-C8D2CCB38B12@infradead.org/T/#m11d75fcfe2da357ec1dabba0d0e3abb91fd13665
+Acked-by: Peter Gonda <pgonda@google.com>
 
-As discussed, an alternative approach might be to augment
-kvm_arch_memslots_updated() to raise KVM_REQ_GET_NESTED_STATE_PAGES to
-each vCPU (and make that req only do anything on a given vCPU if that
-vCPU is actually in L2 guest mode).
+> ---
+>  arch/x86/kvm/svm/sev.c | 68 ++++++++++++++++--------------------------
+>  1 file changed, 26 insertions(+), 42 deletions(-)
+>
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index f9256ba269e6..47d54df7675c 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -1548,6 +1548,9 @@ static int sev_lock_two_vms(struct kvm *dst_kvm, struct kvm *src_kvm)
+>         struct kvm_sev_info *dst_sev = &to_kvm_svm(dst_kvm)->sev_info;
+>         struct kvm_sev_info *src_sev = &to_kvm_svm(src_kvm)->sev_info;
+>
+> +       if (dst_kvm == src_kvm)
+> +               return -EINVAL;
+> +
 
-That would mean the reload gets actively triggered even on memslot
-changes rather than only on MMU notifiers as is the case now. It could
-*potentially* mean we can drop the new 'check_guest_maps' function.
+Worth adding a migrate/mirror from self fails tests in
+test_sev_(migrate|mirror)_parameters()? I guess it's already covered
+by "the source cannot be SEV enabled" test cases.
 
-The 'check_guest_maps' function could be a lot simpler than it is,
-though. It only really needs to get kvm->memslots->generation, then
-check each gpc->generation against that, and each gpc->valid.
-
-Also I suspect we *shouldn't* destroy the virtual_apic_cache in
-nested_vmx_vmexit(). We can just leave it there for next time the
-vCPU enters guest mode. If it happens to get invalidated in the
-meantime, that's fine and we'll refresh it on the way back in.
-We probably *would* want to actively do something on memslot changes
-in that case though, to ensure that even if the vCPU isn't in guest
-mode any more, we *release* the cached page.
-
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
----
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/vmx/nested.c       | 50 ++++++++++++++++++++++++++++-----
- arch/x86/kvm/vmx/vmx.c          | 12 +++++---
- arch/x86/kvm/vmx/vmx.h          |  2 +-
- arch/x86/kvm/x86.c              | 10 +++++++
- 5 files changed, 63 insertions(+), 12 deletions(-)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 6ea2446ab851..24f6f3e2de47 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1511,6 +1511,7 @@ struct kvm_x86_nested_ops {
- 	int (*enable_evmcs)(struct kvm_vcpu *vcpu,
- 			    uint16_t *vmcs_version);
- 	uint16_t (*get_evmcs_version)(struct kvm_vcpu *vcpu);
-+	void (*check_guest_maps)(struct kvm_vcpu *vcpu);
- };
- 
- struct kvm_x86_init_ops {
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 1e2f66951566..794aa6021188 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -309,7 +309,7 @@ static void free_nested(struct kvm_vcpu *vcpu)
- 		kvm_release_page_clean(vmx->nested.apic_access_page);
- 		vmx->nested.apic_access_page = NULL;
- 	}
--	kvm_vcpu_unmap(vcpu, &vmx->nested.virtual_apic_map, true);
-+	kvm_gfn_to_pfn_cache_destroy(vcpu->kvm, &vmx->nested.virtual_apic_cache);
- 	kvm_vcpu_unmap(vcpu, &vmx->nested.pi_desc_map, true);
- 	vmx->nested.pi_desc = NULL;
- 
-@@ -3179,10 +3179,12 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
- 	}
- 
- 	if (nested_cpu_has(vmcs12, CPU_BASED_TPR_SHADOW)) {
--		map = &vmx->nested.virtual_apic_map;
-+		struct gfn_to_pfn_cache *gpc = &vmx->nested.virtual_apic_cache;
- 
--		if (!kvm_vcpu_map(vcpu, gpa_to_gfn(vmcs12->virtual_apic_page_addr), map)) {
--			vmcs_write64(VIRTUAL_APIC_PAGE_ADDR, pfn_to_hpa(map->pfn));
-+ 		if (!kvm_gfn_to_pfn_cache_init(vcpu->kvm, gpc, vcpu, true, true,
-+					       vmcs12->virtual_apic_page_addr,
-+					       PAGE_SIZE, true)) {
-+			vmcs_write64(VIRTUAL_APIC_PAGE_ADDR, pfn_to_hpa(gpc->pfn));
- 		} else if (nested_cpu_has(vmcs12, CPU_BASED_CR8_LOAD_EXITING) &&
- 		           nested_cpu_has(vmcs12, CPU_BASED_CR8_STORE_EXITING) &&
- 			   !nested_cpu_has2(vmcs12, SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES)) {
-@@ -3207,6 +3209,9 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
- 	if (nested_cpu_has_posted_intr(vmcs12)) {
- 		map = &vmx->nested.pi_desc_map;
- 
-+		if (kvm_vcpu_mapped(map))
-+			kvm_vcpu_unmap(vcpu, map, true);
-+
- 		if (!kvm_vcpu_map(vcpu, gpa_to_gfn(vmcs12->posted_intr_desc_addr), map)) {
- 			vmx->nested.pi_desc =
- 				(struct pi_desc *)(((void *)map->hva) +
-@@ -3251,6 +3256,29 @@ static bool vmx_get_nested_state_pages(struct kvm_vcpu *vcpu)
- 	return true;
- }
- 
-+static void nested_vmx_check_guest_maps(struct kvm_vcpu *vcpu)
-+{
-+	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
-+	struct vcpu_vmx *vmx = to_vmx(vcpu);
-+	struct gfn_to_pfn_cache *gpc;
-+
-+	int valid;
-+
-+	if (nested_cpu_has_posted_intr(vmcs12)) {
-+		gpc = &vmx->nested.virtual_apic_cache;
-+
-+		read_lock(&gpc->lock);
-+		valid = kvm_gfn_to_pfn_cache_check(vcpu->kvm, gpc,
-+						   vmcs12->virtual_apic_page_addr,
-+						   PAGE_SIZE);
-+		read_unlock(&gpc->lock);
-+		if (!valid) {
-+			kvm_make_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu);
-+			return;
-+		}
-+	}
-+}
-+
- static int nested_vmx_write_pml_buffer(struct kvm_vcpu *vcpu, gpa_t gpa)
- {
- 	struct vmcs12 *vmcs12;
-@@ -3749,9 +3777,15 @@ static int vmx_complete_nested_posted_interrupt(struct kvm_vcpu *vcpu)
- 
- 	max_irr = find_last_bit((unsigned long *)vmx->nested.pi_desc->pir, 256);
- 	if (max_irr != 256) {
--		vapic_page = vmx->nested.virtual_apic_map.hva;
--		if (!vapic_page)
-+		struct gfn_to_pfn_cache *gpc = &vmx->nested.virtual_apic_cache;
-+
-+		read_lock(&gpc->lock);
-+		if (!kvm_gfn_to_pfn_cache_check(vcpu->kvm, gpc, gpc->gpa, PAGE_SIZE)) {
-+			read_unlock(&gpc->lock);
- 			goto mmio_needed;
-+		}
-+
-+		vapic_page = gpc->khva;
- 
- 		__kvm_apic_update_irr(vmx->nested.pi_desc->pir,
- 			vapic_page, &max_irr);
-@@ -3761,6 +3795,7 @@ static int vmx_complete_nested_posted_interrupt(struct kvm_vcpu *vcpu)
- 			status |= (u8)max_irr;
- 			vmcs_write16(GUEST_INTR_STATUS, status);
- 		}
-+		read_unlock(&gpc->lock);
- 	}
- 
- 	nested_mark_vmcs12_pages_dirty(vcpu);
-@@ -4581,7 +4616,7 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
- 		kvm_release_page_clean(vmx->nested.apic_access_page);
- 		vmx->nested.apic_access_page = NULL;
- 	}
--	kvm_vcpu_unmap(vcpu, &vmx->nested.virtual_apic_map, true);
-+	kvm_gfn_to_pfn_cache_destroy(vcpu->kvm, &vmx->nested.virtual_apic_cache);
- 	kvm_vcpu_unmap(vcpu, &vmx->nested.pi_desc_map, true);
- 	vmx->nested.pi_desc = NULL;
- 
-@@ -6756,4 +6791,5 @@ struct kvm_x86_nested_ops vmx_nested_ops = {
- 	.write_log_dirty = nested_vmx_write_pml_buffer,
- 	.enable_evmcs = nested_enable_evmcs,
- 	.get_evmcs_version = nested_get_evmcs_version,
-+	.check_guest_maps = nested_vmx_check_guest_maps,
- };
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index ba66c171d951..6c61faef86d3 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -3839,19 +3839,23 @@ void pt_update_intercept_for_msr(struct kvm_vcpu *vcpu)
- static bool vmx_guest_apic_has_interrupt(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
--	void *vapic_page;
-+	struct gfn_to_pfn_cache *gpc = &vmx->nested.virtual_apic_cache;
- 	u32 vppr;
- 	int rvi;
- 
- 	if (WARN_ON_ONCE(!is_guest_mode(vcpu)) ||
- 		!nested_cpu_has_vid(get_vmcs12(vcpu)) ||
--		WARN_ON_ONCE(!vmx->nested.virtual_apic_map.gfn))
-+		WARN_ON_ONCE(gpc->gpa == GPA_INVALID))
- 		return false;
- 
- 	rvi = vmx_get_rvi();
- 
--	vapic_page = vmx->nested.virtual_apic_map.hva;
--	vppr = *((u32 *)(vapic_page + APIC_PROCPRI));
-+	read_lock(&gpc->lock);
-+	if (!kvm_gfn_to_pfn_cache_check(vcpu->kvm, gpc, gpc->gpa, PAGE_SIZE))
-+		vppr = *((u32 *)(gpc->khva + APIC_PROCPRI));
-+	else
-+		vppr = 0xff;
-+	read_unlock(&gpc->lock);
- 
- 	return ((rvi & 0xf0) > (vppr & 0xf0));
- }
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 4df2ac24ffc1..8364e7fc92a0 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -195,7 +195,7 @@ struct nested_vmx {
- 	 * pointers, so we must keep them pinned while L2 runs.
- 	 */
- 	struct page *apic_access_page;
--	struct kvm_host_map virtual_apic_map;
-+	struct gfn_to_pfn_cache virtual_apic_cache;
- 	struct kvm_host_map pi_desc_map;
- 
- 	struct kvm_host_map msr_bitmap_map;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 6f7669c94c79..caf35aa85ae3 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9739,6 +9739,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 
- 		if (kvm_check_request(KVM_REQ_UPDATE_CPU_DIRTY_LOGGING, vcpu))
- 			static_call(kvm_x86_update_cpu_dirty_logging)(vcpu);
-+		if (kvm_check_request(KVM_REQ_GPC_INVALIDATE, vcpu))
-+			; /* Nothing to do. It just wanted to wake us */
- 	}
- 
- 	if (kvm_check_request(KVM_REQ_EVENT, vcpu) || req_int_win ||
-@@ -9785,6 +9787,14 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 	local_irq_disable();
- 	vcpu->mode = IN_GUEST_MODE;
- 
-+	/*
-+	 * If the guest requires direct access to mapped L1 pages, check
-+	 * the caches are valid. Will raise KVM_REQ_GET_NESTED_STATE_PAGES
-+	 * to go and revalidate them, if necessary.
-+	 */
-+	if (is_guest_mode(vcpu) && kvm_x86_ops.nested_ops->check_guest_maps)
-+		kvm_x86_ops.nested_ops->check_guest_maps(vcpu);
-+
- 	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
- 
- 	/*
--- 
-2.31.1
-
+>         /*
+>          * Bail if these VMs are already involved in a migration to avoid
+>          * deadlock between two VMs trying to migrate to/from each other.
+> @@ -1951,76 +1954,57 @@ int svm_vm_copy_asid_from(struct kvm *kvm, unsigned int source_fd)
+>  {
+>         struct file *source_kvm_file;
+>         struct kvm *source_kvm;
+> -       struct kvm_sev_info source_sev, *mirror_sev;
+> +       struct kvm_sev_info *source_sev, *mirror_sev;
+>         int ret;
+>
+>         source_kvm_file = fget(source_fd);
+>         if (!file_is_kvm(source_kvm_file)) {
+>                 ret = -EBADF;
+> -               goto e_source_put;
+> +               goto e_source_fput;
+>         }
+>
+>         source_kvm = source_kvm_file->private_data;
+> -       mutex_lock(&source_kvm->lock);
+> -
+> -       if (!sev_guest(source_kvm)) {
+> -               ret = -EINVAL;
+> -               goto e_source_unlock;
+> -       }
+> +       ret = sev_lock_two_vms(kvm, source_kvm);
+> +       if (ret)
+> +               goto e_source_fput;
+>
+> -       /* Mirrors of mirrors should work, but let's not get silly */
+> -       if (is_mirroring_enc_context(source_kvm) || source_kvm == kvm) {
+> +       /*
+> +        * Mirrors of mirrors should work, but let's not get silly.  Also
+> +        * disallow out-of-band SEV/SEV-ES init if the target is already an
+> +        * SEV guest, or if vCPUs have been created.  KVM relies on vCPUs being
+> +        * created after SEV/SEV-ES initialization, e.g. to init intercepts.
+> +        */
+> +       if (sev_guest(kvm) || !sev_guest(source_kvm) ||
+> +           is_mirroring_enc_context(source_kvm) || kvm->created_vcpus) {
+>                 ret = -EINVAL;
+> -               goto e_source_unlock;
+> +               goto e_unlock;
+>         }
+>
+> -       memcpy(&source_sev, &to_kvm_svm(source_kvm)->sev_info,
+> -              sizeof(source_sev));
+> -
+>         /*
+>          * The mirror kvm holds an enc_context_owner ref so its asid can't
+>          * disappear until we're done with it
+>          */
+> +       source_sev = &to_kvm_svm(source_kvm)->sev_info;
+>         kvm_get_kvm(source_kvm);
+>
+> -       fput(source_kvm_file);
+> -       mutex_unlock(&source_kvm->lock);
+> -       mutex_lock(&kvm->lock);
+> -
+> -       /*
+> -        * Disallow out-of-band SEV/SEV-ES init if the target is already an
+> -        * SEV guest, or if vCPUs have been created.  KVM relies on vCPUs being
+> -        * created after SEV/SEV-ES initialization, e.g. to init intercepts.
+> -        */
+> -       if (sev_guest(kvm) || kvm->created_vcpus) {
+> -               ret = -EINVAL;
+> -               goto e_mirror_unlock;
+> -       }
+> -
+>         /* Set enc_context_owner and copy its encryption context over */
+>         mirror_sev = &to_kvm_svm(kvm)->sev_info;
+>         mirror_sev->enc_context_owner = source_kvm;
+>         mirror_sev->active = true;
+> -       mirror_sev->asid = source_sev.asid;
+> -       mirror_sev->fd = source_sev.fd;
+> -       mirror_sev->es_active = source_sev.es_active;
+> -       mirror_sev->handle = source_sev.handle;
+> +       mirror_sev->asid = source_sev->asid;
+> +       mirror_sev->fd = source_sev->fd;
+> +       mirror_sev->es_active = source_sev->es_active;
+> +       mirror_sev->handle = source_sev->handle;
+> +       ret = 0;
+>         /*
+>          * Do not copy ap_jump_table. Since the mirror does not share the same
+>          * KVM contexts as the original, and they may have different
+>          * memory-views.
+>          */
+>
+> -       mutex_unlock(&kvm->lock);
+> -       return 0;
+> -
+> -e_mirror_unlock:
+> -       mutex_unlock(&kvm->lock);
+> -       kvm_put_kvm(source_kvm);
+> -       return ret;
+> -e_source_unlock:
+> -       mutex_unlock(&source_kvm->lock);
+> -e_source_put:
+> +e_unlock:
+> +       sev_unlock_two_vms(kvm, source_kvm);
+> +e_source_fput:
+>         if (source_kvm_file)
+>                 fput(source_kvm_file);
+>         return ret;
+> --
+> 2.27.0
+>
