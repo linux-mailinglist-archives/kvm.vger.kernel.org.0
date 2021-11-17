@@ -2,339 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 17EA7453EDD
-	for <lists+kvm@lfdr.de>; Wed, 17 Nov 2021 04:22:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F1DC453FC3
+	for <lists+kvm@lfdr.de>; Wed, 17 Nov 2021 05:52:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232622AbhKQDZI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 16 Nov 2021 22:25:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46088 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229958AbhKQDZI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 16 Nov 2021 22:25:08 -0500
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E7CFC061570;
-        Tue, 16 Nov 2021 19:22:10 -0800 (PST)
-Received: by mail-pj1-x102d.google.com with SMTP id fv9-20020a17090b0e8900b001a6a5ab1392so1272146pjb.1;
-        Tue, 16 Nov 2021 19:22:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:content-language:to:cc
-         :references:from:organization:subject:in-reply-to
-         :content-transfer-encoding;
-        bh=X90G8t1ctRR/hoezW6Zs/9w7GooG43/g73Bca76K8NA=;
-        b=mmWX5XJdTTKcUH8I6Dh5UZXqzkJmo+YKidwdFRNgtgq0Xn6LkuPfovcngK52HOpAdE
-         Pcjtdv+QiySnufRbFn3RpX5Fi4/seb73vgmUpGNBx2uDJrzWyJvvichFWua15g9AyN3l
-         taUz8PY3+TJyfLZd9CCVoLaZadI0V8GrBgsUncvQFfPXUpu7vqXbTifaWGPO1O6e7t/A
-         ZQ8HxLRJfWE6KjWOtOR99BDnJcvvuAxVkCCOsWeoeUjTwhyXr0QLObYz3LHnjBe9/xlI
-         0m5KO9haE25Kc524endtmkOcTXA6gZWgnxe2Xc+AoCTViGC6sFxstZ2W2GrvMoFz3S8j
-         zv0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent
-         :content-language:to:cc:references:from:organization:subject
-         :in-reply-to:content-transfer-encoding;
-        bh=X90G8t1ctRR/hoezW6Zs/9w7GooG43/g73Bca76K8NA=;
-        b=kyDzwoibZjuFcfuD28Gsb861WvhxeLxGFd6hyaX98yAjM/SIZM3jmIEYS6KO4jbvEx
-         zQ9bIkZQbImsB/EOTqMP1lK1z86qGJ6nVmJyYrGDfVwL4TjfTsireLod9VPr1TR42bal
-         r+VDVIygydNnhqzDX9G7T1F670EJDZZ3fxVrk3HYmocochVDxS5c3Lx4TNlLNU/Fd8oy
-         l3pqgQ/Ji7+BzMmT8t6XiSnltVOS1CYOm7mVPh9viAZ/MR8yo2sCux8FO+Jcq7BM9CTn
-         kkCpaYsqK1pDCAWyXHaqdeIkNQ/bJkpjGgiGloaQoWNvSg2/+pHJfT7OsxO3Y2wLF1Ef
-         pDkw==
-X-Gm-Message-State: AOAM531RPIqycffXZ/puj9Iyg3z6LQg0Zd6v9tv9KPLVuU1ihj1A+nf6
-        hT7RBxntlZCTz+xQ1son6j0=
-X-Google-Smtp-Source: ABdhPJywx2zr0au0NbjZQlHhGyEWvdx/VBKj9KNuPZlmtmzWlxWDf3VvwrcsyVaqgbe8R6uyT9i+DQ==
-X-Received: by 2002:a17:90b:4d09:: with SMTP id mw9mr5336125pjb.238.1637119329724;
-        Tue, 16 Nov 2021 19:22:09 -0800 (PST)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id ot18sm3994720pjb.14.2021.11.16.19.22.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 16 Nov 2021 19:22:08 -0800 (PST)
-Message-ID: <afb108ed-a2f3-cb49-d0b4-b1bd6739cdb6@gmail.com>
-Date:   Wed, 17 Nov 2021 11:21:57 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.3.0
-Content-Language: en-US
-To:     Jim Mattson <jmattson@google.com>,
-        "Paolo Bonzini - Distinguished Engineer (kernel-recipes.org)" 
-        <pbonzini@redhat.com>
-Cc:     Eric Hankland <ehankland@google.com>, kvm@vger.kernel.org,
-        Ingo Molnar <mingo@redhat.com>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Jiri Olsa <jolsa@redhat.com>,
-        Namhyung Kim <namhyung@kernel.org>,
-        linux-perf-users@vger.kernel.org,
+        id S231472AbhKQEzh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 16 Nov 2021 23:55:37 -0500
+Received: from mga02.intel.com ([134.134.136.20]:8783 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230083AbhKQEzh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 16 Nov 2021 23:55:37 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10170"; a="221094867"
+X-IronPort-AV: E=Sophos;i="5.87,240,1631602800"; 
+   d="scan'208";a="221094867"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2021 20:52:38 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.87,240,1631602800"; 
+   d="scan'208";a="593156898"
+Received: from orsmsx606.amr.corp.intel.com ([10.22.229.19])
+  by fmsmga002.fm.intel.com with ESMTP; 16 Nov 2021 20:52:38 -0800
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX606.amr.corp.intel.com (10.22.229.19) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.12; Tue, 16 Nov 2021 20:52:37 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.12 via Frontend Transport; Tue, 16 Nov 2021 20:52:37 -0800
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.41) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2242.12; Tue, 16 Nov 2021 20:52:37 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MUT57HrcCQ2DyxggEzQTqhBHvifMCWrSB596ctYfhLAW0HqvsVC1NWrs4kesCV+5m1TI3lIrFDU5/UUSQ1f/pUqTpcMOZQhri/OgwZg/e85DsYiodHj5AH0VIcgTm5xml/gUFAwzwxwaGpecsAJ9J2v8IXHJUCCsyFxuZ+T4uG2dfnxtiFQDDI2y7gBsNdYEaidDgxMp0BPjtDb7qvJN+jWiL1CoRt16iUGbQm3HkcGwCH1hi091RNjzL9ZP0/29QbuH4dj3pmgJ1cdHYt8jLheqvW3rpaKAIVUoUI7loUNhn0r/ZY320mDO26mwzC/+KwfUn7I4TxfludNg55TnCA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Rf9ia5ZJpc6gVSNh/aEqLLdt5GLeJ4avqkIlEspaddo=;
+ b=N58YjOFR/FL0Eiy5MOf3AvEILUrrezZe27pLXdCN5qXLzr3+fLdZp1YQRbjHtuOcg2pIG+Yb+D3Uj1o94v9C7QmqaQZG4TmHKib7R7hTMFlsVnuedTI2+LYN0OEnjmG05uodekeVGLPkKhHhEy7KpvNjgmNrjJxRIXapMDUNX6HamTg84ab5nrxq10HzfSLnSBjY+C3MQ89O3dkF1ZcQdEi8rpqpw4WbC/xkVIexxuorL1m8gGemz6YR261Bw2peE/MHvjGJf2utuInPSTHuuvayc3GNoKMUG37esN3HWNkN9es7b1IwQj8p7H2tVM/ELjQ6TIPBvTAlQJtWymsiEg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Rf9ia5ZJpc6gVSNh/aEqLLdt5GLeJ4avqkIlEspaddo=;
+ b=PFofq4SdwbMzPs4QClKH1OrfqB8mZJXwS4RE6LJfZK4f+GjQlFkVAFSF6NAf7yQUZB1AvvUrskucwSnawqQjRf2SPKm8JRlhX9mVLhqK02njsSHI8jlIUvTToqYyyDX7difIJqeTwytc2VVcoTCRXRWlfhuA5NLuBqwm0N2xhdg=
+Received: from BY5PR11MB4435.namprd11.prod.outlook.com (2603:10b6:a03:1ce::30)
+ by BYAPR11MB3669.namprd11.prod.outlook.com (2603:10b6:a03:f7::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4690.26; Wed, 17 Nov
+ 2021 04:52:36 +0000
+Received: from BY5PR11MB4435.namprd11.prod.outlook.com
+ ([fe80::348f:bbe0:8491:993]) by BY5PR11MB4435.namprd11.prod.outlook.com
+ ([fe80::348f:bbe0:8491:993%5]) with mapi id 15.20.4690.027; Wed, 17 Nov 2021
+ 04:52:36 +0000
+From:   "Nakajima, Jun" <jun.nakajima@intel.com>
+To:     Thomas Gleixner <tglx@linutronix.de>
+CC:     "Liu, Jing2" <jing2.liu@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         LKML <linux-kernel@vger.kernel.org>,
-        "Peter Zijlstra (Intel OTC, Netherlander)" <peterz@infradead.org>
-References: <20211112235235.1125060-1-jmattson@google.com>
- <20211112235235.1125060-2-jmattson@google.com>
- <fcb9aea5-2cf5-897f-5a3d-054ead555da4@gmail.com>
- <CALMp9eR5oi=ZrrEsZpcAJ7AP-Jo2cLGz9GA=SoTjX--TiG4=sw@mail.gmail.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-Organization: Tencent
-Subject: Re: [PATCH 1/2] KVM: x86: Update vPMCs when retiring instructions
-In-Reply-To: <CALMp9eR5oi=ZrrEsZpcAJ7AP-Jo2cLGz9GA=SoTjX--TiG4=sw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Arjan van de Ven <arjan@linux.intel.com>,
+        Jing Liu <jing2.liu@linux.intel.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "Cooper, Andrew" <andrew.cooper3@citrix.com>,
+        "Bae, Chang Seok" <chang.seok.bae@intel.com>
+Subject: Re: Thoughts of AMX KVM support based on latest kernel
+Thread-Topic: Thoughts of AMX KVM support based on latest kernel
+Thread-Index: AdfWMJGMz5/jeSLQRn+nYCX+7Qj8nwE7nDEAABP7RQA=
+Date:   Wed, 17 Nov 2021 04:52:35 +0000
+Message-ID: <16BF8BE6-B7B1-4F3E-B972-9D82CD2F23C8@intel.com>
+References: <BYAPR11MB325685AB8E3DFD245846F854A9939@BYAPR11MB3256.namprd11.prod.outlook.com>
+ <878rxn6h6t.ffs@tglx>
+In-Reply-To: <878rxn6h6t.ffs@tglx>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-mailer: Apple Mail (2.3608.120.23.2.7)
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 396722d9-d8d3-4d0c-1151-08d9a9861311
+x-ms-traffictypediagnostic: BYAPR11MB3669:
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-microsoft-antispam-prvs: <BYAPR11MB366994E58447F6C2BEAF4F9B9A9A9@BYAPR11MB3669.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7219;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: aSX3pypp4tSyskLSrUZIDfK+p3YFAaMYUMFM3+McAFUO4OJNuu/aYUJBWKC0TtU6l6NKqCCkvWfshvLfUbDZtIHmNUJPq3Ui5ea9J7kkUx0pDkPqasGe2mHYV345CbdyWuGNWjXWPhZP6viLQGtGoPW5Yqe05K7X4CDiqwdRGsDdNWGRpJqPLIpQ9z5Ycagu/qgtp99AWTwE8PnkwQ58d2rvR4kEK0xyTfS3Y77E7Dl86cY1Bxt3vtpKqbVgA0G8ooChWIpdtHh03jBSHsJtL8bhtX1OMnPlfPsJiAkQoo7bRwjF+wlpGDxqWKVyWz6ujh/OFLmHm+QMjPrrkVEjXjU36qcaLAcjdK74pluv2Golvh6EHD/F8XBXr3wwXqSZK/mZKGPhi4sbmtGD/tyhrcC0lmmzXuU5NEtEwYldGSJqvlDxrufzdNRiBJdUiz6S61/cObCnOP0nJvWKldDOvZgn2XkfimFagumFuTK76usu7ZZY0VXIec6NlGDZ+qq1BBuMKr3O/isB31cJVCai41UZuMbkPy27wmk47QjXeRnIrRABaiXarQwot6w9k63vDzlozdW2e/vDq86JYigvU1/Aug+B1ryxcJVdSKGUIArYv2fUWWVqN2uHqiqa6PXlUBV/1pAKIR+v9RBnZxC7GLSXZPZ4E04T1i/huUaXbtNyJWXD02++PHDfOY36qOapMkvq8KAb9weRs4lwNwvApWuw4OvDZMmpUaGRAJ4zl5gG0GIZGYy5cmC8p0jp6A6u
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR11MB4435.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(8936002)(83380400001)(7416002)(53546011)(6506007)(8676002)(5660300002)(82960400001)(4326008)(26005)(6512007)(2906002)(122000001)(186003)(6486002)(38070700005)(316002)(33656002)(86362001)(71200400001)(66946007)(66476007)(66556008)(64756008)(66446008)(2616005)(38100700002)(508600001)(36756003)(76116006)(6916009)(54906003)(45980500001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?3qJVlhdb5Py/Vjkfp7AstBHDqom/00ItiFhctTLYVv/rCdCO5WvoxPZIx4c2?=
+ =?us-ascii?Q?B2KEcVB3SWVZIpqPmYGphJfJ9wYkYQs4Xk8H8yiXbc+a0rVoCFaBKbTQ8WvM?=
+ =?us-ascii?Q?wFA5X5vU/zUANVKVaQCzgMGBjbO8TTkAHRzbwF0zxX7dYxaPuCGdbYgwj1Nx?=
+ =?us-ascii?Q?wlTRaGgmiJbvAW061hVAticoLMnQyJWuW3+e1BDHCV4JeuQwr5Ws4V/M/PG9?=
+ =?us-ascii?Q?dX/SSQrBSZXknOCxMXcZWWgUqW2/uwsSt/ghNCrO0/PJx+ozj6vgoQWmkNVv?=
+ =?us-ascii?Q?qJjn42zDPy+RFeulRZNJ/BQpWVtxrg9vB3uaX94BCV8pyxnqav7JyyiVmvVy?=
+ =?us-ascii?Q?fIpmcUnnvD0K2Li837nWmg++9g6hegIFEw4xm0BIX/ildV/RweCGZTpg3LKn?=
+ =?us-ascii?Q?B+NC8eJ+i9cFBnBwkaGlzrx77eANiUNTIfog2KRAtbc1i5nVMvTRey1tkx36?=
+ =?us-ascii?Q?3XKkm37I85j5rd/CJW+0IViK9qTLWStiV3c/v6gY5TBh5qhHYcyBxwIfkAcZ?=
+ =?us-ascii?Q?OC4H3/ajx3vwnjkA/An7rcICP/KSOMknOI/ZzSfUZ5BnYKGpPU/C4ZZwkehE?=
+ =?us-ascii?Q?vj78g2UqS+UP+Ko06VIqI876VCKKPBsiHbeenDD6UAGjKU72gG7+xIMI2xQ6?=
+ =?us-ascii?Q?J2n0bH8fDP1Vq++fw07x1dApUa/OO/jUC0jQU1F2nxGXqbfHGP/QyuWviM8E?=
+ =?us-ascii?Q?+NmbCAOxSTWlpNc5xdSjVaiU0QiTT4BEtX2nFW/VbqyaaSHlzhVWV9n8ImB3?=
+ =?us-ascii?Q?OTpHts9kvu2eOwnduNYqZwJbpNl77kDtYG6CpgRUWytzFUJY6og+FMsGAZHf?=
+ =?us-ascii?Q?Su7VaLokN3rayB39N91pfvNmUZurIKQ6epCOg3XXombeQJjJznlvRq0X0z8T?=
+ =?us-ascii?Q?00vsjflgaJDmJHtKU3xmhoN0YyD0NGTDDaNpzprrhjVE7jqXEBvGNmlW8+Oh?=
+ =?us-ascii?Q?YOEUl+dNqY303q2sr+Mlwi5wIqqZ7J46fiH4ZO0wp7xMrnnYUAkWtI8/vPOT?=
+ =?us-ascii?Q?t81anc/sKWS9FnkFXixa0rUtPcbI5+E8jwZz6DZv/WerN4koY9/+Bg4xtv5v?=
+ =?us-ascii?Q?rO/U8PlsDFf+hUHaMhbQwkbAp2GX3Ae919JCYp3f8SxuIuJpAHWmBKM1MEtu?=
+ =?us-ascii?Q?y/l/PxkTEruZ7GlmQIDrbkHaUDkl1mElw1RKp9/ihoAefHTetzihUsBNWVNZ?=
+ =?us-ascii?Q?1cCKoE5tLlmON4ZPolITKwL9jBku1mudPLDouvFfZTQ8O34MEsIYo2/VRNBN?=
+ =?us-ascii?Q?AQffC+oRS1qlF7SSjFHoBUD4ost5Tzra27vb4FsZ4FnIBrzvQyie82SobvZD?=
+ =?us-ascii?Q?GD8EH43J91SV8dX4xDy5L4Qq/teiw/gPVszB1OKF+990cxV2009Ls+pql5ov?=
+ =?us-ascii?Q?UFHkusu/0Tmm9N650Xzht676VkAc0mRf0msOo2dpMv1LaKT7WI3XxHjA0Zgt?=
+ =?us-ascii?Q?nIbsojKSoAWZfVtBHqRIdsqjsO5RwcUnR7DcB26OCfIaN7cvsRNOkU1tosla?=
+ =?us-ascii?Q?Qq0rtGRD/nTxI6XbCH+be2702XPB8mHS7KBReFo1FRdXtIj04bmJWg/oQrlF?=
+ =?us-ascii?Q?QMKacYIIDOxyMgA4kIF/Zh+mgj/2YzBeY36icN1o4liEyieXPoJtZiEA3pQZ?=
+ =?us-ascii?Q?tPrQlimtbS78k2ixOABlT4E=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <CAB01BE743E22444946D4A12DC08887A@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BY5PR11MB4435.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 396722d9-d8d3-4d0c-1151-08d9a9861311
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Nov 2021 04:52:35.8874
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 04W6i89PFBpHJqiKoKYEJ1+NrPHt5CfSSpsz7OI1HEVRVjmgv37OdLGa/NFUV7OGQJZ6SDZsGNWPOmn5MHDZsA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR11MB3669
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/11/2021 6:15 am, Jim Mattson wrote:
-> On Tue, Nov 16, 2021 at 4:44 AM Like Xu <like.xu.linux@gmail.com> wrote:
->>
->> Hi Jim,
->>
->> On 13/11/2021 7:52 am, Jim Mattson wrote:
->>> When KVM retires a guest instruction through emulation, increment any
->>> vPMCs that are configured to monitor "instructions retired," and
->>> update the sample period of those counters so that they will overflow
->>> at the right time.
->>>
->>> Signed-off-by: Eric Hankland <ehankland@google.com>
->>> [jmattson:
->>>     - Split the code to increment "branch instructions retired" into a
->>>       separate commit.
->>>     - Added 'static' to kvm_pmu_incr_counter() definition.
->>>     - Modified kvm_pmu_incr_counter() to check pmc->perf_event->state ==
->>>       PERF_EVENT_STATE_ACTIVE.
->>> ]
->>> Signed-off-by: Jim Mattson <jmattson@google.com>
->>> Fixes: f5132b01386b ("KVM: Expose a version 2 architectural PMU to a guests")
->>> ---
->>>    arch/x86/kvm/pmu.c | 31 +++++++++++++++++++++++++++++++
->>>    arch/x86/kvm/pmu.h |  1 +
->>>    arch/x86/kvm/x86.c |  3 +++
->>>    3 files changed, 35 insertions(+)
->>>
->>> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
->>> index 09873f6488f7..153c488032a5 100644
->>> --- a/arch/x86/kvm/pmu.c
->>> +++ b/arch/x86/kvm/pmu.c
->>> @@ -490,6 +490,37 @@ void kvm_pmu_destroy(struct kvm_vcpu *vcpu)
->>>        kvm_pmu_reset(vcpu);
->>>    }
->>>
->>> +static void kvm_pmu_incr_counter(struct kvm_pmc *pmc, u64 evt)
->>> +{
->>> +     u64 counter_value, sample_period;
->>> +
->>> +     if (pmc->perf_event &&
->>
->> We need to incr pmc->counter whether it has a perf_event or not.
->>
->>> +         pmc->perf_event->attr.type == PERF_TYPE_HARDWARE &&
->>
->> We need to cover PERF_TYPE_RAW as well, for example,
->> it has the basic bits for "{ 0xc0, 0x00, PERF_COUNT_HW_INSTRUCTIONS },"
->> plus HSW_IN_TX or ARCH_PERFMON_EVENTSEL_EDGE stuff.
->>
->> We just need to focus on checking the select and umask bits:
-> 
-> [What follows applies only to Intel CPUs. I haven't looked at AMD's
-> PMU implementation yet.]
+>=20
+> On Nov 16, 2021, at 11:20 AM, Thomas Gleixner <tglx@linutronix.de> wrote:
+>=20
+> Jing,
+>=20
+> On Wed, Nov 10 2021 at 13:01, Liu, Jing2 wrote:
+>=20
+> more thoughts.
+>=20
+>> Once we start passthrough the XFD MSR, we need to save/restore
+>> them at VM exit/entry time. If we immediately resume the guest
+>> without enabling interrupts/preemptions (exit fast-path), we have no
+>> issues. We don't need to save the MSR.
+>=20
+> Correct.
+>=20
+>> The question is how the host XFD MSR is restored while control is in
+>> KVM.
+>>=20
+>> The XSAVE(S) instruction saves the (guest) state component[x] as 0 or
+>> doesn't save when XFD[x] !=3D 0. Accordingly, XRSTOR(S) cannot restore
+>> that (guest state). And it is possible that XFD !=3D 0 and the guest is =
+using
+>> extended feature at VM exit;
+>=20
+> You mean on creative guests which just keep AMX state alive and set
+> XFD[AMX] =3D 1 to later restore it to XFD[AMX] =3D 0?
 
-x86 has the same bit definition and semantics on at least the select and umask bits.
 
-> 
-> Looking at the SDM, volume 3, Figure 18-1: Layout of IA32_PERFEVTSELx
-> MSRs, there seems to be a lot of complexity here, actually. In
+Typically a (usual) guest saves the AMX state for the previous process and =
+sets XFD[AMX] =3D 1 for the next at context switch time, and a VM exit can =
+happen anytime, e.g. right after XFD[AMX] =3D 1.=20
+But this case is okay because the state is already saved by the guest.
 
-The devil is in the details.
+If a (creative) guest wants to set XFD[AMX] =3D 1 for fun while keeping AMX=
+ state alive without saving the AXM state, it may lose the state after VM e=
+xit/entry. I think the right thing to do is to avoid such programming in th=
+e first place. Let me find out if we can add such notes in the programming =
+references.
 
-> addition to checking for the desired event select and unit mask, it
-> looks like we need to check the following:
-> 
-> 1. The EN bit is set.
 
-We need to cover the EN bit of fixed counter 0 for HW_INSTRUCTIONS.
+---=20
+Jun
 
-> 2. The CMASK field is 0 (for events that can only happen once per cycle).
-> 3. The E bit is clear (maybe?).
 
-The "Edge detect" bit is about hw detail and let's ignore it.
-
-> 4. The OS bit is set if the guest is running at CPL0.
-> 5. The USR bit is set if the guest is running at CPL>0.
-
-CPL is a necessity.
-
-> 
-> 
->> static inline bool eventsel_match_perf_hw_id(struct kvm_pmc *pmc,
->>          unsigned int perf_hw_id)
->> {
->>          u64 old_eventsel = pmc->eventsel;
->>          unsigned int config;
->>
->>          pmc->eventsel &=
->>                  (ARCH_PERFMON_EVENTSEL_EVENT | ARCH_PERFMON_EVENTSEL_UMASK);
->>          config = kvm_x86_ops.pmu_ops->find_perf_hw_id(pmc);
->>          pmc->eventsel = old_eventsel;
->>          return config == perf_hw_id;
->> }
-
-My proposal is to incr counter as long as the select and mask bits match the 
-generi event.
-
-What do you think?
-
->>
->>> +         pmc->perf_event->state == PERF_EVENT_STATE_ACTIVE &&
->>
->> Again, we should not care the pmc->perf_event.
-> 
-> This test was intended as a proxy for checking that the counter is
-> enabled in the guest's IA32_PERF_GLOBAL_CTRL MSR.
-
-The two are not equivalent.
-
-A enabled counter means true from "pmc_is_enabled(pmc)  && 
-pmc_speculative_in_use(pmc)".
-A well-emulated counter means true from "perf_event->state == 
-PERF_EVENT_STATE_ACTIVE".
-
-A bad-emulated but enabled counter should be incremented for emulated instructions.
-
-> 
->>> +         pmc->perf_event->attr.config == evt) {
->>
->> So how about the emulated instructions for
->> ARCH_PERFMON_EVENTSEL_USR and ARCH_PERFMON_EVENTSEL_USR ?
-> 
-> I assume you're referring to the OS and USR bits of the corresponding
-> IA32_PERFEVTSELx MSR. I agree that these bits have to be consulted,
-> along with guest privilege level, before deciding whether or not to
-> count the event.
-
-Thanks and we may need update the testcase as well.
-
-> 
->>> +             pmc->counter++;
->>> +             counter_value = pmc_read_counter(pmc);
->>> +             sample_period = get_sample_period(pmc, counter_value);
->>> +             if (!counter_value)
->>> +                     perf_event_overflow(pmc->perf_event, NULL, NULL);
->>
->> We need to call kvm_perf_overflow() or kvm_perf_overflow_intr().
->> And the patch set doesn't export the perf_event_overflow() SYMBOL.
-> 
-> Oops. I was compiling with kvm built into vmlinux, so I missed this.
-
-In fact, I don't think the perf code would accept such rude symbolic export
-And I do propose to apply kvm_pmu_incr_counter() in a less invasive way.
-
-> 
->>> +             if (local64_read(&pmc->perf_event->hw.period_left) >
->>> +                 sample_period)
->>> +                     perf_event_period(pmc->perf_event, sample_period);
->>> +     }
->>> +}
->>
->> Not cc PeterZ or perf reviewers for this part of code is not a good thing.
-> 
-> Added.
-> 
->> How about this:
->>
->> static void kvm_pmu_incr_counter(struct kvm_pmc *pmc)
->> {
->>          struct kvm_pmu *pmu = pmc_to_pmu(pmc);
->>
->>          pmc->counter++;
->>          reprogram_counter(pmu, pmc->idx);
->>          if (!pmc_read_counter(pmc))
->>                  // https://lore.kernel.org/kvm/20211116122030.4698-1-likexu@tencent.com/T/#t
->>                  kvm_pmu_counter_overflow(pmc, need_overflow_intr(pmc));
->> }
->>
->>> +
->>> +void kvm_pmu_record_event(struct kvm_vcpu *vcpu, u64 evt)
->>
->> s/kvm_pmu_record_event/kvm_pmu_trigger_event/
->>
->>> +{
->>> +     struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
->>> +     int i;
->>> +
->>> +     for (i = 0; i < pmu->nr_arch_gp_counters; i++)
->>> +             kvm_pmu_incr_counter(&pmu->gp_counters[i], evt);
->>
->> Why do we need to accumulate a counter that is not enabled at all ?
-> 
-> In the original code, the condition checked in kmu_pmu_incr_counter()
-> was intended to filter out disabled counters.
-
-The bar of code review haven't been lowered, eh?
-
-> 
->>> +     for (i = 0; i < pmu->nr_arch_fixed_counters; i++)
->>> +             kvm_pmu_incr_counter(&pmu->fixed_counters[i], evt);
->>
->> How about this:
->>
->>          for_each_set_bit(i, pmu->all_valid_pmc_idx, X86_PMC_IDX_MAX) {
->>                  pmc = kvm_x86_ops.pmu_ops->pmc_idx_to_pmc(pmu, i);
->>
->>                  if (!pmc || !pmc_is_enabled(pmc) || !pmc_speculative_in_use(pmc))
->>                          continue;
->>
->>                  // https://lore.kernel.org/kvm/20211116122030.4698-1-likexu@tencent.com/T/#t
->>                  if (eventsel_match_perf_hw_id(pmc, perf_hw_id))
->>                          kvm_pmu_incr_counter(pmc);
->>          }
->>
-> 
-> Let me expand the list of reviewers and come back with v2 after I
-> collect more input.
-
-I'm not sure Paolo will revert the "Queued both" decision,
-but I'm not taking my eyes or hands off the vPMU code.
-
-> 
-> Thanks!
-> 
-> 
->>> +}
->>> +EXPORT_SYMBOL_GPL(kvm_pmu_record_event);
->>> +
->>>    int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp)
->>>    {
->>>        struct kvm_pmu_event_filter tmp, *filter;
->>> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
->>> index 59d6b76203d5..d1dd2294f8fb 100644
->>> --- a/arch/x86/kvm/pmu.h
->>> +++ b/arch/x86/kvm/pmu.h
->>> @@ -159,6 +159,7 @@ void kvm_pmu_init(struct kvm_vcpu *vcpu);
->>>    void kvm_pmu_cleanup(struct kvm_vcpu *vcpu);
->>>    void kvm_pmu_destroy(struct kvm_vcpu *vcpu);
->>>    int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp);
->>> +void kvm_pmu_record_event(struct kvm_vcpu *vcpu, u64 evt);
->>>
->>>    bool is_vmware_backdoor_pmc(u32 pmc_idx);
->>>
->>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->>> index d7def720227d..bd49e2a204d5 100644
->>> --- a/arch/x86/kvm/x86.c
->>> +++ b/arch/x86/kvm/x86.c
->>> @@ -7854,6 +7854,8 @@ int kvm_skip_emulated_instruction(struct kvm_vcpu *vcpu)
->>>        if (unlikely(!r))
->>>                return 0;
->>>
->>> +     kvm_pmu_record_event(vcpu, PERF_COUNT_HW_INSTRUCTIONS);
->>> +
->>>        /*
->>>         * rflags is the old, "raw" value of the flags.  The new value has
->>>         * not been saved yet.
->>> @@ -8101,6 +8103,7 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->>>                vcpu->arch.emulate_regs_need_sync_to_vcpu = false;
->>>                if (!ctxt->have_exception ||
->>>                    exception_type(ctxt->exception.vector) == EXCPT_TRAP) {
->>> +                     kvm_pmu_record_event(vcpu, PERF_COUNT_HW_INSTRUCTIONS);
->>>                        kvm_rip_write(vcpu, ctxt->eip);
->>>                        if (r && (ctxt->tf || (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP)))
->>>                                r = kvm_vcpu_do_singlestep(vcpu);
->>>
-> 
