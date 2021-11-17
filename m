@@ -2,114 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E151454CE1
-	for <lists+kvm@lfdr.de>; Wed, 17 Nov 2021 19:13:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 05BC0454D0E
+	for <lists+kvm@lfdr.de>; Wed, 17 Nov 2021 19:25:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239883AbhKQSQj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Nov 2021 13:16:39 -0500
-Received: from mail.kernel.org ([198.145.29.99]:53218 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238747AbhKQSQi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Nov 2021 13:16:38 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S239979AbhKQS2L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Nov 2021 13:28:11 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:29801 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S239962AbhKQS2H (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 17 Nov 2021 13:28:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1637173508;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=9x1CusrT8igLfM6MhA9CmHxdNVbcyZMsrBDw9/aXMSY=;
+        b=NauNFe/Rjy1f1VOXhUMhsCjsxcVKqR7fiVF8Y8mNV6tNhijZAaDUHlbMowSiKTx6pxo/3f
+        QSLZOnM2FLO+9hwqwP0n+YkXBkbqNZf/1L7W1hbFSXN6dOuWa9SVWjQgK/3zsK6fIOEYDE
+        PHFgtabadF5AgkmDLbvDSjCmLlK0Qn8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-248-38xd67xOP8-mFlkhoY4Opw-1; Wed, 17 Nov 2021 13:25:02 -0500
+X-MC-Unique: 38xd67xOP8-mFlkhoY4Opw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id D1DA261BC1;
-        Wed, 17 Nov 2021 18:13:39 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1mnPRB-0069CQ-WB; Wed, 17 Nov 2021 18:13:38 +0000
-Date:   Wed, 17 Nov 2021 18:13:37 +0000
-Message-ID: <87pmqy7ir2.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        "jmattson @ google . com" <jmattson@google.com>,
-        "wanpengli @ tencent . com" <wanpengli@tencent.com>,
-        "seanjc @ google . com" <seanjc@google.com>,
-        "vkuznets @ redhat . com" <vkuznets@redhat.com>,
-        "mtosatti @ redhat . com" <mtosatti@redhat.com>,
-        "joro @ 8bytes . org" <joro@8bytes.org>, karahmed@amazon.com,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org
-Subject: Re: [PATCH v3 08/12] KVM: Propagate vcpu explicitly to mark_page_dirty_in_slot()
-In-Reply-To: <20211117174003.297096-9-dwmw2@infradead.org>
-References: <20211117174003.297096-1-dwmw2@infradead.org>
-        <20211117174003.297096-9-dwmw2@infradead.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: dwmw2@infradead.org, pbonzini@redhat.com, kvm@vger.kernel.org, boris.ostrovsky@oracle.com, joao.m.martins@oracle.com, jmattson@google.com, wanpengli@tencent.com, seanjc@google.com, vkuznets@redhat.com, mtosatti@redhat.com, joro@8bytes.org, karahmed@amazon.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, catalin.marinas@arm.com, will@kernel.org, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, mpe@ellerman.id.au, benh@kernel.crashing.org, anup.patel@wdc.com, borntraeger@de.ibm.com, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 61E5F8799E0;
+        Wed, 17 Nov 2021 18:24:58 +0000 (UTC)
+Received: from [10.39.192.245] (unknown [10.39.192.245])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 62AE45BAE6;
+        Wed, 17 Nov 2021 18:24:57 +0000 (UTC)
+Message-ID: <1daca220-1b16-b318-5b77-7c53789cae67@redhat.com>
+Date:   Wed, 17 Nov 2021 19:24:56 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH 1/4] selftests: sev_migrate_tests: free all VMs
+Content-Language: en-US
+To:     Peter Gonda <pgonda@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        seanjc@google.com
+References: <20211117163809.1441845-1-pbonzini@redhat.com>
+ <20211117163809.1441845-2-pbonzini@redhat.com>
+ <CAMkAt6q15oP9MwBDGabD5+wJWVevUVxOwYVCgzwGTi64syL-9g@mail.gmail.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <CAMkAt6q15oP9MwBDGabD5+wJWVevUVxOwYVCgzwGTi64syL-9g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 17 Nov 2021 17:39:59 +0000,
-David Woodhouse <dwmw2@infradead.org> wrote:
+On 11/17/21 17:52, Peter Gonda wrote:
+> I think we are still missing the kvm_vm_free() from
+> test_sev_migrate_locking(). Should we have this at the end?
 > 
-> From: David Woodhouse <dwmw@amazon.co.uk>
-> 
-> The kvm_dirty_ring_get() function uses kvm_get_running_vcpu() to work out
-> which dirty ring to use, but there are some use cases where that doesn't
-> work.
-> 
-> There's one in setting the Xen shared info page, introduced in commit
-> 629b5348841a ("KVM: x86/xen: update wallclock region") and reported by
-> "butt3rflyh4ck" <butterflyhuangxx@gmail.com> in
-> https://lore.kernel.org/kvm/CAFcO6XOmoS7EacN_n6v4Txk7xL7iqRa2gABg3F7E3Naf5uG94g@mail.gmail.com/
-> 
-> There's also about to be another one when the newly-reintroduced
-> gfn_to_pfn_cache needs to mark a page as dirty from the MMU notifier
-> which invalidates the mapping. In that case, we will *know* the vcpu
-> that can be 'blamed' for dirtying the page, and we just need to be
-> able to pass it in as an explicit argument when doing so.
-> 
-> This patch preemptively resolves the second issue, and paves the way
-> for resolving the first. A complete fix for the first issue will need
-> us to switch the Xen shinfo to be owned by a particular vCPU, which
-> will happen in a separate patch.
-> 
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> ---
->  arch/arm64/kvm/mmu.c           |  2 +-
->  arch/x86/kvm/mmu/mmu.c         |  2 +-
->  arch/x86/kvm/mmu/spte.c        |  2 +-
->  arch/x86/kvm/mmu/tdp_mmu.c     |  2 +-
->  arch/x86/kvm/x86.c             |  4 ++--
->  include/linux/kvm_dirty_ring.h |  6 ++++--
->  include/linux/kvm_host.h       |  3 ++-
->  virt/kvm/dirty_ring.c          |  8 ++++++--
->  virt/kvm/kvm_main.c            | 18 +++++++++---------
->  9 files changed, 27 insertions(+), 20 deletions(-)
+> for (i = 0; i < NR_LOCK_TESTING_THREADS; ++i)
+>      kvm_vm_free(input[i].vm);
 
-What's the base for this series? This patch fails to compile for me
-(at least on arm64), and the following patch doesn't apply on -rc1.
+Yes, we should.  Thanks!
 
-Thanks,
+Paolo
 
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
