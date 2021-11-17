@@ -2,123 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 165A3455143
-	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 00:46:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B40445514B
+	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 00:51:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241695AbhKQXtv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Nov 2021 18:49:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43094 "EHLO
+        id S241706AbhKQXyK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Nov 2021 18:54:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241694AbhKQXtg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Nov 2021 18:49:36 -0500
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20CF2C0613B9
-        for <kvm@vger.kernel.org>; Wed, 17 Nov 2021 15:46:36 -0800 (PST)
-Received: by mail-pl1-x636.google.com with SMTP id o14so3607040plg.5
-        for <kvm@vger.kernel.org>; Wed, 17 Nov 2021 15:46:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=vBBxMjPLRUhIihqhqucxRK9lnl2zxhzIK0++UZjm8wA=;
-        b=ZlB2RT7dNPcZE3snoS77x56kjyngl8YJjE2a87gK9wlDb3Mo9LrGTvT+PyyjFmgnUM
-         GyXnWubx2TpkDtfDi0jdSWizGJdqO8xzBIyoKzmgyg4iXtBNhMM63HTZ2VTAn/S+brlk
-         dU7nt7H/95X2tMg69YH9/Szekw3qFjdhb3ChqN20wUU+yZAx5TxFZ5ZwO2SSNudzQSxO
-         7GalZ4ZY/tesjRI1Qpramrd5Bazhk9syLXb4hKKZydLYVFK6VlTwHg3lE/JlfW6jq8LZ
-         fbu0QzJSXcUYjO1/ehDYIUxhIKTjbgyXs85dUl6tafDnYcyuu12Pwcj5aNabCN3BkFr/
-         LJRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=vBBxMjPLRUhIihqhqucxRK9lnl2zxhzIK0++UZjm8wA=;
-        b=P0GoknOf78Bfm2rrohe2Wj6IgHeIzT+/LrzE+wHiMuPbkQVqRbKJ1Zy6u5+o9S6Pnw
-         uK1JDFRtAdstkfUbY59BXAE5pdca+pSZRKpz3SVsXcJPtLYem7+YQgjW269/yuX8roX9
-         /x8GsNbIVMMUyWRfx/XUzF1XeZgfC3/5q/z9MtaMRhzABCfK9u/YtD/fiFFcubkcv1lG
-         IUpFRYYjIrQG47rtwcO+NJX/BnwXrNWa6T0v818zmCfqb11d3usXhtfnkuCdSgp6MHZz
-         Z7I04CvIWXtGR7VW56daidEpXZxVONErivoRItAr1Cs4iBuz0NRZ8Mz5VYyZ9vkvvrEs
-         F4UA==
-X-Gm-Message-State: AOAM530STarzRpzt4RcKjbG7RfBeOiJpr12ljtsNM89fcmcoGPNcRDlL
-        9aiX1rhAf9fMFsMxuUAi6Tk1ZA==
-X-Google-Smtp-Source: ABdhPJwORdO130JVw+aybjtjWO7QHNAn6+9S2r9Cyv5zHvjQDzt1IzZyAOcddO77J2Y+Se6fY1CzSQ==
-X-Received: by 2002:a17:90a:3e09:: with SMTP id j9mr4794449pjc.24.1637192795417;
-        Wed, 17 Nov 2021 15:46:35 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id f130sm714169pfa.81.2021.11.17.15.46.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Nov 2021 15:46:34 -0800 (PST)
-Date:   Wed, 17 Nov 2021 23:46:31 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Juergen Gross <jgross@suse.com>
-Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH v3 1/4] x86/kvm: add boot parameter for adding vcpu-id
- bits
-Message-ID: <YZWUV2jvoOS9RSq8@google.com>
-References: <20211116141054.17800-1-jgross@suse.com>
- <20211116141054.17800-2-jgross@suse.com>
- <7f10b8b4-e753-c977-f201-5ef17a6e81c8@suse.com>
+        with ESMTP id S233682AbhKQXxz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Nov 2021 18:53:55 -0500
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [IPv6:2404:9400:2:0:216:3eff:fee2:21ea])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C040C0613B9;
+        Wed, 17 Nov 2021 15:50:56 -0800 (PST)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4Hvfnf5QFsz4xdN;
+        Thu, 18 Nov 2021 10:50:46 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
+        s=201909; t=1637193050;
+        bh=Y6qLtvD8c83vsgFlioCTxBI91MBKkMrwNyHMmx3iNJk=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=Jv/ugO0GdH1f2QhPzft9Sxm/ntmhVoKfvBJTCvlmQ6WmIVLJ2Ps9uD42n8dNSGkkg
+         wfYndhQTxnNrANlIOxL6l6FdkPbh71djkG3LkipwOlTpsCGCbCaOcYQGn2Fy/ejEeW
+         6kpY8zvN0vfn1DhWVYqTQ5DveIe5yaDoKLSrEg0QCzmfKLpl94IdHDQDBLvD9L4j3v
+         KRtHU+3QH9SXZqUmFBx38dz1SrkWHBs5XGhAkKOmtAXIL5Wbj2db2XwIZWrAlZEIOH
+         05iVEr2HKDWNdtuOaS94KFmS0qEHie53/jVZ5Zr8m5snbbknqPu11gE31EKwHUouyn
+         P9oDRQBt23RFQ==
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     David Woodhouse <dwmw2@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>
+Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        "jmattson @ google . com" <jmattson@google.com>,
+        "wanpengli @ tencent . com" <wanpengli@tencent.com>,
+        "seanjc @ google . com" <seanjc@google.com>,
+        "vkuznets @ redhat . com" <vkuznets@redhat.com>,
+        "mtosatti @ redhat . com" <mtosatti@redhat.com>,
+        "joro @ 8bytes . org" <joro@8bytes.org>, karahmed@amazon.com,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Anup Patel <anup.patel@wdc.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org
+Subject: Re: [PATCH v3 06/12] KVM: powerpc: Use Makefile.kvm for common files
+In-Reply-To: <20211117174003.297096-7-dwmw2@infradead.org>
+References: <20211117174003.297096-1-dwmw2@infradead.org>
+ <20211117174003.297096-7-dwmw2@infradead.org>
+Date:   Thu, 18 Nov 2021 10:50:44 +1100
+Message-ID: <871r3emje3.fsf@mpe.ellerman.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7f10b8b4-e753-c977-f201-5ef17a6e81c8@suse.com>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 17, 2021, Juergen Gross wrote:
-> On 16.11.21 15:10, Juergen Gross wrote:
-> > Today the maximum vcpu-id of a kvm guest's vcpu on x86 systems is set
-> > via a #define in a header file.
-> > 
-> > In order to support higher vcpu-ids without generally increasing the
-> > memory consumption of guests on the host (some guest structures contain
-> > arrays sized by KVM_MAX_VCPU_IDS) add a boot parameter for adding some
-> > bits to the vcpu-id. Additional bits are needed as the vcpu-id is
-> > constructed via bit-wise concatenation of socket-id, core-id, etc.
-> > As those ids maximum values are not always a power of 2, the vcpu-ids
-> > are sparse.
-> > 
-> > The additional number of bits needed is basically the number of
-> > topology levels with a non-power-of-2 maximum value, excluding the top
-> > most level.
-> > 
-> > The default value of the new parameter will be 2 in order to support
-> > today's possible topologies. The special value of -1 will use the
-> > number of bits needed for a guest with the current host's topology.
-> > 
-> > Calculating the maximum vcpu-id dynamically requires to allocate the
-> > arrays using KVM_MAX_VCPU_IDS as the size dynamically.
-> > 
-> > Signed-of-by: Juergen Gross <jgross@suse.com>
-> 
-> Just thought about vcpu-ids a little bit more.
-> 
-> It would be possible to replace the topology games completely by an
-> arbitrary rather high vcpu-id limit (65536?) and to allocate the memory
-> depending on the max vcpu-id just as needed.
-> 
-> Right now the only vcpu-id dependent memory is for the ioapic consisting
-> of a vcpu-id indexed bitmap and a vcpu-id indexed byte array (vectors).
-> 
-> We could start with a minimal size when setting up an ioapic and extend
-> the areas in case a new vcpu created would introduce a vcpu-id outside
-> the currently allocated memory. Both arrays are protected by the ioapic
-> specific lock (at least I couldn't spot any unprotected usage when
-> looking briefly into the code), so reallocating those arrays shouldn't
-> be hard. In case of ENOMEM the related vcpu creation would just fail.
-> 
-> Thoughts?
+David Woodhouse <dwmw2@infradead.org> writes:
+> From: David Woodhouse <dwmw@amazon.co.uk>
+>
+> It's all fairly baroque but in the end, I don't think there's any reason
+> for $(KVM)/irqchip.o to have been handled differently, as they all end
+> up in $(kvm-y) in the end anyway, regardless of whether they get there
+> via $(common-objs-y) and the CPU-specific object lists.
+>
+> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+> ---
+>  arch/powerpc/kvm/Makefile | 6 +-----
+>  1 file changed, 1 insertion(+), 5 deletions(-)
+>
+> diff --git a/arch/powerpc/kvm/Makefile b/arch/powerpc/kvm/Makefile
+> index 583c14ef596e..245f59118413 100644
+> --- a/arch/powerpc/kvm/Makefile
+> +++ b/arch/powerpc/kvm/Makefile
+> @@ -4,11 +4,8 @@
+>  #
+>  
+>  ccflags-y := -Ivirt/kvm -Iarch/powerpc/kvm
+> -KVM := ../../../virt/kvm
+>  
+> -common-objs-y = $(KVM)/kvm_main.o $(KVM)/eventfd.o $(KVM)/binary_stats.o
+> -common-objs-$(CONFIG_KVM_VFIO) += $(KVM)/vfio.o
+> -common-objs-$(CONFIG_KVM_MMIO) += $(KVM)/coalesced_mmio.o
+> +include $(srctree)/virt/kvm/Makefile.kvm
+>  
+>  common-objs-y += powerpc.o emulate_loadstore.o
+>  obj-$(CONFIG_KVM_EXIT_TIMING) += timing.o
+> @@ -125,7 +122,6 @@ kvm-book3s_32-objs := \
+>  kvm-objs-$(CONFIG_KVM_BOOK3S_32) := $(kvm-book3s_32-objs)
+>  
+>  kvm-objs-$(CONFIG_KVM_MPIC) += mpic.o
+> -kvm-objs-$(CONFIG_HAVE_KVM_IRQ_ROUTING) += $(KVM)/irqchip.o
+>  
+>  kvm-objs := $(kvm-objs-m) $(kvm-objs-y)
 
-Why not have userspace state the max vcpu_id it intends to creates on a per-VM
-basis?  Same end result, but doesn't require the complexity of reallocating the
-I/O APIC stuff.
+Looks OK to me. The extra objects built in Makefile.kvm are all behind
+CONFIG symbols we don't enable.
+
+Acked-by: Michael Ellerman <mpe@ellerman.id.au> (powerpc)
+
+cheers
