@@ -2,139 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DDDCB455030
-	for <lists+kvm@lfdr.de>; Wed, 17 Nov 2021 23:14:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D0A8C454F1D
+	for <lists+kvm@lfdr.de>; Wed, 17 Nov 2021 22:10:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241088AbhKQWRf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Nov 2021 17:17:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50584 "EHLO
+        id S231400AbhKQVNp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Nov 2021 16:13:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231929AbhKQWRe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Nov 2021 17:17:34 -0500
-X-Greylist: delayed 3878 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 17 Nov 2021 14:14:35 PST
-Received: from twosheds.infradead.org (unknown [IPv6:2001:8b0:10b:1:aaa1:59ff:fe2f:55f7])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12D2EC061570;
-        Wed, 17 Nov 2021 14:14:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=twosheds.20170209; h=Content-Transfer-Encoding:
-        Content-Type:MIME-Version:Cc:To:From:Subject:Date:References:In-Reply-To:
-        Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-        bh=PY24mY1Y2geRmk7LjuGhOiKBHR3iZW7SC/NuUGtVeMM=; b=fInAvRfbXmsj2mRaAOMhBYLcLy
-        rNV3j1Ejy+5tp8+gefj0Ci1K8wUw/TqCwo4phGfDDq1OEX+zE3T5+9J+WUu8XZ68WvfujlJMgRUdq
-        fxcgLANbQ0bA5uHCFb8tfnVZy19nrvr3qujLNM1CEy+eRbFuppcsu+2Gu1haaPtMH2OZeBT48dIJ+
-        MgZ7cnFoCPvFUVHKjy+wj1KRDU0pwv46XKxGiQF5msM9UIjM+UBm/pQusxMLzB2JKBaHEMNFaf1cY
-        EwEp9WOb3Jf2IfUCshGJH9Upz2d6mUreD3M3e/7okHzoEyb/daAOFczuRJZBRtYk6sazwxlVM7FPi
-        Qu9mdBIA==;
-Received: from localhost ([127.0.0.1] helo=twosheds.infradead.org)
-        by twosheds.infradead.org with esmtp (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mnSBT-00FV0l-BJ; Wed, 17 Nov 2021 21:09:35 +0000
-Received: from 2001:8b0:10b:1:d129:67c1:5868:c3aa
-        (SquirrelMail authenticated user dwmw2)
-        by twosheds.infradead.org with HTTP;
-        Wed, 17 Nov 2021 21:09:35 -0000
-Message-ID: <85d9fec17f32c3eb9e100e56b91af050.squirrel@twosheds.infradead.org>
-In-Reply-To: <20211117174003.297096-9-dwmw2@infradead.org>
-References: <20211117174003.297096-1-dwmw2@infradead.org>
-    <20211117174003.297096-9-dwmw2@infradead.org>
-Date:   Wed, 17 Nov 2021 21:09:35 -0000
-Subject: Re: [PATCH v3 08/12] KVM: Propagate vcpu explicitly to
- mark_page_dirty_in_slot()
-From:   "David Woodhouse" <dwmw2@infradead.org>
-To:     "David Woodhouse" <dwmw2@infradead.org>
-Cc:     "Paolo Bonzini" <pbonzini@redhat.com>, "kvm" <kvm@vger.kernel.org>,
-        "Boris Ostrovsky" <boris.ostrovsky@oracle.com>,
-        "Joao Martins" <joao.m.martins@oracle.com>,
-        "jmattson @ google . com" <jmattson@google.com>,
-        "wanpengli @ tencent . com" <wanpengli@tencent.com>,
-        "seanjc @ google . com" <seanjc@google.com>,
-        "vkuznets @ redhat . com" <vkuznets@redhat.com>,
-        "mtosatti @ redhat . com" <mtosatti@redhat.com>,
-        "joro @ 8bytes . org" <joro@8bytes.org>, karahmed@amazon.com,
-        "Marc Zyngier" <maz@kernel.org>,
-        "James Morse" <james.morse@arm.com>,
-        "Alexandru Elisei" <alexandru.elisei@arm.com>,
-        "Suzuki K Poulose" <suzuki.poulose@arm.com>,
-        "Catalin Marinas" <catalin.marinas@arm.com>,
-        "Will Deacon" <will@kernel.org>,
-        "Huacai Chen" <chenhuacai@kernel.org>,
-        "Aleksandar Markovic" <aleksandar.qemu.devel@gmail.com>,
-        "Michael Ellerman" <mpe@ellerman.id.au>,
-        "Benjamin Herrenschmidt" <benh@kernel.crashing.org>,
-        "Anup Patel" <anup.patel@wdc.com>,
-        "Christian Borntraeger" <borntraeger@de.ibm.com>,
-        kvmarm@lists.cs.columbia.edu,
-        "linux-arm-kernel" <linux-arm-kernel@lists.infradead.org>,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org
-User-Agent: SquirrelMail/1.4.23 [SVN]-5.fc33.20190710
+        with ESMTP id S240104AbhKQVNV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Nov 2021 16:13:21 -0500
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F54AC0613B9
+        for <kvm@vger.kernel.org>; Wed, 17 Nov 2021 13:10:22 -0800 (PST)
+Received: by mail-pj1-x1032.google.com with SMTP id iq11so3333187pjb.3
+        for <kvm@vger.kernel.org>; Wed, 17 Nov 2021 13:10:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=HpUDESohLCksHYlbi/Idrt7wBDoYF2vRmhCJA2AE2Hg=;
+        b=E70vxDhbL7NRBZu/n0+2xIXeHOvjed+dZ49DrMI1mxl2UWO6qwTxglE3LcXt4iXC+/
+         8IBA5k06OIpMphfxCPUnGLo8Ae6u5REQcmrga2EytS/YZP7a2ym/Jd+otxwNqqRw3wWb
+         m2Tc74QoagJ//GPJ8/nNHRZtI0u2MIokLtRBp2n2HzuAFWNKuyFLNL8RersdccjipyM7
+         pcMhvpaZctW8oS43GTizIdUKKptZALR+5VE1LdeFzB6X02RzVaD3IYBFXxH7lEwb1J8g
+         wcT0dicMzz7s/e5aObMfnWW9FeqKm4LwbJUhF42CGJJoM4dLZYA8SlUrGDOzLZKZazQN
+         vR6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=HpUDESohLCksHYlbi/Idrt7wBDoYF2vRmhCJA2AE2Hg=;
+        b=Dnwa9BZkrIKyyr3TDRmVwvO19Wq+EVR//kM9n7F9vYU6MJW6N/Bd3a3sjjQqXQI85c
+         jJ9rVbmNPPUgQbg49+cYhtI5WByNrF6FekkUU0V9GBcNUcBNbOBMf+cx2ZJzVn5xvJ/d
+         vWb41iNflWdPWoGC3cs12TIDJQpzI6qzIVWVmw6mL3NwYHfyt438X5WraHWuB3VDYkJi
+         gRPx/yn26mRj75qmNrIqK6bkuUZSZMqNHo1mFmwIyuTh65UocLTt4qtK3uhxRfrKgYps
+         yKz6mHhSTHc1Tm30edtMgxQkZXRp4O2d8ECjEoBXe7JAYW/J+PY1jq+HUEzVIZw2brus
+         8f4Q==
+X-Gm-Message-State: AOAM533AyyDTS3jgjoTgB1hHcfJQNwkh+j/U6zdxEU15iVGRoeZkRIeg
+        irYKukSc5VufYIVBepWN2sUZAQ==
+X-Google-Smtp-Source: ABdhPJxxmvG3bNvaQSJxBqpDV67VuDzD46C+w4ribl6R0HwF7VLCdxYwcEEpkWzGoN2RkRjO1y/x9A==
+X-Received: by 2002:a17:903:11c3:b0:143:d220:fddb with SMTP id q3-20020a17090311c300b00143d220fddbmr17269018plh.5.1637183421758;
+        Wed, 17 Nov 2021 13:10:21 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id g5sm6196065pjt.15.2021.11.17.13.10.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Nov 2021 13:10:21 -0800 (PST)
+Date:   Wed, 17 Nov 2021 21:10:17 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        stable@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86: check PIR even for vCPUs with disabled APICv
+Message-ID: <YZVvuRdLcxZclw+1@google.com>
+References: <20211117080744.995111-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain;charset=utf-8
-Content-Transfer-Encoding: 8bit
-X-Priority: 3 (Normal)
-Importance: Normal
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by twosheds.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211117080744.995111-1-pbonzini@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Nov 17, 2021, Paolo Bonzini wrote:
+> After fixing the handling of POSTED_INTR_WAKEUP_VECTOR for vCPUs with
+> disabled APICv, take care of POSTED_INTR_VECTOR.  The IRTE for an assigned
+> device can trigger a POSTED_INTR_VECTOR even if APICv is disabled on the
+> vCPU that receives it.  In that case, the interrupt will just cause a
+> vmexit and leave the ON bit set together with the PIR bit corresponding
+> to the interrupt.
+> 
+> Right now, the interrupt would not be delivered until APICv is re-enabled.
+> However, fixing this is just a matter of always doing the PIR->IRR
+> synchronization, even if the vCPU does not have APICv enabled.
+> 
+> This is not a problem for performance, or if anything it is an
+> improvement.  static_call_cond will elide the function call if APICv is
+> not present or disabled, or if (as is the case for AMD hardware) it does
+> not require a sync_pir_to_irr callback.
 
+The AMD part is not accurate, SVM's sync_pir_to_irr() is wired up to point at
+kvm_lapic_find_highest_irr().  That can and probably should be fixed in a separate
+patch, 
 
-> From: David Woodhouse <dwmw@amazon.co.uk>
->
-> The kvm_dirty_ring_get() function uses kvm_get_running_vcpu() to work out
-> which dirty ring to use, but there are some use cases where that doesn't
-> work.
->
-> There's one in setting the Xen shared info page, introduced in commit
-> 629b5348841a ("KVM: x86/xen: update wallclock region") and reported by
-> "butt3rflyh4ck" <butterflyhuangxx@gmail.com> in
-> https://lore.kernel.org/kvm/CAFcO6XOmoS7EacN_n6v4Txk7xL7iqRa2gABg3F7E3Naf5uG94g@mail.gmail.com/
->
-> There's also about to be another one when the newly-reintroduced
-> gfn_to_pfn_cache needs to mark a page as dirty from the MMU notifier
-> which invalidates the mapping. In that case, we will *know* the vcpu
-> that can be 'blamed' for dirtying the page, and we just need to be
-> able to pass it in as an explicit argument when doing so.
->
-> This patch preemptively resolves the second issue, and paves the way
-> for resolving the first. A complete fix for the first issue will need
-> us to switch the Xen shinfo to be owned by a particular vCPU, which
-> will happen in a separate patch.
->
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+And I believe apic_has_interrupt_for_ppr() needs to be updated as well.
 
+We can handled both at once by nullifying SVM's hook and explicitly checking for
+a non-NULL implementation in apic_has_interrupt_for_ppr(), which is the only path
+that cares about the result of sync_pir_to_irr(), i.e. needs to do the work in
+the SVM case.
 
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 4388d22df500..1456745cf5c6 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -707,7 +707,8 @@ static void pv_eoi_clr_pending(struct kvm_vcpu *vcpu)
+ static int apic_has_interrupt_for_ppr(struct kvm_lapic *apic, u32 ppr)
+ {
+        int highest_irr;
+-       if (apic->vcpu->arch.apicv_active)
++
++       if (kvm_x86_ops.sync_pir_to_irr)
+                highest_irr = static_call(kvm_x86_sync_pir_to_irr)(apic->vcpu);
+        else
+                highest_irr = apic_find_highest_irr(apic);
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index ccbf96876ec6..470552e68b7e 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -4649,7 +4649,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+        .load_eoi_exitmap = svm_load_eoi_exitmap,
+        .hwapic_irr_update = svm_hwapic_irr_update,
+        .hwapic_isr_update = svm_hwapic_isr_update,
+-       .sync_pir_to_irr = kvm_lapic_find_highest_irr,
++       .sync_pir_to_irr = NULL,
+        .apicv_post_state_restore = avic_post_state_restore,
 
-> --- a/virt/kvm/dirty_ring.c
-> +++ b/virt/kvm/dirty_ring.c
-> @@ -36,12 +36,16 @@ static bool kvm_dirty_ring_full(struct kvm_dirty_ring
-> *ring)
->  	return kvm_dirty_ring_used(ring) >= ring->size;
->  }
->
-> -struct kvm_dirty_ring *kvm_dirty_ring_get(struct kvm *kvm)
-> +struct kvm_dirty_ring *kvm_dirty_ring_get(struct kvm *kvm, struct
-> kvm_vcpu *vcpu)
->  {
-> -	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
-> +	struct kvm_vcpu *running_vcpu = kvm_get_running_vcpu();
->
-> +	WARN_ON_ONCE(vcpu && vcpu != running_vcpu);
->  	WARN_ON_ONCE(vcpu->kvm != kvm);
-
-Ah, that one needs to be changed to check running_vcpu instead. Or this
-needs to go first:
-
-I think I prefer making the vCPU a required argument. If anyone's going to
-pull a vCPU pointer out of their posterior, let the caller do it.
-
-> +	if (!vcpu)
-> +		vcpu = running_vcpu;
-> +
->  	return &vcpu->dirty_ring;
->  }
->
-
--- 
-dwmw2
-
+        .set_tss_addr = svm_set_tss_addr,
