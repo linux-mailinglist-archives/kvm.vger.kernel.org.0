@@ -2,119 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D0A8C454F1D
-	for <lists+kvm@lfdr.de>; Wed, 17 Nov 2021 22:10:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C28ED454F48
+	for <lists+kvm@lfdr.de>; Wed, 17 Nov 2021 22:23:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231400AbhKQVNp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Nov 2021 16:13:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36100 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240104AbhKQVNV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Nov 2021 16:13:21 -0500
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F54AC0613B9
-        for <kvm@vger.kernel.org>; Wed, 17 Nov 2021 13:10:22 -0800 (PST)
-Received: by mail-pj1-x1032.google.com with SMTP id iq11so3333187pjb.3
-        for <kvm@vger.kernel.org>; Wed, 17 Nov 2021 13:10:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=HpUDESohLCksHYlbi/Idrt7wBDoYF2vRmhCJA2AE2Hg=;
-        b=E70vxDhbL7NRBZu/n0+2xIXeHOvjed+dZ49DrMI1mxl2UWO6qwTxglE3LcXt4iXC+/
-         8IBA5k06OIpMphfxCPUnGLo8Ae6u5REQcmrga2EytS/YZP7a2ym/Jd+otxwNqqRw3wWb
-         m2Tc74QoagJ//GPJ8/nNHRZtI0u2MIokLtRBp2n2HzuAFWNKuyFLNL8RersdccjipyM7
-         pcMhvpaZctW8oS43GTizIdUKKptZALR+5VE1LdeFzB6X02RzVaD3IYBFXxH7lEwb1J8g
-         wcT0dicMzz7s/e5aObMfnWW9FeqKm4LwbJUhF42CGJJoM4dLZYA8SlUrGDOzLZKZazQN
-         vR6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=HpUDESohLCksHYlbi/Idrt7wBDoYF2vRmhCJA2AE2Hg=;
-        b=Dnwa9BZkrIKyyr3TDRmVwvO19Wq+EVR//kM9n7F9vYU6MJW6N/Bd3a3sjjQqXQI85c
-         jJ9rVbmNPPUgQbg49+cYhtI5WByNrF6FekkUU0V9GBcNUcBNbOBMf+cx2ZJzVn5xvJ/d
-         vWb41iNflWdPWoGC3cs12TIDJQpzI6qzIVWVmw6mL3NwYHfyt438X5WraHWuB3VDYkJi
-         gRPx/yn26mRj75qmNrIqK6bkuUZSZMqNHo1mFmwIyuTh65UocLTt4qtK3uhxRfrKgYps
-         yKz6mHhSTHc1Tm30edtMgxQkZXRp4O2d8ECjEoBXe7JAYW/J+PY1jq+HUEzVIZw2brus
-         8f4Q==
-X-Gm-Message-State: AOAM533AyyDTS3jgjoTgB1hHcfJQNwkh+j/U6zdxEU15iVGRoeZkRIeg
-        irYKukSc5VufYIVBepWN2sUZAQ==
-X-Google-Smtp-Source: ABdhPJxxmvG3bNvaQSJxBqpDV67VuDzD46C+w4ribl6R0HwF7VLCdxYwcEEpkWzGoN2RkRjO1y/x9A==
-X-Received: by 2002:a17:903:11c3:b0:143:d220:fddb with SMTP id q3-20020a17090311c300b00143d220fddbmr17269018plh.5.1637183421758;
-        Wed, 17 Nov 2021 13:10:21 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id g5sm6196065pjt.15.2021.11.17.13.10.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Nov 2021 13:10:21 -0800 (PST)
-Date:   Wed, 17 Nov 2021 21:10:17 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        stable@vger.kernel.org
-Subject: Re: [PATCH] KVM: x86: check PIR even for vCPUs with disabled APICv
-Message-ID: <YZVvuRdLcxZclw+1@google.com>
-References: <20211117080744.995111-1-pbonzini@redhat.com>
+        id S232724AbhKQV0n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Nov 2021 16:26:43 -0500
+Received: from gandalf.ozlabs.org ([150.107.74.76]:38841 "EHLO
+        gandalf.ozlabs.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232415AbhKQV0m (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Nov 2021 16:26:42 -0500
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 4HvbWw4wFQz4xbC;
+        Thu, 18 Nov 2021 08:23:40 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+        s=201702; t=1637184220;
+        bh=r2lEfIc6Z9FG0L/36ey/V5SCOY3TzpjJDpD568xulo4=;
+        h=Date:From:To:Cc:Subject:From;
+        b=MgRaeD7lyQjJ9KJsD2CQ5fw79jo3q9g+E2kOf1p5dcafjFng6++J+Sw0Rj3/FhJ81
+         kMxEnUZWr9VnVLH32zdc8MeA6WZBbwTaSzpZVKw6R7qJCxIviHxC2lFOatFZs1A8md
+         vs7gXQ6+te089SrurIa/o0+W6bubxVqiXAu3wxfUQSSbvfqQJs/nS68SahzYN383DO
+         tfzhSBWD6HBu1u2CBB3fVRrrOIG040KPP5RYeGyPFNstpHy2emFpIV6CIw7C4VtWjt
+         6OyrHsP6VwP8KKTCIMClZVQagRK5ZKR1TMUvpFzkreLPSktn+UAQS3FOlNidwSSg8L
+         dSFHPnKSVxl8w==
+Date:   Thu, 18 Nov 2021 08:23:39 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
+Cc:     Paul Durrant <pdurrant@amazon.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: Fixes tag needs some work in the kvm-fixes tree
+Message-ID: <20211118082339.3c5598db@canb.auug.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211117080744.995111-1-pbonzini@redhat.com>
+Content-Type: multipart/signed; boundary="Sig_/LvEN1bAxOsL0WSHw7Dus9/b";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 17, 2021, Paolo Bonzini wrote:
-> After fixing the handling of POSTED_INTR_WAKEUP_VECTOR for vCPUs with
-> disabled APICv, take care of POSTED_INTR_VECTOR.  The IRTE for an assigned
-> device can trigger a POSTED_INTR_VECTOR even if APICv is disabled on the
-> vCPU that receives it.  In that case, the interrupt will just cause a
-> vmexit and leave the ON bit set together with the PIR bit corresponding
-> to the interrupt.
-> 
-> Right now, the interrupt would not be delivered until APICv is re-enabled.
-> However, fixing this is just a matter of always doing the PIR->IRR
-> synchronization, even if the vCPU does not have APICv enabled.
-> 
-> This is not a problem for performance, or if anything it is an
-> improvement.  static_call_cond will elide the function call if APICv is
-> not present or disabled, or if (as is the case for AMD hardware) it does
-> not require a sync_pir_to_irr callback.
+--Sig_/LvEN1bAxOsL0WSHw7Dus9/b
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-The AMD part is not accurate, SVM's sync_pir_to_irr() is wired up to point at
-kvm_lapic_find_highest_irr().  That can and probably should be fixed in a separate
-patch, 
+Hi all,
 
-And I believe apic_has_interrupt_for_ppr() needs to be updated as well.
+In commit
 
-We can handled both at once by nullifying SVM's hook and explicitly checking for
-a non-NULL implementation in apic_has_interrupt_for_ppr(), which is the only path
-that cares about the result of sync_pir_to_irr(), i.e. needs to do the work in
-the SVM case.
+  a31a01172ebf ("cpuid: kvm_find_kvm_cpuid_features() should be declared 's=
+tatic'")
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 4388d22df500..1456745cf5c6 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -707,7 +707,8 @@ static void pv_eoi_clr_pending(struct kvm_vcpu *vcpu)
- static int apic_has_interrupt_for_ppr(struct kvm_lapic *apic, u32 ppr)
- {
-        int highest_irr;
--       if (apic->vcpu->arch.apicv_active)
-+
-+       if (kvm_x86_ops.sync_pir_to_irr)
-                highest_irr = static_call(kvm_x86_sync_pir_to_irr)(apic->vcpu);
-        else
-                highest_irr = apic_find_highest_irr(apic);
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index ccbf96876ec6..470552e68b7e 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4649,7 +4649,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
-        .load_eoi_exitmap = svm_load_eoi_exitmap,
-        .hwapic_irr_update = svm_hwapic_irr_update,
-        .hwapic_isr_update = svm_hwapic_isr_update,
--       .sync_pir_to_irr = kvm_lapic_find_highest_irr,
-+       .sync_pir_to_irr = NULL,
-        .apicv_post_state_restore = avic_post_state_restore,
+Fixes tag
 
-        .set_tss_addr = svm_set_tss_addr,
+  Fixes: 17cd23d68fdf ("KVM: x86: Make sure KVM_CPUID_FEATURES really are K=
+VM_CPUID_FEATURES")
+
+has these problem(s):
+
+  - Target SHA1 does not exist
+
+Maybe you meant
+
+Fixes: 760849b1476c ("KVM: x86: Make sure KVM_CPUID_FEATURES really are KVM=
+_CPUID_FEATURES")
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/LvEN1bAxOsL0WSHw7Dus9/b
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmGVctsACgkQAVBC80lX
+0GywDQf8C6HXra6t78iPzfy0iP5MGwru79ar7j2geHsn9juG4egWP/3INQk7FLbu
+m6ZT1TYodPMGpYuKmonQj87sAbGwZ4n/YidDyucvYbIvXp8SvTklC0RGB3mIxvlu
+vvA2TYeCA5YwhrDo5ug0nZX0TJxLdQatcQy6EMMgo7a+LW8imTxPzZ8pkygicXd+
+FtjK1vvfc52XB08lYL0qNjIF32mkdEBlQ6gFseCHbA6mCxCMXOuOO2zTS6rQ5wKV
+I4jhDhwyzydxhvqhY/Kbehp8N6SM3TtbaMVQSJgTyvula0/Od9U+g0LJcmAx+A9W
+80f40CzScIwjw1YtgncvEFr5v62Hpw==
+=Rdaa
+-----END PGP SIGNATURE-----
+
+--Sig_/LvEN1bAxOsL0WSHw7Dus9/b--
