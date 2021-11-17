@@ -2,88 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B064045484F
-	for <lists+kvm@lfdr.de>; Wed, 17 Nov 2021 15:15:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2A87C454A31
+	for <lists+kvm@lfdr.de>; Wed, 17 Nov 2021 16:42:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238270AbhKQOSR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Nov 2021 09:18:17 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21047 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238286AbhKQOSK (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 17 Nov 2021 09:18:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637158510;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=NDuAh9ydG33nQ/5kdKqaUb4pA1g/jsmhAD4nowtB8q0=;
-        b=dNdy4Mz31I46s5l+sggVpmAsEQyAOnEll6D9rk2qkC4Ov4ptBmSNK3NsomPSmpwGvnA3+m
-        AtWWOl4tSl4cMcdhslXatFCsaYeO0hazQ82kucZ+90aeKBwELErXsnESMfVAMmTTwVKfE/
-        Y6Fc7/dTrtAQeIqydZAdg+I1/083vVA=
-Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com
- [209.85.161.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-587-RUDmlkHKPSi-w0yn1YJWjw-1; Wed, 17 Nov 2021 09:15:09 -0500
-X-MC-Unique: RUDmlkHKPSi-w0yn1YJWjw-1
-Received: by mail-oo1-f72.google.com with SMTP id n19-20020a4a0c53000000b002c2729494aaso1761713ooe.22
-        for <kvm@vger.kernel.org>; Wed, 17 Nov 2021 06:15:09 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=NDuAh9ydG33nQ/5kdKqaUb4pA1g/jsmhAD4nowtB8q0=;
-        b=tgNvhBJ6tCb5SL7KHkLCfMBxQPz21ZZ7dS88NuYfK2qD8XfoJK84SGcJ+lO9aazVm8
-         cs0ybU3Dl3WJ1Ifj3+YULZ/KFp1aKmVu8JzPY/RnlhyUrTBpG/69Swlq5coaT3mY+EBp
-         l4Y+96UhGFWBV8SG58HoVofABk7joqijLUsWQYesiMqVfSM7+eo+2A8fiXReewRxG5rB
-         HcKqolUrLWDhWeZbByWGqzOh3vV5/XbBBsz/DeKml8+HGx/Hxa4BO4f+pkQe2vR5IkGa
-         zFdrRc+R/kDVTMxhWiqlFCYK+OLDGIJxU7Z3vNPw6p71ioZEmcACoP3dnTf91CsFTZPH
-         baWg==
-X-Gm-Message-State: AOAM533mGhMVbaRxIfJJegb4ok35WycVR1F5I3eJ2+XUm/vFrvfcQi5B
-        L3/ruimljdZirFfs8Kl/AWkVdBOUxESv/sD3AQMn06fwUxSez2e8155pEhFKAkzmOv7sjGDbB7G
-        86vo44ecEeO7q
-X-Received: by 2002:a05:6808:178d:: with SMTP id bg13mr14567847oib.171.1637158508616;
-        Wed, 17 Nov 2021 06:15:08 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzIUkaPo+5JL68yqcgqUWzhvxOFFi1URuQME7OdHfDKEYHYLEe4Wuvsx7qhQJwyhWqct3Uphg==
-X-Received: by 2002:a05:6808:178d:: with SMTP id bg13mr14567818oib.171.1637158508414;
-        Wed, 17 Nov 2021 06:15:08 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id s17sm2319497ooj.42.2021.11.17.06.15.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Nov 2021 06:15:08 -0800 (PST)
-Date:   Wed, 17 Nov 2021 07:15:07 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Yifeng Li <tomli@tomli.me>, Bjorn Helgaas <bhelgaas@google.com>,
-        linux-pci@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH v2] PCI: Add func1 DMA quirk for Marvell 88SE9125 SATA
- controller
-Message-ID: <20211117071507.775e12b8.alex.williamson@redhat.com>
-In-Reply-To: <YZTVdOlEbMb0tv59@infradead.org>
-References: <YZPA+gSsGWI6+xBP@work>
-        <YZTVdOlEbMb0tv59@infradead.org>
-Organization: Red Hat
+        id S232284AbhKQPpQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Nov 2021 10:45:16 -0500
+Received: from foss.arm.com ([217.140.110.172]:59248 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S238369AbhKQPpJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Nov 2021 10:45:09 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 54EB31FB;
+        Wed, 17 Nov 2021 07:42:10 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 299263F5A1;
+        Wed, 17 Nov 2021 07:42:09 -0800 (PST)
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     will@kernel.org, julien.thierry.kdev@gmail.com, maz@kernel.org,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Subject: [RFC PATCH v5 kvmtool 0/4] arm64: KVM SPE support
+Date:   Wed, 17 Nov 2021 15:43:52 +0000
+Message-Id: <20211117154356.303039-1-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.33.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 17 Nov 2021 02:12:04 -0800
-Christoph Hellwig <hch@infradead.org> wrote:
+This series adds userspace support for creating a guest which can use SPE.
+It requires KVM SPE support which is in the RFC phase, hence why this
+series is also RFC. The kvmtool patches can also be found at [1], and the
+KVM SPE patches can be found at [2].
 
-> On Tue, Nov 16, 2021 at 02:32:26PM +0000, Yifeng Li wrote:
-> > Like other SATA controller chips in the Marvell 88SE91xx series, the
-> > Marvell 88SE9125 has the same DMA requester ID hardware bug that prevents
-> > it from working under IOMMU. This patch adds its device ID 0x9125 to the
-> > Function 1 DMA alias quirk list.  
-> 
-> Btw, do we need to prevent vfio assignment for all devices with this
-> quirk?
+To create a guest with SPE support the following steps must be executed:
 
-No, the alias is taken into account with grouping and IOMMU
-programming, it should work with vfio.  Thanks,
+1. Set the SPE virtual interrupt ID and then initialize the features on
+every VCPU.
 
-Alex
+2. After the guest memory memslots have been created and SPE initialized,
+kvmtool will lock the memslot memory using the newly introduced capability.
+
+The first patch is a simple update to the Linux headers; the next two
+patches are preparatory patches. SPE support is added in patch number 4.
+
+Changes since v4:
+
+* Removed KVM_ARM_VCPU_SUPPORTED_CPUS ioctl.
+
+[1] https://gitlab.arm.com/linux-arm/kvmtool-ae/-/tree/kvm-spe-v5
+[2] https://gitlab.arm.com/linux-arm/linux-ae/-/tree/kvm-spe-v5
+
+Alexandru Elisei (3):
+  update_headers: Sync KVM UAPI headers with KVM SPE implementation
+  arm/arm64: Make kvm__arch_delete_ram() aarch32/aarch64 specific
+  init: Add last_{init, exit} list macros
+
+Sudeep Holla (1):
+  arm64: Add SPE support
+
+ Makefile                                  |   2 +
+ arm/aarch32/kvm.c                         |   8 +
+ arm/aarch64/arm-cpu.c                     |   2 +
+ arm/aarch64/include/asm/kvm.h             |  67 +++-
+ arm/aarch64/include/kvm/kvm-config-arch.h |   2 +
+ arm/aarch64/include/kvm/spe.h             |   7 +
+ arm/aarch64/kvm-cpu.c                     |   5 +
+ arm/aarch64/kvm.c                         |  19 +
+ arm/aarch64/spe.c                         | 129 +++++++
+ arm/include/arm-common/kvm-config-arch.h  |   1 +
+ arm/kvm-cpu.c                             |   4 +
+ arm/kvm.c                                 |   5 -
+ include/kvm/util-init.h                   |   6 +-
+ include/linux/kvm.h                       | 450 +++++++++++++++++++++-
+ powerpc/include/asm/kvm.h                 |  10 +
+ x86/include/asm/kvm.h                     |  64 ++-
+ 16 files changed, 760 insertions(+), 21 deletions(-)
+ create mode 100644 arm/aarch32/kvm.c
+ create mode 100644 arm/aarch64/include/kvm/spe.h
+ create mode 100644 arm/aarch64/spe.c
+
+-- 
+2.33.1
 
