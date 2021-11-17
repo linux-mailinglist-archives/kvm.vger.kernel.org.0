@@ -2,125 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 77AE3454A5D
-	for <lists+kvm@lfdr.de>; Wed, 17 Nov 2021 16:56:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 92D3D454B1C
+	for <lists+kvm@lfdr.de>; Wed, 17 Nov 2021 17:38:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238803AbhKQP7E (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Nov 2021 10:59:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48872 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229815AbhKQP7E (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Nov 2021 10:59:04 -0500
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0910C061764
-        for <kvm@vger.kernel.org>; Wed, 17 Nov 2021 07:56:05 -0800 (PST)
-Received: by mail-pj1-x1031.google.com with SMTP id np6-20020a17090b4c4600b001a90b011e06so2950655pjb.5
-        for <kvm@vger.kernel.org>; Wed, 17 Nov 2021 07:56:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=m9J3GBVAIZFZGi0XXHxUVPqugO9FTJB0JnBQ/K1xQms=;
-        b=n3Yg+RFlsYoNf+IeW9+Y0IS9Y85tdUMEvNnklLZ20twSkUzFZl1K+t6UAVXra2Ss8m
-         NZrC9cx5JXcgJbQapuIDznZSvV2yUvKZXTxuQPVq7yG5lpBGATWRHP/Y5iuRcKDAhfOa
-         ONhGF8KxqB5xro2PENWRZdxgrBFWOWVzbG/X8a/2+KbrfuQVX3b9U9sMnjy9g7lY3nxf
-         S7u1CteYISimNVvuz/s6zp1slTFfbcIScmqmuI0r21o/iKytnH+E8R3koNj9fD8IJJvB
-         hBsbsU9ulAGltRlvUGjBCpKjWWHlMapjuohePs9hgLKvBtl75klzDMZR97Q/mC2k3m+R
-         Lyug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=m9J3GBVAIZFZGi0XXHxUVPqugO9FTJB0JnBQ/K1xQms=;
-        b=McRU8YA5F+1ZNTtJZdG533bdk1kRIecrUdTOeGJuZ/R1RCvEF7mF1evnDrs8jW8uWN
-         VPujbNGVqiF8CxYkT+nlViNTLCP4DRRVhpE6PQHyGW+0XYuF8RNuGlVEE2TKenXrG8TZ
-         EhpEjItEGJZP3ng1d+/24v3WVRt7JUY2Y60X8DLtuXsTOMCJGLLsODL6VNq/cP24uUeZ
-         nZ4qF1pqhHLXT6sLhgabNcszksh0HHEY4dpBBBRvsX5rV6H/e0kT93SPxdS5ildxN9P4
-         BUnK1BIeCPbD2EPgii14EBWs4bw0YMTD53VnuBfhib62pK+unsWpNqPd6RXr5kNDdaLi
-         3k2A==
-X-Gm-Message-State: AOAM532SMx+wG6ZDccsFON7P418xkOZ2egpPTXl3gMtuDq5mVM/ot2ee
-        1ZhXhZFX7XBDDFx8B0j2q5+YqActYUyCvw==
-X-Google-Smtp-Source: ABdhPJz2X15ilt4+tq6jfQ6bUTy4rzYV43+NVsGdegDpvtMFGx0QZwaLWYvTs00OhvCoTunsg8+1dw==
-X-Received: by 2002:a17:90a:384d:: with SMTP id l13mr848984pjf.104.1637164564540;
-        Wed, 17 Nov 2021 07:56:04 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id t40sm107973pfg.107.2021.11.17.07.56.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Nov 2021 07:56:03 -0800 (PST)
-Date:   Wed, 17 Nov 2021 15:56:00 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Hou Wenlong <houwenlong93@linux.alibaba.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] KVM: x86/mmu: Skip tlb flush if it has been done in
- zap_gfn_range()
-Message-ID: <YZUmEHx6iE9Mr3Ls@google.com>
-References: <5e16546e228877a4d974f8c0e448a93d52c7a5a9.1637140154.git.houwenlong93@linux.alibaba.com>
+        id S235435AbhKQQlO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Nov 2021 11:41:14 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:41780 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230292AbhKQQlM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 17 Nov 2021 11:41:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1637167093;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=lPGN5sNnc45JU/u7eNCeUG16Q1MypWiIp4F+fUE+9/s=;
+        b=DKaoHHiHorJrdA1LktUhiKOrqZNIsvQDUtD2cWy6pnBRa0DYRY3l2T4xBQjQP6CUaUMiIS
+        TSNJu06ARwFEhEATdhH7fVMYkcfL8cIootgW2gdiXh8jSRnUZNOLwHIi3Iiz9FvDIQRq8g
+        jkdrd+M0Ja8E8jYlbHN1kbJctXWZCsI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-408-rRdrb1cMNKWvOUW4MiAPSw-1; Wed, 17 Nov 2021 11:38:11 -0500
+X-MC-Unique: rRdrb1cMNKWvOUW4MiAPSw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 992E815723;
+        Wed, 17 Nov 2021 16:38:10 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3AFBF604CC;
+        Wed, 17 Nov 2021 16:38:10 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     pgonda@google.com, seanjc@google.com
+Subject: [PATCH 0/4] MOVE/COPY_ENC_CONTEXT_FROM locking cleanup and tests
+Date:   Wed, 17 Nov 2021 11:38:05 -0500
+Message-Id: <20211117163809.1441845-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5e16546e228877a4d974f8c0e448a93d52c7a5a9.1637140154.git.houwenlong93@linux.alibaba.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 17, 2021, Hou Wenlong wrote:
-> If the parameter flush is set, zap_gfn_range() would flush remote tlb
-> when yield, then tlb flush is not needed outside. So use the return
-> value of zap_gfn_range() directly instead of OR on it in
-> kvm_unmap_gfn_range() and kvm_tdp_mmu_unmap_gfn_range().
-> 
-> Fixes: 3039bcc744980 ("KVM: Move x86's MMU notifier memslot walkers to generic code")
-> Signed-off-by: Hou Wenlong <houwenlong93@linux.alibaba.com>
-> ---
+Patches 1 and 2 are the long-awaited tests for COPY_ENC_CONTEXT_FROM,
+based on the ones for intra-host migration.  The aim of patches 3
+and 4 is to simplify the locking for COPY_ENC_CONTEXT_FROM, and solving
+(by sidestepping the question) the problem of a VM's encryption
+context being moved from and copied from at the same time.
 
-Ha, I fixed this in my local repo just yesterday :-)
+These patches are an alternative to Sean's patch with subject "KVM:
+SEV: Explicitly document that there are no TOCTOU races in copy ASID"
+(https://lore.kernel.org/kvm/76c7c752-f1b0-f100-03dd-364366eff02f@redhat.com/T/).
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+There is another bug: a VM that is the owner of a copied context must not
+be migrated, otherwise you could have a dangling ASID:
 
->  arch/x86/kvm/mmu/mmu.c     | 2 +-
->  arch/x86/kvm/mmu/tdp_mmu.c | 4 ++--
->  2 files changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 354d2ca92df4..d57319e596a9 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -1582,7 +1582,7 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
->  		flush = kvm_handle_gfn_range(kvm, range, kvm_unmap_rmapp);
->  
->  	if (is_tdp_mmu_enabled(kvm))
-> -		flush |= kvm_tdp_mmu_unmap_gfn_range(kvm, range, flush);
-> +		flush = kvm_tdp_mmu_unmap_gfn_range(kvm, range, flush);
->  
->  	return flush;
->  }
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 7c5dd83e52de..9d03f5b127dc 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -1034,8 +1034,8 @@ bool kvm_tdp_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range,
->  	struct kvm_mmu_page *root;
->  
->  	for_each_tdp_mmu_root(kvm, root, range->slot->as_id)
+1. copy context from A to B (gets ref to A)
+2. move context from A to L (moves ASID from A to L)
+3. close L (releases ASID from L, B still references it)
 
-Another issue is that this should be for_each_tdp_mmu_root_yield_safe().  I'll get
-a patch out for that later today.
+The right way to do the handoff instead is to create a fresh mirror VM
+on the destination first:
 
-> -		flush |= zap_gfn_range(kvm, root, range->start, range->end,
-> -				       range->may_block, flush, false);
-> +		flush = zap_gfn_range(kvm, root, range->start, range->end,
-> +				      range->may_block, flush, false);
->  
->  	return flush;
->  }
-> -- 
-> 2.31.1
-> 
+1. copy context from A to B (gets ref to A)
+[later] 2. close B (releases ref to A)
+3. move context from A to L (moves ASID from A to L)
+4. copy context from L to M
+
+I'll take a look at this later, probably next week after this series has
+been reviewed.
+
+Paolo
+
+
+Paolo Bonzini (4):
+  selftests: sev_migrate_tests: free all VMs
+  selftests: sev_migrate_tests: add tests for
+    KVM_CAP_VM_COPY_ENC_CONTEXT_FROM
+  KVM: SEV: cleanup locking for KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM
+  KVM: SEV: Do COPY_ENC_CONTEXT_FROM with both VMs locked
+
+ arch/x86/kvm/svm/sev.c                        | 118 ++++++++----------
+ .../selftests/kvm/x86_64/sev_migrate_tests.c  | 113 +++++++++++++++--
+ 2 files changed, 155 insertions(+), 76 deletions(-)
+
+-- 
+2.27.0
+
