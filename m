@@ -2,55 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7FE6D454EC3
-	for <lists+kvm@lfdr.de>; Wed, 17 Nov 2021 21:50:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 691F4454ED8
+	for <lists+kvm@lfdr.de>; Wed, 17 Nov 2021 21:57:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236410AbhKQUx0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Nov 2021 15:53:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59814 "EHLO
+        id S239712AbhKQVAF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Nov 2021 16:00:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231956AbhKQUx0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Nov 2021 15:53:26 -0500
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84E6AC061570
-        for <kvm@vger.kernel.org>; Wed, 17 Nov 2021 12:50:27 -0800 (PST)
-Received: by mail-pf1-x429.google.com with SMTP id g19so3782956pfb.8
-        for <kvm@vger.kernel.org>; Wed, 17 Nov 2021 12:50:27 -0800 (PST)
+        with ESMTP id S237736AbhKQVAF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Nov 2021 16:00:05 -0500
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EE27C061570
+        for <kvm@vger.kernel.org>; Wed, 17 Nov 2021 12:57:06 -0800 (PST)
+Received: by mail-pj1-x1034.google.com with SMTP id np6-20020a17090b4c4600b001a90b011e06so3623775pjb.5
+        for <kvm@vger.kernel.org>; Wed, 17 Nov 2021 12:57:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=ICT5nm0AaEkcwcRtYLxy19E9qWThqJpOXj3qwEYWH/U=;
-        b=YY1XtIprpNM5LCnfuA8Ol2j1xAKhTvZb/9h4I6b+Pt33qQ7dnDxi02qaqHMtHpV+CX
-         TskOFQQosvjpyAfPwyF/y9yAIydJfb24Q1ePj8uky59qaeUYEz+Cu5JYe8whodV5Cqki
-         hYvaj3lkxiJTpPECSNSiH92ySs5NDsoIvS6o76lD5XMI361+xQp0DHnB5WrUd+VqhWWA
-         TgM6V0FT+/4rABcpwCxWQQfwD7b2ERtot/3BeOoj9pGBHgNXOrGsbVkDlUGME7fgGQHf
-         CBk7s2w+5fr2YmzcDl55wSQYp/l69L5A6rqf/1eo3HUGkarhzR+3bTy/nCWWQwBRXNrc
-         Jf5A==
+        bh=GKI+SD1yDpNp3ocje9HX9BSZ/X8pxcrXv2y7exF4+pE=;
+        b=ep7ZJDg5FFOSlfdhSeiTQ3Unj2LmsS+WN52k01x4OhN+54b+P7IQkuQoQs5li5hWW3
+         PnYytnyVUanmzvSxu4fu3+4DAfmXGEjzQCYacTvvHSz69eQ/U+PBgQpSWysqHsZiSpn/
+         lZZowSFloCKYyCwFB57cWfUZRfQze7N4KfyIR/KUijyjWARRIT91v1jRdC+Rl7/5xkaS
+         p6IDPlgMM9hfQ3Gff+6c6Q83SbUxVgtFoG3T3WOiirkjpdGVHmpQso6N1niEigbneEkZ
+         qUFSdvNIRlEaIWga5+kJHYHo2hbmHTKKD5MIL1PqiiFwr4qlsyNMcHUAb4kmLaPZvsJb
+         mg3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=ICT5nm0AaEkcwcRtYLxy19E9qWThqJpOXj3qwEYWH/U=;
-        b=IcRlH+00m76Le7l2yn+p37u0NX5YgvqiZi2FNDictfuo0Dh6ermXUVj4nD9RQuDx52
-         +guj3M0CqKFDzyobAB85rANfgELN5TK6iOxexW3g35dPVZ1l7Wt8eZcrE06YN+waw4J2
-         6dihHBWwFqj1SIJue0XG8yBuElTcLQ70w1BFgMAaDwiJV4p3HeDFsoCg+aaRFTRo6Kfj
-         GDB8OoPBQn+nFsq05uN9Yij/pEYfkwYi708af09y6USBQiz/j4+G+Cs3wzzvHi959ZdS
-         9uN3q6Ol2hYGuVVfiYhzR5qvREZYg+ZZ/9fr8pWboeAShBnoektVYTxKW/ccIkeRi8SP
-         ob4w==
-X-Gm-Message-State: AOAM532qsYQZewxgSMJjYd1KbxyykG/epoJOHlILyS7mTr7EA9OJNf0O
-        QNLE6/OoZwQgR6p4OpEdcgYmCQ==
-X-Google-Smtp-Source: ABdhPJzRitWfpIl9ERHa7VOvprmzRlXkuSUeEoOIfJVAqgkJrzvVHfn5EsbuXOLPyfDRozB0oWix1Q==
-X-Received: by 2002:a63:155d:: with SMTP id 29mr7106745pgv.302.1637182226543;
-        Wed, 17 Nov 2021 12:50:26 -0800 (PST)
+        bh=GKI+SD1yDpNp3ocje9HX9BSZ/X8pxcrXv2y7exF4+pE=;
+        b=OfcJ1cpL7R2R8wpZP80enzNs46uNm+Uu7OhFDWXcEdDuCH3fARj6gsQbYBtG1Y4dVE
+         gsl4E35Vs8msqWbvxymGKHNxWi/qc2/t+Rn4RkqCXXtulqoO2uyvdcGHwjBmoAT+6P3M
+         DpIJnOhs0/+s6NwOoEvyx3NIfLzN/UXANxrtNut/FYaMmIRAJb1kf0l/jhbAqCC8gXBe
+         TtvwlpSS5XNxQj1ja0EhVeveBTWh7ftXQBg20M73Vj+YcR8PRyLlX9naQvKP1WiFA37x
+         zZ6eEhK7NVp5XGB0qwxTnPLjjH3No2YPEyBCDqBvt8mXOPzcIAjXTWgiYE+QkA/D43t7
+         aO8w==
+X-Gm-Message-State: AOAM533FidThAoiYpaIR1XDotF2eQwX0RinukJZTLlJ/5KF32F7l1e4/
+        /H2KAij1UFGODrhMFaRWnfTj/IGi4Gn6Kg==
+X-Google-Smtp-Source: ABdhPJx59Vr421W/zCHcwsvCtDFut5od/byYarMtrpHYrCQWNjA56F+rM3W0dWLlOVqJOYrXy37b6A==
+X-Received: by 2002:a17:90a:46c9:: with SMTP id x9mr3393896pjg.183.1637182625920;
+        Wed, 17 Nov 2021 12:57:05 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id m18sm552007pfk.68.2021.11.17.12.50.25
+        by smtp.gmail.com with ESMTPSA id u23sm488409pfl.185.2021.11.17.12.57.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Nov 2021 12:50:26 -0800 (PST)
-Date:   Wed, 17 Nov 2021 20:50:22 +0000
+        Wed, 17 Nov 2021 12:57:05 -0800 (PST)
+Date:   Wed, 17 Nov 2021 20:57:01 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Juergen Gross <jgross@suse.com>
-Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
+Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
@@ -60,84 +61,188 @@ Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         "H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH v3 3/4] x86/kvm: add max number of vcpus for hyperv
- emulation
-Message-ID: <YZVrDpjW0aZjFxo1@google.com>
+Subject: Re: [PATCH v3 4/4] x86/kvm: add boot parameter for setting max
+ number of vcpus per guest
+Message-ID: <YZVsnZ8e7cXls2P2@google.com>
 References: <20211116141054.17800-1-jgross@suse.com>
- <20211116141054.17800-4-jgross@suse.com>
+ <20211116141054.17800-5-jgross@suse.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211116141054.17800-4-jgross@suse.com>
+In-Reply-To: <20211116141054.17800-5-jgross@suse.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Tue, Nov 16, 2021, Juergen Gross wrote:
-> When emulating Hyperv the theoretical maximum of vcpus supported is
-> 4096, as this is the architectural limit for sending IPIs via the PV
-> interface.
+> Today the maximum number of vcpus of a kvm guest is set via a #define
+> in a header file.
 > 
-> For restricting the actual supported number of vcpus for that case
-> introduce another define KVM_MAX_HYPERV_VCPUS and set it to 1024, like
-> today's KVM_MAX_VCPUS. Make both values unsigned ones as this will be
-> needed later.
+> In order to support higher vcpu numbers for guests without generally
+> increasing the memory consumption of guests on the host especially on
+> very large systems add a boot parameter for specifying the number of
+> allowed vcpus for guests.
 > 
-> The actual number of supported vcpus for Hyperv emulation will be the
-> lower value of both defines.
-> 
-> This is a preparation for a future boot parameter support of the max
-> number of vcpus for a KVM guest.
+> The default will still be the current setting of 1024. The value 0 has
+> the special meaning to limit the number of possible vcpus to the
+> number of possible cpus of the host.
 > 
 > Signed-off-by: Juergen Gross <jgross@suse.com>
 > ---
 > V3:
-> - new patch
+> - rebase
 > ---
->  arch/x86/include/asm/kvm_host.h |  3 ++-
->  arch/x86/kvm/hyperv.c           | 15 ++++++++-------
->  2 files changed, 10 insertions(+), 8 deletions(-)
+>  Documentation/admin-guide/kernel-parameters.txt | 7 +++++++
+>  arch/x86/include/asm/kvm_host.h                 | 5 ++++-
+>  arch/x86/kvm/x86.c                              | 9 ++++++++-
+>  3 files changed, 19 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 886930ec8264..8ea03ff01c45 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -38,7 +38,8 @@
+> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+> index e269c3f66ba4..409a72c2d91b 100644
+> --- a/Documentation/admin-guide/kernel-parameters.txt
+> +++ b/Documentation/admin-guide/kernel-parameters.txt
+> @@ -2445,6 +2445,13 @@
+>  			feature (tagged TLBs) on capable Intel chips.
+>  			Default is 1 (enabled)
 >  
->  #define __KVM_HAVE_ARCH_VCPU_DEBUGFS
->  
-> -#define KVM_MAX_VCPUS 1024
-> +#define KVM_MAX_VCPUS 1024U
-> +#define KVM_MAX_HYPERV_VCPUS 1024U
+> +	kvm.max_vcpus=	[KVM,X86] Set the maximum allowed numbers of vcpus per
+> +			guest. The special value 0 sets the limit to the number
+> +			of physical cpus possible on the host (including not
+> +			yet hotplugged cpus). Higher values will result in
+> +			slightly higher memory consumption per guest.
+> +			Default: 1024
 
-I don't see any reason to put this in kvm_host.h, it should never be used outside
-of hyperv.c.
+Rather than makes this a module param, I would prefer to start with the below
+patch (originally from TDX pre-enabling) and then wire up a way for userspace to
+_lower_ the max on a per-VM basis, e.g. add a capability.
 
->  #define KVM_MAX_VCPU_IDS kvm_max_vcpu_ids()
->  /* memory slots that are not exposed to userspace */
->  #define KVM_PRIVATE_MEM_SLOTS 3
-> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-> index 4a555f32885a..c0fa837121f1 100644
-> --- a/arch/x86/kvm/hyperv.c
-> +++ b/arch/x86/kvm/hyperv.c
-> @@ -41,7 +41,7 @@
->  /* "Hv#1" signature */
->  #define HYPERV_CPUID_SIGNATURE_EAX 0x31237648
->  
-> -#define KVM_HV_MAX_SPARSE_VCPU_SET_BITS DIV_ROUND_UP(KVM_MAX_VCPUS, 64)
-> +#define KVM_HV_MAX_SPARSE_VCPU_SET_BITS DIV_ROUND_UP(KVM_MAX_HYPERV_VCPUS, 64)
->  
->  static void stimer_mark_pending(struct kvm_vcpu_hv_stimer *stimer,
->  				bool vcpu_kick);
-> @@ -166,7 +166,7 @@ static struct kvm_vcpu *get_vcpu_by_vpidx(struct kvm *kvm, u32 vpidx)
->  	struct kvm_vcpu *vcpu = NULL;
->  	int i;
->  
-> -	if (vpidx >= KVM_MAX_VCPUS)
-> +	if (vpidx >= min(KVM_MAX_VCPUS, KVM_MAX_HYPERV_VCPUS))
+VMs largely fall into two categories: (1) the max number of vCPUs is known prior
+to VM creation, or (2) the max number of vCPUs is unbounded (up to KVM's hard
+limit), e.g. for container-style use cases where "vCPUs" are created on-demand in
+response to the "guest" creating a new task.
 
-IMO, this is conceptually wrong.  KVM should refuse to allow Hyper-V to be enabled
-if the max number of vCPUs exceeds what can be supported, or should refuse to create
-the vCPUs.  I agree it makes sense to add a Hyper-V specific limit, since there are
-Hyper-V structures that have a hard limit, but detection of violations should be a
-BUILD_BUG_ON, not a silent failure at runtime.
+For #1, a per-VM control lets userspace lower the limit to the bare minimum.  For
+#2, neither the module param nor the per-VM control is likely to be useful, but
+a per-VM control does let mixed environments (both #1 and #2 VMs) lower the limits
+for compatible VMs, whereas a module param must be set to the max of any potential VM.
+
+From 0593cb4f73a6c3f0862f9411f0e14f00671f59ae Mon Sep 17 00:00:00 2001
+From: Sean Christopherson <sean.j.christopherson@intel.com>
+Date: Fri, 2 Jul 2021 15:04:27 -0700
+Subject: [PATCH] KVM: Add max_vcpus field in common 'struct kvm'
+
+Move arm's per-VM max_vcpus field into the generic "struct kvm", and use
+it to check vcpus_created in the generic code instead of checking only
+the hardcoded absolute KVM-wide max.  x86 TDX guests will reuse the
+generic check verbatim, as the max number of vCPUs for a TDX guest is
+user defined at VM creation and immutable thereafter.
+
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/arm64/include/asm/kvm_host.h | 3 ---
+ arch/arm64/kvm/arm.c              | 7 ++-----
+ arch/arm64/kvm/vgic/vgic-init.c   | 6 +++---
+ include/linux/kvm_host.h          | 1 +
+ virt/kvm/kvm_main.c               | 3 ++-
+ 5 files changed, 8 insertions(+), 12 deletions(-)
+
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 4be8486042a7..b51e1aa6ae27 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -108,9 +108,6 @@ struct kvm_arch {
+ 	/* VTCR_EL2 value for this VM */
+ 	u64    vtcr;
+
+-	/* The maximum number of vCPUs depends on the used GIC model */
+-	int max_vcpus;
+-
+ 	/* Interrupt controller */
+ 	struct vgic_dist	vgic;
+
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index f5490afe1ebf..97c3b83235b4 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -153,7 +153,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 	kvm_vgic_early_init(kvm);
+
+ 	/* The maximum number of VCPUs is limited by the host's GIC model */
+-	kvm->arch.max_vcpus = kvm_arm_default_max_vcpus();
++	kvm->max_vcpus = kvm_arm_default_max_vcpus();
+
+ 	set_default_spectre(kvm);
+
+@@ -228,7 +228,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_MAX_VCPUS:
+ 	case KVM_CAP_MAX_VCPU_ID:
+ 		if (kvm)
+-			r = kvm->arch.max_vcpus;
++			r = kvm->max_vcpus;
+ 		else
+ 			r = kvm_arm_default_max_vcpus();
+ 		break;
+@@ -304,9 +304,6 @@ int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
+ 	if (irqchip_in_kernel(kvm) && vgic_initialized(kvm))
+ 		return -EBUSY;
+
+-	if (id >= kvm->arch.max_vcpus)
+-		return -EINVAL;
+-
+ 	return 0;
+ }
+
+diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+index 0a06d0648970..906aee52f2bc 100644
+--- a/arch/arm64/kvm/vgic/vgic-init.c
++++ b/arch/arm64/kvm/vgic/vgic-init.c
+@@ -97,11 +97,11 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+ 	ret = 0;
+
+ 	if (type == KVM_DEV_TYPE_ARM_VGIC_V2)
+-		kvm->arch.max_vcpus = VGIC_V2_MAX_CPUS;
++		kvm->max_vcpus = VGIC_V2_MAX_CPUS;
+ 	else
+-		kvm->arch.max_vcpus = VGIC_V3_MAX_CPUS;
++		kvm->max_vcpus = VGIC_V3_MAX_CPUS;
+
+-	if (atomic_read(&kvm->online_vcpus) > kvm->arch.max_vcpus) {
++	if (atomic_read(&kvm->online_vcpus) > kvm->max_vcpus) {
+ 		ret = -E2BIG;
+ 		goto out_unlock;
+ 	}
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 60a35d9fe259..5f56516e2f5a 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -566,6 +566,7 @@ struct kvm {
+ 	 * and is accessed atomically.
+ 	 */
+ 	atomic_t online_vcpus;
++	int max_vcpus;
+ 	int created_vcpus;
+ 	int last_boosted_vcpu;
+ 	struct list_head vm_list;
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 3f6d450355f0..e509b963651c 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1052,6 +1052,7 @@ static struct kvm *kvm_create_vm(unsigned long type)
+ 	rcuwait_init(&kvm->mn_memslots_update_rcuwait);
+
+ 	INIT_LIST_HEAD(&kvm->devices);
++	kvm->max_vcpus = KVM_MAX_VCPUS;
+
+ 	BUILD_BUG_ON(KVM_MEM_SLOTS_NUM > SHRT_MAX);
+
+@@ -3599,7 +3600,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
+ 		return -EINVAL;
+
+ 	mutex_lock(&kvm->lock);
+-	if (kvm->created_vcpus == KVM_MAX_VCPUS) {
++	if (kvm->created_vcpus >= kvm->max_vcpus) {
+ 		mutex_unlock(&kvm->lock);
+ 		return -EINVAL;
+ 	}
+--
+2.34.0.rc1.387.gb447b232ab-goog
