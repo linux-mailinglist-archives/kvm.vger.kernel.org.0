@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A6A144559C0
-	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 12:11:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CAF1C4559C2
+	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 12:11:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343727AbhKRLOS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Nov 2021 06:14:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54514 "EHLO
+        id S1343828AbhKRLOh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Nov 2021 06:14:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54294 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343758AbhKRLMb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Nov 2021 06:12:31 -0500
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B572C06120F;
-        Thu, 18 Nov 2021 03:08:41 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id gf14-20020a17090ac7ce00b001a7a2a0b5c3so7867162pjb.5;
-        Thu, 18 Nov 2021 03:08:41 -0800 (PST)
+        with ESMTP id S1343635AbhKRLMm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Nov 2021 06:12:42 -0500
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 503C7C06121D;
+        Thu, 18 Nov 2021 03:08:47 -0800 (PST)
+Received: by mail-pf1-x430.google.com with SMTP id n26so5627310pff.3;
+        Thu, 18 Nov 2021 03:08:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=uQxQaa/j7EXWUJQyVa/licy6Kslt0KYeAuLANLkvvZs=;
-        b=qlqlPe3BBwmkZD4k2waU8sSoD4bavgjN3pfvFIXodZeBucwmrMUiOcGACzE9/KXlAl
-         uF8Ga+SZH8QNIFnaiv2KQ+3HnC1mVKL3fTZYsWkSHv3pLNI1dr5T9jw79lANQ0lmeSpy
-         TpxYrAJ0qr9EeAxxpXpiQlUumHXjnlfRfymZT4HbTOGg1ajKlucukKS6JlEAopiBToN8
-         Pw3bfvBTas+auE7sVXlGXFdvIxbPQQddZbUOtvhdbTfwHn/mWKdKCTwotMzGVT26hTOA
-         TsqcoROCUFip7R1b+qGLB+Ykf/kb4jvd96bBgWe496YmoZ+/7S6NwPPacaCjS2wZfvp4
-         LvDg==
+        bh=/8DObiGFy1ZJgr/sl7IgJ6YAecXd6ICgL6Wv5yClO9k=;
+        b=THXQo6MHvGYoDnb5XubuHkCtaC6MFhwS+hunjE06Sjd6+HOJXgFTCZ6Fe0Nwj8la+9
+         DILH55iDqGdwHIcYiX20cgwdF4xtg678GAG5VQj7YDxEJuoGQw3GfdWrG6AtE4Rjp4+h
+         vF9bI1s54nw5rncYHJyCUKsO0w/MqdjzpKCDCloyJeAF59hpeVfDGzm1kAQEXNUszEzK
+         G/cUAe1H1FzS03jahJkTWDHw5tm6snRxcjPzmV1xqOi3T2a1KAYQ0Uy69nUpKYgwuXXq
+         kChYuQBMAWBUesXqF5UsKtQCc5qHc3Eq/GQZFTj1RDVlVqrxIT5I9stWvkttAoNX72iO
+         DuVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=uQxQaa/j7EXWUJQyVa/licy6Kslt0KYeAuLANLkvvZs=;
-        b=oGQM2HYd8Djsijm31Tb2FUpLUkN6pK0C/H1Ymska7IiHwU1qufxGJtzrRG/j7neKOd
-         jbcrZBrALdBC772hUgypSTg2Lgz7R99FD8BeMpjPsbn2RJR0y3eoSA1TbsHYIjPYISVf
-         c6SoCnO3WokeGaotNeMRWxxUMvMnp2mC8tLsj8wBHgG3AdJ7ZhZuk3qJxYWZaBbebeQt
-         ohh370S4V/URSCKIBK2FfCnfWt08QFZqe/HNaetX2fOlq8tSrB61vBMcRUxijNEJzsGI
-         LggmuJiQCvAouiZk7X0xmk8H+93rhCyLOyKQ118PhmebfuQJWkFG9vYx21c0wZL4CQ6R
-         A2Tw==
-X-Gm-Message-State: AOAM532jo7O90DKQ3uj3E+MnNccj33iaF5Ui//QCFFN6UgFLvRSsBNMJ
-        13xFLH0QPvkHW14xOCcTkl4+QV3Wf8I=
-X-Google-Smtp-Source: ABdhPJw6LQqlIxO7mSSJ6CrYFrjmOOBAQoWPfisRqGP2qNC+vfevJFbpCPOsUXgkxyFFgoZt7DNqvg==
-X-Received: by 2002:a17:90b:4f4c:: with SMTP id pj12mr9395993pjb.217.1637233721057;
-        Thu, 18 Nov 2021 03:08:41 -0800 (PST)
+        bh=/8DObiGFy1ZJgr/sl7IgJ6YAecXd6ICgL6Wv5yClO9k=;
+        b=VGyzkCA/9lyOOs73VIK7m7ZrfvORmhKNJj5ldgRW2rsgFEm6E8aNgb+Le8K5hsMucJ
+         dIpLestltc+jcT8dShTlDh1S1q+Ir0cth8NhGmOtM2pJavtPCT9/1a6Jwmm6E3Ccf1D4
+         +nkPpj/X5gyCAGRUc+VI5i+kGRLYFHGPFuHi2S8t8RkbYeUQEYMWk8RhPNfUZcFqfEqX
+         6bzspZLbWu06dCdGWcWTzA+fi1/6D0qZAsG+0KY8kl/hnDkHtGi0NNto4QEjHS6KqMjD
+         D+y9G3pEvvwMYfGUcEJIedRBRM3HxqiBCGc4NQE79E6D3xSPREu6bW3mJlPCatZ+k8JV
+         F38A==
+X-Gm-Message-State: AOAM5306xOscIfh5cSUNHFsNxvb3dMYN/5GPIalRxl/u47cJ8y8HHusF
+        IUVUmyAiGwD8LNFJxdbZPz4hx+LdB3g=
+X-Google-Smtp-Source: ABdhPJxYrTn+tMOGRmDnifEVTL9jK4h4e0hO/vF8kKu8Me12kXsicDQW59R5/sBWSTivP1EGIV9Rxw==
+X-Received: by 2002:a05:6a00:1c65:b0:49f:d8d0:c5d9 with SMTP id s37-20020a056a001c6500b0049fd8d0c5d9mr13920696pfw.72.1637233726730;
+        Thu, 18 Nov 2021 03:08:46 -0800 (PST)
 Received: from localhost ([47.88.60.64])
-        by smtp.gmail.com with ESMTPSA id y18sm2166790pgh.18.2021.11.18.03.08.39
+        by smtp.gmail.com with ESMTPSA id a23sm2065793pgl.37.2021.11.18.03.08.45
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 18 Nov 2021 03:08:40 -0800 (PST)
+        Thu, 18 Nov 2021 03:08:46 -0800 (PST)
 From:   Lai Jiangshan <jiangshanlai@gmail.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     kvm@vger.kernel.org, Lai Jiangshan <laijs@linux.alibaba.com>,
@@ -60,9 +60,9 @@ Cc:     kvm@vger.kernel.org, Lai Jiangshan <laijs@linux.alibaba.com>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
         "H. Peter Anvin" <hpa@zytor.com>
-Subject: [PATCH 06/15] KVM: VMX: Use kvm_set_msr_common() for MSR_IA32_TSC_ADJUST in the default way
-Date:   Thu, 18 Nov 2021 19:08:05 +0800
-Message-Id: <20211118110814.2568-7-jiangshanlai@gmail.com>
+Subject: [PATCH 07/15] KVM: VMX: Change comments about vmx_get_msr()
+Date:   Thu, 18 Nov 2021 19:08:06 +0800
+Message-Id: <20211118110814.2568-8-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 In-Reply-To: <20211118110814.2568-1-jiangshanlai@gmail.com>
 References: <20211118110814.2568-1-jiangshanlai@gmail.com>
@@ -74,28 +74,26 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Lai Jiangshan <laijs@linux.alibaba.com>
 
-MSR_IA32_TSC_ADJUST can be left to the default way which also uese
-kvm_set_msr_common().
+The variable name is changed in the code.
 
 Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 3 ---
- 1 file changed, 3 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index cd081219b668..a0efc1e74311 100644
+index a0efc1e74311..c6d9c50ea5d4 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2104,9 +2104,6 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		}
- 		ret = kvm_set_msr_common(vcpu, msr_info);
- 		break;
--	case MSR_IA32_TSC_ADJUST:
--		ret = kvm_set_msr_common(vcpu, msr_info);
--		break;
- 	case MSR_IA32_MCG_EXT_CTL:
- 		if ((!msr_info->host_initiated &&
- 		     !(to_vmx(vcpu)->msr_ia32_feature_control &
+@@ -1757,7 +1757,7 @@ static int vmx_get_msr_feature(struct kvm_msr_entry *msr)
+ }
+ 
+ /*
+- * Reads an msr value (of 'msr_index') into 'pdata'.
++ * Reads an msr value (of 'msr_info->index') into 'msr_info->data'.
+  * Returns 0 on success, non-0 otherwise.
+  * Assumes vcpu_load() was already called.
+  */
 -- 
 2.19.1.6.gb485710b
 
