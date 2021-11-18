@@ -2,41 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 110A34555F6
-	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 08:44:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9DD854555FB
+	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 08:45:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244039AbhKRHrE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Nov 2021 02:47:04 -0500
-Received: from smtp-out2.suse.de ([195.135.220.29]:52574 "EHLO
+        id S244025AbhKRHsE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Nov 2021 02:48:04 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:52606 "EHLO
         smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244023AbhKRHqd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Nov 2021 02:46:33 -0500
+        with ESMTP id S244057AbhKRHrM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Nov 2021 02:47:12 -0500
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 082CF1FD35;
-        Thu, 18 Nov 2021 07:43:33 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 05CD91FD29;
+        Thu, 18 Nov 2021 07:44:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1637221413; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1637221452; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=cYDfG1oWSZbpBbHPdOX+BBO1kGppbDRZd6YB8IrMIt4=;
-        b=GoW67FhrZiEQtZbWrTUGjiuO1TLmmGJatHDV07tfXVYycEOebd3Trh9TuO7lIkVidGyiLV
-        pmsuLca+A3mZIVabrNdkMeU7X0JZZ7aRYsZ0GvceZv/N1LteG5sbz6ychGzF+SOzGtVBcz
-        cl81O0BddObSuJ02niDMkgEHuNAbWD4=
+        bh=VivlK8luK1AvNEfo3RDyX0t7aR3Y6/ldzwb1M+i4xV8=;
+        b=qNUu/zxCyojTC5Xd/kNV+X29kdCj7sjfba9deFv2Ok7WOuqtmjhlgX/dUzoCkRJH9GVDYP
+        eaCAeHKCEUzbPOT78jUsmafRUpav0K9ycLhxgNF4MQ4YfG2IqUg3YE0IVMPk9VqE/Y84u7
+        uaO6npQDON0cpKjSIhilFYvv4Qm8wRA=
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 8026813CE6;
-        Thu, 18 Nov 2021 07:43:32 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 7433D13CE6;
+        Thu, 18 Nov 2021 07:44:11 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id ncWsHSQElmG0QwAAMHmgww
-        (envelope-from <jgross@suse.com>); Thu, 18 Nov 2021 07:43:32 +0000
+        id biByGksElmHtQwAAMHmgww
+        (envelope-from <jgross@suse.com>); Thu, 18 Nov 2021 07:44:11 +0000
+Subject: Re: [PATCH v3 1/4] x86/kvm: add boot parameter for adding vcpu-id
+ bits
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
+Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
@@ -47,148 +50,88 @@ Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
         Dave Hansen <dave.hansen@linux.intel.com>,
         "H. Peter Anvin" <hpa@zytor.com>
 References: <20211116141054.17800-1-jgross@suse.com>
- <20211116141054.17800-4-jgross@suse.com> <YZVrDpjW0aZjFxo1@google.com>
+ <20211116141054.17800-2-jgross@suse.com> <YZWT6GP/Jfy27r8e@google.com>
 From:   Juergen Gross <jgross@suse.com>
-Subject: Re: [PATCH v3 3/4] x86/kvm: add max number of vcpus for hyperv
- emulation
-Message-ID: <bfe38122-0ddd-d9bc-4927-942b051a39c4@suse.com>
-Date:   Thu, 18 Nov 2021 08:43:31 +0100
+Message-ID: <374d3255-4e6f-e8de-9ab5-709c4a3b4e63@suse.com>
+Date:   Thu, 18 Nov 2021 08:44:10 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.12.0
 MIME-Version: 1.0
-In-Reply-To: <YZVrDpjW0aZjFxo1@google.com>
+In-Reply-To: <YZWT6GP/Jfy27r8e@google.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="5cBUQoToneO8V1pOyzcWLmtIJYL04gXMC"
+ boundary="oHanQA06vyEqo3Ev9ksBIp4414Sza82uS"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---5cBUQoToneO8V1pOyzcWLmtIJYL04gXMC
-Content-Type: multipart/mixed; boundary="LPl7Rl1ITYfjr8Kctme8DZCrMQ2s3J761";
+--oHanQA06vyEqo3Ev9ksBIp4414Sza82uS
+Content-Type: multipart/mixed; boundary="i6134QYU2xtcYjtadLMZErrzEGVrYeISM";
  protected-headers="v1"
 From: Juergen Gross <jgross@suse.com>
 To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
+Cc: kvm@vger.kernel.org, x86@kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
  Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
  Wanpeng Li <wanpengli@tencent.com>, Jim Mattson <jmattson@google.com>,
  Joerg Roedel <joro@8bytes.org>, Thomas Gleixner <tglx@linutronix.de>,
  Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
  Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>
-Message-ID: <bfe38122-0ddd-d9bc-4927-942b051a39c4@suse.com>
-Subject: Re: [PATCH v3 3/4] x86/kvm: add max number of vcpus for hyperv
- emulation
+Message-ID: <374d3255-4e6f-e8de-9ab5-709c4a3b4e63@suse.com>
+Subject: Re: [PATCH v3 1/4] x86/kvm: add boot parameter for adding vcpu-id
+ bits
 References: <20211116141054.17800-1-jgross@suse.com>
- <20211116141054.17800-4-jgross@suse.com> <YZVrDpjW0aZjFxo1@google.com>
-In-Reply-To: <YZVrDpjW0aZjFxo1@google.com>
+ <20211116141054.17800-2-jgross@suse.com> <YZWT6GP/Jfy27r8e@google.com>
+In-Reply-To: <YZWT6GP/Jfy27r8e@google.com>
 
---LPl7Rl1ITYfjr8Kctme8DZCrMQ2s3J761
+--i6134QYU2xtcYjtadLMZErrzEGVrYeISM
 Content-Type: multipart/mixed;
- boundary="------------02CD9F29A3AC9F1BB7F0C3BA"
+ boundary="------------15D4DA9DA748AB7EF14AAF73"
 Content-Language: en-US
 
 This is a multi-part message in MIME format.
---------------02CD9F29A3AC9F1BB7F0C3BA
+--------------15D4DA9DA748AB7EF14AAF73
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 
-On 17.11.21 21:50, Sean Christopherson wrote:
+On 18.11.21 00:44, Sean Christopherson wrote:
 > On Tue, Nov 16, 2021, Juergen Gross wrote:
->> When emulating Hyperv the theoretical maximum of vcpus supported is
->> 4096, as this is the architectural limit for sending IPIs via the PV
->> interface.
->>
->> For restricting the actual supported number of vcpus for that case
->> introduce another define KVM_MAX_HYPERV_VCPUS and set it to 1024, like=
-
->> today's KVM_MAX_VCPUS. Make both values unsigned ones as this will be
->> needed later.
->>
->> The actual number of supported vcpus for Hyperv emulation will be the
->> lower value of both defines.
->>
->> This is a preparation for a future boot parameter support of the max
->> number of vcpus for a KVM guest.
->>
->> Signed-off-by: Juergen Gross <jgross@suse.com>
->> ---
->> V3:
->> - new patch
->> ---
->>   arch/x86/include/asm/kvm_host.h |  3 ++-
->>   arch/x86/kvm/hyperv.c           | 15 ++++++++-------
->>   2 files changed, 10 insertions(+), 8 deletions(-)
->>
->> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kv=
-m_host.h
->> index 886930ec8264..8ea03ff01c45 100644
->> --- a/arch/x86/include/asm/kvm_host.h
->> +++ b/arch/x86/include/asm/kvm_host.h
->> @@ -38,7 +38,8 @@
+>> diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
+>> index 816a82515dcd..64ba9b1c8b3d 100644
+>> --- a/arch/x86/kvm/ioapic.c
+>> +++ b/arch/x86/kvm/ioapic.c
+>> @@ -685,11 +685,21 @@ static const struct kvm_io_device_ops ioapic_mmi=
+o_ops =3D {
+>>   int kvm_ioapic_init(struct kvm *kvm)
+>>   {
+>>   	struct kvm_ioapic *ioapic;
+>> +	size_t sz;
+>>   	int ret;
 >>  =20
->>   #define __KVM_HAVE_ARCH_VCPU_DEBUGFS
->>  =20
->> -#define KVM_MAX_VCPUS 1024
->> +#define KVM_MAX_VCPUS 1024U
->> +#define KVM_MAX_HYPERV_VCPUS 1024U
+>> -	ioapic =3D kzalloc(sizeof(struct kvm_ioapic), GFP_KERNEL_ACCOUNT);
+>> +	sz =3D sizeof(struct kvm_ioapic) +
+>> +	     sizeof(*ioapic->rtc_status.dest_map.map) *
+>> +		    BITS_TO_LONGS(KVM_MAX_VCPU_IDS) +
+>> +	     sizeof(*ioapic->rtc_status.dest_map.vectors) *
+>> +		    (KVM_MAX_VCPU_IDS);
+>> +	ioapic =3D kzalloc(sz, GFP_KERNEL_ACCOUNT);
+>>   	if (!ioapic)
+>>   		return -ENOMEM;
+>> +	ioapic->rtc_status.dest_map.map =3D (void *)(ioapic + 1);
 >=20
-> I don't see any reason to put this in kvm_host.h, it should never be us=
-ed outside
-> of hyperv.c.
+> Oof.  Just do separate allocations.  I highly doubt the performance of =
+the
+> emulated RTC hinges on the spatial locality of the bitmap and array.  T=
+he array
+> is going to end up in a second page for most configuration anyways.
 
 Okay, fine with me.
-
->=20
->>   #define KVM_MAX_VCPU_IDS kvm_max_vcpu_ids()
->>   /* memory slots that are not exposed to userspace */
->>   #define KVM_PRIVATE_MEM_SLOTS 3
->> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
->> index 4a555f32885a..c0fa837121f1 100644
->> --- a/arch/x86/kvm/hyperv.c
->> +++ b/arch/x86/kvm/hyperv.c
->> @@ -41,7 +41,7 @@
->>   /* "Hv#1" signature */
->>   #define HYPERV_CPUID_SIGNATURE_EAX 0x31237648
->>  =20
->> -#define KVM_HV_MAX_SPARSE_VCPU_SET_BITS DIV_ROUND_UP(KVM_MAX_VCPUS, 6=
-4)
->> +#define KVM_HV_MAX_SPARSE_VCPU_SET_BITS DIV_ROUND_UP(KVM_MAX_HYPERV_V=
-CPUS, 64)
->>  =20
->>   static void stimer_mark_pending(struct kvm_vcpu_hv_stimer *stimer,
->>   				bool vcpu_kick);
->> @@ -166,7 +166,7 @@ static struct kvm_vcpu *get_vcpu_by_vpidx(struct k=
-vm *kvm, u32 vpidx)
->>   	struct kvm_vcpu *vcpu =3D NULL;
->>   	int i;
->>  =20
->> -	if (vpidx >=3D KVM_MAX_VCPUS)
->> +	if (vpidx >=3D min(KVM_MAX_VCPUS, KVM_MAX_HYPERV_VCPUS))
->=20
-> IMO, this is conceptually wrong.  KVM should refuse to allow Hyper-V to=
- be enabled
-> if the max number of vCPUs exceeds what can be supported, or should ref=
-use to create
-
-TBH, I wasn't sure where to put this test. Is there a guaranteed
-sequence of ioctl()s regarding vcpu creation (or setting the max
-number of vcpus) and the Hyper-V enabling?
-
-> the vCPUs.  I agree it makes sense to add a Hyper-V specific limit, sin=
-ce there are
-> Hyper-V structures that have a hard limit, but detection of violations =
-should be a
-> BUILD_BUG_ON, not a silent failure at runtime.
->=20
-
-A BUILD_BUG_ON won't be possible with KVM_MAX_VCPUS being selecteble via
-boot parameter.
 
 
 Juergen
 
---------------02CD9F29A3AC9F1BB7F0C3BA
+--------------15D4DA9DA748AB7EF14AAF73
 Content-Type: application/pgp-keys;
  name="OpenPGP_0xB0DE9DD628BF132F.asc"
 Content-Transfer-Encoding: quoted-printable
@@ -280,24 +223,24 @@ ZDn8R38=3D
 =3D2wuH
 -----END PGP PUBLIC KEY BLOCK-----
 
---------------02CD9F29A3AC9F1BB7F0C3BA--
+--------------15D4DA9DA748AB7EF14AAF73--
 
---LPl7Rl1ITYfjr8Kctme8DZCrMQ2s3J761--
+--i6134QYU2xtcYjtadLMZErrzEGVrYeISM--
 
---5cBUQoToneO8V1pOyzcWLmtIJYL04gXMC
+--oHanQA06vyEqo3Ev9ksBIp4414Sza82uS
 Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="OpenPGP_signature"
 
 -----BEGIN PGP SIGNATURE-----
 
-wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmGWBCMFAwAAAAAACgkQsN6d1ii/Ey8x
-Ygf8DFYWyQw1inq76Yw8Q1TG8ZD594hLI99Mb3mC5mBbAGhvHMnbhsG1FwyNW5bFxGMmg+uzr7+p
-n08vckLGia8R8qP/enjy9ZscsTJBX56N/MIHd0dUwMce5cwkgd0ExvR18h7hMsnQSAzJrGJAuz5L
-jymRQEWG8Y/Y4QR+xKLbSpYZU/KypdFTCzu+3ymIuySp/3ASr/SKUyl5RcmMPFXYUsj5r8652owM
-clj373YdqT+lBM5AjVJ+6z8XDJEMNVug4ZX6B7P6How66jytwUDEYdpHfRMrQ8RkpJAEGaHdHQtv
-dvNOW6dJkKNfYjHeH56G3vby6+K0wBNa2l7l+jdRNQ==
-=0eHa
+wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmGWBEoFAwAAAAAACgkQsN6d1ii/Ey/1
+5wf9EJkUkGz9HuArGa2HuYf1prxPdXwe6XEMtLInaf2KwCtiiEoP+hOfpHU+hGB3UkRnrdttvKVZ
+bt0t8meZIiuMxNJgtZ7S4noK7hwLFZFIDdWfvQzij2x4mh/0UoD8t8C3v9kMKyM1ehtC1aAI2QhK
+tT8O04jyKs1s6kww+HHqP8JIyEjtZIo8qyWlMyLtvwLwFeMNWnzAV6Eds1UGaN4LLPig5T2ex/Qr
+GpO2vfT7ShSPmwrrbj4F5lpNQ57uG1devXBP+cqfl5XnTWP8wkd7BmDdLgMFZaplWoasm2JENOh7
+w2wLxSfhKAYusNkpmkvIUKDmKtlO7MRuKniHqiO0Bg==
+=j2qa
 -----END PGP SIGNATURE-----
 
---5cBUQoToneO8V1pOyzcWLmtIJYL04gXMC--
+--oHanQA06vyEqo3Ev9ksBIp4414Sza82uS--
