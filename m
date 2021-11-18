@@ -2,56 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EFF6E4562EC
-	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 19:51:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C0FA8456377
+	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 20:23:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229660AbhKRSyB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Nov 2021 13:54:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48668 "EHLO
+        id S230193AbhKRT0k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Nov 2021 14:26:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56110 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229648AbhKRSyA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Nov 2021 13:54:00 -0500
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A098C061574
-        for <kvm@vger.kernel.org>; Thu, 18 Nov 2021 10:51:00 -0800 (PST)
-Received: by mail-pf1-x42a.google.com with SMTP id g18so6937528pfk.5
-        for <kvm@vger.kernel.org>; Thu, 18 Nov 2021 10:51:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=zAr8G8m6HwrPqqoGdIArvc5MN7TTOd03aeCBtzrDy6c=;
-        b=rbZpSNPBshLLEgA/oYmPUPBbBkHwOg37klgFkMWXqRk+AzrmyZ/M8ccKC2y8hmj5XX
-         PLpPwnUPPnPUTd02kdHoVA+HzFD/83CjjC3Xbl8iUzGpDaC5IgVnhNZp/tysG3KqErGy
-         5NHK+nazoYp2JBbWoBCcZ90G56QCBVHGDC2bRvtFDuQptjhoIwkzkNewqtOfKXf5uclO
-         DhLKIN93hjB32b8vl6mql00pPTkF1CnjBXdgyjfBHRSJU7IHYoN8ZQlZWFAH1r/9oUd0
-         jnvQBNIOdWFfAc3UrHP8NU5X0ygb/qQXibVUtpmNCElsCb3HlLNAGjLYo0jNbS4Fc47o
-         oIdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=zAr8G8m6HwrPqqoGdIArvc5MN7TTOd03aeCBtzrDy6c=;
-        b=0WyWNONoP56y7PAGq+/sm/a6h3X+V0usiRAygkWOfnIhImH1KOHt/g/r8KiJ/gLczv
-         /Ut3cc84kbyakWJ5heDBH+XVIp07yw3gI/nN9IWwgL6DLKsAUuk3NaI3vMeAHfDbVXTU
-         kJpn73r7XslYaBj98UaUf3opp392s560yn4XoASIsuSG7erxWiT/aeQopKzJ2z2mOxO9
-         FOqJcpXtxxeVQvfefzZffMqvij5rsTiA8OwyVNdvQqyMv+xTCzSoCEHkQ51lBmIOSOEh
-         CmzFOXpBgNg8+YpBh+30OCGhNwiwXcnOmb26rdeEvcfi8X3P83w6TBs5iGp5iz73xf8B
-         v1og==
-X-Gm-Message-State: AOAM53338w+n00MxwHeR5NO8CZ5y5nXikfQUipUQi0L9p0CYGhQzkLnY
-        XwdgKRj+VuVZv81cN91B99twOw==
-X-Google-Smtp-Source: ABdhPJwrEgdsIYmbNbF+vA4sWC6GNXtBMPWh0SewfV4Te7mVM91SE0D0KPe2RQ2SZU3Fb1o23V6Nkg==
-X-Received: by 2002:a05:6a00:b49:b0:49f:bad2:bd7c with SMTP id p9-20020a056a000b4900b0049fbad2bd7cmr58136547pfo.64.1637261459650;
-        Thu, 18 Nov 2021 10:50:59 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id y18sm306696pgh.18.2021.11.18.10.50.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Nov 2021 10:50:59 -0800 (PST)
-Date:   Thu, 18 Nov 2021 18:50:55 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>,
+        with ESMTP id S229554AbhKRT0k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Nov 2021 14:26:40 -0500
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3031C061574;
+        Thu, 18 Nov 2021 11:23:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
+        :MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:
+        Sender:Reply-To:Content-ID:Content-Description;
+        bh=dY7Tt+ADu2oQp52XUsO3VZxqjQj7MzSBRXMcpbCbafM=; b=WoRuVORo9B/4wm/C+f4RvGG6R5
+        aSUlxt0MYkOWLrvIgcfDvIr6UXShHu6loY5lSDBiU4FXuXgp3uspwRzYskh1Vs0x+Y53tK7p3vn/+
+        ZjMS5DvaH8e0oC/2BcGEHKvjs+1WptAZ4FhRVASSjAXe0I60rDRJ6dyyjWPnh9cgyFCuKyilaytvL
+        pJluZNiT0bwovPzhRdqmRPs1ZauvCLfEzEFBRXf3uCL1xUUDMSI+n0zj7a52oRJa//NNrrLSKe5bX
+        qlCpX75DD9121jX1HXfgGNlPWl6zYrgFS/RdDFdi+eoCK7Q6hIhil60eqnxdT/fcHrzlvDtVCn6sx
+        ikJ6CUsQ==;
+Received: from [2a01:4c8:1087:8341:4271:4cd3:119b:a847] (helo=[IPv6:::1])
+        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mnn08-00GkGi-FB; Thu, 18 Nov 2021 19:23:16 +0000
+Date:   Thu, 18 Nov 2021 19:23:12 +0000
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Sean Christopherson <seanjc@google.com>
+CC:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>,
         Boris Ostrovsky <boris.ostrovsky@oracle.com>,
         Joao Martins <joao.m.martins@oracle.com>,
         "jmattson @ google . com" <jmattson@google.com>,
@@ -75,42 +54,54 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>,
         linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
         linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
         kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org
-Subject: Re: [PATCH v3 08/12] KVM: Propagate vcpu explicitly to
- mark_page_dirty_in_slot()
-Message-ID: <YZagjzYUsixbFre9@google.com>
-References: <20211117174003.297096-1-dwmw2@infradead.org>
- <20211117174003.297096-9-dwmw2@infradead.org>
- <85d9fec17f32c3eb9e100e56b91af050.squirrel@twosheds.infradead.org>
- <4c48546b-eb4a-dff7-cc38-5df54f73f5d4@redhat.com>
- <20b5952e76c54a3a5dfe5a898e3b835404ac6fb1.camel@infradead.org>
- <YZaeL5YztL3p1nLM@google.com>
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v3_08/12=5D_KVM=3A_Propagate_vcpu?= =?US-ASCII?Q?_explicitly_to_mark=5Fpage=5Fdirty=5Fin=5Fslot=28=29?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <YZagjzYUsixbFre9@google.com>
+References: <20211117174003.297096-1-dwmw2@infradead.org> <20211117174003.297096-9-dwmw2@infradead.org> <85d9fec17f32c3eb9e100e56b91af050.squirrel@twosheds.infradead.org> <4c48546b-eb4a-dff7-cc38-5df54f73f5d4@redhat.com> <20b5952e76c54a3a5dfe5a898e3b835404ac6fb1.camel@infradead.org> <YZaeL5YztL3p1nLM@google.com> <YZagjzYUsixbFre9@google.com>
+Message-ID: <35AEC3FD-B46A-451D-B7D5-4B1BDD5407BD@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <YZaeL5YztL3p1nLM@google.com>
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 18, 2021, Sean Christopherson wrote:
-> On Thu, Nov 18, 2021, David Woodhouse wrote:
-> > That leaves the one in TDP MMU handle_changed_spte_dirty_log() which
-> > AFAICT can trigger the same crash seen by butt3rflyh4ck — can't that
-> > happen from a thread where kvm_get_running_vcpu() is NULL too? For that
-> > one I'm not sure.
-> 
-> I think could be trigger in the TDP MMU via kvm_mmu_notifier_release()
-> -> kvm_mmu_zap_all(), e.g. if the userspace VMM exits while dirty logging is
-> enabled.  That should be easy to (dis)prove via a selftest.
 
-Scratch that, the dirty log update is guarded by the new_spte being present, so
-zapping of any kind won't trigger it.
 
-Currently, I believe the only path that would create a present SPTE without an
-active vCPU is mmu_notifer.change_pte, but that squeaks by because its required
-to be wrapped with invalidate_range_{start,end}(MMU_NOTIFY_CLEAR), and KVM zaps
-in that situation.
+On 18 November 2021 18:50:55 GMT, Sean Christopherson <seanjc@google=2Ecom=
+> wrote:
+>On Thu, Nov 18, 2021, Sean Christopherson wrote:
+>> On Thu, Nov 18, 2021, David Woodhouse wrote:
+>> > That leaves the one in TDP MMU handle_changed_spte_dirty_log() which
+>> > AFAICT can trigger the same crash seen by butt3rflyh4ck =E2=80=94 can=
+'t that
+>> > happen from a thread where kvm_get_running_vcpu() is NULL too? For th=
+at
+>> > one I'm not sure=2E
+>>=20
+>> I think could be trigger in the TDP MMU via kvm_mmu_notifier_release()
+>> -> kvm_mmu_zap_all(), e=2Eg=2E if the userspace VMM exits while dirty l=
+ogging is
+>> enabled=2E  That should be easy to (dis)prove via a selftest=2E
+>
+>Scratch that, the dirty log update is guarded by the new_spte being prese=
+nt, so
+>zapping of any kind won't trigger it=2E
+>
+>Currently, I believe the only path that would create a present SPTE witho=
+ut an
+>active vCPU is mmu_notifer=2Echange_pte, but that squeaks by because its =
+required
+>to be wrapped with invalidate_range_{start,end}(MMU_NOTIFY_CLEAR), and KV=
+M zaps
+>in that situation=2E
 
-Ben's series to promote pages on disabling of dirty logging will also sqeuak by
-because dirty logging is obviously disabled.
+Is it sufficient to have *an* active vCPU?  What if a VMM has threads for =
+active vCPUs but is doing mmap/munmap on a *different* thread? Does that no=
+t suffer the same crash?
+
+
+--=20
+Sent from my Android device with K-9 Mail=2E Please excuse my brevity=2E
