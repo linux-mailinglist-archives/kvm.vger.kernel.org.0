@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8CE654559B8
-	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 12:10:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A6A144559C0
+	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 12:11:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343630AbhKRLNw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Nov 2021 06:13:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54252 "EHLO
+        id S1343727AbhKRLOS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Nov 2021 06:14:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343624AbhKRLMK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Nov 2021 06:12:10 -0500
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 544E0C06120A;
-        Thu, 18 Nov 2021 03:08:35 -0800 (PST)
-Received: by mail-pg1-x533.google.com with SMTP id g28so5032329pgg.3;
-        Thu, 18 Nov 2021 03:08:35 -0800 (PST)
+        with ESMTP id S1343758AbhKRLMb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Nov 2021 06:12:31 -0500
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B572C06120F;
+        Thu, 18 Nov 2021 03:08:41 -0800 (PST)
+Received: by mail-pj1-x102f.google.com with SMTP id gf14-20020a17090ac7ce00b001a7a2a0b5c3so7867162pjb.5;
+        Thu, 18 Nov 2021 03:08:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=Etx4Iv9+9jA1gDNW2CzF9nm1X7mKnJqCJON8r7DMYUk=;
-        b=L0I+oavX4SYk+9SOpNvDZAf0ki0NgMAK19UaXb3GJiteI/VKeUIzSxcES8MALnHQdd
-         Lb5e+/mQHzlznsnMOB+A+o2Zcjbt8WM3ZNkhb2WLzToOjzd1jixfA9zmXU19Ym1DdZqE
-         7tCuOjxT1FPpuInTqklSGJZzpDjvGOhGcw7zTEn/d0i45XV+XKP4HucXhSPKgtVTgAtm
-         0YVn1cHR3jOotdrPnTcsKIUQHeB/DQONdM/hlzsCIfZYFaoDrASXwfQhmH4Yi++yQaEy
-         BeQ0KZ31VJHO04r+RTu7mJ7wpu2/ZBfuTytEnNfvk626HW1/z+ryXLsMY33dCyiDrhjt
-         qQZg==
+        bh=uQxQaa/j7EXWUJQyVa/licy6Kslt0KYeAuLANLkvvZs=;
+        b=qlqlPe3BBwmkZD4k2waU8sSoD4bavgjN3pfvFIXodZeBucwmrMUiOcGACzE9/KXlAl
+         uF8Ga+SZH8QNIFnaiv2KQ+3HnC1mVKL3fTZYsWkSHv3pLNI1dr5T9jw79lANQ0lmeSpy
+         TpxYrAJ0qr9EeAxxpXpiQlUumHXjnlfRfymZT4HbTOGg1ajKlucukKS6JlEAopiBToN8
+         Pw3bfvBTas+auE7sVXlGXFdvIxbPQQddZbUOtvhdbTfwHn/mWKdKCTwotMzGVT26hTOA
+         TsqcoROCUFip7R1b+qGLB+Ykf/kb4jvd96bBgWe496YmoZ+/7S6NwPPacaCjS2wZfvp4
+         LvDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Etx4Iv9+9jA1gDNW2CzF9nm1X7mKnJqCJON8r7DMYUk=;
-        b=0LIabbRI6EIQ2mCT1i1EsT1+FHkAGgJiJ+KRpfy97UsCT6zloyA+3SkpbBW9i1+roI
-         Ci5ZD8qkK731/pELPgIVZGfhL8U8M70NHeguOpWA2nfcHOS2+Ra+WSYvngnQ2DIMTo3C
-         R1T1Yg3gLFzAxpYTymJo+xFZOQLKX1PgpJp2YI+oyhbtI9rsLgZn61zeSJhaJrZsh/kx
-         z9MAAW3WAuy7noH6jVeVCmyOzSMsmG9LVoCwjKE46+zM8orYB4iyjhlPUIKtZqoBxXYr
-         3P0AOPzxB774jTR7mLL6DK+9gVUaky0uIPnCv3Wt+2WRjkl4ii6vUJHNjAX/iypitPka
-         RRHw==
-X-Gm-Message-State: AOAM5323jA5P1iwqnZ+suFGCby2ihcx/KR/X4yf0y15EkO8bjMkaiG5x
-        TXt3kgwZm42Sd7eQqPWzyUikl+ogzeI=
-X-Google-Smtp-Source: ABdhPJyXLYdaEOn8/gAMIkq2OBAxshu/aMYi61rnloV3BChnrsCgjWSyiB8JA+0HQZSyfK/UtAgbrg==
-X-Received: by 2002:aa7:8151:0:b0:480:9d40:8e38 with SMTP id d17-20020aa78151000000b004809d408e38mr54582074pfn.72.1637233714790;
-        Thu, 18 Nov 2021 03:08:34 -0800 (PST)
+        bh=uQxQaa/j7EXWUJQyVa/licy6Kslt0KYeAuLANLkvvZs=;
+        b=oGQM2HYd8Djsijm31Tb2FUpLUkN6pK0C/H1Ymska7IiHwU1qufxGJtzrRG/j7neKOd
+         jbcrZBrALdBC772hUgypSTg2Lgz7R99FD8BeMpjPsbn2RJR0y3eoSA1TbsHYIjPYISVf
+         c6SoCnO3WokeGaotNeMRWxxUMvMnp2mC8tLsj8wBHgG3AdJ7ZhZuk3qJxYWZaBbebeQt
+         ohh370S4V/URSCKIBK2FfCnfWt08QFZqe/HNaetX2fOlq8tSrB61vBMcRUxijNEJzsGI
+         LggmuJiQCvAouiZk7X0xmk8H+93rhCyLOyKQ118PhmebfuQJWkFG9vYx21c0wZL4CQ6R
+         A2Tw==
+X-Gm-Message-State: AOAM532jo7O90DKQ3uj3E+MnNccj33iaF5Ui//QCFFN6UgFLvRSsBNMJ
+        13xFLH0QPvkHW14xOCcTkl4+QV3Wf8I=
+X-Google-Smtp-Source: ABdhPJw6LQqlIxO7mSSJ6CrYFrjmOOBAQoWPfisRqGP2qNC+vfevJFbpCPOsUXgkxyFFgoZt7DNqvg==
+X-Received: by 2002:a17:90b:4f4c:: with SMTP id pj12mr9395993pjb.217.1637233721057;
+        Thu, 18 Nov 2021 03:08:41 -0800 (PST)
 Received: from localhost ([47.88.60.64])
-        by smtp.gmail.com with ESMTPSA id ot18sm2787450pjb.14.2021.11.18.03.08.33
+        by smtp.gmail.com with ESMTPSA id y18sm2166790pgh.18.2021.11.18.03.08.39
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 18 Nov 2021 03:08:34 -0800 (PST)
+        Thu, 18 Nov 2021 03:08:40 -0800 (PST)
 From:   Lai Jiangshan <jiangshanlai@gmail.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     kvm@vger.kernel.org, Lai Jiangshan <laijs@linux.alibaba.com>,
@@ -60,9 +60,9 @@ Cc:     kvm@vger.kernel.org, Lai Jiangshan <laijs@linux.alibaba.com>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
         "H. Peter Anvin" <hpa@zytor.com>
-Subject: [PATCH 05/15] KVM: VMX: Add document to state that write to uret msr should always be intercepted
-Date:   Thu, 18 Nov 2021 19:08:04 +0800
-Message-Id: <20211118110814.2568-6-jiangshanlai@gmail.com>
+Subject: [PATCH 06/15] KVM: VMX: Use kvm_set_msr_common() for MSR_IA32_TSC_ADJUST in the default way
+Date:   Thu, 18 Nov 2021 19:08:05 +0800
+Message-Id: <20211118110814.2568-7-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 In-Reply-To: <20211118110814.2568-1-jiangshanlai@gmail.com>
 References: <20211118110814.2568-1-jiangshanlai@gmail.com>
@@ -74,40 +74,28 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Lai Jiangshan <laijs@linux.alibaba.com>
 
-And adds a corresponding sanity check code.
+MSR_IA32_TSC_ADJUST can be left to the default way which also uese
+kvm_set_msr_common().
 
 Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ arch/x86/kvm/vmx/vmx.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index e8a41fdc3c4d..cd081219b668 100644
+index cd081219b668..a0efc1e74311 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -3703,13 +3703,21 @@ void vmx_disable_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr, int type)
- 	if (!cpu_has_vmx_msr_bitmap())
- 		return;
- 
-+	/*
-+	 * Write to uret msr should always be intercepted due to the mechanism
-+	 * must know the current value.  Santity check to avoid any inadvertent
-+	 * mistake in coding.
-+	 */
-+	if (WARN_ON_ONCE(vmx_find_uret_msr(vmx, msr) && (type & MSR_TYPE_W)))
-+		return;
-+
- 	if (static_branch_unlikely(&enable_evmcs))
- 		evmcs_touch_msr_bitmap();
- 
- 	/*
- 	 * Mark the desired intercept state in shadow bitmap, this is needed
- 	 * for resync when the MSR filters change.
--	*/
-+	 */
- 	if (is_valid_passthrough_msr(msr)) {
- 		int idx = possible_passthrough_msr_slot(msr);
- 
+@@ -2104,9 +2104,6 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		}
+ 		ret = kvm_set_msr_common(vcpu, msr_info);
+ 		break;
+-	case MSR_IA32_TSC_ADJUST:
+-		ret = kvm_set_msr_common(vcpu, msr_info);
+-		break;
+ 	case MSR_IA32_MCG_EXT_CTL:
+ 		if ((!msr_info->host_initiated &&
+ 		     !(to_vmx(vcpu)->msr_ia32_feature_control &
 -- 
 2.19.1.6.gb485710b
 
