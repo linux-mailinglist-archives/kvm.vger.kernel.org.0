@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9DD854555FB
-	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 08:45:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EEEC0455604
+	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 08:46:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244025AbhKRHsE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Nov 2021 02:48:04 -0500
-Received: from smtp-out2.suse.de ([195.135.220.29]:52606 "EHLO
+        id S244061AbhKRHtC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Nov 2021 02:49:02 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:52640 "EHLO
         smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244057AbhKRHrM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Nov 2021 02:47:12 -0500
+        with ESMTP id S244113AbhKRHsV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Nov 2021 02:48:21 -0500
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 05CD91FD29;
-        Thu, 18 Nov 2021 07:44:12 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 5760A1FD37;
+        Thu, 18 Nov 2021 07:45:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1637221452; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1637221520; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=VivlK8luK1AvNEfo3RDyX0t7aR3Y6/ldzwb1M+i4xV8=;
-        b=qNUu/zxCyojTC5Xd/kNV+X29kdCj7sjfba9deFv2Ok7WOuqtmjhlgX/dUzoCkRJH9GVDYP
-        eaCAeHKCEUzbPOT78jUsmafRUpav0K9ycLhxgNF4MQ4YfG2IqUg3YE0IVMPk9VqE/Y84u7
-        uaO6npQDON0cpKjSIhilFYvv4Qm8wRA=
+        bh=U+w/6qcGp66rTr9I94Sy80m7QueLxbiRPqzDu3h7BRw=;
+        b=K6OQWFI/JMK+z+tVtN4GJPi8hmjDQIfLSP6H7QfNA1UBH7Ppggfpjli9nK2FYVCdrwc27h
+        ot5CIuKTJmizvos3j6MSZgivPD9Cllk1Em3wGxbWZKX+KjaV4RDtc3lBlv/UHYxc7p71BP
+        rHKOJnAWy4demiEjaR1hWnu6MDqZLQk=
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 7433D13CE6;
-        Thu, 18 Nov 2021 07:44:11 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E1C8F13CE6;
+        Thu, 18 Nov 2021 07:45:19 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id biByGksElmHtQwAAMHmgww
-        (envelope-from <jgross@suse.com>); Thu, 18 Nov 2021 07:44:11 +0000
+        id pDzoNY8ElmFvRAAAMHmgww
+        (envelope-from <jgross@suse.com>); Thu, 18 Nov 2021 07:45:19 +0000
 Subject: Re: [PATCH v3 1/4] x86/kvm: add boot parameter for adding vcpu-id
  bits
 To:     Sean Christopherson <seanjc@google.com>
@@ -50,24 +50,25 @@ Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-doc@vger.kernel.org,
         Dave Hansen <dave.hansen@linux.intel.com>,
         "H. Peter Anvin" <hpa@zytor.com>
 References: <20211116141054.17800-1-jgross@suse.com>
- <20211116141054.17800-2-jgross@suse.com> <YZWT6GP/Jfy27r8e@google.com>
+ <20211116141054.17800-2-jgross@suse.com>
+ <7f10b8b4-e753-c977-f201-5ef17a6e81c8@suse.com> <YZWUV2jvoOS9RSq8@google.com>
 From:   Juergen Gross <jgross@suse.com>
-Message-ID: <374d3255-4e6f-e8de-9ab5-709c4a3b4e63@suse.com>
-Date:   Thu, 18 Nov 2021 08:44:10 +0100
+Message-ID: <731540b4-e8fc-0322-5aa0-e134bc55a397@suse.com>
+Date:   Thu, 18 Nov 2021 08:45:19 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.12.0
 MIME-Version: 1.0
-In-Reply-To: <YZWT6GP/Jfy27r8e@google.com>
+In-Reply-To: <YZWUV2jvoOS9RSq8@google.com>
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="oHanQA06vyEqo3Ev9ksBIp4414Sza82uS"
+ boundary="BJWNkMgI9hOmEloIqiq80Rjg5tRoMpM2C"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---oHanQA06vyEqo3Ev9ksBIp4414Sza82uS
-Content-Type: multipart/mixed; boundary="i6134QYU2xtcYjtadLMZErrzEGVrYeISM";
+--BJWNkMgI9hOmEloIqiq80Rjg5tRoMpM2C
+Content-Type: multipart/mixed; boundary="ooDNn4Igq5ipKsexUzCfKaCOO8sdrL8Fi";
  protected-headers="v1"
 From: Juergen Gross <jgross@suse.com>
 To: Sean Christopherson <seanjc@google.com>
@@ -78,60 +79,94 @@ Cc: kvm@vger.kernel.org, x86@kernel.org, linux-doc@vger.kernel.org,
  Joerg Roedel <joro@8bytes.org>, Thomas Gleixner <tglx@linutronix.de>,
  Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
  Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>
-Message-ID: <374d3255-4e6f-e8de-9ab5-709c4a3b4e63@suse.com>
+Message-ID: <731540b4-e8fc-0322-5aa0-e134bc55a397@suse.com>
 Subject: Re: [PATCH v3 1/4] x86/kvm: add boot parameter for adding vcpu-id
  bits
 References: <20211116141054.17800-1-jgross@suse.com>
- <20211116141054.17800-2-jgross@suse.com> <YZWT6GP/Jfy27r8e@google.com>
-In-Reply-To: <YZWT6GP/Jfy27r8e@google.com>
+ <20211116141054.17800-2-jgross@suse.com>
+ <7f10b8b4-e753-c977-f201-5ef17a6e81c8@suse.com> <YZWUV2jvoOS9RSq8@google.com>
+In-Reply-To: <YZWUV2jvoOS9RSq8@google.com>
 
---i6134QYU2xtcYjtadLMZErrzEGVrYeISM
+--ooDNn4Igq5ipKsexUzCfKaCOO8sdrL8Fi
 Content-Type: multipart/mixed;
- boundary="------------15D4DA9DA748AB7EF14AAF73"
+ boundary="------------395CF4152ECDAA3862AEB85D"
 Content-Language: en-US
 
 This is a multi-part message in MIME format.
---------------15D4DA9DA748AB7EF14AAF73
+--------------395CF4152ECDAA3862AEB85D
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: quoted-printable
 
-On 18.11.21 00:44, Sean Christopherson wrote:
-> On Tue, Nov 16, 2021, Juergen Gross wrote:
->> diff --git a/arch/x86/kvm/ioapic.c b/arch/x86/kvm/ioapic.c
->> index 816a82515dcd..64ba9b1c8b3d 100644
->> --- a/arch/x86/kvm/ioapic.c
->> +++ b/arch/x86/kvm/ioapic.c
->> @@ -685,11 +685,21 @@ static const struct kvm_io_device_ops ioapic_mmi=
-o_ops =3D {
->>   int kvm_ioapic_init(struct kvm *kvm)
->>   {
->>   	struct kvm_ioapic *ioapic;
->> +	size_t sz;
->>   	int ret;
->>  =20
->> -	ioapic =3D kzalloc(sizeof(struct kvm_ioapic), GFP_KERNEL_ACCOUNT);
->> +	sz =3D sizeof(struct kvm_ioapic) +
->> +	     sizeof(*ioapic->rtc_status.dest_map.map) *
->> +		    BITS_TO_LONGS(KVM_MAX_VCPU_IDS) +
->> +	     sizeof(*ioapic->rtc_status.dest_map.vectors) *
->> +		    (KVM_MAX_VCPU_IDS);
->> +	ioapic =3D kzalloc(sz, GFP_KERNEL_ACCOUNT);
->>   	if (!ioapic)
->>   		return -ENOMEM;
->> +	ioapic->rtc_status.dest_map.map =3D (void *)(ioapic + 1);
->=20
-> Oof.  Just do separate allocations.  I highly doubt the performance of =
-the
-> emulated RTC hinges on the spatial locality of the bitmap and array.  T=
-he array
-> is going to end up in a second page for most configuration anyways.
+On 18.11.21 00:46, Sean Christopherson wrote:
+> On Wed, Nov 17, 2021, Juergen Gross wrote:
+>> On 16.11.21 15:10, Juergen Gross wrote:
+>>> Today the maximum vcpu-id of a kvm guest's vcpu on x86 systems is set=
 
-Okay, fine with me.
+>>> via a #define in a header file.
+>>>
+>>> In order to support higher vcpu-ids without generally increasing the
+>>> memory consumption of guests on the host (some guest structures conta=
+in
+>>> arrays sized by KVM_MAX_VCPU_IDS) add a boot parameter for adding som=
+e
+>>> bits to the vcpu-id. Additional bits are needed as the vcpu-id is
+>>> constructed via bit-wise concatenation of socket-id, core-id, etc.
+>>> As those ids maximum values are not always a power of 2, the vcpu-ids=
+
+>>> are sparse.
+>>>
+>>> The additional number of bits needed is basically the number of
+>>> topology levels with a non-power-of-2 maximum value, excluding the to=
+p
+>>> most level.
+>>>
+>>> The default value of the new parameter will be 2 in order to support
+>>> today's possible topologies. The special value of -1 will use the
+>>> number of bits needed for a guest with the current host's topology.
+>>>
+>>> Calculating the maximum vcpu-id dynamically requires to allocate the
+>>> arrays using KVM_MAX_VCPU_IDS as the size dynamically.
+>>>
+>>> Signed-of-by: Juergen Gross <jgross@suse.com>
+>>
+>> Just thought about vcpu-ids a little bit more.
+>>
+>> It would be possible to replace the topology games completely by an
+>> arbitrary rather high vcpu-id limit (65536?) and to allocate the memor=
+y
+>> depending on the max vcpu-id just as needed.
+>>
+>> Right now the only vcpu-id dependent memory is for the ioapic consisti=
+ng
+>> of a vcpu-id indexed bitmap and a vcpu-id indexed byte array (vectors)=
+=2E
+>>
+>> We could start with a minimal size when setting up an ioapic and exten=
+d
+>> the areas in case a new vcpu created would introduce a vcpu-id outside=
+
+>> the currently allocated memory. Both arrays are protected by the ioapi=
+c
+>> specific lock (at least I couldn't spot any unprotected usage when
+>> looking briefly into the code), so reallocating those arrays shouldn't=
+
+>> be hard. In case of ENOMEM the related vcpu creation would just fail.
+>>
+>> Thoughts?
+>=20
+> Why not have userspace state the max vcpu_id it intends to creates on a=
+ per-VM
+> basis?  Same end result, but doesn't require the complexity of realloca=
+ting the
+> I/O APIC stuff.
+>=20
+
+And if the userspace doesn't do it (like today)?
 
 
 Juergen
 
---------------15D4DA9DA748AB7EF14AAF73
+--------------395CF4152ECDAA3862AEB85D
 Content-Type: application/pgp-keys;
  name="OpenPGP_0xB0DE9DD628BF132F.asc"
 Content-Transfer-Encoding: quoted-printable
@@ -223,24 +258,24 @@ ZDn8R38=3D
 =3D2wuH
 -----END PGP PUBLIC KEY BLOCK-----
 
---------------15D4DA9DA748AB7EF14AAF73--
+--------------395CF4152ECDAA3862AEB85D--
 
---i6134QYU2xtcYjtadLMZErrzEGVrYeISM--
+--ooDNn4Igq5ipKsexUzCfKaCOO8sdrL8Fi--
 
---oHanQA06vyEqo3Ev9ksBIp4414Sza82uS
+--BJWNkMgI9hOmEloIqiq80Rjg5tRoMpM2C
 Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="OpenPGP_signature"
 
 -----BEGIN PGP SIGNATURE-----
 
-wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmGWBEoFAwAAAAAACgkQsN6d1ii/Ey/1
-5wf9EJkUkGz9HuArGa2HuYf1prxPdXwe6XEMtLInaf2KwCtiiEoP+hOfpHU+hGB3UkRnrdttvKVZ
-bt0t8meZIiuMxNJgtZ7S4noK7hwLFZFIDdWfvQzij2x4mh/0UoD8t8C3v9kMKyM1ehtC1aAI2QhK
-tT8O04jyKs1s6kww+HHqP8JIyEjtZIo8qyWlMyLtvwLwFeMNWnzAV6Eds1UGaN4LLPig5T2ex/Qr
-GpO2vfT7ShSPmwrrbj4F5lpNQ57uG1devXBP+cqfl5XnTWP8wkd7BmDdLgMFZaplWoasm2JENOh7
-w2wLxSfhKAYusNkpmkvIUKDmKtlO7MRuKniHqiO0Bg==
-=j2qa
+wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmGWBI8FAwAAAAAACgkQsN6d1ii/Ey/y
+EQf+NHy8pxZtpXYQSjpBdRU7wkliC3RtcpQnu+sOcWYQdrvi+vd+MB5PTYkDBYATm0juMKAdQsMg
+keEBLORRnXwyumkdOHpbdp+vZjN+XTZTIWuyr/GiEqwaKoLuZT9AFVyrmpoblbC16NPX2J59AAQZ
+9OTKOQIhzL3FLJjW/kDC69Snr58DLkOCFLw6KqX1yyFsQ/1SbYS6Q4RVAEIQHdOkJkBHrFoqMHrQ
+Xv6oVynHYVwv6gtlXr6kj9PaH+oMsT2UpBNn4pZanitNc9oHHl9ME9MeY6bF2oy4hxVwdsXRaus5
+Fd/iUg081Jq9u6V/gfdCM6B0p/NbxwkqH2a2Ngollg==
+=LjXh
 -----END PGP SIGNATURE-----
 
---oHanQA06vyEqo3Ev9ksBIp4414Sza82uS--
+--BJWNkMgI9hOmEloIqiq80Rjg5tRoMpM2C--
