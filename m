@@ -2,217 +2,255 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 975874560A6
-	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 17:37:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BE2104560D5
+	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 17:43:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233554AbhKRQkf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Nov 2021 11:40:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45712 "EHLO
+        id S233678AbhKRQq2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Nov 2021 11:46:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233536AbhKRQke (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Nov 2021 11:40:34 -0500
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82DA1C06173E
-        for <kvm@vger.kernel.org>; Thu, 18 Nov 2021 08:37:34 -0800 (PST)
-Received: by mail-pg1-x533.google.com with SMTP id b4so5825217pgh.10
-        for <kvm@vger.kernel.org>; Thu, 18 Nov 2021 08:37:34 -0800 (PST)
+        with ESMTP id S233652AbhKRQqU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Nov 2021 11:46:20 -0500
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBBB1C061574
+        for <kvm@vger.kernel.org>; Thu, 18 Nov 2021 08:43:19 -0800 (PST)
+Received: by mail-lf1-x135.google.com with SMTP id f18so29085548lfv.6
+        for <kvm@vger.kernel.org>; Thu, 18 Nov 2021 08:43:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=eSlGi5RuVgo7OXNua4tu84/flggr/LpyiJgQtSdy3yM=;
-        b=q5ZeqDsUJK3gz8NyzGqQhy4Ng9nNfszISWbCU0xpoPQ28ZdhSY7CDtZ8B1DY7+i8X7
-         kJ6ob4HDQT4KvVAsQg5OyQRpTTfvWeALcBBgro5Ex8Yq6rr1Y2scWKOHnmui6n0LfUC6
-         WR8mrqca5n4HGfq3rqZNzGb9YiJic7LvfLidnUJiJajz7hv3s4hLRjhyZ6IW6RNQF325
-         PQYylEjctPMlMOQioHSeBJpiTIw9njU2+Nqp44N9jhDb20QGUoG4UBtElt7R55D4rkEo
-         3YHFPrcEUchj92JSb1EwGAC5eGwIeW5BTK9QZuNC2fyP06HGw/ZEvLLHLb1ab/ceo7gO
-         +5hQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=A7D/BeXVr7wzzWFs8SKVTpLA5OK3s6ikrHABb23KOco=;
+        b=CqP/wh5rSorV/TnAQxzdgsZz00pJ5cWLtZd6e3yhJ0X2NfcSIeOGNa4K1m8IOgAuZ/
+         IhTPa0XJNMCiP+pgVih/Bi3fq+TwkhnPnoUretxdR/GVsXAbwudVYOECqRPhHYqKXLFQ
+         IWNRqYT+ZOi+IcKyGcxDtm9HuylzUxlZ8WwILX5upefDxs8JGP6Q2BmfWBsc3yHywHAX
+         9tg08Uy5hehL2b/S0KNhF2j1aITHPZTiUW1kXHrP4cuqQJJCU2ydhZs6+YN1zZ0LvLXR
+         xNfmFuA0sXeU3wxMPjanG//zwdlWx6bTfDU1DGAk3gOII5FKYLJHJgajYOYiOX31wQsP
+         LAww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=eSlGi5RuVgo7OXNua4tu84/flggr/LpyiJgQtSdy3yM=;
-        b=lSapc3E3TGaJIgu4VzSWm3svImN23EHKT7wJhlEN1VDpVA4MFdnjc8U8NU+IxPshUR
-         +KA2ihgQo344SeJ1xmkpRIHODYy5fgDH+oBVnL8D8SRNIqtd7/WvY3BH5PKHFIo7tnNw
-         z73XRHnqpVqv2w+W6a2dXsM78LiQyvOHkdWdfcwYuoSJIirTk6Mc8dSkwv96mMcm99Si
-         +HH9Xs8oivIvksnSb77fLnG16vuF2wdv9FCp9sPQEk33Oj16z92bTA928IIBKQqINRHS
-         GF06wJizAQf+AFTJxv6qbbT57YE5ZyBT/X1O1F04xjp+yFr941KjqbPIrs1A4lYkAZJI
-         ugKg==
-X-Gm-Message-State: AOAM532UyH5YqEJEhJvnSDgMVIebA28g5A8203ERcnOS1+xhG/DdAGy6
-        /sbisipXa1CmPj3vrbn7LJhWOORT7BfyKw==
-X-Google-Smtp-Source: ABdhPJyniZd4HCHWU0Zk/S2bncAHEGtGw52ezIlUt31Yx49ou6//UqI+npzLNPw1lXGB6+ljLoOvTQ==
-X-Received: by 2002:a05:6a00:848:b0:49f:b215:e002 with SMTP id q8-20020a056a00084800b0049fb215e002mr56777937pfk.47.1637253453821;
-        Thu, 18 Nov 2021 08:37:33 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id rj8sm9894583pjb.0.2021.11.18.08.37.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Nov 2021 08:37:33 -0800 (PST)
-Date:   Thu, 18 Nov 2021 16:37:29 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Keqian Zhu <zhukeqian1@huawei.com>,
-        David Hildenbrand <david@redhat.com>
-Subject: Re: [RFC 11/19] KVM: x86/mmu: Factor shadow_zero_check out of
- make_spte
-Message-ID: <YZaBSf+bPc69WR1R@google.com>
-References: <20211110223010.1392399-1-bgardon@google.com>
- <20211110223010.1392399-12-bgardon@google.com>
- <YZW02M0+YzAzBF/w@google.com>
- <YZXIqAHftH4d+B9Y@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=A7D/BeXVr7wzzWFs8SKVTpLA5OK3s6ikrHABb23KOco=;
+        b=Cdygnydua/UJnvCp7mL4/GbHFjY9gonUgHYDHnneH3yChgN4tTKLxtm2itiTnvCQr2
+         osuYp4/9EFAKu9SX2TdIONW3ZCr3XZYrfAD4rh6frN5mPjnBzqzOMEaV+2dyYqVfzl+q
+         HLefxlj3fSUkYvuek+AaDnjmFM+hiVsStqaVf4F/F85yfw5LuDO/B/S304R+ckdJWvpQ
+         1p7XmMn1Xexl08PJhMuCmjyAOE19yslLFAzm8XZz9uZpm7xO3qnPceGmQyWxIsiG+26p
+         c3swdk1dlibuJGUQXblEI9Ku+IrruGrumoWUzUrSk02h4wiHobCCHvk12oj4XohAyEE6
+         i9bw==
+X-Gm-Message-State: AOAM5306Ap84i9Yt9Zv6BElMMiXTVhbOwQ/Ln+lYna9Jb4r1UomXf4SI
+        EaVmUXc3nuj3/MgZ0CM2KRihaXf8Uw1g6xNI5149QQ==
+X-Google-Smtp-Source: ABdhPJxW6myjWm6lja6OnE0jaItEXzM/1vqY0/QtkI9jvuFbZMxUM+NzZUA0oYBmrWBnvhOYOZf0hJ2GBlFtQttYCpA=
+X-Received: by 2002:a05:6512:2804:: with SMTP id cf4mr1847789lfb.644.1637253797827;
+ Thu, 18 Nov 2021 08:43:17 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YZXIqAHftH4d+B9Y@google.com>
+References: <20211110220731.2396491-1-brijesh.singh@amd.com> <20211110220731.2396491-45-brijesh.singh@amd.com>
+In-Reply-To: <20211110220731.2396491-45-brijesh.singh@amd.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Thu, 18 Nov 2021 09:43:06 -0700
+Message-ID: <CAMkAt6qGASUFv7_bEDd3zrwt2J8kRxKdNuZCGCnsNvnGr4Uv3g@mail.gmail.com>
+Subject: Re: [PATCH v7 44/45] virt: sevguest: Add support to derive key
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 18, 2021, Sean Christopherson wrote:
-> Another idea.  The only difference between 5-level and 4-level is that 5-level
-> fills in index [4], and I'm pretty sure 4-level doesn't touch that index.  For
-> PAE NPT (32-bit SVM), the shadow root level will never change, so that's not an issue.
-> 
-> Nested NPT is the only case where anything for an EPT/NPT MMU can change, because
-> that follows EFER.NX.
-> 
-> In other words, the non-nested TDP reserved bits don't need to be recalculated
-> regardless of level, they can just fill in 5-level and leave it be.
-> 
-> E.g. something like the below.  The sp->role.direct check could be removed if we
-> forced EFER.NX for nested NPT.
-> 
-> It's a bit ugly in that we'd pass both @kvm and @vcpu, so that needs some more
-> thought, but at minimum it means there's no need to recalc the reserved bits.
+On Wed, Nov 10, 2021 at 3:09 PM Brijesh Singh <brijesh.singh@amd.com> wrote:
+>
+> The SNP_GET_DERIVED_KEY ioctl interface can be used by the SNP guest to
+> ask the firmware to provide a key derived from a root key. The derived
+> key may be used by the guest for any purposes it choose, such as a
+> sealing key or communicating with the external entities.
+>
+> See SEV-SNP firmware spec for more information.
+>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  Documentation/virt/coco/sevguest.rst  | 19 ++++++++++-
+>  drivers/virt/coco/sevguest/sevguest.c | 49 +++++++++++++++++++++++++++
+>  include/uapi/linux/sev-guest.h        | 24 +++++++++++++
+>  3 files changed, 91 insertions(+), 1 deletion(-)
+>
+> diff --git a/Documentation/virt/coco/sevguest.rst b/Documentation/virt/coco/sevguest.rst
+> index 002c90946b8a..0bd9a65e0370 100644
+> --- a/Documentation/virt/coco/sevguest.rst
+> +++ b/Documentation/virt/coco/sevguest.rst
+> @@ -64,10 +64,27 @@ The SNP_GET_REPORT ioctl can be used to query the attestation report from the
+>  SEV-SNP firmware. The ioctl uses the SNP_GUEST_REQUEST (MSG_REPORT_REQ) command
+>  provided by the SEV-SNP firmware to query the attestation report.
+>
+> -On success, the snp_report_resp.data will contains the report. The report
+> +On success, the snp_report_resp.data will contain the report. The report
+>  will contain the format described in the SEV-SNP specification. See the SEV-SNP
+>  specification for further details.
+>
+> +2.2 SNP_GET_DERIVED_KEY
+> +-----------------------
+> +:Technology: sev-snp
+> +:Type: guest ioctl
+> +:Parameters (in): struct snp_derived_key_req
+> +:Returns (out): struct snp_derived_key_req on success, -negative on error
+> +
+> +The SNP_GET_DERIVED_KEY ioctl can be used to get a key derive from a root key.
 
-Ok, I think my final vote is to have the reserved bits passed in, but with the
-non-nested TDP reserved bits being computed at MMU init.
+derived
 
-I would also prefer to keep the existing make_spte() name so that there's no churn
-in those call sites, and to make the relationship between the wrapper, mask_spte(),
-and the "real" helper, __make_spte(), more obvious and aligned with the usual
-kernel style.
+> +The derived key can be used by the guest for any purpose, such as sealing keys
+> +or communicating with external entities.
+> +
+> +The ioctl uses the SNP_GUEST_REQUEST (MSG_KEY_REQ) command provided by the
+> +SEV-SNP firmware to derive the key. See SEV-SNP specification for further details
+> +on the various fields passed in the key derivation request.
+> +
+> +On success, the snp_derived_key_resp.data will contains the derived key value. See
+".data will contain the..." or ".data contains the derived key..."
 
-So with the kvm_vcpu_ad_need_write_protect() change and my proposed hack-a-fix for
-kvm_x86_get_mt_mask(), the end result would look like:
 
-bool __make_spte(struct kvm *kvm, struct kvm_mmu_page *sp,
-		 struct kvm_memory_slot *slot, unsigned int pte_access,
-		 gfn_t gfn, kvm_pfn_t pfn, u64 old_spte, bool prefetch,
-		 bool can_unsync, bool host_writable, u64 *new_spte,
-		 struct rsvd_bits_validate *shadow_rsvd_bits)
-{
-	int level = sp->role.level;
-	u64 spte = SPTE_MMU_PRESENT_MASK;
-	bool wrprot = false;
+> +the SEV-SNP specification for further details.
+>
+>  Reference
+>  ---------
+> diff --git a/drivers/virt/coco/sevguest/sevguest.c b/drivers/virt/coco/sevguest/sevguest.c
+> index 982714c1b4ca..bece6856573e 100644
+> --- a/drivers/virt/coco/sevguest/sevguest.c
+> +++ b/drivers/virt/coco/sevguest/sevguest.c
+> @@ -392,6 +392,52 @@ static int get_report(struct snp_guest_dev *snp_dev, struct snp_guest_request_io
+>         return rc;
+>  }
+>
+> +static int get_derived_key(struct snp_guest_dev *snp_dev, struct snp_guest_request_ioctl *arg)
+> +{
+> +       struct snp_guest_crypto *crypto = snp_dev->crypto;
+> +       struct snp_derived_key_resp resp = {0};
+> +       struct snp_derived_key_req req;
+> +       int rc, resp_len;
+> +       u8 buf[89];
 
-	if (sp->role.ad_disabled)
-		spte |= SPTE_TDP_AD_DISABLED_MASK;
-	else if (kvm_mmu_page_ad_need_write_protect(sp))
-		spte |= SPTE_TDP_AD_WRPROT_ONLY_MASK;
+Could we document this magic number?
 
-	/*
-	 * For the EPT case, shadow_present_mask is 0 if hardware
-	 * supports exec-only page table entries.  In that case,
-	 * ACC_USER_MASK and shadow_user_mask are used to represent
-	 * read access.  See FNAME(gpte_access) in paging_tmpl.h.
-	 */
-	spte |= shadow_present_mask;
-	if (!prefetch)
-		spte |= spte_shadow_accessed_mask(spte);
+> +
+> +       if (!arg->req_data || !arg->resp_data)
+> +               return -EINVAL;
+> +
+> +       /* Copy the request payload from userspace */
+> +       if (copy_from_user(&req, (void __user *)arg->req_data, sizeof(req)))
+> +               return -EFAULT;
+> +
+> +       /* Message version must be non-zero */
+> +       if (!req.msg_version)
+> +               return -EINVAL;
+> +
+> +       /*
+> +        * The intermediate response buffer is used while decrypting the
+> +        * response payload. Make sure that it has enough space to cover the
+> +        * authtag.
+> +        */
+> +       resp_len = sizeof(resp.data) + crypto->a_len;
+> +       if (sizeof(buf) < resp_len)
+> +               return -ENOMEM;
+> +
+> +       /* Issue the command to get the attestation report */
+> +       rc = handle_guest_request(snp_dev, SVM_VMGEXIT_GUEST_REQUEST, req.msg_version,
+> +                                 SNP_MSG_KEY_REQ, &req.data, sizeof(req.data), buf, resp_len,
+> +                                 &arg->fw_err);
+> +       if (rc)
+> +               goto e_free;
 
-	if (level > PG_LEVEL_4K && (pte_access & ACC_EXEC_MASK) &&
-	    is_nx_huge_page_enabled()) {
-		pte_access &= ~ACC_EXEC_MASK;
-	}
+Should we check the first 32 bits of |data| here since that is a
+status field? If we see 16h here we could return -EINVAL, or better to
+let userspace deal with that error handling?
 
-	if (pte_access & ACC_EXEC_MASK)
-		spte |= shadow_x_mask;
-	else
-		spte |= shadow_nx_mask;
-
-	if (pte_access & ACC_USER_MASK)
-		spte |= shadow_user_mask;
-
-	if (level > PG_LEVEL_4K)
-		spte |= PT_PAGE_SIZE_MASK;
-	if (tdp_enabled)
-		spte |= static_call(kvm_x86_get_mt_mask)(kvm, gfn,
-			kvm_is_mmio_pfn(pfn));
-
-	if (host_writable)
-		spte |= shadow_host_writable_mask;
-	else
-		pte_access &= ~ACC_WRITE_MASK;
-
-	if (!kvm_is_mmio_pfn(pfn))
-		spte |= shadow_me_mask;
-
-	spte |= (u64)pfn << PAGE_SHIFT;
-
-	if (pte_access & ACC_WRITE_MASK) {
-		spte |= PT_WRITABLE_MASK | shadow_mmu_writable_mask;
-
-		/*
-		 * Optimization: for pte sync, if spte was writable the hash
-		 * lookup is unnecessary (and expensive). Write protection
-		 * is responsibility of kvm_mmu_get_page / kvm_mmu_sync_roots.
-		 * Same reasoning can be applied to dirty page accounting.
-		 */
-		if (is_writable_pte(old_spte))
-			goto out;
-
-		/*
-		 * Unsync shadow pages that are reachable by the new, writable
-		 * SPTE.  Write-protect the SPTE if the page can't be unsync'd,
-		 * e.g. it's write-tracked (upper-level SPs) or has one or more
-		 * shadow pages and unsync'ing pages is not allowed.
-		 */
-		if (mmu_try_to_unsync_pages(kvm, slot, gfn, can_unsync, prefetch)) {
-			pgprintk("%s: found shadow page for %llx, marking ro\n",
-				 __func__, gfn);
-			wrprot = true;
-			pte_access &= ~ACC_WRITE_MASK;
-			spte &= ~(PT_WRITABLE_MASK | shadow_mmu_writable_mask);
-		}
-	}
-
-	if (pte_access & ACC_WRITE_MASK)
-		spte |= spte_shadow_dirty_mask(spte);
-
-out:
-	if (prefetch)
-		spte = mark_spte_for_access_track(spte);
-
-	WARN_ONCE(is_rsvd_spte(shadow_rsvd_bits), spte, level),
-		  "spte = 0x%llx, level = %d, rsvd bits = 0x%llx", spte, level,
-		  get_rsvd_bits(&shadow_rsvd_bits, spte, level));
-
-	if ((spte & PT_WRITABLE_MASK) && kvm_slot_dirty_track_enabled(slot)) {
-		/* Enforced by kvm_mmu_hugepage_adjust. */
-		WARN_ON(level > PG_LEVEL_4K);
-		mark_page_dirty_in_slot(kvm, slot, gfn);
-	}
-
-	*new_spte = spte;
-	return wrprot;
-}
-
-bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
-	       struct kvm_memory_slot *slot,
-	       unsigned int pte_access, gfn_t gfn, kvm_pfn_t pfn,
-	       u64 old_spte, bool prefetch, bool can_unsync,
-	       bool host_writable, u64 *new_spte)
-{
-	return __make_spte(vcpu->kvm, sp, slot, pte_access, gfn, pfn, old_spte,
-			   prefetch, can_unsync, host_writable, new_spte,
-			   &vcpu->arch.mmu->shadow_zero_check);
-}
+> +
+> +       /* Copy the response payload to userspace */
+> +       memcpy(resp.data, buf, sizeof(resp.data));
+> +       if (copy_to_user((void __user *)arg->resp_data, &resp, sizeof(resp)))
+> +               rc = -EFAULT;
+> +
+> +e_free:
+> +       memzero_explicit(buf, sizeof(buf));
+> +       memzero_explicit(&resp, sizeof(resp));
+> +       return rc;
+> +}
+> +
+>  static long snp_guest_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
+>  {
+>         struct snp_guest_dev *snp_dev = to_snp_dev(file);
+> @@ -417,6 +463,9 @@ static long snp_guest_ioctl(struct file *file, unsigned int ioctl, unsigned long
+>         case SNP_GET_REPORT:
+>                 ret = get_report(snp_dev, &input);
+>                 break;
+> +       case SNP_GET_DERIVED_KEY:
+> +               ret = get_derived_key(snp_dev, &input);
+> +               break;
+>         default:
+>                 break;
+>         }
+> diff --git a/include/uapi/linux/sev-guest.h b/include/uapi/linux/sev-guest.h
+> index eda7edcffda8..f6d9c136ff4d 100644
+> --- a/include/uapi/linux/sev-guest.h
+> +++ b/include/uapi/linux/sev-guest.h
+> @@ -36,9 +36,33 @@ struct snp_guest_request_ioctl {
+>         __u64 fw_err;
+>  };
+>
+> +struct __snp_derived_key_req {
+> +       __u32 root_key_select;
+> +       __u32 rsvd;
+> +       __u64 guest_field_select;
+> +       __u32 vmpl;
+> +       __u32 guest_svn;
+> +       __u64 tcb_version;
+> +};
+> +
+> +struct snp_derived_key_req {
+> +       /* message version number (must be non-zero) */
+> +       __u8 msg_version;
+> +
+> +       struct __snp_derived_key_req data;
+> +};
+> +
+> +struct snp_derived_key_resp {
+> +       /* response data, see SEV-SNP spec for the format */
+> +       __u8 data[64];
+> +};
+> +
+>  #define SNP_GUEST_REQ_IOC_TYPE 'S'
+>
+>  /* Get SNP attestation report */
+>  #define SNP_GET_REPORT _IOWR(SNP_GUEST_REQ_IOC_TYPE, 0x0, struct snp_guest_request_ioctl)
+>
+> +/* Get a derived key from the root */
+> +#define SNP_GET_DERIVED_KEY _IOWR(SNP_GUEST_REQ_IOC_TYPE, 0x1, struct snp_guest_request_ioctl)
+> +
+>  #endif /* __UAPI_LINUX_SEV_GUEST_H_ */
+> --
+> 2.25.1
+>
