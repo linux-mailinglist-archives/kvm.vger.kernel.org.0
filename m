@@ -2,152 +2,302 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C4AD745557B
-	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 08:25:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 110A34555F6
+	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 08:44:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243447AbhKRH2g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Nov 2021 02:28:36 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:59220 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229914AbhKRH2f (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 18 Nov 2021 02:28:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637220335;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=WqErHdfxUiLKqF/HEdQc/BLEInPll3lUng20RpVCeYg=;
-        b=et/q8py3s4rBMUn3GUMNgO5LFP5SKwIKjiIjuxKzWGxoO4rVvtJbDKJDubKXK0aHBBRFKv
-        zGHDjhmesEyvX6mDMVvalbpc3s2tp4UmuVteV0tDb5Lx8moUTbfGoNeRoB2EInGgdRqzIE
-        USGIGblyjPhIU+efqRQ8XmLN6c0pWvk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-61-4EN42HLVNSardqcQ0GBPpg-1; Thu, 18 Nov 2021 02:25:33 -0500
-X-MC-Unique: 4EN42HLVNSardqcQ0GBPpg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S244039AbhKRHrE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Nov 2021 02:47:04 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:52574 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244023AbhKRHqd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Nov 2021 02:46:33 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 377341006AA0;
-        Thu, 18 Nov 2021 07:25:32 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BED46604CC;
-        Thu, 18 Nov 2021 07:25:31 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     stable@vger.kernel.org, Sean Christopherson <seanjc@google.com>
-Subject: [PATCH v2] KVM: x86: check PIR even for vCPUs with disabled APICv
-Date:   Thu, 18 Nov 2021 02:25:31 -0500
-Message-Id: <20211118072531.1534938-1-pbonzini@redhat.com>
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 082CF1FD35;
+        Thu, 18 Nov 2021 07:43:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1637221413; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=cYDfG1oWSZbpBbHPdOX+BBO1kGppbDRZd6YB8IrMIt4=;
+        b=GoW67FhrZiEQtZbWrTUGjiuO1TLmmGJatHDV07tfXVYycEOebd3Trh9TuO7lIkVidGyiLV
+        pmsuLca+A3mZIVabrNdkMeU7X0JZZ7aRYsZ0GvceZv/N1LteG5sbz6ychGzF+SOzGtVBcz
+        cl81O0BddObSuJ02niDMkgEHuNAbWD4=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 8026813CE6;
+        Thu, 18 Nov 2021 07:43:32 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id ncWsHSQElmG0QwAAMHmgww
+        (envelope-from <jgross@suse.com>); Thu, 18 Nov 2021 07:43:32 +0000
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>
+References: <20211116141054.17800-1-jgross@suse.com>
+ <20211116141054.17800-4-jgross@suse.com> <YZVrDpjW0aZjFxo1@google.com>
+From:   Juergen Gross <jgross@suse.com>
+Subject: Re: [PATCH v3 3/4] x86/kvm: add max number of vcpus for hyperv
+ emulation
+Message-ID: <bfe38122-0ddd-d9bc-4927-942b051a39c4@suse.com>
+Date:   Thu, 18 Nov 2021 08:43:31 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <YZVrDpjW0aZjFxo1@google.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="5cBUQoToneO8V1pOyzcWLmtIJYL04gXMC"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The IRTE for an assigned device can trigger a POSTED_INTR_VECTOR even
-if APICv is disabled on the vCPU that receives it.  In that case, the
-interrupt will just cause a vmexit and leave the ON bit set together
-with the PIR bit corresponding to the interrupt.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--5cBUQoToneO8V1pOyzcWLmtIJYL04gXMC
+Content-Type: multipart/mixed; boundary="LPl7Rl1ITYfjr8Kctme8DZCrMQ2s3J761";
+ protected-headers="v1"
+From: Juergen Gross <jgross@suse.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ Wanpeng Li <wanpengli@tencent.com>, Jim Mattson <jmattson@google.com>,
+ Joerg Roedel <joro@8bytes.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>
+Message-ID: <bfe38122-0ddd-d9bc-4927-942b051a39c4@suse.com>
+Subject: Re: [PATCH v3 3/4] x86/kvm: add max number of vcpus for hyperv
+ emulation
+References: <20211116141054.17800-1-jgross@suse.com>
+ <20211116141054.17800-4-jgross@suse.com> <YZVrDpjW0aZjFxo1@google.com>
+In-Reply-To: <YZVrDpjW0aZjFxo1@google.com>
 
-Right now, the interrupt would not be delivered until APICv is re-enabled.
-However, fixing this is just a matter of always doing the PIR->IRR
-synchronization, even if the vCPU has temporarily disabled APICv.
+--LPl7Rl1ITYfjr8Kctme8DZCrMQ2s3J761
+Content-Type: multipart/mixed;
+ boundary="------------02CD9F29A3AC9F1BB7F0C3BA"
+Content-Language: en-US
 
-This is not a problem for performance, or if anything it is an
-improvement.  First, in the common case where vcpu->arch.apicv_active is
-true, one fewer check has to be performed.  Second, static_call_cond will
-elide the function call if APICv is not present or disabled.  Finally,
-in the case for AMD hardware we can remove the sync_pir_to_irr callback:
-it is only needed for apic_has_interrupt_for_ppr, and that function
-already has a fallback for !APICv.
+This is a multi-part message in MIME format.
+--------------02CD9F29A3AC9F1BB7F0C3BA
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
 
-Cc: stable@vger.kernel.org
-Co-developed-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/lapic.c   |  2 +-
- arch/x86/kvm/svm/svm.c |  1 -
- arch/x86/kvm/x86.c     | 18 +++++++++---------
- 3 files changed, 10 insertions(+), 11 deletions(-)
+On 17.11.21 21:50, Sean Christopherson wrote:
+> On Tue, Nov 16, 2021, Juergen Gross wrote:
+>> When emulating Hyperv the theoretical maximum of vcpus supported is
+>> 4096, as this is the architectural limit for sending IPIs via the PV
+>> interface.
+>>
+>> For restricting the actual supported number of vcpus for that case
+>> introduce another define KVM_MAX_HYPERV_VCPUS and set it to 1024, like=
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 759952dd1222..f206fc35deff 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -707,7 +707,7 @@ static void pv_eoi_clr_pending(struct kvm_vcpu *vcpu)
- static int apic_has_interrupt_for_ppr(struct kvm_lapic *apic, u32 ppr)
- {
- 	int highest_irr;
--	if (apic->vcpu->arch.apicv_active)
-+	if (kvm_x86_ops.sync_pir_to_irr)
- 		highest_irr = static_call(kvm_x86_sync_pir_to_irr)(apic->vcpu);
- 	else
- 		highest_irr = apic_find_highest_irr(apic);
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 5630c241d5f6..d0f68d11ec70 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4651,7 +4651,6 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.load_eoi_exitmap = svm_load_eoi_exitmap,
- 	.hwapic_irr_update = svm_hwapic_irr_update,
- 	.hwapic_isr_update = svm_hwapic_isr_update,
--	.sync_pir_to_irr = kvm_lapic_find_highest_irr,
- 	.apicv_post_state_restore = avic_post_state_restore,
- 
- 	.set_tss_addr = svm_set_tss_addr,
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 627c955101a0..a8f12c83db4b 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4448,8 +4448,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
- static int kvm_vcpu_ioctl_get_lapic(struct kvm_vcpu *vcpu,
- 				    struct kvm_lapic_state *s)
- {
--	if (vcpu->arch.apicv_active)
--		static_call(kvm_x86_sync_pir_to_irr)(vcpu);
-+	static_call_cond(kvm_x86_sync_pir_to_irr)(vcpu);
- 
- 	return kvm_apic_get_state(vcpu, s);
- }
-@@ -9528,8 +9527,7 @@ static void vcpu_scan_ioapic(struct kvm_vcpu *vcpu)
- 	if (irqchip_split(vcpu->kvm))
- 		kvm_scan_ioapic_routes(vcpu, vcpu->arch.ioapic_handled_vectors);
- 	else {
--		if (vcpu->arch.apicv_active)
--			static_call(kvm_x86_sync_pir_to_irr)(vcpu);
-+		static_call_cond(kvm_x86_sync_pir_to_irr)(vcpu);
- 		if (ioapic_in_kernel(vcpu->kvm))
- 			kvm_ioapic_scan_entry(vcpu, vcpu->arch.ioapic_handled_vectors);
- 	}
-@@ -9802,10 +9800,12 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 
- 	/*
- 	 * This handles the case where a posted interrupt was
--	 * notified with kvm_vcpu_kick.
-+	 * notified with kvm_vcpu_kick.  Assigned devices can
-+	 * use the POSTED_INTR_VECTOR even if APICv is disabled,
-+	 * so do it even if !kvm_vcpu_apicv_active(vcpu).
- 	 */
--	if (kvm_lapic_enabled(vcpu) && vcpu->arch.apicv_active)
--		static_call(kvm_x86_sync_pir_to_irr)(vcpu);
-+	if (kvm_lapic_enabled(vcpu))
-+		static_call_cond(kvm_x86_sync_pir_to_irr)(vcpu);
- 
- 	if (kvm_vcpu_exit_request(vcpu)) {
- 		vcpu->mode = OUTSIDE_GUEST_MODE;
-@@ -9849,8 +9849,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 		if (likely(exit_fastpath != EXIT_FASTPATH_REENTER_GUEST))
- 			break;
- 
--		if (kvm_lapic_enabled(vcpu) && kvm->arch.apicv_active)
--			static_call(kvm_x86_sync_pir_to_irr)(vcpu);
-+		if (kvm_lapic_enabled(vcpu))
-+			static_call_cond(kvm_x86_sync_pir_to_irr)(vcpu);
- 
- 		if (unlikely(kvm_vcpu_exit_request(vcpu))) {
- 			exit_fastpath = EXIT_FASTPATH_EXIT_HANDLED;
--- 
-2.27.0
+>> today's KVM_MAX_VCPUS. Make both values unsigned ones as this will be
+>> needed later.
+>>
+>> The actual number of supported vcpus for Hyperv emulation will be the
+>> lower value of both defines.
+>>
+>> This is a preparation for a future boot parameter support of the max
+>> number of vcpus for a KVM guest.
+>>
+>> Signed-off-by: Juergen Gross <jgross@suse.com>
+>> ---
+>> V3:
+>> - new patch
+>> ---
+>>   arch/x86/include/asm/kvm_host.h |  3 ++-
+>>   arch/x86/kvm/hyperv.c           | 15 ++++++++-------
+>>   2 files changed, 10 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kv=
+m_host.h
+>> index 886930ec8264..8ea03ff01c45 100644
+>> --- a/arch/x86/include/asm/kvm_host.h
+>> +++ b/arch/x86/include/asm/kvm_host.h
+>> @@ -38,7 +38,8 @@
+>>  =20
+>>   #define __KVM_HAVE_ARCH_VCPU_DEBUGFS
+>>  =20
+>> -#define KVM_MAX_VCPUS 1024
+>> +#define KVM_MAX_VCPUS 1024U
+>> +#define KVM_MAX_HYPERV_VCPUS 1024U
+>=20
+> I don't see any reason to put this in kvm_host.h, it should never be us=
+ed outside
+> of hyperv.c.
 
+Okay, fine with me.
+
+>=20
+>>   #define KVM_MAX_VCPU_IDS kvm_max_vcpu_ids()
+>>   /* memory slots that are not exposed to userspace */
+>>   #define KVM_PRIVATE_MEM_SLOTS 3
+>> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+>> index 4a555f32885a..c0fa837121f1 100644
+>> --- a/arch/x86/kvm/hyperv.c
+>> +++ b/arch/x86/kvm/hyperv.c
+>> @@ -41,7 +41,7 @@
+>>   /* "Hv#1" signature */
+>>   #define HYPERV_CPUID_SIGNATURE_EAX 0x31237648
+>>  =20
+>> -#define KVM_HV_MAX_SPARSE_VCPU_SET_BITS DIV_ROUND_UP(KVM_MAX_VCPUS, 6=
+4)
+>> +#define KVM_HV_MAX_SPARSE_VCPU_SET_BITS DIV_ROUND_UP(KVM_MAX_HYPERV_V=
+CPUS, 64)
+>>  =20
+>>   static void stimer_mark_pending(struct kvm_vcpu_hv_stimer *stimer,
+>>   				bool vcpu_kick);
+>> @@ -166,7 +166,7 @@ static struct kvm_vcpu *get_vcpu_by_vpidx(struct k=
+vm *kvm, u32 vpidx)
+>>   	struct kvm_vcpu *vcpu =3D NULL;
+>>   	int i;
+>>  =20
+>> -	if (vpidx >=3D KVM_MAX_VCPUS)
+>> +	if (vpidx >=3D min(KVM_MAX_VCPUS, KVM_MAX_HYPERV_VCPUS))
+>=20
+> IMO, this is conceptually wrong.  KVM should refuse to allow Hyper-V to=
+ be enabled
+> if the max number of vCPUs exceeds what can be supported, or should ref=
+use to create
+
+TBH, I wasn't sure where to put this test. Is there a guaranteed
+sequence of ioctl()s regarding vcpu creation (or setting the max
+number of vcpus) and the Hyper-V enabling?
+
+> the vCPUs.  I agree it makes sense to add a Hyper-V specific limit, sin=
+ce there are
+> Hyper-V structures that have a hard limit, but detection of violations =
+should be a
+> BUILD_BUG_ON, not a silent failure at runtime.
+>=20
+
+A BUILD_BUG_ON won't be possible with KVM_MAX_VCPUS being selecteble via
+boot parameter.
+
+
+Juergen
+
+--------------02CD9F29A3AC9F1BB7F0C3BA
+Content-Type: application/pgp-keys;
+ name="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Transfer-Encoding: quoted-printable
+Content-Description: OpenPGP public key
+Content-Disposition: attachment;
+ filename="OpenPGP_0xB0DE9DD628BF132F.asc"
+
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOBy=
+cWx
+w3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJvedYm8O=
+f8Z
+d621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJNwQpd369y=
+9bf
+IhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvxXP3FAp2pkW0xq=
+G7/
+377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEBAAHNHEp1ZXJnZW4gR=
+3Jv
+c3MgPGpnQHBmdXBmLm5ldD7CwHkEEwECACMFAlOMcBYCGwMHCwkIBwMCAQYVCAIJCgsEFgIDA=
+QIe
+AQIXgAAKCRCw3p3WKL8TL0KdB/93FcIZ3GCNwFU0u3EjNbNjmXBKDY4FUGNQH2lvWAUy+dnyT=
+hpw
+dtF/jQ6j9RwE8VP0+NXcYpGJDWlNb9/JmYqLiX2Q3TyevpB0CA3dbBQp0OW0fgCetToGIQrg0=
+MbD
+1C/sEOv8Mr4NAfbauXjZlvTj30H2jO0u+6WGM6nHwbh2l5O8ZiHkH32iaSTfN7Eu5RnNVUJbv=
+oPH
+Z8SlM4KWm8rG+lIkGurqqu5gu8q8ZMKdsdGC4bBxdQKDKHEFExLJK/nRPFmAuGlId1E3fe10v=
+5QL
++qHI3EIPtyfE7i9Hz6rVwi7lWKgh7pe0ZvatAudZ+JNIlBKptb64FaiIOAWDCx1SzR9KdWVyZ=
+2Vu
+IEdyb3NzIDxqZ3Jvc3NAc3VzZS5jb20+wsB5BBMBAgAjBQJTjHCvAhsDBwsJCAcDAgEGFQgCC=
+QoL
+BBYCAwECHgECF4AACgkQsN6d1ii/Ey/HmQf/RtI7kv5A2PS4RF7HoZhPVPogNVbC4YA6lW7Dr=
+Wf0
+teC0RR3MzXfy6pJ+7KLgkqMlrAbN/8Dvjoz78X+5vhH/rDLa9BuZQlhFmvcGtCF8eR0T1v0nC=
+/nu
+AFVGy+67q2DH8As3KPu0344TBDpAvr2uYM4tSqxK4DURx5INz4ZZ0WNFHcqsfvlGJALDeE0Lh=
+ITT
+d9jLzdDad1pQSToCnLl6SBJZjDOX9QQcyUigZFtCXFst4dlsvddrxyqT1f17+2cFSdu7+ynLm=
+XBK
+7abQ3rwJY8SbRO2iRulogc5vr/RLMMlscDAiDkaFQWLoqHHOdfO9rURssHNN8WkMnQfvUewRz=
+80h
+SnVlcmdlbiBHcm9zcyA8amdyb3NzQG5vdmVsbC5jb20+wsB5BBMBAgAjBQJTjHDXAhsDBwsJC=
+AcD
+AgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey8PUQf/ehmgCI9jB9hlgexLvgOtf7PJn=
+FOX
+gMLdBQgBlVPO3/D9R8LtF9DBAFPNhlrsfIG/SqICoRCqUcJ96Pn3P7UUinFG/I0ECGF4EvTE1=
+jnD
+kfJZr6jrbjgyoZHiw/4BNwSTL9rWASyLgqlA8u1mf+c2yUwcGhgkRAd1gOwungxcwzwqgljf0=
+N51
+N5JfVRHRtyfwq/ge+YEkDGcTU6Y0sPOuj4Dyfm8fJzdfHNQsWq3PnczLVELStJNdapwPOoE+l=
+otu
+fe3AM2vAEYJ9rTz3Cki4JFUsgLkHFqGZarrPGi1eyQcXeluldO3m91NK/1xMI3/+8jbO0tsn1=
+tqS
+EUGIJi7ox80eSnVlcmdlbiBHcm9zcyA8amdyb3NzQHN1c2UuZGU+wsB5BBMBAgAjBQJTjHDrA=
+hsD
+BwsJCAcDAgEGFQgCCQoLBBYCAwECHgECF4AACgkQsN6d1ii/Ey+LhQf9GL45eU5vOowA2u5N3=
+g3O
+ZUEBmDHVVbqMtzwlmNC4k9Kx39r5s2vcFl4tXqW7g9/ViXYuiDXb0RfUpZiIUW89siKrkzmQ5=
+dM7
+wRqzgJpJwK8Bn2MIxAKArekWpiCKvBOB/Cc+3EXE78XdlxLyOi/NrmSGRIov0karw2RzMNOu5=
+D+j
+LRZQd1Sv27AR+IP3I8U4aqnhLpwhK7MEy9oCILlgZ1QZe49kpcumcZKORmzBTNh30FVKK1Evm=
+V2x
+AKDoaEOgQB4iFQLhJCdP1I5aSgM5IVFdn7v5YgEYuJYx37IoN1EblHI//x/e2AaIHpzK5h88N=
+Eaw
+QsaNRpNSrcfbFmAg987ATQRTjHAWAQgAyzH6AOODMBjgfWE9VeCgsrwH3exNAU32gLq2xvjpW=
+nHI
+s98ndPUDpnoxWQugJ6MpMncr0xSwFmHEgnSEjK/PAjppgmyc57BwKII3sV4on+gDVFJR6Y8ZR=
+wgn
+BC5mVM6JjQ5xDk8WRXljExRfUX9pNhdE5eBOZJrDRoLUmmjDtKzWaDhIg/+1Hzz93X4fCQkNV=
+bVF
+LELU9bMaLPBG/x5q4iYZ2k2ex6d47YE1ZFdMm6YBYMOljGkZKwYde5ldM9mo45mmwe0icXKLk=
+pEd
+IXKTZeKDO+Hdv1aqFuAcccTg9RXDQjmwhC3yEmrmcfl0+rPghO0Iv3OOImwTEe4co3c1mwARA=
+QAB
+wsBfBBgBAgAJBQJTjHAWAhsMAAoJELDendYovxMvQ/gH/1ha96vm4P/L+bQpJwrZ/dneZcmEw=
+Tbe
+8YFsw2V/Buv6Z4Mysln3nQK5ZadD534CF7TDVft7fC4tU4PONxF5D+/tvgkPfDAfF77zy2AH1=
+vJz
+Q1fOU8lYFpZXTXIHb+559UqvIB8AdgR3SAJGHHt4RKA0F7f5ipYBBrC6cyXJyyoprT10EMvU8=
+VGi
+wXvTyJz3fjoYsdFzpWPlJEBRMedCot60g5dmbdrZ5DWClAr0yau47zpWj3enf1tLWaqcsuylW=
+svi
+uGjKGw7KHQd3bxALOknAp4dN3QwBYCKuZ7AddY9yjynVaD5X7nF9nO5BjR/i1DG86lem3iBDX=
+zXs
+ZDn8R38=3D
+=3D2wuH
+-----END PGP PUBLIC KEY BLOCK-----
+
+--------------02CD9F29A3AC9F1BB7F0C3BA--
+
+--LPl7Rl1ITYfjr8Kctme8DZCrMQ2s3J761--
+
+--5cBUQoToneO8V1pOyzcWLmtIJYL04gXMC
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature"
+
+-----BEGIN PGP SIGNATURE-----
+
+wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmGWBCMFAwAAAAAACgkQsN6d1ii/Ey8x
+Ygf8DFYWyQw1inq76Yw8Q1TG8ZD594hLI99Mb3mC5mBbAGhvHMnbhsG1FwyNW5bFxGMmg+uzr7+p
+n08vckLGia8R8qP/enjy9ZscsTJBX56N/MIHd0dUwMce5cwkgd0ExvR18h7hMsnQSAzJrGJAuz5L
+jymRQEWG8Y/Y4QR+xKLbSpYZU/KypdFTCzu+3ymIuySp/3ASr/SKUyl5RcmMPFXYUsj5r8652owM
+clj373YdqT+lBM5AjVJ+6z8XDJEMNVug4ZX6B7P6How66jytwUDEYdpHfRMrQ8RkpJAEGaHdHQtv
+dvNOW6dJkKNfYjHeH56G3vby6+K0wBNa2l7l+jdRNQ==
+=0eHa
+-----END PGP SIGNATURE-----
+
+--5cBUQoToneO8V1pOyzcWLmtIJYL04gXMC--
