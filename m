@@ -2,109 +2,224 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EA6DB4561BD
-	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 18:48:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F13B4561DE
+	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 18:55:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232556AbhKRRvX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Nov 2021 12:51:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33812 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231787AbhKRRvX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Nov 2021 12:51:23 -0500
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9246C061574
-        for <kvm@vger.kernel.org>; Thu, 18 Nov 2021 09:48:22 -0800 (PST)
-Received: by mail-pg1-x530.google.com with SMTP id 136so6108778pgc.0
-        for <kvm@vger.kernel.org>; Thu, 18 Nov 2021 09:48:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=CfdxEdXslR2oVzsVzclVq0hJrKFZ2Qpq+V3kJIPWZNk=;
-        b=We7sJw/oumluwtRGa+yA2tX3O/Pghbk7M4/jhSvZqZ2JB1/Uw01sciZQrCuxTk+AfG
-         Q4dXK/0t31NjwaXKopizYm1hdrH6CKsItzcAIj1v1HRqQouDIMnQZDEGz2lRS/rHqOG8
-         lD6OfRSz4wFE6b1vzCEVsxfl+BOjT4GeZ6XhKvQxqz54U8jlNNDupNHC3gBaWoeJDWd6
-         /rEOelTsuGwFSdjNZgVszFZjMBnpw8ZCZRxc0jWPBETdPoTlz8ic4bL44Lg4Bwb2GaW5
-         K+46One8VeCDyzFfjVaUHvkSLrfJoIUOz3XjYp7zwjO86eqcd2SUhAh73/xfWeigRN0q
-         PD0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=CfdxEdXslR2oVzsVzclVq0hJrKFZ2Qpq+V3kJIPWZNk=;
-        b=H8b9C6CTpE2g7N9hUXIXqyuSWo1fuX2PGWIO+oNVOeikdu913O4kmgUuvvbooT1vyX
-         NWoqpE2m3JqNu2NBzTGt1/2yOaX1BUZyf71pGDLXp1eEcFeEs6ZavEX4kdfSyNgYFxYA
-         kRK8Ni/UuhtNNQEskPj/WJSuY1H8d4U1/16yUqfKsOwWAP7jY6NLLmDjL7qoSAYDKf+i
-         ZCRoeSaAFZtTnDQFvW2r2aTOiOg64wESbGxllq3qflj/Jh6MnC+mfmYs67jauyvP9Hqg
-         t1W2MMCd0QTl+c3G7MrF6oU7WRzy5tSG6on0KL5S385P2SXyjHJBJMyIzMpGi9dnBwi9
-         iENw==
-X-Gm-Message-State: AOAM533fMGhkKhRsijgOXm8Ur3vqGy3d/ENYApQBdmr06sYAY9qqZCK0
-        MZwMFnDAsFah7ftxA6JpctYOLg==
-X-Google-Smtp-Source: ABdhPJx/K5vTuknkNzdb4L245ma/MdAQJ17DKtltFnHyi2rN/3X39SStEpwxLfEG2XBbkUfpeB9Psw==
-X-Received: by 2002:a63:d110:: with SMTP id k16mr12389762pgg.90.1637257702083;
-        Thu, 18 Nov 2021 09:48:22 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id u6sm241496pfg.157.2021.11.18.09.48.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Nov 2021 09:48:21 -0800 (PST)
-Date:   Thu, 18 Nov 2021 17:48:17 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Shivam Kumar <shivam.kumar1@nutanix.com>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
-        Anurag Madnawat <anurag.madnawat@nutanix.com>,
-        Shaju Abraham <shaju.abraham@nutanix.com>,
-        Manish Mishra <manish.mishra@nutanix.com>
-Subject: Re: [PATCH 4/6] Increment dirty counter for vmexit due to page write
- fault.
-Message-ID: <YZaR4U5r3j7zWBIF@google.com>
-References: <20211114145721.209219-1-shivam.kumar1@nutanix.com>
- <20211114145721.209219-5-shivam.kumar1@nutanix.com>
+        id S234207AbhKRR6O (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Nov 2021 12:58:14 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:26643 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234215AbhKRR6I (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 18 Nov 2021 12:58:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1637258106;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=sHWnGcRuP/WgcdAzJ5VzC9lntIFnuIoT2MN9TEimzbc=;
+        b=XDAtq7o/jqGgOn6elFAEhFf9szge1stYGOOwjRuN4a4D52FfFLSI4xVqMYc1JmnxblNNgo
+        gOzCfJbY/iv5JZOd/LNNgQqQaazqirVzbngqOr7+pRPZn4ZQLMUEbStSddHmZaYLavHmTs
+        gQpwOBN3aiB31dYzvn5QcWw2C7mA2CM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-556-N74ubZ-QN32tvq40H3ZBSg-1; Thu, 18 Nov 2021 12:55:05 -0500
+X-MC-Unique: N74ubZ-QN32tvq40H3ZBSg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 10A55CC628;
+        Thu, 18 Nov 2021 17:55:02 +0000 (UTC)
+Received: from [10.39.192.245] (unknown [10.39.192.245])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1912E5D9DE;
+        Thu, 18 Nov 2021 17:54:57 +0000 (UTC)
+Message-ID: <f2a99afc-6ce6-459d-05d5-a2e396af96d4@redhat.com>
+Date:   Thu, 18 Nov 2021 18:54:56 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211114145721.209219-5-shivam.kumar1@nutanix.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH 13/15] KVM: SVM: Add and use svm_register_cache_reset()
+Content-Language: en-US
+To:     Lai Jiangshan <laijs@linux.alibaba.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>
+References: <20211108124407.12187-1-jiangshanlai@gmail.com>
+ <20211108124407.12187-14-jiangshanlai@gmail.com>
+ <937c373e-80f4-38d9-b45a-a655dcb66569@redhat.com>
+ <55654594-9967-37d2-335b-5035f99212fe@linux.alibaba.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <55654594-9967-37d2-335b-5035f99212fe@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Nov 14, 2021, Shivam Kumar wrote:
-> For a page write fault or "page dirty", the dirty counter of the
-> corresponding vCPU is incremented.
-> 
-> Co-developed-by: Anurag Madnawat <anurag.madnawat@nutanix.com>
-> Signed-off-by: Anurag Madnawat <anurag.madnawat@nutanix.com>
-> Signed-off-by: Shivam Kumar <shivam.kumar1@nutanix.com>
-> Signed-off-by: Shaju Abraham <shaju.abraham@nutanix.com>
-> Signed-off-by: Manish Mishra <manish.mishra@nutanix.com>
-> ---
->  virt/kvm/kvm_main.c | 9 ++++++++-
->  1 file changed, 8 insertions(+), 1 deletion(-)
-> 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 1564d3a3f608..55bf92cf9f4f 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -3091,8 +3091,15 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
->  		if (kvm->dirty_ring_size)
->  			kvm_dirty_ring_push(kvm_dirty_ring_get(kvm),
->  					    slot, rel_gfn);
-> -		else
-> +		else {
-> +			struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
-> +
-> +			if (vcpu && vcpu->kvm->dirty_quota_migration_enabled &&
-> +					vcpu->vCPUdqctx)
-> +				vcpu->vCPUdqctx->dirty_counter++;
+On 11/18/21 17:28, Lai Jiangshan wrote:
+> Using VMX_REGS_DIRTY_SET and SVM_REGS_DIRTY_SET and making the code
+> similar is my intent for patch12,13.  If it causes confusing, I would
+> like to make a second thought.  SVM_REGS_DIRTY_SET does be special
+> in svm where VCPU_EXREG_CR3 is in it by definition, but it is not
+> added into SVM_REGS_DIRTY_SET in the patch just for optimization to allow
+> the compiler optimizes the line of code out.
 
-Checking dirty_quota_migration_enabled can race, and it'd be far faster to
-unconditionally update a counter, e.g. a per-vCPU stat.
+I think this is where we disagree.  In my opinion it is enough to
+document that CR3 _can_ be out of date, but it doesn't have to be marked
+dirty because its dirty bit is effectively KVM_REQ_LOAD_MMU_PGD.
 
-> +
->  			set_bit_le(rel_gfn, memslot->dirty_bitmap);
-> +		}
->  	}
->  }
->  EXPORT_SYMBOL_GPL(mark_page_dirty_in_slot);
-> -- 
-> 2.22.3
-> 
+For VMX, it is important to clear VCPU_EXREG_CR3 because the combination
+"avail=0, dirty=1" is nonsensical:
+
+	av d
+	0  0    in VMCS
+	0  1    *INVALID*
+	1  0	in vcpu->arch
+	1  1	in vcpu->arch, needs store
+
+But on SVM, VCPU_EXREG_CR3 is always available.
+
+Thinking more about it, it makes more sense for VMX to reset _all_
+bits of dirty to 0, just like it was before your change, but doing
+so even earlier in vmx_vcpu_run.
+
+I appreciate that VMX_REGS_LAZY_UPDATE_SET is useful for documentation,
+but it's also important that the values in avail/dirty make sense as
+a pair.
+
+So here is what I would do:
+
+diff --git a/arch/x86/kvm/kvm_cache_regs.h b/arch/x86/kvm/kvm_cache_regs.h
+index 6e6d0d01f18d..ac3d3bd662f4 100644
+--- a/arch/x86/kvm/kvm_cache_regs.h
++++ b/arch/x86/kvm/kvm_cache_regs.h
+@@ -43,6 +43,13 @@ BUILD_KVM_GPR_ACCESSORS(r14, R14)
+  BUILD_KVM_GPR_ACCESSORS(r15, R15)
+  #endif
+  
++/*
++ * avail  dirty
++ * 0	  0	  register in VMCS/VMCB
++ * 0	  1	  *INVALID*
++ * 1	  0	  register in vcpu->arch
++ * 1	  1	  register in vcpu->arch, needs to be stored back
++ */
+  static inline bool kvm_register_is_available(struct kvm_vcpu *vcpu,
+  					     enum kvm_reg reg)
+  {
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 6fce61fc98e3..72ae67e214b5 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6635,6 +6635,7 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
+  		vmcs_writel(GUEST_RSP, vcpu->arch.regs[VCPU_REGS_RSP]);
+  	if (kvm_register_is_dirty(vcpu, VCPU_REGS_RIP))
+  		vmcs_writel(GUEST_RIP, vcpu->arch.regs[VCPU_REGS_RIP]);
++	vcpu->arch.regs_dirty = 0;
+  
+  	cr3 = __get_current_cr3_fast();
+  	if (unlikely(cr3 != vmx->loaded_vmcs->host_state.cr3)) {
+@@ -6729,7 +6730,7 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
+  	loadsegment(es, __USER_DS);
+  #endif
+  
+-	vmx_register_cache_reset(vcpu);
++	vcpu->arch.regs_avail &= ~VMX_REGS_LAZY_LOAD_SET;
+  
+  	pt_guest_exit(vmx);
+  
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index 4df2ac24ffc1..f978699480e3 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -473,19 +473,21 @@ BUILD_CONTROLS_SHADOW(pin, PIN_BASED_VM_EXEC_CONTROL)
+  BUILD_CONTROLS_SHADOW(exec, CPU_BASED_VM_EXEC_CONTROL)
+  BUILD_CONTROLS_SHADOW(secondary_exec, SECONDARY_VM_EXEC_CONTROL)
+  
+-static inline void vmx_register_cache_reset(struct kvm_vcpu *vcpu)
+-{
+-	vcpu->arch.regs_avail = ~((1 << VCPU_REGS_RIP) | (1 << VCPU_REGS_RSP)
+-				  | (1 << VCPU_EXREG_RFLAGS)
+-				  | (1 << VCPU_EXREG_PDPTR)
+-				  | (1 << VCPU_EXREG_SEGMENTS)
+-				  | (1 << VCPU_EXREG_CR0)
+-				  | (1 << VCPU_EXREG_CR3)
+-				  | (1 << VCPU_EXREG_CR4)
+-				  | (1 << VCPU_EXREG_EXIT_INFO_1)
+-				  | (1 << VCPU_EXREG_EXIT_INFO_2));
+-	vcpu->arch.regs_dirty = 0;
+-}
++/*
++ * VMX_REGS_LAZY_LOAD_SET - The set of registers that will be updated in the
++ * cache on demand.  Other registers not listed here are synced to
++ * the cache immediately after VM-Exit.
++ */
++#define VMX_REGS_LAZY_LOAD_SET	((1 << VCPU_REGS_RIP) |         \
++				(1 << VCPU_REGS_RSP) |          \
++				(1 << VCPU_EXREG_RFLAGS) |      \
++				(1 << VCPU_EXREG_PDPTR) |       \
++				(1 << VCPU_EXREG_SEGMENTS) |    \
++				(1 << VCPU_EXREG_CR0) |         \
++				(1 << VCPU_EXREG_CR3) |         \
++				(1 << VCPU_EXREG_CR4) |         \
++				(1 << VCPU_EXREG_EXIT_INFO_1) | \
++				(1 << VCPU_EXREG_EXIT_INFO_2))
+  
+  static inline struct kvm_vmx *to_kvm_vmx(struct kvm *kvm)
+  {
+
+and likewise for SVM:
+
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index eb2a2609cae8..4b22aa7d55d0 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3944,6 +3944,7 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
+  		vcpu->arch.regs[VCPU_REGS_RSP] = svm->vmcb->save.rsp;
+  		vcpu->arch.regs[VCPU_REGS_RIP] = svm->vmcb->save.rip;
+  	}
++	vcpu->arch.regs_dirty = 0;
+  
+  	if (unlikely(svm->vmcb->control.exit_code == SVM_EXIT_NMI))
+  		kvm_before_interrupt(vcpu);
+@@ -3978,7 +3978,7 @@ static __no_kcsan fastpath_t svm_vcpu_run(struct kvm_vcpu *vcpu)
+  		vcpu->arch.apf.host_apf_flags =
+  			kvm_read_and_reset_apf_flags();
+  
+-	kvm_register_clear_available(vcpu, VCPU_EXREG_PDPTR);
++	vcpu->arch.regs_avail &= ~SVM_REGS_LAZY_LOAD_SET;
+  
+  	/*
+  	 * We need to handle MC intercepts here before the vcpu has a chance to
+diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+index 32769d227860..b3c3c3098216 100644
+--- a/arch/x86/kvm/svm/svm.h
++++ b/arch/x86/kvm/svm/svm.h
+@@ -321,6 +321,16 @@ static inline bool vmcb_is_dirty(struct vmcb *vmcb, int bit)
+          return !test_bit(bit, (unsigned long *)&vmcb->control.clean);
+  }
+  
++/*
++ * Only the PDPTRs are loaded on demand into the shadow MMU.  All other
++ * fields are synchronized in handle_exit, because accessing the VMCB is cheap.
++ *
++ * CR3 might be out of date in the VMCB but it is not marked dirty; instead,
++ * KVM_REQ_LOAD_MMU_PGD is always requested when the cached vcpu->arch.cr3
++ * is changed.  svm_load_mmu_pgd() then syncs the new CR3 value into the VMCB.
++ */
++#define SVM_REGS_LAZY_LOAD_SET	(1 << VCPU_EXREG_PDPTR)
++
+  static inline struct vcpu_svm *to_svm(struct kvm_vcpu *vcpu)
+  {
+  	return container_of(vcpu, struct vcpu_svm, vcpu);
+
+
