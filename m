@@ -2,125 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7DFDA455CD2
-	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 14:36:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 792D8455CD3
+	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 14:36:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231404AbhKRNjW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Nov 2021 08:39:22 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:41071 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231260AbhKRNjV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 18 Nov 2021 08:39:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637242581;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ytnUUif25oYMkqa8jMsmzRzFU3UWIYFhkH5hBybYE+I=;
-        b=R30S1IRBDgwSpPYLVIYwTo2lq/D4XVre7ZMxRYZ1d7qM4zv70RvSTgKReBPc3Uwai83jgj
-        GUM7G0OzoWU77V+76xa/CAOcxylQpEjA9QwFowz6POvSYu9Aj1pw//IC/ETX44iwlfFHJv
-        KdVE29hpHqUn7tQ3IWVYBsQmIq6NdQw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-413-fe5sf_YwNa6xoEFepYn9eA-1; Thu, 18 Nov 2021 08:36:19 -0500
-X-MC-Unique: fe5sf_YwNa6xoEFepYn9eA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 141CD100E320;
-        Thu, 18 Nov 2021 13:36:18 +0000 (UTC)
-Received: from localhost.localdomain.com (unknown [10.33.36.247])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4BB6A62A41;
-        Thu, 18 Nov 2021 13:36:16 +0000 (UTC)
-From:   =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-To:     qemu-devel@nongnu.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Eduardo Habkost <ehabkost@redhat.com>,
-        Eric Blake <eblake@redhat.com>,
-        Markus Armbruster <armbru@redhat.com>,
-        =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: [PULL 6/6] target/i386/sev: Replace qemu_map_ram_ptr with address_space_map
-Date:   Thu, 18 Nov 2021 13:35:32 +0000
-Message-Id: <20211118133532.2029166-7-berrange@redhat.com>
-In-Reply-To: <20211118133532.2029166-1-berrange@redhat.com>
-References: <20211118133532.2029166-1-berrange@redhat.com>
+        id S231487AbhKRNjt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Nov 2021 08:39:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59480 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231260AbhKRNjs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Nov 2021 08:39:48 -0500
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 016FCC061570;
+        Thu, 18 Nov 2021 05:36:49 -0800 (PST)
+Received: by mail-pl1-x62e.google.com with SMTP id q17so5238190plr.11;
+        Thu, 18 Nov 2021 05:36:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language
+         :from:to:cc:references:organization:in-reply-to
+         :content-transfer-encoding;
+        bh=hYYmABqzjWDvxMbK6+yRwLb5Gk30hSOmT6FVQbcyDNA=;
+        b=e7d3vuc+oxjmFT6vSExtszL9Qhjgwrcm6f97X85X9UusqNM7Nnpyw8jUgUzgL6bd7Q
+         LOytTHp+Khacp/IRv2eMD0hR5FsuwEmuvra5/slYnpJIknlA12qN+QIixq9Ofp6r2ytb
+         fwEahEytdN+i99246w3hjmjd5Jx9eklje1TR4msqI3mMH2c4Xr9RSxuEEUOeMXILN29M
+         b/zar/tsEfkUr69tDTalgUb4bXLAdwJxlToZH7oWIyfUr/UgNmRAsj89bP6RD5l+zlMJ
+         eQk39C4x27U05TMp0pqy0XKGLDq6yrmkaw1r0jKmEgrgdHhOFTvl48NqX5E6FWSltO41
+         G4AQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:from:to:cc:references:organization:in-reply-to
+         :content-transfer-encoding;
+        bh=hYYmABqzjWDvxMbK6+yRwLb5Gk30hSOmT6FVQbcyDNA=;
+        b=TBlCJnUc635CPY/Z4bmckutclIdm5B1lvgdJK8kfO5wFrvKX+M9gkLmoymliGbKe/t
+         kzw/IoRUVOCJKV/IynwCtqq/5VtCR8YRxGHm7qczNnqvvQI6w7VbUZLDyElKbBqJ/whc
+         m5sMHcoNQiMQAz8bsQ32x4WcpJvo69CzpZfjyKTPrnTP3nJOFmaby2/YgsDQo1pjXuug
+         DMZ1QJryx/OAhqll/ZsnzKoP+7evpsbctiJc4OvOSAevmx8OHGBv8KuCOKz8SbPLcs9N
+         jgffXMi8YWQY7iS2JbmEjAEzxzug8L37aIV6hmHDo4Z+pq5munAs4K+jUa5+mPw3cPOm
+         L/IA==
+X-Gm-Message-State: AOAM531EVVnWzQ8DbUA2Cye47oTaa7xiP+x4j2qzhO4xFbiut4Shx50p
+        IJtWVWSkOQtON85vM2p9Av0=
+X-Google-Smtp-Source: ABdhPJwtJ1fdS1vUhVZyONhsmSXYbXNS3oTy3EJM9WiWngiAAfmkYnj6kxSbYTpUzZEo4OBmWkSKSQ==
+X-Received: by 2002:a17:902:e749:b0:141:edaa:fde1 with SMTP id p9-20020a170902e74900b00141edaafde1mr66857828plf.72.1637242608528;
+        Thu, 18 Nov 2021 05:36:48 -0800 (PST)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id w1sm3325230pfg.11.2021.11.18.05.36.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 18 Nov 2021 05:36:48 -0800 (PST)
+Message-ID: <d4b15e7d-8d53-b00a-7b53-c843edb7be70@gmail.com>
+Date:   Thu, 18 Nov 2021 21:36:39 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.3.0
+Subject: Re: [PATCH 6/7] perf: x86/core: Add interface to query
+ perfmon_event_map[] directly
+Content-Language: en-US
+From:   Like Xu <like.xu.linux@gmail.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kbuild-all@lists.01.org, Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        kernel test robot <lkp@intel.com>
+References: <20211112095139.21775-7-likexu@tencent.com>
+ <202111180758.nFyJUMVf-lkp@intel.com>
+ <97ea49ce-2ec2-3b35-6aac-d30998b837fe@gmail.com>
+Organization: Tencent
+In-Reply-To: <97ea49ce-2ec2-3b35-6aac-d30998b837fe@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Dov Murik <dovmurik@linux.ibm.com>
+On 18/11/2021 4:06 pm, Like Xu wrote:
+> On 18/11/2021 7:21 am, kernel test robot wrote:
+>> Hi Like,
+>>
+>> Thank you for the patch! Yet something to improve:
+>>
+>> [auto build test ERROR on kvm/queue]
+>> [also build test ERROR on tip/perf/core mst-vhost/linux-next linus/master 
+>> v5.16-rc1 next-20211117]
+>> [If your patch is applied to the wrong git tree, kindly drop us a note.
+>> And when submitting patch, we suggest to use '--base' as documented in
+>> https://git-scm.com/docs/git-format-patch]
+>>
+> 
+> ...
+> 
+>> vim +500 arch/x86/include/asm/perf_event.h
+>>
+>>     492
+>>     493    #if defined(CONFIG_PERF_EVENTS) && defined(CONFIG_CPU_SUP_INTEL)
+>>     494    extern struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr);
+>>     495    extern u64 perf_get_hw_event_config(int perf_hw_id);
+>>     496    extern int x86_perf_get_lbr(struct x86_pmu_lbr *lbr);
+>>     497    #else
+>>     498    struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr);
+>>     499    u64 perf_get_hw_event_config(int perf_hw_id);
+> 
+> Thanks to the robot, I should have removed the ";" from this line.
+> 
 
-Use address_space_map/unmap and check for errors.
+Sorry, my bot is shouting at me again. This part should be:
 
-Signed-off-by: Dov Murik <dovmurik@linux.ibm.com>
-Acked-by: Brijesh Singh <brijesh.singh@amd.com>
-[Two lines wrapped for length - Daniel]
-Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
----
- target/i386/sev.c | 18 +++++++++++++++---
- 1 file changed, 15 insertions(+), 3 deletions(-)
+diff --git a/arch/x86/include/asm/perf_event.h b/arch/x86/include/asm/perf_event.h
+index 8fc1b5003713..85fd768d49d7 100644
+--- a/arch/x86/include/asm/perf_event.h
++++ b/arch/x86/include/asm/perf_event.h
+@@ -492,9 +492,11 @@ static inline void perf_check_microcode(void) { }
 
-diff --git a/target/i386/sev.c b/target/i386/sev.c
-index 4fd258a570..025ff7a6f8 100644
---- a/target/i386/sev.c
-+++ b/target/i386/sev.c
-@@ -37,6 +37,7 @@
- #include "qapi/qmp/qerror.h"
- #include "exec/confidential-guest-support.h"
- #include "hw/i386/pc.h"
-+#include "exec/address-spaces.h"
- 
- #define TYPE_SEV_GUEST "sev-guest"
- OBJECT_DECLARE_SIMPLE_TYPE(SevGuestState, SEV_GUEST)
-@@ -1232,6 +1233,9 @@ bool sev_add_kernel_loader_hashes(SevKernelLoaderContext *ctx, Error **errp)
-     uint8_t kernel_hash[HASH_SIZE];
-     uint8_t *hashp;
-     size_t hash_len = HASH_SIZE;
-+    hwaddr mapped_len = sizeof(*padded_ht);
-+    MemTxAttrs attrs = { 0 };
-+    bool ret = true;
- 
-     /*
-      * Only add the kernel hashes if the sev-guest configuration explicitly
-@@ -1292,7 +1296,12 @@ bool sev_add_kernel_loader_hashes(SevKernelLoaderContext *ctx, Error **errp)
-      * Populate the hashes table in the guest's memory at the OVMF-designated
-      * area for the SEV hashes table
-      */
--    padded_ht = qemu_map_ram_ptr(NULL, area->base);
-+    padded_ht = address_space_map(&address_space_memory, area->base,
-+                                  &mapped_len, true, attrs);
-+    if (!padded_ht || mapped_len != sizeof(*padded_ht)) {
-+        error_setg(errp, "SEV: cannot map hashes table guest memory area");
-+        return false;
-+    }
-     ht = &padded_ht->ht;
- 
-     ht->guid = sev_hash_table_header_guid;
-@@ -1314,10 +1323,13 @@ bool sev_add_kernel_loader_hashes(SevKernelLoaderContext *ctx, Error **errp)
-     memset(padded_ht->padding, 0, sizeof(padded_ht->padding));
- 
-     if (sev_encrypt_flash((uint8_t *)padded_ht, sizeof(*padded_ht), errp) < 0) {
--        return false;
-+        ret = false;
-     }
- 
--    return true;
-+    address_space_unmap(&address_space_memory, padded_ht,
-+                        mapped_len, true, mapped_len);
-+
-+    return ret;
- }
- 
- static void
--- 
-2.31.1
+  #if defined(CONFIG_PERF_EVENTS) && defined(CONFIG_CPU_SUP_INTEL)
+  extern struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr);
++extern u64 perf_get_hw_event_config(int perf_hw_id);
+  extern int x86_perf_get_lbr(struct x86_pmu_lbr *lbr);
+  #else
+  struct perf_guest_switch_msr *perf_guest_get_msrs(int *nr);
++static u64 perf_get_hw_event_config(int perf_hw_id);
+  static inline int x86_perf_get_lbr(struct x86_pmu_lbr *lbr)
+  {
+         return -1;
 
+> Awaiting further review comments.
+> 
+>>   > 500    {
+>>     501        return 0;
+>>     502    }
+>>     503    static inline int x86_perf_get_lbr(struct x86_pmu_lbr *lbr)
+>>     504    {
+>>     505        return -1;
+>>     506    }
+>>     507    #endif
+>>     508
+>>
+>> ---
+>> 0-DAY CI Kernel Test Service, Intel Corporation
+>> https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+>>
