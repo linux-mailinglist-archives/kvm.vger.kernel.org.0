@@ -2,104 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D933455B2E
-	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 13:04:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BA441455B4F
+	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 13:12:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344492AbhKRMHs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Nov 2021 07:07:48 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:38496 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1344501AbhKRMHZ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 18 Nov 2021 07:07:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637237064;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=W5Ghb5uAlf942gVdbek0yVdXvRxLK8U0BDO6Bp0gMAI=;
-        b=JSPbHF3ENpOolrthgXfyiTyy84c6bAcd1pFyzBQ3YO+UNBX+nw9jZz+Upoo+nDOvNEh3cZ
-        Ce/v3E+WatSI1Cnl5vqMrJla7KljJYXgECyBjW7g5eHTQ5y8ryQxP20yXAmW2AIokoh4mr
-        WaoXH6y9jl6vj3pvmPgQIZoYnYONpCo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-115-k6mdJvwXNi-BzEtUcDvh4A-1; Thu, 18 Nov 2021 07:04:21 -0500
-X-MC-Unique: k6mdJvwXNi-BzEtUcDvh4A-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 81DF11006AA1;
-        Thu, 18 Nov 2021 12:04:17 +0000 (UTC)
-Received: from [10.39.192.245] (unknown [10.39.192.245])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 377E05F4EE;
-        Thu, 18 Nov 2021 12:04:09 +0000 (UTC)
-Message-ID: <4c48546b-eb4a-dff7-cc38-5df54f73f5d4@redhat.com>
-Date:   Thu, 18 Nov 2021 13:04:07 +0100
+        id S1344605AbhKRMPV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Nov 2021 07:15:21 -0500
+Received: from out30-131.freemail.mail.aliyun.com ([115.124.30.131]:55727 "EHLO
+        out30-131.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1344576AbhKRMOI (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 18 Nov 2021 07:14:08 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=houwenlong93@linux.alibaba.com;NM=1;PH=DS;RN=1;SR=0;TI=SMTPD_---0UxC5c95_1637237466;
+Received: from localhost(mailfrom:houwenlong93@linux.alibaba.com fp:SMTPD_---0UxC5c95_1637237466)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Thu, 18 Nov 2021 20:11:07 +0800
+Date:   Thu, 18 Nov 2021 20:11:06 +0800
+From:   Hou Wenlong <houwenlong93@linux.alibaba.com>
+To:     kvm@vger.kernel.org
+Subject: Re: [PATCH v2 0/4] KVM: x86: some fixes about msr access emulation
+Message-ID: <20211118121106.GA10965@k08j02272.eu95sqa>
+Reply-To: cover.1635842679.git.houwenlong93@linux.alibaba.com
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH v3 08/12] KVM: Propagate vcpu explicitly to
- mark_page_dirty_in_slot()
-Content-Language: en-US
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     kvm <kvm@vger.kernel.org>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        "jmattson @ google . com" <jmattson@google.com>,
-        "wanpengli @ tencent . com" <wanpengli@tencent.com>,
-        "seanjc @ google . com" <seanjc@google.com>,
-        "vkuznets @ redhat . com" <vkuznets@redhat.com>,
-        "mtosatti @ redhat . com" <mtosatti@redhat.com>,
-        "joro @ 8bytes . org" <joro@8bytes.org>, karahmed@amazon.com,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org
-References: <20211117174003.297096-1-dwmw2@infradead.org>
- <20211117174003.297096-9-dwmw2@infradead.org>
- <85d9fec17f32c3eb9e100e56b91af050.squirrel@twosheds.infradead.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <85d9fec17f32c3eb9e100e56b91af050.squirrel@twosheds.infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/17/21 22:09, David Woodhouse wrote:
->>   {
->> -	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
->> +	struct kvm_vcpu *running_vcpu = kvm_get_running_vcpu();
->>
->> +	WARN_ON_ONCE(vcpu && vcpu != running_vcpu);
->>   	WARN_ON_ONCE(vcpu->kvm != kvm);
-> Ah, that one needs to be changed to check running_vcpu instead. Or this
-> needs to go first:
+Ping
+
+Thanks
+Hou
+
+On 2021/11/2 17:15, Hou Wenlong wrote:
+> From: Hou Wenlong <houwenlong93@linux.alibaba.com>
 > 
-> I think I prefer making the vCPU a required argument. If anyone's going to
-> pull a vCPU pointer out of their posterior, let the caller do it.
+> When KVM_CAP_X86_USER_SPACE_MSR cap is enabled, userspace can control
+> MSR accesses. In normal scenario, RDMSR/WRMSR can be interceped, but
+> when kvm.force_emulation_prefix is enabled, RDMSR/WRMSR with kvm prefix
+> would trigger an UD and cause instruction emulation. If MSR accesses is
+> filtered, em_rdmsr()/em_wrmsr() returns X86EMUL_IO_NEEDED, but it is
+> ignored by x86_emulate_instruction(). Then guest continues execution,
+> but RIP has been updated to point to RDMSR/WRMSR in handle_ud(), so
+> RDMSR/WRMSR can be interceped and guest exits to userspace finnaly by
+> mistake. Such behaviour leads to two vm exits and wastes one instruction
+> emulation.
 > 
-
-I understand that feeling, but still using the running vCPU is by far 
-the common case, and it's not worth adding a new function parameter to 
-all call sites.
-
-What about using a separate function, possibly __-prefixed, for the case 
-where you have a very specific vCPU?
-
-Paolo
-
+> After let x86_emulate_instruction() returns 0 for RDMSR/WRMSR emulation,
+> if it needs to exit to userspace, its complete_userspace_io callback
+> would call kvm_skip_instruction() to skip instruction. But for vmx,
+> VMX_EXIT_INSTRUCTION_LEN in vmcs is invalid for UD, it can't be used to
+> update RIP, kvm_emulate_instruction() should be used instead. As for
+> svm, nRIP in vmcb is 0 for UD, so kvm_emulate_instruction() is used.
+> But for nested svm, I'm not sure, since svm_check_intercept() would
+> change nRIP.
+> 
+> Changed from v1:
+> 	As Sean suggested, fix the problem within the emulator
+> 	instead of routing to the vendor callback.
+> 	Add a new emulation type to handle completion of user exits.
+> 	Attach a different callback for msr access emulation in the
+> 	emulator.
+> 
+> Hou Wenlong (3):
+>   KVM: x86: Add an emulation type to handle completion of user exits
+>   KVM: x86: Use different callback if msr access comes from the emulator
+>   KVM: x86: Exit to userspace if RDMSR/WRMSR emulation returns
+>     X86EMUL_IO_NEEDED
+> 
+> Sean Christopherson (1):
+>   KVM: x86: Handle 32-bit wrap of EIP for EMULTYPE_SKIP with flat code
+>     seg
+> 
+>  arch/x86/include/asm/kvm_host.h |   8 ++-
+>  arch/x86/kvm/x86.c              | 108 ++++++++++++++++++++------------
+>  2 files changed, 76 insertions(+), 40 deletions(-)
+> 
