@@ -2,180 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 72C3D455868
-	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 10:57:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 36F784558D1
+	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 11:15:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245360AbhKRKAI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Nov 2021 05:00:08 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:51412 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S245369AbhKRJ7T (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 18 Nov 2021 04:59:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637229379;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=wEk0Ix6QqXBgVWnz008QmDW0QekiZrGZyqYEU0wf5p4=;
-        b=R1IVZ+gw68ytCyB3rtw5ziFoQjoDgGTHXTNx7+fHbDiEPoRatPdaXOndkZBNiOVpZ+6s+k
-        hK2CWHNvXRNUuIi7C6lmMMwW2YaXvwy/6F2hDITgvQE17CHEl/gs6ZLSXr46e7uIB0XN3G
-        nSbhHw2zKLUTLkZsBvZnK48Wvz/3CPg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-363-uqecaitHPRmsAKjQpphpBg-1; Thu, 18 Nov 2021 04:56:16 -0500
-X-MC-Unique: uqecaitHPRmsAKjQpphpBg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S244908AbhKRKSe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Nov 2021 05:18:34 -0500
+Received: from mail.kernel.org ([198.145.29.99]:59242 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S244800AbhKRKQb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Nov 2021 05:16:31 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D81587D541;
-        Thu, 18 Nov 2021 09:56:14 +0000 (UTC)
-Received: from starship (unknown [10.40.194.243])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5D8CB5FC13;
-        Thu, 18 Nov 2021 09:56:12 +0000 (UTC)
-Message-ID: <8ad47d43a7c8ae19f09cc6ada73665d6e348e213.camel@redhat.com>
-Subject: Re: [PATCH v2] KVM: x86: check PIR even for vCPUs with disabled
- APICv
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     stable@vger.kernel.org, Sean Christopherson <seanjc@google.com>
-Date:   Thu, 18 Nov 2021 11:56:11 +0200
-In-Reply-To: <20211118072531.1534938-1-pbonzini@redhat.com>
-References: <20211118072531.1534938-1-pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+        by mail.kernel.org (Postfix) with ESMTPSA id 471E661B7D;
+        Thu, 18 Nov 2021 10:13:31 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mneQ5-006Hod-7k; Thu, 18 Nov 2021 10:13:29 +0000
+Date:   Thu, 18 Nov 2021 10:13:28 +0000
+Message-ID: <87mtm17ovr.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Anup Patel <anup.patel@wdc.com>
+Cc:     Will Deacon <will@kernel.org>, julien.thierry.kdev@gmail.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org,
+        Vincent Chen <vincent.chen@sifive.com>
+Subject: Re: [PATCH v10 kvmtool 5/8] riscv: Add PLIC device emulation
+In-Reply-To: <20211116052130.173679-6-anup.patel@wdc.com>
+References: <20211116052130.173679-1-anup.patel@wdc.com>
+        <20211116052130.173679-6-anup.patel@wdc.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: anup.patel@wdc.com, will@kernel.org, julien.thierry.kdev@gmail.com, pbonzini@redhat.com, atishp@atishpatra.org, Alistair.Francis@wdc.com, anup@brainfault.org, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, vincent.chen@sifive.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2021-11-18 at 02:25 -0500, Paolo Bonzini wrote:
-> The IRTE for an assigned device can trigger a POSTED_INTR_VECTOR even
-> if APICv is disabled on the vCPU that receives it.  In that case, the
-> interrupt will just cause a vmexit and leave the ON bit set together
-> with the PIR bit corresponding to the interrupt.
-100% true.
+On Tue, 16 Nov 2021 05:21:27 +0000,
+Anup Patel <anup.patel@wdc.com> wrote:
 > 
-> Right now, the interrupt would not be delivered until APICv is re-enabled.
-> However, fixing this is just a matter of always doing the PIR->IRR
-> synchronization, even if the vCPU has temporarily disabled APICv.
+> The PLIC (platform level interrupt controller) manages peripheral
+> interrupts in RISC-V world. The per-CPU interrupts are managed
+> using CPU CSRs hence virtualized in-kernel by KVM RISC-V.
 > 
-> This is not a problem for performance, or if anything it is an
-> improvement.  First, in the common case where vcpu->arch.apicv_active is
-> true, one fewer check has to be performed.  Second, static_call_cond will
-> elide the function call if APICv is not present or disabled.  Finally,
-> in the case for AMD hardware we can remove the sync_pir_to_irr callback:
-> it is only needed for apic_has_interrupt_for_ppr, and that function
-> already has a fallback for !APICv.
+> This patch adds PLIC device emulation for KVMTOOL RISC-V.
 > 
-> Cc: stable@vger.kernel.org
-> Co-developed-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Vincent Chen <vincent.chen@sifive.com>
+> [For PLIC context CLAIM register emulation]
+> Signed-off-by: Anup Patel <anup.patel@wdc.com>
 > ---
->  arch/x86/kvm/lapic.c   |  2 +-
->  arch/x86/kvm/svm/svm.c |  1 -
->  arch/x86/kvm/x86.c     | 18 +++++++++---------
->  3 files changed, 10 insertions(+), 11 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 759952dd1222..f206fc35deff 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -707,7 +707,7 @@ static void pv_eoi_clr_pending(struct kvm_vcpu *vcpu)
->  static int apic_has_interrupt_for_ppr(struct kvm_lapic *apic, u32 ppr)
->  {
->  	int highest_irr;
-> -	if (apic->vcpu->arch.apicv_active)
-> +	if (kvm_x86_ops.sync_pir_to_irr)
->  		highest_irr = static_call(kvm_x86_sync_pir_to_irr)(apic->vcpu);
+>  Makefile                     |   1 +
+>  riscv/include/kvm/kvm-arch.h |   2 +
+>  riscv/irq.c                  |   4 +-
+>  riscv/plic.c                 | 518 +++++++++++++++++++++++++++++++++++
+>  4 files changed, 523 insertions(+), 2 deletions(-)
+>  create mode 100644 riscv/plic.c
+>
 
->  	else
->  		highest_irr = apic_find_highest_irr(apic);
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 5630c241d5f6..d0f68d11ec70 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -4651,7 +4651,6 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
->  	.load_eoi_exitmap = svm_load_eoi_exitmap,
->  	.hwapic_irr_update = svm_hwapic_irr_update,
->  	.hwapic_isr_update = svm_hwapic_isr_update,
-> -	.sync_pir_to_irr = kvm_lapic_find_highest_irr,
->  	.apicv_post_state_restore = avic_post_state_restore,
->  
->  	.set_tss_addr = svm_set_tss_addr,
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 627c955101a0..a8f12c83db4b 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -4448,8 +4448,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->  static int kvm_vcpu_ioctl_get_lapic(struct kvm_vcpu *vcpu,
->  				    struct kvm_lapic_state *s)
->  {
-> -	if (vcpu->arch.apicv_active)
-> -		static_call(kvm_x86_sync_pir_to_irr)(vcpu);
-> +	static_call_cond(kvm_x86_sync_pir_to_irr)(vcpu);
->  
->  	return kvm_apic_get_state(vcpu, s);
->  }
-> @@ -9528,8 +9527,7 @@ static void vcpu_scan_ioapic(struct kvm_vcpu *vcpu)
->  	if (irqchip_split(vcpu->kvm))
->  		kvm_scan_ioapic_routes(vcpu, vcpu->arch.ioapic_handled_vectors);
->  	else {
-> -		if (vcpu->arch.apicv_active)
-> -			static_call(kvm_x86_sync_pir_to_irr)(vcpu);
-> +		static_call_cond(kvm_x86_sync_pir_to_irr)(vcpu);
->  		if (ioapic_in_kernel(vcpu->kvm))
->  			kvm_ioapic_scan_entry(vcpu, vcpu->arch.ioapic_handled_vectors);
->  	}
-> @@ -9802,10 +9800,12 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
->  
->  	/*
->  	 * This handles the case where a posted interrupt was
-> -	 * notified with kvm_vcpu_kick.
-> +	 * notified with kvm_vcpu_kick.  Assigned devices can
-> +	 * use the POSTED_INTR_VECTOR even if APICv is disabled,
-> +	 * so do it even if !kvm_vcpu_apicv_active(vcpu).
->  	 */
-> -	if (kvm_lapic_enabled(vcpu) && vcpu->arch.apicv_active)
-> -		static_call(kvm_x86_sync_pir_to_irr)(vcpu);
-> +	if (kvm_lapic_enabled(vcpu))
-> +		static_call_cond(kvm_x86_sync_pir_to_irr)(vcpu);
->  
->  	if (kvm_vcpu_exit_request(vcpu)) {
->  		vcpu->mode = OUTSIDE_GUEST_MODE;
-> @@ -9849,8 +9849,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
->  		if (likely(exit_fastpath != EXIT_FASTPATH_REENTER_GUEST))
->  			break;
->  
-> -		if (kvm_lapic_enabled(vcpu) && kvm->arch.apicv_active)
-> -			static_call(kvm_x86_sync_pir_to_irr)(vcpu);
-> +		if (kvm_lapic_enabled(vcpu))
-> +			static_call_cond(kvm_x86_sync_pir_to_irr)(vcpu);
->  
->  		if (unlikely(kvm_vcpu_exit_request(vcpu))) {
->  			exit_fastpath = EXIT_FASTPATH_EXIT_HANDLED;
+[...]
 
+> +static void plic__context_write(struct plic_state *s,
+> +				struct plic_context *c,
+> +				u64 offset, void *data)
+> +{
+> +	u32 val;
+> +	bool irq_update = false;
+> +
+> +	mutex_lock(&c->irq_lock);
+> +
+> +	switch (offset) {
+> +	case CONTEXT_THRESHOLD:
+> +		val = ioport__read32(data);
+> +		val &= ((1 << PRIORITY_PER_ID) - 1);
+> +		if (val <= s->max_prio)
+> +			c->irq_priority_threshold = val;
+> +		else
+> +			irq_update = true;
+> +		break;
+> +	case CONTEXT_CLAIM:
+> +		val = ioport__read32(data);
+> +		if (val < plic.num_irq) {
+> +			c->irq_claimed[val / 32] &= ~(1 << (val % 32));
+> +			irq_update = true;
+> +		}
 
-vmx_sync_pir_to_irr has 'if (KVM_BUG_ON(!vcpu->arch.apicv_active, vcpu->kvm))'
-That has to be removed I think for this to work.
+This seems to ignore the nasty bit of the PLIC spec where a write to
+CLAIM is ignored if the interrupt is masked.
 
-Plus the above calls now can happen when APICv is fully disabled (and not just inhibited),
-which is also something that I think that vmx_sync_pir_to_irr should be fixed to be aware of.
+	M.
 
-Also note that VMX has code that sets vmx_x86_ops.sync_pir_to_irr to NULL in its 'hardware_setup'
-if APICv is disabled. 
-I wonder if that done befor or after the static_call_cond sites are updated.
-
-I think that this code should be removed as well, and vmx_sync_pir_to_irr should just
-do nothing when APICv is fully disabled.
-
-I haven't run tested this code so I might be wrong of course.
-
-
-Best regards,
-	Maxim Levitsky
-
+-- 
+Without deviation from the norm, progress is not possible.
