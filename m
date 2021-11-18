@@ -2,48 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D0EEA455F4C
-	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 16:22:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 81ACA455F62
+	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 16:24:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231574AbhKRPZB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Nov 2021 10:25:01 -0500
-Received: from mail-bn7nam10on2052.outbound.protection.outlook.com ([40.107.92.52]:32672
-        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
+        id S232107AbhKRP1j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Nov 2021 10:27:39 -0500
+Received: from mail-dm6nam10on2058.outbound.protection.outlook.com ([40.107.93.58]:3584
+        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230098AbhKRPZA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Nov 2021 10:25:00 -0500
+        id S232083AbhKRP1d (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Nov 2021 10:27:33 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=F5BHxP6jhXrIHI3ZmV2mxG0VAHQ3uJ92GApKCxjtomPxwUHXXxvYox6kVbfTK68EZ1GX7CRKgCi3QD6/7Gv6IbvvKDSw71uv3FUcTPiV4biu174UaMQgYR9hmWlE3GWd2mlKI2DBKOpapLTYyc0220EGYTOiosgLYpMx0rZ/7oyeCn0hGZJ4fnmNj4WMSbNjXrF1cWcgceuH8SsEQNsxjkCbEFQDqmTzObdYHeSgievrnwg455e5HObYln3w7B+1wkXAzDLS9oXP8UgTfwIL/5uqTz/fUZfD4m4U7GuOocmLt7jbpQrM8eCmakS/tFujvAf5r7nUkKnUhwW/Gavh6w==
+ b=TTzPmfb7+5yvhY80v9E5ZNOp53dmshYqCqkCy2Z6isaT40VqM6KjGmOlg1EW755mI+e+7aKxMnzQnltX4yj/3uluNpdtPTmgM8qF17fV3CcoHNSKZLZHD/p1CQku6t0TkrFR/7q2uhGYvpAAwsD38yjvwkZAH+8mZIeESDVoWh3Urq1i9mCQnGjK96koOFqFOGeOl+xl/w0+9hC9/6LCI0aDxK76QxUnWL2+3JzPR+b/FvqE3FZ7GxbLvfuGvbouQxQnIBA304u7AI0IFfnlM/ayRoLDNR4iuGBEvZlAr6QtMGgWw48wRGl+y5tRFswU64yS2ZUaktaDX2XVDRO3rw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ERxpgQtDimCVjxAZeaHcNvaf9EKn8wPQcPxMHXzXWkM=;
- b=XSkeAuU7OCXL3KL3jLMy6pVoADYnsZH8flywx6bg/hsSRbd5Wm19PbQD1+rKTfTgYUndR7Fq0zGeX+nkuRGTwGRnIF7Mn2WvUYy3u+NDH7SsqxAKPpf0Y3FdrUsEQU6n2j8DGhVJ2sb4FSXC6zD6AHcq4P++HeMlAfZ6xqEtmi2wpDW//m0+xa6s8qQ0GmWipcELn+3zTGHz+btzxmG/hgoHEzrcxo87AIG5cwT5RJ8LV0r0m/il4SY8YaVj0kP0iQwFetdPl/nQd8WB+/FOX1kxzVwC8PbU3+pRQJy8u12aFLfASazCAvvARXEUb3sYq9bSErBPYc0MX78ubfsIEA==
+ bh=eXVSKVPZ9KUGZLJ3rTe3B9m3iU7bvxBmmvh3y8nvk2o=;
+ b=c818yuPKdnaO/BoibqB+GJPi3xSDfNDon6aPq1TasECb9in0N9k5wDh0dx+k5+/082K3XZMrAXudWICcplbh0B2iIrHIvfA7zL842OXWOKmscWKrD7crejmP5m5iy83wBgo/DjQ0xakitYZ5++5a0Lb+CL2WISI6foc1lXa5HogqApvCEq5JRhalKOAE6R+JxOzQXKBEi2AM3mQVacTBIxfVW5+kyQmYnOcBtsXI3yXVxHgV8Pd7KC/41Ovraf7DwjGXAcC3OUraIoc2YQSqHM0+XFgYqtXTeh64KV0c6HwN7uebve8yJ6UZce74T5MS8jP6j2GU/Y6Px7mBHpFupg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ERxpgQtDimCVjxAZeaHcNvaf9EKn8wPQcPxMHXzXWkM=;
- b=SARxaRR6PFl7E9IIocfX3mqIIyyQEDeHdcB2LSlLf30rVuVYZk8fMlYwhHnBqQhFqV3Otg+bbIeBMNH16HV3CXoCJE6yP+bRllsFG8Zdh92y7Sg+HzbB3+FJ2tdUKRoJf2W4jND/lPt+8y3qJvGMFt7IOhsK56LAocE1rIDLADRgFA8869Xrgjqvg8CgUSOgG5AocMt9rqT27z/6COfiKuI3rPesT8WhmzOh+KmpziVdi1b810q+FfSniYnSWoHL9u4C6iHO5+7JNhK6IOaQ0szZXviPpMVgdNUS21MuySup0hQngnRZVXAWTeCqbGXWm6MpDE2a5xp75D/z0G63jA==
+ bh=eXVSKVPZ9KUGZLJ3rTe3B9m3iU7bvxBmmvh3y8nvk2o=;
+ b=crjxSybMYlmrcvMDINr9JrUeJ0emidLLt7T5td2xji1D61tfL1eC549nrLFGKQXrhG8IRyUA1MqPyS6MIB9pvo+n79ezGeZddbP+SHkLCXsNpg8lsYS+fMxVesWrH/rjanl+NWsaGkGpuw9gYckuWqe1SYOMAZv7JysYyotISgE8SevaMc+M0ndeNcEQZ5+7wyaa3FAqaUhHmMqIGSUewta7yZLqhPrzHVI/TspfL7PMPjBBjqfuS0tU0SiygPGHNPfxTyGOO3MCCr4bbnjld9NM9IKc7o7nWlYHTD0oi2vE9EFonLN7kE4cV46KzSYEtIfCmUAk32WzqOWAezVGgA==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from DM6PR12MB2937.namprd12.prod.outlook.com (2603:10b6:5:181::11)
- by DM5PR12MB2487.namprd12.prod.outlook.com (2603:10b6:4:af::19) with
+ by DM6PR12MB3305.namprd12.prod.outlook.com (2603:10b6:5:189::29) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4713.19; Thu, 18 Nov
- 2021 15:21:58 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4690.26; Thu, 18 Nov
+ 2021 15:24:32 +0000
 Received: from DM6PR12MB2937.namprd12.prod.outlook.com
  ([fe80::ac32:c8f7:f83a:8734]) by DM6PR12MB2937.namprd12.prod.outlook.com
  ([fe80::ac32:c8f7:f83a:8734%7]) with mapi id 15.20.4690.027; Thu, 18 Nov 2021
- 15:21:58 +0000
-Message-ID: <8a49aa97-5de9-9cc8-d45f-e96456d66603@nvidia.com>
-Date:   Thu, 18 Nov 2021 20:51:41 +0530
+ 15:24:32 +0000
+Message-ID: <96bb2b52-27b2-655e-2a2f-157efb98826c@nvidia.com>
+Date:   Thu, 18 Nov 2021 20:54:17 +0530
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
  Thunderbird/91.3.0
-Subject: Re: [RFC 3/3] vfio/pci: use runtime PM for vfio-device into low power
- state
+Subject: Re: [RFC 2/3] vfio/pci: virtualize PME related registers bits and
+ initialize to zero
 Content-Language: en-US
 To:     Alex Williamson <alex.williamson@redhat.com>
 Cc:     kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
@@ -52,263 +52,191 @@ Cc:     kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
         Zhen Lei <thunder.leizhen@huawei.com>,
         Jason Gunthorpe <jgg@nvidia.com>, linux-kernel@vger.kernel.org
 References: <20211115133640.2231-1-abhsahu@nvidia.com>
- <20211115133640.2231-4-abhsahu@nvidia.com>
- <20211117105323.2866b739.alex.williamson@redhat.com>
+ <20211115133640.2231-3-abhsahu@nvidia.com>
+ <20211117105304.5f9f9d72.alex.williamson@redhat.com>
 X-Nvconfidentiality: public
 From:   Abhishek Sahu <abhsahu@nvidia.com>
-In-Reply-To: <20211117105323.2866b739.alex.williamson@redhat.com>
+In-Reply-To: <20211117105304.5f9f9d72.alex.williamson@redhat.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: MA1PR01CA0149.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:a00:71::19) To DM6PR12MB2937.namprd12.prod.outlook.com
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MA1PR0101CA0016.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:a00:21::26) To DM6PR12MB2937.namprd12.prod.outlook.com
  (2603:10b6:5:181::11)
 MIME-Version: 1.0
-Received: from [10.40.163.75] (115.114.90.35) by MA1PR01CA0149.INDPRD01.PROD.OUTLOOK.COM (2603:1096:a00:71::19) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4713.21 via Frontend Transport; Thu, 18 Nov 2021 15:21:53 +0000
+Received: from [10.40.163.75] (115.114.90.35) by MA1PR0101CA0016.INDPRD01.PROD.OUTLOOK.COM (2603:1096:a00:21::26) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4713.20 via Frontend Transport; Thu, 18 Nov 2021 15:24:28 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 5bc4addd-c916-41ee-cbb3-08d9aaa72966
-X-MS-TrafficTypeDiagnostic: DM5PR12MB2487:
-X-Microsoft-Antispam-PRVS: <DM5PR12MB248705E6818EEB94ECEFA276CC9B9@DM5PR12MB2487.namprd12.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 9a9448bc-1bcd-4bed-25ab-08d9aaa78529
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3305:
+X-Microsoft-Antispam-PRVS: <DM6PR12MB33059A2F3333AC44E094FBE6CC9B9@DM6PR12MB3305.namprd12.prod.outlook.com>
 X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: UNH+Sqc78jTStib6TXD9rsnZlW4uqbQEPBhkoWYchKkbvkYMaeM/4KOKBb6DlBS27HzDgsbrohK6lkrrJu/yHs+HCYSNhOmuuJUHuTtW/WZ5FWLOqBedSLlQXCoW07wp2ha83tbIz7IUjtjqi9tmc44+bCGZOrvUlWFJIDjXfNEJyhfRKeN7jbIk5Tw2H+63vYY3cdmplkkJAGvVo3jH3UqdhPT4BftO2cHTwulrXkgVxPQoIGREVTZu+MSynxoePWOPfOE0XfB+4d+T4pIHTUgWaBQ58ZiidhCHTQ6pkPBUYAZwK0clde/GFgO5YGU6IQRhAPhWulzJUJMaGl2+lkJIzwjUmSEAxMP8nLNtK0V9Sh2UIIQuoX+PGu1d2HkjhBijtQfa12si0OGwdDSwrFnn20wjksUrLCYSOMKldLQCUY9fmKKokPGiBHmuOqEitjPZfCh6lo+QI1MGt93hQcVW7MQVDTcayhyZ4lSronBk27o0fOHH0gGN5eIecU/rX0kOKA6ZbKZ9VVllubCElXKSW6X8rS/AUXP38Vv+eH0LwIunlXvwsHmGRz2Z9He3nBGcYrHM8KjRqQmiKU1UYvJkE8dIBH5MMaB9YVZPkBQFONz3R1w36LZ6XlCJ3IbWyVrbgH59xiNd4iGibPM16hPk93wKG0r7b7TpskjgCwXK7zBiyGqmx50WYD/7XGC7CsfXECwDdmltAooqUou4p7AfPPlz9ePSrSqqCbT7N/yW7gKLaHG3oa5So/JYVomn
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB2937.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(5660300002)(36756003)(8936002)(53546011)(6486002)(2906002)(6916009)(86362001)(66556008)(66476007)(8676002)(186003)(55236004)(316002)(16576012)(31696002)(2616005)(66946007)(956004)(38100700002)(83380400001)(26005)(54906003)(4326008)(31686004)(508600001)(6666004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: BHO/jSx7kXin4LQl3fKa0Gi1re81Q3bceIhDlbqPGI6Sh0x6cgVpv7RTIa5/OLmAiF85+q+ZrVAEXLqPG435zxsvWsNTM1QvDfMOV8BMrRS3ggcWQOuI874wZ21wjJRxhfKtwifF60zrvLKxhjz3iFmitSij39MNJ/Wye2M9J5NyzX5F/c2hUJee1mwH3hO6ejG/mO+UmJP1h2ecDTqoWOAqtMzflwJVloSlPuBxBuRn/kKP/wRU61KYUKa9CwOfnGJXNbsyWZaskymSh3E4NhC0Z/lxLP5ASqxdvNtrZBqSiSCchlD/zznh+HHv0/qxYLzChl7kC33huQ7oA30P9JeF53euiQN0ekB345UZhqFUU7ijCct2LJKrwwgo+L5iqffNW5md+JEKQRG/anm1nqd/kfqrE4xlOf5mc792qZBMe9Chi/by8F4W2Jp2LS8PgokM5w3BpMPuEfP3fwh4KySzmruVkFclHUfSn874ZB3/w8Sogkyw4DiCpWay4/fbMYyxDprsdbV2gFs2g+zfftfDt3RLmMxRWcDFuyWS3kLaCFR3dh3W9QuD1r5Ns0vri0QrZyAaAQtqjglgru9GRGVC22OLSceCnala+hcayroCOfs55wlfwIrqEQqzvzTCiOO+gRYPhIhpXY4UwHGm53IX2nIzQqEueDGqSbpN/nYBpuEMKVhgn6SFh67NELxZh5SNLjAQ0tZm1gx8GpbOrpc/9JGyUB8eRLySzevHR1I=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB2937.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(316002)(6666004)(36756003)(26005)(2906002)(6916009)(16576012)(55236004)(53546011)(54906003)(8936002)(83380400001)(66946007)(66556008)(38100700002)(31696002)(66476007)(2616005)(31686004)(8676002)(86362001)(6486002)(5660300002)(956004)(4326008)(508600001)(186003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?b0h0aWFwNnhuRHhRVEpvcnppL3ZpclpKOXVWWWVnT09CUU02dkh4bUpzR1A2?=
- =?utf-8?B?RlBmdXByKytCVXNmRUV2MnVSL1lHcCtTUFVFMGhlM1YwWEVqZEUwT1JZMy81?=
- =?utf-8?B?QmxvS3pBakhNNWY3ZDRYWFZtQjZERWtjd2I3Tkl4Y245L2FFQ0tDbzNlSlRt?=
- =?utf-8?B?Z083QWh5QldSM3lCMVZNeEg4WEVTR3NWWEh6QXIwK1A1eUIzK2p2UE5mcHZO?=
- =?utf-8?B?TXhjRVI5TzlOTXJUbk5nM0NBeFRWWFVGOTdSWWdVUjFSaXQzYkhWZjdHYU50?=
- =?utf-8?B?SkZ2eC9veVI0Z2JyTVVJeUhFa3hUTHZMOGphWDFTZ0Nhdk9OSjVBdTg2dFVn?=
- =?utf-8?B?cVU2TS9CWmRCMG11TWJuTHZpaTdqOXZiQnJjNnZ6SlZDMUhQMVJySnV6Y29q?=
- =?utf-8?B?VndXdCs3OVpmclNHSU5hUVhQa0drdHNQMU84ZUVaelRlT3NrMUFXU01qc2Fx?=
- =?utf-8?B?YndoTWd0aUxON0lwRHNpYXNzSHNYcXdHUEtnMWcvU0lFc2RMa20wWExSS0hQ?=
- =?utf-8?B?TXphblhWYzNJcDRKL1RjVXJBd1owQ1FyZml1MzZ6WmpQcmlZbUdEWE9KWHM3?=
- =?utf-8?B?ZzExUlJHWHp2QWlHT0M0SG00cGV6VmFyWVdDS3FMZmN4cVVYbnZXL0xPZmdM?=
- =?utf-8?B?K1hoS3IvVWJUc1hYZWJsdk85Z01weDIyR3J2NDU4dmVLNkZKT3pCTms3Mlk5?=
- =?utf-8?B?OGtxdk8rZlFLeU5pWE5DSGQwQm43czJuZjJucVRSeTh3Y3lIdGVIYk83QjJU?=
- =?utf-8?B?RWhEQmhLUFdrTDdFSEFBbUlsbExRd0N3bE5NTUxhTm0vQUlaYlRBa3hnNnRS?=
- =?utf-8?B?UUlyRkhObEtKaFF5cHZVYjVOa1dzeUtKaHh1eGdWV2ZuelpSS0UzUjNIQVNS?=
- =?utf-8?B?c3JhRFh6cFBhdm5oVm8wZWpqZDl1djZyT0g0M1BPQXdzODYxNkZ5dzhtOUNp?=
- =?utf-8?B?WHNPeFFyVVJnSVJ4dndUVTM3TVZvenFqbkZaek9pMzlWa0o3aGwxOTZDY2xQ?=
- =?utf-8?B?cVhiaEY1L3pDTEN0YlJUTWFyb0JQRzB5a2U5dDA2bXNHYlRpTmprVjRGaHZN?=
- =?utf-8?B?UkwvWW9KTUVkMDNJU2YwNitnaVpxdDNMb0VPWGpONHQycnYyMk1kTVJCVlFL?=
- =?utf-8?B?Sk9xMkxpUkJCTERCMVlPN1BXVEZDT0V2eWxMNjJCZ0NlNG50d2tac01VTXVS?=
- =?utf-8?B?RWxTeFNFRkx5czJFWnFsYStOZXY2cFYreENNb0FiQ0VRT2FncXBrTWFEZXZV?=
- =?utf-8?B?aWVZYnh3R2dJbU9pcTFEQksxa1lnaG10MHp4TmR5TDZxbUhqNWpYOTBUUjBN?=
- =?utf-8?B?cG1kbDNwWG9BUnp2cFlKSi9TQzh2QjIzS2wxUk1DRVZSb1BjRW8vTHNMVEVy?=
- =?utf-8?B?YkNrMHJLRU9kdkJ5dmhQYmREd3lKQmxCVzEwY1FKQy9Mc0RqUWRVM1p5Rmtk?=
- =?utf-8?B?L3JMR1VWU291N0NKUDFFNWRqUHY5Q2VRTEszQlVLNlBCU0ZJWU50U1k4REdx?=
- =?utf-8?B?K3RweEhQNXZNVFc5dU40OWNUQ2hKZms2aWNVNVBBVzFBU0g4dXJEK2JXMm5Z?=
- =?utf-8?B?aWkyeDVvc2FRNE9jMVRSYitPdzd4akhRMjZRRlRNV21IS0doano3aStxZ25s?=
- =?utf-8?B?MVh3blVoTTJWaDBGVDVGcWcyM0ZqMGZDSEtmYTBhdE1GazZNQmd2ZWZSb0hv?=
- =?utf-8?B?V1BUZnBHVm1pT0EyMXVqQlFyc2VxTXljcW03TXV5OU5SaXBGUkhyaU9HN2c1?=
- =?utf-8?B?SEJ2cU8va3RCYXQ0VFRMaS9BTzFKcm1idWhxc3F4ZkRnWGRId2xoTW4vaWFX?=
- =?utf-8?B?VHhlMmRpbkRBeVdYR0IwbTJkM2ZOeE1UcUdGS2Y4R1pSek40cWZxbXdPdldB?=
- =?utf-8?B?bFpReG4rS3p3empjUUFQdGQ3WERxYmwyQjNJTTlPL2NzcjliUHZQcWkvM28w?=
- =?utf-8?B?VFI1WEoxeU1yMmNNbkl0UG1lclBuT21yaW84c2dKRFpXZ2RhYnZDbGNkdXJa?=
- =?utf-8?B?bUVqSW14T0FuNFpJV3Z3ekpXdUpDTTBZYVJHdTFOOThkdzMxYmM2OVlSYUgy?=
- =?utf-8?B?QjB2S01OTHljQlZnS0x2cjE0eGI3ODFpZS91dFpDdXl5ZHQ5Rlo4NnYvS1Y3?=
- =?utf-8?B?VXV0ejBZaDF0cHpuVWd4SDQxYlVDSGFVSjRlTkdUZXdkMzVDQysrL2hYL0tS?=
- =?utf-8?Q?ubu7E5T3TDXGkDgnAfnkiSY=3D?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ekR3Y1JsczIrcHd1cnNtNWtEK2x2RjFXcDJ1MmdIek4wRTVFdXh5dDZhaGR4?=
+ =?utf-8?B?NGcySlFtWXpYdVEzRWUwQkZvNWE5bWpBSnNwK2h0cXVMcFlQVllhYWxOVUI5?=
+ =?utf-8?B?NW14SkpvbEl4MFprMkFnSGJwRUpYZm5keXBXSmF1SThDV1RRYzBEZGtWQmdw?=
+ =?utf-8?B?NzRQNlo5UnNoRkFnNzVudmdmNjBuUHNpMXgrOTRCaHppQWFVQjkvS29vTElN?=
+ =?utf-8?B?amt1V2pqTFRMc1orYzR1QnZYUmVjbTl5M0R1QTRFQW1mbWhlMlhnSVB6WFVZ?=
+ =?utf-8?B?UWFiMmIvT0lTVGhNNi9pbnVZVHlBOEtGeVdZelBPZXRMOTc5MmV0RSs1T24w?=
+ =?utf-8?B?SjlJcTJZVmNNTHA2cHVRN28vK3d4R0RHb3VXTFduM1V1bG54VnV4Z2Qxd091?=
+ =?utf-8?B?RGgyNDRGR09XMVcwSnZick9LZmRvKzdiZjlwQ0xQM1Q3bEM4eDZ5MGQ0N2lS?=
+ =?utf-8?B?N3BkMXlrM2JXdjV2ZFU3OU9lUDNhNFBlMDY4ZzBvOC9ORnYrL2RKdTlzdExS?=
+ =?utf-8?B?V201cTQ4UmZLZmp6dVdqQUUrNUNobVhkaUhuUWJYaDBYR3hEUk11OENYYkF2?=
+ =?utf-8?B?dXRqL0cycDZJQjV0cWZCcDQvOG4wRG1nSnRwM3ZxbVNJMy9YWC9kWnIzR3RO?=
+ =?utf-8?B?MGRzVW94NC96dENwLzlJVlZUT0pIekk0aThsYmU3YUlVNUZta3BjemVGN245?=
+ =?utf-8?B?eEd1K3pFcFRSZGtIQ202eDMyRXp3OGhVS1ZvSkVjSkNOc2M0RjRCRGt3QnM2?=
+ =?utf-8?B?ODVtVHJtdTZVSXNMYzdhdlhtNnd2c2Vra2w2eEZmQUZrTFhDc0d3YmtxWlBW?=
+ =?utf-8?B?eU5PWTkyNXZJSDhxMUkxRWJRSk9za1RYemNUY2J2TGtsT3JoVXpnMDZ3WVBM?=
+ =?utf-8?B?RUNTTFJCbmFXYmUyL0d1RTVZV0NieFV5VFRhbGtWbytOenV1T1p3dG15elVx?=
+ =?utf-8?B?K1hINERyNnQzR1lzYTh5UmNFbTVuazlpT2llUkZtcXhrT3p4dkdXOHNOVWgr?=
+ =?utf-8?B?cWhsdFIyejJseDNadmt3L24xVTR3b0dYQytBWm51L0M2OXF1OGcvRHVhZ1lS?=
+ =?utf-8?B?c3JOcGJHL1NpbHVMV0lRbzU0Z2RrblVvN1A2bndIWnRHZmhoTE1tLzBIY3dz?=
+ =?utf-8?B?SXdxc2VHR1AwaDNZenhCYlVwMmdBdkR4dCtoVWYxUi9TZEVxbWg4VTI4d2Fz?=
+ =?utf-8?B?ZkRHVFZiMjdXTFZmeHprWkpzZENuUlJMeDgyZ0ZzbkkwZ3RsT0NVUjUzVkNz?=
+ =?utf-8?B?UThqWUY1dFFaeDU2SUpPKzNwTWlUQmJSMHlBclp5NHcvMjhPR3AyYWVEVm51?=
+ =?utf-8?B?ajFQVTk4V0JKekhzTUtFUWtQU2JFcnBLdU5BMEZzNWhQeHBFenRKeXZFYzVB?=
+ =?utf-8?B?QzhkTGFickF2dk91ei9mbHM4Sklab04xOWlsUUFXOHgzWVkwaFMvOXNYaU1X?=
+ =?utf-8?B?SzVEbk9kZEFsRVgwcTJrODEwQ2FsNU1LK25NR1JmdHgraDJLUWVwbEYxU2d4?=
+ =?utf-8?B?VlljYlRQWlc2RW1rbUpPbE4xYTh0d0xtYXczNmN3azZ0eUVpcmlseS9DajVk?=
+ =?utf-8?B?a3hSNm1Tc3FLL1pUTjBlTjUxZUtPL2tWNlAwYjVCbVVaSFcrYzlicitrMElu?=
+ =?utf-8?B?aVVqMlc2VXhqaUd1dTdqVU9BZXp6TFNJekF5YzFyS24xaDlTUlljRTdjS3pS?=
+ =?utf-8?B?Ni9NUVpkVU42SnYvdDhrUE5tZWJqM3Y5SCtPSWlORXhDSnRNNDVCWEk0Y3Ex?=
+ =?utf-8?B?K0ZFVi84elF1VEJUM0FWUmZ2M08zaGtCQXpVZGZXV1lBcThBZDd0c0FxZzN3?=
+ =?utf-8?B?WjBDN0xuSW0yRmIvS0tib3Y0cTJ4aXFTaW5LdUZMZjVGQ2gyK1FaVjQ5ZFpE?=
+ =?utf-8?B?UlhXSEc3ZUZTWW4vQzUrSUplMlRUT0JLOUtDSGhkVUlpNkJnTisxSjdjWmxv?=
+ =?utf-8?B?TFR3MHpwREFndkYvWXJrODZSSVQrTFBwRWxSQ0R4WmV3aHBRTGlvdm16QUkv?=
+ =?utf-8?B?NlEyWS8yZFNZYVV3cmVQRDlZZHpRL051QW5TM2Q5Rm5COG1sTGZHTHBUazJZ?=
+ =?utf-8?B?UURiTDYyeVZ0d1BrREV0UGM3dytUbVBSWERTOHJpZThXUnZFZVI2MmR4eEVn?=
+ =?utf-8?B?Wm5ZdjRyblNDdVpjdFZsY1J6RVFtK1kwOFozc2t0amZIZlkycVI4OUZhRTNQ?=
+ =?utf-8?Q?P1uVMtr58uEmpdRJvg8NNKw=3D?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5bc4addd-c916-41ee-cbb3-08d9aaa72966
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9a9448bc-1bcd-4bed-25ab-08d9aaa78529
 X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB2937.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Nov 2021 15:21:58.5166
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Nov 2021 15:24:32.3740
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rLqpAl6UI69XWXM9g+j/CvXs6/QIQZsv/43cSCdVxuqcV8p4oAyfDTrjVUjo+3YJWCspc2Rc7FK8j/rtXClkVw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB2487
+X-MS-Exchange-CrossTenant-UserPrincipalName: cItxVlGjctEVMbzIrcQOriLbvBjMVq6NU0WjC/r7u1eDMVyJE2G43HHfDPxF8OKLDlWL4w4zJ0OM+Dlpi3HggQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3305
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 11/17/2021 11:23 PM, Alex Williamson wrote:
-
-> On Mon, 15 Nov 2021 19:06:40 +0530
+> On Mon, 15 Nov 2021 19:06:39 +0530
 > <abhsahu@nvidia.com> wrote:
 > 
 >> From: Abhishek Sahu <abhsahu@nvidia.com>
 >>
->> Currently, if the runtime power management is enabled for vfio-pci
->> device in guest OS, then guest OS will do the register write for
->> PCI_PM_CTRL register. This write request will be handled in
->> vfio_pm_config_write() where it will do the actual register write of
->> PCI_PM_CTRL register. With this, the maximum D3hot state can be
->> achieved for low power. If we can use the runtime PM framework, then
->> we can achieve the D3cold state which will help in saving
->> maximum power.
+>> If any PME event will be generated by PCI, then it will be mostly
+>> handled in the host by the root port PME code. For example, in the case
+>> of PCIe, the PME event will be sent to the root port and then the PME
+>> interrupt will be generated. This will be handled in
+>> drivers/pci/pcie/pme.c at the host side. Inside this, the
+>> pci_check_pme_status() will be called where PME_Status and PME_En bits
+>> will be cleared. So, the guest OS which is using vfio-pci device will
+>> not come to know about this PME event.
 >>
->> This patch uses runtime PM framework whenever vfio-pci device will
->> be put in the low power state.
+>> To handle these PME events inside guests, we need some framework so
+>> that if any PME events will happen, then it needs to be forwarded to
+>> virtual machine monitor. We can virtualize PME related registers bits
+>> and initialize these bits to zero so vfio-pci device user will assume
+>> that it is not capable of asserting the PME# signal from any power state.
 >>
->> 1. If runtime PM is enabled, then instead of directly writing
->>    PCI_PM_CTRL register, decrement the device usage counter whenever
->>    the power state is non-D0. The kernel runtime PM framework will
->>    itself put the PCI device in low power state when device usage
->>    counter will become zero. Similarly, when the power state will be
->>    again changed back to D0, then increment the device usage counter
->>    and the kernel runtime PM framework will itself bring the PCI device
->>    out of low power state.
+>> Signed-off-by: Abhishek Sahu <abhsahu@nvidia.com>
+>> ---
+>>  drivers/vfio/pci/vfio_pci_config.c | 32 +++++++++++++++++++++++++++++-
+>>  1 file changed, 31 insertions(+), 1 deletion(-)
 >>
->> 2. The guest OS will read the PCI_PM_CTRL register back to
->>    confirm the current power state so virtual register bits can be
->>    used. For this, before decrementing the usage count, read the actual
->>    PCI_PM_CTRL register, update the power state related bits, and then
->>    update the vconfig bits corresponding to PCI_PM_CTRL offset. For
->>    PCI_PM_CTRL register read, return the virtual value if runtime PM is
->>    requested. This vconfig bits will be cleared when the power state
->>    will be changed back to D0.
+>> diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
+>> index 6e58b4bf7a60..fb3a503a5b99 100644
+>> --- a/drivers/vfio/pci/vfio_pci_config.c
+>> +++ b/drivers/vfio/pci/vfio_pci_config.c
+>> @@ -738,12 +738,27 @@ static int __init init_pci_cap_pm_perm(struct perm_bits *perm)
+>>        */
+>>       p_setb(perm, PCI_CAP_LIST_NEXT, (u8)ALL_VIRT, NO_WRITE);
 >>
->> 3. For the guest OS, the PCI power state will be still D3hot
->>    even if put the actual PCI device into D3cold state. In the D3hot
->>    state, the config space can still be read. So, if there is any request
->>    from guest OS to read the config space, then we need to move the actual
->>    PCI device again back to D0. For this, increment the device usage
->>    count before reading/writing the config space and then decrement it
->>    again after reading/writing the config space. There can be
->>    back-to-back config register read/write request, but since the auto
->>    suspend methods are being used here so only first access will
->>    wake up the PCI device and for the remaining access, the device will
->>    already be active.
+>> +     /*
+>> +      * The guests can't process PME events. If any PME event will be
+>> +      * generated, then it will be mostly handled in the host and the
+>> +      * host will clear the PME_STATUS. So virtualize PME_Support bits.
+>> +      * It will be initialized to zero later on.
+>> +      */
+>> +     p_setw(perm, PCI_PM_PMC, PCI_PM_CAP_PME_MASK, NO_WRITE);
+>> +
+>>       /*
+>>        * Power management is defined *per function*, so we can let
+>>        * the user change power state, but we trap and initiate the
+>>        * change ourselves, so the state bits are read-only.
+>> +      *
+>> +      * The guest can't process PME from D3cold so virtualize PME_Status
+>> +      * and PME_En bits. It will be initialized to zero later on.
+>>        */
+>> -     p_setd(perm, PCI_PM_CTRL, NO_VIRT, ~PCI_PM_CTRL_STATE_MASK);
+>> +     p_setd(perm, PCI_PM_CTRL,
+>> +            PCI_PM_CTRL_PME_ENABLE | PCI_PM_CTRL_PME_STATUS,
+>> +            ~(PCI_PM_CTRL_PME_ENABLE | PCI_PM_CTRL_PME_STATUS |
+>> +              PCI_PM_CTRL_STATE_MASK));
+>> +
+>>       return 0;
+>>  }
 >>
->> 4. This above-mentioned wake up is not needed if the register
->>    read/write is done completely with virtual bits. For handling this
->>    condition, the actual resume of device will only being done in
->>    vfio_user_config_read()/vfio_user_config_write(). All the config
->>    register access will come vfio_pci_config_rw(). So, in this
->>    function, use the pm_runtime_get_noresume() so that only usage count
->>    will be incremented without resuming the device. Inside,
->>    vfio_user_config_read()/vfio_user_config_write(), use the routines
->>    with pm_runtime_put_noidle() so that the PCI device won’t be
->>    suspended in the lower level functions. Again in the top level
->>    vfio_pci_config_rw(), use the pm_runtime_put_autosuspend(). Now the
->>    auto suspend timer will be started and the device will be suspended
->>    again. If the device is already runtime suspended, then this routine
->>    will return early.
+>> @@ -1412,6 +1427,18 @@ static int vfio_ext_cap_len(struct vfio_pci_core_device *vdev, u16 ecap, u16 epo
+>>       return 0;
+>>  }
 >>
->> 5. In the host side D3cold will only be used if the platform has
->>    support for this, otherwise some other state will be used. The
->>    config space can be read if the device is not in D3cold state. So in
->>    this case, we can skip the resuming of PCI device. The wrapper
->>    function vfio_pci_config_pm_runtime_get() takes care of this
->>    condition and invoke the pm_runtime_resume() only if current power
->>    state is D3cold.
->>
->> 6. For vfio_pci_config_pm_runtime_get()/vfio_
->>    pci_config_pm_runtime_put(), the reference code is taken from
->>    pci_config_pm_runtime_get()/pci_config_pm_runtime_put() and then it
->>    is modified according to vfio-pci driver requirement.
->>
->> 7. vfio_pci_set_power_state() will be unused after moving to runtime
->>    PM, so this function can be removed along with other related
->>    functions and structure fields.
+>> +static void vfio_update_pm_vconfig_bytes(struct vfio_pci_core_device *vdev,
+>> +                                      int offset)
+>> +{
+>> +      /* initialize virtualized PME_Support bits to zero */
+>> +     *(__le16 *)&vdev->vconfig[offset + PCI_PM_PMC] &=
+>> +             ~cpu_to_le16(PCI_PM_CAP_PME_MASK);
+>> +
+>> +      /* initialize virtualized PME_Status and PME_En bits to zero */
+> 
+>         ^ Extra space here and above.
 > 
 > 
-
- Thanks Alex for checking this series and providing your inputs. 
- 
-> If we're transitioning a device to D3cold rather than D3hot as
-> requested by userspace, isn't that a user visible change? 
-
-  For most of the driver, in linux kernel, the D3hot vs D3cold
-  state will be decided at PCI core layer. In the PCI core layer,
-  pci_target_state() determines which D3 state to choose. It checks
-  for platform_pci_power_manageable() and then it calls
-  platform_pci_choose_state() to find the target state.
-  In VM, the platform_pci_power_manageable() check will fail if the
-  guest is linux OS. So, it uses, D3hot state.
- 
-  But there are few drivers which does not use the PCI framework
-  generic power related routines during runtime suspend/system suspend
-  and set the PCI power state directly with D3hot.
-  Also, the guest can be non-Linux OS also and, in that case,
-  it will be difficult to know the behavior. So, it may impact
-  these cases.
-
-> For instance, a device may report NoSoftRst- indicating that the device
-> does not do a soft reset on D3hot->D0 transition.  If we're instead
-> putting the device in D3cold, then a transition back to D0 has very
-> much undergone a reset.  On one hand we should at least virtualize the
-> NoSoftRst bit to allow the guest to restore the device, but I wonder if
-> that's really safe.  Is a better option to prevent entering D3cold if
-> the device isn't natively reporting NoSoftRst-?
+>> +     *(__le16 *)&vdev->vconfig[offset + PCI_PM_CTRL] &=
+>> +             ~cpu_to_le16(PCI_PM_CTRL_PME_ENABLE | PCI_PM_CTRL_PME_STATUS);
 > 
-
- You mean to say NoSoftRst+ instead of NoSoftRst- as visible in
- the lspci output. For NoSoftRst- case, we do a soft reset on
- D3hot->D0 transition. But, will this case not be handled internally
- in drivers/pci/pci-driver.c ? For both system suspend and runtime suspend,
- we check for pci_dev->state_saved flag and do pci_save_state()
- irrespective of NoSoftRst bit. For NoSoftRst- case, pci_restore_bars()
- will be called in pci_raw_set_power_state() which will reinitialize device
- for D3hot/D3cold-> D0 case. Once the device is initialized in the host,
- then for guest, it should work without re-initializing again in the
- guest side. I am not sure, if my understanding is correct.
-
-> We're also essentially making a policy decision on behalf of userspace
-> that favors power saving over latency.  Is that universally the correct
-> trade-off? 
-
- For most drivers, the D3hot vs D3cold should not be favored due
- to latency reasons. In the linux kernel side, I am seeing, the
- PCI framework try to use D3cold state if platform and device
- supports that. But its correct that covertly replacing D3hot with
- D3cold may be concern for some drivers.
-
-> I can imagine this could be desirable for many use cases,
-> but if we're going to covertly replace D3hot with D3cold, it seems like
-> there should be an opt-in.  Is co-opting the PM capability for this
-> even really acceptable or should there be a device ioctl to request
-> D3cold and plumbing through QEMU such that a VM guest can make informed
-> choices regarding device power management?
+> Perhaps more readable and consistent with elsewhere as:
 > 
-
- Making IOCTL is also an option but that case, this support needs to
- be added in all hypervisors and user must pass this information
- explicitly for each device. Another option could be to use
- module parameter to explicitly enable D3cold support. If module
- parameter is not set, then we can call pci_d3cold_disable() and
- in that case, runtime PM should not use D3cold state. 
-
- Also, I was checking we can pass this information though some
- virtualized register bit which will be only defined for passing
- the information between guest and host. In the guest side if the
- target state is being decided with pci_target_state(), then
- the D3cold vs D3hot should not matter for the driver running
- in the guest side and in that case, it depends upon platform support.
- We can set this virtualize bit to 1. But, if driver is either
- setting D3hot state explicitly or has called pci_d3cold_disable() or
- similar API available in the guest OS, then set this bit to 0 and
- in that case, the D3cold state can be disabled in the host side.
- But don't know if is possible to use some non PCI defined
- virtualized register bit. 
-
- I am not sure what should be best option to make choice
- regarding d3cold but if we can have some option by which this
- can be done without involvement of user, then it will benefit
- for lot of cases. Currently, the D3cold is supported only in
- very few desktops/servers but in future, we will see on
- most of the platforms.  
-
-> Also if the device is not responsive to config space due to the user
-> placing it in D3 now, I'd expect there are other ioctl paths that need
-> to be blocked, maybe even MMIO paths that might be a gap for existing
-> D3hot support.  Thanks,
+>         __le16 *pmc = (__le16 *)&vdev->vconfig[offset + PCI_PM_PMC];
+>         __le16 *ctrl = (__le16 *)&vdev->vconfig[offset + PCI_PM_CTRL];
 > 
+>         /* Clear vconfig PME_Support, PME_Status, and PME_En bits */
+>         *pmc &= ~cpu_to_le16(PCI_PM_CAP_PME_MASK);
+>         *ctrl &= ~cpu_to_le16(PCI_PM_CTRL_PME_ENABLE | PCI_PM_CTRL_PME_STATUS);
+> 
+> Thanks,
 > Alex
 > 
 
- I was in assumption that most of IOCTL code will be called by the
- hypervisor before guest OS boot and during that time, the device
- will be always in D0. But, if we have paths where IOCTL can be
- called when the device has been suspended by guest OS, then can we
- use runtime_get/put API’s there also ?
+ Thanks Alex. I will fix this.
 
- Thanks,
- Abhishek  
+ Regards,
+ Abhishek
+
+>> +}
+>> +
+>>  static int vfio_fill_vconfig_bytes(struct vfio_pci_core_device *vdev,
+>>                                  int offset, int size)
+>>  {
+>> @@ -1535,6 +1562,9 @@ static int vfio_cap_init(struct vfio_pci_core_device *vdev)
+>>               if (ret)
+>>                       return ret;
+>>
+>> +             if (cap == PCI_CAP_ID_PM)
+>> +                     vfio_update_pm_vconfig_bytes(vdev, pos);
+>> +
+>>               prev = &vdev->vconfig[pos + PCI_CAP_LIST_NEXT];
+>>               pos = next;
+>>               caps++;
+> 
 
