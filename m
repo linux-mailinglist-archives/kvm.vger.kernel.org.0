@@ -2,207 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0876E455AE9
-	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 12:49:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D933455B2E
+	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 13:04:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344208AbhKRLwN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Nov 2021 06:52:13 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:42397 "EHLO
+        id S1344492AbhKRMHs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Nov 2021 07:07:48 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:38496 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1344103AbhKRLvn (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 18 Nov 2021 06:51:43 -0500
+        by vger.kernel.org with ESMTP id S1344501AbhKRMHZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 18 Nov 2021 07:07:25 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637236122;
+        s=mimecast20190719; t=1637237064;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=NVvMJWrJ9UKr+oYWnQ3asuZNYNYkBhWlbJlX4He2Ums=;
-        b=LDjPy0L4hJ7fAGL/FA0S3JJCCN3yNn0JylNRJFIt7Gp0xpRU851ugDs0cGWE+ruA+JmvAZ
-        kuRwGFXs3aixBBWaTCxIoTZMMd79Zguy00xE+uknOcKGNRPkZTDm0Rvh6fiUzazqITcApD
-        q4PcSchqCbvz30xhRfIU5fwur92wG4o=
+        bh=W5Ghb5uAlf942gVdbek0yVdXvRxLK8U0BDO6Bp0gMAI=;
+        b=JSPbHF3ENpOolrthgXfyiTyy84c6bAcd1pFyzBQ3YO+UNBX+nw9jZz+Upoo+nDOvNEh3cZ
+        Ce/v3E+WatSI1Cnl5vqMrJla7KljJYXgECyBjW7g5eHTQ5y8ryQxP20yXAmW2AIokoh4mr
+        WaoXH6y9jl6vj3pvmPgQIZoYnYONpCo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-580-zvgDP5ZjNYa2lSvL9U8ZAg-1; Thu, 18 Nov 2021 06:48:37 -0500
-X-MC-Unique: zvgDP5ZjNYa2lSvL9U8ZAg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-115-k6mdJvwXNi-BzEtUcDvh4A-1; Thu, 18 Nov 2021 07:04:21 -0500
+X-MC-Unique: k6mdJvwXNi-BzEtUcDvh4A-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 09A9B804141;
-        Thu, 18 Nov 2021 11:48:35 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 81DF11006AA1;
+        Thu, 18 Nov 2021 12:04:17 +0000 (UTC)
 Received: from [10.39.192.245] (unknown [10.39.192.245])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1452A10246F8;
-        Thu, 18 Nov 2021 11:48:30 +0000 (UTC)
-Message-ID: <a130e317-58b9-dae8-2d87-98695cdc4f22@redhat.com>
-Date:   Thu, 18 Nov 2021 12:48:29 +0100
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 377E05F4EE;
+        Thu, 18 Nov 2021 12:04:09 +0000 (UTC)
+Message-ID: <4c48546b-eb4a-dff7-cc38-5df54f73f5d4@redhat.com>
+Date:   Thu, 18 Nov 2021 13:04:07 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.2.0
-Subject: Re: [PATCH] Fix SEV-ES INS/OUTS instructions for word, dword, and
- qword.
+Subject: Re: [PATCH v3 08/12] KVM: Propagate vcpu explicitly to
+ mark_page_dirty_in_slot()
 Content-Language: en-US
-To:     Michael Sterritt <sterritt@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <jroedel@suse.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-coco@lists.linux.dev
-Cc:     marcorr@google.com, pgonda@google.com
-References: <20211118021326.4134850-1-sterritt@google.com>
+To:     David Woodhouse <dwmw2@infradead.org>
+Cc:     kvm <kvm@vger.kernel.org>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        "jmattson @ google . com" <jmattson@google.com>,
+        "wanpengli @ tencent . com" <wanpengli@tencent.com>,
+        "seanjc @ google . com" <seanjc@google.com>,
+        "vkuznets @ redhat . com" <vkuznets@redhat.com>,
+        "mtosatti @ redhat . com" <mtosatti@redhat.com>,
+        "joro @ 8bytes . org" <joro@8bytes.org>, karahmed@amazon.com,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Anup Patel <anup.patel@wdc.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org
+References: <20211117174003.297096-1-dwmw2@infradead.org>
+ <20211117174003.297096-9-dwmw2@infradead.org>
+ <85d9fec17f32c3eb9e100e56b91af050.squirrel@twosheds.infradead.org>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211118021326.4134850-1-sterritt@google.com>
+In-Reply-To: <85d9fec17f32c3eb9e100e56b91af050.squirrel@twosheds.infradead.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/18/21 03:13, Michael Sterritt wrote:
-> Properly type the operands being passed to __put_user()/__get_user().
-> Otherwise, these routines truncate data for dependent instructions
-> (e.g., INSW) and only read/write one byte.
+On 11/17/21 22:09, David Woodhouse wrote:
+>>   {
+>> -	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
+>> +	struct kvm_vcpu *running_vcpu = kvm_get_running_vcpu();
+>>
+>> +	WARN_ON_ONCE(vcpu && vcpu != running_vcpu);
+>>   	WARN_ON_ONCE(vcpu->kvm != kvm);
+> Ah, that one needs to be changed to check running_vcpu instead. Or this
+> needs to go first:
 > 
-> Tested: Tested by sending a string with `REP OUTSW` to a port and then
-> reading it back in with `REP INSW` on the same port. Previous behavior
-> was to only send and receive the first char of the size. For example,
-> word operations for "abcd" would only read/write "ac". With change, the
-> full string is now written and read back.
-> 
-> Signed-off-by: Michael Sterritt <sterritt@google.com>
-> Reviewed-by: Marc Orr <marcorr@google.com>
-> Reviewed-by: Peter Gonda <pgonda@google.com>
-> ---
->   arch/x86/kernel/sev.c | 57 +++++++++++++++++++++++++++++--------------
->   1 file changed, 39 insertions(+), 18 deletions(-)
-> 
-> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-> index 74f0ec955384..a9fc2ac7a8bd 100644
-> --- a/arch/x86/kernel/sev.c
-> +++ b/arch/x86/kernel/sev.c
-> @@ -294,11 +294,6 @@ static enum es_result vc_write_mem(struct es_em_ctxt *ctxt,
->   				   char *dst, char *buf, size_t size)
->   {
->   	unsigned long error_code = X86_PF_PROT | X86_PF_WRITE;
-> -	char __user *target = (char __user *)dst;
-> -	u64 d8;
-> -	u32 d4;
-> -	u16 d2;
-> -	u8  d1;
->   
->   	/*
->   	 * This function uses __put_user() independent of whether kernel or user
-> @@ -320,26 +315,42 @@ static enum es_result vc_write_mem(struct es_em_ctxt *ctxt,
->   	 * instructions here would cause infinite nesting.
->   	 */
->   	switch (size) {
-> -	case 1:
-> +	case 1: {
-> +		u8 d1;
-> +		u8 __user *target = (u8 __user *)dst;
-> +
->   		memcpy(&d1, buf, 1);
->   		if (__put_user(d1, target))
->   			goto fault;
->   		break;
-> -	case 2:
-> +	}
-> +	case 2: {
-> +		u16 d2;
-> +		u16 __user *target = (u16 __user *)dst;
-> +
->   		memcpy(&d2, buf, 2);
->   		if (__put_user(d2, target))
->   			goto fault;
->   		break;
-> -	case 4:
-> +	}
-> +	case 4: {
-> +		u32 d4;
-> +		u32 __user *target = (u32 __user *)dst;
-> +
->   		memcpy(&d4, buf, 4);
->   		if (__put_user(d4, target))
->   			goto fault;
->   		break;
-> -	case 8:
-> +	}
-> +	case 8: {
-> +		u64 d8;
-> +		u64 __user *target = (u64 __user *)dst;
-> +
->   		memcpy(&d8, buf, 8);
->   		if (__put_user(d8, target))
->   			goto fault;
->   		break;
-> +	}
->   	default:
->   		WARN_ONCE(1, "%s: Invalid size: %zu\n", __func__, size);
->   		return ES_UNSUPPORTED;
-> @@ -362,11 +373,6 @@ static enum es_result vc_read_mem(struct es_em_ctxt *ctxt,
->   				  char *src, char *buf, size_t size)
->   {
->   	unsigned long error_code = X86_PF_PROT;
-> -	char __user *s = (char __user *)src;
-> -	u64 d8;
-> -	u32 d4;
-> -	u16 d2;
-> -	u8  d1;
->   
->   	/*
->   	 * This function uses __get_user() independent of whether kernel or user
-> @@ -388,26 +394,41 @@ static enum es_result vc_read_mem(struct es_em_ctxt *ctxt,
->   	 * instructions here would cause infinite nesting.
->   	 */
->   	switch (size) {
-> -	case 1:
-> +	case 1: {
-> +		u8 d1;
-> +		u8 __user *s = (u8 __user *)src;
-> +
->   		if (__get_user(d1, s))
->   			goto fault;
->   		memcpy(buf, &d1, 1);
->   		break;
-> -	case 2:
-> +	}
-> +	case 2: {
-> +		u16 d2;
-> +		u16 __user *s = (u16 __user *)src;
-> +
->   		if (__get_user(d2, s))
->   			goto fault;
->   		memcpy(buf, &d2, 2);
->   		break;
-> -	case 4:
-> +	}
-> +	case 4: {
-> +		u32 d4;
-> +		u32 __user *s = (u32 __user *)src;
-> +
->   		if (__get_user(d4, s))
->   			goto fault;
->   		memcpy(buf, &d4, 4);
->   		break;
-> -	case 8:
-> +	}
-> +	case 8: {
-> +		u64 d8;
-> +		u64 __user *s = (u64 __user *)src;
->   		if (__get_user(d8, s))
->   			goto fault;
->   		memcpy(buf, &d8, 8);
->   		break;
-> +	}
->   	default:
->   		WARN_ONCE(1, "%s: Invalid size: %zu\n", __func__, size);
->   		return ES_UNSUPPORTED;
+> I think I prefer making the vCPU a required argument. If anyone's going to
+> pull a vCPU pointer out of their posterior, let the caller do it.
 > 
 
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+I understand that feeling, but still using the running vCPU is by far 
+the common case, and it's not worth adding a new function parameter to 
+all call sites.
+
+What about using a separate function, possibly __-prefixed, for the case 
+where you have a very specific vCPU?
+
+Paolo
 
