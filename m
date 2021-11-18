@@ -2,154 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A93E7455E89
-	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 15:49:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E2F0455E8C
+	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 15:49:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229734AbhKROwA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Nov 2021 09:52:00 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:27634 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229836AbhKROvy (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 18 Nov 2021 09:51:54 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1AIEfWUC029239
-        for <kvm@vger.kernel.org>; Thu, 18 Nov 2021 14:48:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=CEzERD41iqdaC/zb13bQCtTx3OJT50NH3EnQOjjs+i0=;
- b=lrwdSs26ft0L9g7gwgGg1bARogr76aW8ywVzDFdxdK2AW1M2xGar6zJ3P5d+MfB1kG3D
- a/1dRY50UXFascErVXjkPmZJYQLmpdh9Zsh14MEs0RD2sV5GqRWsxfzCW5JUF5QNHpEm
- xGP9FYARVZsQGVd83KpTTESwxKPxwKYlNlVHFxOBV9gI63b3eD2FNNvUCwh3fj7/Bmr8
- eFtdiGb0kejqymkjoxXV1SjrUztrCmEDrrCjMIWi9AC8AzPKUoEGWTLqbdGeOi5kCWyX
- vAuHhe4x09e6bRW82fgl8Fp6WQ4lR8ayJ8v4IGc4frMkHDAMwcNcZB2tQ8xecEkeG/c5 fg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cdrtjr5vr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 18 Nov 2021 14:48:52 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1AIEgujm006444
-        for <kvm@vger.kernel.org>; Thu, 18 Nov 2021 14:48:51 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cdrtjr5uy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 18 Nov 2021 14:48:51 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1AIEfRXl008502;
-        Thu, 18 Nov 2021 14:48:49 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 3ca4mkf1m9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 18 Nov 2021 14:48:49 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1AIEmkjj26542422
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 18 Nov 2021 14:48:46 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 12BAEAE05F;
-        Thu, 18 Nov 2021 14:48:46 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AAA64AE055;
-        Thu, 18 Nov 2021 14:48:45 +0000 (GMT)
-Received: from [9.171.84.168] (unknown [9.171.84.168])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 18 Nov 2021 14:48:45 +0000 (GMT)
-Message-ID: <2b7cdcb3-a8cf-5fa9-4cbd-70586966bc73@linux.ibm.com>
-Date:   Thu, 18 Nov 2021 15:49:20 +0100
+        id S230510AbhKROwj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Nov 2021 09:52:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48692 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230477AbhKROwj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Nov 2021 09:52:39 -0500
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CA9EC06173E
+        for <kvm@vger.kernel.org>; Thu, 18 Nov 2021 06:49:39 -0800 (PST)
+Received: by mail-pl1-x62b.google.com with SMTP id u17so5435469plg.9
+        for <kvm@vger.kernel.org>; Thu, 18 Nov 2021 06:49:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=yfgOishc+iyGnpLtUV02QcOrbhlHMbh/VRP7OyAqEeU=;
+        b=I7gH33SMM5K528hZc6oE7o1NwZqPOQ14ApO241MZe44zhrW7cwQufQUf1DTDuXQQJj
+         6o100rddBL1u5trO+IAK9O6mdBmPUMTRX+Aw56d/IzRlHp6zeI7+m68y9LpcJcbdGzWG
+         nwUm1j+c6PItm4wk76vOblRyU2c4Ivz8vPeEs5w3E2NzgF7VcpsD/2HXbURoqIroyWtb
+         57XZoA5ZmlOORhMW4VOpYow0829BbFn3jvX7vXl4qkQfrshfkScZ80Jr4vifMbISvA+J
+         f62pJlOWdatUUUmG9U7cR/egTojvWT+/cVkJqbGFlCO5/i/TiRF8bq0a+GPjYCkL1FBT
+         Ftwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=yfgOishc+iyGnpLtUV02QcOrbhlHMbh/VRP7OyAqEeU=;
+        b=CKls7FBlnC+IXI4gMEqFH42sVenRZplUsjOgFCtMaUPP3lKqF4RMJa9PQ3ytVo90Gh
+         xiYERkJ4/kK/zwZAD7gwfyPV1BWB9reIr04Rl2wSWjnEZaCRnavGzQicIBR+f+Jr40qu
+         poIQlNOzHHbC7sIM9WyQPaYWK2hMFITaf7n+G2WI+SEGix+XdeDUnQsqcGbuWA0kHhvJ
+         KeoM+qOBODQ+VYni7eJ/1GP53QnxXHIA5rNFV85Vf7dAc9RWBhsS4r7bgIhMqBqXUkCL
+         DK+KCe+/iAWOmXbiiMae/8nmQXFng2Evt5zW8z+JZQUs++0usovEVnSZ1Tn0dLLIFzVX
+         AVxA==
+X-Gm-Message-State: AOAM530/EvowTq5AbPLtCX6mlvfrBZMjI+ilUdv0soaLAvi5hHy33+9T
+        aVCWACe1h1s641+HCfAsoFFNYnAVpM1qJg==
+X-Google-Smtp-Source: ABdhPJyUILYN6gmH9Qpi1vIeNx6IWkRkXkdABwGeC0vvHQ0h8OAD7bS8b6z47Bl/9u03gMPcQjWINA==
+X-Received: by 2002:a17:90b:4f4c:: with SMTP id pj12mr11150375pjb.217.1637246978538;
+        Thu, 18 Nov 2021 06:49:38 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id k20sm4241488pfc.83.2021.11.18.06.49.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Nov 2021 06:49:37 -0800 (PST)
+Date:   Thu, 18 Nov 2021 14:49:34 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Juergen Gross <jgross@suse.com>
+Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH v3 3/4] x86/kvm: add max number of vcpus for hyperv
+ emulation
+Message-ID: <YZZn/iWsi2H845w6@google.com>
+References: <20211116141054.17800-1-jgross@suse.com>
+ <20211116141054.17800-4-jgross@suse.com>
+ <YZVrDpjW0aZjFxo1@google.com>
+ <bfe38122-0ddd-d9bc-4927-942b051a39c4@suse.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [kvm-unit-tests PATCH v2] io: declare __cpu_is_be in generic code
-Content-Language: en-US
-To:     Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
-Cc:     frankja@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
-        imbrenda@linux.ibm.com
-References: <20211118134848.336943-1-pmorel@linux.ibm.com>
- <a646aee0-dc3d-d5d6-268a-7994c7b86789@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <a646aee0-dc3d-d5d6-268a-7994c7b86789@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: PZxJHh4Nj0cfbh3Zttr89ptH3GSH1v17
-X-Proofpoint-GUID: 9bzG2USQNFrwLrBMa7n_IaJdmoeEMaO7
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-11-18_12,2021-11-17_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 mlxscore=0
- lowpriorityscore=0 phishscore=0 impostorscore=0 mlxlogscore=999
- bulkscore=0 adultscore=0 clxscore=1015 spamscore=0 priorityscore=1501
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2111180081
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bfe38122-0ddd-d9bc-4927-942b051a39c4@suse.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Nov 18, 2021, Juergen Gross wrote:
+> On 17.11.21 21:50, Sean Christopherson wrote:
+> > > @@ -166,7 +166,7 @@ static struct kvm_vcpu *get_vcpu_by_vpidx(struct kvm *kvm, u32 vpidx)
+> > >   	struct kvm_vcpu *vcpu = NULL;
+> > >   	int i;
+> > > -	if (vpidx >= KVM_MAX_VCPUS)
+> > > +	if (vpidx >= min(KVM_MAX_VCPUS, KVM_MAX_HYPERV_VCPUS))
+> > 
+> > IMO, this is conceptually wrong.  KVM should refuse to allow Hyper-V to be enabled
+> > if the max number of vCPUs exceeds what can be supported, or should refuse to create
+> 
+> TBH, I wasn't sure where to put this test. Is there a guaranteed
+> sequence of ioctl()s regarding vcpu creation (or setting the max
+> number of vcpus) and the Hyper-V enabling?
 
+For better or worse (mostly worse), like all other things CPUID, Hyper-V is a per-vCPU
+knob.  If KVM can't detect the impossible condition at compile time, kvm_check_cpuid()
+is probably the right place to prevent enabling Hyper-V on an unreachable vCPU.
 
-On 11/18/21 15:45, Thomas Huth wrote:
-> On 18/11/2021 14.48, Pierre Morel wrote:
->> To use the swap byte transformations in big endian architectures,
->> we need to declare __cpu_is_be in the generic code.
->> Let's move it from the ppc code to the generic code.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> Suggested-by: Thomas Huth <thuth@redhat.com>
->> ---
->>   lib/asm-generic/io.h | 8 ++++++++
->>   lib/ppc64/asm/io.h   | 8 --------
->>   2 files changed, 8 insertions(+), 8 deletions(-)
->>
->> diff --git a/lib/asm-generic/io.h b/lib/asm-generic/io.h
->> index 88972f3b..9fa76ddb 100644
->> --- a/lib/asm-generic/io.h
->> +++ b/lib/asm-generic/io.h
->> @@ -13,6 +13,14 @@
->>   #include "asm/page.h"
->>   #include "asm/barrier.h"
->> +#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
->> +#define __cpu_is_be() (0)
->> +#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
->> +#define __cpu_is_be() (1)
->> +#else
->> +#error Undefined byte order
->> +#endif
+> > the vCPUs.  I agree it makes sense to add a Hyper-V specific limit, since there are
+> > Hyper-V structures that have a hard limit, but detection of violations should be a
+> > BUILD_BUG_ON, not a silent failure at runtime.
+> > 
 > 
-> Please remove these three later lines in that file now:
-> 
-> #ifndef __cpu_is_be
-> #define __cpu_is_be() (0)
-> #endif
-> 
->   Thomas
-> 
+> A BUILD_BUG_ON won't be possible with KVM_MAX_VCPUS being selecteble via
+> boot parameter.
 
-grrr, stupid me
-
-> 
->>   #ifndef __raw_readb
->>   static inline u8 __raw_readb(const volatile void *addr)
->>   {
->> diff --git a/lib/ppc64/asm/io.h b/lib/ppc64/asm/io.h
->> index 2b4dd2be..08d7297c 100644
->> --- a/lib/ppc64/asm/io.h
->> +++ b/lib/ppc64/asm/io.h
->> @@ -1,14 +1,6 @@
->>   #ifndef _ASMPPC64_IO_H_
->>   #define _ASMPPC64_IO_H_
->> -#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
->> -#define __cpu_is_be() (0)
->> -#elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
->> -#define __cpu_is_be() (1)
->> -#else
->> -#error Undefined byte order
->> -#endif
->> -
->>   #define __iomem
->>   #include <asm-generic/io.h>
->>
-> 
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
+I was thinking that there would still be a KVM-defined max that would cap whatever
+comes in from userspace.
