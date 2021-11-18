@@ -2,148 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 67824455852
-	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 10:52:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 72C3D455868
+	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 10:57:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245292AbhKRJzt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Nov 2021 04:55:49 -0500
-Received: from smtp-fw-9103.amazon.com ([207.171.188.200]:5237 "EHLO
-        smtp-fw-9103.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245287AbhKRJyW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Nov 2021 04:54:22 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
-  t=1637229083; x=1668765083;
-  h=from:to:cc:subject:date:message-id:content-id:
-   mime-version:content-transfer-encoding;
-  bh=qmsJzsuIciemmp4zdBevBtDHty8sywNOzaXrLohwo6Q=;
-  b=lRZBM6LSqwblL1KQEmqGd2BDf7SBkxwKrEG000dtmmB2qSkUHZYD51D0
-   IkKKzJ+CWDeTXc/3fFvMWj2/SytFcOSVW98IUjWTvKR1BaYsR/XRbhqNv
-   G4BeY0EPLN418DcHmBnteqDW1h5uHvAnMq8xqTRTojtMIp5bUfrIui1kc
-   g=;
-X-IronPort-AV: E=Sophos;i="5.87,244,1631577600"; 
-   d="scan'208,223";a="972553103"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2b-1f9d5b26.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-9103.sea19.amazon.com with ESMTP; 18 Nov 2021 09:51:08 +0000
-Received: from EX13D15EUA002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-        by email-inbound-relay-pdx-2b-1f9d5b26.us-west-2.amazon.com (Postfix) with ESMTPS id 094B241D14;
-        Thu, 18 Nov 2021 09:51:08 +0000 (UTC)
-Received: from EX13D15EUA003.ant.amazon.com (10.43.165.94) by
- EX13D15EUA002.ant.amazon.com (10.43.165.79) with Microsoft SMTP Server (TLS)
- id 15.0.1497.26; Thu, 18 Nov 2021 09:51:06 +0000
-Received: from EX13D15EUA003.ant.amazon.com ([10.43.165.94]) by
- EX13D15EUA003.ant.amazon.com ([10.43.165.94]) with mapi id 15.00.1497.026;
- Thu, 18 Nov 2021 09:51:06 +0000
-From:   "Barzen, Benjamin" <bbarzen@amazon.de>
-To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC:     Benjamin Barzen <b.barzen@barzen.io>,
-        "Barzen, Benjamin" <bbarzen@amazon.de>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>
-Subject: [kvm-unit-tests PATCH RESEND] x86/intel-iommu: check if DMA
- translation is enabled before testing it
-Thread-Topic: [kvm-unit-tests PATCH RESEND] x86/intel-iommu: check if DMA
- translation is enabled before testing it
-Thread-Index: AQHX3GHOrjHCaGsBYkCOfJkGRqe8CA==
-Date:   Thu, 18 Nov 2021 09:51:05 +0000
-Message-ID: <B5561618-963A-4750-A20C-03B937BE1CD6@amazon.de>
-Accept-Language: en-US
-Content-Language: en-GB
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.43.164.131]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <9A376AAB6E815F469FE72AB350D4AF71@amazon.com>
+        id S245360AbhKRKAI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Nov 2021 05:00:08 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:51412 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S245369AbhKRJ7T (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 18 Nov 2021 04:59:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1637229379;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=wEk0Ix6QqXBgVWnz008QmDW0QekiZrGZyqYEU0wf5p4=;
+        b=R1IVZ+gw68ytCyB3rtw5ziFoQjoDgGTHXTNx7+fHbDiEPoRatPdaXOndkZBNiOVpZ+6s+k
+        hK2CWHNvXRNUuIi7C6lmMMwW2YaXvwy/6F2hDITgvQE17CHEl/gs6ZLSXr46e7uIB0XN3G
+        nSbhHw2zKLUTLkZsBvZnK48Wvz/3CPg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-363-uqecaitHPRmsAKjQpphpBg-1; Thu, 18 Nov 2021 04:56:16 -0500
+X-MC-Unique: uqecaitHPRmsAKjQpphpBg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D81587D541;
+        Thu, 18 Nov 2021 09:56:14 +0000 (UTC)
+Received: from starship (unknown [10.40.194.243])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5D8CB5FC13;
+        Thu, 18 Nov 2021 09:56:12 +0000 (UTC)
+Message-ID: <8ad47d43a7c8ae19f09cc6ada73665d6e348e213.camel@redhat.com>
+Subject: Re: [PATCH v2] KVM: x86: check PIR even for vCPUs with disabled
+ APICv
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     stable@vger.kernel.org, Sean Christopherson <seanjc@google.com>
+Date:   Thu, 18 Nov 2021 11:56:11 +0200
+In-Reply-To: <20211118072531.1534938-1-pbonzini@redhat.com>
+References: <20211118072531.1534938-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-RnJvbSA3NGVhZWRlNjZmNzU4N2JmYjUyYTkyOWJjNTUzNDA0YTlhNDc2MzkyIE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQ0KRnJvbTogQmVuamFtaW4gQmFyemVuIDxiYmFyemVuQGFtYXpvbi5kZT4N
-CkRhdGU6IFdlZCwgMTcgTm92IDIwMjEgMTE6NDA6NTggKzAwMDANClN1YmplY3Q6IFtQQVRDSCBS
-RVNFTkRdIHg4Ni9pbnRlbC1pb21tdTogY2hlY2sgaWYgRE1BIHRyYW5zbGF0aW9uIGlzIGVuYWJs
-ZWQgYmVmb3JlIHRlc3RpbmcgaXQNCsKgDQpDb21taXQgWzFdIHRvIHRoZSBMaW51eCBrZXJuZWwg
-YWxsb3dzIGZvciB1bml0cyB3aGVyZSBvbmx5IGludGVycnVwdA0KcmVtYXBwaW5nIGlzIGltcGxl
-bWVudGVkLiBUbyBzaWduYWwgdGhpcyB0byB0aGUgZ3Vlc3Qgc3lzdGVtLCBhbGwgU0FHQVcNCmJp
-dHMgb2YgdGhlIERNQVIgY2FwYWJpbGl0eSByZWdpc3RlciBhcmUgc2V0IHRvIDAuIFRoaXMgY29t
-bWl0IGNoZWNrcyB0aGF0DQphdCBsZWFzdCBvbmUgU0FHQVcgYml0IGlzIHNldCBiZWZvcmUgcnVu
-bmluZyBETUEgdHJhbnNsYXRpb24gdGVzdHMuDQrCoA0KWzFdwqBodHRwczovL2dpdC5rZXJuZWwu
-b3JnL3B1Yi9zY20vbGludXgva2VybmVsL2dpdC90b3J2YWxkcy9saW51eC5naXQvY29tbWl0Lz9p
-ZD1jNDBhYWFhYzEwIA0KwqANClNpZ25lZC1vZmYtYnk6IEJlbmphbWluIEJhcnplbiA8YmJhcnpl
-bkBhbWF6b24uZGU+DQotLS0NCmxpYi94ODYvaW50ZWwtaW9tbXUuYyB8wqAgNyArKysrKy0tDQps
-aWIveDg2L2ludGVsLWlvbW11LmggfMKgIDMgKystDQp4ODYvaW50ZWwtaW9tbXUuY8KgwqDCoMKg
-IHwgMjIgKysrKysrKysrKysrKysrKy0tLS0tLQ0KMyBmaWxlcyBjaGFuZ2VkLCAyMyBpbnNlcnRp
-b25zKCspLCA5IGRlbGV0aW9ucygtKQ0KwqANCmRpZmYgLS1naXQgYS9saWIveDg2L2ludGVsLWlv
-bW11LmMgYi9saWIveDg2L2ludGVsLWlvbW11LmMNCmluZGV4IGM4MTFiYTUuLmY2ZjU2MzQgMTAw
-NjQ0DQotLS0gYS9saWIveDg2L2ludGVsLWlvbW11LmMNCisrKyBiL2xpYi94ODYvaW50ZWwtaW9t
-bXUuYw0KQEAgLTM1OCw4ICszNTgsMTEgQEAgdm9pZCB2dGRfaW5pdCh2b2lkKQ0KwqDCoMKgwqDC
-oMKgwqDCoHZ0ZF9kdW1wX2luaXRfaW5mbygpOw0KwqDCoMKgwqDCoMKgwqAgdnRkX2djbWRfb3Io
-VlREX0dDTURfUUkpOyAvKiBFbmFibGUgUUkgKi8NCi3CoMKgwqDCoMKgwqAgdnRkX3NldHVwX3Jv
-b3RfdGFibGUoKTsNCsKgwqDCoMKgwqDCoMKgIHZ0ZF9zZXR1cF9pcl90YWJsZSgpOw0KLcKgwqDC
-oMKgwqDCoCB2dGRfZ2NtZF9vcihWVERfR0NNRF9ETUFSKTsgLyogRW5hYmxlIERNQVIgKi8NCsKg
-wqDCoMKgwqDCoMKgIHZ0ZF9nY21kX29yKFZURF9HQ01EX0lSKTvCoMKgIC8qIEVuYWJsZSBJUiAq
-Lw0KKw0KK8KgwqDCoMKgIMKgwqBpZih2dGRfcmVhZHEoRE1BUl9DQVBfUkVHKSAmIFZURF9DQVBf
-U0FHQVcpew0KK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgdnRkX3NldHVwX3Jvb3RfdGFi
-bGUoKTsNCivCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHZ0ZF9nY21kX29yKFZURF9HQ01E
-X0RNQVIpOyAvKiBFbmFibGUgRE1BUiAqLw0KK8KgwqDCoMKgwqDCoCB9DQp9DQpkaWZmIC0tZ2l0
-IGEvbGliL3g4Ni9pbnRlbC1pb21tdS5oIGIvbGliL3g4Ni9pbnRlbC1pb21tdS5oDQppbmRleCBl
-MTRmODI1Li4xOTNkODY2IDEwMDY0NA0KLS0tIGEvbGliL3g4Ni9pbnRlbC1pb21tdS5oDQorKysg
-Yi9saWIveDg2L2ludGVsLWlvbW11LmgNCkBAIC0xMDAsNyArMTAwLDggQEANCiNkZWZpbmUgVlRE
-X0NBUF9TQUdBV18zOWJpdMKgwqDCoMKgwqDCoMKgwqAgKDB4MlVMTCA8PCBWVERfQ0FQX1NBR0FX
-X1NISUZUKQ0KLyogNDgtYml0IEFHQVcsIDQtbGV2ZWwgcGFnZS10YWJsZSAqLw0KI2RlZmluZSBW
-VERfQ0FQX1NBR0FXXzQ4Yml0wqDCoMKgwqDCoMKgwqDCoCAoMHg0VUxMIDw8IFZURF9DQVBfU0FH
-QVdfU0hJRlQpDQotI2RlZmluZSBWVERfQ0FQX1NBR0FXwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoCBWVERfQ0FQX1NBR0FXXzM5Yml0DQorLyogQWxsIFNBR0FXIGJpdHMgKi8NCisjZGVmaW5l
-IFZURF9DQVBfU0FHQVfCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICgweDFGVUxMIDw8IFZU
-RF9DQVBfU0FHQVdfU0hJRlQpDQrCoC8qIEJvdGggMUcvMk0gaHVnZSBwYWdlcyAqLw0KI2RlZmlu
-ZSBWVERfQ0FQX1NMTFBTwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAoKDFVTEwgPDwgMzQp
-IHwgKDFVTEwgPDwgMzUpKQ0KZGlmZiAtLWdpdCBhL3g4Ni9pbnRlbC1pb21tdS5jIGIveDg2L2lu
-dGVsLWlvbW11LmMNCmluZGV4IDQ0NDJmZTEuLjUyZjI1MmUgMTAwNjQ0DQotLS0gYS94ODYvaW50
-ZWwtaW9tbXUuYw0KKysrIGIveDg2L2ludGVsLWlvbW11LmMNCkBAIC0xNDAsMTQgKzE0MCwyMCBA
-QCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqYXJndltdKQ0KwqDCoMKgwqDCoMKgwqDCoHJlcG9y
-dCh2dGRfcmVhZGwoRE1BUl9GU1RTX1JFRykgPT0gMCwgImZhdWx0IHN0YXR1cyBjaGVjayIpOw0K
-wqDCoMKgwqDCoMKgwqAgcmVwb3J0KHZ0ZF9yZWFkbChETUFSX0dTVFNfUkVHKSAmIFZURF9HQ01E
-X1FJLCAiUUkgZW5hYmxlbWVudCIpOw0KLcKgwqDCoMKgwqDCoCByZXBvcnQodnRkX3JlYWRsKERN
-QVJfR1NUU19SRUcpICYgVlREX0dDTURfUk9PVCwgIkRNQVIgdGFibGUgc2V0dXAiKTsNCsKgwqDC
-oMKgwqDCoMKgIHJlcG9ydCh2dGRfcmVhZGwoRE1BUl9HU1RTX1JFRykgJiBWVERfR0NNRF9JUl9U
-QUJMRSwgIklSIHRhYmxlIHNldHVwIik7DQotwqDCoMKgwqDCoMKgIHJlcG9ydCh2dGRfcmVhZGwo
-RE1BUl9HU1RTX1JFRykgJiBWVERfR0NNRF9ETUFSLCAiRE1BUiBlbmFibGVtZW50Iik7DQrCoMKg
-wqDCoMKgwqDCoCByZXBvcnQodnRkX3JlYWRsKERNQVJfR1NUU19SRUcpICYgVlREX0dDTURfSVIs
-ICJJUiBlbmFibGVtZW50Iik7DQotwqDCoMKgwqDCoMKgIHJlcG9ydCh2dGRfcmVhZHEoRE1BUl9D
-QVBfUkVHKSAmIFZURF9DQVBfU0FHQVcsDQorDQorwqDCoMKgwqDCoCDCoGlmICh2dGRfcmVhZHEo
-RE1BUl9DQVBfUkVHKSAmIFZURF9DQVBfU0FHQVcpIHsNCivCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgIHJlcG9ydCh2dGRfcmVhZGwoRE1BUl9HU1RTX1JFRykgJiBWVERfR0NNRF9ST09ULCAi
-RE1BUiB0YWJsZSBzZXR1cCIpOw0KK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcmVwb3J0
-KHZ0ZF9yZWFkbChETUFSX0dTVFNfUkVHKSAmIFZURF9HQ01EX0RNQVIsICJETUFSIGVuYWJsZW1l
-bnQiKTsNCivCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHJlcG9ydCh2dGRfcmVhZHEoRE1B
-Ul9DQVBfUkVHKSAmIFZURF9DQVBfU0FHQVdfMzliaXQsDQrCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgICJETUFSIHN1cHBvcnQgMzkgYml0cyBhZGRyZXNzIHdpZHRoIik7DQotwqDCoMKgwqDC
-oMKgIHJlcG9ydCh2dGRfcmVhZHEoRE1BUl9DQVBfUkVHKSAmIFZURF9DQVBfU0xMUFMsDQotwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgIkRNQVIgc3VwcG9ydCBodWdlIHBhZ2VzIik7DQorwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCByZXBvcnQodnRkX3JlYWRxKERNQVJfQ0FQX1JFRykg
-JiBWVERfQ0FQX1NMTFBTLA0KK8KgwqDCoMKgIMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoCJETUFSIHN1cHBvcnQgaHVnZSBwYWdlcyIpOw0KK8KgwqDCoMKgwqDCoCB9IGVsc2Ug
-ew0KK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcHJpbnRmKCJETUFSIG1hcmtlZCBhcyBu
-b3QgaW1wbGVtZW50ZWQgYnkgbWFjaGluZSwiDQorwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgICIgc2tpcHBpbmcgRE1BUiBzZXR1cCBh
-bmQgdGVzdHMuXG4iKTsNCivCoMKgwqDCoMKgwqAgfQ0KwqDCoMKgwqDCoMKgwqDCoHJlcG9ydF9w
-cmVmaXhfcG9wKCk7DQpAQCAtMTYwLDcgKzE2NiwxMSBAQCBpbnQgbWFpbihpbnQgYXJnYywgY2hh
-ciAqYXJndltdKQ0KwqDCoMKgwqDCoMKgwqAgfSBlbHNlIHsNCsKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoCBwcmludGYoIkZvdW5kIEVEVSBkZXZpY2U6XG4iKTsNCsKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoCBwY2lfZGV2X3ByaW50KCZlZHVfZGV2LnBjaV9kZXYpOw0KLcKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgdnRkX3Rlc3RfZG1hcigpOw0KK8KgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqAgaWYgKHZ0ZF9yZWFkcShETUFSX0NBUF9SRUcpICYgVlREX0NBUF9TQUdB
-Vykgew0KK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHZ0ZF90
-ZXN0X2RtYXIoKTsNCivCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIH0gZWxzZSB7DQorwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcmVwb3J0X3NraXAoVlRE
-X1RFU1RfRE1BUl80Qik7DQorwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB9DQrCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgdnRkX3Rlc3RfaXIoKTsNCsKgwqDCoMKgwqDCoMKgIH0N
-Ci0twqANCjIuMzIuMA0KDQoNCgoKCkFtYXpvbiBEZXZlbG9wbWVudCBDZW50ZXIgR2VybWFueSBH
-bWJICktyYXVzZW5zdHIuIDM4CjEwMTE3IEJlcmxpbgpHZXNjaGFlZnRzZnVlaHJ1bmc6IENocmlz
-dGlhbiBTY2hsYWVnZXIsIEpvbmF0aGFuIFdlaXNzCkVpbmdldHJhZ2VuIGFtIEFtdHNnZXJpY2h0
-IENoYXJsb3R0ZW5idXJnIHVudGVyIEhSQiAxNDkxNzMgQgpTaXR6OiBCZXJsaW4KVXN0LUlEOiBE
-RSAyODkgMjM3IDg3OQoKCg==
+On Thu, 2021-11-18 at 02:25 -0500, Paolo Bonzini wrote:
+> The IRTE for an assigned device can trigger a POSTED_INTR_VECTOR even
+> if APICv is disabled on the vCPU that receives it.  In that case, the
+> interrupt will just cause a vmexit and leave the ON bit set together
+> with the PIR bit corresponding to the interrupt.
+100% true.
+> 
+> Right now, the interrupt would not be delivered until APICv is re-enabled.
+> However, fixing this is just a matter of always doing the PIR->IRR
+> synchronization, even if the vCPU has temporarily disabled APICv.
+> 
+> This is not a problem for performance, or if anything it is an
+> improvement.  First, in the common case where vcpu->arch.apicv_active is
+> true, one fewer check has to be performed.  Second, static_call_cond will
+> elide the function call if APICv is not present or disabled.  Finally,
+> in the case for AMD hardware we can remove the sync_pir_to_irr callback:
+> it is only needed for apic_has_interrupt_for_ppr, and that function
+> already has a fallback for !APICv.
+> 
+> Cc: stable@vger.kernel.org
+> Co-developed-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/kvm/lapic.c   |  2 +-
+>  arch/x86/kvm/svm/svm.c |  1 -
+>  arch/x86/kvm/x86.c     | 18 +++++++++---------
+>  3 files changed, 10 insertions(+), 11 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 759952dd1222..f206fc35deff 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -707,7 +707,7 @@ static void pv_eoi_clr_pending(struct kvm_vcpu *vcpu)
+>  static int apic_has_interrupt_for_ppr(struct kvm_lapic *apic, u32 ppr)
+>  {
+>  	int highest_irr;
+> -	if (apic->vcpu->arch.apicv_active)
+> +	if (kvm_x86_ops.sync_pir_to_irr)
+>  		highest_irr = static_call(kvm_x86_sync_pir_to_irr)(apic->vcpu);
+
+>  	else
+>  		highest_irr = apic_find_highest_irr(apic);
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 5630c241d5f6..d0f68d11ec70 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -4651,7 +4651,6 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+>  	.load_eoi_exitmap = svm_load_eoi_exitmap,
+>  	.hwapic_irr_update = svm_hwapic_irr_update,
+>  	.hwapic_isr_update = svm_hwapic_isr_update,
+> -	.sync_pir_to_irr = kvm_lapic_find_highest_irr,
+>  	.apicv_post_state_restore = avic_post_state_restore,
+>  
+>  	.set_tss_addr = svm_set_tss_addr,
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 627c955101a0..a8f12c83db4b 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -4448,8 +4448,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
+>  static int kvm_vcpu_ioctl_get_lapic(struct kvm_vcpu *vcpu,
+>  				    struct kvm_lapic_state *s)
+>  {
+> -	if (vcpu->arch.apicv_active)
+> -		static_call(kvm_x86_sync_pir_to_irr)(vcpu);
+> +	static_call_cond(kvm_x86_sync_pir_to_irr)(vcpu);
+>  
+>  	return kvm_apic_get_state(vcpu, s);
+>  }
+> @@ -9528,8 +9527,7 @@ static void vcpu_scan_ioapic(struct kvm_vcpu *vcpu)
+>  	if (irqchip_split(vcpu->kvm))
+>  		kvm_scan_ioapic_routes(vcpu, vcpu->arch.ioapic_handled_vectors);
+>  	else {
+> -		if (vcpu->arch.apicv_active)
+> -			static_call(kvm_x86_sync_pir_to_irr)(vcpu);
+> +		static_call_cond(kvm_x86_sync_pir_to_irr)(vcpu);
+>  		if (ioapic_in_kernel(vcpu->kvm))
+>  			kvm_ioapic_scan_entry(vcpu, vcpu->arch.ioapic_handled_vectors);
+>  	}
+> @@ -9802,10 +9800,12 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>  
+>  	/*
+>  	 * This handles the case where a posted interrupt was
+> -	 * notified with kvm_vcpu_kick.
+> +	 * notified with kvm_vcpu_kick.  Assigned devices can
+> +	 * use the POSTED_INTR_VECTOR even if APICv is disabled,
+> +	 * so do it even if !kvm_vcpu_apicv_active(vcpu).
+>  	 */
+> -	if (kvm_lapic_enabled(vcpu) && vcpu->arch.apicv_active)
+> -		static_call(kvm_x86_sync_pir_to_irr)(vcpu);
+> +	if (kvm_lapic_enabled(vcpu))
+> +		static_call_cond(kvm_x86_sync_pir_to_irr)(vcpu);
+>  
+>  	if (kvm_vcpu_exit_request(vcpu)) {
+>  		vcpu->mode = OUTSIDE_GUEST_MODE;
+> @@ -9849,8 +9849,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+>  		if (likely(exit_fastpath != EXIT_FASTPATH_REENTER_GUEST))
+>  			break;
+>  
+> -		if (kvm_lapic_enabled(vcpu) && kvm->arch.apicv_active)
+> -			static_call(kvm_x86_sync_pir_to_irr)(vcpu);
+> +		if (kvm_lapic_enabled(vcpu))
+> +			static_call_cond(kvm_x86_sync_pir_to_irr)(vcpu);
+>  
+>  		if (unlikely(kvm_vcpu_exit_request(vcpu))) {
+>  			exit_fastpath = EXIT_FASTPATH_EXIT_HANDLED;
+
+
+vmx_sync_pir_to_irr has 'if (KVM_BUG_ON(!vcpu->arch.apicv_active, vcpu->kvm))'
+That has to be removed I think for this to work.
+
+Plus the above calls now can happen when APICv is fully disabled (and not just inhibited),
+which is also something that I think that vmx_sync_pir_to_irr should be fixed to be aware of.
+
+Also note that VMX has code that sets vmx_x86_ops.sync_pir_to_irr to NULL in its 'hardware_setup'
+if APICv is disabled. 
+I wonder if that done befor or after the static_call_cond sites are updated.
+
+I think that this code should be removed as well, and vmx_sync_pir_to_irr should just
+do nothing when APICv is fully disabled.
+
+I haven't run tested this code so I might be wrong of course.
+
+
+Best regards,
+	Maxim Levitsky
 
