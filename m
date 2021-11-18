@@ -2,146 +2,206 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E1104455285
-	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 03:12:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 579C0455288
+	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 03:13:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242469AbhKRCPc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Nov 2021 21:15:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47526 "EHLO
+        id S242481AbhKRCQv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Nov 2021 21:16:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242462AbhKRCPb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Nov 2021 21:15:31 -0500
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED144C061570
-        for <kvm@vger.kernel.org>; Wed, 17 Nov 2021 18:12:31 -0800 (PST)
-Received: by mail-pj1-x102c.google.com with SMTP id fv9-20020a17090b0e8900b001a6a5ab1392so4253158pjb.1
-        for <kvm@vger.kernel.org>; Wed, 17 Nov 2021 18:12:31 -0800 (PST)
+        with ESMTP id S241485AbhKRCQu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Nov 2021 21:16:50 -0500
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CAF5C061764
+        for <kvm@vger.kernel.org>; Wed, 17 Nov 2021 18:13:51 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id x18-20020a17090a789200b001a7317f995cso4118025pjk.4
+        for <kvm@vger.kernel.org>; Wed, 17 Nov 2021 18:13:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=A4BA9drk3T915Gv5BUziX7aipJ2k8U9h+N8xeIjFfWY=;
-        b=RYTMLpgJFpGPSbbh5jqrW6uo91lleQGsSoLGj5Lo6/gpUtPAXzczZPTTl2vm/aCdOj
-         /2n5VTnIQZxIh0TD1PkodzMm5Ui39R2BbaKWV/9ogRhX65JBZrrB9zVonBSOiOJuGUF9
-         dIZPYoPaUMkX5mZ0D2n94sf0xcxPVB0ifGqtMc1UgWrtdQGWVI+FSd3UgJ69BVt1hTsT
-         OeG+fO4XJ+40wzpGicy8JZaMXKBzGTSuSV5qxgBnNHaonPHFGbURJ/58GY1hsbdZhqd0
-         K0Cm2Bx0Lx2LWaujNexKoM2KGUCmBWuhuiRXav/xmlCFOZMqGsdCynDabe3FCoahdh3S
-         zYUA==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=2Js2iHBO2bZVfNMqUVey3hZaIS7yAI9P1HePKZNMPjA=;
+        b=StB2FGyNfxc2zpcYOPcBGNktxSHAjN23Ec7WAeY4so4yqYSmScPquLDjh/m9LV6HoD
+         fdeYbBmfy+fBMvCLrQIkwr8RtHFOeN66RsiUBCKDCuLcXaIUOctrG8WTCjEwgJngXVGn
+         Mml8YfwIFTYHOJbx6McEHlVqRUwkcpoNbjf0G1FcfxeKoMU43aHKxgx3IYNasIznozau
+         eWsfRSHcaPAtEeVhpJTfs7WqRiu7tzIzY2bhel28rQG0KKQ039eutWnGlNI5Ir8fg+64
+         zRuzue/dg6kjgVDJZJBAhtL6vltRf02h4jcympZOGzVIrxcAiGrW0IHStrnbaltYIxJY
+         h0hQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=A4BA9drk3T915Gv5BUziX7aipJ2k8U9h+N8xeIjFfWY=;
-        b=SkKWA1t8T1H3jtbxVtZqAj4/yPrxiajupbdqCY1scR/U3nW99VYdCes7AU777uV8uM
-         54FN3xva+ZRqs/2TgAVF+TE1viSIGuM48WSYjUi8BOHAIQ1A4TO8m3k/BpoR61QWnpb8
-         t/VfsMf8yMA1+1CpHRvY86r6/eYM6F8dvn5ccuJkf7af6DNCv+e0GgaiH+3oyn1Tc+8e
-         ijmyGT1igWcr8J4H7GsB2o0aRO4qvOGrzlG3xjhD4yln2koTbvTTqR+9+BrHRNvSf98/
-         RBeNZymp5eZOOhp18qaYzbU+frnya6BXF0VFCWtQGizy5zM05R4fzVTNGkeU5ZT3rtrq
-         /cIg==
-X-Gm-Message-State: AOAM532xPHNxt1HrcL4iNsBQ0xh2C9s5w9ZALN7D3ztMSu1iwct5ogyl
-        B+gxXg9Jr5e5dSprbMnjPyWsLiduX7h2Kg==
-X-Google-Smtp-Source: ABdhPJx4HUTSi1tcC4By2b4tFJQCysvVDAyNsAqdsK1ez/bi/mQTw5ipWI21Iz23z60sJBjTwdYDnQ==
-X-Received: by 2002:a17:902:d488:b0:141:f3a3:d2f4 with SMTP id c8-20020a170902d48800b00141f3a3d2f4mr62011801plg.86.1637201551314;
-        Wed, 17 Nov 2021 18:12:31 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id s15sm826250pjs.51.2021.11.17.18.12.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Nov 2021 18:12:30 -0800 (PST)
-Date:   Thu, 18 Nov 2021 02:12:27 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Keqian Zhu <zhukeqian1@huawei.com>,
-        David Hildenbrand <david@redhat.com>
-Subject: Re: [RFC 07/19] KVM: x86/mmu: Factor wrprot for nested PML out of
- make_spte
-Message-ID: <YZW2i7GnORD+X5NT@google.com>
-References: <20211110223010.1392399-1-bgardon@google.com>
- <20211110223010.1392399-8-bgardon@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211110223010.1392399-8-bgardon@google.com>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=2Js2iHBO2bZVfNMqUVey3hZaIS7yAI9P1HePKZNMPjA=;
+        b=sO3UYQEPTq6b33lWTmpTLFS9X8y+bKwKtagIxsVJlB2SHho0arqVAclcYxtl9ymTfn
+         hnSRmaSNRFBTImWNdjMTuOEWZXEA3MBRvWHoPubCwwGJj3SLSAos+lI+2M8nbSweoyoJ
+         oIM3sDrRTItr71rUW4XAi6Z9/PXJA8C4Ug31uvY9nd0B4MC9d9NdFgbwqm7WkciG/WzQ
+         VQFNxdC+mkyn2VHYx29lA/qdJvaG5SB3bE7HFiUPA25ZlUkEdhxHEsZUZ0ClXr32dqCU
+         ShGGUKP75g0kdfaQr70FDNUG7xl/6TlOFZhyjklNJJF1xB+gID+xF5flO70zEWx4l9uG
+         5c1g==
+X-Gm-Message-State: AOAM533mAg/x8wMH3yupTMNr9h+F9ou1Esyogo6axzLiFJZvvZ9Q0QlS
+        68IfNoQIfP0hfggOIrnj7vOeh4cM+C/dHg==
+X-Google-Smtp-Source: ABdhPJzVZ+TP2/CXOW9X27brrp2kSoZ7P1RxWqUT/XC+pIhpI+apST8WXWlgTXn/BrCtbSo7L3BMTH6FBf2RYg==
+X-Received: from tlingit.sea.corp.google.com ([2620:15c:17:3:48cc:d46b:ea6d:e005])
+ (user=sterritt job=sendgmr) by 2002:a17:90b:4b04:: with SMTP id
+ lx4mr5844564pjb.11.1637201630693; Wed, 17 Nov 2021 18:13:50 -0800 (PST)
+Date:   Wed, 17 Nov 2021 18:13:26 -0800
+Message-Id: <20211118021326.4134850-1-sterritt@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.34.0.rc2.393.gf8c9666880-goog
+Subject: [PATCH] Fix SEV-ES INS/OUTS instructions for word, dword, and qword.
+From:   Michael Sterritt <sterritt@google.com>
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, Joerg Roedel <jroedel@suse.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-coco@lists.linux.dev
+Cc:     marcorr@google.com, pgonda@google.com,
+        Michael Sterritt <sterritt@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 10, 2021, Ben Gardon wrote:
-> When running a nested VM, KVM write protects SPTEs in the EPT/NPT02
-> instead of using PML for dirty tracking. This avoids expensive
-> translation later, when emptying the Page Modification Log. In service
-> of removing the vCPU pointer from make_spte, factor the check for nested
-> PML out of the function.
+Properly type the operands being passed to __put_user()/__get_user().
+Otherwise, these routines truncate data for dependent instructions
+(e.g., INSW) and only read/write one byte.
 
-Aha!  The dependency on @vcpu can be avoided without having to take a flag from
-the caller.  The shadow page has everything we need.  The check is really "is this
-a page for L2 EPT".  The kvm_x86_ops.cpu_dirty_log_size gets us the EPT part, and
-kvm_mmu_page.guest_mode gets us the L2 part.
+Tested: Tested by sending a string with `REP OUTSW` to a port and then
+reading it back in with `REP INSW` on the same port. Previous behavior
+was to only send and receive the first char of the size. For example,
+word operations for "abcd" would only read/write "ac". With change, the
+full string is now written and read back.
 
-Compile tested only...
-
-From 773414e4fd7010c38ac89221d16089f3dcc57467 Mon Sep 17 00:00:00 2001
-From: Sean Christopherson <seanjc@google.com>
-Date: Wed, 17 Nov 2021 18:08:42 -0800
-Subject: [PATCH] KVM: x86/mmu: Use shadow page role to detect PML-unfriendly
- pages for L2
-
-Rework make_spte() to query the shadow page's role, specifically whether
-or not it's a guest_mode page, a.k.a. a page for L2, when determining if
-the SPTE is compatible with PML.  This eliminates a dependency on @vcpu,
-with a future goal of being able to create SPTEs without a specific vCPU.
-
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Michael Sterritt <sterritt@google.com>
+Reviewed-by: Marc Orr <marcorr@google.com>
+Reviewed-by: Peter Gonda <pgonda@google.com>
 ---
- arch/x86/kvm/mmu/mmu_internal.h | 7 +++----
- arch/x86/kvm/mmu/spte.c         | 2 +-
- 2 files changed, 4 insertions(+), 5 deletions(-)
+ arch/x86/kernel/sev.c | 57 +++++++++++++++++++++++++++++--------------
+ 1 file changed, 39 insertions(+), 18 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index 8ede43a826af..03882b2624c8 100644
---- a/arch/x86/kvm/mmu/mmu_internal.h
-+++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -109,7 +109,7 @@ static inline int kvm_mmu_page_as_id(struct kvm_mmu_page *sp)
- 	return kvm_mmu_role_as_id(sp->role);
- }
-
--static inline bool kvm_vcpu_ad_need_write_protect(struct kvm_vcpu *vcpu)
-+static inline bool kvm_mmu_page_ad_need_write_protect(struct kvm_mmu_page *sp)
+diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+index 74f0ec955384..a9fc2ac7a8bd 100644
+--- a/arch/x86/kernel/sev.c
++++ b/arch/x86/kernel/sev.c
+@@ -294,11 +294,6 @@ static enum es_result vc_write_mem(struct es_em_ctxt *ctxt,
+ 				   char *dst, char *buf, size_t size)
  {
+ 	unsigned long error_code = X86_PF_PROT | X86_PF_WRITE;
+-	char __user *target = (char __user *)dst;
+-	u64 d8;
+-	u32 d4;
+-	u16 d2;
+-	u8  d1;
+ 
  	/*
- 	 * When using the EPT page-modification log, the GPAs in the CPU dirty
-@@ -117,10 +117,9 @@ static inline bool kvm_vcpu_ad_need_write_protect(struct kvm_vcpu *vcpu)
- 	 * on write protection to record dirty pages, which bypasses PML, since
- 	 * writes now result in a vmexit.  Note, the check on CPU dirty logging
- 	 * being enabled is mandatory as the bits used to denote WP-only SPTEs
--	 * are reserved for NPT w/ PAE (32-bit KVM).
-+	 * are reserved for PAE paging (32-bit KVM).
+ 	 * This function uses __put_user() independent of whether kernel or user
+@@ -320,26 +315,42 @@ static enum es_result vc_write_mem(struct es_em_ctxt *ctxt,
+ 	 * instructions here would cause infinite nesting.
  	 */
--	return vcpu->arch.mmu == &vcpu->arch.guest_mmu &&
--	       kvm_x86_ops.cpu_dirty_log_size;
-+	return kvm_x86_ops.cpu_dirty_log_size && sp->role.guest_mode;
- }
-
- int mmu_try_to_unsync_pages(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
-diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
-index 0c76c45fdb68..84e64dbdd89e 100644
---- a/arch/x86/kvm/mmu/spte.c
-+++ b/arch/x86/kvm/mmu/spte.c
-@@ -101,7 +101,7 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
-
- 	if (sp->role.ad_disabled)
- 		spte |= SPTE_TDP_AD_DISABLED_MASK;
--	else if (kvm_vcpu_ad_need_write_protect(vcpu))
-+	else if (kvm_mmu_page_ad_need_write_protect(sp))
- 		spte |= SPTE_TDP_AD_WRPROT_ONLY_MASK;
-
+ 	switch (size) {
+-	case 1:
++	case 1: {
++		u8 d1;
++		u8 __user *target = (u8 __user *)dst;
++
+ 		memcpy(&d1, buf, 1);
+ 		if (__put_user(d1, target))
+ 			goto fault;
+ 		break;
+-	case 2:
++	}
++	case 2: {
++		u16 d2;
++		u16 __user *target = (u16 __user *)dst;
++
+ 		memcpy(&d2, buf, 2);
+ 		if (__put_user(d2, target))
+ 			goto fault;
+ 		break;
+-	case 4:
++	}
++	case 4: {
++		u32 d4;
++		u32 __user *target = (u32 __user *)dst;
++
+ 		memcpy(&d4, buf, 4);
+ 		if (__put_user(d4, target))
+ 			goto fault;
+ 		break;
+-	case 8:
++	}
++	case 8: {
++		u64 d8;
++		u64 __user *target = (u64 __user *)dst;
++
+ 		memcpy(&d8, buf, 8);
+ 		if (__put_user(d8, target))
+ 			goto fault;
+ 		break;
++	}
+ 	default:
+ 		WARN_ONCE(1, "%s: Invalid size: %zu\n", __func__, size);
+ 		return ES_UNSUPPORTED;
+@@ -362,11 +373,6 @@ static enum es_result vc_read_mem(struct es_em_ctxt *ctxt,
+ 				  char *src, char *buf, size_t size)
+ {
+ 	unsigned long error_code = X86_PF_PROT;
+-	char __user *s = (char __user *)src;
+-	u64 d8;
+-	u32 d4;
+-	u16 d2;
+-	u8  d1;
+ 
  	/*
---
+ 	 * This function uses __get_user() independent of whether kernel or user
+@@ -388,26 +394,41 @@ static enum es_result vc_read_mem(struct es_em_ctxt *ctxt,
+ 	 * instructions here would cause infinite nesting.
+ 	 */
+ 	switch (size) {
+-	case 1:
++	case 1: {
++		u8 d1;
++		u8 __user *s = (u8 __user *)src;
++
+ 		if (__get_user(d1, s))
+ 			goto fault;
+ 		memcpy(buf, &d1, 1);
+ 		break;
+-	case 2:
++	}
++	case 2: {
++		u16 d2;
++		u16 __user *s = (u16 __user *)src;
++
+ 		if (__get_user(d2, s))
+ 			goto fault;
+ 		memcpy(buf, &d2, 2);
+ 		break;
+-	case 4:
++	}
++	case 4: {
++		u32 d4;
++		u32 __user *s = (u32 __user *)src;
++
+ 		if (__get_user(d4, s))
+ 			goto fault;
+ 		memcpy(buf, &d4, 4);
+ 		break;
+-	case 8:
++	}
++	case 8: {
++		u64 d8;
++		u64 __user *s = (u64 __user *)src;
+ 		if (__get_user(d8, s))
+ 			goto fault;
+ 		memcpy(buf, &d8, 8);
+ 		break;
++	}
+ 	default:
+ 		WARN_ONCE(1, "%s: Invalid size: %zu\n", __func__, size);
+ 		return ES_UNSUPPORTED;
+-- 
+2.34.0.rc2.393.gf8c9666880-goog
+
