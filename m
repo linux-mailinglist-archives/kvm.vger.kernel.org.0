@@ -2,115 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B351945629C
-	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 19:40:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 656F24562CB
+	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 19:46:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229662AbhKRSnw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Nov 2021 13:43:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46084 "EHLO
+        id S231127AbhKRSty (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Nov 2021 13:49:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47616 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230499AbhKRSnw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Nov 2021 13:43:52 -0500
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 236B6C06173E
-        for <kvm@vger.kernel.org>; Thu, 18 Nov 2021 10:40:52 -0800 (PST)
-Received: by mail-pl1-x633.google.com with SMTP id b11so5995018pld.12
-        for <kvm@vger.kernel.org>; Thu, 18 Nov 2021 10:40:52 -0800 (PST)
+        with ESMTP id S229812AbhKRSty (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Nov 2021 13:49:54 -0500
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 601E5C061574
+        for <kvm@vger.kernel.org>; Thu, 18 Nov 2021 10:46:53 -0800 (PST)
+Received: by mail-wr1-x42b.google.com with SMTP id s13so13456022wrb.3
+        for <kvm@vger.kernel.org>; Thu, 18 Nov 2021 10:46:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=grrMnij3a2kLK2nD9/+zi8H0lxQV5j7EQVRD7AIwS2E=;
-        b=DnjI9osT+moWRQdwwunhhgYe2YGuzWKrQy5JwjvEJNUqQcpvnb0WoX5Pei6uXI5OdC
-         7eGLhv3YIzk62P6sC5D7JBPnUohj6O7s664U/+jqNIv857J2ijyYc9lxkutY0si+1Jso
-         ztfH/9rMsVdRRal+62dCEzvALKr3rtl5XahGBeHA8m4ynGczBHkUGlN7RYWuUfQGcFke
-         WSfMnan0Kg6M9yWEVCFKWFu1Oy/he0ioyfZD1myK/YDRWIUpBN/5hc73yoNPRxPOyT9C
-         VLzYMyPNfdN9orn15Wn6MlOWGc4Qs8aD/O0pRMiPP4mF4KE17PRSHz5sCFRZguQ3AWZA
-         KcTA==
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=XS343c0IO3niqftwP4v6K7OUkGkeIMiA5I+9ZdZYBh0=;
+        b=zjCZRzmU5VCoORz9MR7qg3iHeYGB+ARqpBgEFkojvl3nOwIzmuTPU5pdKUpWT8la3D
+         UGY2TfUGFT4IEnWlBAxDQbMkUvtFSzNFeJogW9rLHEt6T2HeHxTkT2xjszrOKBdtUFb9
+         HDYwnutRjR2KmtByWx8sGIFQ9tOlC16XfCsOjBG34gpIOtSvCfOaLbsfTOkaX+bQWFhq
+         oOgZPpjmyct9bW6VdtSvsKyWBNv6blWpTi+XmkhSew3RZDofHkbxCG/imoO5BTFK/4fA
+         3w7GEk/JPKDNoNsdN20Tm53RgVUyMk9bcZUxmPoeqoX1f3rybUdDDJYupwV2fRG6wp+b
+         73Ag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=grrMnij3a2kLK2nD9/+zi8H0lxQV5j7EQVRD7AIwS2E=;
-        b=1wpocJLqfDl+6DRCW2mNAQIeM/9zfjGM+DnzMKGyGBqxpjKFG87CLpl9qe7cDPIO19
-         7gGaaLQjbQFVJWyg+XpN7jugcJTGEqhxBPSpVCDM2vN+TvVOvqHUd9YvrjLfcAAicxVL
-         m+uLkAFzsqJL6+4QTyaFeA+ek9Rpc/4HEFUtd7QmlH7AwYDJDdfxsHMPfQTBziXG8x2e
-         v5b/nzHvamFDJvJXlx/e4CGSLlIio274StUNlYPkragkqYmax9J3KYnjZa05plEH9T9Y
-         tJJz2nxiyS9AQluxXdeRpeUAxSCz5r2Hii49GqWS7kSF7Fwe9wdtentlba/WrNZPwEt4
-         IZRg==
-X-Gm-Message-State: AOAM533hZr0/V7oL4m35PSZMO0StXYSHcjT5fbDXuav/0x6HzH3BgR5R
-        NcnDuoXrmiOxl2lb9g+RqAMoMQ==
-X-Google-Smtp-Source: ABdhPJxTT+sS2hBA2CisuiyQO1bWgOM4L3odX2TF09Y4yJcQHjhUg5+FNsR41T/1dQnqfraxxzIiPQ==
-X-Received: by 2002:a17:90a:af94:: with SMTP id w20mr12506911pjq.223.1637260851435;
-        Thu, 18 Nov 2021 10:40:51 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id a12sm8600266pjq.16.2021.11.18.10.40.50
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=XS343c0IO3niqftwP4v6K7OUkGkeIMiA5I+9ZdZYBh0=;
+        b=0kliN04tLAIez+jA93zlHI+7SHozTVovRYvjCh4rsSTCM0fal7fDsw7bG5DFiLrugq
+         UlKS8Vl7hOTMsm8l3eCe7UZyUbHazRFpkfEq6D7aGM2k0sLIRC4Q4z/dm1HhdRzepUcq
+         zNhjGpz47WO1v2DkSxN3fcatDWl3pPezPVbiNL75xp4uGY2avuLnIywdlFLDkis3Rl68
+         usVm576pZehmJpcrRnCjB4gV0mtNK4oDJ1+zfr4wFm5tKedqF06M8VYqA3X1s7G3kwXt
+         PjTah7exCubIe/wDLywKczYpT8xPgRJ4ZI2+FY527PdKT8sDq3Vn6b8SYj69HKXIG/IN
+         /ywg==
+X-Gm-Message-State: AOAM533e/k15/uzQ8CE4YCkwQZuhnOdGQKiqJNCvZ43hXzkDKrO3tMlu
+        m8tFXMWZL85WOSGrG0XuocVTrw==
+X-Google-Smtp-Source: ABdhPJw2NzXqRxesIK9jA2HRDk+2Uk6jmBQZFD0hYkGO36LMi1zQxSDYgNlrw4ejSdORJel1NMHILw==
+X-Received: by 2002:adf:f012:: with SMTP id j18mr33404834wro.353.1637261211921;
+        Thu, 18 Nov 2021 10:46:51 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+        by smtp.gmail.com with ESMTPSA id 8sm9332039wmg.24.2021.11.18.10.46.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Nov 2021 10:40:50 -0800 (PST)
-Date:   Thu, 18 Nov 2021 18:40:47 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        "jmattson @ google . com" <jmattson@google.com>,
-        "wanpengli @ tencent . com" <wanpengli@tencent.com>,
-        "vkuznets @ redhat . com" <vkuznets@redhat.com>,
-        "mtosatti @ redhat . com" <mtosatti@redhat.com>,
-        "joro @ 8bytes . org" <joro@8bytes.org>, karahmed@amazon.com,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org
-Subject: Re: [PATCH v3 08/12] KVM: Propagate vcpu explicitly to
- mark_page_dirty_in_slot()
-Message-ID: <YZaeL5YztL3p1nLM@google.com>
-References: <20211117174003.297096-1-dwmw2@infradead.org>
- <20211117174003.297096-9-dwmw2@infradead.org>
- <85d9fec17f32c3eb9e100e56b91af050.squirrel@twosheds.infradead.org>
- <4c48546b-eb4a-dff7-cc38-5df54f73f5d4@redhat.com>
- <20b5952e76c54a3a5dfe5a898e3b835404ac6fb1.camel@infradead.org>
+        Thu, 18 Nov 2021 10:46:50 -0800 (PST)
+Received: from zen.lan (localhost [127.0.0.1])
+        by zen.linaroharston (Postfix) with ESMTP id 3D38D1FF96;
+        Thu, 18 Nov 2021 18:46:50 +0000 (GMT)
+From:   =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To:     kvm@vger.kernel.org
+Cc:     idan.horowitz@gmail.com, qemu-arm@nongnu.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        christoffer.dall@arm.com, maz@kernel.org,
+        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: [kvm-unit-tests PATCH v8 00/10] MTTCG sanity tests for ARM
+Date:   Thu, 18 Nov 2021 18:46:40 +0000
+Message-Id: <20211118184650.661575-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20b5952e76c54a3a5dfe5a898e3b835404ac6fb1.camel@infradead.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 18, 2021, David Woodhouse wrote:
-> That leaves the one in TDP MMU handle_changed_spte_dirty_log() which
-> AFAICT can trigger the same crash seen by butt3rflyh4ck — can't that
-> happen from a thread where kvm_get_running_vcpu() is NULL too? For that
-> one I'm not sure.
+Hi,
 
-I think could be trigger in the TDP MMU via kvm_mmu_notifier_release()
--> kvm_mmu_zap_all(), e.g. if the userspace VMM exits while dirty logging is
-enabled.  That should be easy to (dis)prove via a selftest.
+It's been a long time since I last posted these but I'd like to
+incorporate some MTTCG tests into QEMU's upstream acceptance tests and
+a first step is getting these up-streamed. Most of the changes are
+fixing up the numerous checkpatch failures (although isaac remains
+unchanged and some warnings make no sense for kvm-unit-tests).
 
-And for the record :-)
+I dropped an additional test which attempts to test for data flush
+behaviour but it still needs some work:
 
-On Mon, Dec 02, 2019 at 12:10:36PM -0800, Sean Christopherson wrote:
-> IMO, adding kvm_get_running_vcpu() is a hack that is just asking for future
-> abuse and the vcpu/vm/as_id interactions in mark_page_dirty_in_ring()
-> look extremely fragile.
+  https://github.com/stsquad/kvm-unit-tests/commit/712eb3a287df24cdeff00ef966d68aef6ff2b8eb
 
-On 03/12/19 20:01, Sean Christopherson wrote:
-> In case it was clear, I strongly dislike adding kvm_get_running_vcpu().
-> IMO, it's a unnecessary hack.  The proper change to ensure a valid vCPU is
-> seen by mark_page_dirty_in_ring() when there is a current vCPU is to
-> plumb the vCPU down through the various call stacks.
+Alex Bennée (10):
+  docs: mention checkpatch in the README
+  arm/flat.lds: don't drop debug during link
+  Makefile: add GNU global tags support
+  run_tests.sh: add --config option for alt test set
+  lib: add isaac prng library from CCAN
+  arm/tlbflush-code: TLB flush during code execution
+  arm/locking-tests: add comprehensive locking test
+  arm/barrier-litmus-tests: add simple mp and sal litmus tests
+  arm/run: use separate --accel form
+  arm/tcg-test: some basic TCG exercising tests
+
+ arm/run                   |   4 +-
+ run_tests.sh              |  11 +-
+ Makefile                  |   5 +-
+ arm/Makefile.arm          |   2 +
+ arm/Makefile.arm64        |   2 +
+ arm/Makefile.common       |   6 +-
+ lib/arm/asm/barrier.h     |  61 ++++++
+ lib/arm64/asm/barrier.h   |  50 +++++
+ lib/prng.h                |  82 +++++++
+ lib/prng.c                | 162 ++++++++++++++
+ arm/flat.lds              |   1 -
+ arm/tcg-test-asm.S        | 171 +++++++++++++++
+ arm/tcg-test-asm64.S      | 170 ++++++++++++++
+ arm/barrier-litmus-test.c | 450 ++++++++++++++++++++++++++++++++++++++
+ arm/locking-test.c        | 322 +++++++++++++++++++++++++++
+ arm/spinlock-test.c       |  87 --------
+ arm/tcg-test.c            | 338 ++++++++++++++++++++++++++++
+ arm/tlbflush-code.c       | 209 ++++++++++++++++++
+ arm/mttcgtests.cfg        | 176 +++++++++++++++
+ README.md                 |   2 +
+ 20 files changed, 2216 insertions(+), 95 deletions(-)
+ create mode 100644 lib/prng.h
+ create mode 100644 lib/prng.c
+ create mode 100644 arm/tcg-test-asm.S
+ create mode 100644 arm/tcg-test-asm64.S
+ create mode 100644 arm/barrier-litmus-test.c
+ create mode 100644 arm/locking-test.c
+ delete mode 100644 arm/spinlock-test.c
+ create mode 100644 arm/tcg-test.c
+ create mode 100644 arm/tlbflush-code.c
+ create mode 100644 arm/mttcgtests.cfg
+
+-- 
+2.30.2
+
