@@ -2,105 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 36F784558D1
-	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 11:15:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5370A455904
+	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 11:26:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244908AbhKRKSe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Nov 2021 05:18:34 -0500
-Received: from mail.kernel.org ([198.145.29.99]:59242 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S244800AbhKRKQb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Nov 2021 05:16:31 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 471E661B7D;
-        Thu, 18 Nov 2021 10:13:31 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1mneQ5-006Hod-7k; Thu, 18 Nov 2021 10:13:29 +0000
-Date:   Thu, 18 Nov 2021 10:13:28 +0000
-Message-ID: <87mtm17ovr.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Anup Patel <anup.patel@wdc.com>
-Cc:     Will Deacon <will@kernel.org>, julien.thierry.kdev@gmail.com,
+        id S245134AbhKRK3J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Nov 2021 05:29:09 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:10124 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S243415AbhKRK3F (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 18 Nov 2021 05:29:05 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1AIABPfD011744;
+        Thu, 18 Nov 2021 10:26:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=m8OGdty1aA6IVWuRNAcYSIV5uW9EeB7e1U5YtYJ+HwA=;
+ b=Ztk2YE9uchCTVHvNQSI2WstTTnKC1+0Qi/6sAZExQpa0BQAsXagV/ob6kgLpJtj1LfL8
+ c2grmx/D4RSCeEe26vwRNTMvirvH3zn5eOR0hW5nyehrkW2E9xCe06ZrEGLXaVXy0OnO
+ 3qjGOsWpeKTZJN0J48fxrJcUQqAdElZbJGNI9DxwZB8JZb1LdZJdicY+mi8E9s3fsur/
+ fAIwpl0Ec+nBNmiDU06LWiPKQZ2ZR9mRA83xEsrxGybGbMrUOf/3oapZyOW1LQsyuGT/
+ P7jE1aMsE2eyG66IvDSyP+9cEAp3vSDoKRoHde95kU75eVBFxdnIMz5o8IClfDgsJGFu 4Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cdmv008ve-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Nov 2021 10:26:04 +0000
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1AIABkm7017004;
+        Thu, 18 Nov 2021 10:26:03 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cdmv008ut-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Nov 2021 10:26:03 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1AIAIddC014406;
+        Thu, 18 Nov 2021 10:26:01 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma05fra.de.ibm.com with ESMTP id 3ca50aj8nf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 18 Nov 2021 10:26:01 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1AIAPw1m32965090
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 18 Nov 2021 10:25:58 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 47BED52051;
+        Thu, 18 Nov 2021 10:25:58 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 0C02F5204F;
+        Thu, 18 Nov 2021 10:25:58 +0000 (GMT)
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org,
-        Vincent Chen <vincent.chen@sifive.com>
-Subject: Re: [PATCH v10 kvmtool 5/8] riscv: Add PLIC device emulation
-In-Reply-To: <20211116052130.173679-6-anup.patel@wdc.com>
-References: <20211116052130.173679-1-anup.patel@wdc.com>
-        <20211116052130.173679-6-anup.patel@wdc.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: anup.patel@wdc.com, will@kernel.org, julien.thierry.kdev@gmail.com, pbonzini@redhat.com, atishp@atishpatra.org, Alistair.Francis@wdc.com, anup@brainfault.org, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, vincent.chen@sifive.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+        Jonathan Corbet <corbet@lwn.net>
+Cc:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: s390: Fix names of skey constants in api documentation
+Date:   Thu, 18 Nov 2021 11:25:22 +0100
+Message-Id: <20211118102522.569660-1-scgl@linux.ibm.com>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: I-62SnQjNXul2OVFXqxtHTM-aoLhQTQP
+X-Proofpoint-ORIG-GUID: NA1tRtkHtwRKJBAmtgCga1wt-CPbO4IS
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
+ definitions=2021-11-18_04,2021-11-17_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ spamscore=0 phishscore=0 mlxscore=0 adultscore=0 bulkscore=0
+ mlxlogscore=999 clxscore=1011 impostorscore=0 malwarescore=0
+ lowpriorityscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2110150000 definitions=main-2111180059
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 16 Nov 2021 05:21:27 +0000,
-Anup Patel <anup.patel@wdc.com> wrote:
-> 
-> The PLIC (platform level interrupt controller) manages peripheral
-> interrupts in RISC-V world. The per-CPU interrupts are managed
-> using CPU CSRs hence virtualized in-kernel by KVM RISC-V.
-> 
-> This patch adds PLIC device emulation for KVMTOOL RISC-V.
-> 
-> Signed-off-by: Vincent Chen <vincent.chen@sifive.com>
-> [For PLIC context CLAIM register emulation]
-> Signed-off-by: Anup Patel <anup.patel@wdc.com>
-> ---
->  Makefile                     |   1 +
->  riscv/include/kvm/kvm-arch.h |   2 +
->  riscv/irq.c                  |   4 +-
->  riscv/plic.c                 | 518 +++++++++++++++++++++++++++++++++++
->  4 files changed, 523 insertions(+), 2 deletions(-)
->  create mode 100644 riscv/plic.c
->
+The are defined in include/uapi/linux/kvm.h as
+KVM_S390_GET_SKEYS_NONE and KVM_S390_SKEYS_MAX, but the
+api documetation talks of KVM_S390_GET_KEYS_NONE and
+KVM_S390_SKEYS_ALLOC_MAX respectively.
 
-[...]
+Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+---
+ Documentation/virt/kvm/api.rst | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-> +static void plic__context_write(struct plic_state *s,
-> +				struct plic_context *c,
-> +				u64 offset, void *data)
-> +{
-> +	u32 val;
-> +	bool irq_update = false;
-> +
-> +	mutex_lock(&c->irq_lock);
-> +
-> +	switch (offset) {
-> +	case CONTEXT_THRESHOLD:
-> +		val = ioport__read32(data);
-> +		val &= ((1 << PRIORITY_PER_ID) - 1);
-> +		if (val <= s->max_prio)
-> +			c->irq_priority_threshold = val;
-> +		else
-> +			irq_update = true;
-> +		break;
-> +	case CONTEXT_CLAIM:
-> +		val = ioport__read32(data);
-> +		if (val < plic.num_irq) {
-> +			c->irq_claimed[val / 32] &= ~(1 << (val % 32));
-> +			irq_update = true;
-> +		}
-
-This seems to ignore the nasty bit of the PLIC spec where a write to
-CLAIM is ignored if the interrupt is masked.
-
-	M.
-
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index aeeb071c7688..b86c7edae888 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -3701,7 +3701,7 @@ KVM with the currently defined set of flags.
+ :Architectures: s390
+ :Type: vm ioctl
+ :Parameters: struct kvm_s390_skeys
+-:Returns: 0 on success, KVM_S390_GET_KEYS_NONE if guest is not using storage
++:Returns: 0 on success, KVM_S390_GET_SKEYS_NONE if guest is not using storage
+           keys, negative value on error
+ 
+ This ioctl is used to get guest storage key values on the s390
+@@ -3720,7 +3720,7 @@ you want to get.
+ 
+ The count field is the number of consecutive frames (starting from start_gfn)
+ whose storage keys to get. The count field must be at least 1 and the maximum
+-allowed value is defined as KVM_S390_SKEYS_ALLOC_MAX. Values outside this range
++allowed value is defined as KVM_S390_SKEYS_MAX. Values outside this range
+ will cause the ioctl to return -EINVAL.
+ 
+ The skeydata_addr field is the address to a buffer large enough to hold count
+@@ -3744,7 +3744,7 @@ you want to set.
+ 
+ The count field is the number of consecutive frames (starting from start_gfn)
+ whose storage keys to get. The count field must be at least 1 and the maximum
+-allowed value is defined as KVM_S390_SKEYS_ALLOC_MAX. Values outside this range
++allowed value is defined as KVM_S390_SKEYS_MAX. Values outside this range
+ will cause the ioctl to return -EINVAL.
+ 
+ The skeydata_addr field is the address to a buffer containing count bytes of
 -- 
-Without deviation from the norm, progress is not possible.
+2.25.1
+
