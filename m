@@ -2,111 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8379B455219
-	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 02:19:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B6D6A45527A
+	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 03:05:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242193AbhKRBWk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 17 Nov 2021 20:22:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35662 "EHLO
+        id S242432AbhKRCIS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 17 Nov 2021 21:08:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242174AbhKRBWj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 17 Nov 2021 20:22:39 -0500
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44961C061570
-        for <kvm@vger.kernel.org>; Wed, 17 Nov 2021 17:19:40 -0800 (PST)
-Received: by mail-pj1-x102d.google.com with SMTP id h24so3791365pjq.2
-        for <kvm@vger.kernel.org>; Wed, 17 Nov 2021 17:19:40 -0800 (PST)
+        with ESMTP id S242427AbhKRCIR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 17 Nov 2021 21:08:17 -0500
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC6F6C061570
+        for <kvm@vger.kernel.org>; Wed, 17 Nov 2021 18:05:17 -0800 (PST)
+Received: by mail-pl1-x62f.google.com with SMTP id o14so3866229plg.5
+        for <kvm@vger.kernel.org>; Wed, 17 Nov 2021 18:05:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=R0Zw8wcDSXsa3WAhRYHWSbV2JP7EN2Oe5l2I61VKZ7U=;
-        b=CqO6PRm2DcZD7l7dscUM0meQfr+JgCmJ86nKpR3BNFAes2VmAUv+iho3ZOHMz7lUUV
-         AaFEIJrSlT8KpGBcFal0F71x78CwkinpkQyQqWBft82fgdxWv+KwVVFeY51OlRimNo5Z
-         AkrK94lXOS2Dw7cuKFwt6LcuYorqGyfTdoh0JvgiTRCZ8yGJf3kwM+HQnej5qDcbICyi
-         p9nBwv6Iwf1TTxLxgGniyOMEMHeANTqLb0LH0ZNf4ruBNJoCFLJEw7xxdyHvBX+XYoXe
-         cU9v98e2xYD/Fl3KR+W1fUk8oJy4D0+YZKjPaq2AcvqXN2WSva0qe+OZMTO+GKWR5lGQ
-         JZOA==
+        bh=UFmDZX3iZjmhuVQR+vjc6h7KMRvGK/W6qGNnrnIksJI=;
+        b=hEsvcYnEadPA6+b0djAbkweEqFuulYFEhfsUUAdZShhuJLcwjOufRelSUOU6Dwez8U
+         Dqc3aQX6FahSu/C7FU5UFvh/SDrSzs2f957l7nTjJtgl+qnGNevYYJKJ7R02mitbVCO+
+         QoJTdn/ILVJITrUuVeoxXjV7eYxAaf3gmKc+qFhJxcoVsufiPuHeL3L8VE3IkZ+QLSMK
+         BDpEM/8JZw2RjPQ/eekKdqim5pT3k1G0l+GaGEO5KowuLdbimYgM731P1xx/DILAgzYM
+         fi0lZ8iWqLGNE6UxiiXVzHm33TQ3AgaIoNvuYictx222GyKifm9HMMNBGp3tT7EeC3YG
+         azRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=R0Zw8wcDSXsa3WAhRYHWSbV2JP7EN2Oe5l2I61VKZ7U=;
-        b=53bvfmftGYe0xFkCiKV7lNGtxRUraxlPOJLAgvSuDAKoy6snmlzl1svPtFkwHCLU/s
-         G2WBsv24NzwVe/jpL/U6u9TgPp0p2ZSma/gYsBe8/z6YI53c63kNOFs3pTeRnkMr/QOR
-         Nh61wyOGre9rOriPrD6ChqDFgg3rRXIsqCKMbtw0Rq2I38pI5LNT4peIQoozNTEdr2ll
-         AvtKBeTlLTEAkZvElTH1CqK3Cc6vruSHP056D8wbbMSjbkhrN9EdLevMLyajgDgCRWZF
-         ywgpb8yG7907ZwGa233aOyQksclMxyjtZHHt19MSU/DC4lfP3lMdiNNZ4SN6rYESegg6
-         hx7Q==
-X-Gm-Message-State: AOAM532MetBYAFCj7GZH1+lOxbj2PeANax9sz0lskqUiS5pAjvN438X/
-        I5jdIG0vwRPfH5v52409iLxonQ==
-X-Google-Smtp-Source: ABdhPJzDSpDBUFH7PHioMGoNxz1NE2+zU4tyS8GjtYSaeWxuz75EqMOymOPiNhoiby6UmXj9vYk6lQ==
-X-Received: by 2002:a17:90b:4b89:: with SMTP id lr9mr5361350pjb.49.1637198379709;
-        Wed, 17 Nov 2021 17:19:39 -0800 (PST)
+        bh=UFmDZX3iZjmhuVQR+vjc6h7KMRvGK/W6qGNnrnIksJI=;
+        b=yrEalhMrBReSpOKuf+9B4xJ8n2fLGImkSODaLPQKvAHMe4+Y24ZTt6bW23vO9e9HUR
+         m84s4Db/A47q0Wjt+lKu6TbcuzguV3bl1W3Y6gAkYzyMshS4OSzPr2MqdL5VjSdmDldX
+         ANsiTGoWA39Jj/T0M5VjqajiuLdbgIraFux9tHSAA1f7KKy/JlSDH7bTHoork5FnDqQQ
+         pvkTBmg57Td8Kp4ZCMbEI6+6aLK2NCSqMSvQY8R4wHZnBaepK57sZaJRST+WbRCWQZ9Q
+         AMUIeZrZJWUaXUuXyDijF/8I5evUylRD3DpNWyrEuybi2AENJ0+eI8YefUJnvkZmEDYI
+         IPow==
+X-Gm-Message-State: AOAM5303ekWto/5OxrCWBi29wAIOpc+UMv6eRmCj/n4KSi4hxiT9iI8D
+        aXeMdKuCQRzFTKCKnHlWF03I/A==
+X-Google-Smtp-Source: ABdhPJyGYwQLyMPnIzlZjzcdU17UtKHkMGVxlOCCUMdlp8IjJ88xlZMgN5PPyznT5dNXAQrSz7G/UQ==
+X-Received: by 2002:a17:902:ab8d:b0:143:8d6f:2b52 with SMTP id f13-20020a170902ab8d00b001438d6f2b52mr61118529plr.78.1637201117095;
+        Wed, 17 Nov 2021 18:05:17 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id ng9sm7407071pjb.4.2021.11.17.17.19.39
+        by smtp.gmail.com with ESMTPSA id mq14sm7225211pjb.54.2021.11.17.18.05.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Nov 2021 17:19:39 -0800 (PST)
-Date:   Thu, 18 Nov 2021 01:19:35 +0000
+        Wed, 17 Nov 2021 18:05:16 -0800 (PST)
+Date:   Thu, 18 Nov 2021 02:05:12 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Yu Zhang <yu.c.zhang@linux.intel.com>
-Cc:     Robert Hoo <robert.hu@linux.intel.com>,
-        Jim Mattson <jmattson@google.com>, pbonzini@redhat.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, joro@8bytes.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH v1 3/5] KVM: x86: nVMX: VMCS12 field's read/write
- respects field existence bitmap
-Message-ID: <YZWqJwUrF2Id9hM2@google.com>
-References: <CALMp9eT+uAvPv7LhJKrJGDN31-aVy6DYBrP+PUDiTk0zWuCX4g@mail.gmail.com>
- <YVzeJ59/yCpqgTX2@google.com>
- <20211008082302.txckaasmsystigeu@linux.intel.com>
- <85da4484902e5a4b1be645669c95dba7934d98b5.camel@linux.intel.com>
- <CALMp9eTSkK2+-W8AVRdYv3MEsMKj-Xc2-v7DsavJRh5FLsVuCQ@mail.gmail.com>
- <3360abf3841a5d3234ac5983dd2df62b24e5fc47.camel@linux.intel.com>
- <CALMp9eQruRB3WEuwe2PEyEmbYUcJC_vR86Dd_wPTuqjb212h+w@mail.gmail.com>
- <32f506647ff99f58441ed1281c1db84599d48c8c.camel@linux.intel.com>
- <YYr3R8ehb/1tsCDj@google.com>
- <20211110053548.tewdtkebhl77dmye@linux.intel.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Keqian Zhu <zhukeqian1@huawei.com>,
+        David Hildenbrand <david@redhat.com>
+Subject: Re: [RFC 11/19] KVM: x86/mmu: Factor shadow_zero_check out of
+ make_spte
+Message-ID: <YZW02M0+YzAzBF/w@google.com>
+References: <20211110223010.1392399-1-bgardon@google.com>
+ <20211110223010.1392399-12-bgardon@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211110053548.tewdtkebhl77dmye@linux.intel.com>
+In-Reply-To: <20211110223010.1392399-12-bgardon@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 10, 2021, Yu Zhang wrote:
-> On Tue, Nov 09, 2021 at 10:33:43PM +0000, Sean Christopherson wrote:
-> > On Wed, Nov 03, 2021, Robert Hoo wrote:
-> > > On Fri, 2021-10-29 at 12:53 -0700, Jim Mattson wrote:
-> > > > On Fri, Oct 8, 2021 at 5:05 PM Robert Hoo <robert.hu@linux.intel.com>
-> > > > wrote:
-> > > > > 
-> > > > > On Fri, 2021-10-08 at 16:49 -0700, Jim Mattson wrote:
-> > > > > > We have some internal patches for virtualizing VMCS shadowing
-> > > > > > which
-> > > > > > may break if there is a guest VMCS field with index greater than
-> > > > > > VMX_VMCS_ENUM.MAX_INDEX. I plan to upstream them soon.
-> > > > > 
-> > > > > OK, thanks for letting us know.:-)
-> > > > 
-> > > > After careful consideration, we're actually going to drop these
-> > > > patches rather than sending them upstream.
-> > > 
-> > > OK.
-> > > 
-> > > Hi, Paolo, Sean and Jim,
-> > > 
-> > > Do you think our this series patch are still needed or can be dropped
-> > > as well?
-> > 
-> > IMO we should drop this series and take our own erratum.
-> > 
+On Wed, Nov 10, 2021, Ben Gardon wrote:
+> In the interest of devloping a version of make_spte that can function
+> without a vCPU pointer, factor out the shadow_zero_mask to be an
+> additional argument to the function.
 > 
-> Thanks, Sean.
+> No functional change intended.
 > 
-> Do we need a patch in kvm-unit-test to depricate the check against
-> the max index from MSR_IA32_VMX_VMCS_ENUM?
+> 
+> Signed-off-by: Ben Gardon <bgardon@google.com>
+> ---
+>  arch/x86/kvm/mmu/spte.c | 11 +++++++----
+>  arch/x86/kvm/mmu/spte.h |  3 ++-
+>  2 files changed, 9 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+> index b7271daa06c5..d3b059e96c6e 100644
+> --- a/arch/x86/kvm/mmu/spte.c
+> +++ b/arch/x86/kvm/mmu/spte.c
+> @@ -93,7 +93,8 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+>  	       struct kvm_memory_slot *slot, unsigned int pte_access,
+>  	       gfn_t gfn, kvm_pfn_t pfn, u64 old_spte, bool prefetch,
+>  	       bool can_unsync, bool host_writable, bool ad_need_write_protect,
+> -	       u64 mt_mask, u64 *new_spte)
+> +	       u64 mt_mask, struct rsvd_bits_validate *shadow_zero_check,
 
-Hmm, yes, unless there's an easy way to tell QEMU to not override the VMX MSRs.
-I don't see any point in fighting too hard with QEMU.
+Ugh, so I had a big email written about how I think we should add a module param
+to control 4-level vs. 5-level for all TDP pages, but then I realized it wouldn't
+work for nested EPT because that follows the root level used by L1.  We could
+still make a global non_nested_tdp_shadow_zero_check or whatever, but then make_spte()
+would have to do some work to find the right rsvd_bits_validate, and the end result
+would likely be a mess.
+
+One idea to avoid exploding make_spte() would be to add a backpointer to the MMU
+in kvm_mmu_page.  I don't love the idea, but I also don't love passing in rsvd_bits_validate.
