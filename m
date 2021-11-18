@@ -2,63 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 08E1F4562D2
-	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 19:47:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D4FE4562D9
+	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 19:47:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232058AbhKRSuA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Nov 2021 13:50:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47646 "EHLO
+        id S233609AbhKRSuG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Nov 2021 13:50:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47686 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232045AbhKRSt7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Nov 2021 13:49:59 -0500
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BA8AC061574
-        for <kvm@vger.kernel.org>; Thu, 18 Nov 2021 10:46:59 -0800 (PST)
-Received: by mail-wm1-x333.google.com with SMTP id j140-20020a1c2392000000b003399ae48f58so552893wmj.5
-        for <kvm@vger.kernel.org>; Thu, 18 Nov 2021 10:46:59 -0800 (PST)
+        with ESMTP id S229514AbhKRSuF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Nov 2021 13:50:05 -0500
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC777C061574
+        for <kvm@vger.kernel.org>; Thu, 18 Nov 2021 10:47:04 -0800 (PST)
+Received: by mail-wm1-x330.google.com with SMTP id p18so6239776wmq.5
+        for <kvm@vger.kernel.org>; Thu, 18 Nov 2021 10:47:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=eaPUXaq41WZH/h6GYRFaezaVsEA4ttJDyJAW7JSISJY=;
-        b=F2gHMH6vwR4xvqpoXWpgXJXoDksN1UxSEkEmbqmlD8hyupOtNFO3mGg1RFg2TX62I0
-         xaVKX0aL2NMGzFQ7eMYjleeolRXafF/TqwYxwneEasRcGVHXl9epK3WPRzqcTmi+iari
-         8D1slSEtOH3Kcb+9lMZCC5DUr/4MEXsoYBE5MKGETfA15XQ6FsHrOCcgkCH8hu/Ar5LW
-         w+aYUP1y+h/3dKHWBAedUL1pTKEzA2KvVoU2gHvciE3OMO5GFXa9/4ysbEzpyvaNQaO/
-         BibROcRlDz9v5WAQZTmIZvB17dBLXL1BiGJytnG6W9zHQHW0EGbhak1/43tvnoirJFAe
-         wCNQ==
+        bh=hk3bzlKoxpZyDrrCE6PtbaVaXFgnlPYcxwsdlufAHz0=;
+        b=I43S0rspR+9J8s4VPXSwP0qyAG5XgbNXHbzEd835vMuI7wuTMavLxF7tWdRLqOMS0y
+         e59iO9k++LXYhBppdh31y+jrY77McfWBpeFfblKi+SHAMwp3O9C6UfOFH2vWzw99n0W2
+         Fdw7EYaEqtfZtIObXsnYWMYOdEn3gM0oiW0glfAzGKRuEETBfs0Tx1h3d/14eoL0Ah5G
+         FGAOyCY3DSA6KazwWqVGE8YkG9pPRxJ1OhHQDVURFTtMPz37nA1d3MZV7ZQOjebdFXu/
+         2TNnrkru4w3C8CiMDUm+zUGlIZyl5WZpJOINtNhePY8GX7fsplROp928dF2Qr7yKuRlB
+         IE/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=eaPUXaq41WZH/h6GYRFaezaVsEA4ttJDyJAW7JSISJY=;
-        b=2d3pyrbFPUhDHNI9Ih/UEjvOZl9i8GBhUuRiNfTXpBYBZ9Oa9oGs65A6EYr5p26XxA
-         YEykhyk9+ftUXlNYXbhPqeaGvCqwmmhM/4sf2XXNACT4mYVNYAFqpIpnZySqSUZh1PoW
-         Srt2Nk8Ntzchorl/mtVIUNSYi6UgKrrbLPrj3BAyAPwUtJLBCM4Crt8VsrUR96+1aDty
-         SRCDoa40Kx760mRFckzlYEUoz4ZaxdvX/2vHrpyGLP/a9Sa5KRkLKtmRnCb8cpMhBRnt
-         bddnGBfPNDoLJ3Gkosx1YE0L6FnBwxUUB2MiRmgKdV4ecV3QodZ+vNbAp5CNNHnpZeiB
-         ATOA==
-X-Gm-Message-State: AOAM531dkDSzFRYsW4GBLz27tlSpBRqExw02sixu4dLHpwN2T8CJL99b
-        2xm1D0HZYLqcVdWBtmSM54SAgQ==
-X-Google-Smtp-Source: ABdhPJxi0gHTPCkCLhwz4sZpESe0ZsiFVHaJxtTlU8ot0566wwXQutX6kiYchOOZ+lORo2U9U57Iog==
-X-Received: by 2002:a1c:9a4f:: with SMTP id c76mr12329695wme.162.1637261217715;
-        Thu, 18 Nov 2021 10:46:57 -0800 (PST)
+        bh=hk3bzlKoxpZyDrrCE6PtbaVaXFgnlPYcxwsdlufAHz0=;
+        b=0crLsutgPGvUBU/JrZJMCtGBA9iSHBq4OJZisp7bPPCXjbT77vVhYW7OORTqOTLYE9
+         Jd94hmpaWTB828W2v+KUgDNWR4JzKCapINJOXvhupiR6OYqiRKygQEXFYGObPUcKL+rK
+         XqmMfCZCpwUMnMLT7lUkh9ChEHG0JBM0+Fxqh60EZ6KZm7IdYaHfQxNqbXWGyKoFdoNT
+         4LsetInEzgNWR1qYwiA0gJuZvDrY4mtArmiO2P97+zhgMOC7GnuI6Wf2Ct1RVneJxHNb
+         eE0Qk0ftMUU5TOlqNVtMfdBVE4vPe/O55G/A1KRyT7jczDLlgk+G4+3GsWVTsIgeSaE+
+         hjcw==
+X-Gm-Message-State: AOAM530Ue1o8bTbwNg1+vSk2BVo+tgj1jBZMDb1grlhEx8y6m1m6KQum
+        ZohxUkvzcRrhAAKU9m/S7DSUxw==
+X-Google-Smtp-Source: ABdhPJwenmIb9vjZ9kptMGO/3EYwW5+5ywUMVFwd1C+3xnaj5wrhMgI/Yra/+F6z1kZFHXsAdH4uSw==
+X-Received: by 2002:a7b:c257:: with SMTP id b23mr12531384wmj.67.1637261223275;
+        Thu, 18 Nov 2021 10:47:03 -0800 (PST)
 Received: from zen.linaroharston ([51.148.130.216])
-        by smtp.gmail.com with ESMTPSA id q26sm654555wrc.39.2021.11.18.10.46.50
+        by smtp.gmail.com with ESMTPSA id s8sm697055wra.9.2021.11.18.10.46.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Nov 2021 10:46:54 -0800 (PST)
+        Thu, 18 Nov 2021 10:46:55 -0800 (PST)
 Received: from zen.lan (localhost [127.0.0.1])
-        by zen.linaroharston (Postfix) with ESMTP id 583341FF9B;
+        by zen.linaroharston (Postfix) with ESMTP id 64ADB1FF9C;
         Thu, 18 Nov 2021 18:46:50 +0000 (GMT)
 From:   =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To:     kvm@vger.kernel.org
 Cc:     idan.horowitz@gmail.com, qemu-arm@nongnu.org,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         christoffer.dall@arm.com, maz@kernel.org,
-        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [kvm-unit-tests PATCH v8 04/10] run_tests.sh: add --config option for alt test set
-Date:   Thu, 18 Nov 2021 18:46:44 +0000
-Message-Id: <20211118184650.661575-5-alex.bennee@linaro.org>
+        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+        "Timothy B . Terriberry" <tterribe@xiph.org>,
+        Andrew Jones <drjones@redhat.com>
+Subject: [kvm-unit-tests PATCH v8 05/10] lib: add isaac prng library from CCAN
+Date:   Thu, 18 Nov 2021 18:46:45 +0000
+Message-Id: <20211118184650.661575-6-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211118184650.661575-1-alex.bennee@linaro.org>
 References: <20211118184650.661575-1-alex.bennee@linaro.org>
@@ -69,64 +71,300 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The upcoming MTTCG tests don't need to be run for normal KVM unit
-tests so lets add the facility to have a custom set of tests.
+It's often useful to introduce some sort of random variation when
+testing several racing CPU conditions. Instead of each test implementing
+some half-arsed PRNG bring in a a decent one which has good statistical
+randomness. Obviously it is deterministic for a given seed value which
+is likely the behaviour you want.
+
+I've pulled in the ISAAC library from CCAN:
+
+    http://ccodearchive.net/info/isaac.html
+
+I shaved off the float related stuff which is less useful for unit
+testing and re-indented to fit the style. The original license was
+CC0 (Public Domain) which is compatible with the LGPL v2 of
+kvm-unit-tests.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+CC: Timothy B. Terriberry <tterribe@xiph.org>
+Acked-by: Andrew Jones <drjones@redhat.com>
 ---
- run_tests.sh | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ arm/Makefile.common |   1 +
+ lib/prng.h          |  82 ++++++++++++++++++++++
+ lib/prng.c          | 162 ++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 245 insertions(+)
+ create mode 100644 lib/prng.h
+ create mode 100644 lib/prng.c
 
-diff --git a/run_tests.sh b/run_tests.sh
-index 9f233c5..b1088d2 100755
---- a/run_tests.sh
-+++ b/run_tests.sh
-@@ -15,7 +15,7 @@ function usage()
- {
- cat <<EOF
- 
--Usage: $0 [-h] [-v] [-a] [-g group] [-j NUM-TASKS] [-t]
-+Usage: $0 [-h] [-v] [-a] [-g group] [-j NUM-TASKS] [-t] [-c CONFIG]
- 
-     -h, --help      Output this help text
-     -v, --verbose   Enables verbose mode
-@@ -24,6 +24,7 @@ Usage: $0 [-h] [-v] [-a] [-g group] [-j NUM-TASKS] [-t]
-     -g, --group     Only execute tests in the given group
-     -j, --parallel  Execute tests in parallel
-     -t, --tap13     Output test results in TAP format
-+    -c, --config    Override default unittests.cfg
- 
- Set the environment variable QEMU=/path/to/qemu-system-ARCH to
- specify the appropriate qemu binary for ARCH-run.
-@@ -42,7 +43,7 @@ if [ $? -ne 4 ]; then
- fi
- 
- only_tests=""
--args=$(getopt -u -o ag:htj:v -l all,group:,help,tap13,parallel:,verbose -- $*)
-+args=$(getopt -u -o ag:htj:vc: -l all,group:,help,tap13,parallel:,verbose,config: -- $*)
- [ $? -ne 0 ] && exit 2;
- set -- $args;
- while [ $# -gt 0 ]; do
-@@ -73,6 +74,10 @@ while [ $# -gt 0 ]; do
-         -t | --tap13)
-             tap_output="yes"
-             ;;
-+        -c | --config)
-+            shift
-+            config=$1
-+            ;;
-         --)
-             ;;
-         *)
-@@ -152,7 +157,7 @@ function run_task()
- 
- : ${unittest_log_dir:=logs}
- : ${unittest_run_queues:=1}
--config=$TEST_DIR/unittests.cfg
-+: ${config:=$TEST_DIR/unittests.cfg}
- 
- rm -rf $unittest_log_dir.old
- [ -d $unittest_log_dir ] && mv $unittest_log_dir $unittest_log_dir.old
+diff --git a/arm/Makefile.common b/arm/Makefile.common
+index 38385e0..99bcf3f 100644
+--- a/arm/Makefile.common
++++ b/arm/Makefile.common
+@@ -44,6 +44,7 @@ cflatobjs += lib/pci-testdev.o
+ cflatobjs += lib/virtio.o
+ cflatobjs += lib/virtio-mmio.o
+ cflatobjs += lib/chr-testdev.o
++cflatobjs += lib/prng.o
+ cflatobjs += lib/arm/io.o
+ cflatobjs += lib/arm/setup.o
+ cflatobjs += lib/arm/mmu.o
+diff --git a/lib/prng.h b/lib/prng.h
+new file mode 100644
+index 0000000..bf5776d
+--- /dev/null
++++ b/lib/prng.h
+@@ -0,0 +1,82 @@
++/*
++ * PRNG Header
++ */
++#ifndef __PRNG_H__
++#define __PRNG_H__
++
++# include <stdint.h>
++
++
++
++typedef struct isaac_ctx isaac_ctx;
++
++
++
++/*This value may be lowered to reduce memory usage on embedded platforms, at
++  the cost of reducing security and increasing bias.
++  Quoting Bob Jenkins: "The current best guess is that bias is detectable after
++  2**37 values for [ISAAC_SZ_LOG]=3, 2**45 for 4, 2**53 for 5, 2**61 for 6,
++  2**69 for 7, and 2**77 values for [ISAAC_SZ_LOG]=8."*/
++#define ISAAC_SZ_LOG      (8)
++#define ISAAC_SZ          (1<<ISAAC_SZ_LOG)
++#define ISAAC_SEED_SZ_MAX (ISAAC_SZ<<2)
++
++
++
++/*ISAAC is the most advanced of a series of pseudo-random number generators
++  designed by Robert J. Jenkins Jr. in 1996.
++  http://www.burtleburtle.net/bob/rand/isaac.html
++  To quote:
++  No efficient method is known for deducing their internal states.
++  ISAAC requires an amortized 18.75 instructions to produce a 32-bit value.
++  There are no cycles in ISAAC shorter than 2**40 values.
++  The expected cycle length is 2**8295 values.*/
++struct isaac_ctx{
++	unsigned n;
++	uint32_t r[ISAAC_SZ];
++	uint32_t m[ISAAC_SZ];
++	uint32_t a;
++	uint32_t b;
++	uint32_t c;
++};
++
++
++/**
++ * isaac_init - Initialize an instance of the ISAAC random number generator.
++ * @_ctx:   The instance to initialize.
++ * @_seed:  The specified seed bytes.
++ *          This may be NULL if _nseed is less than or equal to zero.
++ * @_nseed: The number of bytes to use for the seed.
++ *          If this is greater than ISAAC_SEED_SZ_MAX, the extra bytes are
++ *           ignored.
++ */
++void isaac_init(isaac_ctx *_ctx,const unsigned char *_seed,int _nseed);
++
++/**
++ * isaac_reseed - Mix a new batch of entropy into the current state.
++ * To reset ISAAC to a known state, call isaac_init() again instead.
++ * @_ctx:   The instance to reseed.
++ * @_seed:  The specified seed bytes.
++ *          This may be NULL if _nseed is zero.
++ * @_nseed: The number of bytes to use for the seed.
++ *          If this is greater than ISAAC_SEED_SZ_MAX, the extra bytes are
++ *           ignored.
++ */
++void isaac_reseed(isaac_ctx *_ctx,const unsigned char *_seed,int _nseed);
++/**
++ * isaac_next_uint32 - Return the next random 32-bit value.
++ * @_ctx: The ISAAC instance to generate the value with.
++ */
++uint32_t isaac_next_uint32(isaac_ctx *_ctx);
++/**
++ * isaac_next_uint - Uniform random integer less than the given value.
++ * @_ctx: The ISAAC instance to generate the value with.
++ * @_n:   The upper bound on the range of numbers returned (not inclusive).
++ *        This must be greater than zero and less than 2**32.
++ *        To return integers in the full range 0...2**32-1, use
++ *         isaac_next_uint32() instead.
++ * Return: An integer uniformly distributed between 0 and _n-1 (inclusive).
++ */
++uint32_t isaac_next_uint(isaac_ctx *_ctx,uint32_t _n);
++
++#endif
+diff --git a/lib/prng.c b/lib/prng.c
+new file mode 100644
+index 0000000..ebd6df7
+--- /dev/null
++++ b/lib/prng.c
+@@ -0,0 +1,162 @@
++/*
++ * Pseudo Random Number Generator
++ *
++ * Lifted from ccan modules ilog/isaac under CC0
++ *   - http://ccodearchive.net/info/isaac.html
++ *   - http://ccodearchive.net/info/ilog.html
++ *
++ * And lightly hacked to compile under the KVM unit test environment.
++ * This provides a handy RNG for torture tests that want to vary
++ * delays and the like.
++ *
++ */
++
++/*Written by Timothy B. Terriberry (tterribe@xiph.org) 1999-2009.
++  CC0 (Public domain) - see LICENSE file for details
++  Based on the public domain implementation by Robert J. Jenkins Jr.*/
++
++#include "libcflat.h"
++
++#include <string.h>
++#include "prng.h"
++
++#define ISAAC_MASK        (0xFFFFFFFFU)
++
++/* Extract ISAAC_SZ_LOG bits (starting at bit 2). */
++static inline uint32_t lower_bits(uint32_t x)
++{
++	return (x & ((ISAAC_SZ-1) << 2)) >> 2;
++}
++
++/* Extract next ISAAC_SZ_LOG bits (starting at bit ISAAC_SZ_LOG+2). */
++static inline uint32_t upper_bits(uint32_t y)
++{
++	return (y >> (ISAAC_SZ_LOG+2)) & (ISAAC_SZ-1);
++}
++
++static void isaac_update(isaac_ctx *_ctx){
++	uint32_t *m;
++	uint32_t *r;
++	uint32_t  a;
++	uint32_t  b;
++	uint32_t  x;
++	uint32_t  y;
++	int       i;
++	m=_ctx->m;
++	r=_ctx->r;
++	a=_ctx->a;
++	b=_ctx->b+(++_ctx->c);
++	for(i=0;i<ISAAC_SZ/2;i++){
++		x=m[i];
++		a=(a^a<<13)+m[i+ISAAC_SZ/2];
++		m[i]=y=m[lower_bits(x)]+a+b;
++		r[i]=b=m[upper_bits(y)]+x;
++		x=m[++i];
++		a=(a^a>>6)+m[i+ISAAC_SZ/2];
++		m[i]=y=m[lower_bits(x)]+a+b;
++		r[i]=b=m[upper_bits(y)]+x;
++		x=m[++i];
++		a=(a^a<<2)+m[i+ISAAC_SZ/2];
++		m[i]=y=m[lower_bits(x)]+a+b;
++		r[i]=b=m[upper_bits(y)]+x;
++		x=m[++i];
++		a=(a^a>>16)+m[i+ISAAC_SZ/2];
++		m[i]=y=m[lower_bits(x)]+a+b;
++		r[i]=b=m[upper_bits(y)]+x;
++	}
++	for(i=ISAAC_SZ/2;i<ISAAC_SZ;i++){
++		x=m[i];
++		a=(a^a<<13)+m[i-ISAAC_SZ/2];
++		m[i]=y=m[lower_bits(x)]+a+b;
++		r[i]=b=m[upper_bits(y)]+x;
++		x=m[++i];
++		a=(a^a>>6)+m[i-ISAAC_SZ/2];
++		m[i]=y=m[lower_bits(x)]+a+b;
++		r[i]=b=m[upper_bits(y)]+x;
++		x=m[++i];
++		a=(a^a<<2)+m[i-ISAAC_SZ/2];
++		m[i]=y=m[lower_bits(x)]+a+b;
++		r[i]=b=m[upper_bits(y)]+x;
++		x=m[++i];
++		a=(a^a>>16)+m[i-ISAAC_SZ/2];
++		m[i]=y=m[lower_bits(x)]+a+b;
++		r[i]=b=m[upper_bits(y)]+x;
++	}
++	_ctx->b=b;
++	_ctx->a=a;
++	_ctx->n=ISAAC_SZ;
++}
++
++static void isaac_mix(uint32_t _x[8]){
++	static const unsigned char SHIFT[8]={11,2,8,16,10,4,8,9};
++	int i;
++	for(i=0;i<8;i++){
++		_x[i]^=_x[(i+1)&7]<<SHIFT[i];
++		_x[(i+3)&7]+=_x[i];
++		_x[(i+1)&7]+=_x[(i+2)&7];
++		i++;
++		_x[i]^=_x[(i+1)&7]>>SHIFT[i];
++		_x[(i+3)&7]+=_x[i];
++		_x[(i+1)&7]+=_x[(i+2)&7];
++	}
++}
++
++
++void isaac_init(isaac_ctx *_ctx,const unsigned char *_seed,int _nseed){
++	_ctx->a=_ctx->b=_ctx->c=0;
++	memset(_ctx->r,0,sizeof(_ctx->r));
++	isaac_reseed(_ctx,_seed,_nseed);
++}
++
++void isaac_reseed(isaac_ctx *_ctx,const unsigned char *_seed,int _nseed){
++	uint32_t *m;
++	uint32_t *r;
++	uint32_t  x[8];
++	int       i;
++	int       j;
++	m=_ctx->m;
++	r=_ctx->r;
++	if(_nseed>ISAAC_SEED_SZ_MAX)_nseed=ISAAC_SEED_SZ_MAX;
++	for(i=0;i<_nseed>>2;i++){
++		r[i]^=(uint32_t)_seed[i<<2|3]<<24|(uint32_t)_seed[i<<2|2]<<16|
++			(uint32_t)_seed[i<<2|1]<<8|_seed[i<<2];
++	}
++	_nseed-=i<<2;
++	if(_nseed>0){
++		uint32_t ri;
++		ri=_seed[i<<2];
++		for(j=1;j<_nseed;j++)ri|=(uint32_t)_seed[i<<2|j]<<(j<<3);
++		r[i++]^=ri;
++	}
++	x[0]=x[1]=x[2]=x[3]=x[4]=x[5]=x[6]=x[7]=0x9E3779B9U;
++	for(i=0;i<4;i++)isaac_mix(x);
++	for(i=0;i<ISAAC_SZ;i+=8){
++		for(j=0;j<8;j++)x[j]+=r[i+j];
++		isaac_mix(x);
++		memcpy(m+i,x,sizeof(x));
++	}
++	for(i=0;i<ISAAC_SZ;i+=8){
++		for(j=0;j<8;j++)x[j]+=m[i+j];
++		isaac_mix(x);
++		memcpy(m+i,x,sizeof(x));
++	}
++	isaac_update(_ctx);
++}
++
++uint32_t isaac_next_uint32(isaac_ctx *_ctx){
++	if(!_ctx->n)isaac_update(_ctx);
++	return _ctx->r[--_ctx->n];
++}
++
++uint32_t isaac_next_uint(isaac_ctx *_ctx,uint32_t _n){
++	uint32_t r;
++	uint32_t v;
++	uint32_t d;
++	do{
++		r=isaac_next_uint32(_ctx);
++		v=r%_n;
++		d=r-v;
++	}
++	while(((d+_n-1)&ISAAC_MASK)<d);
++	return v;
++}
 -- 
 2.30.2
 
