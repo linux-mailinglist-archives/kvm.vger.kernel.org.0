@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CAF1C4559C2
-	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 12:11:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 683E64559C4
+	for <lists+kvm@lfdr.de>; Thu, 18 Nov 2021 12:11:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343828AbhKRLOh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Nov 2021 06:14:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54294 "EHLO
+        id S1343848AbhKRLOn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 18 Nov 2021 06:14:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343635AbhKRLMm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Nov 2021 06:12:42 -0500
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 503C7C06121D;
-        Thu, 18 Nov 2021 03:08:47 -0800 (PST)
-Received: by mail-pf1-x430.google.com with SMTP id n26so5627310pff.3;
-        Thu, 18 Nov 2021 03:08:47 -0800 (PST)
+        with ESMTP id S1343781AbhKRLMo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 18 Nov 2021 06:12:44 -0500
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC4DDC061224;
+        Thu, 18 Nov 2021 03:08:52 -0800 (PST)
+Received: by mail-pf1-x432.google.com with SMTP id i12so5620559pfd.6;
+        Thu, 18 Nov 2021 03:08:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=/8DObiGFy1ZJgr/sl7IgJ6YAecXd6ICgL6Wv5yClO9k=;
-        b=THXQo6MHvGYoDnb5XubuHkCtaC6MFhwS+hunjE06Sjd6+HOJXgFTCZ6Fe0Nwj8la+9
-         DILH55iDqGdwHIcYiX20cgwdF4xtg678GAG5VQj7YDxEJuoGQw3GfdWrG6AtE4Rjp4+h
-         vF9bI1s54nw5rncYHJyCUKsO0w/MqdjzpKCDCloyJeAF59hpeVfDGzm1kAQEXNUszEzK
-         G/cUAe1H1FzS03jahJkTWDHw5tm6snRxcjPzmV1xqOi3T2a1KAYQ0Uy69nUpKYgwuXXq
-         kChYuQBMAWBUesXqF5UsKtQCc5qHc3Eq/GQZFTj1RDVlVqrxIT5I9stWvkttAoNX72iO
-         DuVA==
+        bh=ISbDnAZvCkNnZWiq8wIewWzuFvAywFkypxPVxiTn/no=;
+        b=fDk3vkgnsu9ix+Uq/GpfSjAaUah/0sJLYC6VSPogC3NB0IzF6jCVq88murhVg7bGQE
+         Kc2iHsg++txtFkCUiyNpP2OkF3YDr6hGnSSxP7p4Yuui5oPUwzLbIxerPvaoneAvLClt
+         029owMEhEwki8Kn7JzuiSKAiSHF5+uueIwlS6D4ynRgSDrbE6M/VR7CLKkdTWgAdzGwk
+         sKfl9yUkpPUCPobdAOX5bEgDpGf4byWAII0981YW/NgJqMv4QsYB3GDSfHTM1/df8lYJ
+         428lZKssJ5ur3zRfuP8hXq3AjW9dW7Y2CQRnl4COV70L9/wApLp7AMyJRqZ5glB5XR4G
+         8LqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=/8DObiGFy1ZJgr/sl7IgJ6YAecXd6ICgL6Wv5yClO9k=;
-        b=VGyzkCA/9lyOOs73VIK7m7ZrfvORmhKNJj5ldgRW2rsgFEm6E8aNgb+Le8K5hsMucJ
-         dIpLestltc+jcT8dShTlDh1S1q+Ir0cth8NhGmOtM2pJavtPCT9/1a6Jwmm6E3Ccf1D4
-         +nkPpj/X5gyCAGRUc+VI5i+kGRLYFHGPFuHi2S8t8RkbYeUQEYMWk8RhPNfUZcFqfEqX
-         6bzspZLbWu06dCdGWcWTzA+fi1/6D0qZAsG+0KY8kl/hnDkHtGi0NNto4QEjHS6KqMjD
-         D+y9G3pEvvwMYfGUcEJIedRBRM3HxqiBCGc4NQE79E6D3xSPREu6bW3mJlPCatZ+k8JV
-         F38A==
-X-Gm-Message-State: AOAM5306xOscIfh5cSUNHFsNxvb3dMYN/5GPIalRxl/u47cJ8y8HHusF
-        IUVUmyAiGwD8LNFJxdbZPz4hx+LdB3g=
-X-Google-Smtp-Source: ABdhPJxYrTn+tMOGRmDnifEVTL9jK4h4e0hO/vF8kKu8Me12kXsicDQW59R5/sBWSTivP1EGIV9Rxw==
-X-Received: by 2002:a05:6a00:1c65:b0:49f:d8d0:c5d9 with SMTP id s37-20020a056a001c6500b0049fd8d0c5d9mr13920696pfw.72.1637233726730;
-        Thu, 18 Nov 2021 03:08:46 -0800 (PST)
+        bh=ISbDnAZvCkNnZWiq8wIewWzuFvAywFkypxPVxiTn/no=;
+        b=qQTEpToz4IHx5fVtw1s8Xx95yYQsQQPkr2YIiAIClZcz2z4nkeMrHn9aKSld2gjdoJ
+         YKpkBJXwbYvqkj9KXQn+MnOPQDyp5D5vDT3hCRicq3DT415VLdl1h1ZrZ7Rtlt4gFk/y
+         Ks/9KJO58a1Tgq2Nc5JXLMflHVCaJP82axQaLnBlDZ8l3pxq3Ge+rsuj7BU5hlukgond
+         CBPWreNGLx4PnqDqgklcvISJm0AyT7qfswShZbwu35wTRg5ogjgWYYhul2VeaeQXWMRQ
+         tIlIl8uv3S3KO/22Lf9NqjVHMBK6Uukh+pAgupwzVzTYaglgpKHg8gtBZnwtwmlJ7fwm
+         SGLw==
+X-Gm-Message-State: AOAM533uZQuBd5HN7XVxhOcDSB8zz8HCQsrSr+xLstiDEa9Xesbvbc8G
+        Pqooh/XvV/mMO2z3Bf+VeCaU8p1p/UQ=
+X-Google-Smtp-Source: ABdhPJwtgAUJ8m882oG9AhS6YDRSLpX01XVkzwMuyNN2UhUdK4Lwij+vxgol7sq1FAVxN17bzXP/+g==
+X-Received: by 2002:a05:6a00:24cd:b0:49f:a4d8:3d43 with SMTP id d13-20020a056a0024cd00b0049fa4d83d43mr14300238pfv.49.1637233732315;
+        Thu, 18 Nov 2021 03:08:52 -0800 (PST)
 Received: from localhost ([47.88.60.64])
-        by smtp.gmail.com with ESMTPSA id a23sm2065793pgl.37.2021.11.18.03.08.45
+        by smtp.gmail.com with ESMTPSA id u32sm3152846pfg.220.2021.11.18.03.08.51
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 18 Nov 2021 03:08:46 -0800 (PST)
+        Thu, 18 Nov 2021 03:08:52 -0800 (PST)
 From:   Lai Jiangshan <jiangshanlai@gmail.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     kvm@vger.kernel.org, Lai Jiangshan <laijs@linux.alibaba.com>,
@@ -60,9 +60,9 @@ Cc:     kvm@vger.kernel.org, Lai Jiangshan <laijs@linux.alibaba.com>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
         "H. Peter Anvin" <hpa@zytor.com>
-Subject: [PATCH 07/15] KVM: VMX: Change comments about vmx_get_msr()
-Date:   Thu, 18 Nov 2021 19:08:06 +0800
-Message-Id: <20211118110814.2568-8-jiangshanlai@gmail.com>
+Subject: [PATCH 08/15] KVM: SVM: Rename get_max_npt_level() to get_npt_level()
+Date:   Thu, 18 Nov 2021 19:08:07 +0800
+Message-Id: <20211118110814.2568-9-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 In-Reply-To: <20211118110814.2568-1-jiangshanlai@gmail.com>
 References: <20211118110814.2568-1-jiangshanlai@gmail.com>
@@ -74,26 +74,40 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Lai Jiangshan <laijs@linux.alibaba.com>
 
-The variable name is changed in the code.
+It returns the only proper NPT level, so the "max" in the name
+is not appropriate.
 
 Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/x86/kvm/svm/svm.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index a0efc1e74311..c6d9c50ea5d4 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1757,7 +1757,7 @@ static int vmx_get_msr_feature(struct kvm_msr_entry *msr)
- }
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 943da8a7d850..33b434fd5d9b 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -265,7 +265,7 @@ u32 svm_msrpm_offset(u32 msr)
  
- /*
-- * Reads an msr value (of 'msr_index') into 'pdata'.
-+ * Reads an msr value (of 'msr_info->index') into 'msr_info->data'.
-  * Returns 0 on success, non-0 otherwise.
-  * Assumes vcpu_load() was already called.
-  */
+ #define MAX_INST_SIZE 15
+ 
+-static int get_max_npt_level(void)
++static int get_npt_level(void)
+ {
+ #ifdef CONFIG_X86_64
+ 	return pgtable_l5_enabled() ? PT64_ROOT_5LEVEL : PT64_ROOT_4LEVEL;
+@@ -1029,9 +1029,9 @@ static __init int svm_hardware_setup(void)
+ 	if (!boot_cpu_has(X86_FEATURE_NPT))
+ 		npt_enabled = false;
+ 
+-	/* Force VM NPT level equal to the host's max NPT level */
+-	kvm_configure_mmu(npt_enabled, get_max_npt_level(),
+-			  get_max_npt_level(), PG_LEVEL_1G);
++	/* Force VM NPT level equal to the host's paging level */
++	kvm_configure_mmu(npt_enabled, get_npt_level(),
++			  get_npt_level(), PG_LEVEL_1G);
+ 	pr_info("kvm: Nested Paging %sabled\n", npt_enabled ? "en" : "dis");
+ 
+ 	/* Note, SEV setup consumes npt_enabled. */
 -- 
 2.19.1.6.gb485710b
 
