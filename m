@@ -2,303 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A2E18456F0A
-	for <lists+kvm@lfdr.de>; Fri, 19 Nov 2021 13:46:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EAF2456F26
+	for <lists+kvm@lfdr.de>; Fri, 19 Nov 2021 13:56:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235376AbhKSMtO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Nov 2021 07:49:14 -0500
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:16451 "EHLO
-        esa4.hgst.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235368AbhKSMtN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Nov 2021 07:49:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1637325972; x=1668861972;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=D1cARkAArM8K1gB3X75oBoxs87f/TxJOrgeWMkbQybs=;
-  b=hYUquPM3qomrFdJTlXQ5tRfOi3w5O+TmRGNg3vOK4CvBWLwmasY1Clla
-   Z4f2XRAOtQgl2+/iaO8eEDazycpqSeLTD0MS1nqNQywuts3hF+Tas8dg6
-   9LiFH11kAFOA0yEH2nvEQmDMFAzoBzJSSxwVOkCdlS8rErKlvhFWW4yP0
-   Xmqu/O2qsKhKcISbfwwLhKyP5V220ICBFNHtJz2HmVUA7mv3rUaIEUyDM
-   GBVjkUloAqHVPuy1Nm12xV+2MJ/qKbWTjsGnACN8bNJ1btA4SoKlTanPp
-   uVYCS+tSnu2pAiEUs3d1Is2U2BngmUVE9mWeG59CGWQuG1leskOJ3W29P
-   g==;
-X-IronPort-AV: E=Sophos;i="5.87,247,1631548800"; 
-   d="scan'208";a="185086399"
-Received: from mail-dm6nam10lp2105.outbound.protection.outlook.com (HELO NAM10-DM6-obe.outbound.protection.outlook.com) ([104.47.58.105])
-  by ob1.hgst.iphmx.com with ESMTP; 19 Nov 2021 20:46:10 +0800
+        id S234826AbhKSM7X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Nov 2021 07:59:23 -0500
+Received: from mail-bn8nam12on2068.outbound.protection.outlook.com ([40.107.237.68]:56416
+        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S232020AbhKSM7W (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Nov 2021 07:59:22 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bzdX0vX8RZFMRCwr3TW/TbeH8Krm+EZP0R5Yt3hQ1EyP4KcbpBirSlUhT7b/av+kw5T9QR44EH9qAft3bEbtF5e109UiOctEt7bsJ49hM1HM+rGo41heCNcqZEHIew5irQWeX85R3vbSB+97X+YL4lk2ddasx+J0Qu2EU7PY+b8VzlXKBHl/5AFWMKiS+L64rt/raXlIhqugJyT4DpMHoLIguh0vQALpOvxH8KQKneYoFZbePRKPGMILx8Vvwe1iErMpYL+Hd/TcF6YYnG+ed87w9tghhdIJoQ5g5d2INHhlsKZUQi+9Bn1PAiwp9NFlhgNc89/qnXLidEHfSzyVtw==
+ b=O6/zFhzyemyE8ihmiHp5p4varYCUlO3bFh28T6vck30S/N7x6k7SVrDuc69CeZ6JwoTFnGpAvUf4o9XC0QFXtAXSI3lGI2+Lh5bYjWfH9QULYDTKZAU8JET5i0Mn9hJ65Qd/0dyQgcg1jWSVQ12M24kUrqo4FD8RFnGvDOar1jg8z5pB2chr3BjcNNRWNR9c1rBPGQEH8qbYu2iZwHcC0yqdlsC4mk/TpyEudffnUHEfyungTviJMqBP0nIvTONDxRX3bRfUEabYAjKCMr3Gjat8EH2ZwyGy/+BZGSu6Cg8m2wsQnjuZGDPWniZj8U3UPrCKgFhgAh7pUfEiv6SU+w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BqD2Isi2RVc+S4qi+f8tB5ggdWgWcbt3YZ6ghkdH9f4=;
- b=mBr2Rgw0i4XrPuBCprpwmp7F3Ke5EvQDxRVz9gYImbiDWMz/FjC+4A2rtl42RsFDknteqQmXi1OjGealqGqNQeEeXEwrhUs80fFeUxb+i/fMPLTk9Xjtxwmn+V6QYgDBld+Z1LkSZ3DiEQXF6w9lW6C+3VIuxL27OKmS848BT+GFg7V0ycoBT/iTsjU0ytk38gI2K8yodrc/VPLzqPrXv0GJpgsDt1b3FcSQYTgOOmuDHPH2y0YWfIy17LuRNApfCAlZR6u5brfJ7fvDyOzZNNaJ7Gc8WF5zve2CJuOkoqI/RFWeSCLLgN0GLEk+51JKt6mhPWe4H8Vaex8eub24tQ==
+ bh=waWO4esmW1rZN0jKQVTNJUZ/+4abaXfg588B+b+Cghk=;
+ b=kVKcI0HyZ6O7ybQx+VpFJNl0kvaurizdqNF2zqBOZcxyGMWsGHRcnwlSetsNqTF9ExyUmEiWMY7dhCgQax87bA2LQKAhKeFrJbZ/Y3D/8srdTLvOKboVG2+1PhHFOHFus/81/WvFnxzS59Z5sSEnpkPlwx3bwdHRrAxl9R88b7jD3Zgh2EwX22FwJ5bsQTV/UN8rRFbDGDTPT9MIPGiRPyO5piptLM9j2GN+a1q8/vWiBFQ0JICjuuphCz6tg5MTLrgXP3NciEDfiE/dxfkpO+r6digsWNbFce0wYjDhCkSd6CMPvcLqTh7Q85U6BuuC3QZbzlETSNcrAeW38sDQaA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BqD2Isi2RVc+S4qi+f8tB5ggdWgWcbt3YZ6ghkdH9f4=;
- b=FzU36th9npwicOkuI8TQa025E842hMzclkrMashdINch+ohzw+shloWKpXirGqJMTofeOCtM8JaruFps58sh17gmulH5WCGU1o2PJdGtVSuAnDT1lmKGfMiwdUty+E4YzaKQ3bM5t+WNBxlJua1oytmIkVEuRcDtlqDVOtkb/xU=
-Authentication-Results: kernel.org; dkim=none (message not signed)
- header.d=none;kernel.org; dmarc=none action=none header.from=wdc.com;
-Received: from CO6PR04MB7812.namprd04.prod.outlook.com (2603:10b6:303:138::6)
- by CO6PR04MB7777.namprd04.prod.outlook.com (2603:10b6:5:354::5) with
+ bh=waWO4esmW1rZN0jKQVTNJUZ/+4abaXfg588B+b+Cghk=;
+ b=m9ZyHhZN2JGVeQehSUFWRPXGNbI0GPhpmS7GaaR2Tn/FC5R9fy3Tol1yp4k7elkYdfqv20JUiN40fwmdbdpdqZD8WI7GW59PD+ZRRvwcRZL2xU5jbsfM1ZuTcD9a+kM1/dY7yzglDCcKUcWx/ZUzItyVMoRBnpw4InEOT5OoEc/mqHQnC+W7iNF8hpq7l/rEP2PBJRl/S7TrTPa2NXc2DDbeU2KNNh5MZf51wqSMdidsJfzWGfuzZhMief9CIQUCRyKfx0sXwqXnLG4B1OfbyoCmc85cKkzeP43MkERpHn8XTLTlSJiSvWRh5hN0mXKSt4Et1dr6zXMN+zzFzbIgQQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5317.namprd12.prod.outlook.com (2603:10b6:208:31f::17) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4669.15; Fri, 19 Nov
- 2021 12:46:09 +0000
-Received: from CO6PR04MB7812.namprd04.prod.outlook.com
- ([fe80::8100:4308:5b21:8d97]) by CO6PR04MB7812.namprd04.prod.outlook.com
- ([fe80::8100:4308:5b21:8d97%8]) with mapi id 15.20.4713.022; Fri, 19 Nov 2021
- 12:46:09 +0000
-From:   Anup Patel <anup.patel@wdc.com>
-To:     Will Deacon <will@kernel.org>, julien.thierry.kdev@gmail.com,
-        maz@kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Vincent Chen <vincent.chen@sifive.com>,
-        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, Anup Patel <anup.patel@wdc.com>
-Subject: [PATCH v11 kvmtool 8/8] riscv: Generate PCI host DT node
-Date:   Fri, 19 Nov 2021 18:15:15 +0530
-Message-Id: <20211119124515.89439-9-anup.patel@wdc.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20211119124515.89439-1-anup.patel@wdc.com>
-References: <20211119124515.89439-1-anup.patel@wdc.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: MA1PR01CA0085.INDPRD01.PROD.OUTLOOK.COM (2603:1096:a00::25)
- To CO6PR04MB7812.namprd04.prod.outlook.com (2603:10b6:303:138::6)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4713.19; Fri, 19 Nov
+ 2021 12:56:19 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::5897:83b2:a704:7909]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::5897:83b2:a704:7909%7]) with mapi id 15.20.4713.022; Fri, 19 Nov 2021
+ 12:56:19 +0000
+Date:   Fri, 19 Nov 2021 08:56:18 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Joerg Roedel <joro@8bytes.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "rafael@kernel.org" <rafael@kernel.org>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 01/11] iommu: Add device dma ownership set/release
+ interfaces
+Message-ID: <20211119125618.GU2105516@nvidia.com>
+References: <20211115020552.2378167-1-baolu.lu@linux.intel.com>
+ <20211115020552.2378167-2-baolu.lu@linux.intel.com>
+ <YZJdJH4AS+vm0j06@infradead.org>
+ <cc7ce6f4-b1ec-49ef-e245-ab6c330154c2@linux.intel.com>
+ <20211116134603.GA2105516@nvidia.com>
+ <BN9PR11MB5433639E43C37C5D2462BD718C9B9@BN9PR11MB5433.namprd11.prod.outlook.com>
+ <20211118133325.GO2105516@nvidia.com>
+ <BN9PR11MB5433E5B63E575E2232DFBBE48C9C9@BN9PR11MB5433.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BN9PR11MB5433E5B63E575E2232DFBBE48C9C9@BN9PR11MB5433.namprd11.prod.outlook.com>
+X-ClientProxiedBy: BL1PR13CA0151.namprd13.prod.outlook.com
+ (2603:10b6:208:2bd::6) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
 MIME-Version: 1.0
-Received: from wdc.com (122.171.140.195) by MA1PR01CA0085.INDPRD01.PROD.OUTLOOK.COM (2603:1096:a00::25) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4713.21 via Frontend Transport; Fri, 19 Nov 2021 12:46:06 +0000
+Received: from mlx.ziepe.ca (142.162.113.129) by BL1PR13CA0151.namprd13.prod.outlook.com (2603:10b6:208:2bd::6) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4713.18 via Frontend Transport; Fri, 19 Nov 2021 12:56:19 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mo3RC-00CDVX-KE; Fri, 19 Nov 2021 08:56:18 -0400
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 7531f0d8-f96f-4689-9ee3-08d9ab5a8fab
-X-MS-TrafficTypeDiagnostic: CO6PR04MB7777:
-X-Microsoft-Antispam-PRVS: <CO6PR04MB777727F4FBFD27DFA31C95BF8D9C9@CO6PR04MB7777.namprd04.prod.outlook.com>
-WDCIPOUTBOUND: EOP-TRUE
-X-MS-Oob-TLC-OOBClassifiers: OLM:6108;
+X-MS-Office365-Filtering-Correlation-Id: dd6cee00-3bc4-4408-795e-08d9ab5bfb41
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5317:
+X-Microsoft-Antispam-PRVS: <BL1PR12MB53172E98B89C54E3133C7132C29C9@BL1PR12MB5317.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 18ad/rZyasADAJZ1M/CbbpTRldCX85fQbClxKDiMXeACyWZPLnTM78K4wx//1l7hMso3eZt/3ELXlZqeNPMofMNkLOrHLni7xNlayLd2X5H7c2qPv0g5sWsQlUahTaBvCI4Go9ZK7T8lks4h5dbZ2oSUq3RdbRzPeoCpFPRR/M/LlH39RhG/i+b88vTeeaDz2Vi6IedvRKsDSZiJ52iJxg1/2k513ZVwM6/XmqTM8LaGZKjTid2+dLSyPJLbdJHQ+6QwBFH01PvqN50Im0Rg2JRx62NHedh5qMiJ4/lZnrV0rl/JuIZ61ejLvatQvef7eCEOlAXVoCw/4trtSR3loxayRtizqdKY+yq7k2vQR9eXjH1pMJL4s9vSQlMsiYykOmmMOUpEltbzsCZjMF6CoiJjwdweqHU/rtJiNnXZ6a+dKL8PGdAnBCHiEuMBzsAQTC/6906MqPy8dSpgJ17k9kk5tctaatXzGRokKCTD896gcrZZEgR2QpGVJxrQjJcE4ng7Yv3gZBFVr5jC2zrM31aYY07cX5LsJZ4hbgIfT5L0wovxc0dmR38cReVdVgVVTHzb4M6MVg60ROtAg9kUWcOrSp2SocS0jR2WT1LAb/XTTgpqPoEgGgZEjD3KIc+nFUBDj0/AJmc2M+oQixMf/vOLDEYhwiu29s8m6/Us/cvbszZYle0edezCtEIdvF+o
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO6PR04MB7812.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(86362001)(2906002)(82960400001)(6666004)(956004)(52116002)(8886007)(38100700002)(26005)(55016002)(7696005)(186003)(4326008)(5660300002)(38350700002)(8676002)(36756003)(508600001)(66476007)(54906003)(66946007)(1076003)(66556008)(8936002)(44832011)(316002)(2616005);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: lsi/m2v+SxMVMd77cDLQDu3uZGagYoMmHvqSBVIfIUoH0mfhBRbTJRLjGKDtrmLGbfPCZ836kEqHvEVt9oGHoTxpET75f641VMdJdWoEd8dFoXyaxRGRPPsVILPMefyJaIJLOvedmeTnyS67hJhlvvIF2gSfDuDB3tbRoEdy0pshofCqF74dmxDhsoK99I29b1Ca9JzfFmSeTRxF48mXS7dzSt9r7z/NDSwqPddnJW/P2hb0l+K1EspcTxxnUrR6WMfSBqDJNBSkGRumbqjl6aoVpDhkCx7I9JxeAbBW7cyQNzjxJdBmGgo9OWOXu1f45stVU/9AEFAQRfKSpYI+Vo1uU0j21NM9i/sEiLHlZNSzdmXfkqskKT0y11mB0NHkgIu+2qweFd1936j8B3iEkIEF7Us0PVZmArRlnbZndG8asD7+bXRiFxIxa/vexu+QgaNZWOGGRA59KsP8KYxjMCW6DtARsny/aLDuMh3LV9t0qZv7EbwuVn2pUPYBTrUm14SFW8QsdJIt2eE9QoxvEhLPgSnD4HpZ/ExlPaAxYTzY83lB/1GZwRkUKLk/QyCSl4k0fGl2lVPzumKPabkQpUVdFORFrMq7UltexIHU3R4l5rvnkKhfOsdTB8GVE0xnf3UCr2GeMESE6qJbg6Wmkw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(7416002)(38100700002)(66946007)(66556008)(66476007)(86362001)(316002)(426003)(36756003)(5660300002)(2616005)(6916009)(54906003)(2906002)(8936002)(9786002)(9746002)(1076003)(8676002)(508600001)(186003)(33656002)(4744005)(4326008)(26005);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?U3QFSNY4Oaq5ejrCTrYXZpVZEWcNqh+EEv1a6zOf+7CDAUnVAVkkKF7JKWJr?=
- =?us-ascii?Q?edZ95WRue0AZItJs3BMaANamZdiZlyS13DAmKL5t2utBAsp9i+pwLubbI/7D?=
- =?us-ascii?Q?SlB85a3DzyT56T012GyC+pfiIhC9xePtyjLp8LO3ElI+5U31JGnvUJ6N5r7c?=
- =?us-ascii?Q?0V4j8TLjHK3rTbeLaHT0bZlTs9Fd44yFR7ZOwZcQZJMu1bEvqMMjWzyPnVJD?=
- =?us-ascii?Q?mIlPo1m6qEENVbyb0AtqSw/aLZok+oJw96MJ+NqkbrzbYIGL0FkGBWB0Ocnp?=
- =?us-ascii?Q?KcV7jMTPKgl+qnZTo0l75cwbGVBEyFH7W8NxltXgegOR8A19cMlby4pkJkw/?=
- =?us-ascii?Q?hl74eZ2wT3WnWU1Atk8wxdsMyKoVx0hE/c4qeeva9YEF4/UghfS7L7H28d5z?=
- =?us-ascii?Q?/iEQ9kkIBuRkl5heLE4mapoTvDdv0e24O4gs8L4NhezWrjOhu5nVEFSW+eFY?=
- =?us-ascii?Q?1CC6NATCQ8ec9+w6w9OcrsrYf6Xk/3XilCo0J20vc2ezkthc917jUwFGNOLx?=
- =?us-ascii?Q?TyLlqOCSppvvVZPCced46lFQyP5163lSGj3Eauam4sitOYX7x33GjcoQ/XVg?=
- =?us-ascii?Q?V7jH/ZobyFyLmI9WM3FU0xLNBKKY5K3KFc0s6Cp0AHOmzquGpITGUsg3EnED?=
- =?us-ascii?Q?zXoG7hsS+uJBHTiQHmhRDUPdSos0IultyTlsYGw48Z+9AeINlJR3Pui7RxU9?=
- =?us-ascii?Q?GohUoPnvaUxGs8AV3mXg+pBWZWZnlSmHaEg76xvQPtyezNKAcrq06vyNbXIo?=
- =?us-ascii?Q?nO8p08lfugVNwEdHpLooFuZJMCgVteqnsaQcTFnuD575yb+BqQJo5JPGPVYt?=
- =?us-ascii?Q?enQ18l1bqnhItI3xj52jgKgDsfhLcpDT9QUw6SA198NXqjg69jx33ZRGnBKO?=
- =?us-ascii?Q?W/+yexYqv2LaYFGSgf+FcCXnc+RqHaSrQxdKpSZ20PzS4rvuSwCxqA2m3sBa?=
- =?us-ascii?Q?vUy2fPfaEb+tx4NPUDbwwOE1OvhuYj/hW5r2AgBPNio8EWcjAA27S9zpcumx?=
- =?us-ascii?Q?hoEWlMNn/pIaMsmHl4CcWPedwI/ptGLU28s7hyouOPlCAZGD82ABkk/FAhUw?=
- =?us-ascii?Q?8Wdsgh6TuIGaeIlGE8qtBxuaYiRKSbyC/cMIY+CO4DLlYfY/gIl/oO9ARwns?=
- =?us-ascii?Q?o8Ne1sUzdNL05oHYrLuhEnxaZH/VrVvtYqSXVIoDfUk15Gl/f52t33k78EZF?=
- =?us-ascii?Q?7H/avs4dqxdrKBxhqR7AYnsMBJLBwObg76GfuEdGrIw8d6Uiayh9p/EpoEIj?=
- =?us-ascii?Q?vRdivGDH26Qlx/+KGQ5OcpZ8Za3ROiCCSqeRmc93YYFcp0oHmdSh/Tq8Hd9Q?=
- =?us-ascii?Q?m3LhzxCH6Kmc4Q+x1IX6+EzDC6KTiFtoK1hEA0q/Z2dpGd9vYMrIzIh7ryG6?=
- =?us-ascii?Q?5ZRrIubW+Cskcoqv9J/slUfWrUgYBqK9DJBmB7flAWH+izmKc1fky8CNVC65?=
- =?us-ascii?Q?kkdPDp5pzdUpwRNPXEUtn0+HFzQDeq/5C/tqylYDt34IG+wyj6E26GENILa9?=
- =?us-ascii?Q?aDnXg3xXA8ji2qAFtQuAi28ST++5o0KI9ycuwKR/uTt1fhXXUft5tK+ZDMLJ?=
- =?us-ascii?Q?/aYvYzl3MUR1xOx2d4OBttV+Na+sYosIvj5DxXHS23t3U0+yfRx+5B5l1ul8?=
- =?us-ascii?Q?xPEG+hOHuV5hYM0nsFzmMXw=3D?=
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7531f0d8-f96f-4689-9ee3-08d9ab5a8fab
-X-MS-Exchange-CrossTenant-AuthSource: CO6PR04MB7812.namprd04.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?DjSWR7cyFSn5g9DswKoP8QiIbCwnzPor+4i4yeBgK3IfEg1Ge0jVhw2w4jtO?=
+ =?us-ascii?Q?5+c37BrCFBB6cxRrj2vVfKzifo9lhTLw9kzWYhTSldfYvLIBEVsKPvbyS/wM?=
+ =?us-ascii?Q?q97cvuajLV2nCsXd00IQke313WHEeLTM54EOvY3KdzcaqF/P7OAWp8aqrRgM?=
+ =?us-ascii?Q?QfBJHVg/+1z73Qnel3LyE/tTa2e7LVQc1jFCAdtEkIhHEhr5avdHmzVgVsoL?=
+ =?us-ascii?Q?ljCtIBP/sYbmSBxPLDvy+hnF8NyGtgLXVRmw9c9EladTG1Xnh9PR13sb7NLF?=
+ =?us-ascii?Q?75OzOJykBq8jTesvFqrT/dw5E095ANsvgEywdX3aPVg32KuwRWW39TJT7OxA?=
+ =?us-ascii?Q?SyU8E13hN9NZlwOgXKhUPs0tPihHTeKnuH7fVwMzyXYpmtbOLBypk6BbY9+P?=
+ =?us-ascii?Q?8WJyb9cMPd3Qq/++09NB9U1h9J+xSRf67E/AOEYk2e8BJ5/0UDzOsMZBzV1/?=
+ =?us-ascii?Q?89j0JNb3Yt/OEbUq89/i/k6LoBEel4HYon65hz1gt04Jn4WGHd5PJT/LdT5k?=
+ =?us-ascii?Q?oHAcQxzgysx+CkVvKhWFS4xt6K0SUoywBWL3ovVGBbpb681KUXghaAjjGq3P?=
+ =?us-ascii?Q?z8zsXbMkNs2Fsn6Y+FG7s0X7uIvw4MS8bxK1qTzoJ1BVOwPMNOTH0xJ1pylH?=
+ =?us-ascii?Q?rry1+jeHaFAAWvDI6/s7snO3+UOhsR9dUYInCvKeZyEehchM6GMeRc8yaGKl?=
+ =?us-ascii?Q?YXaVluVUMEB83BTQBKa+tlq/ziOhQ1U8jEGLc8wUIE7joNMqslytfnhygdcn?=
+ =?us-ascii?Q?j+9zAKk3EuRlpHCz6cJ24WGrUXvE18jaKjJJjqPa+oed54lQkqnEWNTSrfur?=
+ =?us-ascii?Q?kktVo1e1nZpU7ObuHPOBPWwJ5p9kQedn7X8Pn17UBj7xURJ3+G4UtYXnb3Dh?=
+ =?us-ascii?Q?iNFIb9LZsK/LX9sV7IIRUIxfsvZPDUsyWMpIYME7aVa+775z0LKAskxW6Dq6?=
+ =?us-ascii?Q?8av6CSKK1Grh+be9rjiBRPWMaXOGhf9yMWRlSBYl68SnCP/WqoGVu/B9+WLv?=
+ =?us-ascii?Q?ztq2VZLmC7joqveDGHFBbvRoY6iMyyMW2CWhrYu8/44z4sqODmHP2rBbGhOH?=
+ =?us-ascii?Q?BBLrffydR2QxK/KlpxJkmeOaODv+Ucia6R0rKU4IlmNAUZMuSdnGbw3UhQKJ?=
+ =?us-ascii?Q?+L6A3Mlpsf3PNtJQUBjO+STqweQ3ziLlPXyzn2xnARen0U+u7RlUcgC4vVUd?=
+ =?us-ascii?Q?rRmHN7zWrmGFkJVSeDwdwHzsHzCLylFgrM2W2DZx9KI7Svw/o9iwHbL+Rmhv?=
+ =?us-ascii?Q?QwL/Yj8m2e1cWxhE3xesxVFVam2N2q/TtV/NZHOUJQYwplzNSyEETKyXSw7z?=
+ =?us-ascii?Q?HpMZfX8yzC6MgnNCYGfNxsKB1wmT4d9/p4B7dpzPBdYSgNilkJxcgSA6Tt29?=
+ =?us-ascii?Q?iyuCfh9wBK5klk0HRkgXclbKXY0u/XZ/Dg8D642GRSoanXaXGBu8OVdHNVLM?=
+ =?us-ascii?Q?pXGy553NR6+W4BJJd+yyRb1YeubYhU/fNuYn6QWYu1/4XfeQao5VpoH8tkNH?=
+ =?us-ascii?Q?9UGxpfyRTKydf/AVY9e8OFnbcyaL58qWoWtjgB409sIzs3BYIZu9r42mek1g?=
+ =?us-ascii?Q?nBcUFWuKJszVevwCP3U=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: dd6cee00-3bc4-4408-795e-08d9ab5bfb41
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Nov 2021 12:46:09.7024
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Nov 2021 12:56:19.7163
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: HUSh8annYOxmb6I9IQlL1Qrd1YAmsmjd9t05EAgc2OFuz0he0zeS1WiZEHH22fUPsBJjNhb2LCdHmrUvB3k4PA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR04MB7777
+X-MS-Exchange-CrossTenant-UserPrincipalName: ks5v0pHJEgPqffsZbUd5t3hZDDeIxU/Jzb/Js1pqKaF+zcJ4h4jTuagCPcpLpqBk
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5317
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch extends FDT generation to generate PCI host DT node.
+On Fri, Nov 19, 2021 at 05:44:35AM +0000, Tian, Kevin wrote:
 
-Of course, PCI host for Guest/VM is not useful at the moment
-because it's mostly for PCI pass-through and we don't have
-IOMMU and interrupt routing available for KVM RISC-V. In future,
-we might be able to use PCI host for VirtIO PCI transport or
-other software emulated PCI devices.
+> Well, the difference is just in literal. I don't know the background
+> why the existing iommu_attach_device() users want to do it this
+> way. But given the condition in iommu_attach_device() it could
+> in theory imply some unknown hardware-level side effect which 
+> may break the desired functionality once the group size grows 
+> beyond singleton. Is it a real case? I don't know...
 
-Signed-off-by: Anup Patel <anup.patel@wdc.com>
----
- Makefile                     |   1 +
- riscv/fdt.c                  |   3 +
- riscv/include/kvm/kvm-arch.h |   2 +
- riscv/pci.c                  | 109 +++++++++++++++++++++++++++++++++++
- 4 files changed, 115 insertions(+)
- create mode 100644 riscv/pci.c
+No, this must not be.
 
-diff --git a/Makefile b/Makefile
-index e4e1184..6920d7f 100644
---- a/Makefile
-+++ b/Makefile
-@@ -204,6 +204,7 @@ ifeq ($(ARCH),riscv)
- 	OBJS		+= riscv/irq.o
- 	OBJS		+= riscv/kvm.o
- 	OBJS		+= riscv/kvm-cpu.o
-+	OBJS		+= riscv/pci.o
- 	OBJS		+= riscv/plic.o
- 	ifeq ($(RISCV_XLEN),32)
- 		CFLAGS	+= -mabi=ilp32d -march=rv32gc
-diff --git a/riscv/fdt.c b/riscv/fdt.c
-index 6527ef7..de15bfe 100644
---- a/riscv/fdt.c
-+++ b/riscv/fdt.c
-@@ -167,6 +167,9 @@ static int setup_fdt(struct kvm *kvm)
- 		dev_hdr = device__next_dev(dev_hdr);
- 	}
- 
-+	/* PCI host controller */
-+	pci__generate_fdt_nodes(fdt);
-+
- 	_FDT(fdt_end_node(fdt));
- 
- 	if (fdt_stdout_path) {
-diff --git a/riscv/include/kvm/kvm-arch.h b/riscv/include/kvm/kvm-arch.h
-index d0be965..f090883 100644
---- a/riscv/include/kvm/kvm-arch.h
-+++ b/riscv/include/kvm/kvm-arch.h
-@@ -84,4 +84,6 @@ void plic__generate_irq_prop(void *fdt, u8 irq, enum irq_type irq_type);
- 
- void plic__irq_trig(struct kvm *kvm, int irq, int level, bool edge);
- 
-+void pci__generate_fdt_nodes(void *fdt);
-+
- #endif /* KVM__KVM_ARCH_H */
-diff --git a/riscv/pci.c b/riscv/pci.c
-new file mode 100644
-index 0000000..604fd20
---- /dev/null
-+++ b/riscv/pci.c
-@@ -0,0 +1,109 @@
-+#include "kvm/devices.h"
-+#include "kvm/fdt.h"
-+#include "kvm/kvm.h"
-+#include "kvm/of_pci.h"
-+#include "kvm/pci.h"
-+#include "kvm/util.h"
-+
-+/*
-+ * An entry in the interrupt-map table looks like:
-+ * <pci unit address> <pci interrupt pin> <plic phandle> <plic interrupt>
-+ */
-+
-+struct of_interrupt_map_entry {
-+	struct of_pci_irq_mask		pci_irq_mask;
-+	u32				plic_phandle;
-+	u32				plic_irq;
-+} __attribute__((packed));
-+
-+void pci__generate_fdt_nodes(void *fdt)
-+{
-+	struct device_header *dev_hdr;
-+	struct of_interrupt_map_entry irq_map[OF_PCI_IRQ_MAP_MAX];
-+	unsigned nentries = 0;
-+	/* Bus range */
-+	u32 bus_range[] = { cpu_to_fdt32(0), cpu_to_fdt32(1), };
-+	/* Configuration Space */
-+	u64 cfg_reg_prop[] = { cpu_to_fdt64(KVM_PCI_CFG_AREA),
-+			       cpu_to_fdt64(RISCV_PCI_CFG_SIZE), };
-+	/* Describe the memory ranges */
-+	struct of_pci_ranges_entry ranges[] = {
-+		{
-+			.pci_addr = {
-+				.hi	= cpu_to_fdt32(of_pci_b_ss(OF_PCI_SS_IO)),
-+				.mid	= 0,
-+				.lo	= 0,
-+			},
-+			.cpu_addr	= cpu_to_fdt64(KVM_IOPORT_AREA),
-+			.length		= cpu_to_fdt64(RISCV_IOPORT_SIZE),
-+		},
-+		{
-+			.pci_addr = {
-+				.hi	= cpu_to_fdt32(of_pci_b_ss(OF_PCI_SS_M32)),
-+				.mid	= cpu_to_fdt32(KVM_PCI_MMIO_AREA >> 32),
-+				.lo	= cpu_to_fdt32(KVM_PCI_MMIO_AREA),
-+			},
-+			.cpu_addr	= cpu_to_fdt64(KVM_PCI_MMIO_AREA),
-+			.length		= cpu_to_fdt64(RISCV_PCI_MMIO_SIZE),
-+		},
-+	};
-+
-+	/* Boilerplate PCI properties */
-+	_FDT(fdt_begin_node(fdt, "pci"));
-+	_FDT(fdt_property_string(fdt, "device_type", "pci"));
-+	_FDT(fdt_property_cell(fdt, "#address-cells", 0x3));
-+	_FDT(fdt_property_cell(fdt, "#size-cells", 0x2));
-+	_FDT(fdt_property_cell(fdt, "#interrupt-cells", 0x1));
-+	_FDT(fdt_property_string(fdt, "compatible", "pci-host-ecam-generic"));
-+	_FDT(fdt_property(fdt, "dma-coherent", NULL, 0));
-+
-+	_FDT(fdt_property(fdt, "bus-range", bus_range, sizeof(bus_range)));
-+	_FDT(fdt_property(fdt, "reg", &cfg_reg_prop, sizeof(cfg_reg_prop)));
-+	_FDT(fdt_property(fdt, "ranges", ranges, sizeof(ranges)));
-+
-+	/* Generate the interrupt map ... */
-+	dev_hdr = device__first_dev(DEVICE_BUS_PCI);
-+	while (dev_hdr && nentries < ARRAY_SIZE(irq_map)) {
-+		struct of_interrupt_map_entry *entry = &irq_map[nentries];
-+		struct pci_device_header *pci_hdr = dev_hdr->data;
-+		u8 dev_num = dev_hdr->dev_num;
-+		u8 pin = pci_hdr->irq_pin;
-+		u8 irq = pci_hdr->irq_line;
-+
-+		*entry = (struct of_interrupt_map_entry) {
-+			.pci_irq_mask = {
-+				.pci_addr = {
-+					.hi	= cpu_to_fdt32(of_pci_b_ddddd(dev_num)),
-+					.mid	= 0,
-+					.lo	= 0,
-+				},
-+				.pci_pin	= cpu_to_fdt32(pin),
-+			},
-+			.plic_phandle	= cpu_to_fdt32(PHANDLE_PLIC),
-+			.plic_irq	= cpu_to_fdt32(irq),
-+		};
-+
-+		nentries++;
-+		dev_hdr = device__next_dev(dev_hdr);
-+	}
-+
-+	_FDT(fdt_property(fdt, "interrupt-map", irq_map,
-+			  sizeof(struct of_interrupt_map_entry) * nentries));
-+
-+	/* ... and the corresponding mask. */
-+	if (nentries) {
-+		struct of_pci_irq_mask irq_mask = {
-+			.pci_addr = {
-+				.hi	= cpu_to_fdt32(of_pci_b_ddddd(-1)),
-+				.mid	= 0,
-+				.lo	= 0,
-+			},
-+			.pci_pin	= cpu_to_fdt32(7),
-+		};
-+
-+		_FDT(fdt_property(fdt, "interrupt-map-mask", &irq_mask,
-+				  sizeof(irq_mask)));
-+	}
-+
-+	_FDT(fdt_end_node(fdt));
-+}
--- 
-2.25.1
+Any device can have VFIO attached to it, and VFIO does the equivalent
+of iommu_attach_device(). We cannot have "unknown hardware-level side
+effects" to changing the domain's of multi device groups and also have
+working VFIO.
 
+If these HW problems exist they are a seperate issue and the iommu
+core should flag such groups as being unable to change their domains
+at all.
+
+Jason
