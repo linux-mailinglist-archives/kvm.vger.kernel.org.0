@@ -2,207 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4041545729D
-	for <lists+kvm@lfdr.de>; Fri, 19 Nov 2021 17:16:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 563694572BC
+	for <lists+kvm@lfdr.de>; Fri, 19 Nov 2021 17:19:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236345AbhKSQTg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Nov 2021 11:19:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55954 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236352AbhKSQTf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Nov 2021 11:19:35 -0500
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9224C061574
-        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 08:16:33 -0800 (PST)
-Received: by mail-lf1-x12f.google.com with SMTP id t26so45441652lfk.9
-        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 08:16:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=PT99iXBgpFIqepfqqbxcYIJQ3M5siuSp1UK8d1YL76U=;
-        b=jHnYvtbACgEqbUWh2jxPk+A/JrzDhbXD8GN8W5j+q116oOn4I3SOuYu6WXCtrrggre
-         F7RpoUb/u9Up8UEnvaefDtRgviWR4D0TRw1rW/Phwc80x7ZOoDd8O2dfgi/c+ROR+lX5
-         Yy2fFiZqBJ5+RA1uTtjpnhhyj1hCKxOF02fIylR+5hy8M6tyWFndK21K7bQVKGshQUbZ
-         i/FNRVp4LEQcjTlUBmMdV3GUS7OuM5jx1rMJe4MjQZPdej9ePypZgGW9aGrETXY4QiZp
-         kerRyGX2XuCWsfQK8QYTwunTBoAEJdQvm1+FgZtHsirRQWxrNm3WV5XlSKSARBFjr8R5
-         GQrg==
+        id S236451AbhKSQW6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Nov 2021 11:22:58 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28950 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234650AbhKSQW6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 19 Nov 2021 11:22:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1637338795;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=KV/tkCgmsS7i2APUX/7qyOc6gDmwY8m+7cktraXzQn0=;
+        b=NB36R+taVKTCjwEYwjuaZm5fLpMkkdHoXp3f1T7oFZxhMbalourQCTNwCc9y/odUw6j0YR
+        z6dO8ffpXE/QXMGA8Ye3CBC1tCXpC9hZqIqyMjoBrPYNbqvgcY6/vNzCIxXNIoJrcugOKB
+        VNiem1ZjddCvSjcMD5cstYYfl6+zh/U=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-560-RM7S80wHNsixISl-kVaQMQ-1; Fri, 19 Nov 2021 11:19:54 -0500
+X-MC-Unique: RM7S80wHNsixISl-kVaQMQ-1
+Received: by mail-wm1-f72.google.com with SMTP id n41-20020a05600c502900b003335ab97f41so4990481wmr.3
+        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 08:19:54 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=PT99iXBgpFIqepfqqbxcYIJQ3M5siuSp1UK8d1YL76U=;
-        b=Hj6QPYPgahQ3ocq58Ag+E0H/rr2bIcLGaa8LFjQm6t23XsEb4J4+6ltRVxcaxT/3St
-         oT3QmuwN9/k0JpHWNzHdTXJkZuD0NeMzgdzQaEVg6h22ZURnmGMFlvy0x6+3zmcEaOSW
-         UQFEjTmD9J52TX9N7XCsz0oalk1vdsakWfo09pZVJX054iM/fHPmJjtyHRFIj7PWGPua
-         HLWT/yimUpL2PygqspMr2UhePQQjjU3PEKtaYerxq7l995TDetrE7ePU1mJYniIdD0xv
-         sDvKyssjO7xern6N1IJSDZMuuLGFw3PvfJkYOfnAjpz6qpKQCmVP6wQPkSRYGxCPjz5B
-         6m4w==
-X-Gm-Message-State: AOAM530zFt8HaVnnTNBQdVWZuqNDVs/qb5dV+y6mvGRcURqJ1ewx8IBB
-        qdETunoeEOjh2riAcwfYM8Z1RQfGLTNcQXaxkVyXaw==
-X-Google-Smtp-Source: ABdhPJyWR8stzdTiCGjrREyonaNUfQgQWz4uaz8HWtQNIMD89ICA71wJAEljhEu8NgU+6QnOvVwM8eP3k2kVjE8qGLw=
-X-Received: by 2002:a2e:9f15:: with SMTP id u21mr26972655ljk.132.1637338591736;
- Fri, 19 Nov 2021 08:16:31 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=KV/tkCgmsS7i2APUX/7qyOc6gDmwY8m+7cktraXzQn0=;
+        b=IbfYpFBxpxGB4vBXH3X01uHKmMF0k+4l8Or2PMYcyY7NoER/nH0vjS2gAbY6Vjx8MB
+         mC9JvNdN0fH7SFpkYjUKlYPb/HFErn7aFjhLOQIUH+NXi1BgJrCQFWnGVKwsabVjRqag
+         rCycmoK6VErCVnZzwfZheqXDP0+XIIDPNiOmscDOXRHox0sI0oAF09zclnGhmvUnLnJC
+         vCjgAq9Pq0DRVivO9/Ss/W88K+cUqsmWhYDhy9dG/ZB8mMfPo2Ysl5aSREfOsCJG4nlO
+         kv//iAVjdLNIGRz31CErpxoPOhe3M40yt4QLRg3BKT/rUamAxJ2+b6uf8er456eJTZeL
+         O+QA==
+X-Gm-Message-State: AOAM533TvKaCvg1CO8nXpJDl3bHYZaiVptbZYjpG+FpDtYnum/pz5Iyc
+        RWsQ+5BVIGF/qtUiLdZi680KXVzZajbpVnvssSMDcX2+vPv/nO8TxXO6R+zxwZryn2z/sJBKYVF
+        RBE9Z2Cb3AlDO
+X-Received: by 2002:a05:600c:2117:: with SMTP id u23mr1016432wml.19.1637338793351;
+        Fri, 19 Nov 2021 08:19:53 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyypSNe83wKPHORFILceewC9LXVrcDFK0lsfkP7ru/nhY1odUOFzw45jOp2yZPs390wmI5MTQ==
+X-Received: by 2002:a05:600c:2117:: with SMTP id u23mr1016388wml.19.1637338793086;
+        Fri, 19 Nov 2021 08:19:53 -0800 (PST)
+Received: from fedora (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id f81sm13871621wmf.22.2021.11.19.08.19.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Nov 2021 08:19:52 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Li RongQing <lirongqing@baidu.com>, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, seanjc@google.com, lirongqing@baidu.com,
+        stable@kernel.org
+Subject: Re: [v4][PATCH 2/2] KVM: Clear pv eoi pending bit only when it is set
+In-Reply-To: <1636026974-50555-2-git-send-email-lirongqing@baidu.com>
+References: <1636026974-50555-1-git-send-email-lirongqing@baidu.com>
+ <1636026974-50555-2-git-send-email-lirongqing@baidu.com>
+Date:   Fri, 19 Nov 2021 17:19:50 +0100
+Message-ID: <8735nsnmmx.fsf@redhat.com>
 MIME-Version: 1.0
-References: <20211110220731.2396491-1-brijesh.singh@amd.com>
- <20211110220731.2396491-44-brijesh.singh@amd.com> <CAMkAt6q3D4h=01XhHcxXTEwbWLM9CnAaq+6vgNzxyqzt+X00UQ@mail.gmail.com>
- <ff3ceeb5-e120-fe07-2a0c-4cd51f552db8@amd.com>
-In-Reply-To: <ff3ceeb5-e120-fe07-2a0c-4cd51f552db8@amd.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Fri, 19 Nov 2021 09:16:20 -0700
-Message-ID: <CAMkAt6pAcM-+odnagFTiaY7PPGE1CfAt27x=tG=-4UU9c+dQXA@mail.gmail.com>
-Subject: Re: [PATCH v7 43/45] virt: Add SEV-SNP guest driver
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <Thomas.Lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 18, 2021 at 10:32 AM Brijesh Singh <brijesh.singh@amd.com> wrote:
->
->
->
-> On 11/17/21 5:34 PM, Peter Gonda wrote:
->
->
-> >> +The guest ioctl should be issued on a file descriptor of the /dev/sev-guest device.
-> >> +The ioctl accepts struct snp_user_guest_request. The input and output structure is
-> >> +specified through the req_data and resp_data field respectively. If the ioctl fails
-> >> +to execute due to a firmware error, then fw_err code will be set.
-> >
-> > Should way say what it will be set to? Also Sean pointed out on CCP
-> > driver that 0 is strange to set the error to, its a uint so we cannot
-> > do -1 like we did there. What about all FFs?
-> >
->
-> Sure, all FF's works, I can document and use it.
->
->
-> >> +static inline u64 __snp_get_msg_seqno(struct snp_guest_dev *snp_dev)
-> >> +{
-> >> +       u64 count;
-> >
-> > I may be overly paranoid here but how about
-> > `lockdep_assert_held(&snp_cmd_mutex);` when writing or reading
-> > directly from this data?
-> >
->
-> Sure, I can do it.
->
-> ...
->
-> >> +
-> >> +       if (rc)
-> >> +               return rc;
-> >> +
-> >> +       rc = verify_and_dec_payload(snp_dev, resp_buf, resp_sz);
-> >> +       if (rc) {
-> >> +               /*
-> >> +                * The verify_and_dec_payload() will fail only if the hypervisor is
-> >> +                * actively modifiying the message header or corrupting the encrypted payload.
-> > modifiying
-> >> +                * This hints that hypervisor is acting in a bad faith. Disable the VMPCK so that
-> >> +                * the key cannot be used for any communication.
-> >> +                */
-> >
-> > This looks great, thanks for changes Brijesh. Should we mention in
-> > comment here or at snp_disable_vmpck() the AES-GCM issues with
-> > continuing to use the key? Or will future updaters to this code
-> > understand already?
-> >
->
-> Sure, I can add comment about the AES-GCM.
->
-> ...
->
-> >> +
-> >> +/* See SNP spec SNP_GUEST_REQUEST section for the structure */
-> >> +enum msg_type {
-> >> +       SNP_MSG_TYPE_INVALID = 0,
-> >> +       SNP_MSG_CPUID_REQ,
-> >> +       SNP_MSG_CPUID_RSP,
-> >> +       SNP_MSG_KEY_REQ,
-> >> +       SNP_MSG_KEY_RSP,
-> >> +       SNP_MSG_REPORT_REQ,
-> >> +       SNP_MSG_REPORT_RSP,
-> >> +       SNP_MSG_EXPORT_REQ,
-> >> +       SNP_MSG_EXPORT_RSP,
-> >> +       SNP_MSG_IMPORT_REQ,
-> >> +       SNP_MSG_IMPORT_RSP,
-> >> +       SNP_MSG_ABSORB_REQ,
-> >> +       SNP_MSG_ABSORB_RSP,
-> >> +       SNP_MSG_VMRK_REQ,
-> >> +       SNP_MSG_VMRK_RSP,
-> >
-> > Did you want to include MSG_ABSORB_NOMA_REQ and MSG_ABSORB_NOMA_RESP here?
-> >
->
-> Yes, I can includes those for the completeness.
->
-> ...
->
-> >> +struct snp_report_req {
-> >> +       /* message version number (must be non-zero) */
-> >> +       __u8 msg_version;
-> >> +
-> >> +       /* user data that should be included in the report */
-> >> +       __u8 user_data[64];
-> >
-> > Are we missing the 'vmpl' field here? Does those default all requests
-> > to be signed with VMPL0? Users might want to change that, they could
-> > be using a paravisor.
-> >
->
-> Good question, so far I was thinking that guest kernel will provide its
-> vmpl level instead of accepted the vmpl level from the userspace. Do you
-> see a need for a userspace to provide this information ?
+Li RongQing <lirongqing@baidu.com> writes:
 
-That seems fine. I am just confused because we are just encrypting
-this struct as the payload for the PSP. Doesn't the message require a
-struct that looks like 'snp_report_req_user_data' below?
-
-snp_report_req{
-       /* message version number (must be non-zero) */
-       __u8 msg_version;
-
-      /* user data that should be included in the report */
-       struct snp_report_req_user_data;
-};
-
-struct snp_report_req_user_data {
-  u8 user_data[64];
-  u32 vmpl;
-  u32 reserved;
-};
-
-
+> merge pv_eoi_get_pending and pv_eoi_clr_pending into a single
+> function pv_eoi_test_and_clear_pending, which returns and clear
+> the value of the pending bit.
 >
+> and clear pv eoi pending bit only when it is set, to avoid calling
+> pv_eoi_put_user(), this can speed about 300 nsec on AMD EPYC most
+> of the time
 >
-> thanks
+> Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Li RongQing <lirongqing@baidu.com>
+> ---
+> diff v2: merge as pv_eoi_test_and_clear_pending
+> diff v3: remove printk in a new patch
+> diff v4: fix comments place
+>  arch/x86/kvm/lapic.c |   40 +++++++++++++++++++---------------------
+>  1 files changed, 19 insertions(+), 21 deletions(-)
+>
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 752c48e..b1de23e 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -673,15 +673,6 @@ static inline bool pv_eoi_enabled(struct kvm_vcpu *vcpu)
+>  	return vcpu->arch.pv_eoi.msr_val & KVM_MSR_ENABLED;
+>  }
+>  
+> -static bool pv_eoi_get_pending(struct kvm_vcpu *vcpu)
+> -{
+> -	u8 val;
+> -	if (pv_eoi_get_user(vcpu, &val) < 0)
+> -		return false;
+> -
+> -	return val & KVM_PV_EOI_ENABLED;
+> -}
+> -
+>  static void pv_eoi_set_pending(struct kvm_vcpu *vcpu)
+>  {
+>  	if (pv_eoi_put_user(vcpu, KVM_PV_EOI_ENABLED) < 0)
+> @@ -690,12 +681,26 @@ static void pv_eoi_set_pending(struct kvm_vcpu *vcpu)
+>  	__set_bit(KVM_APIC_PV_EOI_PENDING, &vcpu->arch.apic_attention);
+>  }
+>  
+> -static void pv_eoi_clr_pending(struct kvm_vcpu *vcpu)
+> +static bool pv_eoi_test_and_clr_pending(struct kvm_vcpu *vcpu)
+>  {
+> -	if (pv_eoi_put_user(vcpu, KVM_PV_EOI_DISABLED) < 0)
+> -		return;
+> +	u8 val;
+> +
+> +	if (pv_eoi_get_user(vcpu, &val) < 0)
+> +		return false;
+> +
+> +	val &= KVM_PV_EOI_ENABLED;
+> +
+> +	if (val && pv_eoi_put_user(vcpu, KVM_PV_EOI_DISABLED) < 0)
+> +		return false;
+>  
+> +	/*
+> +	 * Clear pending bit in any case: it will be set again on vmentry.
+> +	 * While this might not be ideal from performance point of view,
+> +	 * this makes sure pv eoi is only enabled when we know it's safe.
+> +	 */
+>  	__clear_bit(KVM_APIC_PV_EOI_PENDING, &vcpu->arch.apic_attention);
+> +
+> +	return val;
+>  }
+>  
+>  static int apic_has_interrupt_for_ppr(struct kvm_lapic *apic, u32 ppr)
+> @@ -2671,7 +2676,6 @@ void __kvm_migrate_apic_timer(struct kvm_vcpu *vcpu)
+>  static void apic_sync_pv_eoi_from_guest(struct kvm_vcpu *vcpu,
+>  					struct kvm_lapic *apic)
+>  {
+> -	bool pending;
+>  	int vector;
+>  	/*
+>  	 * PV EOI state is derived from KVM_APIC_PV_EOI_PENDING in host
+> @@ -2685,14 +2689,8 @@ static void apic_sync_pv_eoi_from_guest(struct kvm_vcpu *vcpu,
+>  	 * 	-> host enabled PV EOI, guest executed EOI.
+>  	 */
+>  	BUG_ON(!pv_eoi_enabled(vcpu));
+> -	pending = pv_eoi_get_pending(vcpu);
+> -	/*
+> -	 * Clear pending bit in any case: it will be set again on vmentry.
+> -	 * While this might not be ideal from performance point of view,
+> -	 * this makes sure pv eoi is only enabled when we know it's safe.
+> -	 */
+> -	pv_eoi_clr_pending(vcpu);
+> -	if (pending)
+> +
+> +	if (pv_eoi_test_and_clr_pending(vcpu))
+>  		return;
+>  	vector = apic_set_eoi(apic);
+>  	trace_kvm_pv_eoi(apic, vector);
+
+I see my R-b tag is missign, so
+
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+
+-- 
+Vitaly
+
