@@ -2,104 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9AC4145766D
-	for <lists+kvm@lfdr.de>; Fri, 19 Nov 2021 19:33:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 427544576F4
+	for <lists+kvm@lfdr.de>; Fri, 19 Nov 2021 20:18:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234459AbhKSSgG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Nov 2021 13:36:06 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:54247 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231841AbhKSSgF (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 19 Nov 2021 13:36:05 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637346783;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=B+GQMwG10mbwdIIWMwu0ilfUEUoBg0jOybBvIrXEDjQ=;
-        b=hANP8MGuaLOviZukTTmSdxdSRT9HNjIRf84lXZRDqKWSYJd73n6Qc5hqqxGvl5Mc6YtRJE
-        O6Vc7IatXO9xxfMafYdE8dtSWDrJPVRLFFDpC3Dzyf0+FEu4uLlyhsxJt/zNlBdLALBfxs
-        M70n7y1g7cbMtxBwUxg7no3wnijvfuQ=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-190-IoM9-hPuNpWTUoaqJeAgEA-1; Fri, 19 Nov 2021 13:33:02 -0500
-X-MC-Unique: IoM9-hPuNpWTUoaqJeAgEA-1
-Received: by mail-ed1-f69.google.com with SMTP id v10-20020aa7d9ca000000b003e7bed57968so9141889eds.23
-        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 10:33:01 -0800 (PST)
+        id S234456AbhKSTVH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Nov 2021 14:21:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41018 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232663AbhKSTVH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Nov 2021 14:21:07 -0500
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C81AC06173E
+        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 11:18:05 -0800 (PST)
+Received: by mail-pj1-x102f.google.com with SMTP id gx15-20020a17090b124f00b001a695f3734aso9659400pjb.0
+        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 11:18:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=g/YNskCC8H0pIrRty3bOxTWWIwZezM/dF8uipgTGVfY=;
+        b=CNOzkM2IBiGjqfRhSRYpA8+aOR9+w9kYa1mO17Fub/lEhXiodlJQQbYvAU23XPSB80
+         zEPvGqgAhRJ6Ac9fwqtRfF+TRjsCcSQq5iPvk/1Ntl7JnciUfiF+ZDILvu0CHa2qGnpl
+         ujk4JKugJX/qAenq8IEMYsdgtnjBtqpUR91i9SBdt8L7pGQrEmbiL4/gffr02rrMSJmz
+         6yzyBXWa8jt0zBA9CA494YG0zM4LbpueA4wdoIYm5oesyznYRillp/PJwv9KFNX7usVm
+         7PTxEHROAZHj6Qj+AaUATSaSV1EpFTybV/lhNnk/ZpIoUTNLB6A6TpiLrhOQ7Y6XFsOL
+         ut9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=B+GQMwG10mbwdIIWMwu0ilfUEUoBg0jOybBvIrXEDjQ=;
-        b=vTgWIXfsy2X9oMZoWEQiAp7EHozLzFCVx3LXaDagu47Eir/l0HsfELUiv+9m+LLSWP
-         jfJQjxX/frnz0KvSIuLBtC6ZIazydf1MLuCprwJkTkRwrsU5umVIeEIlri5pNWjb6ssw
-         x7ODlaqWSWLP51ACx38tO8bf91SRofGOoYMW5CMwKiZuhECgsOid0r7i0iFc1EZLhHhr
-         TC/VoRGK5Qxy/qg15ed6XM3zoA9k0YsGdjHD55MvsDUmljBEe9T0OzNWhSIjuQ17uy98
-         iaDqo0gWB8xY1lKWeDJWGz1Sq89O5XozWMxFMARje+X4EKH/NpvfLwzCZnjiOha/5vkd
-         t8gw==
-X-Gm-Message-State: AOAM531lPb0L+idT2+iKSqpctNkpys1rkZHJWh6lyi4RmYytq6RJ2zR+
-        SYvtYCIHrIF7rKGPJZXdxpeid/CF4ESdYClLyQyl8cr8mQNMaCxTfaME8e/B+GpFsuZ6V4NUzId
-        s673ESALwRu13
-X-Received: by 2002:a05:6402:4d5:: with SMTP id n21mr27235421edw.303.1637346780087;
-        Fri, 19 Nov 2021 10:33:00 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxEuO0iTCuF5ryZ5+13DQLvOPXu0iE6NgZszeF9V/f02IjK+pJ3+OHzfTepFE/huLwiPjmqwQ==
-X-Received: by 2002:a05:6402:4d5:: with SMTP id n21mr27235398edw.303.1637346779971;
-        Fri, 19 Nov 2021 10:32:59 -0800 (PST)
-Received: from gator.home (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
-        by smtp.gmail.com with ESMTPSA id sa3sm251805ejc.113.2021.11.19.10.32.59
+         :mime-version:content-disposition:in-reply-to;
+        bh=g/YNskCC8H0pIrRty3bOxTWWIwZezM/dF8uipgTGVfY=;
+        b=o43ysm8jvTMvI3SZP4tZW49LC1MP92fGjPCo54mhzHWzjkbSdOyIKLXYEcls3pXPe1
+         gCBvye32pdl7lHJsB77/2kFXitBw0jIGlqx1UZtVhCqH0kTYtdX6m+JD+AdTOkE8QiEp
+         8lz/cogveo1JC7Vs2jlzA18iFdIQPIq0eWwAXUpwbZQJ5qLfztYwi/2G1LNDo8C25VTr
+         Ddzd249gIUUpRyEUaEg6piVle9rLyL9nQm5vusQnas2K1+m9eas69v7t5aNwRLQHi3e7
+         EU/dUO8JqEg2PHyAY6iY/jwDZjjQ+9LwUS3/VcARz21w5DAXzmicNFKuCKeKA9si/c1S
+         1aAA==
+X-Gm-Message-State: AOAM532PMcQx2G7J2V41e008Jz0MgJ5/w0klHCwRPqnTeHZdACziU6HM
+        yQ4beN67/DJPcUUry5WeIdBMUg==
+X-Google-Smtp-Source: ABdhPJxLPt6CntmozfnHLwXqny0KwCU2vgLZSjJXfMA4iRfgP9luxNnbV0AtIM87S/ieQOg/r1KAAQ==
+X-Received: by 2002:a17:902:b28a:b0:142:3e17:38d8 with SMTP id u10-20020a170902b28a00b001423e1738d8mr80638372plr.56.1637349484440;
+        Fri, 19 Nov 2021 11:18:04 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id f15sm426180pfe.171.2021.11.19.11.18.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Nov 2021 10:32:59 -0800 (PST)
-Date:   Fri, 19 Nov 2021 19:32:57 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Cc:     kvm@vger.kernel.org, maz@kernel.org, qemu-arm@nongnu.org,
-        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org
-Subject: Re: [kvm-unit-tests PATCH v4 0/3] GIC ITS tests
-Message-ID: <20211119183257.unj256xrobwbjvae@gator.home>
-References: <20211119163710.974653-1-alex.bennee@linaro.org>
+        Fri, 19 Nov 2021 11:18:03 -0800 (PST)
+Date:   Fri, 19 Nov 2021 19:18:00 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     Jason Gunthorpe <jgg@ziepe.ca>,
+        Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, john.ji@intel.com, susie.li@intel.com,
+        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com
+Subject: Re: [RFC v2 PATCH 01/13] mm/shmem: Introduce F_SEAL_GUEST
+Message-ID: <YZf4aAlbyeWw8wUk@google.com>
+References: <20211119134739.20218-1-chao.p.peng@linux.intel.com>
+ <20211119134739.20218-2-chao.p.peng@linux.intel.com>
+ <20211119151943.GH876299@ziepe.ca>
+ <df11d753-6242-8f7c-cb04-c095f68b41fa@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20211119163710.974653-1-alex.bennee@linaro.org>
+In-Reply-To: <df11d753-6242-8f7c-cb04-c095f68b41fa@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alex,
+On Fri, Nov 19, 2021, David Hildenbrand wrote:
+> On 19.11.21 16:19, Jason Gunthorpe wrote:
+> > As designed the above looks useful to import a memfd to a VFIO
+> > container but could you consider some more generic naming than calling
+> > this 'guest' ?
+> 
+> +1 the guest terminology is somewhat sob-optimal.
 
-Please CC me on the full series. I'm not always able to keep up
-on the lists. I see there's another series too that you've
-posted. I'll look next week.
+For the F_SEAL part, maybe F_SEAL_UNMAPPABLE?
 
-Thanks,
-drew
-
-On Fri, Nov 19, 2021 at 04:37:07PM +0000, Alex Bennée wrote:
-> Hi,
-> 
-> changes since v3:
-> 
->   - dropped the pending LPI test altogether
-> 
-> Alex Bennée (3):
->   arm64: remove invalid check from its-trigger test
->   arm64: enable its-migration tests for TCG
->   arch-run: do not process ERRATA when running under TCG
-> 
->  scripts/arch-run.bash |  4 +++-
->  arm/gic.c             | 28 ++++++++--------------------
->  arm/unittests.cfg     |  3 ---
->  3 files changed, 11 insertions(+), 24 deletions(-)
-> 
-> -- 
-> 2.30.2
-> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-
+No ideas for the kernel API, but that's also less concerning since it's not set
+in stone.  I'm also not sure that dedicated APIs for each high-ish level use case
+would be a bad thing, as the semantics are unlikely to be different to some extent.
+E.g. for the KVM use case, there can be at most one guest associated with the fd,
+but there can be any number of VFIO devices attached to the fd.
