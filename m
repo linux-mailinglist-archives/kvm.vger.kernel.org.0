@@ -2,327 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 55F9D456957
-	for <lists+kvm@lfdr.de>; Fri, 19 Nov 2021 05:48:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 455A74569D1
+	for <lists+kvm@lfdr.de>; Fri, 19 Nov 2021 06:44:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232046AbhKSEvM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 18 Nov 2021 23:51:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41308 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229521AbhKSEvL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 18 Nov 2021 23:51:11 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88919C061574
-        for <kvm@vger.kernel.org>; Thu, 18 Nov 2021 20:48:10 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id gb13-20020a17090b060d00b001a674e2c4a8so7799966pjb.4
-        for <kvm@vger.kernel.org>; Thu, 18 Nov 2021 20:48:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=QoHMt8LQUTb/w8rEtIXtkstD7X6Wu7UF3Mkd4lNy0LM=;
-        b=f6mE+4ldYjvX5BJjmShvzZEMh3rnrUBTxlm+JT423a5ncMdZ/VrE6xWERj1wVvZnJg
-         3Dfv0OYWvbNcdNKK/07mp7loX0QW0l6uNlZQ2zbPRIg39ZIzpo6j1nciS5cIaLwP/mvq
-         2S+8fUbR1sU8bLfFd8BDRuwdNc1Oorz1g64qaS1ZyhaHIt50GgGG3amMgonK7S4A98yH
-         5+fd22zdHRWrceTvR+mA2diDl5QuPtJJuYDmMkohPdNGKcsN53vP8w+ukpPuvel2Ps7J
-         qB5HM/E5a16x+LEjZrc+by6RwXaQFsw9/aOfvXzHkSuNI2TAyIy4I2J0Ca+BZKSFOfQ7
-         CNsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=QoHMt8LQUTb/w8rEtIXtkstD7X6Wu7UF3Mkd4lNy0LM=;
-        b=ipnNVdEtvxGf+m0A4/jHVIl21RUFGFETcnjM9SlKrIGTmK0NfpVzlESLvw0fg1zXdF
-         wRytsJvqDLyaUEFC58CUnWFtF9jMzTGVlGuTGsKEgp6HcJ2YjS4cB3OcsmZOv80BMuym
-         v4vGD5GaXtd1T8NAXq5RsNoO9MYmZ1FljiuDh28dYmCUrCmdzxvKooJ7jZOoispUmCsZ
-         f3/MPrYlI8C7XRFkVfH7Ah0DnM0FUt8W+EJCxuKXhFLIttYx9qV3CWSorpwBG7XgsUZm
-         A4ap3uqu4LkFKluUmgDrn7SWbvsPiOP0suWeN7eEDYgC/Lwet8hC2BP/rPSwd0Ttg6uu
-         V0Hg==
-X-Gm-Message-State: AOAM531uybVaSjou39WkN3J22GuNLL6+V8hIsK1Vljw2PqZAbpInhloB
-        Y7YpfczxaK204qsrIub9KeKk6MwpAdZWZFL8PeoWDA==
-X-Google-Smtp-Source: ABdhPJycAlRxaIvHJJXbqCGSK0+HzBRgJ+ZDhfwoA9cw6lmE0XvsRNi8m9y30tvBRIhyXpjjclu41pp0XPEkOGMUgRU=
-X-Received: by 2002:a17:902:d703:b0:144:e012:d550 with SMTP id
- w3-20020a170902d70300b00144e012d550mr7302851ply.38.1637297289775; Thu, 18 Nov
- 2021 20:48:09 -0800 (PST)
+        id S232202AbhKSFrk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Nov 2021 00:47:40 -0500
+Received: from mga01.intel.com ([192.55.52.88]:58992 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229646AbhKSFrj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Nov 2021 00:47:39 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10172"; a="258151106"
+X-IronPort-AV: E=Sophos;i="5.87,246,1631602800"; 
+   d="scan'208";a="258151106"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2021 21:44:38 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.87,246,1631602800"; 
+   d="scan'208";a="537004699"
+Received: from fmsmsx605.amr.corp.intel.com ([10.18.126.85])
+  by orsmga001.jf.intel.com with ESMTP; 18 Nov 2021 21:44:37 -0800
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx605.amr.corp.intel.com (10.18.126.85) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.12; Thu, 18 Nov 2021 21:44:37 -0800
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.12 via Frontend Transport; Thu, 18 Nov 2021 21:44:37 -0800
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.104)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2242.12; Thu, 18 Nov 2021 21:44:37 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dvr5HXJlaTWnkEU1VP0QTKr1VwfLbmhV2zDj1mPX04G/Ag/E+bF7Jays505Uo2aXqNgv2/IFYszIqjcetCFz1qr28K0c7+UZ39CJn47TYLAFmOPdAEFxH4tbqhjEKJx7rI2MwwXvbQ2CTO1Og7sJXdANeKhvb0MUuJrytXAGjxG9qrIuWPUtQBIzrTsl2dyZExxnq0J56+1TTEd2Y2LdVzAld+tEUW529ih604TgBUtpUu/yTKt8uMT+c6SQ4mAWrKeSTgE0mrTkDUNlGmgsDq069u6br+G1RKxpvtVkKQ5WD9Hx4k+cDvPMymOfd2x8IeWve75BWn+/bi88gRcKZg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=y4LjgUejy0p38kAebtS/6N1uJJoLDu3MfF6X6fIxNFc=;
+ b=YYQ0C1lf0YTw2q1zxof1lJiTZtBZmr26ZPrLoW9xqgrfXR4mhrWtbGdMTS0JQwyQPM8wSjib7QaXVLEs6OgNApu7EEhiev5409LNSogCRQC1EP7xVtvEPc61j9CgIievVQsvhCmnXJtl9HQpfPjGhW3+v7zW624fmIaz9NK75Z4GK0JF/CyD/RHYQ/TN5ZgbXG1IGlA/9b7/QkrxgkjpkypPBG5Rqca6TwI8fwvefq3YD462+HgD/xnZsH4aaVyzZlmKD5yqFw7gwtUh7Fx6I6rkBnTDFh6uklHyPLo17FTuKoZ6F1sRiBb+8JEgQH5XZkFDswS0LHAtOkO9e+fJ2Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=y4LjgUejy0p38kAebtS/6N1uJJoLDu3MfF6X6fIxNFc=;
+ b=MhmVpbohXhyPIV656p66d5sHnq9xJwP06A0NIk+MzyL40KZ5AScpQ/GfKbuymgnPTGnTJ+Qppz/W0B9oUEaU6QUAWzG7qaNtkwmbGPa5mZlQq11eHBmLcukIEmdpsPS7fBZheiq0hJYU2ML+GUjkWlxbuKpW2mfgbIhTHrZxcpU=
+Received: from BN9PR11MB5433.namprd11.prod.outlook.com (2603:10b6:408:11e::13)
+ by BN9PR11MB5338.namprd11.prod.outlook.com (2603:10b6:408:137::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4690.27; Fri, 19 Nov
+ 2021 05:44:35 +0000
+Received: from BN9PR11MB5433.namprd11.prod.outlook.com
+ ([fe80::ecad:62e1:bab9:ac81]) by BN9PR11MB5433.namprd11.prod.outlook.com
+ ([fe80::ecad:62e1:bab9:ac81%9]) with mapi id 15.20.4690.027; Fri, 19 Nov 2021
+ 05:44:35 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     Lu Baolu <baolu.lu@linux.intel.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Joerg Roedel" <joro@8bytes.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "rafael@kernel.org" <rafael@kernel.org>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        "Will Deacon" <will@kernel.org>
+Subject: RE: [PATCH 01/11] iommu: Add device dma ownership set/release
+ interfaces
+Thread-Topic: [PATCH 01/11] iommu: Add device dma ownership set/release
+ interfaces
+Thread-Index: AQHX2cX72SW3lNH8302ZqE4v8PTHlawEkdAAgADVRACAAMX3gIACZvYQgAC6LICAAQu4sA==
+Date:   Fri, 19 Nov 2021 05:44:35 +0000
+Message-ID: <BN9PR11MB5433E5B63E575E2232DFBBE48C9C9@BN9PR11MB5433.namprd11.prod.outlook.com>
+References: <20211115020552.2378167-1-baolu.lu@linux.intel.com>
+ <20211115020552.2378167-2-baolu.lu@linux.intel.com>
+ <YZJdJH4AS+vm0j06@infradead.org>
+ <cc7ce6f4-b1ec-49ef-e245-ab6c330154c2@linux.intel.com>
+ <20211116134603.GA2105516@nvidia.com>
+ <BN9PR11MB5433639E43C37C5D2462BD718C9B9@BN9PR11MB5433.namprd11.prod.outlook.com>
+ <20211118133325.GO2105516@nvidia.com>
+In-Reply-To: <20211118133325.GO2105516@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-version: 11.6.200.16
+dlp-product: dlpe-windows
+dlp-reaction: no-action
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 138a110b-8d55-494e-daf1-08d9ab1fab0a
+x-ms-traffictypediagnostic: BN9PR11MB5338:
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-microsoft-antispam-prvs: <BN9PR11MB53380E113C061E79EA0ECDC38C9C9@BN9PR11MB5338.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: VBfYxOAs0w8vlKjwacxwA8RSHPjFko/aNRiJdMGjjHg9zGREiYsFUpXcESavcQSoT1RvApe34fexSC4ZgxcO0/s9eEB7l1MoZR2huE7zLb8c63qRuNDXN9lr3MHxIjRdn7ZcCWAAZnFIDy2zidkPVwgl+pQusYQZfrWBU4lw57pqjWfyuQLKKMHfeweRNY3LvJH0Quex7ujjR3M76e37mZRtyoPMkl2GGmzb6NS468MPSDRSJumyHXc5drW+gNqezi+jo8N7INKtN5tThqF7gaP1cJ5lSZniVUtHays6fdz6Cw3Gbupj0deEwfEhjV2nBLpGJTlNbn8Sh1Jnaj3J0X4nf9+QzAonDjhdga8Vt0RrkrZXAM5egEPhavPuWhsDMFi+2NSMxET+IeAeXusxvscNEDRjRwalxRz0vvZmdCzC2dsEcRltLdSOo7iDj5tHmBwRF73psGVo7WjbKH+HSUrLEexkgVSFvwXCI/iDMG3MyqsR9jHnZvXOD8e2ozaEk9fzqWv8FegOqDrmDP9qDlCOvdAsw6ynYTsRcm9JCO0U7kaCa0i5uD5HOGxLpsAJ7iV4mvaRXzTA7hj6/oPEnTisJQzSlPtjWYlObOZpctBRDWICpzt/BuILAN+8K20cyjeL8YA5D9pFluTOzNitJ+NnmbWEiRl8i1Of00UF2RFe6n57vGRO63hc8Ox5rZIvn+BiZMBy+NGJTzoMS0/CUQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5433.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(6506007)(316002)(8676002)(9686003)(7696005)(54906003)(4326008)(6916009)(66446008)(38100700002)(122000001)(7416002)(71200400001)(2906002)(55016002)(64756008)(66556008)(8936002)(52536014)(38070700005)(26005)(66946007)(82960400001)(5660300002)(33656002)(186003)(508600001)(86362001)(66476007)(76116006);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?4XhPW5y7zKvWtaaM4WzsExRHz3Iq3b2DPpDNqEWG650nAisLywqa3Oflwo9N?=
+ =?us-ascii?Q?TLJx9+9HLLE9LjxZNjybZUZ0cPh2m3EHtxqjOu3XaisQaOxFaOpZQ6Rz3abc?=
+ =?us-ascii?Q?lJ4AF5SYHcQKFATStkwaBcmhWs3xn1Flgi7yiMVpTrH/f58GFtmSMRo1h6Nw?=
+ =?us-ascii?Q?T0P7wBYbdnxg9bD/Eo1RRw7blzNQ6cxZKgZaXvUI2HQgyf9qYDF6U5BAfOwY?=
+ =?us-ascii?Q?3RlGFVh1w5PmK/9do9eScow8jgdNBjBMNeMLVdUqC0/g0y6MiAihvxwaalbV?=
+ =?us-ascii?Q?tu9VaR48HIsyR8BhMHvep4igJban7+5NAAnJHM/VACrbmnS04bcqvw+y61xp?=
+ =?us-ascii?Q?KQj06YK6uooCCjvmiWQsJWhjMF1LSokqxN2M3G3fy3G9SCfytYl3feRQMNTk?=
+ =?us-ascii?Q?RAddH8aCmLdcRs3bidnwvEmzj2b1/xFgG6fCHIzxtX1eMJFvzUy9imEmvwFS?=
+ =?us-ascii?Q?Ws0TlokRzKt3kdbJdkk5IqzQmVPFxc+pwbW5WtzNI6nlB7xIb+TPxpjzVIiv?=
+ =?us-ascii?Q?QI7x5EoDqasokPJeH76aFmTKgIr1xpvvyyDnuB4ls6R+RZXwN+S7wuDp7IOF?=
+ =?us-ascii?Q?aOCrzlnWqdB7GY0mqHqcwbfzYDkHnCsbkRTQsjHATqBwqoHLcCO8gwAWWb1l?=
+ =?us-ascii?Q?DS36sAUqDUDSvdb4qjCUWkKFcGgPh++6ZOXpqx4pYqVDo5RtYk+nWkZtHpV7?=
+ =?us-ascii?Q?HCJ3a5+2KeRJI0z8s8FcUPOiaAMT/vq5xZ/VH2rbd/YR3ymE3CNpdd0et/6/?=
+ =?us-ascii?Q?6x/OKE+wqySm81SLVvaP5PbPxWUKHD5RTKNEBXRRvgGho1SwWs2N7hDNF1vO?=
+ =?us-ascii?Q?ide52cq7PLxAkHQUEYdTymV2s8RYt9I5c+9ELu6CxivNhdMeA8HttEnZk5Eq?=
+ =?us-ascii?Q?ADq4d0NL/kPUF96D58qG3Uq3iTG+P0NL/W/snYdTn0ixuKHEVlhrTzWot1qh?=
+ =?us-ascii?Q?0BE/4RSR8xOOKvmwf+UmI/B2P+hiSNLXxH85O6OIKzwWIgl/efnbI6kiWo8y?=
+ =?us-ascii?Q?P9I8qRwhLlZ9qIvzzGtIGOUkcdYeRi6Uo2WfV7lSkln8dYTshV1guL7Y3ZJu?=
+ =?us-ascii?Q?6yD4LhXYtLie+AV/URfRFDzFNxU1aUWInKHbQU0CWeBhUN9dBX7UGNbp22I0?=
+ =?us-ascii?Q?awHcDApBF8FU80pEPK63P/AAochzDIviZVHgF0F3086GzNmjXPfEYTunHaLI?=
+ =?us-ascii?Q?Pg5/tVTCw9JJ7VsvRVUT3hxg/962e9OCbW00yW9f503xJCLkf52OEuYuD0CW?=
+ =?us-ascii?Q?0zImzR9hRPvZH3exVvHhrQ3vC2UJoOuIcmEbmz8Z7gRPyYOXq5jaUY8HOVI3?=
+ =?us-ascii?Q?pd30mcC9ZJ7r5ORJz9dED0t5aG80EbDrbH1zDpA8TvRcFzvJ1Q3c4huTs593?=
+ =?us-ascii?Q?lpb6KTJGxa6Y6JTuFOEOT9DkH5s8droSci9mz1UQk5zimRr9iltBIJj8FmYM?=
+ =?us-ascii?Q?pNd98mGo4Em8JUf4HrzuWjoTKLoP6hITN8suYmya/X2f/JTLuyarZqLxVrT6?=
+ =?us-ascii?Q?CmLb7P1e9TrT1fq/ZDVnS/VBrMEN9j8LadDrjmqswKbLd6f6orUx/+ivMaSh?=
+ =?us-ascii?Q?dgGLNpKdhYuLRXOgaIDRrKAabi2LoXpWekyYmpIZQIbzielhnh6zSSbX00Qf?=
+ =?us-ascii?Q?HA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <20211117064359.2362060-1-reijiw@google.com> <20211117064359.2362060-4-reijiw@google.com>
- <d3fd9d6c-c96c-d7a0-b78d-af36430dbf3f@redhat.com>
-In-Reply-To: <d3fd9d6c-c96c-d7a0-b78d-af36430dbf3f@redhat.com>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Thu, 18 Nov 2021 20:47:53 -0800
-Message-ID: <CAAeT=FyzvGaksi+-WidHObrGYcqs4vR73ChCGpo8AFuin6UbYw@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 03/29] KVM: arm64: Introduce struct id_reg_info
-To:     Eric Auger <eauger@redhat.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
-        Peter Shier <pshier@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        linux-arm-kernel@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5433.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 138a110b-8d55-494e-daf1-08d9ab1fab0a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Nov 2021 05:44:35.0920
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: U0IZm3EJ6GW/suwo3q626mdBHLM/ErBD+6Z3Mmn2Zz+CrRMluN1toK+jIcZKwgdHvgKzVh/WSYCA2QW9RLLlJQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR11MB5338
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Thursday, November 18, 2021 9:33 PM
+>=20
+> > In concept a singleton group is different from a
+> > multi-devices group which has only one device bound to driver...
+>=20
+> Really? Why? I don't see it that way..
+>=20
+> A singleton group is just a multi-device group that hasn't been
+> hotplugged yet.
+>=20
+> We don't seem to have the concept of a "true" singleton group which is
+> permanently single due to HW features.
+>=20
+> > This series aims to avoid conflict having both user and kernel drivers
+> > mixed in a multi-devices group.
 
-On Thu, Nov 18, 2021 at 12:36 PM Eric Auger <eauger@redhat.com> wrote:
->
-> Hi Reiji,
->
-> On 11/17/21 7:43 AM, Reiji Watanabe wrote:
-> > This patch lays the groundwork to make ID registers writable.
-> >
-> > Introduce struct id_reg_info for an ID register to manage the
-> > register specific control of its value for the guest, and provide set
-> > of functions commonly used for ID registers to make them writable.
-> >
-> > The id_reg_info is used to do register specific initialization,
-> > validation of the ID register and etc.  Not all ID registers must
-> > have the id_reg_info. ID registers that don't have the id_reg_info
-> > are handled in a common way that is applied to all ID registers.
-> >
-> > At present, changing an ID register from userspace is allowed only
-> > if the ID register has the id_reg_info, but that will be changed
-> > by the following patches.
-> >
-> > No ID register has the structure yet and the following patches
-> > will add the id_reg_info for some ID registers.
-> >
-> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> > ---
-> >  arch/arm64/include/asm/sysreg.h |   1 +
-> >  arch/arm64/kvm/sys_regs.c       | 226 ++++++++++++++++++++++++++++++--
-> >  2 files changed, 218 insertions(+), 9 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> > index 16b3f1a1d468..597609f26331 100644
-> > --- a/arch/arm64/include/asm/sysreg.h
-> > +++ b/arch/arm64/include/asm/sysreg.h
-> > @@ -1197,6 +1197,7 @@
-> >  #define ICH_VTR_TDS_MASK     (1 << ICH_VTR_TDS_SHIFT)
-> >
-> >  #define ARM64_FEATURE_FIELD_BITS     4
-> > +#define ARM64_FEATURE_FIELD_MASK     ((1ull << ARM64_FEATURE_FIELD_BITS) - 1)
-> >
-> >  /* Create a mask for the feature bits of the specified feature. */
-> >  #define ARM64_FEATURE_MASK(x)        (GENMASK_ULL(x##_SHIFT + ARM64_FEATURE_FIELD_BITS - 1, x##_SHIFT))
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 5608d3410660..1552cd5581b7 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -265,6 +265,181 @@ static bool trap_raz_wi(struct kvm_vcpu *vcpu,
-> >               return read_zero(vcpu, p);
-> >  }
-> >
-> > +/*
-> > + * A value for FCT_LOWER_SAFE must be zero and changing that will affect
-> > + * ftr_check_types of id_reg_info.
-> > + */
-> > +enum feature_check_type {
-> > +     FCT_LOWER_SAFE = 0,
-> > +     FCT_HIGHER_SAFE,
-> > +     FCT_HIGHER_OR_ZERO_SAFE,
-> > +     FCT_EXACT,
-> > +     FCT_EXACT_OR_ZERO_SAFE,
-> > +     FCT_IGNORE,     /* Don't check (any value is fine) */
-> Maybe you can remove the _SAFE suffix (EXACT does not have it).
+Well, the difference is just in literal. I don't know the background
+why the existing iommu_attach_device() users want to do it this
+way. But given the condition in iommu_attach_device() it could
+in theory imply some unknown hardware-level side effect which=20
+may break the desired functionality once the group size grows=20
+beyond singleton. Is it a real case? I don't know...
 
-I am inclined to keep 'SAFE' (otherwise, I am likely to forget
-if lower is safe or not).
+You are now redefining that condition from singleton group to
+multi-devices group with single driver bound. As long as no object
+from existing driver users, I'm fine with it. But still want to raise
+awareness as it does change the existing semantics (though might
+be considered as an imperfect way).
 
-> s/EXACT/EQUAL ?
+Thanks
+Kevin
 
-I will fix that FCT_EXACT to FCT_EQUAL_SAFE.
-
-> > +};
-> > +
-> > +static int arm64_check_feature_one(enum feature_check_type type, int val,
-> > +                                int limit)
-> > +{
-> > +     bool is_safe = false;
-> > +
-> > +     if (val == limit)
-> > +             return 0;
-> even if the type is unexpected?
-
-I will remove it.
-
-> > +
-> > +     switch (type) {
-> > +     case FCT_LOWER_SAFE:
-> > +             is_safe = (val <= limit);
-> > +             break;
-> > +     case FCT_HIGHER_OR_ZERO_SAFE:
-> > +             if (val == 0) {
-> > +                     is_safe = true;
-> > +                     break;
-> > +             }
-> > +             fallthrough;
-> > +     case FCT_HIGHER_SAFE:
-> > +             is_safe = (val >= limit);
-> > +             break;
-> > +     case FCT_EXACT:
-> > +             break;
-> > +     case FCT_EXACT_OR_ZERO_SAFE:
-> > +             is_safe = (val == 0);
-> > +             break;
-> > +     case FCT_IGNORE:
-> > +             is_safe = true;
-> > +             break;
-> > +     default:
-> > +             WARN_ONCE(1, "Unexpected feature_check_type (%d)\n", type);
-> > +             break;
-> > +     }
-> > +
-> > +     return is_safe ? 0 : -1;
-> > +}
-> > +
-> > +#define      FCT_TYPE_MASK           0x7
-> > +#define      FCT_TYPE_SHIFT          1
-> > +#define      FCT_SIGN_MASK           0x1
-> > +#define      FCT_SIGN_SHIFT          0
-> > +#define      FCT_TYPE(val)   ((val >> FCT_TYPE_SHIFT) & FCT_TYPE_MASK)
-> > +#define      FCT_SIGN(val)   ((val >> FCT_SIGN_SHIFT) & FCT_SIGN_MASK)
-> > +
-> > +#define      MAKE_FCT(shift, type, sign)                             \
-> > +     ((u64)((((type) & FCT_TYPE_MASK) << FCT_TYPE_SHIFT) |   \
-> > +            (((sign) & FCT_SIGN_MASK) << FCT_SIGN_SHIFT)) << (shift))
-> > +
-> > +/* For signed field */
-> > +#define      S_FCT(shift, type)      MAKE_FCT(shift, type, 1)
-> > +/* For unigned field */
-> > +#define      U_FCT(shift, type)      MAKE_FCT(shift, type, 0)
-> > +
-> > +/*
-> > + * @val and @lim are both a value of the ID register. The function checks
-> > + * if all features indicated in @val can be supported for guests on the host,
-> > + * which supports features indicated in @lim. @check_types indicates how> + * features in the ID register needs to be checked.
-> > + * See comments for id_reg_info's ftr_check_types field for more detail.
-> What about RES0 fields which may exist? add a comment to reassure about
-> the fact they are properly handled if there are?
-
-Any fields including RES0 should be checked based on check_types.
-I will explicitly state that in the comment.
-
-> > + */
-> > +static int arm64_check_features(u64 check_types, u64 val, u64 lim)
-> > +{
-> > +     int i;
-> > +
-> > +     for (i = 0; i < 64; i += ARM64_FEATURE_FIELD_BITS) {
-> > +             u8 ftr_check = (check_types >> i) & ARM64_FEATURE_FIELD_MASK;
-> > +             bool is_sign = FCT_SIGN(ftr_check);
-> > +             enum feature_check_type fctype = FCT_TYPE(ftr_check);
-> > +             int fval, flim, ret;
-> > +
-> > +             fval = cpuid_feature_extract_field(val, i, is_sign);
-> > +             flim = cpuid_feature_extract_field(lim, i, is_sign);
-> > +
-> > +             ret = arm64_check_feature_one(fctype, fval, flim);
-> > +             if (ret)
-> > +                     return -E2BIG;
-> > +     }
-> > +     return 0;
-> > +}
-> > +
-> > +struct id_reg_info {
-> > +     u32     sys_reg;        /* Register ID */
-> use struct kernel-doc comments instead?
-> > +
-> > +     /*
-> > +      * Limit value of the register for a vcpu. The value is the sanitized
-> > +      * system value with bits cleared for unsupported features for the
-> > +      * guest.
-> > +      */
-> > +     u64     vcpu_limit_val;
-> > +
-> > +     /*
-> > +      * The ftr_check_types is comprised of a set of 4 bits fields.
-> nit: s/bits field/bit field here and below
-
-I will fix them.
-
-> > +      * Each 4 bits field is for a feature indicated by the same bits
-> > +      * field of the ID register and indicates how the feature support
-> > +      * for guests needs to be checked.
-> > +      * The bit 0 indicates that the corresponding ID register field
-> > +      * is signed(1) or unsigned(0).
-> > +      * The bits [3:1] hold feature_check_type for the field.
-> > +      * If all zero, all features in the ID register are treated as unsigned
-> > +      * fields and checked based on Principles of the ID scheme for fields
-> > +      * in ID registers (FCT_LOWER_SAFE of feature_check_type).
-> values set by the guest are checked against host ID field values
-> according to FCT_LOWER_SAFE test? You do not actually explicitly explain
-> what the check is about although this may be obvious for you?
-
-How about this ?
-
-        /*
-         * The ftr_check_types is comprised of a set of 4 bit fields.
-         * Each 4 bit field is for a feature indicated by the same bit field
-         * of the ID register and indicates how the field needs to be checked
-         * (by arm64_check_feature_one) against the host's ID field when
-         * userspace tries to set the register.
-         * The bit 0 indicates that the corresponding ID register field is
-         * signed(1) or unsigned(0). The bits [3:1] hold feature_check_type
-         * for the field (FCT_LOWER_SAFE == 0, etc).
-         * e.g. for ID_AA64PFR0_EL1.SVE(bits [35:32]), bits[35:32] of
-         * ftr_check_types for the register should be 0. It means the SVE
-         * field is treated as an unsigned field, and userspace can set the
-         * field to a equal or lower value than the host's ID field value.
-         */
-
-> > +      */
-> > +     u64     ftr_check_types;
-> > +
-> > +     /* Initialization function of the id_reg_info */
-> > +     void (*init)(struct id_reg_info *id_reg);
-> > +
-> > +     /* Register specific validation function */
-> validation callback? it does not register anything. We have check
-> customization means already in ftr_check_types so it is difficult to
-> guess at that point why this cb is needed, all the more so it applies
-> after the ftr_checks.
-
-I am going to add the following comment. Does it look clear enough for you ?
-
-        /*
-         * This is an optional ID register specific validation function.
-         * When userspace tries to set the ID register, arm64_check_features()
-         * will check if the requested value indicates any features that cannot
-         * be supported by KVM on the host.  But, some ID register fields need
-         * a special checking and this function can be used for such fields.
-         * e.g. KVM_CREATE_DEVICE must be used to configure GICv3 for a guest.
-         * ID_AA64PFR0_EL1.GIC shouldn't be set to 1 unless GICv3 is configured.
-         * The validation function for ID_AA64PFR0_EL1 could be used to check
-         * the field is consistent with GICv3 configuration.
-         */
-
-> > +     int (*validate)(struct kvm_vcpu *vcpu, const struct id_reg_info *id_reg,
-> > +                     u64 val);
-> > +
-> > +     /* Return the reset value of the register for the vCPU */
-> > +     u64 (*get_reset_val)(struct kvm_vcpu *vcpu,
-> > +                          const struct id_reg_info *id_reg);
-> > +};
-> > +
-> > +static void id_reg_info_init(struct id_reg_info *id_reg)
-> > +{
-> > +     id_reg->vcpu_limit_val = read_sanitised_ftr_reg(id_reg->sys_reg);
-> > +     if (id_reg->init)
-> > +             id_reg->init(id_reg);
-> > +}
-> > +
-> > +/*
-> > + * An ID register that needs special handling to control the value for the
-> > + * guest must have its own id_reg_info in id_reg_info_table.
-> > + * (i.e. the reset value is different from the host's sanitized value,
-> > + * the value is affected by opt-in features, some fields needs specific
-> s/needs/need
-
-I will fix it.
-
-Thank you for your review !
-
-Regards
-Reiji
