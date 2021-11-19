@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DAB804579CB
-	for <lists+kvm@lfdr.de>; Sat, 20 Nov 2021 00:58:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7843D4579CC
+	for <lists+kvm@lfdr.de>; Sat, 20 Nov 2021 00:58:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236255AbhKTAB0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Nov 2021 19:01:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47296 "EHLO
+        id S236382AbhKTABd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Nov 2021 19:01:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236200AbhKTABQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Nov 2021 19:01:16 -0500
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9833C061574
-        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 15:58:13 -0800 (PST)
-Received: by mail-pj1-x1049.google.com with SMTP id n6-20020a17090a670600b001a9647fd1aaso7470576pjj.1
-        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 15:58:13 -0800 (PST)
+        with ESMTP id S236209AbhKTABR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Nov 2021 19:01:17 -0500
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65170C06173E
+        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 15:58:15 -0800 (PST)
+Received: by mail-pl1-x649.google.com with SMTP id m15-20020a170902bb8f00b0014382b67873so5338379pls.19
+        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 15:58:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=ORkMQIzkhcuqBRx3eJca9p54z3P3WQQiypjtLzoh9Ww=;
-        b=EVSF8l2vRT5ze/yOakhU3W87MjlMAJgeJZV3rU6oZltmiUFxh+DyzzmdvRvSSZAPns
-         XY8l9R6BnQ64vMmHMDgW7+QAwDxuY32vGK9MHNB5n6ldmHSDpPkafoWTkpWp9aIUtgSP
-         +/ywtXMjb6MXL2xKJYw2FTqOPuRv856TVe0gOHyl1TizlNGA/H3C8Dg8Gy6emBUy6Y4C
-         ZRySLnuK43nsg843viqcB20kVaeU6NfVMvjljgso/5eWEYJEFD2enkl6TFuWNR46DQFI
-         hYnVD9CwD+llCGwW7jq9cVs/nW/5eUtQwPcVh6U2H7dvsFedECBCxyBzlev6OJdR5TkY
-         c2ZQ==
+        bh=+5FkbEhx1+9GLVuvk8L93fKbVlYearXqDKwYBbqQGyM=;
+        b=J47SqzCVE674c+S+p5XhPXNPtiUpiobr5ZLjHVmBMWqoDbo7Lo/B8LgRidDs4r/Lf8
+         3VbgHm3sqq3B6iQYOcnOGYLdQQkS0mvaGY18DUt5nFkSClyk+dvy3ZyuPtVyUSWeDyWC
+         f+KP84lqd29GRxChGs0+5a5vG4aEyBHn+mFBf1G3zVB9O2Fr9Lkwz5nfjRmi1Ejbv9k9
+         dAtmDiTGvTJf7rpXpkS0qpGbMPMrMGe3W3hg+RGszAtpZaUjTOuSX+k+nZ382eYwNcTW
+         kUUSSVkaOknfJZY9mD1DQWWQN2+PrRR9/b75tTcdvZ7Sgy6X3j5Amf9chVez/hruJxte
+         UM7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=ORkMQIzkhcuqBRx3eJca9p54z3P3WQQiypjtLzoh9Ww=;
-        b=WnAUu0+RTeZLigsI6dYnZIeA+XUeEkOjFHPZqCpC3Lznb+pg71imrqY5YnchqSN/ls
-         3913zjExJ9njwJKLsaD5X/SOrlht32cniOXb4A/RT6Ty4ZU2xp4K1qRD/RsTGplyBF+3
-         mRY2sVmFHQaRyFkei6hAZ/k3DdOCeTWkXezC1XMdMU58Z5mIvlgDKflBfZ122eDTUH55
-         dry9gpZU9jMR00N0tGvKcPiyl1u4wWj+GitA7HbIQW+AnVbjiPX3JaqvpNaeSDjXXcqx
-         YJI5N9WF/DOyFc1zQVytaOK6dWXMGvaF/W8wi0ulx88HSjp64KEoaDZri0adFFzwlB/H
-         FcsA==
-X-Gm-Message-State: AOAM531RO4wuJ+WV6c8AVauJDMSyJ+H/EeV4PciiCkspEJaWznULKSTA
-        sm3+UA76EvpJ+YolO2B5LY0j2TA85jlywg==
-X-Google-Smtp-Source: ABdhPJxLdz2EWalCLqpJuTxAPY1Jh19P8TYAALRiU2AkUb/W0TGkkeemjFitnuvBcRG+X388eZUBcbtHyAR2uw==
+        bh=+5FkbEhx1+9GLVuvk8L93fKbVlYearXqDKwYBbqQGyM=;
+        b=RCLjszOOn9S2gp4DwkCb2YRBIhCJEZufJjtjjLcMpLne687brqdkDZYJCfn/+ggZ0U
+         Eg4QowP6+vr60dx8YY3tFzCBaJ5C0WlAhI/H8TfWLwqHg0KEenJaHwujIN71uRAd9Cpb
+         1ZH+aNT6iOs7EvkQ8/m0DRGO4j/8sDe1mfeMrwRiGkTEanfuwZgyrdfmc4uPtVlrACPn
+         1pYiApCKHWQXUuRwxiT2QDLshokh30xFvpC4sOc4TRY+uIqofZvwmYPYWHWEOFOR3mb2
+         Tg/EcUknTLTB6A2eYjudop1zdKpRFxoz7k6G+wNwECVUCpahLrfSxhfRN/3uMKGIdz+1
+         i6xw==
+X-Gm-Message-State: AOAM531lATvV2iXgTevApOrSvP39ZujB9UCvzTNAgnuyA84BFyF97hEl
+        Afz625VokTpTEPMiv1L1EQBkV/Ts/jSoMg==
+X-Google-Smtp-Source: ABdhPJxxYB6OpokHiTIXOsuahJdGdcZ/cwDyR5jXqj8GkgVPFTmZ6RbpEcJdgasomqfuV7TJM5DMuIunJ0wKIw==
 X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a05:6a00:a8e:b0:47b:a658:7f4d with SMTP
- id b14-20020a056a000a8e00b0047ba6587f4dmr67288414pfl.82.1637366293339; Fri,
- 19 Nov 2021 15:58:13 -0800 (PST)
-Date:   Fri, 19 Nov 2021 23:57:46 +0000
+ (user=dmatlack job=sendgmr) by 2002:a17:902:714f:b0:142:892d:a46 with SMTP id
+ u15-20020a170902714f00b00142892d0a46mr80956847plm.39.1637366294873; Fri, 19
+ Nov 2021 15:58:14 -0800 (PST)
+Date:   Fri, 19 Nov 2021 23:57:47 +0000
 In-Reply-To: <20211119235759.1304274-1-dmatlack@google.com>
-Message-Id: <20211119235759.1304274-3-dmatlack@google.com>
+Message-Id: <20211119235759.1304274-4-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20211119235759.1304274-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.34.0.rc2.393.gf8c9666880-goog
-Subject: [RFC PATCH 02/15] KVM: x86/mmu: Rename __rmap_write_protect to rmap_write_protect
+Subject: [RFC PATCH 03/15] KVM: x86/mmu: Automatically update iter->old_spte
+ if cmpxchg fails
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Ben Gardon <bgardon@google.com>,
@@ -71,60 +72,140 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now that rmap_write_protect has been renamed, there is no need for the
-double underscores in front of __rmap_write_protect.
-
-No functional change intended.
+Consolidate a bunch of code that was manually re-reading the spte if the
+cmpxchg fails. There is no extra cost of doing this because we already
+have the spte value as a result of the cmpxchg (and in fact this
+eliminates re-reading the spte), and none of the call sites depend on
+iter->old_spte retaining the stale spte value.
 
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ arch/x86/kvm/mmu/tdp_mmu.c | 56 ++++++++++++--------------------------
+ 1 file changed, 18 insertions(+), 38 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 16ffb571bc75..1146f87044a6 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1235,9 +1235,9 @@ static bool spte_write_protect(u64 *sptep, bool pt_protect)
- 	return mmu_spte_update(sptep, spte);
- }
- 
--static bool __rmap_write_protect(struct kvm *kvm,
--				 struct kvm_rmap_head *rmap_head,
--				 bool pt_protect)
-+static bool rmap_write_protect(struct kvm *kvm,
-+			       struct kvm_rmap_head *rmap_head,
-+			       bool pt_protect)
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 377a96718a2e..cc9fe33c9b36 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -492,16 +492,22 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+  * and handle the associated bookkeeping.  Do not mark the page dirty
+  * in KVM's dirty bitmaps.
+  *
++ * If setting the SPTE fails because it has changed, iter->old_spte will be
++ * updated with the updated value of the spte.
++ *
+  * @kvm: kvm instance
+  * @iter: a tdp_iter instance currently on the SPTE that should be set
+  * @new_spte: The value the SPTE should be set to
+  * Returns: true if the SPTE was set, false if it was not. If false is returned,
+- *	    this function will have no side-effects.
++ *          this function will have no side-effects other than updating
++ *          iter->old_spte to the latest value of spte.
+  */
+ static inline bool tdp_mmu_set_spte_atomic(struct kvm *kvm,
+ 					   struct tdp_iter *iter,
+ 					   u64 new_spte)
  {
- 	u64 *sptep;
- 	struct rmap_iterator iter;
-@@ -1317,7 +1317,7 @@ static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
- 	while (mask) {
- 		rmap_head = gfn_to_rmap(slot->base_gfn + gfn_offset + __ffs(mask),
- 					PG_LEVEL_4K, slot);
--		__rmap_write_protect(kvm, rmap_head, false);
-+		rmap_write_protect(kvm, rmap_head, false);
++	u64 old_spte;
++
+ 	lockdep_assert_held_read(&kvm->mmu_lock);
  
- 		/* clear the first set bit */
- 		mask &= mask - 1;
-@@ -1416,7 +1416,7 @@ bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm,
- 	if (kvm_memslots_have_rmaps(kvm)) {
- 		for (i = min_level; i <= KVM_MAX_HUGEPAGE_LEVEL; ++i) {
- 			rmap_head = gfn_to_rmap(gfn, i, slot);
--			write_protected |= __rmap_write_protect(kvm, rmap_head, true);
-+			write_protected |= rmap_write_protect(kvm, rmap_head, true);
- 		}
+ 	/*
+@@ -515,9 +521,11 @@ static inline bool tdp_mmu_set_spte_atomic(struct kvm *kvm,
+ 	 * Note, fast_pf_fix_direct_spte() can also modify TDP MMU SPTEs and
+ 	 * does not hold the mmu_lock.
+ 	 */
+-	if (cmpxchg64(rcu_dereference(iter->sptep), iter->old_spte,
+-		      new_spte) != iter->old_spte)
++	old_spte = cmpxchg64(rcu_dereference(iter->sptep), iter->old_spte, new_spte);
++	if (old_spte != iter->old_spte) {
++		iter->old_spte = old_spte;
+ 		return false;
++	}
+ 
+ 	__handle_changed_spte(kvm, iter->as_id, iter->gfn, iter->old_spte,
+ 			      new_spte, iter->level, true);
+@@ -747,14 +755,8 @@ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
+ 		if (!shared) {
+ 			tdp_mmu_set_spte(kvm, &iter, 0);
+ 			flush = true;
+-		} else if (!tdp_mmu_zap_spte_atomic(kvm, &iter)) {
+-			/*
+-			 * The iter must explicitly re-read the SPTE because
+-			 * the atomic cmpxchg failed.
+-			 */
+-			iter.old_spte = READ_ONCE(*rcu_dereference(iter.sptep));
++		} else if (!tdp_mmu_zap_spte_atomic(kvm, &iter))
+ 			goto retry;
+-		}
  	}
  
-@@ -5780,7 +5780,7 @@ static bool slot_rmap_write_protect(struct kvm *kvm,
- 				    struct kvm_rmap_head *rmap_head,
- 				    const struct kvm_memory_slot *slot)
- {
--	return __rmap_write_protect(kvm, rmap_head, false);
-+	return rmap_write_protect(kvm, rmap_head, false);
- }
+ 	rcu_read_unlock();
+@@ -978,13 +980,6 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ 		    is_large_pte(iter.old_spte)) {
+ 			if (!tdp_mmu_zap_spte_atomic(vcpu->kvm, &iter))
+ 				break;
+-
+-			/*
+-			 * The iter must explicitly re-read the spte here
+-			 * because the new value informs the !present
+-			 * path below.
+-			 */
+-			iter.old_spte = READ_ONCE(*rcu_dereference(iter.sptep));
+ 		}
  
- void kvm_mmu_slot_remove_write_access(struct kvm *kvm,
+ 		if (!is_shadow_present_pte(iter.old_spte)) {
+@@ -1190,14 +1185,9 @@ static bool wrprot_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
+ 
+ 		new_spte = iter.old_spte & ~PT_WRITABLE_MASK;
+ 
+-		if (!tdp_mmu_set_spte_atomic(kvm, &iter, new_spte)) {
+-			/*
+-			 * The iter must explicitly re-read the SPTE because
+-			 * the atomic cmpxchg failed.
+-			 */
+-			iter.old_spte = READ_ONCE(*rcu_dereference(iter.sptep));
++		if (!tdp_mmu_set_spte_atomic(kvm, &iter, new_spte))
+ 			goto retry;
+-		}
++
+ 		spte_set = true;
+ 	}
+ 
+@@ -1258,14 +1248,9 @@ static bool clear_dirty_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
+ 				continue;
+ 		}
+ 
+-		if (!tdp_mmu_set_spte_atomic(kvm, &iter, new_spte)) {
+-			/*
+-			 * The iter must explicitly re-read the SPTE because
+-			 * the atomic cmpxchg failed.
+-			 */
+-			iter.old_spte = READ_ONCE(*rcu_dereference(iter.sptep));
++		if (!tdp_mmu_set_spte_atomic(kvm, &iter, new_spte))
+ 			goto retry;
+-		}
++
+ 		spte_set = true;
+ 	}
+ 
+@@ -1391,14 +1376,9 @@ static bool zap_collapsible_spte_range(struct kvm *kvm,
+ 							    pfn, PG_LEVEL_NUM))
+ 			continue;
+ 
+-		if (!tdp_mmu_zap_spte_atomic(kvm, &iter)) {
+-			/*
+-			 * The iter must explicitly re-read the SPTE because
+-			 * the atomic cmpxchg failed.
+-			 */
+-			iter.old_spte = READ_ONCE(*rcu_dereference(iter.sptep));
++		if (!tdp_mmu_zap_spte_atomic(kvm, &iter))
+ 			goto retry;
+-		}
++
+ 		flush = true;
+ 	}
+ 
 -- 
 2.34.0.rc2.393.gf8c9666880-goog
 
