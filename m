@@ -2,170 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 563694572BC
-	for <lists+kvm@lfdr.de>; Fri, 19 Nov 2021 17:19:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 50EEB4572F7
+	for <lists+kvm@lfdr.de>; Fri, 19 Nov 2021 17:31:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236451AbhKSQW6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Nov 2021 11:22:58 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28950 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234650AbhKSQW6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 19 Nov 2021 11:22:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637338795;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=KV/tkCgmsS7i2APUX/7qyOc6gDmwY8m+7cktraXzQn0=;
-        b=NB36R+taVKTCjwEYwjuaZm5fLpMkkdHoXp3f1T7oFZxhMbalourQCTNwCc9y/odUw6j0YR
-        z6dO8ffpXE/QXMGA8Ye3CBC1tCXpC9hZqIqyMjoBrPYNbqvgcY6/vNzCIxXNIoJrcugOKB
-        VNiem1ZjddCvSjcMD5cstYYfl6+zh/U=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-560-RM7S80wHNsixISl-kVaQMQ-1; Fri, 19 Nov 2021 11:19:54 -0500
-X-MC-Unique: RM7S80wHNsixISl-kVaQMQ-1
-Received: by mail-wm1-f72.google.com with SMTP id n41-20020a05600c502900b003335ab97f41so4990481wmr.3
-        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 08:19:54 -0800 (PST)
+        id S235117AbhKSQeU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Nov 2021 11:34:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59398 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232663AbhKSQeT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Nov 2021 11:34:19 -0500
+Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 897B6C061574
+        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 08:31:17 -0800 (PST)
+Received: by mail-wm1-x32b.google.com with SMTP id j140-20020a1c2392000000b003399ae48f58so3041025wmj.5
+        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 08:31:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=references:user-agent:from:to:cc:subject:date:in-reply-to
+         :message-id:mime-version:content-transfer-encoding;
+        bh=XonVBN9UhK3TNdc3A1YJVcvvL67hZKsmNPxUpmHwItk=;
+        b=rC9uz1gZXdPk56Nk1Dga+Mzt5srm/6DA12btE8+r1C7t9CBSmkBwo3Hfqjj6Mb8vR6
+         tg+TM3G1LBeSNXK4nxjLnlPiIoEL7X4Q//7jHhzVC7cNFTuivF3BEq9xCb92F4wAds+6
+         wlrQPPts1zZpw5JMvTmfXlg3+KZE0AK6wEAEPQfT5+Sb8mvLhQxfAdxG2gb8wmoSLJJB
+         TmOEln4YDW8P3hndFtguagY9LGjYmDu3WY4p7xJbQmUP5nfm/JA5angfK4H1ibFwJTOE
+         cAW+8F0EQvtMc5V5XrU+TZ0W/wTqWj3VxqErijViSeeVEbkM/sIN4RaJiCGVtX+xNafp
+         K2Vw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=KV/tkCgmsS7i2APUX/7qyOc6gDmwY8m+7cktraXzQn0=;
-        b=IbfYpFBxpxGB4vBXH3X01uHKmMF0k+4l8Or2PMYcyY7NoER/nH0vjS2gAbY6Vjx8MB
-         mC9JvNdN0fH7SFpkYjUKlYPb/HFErn7aFjhLOQIUH+NXi1BgJrCQFWnGVKwsabVjRqag
-         rCycmoK6VErCVnZzwfZheqXDP0+XIIDPNiOmscDOXRHox0sI0oAF09zclnGhmvUnLnJC
-         vCjgAq9Pq0DRVivO9/Ss/W88K+cUqsmWhYDhy9dG/ZB8mMfPo2Ysl5aSREfOsCJG4nlO
-         kv//iAVjdLNIGRz31CErpxoPOhe3M40yt4QLRg3BKT/rUamAxJ2+b6uf8er456eJTZeL
-         O+QA==
-X-Gm-Message-State: AOAM533TvKaCvg1CO8nXpJDl3bHYZaiVptbZYjpG+FpDtYnum/pz5Iyc
-        RWsQ+5BVIGF/qtUiLdZi680KXVzZajbpVnvssSMDcX2+vPv/nO8TxXO6R+zxwZryn2z/sJBKYVF
-        RBE9Z2Cb3AlDO
-X-Received: by 2002:a05:600c:2117:: with SMTP id u23mr1016432wml.19.1637338793351;
-        Fri, 19 Nov 2021 08:19:53 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyypSNe83wKPHORFILceewC9LXVrcDFK0lsfkP7ru/nhY1odUOFzw45jOp2yZPs390wmI5MTQ==
-X-Received: by 2002:a05:600c:2117:: with SMTP id u23mr1016388wml.19.1637338793086;
-        Fri, 19 Nov 2021 08:19:53 -0800 (PST)
-Received: from fedora (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id f81sm13871621wmf.22.2021.11.19.08.19.51
+        h=x-gm-message-state:references:user-agent:from:to:cc:subject:date
+         :in-reply-to:message-id:mime-version:content-transfer-encoding;
+        bh=XonVBN9UhK3TNdc3A1YJVcvvL67hZKsmNPxUpmHwItk=;
+        b=lyIKoDgWm9Wd9gCt2/zchct2KxQi9bBUCFtEl4N6b0nQaDwcYB2VJSJjik5qwdAczT
+         REWsUii03GHjEqRResFYazL0Gf1/JkpM4IAlLmoniNULgJn6dc0q4wdGZDCCdgE48rTc
+         b+LqFtpzuv+l8lXAdMrAEZ+Eit9zj8NOMQdxHb5BHLCigDH4RSx+ZjCwyTpfsb/2adXs
+         +r5MQKZfSgtdb0gJavD0ngoMfQ8PgcZ07oGHIScHbfoHspR864xpusM/GRxpz0H+Skuq
+         yy8vfV7y5rajLM19f/xo2fkRP/TA7GQBmbAzNG8womO188QIOqzislCKOTDQxYCt46Ay
+         7toQ==
+X-Gm-Message-State: AOAM532sKy/wLrKq3BmUPDEH+/Cf377948foCT1Y9cCH/v+cSTnZCGjJ
+        w8zcEsc3PEY+v567z8F+MQ9MWA==
+X-Google-Smtp-Source: ABdhPJy4m0XfeadVPe3VvpHbxVbveI8YvM0lUgplP9BkWybjPN0yJWrOgZpbmCDr2hgqJbZc+aGBMQ==
+X-Received: by 2002:a1c:790d:: with SMTP id l13mr1116489wme.101.1637339476035;
+        Fri, 19 Nov 2021 08:31:16 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+        by smtp.gmail.com with ESMTPSA id h15sm15359588wmq.32.2021.11.19.08.31.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Nov 2021 08:19:52 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Li RongQing <lirongqing@baidu.com>, kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, seanjc@google.com, lirongqing@baidu.com,
-        stable@kernel.org
-Subject: Re: [v4][PATCH 2/2] KVM: Clear pv eoi pending bit only when it is set
-In-Reply-To: <1636026974-50555-2-git-send-email-lirongqing@baidu.com>
-References: <1636026974-50555-1-git-send-email-lirongqing@baidu.com>
- <1636026974-50555-2-git-send-email-lirongqing@baidu.com>
-Date:   Fri, 19 Nov 2021 17:19:50 +0100
-Message-ID: <8735nsnmmx.fsf@redhat.com>
+        Fri, 19 Nov 2021 08:31:14 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+        by zen.linaroharston (Postfix) with ESMTP id 053491FF96;
+        Fri, 19 Nov 2021 16:31:14 +0000 (GMT)
+References: <20211112114734.3058678-1-alex.bennee@linaro.org>
+ <20211112132312.qrgmby55mlenj72p@gator.home> <87wnldfoul.fsf@linaro.org>
+ <20211112145442.5ktlpwyolwdsxlnx@gator.home>
+User-agent: mu4e 1.7.5; emacs 28.0.60
+From:   Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     kvm@vger.kernel.org, maz@kernel.org, shashi.mallela@linaro.org,
+        qemu-arm@nongnu.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, eric.auger@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v3 0/3] GIC ITS tests
+Date:   Fri, 19 Nov 2021 16:30:47 +0000
+In-reply-to: <20211112145442.5ktlpwyolwdsxlnx@gator.home>
+Message-ID: <877dd4umy6.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Li RongQing <lirongqing@baidu.com> writes:
 
-> merge pv_eoi_get_pending and pv_eoi_clr_pending into a single
-> function pv_eoi_test_and_clear_pending, which returns and clear
-> the value of the pending bit.
+Andrew Jones <drjones@redhat.com> writes:
+
+> On Fri, Nov 12, 2021 at 02:08:01PM +0000, Alex Benn=C3=A9e wrote:
+>>=20
+>> Andrew Jones <drjones@redhat.com> writes:
+>>=20
+>> > On Fri, Nov 12, 2021 at 11:47:31AM +0000, Alex Benn=C3=A9e wrote:
+>> >> Hi,
+>> >>=20
+>> >> Sorry this has been sitting in my tree so long. The changes are fairly
+>> >> minor from v2. I no longer split the tests up into TCG and KVM
+>> >> versions and instead just ensure that ERRATA_FORCE is always set when
+>> >> run under TCG.
+>> >>=20
+>> >> Alex Benn=C3=A9e (3):
+>> >>   arm64: remove invalid check from its-trigger test
+>> >>   arm64: enable its-migration tests for TCG
+>> >>   arch-run: do not process ERRATA when running under TCG
+>> >>=20
+>> >>  scripts/arch-run.bash |  4 +++-
+>> >>  arm/gic.c             | 16 ++++++----------
+>> >>  arm/unittests.cfg     |  3 ---
+>> >>  3 files changed, 9 insertions(+), 14 deletions(-)
+>> >>=20
+>> >> --=20
+>> >> 2.30.2
+>> >>=20
+>> >> _______________________________________________
+>> >> kvmarm mailing list
+>> >> kvmarm@lists.cs.columbia.edu
+>> >> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+>> >
+>> > Hi Alex,
+>> >
+>> > Thanks for this. I've applied to arm/queue, but I see that
+>> >
+>> > FAIL: gicv3: its-trigger: inv/invall: dev2/eventid=3D20 pending LPI is=
+ received
+>> >
+>> > consistently fails for me. Is that expected? Does it work for you?
+>>=20
+>> doh - looks like I cocked up the merge conflict...
+>>=20
+>> Did it fail for TCG or for KVM (or both)?
 >
-> and clear pv eoi pending bit only when it is set, to avoid calling
-> pv_eoi_put_user(), this can speed about 300 nsec on AMD EPYC most
-> of the time
+> Just TCG, which was why I was wondering if it was expected. I've never run
+> these tests with TCG before.
+
+Hmm I think expecting the IRQ at all is broken so I think I should
+delete the whole pending test.
+
 >
-> Suggested-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Li RongQing <lirongqing@baidu.com>
-> ---
-> diff v2: merge as pv_eoi_test_and_clear_pending
-> diff v3: remove printk in a new patch
-> diff v4: fix comments place
->  arch/x86/kvm/lapic.c |   40 +++++++++++++++++++---------------------
->  1 files changed, 19 insertions(+), 21 deletions(-)
->
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 752c48e..b1de23e 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -673,15 +673,6 @@ static inline bool pv_eoi_enabled(struct kvm_vcpu *vcpu)
->  	return vcpu->arch.pv_eoi.msr_val & KVM_MSR_ENABLED;
->  }
->  
-> -static bool pv_eoi_get_pending(struct kvm_vcpu *vcpu)
-> -{
-> -	u8 val;
-> -	if (pv_eoi_get_user(vcpu, &val) < 0)
-> -		return false;
-> -
-> -	return val & KVM_PV_EOI_ENABLED;
-> -}
-> -
->  static void pv_eoi_set_pending(struct kvm_vcpu *vcpu)
->  {
->  	if (pv_eoi_put_user(vcpu, KVM_PV_EOI_ENABLED) < 0)
-> @@ -690,12 +681,26 @@ static void pv_eoi_set_pending(struct kvm_vcpu *vcpu)
->  	__set_bit(KVM_APIC_PV_EOI_PENDING, &vcpu->arch.apic_attention);
->  }
->  
-> -static void pv_eoi_clr_pending(struct kvm_vcpu *vcpu)
-> +static bool pv_eoi_test_and_clr_pending(struct kvm_vcpu *vcpu)
->  {
-> -	if (pv_eoi_put_user(vcpu, KVM_PV_EOI_DISABLED) < 0)
-> -		return;
-> +	u8 val;
-> +
-> +	if (pv_eoi_get_user(vcpu, &val) < 0)
-> +		return false;
-> +
-> +	val &= KVM_PV_EOI_ENABLED;
-> +
-> +	if (val && pv_eoi_put_user(vcpu, KVM_PV_EOI_DISABLED) < 0)
-> +		return false;
->  
-> +	/*
-> +	 * Clear pending bit in any case: it will be set again on vmentry.
-> +	 * While this might not be ideal from performance point of view,
-> +	 * this makes sure pv eoi is only enabled when we know it's safe.
-> +	 */
->  	__clear_bit(KVM_APIC_PV_EOI_PENDING, &vcpu->arch.apic_attention);
-> +
-> +	return val;
->  }
->  
->  static int apic_has_interrupt_for_ppr(struct kvm_lapic *apic, u32 ppr)
-> @@ -2671,7 +2676,6 @@ void __kvm_migrate_apic_timer(struct kvm_vcpu *vcpu)
->  static void apic_sync_pv_eoi_from_guest(struct kvm_vcpu *vcpu,
->  					struct kvm_lapic *apic)
->  {
-> -	bool pending;
->  	int vector;
->  	/*
->  	 * PV EOI state is derived from KVM_APIC_PV_EOI_PENDING in host
-> @@ -2685,14 +2689,8 @@ static void apic_sync_pv_eoi_from_guest(struct kvm_vcpu *vcpu,
->  	 * 	-> host enabled PV EOI, guest executed EOI.
->  	 */
->  	BUG_ON(!pv_eoi_enabled(vcpu));
-> -	pending = pv_eoi_get_pending(vcpu);
-> -	/*
-> -	 * Clear pending bit in any case: it will be set again on vmentry.
-> -	 * While this might not be ideal from performance point of view,
-> -	 * this makes sure pv eoi is only enabled when we know it's safe.
-> -	 */
-> -	pv_eoi_clr_pending(vcpu);
-> -	if (pending)
-> +
-> +	if (pv_eoi_test_and_clr_pending(vcpu))
->  		return;
->  	vector = apic_set_eoi(apic);
->  	trace_kvm_pv_eoi(apic, vector);
+> Thanks,
+> drew
 
-I see my R-b tag is missign, so
 
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-
--- 
-Vitaly
-
+--=20
+Alex Benn=C3=A9e
