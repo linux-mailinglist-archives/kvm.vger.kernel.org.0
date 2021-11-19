@@ -2,99 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D162945732B
-	for <lists+kvm@lfdr.de>; Fri, 19 Nov 2021 17:37:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7669E45766C
+	for <lists+kvm@lfdr.de>; Fri, 19 Nov 2021 19:31:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236549AbhKSQkT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Nov 2021 11:40:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60804 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236543AbhKSQkS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Nov 2021 11:40:18 -0500
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72D8EC061574
-        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 08:37:16 -0800 (PST)
-Received: by mail-wr1-x42d.google.com with SMTP id d5so19185460wrc.1
-        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 08:37:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=UBTLYu0ovf90Ly8jIucNjZn0s6JSXdArNLPowmPdXjc=;
-        b=YafddRxj9VBjZzRlxSamFKtngp9kYQ/Om6EnwnudYXjJCJd722nl8E5+pxBa7+IsPc
-         83efOXLfP236CvwaWzzAxIMlzCcdKh8S+J7sMw2Meb7MZYYiH5kb4BU1yowwH+TewDI6
-         X2wl3xmG/2/4mjDUuRK1es7OGu0lWBR2jMsV4LVwHfKT7TPClcNFHc3W/2btWNjvNFJ7
-         30Sp0dfQIc5SEF6NpuQjdaATSmdhExxfBHWU3/1SEebk+mYPT8aWAU+Y+5OkvC2aqV5u
-         DHNOYSrn9t+mSyQymC+FIW69HipUe4ItdOnWD/ltILkAbB0qE3BAcY5B8wAx+UONSO6i
-         3mPg==
+        id S234009AbhKSSeM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Nov 2021 13:34:12 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:37490 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231841AbhKSSeK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 19 Nov 2021 13:34:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1637346667;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=U64RY7OU2Xju+JsoSQCaxT3xKU3oSuMc1u+Un65V0zY=;
+        b=Vmnak2UghSzmiTeMiuGxWv9ulI4c6AdFCz8/GowKiUghP9uLd7SMseGr51uVcINnPB6XI+
+        BTmSF70mRgDkqnOTvIqCec3cMtEdBXiTcLSe+Yep1ISN1HRB4L3AZiF8Ckzx9h7oSTbKWs
+        hK5cF7CUaEfckoolP43DS7JGiCm33tA=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-257-kNiuQashN52E2p9NHxGi6g-1; Fri, 19 Nov 2021 13:31:02 -0500
+X-MC-Unique: kNiuQashN52E2p9NHxGi6g-1
+Received: by mail-ed1-f69.google.com with SMTP id v10-20020aa7d9ca000000b003e7bed57968so9136958eds.23
+        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 10:31:02 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=UBTLYu0ovf90Ly8jIucNjZn0s6JSXdArNLPowmPdXjc=;
-        b=5lSm1xHF0R15N8WbETlhHHOeFVW29pdF1iD416Hy6kfyPU+5r8h7Lon5Mc2oNY27WT
-         CSqWP0qFUJ7P4FMq5DfQlUXylJPKB4X/S+bUCXO0WyK87C2TZ/Jc56P3OYGGBV3kf4g2
-         jLiO4GyzvwbH3q/Amv8h1ARjaNYba6JAmqQk7/mqivoM78UuQSKt+HHECgqKqljaCDag
-         H7S8QNm27vVhNNXE2CuPBVB0X0oict/I3ZYtfWZPvvYO7DFsxlPE3VQSopJJrNpWMP0V
-         ruUOVWWrS5sBd1+9Kpdp/fgiiflw4YV8hERtK0S/Fvcj0aU2SrcJnpuTgqrIGFC/05Sq
-         qUjg==
-X-Gm-Message-State: AOAM533ozeScC6nLWkUzuIEmRpqGz7I53WnzkrwaxjfAEDqWgsoPdjLx
-        3XsELJyfOesS8sxBlRJm5Qii+ODw1qHh8A==
-X-Google-Smtp-Source: ABdhPJy8eUMgWTmXLHQO73lzwoAiNLaV22W1knajMZd2flThIs36ASzjzldkk3oB/MzzmN49Z8cxrQ==
-X-Received: by 2002:a05:6000:143:: with SMTP id r3mr9139425wrx.236.1637339834937;
-        Fri, 19 Nov 2021 08:37:14 -0800 (PST)
-Received: from zen.linaroharston ([51.148.130.216])
-        by smtp.gmail.com with ESMTPSA id r8sm328551wrz.43.2021.11.19.08.37.11
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=U64RY7OU2Xju+JsoSQCaxT3xKU3oSuMc1u+Un65V0zY=;
+        b=oa31DGdLjR1TlXb+/EpAs7k31sRIX8DYyZNAVBTiXtl/o8zXDprJKjN9/IBbJeMy2L
+         TPWKw/O2Uv08v4ZyR3X3/IhSzXp4EywNwpxMydvQftz0OqYzLiyMxzgw54p9MiLq647w
+         8QTbKW9+2ujAEBFcMxKythBBhCMhN+PlTDXlA23kawYQ9xc6nvM5BItEmZ/5SqBCh72V
+         1LDWYUjHNSjjQQ3rgR8Jq0vZZSagrsazHNHhl+ekxg3Ik6QUqF2y2pfLxYTZ2ggKd+6z
+         e2v7aVjKnXkLiVTqHOpjRVaqRsXElHdNTwqNwzoh0UYwPAT//G/9VhzMMdaH7SI2B1To
+         AUBg==
+X-Gm-Message-State: AOAM531ygXYudVg7zY3T+d8Jrdym+hPtgTtWtCHa0ZzUKaierJrZHgGV
+        RaSHr5tK21omiNcPhIJRxXeijtbpa/towCXwfUwNFS/f7frtAhozTOVhxUXfdnUbAVdhXPzCkvJ
+        DnHINeDXztwJx
+X-Received: by 2002:a17:907:980e:: with SMTP id ji14mr10567039ejc.346.1637346661496;
+        Fri, 19 Nov 2021 10:31:01 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJysizuNz29kxmyK5Y1pJmiEUFOOyuHyVXO5SYZcYalJ0raRF2y2AltBq/8bujU2pPYgEOHbiA==
+X-Received: by 2002:a17:907:980e:: with SMTP id ji14mr10567009ejc.346.1637346661324;
+        Fri, 19 Nov 2021 10:31:01 -0800 (PST)
+Received: from gator.home (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
+        by smtp.gmail.com with ESMTPSA id qf9sm301194ejc.18.2021.11.19.10.31.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Nov 2021 08:37:11 -0800 (PST)
-Received: from zen.lan (localhost [127.0.0.1])
-        by zen.linaroharston (Postfix) with ESMTP id 721D91FF9A;
-        Fri, 19 Nov 2021 16:37:10 +0000 (GMT)
-From:   =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To:     kvm@vger.kernel.org
-Cc:     qemu-arm@nongnu.org, linux-arm-kernel@lists.infradead.org,
-        kvmarm@lists.cs.columbia.edu, christoffer.dall@arm.com,
-        maz@kernel.org,
-        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [kvm-unit-tests PATCH v4 3/3] arch-run: do not process ERRATA when running under TCG
-Date:   Fri, 19 Nov 2021 16:37:10 +0000
-Message-Id: <20211119163710.974653-4-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20211119163710.974653-1-alex.bennee@linaro.org>
-References: <20211119163710.974653-1-alex.bennee@linaro.org>
+        Fri, 19 Nov 2021 10:31:00 -0800 (PST)
+Date:   Fri, 19 Nov 2021 19:30:59 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc:     kvm@vger.kernel.org, maz@kernel.org, shashi.mallela@linaro.org,
+        qemu-arm@nongnu.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, eric.auger@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v3 0/3] GIC ITS tests
+Message-ID: <20211119183059.jwrhb77jfjbv5rbz@gator.home>
+References: <20211112114734.3058678-1-alex.bennee@linaro.org>
+ <20211112132312.qrgmby55mlenj72p@gator.home>
+ <87wnldfoul.fsf@linaro.org>
+ <20211112145442.5ktlpwyolwdsxlnx@gator.home>
+ <877dd4umy6.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <877dd4umy6.fsf@linaro.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-All the errata checking looks at the current host kernel version. For
-TCG runs this is entirely irrelevant as the host kernel has no impact
-on the behaviour of the guest. In fact we should set ERRATA_FORCE to
-ensure we run those tests as QEMU doesn't attempt to model
-non-confirming architectures.
+On Fri, Nov 19, 2021 at 04:30:47PM +0000, Alex BennÈe wrote:
+> 
+> Andrew Jones <drjones@redhat.com> writes:
+> 
+> > On Fri, Nov 12, 2021 at 02:08:01PM +0000, Alex BennÈe wrote:
+> >> 
+> >> Andrew Jones <drjones@redhat.com> writes:
+> >> 
+> >> > On Fri, Nov 12, 2021 at 11:47:31AM +0000, Alex BennÈe wrote:
+> >> >> Hi,
+> >> >> 
+> >> >> Sorry this has been sitting in my tree so long. The changes are fairly
+> >> >> minor from v2. I no longer split the tests up into TCG and KVM
+> >> >> versions and instead just ensure that ERRATA_FORCE is always set when
+> >> >> run under TCG.
+> >> >> 
+> >> >> Alex BennÈe (3):
+> >> >>   arm64: remove invalid check from its-trigger test
+> >> >>   arm64: enable its-migration tests for TCG
+> >> >>   arch-run: do not process ERRATA when running under TCG
+> >> >> 
+> >> >>  scripts/arch-run.bash |  4 +++-
+> >> >>  arm/gic.c             | 16 ++++++----------
+> >> >>  arm/unittests.cfg     |  3 ---
+> >> >>  3 files changed, 9 insertions(+), 14 deletions(-)
+> >> >> 
+> >> >> -- 
+> >> >> 2.30.2
+> >> >> 
+> >> >> _______________________________________________
+> >> >> kvmarm mailing list
+> >> >> kvmarm@lists.cs.columbia.edu
+> >> >> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> >> >
+> >> > Hi Alex,
+> >> >
+> >> > Thanks for this. I've applied to arm/queue, but I see that
+> >> >
+> >> > FAIL: gicv3: its-trigger: inv/invall: dev2/eventid=20 pending LPI is received
+> >> >
+> >> > consistently fails for me. Is that expected? Does it work for you?
+> >> 
+> >> doh - looks like I cocked up the merge conflict...
+> >> 
+> >> Did it fail for TCG or for KVM (or both)?
+> >
+> > Just TCG, which was why I was wondering if it was expected. I've never run
+> > these tests with TCG before.
+> 
+> Hmm I think expecting the IRQ at all is broken so I think I should
+> delete the whole pending test.
 
-Signed-off-by: Alex Benn√©e <alex.bennee@linaro.org>
----
- scripts/arch-run.bash | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Feel free to repost. I'll update the patches in arm/queue before my next
+MR.
 
-diff --git a/scripts/arch-run.bash b/scripts/arch-run.bash
-index 43da998..f1f4456 100644
---- a/scripts/arch-run.bash
-+++ b/scripts/arch-run.bash
-@@ -267,7 +267,9 @@ env_file ()
- 
- env_errata ()
- {
--	if [ "$ERRATATXT" ] && [ ! -f "$ERRATATXT" ]; then
-+	if [ "$ACCEL" = "tcg" ]; then
-+		eval export "ERRATA_FORCE=y"
-+	elif [ "$ERRATATXT" ] && [ ! -f "$ERRATATXT" ]; then
- 		echo "$ERRATATXT not found. (ERRATATXT=$ERRATATXT)" >&2
- 		return 2
- 	elif [ "$ERRATATXT" ]; then
--- 
-2.30.2
+Thanks,
+drew
 
