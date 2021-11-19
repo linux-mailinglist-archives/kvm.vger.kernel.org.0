@@ -2,117 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 07B0A456E10
-	for <lists+kvm@lfdr.de>; Fri, 19 Nov 2021 12:14:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F124456E3C
+	for <lists+kvm@lfdr.de>; Fri, 19 Nov 2021 12:32:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234965AbhKSLRU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Nov 2021 06:17:20 -0500
-Received: from mga05.intel.com ([192.55.52.43]:33847 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229521AbhKSLRT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Nov 2021 06:17:19 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10172"; a="320612641"
-X-IronPort-AV: E=Sophos;i="5.87,247,1631602800"; 
-   d="scan'208";a="320612641"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2021 03:14:17 -0800
-X-IronPort-AV: E=Sophos;i="5.87,247,1631602800"; 
-   d="scan'208";a="507861408"
-Received: from blu2-mobl3.ccr.corp.intel.com (HELO [10.254.208.131]) ([10.254.208.131])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Nov 2021 03:14:13 -0800
-Message-ID: <75100dfd-9cfe-9f3d-531d-b4d30de03e76@linux.intel.com>
-Date:   Fri, 19 Nov 2021 19:14:10 +0800
+        id S231358AbhKSLdx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Nov 2021 06:33:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46950 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232685AbhKSLdw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Nov 2021 06:33:52 -0500
+Received: from forwardcorp1o.mail.yandex.net (forwardcorp1o.mail.yandex.net [IPv6:2a02:6b8:0:1a2d::193])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CEFEC06173E;
+        Fri, 19 Nov 2021 03:30:49 -0800 (PST)
+Received: from iva8-d2cd82b7433e.qloud-c.yandex.net (iva8-d2cd82b7433e.qloud-c.yandex.net [IPv6:2a02:6b8:c0c:a88e:0:640:d2cd:82b7])
+        by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id C791E2E0A87;
+        Fri, 19 Nov 2021 14:30:33 +0300 (MSK)
+Received: from iva8-3a65cceff156.qloud-c.yandex.net (iva8-3a65cceff156.qloud-c.yandex.net [2a02:6b8:c0c:2d80:0:640:3a65:ccef])
+        by iva8-d2cd82b7433e.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id EKjSaatRh8-UVsKQDuU;
+        Fri, 19 Nov 2021 14:30:33 +0300
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.com; s=default;
+        t=1637321433; bh=+L4v8jYAJNvQOeZwWnjjVUETCxcUIlwbJiPy76hhiGc=;
+        h=In-Reply-To:References:Date:From:To:Subject:Message-ID:Cc;
+        b=Phv9LjoFFPfzg/431KWrbeNCQFLqyLJhk/LLMH/jjKMCp8+b/rNNVD0iKobQ9uoJ1
+         hfcn8C6+99r/xm/4ny0nG5U+2LsryFeG3pHjk/xF9no1EHF6SnNipN4l6UZ1dwThJy
+         fcM/1euZs3NwnsyPmy196HLvoJdnkZql40r9r0oY=
+Authentication-Results: iva8-d2cd82b7433e.qloud-c.yandex.net; dkim=pass header.i=@yandex-team.com
+Received: from [IPv6:2a02:6b8:0:107:3e85:844d:5b1d:60a] (dynamic-red3.dhcp.yndx.net [2a02:6b8:0:107:3e85:844d:5b1d:60a])
+        by iva8-3a65cceff156.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPS id WlImvNE7yL-UUwSObAb;
+        Fri, 19 Nov 2021 14:30:31 +0300
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+        (Client certificate not present)
+X-Yandex-Fwd: 2
+Subject: Re: [PATCH 6/6] vhost_net: use RCU callbacks instead of
+ synchronize_rcu()
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        kvm <kvm@vger.kernel.org>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        netdev <netdev@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>, bpf@vger.kernel.org
+References: <20211115153003.9140-1-arbn@yandex-team.com>
+ <20211115153003.9140-6-arbn@yandex-team.com>
+ <CACGkMEumax9RFVNgWLv5GyoeQAmwo-UgAq=DrUd4yLxPAUUqBw@mail.gmail.com>
+From:   Andrey Ryabinin <arbn@yandex-team.com>
+Message-ID: <b163233f-090f-baaf-4460-37978cab4d55@yandex-team.com>
+Date:   Fri, 19 Nov 2021 14:32:05 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.1
-Cc:     baolu.lu@linux.intel.com, Christoph Hellwig <hch@infradead.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Joerg Roedel <joro@8bytes.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Will Deacon <will@kernel.org>
+In-Reply-To: <CACGkMEumax9RFVNgWLv5GyoeQAmwo-UgAq=DrUd4yLxPAUUqBw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>
-References: <20211115020552.2378167-1-baolu.lu@linux.intel.com>
- <20211115020552.2378167-2-baolu.lu@linux.intel.com>
- <YZJdJH4AS+vm0j06@infradead.org>
- <cc7ce6f4-b1ec-49ef-e245-ab6c330154c2@linux.intel.com>
- <20211116134603.GA2105516@nvidia.com>
- <BN9PR11MB5433639E43C37C5D2462BD718C9B9@BN9PR11MB5433.namprd11.prod.outlook.com>
- <20211118133325.GO2105516@nvidia.com>
- <BN9PR11MB5433E5B63E575E2232DFBBE48C9C9@BN9PR11MB5433.namprd11.prod.outlook.com>
-From:   Lu Baolu <baolu.lu@linux.intel.com>
-Subject: Re: [PATCH 01/11] iommu: Add device dma ownership set/release
- interfaces
-In-Reply-To: <BN9PR11MB5433E5B63E575E2232DFBBE48C9C9@BN9PR11MB5433.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021/11/19 13:44, Tian, Kevin wrote:
->> From: Jason Gunthorpe <jgg@nvidia.com>
->> Sent: Thursday, November 18, 2021 9:33 PM
+
+
+On 11/16/21 8:00 AM, Jason Wang wrote:
+> On Mon, Nov 15, 2021 at 11:32 PM Andrey Ryabinin <arbn@yandex-team.com> wrote:
 >>
->>> In concept a singleton group is different from a
->>> multi-devices group which has only one device bound to driver...
+>> Currently vhost_net_release() uses synchronize_rcu() to synchronize
+>> freeing with vhost_zerocopy_callback(). However synchronize_rcu()
+>> is quite costly operation. It take more than 10 seconds
+>> to shutdown qemu launched with couple net devices like this:
+>>         -netdev tap,id=tap0,..,vhost=on,queues=80
+>> because we end up calling synchronize_rcu() netdev_count*queues times.
 >>
->> Really? Why? I don't see it that way..
->>
->> A singleton group is just a multi-device group that hasn't been
->> hotplugged yet.
->>
->> We don't seem to have the concept of a "true" singleton group which is
->> permanently single due to HW features.
->>
->>> This series aims to avoid conflict having both user and kernel drivers
->>> mixed in a multi-devices group.
+>> Free vhost net structures in rcu callback instead of using
+>> synchronize_rcu() to fix the problem.
 > 
-> Well, the difference is just in literal. I don't know the background
-> why the existing iommu_attach_device() users want to do it this
-> way. But given the condition in iommu_attach_device() it could
-> in theory imply some unknown hardware-level side effect which
-> may break the desired functionality once the group size grows
-> beyond singleton. Is it a real case? I don't know...
+> I admit the release code is somehow hard to understand. But I wonder
+> if the following case can still happen with this:
 > 
-> You are now redefining that condition from singleton group to
-> multi-devices group with single driver bound. As long as no object
-> from existing driver users, I'm fine with it. But still want to raise
-> awareness as it does change the existing semantics (though might
-> be considered as an imperfect way).
+> CPU 0 (vhost_dev_cleanup)   CPU1
+> (vhost_net_zerocopy_callback()->vhost_work_queue())
+>                                                 if (!dev->worker)
+> dev->worker = NULL
+> 
+> wake_up_process(dev->worker)
+> 
+> If this is true. It seems the fix is to move RCU synchronization stuff
+> in vhost_net_ubuf_put_and_wait()?
+> 
 
-The singleton group requirement for iommu_attach/detach_device() was
-added by below commit:
+It all depends whether vhost_zerocopy_callback() can be called outside of vhost
+thread context or not. If it can run after vhost thread stopped, than the race you
+describe seems possible and the fix in commit b0c057ca7e83 ("vhost: fix a theoretical race in device cleanup")
+wasn't complete. I would fix it by calling synchronize_rcu() after vhost_net_flush()
+and before vhost_dev_cleanup().
 
-commit 426a273834eae65abcfc7132a21a85b3151e0bce
-Author: Joerg Roedel <jroedel@suse.de>
-Date:   Thu May 28 18:41:30 2015 +0200
+As for the performance problem, it can be solved by replacing synchronize_rcu() with synchronize_rcu_expedited().
 
-     iommu: Limit iommu_attach/detach_device to devices with their own group
+But now I'm not sure that this race is actually exists and that synchronize_rcu() needed at all.
+I did a bit of testing and I only see callback being called from vhost thread:
 
-     This patch changes the behavior of the iommu_attach_device
-     and iommu_detach_device functions. With this change these
-     functions only work on devices that have their own group.
-     For all other devices the iommu_group_attach/detach
-     functions must be used.
+vhost-3724  3733 [002]  2701.768731: probe:vhost_zerocopy_callback: (ffffffff81af8c10)
+        ffffffff81af8c11 vhost_zerocopy_callback+0x1 ([kernel.kallsyms])
+        ffffffff81bb34f6 skb_copy_ubufs+0x256 ([kernel.kallsyms])
+        ffffffff81bce621 __netif_receive_skb_core.constprop.0+0xac1 ([kernel.kallsyms])
+        ffffffff81bd062d __netif_receive_skb_one_core+0x3d ([kernel.kallsyms])
+        ffffffff81bd0748 netif_receive_skb+0x38 ([kernel.kallsyms])
+        ffffffff819a2a1e tun_get_user+0xdce ([kernel.kallsyms])
+        ffffffff819a2cf4 tun_sendmsg+0xa4 ([kernel.kallsyms])
+        ffffffff81af9229 handle_tx_zerocopy+0x149 ([kernel.kallsyms])
+        ffffffff81afaf05 handle_tx+0xc5 ([kernel.kallsyms])
+        ffffffff81afce86 vhost_worker+0x76 ([kernel.kallsyms])
+        ffffffff811581e9 kthread+0x169 ([kernel.kallsyms])
+        ffffffff810018cf ret_from_fork+0x1f ([kernel.kallsyms])
+                       0 [unknown] ([unknown])
 
-     Signed-off-by: Joerg Roedel <jroedel@suse.de>
+This means that the callback can't run after kthread_stop() in vhost_dev_cleanup() and no synchronize_rcu() needed.
 
-Joerg,can you please shed some light on the background of this
-requirement? Does above idea of transition from singleton group
-to group with single driver bound make sense to you?
-
-Best regards,
-baolu
+I'm not confident that my quite limited testing cover all possible vhost_zerocopy_callback() callstacks.
