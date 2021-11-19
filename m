@@ -2,164 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 288EF4577AA
-	for <lists+kvm@lfdr.de>; Fri, 19 Nov 2021 21:20:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 47DD34577AD
+	for <lists+kvm@lfdr.de>; Fri, 19 Nov 2021 21:22:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234413AbhKSUXp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Nov 2021 15:23:45 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:55514 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230474AbhKSUXo (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 19 Nov 2021 15:23:44 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1AJJiGP3015415;
-        Fri, 19 Nov 2021 20:20:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=BtB+qZSV4tF1z3EjQQN1P+BdhpW/UZe1Ndn4JleH048=;
- b=HlmqKET7/4NaU1xE2cMW1WswQj48l4ZqFxeN4cxTz8CO3pJSPgmdOfTFLqwG/QDv5Wf+
- WTwTqk34yPX9ODskcnGVFtIzgCe8b5IrglNngLahoGoVF1qTey/Az3HwGuaWNdTsNyU8
- dKHkvOgfCLbyX0uALLTo2Xge7TxosxOy//PM4B3AKYF2w1btgU4s6Y2/hJg3HRMkwLKk
- nD4p8sT9wTEMF2Vo87jImfTPZE7O6JJ9bG3CYcT4pmPdo/m3HMCDCuXbEIHr7aGg+POu
- N5ZPNOAJOlBT8Infvk9YEobtfuYh3rWiyLkbW6WmjyrDvDjypxdkbWRBfBdyCxq4NaLf Aw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cejbb8nqy-1
+        id S234784AbhKSUZE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Nov 2021 15:25:04 -0500
+Received: from mx0a-002c1b01.pphosted.com ([148.163.151.68]:55938 "EHLO
+        mx0a-002c1b01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230474AbhKSUZD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 19 Nov 2021 15:25:03 -0500
+Received: from pps.filterd (m0127839.ppops.net [127.0.0.1])
+        by mx0a-002c1b01.pphosted.com (8.16.1.2/8.16.1.2) with ESMTP id 1AJH6hGU012510;
+        Fri, 19 Nov 2021 12:21:57 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com; h=message-id : date :
+ subject : to : references : cc : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=proofpoint20171006;
+ bh=YJae4B07q0CaTXgy+EX+V1S5ZWEYenWtekVUqZVk6Jk=;
+ b=Ayn163lkH9IkwaTuhJIl+EisIU6y8lYoMchGPhp7nk6TZ/X7OrMwRx7NJrDeWgonyqgA
+ Ywcris7QvqkqRl9mv8uOUiwV1xLKw4L9uTuBh5EQrwtVEIEIlY8FgSMJq+XUN/FR/Ay2
+ IHkkAudx089QDlxDOJeHy4cRqhRlF7FUd7AWAb+BT345jj3l/vShDbcxxgba73Vvjmws
+ rv1AGYGLmFedbCK/4G3ZdcKDR+LfzDfBbuyiWbZtZKmWhIawM4oFHEdl0tUiKXR0mQyF
+ 2Fs2Tw8lB5Sga7Mbs1PawS5IenzOSAQ2YqNHdlNLzjKK3MbsvmUCxNbkZ8GkDh8+P9rm TA== 
+Received: from nam02-dm3-obe.outbound.protection.outlook.com (mail-dm3nam07lp2040.outbound.protection.outlook.com [104.47.56.40])
+        by mx0a-002c1b01.pphosted.com (PPS) with ESMTPS id 3ce950s7pj-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 19 Nov 2021 20:20:42 +0000
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1AJJjJod018712;
-        Fri, 19 Nov 2021 20:20:42 GMT
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cejbb8nqm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 19 Nov 2021 20:20:42 +0000
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1AJKBwBd016745;
-        Fri, 19 Nov 2021 20:20:40 GMT
-Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
-        by ppma02wdc.us.ibm.com with ESMTP id 3cd81es9gb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 19 Nov 2021 20:20:40 +0000
-Received: from b03ledav003.gho.boulder.ibm.com (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
-        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1AJKKdjb29098562
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 19 Nov 2021 20:20:39 GMT
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9F2296A04D;
-        Fri, 19 Nov 2021 20:20:39 +0000 (GMT)
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B4D006A057;
-        Fri, 19 Nov 2021 20:20:38 +0000 (GMT)
-Received: from farman-thinkpad-t470p (unknown [9.211.117.31])
-        by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Fri, 19 Nov 2021 20:20:38 +0000 (GMT)
-Message-ID: <cd1c11a05cc13fb8c70ce3644dcf823a840872b5.camel@linux.ibm.com>
-Subject: Re: [RFC PATCH v3 2/2] KVM: s390: Extend the USER_SIGP capability
-From:   Eric Farman <farman@linux.ibm.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>
-Cc:     Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Date:   Fri, 19 Nov 2021 15:20:37 -0500
-In-Reply-To: <9c9bbf66-54c9-3d02-6d9f-1e147945abe8@de.ibm.com>
-References: <20211110203322.1374925-1-farman@linux.ibm.com>
-         <20211110203322.1374925-3-farman@linux.ibm.com>
-         <dd8a8b49-da6d-0ab8-dc47-b24f5604767f@redhat.com>
-         <ab82e68051674ea771e2cb5371ca2a204effab40.camel@linux.ibm.com>
-         <32836eb5-532f-962d-161a-faa2213a0691@linux.ibm.com>
-         <b116e738d8f9b185867ab28395012aaddd58af31.camel@linux.ibm.com>
-         <85ba9fa3-ca25-b598-aecd-5e0c6a0308f2@redhat.com>
-         <19a2543b24015873db736bddb14d0e4d97712086.camel@linux.ibm.com>
-         <9c9bbf66-54c9-3d02-6d9f-1e147945abe8@de.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-16.el8) 
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: IzA7vE_QigE291u-n3EDW2emQSpeTOzB
-X-Proofpoint-ORIG-GUID: jUKVzFCZftM6lZDE5nfVMNmNcZia1Ays
+        Fri, 19 Nov 2021 12:21:57 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VdLG4g/UgG3JelGtfM/6LQ9F3c0YkuM5Cx1Z1z3AxnjoZFh/0loKZO41+o6C3HFEsUQxRRPn2MGD1Dw7GgOkxFe9+1MIpibXjxnQBI39/65Zdk0Gx2EZv5eXRUilMaMG2vtPfX4+p+ssYz3xggIVBBxVYvXeHBuVZBqI1P9mTnqWsljSDL7fdeOjybUl7Q1JPZEks2SmUy3K6lwteMTdU7YLyNGg6N/7pd7WcTt8w1GCjfgXRCXGPJ/CflzcpsxYhJGUOoGilHwpL0VSWSRDGO7Ta7xDymA/K0nVfR0gfiUzVoVMDYCABZmZn/LchlR2wEkBpZvMa2n8O7lozuJcug==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YJae4B07q0CaTXgy+EX+V1S5ZWEYenWtekVUqZVk6Jk=;
+ b=AuC5WAxQvUeP6hy7yuK4YvLuy+kvosW4dTJTfisAXDDzeXWdRq9PlJ6t9JlWav0svG7HunQXkLeHBb0UI0P6xdd9Oqx1ti0pDP8+Kn73iq//50svzxRefK/4tO+9+RPvsr+QysURDeqmRHKpLgcp3nqtdxznaOiMJwQ7fGZm5WCnAJBAhr7t9yzElb4ZOAfR4NEVgWguge1xz/+8Il3zI+7+ieM6EnimGy0S3Cqbqk5Z4Ct347Fle+ENTWSJ55aneeAULnTLa+QSjLT+P/6F11NEeU/EQR3AZlQvSIAQOLuNBfVfrff9cNSi1kB4HzTrq85HLrkbYsctFlhhM+8+Yw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
+ dkim=pass header.d=nutanix.com; arc=none
+Received: from CO6PR02MB7555.namprd02.prod.outlook.com (2603:10b6:303:b3::20)
+ by MWHPR02MB2525.namprd02.prod.outlook.com (2603:10b6:300:42::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4713.22; Fri, 19 Nov
+ 2021 20:21:54 +0000
+Received: from CO6PR02MB7555.namprd02.prod.outlook.com
+ ([fe80::8d99:ba07:279:25c3]) by CO6PR02MB7555.namprd02.prod.outlook.com
+ ([fe80::8d99:ba07:279:25c3%8]) with mapi id 15.20.4713.022; Fri, 19 Nov 2021
+ 20:21:53 +0000
+Message-ID: <2a329e03-1b44-1cb3-f00c-1ee138bb74de@nutanix.com>
+Date:   Sat, 20 Nov 2021 01:51:39 +0530
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.3.2
+Subject: Re: [PATCH 3/6] Add KVM_CAP_DIRTY_QUOTA_MIGRATION and handle vCPU
+ page faults.
+To:     Sean Christopherson <seanjc@google.com>
+References: <20211114145721.209219-1-shivam.kumar1@nutanix.com>
+ <20211114145721.209219-4-shivam.kumar1@nutanix.com>
+ <YZaUENi0ZyQi/9M0@google.com>
+ <02b8fa86-a86b-969e-2137-1953639cb6d2@nutanix.com>
+ <YZgD0D4536s2DMem@google.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
+        Anurag Madnawat <anurag.madnawat@nutanix.com>,
+        Shaju Abraham <shaju.abraham@nutanix.com>,
+        Manish Mishra <manish.mishra@nutanix.com>
+From:   Shivam Kumar <shivam.kumar1@nutanix.com>
+In-Reply-To: <YZgD0D4536s2DMem@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+X-ClientProxiedBy: SYYP282CA0012.AUSP282.PROD.OUTLOOK.COM
+ (2603:10c6:10:b4::22) To CO6PR02MB7555.namprd02.prod.outlook.com
+ (2603:10b6:303:b3::20)
 MIME-Version: 1.0
+Received: from [192.168.1.4] (117.194.217.157) by SYYP282CA0012.AUSP282.PROD.OUTLOOK.COM (2603:10c6:10:b4::22) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4713.22 via Frontend Transport; Fri, 19 Nov 2021 20:21:50 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 8fd58deb-798d-4c7a-102f-08d9ab9a39e0
+X-MS-TrafficTypeDiagnostic: MWHPR02MB2525:
+X-Microsoft-Antispam-PRVS: <MWHPR02MB25256CA6E6B242B4DF012BDCB39C9@MWHPR02MB2525.namprd02.prod.outlook.com>
+x-proofpoint-crosstenant: true
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 0TTfiAt0KpMpnCmCkaXWcgOhG3N6TXkQtD7PkSM6A8Ci9D+99aXzu8YkaMjVpf/+drwqffA/j0MMY8ZFbE0JesBIyBHRrsTqm7KSqVd2G6fs/sYhXmHm5gnV6fpKD5Dn2I4oSqQIuG6qc/dbRHhB1XQdABQUQl+gNuwVaAg+74wLDtkYhpw2OmLc8Pjj/L3rV9s3sp8txZKx/+iV9RQL72u8/49guPiTWtcIWt/sd3g5xdyBUyXpDU9Alzr9GfpQQoB5IaJ/Sb0bKxOKswjJ121oTtecHi6c43H8av4fF1GxW/aeokSWZFVg9mf1555Ix0reRqoIguqrUmGg2ONOYrFVa1HOl1GY4z1EDp9F8w/zevwKu1FAGecc2kLJAniomZGAtzK1BGoFza6aSDMQ9ilzqZvQvVE15n+Ea8Sir/ua4uswRH4yfq/tzCTARcwCCGYuIstDcjv03Ov4Dd5VR0ytncwjK1KDANVdRNA2GotuYhs6nrNOpJh3HrCIUfDzqTWjxTrRyRuY58SEEE0SYBHeXBhuyx/h/SltJeWlC/2mYjNcJJ6XiNuwIzPcsVKmOgvZdieSnaN/H6wbqMGYAItpKjGW2RSskpxCAOwuaYjP67G+pRk52jtvLAERVz0kmAD99tLXBIrRkmXcQ0XDX+COZfM8XmH2PVYuySLAT4kwsXdi6KMmm4hwtqH7mxOTmv2Ln0e5CMpdnoMsGbIxzxt+u9lkh6FJeao2o2hP7AW9E5S5jubINHApNs1anAau8dXy3Q9nNMYPjCB3NKwVSg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO6PR02MB7555.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(316002)(66476007)(66556008)(2906002)(83380400001)(66946007)(38100700002)(8936002)(53546011)(6486002)(55236004)(107886003)(36756003)(6916009)(31686004)(186003)(4326008)(16576012)(2616005)(54906003)(6666004)(5660300002)(8676002)(508600001)(31696002)(26005)(956004)(86362001)(14143004)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UjNZSzR3QXRlUGtLRWcwMmxMWTVCSDdnTzJwOGNpa1YwMkErK1ROU2NjVEQ1?=
+ =?utf-8?B?THRnWit5Zy9mSE5pc3VOR1c1R3pNL1IzaXYwclBJVTl3NCtqdklQTTNEeDZS?=
+ =?utf-8?B?dEU5ZUV0NXZNV1ViOThOU0p5ejk2YmxKMUpSYi9lVG84WTVDL0d4RndVSS9Y?=
+ =?utf-8?B?Y1JHRHBBNERNVHVTdE5qYWljUmh2blVHUUZpdjZJbHZ3b2RheFNvd0s0MVZJ?=
+ =?utf-8?B?OWFReklzOThMTmxIT2FadWJnNHErak9HTG4rS2w5WDhtUDRYRDlZWFJzNUdB?=
+ =?utf-8?B?UnQ1QXZYUjJraUgweTFGYWZSZWxzRDUzZWhwTEc3cnhoa0VsKzY3WVpJMGZH?=
+ =?utf-8?B?KzNCYXRaV1daQVUyRC9YeGZZdThDTG52RExvT0k5WlFXbTJUNVgxaUVQZE9T?=
+ =?utf-8?B?U3pZaHoweDBZYTN2K2VGdlFZUzhrM0g4TkEyQ1ZhVDYyVzkvRTJ6MzhtalNu?=
+ =?utf-8?B?elJWMW9TUko4dm5TTEdYN1lQRTZodS9Wc0ZNUEZ3cUF5aXpBa2dMVGtRQlJW?=
+ =?utf-8?B?amJsc2xrZmUzc3ZPbVAxTlB5V2RqRjVXRUlwdnBCOTltOER0N0JYZlFZZ3Qy?=
+ =?utf-8?B?UjNSZ1J1eThoSkVDM3cyc1N1TThjZUFyZkxCS1g5cktUZWZ3Ym5ZQS9tc3FO?=
+ =?utf-8?B?Z0E5b0M2ZURKRXFjdjljcDRkWnFRcENvL0xjNmJYRjlJczZqVTcvWUcrTDdC?=
+ =?utf-8?B?UTczakhaOFppYzhZWmJhWCtYZmpIL28rOTEyQk02T3hOend3SUk0UGs3STc5?=
+ =?utf-8?B?QjRLdkYvSnRsc3hxQ2l1dk1XTjVsQTExVlFnVnVIUmVhbTNyWTNtNmJnUk1m?=
+ =?utf-8?B?Q2EzZDJ6SDBvdHB3MjAyMmYwdm1PWmJ4MG5Qcjc0WU04Z0JDbHB3SDd2dDIw?=
+ =?utf-8?B?a1JTbmUrNEhsMjlpNVgrUzZFWk1hYy9ERmd0b3pTWjdyR1o3NkMvSlZRdGRK?=
+ =?utf-8?B?SkFaNjllODk0cGh4RWcxSzRUZjVRbW10RUlIc2pVZlFFYmdkdW1lVlk1YkpH?=
+ =?utf-8?B?SStiMUlCRTM2Tyt0MHN2ZG5MSGF1REZrcEx6SnRvZjdzZndrMFpuSmtNL1RC?=
+ =?utf-8?B?MWdWSU1uYjQrMWJPamZSKzhiRmU5aGJuZEdDUGhlWnpXL0ZxTi9OOHhuVXJv?=
+ =?utf-8?B?cm9vbWpmZlJ3SkVIMytwQTBFRkVvWnFYaUxQT09URTMvVkE3cFJ2L1d0Z1Za?=
+ =?utf-8?B?aXg0aTJWMnl1Q2x5U0o0MDJqd0tLTXEwalA3MnRpVi9lU3lwak1Jc0dndzR5?=
+ =?utf-8?B?N0RMNlN5WFZDQ20zOHNNZzk4dGNUSFIzUjllbFJqbC9UbjZlcVJYem81NCtG?=
+ =?utf-8?B?bHZ0cVRQWUFYWEdiMjNLUE9UM2pUY0hQYlF2VGRhdkVOek5LUmQ1cS9OYjY4?=
+ =?utf-8?B?OFZtN3BDcm1pdEV5UlVSWlY2OVVZRG1TYmZad3hXMFc3ZmwycEV4YTVxemRm?=
+ =?utf-8?B?U0RKOG05eUxxeDVJL1hxZjJPSkRUMjQ4YWhNb3BlYldPVU8vakV3STl3UEk3?=
+ =?utf-8?B?SDVramF4aHNwajJpUi9NcVJiZWxoNnRJakV0Z3lPV0pJM09SK0xTMDh6Mm1U?=
+ =?utf-8?B?UzJXYXlJVWMrYXZaV3J6U2lWUmNFMkFUUGgwVGJLMFdoN2dRZzlnc0VsbUNa?=
+ =?utf-8?B?ZS84dHd2MlNMdXVwZUt6L1plOHMwS0pKY2w1NVZmejYrR0xyZExVb2thTm9z?=
+ =?utf-8?B?Qm1yTkp1UENocTRYRVpGd0NFTTRUZThZTEVwK2ZNYldlbGpCbWZhQlRsK0Z5?=
+ =?utf-8?B?QTFUbEYzTE1RTVNZTktkVnllS2R3VHJSRDdENkxlanFXTDlVNkJpZ3VqSTBC?=
+ =?utf-8?B?aHpUVnlzYWxPVUdwd2twTGNEdGhaSFF3YVdTSnNKZGdWSU9yd1FVS1k4TWRt?=
+ =?utf-8?B?R2xQSFJwb1VONFFKVDFRUTdUVGVkWHlzaGl0cFhoeDl1OWRjblovSnZ0bS9z?=
+ =?utf-8?B?OGFYUW16SWwrWkFOditPVGJad3NsWXR5UWh3anZsVHBGRkp2cjg1b0Q4bVk2?=
+ =?utf-8?B?ZVRGR3VobmkrM1pzQUgvUmF4N1Jjb0c1V1h6YTJqQ0dkZUlOUm14TW85RFJE?=
+ =?utf-8?B?VFNyMlJYeEEycnNiOUJoYjRlVitCSGxIMDEyYUpWWEJmTnJWc0ZUMGNtTytS?=
+ =?utf-8?B?ZTJxS1pldDhXL3dJRlVsbnR3MEE1eGJzVzhUcnp0VklYYS91b05VK083bk1u?=
+ =?utf-8?B?dzFKL3lVZXREVXJHQnF5WXJxb2ZPMTFFN3RkWitsVVQvbTI3bGEvdGF0cUl1?=
+ =?utf-8?Q?k0iiX+e+3S9dM46wkYsKfUv11yha9y5hDPO80I7XTI=3D?=
+X-OriginatorOrg: nutanix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8fd58deb-798d-4c7a-102f-08d9ab9a39e0
+X-MS-Exchange-CrossTenant-AuthSource: CO6PR02MB7555.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Nov 2021 20:21:53.6075
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: bb047546-786f-4de1-bd75-24e5b6f79043
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9HzEZYoWTudbtEJpxxOs+zL9BBuPFpuN7cZVyQV39hlZmvZksVWn4eQnqKh7rZyV+iqFCJ/x61l3A/BkSr4TFpHlbr3Kl7oEPDt1s1cQYgI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR02MB2525
+X-Proofpoint-GUID: 79gsEDv8R1GftXXZME9Knkm4KUMfHGO4
+X-Proofpoint-ORIG-GUID: 79gsEDv8R1GftXXZME9Knkm4KUMfHGO4
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
  definitions=2021-11-19_15,2021-11-17_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=999
- spamscore=0 suspectscore=0 priorityscore=1501 bulkscore=0
- lowpriorityscore=0 phishscore=0 malwarescore=0 impostorscore=0
- clxscore=1015 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2111190108
+X-Proofpoint-Spam-Reason: safe
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2021-11-17 at 08:54 +0100, Christian Borntraeger wrote:
-> Am 11.11.21 um 20:05 schrieb Eric Farman:
-> > On Thu, 2021-11-11 at 19:29 +0100, David Hildenbrand wrote:
-> > > On 11.11.21 18:48, Eric Farman wrote:
-> > > > On Thu, 2021-11-11 at 17:13 +0100, Janosch Frank wrote:
-> > > > > 
-> > > > > Looking at the API I'd like to avoid having two IOCTLs
-> > > > 
-> > > > Since the order is a single byte, we could have the payload of
-> > > > an
-> > > > ioctl
-> > > > say "0-255 is an order that we're busy processing, anything
-> > > > higher
-> > > > than
-> > > > that resets the busy" or something. That would remove the need
-> > > > for
-> > > > a
-> > > > second IOCTL.
-> > > 
-> > > Maybe just pass an int and treat a negative (or just -1) value as
-> > > clearing the order.
-> > > 
-> > 
-> > Right, that's exactly what I had at one point. I thought it was too
-> > cumbersome, but maybe not. Will dust it off, pending my question to
-> > Janosch about 0-vs-1 IOCTLs.
-> 
-> As a totally different idea. Would a sync_reg value called SIGP_BUSY
-> work as well?
-> 
 
-Hrm... I'm not sure. I played with it a bit, and it's not looking
-great. I'm almost certainly missing some serialization, because I was
-frequently "losing" one of the toggles (busy/not-busy) when hammering
-CPUs with various SIGP orders on this interface and thus getting
-incorrect responses from the in-kernel orders.
-
-I also took a stab at David's idea of tying it to KVM_MP_STATE [1]. I
-still think it's a little odd, considering the existing states are all
-z/Arch-defined CPU states, but it does sound like the sort of thing
-we're trying to do (letting userspace announce what the CPU is up to).
-One flaw is that most of the rest of QEMU uses s390_cpu_set_state() for
-this, which returns the number of running CPUs instead of the return
-code from the MP_STATE ioctl (via kvm_s390_set_cpu_state()) that SIGP
-would be interested in. Even if I made the ioctl call directly, I still
-encounter some system problems that smell like ones I've addressed in
-v2 and v3. Possibly fixable, but I didn't pursue them far enough to be
-certain.
-
-I ALSO took a stab at folding this into the S390 IRQ paths [2], similar
-to what was done with kvm_s390_stop_info. This worked reasonably well,
-except the QEMU interface kvm_s390_vcpu_interrupt() returns a void, and
-so wouldn't notice an error sent back by KVM. Not a deal breaker, but
-having not heard anything to this idea, I didn't go much farther.
-
-Next week is a short week due to the US holiday, so rather than flesh
-out any of the above possibilities, I'm going to send a new RFC as v4.
-This will be back to a single IOCTL, with a small payload, per Janosch'
-feedback. We can have a discussion on that, but if any of the above
-alternatives sound more appealing I can try getting one of them working
-with more consistency.
-
-[1] 
-https://lore.kernel.org/r/ff344676-0c37-610b-eafb-b1477db0f6a1@redhat.com/
-[2] 
-https://lore.kernel.org/all/b206e7b73696907328bc4338664dea1ef572e8aa.camel@linux.ibm.com/
-
+On 20/11/21 1:36 am, Sean Christopherson wrote:
+> On Sat, Nov 20, 2021, Shivam Kumar wrote:
+>> On 18/11/21 11:27 pm, Sean Christopherson wrote:
+>>>> +		return -EINVAL;
+>>> Probably more idiomatic to return 0 if the desired value is the current value.
+>> Keeping the case in mind when the userspace is trying to enable it while the
+>> migration is already going on(which shouldn't happen), we are returning
+>> -EINVAL. Please let me know if 0 still makes more sense.
+> If the semantics are not "enable/disable", but rather "(re)set the quota",
+> then it makes sense to allow changing the quota arbitrarily.
+I agree that the semantics are not apt. Will modify it. Thanks.
+>
+>>>> +	mutex_lock(&kvm->lock);
+>>>> +	kvm->dirty_quota_migration_enabled = enabled;
+>>> Needs to check vCPU creation.
+>> In our current implementation, we are using the
+>> KVM_CAP_DIRTY_QUOTA_MIGRATION ioctl to start dirty logging (through dirty
+>> counter) on the kernel side. This ioctl is called each time a new migration
+>> starts and ends.
+> Ah, and from the cover letter discussion, you want the count and quota to be
+> reset when a new migration occurs.  That makes sense.
+>
+> Actually, if we go the route of using kvm_run to report and update the count/quota,
+> we don't even need a capability.  Userspace can signal each vCPU to induce an exit
+> to userspace, e.g. at the start of migration, then set the desired quota/count in
+> vcpu->kvm_run and stuff exit_reason so that KVM updates the quota/count on the
+> subsequent KVM_RUN.  No locking or requests needed, and userspace can reset the
+> count at will, it just requires a signal.
+>
+> It's a little weird to overload exit_reason like that, but if that's a sticking
+> point we could add a flag in kvm_run somewhere.  Requiring an exit to userspace
+> at the start of migration doesn't seem too onerous.
+Yes, this path looks flaw-free. We will explore the complexity and how 
+we can simplify its implementation.
