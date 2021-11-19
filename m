@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7843D4579CC
-	for <lists+kvm@lfdr.de>; Sat, 20 Nov 2021 00:58:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 326A64579CD
+	for <lists+kvm@lfdr.de>; Sat, 20 Nov 2021 00:58:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236382AbhKTABd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Nov 2021 19:01:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47300 "EHLO
+        id S236442AbhKTABk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Nov 2021 19:01:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47314 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236209AbhKTABR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Nov 2021 19:01:17 -0500
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65170C06173E
-        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 15:58:15 -0800 (PST)
-Received: by mail-pl1-x649.google.com with SMTP id m15-20020a170902bb8f00b0014382b67873so5338379pls.19
-        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 15:58:15 -0800 (PST)
+        with ESMTP id S236227AbhKTABU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Nov 2021 19:01:20 -0500
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26E64C061574
+        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 15:58:17 -0800 (PST)
+Received: by mail-pl1-x64a.google.com with SMTP id v23-20020a170902bf9700b001421d86afc4so5356893pls.9
+        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 15:58:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=+5FkbEhx1+9GLVuvk8L93fKbVlYearXqDKwYBbqQGyM=;
-        b=J47SqzCVE674c+S+p5XhPXNPtiUpiobr5ZLjHVmBMWqoDbo7Lo/B8LgRidDs4r/Lf8
-         3VbgHm3sqq3B6iQYOcnOGYLdQQkS0mvaGY18DUt5nFkSClyk+dvy3ZyuPtVyUSWeDyWC
-         f+KP84lqd29GRxChGs0+5a5vG4aEyBHn+mFBf1G3zVB9O2Fr9Lkwz5nfjRmi1Ejbv9k9
-         dAtmDiTGvTJf7rpXpkS0qpGbMPMrMGe3W3hg+RGszAtpZaUjTOuSX+k+nZ382eYwNcTW
-         kUUSSVkaOknfJZY9mD1DQWWQN2+PrRR9/b75tTcdvZ7Sgy6X3j5Amf9chVez/hruJxte
-         UM7A==
+        bh=IFiCOA44RFYNwaRr/Yb1BDlw+EFlbcyt6Uo3IPFhDZo=;
+        b=kuGzEGQ65pTKEh6gsEmMPWzBQLJ3tfPfO2YP4JqYZllDteIFsyo3EJiTaJQeP2RLyL
+         jHZumiyvBi/3tq0Y482P0/oT6o0tMb3p7NeqUaUrF1hDRHL1dmfk70JhvGACb3SMAb8w
+         MG73XS+erymKTKp9F3LikG9NdwRIrYjtpd01twH1ExPmcguk9mpSPaTehYDzYd/XNN4A
+         yhnF1AulmXv1wkB8MPhU/t6HJymMNks9QyEQn1sXd8tf9Vqdb4L7rGYmpxaOwQ+trQwE
+         i6ExWO28eLjOedEqr3JM9IuzXccsSFUu4rKGvp7/E/oXnH4uIWD6ERILyFhIqn+bFHFa
+         +CgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=+5FkbEhx1+9GLVuvk8L93fKbVlYearXqDKwYBbqQGyM=;
-        b=RCLjszOOn9S2gp4DwkCb2YRBIhCJEZufJjtjjLcMpLne687brqdkDZYJCfn/+ggZ0U
-         Eg4QowP6+vr60dx8YY3tFzCBaJ5C0WlAhI/H8TfWLwqHg0KEenJaHwujIN71uRAd9Cpb
-         1ZH+aNT6iOs7EvkQ8/m0DRGO4j/8sDe1mfeMrwRiGkTEanfuwZgyrdfmc4uPtVlrACPn
-         1pYiApCKHWQXUuRwxiT2QDLshokh30xFvpC4sOc4TRY+uIqofZvwmYPYWHWEOFOR3mb2
-         Tg/EcUknTLTB6A2eYjudop1zdKpRFxoz7k6G+wNwECVUCpahLrfSxhfRN/3uMKGIdz+1
-         i6xw==
-X-Gm-Message-State: AOAM531lATvV2iXgTevApOrSvP39ZujB9UCvzTNAgnuyA84BFyF97hEl
-        Afz625VokTpTEPMiv1L1EQBkV/Ts/jSoMg==
-X-Google-Smtp-Source: ABdhPJxxYB6OpokHiTIXOsuahJdGdcZ/cwDyR5jXqj8GkgVPFTmZ6RbpEcJdgasomqfuV7TJM5DMuIunJ0wKIw==
+        bh=IFiCOA44RFYNwaRr/Yb1BDlw+EFlbcyt6Uo3IPFhDZo=;
+        b=GMheO/agsugWp9zMsFiuLbiI2DJ+7sbhwT2OZWJ3RNb6g42AyiS5TjlR2mRZnGOi06
+         SGcUmsrMrTMFhcUpx+nVA8AWiXx63FJU5CfNgaK3m3m/YcNLwyOoum4szv+YqFK1VOr0
+         OO+5NBMviDYylbWFY8/yeNuM0XhZPVL1p6nwJzfU4kh2mYDd623EJ7rnOHP9Z4PH4nt9
+         Dh3hccz1H1zNf2IN1jbrJjvBF+bLk2FWxbQ1LzN3gzFRLsubDXc7JmlqSjZ4zB4HdDqC
+         7gjOJ/nBOZRxukLcVLdXHvc+xDJjDeRCL4nPzND42kFTUnjMn5nRWaiaQZoeTaIwtNk8
+         zOBQ==
+X-Gm-Message-State: AOAM531M7mJk8AJEKOIdnqVsX2pK84vlaHBOZnS5k/KvGW89kZyQzj2X
+        via5N/G8d8rMI7dnlzZ5EUgP5Yy1aiG7PQ==
+X-Google-Smtp-Source: ABdhPJydB1K+/B/2hmZVYyzVCOl2RrQKg/VTodVN+yYJAtI40Y49nXiXylnIcWmFVSJtOTp5jQ2hu7NnRLXGVA==
 X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a17:902:714f:b0:142:892d:a46 with SMTP id
- u15-20020a170902714f00b00142892d0a46mr80956847plm.39.1637366294873; Fri, 19
- Nov 2021 15:58:14 -0800 (PST)
-Date:   Fri, 19 Nov 2021 23:57:47 +0000
+ (user=dmatlack job=sendgmr) by 2002:a17:902:8d85:b0:142:892d:bfa with SMTP id
+ v5-20020a1709028d8500b00142892d0bfamr82529714plo.76.1637366296582; Fri, 19
+ Nov 2021 15:58:16 -0800 (PST)
+Date:   Fri, 19 Nov 2021 23:57:48 +0000
 In-Reply-To: <20211119235759.1304274-1-dmatlack@google.com>
-Message-Id: <20211119235759.1304274-4-dmatlack@google.com>
+Message-Id: <20211119235759.1304274-5-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20211119235759.1304274-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.34.0.rc2.393.gf8c9666880-goog
-Subject: [RFC PATCH 03/15] KVM: x86/mmu: Automatically update iter->old_spte
- if cmpxchg fails
+Subject: [RFC PATCH 04/15] KVM: x86/mmu: Factor out logic to atomically
+ install a new page table
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Ben Gardon <bgardon@google.com>,
@@ -72,138 +72,99 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Consolidate a bunch of code that was manually re-reading the spte if the
-cmpxchg fails. There is no extra cost of doing this because we already
-have the spte value as a result of the cmpxchg (and in fact this
-eliminates re-reading the spte), and none of the call sites depend on
-iter->old_spte retaining the stale spte value.
+Factor out the logic to atomically replace an SPTE with an SPTE that
+points to a new page table. This will be used in a follow-up commit to
+split a large page SPTE into one level lower.
 
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- arch/x86/kvm/mmu/tdp_mmu.c | 56 ++++++++++++--------------------------
- 1 file changed, 18 insertions(+), 38 deletions(-)
+ arch/x86/kvm/mmu/tdp_mmu.c | 53 ++++++++++++++++++++++++++------------
+ 1 file changed, 37 insertions(+), 16 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 377a96718a2e..cc9fe33c9b36 100644
+index cc9fe33c9b36..9ee3f4f7fdf5 100644
 --- a/arch/x86/kvm/mmu/tdp_mmu.c
 +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -492,16 +492,22 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
-  * and handle the associated bookkeeping.  Do not mark the page dirty
-  * in KVM's dirty bitmaps.
-  *
-+ * If setting the SPTE fails because it has changed, iter->old_spte will be
-+ * updated with the updated value of the spte.
+@@ -945,6 +945,39 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
+ 	return ret;
+ }
+ 
++/*
++ * tdp_mmu_install_sp_atomic - Atomically replace the given spte with an
++ * spte pointing to the provided page table.
 + *
-  * @kvm: kvm instance
-  * @iter: a tdp_iter instance currently on the SPTE that should be set
-  * @new_spte: The value the SPTE should be set to
-  * Returns: true if the SPTE was set, false if it was not. If false is returned,
-- *	    this function will have no side-effects.
-+ *          this function will have no side-effects other than updating
-+ *          iter->old_spte to the latest value of spte.
-  */
- static inline bool tdp_mmu_set_spte_atomic(struct kvm *kvm,
- 					   struct tdp_iter *iter,
- 					   u64 new_spte)
- {
-+	u64 old_spte;
++ * @kvm: kvm instance
++ * @iter: a tdp_iter instance currently on the SPTE that should be set
++ * @sp: The new TDP page table to install.
++ * @account_nx: True if this page table is being installed to split a
++ *              non-executable huge page.
++ *
++ * Returns: True if the new page table was installed. False if spte being
++ *          replaced changed, causing the atomic compare-exchange to fail.
++ *          If this function returns false the sp will be freed before
++ *          returning.
++ */
++static bool tdp_mmu_install_sp_atomic(struct kvm *kvm,
++				      struct tdp_iter *iter,
++				      struct kvm_mmu_page *sp,
++				      bool account_nx)
++{
++	u64 spte;
 +
- 	lockdep_assert_held_read(&kvm->mmu_lock);
- 
- 	/*
-@@ -515,9 +521,11 @@ static inline bool tdp_mmu_set_spte_atomic(struct kvm *kvm,
- 	 * Note, fast_pf_fix_direct_spte() can also modify TDP MMU SPTEs and
- 	 * does not hold the mmu_lock.
- 	 */
--	if (cmpxchg64(rcu_dereference(iter->sptep), iter->old_spte,
--		      new_spte) != iter->old_spte)
-+	old_spte = cmpxchg64(rcu_dereference(iter->sptep), iter->old_spte, new_spte);
-+	if (old_spte != iter->old_spte) {
-+		iter->old_spte = old_spte;
- 		return false;
++	spte = make_nonleaf_spte(sp->spt, !shadow_accessed_mask);
++
++	if (tdp_mmu_set_spte_atomic(kvm, iter, spte)) {
++		tdp_mmu_link_page(kvm, sp, account_nx);
++		return true;
++	} else {
++		tdp_mmu_free_sp(sp);
++		return false;
 +	}
++}
++
+ /*
+  * Handle a TDP page fault (NPT/EPT violation/misconfiguration) by installing
+  * page tables and SPTEs to translate the faulting guest physical address.
+@@ -954,8 +987,6 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ 	struct kvm_mmu *mmu = vcpu->arch.mmu;
+ 	struct tdp_iter iter;
+ 	struct kvm_mmu_page *sp;
+-	u64 *child_pt;
+-	u64 new_spte;
+ 	int ret;
  
- 	__handle_changed_spte(kvm, iter->as_id, iter->gfn, iter->old_spte,
- 			      new_spte, iter->level, true);
-@@ -747,14 +755,8 @@ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
- 		if (!shared) {
- 			tdp_mmu_set_spte(kvm, &iter, 0);
- 			flush = true;
--		} else if (!tdp_mmu_zap_spte_atomic(kvm, &iter)) {
--			/*
--			 * The iter must explicitly re-read the SPTE because
--			 * the atomic cmpxchg failed.
--			 */
--			iter.old_spte = READ_ONCE(*rcu_dereference(iter.sptep));
-+		} else if (!tdp_mmu_zap_spte_atomic(kvm, &iter))
- 			goto retry;
--		}
- 	}
- 
- 	rcu_read_unlock();
-@@ -978,13 +980,6 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 		    is_large_pte(iter.old_spte)) {
- 			if (!tdp_mmu_zap_spte_atomic(vcpu->kvm, &iter))
- 				break;
--
--			/*
--			 * The iter must explicitly re-read the spte here
--			 * because the new value informs the !present
--			 * path below.
--			 */
--			iter.old_spte = READ_ONCE(*rcu_dereference(iter.sptep));
+ 	kvm_mmu_hugepage_adjust(vcpu, fault);
+@@ -983,6 +1014,9 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
  		}
  
  		if (!is_shadow_present_pte(iter.old_spte)) {
-@@ -1190,14 +1185,9 @@ static bool wrprot_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
- 
- 		new_spte = iter.old_spte & ~PT_WRITABLE_MASK;
- 
--		if (!tdp_mmu_set_spte_atomic(kvm, &iter, new_spte)) {
--			/*
--			 * The iter must explicitly re-read the SPTE because
--			 * the atomic cmpxchg failed.
--			 */
--			iter.old_spte = READ_ONCE(*rcu_dereference(iter.sptep));
-+		if (!tdp_mmu_set_spte_atomic(kvm, &iter, new_spte))
- 			goto retry;
--		}
++			bool account_nx = fault->huge_page_disallowed &&
++					  fault->req_level >= iter.level;
 +
- 		spte_set = true;
- 	}
+ 			/*
+ 			 * If SPTE has been frozen by another thread, just
+ 			 * give up and retry, avoiding unnecessary page table
+@@ -992,21 +1026,8 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ 				break;
  
-@@ -1258,14 +1248,9 @@ static bool clear_dirty_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
- 				continue;
+ 			sp = alloc_tdp_mmu_page(vcpu, iter.gfn, iter.level - 1);
+-			child_pt = sp->spt;
+-
+-			new_spte = make_nonleaf_spte(child_pt,
+-						     !shadow_accessed_mask);
+-
+-			if (tdp_mmu_set_spte_atomic(vcpu->kvm, &iter, new_spte)) {
+-				tdp_mmu_link_page(vcpu->kvm, sp,
+-						  fault->huge_page_disallowed &&
+-						  fault->req_level >= iter.level);
+-
+-				trace_kvm_mmu_get_page(sp, true);
+-			} else {
+-				tdp_mmu_free_sp(sp);
++			if (!tdp_mmu_install_sp_atomic(vcpu->kvm, &iter, sp, account_nx))
+ 				break;
+-			}
  		}
- 
--		if (!tdp_mmu_set_spte_atomic(kvm, &iter, new_spte)) {
--			/*
--			 * The iter must explicitly re-read the SPTE because
--			 * the atomic cmpxchg failed.
--			 */
--			iter.old_spte = READ_ONCE(*rcu_dereference(iter.sptep));
-+		if (!tdp_mmu_set_spte_atomic(kvm, &iter, new_spte))
- 			goto retry;
--		}
-+
- 		spte_set = true;
- 	}
- 
-@@ -1391,14 +1376,9 @@ static bool zap_collapsible_spte_range(struct kvm *kvm,
- 							    pfn, PG_LEVEL_NUM))
- 			continue;
- 
--		if (!tdp_mmu_zap_spte_atomic(kvm, &iter)) {
--			/*
--			 * The iter must explicitly re-read the SPTE because
--			 * the atomic cmpxchg failed.
--			 */
--			iter.old_spte = READ_ONCE(*rcu_dereference(iter.sptep));
-+		if (!tdp_mmu_zap_spte_atomic(kvm, &iter))
- 			goto retry;
--		}
-+
- 		flush = true;
  	}
  
 -- 
