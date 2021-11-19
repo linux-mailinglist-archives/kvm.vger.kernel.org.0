@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 804E94579D0
-	for <lists+kvm@lfdr.de>; Sat, 20 Nov 2021 00:58:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D4C644579D1
+	for <lists+kvm@lfdr.de>; Sat, 20 Nov 2021 00:58:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236314AbhKTABw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Nov 2021 19:01:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47336 "EHLO
+        id S236205AbhKTABz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Nov 2021 19:01:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236212AbhKTABY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Nov 2021 19:01:24 -0500
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15C07C06174A
-        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 15:58:22 -0800 (PST)
-Received: by mail-pl1-x64a.google.com with SMTP id x18-20020a170902ec9200b00143c6409dbcso5371500plg.5
-        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 15:58:22 -0800 (PST)
+        with ESMTP id S236254AbhKTAB0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Nov 2021 19:01:26 -0500
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C07EAC06173E
+        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 15:58:23 -0800 (PST)
+Received: by mail-pj1-x1049.google.com with SMTP id a16-20020a17090aa51000b001a78699acceso7455234pjq.8
+        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 15:58:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=THyCGcJlJDIteh93mmk5MXegs42Ad6o+RQjSwoy4UKE=;
-        b=HzfOzdGrIvRs5CF2OA0gibAVw6lsOEdz4I9Y3lvNVhRphfkOGsmN2IdLnrQOgDe7Wd
-         gUAcFcFlNnBVY9rG1gXm9D0WUfqtNbo2+vhixc3srxN+Sw81tuSyHPFqSmsB+i8tscLn
-         SbOrfwigCEi+pCyreDY377FZMcYVvZl1RD88P2bv9p8JWHBXs2j43mlJIjVDFfLX6Qi/
-         1IxX7BsjaFXchGBtICPLuxxPFB9xDf6KBMSyk+sEyidXAsW+O7IIMw/Er4vbM1Ek6h2r
-         1UR2R80rT0W1hmP3Urp+8M1HRoNKPg6X6VbqSjSgmMYkfEcW8HSC8riD9Szou81VLxuX
-         xMuw==
+        bh=WSjxVd+eIUHGILSD5cz53Ty6YrqZdmuc1hfDKll+vog=;
+        b=QvwtB7h+duQXv3dzzrPANRhkI3y4CeNF7R9Z21cqkoZpgq4T8pL3s6G9edaV9bE8EV
+         vpU0w7cWgje9IrgtkN+tdZ7QlxPoBRlfgNjPUqMm2sbDrsbOr/H8WZ+QsOKmL4UGV/Wv
+         g5CDvpAGBFiGU2+JIjQp/IIaonmRkwSgO4wRilkGjKyx78GtLnIAS+QdkwkXDpxkYARJ
+         lA+w9DMyFXDjUwsBRRrC0e/5U0LsmeqE7OwxeisO3e7XuVRM7XFvckMKG1/F8X/SbmvL
+         C2fj53qUag/eCof8Ia53ZVMO0tWABU4En+GZx1WamrNay4xYslApyDEdKLjCrDmOTOJs
+         dRSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=THyCGcJlJDIteh93mmk5MXegs42Ad6o+RQjSwoy4UKE=;
-        b=pCtUPkkcccQJ6rf6cxabO6iU5aEl3k9yw96ykCEiV5Yqfc+QV06iEjiBNt9R0Uubmw
-         gZGjO51J1ZjLL2Y245QXx+DaFonXzrqsPn+XQprgZBUWCGRQh5D20T9MThjnToHRjM3V
-         feQ/LU6qunnOrkb3CNJBYN8fXl+oRtjoP/ijbSNv2e1+ItXNiEnBoaSKjYL+DrpdfYtE
-         lNoXpzPo3mI/GrUnkESivY0RIVCE8SCc3uBbbTDpGKcy/eaULvRS0LcJFZQMhsYO7dTB
-         fqcnGcd1m47fj9GSCUNxZB0qktROEYMF+8P5YOasc/uMA36VzlVi2+EmAClVqeXAALeg
-         KAcA==
-X-Gm-Message-State: AOAM5311/SQRv/tZAuJJWoByVK4VtLCHwQZhJjZb0tsRubsx9MWcENtH
-        P+UFB1hA6yLkF19xLk1kEwHMxKRSd2BwOg==
-X-Google-Smtp-Source: ABdhPJxt7MI51GZajwUnfC3GYlRa9MHQ8weuL4DIzGepaXz2g9XCcaSYQOuxMHK8ExOZQp1keUHWHsbpgXa43w==
+        bh=WSjxVd+eIUHGILSD5cz53Ty6YrqZdmuc1hfDKll+vog=;
+        b=iJQcVzNv2x+UEEh86/0GBrICfIx3bgihu5H8ffGivbKw3N7jkZboWS0eilhQb7vAYz
+         xGqIGSVKeDC/ZamqLednp0FVL0UWkhHIK8krUXsm0vQYkfWmsyB14/FOwoPGZKXKXs2B
+         b+m+lKaneZC3fhMu3gmVj93vCWQKXBlqe31rSQ0vy4MOg9JqbvNLPxZeODM4iPbvsXsA
+         Tjsprwi3yCe+GziVtbSRxJWOlDyFE73AP4dgDoRgwil9/vyg2HhzQ29FAZEQ5ZhpaCO8
+         s9ivPXT6St8KxVuXtUAz/cAQMfW73UNi4T5klozyTKHzh4xPnGlinsCTcb7Cp90WKxHD
+         N+fw==
+X-Gm-Message-State: AOAM5323sx/2oMzADjylvDEGszjizmWbbgF20mRXJoIOMkVEiRCh/Onm
+        qHdMA4cx/atNLHClZ9RjitCXn+MVUhD/6g==
+X-Google-Smtp-Source: ABdhPJxalh2bCjcDgQUc9QuZFQdQ9h6h3Ghsd3BB+2YaEjBodxA1MBl+2fDqDME4UqArL3EbXCW0bA84LJzy+w==
 X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a17:902:f68e:b0:142:c60:475 with SMTP id
- l14-20020a170902f68e00b001420c600475mr83161881plg.8.1637366301600; Fri, 19
- Nov 2021 15:58:21 -0800 (PST)
-Date:   Fri, 19 Nov 2021 23:57:51 +0000
+ (user=dmatlack job=sendgmr) by 2002:a17:902:bc8b:b0:143:caf5:4a0e with SMTP
+ id bb11-20020a170902bc8b00b00143caf54a0emr47960112plb.38.1637366303291; Fri,
+ 19 Nov 2021 15:58:23 -0800 (PST)
+Date:   Fri, 19 Nov 2021 23:57:52 +0000
 In-Reply-To: <20211119235759.1304274-1-dmatlack@google.com>
-Message-Id: <20211119235759.1304274-8-dmatlack@google.com>
+Message-Id: <20211119235759.1304274-9-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20211119235759.1304274-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.34.0.rc2.393.gf8c9666880-goog
-Subject: [RFC PATCH 07/15] KVM: x86/mmu: Pass in vcpu->arch.mmu_caches instead
- of vcpu
+Subject: [RFC PATCH 08/15] KVM: x86/mmu: Helper method to check for large and
+ present sptes
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Ben Gardon <bgardon@google.com>,
@@ -72,73 +72,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Pass in vcpu->arch.mmu_caches to alloc_{,_child}_tdp_mmu_page() instead
-of the vcpu. This is in preparation for eagerly splitting large pages
-during VM-ioctls which does not have access to the vCPU mmu_caches.
+Consolidate is_large_pte and is_present_pte into a single helper. This
+will be used in a follow-up commit to check for present large-pages
+during Eager Page Splitting.
 
 No functional change intended.
 
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- arch/x86/kvm/mmu/tdp_mmu.c | 16 +++++++---------
- 1 file changed, 7 insertions(+), 9 deletions(-)
+ arch/x86/kvm/mmu/spte.h    | 5 +++++
+ arch/x86/kvm/mmu/tdp_mmu.c | 3 +--
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
+diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+index cc432f9a966b..e73c41d31816 100644
+--- a/arch/x86/kvm/mmu/spte.h
++++ b/arch/x86/kvm/mmu/spte.h
+@@ -257,6 +257,11 @@ static inline bool is_large_pte(u64 pte)
+ 	return pte & PT_PAGE_SIZE_MASK;
+ }
+ 
++static inline bool is_large_present_pte(u64 pte)
++{
++	return is_shadow_present_pte(pte) && is_large_pte(pte);
++}
++
+ static inline bool is_last_spte(u64 pte, int level)
+ {
+ 	return (level == PG_LEVEL_4K) || is_large_pte(pte);
 diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 1a409992a57f..ff4d83ad7580 100644
+index ff4d83ad7580..f8c4337f1fcf 100644
 --- a/arch/x86/kvm/mmu/tdp_mmu.c
 +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -157,14 +157,11 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
- 		if (kvm_mmu_page_as_id(_root) != _as_id) {		\
- 		} else
- 
--static struct kvm_mmu_page *alloc_tdp_mmu_page(struct kvm_vcpu *vcpu, gfn_t gfn,
--					       union kvm_mmu_page_role role)
-+static struct kvm_mmu_page *alloc_tdp_mmu_page(struct kvm_mmu_memory_caches *mmu_caches,
-+					       gfn_t gfn, union kvm_mmu_page_role role)
- {
--	struct kvm_mmu_memory_caches *mmu_caches;
- 	struct kvm_mmu_page *sp;
- 
--	mmu_caches = &vcpu->arch.mmu_caches;
--
- 	sp = kvm_mmu_memory_cache_alloc(&mmu_caches->page_header_cache);
- 	sp->spt = kvm_mmu_memory_cache_alloc(&mmu_caches->shadow_page_cache);
- 	set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
-@@ -178,7 +175,8 @@ static struct kvm_mmu_page *alloc_tdp_mmu_page(struct kvm_vcpu *vcpu, gfn_t gfn,
- 	return sp;
- }
- 
--static struct kvm_mmu_page *alloc_child_tdp_mmu_page(struct kvm_vcpu *vcpu, struct tdp_iter *iter)
-+static struct kvm_mmu_page *alloc_child_tdp_mmu_page(struct kvm_mmu_memory_caches *mmu_caches,
-+						     struct tdp_iter *iter)
- {
- 	struct kvm_mmu_page *parent_sp;
- 	union kvm_mmu_page_role role;
-@@ -188,7 +186,7 @@ static struct kvm_mmu_page *alloc_child_tdp_mmu_page(struct kvm_vcpu *vcpu, stru
- 	role = parent_sp->role;
- 	role.level--;
- 
--	return alloc_tdp_mmu_page(vcpu, iter->gfn, role);
-+	return alloc_tdp_mmu_page(mmu_caches, iter->gfn, role);
- }
- 
- hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
-@@ -213,7 +211,7 @@ hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
- 			goto out;
- 	}
- 
--	root = alloc_tdp_mmu_page(vcpu, 0, role);
-+	root = alloc_tdp_mmu_page(&vcpu->arch.mmu_caches, 0, role);
- 	refcount_set(&root->tdp_mmu_root_count, 1);
- 
- 	spin_lock(&kvm->arch.tdp_mmu_pages_lock);
-@@ -1031,7 +1029,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 			if (is_removed_spte(iter.old_spte))
- 				break;
- 
--			sp = alloc_child_tdp_mmu_page(vcpu, &iter);
-+			sp = alloc_child_tdp_mmu_page(&vcpu->arch.mmu_caches, &iter);
- 			if (!tdp_mmu_install_sp_atomic(vcpu->kvm, &iter, sp, account_nx))
+@@ -1011,8 +1011,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ 		 * than the target, that SPTE must be cleared and replaced
+ 		 * with a non-leaf SPTE.
+ 		 */
+-		if (is_shadow_present_pte(iter.old_spte) &&
+-		    is_large_pte(iter.old_spte)) {
++		if (is_large_present_pte(iter.old_spte)) {
+ 			if (!tdp_mmu_zap_spte_atomic(vcpu->kvm, &iter))
  				break;
  		}
 -- 
