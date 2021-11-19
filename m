@@ -2,60 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 70056457830
-	for <lists+kvm@lfdr.de>; Fri, 19 Nov 2021 22:37:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C4C9B457833
+	for <lists+kvm@lfdr.de>; Fri, 19 Nov 2021 22:37:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235576AbhKSVkS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Nov 2021 16:40:18 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:20272 "EHLO
+        id S235615AbhKSVkT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Nov 2021 16:40:19 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38948 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235262AbhKSVkR (ORCPT
+        by vger.kernel.org with ESMTP id S235475AbhKSVkR (ORCPT
         <rfc822;kvm@vger.kernel.org>); Fri, 19 Nov 2021 16:40:17 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1AJLIWHQ031622;
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1AJLIBsq027325;
         Fri, 19 Nov 2021 21:37:15 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=fLJN1OwTfDL7nZ8IwLAFT9pFSURzXxJhDOt/4m0V5Ho=;
- b=EcmQqUxhSlaguxVTm2x6sevoprXmbtWTfhxb8ix4NpZoXwxharxxu8w794YQKIhB9AWn
- HIU8IgQ3+14SbiPPzJy0MyfnpTKALh+U9hB41i8pQ5Ad/R06DgAQlGCyGkrfMHUe/1tk
- doM2Y7w77ICGxn3Xzmt82RPB/goNWvk7nt/UiQR7ptogRqQ5KJzcbh4OGeRGGx/q0Ok8
- HHmvER3/B29MojPsHSrzh09EnTQe5oh/z/K9Fgb0FirjhXvjwqerQkz+9vk9uYW5pp6F
- afw7V2wO2FcLg9y8Zk8nphJOx7lr8cnFikruK321SkHTzSAQjIMQtW11XW4+jSyCZ1+p bg== 
+ bh=+tO7K28mnq66T55XkeDpqwJ1uhbc9+UMlo78ODPC0r4=;
+ b=RXAdCfpDjrlubQstvC71BrkmATqewHIs31JAWuLjheL87ZPW76+UmcsADKRU/b+UN9QQ
+ M1zEYtVVn+QxFE0wgydDAjxc0Md4zmC3yspOrOBimoIqldbTVjHep9+dsrLP+FhEwjEE
+ 9KLKELeIDHz+P5hShRChaVIIcWs0skPoNcJ5tTYjuZH1E0/EWH4wkgHB+MZ/LMAXem5+
+ 0QlLkjRPgyFuEcwdWLaXHCnKoH6DD4DyhSPsV/DtLsHkk++3mZoQliAXkTrKu5jVtjtO
+ zqFDRZFppK7pbqu4SfdPBUXrL5voC4I0KAGm6Rz5+Qo9pgHPpHA+NsD92YjJVBtqTfzq Uw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cekqgga50-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cekqh09jx-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Fri, 19 Nov 2021 21:37:15 +0000
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1AJLPufg003257;
-        Fri, 19 Nov 2021 21:37:14 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cekqgga4j-1
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1AJLZoBN032374;
+        Fri, 19 Nov 2021 21:37:15 GMT
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cekqh09j0-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Fri, 19 Nov 2021 21:37:14 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1AJLI6JX001639;
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1AJLHoVN019661;
         Fri, 19 Nov 2021 21:37:12 GMT
 Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma02fra.de.ibm.com with ESMTP id 3ca50at2w0-1
+        by ppma06fra.de.ibm.com with ESMTP id 3ca4mm23fn-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Fri, 19 Nov 2021 21:37:12 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1AJLU9hN48693642
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1AJLU8V562849468
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Fri, 19 Nov 2021 21:30:09 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5FFB8A4053;
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4F7DF11C058;
         Fri, 19 Nov 2021 21:37:09 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4B91AA404D;
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 387AD11C050;
         Fri, 19 Nov 2021 21:37:09 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
         Fri, 19 Nov 2021 21:37:09 +0000 (GMT)
 Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
-        id DECB4E128D; Fri, 19 Nov 2021 22:37:08 +0100 (CET)
+        id E117AE153A; Fri, 19 Nov 2021 22:37:08 +0100 (CET)
 From:   Eric Farman <farman@linux.ibm.com>
 To:     Christian Borntraeger <borntraeger@de.ibm.com>,
         Janosch Frank <frankja@linux.ibm.com>,
@@ -65,110 +65,181 @@ To:     Christian Borntraeger <borntraeger@de.ibm.com>,
 Cc:     Heiko Carstens <hca@linux.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>, kvm@vger.kernel.org,
         linux-s390@vger.kernel.org, Eric Farman <farman@linux.ibm.com>
-Subject: [RFC PATCH v4 1/2] Capability/IOCTL/Documentation
-Date:   Fri, 19 Nov 2021 22:37:06 +0100
-Message-Id: <20211119213707.2363945-2-farman@linux.ibm.com>
+Subject: [RFC PATCH v4 2/2] KVM: s390: Introduce a USER_BUSY capability and IOCTL
+Date:   Fri, 19 Nov 2021 22:37:07 +0100
+Message-Id: <20211119213707.2363945-3-farman@linux.ibm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20211119213707.2363945-1-farman@linux.ibm.com>
 References: <20211119213707.2363945-1-farman@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Cxrl4CzwwcPjt8ZGtKMONQYNeedZqdp3
-X-Proofpoint-GUID: iTygox2nU3xwOm-S-aYCuQrWzIBZ8iBp
+X-Proofpoint-GUID: OCqCgogrihkCYWaYam_wT59f2tUqi907
+X-Proofpoint-ORIG-GUID: vLPtwawY3Kz6YXyNoYy8Ofgv2oBMy-w4
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
  definitions=2021-11-19_15,2021-11-17_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 mlxscore=0
- adultscore=0 priorityscore=1501 spamscore=0 phishscore=0
- lowpriorityscore=0 mlxlogscore=999 bulkscore=0 impostorscore=0
- clxscore=1015 suspectscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2110150000 definitions=main-2111190114
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
+ clxscore=1015 impostorscore=0 mlxlogscore=999 priorityscore=1501
+ lowpriorityscore=0 bulkscore=0 malwarescore=0 adultscore=0 phishscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2111190114
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-(This should be squashed with the next patch; it's just broken
-out for ease-of-future rebase.)
+With commit 2444b352c3ac ("KVM: s390: forward most SIGP orders to user
+space") we have a capability that allows the "fast" SIGP orders (as
+defined by the Programming Notes for the SIGNAL PROCESSOR instruction in
+the Principles of Operation) to be handled in-kernel, while all others are
+sent to userspace for processing.
+
+This works fine but it creates a situation when, for example, a SIGP SENSE
+might return CC1 (STATUS STORED, and status bits indicating the vcpu is
+stopped), when in actuality userspace is still processing a SIGP STOP AND
+STORE STATUS order, and the vcpu is not yet actually stopped. Thus, the
+SIGP SENSE should actually be returning CC2 (busy) instead of CC1.
+
+To fix this, add another CPU capability and an associated IOCTL.
+The IOCTL can be used by userspace to mark a vcpu "busy" processing a
+SIGP order, and cause concurrent orders handled in-kernel to be returned
+with CC2 (busy). Another invocation of the IOCTL with a different payload
+can be used to mark the SIGP completed, and thus the vcpu is free to
+process additional orders.
 
 Signed-off-by: Eric Farman <farman@linux.ibm.com>
 ---
- Documentation/virt/kvm/api.rst | 22 ++++++++++++++++++++++
- include/uapi/linux/kvm.h       | 16 ++++++++++++++++
- 2 files changed, 38 insertions(+)
+ arch/s390/include/asm/kvm_host.h |  2 ++
+ arch/s390/kvm/kvm-s390.c         | 40 ++++++++++++++++++++++++++++++++
+ arch/s390/kvm/kvm-s390.h         | 15 ++++++++++++
+ arch/s390/kvm/sigp.c             |  3 +++
+ 4 files changed, 60 insertions(+)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index a6729c8cf063..012167775419 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -5317,6 +5317,18 @@ the trailing ``'\0'``, is indicated by ``name_size`` in the header.
- The Stats Data block contains an array of 64-bit values in the same order
- as the descriptors in Descriptors block.
+diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+index a604d51acfc8..d05cb4d2e1d5 100644
+--- a/arch/s390/include/asm/kvm_host.h
++++ b/arch/s390/include/asm/kvm_host.h
+@@ -748,6 +748,7 @@ struct kvm_vcpu_arch {
+ 	bool skey_enabled;
+ 	struct kvm_s390_pv_vcpu pv;
+ 	union diag318_info diag318_info;
++	atomic_t busy;
+ };
  
-+4.134 KVM_S390_USER_BUSY
-+---------------------------------
+ struct kvm_vm_stat {
+@@ -941,6 +942,7 @@ struct kvm_arch{
+ 	int user_sigp;
+ 	int user_stsi;
+ 	int user_instr0;
++	int user_busy;
+ 	struct s390_io_adapter *adapters[MAX_S390_IO_ADAPTERS];
+ 	wait_queue_head_t ipte_wq;
+ 	int ipte_lock_count;
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 5f52e7eec02f..c9f61777abea 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -564,6 +564,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_S390_VCPU_RESETS:
+ 	case KVM_CAP_SET_GUEST_DEBUG:
+ 	case KVM_CAP_S390_DIAG318:
++	case KVM_CAP_S390_USER_BUSY:
+ 		r = 1;
+ 		break;
+ 	case KVM_CAP_SET_GUEST_DEBUG2:
+@@ -706,6 +707,11 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
+ 		kvm->arch.user_sigp = 1;
+ 		r = 0;
+ 		break;
++	case KVM_CAP_S390_USER_BUSY:
++		VM_EVENT(kvm, 3, "%s", "ENABLE: CAP_S390_USER_BUSY");
++		kvm->arch.user_busy = 1;
++		r = 0;
++		break;
+ 	case KVM_CAP_S390_VECTOR_REGISTERS:
+ 		mutex_lock(&kvm->lock);
+ 		if (kvm->created_vcpus) {
+@@ -4825,6 +4831,40 @@ long kvm_arch_vcpu_async_ioctl(struct file *filp,
+ 			return -EINVAL;
+ 		return kvm_s390_inject_vcpu(vcpu, &s390irq);
+ 	}
++	case KVM_S390_USER_BUSY: {
++		struct kvm_s390_user_busy_info busy;
 +
-+:Capability: KVM_CAP_S390_USER_BUSY
-+:Architectures: s390
-+:Type: vcpu ioctl
-+:Parameters: struct kvm_s390_busy_info
-+:Returns: 0, or -EBUSY if VCPU is already busy
++		if (!vcpu->kvm->arch.user_busy)
++			return -EINVAL;
 +
-+This ioctl sets the VCPU's indicator that it is busy processing an item
-+of work, and is thus unavailable for additional work of that type.
++		if (copy_from_user(&busy, argp, sizeof(busy)))
++			return -EFAULT;
 +
- 5. The kvm_run structure
- ========================
++		switch (busy.reason) {
++		case KVM_S390_USER_BUSY_REASON_SIGP:
++			break;
++		default:
++			return -EINVAL;
++		}
++
++		switch (busy.function) {
++		case KVM_S390_USER_BUSY_FUNCTION_RESET:
++			kvm_s390_vcpu_clear_busy(vcpu);
++			break;
++		case KVM_S390_USER_BUSY_FUNCTION_SET:
++			if (!kvm_s390_vcpu_set_busy(vcpu))
++				return -EBUSY;
++			break;
++		default:
++			return -EINVAL;
++		}
++
++		VCPU_EVENT(vcpu, 3, "BUSY: CPU %x %x reason %x payload %x",
++			   vcpu->vcpu_id,
++			   busy.function, busy.reason, busy.payload);
++
++		return 0;
++	}
+ 	}
+ 	return -ENOIOCTLCMD;
+ }
+diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
+index c07a050d757d..92497c23e5a4 100644
+--- a/arch/s390/kvm/kvm-s390.h
++++ b/arch/s390/kvm/kvm-s390.h
+@@ -82,6 +82,21 @@ static inline int is_vcpu_idle(struct kvm_vcpu *vcpu)
+ 	return test_bit(vcpu->vcpu_idx, vcpu->kvm->arch.idle_mask);
+ }
  
-@@ -6706,6 +6718,16 @@ MAP_SHARED mmap will result in an -EINVAL return.
- When enabled the VMM may make use of the ``KVM_ARM_MTE_COPY_TAGS`` ioctl to
- perform a bulk copy of tags to/from the guest.
++static inline bool kvm_s390_vcpu_is_busy(struct kvm_vcpu *vcpu)
++{
++	return atomic_read(&vcpu->arch.busy) == 1;
++}
++
++static inline bool kvm_s390_vcpu_set_busy(struct kvm_vcpu *vcpu)
++{
++	return atomic_cmpxchg(&vcpu->arch.busy, 0, 1) == 0;
++}
++
++static inline void kvm_s390_vcpu_clear_busy(struct kvm_vcpu *vcpu)
++{
++	atomic_set(&vcpu->arch.busy, 0);
++}
++
+ static inline int kvm_is_ucontrol(struct kvm *kvm)
+ {
+ #ifdef CONFIG_KVM_S390_UCONTROL
+diff --git a/arch/s390/kvm/sigp.c b/arch/s390/kvm/sigp.c
+index 5ad3fb4619f1..c3066b134e50 100644
+--- a/arch/s390/kvm/sigp.c
++++ b/arch/s390/kvm/sigp.c
+@@ -276,6 +276,9 @@ static int handle_sigp_dst(struct kvm_vcpu *vcpu, u8 order_code,
+ 	if (!dst_vcpu)
+ 		return SIGP_CC_NOT_OPERATIONAL;
  
-+7.29 KVM_CAP_S390_USER_BUSY
-+--------------------------------
++	if (kvm_s390_vcpu_is_busy(dst_vcpu))
++		return SIGP_CC_BUSY;
 +
-+:Architectures: s390
-+:Parameters: none
-+
-+This capability indicates that KVM should indicate when a vcpu is busy
-+performing some work, and conflicting work directed at the same vcpu should
-+return CC2 (BUSY) until it has completed.
-+
- 8. Other capabilities.
- ======================
- 
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index a067410ebea5..7f16f9fb4ae8 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1112,6 +1112,7 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_BINARY_STATS_FD 203
- #define KVM_CAP_EXIT_ON_EMULATION_FAILURE 204
- #define KVM_CAP_ARM_MTE 205
-+#define KVM_CAP_S390_USER_BUSY 206
- 
- #ifdef KVM_CAP_IRQ_ROUTING
- 
-@@ -2007,4 +2008,19 @@ struct kvm_stats_desc {
- 
- #define KVM_GET_STATS_FD  _IO(KVMIO,  0xce)
- 
-+/* Available with KVM_CAP_S390_USER_BUSY */
-+#define KVM_S390_USER_BUSY	_IOW(KVMIO, 0xcf, struct kvm_s390_user_busy_info)
-+
-+#define KVM_S390_USER_BUSY_REASON_SIGP		1
-+
-+#define KVM_S390_USER_BUSY_FUNCTION_RESET	0
-+#define KVM_S390_USER_BUSY_FUNCTION_SET		1
-+
-+/* FIXME struct description */
-+struct kvm_s390_user_busy_info {
-+	__u32 reason;
-+	__u32 function;
-+	__u32 payload;
-+};
-+
- #endif /* __LINUX_KVM_H */
+ 	switch (order_code) {
+ 	case SIGP_SENSE:
+ 		vcpu->stat.instruction_sigp_sense++;
 -- 
 2.25.1
 
