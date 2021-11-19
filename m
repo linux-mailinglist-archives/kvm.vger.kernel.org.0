@@ -2,57 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 326A64579CD
-	for <lists+kvm@lfdr.de>; Sat, 20 Nov 2021 00:58:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E99824579CE
+	for <lists+kvm@lfdr.de>; Sat, 20 Nov 2021 00:58:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236442AbhKTABk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Nov 2021 19:01:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47314 "EHLO
+        id S236501AbhKTABt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Nov 2021 19:01:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236227AbhKTABU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Nov 2021 19:01:20 -0500
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26E64C061574
-        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 15:58:17 -0800 (PST)
-Received: by mail-pl1-x64a.google.com with SMTP id v23-20020a170902bf9700b001421d86afc4so5356893pls.9
-        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 15:58:17 -0800 (PST)
+        with ESMTP id S236152AbhKTABV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Nov 2021 19:01:21 -0500
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5AC8C06173E
+        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 15:58:18 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id pg9-20020a17090b1e0900b001a689204b52so7484114pjb.0
+        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 15:58:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=IFiCOA44RFYNwaRr/Yb1BDlw+EFlbcyt6Uo3IPFhDZo=;
-        b=kuGzEGQ65pTKEh6gsEmMPWzBQLJ3tfPfO2YP4JqYZllDteIFsyo3EJiTaJQeP2RLyL
-         jHZumiyvBi/3tq0Y482P0/oT6o0tMb3p7NeqUaUrF1hDRHL1dmfk70JhvGACb3SMAb8w
-         MG73XS+erymKTKp9F3LikG9NdwRIrYjtpd01twH1ExPmcguk9mpSPaTehYDzYd/XNN4A
-         yhnF1AulmXv1wkB8MPhU/t6HJymMNks9QyEQn1sXd8tf9Vqdb4L7rGYmpxaOwQ+trQwE
-         i6ExWO28eLjOedEqr3JM9IuzXccsSFUu4rKGvp7/E/oXnH4uIWD6ERILyFhIqn+bFHFa
-         +CgA==
+        bh=bEq6kwsGlJixZVgAv3CUce1H9nK4ADw+62+7N53XAYs=;
+        b=GKm3oFtEl/vKHCcbQsCpBhn9CrwXLXZPY7uYiR+Le8/eDyIr1HsVjvi/00exiiwOhF
+         F1RhN25/KJRp2zP/+edLUlvK7i5hSlIWdtLGq8beOwPbLlsAc8+4UJeZ5BP6Ei7B8CFZ
+         JUx2LZ/TwYYvWqjEvGTYHR87J3g3ihDTGMUa2nr4MO2FllPVgiIJeXhIBXB6t3yBphLT
+         cwSFEHvv0Glh5Cbm5HflMIslN9iI8zAm66pJX4BHGVfbmvU0GDdPL14kAlcB7bJPTPfR
+         Ew9kMW8ytp14yTU4eqizaGooQf2urkC+JBRmCAyMG+w7DqyiL8vzHVPQRoL2cpis+JD5
+         mcog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=IFiCOA44RFYNwaRr/Yb1BDlw+EFlbcyt6Uo3IPFhDZo=;
-        b=GMheO/agsugWp9zMsFiuLbiI2DJ+7sbhwT2OZWJ3RNb6g42AyiS5TjlR2mRZnGOi06
-         SGcUmsrMrTMFhcUpx+nVA8AWiXx63FJU5CfNgaK3m3m/YcNLwyOoum4szv+YqFK1VOr0
-         OO+5NBMviDYylbWFY8/yeNuM0XhZPVL1p6nwJzfU4kh2mYDd623EJ7rnOHP9Z4PH4nt9
-         Dh3hccz1H1zNf2IN1jbrJjvBF+bLk2FWxbQ1LzN3gzFRLsubDXc7JmlqSjZ4zB4HdDqC
-         7gjOJ/nBOZRxukLcVLdXHvc+xDJjDeRCL4nPzND42kFTUnjMn5nRWaiaQZoeTaIwtNk8
-         zOBQ==
-X-Gm-Message-State: AOAM531M7mJk8AJEKOIdnqVsX2pK84vlaHBOZnS5k/KvGW89kZyQzj2X
-        via5N/G8d8rMI7dnlzZ5EUgP5Yy1aiG7PQ==
-X-Google-Smtp-Source: ABdhPJydB1K+/B/2hmZVYyzVCOl2RrQKg/VTodVN+yYJAtI40Y49nXiXylnIcWmFVSJtOTp5jQ2hu7NnRLXGVA==
+        bh=bEq6kwsGlJixZVgAv3CUce1H9nK4ADw+62+7N53XAYs=;
+        b=PsFYWi8X5bfAObifG3Ulq1peQ29laitSIgZ/U7HFAiOho1/g5I4FbqBaEe9CqjoKCy
+         C9eTrcTSUMA/fHINGah8KGbrkrRO0ahD73FrOHDwLeawus7JL+foDO0rpaVuXg3pxMU+
+         eJYRsIGDRUVnhgOGo602JvpWhO8H1AVjNMrOhi3bWkdf8R6Y884PiaIp737Wqy7ftYmR
+         lD2Q3+DhWM58MkOKP6NrmboSyLldxJuDfwEOSNGlM3L1e5PVEb5yxcD5QY1wwWhK1qgv
+         +UTqnuAXX9XZjPu8QxkbzbWKIgMtg6Q1cMmNIVBSaGFxUaPWXo9AKfiKziYB6ZqNyyzH
+         pzmA==
+X-Gm-Message-State: AOAM532hlxcQ4rYzowPkJaWgfIeYEvrHKV9Mmfu4jWiQaSWeA35cRFc+
+        DtlftBZr7xeZFRj5OQF9n9vIR2BeVQprUA==
+X-Google-Smtp-Source: ABdhPJx6WLjwzwkSIJDC2kZ6nBkzcxNQZJcUrSVxixUY4nlSMrmb42RaIGHplK/00Q5IzF7tCHhrRIAojt4p6A==
 X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a17:902:8d85:b0:142:892d:bfa with SMTP id
- v5-20020a1709028d8500b00142892d0bfamr82529714plo.76.1637366296582; Fri, 19
- Nov 2021 15:58:16 -0800 (PST)
-Date:   Fri, 19 Nov 2021 23:57:48 +0000
+ (user=dmatlack job=sendgmr) by 2002:a17:90b:615:: with SMTP id
+ gb21mr4827648pjb.10.1637366298243; Fri, 19 Nov 2021 15:58:18 -0800 (PST)
+Date:   Fri, 19 Nov 2021 23:57:49 +0000
 In-Reply-To: <20211119235759.1304274-1-dmatlack@google.com>
-Message-Id: <20211119235759.1304274-5-dmatlack@google.com>
+Message-Id: <20211119235759.1304274-6-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20211119235759.1304274-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.34.0.rc2.393.gf8c9666880-goog
-Subject: [RFC PATCH 04/15] KVM: x86/mmu: Factor out logic to atomically
- install a new page table
+Subject: [RFC PATCH 05/15] KVM: x86/mmu: Abstract mmu caches out to a separate struct
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Ben Gardon <bgardon@google.com>,
@@ -72,101 +70,185 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Factor out the logic to atomically replace an SPTE with an SPTE that
-points to a new page table. This will be used in a follow-up commit to
-split a large page SPTE into one level lower.
+Move the kvm_mmu_memory_cache structs into a separate wrapper struct.
+This is in preparation for eagerly splitting all large pages during
+VM-ioctls (i.e. not in the vCPU fault path) which will require adding
+kvm_mmu_memory_cache structs to struct kvm_arch.
 
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- arch/x86/kvm/mmu/tdp_mmu.c | 53 ++++++++++++++++++++++++++------------
- 1 file changed, 37 insertions(+), 16 deletions(-)
+ arch/x86/include/asm/kvm_host.h | 12 ++++---
+ arch/x86/kvm/mmu/mmu.c          | 59 ++++++++++++++++++++++-----------
+ arch/x86/kvm/mmu/tdp_mmu.c      |  7 ++--
+ 3 files changed, 52 insertions(+), 26 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index cc9fe33c9b36..9ee3f4f7fdf5 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -945,6 +945,39 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
- 	return ret;
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 1fcb345bc107..2a7564703ea6 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -612,6 +612,13 @@ struct kvm_vcpu_xen {
+ 	u64 runstate_times[4];
+ };
+ 
++struct kvm_mmu_memory_caches {
++	struct kvm_mmu_memory_cache pte_list_desc_cache;
++	struct kvm_mmu_memory_cache shadow_page_cache;
++	struct kvm_mmu_memory_cache gfn_array_cache;
++	struct kvm_mmu_memory_cache page_header_cache;
++};
++
+ struct kvm_vcpu_arch {
+ 	/*
+ 	 * rip and regs accesses must go through
+@@ -681,10 +688,7 @@ struct kvm_vcpu_arch {
+ 	 */
+ 	struct kvm_mmu *walk_mmu;
+ 
+-	struct kvm_mmu_memory_cache mmu_pte_list_desc_cache;
+-	struct kvm_mmu_memory_cache mmu_shadow_page_cache;
+-	struct kvm_mmu_memory_cache mmu_gfn_array_cache;
+-	struct kvm_mmu_memory_cache mmu_page_header_cache;
++	struct kvm_mmu_memory_caches mmu_caches;
+ 
+ 	/*
+ 	 * QEMU userspace and the guest each have their own FPU state.
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 1146f87044a6..537952574211 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -732,38 +732,60 @@ static void walk_shadow_page_lockless_end(struct kvm_vcpu *vcpu)
+ 
+ static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect)
+ {
++	struct kvm_mmu_memory_caches *mmu_caches;
+ 	int r;
+ 
++	mmu_caches = &vcpu->arch.mmu_caches;
++
+ 	/* 1 rmap, 1 parent PTE per level, and the prefetched rmaps. */
+-	r = kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache,
++	r = kvm_mmu_topup_memory_cache(&mmu_caches->pte_list_desc_cache,
+ 				       1 + PT64_ROOT_MAX_LEVEL + PTE_PREFETCH_NUM);
+ 	if (r)
+ 		return r;
+-	r = kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_shadow_page_cache,
++	r = kvm_mmu_topup_memory_cache(&mmu_caches->shadow_page_cache,
+ 				       PT64_ROOT_MAX_LEVEL);
+ 	if (r)
+ 		return r;
+ 	if (maybe_indirect) {
+-		r = kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_gfn_array_cache,
++		r = kvm_mmu_topup_memory_cache(&mmu_caches->gfn_array_cache,
+ 					       PT64_ROOT_MAX_LEVEL);
+ 		if (r)
+ 			return r;
+ 	}
+-	return kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_page_header_cache,
++	return kvm_mmu_topup_memory_cache(&mmu_caches->page_header_cache,
+ 					  PT64_ROOT_MAX_LEVEL);
  }
  
-+/*
-+ * tdp_mmu_install_sp_atomic - Atomically replace the given spte with an
-+ * spte pointing to the provided page table.
-+ *
-+ * @kvm: kvm instance
-+ * @iter: a tdp_iter instance currently on the SPTE that should be set
-+ * @sp: The new TDP page table to install.
-+ * @account_nx: True if this page table is being installed to split a
-+ *              non-executable huge page.
-+ *
-+ * Returns: True if the new page table was installed. False if spte being
-+ *          replaced changed, causing the atomic compare-exchange to fail.
-+ *          If this function returns false the sp will be freed before
-+ *          returning.
-+ */
-+static bool tdp_mmu_install_sp_atomic(struct kvm *kvm,
-+				      struct tdp_iter *iter,
-+				      struct kvm_mmu_page *sp,
-+				      bool account_nx)
-+{
-+	u64 spte;
+ static void mmu_free_memory_caches(struct kvm_vcpu *vcpu)
+ {
+-	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache);
+-	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_shadow_page_cache);
+-	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_gfn_array_cache);
+-	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_header_cache);
++	struct kvm_mmu_memory_caches *mmu_caches;
 +
-+	spte = make_nonleaf_spte(sp->spt, !shadow_accessed_mask);
++	mmu_caches = &vcpu->arch.mmu_caches;
 +
-+	if (tdp_mmu_set_spte_atomic(kvm, iter, spte)) {
-+		tdp_mmu_link_page(kvm, sp, account_nx);
-+		return true;
-+	} else {
-+		tdp_mmu_free_sp(sp);
-+		return false;
-+	}
++	kvm_mmu_free_memory_cache(&mmu_caches->pte_list_desc_cache);
++	kvm_mmu_free_memory_cache(&mmu_caches->shadow_page_cache);
++	kvm_mmu_free_memory_cache(&mmu_caches->gfn_array_cache);
++	kvm_mmu_free_memory_cache(&mmu_caches->page_header_cache);
 +}
 +
- /*
-  * Handle a TDP page fault (NPT/EPT violation/misconfiguration) by installing
-  * page tables and SPTEs to translate the faulting guest physical address.
-@@ -954,8 +987,6 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 	struct kvm_mmu *mmu = vcpu->arch.mmu;
- 	struct tdp_iter iter;
++static void mmu_init_memory_caches(struct kvm_mmu_memory_caches *caches)
++{
++	caches->pte_list_desc_cache.kmem_cache = pte_list_desc_cache;
++	caches->pte_list_desc_cache.gfp_zero = __GFP_ZERO;
++
++	caches->page_header_cache.kmem_cache = mmu_page_header_cache;
++	caches->page_header_cache.gfp_zero = __GFP_ZERO;
++
++	caches->shadow_page_cache.gfp_zero = __GFP_ZERO;
+ }
+ 
+ static struct pte_list_desc *mmu_alloc_pte_list_desc(struct kvm_vcpu *vcpu)
+ {
+-	return kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_pte_list_desc_cache);
++	struct kvm_mmu_memory_caches *mmu_caches;
++
++	mmu_caches = &vcpu->arch.mmu_caches;
++
++	return kvm_mmu_memory_cache_alloc(&mmu_caches->pte_list_desc_cache);
+ }
+ 
+ static void mmu_free_pte_list_desc(struct pte_list_desc *pte_list_desc)
+@@ -1071,7 +1093,7 @@ static bool rmap_can_add(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_mmu_memory_cache *mc;
+ 
+-	mc = &vcpu->arch.mmu_pte_list_desc_cache;
++	mc = &vcpu->arch.mmu_caches.pte_list_desc_cache;
+ 	return kvm_mmu_memory_cache_nr_free_objects(mc);
+ }
+ 
+@@ -1742,12 +1764,15 @@ static void drop_parent_pte(struct kvm_mmu_page *sp,
+ 
+ static struct kvm_mmu_page *kvm_mmu_alloc_page(struct kvm_vcpu *vcpu, int direct)
+ {
++	struct kvm_mmu_memory_caches *mmu_caches;
  	struct kvm_mmu_page *sp;
--	u64 *child_pt;
--	u64 new_spte;
+ 
+-	sp = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_page_header_cache);
+-	sp->spt = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_shadow_page_cache);
++	mmu_caches = &vcpu->arch.mmu_caches;
++
++	sp = kvm_mmu_memory_cache_alloc(&mmu_caches->page_header_cache);
++	sp->spt = kvm_mmu_memory_cache_alloc(&mmu_caches->shadow_page_cache);
+ 	if (!direct)
+-		sp->gfns = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_gfn_array_cache);
++		sp->gfns = kvm_mmu_memory_cache_alloc(&mmu_caches->gfn_array_cache);
+ 	set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
+ 
+ 	/*
+@@ -5544,13 +5569,7 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
+ {
  	int ret;
  
- 	kvm_mmu_hugepage_adjust(vcpu, fault);
-@@ -983,6 +1014,9 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 		}
+-	vcpu->arch.mmu_pte_list_desc_cache.kmem_cache = pte_list_desc_cache;
+-	vcpu->arch.mmu_pte_list_desc_cache.gfp_zero = __GFP_ZERO;
+-
+-	vcpu->arch.mmu_page_header_cache.kmem_cache = mmu_page_header_cache;
+-	vcpu->arch.mmu_page_header_cache.gfp_zero = __GFP_ZERO;
+-
+-	vcpu->arch.mmu_shadow_page_cache.gfp_zero = __GFP_ZERO;
++	mmu_init_memory_caches(&vcpu->arch.mmu_caches);
  
- 		if (!is_shadow_present_pte(iter.old_spte)) {
-+			bool account_nx = fault->huge_page_disallowed &&
-+					  fault->req_level >= iter.level;
+ 	vcpu->arch.mmu = &vcpu->arch.root_mmu;
+ 	vcpu->arch.walk_mmu = &vcpu->arch.root_mmu;
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 9ee3f4f7fdf5..b70707a7fe87 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -175,10 +175,13 @@ static union kvm_mmu_page_role page_role_for_level(struct kvm_vcpu *vcpu,
+ static struct kvm_mmu_page *alloc_tdp_mmu_page(struct kvm_vcpu *vcpu, gfn_t gfn,
+ 					       int level)
+ {
++	struct kvm_mmu_memory_caches *mmu_caches;
+ 	struct kvm_mmu_page *sp;
+ 
+-	sp = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_page_header_cache);
+-	sp->spt = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_shadow_page_cache);
++	mmu_caches = &vcpu->arch.mmu_caches;
 +
- 			/*
- 			 * If SPTE has been frozen by another thread, just
- 			 * give up and retry, avoiding unnecessary page table
-@@ -992,21 +1026,8 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 				break;
++	sp = kvm_mmu_memory_cache_alloc(&mmu_caches->page_header_cache);
++	sp->spt = kvm_mmu_memory_cache_alloc(&mmu_caches->shadow_page_cache);
+ 	set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
  
- 			sp = alloc_tdp_mmu_page(vcpu, iter.gfn, iter.level - 1);
--			child_pt = sp->spt;
--
--			new_spte = make_nonleaf_spte(child_pt,
--						     !shadow_accessed_mask);
--
--			if (tdp_mmu_set_spte_atomic(vcpu->kvm, &iter, new_spte)) {
--				tdp_mmu_link_page(vcpu->kvm, sp,
--						  fault->huge_page_disallowed &&
--						  fault->req_level >= iter.level);
--
--				trace_kvm_mmu_get_page(sp, true);
--			} else {
--				tdp_mmu_free_sp(sp);
-+			if (!tdp_mmu_install_sp_atomic(vcpu->kvm, &iter, sp, account_nx))
- 				break;
--			}
- 		}
- 	}
- 
+ 	sp->role.word = page_role_for_level(vcpu, level).word;
 -- 
 2.34.0.rc2.393.gf8c9666880-goog
 
