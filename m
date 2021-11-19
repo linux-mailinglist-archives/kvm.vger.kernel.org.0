@@ -2,55 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 882B54579D5
-	for <lists+kvm@lfdr.de>; Sat, 20 Nov 2021 00:59:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 532B94579D7
+	for <lists+kvm@lfdr.de>; Sat, 20 Nov 2021 00:59:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236359AbhKTACG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Nov 2021 19:02:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47318 "EHLO
+        id S236282AbhKTACN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Nov 2021 19:02:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236249AbhKTABj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S236217AbhKTABj (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 19 Nov 2021 19:01:39 -0500
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 963B4C06175D
-        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 15:58:31 -0800 (PST)
-Received: by mail-pj1-x1049.google.com with SMTP id n6-20020a17090a670600b001a9647fd1aaso7470968pjj.1
-        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 15:58:31 -0800 (PST)
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 502D5C06175E
+        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 15:58:33 -0800 (PST)
+Received: by mail-pf1-x449.google.com with SMTP id q2-20020a056a00084200b004a2582fcec1so6456880pfk.15
+        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 15:58:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=pkWaF7bQP6gucghx+x3mEjN+bvfdj/rHkNl/xx3z+d8=;
-        b=bAz8AOc/hZUuzNMBOzzmxr0xbPUPI6Q9V5CmnFRWmbdg/O4erZO/M/GRxEPp6v7/AY
-         6mIvJNpFIqefvB8veWA9J1SYzi/tE94oR0k/wuzQSSXS1xeMnPYRaMoq5Q91VT4oVFBz
-         O5+u+plrt8PBdCepbxKrLbBgGe2Vcgyq/hw40KWYKzH1EZD37fUxyE6VX32UAes5uTqY
-         n9DKrwmXYdmAE6c4lK3qWkoWpHq/S6r3DGvA1DPw5J9D49VUtvnXldPx0G21TLHZtaBo
-         QipCeUjSvs3/7t2JgEDK8HpQSjHI0cmL1Fmoxv9xcczRqlnjffJoPhaIlOvWu/lNAFfH
-         IsTA==
+        bh=907pw9qKzH1wGLGqMFvCzKM8gYj98bpyPMmwUQUZ+H8=;
+        b=gbpk8jWnIl4njyuLIyTnd7OaVlUgBgzPcG1SWhfuug0e11AuYP5dRnZZm7gCoNnu+D
+         H4tOA9vVkPPEaKKU5aX4z31B7YtJjDUkgylae+zJAxUJ3c96NwjsaiA003E/d34G82I3
+         wF2Vu6psZ3x+bmJlnZ0HhAWYImEbuR2d2/r4OwbdnBLA5hudmU4H9oc3ozcQydfubPgT
+         iBrh+Ma9Uv2w4pk3jd/oAD//S4QHja3k/iXePv7AOavIS4NHxPMFViViaVu3wtz+3/os
+         NTjkzDlpZDjSQLs0SrwFGZC+x2ZaZShUEIe4ghsP09hiXtpvdQjqcdWZwqoXSCuC23Xt
+         NaYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=pkWaF7bQP6gucghx+x3mEjN+bvfdj/rHkNl/xx3z+d8=;
-        b=B2GpX1eDqxvaOV737VYdAhHMdHIcASfqCxAX3ONyLFcweyB//oMUhhDHMqHIb+MVNv
-         iYD6P8BimyY/s/jB36U/Mixlob/0Tam+XJju3fgNFv/7a+kVeF29gvZp8f/lxZkCHL5+
-         QUbJiSDk/5cuGlSlfb/Sd5QfnFY7qFB/7qv6r6gLgacAXDrpVf4Z5BA/aRerAhwomnrp
-         ZxdFceRPdtTFQuD2cxxi/5PN4dl7t0teTbgxL55fNtvtLiq3jxRGMXm/Vnv78TiqzAUB
-         D/GFvQKfmVGNUP9Juuoxi0Qe1EyAvljrgB+gFg6t9YKWDVFxL0hnKE45x6nbpY583WD/
-         Wy4A==
-X-Gm-Message-State: AOAM533DWGxH0uncrWkFraVzXh8BofMJYccM3Cqx3whF9klZTX1p0/XZ
-        c5KAdJC37OfUixmnu5KZKmszQSBCsUUezw==
-X-Google-Smtp-Source: ABdhPJxez272G3wG/hupmmPHs5bDdzSEpf3O30ohlyIH3Jz4ZmCj+aZRQ/W++MAypps8SLIS1u8CxvFdl3mkeg==
+        bh=907pw9qKzH1wGLGqMFvCzKM8gYj98bpyPMmwUQUZ+H8=;
+        b=RIH8HgDsDJ+1+/f8eBYU3fza8g1lFrNgnNSgFlp1X4ubn962SySRcSDSoPkRrBSS80
+         Y5L6Hw4KXBRP6YlIZRwZVEYhyhvMnUjaN9/uXn0ZMJf/gU3iHS+B4S9dQOndy+2uERn8
+         /j/vfSS9YDEiigHWupkoz7dWWIrRgIHAD8txq106qCLdBcj/LMuOAMgnGm9GohJwJRUG
+         IMS92+g8iyRIoml6/6++EbcasUnomKSTrP0jFOxhl11mtJpvk873tVh87wY6DvFc3/vb
+         N5dWVC2q8Yx0LkUKNIZQsCr29M5fV+w6w7nLZAMNIMxivyda71qmi8VQKJVGVZVA24zO
+         Fk0g==
+X-Gm-Message-State: AOAM531NKpxTA3Dafp08wNWIlY9pPw4zws7H/00xKUdHfg5N7A4BWCZS
+        wuboxKOe+xrmY1BxzVRaYCOHZ4imAcG6/Q==
+X-Google-Smtp-Source: ABdhPJw3Jmz2av0uQKnM0ABopk5NJT4vWMk0To2NoBoGrb0U3lrALLjdUXWi8GMq/m4XrP7MlUMyehzYK5k1yA==
 X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a17:90b:1b4a:: with SMTP id
- nv10mr4710359pjb.118.1637366311056; Fri, 19 Nov 2021 15:58:31 -0800 (PST)
-Date:   Fri, 19 Nov 2021 23:57:57 +0000
+ (user=dmatlack job=sendgmr) by 2002:a17:902:bd87:b0:143:c6e8:4110 with SMTP
+ id q7-20020a170902bd8700b00143c6e84110mr57007798pls.23.1637366312753; Fri, 19
+ Nov 2021 15:58:32 -0800 (PST)
+Date:   Fri, 19 Nov 2021 23:57:58 +0000
 In-Reply-To: <20211119235759.1304274-1-dmatlack@google.com>
-Message-Id: <20211119235759.1304274-14-dmatlack@google.com>
+Message-Id: <20211119235759.1304274-15-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20211119235759.1304274-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.34.0.rc2.393.gf8c9666880-goog
-Subject: [RFC PATCH 13/15] KVM: x86/mmu: Split large pages during CLEAR_DIRTY_LOG
+Subject: [RFC PATCH 14/15] KVM: x86/mmu: Add tracepoint for splitting large pages
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Ben Gardon <bgardon@google.com>,
@@ -70,101 +71,58 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When using initially-all-set, large pages are not write-protected when
-dirty logging is enabled on the memslot. Instead they are
-write-protected once userspace invoked CLEAR_DIRTY_LOG for the first
-time, and only for the specific sub-region of the memslot that userspace
-whishes to clear.
-
-Enhance CLEAR_DIRTY_LOG to also try to split large pages prior to
-write-protecting to avoid causing write-protection faults on vCPU
-threads. This also allows userspace to smear the cost of large page
-splitting across multiple ioctls rather than splitting the entire
-memslot when not using initially-all-set.
+Add a tracepoint that records whenever we split a large page.
 
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- arch/x86/include/asm/kvm_host.h |  4 ++++
- arch/x86/kvm/mmu/mmu.c          | 30 ++++++++++++++++++++++--------
- 2 files changed, 26 insertions(+), 8 deletions(-)
+ arch/x86/kvm/mmu/mmutrace.h | 20 ++++++++++++++++++++
+ arch/x86/kvm/mmu/tdp_mmu.c  |  2 ++
+ 2 files changed, 22 insertions(+)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 432a4df817ec..6b5bf99f57af 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1591,6 +1591,10 @@ void kvm_mmu_reset_context(struct kvm_vcpu *vcpu);
- void kvm_mmu_slot_remove_write_access(struct kvm *kvm,
- 				      const struct kvm_memory_slot *memslot,
- 				      int start_level);
-+void kvm_mmu_try_split_large_pages(struct kvm *kvm,
-+				   const struct kvm_memory_slot *memslot,
-+				   u64 start, u64 end,
-+				   int target_level);
- void kvm_mmu_slot_try_split_large_pages(struct kvm *kvm,
- 					const struct kvm_memory_slot *memslot,
- 					int target_level);
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 6768ef9c0891..4e78ef2dd352 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1448,6 +1448,12 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
- 		gfn_t start = slot->base_gfn + gfn_offset + __ffs(mask);
- 		gfn_t end = slot->base_gfn + gfn_offset + __fls(mask);
+diff --git a/arch/x86/kvm/mmu/mmutrace.h b/arch/x86/kvm/mmu/mmutrace.h
+index b8151bbca36a..4adb794470ae 100644
+--- a/arch/x86/kvm/mmu/mmutrace.h
++++ b/arch/x86/kvm/mmu/mmutrace.h
+@@ -416,6 +416,26 @@ TRACE_EVENT(
+ 	)
+ );
  
-+		/*
-+		 * Try to proactively split any large pages down to 4KB so that
-+		 * vCPUs don't have to take write-protection faults.
-+		 */
-+		kvm_mmu_try_split_large_pages(kvm, slot, start, end, PG_LEVEL_4K);
++TRACE_EVENT(
++	kvm_mmu_split_large_page,
++	TP_PROTO(u64 gfn, u64 spte, int level),
++	TP_ARGS(gfn, spte, level),
 +
- 		kvm_mmu_slot_gfn_write_protect(kvm, slot, start, PG_LEVEL_2M);
- 
- 		/* Cross two large pages? */
-@@ -5880,21 +5886,17 @@ void kvm_mmu_slot_remove_write_access(struct kvm *kvm,
- 		kvm_arch_flush_remote_tlbs_memslot(kvm, memslot);
- }
- 
--void kvm_mmu_slot_try_split_large_pages(struct kvm *kvm,
--					const struct kvm_memory_slot *memslot,
--					int target_level)
-+void kvm_mmu_try_split_large_pages(struct kvm *kvm,
-+				   const struct kvm_memory_slot *memslot,
-+				   u64 start, u64 end,
-+				   int target_level)
- {
--	u64 start, end;
--
- 	if (!is_tdp_mmu_enabled(kvm))
- 		return;
- 
- 	if (mmu_topup_split_caches(kvm))
- 		return;
- 
--	start = memslot->base_gfn;
--	end = start + memslot->npages;
--
- 	read_lock(&kvm->mmu_lock);
- 	kvm_tdp_mmu_try_split_large_pages(kvm, memslot, start, end, target_level);
- 	read_unlock(&kvm->mmu_lock);
-@@ -5902,6 +5904,18 @@ void kvm_mmu_slot_try_split_large_pages(struct kvm *kvm,
- 	mmu_free_split_caches(kvm);
- }
- 
-+void kvm_mmu_slot_try_split_large_pages(struct kvm *kvm,
-+					const struct kvm_memory_slot *memslot,
-+					int target_level)
-+{
-+	u64 start, end;
++	TP_STRUCT__entry(
++		__field(u64, gfn)
++		__field(u64, spte)
++		__field(int, level)
++	),
 +
-+	start = memslot->base_gfn;
-+	end = start + memslot->npages;
++	TP_fast_assign(
++		__entry->gfn = gfn;
++		__entry->spte = spte;
++		__entry->level = level;
++	),
 +
-+	kvm_mmu_try_split_large_pages(kvm, memslot, start, end, target_level);
-+}
++	TP_printk("gfn %llx spte %llx level %d", __entry->gfn, __entry->spte, __entry->level)
++);
 +
- static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
- 					 struct kvm_rmap_head *rmap_head,
- 					 const struct kvm_memory_slot *slot)
+ #endif /* _TRACE_KVMMMU_H */
+ 
+ #undef TRACE_INCLUDE_PATH
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 366857b9fb3b..8f60d942c789 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -1284,6 +1284,8 @@ static bool tdp_mmu_split_large_page_atomic(struct kvm *kvm, struct tdp_iter *it
+ 
+ 	BUG_ON(mmu_split_caches_need_topup(kvm));
+ 
++	trace_kvm_mmu_split_large_page(iter->gfn, large_spte, level);
++
+ 	child_sp = alloc_child_tdp_mmu_page(&kvm->arch.split_caches, iter);
+ 
+ 	for (i = 0; i < PT64_ENT_PER_PAGE; i++) {
 -- 
 2.34.0.rc2.393.gf8c9666880-goog
 
