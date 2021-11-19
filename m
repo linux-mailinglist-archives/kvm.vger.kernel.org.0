@@ -2,154 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D6468457012
-	for <lists+kvm@lfdr.de>; Fri, 19 Nov 2021 14:51:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AAFC7457160
+	for <lists+kvm@lfdr.de>; Fri, 19 Nov 2021 16:06:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235665AbhKSNyT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Nov 2021 08:54:19 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43371 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235574AbhKSNyS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 19 Nov 2021 08:54:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637329876;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=0MQ6EmX5xeBMO7143sm+kmalOXvvH8veZYgNdztafAY=;
-        b=Du9s4mAvHjp3HTcNatjhyJ3KkDckrh1zfwF+jr9J7tVTUY1CrL3DfvyXUTHnLQHOe9Rno0
-        suBtY3F0jMozvjK2dV6+9taJfE+cvwqxmE/+wdEDYJ80TACvb3c4u2WGCrA7hu6Ypu+1H8
-        V3z1nmVNSaNiEo+61RmAq44xQqOo/lo=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-507-VJVV2pDlNlGcw331IPvvuQ-1; Fri, 19 Nov 2021 08:51:15 -0500
-X-MC-Unique: VJVV2pDlNlGcw331IPvvuQ-1
-Received: by mail-wm1-f71.google.com with SMTP id r129-20020a1c4487000000b00333629ed22dso5935189wma.6
-        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 05:51:15 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=0MQ6EmX5xeBMO7143sm+kmalOXvvH8veZYgNdztafAY=;
-        b=1UKWoFcppQXgIdRgP/06DsZkn4r8/Hh/o9GNjC8wPe5xSMUkUa8L9hvKUYuTF+EgGW
-         IJqICbwQhm7RDuotwIdX1vR5dMvtxyRL6xsJNkD1wjxFD7zHtV+bEC9gPOhq7sw8LOF6
-         WwTBL31TDCIqjeAsRjJ+SCwsglSfx93wiw/YPx7cL/8t9Rc/p2eGNMJ6tjOjvSd3yc5O
-         hkoZbjWSLCNT+0ghM1D+E6ktawqmDlU/RlXZn5um7XyawoewdZYaQKk+JIqvjR6eG9Ew
-         B4uMrl0jyAN1i+S9oL0NR78xfNa70QRapA2OL8zoytMG5UA2VyFrNrUyYIpxUzat1WdU
-         RG2w==
-X-Gm-Message-State: AOAM533wJStDy+2TS5IAGGkQWdM0vhhZE9ToqHPgzoFk7zTU2zhJUJL4
-        W9EUgaokGKM6J9q6udmb7j2jEiQP+uqMKpupsnNy/MnVId27A/gWFkpUjfonpY80ltOmzKjnfKh
-        Zr35utzaxRWF3
-X-Received: by 2002:a05:6000:1a45:: with SMTP id t5mr7549027wry.306.1637329874054;
-        Fri, 19 Nov 2021 05:51:14 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyguzOIQ4dtj/UgUT64libXTpwo03IBVeH470Oj9eTA/dOIJOsebKLkqM9WONqcZosshV46JQ==
-X-Received: by 2002:a05:6000:1a45:: with SMTP id t5mr7548995wry.306.1637329873829;
-        Fri, 19 Nov 2021 05:51:13 -0800 (PST)
-Received: from [192.168.3.132] (p5b0c6271.dip0.t-ipconnect.de. [91.12.98.113])
-        by smtp.gmail.com with ESMTPSA id f15sm3823943wmg.30.2021.11.19.05.51.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 19 Nov 2021 05:51:13 -0800 (PST)
-Message-ID: <942e0dd6-e426-06f6-7b6c-0e80d23c27e6@redhat.com>
-Date:   Fri, 19 Nov 2021 14:51:11 +0100
+        id S233604AbhKSPJ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Nov 2021 10:09:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39908 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230209AbhKSPJZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Nov 2021 10:09:25 -0500
+Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3304EC061574;
+        Fri, 19 Nov 2021 07:06:22 -0800 (PST)
+Received: by theia.8bytes.org (Postfix, from userid 1000)
+        id 204915B9; Fri, 19 Nov 2021 16:06:19 +0100 (CET)
+Date:   Fri, 19 Nov 2021 16:06:12 +0100
+From:   =?utf-8?B?SsO2cmcgUsO2ZGVs?= <joro@8bytes.org>
+To:     Lu Baolu <baolu.lu@linux.intel.com>
+Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "rafael@kernel.org" <rafael@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Will Deacon <will@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>
+Subject: Re: [PATCH 01/11] iommu: Add device dma ownership set/release
+ interfaces
+Message-ID: <20211119150612.jhsvsbzisvux2lga@8bytes.org>
+References: <20211115020552.2378167-1-baolu.lu@linux.intel.com>
+ <20211115020552.2378167-2-baolu.lu@linux.intel.com>
+ <YZJdJH4AS+vm0j06@infradead.org>
+ <cc7ce6f4-b1ec-49ef-e245-ab6c330154c2@linux.intel.com>
+ <20211116134603.GA2105516@nvidia.com>
+ <BN9PR11MB5433639E43C37C5D2462BD718C9B9@BN9PR11MB5433.namprd11.prod.outlook.com>
+ <20211118133325.GO2105516@nvidia.com>
+ <BN9PR11MB5433E5B63E575E2232DFBBE48C9C9@BN9PR11MB5433.namprd11.prod.outlook.com>
+ <75100dfd-9cfe-9f3d-531d-b4d30de03e76@linux.intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [RFC v2 PATCH 01/13] mm/shmem: Introduce F_SEAL_GUEST
-Content-Language: en-US
-To:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, qemu-devel@nongnu.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, john.ji@intel.com, susie.li@intel.com,
-        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com
-References: <20211119134739.20218-1-chao.p.peng@linux.intel.com>
- <20211119134739.20218-2-chao.p.peng@linux.intel.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <20211119134739.20218-2-chao.p.peng@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <75100dfd-9cfe-9f3d-531d-b4d30de03e76@linux.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19.11.21 14:47, Chao Peng wrote:
-> From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+On Fri, Nov 19, 2021 at 07:14:10PM +0800, Lu Baolu wrote:
+> The singleton group requirement for iommu_attach/detach_device() was
+> added by below commit:
 > 
-> The new seal type provides semantics required for KVM guest private
-> memory support. A file descriptor with the seal set is going to be used
-> as source of guest memory in confidential computing environments such as
-> Intel TDX and AMD SEV.
+> commit 426a273834eae65abcfc7132a21a85b3151e0bce
+> Author: Joerg Roedel <jroedel@suse.de>
+> Date:   Thu May 28 18:41:30 2015 +0200
 > 
-> F_SEAL_GUEST can only be set on empty memfd. After the seal is set
-> userspace cannot read, write or mmap the memfd.
+>     iommu: Limit iommu_attach/detach_device to devices with their own group
 > 
-> Userspace is in charge of guest memory lifecycle: it can allocate the
-> memory with falloc or punch hole to free memory from the guest.
+>     This patch changes the behavior of the iommu_attach_device
+>     and iommu_detach_device functions. With this change these
+>     functions only work on devices that have their own group.
+>     For all other devices the iommu_group_attach/detach
+>     functions must be used.
 > 
-> The file descriptor passed down to KVM as guest memory backend. KVM
-> register itself as the owner of the memfd via memfd_register_guest().
+>     Signed-off-by: Joerg Roedel <jroedel@suse.de>
 > 
-> KVM provides callback that needed to be called on fallocate and punch
-> hole.
-> 
-> memfd_register_guest() returns callbacks that need be used for
-> requesting a new page from memfd.
-> 
+> Joerg,can you please shed some light on the background of this
+> requirement? Does above idea of transition from singleton group
+> to group with single driver bound make sense to you?
 
-Repeating the feedback I already shared in a private mail thread:
+This change came to be because the iommu_attach/detach_device()
+interface doesn't fit well into a world with iommu-groups. Devices
+within a group are by definition not isolated between each other, so
+they must all be in the same address space (== iommu_domain). So it
+doesn't make sense to allow attaching a single device within a group to
+a different iommu_domain.
 
+I know that in theory it is safe to allow devices within a group to be
+in different domains because there iommu-groups catch multiple
+non-isolation cases:
 
-As long as page migration / swapping is not supported, these pages
-behave like any longterm pinned pages (e.g., VFIO) or secretmem pages.
+	1) Devices behind a non-ACS capable bridge or multiple functions
+	   of a PCI device. Here it is safe to put the devices into
+	   different iommu-domains as long as all affected devices are
+	   controlled by the same owner.
 
-1. These pages are not MOVABLE. They must not end up on ZONE_MOVABLE or
-MIGRATE_CMA.
+	2) Devices which share a single request-id and can't be
+	   differentiated by the IOMMU hardware. These always need to be
+	   in the same iommu_domain.
 
-That should be easy to handle, you have to adjust the gfp_mask to
-	mapping_set_gfp_mask(inode->i_mapping, GFP_HIGHUSER);
-just as mm/secretmem.c:secretmem_file_create() does.
+To lift the single-domain-per-group requirement the iommu core code
+needs to learn the difference between the two cases above.
 
-2. These pages behave like mlocked pages and should be accounted as such.
+Regards,
 
-This is probably where the accounting "fun" starts, but maybe it's
-easier than I think to handle.
-
-See mm/secretmem.c:secretmem_mmap(), where we account the pages as
-VM_LOCKED and will consequently check per-process mlock limits. As we
-don't mmap(), the same approach cannot be reused.
-
-See drivers/vfio/vfio_iommu_type1.c:vfio_pin_map_dma() and
-vfio_pin_pages_remote() on how to manually account via mm->locked_vm .
-
-But it's a bit hairy because these pages are not actually mapped into
-the page tables of the MM, so it might need some thought. Similarly,
-these pages actually behave like "pinned" (as in mm->pinned_vm), but we
-just don't increase the refcount AFAIR. Again, accounting really is a
-bit hairy ...
-
-
-
--- 
-Thanks,
-
-David / dhildenb
-
+	Joerg
