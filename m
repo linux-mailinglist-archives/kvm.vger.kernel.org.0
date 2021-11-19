@@ -2,103 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4476945799C
-	for <lists+kvm@lfdr.de>; Sat, 20 Nov 2021 00:37:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D63D4579C9
+	for <lists+kvm@lfdr.de>; Sat, 20 Nov 2021 00:58:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235932AbhKSXkL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Nov 2021 18:40:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42560 "EHLO
+        id S236230AbhKTABU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Nov 2021 19:01:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234793AbhKSXkK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Nov 2021 18:40:10 -0500
-Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E509DC061574
-        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 15:37:07 -0800 (PST)
-Received: by mail-oi1-x229.google.com with SMTP id m6so24748089oim.2
-        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 15:37:07 -0800 (PST)
+        with ESMTP id S230361AbhKTABM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Nov 2021 19:01:12 -0500
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 306B3C061574
+        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 15:58:10 -0800 (PST)
+Received: by mail-pf1-x44a.google.com with SMTP id u4-20020a056a00098400b004946fc3e863so6465309pfg.8
+        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 15:58:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxfoundation.org; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=HVNPEhMcOmOhfhojpKvCw8oyIiVQ1USECxxRocgYuuo=;
-        b=bhr1pt/WQkTe1YEUocNBxT27ISrQEj7QMDkuLe5dvP+deckUmlad8hwLcpCd631PW/
-         o08lTRZU6qHob4SAQtfRS0olA5g5VmUbrSLOOVXPr2jzpAumDUUm8U88TRra1dMLclXk
-         rUSDuQJxOhQtnoO5TteUz3RRNodxJ996mLNns=
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=x+AXPIBrd7fYBtaaBeVAoiT8PlAZmTojHdyAgPBqmHg=;
+        b=CF6XeEePv3BPlNMureJYj8TgbKSi+LoGwjdRz28WaqmgNZoOeI9dxgTFA81jw4R6Q+
+         5zeIE1X0eLnSQL0NRxFUFnk7Mh8UqwShiOyi/lZ/Zd24k4SBjZWpYivx5T3fAvnH6jlP
+         kNAbquEdTgUkQsPTr2amA+gQHHxhfHOIdKi8JgLi+d4KY2Mna2ACtBDzAB81+cIOZApf
+         ep4WVXu3HMtb+LD84KeOnQQPSZ4h8fhktJ1kl3+Dd7wpD1PNc1qeJcDNBaUMudw66SLx
+         S3vpyKEojDLGjUtcEe8MmMQgVq3A/fpQBDHAJakMU0BeK4PqPR00F3u0V0jcZk0XA0fO
+         IA+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=HVNPEhMcOmOhfhojpKvCw8oyIiVQ1USECxxRocgYuuo=;
-        b=tkfpGdGi5l3O7a8JfnbjbXR3vEU66Qd6WiQcEokFFtNj6k9kre1s/SOyMXLJutX432
-         WAYyszRxof8JRzmGwvG3vrWSZ9uOirrIulL0QZWwFyu2zYEH6VkyWXnZQsH4wUx044x8
-         GZviJqscVB6ELsF3hqAEtKutDJ4sWqFQ1gEA69yuAK1KgDaZJMRCyHmW+Guy5rE5l58o
-         Jb5I2cUXXLLFoqAlGopJJIJQyBwlNdqFBuFMRfIDk9tAerIvkSVeh9DDSBUQK12hxHrb
-         +q9zEM7dhQqS2W+U5sJai2Dkqz06pqtxUJH86L+RzL5MeVpzYywOYjygCsTgw7aV9TxE
-         9Bjg==
-X-Gm-Message-State: AOAM531Wh4WX8Qay9pDgWwLrZrX75kqaWFy1euAP1uGMf+AKbWhtZjLG
-        wO3OdRE+P2nxw/wK9+wXLwNwGw==
-X-Google-Smtp-Source: ABdhPJzV5x19l3UVigMY7QB0qCih3N70YjGLmr7EYU41kLicL3Zb4yXYyHKQ3NqxhS/RvpXkBZy3Mg==
-X-Received: by 2002:a05:6808:18a9:: with SMTP id bi41mr3719657oib.48.1637365027254;
-        Fri, 19 Nov 2021 15:37:07 -0800 (PST)
-Received: from [192.168.1.112] (c-24-9-64-241.hsd1.co.comcast.net. [24.9.64.241])
-        by smtp.gmail.com with ESMTPSA id u40sm345615oiw.56.2021.11.19.15.37.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 19 Nov 2021 15:37:07 -0800 (PST)
-Subject: Re: [PATCH] selftests:kvm: remove unneeded semicolon
-To:     cgel.zte@gmail.com, pbonzini@redhat.com
-Cc:     shuah@kernel.org, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        chiminghao <chi.minghao@zte.com.cn>,
-        Zeal Robot <zealci@zte.com.cm>,
-        Shuah Khan <skhan@linuxfoundation.org>
-References: <20211119023133.2027-1-chi.minghao@zte.com.cn>
-From:   Shuah Khan <skhan@linuxfoundation.org>
-Message-ID: <f4be7305-e0d8-68d0-68de-0e95e17563e0@linuxfoundation.org>
-Date:   Fri, 19 Nov 2021 16:37:06 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.8.1
-MIME-Version: 1.0
-In-Reply-To: <20211119023133.2027-1-chi.minghao@zte.com.cn>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=x+AXPIBrd7fYBtaaBeVAoiT8PlAZmTojHdyAgPBqmHg=;
+        b=l8ZYNC4cLoojNElN/crTOaCmZ58KE0EthDEv5W8tjeZ462TGtNg1p8XaCWt7d0r0aX
+         EgABM55jp0EnHC2mHTCbp7bb4jso8juVmR+O1ZRvawBSwTX3FShDWcs2z+u8WGfyYbOZ
+         LVIuLUB8gqjrfZ1Mjz6KxpwMfkmQe0G+oEf3EFMoBhJH37f52LR4OReyVO+c6CL26hAb
+         R8nwY8WovRYhLgyDpRgBqwaKe6FOUh3AsF/kXUcIJR8E3uDVVQoOkxLoKIAdGYYYS/wO
+         LclysPLZUf3rN4IoBnHl18PzXuWCYkIJ8XMvxbsF+YUSHdWwiHKCIOa8zzii1uOjjTu/
+         bdmw==
+X-Gm-Message-State: AOAM5304nQy8h8E9zPsvu6TYVHGq+6lkMIoCWoQ5/kdjPvX5Kg8CZSHx
+        ziQqga84iKEhxl5NmhBhB3J5UEfScJzV6A==
+X-Google-Smtp-Source: ABdhPJwoNfRB4cP86yt0myx6V9vDZoBvpRNX65i5sd/wT7wAOgTLQrn2Pu8xKPK/xcXGAhZuG6PKy3QqU3eing==
+X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
+ (user=dmatlack job=sendgmr) by 2002:a17:902:b7cb:b0:141:b33a:9589 with SMTP
+ id v11-20020a170902b7cb00b00141b33a9589mr82303406plz.9.1637366289637; Fri, 19
+ Nov 2021 15:58:09 -0800 (PST)
+Date:   Fri, 19 Nov 2021 23:57:44 +0000
+Message-Id: <20211119235759.1304274-1-dmatlack@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.34.0.rc2.393.gf8c9666880-goog
+Subject: [RFC PATCH 00/15] KVM: x86/mmu: Eager Page Splitting for the TDP MMU
+From:   David Matlack <dmatlack@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Ben Gardon <bgardon@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>,
+        Junaid Shahid <junaids@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Harish Barathvajasankar <hbarath@google.com>,
+        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
+        David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+This series is a first pass at implementing Eager Page Splitting for the
+TDP MMU. For context on the motivation and design of Eager Page
+Splitting, please see the RFC design proposal and discussion [1].
 
+Paolo, I went ahead and added splitting in both the intially-all-set
+case (only splitting the region passed to CLEAR_DIRTY_LOG) and the
+case where we are not using initially-all-set (splitting the entire
+memslot when dirty logging is enabled) to give you an idea of what
+both look like.
 
-On 11/18/21 7:31 PM, cgel.zte@gmail.com wrote:
+Note: I will be on vacation all of next week so I will not be able to
+respond to reviews until Monday November 29. I thought it would be
+useful to seed discussion and reviews with an early version of the code
+rather than putting it off another week. But feel free to also ignore
+this until I get back :)
 
-Missing commit log. Please add one and include information on
-how you found this problem and tool output.
+This series compiles and passes the most basic splitting test:
 
-> From: chiminghao <chi.minghao@zte.com.cn>
-> 
-> Fix the following coccicheck REVIEW:
-> ./tools/testing/selftests/kvm/access_tracking_perf_test.c: REVIEW Unneeded semicolon
-> 
-> Reported-by: Zeal Robot <zealci@zte.com.cm>
-> Signed-off-by: chiminghao <chi.minghao@zte.com.cn>
-> ---
->   tools/testing/selftests/kvm/access_tracking_perf_test.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-> index 5d95113c7b7c..09bf6c6ca11a 100644
-> --- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
-> +++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-> @@ -231,7 +231,7 @@ static void *vcpu_thread_main(void *arg)
->   		case ITERATION_MARK_IDLE:
->   			mark_vcpu_memory_idle(vm, vcpu_id);
->   			break;
-> -		};
-> +		}
->   
->   		vcpu_last_completed_iteration[vcpu_id] = current_iteration;
->   	}
-> 
+$ ./dirty_log_perf_test -s anonymous_hugetlb_2mb -v 2 -i 4
 
-thanks,
--- Shuah
+But please operate under the assumption that this code is probably
+buggy.
+
+[1] https://lore.kernel.org/kvm/CALzav=dV_U4r1K9oDq4esb4mpBQDQ2ROQ5zH5wV3KpOaZrRW-A@mail.gmail.com/#t
+
+David Matlack (15):
+  KVM: x86/mmu: Rename rmap_write_protect to kvm_vcpu_write_protect_gfn
+  KVM: x86/mmu: Rename __rmap_write_protect to rmap_write_protect
+  KVM: x86/mmu: Automatically update iter->old_spte if cmpxchg fails
+  KVM: x86/mmu: Factor out logic to atomically install a new page table
+  KVM: x86/mmu: Abstract mmu caches out to a separate struct
+  KVM: x86/mmu: Derive page role from parent
+  KVM: x86/mmu: Pass in vcpu->arch.mmu_caches instead of vcpu
+  KVM: x86/mmu: Helper method to check for large and present sptes
+  KVM: x86/mmu: Move restore_acc_track_spte to spte.c
+  KVM: x86/mmu: Abstract need_resched logic from
+    tdp_mmu_iter_cond_resched
+  KVM: x86/mmu: Refactor tdp_mmu iterators to take kvm_mmu_page root
+  KVM: x86/mmu: Split large pages when dirty logging is enabled
+  KVM: x86/mmu: Split large pages during CLEAR_DIRTY_LOG
+  KVM: x86/mmu: Add tracepoint for splitting large pages
+  KVM: x86/mmu: Update page stats when splitting large pages
+
+ arch/x86/include/asm/kvm_host.h |  22 ++-
+ arch/x86/kvm/mmu/mmu.c          | 185 +++++++++++++-----
+ arch/x86/kvm/mmu/mmu_internal.h |   3 +
+ arch/x86/kvm/mmu/mmutrace.h     |  20 ++
+ arch/x86/kvm/mmu/spte.c         |  64 +++++++
+ arch/x86/kvm/mmu/spte.h         |   7 +
+ arch/x86/kvm/mmu/tdp_iter.c     |   5 +-
+ arch/x86/kvm/mmu/tdp_iter.h     |  10 +-
+ arch/x86/kvm/mmu/tdp_mmu.c      | 322 +++++++++++++++++++++++---------
+ arch/x86/kvm/mmu/tdp_mmu.h      |   5 +
+ arch/x86/kvm/x86.c              |   6 +
+ 11 files changed, 501 insertions(+), 148 deletions(-)
+
+-- 
+2.34.0.rc2.393.gf8c9666880-goog
+
