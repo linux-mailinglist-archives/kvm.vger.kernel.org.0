@@ -2,186 +2,244 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 122514571E6
-	for <lists+kvm@lfdr.de>; Fri, 19 Nov 2021 16:43:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4725A4571FA
+	for <lists+kvm@lfdr.de>; Fri, 19 Nov 2021 16:45:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235861AbhKSPqV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Nov 2021 10:46:21 -0500
-Received: from mail-dm6nam10on2047.outbound.protection.outlook.com ([40.107.93.47]:30305
-        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S235474AbhKSPqU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Nov 2021 10:46:20 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Q6hfN3/UPSx/wrdOQt9b/wMFv7znAf5BjI82pGXpyhS7C5dUaHGypdBhRdwhIEE0vpOPfORuMutGxy3E7U6TqlYLcSrTSraPGql9UYzSvePLyHipZsJpBOS2elCdjWD9IGHuTdKegnL9s6n6PWgB0Mgyr3gGxx/+hYZWSFYS582kaL41vyn14jWTrZfoSl7BIm1i8rkuwBCXjEgLAUJgIcyB/NkGCF0uUK390N4uP3JbVvpB8DKod/ij0rwnfUx+x1ZM372I7jSbox1TIuUiBmV56ujpVR1OH7lt2ZhBITt/DSzgg0m9bWH60WX9U35XQDcLyktlGhDco4HmmUsOoQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oLrJtbHtjzsw1lTS8W2bBKApGBePUKm9+tkx0oIk0mU=;
- b=aoTYQ6D4RT83bgggqOe4XXa4LVKdQ8xtwnZP3OvX3H1UhGMrVLBAlv8Af7RbDAa1GBZMcTdMXfJJsaqlGK1jJsIATDWmGiYb43m6rpu48IasBh211k4gIo3bj5ycdRFLFhSWpMM/dxCvYNiOkYid8RarTY1nNuJ97Oy6q67W2FShFJdhZ/693oJoMnHytbq4zqKdEzDiFP/QGUmyvPMoocA4qssb54mWh/Ww7n7QxCpjC1TPVuusjkQLTlHzrEf3BBfJllhoIUmrGKLZhnsMgjq33etjpRjh+9Tk5/dTF1CqAJ6BcfDQ4dI47KrmMuTR4IYEmqyWuWJaebcHFy3Ndg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oLrJtbHtjzsw1lTS8W2bBKApGBePUKm9+tkx0oIk0mU=;
- b=dH5QqIvhHGQsGG8IT7TZ6V01Diw9Y5bOxuur+MZoMaA+8a8lZMj2ReQh1F8sNkRTVHuC8Lw3kfFh4dL9oVu3prc8ajH6WMYW1ZQqFcPxSWAejKw4rJW8dGzw95MkYlNwptmzUv8dlODNdJ+LIo2V3lKqS1npgGTIQx3ZAHL1eSLDRCWEw3nFScIipFhs29WDG9wTzDPQuXgoAxFsw0Qk0T/52HiPlVzRE0pvQtbU6rZXlm2wudEOBRwD0jKBfJF6/EF6i/ifZwzopVIIR4y/qF4gv8zY6i/xhnKJ4VB2p9Yp4C2T0EdmOKh8HOViy9R2c4FKPLPTeN/xGCa28pirvQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5317.namprd12.prod.outlook.com (2603:10b6:208:31f::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4713.19; Fri, 19 Nov
- 2021 15:43:16 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::5897:83b2:a704:7909]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::5897:83b2:a704:7909%7]) with mapi id 15.20.4713.022; Fri, 19 Nov 2021
- 15:43:15 +0000
-Date:   Fri, 19 Nov 2021 11:43:14 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     =?utf-8?B?SsO2cmcgUsO2ZGVs?= <joro@8bytes.org>
-Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Diana Craciun <diana.craciun@oss.nxp.com>
-Subject: Re: [PATCH 01/11] iommu: Add device dma ownership set/release
- interfaces
-Message-ID: <20211119154314.GA2105516@nvidia.com>
-References: <20211115020552.2378167-1-baolu.lu@linux.intel.com>
- <20211115020552.2378167-2-baolu.lu@linux.intel.com>
- <YZJdJH4AS+vm0j06@infradead.org>
- <cc7ce6f4-b1ec-49ef-e245-ab6c330154c2@linux.intel.com>
- <20211116134603.GA2105516@nvidia.com>
- <BN9PR11MB5433639E43C37C5D2462BD718C9B9@BN9PR11MB5433.namprd11.prod.outlook.com>
- <20211118133325.GO2105516@nvidia.com>
- <BN9PR11MB5433E5B63E575E2232DFBBE48C9C9@BN9PR11MB5433.namprd11.prod.outlook.com>
- <75100dfd-9cfe-9f3d-531d-b4d30de03e76@linux.intel.com>
- <20211119150612.jhsvsbzisvux2lga@8bytes.org>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20211119150612.jhsvsbzisvux2lga@8bytes.org>
-X-ClientProxiedBy: MN2PR07CA0015.namprd07.prod.outlook.com
- (2603:10b6:208:1a0::25) To BL0PR12MB5506.namprd12.prod.outlook.com
- (2603:10b6:208:1cb::22)
+        id S229936AbhKSPs4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Nov 2021 10:48:56 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:20477 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232958AbhKSPs4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 19 Nov 2021 10:48:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1637336754;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=WlrRZ7ZQ0wO6D5Tupwu96i6pPZ9CWusrE+ynPw5h7ZY=;
+        b=ha8I7nTq8dvZeQQ/KUjwRSNIMyjXjB+HBTFjSXXoCTOgGP3zKNOo45VUzvAOpud0JzaUmR
+        g8tSthEFIXWHMcapzI+vM7vUOOGvWJPH+Q6Yv5231pSK0oGcZULCYaRl+BuodYpfR3M0Pk
+        3ffwH4K4/8ohJovqZHd5ljRzOL3hjZ4=
+Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
+ [209.85.210.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-578-nm08rkHFOVm0b3x4k09paA-1; Fri, 19 Nov 2021 10:45:52 -0500
+X-MC-Unique: nm08rkHFOVm0b3x4k09paA-1
+Received: by mail-ot1-f70.google.com with SMTP id y12-20020a056830108c00b0055c81f70e51so6035564oto.23
+        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 07:45:51 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=WlrRZ7ZQ0wO6D5Tupwu96i6pPZ9CWusrE+ynPw5h7ZY=;
+        b=WzHHIBaE5mltX+UYsckbmIvJBY+RbGpdZHBuaKQSPdIF3KrAM+JT3aHDgu+EzFDly0
+         J2bFs2s6uteeGqaRm7Rqei9cBVDYEdiE9KqoOxBXyk1IJk3N+oHoqG72gZaFSXlIMJ54
+         xtS9aTmUJuPPdBUEXnz4nlYoDfShzzWDfa7xVL8+jkeF4+s8g/npj/9+J5UhXRN68/QR
+         BGOL/5Hy4gISo+7DJ6U0lUFj+NSTgnXbeavAT3Mgb0nz4YOKdQKngiq6xpFBqHcMeAwU
+         eDZ6xTrt/hX33kSQyl+PXF+GxfpFDgfAqah1/60d/sW+NtP4Gaa7yGnbxomC+0dQZaZx
+         bnCw==
+X-Gm-Message-State: AOAM532c/g+WUgfWQGABmcyvmGpXLX/MEJ4dV+WSkcl0sVzD5iAYiW9E
+        G7QRFnXHl2Ah34wBF5ya4boM9xjC9fu8OalJaih/gMSsH4eK/SXcnIHVflUwt8aYAbhTUUNS3u/
+        nn92h9wFG/yfU
+X-Received: by 2002:a05:6830:2645:: with SMTP id f5mr5584421otu.193.1637336751075;
+        Fri, 19 Nov 2021 07:45:51 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwriOGJbkWFoXBCDzejhT+3F2BYP+sYY+BEeMw9eqAmzTTAYa50zMIc/3oh66GwV24ZFPVtkg==
+X-Received: by 2002:a05:6830:2645:: with SMTP id f5mr5584394otu.193.1637336750749;
+        Fri, 19 Nov 2021 07:45:50 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id f7sm38880ooo.38.2021.11.19.07.45.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Nov 2021 07:45:50 -0800 (PST)
+Date:   Fri, 19 Nov 2021 08:45:48 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Abhishek Sahu <abhsahu@nvidia.com>
+Cc:     kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        Zhen Lei <thunder.leizhen@huawei.com>,
+        Jason Gunthorpe <jgg@nvidia.com>, linux-kernel@vger.kernel.org
+Subject: Re: [RFC 3/3] vfio/pci: use runtime PM for vfio-device into low
+ power state
+Message-ID: <20211119084548.2042d763.alex.williamson@redhat.com>
+In-Reply-To: <20211118140913.180bf94f.alex.williamson@redhat.com>
+References: <20211115133640.2231-1-abhsahu@nvidia.com>
+        <20211115133640.2231-4-abhsahu@nvidia.com>
+        <20211117105323.2866b739.alex.williamson@redhat.com>
+        <8a49aa97-5de9-9cc8-d45f-e96456d66603@nvidia.com>
+        <20211118140913.180bf94f.alex.williamson@redhat.com>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Received: from mlx.ziepe.ca (142.162.113.129) by MN2PR07CA0015.namprd07.prod.outlook.com (2603:10b6:208:1a0::25) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4713.22 via Frontend Transport; Fri, 19 Nov 2021 15:43:15 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mo62k-00CHa4-Qs; Fri, 19 Nov 2021 11:43:14 -0400
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 4c1d1091-bf1c-44e4-2771-08d9ab734d5b
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5317:
-X-Microsoft-Antispam-PRVS: <BL1PR12MB531754113FF903404F6FE028C29C9@BL1PR12MB5317.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: bPNAZflQQgBXFjz0w8xG1xRFeSt1B7dZfcGQ4S5ngNdVL2BcRFDNl8Kb5MCt49DfFPQ5/M+d/DWCu5ebU/ub+YzECdUvzorvLomwhBn/LoKOKv9B1EVMdjk2oV+orKEdL7cbgL6+4NhBTvmxKK8NVaPJ9wd3b3ggjeck9ZA5jUb5mdSRLQBuyZXlcu5LbikItFTa7EkDjN3R9Sx9gE/6sepb4GCkpdoSzicKIS2Jc37nltZEngtgbMFWHBrEARogM8xi/6um7db7ZGMH92K3Ur0I6F8Sz+kQVopJe4IsxwuaUQf6p/uDjP5YwwFUGbI4mL94QCCTqFEb8HtflKw4v7lMYxZgpvl79p1u3lpo2RX5TRwYw0uTL+BZnUh3wmSlHKD5YevOt8zNy5YqOXEp4DLfkn4A0a9CCzI7Un176eTiIGGsNITJY7Iq6aguyjhhu6X8eEpWQKFEhazuXmAtMChm8V+Vsf2E2aQlbfYKLjUIASLNWWXJzsDi7QVq8GlIONUShWljSxcaLvxuF+e+Jhs3dZHPvQM2uXsiQQJWuPVHiduaW7q2VPqoR2/TrxP1uGsd0ALR9mcEpnM8Dg/Vv8NjxRttSoQHTe0svG2uPOBTbssaFKdVkR/bzzv7omculCdjUQkDSZluN7kVtBqbMg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(54906003)(6916009)(8936002)(2906002)(33656002)(2616005)(186003)(83380400001)(508600001)(4326008)(26005)(1076003)(9786002)(9746002)(8676002)(66556008)(66476007)(66946007)(7416002)(38100700002)(36756003)(426003)(66574015)(5660300002)(86362001)(316002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UzF1cDhzcEVBQlFSbzRVT3MvS0IxNGZZNzNQeFNIdjY3dHYxbTc2OUxiTi9x?=
- =?utf-8?B?VHozdlQ5Z2xjemFqVWg2SzBuNlZYLzZncnJtY1BLcjVBbkRzUFdwRDF1OFR4?=
- =?utf-8?B?VCtqMHRMTUcrMGt6dVBxbWV0Tm80Z2lCNGlOc2hMbisrRkNpdVQ1Q1M4QzNU?=
- =?utf-8?B?MTRSaVlIbWVsSzA2cTloM2VyY1c3KzI0UThKM0RScXZsdkg0ZTc4QkEyKzlG?=
- =?utf-8?B?Z0lWRFJiczBzeE1yVE5NN1RhTlFFZGtsUnkzOGx1K2JmeXZuNExJVzd3UHBU?=
- =?utf-8?B?VzkrTlBXZGE2R1FOTFdsMWFRVXI4c3oxc1FhTE52VmVmNW1rbk9oRmxPaEJL?=
- =?utf-8?B?amhQUkhaS01LRldMRnJYeHYvRG5UTHI4SGgxek9ucHAzbktsNXVRVmp5dGRr?=
- =?utf-8?B?WFhCV2N0a296citpNjBEOGlwemhsclVkMkFRaW1kYVJWTERiaXVPRVNLQ2Zy?=
- =?utf-8?B?Qzk2c2ltcW8yVzMzZC9aQm1ha3VJS2FOblNERFhLN0Z5NUZaMHU1b2hDU25V?=
- =?utf-8?B?ODF3aUxlV0M1eUZnVXFQaGFnTE1ZaXRGR21wdTFRejlCZXhCVUtlY0hSdDRU?=
- =?utf-8?B?ekVwa3l0WCtBdjN0SC9LdUIwRVlrclhLbEduS2Iwb3V5ekNtUUdBa3YzQ2ov?=
- =?utf-8?B?Lys1RzNDUU02RkRISVR0a0tRQ2N1Um01OGEwT2tiUDBOVnZKOFVIcy9KSXhs?=
- =?utf-8?B?RG5zN0hLWUgvTGxKMUhlMnU5ZlZ3UDIza0gzWTA4TDNVWWs5T2ZCVnFjVzMw?=
- =?utf-8?B?UDZ1T094anJ1VkhQOTB6K3NPNGRpY1Q2RmppKy9TdUtiZGZrTXdKcEkvZ0Ux?=
- =?utf-8?B?RkkwbkVmS1p4U0x4VE5SVDBkdE9xMFRpM0hsdnlHMXZSdTNTY3E0aWZaNnBI?=
- =?utf-8?B?ZDloNEM2R3B0T2VTSURuN2VyYUNxS284NzgzZ3YyTmZWRitucW9XU0hUYitC?=
- =?utf-8?B?ODRFOGxFR1QxekhQaEVqTCsveHU1OFE2YkhiMHA4R3JJVTZJWDgzd1BNa3Ez?=
- =?utf-8?B?cEc3VFMyUkUwOGVjeUNJQjVQeis2S3JIK0RMZ1k0VHFXVE5BVW1LeC8zNlps?=
- =?utf-8?B?VzR4c1g3dlV3cDlPajB1QXNJUk1XalpkVmFud3E0OElIT0hXaVBZWEhqVFdH?=
- =?utf-8?B?N050S0wzdzJlZzFvb2hVcEhLK2p4cFExZDJ6RS9Qb1lubTg5Z2xBUnYwQ0Mx?=
- =?utf-8?B?YlJYRUZrZUVybGZxUnV0TW5PS0EyUlduKzJkSURCNGEyZG9KUUVVNUhNUElZ?=
- =?utf-8?B?QXBHY1BsU3F0VG1wM0l4U3pKdWk5amx5alZIdVp0UGpsdWgzR3hIVEZNZW93?=
- =?utf-8?B?c3FmUEgwaFZxWVpOSVRBOVZmUytKQ0JsRlJubXRrQ2RDL2JwZkNiRXUwcWZZ?=
- =?utf-8?B?ZllLWmhKdFBXTUdtSG05anNKVDNmeW8wbUd0cFhHYW0zQ2FnVi9PM3YvS0RB?=
- =?utf-8?B?R0tnVXBpNVJXSUJoL04wc3hvdldCUUcrVEx6QVpCUW9LalZuM0E2WjljL1V2?=
- =?utf-8?B?WkpjaWJFd3JFZDVCZ0cySEtmOUZxWExsUU9yVE1xUmROTlEzZjR4NC9pQkZD?=
- =?utf-8?B?bVMycXVDdDFYMnNyQTl3WlpGbWhlSlBFNy9LcUd3TzlVNzBBZFBuV3REWmty?=
- =?utf-8?B?YUxKdEtDQVhZNWhPaFpvcWJ5RS9KeXF5S1VxdnNZYy9Edk9IR1JpRHNjcnFF?=
- =?utf-8?B?c3lydEQ0Y1lrV1hlMHd1RDNnb09PcEtNRnBxdXJncVY2bXpRYUZNVmpVSnJl?=
- =?utf-8?B?YS8wU0k0YzJaTHJMY2ptdjlsaDJxTStPVzMzTnRNYWdpaFB3N0NNY1ZnNndJ?=
- =?utf-8?B?RTJzbVJibnZab0syclEvZlppeWtIUVJueVdmSTZ1cjU4WTBjYng0RmplRVM1?=
- =?utf-8?B?TS85VVZocXdTZ0ZpSTY4NGpRRUx3RlovbEZlT0IwbVRXOHVFcWNQWjByZEtl?=
- =?utf-8?B?T1hVQlpWYTY3WXpRVkljSm5BN1FMc2wvUUxGbEFtZ3lmWlhXS2hFSDNrbFM0?=
- =?utf-8?B?ZjJla2hqZ0FiTk0rV2FjQUhsK0JxR0Y0WUEzKzBlejhvVWplQ3BjMEFKUUND?=
- =?utf-8?B?Um1oK2ZLeDd1c1JGUFlDZjlMVWUvdmNNU1o4aUZsd21oSnNOQUs3NEJZSlgz?=
- =?utf-8?Q?SYCg=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4c1d1091-bf1c-44e4-2771-08d9ab734d5b
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Nov 2021 15:43:15.8716
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /FD+S709PV/BUKHyaiX73/2a3AkJDSph6E9d78J/VnbuIwU6rQlSoz9oIkRC4Agp
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5317
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 19, 2021 at 04:06:12PM +0100, Jörg Rödel wrote:
+On Thu, 18 Nov 2021 14:09:13 -0700
+Alex Williamson <alex.williamson@redhat.com> wrote:
 
-> This change came to be because the iommu_attach/detach_device()
-> interface doesn't fit well into a world with iommu-groups. Devices
-> within a group are by definition not isolated between each other, so
-> they must all be in the same address space (== iommu_domain). So it
-> doesn't make sense to allow attaching a single device within a group to
-> a different iommu_domain.
+> On Thu, 18 Nov 2021 20:51:41 +0530
+> Abhishek Sahu <abhsahu@nvidia.com> wrote:
+> > On 11/17/2021 11:23 PM, Alex Williamson wrote:
+> >  Thanks Alex for checking this series and providing your inputs.=20
+> >   =20
+> > > If we're transitioning a device to D3cold rather than D3hot as
+> > > requested by userspace, isn't that a user visible change?    =20
+> >=20
+> >   For most of the driver, in linux kernel, the D3hot vs D3cold
+> >   state will be decided at PCI core layer. In the PCI core layer,
+> >   pci_target_state() determines which D3 state to choose. It checks
+> >   for platform_pci_power_manageable() and then it calls
+> >   platform_pci_choose_state() to find the target state.
+> >   In VM, the platform_pci_power_manageable() check will fail if the
+> >   guest is linux OS. So, it uses, D3hot state. =20
+>=20
+> Right, but my statement is really more that the device PM registers
+> cannot be used to put the device into D3cold, so the write of the PM
+> register that we're trapping was the user/guest's intention to put the
+> device into D3hot.  We therefore need to be careful about differences
+> in the resulting device state when it comes out of D3cold vs D3hot.
+>=20
+> >   But there are few drivers which does not use the PCI framework
+> >   generic power related routines during runtime suspend/system suspend
+> >   and set the PCI power state directly with D3hot. =20
+>=20
+> Current vfio-pci being one of those ;)
+>=20
+> >   Also, the guest can be non-Linux OS also and, in that case,
+> >   it will be difficult to know the behavior. So, it may impact
+> >   these cases. =20
+>=20
+> That's what I'm worried about.
+>=20
+> > > For instance, a device may report NoSoftRst- indicating that the devi=
+ce
+> > > does not do a soft reset on D3hot->D0 transition.  If we're instead
+> > > putting the device in D3cold, then a transition back to D0 has very
+> > > much undergone a reset.  On one hand we should at least virtualize the
+> > > NoSoftRst bit to allow the guest to restore the device, but I wonder =
+if
+> > > that's really safe.  Is a better option to prevent entering D3cold if
+> > > the device isn't natively reporting NoSoftRst-?
+> > >    =20
+> >=20
+> >  You mean to say NoSoftRst+ instead of NoSoftRst- as visible in =20
+>=20
+> Oops yes.  The concern is if the user/guest is not expecting a soft
+> reset when using D3hot, but we transparently promote D3hot to D3cold
+> which will always implies a device reset.
+>=20
+> >  the lspci output. For NoSoftRst- case, we do a soft reset on
+> >  D3hot->D0 transition. But, will this case not be handled internally
+> >  in drivers/pci/pci-driver.c ? For both system suspend and runtime susp=
+end,
+> >  we check for pci_dev->state_saved flag and do pci_save_state()
+> >  irrespective of NoSoftRst bit. For NoSoftRst- case, pci_restore_bars()
+> >  will be called in pci_raw_set_power_state() which will reinitialize de=
+vice
+> >  for D3hot/D3cold-> D0 case. Once the device is initialized in the host,
+> >  then for guest, it should work without re-initializing again in the
+> >  guest side. I am not sure, if my understanding is correct. =20
+>=20
+> The soft reset is not limited to the state that the PCI subsystem can
+> save and restore.  Device specific state that the user/guest may
+> legitimately expect to be retained may be reset as well.
+>=20
+> [PCIe v5 5.3.1.4]
+> 	Functional context is required to be maintained by Functions in
+> 	the D3 hot state if the No_Soft_Reset field in the PMCSR is Set.
+>=20
+> Unfortunately I don't see a specific definition of "functional
+> context", but I interpret that to include device specific state.  For
+> example, if a GPU contains specific frame buffer data and reports
+> NoSoftRst+, wouldn't it be reasonable to expect that framebuffer data
+> to be retained on D3hot->D0 transition?
+> =20
+> > > We're also essentially making a policy decision on behalf of
+> > > userspace that favors power saving over latency.  Is that
+> > > universally the correct trade-off?    =20
+> >=20
+> >  For most drivers, the D3hot vs D3cold should not be favored due
+> >  to latency reasons. In the linux kernel side, I am seeing, the
+> >  PCI framework try to use D3cold state if platform and device
+> >  supports that. But its correct that covertly replacing D3hot with
+> >  D3cold may be concern for some drivers.
+> >  =20
+> > > I can imagine this could be desirable for many use cases,
+> > > but if we're going to covertly replace D3hot with D3cold, it seems
+> > > like there should be an opt-in.  Is co-opting the PM capability for
+> > > this even really acceptable or should there be a device ioctl to
+> > > request D3cold and plumbing through QEMU such that a VM guest can
+> > > make informed choices regarding device power management?
+> > >    =20
+> >=20
+> >  Making IOCTL is also an option but that case, this support needs to
+> >  be added in all hypervisors and user must pass this information
+> >  explicitly for each device. Another option could be to use
+> >  module parameter to explicitly enable D3cold support. If module
+> >  parameter is not set, then we can call pci_d3cold_disable() and
+> >  in that case, runtime PM should not use D3cold state.
+> >=20
+> >  Also, I was checking we can pass this information though some
+> >  virtualized register bit which will be only defined for passing
+> >  the information between guest and host. In the guest side if the
+> >  target state is being decided with pci_target_state(), then
+> >  the D3cold vs D3hot should not matter for the driver running
+> >  in the guest side and in that case, it depends upon platform support.
+> >  We can set this virtualize bit to 1. But, if driver is either
+> >  setting D3hot state explicitly or has called pci_d3cold_disable() or
+> >  similar API available in the guest OS, then set this bit to 0 and
+> >  in that case, the D3cold state can be disabled in the host side.
+> >  But don't know if is possible to use some non PCI defined
+> >  virtualized register bit.  =20
+>=20
+> If you're suggesting a device config space register, that's troublesome
+> because we can't guarantee that simply because a range of config space
+> isn't within a capability that it doesn't have some device specific
+> purpose.  However, we could certainly implement virtual registers in
+> the hypervisor that implement the ACPI support that an OS would use on
+> bare metal to implement D3cold.  Those could trigger this ioctl through
+> the vfio device.
+>=20
+> >  I am not sure what should be best option to make choice
+> >  regarding d3cold but if we can have some option by which this
+> >  can be done without involvement of user, then it will benefit
+> >  for lot of cases. Currently, the D3cold is supported only in
+> >  very few desktops/servers but in future, we will see on
+> >  most of the platforms.   =20
+>=20
+> I tend to see it as an interesting hack to promote D3hot to D3cold, and
+> potentially very useful.  However, we're also introducing potentially
+> unexpected device behavior, so I think it would probably need to be an
+> opt-in.  Possibly if the device reports NoSoftRst- we could use it by
+> default, but even virtualizing the NoSoftRst suggests that there's an
+> expectation that the guest driver has that support available.
+> =20
+> > > Also if the device is not responsive to config space due to the user
+> > > placing it in D3 now, I'd expect there are other ioctl paths that
+> > > need to be blocked, maybe even MMIO paths that might be a gap for
+> > > existing D3hot support.  Thanks, =20
+> >=20
+> >  I was in assumption that most of IOCTL code will be called by the
+> >  hypervisor before guest OS boot and during that time, the device
+> >  will be always in D0. But, if we have paths where IOCTL can be
+> >  called when the device has been suspended by guest OS, then can we
+> >  use runtime_get/put API=E2=80=99s there also ? =20
+>=20
+> It's more a matter of preventing user actions that can cause harm
+> rather than expecting certain operations only in specific states.  We
+> could chose to either resume the device for those operations or fail
+> the operation.  We should probably also leverage the memory-disable
+> support to fault mmap access to MMIO when the device is in D3* as well.
 
-It is the same problem VFIO has. It changes the iommu_domain of a
-group while it only has a single driver bound to one device in the
-group.
+It also occurred to me last night that a guest triggering D3hot via the
+PM registers must be a synchronous power state change, we can't use
+auto-suspend.  This is necessary for nested assignment where the guest
+might use a D3hot->D0 power state transition with NoSoftRst- devices in
+order to perform a reset of the device.  With auto-suspend, the guest
+would return the device to D0 before the physical device ever timed out
+to enter a D3 state.  Thanks,
 
-Robin is also right to point out there is no guarentee that a single
-device group will remain a single device group after a hot plug
-event. This is something VFIO is also able to handle today.
+Alex
 
-So, I think the solution of this series applies equally well to this
-problem. Let's see it in v2.
-
-> I know that in theory it is safe to allow devices within a group to be
-> in different domains because there iommu-groups catch multiple
-> non-isolation cases:
-> 
-> 	1) Devices behind a non-ACS capable bridge or multiple functions
-> 	   of a PCI device. Here it is safe to put the devices into
-> 	   different iommu-domains as long as all affected devices are
-> 	   controlled by the same owner.
-> 
-> 	2) Devices which share a single request-id and can't be
-> 	   differentiated by the IOMMU hardware. These always need to be
-> 	   in the same iommu_domain.
-
-> To lift the single-domain-per-group requirement the iommu core code
-> needs to learn the difference between the two cases above.
-
-We had a long talk about this a while back, nobody came with
-compelling arguments to justify doing this work. I've just been using
-it as a guidepost for building APIs. If the API can accomodate #1 then
-it is a better design than one that cannot.
-
-Jason
