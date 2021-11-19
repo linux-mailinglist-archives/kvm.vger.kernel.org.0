@@ -2,55 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 427544576F4
-	for <lists+kvm@lfdr.de>; Fri, 19 Nov 2021 20:18:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 31FFF457753
+	for <lists+kvm@lfdr.de>; Fri, 19 Nov 2021 20:47:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234456AbhKSTVH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Nov 2021 14:21:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41018 "EHLO
+        id S236660AbhKSTu5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Nov 2021 14:50:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47722 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232663AbhKSTVH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Nov 2021 14:21:07 -0500
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C81AC06173E
-        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 11:18:05 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id gx15-20020a17090b124f00b001a695f3734aso9659400pjb.0
-        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 11:18:05 -0800 (PST)
+        with ESMTP id S234843AbhKSTuy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Nov 2021 14:50:54 -0500
+Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39CB7C061748
+        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 11:47:48 -0800 (PST)
+Received: by mail-qv1-xf29.google.com with SMTP id v2so7817337qve.11
+        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 11:47:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
+        d=ziepe.ca; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=g/YNskCC8H0pIrRty3bOxTWWIwZezM/dF8uipgTGVfY=;
-        b=CNOzkM2IBiGjqfRhSRYpA8+aOR9+w9kYa1mO17Fub/lEhXiodlJQQbYvAU23XPSB80
-         zEPvGqgAhRJ6Ac9fwqtRfF+TRjsCcSQq5iPvk/1Ntl7JnciUfiF+ZDILvu0CHa2qGnpl
-         ujk4JKugJX/qAenq8IEMYsdgtnjBtqpUR91i9SBdt8L7pGQrEmbiL4/gffr02rrMSJmz
-         6yzyBXWa8jt0zBA9CA494YG0zM4LbpueA4wdoIYm5oesyznYRillp/PJwv9KFNX7usVm
-         7PTxEHROAZHj6Qj+AaUATSaSV1EpFTybV/lhNnk/ZpIoUTNLB6A6TpiLrhOQ7Y6XFsOL
-         ut9g==
+        bh=b8HwEu/l2NAGuMcWKH5jQM9AiiPfyTyPdU6LnAiTwjE=;
+        b=eXYLScpgWGOSOqBVSQtdTVD++xT2fUA+29WU5uRjLvVVyE3JEysFYMD3c5m3MUuwhi
+         2/dEOlgu6r/9aoIpMC/3VJ29OZt+Y5gY+DeEvBjU4JCXVvlQTRyE4kipd4bnNE4VfygO
+         gi2wVXk5KMG1My3gjGCyppqDyPaW46HK5/4P7hKcEdPibptKWHECr7E7AOpM6qgeV0Gk
+         5XFBGCzNpMsoTIPVISn+JIpRXTxD1C4vDaEFVrlgHo58JmtwUKTR1DrLx7zfgn5Z1MG8
+         NtfI2Hh1jxXAWFSVfmkK0Vl+a+bgSvADPQFiF6otkPWuXnCgFRePBcvR1qLvCTFwllWk
+         rJ2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=g/YNskCC8H0pIrRty3bOxTWWIwZezM/dF8uipgTGVfY=;
-        b=o43ysm8jvTMvI3SZP4tZW49LC1MP92fGjPCo54mhzHWzjkbSdOyIKLXYEcls3pXPe1
-         gCBvye32pdl7lHJsB77/2kFXitBw0jIGlqx1UZtVhCqH0kTYtdX6m+JD+AdTOkE8QiEp
-         8lz/cogveo1JC7Vs2jlzA18iFdIQPIq0eWwAXUpwbZQJ5qLfztYwi/2G1LNDo8C25VTr
-         Ddzd249gIUUpRyEUaEg6piVle9rLyL9nQm5vusQnas2K1+m9eas69v7t5aNwRLQHi3e7
-         EU/dUO8JqEg2PHyAY6iY/jwDZjjQ+9LwUS3/VcARz21w5DAXzmicNFKuCKeKA9si/c1S
-         1aAA==
-X-Gm-Message-State: AOAM532PMcQx2G7J2V41e008Jz0MgJ5/w0klHCwRPqnTeHZdACziU6HM
-        yQ4beN67/DJPcUUry5WeIdBMUg==
-X-Google-Smtp-Source: ABdhPJxLPt6CntmozfnHLwXqny0KwCU2vgLZSjJXfMA4iRfgP9luxNnbV0AtIM87S/ieQOg/r1KAAQ==
-X-Received: by 2002:a17:902:b28a:b0:142:3e17:38d8 with SMTP id u10-20020a170902b28a00b001423e1738d8mr80638372plr.56.1637349484440;
-        Fri, 19 Nov 2021 11:18:04 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id f15sm426180pfe.171.2021.11.19.11.18.03
+        bh=b8HwEu/l2NAGuMcWKH5jQM9AiiPfyTyPdU6LnAiTwjE=;
+        b=XG6CtFZs8+ypPdmAATjRreiN46dOi6LYn2TG7LaDRuyty+L+Z9l2fPnlTbPWqtPAp1
+         on9HIU6GDwGjQS3VYBL3tMDPRyQ1ze6N3qeCo/OalnZCJlmhFi7KSExdeAE/XNbZTJCm
+         MqC3xqCjtrDl52EfDC0DjHamM5lvbX/pSJ2jIZumlhDSmKFmESxSwTBFBjyqs1v+WUtv
+         sYlkAkis+mqwXL/N6dwgxOlSAlXBRp7AOhrNcf0Tzq+Z+W6nJZKgGF987K+8ffvY1JKc
+         cLvwpW4AdVM7bMuMzd+nW6tM5feLGIyi94QzljHkfDhcutETomfrozJOpraqWd18oGqj
+         yXzQ==
+X-Gm-Message-State: AOAM532V03rgtJP6XPbCllc26KYGUpGoV4JdxXLyTOA0j3+Xzuva3U9b
+        JDVWQfU+JDSwMl1kxXeu1RG8Tw==
+X-Google-Smtp-Source: ABdhPJwYijRrK8qgpzAhCkRXoqK9YWbXTodbosR5h3I14ZDdTjYbPRJ8dYw0rADALVOrpBmC6Q7oWg==
+X-Received: by 2002:a05:6214:4107:: with SMTP id kc7mr76325935qvb.57.1637351267376;
+        Fri, 19 Nov 2021 11:47:47 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
+        by smtp.gmail.com with ESMTPSA id d13sm339977qkn.100.2021.11.19.11.47.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Nov 2021 11:18:03 -0800 (PST)
-Date:   Fri, 19 Nov 2021 19:18:00 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     Jason Gunthorpe <jgg@ziepe.ca>,
+        Fri, 19 Nov 2021 11:47:46 -0800 (PST)
+Received: from jgg by mlx with local (Exim 4.94)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1mo9rO-00Cdid-BP; Fri, 19 Nov 2021 15:47:46 -0400
+Date:   Fri, 19 Nov 2021 15:47:46 -0400
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     David Hildenbrand <david@redhat.com>,
         Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         linux-fsdevel@vger.kernel.org, qemu-devel@nongnu.org,
@@ -72,31 +75,51 @@ Cc:     Jason Gunthorpe <jgg@ziepe.ca>,
         luto@kernel.org, john.ji@intel.com, susie.li@intel.com,
         jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com
 Subject: Re: [RFC v2 PATCH 01/13] mm/shmem: Introduce F_SEAL_GUEST
-Message-ID: <YZf4aAlbyeWw8wUk@google.com>
+Message-ID: <20211119194746.GM876299@ziepe.ca>
 References: <20211119134739.20218-1-chao.p.peng@linux.intel.com>
  <20211119134739.20218-2-chao.p.peng@linux.intel.com>
  <20211119151943.GH876299@ziepe.ca>
  <df11d753-6242-8f7c-cb04-c095f68b41fa@redhat.com>
+ <YZf4aAlbyeWw8wUk@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <df11d753-6242-8f7c-cb04-c095f68b41fa@redhat.com>
+In-Reply-To: <YZf4aAlbyeWw8wUk@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 19, 2021, David Hildenbrand wrote:
-> On 19.11.21 16:19, Jason Gunthorpe wrote:
-> > As designed the above looks useful to import a memfd to a VFIO
-> > container but could you consider some more generic naming than calling
-> > this 'guest' ?
+On Fri, Nov 19, 2021 at 07:18:00PM +0000, Sean Christopherson wrote:
+> On Fri, Nov 19, 2021, David Hildenbrand wrote:
+> > On 19.11.21 16:19, Jason Gunthorpe wrote:
+> > > As designed the above looks useful to import a memfd to a VFIO
+> > > container but could you consider some more generic naming than calling
+> > > this 'guest' ?
+> > 
+> > +1 the guest terminology is somewhat sob-optimal.
 > 
-> +1 the guest terminology is somewhat sob-optimal.
+> For the F_SEAL part, maybe F_SEAL_UNMAPPABLE?
 
-For the F_SEAL part, maybe F_SEAL_UNMAPPABLE?
+Perhaps INACCESSIBLE?
 
-No ideas for the kernel API, but that's also less concerning since it's not set
-in stone.  I'm also not sure that dedicated APIs for each high-ish level use case
-would be a bad thing, as the semantics are unlikely to be different to some extent.
-E.g. for the KVM use case, there can be at most one guest associated with the fd,
-but there can be any number of VFIO devices attached to the fd.
+> No ideas for the kernel API, but that's also less concerning since
+> it's not set in stone.  I'm also not sure that dedicated APIs for
+> each high-ish level use case would be a bad thing, as the semantics
+> are unlikely to be different to some extent.  E.g. for the KVM use
+> case, there can be at most one guest associated with the fd, but
+> there can be any number of VFIO devices attached to the fd.
+
+Even the kvm thing is not a hard restriction when you take away
+confidential compute.
+
+Why can't we have multiple KVMs linked to the same FD if the memory
+isn't encrypted? Sure it isn't actually useful but it should work
+fine.
+
+Supporting only one thing is just a way to avoid having a linked list
+of clients to broadcast invalidations too - for instance by using a
+standard notifier block...
+
+Also, how does dirty tracking work on this memory?
+
+Jason
