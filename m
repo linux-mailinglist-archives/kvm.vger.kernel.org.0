@@ -2,57 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C95DB45718B
-	for <lists+kvm@lfdr.de>; Fri, 19 Nov 2021 16:19:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7BECD4571C9
+	for <lists+kvm@lfdr.de>; Fri, 19 Nov 2021 16:39:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234601AbhKSPWs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Nov 2021 10:22:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42940 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230064AbhKSPWr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Nov 2021 10:22:47 -0500
-Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68413C061574
-        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 07:19:45 -0800 (PST)
-Received: by mail-qt1-x82f.google.com with SMTP id f20so9758167qtb.4
-        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 07:19:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=0+oKCHlqOeL41R0XCrWbPi4i3qyXHn6RmL7MeAl4NL8=;
-        b=lPGpGcid8QXwelr7zzSt5VTkDWstEKhmIVZjDI/gptTZ1XB8fRlCJsY82dS22YEbbI
-         GADEuew95VumLWojAcQF6/3Rj7N9VtmARWHCGzMlbaVOuA5B2Iy8CEcEelQIeeRTPjCb
-         /UriGVwYo5CnjPZCDlOVP8JIARNcJaTQUz01jDwgOeu3eE5FmpCC10B9LQ/D1G1T0tx4
-         iQg2Eg0YoxH/lMrAwoMlca7V5PAbid3j8gMabaFjohga4jUqveMxv4mUiSKJmYsSXZJ9
-         w9340v2YmW88xNRP0Sl+7ZXF9oISeC5mr2uPkE4vqO+Lek1l1/D1zTf+VnU59MujzXzD
-         zgyQ==
+        id S235474AbhKSPmX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Nov 2021 10:42:23 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:36709 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235448AbhKSPmW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 19 Nov 2021 10:42:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1637336360;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=DsNc1Iy6WSOW9ZyvvnH8bkc6OnCaXrc9G/cZpSnv6/Y=;
+        b=Ahji00mm5wzmW1gi3w1PIQMf93hSmKcyLGGLP/NtWQrrxl3GnRgtA90H1KEjSdaxQRG5Wo
+        xzAGbE+L09S6owDYIs8wRQ8aon6QXO5OL8lHh3WHUW/Tvd/TAmHjVM3FjKQL65q+76uZ9v
+        Hzak3qCf5Lv9JywC/uWuxABmwgQFK0s=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-275-2JMGK77CPKO__UkPqFrPWg-1; Fri, 19 Nov 2021 10:39:18 -0500
+X-MC-Unique: 2JMGK77CPKO__UkPqFrPWg-1
+Received: by mail-wm1-f72.google.com with SMTP id l187-20020a1c25c4000000b0030da46b76daso6089927wml.9
+        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 07:39:18 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=0+oKCHlqOeL41R0XCrWbPi4i3qyXHn6RmL7MeAl4NL8=;
-        b=I+A90QyvqgFedScUXN3swvucunuIS41MiVdIZ5X0l5IEPrBWSTeR74HJtkuWiVrTeU
-         qugiwzVhRFQX4RgStavz6SRryvI+mx5xQkOiY0YHZ2N5QOkfREhOY/TMiCVZSy66sYSk
-         IlzqZKusKZA/sMt4nNs+fbQk6x+ctkCePrjeQskitv/uRwrspzUAwFPTQDy716C0HqaV
-         A8bo5NH+voLCLHWeTBNN9dS2REKMkO8EM7LG9PV5BGsTGyiasr2Xg+j6niKSuRyakx69
-         7vAuzs8xpccpAYRNaBrWWBZcE08ud3GDnUw510/1FJykGRDX4whqIIzyVeOpEbGZxa9m
-         +HRQ==
-X-Gm-Message-State: AOAM531ieoklTFW78XEHTIsNl+lSc3F2QfQ9IrjVJldhkImuFuj3oiSC
-        mg1BGKRa2f2Iw6zvp2bchy1iaQ==
-X-Google-Smtp-Source: ABdhPJzBFCjiPUEhMyOCMWRnIUW5f5YGg2HohyzeoXo1q5KwzNya5wlMfrrS3JbWjHX+xZcOYu6I9Q==
-X-Received: by 2002:a05:622a:1a93:: with SMTP id s19mr7169174qtc.291.1637335184307;
-        Fri, 19 Nov 2021 07:19:44 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
-        by smtp.gmail.com with ESMTPSA id o126sm11039qke.11.2021.11.19.07.19.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Nov 2021 07:19:43 -0800 (PST)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1mo5fz-00CHGM-Aq; Fri, 19 Nov 2021 11:19:43 -0400
-Date:   Fri, 19 Nov 2021 11:19:43 -0400
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Chao Peng <chao.p.peng@linux.intel.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:organization:in-reply-to
+         :content-transfer-encoding;
+        bh=DsNc1Iy6WSOW9ZyvvnH8bkc6OnCaXrc9G/cZpSnv6/Y=;
+        b=mWvKPtTNP62hWaD5zLe2g4ld5gickx+493D7NKYrD68YX+LEkNnRKI55UpqLZtPjsm
+         7QPmpHq8R5XDZXVaJXRzQHJbm3ZW+QYXO79FTDlsOc4ERiSaTk7wUOeNUyLJSiyTd3Cq
+         0FOb2eWIK7hHmSFQPsPmrrrzsnWsfHyN7Yj4lLXaA3lfPSGU0Wjs50p8WKA+OStn2rHa
+         FLaNk81URP4/lZm88LYW0l5X7hEwQKG1+5lf415Gp/NqgGYQ17ytya+PxvBuWZqNIAuI
+         u+HOt/BTvK2MYioenUSdXfOI8n/rVYW9M2fo8HuMljsbYXlsHieDoYYmSsYSnuv6fAeo
+         dnNA==
+X-Gm-Message-State: AOAM530vJWXGuUPdMnqj3Zmtq0C9w8OKtBrfbou4bkyZ3KYUvxepHW0l
+        WcU6tSg4zC+vk2eQXD9aaX8mRwIT8y+eoAWrkTFEXp/LBUH2myzULAJ5CCr5LPt21doSYOkihys
+        ZaI2uiW+Y2/nf
+X-Received: by 2002:a1c:7f56:: with SMTP id a83mr731968wmd.32.1637336357599;
+        Fri, 19 Nov 2021 07:39:17 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJw4oITHzX1lxkkdw28CPiDPbmMdcPR9dT1zPt74sOy7KqZZqsLOUPmgkUDSXt/kGh+UoeRKqw==
+X-Received: by 2002:a1c:7f56:: with SMTP id a83mr731928wmd.32.1637336357312;
+        Fri, 19 Nov 2021 07:39:17 -0800 (PST)
+Received: from [192.168.3.132] (p5b0c6271.dip0.t-ipconnect.de. [91.12.98.113])
+        by smtp.gmail.com with ESMTPSA id j19sm110732wra.5.2021.11.19.07.39.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 19 Nov 2021 07:39:16 -0800 (PST)
+Message-ID: <df11d753-6242-8f7c-cb04-c095f68b41fa@redhat.com>
+Date:   Fri, 19 Nov 2021 16:39:15 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [RFC v2 PATCH 01/13] mm/shmem: Introduce F_SEAL_GUEST
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@ziepe.ca>,
+        Chao Peng <chao.p.peng@linux.intel.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
         qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
@@ -72,109 +80,108 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Yu Zhang <yu.c.zhang@linux.intel.com>,
         "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
         luto@kernel.org, john.ji@intel.com, susie.li@intel.com,
-        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
-        david@redhat.com
-Subject: Re: [RFC v2 PATCH 01/13] mm/shmem: Introduce F_SEAL_GUEST
-Message-ID: <20211119151943.GH876299@ziepe.ca>
+        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com
 References: <20211119134739.20218-1-chao.p.peng@linux.intel.com>
  <20211119134739.20218-2-chao.p.peng@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211119134739.20218-2-chao.p.peng@linux.intel.com>
+ <20211119151943.GH876299@ziepe.ca>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+In-Reply-To: <20211119151943.GH876299@ziepe.ca>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 19, 2021 at 09:47:27PM +0800, Chao Peng wrote:
-> From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+On 19.11.21 16:19, Jason Gunthorpe wrote:
+> On Fri, Nov 19, 2021 at 09:47:27PM +0800, Chao Peng wrote:
+>> From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+>>
+>> The new seal type provides semantics required for KVM guest private
+>> memory support. A file descriptor with the seal set is going to be used
+>> as source of guest memory in confidential computing environments such as
+>> Intel TDX and AMD SEV.
+>>
+>> F_SEAL_GUEST can only be set on empty memfd. After the seal is set
+>> userspace cannot read, write or mmap the memfd.
+>>
+>> Userspace is in charge of guest memory lifecycle: it can allocate the
+>> memory with falloc or punch hole to free memory from the guest.
+>>
+>> The file descriptor passed down to KVM as guest memory backend. KVM
+>> register itself as the owner of the memfd via memfd_register_guest().
+>>
+>> KVM provides callback that needed to be called on fallocate and punch
+>> hole.
+>>
+>> memfd_register_guest() returns callbacks that need be used for
+>> requesting a new page from memfd.
+>>
+>> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+>> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+>>  include/linux/memfd.h      |  24 ++++++++
+>>  include/linux/shmem_fs.h   |   9 +++
+>>  include/uapi/linux/fcntl.h |   1 +
+>>  mm/memfd.c                 |  33 +++++++++-
+>>  mm/shmem.c                 | 123 ++++++++++++++++++++++++++++++++++++-
+>>  5 files changed, 186 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/include/linux/memfd.h b/include/linux/memfd.h
+>> index 4f1600413f91..ff920ef28688 100644
+>> +++ b/include/linux/memfd.h
+>> @@ -4,13 +4,37 @@
+>>  
+>>  #include <linux/file.h>
+>>  
+>> +struct guest_ops {
+>> +	void (*invalidate_page_range)(struct inode *inode, void *owner,
+>> +				      pgoff_t start, pgoff_t end);
+>> +	void (*fallocate)(struct inode *inode, void *owner,
+>> +			  pgoff_t start, pgoff_t end);
+>> +};
+>> +
+>> +struct guest_mem_ops {
+>> +	unsigned long (*get_lock_pfn)(struct inode *inode, pgoff_t offset,
+>> +				      bool alloc, int *order);
+>> +	void (*put_unlock_pfn)(unsigned long pfn);
+>> +
+>> +};
 > 
-> The new seal type provides semantics required for KVM guest private
-> memory support. A file descriptor with the seal set is going to be used
-> as source of guest memory in confidential computing environments such as
-> Intel TDX and AMD SEV.
+> Ignoring confidential compute for a moment
 > 
-> F_SEAL_GUEST can only be set on empty memfd. After the seal is set
-> userspace cannot read, write or mmap the memfd.
+> If qmeu can put all the guest memory in a memfd and not map it, then
+> I'd also like to see that the IOMMU can use this interface too so we
+> can have VFIO working in this configuration.
+
+In QEMU we usually want to (and must) be able to access guest memory
+from user space, with the current design we wouldn't even be able to
+temporarily mmap it -- which makes sense for encrypted memory only. The
+corner case really is encrypted memory. So I don't think we'll see a
+broad use of this feature outside of encrypted VMs in QEMU. I might be
+wrong, most probably I am :)
+
 > 
-> Userspace is in charge of guest memory lifecycle: it can allocate the
-> memory with falloc or punch hole to free memory from the guest.
+> As designed the above looks useful to import a memfd to a VFIO
+> container but could you consider some more generic naming than calling
+> this 'guest' ?
+
++1 the guest terminology is somewhat sob-optimal.
+
 > 
-> The file descriptor passed down to KVM as guest memory backend. KVM
-> register itself as the owner of the memfd via memfd_register_guest().
+> Along the same lines, to support fast migration, we'd want to be able
+> to send these things to the RDMA subsytem as well so we can do data
+> xfer. Very similar to VFIO.
 > 
-> KVM provides callback that needed to be called on fallocate and punch
-> hole.
-> 
-> memfd_register_guest() returns callbacks that need be used for
-> requesting a new page from memfd.
-> 
-> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
->  include/linux/memfd.h      |  24 ++++++++
->  include/linux/shmem_fs.h   |   9 +++
->  include/uapi/linux/fcntl.h |   1 +
->  mm/memfd.c                 |  33 +++++++++-
->  mm/shmem.c                 | 123 ++++++++++++++++++++++++++++++++++++-
->  5 files changed, 186 insertions(+), 4 deletions(-)
-> 
-> diff --git a/include/linux/memfd.h b/include/linux/memfd.h
-> index 4f1600413f91..ff920ef28688 100644
-> +++ b/include/linux/memfd.h
-> @@ -4,13 +4,37 @@
->  
->  #include <linux/file.h>
->  
-> +struct guest_ops {
-> +	void (*invalidate_page_range)(struct inode *inode, void *owner,
-> +				      pgoff_t start, pgoff_t end);
-> +	void (*fallocate)(struct inode *inode, void *owner,
-> +			  pgoff_t start, pgoff_t end);
-> +};
-> +
-> +struct guest_mem_ops {
-> +	unsigned long (*get_lock_pfn)(struct inode *inode, pgoff_t offset,
-> +				      bool alloc, int *order);
-> +	void (*put_unlock_pfn)(unsigned long pfn);
-> +
-> +};
+> Also, shouldn't this be two patches? F_SEAL is not really related to
+> these acessors, is it?
 
-Ignoring confidential compute for a moment
 
-If qmeu can put all the guest memory in a memfd and not map it, then
-I'd also like to see that the IOMMU can use this interface too so we
-can have VFIO working in this configuration.
+Apart from the special "encrypted memory" semantics, I assume nothing
+speaks against allowing for mmaping these memfds, for example, for any
+other VFIO use cases.
 
-As designed the above looks useful to import a memfd to a VFIO
-container but could you consider some more generic naming than calling
-this 'guest' ?
+-- 
+Thanks,
 
-Along the same lines, to support fast migration, we'd want to be able
-to send these things to the RDMA subsytem as well so we can do data
-xfer. Very similar to VFIO.
+David / dhildenb
 
-Also, shouldn't this be two patches? F_SEAL is not really related to
-these acessors, is it?
-
-> +extern inline int memfd_register_guest(struct inode *inode, void *owner,
-> +				       const struct guest_ops *guest_ops,
-> +				       const struct guest_mem_ops **guest_mem_ops);
-
-Why does this take an inode and not a file *?
-
-> +int shmem_register_guest(struct inode *inode, void *owner,
-> +			 const struct guest_ops *guest_ops,
-> +			 const struct guest_mem_ops **guest_mem_ops)
-> +{
-> +	struct shmem_inode_info *info = SHMEM_I(inode);
-> +
-> +	if (!owner)
-> +		return -EINVAL;
-> +
-> +	if (info->guest_owner && info->guest_owner != owner)
-> +		return -EPERM;
-
-And this looks like it means only a single subsytem can use this API
-at once, not so nice..
-
-Jason
