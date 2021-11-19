@@ -2,134 +2,207 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 35EDE457249
-	for <lists+kvm@lfdr.de>; Fri, 19 Nov 2021 17:00:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4041545729D
+	for <lists+kvm@lfdr.de>; Fri, 19 Nov 2021 17:16:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236150AbhKSQDa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Nov 2021 11:03:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52220 "EHLO
+        id S236345AbhKSQTg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Nov 2021 11:19:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236139AbhKSQD3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Nov 2021 11:03:29 -0500
-Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A2FCC061748
-        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 08:00:27 -0800 (PST)
-Received: by mail-qt1-x82b.google.com with SMTP id t11so9916840qtw.3
-        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 08:00:27 -0800 (PST)
+        with ESMTP id S236352AbhKSQTf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Nov 2021 11:19:35 -0500
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9224C061574
+        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 08:16:33 -0800 (PST)
+Received: by mail-lf1-x12f.google.com with SMTP id t26so45441652lfk.9
+        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 08:16:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=VtV9HHXd4X5WRhcYz4pKiiL6eAEsTLpENVV+xmm0B1E=;
-        b=gsJUvh5WctLgXnshRJv4wGg2JAgnGdSqNb3S1bmxpaDvTOBEX8LcgLW/+JvwTzVB37
-         v5K7AG9csFvUa4d1e8VMH07tEJ/4GXeXR0y5xTNeGGDEbPPYGPgXDzn7G4nizRSxv1eO
-         ORYsNAAPbkIfEb6NsGnWQ8GCPrvVKrf/49w0ZT27g2F3XOg052ttHxyU5wmveX2QAeR0
-         /CkUMXANh4cDh+HorkLPLoxEa1f7SRa67fSFzDU/E1oWa7A8N6PtOVfUv80pyqxAxqRj
-         YJDGrR6Uf5+iNfe0u7fumnhfivIpDOd+RCAzSsT04BV51dAxqsTNgRzPecBJz4DuF5VH
-         RdEA==
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=PT99iXBgpFIqepfqqbxcYIJQ3M5siuSp1UK8d1YL76U=;
+        b=jHnYvtbACgEqbUWh2jxPk+A/JrzDhbXD8GN8W5j+q116oOn4I3SOuYu6WXCtrrggre
+         F7RpoUb/u9Up8UEnvaefDtRgviWR4D0TRw1rW/Phwc80x7ZOoDd8O2dfgi/c+ROR+lX5
+         Yy2fFiZqBJ5+RA1uTtjpnhhyj1hCKxOF02fIylR+5hy8M6tyWFndK21K7bQVKGshQUbZ
+         i/FNRVp4LEQcjTlUBmMdV3GUS7OuM5jx1rMJe4MjQZPdej9ePypZgGW9aGrETXY4QiZp
+         kerRyGX2XuCWsfQK8QYTwunTBoAEJdQvm1+FgZtHsirRQWxrNm3WV5XlSKSARBFjr8R5
+         GQrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=VtV9HHXd4X5WRhcYz4pKiiL6eAEsTLpENVV+xmm0B1E=;
-        b=tuOOzzdg8h6TfUpdZPWNzX7C2aa5iqXbIBsZfHc9gUp67v3C6e4nALhcqhjXYtZcqc
-         ps44+Rm1QELjMYlEn4cb38ZDHHM+I/0JIPi8Xj9xPBcoynJNWMJOUD7vtF5qWeHLKxy3
-         v7/6K9OHRvxni4we/jPNoAUc2FAbjOmRGWAuMUBAcyEOVJTszU69RXq0P20es6ixHSyy
-         QLLxqwj8i6D6f9mIwPzmMkvBBZFAAbTOXJyR2UUU3DRgaqc+XfoWN5C0NfAIovYydP7t
-         etQGQg4eySPaNaLDlo/dsHptZO/IK5soj2LoLPjRtZv6qgM5GOqLC6wgnch1Lb4ye5rm
-         2suA==
-X-Gm-Message-State: AOAM530s49YkWbJFs1km+g7dLOtQSWCdaaMMQ8SEC++PTl5Q9AqkhmpG
-        xT3We9U26Is6ulX143juOWQ59w==
-X-Google-Smtp-Source: ABdhPJxKednFIP8LV5fXPBeBBtPHTY7W03I8IO74iFi+Vm9ZxLiGU52DJu0TAbPkEtajZX/lLl8ZnA==
-X-Received: by 2002:a05:622a:349:: with SMTP id r9mr7258679qtw.213.1637337626383;
-        Fri, 19 Nov 2021 08:00:26 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
-        by smtp.gmail.com with ESMTPSA id j20sm54140qko.117.2021.11.19.08.00.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Nov 2021 08:00:25 -0800 (PST)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1mo6JL-00CHtq-W3; Fri, 19 Nov 2021 12:00:24 -0400
-Date:   Fri, 19 Nov 2021 12:00:23 -0400
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, qemu-devel@nongnu.org,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=PT99iXBgpFIqepfqqbxcYIJQ3M5siuSp1UK8d1YL76U=;
+        b=Hj6QPYPgahQ3ocq58Ag+E0H/rr2bIcLGaa8LFjQm6t23XsEb4J4+6ltRVxcaxT/3St
+         oT3QmuwN9/k0JpHWNzHdTXJkZuD0NeMzgdzQaEVg6h22ZURnmGMFlvy0x6+3zmcEaOSW
+         UQFEjTmD9J52TX9N7XCsz0oalk1vdsakWfo09pZVJX054iM/fHPmJjtyHRFIj7PWGPua
+         HLWT/yimUpL2PygqspMr2UhePQQjjU3PEKtaYerxq7l995TDetrE7ePU1mJYniIdD0xv
+         sDvKyssjO7xern6N1IJSDZMuuLGFw3PvfJkYOfnAjpz6qpKQCmVP6wQPkSRYGxCPjz5B
+         6m4w==
+X-Gm-Message-State: AOAM530zFt8HaVnnTNBQdVWZuqNDVs/qb5dV+y6mvGRcURqJ1ewx8IBB
+        qdETunoeEOjh2riAcwfYM8Z1RQfGLTNcQXaxkVyXaw==
+X-Google-Smtp-Source: ABdhPJyWR8stzdTiCGjrREyonaNUfQgQWz4uaz8HWtQNIMD89ICA71wJAEljhEu8NgU+6QnOvVwM8eP3k2kVjE8qGLw=
+X-Received: by 2002:a2e:9f15:: with SMTP id u21mr26972655ljk.132.1637338591736;
+ Fri, 19 Nov 2021 08:16:31 -0800 (PST)
+MIME-Version: 1.0
+References: <20211110220731.2396491-1-brijesh.singh@amd.com>
+ <20211110220731.2396491-44-brijesh.singh@amd.com> <CAMkAt6q3D4h=01XhHcxXTEwbWLM9CnAaq+6vgNzxyqzt+X00UQ@mail.gmail.com>
+ <ff3ceeb5-e120-fe07-2a0c-4cd51f552db8@amd.com>
+In-Reply-To: <ff3ceeb5-e120-fe07-2a0c-4cd51f552db8@amd.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Fri, 19 Nov 2021 09:16:20 -0700
+Message-ID: <CAMkAt6pAcM-+odnagFTiaY7PPGE1CfAt27x=tG=-4UU9c+dQXA@mail.gmail.com>
+Subject: Re: [PATCH v7 43/45] virt: Add SEV-SNP guest driver
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, john.ji@intel.com, susie.li@intel.com,
-        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com
-Subject: Re: [RFC v2 PATCH 01/13] mm/shmem: Introduce F_SEAL_GUEST
-Message-ID: <20211119160023.GI876299@ziepe.ca>
-References: <20211119134739.20218-1-chao.p.peng@linux.intel.com>
- <20211119134739.20218-2-chao.p.peng@linux.intel.com>
- <20211119151943.GH876299@ziepe.ca>
- <df11d753-6242-8f7c-cb04-c095f68b41fa@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <df11d753-6242-8f7c-cb04-c095f68b41fa@redhat.com>
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 19, 2021 at 04:39:15PM +0100, David Hildenbrand wrote:
+On Thu, Nov 18, 2021 at 10:32 AM Brijesh Singh <brijesh.singh@amd.com> wrote:
+>
+>
+>
+> On 11/17/21 5:34 PM, Peter Gonda wrote:
+>
+>
+> >> +The guest ioctl should be issued on a file descriptor of the /dev/sev-guest device.
+> >> +The ioctl accepts struct snp_user_guest_request. The input and output structure is
+> >> +specified through the req_data and resp_data field respectively. If the ioctl fails
+> >> +to execute due to a firmware error, then fw_err code will be set.
+> >
+> > Should way say what it will be set to? Also Sean pointed out on CCP
+> > driver that 0 is strange to set the error to, its a uint so we cannot
+> > do -1 like we did there. What about all FFs?
+> >
+>
+> Sure, all FF's works, I can document and use it.
+>
+>
+> >> +static inline u64 __snp_get_msg_seqno(struct snp_guest_dev *snp_dev)
+> >> +{
+> >> +       u64 count;
+> >
+> > I may be overly paranoid here but how about
+> > `lockdep_assert_held(&snp_cmd_mutex);` when writing or reading
+> > directly from this data?
+> >
+>
+> Sure, I can do it.
+>
+> ...
+>
+> >> +
+> >> +       if (rc)
+> >> +               return rc;
+> >> +
+> >> +       rc = verify_and_dec_payload(snp_dev, resp_buf, resp_sz);
+> >> +       if (rc) {
+> >> +               /*
+> >> +                * The verify_and_dec_payload() will fail only if the hypervisor is
+> >> +                * actively modifiying the message header or corrupting the encrypted payload.
+> > modifiying
+> >> +                * This hints that hypervisor is acting in a bad faith. Disable the VMPCK so that
+> >> +                * the key cannot be used for any communication.
+> >> +                */
+> >
+> > This looks great, thanks for changes Brijesh. Should we mention in
+> > comment here or at snp_disable_vmpck() the AES-GCM issues with
+> > continuing to use the key? Or will future updaters to this code
+> > understand already?
+> >
+>
+> Sure, I can add comment about the AES-GCM.
+>
+> ...
+>
+> >> +
+> >> +/* See SNP spec SNP_GUEST_REQUEST section for the structure */
+> >> +enum msg_type {
+> >> +       SNP_MSG_TYPE_INVALID = 0,
+> >> +       SNP_MSG_CPUID_REQ,
+> >> +       SNP_MSG_CPUID_RSP,
+> >> +       SNP_MSG_KEY_REQ,
+> >> +       SNP_MSG_KEY_RSP,
+> >> +       SNP_MSG_REPORT_REQ,
+> >> +       SNP_MSG_REPORT_RSP,
+> >> +       SNP_MSG_EXPORT_REQ,
+> >> +       SNP_MSG_EXPORT_RSP,
+> >> +       SNP_MSG_IMPORT_REQ,
+> >> +       SNP_MSG_IMPORT_RSP,
+> >> +       SNP_MSG_ABSORB_REQ,
+> >> +       SNP_MSG_ABSORB_RSP,
+> >> +       SNP_MSG_VMRK_REQ,
+> >> +       SNP_MSG_VMRK_RSP,
+> >
+> > Did you want to include MSG_ABSORB_NOMA_REQ and MSG_ABSORB_NOMA_RESP here?
+> >
+>
+> Yes, I can includes those for the completeness.
+>
+> ...
+>
+> >> +struct snp_report_req {
+> >> +       /* message version number (must be non-zero) */
+> >> +       __u8 msg_version;
+> >> +
+> >> +       /* user data that should be included in the report */
+> >> +       __u8 user_data[64];
+> >
+> > Are we missing the 'vmpl' field here? Does those default all requests
+> > to be signed with VMPL0? Users might want to change that, they could
+> > be using a paravisor.
+> >
+>
+> Good question, so far I was thinking that guest kernel will provide its
+> vmpl level instead of accepted the vmpl level from the userspace. Do you
+> see a need for a userspace to provide this information ?
 
-> > If qmeu can put all the guest memory in a memfd and not map it, then
-> > I'd also like to see that the IOMMU can use this interface too so we
-> > can have VFIO working in this configuration.
-> 
-> In QEMU we usually want to (and must) be able to access guest memory
-> from user space, with the current design we wouldn't even be able to
-> temporarily mmap it -- which makes sense for encrypted memory only. The
-> corner case really is encrypted memory. So I don't think we'll see a
-> broad use of this feature outside of encrypted VMs in QEMU. I might be
-> wrong, most probably I am :)
+That seems fine. I am just confused because we are just encrypting
+this struct as the payload for the PSP. Doesn't the message require a
+struct that looks like 'snp_report_req_user_data' below?
 
-Interesting..
+snp_report_req{
+       /* message version number (must be non-zero) */
+       __u8 msg_version;
 
-The non-encrypted case I had in mind is the horrible flow in VFIO to
-support qemu re-execing itself (VFIO_DMA_UNMAP_FLAG_VADDR).
+      /* user data that should be included in the report */
+       struct snp_report_req_user_data;
+};
 
-Here VFIO is connected to a VA in a mm_struct that will become invalid
-during the kexec period, but VFIO needs to continue to access it. For
-IOMMU cases this is OK because the memory is already pinned, but for
-the 'emulated iommu' used by mdevs pages are pinned dynamically. qemu
-needs to ensure that VFIO can continue to access the pages across the
-kexec, even though there is nothing to pin_user_pages() on.
+struct snp_report_req_user_data {
+  u8 user_data[64];
+  u32 vmpl;
+  u32 reserved;
+};
 
-This flow would work a lot better if VFIO was connected to the memfd
-that is storing the guest memory. Then it naturally doesn't get
-disrupted by exec() and we don't need the mess in the kernel..
 
-I was wondering if we could get here using the direct_io APIs but this
-would do the job too.
-
-> Apart from the special "encrypted memory" semantics, I assume nothing
-> speaks against allowing for mmaping these memfds, for example, for any
-> other VFIO use cases.
-
-We will eventually have VFIO with "encrypted memory". There was a talk
-in LPC about the enabling work for this.
-
-So, if the plan is to put fully encrpyted memory inside a memfd, then
-we still will eventually need a way to pull the pfns it into the
-IOMMU, presumably along with the access control parameters needed to
-pass to the secure monitor to join a PCI device to the secure memory.
-
-Jason
+>
+>
+> thanks
