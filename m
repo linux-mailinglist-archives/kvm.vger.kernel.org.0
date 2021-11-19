@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C2F3D4579CF
-	for <lists+kvm@lfdr.de>; Sat, 20 Nov 2021 00:58:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 804E94579D0
+	for <lists+kvm@lfdr.de>; Sat, 20 Nov 2021 00:58:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236280AbhKTABu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Nov 2021 19:01:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47328 "EHLO
+        id S236314AbhKTABw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Nov 2021 19:01:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47336 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236232AbhKTABW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Nov 2021 19:01:22 -0500
+        with ESMTP id S236212AbhKTABY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Nov 2021 19:01:24 -0500
 Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F5D6C061748
-        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 15:58:20 -0800 (PST)
-Received: by mail-pl1-x64a.google.com with SMTP id n13-20020a170902d2cd00b0014228ffc40dso5361561plc.4
-        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 15:58:20 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15C07C06174A
+        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 15:58:22 -0800 (PST)
+Received: by mail-pl1-x64a.google.com with SMTP id x18-20020a170902ec9200b00143c6409dbcso5371500plg.5
+        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 15:58:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=Wkh89fBmd980/DQWmtPUYCadBdan6p83cu7YV29qV8k=;
-        b=ldY/d0mXvBJvYMeDK9yCu4ktNBNtCrtdEfhdwO9kKn2UaQOwPlTeNKIPzENhdWDDaV
-         XJMXzeLRc3dO+wT7e5bXMZmayNYt23r/Ogdip4meQ9vPQQNcW/VNp07LGN7VUJJwyR8g
-         ofWeE4b3IIp451A6W10yKqZ4rDxjfJGVSloYlu/prw86q7L/tlDBN5+VR+8owR5VkEWB
-         BpC9QOPuNqIWz79X7ztv0Z28B9aeSN02nr8YoQoQRjRqI/VPw5a5gmaH87wSuisUZn5m
-         hVw2Lrqf9O0UYuIwkdIEVaOnOOsQ9vjt4m3mFfogdpP2iUC3V4LUjYFz+SGdq20QUj5x
-         QeVQ==
+        bh=THyCGcJlJDIteh93mmk5MXegs42Ad6o+RQjSwoy4UKE=;
+        b=HzfOzdGrIvRs5CF2OA0gibAVw6lsOEdz4I9Y3lvNVhRphfkOGsmN2IdLnrQOgDe7Wd
+         gUAcFcFlNnBVY9rG1gXm9D0WUfqtNbo2+vhixc3srxN+Sw81tuSyHPFqSmsB+i8tscLn
+         SbOrfwigCEi+pCyreDY377FZMcYVvZl1RD88P2bv9p8JWHBXs2j43mlJIjVDFfLX6Qi/
+         1IxX7BsjaFXchGBtICPLuxxPFB9xDf6KBMSyk+sEyidXAsW+O7IIMw/Er4vbM1Ek6h2r
+         1UR2R80rT0W1hmP3Urp+8M1HRoNKPg6X6VbqSjSgmMYkfEcW8HSC8riD9Szou81VLxuX
+         xMuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=Wkh89fBmd980/DQWmtPUYCadBdan6p83cu7YV29qV8k=;
-        b=nKlFhoxzPl7Xt6m/PkowL+4QyCa+ocQ0ZNa9urYrSfI2QLveXJnyWHd3iYPm9lV4dD
-         RJggaNiBSwvJHLPt7MVkJYnyM720YoHRw8sM1J93Xyw/CBFLUCmIZbAgXyFDqXqloLuv
-         tr9lpG/0jauyJQANjNV6BAe8oCffGLQ3a2imRBfyMZBsDdyTzppMS4LvA8p7OhxIuLEI
-         aq7wY26BHLdI0EHeJ4+BC4ahHvX1AQv2kMiTRYyVNWRRD32TAkOT9RxalKhJcdNLwyOV
-         fGt5aFTpuD9LbYCujnU2cBiAMzx6Sn/0pmC9WE8EaAGll6OX9abUuY5UylIz0cbLmCgD
-         JaHg==
-X-Gm-Message-State: AOAM531PiTqhmezc87D1mBsPZDIaX7fFt0lkExCPEZg4El6LmTWeDC2J
-        9yRQKcFtZ+n2RE+n00Ycp7CfWB/Fh9Ic9w==
-X-Google-Smtp-Source: ABdhPJxAiDhSmMRQvNP4bwzJil10537qF0v5lVx1zfQp6exZ6z/iBFJmLyKBgLkVV9W6GLU1kmcYWRkSF8Jxrw==
+        bh=THyCGcJlJDIteh93mmk5MXegs42Ad6o+RQjSwoy4UKE=;
+        b=pCtUPkkcccQJ6rf6cxabO6iU5aEl3k9yw96ykCEiV5Yqfc+QV06iEjiBNt9R0Uubmw
+         gZGjO51J1ZjLL2Y245QXx+DaFonXzrqsPn+XQprgZBUWCGRQh5D20T9MThjnToHRjM3V
+         feQ/LU6qunnOrkb3CNJBYN8fXl+oRtjoP/ijbSNv2e1+ItXNiEnBoaSKjYL+DrpdfYtE
+         lNoXpzPo3mI/GrUnkESivY0RIVCE8SCc3uBbbTDpGKcy/eaULvRS0LcJFZQMhsYO7dTB
+         fqcnGcd1m47fj9GSCUNxZB0qktROEYMF+8P5YOasc/uMA36VzlVi2+EmAClVqeXAALeg
+         KAcA==
+X-Gm-Message-State: AOAM5311/SQRv/tZAuJJWoByVK4VtLCHwQZhJjZb0tsRubsx9MWcENtH
+        P+UFB1hA6yLkF19xLk1kEwHMxKRSd2BwOg==
+X-Google-Smtp-Source: ABdhPJxt7MI51GZajwUnfC3GYlRa9MHQ8weuL4DIzGepaXz2g9XCcaSYQOuxMHK8ExOZQp1keUHWHsbpgXa43w==
 X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:aa7:8b14:0:b0:4a3:a714:30ed with SMTP id
- f20-20020aa78b14000000b004a3a71430edmr10453181pfd.2.1637366299898; Fri, 19
- Nov 2021 15:58:19 -0800 (PST)
-Date:   Fri, 19 Nov 2021 23:57:50 +0000
+ (user=dmatlack job=sendgmr) by 2002:a17:902:f68e:b0:142:c60:475 with SMTP id
+ l14-20020a170902f68e00b001420c600475mr83161881plg.8.1637366301600; Fri, 19
+ Nov 2021 15:58:21 -0800 (PST)
+Date:   Fri, 19 Nov 2021 23:57:51 +0000
 In-Reply-To: <20211119235759.1304274-1-dmatlack@google.com>
-Message-Id: <20211119235759.1304274-7-dmatlack@google.com>
+Message-Id: <20211119235759.1304274-8-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20211119235759.1304274-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.34.0.rc2.393.gf8c9666880-goog
-Subject: [RFC PATCH 06/15] KVM: x86/mmu: Derive page role from parent
+Subject: [RFC PATCH 07/15] KVM: x86/mmu: Pass in vcpu->arch.mmu_caches instead
+ of vcpu
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Ben Gardon <bgardon@google.com>,
@@ -71,105 +72,72 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Derive the page role from the parent shadow page, since the only thing
-that changes is the level. This is in preparation for eagerly splitting
-large pages during VM-ioctls which does not have access to the vCPU
-MMU context.
+Pass in vcpu->arch.mmu_caches to alloc_{,_child}_tdp_mmu_page() instead
+of the vcpu. This is in preparation for eagerly splitting large pages
+during VM-ioctls which does not have access to the vCPU mmu_caches.
 
 No functional change intended.
 
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- arch/x86/kvm/mmu/tdp_mmu.c | 43 ++++++++++++++++++++------------------
- 1 file changed, 23 insertions(+), 20 deletions(-)
+ arch/x86/kvm/mmu/tdp_mmu.c | 16 +++++++---------
+ 1 file changed, 7 insertions(+), 9 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index b70707a7fe87..1a409992a57f 100644
+index 1a409992a57f..ff4d83ad7580 100644
 --- a/arch/x86/kvm/mmu/tdp_mmu.c
 +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -157,23 +157,8 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
+@@ -157,14 +157,11 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
  		if (kvm_mmu_page_as_id(_root) != _as_id) {		\
  		} else
  
--static union kvm_mmu_page_role page_role_for_level(struct kvm_vcpu *vcpu,
--						   int level)
--{
--	union kvm_mmu_page_role role;
--
--	role = vcpu->arch.mmu->mmu_role.base;
--	role.level = level;
--	role.direct = true;
--	role.gpte_is_8_bytes = true;
--	role.access = ACC_ALL;
--	role.ad_disabled = !shadow_accessed_mask;
--
--	return role;
--}
--
- static struct kvm_mmu_page *alloc_tdp_mmu_page(struct kvm_vcpu *vcpu, gfn_t gfn,
--					       int level)
-+					       union kvm_mmu_page_role role)
+-static struct kvm_mmu_page *alloc_tdp_mmu_page(struct kvm_vcpu *vcpu, gfn_t gfn,
+-					       union kvm_mmu_page_role role)
++static struct kvm_mmu_page *alloc_tdp_mmu_page(struct kvm_mmu_memory_caches *mmu_caches,
++					       gfn_t gfn, union kvm_mmu_page_role role)
  {
- 	struct kvm_mmu_memory_caches *mmu_caches;
+-	struct kvm_mmu_memory_caches *mmu_caches;
  	struct kvm_mmu_page *sp;
-@@ -184,7 +169,7 @@ static struct kvm_mmu_page *alloc_tdp_mmu_page(struct kvm_vcpu *vcpu, gfn_t gfn,
+ 
+-	mmu_caches = &vcpu->arch.mmu_caches;
+-
+ 	sp = kvm_mmu_memory_cache_alloc(&mmu_caches->page_header_cache);
  	sp->spt = kvm_mmu_memory_cache_alloc(&mmu_caches->shadow_page_cache);
  	set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
- 
--	sp->role.word = page_role_for_level(vcpu, level).word;
-+	sp->role = role;
- 	sp->gfn = gfn;
- 	sp->tdp_mmu_page = true;
- 
-@@ -193,6 +178,19 @@ static struct kvm_mmu_page *alloc_tdp_mmu_page(struct kvm_vcpu *vcpu, gfn_t gfn,
+@@ -178,7 +175,8 @@ static struct kvm_mmu_page *alloc_tdp_mmu_page(struct kvm_vcpu *vcpu, gfn_t gfn,
  	return sp;
  }
  
-+static struct kvm_mmu_page *alloc_child_tdp_mmu_page(struct kvm_vcpu *vcpu, struct tdp_iter *iter)
-+{
-+	struct kvm_mmu_page *parent_sp;
-+	union kvm_mmu_page_role role;
-+
-+	parent_sp = sptep_to_sp(rcu_dereference(iter->sptep));
-+
-+	role = parent_sp->role;
-+	role.level--;
-+
-+	return alloc_tdp_mmu_page(vcpu, iter->gfn, role);
-+}
-+
- hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
+-static struct kvm_mmu_page *alloc_child_tdp_mmu_page(struct kvm_vcpu *vcpu, struct tdp_iter *iter)
++static struct kvm_mmu_page *alloc_child_tdp_mmu_page(struct kvm_mmu_memory_caches *mmu_caches,
++						     struct tdp_iter *iter)
  {
+ 	struct kvm_mmu_page *parent_sp;
  	union kvm_mmu_page_role role;
-@@ -201,7 +199,12 @@ hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
+@@ -188,7 +186,7 @@ static struct kvm_mmu_page *alloc_child_tdp_mmu_page(struct kvm_vcpu *vcpu, stru
+ 	role = parent_sp->role;
+ 	role.level--;
  
- 	lockdep_assert_held_write(&kvm->mmu_lock);
+-	return alloc_tdp_mmu_page(vcpu, iter->gfn, role);
++	return alloc_tdp_mmu_page(mmu_caches, iter->gfn, role);
+ }
  
--	role = page_role_for_level(vcpu, vcpu->arch.mmu->shadow_root_level);
-+	role = vcpu->arch.mmu->mmu_role.base;
-+	role.level = vcpu->arch.mmu->shadow_root_level;
-+	role.direct = true;
-+	role.gpte_is_8_bytes = true;
-+	role.access = ACC_ALL;
-+	role.ad_disabled = !shadow_accessed_mask;
- 
- 	/* Check for an existing root before allocating a new one. */
- 	for_each_tdp_mmu_root(kvm, root, kvm_mmu_role_as_id(role)) {
-@@ -210,7 +213,7 @@ hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
+ hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
+@@ -213,7 +211,7 @@ hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
  			goto out;
  	}
  
--	root = alloc_tdp_mmu_page(vcpu, 0, vcpu->arch.mmu->shadow_root_level);
-+	root = alloc_tdp_mmu_page(vcpu, 0, role);
+-	root = alloc_tdp_mmu_page(vcpu, 0, role);
++	root = alloc_tdp_mmu_page(&vcpu->arch.mmu_caches, 0, role);
  	refcount_set(&root->tdp_mmu_root_count, 1);
  
  	spin_lock(&kvm->arch.tdp_mmu_pages_lock);
-@@ -1028,7 +1031,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+@@ -1031,7 +1029,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
  			if (is_removed_spte(iter.old_spte))
  				break;
  
--			sp = alloc_tdp_mmu_page(vcpu, iter.gfn, iter.level - 1);
-+			sp = alloc_child_tdp_mmu_page(vcpu, &iter);
+-			sp = alloc_child_tdp_mmu_page(vcpu, &iter);
++			sp = alloc_child_tdp_mmu_page(&vcpu->arch.mmu_caches, &iter);
  			if (!tdp_mmu_install_sp_atomic(vcpu->kvm, &iter, sp, account_nx))
  				break;
  		}
