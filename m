@@ -2,127 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 36969457D3C
-	for <lists+kvm@lfdr.de>; Sat, 20 Nov 2021 12:20:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BF3C7457DD3
+	for <lists+kvm@lfdr.de>; Sat, 20 Nov 2021 13:25:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237329AbhKTLXx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 20 Nov 2021 06:23:53 -0500
-Received: from mga07.intel.com ([134.134.136.100]:55992 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231161AbhKTLXx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 20 Nov 2021 06:23:53 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10173"; a="297974069"
-X-IronPort-AV: E=Sophos;i="5.87,250,1631602800"; 
-   d="scan'208";a="297974069"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2021 03:20:49 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.87,250,1631602800"; 
-   d="scan'208";a="496214393"
-Received: from allen-box.sh.intel.com (HELO [10.239.159.118]) ([10.239.159.118])
-  by orsmga007.jf.intel.com with ESMTP; 20 Nov 2021 03:20:44 -0800
-Cc:     baolu.lu@linux.intel.com, "Tian, Kevin" <kevin.tian@intel.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        "Raj, Ashok" <ashok.raj@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "rafael@kernel.org" <rafael@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Diana Craciun <diana.craciun@oss.nxp.com>
-Subject: Re: [PATCH 01/11] iommu: Add device dma ownership set/release
- interfaces
-To:     =?UTF-8?B?SsO2cmcgUsO2ZGVs?= <joro@8bytes.org>
-References: <20211115020552.2378167-1-baolu.lu@linux.intel.com>
- <20211115020552.2378167-2-baolu.lu@linux.intel.com>
- <YZJdJH4AS+vm0j06@infradead.org>
- <cc7ce6f4-b1ec-49ef-e245-ab6c330154c2@linux.intel.com>
- <20211116134603.GA2105516@nvidia.com>
- <BN9PR11MB5433639E43C37C5D2462BD718C9B9@BN9PR11MB5433.namprd11.prod.outlook.com>
- <20211118133325.GO2105516@nvidia.com>
- <BN9PR11MB5433E5B63E575E2232DFBBE48C9C9@BN9PR11MB5433.namprd11.prod.outlook.com>
- <75100dfd-9cfe-9f3d-531d-b4d30de03e76@linux.intel.com>
- <20211119150612.jhsvsbzisvux2lga@8bytes.org>
-From:   Lu Baolu <baolu.lu@linux.intel.com>
-Message-ID: <48cf6b2b-28ee-178d-6471-460e781e7b20@linux.intel.com>
-Date:   Sat, 20 Nov 2021 19:16:13 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        id S237253AbhKTM2E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 20 Nov 2021 07:28:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40470 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230381AbhKTM2E (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 20 Nov 2021 07:28:04 -0500
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5447C061574
+        for <kvm@vger.kernel.org>; Sat, 20 Nov 2021 04:25:00 -0800 (PST)
+Received: by mail-wm1-x336.google.com with SMTP id 77-20020a1c0450000000b0033123de3425so12625639wme.0
+        for <kvm@vger.kernel.org>; Sat, 20 Nov 2021 04:25:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=k4t/moyFPTnHr3tkMLXdwzp25OETETV91StNXhkcfik=;
+        b=mTt0jFk99R2Hwmx6XtvgMNqXkKwzzU/oAFpisDMSKhRsdclK3eNa5imnm7YU1wQB/N
+         DeliNaskMhSb/BnpkkkRqnVQlYONk77YC/IvM8NpN7SOijehD4mtQPpawUl8aTDll4Yq
+         v4LvStzkKeZqpEbd7T832AZqX/9YzwQyvhiE+v7UtxQ+9Y7+KPn4F3k+7wEacgdxc1qw
+         qTg8seqVVJklVhR78mMVC4RbnLE0GbA2xu9dCVgAz+/QeJk7HylDumSo30RrRoKrznoc
+         sxtU801bzcYKU3zi6Fe7r+D2upCgVv6P4+OeBlnrwDXvhPMbOtksThBtpmb1K3+ajzUs
+         jn+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=k4t/moyFPTnHr3tkMLXdwzp25OETETV91StNXhkcfik=;
+        b=tvE32Iui68+Qfc0ULi//LK2hZTyH7iKzCjPI9YQu1THE8ysE/3UsWnkSOr6pt374RJ
+         PpQHAPUEb7nUHhBAwcMyvjZkNQ2Ca2UYyvCmIZ5FT3laqfbbuupwADS+r1AkzFXHWtbD
+         9oX7dC9Y8sqUQVyWPXg4e0Qh9lABQ7HvvuheGt11aqhkT1GgkifD8pyQ9S3R6mwYwGyE
+         MhlO/qYjtMnYefdG7LCKJ+81TQhxusK9RTt5KdrYTtjlPM39Qt/tSB7J/qwBJwcOl3u+
+         4TWid+ayv7Bxcg62tD1Qutgux5QgvKOYiHbLv7QWNWZ4yllSVc3uY9E7ADxDpSmUG5Qp
+         0ANA==
+X-Gm-Message-State: AOAM530PpSODZsuE5ggQhBrlsNom26eoblMc/ZOkXkPExQatUlybR5Xh
+        6X+e83IVvbkZaqVvOmVX9BU=
+X-Google-Smtp-Source: ABdhPJy74oP1WqfRYny5eO9aXcR0fnFrgZXOV0i6XL8EyY0WicsV91rMm7YQV/K2FH+SnMgCAUJXew==
+X-Received: by 2002:a05:600c:1d01:: with SMTP id l1mr9908447wms.44.1637411099258;
+        Sat, 20 Nov 2021 04:24:59 -0800 (PST)
+Received: from [192.168.1.36] (62.red-83-57-168.dynamicip.rima-tde.net. [83.57.168.62])
+        by smtp.gmail.com with ESMTPSA id g13sm2698002wmk.37.2021.11.20.04.24.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 20 Nov 2021 04:24:58 -0800 (PST)
+Sender: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= 
+        <philippe.mathieu.daude@gmail.com>
+Message-ID: <afe5b14f-ec27-2722-73a8-b9f6716d207e@amsat.org>
+Date:   Sat, 20 Nov 2021 13:24:56 +0100
 MIME-Version: 1.0
-In-Reply-To: <20211119150612.jhsvsbzisvux2lga@8bytes.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH v1 08/12] target/riscv: Handle KVM_EXIT_RISCV_SBI exit
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+To:     Yifei Jiang <jiangyifei@huawei.com>, qemu-devel@nongnu.org,
+        qemu-riscv@nongnu.org
+Cc:     bin.meng@windriver.com, Mingwang Li <limingwang@huawei.com>,
+        kvm@vger.kernel.org, libvir-list@redhat.com, anup.patel@wdc.com,
+        wanbo13@huawei.com, Alistair.Francis@wdc.com,
+        kvm-riscv@lists.infradead.org, wanghaibin.wang@huawei.com,
+        palmer@dabbelt.com, fanliang@huawei.com, wu.wubin@huawei.com,
+        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20211120074644.729-1-jiangyifei@huawei.com>
+ <20211120074644.729-9-jiangyifei@huawei.com>
+From:   =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+In-Reply-To: <20211120074644.729-9-jiangyifei@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Joerg,
+Hi,
 
-On 11/19/21 11:06 PM, Jörg Rödel wrote:
-> On Fri, Nov 19, 2021 at 07:14:10PM +0800, Lu Baolu wrote:
->> The singleton group requirement for iommu_attach/detach_device() was
->> added by below commit:
->>
->> commit 426a273834eae65abcfc7132a21a85b3151e0bce
->> Author: Joerg Roedel <jroedel@suse.de>
->> Date:   Thu May 28 18:41:30 2015 +0200
->>
->>      iommu: Limit iommu_attach/detach_device to devices with their own group
->>
->>      This patch changes the behavior of the iommu_attach_device
->>      and iommu_detach_device functions. With this change these
->>      functions only work on devices that have their own group.
->>      For all other devices the iommu_group_attach/detach
->>      functions must be used.
->>
->>      Signed-off-by: Joerg Roedel <jroedel@suse.de>
->>
->> Joerg,can you please shed some light on the background of this
->> requirement? Does above idea of transition from singleton group
->> to group with single driver bound make sense to you?
+On 11/20/21 08:46, Yifei Jiang wrote:
+> Use char-fe to handle console sbi call, which implement early
+> console io while apply 'earlycon=sbi' into kernel parameters.
 > 
-> This change came to be because the iommu_attach/detach_device()
-> interface doesn't fit well into a world with iommu-groups. Devices
-> within a group are by definition not isolated between each other, so
-> they must all be in the same address space (== iommu_domain). So it
-> doesn't make sense to allow attaching a single device within a group to
-> a different iommu_domain.
+> Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
+> Signed-off-by: Mingwang Li <limingwang@huawei.com>
+> ---
+>  target/riscv/kvm.c                 | 42 ++++++++++++++++-
+>  target/riscv/sbi_ecall_interface.h | 72 ++++++++++++++++++++++++++++++
+>  2 files changed, 113 insertions(+), 1 deletion(-)
+>  create mode 100644 target/riscv/sbi_ecall_interface.h
+> 
+> diff --git a/target/riscv/kvm.c b/target/riscv/kvm.c
+> index 8da2648d1a..6d419ba02e 100644
+> --- a/target/riscv/kvm.c
+> +++ b/target/riscv/kvm.c
+> @@ -38,6 +38,8 @@
+>  #include "qemu/log.h"
+>  #include "hw/loader.h"
+>  #include "kvm_riscv.h"
+> +#include "sbi_ecall_interface.h"
+> +#include "chardev/char-fe.h"
+>  
+>  static uint64_t kvm_riscv_reg_id(CPURISCVState *env, uint64_t type, uint64_t idx)
+>  {
+> @@ -440,9 +442,47 @@ bool kvm_arch_stop_on_emulation_error(CPUState *cs)
+>      return true;
+>  }
+>  
+> +static int kvm_riscv_handle_sbi(struct kvm_run *run)
+> +{
+> +    int ret = 0;
+> +    unsigned char ch;
+> +    switch (run->riscv_sbi.extension_id) {
+> +    case SBI_EXT_0_1_CONSOLE_PUTCHAR:
+> +        ch = run->riscv_sbi.args[0];
+> +        qemu_chr_fe_write(serial_hd(0)->be, &ch, sizeof(ch));
+> +        break;
+> +    case SBI_EXT_0_1_CONSOLE_GETCHAR:
+> +        ret = qemu_chr_fe_read_all(serial_hd(0)->be, &ch, sizeof(ch));
+> +        if (ret == sizeof(ch)) {
+> +            run->riscv_sbi.args[0] = ch;
+> +        } else {
+> +            run->riscv_sbi.args[0] = -1;
+> +        }
+> +        break;
 
-Thanks for the explanation. It's very helpful. There seems to be a lot
-of discussions around this, but I didn't see any meaningful reasons to
-break the assumption of "all devices in a group being in a same address
-space".
-
-Best regards,
-baolu
-
-> 
-> I know that in theory it is safe to allow devices within a group to be
-> in different domains because there iommu-groups catch multiple
-> non-isolation cases:
-> 
-> 	1) Devices behind a non-ACS capable bridge or multiple functions
-> 	   of a PCI device. Here it is safe to put the devices into
-> 	   different iommu-domains as long as all affected devices are
-> 	   controlled by the same owner.
-> 
-> 	2) Devices which share a single request-id and can't be
-> 	   differentiated by the IOMMU hardware. These always need to be
-> 	   in the same iommu_domain.
-> 
-> To lift the single-domain-per-group requirement the iommu core code
-> needs to learn the difference between the two cases above.
-> 
-> Regards,
-> 
-> 	Joerg
-> 
+Shouldn't this code use the Semihosting Console API from
+"semihosting/console.h" instead?
