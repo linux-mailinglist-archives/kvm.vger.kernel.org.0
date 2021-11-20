@@ -2,128 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D33C457A67
-	for <lists+kvm@lfdr.de>; Sat, 20 Nov 2021 02:23:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B1ACF457A7D
+	for <lists+kvm@lfdr.de>; Sat, 20 Nov 2021 02:50:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234360AbhKTB02 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Nov 2021 20:26:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37870 "EHLO
+        id S235856AbhKTBxT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Nov 2021 20:53:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43698 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234687AbhKTB0Y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Nov 2021 20:26:24 -0500
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3A7FC06173E
-        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 17:23:20 -0800 (PST)
-Received: by mail-pl1-x631.google.com with SMTP id o14so9424863plg.5
-        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 17:23:20 -0800 (PST)
+        with ESMTP id S234823AbhKTBxS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Nov 2021 20:53:18 -0500
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56DF3C061574
+        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 17:50:11 -0800 (PST)
+Received: by mail-pl1-x649.google.com with SMTP id e9-20020a170902ed8900b00143a3f40299so5497474plj.20
+        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 17:50:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=/Xij941QtBI1Uy4eu8Bu4KYhGHxK/4BecrqjrKxNLxc=;
-        b=GpoQ21DjhXv2BUYJlGx0hMtF15Q8bpsRbq0wJvD6yrNvx1DYqqtNexsuLz1NRYVJ7e
-         NHFLzQYzZOyh+GJfAJnENBvIm+qSEHAVkgDfaCl/Zr3pl/+QESPUvhi1a2uPxB+ICwuy
-         d5j4VltRnAABaR74WGpaFwAADwy0tlcySm0JDW/fekN3+r5XTQVTXr1Oeo7Jdu+sGAFN
-         rv5qPR8lCfq27Bt1ONuGfxXO5QpeOfd39C4seaS4JUP7gy5aJprSPYN7u6PlhL8Ju2dl
-         odxJsmR6NbgGQCOlLIJktpJf2jC+gWvVcaW+8w8uNLE8ah6nxpfEwfFkX5r9M/k9m+ys
-         91CA==
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=/oTaTNiB/LMk2r2BJ6BITqZh/xo7HcDPFHBzIC0aTcA=;
+        b=Y17iUQxETsjV0XAmZHTD+ZjD5tMQk/NOpkpraqf9BW2+v5JR2eBy3f1p4yCP1mV3uC
+         PUm9MEBvTS93oMslh7RgrsjIn7MwY6k54gJbA1d9WbMvca4OO99KHtuRdpvxgnR+uFI8
+         LbTg7u6ztPgJXa9z5xh0G849CN6AM529jrtRS41dtzaJTlu8O0VHwLxmLIcdHfTH1nzT
+         oEv7OW24KEsMMt+gNB/z1zgrC8XGFXUhCRr2vRbVD3sdbBDeSfePKELcnp6wMPAU86Cf
+         f8n5fBHLETiqOcQskna/SG3gZC+RBCd39PIXox+DkR1QIc46GJKsFIYBprHQib5cj5Zr
+         bLXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=/Xij941QtBI1Uy4eu8Bu4KYhGHxK/4BecrqjrKxNLxc=;
-        b=fFaQ4sVxMv98w2uhoXYDAr6OehTsQWJQhE1t+EZJzClGRdPGLk27OI44aziHqT4nq5
-         k0R21IGlq45Cor0E1maqgshtzZBdneK6OsfKjWxSajgORXqJZLJNqLB0APhbLHieUOMM
-         OnHvpn+QyOGpFAsSqRRdWzpfAaOw2pWJ/yDfl03DZDm7JMeRxseJrOeswj3QMo4VYHnu
-         ffUMp8c+qR7szYw72Xu1JK3pp7bVvlfEH89ongI7GZiI2JObFobcyIiFDIsLcgxvgBnM
-         AWCnD0hEgqouNGwYOlh19vb9DLJSp5K3lcnUJzCQnGB5q2SIlfWm+AaHjd7aUHPgeDiG
-         DbNw==
-X-Gm-Message-State: AOAM533DMYSULm5WgSfp+jNY5vGL+c24cBkOfyF117TmIHBOHntOTCOv
-        0uBoUr8NgjtfQOImgWZNh4bADg==
-X-Google-Smtp-Source: ABdhPJzlUE1Um8kito32w8cWRvgp+EMtWNpSCF44SWtHzwom4+CZVI8C0AgTahILZETsub8pzqpAog==
-X-Received: by 2002:a17:90b:3ec4:: with SMTP id rm4mr5349860pjb.88.1637371400077;
-        Fri, 19 Nov 2021 17:23:20 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id k12sm635804pgi.23.2021.11.19.17.23.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Nov 2021 17:23:19 -0800 (PST)
-Date:   Sat, 20 Nov 2021 01:23:16 +0000
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=/oTaTNiB/LMk2r2BJ6BITqZh/xo7HcDPFHBzIC0aTcA=;
+        b=LIY6CXcdUhEUGwI7xatvzR6t8bvDbJD+SfE+EowV0iVSAp1PwhFfGoMw9iKo4CYTBO
+         5y3MhMfrXTYUDUrUqjKvw+LgW9ZenhXYCPWXRXebq7FRA5keh0pTjxFiRAZJAyZ0E6Rp
+         FcMZwMznW9oE9bJt2vuuCyz+gBN8mOS9JicdlcIw6JcKhGblJxpI5A5tzCnKL206DSny
+         1e/49tmTi/PRGD6w1Eq1i7tXPgCvVMRcOUFof57bU7kVt2+hLQjQbQRbgeGklj+ao9IP
+         f2ZejQXFCtry7/LiqfurA41Hq/oNJ1hX3ulUin9bqW8IShKJh2hJCeG7py+HW3w7wdUE
+         YvJw==
+X-Gm-Message-State: AOAM530iFQU0JJPIQBl+aVLRO9okEfeq+6ANWsKmE45a+Uabg3fCN72t
+        eCKYsSMHS/XfucFHq822OgANye6YjBM=
+X-Google-Smtp-Source: ABdhPJw57b08V0yHzRvjztHGvC6NDI5qlJErpxBPqWosR83M55tCfe2R+c09/5jVgLkTn+wpYzGFXH7ZbEQ=
+X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
+ (user=seanjc job=sendgmr) by 2002:a17:90b:3a89:: with SMTP id
+ om9mr5591281pjb.29.1637373010794; Fri, 19 Nov 2021 17:50:10 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Sat, 20 Nov 2021 01:50:08 +0000
+Message-Id: <20211120015008.3780032-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.34.0.rc2.393.gf8c9666880-goog
+Subject: [PATCH] KVM: x86/mmu: Use yield-safe TDP MMU root iter in MMU
+ notifier unmapping
 From:   Sean Christopherson <seanjc@google.com>
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, john.ji@intel.com, susie.li@intel.com,
-        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com
-Subject: Re: [RFC v2 PATCH 01/13] mm/shmem: Introduce F_SEAL_GUEST
-Message-ID: <YZhOBD6vlkBEyq8t@google.com>
-References: <20211119134739.20218-1-chao.p.peng@linux.intel.com>
- <20211119134739.20218-2-chao.p.peng@linux.intel.com>
- <20211119151943.GH876299@ziepe.ca>
- <df11d753-6242-8f7c-cb04-c095f68b41fa@redhat.com>
- <YZf4aAlbyeWw8wUk@google.com>
- <20211119194746.GM876299@ziepe.ca>
- <YZgjc5x6FeBxOqbD@google.com>
- <20211119233312.GO876299@ziepe.ca>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211119233312.GO876299@ziepe.ca>
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 19, 2021, Jason Gunthorpe wrote:
-> On Fri, Nov 19, 2021 at 10:21:39PM +0000, Sean Christopherson wrote:
-> > On Fri, Nov 19, 2021, Jason Gunthorpe wrote:
-> > > On Fri, Nov 19, 2021 at 07:18:00PM +0000, Sean Christopherson wrote:
-> > > > No ideas for the kernel API, but that's also less concerning since
-> > > > it's not set in stone.  I'm also not sure that dedicated APIs for
-> > > > each high-ish level use case would be a bad thing, as the semantics
-> > > > are unlikely to be different to some extent.  E.g. for the KVM use
-> > > > case, there can be at most one guest associated with the fd, but
-> > > > there can be any number of VFIO devices attached to the fd.
-> > > 
-> > > Even the kvm thing is not a hard restriction when you take away
-> > > confidential compute.
-> > > 
-> > > Why can't we have multiple KVMs linked to the same FD if the memory
-> > > isn't encrypted? Sure it isn't actually useful but it should work
-> > > fine.
-> > 
-> > Hmm, true, but I want the KVM semantics to be 1:1 even if memory
-> > isn't encrypted.
-> 
-> That is policy and it doesn't belong hardwired into the kernel.
+Use the yield-safe variant of the TDP MMU iterator when handling an
+unmapping event from the MMU notifier, as most occurences of the event
+allow yielding.
 
-Agreed.  I had a blurb typed up about that policy just being an "exclusive" flag
-in the kernel API that KVM would set when creating a confidential VM, but deleted
-it and forgot to restore it when I went down the tangent of removing userspace
-from the TCB without an assist from hardware/firmware.
+Fixes: e1eed5847b09 ("KVM: x86/mmu: Allow yielding during MMU notifier unmap/zap, if possible")
+Cc: stable@vger.kernel.org
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/mmu/tdp_mmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> Your explanation makes me think that the F_SEAL_XX isn't defined
-> properly. It should be a userspace trap door to prevent any new
-> external accesses, including establishing new kvms, iommu's, rdmas,
-> mmaps, read/write, etc.
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 377a96718a2e..a29ebff1cfa0 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -1031,7 +1031,7 @@ bool kvm_tdp_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range,
+ {
+ 	struct kvm_mmu_page *root;
+ 
+-	for_each_tdp_mmu_root(kvm, root, range->slot->as_id)
++	for_each_tdp_mmu_root_yield_safe(kvm, root, range->slot->as_id, false)
+ 		flush |= zap_gfn_range(kvm, root, range->start, range->end,
+ 				       range->may_block, flush, false);
+ 
+-- 
+2.34.0.rc2.393.gf8c9666880-goog
 
-Hmm, the way I was thinking of it is that it the F_SEAL_XX itself would prevent
-mapping/accessing it from userspace, and that any policy beyond that would be
-done via kernel APIs and thus handled by whatever in-kernel agent can access the
-memory.  E.g. in the confidential VM case, without support for trusted devices,
-KVM would require that it be the sole owner of the file.
