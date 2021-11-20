@@ -2,57 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D479B457B88
-	for <lists+kvm@lfdr.de>; Sat, 20 Nov 2021 05:54:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EDCCF457B85
+	for <lists+kvm@lfdr.de>; Sat, 20 Nov 2021 05:54:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237241AbhKTEzu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Nov 2021 23:55:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54988 "EHLO
+        id S237211AbhKTEzp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Nov 2021 23:55:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236900AbhKTEyq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S236887AbhKTEyq (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 19 Nov 2021 23:54:46 -0500
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E58EC0613B3
-        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 20:51:20 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id h134-20020a25d08c000000b005f5cd3befbbso842023ybg.10
-        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 20:51:20 -0800 (PST)
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FA4CC0613B4
+        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 20:51:21 -0800 (PST)
+Received: by mail-pg1-x54a.google.com with SMTP id r7-20020a63ce47000000b002a5cadd2f25so5035545pgi.9
+        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 20:51:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=5jSoienwu2EmQOFwC5eYL0nZeslWeLTguu5n+4aZuFQ=;
-        b=s4dD3+6VYlLhcv66XkqJRvRBAUDhX5CksHNJcZ+vbxMaHEYu0sTmyfb0wcvMc8LYkL
-         ko8CDsSC0npN1JD/73980BUYUF3JvGw6DCngO4Nfso9fRKj9MHU+CRILd+JnRuqpkCDp
-         bFniUTcdHwF10jSOUa/0Ri1Smv6nRBHh8vWg+T4SrPgc99JCXci+1v8j55BkU8p9JGkI
-         8Wj+ks5XFgKjbiy9jfb229VoP8PYE+xydJSnIMJWxrFt2TZN20ERLnOFenCo7Th/rFHa
-         kk0/w+rN9XXblron+ISNzLbyeEyiPLz9LLjEfogoaLim7wR5e8/QpZ9STPzstAdapj2b
-         h+uw==
+        bh=vpW88SHzUFzeY5wxWhNM8yjnTiJb1vYPDMtlKPeZFAI=;
+        b=cGp/JVnUNA505xbBtYaIj0kTLVg9Gu72kOlFwL/+VoR+2UbeLH+zToWHCo9VNiYu0r
+         Jzyn+QLlxffEwXLmYAaW+NGsqSGIP1txIjQGp5bonnElZKfHMji/sWWpJ+3r+dqqkQGI
+         DoveicQe4HuT0J6dSJI2EcyBpbh6Vlw60oi4LNW58k5P84wKGpSzWbDtbiNK0Kvuv9wz
+         L1wC7A+L64bY6R0XlY0HFDm6eDp5q/GOHn8Ogic4Fgwn5DUeTSJp+9u4sL9n7oKoH3uA
+         EfGzEY7rEJcfxuTE77+yfXcdpj7prbToP4kFo6IeWibUJUVeF5FRnhENPO45lzNu9/Ok
+         P4eQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=5jSoienwu2EmQOFwC5eYL0nZeslWeLTguu5n+4aZuFQ=;
-        b=PuvEpzUQ3bT1Iz+O5ueu8fflqnALt+oY5asy+q9JgtfFM2Z1qrezI/NAMEalujVQKt
-         6ldQ/tvAdXZZwPOtFoTUYCh/mj2Sdonja1CcIN0HemoxavgMt5olW/IdTYF55Iv8bV0C
-         VKR1m9WG7ICb8fcgFs5/YxgQg9HKBBgwDq5f+AgVlNCzqmRH/t8H6rFt+VRbyvu0OQoA
-         usdTawaqseYz90gjYPk5xY+aeTc2dkpxyFvzyd8ZYUUQLzsfjQPHTjpGO190wGlaWSBu
-         Af0DiwC2NIvAYwZfesUXbtrBE2MKplWnAsCgOKgTDOgMT0MNFNR2abk7X2o22OmYn9Kw
-         hPVg==
-X-Gm-Message-State: AOAM532u59BkfVsmmWdoPB6SzV0CQHRDmUEquhbGigFT4pdG33jchd0Y
-        zifwns4tq9AnzXEaWDv+MVaBMdHtv+0=
-X-Google-Smtp-Source: ABdhPJxbdy+I6Hql4u/1zRTRDXVZETSx8iioHLVbrSAgX4s52XvY3QTZxioyq1Jzc9vDvc8T1m94bvU2NO4=
+        bh=vpW88SHzUFzeY5wxWhNM8yjnTiJb1vYPDMtlKPeZFAI=;
+        b=uPJq29YPo3qOHBH4w0qlTvdOUaOIMiux7LqLvyfCEwTapBa1EW7rP/Ba8SN/DZGSB9
+         wD4e/rLd7flLOrWciSDTEopLCcWiYg+RlXuhqGf1eiH+yjvOQm5i9NxlhDYI7uebuOqO
+         fvTKm2ac5X3zCdrR0ejhqciGIi7CWL9tgGP1Fk3kMzOtBe8tKXlNjgKTMWILvf8JDEEM
+         uJ9b3rIsf+Zyx3HsEg5l+GtGffjucmIS8PmyNzIH9NXU35czzMUBARZjZWAWFXOWDFlH
+         OQjRHNzyKOApHQWyeRCIQe2b5E9Ogmc3GgcPAUAQ7vHszMEWjkQIzx5xmGtW8fyJ4jZA
+         HN7A==
+X-Gm-Message-State: AOAM533rwUfED3l0q9UGP7Is4h6IIVF8nsPFOqVTINLVIRSvw/T8tjHj
+        rcWCV/YsXmZYGSxGYOHkQT4n2iQWEKY=
+X-Google-Smtp-Source: ABdhPJwqRpo1Fz2u4UcrRfyLEP+GCsURIO87vhqvcbYCyfL/Rg5Q/gyNo/Tg+Vl/2jEjFjuKQCR8gGLLLOI=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a25:a427:: with SMTP id f36mr41341862ybi.245.1637383879396;
- Fri, 19 Nov 2021 20:51:19 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:902:d4c2:b0:142:76f:3200 with SMTP id
+ o2-20020a170902d4c200b00142076f3200mr83849749plg.53.1637383880914; Fri, 19
+ Nov 2021 20:51:20 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Sat, 20 Nov 2021 04:50:34 +0000
+Date:   Sat, 20 Nov 2021 04:50:35 +0000
 In-Reply-To: <20211120045046.3940942-1-seanjc@google.com>
-Message-Id: <20211120045046.3940942-17-seanjc@google.com>
+Message-Id: <20211120045046.3940942-18-seanjc@google.com>
 Mime-Version: 1.0
 References: <20211120045046.3940942-1-seanjc@google.com>
 X-Mailer: git-send-email 2.34.0.rc2.393.gf8c9666880-goog
-Subject: [PATCH 16/28] KVM: x86/mmu: WARN if old _or_ new SPTE is REMOVED in
- non-atomic path
+Subject: [PATCH 17/28] KVM: x86/mmu: Terminate yield-friendly walk if invalid
+ root observed
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -68,39 +69,52 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-WARN if the new_spte being set by __tdp_mmu_set_spte() is a REMOVED_SPTE,
-which is called out by the comment as being disallowed but not actually
-checked.  Keep the WARN on the old_spte as well, because overwriting a
-REMOVED_SPTE in the non-atomic path is also disallowed (as evidence by
-lack of splats with the existing WARN).
+Stop walking TDP MMU roots if the previous root was invalidated while the
+caller yielded (dropped mmu_lock).  Any effect that the caller wishes to
+be recognized by a root must be made visible before walking the list of
+roots.  Because all roots are invalided when any root is invalidated, if
+the previous root was invalidated, then all roots on the list when the
+caller first started the walk also were invalidated, and any valid roots
+on the list must have been added after the invalidation event.
 
-Fixes: 08f07c800e9d ("KVM: x86/mmu: Flush TLBs after zap in TDP MMU PF handler")
-Cc: Ben Gardon <bgardon@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/tdp_mmu.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/x86/kvm/mmu/tdp_mmu.c | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 085f6b09e5f3..d9524b387221 100644
+index d9524b387221..cc8d021a1ba5 100644
 --- a/arch/x86/kvm/mmu/tdp_mmu.c
 +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -638,13 +638,13 @@ static inline void __tdp_mmu_set_spte(struct kvm *kvm, struct tdp_iter *iter,
- 	lockdep_assert_held_write(&kvm->mmu_lock);
+@@ -140,16 +140,21 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
+ 	lockdep_assert_held(&kvm->mmu_lock);
  
  	/*
--	 * No thread should be using this function to set SPTEs to the
-+	 * No thread should be using this function to set SPTEs to or from the
- 	 * temporary removed SPTE value.
- 	 * If operating under the MMU lock in read mode, tdp_mmu_set_spte_atomic
- 	 * should be used. If operating under the MMU lock in write mode, the
- 	 * use of the removed SPTE should not be necessary.
+-	 * Restart the walk if the previous root was invalidated, which can
+-	 * happen if the caller drops mmu_lock when yielding.  Restarting the
+-	 * walke is necessary because invalidating a root also removes it from
+-	 * tdp_mmu_roots.  Restarting is safe and correct because invalidating
+-	 * a root is done if and only if _all_ roots are invalidated, i.e. any
+-	 * root on tdp_mmu_roots was added _after_ the invalidation event.
++	 * Terminate the walk if the previous root was invalidated, which can
++	 * happen if the caller yielded and dropped mmu_lock.  Because invalid
++	 * roots are removed from tdp_mmu_roots with mmu_lock held for write,
++	 * if the previous root was invalidated, then the invalidation occurred
++	 * after this walk started.  And because _all_ roots are invalidated
++	 * during an invalidation event, any root on tdp_mmu_roots was created
++	 * after the invalidation.  Lastly, any state change being made by the
++	 * caller must be effected before updating SPTEs, otherwise vCPUs could
++	 * simply create new SPTEs with the old state.  Thus, if the previous
++	 * root was invalidated, all valid roots are guaranteed to have been
++	 * created after the desired state change and don't need to be updated.
  	 */
--	WARN_ON(is_removed_spte(iter->old_spte));
-+	WARN_ON(is_removed_spte(iter->old_spte) || is_removed_spte(new_spte));
+ 	if (prev_root && prev_root->role.invalid) {
+ 		kvm_tdp_mmu_put_root(kvm, prev_root, shared);
+-		prev_root = NULL;
++		return NULL;
+ 	}
  
- 	kvm_tdp_mmu_write_spte(iter->sptep, new_spte);
- 
+ 	/*
 -- 
 2.34.0.rc2.393.gf8c9666880-goog
 
