@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 11B3A457B6E
+	by mail.lfdr.de (Postfix) with ESMTP id DF88A457B70
 	for <lists+kvm@lfdr.de>; Sat, 20 Nov 2021 05:53:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237219AbhKTEzB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Nov 2021 23:55:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54996 "EHLO
+        id S237296AbhKTEzH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Nov 2021 23:55:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237012AbhKTEyq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Nov 2021 23:54:46 -0500
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D92BC061370
-        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 20:51:26 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id y17-20020a25bb91000000b005f6b36b28b9so257898ybg.22
-        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 20:51:26 -0800 (PST)
+        with ESMTP id S237032AbhKTEyr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Nov 2021 23:54:47 -0500
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B693BC061373
+        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 20:51:27 -0800 (PST)
+Received: by mail-pj1-x1049.google.com with SMTP id p8-20020a17090a748800b001a6cceee8afso3772345pjk.4
+        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 20:51:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=ET9uUH9CL1d6Cca0FcVDgzduHiKP9j7LmRDv1gQGbwE=;
-        b=BpEuNQ/k9nc/NnkuJPGLVKfzjYSKDe/Hen9rSNiVeablfm+B+HGG73//nyfkG3UjSZ
-         r17JcZizr/6XAXQ81H60Mg0IiI2dfSENqicQj3NCDslrcJRE0J9y5srRlYbE2vlbKFg0
-         eraxf0IisbM+1/igJjQcCgP9ea4Kokxgz0WztAh9GV31ZvGFw7X5HM/pn0t1WLZ4Puu3
-         +Cv/Q0WHVV65CR/vZNAAXRu4hEdmbQJ4psGKjwkznIOC5QfgWCBww5f4bWTDTtXrlW8Y
-         quG3v+XJYh1VllvpEEgyBRTjEhKI9dvMbInHCmYzvqmOuq7qUuhyboVvrQzVizmBwV9T
-         +g6A==
+        bh=j/5ilI+p7xSEigUVpkO5IliCCfj3KTwYuc/+FdZNd0I=;
+        b=ATulbKNjOj7Ye9EesfBxW6g40JQWfDn6lwpwnpNWGasq3apZnfIOvhO31RyDvdnClS
+         dM2/Q3qf8c0Zbmx5QvYpN91D2Fl/9AmTqE2EAGtUvHBuIZDQ37B16puNbZq1Wi8CzPni
+         L51GnK+6THHaMBzJQSnXEP/DxlNc7SJsqk9JtQnLps7V6KxdxlC2dBaxAdMjU3FzpJWC
+         G4ILf/38Td1UdbmQyfYdQR2CtnuXGH9B3oGp9X7KregpsY45zOdUgCR333PeZL99ALwM
+         cj2oHStk+VngvDd5bk9YWbkeNdR42WPgPpiAkuUddFjRoWYlVrOiA0QpnwiqJPdCE49Q
+         iTLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=ET9uUH9CL1d6Cca0FcVDgzduHiKP9j7LmRDv1gQGbwE=;
-        b=HUcCRRSAHWZnpbsr7j2IxATRqnDFjSkz8yFi38Zk0m3IXU37ld+3tHgOc7/GNft8N6
-         WFJlWkMP6ijuEjjtitlZm0EYmwOU/qTSF1gZkshULgOIyhtBV/dT+SL/SMLId4cN4tfY
-         3BEabmBMtLR6J7u909HCuFt/uXXTNUyW9lEuOW/2ZivJQFJWNY7R3QrBZbdfTPo0EE+9
-         EV66sDFa2Xf9bNqVtANnikk+NRxEhZlf5KF6CUPIFFu9Xq88o+YcqWPo6sn0lPw30sRw
-         kDCDMKT2F3ya5BR/sbKR/PBkUdjcSwGVlClyS2rjmW/qPQyRv9eplAhiICZKvAzb3UqE
-         QsIw==
-X-Gm-Message-State: AOAM530EQ+C3c3329vRtYI+ZfgucQSh0RyEOOa2zKJd1hh72qDSkkuHH
-        gB8PiYlyylcNWfrkEh5MGBR0O/86oh0=
-X-Google-Smtp-Source: ABdhPJybmBN7p+6Bmb7Br2BWJmVRY6KsYOmD1KU4uaw6O9EQUdYhQxFuf6+R/6rDdKViycGF71VKR0+46Pc=
+        bh=j/5ilI+p7xSEigUVpkO5IliCCfj3KTwYuc/+FdZNd0I=;
+        b=S/DeWr/mg8V8ceYmO38MNnoE/euYNgPNILQLQ04Ex9x+t6Nt8/Eumqv1A/huYUVq6V
+         EcO6+/DrI8EtfrVAxqrDMNjIM+AOJGvTSGyRyrOc7HXFxvDtpmLVtcAL0KbjCePKTCeV
+         FRi5GWTaadDn6/o2KQEJxPXE1+yZr5xZ0vMtF9Iqyu3oVDvFy/Bx1U1sh6IAtGrKWpEx
+         tAIq3AmqHiRW0AT5DtB19bMn22K1xrl8VVHoYwD6V7VYqeICdnDzHP5B/X0BB0LhuvLA
+         v+RF8CyxSkU4Oyej/Y5+YPbryOZBdgx8F8NxL7lRQ4O7cT9HcB08hDTnaB5Ql//K1neF
+         DmpQ==
+X-Gm-Message-State: AOAM531cFy5/2Iq+NAkkgAF/BggKfL3n3CNUgmFRhZk0tYiOekJh3XSw
+        SwZJAqj1gH0wEAJ9Q8NliRNH+IvOie0=
+X-Google-Smtp-Source: ABdhPJyfieQwpbsF1IWVpOClwVrjHZXYct5Fokol92pQA1zBvl2GvEP1mDpZE1BRaaWab6rPxzg9oiJcXe8=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a25:3252:: with SMTP id y79mr42298126yby.5.1637383885848;
- Fri, 19 Nov 2021 20:51:25 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:902:ea09:b0:141:ec88:4410 with SMTP id
+ s9-20020a170902ea0900b00141ec884410mr85626446plg.51.1637383887252; Fri, 19
+ Nov 2021 20:51:27 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Sat, 20 Nov 2021 04:50:38 +0000
+Date:   Sat, 20 Nov 2021 04:50:39 +0000
 In-Reply-To: <20211120045046.3940942-1-seanjc@google.com>
-Message-Id: <20211120045046.3940942-21-seanjc@google.com>
+Message-Id: <20211120045046.3940942-22-seanjc@google.com>
 Mime-Version: 1.0
 References: <20211120045046.3940942-1-seanjc@google.com>
 X-Mailer: git-send-email 2.34.0.rc2.393.gf8c9666880-goog
-Subject: [PATCH 20/28] KVM: x86/mmu: Use common TDP MMU zap helper for MMU
- notifier unmap hook
+Subject: [PATCH 21/28] KVM: x86/mmu: Add TDP MMU helper to zap a root
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -68,36 +68,58 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use the common TDP MMU zap helper when hanlding an MMU notifier unmap
-event, the two flows are semantically identical.
+Add a small wrapper to handle zapping a specific root.  For now, it's
+little more than syntactic sugar, but in the future it will become a
+unique flow with rules specific to zapping an unreachable root.
 
 No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/tdp_mmu.c | 9 ++-------
- 1 file changed, 2 insertions(+), 7 deletions(-)
+ arch/x86/kvm/mmu/tdp_mmu.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index ea6651e735c2..9449cb5baf0b 100644
+index 9449cb5baf0b..31fb622249e5 100644
 --- a/arch/x86/kvm/mmu/tdp_mmu.c
 +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -1112,13 +1112,8 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- bool kvm_tdp_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range,
- 				 bool flush)
- {
--	struct kvm_mmu_page *root;
--
--	for_each_tdp_mmu_root_yield_safe(kvm, root, range->slot->as_id, false)
--		flush = zap_gfn_range(kvm, root, range->start, range->end,
--				      range->may_block, flush, false);
--
--	return flush;
-+	return __kvm_tdp_mmu_zap_gfn_range(kvm, range->slot->as_id, range->start,
-+					   range->end, range->may_block, flush);
+@@ -79,11 +79,18 @@ static void tdp_mmu_free_sp_rcu_callback(struct rcu_head *head)
+ 	tdp_mmu_free_sp(sp);
  }
  
- typedef bool (*tdp_handler_t)(struct kvm *kvm, struct tdp_iter *iter,
++static bool tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
++			     bool shared)
++{
++	return zap_gfn_range(kvm, root, 0, -1ull, true, false, shared);
++}
++
+ /*
+  * Note, putting a root might sleep, i.e. the caller must have IRQs enabled and
+  * must not explicitly disable preemption (it will be disabled by virtue of
+  * holding mmu_lock, hence the lack of a might_sleep()).
+  */
++
+ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
+ 			  bool shared)
+ {
+@@ -118,7 +125,7 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
+ 	 * should have been zapped by kvm_tdp_mmu_zap_invalidated_roots(), and
+ 	 * inserting new SPTEs under an invalid root is a KVM bug.
+ 	 */
+-	if (zap_gfn_range(kvm, root, 0, -1ull, true, false, shared))
++	if (tdp_mmu_zap_root(kvm, root, shared))
+ 		WARN_ON_ONCE(root->role.invalid);
+ 
+ 	call_rcu(&root->rcu_head, tdp_mmu_free_sp_rcu_callback);
+@@ -923,7 +930,7 @@ void kvm_tdp_mmu_zap_invalidated_roots(struct kvm *kvm,
+ 		 * will still flush on yield, but that's a minor performance
+ 		 * blip and not a functional issue.
+ 		 */
+-		(void)zap_gfn_range(kvm, root, 0, -1ull, true, false, true);
++		(void)tdp_mmu_zap_root(kvm, root, true);
+ 		kvm_tdp_mmu_put_root(kvm, root, true);
+ 	}
+ }
 -- 
 2.34.0.rc2.393.gf8c9666880-goog
 
