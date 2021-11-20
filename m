@@ -2,220 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D1D77457A83
-	for <lists+kvm@lfdr.de>; Sat, 20 Nov 2021 02:55:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 918F0457A86
+	for <lists+kvm@lfdr.de>; Sat, 20 Nov 2021 02:57:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236181AbhKTB6i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 19 Nov 2021 20:58:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44880 "EHLO
+        id S236227AbhKTCAN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 19 Nov 2021 21:00:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235856AbhKTB6f (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 19 Nov 2021 20:58:35 -0500
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F925C061574;
-        Fri, 19 Nov 2021 17:55:33 -0800 (PST)
-Received: by mail-pg1-x536.google.com with SMTP id 200so10090969pga.1;
-        Fri, 19 Nov 2021 17:55:33 -0800 (PST)
+        with ESMTP id S231958AbhKTCAM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 19 Nov 2021 21:00:12 -0500
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB667C061574
+        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 17:57:09 -0800 (PST)
+Received: by mail-pj1-x1049.google.com with SMTP id lt10-20020a17090b354a00b001a649326aedso7607232pjb.5
+        for <kvm@vger.kernel.org>; Fri, 19 Nov 2021 17:57:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=17p5myYhxd1DhZxcAj8FE6tGw2XX7477rU/2jCULHIY=;
-        b=ZaSY/6WDh36yTnPO3funThb8FwveZMT1wex7pJVnn+fZUBC1p9v0eYH/dLMcaB9HXN
-         MF3+NE6ZVSK5hvPAoxzMspYsPJ2/t7RaoPXTPsvrWt1VPXyg5Ydz2GjI4oBEy7/Yqy7v
-         HYQy9OCN4y2ylWkNEWFbXnJk5rad8Lbi2qLJVDzMlyowodFGSanwfsdvKMwc58d8p8ti
-         lBcnLahb0sluOe9H0N/Y2EvQCJY/znuguPHpkNygQujYswQ8EwCxe3PZfzmen+S0jRQj
-         p1KmZszVCG8Z+8Pi76caVM4IZW79xuweOrGg1QQ+HMA4uk2m9TY4cdOQr/zSFw1EvS6+
-         09zQ==
+        d=google.com; s=20210112;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=KrbbWwTYAYpbfb8RZZsX15NqaAxDG8BItIa+niGTlEk=;
+        b=lYEZZ3hpyEBNFBTV+81BSUwcFX40weMuhwWa/i70LhjiSbVrDoiyJQHWJO4hP+XzPm
+         5UOQlwbsOn7X6jc4qWN/T//Q5P6eI0tRQQeb7UPzjVn7I5ZuMuPXgb3MO8BUUjHIfRua
+         bX8cWv+Z+THojJiihUCuUDnAqFD3OlJOgMHw9/x25RERuelld/mZYgQ52sQxaSVVyIfC
+         1bhm9ZXawqYBoSXAGUYIiEqMUeV+T8wOXvbbwAqsLxeX5PSIa1pW+71tx73rVsS8rEuR
+         ASNZL2Px+ELqKlczjR0v107ZOSjf/BXriB+9rJ6wfacI8xrJwspk+1GsqvZXmHewFvlG
+         YkLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=17p5myYhxd1DhZxcAj8FE6tGw2XX7477rU/2jCULHIY=;
-        b=Q1ZWfaON2++xBlmmHgYfcgQ6ZvKN5lGtjc0IFfxCMCFTVmbML9nt6nWHkAV+6NpRcS
-         p4iHYbh4xhTaiyT9k1t2MqTq3IF/WUve0NX7XQTTksjNQJCpAuVZssRhKfOVICjI4Efo
-         q9l3EnbyDgMxi1Sz+i0VOJnUJWO37ouMppKYTt8F8hPVvCwQKm9C7B7Z+qiqR4zVipn2
-         LmLQVxGrDAjO7zSAhYcEx5TssAmZoA57azNZOVP436R66x9y3N0PTVJYaObyAz+TyTln
-         InEYZarup/+AS7KTWTz16Khfp+h/mWaBKR7zx2KMk3ysXtpbiIW+D+j2p0056znPLoGH
-         7vmg==
-X-Gm-Message-State: AOAM532iOjovnnxBI4MuRqEpYYWjoM8oSb361hAMobkkzvlLFMswFA91
-        5T+6qyaYbqnpxuJ5W1Oq5XA=
-X-Google-Smtp-Source: ABdhPJxqfGSAOl+n1hw3lcxU/J2v5Bgk2T0qOLxz/60dcuVIoDGE4CcngM8bedIUT1nnDOyJlWJAjw==
-X-Received: by 2002:a62:2503:0:b0:4a2:b772:25ac with SMTP id l3-20020a622503000000b004a2b77225acmr43341008pfl.53.1637373332481;
-        Fri, 19 Nov 2021 17:55:32 -0800 (PST)
-Received: from localhost (176.222.229.35.bc.googleusercontent.com. [35.229.222.176])
-        by smtp.gmail.com with ESMTPSA id x64sm845844pfd.151.2021.11.19.17.55.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Nov 2021 17:55:31 -0800 (PST)
-Date:   Sat, 20 Nov 2021 09:55:29 +0800
-From:   Yao Yuan <yaoyuan0329os@gmail.com>
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=KrbbWwTYAYpbfb8RZZsX15NqaAxDG8BItIa+niGTlEk=;
+        b=LX0lv8VLgFl7HUS+Zk4fxbiMD12SgEHuTQ0RGU2YGub/gJ8+lwjOcOi9zD1JJP4ron
+         axihqfhla4aahIJdRgK3Ntub0YhIVIVpgJprCR1U2T6Av2M+AjrKtdXVqkGTBnRpQYwI
+         mO/SuGMZEJufIH0hi37ZIbeT46ZTqL/G0ENY05wUzsPzM+uoEdarclC54I/REwioM3lH
+         8Dqr2qJStZMk5YzZwJVNOPfMdEpnUuz7h3yvLkiiVWX5cKVtIbikiKS4AtEI2MOsxZg9
+         4yFgYzO1W8Lnz9RJvpkBL2apg4ED/SrfjKP24ifwYLibKcUZRca4VdkLfg4noGQiCbbz
+         N36w==
+X-Gm-Message-State: AOAM533yWHOI49cx/GNP304ehSEePzSJdfEZ6gpTp0TE+o07zuIoMdAD
+        +XIzSJWHTZuGKT/hrPtP8jWqRx1eo0E=
+X-Google-Smtp-Source: ABdhPJyIJ5Q2QfuuEejoxgJn4d6h17tsial0wLdeo15vwuLRl9OOZzUoxXtFqmzpF0H8R9owtG4Kh6eckdk=
+X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:390c:: with SMTP id
+ y12mr664126pjb.0.1637373428916; Fri, 19 Nov 2021 17:57:08 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Sat, 20 Nov 2021 01:57:06 +0000
+Message-Id: <20211120015706.3830341-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.34.0.rc2.393.gf8c9666880-goog
+Subject: [PATCH] KVM: x86/mmu: Handle "default" period when selectively waking kthread
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, john.ji@intel.com, susie.li@intel.com,
-        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
-        david@redhat.com
-Subject: Re: [RFC v2 PATCH 07/13] KVM: Handle page fault for fd based memslot
-Message-ID: <20211120015529.w23fg2df3fqs4ov5@sapienza>
-References: <20211119134739.20218-1-chao.p.peng@linux.intel.com>
- <20211119134739.20218-8-chao.p.peng@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211119134739.20218-8-chao.p.peng@linux.intel.com>
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Junaid Shahid <junaids@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 19, 2021 at 09:47:33PM +0800, Chao Peng wrote:
-> Current code assume the private memory is persistent and KVM can check
-> with backing store to see if private memory exists at the same address
-> by calling get_pfn(alloc=false).
->
-> Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> ---
->  arch/x86/kvm/mmu/mmu.c | 75 ++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 73 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 40377901598b..cd5d1f923694 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -3277,6 +3277,9 @@ int kvm_mmu_max_mapping_level(struct kvm *kvm,
->  	if (max_level == PG_LEVEL_4K)
->  		return PG_LEVEL_4K;
->
-> +	if (memslot_is_memfd(slot))
-> +		return max_level;
-> +
->  	host_level = host_pfn_mapping_level(kvm, gfn, pfn, slot);
->  	return min(host_level, max_level);
->  }
-> @@ -4555,6 +4558,65 @@ static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->  				  kvm_vcpu_gfn_to_hva(vcpu, gfn), &arch);
->  }
->
-> +static bool kvm_faultin_pfn_memfd(struct kvm_vcpu *vcpu,
-> +				  struct kvm_page_fault *fault, int *r)
-> +{	int order;
-> +	kvm_pfn_t pfn;
-> +	struct kvm_memory_slot *slot = fault->slot;
-> +	bool priv_gfn = kvm_vcpu_is_private_gfn(vcpu, fault->addr >> PAGE_SHIFT);
-> +	bool priv_slot_exists = memslot_has_private(slot);
-> +	bool priv_gfn_exists = false;
-> +	int mem_convert_type;
-> +
-> +	if (priv_gfn && !priv_slot_exists) {
-> +		*r = RET_PF_INVALID;
-> +		return true;
-> +	}
-> +
-> +	if (priv_slot_exists) {
-> +		pfn = slot->memfd_ops->get_pfn(slot, slot->priv_file,
-> +					       fault->gfn, false, &order);
-> +		if (pfn >= 0)
-> +			priv_gfn_exists = true;
+Account for the '0' being a default, "let KVM choose" period, when
+determining whether or not the recovery worker needs to be awakened in
+response to userspace reducing the period.  Failure to do so results in
+the worker not being awakened properly, e.g. when changing the period
+from '0' to any small-ish value.
 
-Need "fault->pfn = pfn" here if actual pfn is returned in
-get_pfn(alloc=false) case for private page case.
+Fixes: 4dfe4f40d845 ("kvm: x86: mmu: Make NX huge page recovery period configurable")
+Cc: stable@vger.kernel.org
+Cc: Junaid Shahid <junaids@google.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 48 +++++++++++++++++++++++++++++-------------
+ 1 file changed, 33 insertions(+), 15 deletions(-)
 
-> +	}
-> +
-> +	if (priv_gfn && !priv_gfn_exists) {
-> +		mem_convert_type = KVM_EXIT_MEM_MAP_PRIVATE;
-> +		goto out_convert;
-> +	}
-> +
-> +	if (!priv_gfn && priv_gfn_exists) {
-> +		slot->memfd_ops->put_pfn(pfn);
-> +		mem_convert_type = KVM_EXIT_MEM_MAP_SHARED;
-> +		goto out_convert;
-> +	}
-> +
-> +	if (!priv_gfn) {
-> +		pfn = slot->memfd_ops->get_pfn(slot, slot->file,
-> +					       fault->gfn, true, &order);
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 8f0035517450..db7e1ad4d046 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -6165,23 +6165,46 @@ void kvm_mmu_module_exit(void)
+ 	mmu_audit_disable();
+ }
+ 
++/*
++ * Calculate the effective recovery period, accounting for '0' meaning "let KVM
++ * select a period of ~1 hour per page".  Returns true if recovery is enabled.
++ */
++static bool calc_nx_huge_pages_recovery_period(uint *period)
++{
++	/*
++	 * Use READ_ONCE to get the params, this may be called outside of the
++	 * param setters, e.g. by the kthread to compute its next timeout.
++	 */
++	bool enabled = READ_ONCE(nx_huge_pages);
++	uint ratio = READ_ONCE(nx_huge_pages_recovery_ratio);
++
++	if (!enabled || !ratio)
++		return false;
++
++	*period = READ_ONCE(nx_huge_pages_recovery_period_ms);
++	if (!*period) {
++		/* Make sure the period is not less than one second.  */
++		ratio = min(ratio, 3600u);
++		*period = 60 * 60 * 1000 / ratio;
++	}
++	return true;
++}
++
+ static int set_nx_huge_pages_recovery_param(const char *val, const struct kernel_param *kp)
+ {
+ 	bool was_recovery_enabled, is_recovery_enabled;
+ 	uint old_period, new_period;
+ 	int err;
+ 
+-	was_recovery_enabled = nx_huge_pages_recovery_ratio;
+-	old_period = nx_huge_pages_recovery_period_ms;
++	was_recovery_enabled = calc_nx_huge_pages_recovery_period(&old_period);
+ 
+ 	err = param_set_uint(val, kp);
+ 	if (err)
+ 		return err;
+ 
+-	is_recovery_enabled = nx_huge_pages_recovery_ratio;
+-	new_period = nx_huge_pages_recovery_period_ms;
++	is_recovery_enabled = calc_nx_huge_pages_recovery_period(&new_period);
+ 
+-	if (READ_ONCE(nx_huge_pages) && is_recovery_enabled &&
++	if (is_recovery_enabled &&
+ 	    (!was_recovery_enabled || old_period > new_period)) {
+ 		struct kvm *kvm;
+ 
+@@ -6245,18 +6268,13 @@ static void kvm_recover_nx_lpages(struct kvm *kvm)
+ 
+ static long get_nx_lpage_recovery_timeout(u64 start_time)
+ {
+-	uint ratio = READ_ONCE(nx_huge_pages_recovery_ratio);
+-	uint period = READ_ONCE(nx_huge_pages_recovery_period_ms);
++	bool enabled;
++	uint period;
+ 
+-	if (!period && ratio) {
+-		/* Make sure the period is not less than one second.  */
+-		ratio = min(ratio, 3600u);
+-		period = 60 * 60 * 1000 / ratio;
+-	}
++	enabled = calc_nx_huge_pages_recovery_period(&period);
+ 
+-	return READ_ONCE(nx_huge_pages) && ratio
+-		? start_time + msecs_to_jiffies(period) - get_jiffies_64()
+-		: MAX_SCHEDULE_TIMEOUT;
++	return enabled ? start_time + msecs_to_jiffies(period) - get_jiffies_64()
++		       : MAX_SCHEDULE_TIMEOUT;
+ }
+ 
+ static int kvm_nx_lpage_recovery_worker(struct kvm *kvm, uintptr_t data)
+-- 
+2.34.0.rc2.393.gf8c9666880-goog
 
-Need "fault->pfn = pfn" here, because he pfn for
-share page is getted here only.
-
-> +		if (fault->pfn < 0) {
-> +			*r = RET_PF_INVALID;
-> +			return true;
-> +		}
-> +	}
-> +
-> +	if (slot->flags & KVM_MEM_READONLY)
-> +		fault->map_writable = false;
-> +	if (order == 0)
-> +		fault->max_level = PG_LEVEL_4K;
-> +
-> +	return false;
-> +
-> +out_convert:
-> +	vcpu->run->exit_reason = KVM_EXIT_MEMORY_ERROR;
-> +	vcpu->run->mem.type = mem_convert_type;
-> +	vcpu->run->mem.u.map.gpa = fault->gfn << PAGE_SHIFT;
-> +	vcpu->run->mem.u.map.size = PAGE_SIZE;
-> +	fault->pfn = -1;
-> +	*r = -1;
-> +	return true;
-> +}
-> +
->  static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault, int *r)
->  {
->  	struct kvm_memory_slot *slot = fault->slot;
-> @@ -4596,6 +4658,9 @@ static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
->  		}
->  	}
->
-> +	if (memslot_is_memfd(slot))
-> +		return kvm_faultin_pfn_memfd(vcpu, fault, r);
-> +
->  	async = false;
->  	fault->pfn = __gfn_to_pfn_memslot(slot, fault->gfn, false, &async,
->  					  fault->write, &fault->map_writable,
-> @@ -4660,7 +4725,8 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
->  	else
->  		write_lock(&vcpu->kvm->mmu_lock);
->
-> -	if (fault->slot && mmu_notifier_retry_hva(vcpu->kvm, mmu_seq, fault->hva))
-> +	if (fault->slot && !memslot_is_memfd(fault->slot) &&
-> +			mmu_notifier_retry_hva(vcpu->kvm, mmu_seq, fault->hva))
->  		goto out_unlock;
->  	r = make_mmu_pages_available(vcpu);
->  	if (r)
-> @@ -4676,7 +4742,12 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
->  		read_unlock(&vcpu->kvm->mmu_lock);
->  	else
->  		write_unlock(&vcpu->kvm->mmu_lock);
-> -	kvm_release_pfn_clean(fault->pfn);
-> +
-> +	if (memslot_is_memfd(fault->slot))
-> +		fault->slot->memfd_ops->put_pfn(fault->pfn);
-> +	else
-> +		kvm_release_pfn_clean(fault->pfn);
-> +
->  	return r;
->  }
->
-> --
-> 2.17.1
->
