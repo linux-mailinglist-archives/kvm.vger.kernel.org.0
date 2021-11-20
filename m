@@ -2,303 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1FBEC457D01
-	for <lists+kvm@lfdr.de>; Sat, 20 Nov 2021 11:28:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 36969457D3C
+	for <lists+kvm@lfdr.de>; Sat, 20 Nov 2021 12:20:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236993AbhKTKbr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 20 Nov 2021 05:31:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43136 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230203AbhKTKbj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 20 Nov 2021 05:31:39 -0500
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 069FAC061757;
-        Sat, 20 Nov 2021 02:28:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
-        Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=mkQSxNiO24zNj6PGwmIB/b9M7//rpOKLCivjYBWhmLk=; b=Xq+TKkth6UGodwC73698VUUlg7
-        XaF+tHM0Nlbri4MMM3zhIHH4iVFBGizeCvqtcoCTQjtzolu8/j4b0EWXksiWfweSzwKvWn2qeCmQ8
-        tVv0OxDJf6neQTb9+hvnu3mcxe2Xogw6e3lQogSWyUfXCk7Ow9LPwJVMA14SPu4RQT5RN5MjWabv6
-        8mVy1AKQKTVA9kPyTEi8VcCTAFcPULt6mEEScYsRuzttf3QmjQCpmmUyZ514KUlPKpUplHlYkbjCg
-        P9d28LBw8RTMs+QDZjKa4yh6FtrIihxtdYWEFXzLLdCaRdUZ3K2eKqbNvmD8msBDBbqMzka4kfJnt
-        3nqfee8Q==;
-Received: from i7.infradead.org ([2001:8b0:10b:1:21e:67ff:fecb:7a92])
-        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1moNbR-00H55z-IH; Sat, 20 Nov 2021 10:28:13 +0000
-Received: from dwoodhou by i7.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1moNbR-0002KZ-4L; Sat, 20 Nov 2021 10:28:13 +0000
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>
-Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        "jmattson @ google . com" <jmattson@google.com>,
-        "wanpengli @ tencent . com" <wanpengli@tencent.com>,
-        "seanjc @ google . com" <seanjc@google.com>,
-        "vkuznets @ redhat . com" <vkuznets@redhat.com>,
-        "mtosatti @ redhat . com" <mtosatti@redhat.com>,
-        "joro @ 8bytes . org" <joro@8bytes.org>, karahmed@amazon.com,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
+        id S237329AbhKTLXx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 20 Nov 2021 06:23:53 -0500
+Received: from mga07.intel.com ([134.134.136.100]:55992 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231161AbhKTLXx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 20 Nov 2021 06:23:53 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10173"; a="297974069"
+X-IronPort-AV: E=Sophos;i="5.87,250,1631602800"; 
+   d="scan'208";a="297974069"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2021 03:20:49 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.87,250,1631602800"; 
+   d="scan'208";a="496214393"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.118]) ([10.239.159.118])
+  by orsmga007.jf.intel.com with ESMTP; 20 Nov 2021 03:20:44 -0800
+Cc:     baolu.lu@linux.intel.com, "Tian, Kevin" <kevin.tian@intel.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        "Raj, Ashok" <ashok.raj@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "rafael@kernel.org" <rafael@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Cornelia Huck <cohuck@redhat.com>,
         Will Deacon <will@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org
-Subject: [PATCH v4 11/11] KVM: x86: First attempt at converting nested virtual APIC page to gpc
-Date:   Sat, 20 Nov 2021 10:28:10 +0000
-Message-Id: <20211120102810.8858-12-dwmw2@infradead.org>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20211120102810.8858-1-dwmw2@infradead.org>
-References: <20211120102810.8858-1-dwmw2@infradead.org>
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        "Pan, Jacob jun" <jacob.jun.pan@intel.com>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Diana Craciun <diana.craciun@oss.nxp.com>
+Subject: Re: [PATCH 01/11] iommu: Add device dma ownership set/release
+ interfaces
+To:     =?UTF-8?B?SsO2cmcgUsO2ZGVs?= <joro@8bytes.org>
+References: <20211115020552.2378167-1-baolu.lu@linux.intel.com>
+ <20211115020552.2378167-2-baolu.lu@linux.intel.com>
+ <YZJdJH4AS+vm0j06@infradead.org>
+ <cc7ce6f4-b1ec-49ef-e245-ab6c330154c2@linux.intel.com>
+ <20211116134603.GA2105516@nvidia.com>
+ <BN9PR11MB5433639E43C37C5D2462BD718C9B9@BN9PR11MB5433.namprd11.prod.outlook.com>
+ <20211118133325.GO2105516@nvidia.com>
+ <BN9PR11MB5433E5B63E575E2232DFBBE48C9C9@BN9PR11MB5433.namprd11.prod.outlook.com>
+ <75100dfd-9cfe-9f3d-531d-b4d30de03e76@linux.intel.com>
+ <20211119150612.jhsvsbzisvux2lga@8bytes.org>
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+Message-ID: <48cf6b2b-28ee-178d-6471-460e781e7b20@linux.intel.com>
+Date:   Sat, 20 Nov 2021 19:16:13 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
+In-Reply-To: <20211119150612.jhsvsbzisvux2lga@8bytes.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Sender: David Woodhouse <dwmw2@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: David Woodhouse <dwmw@amazon.co.uk>
+Hi Joerg,
 
-This is what evolved during the discussion at
-https://lore.kernel.org/kvm/960E233F-EC0B-4FB5-BA2E-C8D2CCB38B12@infradead.org/T/#m11d75fcfe2da357ec1dabba0d0e3abb91fd13665
+On 11/19/21 11:06 PM, Jörg Rödel wrote:
+> On Fri, Nov 19, 2021 at 07:14:10PM +0800, Lu Baolu wrote:
+>> The singleton group requirement for iommu_attach/detach_device() was
+>> added by below commit:
+>>
+>> commit 426a273834eae65abcfc7132a21a85b3151e0bce
+>> Author: Joerg Roedel <jroedel@suse.de>
+>> Date:   Thu May 28 18:41:30 2015 +0200
+>>
+>>      iommu: Limit iommu_attach/detach_device to devices with their own group
+>>
+>>      This patch changes the behavior of the iommu_attach_device
+>>      and iommu_detach_device functions. With this change these
+>>      functions only work on devices that have their own group.
+>>      For all other devices the iommu_group_attach/detach
+>>      functions must be used.
+>>
+>>      Signed-off-by: Joerg Roedel <jroedel@suse.de>
+>>
+>> Joerg,can you please shed some light on the background of this
+>> requirement? Does above idea of transition from singleton group
+>> to group with single driver bound make sense to you?
+> 
+> This change came to be because the iommu_attach/detach_device()
+> interface doesn't fit well into a world with iommu-groups. Devices
+> within a group are by definition not isolated between each other, so
+> they must all be in the same address space (== iommu_domain). So it
+> doesn't make sense to allow attaching a single device within a group to
+> a different iommu_domain.
 
-As discussed, an alternative approach might be to augment
-kvm_arch_memslots_updated() to raise KVM_REQ_GET_NESTED_STATE_PAGES to
-each vCPU (and make that req only do anything on a given vCPU if that
-vCPU is actually in L2 guest mode).
+Thanks for the explanation. It's very helpful. There seems to be a lot
+of discussions around this, but I didn't see any meaningful reasons to
+break the assumption of "all devices in a group being in a same address
+space".
 
-That would mean the reload gets actively triggered even on memslot
-changes rather than only on MMU notifiers as is the case now. It could
-*potentially* mean we can drop the new 'check_guest_maps' function.
+Best regards,
+baolu
 
-The 'check_guest_maps' function could be a lot simpler than it is,
-though. It only really needs to get kvm->memslots->generation, then
-check each gpc->generation against that, and each gpc->valid.
-
-Also I suspect we *shouldn't* destroy the virtual_apic_cache in
-nested_vmx_vmexit(). We can just leave it there for next time the
-vCPU enters guest mode. If it happens to get invalidated in the
-meantime, that's fine and we'll refresh it on the way back in.
-We probably *would* want to actively do something on memslot changes
-in that case though, to ensure that even if the vCPU isn't in guest
-mode any more, we *release* the cached page.
-
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
----
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/vmx/nested.c       | 50 ++++++++++++++++++++++++++++-----
- arch/x86/kvm/vmx/vmx.c          | 12 +++++---
- arch/x86/kvm/vmx/vmx.h          |  2 +-
- arch/x86/kvm/x86.c              | 10 +++++++
- 5 files changed, 63 insertions(+), 12 deletions(-)
-
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 6ea2446ab851..24f6f3e2de47 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1511,6 +1511,7 @@ struct kvm_x86_nested_ops {
- 	int (*enable_evmcs)(struct kvm_vcpu *vcpu,
- 			    uint16_t *vmcs_version);
- 	uint16_t (*get_evmcs_version)(struct kvm_vcpu *vcpu);
-+	void (*check_guest_maps)(struct kvm_vcpu *vcpu);
- };
- 
- struct kvm_x86_init_ops {
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 1e2f66951566..01bfabcfbbce 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -309,7 +309,7 @@ static void free_nested(struct kvm_vcpu *vcpu)
- 		kvm_release_page_clean(vmx->nested.apic_access_page);
- 		vmx->nested.apic_access_page = NULL;
- 	}
--	kvm_vcpu_unmap(vcpu, &vmx->nested.virtual_apic_map, true);
-+	kvm_gfn_to_pfn_cache_destroy(vcpu->kvm, &vmx->nested.virtual_apic_cache);
- 	kvm_vcpu_unmap(vcpu, &vmx->nested.pi_desc_map, true);
- 	vmx->nested.pi_desc = NULL;
- 
-@@ -3179,10 +3179,12 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
- 	}
- 
- 	if (nested_cpu_has(vmcs12, CPU_BASED_TPR_SHADOW)) {
--		map = &vmx->nested.virtual_apic_map;
-+		struct gfn_to_pfn_cache *gpc = &vmx->nested.virtual_apic_cache;
- 
--		if (!kvm_vcpu_map(vcpu, gpa_to_gfn(vmcs12->virtual_apic_page_addr), map)) {
--			vmcs_write64(VIRTUAL_APIC_PAGE_ADDR, pfn_to_hpa(map->pfn));
-+ 		if (!kvm_gfn_to_pfn_cache_init(vcpu->kvm, gpc, vcpu, true, true,
-+					       vmcs12->virtual_apic_page_addr,
-+					       PAGE_SIZE, true)) {
-+			vmcs_write64(VIRTUAL_APIC_PAGE_ADDR, pfn_to_hpa(gpc->pfn));
- 		} else if (nested_cpu_has(vmcs12, CPU_BASED_CR8_LOAD_EXITING) &&
- 		           nested_cpu_has(vmcs12, CPU_BASED_CR8_STORE_EXITING) &&
- 			   !nested_cpu_has2(vmcs12, SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES)) {
-@@ -3207,6 +3209,9 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
- 	if (nested_cpu_has_posted_intr(vmcs12)) {
- 		map = &vmx->nested.pi_desc_map;
- 
-+		if (kvm_vcpu_mapped(map))
-+			kvm_vcpu_unmap(vcpu, map, true);
-+
- 		if (!kvm_vcpu_map(vcpu, gpa_to_gfn(vmcs12->posted_intr_desc_addr), map)) {
- 			vmx->nested.pi_desc =
- 				(struct pi_desc *)(((void *)map->hva) +
-@@ -3251,6 +3256,29 @@ static bool vmx_get_nested_state_pages(struct kvm_vcpu *vcpu)
- 	return true;
- }
- 
-+static void nested_vmx_check_guest_maps(struct kvm_vcpu *vcpu)
-+{
-+	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
-+	struct vcpu_vmx *vmx = to_vmx(vcpu);
-+	struct gfn_to_pfn_cache *gpc;
-+
-+	int valid;
-+
-+	if (nested_cpu_has_posted_intr(vmcs12)) {
-+		gpc = &vmx->nested.virtual_apic_cache;
-+
-+		read_lock(&gpc->lock);
-+		valid = kvm_gfn_to_pfn_cache_check(vcpu->kvm, gpc,
-+						   vmcs12->virtual_apic_page_addr,
-+						   PAGE_SIZE);
-+		read_unlock(&gpc->lock);
-+		if (!valid) {
-+			kvm_make_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu);
-+			return;
-+		}
-+	}
-+}
-+
- static int nested_vmx_write_pml_buffer(struct kvm_vcpu *vcpu, gpa_t gpa)
- {
- 	struct vmcs12 *vmcs12;
-@@ -3749,9 +3777,15 @@ static int vmx_complete_nested_posted_interrupt(struct kvm_vcpu *vcpu)
- 
- 	max_irr = find_last_bit((unsigned long *)vmx->nested.pi_desc->pir, 256);
- 	if (max_irr != 256) {
--		vapic_page = vmx->nested.virtual_apic_map.hva;
--		if (!vapic_page)
-+		struct gfn_to_pfn_cache *gpc = &vmx->nested.virtual_apic_cache;
-+
-+		read_lock(&gpc->lock);
-+		if (!kvm_gfn_to_pfn_cache_check(vcpu->kvm, gpc, gpc->gpa, PAGE_SIZE)) {
-+			read_unlock(&gpc->lock);
- 			goto mmio_needed;
-+		}
-+
-+		vapic_page = gpc->khva;
- 
- 		__kvm_apic_update_irr(vmx->nested.pi_desc->pir,
- 			vapic_page, &max_irr);
-@@ -3761,6 +3795,7 @@ static int vmx_complete_nested_posted_interrupt(struct kvm_vcpu *vcpu)
- 			status |= (u8)max_irr;
- 			vmcs_write16(GUEST_INTR_STATUS, status);
- 		}
-+		read_unlock(&gpc->lock);
- 	}
- 
- 	nested_mark_vmcs12_pages_dirty(vcpu);
-@@ -4581,7 +4616,7 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
- 		kvm_release_page_clean(vmx->nested.apic_access_page);
- 		vmx->nested.apic_access_page = NULL;
- 	}
--	kvm_vcpu_unmap(vcpu, &vmx->nested.virtual_apic_map, true);
-+	kvm_gfn_to_pfn_cache_unmap(vcpu->kvm, &vmx->nested.virtual_apic_cache);
- 	kvm_vcpu_unmap(vcpu, &vmx->nested.pi_desc_map, true);
- 	vmx->nested.pi_desc = NULL;
- 
-@@ -6756,4 +6791,5 @@ struct kvm_x86_nested_ops vmx_nested_ops = {
- 	.write_log_dirty = nested_vmx_write_pml_buffer,
- 	.enable_evmcs = nested_enable_evmcs,
- 	.get_evmcs_version = nested_get_evmcs_version,
-+	.check_guest_maps = nested_vmx_check_guest_maps,
- };
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index ba66c171d951..6c61faef86d3 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -3839,19 +3839,23 @@ void pt_update_intercept_for_msr(struct kvm_vcpu *vcpu)
- static bool vmx_guest_apic_has_interrupt(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
--	void *vapic_page;
-+	struct gfn_to_pfn_cache *gpc = &vmx->nested.virtual_apic_cache;
- 	u32 vppr;
- 	int rvi;
- 
- 	if (WARN_ON_ONCE(!is_guest_mode(vcpu)) ||
- 		!nested_cpu_has_vid(get_vmcs12(vcpu)) ||
--		WARN_ON_ONCE(!vmx->nested.virtual_apic_map.gfn))
-+		WARN_ON_ONCE(gpc->gpa == GPA_INVALID))
- 		return false;
- 
- 	rvi = vmx_get_rvi();
- 
--	vapic_page = vmx->nested.virtual_apic_map.hva;
--	vppr = *((u32 *)(vapic_page + APIC_PROCPRI));
-+	read_lock(&gpc->lock);
-+	if (!kvm_gfn_to_pfn_cache_check(vcpu->kvm, gpc, gpc->gpa, PAGE_SIZE))
-+		vppr = *((u32 *)(gpc->khva + APIC_PROCPRI));
-+	else
-+		vppr = 0xff;
-+	read_unlock(&gpc->lock);
- 
- 	return ((rvi & 0xf0) > (vppr & 0xf0));
- }
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 4df2ac24ffc1..8364e7fc92a0 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -195,7 +195,7 @@ struct nested_vmx {
- 	 * pointers, so we must keep them pinned while L2 runs.
- 	 */
- 	struct page *apic_access_page;
--	struct kvm_host_map virtual_apic_map;
-+	struct gfn_to_pfn_cache virtual_apic_cache;
- 	struct kvm_host_map pi_desc_map;
- 
- 	struct kvm_host_map msr_bitmap_map;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index fa56c590d8db..01d20db5b1f4 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9739,6 +9739,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 
- 		if (kvm_check_request(KVM_REQ_UPDATE_CPU_DIRTY_LOGGING, vcpu))
- 			static_call(kvm_x86_update_cpu_dirty_logging)(vcpu);
-+		if (kvm_check_request(KVM_REQ_GPC_INVALIDATE, vcpu))
-+			; /* Nothing to do. It just wanted to wake us */
- 	}
- 
- 	if (kvm_check_request(KVM_REQ_EVENT, vcpu) || req_int_win ||
-@@ -9785,6 +9787,14 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 	local_irq_disable();
- 	vcpu->mode = IN_GUEST_MODE;
- 
-+	/*
-+	 * If the guest requires direct access to mapped L1 pages, check
-+	 * the caches are valid. Will raise KVM_REQ_GET_NESTED_STATE_PAGES
-+	 * to go and revalidate them, if necessary.
-+	 */
-+	if (is_guest_mode(vcpu) && kvm_x86_ops.nested_ops->check_guest_maps)
-+		kvm_x86_ops.nested_ops->check_guest_maps(vcpu);
-+
- 	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
- 
- 	/*
--- 
-2.31.1
-
+> 
+> I know that in theory it is safe to allow devices within a group to be
+> in different domains because there iommu-groups catch multiple
+> non-isolation cases:
+> 
+> 	1) Devices behind a non-ACS capable bridge or multiple functions
+> 	   of a PCI device. Here it is safe to put the devices into
+> 	   different iommu-domains as long as all affected devices are
+> 	   controlled by the same owner.
+> 
+> 	2) Devices which share a single request-id and can't be
+> 	   differentiated by the IOMMU hardware. These always need to be
+> 	   in the same iommu_domain.
+> 
+> To lift the single-domain-per-group requirement the iommu core code
+> needs to learn the difference between the two cases above.
+> 
+> Regards,
+> 
+> 	Joerg
+> 
