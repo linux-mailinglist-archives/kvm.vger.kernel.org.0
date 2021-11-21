@@ -2,226 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E18AA458372
-	for <lists+kvm@lfdr.de>; Sun, 21 Nov 2021 13:37:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C445458388
+	for <lists+kvm@lfdr.de>; Sun, 21 Nov 2021 13:55:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238260AbhKUMki (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 21 Nov 2021 07:40:38 -0500
-Received: from mail.kernel.org ([198.145.29.99]:44266 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238251AbhKUMkh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 21 Nov 2021 07:40:37 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 72CE460555;
-        Sun, 21 Nov 2021 12:37:32 +0000 (UTC)
-Received: from ip-185-104-136-29.ptr.icomera.net ([185.104.136.29] helo=wait-a-minute.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1mom66-006sRS-BV; Sun, 21 Nov 2021 12:37:30 +0000
-Date:   Sun, 21 Nov 2021 12:37:30 +0000
-Message-ID: <87h7c5sn05.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Reiji Watanabe <reijiw@google.com>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
+        id S238248AbhKUM6U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 21 Nov 2021 07:58:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46514 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238161AbhKUM6R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 21 Nov 2021 07:58:17 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7514EC061714;
+        Sun, 21 Nov 2021 04:55:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
+        Content-Type:MIME-Version:Message-Id:Date:Subject:Cc:To:From:Reply-To:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=IgNSXNY2TpIuc5DjPBel8XiPwVYxmuy/OdeenPYbteI=; b=Vu9vRhXy7bRTzRn551qpp2Sl2x
+        zCtr/gMJ4DW8RwOHmzxJxzo7vDlzWes4Hqvf8OhYVQvu8TgUnPYAkp+B7dwWJGxd4qa98SoZOYuWV
+        5bhHnd4moc54T+xIGj//+Ct1psMVjPk+Pdg32UPn83uTEm30Y2xWCWDUWG7zzQA8A9jiya3kArabf
+        lHB8fd0S9GhuLNI6EX6C0akf58/mnAKpVwdY1c0zqvxOiNqI8W9eVWQtmP2IMzGzdVo5+UUmKjlgh
+        pghg+NjWVpziG/dkvqPqodD+6axkmt7LKPKsHXKEoxT0UziAnHuI2HqKcy6sNMq8iwkWYu+xYx/tX
+        kWDa6thg==;
+Received: from i7.infradead.org ([2001:8b0:10b:1:21e:67ff:fecb:7a92])
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1momMv-00C3xt-Mo; Sun, 21 Nov 2021 12:54:54 +0000
+Received: from dwoodhou by i7.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1momMv-0002Vv-R2; Sun, 21 Nov 2021 12:54:53 +0000
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>
+Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        "jmattson @ google . com" <jmattson@google.com>,
+        "wanpengli @ tencent . com" <wanpengli@tencent.com>,
+        "seanjc @ google . com" <seanjc@google.com>,
+        "vkuznets @ redhat . com" <vkuznets@redhat.com>,
+        "mtosatti @ redhat . com" <mtosatti@redhat.com>,
+        "joro @ 8bytes . org" <joro@8bytes.org>, karahmed@amazon.com,
+        Marc Zyngier <maz@kernel.org>,
         James Morse <james.morse@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
         Will Deacon <will@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Peng Liang <liangpeng10@huawei.com>,
-        Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>
-Subject: Re: [RFC PATCH v3 04/29] KVM: arm64: Make ID_AA64PFR0_EL1 writable
-In-Reply-To: <20211117064359.2362060-5-reijiw@google.com>
-References: <20211117064359.2362060-1-reijiw@google.com>        <20211117064359.2362060-5-reijiw@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.104.136.29
-X-SA-Exim-Rcpt-To: reijiw@google.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, will@kernel.org, drjones@redhat.com, liangpeng10@huawei.com, pshier@google.com, ricarkol@google.com, oupton@google.com, jingzhangos@google.com, rananta@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Anup Patel <anup.patel@wdc.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+        butt3rflyh4ck <butterflyhuangxx@gmail.com>
+Subject: [PATCH v5 00/12] KVM: x86/xen: Add in-kernel Xen event channel delivery
+Date:   Sun, 21 Nov 2021 12:54:39 +0000
+Message-Id: <20211121125451.9489-1-dwmw2@infradead.org>
+X-Mailer: git-send-email 2.31.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Sender: David Woodhouse <dwmw2@infradead.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 17 Nov 2021 06:43:34 +0000,
-Reiji Watanabe <reijiw@google.com> wrote:
-> 
-> This patch adds id_reg_info for ID_AA64PFR0_EL1 to make it writable by
-> userspace.
-> 
-> The CSV2/CSV3 fields of the register were already writable and values
-> that were written for them affected all vCPUs before. Now they only
-> affect the vCPU.
-> Return an error if userspace tries to set SVE/GIC field of the register
-> to a value that conflicts with SVE/GIC configuration for the guest.
-> SIMD/FP/SVE fields of the requested value are validated according to
-> Arm ARM.
-> 
-> Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> ---
->  arch/arm64/kvm/sys_regs.c | 159 ++++++++++++++++++++++++--------------
->  1 file changed, 103 insertions(+), 56 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 1552cd5581b7..35400869067a 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -401,6 +401,92 @@ static void id_reg_info_init(struct id_reg_info *id_reg)
->  		id_reg->init(id_reg);
->  }
->  
-> +#define	kvm_has_gic3(kvm)		\
-> +	(irqchip_in_kernel(kvm) &&	\
-> +	 (kvm)->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
-> +
-> +static int validate_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
-> +				    const struct id_reg_info *id_reg, u64 val)
-> +{
-> +	int fp, simd;
-> +	bool vcpu_has_sve = vcpu_has_sve(vcpu);
-> +	bool pfr0_has_sve = id_aa64pfr0_sve(val);
-> +	int gic;
-> +
-> +	simd = cpuid_feature_extract_signed_field(val, ID_AA64PFR0_ASIMD_SHIFT);
-> +	fp = cpuid_feature_extract_signed_field(val, ID_AA64PFR0_FP_SHIFT);
-> +	if (simd != fp)
-> +		return -EINVAL;
-> +
-> +	/* fp must be supported when sve is supported */
-> +	if (pfr0_has_sve && (fp < 0))
-> +		return -EINVAL;
-> +
-> +	/* Check if there is a conflict with a request via KVM_ARM_VCPU_INIT */
-> +	if (vcpu_has_sve ^ pfr0_has_sve)
-> +		return -EPERM;
-> +
-> +	gic = cpuid_feature_extract_unsigned_field(val, ID_AA64PFR0_GIC_SHIFT);
-> +	if ((gic > 0) ^ kvm_has_gic3(vcpu->kvm))
-> +		return -EPERM;
-> +
-> +	return 0;
-> +}
-> +
-> +static void init_id_aa64pfr0_el1_info(struct id_reg_info *id_reg)
-> +{
-> +	u64 limit = id_reg->vcpu_limit_val;
-> +	unsigned int gic;
-> +
-> +	limit &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_AMU);
-> +	if (!system_supports_sve())
-> +		limit &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_SVE);
-> +
-> +	/*
-> +	 * The default is to expose CSV2 == 1 and CSV3 == 1 if the HW
-> +	 * isn't affected.  Userspace can override this as long as it
-> +	 * doesn't promise the impossible.
-> +	 */
-> +	limit &= ~(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV2) |
-> +		   ARM64_FEATURE_MASK(ID_AA64PFR0_CSV3));
-> +
-> +	if (arm64_get_spectre_v2_state() == SPECTRE_UNAFFECTED)
-> +		limit |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV2), 1);
-> +	if (arm64_get_meltdown_state() == SPECTRE_UNAFFECTED)
-> +		limit |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV3), 1);
-> +
-> +	gic = cpuid_feature_extract_unsigned_field(limit, ID_AA64PFR0_GIC_SHIFT);
-> +	if (gic > 1) {
-> +		/* Limit to GICv3.0/4.0 */
-> +		limit &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_GIC);
-> +		limit |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_GIC), 1);
-> +	}
-> +	id_reg->vcpu_limit_val = limit;
-> +}
-> +
-> +static u64 get_reset_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
-> +				     const struct id_reg_info *idr)
-> +{
-> +	u64 val = idr->vcpu_limit_val;
-> +
-> +	if (!vcpu_has_sve(vcpu))
-> +		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_SVE);
-> +
-> +	if (!kvm_has_gic3(vcpu->kvm))
-> +		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_GIC);
+Introduce the basic concept of 2 level event channels for kernel delivery,
+which is just a simple matter of a few test_and_set_bit calls on a mapped
+shared info page.
 
-No. As I said in a previous email, this breaks migration, and
-advertising a GICv3 CPU interface doesn't mean it is usable (the guest
-OS must check that it can actually enable ICC_SRE_EL1.SRE -- see what
-the Linux GICv3 driver does for an example).
+This can be used for routing MSI of passthrough devices to PIRQ event
+channels in a Xen guest, and we can build on it for delivering IPIs and
+timers directly from the kernel too.
 
-> +
-> +	return val;
-> +}
-> +
-> +static struct id_reg_info id_aa64pfr0_el1_info = {
-> +	.sys_reg = SYS_ID_AA64PFR0_EL1,
-> +	.ftr_check_types = S_FCT(ID_AA64PFR0_ASIMD_SHIFT, FCT_LOWER_SAFE) |
-> +			   S_FCT(ID_AA64PFR0_FP_SHIFT, FCT_LOWER_SAFE),
-> +	.init = init_id_aa64pfr0_el1_info,
-> +	.validate = validate_id_aa64pfr0_el1,
-> +	.get_reset_val = get_reset_id_aa64pfr0_el1,
-> +};
-> +
->  /*
->   * An ID register that needs special handling to control the value for the
->   * guest must have its own id_reg_info in id_reg_info_table.
-> @@ -409,7 +495,9 @@ static void id_reg_info_init(struct id_reg_info *id_reg)
->   * validation, etc.)
->   */
->  #define	GET_ID_REG_INFO(id)	(id_reg_info_table[IDREG_IDX(id)])
-> -static struct id_reg_info *id_reg_info_table[KVM_ARM_ID_REG_MAX_NUM] = {};
-> +static struct id_reg_info *id_reg_info_table[KVM_ARM_ID_REG_MAX_NUM] = {
-> +	[IDREG_IDX(SYS_ID_AA64PFR0_EL1)] = &id_aa64pfr0_el1_info,
-> +};
->  
->  static int validate_id_reg(struct kvm_vcpu *vcpu,
->  			   const struct sys_reg_desc *rd, u64 val)
-> @@ -1239,20 +1327,22 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
->  static u64 __read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
->  {
->  	u64 val = __vcpu_sys_reg(vcpu, IDREG_SYS_IDX(id));
-> +	u64 lim, gic, gic_lim;
-> +	const struct id_reg_info *id_reg;
->  
->  	switch (id) {
->  	case SYS_ID_AA64PFR0_EL1:
-> -		if (!vcpu_has_sve(vcpu))
-> -			val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_SVE);
-> -		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_AMU);
-> -		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_CSV2);
-> -		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV2), (u64)vcpu->kvm->arch.pfr0_csv2);
-> -		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_CSV3);
-> -		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV3), (u64)vcpu->kvm->arch.pfr0_csv3);
-> -		if (irqchip_in_kernel(vcpu->kvm) &&
-> -		    vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
-> -			val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_GIC);
-> -			val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_GIC), 1);
-> +		gic = cpuid_feature_extract_unsigned_field(val, ID_AA64PFR0_GIC_SHIFT);
-> +		if (kvm_has_gic3(vcpu->kvm) && (gic == 0)) {
-> +			/*
-> +			 * This is a case where userspace configured gic3 after
-> +			 * the vcpu was created, and then it didn't set
-> +			 * ID_AA64PFR0_EL1.
-> +			 */
+v1: Use kvm_map_gfn() although I didn't quite see how it works.
 
-Shouldn't that be done at the point where a GICv3 is created, rather
-than after the fact?
+v2: Avoid kvm_map_gfn() and implement a safe mapping with invalidation
+    support for myself.
 
-Thanks,
+v3: Reinvent gfn_to_pfn_cache with sane invalidation semantics, for my
+    use case as well as nesting.
 
-	M.
+v4: Rework dirty handling, as it became apparently that we need an active
+    vCPU context to mark pages dirty so it can't be done from the MMU
+    notifier duing the invalidation; it has to happen on unmap.
 
--- 
-Without deviation from the norm, progress is not possible.
+v5: Fix sparse warnings reported by kernel test robot <lkp@intel.com>.
+
+    Fix revalidation when memslots change but the resulting HVA stays
+    the same. We can use the same kernel mapping in that case, if the
+    HVA → PFN translation was valid before. So that probably means we
+    shouldn't unmap the "old_hva". Augment the test case to exercise
+    that one too.
+
+    Include the fix for the dirty ring vs. Xen shinfo oops reported
+    by butt3rflyh4ck <butterflyhuangxx@gmail.com>.
+
+
+As in the previous two rounds, the last patch (this time patch 12) is
+included as illustration of how we *might* use this for fixing the UAF
+bugs in nesting, but isn't intended to be applied as-is. Patches 1-11 are.
+
+
+
+David Woodhouse (12):
+      KVM: Introduce CONFIG_HAVE_KVM_DIRTY_RING
+      KVM: Add Makefile.kvm for common files, use it for x86
+      KVM: s390: Use Makefile.kvm for common files
+      KVM: mips: Use Makefile.kvm for common files
+      KVM: RISC-V: Use Makefile.kvm for common files
+      KVM: powerpc: Use Makefile.kvm for common files
+      KVM: arm64: Use Makefile.kvm for common files
+      KVM: Reinstate gfn_to_pfn_cache with invalidation support
+      KVM: x86/xen: Maintain valid mapping of Xen shared_info page
+      KVM: x86/xen: Add KVM_IRQ_ROUTING_XEN_EVTCHN and event channel delivery
+      KVM: x86: Fix wall clock writes in Xen shared_info not to mark page dirty
+      KVM: x86: First attempt at converting nested virtual APIC page to gpc
+
+ Documentation/virt/kvm/api.rst                     |  33 ++
+ arch/arm64/kvm/Makefile                            |   6 +-
+ arch/mips/kvm/Makefile                             |   3 +-
+ arch/powerpc/kvm/Makefile                          |   6 +-
+ arch/riscv/kvm/Makefile                            |   6 +-
+ arch/s390/kvm/Makefile                             |   6 +-
+ arch/x86/include/asm/kvm_host.h                    |   4 +-
+ arch/x86/kvm/Kconfig                               |   2 +
+ arch/x86/kvm/Makefile                              |   7 +-
+ arch/x86/kvm/irq_comm.c                            |  12 +
+ arch/x86/kvm/vmx/nested.c                          |  50 ++-
+ arch/x86/kvm/vmx/vmx.c                             |  12 +-
+ arch/x86/kvm/vmx/vmx.h                             |   2 +-
+ arch/x86/kvm/x86.c                                 |  15 +-
+ arch/x86/kvm/x86.h                                 |   1 -
+ arch/x86/kvm/xen.c                                 | 341 +++++++++++++++++++--
+ arch/x86/kvm/xen.h                                 |   9 +
+ include/linux/kvm_dirty_ring.h                     |   8 +-
+ include/linux/kvm_host.h                           | 110 +++++++
+ include/linux/kvm_types.h                          |  18 ++
+ include/uapi/linux/kvm.h                           |  11 +
+ .../testing/selftests/kvm/x86_64/xen_shinfo_test.c | 184 ++++++++++-
+ virt/kvm/Kconfig                                   |   6 +
+ virt/kvm/Makefile.kvm                              |  14 +
+ virt/kvm/dirty_ring.c                              |   2 +-
+ virt/kvm/kvm_main.c                                |  16 +-
+ virt/kvm/kvm_mm.h                                  |  44 +++
+ virt/kvm/mmu_lock.h                                |  23 --
+ virt/kvm/pfncache.c                                | 323 +++++++++++++++++++
+ 29 files changed, 1173 insertions(+), 101 deletions(-)
+
+
