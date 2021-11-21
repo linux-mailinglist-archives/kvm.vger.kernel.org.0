@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2291345838A
-	for <lists+kvm@lfdr.de>; Sun, 21 Nov 2021 13:55:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EF460458396
+	for <lists+kvm@lfdr.de>; Sun, 21 Nov 2021 13:55:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238244AbhKUM6T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 21 Nov 2021 07:58:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46516 "EHLO
+        id S238273AbhKUM6Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 21 Nov 2021 07:58:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238163AbhKUM6R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 21 Nov 2021 07:58:17 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E918C06173E;
-        Sun, 21 Nov 2021 04:55:12 -0800 (PST)
+        with ESMTP id S238212AbhKUM6S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 21 Nov 2021 07:58:18 -0500
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DFC9C061714;
+        Sun, 21 Nov 2021 04:55:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
+        d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=IhomdJGyEpT4miSx3PHsvuZfOTBIMbEy9yEOpBFWNhc=; b=Hrfi5S/PBcreogZZnR9WAZWHxz
-        naUNyfmQiHsqREhK4mW19hl78S/snmuosyEFH00+jyH7eOAeuX6u30B1o4vsktDCMiaffbjacitru
-        ioIN/wshQmNKfa2sTelONERoHagPlYSVXDwtYE0nKzTVe3InL+NP9TGIavoBRTk9bOwtK7LfPetal
-        l/dYF6beNqjnPcVC1/ftEXlz6dz7UbObmwkDp34hmE03r5H571+lVDyamDqcZCqqQFgatIfZnyTfR
-        LTZxXj62MOE8AQpljp7iCruAKGZ2qPDar0pSwsCa/KppnsMHAM61HuPs6MF0XcXeHWasvjEsQ22Yu
-        cZx2pJRA==;
+        bh=6h0xVL2esfqq+zqj5xeWRwsV4t0vspg87ggVyWnX0Og=; b=kM6W7+RyOTSXt0gvoBtCktAzx2
+        /LtufhJIKvcBy7y0MOZd6OjUm6Jr2Nz9ADUjvUL2/KyqQO5Acp+NgBk0EEvwV1bPLjkf1Wx9jC2o6
+        14kLlfqTtORV1PknVGEkEIAmoqXlrafVAgfPRYG4qCLDCC5hMvVdfVXYj3IEyKFDkFGgUslJTeRqI
+        +B1I9eB3vaDeV6cA9ZznUZQ/yppCupDImsN6zk4R3EP5UJWC0yHfHFqWoX5JlVjxa4UFfOfDPypbr
+        D0gey51oZTKa2Tzkz82fphlPoE0YsKSKDcGP2vSfaunjg5k/14lu3yiEe5T6Rn4h4IF/K5d7pUeWr
+        RrWrxAtA==;
 Received: from i7.infradead.org ([2001:8b0:10b:1:21e:67ff:fecb:7a92])
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1momMv-00C3xu-QZ; Sun, 21 Nov 2021 12:54:54 +0000
+        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1momMw-00HIgA-Eo; Sun, 21 Nov 2021 12:54:54 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1momMw-0002W1-0o; Sun, 21 Nov 2021 12:54:54 +0000
+        id 1momMw-0002W5-32; Sun, 21 Nov 2021 12:54:54 +0000
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>
 Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
@@ -56,71 +56,48 @@ Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
         linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
         kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
         butt3rflyh4ck <butterflyhuangxx@gmail.com>
-Subject: [PATCH v5 02/12] KVM: Add Makefile.kvm for common files, use it for x86
-Date:   Sun, 21 Nov 2021 12:54:41 +0000
-Message-Id: <20211121125451.9489-3-dwmw2@infradead.org>
+Subject: [PATCH v5 03/12] KVM: s390: Use Makefile.kvm for common files
+Date:   Sun, 21 Nov 2021 12:54:42 +0000
+Message-Id: <20211121125451.9489-4-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20211121125451.9489-1-dwmw2@infradead.org>
 References: <20211121125451.9489-1-dwmw2@infradead.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: David Woodhouse <dwmw2@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 From: David Woodhouse <dwmw@amazon.co.uk>
 
-Splitting kvm_main.c out into smaller and better-organized files is
-slightly non-trivial when it involves editing a bunch of per-arch
-KVM makefiles. Provide virt/kvm/Makefile.kvm for them to include.
-
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-Acked-by: Marc Zyngier <maz@kernel.org>
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
 ---
- arch/x86/kvm/Makefile |  7 +------
- virt/kvm/Makefile.kvm | 13 +++++++++++++
- 2 files changed, 14 insertions(+), 6 deletions(-)
- create mode 100644 virt/kvm/Makefile.kvm
+ arch/s390/kvm/Makefile | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-index 75dfd27b6e8a..30f244b64523 100644
---- a/arch/x86/kvm/Makefile
-+++ b/arch/x86/kvm/Makefile
-@@ -7,12 +7,7 @@ ifeq ($(CONFIG_FRAME_POINTER),y)
- OBJECT_FILES_NON_STANDARD_vmenter.o := y
- endif
+diff --git a/arch/s390/kvm/Makefile b/arch/s390/kvm/Makefile
+index b3aaadc60ead..e4f50453cf7f 100644
+--- a/arch/s390/kvm/Makefile
++++ b/arch/s390/kvm/Makefile
+@@ -3,13 +3,11 @@
+ #
+ # Copyright IBM Corp. 2008
  
 -KVM := ../../../virt/kvm
--
--kvm-y			+= $(KVM)/kvm_main.o $(KVM)/coalesced_mmio.o \
--				$(KVM)/eventfd.o $(KVM)/irqchip.o $(KVM)/vfio.o \
--				$(KVM)/dirty_ring.o $(KVM)/binary_stats.o
--kvm-$(CONFIG_KVM_ASYNC_PF)	+= $(KVM)/async_pf.o
+-common-objs = $(KVM)/kvm_main.o $(KVM)/eventfd.o  $(KVM)/async_pf.o \
+-	      $(KVM)/irqchip.o $(KVM)/vfio.o $(KVM)/binary_stats.o
 +include $(srctree)/virt/kvm/Makefile.kvm
  
- kvm-y			+= x86.o emulate.o i8259.o irq.o lapic.o \
- 			   i8254.o ioapic.o irq_comm.o cpuid.o pmu.o mtrr.o \
-diff --git a/virt/kvm/Makefile.kvm b/virt/kvm/Makefile.kvm
-new file mode 100644
-index 000000000000..ffdcad3cc97a
---- /dev/null
-+++ b/virt/kvm/Makefile.kvm
-@@ -0,0 +1,13 @@
-+# SPDX-License-Identifier: GPL-2.0
-+#
-+# Makefile for Kernel-based Virtual Machine module
-+#
-+
-+KVM ?= ../../../virt/kvm
-+
-+kvm-y := $(KVM)/kvm_main.o $(KVM)/eventfd.o $(KVM)/binary_stats.o
-+kvm-$(CONFIG_KVM_VFIO) += $(KVM)/vfio.o
-+kvm-$(CONFIG_KVM_MMIO) += $(KVM)/coalesced_mmio.o
-+kvm-$(CONFIG_KVM_ASYNC_PF) += $(KVM)/async_pf.o
-+kvm-$(CONFIG_HAVE_KVM_IRQ_ROUTING) += $(KVM)/irqchip.o
-+kvm-$(CONFIG_HAVE_KVM_DIRTY_RING) += $(KVM)/dirty_ring.o
+ ccflags-y := -Ivirt/kvm -Iarch/s390/kvm
+ 
+-kvm-objs := $(common-objs) kvm-s390.o intercept.o interrupt.o priv.o sigp.o
++kvm-objs := kvm-s390.o intercept.o interrupt.o priv.o sigp.o
+ kvm-objs += diag.o gaccess.o guestdbg.o vsie.o pv.o
+ 
+ obj-$(CONFIG_KVM) += kvm.o
 -- 
 2.31.1
 
