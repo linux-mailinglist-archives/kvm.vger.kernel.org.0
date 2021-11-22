@@ -2,193 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C7D3459552
-	for <lists+kvm@lfdr.de>; Mon, 22 Nov 2021 20:06:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0BAB545955E
+	for <lists+kvm@lfdr.de>; Mon, 22 Nov 2021 20:13:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239712AbhKVTJ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Nov 2021 14:09:29 -0500
-Received: from mail-bn8nam12on2078.outbound.protection.outlook.com ([40.107.237.78]:53793
-        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S239573AbhKVTJY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Nov 2021 14:09:24 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=J072ITe/WUcgNVOTCqGCH/YCyG30kvvhYKtaLhO2Ds7v9iNI5ceu+2jkU6QhSJiZyX+cftp/pCYTJas9uFdzuhx6uqLTkvkqvnCYR/3czMkofL18LvZqaPFnPhKZ+sdOyyXpIPKoWKERTTi+Lp+/A0Yza5m6Ep7mSi1mpg/Aklz/0Pkgr5w3LYqRU4GFuYeEpfIU/sv2x0NAyMWRjZ6BlvzP7/5x1WMJ/qNIJaRTUuOVZZ5E6MWD3GvvJQAQQY+sFuehyVfN/Cey5ZBQXXDk8YhlxLjeZmvx5BPdY8GSJQjyJeRKG6QE50xc/XKIPE8FImtFOw1Sy5nvVjNXl+u6kA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AHuV0m4tLTG5c62yXPPAQmjbSvNAP72mQ1ZsxHiNhlo=;
- b=Ki5whdi08nQXoFdFVgxUAzNv7H8g1OhxbVb2nKCdGFDpvnXDlUBp9Zway+LrfkRWJM3ewSs1t6GHDwkH6vClNMC2iY6+zCNb1tXLhrCils02mcl3I8qzGcVoE0zHquJvXjH+u1La/CBIi/yO2BuJXBjxpBaqpI5nweK7jV8V7RSOeq6Bsez39eNNRuZP9x49lh8DzPIUJn09IJqmw17X5y3XOTsEGSp7jgYj3aNMgtXPkqov1Qsy8kPHYSc89xgTSS9DqSVaMmXPtfIAHOyOunrCwbKxkgpHhktRPojvT9aqUEVIsBMKV080HKrpTDPtbSNpirTKUFHhBDTw0T2ZYw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AHuV0m4tLTG5c62yXPPAQmjbSvNAP72mQ1ZsxHiNhlo=;
- b=r54DqXH4Ae71z7vQIqKw7xF6SNpo7Y4G8Txn/iXcsXn26wq+zkB5zlEve/rbATZB393pxLec529NA9+WkB7fEVUfqe/Y9OOTXs88r17JxX8Jk1xtkhKexJEu//hKJMPIsAhNq/aTTPA14zSM721scrRVhU3CqI0AUQ4jUrSYVwY=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SA0PR12MB4559.namprd12.prod.outlook.com (2603:10b6:806:9e::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4713.22; Mon, 22 Nov
- 2021 19:06:15 +0000
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::e4da:b3ea:a3ec:761c]) by SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::e4da:b3ea:a3ec:761c%7]) with mapi id 15.20.4713.025; Mon, 22 Nov 2021
- 19:06:15 +0000
-Message-ID: <f15597a0-e7e0-0a57-39fd-20715abddc7f@amd.com>
-Date:   Mon, 22 Nov 2021 13:06:11 -0600
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.3.1
-Cc:     brijesh.singh@amd.com, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <Thomas.Lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
- Hypervisor Support
-Content-Language: en-US
-To:     Dave Hansen <dave.hansen@intel.com>,
-        Peter Gonda <pgonda@google.com>
-References: <20210820155918.7518-1-brijesh.singh@amd.com>
- <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
- <daf5066b-e89b-d377-ed8a-9338f1a04c0d@amd.com>
- <d673f082-9023-dafb-e42e-eab32a3ddd0c@intel.com>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-In-Reply-To: <d673f082-9023-dafb-e42e-eab32a3ddd0c@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA9PR13CA0050.namprd13.prod.outlook.com
- (2603:10b6:806:22::25) To SN6PR12MB2718.namprd12.prod.outlook.com
- (2603:10b6:805:6f::22)
+        id S239773AbhKVTQV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Nov 2021 14:16:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55094 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239713AbhKVTQP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Nov 2021 14:16:15 -0500
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4373C06173E
+        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 11:13:08 -0800 (PST)
+Received: by mail-pg1-x52b.google.com with SMTP id 28so16092606pgq.8
+        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 11:13:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=xdP/1E/sjsU4zxgXiTU4EW1L3AvShi1LySCVgiuwxhk=;
+        b=pgAhS8MM5EonlJPkdQAeawThA4p4egLanaMBN6/4TKVldxH9LVZ7k9WHaYVGo82KX7
+         18aFXBTWlhy0r/V4IOx8/8UAgghLzT09K0F9iCHD30AQvsa4Qt+CSvMLRp5SvJjtT/gi
+         1PqBcprOLhMQoW5KlGtsACtBcaGDwM0bSlRJd65uOqAG5ciWprx28kvVT/YCQFd1rj7U
+         376ehb8bHBDi9adfN3SfvlYq/nyxAuTfnV9uoanvKLMC61PL5czLo8QVib+HUNC/wLrt
+         ieOxttB5hSPlfSshaRcdbBLJbF+aZVwSAzHz9ED2YhoDiAwAZ4JPOuBkXvo6xB5av/py
+         6DNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=xdP/1E/sjsU4zxgXiTU4EW1L3AvShi1LySCVgiuwxhk=;
+        b=QCSX82mAf2TP2C6EsiXgzTZhEE+3V7BVjNyGpPPSoDikDjj/UMZFoQC7eTFV/BvPzm
+         wRzbvvhIRmv1HmoZfjZVWmqlutk4mLIzteTCkeELUwZ+LCsrFqIebq67xPlKKVcsEOdf
+         LR/dBw6FU9Dm0UxToXpEfSVX8+pbKYvgOxaldBYoejpAjNb9gOs53biFUakI3BTrGXOP
+         xZZP2iPCkLwM7hb9PDjw7739k+dOJNnUWkL82dn6lVBbFFYrVkapho3ngdvfHL/N3k3N
+         mW+OoXqY9wUTqTMEF0ya3Agny4GJdUfZuVA9djb8i2dFffpD33+NrNcXLiMjcLiTi/8I
+         1nUw==
+X-Gm-Message-State: AOAM533QlZKx5CxjD7xYCOg3bjAlRhhX99VgZLhXr4NVxLhYnaRDOnDE
+        9zcRnqCLm1OZP4lA6NZUQvL47Q==
+X-Google-Smtp-Source: ABdhPJywWf83H/xNNjbfsd1y6iSA/s+3iEDb0YY1d+t06wff/MSS3oF9BLmYM22aWFFftqWP9pxyxg==
+X-Received: by 2002:a62:1b51:0:b0:49f:a8d8:84b with SMTP id b78-20020a621b51000000b0049fa8d8084bmr87130253pfb.31.1637608387283;
+        Mon, 22 Nov 2021 11:13:07 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id b15sm9600038pfv.48.2021.11.22.11.13.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Nov 2021 11:13:06 -0800 (PST)
+Date:   Mon, 22 Nov 2021 19:13:02 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Aili Yao <yaoaili126@gmail.com>
+Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yaoaili@kingsoft.com
+Subject: Re: [PATCH] KVM: LAPIC: Per vCPU control over
+ kvm_can_post_timer_interrupt
+Message-ID: <YZvrvmRnuDc1e+gi@google.com>
+References: <20211122095619.000060d2@gmail.com>
 MIME-Version: 1.0
-Received: from [10.0.0.5] (70.112.153.56) by SA9PR13CA0050.namprd13.prod.outlook.com (2603:10b6:806:22::25) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4734.13 via Frontend Transport; Mon, 22 Nov 2021 19:06:13 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 6033cb8c-cd4f-43f4-8a09-08d9adeb280b
-X-MS-TrafficTypeDiagnostic: SA0PR12MB4559:
-X-Microsoft-Antispam-PRVS: <SA0PR12MB4559C55F265F41A89BC9E8ACE59F9@SA0PR12MB4559.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: qbA+sef8ORpA8IhrONT3D2Y9V0FOO9ucIjX4iA+uyRswDIFtrtMrwPIc21suLRfldzq+1BD/g9kmhPoyz1AyYLMgkSoSpGrzXz+dh8Qn+g/VyfmN3RFbAF1jPsxm3Tg42L3xcsI5n/fgm3N/C5K41BNtU1tt26ybF6qwnoWCnkIAYTqpIMCckmVMucEO0RfhKZSTPy7rVFJxEfizU8T6HT5I4nEkBTkB+4L4j/kA2uz07bWkVJNtk1a+Va8njtzJHR0fpcBMPMQYY0l+eHDbBg87/jqxHcEJ7wdMughxiUt6dQ/JMEcDeYW913BI/DGZvQB3mWL0R305qunYUUERdrN8MsNdck8j93Qwxr9qgt5pKj9X9OX3+9n/UcQEuuJrNM1tg0H6EJjBl8AdKIvv41Do2C/n+XkOMldkQfc77jmdVExHWwyawRRWdv5IpVXJJuGW7i0KRFPQnAy/n18VGR4EDZhmiRfuvAuFauFjeqQMAHQt/ireefMcboIDb/mBEjhODQMOOqijPFRjFRHhsPMD8uekM1YG4vPAqnggs4KQClMWLWlxppLN+d5Njm6OfN48ePIrF78hP0/pycA8jhEVW8Y4oe+z148wF2rYXsTRDiICQ2OynoSbTTxxoJEybRd2lj/Z9KrF1BNQfCLSvo0H1QR825qk6DKVj9ovHxV9DpCxrKqki2uAW88UZjWqmRsGJwxiWZ8BRaMnusx7+bwZbvtceq50f9eoCK3eznQ=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(7406005)(7416002)(31696002)(956004)(2616005)(4326008)(6486002)(5660300002)(8676002)(186003)(316002)(36756003)(26005)(38100700002)(53546011)(16576012)(44832011)(54906003)(66476007)(2906002)(66556008)(508600001)(86362001)(83380400001)(8936002)(31686004)(110136005)(66946007)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZU1QNXdLdFZpR254UENBcXdtenRIaUJMM1lSS3BhS3JHaVZvN3ZDN1A4TitZ?=
- =?utf-8?B?Y0kyUkNjZmE2QUx6Yis1SERrTlRzNG82QmZwVDd2ajNJWnEvbGJwUitLNm5N?=
- =?utf-8?B?MUFRK3M4di9OWmdtejQ4TWc3eUlPNnFqb01uQWNGeEJraThCNHZ6dm8wemVB?=
- =?utf-8?B?REJoR2xEendHd043WEV5bnA1bVdBcExhc3VwdHNGZXdLdVhPbUpmSUc4UDNG?=
- =?utf-8?B?TjhxNkJnRWEybmNKY2s1OTVrbzlmSEpFbHZqYUlBOWpMT1BzVGxzMkJwMWNQ?=
- =?utf-8?B?RjR1Y3hHYU96ekdWZHlEMTJEZWZDdVlwZ1RLNDQ5V0k3SUp1akFJY2hRZFdu?=
- =?utf-8?B?Uy9xVWlSM2lZcGxtbUJHNHBjZGxlcm1tWC9HaldHczIxa0p1ZHE2c01IaDlq?=
- =?utf-8?B?a1ByakpjU1IzTk5sMUxyZERpRkd4akNaMkk4OWlGWkdMZnZqa3VFOFJVMmVu?=
- =?utf-8?B?TW0xODV0Vks1SFBZOWFpUS81VkhOZlZXVmF0Qmc0Z1JNZGV5Skwzb3ExMnM5?=
- =?utf-8?B?SUF2YTA2cFJORG5kUUNCQVNMa1N3Z0YzYmFRbDhwQmRGejJWVUY2SXdqZFlp?=
- =?utf-8?B?cUszdmloS0xmZzl0QkljSENFQ0lSeE05bjhYUFFjdUpCQVFHc0I2WUhqZWZ3?=
- =?utf-8?B?N2Jrek9BVGR0Tm5NenpOSjk0SGRpNE9NLzFraGsxa1N1N3lHRm9CRVB6eHhP?=
- =?utf-8?B?OHZoQXJJSXErU1B2YnJIRm01cEJERzdXQ3p0Y0pEL2NIeFBtRmpFZ0FHeThQ?=
- =?utf-8?B?amR0NFhyT2xKaDhWa1VEWDJobEFUdk01VmNyM21Ec2RpRDVwRUV2TlFLVTV4?=
- =?utf-8?B?RHN1b0EzRGVsUngzbXVQTnhJRHhvWktFd014Y1RuVDZaVTJkZ1JXRXpQR24w?=
- =?utf-8?B?cmFabFIvSk5pcHR4VS9pcnJocm1NZjVwTHNvelhHSXZXU1RFdXJpMGxJcmwx?=
- =?utf-8?B?NGVxdGxaMnBIalpZTEJzWlBpNTNHWXF6WkVhc01PN2N3MDM1R3FsdFM3Z0NH?=
- =?utf-8?B?aExEWWFURXRvaU1kR1ZqSHVVWjF0aWdHa242dVMyeUdZSitjV2JXenBJQ3Vx?=
- =?utf-8?B?a0puUEN1Q0s1UVJ3K2trSlU5NzYweGdOeTVsNzdaUzgrdUdtNXhEMTVVQWNv?=
- =?utf-8?B?alpRaWZEbWZqMHVYb3Qya1N3ZndBYzhaTVFPSFZNM280QmZDZi8xOHhvQ3Vm?=
- =?utf-8?B?aERYZzJEM2I0YmxSelBzNC8zQzlrUEdmdnpjazc4TmwrWXBvUkNPb2JEaGhv?=
- =?utf-8?B?SG96V2o1Z0tud0lZQVh0NHJLTUhCdFVWWDUrZWNBaFFYYXNjSGsyZmFPZllT?=
- =?utf-8?B?TGF1NW41LzR2RGJkUm9VRkJERE9aUXdVdWk1QVRvSnpQblNhYm9VZzVaUHNY?=
- =?utf-8?B?VThieUVxZEFjeEw4a0pzQXhRQ0hkaTEwR1l2YXBpTU5JbUptNm9wT2sxWWg4?=
- =?utf-8?B?UVNKUkhyb3FveW9TemE2SkVleXlWVjJtVmFaS1AvVzBsdEI5aHVkaFVBbm9K?=
- =?utf-8?B?Unc1Wm5nTnFnUWxjeTNPK241d3grZGkrYW03ek9nR1piY1pBcW1Qbkk3R0ZZ?=
- =?utf-8?B?RFEzbHdJaWU4SmxnK1JmbklWZE44U0lWcG1tZkI5RDFWTGNDa1RXSk5DUEl5?=
- =?utf-8?B?SFA1N1c3QVlVaDBFTWw0dDVVQUNXdFZEcy9NV2VsYXMzeVYxdjN0Q0g2cExM?=
- =?utf-8?B?b3hlUURJS0xsWmJ6K3U5MUxlZVNnWGxHNzFDckNrNlNlMGVmOFpqT2FPa0tm?=
- =?utf-8?B?a0NReGorSFVjbVU5SW9OWDJHdS9wS2I3NlRtUUNyT05Dc3ZrZERnNlNjRWph?=
- =?utf-8?B?cncxTlYrTkFTK2ZCWVJxRjUxRE1RdW5lWlhscjRBamRpb2Q1MUZ3bW1hbW9Y?=
- =?utf-8?B?UGJrT2Iway9pclIycS9vQ1ZJeXFEL1FydnVTRFJtRnhiUk1Qb2hSQjNmb0pW?=
- =?utf-8?B?VHlMUXVIN3o5Tmw4S3ZmMi84MGtwcnFNWjhNTWd2YkwvaVJlT3JEOGtXelNl?=
- =?utf-8?B?RjNyNXREbmxqY3Z5Q2d6OXNCQzg4dElLMlJhOEFaSmVzRFhDMFFiejZDS3pz?=
- =?utf-8?B?UnBuTWhVdjV0SWtRcU5Nd0FFeHI1UnVtbkNZbzA3U2dMQzhEZ3dUaUJJSldZ?=
- =?utf-8?B?d0ZGbWUvd2s3QldBeDUybXdPLzhrWDgxUUVKYzVlUWNaTGxKVjVZeGpJZXhY?=
- =?utf-8?Q?9hZPxLIVhp3Zk+SRAkEPSJY=3D?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6033cb8c-cd4f-43f4-8a09-08d9adeb280b
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Nov 2021 19:06:15.2319
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: i669jqUPEJMVh8/cJDFsUnTZQmpJDDBUlB7ABf8xCH/JbJp9gPdlTVS+bfolY8cyYAjo/azhg4GdNKSWez4ETw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4559
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211122095619.000060d2@gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Nov 22, 2021, Aili Yao wrote:
+> From: Aili Yao <yaoaili@kingsoft.com>
+> 
+> When we isolate some pyhiscal cores, We may not use them for kvm guests,
+> We may use them for other purposes like DPDK, or we can make some kvm
+> guests isolated and some not, the global judgement pi_inject_timer is
+> not enough; We may make wrong decisions:
+> 
+> In such a scenario, the guests without isolated cores will not be
+> permitted to use vmx preemption timer, and tscdeadline fastpath also be
+> disabled, both will lead to performance penalty.
+> 
+> So check whether the vcpu->cpu is isolated, if not, don't post timer
+> interrupt.
+> 
+> Signed-off-by: Aili Yao <yaoaili@kingsoft.com>
+> ---
+>  arch/x86/kvm/lapic.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 759952dd1222..72dde5532101 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -34,6 +34,7 @@
+>  #include <asm/delay.h>
+>  #include <linux/atomic.h>
+>  #include <linux/jump_label.h>
+> +#include <linux/sched/isolation.h>
+>  #include "kvm_cache_regs.h"
+>  #include "irq.h"
+>  #include "ioapic.h"
+> @@ -113,7 +114,8 @@ static inline u32 kvm_x2apic_id(struct kvm_lapic *apic)
+>  
+>  static bool kvm_can_post_timer_interrupt(struct kvm_vcpu *vcpu)
+>  {
+> -	return pi_inject_timer && kvm_vcpu_apicv_active(vcpu);
+> +	return pi_inject_timer && kvm_vcpu_apicv_active(vcpu) &&
+> +		!housekeeping_cpu(vcpu->cpu, HK_FLAG_TIMER);
 
-On 11/22/21 12:30 PM, Dave Hansen wrote:
-> On 11/22/21 7:23 AM, Brijesh Singh wrote:
->> Thank you for starting the thread; based on the discussion, I am keeping
->> the current implementation as-is and *not* going with the auto
->> conversion from private to shared. To summarize what we are doing in the
->> current SNP series:
->>
->> - If userspace accesses guest private memory, it gets SIGBUS.
->> - If kernel accesses[*] guest private memory, it does panic.
-> There's a subtlety here, though.  There are really three *different*
-> kinds of kernel accesses that matter:
-> 1. Kernel bugs.  Kernel goes off and touches some guest private memory
->    when it didn't mean to.  Say, it runs off the end of a slab page and
->    runs into a guest page.  panic() is expected here.
+I don't think this is safe, vcpu->cpu will be -1 if the vCPU isn't scheduled in.
+This also doesn't play nice with the admin forcing pi_inject_timer=1.  Not saying
+there's a reasonable use case for doing that, but it's supported today and this
+would break that behavior.  It would also lead to weird behavior if a vCPU were
+migrated on/off a housekeeping vCPU.  Again, probably not a reasonable use case,
+but I don't see anything that would outright prevent that behavior.
 
-In current implementation, a write to guest private will trigger a
-kernel panic().
+The existing behavior also feels a bit unsafe as pi_inject_timer is writable while
+KVM is running, though I supposed that's orthogonal to this discussion.
 
+Rather than check vcpu->cpu, is there an existing vCPU flag that can be queried,
+e.g. KVM_HINTS_REALTIME?
 
-> 2. Kernel accesses guest private memory via a userspace mapping, in a
->    place where it is known to be accessing userspace and is prepared to
->    fault.  copy_to_user() is the most straightforward example.  Kernel
->    must *not* panic().  Returning an error to the syscall is a good
->    way to handle these (if in a syscall).
-
-In the current implementation, the copy_to_user() on the guest private
-will fails with -EFAULT.
-
-
-> 3. Kernel accesses guest private memory via a kernel mapping.  This one
->    is tricky.  These probably *do* result in a panic() today, but
->    ideally shouldn't.
-
-KVM has defined some helper functions to maps and unmap the guest pages.
-Those helper functions do the GPA to PFN lookup before calling the
-kmap(). Those helpers are enhanced such that it check the RMP table
-before the kmap() and acquire a lock to prevent a page state change
-until the kunmap() is called. So, in the current implementation, we
-should *not* see a panic() unless there is a KVM driver bug that didn't
-use the helper functions or a bug in the helper function itself.
-
-
-> Could you explicitly clarify what the current behavior is?
+>  }
+>  
+>  bool kvm_can_use_hv_timer(struct kvm_vcpu *vcpu)
+> -- 
+> 2.25.1
+> 
