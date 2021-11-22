@@ -2,112 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8069E458864
-	for <lists+kvm@lfdr.de>; Mon, 22 Nov 2021 04:35:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1D4C0458856
+	for <lists+kvm@lfdr.de>; Mon, 22 Nov 2021 04:27:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238620AbhKVDiE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 21 Nov 2021 22:38:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40632 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232690AbhKVDiD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 21 Nov 2021 22:38:03 -0500
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AA2EC061574;
-        Sun, 21 Nov 2021 19:34:57 -0800 (PST)
-Received: by mail-pg1-x535.google.com with SMTP id r138so4535749pgr.13;
-        Sun, 21 Nov 2021 19:34:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:organization:mime-version
-         :content-transfer-encoding;
-        bh=JGBn1lQayMnvk5SYEnWwopHGKPW7YJeqgCL9mkpoJ34=;
-        b=GKuf5TJI6uvcJKJwjsXYULnUa66irwmLfzeztcZ8oAHAtL0PLYvORmDI/X0iWIxzdL
-         HmMBaBNDfREaIiMwVvp+k7VUFuWM8nA8POMCFO9Hyjsno/6DXPwrYiW82gTxAo4LNBTP
-         f12S6SkQyMVkPJNT6O8hLHtMkT1xpBw1uQzOLESDmz4dqvnoZgUsBbGIGySjTZZmMyYf
-         QP3rZ1qLhNfzLsJeC0jJHDrUkghJ5uM4Gqjh+g2mqXAxoPzLSkqTKfzacOCnHFgdfzqk
-         OpcIf7nkgJk+7PM5/sTU9suzJ1WYlBtmP3g4igBBUdnZ/tSfbrxO8XMGNl9SFLoSSk7f
-         l+og==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:organization
-         :mime-version:content-transfer-encoding;
-        bh=JGBn1lQayMnvk5SYEnWwopHGKPW7YJeqgCL9mkpoJ34=;
-        b=a//yWCzauN0Jv5lM2pQMc1kIae+2r8yOkOnb21/di5d12Z7WBxjD+k4LEdJvb+xQNR
-         WU7n8GVLSo34POn9E3XoSRlbXp3wRAsCYToqjb3FqqHwlApukspSOV2YdSOtGY/SY/m5
-         +lqUD45RsZvuNiEShWA8t71cZma/MOHZnGepo6q6TLI5H7wOHRPSLtw4Q5eIzC074aHx
-         iJcbyQowXGb6Yvo5xsH2Z4fEsjJFoaAEGPtUkATRwFMunCznAEw4H/j6sb3d/Y0WoswD
-         jWHqh1KhZAcEirjHz4zzvd5SSw0zZ/1vRGPpQLrfy+DCu6fPb95DYZTGRuLncvCodQ0A
-         PD+w==
-X-Gm-Message-State: AOAM533cpGDojpkj5hiHAsqAXJnZ1ydkB5+VK2AdQwnnGsEY9cox4gRX
-        npEQjFT+9GHdDXFDGp+xbLc=
-X-Google-Smtp-Source: ABdhPJzbtMlHIwYNN2ppajgDSPNxu3KUwho2MEopPGg2LjwXiAjme+TJwfxsAur8aU+h8LTGasVMqA==
-X-Received: by 2002:a63:f749:: with SMTP id f9mr31061332pgk.330.1637552096890;
-        Sun, 21 Nov 2021 19:34:56 -0800 (PST)
-Received: from ubuntu ([222.129.53.202])
-        by smtp.gmail.com with ESMTPSA id k2sm7327273pfc.9.2021.11.21.19.34.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Nov 2021 19:34:56 -0800 (PST)
-Date:   Mon, 22 Nov 2021 09:58:05 +0800
-From:   Aili Yao <yaoaili126@gmail.com>
-To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com
-Cc:     x86@kernel.org, hpa@zytor.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yaoaili@kingsoft.com
-Subject: [PATCH] KVM: LAPIC: Per vCPU control over
- kvm_can_post_timer_interrupt
-Message-ID: <20211122095619.000060d2@gmail.com>
-Organization: ksyun
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.29; x86_64-w64-mingw32)
+        id S232276AbhKVDa0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 21 Nov 2021 22:30:26 -0500
+Received: from out30-45.freemail.mail.aliyun.com ([115.124.30.45]:35099 "EHLO
+        out30-45.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229775AbhKVDaZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 21 Nov 2021 22:30:25 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04395;MF=laijs@linux.alibaba.com;NM=1;PH=DS;RN=16;SR=0;TI=SMTPD_---0UxaZBi6_1637551635;
+Received: from 30.22.113.131(mailfrom:laijs@linux.alibaba.com fp:SMTPD_---0UxaZBi6_1637551635)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Mon, 22 Nov 2021 11:27:16 +0800
+Message-ID: <1c851214-2873-69c0-0ba6-d82374c26722@linux.alibaba.com>
+Date:   Mon, 22 Nov 2021 11:27:15 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.2.1
+Subject: Re: [PATCH 01/15] KVM: VMX: Use x86 core API to access to fs_base and
+ inactive gs_base
+Content-Language: en-US
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        linux-kernel@vger.kernel.org
+Cc:     kvm@vger.kernel.org, x86@kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Ingo Molnar <mingo@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Kees Cook <keescook@chromium.org>
+References: <20211118110814.2568-1-jiangshanlai@gmail.com>
+ <20211118110814.2568-2-jiangshanlai@gmail.com> <87k0h1leqj.ffs@tglx>
+From:   Lai Jiangshan <laijs@linux.alibaba.com>
+In-Reply-To: <87k0h1leqj.ffs@tglx>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Aili Yao <yaoaili@kingsoft.com>
 
-When we isolate some pyhiscal cores, We may not use them for kvm guests,
-We may use them for other purposes like DPDK, or we can make some kvm
-guests isolated and some not, the global judgement pi_inject_timer is
-not enough; We may make wrong decisions:
 
-In such a scenario, the guests without isolated cores will not be
-permitted to use vmx preemption timer, and tscdeadline fastpath also be
-disabled, both will lead to performance penalty.
+On 2021/11/21 23:17, Thomas Gleixner wrote:
+> Lai,
+> 
+> On Thu, Nov 18 2021 at 19:08, Lai Jiangshan wrote:
+>> From: Lai Jiangshan <laijs@linux.alibaba.com>
+>>
+>> And they use FSGSBASE instructions when enabled.
+> 
+> That's really not a proper explanation for adding yet more exports.
+> 
 
-So check whether the vcpu->cpu is isolated, if not, don't post timer
-interrupt.
+Hello
 
-Signed-off-by: Aili Yao <yaoaili@kingsoft.com>
 ---
- arch/x86/kvm/lapic.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+When a vCPU thread is rescheduled, 1 rdmsr and 2 wrmsr are called for
+MSR_KERNEL_GS_BASE.
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 759952dd1222..72dde5532101 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -34,6 +34,7 @@
- #include <asm/delay.h>
- #include <linux/atomic.h>
- #include <linux/jump_label.h>
-+#include <linux/sched/isolation.h>
- #include "kvm_cache_regs.h"
- #include "irq.h"
- #include "ioapic.h"
-@@ -113,7 +114,8 @@ static inline u32 kvm_x2apic_id(struct kvm_lapic *apic)
- 
- static bool kvm_can_post_timer_interrupt(struct kvm_vcpu *vcpu)
- {
--	return pi_inject_timer && kvm_vcpu_apicv_active(vcpu);
-+	return pi_inject_timer && kvm_vcpu_apicv_active(vcpu) &&
-+		!housekeeping_cpu(vcpu->cpu, HK_FLAG_TIMER);
- }
- 
- bool kvm_can_use_hv_timer(struct kvm_vcpu *vcpu)
--- 
-2.25.1
+In scheduler, the core kernel uses x86_gsbase_[read|write]_cpu_inactive()
+to accelerate the access to inactive GSBASE, but when the scheduler calls
+in the preemption notifier in kvm, {rd|wr}msr(MSR_KERNEL_GS_BASE) is used.
 
+To make the way of how kvm access to inactive GSBASE consistent with the
+scheduler, kvm is changed to use x86 core API to access to fs_base and
+inactive gs_base.  And they use FSGSBASE instructions when enabled.
+
+It would add 2 more exports, but it doesn't export any extra software nor
+hardware resources since the resources can be access via {rd|wr}msr.
+---
+
+Not so persuasive.  If it needs to be accelerated in the preemption notifier,
+there are some other more aggressive ways.
+
+Thanks
+Lai
