@@ -2,161 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0786C45881D
-	for <lists+kvm@lfdr.de>; Mon, 22 Nov 2021 03:48:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8069E458864
+	for <lists+kvm@lfdr.de>; Mon, 22 Nov 2021 04:35:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234672AbhKVCv5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 21 Nov 2021 21:51:57 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:48930 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230258AbhKVCvz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 21 Nov 2021 21:51:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637549329;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=bCpHgtK0TLoUoBYAl3rKsWf4v1EviHMP7QNyo8Nuefw=;
-        b=eO+1y7hhModGV9J3rCIiD4km7JibIdbZZuGNesyTUYp9O2diAMjY9NNPWCPSJ9zjAtt/zq
-        m69MjJaXNRamcy/qs+jqxc7OKpN2L4HvzGIQ3luNRJaURioCf1wjdcBwqNLj1/0+rUhVpa
-        0LvMbtdTPZf/y4b17XXwn/Q6Po+AktQ=
-Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
- [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-203-AVd3hR5KNhatryfP6nFcbw-1; Sun, 21 Nov 2021 21:48:48 -0500
-X-MC-Unique: AVd3hR5KNhatryfP6nFcbw-1
-Received: by mail-lf1-f72.google.com with SMTP id x17-20020a0565123f9100b003ff593b7c65so11031441lfa.12
-        for <kvm@vger.kernel.org>; Sun, 21 Nov 2021 18:48:48 -0800 (PST)
+        id S238620AbhKVDiE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 21 Nov 2021 22:38:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40632 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232690AbhKVDiD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 21 Nov 2021 22:38:03 -0500
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AA2EC061574;
+        Sun, 21 Nov 2021 19:34:57 -0800 (PST)
+Received: by mail-pg1-x535.google.com with SMTP id r138so4535749pgr.13;
+        Sun, 21 Nov 2021 19:34:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:organization:mime-version
+         :content-transfer-encoding;
+        bh=JGBn1lQayMnvk5SYEnWwopHGKPW7YJeqgCL9mkpoJ34=;
+        b=GKuf5TJI6uvcJKJwjsXYULnUa66irwmLfzeztcZ8oAHAtL0PLYvORmDI/X0iWIxzdL
+         HmMBaBNDfREaIiMwVvp+k7VUFuWM8nA8POMCFO9Hyjsno/6DXPwrYiW82gTxAo4LNBTP
+         f12S6SkQyMVkPJNT6O8hLHtMkT1xpBw1uQzOLESDmz4dqvnoZgUsBbGIGySjTZZmMyYf
+         QP3rZ1qLhNfzLsJeC0jJHDrUkghJ5uM4Gqjh+g2mqXAxoPzLSkqTKfzacOCnHFgdfzqk
+         OpcIf7nkgJk+7PM5/sTU9suzJ1WYlBtmP3g4igBBUdnZ/tSfbrxO8XMGNl9SFLoSSk7f
+         l+og==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=bCpHgtK0TLoUoBYAl3rKsWf4v1EviHMP7QNyo8Nuefw=;
-        b=I5VyUO1ZGkBSzVAEMgVrAbZn88cJnnCAw5o7VOYIUd6PGg3+S/GTGpuwvwFwDZGzpW
-         kCHxDXPFbgarcpuXto3lbZSm+7hrFBuxYVkfy4N8w/8rjXaQNJTXQEoCZ8H/uPDPSdk/
-         d+YGPZ5CZqI64OwmnjSEZ6G+QfY+4T9VqbnNBtU2qpLSP0yvxj2FZtgZHNC+V/jg39Nc
-         WQd0c9sxCkugfpOhFewT9rVu+sDsiH2YXIlgdZqu/PLDId3Kw7HwV1wTs04iq2GraBov
-         Q0fxh6eHoVpQ+KIID2hjKBn97oz4R3vpac9N6VAlB5zBdWfULfvkV1LbKG+EVIbB3Ry/
-         qUWw==
-X-Gm-Message-State: AOAM532LiZC+vXte3JNDQ0K+b6Ij7u/w9jctJOybzPGQrA1PjAs61OoS
-        Y4yWSeR6pdwNufMZbw4poPnCjXOO1YqS0LNSBPKWiFNUT+xQH1jyieR0CmZ8Yw+1eLp25VTfZwN
-        SzStMYOcXEWazmMczugt4aa6x06Bt
-X-Received: by 2002:a2e:3012:: with SMTP id w18mr47494883ljw.217.1637549326836;
-        Sun, 21 Nov 2021 18:48:46 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzhMUoYJy/fa5HNf3Y1dZw9n8WaAFEGalW9iZHLhJvk00Yldk6U6avgseBmGbi5f8k7IKQdMCJIgKYGrl1mobY=
-X-Received: by 2002:a2e:3012:: with SMTP id w18mr47494851ljw.217.1637549326643;
- Sun, 21 Nov 2021 18:48:46 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:organization
+         :mime-version:content-transfer-encoding;
+        bh=JGBn1lQayMnvk5SYEnWwopHGKPW7YJeqgCL9mkpoJ34=;
+        b=a//yWCzauN0Jv5lM2pQMc1kIae+2r8yOkOnb21/di5d12Z7WBxjD+k4LEdJvb+xQNR
+         WU7n8GVLSo34POn9E3XoSRlbXp3wRAsCYToqjb3FqqHwlApukspSOV2YdSOtGY/SY/m5
+         +lqUD45RsZvuNiEShWA8t71cZma/MOHZnGepo6q6TLI5H7wOHRPSLtw4Q5eIzC074aHx
+         iJcbyQowXGb6Yvo5xsH2Z4fEsjJFoaAEGPtUkATRwFMunCznAEw4H/j6sb3d/Y0WoswD
+         jWHqh1KhZAcEirjHz4zzvd5SSw0zZ/1vRGPpQLrfy+DCu6fPb95DYZTGRuLncvCodQ0A
+         PD+w==
+X-Gm-Message-State: AOAM533cpGDojpkj5hiHAsqAXJnZ1ydkB5+VK2AdQwnnGsEY9cox4gRX
+        npEQjFT+9GHdDXFDGp+xbLc=
+X-Google-Smtp-Source: ABdhPJzbtMlHIwYNN2ppajgDSPNxu3KUwho2MEopPGg2LjwXiAjme+TJwfxsAur8aU+h8LTGasVMqA==
+X-Received: by 2002:a63:f749:: with SMTP id f9mr31061332pgk.330.1637552096890;
+        Sun, 21 Nov 2021 19:34:56 -0800 (PST)
+Received: from ubuntu ([222.129.53.202])
+        by smtp.gmail.com with ESMTPSA id k2sm7327273pfc.9.2021.11.21.19.34.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 21 Nov 2021 19:34:56 -0800 (PST)
+Date:   Mon, 22 Nov 2021 09:58:05 +0800
+From:   Aili Yao <yaoaili126@gmail.com>
+To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com
+Cc:     x86@kernel.org, hpa@zytor.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yaoaili@kingsoft.com
+Subject: [PATCH] KVM: LAPIC: Per vCPU control over
+ kvm_can_post_timer_interrupt
+Message-ID: <20211122095619.000060d2@gmail.com>
+Organization: ksyun
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.29; x86_64-w64-mingw32)
 MIME-Version: 1.0
-References: <20211115153003.9140-1-arbn@yandex-team.com> <20211115153003.9140-6-arbn@yandex-team.com>
- <CACGkMEumax9RFVNgWLv5GyoeQAmwo-UgAq=DrUd4yLxPAUUqBw@mail.gmail.com> <b163233f-090f-baaf-4460-37978cab4d55@yandex-team.com>
-In-Reply-To: <b163233f-090f-baaf-4460-37978cab4d55@yandex-team.com>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Mon, 22 Nov 2021 10:48:35 +0800
-Message-ID: <CACGkMEuNhRf8_nhAsJ68J4HFxGJcnjNyA8ZyktNcBhNGfSafmA@mail.gmail.com>
-Subject: Re: [PATCH 6/6] vhost_net: use RCU callbacks instead of synchronize_rcu()
-To:     Andrey Ryabinin <arbn@yandex-team.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        kvm <kvm@vger.kernel.org>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev <netdev@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 19, 2021 at 7:31 PM Andrey Ryabinin <arbn@yandex-team.com> wrote:
->
->
->
-> On 11/16/21 8:00 AM, Jason Wang wrote:
-> > On Mon, Nov 15, 2021 at 11:32 PM Andrey Ryabinin <arbn@yandex-team.com> wrote:
-> >>
-> >> Currently vhost_net_release() uses synchronize_rcu() to synchronize
-> >> freeing with vhost_zerocopy_callback(). However synchronize_rcu()
-> >> is quite costly operation. It take more than 10 seconds
-> >> to shutdown qemu launched with couple net devices like this:
-> >>         -netdev tap,id=tap0,..,vhost=on,queues=80
-> >> because we end up calling synchronize_rcu() netdev_count*queues times.
-> >>
-> >> Free vhost net structures in rcu callback instead of using
-> >> synchronize_rcu() to fix the problem.
-> >
-> > I admit the release code is somehow hard to understand. But I wonder
-> > if the following case can still happen with this:
-> >
-> > CPU 0 (vhost_dev_cleanup)   CPU1
-> > (vhost_net_zerocopy_callback()->vhost_work_queue())
-> >                                                 if (!dev->worker)
-> > dev->worker = NULL
-> >
-> > wake_up_process(dev->worker)
-> >
-> > If this is true. It seems the fix is to move RCU synchronization stuff
-> > in vhost_net_ubuf_put_and_wait()?
-> >
->
-> It all depends whether vhost_zerocopy_callback() can be called outside of vhost
-> thread context or not.
+From: Aili Yao <yaoaili@kingsoft.com>
 
-I think the answer is yes, the callback will be mainly used in the
-zerocopy path when the underlayer NIC finishes the DMA of a packet.
+When we isolate some pyhiscal cores, We may not use them for kvm guests,
+We may use them for other purposes like DPDK, or we can make some kvm
+guests isolated and some not, the global judgement pi_inject_timer is
+not enough; We may make wrong decisions:
 
-> If it can run after vhost thread stopped, than the race you
-> describe seems possible and the fix in commit b0c057ca7e83 ("vhost: fix a theoretical race in device cleanup")
-> wasn't complete. I would fix it by calling synchronize_rcu() after vhost_net_flush()
-> and before vhost_dev_cleanup().
->
-> As for the performance problem, it can be solved by replacing synchronize_rcu() with synchronize_rcu_expedited().
+In such a scenario, the guests without isolated cores will not be
+permitted to use vmx preemption timer, and tscdeadline fastpath also be
+disabled, both will lead to performance penalty.
 
-Yes, that's another way, but see below.
+So check whether the vcpu->cpu is isolated, if not, don't post timer
+interrupt.
 
->
-> But now I'm not sure that this race is actually exists and that synchronize_rcu() needed at all.
-> I did a bit of testing and I only see callback being called from vhost thread:
->
-> vhost-3724  3733 [002]  2701.768731: probe:vhost_zerocopy_callback: (ffffffff81af8c10)
->         ffffffff81af8c11 vhost_zerocopy_callback+0x1 ([kernel.kallsyms])
->         ffffffff81bb34f6 skb_copy_ubufs+0x256 ([kernel.kallsyms])
->         ffffffff81bce621 __netif_receive_skb_core.constprop.0+0xac1 ([kernel.kallsyms])
->         ffffffff81bd062d __netif_receive_skb_one_core+0x3d ([kernel.kallsyms])
->         ffffffff81bd0748 netif_receive_skb+0x38 ([kernel.kallsyms])
->         ffffffff819a2a1e tun_get_user+0xdce ([kernel.kallsyms])
->         ffffffff819a2cf4 tun_sendmsg+0xa4 ([kernel.kallsyms])
->         ffffffff81af9229 handle_tx_zerocopy+0x149 ([kernel.kallsyms])
->         ffffffff81afaf05 handle_tx+0xc5 ([kernel.kallsyms])
->         ffffffff81afce86 vhost_worker+0x76 ([kernel.kallsyms])
->         ffffffff811581e9 kthread+0x169 ([kernel.kallsyms])
->         ffffffff810018cf ret_from_fork+0x1f ([kernel.kallsyms])
->                        0 [unknown] ([unknown])
->
+Signed-off-by: Aili Yao <yaoaili@kingsoft.com>
+---
+ arch/x86/kvm/lapic.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-From the call trace you can send packets between two TAP. Since the TX
-of TAP is synchronous so we can't see callback to be called out of
-vhost thread.
-
-In order to test it, we need 1) enable zerocopy
-(experimental_zcopytx=1) and 2) sending the packet to the real NIC
-with bridge or macvlan
-
-Zerocopy was disalbed due to a lot of isuses (098eadce3c62 "vhost_net:
-disable zerocopy by default"). So if we fix by moving it to
-vhost_net_ubuf_put_and_wait(), there won't be a synchronize_rcu() in
-the non-zerocopy path which seems to be sufficient. And we can use
-synchronize_rcu_expedited() on top if it is really needed.
-
-Thanks
-
-> This means that the callback can't run after kthread_stop() in vhost_dev_cleanup() and no synchronize_rcu() needed.
->
-> I'm not confident that my quite limited testing cover all possible vhost_zerocopy_callback() callstacks.
->
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 759952dd1222..72dde5532101 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -34,6 +34,7 @@
+ #include <asm/delay.h>
+ #include <linux/atomic.h>
+ #include <linux/jump_label.h>
++#include <linux/sched/isolation.h>
+ #include "kvm_cache_regs.h"
+ #include "irq.h"
+ #include "ioapic.h"
+@@ -113,7 +114,8 @@ static inline u32 kvm_x2apic_id(struct kvm_lapic *apic)
+ 
+ static bool kvm_can_post_timer_interrupt(struct kvm_vcpu *vcpu)
+ {
+-	return pi_inject_timer && kvm_vcpu_apicv_active(vcpu);
++	return pi_inject_timer && kvm_vcpu_apicv_active(vcpu) &&
++		!housekeeping_cpu(vcpu->cpu, HK_FLAG_TIMER);
+ }
+ 
+ bool kvm_can_use_hv_timer(struct kvm_vcpu *vcpu)
+-- 
+2.25.1
 
