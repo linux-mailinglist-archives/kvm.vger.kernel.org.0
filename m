@@ -2,150 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A1B8458FD5
-	for <lists+kvm@lfdr.de>; Mon, 22 Nov 2021 14:59:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 78052458FDD
+	for <lists+kvm@lfdr.de>; Mon, 22 Nov 2021 15:01:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239543AbhKVOCh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Nov 2021 09:02:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39314 "EHLO
+        id S239631AbhKVOE5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Nov 2021 09:04:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232880AbhKVOCg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Nov 2021 09:02:36 -0500
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCAF9C061574
-        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 05:59:29 -0800 (PST)
-Received: by mail-lf1-x135.google.com with SMTP id n12so81324084lfe.1
-        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 05:59:29 -0800 (PST)
+        with ESMTP id S235993AbhKVOE4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Nov 2021 09:04:56 -0500
+Received: from mail-qk1-x72f.google.com (mail-qk1-x72f.google.com [IPv6:2607:f8b0:4864:20::72f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77C23C061574
+        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 06:01:50 -0800 (PST)
+Received: by mail-qk1-x72f.google.com with SMTP id de30so18214646qkb.0
+        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 06:01:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=shutemov-name.20210112.gappssmtp.com; s=20210112;
+        d=ziepe.ca; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=Q7OhoPungBQlpmy/07g8Fe+342nGWhdV6y8JU2nGv18=;
-        b=vT0USDJF2fCKLhM7AtmhHZ6TqmNhALxV9Bh1G9113KXxZPkG5aIQh+e3yJp+NMyEgB
-         yyjush06rRDAKf6xyUA+EMVlTfQFUDAid0CUtMtmeUtHix0pvnF7sbVcje0OV7nvBw9a
-         g/8GZ6NHc48vcDLcr1f3fW01yrRMGBsBbjITwRurbUP5g1aabFr4PnvcR9GVkDnhTJOZ
-         I3gDHccbJ7qYXpaRZGgxrspIfnGqi2qJLDQzshng4iQv3se7ahPPk7IgwWM5bY1jozMl
-         SfrrFIYhsGdWwbB4Wq4Hi54Cs40biyzXYNHrpN0Wwyms/lv0ik/a9vUpy/9oPybPTkwE
-         XN5A==
+        bh=AkVa9dgYFMW65oNWi3lEAnC5wvNaUzrKbDuhcPjVyAM=;
+        b=YbZPXtBUsIP409q2mT8lSr4BqkVNQQ7uwSh3flKk8k1tLdFvFH+qBcjZfbEQuRnSJt
+         ym7KIc8Rr2qe7cnTl58XYSE6lugUqTMCIbLTauRHYkZqs9rs3GKm1bMlBUWI+TRMcDGX
+         I0UZlTo4cd8ySiP1lEYqugVzwPTPEfPtKNmmPzejl2rh3HDr1pH7Jp2W80NczxtpUT2f
+         7DZmFWyXm06nxDnZOIMEP5lLL2tkQARwppJwaeUpCzINEB5Wi61hhIuu1iPds6HyRHDs
+         CkaIWL9eMwFvW3dqc9J2iSLvyxaUEjT+FHbVEY0VTDVLySkuR3731mB61RPDNMhCVl2Y
+         9yWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=Q7OhoPungBQlpmy/07g8Fe+342nGWhdV6y8JU2nGv18=;
-        b=YsiQ+guAiYTh89KfLMZpt+oKWuc/OXble0+b7sAieBA7N7nCB61Qk4iafSeTTcsOHR
-         gSBOOKNC5p6Kuty8szTAVYLRpzKYLOQjLbzRBDW81AhKU5jAsBmQ7OgFQmfBZckuFckm
-         tIXmvRzT9fVJGvvuaLL2Buzpcf4BvIvG/LTznYOkfSlHd1njSXRB0L7DCwakKiG+1olM
-         twRwjVTk8CTgsDqLWm7NqqQKlHs4sdeoyWgrbOLJuNgQZNJmQtdxJ2ExV6l3sTvzc8tC
-         JAtNkwnkdifPpJiC9my4asvbANSroI0QlwYYtENYqKPdhA5HBjpoyOUxy3GNAc5d6uhM
-         9sUQ==
-X-Gm-Message-State: AOAM533MePtaKn1yVQrNO5/a+Gcm1vNhPn105XO8i8eE/sENcBdQR51v
-        CEwzbW9MdxDV5rieoSUQLsL4oA==
-X-Google-Smtp-Source: ABdhPJwOSduIL/T2HcuHSSI/wDp1Ip4IJTwBbrmlaHHjfVN4PCNHDjahR2ZbiKbNVp+QmDNNUEuLww==
-X-Received: by 2002:a2e:9545:: with SMTP id t5mr51763112ljh.225.1637589567919;
-        Mon, 22 Nov 2021 05:59:27 -0800 (PST)
-Received: from box.localdomain ([86.57.175.117])
-        by smtp.gmail.com with ESMTPSA id i17sm967582lfe.281.2021.11.22.05.59.27
+        bh=AkVa9dgYFMW65oNWi3lEAnC5wvNaUzrKbDuhcPjVyAM=;
+        b=mCJ3eMtq2KfsZTwzLBbbDO5yrp45KILfGpI5ZSdaQfkb/HLCidT9khEQhHeM1u2zfd
+         xvgupa+VABti3Mwq67RuWleON5MKThVrbyfbyffbx/xC69jBZqT3bW7AhdqWXG6YTvif
+         7oL9m0gQ8mqqOB3W8FIZRP6P2XvJAhDN0wLCWevSLrbjciY0vsMnPgXcJnrRU+maC4Nj
+         C4WvvWws84KUHkuYoHYsAFzJC0g/Z21xrrOcu/bD6YnIw1VQKGoNEZf74Hzzsy0mmAcI
+         JiayUYnZzoAp8fcjbH3sMg7p9OVv+zW/n0+D9nrBDznipyNWAIPq4EhwfcVMsfdFJZIQ
+         pXFg==
+X-Gm-Message-State: AOAM53090zXQHwTGkCtAzhXBPW37wDd695HWSRgVTLURS2vXHHDhpKfJ
+        QKUJ49AJWYvrCCI7iu0u/l5kWsyqp+vfuw==
+X-Google-Smtp-Source: ABdhPJx4FBEsFukDClDSwGw8qd9OgvbrBef1ytO7EqEtX4yVEQkSoyHCZqYrRFEAi40duExffLYOuw==
+X-Received: by 2002:a05:620a:190b:: with SMTP id bj11mr47809423qkb.514.1637589709646;
+        Mon, 22 Nov 2021 06:01:49 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
+        by smtp.gmail.com with ESMTPSA id s13sm4716120qki.23.2021.11.22.06.01.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Nov 2021 05:59:27 -0800 (PST)
-Received: by box.localdomain (Postfix, from userid 1000)
-        id AD905103610; Mon, 22 Nov 2021 16:59:33 +0300 (+03)
-Date:   Mon, 22 Nov 2021 16:59:33 +0300
-From:   "Kirill A. Shutemov" <kirill@shutemov.name>
+        Mon, 22 Nov 2021 06:01:49 -0800 (PST)
+Received: from jgg by mlx with local (Exim 4.94)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1mp9tE-00DsN8-Ie; Mon, 22 Nov 2021 10:01:48 -0400
+Date:   Mon, 22 Nov 2021 10:01:48 -0400
+From:   Jason Gunthorpe <jgg@ziepe.ca>
 To:     David Hildenbrand <david@redhat.com>
 Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         linux-fsdevel@vger.kernel.org, qemu-devel@nongnu.org,
-        Wanpeng Li <wanpengli@tencent.com>, luto@kernel.org,
-        "J . Bruce Fields" <bfields@fieldses.org>, dave.hansen@intel.com,
-        "H . Peter Anvin" <hpa@zytor.com>, ak@linux.intel.com,
-        Jonathan Corbet <corbet@lwn.net>,
-        Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
-        Hugh Dickins <hughd@google.com>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        jun.nakajima@intel.com, Thomas Gleixner <tglx@linutronix.de>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Sean Christopherson <seanjc@google.com>, susie.li@intel.com,
-        Jeff Layton <jlayton@kernel.org>, john.ji@intel.com,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
         Andrew Morton <akpm@linux-foundation.org>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, john.ji@intel.com, susie.li@intel.com,
+        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com
 Subject: Re: [RFC v2 PATCH 01/13] mm/shmem: Introduce F_SEAL_GUEST
-Message-ID: <20211122135933.arjxpl7wyskkwvwv@box.shutemov.name>
+Message-ID: <20211122140148.GR876299@ziepe.ca>
 References: <20211119134739.20218-1-chao.p.peng@linux.intel.com>
  <20211119134739.20218-2-chao.p.peng@linux.intel.com>
- <942e0dd6-e426-06f6-7b6c-0e80d23c27e6@redhat.com>
+ <20211119151943.GH876299@ziepe.ca>
+ <df11d753-6242-8f7c-cb04-c095f68b41fa@redhat.com>
+ <20211119160023.GI876299@ziepe.ca>
+ <4efdccac-245f-eb1f-5b7f-c1044ff0103d@redhat.com>
+ <20211122133145.GQ876299@ziepe.ca>
+ <56c0dffc-5fc4-c337-3e85-a5c9ce619140@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <942e0dd6-e426-06f6-7b6c-0e80d23c27e6@redhat.com>
+In-Reply-To: <56c0dffc-5fc4-c337-3e85-a5c9ce619140@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 19, 2021 at 02:51:11PM +0100, David Hildenbrand wrote:
-> On 19.11.21 14:47, Chao Peng wrote:
-> > From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+On Mon, Nov 22, 2021 at 02:35:49PM +0100, David Hildenbrand wrote:
+> On 22.11.21 14:31, Jason Gunthorpe wrote:
+> > On Mon, Nov 22, 2021 at 10:26:12AM +0100, David Hildenbrand wrote:
 > > 
-> > The new seal type provides semantics required for KVM guest private
-> > memory support. A file descriptor with the seal set is going to be used
-> > as source of guest memory in confidential computing environments such as
-> > Intel TDX and AMD SEV.
+> >> I do wonder if we want to support sharing such memfds between processes
+> >> in all cases ... we most certainly don't want to be able to share
+> >> encrypted memory between VMs (I heard that the kernel has to forbid
+> >> that). It would make sense in the use case you describe, though.
 > > 
-> > F_SEAL_GUEST can only be set on empty memfd. After the seal is set
-> > userspace cannot read, write or mmap the memfd.
-> > 
-> > Userspace is in charge of guest memory lifecycle: it can allocate the
-> > memory with falloc or punch hole to free memory from the guest.
-> > 
-> > The file descriptor passed down to KVM as guest memory backend. KVM
-> > register itself as the owner of the memfd via memfd_register_guest().
-> > 
-> > KVM provides callback that needed to be called on fallocate and punch
-> > hole.
-> > 
-> > memfd_register_guest() returns callbacks that need be used for
-> > requesting a new page from memfd.
-> > 
-> 
-> Repeating the feedback I already shared in a private mail thread:
-> 
-> 
-> As long as page migration / swapping is not supported, these pages
-> behave like any longterm pinned pages (e.g., VFIO) or secretmem pages.
-> 
-> 1. These pages are not MOVABLE. They must not end up on ZONE_MOVABLE or
-> MIGRATE_CMA.
-> 
-> That should be easy to handle, you have to adjust the gfp_mask to
-> 	mapping_set_gfp_mask(inode->i_mapping, GFP_HIGHUSER);
-> just as mm/secretmem.c:secretmem_file_create() does.
+> > If there is a F_SEAL_XX that blocks every kind of new access, who
+> > cares if userspace passes the FD around or not?
+> I was imagining that you actually would want to do some kind of "change
+> ownership". But yeah, the intended semantics and all use cases we have
+> in mind are not fully clear to me yet. If it's really "no new access"
+> (side note: is "access" the right word?) then sure, we can pass the fd
+> around.
 
-Okay, fair enough. mapping_set_unevictable() also makes sesne.
+What is "ownership" in a world with kvm and iommu are reading pages
+out of the same fd?
 
-> 2. These pages behave like mlocked pages and should be accounted as such.
-> 
-> This is probably where the accounting "fun" starts, but maybe it's
-> easier than I think to handle.
-> 
-> See mm/secretmem.c:secretmem_mmap(), where we account the pages as
-> VM_LOCKED and will consequently check per-process mlock limits. As we
-> don't mmap(), the same approach cannot be reused.
-> 
-> See drivers/vfio/vfio_iommu_type1.c:vfio_pin_map_dma() and
-> vfio_pin_pages_remote() on how to manually account via mm->locked_vm .
-> 
-> But it's a bit hairy because these pages are not actually mapped into
-> the page tables of the MM, so it might need some thought. Similarly,
-> these pages actually behave like "pinned" (as in mm->pinned_vm), but we
-> just don't increase the refcount AFAIR. Again, accounting really is a
-> bit hairy ...
+"no new access" makes sense to me, we have access through
+read/write/mmap/splice/etc and access to pages through the private in
+kernel interface (kvm, iommu)
 
-Accounting is fun indeed. Non-mapped mlocked memory is going to be
-confusing. Hm...
-
-I will look closer.
-
--- 
- Kirill A. Shutemov
+Jason
