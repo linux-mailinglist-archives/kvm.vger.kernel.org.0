@@ -2,91 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D2BC5459464
-	for <lists+kvm@lfdr.de>; Mon, 22 Nov 2021 18:58:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 55082459466
+	for <lists+kvm@lfdr.de>; Mon, 22 Nov 2021 18:58:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238381AbhKVSBO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Nov 2021 13:01:14 -0500
-Received: from mail.kernel.org ([198.145.29.99]:39492 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233367AbhKVSBM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Nov 2021 13:01:12 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id B97BC60C4A;
-        Mon, 22 Nov 2021 17:58:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1637603885;
-        bh=xaPvWRRZLplWuTj6zfL8WONxOMLolZjyxQW/VUcabzM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=TaGnGGcyBXQBLJ9W61wVeyz/MNc33lttcCzOEXoIzohiqYDXGAVQhE/bdAdCQXoBo
-         Ji9T5Zp7wrEbdDIlf9DGI/ID7+/9eAuP+S/XvPWVFA06C0C1GR8bWQErfGKxKAKPs7
-         BaIHVWzvDJo+7Lr4fSQAcdza1HzrY7X46t4hqxjL0W2a0jSq8m/ROoxl6lW7P2Y1To
-         O8bUzzD65jVr0byC6hNreFKUVASfB3oUMhvcfA0i6vnpZECT08FV5sKjJBK0n+axbr
-         lCSWQlBgmjz62gQHH5T6bmkD11Y4a0ZKB0GMMhq9rJs63xQaDPaOz4QvipZTMPSCIQ
-         wHO6s9Sz4CcBg==
-Date:   Mon, 22 Nov 2021 17:58:00 +0000
-From:   Mark Brown <broonie@kernel.org>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Quentin Perret <qperret@google.com>,
-        Will Deacon <will@kernel.org>, kernel-team@android.com
-Subject: Re: [PATCH v2 2/5] KVM: arm64: Get rid of host SVE tracking/saving
-Message-ID: <YZvaKOLPxwFE9vQz@sirena.org.uk>
-References: <20211028111640.3663631-1-maz@kernel.org>
- <20211028111640.3663631-3-maz@kernel.org>
- <5ab3836f-2b39-2ff5-3286-8258addd01e4@huawei.com>
- <871r38dvyr.wl-maz@kernel.org>
+        id S239614AbhKVSBf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Nov 2021 13:01:35 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:22853 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S239456AbhKVSBd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 22 Nov 2021 13:01:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1637603906;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=oho2gQcrtnBzKN/N7Mw7niaAvzwkqs20P8dz8NbT/KA=;
+        b=bB8KI4pLxKHBVMURumSkvoRKqaQJzOlmGaSmGEooDydgu/pOIkjYd0/o/vt1DMHRjSKXUg
+        PwnB+ltlmnjFD1uEW76sSaAP+aYWvQvxy12O499MU0c7xl0HsnQSXF/ZYGAGJnBquhzYLZ
+        gZg+DMiy7px5BudbrnWcJFguq3jrwh0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-181-Ba9gOhaROT-WNYpa-QMgvw-1; Mon, 22 Nov 2021 12:58:23 -0500
+X-MC-Unique: Ba9gOhaROT-WNYpa-QMgvw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 07BC7872FF3;
+        Mon, 22 Nov 2021 17:58:22 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.40.192.236])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 119721037F5D;
+        Mon, 22 Nov 2021 17:58:19 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
+Subject: [PATCH 0/2] KVM: x86: Forbid KVM_SET_CPUID{,2} after KVM_RUN
+Date:   Mon, 22 Nov 2021 18:58:16 +0100
+Message-Id: <20211122175818.608220-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="4ejJzEuy+GX8OnS7"
-Content-Disposition: inline
-In-Reply-To: <871r38dvyr.wl-maz@kernel.org>
-X-Cookie: Lake Erie died for your sins.
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Commit 63f5a1909f9e ("KVM: x86: Alert userspace that KVM_SET_CPUID{,2}
+after KVM_RUN is broken") officially deprecated KVM_SET_CPUID{,2} ioctls
+after first successful KVM_RUN and promissed to make this sequence forbiden
+in 5.16. TO fulfil the promise 'hyperv_features' selftest needs to be fixed
+first.
 
---4ejJzEuy+GX8OnS7
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Vitaly Kuznetsov (2):
+  KVM: selftests: Avoid KVM_SET_CPUID2 after KVM_RUN in hyperv_features
+    test
+  KVM: x86: Forbid KVM_SET_CPUID{,2} after KVM_RUN
 
-On Mon, Nov 22, 2021 at 03:57:32PM +0000, Marc Zyngier wrote:
-> Zenghui Yu <yuzenghui@huawei.com> wrote:
+ arch/x86/kvm/mmu/mmu.c                        |  20 +--
+ arch/x86/kvm/x86.c                            |  27 ++++
+ .../selftests/kvm/x86_64/hyperv_features.c    | 140 +++++++++---------
+ 3 files changed, 101 insertions(+), 86 deletions(-)
 
-> > Nit: This removes the only user of __sve_save_state() helper. Should we
-> > still keep it in fpsimd.S?
+-- 
+2.33.1
 
-> I was in two minds about that, as I'd like to eventually be able to
-> use SVE for protected guests, where the hypervisor itself has to be in
-> charge of the FP/SVE save-restore.
-
-> But that's probably several months away, and I can always revert a
-> deletion patch if I need to, so let's get rid of it now.
-
-While we're on the subject of potential future work we might in future
-want to not disable SVE on every syscall if (as seems likely) it turns
-out that that's more performant for small vector lengths which would
-mean some minor reshuffling here to do something like convert the saved
-state to FPSIMD and drop TIF_SVE in _vcpu_load_fp().  As with using SVE
-in protected guests that can just be done when needed though.
-
---4ejJzEuy+GX8OnS7
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmGb2icACgkQJNaLcl1U
-h9BczQf+IBminM9LlYcrYBFvkLv1xG/VjhSrXo0RiCzpz5QehpsZDC2Xycu4+seo
-7y5r3IXniQ0R4FAA68e9D2FT/ubuwBJ72cZ/eBdW5QWMFoX0dZMk3v+/YiDVxch0
-hr/ZUAVDB6qsgjVXoUeuYJxfBuxlDnDUbB4zMw+PjP9mMcgg9aTzO4kgQ8VHd9q0
-OkCT/fyP1zl0yaKtcFXeg2fsJWvJgOp+SnwQ+z5ht1jnCkb2t+iXO48wpg0YETtd
-Uw5m/QMMsg/7Sy2WBjCB/gY2ThljfBpLY9CgbESPFNbyamfxDF/NWJZs6Bs/qHOB
-y0I6Gy6DMi9nbVMYHcuZgcq+XzWlOg==
-=9M+3
------END PGP SIGNATURE-----
-
---4ejJzEuy+GX8OnS7--
