@@ -2,196 +2,193 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 945A045952F
-	for <lists+kvm@lfdr.de>; Mon, 22 Nov 2021 19:56:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C7D3459552
+	for <lists+kvm@lfdr.de>; Mon, 22 Nov 2021 20:06:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235819AbhKVTAD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Nov 2021 14:00:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51284 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235967AbhKVTAB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Nov 2021 14:00:01 -0500
-Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46F79C06173E
-        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 10:56:55 -0800 (PST)
-Received: by mail-io1-xd34.google.com with SMTP id 14so24618649ioe.2
-        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 10:56:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ZCwF2T7S6E1D0BNcdwX7lIZbWotX8W3x5GSjT7EmrZc=;
-        b=ERKIJRbIql03mAwO5FrSUyhNYPi2k09yS4SNrtrsLY37ab+s+bWM30bKjrDIMlA2Vv
-         B/HIDxyKIdPLYp/HLTNHtWqO7pjLB5DPtcjEdneqXBNd7H60KoHPKwqpS5gViOK5bMCY
-         KqqnNbvGu4uqMziW6aZCzdQxStunSxQbMFqzTKtGaZD3PGUjiKe8lLiV6EgxLtMXa36p
-         fxWnnGZLmO3aSLZof2v2gn8KAB4UFM6+oSkpNt8C6H2OC1/DM5eWTsDiXpfCdTVbxoQt
-         KPZ2x26OlUzeMcLbnzb0gYiMturOi2/iqdFOImPmgZyvTjNFkNBJY9ooaTUBeBJvMASa
-         ZYUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ZCwF2T7S6E1D0BNcdwX7lIZbWotX8W3x5GSjT7EmrZc=;
-        b=bPsOBekh1Ry5ee5GP7gJTQKEHMrAseNVzBKjbp1U1I2Ngr3qN0d7M8O08MDcvNZn+5
-         TiAWlUBVYF9rI0xqIIzcDFCKoaBLeTzS1VnBULFmTr6Y7Cd8gUjOyEw6h2Jzfy1pNHk4
-         15iQKlgzIwX7yUpKT79Hc54yOBnT/EdtrwFTZQFuL/m364kvG/kY3L0eByxYpQ4d4j/n
-         cmVE0t9OU1S8Y435LQerZnpjBVZabjMcCj4n5J3iHHv8nNzgE5f2kn8ky4vP5AD8M9WA
-         uYTVtLHivmp6kwMPMLvF2eWkjpuyM1Q9zMN80QkHWVxgFkoKjuY7CqJKNAa4JP4BJXQa
-         f6kA==
-X-Gm-Message-State: AOAM531Eoj8CRYs1OQWBArzgea2YTSqXHSi98JZbhzW+NsSXX9kJ5Drw
-        cX7uYdVugg4x2xhshLvkRtLfhcLwuuwrFwMUivpEtg==
-X-Google-Smtp-Source: ABdhPJz/Nd1I32bh6dUHYooxdGX2h3fPAFFuEDE5tdFCNm+r9lxNRI9Q8Pj2KkpbB0kEPoKFckb6EL3hZsIZtWNVCmo=
-X-Received: by 2002:a02:70cf:: with SMTP id f198mr50104593jac.124.1637607414513;
- Mon, 22 Nov 2021 10:56:54 -0800 (PST)
-MIME-Version: 1.0
-References: <20211119235759.1304274-1-dmatlack@google.com> <20211119235759.1304274-12-dmatlack@google.com>
-In-Reply-To: <20211119235759.1304274-12-dmatlack@google.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Mon, 22 Nov 2021 10:56:43 -0800
-Message-ID: <CANgfPd_xRLwDahhp3136B4_0JC7S=JCo8wZ6E3uPQ9JC-n1eHg@mail.gmail.com>
-Subject: Re: [RFC PATCH 11/15] KVM: x86/mmu: Refactor tdp_mmu iterators to
- take kvm_mmu_page root
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        id S239712AbhKVTJ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Nov 2021 14:09:29 -0500
+Received: from mail-bn8nam12on2078.outbound.protection.outlook.com ([40.107.237.78]:53793
+        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S239573AbhKVTJY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Nov 2021 14:09:24 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=J072ITe/WUcgNVOTCqGCH/YCyG30kvvhYKtaLhO2Ds7v9iNI5ceu+2jkU6QhSJiZyX+cftp/pCYTJas9uFdzuhx6uqLTkvkqvnCYR/3czMkofL18LvZqaPFnPhKZ+sdOyyXpIPKoWKERTTi+Lp+/A0Yza5m6Ep7mSi1mpg/Aklz/0Pkgr5w3LYqRU4GFuYeEpfIU/sv2x0NAyMWRjZ6BlvzP7/5x1WMJ/qNIJaRTUuOVZZ5E6MWD3GvvJQAQQY+sFuehyVfN/Cey5ZBQXXDk8YhlxLjeZmvx5BPdY8GSJQjyJeRKG6QE50xc/XKIPE8FImtFOw1Sy5nvVjNXl+u6kA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=AHuV0m4tLTG5c62yXPPAQmjbSvNAP72mQ1ZsxHiNhlo=;
+ b=Ki5whdi08nQXoFdFVgxUAzNv7H8g1OhxbVb2nKCdGFDpvnXDlUBp9Zway+LrfkRWJM3ewSs1t6GHDwkH6vClNMC2iY6+zCNb1tXLhrCils02mcl3I8qzGcVoE0zHquJvXjH+u1La/CBIi/yO2BuJXBjxpBaqpI5nweK7jV8V7RSOeq6Bsez39eNNRuZP9x49lh8DzPIUJn09IJqmw17X5y3XOTsEGSp7jgYj3aNMgtXPkqov1Qsy8kPHYSc89xgTSS9DqSVaMmXPtfIAHOyOunrCwbKxkgpHhktRPojvT9aqUEVIsBMKV080HKrpTDPtbSNpirTKUFHhBDTw0T2ZYw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AHuV0m4tLTG5c62yXPPAQmjbSvNAP72mQ1ZsxHiNhlo=;
+ b=r54DqXH4Ae71z7vQIqKw7xF6SNpo7Y4G8Txn/iXcsXn26wq+zkB5zlEve/rbATZB393pxLec529NA9+WkB7fEVUfqe/Y9OOTXs88r17JxX8Jk1xtkhKexJEu//hKJMPIsAhNq/aTTPA14zSM721scrRVhU3CqI0AUQ4jUrSYVwY=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
+ by SA0PR12MB4559.namprd12.prod.outlook.com (2603:10b6:806:9e::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4713.22; Mon, 22 Nov
+ 2021 19:06:15 +0000
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::e4da:b3ea:a3ec:761c]) by SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::e4da:b3ea:a3ec:761c%7]) with mapi id 15.20.4713.025; Mon, 22 Nov 2021
+ 19:06:15 +0000
+Message-ID: <f15597a0-e7e0-0a57-39fd-20715abddc7f@amd.com>
+Date:   Mon, 22 Nov 2021 13:06:11 -0600
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.3.1
+Cc:     brijesh.singh@amd.com, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>,
-        Junaid Shahid <junaids@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Harish Barathvajasankar <hbarath@google.com>,
-        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
+ Hypervisor Support
+Content-Language: en-US
+To:     Dave Hansen <dave.hansen@intel.com>,
+        Peter Gonda <pgonda@google.com>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
+ <daf5066b-e89b-d377-ed8a-9338f1a04c0d@amd.com>
+ <d673f082-9023-dafb-e42e-eab32a3ddd0c@intel.com>
+From:   Brijesh Singh <brijesh.singh@amd.com>
+In-Reply-To: <d673f082-9023-dafb-e42e-eab32a3ddd0c@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA9PR13CA0050.namprd13.prod.outlook.com
+ (2603:10b6:806:22::25) To SN6PR12MB2718.namprd12.prod.outlook.com
+ (2603:10b6:805:6f::22)
+MIME-Version: 1.0
+Received: from [10.0.0.5] (70.112.153.56) by SA9PR13CA0050.namprd13.prod.outlook.com (2603:10b6:806:22::25) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4734.13 via Frontend Transport; Mon, 22 Nov 2021 19:06:13 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 6033cb8c-cd4f-43f4-8a09-08d9adeb280b
+X-MS-TrafficTypeDiagnostic: SA0PR12MB4559:
+X-Microsoft-Antispam-PRVS: <SA0PR12MB4559C55F265F41A89BC9E8ACE59F9@SA0PR12MB4559.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: qbA+sef8ORpA8IhrONT3D2Y9V0FOO9ucIjX4iA+uyRswDIFtrtMrwPIc21suLRfldzq+1BD/g9kmhPoyz1AyYLMgkSoSpGrzXz+dh8Qn+g/VyfmN3RFbAF1jPsxm3Tg42L3xcsI5n/fgm3N/C5K41BNtU1tt26ybF6qwnoWCnkIAYTqpIMCckmVMucEO0RfhKZSTPy7rVFJxEfizU8T6HT5I4nEkBTkB+4L4j/kA2uz07bWkVJNtk1a+Va8njtzJHR0fpcBMPMQYY0l+eHDbBg87/jqxHcEJ7wdMughxiUt6dQ/JMEcDeYW913BI/DGZvQB3mWL0R305qunYUUERdrN8MsNdck8j93Qwxr9qgt5pKj9X9OX3+9n/UcQEuuJrNM1tg0H6EJjBl8AdKIvv41Do2C/n+XkOMldkQfc77jmdVExHWwyawRRWdv5IpVXJJuGW7i0KRFPQnAy/n18VGR4EDZhmiRfuvAuFauFjeqQMAHQt/ireefMcboIDb/mBEjhODQMOOqijPFRjFRHhsPMD8uekM1YG4vPAqnggs4KQClMWLWlxppLN+d5Njm6OfN48ePIrF78hP0/pycA8jhEVW8Y4oe+z148wF2rYXsTRDiICQ2OynoSbTTxxoJEybRd2lj/Z9KrF1BNQfCLSvo0H1QR825qk6DKVj9ovHxV9DpCxrKqki2uAW88UZjWqmRsGJwxiWZ8BRaMnusx7+bwZbvtceq50f9eoCK3eznQ=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(7406005)(7416002)(31696002)(956004)(2616005)(4326008)(6486002)(5660300002)(8676002)(186003)(316002)(36756003)(26005)(38100700002)(53546011)(16576012)(44832011)(54906003)(66476007)(2906002)(66556008)(508600001)(86362001)(83380400001)(8936002)(31686004)(110136005)(66946007)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZU1QNXdLdFZpR254UENBcXdtenRIaUJMM1lSS3BhS3JHaVZvN3ZDN1A4TitZ?=
+ =?utf-8?B?Y0kyUkNjZmE2QUx6Yis1SERrTlRzNG82QmZwVDd2ajNJWnEvbGJwUitLNm5N?=
+ =?utf-8?B?MUFRK3M4di9OWmdtejQ4TWc3eUlPNnFqb01uQWNGeEJraThCNHZ6dm8wemVB?=
+ =?utf-8?B?REJoR2xEendHd043WEV5bnA1bVdBcExhc3VwdHNGZXdLdVhPbUpmSUc4UDNG?=
+ =?utf-8?B?TjhxNkJnRWEybmNKY2s1OTVrbzlmSEpFbHZqYUlBOWpMT1BzVGxzMkJwMWNQ?=
+ =?utf-8?B?RjR1Y3hHYU96ekdWZHlEMTJEZWZDdVlwZ1RLNDQ5V0k3SUp1akFJY2hRZFdu?=
+ =?utf-8?B?Uy9xVWlSM2lZcGxtbUJHNHBjZGxlcm1tWC9HaldHczIxa0p1ZHE2c01IaDlq?=
+ =?utf-8?B?a1ByakpjU1IzTk5sMUxyZERpRkd4akNaMkk4OWlGWkdMZnZqa3VFOFJVMmVu?=
+ =?utf-8?B?TW0xODV0Vks1SFBZOWFpUS81VkhOZlZXVmF0Qmc0Z1JNZGV5Skwzb3ExMnM5?=
+ =?utf-8?B?SUF2YTA2cFJORG5kUUNCQVNMa1N3Z0YzYmFRbDhwQmRGejJWVUY2SXdqZFlp?=
+ =?utf-8?B?cUszdmloS0xmZzl0QkljSENFQ0lSeE05bjhYUFFjdUpCQVFHc0I2WUhqZWZ3?=
+ =?utf-8?B?N2Jrek9BVGR0Tm5NenpOSjk0SGRpNE9NLzFraGsxa1N1N3lHRm9CRVB6eHhP?=
+ =?utf-8?B?OHZoQXJJSXErU1B2YnJIRm01cEJERzdXQ3p0Y0pEL2NIeFBtRmpFZ0FHeThQ?=
+ =?utf-8?B?amR0NFhyT2xKaDhWa1VEWDJobEFUdk01VmNyM21Ec2RpRDVwRUV2TlFLVTV4?=
+ =?utf-8?B?RHN1b0EzRGVsUngzbXVQTnhJRHhvWktFd014Y1RuVDZaVTJkZ1JXRXpQR24w?=
+ =?utf-8?B?cmFabFIvSk5pcHR4VS9pcnJocm1NZjVwTHNvelhHSXZXU1RFdXJpMGxJcmwx?=
+ =?utf-8?B?NGVxdGxaMnBIalpZTEJzWlBpNTNHWXF6WkVhc01PN2N3MDM1R3FsdFM3Z0NH?=
+ =?utf-8?B?aExEWWFURXRvaU1kR1ZqSHVVWjF0aWdHa242dVMyeUdZSitjV2JXenBJQ3Vx?=
+ =?utf-8?B?a0puUEN1Q0s1UVJ3K2trSlU5NzYweGdOeTVsNzdaUzgrdUdtNXhEMTVVQWNv?=
+ =?utf-8?B?alpRaWZEbWZqMHVYb3Qya1N3ZndBYzhaTVFPSFZNM280QmZDZi8xOHhvQ3Vm?=
+ =?utf-8?B?aERYZzJEM2I0YmxSelBzNC8zQzlrUEdmdnpjazc4TmwrWXBvUkNPb2JEaGhv?=
+ =?utf-8?B?SG96V2o1Z0tud0lZQVh0NHJLTUhCdFVWWDUrZWNBaFFYYXNjSGsyZmFPZllT?=
+ =?utf-8?B?TGF1NW41LzR2RGJkUm9VRkJERE9aUXdVdWk1QVRvSnpQblNhYm9VZzVaUHNY?=
+ =?utf-8?B?VThieUVxZEFjeEw4a0pzQXhRQ0hkaTEwR1l2YXBpTU5JbUptNm9wT2sxWWg4?=
+ =?utf-8?B?UVNKUkhyb3FveW9TemE2SkVleXlWVjJtVmFaS1AvVzBsdEI5aHVkaFVBbm9K?=
+ =?utf-8?B?Unc1Wm5nTnFnUWxjeTNPK241d3grZGkrYW03ek9nR1piY1pBcW1Qbkk3R0ZZ?=
+ =?utf-8?B?RFEzbHdJaWU4SmxnK1JmbklWZE44U0lWcG1tZkI5RDFWTGNDa1RXSk5DUEl5?=
+ =?utf-8?B?SFA1N1c3QVlVaDBFTWw0dDVVQUNXdFZEcy9NV2VsYXMzeVYxdjN0Q0g2cExM?=
+ =?utf-8?B?b3hlUURJS0xsWmJ6K3U5MUxlZVNnWGxHNzFDckNrNlNlMGVmOFpqT2FPa0tm?=
+ =?utf-8?B?a0NReGorSFVjbVU5SW9OWDJHdS9wS2I3NlRtUUNyT05Dc3ZrZERnNlNjRWph?=
+ =?utf-8?B?cncxTlYrTkFTK2ZCWVJxRjUxRE1RdW5lWlhscjRBamRpb2Q1MUZ3bW1hbW9Y?=
+ =?utf-8?B?UGJrT2Iway9pclIycS9vQ1ZJeXFEL1FydnVTRFJtRnhiUk1Qb2hSQjNmb0pW?=
+ =?utf-8?B?VHlMUXVIN3o5Tmw4S3ZmMi84MGtwcnFNWjhNTWd2YkwvaVJlT3JEOGtXelNl?=
+ =?utf-8?B?RjNyNXREbmxqY3Z5Q2d6OXNCQzg4dElLMlJhOEFaSmVzRFhDMFFiejZDS3pz?=
+ =?utf-8?B?UnBuTWhVdjV0SWtRcU5Nd0FFeHI1UnVtbkNZbzA3U2dMQzhEZ3dUaUJJSldZ?=
+ =?utf-8?B?d0ZGbWUvd2s3QldBeDUybXdPLzhrWDgxUUVKYzVlUWNaTGxKVjVZeGpJZXhY?=
+ =?utf-8?Q?9hZPxLIVhp3Zk+SRAkEPSJY=3D?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6033cb8c-cd4f-43f4-8a09-08d9adeb280b
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Nov 2021 19:06:15.2319
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: i669jqUPEJMVh8/cJDFsUnTZQmpJDDBUlB7ABf8xCH/JbJp9gPdlTVS+bfolY8cyYAjo/azhg4GdNKSWez4ETw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4559
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 19, 2021 at 3:58 PM David Matlack <dmatlack@google.com> wrote:
->
-> Instead of passing a pointer to the root page table and the root level
-> seperately, pass in a pointer to the kvm_mmu_page that backs the root.
-> This reduces the number of arguments by 1, cutting down on line lengths.
->
-> No functional change intended.
->
-> Signed-off-by: David Matlack <dmatlack@google.com>
 
-Reviewed-by: Ben Gardon <bgardon@google.com>
+On 11/22/21 12:30 PM, Dave Hansen wrote:
+> On 11/22/21 7:23 AM, Brijesh Singh wrote:
+>> Thank you for starting the thread; based on the discussion, I am keeping
+>> the current implementation as-is and *not* going with the auto
+>> conversion from private to shared. To summarize what we are doing in the
+>> current SNP series:
+>>
+>> - If userspace accesses guest private memory, it gets SIGBUS.
+>> - If kernel accesses[*] guest private memory, it does panic.
+> There's a subtlety here, though.  There are really three *different*
+> kinds of kernel accesses that matter:
+> 1. Kernel bugs.  Kernel goes off and touches some guest private memory
+>    when it didn't mean to.  Say, it runs off the end of a slab page and
+>    runs into a guest page.  panic() is expected here.
 
-> ---
->  arch/x86/kvm/mmu/tdp_iter.c |  5 ++++-
->  arch/x86/kvm/mmu/tdp_iter.h | 10 +++++-----
->  arch/x86/kvm/mmu/tdp_mmu.c  | 14 +++++---------
->  3 files changed, 14 insertions(+), 15 deletions(-)
->
-> diff --git a/arch/x86/kvm/mmu/tdp_iter.c b/arch/x86/kvm/mmu/tdp_iter.c
-> index b3ed302c1a35..92b3a075525a 100644
-> --- a/arch/x86/kvm/mmu/tdp_iter.c
-> +++ b/arch/x86/kvm/mmu/tdp_iter.c
-> @@ -39,9 +39,12 @@ void tdp_iter_restart(struct tdp_iter *iter)
->   * Sets a TDP iterator to walk a pre-order traversal of the paging structure
->   * rooted at root_pt, starting with the walk to translate next_last_level_gfn.
->   */
-> -void tdp_iter_start(struct tdp_iter *iter, u64 *root_pt, int root_level,
-> +void tdp_iter_start(struct tdp_iter *iter, struct kvm_mmu_page *root,
-
-I think this is an artifact of the days when I thought we could avoid
-allocating struct kvm_mmu_pages for the TDP MMU.
-Trying to do that turned out to be a huge pain though and the memory
-savings weren't great.
-Happy to see this cleaned up.
+In current implementation, a write to guest private will trigger a
+kernel panic().
 
 
->                     int min_level, gfn_t next_last_level_gfn)
->  {
-> +       u64 *root_pt = root->spt;
-> +       int root_level = root->role.level;
-> +
->         WARN_ON(root_level < 1);
->         WARN_ON(root_level > PT64_ROOT_MAX_LEVEL);
->
-> diff --git a/arch/x86/kvm/mmu/tdp_iter.h b/arch/x86/kvm/mmu/tdp_iter.h
-> index b1748b988d3a..ec1f58013428 100644
-> --- a/arch/x86/kvm/mmu/tdp_iter.h
-> +++ b/arch/x86/kvm/mmu/tdp_iter.h
-> @@ -51,17 +51,17 @@ struct tdp_iter {
->   * Iterates over every SPTE mapping the GFN range [start, end) in a
->   * preorder traversal.
->   */
-> -#define for_each_tdp_pte_min_level(iter, root, root_level, min_level, start, end) \
-> -       for (tdp_iter_start(&iter, root, root_level, min_level, start); \
-> +#define for_each_tdp_pte_min_level(iter, root, min_level, start, end) \
-> +       for (tdp_iter_start(&iter, root, min_level, start); \
->              iter.valid && iter.gfn < end;                   \
->              tdp_iter_next(&iter))
->
-> -#define for_each_tdp_pte(iter, root, root_level, start, end) \
-> -       for_each_tdp_pte_min_level(iter, root, root_level, PG_LEVEL_4K, start, end)
-> +#define for_each_tdp_pte(iter, root, start, end) \
-> +       for_each_tdp_pte_min_level(iter, root, PG_LEVEL_4K, start, end)
->
->  tdp_ptep_t spte_to_child_pt(u64 pte, int level);
->
-> -void tdp_iter_start(struct tdp_iter *iter, u64 *root_pt, int root_level,
-> +void tdp_iter_start(struct tdp_iter *iter, struct kvm_mmu_page *root,
->                     int min_level, gfn_t next_last_level_gfn);
->  void tdp_iter_next(struct tdp_iter *iter);
->  void tdp_iter_restart(struct tdp_iter *iter);
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 2221e074d8ea..5ca0fa659245 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -632,7 +632,7 @@ static inline void tdp_mmu_set_spte_no_dirty_log(struct kvm *kvm,
->  }
->
->  #define tdp_root_for_each_pte(_iter, _root, _start, _end) \
-> -       for_each_tdp_pte(_iter, _root->spt, _root->role.level, _start, _end)
-> +       for_each_tdp_pte(_iter, _root, _start, _end)
->
->  #define tdp_root_for_each_leaf_pte(_iter, _root, _start, _end) \
->         tdp_root_for_each_pte(_iter, _root, _start, _end)               \
-> @@ -642,8 +642,7 @@ static inline void tdp_mmu_set_spte_no_dirty_log(struct kvm *kvm,
->                 else
->
->  #define tdp_mmu_for_each_pte(_iter, _mmu, _start, _end)                \
-> -       for_each_tdp_pte(_iter, __va(_mmu->root_hpa),           \
-> -                        _mmu->shadow_root_level, _start, _end)
-> +       for_each_tdp_pte(_iter, to_shadow_page(_mmu->root_hpa), _start, _end)
->
->  static inline bool tdp_mmu_iter_need_resched(struct kvm *kvm, struct tdp_iter *iter)
->  {
-> @@ -738,8 +737,7 @@ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
->
->         rcu_read_lock();
->
-> -       for_each_tdp_pte_min_level(iter, root->spt, root->role.level,
-> -                                  min_level, start, end) {
-> +       for_each_tdp_pte_min_level(iter, root, min_level, start, end) {
->  retry:
->                 if (can_yield &&
->                     tdp_mmu_iter_cond_resched(kvm, &iter, flush, shared)) {
-> @@ -1201,8 +1199,7 @@ static bool wrprot_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
->
->         BUG_ON(min_level > KVM_MAX_HUGEPAGE_LEVEL);
->
-> -       for_each_tdp_pte_min_level(iter, root->spt, root->role.level,
-> -                                  min_level, start, end) {
-> +       for_each_tdp_pte_min_level(iter, root, min_level, start, end) {
->  retry:
->                 if (tdp_mmu_iter_cond_resched(kvm, &iter, false, true))
->                         continue;
-> @@ -1450,8 +1447,7 @@ static bool write_protect_gfn(struct kvm *kvm, struct kvm_mmu_page *root,
->
->         rcu_read_lock();
->
-> -       for_each_tdp_pte_min_level(iter, root->spt, root->role.level,
-> -                                  min_level, gfn, gfn + 1) {
-> +       for_each_tdp_pte_min_level(iter, root, min_level, gfn, gfn + 1) {
->                 if (!is_shadow_present_pte(iter.old_spte) ||
->                     !is_last_spte(iter.old_spte, iter.level))
->                         continue;
-> --
-> 2.34.0.rc2.393.gf8c9666880-goog
->
+> 2. Kernel accesses guest private memory via a userspace mapping, in a
+>    place where it is known to be accessing userspace and is prepared to
+>    fault.  copy_to_user() is the most straightforward example.  Kernel
+>    must *not* panic().  Returning an error to the syscall is a good
+>    way to handle these (if in a syscall).
+
+In the current implementation, the copy_to_user() on the guest private
+will fails with -EFAULT.
+
+
+> 3. Kernel accesses guest private memory via a kernel mapping.  This one
+>    is tricky.  These probably *do* result in a panic() today, but
+>    ideally shouldn't.
+
+KVM has defined some helper functions to maps and unmap the guest pages.
+Those helper functions do the GPA to PFN lookup before calling the
+kmap(). Those helpers are enhanced such that it check the RMP table
+before the kmap() and acquire a lock to prevent a page state change
+until the kunmap() is called. So, in the current implementation, we
+should *not* see a panic() unless there is a KVM driver bug that didn't
+use the helper functions or a bug in the helper function itself.
+
+
+> Could you explicitly clarify what the current behavior is?
