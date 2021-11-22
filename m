@@ -2,102 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4EDFA459604
-	for <lists+kvm@lfdr.de>; Mon, 22 Nov 2021 21:20:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2EF7D459616
+	for <lists+kvm@lfdr.de>; Mon, 22 Nov 2021 21:31:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240434AbhKVUXE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Nov 2021 15:23:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41818 "EHLO
+        id S231663AbhKVUeY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Nov 2021 15:34:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232667AbhKVUXD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Nov 2021 15:23:03 -0500
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C844EC061714
-        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 12:19:56 -0800 (PST)
-Received: by mail-pj1-x1031.google.com with SMTP id fv9-20020a17090b0e8900b001a6a5ab1392so886092pjb.1
-        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 12:19:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=mRxIeU9HPgzOY3clEU+77o23b2EAQbNCRiTPpgLxklA=;
-        b=CKa8JazZ41nRBv/+ULd1g5vvoetmCxEd7/52ZApQmKaWjCkKzv4wX0aZcynTwBG44V
-         dp/yPAisfCYmXCGEtl96K9Dvesy2q4l76JsT5rxcVJ3epWACmiFg4Y8YRJ7LDZwlx/Ic
-         u3BtM8hd9e6keFl2lJWiRpXc5BGJn+kdyr0DJdBYkWuZXPogLKvJD4IRHVqHWo9IrGL4
-         XsgNrdtYF8TrbjEOgbpuWGcnsOYJUAjwz5z5qtv7l6WS04Ik89Ksmbg6auAPVWTPxVm5
-         uY1LjtFCsW/4IN1RbSbExW3o2r2XKCw/7R4tRrmrNqAra2UQjds5J0CuGupE1lPTaEQH
-         YZag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=mRxIeU9HPgzOY3clEU+77o23b2EAQbNCRiTPpgLxklA=;
-        b=giEgqeAVIkiBNXyG8VcAL2Z/36VW8k7SYCfhHmciiTyB3/baRzBWVc6LKjRfPxTUjo
-         zJ8/V6+Blzygjh6dC/+PuVAfvvsl4o5hPu9WdFqTZep3TluVf5b92rfjmOCqXI4TovTj
-         2jw9/4n9Q5P44NHepObSKHf8b6+/Y7zSi4mf7OvAxuK+MA0VzX7r+yO+enboQtRft6fo
-         SbkxqtKeZu9Zc+XdfoQiarbrhQTPYIGne8uxkhxzmCQ4rKD0CYbzs4oKFHxCgWl5/DG6
-         yqZEHVv+jsWvdcy63SivMmTK0ZDZmG8J6D6+A5HszK7Q4huMuCDLkWGcJc6Dpq+y1ykg
-         a9WQ==
-X-Gm-Message-State: AOAM5309P5GKkL6pAzRfXyPvmM9q+6vSLrqqZC4SgnTVgp4PR4DrKMzT
-        QBouWqoN7U3oM24ErSC2A3TKGQ==
-X-Google-Smtp-Source: ABdhPJzQAX5rio7DTTwz9eNYQ6QSDxHgCK5fgM6VOwMLfwtHzlnXhLRnQp6cNfcC09xIgx8XvJICDQ==
-X-Received: by 2002:a17:902:d4d0:b0:141:c13d:6c20 with SMTP id o16-20020a170902d4d000b00141c13d6c20mr112062554plg.44.1637612396182;
-        Mon, 22 Nov 2021 12:19:56 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id v38sm6717082pgl.38.2021.11.22.12.19.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Nov 2021 12:19:55 -0800 (PST)
-Date:   Mon, 22 Nov 2021 20:19:52 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Hou Wenlong <houwenlong93@linux.alibaba.com>
-Subject: Re: [PATCH 09/28] KVM: x86/mmu: Require mmu_lock be held for write
- in unyielding root iter
-Message-ID: <YZv7aIL8+7ESCfFc@google.com>
-References: <20211120045046.3940942-1-seanjc@google.com>
- <20211120045046.3940942-10-seanjc@google.com>
- <CANgfPd9=ce+JT3xEJy=p5MEfvkMGovEaBEu8KmxiZAJ1AA958g@mail.gmail.com>
+        with ESMTP id S229997AbhKVUeX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Nov 2021 15:34:23 -0500
+Received: from ms.lwn.net (ms.lwn.net [IPv6:2600:3c01:e000:3a1::42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4E96C061574
+        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 12:31:16 -0800 (PST)
+Received: from localhost (unknown [IPv6:2601:281:8300:104d::5f6])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ms.lwn.net (Postfix) with ESMTPSA id 284B46A2;
+        Mon, 22 Nov 2021 20:31:15 +0000 (UTC)
+DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 284B46A2
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
+        t=1637613075; bh=38c8szBRcFhkJvxMndhYg4axlYAnQw6cjZ5m2H/eLzk=;
+        h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+        b=g/9z/b1pqJDEnkOqhZDw2IV7sVt2SkZH4dLJb+0ZLKQnnoIjEj4q73l7rj6+gCjkc
+         e615DaRfdozdf2VHYLxb3RaZtSJdAdJF1EL01gptRpQd5kJRVfw0FzHggFT36Dlx9K
+         6eA1UBfjL5bu27tXaY3dlO8xnEb+LHqudGgfinzD8zWpZiXiKBR1u1ocajD0YFvJiO
+         xaC1gepYrxiCasGCYYsZOA/sZrzt5Gm+L4Yznm+Q2PdWhxqK38/bHLc5fC02EgL/tu
+         fZeGlolnHkOEPYZxIB0QiQv9A+YRpDkAexNz6DJcao5ke8Hf68Ga7HBdEeGlWnXWpv
+         9rEuza2WEKgtg==
+From:   Jonathan Corbet <corbet@lwn.net>
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        linux-doc@vger.kernel.org
+Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Yishai Hadas <yishaih@nvidia.com>
+Subject: Re: [PATCH RFC] vfio: Documentation for the migration region
+In-Reply-To: <0-v1-0ec87874bede+123-vfio_mig_doc_jgg@nvidia.com>
+References: <0-v1-0ec87874bede+123-vfio_mig_doc_jgg@nvidia.com>
+Date:   Mon, 22 Nov 2021 13:31:14 -0700
+Message-ID: <875yskvsod.fsf@meer.lwn.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANgfPd9=ce+JT3xEJy=p5MEfvkMGovEaBEu8KmxiZAJ1AA958g@mail.gmail.com>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 22, 2021, Ben Gardon wrote:
-> > + * Holding mmu_lock for write obviates the need for RCU protection as the list
-> > + * is guaranteed to be stable.
-> > + */
-> > +#define for_each_tdp_mmu_root(_kvm, _root, _as_id)                     \
-> > +       list_for_each_entry(_root, &_kvm->arch.tdp_mmu_roots, link)     \
-> >                 if (kvm_mmu_page_as_id(_root) != _as_id) {              \
-> > +                       lockdep_assert_held_write(&(_kvm)->mmu_lock);   \
-> 
-> Did you mean for this lockdep to only be hit in this uncommon
-> non-matching ASID case?
+Jason Gunthorpe <jgg@nvidia.com> writes:
 
-Yes and no.  Yes, I intended what I wrote.  No, this isn't intended to be limited
-to a memslot address space mismatch, but at the time I wrote this I was apparently
-lazy or inept :-)
+> Provide some more complete documentation for the migration region's
+> behavior, specifically focusing on the device_state bits and the whole
+> system view from a VMM.
+>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>  Documentation/driver-api/vfio.rst | 208 +++++++++++++++++++++++++++++-
+>  1 file changed, 207 insertions(+), 1 deletion(-)
+>
+> Alex/Cornelia, here is the first draft of the requested documentation I promised
+>
+> We think it includes all the feedback from hns, Intel and NVIDIA on this mechanism.
+>
+> Our thinking is that NDMA would be implemented like this:
+>
+>    +#define VFIO_DEVICE_STATE_NDMA      (1 << 3)
+>
+> And a .add_capability ops will be used to signal to userspace driver support:
+>
+>    +#define VFIO_REGION_INFO_CAP_MIGRATION_NDMA    6
+>
+> I've described DIRTY TRACKING as a seperate concept here. With the current
+> uAPI this would be controlled by VFIO_IOMMU_DIRTY_PAGES_FLAG_START, with our
+> change in direction this would be per-tracker control, but no semantic change.
+>
+> Upon some agreement we'll include this patch in the next iteration of the mlx5 driver
+> along with the NDMA bits.
+>
+> Thanks,
+> Jason
+>
+> diff --git a/Documentation/driver-api/vfio.rst b/Documentation/driver-api/vfio.rst
+> index c663b6f978255b..b28c6fb89ee92f 100644
+> --- a/Documentation/driver-api/vfio.rst
+> +++ b/Documentation/driver-api/vfio.rst
+> @@ -242,7 +242,213 @@ group and can access them as follows::
+>  VFIO User API
+>  -------------------------------------------------------------------------------
+>  
+> -Please see include/linux/vfio.h for complete API documentation.
+> +Please see include/uapi/linux/vfio.h for complete API documentation.
+> +
+> +-------------------------------------------------------------------------------
+> +
+> +VFIO migration driver API
+> +-------------------------------------------------------------------------------
+> +
+> +VFIO drivers that support migration implement a migration control register
+> +called device_state in the struct vfio_device_migration_info which is in its
+> +VFIO_REGION_TYPE_MIGRATION region.
+> +
+> +The device_state triggers device action both when bits are set/cleared and
+> +continuous behavior for each bit. For VMMs they can also control if the VCPUs in
+> +a VM are executing (VCPU RUNNING) and if the IOMMU is logging DMAs (DIRTY
+> +TRACKING). These two controls are not part of the device_state register, KVM
+> +will be used to control the VCPU and VFIO_IOMMU_DIRTY_PAGES_FLAG_START on the
+> +container controls dirty tracking.
+> +
+> +Along with the device_state the migration driver provides a data window which
+> +allows streaming migration data into or out of the device.
+> +
+> +A lot of flexibility is provided to userspace in how it operates these bits. The
+> +reference flow for saving device state in a live migration, with all features:
+> +
+> +  RUNNING, VCPU_RUNNING
+> +     Normal operating state
+> +  RUNNING, DIRTY TRACKING, VCPU RUNNING
+> +     Log DMAs
+> +     Stream all memory
 
-In hindsight, this would be better:
+So I'd recommend actually building the docs and looking at the result;
+this will not render the way you expect it to.  I'd suggest using a
+literal block for preformatted sections like this.
 
-/* blah blah blah */
-static inline struct list_head *kvm_get_tdp_mmu_roots_exclusive(struct kvm *kvm)
-{
-	lockdep_assert_held_write(&kvm->mmu_lock);
+Thanks,
 
-	return &kvm->arch.tdp_mmu_roots;
-}
-
-#define for_each_tdp_mmu_root(_kvm, _root, _as_id)			       \
-	list_for_each_entry(_root, kvm_get_tdp_mmu_roots_exclusive(kvm), link) \
-		if (kvm_mmu_page_as_id(_root) != _as_id) {		       \
-		} else
+jon
