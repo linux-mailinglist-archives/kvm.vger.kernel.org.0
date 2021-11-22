@@ -2,161 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 42733458B4E
-	for <lists+kvm@lfdr.de>; Mon, 22 Nov 2021 10:26:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E2D7458B97
+	for <lists+kvm@lfdr.de>; Mon, 22 Nov 2021 10:32:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239108AbhKVJ3a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Nov 2021 04:29:30 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:34506 "EHLO
+        id S239150AbhKVJfP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Nov 2021 04:35:15 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:31436 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239059AbhKVJ3Z (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 22 Nov 2021 04:29:25 -0500
+        by vger.kernel.org with ESMTP id S238838AbhKVJfO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 22 Nov 2021 04:35:14 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637573178;
+        s=mimecast20190719; t=1637573527;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=W24LOqoXm5rO4QnnE3nnOA9qNOGul+S9uy89jqjOA+M=;
-        b=M9SWiDlQlmjsbRXUaSKQ884eBAyR/4gyn54RGanf8kh25DNdqTD8jUBMR9J28hwfAfPbWH
-        eYoGWAAWGxkEvoeSlJxC/9ggFqGsLeywZFHzbiCcr6aRX5WBhMvfAt8iwlMX8/AVHBJl5K
-        Yp9o2jmYLeOjQtSLd16rQXHvfkzHdLI=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=belxqpIEPM8b5ddVw8XKTj7NYwBuhVnMMeNM/xGD1js=;
+        b=e9KycYzwqc/zDGu+ifks2yqEGqKI/fLCZRPm2vclsBSqiKT1U+rnLRXw18yJSPdqMb7YWn
+        DNmBlm2xFvmmnKA1tHZKsuUcixpIQ7NjFj7Zo0K7UkXM6hkWGEXot1sMvZeWN1l51tPfB+
+        b3LDTCPZydhhpfsuTm0MIpNLnvmlsPM=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-247-3p8jmGJoPJuE-84AvoWGqA-1; Mon, 22 Nov 2021 04:26:15 -0500
-X-MC-Unique: 3p8jmGJoPJuE-84AvoWGqA-1
-Received: by mail-wm1-f72.google.com with SMTP id j193-20020a1c23ca000000b003306ae8bfb7so6527035wmj.7
-        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 01:26:15 -0800 (PST)
+ us-mta-121-YiiSLF8RNxC2-lDv88UJWg-1; Mon, 22 Nov 2021 04:32:06 -0500
+X-MC-Unique: YiiSLF8RNxC2-lDv88UJWg-1
+Received: by mail-ed1-f71.google.com with SMTP id v1-20020aa7cd41000000b003e80973378aso12695597edw.14
+        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 01:32:06 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=W24LOqoXm5rO4QnnE3nnOA9qNOGul+S9uy89jqjOA+M=;
-        b=8Q9OkCMlsML+ce8hTMMmPKuOJFuRlr3dpI4AQquAfDpi/RzwaiWg22wn+/mud+QuF8
-         G7PG1zoYryW1JxzyiNAvlVsnBfuylBzEXwPzYyXJi2I/ADY6+3JMniC4MQaL5dq5e/+Q
-         SB+t5X20zdBTaKd9il5WAnk1VT+DDF1KDjCCTWztCS+jaSVHL1XV0wDafvlprZPmbKge
-         U6w4IIwzu4E+DtuIsr7XiwBqqR/b0uMK9Au4tR4hgtPkzI+SwJ9u3TxCA5hyvVrdLUno
-         mF14GS5V2CP268Vn6HYogamsfoiAY/rz06Ya//Lt6uScuDGUeBaoGie5oCVz0Mw5d+BK
-         Fzgw==
-X-Gm-Message-State: AOAM5336F2bNeyVz9UQA8OigiD0zN1aG+H5WqrL1JoE35ALelYMqm2vg
-        Y/rN5G393inyoDpCrr1buuIityHIBy19cg30IgsnMQNC1DnVDAkASF+0saVCL9/m2uc0vDA2owD
-        rp9iom42t8Ixc
-X-Received: by 2002:a05:600c:104b:: with SMTP id 11mr28668562wmx.54.1637573174581;
-        Mon, 22 Nov 2021 01:26:14 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyLFJu5j4VPLLnAmpU8CA4IejbWxqy8Vo0yv4T3cYINYpxhqk/tZpLIoYKCers6pf22TsjTpQ==
-X-Received: by 2002:a05:600c:104b:: with SMTP id 11mr28668518wmx.54.1637573174383;
-        Mon, 22 Nov 2021 01:26:14 -0800 (PST)
-Received: from [192.168.3.132] (p5b0c667b.dip0.t-ipconnect.de. [91.12.102.123])
-        by smtp.gmail.com with ESMTPSA id t8sm8351680wrv.30.2021.11.22.01.26.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Nov 2021 01:26:13 -0800 (PST)
-Message-ID: <4efdccac-245f-eb1f-5b7f-c1044ff0103d@redhat.com>
-Date:   Mon, 22 Nov 2021 10:26:12 +0100
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=belxqpIEPM8b5ddVw8XKTj7NYwBuhVnMMeNM/xGD1js=;
+        b=wxSXT0/qiF1d9SnWdOxqFDUMtj+8Cd1KJGQ89NpaT7LMKlTadND17UpjRkqqJYT6FA
+         fdxOoZYY27yafRF+YsPlcHoVnvA3J56uU2TGKxFAZesJMeTMpPbAGLzm+sm7oJWhN4fg
+         cEHcO5LbCyJvKdFEStr011/NuR40BPoT2aqIQO5Utp13zAVBheG4vmP5HjVSvcZyTIUc
+         uHexWen/0vmlnqNDVKAK+yvxS6Km4v7vq6OyxEtqatDVA3GwsGPIgfDQLltFn+8htsq1
+         kOI6w6dbUv4nnZ22j/6Xircrv0VVWkk8RNLkvlRUj1vu7Tg2+TfsyhkyJKaSsjAg65ZS
+         9KHA==
+X-Gm-Message-State: AOAM532GlrA2scign8/5VZPmyxs6nVwKLz3CmpguIaBNrBhiuAAX3Vsb
+        +9Hy+BAvosofYL1fu9Qx6QbU26Ix9mzmA2T+A+W+ZVGZ5taIZLOJLlC4fCH1Tp3AxutUdW4IFRd
+        T8uArTMOjRZGQ
+X-Received: by 2002:a17:906:b2d0:: with SMTP id cf16mr38631562ejb.52.1637573525285;
+        Mon, 22 Nov 2021 01:32:05 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwaDt8hngfWzHfFUTs49+2toJfr7BA5IoCX89wF8FGrB5kAMe2yz7xlpf9wWvnAeYerGQlgwg==
+X-Received: by 2002:a17:906:b2d0:: with SMTP id cf16mr38631543ejb.52.1637573525115;
+        Mon, 22 Nov 2021 01:32:05 -0800 (PST)
+Received: from redhat.com ([2.55.128.84])
+        by smtp.gmail.com with ESMTPSA id jg32sm3539120ejc.43.2021.11.22.01.32.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Nov 2021 01:32:04 -0800 (PST)
+Date:   Mon, 22 Nov 2021 04:32:01 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Halil Pasic <pasic@linux.ibm.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        f.hetzelt@tu-berlin.de, david.kaplan@amd.com,
+        konrad.wilk@oracle.com
+Subject: [PATCH] vsock/virtio: suppress used length validation
+Message-ID: <20211122093036.285952-1-mst@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [RFC v2 PATCH 01/13] mm/shmem: Introduce F_SEAL_GUEST
-Content-Language: en-US
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, john.ji@intel.com, susie.li@intel.com,
-        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com
-References: <20211119134739.20218-1-chao.p.peng@linux.intel.com>
- <20211119134739.20218-2-chao.p.peng@linux.intel.com>
- <20211119151943.GH876299@ziepe.ca>
- <df11d753-6242-8f7c-cb04-c095f68b41fa@redhat.com>
- <20211119160023.GI876299@ziepe.ca>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <20211119160023.GI876299@ziepe.ca>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
+X-Mutt-Fcc: =sent
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 19.11.21 17:00, Jason Gunthorpe wrote:
-> On Fri, Nov 19, 2021 at 04:39:15PM +0100, David Hildenbrand wrote:
-> 
->>> If qmeu can put all the guest memory in a memfd and not map it, then
->>> I'd also like to see that the IOMMU can use this interface too so we
->>> can have VFIO working in this configuration.
->>
->> In QEMU we usually want to (and must) be able to access guest memory
->> from user space, with the current design we wouldn't even be able to
->> temporarily mmap it -- which makes sense for encrypted memory only. The
->> corner case really is encrypted memory. So I don't think we'll see a
->> broad use of this feature outside of encrypted VMs in QEMU. I might be
->> wrong, most probably I am :)
-> 
-> Interesting..
-> 
-> The non-encrypted case I had in mind is the horrible flow in VFIO to
-> support qemu re-execing itself (VFIO_DMA_UNMAP_FLAG_VADDR).
+It turns out that vhost vsock violates the virtio spec
+by supplying the out buffer length in the used length
+(should just be the in length).
+As a result, attempts to validate the used length fail with:
+vmw_vsock_virtio_transport virtio1: tx: used len 44 is larger than in buflen 0
 
-Thanks for sharing!
+Since vsock driver does not use the length fox tx and
+validates the length before use for rx, it is safe to
+suppress the validation in virtio core for this driver.
 
-> 
-> Here VFIO is connected to a VA in a mm_struct that will become invalid
-> during the kexec period, but VFIO needs to continue to access it. For
-> IOMMU cases this is OK because the memory is already pinned, but for
-> the 'emulated iommu' used by mdevs pages are pinned dynamically. qemu
-> needs to ensure that VFIO can continue to access the pages across the
-> kexec, even though there is nothing to pin_user_pages() on.
-> 
-> This flow would work a lot better if VFIO was connected to the memfd
-> that is storing the guest memory. Then it naturally doesn't get
-> disrupted by exec() and we don't need the mess in the kernel..
+Reported-by: Halil Pasic <pasic@linux.ibm.com>
+Fixes: 939779f5152d ("virtio_ring: validate used buffer length")
+Cc: "Jason Wang" <jasowang@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ net/vmw_vsock/virtio_transport.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-I do wonder if we want to support sharing such memfds between processes
-in all cases ... we most certainly don't want to be able to share
-encrypted memory between VMs (I heard that the kernel has to forbid
-that). It would make sense in the use case you describe, though.
-
-> 
-> I was wondering if we could get here using the direct_io APIs but this
-> would do the job too.
-> 
->> Apart from the special "encrypted memory" semantics, I assume nothing
->> speaks against allowing for mmaping these memfds, for example, for any
->> other VFIO use cases.
-> 
-> We will eventually have VFIO with "encrypted memory". There was a talk
-> in LPC about the enabling work for this.
-
-Yes, I heard about that as well. In the foreseeable future, we'll have
-shared memory only visible for VFIO devices.
-
-> 
-> So, if the plan is to put fully encrpyted memory inside a memfd, then
-> we still will eventually need a way to pull the pfns it into the
-> IOMMU, presumably along with the access control parameters needed to
-> pass to the secure monitor to join a PCI device to the secure memory.
-
-Long-term, agreed.
-
+diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+index 4f7c99dfd16c..3f82b2f1e6dd 100644
+--- a/net/vmw_vsock/virtio_transport.c
++++ b/net/vmw_vsock/virtio_transport.c
+@@ -731,6 +731,7 @@ static unsigned int features[] = {
+ static struct virtio_driver virtio_vsock_driver = {
+ 	.feature_table = features,
+ 	.feature_table_size = ARRAY_SIZE(features),
++	.suppress_used_validation = true,
+ 	.driver.name = KBUILD_MODNAME,
+ 	.driver.owner = THIS_MODULE,
+ 	.id_table = id_table,
 -- 
-Thanks,
-
-David / dhildenb
+MST
 
