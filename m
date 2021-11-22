@@ -2,94 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DE19845918E
-	for <lists+kvm@lfdr.de>; Mon, 22 Nov 2021 16:42:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D931745928B
+	for <lists+kvm@lfdr.de>; Mon, 22 Nov 2021 16:58:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239842AbhKVPps (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Nov 2021 10:45:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34508 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234686AbhKVPpr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Nov 2021 10:45:47 -0500
-Received: from mail-qk1-x729.google.com (mail-qk1-x729.google.com [IPv6:2607:f8b0:4864:20::729])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F499C061574
-        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 07:42:41 -0800 (PST)
-Received: by mail-qk1-x729.google.com with SMTP id g28so18524329qkk.9
-        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 07:42:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:reply-to:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=PAwkKX4XYZMTma6o9HoNBv5LY6YuG+aQfSzMuvPwLZ8=;
-        b=ncvCkWsV8I+SgSt3FmpLFBbkDlFL9lEz1Fll+NzdzJMiWuSYwnO+ALpdMvKNGr2TsW
-         nhw5h5eiIqESU+cZwXcwkH1NPsYqG68YrRFK85IjkhOg1CyWQmcHGkqthPMhEE+vecCP
-         2fVNdFMr29nm1o9Dy/84HMimOWeO9R0gohUci5LrH4sBDedg1pAS/9+0CPLieymydu4x
-         bbCgcj/e3fa16Wd+F1IZUz/eGctxTjKaOqnSAnc9Jq8Y53TTuPL8IiGOYFMd3vhWApx/
-         Mdz698t26MGq88zpZhiES9Si0z2EvPThzDSk2BJ38yh/AS+jdjoECe5V6ZEZDkxDRpEq
-         xEgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to:content-transfer-encoding;
-        bh=PAwkKX4XYZMTma6o9HoNBv5LY6YuG+aQfSzMuvPwLZ8=;
-        b=7aMKmFv1XcmiwqsOmAKAT5jSem+pMxpBNXUnnnfVAxw8TseIsVvM9ZbD/G6wzqZH1R
-         dXBDCwdkN32NWznI4X70sWt7KpNcWy9uAIlxmyT68THVAUMmbDBUFV2NmbigjTei6lA3
-         Fu7OexHmrv/ZQtqb3Pw1olP+Q+nkKGFNI83IfVYQxg44blcUAbwzMc07yPgQrA0J/KEa
-         iD0sROjh6Cul0d5NZRQiplchDjx0CyM7outUN81fkwW9+C4AWodsBhMyZji4ncMeKGBG
-         qEkea3X8VOcBxCieeedyMFdoU2ShCz1JoEWH7/AzCs8JDphDsbp4LaP/qN+bVo4lUIMI
-         3cQA==
-X-Gm-Message-State: AOAM530/HZVuidwloBQufTxK/I6eirfQ7g/5Ie2qABn/GvFElvM+YdTa
-        1tR/lUrVf8KvguFo+1VhNBXOOhc+emPmxyWTtTY=
-X-Google-Smtp-Source: ABdhPJyKvSkejSDrToAGoDnxMs2luuiRFhNwrbMp5fBUkgSAPLEy8BU9CBQ17sHED8Wq3lly9+wlF65vEMkitrZHbE0=
-X-Received: by 2002:a05:620a:1986:: with SMTP id bm6mr28819813qkb.217.1637595760285;
- Mon, 22 Nov 2021 07:42:40 -0800 (PST)
-MIME-Version: 1.0
-Received: by 2002:ac8:7d43:0:0:0:0:0 with HTTP; Mon, 22 Nov 2021 07:42:39
- -0800 (PST)
-Reply-To: mrssamiramohamed505050@gmail.com
-From:   Mrs samira mohamed <mr.alinmusah06@gmail.com>
-Date:   Mon, 22 Nov 2021 07:42:39 -0800
-Message-ID: <CALDhU2SbpkazOGPMV==AL60=jgVipwZPOMZsvGyEQV0fBc9kUQ@mail.gmail.com>
-Subject: THE AMOUNT IS 27.5 MILLIOMS USD
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
+        id S240239AbhKVQA7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Nov 2021 11:00:59 -0500
+Received: from mail.kernel.org ([198.145.29.99]:50408 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S240250AbhKVQAy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Nov 2021 11:00:54 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 0498D60D07;
+        Mon, 22 Nov 2021 15:57:42 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mpBhL-0075am-OG; Mon, 22 Nov 2021 15:57:39 +0000
+Date:   Mon, 22 Nov 2021 15:57:32 +0000
+Message-ID: <871r38dvyr.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Zenghui Yu <yuzenghui@huawei.com>
+Cc:     <kvmarm@lists.cs.columbia.edu>, <kvm@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Quentin Perret <qperret@google.com>,
+        Will Deacon <will@kernel.org>, <broonie@kernel.org>,
+        <kernel-team@android.com>
+Subject: Re: [PATCH v2 2/5] KVM: arm64: Get rid of host SVE tracking/saving
+In-Reply-To: <5ab3836f-2b39-2ff5-3286-8258addd01e4@huawei.com>
+References: <20211028111640.3663631-1-maz@kernel.org>
+        <20211028111640.3663631-3-maz@kernel.org>
+        <5ab3836f-2b39-2ff5-3286-8258addd01e4@huawei.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: yuzenghui@huawei.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, qperret@google.com, will@kernel.org, broonie@kernel.org, kernel-team@android.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-LS0gDQpJIGFtIE1ycyBTYW1pcmEgTW9oYW1lZCwNCkhpIEZyaWVuZCBJIHdvcmsgaW4gVW5pdGVk
-IEJhbmsgZm9yIEFmcmljYSAoQk9BKSBoZXJlIGluIEJVUktJTkEgRkFTTw0KLkkgd2FudHMgdG8g
-dHJhbnNmZXIgYW4gYWJhbmRvbmVkIHN1bSBvZiAyNy41IG1pbGxpb25zIFVTRCB0byB5b3UNCnRo
-cm91Z2ggQVRNIFZJU0EgQ0FSRCAuNTAlIHdpbGwgYmUgZm9yIHlvdS4gTm8gcmlzayBpbnZvbHZl
-ZC4gVGhlDQooVUJBKSBiYW5rIHdhcyBiZWluZyB1c2VkIGJ5IG1hbnkgQWZyaWNhbiBQb2xpdGlj
-aWFucyB0byBkaXZlcnQgZnVuZHMNCih0aGUgUG9saXRpY2lhbnMgbG9vdGVkIG92ZXIgNWJpbGxp
-b24gVW5pdGVkIFN0YXRlcyBkb2xsYXJzKSB0byB0aGVpcg0KZm9yZWlnbiBhY2NvdW50cyBhbmQg
-dGhleSBkaWQgTm90IGJvdGhlciB0byBrbm93IGhvdyBtdWNoIHdhcw0KdHJhbnNmZXJyZWQgYmVj
-YXVzZSB0aGUgZnVuZHMgYmVsb25nZWQgdG8gdGhlICdTdGF0ZScgdGhhdCBpcyB3aHkgSQ0KYWxz
-byBkZWNpZGVkIHRvIHB1dCBhcGFydCB0aGUgc3VtIG9mICQyNy41bWlsbGlvbiBEb2xsYXJzIHdo
-aWNoIGlzDQpzdGlsbCBpbiBvdXIgYmFuayB1bmRlciBteSBjdXN0b2R5IGZvciBhIGxvbmcgcGVy
-aW9kIG5vdyEgSSBoYXZlIHRvDQpnaXZlIHlvdSBhbGwgdGhlIHJlcXVpcmVkIGd1aWRlbGluZXMg
-c28gdGhhdCB5b3UgZG8gbm90IG1ha2UgYW55DQptaXN0YWtlLiBJZiB5b3UgYXJlIGNhcGFibGUg
-dG8gaGFuZGxlIHRoZSB0cmFuc2FjdGlvbg0KQ29udGFjdCBtZSBmb3IgbW9yZSBkZXRhaWxzLiBL
-aW5kbHkgcmVwbHkgbWUgYmFjayB0byBteSBhbHRlcm5hdGl2ZQ0KZW1haWwgYWRkcmVzcyAobXJz
-c2FtaXJhbW9oYW1lZDUwNTA1MEBnbWFpbC5jb20pDQpNcnMgU2FtaXJhIE1vaGFtZWQNCg0KDQoN
-Cg0K7KCA64qUIOyCrOuvuOudvCDrqqjtlZjrqZTrk5wg67aA7J247J6F64uI64ukLg0K7JWI64WV
-7ZWY7IS47JqUIOy5nOq1rCDsoIDripQg7Jes6riwIEJVUktJTkEgRkFTT+yXkCDsnojripQgVUJB
-KFVuaXRlZCBCYW5rIGZvciBBZnJpY2Ep7JeQ7IScIOydvO2VmOqzoA0K7J6I7Iq164uI64ukLiBB
-VE0gVklTQSBDQVJE66W8IO2Gte2VtCAyLDc1MOunjCDri6zrn6zsnZgg67KE66Ck7KeEIOq4iOyV
-oeydhCDshqHquIjtlZjqs6Ag7Iu27Iq164uI64ukLiA1MCXripQg64u57Iug7J2EIOychO2VnA0K
-6rKD7J6F64uI64ukLiDsnITtl5jsnbQg7JeG7Iq164uI64ukLiAoQk9BKSDsnYDtlonsnYAg66eO
-7J2AIOyVhO2UhOumrOy5tCDsoJXsuZjsnbjrk6TsnbQg7J6Q6riIKOygley5mOyduOuTpOydtCDs
-lb0gNTDslrUg64us65+sIOydtOyDgeydhCDslb3tg4jtlagp7J2EIOyZuOq1rQ0K6rOE7KKM66Gc
-IOyghOyaqe2VmOuKlCDrjbAg7IKs7Jqp7ZWY6rOgIOyeiOyXiOqzoCDsnpDquIjsnbQgJ+q1reqw
-gCfsl5Ag7IaN7ZaI6riwIOuVjOusuOyXkCDslrzrp4jrgpgg7J207LK065CY7JeI64qU7KeAIOyL
-oOqyveyTsOyngCDslYrslZjsirXri4jri6QuIOydtOqyg+ydtCDrgrTqsIANCuyYpOueq+uPmeyV
-iCDsmrDrpqwg7J2A7ZaJ7JeQIOuztOq0gOuQmOyWtCDsnojripQgMiw3NTDrp4wg64us65+s7J2Y
-IOq4iOyVoeydhCDrtoTrpqztlZjquLDroZwg6rKw7KCV7ZWcIOydtOycoOydtOq4sOuPhCDtlanr
-i4jri6QhIOuCmOuKlCDri7nsi6DsnbQg7Iuk7IiY7ZWY7KeADQrslYrrj4TroZ0g66qo65OgIO2V
-hOyImCDsp4DsuajsnYQg7KCc6rO17ZW07JW87ZWp64uI64ukLiDqsbDrnpjrpbwg7LKY66as7ZWg
-IOyImCDsnojripQg6rK97JqwDQrsnpDshLjtlZwg64K07Jqp7J2AIOyggOyXkOqyjCDsl7Drnb3t
-lZjsi63si5zsmKQuIOygnCDrjIDssrQg7J2066mU7J28IOyjvOyGjChtcnNzYW1pcmFtb2hhbWVk
-NTA1MDUwQGdtYWlsLmNvbSnroZwg7ZqM7Iug7ZW0IOyjvOyLreyLnOyYpC4NCuyCrOuvuOudvCDr
-qqjtlZjrqZTrk5wg67aA7J24DQo=
+Hi Zenghui,
+
+On Wed, 10 Nov 2021 13:19:23 +0000,
+Zenghui Yu <yuzenghui@huawei.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 2021/10/28 19:16, Marc Zyngier wrote:
+> > The SVE host tracking in KVM is pretty involved. It relies on a
+> > set of flags tracking the ownership of the SVE register, as well
+> > as that of the EL0 access.
+> > 
+> > It is also pretty scary: __hyp_sve_save_host() computes
+> > a thread_struct pointer and obtains a sve_state which gets directly
+> > accessed without further ado, even on nVHE. How can this even work?
+> > 
+> > The answer to that is that it doesn't, and that this is mostly dead
+> > code. Closer examination shows that on executing a syscall, userspace
+> > loses its SVE state entirely. This is part of the ABI. Another
+> > thing to notice is that although the kernel provides helpers such as
+> > kernel_neon_begin()/end(), they only deal with the FP/NEON state,
+> > and not SVE.
+> > 
+> > Given that you can only execute a guest as the result of a syscall,
+> > and that the kernel cannot use SVE by itself, it becomes pretty
+> > obvious that there is never any host SVE state to save, and that
+> > this code is only there to increase confusion.
+> > 
+> > Get rid of the TIF_SVE tracking and host save infrastructure altogether.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > diff --git a/arch/arm64/kvm/fpsimd.c b/arch/arm64/kvm/fpsimd.c
+> > index 5621020b28de..38ca332c10fe 100644
+> > --- a/arch/arm64/kvm/fpsimd.c
+> > +++ b/arch/arm64/kvm/fpsimd.c
+> > @@ -73,15 +73,11 @@ int kvm_arch_vcpu_run_map_fp(struct kvm_vcpu *vcpu)
+> >  void kvm_arch_vcpu_load_fp(struct kvm_vcpu *vcpu)
+> >  {
+> >  	BUG_ON(!current->mm);
+> > +	BUG_ON(test_thread_flag(TIF_SVE));
+> >  -	vcpu->arch.flags &= ~(KVM_ARM64_FP_ENABLED |
+> > -			      KVM_ARM64_HOST_SVE_IN_USE |
+> > -			      KVM_ARM64_HOST_SVE_ENABLED);
+> > +	vcpu->arch.flags &= ~KVM_ARM64_FP_ENABLED;
+> >  	vcpu->arch.flags |= KVM_ARM64_FP_HOST;
+> >  -	if (test_thread_flag(TIF_SVE))
+> > -		vcpu->arch.flags |= KVM_ARM64_HOST_SVE_IN_USE;
+> 
+> The comment about TIF_SVE on top of kvm_arch_vcpu_load_fp() becomes
+> obsolete now. Maybe worth removing it?
+> 
+> | *
+> | * TIF_SVE is backed up here, since it may get clobbered with guest state.
+> | * This flag is restored by kvm_arch_vcpu_put_fp(vcpu).
+
+Indeed. Now gone.
+
+> 
+> > diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > index a0e78a6027be..722dfde7f1aa 100644
+> > --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> > @@ -207,16 +207,6 @@ static inline bool __populate_fault_info(struct kvm_vcpu *vcpu)
+> >  	return __get_fault_info(esr, &vcpu->arch.fault);
+> >  }
+> >  -static inline void __hyp_sve_save_host(struct kvm_vcpu *vcpu)
+> > -{
+> > -	struct thread_struct *thread;
+> > -
+> > -	thread = container_of(vcpu->arch.host_fpsimd_state, struct thread_struct,
+> > -			      uw.fpsimd_state);
+> > -
+> > -	__sve_save_state(sve_pffr(thread), &vcpu->arch.host_fpsimd_state->fpsr);
+> > -}
+> 
+> Nit: This removes the only user of __sve_save_state() helper. Should we
+> still keep it in fpsimd.S?
+
+I was in two minds about that, as I'd like to eventually be able to
+use SVE for protected guests, where the hypervisor itself has to be in
+charge of the FP/SVE save-restore.
+
+But that's probably several months away, and I can always revert a
+deletion patch if I need to, so let's get rid of it now.
+
+Thanks for the suggestions.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
