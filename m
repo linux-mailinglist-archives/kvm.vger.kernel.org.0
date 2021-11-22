@@ -2,64 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A30394590A3
-	for <lists+kvm@lfdr.de>; Mon, 22 Nov 2021 15:57:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E36B24590FD
+	for <lists+kvm@lfdr.de>; Mon, 22 Nov 2021 16:10:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239555AbhKVPAb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Nov 2021 10:00:31 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:55623 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232119AbhKVPAa (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 22 Nov 2021 10:00:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637593043;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=a6sxP8BbpsAMN/5roSu3j/ZWT90syA5vCmiIsqjbMtk=;
-        b=CTZzBYOj9NMS5ihn+fb5DQ0CxKjOREYArVSwooh1gGYa7KVAOl/GRdo+Lm3TQbPQ0N5RMX
-        trHokDDWh6MqpRVL150h4rHCDPS8CKctvHJXt7xOcml7yfI84XG/1CzOa+lx8Ku+yVMg34
-        1mEDWYR0JMwosIttyQ5pqFLcz9/tpK8=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-130-61nma3CdMiy73oCzsd08Jg-1; Mon, 22 Nov 2021 09:57:22 -0500
-X-MC-Unique: 61nma3CdMiy73oCzsd08Jg-1
-Received: by mail-wm1-f70.google.com with SMTP id j193-20020a1c23ca000000b003306ae8bfb7so6909968wmj.7
-        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 06:57:21 -0800 (PST)
+        id S239609AbhKVPNF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Nov 2021 10:13:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55234 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235929AbhKVPNE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Nov 2021 10:13:04 -0500
+Received: from mail-qt1-x829.google.com (mail-qt1-x829.google.com [IPv6:2607:f8b0:4864:20::829])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 585B6C06173E
+        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 07:09:58 -0800 (PST)
+Received: by mail-qt1-x829.google.com with SMTP id a2so16758751qtx.11
+        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 07:09:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=5VTof+3edSRysBWJfMrn+QjeSl3KM16l29/PC/dx3o4=;
+        b=GgW+p5PeHc0bQly0v21nzAJ3y6uv9j+6GJjj3/kSRMtOhXgQUdo630hHq9WFNfMw3+
+         7jwm/pEg3OMqP3OSiHN9g6X2ApOK6D6i97qPCojv4hHg6bX3hTJX1VRV9wv9AJivwnTz
+         NMbrhhMDJdFriocGD9Q87qSC2eg3XWgnsBQvzED4l/rtGH5c3J9RkR24eZLMQVocatzk
+         16fEwCdt4zSVbLzcMUR1znohS2vSzntWqte0ryaXUwXGyQptkpXIcQYp/zc6kdLcBhqC
+         Cg6yB3MWTxm24NNgtuPBXuKgfkuCI4/QoYWo4AoHhvWYPVXt8w84jQYnFFi6M8A4ngDL
+         vRoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=a6sxP8BbpsAMN/5roSu3j/ZWT90syA5vCmiIsqjbMtk=;
-        b=XyBZwHEunurYDYaxcsiKnh7tR1MkSOvdIRLiXwai2JAQKOs8q6dXAcan92rN1YdmNU
-         iyNAUHxsodCHpmsJkWZPOI32TDHGf7T1K8HOsYJeGy8HEukSyTVsP4pxRk3N24F4OdYm
-         ddEJBNqMuD4Gg9L4+wnvYKRDSbyp9D9h4Q1o+hvs6OSWYzHhas9WBarskfJmbfs4qd9z
-         i5hQwUSCYWCOuqBc5AjRQ+sO+221LZp464crox/Eo5aeFV8xjtES3avhuMOZUUAlmK1+
-         OjIqIVyQ4wYpwxjVfRvoR8DCZM7kysyhDkCoTqZDgGx82Hea9pxRuK0jfXFXKXUL4B40
-         Iz0A==
-X-Gm-Message-State: AOAM5315YBcrwXutAFa+7PXnBLCUYavix4tGqdDD4cgM87v6gXQl8URp
-        JxeTfghKU/WggyKrFtghaLDwr5PO7VqngK8h5nDKeml0BArj+y9rvvUcGNvB5BmUHXYC78w/1hx
-        gtiyj9ntjQkiS
-X-Received: by 2002:a7b:ce8c:: with SMTP id q12mr29900028wmj.91.1637593040913;
-        Mon, 22 Nov 2021 06:57:20 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzb1fVkmOhpRnzBJsEnrS5eq+nBwa2MfaKvZWrzzGVY0sVj4OHkUiEBZAugOc7zSp386W7pog==
-X-Received: by 2002:a7b:ce8c:: with SMTP id q12mr29899978wmj.91.1637593040715;
-        Mon, 22 Nov 2021 06:57:20 -0800 (PST)
-Received: from [192.168.3.132] (p5b0c667b.dip0.t-ipconnect.de. [91.12.102.123])
-        by smtp.gmail.com with ESMTPSA id s63sm10249585wme.22.2021.11.22.06.57.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Nov 2021 06:57:20 -0800 (PST)
-Message-ID: <d2b46b84-8930-4304-2946-4d4a16698b24@redhat.com>
-Date:   Mon, 22 Nov 2021 15:57:17 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [RFC v2 PATCH 01/13] mm/shmem: Introduce F_SEAL_GUEST
-Content-Language: en-US
-To:     Jason Gunthorpe <jgg@ziepe.ca>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=5VTof+3edSRysBWJfMrn+QjeSl3KM16l29/PC/dx3o4=;
+        b=u57IyR/hbGJkAYuvxlUOoH52UEsPoJKZC6qlbMxcTDe6C/f8Rjq0pm5uXqtbfPeGYr
+         kXa6/NT5HTG0K/agLHsNnWP7LjfqUhuBfzLW11/Av2+leR/8e2gnGe++Bf5yL1HhfYW1
+         TeCwSruKDxxv88m5rbLNFowVBgMBW1BkykLuWmxQmwpkr6JhU2tiHL3JMOcMhX+bcM4v
+         4ufqUDUQ/lYrQ0FwoR2DkVHy3Hm9sqYfjeK8SmfYGXLz8rc2ewOQgOZ1753m1+VZZVTq
+         eGmicQ9sTRZ2UXG/1E/UlcBQPsLCzmT3FgMv02a1uy2MPSIc+p1LNuB2sALiDznlh0x/
+         XYBw==
+X-Gm-Message-State: AOAM53199TzNkP/Ys63Ol23wBsc9pgJV4+pRPxquxcsKqGhAwXEwnll1
+        BIAmzN+W1ruDzQQiFm88nPmCMQ==
+X-Google-Smtp-Source: ABdhPJyRLMA8XcwBk54ljNUHf6oDk+V6lmAhSa4hBpytn+jTTywY+jUzb27EMb9+9wB5t9Defs2Bqw==
+X-Received: by 2002:a05:622a:189:: with SMTP id s9mr31877263qtw.352.1637593797445;
+        Mon, 22 Nov 2021 07:09:57 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
+        by smtp.gmail.com with ESMTPSA id b9sm4563076qtb.53.2021.11.22.07.09.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Nov 2021 07:09:57 -0800 (PST)
+Received: from jgg by mlx with local (Exim 4.94)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1mpAxA-00DtLu-8c; Mon, 22 Nov 2021 11:09:56 -0400
+Date:   Mon, 22 Nov 2021 11:09:56 -0400
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     David Hildenbrand <david@redhat.com>
 Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-mm@kvack.org,
         linux-fsdevel@vger.kernel.org, qemu-devel@nongnu.org,
@@ -81,6 +74,8 @@ Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
         "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
         luto@kernel.org, john.ji@intel.com, susie.li@intel.com,
         jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com
+Subject: Re: [RFC v2 PATCH 01/13] mm/shmem: Introduce F_SEAL_GUEST
+Message-ID: <20211122150956.GS876299@ziepe.ca>
 References: <20211119134739.20218-1-chao.p.peng@linux.intel.com>
  <20211119134739.20218-2-chao.p.peng@linux.intel.com>
  <20211119151943.GH876299@ziepe.ca>
@@ -90,42 +85,41 @@ References: <20211119134739.20218-1-chao.p.peng@linux.intel.com>
  <20211122133145.GQ876299@ziepe.ca>
  <56c0dffc-5fc4-c337-3e85-a5c9ce619140@redhat.com>
  <20211122140148.GR876299@ziepe.ca>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <20211122140148.GR876299@ziepe.ca>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+ <d2b46b84-8930-4304-2946-4d4a16698b24@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d2b46b84-8930-4304-2946-4d4a16698b24@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22.11.21 15:01, Jason Gunthorpe wrote:
-> On Mon, Nov 22, 2021 at 02:35:49PM +0100, David Hildenbrand wrote:
->> On 22.11.21 14:31, Jason Gunthorpe wrote:
->>> On Mon, Nov 22, 2021 at 10:26:12AM +0100, David Hildenbrand wrote:
->>>
->>>> I do wonder if we want to support sharing such memfds between processes
->>>> in all cases ... we most certainly don't want to be able to share
->>>> encrypted memory between VMs (I heard that the kernel has to forbid
->>>> that). It would make sense in the use case you describe, though.
->>>
->>> If there is a F_SEAL_XX that blocks every kind of new access, who
->>> cares if userspace passes the FD around or not?
->> I was imagining that you actually would want to do some kind of "change
->> ownership". But yeah, the intended semantics and all use cases we have
->> in mind are not fully clear to me yet. If it's really "no new access"
->> (side note: is "access" the right word?) then sure, we can pass the fd
->> around.
+On Mon, Nov 22, 2021 at 03:57:17PM +0100, David Hildenbrand wrote:
+> On 22.11.21 15:01, Jason Gunthorpe wrote:
+> > On Mon, Nov 22, 2021 at 02:35:49PM +0100, David Hildenbrand wrote:
+> >> On 22.11.21 14:31, Jason Gunthorpe wrote:
+> >>> On Mon, Nov 22, 2021 at 10:26:12AM +0100, David Hildenbrand wrote:
+> >>>
+> >>>> I do wonder if we want to support sharing such memfds between processes
+> >>>> in all cases ... we most certainly don't want to be able to share
+> >>>> encrypted memory between VMs (I heard that the kernel has to forbid
+> >>>> that). It would make sense in the use case you describe, though.
+> >>>
+> >>> If there is a F_SEAL_XX that blocks every kind of new access, who
+> >>> cares if userspace passes the FD around or not?
+> >> I was imagining that you actually would want to do some kind of "change
+> >> ownership". But yeah, the intended semantics and all use cases we have
+> >> in mind are not fully clear to me yet. If it's really "no new access"
+> >> (side note: is "access" the right word?) then sure, we can pass the fd
+> >> around.
+> > 
+> > What is "ownership" in a world with kvm and iommu are reading pages
+> > out of the same fd?
 > 
-> What is "ownership" in a world with kvm and iommu are reading pages
-> out of the same fd?
+> In the world of encrypted memory / TDX, KVM somewhat "owns" that memory
+> IMHO (for example, only it can migrate or swap out these pages; it's
+> might be debatable if the TDX module or KVM actually "own" these pages ).
 
-In the world of encrypted memory / TDX, KVM somewhat "owns" that memory
-IMHO (for example, only it can migrate or swap out these pages; it's
-might be debatable if the TDX module or KVM actually "own" these pages ).
+Sounds like it is a swap provider more than an owner?
 
--- 
-Thanks,
-
-David / dhildenb
-
+Jason
