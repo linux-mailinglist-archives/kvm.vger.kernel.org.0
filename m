@@ -2,140 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 40D454596C5
-	for <lists+kvm@lfdr.de>; Mon, 22 Nov 2021 22:34:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CF9F14596DE
+	for <lists+kvm@lfdr.de>; Mon, 22 Nov 2021 22:45:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237918AbhKVVhX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Nov 2021 16:37:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58460 "EHLO
+        id S234935AbhKVVsZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Nov 2021 16:48:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236478AbhKVVhS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Nov 2021 16:37:18 -0500
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AC6BC061574
-        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 13:34:11 -0800 (PST)
-Received: by mail-pg1-x535.google.com with SMTP id l190so5845775pge.7
-        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 13:34:11 -0800 (PST)
+        with ESMTP id S231418AbhKVVsY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Nov 2021 16:48:24 -0500
+Received: from mail-il1-x134.google.com (mail-il1-x134.google.com [IPv6:2607:f8b0:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CC69C061714
+        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 13:45:17 -0800 (PST)
+Received: by mail-il1-x134.google.com with SMTP id i9so14103178ilu.1
+        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 13:45:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=C6kqWf8YL8Pc2dhuN/yLLDflJewwm9k+jgx8JhJxfWI=;
-        b=Y4jFEgnmso7slD8LmL+kHkcNuNHAU/37pom02AnkOXJQBehxeoCWnx+y1Ay+5jTHkt
-         coGzrMB4Xgugt8yyYmw4BNvCxgmlYN0WS0xiPHG+ISwHq0tRZ0Mg7IiiBPlthWJPFiIc
-         wbqm5LT0GOi5tfvtMY7V2y7btZs0kYlE9HXxCc1Dt0dpcJXHkADQLyitH82pTJmfJ5ze
-         ti+OahblPqZ4/SyJAQN7CRkytCBKXGQQVU2LWiqdmqN/xzx6cdci5pw1hiM9FeGyHAYZ
-         n+aaI/WVszqxWu+ZAg88mTKSERwgqTtW0RqEMFl6fIZ87hlbdUk2bmolJLE3N3NqCFBX
-         bNyQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=SYp+2FQ9kEUUYn5etdjt0S74MkYWDopaecoN+XmZ9MI=;
+        b=rFj2UjwziV5n3HfSTQDoq+pBzkhpC7GeCierENOXBNmX1ito9ab6QG+bSslB6dhOKe
+         CHUXpEF1BO74A6d7TGCo9Pt3MfOU0TpIWplMXt9CRCs03QqpINJDR4T4BlSa//AU3Dpx
+         uZomX3lDMA6+zY9YQ7q8L+bHH2yRvucUKluIlQMAgw3e7uJR9Yc5MwgZMnmOVRuFbtiy
+         rBteKFsGmWS6BE5lSy9awq2n9e4cE42bmHoqzoULE2BV35Of6mKSxnO6LtOFSEcLW3DT
+         GmGPfrfkjNl+FW5fE8H1a9fXvmu+6T+rPP+a5xzOlP2GQ8ko7r72ljClAmeVN3eQEnCp
+         DvWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=C6kqWf8YL8Pc2dhuN/yLLDflJewwm9k+jgx8JhJxfWI=;
-        b=HtoJCxIhYMohiT8sAw8z8fJJ/tG6nKHV8hmztIf6GbKLuwYoTrAWQY7Gt6LpOwRpU2
-         NMcWL3ZpE8a4jIrtr/HebKnQeqfRb0qYPHLL1vtGOmq2pCfPMJlNnKkXIdD0we2dc4hD
-         SKaz1RandcWf1k1N3YBA3T5OJXJYaB8vjq1oHI/wgYrwNtHujXSId1OMksdQ1ywEvm5y
-         pNyui6hf9SRUCLa7dkFwzXHsmqOVwr6KkPXq8DJbYJvLxsYeQTw/WV5m7hezPK+txUnI
-         5cR3Xwh7QhuO+LDBweNytaPBIhEF4fVjsi7qBuzy6ZTj3hF7OPQUOZMK0Sb7M+3CA4bY
-         P8UQ==
-X-Gm-Message-State: AOAM530F4DnEDmqMJlKNHD+47FQYEyH6aE+cL3nRG6p1gUJ7cSAJXBdl
-        Qvv86fz7oxXDmK0jtW0/YjBNAw==
-X-Google-Smtp-Source: ABdhPJzg1Ma8Ooke2Tu2SRT4bzBeuNYSa3FNKmTYJnIPrnbr5F4nQ/snq2bFZz6CLLSh1eNnhZn30Q==
-X-Received: by 2002:a63:87c1:: with SMTP id i184mr35130pge.75.1637616850788;
-        Mon, 22 Nov 2021 13:34:10 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id c5sm8228997pjm.52.2021.11.22.13.34.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Nov 2021 13:34:10 -0800 (PST)
-Date:   Mon, 22 Nov 2021 21:34:06 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     Dave Hansen <dave.hansen@intel.com>,
-        Peter Gonda <pgonda@google.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <Thomas.Lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=SYp+2FQ9kEUUYn5etdjt0S74MkYWDopaecoN+XmZ9MI=;
+        b=2rz8xwHdgDE0aLd+98ujlJgdylXfbrgloigs8xiXs8QmphSL474XgL2v02I30JSf93
+         2tSFabcyGgOD5pba3Dh6mqztbWZocKzacwkDcFiKRfYLLk6q0U08vo8a6SXAosMltICQ
+         fVF6kaR4XChwNVmGo32exNciScsFKBaOI9p9Ic6uDfZrm5lndEqAmfVb8v+56mor3O/H
+         xqITvzwGaLAulAKheZ2jFLYQ9Fs5GmVZfAfJfxajIVSCr0F/kkloWbK8vrkUUQB/65PP
+         f1vvDuIUZj2ZWE0OlfQfbKuOoDySz9qQAFkL1wnosAVyc/N3mWkbv+qFkv+y5ZPmo7a/
+         wNmQ==
+X-Gm-Message-State: AOAM5337vhx0lKfltJ8YXwSvODJQdj/8D/u4nIYlqB4soifZAC51pwFZ
+        QxHRkNs4K1WREeQwgl/dgQ5ILgkVLigLfqyZEfSTcQ==
+X-Google-Smtp-Source: ABdhPJwpl6MJzOLQ0iyNZlqmcZDIclkCWWjM+ZidA98o0UeFwYvSbDYyan3axZG/cMJRE+NyISI92Oxbhf0f74cuXQk=
+X-Received: by 2002:a05:6e02:52d:: with SMTP id h13mr127511ils.274.1637617516748;
+ Mon, 22 Nov 2021 13:45:16 -0800 (PST)
+MIME-Version: 1.0
+References: <20211120045046.3940942-1-seanjc@google.com> <20211120045046.3940942-13-seanjc@google.com>
+In-Reply-To: <20211120045046.3940942-13-seanjc@google.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Mon, 22 Nov 2021 13:45:05 -0800
+Message-ID: <CANgfPd8NRY++QuLxZvk+T+rxFw_09tSsMBes_09B4R90wdrtUA@mail.gmail.com>
+Subject: Re: [PATCH 12/28] KVM: x86/mmu: Batch TLB flushes from TDP MMU for
+ MMU notifier change_spte
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
- Hypervisor Support
-Message-ID: <YZwMzpx8422JiJTS@google.com>
-References: <20210820155918.7518-1-brijesh.singh@amd.com>
- <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
- <daf5066b-e89b-d377-ed8a-9338f1a04c0d@amd.com>
- <d673f082-9023-dafb-e42e-eab32a3ddd0c@intel.com>
- <f15597a0-e7e0-0a57-39fd-20715abddc7f@amd.com>
- <5f3b3aab-9ec2-c489-eefd-9136874762ee@intel.com>
- <d83e6668-bec4-8d1f-7f8a-085829146846@amd.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d83e6668-bec4-8d1f-7f8a-085829146846@amd.com>
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Hou Wenlong <houwenlong93@linux.alibaba.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 22, 2021, Brijesh Singh wrote:
-> 
-> On 11/22/21 1:14 PM, Dave Hansen wrote:
-> > On 11/22/21 11:06 AM, Brijesh Singh wrote:
-> > > > 3. Kernel accesses guest private memory via a kernel mapping.  This one
-> > > >     is tricky.  These probably *do* result in a panic() today, but
-> > > >     ideally shouldn't.
-> > > KVM has defined some helper functions to maps and unmap the guest pages.
-> > > Those helper functions do the GPA to PFN lookup before calling the
-> > > kmap(). Those helpers are enhanced such that it check the RMP table
-> > > before the kmap() and acquire a lock to prevent a page state change
-> > > until the kunmap() is called. So, in the current implementation, we
-> > > should *not* see a panic() unless there is a KVM driver bug that didn't
-> > > use the helper functions or a bug in the helper function itself.
-> > 
-> > I don't think this is really KVM specific.
-> > 
-> > Think of a remote process doing ptrace(PTRACE_POKEUSER) or pretty much
-> > any generic get_user_pages() instance.  As long as the memory is mapped
-> > into the page tables, you're exposed to users that walk the page tables.
-> > 
-> > How do we, for example, prevent ptrace() from inducing a panic()?
-> > 
-> 
-> In the current approach, this access will induce a panic(). In general,
-> supporting the ptrace() for the encrypted VM region is going to be
-> difficult.
+On Fri, Nov 19, 2021 at 8:51 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> Batch TLB flushes (with other MMUs) when handling ->change_spte()
+> notifications in the TDP MMU.  The MMU notifier path in question doesn't
+> allow yielding and correcty flushes before dropping mmu_lock.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-But ptrace() is just an example, any path in the kernel that accesses a gup'd
-page through a kernel mapping will explode if handed a guest private page.
+Reviewed-by: Ben Gardon <bgardon@google.com>
 
-> The upcoming TDX work to unmap the guest memory region from the current process
-> page table can easily extend for the SNP to cover the current limitations.
+This seems very reasonable to me.
 
-That represents an ABI change though.  If KVM allows userspace to create SNP guests
-without any guarantees that userspace cannot coerce the kernel into accessing guest
-private memory, then we are stuck supporting that behavior even if KVM later gains
-the ability to provide such guarantees through new APIs.
-
-If allowing this behavior was only a matter of the system admin opting into a
-dangerous configuration, I would probably be ok merging SNP with it buried behind
-EXPERT or something scarier, but this impacts KVM's ABI as well as kernel internals,
-e.g. the hooks in kvm_vcpu_map() and friends are unnecessary if KVM can differentiate
-between shared and private gfns in its memslots, as gfn_to_pfn() will either fail or
-point at memory that is guaranteed to be in the shared state.
+> ---
+>  arch/x86/kvm/mmu/tdp_mmu.c | 13 ++++++-------
+>  1 file changed, 6 insertions(+), 7 deletions(-)
+>
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 8e446ef03022..06b500fab248 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -1182,13 +1182,12 @@ static bool set_spte_gfn(struct kvm *kvm, struct tdp_iter *iter,
+>   */
+>  bool kvm_tdp_mmu_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+>  {
+> -       bool flush = kvm_tdp_mmu_handle_gfn(kvm, range, set_spte_gfn);
+> -
+> -       /* FIXME: return 'flush' instead of flushing here. */
+> -       if (flush)
+> -               kvm_flush_remote_tlbs_with_address(kvm, range->start, 1);
+> -
+> -       return false;
+> +       /*
+> +        * No need to handle the remote TLB flush under RCU protection, the
+> +        * target SPTE _must_ be a leaf SPTE, i.e. cannot result in freeing a
+> +        * shadow page.  See the WARN on pfn_changed in __handle_changed_spte().
+> +        */
+> +       return kvm_tdp_mmu_handle_gfn(kvm, range, set_spte_gfn);
+>  }
+>
+>  /*
+> --
+> 2.34.0.rc2.393.gf8c9666880-goog
+>
