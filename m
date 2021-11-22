@@ -2,127 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0BAB545955E
-	for <lists+kvm@lfdr.de>; Mon, 22 Nov 2021 20:13:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B775459564
+	for <lists+kvm@lfdr.de>; Mon, 22 Nov 2021 20:14:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239773AbhKVTQV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Nov 2021 14:16:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55094 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239713AbhKVTQP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Nov 2021 14:16:15 -0500
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4373C06173E
-        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 11:13:08 -0800 (PST)
-Received: by mail-pg1-x52b.google.com with SMTP id 28so16092606pgq.8
-        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 11:13:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=xdP/1E/sjsU4zxgXiTU4EW1L3AvShi1LySCVgiuwxhk=;
-        b=pgAhS8MM5EonlJPkdQAeawThA4p4egLanaMBN6/4TKVldxH9LVZ7k9WHaYVGo82KX7
-         18aFXBTWlhy0r/V4IOx8/8UAgghLzT09K0F9iCHD30AQvsa4Qt+CSvMLRp5SvJjtT/gi
-         1PqBcprOLhMQoW5KlGtsACtBcaGDwM0bSlRJd65uOqAG5ciWprx28kvVT/YCQFd1rj7U
-         376ehb8bHBDi9adfN3SfvlYq/nyxAuTfnV9uoanvKLMC61PL5czLo8QVib+HUNC/wLrt
-         ieOxttB5hSPlfSshaRcdbBLJbF+aZVwSAzHz9ED2YhoDiAwAZ4JPOuBkXvo6xB5av/py
-         6DNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=xdP/1E/sjsU4zxgXiTU4EW1L3AvShi1LySCVgiuwxhk=;
-        b=QCSX82mAf2TP2C6EsiXgzTZhEE+3V7BVjNyGpPPSoDikDjj/UMZFoQC7eTFV/BvPzm
-         wRzbvvhIRmv1HmoZfjZVWmqlutk4mLIzteTCkeELUwZ+LCsrFqIebq67xPlKKVcsEOdf
-         LR/dBw6FU9Dm0UxToXpEfSVX8+pbKYvgOxaldBYoejpAjNb9gOs53biFUakI3BTrGXOP
-         xZZP2iPCkLwM7hb9PDjw7739k+dOJNnUWkL82dn6lVBbFFYrVkapho3ngdvfHL/N3k3N
-         mW+OoXqY9wUTqTMEF0ya3Agny4GJdUfZuVA9djb8i2dFffpD33+NrNcXLiMjcLiTi/8I
-         1nUw==
-X-Gm-Message-State: AOAM533QlZKx5CxjD7xYCOg3bjAlRhhX99VgZLhXr4NVxLhYnaRDOnDE
-        9zcRnqCLm1OZP4lA6NZUQvL47Q==
-X-Google-Smtp-Source: ABdhPJywWf83H/xNNjbfsd1y6iSA/s+3iEDb0YY1d+t06wff/MSS3oF9BLmYM22aWFFftqWP9pxyxg==
-X-Received: by 2002:a62:1b51:0:b0:49f:a8d8:84b with SMTP id b78-20020a621b51000000b0049fa8d8084bmr87130253pfb.31.1637608387283;
-        Mon, 22 Nov 2021 11:13:07 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id b15sm9600038pfv.48.2021.11.22.11.13.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Nov 2021 11:13:06 -0800 (PST)
-Date:   Mon, 22 Nov 2021 19:13:02 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Aili Yao <yaoaili126@gmail.com>
-Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yaoaili@kingsoft.com
-Subject: Re: [PATCH] KVM: LAPIC: Per vCPU control over
- kvm_can_post_timer_interrupt
-Message-ID: <YZvrvmRnuDc1e+gi@google.com>
-References: <20211122095619.000060d2@gmail.com>
+        id S237306AbhKVTRa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Nov 2021 14:17:30 -0500
+Received: from mga14.intel.com ([192.55.52.115]:44635 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230159AbhKVTR1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Nov 2021 14:17:27 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10176"; a="235091542"
+X-IronPort-AV: E=Sophos;i="5.87,255,1631602800"; 
+   d="scan'208";a="235091542"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2021 11:14:20 -0800
+X-IronPort-AV: E=Sophos;i="5.87,255,1631602800"; 
+   d="scan'208";a="606529899"
+Received: from kvadariv-mobl1.amr.corp.intel.com (HELO [10.212.223.175]) ([10.212.223.175])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2021 11:14:19 -0800
+Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
+ Hypervisor Support
+To:     Brijesh Singh <brijesh.singh@amd.com>,
+        Peter Gonda <pgonda@google.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
+ <daf5066b-e89b-d377-ed8a-9338f1a04c0d@amd.com>
+ <d673f082-9023-dafb-e42e-eab32a3ddd0c@intel.com>
+ <f15597a0-e7e0-0a57-39fd-20715abddc7f@amd.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+ z5cecg==
+Message-ID: <5f3b3aab-9ec2-c489-eefd-9136874762ee@intel.com>
+Date:   Mon, 22 Nov 2021 11:14:16 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211122095619.000060d2@gmail.com>
+In-Reply-To: <f15597a0-e7e0-0a57-39fd-20715abddc7f@amd.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 22, 2021, Aili Yao wrote:
-> From: Aili Yao <yaoaili@kingsoft.com>
-> 
-> When we isolate some pyhiscal cores, We may not use them for kvm guests,
-> We may use them for other purposes like DPDK, or we can make some kvm
-> guests isolated and some not, the global judgement pi_inject_timer is
-> not enough; We may make wrong decisions:
-> 
-> In such a scenario, the guests without isolated cores will not be
-> permitted to use vmx preemption timer, and tscdeadline fastpath also be
-> disabled, both will lead to performance penalty.
-> 
-> So check whether the vcpu->cpu is isolated, if not, don't post timer
-> interrupt.
-> 
-> Signed-off-by: Aili Yao <yaoaili@kingsoft.com>
-> ---
->  arch/x86/kvm/lapic.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 759952dd1222..72dde5532101 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -34,6 +34,7 @@
->  #include <asm/delay.h>
->  #include <linux/atomic.h>
->  #include <linux/jump_label.h>
-> +#include <linux/sched/isolation.h>
->  #include "kvm_cache_regs.h"
->  #include "irq.h"
->  #include "ioapic.h"
-> @@ -113,7 +114,8 @@ static inline u32 kvm_x2apic_id(struct kvm_lapic *apic)
->  
->  static bool kvm_can_post_timer_interrupt(struct kvm_vcpu *vcpu)
->  {
-> -	return pi_inject_timer && kvm_vcpu_apicv_active(vcpu);
-> +	return pi_inject_timer && kvm_vcpu_apicv_active(vcpu) &&
-> +		!housekeeping_cpu(vcpu->cpu, HK_FLAG_TIMER);
+On 11/22/21 11:06 AM, Brijesh Singh wrote:
+>> 3. Kernel accesses guest private memory via a kernel mapping.  This one
+>>    is tricky.  These probably *do* result in a panic() today, but
+>>    ideally shouldn't.
+> KVM has defined some helper functions to maps and unmap the guest pages.
+> Those helper functions do the GPA to PFN lookup before calling the
+> kmap(). Those helpers are enhanced such that it check the RMP table
+> before the kmap() and acquire a lock to prevent a page state change
+> until the kunmap() is called. So, in the current implementation, we
+> should *not* see a panic() unless there is a KVM driver bug that didn't
+> use the helper functions or a bug in the helper function itself.
 
-I don't think this is safe, vcpu->cpu will be -1 if the vCPU isn't scheduled in.
-This also doesn't play nice with the admin forcing pi_inject_timer=1.  Not saying
-there's a reasonable use case for doing that, but it's supported today and this
-would break that behavior.  It would also lead to weird behavior if a vCPU were
-migrated on/off a housekeeping vCPU.  Again, probably not a reasonable use case,
-but I don't see anything that would outright prevent that behavior.
+I don't think this is really KVM specific.
 
-The existing behavior also feels a bit unsafe as pi_inject_timer is writable while
-KVM is running, though I supposed that's orthogonal to this discussion.
+Think of a remote process doing ptrace(PTRACE_POKEUSER) or pretty much
+any generic get_user_pages() instance.  As long as the memory is mapped
+into the page tables, you're exposed to users that walk the page tables.
 
-Rather than check vcpu->cpu, is there an existing vCPU flag that can be queried,
-e.g. KVM_HINTS_REALTIME?
-
->  }
->  
->  bool kvm_can_use_hv_timer(struct kvm_vcpu *vcpu)
-> -- 
-> 2.25.1
-> 
+How do we, for example, prevent ptrace() from inducing a panic()?
