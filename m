@@ -2,55 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F1CE44595D5
-	for <lists+kvm@lfdr.de>; Mon, 22 Nov 2021 20:57:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E60E4595DD
+	for <lists+kvm@lfdr.de>; Mon, 22 Nov 2021 21:03:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240358AbhKVUAj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Nov 2021 15:00:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36814 "EHLO
+        id S240386AbhKVUGW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Nov 2021 15:06:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239711AbhKVUAi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Nov 2021 15:00:38 -0500
-Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3125DC061574
-        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 11:57:31 -0800 (PST)
-Received: by mail-io1-xd34.google.com with SMTP id e144so24905422iof.3
-        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 11:57:31 -0800 (PST)
+        with ESMTP id S231137AbhKVUGR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Nov 2021 15:06:17 -0500
+Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CC8EC061714
+        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 12:03:10 -0800 (PST)
+Received: by mail-io1-xd31.google.com with SMTP id 14so24848618ioe.2
+        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 12:03:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=Tu3lxcIg7V05BfeRU1lfgCDNUx8anDFHSWBxng5Jwac=;
-        b=srhMB9M6hX0PkCDJD/JQkumC/IQ8M7Lz+cplUXYaHfAi76HHbwUnWECul4L4RyW3GZ
-         w1ashi5ZD6M2Std6cYhwV68h2Oek1z9hhwcbYqJduTemt9RX7vRtMkAIX4Scg3jiWfJ6
-         L19cXhw/DAa7JB41HMYsjsNBKGjjunmogVFekOu8oi2kg5RyRi0p1jCrYKRfOUPVsA5l
-         ViZNpsmbYOPVjM5hEek05EhquFS15s4A8GxJYDNhVixHuFAk3Fbk4J/rMjFqaYxYEqnv
-         N7NFJ+2Z1p0OW9A9GFli/pvYeLEjO9UQbwIsCNSOru8/ZDz25V2MSfmjXudcVOxTxc+E
-         khYg==
+        bh=rrUEucjsIu25GY601OtreqwaBPOJR4BOvmaMLgpsfuw=;
+        b=JHgX7iSo19FK/TBFpxrd4cWpaSIJvNrXDPtItYF6sb6+arW0kpgY22ZNg4KY/xzD/0
+         VHFvbpt/eyLLuPknWFGPy8znPRHfkBpRRD8LZI46fj/hixT884bAeem93vBM3MaCaNX4
+         8tCv2GPwUFppLfJQet1T6y2cbn46MORiZ4lJitgJqfhuBWvJSEpBx2Cebeomc1EphDUh
+         0rnGP4e/PytZIR5PmDOcEhoqTv7/ft+x42f/Ti+yE+Zzanl9iGN4dBIpTJBTaMs3ylQs
+         BG5hLxnIH6Xqypo2tYQ94IusN7s0xjv8EvhLBl7d5sKMVXefoNzunAlQIg/Keu/y7bdZ
+         I+jw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=Tu3lxcIg7V05BfeRU1lfgCDNUx8anDFHSWBxng5Jwac=;
-        b=D5637sc4sXQKl4jNYMA4hTJlJjJquDV4Q/+t+lhxwJcLCxD8XHIw04bjLtlmOuoG3K
-         uwxdLmzJ9Fm2JVUCreMGHOZ5xtPglMUHXaxAUZeYtc6fdgF4VUMtijZJn2MQgJt7+Lmw
-         qFFfCGKfwCTFKz6A8S1+Upj0oFnpWGsvy5glygeqtawhP9L9e5MhPf2YBMzzi1Wi77+b
-         ATyoUu5jzHlxzGTNKvdvsveFsMBcRqxzMhOpYgtjVSpkfMdTjdLk3ftQvkdPFJnMooYW
-         7hAzbdSPzh5be5ox+1qNv48PHp/8TybmvlizqiU8uf0w7WnxK7/9gneeJMJ2uc1mHItr
-         Kivg==
-X-Gm-Message-State: AOAM531v0VB83GZ4yEpNclYmtH6kdLaY9B7aAaWRdzyyg7EKceh7UZjY
-        byaZyKd9nP9hIlqX/gw4ycZlQ1J8ePp9ivfxtA/jmg==
-X-Google-Smtp-Source: ABdhPJyHs56CGDl8ro/bvC8wCPGXjqMFzrf4zkecyaHKTPWrCYSJk7Xl8Ol3tNmm5cWwTHdBhkyJ1bFqwou2YOv2q/4=
-X-Received: by 2002:a5d:9493:: with SMTP id v19mr24296286ioj.34.1637611050436;
- Mon, 22 Nov 2021 11:57:30 -0800 (PST)
+        bh=rrUEucjsIu25GY601OtreqwaBPOJR4BOvmaMLgpsfuw=;
+        b=Dcq9w84K6HT69vyBKSG1aKF7D1bBKPMLcDNwO6N3cbGlvekP8SIoFx/15u90ksPxvj
+         2NYd5ch+i6rij3sqP5uwVmGaGS5IcLpyy8az3+Z3+xtV0NztZhkY28397EtQ1CUt37Qb
+         p7eKFmdiLNJvqpXo+1+bud+LgbQhBWFARVYlfuup4qo+Q3Bp7m2UcL0cVvtUvK/qu4jq
+         UacpAZPHY+LAVcmSt3EZuku514XbNGQc6sso8p2tDCRQm+1KRVb0TIGDg8p4hndrRaON
+         bPM27arrKAU+JpQ1vTmFa6e2dESFr+thf3sY/ETPvazq+MzTbWqNjpHboNczaMXqe3bX
+         mqRw==
+X-Gm-Message-State: AOAM533BgR35KNVQOuPlImRdBsgItf23usY9TvmMn8fTa3/mOUKAxmfw
+        Mgd8cBt2GKSdF/64SM10yrgySHIQf3j0J1aLnCbz5A==
+X-Google-Smtp-Source: ABdhPJw+dM1W6M353i8ytIfkTfAqnSaPWZ2KAo4J7ruuSLgE7Liwv37EY3rrV6tUPxizCJ565dVIz/6617AG9sTMgrI=
+X-Received: by 2002:a02:70cf:: with SMTP id f198mr50759883jac.124.1637611389509;
+ Mon, 22 Nov 2021 12:03:09 -0800 (PST)
 MIME-Version: 1.0
-References: <20211120045046.3940942-1-seanjc@google.com> <20211120045046.3940942-6-seanjc@google.com>
-In-Reply-To: <20211120045046.3940942-6-seanjc@google.com>
+References: <20211120045046.3940942-1-seanjc@google.com> <20211120045046.3940942-9-seanjc@google.com>
+In-Reply-To: <20211120045046.3940942-9-seanjc@google.com>
 From:   Ben Gardon <bgardon@google.com>
-Date:   Mon, 22 Nov 2021 11:57:19 -0800
-Message-ID: <CANgfPd8nRH+6ovkNETgx6fLjf4bNsHjHCMMq7ZVxtuU-J30UrQ@mail.gmail.com>
-Subject: Re: [PATCH 05/28] KVM: x86/mmu: Check for present SPTE when clearing
- dirty bit in TDP MMU
+Date:   Mon, 22 Nov 2021 12:02:58 -0800
+Message-ID: <CANgfPd9PNYOvZ1L4rxUuiAVF+FCuAYMbgfojLu1OTWEr-74M_Q@mail.gmail.com>
+Subject: Re: [PATCH 08/28] KVM: x86/mmu: Drop unused @kvm param from kvm_tdp_mmu_get_root()
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -66,36 +65,58 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Fri, Nov 19, 2021 at 8:51 PM Sean Christopherson <seanjc@google.com> wrote:
 >
-> Explicitly check for preset SPTEs when clearing dirty bits in the TDP
-> MMU.  This isn't strictly required for correctness, as setting the dirty
-> bit in a defunct SPTE will not change the SPTE from !PRESENT to PRESENT.
-> However, the guarded MMU_WARN_ON() in spte_ad_need_write_protect() would
-> complain if anyone actually turned on KVM's MMU debugging.
+> Drop the unused @kvm param from kvm_tdp_mmu_get_root().  No functional
+> change intended.
 >
-> Fixes: a6a0b05da9f3 ("kvm: x86/mmu: Support dirty logging for the TDP MMU")
-> Cc: Ben Gardon <bgardon@google.com>
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 
 Reviewed-by: Ben Gardon <bgardon@google.com>
 
 > ---
->  arch/x86/kvm/mmu/tdp_mmu.c | 3 +++
->  1 file changed, 3 insertions(+)
+>  arch/x86/kvm/mmu/tdp_mmu.c | 7 ++++---
+>  arch/x86/kvm/mmu/tdp_mmu.h | 3 +--
+>  2 files changed, 5 insertions(+), 5 deletions(-)
 >
 > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 1db8496259ad..c575df121b19 100644
+> index 4305ee8e3de3..12a28afce73f 100644
 > --- a/arch/x86/kvm/mmu/tdp_mmu.c
 > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -1246,6 +1246,9 @@ static bool clear_dirty_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
->                 if (tdp_mmu_iter_cond_resched(kvm, &iter, false, true))
->                         continue;
+> @@ -129,9 +129,10 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
+>                 next_root = list_first_or_null_rcu(&kvm->arch.tdp_mmu_roots,
+>                                                    typeof(*next_root), link);
 >
-> +               if (!is_shadow_present_pte(iter.old_spte))
-> +                       continue;
-> +
->                 if (spte_ad_need_write_protect(iter.old_spte)) {
->                         if (is_writable_pte(iter.old_spte))
->                                 new_spte = iter.old_spte & ~PT_WRITABLE_MASK;
+> -       while (next_root && !kvm_tdp_mmu_get_root(kvm, next_root))
+> +       while (next_root && !kvm_tdp_mmu_get_root(next_root))
+>                 next_root = list_next_or_null_rcu(&kvm->arch.tdp_mmu_roots,
+> -                               &next_root->link, typeof(*next_root), link);
+> +                                                 &next_root->link,
+> +                                                 typeof(*next_root), link);
+>
+>         rcu_read_unlock();
+>
+> @@ -211,7 +212,7 @@ hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
+>         /* Check for an existing root before allocating a new one. */
+>         for_each_tdp_mmu_root(kvm, root, kvm_mmu_role_as_id(role)) {
+>                 if (root->role.word == role.word &&
+> -                   kvm_tdp_mmu_get_root(kvm, root))
+> +                   kvm_tdp_mmu_get_root(root))
+>                         goto out;
+>         }
+>
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
+> index 3899004a5d91..599714de67c3 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.h
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.h
+> @@ -7,8 +7,7 @@
+>
+>  hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu);
+>
+> -__must_check static inline bool kvm_tdp_mmu_get_root(struct kvm *kvm,
+> -                                                    struct kvm_mmu_page *root)
+> +__must_check static inline bool kvm_tdp_mmu_get_root(struct kvm_mmu_page *root)
+>  {
+>         if (root->role.invalid)
+>                 return false;
 > --
 > 2.34.0.rc2.393.gf8c9666880-goog
 >
