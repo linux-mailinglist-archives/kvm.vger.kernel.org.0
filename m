@@ -2,46 +2,46 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E28E1459469
-	for <lists+kvm@lfdr.de>; Mon, 22 Nov 2021 18:58:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B0A1A45946B
+	for <lists+kvm@lfdr.de>; Mon, 22 Nov 2021 18:58:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233748AbhKVSBl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Nov 2021 13:01:41 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:33857 "EHLO
+        id S239825AbhKVSBn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Nov 2021 13:01:43 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:37194 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239764AbhKVSBk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 22 Nov 2021 13:01:40 -0500
+        by vger.kernel.org with ESMTP id S239764AbhKVSBm (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 22 Nov 2021 13:01:42 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637603913;
+        s=mimecast20190719; t=1637603915;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Hazvb/oLnE0S4p00gZpiwfDjAfE/nO71NZErwwXCP8Q=;
-        b=XVvI6n+Af+4VitcxVnyJr+WWi9/xATgJ9PjWoO79F/36t6K4FhW8X43hkFAierMmsku4ym
-        mmBUPhzwmOgJhFGBdhdxK3a+4TKWIPBf55sYZBiBwCohYTVgVcC32iODWBYkaJ9z3G3fpx
-        lHeOIjWFg1FXZ1MwT0r+BczcV8Q7n4s=
+        bh=rKBdp+c5ShVw+K+W5BqKDAfh3gXZdMMO+xQSPcJQJv4=;
+        b=Su8BlT4fAW1cPkxz2HoG86CdGQjmDCrJozwL4tPK0U8XWQnDApJDzHy7iUAE0wcmNMgbpm
+        thL5orjmDpns5bxa8DES7bdErtlImPs5q5/fAfy2ZoZr7XGvJtEOzEWPW2td5U0v5cR7nw
+        7bKl+8Z/89aUfm0GmVU5yW9xmIQbmCM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-238-evlMqVPhOqi_OZ820b3geA-1; Mon, 22 Nov 2021 12:58:30 -0500
-X-MC-Unique: evlMqVPhOqi_OZ820b3geA-1
+ us-mta-427--DQANkk4NAG4cdzY6Hl0Mw-1; Mon, 22 Nov 2021 12:58:32 -0500
+X-MC-Unique: -DQANkk4NAG4cdzY6Hl0Mw-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 00C981023F4E;
-        Mon, 22 Nov 2021 17:58:29 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E56BA0CAE;
+        Mon, 22 Nov 2021 17:58:31 +0000 (UTC)
 Received: from fedora.redhat.com (unknown [10.40.192.236])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 68A7B1017CE5;
-        Mon, 22 Nov 2021 17:58:22 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5F10F1002D71;
+        Mon, 22 Nov 2021 17:58:29 +0000 (UTC)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
-Subject: [PATCH 1/2] KVM: selftests: Avoid KVM_SET_CPUID2 after KVM_RUN in hyperv_features test
-Date:   Mon, 22 Nov 2021 18:58:17 +0100
-Message-Id: <20211122175818.608220-2-vkuznets@redhat.com>
+Subject: [PATCH 2/2] KVM: x86: Forbid KVM_SET_CPUID{,2} after KVM_RUN
+Date:   Mon, 22 Nov 2021 18:58:18 +0100
+Message-Id: <20211122175818.608220-3-vkuznets@redhat.com>
 In-Reply-To: <20211122175818.608220-1-vkuznets@redhat.com>
 References: <20211122175818.608220-1-vkuznets@redhat.com>
 MIME-Version: 1.0
@@ -51,233 +51,94 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-hyperv_features's sole purpose is to test access to various Hyper-V MSRs
-and hypercalls with different CPUID data. As KVM_SET_CPUID2 after KVM_RUN
-is deprecated and soon-to-be forbidden, avoid it by re-creating test VM
-for each sub-test.
+Commit 63f5a1909f9e ("KVM: x86: Alert userspace that KVM_SET_CPUID{,2}
+after KVM_RUN is broken") officially deprecated KVM_SET_CPUID{,2} ioctls
+after first successful KVM_RUN and promissed to make this sequence forbiden
+in 5.16. It's time to fulfil the promise.
 
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- .../selftests/kvm/x86_64/hyperv_features.c    | 140 +++++++++---------
- 1 file changed, 71 insertions(+), 69 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 20 +++-----------------
+ arch/x86/kvm/x86.c     | 27 +++++++++++++++++++++++++++
+ 2 files changed, 30 insertions(+), 17 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_features.c b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-index 91d88aaa9899..672915ce73d8 100644
---- a/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-+++ b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-@@ -165,10 +165,10 @@ static void hv_set_cpuid(struct kvm_vm *vm, struct kvm_cpuid2 *cpuid,
- 	vcpu_set_cpuid(vm, VCPU_ID, cpuid);
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 3be9beea838d..669e86688cbf 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -5032,24 +5032,10 @@ void kvm_mmu_after_set_cpuid(struct kvm_vcpu *vcpu)
+ 	kvm_mmu_reset_context(vcpu);
+ 
+ 	/*
+-	 * KVM does not correctly handle changing guest CPUID after KVM_RUN, as
+-	 * MAXPHYADDR, GBPAGES support, AMD reserved bit behavior, etc.. aren't
+-	 * tracked in kvm_mmu_page_role.  As a result, KVM may miss guest page
+-	 * faults due to reusing SPs/SPTEs.  Alert userspace, but otherwise
+-	 * sweep the problem under the rug.
+-	 *
+-	 * KVM's horrific CPUID ABI makes the problem all but impossible to
+-	 * solve, as correctly handling multiple vCPU models (with respect to
+-	 * paging and physical address properties) in a single VM would require
+-	 * tracking all relevant CPUID information in kvm_mmu_page_role.  That
+-	 * is very undesirable as it would double the memory requirements for
+-	 * gfn_track (see struct kvm_mmu_page_role comments), and in practice
+-	 * no sane VMM mucks with the core vCPU model on the fly.
++	 * Changing guest CPUID after KVM_RUN is forbidden, see the comment in
++	 * kvm_arch_vcpu_ioctl().
+ 	 */
+-	if (vcpu->arch.last_vmentry_cpu != -1) {
+-		pr_warn_ratelimited("KVM: KVM_SET_CPUID{,2} after KVM_RUN may cause guest instability\n");
+-		pr_warn_ratelimited("KVM: KVM_SET_CPUID{,2} will fail after KVM_RUN starting with Linux 5.16\n");
+-	}
++	KVM_BUG_ON(vcpu->arch.last_vmentry_cpu != -1, vcpu->kvm);
  }
  
--static void guest_test_msrs_access(struct kvm_vm *vm, struct msr_data *msr,
--				   struct kvm_cpuid2 *best)
-+static void guest_test_msrs_access(void)
- {
- 	struct kvm_run *run;
-+	struct kvm_vm *vm;
- 	struct ucall uc;
- 	int stage = 0, r;
- 	struct kvm_cpuid_entry2 feat = {
-@@ -180,11 +180,34 @@ static void guest_test_msrs_access(struct kvm_vm *vm, struct msr_data *msr,
- 	struct kvm_cpuid_entry2 dbg = {
- 		.function = HYPERV_CPUID_SYNDBG_PLATFORM_CAPABILITIES
- 	};
--	struct kvm_enable_cap cap = {0};
--
--	run = vcpu_state(vm, VCPU_ID);
-+	struct kvm_cpuid2 *best;
-+	vm_vaddr_t msr_gva;
-+	struct kvm_enable_cap cap = {
-+		.cap = KVM_CAP_HYPERV_ENFORCE_CPUID,
-+		.args = {1}
-+	};
-+	struct msr_data *msr;
+ void kvm_mmu_reset_context(struct kvm_vcpu *vcpu)
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 5a403d92833f..3cfaccc24efb 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -5125,6 +5125,25 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 		struct kvm_cpuid cpuid;
  
- 	while (true) {
-+		vm = vm_create_default(VCPU_ID, 0, guest_msr);
+ 		r = -EFAULT;
 +
-+		msr_gva = vm_vaddr_alloc_page(vm);
-+		memset(addr_gva2hva(vm, msr_gva), 0x0, getpagesize());
-+		msr = addr_gva2hva(vm, msr_gva);
++		/*
++		 * KVM does not correctly handle changing guest CPUID after KVM_RUN, as
++		 * MAXPHYADDR, GBPAGES support, AMD reserved bit behavior, etc.. aren't
++		 * tracked in kvm_mmu_page_role.  As a result, KVM may miss guest page
++		 * faults due to reusing SPs/SPTEs.  Alert userspace, but otherwise
++		 * sweep the problem under the rug.
++		 *
++		 * KVM's horrific CPUID ABI makes the problem all but impossible to
++		 * solve, as correctly handling multiple vCPU models (with respect to
++		 * paging and physical address properties) in a single VM would require
++		 * tracking all relevant CPUID information in kvm_mmu_page_role.  That
++		 * is very undesirable as it would double the memory requirements for
++		 * gfn_track (see struct kvm_mmu_page_role comments), and in practice
++		 * no sane VMM mucks with the core vCPU model on the fly.
++		 */
++		if (vcpu->arch.last_vmentry_cpu != -1)
++			goto out;
 +
-+		vcpu_args_set(vm, VCPU_ID, 1, msr_gva);
-+		vcpu_enable_cap(vm, VCPU_ID, &cap);
-+
-+		vcpu_set_hv_cpuid(vm, VCPU_ID);
-+
-+		best = kvm_get_supported_hv_cpuid();
-+
-+		vm_init_descriptor_tables(vm);
-+		vcpu_init_descriptor_tables(vm, VCPU_ID);
-+		vm_install_exception_handler(vm, GP_VECTOR, guest_gp_handler);
-+
-+		run = vcpu_state(vm, VCPU_ID);
-+
- 		switch (stage) {
- 		case 0:
- 			/*
-@@ -315,6 +338,7 @@ static void guest_test_msrs_access(struct kvm_vm *vm, struct msr_data *msr,
- 			 * capability enabled and guest visible CPUID bit unset.
- 			 */
- 			cap.cap = KVM_CAP_HYPERV_SYNIC2;
-+			cap.args[0] = 0;
- 			vcpu_enable_cap(vm, VCPU_ID, &cap);
- 			break;
- 		case 22:
-@@ -461,9 +485,9 @@ static void guest_test_msrs_access(struct kvm_vm *vm, struct msr_data *msr,
+ 		if (copy_from_user(&cpuid, cpuid_arg, sizeof(cpuid)))
+ 			goto out;
+ 		r = kvm_vcpu_ioctl_set_cpuid(vcpu, &cpuid, cpuid_arg->entries);
+@@ -5135,6 +5154,14 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 		struct kvm_cpuid2 cpuid;
  
- 		switch (get_ucall(vm, VCPU_ID, &uc)) {
- 		case UCALL_SYNC:
--			TEST_ASSERT(uc.args[1] == stage,
--				    "Unexpected stage: %ld (%d expected)\n",
--				    uc.args[1], stage);
-+			TEST_ASSERT(uc.args[1] == 0,
-+				    "Unexpected stage: %ld (0 expected)\n",
-+				    uc.args[1]);
- 			break;
- 		case UCALL_ABORT:
- 			TEST_FAIL("%s at %s:%ld", (const char *)uc.args[0],
-@@ -474,13 +498,14 @@ static void guest_test_msrs_access(struct kvm_vm *vm, struct msr_data *msr,
- 		}
- 
- 		stage++;
-+		kvm_vm_free(vm);
- 	}
- }
- 
--static void guest_test_hcalls_access(struct kvm_vm *vm, struct hcall_data *hcall,
--				     void *input, void *output, struct kvm_cpuid2 *best)
-+static void guest_test_hcalls_access(void)
- {
- 	struct kvm_run *run;
-+	struct kvm_vm *vm;
- 	struct ucall uc;
- 	int stage = 0, r;
- 	struct kvm_cpuid_entry2 feat = {
-@@ -493,10 +518,38 @@ static void guest_test_hcalls_access(struct kvm_vm *vm, struct hcall_data *hcall
- 	struct kvm_cpuid_entry2 dbg = {
- 		.function = HYPERV_CPUID_SYNDBG_PLATFORM_CAPABILITIES
- 	};
--
--	run = vcpu_state(vm, VCPU_ID);
-+	struct kvm_enable_cap cap = {
-+		.cap = KVM_CAP_HYPERV_ENFORCE_CPUID,
-+		.args = {1}
-+	};
-+	vm_vaddr_t hcall_page, hcall_params;
-+	struct hcall_data *hcall;
-+	struct kvm_cpuid2 *best;
- 
- 	while (true) {
-+		vm = vm_create_default(VCPU_ID, 0, guest_hcall);
+ 		r = -EFAULT;
 +
-+		vm_init_descriptor_tables(vm);
-+		vcpu_init_descriptor_tables(vm, VCPU_ID);
-+		vm_install_exception_handler(vm, UD_VECTOR, guest_ud_handler);
++		/*
++		 * KVM_SET_CPUID{,2} after KVM_RUN is forbidded, see the comment in
++		 * KVM_SET_CPUID case above.
++		 */
++		if (vcpu->arch.last_vmentry_cpu != -1)
++			goto out;
 +
-+		/* Hypercall input/output */
-+		hcall_page = vm_vaddr_alloc_pages(vm, 2);
-+		hcall = addr_gva2hva(vm, hcall_page);
-+		memset(addr_gva2hva(vm, hcall_page), 0x0, 2 * getpagesize());
-+
-+		hcall_params = vm_vaddr_alloc_page(vm);
-+		memset(addr_gva2hva(vm, hcall_params), 0x0, getpagesize());
-+
-+		vcpu_args_set(vm, VCPU_ID, 2, addr_gva2gpa(vm, hcall_page), hcall_params);
-+		vcpu_enable_cap(vm, VCPU_ID, &cap);
-+
-+		vcpu_set_hv_cpuid(vm, VCPU_ID);
-+
-+		best = kvm_get_supported_hv_cpuid();
-+
-+		run = vcpu_state(vm, VCPU_ID);
-+
- 		switch (stage) {
- 		case 0:
- 			hcall->control = 0xdeadbeef;
-@@ -606,9 +659,9 @@ static void guest_test_hcalls_access(struct kvm_vm *vm, struct hcall_data *hcall
- 
- 		switch (get_ucall(vm, VCPU_ID, &uc)) {
- 		case UCALL_SYNC:
--			TEST_ASSERT(uc.args[1] == stage,
--				    "Unexpected stage: %ld (%d expected)\n",
--				    uc.args[1], stage);
-+			TEST_ASSERT(uc.args[1] == 0,
-+				    "Unexpected stage: %ld (0 expected)\n",
-+				    uc.args[1]);
- 			break;
- 		case UCALL_ABORT:
- 			TEST_FAIL("%s at %s:%ld", (const char *)uc.args[0],
-@@ -619,66 +672,15 @@ static void guest_test_hcalls_access(struct kvm_vm *vm, struct hcall_data *hcall
- 		}
- 
- 		stage++;
-+		kvm_vm_free(vm);
- 	}
- }
- 
- int main(void)
- {
--	struct kvm_cpuid2 *best;
--	struct kvm_vm *vm;
--	vm_vaddr_t msr_gva, hcall_page, hcall_params;
--	struct kvm_enable_cap cap = {
--		.cap = KVM_CAP_HYPERV_ENFORCE_CPUID,
--		.args = {1}
--	};
--
--	/* Test MSRs */
--	vm = vm_create_default(VCPU_ID, 0, guest_msr);
--
--	msr_gva = vm_vaddr_alloc_page(vm);
--	memset(addr_gva2hva(vm, msr_gva), 0x0, getpagesize());
--	vcpu_args_set(vm, VCPU_ID, 1, msr_gva);
--	vcpu_enable_cap(vm, VCPU_ID, &cap);
--
--	vcpu_set_hv_cpuid(vm, VCPU_ID);
--
--	best = kvm_get_supported_hv_cpuid();
--
--	vm_init_descriptor_tables(vm);
--	vcpu_init_descriptor_tables(vm, VCPU_ID);
--	vm_install_exception_handler(vm, GP_VECTOR, guest_gp_handler);
--
- 	pr_info("Testing access to Hyper-V specific MSRs\n");
--	guest_test_msrs_access(vm, addr_gva2hva(vm, msr_gva),
--			       best);
--	kvm_vm_free(vm);
--
--	/* Test hypercalls */
--	vm = vm_create_default(VCPU_ID, 0, guest_hcall);
--
--	vm_init_descriptor_tables(vm);
--	vcpu_init_descriptor_tables(vm, VCPU_ID);
--	vm_install_exception_handler(vm, UD_VECTOR, guest_ud_handler);
--
--	/* Hypercall input/output */
--	hcall_page = vm_vaddr_alloc_pages(vm, 2);
--	memset(addr_gva2hva(vm, hcall_page), 0x0, 2 * getpagesize());
--
--	hcall_params = vm_vaddr_alloc_page(vm);
--	memset(addr_gva2hva(vm, hcall_params), 0x0, getpagesize());
--
--	vcpu_args_set(vm, VCPU_ID, 2, addr_gva2gpa(vm, hcall_page), hcall_params);
--	vcpu_enable_cap(vm, VCPU_ID, &cap);
--
--	vcpu_set_hv_cpuid(vm, VCPU_ID);
--
--	best = kvm_get_supported_hv_cpuid();
-+	guest_test_msrs_access();
- 
- 	pr_info("Testing access to Hyper-V hypercalls\n");
--	guest_test_hcalls_access(vm, addr_gva2hva(vm, hcall_params),
--				 addr_gva2hva(vm, hcall_page),
--				 addr_gva2hva(vm, hcall_page) + getpagesize(),
--				 best);
--
--	kvm_vm_free(vm);
-+	guest_test_hcalls_access();
- }
+ 		if (copy_from_user(&cpuid, cpuid_arg, sizeof(cpuid)))
+ 			goto out;
+ 		r = kvm_vcpu_ioctl_set_cpuid2(vcpu, &cpuid,
 -- 
 2.33.1
 
