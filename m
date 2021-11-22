@@ -2,189 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 54E9745910C
-	for <lists+kvm@lfdr.de>; Mon, 22 Nov 2021 16:11:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A9E2A45911E
+	for <lists+kvm@lfdr.de>; Mon, 22 Nov 2021 16:15:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231697AbhKVPOo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Nov 2021 10:14:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55616 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239534AbhKVPOl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Nov 2021 10:14:41 -0500
-Received: from forwardcorp1j.mail.yandex.net (forwardcorp1j.mail.yandex.net [IPv6:2a02:6b8:0:1619::183])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64049C061574;
-        Mon, 22 Nov 2021 07:11:34 -0800 (PST)
-Received: from sas1-4cbebe29391b.qloud-c.yandex.net (sas1-4cbebe29391b.qloud-c.yandex.net [IPv6:2a02:6b8:c08:789:0:640:4cbe:be29])
-        by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id CFFCD2E19B0;
-        Mon, 22 Nov 2021 18:11:27 +0300 (MSK)
-Received: from sas2-d40aa8807eff.qloud-c.yandex.net (sas2-d40aa8807eff.qloud-c.yandex.net [2a02:6b8:c08:b921:0:640:d40a:a880])
-        by sas1-4cbebe29391b.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id YiPih2xZ0h-BQsOL2aO;
-        Mon, 22 Nov 2021 18:11:27 +0300
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.com; s=default;
-        t=1637593887; bh=5SoeLo1xTGbCZidoCkfBDOnFEuE/R0Qz7W+q8Uyq6I4=;
-        h=In-Reply-To:References:Date:From:To:Subject:Message-ID:Cc;
-        b=2vRHIv1S2bOBt4EJL7FB9EKnVMkVu9oyf8rr4twhznsXRqq5168NXXdVTmcwf/eNL
-         UL1VclENnC3L8CvkHPhRAddD7J3UvfONOCX5W+STzaLH1tc7ZSY5CHVU7HgWQa3QPo
-         TZ3NZJgTcGM+1KFGzxgUW2rSTxR5i18rmAEju04M=
-Authentication-Results: sas1-4cbebe29391b.qloud-c.yandex.net; dkim=pass header.i=@yandex-team.com
-Received: from [IPv6:2a02:6b8:0:107:3e85:844d:5b1d:60a] (dynamic-red3.dhcp.yndx.net [2a02:6b8:0:107:3e85:844d:5b1d:60a])
-        by sas2-d40aa8807eff.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPS id adw8Ie3kCo-BQw4PPnO;
-        Mon, 22 Nov 2021 18:11:26 +0300
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-        (Client certificate not present)
-X-Yandex-Fwd: 2
-Subject: Re: [PATCH 6/6] vhost_net: use RCU callbacks instead of
- synchronize_rcu()
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Jesper Dangaard Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        kvm <kvm@vger.kernel.org>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        netdev <netdev@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>, bpf@vger.kernel.org
-References: <20211115153003.9140-1-arbn@yandex-team.com>
- <20211115153003.9140-6-arbn@yandex-team.com>
- <CACGkMEumax9RFVNgWLv5GyoeQAmwo-UgAq=DrUd4yLxPAUUqBw@mail.gmail.com>
- <b163233f-090f-baaf-4460-37978cab4d55@yandex-team.com>
- <20211122043620-mutt-send-email-mst@kernel.org>
-From:   Andrey Ryabinin <arbn@yandex-team.com>
-Message-ID: <ba4dbc25-f912-fb34-a0e2-c6c85b34b918@yandex-team.com>
-Date:   Mon, 22 Nov 2021 18:12:59 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        id S239821AbhKVPS5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Nov 2021 10:18:57 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:45103 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S239755AbhKVPS4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 22 Nov 2021 10:18:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1637594149;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=621jYNtFW+0mFTU6R2GKZf+P+Fi4Pvi8SOzQ0aE6RqI=;
+        b=iwkuELpZAhqolFQcC1E6znrWv2bjBEuIT4o77IdVGM4lv+Y6VLR4FhYvje5zKJ6D3w6yjR
+        ktOjG7C7d3NYSzLVrn7S3sP8zOpm9GY+qW92a6jxpkc6GZJPe51k8dgXrAD4yAEF4wC5WU
+        V0+D0vruKnDpbRxgTUctKHh3LY5hRaA=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-415-fJlVslAmOvuCoWqmNMvn6w-1; Mon, 22 Nov 2021 10:15:48 -0500
+X-MC-Unique: fJlVslAmOvuCoWqmNMvn6w-1
+Received: by mail-wm1-f69.google.com with SMTP id m14-20020a05600c3b0e00b0033308dcc933so37567wms.7
+        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 07:15:48 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:organization:in-reply-to
+         :content-transfer-encoding;
+        bh=621jYNtFW+0mFTU6R2GKZf+P+Fi4Pvi8SOzQ0aE6RqI=;
+        b=cIBWm1HBjNtMPg9shG0HVlHMT95Fcc1bLmBmhr7Ix/FZ2Svy3XdQICm4WVGxNA38pn
+         So3Lk4i3Uix8mM+l6NE8mHqsD6yUVhjWjuVmaCigRO+WO5i0P9iaZFidT2wc4rqX6suI
+         xScsyroiidM0ucKx7PU1+IfOr5ZSmWwQqIEslGhUgSmkb0e9NVlzPQ+l0BeSIYTsgv+9
+         //qLpEpZoVk2VDFJLs1FNqnq3NEzXwBzUFDyCWWdh6NUTv8ZHcXF7Eu8wpFGL8t6PqPo
+         7VK+NfVX1g7eaEn7hIJw9750mSIgz0Z5Lk1Qulp6O/t0seYDyFkhUWA1fqE7RaN4NzcU
+         wmmw==
+X-Gm-Message-State: AOAM533HLIysBtZIGR1U4cZBflf/FqEW0xz0H8nr2pmF0Q7FglgT33yT
+        Ax7gbr599Jx6uiV9lVGgcqcKFfCzGsLNXetCcasU7O/979z38yqQIVwszTNaa6YgRFsMsbpnUe6
+        sC+er4324fw0M
+X-Received: by 2002:a5d:47c9:: with SMTP id o9mr23544428wrc.348.1637594147106;
+        Mon, 22 Nov 2021 07:15:47 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxuFOOEsifCDD0U8JxvjAD6WFeCs8A6VTuxwL4oNddrkpIFu/eH1rQJ0/pc+09fBfKgQ5UEOw==
+X-Received: by 2002:a5d:47c9:: with SMTP id o9mr23544380wrc.348.1637594146835;
+        Mon, 22 Nov 2021 07:15:46 -0800 (PST)
+Received: from [192.168.3.132] (p5b0c667b.dip0.t-ipconnect.de. [91.12.102.123])
+        by smtp.gmail.com with ESMTPSA id d7sm8948184wrw.87.2021.11.22.07.15.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 22 Nov 2021 07:15:46 -0800 (PST)
+Message-ID: <f201406b-1448-f7c4-5484-3f4c257b6896@redhat.com>
+Date:   Mon, 22 Nov 2021 16:15:44 +0100
 MIME-Version: 1.0
-In-Reply-To: <20211122043620-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=utf-8
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [RFC v2 PATCH 01/13] mm/shmem: Introduce F_SEAL_GUEST
 Content-Language: en-US
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, john.ji@intel.com, susie.li@intel.com,
+        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com
+References: <20211119134739.20218-1-chao.p.peng@linux.intel.com>
+ <20211119134739.20218-2-chao.p.peng@linux.intel.com>
+ <20211119151943.GH876299@ziepe.ca>
+ <df11d753-6242-8f7c-cb04-c095f68b41fa@redhat.com>
+ <20211119160023.GI876299@ziepe.ca>
+ <4efdccac-245f-eb1f-5b7f-c1044ff0103d@redhat.com>
+ <20211122133145.GQ876299@ziepe.ca>
+ <56c0dffc-5fc4-c337-3e85-a5c9ce619140@redhat.com>
+ <20211122140148.GR876299@ziepe.ca>
+ <d2b46b84-8930-4304-2946-4d4a16698b24@redhat.com>
+ <20211122150956.GS876299@ziepe.ca>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+In-Reply-To: <20211122150956.GS876299@ziepe.ca>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 11/22/21 12:37 PM, Michael S. Tsirkin wrote:
-> On Fri, Nov 19, 2021 at 02:32:05PM +0300, Andrey Ryabinin wrote:
+On 22.11.21 16:09, Jason Gunthorpe wrote:
+> On Mon, Nov 22, 2021 at 03:57:17PM +0100, David Hildenbrand wrote:
+>> On 22.11.21 15:01, Jason Gunthorpe wrote:
+>>> On Mon, Nov 22, 2021 at 02:35:49PM +0100, David Hildenbrand wrote:
+>>>> On 22.11.21 14:31, Jason Gunthorpe wrote:
+>>>>> On Mon, Nov 22, 2021 at 10:26:12AM +0100, David Hildenbrand wrote:
+>>>>>
+>>>>>> I do wonder if we want to support sharing such memfds between processes
+>>>>>> in all cases ... we most certainly don't want to be able to share
+>>>>>> encrypted memory between VMs (I heard that the kernel has to forbid
+>>>>>> that). It would make sense in the use case you describe, though.
+>>>>>
+>>>>> If there is a F_SEAL_XX that blocks every kind of new access, who
+>>>>> cares if userspace passes the FD around or not?
+>>>> I was imagining that you actually would want to do some kind of "change
+>>>> ownership". But yeah, the intended semantics and all use cases we have
+>>>> in mind are not fully clear to me yet. If it's really "no new access"
+>>>> (side note: is "access" the right word?) then sure, we can pass the fd
+>>>> around.
+>>>
+>>> What is "ownership" in a world with kvm and iommu are reading pages
+>>> out of the same fd?
 >>
->>
->> On 11/16/21 8:00 AM, Jason Wang wrote:
->>> On Mon, Nov 15, 2021 at 11:32 PM Andrey Ryabinin <arbn@yandex-team.com> wrote:
->>>>
->>>> Currently vhost_net_release() uses synchronize_rcu() to synchronize
->>>> freeing with vhost_zerocopy_callback(). However synchronize_rcu()
->>>> is quite costly operation. It take more than 10 seconds
->>>> to shutdown qemu launched with couple net devices like this:
->>>>         -netdev tap,id=tap0,..,vhost=on,queues=80
->>>> because we end up calling synchronize_rcu() netdev_count*queues times.
->>>>
->>>> Free vhost net structures in rcu callback instead of using
->>>> synchronize_rcu() to fix the problem.
->>>
->>> I admit the release code is somehow hard to understand. But I wonder
->>> if the following case can still happen with this:
->>>
->>> CPU 0 (vhost_dev_cleanup)   CPU1
->>> (vhost_net_zerocopy_callback()->vhost_work_queue())
->>>                                                 if (!dev->worker)
->>> dev->worker = NULL
->>>
->>> wake_up_process(dev->worker)
->>>
->>> If this is true. It seems the fix is to move RCU synchronization stuff
->>> in vhost_net_ubuf_put_and_wait()?
->>>
->>
->> It all depends whether vhost_zerocopy_callback() can be called outside of vhost
->> thread context or not. If it can run after vhost thread stopped, than the race you
->> describe seems possible and the fix in commit b0c057ca7e83 ("vhost: fix a theoretical race in device cleanup")
->> wasn't complete. I would fix it by calling synchronize_rcu() after vhost_net_flush()
->> and before vhost_dev_cleanup().
->>
->> As for the performance problem, it can be solved by replacing synchronize_rcu() with synchronize_rcu_expedited().
+>> In the world of encrypted memory / TDX, KVM somewhat "owns" that memory
+>> IMHO (for example, only it can migrate or swap out these pages; it's
+>> might be debatable if the TDX module or KVM actually "own" these pages ).
 > 
-> expedited causes a stop of IPIs though, so it's problematic to
-> do it upon a userspace syscall.
-> 
+> Sounds like it is a swap provider more than an owner?
 
-How about something like this?
+Yes, I think we can phrase it that way, + "migrate provider"
 
 
----
- drivers/vhost/net.c | 40 ++++++++++++++++++++++++++--------------
- 1 file changed, 26 insertions(+), 14 deletions(-)
-
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index 97a209d6a527..556df26c584d 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -144,6 +144,10 @@ struct vhost_net {
- 	struct page_frag page_frag;
- 	/* Refcount bias of page frag */
- 	int refcnt_bias;
-+
-+	struct socket *tx_sock;
-+	struct socket *rx_sock;
-+	struct rcu_work rwork;
- };
- 
- static unsigned vhost_net_zcopy_mask __read_mostly;
-@@ -1389,6 +1393,24 @@ static void vhost_net_flush(struct vhost_net *n)
- 	}
- }
- 
-+static void vhost_net_cleanup(struct work_struct *work)
-+{
-+	struct vhost_net *n =
-+		container_of(to_rcu_work(work), struct vhost_net, rwork);
-+	vhost_dev_cleanup(&n->dev);
-+	vhost_net_vq_reset(n);
-+	if (n->tx_sock)
-+		sockfd_put(n->tx_sock);
-+	if (n->rx_sock)
-+		sockfd_put(n->rx_sock);
-+	kfree(n->vqs[VHOST_NET_VQ_RX].rxq.queue);
-+	kfree(n->vqs[VHOST_NET_VQ_TX].xdp);
-+	kfree(n->dev.vqs);
-+	if (n->page_frag.page)
-+		__page_frag_cache_drain(n->page_frag.page, n->refcnt_bias);
-+	kvfree(n);
-+}
-+
- static int vhost_net_release(struct inode *inode, struct file *f)
- {
- 	struct vhost_net *n = f->private_data;
-@@ -1398,21 +1420,11 @@ static int vhost_net_release(struct inode *inode, struct file *f)
- 	vhost_net_stop(n, &tx_sock, &rx_sock);
- 	vhost_net_flush(n);
- 	vhost_dev_stop(&n->dev);
--	vhost_dev_cleanup(&n->dev);
--	vhost_net_vq_reset(n);
--	if (tx_sock)
--		sockfd_put(tx_sock);
--	if (rx_sock)
--		sockfd_put(rx_sock);
--	/* Make sure no callbacks are outstanding */
--	synchronize_rcu();
-+	n->tx_sock = tx_sock;
-+	n->rx_sock = rx_sock;
- 
--	kfree(n->vqs[VHOST_NET_VQ_RX].rxq.queue);
--	kfree(n->vqs[VHOST_NET_VQ_TX].xdp);
--	kfree(n->dev.vqs);
--	if (n->page_frag.page)
--		__page_frag_cache_drain(n->page_frag.page, n->refcnt_bias);
--	kvfree(n);
-+	INIT_RCU_WORK(&n->rwork, vhost_net_cleanup);
-+	queue_rcu_work(system_wq, &n->rwork);
- 	return 0;
- }
- 
 -- 
+Thanks,
+
+David / dhildenb
 
