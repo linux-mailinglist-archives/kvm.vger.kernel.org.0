@@ -2,27 +2,27 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5DA3C4592FA
-	for <lists+kvm@lfdr.de>; Mon, 22 Nov 2021 17:27:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B9AC459312
+	for <lists+kvm@lfdr.de>; Mon, 22 Nov 2021 17:31:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240218AbhKVQaZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Nov 2021 11:30:25 -0500
-Received: from mail.kernel.org ([198.145.29.99]:40030 "EHLO mail.kernel.org"
+        id S240289AbhKVQez (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Nov 2021 11:34:55 -0500
+Received: from mail.kernel.org ([198.145.29.99]:43820 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233901AbhKVQaY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Nov 2021 11:30:24 -0500
+        id S232912AbhKVQeu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Nov 2021 11:34:50 -0500
 Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E5249608FB;
-        Mon, 22 Nov 2021 16:27:17 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8EFB460F90;
+        Mon, 22 Nov 2021 16:31:40 +0000 (UTC)
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1mpC9z-0075rm-Mz; Mon, 22 Nov 2021 16:27:15 +0000
-Date:   Mon, 22 Nov 2021 16:27:15 +0000
-Message-ID: <87zgpwcg0s.wl-maz@kernel.org>
+        id 1mpCEE-0075vS-8n; Mon, 22 Nov 2021 16:31:38 +0000
+Date:   Mon, 22 Nov 2021 16:31:37 +0000
+Message-ID: <87y25gcfti.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Raghavendra Rao Ananta <rananta@google.com>
 Cc:     Andrew Jones <drjones@redhat.com>,
@@ -38,10 +38,10 @@ Cc:     Andrew Jones <drjones@redhat.com>,
         Jing Zhang <jingzhangos@google.com>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [RFC PATCH v2 02/11] KVM: Introduce kvm_vcpu_has_run_once
-In-Reply-To: <20211113012234.1443009-3-rananta@google.com>
+Subject: Re: [RFC PATCH v2 03/11] KVM: Introduce kvm_vm_has_run_once
+In-Reply-To: <20211113012234.1443009-4-rananta@google.com>
 References: <20211113012234.1443009-1-rananta@google.com>
-        <20211113012234.1443009-3-rananta@google.com>
+        <20211113012234.1443009-4-rananta@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -55,31 +55,64 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, 13 Nov 2021 01:22:25 +0000,
+On Sat, 13 Nov 2021 01:22:26 +0000,
 Raghavendra Rao Ananta <rananta@google.com> wrote:
 > 
-> Architectures such as arm64 and riscv uses vcpu variables
-> such as has_run_once and ran_atleast_once, respectively,
-> to mark if the vCPU has started running. Since these are
-> architecture agnostic variables, introduce
-> kvm_vcpu_has_run_once() as a core kvm functionality and
-> use this instead of the architecture defined variables.
+> The upcoming patches need a way to detect if the VM, as
+> a whole, has started. Hence, unionize kvm_vcpu_has_run_once()
+> of all the vcpus of the VM and build kvm_vm_has_run_once()
+> to achieve the functionality.
 > 
 > No functional change intended.
 > 
 > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
+> ---
+>  include/linux/kvm_host.h |  2 ++
+>  virt/kvm/kvm_main.c      | 17 +++++++++++++++++
+>  2 files changed, 19 insertions(+)
+> 
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index b373929c71eb..102e00c0e21c 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1854,4 +1854,6 @@ static inline bool kvm_vcpu_has_run_once(struct kvm_vcpu *vcpu)
+>  	return vcpu->has_run_once;
+>  }
+>  
+> +bool kvm_vm_has_run_once(struct kvm *kvm);
+> +
+>  #endif
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 1ec8a8e959b2..3d8d96e8f61d 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -4339,6 +4339,23 @@ static int kvm_vm_ioctl_get_stats_fd(struct kvm *kvm)
+>  	return fd;
+>  }
+>  
+> +bool kvm_vm_has_run_once(struct kvm *kvm)
+> +{
+> +	int i, ret = false;
+> +	struct kvm_vcpu *vcpu;
+> +
+> +	mutex_lock(&kvm->lock);
+> +
+> +	kvm_for_each_vcpu(i, vcpu, kvm) {
+> +		ret = kvm_vcpu_has_run_once(vcpu);
+> +		if (ret)
+> +			break;
+> +	}
+> +
+> +	mutex_unlock(&kvm->lock);
+> +	return ret;
+> +}
 
-arm64 is moving away from this, see [1]. You also don't need any new
-state, as vcpu->pid gives you exactly what you need.
-
-Happy to queue additional patches on top if you want to deal with
-riscv.
-
-Thanks,
+This is horribly racy. Nothing prevents a vcpu from running behind
+your back. If you want any sort of guarantee, look at what we do in
+kvm_vgic_create(). Alexandru has patches that extract it to make it
+generally available (at least for arm64).
 
 	M.
-
-[1] https://lore.kernel.org/all/20211018211158.3050779-1-maz@kernel.org/
 
 -- 
 Without deviation from the norm, progress is not possible.
