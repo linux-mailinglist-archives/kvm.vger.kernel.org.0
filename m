@@ -2,98 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 632604594BC
-	for <lists+kvm@lfdr.de>; Mon, 22 Nov 2021 19:30:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5086D4594BB
+	for <lists+kvm@lfdr.de>; Mon, 22 Nov 2021 19:30:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240340AbhKVSdn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Nov 2021 13:33:43 -0500
-Received: from mail.kernel.org ([198.145.29.99]:44978 "EHLO mail.kernel.org"
+        id S240389AbhKVSdl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Nov 2021 13:33:41 -0500
+Received: from mga02.intel.com ([134.134.136.20]:6769 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S240331AbhKVSd3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Nov 2021 13:33:29 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 01DD260F9E;
-        Mon, 22 Nov 2021 18:30:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1637605822;
-        bh=ZgkUoAWdmiRKUbUvietPcNzDO9GCs6GkFq0UMKXm6rc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Hz+rMmjnlhRyBqUgiwuunFGaOjPQwIy/9Avd97+VzBIa8jbSBbl0frxmpG0siIso8
-         bJ5ZEovNEnQaex4ae2Mx7W7w2ptZO56uRASSqe4z9icO3YkjjCMdhVtH9HJ7/ZV5TW
-         aRzyo8QxdGLpmG8oQwQMeo1/ns60pjQUURWkHiHlouR2qkc2WoqiQeIMM3shDU5rG4
-         Plo9CEma+eJx7bKdB4eICRXbg+n9VbbJAo0tYsADDqSxrWMkdCbXwKZPnBRRKHMOot
-         hSpH7taEBNG9Pq1eTlTNQ+PBv2yKWqbTTOVWZio3Ryj4frJzs9dlnEAq7RRVR5d49k
-         0VOon6XV6Cqvw==
-Date:   Mon, 22 Nov 2021 18:30:16 +0000
-From:   Mark Brown <broonie@kernel.org>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Quentin Perret <qperret@google.com>,
-        Will Deacon <will@kernel.org>, kernel-team@android.com
-Subject: Re: [PATCH v2 2/5] KVM: arm64: Get rid of host SVE tracking/saving
-Message-ID: <YZvhuD7cVU/4AaFC@sirena.org.uk>
-References: <20211028111640.3663631-1-maz@kernel.org>
- <20211028111640.3663631-3-maz@kernel.org>
- <5ab3836f-2b39-2ff5-3286-8258addd01e4@huawei.com>
- <871r38dvyr.wl-maz@kernel.org>
- <YZvaKOLPxwFE9vQz@sirena.org.uk>
- <87v90kcb8u.wl-maz@kernel.org>
+        id S237621AbhKVSd2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Nov 2021 13:33:28 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10176"; a="222068364"
+X-IronPort-AV: E=Sophos;i="5.87,255,1631602800"; 
+   d="scan'208";a="222068364"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2021 10:30:21 -0800
+X-IronPort-AV: E=Sophos;i="5.87,255,1631602800"; 
+   d="scan'208";a="606517604"
+Received: from kvadariv-mobl1.amr.corp.intel.com (HELO [10.212.223.175]) ([10.212.223.175])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2021 10:30:20 -0800
+Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
+ Hypervisor Support
+To:     Brijesh Singh <brijesh.singh@amd.com>,
+        Peter Gonda <pgonda@google.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
+ <daf5066b-e89b-d377-ed8a-9338f1a04c0d@amd.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+ z5cecg==
+Message-ID: <d673f082-9023-dafb-e42e-eab32a3ddd0c@intel.com>
+Date:   Mon, 22 Nov 2021 10:30:17 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="+FNNm7pPPOruqt76"
-Content-Disposition: inline
-In-Reply-To: <87v90kcb8u.wl-maz@kernel.org>
-X-Cookie: Lake Erie died for your sins.
+In-Reply-To: <daf5066b-e89b-d377-ed8a-9338f1a04c0d@amd.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 11/22/21 7:23 AM, Brijesh Singh wrote:
+> Thank you for starting the thread; based on the discussion, I am keeping
+> the current implementation as-is and *not* going with the auto
+> conversion from private to shared. To summarize what we are doing in the
+> current SNP series:
+> 
+> - If userspace accesses guest private memory, it gets SIGBUS.
+> - If kernel accesses[*] guest private memory, it does panic.
 
---+FNNm7pPPOruqt76
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+There's a subtlety here, though.  There are really three *different*
+kinds of kernel accesses that matter:
 
-On Mon, Nov 22, 2021 at 06:10:25PM +0000, Marc Zyngier wrote:
-> Mark Brown <broonie@kernel.org> wrote:
+1. Kernel bugs.  Kernel goes off and touches some guest private memory
+   when it didn't mean to.  Say, it runs off the end of a slab page and
+   runs into a guest page.  panic() is expected here.
+2. Kernel accesses guest private memory via a userspace mapping, in a
+   place where it is known to be accessing userspace and is prepared to
+   fault.  copy_to_user() is the most straightforward example.  Kernel
+   must *not* panic().  Returning an error to the syscall is a good
+   way to handle these (if in a syscall).
+3. Kernel accesses guest private memory via a kernel mapping.  This one
+   is tricky.  These probably *do* result in a panic() today, but
+   ideally shouldn't.
 
-> > While we're on the subject of potential future work we might in future
-> > want to not disable SVE on every syscall if (as seems likely) it turns
-> > out that that's more performant for small vector lengths
-
-> How are you going to retrofit that into userspace? This would be an
-> ABI change, and I'm not sure how you'd want to deal with that
-> transition...
-
-We don't need to change the ABI, the ABI just says we zero the registers
-that aren't shared with FPSIMD.  Instead of doing that on taking a SVE
-access trap to reenable SVE after having disabled TIF_SVE we could do
-that during the syscall, userspace can't tell the difference other than
-via the different formats we use to report the SVE register set via
-ptrace if it single steps over a syscall.  Even then I'm struggling to
-think of a scenario where userspace would be relying on that.
-
-You could also implement a similar optimisation by forcing on TIF_SVE
-whenever we return to userspace but that would create a cost for
-userspace tasks that don't use SVE on SVE capable hardware so doesn't
-seem as good.  In any case it's not an issue for now since anything here
-will need benchmarking on a reasonable range of hardware.
-
---+FNNm7pPPOruqt76
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmGb4bgACgkQJNaLcl1U
-h9BJJAf/ciD1MtXHX5JAbHk0igE0oidNp8b9PC8Lr45L0awCj8NLgZsO8rtHptI/
-3SfqfKNTSaf0s7Z66yhULasICS/LyqlWKT9xzQ/DgkEZ+RopR8Tp5DBzzhE0p+mQ
-vJ1PvKLbsoxF2D8xKVSMkQQYPCwxPujhiG0zncarGpC7S7CVIvxfNtwxw7ZcIfv5
-aj9qc2LC3+KM75nh99y5Cmo2mIJd5B624FCsIYgv8uTi5G2ARPIDnGQLHSshCOgI
-eF26xy4TiO5BSDlEBLy4fsNjGGlt8cFkSgK6PzOcbVg8hpYAetyRdTQDfF2+AdX0
-SwnDsW/jAH/An8aFkvvSUGb/YuZGvA==
-=Me7X
------END PGP SIGNATURE-----
-
---+FNNm7pPPOruqt76--
+Could you explicitly clarify what the current behavior is?
