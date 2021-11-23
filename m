@@ -2,171 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A5EB459A4A
-	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 03:57:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C373459B0E
+	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 05:28:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232848AbhKWDA6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Nov 2021 22:00:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46808 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229628AbhKWDA5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Nov 2021 22:00:57 -0500
-Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 530E7C061574;
-        Mon, 22 Nov 2021 18:57:50 -0800 (PST)
-Received: by mail-oi1-x232.google.com with SMTP id u74so41690774oie.8;
-        Mon, 22 Nov 2021 18:57:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=+PfKM5+BXtpPxMwFFLQf7c1ReGeR+E33SLHVUAdsXro=;
-        b=HsgBuuFhMwWG5y0W7zpMNyVPm524nbiUnao0Ns/KspjMP0JkIkg0LaE6IZZOibFQvK
-         IRerg8RuCEbdcC3WvQK95mE+zyjeyfdlexO63jr+OzlSpJ7WiAByOdYMJvhxm0xIBx5K
-         xVYoVuNxJPhtWHv1XPYwGlVErJzk6H580f0RGnDv7SS1G5rVrl3y8CQ27gW21OQbitKP
-         KSB2MbMepd1+lzBdJb1C/kk31YKBmXcG1A5mVBJxopIvyEvqk0b0t9eSip/gxOOBenV0
-         PIypaazJvcEq/iArBwgQHLzswkYNJ5zJMmnURl6q7BW5QUzK+agMMICxMR8GJVQKuDMh
-         yQow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=+PfKM5+BXtpPxMwFFLQf7c1ReGeR+E33SLHVUAdsXro=;
-        b=whB2ejKceP97JK2sYERkncpbZaAe8O1w4K8V78d2/xOApPX5gI9v0THSxHUOv+qa1U
-         VN7lAx7Z+euN5/Oh5EkfhvRaGd9Rz3HugPdAtDvP2QPrWrUuwttqDSCkPd2ZKjJpU5pP
-         AOEhy7x/+oXUuVDQbn5X8s5DHClbMhUUTu8Orim2K4rTPmRxQYsAizbXUzGoA9kAP3Jr
-         xWGCZr+1CtmW2nqdaH6mnpzn74Sj9svrFmpjLhy93ksjR3zZ/rWPyixrjfrSfWKlJiAl
-         XP4w8jJZirVWguAAF+a3aIbiCY8+Y+QY5G1H/QaYq9OK4FQ3STkBvyJ2GU6i8Wen7yBN
-         ewMA==
-X-Gm-Message-State: AOAM5305meXiUZcuS0YNpGGRHY+pLsfN3hB+FZVLdXdkZ39ByhEie5qJ
-        v4ErGtGwN6trZ++GMa68r+H0hd/IZJoUvn2Awjk=
-X-Google-Smtp-Source: ABdhPJyzJnmXDZeeINl57vI96DP1Mg/KDzKedP8P1UH7ZgqxWQWyg1wA1cTJLwWGplxKZKH3oHLsdgNo5OGs4knEqMQ=
-X-Received: by 2002:a05:6808:5c1:: with SMTP id d1mr27439882oij.141.1637636269627;
- Mon, 22 Nov 2021 18:57:49 -0800 (PST)
-MIME-Version: 1.0
-References: <20211122095619.000060d2@gmail.com> <YZvrvmRnuDc1e+gi@google.com>
-In-Reply-To: <YZvrvmRnuDc1e+gi@google.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Tue, 23 Nov 2021 10:57:38 +0800
-Message-ID: <CANRm+Cx+bC8D7s1qzJYbrT+1rm46wxg6bAXD+kGYAHGnruZMXw@mail.gmail.com>
-Subject: Re: [PATCH] KVM: LAPIC: Per vCPU control over kvm_can_post_timer_interrupt
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Aili Yao <yaoaili126@gmail.com>,
+        id S233088AbhKWE3j (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Nov 2021 23:29:39 -0500
+Received: from mail.kingsoft.com ([114.255.44.145]:16254 "EHLO
+        mail.kingsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229947AbhKWE3i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Nov 2021 23:29:38 -0500
+X-Greylist: delayed 903 seconds by postgrey-1.27 at vger.kernel.org; Mon, 22 Nov 2021 23:29:37 EST
+X-AuditID: 0a580155-fe9e070000024f67-1b-619c69e9146d
+Received: from mail.kingsoft.com (bogon [10.88.1.78])
+        (using TLS with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (Client did not present a certificate)
+        by mail.kingsoft.com (SMG-2-NODE-85) with SMTP id 56.23.20327.9E96C916; Tue, 23 Nov 2021 12:11:21 +0800 (HKT)
+Received: from KSbjmail4.kingsoft.cn (10.88.1.79) by KSBJMAIL3.kingsoft.cn
+ (10.88.1.78) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.17; Tue, 23 Nov
+ 2021 12:11:21 +0800
+Received: from KSbjmail4.kingsoft.cn ([fe80::8036:b70b:7d3c:4ee2]) by
+ KSBJMAIL4.kingsoft.cn ([fe80::8036:b70b:7d3c:4ee2%11]) with mapi id
+ 15.01.2375.017; Tue, 23 Nov 2021 12:11:21 +0800
+From:   =?utf-8?B?eWFvYWlsaSBb5LmI54ix5YipXQ==?= <yaoaili@kingsoft.com>
+To:     Wanpeng Li <kernellwp@gmail.com>,
+        Sean Christopherson <seanjc@google.com>
+CC:     Aili Yao <yaoaili126@gmail.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "Thomas Gleixner" <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "Borislav Petkov" <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         "the arch/x86 maintainers" <x86@kernel.org>,
         "H. Peter Anvin" <hpa@zytor.com>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, yaoaili@kingsoft.com
-Content-Type: text/plain; charset="UTF-8"
+        LKML <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH] KVM: LAPIC: Per vCPU control over
+ kvm_can_post_timer_interrupt
+Thread-Topic: [PATCH] KVM: LAPIC: Per vCPU control over
+ kvm_can_post_timer_interrupt
+Thread-Index: AQHX31HuUhGu3lfAGEub9LSWCeOdcqwPZTAAgACBzgCAAI8NcA==
+Date:   Tue, 23 Nov 2021 04:11:21 +0000
+Message-ID: <3204a646aa9d43d0b9af8da1c5ddf79f@kingsoft.com>
+References: <20211122095619.000060d2@gmail.com> <YZvrvmRnuDc1e+gi@google.com>
+ <CANRm+Cx+bC8D7s1qzJYbrT+1rm46wxg6bAXD+kGYAHGnruZMXw@mail.gmail.com>
+In-Reply-To: <CANRm+Cx+bC8D7s1qzJYbrT+1rm46wxg6bAXD+kGYAHGnruZMXw@mail.gmail.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.88.2.22]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrGIsWRmVeSWpSXmKPExsXCFcHop/syc06iQfNCfYvPG/6xWbzY0M5o
+        MW2juMXW6VfYLDpnb2C3eL1+HavFnKmFFpd3zWGzuHRgAZPF/m3/WC2Onr/FZLF501Rmi0mt
+        l5ktdt15wmLxY8NjVotnrVdZHAQ8nhycx+TxvbWPxWPnrLvsHgs2lXpsWtXJ5vHu3Dl2j3kn
+        Az3e77vK5tE49Rqbx+dNch4nWr6wBnBHcdmkpOZklqUW6dslcGX0nm9gKfhjV/F1Ik8D4xrb
+        LkYODgkBE4nN/yy7GLk4hAQmM0k8a5rKDOG8YJRYcO4DG4Szl1Fi6YtFTF2MnBxsAq4Sf7d+
+        YATpFhHwlbj2OAOkhlmgnUVi7Y7FrCA1wgKhEjOXfQWrFxEIk1i4uBPKdpJ4/uAoG4jNIqAq
+        8f1nKzPIHF4Ba4m7T6CumMIoce7HJxaQGk6BQImjTevBZjIKyEpMe3QfbA6zgLjE3GmzwOIS
+        AgISS/acZ4awRSVePv4HFZeT2HCikx1kPrOApsT6XfoQrYoSU7ofsoPYvAKCEidnPmGZwCg2
+        C8nUWQgds5B0zELSsYCRZRUjS3FuutEmRkjUh+5gnNH0Ue8QIxMH4yFGCQ5mJRHea0tmJwrx
+        piRWVqUW5ccXleakFh9ilOZgURLn5audkigkkJ5YkpqdmlqQWgSTZeLglGpgOh/z1MR95eRQ
+        qZOpod8sjdps9aIr4jbo82+t1e0tMND4tmbLunvOVTsbbVafOfOpfNMGq+Dme3tOmmm/Xhnr
+        oLTKYN2bQwm1MnzTeJ8cuLMhtEL99sMt5cyreu78tA5RYz2gm54fUOV/4VpstYpNUmsH16Ji
+        g6RpMr9MnK9mFsakrp48vYkzQ/PUy00TLy42Pna4q2TWswMPdn2fNKMzL97itstyzxAWj2m5
+        V/Ju/rRNuvjpE9OFlJZfE5gTjkZPb5Zw298d8GD/fIvI3+1LjzK8rT8c8kH18zEP9uKwZMXr
+        elkvNtmccZTIl/hzKiV1Tchmp5NViean9Q/NjDYPXXHxd9O8u17eB3bWrbjYqcRSnJFoqMVc
+        VJwIAPMw4YNpAwAA
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 23 Nov 2021 at 03:14, Sean Christopherson <seanjc@google.com> wrote:
->
-> On Mon, Nov 22, 2021, Aili Yao wrote:
-> > From: Aili Yao <yaoaili@kingsoft.com>
-> >
-> > When we isolate some pyhiscal cores, We may not use them for kvm guests,
-> > We may use them for other purposes like DPDK, or we can make some kvm
-> > guests isolated and some not, the global judgement pi_inject_timer is
-> > not enough; We may make wrong decisions:
-> >
-> > In such a scenario, the guests without isolated cores will not be
-> > permitted to use vmx preemption timer, and tscdeadline fastpath also be
-> > disabled, both will lead to performance penalty.
-> >
-> > So check whether the vcpu->cpu is isolated, if not, don't post timer
-> > interrupt.
-> >
-> > Signed-off-by: Aili Yao <yaoaili@kingsoft.com>
-> > ---
-> >  arch/x86/kvm/lapic.c | 4 +++-
-> >  1 file changed, 3 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > index 759952dd1222..72dde5532101 100644
-> > --- a/arch/x86/kvm/lapic.c
-> > +++ b/arch/x86/kvm/lapic.c
-> > @@ -34,6 +34,7 @@
-> >  #include <asm/delay.h>
-> >  #include <linux/atomic.h>
-> >  #include <linux/jump_label.h>
-> > +#include <linux/sched/isolation.h>
-> >  #include "kvm_cache_regs.h"
-> >  #include "irq.h"
-> >  #include "ioapic.h"
-> > @@ -113,7 +114,8 @@ static inline u32 kvm_x2apic_id(struct kvm_lapic *apic)
-> >
-> >  static bool kvm_can_post_timer_interrupt(struct kvm_vcpu *vcpu)
-> >  {
-> > -     return pi_inject_timer && kvm_vcpu_apicv_active(vcpu);
-> > +     return pi_inject_timer && kvm_vcpu_apicv_active(vcpu) &&
-> > +             !housekeeping_cpu(vcpu->cpu, HK_FLAG_TIMER);
->
-> I don't think this is safe, vcpu->cpu will be -1 if the vCPU isn't scheduled in.
-> This also doesn't play nice with the admin forcing pi_inject_timer=1.  Not saying
-> there's a reasonable use case for doing that, but it's supported today and this
-> would break that behavior.  It would also lead to weird behavior if a vCPU were
-> migrated on/off a housekeeping vCPU.  Again, probably not a reasonable use case,
-> but I don't see anything that would outright prevent that behavior.
->
-> The existing behavior also feels a bit unsafe as pi_inject_timer is writable while
-> KVM is running, though I supposed that's orthogonal to this discussion.
->
-> Rather than check vcpu->cpu, is there an existing vCPU flag that can be queried,
-> e.g. KVM_HINTS_REALTIME?
-
-How about something like below:
-
-From 67f605120e212384cb3d5788ba8c83f15659503b Mon Sep 17 00:00:00 2001
-From: Wanpeng Li <wanpengli@tencent.com>
-Date: Tue, 23 Nov 2021 10:36:10 +0800
-Subject: [PATCH] KVM: LAPIC: To keep the vCPUs in non-root mode for timer-pi
-
-From: Wanpeng Li <wanpengli@tencent.com>
-
-As commit 0c5f81dad46 (KVM: LAPIC: Inject timer interrupt via posted interrupt)
-mentioned that the host admin should well tune the guest setup, so that vCPUs
-are placed on isolated pCPUs, and with several pCPUs surplus for
-*busy* housekeeping.
-It is better to disable mwait/hlt/pause vmexits to keep the vCPUs in non-root
-mode. However, we may isolate pCPUs for other purpose like DPDK or we can make
-some guests isolated and others not, Let's add the checking kvm_mwait_in_guest()
-to kvm_can_post_timer_interrupt() since we can't benefit from timer
-posted-interrupt
-w/o keeping the vCPUs in non-root mode.
-
-Reported-by: Aili Yao <yaoaili@kingsoft.com>
-Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
----
- arch/x86/kvm/lapic.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
-
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 759952dd1222..8257566d44c7 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -113,14 +113,13 @@ static inline u32 kvm_x2apic_id(struct kvm_lapic *apic)
-
- static bool kvm_can_post_timer_interrupt(struct kvm_vcpu *vcpu)
- {
--    return pi_inject_timer && kvm_vcpu_apicv_active(vcpu);
-+    return pi_inject_timer && kvm_mwait_in_guest(vcpu->kvm) &&
-kvm_vcpu_apicv_active(vcpu);
- }
-
- bool kvm_can_use_hv_timer(struct kvm_vcpu *vcpu)
- {
-     return kvm_x86_ops.set_hv_timer
--           && !(kvm_mwait_in_guest(vcpu->kvm) ||
--            kvm_can_post_timer_interrupt(vcpu));
-+           && !kvm_mwait_in_guest(vcpu->kvm);
- }
- EXPORT_SYMBOL_GPL(kvm_can_use_hv_timer);
+PiBPbiBUdWUsIDIzIE5vdiAyMDIxIGF0IDAzOjE0LCBTZWFuIENocmlzdG9waGVyc29uIDxzZWFu
+amNAZ29vZ2xlLmNvbT4NCj4gd3JvdGU6DQo+ID4NCj4gPiBPbiBNb24sIE5vdiAyMiwgMjAyMSwg
+QWlsaSBZYW8gd3JvdGU6DQo+ID4gPiBGcm9tOiBBaWxpIFlhbyA8eWFvYWlsaUBraW5nc29mdC5j
+b20+DQo+ID4gPg0KPiA+ID4gV2hlbiB3ZSBpc29sYXRlIHNvbWUgcHloaXNjYWwgY29yZXMsIFdl
+IG1heSBub3QgdXNlIHRoZW0gZm9yIGt2bQ0KPiA+ID4gZ3Vlc3RzLCBXZSBtYXkgdXNlIHRoZW0g
+Zm9yIG90aGVyIHB1cnBvc2VzIGxpa2UgRFBESywgb3Igd2UgY2FuIG1ha2UNCj4gPiA+IHNvbWUg
+a3ZtIGd1ZXN0cyBpc29sYXRlZCBhbmQgc29tZSBub3QsIHRoZSBnbG9iYWwganVkZ2VtZW50DQo+
+ID4gPiBwaV9pbmplY3RfdGltZXIgaXMgbm90IGVub3VnaDsgV2UgbWF5IG1ha2Ugd3JvbmcgZGVj
+aXNpb25zOg0KPiA+ID4NCj4gPiA+IEluIHN1Y2ggYSBzY2VuYXJpbywgdGhlIGd1ZXN0cyB3aXRo
+b3V0IGlzb2xhdGVkIGNvcmVzIHdpbGwgbm90IGJlDQo+ID4gPiBwZXJtaXR0ZWQgdG8gdXNlIHZt
+eCBwcmVlbXB0aW9uIHRpbWVyLCBhbmQgdHNjZGVhZGxpbmUgZmFzdHBhdGggYWxzbw0KPiA+ID4g
+YmUgZGlzYWJsZWQsIGJvdGggd2lsbCBsZWFkIHRvIHBlcmZvcm1hbmNlIHBlbmFsdHkuDQo+ID4g
+Pg0KPiA+ID4gU28gY2hlY2sgd2hldGhlciB0aGUgdmNwdS0+Y3B1IGlzIGlzb2xhdGVkLCBpZiBu
+b3QsIGRvbid0IHBvc3QgdGltZXINCj4gPiA+IGludGVycnVwdC4NCj4gPiA+DQo+ID4gPiBTaWdu
+ZWQtb2ZmLWJ5OiBBaWxpIFlhbyA8eWFvYWlsaUBraW5nc29mdC5jb20+DQo+ID4gPiAtLS0NCj4g
+PiA+ICBhcmNoL3g4Ni9rdm0vbGFwaWMuYyB8IDQgKysrLQ0KPiA+ID4gIDEgZmlsZSBjaGFuZ2Vk
+LCAzIGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkNCj4gPiA+DQo+ID4gPiBkaWZmIC0tZ2l0
+IGEvYXJjaC94ODYva3ZtL2xhcGljLmMgYi9hcmNoL3g4Ni9rdm0vbGFwaWMuYyBpbmRleA0KPiA+
+ID4gNzU5OTUyZGQxMjIyLi43MmRkZTU1MzIxMDEgMTAwNjQ0DQo+ID4gPiAtLS0gYS9hcmNoL3g4
+Ni9rdm0vbGFwaWMuYw0KPiA+ID4gKysrIGIvYXJjaC94ODYva3ZtL2xhcGljLmMNCj4gPiA+IEBA
+IC0zNCw2ICszNCw3IEBADQo+ID4gPiAgI2luY2x1ZGUgPGFzbS9kZWxheS5oPg0KPiA+ID4gICNp
+bmNsdWRlIDxsaW51eC9hdG9taWMuaD4NCj4gPiA+ICAjaW5jbHVkZSA8bGludXgvanVtcF9sYWJl
+bC5oPg0KPiA+ID4gKyNpbmNsdWRlIDxsaW51eC9zY2hlZC9pc29sYXRpb24uaD4NCj4gPiA+ICAj
+aW5jbHVkZSAia3ZtX2NhY2hlX3JlZ3MuaCINCj4gPiA+ICAjaW5jbHVkZSAiaXJxLmgiDQo+ID4g
+PiAgI2luY2x1ZGUgImlvYXBpYy5oIg0KPiA+ID4gQEAgLTExMyw3ICsxMTQsOCBAQCBzdGF0aWMg
+aW5saW5lIHUzMiBrdm1feDJhcGljX2lkKHN0cnVjdCBrdm1fbGFwaWMNCj4gPiA+ICphcGljKQ0K
+PiA+ID4NCj4gPiA+ICBzdGF0aWMgYm9vbCBrdm1fY2FuX3Bvc3RfdGltZXJfaW50ZXJydXB0KHN0
+cnVjdCBrdm1fdmNwdSAqdmNwdSkgIHsNCj4gPiA+IC0gICAgIHJldHVybiBwaV9pbmplY3RfdGlt
+ZXIgJiYga3ZtX3ZjcHVfYXBpY3ZfYWN0aXZlKHZjcHUpOw0KPiA+ID4gKyAgICAgcmV0dXJuIHBp
+X2luamVjdF90aW1lciAmJiBrdm1fdmNwdV9hcGljdl9hY3RpdmUodmNwdSkgJiYNCj4gPiA+ICsg
+ICAgICAgICAgICAgIWhvdXNla2VlcGluZ19jcHUodmNwdS0+Y3B1LCBIS19GTEFHX1RJTUVSKTsN
+Cj4gPg0KPiA+IEkgZG9uJ3QgdGhpbmsgdGhpcyBpcyBzYWZlLCB2Y3B1LT5jcHUgd2lsbCBiZSAt
+MSBpZiB0aGUgdkNQVSBpc24ndCBzY2hlZHVsZWQgaW4uDQoNClllcywgdmNwdS0+Y3B1IGlzICAt
+MSBiZWZvcmUgdmNwdSBjcmVhdGUsIGJ1dCBpbiBteSBlbnZpcm9ubWVudHMsIGl0IGRpZG4ndA0K
+dHJpZ2dlciB0aGlzIGlzc3VlLiBJIG5lZWQgdG8gZGlnIG1vcmUsIFRoYW5rcyEgIA0KTWF5YmUg
+SSBuZWVkIG9uZSB2YWxpZCBjaGVjayBoZXJlLg0KDQo+ID4gVGhpcyBhbHNvIGRvZXNuJ3QgcGxh
+eSBuaWNlIHdpdGggdGhlIGFkbWluIGZvcmNpbmcgcGlfaW5qZWN0X3RpbWVyPTEuDQo+ID4gTm90
+IHNheWluZyB0aGVyZSdzIGEgcmVhc29uYWJsZSB1c2UgY2FzZSBmb3IgZG9pbmcgdGhhdCwgYnV0
+IGl0J3MNCj4gPiBzdXBwb3J0ZWQgdG9kYXkgYW5kIHRoaXMgd291bGQgYnJlYWsgdGhhdCBiZWhh
+dmlvci4gIEl0IHdvdWxkIGFsc28NCj4gPiBsZWFkIHRvIHdlaXJkIGJlaGF2aW9yIGlmIGEgdkNQ
+VSB3ZXJlIG1pZ3JhdGVkIG9uL29mZiBhIGhvdXNla2VlcGluZw0KPiA+IHZDUFUuICBBZ2Fpbiwg
+cHJvYmFibHkgbm90IGEgcmVhc29uYWJsZSB1c2UgY2FzZSwgYnV0IEkgZG9uJ3Qgc2VlIGFueXRo
+aW5nDQo+IHRoYXQgd291bGQgb3V0cmlnaHQgcHJldmVudCB0aGF0IGJlaGF2aW9yLg0KDQpZZXMs
+ICB0aGlzIGlzIG5vdCBvbmUgY29tbW9uIG9wZXJhdGlvbiwgIEJ1dCBJIGRpZCBkbyB0ZXN0IHNv
+bWUgc2NlbmFyaW9zOg0KMS4gaXNvbGF0ZWQgY3B1IC0tPiBob3VzZWtlZXBpbmcgY3B1Ow0KICAg
+IGlzb2xhdGVkIGd1ZXN0IHRpbWVyIGlzIGluIGhvdXNla2VlcGluZyBDUFUsIGZvciBtaWdyYXRp
+b24sIGt2bV9jYW5fcG9zdF90aW1lcl9pbnRlcnJ1cHQNCiAgICB3aWxsIHJldHVybiBmYWxzZSwg
+c28gdGhlIHRpbWVyIG1heSBiZSBtaWdyYXRlZCB0byB2Y3B1LT5jcHU7DQogICAgVGhpcyBzZWVt
+cyB3b3JrcyBpbiBteSB0ZXN0Ow0KMi4gaXNvbGF0ZWQgLS0+IGlzb2xhdGVkDQogICAgSXNvbGF0
+ZWQgZ3Vlc3QgdGltZXIgaXMgaW4gaG91c2VrZWVwaW5nIGNwdSwgZm9yIG1pZ3JhdGlvbixrdm1f
+Y2FuX3Bvc3RfdGltZXJfaW50ZXJydXB0IHJldHVybiANCiAgICB0cnVlLCB0aW1lciBpcyBub3Qg
+bWlncmF0ZWQNCjMuIGhvdXNla2VlcGluZyBDUFUgLS0+IGlzb2xhdGVkIENQVQ0KICAgIG5vbi1p
+c29sYXRlZCBDUFUgdGltZXIgaXMgdXN1YWxseSBpbiB2Y3B1LT5jcHUsIGZvciBtaWdyYXRpb24g
+dG8gaXNvbGF0ZWQsIGt2bV9jYW5fcG9zdF90aW1lcl9pbnRlcnJ1cHQNCiAgICB3aWxsIGJlIHRy
+dWUsICB0aGUgdGltZXIgcmVtYWluIG9uIHRoZSBzYW1lIENQVTsNCiAgICBUaGlzIHNlZW1zIHdv
+cmtzIGluIG15IHRlc3Q7ICANCjQuIGhvdXNla2VlcGluZyBDUFUgLS0+IGhvdXNla2VlcGluZyBD
+UFUNCiAgICAgdGltZXIgbWlncmF0ZWQ7DQpJdCBzZWVtcyB0aGlzIGlzIG5vdCBhbiBhZmZlY3Rp
+bmcgcHJvYmxlbTsgICANCg0KPiA+DQo+ID4gVGhlIGV4aXN0aW5nIGJlaGF2aW9yIGFsc28gZmVl
+bHMgYSBiaXQgdW5zYWZlIGFzIHBpX2luamVjdF90aW1lciBpcw0KPiA+IHdyaXRhYmxlIHdoaWxl
+IEtWTSBpcyBydW5uaW5nLCB0aG91Z2ggSSBzdXBwb3NlZCB0aGF0J3Mgb3J0aG9nb25hbCB0byB0
+aGlzDQo+IGRpc2N1c3Npb24uDQo+ID4NCj4gPiBSYXRoZXIgdGhhbiBjaGVjayB2Y3B1LT5jcHUs
+IGlzIHRoZXJlIGFuIGV4aXN0aW5nIHZDUFUgZmxhZyB0aGF0IGNhbg0KPiA+IGJlIHF1ZXJpZWQs
+IGUuZy4gS1ZNX0hJTlRTX1JFQUxUSU1FPw0KPiANCj4gSG93IGFib3V0IHNvbWV0aGluZyBsaWtl
+IGJlbG93Og0KPiANCj4gRnJvbSA2N2Y2MDUxMjBlMjEyMzg0Y2IzZDU3ODhiYThjODNmMTU2NTk1
+MDNiIE1vbiBTZXAgMTcgMDA6MDA6MDANCj4gMjAwMQ0KPiBGcm9tOiBXYW5wZW5nIExpIDx3YW5w
+ZW5nbGlAdGVuY2VudC5jb20+DQo+IERhdGU6IFR1ZSwgMjMgTm92IDIwMjEgMTA6MzY6MTAgKzA4
+MDANCj4gU3ViamVjdDogW1BBVENIXSBLVk06IExBUElDOiBUbyBrZWVwIHRoZSB2Q1BVcyBpbiBu
+b24tcm9vdCBtb2RlIGZvciB0aW1lci0NCj4gcGkNCj4gDQo+IEZyb206IFdhbnBlbmcgTGkgPHdh
+bnBlbmdsaUB0ZW5jZW50LmNvbT4NCj4gDQo+IEFzIGNvbW1pdCAwYzVmODFkYWQ0NiAoS1ZNOiBM
+QVBJQzogSW5qZWN0IHRpbWVyIGludGVycnVwdCB2aWEgcG9zdGVkDQo+IGludGVycnVwdCkgbWVu
+dGlvbmVkIHRoYXQgdGhlIGhvc3QgYWRtaW4gc2hvdWxkIHdlbGwgdHVuZSB0aGUgZ3Vlc3Qgc2V0
+dXAsDQo+IHNvIHRoYXQgdkNQVXMgYXJlIHBsYWNlZCBvbiBpc29sYXRlZCBwQ1BVcywgYW5kIHdp
+dGggc2V2ZXJhbCBwQ1BVcyBzdXJwbHVzDQo+IGZvcg0KPiAqYnVzeSogaG91c2VrZWVwaW5nLg0K
+PiBJdCBpcyBiZXR0ZXIgdG8gZGlzYWJsZSBtd2FpdC9obHQvcGF1c2Ugdm1leGl0cyB0byBrZWVw
+IHRoZSB2Q1BVcyBpbiBub24tcm9vdA0KPiBtb2RlLiBIb3dldmVyLCB3ZSBtYXkgaXNvbGF0ZSBw
+Q1BVcyBmb3Igb3RoZXIgcHVycG9zZSBsaWtlIERQREsgb3Igd2UNCj4gY2FuIG1ha2Ugc29tZSBn
+dWVzdHMgaXNvbGF0ZWQgYW5kIG90aGVycyBub3QsIExldCdzIGFkZCB0aGUgY2hlY2tpbmcNCj4g
+a3ZtX213YWl0X2luX2d1ZXN0KCkgdG8ga3ZtX2Nhbl9wb3N0X3RpbWVyX2ludGVycnVwdCgpIHNp
+bmNlIHdlIGNhbid0DQo+IGJlbmVmaXQgZnJvbSB0aW1lciBwb3N0ZWQtaW50ZXJydXB0IHcvbyBr
+ZWVwaW5nIHRoZSB2Q1BVcyBpbiBub24tcm9vdA0KPiBtb2RlLg0KPiANCj4gUmVwb3J0ZWQtYnk6
+IEFpbGkgWWFvIDx5YW9haWxpQGtpbmdzb2Z0LmNvbT4NCj4gU2lnbmVkLW9mZi1ieTogV2FucGVu
+ZyBMaSA8d2FucGVuZ2xpQHRlbmNlbnQuY29tPg0KPiAtLS0NCj4gIGFyY2gveDg2L2t2bS9sYXBp
+Yy5jIHwgNSArKy0tLQ0KPiAgMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwgMyBkZWxl
+dGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9hcmNoL3g4Ni9rdm0vbGFwaWMuYyBiL2FyY2gv
+eDg2L2t2bS9sYXBpYy5jIGluZGV4DQo+IDc1OTk1MmRkMTIyMi4uODI1NzU2NmQ0NGM3IDEwMDY0
+NA0KPiAtLS0gYS9hcmNoL3g4Ni9rdm0vbGFwaWMuYw0KPiArKysgYi9hcmNoL3g4Ni9rdm0vbGFw
+aWMuYw0KPiBAQCAtMTEzLDE0ICsxMTMsMTMgQEAgc3RhdGljIGlubGluZSB1MzIga3ZtX3gyYXBp
+Y19pZChzdHJ1Y3Qga3ZtX2xhcGljDQo+ICphcGljKQ0KPiANCj4gIHN0YXRpYyBib29sIGt2bV9j
+YW5fcG9zdF90aW1lcl9pbnRlcnJ1cHQoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KSAgew0KPiAtICAg
+IHJldHVybiBwaV9pbmplY3RfdGltZXIgJiYga3ZtX3ZjcHVfYXBpY3ZfYWN0aXZlKHZjcHUpOw0K
+PiArICAgIHJldHVybiBwaV9pbmplY3RfdGltZXIgJiYga3ZtX213YWl0X2luX2d1ZXN0KHZjcHUt
+Pmt2bSkgJiYNCj4ga3ZtX3ZjcHVfYXBpY3ZfYWN0aXZlKHZjcHUpOw0KPiAgfQ0KPiANCj4gIGJv
+b2wga3ZtX2Nhbl91c2VfaHZfdGltZXIoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KSAgew0KPiAgICAg
+IHJldHVybiBrdm1feDg2X29wcy5zZXRfaHZfdGltZXINCj4gLSAgICAgICAgICAgJiYgIShrdm1f
+bXdhaXRfaW5fZ3Vlc3QodmNwdS0+a3ZtKSB8fA0KPiAtICAgICAgICAgICAga3ZtX2Nhbl9wb3N0
+X3RpbWVyX2ludGVycnVwdCh2Y3B1KSk7DQo+ICsgICAgICAgICAgICYmICFrdm1fbXdhaXRfaW5f
+Z3Vlc3QodmNwdS0+a3ZtKTsNCj4gIH0NCj4gIEVYUE9SVF9TWU1CT0xfR1BMKGt2bV9jYW5fdXNl
+X2h2X3RpbWVyKTsNCg0KVGhpcyBtZXRob2Qgc2VlbXMgbW9yZSBxdWljayBhbmQgc2FmZSwgYnV0
+IEkgaGF2ZSBvbmUgcXVlc3Rpb246IERvZXMgdGhpcyBrdm1fbXdhaXRfaW5fZ3Vlc3QNCmNhbiBn
+dWFyYW50ZWUgdGhlIENQVSBpc29sYXRlZCwgIGluIHNvbWUgcHJvZHVjdGlvbiBlbnZpcm9ubWVu
+dHMgYW5kIHVzdWFsbHksICBNV0FJVCBmZWF0dXJlIGlzIGRpc2FibGVkIGluIGhvc3QNCmFuZCBl
+dmVuIGd1ZXN0cyB3aXRoIGlzb2xhdGVkIENQVXMuICBBbmQgYWxzbyB3ZSBjYW4gc2V0IGd1ZXN0
+cyBrdm1fbXdhaXRfaW5fZ3Vlc3QgdHJ1ZSB3aXRoIENQVXMganVzdCBwaW5uZWQsIG5vdCBpc29s
+YXRlZC4NCg0KVGhhbmtzDQo=
