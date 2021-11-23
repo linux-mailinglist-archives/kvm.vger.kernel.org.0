@@ -2,132 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6FFDE45994A
-	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 01:43:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EE0C5459957
+	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 01:51:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232577AbhKWAqd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Nov 2021 19:46:33 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:57212 "EHLO
+        id S232910AbhKWAyE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Nov 2021 19:54:04 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:59038 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231964AbhKWAq0 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 22 Nov 2021 19:46:26 -0500
+        by vger.kernel.org with ESMTP id S229779AbhKWAxs (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 22 Nov 2021 19:53:48 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637628198;
+        s=mimecast20190719; t=1637628641;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=FQhzxn4KaZJIOdSYOFbcHxUTE1Gb9ZMjCUYSHNYD+PA=;
-        b=TMpCWblqTVAnAD8a8u0TnJJFFirRasn11W2D3/CkeWmakq8+XgJQpsGKYulbbCOO22qwBd
-        S1yjTiHHy5JXp+/lqHQx2H2edI0d3xf2wa9AK5GM5Z1up4T5nq5g5M3n1tsCldldfTDd5a
-        GnZM7b9/7OIJ9WBaAF/FnQxVkkj+MXo=
+         content-transfer-encoding:content-transfer-encoding;
+        bh=m+NOR1Qa7DvdNATRQaylnxWMsvpMhuNDm+7DW2JM0YE=;
+        b=S/AD1arUwXtQBsWtCs3v8D4ahs80XmYYqW+gflZboc9W0yCVEyognyXUt7fjetSfqeSv/W
+        BUTEVzNBQt9qWkm8sa1QbS8m5FmgBmnr5JoOgWbcM1usIJzrIUF3h1wMmNMXmtoRPvKPin
+        8qqtqk9qE0oMULwulSewc35RFScRt4M=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-488-1HjnZGGTNKudWQsyjr4txQ-1; Mon, 22 Nov 2021 19:43:15 -0500
-X-MC-Unique: 1HjnZGGTNKudWQsyjr4txQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-163-5wJ-zTINPOS44e4GkPIdyQ-1; Mon, 22 Nov 2021 19:50:37 -0500
+X-MC-Unique: 5wJ-zTINPOS44e4GkPIdyQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EECCD87D541;
-        Tue, 23 Nov 2021 00:43:13 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A064D1023F4D;
+        Tue, 23 Nov 2021 00:50:36 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9133656A8C;
-        Tue, 23 Nov 2021 00:43:13 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 51AA85C1C5;
+        Tue, 23 Nov 2021 00:50:36 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     seanjc@google.com, stable@vger.kernel.org
-Subject: [PATCH 4/4] KVM: x86: Use a stable condition around all VT-d PI paths
-Date:   Mon, 22 Nov 2021 19:43:11 -0500
-Message-Id: <20211123004311.2954158-5-pbonzini@redhat.com>
-In-Reply-To: <20211123004311.2954158-1-pbonzini@redhat.com>
-References: <20211123004311.2954158-1-pbonzini@redhat.com>
+Cc:     pgonda@google.com
+Subject: [PATCH 00/12] Fixes for KVM_CAP_VM_MOVE/COPY_ENC_CONTEXT_FROM
+Date:   Mon, 22 Nov 2021 19:50:24 -0500
+Message-Id: <20211123005036.2954379-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently, checks for whether VT-d PI can be used refer to the current
-status of the feature in the current vCPU; or they more or less pick
-vCPU 0 in case a specific vCPU is not available.
+This turned out to be a bit of a trainwreck, mostly due to
+the patches being merged hastily at the end of the merge window.
+For this reason, there are a few bugs for intra-host migration
+as well.
 
-However, these checks do not attempt to synchronize with changes to
-the IRTE.  In particular, there is no path that updates the IRTE when
-APICv is re-activated on vCPU 0; and there is no path to wakeup a CPU
-that has APICv disabled, if the wakeup occurs because of an IRTE
-that points to a posted interrupt.
+Compared to the v1 I posted last week, there's many more bugfixes,
+and the code I promised to avoid dangling ASIDs when a VM has
+mirrors and is migrated.
 
-To fix this, always go through the VT-d PI path as long as there are
-assigned devices and APICv is available on both the host and the VM side.
-Since the relevant condition was copied over three times, take the hint
-and factor it into a separate function.
+Paolo
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Cc: stable@vger.kernel.org
-Reviewed-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/vmx/posted_intr.c | 20 +++++++++++---------
- 1 file changed, 11 insertions(+), 9 deletions(-)
+Paolo Bonzini (12):
+  selftests: fix check for circular KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM
+  selftests: sev_migrate_tests: free all VMs
+  KVM: SEV: expose KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM capability
+  KVM: SEV: do not use list_replace_init on an empty list
+  KVM: SEV: cleanup locking for KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM
+  KVM: SEV: initialize regions_list of a mirror VM
+  KVM: SEV: move mirror status to destination of
+    KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM
+  selftests: sev_migrate_tests: add tests for
+    KVM_CAP_VM_COPY_ENC_CONTEXT_FROM
+  KVM: SEV: Do COPY_ENC_CONTEXT_FROM with both VMs locked
+  KVM: SEV: Prohibit migration of a VM that has mirrors
+  KVM: SEV: do not take kvm->lock when destroying
+  KVM: SEV: accept signals in sev_lock_two_vms
 
-diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-index 5f81ef092bd4..1c94783b5a54 100644
---- a/arch/x86/kvm/vmx/posted_intr.c
-+++ b/arch/x86/kvm/vmx/posted_intr.c
-@@ -5,6 +5,7 @@
- #include <asm/cpu.h>
- 
- #include "lapic.h"
-+#include "irq.h"
- #include "posted_intr.h"
- #include "trace.h"
- #include "vmx.h"
-@@ -77,13 +78,18 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
- 		pi_set_on(pi_desc);
- }
- 
-+static bool vmx_can_use_vtd_pi(struct kvm *kvm)
-+{
-+	return irqchip_in_kernel(kvm) && enable_apicv &&
-+		kvm_arch_has_assigned_device(kvm) &&
-+		irq_remapping_cap(IRQ_POSTING_CAP);
-+}
-+
- void vmx_vcpu_pi_put(struct kvm_vcpu *vcpu)
- {
- 	struct pi_desc *pi_desc = vcpu_to_pi_desc(vcpu);
- 
--	if (!kvm_arch_has_assigned_device(vcpu->kvm) ||
--		!irq_remapping_cap(IRQ_POSTING_CAP)  ||
--		!kvm_vcpu_apicv_active(vcpu))
-+	if (!vmx_can_use_vtd_pi(vcpu->kvm))
- 		return;
- 
- 	/* Set SN when the vCPU is preempted */
-@@ -141,9 +147,7 @@ int pi_pre_block(struct kvm_vcpu *vcpu)
- 	struct pi_desc old, new;
- 	struct pi_desc *pi_desc = vcpu_to_pi_desc(vcpu);
- 
--	if (!kvm_arch_has_assigned_device(vcpu->kvm) ||
--		!irq_remapping_cap(IRQ_POSTING_CAP)  ||
--		!kvm_vcpu_apicv_active(vcpu))
-+	if (!vmx_can_use_vtd_pi(vcpu->kvm))
- 		return 0;
- 
- 	WARN_ON(irqs_disabled());
-@@ -270,9 +274,7 @@ int pi_update_irte(struct kvm *kvm, unsigned int host_irq, uint32_t guest_irq,
- 	struct vcpu_data vcpu_info;
- 	int idx, ret = 0;
- 
--	if (!kvm_arch_has_assigned_device(kvm) ||
--	    !irq_remapping_cap(IRQ_POSTING_CAP) ||
--	    !kvm_vcpu_apicv_active(kvm->vcpus[0]))
-+	if (!vmx_can_use_vtd_pi(kvm))
- 		return 0;
- 
- 	idx = srcu_read_lock(&kvm->irq_srcu);
+ arch/x86/kvm/svm/sev.c                        | 161 +++++++++--------
+ arch/x86/kvm/svm/svm.h                        |   1 +
+ arch/x86/kvm/x86.c                            |   1 +
+ .../selftests/kvm/x86_64/sev_migrate_tests.c  | 165 ++++++++++++++++--
+ 4 files changed, 243 insertions(+), 85 deletions(-)
+
 -- 
 2.27.0
 
