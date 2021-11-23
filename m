@@ -2,251 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 75CBF45997C
-	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 02:04:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A7BAC459980
+	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 02:07:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231351AbhKWBHa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Nov 2021 20:07:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49992 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231181AbhKWBH3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Nov 2021 20:07:29 -0500
-Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 023CFC061714
-        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 17:04:21 -0800 (PST)
-Received: by mail-io1-xd35.google.com with SMTP id c3so25839002iob.6
-        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 17:04:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=tBOLwQuO4Uv4lLpUFmn2uKJGTTwGQOdqTTsaaQkrB0U=;
-        b=iorzxMUWbbbUaoRKGu6cjqQtJs6dLTgP6glE4zLm+EWW8tFcR5AEV4Mb32rMUa3Bub
-         srkYtPvHCvtjSioawPXPYMptyGOjp6XX5Q7lLvThu18T04I+sVbJHSfUZ0ZdxXONYS0K
-         lyc6JkCIgxKi8mHSNLKNt1TKavR6Jl6SJNHhOiMH02V/HlwdovDooJFdJc9FzeVUv+bj
-         GyaRt253zPszWS2DqL7XBAA+SoVX0+K9dk1zHdV0A7P9eaY/VTbbq63Hzp6JOfUDfpHC
-         sAfRNBwdwBxth0VZ4bdq8GxZUZXdXCul/RTYAN8JJG+N0r5OU1zcx96gkOxe7fbZu9Wp
-         7jLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=tBOLwQuO4Uv4lLpUFmn2uKJGTTwGQOdqTTsaaQkrB0U=;
-        b=wXn53c29OSsHKYhqxvlfcaw9j1YfUo3f0hU6etXriZIbtT4E1utGzk9M8/gdz3ucrH
-         Evp7tR6fOKL3RnPxIu9LlYW4i2wwmRfW6JBy/L530gmE7feXrmGLlAAorYOZHUqdNG7/
-         ZNAHCkSZptgzk5xK5PNNNR5xEWGkX7c0/QdERXRIK/99eBGc9c1/GC5RqyHxALfjjRQd
-         hbjw47FKNZRFaC3x/jC8MfFjCj8FGd/jxmX5EbXmSzn502/TnhWTSdLeWkzLnnzun+Iq
-         WknsqxGU/1TYkVLK/YcyZjExBhmM/22K28AqzIzjfJxRWFmPHcn9uxjbCqhwBPB5TQF+
-         +DXw==
-X-Gm-Message-State: AOAM532V6Vk0uZrvgxEFW1gSTh6ek4Q8vms+X+eGP8klYHbRASs9DZFk
-        d5PSONMvRrDxidvHoepQ1SMDAe8v3xeIVPTPD8d+Nw==
-X-Google-Smtp-Source: ABdhPJwEqszhzCssKWVGF92nXCMfrK/Z50flixQJPeb4PahYT1QK7rpigX/KDcWXJmAtkRwwKgcXkO3TS4P2G6YKGEU=
-X-Received: by 2002:a05:6638:1923:: with SMTP id p35mr964935jal.16.1637629461152;
- Mon, 22 Nov 2021 17:04:21 -0800 (PST)
-MIME-Version: 1.0
-References: <20211120045046.3940942-1-seanjc@google.com> <20211120045046.3940942-25-seanjc@google.com>
-In-Reply-To: <20211120045046.3940942-25-seanjc@google.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Mon, 22 Nov 2021 17:04:10 -0800
-Message-ID: <CANgfPd97nEn8WYWEnXPbpJanP=DQ4yh1E3z+x9T5kLX=8ge+WQ@mail.gmail.com>
-Subject: Re: [PATCH 24/28] KVM: x86/mmu: Add dedicated helper to zap TDP MMU
- root shadow page
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        id S231537AbhKWBKl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Nov 2021 20:10:41 -0500
+Received: from mga12.intel.com ([192.55.52.136]:54361 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231174AbhKWBKl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Nov 2021 20:10:41 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10176"; a="214950573"
+X-IronPort-AV: E=Sophos;i="5.87,256,1631602800"; 
+   d="scan'208";a="214950573"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Nov 2021 17:07:33 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.87,256,1631602800"; 
+   d="scan'208";a="649751921"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.101])
+  by fmsmga001.fm.intel.com with ESMTP; 22 Nov 2021 17:07:25 -0800
+Date:   Tue, 23 Nov 2021 09:06:39 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     "Kirill A. Shutemov" <kirill@shutemov.name>
+Cc:     Wanpeng Li <wanpengli@tencent.com>, jun.nakajima@intel.com,
+        kvm@vger.kernel.org, david@redhat.com, qemu-devel@nongnu.org,
+        "J . Bruce Fields" <bfields@fieldses.org>, dave.hansen@intel.com,
+        "H . Peter Anvin" <hpa@zytor.com>, ak@linux.intel.com,
+        Jonathan Corbet <corbet@lwn.net>,
+        Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
+        Hugh Dickins <hughd@google.com>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        luto@kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jim Mattson <jmattson@google.com>, linux-mm@kvack.org,
+        Sean Christopherson <seanjc@google.com>, susie.li@intel.com,
+        Jeff Layton <jlayton@kernel.org>, linux-kernel@vger.kernel.org,
+        john.ji@intel.com, Yu Zhang <yu.c.zhang@linux.intel.com>,
+        linux-fsdevel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Hou Wenlong <houwenlong93@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+Subject: Re: [RFC v2 PATCH 13/13] KVM: Enable memfd based page
+ invalidation/fallocate
+Message-ID: <20211123010639.GA32088@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <20211119134739.20218-1-chao.p.peng@linux.intel.com>
+ <20211119134739.20218-14-chao.p.peng@linux.intel.com>
+ <20211122141647.3pcsywilrzcoqvbf@box.shutemov.name>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211122141647.3pcsywilrzcoqvbf@box.shutemov.name>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 19, 2021 at 8:51 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> Convert tdp_mmu_zap_root() into its own dedicated flow instead of simply
-> redirecting into zap_gfn_range().  In addition to hardening zapping of
-> roots, this will allow future simplification of zap_gfn_range() by having
-> it zap only leaf SPTEs, and by removing its tricky "zap all" heuristic.
-> By having all paths that truly need to free _all_ SPs flow through the
-> dedicated root zapper, the generic zapper can be freed of those concerns.
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/mmu/tdp_mmu.c | 91 +++++++++++++++++++++++++++-----------
->  1 file changed, 66 insertions(+), 25 deletions(-)
->
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 99ea19e763da..0e5a0d40e54a 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -53,10 +53,6 @@ void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
->         rcu_barrier();
->  }
->
-> -static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
-> -                         gfn_t start, gfn_t end, bool can_yield, bool flush,
-> -                         bool shared);
-> -
->  static void tdp_mmu_free_sp(struct kvm_mmu_page *sp)
->  {
->         free_page((unsigned long)sp->spt);
-> @@ -79,11 +75,8 @@ static void tdp_mmu_free_sp_rcu_callback(struct rcu_head *head)
->         tdp_mmu_free_sp(sp);
->  }
->
-> -static bool tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
-> -                            bool shared)
-> -{
-> -       return zap_gfn_range(kvm, root, 0, -1ull, true, false, shared);
-> -}
-> +static void tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
-> +                            bool shared, bool root_is_unreachable);
->
->  /*
->   * Note, putting a root might sleep, i.e. the caller must have IRQs enabled and
-> @@ -120,13 +113,8 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
->          * invalidates any paging-structure-cache entries, i.e. TLB entries for
->          * intermediate paging structures, that may be zapped, as such entries
->          * are associated with the ASID on both VMX and SVM.
-> -        *
-> -        * WARN if a flush is reported for an invalid root, as its child SPTEs
-> -        * should have been zapped by kvm_tdp_mmu_zap_invalidated_roots(), and
-> -        * inserting new SPTEs under an invalid root is a KVM bug.
->          */
-> -       if (tdp_mmu_zap_root(kvm, root, shared))
-> -               WARN_ON_ONCE(root->role.invalid);
-> +       tdp_mmu_zap_root(kvm, root, shared, true);
->
->         call_rcu(&root->rcu_head, tdp_mmu_free_sp_rcu_callback);
->  }
-> @@ -766,6 +754,65 @@ static inline bool tdp_mmu_iter_cond_resched(struct kvm *kvm,
->         return false;
->  }
->
-> +static inline gfn_t tdp_mmu_max_gfn_host(void)
-> +{
-> +       /*
-> +        * Bound TDP MMU walks at host.MAXPHYADDR, guest accesses beyond that
-> +        * will hit a #PF(RSVD) and never hit an EPT Violation/Misconfig / #NPF,
-> +        * and so KVM will never install a SPTE for such addresses.
-> +        */
-> +       return 1ULL << (shadow_phys_bits - PAGE_SHIFT);
-> +}
-> +
-> +static void tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
-> +                            bool shared, bool root_is_unreachable)
-> +{
-> +       struct tdp_iter iter;
-> +
-> +       gfn_t end = tdp_mmu_max_gfn_host();
-> +       gfn_t start = 0;
-> +
-> +       kvm_lockdep_assert_mmu_lock_held(kvm, shared);
-> +
-> +       rcu_read_lock();
-> +
-> +       /*
-> +        * No need to try to step down in the iterator when zapping an entire
-> +        * root, zapping an upper-level SPTE will recurse on its children.
-> +        */
-> +       for_each_tdp_pte_min_level(iter, root->spt, root->role.level,
-> +                                  root->role.level, start, end) {
-> +retry:
-> +               if (tdp_mmu_iter_cond_resched(kvm, &iter, false, shared))
-> +                       continue;
-> +
-> +               if (!is_shadow_present_pte(iter.old_spte))
-> +                       continue;
-> +
-> +               if (!shared) {
-> +                       tdp_mmu_set_spte(kvm, &iter, 0);
-> +               } else if (!tdp_mmu_set_spte_atomic(kvm, &iter, 0)) {
+On Mon, Nov 22, 2021 at 05:16:47PM +0300, Kirill A. Shutemov wrote:
+> On Fri, Nov 19, 2021 at 09:47:39PM +0800, Chao Peng wrote:
+> > Since the memory backing store does not get notified when VM is
+> > destroyed so need check if VM is still live in these callbacks.
+> > 
+> > Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> > ---
+> >  virt/kvm/memfd.c | 22 ++++++++++++++++++++++
+> >  1 file changed, 22 insertions(+)
+> > 
+> > diff --git a/virt/kvm/memfd.c b/virt/kvm/memfd.c
+> > index bd930dcb455f..bcfdc685ce22 100644
+> > --- a/virt/kvm/memfd.c
+> > +++ b/virt/kvm/memfd.c
+> > @@ -12,16 +12,38 @@
+> >  #include <linux/memfd.h>
+> >  const static struct guest_mem_ops *memfd_ops;
+> >  
+> > +static bool vm_is_dead(struct kvm *vm)
+> > +{
+> > +	struct kvm *kvm;
+> > +
+> > +	list_for_each_entry(kvm, &vm_list, vm_list) {
+> > +		if (kvm == vm)
+> > +			return false;
+> > +	}
+> 
+> I don't think this is enough. The struct kvm can be freed and re-allocated
+> from the slab and this function will give false-negetive.
 
-Worth adding a comment about why this is used instead of
-tdp_mmu_zap_spte_atomic.
+Right.
 
-> +                       /*
-> +                        * cmpxchg() shouldn't fail if the root is unreachable.
-> +                        * to be unreachable.  Re-read the SPTE and retry so as
+> 
+> Maybe the kvm has to be tagged with a sequential id that incremented every
+> allocation. This id can be checked here.
 
-Repeated phrase.
+Sounds like a sequential id will be needed, no existing fields in struct
+kvm can work for this.
 
-
-> +                        * not to leak the page and its children.
-> +                        */
-> +                       WARN_ONCE(root_is_unreachable,
-> +                                 "Contended TDP MMU SPTE in unreachable root.");
-> +                       iter.old_spte = kvm_tdp_mmu_read_spte(iter.sptep);
-
-Note this will conflict with the series David sent out Friday.
-Hopefully some of the cleanups early in that series get merged, in
-which case this line will not be needed.
-
-> +                       goto retry;
-> +               }
-> +               /*
-> +                * WARN if the root is invalid and is unreachable, all SPTEs
-> +                * should've been zapped by kvm_tdp_mmu_zap_invalidated_roots(),
-> +                * and inserting new SPTEs under an invalid root is a KVM bug.
-> +                */
-> +               WARN_ON_ONCE(root_is_unreachable && root->role.invalid);
-> +       }
-> +
-> +       rcu_read_unlock();
-> +}
-> +
->  bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
->  {
->         u64 old_spte;
-> @@ -807,8 +854,7 @@ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
->                           gfn_t start, gfn_t end, bool can_yield, bool flush,
->                           bool shared)
->  {
-> -       gfn_t max_gfn_host = 1ULL << (shadow_phys_bits - PAGE_SHIFT);
-> -       bool zap_all = (start == 0 && end >= max_gfn_host);
-> +       bool zap_all = (start == 0 && end >= tdp_mmu_max_gfn_host());
->         struct tdp_iter iter;
->
->         /*
-> @@ -817,12 +863,7 @@ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
->          */
->         int min_level = zap_all ? root->role.level : PG_LEVEL_4K;
->
-> -       /*
-> -        * Bound the walk at host.MAXPHYADDR, guest accesses beyond that will
-> -        * hit a #PF(RSVD) and never get to an EPT Violation/Misconfig / #NPF,
-> -        * and so KVM will never install a SPTE for such addresses.
-> -        */
-> -       end = min(end, max_gfn_host);
-> +       end = min(end, tdp_mmu_max_gfn_host());
-
-tdp_mmu_max_gfn_host and this refactor, could be added in a separate
-commit if desired.
-
->
->         kvm_lockdep_assert_mmu_lock_held(kvm, shared);
->
-> @@ -898,7 +939,7 @@ void kvm_tdp_mmu_zap_all(struct kvm *kvm)
->          */
->         for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
->                 for_each_tdp_mmu_root_yield_safe(kvm, root, i, false)
-> -                       (void)tdp_mmu_zap_root(kvm, root, false);
-> +                       tdp_mmu_zap_root(kvm, root, false, true);
->         }
->  }
->
-> @@ -934,7 +975,7 @@ void kvm_tdp_mmu_zap_invalidated_roots(struct kvm *kvm,
->                  * will still flush on yield, but that's a minor performance
->                  * blip and not a functional issue.
->                  */
-> -               (void)tdp_mmu_zap_root(kvm, root, true);
-> +               tdp_mmu_zap_root(kvm, root, true, false);
->                 kvm_tdp_mmu_put_root(kvm, root, true);
->         }
->  }
-> --
-> 2.34.0.rc2.393.gf8c9666880-goog
->
+> 
+> > +
+> > +	return true;
+> > +}
+> 
+> -- 
+>  Kirill A. Shutemov
