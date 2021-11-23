@@ -2,120 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 84AE445A66B
-	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 16:20:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CEDCE45A693
+	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 16:36:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238328AbhKWPXQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Nov 2021 10:23:16 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:30941 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236501AbhKWPXP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 23 Nov 2021 10:23:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637680807;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=nzZw5UfSegXbw18CEt/o6FXd1pUErV1MvwcNtl5mpBU=;
-        b=PXbNt34wqhDZV3S3ho8nfqy6XLHaVcf3TDjhn+sjF1uYo8ccNHr2a7pt5mjOSvnL1QLkm+
-        4j/VF6uD1TCizJWv/WagQ5/SFQngWX4BZJFKzVYsIgr2vM5niN2dIwvQG7XimNOkeuXDps
-        LJK53mWx6zoLoj2/7zHrxQUo6eYmi1U=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-499-_pnIBTF9OhKzBS3Ox2Sx5A-1; Tue, 23 Nov 2021 10:20:05 -0500
-X-MC-Unique: _pnIBTF9OhKzBS3Ox2Sx5A-1
-Received: by mail-wm1-f69.google.com with SMTP id i131-20020a1c3b89000000b00337f92384e0so1369239wma.5
-        for <kvm@vger.kernel.org>; Tue, 23 Nov 2021 07:20:05 -0800 (PST)
+        id S234837AbhKWPjs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Nov 2021 10:39:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50488 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231209AbhKWPjr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Nov 2021 10:39:47 -0500
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C266BC061574
+        for <kvm@vger.kernel.org>; Tue, 23 Nov 2021 07:36:39 -0800 (PST)
+Received: by mail-pl1-x629.google.com with SMTP id u11so17400106plf.3
+        for <kvm@vger.kernel.org>; Tue, 23 Nov 2021 07:36:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=5VVg5sF/i5gU/ki52+bDwZvmQKpTX8HJeSrAf6kcWFQ=;
+        b=U6HSgDxCZz53CGLYrJ7O5A0XNm09HecVxGKIpmb1gkV3apRWZ25N2jA23Ttyp2MYKZ
+         K7PCL8IziOVl3IGVvcEKWxmZ7N5WFdDKaeFnFWDdTQL8q+kbkqylzTzEvEGM/qub8VsW
+         0kNCx9MqyC2snH1QR5CdErs3MA8OmHVtnhGLtP4QLDC7rwwGeLp30owwNo0TxBfgzp/4
+         z9A4yJ5wtwLQDky0itThd+HFGg3KslkVzZMf+De/ppvd/GGnqEzg8bvzIdr3jjCW1Wdw
+         esOXbQYxDR8uPmd7RrzvIegmxMJgPyMy2od9otejx7jL7aU+uOEan4lmnuCo0jVl028f
+         on6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=nzZw5UfSegXbw18CEt/o6FXd1pUErV1MvwcNtl5mpBU=;
-        b=cWtsNbIp2X9Vk0BG2LZk04spY7FGJi4v1qzkcSGRPYl0B1MPrIk6nWu3rSGCpihSGj
-         s9mtGoCsgvpSXQjBVvFH/o55nNAZEGQ/9S32YM9BJYMASuHE3mPqqx4m2L+iz5bdQz3N
-         5Aoh8HIPVPPFVv+GdVNjXxWJ9i/jbLRKDuIqaRRE+a1V6pIWuwO9e1KZ5vAwXxGF1RGs
-         z5F4neXkuN4Y5hdqGV/yu4FEaQcUZFxdZR38JVirpLPK+AD23WQ+hdUbFJ/FnDjnc4sX
-         JZi8YXNzImBJBR681kSM4FgFmtQDlddu2GmdnUIxu6o/X4NQYoB6MMJ4e6+V+cyY5ILY
-         hwTA==
-X-Gm-Message-State: AOAM533tAExv2Z1V58BRC0PuSlmJLhPNL0Up0b4ODx5siX8xrEjFzivX
-        lQj1G845utTTqvLhWzhd2aR5YQyR+yKEn3nRe7ccUhaN204W+6uRxBlKdaYEdCxghRB25pwfZpY
-        zxHF7AxLDAtrc
-X-Received: by 2002:a05:6000:1681:: with SMTP id y1mr8183316wrd.52.1637680804536;
-        Tue, 23 Nov 2021 07:20:04 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxUoSoPvPvLO49H6NY+gHF+4FNFe07RzaW7WxEc5sbe1D39sGgbrgj8rSNIcLf3gIFDDlAziw==
-X-Received: by 2002:a05:6000:1681:: with SMTP id y1mr8183284wrd.52.1637680804298;
-        Tue, 23 Nov 2021 07:20:04 -0800 (PST)
-Received: from [192.168.3.132] (p5b0c6765.dip0.t-ipconnect.de. [91.12.103.101])
-        by smtp.gmail.com with ESMTPSA id n15sm1632169wmq.38.2021.11.23.07.20.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Nov 2021 07:20:03 -0800 (PST)
-Message-ID: <ebe07977-8840-ebe2-57ce-9126a4081bb4@redhat.com>
-Date:   Tue, 23 Nov 2021 16:20:02 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [RFC v2 PATCH 01/13] mm/shmem: Introduce F_SEAL_GUEST
-Content-Language: en-US
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        qemu-devel@nongnu.org, Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=5VVg5sF/i5gU/ki52+bDwZvmQKpTX8HJeSrAf6kcWFQ=;
+        b=Ok8Au79Nbp/wdUkKOrqiD3iho6RbspHKvkiK/QAjWuQspOCoP0bgVIEKtlIfhGXXH+
+         bt8ZDd/Cro6p4/31BhEkRbdNF2JWAPZba95nktAhWBVCGwQ89zD5GXbcaQfHbuxiwV5R
+         xp1yEZ23Q6ztqDQW9Rfmzh9POYny4Wdhx2F8b4saSx9BYP8WzErZgFFYvgN1jcx/BY1k
+         OnFuRSPGY/ts5ddYHCLL/61HLNkusGcGlKuuIdkT5Lxh3hdiwn8tMeT4VtK/f8bCarSa
+         ogrSSL0iZsVRthkt8Z4I5nlAc9H/DxG/+aY7Xr3/1rENMACaGrbRyZDF1aNA2E7BRgM7
+         2bfA==
+X-Gm-Message-State: AOAM532CmEpjDasVT0l4tyr5xKPCmI6Q2ce+2bZyBIYhBAScIWjqQlH8
+        mOfgFFu+wPfr3HvSgjTaMeTJVg==
+X-Google-Smtp-Source: ABdhPJzN3VZxkHeunJB6N/YPoYEM/c03A9bU/hzxt4O7jM4g9pvIKKtkf8VdyZ1rwnxZzh/blb4dBw==
+X-Received: by 2002:a17:902:c78a:b0:142:1b7a:930 with SMTP id w10-20020a170902c78a00b001421b7a0930mr7959825pla.8.1637681799124;
+        Tue, 23 Nov 2021 07:36:39 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id k14sm9384097pga.65.2021.11.23.07.36.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Nov 2021 07:36:38 -0800 (PST)
+Date:   Tue, 23 Nov 2021 15:36:35 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Dave Hansen <dave.hansen@intel.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Peter Gonda <pgonda@google.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, john.ji@intel.com, susie.li@intel.com,
-        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com
-References: <20211119134739.20218-1-chao.p.peng@linux.intel.com>
- <20211119134739.20218-2-chao.p.peng@linux.intel.com>
- <20211119151943.GH876299@ziepe.ca>
- <df11d753-6242-8f7c-cb04-c095f68b41fa@redhat.com>
- <6de78894-8269-ea3a-b4ee-a5cc4dad827e@redhat.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <6de78894-8269-ea3a-b4ee-a5cc4dad827e@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
+ Hypervisor Support
+Message-ID: <YZ0KgymKvLC2HcIk@google.com>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
+ <daf5066b-e89b-d377-ed8a-9338f1a04c0d@amd.com>
+ <d673f082-9023-dafb-e42e-eab32a3ddd0c@intel.com>
+ <f15597a0-e7e0-0a57-39fd-20715abddc7f@amd.com>
+ <5f3b3aab-9ec2-c489-eefd-9136874762ee@intel.com>
+ <d83e6668-bec4-8d1f-7f8a-085829146846@amd.com>
+ <38282b0c-7eb5-6a91-df19-2f4cfa8549ce@intel.com>
+ <YZyVx38L6gf689zq@zn.tnic>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YZyVx38L6gf689zq@zn.tnic>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23.11.21 10:06, Paolo Bonzini wrote:
-> On 11/19/21 16:39, David Hildenbrand wrote:
->>> If qmeu can put all the guest memory in a memfd and not map it, then
->>> I'd also like to see that the IOMMU can use this interface too so we
->>> can have VFIO working in this configuration.
->>
->> In QEMU we usually want to (and must) be able to access guest memory
->> from user space, with the current design we wouldn't even be able to
->> temporarily mmap it -- which makes sense for encrypted memory only. The
->> corner case really is encrypted memory. So I don't think we'll see a
->> broad use of this feature outside of encrypted VMs in QEMU. I might be
->> wrong, most probably I am:)
+On Tue, Nov 23, 2021, Borislav Petkov wrote:
+> On Mon, Nov 22, 2021 at 02:51:35PM -0800, Dave Hansen wrote:
+> > By "supporting", do you mean doing something functional?  I don't really
+> > care if ptrace() to guest private memory returns -EINVAL or whatever.
+> > The most important thing is not crashing the host.
+> > 
+> > Also, as Sean mentioned, this isn't really about ptrace() itself.  It's
+> > really about ensuring that no kernel or devices accesses to guest
+> > private memory can induce bad behavior.
 > 
-> It's not _that_ crazy an idea, but it's going to be some work to teach 
-> KVM that it has to kmap/kunmap around all memory accesses.
+> I keep repeating this suggestion of mine that we should treat
+> guest-private pages as hw-poisoned pages which have experienced a
+> uncorrectable error in the past.
+> 
+> mm already knows how to stay away from those.
 
-I'm also concerned about userspace access. But you sound like you have a
-plan :)
+Kirill posted a few RFCs that did exactly that.  It's definitely a viable approach,
+but it's a bit of a dead end, e.g. doesn't help solve page migration, is limited to
+struct page, doesn't capture which KVM guest owns the memory, etc...
 
--- 
-Thanks,
-
-David / dhildenb
-
+https://lore.kernel.org/kvm/20210416154106.23721-1-kirill.shutemov@linux.intel.com/
