@@ -2,280 +2,375 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D0A1459CC0
-	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 08:27:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 315D5459D56
+	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 09:02:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234128AbhKWHaj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Nov 2021 02:30:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49684 "EHLO
+        id S234274AbhKWIFt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Nov 2021 03:05:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234130AbhKWHaf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Nov 2021 02:30:35 -0500
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C97AC061714
-        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 23:27:28 -0800 (PST)
-Received: by mail-pl1-x62a.google.com with SMTP id y7so16357231plp.0
-        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 23:27:28 -0800 (PST)
+        with ESMTP id S234012AbhKWIFt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Nov 2021 03:05:49 -0500
+Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21A3BC061714
+        for <kvm@vger.kernel.org>; Tue, 23 Nov 2021 00:02:41 -0800 (PST)
+Received: by mail-wm1-x329.google.com with SMTP id o19-20020a1c7513000000b0033a93202467so1810247wmc.2
+        for <kvm@vger.kernel.org>; Tue, 23 Nov 2021 00:02:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
+        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=a/jOJfBxYMr68LtaWMzzCSnglAw6mPj5RWwAjR4ErlI=;
-        b=NQ1ROgk2G2jDnMoiOljzW5fB/BLOzDTCFmMn8rpKthuf8Vw7NYRDAzKsVxJPTxWQ8c
-         BK68yEDLbG3ieVCQZVtDuWmQDpXtnT1/kUJvucVsCsb4iENGD7kPracmHmOJRp6uwEx7
-         KguhK0IQ2LA0uFh/alvWAqbKk3QO4vaoV3Wn3qRlBoNk5rlFLzWA4HSoDDAPFKtTt22/
-         SXMZxCzigEeo7/1sEQN9xZrw7gbj3NyaEOCdnmNLvHUOG5fRCF2B1ej2DAaKEQ7s+bpk
-         DTmwLefwHv9yzWz7bCOFnxKP34L9REWt1+I1qaX2vnbWCjze2xaLSdCKJQpUX2HQGTBt
-         4WZw==
+        bh=mcOThBA52zPLhCS2zPMb4qpl869iJkhdJeBDm9K1m+A=;
+        b=HqA5YbSrueDLeFJdmmk0X8ku7AbQ43ptWJKPgT+vSDnTsPNC+L235iAEGBlnOhariW
+         69qonCe8yJCsgEHEQ7wZYB4q9Nji1BoPEEDHWBFx+/ai5VaF+xigRqUeAPvtnHiYhsm5
+         5C0KdvNsKiNhKqtfk2Lond8uRIOShGBdpttLLFQtICb28/ZZwUlzHdY6nEqIuAI+Ml79
+         yhpbuaGM9G7/wGdjg6NtmsZW9dAO0Xj/mymubi5ADdk7z/DvRLRSgMec1j+nbPWJxzec
+         SnMokwlrpsdRHocdAU1qOO8TnO7LCH8CGWNTMlAVf/wRa3fdm5fOc37allhajf4n3ZAu
+         k/jA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=a/jOJfBxYMr68LtaWMzzCSnglAw6mPj5RWwAjR4ErlI=;
-        b=Om9Lo3fmhpFzgRXlzpdF/eZ0cxIg9CBBFCEu8OPpmgmG8x/ASbGjlsLePBKlgoZLqj
-         E0KfkJnZu85+GFWL0p6m+3tzrzqq9lLD5pMBVzI8MzHcvqtFpwFXH2OHSMTq/IKuQrt2
-         fG4+13Yv1poQjyYcMFSMOXxAEtIhipnjE4/4iO0tL6HrLnm44L6/jbeSBgGwkazM7JgT
-         3lP1hoR1mrdZbGnJKgmLzbHHV8XJ9SbJZ+1ydc3EtPNi/YBUHwHxt3ij8+tEUywB6yHV
-         5X3z/GiIYKWGAl/Utfk/KIdEGxlvIrXCNHStfmUduFGW9S4TaqkSrKam4MNRdbkgfmM/
-         AX2Q==
-X-Gm-Message-State: AOAM532jkcHFCIfAeXpqgR2eVhaP639114pPcf/JN5LCciQI7VLRyj7d
-        dFqUMperjHXpQjFh0huPzxX9wFIsO5kz7i92uK1ZxQ==
-X-Google-Smtp-Source: ABdhPJwf2G6YVg5t9TnlP39xMAJPWzYB0UD9y46tt/9WhaJq6sdYAgKUCg4C4rPKJyzryOyEpQIRjjMs7b1E1l75meU=
-X-Received: by 2002:a17:90b:380d:: with SMTP id mq13mr428792pjb.110.1637652447274;
- Mon, 22 Nov 2021 23:27:27 -0800 (PST)
+        bh=mcOThBA52zPLhCS2zPMb4qpl869iJkhdJeBDm9K1m+A=;
+        b=5l8Gi3agtWQ4YkufuWEpq/N/7GAmweFDuKmybtpfl4tLAkZm2KmoUryAgW1ufvIY2p
+         fz6v4JQ0sJopl0zSm5NfqJTmAqNDA0ORfG/mJFBQH/8GDyHBfXi3lWTtOow68g/MvyoF
+         pSpZMqT4mq21fiP1C87d69C4BiUafRffv9NoFugB5TDQ72YVSqITGpzb1tLR5XjssbtD
+         AaSU6FzYJvRyib4POMXEaT0ziHGGF9ln16dTbUFZm+nF+1g4xw5S+n9pjSBFu3aDkwIo
+         ICgssvnWFmtdaLJnAgMDfakpyPsWF4X96jjAFRvBA9G524G7wookVDwKbeydXra5g+Cd
+         Jf2w==
+X-Gm-Message-State: AOAM532CA9PxywcLqBnmNVzZsUfx/RuI76vw8KpRFFFeRBqg9KZhZHCb
+        Qb/HqJ/xzpF2jtxWOMZMh2SKPBFCPyHdCs6Lo72pbA==
+X-Google-Smtp-Source: ABdhPJyhcMIMLuH2MyEC66R1s74CyMvA46Ejn2Gj4Vs7G6l+/+piFlUNEMq8byRwemOdCO5s06VkN1YoFdcZd0YT7eM=
+X-Received: by 2002:a1c:7201:: with SMTP id n1mr660067wmc.176.1637654559549;
+ Tue, 23 Nov 2021 00:02:39 -0800 (PST)
 MIME-Version: 1.0
-References: <20211117064359.2362060-1-reijiw@google.com> <20211117064359.2362060-22-reijiw@google.com>
- <87fsrps5wu.wl-maz@kernel.org>
-In-Reply-To: <87fsrps5wu.wl-maz@kernel.org>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Mon, 22 Nov 2021 23:27:11 -0800
-Message-ID: <CAAeT=Fwyr_KAwj5d3feiV1iw8fqSAy3Mz43d6diuOkSjg+Cmcg@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 21/29] KVM: arm64: Introduce framework to trap
- disabled features
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Peng Liang <liangpeng10@huawei.com>,
-        Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>
+References: <20211118083912.981995-1-atishp@rivosinc.com> <20211118083912.981995-2-atishp@rivosinc.com>
+In-Reply-To: <20211118083912.981995-2-atishp@rivosinc.com>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Tue, 23 Nov 2021 13:32:28 +0530
+Message-ID: <CAAhSdy0q30ftusYnsNnXPLHjfMPahpdo6J5pY45AnK69S5bnSw@mail.gmail.com>
+Subject: Re: [PATCH v5 1/5] RISC-V: KVM: Mark the existing SBI implementation
+ as v01
+To:     Atish Patra <atishp@rivosinc.com>
+Cc:     "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
+        Atish Patra <atish.patra@wdc.com>,
+        Anup Patel <anup.patel@wdc.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Heinrich Schuchardt <xypron.glpk@gmx.de>,
+        Kefeng Wang <wangkefeng.wang@huawei.com>,
+        kvm-riscv@lists.infradead.org, KVM General <kvm@vger.kernel.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Nov 21, 2021 at 10:46 AM Marc Zyngier <maz@kernel.org> wrote:
+On Thu, Nov 18, 2021 at 2:10 PM Atish Patra <atishp@rivosinc.com> wrote:
 >
-> On Wed, 17 Nov 2021 06:43:51 +0000,
-> Reiji Watanabe <reijiw@google.com> wrote:
-> >
-> > When a CPU feature that is supported on the host is not exposed to
-> > its guest, emulating a real CPU's behavior (by trapping or disabling
-> > guest's using the feature) is generally a desirable behavior (when
-> > it's possible without any or little side effect).
-> >
-> > Introduce feature_config_ctrl structure, which manages feature
-> > information to program configuration register to trap or disable
-> > the feature when the feature is not exposed to the guest, and
-> > functions that uses the structure to activate trapping the feature.
-> >
-> > At present, no feature has feature_config_ctrl yet and the following
-> > patches will add the feature_config_ctrl for several features.
-> >
-> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> > ---
-> >  arch/arm64/kvm/sys_regs.c | 121 +++++++++++++++++++++++++++++++++++++-
-> >  1 file changed, 120 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 2f96103fc0d2..501de08dacb7 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -376,8 +376,38 @@ static int arm64_check_features(u64 check_types, u64 val, u64 lim)
-> >       (cpuid_feature_extract_unsigned_field(val, ID_AA64ISAR1_GPI_SHIFT) >= \
-> >        ID_AA64ISAR1_GPI_IMP_DEF)
-> >
-> > +enum vcpu_config_reg {
-> > +     VCPU_HCR_EL2 = 1,
-> > +     VCPU_MDCR_EL2,
-> > +     VCPU_CPTR_EL2,
-> > +};
-> > +
-> > +/*
-> > + * Feature information to program configuration register to trap or disable
-> > + * guest's using a feature when the feature is not exposed to the guest.
-> > + */
-> > +struct feature_config_ctrl {
-> > +     /* ID register/field for the feature */
-> > +     u32     ftr_reg;        /* ID register */
-> > +     bool    ftr_signed;     /* Is the feature field signed ? */
-> > +     u8      ftr_shift;      /* Field of ID register for the feature */
-> > +     s8      ftr_min;        /* Min value that indicate the feature */
-> > +
-> > +     /*
-> > +      * Function to check trapping is needed. This is used when the above
-> > +      * fields are not enough to determine if trapping is needed.
-> > +      */
-> > +     bool    (*ftr_need_trap)(struct kvm_vcpu *vcpu);
-> > +
-> > +     /* Configuration register information to trap the feature. */
-> > +     enum vcpu_config_reg cfg_reg;   /* Configuration register */
-> > +     u64     cfg_mask;       /* Field of the configuration register */
-> > +     u64     cfg_val;        /* Value that are set for the field */
+> From: Atish Patra <atish.patra@wdc.com>
 >
-> Although this probably works for the use cases you have in mind, some
-> trap bits are actually working the other way around (clear to trap).
-> So you probably want to turn this into cfg_set and add a cfg_clear for
-> a good measure, dropping cfg_mask in the process.
-
-Although I was aware of both of the cases (cfg_clear is implicitly
-derived from cfg_mask ~ cfg_set), I agree that dropping cfg_mask and
-adding cfg_clear would be more explicit and nicer.
-
-> That being said, the current trend is to move to FGT, meaning that a
-> single register is unlikely to cut it in the long run. I'd rather you
-> simply have a configuration function here (and the helper you already
-> have is probably enough).
-
-Thank you for the nice suggestion ! That's a good point (I didn't pay
-attention to FGT yet).  I will look into having a configuration function
-here.
-
-> > +};
-> > +
-> >  struct id_reg_info {
-> >       u32     sys_reg;        /* Register ID */
-> > +     u64     sys_val;        /* Sanitized system value */
-> >
-> >       /*
-> >        * Limit value of the register for a vcpu. The value is the sanitized
-> > @@ -410,11 +440,15 @@ struct id_reg_info {
-> >       /* Return the reset value of the register for the vCPU */
-> >       u64 (*get_reset_val)(struct kvm_vcpu *vcpu,
-> >                            const struct id_reg_info *id_reg);
-> > +
-> > +     /* Information to trap features that are disabled for the guest */
-> > +     const struct feature_config_ctrl *(*trap_features)[];
-> >  };
-> >
-> >  static void id_reg_info_init(struct id_reg_info *id_reg)
-> >  {
-> > -     id_reg->vcpu_limit_val = read_sanitised_ftr_reg(id_reg->sys_reg);
-> > +     id_reg->sys_val = read_sanitised_ftr_reg(id_reg->sys_reg);
-> > +     id_reg->vcpu_limit_val = id_reg->sys_val;
-> >       if (id_reg->init)
-> >               id_reg->init(id_reg);
-> >  }
-> > @@ -952,6 +986,47 @@ static int validate_id_reg(struct kvm_vcpu *vcpu,
-> >       return err;
-> >  }
-> >
-> > +static void feature_trap_activate(struct kvm_vcpu *vcpu,
-> > +                               const struct feature_config_ctrl *config)
-> > +{
-> > +     u64 *reg_ptr, reg_val;
-> > +
-> > +     switch (config->cfg_reg) {
-> > +     case VCPU_HCR_EL2:
-> > +             reg_ptr = &vcpu->arch.hcr_el2;
-> > +             break;
-> > +     case VCPU_MDCR_EL2:
-> > +             reg_ptr = &vcpu->arch.mdcr_el2;
-> > +             break;
-> > +     case VCPU_CPTR_EL2:
-> > +             reg_ptr = &vcpu->arch.cptr_el2;
-> > +             break;
-> > +     }
-> > +
-> > +     /* Update cfg_mask fields with cfg_val */
-> > +     reg_val = (*reg_ptr & ~config->cfg_mask);
-> > +     reg_val |= config->cfg_val;
-> > +     *reg_ptr = reg_val;
-> > +}
-> > +
-> > +static inline bool feature_avail(const struct feature_config_ctrl *ctrl,
-> > +                              u64 id_val)
-> > +{
-> > +     int field_val = cpuid_feature_extract_field(id_val,
-> > +                             ctrl->ftr_shift, ctrl->ftr_signed);
-> > +
-> > +     return (field_val >= ctrl->ftr_min);
-> > +}
-> > +
-> > +static inline bool vcpu_feature_is_available(struct kvm_vcpu *vcpu,
-> > +                                     const struct feature_config_ctrl *ctrl)
-> > +{
-> > +     u64 val;
-> > +
-> > +     val = __read_id_reg(vcpu, ctrl->ftr_reg);
-> > +     return feature_avail(ctrl, val);
-> > +}
-> > +
-> >  /*
-> >   * ARMv8.1 mandates at least a trivial LORegion implementation, where all the
-> >   * RW registers are RES0 (which we can implement as RAZ/WI). On an ARMv8.0
-> > @@ -1831,6 +1906,42 @@ static int reg_from_user(u64 *val, const void __user *uaddr, u64 id);
-> >  static int reg_to_user(void __user *uaddr, const u64 *val, u64 id);
-> >  static u64 sys_reg_to_index(const struct sys_reg_desc *reg);
-> >
-> > +static void id_reg_features_trap_activate(struct kvm_vcpu *vcpu,
-> > +                                       const struct id_reg_info *id_reg)
-> > +{
-> > +     u64 val;
-> > +     int i = 0;
-> > +     const struct feature_config_ctrl **ctrlp_array, *ctrl;
-> > +
-> > +     if (!id_reg || !id_reg->trap_features)
-> > +             /* No information to trap a feature */
-> > +             return;
-> > +
-> > +     val = __read_id_reg(vcpu, id_reg->sys_reg);
-> > +     if (val == id_reg->sys_val)
-> > +             /* No feature needs to be trapped (no feature is disabled). */
-> > +             return;
-> > +
-> > +     ctrlp_array = *id_reg->trap_features;
-> > +     while ((ctrl = ctrlp_array[i++]) != NULL) {
-> > +             if (ctrl->ftr_need_trap && ctrl->ftr_need_trap(vcpu)) {
-> > +                     feature_trap_activate(vcpu, ctrl);
-> > +                     continue;
-> > +             }
-> > +
-> > +             if (!feature_avail(ctrl, id_reg->sys_val))
-> > +                     /* The feature is not supported on the host. */
-> > +                     continue;
-> > +
-> > +             if (feature_avail(ctrl, val))
-> > +                     /* The feature is enabled for the guest. */
-> > +                     continue;
-> > +
-> > +             /* The feature is supported but disabled. */
-> > +             feature_trap_activate(vcpu, ctrl);
-> > +     }
-> > +}
-> > +
-> >  /* Visibility overrides for SVE-specific control registers */
-> >  static unsigned int sve_visibility(const struct kvm_vcpu *vcpu,
-> >                                  const struct sys_reg_desc *rd)
-> > @@ -3457,6 +3568,14 @@ int kvm_arm_copy_sys_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
-> >       return write_demux_regids(uindices);
-> >  }
-> >
-> > +void kvm_vcpu_init_traps(struct kvm_vcpu *vcpu)
+> The existing SBI specification impelementation follows v0.1
+> specification. The latest specification allows more
+> scalability and performance improvements.
 >
-> Who is going to call this? At which point? Please document the use
-> constraints on this.
+> Rename the existing implementation as v01 and provide a way to allow
+> future extensions.
+>
+> Reviewed-by: Anup Patel <anup.patel@wdc.com>
+> Signed-off-by: Atish Patra <atish.patra@wdc.com>
+> Signed-off-by: Atish Patra <atishp@rivosinc.com>
 
-kvm_vcpu_first_run_init() is going to call it (for non-pKVM).
-I will document the use constraints on that.
+I have queued this for 5.17
 
 Thanks,
-Reiji
+Anup
+
+> ---
+>  arch/riscv/include/asm/kvm_vcpu_sbi.h |  29 +++++
+>  arch/riscv/kvm/vcpu_sbi.c             | 149 ++++++++++++++++++++------
+>  2 files changed, 145 insertions(+), 33 deletions(-)
+>  create mode 100644 arch/riscv/include/asm/kvm_vcpu_sbi.h
+>
+> diff --git a/arch/riscv/include/asm/kvm_vcpu_sbi.h b/arch/riscv/include/asm/kvm_vcpu_sbi.h
+> new file mode 100644
+> index 000000000000..1a4cb0db2d0b
+> --- /dev/null
+> +++ b/arch/riscv/include/asm/kvm_vcpu_sbi.h
+> @@ -0,0 +1,29 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/**
+> + * Copyright (c) 2021 Western Digital Corporation or its affiliates.
+> + *
+> + * Authors:
+> + *     Atish Patra <atish.patra@wdc.com>
+> + */
+> +
+> +#ifndef __RISCV_KVM_VCPU_SBI_H__
+> +#define __RISCV_KVM_VCPU_SBI_H__
+> +
+> +#define KVM_SBI_VERSION_MAJOR 0
+> +#define KVM_SBI_VERSION_MINOR 2
+> +
+> +struct kvm_vcpu_sbi_extension {
+> +       unsigned long extid_start;
+> +       unsigned long extid_end;
+> +       /**
+> +        * SBI extension handler. It can be defined for a given extension or group of
+> +        * extension. But it should always return linux error codes rather than SBI
+> +        * specific error codes.
+> +        */
+> +       int (*handler)(struct kvm_vcpu *vcpu, struct kvm_run *run,
+> +                      unsigned long *out_val, struct kvm_cpu_trap *utrap,
+> +                      bool *exit);
+> +};
+> +
+> +const struct kvm_vcpu_sbi_extension *kvm_vcpu_sbi_find_ext(unsigned long extid);
+> +#endif /* __RISCV_KVM_VCPU_SBI_H__ */
+> diff --git a/arch/riscv/kvm/vcpu_sbi.c b/arch/riscv/kvm/vcpu_sbi.c
+> index eb3c045edf11..32376906ff20 100644
+> --- a/arch/riscv/kvm/vcpu_sbi.c
+> +++ b/arch/riscv/kvm/vcpu_sbi.c
+> @@ -1,5 +1,5 @@
+>  // SPDX-License-Identifier: GPL-2.0
+> -/**
+> +/*
+>   * Copyright (c) 2019 Western Digital Corporation or its affiliates.
+>   *
+>   * Authors:
+> @@ -12,9 +12,25 @@
+>  #include <asm/csr.h>
+>  #include <asm/sbi.h>
+>  #include <asm/kvm_vcpu_timer.h>
+> +#include <asm/kvm_vcpu_sbi.h>
+>
+> -#define SBI_VERSION_MAJOR                      0
+> -#define SBI_VERSION_MINOR                      1
+> +static int kvm_linux_err_map_sbi(int err)
+> +{
+> +       switch (err) {
+> +       case 0:
+> +               return SBI_SUCCESS;
+> +       case -EPERM:
+> +               return SBI_ERR_DENIED;
+> +       case -EINVAL:
+> +               return SBI_ERR_INVALID_PARAM;
+> +       case -EFAULT:
+> +               return SBI_ERR_INVALID_ADDRESS;
+> +       case -EOPNOTSUPP:
+> +               return SBI_ERR_NOT_SUPPORTED;
+> +       default:
+> +               return SBI_ERR_FAILURE;
+> +       };
+> +}
+>
+>  static void kvm_riscv_vcpu_sbi_forward(struct kvm_vcpu *vcpu,
+>                                        struct kvm_run *run)
+> @@ -72,21 +88,19 @@ static void kvm_sbi_system_shutdown(struct kvm_vcpu *vcpu,
+>         run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
+>  }
+>
+> -int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu, struct kvm_run *run)
+> +static int kvm_sbi_ext_v01_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
+> +                                     unsigned long *out_val,
+> +                                     struct kvm_cpu_trap *utrap,
+> +                                     bool *exit)
+>  {
+>         ulong hmask;
+> -       int i, ret = 1;
+> +       int i, ret = 0;
+>         u64 next_cycle;
+>         struct kvm_vcpu *rvcpu;
+> -       bool next_sepc = true;
+>         struct cpumask cm, hm;
+>         struct kvm *kvm = vcpu->kvm;
+> -       struct kvm_cpu_trap utrap = { 0 };
+>         struct kvm_cpu_context *cp = &vcpu->arch.guest_context;
+>
+> -       if (!cp)
+> -               return -EINVAL;
+> -
+>         switch (cp->a7) {
+>         case SBI_EXT_0_1_CONSOLE_GETCHAR:
+>         case SBI_EXT_0_1_CONSOLE_PUTCHAR:
+> @@ -95,8 +109,7 @@ int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>                  * handled in kernel so we forward these to user-space
+>                  */
+>                 kvm_riscv_vcpu_sbi_forward(vcpu, run);
+> -               next_sepc = false;
+> -               ret = 0;
+> +               *exit = true;
+>                 break;
+>         case SBI_EXT_0_1_SET_TIMER:
+>  #if __riscv_xlen == 32
+> @@ -104,47 +117,42 @@ int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>  #else
+>                 next_cycle = (u64)cp->a0;
+>  #endif
+> -               kvm_riscv_vcpu_timer_next_event(vcpu, next_cycle);
+> +               ret = kvm_riscv_vcpu_timer_next_event(vcpu, next_cycle);
+>                 break;
+>         case SBI_EXT_0_1_CLEAR_IPI:
+> -               kvm_riscv_vcpu_unset_interrupt(vcpu, IRQ_VS_SOFT);
+> +               ret = kvm_riscv_vcpu_unset_interrupt(vcpu, IRQ_VS_SOFT);
+>                 break;
+>         case SBI_EXT_0_1_SEND_IPI:
+>                 if (cp->a0)
+>                         hmask = kvm_riscv_vcpu_unpriv_read(vcpu, false, cp->a0,
+> -                                                          &utrap);
+> +                                                          utrap);
+>                 else
+>                         hmask = (1UL << atomic_read(&kvm->online_vcpus)) - 1;
+> -               if (utrap.scause) {
+> -                       utrap.sepc = cp->sepc;
+> -                       kvm_riscv_vcpu_trap_redirect(vcpu, &utrap);
+> -                       next_sepc = false;
+> +               if (utrap->scause)
+>                         break;
+> -               }
+> +
+>                 for_each_set_bit(i, &hmask, BITS_PER_LONG) {
+>                         rvcpu = kvm_get_vcpu_by_id(vcpu->kvm, i);
+> -                       kvm_riscv_vcpu_set_interrupt(rvcpu, IRQ_VS_SOFT);
+> +                       ret = kvm_riscv_vcpu_set_interrupt(rvcpu, IRQ_VS_SOFT);
+> +                       if (ret < 0)
+> +                               break;
+>                 }
+>                 break;
+>         case SBI_EXT_0_1_SHUTDOWN:
+>                 kvm_sbi_system_shutdown(vcpu, run, KVM_SYSTEM_EVENT_SHUTDOWN);
+> -               next_sepc = false;
+> -               ret = 0;
+> +               *exit = true;
+>                 break;
+>         case SBI_EXT_0_1_REMOTE_FENCE_I:
+>         case SBI_EXT_0_1_REMOTE_SFENCE_VMA:
+>         case SBI_EXT_0_1_REMOTE_SFENCE_VMA_ASID:
+>                 if (cp->a0)
+>                         hmask = kvm_riscv_vcpu_unpriv_read(vcpu, false, cp->a0,
+> -                                                          &utrap);
+> +                                                          utrap);
+>                 else
+>                         hmask = (1UL << atomic_read(&kvm->online_vcpus)) - 1;
+> -               if (utrap.scause) {
+> -                       utrap.sepc = cp->sepc;
+> -                       kvm_riscv_vcpu_trap_redirect(vcpu, &utrap);
+> -                       next_sepc = false;
+> +               if (utrap->scause)
+>                         break;
+> -               }
+> +
+>                 cpumask_clear(&cm);
+>                 for_each_set_bit(i, &hmask, BITS_PER_LONG) {
+>                         rvcpu = kvm_get_vcpu_by_id(vcpu->kvm, i);
+> @@ -154,22 +162,97 @@ int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu, struct kvm_run *run)
+>                 }
+>                 riscv_cpuid_to_hartid_mask(&cm, &hm);
+>                 if (cp->a7 == SBI_EXT_0_1_REMOTE_FENCE_I)
+> -                       sbi_remote_fence_i(cpumask_bits(&hm));
+> +                       ret = sbi_remote_fence_i(cpumask_bits(&hm));
+>                 else if (cp->a7 == SBI_EXT_0_1_REMOTE_SFENCE_VMA)
+> -                       sbi_remote_hfence_vvma(cpumask_bits(&hm),
+> +                       ret = sbi_remote_hfence_vvma(cpumask_bits(&hm),
+>                                                 cp->a1, cp->a2);
+>                 else
+> -                       sbi_remote_hfence_vvma_asid(cpumask_bits(&hm),
+> +                       ret = sbi_remote_hfence_vvma_asid(cpumask_bits(&hm),
+>                                                 cp->a1, cp->a2, cp->a3);
+>                 break;
+>         default:
+> +               ret = -EINVAL;
+> +               break;
+> +       }
+> +
+> +       return ret;
+> +}
+> +
+> +const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_v01 = {
+> +       .extid_start = SBI_EXT_0_1_SET_TIMER,
+> +       .extid_end = SBI_EXT_0_1_SHUTDOWN,
+> +       .handler = kvm_sbi_ext_v01_handler,
+> +};
+> +
+> +static const struct kvm_vcpu_sbi_extension *sbi_ext[] = {
+> +       &vcpu_sbi_ext_v01,
+> +};
+> +
+> +const struct kvm_vcpu_sbi_extension *kvm_vcpu_sbi_find_ext(unsigned long extid)
+> +{
+> +       int i = 0;
+> +
+> +       for (i = 0; i < ARRAY_SIZE(sbi_ext); i++) {
+> +               if (sbi_ext[i]->extid_start <= extid &&
+> +                   sbi_ext[i]->extid_end >= extid)
+> +                       return sbi_ext[i];
+> +       }
+> +
+> +       return NULL;
+> +}
+> +
+> +int kvm_riscv_vcpu_sbi_ecall(struct kvm_vcpu *vcpu, struct kvm_run *run)
+> +{
+> +       int ret = 1;
+> +       bool next_sepc = true;
+> +       bool userspace_exit = false;
+> +       struct kvm_cpu_context *cp = &vcpu->arch.guest_context;
+> +       const struct kvm_vcpu_sbi_extension *sbi_ext;
+> +       struct kvm_cpu_trap utrap = { 0 };
+> +       unsigned long out_val = 0;
+> +       bool ext_is_v01 = false;
+> +
+> +       sbi_ext = kvm_vcpu_sbi_find_ext(cp->a7);
+> +       if (sbi_ext && sbi_ext->handler) {
+> +               if (cp->a7 >= SBI_EXT_0_1_SET_TIMER &&
+> +                   cp->a7 <= SBI_EXT_0_1_SHUTDOWN)
+> +                       ext_is_v01 = true;
+> +               ret = sbi_ext->handler(vcpu, run, &out_val, &utrap, &userspace_exit);
+> +       } else {
+>                 /* Return error for unsupported SBI calls */
+>                 cp->a0 = SBI_ERR_NOT_SUPPORTED;
+> -               break;
+> +               goto ecall_done;
+> +       }
+> +
+> +       /* Handle special error cases i.e trap, exit or userspace forward */
+> +       if (utrap.scause) {
+> +               /* No need to increment sepc or exit ioctl loop */
+> +               ret = 1;
+> +               utrap.sepc = cp->sepc;
+> +               kvm_riscv_vcpu_trap_redirect(vcpu, &utrap);
+> +               next_sepc = false;
+> +               goto ecall_done;
+>         }
+>
+> +       /* Exit ioctl loop or Propagate the error code the guest */
+> +       if (userspace_exit) {
+> +               next_sepc = false;
+> +               ret = 0;
+> +       } else {
+> +               /**
+> +                * SBI extension handler always returns an Linux error code. Convert
+> +                * it to the SBI specific error code that can be propagated the SBI
+> +                * caller.
+> +                */
+> +               ret = kvm_linux_err_map_sbi(ret);
+> +               cp->a0 = ret;
+> +               ret = 1;
+> +       }
+> +ecall_done:
+>         if (next_sepc)
+>                 cp->sepc += 4;
+> +       if (!ext_is_v01)
+> +               cp->a1 = out_val;
+>
+>         return ret;
+>  }
+> --
+> 2.33.1
+>
+>
+> --
+> kvm-riscv mailing list
+> kvm-riscv@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/kvm-riscv
