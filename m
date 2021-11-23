@@ -2,40 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 76B0845A82F
-	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 17:36:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 88D6745A838
+	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 17:37:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238967AbhKWQkA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Nov 2021 11:40:00 -0500
-Received: from mail.kernel.org ([198.145.29.99]:45136 "EHLO mail.kernel.org"
+        id S238529AbhKWQkR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Nov 2021 11:40:17 -0500
+Received: from mail.kernel.org ([198.145.29.99]:45290 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238425AbhKWQj4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Nov 2021 11:39:56 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id BF71460F6F;
-        Tue, 23 Nov 2021 16:36:46 +0000 (UTC)
+        id S238389AbhKWQkD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Nov 2021 11:40:03 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 4043560FA0;
+        Tue, 23 Nov 2021 16:36:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1637685407;
-        bh=Z+hfXtVaTfys0qEPyoaNYuHfB9n2dbOjn/djzkbPFyg=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Vy8NKBrEgiNowynRCgw/+HaiC9Mg7JEiE43bwA5Jf9Kh3sMsOzSPVfOtKL9CKhWTX
-         a//H5teQdySL9oRJDJnudxHWDMIqBTIFSpWI5mG2czoPjSYl/TxHzAY/ZvhX3F8zmA
-         +hK8+dhyNEdRtQO36uyM8LPl1FLeTtaGE2miTv7nMZVg1KQi3+mxbyd92mzNe8CojC
-         wBfGe4A+3tfQvrGxzMRg9gNP5y2fZFTGWQozRM87/2MfkmzoFv03YnLd2G79KJE/+3
-         hQ97iytLww/sSmIUqJHCPL28GQQSmYvN5jBbDj3W6tO3BQo+NzlUYxkp1XOreSjHHP
-         +zRXRjJDuihbQ==
+        s=k20201202; t=1637685415;
+        bh=fJJDZ2OhFIQU4da2SyiIsTuTgELfj6WEyRyJXMVkv1U=;
+        h=From:To:Cc:Subject:Date:From;
+        b=lZlP1wtq779fzB4XF7DKkV+Qj6HAH7oq7jhfiWXRvr07/0Fcl8ke4pe4bVzLVnQuo
+         u6gGAi7Hd14sxp78Km/F/yQtW183I4Qt8W/vp7kkUfIksgr1rjTzRyu5wPa+nc7mSF
+         7MariqzMg+d+bLG+p7x+iTIRr+Ie604gFAziBiPfSEAH0KmPEjVq0hta81ikXvDAQx
+         WdOkJck8S4EqBk+UTFdlDmhd0iyFoVbzqjcJgU3Kq8Jiq+pZNHH9F7X7UhjQ8n0hYU
+         8P1dfC0LWA3aMnJwDhw5M+wDqr8dDsBFGLAcZkyp/DK7+G9u1q2OeMNXDzfAeEANZd
+         y5KiR//3mjaYQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+Cc:     Thomas Huth <thuth@redhat.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Sasha Levin <sashal@kernel.org>, chenhuacai@kernel.org,
-        aleksandar.qemu.devel@gmail.com, tsbogend@alpha.franken.de,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org
-Subject: [PATCH MANUALSEL 5.15 7/8] KVM: MIPS: Cap KVM_CAP_NR_VCPUS by KVM_CAP_MAX_VCPUS
-Date:   Tue, 23 Nov 2021 11:36:29 -0500
-Message-Id: <20211123163630.289306-7-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, shuah@kernel.org,
+        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: [PATCH MANUALSEL 5.10 1/5] KVM: selftests: Fix kvm_vm_free() in cr4_cpuid_sync and vmx_tsc_adjust tests
+Date:   Tue, 23 Nov 2021 11:36:45 -0500
+Message-Id: <20211123163652.289483-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20211123163630.289306-1-sashal@kernel.org>
-References: <20211123163630.289306-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -44,34 +41,51 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
 
-[ Upstream commit 57a2e13ebdda8b65602b44ec8b80e385603eb84c ]
+[ Upstream commit 22d7108ce47290d47e1ea83a28fbfc85e0ecf97e ]
 
-It doesn't make sense to return the recommended maximum number of
-vCPUs which exceeds the maximum possible number of vCPUs.
+The kvm_vm_free() statement here is currently dead code, since the loop
+in front of it can only be left with the "goto done" that jumps right
+after the kvm_vm_free(). Fix it by swapping the locations of the "done"
+label and the kvm_vm_free().
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-Message-Id: <20211116163443.88707-3-vkuznets@redhat.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20210826074928.240942-1-thuth@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- arch/mips/kvm/mips.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tools/testing/selftests/kvm/x86_64/cr4_cpuid_sync_test.c | 3 +--
+ tools/testing/selftests/kvm/x86_64/vmx_tsc_adjust_test.c | 2 +-
+ 2 files changed, 2 insertions(+), 3 deletions(-)
 
-diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-index 75c6f264c626c..713ac87fbeb59 100644
---- a/arch/mips/kvm/mips.c
-+++ b/arch/mips/kvm/mips.c
-@@ -1067,7 +1067,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		r = 1;
- 		break;
- 	case KVM_CAP_NR_VCPUS:
--		r = num_online_cpus();
-+		r = min_t(unsigned int, num_online_cpus(), KVM_MAX_VCPUS);
- 		break;
- 	case KVM_CAP_MAX_VCPUS:
- 		r = KVM_MAX_VCPUS;
+diff --git a/tools/testing/selftests/kvm/x86_64/cr4_cpuid_sync_test.c b/tools/testing/selftests/kvm/x86_64/cr4_cpuid_sync_test.c
+index 140e91901582b..4d259294804fc 100644
+--- a/tools/testing/selftests/kvm/x86_64/cr4_cpuid_sync_test.c
++++ b/tools/testing/selftests/kvm/x86_64/cr4_cpuid_sync_test.c
+@@ -110,8 +110,7 @@ int main(int argc, char *argv[])
+ 		}
+ 	}
+ 
+-	kvm_vm_free(vm);
+-
+ done:
++	kvm_vm_free(vm);
+ 	return 0;
+ }
+diff --git a/tools/testing/selftests/kvm/x86_64/vmx_tsc_adjust_test.c b/tools/testing/selftests/kvm/x86_64/vmx_tsc_adjust_test.c
+index fbe8417cbc2c3..8b9fa313adf21 100644
+--- a/tools/testing/selftests/kvm/x86_64/vmx_tsc_adjust_test.c
++++ b/tools/testing/selftests/kvm/x86_64/vmx_tsc_adjust_test.c
+@@ -162,7 +162,7 @@ int main(int argc, char *argv[])
+ 		}
+ 	}
+ 
+-	kvm_vm_free(vm);
+ done:
++	kvm_vm_free(vm);
+ 	return 0;
+ }
 -- 
 2.33.0
 
