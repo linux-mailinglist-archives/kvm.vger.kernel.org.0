@@ -2,75 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B610C45A626
-	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 16:01:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CC41D45A638
+	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 16:06:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237867AbhKWPEd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Nov 2021 10:04:33 -0500
-Received: from mga05.intel.com ([192.55.52.43]:3048 "EHLO mga05.intel.com"
+        id S231531AbhKWPJT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Nov 2021 10:09:19 -0500
+Received: from mail.kernel.org ([198.145.29.99]:58480 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230510AbhKWPEc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Nov 2021 10:04:32 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10176"; a="321266870"
-X-IronPort-AV: E=Sophos;i="5.87,258,1631602800"; 
-   d="scan'208";a="321266870"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Nov 2021 07:01:22 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.87,258,1631602800"; 
-   d="scan'208";a="509438278"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.101])
-  by orsmga008.jf.intel.com with ESMTP; 23 Nov 2021 07:01:13 -0800
-Date:   Tue, 23 Nov 2021 23:00:28 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     "Kirill A. Shutemov" <kirill@shutemov.name>,
-        Wanpeng Li <wanpengli@tencent.com>, jun.nakajima@intel.com,
-        kvm@vger.kernel.org, david@redhat.com, qemu-devel@nongnu.org,
-        "J . Bruce Fields" <bfields@fieldses.org>, dave.hansen@intel.com,
-        "H . Peter Anvin" <hpa@zytor.com>, ak@linux.intel.com,
-        Jonathan Corbet <corbet@lwn.net>,
-        Joerg Roedel <joro@8bytes.org>, x86@kernel.org,
-        Hugh Dickins <hughd@google.com>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        luto@kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jim Mattson <jmattson@google.com>, linux-mm@kvack.org,
-        Sean Christopherson <seanjc@google.com>, susie.li@intel.com,
-        Jeff Layton <jlayton@kernel.org>, linux-kernel@vger.kernel.org,
-        john.ji@intel.com, Yu Zhang <yu.c.zhang@linux.intel.com>,
-        linux-fsdevel@vger.kernel.org,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: Re: [RFC v2 PATCH 13/13] KVM: Enable memfd based page
- invalidation/fallocate
-Message-ID: <20211123150028.GE32088@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20211119134739.20218-1-chao.p.peng@linux.intel.com>
- <20211119134739.20218-14-chao.p.peng@linux.intel.com>
- <20211122141647.3pcsywilrzcoqvbf@box.shutemov.name>
- <20211123010639.GA32088@chaop.bj.intel.com>
- <2f3e9d7e-ce15-e47b-54c6-3ca3d7195d70@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2f3e9d7e-ce15-e47b-54c6-3ca3d7195d70@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+        id S230132AbhKWPJT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Nov 2021 10:09:19 -0500
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 34BBB60C49;
+        Tue, 23 Nov 2021 15:06:11 +0000 (UTC)
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mpXN2-007JJp-QT; Tue, 23 Nov 2021 15:06:08 +0000
+Date:   Tue, 23 Nov 2021 15:06:08 +0000
+Message-ID: <87h7c2di8v.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        drjones@redhat.com, eric.auger@redhat.com,
+        alexandru.elisei@arm.com, Paolo Bonzini <pbonzini@redhat.com>,
+        oupton@google.com, james.morse@arm.com, suzuki.poulose@arm.com,
+        shuah@kernel.org, jingzhangos@google.com, pshier@google.com,
+        rananta@google.com, reijiw@google.com
+Subject: Re: [PATCH 02/17] KVM: selftests: aarch64: add function for accessing GICv3 dist and redist registers
+In-Reply-To: <20211109023906.1091208-3-ricarkol@google.com>
+References: <20211109023906.1091208-1-ricarkol@google.com>
+        <20211109023906.1091208-3-ricarkol@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ricarkol@google.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, drjones@redhat.com, eric.auger@redhat.com, alexandru.elisei@arm.com, pbonzini@redhat.com, oupton@google.com, james.morse@arm.com, suzuki.poulose@arm.com, shuah@kernel.org, jingzhangos@google.com, pshier@google.com, rananta@google.com, reijiw@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 23, 2021 at 10:09:28AM +0100, Paolo Bonzini wrote:
-> On 11/23/21 02:06, Chao Peng wrote:
-> > > Maybe the kvm has to be tagged with a sequential id that incremented every
-> > > allocation. This id can be checked here.
-> > Sounds like a sequential id will be needed, no existing fields in struct
-> > kvm can work for this.
+On Tue, 09 Nov 2021 02:38:51 +0000,
+Ricardo Koller <ricarkol@google.com> wrote:
 > 
-> There's no need to new concepts when there's a perfectly usable reference
-> count. :)
-
-Indeed, thanks.
-
+> Add a generic library function for reading and writing GICv3 distributor
+> and redistributor registers. Then adapt some functions to use it; more
+> will come and use it in the next commit.
 > 
-> Paolo
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> ---
+>  .../selftests/kvm/lib/aarch64/gic_v3.c        | 124 ++++++++++++++----
+>  1 file changed, 101 insertions(+), 23 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/lib/aarch64/gic_v3.c b/tools/testing/selftests/kvm/lib/aarch64/gic_v3.c
+> index 2dbf3339b62e..00e944fd8148 100644
+> --- a/tools/testing/selftests/kvm/lib/aarch64/gic_v3.c
+> +++ b/tools/testing/selftests/kvm/lib/aarch64/gic_v3.c
+> @@ -19,7 +19,8 @@ struct gicv3_data {
+>  	unsigned int nr_spis;
+>  };
+>  
+> -#define sgi_base_from_redist(redist_base) (redist_base + SZ_64K)
+> +#define sgi_base_from_redist(redist_base) 	(redist_base + SZ_64K)
+> +#define DIST_BIT				(1U << 31)
+>  
+>  enum gicv3_intid_range {
+>  	SGI_RANGE,
+> @@ -50,6 +51,14 @@ static void gicv3_gicr_wait_for_rwp(void *redist_base)
+>  	}
+>  }
+>  
+> +static void gicv3_wait_for_rwp(uint32_t cpu_or_dist)
+> +{
+> +	if (cpu_or_dist & DIST_BIT)
+> +		gicv3_gicd_wait_for_rwp();
+> +	else
+> +		gicv3_gicr_wait_for_rwp(gicv3_data.redist_base[cpu_or_dist]);
+> +}
+> +
+>  static enum gicv3_intid_range get_intid_range(unsigned int intid)
+>  {
+>  	switch (intid) {
+> @@ -81,39 +90,108 @@ static void gicv3_write_eoir(uint32_t irq)
+>  	isb();
+>  }
+>  
+> -static void
+> -gicv3_config_irq(unsigned int intid, unsigned int offset)
+> +uint32_t gicv3_reg_readl(uint32_t cpu_or_dist, uint64_t offset)
+> +{
+> +	void *base = cpu_or_dist & DIST_BIT ? gicv3_data.dist_base
+> +		: sgi_base_from_redist(gicv3_data.redist_base[cpu_or_dist]);
+> +	return readl(base + offset);
+> +}
+> +
+> +void gicv3_reg_writel(uint32_t cpu_or_dist, uint64_t offset, uint32_t reg_val)
+> +{
+> +	void *base = cpu_or_dist & DIST_BIT ? gicv3_data.dist_base
+> +		: sgi_base_from_redist(gicv3_data.redist_base[cpu_or_dist]);
+> +	writel(reg_val, base + offset);
+> +}
+> +
+> +uint32_t gicv3_getl_fields(uint32_t cpu_or_dist, uint64_t offset, uint32_t mask)
+> +{
+> +	return gicv3_reg_readl(cpu_or_dist, offset) & mask;
+> +}
+> +
+> +void gicv3_setl_fields(uint32_t cpu_or_dist, uint64_t offset,
+> +		uint32_t mask, uint32_t reg_val)
+> +{
+> +	uint32_t tmp = gicv3_reg_readl(cpu_or_dist, offset) & ~mask;
+> +
+> +	tmp |= (reg_val & mask);
+> +	gicv3_reg_writel(cpu_or_dist, offset, tmp);
+> +}
+> +
+> +/*
+> + * We use a single offset for the distributor and redistributor maps as they
+> + * have the same value in both. The only exceptions are registers that only
+> + * exist in one and not the other, like GICR_WAKER that doesn't exist in the
+> + * distributor map. Such registers are conveniently marked as reserved in the
+> + * map that doesn't implement it; like GICR_WAKER's offset of 0x0014 being
+> + * marked as "Reserved" in the Distributor map.
+> + */
+> +static void gicv3_access_reg(uint32_t intid, uint64_t offset,
+> +		uint32_t reg_bits, uint32_t bits_per_field,
+> +		bool write, uint32_t *val)
+>  {
+>  	uint32_t cpu = guest_get_vcpuid();
+> -	uint32_t mask = 1 << (intid % 32);
+>  	enum gicv3_intid_range intid_range = get_intid_range(intid);
+> -	void *reg;
+> -
+> -	/* We care about 'cpu' only for SGIs or PPIs */
+> -	if (intid_range == SGI_RANGE || intid_range == PPI_RANGE) {
+> -		GUEST_ASSERT(cpu < gicv3_data.nr_cpus);
+> -
+> -		reg = sgi_base_from_redist(gicv3_data.redist_base[cpu]) +
+> -			offset;
+> -		writel(mask, reg);
+> -		gicv3_gicr_wait_for_rwp(gicv3_data.redist_base[cpu]);
+> -	} else if (intid_range == SPI_RANGE) {
+> -		reg = gicv3_data.dist_base + offset + (intid / 32) * 4;
+> -		writel(mask, reg);
+> -		gicv3_gicd_wait_for_rwp();
+> -	} else {
+> -		GUEST_ASSERT(0);
+> -	}
+> +	uint32_t fields_per_reg, index, mask, shift;
+> +	uint32_t cpu_or_dist;
+> +
+> +	GUEST_ASSERT(bits_per_field <= reg_bits);
+> +	GUEST_ASSERT(*val < (1U << bits_per_field));
+> +	/* Some registers like IROUTER are 64 bit long. Those are currently not
+> +	 * supported by readl nor writel, so just asserting here until then.
+> +	 */
+> +	GUEST_ASSERT(reg_bits == 32);
+
+IROUTER *does* support 32bit accesses. There are no 64bit MMIO
+registers in the GIC architecture that do not support 32bit accesses,
+if only because there is no guarantee about the width of the MMIO bus
+itself (not to mention the existence of 32bit CPUs!).
+
+See 12.1.3 ("GIC memory-mapped register access") in the GICv3 arch
+spec.
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
