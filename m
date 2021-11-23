@@ -2,106 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F41FA45A41E
-	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 14:52:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E04F45A44B
+	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 15:00:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235826AbhKWNz6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Nov 2021 08:55:58 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:33938 "EHLO
+        id S233815AbhKWODM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Nov 2021 09:03:12 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:37320 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235702AbhKWNzz (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 23 Nov 2021 08:55:55 -0500
+        by vger.kernel.org with ESMTP id S229808AbhKWODL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 23 Nov 2021 09:03:11 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637675567;
+        s=mimecast20190719; t=1637676002;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=hg3rpdgYxxcOBJc5G9ynr2yksQKyjRICI2KgG4YRajw=;
-        b=evr0QXRKqYUWh7KPzNQrkvBllgBAf7R8zFdvgoBKag709zrEiI5JAcyihkkWArqnpWUbOO
-        Pp79vLc8V4beJagq1acSp5GDtpBCKhrg4/eHufeWInOTMSrCYvNflyvGYgdWLTbb83vsRC
-        72V5L5359zP0UF1CvI93Dmnq2snft0s=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=J+U2ly5t8pjpukreZ+mwG58hWGw3qavINk7r30wyotQ=;
+        b=FzhYY34mUX6e1M1C0IJaf+Z70sX685fliY1MvuPLjm2RDRVSbr376ZTj6b8UbXx/czEHCT
+        W/AJ3ehuNq1q0NU5xZ7LqXbCi60fuEVDWOjUPbw/IXC4P9OEG77BGSYYUq1z90CFNLpAFI
+        2H11BdM1A5n3s23hzbz386D9a4+JBfA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-485-8E-DjwUIOKKJRdNYlFP7XA-1; Tue, 23 Nov 2021 08:52:44 -0500
-X-MC-Unique: 8E-DjwUIOKKJRdNYlFP7XA-1
-Received: by mail-wm1-f69.google.com with SMTP id 201-20020a1c04d2000000b003335bf8075fso8508214wme.0
-        for <kvm@vger.kernel.org>; Tue, 23 Nov 2021 05:52:43 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=hg3rpdgYxxcOBJc5G9ynr2yksQKyjRICI2KgG4YRajw=;
-        b=Fx70w8HPyYE30cANlgY5ebJlaP+gWswvLT1r0UHpbC+38pn9HJ0yg+QpgeZBZnMqoi
-         cHDwXgGLRmIU32o+09MSYk7WRX7cqLP4WtY5qaIGH/uoPB5HZ0gEnlx4JENVW95s6rWu
-         gI6S6+/me12VIRH9sydCI/i7P6eHl17OB+LiEuRex3J+AbPjIWDXUA5W/1YS+MOKVJWV
-         ie/khoZ4hn0zK7vdDsNU7ZFLsdguGXHZWA6LSeJ7hCsy7fcmhJ8xxNPP5uYNxtmihb35
-         eoC/lxvJimTeTXVDMmoQyzQ5NrDTDU8vDHDcd2azJ00PaMpALKNETi/rrKNiOfc60+eR
-         NpfA==
-X-Gm-Message-State: AOAM532qOg/ehDAKqSi3KkNQA2pKPujNVHhZdg2P6fYz57cNSGB1pLUm
-        qGF+PrHZz+/imVQIRD4O4SARYUIpqkmz4Q7A63zgZDkMs0w0YxvI557Q2AWkiplXDBuQ+qb9YWq
-        KdmTGW/Ii0YQM
-X-Received: by 2002:a1c:7e04:: with SMTP id z4mr3279216wmc.134.1637675562910;
-        Tue, 23 Nov 2021 05:52:42 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJw7iTjEl+nEyfMdplA1sJxP2OTCbcZNTVWZJYf4xKxVJgZBJzKPzNLaMH3ChCLer/E4VRC5uQ==
-X-Received: by 2002:a1c:7e04:: with SMTP id z4mr3279190wmc.134.1637675562732;
-        Tue, 23 Nov 2021 05:52:42 -0800 (PST)
-Received: from fedora (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id o1sm12066278wrn.63.2021.11.23.05.52.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Nov 2021 05:52:42 -0800 (PST)
+ us-mta-406-mp2Gm_tkMRyg_0jsb2KKiw-1; Tue, 23 Nov 2021 08:59:57 -0500
+X-MC-Unique: mp2Gm_tkMRyg_0jsb2KKiw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 87D5FEC1A2;
+        Tue, 23 Nov 2021 13:59:56 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.40.192.236])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6E69C5C1D5;
+        Tue, 23 Nov 2021 13:59:54 +0000 (UTC)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: selftests: Make sure kvm_create_max_vcpus test
- won't hit RLIMIT_NOFILE
-In-Reply-To: <87czmsm5iv.fsf@redhat.com>
-References: <20211122171920.603760-1-vkuznets@redhat.com>
- <YZvVeW6qYNb/kkSc@google.com> <87czmsm5iv.fsf@redhat.com>
-Date:   Tue, 23 Nov 2021 14:52:41 +0100
-Message-ID: <877dczm11y.fsf@redhat.com>
+Subject: [PATCH v2] KVM: selftests: Make sure kvm_create_max_vcpus test won't hit RLIMIT_NOFILE
+Date:   Tue, 23 Nov 2021 14:59:53 +0100
+Message-Id: <20211123135953.667434-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Vitaly Kuznetsov <vkuznets@redhat.com> writes:
+With the elevated 'KVM_CAP_MAX_VCPUS' value kvm_create_max_vcpus test
+may hit RLIMIT_NOFILE limits:
 
->>>  
->>> +	/*
->>> +	 * Creating KVM_CAP_MAX_VCPUS vCPUs require KVM_CAP_MAX_VCPUS open
->>> +	 * file decriptors.
->>> +	 */
->>> +	TEST_ASSERT(!getrlimit(RLIMIT_NOFILE, &rl),
->>> +		    "getrlimit() failed (errno: %d)", errno);
->>
->> And strerror() output too?
->>
->
-> Sure, will add in v2.
->
+ # ./kvm_create_max_vcpus
+ KVM_CAP_MAX_VCPU_ID: 4096
+ KVM_CAP_MAX_VCPUS: 1024
+ Testing creating 1024 vCPUs, with IDs 0...1023.
+ /dev/kvm not available (errno: 24), skipping test
 
-Actually, there are two issues with the code above. First, TEST_ASSERT()
-already prints both errno and strerror() (setrlimit() counterpart which
-is easier to make fail):
+Adjust RLIMIT_NOFILE limits to make sure KVM_CAP_MAX_VCPUS fds can be
+opened. Note, raising hard limit ('rlim_max') requires CAP_SYS_RESOURCE
+capability which is generally not needed to run kvm selftests (but without
+raising the limit the test is doomed to fail anyway).
 
-KVM_CAP_MAX_VCPU_ID: 4096
-KVM_CAP_MAX_VCPUS: 1024
-==== Test Assertion Failure ====
-  kvm_create_max_vcpus.c:68: !setrlimit(RLIMIT_NOFILE, &rl)
-  pid=344504 tid=344504 errno=1 - Operation not permitted
-     1	0x0000000000402485: main at kvm_create_max_vcpus.c:68
-     2	0x00007fcb2e8b4041: ?? ??:0
-     3	0x000000000040254d: _start at ??:?
-  setrlimit() failed, errno: 0
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+---
+Changes since v1:
+- Drop 'NOFD' define replacing it with 'int nr_fds_wanted' [Sean]
+- Drop 'errno' printout as TEST_ASSERT() already does that.
+---
+ .../selftests/kvm/kvm_create_max_vcpus.c      | 22 +++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
-Second, note "errno: 0" above. There's no guarantee that getrlimit()
-will be executed before evaluating 'errno' in C. I think I'll just drop
-redundant errno printout then.
-
+diff --git a/tools/testing/selftests/kvm/kvm_create_max_vcpus.c b/tools/testing/selftests/kvm/kvm_create_max_vcpus.c
+index f968dfd4ee88..ca957fe3f903 100644
+--- a/tools/testing/selftests/kvm/kvm_create_max_vcpus.c
++++ b/tools/testing/selftests/kvm/kvm_create_max_vcpus.c
+@@ -12,6 +12,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <sys/resource.h>
+ 
+ #include "test_util.h"
+ 
+@@ -40,10 +41,31 @@ int main(int argc, char *argv[])
+ {
+ 	int kvm_max_vcpu_id = kvm_check_cap(KVM_CAP_MAX_VCPU_ID);
+ 	int kvm_max_vcpus = kvm_check_cap(KVM_CAP_MAX_VCPUS);
++	/*
++	 * Number of file descriptors reqired, KVM_CAP_MAX_VCPUS for vCPU fds +
++	 * an arbitrary number for everything else.
++	 */
++	int nr_fds_wanted = kvm_max_vcpus + 100;
++	struct rlimit rl;
+ 
+ 	pr_info("KVM_CAP_MAX_VCPU_ID: %d\n", kvm_max_vcpu_id);
+ 	pr_info("KVM_CAP_MAX_VCPUS: %d\n", kvm_max_vcpus);
+ 
++	/*
++	 * Check that we're allowed to open nr_fds_wanted file descriptors and
++	 * try raising the limits if needed.
++	 */
++	TEST_ASSERT(!getrlimit(RLIMIT_NOFILE, &rl), "getrlimit() failed!");
++
++	if (rl.rlim_cur < nr_fds_wanted) {
++		rl.rlim_cur = nr_fds_wanted;
++
++		if (rl.rlim_max <  nr_fds_wanted)
++			rl.rlim_max = nr_fds_wanted;
++
++		TEST_ASSERT(!setrlimit(RLIMIT_NOFILE, &rl), "setrlimit() failed!");
++	}
++
+ 	/*
+ 	 * Upstream KVM prior to 4.8 does not support KVM_CAP_MAX_VCPU_ID.
+ 	 * Userspace is supposed to use KVM_CAP_MAX_VCPUS as the maximum ID
 -- 
-Vitaly
+2.33.1
 
