@@ -2,112 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5EB51459E87
-	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 09:47:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E9B3459E89
+	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 09:47:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235080AbhKWIuE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Nov 2021 03:50:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39996 "EHLO
+        id S234963AbhKWIu7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Nov 2021 03:50:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229617AbhKWIuD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Nov 2021 03:50:03 -0500
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7B0CC061574;
-        Tue, 23 Nov 2021 00:46:55 -0800 (PST)
-Received: by mail-ed1-x52f.google.com with SMTP id x6so76681195edr.5;
-        Tue, 23 Nov 2021 00:46:55 -0800 (PST)
+        with ESMTP id S229617AbhKWIu7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Nov 2021 03:50:59 -0500
+Received: from mail-ua1-x941.google.com (mail-ua1-x941.google.com [IPv6:2607:f8b0:4864:20::941])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D189C061574
+        for <kvm@vger.kernel.org>; Tue, 23 Nov 2021 00:47:51 -0800 (PST)
+Received: by mail-ua1-x941.google.com with SMTP id t13so42141923uad.9
+        for <kvm@vger.kernel.org>; Tue, 23 Nov 2021 00:47:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=7HA05XhYlCzTp4qvhhSBcSuSKybJ0PulYKdWBwG+DL8=;
-        b=eRxUC+sJSCTIGOoVdTOOhCcUZfnZdG7DdFIkTVEmTD9NGwphMQiid3xEfITu5XW/Fm
-         OPcyu0o0RT6S6BanewL3NWZY6xVwmP0C439+0yWwFxG7UfkAXRzQPZpRKz3tzk18JnVw
-         HtjSX+daGQP8TGpv1J7Hr4rpLkhRhWOvo2U6K+oZWNz38u91Wa2/oojHfKIIW/fP8O/2
-         ahzoMGXbn8rp25gMWGp0CrvgXNrpYwO9AUUeMsfLXR/CR8EAjxMYcttXW0FO+AjATfG+
-         AGb2k3JRmpq499iNZ+yWcjQK0WwJ6RmYDNO89V0hqqHW4QFAC87ThcSmDD7gnTTsYtlu
-         0MVw==
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=DBXVr+2yQA4Yc+mJwCPapHs1PcqJSd/+SbzdjhsE7eQ=;
+        b=FQy77KtvRzCHhYtYxWx0FpSHr3FFp4p+72vbgLO6Ow5RxOH7eJArY5DLUAowKQMTu+
+         x960zr/KJ9F57EcIYr0Bk7xKYVfRyyl/v/FtkDY25dJLW47dJYvAPdaQ22nWBKYPm5K9
+         FtfVylY17ubpF3M9MWfzmI1NRwyVcYrJK/tbXS5Qz+89Nquzyyk5a9r7JeMNygYXstzX
+         p8TXYx9M4zkqsKVPQa8P0RqrT0r9sVyf03yqxkW40yi4H8ayO4d4YI1hmTGsLWaoEnL2
+         gtyeAxrfk1chOQHY1zpd8bXqs62xAZTVLSLhasWhT0a23Kap1SrEf/X7kjx9yBi0Sj7W
+         kkHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=7HA05XhYlCzTp4qvhhSBcSuSKybJ0PulYKdWBwG+DL8=;
-        b=CXpaZKQRZ3xOnVgoN+yqI7/g4N0YVnZpKFGGdpXNSWqSRmJb74ATOhZK4e/gphgeZi
-         85KKcxOUacY1vkaziEr+jsTuLF1Fiy8fnGW/fdYVbMuugMgXDS2usP2OWqUi8VIciGw2
-         N9BsbZSkZTmxfW/ZlYZF/V4JphA8Om72OM/Dh+DmtTvsAk6N8wUGY7Ga7bdTQ2zLYLzZ
-         HJHnP/eg81d8J762TS4nJ8kZjeSVlFt/DnPu8m4nzre3VUIdbPHPSto6SqhytNVppcft
-         Sc0YyqR3g8pMQlqatzulAzlVUon5mUeYcYswiW4ectcWCntpXIGawNpAlN/BW9/QxwYn
-         PPxA==
-X-Gm-Message-State: AOAM531Oq+aIkppVYpqO6+t4+QJyibOaDRbaHHFyFNwwt2fClE+Yttnt
-        TaT3Lq7kZ9fuixZtpG7BVZY=
-X-Google-Smtp-Source: ABdhPJygultcXZ5O6UR+Ra3FMuRkjBlnywYkj/YSuUzgBBN4t/ktdv6OEJaf5N8LyoDiF4gs7MeeKQ==
-X-Received: by 2002:a17:906:974c:: with SMTP id o12mr2362914ejy.229.1637657214203;
-        Tue, 23 Nov 2021 00:46:54 -0800 (PST)
-Received: from ?IPV6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a? ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
-        by smtp.googlemail.com with ESMTPSA id cs12sm5074681ejc.15.2021.11.23.00.46.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 23 Nov 2021 00:46:53 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <4041d98a-23df-e9ed-b245-5edd7151fec5@redhat.com>
-Date:   Tue, 23 Nov 2021 09:46:34 +0100
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=DBXVr+2yQA4Yc+mJwCPapHs1PcqJSd/+SbzdjhsE7eQ=;
+        b=6WdiaCBOaS6xCvGnnuRIBmSnOb3DqXdGjw5D/t7imUPg+VOTUtL+YxspaHEuMafIhO
+         yHEF7Qdh5SGmjWXwVianFMdSZFb3AwDGL985zYUJADtVgliXiemC06YguaMWJPtjNpVF
+         9Rs3E9nQcbhmI9TBfB730K/vAouUXLMAMlC6lAhpBUW3wdzry3QbfETOjeYMrazPLV1o
+         qIggv3Ox5V2fIQfpm1ESLwiXaibgieMHjcI4g9E9LyhITD/viriFgmZOprGfrmOfAP6b
+         FsVQ+TnYV2t9jJyPK3jJFF/txMZy2z7HkVLJxjMhtYhurfS4yW7D7R105sGFND+9+5cI
+         YiIA==
+X-Gm-Message-State: AOAM530nqAxH5FvBvXi+GKxqsQ2Jj5lIvstH4BYsot7NDAUUpRSjq9q7
+        4ZdXk2DiZW4RMv+FFWms6yu2sZUegJ88zi1J3Ac=
+X-Google-Smtp-Source: ABdhPJyV8N4uTWtSKAXkho6FQARGrSKK826QDkGBPYwHU5CmcNT4nSlhezNnQ4W2tJXFL/yzSPWCV0Xr/ROVys19fII=
+X-Received: by 2002:a67:3093:: with SMTP id w141mr5611450vsw.24.1637657270801;
+ Tue, 23 Nov 2021 00:47:50 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [RFC v2 PATCH 09/13] KVM: Introduce kvm_memfd_invalidate_range
-Content-Language: en-US
-To:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, qemu-devel@nongnu.org
-Cc:     Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
-        Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, john.ji@intel.com, susie.li@intel.com,
-        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
-        david@redhat.com
-References: <20211119134739.20218-1-chao.p.peng@linux.intel.com>
- <20211119134739.20218-10-chao.p.peng@linux.intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211119134739.20218-10-chao.p.peng@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Received: by 2002:ab0:6e93:0:0:0:0:0 with HTTP; Tue, 23 Nov 2021 00:47:50
+ -0800 (PST)
+Reply-To: corporationchevronoil@gmail.com
+From:   Chevronoil Corporation <george.ghuba101@gmail.com>
+Date:   Tue, 23 Nov 2021 09:47:50 +0100
+Message-ID: <CAEeBM7sCcDM4qemqCe_y1e12EJeGMK5S5NgMUrYReGyG28nhTQ@mail.gmail.com>
+Subject: interested reply
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/19/21 14:47, Chao Peng wrote:
-> +
-> +	/* Prevent memslot modification */
-> +	spin_lock(&kvm->mn_invalidate_lock);
-> +	kvm->mn_active_invalidate_count++;
-> +	spin_unlock(&kvm->mn_invalidate_lock);
-> +
-> +	ret = __kvm_handle_useraddr_range(kvm, &useraddr_range);
-> +
-> +	spin_lock(&kvm->mn_invalidate_lock);
-> +	kvm->mn_active_invalidate_count--;
-> +	spin_unlock(&kvm->mn_invalidate_lock);
-> +
+BEWARE, Real company doesn't ask for money, Chevron Oil and Gas United
+States is employing now free flight ticket, if you are interested
+reply with your Resume/CV.
 
-
-You need to follow this with a rcuwait_wake_up as in 
-kvm_mmu_notifier_invalidate_range_end.
-
-It's probably best if you move the manipulations of 
-mn_active_invalidate_count from kvm_mmu_notifier_invalidate_range_* to 
-two separate functions.
-
-Paolo
+Regards,
+Mr Jack McDonald.
+Chevron Corporation United USA.
