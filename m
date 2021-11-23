@@ -2,253 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EB31B459CAC
-	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 08:22:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 32F12459CAF
+	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 08:22:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233949AbhKWHZh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Nov 2021 02:25:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48538 "EHLO
+        id S233970AbhKWHZ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Nov 2021 02:25:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48634 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231577AbhKWHZh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Nov 2021 02:25:37 -0500
-Received: from mail-ot1-x32d.google.com (mail-ot1-x32d.google.com [IPv6:2607:f8b0:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64EAEC061574;
-        Mon, 22 Nov 2021 23:22:29 -0800 (PST)
-Received: by mail-ot1-x32d.google.com with SMTP id u18-20020a9d7212000000b00560cb1dc10bso32437631otj.11;
-        Mon, 22 Nov 2021 23:22:29 -0800 (PST)
+        with ESMTP id S233965AbhKWHZ6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Nov 2021 02:25:58 -0500
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D124C061574;
+        Mon, 22 Nov 2021 23:22:51 -0800 (PST)
+Received: by mail-pj1-x1029.google.com with SMTP id n15-20020a17090a160f00b001a75089daa3so1396556pja.1;
+        Mon, 22 Nov 2021 23:22:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=E6qdF+xT3t2HA1txTSkWAyaI9rgoVw9j02qTMEQZZ0U=;
-        b=mGzEZJuUONGTeP9qivEXdM4XgtUaymQ6an6yMvu4DlZ4uEOly+8qIMcpm3NvxL9GlG
-         dTmhkv1WROS1vSamIvkuUzP/FebadrOUv7a/bzHkeVGwzHpF+9cjlS0ERcV66KZRrX0M
-         aWK8DT7u9xcvnYSH5xXGLgY3YWNoExBzWhAZ6IiEFuZjZA0126rRN1UiiPgxxMRPcmDM
-         IKmzxS4cWdjHDb+ervmHgpZONrHu6lePT5AYjUYSWou289oFLB1YOiTdOzLg7TB/Us2g
-         njgcyz/2bPt+7ZRFD8Oe60U6iocfQV4x3dsCzC9W3su2KDOq+tj48p3MMHUFUkP8CgE0
-         HGQw==
+        h=to:cc:references:subject:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=E152euvL8xFG6VtAVAYhcexuCCdzDHvA0/ZqwvZLKFw=;
+        b=SO9zbuw+diZKTBr22YgM1YDinZbXMFBFDBKd3Lax/vvRG70Ooa3eUp7TS57a1wHgGQ
+         9w8xYbZZ/TNLehbBL18OAuuI37+sB2rnLFMbaZSdCtjYcqRKz+79upKooeCW2LL8FN5y
+         tb9N+mCo9CEV6iVDnSpRghWJFw8g6MpsccfzGOEwjasGJrqcCK0Keq/d1UIoPEEeq2+L
+         qYz8gOilk3JUWzLgOEOpZalnY800qzwWNhioDWDmEXD8+Sj4QmyNXSfclYDQbG2JzqqQ
+         8wQdEhLFOfl1wm+wAWrQlrUJ8CATRGiH1KX4Unud7EQGn2woAVVM5+eFd9sHAEsu1M/y
+         sEZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=E6qdF+xT3t2HA1txTSkWAyaI9rgoVw9j02qTMEQZZ0U=;
-        b=nh++loW1FNkK/Hn/OcKg1UHSREizmmimhQL1HT0DDFuPe9RZdVvfk07wQ+DU+NCkNM
-         ffOgXuGhP85ZpyNDeUEXI4EjyYphImQABJkQxp9Y6ECFHwMrsFmelUM900beNVPgFl2z
-         gCDf815G0D10G2bGtDzaeSd5dfntkfWv9RioB/iYALzRV+Oh33ZfkHuPjjJ9bLE7XoyD
-         hny9ssR9sg/TsFIM2Tox6Wd7dKjR9EbdvCOwL+FOl6kAiDzPmQjXyJA5ksRPTq6hPGdo
-         cQZTY1zZ1/WZhC48bwAmA1gDZNA0olKWuZCNyKHSqw153+KVdcQ8HTD79Obq957AFH2L
-         ewjw==
-X-Gm-Message-State: AOAM533YCHABccd4k9RXTcHsUBrX9lIxx3tLnnnmAoVVwWNFhrC0adBf
-        LAfG7hkx/l76K9ewyadV9bYdFAe6C92AFJh+qPE=
-X-Google-Smtp-Source: ABdhPJwGo5ukFvItEeIr8a9Of+4gCrN+cKsOBRDKfW6LXKRDsQrtWJfZdoK1Tt5Q+7AIAtW6SVhpKwL1SmUd2mFDs4g=
-X-Received: by 2002:a9d:6559:: with SMTP id q25mr2445324otl.0.1637652148527;
- Mon, 22 Nov 2021 23:22:28 -0800 (PST)
+        h=x-gm-message-state:to:cc:references:subject:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=E152euvL8xFG6VtAVAYhcexuCCdzDHvA0/ZqwvZLKFw=;
+        b=bl/OEuWGOw7zUf73btV8I9NN5VVa9xb2HYpfny18b1of4c4K1YPSDYi9OXGpzS5Tgf
+         ZuyzVVu3QIdtoju4T/PpP5FkuywAIJVPwqwrK+YNHZ+3imCnbVk2Luge7jGS8WzQJJfj
+         3uWRdzfjtCp79YRkzLnnDuikThLFokFpk3y8Lmm7jwhll98BlESagb+x8FnU4EXGygXa
+         hzhPs9mx268SFPKkbqCK9rJTEMyQ9hN48UPKawz3kAkZzxx8R/GXUhRoNPD1qVY3nwss
+         e7DgcAEkZQuPpYTkHFVbJUkm6e4gVhL33zIn+t1k4uMjRwsvgpLevrIpS2xKCR1u7RKZ
+         6CDg==
+X-Gm-Message-State: AOAM5325A4VhRHqxTyFO8Pm/dto4yo/SsZduwf98VAw1pT5D4TNZheJ4
+        wbWr9z+Mnlo6aEmNuBuxOvw=
+X-Google-Smtp-Source: ABdhPJyGKnaA+H7NrpBN2lqstj0eyHlhXCpNCfzFdZJJUs82VkCATzi6Dr3KMHEmUGe7tiJahjpy4Q==
+X-Received: by 2002:a17:90b:4a05:: with SMTP id kk5mr388499pjb.142.1637652170654;
+        Mon, 22 Nov 2021 23:22:50 -0800 (PST)
+Received: from [192.168.11.5] (KD106167171201.ppp-bb.dion.ne.jp. [106.167.171.201])
+        by smtp.gmail.com with ESMTPSA id p6sm198907pjb.48.2021.11.22.23.22.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 22 Nov 2021 23:22:50 -0800 (PST)
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        linux-doc@vger.kernel.org, Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Yishai Hadas <yishaih@nvidia.com>
+References: <20211123002042.GQ2105516@nvidia.com>
+Subject: Re: [PATCH RFC] vfio: Documentation for the migration region
+From:   Akira Yokosawa <akiyks@gmail.com>
+Message-ID: <62d331f3-ce82-dbb0-bb94-7a2ce50d231c@gmail.com>
+Date:   Tue, 23 Nov 2021 16:22:45 +0900
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-References: <20211122095619.000060d2@gmail.com> <YZvrvmRnuDc1e+gi@google.com>
- <CANRm+Cx+bC8D7s1qzJYbrT+1rm46wxg6bAXD+kGYAHGnruZMXw@mail.gmail.com>
- <3204a646aa9d43d0b9af8da1c5ddf79f@kingsoft.com> <CANRm+CxAM-h1F3CTNUY6wc-LAgRPDbwFrTPKXS_aoOBx9mveCQ@mail.gmail.com>
- <20211123145713.76a7d5b8@gmail.com>
-In-Reply-To: <20211123145713.76a7d5b8@gmail.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Tue, 23 Nov 2021 15:22:17 +0800
-Message-ID: <CANRm+CzDBZRMC5L2_NuEG8Ek-d8fJqC-SLRxM7p0=6XuB-2w=w@mail.gmail.com>
-Subject: Re: [PATCH] KVM: LAPIC: Per vCPU control over kvm_can_post_timer_interrupt
-To:     Aili Yao <yaoaili126@gmail.com>
-Cc:     =?UTF-8?B?eWFvYWlsaSBb5LmI54ix5YipXQ==?= <yaoaili@kingsoft.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20211123002042.GQ2105516@nvidia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 23 Nov 2021 at 15:04, Aili Yao <yaoaili126@gmail.com> wrote:
->
-> On Tue, 23 Nov 2021 14:24:19 +0800
-> Wanpeng Li <kernellwp@gmail.com> wrote:
->
-> > On Tue, 23 Nov 2021 at 12:11, yaoaili [=E4=B9=88=E7=88=B1=E5=88=A9] <ya=
-oaili@kingsoft.com>
-> > wrote:
-> > >
-> > > > On Tue, 23 Nov 2021 at 03:14, Sean Christopherson
-> > > > <seanjc@google.com> wrote:
-> > > > >
-> > > > > On Mon, Nov 22, 2021, Aili Yao wrote:
-> > > > > > From: Aili Yao <yaoaili@kingsoft.com>
-> > > > > >
-> > > > > > When we isolate some pyhiscal cores, We may not use them for
-> > > > > > kvm guests, We may use them for other purposes like DPDK, or
-> > > > > > we can make some kvm guests isolated and some not, the global
-> > > > > > judgement pi_inject_timer is not enough; We may make wrong
-> > > > > > decisions:
-> > > > > >
-> > > > > > In such a scenario, the guests without isolated cores will
-> > > > > > not be permitted to use vmx preemption timer, and tscdeadline
-> > > > > > fastpath also be disabled, both will lead to performance
-> > > > > > penalty.
-> > > > > >
-> > > > > > So check whether the vcpu->cpu is isolated, if not, don't
-> > > > > > post timer interrupt.
-> > > > > >
-> > > > > > Signed-off-by: Aili Yao <yaoaili@kingsoft.com>
-> > > > > > ---
-> > > > > >  arch/x86/kvm/lapic.c | 4 +++-
-> > > > > >  1 file changed, 3 insertions(+), 1 deletion(-)
-> > > > > >
-> > > > > > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c index
-> > > > > > 759952dd1222..72dde5532101 100644
-> > > > > > --- a/arch/x86/kvm/lapic.c
-> > > > > > +++ b/arch/x86/kvm/lapic.c
-> > > > > > @@ -34,6 +34,7 @@
-> > > > > >  #include <asm/delay.h>
-> > > > > >  #include <linux/atomic.h>
-> > > > > >  #include <linux/jump_label.h>
-> > > > > > +#include <linux/sched/isolation.h>
-> > > > > >  #include "kvm_cache_regs.h"
-> > > > > >  #include "irq.h"
-> > > > > >  #include "ioapic.h"
-> > > > > > @@ -113,7 +114,8 @@ static inline u32 kvm_x2apic_id(struct
-> > > > > > kvm_lapic *apic)
-> > > > > >
-> > > > > >  static bool kvm_can_post_timer_interrupt(struct kvm_vcpu
-> > > > > > *vcpu)  {
-> > > > > > -     return pi_inject_timer && kvm_vcpu_apicv_active(vcpu);
-> > > > > > +     return pi_inject_timer && kvm_vcpu_apicv_active(vcpu) &&
-> > > > > > +             !housekeeping_cpu(vcpu->cpu, HK_FLAG_TIMER);
-> > > > >
-> > > > > I don't think this is safe, vcpu->cpu will be -1 if the vCPU
-> > > > > isn't scheduled in.
-> > >
-> > > Yes, vcpu->cpu is  -1 before vcpu create, but in my environments,
-> > > it didn't trigger this issue. I need to dig more, Thanks!
-> > > Maybe I need one valid check here.
-> > >
-> > > > > This also doesn't play nice with the admin forcing
-> > > > > pi_inject_timer=3D1. Not saying there's a reasonable use case for
-> > > > > doing that, but it's supported today and this would break that
-> > > > > behavior.  It would also lead to weird behavior if a vCPU were
-> > > > > migrated on/off a housekeeping vCPU.  Again, probably not a
-> > > > > reasonable use case, but I don't see anything
-> > > > that would outright prevent that behavior.
-> > >
-> > > Yes,  this is not one common operation,  But I did do test some
-> > > scenarios: 1. isolated cpu --> housekeeping cpu;
-> > >     isolated guest timer is in housekeeping CPU, for migration,
-> > > kvm_can_post_timer_interrupt will return false, so the timer may be
-> > > migrated to vcpu->cpu; This seems works in my test;
-> > > 2. isolated --> isolated
-> > >     Isolated guest timer is in housekeeping cpu, for
-> > > migration,kvm_can_post_timer_interrupt return true, timer is not
-> > > migrated 3. housekeeping CPU --> isolated CPU
-> > >     non-isolated CPU timer is usually in vcpu->cpu, for migration
-> > > to isolated, kvm_can_post_timer_interrupt will be true,  the timer
-> > > remain on the same CPU; This seems works in my test;
-> > > 4. housekeeping CPU --> housekeeping CPU
-> > >      timer migrated;
-> > > It seems this is not an affecting problem;
-> > >
-> > > > >
-> > > > > The existing behavior also feels a bit unsafe as
-> > > > > pi_inject_timer is writable while KVM is running, though I
-> > > > > supposed that's orthogonal to this
-> > > > discussion.
-> > > > >
-> > > > > Rather than check vcpu->cpu, is there an existing vCPU flag
-> > > > > that can be queried, e.g. KVM_HINTS_REALTIME?
-> > > >
-> > > > How about something like below:
-> > > >
-> > > > From 67f605120e212384cb3d5788ba8c83f15659503b Mon Sep 17 00:00:00
-> > > > 2001
-> > > > From: Wanpeng Li <wanpengli@tencent.com>
-> > > > Date: Tue, 23 Nov 2021 10:36:10 +0800
-> > > > Subject: [PATCH] KVM: LAPIC: To keep the vCPUs in non-root mode
-> > > > for timer- pi
-> > > >
-> > > > From: Wanpeng Li <wanpengli@tencent.com>
-> > > >
-> > > > As commit 0c5f81dad46 (KVM: LAPIC: Inject timer interrupt via
-> > > > posted interrupt) mentioned that the host admin should well tune
-> > > > the guest setup, so that vCPUs are placed on isolated pCPUs, and
-> > > > with several pCPUs surplus for
-> > > > *busy* housekeeping.
-> > > > It is better to disable mwait/hlt/pause vmexits to keep the vCPUs
-> > > > in non-root mode. However, we may isolate pCPUs for other purpose
-> > > > like DPDK or we can make some guests isolated and others not,
-> > > > Let's add the checking kvm_mwait_in_guest() to
-> > > > kvm_can_post_timer_interrupt() since we can't benefit from timer
-> > > > posted-interrupt w/o keeping the vCPUs in non-root mode.
-> > > >
-> > > > Reported-by: Aili Yao <yaoaili@kingsoft.com>
-> > > > Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
-> > > > ---
-> > > >  arch/x86/kvm/lapic.c | 5 ++---
-> > > >  1 file changed, 2 insertions(+), 3 deletions(-)
-> > > >
-> > > > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c index
-> > > > 759952dd1222..8257566d44c7 100644
-> > > > --- a/arch/x86/kvm/lapic.c
-> > > > +++ b/arch/x86/kvm/lapic.c
-> > > > @@ -113,14 +113,13 @@ static inline u32 kvm_x2apic_id(struct
-> > > > kvm_lapic *apic)
-> > > >
-> > > >  static bool kvm_can_post_timer_interrupt(struct kvm_vcpu *vcpu)
-> > > > {
-> > > > -    return pi_inject_timer && kvm_vcpu_apicv_active(vcpu);
-> > > > +    return pi_inject_timer && kvm_mwait_in_guest(vcpu->kvm) &&
-> > > > kvm_vcpu_apicv_active(vcpu);
-> > > >  }
-> > > >
-> > > >  bool kvm_can_use_hv_timer(struct kvm_vcpu *vcpu)  {
-> > > >      return kvm_x86_ops.set_hv_timer
-> > > > -           && !(kvm_mwait_in_guest(vcpu->kvm) ||
-> > > > -            kvm_can_post_timer_interrupt(vcpu));
-> > > > +           && !kvm_mwait_in_guest(vcpu->kvm);
-> > > >  }
-> > > >  EXPORT_SYMBOL_GPL(kvm_can_use_hv_timer);
-> > >
-> > > This method seems more quick and safe, but I have one question:
-> > > Does this kvm_mwait_in_guest can guarantee the CPU isolated,  in
-> > > some production environments and usually,  MWAIT feature is
-> > > disabled in host and even guests with isolated CPUs.  And also we
-> > > can set guests kvm_mwait_in_guest true with CPUs just pinned, not
-> > > isolated.
-> >
-> > You won't benefit from timer posted-interrupt if mwait is not exposed
-> > to the guest since you can't keep CPU in non-root mode.
-> > kvm_mwait_in_guest() will not guarantee the CPU is isolated, but
-> > what's still bothering?
->
-> Sorry, Did I miss some thing?
->
-> What in my mind: MWait may be disabled in bios, so host will use halt
-> instruction as one replacement for idle operation, in such a
-> configuration, Mwait in guest will also be disabled even if you try to
-> set kvm_mwait_in_guest true; As a result, halt,pause may not exit the
-> guest, so the post interrupt still counts?
+On Mon, 22 Nov 2021 20:20:42 -0400, Jason Gunthorpe wrote:
+> On Mon, Nov 22, 2021 at 01:31:14PM -0700, Jonathan Corbet wrote:
+>> Jason Gunthorpe <jgg@nvidia.com> writes:
+>> 
+>> > Provide some more complete documentation for the migration region's
+>> > behavior, specifically focusing on the device_state bits and the whole
+>> > system view from a VMM.
+>> >
+>> > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+>> >  Documentation/driver-api/vfio.rst | 208 +++++++++++++++++++++++++++++-
+>> >  1 file changed, 207 insertions(+), 1 deletion(-)
+>> >
+>> > Alex/Cornelia, here is the first draft of the requested documentation I promised
+>> >
+>> > We think it includes all the feedback from hns, Intel and NVIDIA on this mechanism.
+>> >
+>> > Our thinking is that NDMA would be implemented like this:
+>> >
+>> >    +#define VFIO_DEVICE_STATE_NDMA      (1 << 3)
+>> >
+>> > And a .add_capability ops will be used to signal to userspace driver support:
+>> >
+>> >    +#define VFIO_REGION_INFO_CAP_MIGRATION_NDMA    6
+>> >
+>> > I've described DIRTY TRACKING as a seperate concept here. With the current
+>> > uAPI this would be controlled by VFIO_IOMMU_DIRTY_PAGES_FLAG_START, with our
+>> > change in direction this would be per-tracker control, but no semantic change.
+>> >
+>> > Upon some agreement we'll include this patch in the next iteration of the mlx5 driver
+>> > along with the NDMA bits.
+>> >
+>> > Thanks,
+>> > Jason
+>> >
+>> > diff --git a/Documentation/driver-api/vfio.rst b/Documentation/driver-api/vfio.rst
+>> > index c663b6f978255b..b28c6fb89ee92f 100644
+>> > +++ b/Documentation/driver-api/vfio.rst
+>> > @@ -242,7 +242,213 @@ group and can access them as follows::
+>> >  VFIO User API
+>> >  
+>> > -Please see include/linux/vfio.h for complete API documentation.
+>> > +Please see include/uapi/linux/vfio.h for complete API documentation.
+>> > +
+>> > +-------------------------------------------------------------------------------
+>> > +
+>> > +VFIO migration driver API
+>> > +-------------------------------------------------------------------------------
+>> > +
+>> > +VFIO drivers that support migration implement a migration control register
+>> > +called device_state in the struct vfio_device_migration_info which is in its
+>> > +VFIO_REGION_TYPE_MIGRATION region.
+>> > +
+>> > +The device_state triggers device action both when bits are set/cleared and
+>> > +continuous behavior for each bit. For VMMs they can also control if the VCPUs in
+>> > +a VM are executing (VCPU RUNNING) and if the IOMMU is logging DMAs (DIRTY
+>> > +TRACKING). These two controls are not part of the device_state register, KVM
+>> > +will be used to control the VCPU and VFIO_IOMMU_DIRTY_PAGES_FLAG_START on the
+>> > +container controls dirty tracking.
+>> > +
+>> > +Along with the device_state the migration driver provides a data window which
+>> > +allows streaming migration data into or out of the device.
+>> > +
+>> > +A lot of flexibility is provided to userspace in how it operates these bits. The
+>> > +reference flow for saving device state in a live migration, with all features:
+>> > +
+>> > +  RUNNING, VCPU_RUNNING
+>> > +     Normal operating state
 
-I prefer to expose mwait/hlt/pause to the guest simultaneously, you
-don't need the ultra schedule latency/performance if you aren't
-exposing mwait. Then why do you care about latency from the timer?
+Hi.
 
->
-> For current code, We can migrate guest between isolated and
-> housekeeping or we can change the cpu pinning on the fly, we allow this
-> even the operation is not usually used, right?
+So if you'd like definition lists of ReST, adding empty lines here
 
-My patch will not prevent using vmx preemption timer or tscdeadline fastpat=
-h.
+>> > +  RUNNING, DIRTY TRACKING, VCPU RUNNING>> > +     Log DMAs
 
-    Wanpeng
+and here should do the trick.
+
+>> > +     Stream all memory
+
+Ditto for the rest of the lists.
+
+>> 
+>> So I'd recommend actually building the docs and looking at the result;
+>> this will not render the way you expect it to.  
+> 
+> Hum... It is really close to what I'd like, with the state names
+> bolded and in something like an enumerated list
+> 
+> But on close inspection I see the text fragments have been assembled
+> together. I'd probably try to make them into sentances than go to a
+> literal block?
+
+Please see ReST documentation for further info:
+
+    https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html#definition-lists
+
+        Thanks, Akira
+> 
+> Thanks,
+> Jason
