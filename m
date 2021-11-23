@@ -2,472 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C41CC45A1BE
-	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 12:42:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 84DD145A251
+	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 13:16:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236352AbhKWLpO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Nov 2021 06:45:14 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35340 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S236399AbhKWLpN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 23 Nov 2021 06:45:13 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1ANBUTG3010287;
-        Tue, 23 Nov 2021 11:42:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=fVp9iFq0ni2/iL7oMuZXRGD7i5RSpVKkHJGzb+51o/E=;
- b=ZBgrYkywFXOZ6HIBEMBu3B9eCv1NyfNOXg8l/891b+AcNdumg2ztSt0ba9itSn5T3i+r
- tl2FP88EPfglOtLoNErdYFPJwmB2mpUi7u3vc6BC589YSP5X60wlwz6VehQ8vie0T0f3
- dwredpPTcig9rqLRTUN7sosxkuUZi3ukOf7PI/YCXL3BY9iozm/SjsLEh2/cU8Ajb06r
- PL9/QZyWOoAFNUxlzQNopqMzvvJvw5HwyL2r7X49ORb1a5OKeFhCptBg86a5ZrH97Ws3
- KZ+oB6qdTYTh7mSrMY3dPAFWtfXgnNygOfNx3Hdazq3E/7KfhnpSXAXvS3dmGCrCVz9O Aw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3cgyfvg774-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Nov 2021 11:42:04 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1ANBVwPj014009;
-        Tue, 23 Nov 2021 11:42:04 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3cgyfvg76j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Nov 2021 11:42:04 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1ANBd9b8014024;
-        Tue, 23 Nov 2021 11:42:02 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma04ams.nl.ibm.com with ESMTP id 3cernaq9ay-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Nov 2021 11:42:02 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1ANBfw4S18546964
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 23 Nov 2021 11:41:58 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B898711C064;
-        Tue, 23 Nov 2021 11:41:58 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 48DEA11C04A;
-        Tue, 23 Nov 2021 11:41:58 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.4.158])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 23 Nov 2021 11:41:58 +0000 (GMT)
-Date:   Tue, 23 Nov 2021 12:41:33 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org, david@redhat.com,
-        thuth@redhat.com, seiden@linux.ibm.com, mhartmay@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH 8/8] s390x: sie: Add PV diag test
-Message-ID: <20211123124133.3a045ef0@p-imbrenda>
-In-Reply-To: <20211123103956.2170-9-frankja@linux.ibm.com>
-References: <20211123103956.2170-1-frankja@linux.ibm.com>
-        <20211123103956.2170-9-frankja@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S236011AbhKWMTd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Nov 2021 07:19:33 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:41754 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229939AbhKWMTa (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 23 Nov 2021 07:19:30 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1637669782;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=0lTu4UDtxs9G6akE9Ez/8GeGccVaaleJp/KA7PEeCZI=;
+        b=RjaVebfbaJBsetzJUGoxL5r2qtfOWKt1mONywQpz6T2146e0VNuf2SpX0HPDU/DNRUoD71
+        zZJ88x/tn3GJfoLo0z9D1gpeTuO1aMz/N/OEB4GI1wyA8K18+9HjVEdV4DPZil4Adx+bvu
+        D9LH2JrLRfOZ/OEbHF4L9Uj8vKzYnME=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-283-Bs2hW7wxOpO7rKc5JVGstw-1; Tue, 23 Nov 2021 07:16:21 -0500
+X-MC-Unique: Bs2hW7wxOpO7rKc5JVGstw-1
+Received: by mail-pj1-f72.google.com with SMTP id u11-20020a17090a4bcb00b001a6e77f7312so1268743pjl.5
+        for <kvm@vger.kernel.org>; Tue, 23 Nov 2021 04:16:20 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=0lTu4UDtxs9G6akE9Ez/8GeGccVaaleJp/KA7PEeCZI=;
+        b=onGHM+jZ28LBVQ9qoFVTE1Yc0Ar4IOtx2Npx1cAcZ5DTiHmumuOD6rpBJ1kd5vUFrn
+         6rIQWBdcsgg0wOanwAfaDQtpOYqvRBxr1q1lZyHF3GxwO9YltXl5tFFD8Y25hqvh54Y0
+         Ec0QznAno0geh+0ihganCAySYhmWszs68wu+Ly8bPIfCR3Padk4xRkX7LQY3MO54S19P
+         xGQOozG3n02aKlFkxc1c87XDEJ+vYIvJNgUzLaats3IbE9U7M56W/iIRG900snFmLCLH
+         aG2lUQz7fSbJs0Fq7zFkKH6iS6Bp/zIzo0pxGd9oNwxB0zAGxdsScBeZeU3Hr7LefqXK
+         1Ghw==
+X-Gm-Message-State: AOAM531D+xoECJlnvc72tr3oD4KSRnYW8qH7xcvuDWpRCQSYHOGUrZ5N
+        JRNflVpc4JHvfeI2MeeUPcAAQgOLRTbU5XbDz28Rws1TtIInssTIz3Am45XpaqCMhw3hFJBO3Jf
+        ubysR6hz9hIJv
+X-Received: by 2002:a62:7c8b:0:b0:49f:a8ae:de33 with SMTP id x133-20020a627c8b000000b0049fa8aede33mr4665106pfc.29.1637669779922;
+        Tue, 23 Nov 2021 04:16:19 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzXoQ6l69oslSPduxOpj5oSb0/wv8X2UapMrfGsTgsa2jNnmdantJusdefawcE93caP/ffL5g==
+X-Received: by 2002:a62:7c8b:0:b0:49f:a8ae:de33 with SMTP id x133-20020a627c8b000000b0049fa8aede33mr4665066pfc.29.1637669779657;
+        Tue, 23 Nov 2021 04:16:19 -0800 (PST)
+Received: from xz-m1.local ([191.101.132.71])
+        by smtp.gmail.com with ESMTPSA id b4sm13267412pfl.60.2021.11.23.04.16.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Nov 2021 04:16:19 -0800 (PST)
+Date:   Tue, 23 Nov 2021 20:15:57 +0800
+From:   Peter Xu <peterx@redhat.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        kvm list <kvm@vger.kernel.org>,
+        Ben Gardon <bgardon@google.com>,
+        Junaid Shahid <junaids@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Harish Barathvajasankar <hbarath@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Shier <pshier@google.com>
+Subject: Re: RFC: KVM: x86/mmu: Eager Page Splitting
+Message-ID: <YZzbfYeVSJ/rPTuI@xz-m1.local>
+References: <CALzav=dV_U4r1K9oDq4esb4mpBQDQ2ROQ5zH5wV3KpOaZrRW-A@mail.gmail.com>
+ <bc06dd82-06e1-b455-b2c1-59125b530dda@linux.vnet.ibm.com>
+ <YYmRpz4dQgli3GKM@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: F0DSJZlRtuxOLdgVOUdgDE-hNEQ9yYf2
-X-Proofpoint-ORIG-GUID: XrvNsFuKL_POUF4l5uU9OuYA-KQ33aVA
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-11-23_04,2021-11-23_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
- lowpriorityscore=0 phishscore=0 priorityscore=1501 bulkscore=0 spamscore=0
- clxscore=1015 mlxscore=0 impostorscore=0 malwarescore=0 adultscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2111230064
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <YYmRpz4dQgli3GKM@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 23 Nov 2021 10:39:56 +0000
-Janosch Frank <frankja@linux.ibm.com> wrote:
-
-> Let's start testing the format 4 (PV) SIE via the diagnose
-> instructions since most of them are pretty simple to handle.
+On Mon, Nov 08, 2021 at 09:07:51PM +0000, David Matlack wrote:
+> On Fri, Nov 05, 2021 at 06:17:11PM +0100, Janis Schoetterl-Glausch wrote:
+> > On 11/4/21 23:45, David Matlack wrote:
+> > 
+> > [...]
+> > > 
+> > > The last alternative is to perform dirty tracking at a 2M granularity.
+> > > This would reduce the amount of splitting work required by 512x,
+> > > making the current approach of splitting on fault less impactful to
+> > > customer performance. We are in the early stages of investigating 2M
+> > > dirty tracking internally but it will be a while before it is proven
+> > > and ready for production. Furthermore there may be scenarios where
+> > > dirty tracking at 4K would be preferable to reduce the amount of
+> > > memory that needs to be demand-faulted during precopy.
 > 
-> The tests check for the intercept values like ipa/ipb and icptcode as
-> well as the values in the registers and handling of the exception
-> injection.
-> 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Oops I meant to say "demand-faulted during post-copy" here.
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Sorry to join late, but this does sound like an interesting topic, too.
 
-> ---
->  s390x/Makefile                             |   7 +
->  s390x/pv-diags.c                           | 240 +++++++++++++++++++++
->  s390x/snippets/asm/snippet-pv-diag-288.S   |  25 +++
->  s390x/snippets/asm/snippet-pv-diag-500.S   |  39 ++++
->  s390x/snippets/asm/snippet-pv-diag-yield.S |   7 +
->  5 files changed, 318 insertions(+)
->  create mode 100644 s390x/pv-diags.c
->  create mode 100644 s390x/snippets/asm/snippet-pv-diag-288.S
->  create mode 100644 s390x/snippets/asm/snippet-pv-diag-500.S
->  create mode 100644 s390x/snippets/asm/snippet-pv-diag-yield.S
-> 
-> diff --git a/s390x/Makefile b/s390x/Makefile
-> index 55e6d962..4f2374a5 100644
-> --- a/s390x/Makefile
-> +++ b/s390x/Makefile
-> @@ -26,6 +26,8 @@ tests += $(TEST_DIR)/edat.elf
->  tests += $(TEST_DIR)/mvpg-sie.elf
->  tests += $(TEST_DIR)/spec_ex-sie.elf
->  
-> +pv-tests += $(TEST_DIR)/pv-diags.elf
-> +
->  ifneq ($(HOST_KEY_DOCUMENT),)
->  ifneq ($(GEN_SE_HEADER),)
->  tests += $(pv-tests)
-> @@ -98,6 +100,11 @@ snippet_lib = $(snippet_asmlib) lib/auxinfo.o
->  $(TEST_DIR)/mvpg-sie.elf: snippets = $(SNIPPET_DIR)/c/mvpg-snippet.gbin
->  $(TEST_DIR)/spec_ex-sie.elf: snippets = $(SNIPPET_DIR)/c/spec_ex.gbin
->  
-> +$(TEST_DIR)/pv-diags.elf: pv-snippets += $(SNIPPET_DIR)/asm/snippet-pv-diag-yield.gbin
-> +$(TEST_DIR)/pv-diags.elf: pv-snippets += $(SNIPPET_DIR)/asm/snippet-pv-diag-288.gbin
-> +$(TEST_DIR)/pv-diags.elf: pv-snippets += $(SNIPPET_DIR)/asm/snippet-pv-diag-500.gbin
-> +
-> +
->  ifneq ($(GEN_SE_HEADER),)
->  snippets += $(pv-snippets)
->  tests += $(pv-tests)
-> diff --git a/s390x/pv-diags.c b/s390x/pv-diags.c
-> new file mode 100644
-> index 00000000..82288943
-> --- /dev/null
-> +++ b/s390x/pv-diags.c
-> @@ -0,0 +1,240 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * PV virtualization interception tests for diagnose instructions.
-> + *
-> + * Copyright (c) 2021 IBM Corp
-> + *
-> + * Authors:
-> + *  Janosch Frank <frankja@linux.ibm.com>
-> + */
-> +#include <libcflat.h>
-> +#include <asm/asm-offsets.h>
-> +#include <asm-generic/barrier.h>
-> +#include <asm/interrupt.h>
-> +#include <asm/pgtable.h>
-> +#include <mmu.h>
-> +#include <asm/page.h>
-> +#include <asm/facility.h>
-> +#include <asm/mem.h>
-> +#include <asm/sigp.h>
-> +#include <smp.h>
-> +#include <alloc_page.h>
-> +#include <vm.h>
-> +#include <vmalloc.h>
-> +#include <sclp.h>
-> +#include <snippet.h>
-> +#include <sie.h>
-> +#include <uv.h>
-> +#include <asm/uv.h>
-> +
-> +static u8 *guest;
-> +static u8 *guest_instr;
-> +static struct vm vm;
-> +
-> +uint64_t tweak[2] = {0x42, 0x00};
-> +
-> +static void setup_vmem(void)
-> +{
-> +	uint64_t asce;
-> +
-> +	/* We need to have a valid primary ASCE to run guests. */
-> +	setup_vm();
-> +
-> +	/* Set P bit in ASCE as it is required for SE guests */
-> +	asce = stctg(1) | ASCE_P;
-> +	lctlg(1, asce);
-> +
-> +	/* Copy ASCE into home space CR */
-> +	lctlg(13, asce);
-> +}
-> +
-> +
-> +static void init_guest(const char *gbin, const char *hdr, uint64_t gbin_len,
-> +		       uint64_t hdr_len)
-> +{
-> +	uv_create_guest(&vm);
-> +	uv_set_se_hdr(vm.uv.vm_handle, (void *)hdr, hdr_len);
-> +
-> +	/* Copy test image to guest memory */
-> +	memcpy(guest_instr, gbin, gbin_len);
-> +
-> +	uv_unpack(&vm, SNIPPET_ENTRY_ADDR, gbin_len, tweak[0]);
-> +	uv_verify_load(&vm);
-> +
-> +	/* Manually import lowcore */
-> +	uv_import(vm.uv.vm_handle, (uint64_t)guest);
-> +	uv_import(vm.uv.vm_handle, (uint64_t)(guest + PAGE_SIZE));
-> +}
-> +
-> +static void setup_guest(void)
-> +{
-> +	setup_vmem();
-> +
-> +	/* Allocate 1MB as guest memory */
-> +	guest = alloc_pages(8);
-> +	memset(guest, 0, HPAGE_SIZE);
-> +	/* The first two pages are the lowcore */
-> +	guest_instr = guest + SNIPPET_ENTRY_ADDR;
-> +
-> +	sie_guest_create(&vm, (uint64_t)guest, HPAGE_SIZE);
-> +	/* FMT4 needs a ESCA */
-> +	sie_guest_sca_create(&vm);
-> +
-> +	uv_init();
-> +}
-> +
-> +static void test_diag_500(void)
-> +{
-> +	extern const char SNIPPET_NAME_START(asm, snippet_pv_diag_500)[];
-> +	extern const char SNIPPET_NAME_END(asm, snippet_pv_diag_500)[];
-> +	extern const char SNIPPET_HDR_START(asm, snippet_pv_diag_500)[];
-> +	extern const char SNIPPET_HDR_END(asm, snippet_pv_diag_500)[];
-> +	int size_hdr = SNIPPET_HDR_LEN(asm, snippet_pv_diag_500);
-> +	int size_gbin = SNIPPET_LEN(asm, snippet_pv_diag_500);
-> +
-> +	report_prefix_push("diag 0x500");
-> +
-> +	init_guest(SNIPPET_NAME_START(asm, snippet_pv_diag_500),
-> +		   SNIPPET_HDR_START(asm, snippet_pv_diag_500),
-> +		   size_gbin, size_hdr);
-> +
-> +	sie(&vm);
-> +	report(vm.sblk->icptcode == ICPT_PV_INSTR && vm.sblk->ipa == 0x8302 &&
-> +	       vm.sblk->ipb == 0x50000000 && vm.save_area.guest.grs[5] == 0x500,
-> +	       "intercept values");
-> +	report(vm.save_area.guest.grs[1] == 1 &&
-> +	       vm.save_area.guest.grs[2] == 2 &&
-> +	       vm.save_area.guest.grs[3] == 3 &&
-> +	       vm.save_area.guest.grs[4] == 4,
-> +	       "register values");
-> +	/*
-> +	 * Check if we can inject a PGM operand which we are always
-> +	 * allowed to do after a diag500 exit.
-> +	 */
-> +	vm.sblk->iictl = IICTL_CODE_OPERAND;
-> +	sie(&vm);
-> +	report(vm.sblk->icptcode == ICPT_PV_NOTIFY && vm.sblk->ipa == 0x8302 &&
-> +	       vm.sblk->ipb == 0x50000000 && vm.save_area.guest.grs[5] == 0x9c
-> +	       && vm.save_area.guest.grs[0] == PGM_INT_CODE_OPERAND,
-> +	       "operand exception");
-> +
-> +	/*
-> +	 * Check if we can inject a PGM specification which we are always
-> +	 * allowed to do after a diag500 exit.
-> +	 */
-> +	sie(&vm);
-> +	vm.sblk->iictl = IICTL_CODE_SPECIFICATION;
-> +	/* Inject PGM, next exit should be 9c */
-> +	sie(&vm);
-> +	report(vm.sblk->icptcode == ICPT_PV_NOTIFY && vm.sblk->ipa == 0x8302 &&
-> +	       vm.sblk->ipb == 0x50000000 && vm.save_area.guest.grs[5] == 0x9c
-> +	       && vm.save_area.guest.grs[0] == PGM_INT_CODE_SPECIFICATION,
-> +	       "specification exception");
-> +
-> +	/* No need for cleanup, just tear down the VM */
-> +	uv_destroy_guest(&vm);
-> +
-> +	report_prefix_pop();
-> +}
-> +
-> +
-> +static void test_diag_288(void)
-> +{
-> +	extern const char SNIPPET_NAME_START(asm, snippet_pv_diag_288)[];
-> +	extern const char SNIPPET_NAME_END(asm, snippet_pv_diag_288)[];
-> +	extern const char SNIPPET_HDR_START(asm, snippet_pv_diag_288)[];
-> +	extern const char SNIPPET_HDR_END(asm, snippet_pv_diag_288)[];
-> +	int size_hdr = SNIPPET_HDR_LEN(asm, snippet_pv_diag_288);
-> +	int size_gbin = SNIPPET_LEN(asm, snippet_pv_diag_288);
-> +
-> +	report_prefix_push("diag 0x288");
-> +
-> +	init_guest(SNIPPET_NAME_START(asm, snippet_pv_diag_288),
-> +		   SNIPPET_HDR_START(asm, snippet_pv_diag_288),
-> +		   size_gbin, size_hdr);
-> +
-> +	sie(&vm);
-> +	report(vm.sblk->icptcode == ICPT_PV_INSTR && vm.sblk->ipa == 0x8302 &&
-> +	       vm.sblk->ipb == 0x50000000 && vm.save_area.guest.grs[5] == 0x288,
-> +	       "intercept values");
-> +	report(vm.save_area.guest.grs[0] == 1 &&
-> +	       vm.save_area.guest.grs[1] == 2 &&
-> +	       vm.save_area.guest.grs[2] == 3,
-> +	       "register values");
-> +
-> +	/*
-> +	 * Check if we can inject a PGM spec which we are always
-> +	 * allowed to do after a diag288 exit.
-> +	 */
-> +	vm.sblk->iictl = IICTL_CODE_SPECIFICATION;
-> +	sie(&vm);
-> +	report(vm.sblk->icptcode == ICPT_PV_NOTIFY && vm.sblk->ipa == 0x8302 &&
-> +	       vm.sblk->ipb == 0x50000000 && vm.save_area.guest.grs[5] == 0x9c
-> +	       && vm.save_area.guest.grs[0] == PGM_INT_CODE_SPECIFICATION,
-> +	       "specification exception");
-> +
-> +	/* No need for cleanup, just tear down the VM */
-> +	uv_destroy_guest(&vm);
-> +
-> +	report_prefix_pop();
-> +}
-> +
-> +static void test_diag_yield(void)
-> +{
-> +	extern const char SNIPPET_NAME_START(asm, snippet_pv_diag_yield)[];
-> +	extern const char SNIPPET_NAME_END(asm, snippet_pv_diag_yield)[];
-> +	extern const char SNIPPET_HDR_START(asm, snippet_pv_diag_yield)[];
-> +	extern const char SNIPPET_HDR_END(asm, snippet_pv_diag_yield)[];
-> +	int size_hdr = SNIPPET_HDR_LEN(asm, snippet_pv_diag_yield);
-> +	int size_gbin = SNIPPET_LEN(asm, snippet_pv_diag_yield);
-> +
-> +	report_prefix_push("diag yield");
-> +
-> +	init_guest(SNIPPET_NAME_START(asm, snippet_pv_diag_yield),
-> +		   SNIPPET_HDR_START(asm, snippet_pv_diag_yield),
-> +		   size_gbin, size_hdr);
-> +
-> +	/* 0x44 */
-> +	report_prefix_push("0x44");
-> +	sie(&vm);
-> +	report(vm.sblk->icptcode == ICPT_PV_NOTIFY && vm.sblk->ipa == 0x8302 &&
-> +	       vm.sblk->ipb == 0x50000000 && vm.save_area.guest.grs[5] == 0x44,
-> +	       "intercept values");
-> +	report_prefix_pop();
-> +
-> +	/* 0x9c */
-> +	report_prefix_push("0x9c");
-> +	sie(&vm);
-> +	report(vm.sblk->icptcode == ICPT_PV_NOTIFY && vm.sblk->ipa == 0x8302 &&
-> +	       vm.sblk->ipb == 0x50000000 && vm.save_area.guest.grs[5] == 0x9c,
-> +	       "intercept values");
-> +	report(vm.save_area.guest.grs[0] == 42, "r1 correct");
-> +	report_prefix_pop();
-> +
-> +	uv_destroy_guest(&vm);
-> +	report_prefix_pop();
-> +}
-> +
-> +
-> +int main(void)
-> +{
-> +	report_prefix_push("pv-diags");
-> +	if (!test_facility(158)) {
-> +		report_skip("UV Call facility unavailable");
-> +		goto done;
-> +	}
-> +	if (!sclp_facilities.has_sief2) {
-> +		report_skip("SIEF2 facility unavailable");
-> +		goto done;
-> +	}
-> +
-> +	setup_guest();
-> +	test_diag_yield();
-> +	test_diag_288();
-> +	test_diag_500();
-> +	sie_guest_destroy(&vm);
-> +
-> +done:
-> +	report_prefix_pop();
-> +	return report_summary();
-> +}
-> diff --git a/s390x/snippets/asm/snippet-pv-diag-288.S b/s390x/snippets/asm/snippet-pv-diag-288.S
-> new file mode 100644
-> index 00000000..e3e63121
-> --- /dev/null
-> +++ b/s390x/snippets/asm/snippet-pv-diag-288.S
-> @@ -0,0 +1,25 @@
-> +#include <asm/asm-offsets.h>
-> +.section .text
-> +
-> +/* Clean and pre-load registers that are used for diag 288 */
-> +xgr	%r0, %r0
-> +xgr	%r1, %r1
-> +xgr	%r3, %r3
-> +lghi	%r0, 1
-> +lghi	%r1, 2
-> +lghi	%r2, 3
-> +
-> +/* Let's jump to the pgm exit label on a PGM */
-> +larl	%r4, exit_pgm
-> +stg     %r4, GEN_LC_PGM_NEW_PSW + 8
-> +
-> +/* Execute the diag288 */
-> +diag	%r0, %r2, 0x288
-> +
-> +/* Force exit if we don't get a PGM */
-> +diag	0, 0, 0x44
-> +
-> +/* Communicate the PGM code via diag9c(easiest) */
-> +exit_pgm:
-> +lh	%r1, GEN_LC_PGM_INT_CODE
-> +diag	%r1, 0, 0x9c
-> diff --git a/s390x/snippets/asm/snippet-pv-diag-500.S b/s390x/snippets/asm/snippet-pv-diag-500.S
-> new file mode 100644
-> index 00000000..50c06779
-> --- /dev/null
-> +++ b/s390x/snippets/asm/snippet-pv-diag-500.S
-> @@ -0,0 +1,39 @@
-> +#include <asm/asm-offsets.h>
-> +.section .text
-> +
-> +/* Clean and pre-load registers that are used for diag 500 */
-> +xgr	%r1, %r1
-> +xgr	%r2, %r2
-> +xgr	%r3, %r3
-> +xgr	%r4, %r4
-> +lghi	%r1, 1
-> +lghi	%r2, 2
-> +lghi	%r3, 3
-> +lghi	%r4, 4
-> +
-> +/* Let's jump to the next label on a PGM */
-> +xgr	%r5, %r5
-> +stg	%r5, GEN_LC_PGM_NEW_PSW
-> +larl	%r5, next
-> +stg	%r5, GEN_LC_PGM_NEW_PSW + 8
-> +
-> +/* Execute the diag500 */
-> +diag	0, 0, 0x500
-> +
-> +/* Should never be executed because of the PGM */
-> +diag	0, 0, 0x44
-> +
-> +/* Execute again to test spec PGM injection*/
-> +next:
-> +lh	%r1, GEN_LC_PGM_INT_CODE
-> +diag	%r1, 0, 0x9c
-> +larl	%r5, done
-> +stg	%r5, GEN_LC_PGM_NEW_PSW + 8
-> +diag	0, 0, 0x500
-> +
-> +/* Should never be executed because of the PGM */
-> +diag	0, 0, 0x44
-> +
-> +done:
-> +lh	%r1, GEN_LC_PGM_INT_CODE
-> +diag	%r1, 0, 0x9c
-> diff --git a/s390x/snippets/asm/snippet-pv-diag-yield.S b/s390x/snippets/asm/snippet-pv-diag-yield.S
-> new file mode 100644
-> index 00000000..5795cf0f
-> --- /dev/null
-> +++ b/s390x/snippets/asm/snippet-pv-diag-yield.S
-> @@ -0,0 +1,7 @@
-> +.section .text
-> +
-> +xgr	%r0, %r0
-> +xgr	%r1, %r1
-> +diag	0,0,0x44
-> +lghi	%r1, 42
-> +diag	1,0,0x9c
+Hopefully assuming postcopy will be enabled in just a few iterations of
+precopy, write amplification could hopefully be a much smaller problem, so the
+mostly-static pages can still be successfully migrated during precopy.
+
+Please share more information when there is, and I'll be very interested to
+learn.
+
+Thanks!
+
+-- 
+Peter Xu
 
