@@ -2,160 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BE93245998E
-	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 02:16:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A5EB459A4A
+	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 03:57:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232036AbhKWBTR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Nov 2021 20:19:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52612 "EHLO
+        id S232848AbhKWDA6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Nov 2021 22:00:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231879AbhKWBTR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Nov 2021 20:19:17 -0500
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 307F0C061574
-        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 17:16:10 -0800 (PST)
-Received: by mail-pl1-x636.google.com with SMTP id p18so15589894plf.13
-        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 17:16:10 -0800 (PST)
+        with ESMTP id S229628AbhKWDA5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Nov 2021 22:00:57 -0500
+Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 530E7C061574;
+        Mon, 22 Nov 2021 18:57:50 -0800 (PST)
+Received: by mail-oi1-x232.google.com with SMTP id u74so41690774oie.8;
+        Mon, 22 Nov 2021 18:57:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=aOapSZPUp0g2vRLPFt2Pwlv4YJeJLNgFW5OzxeO2Az4=;
-        b=L7O8jFumaB7EmY5HtnwDKbxvXRB5S0200eENfBFBtzsOYZm0Xb0fZkzugBes9139gc
-         LtOpN74gDJingIlx2690zN4s3ahjPf41d0oh+7i5fxL9QxNlx04ZQztrDNs2fR+TBWrL
-         vKkkWxwTOM2ac5h2AKvi7Eti26GSgQJzzZ/8CLVEUmQGCqGLL6GdLYXzgO+oE0soWXar
-         gWPRAQi+IAhx0fk6JqIv4UUB4QTmtQetbKvGpNtxejn4YJPH/tFMpLGIU7+pEN3rji4R
-         4fqvN61jFMP4o95fuRjUpq3IyEfhHZ9DvtxsQ66iBoJpILhFAmVeGDa5Qnud/7kVKy2+
-         Qlfg==
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=+PfKM5+BXtpPxMwFFLQf7c1ReGeR+E33SLHVUAdsXro=;
+        b=HsgBuuFhMwWG5y0W7zpMNyVPm524nbiUnao0Ns/KspjMP0JkIkg0LaE6IZZOibFQvK
+         IRerg8RuCEbdcC3WvQK95mE+zyjeyfdlexO63jr+OzlSpJ7WiAByOdYMJvhxm0xIBx5K
+         xVYoVuNxJPhtWHv1XPYwGlVErJzk6H580f0RGnDv7SS1G5rVrl3y8CQ27gW21OQbitKP
+         KSB2MbMepd1+lzBdJb1C/kk31YKBmXcG1A5mVBJxopIvyEvqk0b0t9eSip/gxOOBenV0
+         PIypaazJvcEq/iArBwgQHLzswkYNJ5zJMmnURl6q7BW5QUzK+agMMICxMR8GJVQKuDMh
+         yQow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=aOapSZPUp0g2vRLPFt2Pwlv4YJeJLNgFW5OzxeO2Az4=;
-        b=0gonQRaAhCzl6V9osQySdH2wS9XInMG9UKkGWtui3KSm2fdB6Z2n1O0fz70Mtcm7Qk
-         8APQVUJaZcsLp/ZixWzaiRFEHgnyvRuVijfmED7UdA9EYyk/Hc7p33+pYgVcxz6R0G4z
-         3Ij0lwsR9aWb3mLyxUb+SVsfRDklrsB8rBadluaafVBfQ7UuGxcwki93IjtHsQmH2R1B
-         TVL9tsmIjvH8CbLu4XE4zLytwJrzlFzUeCyituP8664zfWUGX0+AzgqrHvcL89MLB9UL
-         IH08+ds0RDL1H5lNShljAjR5X1sF/jvuJeA2aXpZypmm/bUuQpWvSycFE21vaRk76Pzh
-         6JxQ==
-X-Gm-Message-State: AOAM531zdHdBGpj2hASujFJgUxHo5JB6vHByzA8NRyGNrBIez8tcMkjq
-        N0wEZGJZDm/clOiRk3kedSptxMOwEeFf9g==
-X-Google-Smtp-Source: ABdhPJwy+1KiAnohFRJPtinqi0mLVPo2CYoFy6QQ+dNhNSAJSqwN1dFfxnZhk0fdbHcBKjJRAcLlNw==
-X-Received: by 2002:a17:902:c643:b0:141:cf6b:6999 with SMTP id s3-20020a170902c64300b00141cf6b6999mr2068159pls.80.1637630169419;
-        Mon, 22 Nov 2021 17:16:09 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id m6sm6829396pgc.17.2021.11.22.17.16.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Nov 2021 17:16:08 -0800 (PST)
-Date:   Tue, 23 Nov 2021 01:16:05 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=+PfKM5+BXtpPxMwFFLQf7c1ReGeR+E33SLHVUAdsXro=;
+        b=whB2ejKceP97JK2sYERkncpbZaAe8O1w4K8V78d2/xOApPX5gI9v0THSxHUOv+qa1U
+         VN7lAx7Z+euN5/Oh5EkfhvRaGd9Rz3HugPdAtDvP2QPrWrUuwttqDSCkPd2ZKjJpU5pP
+         AOEhy7x/+oXUuVDQbn5X8s5DHClbMhUUTu8Orim2K4rTPmRxQYsAizbXUzGoA9kAP3Jr
+         xWGCZr+1CtmW2nqdaH6mnpzn74Sj9svrFmpjLhy93ksjR3zZ/rWPyixrjfrSfWKlJiAl
+         XP4w8jJZirVWguAAF+a3aIbiCY8+Y+QY5G1H/QaYq9OK4FQ3STkBvyJ2GU6i8Wen7yBN
+         ewMA==
+X-Gm-Message-State: AOAM5305meXiUZcuS0YNpGGRHY+pLsfN3hB+FZVLdXdkZ39ByhEie5qJ
+        v4ErGtGwN6trZ++GMa68r+H0hd/IZJoUvn2Awjk=
+X-Google-Smtp-Source: ABdhPJyzJnmXDZeeINl57vI96DP1Mg/KDzKedP8P1UH7ZgqxWQWyg1wA1cTJLwWGplxKZKH3oHLsdgNo5OGs4knEqMQ=
+X-Received: by 2002:a05:6808:5c1:: with SMTP id d1mr27439882oij.141.1637636269627;
+ Mon, 22 Nov 2021 18:57:49 -0800 (PST)
+MIME-Version: 1.0
+References: <20211122095619.000060d2@gmail.com> <YZvrvmRnuDc1e+gi@google.com>
+In-Reply-To: <YZvrvmRnuDc1e+gi@google.com>
+From:   Wanpeng Li <kernellwp@gmail.com>
+Date:   Tue, 23 Nov 2021 10:57:38 +0800
+Message-ID: <CANRm+Cx+bC8D7s1qzJYbrT+1rm46wxg6bAXD+kGYAHGnruZMXw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: LAPIC: Per vCPU control over kvm_can_post_timer_interrupt
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Aili Yao <yaoaili126@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Hou Wenlong <houwenlong93@linux.alibaba.com>
-Subject: Re: [PATCH 19/28] KVM: x86/mmu: Zap only the target TDP MMU shadow
- page in NX recovery
-Message-ID: <YZxA1VAs5FNbjmH9@google.com>
-References: <20211120045046.3940942-1-seanjc@google.com>
- <20211120045046.3940942-20-seanjc@google.com>
- <CANgfPd83h4dXa-bFY96dkwHfJsdqu65BAzbqztgEhiRcHFquJw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANgfPd83h4dXa-bFY96dkwHfJsdqu65BAzbqztgEhiRcHFquJw@mail.gmail.com>
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "the arch/x86 maintainers" <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm <kvm@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, yaoaili@kingsoft.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 22, 2021, Ben Gardon wrote:
-> On Fri, Nov 19, 2021 at 8:51 PM Sean Christopherson <seanjc@google.com> wrote:
-> > @@ -755,6 +759,26 @@ static inline bool tdp_mmu_iter_cond_resched(struct kvm *kvm,
-> >         return false;
-> >  }
+On Tue, 23 Nov 2021 at 03:14, Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Mon, Nov 22, 2021, Aili Yao wrote:
+> > From: Aili Yao <yaoaili@kingsoft.com>
 > >
-> > +bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
-> > +{
-> > +       u64 old_spte;
-> > +
-> > +       rcu_read_lock();
-> > +
-> > +       old_spte = kvm_tdp_mmu_read_spte(sp->ptep);
-> > +       if (WARN_ON_ONCE(!is_shadow_present_pte(old_spte))) {
-> > +               rcu_read_unlock();
-> > +               return false;
-> > +       }
-> > +
-> > +       __tdp_mmu_set_spte(kvm, kvm_mmu_page_as_id(sp), sp->ptep, old_spte, 0,
-> > +                          sp->gfn, sp->role.level + 1, true, true);
-> > +
-> > +       rcu_read_unlock();
-> > +
-> > +       return true;
-> > +}
-> > +
-> 
-> Ooooh this makes me really nervous. There are a lot of gotchas to
-> modifying SPTEs in a new context without traversing the paging
-> structure like this. For example, we could modify an SPTE under an
-> invalidated root here. I don't think that would be a problem since
-> we're just clearing it, but it makes the code more fragile.
+> > When we isolate some pyhiscal cores, We may not use them for kvm guests,
+> > We may use them for other purposes like DPDK, or we can make some kvm
+> > guests isolated and some not, the global judgement pi_inject_timer is
+> > not enough; We may make wrong decisions:
+> >
+> > In such a scenario, the guests without isolated cores will not be
+> > permitted to use vmx preemption timer, and tscdeadline fastpath also be
+> > disabled, both will lead to performance penalty.
+> >
+> > So check whether the vcpu->cpu is isolated, if not, don't post timer
+> > interrupt.
+> >
+> > Signed-off-by: Aili Yao <yaoaili@kingsoft.com>
+> > ---
+> >  arch/x86/kvm/lapic.c | 4 +++-
+> >  1 file changed, 3 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> > index 759952dd1222..72dde5532101 100644
+> > --- a/arch/x86/kvm/lapic.c
+> > +++ b/arch/x86/kvm/lapic.c
+> > @@ -34,6 +34,7 @@
+> >  #include <asm/delay.h>
+> >  #include <linux/atomic.h>
+> >  #include <linux/jump_label.h>
+> > +#include <linux/sched/isolation.h>
+> >  #include "kvm_cache_regs.h"
+> >  #include "irq.h"
+> >  #include "ioapic.h"
+> > @@ -113,7 +114,8 @@ static inline u32 kvm_x2apic_id(struct kvm_lapic *apic)
+> >
+> >  static bool kvm_can_post_timer_interrupt(struct kvm_vcpu *vcpu)
+> >  {
+> > -     return pi_inject_timer && kvm_vcpu_apicv_active(vcpu);
+> > +     return pi_inject_timer && kvm_vcpu_apicv_active(vcpu) &&
+> > +             !housekeeping_cpu(vcpu->cpu, HK_FLAG_TIMER);
+>
+> I don't think this is safe, vcpu->cpu will be -1 if the vCPU isn't scheduled in.
+> This also doesn't play nice with the admin forcing pi_inject_timer=1.  Not saying
+> there's a reasonable use case for doing that, but it's supported today and this
+> would break that behavior.  It would also lead to weird behavior if a vCPU were
+> migrated on/off a housekeeping vCPU.  Again, probably not a reasonable use case,
+> but I don't see anything that would outright prevent that behavior.
+>
+> The existing behavior also feels a bit unsafe as pi_inject_timer is writable while
+> KVM is running, though I supposed that's orthogonal to this discussion.
+>
+> Rather than check vcpu->cpu, is there an existing vCPU flag that can be queried,
+> e.g. KVM_HINTS_REALTIME?
 
-Heh, it better not be a problem, because there are plently of flows in the TDP MMU
-that can modify SPTEs under an invalidated root, e.g. fast_page_fault(),
-tdp_mmu_zap_leafs(), kvm_age_gfn(), kvm_test_age_gfn(), etc...  And before the
-patch that introduced is_page_fault_stale(), kvm_tdp_mmu_map() was even installing
-SPTEs into an invalid root!  Anything that takes a reference to a root and yields
-(or never takes mmu_lock) can potentially modify a SPTE under an invalid root.
+How about something like below:
 
-Checking the paging structures for this flow wouldn't change anything.  Invalidating
-a root doesn't immediately zap SPTEs, it just marks the root invalid.  The other
-subtle gotcha is that kvm_reload_remote_mmus() doesn't actually gaurantee all vCPUs
-will have dropped the invalid root or performed a TLB flush when mmu_lock is dropped,
-those guarantees are only with respect to re-entering the guest!
+From 67f605120e212384cb3d5788ba8c83f15659503b Mon Sep 17 00:00:00 2001
+From: Wanpeng Li <wanpengli@tencent.com>
+Date: Tue, 23 Nov 2021 10:36:10 +0800
+Subject: [PATCH] KVM: LAPIC: To keep the vCPUs in non-root mode for timer-pi
 
-All of the above is no small part of why I don't want to walk the page tables:
-it's completely misleading as walking the page tables doesn't actually provide any
-protection, it's holding RCU that guarantees KVM doesn't write memory it doesn't own.
+From: Wanpeng Li <wanpengli@tencent.com>
 
-> Another approach to this would be to do in-place promotion / in-place
-> splitting once the patch sets David and I just sent out are merged.  That
-> would avoid causing extra page faults here to bring in the page after this
-> zap, but it probably wouldn't be safe if we did it under an invalidated root.
+As commit 0c5f81dad46 (KVM: LAPIC: Inject timer interrupt via posted interrupt)
+mentioned that the host admin should well tune the guest setup, so that vCPUs
+are placed on isolated pCPUs, and with several pCPUs surplus for
+*busy* housekeeping.
+It is better to disable mwait/hlt/pause vmexits to keep the vCPUs in non-root
+mode. However, we may isolate pCPUs for other purpose like DPDK or we can make
+some guests isolated and others not, Let's add the checking kvm_mwait_in_guest()
+to kvm_can_post_timer_interrupt() since we can't benefit from timer
+posted-interrupt
+w/o keeping the vCPUs in non-root mode.
 
-I agree that in-place promotion would be better, but if we do that, I think a logical
-intermediate step would be to stop zapping unrelated roots and entries.  If there's
-a bug that is exposed/introduced by not zapping other stuff, I would much rather it
-show up when KVM stops zapping other stuff, not when KVM stops zapping other stuff
-_and_ promotes in place.  Ditto for if in-place promotion introduces a bug.
+Reported-by: Aili Yao <yaoaili@kingsoft.com>
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+---
+ arch/x86/kvm/lapic.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-> I'd rather avoid this extra complexity and just tolerate the worse
-> performance on the iTLB multi hit mitigation at this point since new
-> CPUs seem to be moving past that vulnerability.
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 759952dd1222..8257566d44c7 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -113,14 +113,13 @@ static inline u32 kvm_x2apic_id(struct kvm_lapic *apic)
 
-IMO, it reduces complexity, especially when looking at the series as a whole, which
-I fully realize you haven't yet done :-)  Setting aside the complexities of each
-chunk of code, what I find complex with the current TDP MMU zapping code is that
-there are no precise rules for what needs to be done in each situation.  I'm not
-criticizing how we got to this point, I absolutely think that hitting everything
-with a big hammer to get the initial version stable was the right thing to do.
+ static bool kvm_can_post_timer_interrupt(struct kvm_vcpu *vcpu)
+ {
+-    return pi_inject_timer && kvm_vcpu_apicv_active(vcpu);
++    return pi_inject_timer && kvm_mwait_in_guest(vcpu->kvm) &&
+kvm_vcpu_apicv_active(vcpu);
+ }
 
-But a side effect of the big hammer approach is that it makes reasoning about things
-more difficult, e.g. "when is it safe to modify a SPTE versus when is it safe to insert
-a SPTE into the paging structures?" or "what needs to be zapped when the mmu_notifier
-unmaps a range?".
-
-And I also really want to avoid another snafu like the memslots with passthrough
-GPUs bug, where using a big hammer (zap all) when a smaller hammer (zap SPTEs for
-the memslot) _should_ work allows bugs to creep in unnoticed because they're hidden
-by overzealous zapping.
-
-> If you think this is worth the complexity, it'd be nice to do a little
-> benchmarking to make sure it's giving us a substantial improvement.
-
-Performance really isn't a motivating factor.  Per the changelog, the motivation
-is mostly to allow later patches to simplify zap_gfn_range() by having it zap only
-leaf SPTEs, and now that I've typed it up, also all of the above :-)
+ bool kvm_can_use_hv_timer(struct kvm_vcpu *vcpu)
+ {
+     return kvm_x86_ops.set_hv_timer
+-           && !(kvm_mwait_in_guest(vcpu->kvm) ||
+-            kvm_can_post_timer_interrupt(vcpu));
++           && !kvm_mwait_in_guest(vcpu->kvm);
+ }
+ EXPORT_SYMBOL_GPL(kvm_can_use_hv_timer);
