@@ -2,315 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E866D459D74
-	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 09:06:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 669FD459DAF
+	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 09:18:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234531AbhKWIJh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Nov 2021 03:09:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58798 "EHLO
+        id S231240AbhKWIVv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Nov 2021 03:21:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33418 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234042AbhKWIJg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Nov 2021 03:09:36 -0500
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8CDFC061714
-        for <kvm@vger.kernel.org>; Tue, 23 Nov 2021 00:06:28 -0800 (PST)
-Received: by mail-wr1-x42d.google.com with SMTP id u1so37374513wru.13
-        for <kvm@vger.kernel.org>; Tue, 23 Nov 2021 00:06:28 -0800 (PST)
+        with ESMTP id S229617AbhKWIVu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Nov 2021 03:21:50 -0500
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4E5EC061574;
+        Tue, 23 Nov 2021 00:18:42 -0800 (PST)
+Received: by mail-pj1-x102d.google.com with SMTP id v23so15987911pjr.5;
+        Tue, 23 Nov 2021 00:18:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=9Dc9IyqXO7Wm3+bDtKtLtx9+DbBZ47LkjAeuYVgRscE=;
-        b=uyE143lDDpEzHULTmTWN3E6pSz0XnoCTz9jlrWpHMlE6TbfSeOBjEgvIM9577xSgXj
-         BBxJ0zrcoG5tqvWdYwTXWCO29y0BUU7yvmo35N2IaN9UaKoj8HQFcImmcUSTmURsGlFf
-         5gygDqK3dkkC05wLYASGKJyOX7LLOmYDK/P+hGqZsq95cuzLi6xbVTvafUq1PCqqcBU7
-         vVdZupRVVNvlF21oKydJsqvF/1K0NaWazGmdwvwj3dYbXh0Bj+VG5pXt8NsBQLK+l2ij
-         FPhQJKHGkPytqV1mIuEqsA28nV332n2VHVkXtDC+dK3axYh7V+JwA/u8N35m7QeDpJok
-         hKqw==
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:in-reply-to:references
+         :organization:mime-version:content-transfer-encoding;
+        bh=zM3bW2Pr7xWb7m7mGViXuar4Xf1FuOAyNpmKVEYv2LA=;
+        b=DYy0Lv2BFenFI2/lwQjulVqCLOZIQ+ilw5KhORwu5MG7fMbv+fC8OCR3HuYlEI0kAr
+         QbDNKH9j5L+W+1UCym7utRg5nAgAVoJmNvLWnzfZjB6kiCOr6qYUBTQxvNHVvPLQbHtg
+         yVfthnVF3ncL8y2XUkLdgFcWbxgzY00YsXKxcWLtvRrU/ZHaGrGTLvY+H/GzfgmSSoE9
+         HKegLjzaXHMk2vOcLvyFnRnxoa7Bm1G+NtwH9qsFpExafxw/zmjuVjQy47UZ8cPNLt96
+         8KYNfUswdJJ0nn6TXTUjDUMW7c9nebT6EOBNLM9rK21B9LkdoZhLiTtvhbNZUW2GxlfO
+         syyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=9Dc9IyqXO7Wm3+bDtKtLtx9+DbBZ47LkjAeuYVgRscE=;
-        b=IDGjUrxATdIB8p6mnWaYsaHiSt6z/wJvStPDThPpWRG1grIKqJPQSZwI6TDwRvD4Ds
-         qAet7fRCIpoJJ4jMGs9mF6kJR6K9HIv56HnRf3TXl4I15E+ge7xqjGtUOoFyOlNcBca6
-         4AWeL5/+O3daW4tFDm0KSXOOYgYry9A2RKvrKE8eEyaVmebTHvF+OiDsgSDVW3LpHtuK
-         BWFmUq1rRbSfsb1BnoQtwXgwBB6xImD0+QeYJiIwm0/uG4wcPqbUsKv+eBaB4BYOCVHc
-         Z2JljWXhLD5HBQUhrUJFP14zdYeTJy9+vIOvRi78L6lXeF3U4+G7fsbyVCUBwTesJqbV
-         7GEQ==
-X-Gm-Message-State: AOAM532rajkeMPWF1lA/LdowXcRnbKOernT/IrwdOtzxY+6t/Wc6U2yi
-        fLXw7gThFP7J1zUAdVIHX85a1pHoCPkRSY+gktdSOA==
-X-Google-Smtp-Source: ABdhPJw/0TlGByNPXLRpWckwAfeK5n1U/QSPywu8h+JqZ5aS4wDj0Pv0sWPe4vPMhb02puhJ/NUfbfRfX4m2azGkTRk=
-X-Received: by 2002:adf:8165:: with SMTP id 92mr5106482wrm.199.1637654787221;
- Tue, 23 Nov 2021 00:06:27 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=zM3bW2Pr7xWb7m7mGViXuar4Xf1FuOAyNpmKVEYv2LA=;
+        b=eA2InHZ4M0K6AjLf9tXNd3G7QLD55Av9vYuHgiyjEDmlqnqvidYCvukFy2SUOpYSVK
+         DslaKAbV3cxsn8qi00SeXHxgLSh7bDDqnFHrvDF1CNkw7GROZr7LxW+Xr6J9r1IC/604
+         5VNF/PyjfLlgkU7d6dvwiiKOeBFEyETlFrVecAgDdAE7qPS9UI0VP11M8ZLGRnmSFdyX
+         UMK732e4ZtEHBFtE8Tf7rUJUsxS4P4GDnxqs8ObcXeeohVrnP3yEcf3Bf7P0PKM8ZiI6
+         XsgoBtLXz17/2HoGQrwCSdtWprCFuIfqua33uTAdPQgvcb1fZIpQsnWgJnaZFnXmyLD6
+         zJHw==
+X-Gm-Message-State: AOAM530OKdQGhktUxEFcE9SoLjGfcaWr13tTpKdf1IcwQTH15at4ID8i
+        i/1hwD8Vv7SQvsAO1F8xQnY=
+X-Google-Smtp-Source: ABdhPJym4WIvvqBdSxc3QdDoPrEZoQ+DdR1k0sDyFiSsvL3xfSowMr6drnWP8/hjU4+Puti0DlmP2A==
+X-Received: by 2002:a17:902:da85:b0:142:11b4:b5c0 with SMTP id j5-20020a170902da8500b0014211b4b5c0mr4660836plx.53.1637655522459;
+        Tue, 23 Nov 2021 00:18:42 -0800 (PST)
+Received: from localhost.localdomain ([43.128.78.144])
+        by smtp.gmail.com with ESMTPSA id g17sm11593029pfv.136.2021.11.23.00.18.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Nov 2021 00:18:42 -0800 (PST)
+Date:   Tue, 23 Nov 2021 16:18:34 +0800
+From:   Aili Yao <yaoaili126@gmail.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yaoaili@kingsoft.com
+Subject: Re: [PATCH] KVM: LAPIC: Per vCPU control over
+ kvm_can_post_timer_interrupt
+Message-ID: <20211123161834.30714698@gmail.com>
+In-Reply-To: <YZvrvmRnuDc1e+gi@google.com>
+References: <20211122095619.000060d2@gmail.com>
+        <YZvrvmRnuDc1e+gi@google.com>
+Organization: ksyun
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 MIME-Version: 1.0
-References: <20211118083912.981995-1-atishp@rivosinc.com> <20211118083912.981995-6-atishp@rivosinc.com>
-In-Reply-To: <20211118083912.981995-6-atishp@rivosinc.com>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Tue, 23 Nov 2021 13:36:16 +0530
-Message-ID: <CAAhSdy1V6cUYBmpTz8tT0gMg7=ZP1hQ25_zVdPg56TtnegLriw@mail.gmail.com>
-Subject: Re: [PATCH v5 5/5] RISC-V: KVM: Add SBI HSM extension in KVM
-To:     Atish Patra <atishp@rivosinc.com>
-Cc:     "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
-        Atish Patra <atish.patra@wdc.com>,
-        Anup Patel <anup.patel@wdc.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Heinrich Schuchardt <xypron.glpk@gmx.de>,
-        Kefeng Wang <wangkefeng.wang@huawei.com>,
-        kvm-riscv@lists.infradead.org, KVM General <kvm@vger.kernel.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 18, 2021 at 2:10 PM Atish Patra <atishp@rivosinc.com> wrote:
->
-> From: Atish Patra <atish.patra@wdc.com>
->
-> SBI HSM extension allows OS to start/stop harts any time. It also allows
-> ordered booting of harts instead of random booting.
->
-> Implement SBI HSM exntesion and designate the vcpu 0 as the boot vcpu id.
-> All other non-zero non-booting vcpus should be brought up by the OS
-> implementing HSM extension. If the guest OS doesn't implement HSM
-> extension, only single vcpu will be available to OS.
->
-> Reviewed-by: Anup Patel <anup.patel@wdc.com>
-> Signed-off-by: Atish Patra <atish.patra@wdc.com>
-> Signed-off-by: Atish Patra <atishp@rivosinc.com>
+On Mon, 22 Nov 2021 19:13:02 +0000
+Sean Christopherson <seanjc@google.com> wrote:
 
-I have queued this for 5.17
+> On Mon, Nov 22, 2021, Aili Yao wrote:
+> > From: Aili Yao <yaoaili@kingsoft.com>
+> > 
+> > When we isolate some pyhiscal cores, We may not use them for kvm
+> > guests, We may use them for other purposes like DPDK, or we can
+> > make some kvm guests isolated and some not, the global judgement
+> > pi_inject_timer is not enough; We may make wrong decisions:
+> > 
+> > In such a scenario, the guests without isolated cores will not be
+> > permitted to use vmx preemption timer, and tscdeadline fastpath
+> > also be disabled, both will lead to performance penalty.
+> > 
+> > So check whether the vcpu->cpu is isolated, if not, don't post timer
+> > interrupt.
+> > 
+> > Signed-off-by: Aili Yao <yaoaili@kingsoft.com>
+> > ---
+> >  arch/x86/kvm/lapic.c | 4 +++-
+> >  1 file changed, 3 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> > index 759952dd1222..72dde5532101 100644
+> > --- a/arch/x86/kvm/lapic.c
+> > +++ b/arch/x86/kvm/lapic.c
+> > @@ -34,6 +34,7 @@
+> >  #include <asm/delay.h>
+> >  #include <linux/atomic.h>
+> >  #include <linux/jump_label.h>
+> > +#include <linux/sched/isolation.h>
+> >  #include "kvm_cache_regs.h"
+> >  #include "irq.h"
+> >  #include "ioapic.h"
+> > @@ -113,7 +114,8 @@ static inline u32 kvm_x2apic_id(struct
+> > kvm_lapic *apic) 
+> >  static bool kvm_can_post_timer_interrupt(struct kvm_vcpu *vcpu)
+> >  {
+> > -	return pi_inject_timer && kvm_vcpu_apicv_active(vcpu);
+> > +	return pi_inject_timer && kvm_vcpu_apicv_active(vcpu) &&
+> > +		!housekeeping_cpu(vcpu->cpu, HK_FLAG_TIMER);  
+> 
+> I don't think this is safe, vcpu->cpu will be -1 if the vCPU isn't
+> scheduled in. 
 
-Thanks,
-Anup
+I checked this, It seems we will set vcpu->cpu to a valid value when we
+create vcpu( kvm_vm_ioctl_create_vcpu()), only after that we can
+configure lapic through vcpu fd and start the timer, this may not be one
+real problem.
 
-> ---
->  arch/riscv/include/asm/sbi.h  |   1 +
->  arch/riscv/kvm/Makefile       |   1 +
->  arch/riscv/kvm/vcpu.c         |  23 ++++++++
->  arch/riscv/kvm/vcpu_sbi.c     |   4 ++
->  arch/riscv/kvm/vcpu_sbi_hsm.c | 105 ++++++++++++++++++++++++++++++++++
->  5 files changed, 134 insertions(+)
->  create mode 100644 arch/riscv/kvm/vcpu_sbi_hsm.c
->
-> diff --git a/arch/riscv/include/asm/sbi.h b/arch/riscv/include/asm/sbi.h
-> index 4f9370b6032e..79af25c45c8d 100644
-> --- a/arch/riscv/include/asm/sbi.h
-> +++ b/arch/riscv/include/asm/sbi.h
-> @@ -90,6 +90,7 @@ enum sbi_hsm_hart_status {
->  #define SBI_ERR_INVALID_PARAM  -3
->  #define SBI_ERR_DENIED         -4
->  #define SBI_ERR_INVALID_ADDRESS        -5
-> +#define SBI_ERR_ALREADY_AVAILABLE -6
->
->  extern unsigned long sbi_spec_version;
->  struct sbiret {
-> diff --git a/arch/riscv/kvm/Makefile b/arch/riscv/kvm/Makefile
-> index 4757ae158bf3..aaf181a3d74b 100644
-> --- a/arch/riscv/kvm/Makefile
-> +++ b/arch/riscv/kvm/Makefile
-> @@ -26,4 +26,5 @@ kvm-y += vcpu_sbi.o
->  kvm-$(CONFIG_RISCV_SBI_V01) += vcpu_sbi_v01.o
->  kvm-y += vcpu_sbi_base.o
->  kvm-y += vcpu_sbi_replace.o
-> +kvm-y += vcpu_sbi_hsm.o
->  kvm-y += vcpu_timer.o
-> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> index e3d3aed46184..50158867406d 100644
-> --- a/arch/riscv/kvm/vcpu.c
-> +++ b/arch/riscv/kvm/vcpu.c
-> @@ -53,6 +53,17 @@ static void kvm_riscv_reset_vcpu(struct kvm_vcpu *vcpu)
->         struct kvm_vcpu_csr *reset_csr = &vcpu->arch.guest_reset_csr;
->         struct kvm_cpu_context *cntx = &vcpu->arch.guest_context;
->         struct kvm_cpu_context *reset_cntx = &vcpu->arch.guest_reset_context;
-> +       bool loaded;
-> +
-> +       /**
-> +        * The preemption should be disabled here because it races with
-> +        * kvm_sched_out/kvm_sched_in(called from preempt notifiers) which
-> +        * also calls vcpu_load/put.
-> +        */
-> +       get_cpu();
-> +       loaded = (vcpu->cpu != -1);
-> +       if (loaded)
-> +               kvm_arch_vcpu_put(vcpu);
->
->         memcpy(csr, reset_csr, sizeof(*csr));
->
-> @@ -64,6 +75,11 @@ static void kvm_riscv_reset_vcpu(struct kvm_vcpu *vcpu)
->
->         WRITE_ONCE(vcpu->arch.irqs_pending, 0);
->         WRITE_ONCE(vcpu->arch.irqs_pending_mask, 0);
-> +
-> +       /* Reset the guest CSRs for hotplug usecase */
-> +       if (loaded)
-> +               kvm_arch_vcpu_load(vcpu, smp_processor_id());
-> +       put_cpu();
->  }
->
->  int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
-> @@ -100,6 +116,13 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->
->  void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
->  {
-> +       /**
-> +        * vcpu with id 0 is the designated boot cpu.
-> +        * Keep all vcpus with non-zero cpu id in power-off state so that they
-> +        * can brought to online using SBI HSM extension.
-> +        */
-> +       if (vcpu->vcpu_idx != 0)
-> +               kvm_riscv_vcpu_power_off(vcpu);
->  }
->
->  void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
-> diff --git a/arch/riscv/kvm/vcpu_sbi.c b/arch/riscv/kvm/vcpu_sbi.c
-> index cf284e080f3e..f62d25bc9733 100644
-> --- a/arch/riscv/kvm/vcpu_sbi.c
-> +++ b/arch/riscv/kvm/vcpu_sbi.c
-> @@ -25,6 +25,8 @@ static int kvm_linux_err_map_sbi(int err)
->                 return SBI_ERR_INVALID_ADDRESS;
->         case -EOPNOTSUPP:
->                 return SBI_ERR_NOT_SUPPORTED;
-> +       case -EALREADY:
-> +               return SBI_ERR_ALREADY_AVAILABLE;
->         default:
->                 return SBI_ERR_FAILURE;
->         };
-> @@ -43,6 +45,7 @@ extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_base;
->  extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_time;
->  extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_ipi;
->  extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_rfence;
-> +extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_hsm;
->
->  static const struct kvm_vcpu_sbi_extension *sbi_ext[] = {
->         &vcpu_sbi_ext_v01,
-> @@ -50,6 +53,7 @@ static const struct kvm_vcpu_sbi_extension *sbi_ext[] = {
->         &vcpu_sbi_ext_time,
->         &vcpu_sbi_ext_ipi,
->         &vcpu_sbi_ext_rfence,
-> +       &vcpu_sbi_ext_hsm,
->  };
->
->  void kvm_riscv_vcpu_sbi_forward(struct kvm_vcpu *vcpu, struct kvm_run *run)
-> diff --git a/arch/riscv/kvm/vcpu_sbi_hsm.c b/arch/riscv/kvm/vcpu_sbi_hsm.c
-> new file mode 100644
-> index 000000000000..2e383687fa48
-> --- /dev/null
-> +++ b/arch/riscv/kvm/vcpu_sbi_hsm.c
-> @@ -0,0 +1,105 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (c) 2021 Western Digital Corporation or its affiliates.
-> + *
-> + * Authors:
-> + *     Atish Patra <atish.patra@wdc.com>
-> + */
-> +
-> +#include <linux/errno.h>
-> +#include <linux/err.h>
-> +#include <linux/kvm_host.h>
-> +#include <asm/csr.h>
-> +#include <asm/sbi.h>
-> +#include <asm/kvm_vcpu_sbi.h>
-> +
-> +static int kvm_sbi_hsm_vcpu_start(struct kvm_vcpu *vcpu)
-> +{
-> +       struct kvm_cpu_context *reset_cntx;
-> +       struct kvm_cpu_context *cp = &vcpu->arch.guest_context;
-> +       struct kvm_vcpu *target_vcpu;
-> +       unsigned long target_vcpuid = cp->a0;
-> +
-> +       target_vcpu = kvm_get_vcpu_by_id(vcpu->kvm, target_vcpuid);
-> +       if (!target_vcpu)
-> +               return -EINVAL;
-> +       if (!target_vcpu->arch.power_off)
-> +               return -EALREADY;
-> +
-> +       reset_cntx = &target_vcpu->arch.guest_reset_context;
-> +       /* start address */
-> +       reset_cntx->sepc = cp->a1;
-> +       /* target vcpu id to start */
-> +       reset_cntx->a0 = target_vcpuid;
-> +       /* private data passed from kernel */
-> +       reset_cntx->a1 = cp->a2;
-> +       kvm_make_request(KVM_REQ_VCPU_RESET, target_vcpu);
-> +
-> +       kvm_riscv_vcpu_power_on(target_vcpu);
-> +
-> +       return 0;
-> +}
-> +
-> +static int kvm_sbi_hsm_vcpu_stop(struct kvm_vcpu *vcpu)
-> +{
-> +       if (vcpu->arch.power_off)
-> +               return -EINVAL;
-> +
-> +       kvm_riscv_vcpu_power_off(vcpu);
-> +
-> +       return 0;
-> +}
-> +
-> +static int kvm_sbi_hsm_vcpu_get_status(struct kvm_vcpu *vcpu)
-> +{
-> +       struct kvm_cpu_context *cp = &vcpu->arch.guest_context;
-> +       unsigned long target_vcpuid = cp->a0;
-> +       struct kvm_vcpu *target_vcpu;
-> +
-> +       target_vcpu = kvm_get_vcpu_by_id(vcpu->kvm, target_vcpuid);
-> +       if (!target_vcpu)
-> +               return -EINVAL;
-> +       if (!target_vcpu->arch.power_off)
-> +               return SBI_HSM_HART_STATUS_STARTED;
-> +       else
-> +               return SBI_HSM_HART_STATUS_STOPPED;
-> +}
-> +
-> +static int kvm_sbi_ext_hsm_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
-> +                                  unsigned long *out_val,
-> +                                  struct kvm_cpu_trap *utrap,
-> +                                  bool *exit)
-> +{
-> +       int ret = 0;
-> +       struct kvm_cpu_context *cp = &vcpu->arch.guest_context;
-> +       struct kvm *kvm = vcpu->kvm;
-> +       unsigned long funcid = cp->a6;
-> +
-> +       switch (funcid) {
-> +       case SBI_EXT_HSM_HART_START:
-> +               mutex_lock(&kvm->lock);
-> +               ret = kvm_sbi_hsm_vcpu_start(vcpu);
-> +               mutex_unlock(&kvm->lock);
-> +               break;
-> +       case SBI_EXT_HSM_HART_STOP:
-> +               ret = kvm_sbi_hsm_vcpu_stop(vcpu);
-> +               break;
-> +       case SBI_EXT_HSM_HART_STATUS:
-> +               ret = kvm_sbi_hsm_vcpu_get_status(vcpu);
-> +               if (ret >= 0) {
-> +                       *out_val = ret;
-> +                       ret = 0;
-> +               }
-> +               break;
-> +       default:
-> +               ret = -EOPNOTSUPP;
-> +       }
-> +
-> +       return ret;
-> +}
-> +
-> +const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_hsm = {
-> +       .extid_start = SBI_EXT_HSM,
-> +       .extid_end = SBI_EXT_HSM,
-> +       .handler = kvm_sbi_ext_hsm_handler,
-> +};
-> --
-> 2.33.1
->
->
-> --
-> kvm-riscv mailing list
-> kvm-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/kvm-riscv
+Currently, the patch seems work as expected in my test, maybe one
+possible candidate for the issue listed above.
+
+Thanks
+
+> This also doesn't play nice with the admin forcing
+> pi_inject_timer=1.  Not saying there's a reasonable use case for
+> doing that, but it's supported today and this would break that
+> behavior.  It would also lead to weird behavior if a vCPU were
+> migrated on/off a housekeeping vCPU.  Again, probably not a
+> reasonable use case, but I don't see anything that would outright
+> prevent that behavior.
+> 
+> The existing behavior also feels a bit unsafe as pi_inject_timer is
+> writable while KVM is running, though I supposed that's orthogonal to
+> this discussion.
+> 
+> Rather than check vcpu->cpu, is there an existing vCPU flag that can
+> be queried, e.g. KVM_HINTS_REALTIME?
+> 
+> >  }
+> >  
+> >  bool kvm_can_use_hv_timer(struct kvm_vcpu *vcpu)
+> > -- 
+> > 2.25.1
+> >   
+
