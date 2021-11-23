@@ -2,566 +2,253 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E71B245AB52
-	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 19:34:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1CC0B45AB6C
+	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 19:44:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239898AbhKWSho (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Nov 2021 13:37:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35952 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238991AbhKWShn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Nov 2021 13:37:43 -0500
-Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14636C061574
-        for <kvm@vger.kernel.org>; Tue, 23 Nov 2021 10:34:35 -0800 (PST)
-Received: by mail-yb1-xb30.google.com with SMTP id j2so25354650ybg.9
-        for <kvm@vger.kernel.org>; Tue, 23 Nov 2021 10:34:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=UmZP7s6Y3y+BF7GQWu/5PpGCQsbzEywMQfIlhCqz6v4=;
-        b=SuRvNQDEpRXjhYRiHyMdceZXXKR3Z4OeeeYGs+ivzUHHISqbE0trWtDfeES/aCdUOG
-         eBMlA3WvaZkYfviPwMbULEhwyAayAEf4agFQEEIAdreoNvDpVyh7mJS2vf7AbKsUuR3O
-         WG6KrCHo5HZuwb61ivG0wsgOANUTL2bGmgDExNZlLK2A/CEj1gVFSuNW7iu+K8eFZMUY
-         PvESzMBpz23xewRjRCbJEgvsFMv0XMb169rolHM/MsSijsoVo3/1EdZLcYTSf5gFPZ/0
-         g8gqH0ANsD72hNDM256lxo+4XBPREY/1EttLu6gBD6877ym32hLX9gE/o5np3TKLtP/S
-         7XjA==
+        id S235472AbhKWSsE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Nov 2021 13:48:04 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:57785 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234139AbhKWSsE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 23 Nov 2021 13:48:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1637693094;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=atUqbi/LGR3R88oWuOD1lf3jMc+Pa506gfmC4ZKl7sA=;
+        b=eAhB15OeU8B5/1MQqNKHW3hJgQesbunqOLVZ3dvgT/4QC3Q+0YbhkghIGuIY26CdQBY/xS
+        dr8c/I6k9FxFFuKGgB7d72K6UaVuc9fMpqrM1gZBHYlYFWvXxMa4nj326Fazy9MWWx4V7D
+        fqdTeaWkaaD2QKbX8xQgF+cqDqiNDhQ=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-18-1VLs5ALFOqKE3E6r2lIRkQ-1; Tue, 23 Nov 2021 13:44:53 -0500
+X-MC-Unique: 1VLs5ALFOqKE3E6r2lIRkQ-1
+Received: by mail-wm1-f72.google.com with SMTP id i131-20020a1c3b89000000b00337f92384e0so1635778wma.5
+        for <kvm@vger.kernel.org>; Tue, 23 Nov 2021 10:44:53 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=UmZP7s6Y3y+BF7GQWu/5PpGCQsbzEywMQfIlhCqz6v4=;
-        b=39rtIfq/NhErRwxRPas/WIOOBFJiYwVoAVjjH90kIhuFQ56ikD8Ilw+d/nLYG7tuOE
-         ZJkFOzsAatOcxHFhdg2Dxro5orqi9ZmZm/C10KtxXz9OhVKdHcztb5izLS+PiyhtYb/H
-         NXLDaGCHrNp7ACFUeBXAwBID7giJuA/hrs9+G6up2KKchaLSN5ATLuY3IAfUQnhAwf1v
-         w4xNq4cUa6faq1fgkwGIrkw6PisbghJ5H4Qewpzgd3/aaqEQGDhptTg172PkJiHKvsl/
-         P3A1oxTdtmxmPypFEzXU/aiWV9YTFModlsa0QkRnSxDChoR+qV2geDd/0ULem/RTVs0M
-         d9QQ==
-X-Gm-Message-State: AOAM533LCzpIeQJvqgqbzioY6tMIM0bqrtP7RgUftgK0brEUss7Y8Bck
-        ycjJ7dL+7YDZ+hC8poEP47xEBxRHw9ndPU8D8XR//Q==
-X-Google-Smtp-Source: ABdhPJyKBOjqFxhrIYRb6WnTjSnZAzj3R5xLYdyizgpOGHfTaxFkY8la+ITvpHJBc+r+AAKzCz2HVpYbWN52w0dOQXk=
-X-Received: by 2002:a25:2c92:: with SMTP id s140mr8704685ybs.308.1637692473922;
- Tue, 23 Nov 2021 10:34:33 -0800 (PST)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:cc:references:from:organization:subject
+         :in-reply-to:content-transfer-encoding;
+        bh=atUqbi/LGR3R88oWuOD1lf3jMc+Pa506gfmC4ZKl7sA=;
+        b=dVkz7TYINH0WNA+3Q2PjCd49qqHfKo80xwcD6zN78nIk5SuYiyTHr4JDz/1yS/oFmn
+         x1jWw7YcxBVsv+vt0CwyNrPGoRQ0aEsqsx2LaxZojHuqCad75bs0XnIVy05wzKFEP+Mp
+         PdxuT9XVc1hDv7mhroK5FbS/HzBL3gk+jcweW5qmEdxsmabniB1RSs/Wlx6RgW92LTSx
+         MDTJtnFEbNzd/5O3Wk41Ag8xLb53aEcbQsLkqX908CKaEq7ox/BK8qMQ78SGlovIa61a
+         v4aaOm2vmPo8DF9v7asHoq2cBACNZjkb+EqHHlacqTfTfoV+vkla/Y4SVwi/Zyx36xex
+         zo8Q==
+X-Gm-Message-State: AOAM533ktrEchfHOx3kLTnDmGyS/f/+PFguo0goCItrwPXLuT2HlSx7V
+        pnnoJg8LM5HjLW6lGXmt4YMYTM1cbKHXsPUKAWkK1TqaDNbPyRkErhNZqIi2mrtuvlcZtSzk/Ac
+        FyS0Ezr/tiMmE
+X-Received: by 2002:a05:600c:4308:: with SMTP id p8mr5825210wme.132.1637693092337;
+        Tue, 23 Nov 2021 10:44:52 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxbaFPD94nEBZ68gs+jNNHX8jNyAeKzejwp6ZTQ5kQr2c1qNW2ALik4DmqlEP+UBCOrJExp7w==
+X-Received: by 2002:a05:600c:4308:: with SMTP id p8mr5825159wme.132.1637693092032;
+        Tue, 23 Nov 2021 10:44:52 -0800 (PST)
+Received: from [192.168.3.132] (p5b0c6765.dip0.t-ipconnect.de. [91.12.103.101])
+        by smtp.gmail.com with ESMTPSA id w2sm1763996wrn.67.2021.11.23.10.44.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 23 Nov 2021 10:44:51 -0800 (PST)
+Message-ID: <ffa6e5da-e0d2-6b21-f0aa-589ee7aabe47@redhat.com>
+Date:   Tue, 23 Nov 2021 19:44:50 +0100
 MIME-Version: 1.0
-References: <20211113012234.1443009-1-rananta@google.com> <20211113012234.1443009-5-rananta@google.com>
- <87wnl0cdfn.wl-maz@kernel.org>
-In-Reply-To: <87wnl0cdfn.wl-maz@kernel.org>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Tue, 23 Nov 2021 10:34:23 -0800
-Message-ID: <CAJHc60ydffBkqqb6xyObiK-66psaPODsOo0DpLFv7thx=zHjZw@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 04/11] KVM: arm64: Setup a framework for hypercall
- bitmap firmware registers
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Andrew Jones <drjones@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Content-Language: en-US
+To:     Eric Farman <farman@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>
+Cc:     Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+References: <20211110203322.1374925-1-farman@linux.ibm.com>
+ <20211110203322.1374925-3-farman@linux.ibm.com>
+ <dd8a8b49-da6d-0ab8-dc47-b24f5604767f@redhat.com>
+ <ab82e68051674ea771e2cb5371ca2a204effab40.camel@linux.ibm.com>
+ <32836eb5-532f-962d-161a-faa2213a0691@linux.ibm.com>
+ <b116e738d8f9b185867ab28395012aaddd58af31.camel@linux.ibm.com>
+ <85ba9fa3-ca25-b598-aecd-5e0c6a0308f2@redhat.com>
+ <19a2543b24015873db736bddb14d0e4d97712086.camel@linux.ibm.com>
+ <9c9bbf66-54c9-3d02-6d9f-1e147945abe8@de.ibm.com>
+ <cd1c11a05cc13fb8c70ce3644dcf823a840872b5.camel@linux.ibm.com>
+ <858e4f2b-d601-a4f1-9e80-8f7838299c9a@redhat.com>
+ <8849fcae225c2e7255db4d2aa164ea77d1b26c7a.camel@linux.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+Subject: Re: [RFC PATCH v3 2/2] KVM: s390: Extend the USER_SIGP capability
+In-Reply-To: <8849fcae225c2e7255db4d2aa164ea77d1b26c7a.camel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 22, 2021 at 9:23 AM Marc Zyngier <maz@kernel.org> wrote:
->
-> On Sat, 13 Nov 2021 01:22:27 +0000,
-> Raghavendra Rao Ananta <rananta@google.com> wrote:
-> >
-> > KVM regularly introduces new hypercall services to the guests without
-> > any consent from the Virtual Machine Manager (VMM). This means, the
-> > guests can observe hypercall services in and out as they migrate
-> > across various host kernel versions. This could be a major problem
-> > if the guest discovered a hypercall, started using it, and after
-> > getting migrated to an older kernel realizes that it's no longer
-> > available. Depending on how the guest handles the change, there's
-> > a potential chance that the guest would just panic.
-> >
-> > As a result, there's a need for the VMM to elect the services that
-> > it wishes the guest to discover. VMM can elect these services based
-> > on the kernels spread across its (migration) fleet. To remedy this,
-> > extend the existing firmware psuedo-registers, such as
-> > KVM_REG_ARM_PSCI_VERSION, for all the hypercall services available.
-> >
-> > These firmware registers are categorized based on the service call
-> > owners, and unlike the existing firmware psuedo-registers, they hold
-> > the features supported in the form of a bitmap. During VM (vCPU)
-> > initialization, the registers shows an upper-limit of the features
-> > supported by the corresponding registers. The VMM can simply use
-> > GET_ONE_REG to discover the features. If it's unhappy with any of
-> > the features, it can simply write-back the desired feature bitmap
-> > using SET_ONE_REG.
-> >
-> > KVM allows these modification only until a VM has started. KVM also
-> > assumes that the VMM is unaware of a register if a register remains
-> > unaccessed (read/write), and would simply clear all the bits of the
-> > registers such that the guest accidently doesn't get exposed to the
-> > features. Finally, the set of bitmaps from all the registers are the
-> > services that are exposed to the guest.
-> >
-> > In order to provide backward compatibility with already existing VMMs,
-> > a new capability, KVM_CAP_ARM_HVC_FW_REG_BMAP, is introduced. To enable
-> > the bitmap firmware registers extension, the capability must be
-> > explicitly enabled. If not, the behavior is similar to the previous
-> > setup.
-> >
-> > In this patch, the framework adds the register only for ARM's standard
-> > secure services (owner value 4). Currently, this includes support only
-> > for ARM True Random Number Generator (TRNG) service, with bit-0 of the
-> > register representing mandatory features of v1.0. Other services are
-> > momentarily added in the upcoming patches.
-> >
-> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h |  16 +++
-> >  arch/arm64/include/uapi/asm/kvm.h |   4 +
-> >  arch/arm64/kvm/arm.c              |  23 +++-
-> >  arch/arm64/kvm/hypercalls.c       | 217 +++++++++++++++++++++++++++++-
-> >  arch/arm64/kvm/trng.c             |   9 +-
-> >  include/kvm/arm_hypercalls.h      |   7 +
-> >  include/uapi/linux/kvm.h          |   1 +
-> >  7 files changed, 262 insertions(+), 15 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > index 02dffe50a20c..1546a2f973ef 100644
-> > --- a/arch/arm64/include/asm/kvm_host.h
-> > +++ b/arch/arm64/include/asm/kvm_host.h
-> > @@ -102,6 +102,19 @@ struct kvm_s2_mmu {
-> >  struct kvm_arch_memory_slot {
-> >  };
-> >
-> > +struct hvc_fw_reg_bmap {
-> > +     bool accessed;
-> > +     u64 reg_id;
-> > +     u64 bmap;
-> > +};
-> > +
-> > +struct hvc_reg_desc {
-> > +     spinlock_t lock;
-> > +     bool fw_reg_bmap_enabled;
-> > +
-> > +     struct hvc_fw_reg_bmap hvc_std_bmap;
-> > +};
->
-> Please document what these data structures track. Without any
-> documentation, it is pretty difficult to build a mental picture of how
-> this all fits together.
->
-Sure, will do.
-> > +
-> >  struct kvm_arch {
-> >       struct kvm_s2_mmu mmu;
-> >
-> > @@ -137,6 +150,9 @@ struct kvm_arch {
-> >
-> >       /* Memory Tagging Extension enabled for the guest */
-> >       bool mte_enabled;
-> > +
-> > +     /* Hypercall firmware registers' descriptor */
-> > +     struct hvc_reg_desc hvc_desc;
-> >  };
-> >
-> >  struct kvm_vcpu_fault_info {
-> > diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-> > index b3edde68bc3e..d6e099ed14ef 100644
-> > --- a/arch/arm64/include/uapi/asm/kvm.h
-> > +++ b/arch/arm64/include/uapi/asm/kvm.h
-> > @@ -281,6 +281,10 @@ struct kvm_arm_copy_mte_tags {
-> >  #define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_REQUIRED     3
-> >  #define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_ENABLED          (1U << 4)
-> >
-> > +#define KVM_REG_ARM_STD_BMAP                 KVM_REG_ARM_FW_REG(3)
-> > +#define KVM_REG_ARM_STD_BIT_TRNG_V1_0                BIT(0)
-> > +#define KVM_REG_ARM_STD_BMAP_BIT_MAX         0       /* Last valid bit */
-> > +
-> >  /* SVE registers */
-> >  #define KVM_REG_ARM64_SVE            (0x15 << KVM_REG_ARM_COPROC_SHIFT)
-> >
-> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > index 0cc148211b4e..f2099e4d1109 100644
-> > --- a/arch/arm64/kvm/arm.c
-> > +++ b/arch/arm64/kvm/arm.c
-> > @@ -81,26 +81,32 @@ int kvm_arch_check_processor_compat(void *opaque)
-> >  int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
-> >                           struct kvm_enable_cap *cap)
-> >  {
-> > -     int r;
-> > +     int r = 0;
-> > +     struct hvc_reg_desc *hvc_desc = &kvm->arch.hvc_desc;
-> >
-> >       if (cap->flags)
-> >               return -EINVAL;
-> >
-> >       switch (cap->cap) {
-> >       case KVM_CAP_ARM_NISV_TO_USER:
-> > -             r = 0;
-> >               kvm->arch.return_nisv_io_abort_to_user = true;
-> >               break;
-> >       case KVM_CAP_ARM_MTE:
-> >               mutex_lock(&kvm->lock);
-> > -             if (!system_supports_mte() || kvm->created_vcpus) {
-> > +             if (!system_supports_mte() || kvm->created_vcpus)
-> >                       r = -EINVAL;
-> > -             } else {
-> > -                     r = 0;
-> > +             else
-> >                       kvm->arch.mte_enabled = true;
-> > -             }
-> >               mutex_unlock(&kvm->lock);
-> >               break;
-> > +     case KVM_CAP_ARM_HVC_FW_REG_BMAP:
-> > +             if (kvm_vm_has_run_once(kvm))
-> > +                     return -EBUSY;
-> > +
-> > +             spin_lock(&hvc_desc->lock);
->
-> Does this really need to be a spin-lock? Are you ever taking it on a
-> context where you cannot sleep? And why does it need to be a new lock
-> when we already have a plethora of them?
->
-I suppose I was going with the fact that we have very small critical
-sections and could just go with a spinlock without interfering with
-any other paths. But I suppose that's not needed. I can go with the
-kvm->lock mutex instead.
-> > +             hvc_desc->fw_reg_bmap_enabled = true;
-> > +             spin_unlock(&hvc_desc->lock);
-> > +             break;
-> >       default:
-> >               r = -EINVAL;
-> >               break;
-> > @@ -157,6 +163,8 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
-> >
-> >       set_default_spectre(kvm);
-> >
-> > +     kvm_arm_init_hypercalls(kvm);
-> > +
-> >       return ret;
-> >  out_free_stage2_pgd:
-> >       kvm_free_stage2_pgd(&kvm->arch.mmu);
-> > @@ -215,6 +223,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
-> >       case KVM_CAP_SET_GUEST_DEBUG:
-> >       case KVM_CAP_VCPU_ATTRIBUTES:
-> >       case KVM_CAP_PTP_KVM:
-> > +     case KVM_CAP_ARM_HVC_FW_REG_BMAP:
-> >               r = 1;
-> >               break;
-> >       case KVM_CAP_SET_GUEST_DEBUG2:
-> > @@ -622,6 +631,8 @@ static int kvm_vcpu_first_run_init(struct kvm_vcpu *vcpu)
-> >       if (kvm_vm_is_protected(kvm))
-> >               kvm_call_hyp_nvhe(__pkvm_vcpu_init_traps, vcpu);
-> >
-> > +     kvm_arm_sanitize_fw_regs(kvm);
->
-> What is the rational for doing this on first run? Surely this could be
-> done at the point where userspace performs the write, couldn't it?
->
-> My mental model is that the VMM reads some data, clears some bits if
-> it really wants to, and writes it back. There shouldn't be anything to
-> sanitise after the facts. Or at least that's my gut feeling so far.
->
-I tried to explain things below..
+>>
+>>> I ALSO took a stab at folding this into the S390 IRQ paths [2],
+>>> similar
+>>> to what was done with kvm_s390_stop_info. This worked reasonably
+>>> well,
+>>> except the QEMU interface kvm_s390_vcpu_interrupt() returns a void,
+>>> and
+>>> so wouldn't notice an error sent back by KVM. Not a deal breaker,
+>>> but
+>>> having not heard anything to this idea, I didn't go much farther.
+>>
+>> We only care about SIGP STOP* handling so far, if anybody is aware of
+>> other issues
+>> that need fixing, it would be helpful  to spell them out. 
+> 
+> Yes, I keep using SIGP STOP* as an example because it offers (A) a
+> clear miscommunication with the status bits returned by SIGP SENSE, and
+> (B) has some special handling in QEMU that to my experience is still
+> incomplete. But I'm seeing issues with other orders, like SIGP RESTART
+> [1] [2] (where QEMU does a kvm_s390_vcpu_interrupt() with
+> KVM_S390_RESTART, and thus adds to pending_irq) and SIGP (INITIAL) CPU
+> RESET [2] (admittedly not greatly researched).
 
-> /me reads on.
->
-> > +
-> >       return ret;
-> >  }
-> >
-> > diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-> > index 9e136d91b470..f5df7bc61146 100644
-> > --- a/arch/arm64/kvm/hypercalls.c
-> > +++ b/arch/arm64/kvm/hypercalls.c
-> > @@ -58,6 +58,41 @@ static void kvm_ptp_get_time(struct kvm_vcpu *vcpu, u64 *val)
-> >       val[3] = lower_32_bits(cycles);
-> >  }
-> >
-> > +static bool
-> > +kvm_arm_fw_reg_feat_enabled(struct hvc_fw_reg_bmap *reg_bmap, u64 feat_bit)
-> > +{
-> > +     return reg_bmap->bmap & feat_bit;
-> > +}
-> > +
-> > +bool kvm_hvc_call_supported(struct kvm_vcpu *vcpu, u32 func_id)
-> > +{
-> > +     struct hvc_reg_desc *hvc_desc = &vcpu->kvm->arch.hvc_desc;
-> > +
-> > +     /*
-> > +      * To ensure backward compatibility, support all the service calls,
-> > +      * including new additions, if the firmware registers holding the
-> > +      * feature bitmaps isn't explicitly enabled.
-> > +      */
-> > +     if (!hvc_desc->fw_reg_bmap_enabled)
-> > +             return true;
-> > +
-> > +     switch (func_id) {
-> > +     case ARM_SMCCC_TRNG_VERSION:
-> > +     case ARM_SMCCC_TRNG_FEATURES:
-> > +     case ARM_SMCCC_TRNG_GET_UUID:
-> > +     case ARM_SMCCC_TRNG_RND32:
-> > +     case ARM_SMCCC_TRNG_RND64:
-> > +             return kvm_arm_fw_reg_feat_enabled(&hvc_desc->hvc_std_bmap,
-> > +                                     KVM_REG_ARM_STD_BIT_TRNG_V1_0);
-> > +     default:
-> > +             /* By default, allow the services that aren't listed here */
-> > +             return true;
-> > +     }
-> > +
-> > +     /* We shouldn't be reaching here */
-> > +     return true;
->
-> So why have anything at all?
->
-I was expecting the compiler might complain, but guess not, I'll remove this.
-> > +}
-> > +
-> >  int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
-> >  {
-> >       u32 func_id = smccc_get_function(vcpu);
-> > @@ -65,6 +100,9 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
-> >       u32 feature;
-> >       gpa_t gpa;
-> >
-> > +     if (!kvm_hvc_call_supported(vcpu, func_id))
-> > +             goto out;
-> > +
-> >       switch (func_id) {
-> >       case ARM_SMCCC_VERSION_FUNC_ID:
-> >               val[0] = ARM_SMCCC_VERSION_1_1;
-> > @@ -143,6 +181,7 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
-> >               return kvm_psci_call(vcpu);
-> >       }
-> >
-> > +out:
-> >       smccc_set_retval(vcpu, val[0], val[1], val[2], val[3]);
-> >       return 1;
-> >  }
-> > @@ -153,17 +192,178 @@ static const u64 fw_reg_ids[] = {
-> >       KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2,
-> >  };
-> >
-> > +static const u64 fw_reg_bmap_ids[] = {
-> > +     KVM_REG_ARM_STD_BMAP,
-> > +};
-> > +
-> > +static void kvm_arm_fw_reg_init_hvc(struct hvc_reg_desc *hvc_desc,
-> > +                                     struct hvc_fw_reg_bmap *fw_reg_bmap,
-> > +                                     u64 reg_id, u64 default_map)
-> > +{
-> > +     fw_reg_bmap->reg_id = reg_id;
-> > +     fw_reg_bmap->bmap = default_map;
-> > +}
-> > +
-> > +void kvm_arm_init_hypercalls(struct kvm *kvm)
-> > +{
-> > +     struct hvc_reg_desc *hvc_desc = &kvm->arch.hvc_desc;
-> > +
-> > +     spin_lock_init(&hvc_desc->lock);
-> > +
-> > +     kvm_arm_fw_reg_init_hvc(hvc_desc, &hvc_desc->hvc_std_bmap,
-> > +                             KVM_REG_ARM_STD_BMAP, ARM_SMCCC_STD_FEATURES);
-> > +}
-> > +
-> > +static void kvm_arm_fw_reg_sanitize(struct hvc_fw_reg_bmap *fw_reg_bmap)
-> > +{
-> > +     if (!fw_reg_bmap->accessed)
-> > +             fw_reg_bmap->bmap = 0;
-> > +}
-> > +
-> > +/*
-> > + * kvm_arm_sanitize_fw_regs: Sanitize the hypercall firmware registers
-> > + *
-> > + * Sanitization, in the case of hypercall firmware registers, is basically
-> > + * clearing out the feature bitmaps so that the guests are not exposed to
-> > + * the services corresponding to a particular register. The registers that
-> > + * needs sanitization is decided on two factors on the user-space part:
-> > + *   1. Enablement of KVM_CAP_ARM_HVC_FW_REG_BMAP:
-> > + *      If the user-space hasn't enabled the capability, it either means
-> > + *      that it's unaware of its existence, or it simply doesn't want to
-> > + *      participate in the arrangement and is okay with the default settings.
-> > + *      The former case is to ensure backward compatibility.
-> > + *
-> > + *   2. Has the user-space accessed (read/write) the register? :
-> > + *      If yes, it means that the user-space is aware of the register's
-> > + *      existence and can set the bits as it sees fit for the guest. A
-> > + *      read-only access from user-space indicates that the user-space is
-> > + *      happy with the default settings, and doesn't wish to change it.
-> > + *
-> > + * The logic for sanitizing a register will then be:
-> > + * ---------------------------------------------------------------------------
-> > + * | CAP enabled | Accessed reg | Clear reg | Comments                       |
-> > + * ---------------------------------------------------------------------------
-> > + * |      N      |       N      |     N     |                                |
-> > + * |      N      |       Y      |     N     | -ENOENT returned during access |
-> > + * |      Y      |       N      |     Y     |                                |
-> > + * |      Y      |       Y      |     N     |                                |
-> > + * ---------------------------------------------------------------------------
-> > + */
-> > +void kvm_arm_sanitize_fw_regs(struct kvm *kvm)
-> > +{
-> > +     struct hvc_reg_desc *hvc_desc = &kvm->arch.hvc_desc;
-> > +
-> > +     spin_lock(&hvc_desc->lock);
-> > +
-> > +     if (!hvc_desc->fw_reg_bmap_enabled)
-> > +             goto out;
-> > +
-> > +     kvm_arm_fw_reg_sanitize(&hvc_desc->hvc_std_bmap);
-> > +
-> > +out:
-> > +     spin_unlock(&hvc_desc->lock);
->
-> I keep being baffled by this. Why should we track the VMM accesses or
-> the VMM writeback? This logic doesn't seem to bring anything useful as
-> far as I can tell. All we need to ensure is that what is written to
-> the pseudo-register is an acceptable subset of the previous value, and
-> I cannot see why this can't be done at write-time.
->
-> If you want to hide this behind a capability, fine (although my guts
-> feeling is that we don't need that either). But I really want to be
-> convinced about all this tracking.
->
-The tracking of each owner register is necessary here to safe-guard
-the possibility that the user-space may not be aware of a newly
-introduced register, and hence, hasn't accessed it. If it had at least
-read the register, but not write-back, we assume that the user-space
-is happy with the configuration. But the fact that the register has
-not even been read would state that user-space is unaware of the
-existence of this new register. In such a case, if we don't sanitize
-(clear all the bits) this register, the features will be exposed
-unconditionally to the guest.
+Sorry I missed that discussion previously. Summarizing what the PoP says:
 
-The capability is introduced here to make sure that this new
-infrastructure is backward compatible with old VMMs. If the VMMs don't
-enable this capability, they are probably unaware of this, and this
-will work as it always has- expose new services to the guest
-unconditionally as and when they are introduced.
-> > +}
-> > +
-> > +static int kvm_arm_fw_reg_get_bmap(struct kvm *kvm,
-> > +                             struct hvc_fw_reg_bmap *fw_reg_bmap, u64 *val)
-> > +{
-> > +     int ret = 0;
-> > +     struct hvc_reg_desc *hvc_desc = &kvm->arch.hvc_desc;
-> > +
-> > +     spin_lock(&hvc_desc->lock);
-> > +
-> > +     if (!hvc_desc->fw_reg_bmap_enabled) {
-> > +             ret = -ENOENT;
-> > +             goto out;
-> > +     }
-> > +
-> > +     fw_reg_bmap->accessed = true;
-> > +     *val = fw_reg_bmap->bmap;
-> > +out:
-> > +     spin_unlock(&hvc_desc->lock);
-> > +     return ret;
-> > +}
-> > +
-> > +static int kvm_arm_fw_reg_set_bmap(struct kvm *kvm,
-> > +                             struct hvc_fw_reg_bmap *fw_reg_bmap, u64 val)
-> > +{
-> > +     int ret = 0;
-> > +     u64 fw_reg_features;
-> > +     struct hvc_reg_desc *hvc_desc = &kvm->arch.hvc_desc;
-> > +
-> > +     spin_lock(&hvc_desc->lock);
-> > +
-> > +     if (!hvc_desc->fw_reg_bmap_enabled) {
-> > +             ret = -ENOENT;
-> > +             goto out;
-> > +     }
-> > +
-> > +     if (fw_reg_bmap->bmap == val)
-> > +             goto out;
-> > +
-> > +     if (kvm_vm_has_run_once(kvm)) {
-> > +             ret = -EBUSY;
-> > +             goto out;
-> > +     }
-> > +
-> > +     switch (fw_reg_bmap->reg_id) {
-> > +     case KVM_REG_ARM_STD_BMAP:
-> > +             fw_reg_features = ARM_SMCCC_STD_FEATURES;
-> > +             break;
-> > +     default:
-> > +             ret = -EINVAL;
-> > +             goto out;
-> > +     }
-> > +
-> > +     /* Check for unsupported feature bit */
-> > +     if (val & ~fw_reg_features) {
-> > +             ret = -EINVAL;
-> > +             goto out;
-> > +     }
-> > +
-> > +     fw_reg_bmap->accessed = true;
-> > +     fw_reg_bmap->bmap = val;
-> > +out:
-> > +     spin_unlock(&hvc_desc->lock);
-> > +     return ret;
-> > +}
-> > +
-> >  int kvm_arm_get_fw_num_regs(struct kvm_vcpu *vcpu)
-> >  {
-> > -     return ARRAY_SIZE(fw_reg_ids);
-> > +     struct hvc_reg_desc *hvc_desc = &vcpu->kvm->arch.hvc_desc;
-> > +     int n_regs = ARRAY_SIZE(fw_reg_ids);
-> > +
-> > +     spin_lock(&hvc_desc->lock);
-> > +
-> > +     if (hvc_desc->fw_reg_bmap_enabled)
-> > +             n_regs += ARRAY_SIZE(fw_reg_bmap_ids);
-> > +
-> > +     spin_unlock(&hvc_desc->lock);
-> > +
-> > +     return n_regs;
-> >  }
-> >
-> >  int kvm_arm_copy_fw_reg_indices(struct kvm_vcpu *vcpu, u64 __user *uindices)
-> >  {
-> > +     struct hvc_reg_desc *hvc_desc = &vcpu->kvm->arch.hvc_desc;
-> >       int i;
-> >
-> >       for (i = 0; i < ARRAY_SIZE(fw_reg_ids); i++) {
-> > -             if (put_user(fw_reg_ids[i], uindices))
-> > +             if (put_user(fw_reg_ids[i], uindices++))
-> > +                     return -EFAULT;
-> > +     }
-> > +
-> > +     spin_lock(&hvc_desc->lock);
-> > +
-> > +     if (!hvc_desc->fw_reg_bmap_enabled) {
-> > +             spin_unlock(&hvc_desc->lock);
-> > +             return 0;
-> > +     }
-> > +
-> > +     spin_unlock(&hvc_desc->lock);
-> > +
-> > +     for (i = 0; i < ARRAY_SIZE(fw_reg_bmap_ids); i++) {
-> > +             if (put_user(fw_reg_bmap_ids[i], uindices++))
-> >                       return -EFAULT;
->
-> I really don't get what you are trying to achieve with this locking.
-> You guard the 'enabled' bit, but you still allow the kernel view to be
-> copied to userspace while another thread is writing to it?
->
-That's my mistake. Thanks for pointing it out. I'll get rid of the
-spinlock and use the existing ones correctly.
+Once we have a pending:
+* start (-> synchronous)
+* stop (-> asynchronous)
+* restart (-> asynchronous)
+* stop-and-store-status (-> asynchronous)
+* set-prefix (-> synchronous)
+* store-status-at-address (-> synchronous)
+* store-additional-status-at-address (-> synchronous)
+* initial-CPU-reset (-> synchronous)
+* CPU-reset order (-> synchronous)
 
-Regards,
-Raghavendra
+The following orders have to return busy (my take: only a must if the
+guest could observe the difference):
+* sense
+* external call
+* emergency signal
+* start
+* stop
+* restart
+* stop and store status
+* set prefix
+* store status at address
+* set architecture
+* set multithreading
+* store additional status at address
 
-> Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+We have to ask ourselves
+
+a) How could a single VCPU observe the difference if executing any other
+instruction immediately afterwards. My take would be that for
+synchronous orders we can't really. So we're left with:
+* stop (-> asynchronous)
+* restart (-> asynchronous)
+* stop-and-store-status (-> asynchronous)
+
+b) How could multiple VCPUs observe the difference that a single VCPU
+can't observe. That will require more thought, but I think it will be
+hardly possible.
+
+
+We know that SIGP STOP * needs care.
+
+SIGP RESTART is interesting. We inject it only for OPERATING cpus and it
+will only change the LC psw. What if we execute immediately afterwards:
+
+* sense -> does not affect any bits
+* external call -> has higher IRQ priority. There could be a difference
+  if injected before or after the restart was delivered. Could be fixed
+  in the kernel (check IRQ_PEND_RESTART).
+* emergency signal -> has higher IRQ priority. There could be a
+  difference if injected before or after the restart was delivered.
+  Could be fixed in the kernel (check IRQ_PEND_RESTART).
+* start -> CPU is already operating
+* stop -> restart is delivered first
+* restart -> I think the lowcore will look different if we inject two
+  RESTARTs immediately afterwards instead of only a single
+  one. Could be fixed in the kernel (double-deliver the interrupt).
+* stop and store status -> restart is delivered first
+* set prefix -> CPU is operating, not possible
+* store status at address -> CPU is operating, not possible
+* set architecture -> don't care
+* set multithreading -> don't care
+* store additional status at address -> CPU is operating, not possible
+* initial-CPU-reset -> clears local IRQ. LC will look different if
+  RESTART was delivered or not. Could be fixed in the kernel quite
+  easily (deliver restart first before clearing interrupts).
+* CPU-reset -> clears local IRQs. LC will look different if
+  injected before vs. after. Could be fixed in the kernel quite
+  easily (deliver restart first before clearing interrupts)..
+
+external call as handled by the SIGP interpretation facility will
+already also violate that description. We don't know that a SIGP restart
+is pending. We'd have to disable the SIGP interpretation facility
+temporarily.
+
+/me shivers
+
+This sounds like the kind of things we should happily not be fixing
+because nobody might really care :)
+
+
+
+> 
+> The reason for why I have no spent a lot of time in the latter is that
+> I have also mentioned that POPS has lists of orders that will return
+> busy [3], and so something more general is perhaps warranted. The QEMU
+> RFC's don't handle anything further than SIGP STOP*, on account of it
+> makes sense to get the interface right first.
+
+Right. My take is to have a look what we actually have to fix -- where
+the guest can actually observe the difference. If the guest can't
+observe the difference there is no need to actually implement BUSY logic
+as instructed in the PoP.
+
+> 
+>> I'll keep assuming that
+>> only SIGP STOP*  needs fixing, as I already explained.
+>>
+>> Whenever QEMU tells a CPU to stop asynchronously, it does so via a
+>> STOP IRQ from
+>> the destination CPU thread via KVM_S390_SIGP_STOP. Then, we know the
+>> CPU is busy
+>> ... until we clear that interrupt, which happens via
+>> kvm_s390_clear_stop_irq().
+>>
+>> Interestingly, we clear that interrupt via two paths:
+>>
+>> 1) kvm_s390_clear_local_irqs(), via KVM_S390_INITIAL_RESET and 
+>>    KVM_S390_NORMAL_RESET. Here, we expect that new user space also
+>> sets  
+>>    the CPU to stopped via KVM_MP_STATE_STOPPED. In fact, modern QEMU 
+>>    properly sets the CPU stopped before triggering clearing of the 
+>>    interrupts (s390_cpu_reset()).
+>> 2) kvm_s390_clear_stop_irq() via kvm_s390_vcpu_stop(), which is 
+>>    triggered via:
+>>
+>> a) STOP intercept (handle_stop()), KVM_S390_INITIAL_RESET and 
+>>    KVM_S390_NORMAL_RESET with old user space -- 
+>>    !kvm_s390_user_cpu_state_ctrl().
+>>
+>> b) KVM_MP_STATE_STOPPED for modern user space.
+>>
+>>
+>>
+>> Would the following solve our SIGP STOP * issue w.o. uapi changes?
+>>
+> 
+> A quick pass shows some promise, but I haven't the bandwidth to throw
+> the battery of stuff at it. I'll have to take a closer look after the
+> US Holiday to give a better answer. (Example: looking for
+> IRQ_PEND_SIGP_STOP || IRQ_PEND_RESTART is trivial.)
+
+Yes, extending to IRQ_PEND_RESTART would make sense.
+
+-- 
+Thanks,
+
+David / dhildenb
+
