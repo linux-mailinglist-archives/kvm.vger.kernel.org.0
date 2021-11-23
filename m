@@ -2,142 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CCF6C45AB7F
-	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 19:48:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D355E45AC90
+	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 20:35:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234459AbhKWSvo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Nov 2021 13:51:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39084 "EHLO
+        id S235991AbhKWTit (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Nov 2021 14:38:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234248AbhKWSvl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 23 Nov 2021 13:51:41 -0500
-Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 731CAC061714
-        for <kvm@vger.kernel.org>; Tue, 23 Nov 2021 10:48:33 -0800 (PST)
-Received: by mail-yb1-xb2c.google.com with SMTP id f9so81769ybq.10
-        for <kvm@vger.kernel.org>; Tue, 23 Nov 2021 10:48:33 -0800 (PST)
+        with ESMTP id S234924AbhKWTis (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Nov 2021 14:38:48 -0500
+Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B37BC061714
+        for <kvm@vger.kernel.org>; Tue, 23 Nov 2021 11:35:40 -0800 (PST)
+Received: by mail-io1-xd34.google.com with SMTP id p23so52717iod.7
+        for <kvm@vger.kernel.org>; Tue, 23 Nov 2021 11:35:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=f0cDGU3aBL/JtvFU6Lqj9TIEFTKrrsLTWwNQVeTfm7s=;
-        b=UJ+RaSYUdCuTpsCZQj9E3Oh9qJbvyuGy/4UukrBI48rk2Nj58gRp22Q5xYhb4vPTYQ
-         S836CgyDfUSjbbUntu1fu6hwQgtOU+NNXS/hpd+ZkuuL5OGlxrNQooDduy8It3MuFzWg
-         gzVzhOfTT8FoN4wNgjAdm4R5OlALjGaiHZfAconX1StgxWhu+iNLBHUfAnl5n86L7fsx
-         xugVpbFgqEXK+5rIKSzhKsDpTeR+iYDBDYjBvthud8qfespy38O0nRnjyHMQZkeXPBYz
-         KmDQil4XmOWKq9l38u9bPGnUPDJhIpUvifcD2bTWFK+f+zh+qcZC+ere/4WKN9vvBo6n
-         7EgQ==
+        bh=ucNIn3z++wzCwtlfmsvcWdlPYzoFbmTEmF2M6hyhBwI=;
+        b=tQMnoa4+qz/Z41aGmrjYClQCD8PCyRPzy1m/yn/nNwokdqmFLe/IrZvJCbXJfRiBqE
+         eLNWKs0BUE9eP6cpHfSQICVBQ6JZpExv02I70DyjsfWGRm1BHaOOAqlc0n86bkOs3z6v
+         HhS4++Y5Qz5T4jtC7PS39Q7k8FgeC7Lxh2B5uUDmX41J4XGfG1z+E0+uPDFkzCu3wcfD
+         nszKuyqDLcSnI07R4wGuUO3glVzTHEnV4VM2NNVkJAkWeIAEFJJJU7krQ49ORwzuzLzr
+         jmEKzmE0zSqnOUoj1K/WImOCvF5pnXvBdzy3lfMMkUqJR5Dd9pJaKTj9B2X92Z+8sH6V
+         psFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=f0cDGU3aBL/JtvFU6Lqj9TIEFTKrrsLTWwNQVeTfm7s=;
-        b=NFzM+5gIBg998V7gY4l2AURuOPAc1Ze/8th9etqYGQOEwuT8GAkabKrQnIcdGhZ4hk
-         smHK0xMLBDRuhYnjjiZOJyeWqs4T0JLabusq1uraoP0aBCz/AGR2anE4MuXLUkxhsvDT
-         s/8g//5eHo8bQbxJr6JgX6VsSR/1DWsfkNLfKXYokOT1qx7HVxNgC2L5eJI9OzaKQK6q
-         q8E8C69RIFm6aLDcb/lqJOuGR/kPeC/x9rqqxz4bgtnsYvwIsznODNzfZECJHU2yYw8P
-         nZujEJlovjEbqhgi2UT7bmHpjKzd67niMDrjCGphuy7yoq/odN8TZ6i9CZ3u3Rihgj4c
-         +M3w==
-X-Gm-Message-State: AOAM531F2rBY7JFCz+GgO58Ruxex5hNKZSw6zW6IjJT8FQxSVABF+BVv
-        aIrEC0sEXx5+9EKWgkt6Ip08IcsAGm3LR99l25x3dw==
-X-Google-Smtp-Source: ABdhPJzU9v6xYxlXR916SwfBpEwyCUWNGSP479wu5nIbbs9AwafRNm4AxCs/8CG3O42oR0mI9qJxiWj7/+VUFrV8ogU=
-X-Received: by 2002:a25:a169:: with SMTP id z96mr8003600ybh.491.1637693312457;
- Tue, 23 Nov 2021 10:48:32 -0800 (PST)
+        bh=ucNIn3z++wzCwtlfmsvcWdlPYzoFbmTEmF2M6hyhBwI=;
+        b=ogafspy7et8k6P9gjNuHpkbXMZr87U1z44nP/78OjTePom2j3av5dF5R5aR/R1Zy4O
+         ucbgXUdP3YfFt5r122DTbfDr99E10kjDdTWQ2W+f7xsvht1OLD/HQ6GZgXlMCtVVWN6i
+         4HrvaZJ/CP/42N/55Lfu4TLi2l5wrW2KpmJoBSd2k59Hf7t6xlMdYddYyFbqwrCl7CBB
+         vGwP21HqrnxjXxCcdGR6JDGEm0QmkaM5qwL/qAp8Dbd3A2bkYOs8Bs1bbkGDUx4Y/bNo
+         Sor1KAxnVF9+671/88uTi9LL2da5/nKfHc7p4GDTHBr+hmu38UpTH4CNF8v8kXABSWhJ
+         UTKw==
+X-Gm-Message-State: AOAM531J/t8JGl/xXHKWF/rEZkM7hNH4Uxbs6RTlysxesx5wdgbk/dV5
+        tStxHIwG4J0CShG/DrIZf4XfTMHGPnO4uSli0ZVH9GaALGM=
+X-Google-Smtp-Source: ABdhPJz1Q5be47A5QaEz2ud5Vd/DaXz1jSr4PV8Oat5SPte2Qr/URb8mmYQb+i9Xn23rPMixU/RtwZdGaRaE9QnluWc=
+X-Received: by 2002:a5d:8049:: with SMTP id b9mr8671820ior.41.1637696139607;
+ Tue, 23 Nov 2021 11:35:39 -0800 (PST)
 MIME-Version: 1.0
-References: <20211113012234.1443009-1-rananta@google.com> <20211113012234.1443009-4-rananta@google.com>
- <87y25gcfti.wl-maz@kernel.org>
-In-Reply-To: <87y25gcfti.wl-maz@kernel.org>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Tue, 23 Nov 2021 10:48:21 -0800
-Message-ID: <CAJHc60yF6BbeQGsYsSLMKd_A1SAVBiZLXBdWMO9NFH1Y2h4JRg@mail.gmail.com>
-Subject: Re: [RFC PATCH v2 03/11] KVM: Introduce kvm_vm_has_run_once
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Andrew Jones <drjones@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+References: <20211120045046.3940942-1-seanjc@google.com> <20211120045046.3940942-20-seanjc@google.com>
+ <CANgfPd83h4dXa-bFY96dkwHfJsdqu65BAzbqztgEhiRcHFquJw@mail.gmail.com> <YZxA1VAs5FNbjmH9@google.com>
+In-Reply-To: <YZxA1VAs5FNbjmH9@google.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Tue, 23 Nov 2021 11:35:28 -0800
+Message-ID: <CANgfPd9CdP-4aYkM7SCtCtV+v4T3HsyG6F8tLu=FCBz1nt=htg@mail.gmail.com>
+Subject: Re: [PATCH 19/28] KVM: x86/mmu: Zap only the target TDP MMU shadow
+ page in NX recovery
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Hou Wenlong <houwenlong93@linux.alibaba.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 22, 2021 at 8:31 AM Marc Zyngier <maz@kernel.org> wrote:
+On Mon, Nov 22, 2021 at 5:16 PM Sean Christopherson <seanjc@google.com> wrote:
 >
-> On Sat, 13 Nov 2021 01:22:26 +0000,
-> Raghavendra Rao Ananta <rananta@google.com> wrote:
+> On Mon, Nov 22, 2021, Ben Gardon wrote:
+> > On Fri, Nov 19, 2021 at 8:51 PM Sean Christopherson <seanjc@google.com> wrote:
+> > > @@ -755,6 +759,26 @@ static inline bool tdp_mmu_iter_cond_resched(struct kvm *kvm,
+> > >         return false;
+> > >  }
+> > >
+> > > +bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
+> > > +{
+> > > +       u64 old_spte;
+> > > +
+> > > +       rcu_read_lock();
+> > > +
+> > > +       old_spte = kvm_tdp_mmu_read_spte(sp->ptep);
+> > > +       if (WARN_ON_ONCE(!is_shadow_present_pte(old_spte))) {
+> > > +               rcu_read_unlock();
+> > > +               return false;
+> > > +       }
+> > > +
+> > > +       __tdp_mmu_set_spte(kvm, kvm_mmu_page_as_id(sp), sp->ptep, old_spte, 0,
+> > > +                          sp->gfn, sp->role.level + 1, true, true);
+> > > +
+> > > +       rcu_read_unlock();
+> > > +
+> > > +       return true;
+> > > +}
+> > > +
 > >
-> > The upcoming patches need a way to detect if the VM, as
-> > a whole, has started. Hence, unionize kvm_vcpu_has_run_once()
-> > of all the vcpus of the VM and build kvm_vm_has_run_once()
-> > to achieve the functionality.
-> >
-> > No functional change intended.
-> >
-> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > ---
-> >  include/linux/kvm_host.h |  2 ++
-> >  virt/kvm/kvm_main.c      | 17 +++++++++++++++++
-> >  2 files changed, 19 insertions(+)
-> >
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index b373929c71eb..102e00c0e21c 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -1854,4 +1854,6 @@ static inline bool kvm_vcpu_has_run_once(struct kvm_vcpu *vcpu)
-> >       return vcpu->has_run_once;
-> >  }
-> >
-> > +bool kvm_vm_has_run_once(struct kvm *kvm);
-> > +
-> >  #endif
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 1ec8a8e959b2..3d8d96e8f61d 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -4339,6 +4339,23 @@ static int kvm_vm_ioctl_get_stats_fd(struct kvm *kvm)
-> >       return fd;
-> >  }
-> >
-> > +bool kvm_vm_has_run_once(struct kvm *kvm)
-> > +{
-> > +     int i, ret = false;
-> > +     struct kvm_vcpu *vcpu;
-> > +
-> > +     mutex_lock(&kvm->lock);
-> > +
-> > +     kvm_for_each_vcpu(i, vcpu, kvm) {
-> > +             ret = kvm_vcpu_has_run_once(vcpu);
-> > +             if (ret)
-> > +                     break;
-> > +     }
-> > +
-> > +     mutex_unlock(&kvm->lock);
-> > +     return ret;
-> > +}
+> > Ooooh this makes me really nervous. There are a lot of gotchas to
+> > modifying SPTEs in a new context without traversing the paging
+> > structure like this. For example, we could modify an SPTE under an
+> > invalidated root here. I don't think that would be a problem since
+> > we're just clearing it, but it makes the code more fragile.
 >
-> This is horribly racy. Nothing prevents a vcpu from running behind
-> your back. If you want any sort of guarantee, look at what we do in
-> kvm_vgic_create(). Alexandru has patches that extract it to make it
-> generally available (at least for arm64).
->
-Yes, I looked into kvm_lock_all_vcpus(), but the fact that the series
-would call the function with the current vcpu lock held caused me to
-back off..
-Perhaps I can come up with a similar function, kvm_lock_all_vcpus_except(vcpu) ?
+> Heh, it better not be a problem, because there are plently of flows in the TDP MMU
+> that can modify SPTEs under an invalidated root, e.g. fast_page_fault(),
+> tdp_mmu_zap_leafs(), kvm_age_gfn(), kvm_test_age_gfn(), etc...  And before the
+> patch that introduced is_page_fault_stale(), kvm_tdp_mmu_map() was even installing
+> SPTEs into an invalid root!  Anything that takes a reference to a root and yields
+> (or never takes mmu_lock) can potentially modify a SPTE under an invalid root.
 
-Regards,
-Raghavendra
+That's true, I don't think there's really a problem with this commit,
+just a different way of dealing with the PTs.
 
->         M.
+
 >
-> --
-> Without deviation from the norm, progress is not possible.
+> Checking the paging structures for this flow wouldn't change anything.  Invalidating
+> a root doesn't immediately zap SPTEs, it just marks the root invalid.  The other
+> subtle gotcha is that kvm_reload_remote_mmus() doesn't actually gaurantee all vCPUs
+> will have dropped the invalid root or performed a TLB flush when mmu_lock is dropped,
+> those guarantees are only with respect to re-entering the guest!
+>
+> All of the above is no small part of why I don't want to walk the page tables:
+> it's completely misleading as walking the page tables doesn't actually provide any
+> protection, it's holding RCU that guarantees KVM doesn't write memory it doesn't own.
+
+That's a great point. I was thinking about the RCU protection being
+sort of passed down through the RCU dereferences from the root of the
+paging structure to whatever SPTE we modify, but since we protect the
+SPs with RCU too, dereferencing from them is just as good, I suppose.
+
+>
+> > Another approach to this would be to do in-place promotion / in-place
+> > splitting once the patch sets David and I just sent out are merged.  That
+> > would avoid causing extra page faults here to bring in the page after this
+> > zap, but it probably wouldn't be safe if we did it under an invalidated root.
+>
+> I agree that in-place promotion would be better, but if we do that, I think a logical
+> intermediate step would be to stop zapping unrelated roots and entries.  If there's
+> a bug that is exposed/introduced by not zapping other stuff, I would much rather it
+> show up when KVM stops zapping other stuff, not when KVM stops zapping other stuff
+> _and_ promotes in place.  Ditto for if in-place promotion introduces a bug.
+
+That makes sense. I think this is a good first step.
+
+>
+> > I'd rather avoid this extra complexity and just tolerate the worse
+> > performance on the iTLB multi hit mitigation at this point since new
+> > CPUs seem to be moving past that vulnerability.
+>
+> IMO, it reduces complexity, especially when looking at the series as a whole, which
+> I fully realize you haven't yet done :-)  Setting aside the complexities of each
+> chunk of code, what I find complex with the current TDP MMU zapping code is that
+> there are no precise rules for what needs to be done in each situation.  I'm not
+> criticizing how we got to this point, I absolutely think that hitting everything
+> with a big hammer to get the initial version stable was the right thing to do.
+>
+> But a side effect of the big hammer approach is that it makes reasoning about things
+> more difficult, e.g. "when is it safe to modify a SPTE versus when is it safe to insert
+> a SPTE into the paging structures?" or "what needs to be zapped when the mmu_notifier
+> unmaps a range?".
+>
+> And I also really want to avoid another snafu like the memslots with passthrough
+> GPUs bug, where using a big hammer (zap all) when a smaller hammer (zap SPTEs for
+> the memslot) _should_ work allows bugs to creep in unnoticed because they're hidden
+> by overzealous zapping.
+>
+> > If you think this is worth the complexity, it'd be nice to do a little
+> > benchmarking to make sure it's giving us a substantial improvement.
+>
+> Performance really isn't a motivating factor.  Per the changelog, the motivation
+> is mostly to allow later patches to simplify zap_gfn_range() by having it zap only
+> leaf SPTEs, and now that I've typed it up, also all of the above :-)
+
+That makes sense, and addresses all my concerns. Carry on.
+Thanks for writing all that up.
