@@ -2,183 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C373459B0E
-	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 05:28:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C3D02459B48
+	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 05:39:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233088AbhKWE3j (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 22 Nov 2021 23:29:39 -0500
-Received: from mail.kingsoft.com ([114.255.44.145]:16254 "EHLO
-        mail.kingsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229947AbhKWE3i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 22 Nov 2021 23:29:38 -0500
-X-Greylist: delayed 903 seconds by postgrey-1.27 at vger.kernel.org; Mon, 22 Nov 2021 23:29:37 EST
-X-AuditID: 0a580155-fe9e070000024f67-1b-619c69e9146d
-Received: from mail.kingsoft.com (bogon [10.88.1.78])
-        (using TLS with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (Client did not present a certificate)
-        by mail.kingsoft.com (SMG-2-NODE-85) with SMTP id 56.23.20327.9E96C916; Tue, 23 Nov 2021 12:11:21 +0800 (HKT)
-Received: from KSbjmail4.kingsoft.cn (10.88.1.79) by KSBJMAIL3.kingsoft.cn
- (10.88.1.78) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.17; Tue, 23 Nov
- 2021 12:11:21 +0800
-Received: from KSbjmail4.kingsoft.cn ([fe80::8036:b70b:7d3c:4ee2]) by
- KSBJMAIL4.kingsoft.cn ([fe80::8036:b70b:7d3c:4ee2%11]) with mapi id
- 15.01.2375.017; Tue, 23 Nov 2021 12:11:21 +0800
-From:   =?utf-8?B?eWFvYWlsaSBb5LmI54ix5YipXQ==?= <yaoaili@kingsoft.com>
-To:     Wanpeng Li <kernellwp@gmail.com>,
-        Sean Christopherson <seanjc@google.com>
-CC:     Aili Yao <yaoaili126@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "Thomas Gleixner" <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "Borislav Petkov" <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm <kvm@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH] KVM: LAPIC: Per vCPU control over
- kvm_can_post_timer_interrupt
-Thread-Topic: [PATCH] KVM: LAPIC: Per vCPU control over
- kvm_can_post_timer_interrupt
-Thread-Index: AQHX31HuUhGu3lfAGEub9LSWCeOdcqwPZTAAgACBzgCAAI8NcA==
-Date:   Tue, 23 Nov 2021 04:11:21 +0000
-Message-ID: <3204a646aa9d43d0b9af8da1c5ddf79f@kingsoft.com>
-References: <20211122095619.000060d2@gmail.com> <YZvrvmRnuDc1e+gi@google.com>
- <CANRm+Cx+bC8D7s1qzJYbrT+1rm46wxg6bAXD+kGYAHGnruZMXw@mail.gmail.com>
-In-Reply-To: <CANRm+Cx+bC8D7s1qzJYbrT+1rm46wxg6bAXD+kGYAHGnruZMXw@mail.gmail.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.88.2.22]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S230018AbhKWEmx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 22 Nov 2021 23:42:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40958 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229553AbhKWEmv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 22 Nov 2021 23:42:51 -0500
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79460C061574
+        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 20:39:44 -0800 (PST)
+Received: by mail-pf1-x42f.google.com with SMTP id u80so6544239pfc.9
+        for <kvm@vger.kernel.org>; Mon, 22 Nov 2021 20:39:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=JZECwSvXg0MwYpcw/lT1xG0xEMMAh0EHotR98E/tTUA=;
+        b=PWqHevJs+bq9UN9gwN2aFq2+fwq425MeYgrrioyKiiN1cCCza9b42qYr1ENBfAdLHY
+         Ejg+Xfy1J/EEVC5Rj55hTArkewbGIfslYO8+e8PJ9+457cGvTOnEwrnYXY+VZKMLZOJQ
+         NFQfBJsuSIpbnIMgPtsoq7sHo+wr23hhBiXzabS4JgI5a26+COLpw02rY/Nd8xEyawZq
+         jQCXNig79ITPzvs8CzPXDknaxM2JUnxVbQJg3fL+pZoUTOxOm7PtuLISagRd5AIT81sh
+         SVzpdwtwvQDHpB+26yyd/L74AGwcefc9jhM+fLFOwZbc5NgfFqg5aTMhkZ1fL3bXigFp
+         +yWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=JZECwSvXg0MwYpcw/lT1xG0xEMMAh0EHotR98E/tTUA=;
+        b=o/pMLRz2Uq8AU5u3ZBH4vzomLJkfWayxKOr5YykOAX9k/vf4NUJJdLF6M2NdTSsNvI
+         Pw/dKKPnlGVRKCc8SHC+WsPawtWc1oaD8GDUQUdvv1RxWvj5M1tSzNQXUnXc503PM7Xv
+         1BFoEhyw3nX5/OC/fjMie5yfZ5aJKo1z+wmS1iHw0+p2GypcPCGIc88cmUTOTa85RW8F
+         yxrOrEilXPXRLrfuvdvMCK9weMywvBqOErk3N8vJKYiAWX5gyo/qF1sKe6HjNFW16dfl
+         nzlf36p137Ma/xIrrZBiEZZTkiz80ZfCx+F7ouhfcPt1TL4CAvHKRkmPCtNWgP+bLusJ
+         hQzQ==
+X-Gm-Message-State: AOAM530KJ0vOgNl9oEz2+9EossfAK9mVDL+TKt9lnxKi1pVJnH1W/n5b
+        n3lJBsccFTHLBOO1xVJswJEDIvfhYxiNHfAK3Bo+Gg==
+X-Google-Smtp-Source: ABdhPJyegAX27Q4ZmfdkoCLcAk4V9INtgvTmDNc65NtpQ43unJw2bVPyzHKuMXESV5tSMJHj1ocMLRNeBY+/ugIckl0=
+X-Received: by 2002:aa7:9438:0:b0:4a2:c941:9ac4 with SMTP id
+ y24-20020aa79438000000b004a2c9419ac4mr2437622pfo.12.1637642383746; Mon, 22
+ Nov 2021 20:39:43 -0800 (PST)
 MIME-Version: 1.0
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrGIsWRmVeSWpSXmKPExsXCFcHop/syc06iQfNCfYvPG/6xWbzY0M5o
-        MW2juMXW6VfYLDpnb2C3eL1+HavFnKmFFpd3zWGzuHRgAZPF/m3/WC2Onr/FZLF501Rmi0mt
-        l5ktdt15wmLxY8NjVotnrVdZHAQ8nhycx+TxvbWPxWPnrLvsHgs2lXpsWtXJ5vHu3Dl2j3kn
-        Az3e77vK5tE49Rqbx+dNch4nWr6wBnBHcdmkpOZklqUW6dslcGX0nm9gKfhjV/F1Ik8D4xrb
-        LkYODgkBE4nN/yy7GLk4hAQmM0k8a5rKDOG8YJRYcO4DG4Szl1Fi6YtFTF2MnBxsAq4Sf7d+
-        YATpFhHwlbj2OAOkhlmgnUVi7Y7FrCA1wgKhEjOXfQWrFxEIk1i4uBPKdpJ4/uAoG4jNIqAq
-        8f1nKzPIHF4Ba4m7T6CumMIoce7HJxaQGk6BQImjTevBZjIKyEpMe3QfbA6zgLjE3GmzwOIS
-        AgISS/acZ4awRSVePv4HFZeT2HCikx1kPrOApsT6XfoQrYoSU7ofsoPYvAKCEidnPmGZwCg2
-        C8nUWQgds5B0zELSsYCRZRUjS3FuutEmRkjUh+5gnNH0Ue8QIxMH4yFGCQ5mJRHea0tmJwrx
-        piRWVqUW5ccXleakFh9ilOZgURLn5audkigkkJ5YkpqdmlqQWgSTZeLglGpgOh/z1MR95eRQ
-        qZOpod8sjdps9aIr4jbo82+t1e0tMND4tmbLunvOVTsbbVafOfOpfNMGq+Dme3tOmmm/Xhnr
-        oLTKYN2bQwm1MnzTeJ8cuLMhtEL99sMt5cyreu78tA5RYz2gm54fUOV/4VpstYpNUmsH16Ji
-        g6RpMr9MnK9mFsakrp48vYkzQ/PUy00TLy42Pna4q2TWswMPdn2fNKMzL97itstyzxAWj2m5
-        V/Ju/rRNuvjpE9OFlJZfE5gTjkZPb5Zw298d8GD/fIvI3+1LjzK8rT8c8kH18zEP9uKwZMXr
-        elkvNtmccZTIl/hzKiV1Tchmp5NViean9Q/NjDYPXXHxd9O8u17eB3bWrbjYqcRSnJFoqMVc
-        VJwIAPMw4YNpAwAA
+References: <20211117064359.2362060-1-reijiw@google.com> <20211117064359.2362060-3-reijiw@google.com>
+ <87lf1hsn11.wl-maz@kernel.org>
+In-Reply-To: <87lf1hsn11.wl-maz@kernel.org>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Mon, 22 Nov 2021 20:39:27 -0800
+Message-ID: <CAAeT=Fxcd9ExAXP-c6N-LYAT8_SGYUMHHeGO5dCW8=K+m=WTMQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 02/29] KVM: arm64: Save ID registers' sanitized
+ value per vCPU
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        Peng Liang <liangpeng10@huawei.com>,
+        Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBPbiBUdWUsIDIzIE5vdiAyMDIxIGF0IDAzOjE0LCBTZWFuIENocmlzdG9waGVyc29uIDxzZWFu
-amNAZ29vZ2xlLmNvbT4NCj4gd3JvdGU6DQo+ID4NCj4gPiBPbiBNb24sIE5vdiAyMiwgMjAyMSwg
-QWlsaSBZYW8gd3JvdGU6DQo+ID4gPiBGcm9tOiBBaWxpIFlhbyA8eWFvYWlsaUBraW5nc29mdC5j
-b20+DQo+ID4gPg0KPiA+ID4gV2hlbiB3ZSBpc29sYXRlIHNvbWUgcHloaXNjYWwgY29yZXMsIFdl
-IG1heSBub3QgdXNlIHRoZW0gZm9yIGt2bQ0KPiA+ID4gZ3Vlc3RzLCBXZSBtYXkgdXNlIHRoZW0g
-Zm9yIG90aGVyIHB1cnBvc2VzIGxpa2UgRFBESywgb3Igd2UgY2FuIG1ha2UNCj4gPiA+IHNvbWUg
-a3ZtIGd1ZXN0cyBpc29sYXRlZCBhbmQgc29tZSBub3QsIHRoZSBnbG9iYWwganVkZ2VtZW50DQo+
-ID4gPiBwaV9pbmplY3RfdGltZXIgaXMgbm90IGVub3VnaDsgV2UgbWF5IG1ha2Ugd3JvbmcgZGVj
-aXNpb25zOg0KPiA+ID4NCj4gPiA+IEluIHN1Y2ggYSBzY2VuYXJpbywgdGhlIGd1ZXN0cyB3aXRo
-b3V0IGlzb2xhdGVkIGNvcmVzIHdpbGwgbm90IGJlDQo+ID4gPiBwZXJtaXR0ZWQgdG8gdXNlIHZt
-eCBwcmVlbXB0aW9uIHRpbWVyLCBhbmQgdHNjZGVhZGxpbmUgZmFzdHBhdGggYWxzbw0KPiA+ID4g
-YmUgZGlzYWJsZWQsIGJvdGggd2lsbCBsZWFkIHRvIHBlcmZvcm1hbmNlIHBlbmFsdHkuDQo+ID4g
-Pg0KPiA+ID4gU28gY2hlY2sgd2hldGhlciB0aGUgdmNwdS0+Y3B1IGlzIGlzb2xhdGVkLCBpZiBu
-b3QsIGRvbid0IHBvc3QgdGltZXINCj4gPiA+IGludGVycnVwdC4NCj4gPiA+DQo+ID4gPiBTaWdu
-ZWQtb2ZmLWJ5OiBBaWxpIFlhbyA8eWFvYWlsaUBraW5nc29mdC5jb20+DQo+ID4gPiAtLS0NCj4g
-PiA+ICBhcmNoL3g4Ni9rdm0vbGFwaWMuYyB8IDQgKysrLQ0KPiA+ID4gIDEgZmlsZSBjaGFuZ2Vk
-LCAzIGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkNCj4gPiA+DQo+ID4gPiBkaWZmIC0tZ2l0
-IGEvYXJjaC94ODYva3ZtL2xhcGljLmMgYi9hcmNoL3g4Ni9rdm0vbGFwaWMuYyBpbmRleA0KPiA+
-ID4gNzU5OTUyZGQxMjIyLi43MmRkZTU1MzIxMDEgMTAwNjQ0DQo+ID4gPiAtLS0gYS9hcmNoL3g4
-Ni9rdm0vbGFwaWMuYw0KPiA+ID4gKysrIGIvYXJjaC94ODYva3ZtL2xhcGljLmMNCj4gPiA+IEBA
-IC0zNCw2ICszNCw3IEBADQo+ID4gPiAgI2luY2x1ZGUgPGFzbS9kZWxheS5oPg0KPiA+ID4gICNp
-bmNsdWRlIDxsaW51eC9hdG9taWMuaD4NCj4gPiA+ICAjaW5jbHVkZSA8bGludXgvanVtcF9sYWJl
-bC5oPg0KPiA+ID4gKyNpbmNsdWRlIDxsaW51eC9zY2hlZC9pc29sYXRpb24uaD4NCj4gPiA+ICAj
-aW5jbHVkZSAia3ZtX2NhY2hlX3JlZ3MuaCINCj4gPiA+ICAjaW5jbHVkZSAiaXJxLmgiDQo+ID4g
-PiAgI2luY2x1ZGUgImlvYXBpYy5oIg0KPiA+ID4gQEAgLTExMyw3ICsxMTQsOCBAQCBzdGF0aWMg
-aW5saW5lIHUzMiBrdm1feDJhcGljX2lkKHN0cnVjdCBrdm1fbGFwaWMNCj4gPiA+ICphcGljKQ0K
-PiA+ID4NCj4gPiA+ICBzdGF0aWMgYm9vbCBrdm1fY2FuX3Bvc3RfdGltZXJfaW50ZXJydXB0KHN0
-cnVjdCBrdm1fdmNwdSAqdmNwdSkgIHsNCj4gPiA+IC0gICAgIHJldHVybiBwaV9pbmplY3RfdGlt
-ZXIgJiYga3ZtX3ZjcHVfYXBpY3ZfYWN0aXZlKHZjcHUpOw0KPiA+ID4gKyAgICAgcmV0dXJuIHBp
-X2luamVjdF90aW1lciAmJiBrdm1fdmNwdV9hcGljdl9hY3RpdmUodmNwdSkgJiYNCj4gPiA+ICsg
-ICAgICAgICAgICAgIWhvdXNla2VlcGluZ19jcHUodmNwdS0+Y3B1LCBIS19GTEFHX1RJTUVSKTsN
-Cj4gPg0KPiA+IEkgZG9uJ3QgdGhpbmsgdGhpcyBpcyBzYWZlLCB2Y3B1LT5jcHUgd2lsbCBiZSAt
-MSBpZiB0aGUgdkNQVSBpc24ndCBzY2hlZHVsZWQgaW4uDQoNClllcywgdmNwdS0+Y3B1IGlzICAt
-MSBiZWZvcmUgdmNwdSBjcmVhdGUsIGJ1dCBpbiBteSBlbnZpcm9ubWVudHMsIGl0IGRpZG4ndA0K
-dHJpZ2dlciB0aGlzIGlzc3VlLiBJIG5lZWQgdG8gZGlnIG1vcmUsIFRoYW5rcyEgIA0KTWF5YmUg
-SSBuZWVkIG9uZSB2YWxpZCBjaGVjayBoZXJlLg0KDQo+ID4gVGhpcyBhbHNvIGRvZXNuJ3QgcGxh
-eSBuaWNlIHdpdGggdGhlIGFkbWluIGZvcmNpbmcgcGlfaW5qZWN0X3RpbWVyPTEuDQo+ID4gTm90
-IHNheWluZyB0aGVyZSdzIGEgcmVhc29uYWJsZSB1c2UgY2FzZSBmb3IgZG9pbmcgdGhhdCwgYnV0
-IGl0J3MNCj4gPiBzdXBwb3J0ZWQgdG9kYXkgYW5kIHRoaXMgd291bGQgYnJlYWsgdGhhdCBiZWhh
-dmlvci4gIEl0IHdvdWxkIGFsc28NCj4gPiBsZWFkIHRvIHdlaXJkIGJlaGF2aW9yIGlmIGEgdkNQ
-VSB3ZXJlIG1pZ3JhdGVkIG9uL29mZiBhIGhvdXNla2VlcGluZw0KPiA+IHZDUFUuICBBZ2Fpbiwg
-cHJvYmFibHkgbm90IGEgcmVhc29uYWJsZSB1c2UgY2FzZSwgYnV0IEkgZG9uJ3Qgc2VlIGFueXRo
-aW5nDQo+IHRoYXQgd291bGQgb3V0cmlnaHQgcHJldmVudCB0aGF0IGJlaGF2aW9yLg0KDQpZZXMs
-ICB0aGlzIGlzIG5vdCBvbmUgY29tbW9uIG9wZXJhdGlvbiwgIEJ1dCBJIGRpZCBkbyB0ZXN0IHNv
-bWUgc2NlbmFyaW9zOg0KMS4gaXNvbGF0ZWQgY3B1IC0tPiBob3VzZWtlZXBpbmcgY3B1Ow0KICAg
-IGlzb2xhdGVkIGd1ZXN0IHRpbWVyIGlzIGluIGhvdXNla2VlcGluZyBDUFUsIGZvciBtaWdyYXRp
-b24sIGt2bV9jYW5fcG9zdF90aW1lcl9pbnRlcnJ1cHQNCiAgICB3aWxsIHJldHVybiBmYWxzZSwg
-c28gdGhlIHRpbWVyIG1heSBiZSBtaWdyYXRlZCB0byB2Y3B1LT5jcHU7DQogICAgVGhpcyBzZWVt
-cyB3b3JrcyBpbiBteSB0ZXN0Ow0KMi4gaXNvbGF0ZWQgLS0+IGlzb2xhdGVkDQogICAgSXNvbGF0
-ZWQgZ3Vlc3QgdGltZXIgaXMgaW4gaG91c2VrZWVwaW5nIGNwdSwgZm9yIG1pZ3JhdGlvbixrdm1f
-Y2FuX3Bvc3RfdGltZXJfaW50ZXJydXB0IHJldHVybiANCiAgICB0cnVlLCB0aW1lciBpcyBub3Qg
-bWlncmF0ZWQNCjMuIGhvdXNla2VlcGluZyBDUFUgLS0+IGlzb2xhdGVkIENQVQ0KICAgIG5vbi1p
-c29sYXRlZCBDUFUgdGltZXIgaXMgdXN1YWxseSBpbiB2Y3B1LT5jcHUsIGZvciBtaWdyYXRpb24g
-dG8gaXNvbGF0ZWQsIGt2bV9jYW5fcG9zdF90aW1lcl9pbnRlcnJ1cHQNCiAgICB3aWxsIGJlIHRy
-dWUsICB0aGUgdGltZXIgcmVtYWluIG9uIHRoZSBzYW1lIENQVTsNCiAgICBUaGlzIHNlZW1zIHdv
-cmtzIGluIG15IHRlc3Q7ICANCjQuIGhvdXNla2VlcGluZyBDUFUgLS0+IGhvdXNla2VlcGluZyBD
-UFUNCiAgICAgdGltZXIgbWlncmF0ZWQ7DQpJdCBzZWVtcyB0aGlzIGlzIG5vdCBhbiBhZmZlY3Rp
-bmcgcHJvYmxlbTsgICANCg0KPiA+DQo+ID4gVGhlIGV4aXN0aW5nIGJlaGF2aW9yIGFsc28gZmVl
-bHMgYSBiaXQgdW5zYWZlIGFzIHBpX2luamVjdF90aW1lciBpcw0KPiA+IHdyaXRhYmxlIHdoaWxl
-IEtWTSBpcyBydW5uaW5nLCB0aG91Z2ggSSBzdXBwb3NlZCB0aGF0J3Mgb3J0aG9nb25hbCB0byB0
-aGlzDQo+IGRpc2N1c3Npb24uDQo+ID4NCj4gPiBSYXRoZXIgdGhhbiBjaGVjayB2Y3B1LT5jcHUs
-IGlzIHRoZXJlIGFuIGV4aXN0aW5nIHZDUFUgZmxhZyB0aGF0IGNhbg0KPiA+IGJlIHF1ZXJpZWQs
-IGUuZy4gS1ZNX0hJTlRTX1JFQUxUSU1FPw0KPiANCj4gSG93IGFib3V0IHNvbWV0aGluZyBsaWtl
-IGJlbG93Og0KPiANCj4gRnJvbSA2N2Y2MDUxMjBlMjEyMzg0Y2IzZDU3ODhiYThjODNmMTU2NTk1
-MDNiIE1vbiBTZXAgMTcgMDA6MDA6MDANCj4gMjAwMQ0KPiBGcm9tOiBXYW5wZW5nIExpIDx3YW5w
-ZW5nbGlAdGVuY2VudC5jb20+DQo+IERhdGU6IFR1ZSwgMjMgTm92IDIwMjEgMTA6MzY6MTAgKzA4
-MDANCj4gU3ViamVjdDogW1BBVENIXSBLVk06IExBUElDOiBUbyBrZWVwIHRoZSB2Q1BVcyBpbiBu
-b24tcm9vdCBtb2RlIGZvciB0aW1lci0NCj4gcGkNCj4gDQo+IEZyb206IFdhbnBlbmcgTGkgPHdh
-bnBlbmdsaUB0ZW5jZW50LmNvbT4NCj4gDQo+IEFzIGNvbW1pdCAwYzVmODFkYWQ0NiAoS1ZNOiBM
-QVBJQzogSW5qZWN0IHRpbWVyIGludGVycnVwdCB2aWEgcG9zdGVkDQo+IGludGVycnVwdCkgbWVu
-dGlvbmVkIHRoYXQgdGhlIGhvc3QgYWRtaW4gc2hvdWxkIHdlbGwgdHVuZSB0aGUgZ3Vlc3Qgc2V0
-dXAsDQo+IHNvIHRoYXQgdkNQVXMgYXJlIHBsYWNlZCBvbiBpc29sYXRlZCBwQ1BVcywgYW5kIHdp
-dGggc2V2ZXJhbCBwQ1BVcyBzdXJwbHVzDQo+IGZvcg0KPiAqYnVzeSogaG91c2VrZWVwaW5nLg0K
-PiBJdCBpcyBiZXR0ZXIgdG8gZGlzYWJsZSBtd2FpdC9obHQvcGF1c2Ugdm1leGl0cyB0byBrZWVw
-IHRoZSB2Q1BVcyBpbiBub24tcm9vdA0KPiBtb2RlLiBIb3dldmVyLCB3ZSBtYXkgaXNvbGF0ZSBw
-Q1BVcyBmb3Igb3RoZXIgcHVycG9zZSBsaWtlIERQREsgb3Igd2UNCj4gY2FuIG1ha2Ugc29tZSBn
-dWVzdHMgaXNvbGF0ZWQgYW5kIG90aGVycyBub3QsIExldCdzIGFkZCB0aGUgY2hlY2tpbmcNCj4g
-a3ZtX213YWl0X2luX2d1ZXN0KCkgdG8ga3ZtX2Nhbl9wb3N0X3RpbWVyX2ludGVycnVwdCgpIHNp
-bmNlIHdlIGNhbid0DQo+IGJlbmVmaXQgZnJvbSB0aW1lciBwb3N0ZWQtaW50ZXJydXB0IHcvbyBr
-ZWVwaW5nIHRoZSB2Q1BVcyBpbiBub24tcm9vdA0KPiBtb2RlLg0KPiANCj4gUmVwb3J0ZWQtYnk6
-IEFpbGkgWWFvIDx5YW9haWxpQGtpbmdzb2Z0LmNvbT4NCj4gU2lnbmVkLW9mZi1ieTogV2FucGVu
-ZyBMaSA8d2FucGVuZ2xpQHRlbmNlbnQuY29tPg0KPiAtLS0NCj4gIGFyY2gveDg2L2t2bS9sYXBp
-Yy5jIHwgNSArKy0tLQ0KPiAgMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwgMyBkZWxl
-dGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9hcmNoL3g4Ni9rdm0vbGFwaWMuYyBiL2FyY2gv
-eDg2L2t2bS9sYXBpYy5jIGluZGV4DQo+IDc1OTk1MmRkMTIyMi4uODI1NzU2NmQ0NGM3IDEwMDY0
-NA0KPiAtLS0gYS9hcmNoL3g4Ni9rdm0vbGFwaWMuYw0KPiArKysgYi9hcmNoL3g4Ni9rdm0vbGFw
-aWMuYw0KPiBAQCAtMTEzLDE0ICsxMTMsMTMgQEAgc3RhdGljIGlubGluZSB1MzIga3ZtX3gyYXBp
-Y19pZChzdHJ1Y3Qga3ZtX2xhcGljDQo+ICphcGljKQ0KPiANCj4gIHN0YXRpYyBib29sIGt2bV9j
-YW5fcG9zdF90aW1lcl9pbnRlcnJ1cHQoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KSAgew0KPiAtICAg
-IHJldHVybiBwaV9pbmplY3RfdGltZXIgJiYga3ZtX3ZjcHVfYXBpY3ZfYWN0aXZlKHZjcHUpOw0K
-PiArICAgIHJldHVybiBwaV9pbmplY3RfdGltZXIgJiYga3ZtX213YWl0X2luX2d1ZXN0KHZjcHUt
-Pmt2bSkgJiYNCj4ga3ZtX3ZjcHVfYXBpY3ZfYWN0aXZlKHZjcHUpOw0KPiAgfQ0KPiANCj4gIGJv
-b2wga3ZtX2Nhbl91c2VfaHZfdGltZXIoc3RydWN0IGt2bV92Y3B1ICp2Y3B1KSAgew0KPiAgICAg
-IHJldHVybiBrdm1feDg2X29wcy5zZXRfaHZfdGltZXINCj4gLSAgICAgICAgICAgJiYgIShrdm1f
-bXdhaXRfaW5fZ3Vlc3QodmNwdS0+a3ZtKSB8fA0KPiAtICAgICAgICAgICAga3ZtX2Nhbl9wb3N0
-X3RpbWVyX2ludGVycnVwdCh2Y3B1KSk7DQo+ICsgICAgICAgICAgICYmICFrdm1fbXdhaXRfaW5f
-Z3Vlc3QodmNwdS0+a3ZtKTsNCj4gIH0NCj4gIEVYUE9SVF9TWU1CT0xfR1BMKGt2bV9jYW5fdXNl
-X2h2X3RpbWVyKTsNCg0KVGhpcyBtZXRob2Qgc2VlbXMgbW9yZSBxdWljayBhbmQgc2FmZSwgYnV0
-IEkgaGF2ZSBvbmUgcXVlc3Rpb246IERvZXMgdGhpcyBrdm1fbXdhaXRfaW5fZ3Vlc3QNCmNhbiBn
-dWFyYW50ZWUgdGhlIENQVSBpc29sYXRlZCwgIGluIHNvbWUgcHJvZHVjdGlvbiBlbnZpcm9ubWVu
-dHMgYW5kIHVzdWFsbHksICBNV0FJVCBmZWF0dXJlIGlzIGRpc2FibGVkIGluIGhvc3QNCmFuZCBl
-dmVuIGd1ZXN0cyB3aXRoIGlzb2xhdGVkIENQVXMuICBBbmQgYWxzbyB3ZSBjYW4gc2V0IGd1ZXN0
-cyBrdm1fbXdhaXRfaW5fZ3Vlc3QgdHJ1ZSB3aXRoIENQVXMganVzdCBwaW5uZWQsIG5vdCBpc29s
-YXRlZC4NCg0KVGhhbmtzDQo=
+On Sun, Nov 21, 2021 at 4:37 AM Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Wed, 17 Nov 2021 06:43:32 +0000,
+> Reiji Watanabe <reijiw@google.com> wrote:
+> >
+> > Extend sys_regs[] of kvm_cpu_context for ID registers and save ID
+> > registers' sanitized value in the array for the vCPU at the first
+> > vCPU reset. Use the saved ones when ID registers are read by
+> > userspace (via KVM_GET_ONE_REG) or the guest.
+> >
+> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h | 10 +++++++
+> >  arch/arm64/kvm/sys_regs.c         | 43 +++++++++++++++++++------------
+> >  2 files changed, 37 insertions(+), 16 deletions(-)
+> >
+> > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> > index edbe2cb21947..72db73c79403 100644
+> > --- a/arch/arm64/include/asm/kvm_host.h
+> > +++ b/arch/arm64/include/asm/kvm_host.h
+> > @@ -146,6 +146,14 @@ struct kvm_vcpu_fault_info {
+> >       u64 disr_el1;           /* Deferred [SError] Status Register */
+> >  };
+> >
+> > +/*
+> > + * (Op0, Op1, CRn, CRm, Op2) of ID registers is (3, 0, 0, crm, op2),
+> > + * where 0<=crm<8, 0<=op2<8.
+> > + */
+> > +#define KVM_ARM_ID_REG_MAX_NUM 64
+> > +#define IDREG_IDX(id)                ((sys_reg_CRm(id) << 3) | sys_reg_Op2(id))
+> > +#define IDREG_SYS_IDX(id)    (ID_REG_BASE + IDREG_IDX(id))
+> > +
+> >  enum vcpu_sysreg {
+> >       __INVALID_SYSREG__,   /* 0 is reserved as an invalid value */
+> >       MPIDR_EL1,      /* MultiProcessor Affinity Register */
+> > @@ -210,6 +218,8 @@ enum vcpu_sysreg {
+> >       CNTP_CVAL_EL0,
+> >       CNTP_CTL_EL0,
+> >
+> > +     ID_REG_BASE,
+> > +     ID_REG_END = ID_REG_BASE + KVM_ARM_ID_REG_MAX_NUM - 1,
+>
+> It is rather unclear to me why we want these registers to be
+> replicated on a per-CPU basis. Yes, this fits the architecture, but
+> that's also a total waste of memory if you have more than a single
+> CPU, because we make a point in only exposing homogeneous properties
+> to the VM (I don't think anyone intends to support vcpu asymmetry in a
+> VM, and 64 registers per vcpu is not an insignificant memory usage).
+>
+> If there are no reasons for this to be per-CPU, please move it to be
+> global to the VM. This also mean that once a vcpu has reset, it
+> shouldn't be possible to affect the registers. This shouldn't affect
+> the userspace API though.
+
+
+Currently, userspace can configure different CPU features for each vCPU
+with KVM_ARM_VCPU_INIT, which indirectly affect ID registers.
+I'm not sure if anyone actually does that though.
+
+Since I personally thought having ID registers per vCPU more naturally
+fits the behavior of KVM_ARM_VCPU_INIT and makes more straightforward
+behavior of KVM_SET_ONE_REG, I chose that.
+(That would be also better in terms of vCPUs scalability for live migration
+ considering a case where userspace tries to restore ID registers for
+ many vCPUs in parallel during live migration.  Userspace could avoid that,
+ and there are ways for KVM to mitigate that though.)
+
+Having ID registers per-VM is of course feasible even while maintaining
+the current behavior of KVM_ARM_VCPU_INIT though.
+
+Thanks,
+Reiji
