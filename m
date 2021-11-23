@@ -2,126 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5611E45A3DA
-	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 14:35:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F41FA45A41E
+	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 14:52:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234572AbhKWNiQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Nov 2021 08:38:16 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:9654 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229939AbhKWNiP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 23 Nov 2021 08:38:15 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1ANDWvV3030294;
-        Tue, 23 Nov 2021 13:35:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=JhkYMBSB3TFJwO+8btge7mrVeNvkGW7dfXyrbtfjwXE=;
- b=ri1UKDFNNHoCXCg5mpYSNaeT2zPoj8xucNoM85jQP3wPvGTH5DsW9ixtcceiwp38I3g4
- wsZKZDpJcQAsHkDKSOzk1g8yGOPYavf5CNMQYyp08yISz9tqqMP4vTk2NB9AwpXdnjN5
- xeOJ4MthZRcV/vw086ugaXRjR26I3bJ39CbByHuZUmVqm5GcfG8zcCrx5RfZlYsNAZQM
- 7prmGLXfTZi6Z1UhC2D05YySI/WpG3Wh2telp4eYHokZmEadu+Qcfdo3ryDkMqQ3SkBl
- Qm4JtWVUs0ZMbG7lZlYCKqjPWbuLDm+rOj0nVD9FIJI3+G6Cn8r3pfWPugqBc+FsSnZD 0g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cgw5nnk65-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Nov 2021 13:35:05 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1ANDXc9I032676;
-        Tue, 23 Nov 2021 13:35:05 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cgw5nnk5c-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Nov 2021 13:35:05 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1AND94hI029337;
-        Tue, 23 Nov 2021 13:22:34 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma06ams.nl.ibm.com with ESMTP id 3cer9jr949-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 23 Nov 2021 13:22:34 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1ANDMW4415073734
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 23 Nov 2021 13:22:32 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 01FF94C044;
-        Tue, 23 Nov 2021 13:22:32 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 83C934C046;
-        Tue, 23 Nov 2021 13:22:31 +0000 (GMT)
-Received: from li-e979b1cc-23ba-11b2-a85c-dfd230f6cf82 (unknown [9.171.0.71])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with SMTP;
-        Tue, 23 Nov 2021 13:22:31 +0000 (GMT)
-Date:   Tue, 23 Nov 2021 14:22:29 +0100
-From:   Halil Pasic <pasic@linux.ibm.com>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     virtualization@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>, netdev@vger.kernel.org,
-        kvm@vger.kernel.org, Asias He <asias@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: [PATCH 1/2] vhost/vsock: fix incorrect used length reported to
- the guest
-Message-ID: <20211123142229.78edf43a.pasic@linux.ibm.com>
-In-Reply-To: <20211122163525.294024-2-sgarzare@redhat.com>
-References: <20211122163525.294024-1-sgarzare@redhat.com>
-        <20211122163525.294024-2-sgarzare@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        id S235826AbhKWNz6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Nov 2021 08:55:58 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:33938 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235702AbhKWNzz (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 23 Nov 2021 08:55:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1637675567;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=hg3rpdgYxxcOBJc5G9ynr2yksQKyjRICI2KgG4YRajw=;
+        b=evr0QXRKqYUWh7KPzNQrkvBllgBAf7R8zFdvgoBKag709zrEiI5JAcyihkkWArqnpWUbOO
+        Pp79vLc8V4beJagq1acSp5GDtpBCKhrg4/eHufeWInOTMSrCYvNflyvGYgdWLTbb83vsRC
+        72V5L5359zP0UF1CvI93Dmnq2snft0s=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-485-8E-DjwUIOKKJRdNYlFP7XA-1; Tue, 23 Nov 2021 08:52:44 -0500
+X-MC-Unique: 8E-DjwUIOKKJRdNYlFP7XA-1
+Received: by mail-wm1-f69.google.com with SMTP id 201-20020a1c04d2000000b003335bf8075fso8508214wme.0
+        for <kvm@vger.kernel.org>; Tue, 23 Nov 2021 05:52:43 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=hg3rpdgYxxcOBJc5G9ynr2yksQKyjRICI2KgG4YRajw=;
+        b=Fx70w8HPyYE30cANlgY5ebJlaP+gWswvLT1r0UHpbC+38pn9HJ0yg+QpgeZBZnMqoi
+         cHDwXgGLRmIU32o+09MSYk7WRX7cqLP4WtY5qaIGH/uoPB5HZ0gEnlx4JENVW95s6rWu
+         gI6S6+/me12VIRH9sydCI/i7P6eHl17OB+LiEuRex3J+AbPjIWDXUA5W/1YS+MOKVJWV
+         ie/khoZ4hn0zK7vdDsNU7ZFLsdguGXHZWA6LSeJ7hCsy7fcmhJ8xxNPP5uYNxtmihb35
+         eoC/lxvJimTeTXVDMmoQyzQ5NrDTDU8vDHDcd2azJ00PaMpALKNETi/rrKNiOfc60+eR
+         NpfA==
+X-Gm-Message-State: AOAM532qOg/ehDAKqSi3KkNQA2pKPujNVHhZdg2P6fYz57cNSGB1pLUm
+        qGF+PrHZz+/imVQIRD4O4SARYUIpqkmz4Q7A63zgZDkMs0w0YxvI557Q2AWkiplXDBuQ+qb9YWq
+        KdmTGW/Ii0YQM
+X-Received: by 2002:a1c:7e04:: with SMTP id z4mr3279216wmc.134.1637675562910;
+        Tue, 23 Nov 2021 05:52:42 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJw7iTjEl+nEyfMdplA1sJxP2OTCbcZNTVWZJYf4xKxVJgZBJzKPzNLaMH3ChCLer/E4VRC5uQ==
+X-Received: by 2002:a1c:7e04:: with SMTP id z4mr3279190wmc.134.1637675562732;
+        Tue, 23 Nov 2021 05:52:42 -0800 (PST)
+Received: from fedora (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id o1sm12066278wrn.63.2021.11.23.05.52.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 23 Nov 2021 05:52:42 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: selftests: Make sure kvm_create_max_vcpus test
+ won't hit RLIMIT_NOFILE
+In-Reply-To: <87czmsm5iv.fsf@redhat.com>
+References: <20211122171920.603760-1-vkuznets@redhat.com>
+ <YZvVeW6qYNb/kkSc@google.com> <87czmsm5iv.fsf@redhat.com>
+Date:   Tue, 23 Nov 2021 14:52:41 +0100
+Message-ID: <877dczm11y.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: wRsvhxK9Lethzrk-8OpJ2qBrcMHq6Gmt
-X-Proofpoint-ORIG-GUID: rEbIEAYwChKL5YaPQCZC2OyfUobdXAVK
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-11-23_04,2021-11-23_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
- suspectscore=0 mlxlogscore=999 spamscore=0 malwarescore=0 mlxscore=0
- priorityscore=1501 impostorscore=0 lowpriorityscore=0 adultscore=0
- clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2111230076
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 22 Nov 2021 17:35:24 +0100
-Stefano Garzarella <sgarzare@redhat.com> wrote:
+Vitaly Kuznetsov <vkuznets@redhat.com> writes:
 
-> The "used length" reported by calling vhost_add_used() must be the
-> number of bytes written by the device (using "in" buffers).
-> 
-> In vhost_vsock_handle_tx_kick() the device only reads the guest
-> buffers (they are all "out" buffers), without writing anything,
-> so we must pass 0 as "used length" to comply virtio spec.
-> 
-> Fixes: 433fc58e6bf2 ("VSOCK: Introduce vhost_vsock.ko")
-> Cc: stable@vger.kernel.org
-> Reported-by: Halil Pasic <pasic@linux.ibm.com>
-> Suggested-by: Jason Wang <jasowang@redhat.com>
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>>>  
+>>> +	/*
+>>> +	 * Creating KVM_CAP_MAX_VCPUS vCPUs require KVM_CAP_MAX_VCPUS open
+>>> +	 * file decriptors.
+>>> +	 */
+>>> +	TEST_ASSERT(!getrlimit(RLIMIT_NOFILE, &rl),
+>>> +		    "getrlimit() failed (errno: %d)", errno);
+>>
+>> And strerror() output too?
+>>
+>
+> Sure, will add in v2.
+>
 
-Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+Actually, there are two issues with the code above. First, TEST_ASSERT()
+already prints both errno and strerror() (setrlimit() counterpart which
+is easier to make fail):
 
-> ---
->  drivers/vhost/vsock.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-> index 938aefbc75ec..4e3b95af7ee4 100644
-> --- a/drivers/vhost/vsock.c
-> +++ b/drivers/vhost/vsock.c
-> @@ -554,7 +554,7 @@ static void vhost_vsock_handle_tx_kick(struct vhost_work *work)
->  			virtio_transport_free_pkt(pkt);
->  
->  		len += sizeof(pkt->hdr);
-> -		vhost_add_used(vq, head, len);
-> +		vhost_add_used(vq, head, 0);
->  		total_len += len;
->  		added = true;
->  	} while(likely(!vhost_exceeds_weight(vq, ++pkts, total_len)));
+KVM_CAP_MAX_VCPU_ID: 4096
+KVM_CAP_MAX_VCPUS: 1024
+==== Test Assertion Failure ====
+  kvm_create_max_vcpus.c:68: !setrlimit(RLIMIT_NOFILE, &rl)
+  pid=344504 tid=344504 errno=1 - Operation not permitted
+     1	0x0000000000402485: main at kvm_create_max_vcpus.c:68
+     2	0x00007fcb2e8b4041: ?? ??:0
+     3	0x000000000040254d: _start at ??:?
+  setrlimit() failed, errno: 0
+
+Second, note "errno: 0" above. There's no guarantee that getrlimit()
+will be executed before evaluating 'errno' in C. I think I'll just drop
+redundant errno printout then.
+
+-- 
+Vitaly
 
