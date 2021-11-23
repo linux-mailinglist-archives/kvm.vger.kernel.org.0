@@ -2,110 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 84DD145A251
-	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 13:16:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B8CC45A2AE
+	for <lists+kvm@lfdr.de>; Tue, 23 Nov 2021 13:33:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236011AbhKWMTd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 23 Nov 2021 07:19:33 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:41754 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229939AbhKWMTa (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 23 Nov 2021 07:19:30 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637669782;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=0lTu4UDtxs9G6akE9Ez/8GeGccVaaleJp/KA7PEeCZI=;
-        b=RjaVebfbaJBsetzJUGoxL5r2qtfOWKt1mONywQpz6T2146e0VNuf2SpX0HPDU/DNRUoD71
-        zZJ88x/tn3GJfoLo0z9D1gpeTuO1aMz/N/OEB4GI1wyA8K18+9HjVEdV4DPZil4Adx+bvu
-        D9LH2JrLRfOZ/OEbHF4L9Uj8vKzYnME=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-283-Bs2hW7wxOpO7rKc5JVGstw-1; Tue, 23 Nov 2021 07:16:21 -0500
-X-MC-Unique: Bs2hW7wxOpO7rKc5JVGstw-1
-Received: by mail-pj1-f72.google.com with SMTP id u11-20020a17090a4bcb00b001a6e77f7312so1268743pjl.5
-        for <kvm@vger.kernel.org>; Tue, 23 Nov 2021 04:16:20 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=0lTu4UDtxs9G6akE9Ez/8GeGccVaaleJp/KA7PEeCZI=;
-        b=onGHM+jZ28LBVQ9qoFVTE1Yc0Ar4IOtx2Npx1cAcZ5DTiHmumuOD6rpBJ1kd5vUFrn
-         6rIQWBdcsgg0wOanwAfaDQtpOYqvRBxr1q1lZyHF3GxwO9YltXl5tFFD8Y25hqvh54Y0
-         Ec0QznAno0geh+0ihganCAySYhmWszs68wu+Ly8bPIfCR3Padk4xRkX7LQY3MO54S19P
-         xGQOozG3n02aKlFkxc1c87XDEJ+vYIvJNgUzLaats3IbE9U7M56W/iIRG900snFmLCLH
-         aG2lUQz7fSbJs0Fq7zFkKH6iS6Bp/zIzo0pxGd9oNwxB0zAGxdsScBeZeU3Hr7LefqXK
-         1Ghw==
-X-Gm-Message-State: AOAM531D+xoECJlnvc72tr3oD4KSRnYW8qH7xcvuDWpRCQSYHOGUrZ5N
-        JRNflVpc4JHvfeI2MeeUPcAAQgOLRTbU5XbDz28Rws1TtIInssTIz3Am45XpaqCMhw3hFJBO3Jf
-        ubysR6hz9hIJv
-X-Received: by 2002:a62:7c8b:0:b0:49f:a8ae:de33 with SMTP id x133-20020a627c8b000000b0049fa8aede33mr4665106pfc.29.1637669779922;
-        Tue, 23 Nov 2021 04:16:19 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzXoQ6l69oslSPduxOpj5oSb0/wv8X2UapMrfGsTgsa2jNnmdantJusdefawcE93caP/ffL5g==
-X-Received: by 2002:a62:7c8b:0:b0:49f:a8ae:de33 with SMTP id x133-20020a627c8b000000b0049fa8aede33mr4665066pfc.29.1637669779657;
-        Tue, 23 Nov 2021 04:16:19 -0800 (PST)
-Received: from xz-m1.local ([191.101.132.71])
-        by smtp.gmail.com with ESMTPSA id b4sm13267412pfl.60.2021.11.23.04.16.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Nov 2021 04:16:19 -0800 (PST)
-Date:   Tue, 23 Nov 2021 20:15:57 +0800
-From:   Peter Xu <peterx@redhat.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        kvm list <kvm@vger.kernel.org>,
-        Ben Gardon <bgardon@google.com>,
-        Junaid Shahid <junaids@google.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Harish Barathvajasankar <hbarath@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Shier <pshier@google.com>
-Subject: Re: RFC: KVM: x86/mmu: Eager Page Splitting
-Message-ID: <YZzbfYeVSJ/rPTuI@xz-m1.local>
-References: <CALzav=dV_U4r1K9oDq4esb4mpBQDQ2ROQ5zH5wV3KpOaZrRW-A@mail.gmail.com>
- <bc06dd82-06e1-b455-b2c1-59125b530dda@linux.vnet.ibm.com>
- <YYmRpz4dQgli3GKM@google.com>
+        id S236694AbhKWMge (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 23 Nov 2021 07:36:34 -0500
+Received: from mail.kernel.org ([198.145.29.99]:38584 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S235366AbhKWMgd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 23 Nov 2021 07:36:33 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 8E78A6102A;
+        Tue, 23 Nov 2021 12:33:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1637670805;
+        bh=qeoJNcSgbBVk7r1DYK17Di/fl8glCyyr/Yvfx5GDx/c=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=TX5eiN6+XilYYUL2SB8jn4QVFlWbUuHBQjnohU3/wSIUZw98IL2SZkakd5+SusLcf
+         HRhThGUf5UAlOhNFUJri/JFoZcG06SNeE+NrvgvyPzG0+1sMWgLilRoWt7qDke/ujd
+         vA1ezHAHjXGtHgbbijftkUuyf1PufTW4F1DvduD1jWCKIEtEGSTfW1NsjCMESu9jBo
+         aivRIRZnjVzR9s71dwl8+hRT+pFJuJ3/k8UpgVYZjta2uglXn6yuPLAyFs7wUuygqa
+         Pcm2F9GlX2vMOJ80YCUuWRFlnfvtIhZ5hxL+M8es3q2542A/Ch1Q1xn4xAbsTO6wjN
+         wPxhsFIFLFQgA==
+Date:   Tue, 23 Nov 2021 12:33:20 +0000
+From:   Mark Brown <broonie@kernel.org>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Quentin Perret <qperret@google.com>,
+        Will Deacon <will@kernel.org>, kernel-team@android.com
+Subject: Re: [PATCH v2 2/5] KVM: arm64: Get rid of host SVE tracking/saving
+Message-ID: <YZzfkO+HawhyZSjt@sirena.org.uk>
+References: <20211028111640.3663631-1-maz@kernel.org>
+ <20211028111640.3663631-3-maz@kernel.org>
+ <5ab3836f-2b39-2ff5-3286-8258addd01e4@huawei.com>
+ <871r38dvyr.wl-maz@kernel.org>
+ <YZvaKOLPxwFE9vQz@sirena.org.uk>
+ <87v90kcb8u.wl-maz@kernel.org>
+ <YZvhuD7cVU/4AaFC@sirena.org.uk>
+ <87mtlvchbe.wl-maz@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="q//FCEjhiy9XzDIz"
 Content-Disposition: inline
-In-Reply-To: <YYmRpz4dQgli3GKM@google.com>
+In-Reply-To: <87mtlvchbe.wl-maz@kernel.org>
+X-Cookie: A closed mouth gathers no foot.
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 08, 2021 at 09:07:51PM +0000, David Matlack wrote:
-> On Fri, Nov 05, 2021 at 06:17:11PM +0100, Janis Schoetterl-Glausch wrote:
-> > On 11/4/21 23:45, David Matlack wrote:
-> > 
-> > [...]
-> > > 
-> > > The last alternative is to perform dirty tracking at a 2M granularity.
-> > > This would reduce the amount of splitting work required by 512x,
-> > > making the current approach of splitting on fault less impactful to
-> > > customer performance. We are in the early stages of investigating 2M
-> > > dirty tracking internally but it will be a while before it is proven
-> > > and ready for production. Furthermore there may be scenarios where
-> > > dirty tracking at 4K would be preferable to reduce the amount of
-> > > memory that needs to be demand-faulted during precopy.
-> 
-> Oops I meant to say "demand-faulted during post-copy" here.
 
-Sorry to join late, but this does sound like an interesting topic, too.
+--q//FCEjhiy9XzDIz
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Hopefully assuming postcopy will be enabled in just a few iterations of
-precopy, write amplification could hopefully be a much smaller problem, so the
-mostly-static pages can still be successfully migrated during precopy.
+On Tue, Nov 23, 2021 at 10:11:33AM +0000, Marc Zyngier wrote:
+> Mark Brown <broonie@kernel.org> wrote:
 
-Please share more information when there is, and I'll be very interested to
-learn.
+> > We don't need to change the ABI, the ABI just says we zero the registers
+> > that aren't shared with FPSIMD.  Instead of doing that on taking a SVE
+> > access trap to reenable SVE after having disabled TIF_SVE we could do
 
-Thanks!
+> That's not the point I'm trying to make.
 
--- 
-Peter Xu
+> Userspace expects to have lost SVE information over a syscall (even if
+> the VL is 128, it expects to have lost P0..P15 and FFR). How do you
+> plan to tell userspace that this behaviour has changed?
 
+My point is that this doesn't need to change.  Userspace can't tell if
+we zeroed the non-shared state on syscall or on some later access trap.
+
+--q//FCEjhiy9XzDIz
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmGc348ACgkQJNaLcl1U
+h9A32Qf/Q7Q5jbrsFshgkZUBzFoqpvW0snt8h5uAD6T9O2p4YA5CaPXHdfHWiLIQ
+iQqziZPS0Yz6EMaiwfIx6BKYzWacpwT/k3uKbyT3tUxaWo9y7XrDrAqyqlBr24Zi
+XUAcppKtKYkugRLQ2aLWEjxA5x3lv2N5yK5xvRLeP+ogP1k5HPfJsU82fG81Kh17
+zXksTe5o+AlSttOE25+UAcO7tUkY0OxorMjdaF+ih7OCiZlXn30dNheNniPRzxP8
++3M6ZchCoNcFNETThDNGvg+9Kt3TACRFYQsHRJk6fq4mIw9VLkVv3n93vhgzFK5n
+pVgD3/8+7m+I7Bj5iObRveR1nxSLaQ==
+=3P0L
+-----END PGP SIGNATURE-----
+
+--q//FCEjhiy9XzDIz--
