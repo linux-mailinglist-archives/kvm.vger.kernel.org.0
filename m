@@ -2,58 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 15AF145C414
-	for <lists+kvm@lfdr.de>; Wed, 24 Nov 2021 14:43:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 294CB45C417
+	for <lists+kvm@lfdr.de>; Wed, 24 Nov 2021 14:43:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351284AbhKXNpY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Nov 2021 08:45:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37328 "EHLO
+        id S243740AbhKXNp1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Nov 2021 08:45:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345928AbhKXNmQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Nov 2021 08:42:16 -0500
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 909E2C0698C7;
-        Wed, 24 Nov 2021 04:21:01 -0800 (PST)
-Received: by mail-pl1-x632.google.com with SMTP id z6so1696328plk.6;
-        Wed, 24 Nov 2021 04:21:01 -0800 (PST)
+        with ESMTP id S1350772AbhKXNmr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Nov 2021 08:42:47 -0500
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3E5BC0698C5;
+        Wed, 24 Nov 2021 04:21:06 -0800 (PST)
+Received: by mail-pj1-x1029.google.com with SMTP id gx15-20020a17090b124f00b001a695f3734aso2560751pjb.0;
+        Wed, 24 Nov 2021 04:21:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=xUvUOJeaDFWG0kCntPaGnPejZW29ujn3LDMRhDQ7kP8=;
-        b=gKaMj2W9QFCwd0YsFcprPM9iGY5KGI1sDYTS8S7oo3W7YQ+4rhwrKoUWZ3z25i2SWs
-         9qppVN+O35uRn+PX/sFeoOgMwxRJUFCPAP/vYnOxodRkzjDKLcw3sFt7Jd2jBOptsEoJ
-         rMJY9ITVsAR8BaufPVflDgtb8GyjKRPmKaL1tsMNFNBhFWZr4OJH44eAGrN20/xaocb0
-         HAihhb8fxKr63n3tqGXlWtcCY9mbCJLagDY6RE1HM4oUq2hD3HK1bg9FyDpskU/zqG0T
-         l+0FeAf0w08QLmltOGJXbGxuSgrUKe9Ek9S11hHYpCgviKp7DaqAVp8i1hAxqDbKlWVM
-         1u/A==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=AEdqjK4o16EGLSk6JO6HF5Tgz4hVCtbgs2lA50oCK6g=;
+        b=EsylvIa6Gpn3m2ZXaJQlOQMttlasMarVx7+tOAP/h1b5Sg4ffnlTAQIl/gKLVjnDHL
+         YMkTwAZuaD7UIDCPG9GsDA9ArdDM65KIZj8X4fcLj/UFemAzH/FIfDKwWA03hTlr8xII
+         scM+GnDHOyp9uLmwaYg0G5bq9oQ72luE3g38/fLEbF9YshdSeM3G2Lo4ky+lS3QOPm4N
+         fRgG/2Lu1aiZTAddbK0ktvLyl/OZ7XX30Tezyw1snZtjm3SbePkG4EXv7uGDRfEDXLfw
+         aVSEZuG8wDoIe05ia9AjHdfbQS0OFDBevporn0iHpP2D8/1qFDfUQW7nB5fWr8N2fRP5
+         fDZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=xUvUOJeaDFWG0kCntPaGnPejZW29ujn3LDMRhDQ7kP8=;
-        b=o5vwAFa7SY3EPSTFzvztAAHU40UlxBLsmlQeO9UF4vOMoU+uoTi0SdQtDXiBYy4wX1
-         2UUBdrqPPFjpbyU6whitrRKyi/0yYBXU2OoyXmdqPs+lQa9iTq/dqIXcVuJpwSvXoIVb
-         aAlTIQ8Tt6Y/5WyYTEgrx7AV8R8K/a+fEaFCYWQuo6u/PoA8v0A8uhYA9kSJk3ujV26D
-         MwTldcaiZ0cQgCWieNU8p5Tut7KicGTCS+4Ray8+XDWwkZROpXtshLsl9N3tahwW4QI1
-         /9k5HSt4ttX7Fgnaqg3xZLlW1UXISe4u0tnPNUlIVZ7ftA0s55QAotZHXzDGJNyf3vhY
-         le0w==
-X-Gm-Message-State: AOAM532TXthcEyuWgRUV6d1KSTyVX9nZj7QXR5EvLYXYI6rtfX9em28b
-        8NwrFV3BsN08N4ssdyciMYqoE9q0NPI=
-X-Google-Smtp-Source: ABdhPJxSvkao1rbgzHDAqBrYxWCGtUgMxc0rOvfp/8357ycGugGC9yTYDMi2FlOoz+QqSajiC43PuA==
-X-Received: by 2002:a17:903:31d1:b0:141:f14b:6ebd with SMTP id v17-20020a17090331d100b00141f14b6ebdmr17569423ple.75.1637756460889;
-        Wed, 24 Nov 2021 04:21:00 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=AEdqjK4o16EGLSk6JO6HF5Tgz4hVCtbgs2lA50oCK6g=;
+        b=5VAmcO0vtyLsow+o54Sv8wuRLkspl4Va8ZEuLuOPnPjBKy14blCawaGA/ei/0j+ZNf
+         CDZczyMVhTZ2TW2My3tQqBCN364CAoqiE+WlxEuU4k3MwwAQkL5NlLTaABNmTe7tz9GA
+         a4bhO9m1hzbmKJF9Iyi0K9El7lacHgtD3bbJ54veYtzB4PWddpzBfsJIR9PiBQV20tf1
+         0zsjzcuzAucF/H6THrEsy8nFLL45ktQih5g8+B7zreb2NqpbIHPHOJoOu4lftbddPWLX
+         XrU2AXVr2rs77GhxclTm2Iv5t703tqOkuuxj6u+KzjxCfY7UAg4x8aEpbJWy59U2Yoo0
+         3khw==
+X-Gm-Message-State: AOAM532CwxO20c/qFsMCy//gDs7MRY1mxlOh/mZUSzjvgJDPlQf1Fuw4
+        2fRI4yLzFR1UoiNqjpzyaLrIn4zQlm0=
+X-Google-Smtp-Source: ABdhPJyI7qlzd1CFleVPx388vWONmPdD5I72tP5aJSGc5nveoHSEINgbfO7jMLHBwLTTwsNsh3x/tw==
+X-Received: by 2002:a17:90b:1c02:: with SMTP id oc2mr8202258pjb.65.1637756466275;
+        Wed, 24 Nov 2021 04:21:06 -0800 (PST)
 Received: from localhost ([198.11.178.15])
-        by smtp.gmail.com with ESMTPSA id e14sm18448429pfv.18.2021.11.24.04.21.00
+        by smtp.gmail.com with ESMTPSA id j13sm4285647pgm.35.2021.11.24.04.21.05
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 24 Nov 2021 04:21:00 -0800 (PST)
+        Wed, 24 Nov 2021 04:21:06 -0800 (PST)
 From:   Lai Jiangshan <jiangshanlai@gmail.com>
 To:     linux-kernel@vger.kernel.org
-Cc:     kvm@vger.kernel.org, Lai Jiangshan <laijs@linux.alibaba.com>
-Subject: [PATCH 00/12] KVM: X86: misc fixes and cleanup
-Date:   Wed, 24 Nov 2021 20:20:42 +0800
-Message-Id: <20211124122055.64424-1-jiangshanlai@gmail.com>
+Cc:     kvm@vger.kernel.org, Lai Jiangshan <laijs@linux.alibaba.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Subject: [PATCH 01/12] KVM: X86: Fix when shadow_root_level=5 && guest root_level<4
+Date:   Wed, 24 Nov 2021 20:20:43 +0800
+Message-Id: <20211124122055.64424-2-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
+In-Reply-To: <20211124122055.64424-1-jiangshanlai@gmail.com>
+References: <20211124122055.64424-1-jiangshanlai@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -62,48 +75,32 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Lai Jiangshan <laijs@linux.alibaba.com>
 
-This pacheset has misc fixes and cleanups with loose dependence to each
-other.  It includes a prevous patch that inverts and renames
-gpte_is_8_bytes.
+If the is an L1 with nNPT in 32bit, the shadow walk starts with
+pae_root.
 
-Ohter patches focus on the usage of vcpu->arch.walk_mmu and
-vcpu->arch.mmu, root_level, lpage_level.
+Fixes: a717a780fc4e ("KVM: x86/mmu: Support shadowing NPT when 5-level paging is enabled in host)
+Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Patch 1,4,5,6,7 fixes something, but I don't think path4,5,6,7 are worth
-in stable tree.
-
-Lai Jiangshan (12):
-  KVM: X86: Fix when shadow_root_level=5 && guest root_level<4
-  KVM: X86: Add parameter struct kvm_mmu *mmu into mmu->gva_to_gpa()
-  KVM: X86: Remove mmu->translate_gpa
-  KVM: X86: Use vcpu->arch.walk_mmu for kvm_mmu_invlpg()
-  KVM: X86: Change the type of a parameter of kvm_mmu_invalidate_gva()
-    and mmu->invlpg() to gpa_t
-  KVM: X86: Add huge_page_level to __reset_rsvds_bits_mask_ept()
-  KVM: X86: Add parameter huge_page_level to kvm_init_shadow_ept_mmu()
-  KVM: VMX: Use ept_caps_to_lpage_level() in hardware_setup()
-  KVM: X86: Rename gpte_is_8_bytes to has_4_byte_gpte and invert the
-    direction
-  KVM: X86: Remove mmu parameter from load_pdptrs()
-  KVM: X86: Check root_level only in fast_pgd_switch()
-  KVM: X86: Walk shadow page starting with shadow_root_level
-
- Documentation/virt/kvm/mmu.rst  |   8 +--
- arch/x86/include/asm/kvm_host.h |  23 ++++----
- arch/x86/kvm/mmu.h              |  16 ++++-
- arch/x86/kvm/mmu/mmu.c          | 100 +++++++++++++++-----------------
- arch/x86/kvm/mmu/mmu_audit.c    |   5 +-
- arch/x86/kvm/mmu/mmutrace.h     |   2 +-
- arch/x86/kvm/mmu/paging_tmpl.h  |  55 ++++--------------
- arch/x86/kvm/mmu/tdp_mmu.c      |   2 +-
- arch/x86/kvm/svm/nested.c       |   4 +-
- arch/x86/kvm/svm/svm.c          |   2 +-
- arch/x86/kvm/vmx/capabilities.h |   9 +++
- arch/x86/kvm/vmx/nested.c       |  12 ++--
- arch/x86/kvm/vmx/vmx.c          |  12 +---
- arch/x86/kvm/x86.c              |  55 +++++++++++-------
- 14 files changed, 145 insertions(+), 160 deletions(-)
-
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 6948f2d696c3..701c67c55239 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -2171,10 +2171,10 @@ static void shadow_walk_init_using_root(struct kvm_shadow_walk_iterator *iterato
+ 	iterator->shadow_addr = root;
+ 	iterator->level = vcpu->arch.mmu->shadow_root_level;
+ 
+-	if (iterator->level == PT64_ROOT_4LEVEL &&
++	if (iterator->level >= PT64_ROOT_4LEVEL &&
+ 	    vcpu->arch.mmu->root_level < PT64_ROOT_4LEVEL &&
+ 	    !vcpu->arch.mmu->direct_map)
+-		--iterator->level;
++		iterator->level = PT32E_ROOT_LEVEL;
+ 
+ 	if (iterator->level == PT32E_ROOT_LEVEL) {
+ 		/*
 -- 
 2.19.1.6.gb485710b
 
