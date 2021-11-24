@@ -2,121 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D702045CA7F
-	for <lists+kvm@lfdr.de>; Wed, 24 Nov 2021 18:01:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2CF0645CB5C
+	for <lists+kvm@lfdr.de>; Wed, 24 Nov 2021 18:48:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240995AbhKXREK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Nov 2021 12:04:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55598 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233492AbhKXREG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Nov 2021 12:04:06 -0500
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C81FAC061574
-        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 09:00:56 -0800 (PST)
-Received: by mail-pl1-x62c.google.com with SMTP id p18so2332231plf.13
-        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 09:00:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ccD0ntUVVYkwYlyadNBt1sjxaVIrP/hx7EjWxQNG1N8=;
-        b=GOWk964Yosu4ck30FptZ70D1KfKid+USBLbkj8qHTGA21vV6GE7GYqSTOdM2HFjGeW
-         2SxyiSkj0+IfbN3/2320KZDe3R7YEgaSwjdsvCkNh6MfmUBbb9k4SZ0rPYhB4qCeCqMb
-         t/ZHRtkalvm2Q23Mu0NnH41nyx2BZihuqFVmuuUbsg3TWXJiz66zbOwFC/14Xb0PLQI+
-         9FhNtTngAmj5DY4E/DkWHD40NtKCuujkZtfK2C8PahXspP61IoOPNfbRsBJ5mkj9dFFh
-         lSYRq5586zAHmDgxQR8/n35KSbN2KVgpG0/QkTPRAHlbLz1CWRdIr9ou8r5QwD9PLIcQ
-         Y29Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ccD0ntUVVYkwYlyadNBt1sjxaVIrP/hx7EjWxQNG1N8=;
-        b=IdBjHrW+J8Zbahy3+5e2oHagkyMYjxIwUJNZAtGA2kRiE3cdcUsoAi7A695fyxaVvc
-         HJQ0LKRBJAtVgND0aKTZnvheuHjyWyBS7m1QWnnwRlEqCnpFgZg3X+Oqb3tcZqV5fjEk
-         LF+RHiEOoKgme8RtSlTmm2DshMXub3RdlAtj9zi59v/XCVaioOuZl/qz0SyAAhNSznsc
-         h7UGQwS/dfFluW7kgOcizhSfmF3aTp8WJf2A0WWBw8F073SQorvXBdf6sYo/v0Mm1AMQ
-         41c/zJNdcdp3kAK2E4kLGIxMJ3h/58a5ozjkzNaSiBgYO20rrE0EdFhjw63McWExLgTN
-         L9Lw==
-X-Gm-Message-State: AOAM5312VP94bSBOUDhL+3C8In0Sl6Q5Pgu/mM0LGG3nNolX2WvbQXgo
-        KtnOMiKFm1K6quCtPQQKK40qpZvyX/Kgq9XgtrQB5Q==
-X-Google-Smtp-Source: ABdhPJx4hHfvg7PjcL9qHntLsSw4S293Gegpji2gVZVbaMxcedLFto0w5R8opTR+gtpycaYJ0aXlQUScJRfPuAzPG2I=
-X-Received: by 2002:a17:902:d703:b0:144:e012:d550 with SMTP id
- w3-20020a170902d70300b00144e012d550mr19489170ply.38.1637773256073; Wed, 24
- Nov 2021 09:00:56 -0800 (PST)
-MIME-Version: 1.0
-References: <20211117064359.2362060-1-reijiw@google.com> <YZ0QMK1QFjw/uznl@monolith.localdoman>
- <CAAeT=FxeXmgM3Pyt_brYRdehMrKHQwZut5xTbHOv-9um7anhYw@mail.gmail.com> <YZ4Y/r8BM2hnrlYQ@monolith.localdoman>
-In-Reply-To: <YZ4Y/r8BM2hnrlYQ@monolith.localdoman>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Wed, 24 Nov 2021 09:00:39 -0800
-Message-ID: <CAAeT=FzhCmBTF2QpCdNVjtVT_Ct0mo2_05uTny73U4B3fTyVZg@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 00/29] KVM: arm64: Make CPU ID registers writable
- by userspace
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        id S1349834AbhKXRva (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Nov 2021 12:51:30 -0500
+Received: from mga09.intel.com ([134.134.136.24]:42572 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S237134AbhKXRv3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Nov 2021 12:51:29 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10178"; a="235154479"
+X-IronPort-AV: E=Sophos;i="5.87,261,1631602800"; 
+   d="scan'208";a="235154479"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 09:48:19 -0800
+X-IronPort-AV: E=Sophos;i="5.87,261,1631602800"; 
+   d="scan'208";a="597748440"
+Received: from sreyacha-mobl2.amr.corp.intel.com (HELO [10.212.208.53]) ([10.212.208.53])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 09:48:16 -0800
+Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
+ Hypervisor Support
+To:     Joerg Roedel <jroedel@suse.de>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>,
+        Peter Gonda <pgonda@google.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Peng Liang <liangpeng10@huawei.com>,
-        Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
+ <daf5066b-e89b-d377-ed8a-9338f1a04c0d@amd.com>
+ <d673f082-9023-dafb-e42e-eab32a3ddd0c@intel.com>
+ <f15597a0-e7e0-0a57-39fd-20715abddc7f@amd.com>
+ <5f3b3aab-9ec2-c489-eefd-9136874762ee@intel.com>
+ <d83e6668-bec4-8d1f-7f8a-085829146846@amd.com>
+ <38282b0c-7eb5-6a91-df19-2f4cfa8549ce@intel.com> <YZ5iWJuxjSCmZL5l@suse.de>
+From:   Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+ z5cecg==
+Message-ID: <bd31abd4-c8a2-bdda-ea74-1c24b29beda7@intel.com>
+Date:   Wed, 24 Nov 2021 09:48:14 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <YZ5iWJuxjSCmZL5l@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alex,
+On 11/24/21 8:03 AM, Joerg Roedel wrote:
+> On Mon, Nov 22, 2021 at 02:51:35PM -0800, Dave Hansen wrote:
+>> My preference would be that we never have SEV-SNP code in the kernel
+>> that can panic() the host from guest userspace.  If that means waiting
+>> until there's common guest unmapping infrastructure around, then I think
+>> we should wait.
+> Can you elaborate how to crash host kernel from guest user-space? If I
+> understood correctly it was about crashing host kernel from _host_
+> user-space.
 
-> > > I started reviewing the series, but I ended up being very confused, see
-> > > below.
-> > >
-> > > On Tue, Nov 16, 2021 at 10:43:30PM -0800, Reiji Watanabe wrote:
-> > > > In KVM/arm64, values of ID registers for a guest are mostly same as
-> > > > its host's values except for bits for feature that KVM doesn't support
-> > > > and for opt-in features that userspace didn't configure.  Userspace
-> > > > can use KVM_SET_ONE_REG to a set ID register value, but it fails
-> > > > if userspace attempts to modify the register value.
-> > > >
-> > > > This patch series adds support to allow userspace to modify a value of
-> > > > ID registers (as long as KVM can support features that are indicated
-> > > > in the registers) so userspace can have more control of configuring
-> > > > and unconfiguring features for guests.
-> > >
-> > > What not use VCPU features? Isn't that why the field
-> > > kvm_vcpu_init->features exists in the first place? This cover letter does
-> > > nothing to explaing why any changes are needed.
-> > >
-> > > Do you require finer grained control over certain feature that you cannot
-> > > get with the 32 * 7 = 224 feature flag bits from kvm_vcpu_init? Does using
-> > > the ID registers simplify certain aspects of the implementation?
-> >
-> > Since some features are not binary in nature (e.g. AA64DFR0_EL1.BRPs
-> > fields indicate number of breakpoints minus 1), using
-> > kvm_vcpu_init->features to configure such features is inconvenient.
->
-> I see, this makes a lot of sense and this looks like a nice solution to
-> that problem.
->
-> >
-> > One of the reasons why we want the finer grained control is that
-> > we want to expose a uniform set/level of features for a group of
-> > guests on systems with different ARM CPUs.
->
-> So here you are talking specifically about KVM not checking that all VCPUs
-> have the same feature bits set in vcpu->arch.features, which makes it
-> possible for userspace to set different features for different VCPUs,
-> right?
+Sorry, I misspoke there.
 
-Yes, that is correct.  For features that can be configured by
-KVM_ARM_VCPU_INIT, userspace can configure different features
-for different vCPUs by using KVM_ARM_VCPU_INIT as before.
+My concern is about crashing the host kernel.  It appears that *host*
+userspace can do that quite easily by inducing the host kernel to access
+some guest private memory via a kernel mapping.
 
-Thanks,
-Reiji
+> I think the RMP-fault path in the page-fault handler needs to take the
+> uaccess exception tables into account before actually causing a panic.
+> This should solve most of the problems discussed here.
+
+That covers things like copy_from_user().  It does not account for
+things where kernel mappings are used, like where a
+get_user_pages()/kmap() is in play.
