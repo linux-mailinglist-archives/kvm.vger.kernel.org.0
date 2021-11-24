@@ -2,70 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8711345B409
-	for <lists+kvm@lfdr.de>; Wed, 24 Nov 2021 06:49:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D381145B40D
+	for <lists+kvm@lfdr.de>; Wed, 24 Nov 2021 06:52:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233160AbhKXFwa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Nov 2021 00:52:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45916 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231421AbhKXFw3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Nov 2021 00:52:29 -0500
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6F4DC061574
-        for <kvm@vger.kernel.org>; Tue, 23 Nov 2021 21:49:19 -0800 (PST)
-Received: by mail-pj1-x102c.google.com with SMTP id cq22-20020a17090af99600b001a9550a17a5so4133192pjb.2
-        for <kvm@vger.kernel.org>; Tue, 23 Nov 2021 21:49:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=1fKAu0gabcfxHmH3nc8SLSbctQh/mX8LVUgzfwNVf0I=;
-        b=C4q08bNoOkWxvXiw0wQFQ0kNFxfHQeK/CRUMQDrWHuqVtJNXuP08yRq6UJ/a2hiaiB
-         iIfXR0r4y+8OXPQLxyGd9Ov5TJUncl0QeC2HA/cdEaVM6nZa6Aijip3T5BPJnNTRE+6c
-         ZCQhfhol6EJ0YE7ZrPKDj7SxGwZdazAOv0hAgZOf/InTXPMY/+z6ucZDCg+q5gA3V02V
-         b3DZOJyftS4Uiw29Vca4kPHhwH892YtrZj3FqgLErmP9c28fI7pYaIBaSBdY+QuJqAVM
-         xxB7eFIErGIlAlq8rnFwstloDidxPnK23q1V73lTcuWwnqegB6qiN/0dsAaE5DpH+yhZ
-         xE0g==
+        id S233331AbhKXFzk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Nov 2021 00:55:40 -0500
+Received: from smtp-relay-internal-0.canonical.com ([185.125.188.122]:44988
+        "EHLO smtp-relay-internal-0.canonical.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231421AbhKXFzk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 24 Nov 2021 00:55:40 -0500
+Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com [209.85.210.200])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 293B23F19E
+        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 05:52:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+        s=20210705; t=1637733149;
+        bh=V/j9435sf+Q6QqIYUyi0ktOVWvCT49bfuL52dC8eJNQ=;
+        h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+         To:Cc:Content-Type;
+        b=mNA71YDlPdMDewD3l9zhJplvW/lU6JG5K33Ie2aSCJOnbyp387hcJTA8AsAsyPonC
+         YcGnFIAVyUsAVEqJ1pRjiRHMNmsniWnOjEF3/dFmlyeU4C62WWnaFbVzYXVDmAFlly
+         PoRK5eQZVr0rqqJB3IaV6DOJjMiOuCYava/gVdJutkJtWB31a+5c0PZBHFr1DKJM+Y
+         dHYDA+z17+agCWgjwKXKjGce2RMkDsoH1ECDqur1EeWHIkKJ6YbN2Sr7H8Zf+uKaUy
+         HibNTSiOESlWIbKQZzPeKPftNUpMbc/o0F0d3EHRZZJzEU+SpbgRLO5G/+6WalPIEV
+         FgybKkKwwkvEw==
+Received: by mail-pf1-f200.google.com with SMTP id x14-20020a627c0e000000b0049473df362dso917120pfc.12
+        for <kvm@vger.kernel.org>; Tue, 23 Nov 2021 21:52:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=1fKAu0gabcfxHmH3nc8SLSbctQh/mX8LVUgzfwNVf0I=;
-        b=4Hm/Jc79eaFXaAmLhvjY4yM1rUkfI5mp7Mvffhlw6Pz87oeF97cZArRg1Hy1dZ4jog
-         pVIGtmnZhy//8S+mhr2f82RCyAP48fj4UUBGO2An1rQsJXhlmTZ1F0s/zcaYIBr/4Gj3
-         /iGRIgMwirFRK7bLnHW/qsyNbJuTlYhh4DK8+b+lDG1Am72uzD7qQ6I7IEfpQfvFbj0Y
-         YeJpnZU3AlZovps6X+5KI958YRjRD1yL1NgOCwIMDujUGsecgPG2c0U8eQ5GN4AzN9/l
-         8hXQHIgKNMepQPdJ07c1k9Z0RUochC9NZFcRJdHqCenNAuBFW0oe5+CX1YgpHXP84cFx
-         uj0w==
-X-Gm-Message-State: AOAM532+hdobcUaeUF3OpYQ91Gur9QUGOUBXWQs/17Hs7k8Gh9QTH5SX
-        M2mY2KI5WipIL9Y81RmZJU3IFfU+VJ8uwsSjJzzE2A==
-X-Google-Smtp-Source: ABdhPJydhWOvuJDnIMYqeeeDMTToKzMOfxMKgR7Re5ZnGAS7Km93k1zcKD9xp9yWrFsit0u3nU1zMxPl16wtjfXmPoI=
-X-Received: by 2002:a17:902:ab47:b0:141:95b2:7eaf with SMTP id
- ij7-20020a170902ab4700b0014195b27eafmr14440560plb.40.1637732958710; Tue, 23
- Nov 2021 21:49:18 -0800 (PST)
+        bh=V/j9435sf+Q6QqIYUyi0ktOVWvCT49bfuL52dC8eJNQ=;
+        b=6GRyFy97eXbMFOwRFE9MqkxTaAFNsWdgj+00OtsZ1L9+MSzv+OoHQXndPp5q42mEyc
+         9QJWejWGokkN/fB8VyD65Cn05R/xcTJ0qJ8dZajJlKzuu4m4o4vL+rPOWLIrpHbFL+y7
+         1q9o42SZdJkIwcvIZpqYPXPuQNHRQ9D9z6ARfKAImbxngrZ25FCPQEBHH6XcU01kh2MS
+         NzbYE/l1QPQy/8Bkw2qcqwaV10wKbcxrfPFoL6ceNxHfXDKYw78RWOOb+mijx9d2MoLC
+         QtK2Tdjvbl/j6D71Z5USa3v73xa4j2gz5vzcJFNGOHaiZcxGTzNa+dKD+5E0RA6C+grH
+         2mjQ==
+X-Gm-Message-State: AOAM532cJlCn0nl/P3GNWwrTmxnJJ/RT75NrunQyBqX8i7YU6ePoGr0a
+        AISJvttBTsYUA1cqgRnMgj2AZYOGDY9S3WSpVujjseCOnEEN7jWq8vPUHXVp+kf/k9Ro5WhWk37
+        6lO21TkoEulIij+xyf+aarYdafUpmivlyZXWc1WqWuy9USw==
+X-Received: by 2002:a17:90a:fe0a:: with SMTP id ck10mr5187432pjb.216.1637733147744;
+        Tue, 23 Nov 2021 21:52:27 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxtcQIbaN5dL44ZbqC9L1a1WlemOP/LRBnvajM2RC/ohJohHICyHnWXVJGR7cdc4bVPeYgPZaVQp8pkmusSUQE=
+X-Received: by 2002:a17:90a:fe0a:: with SMTP id ck10mr5187399pjb.216.1637733147439;
+ Tue, 23 Nov 2021 21:52:27 -0800 (PST)
 MIME-Version: 1.0
-References: <20211117064359.2362060-1-reijiw@google.com> <YZ0WfQDGT5d8+6i1@monolith.localdoman>
-In-Reply-To: <YZ0WfQDGT5d8+6i1@monolith.localdoman>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Tue, 23 Nov 2021 21:49:02 -0800
-Message-ID: <CAAeT=FwTrWts=jdO2SzAECKKp5-1gGc5UR22Mf=xpx_8qOcbHw@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 00/29] KVM: arm64: Make CPU ID registers writable
- by userspace
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Peng Liang <liangpeng10@huawei.com>,
-        Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>
+References: <d4084296-9d36-64ec-8a79-77d82ac6d31c@canonical.com>
+ <20210914104301.48270518.alex.williamson@redhat.com> <9e8d0e9e-1d94-35e8-be1f-cf66916c24b2@canonical.com>
+ <20210915103235.097202d2.alex.williamson@redhat.com> <2fadf33d-8487-94c2-4460-2a20fdb2ea12@canonical.com>
+ <20211005171326.3f25a43a.alex.williamson@redhat.com> <CAKAwkKtJQ1mE3=iaDA1B_Dkn1+ZbN0jTSWrQon0=SAszRv5xFw@mail.gmail.com>
+ <20211012140516.6838248b.alex.williamson@redhat.com> <CAKAwkKsF3Kn1HLAg55cBVmPmo2y0QAf7g6Zc7q6ZsQZBXGW9bg@mail.gmail.com>
+ <CAKAwkKsoKELnR=--06sRZL3S6_rQVi5J_Kcv6iRQ6w2tY71WCQ@mail.gmail.com> <20211104160541.4aedc593.alex.williamson@redhat.com>
+In-Reply-To: <20211104160541.4aedc593.alex.williamson@redhat.com>
+From:   Matthew Ruffell <matthew.ruffell@canonical.com>
+Date:   Wed, 24 Nov 2021 18:52:16 +1300
+Message-ID: <CAKAwkKs=p3bHQL5VXuh_Xhu3A+mg0mSEuFJ_fy4Zh6E6YG4aag@mail.gmail.com>
+Subject: Re: [PROBLEM] Frequently get "irq 31: nobody cared" when passing
+ through 2x GPUs that share same pci switch via vfio
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     linux-pci@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>,
+        kvm@vger.kernel.org, nathan.langford@xcelesunifiedtechnologies.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
@@ -73,191 +72,216 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Hi Alex,
 
-On Tue, Nov 23, 2021 at 8:25 AM Alexandru Elisei
-<alexandru.elisei@arm.com> wrote:
->
-> Hi Reiji,
->
-> The API documentation for KVM_ARM_VCPU_INIT states:
->
-> "Userspace can call this function multiple times for a given vcpu,
-> including after the vcpu has been run. This will reset the vcpu to its
-> initial state. All calls to this function after the initial call must use
-> the same target and same set of feature flags, otherwise EINVAL will be
-> returned."
->
-> The consequences of that, according to my understanding:
->
-> 1. Any changes to the VCPU features made by KVM are observable by
-> userspace.
->
-> 2. The features in KVM weren't designed and implemented to be disabled
-> after being enabled.
->
-> With that in mind, I have two questions:
->
-> 1. What happens when userspace disables a feature via the ID registers
-> which is set in vcpu->arch.features? Does the feature bit get cleared from
-> vcpu->arch.features? Does it stay set? If it gets cleared, is it now
-> possible for userspace to call KVM_ARM_VCPU_INIT again with a different set
-> of VCPU features (it doesn't look possible to me after looking at the
-> code). If it stays set, what does it mean when userspace calls
-> KVM_ARM_VCPU_INIT with a different set of features enabled than what is
-> present in the ID registers? Should the ID registers be changed to match
-> the features that userspace set in the last KVM_ARM_VCPU_INIT call (it
-> looks to me that the ID registers are not changed)?
+I have forward ported your patch to 5.16-rc2 to account for the vfio module
+refactor that happened recently. Attached below.
 
-KVM will not allow userspace to set the ID register value that conflicts
-with CPU features that are configured by the initial KVM_ARM_VCPU_INIT
-(or there are a few more APIs).
-KVM_SET_ONE_REG for such requests will fail.
+Have you had an opportunity to research if it is possible to conditionalise
+clearing DisINTx by looking at the interrupt status and seeing if there is a
+pending interrupt but no handler set?
 
+We are testing a 5.16-rc2 kernel with the patch applied on Nathan's server
+currently, and we are also trying out the pci=clearmsi command line parameter
+that was discussed on linux-pci a few years ago in [1][2][3][4] along with
+setting snd-hda-intel.enable_msi=1 to see if it helps the crashkernel not get
+stuck copying IR tables.
 
-> 2. What happens to vcpu->arch.features when userspace enables a feature via
-> the ID registers which is not present in the bitmap?
+[1] https://marc.info/?l=linux-pci&m=153988799707413
+[2] https://lore.kernel.org/linux-pci/20181018183721.27467-1-gpiccoli@canonical.com/
+[3] https://lore.kernel.org/linux-pci/20181018183721.27467-2-gpiccoli@canonical.com/
+[4] https://lore.kernel.org/linux-pci/20181018183721.27467-3-gpiccoli@canonical.com/
 
-The answer for this question is basically the same as above.
-Userspace is not allowed to enable a feature via the ID registers
-which is not present in the bit map.
+I will let you know how we get on.
 
-The cover lever included a brief explanation of this, but I will
-try to improve the explanation:-)
+Thanks,
+Matthew
 
-Regards,
-Reiji
+diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+index f948e6cd2993..cbca207ddc45 100644
+--- a/drivers/vfio/pci/vfio_pci_core.c
++++ b/drivers/vfio/pci/vfio_pci_core.c
+@@ -276,6 +276,7 @@ int vfio_pci_core_enable(struct vfio_pci_core_device *vdev)
+             vdev->pci_2_3 = pci_intx_mask_supported(pdev);
+     }
 
->
-> Thanks,
-> Alex
->
-> On Tue, Nov 16, 2021 at 10:43:30PM -0800, Reiji Watanabe wrote:
-> > In KVM/arm64, values of ID registers for a guest are mostly same as
-> > its host's values except for bits for feature that KVM doesn't support
-> > and for opt-in features that userspace didn't configure.  Userspace
-> > can use KVM_SET_ONE_REG to a set ID register value, but it fails
-> > if userspace attempts to modify the register value.
-> >
-> > This patch series adds support to allow userspace to modify a value of
-> > ID registers (as long as KVM can support features that are indicated
-> > in the registers) so userspace can have more control of configuring
-> > and unconfiguring features for guests.
-> >
-> > The patch series is for both VHE and non-VHE, except for protected VMs,
-> > which have a different way of configuring ID registers based on its
-> > different requirements [1].
-> > There was a patch series that tried to achieve the same thing [2].
-> > A few snippets of codes in this series were inspired by or came from [2].
-> >
-> > The initial value of ID registers for a vCPU will be the host's value
-> > with bits cleared for unsupported features and for opt-in features that
-> > were not configured. So, the initial value userspace can see (via
-> > KVM_GET_ONE_REG) is the upper limit that can be set for the register.
-> > Any requests to change the value that conflicts with opt-in features'
-> > configuration will fail.
-> >
-> > When a guest tries to use a CPU feature that is not exposed to the guest,
-> > trapping it (to emulate a real CPU's behavior) would generally be a
-> > desirable behavior (when it is possible with no or little side effects).
-> > The later patches in the series add codes for this.  Only features that
-> > can be trapped independently will be trapped by this series though.
-> >
-> > This series adds kunit tests for new functions in sys_regs.c (except for
-> > trivial ones), and these tests are enabled with a new configuration
-> > option 'CONFIG_KVM_KUNIT_TEST'.
-> >
-> > The series is based on v5.16-rc1.
-> >
-> > v3:
-> >   - Remove ID register consistency checking across vCPUs [Oliver]
-> >   - Change KVM_CAP_ARM_ID_REG_WRITABLE to
-> >     KVM_CAP_ARM_ID_REG_CONFIGURABLE [Oliver]
-> >   - Add KUnit testing for ID register validation and trap initialization.
-> >   - Change read_id_reg() to take care of ID_AA64PFR0_EL1.GIC
-> >   - Add a helper of read_id_reg() (__read_id_reg()) and use the helper
-> >     instead of directly using __vcpu_sys_reg()
-> >   - Change not to run kvm_id_regs_consistency_check() and
-> >     kvm_vcpu_init_traps() for protected VMs.
-> >   - Update selftest to remove test cases for ID register consistency
-> >     checking across vCPUs and to add test cases for ID_AA64PFR0_EL1.GIC.
-> >
-> > v2: https://lore.kernel.org/all/20211103062520.1445832-1-reijiw@google.com/
-> >   - Remove unnecessary line breaks. [Andrew]
-> >   - Use @params for comments. [Andrew]
-> >   - Move arm64_check_features to arch/arm64/kvm/sys_regs.c and
-> >     change that KVM specific feature check function.  [Andrew]
-> >   - Remove unnecessary raz handling from __set_id_reg. [Andrew]
-> >   - Remove sys_val field from the initial id_reg_info and add it
-> >     in the later patch. [Andrew]
-> >   - Call id_reg->init() from id_reg_info_init(). [Andrew]
-> >   - Fix cpuid_feature_cap_perfmon_field() to convert 0xf to 0x0
-> >     (and use it in the following patches).
-> >   - Change kvm_vcpu_first_run_init to set has_run_once to false
-> >     when kvm_id_regs_consistency_check() fails.
-> >   - Add a patch to introduce id_reg_info for ID_AA64MMFR0_EL1,
-> >     which requires special validity checking for TGran*_2 fields.
-> >   - Add patches to introduce id_reg_info for ID_DFR1_EL1 and
-> >     ID_MMFR0_EL1, which are required due to arm64_check_features
-> >     implementation change.
-> >   - Add a new argument, which is a pointer to id_reg_info, for
-> >     id_reg_info's validate()
-> >
-> > v1: https://lore.kernel.org/all/20211012043535.500493-1-reijiw@google.com/
-> >
-> > [1] https://lore.kernel.org/kvmarm/20211010145636.1950948-1-tabba@google.com/
-> > [2] https://lore.kernel.org/kvm/20201102033422.657391-1-liangpeng10@huawei.com/
-> >
-> > Reiji Watanabe (29):
-> >   KVM: arm64: Add has_reset_once flag for vcpu
-> >   KVM: arm64: Save ID registers' sanitized value per vCPU
-> >   KVM: arm64: Introduce struct id_reg_info
-> >   KVM: arm64: Make ID_AA64PFR0_EL1 writable
-> >   KVM: arm64: Make ID_AA64PFR1_EL1 writable
-> >   KVM: arm64: Make ID_AA64ISAR0_EL1 writable
-> >   KVM: arm64: Make ID_AA64ISAR1_EL1 writable
-> >   KVM: arm64: Make ID_AA64MMFR0_EL1 writable
-> >   KVM: arm64: Hide IMPLEMENTATION DEFINED PMU support for the guest
-> >   KVM: arm64: Make ID_AA64DFR0_EL1 writable
-> >   KVM: arm64: Make ID_DFR0_EL1 writable
-> >   KVM: arm64: Make ID_DFR1_EL1 writable
-> >   KVM: arm64: Make ID_MMFR0_EL1 writable
-> >   KVM: arm64: Make MVFR1_EL1 writable
-> >   KVM: arm64: Make ID registers without id_reg_info writable
-> >   KVM: arm64: Add consistency checking for frac fields of ID registers
-> >   KVM: arm64: Introduce KVM_CAP_ARM_ID_REG_CONFIGURABLE capability
-> >   KVM: arm64: Add kunit test for ID register validation
-> >   KVM: arm64: Use vcpu->arch cptr_el2 to track value of cptr_el2 for VHE
-> >   KVM: arm64: Use vcpu->arch.mdcr_el2 to track value of mdcr_el2
-> >   KVM: arm64: Introduce framework to trap disabled features
-> >   KVM: arm64: Trap disabled features of ID_AA64PFR0_EL1
-> >   KVM: arm64: Trap disabled features of ID_AA64PFR1_EL1
-> >   KVM: arm64: Trap disabled features of ID_AA64DFR0_EL1
-> >   KVM: arm64: Trap disabled features of ID_AA64MMFR1_EL1
-> >   KVM: arm64: Trap disabled features of ID_AA64ISAR1_EL1
-> >   KVM: arm64: Initialize trapping of disabled CPU features for the guest
-> >   KVM: arm64: Add kunit test for trap initialization
-> >   KVM: arm64: selftests: Introduce id_reg_test
-> >
-> >  Documentation/virt/kvm/api.rst                |    8 +
-> >  arch/arm64/include/asm/cpufeature.h           |    2 +-
-> >  arch/arm64/include/asm/kvm_arm.h              |   32 +
-> >  arch/arm64/include/asm/kvm_host.h             |   15 +
-> >  arch/arm64/include/asm/sysreg.h               |    2 +
-> >  arch/arm64/kvm/Kconfig                        |   11 +
-> >  arch/arm64/kvm/arm.c                          |   12 +-
-> >  arch/arm64/kvm/debug.c                        |   13 +-
-> >  arch/arm64/kvm/hyp/vhe/switch.c               |   14 +-
-> >  arch/arm64/kvm/reset.c                        |    4 +
-> >  arch/arm64/kvm/sys_regs.c                     | 1265 +++++++++++++++--
-> >  arch/arm64/kvm/sys_regs_test.c                | 1109 +++++++++++++++
-> >  include/uapi/linux/kvm.h                      |    1 +
-> >  tools/arch/arm64/include/asm/sysreg.h         |    1 +
-> >  tools/testing/selftests/kvm/.gitignore        |    1 +
-> >  tools/testing/selftests/kvm/Makefile          |    1 +
-> >  .../selftests/kvm/aarch64/id_reg_test.c       | 1128 +++++++++++++++
-> >  17 files changed, 3488 insertions(+), 131 deletions(-)
-> >  create mode 100644 arch/arm64/kvm/sys_regs_test.c
-> >  create mode 100644 tools/testing/selftests/kvm/aarch64/id_reg_test.c
-> >
-> > --
-> > 2.34.0.rc1.387.gb447b232ab-goog
-> >
++    vfio_intx_stub_init(vdev);
+     pci_read_config_word(pdev, PCI_COMMAND, &cmd);
+     if (vdev->pci_2_3 && (cmd & PCI_COMMAND_INTX_DISABLE)) {
+         cmd &= ~PCI_COMMAND_INTX_DISABLE;
+@@ -365,6 +366,14 @@ void vfio_pci_core_disable(struct
+vfio_pci_core_device *vdev)
+         kfree(dummy_res);
+     }
+
++    /*
++     * Set known command register state, disabling MSI/X (via busmaster)
++     * and INTx directly.  At this point we can teardown the INTx stub
++     * handler initialized from the SET_IRQS teardown above.
++     */
++    pci_write_config_word(pdev, PCI_COMMAND, PCI_COMMAND_INTX_DISABLE);
++    vfio_intx_stub_exit(vdev);
++
+     vdev->needs_reset = true;
+
+     /*
+@@ -382,12 +391,6 @@ void vfio_pci_core_disable(struct
+vfio_pci_core_device *vdev)
+         pci_save_state(pdev);
+     }
+
+-    /*
+-     * Disable INTx and MSI, presumably to avoid spurious interrupts
+-     * during reset.  Stolen from pci_reset_function()
+-     */
+-    pci_write_config_word(pdev, PCI_COMMAND, PCI_COMMAND_INTX_DISABLE);
+-
+     /*
+      * Try to get the locks ourselves to prevent a deadlock. The
+      * success of this is dependent on being able to lock the device,
+diff --git a/drivers/vfio/pci/vfio_pci_intrs.c
+b/drivers/vfio/pci/vfio_pci_intrs.c
+index 6069a11fb51a..98cf528aa175 100644
+--- a/drivers/vfio/pci/vfio_pci_intrs.c
++++ b/drivers/vfio/pci/vfio_pci_intrs.c
+@@ -139,6 +139,44 @@ static irqreturn_t vfio_intx_handler(int irq, void *dev_id)
+     return ret;
+ }
+
++static irqreturn_t vfio_intx_stub(int irq, void *dev_id)
++{
++    struct vfio_pci_core_device *vdev = dev_id;
++
++    if (pci_check_and_mask_intx(vdev->pdev))
++        return IRQ_HANDLED;
++
++    return IRQ_NONE;
++}
++
++void vfio_intx_stub_init(struct vfio_pci_core_device *vdev)
++{
++    char *name;
++
++    if (vdev->nointx || !vdev->pci_2_3 || !vdev->pdev->irq)
++        return;
++
++    name = kasprintf(GFP_KERNEL, "vfio-intx-stub(%s)",
++             pci_name(vdev->pdev));
++    if (!name)
++        return;
++
++    if (request_irq(vdev->pdev->irq, vfio_intx_stub,
++            IRQF_SHARED, name, vdev))
++        kfree(name);
++
++    vdev->intx_stub = true;
++}
++
++void vfio_intx_stub_exit(struct vfio_pci_core_device *vdev)
++{
++    if (!vdev->intx_stub)
++        return;
++
++    kfree(free_irq(vdev->pdev->irq, vdev));
++    vdev->intx_stub = false;
++}
++
+ static int vfio_intx_enable(struct vfio_pci_core_device *vdev)
+ {
+     if (!is_irq_none(vdev))
+@@ -153,6 +191,8 @@ static int vfio_intx_enable(struct
+vfio_pci_core_device *vdev)
+
+     vdev->num_ctx = 1;
+
++    vfio_intx_stub_exit(vdev);
++
+     /*
+      * If the virtual interrupt is masked, restore it.  Devices
+      * supporting DisINTx can be masked at the hardware level
+@@ -231,6 +271,7 @@ static void vfio_intx_disable(struct
+vfio_pci_core_device *vdev)
+     vdev->irq_type = VFIO_PCI_NUM_IRQS;
+     vdev->num_ctx = 0;
+     kfree(vdev->ctx);
++    vfio_intx_stub_init(vdev);
+ }
+
+ /*
+@@ -258,6 +299,8 @@ static int vfio_msi_enable(struct
+vfio_pci_core_device *vdev, int nvec, bool msi
+     if (!vdev->ctx)
+         return -ENOMEM;
+
++    vfio_intx_stub_exit(vdev);
++
+     /* return the number of supported vectors if we can't get all: */
+     cmd = vfio_pci_memory_lock_and_enable(vdev);
+     ret = pci_alloc_irq_vectors(pdev, 1, nvec, flag);
+@@ -266,6 +309,7 @@ static int vfio_msi_enable(struct
+vfio_pci_core_device *vdev, int nvec, bool msi
+             pci_free_irq_vectors(pdev);
+         vfio_pci_memory_unlock_and_restore(vdev, cmd);
+         kfree(vdev->ctx);
++        vfio_intx_stub_init(vdev);
+         return ret;
+     }
+     vfio_pci_memory_unlock_and_restore(vdev, cmd);
+@@ -388,6 +432,7 @@ static int vfio_msi_set_block(struct
+vfio_pci_core_device *vdev, unsigned start,
+ static void vfio_msi_disable(struct vfio_pci_core_device *vdev, bool msix)
+ {
+     struct pci_dev *pdev = vdev->pdev;
++    pci_dev_flags_t dev_flags = pdev->dev_flags;
+     int i;
+     u16 cmd;
+
+@@ -399,19 +444,22 @@ static void vfio_msi_disable(struct
+vfio_pci_core_device *vdev, bool msix)
+     vfio_msi_set_block(vdev, 0, vdev->num_ctx, NULL, msix);
+
+     cmd = vfio_pci_memory_lock_and_enable(vdev);
+-    pci_free_irq_vectors(pdev);
+-    vfio_pci_memory_unlock_and_restore(vdev, cmd);
+
+     /*
+-     * Both disable paths above use pci_intx_for_msi() to clear DisINTx
+-     * via their shutdown paths.  Restore for NoINTx devices.
++     * XXX pci_intx_for_msi() will clear DisINTx, which can trigger an
++     * INTx storm even before we return from pci_free_irq_vectors(), even
++     * as we'll restore the previous command register immediately after.
++     * Hack around it by masking in a dev_flag to prevent such behavior.
+      */
+-    if (vdev->nointx)
+-        pci_intx(pdev, 0);
++    pdev->dev_flags |= PCI_DEV_FLAGS_MSI_INTX_DISABLE_BUG;
++    pci_free_irq_vectors(pdev);
++    pdev->dev_flags = dev_flags;
+
++    vfio_pci_memory_unlock_and_restore(vdev, cmd);
+     vdev->irq_type = VFIO_PCI_NUM_IRQS;
+     vdev->num_ctx = 0;
+     kfree(vdev->ctx);
++    vfio_intx_stub_init(vdev);
+ }
+
+ /*
+diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
+index ef9a44b6cf5d..58e1029eb083 100644
+--- a/include/linux/vfio_pci_core.h
++++ b/include/linux/vfio_pci_core.h
+@@ -124,6 +124,7 @@ struct vfio_pci_core_device {
+     bool            needs_reset;
+     bool            nointx;
+     bool            needs_pm_restore;
++    bool            intx_stub;
+     struct pci_saved_state    *pci_saved_state;
+     struct pci_saved_state    *pm_save;
+     int            ioeventfds_nr;
+@@ -145,6 +146,9 @@ struct vfio_pci_core_device {
+ #define is_irq_none(vdev) (!(is_intx(vdev) || is_msi(vdev) || is_msix(vdev)))
+ #define irq_is(vdev, type) (vdev->irq_type == type)
+
++extern void vfio_intx_stub_init(struct vfio_pci_core_device *vdev);
++extern void vfio_intx_stub_exit(struct vfio_pci_core_device *vdev);
++
+ extern void vfio_pci_intx_mask(struct vfio_pci_core_device *vdev);
+ extern void vfio_pci_intx_unmask(struct vfio_pci_core_device *vdev);
