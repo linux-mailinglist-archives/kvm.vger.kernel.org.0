@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CC1D545B3C5
-	for <lists+kvm@lfdr.de>; Wed, 24 Nov 2021 06:13:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8711345B409
+	for <lists+kvm@lfdr.de>; Wed, 24 Nov 2021 06:49:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230250AbhKXFQx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Nov 2021 00:16:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38236 "EHLO
+        id S233160AbhKXFwa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Nov 2021 00:52:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229817AbhKXFQw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Nov 2021 00:16:52 -0500
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA087C061574
-        for <kvm@vger.kernel.org>; Tue, 23 Nov 2021 21:13:43 -0800 (PST)
-Received: by mail-pg1-x534.google.com with SMTP id s137so1077937pgs.5
-        for <kvm@vger.kernel.org>; Tue, 23 Nov 2021 21:13:43 -0800 (PST)
+        with ESMTP id S231421AbhKXFw3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Nov 2021 00:52:29 -0500
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6F4DC061574
+        for <kvm@vger.kernel.org>; Tue, 23 Nov 2021 21:49:19 -0800 (PST)
+Received: by mail-pj1-x102c.google.com with SMTP id cq22-20020a17090af99600b001a9550a17a5so4133192pjb.2
+        for <kvm@vger.kernel.org>; Tue, 23 Nov 2021 21:49:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=e1dzqsYgP1AOU3wSeDrdX/w4s62HxZ9tSYror2UqHsg=;
-        b=Vosw69fUhO15RMMhi8w93lj7tX+6o2sgctmKWvVNdY5HmcUhOjO4KEePVuh2y3kBN7
-         feWeYgUy8xfghytaQ39DsHDkKGwTZSJhJQP5QLKRpQAiEdTDJOgC0KAvphqQQ6Fu7Qhp
-         hTesiOHPgGm/Og3cUdWEacwbjpkWBT28hOr2IGB7JFrqpOBjwauIeId3+8+krBcNaNhq
-         mgjxOC1/yWuiVXvmLfEhWqWbhxz97ahtnUyEaV7HljLpaVywdsnGhc+KKd+ZmzxZ+0s4
-         1JXzWdIMfUW7vcH2JiGeipvNpABfGcKpzdyWRO+p9x7PNo8BPDgyiTXO+Xy2puf8XrHi
-         vfKg==
+        bh=1fKAu0gabcfxHmH3nc8SLSbctQh/mX8LVUgzfwNVf0I=;
+        b=C4q08bNoOkWxvXiw0wQFQ0kNFxfHQeK/CRUMQDrWHuqVtJNXuP08yRq6UJ/a2hiaiB
+         iIfXR0r4y+8OXPQLxyGd9Ov5TJUncl0QeC2HA/cdEaVM6nZa6Aijip3T5BPJnNTRE+6c
+         ZCQhfhol6EJ0YE7ZrPKDj7SxGwZdazAOv0hAgZOf/InTXPMY/+z6ucZDCg+q5gA3V02V
+         b3DZOJyftS4Uiw29Vca4kPHhwH892YtrZj3FqgLErmP9c28fI7pYaIBaSBdY+QuJqAVM
+         xxB7eFIErGIlAlq8rnFwstloDidxPnK23q1V73lTcuWwnqegB6qiN/0dsAaE5DpH+yhZ
+         xE0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=e1dzqsYgP1AOU3wSeDrdX/w4s62HxZ9tSYror2UqHsg=;
-        b=wBDbsKjEUnnoL5q6nQZxKlrRm3IZxVl70TQV0eCnwQJVdnW2I9UDcM8nTDtrlfWBmS
-         pgFwEbZeU6I0jibzpyQ+YM3aJPceSVcuoc9D0u2qqTvK6DxemqYgpGztHvmmx8f+8m0y
-         z5cGszvagY/6tHjwlgARJLgSEiJs3KpCQaETU7+qH131W64ytsh25ksmURozBAunSjuS
-         dthvxcTJm8OTOqvyzXKvTwu6bqkOahlqxdR7PeJBFWe3xjRyn3XxSoKF3QtPTSQ6Hh9U
-         HgkXgBKth/PZzBh/Pe+uNlB7tsUhKDQzfceobNQ6tH3FPnDoHDw6JXhqLphsqD/gClLj
-         lmOQ==
-X-Gm-Message-State: AOAM531xG4EFpj/eEU2vVTde/kMoAgEUvh+XA0EbZHX+qHthD9hKMitL
-        wofc4R9TrIxPC0nab8IwcQsDBcgvGtIUQPrAZR7gzw==
-X-Google-Smtp-Source: ABdhPJyvokOAgCXpC9DVsZl7yuHWNZAyv4IA9VRFby5H56KFnxxSyU3prkd4d0LB9u5pSW8jts1Phe00+k31dTnEvl0=
-X-Received: by 2002:aa7:8198:0:b0:44b:e191:7058 with SMTP id
- g24-20020aa78198000000b0044be1917058mr3161845pfi.39.1637730822945; Tue, 23
- Nov 2021 21:13:42 -0800 (PST)
+        bh=1fKAu0gabcfxHmH3nc8SLSbctQh/mX8LVUgzfwNVf0I=;
+        b=4Hm/Jc79eaFXaAmLhvjY4yM1rUkfI5mp7Mvffhlw6Pz87oeF97cZArRg1Hy1dZ4jog
+         pVIGtmnZhy//8S+mhr2f82RCyAP48fj4UUBGO2An1rQsJXhlmTZ1F0s/zcaYIBr/4Gj3
+         /iGRIgMwirFRK7bLnHW/qsyNbJuTlYhh4DK8+b+lDG1Am72uzD7qQ6I7IEfpQfvFbj0Y
+         YeJpnZU3AlZovps6X+5KI958YRjRD1yL1NgOCwIMDujUGsecgPG2c0U8eQ5GN4AzN9/l
+         8hXQHIgKNMepQPdJ07c1k9Z0RUochC9NZFcRJdHqCenNAuBFW0oe5+CX1YgpHXP84cFx
+         uj0w==
+X-Gm-Message-State: AOAM532+hdobcUaeUF3OpYQ91Gur9QUGOUBXWQs/17Hs7k8Gh9QTH5SX
+        M2mY2KI5WipIL9Y81RmZJU3IFfU+VJ8uwsSjJzzE2A==
+X-Google-Smtp-Source: ABdhPJydhWOvuJDnIMYqeeeDMTToKzMOfxMKgR7Re5ZnGAS7Km93k1zcKD9xp9yWrFsit0u3nU1zMxPl16wtjfXmPoI=
+X-Received: by 2002:a17:902:ab47:b0:141:95b2:7eaf with SMTP id
+ ij7-20020a170902ab4700b0014195b27eafmr14440560plb.40.1637732958710; Tue, 23
+ Nov 2021 21:49:18 -0800 (PST)
 MIME-Version: 1.0
-References: <20211117064359.2362060-1-reijiw@google.com> <YZ0QMK1QFjw/uznl@monolith.localdoman>
-In-Reply-To: <YZ0QMK1QFjw/uznl@monolith.localdoman>
+References: <20211117064359.2362060-1-reijiw@google.com> <YZ0WfQDGT5d8+6i1@monolith.localdoman>
+In-Reply-To: <YZ0WfQDGT5d8+6i1@monolith.localdoman>
 From:   Reiji Watanabe <reijiw@google.com>
-Date:   Tue, 23 Nov 2021 21:13:27 -0800
-Message-ID: <CAAeT=FxeXmgM3Pyt_brYRdehMrKHQwZut5xTbHOv-9um7anhYw@mail.gmail.com>
+Date:   Tue, 23 Nov 2021 21:49:02 -0800
+Message-ID: <CAAeT=FwTrWts=jdO2SzAECKKp5-1gGc5UR22Mf=xpx_8qOcbHw@mail.gmail.com>
 Subject: Re: [RFC PATCH v3 00/29] KVM: arm64: Make CPU ID registers writable
  by userspace
 To:     Alexandru Elisei <alexandru.elisei@arm.com>
@@ -71,15 +71,64 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-HI Alex,
+Hi Alex,
 
-On Tue, Nov 23, 2021 at 7:59 AM Alexandru Elisei
+On Tue, Nov 23, 2021 at 8:25 AM Alexandru Elisei
 <alexandru.elisei@arm.com> wrote:
 >
 > Hi Reiji,
 >
-> I started reviewing the series, but I ended up being very confused, see
-> below.
+> The API documentation for KVM_ARM_VCPU_INIT states:
+>
+> "Userspace can call this function multiple times for a given vcpu,
+> including after the vcpu has been run. This will reset the vcpu to its
+> initial state. All calls to this function after the initial call must use
+> the same target and same set of feature flags, otherwise EINVAL will be
+> returned."
+>
+> The consequences of that, according to my understanding:
+>
+> 1. Any changes to the VCPU features made by KVM are observable by
+> userspace.
+>
+> 2. The features in KVM weren't designed and implemented to be disabled
+> after being enabled.
+>
+> With that in mind, I have two questions:
+>
+> 1. What happens when userspace disables a feature via the ID registers
+> which is set in vcpu->arch.features? Does the feature bit get cleared from
+> vcpu->arch.features? Does it stay set? If it gets cleared, is it now
+> possible for userspace to call KVM_ARM_VCPU_INIT again with a different set
+> of VCPU features (it doesn't look possible to me after looking at the
+> code). If it stays set, what does it mean when userspace calls
+> KVM_ARM_VCPU_INIT with a different set of features enabled than what is
+> present in the ID registers? Should the ID registers be changed to match
+> the features that userspace set in the last KVM_ARM_VCPU_INIT call (it
+> looks to me that the ID registers are not changed)?
+
+KVM will not allow userspace to set the ID register value that conflicts
+with CPU features that are configured by the initial KVM_ARM_VCPU_INIT
+(or there are a few more APIs).
+KVM_SET_ONE_REG for such requests will fail.
+
+
+> 2. What happens to vcpu->arch.features when userspace enables a feature via
+> the ID registers which is not present in the bitmap?
+
+The answer for this question is basically the same as above.
+Userspace is not allowed to enable a feature via the ID registers
+which is not present in the bit map.
+
+The cover lever included a brief explanation of this, but I will
+try to improve the explanation:-)
+
+Regards,
+Reiji
+
+>
+> Thanks,
+> Alex
 >
 > On Tue, Nov 16, 2021 at 10:43:30PM -0800, Reiji Watanabe wrote:
 > > In KVM/arm64, values of ID registers for a guest are mostly same as
@@ -92,32 +141,6 @@ On Tue, Nov 23, 2021 at 7:59 AM Alexandru Elisei
 > > ID registers (as long as KVM can support features that are indicated
 > > in the registers) so userspace can have more control of configuring
 > > and unconfiguring features for guests.
->
-> What not use VCPU features? Isn't that why the field
-> kvm_vcpu_init->features exists in the first place? This cover letter does
-> nothing to explaing why any changes are needed.
->
-> Do you require finer grained control over certain feature that you cannot
-> get with the 32 * 7 = 224 feature flag bits from kvm_vcpu_init? Does using
-> the ID registers simplify certain aspects of the implementation?
-
-Since some features are not binary in nature (e.g. AA64DFR0_EL1.BRPs
-fields indicate number of breakpoints minus 1), using
-kvm_vcpu_init->features to configure such features is inconvenient.
-
-One of the reasons why we want the finer grained control is that
-we want to expose a uniform set/level of features for a group of
-guests on systems with different ARM CPUs.
-
-I will update the cover letter.
-
-Thanks,
-Reiji
-
->
-> Thanks,
-> Alex
->
 > >
 > > The patch series is for both VHE and non-VHE, except for protected VMs,
 > > which have a different way of configuring ID registers based on its
