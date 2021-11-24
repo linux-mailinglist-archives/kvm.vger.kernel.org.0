@@ -2,112 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B4CE45B8E3
-	for <lists+kvm@lfdr.de>; Wed, 24 Nov 2021 12:08:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C155045B8FD
+	for <lists+kvm@lfdr.de>; Wed, 24 Nov 2021 12:18:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234726AbhKXLLk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Nov 2021 06:11:40 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:52199 "EHLO
+        id S240996AbhKXLV5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Nov 2021 06:21:57 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:22823 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232594AbhKXLLj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 24 Nov 2021 06:11:39 -0500
+        by vger.kernel.org with ESMTP id S240887AbhKXLV4 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 24 Nov 2021 06:21:56 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637752109;
+        s=mimecast20190719; t=1637752726;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=waH4hRzlVOpWIl+cTH6RBonEIb6tUAeusmu8efKZ6yQ=;
-        b=SBZqbIldEPHVtDsI9lCCNDNdKzZbLHHmqQkaG0Oel8izYYW6xp8gqICSD6cS+mx5XTdyjw
-        woiffO49uzzb13NZwzIsR6v+P93D2XAWFFCUDB0lxsyQs0D+SICG/KHPsmh62RroSLNP9G
-        SKJl4o0xQ94Xd1ZOHHvfJKIS/u06HEc=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=EXLSeLEr0J3vq9Ir5gCLpfItHKa5rtYcPMMzJxUxGIM=;
+        b=duQlzeviRalGqutZ67DQhZVN0mZWOVfeRmGoS8alF7FvL9U1ZNpAQ3MUFjxKN0iTA/9ouT
+        BfD3lHwTLC9MElgzXYmMZ19m0NypLBdRUSxC/cEEcZvinC+cOZ4K0OovT6W4r3trvFOKkC
+        o44JXrORnr9iBxg0/BO6VSOeK8/oT28=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-61-FIbEYFUuOhKEyG5jSo5pOA-1; Wed, 24 Nov 2021 06:08:28 -0500
-X-MC-Unique: FIbEYFUuOhKEyG5jSo5pOA-1
-Received: by mail-ed1-f71.google.com with SMTP id c1-20020aa7c741000000b003e7bf1da4bcso1948505eds.21
-        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 03:08:28 -0800 (PST)
+ us-mta-534-Lax9vaEuPkuIlZhKqYaqoA-1; Wed, 24 Nov 2021 06:18:45 -0500
+X-MC-Unique: Lax9vaEuPkuIlZhKqYaqoA-1
+Received: by mail-wm1-f72.google.com with SMTP id a85-20020a1c7f58000000b0033ddc0eacc8so947294wmd.9
+        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 03:18:45 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=waH4hRzlVOpWIl+cTH6RBonEIb6tUAeusmu8efKZ6yQ=;
-        b=c+vFwiqVmJSCCnX5CaxRImLWodS9rJyA7ZILiO0o49p0m/c2uWuwV3ZSc3wASa2hMm
-         9lSDQnvNvbZFBfvEHPPqSeRN57UZoxpNHbVKrFLkVQ76+5aqfYZABzmnyW10fWvMPKf1
-         4WFSqp2XZVmh3lUZ1xKplFcsY9lB+qTz3GGcWzGn769I7BdWjyFP+v9DXS8X4C3PfiTJ
-         qhOCrBRKocQnnn9BDNgxHyF/hzh3lC0IqeM86buDIDuxfTi1MWs7ipihdX7uuBFT7lBV
-         nuEpeZheIJuqOCni9FMcIq8+RGxogA76KMO8OzLAGyJ6ijtjDj+G7QDlb9K6hT9ijp8G
-         bP+A==
-X-Gm-Message-State: AOAM532rhXRDsYQrgL1zu9OEWB8gHUXFbU+4nOxW79KmvygWvhnwDQUo
-        RPAE64Q9jgX6B0aQEqxNOaUO56abIfhO3wI0MTkgBqZmJHtMMUw+WfXQwd1yVtN62jnxkdCyP5b
-        hh/gj0RlBcjut
-X-Received: by 2002:a05:6402:50d4:: with SMTP id h20mr23601517edb.52.1637752107073;
-        Wed, 24 Nov 2021 03:08:27 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwglewokYpugqHWrBhNdWGpHvZXynVUenV12dW1Fb7vRdTvAfPH5JZMz6PqUW3GovixbQIRJA==
-X-Received: by 2002:a05:6402:50d4:: with SMTP id h20mr23601480edb.52.1637752106917;
-        Wed, 24 Nov 2021 03:08:26 -0800 (PST)
-Received: from gator.home (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
-        by smtp.gmail.com with ESMTPSA id nd22sm6940051ejc.98.2021.11.24.03.08.26
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=EXLSeLEr0J3vq9Ir5gCLpfItHKa5rtYcPMMzJxUxGIM=;
+        b=guXDSg7yYoSp32+J0sCzcIrZK87seWArixJyB75iUUCff6Cce29odftfUPfuZYFJLM
+         mrgPng7Xa2QnfEVQduhPhZsV6tpnXokZTAR+3VHNb7TBZ5Yhg2c66G201fONSSukmzOe
+         B88d3S5DXOa2vR3AfRWFH2TS8wh41c7oFbX0uhBermxAQCfp3sT826otuj+6HgW2EEaz
+         mWKSjF42zXnj9yg3zAlb+QVaZRhu7f+4szzoymelW1b1JbZjvWsKY1dwsWpyDryqGLOQ
+         YQ//E8OxGSTyDLgsfM0Z2CNjo3KapgmcBFguRE8JAwWoTfIgVi8QklCcp8DIS2HZ/pQ3
+         PWSQ==
+X-Gm-Message-State: AOAM532CVEIaYVC6oVSqdtKd37EWDzjDgFoM8f7CKlKkz0d51mRn6pYB
+        qf564tu850vWZ/VEPakuNGS5IU7nlGqFg+mIoSMTYLKc4LjmcOd9n8N6ncUrsi5Bxu9FHyeq/LF
+        3MoDYssA1TiWp
+X-Received: by 2002:a05:6000:1568:: with SMTP id 8mr17888293wrz.76.1637752724294;
+        Wed, 24 Nov 2021 03:18:44 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwUFsykw0HGFhTqQnLN7D+ri7et5Vk/6y++jdKzN6SIrBYF+ephUxl+Qt7w4lsYUvICVs6Pkw==
+X-Received: by 2002:a05:6000:1568:: with SMTP id 8mr17888258wrz.76.1637752724065;
+        Wed, 24 Nov 2021 03:18:44 -0800 (PST)
+Received: from fedora (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id t8sm5115342wmq.32.2021.11.24.03.18.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Nov 2021 03:08:26 -0800 (PST)
-Date:   Wed, 24 Nov 2021 12:08:24 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Cc:     kvm@vger.kernel.org, maz@kernel.org, qemu-arm@nongnu.org,
-        idan.horowitz@gmail.com, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org, pbonzini@redhat.com,
-        thuth@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v8 01/10] docs: mention checkpatch in the
- README
-Message-ID: <20211124110824.yqrtjkbul3h3pv2i@gator.home>
-References: <20211118184650.661575-1-alex.bennee@linaro.org>
- <20211118184650.661575-2-alex.bennee@linaro.org>
- <20211124110659.jhjuuzez6ij5v7g7@gator.home>
+        Wed, 24 Nov 2021 03:18:43 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     pbonzini@redhat.com, David Woodhouse <dwmw@amazon.co.uk>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzbot <syzbot+7b7db8bb4db6fd5e157b@syzkaller.appspotmail.com>,
+        syzkaller-bugs@googlegroups.com,
+        Sean Christopherson <seanjc@google.com>
+Subject: Re: [syzbot] kernel BUG in kvm_read_guest_offset_cached
+In-Reply-To: <000000000000f854ec05d167f227@google.com>
+References: <000000000000f854ec05d167f227@google.com>
+Date:   Wed, 24 Nov 2021 12:18:42 +0100
+Message-ID: <871r35n6nh.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20211124110659.jhjuuzez6ij5v7g7@gator.home>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 24, 2021 at 12:07:02PM +0100, Andrew Jones wrote:
-> On Thu, Nov 18, 2021 at 06:46:41PM +0000, Alex Bennée wrote:
-> > Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> > ---
-> >  README.md | 2 ++
-> >  1 file changed, 2 insertions(+)
-> > 
-> > diff --git a/README.md b/README.md
-> > index b498aaf..5db48e5 100644
-> > --- a/README.md
-> > +++ b/README.md
-> > @@ -182,3 +182,5 @@ the code files.  We also start with common code and finish with unit test
-> >  code. git-diff's orderFile feature allows us to specify the order in a
-> >  file.  The orderFile we use is `scripts/git.difforder`; adding the config
-> >  with `git config diff.orderFile scripts/git.difforder` enables it.
-> > +
-> > +Please run the kernel's ./scripts/checkpatch.pl on new patches
-> 
-> This is a bit of a problem for kvm-unit-tests code which still has a mix
-> of styles since it was originally written with a strange tab and space
-> mixed style. If somebody is patching one of those files we've usually
-> tried to maintain the original style rather than reformat the whole
-> thing (in hindsight maybe we should have just reformatted). We're also
-> more flexible with line length than Linux, although Linux now only warns
-> for anything over 80 as long as it's under 100, which is probably good
-> enough for us too. Anyway, let's see what Paolo and Thomas say. Personally
-> I wouldn't mind adding this line to the documentation, so I'll ack it.
-> Anyway, we can also ignore our own advise when it suits us :-)
-> 
-> Acked-by: Andrew Jones <drjones@redhat.com>
+syzbot <syzbot+7b7db8bb4db6fd5e157b@syzkaller.appspotmail.com> writes:
+
+> Hello,
 >
+> syzbot found the following issue on:
+>
+> HEAD commit:    4c388a8e740d Merge tag 'zstd-for-linus-5.16-rc1' of git://..
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=171ff6eeb00000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=6d3b8fd1977c1e73
+> dashboard link: https://syzkaller.appspot.com/bug?extid=7b7db8bb4db6fd5e157b
+> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+>
+> Unfortunately, I don't have any reproducer for this issue yet.
 
-Forgot to CC Thomas and Paolo, am now.
+No worries, I think I do.
 
-Thanks,
-drew
+>
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+7b7db8bb4db6fd5e157b@syzkaller.appspotmail.com
+>
+> ------------[ cut here ]------------
+> kernel BUG at arch/x86/kvm/../../../virt/kvm/kvm_main.c:2955!
+> invalid opcode: 0000 [#1] PREEMPT SMP KASAN
+> CPU: 0 PID: 27639 Comm: syz-executor.0 Not tainted 5.16.0-rc1-syzkaller #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+> RIP: 0010:kvm_read_guest_offset_cached+0x3aa/0x440 arch/x86/kvm/../../../virt/kvm/kvm_main.c:2955
+> Code: 00 48 c7 c2 c0 08 a2 89 be 0b 03 00 00 48 c7 c7 60 0d a2 89 c6 05 71 f9 73 0c 01 e8 62 19 f8 07 e9 d6 fc ff ff e8 36 1b 6f 00 <0f> 0b e8 2f 1b 6f 00 48 8b 74 24 10 4c 89 ef 4c 89 e1 48 8b 54 24
+> RSP: 0018:ffffc9000589fa18 EFLAGS: 00010216
+> RAX: 0000000000003b75 RBX: ffff8880722ba798 RCX: ffffc90002b94000
+> RDX: 0000000000040000 RSI: ffffffff81087cda RDI: 0000000000000003
+> RBP: 0000000000000000 R08: 0000000000000004 R09: ffffc900049dbf53
+> R10: ffffffff81087a0f R11: 0000000000000002 R12: 0000000000000004
+> R13: ffffc900049d1000 R14: 0000000000000000 R15: ffff8880886c0000
+> FS:  00007fd7a562f700(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000000020000200 CR3: 0000000038e62000 CR4: 00000000003526f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 000000000000c0fe
+> DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000400
+> Call Trace:
+>  <TASK>
+>  handle_vmptrld arch/x86/kvm/vmx/nested.c:5304 [inline]
+
+The code is:
+
+		struct gfn_to_hva_cache *ghc = &vmx->nested.vmcs12_cache;
+		struct vmcs_hdr hdr;
+
+		if (ghc->gpa != vmptr &&
+		    kvm_gfn_to_hva_cache_init(vcpu->kvm, ghc, vmptr, VMCS12_SIZE)) {
+	            ...
+		}
+
+		if (kvm_read_guest_offset_cached(vcpu->kvm, ghc, &hdr,
+						 offsetof(struct vmcs12, hdr),
+						 sizeof(hdr))) {
+                ....
+
+It seems that 'nested.vmcs12_cache' is zero-initalized and 'ghc->gpa !=
+vmptr' check will pass if VMPTRLD is called with '0' argument.
+
+The following hack to 'state_test.c' can be used to crash host's kernel:
+
+diff --git a/tools/testing/selftests/kvm/x86_64/state_test.c b/tools/testing/selftests/kvm/x86_64/state_test.c
+index 32854c1462ad..29b468f1a083 100644
+--- a/tools/testing/selftests/kvm/x86_64/state_test.c
++++ b/tools/testing/selftests/kvm/x86_64/state_test.c
+@@ -81,6 +81,9 @@ static void vmx_l1_guest_code(struct vmx_pages *vmx_pages)
+        GUEST_ASSERT(vmx_pages->vmcs_gpa);
+        GUEST_ASSERT(prepare_for_vmx_operation(vmx_pages));
+        GUEST_SYNC(3);
++
++       vmptrld(0);
++
+        GUEST_ASSERT(load_vmcs(vmx_pages));
+        GUEST_ASSERT(vmptrstz() == vmx_pages->vmcs_gpa);
+ 
+
+This seems to be a regression introduced by
+
+commit cee66664dcd6241a943380ef9dcd2f8a0a7dc47d
+Author: David Woodhouse <dwmw@amazon.co.uk>
+Date:   Mon Nov 15 16:50:26 2021 +0000
+
+    KVM: nVMX: Use a gfn_to_hva_cache for vmptrld
+
+Luckily, it's in 5.16-rc2 only.
+
+I think the solution is to assign 'ghc->gpa' to '-1' upon
+initialization. I can send a patch if my conclusions seem to be right.
+
+-- 
+Vitaly
 
