@@ -2,286 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D381145B40D
-	for <lists+kvm@lfdr.de>; Wed, 24 Nov 2021 06:52:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A34FD45B416
+	for <lists+kvm@lfdr.de>; Wed, 24 Nov 2021 07:00:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233331AbhKXFzk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Nov 2021 00:55:40 -0500
-Received: from smtp-relay-internal-0.canonical.com ([185.125.188.122]:44988
-        "EHLO smtp-relay-internal-0.canonical.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231421AbhKXFzk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 24 Nov 2021 00:55:40 -0500
-Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com [209.85.210.200])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 293B23F19E
-        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 05:52:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1637733149;
-        bh=V/j9435sf+Q6QqIYUyi0ktOVWvCT49bfuL52dC8eJNQ=;
-        h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-         To:Cc:Content-Type;
-        b=mNA71YDlPdMDewD3l9zhJplvW/lU6JG5K33Ie2aSCJOnbyp387hcJTA8AsAsyPonC
-         YcGnFIAVyUsAVEqJ1pRjiRHMNmsniWnOjEF3/dFmlyeU4C62WWnaFbVzYXVDmAFlly
-         PoRK5eQZVr0rqqJB3IaV6DOJjMiOuCYava/gVdJutkJtWB31a+5c0PZBHFr1DKJM+Y
-         dHYDA+z17+agCWgjwKXKjGce2RMkDsoH1ECDqur1EeWHIkKJ6YbN2Sr7H8Zf+uKaUy
-         HibNTSiOESlWIbKQZzPeKPftNUpMbc/o0F0d3EHRZZJzEU+SpbgRLO5G/+6WalPIEV
-         FgybKkKwwkvEw==
-Received: by mail-pf1-f200.google.com with SMTP id x14-20020a627c0e000000b0049473df362dso917120pfc.12
-        for <kvm@vger.kernel.org>; Tue, 23 Nov 2021 21:52:29 -0800 (PST)
+        id S233794AbhKXGDr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Nov 2021 01:03:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48358 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233741AbhKXGDq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Nov 2021 01:03:46 -0500
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 018B9C061574;
+        Tue, 23 Nov 2021 22:00:37 -0800 (PST)
+Received: by mail-pg1-x536.google.com with SMTP id m15so1157020pgu.11;
+        Tue, 23 Nov 2021 22:00:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id;
+        bh=OuG6Dcru5xJdxaep/9HwArVKmO5jy/e5OafxYbkdspc=;
+        b=c7fDY59tF11DmqhKPhYtptf6fwu3mX3P3bUqUuhRmlvDjvUFRwWV51VvS9c5jBzchu
+         xipWUblGN9DUkucd+k1wJgenwnpN8Rf3h7PmOLlz3c+RjjO8xSVGqK5T67ZTYOJu+rf8
+         Efgcn3pg8wdfId/TiNxqvAOIpK6gR5OsHs3zPPbhPGkasi6k/DrslGHNyWDZm3gcbzIl
+         mjbELS3xev+oTq3n4UrKnkApePYAWypEohFApG5/zh+R0PnQJtiX9s/nA6wK9DxN/N+A
+         4T9OSRBLj2sIqyzhLAsa5FDjnOdVTUHWJmnGkXovsk84KUUn/Zscwe4iwRzusAQA8hj/
+         gKoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=V/j9435sf+Q6QqIYUyi0ktOVWvCT49bfuL52dC8eJNQ=;
-        b=6GRyFy97eXbMFOwRFE9MqkxTaAFNsWdgj+00OtsZ1L9+MSzv+OoHQXndPp5q42mEyc
-         9QJWejWGokkN/fB8VyD65Cn05R/xcTJ0qJ8dZajJlKzuu4m4o4vL+rPOWLIrpHbFL+y7
-         1q9o42SZdJkIwcvIZpqYPXPuQNHRQ9D9z6ARfKAImbxngrZ25FCPQEBHH6XcU01kh2MS
-         NzbYE/l1QPQy/8Bkw2qcqwaV10wKbcxrfPFoL6ceNxHfXDKYw78RWOOb+mijx9d2MoLC
-         QtK2Tdjvbl/j6D71Z5USa3v73xa4j2gz5vzcJFNGOHaiZcxGTzNa+dKD+5E0RA6C+grH
-         2mjQ==
-X-Gm-Message-State: AOAM532cJlCn0nl/P3GNWwrTmxnJJ/RT75NrunQyBqX8i7YU6ePoGr0a
-        AISJvttBTsYUA1cqgRnMgj2AZYOGDY9S3WSpVujjseCOnEEN7jWq8vPUHXVp+kf/k9Ro5WhWk37
-        6lO21TkoEulIij+xyf+aarYdafUpmivlyZXWc1WqWuy9USw==
-X-Received: by 2002:a17:90a:fe0a:: with SMTP id ck10mr5187432pjb.216.1637733147744;
-        Tue, 23 Nov 2021 21:52:27 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxtcQIbaN5dL44ZbqC9L1a1WlemOP/LRBnvajM2RC/ohJohHICyHnWXVJGR7cdc4bVPeYgPZaVQp8pkmusSUQE=
-X-Received: by 2002:a17:90a:fe0a:: with SMTP id ck10mr5187399pjb.216.1637733147439;
- Tue, 23 Nov 2021 21:52:27 -0800 (PST)
-MIME-Version: 1.0
-References: <d4084296-9d36-64ec-8a79-77d82ac6d31c@canonical.com>
- <20210914104301.48270518.alex.williamson@redhat.com> <9e8d0e9e-1d94-35e8-be1f-cf66916c24b2@canonical.com>
- <20210915103235.097202d2.alex.williamson@redhat.com> <2fadf33d-8487-94c2-4460-2a20fdb2ea12@canonical.com>
- <20211005171326.3f25a43a.alex.williamson@redhat.com> <CAKAwkKtJQ1mE3=iaDA1B_Dkn1+ZbN0jTSWrQon0=SAszRv5xFw@mail.gmail.com>
- <20211012140516.6838248b.alex.williamson@redhat.com> <CAKAwkKsF3Kn1HLAg55cBVmPmo2y0QAf7g6Zc7q6ZsQZBXGW9bg@mail.gmail.com>
- <CAKAwkKsoKELnR=--06sRZL3S6_rQVi5J_Kcv6iRQ6w2tY71WCQ@mail.gmail.com> <20211104160541.4aedc593.alex.williamson@redhat.com>
-In-Reply-To: <20211104160541.4aedc593.alex.williamson@redhat.com>
-From:   Matthew Ruffell <matthew.ruffell@canonical.com>
-Date:   Wed, 24 Nov 2021 18:52:16 +1300
-Message-ID: <CAKAwkKs=p3bHQL5VXuh_Xhu3A+mg0mSEuFJ_fy4Zh6E6YG4aag@mail.gmail.com>
-Subject: Re: [PROBLEM] Frequently get "irq 31: nobody cared" when passing
- through 2x GPUs that share same pci switch via vfio
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     linux-pci@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>,
-        kvm@vger.kernel.org, nathan.langford@xcelesunifiedtechnologies.com
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=OuG6Dcru5xJdxaep/9HwArVKmO5jy/e5OafxYbkdspc=;
+        b=Kn6AIuPD/kFguqR+hzOUyOzyXuIQ1S6EQD4cKgpVTCWxcbrf3grWdyD59DVQnPsXif
+         g0LbB4NhtQgcMG5M6jdluoBekpUr7EKASQAGLQjwJKO5yfBV9egIMtNywEeGZza6q4s3
+         RLSJX1pq3Sbnqkv4FhX3h0UIuGuizw2zLDlY/UCP2Juxzzg54/C1vJfK683mYV0yqbE2
+         D36iOxTkCb4l6EZrSTizoBx0bVZLnPmiFc4sPQ2ABdRaOZx71Ba8pJvsMkpzE0mDQit1
+         wLkpxtDlWkHWJ93RYemPi93c6/LyWT5M3jKE+NbPRc/dQynCLK2F0JcD3beOvRnGa98q
+         iCrg==
+X-Gm-Message-State: AOAM533pM+QVIG7fsnBVJHGPRpjG2kSCsmwRfZrMQLmcdOpgKvxsJKMC
+        1zMI33k4hCubW8Ywe4UrJbGAYT1QSuw=
+X-Google-Smtp-Source: ABdhPJw8EG+NFrl07hkhFpagDnM4ahw3ypYp4PllZRtykYNMAs5uNRfwZLE4YuA5aTMjyv+yBNHzLQ==
+X-Received: by 2002:aa7:811a:0:b0:44c:b9ef:f618 with SMTP id b26-20020aa7811a000000b0044cb9eff618mr3411148pfi.9.1637733636327;
+        Tue, 23 Nov 2021 22:00:36 -0800 (PST)
+Received: from localhost.localdomain ([203.205.141.111])
+        by smtp.googlemail.com with ESMTPSA id i76sm10288474pgd.69.2021.11.23.22.00.33
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 23 Nov 2021 22:00:35 -0800 (PST)
+From:   Wanpeng Li <kernellwp@gmail.com>
+X-Google-Original-From: Wanpeng Li <wanpengli@tencent.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, Aili Yao <yaoaili@kingsoft.com>
+Subject: [PATCH] KVM: LAPIC: To keep the vCPUs in non-root mode for timer-pi
+Date:   Tue, 23 Nov 2021 21:59:45 -0800
+Message-Id: <1637733585-47113-1-git-send-email-wanpengli@tencent.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alex,
+From: Wanpeng Li <wanpengli@tencent.com>
 
-I have forward ported your patch to 5.16-rc2 to account for the vfio module
-refactor that happened recently. Attached below.
+As commit 0c5f81dad46 (KVM: LAPIC: Inject timer interrupt via posted interrupt) 
+mentioned that the host admin should well tune the guest setup, so that vCPUs 
+are placed on isolated pCPUs, and with several pCPUs surplus for *busy* housekeeping.
+It is better to disable mwait/hlt/pause vmexits to keep the vCPUs in non-root 
+mode. However, we may isolate pCPUs for other purpose like DPDK or we can make 
+some guests isolated and others not, Let's add the checking kvm_mwait_in_guest() 
+to kvm_can_post_timer_interrupt() since we can't benefit from timer posted-interrupt 
+w/o keeping the vCPUs in non-root mode.
 
-Have you had an opportunity to research if it is possible to conditionalise
-clearing DisINTx by looking at the interrupt status and seeing if there is a
-pending interrupt but no handler set?
+Reported-by: Aili Yao <yaoaili@kingsoft.com>
+Cc: Aili Yao <yaoaili@kingsoft.com>
+Signed-off-by: Wanpeng Li <wanpengli@tencent.com>
+---
+ arch/x86/kvm/lapic.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-We are testing a 5.16-rc2 kernel with the patch applied on Nathan's server
-currently, and we are also trying out the pci=clearmsi command line parameter
-that was discussed on linux-pci a few years ago in [1][2][3][4] along with
-setting snd-hda-intel.enable_msi=1 to see if it helps the crashkernel not get
-stuck copying IR tables.
-
-[1] https://marc.info/?l=linux-pci&m=153988799707413
-[2] https://lore.kernel.org/linux-pci/20181018183721.27467-1-gpiccoli@canonical.com/
-[3] https://lore.kernel.org/linux-pci/20181018183721.27467-2-gpiccoli@canonical.com/
-[4] https://lore.kernel.org/linux-pci/20181018183721.27467-3-gpiccoli@canonical.com/
-
-I will let you know how we get on.
-
-Thanks,
-Matthew
-
-diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-index f948e6cd2993..cbca207ddc45 100644
---- a/drivers/vfio/pci/vfio_pci_core.c
-+++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -276,6 +276,7 @@ int vfio_pci_core_enable(struct vfio_pci_core_device *vdev)
-             vdev->pci_2_3 = pci_intx_mask_supported(pdev);
-     }
-
-+    vfio_intx_stub_init(vdev);
-     pci_read_config_word(pdev, PCI_COMMAND, &cmd);
-     if (vdev->pci_2_3 && (cmd & PCI_COMMAND_INTX_DISABLE)) {
-         cmd &= ~PCI_COMMAND_INTX_DISABLE;
-@@ -365,6 +366,14 @@ void vfio_pci_core_disable(struct
-vfio_pci_core_device *vdev)
-         kfree(dummy_res);
-     }
-
-+    /*
-+     * Set known command register state, disabling MSI/X (via busmaster)
-+     * and INTx directly.  At this point we can teardown the INTx stub
-+     * handler initialized from the SET_IRQS teardown above.
-+     */
-+    pci_write_config_word(pdev, PCI_COMMAND, PCI_COMMAND_INTX_DISABLE);
-+    vfio_intx_stub_exit(vdev);
-+
-     vdev->needs_reset = true;
-
-     /*
-@@ -382,12 +391,6 @@ void vfio_pci_core_disable(struct
-vfio_pci_core_device *vdev)
-         pci_save_state(pdev);
-     }
-
--    /*
--     * Disable INTx and MSI, presumably to avoid spurious interrupts
--     * during reset.  Stolen from pci_reset_function()
--     */
--    pci_write_config_word(pdev, PCI_COMMAND, PCI_COMMAND_INTX_DISABLE);
--
-     /*
-      * Try to get the locks ourselves to prevent a deadlock. The
-      * success of this is dependent on being able to lock the device,
-diff --git a/drivers/vfio/pci/vfio_pci_intrs.c
-b/drivers/vfio/pci/vfio_pci_intrs.c
-index 6069a11fb51a..98cf528aa175 100644
---- a/drivers/vfio/pci/vfio_pci_intrs.c
-+++ b/drivers/vfio/pci/vfio_pci_intrs.c
-@@ -139,6 +139,44 @@ static irqreturn_t vfio_intx_handler(int irq, void *dev_id)
-     return ret;
- }
-
-+static irqreturn_t vfio_intx_stub(int irq, void *dev_id)
-+{
-+    struct vfio_pci_core_device *vdev = dev_id;
-+
-+    if (pci_check_and_mask_intx(vdev->pdev))
-+        return IRQ_HANDLED;
-+
-+    return IRQ_NONE;
-+}
-+
-+void vfio_intx_stub_init(struct vfio_pci_core_device *vdev)
-+{
-+    char *name;
-+
-+    if (vdev->nointx || !vdev->pci_2_3 || !vdev->pdev->irq)
-+        return;
-+
-+    name = kasprintf(GFP_KERNEL, "vfio-intx-stub(%s)",
-+             pci_name(vdev->pdev));
-+    if (!name)
-+        return;
-+
-+    if (request_irq(vdev->pdev->irq, vfio_intx_stub,
-+            IRQF_SHARED, name, vdev))
-+        kfree(name);
-+
-+    vdev->intx_stub = true;
-+}
-+
-+void vfio_intx_stub_exit(struct vfio_pci_core_device *vdev)
-+{
-+    if (!vdev->intx_stub)
-+        return;
-+
-+    kfree(free_irq(vdev->pdev->irq, vdev));
-+    vdev->intx_stub = false;
-+}
-+
- static int vfio_intx_enable(struct vfio_pci_core_device *vdev)
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 759952dd1222..8257566d44c7 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -113,14 +113,13 @@ static inline u32 kvm_x2apic_id(struct kvm_lapic *apic)
+ 
+ static bool kvm_can_post_timer_interrupt(struct kvm_vcpu *vcpu)
  {
-     if (!is_irq_none(vdev))
-@@ -153,6 +191,8 @@ static int vfio_intx_enable(struct
-vfio_pci_core_device *vdev)
-
-     vdev->num_ctx = 1;
-
-+    vfio_intx_stub_exit(vdev);
-+
-     /*
-      * If the virtual interrupt is masked, restore it.  Devices
-      * supporting DisINTx can be masked at the hardware level
-@@ -231,6 +271,7 @@ static void vfio_intx_disable(struct
-vfio_pci_core_device *vdev)
-     vdev->irq_type = VFIO_PCI_NUM_IRQS;
-     vdev->num_ctx = 0;
-     kfree(vdev->ctx);
-+    vfio_intx_stub_init(vdev);
+-	return pi_inject_timer && kvm_vcpu_apicv_active(vcpu);
++	return pi_inject_timer && kvm_mwait_in_guest(vcpu->kvm) && kvm_vcpu_apicv_active(vcpu);
  }
-
- /*
-@@ -258,6 +299,8 @@ static int vfio_msi_enable(struct
-vfio_pci_core_device *vdev, int nvec, bool msi
-     if (!vdev->ctx)
-         return -ENOMEM;
-
-+    vfio_intx_stub_exit(vdev);
-+
-     /* return the number of supported vectors if we can't get all: */
-     cmd = vfio_pci_memory_lock_and_enable(vdev);
-     ret = pci_alloc_irq_vectors(pdev, 1, nvec, flag);
-@@ -266,6 +309,7 @@ static int vfio_msi_enable(struct
-vfio_pci_core_device *vdev, int nvec, bool msi
-             pci_free_irq_vectors(pdev);
-         vfio_pci_memory_unlock_and_restore(vdev, cmd);
-         kfree(vdev->ctx);
-+        vfio_intx_stub_init(vdev);
-         return ret;
-     }
-     vfio_pci_memory_unlock_and_restore(vdev, cmd);
-@@ -388,6 +432,7 @@ static int vfio_msi_set_block(struct
-vfio_pci_core_device *vdev, unsigned start,
- static void vfio_msi_disable(struct vfio_pci_core_device *vdev, bool msix)
+ 
+ bool kvm_can_use_hv_timer(struct kvm_vcpu *vcpu)
  {
-     struct pci_dev *pdev = vdev->pdev;
-+    pci_dev_flags_t dev_flags = pdev->dev_flags;
-     int i;
-     u16 cmd;
-
-@@ -399,19 +444,22 @@ static void vfio_msi_disable(struct
-vfio_pci_core_device *vdev, bool msix)
-     vfio_msi_set_block(vdev, 0, vdev->num_ctx, NULL, msix);
-
-     cmd = vfio_pci_memory_lock_and_enable(vdev);
--    pci_free_irq_vectors(pdev);
--    vfio_pci_memory_unlock_and_restore(vdev, cmd);
-
-     /*
--     * Both disable paths above use pci_intx_for_msi() to clear DisINTx
--     * via their shutdown paths.  Restore for NoINTx devices.
-+     * XXX pci_intx_for_msi() will clear DisINTx, which can trigger an
-+     * INTx storm even before we return from pci_free_irq_vectors(), even
-+     * as we'll restore the previous command register immediately after.
-+     * Hack around it by masking in a dev_flag to prevent such behavior.
-      */
--    if (vdev->nointx)
--        pci_intx(pdev, 0);
-+    pdev->dev_flags |= PCI_DEV_FLAGS_MSI_INTX_DISABLE_BUG;
-+    pci_free_irq_vectors(pdev);
-+    pdev->dev_flags = dev_flags;
-
-+    vfio_pci_memory_unlock_and_restore(vdev, cmd);
-     vdev->irq_type = VFIO_PCI_NUM_IRQS;
-     vdev->num_ctx = 0;
-     kfree(vdev->ctx);
-+    vfio_intx_stub_init(vdev);
+ 	return kvm_x86_ops.set_hv_timer
+-	       && !(kvm_mwait_in_guest(vcpu->kvm) ||
+-		    kvm_can_post_timer_interrupt(vcpu));
++	       && !kvm_mwait_in_guest(vcpu->kvm);
  }
+ EXPORT_SYMBOL_GPL(kvm_can_use_hv_timer);
+ 
+-- 
+2.25.1
 
- /*
-diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
-index ef9a44b6cf5d..58e1029eb083 100644
---- a/include/linux/vfio_pci_core.h
-+++ b/include/linux/vfio_pci_core.h
-@@ -124,6 +124,7 @@ struct vfio_pci_core_device {
-     bool            needs_reset;
-     bool            nointx;
-     bool            needs_pm_restore;
-+    bool            intx_stub;
-     struct pci_saved_state    *pci_saved_state;
-     struct pci_saved_state    *pm_save;
-     int            ioeventfds_nr;
-@@ -145,6 +146,9 @@ struct vfio_pci_core_device {
- #define is_irq_none(vdev) (!(is_intx(vdev) || is_msi(vdev) || is_msix(vdev)))
- #define irq_is(vdev, type) (vdev->irq_type == type)
-
-+extern void vfio_intx_stub_init(struct vfio_pci_core_device *vdev);
-+extern void vfio_intx_stub_exit(struct vfio_pci_core_device *vdev);
-+
- extern void vfio_pci_intx_mask(struct vfio_pci_core_device *vdev);
- extern void vfio_pci_intx_unmask(struct vfio_pci_core_device *vdev);
