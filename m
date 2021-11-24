@@ -2,96 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A151C45C8DC
-	for <lists+kvm@lfdr.de>; Wed, 24 Nov 2021 16:39:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C9AF545C97A
+	for <lists+kvm@lfdr.de>; Wed, 24 Nov 2021 17:03:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241850AbhKXPme (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Nov 2021 10:42:34 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36599 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241758AbhKXPmd (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 24 Nov 2021 10:42:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637768363;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        id S241998AbhKXQG5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Nov 2021 11:06:57 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:52948 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S241205AbhKXQGv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Nov 2021 11:06:51 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 0DED12193C;
+        Wed, 24 Nov 2021 16:03:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1637769819; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=2ZAQ9bYIpFW8w5nnJ2NX1dTFB2zcv9+w2ukWOWPCF5I=;
-        b=VAlpX7IqzWtTm059kr65xTpzweeSwR5fXX1VFPaNKcDRLd38z2MkFrOzLEu7GVP1Y3YHnv
-        PFTiDgUEpytoQRWWRA8gvhjcxbU1vnokkMB++Ng+NQHCFUgdvhqH8j3jESYfa0UFOjBAaM
-        Ma1WRzojfx9ZHuXfQh3Rj0jTwqUbMyM=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-442-1npDLHsWOwK3JEgNGmNWvQ-1; Wed, 24 Nov 2021 10:39:22 -0500
-X-MC-Unique: 1npDLHsWOwK3JEgNGmNWvQ-1
-Received: by mail-ed1-f70.google.com with SMTP id i19-20020a05640242d300b003e7d13ebeedso2722983edc.7
-        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 07:39:21 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=2ZAQ9bYIpFW8w5nnJ2NX1dTFB2zcv9+w2ukWOWPCF5I=;
-        b=yjvDn1FYwkUnA7g3xhGOHHpY7ekVODjHKhRBuqLhQVTSVFBS/iQ5XJDgqfOkrUxcZg
-         mziZ0qvTetpSLsacRqPrVd5VTH1UGR+82R3cqzk39kEpiuYtthYVEx9cjOnE9r5IpP++
-         4Gh8zEtFapdlOOrAYuKth87V5FIKwcLI4HOPXmZkd/emvp2xcKgn2coysc+TAj1TJkm0
-         5fsXKsoI8eyRy+JWprDHWiZefxU/kyZ8KtMvtlmeAAjHucX5AQXgDwzRj5y4wTnczdwi
-         CIj1P3bJejn3J+4oF8uW3MfaaUhAqZqw2kTSpMWTWs+5TytsyYtzCDz6z/W4ICvWrsdK
-         uJ4A==
-X-Gm-Message-State: AOAM532QBnpbGoXkISlBVImwWpP0t/S8ZziOXEbYIhGkNYYqfzHgYV5A
-        fOXoU2NQ+cwIAPwERjhsuYJCnN+b640U5Gx2BW6+OtXGa8H2GMEkofbHKE2Vh0gpfqTO387Tgcj
-        YaNZp461eXTYE
-X-Received: by 2002:a17:906:4bcf:: with SMTP id x15mr21211718ejv.273.1637768360443;
-        Wed, 24 Nov 2021 07:39:20 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzIoRH2WtnFT3cwBPr87hT88WyQOrA/0ZJYyfvukNGh+Cf3LGP/KgoKVcbcNm0UQ/svUQrL/A==
-X-Received: by 2002:a17:906:4bcf:: with SMTP id x15mr21211655ejv.273.1637768360136;
-        Wed, 24 Nov 2021 07:39:20 -0800 (PST)
-Received: from steredhat (host-87-10-72-39.retail.telecomitalia.it. [87.10.72.39])
-        by smtp.gmail.com with ESMTPSA id u16sm103149ejy.16.2021.11.24.07.39.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Nov 2021 07:39:19 -0800 (PST)
-Date:   Wed, 24 Nov 2021 16:39:16 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Zhu Lingshan <lingshan.zhu@intel.com>
-Cc:     Jason Wang <jasowang@redhat.com>, Michael Tsirkin <mst@redhat.com>,
-        Cindy Lu <lulu@redhat.com>,
-        Linux Virtualization <virtualization@lists.linux-foundation.org>,
-        netdev <netdev@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        kernel list <linux-kernel@vger.kernel.org>,
-        Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: Re: [PATCH V4 0/3] vDPA/ifcvf: enables Intel C5000X-PL virtio-blk
-Message-ID: <CAGxU2F622pzZkh8WC7J+jGYu-_ozSDx1Tvvvtw-z52xwC3S38A@mail.gmail.com>
-References: <20210419063326.3748-1-lingshan.zhu@intel.com>
+        bh=+K9X0gnKgAVGvjlnxJQwG5HJjl9FzPuLLZJhp/rDicQ=;
+        b=TjZVpHr9twy3p2Y6wNd56k9PHBwLZ/ZwTJcdY5ck7SQC6QEFdmOB4fP7mqMyJh4Ghd/s9x
+        oXYxD2FTZuUY5Mf8Gba2dcolshwOfCtr0a3a94gACWGcxWy+Ws87hC9rnGdoOtHGhpYX2p
+        qs7i1nsaNkE2+nxUpjCfNXjcS9QXdwc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1637769819;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+K9X0gnKgAVGvjlnxJQwG5HJjl9FzPuLLZJhp/rDicQ=;
+        b=/EU59iTj2EaHMP94a0Q2XP7zqwHQjqdwjcOzxkGdeGbZaNwurBRsabWvcMiJH1fbVskYZx
+        63iV1KbmQrrX4iDw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id E5DC513F2A;
+        Wed, 24 Nov 2021 16:03:37 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id uNpjNllinmHoGAAAMHmgww
+        (envelope-from <jroedel@suse.de>); Wed, 24 Nov 2021 16:03:37 +0000
+Date:   Wed, 24 Nov 2021 17:03:36 +0100
+From:   Joerg Roedel <jroedel@suse.de>
+To:     Dave Hansen <dave.hansen@intel.com>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>,
+        Peter Gonda <pgonda@google.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
+ Hypervisor Support
+Message-ID: <YZ5iWJuxjSCmZL5l@suse.de>
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
+ <daf5066b-e89b-d377-ed8a-9338f1a04c0d@amd.com>
+ <d673f082-9023-dafb-e42e-eab32a3ddd0c@intel.com>
+ <f15597a0-e7e0-0a57-39fd-20715abddc7f@amd.com>
+ <5f3b3aab-9ec2-c489-eefd-9136874762ee@intel.com>
+ <d83e6668-bec4-8d1f-7f8a-085829146846@amd.com>
+ <38282b0c-7eb5-6a91-df19-2f4cfa8549ce@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20210419063326.3748-1-lingshan.zhu@intel.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <38282b0c-7eb5-6a91-df19-2f4cfa8549ce@intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Zhu,
+On Mon, Nov 22, 2021 at 02:51:35PM -0800, Dave Hansen wrote:
+> My preference would be that we never have SEV-SNP code in the kernel
+> that can panic() the host from guest userspace.  If that means waiting
+> until there's common guest unmapping infrastructure around, then I think
+> we should wait.
 
-On Mon, Apr 19, 2021 at 8:39 AM Zhu Lingshan <lingshan.zhu@intel.com> wrote:
->
-> This series enabled Intel FGPA SmartNIC C5000X-PL virtio-blk for vDPA.
+Can you elaborate how to crash host kernel from guest user-space? If I
+understood correctly it was about crashing host kernel from _host_
+user-space.
 
-Looking at the IFCVF upstream vDPA driver (with this series applied), it 
-seems that there is still some cleaning to be done to support virtio-blk 
-devices:
+I think the RMP-fault path in the page-fault handler needs to take the
+uaccess exception tables into account before actually causing a panic.
+This should solve most of the problems discussed here.
 
-- ifcvf_vdpa_get_config() and ifcvf_vdpa_set_config() use
-  `sizeof(struct virtio_net_config)` to check the inputs.
-  This seems wrong for a virtio-blk device. Maybe we can set the config
-  size for each device in ifcvf_vdpa_dev_add() and use that field to
-  check the inputs. We can reuse the same field also in
-  ifcvf_vdpa_get_config_size().
+Maybe we also need the previously suggested copy_from/to_guest()
+interfaces.
 
-- Just for make the code more readable we should rename `net_cfg` field
-  to `device_cfg`in `struct ifcvf_hw`.
+Regards,
 
-What do you think?
+-- 
+Jörg Rödel
+jroedel@suse.de
 
-Thanks,
-Stefano
+SUSE Software Solutions Germany GmbH
+Maxfeldstr. 5
+90409 Nürnberg
+Germany
+ 
+(HRB 36809, AG Nürnberg)
+Geschäftsführer: Ivo Totev
 
