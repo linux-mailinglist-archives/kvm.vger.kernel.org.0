@@ -2,22 +2,22 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5112845B89B
-	for <lists+kvm@lfdr.de>; Wed, 24 Nov 2021 11:46:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 116A645B8A6
+	for <lists+kvm@lfdr.de>; Wed, 24 Nov 2021 11:48:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229954AbhKXKtz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Nov 2021 05:49:55 -0500
-Received: from foss.arm.com ([217.140.110.172]:34798 "EHLO foss.arm.com"
+        id S240784AbhKXKv5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Nov 2021 05:51:57 -0500
+Received: from foss.arm.com ([217.140.110.172]:34840 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229482AbhKXKtz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Nov 2021 05:49:55 -0500
+        id S235858AbhKXKv5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Nov 2021 05:51:57 -0500
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 632DA1FB;
-        Wed, 24 Nov 2021 02:46:45 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B74B51FB;
+        Wed, 24 Nov 2021 02:48:47 -0800 (PST)
 Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7C4A53F73B;
-        Wed, 24 Nov 2021 02:46:42 -0800 (PST)
-Date:   Wed, 24 Nov 2021 10:48:35 +0000
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CD75A3F73B;
+        Wed, 24 Nov 2021 02:48:44 -0800 (PST)
+Date:   Wed, 24 Nov 2021 10:50:38 +0000
 From:   Alexandru Elisei <alexandru.elisei@arm.com>
 To:     Reiji Watanabe <reijiw@google.com>
 Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
@@ -35,87 +35,30 @@ Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
         Raghavendra Rao Anata <rananta@google.com>
 Subject: Re: [RFC PATCH v3 00/29] KVM: arm64: Make CPU ID registers writable
  by userspace
-Message-ID: <YZ4Yg2R+r7q/iHpu@monolith.localdoman>
+Message-ID: <YZ4Y/r8BM2hnrlYQ@monolith.localdoman>
 References: <20211117064359.2362060-1-reijiw@google.com>
- <YZ0WfQDGT5d8+6i1@monolith.localdoman>
- <CAAeT=FwTrWts=jdO2SzAECKKp5-1gGc5UR22Mf=xpx_8qOcbHw@mail.gmail.com>
+ <YZ0QMK1QFjw/uznl@monolith.localdoman>
+ <CAAeT=FxeXmgM3Pyt_brYRdehMrKHQwZut5xTbHOv-9um7anhYw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAAeT=FwTrWts=jdO2SzAECKKp5-1gGc5UR22Mf=xpx_8qOcbHw@mail.gmail.com>
+In-Reply-To: <CAAeT=FxeXmgM3Pyt_brYRdehMrKHQwZut5xTbHOv-9um7anhYw@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 Hi Reiji,
 
-On Tue, Nov 23, 2021 at 09:49:02PM -0800, Reiji Watanabe wrote:
-> Hi Alex,
+On Tue, Nov 23, 2021 at 09:13:27PM -0800, Reiji Watanabe wrote:
+> HI Alex,
 > 
-> On Tue, Nov 23, 2021 at 8:25 AM Alexandru Elisei
+> On Tue, Nov 23, 2021 at 7:59 AM Alexandru Elisei
 > <alexandru.elisei@arm.com> wrote:
 > >
 > > Hi Reiji,
 > >
-> > The API documentation for KVM_ARM_VCPU_INIT states:
-> >
-> > "Userspace can call this function multiple times for a given vcpu,
-> > including after the vcpu has been run. This will reset the vcpu to its
-> > initial state. All calls to this function after the initial call must use
-> > the same target and same set of feature flags, otherwise EINVAL will be
-> > returned."
-> >
-> > The consequences of that, according to my understanding:
-> >
-> > 1. Any changes to the VCPU features made by KVM are observable by
-> > userspace.
-> >
-> > 2. The features in KVM weren't designed and implemented to be disabled
-> > after being enabled.
-> >
-> > With that in mind, I have two questions:
-> >
-> > 1. What happens when userspace disables a feature via the ID registers
-> > which is set in vcpu->arch.features? Does the feature bit get cleared from
-> > vcpu->arch.features? Does it stay set? If it gets cleared, is it now
-> > possible for userspace to call KVM_ARM_VCPU_INIT again with a different set
-> > of VCPU features (it doesn't look possible to me after looking at the
-> > code). If it stays set, what does it mean when userspace calls
-> > KVM_ARM_VCPU_INIT with a different set of features enabled than what is
-> > present in the ID registers? Should the ID registers be changed to match
-> > the features that userspace set in the last KVM_ARM_VCPU_INIT call (it
-> > looks to me that the ID registers are not changed)?
-> 
-> KVM will not allow userspace to set the ID register value that conflicts
-> with CPU features that are configured by the initial KVM_ARM_VCPU_INIT
-> (or there are a few more APIs).
-> KVM_SET_ONE_REG for such requests will fail.
-> 
-> 
-> > 2. What happens to vcpu->arch.features when userspace enables a feature via
-> > the ID registers which is not present in the bitmap?
-> 
-> The answer for this question is basically the same as above.
-> Userspace is not allowed to enable a feature via the ID registers
-> which is not present in the bit map.
-> 
-> The cover lever included a brief explanation of this, but I will
-> try to improve the explanation:-)
-
-So the ID registers are used to set the version of a feature which is present in
-the VCPU features bitmap, not to enable or a disable a VCPU feature. Thank you
-for the explanation!
-
-Thanks,
-Alex
-
-> 
-> Regards,
-> Reiji
-> 
-> >
-> > Thanks,
-> > Alex
+> > I started reviewing the series, but I ended up being very confused, see
+> > below.
 > >
 > > On Tue, Nov 16, 2021 at 10:43:30PM -0800, Reiji Watanabe wrote:
 > > > In KVM/arm64, values of ID registers for a guest are mostly same as
@@ -128,6 +71,45 @@ Alex
 > > > ID registers (as long as KVM can support features that are indicated
 > > > in the registers) so userspace can have more control of configuring
 > > > and unconfiguring features for guests.
+> >
+> > What not use VCPU features? Isn't that why the field
+> > kvm_vcpu_init->features exists in the first place? This cover letter does
+> > nothing to explaing why any changes are needed.
+> >
+> > Do you require finer grained control over certain feature that you cannot
+> > get with the 32 * 7 = 224 feature flag bits from kvm_vcpu_init? Does using
+> > the ID registers simplify certain aspects of the implementation?
+> 
+> Since some features are not binary in nature (e.g. AA64DFR0_EL1.BRPs
+> fields indicate number of breakpoints minus 1), using
+> kvm_vcpu_init->features to configure such features is inconvenient.
+
+I see, this makes a lot of sense and this looks like a nice solution to
+that problem.
+
+> 
+> One of the reasons why we want the finer grained control is that
+> we want to expose a uniform set/level of features for a group of
+> guests on systems with different ARM CPUs.
+
+So here you are talking specifically about KVM not checking that all VCPUs
+have the same feature bits set in vcpu->arch.features, which makes it
+possible for userspace to set different features for different VCPUs,
+right?
+
+Thanks,
+Alex
+
+> 
+> I will update the cover letter.
+> 
+> Thanks,
+> Reiji
+> 
+> >
+> > Thanks,
+> > Alex
+> >
 > > >
 > > > The patch series is for both VHE and non-VHE, except for protected VMs,
 > > > which have a different way of configuring ID registers based on its
