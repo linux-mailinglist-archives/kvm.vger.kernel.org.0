@@ -2,56 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6627845C44C
-	for <lists+kvm@lfdr.de>; Wed, 24 Nov 2021 14:44:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4EFAC45C47C
+	for <lists+kvm@lfdr.de>; Wed, 24 Nov 2021 14:47:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348510AbhKXNrO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Nov 2021 08:47:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37028 "EHLO
+        id S1351832AbhKXNt3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Nov 2021 08:49:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345347AbhKXNpL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Nov 2021 08:45:11 -0500
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7436FC04A4FA;
-        Wed, 24 Nov 2021 04:21:55 -0800 (PST)
-Received: by mail-pj1-x1031.google.com with SMTP id y14-20020a17090a2b4e00b001a5824f4918so4891232pjc.4;
-        Wed, 24 Nov 2021 04:21:55 -0800 (PST)
+        with ESMTP id S1345655AbhKXNrd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Nov 2021 08:47:33 -0500
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B71AFC04CC95;
+        Wed, 24 Nov 2021 04:22:02 -0800 (PST)
+Received: by mail-pj1-x1032.google.com with SMTP id n15-20020a17090a160f00b001a75089daa3so4914768pja.1;
+        Wed, 24 Nov 2021 04:22:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=wd98xQLQ/pXf9ib4u6bLtTjsr2IvaHY/2gqbkIzN0/4=;
-        b=nDw17EGrKlKzgCNbqTAO4qrT4BcO03O3lXSTZZgQiTsbRqo8xhfSlNWM1850aAgT05
-         0r9DGKtSvIWT9wVb9O2SGj4drBh7nxh5tZk1UCf85gTPNwBwjwv9aNEbJNbt15SLKyi5
-         mOh0SWwcFtOfvzaSavVcBGzOUqorZmnM4szZgWu2pX2ri0QL9fuZbiOyLcSO2jDoh/yK
-         gNh9Z1ZsW/YPvG/MbwGskz/UWgvtU6hcDfISO89e9yV5aZY2H7RZOhMrdAFqlqtfosWU
-         TascdGCwJh/e81igDb3JbEM0ZTr8KB38xNOKRAT16R1hMX9/7aPcRmgmIqvmGcjUgFUh
-         S1lQ==
+        bh=lxRHUxGSkSQXehchPRqK/OWhl6PvsYSKhbqxCMpqdXc=;
+        b=h2/shSb1uy0pc7QPKfGdipbuEmLdi8hryEYMLwz8yo8+IkmNkA+OdOQnHq8gnu4MnO
+         zRQvgBi/i50xVh2Q4Grqsk8mrgo1H+4sCCg2aCA5XPuunbAI6XvyF+6e0NCvx9iVdpp/
+         ugYpBngAYgsdJp66fmVEdX6BRY2Q8zzOVEEZNB2wnrPx8F2Vx/ew1XNy+twDndmBmfKA
+         g0gmxRn5bgI1edUSrzy5bUwW/N4U/5d6F0SL8lQRDvxYrq0XWQmONOivk6IwyjdVstMN
+         OpSt4hLDSGpPgwk18xzcHqYBB3oZ6+gSb3XAtN9LPODtfDy1h7fgMuqFVTXAimHoeVDL
+         DDPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=wd98xQLQ/pXf9ib4u6bLtTjsr2IvaHY/2gqbkIzN0/4=;
-        b=WK/o95BINfeqNYHE4LBE5t1M6fjsZig2kJvZhyfdQtQL5mV1wxXP/gplIZEb/TZ5EA
-         Nd5SE7xGTes3FoVVcZbnjZbS9XUZLVAKtitbORp6RBRytXVpOH4E6XEb7YuWg77qX0UP
-         yi0iR1FAzQJcnZG4jM8eHaWsduEihjiJWNgIBMqR5wQq7SX+3cicm0fTnRKQzRKAgXdP
-         n7IyiZLuMA48hlh4C3l+czoai0owhkzdu2tfAniWsXF8b7iNbv4Nym4avrzAhQtGd04z
-         5jaUM0CaSOyJwd/hWWTkZl5NX4vhGATRNexilWhA27uia+8xwe55AMYW1KJHYLQYUk25
-         QNHw==
-X-Gm-Message-State: AOAM532n6VuZ1F90odMnXicig0ZUKAnQeqT0nc6wqgQaediLb0kEO4Yc
-        vojpaKD5QvT8A7EhDcZVt9zg3QIMsww=
-X-Google-Smtp-Source: ABdhPJzOeUthB7SJFTxs0C6WTTdaax8E5IuqrJa5n3HsbzyKcEvbOYSslpfKJ/M20wTS7LoXauXWtA==
-X-Received: by 2002:a17:902:9684:b0:143:cc70:6472 with SMTP id n4-20020a170902968400b00143cc706472mr17766695plp.70.1637756514834;
-        Wed, 24 Nov 2021 04:21:54 -0800 (PST)
+        bh=lxRHUxGSkSQXehchPRqK/OWhl6PvsYSKhbqxCMpqdXc=;
+        b=xo3gP5WEdSQrXXM+X+az1rJNYmDfwO9JTBcS+4UdsI//wCAX6ehyVTZbcQ6MJUwH3/
+         2TXs1Iltku33ijOhCbszl8d5NvMIhZk+MU9vC7GxZs1Gw0RrSmUpkNvdtEMySlXacBSh
+         WXGEjYbQd6TWUTkkQPLXqnHrLj+LYMqeuQMImKGKM0s4fiRi4Ox097x6ISgpoycqS6pn
+         7pvNzHRIRxqe1OxGLUo/2zX7YnfcdyabI11C9Yi9ZNIauIJrooL9HX8zYRr+kvIQ75Ql
+         xRvLUkGduTZRZCqRAtwBhMxOMMi8igcpH3/8ALpEe8K2nyZYxH/rJfmBJ2AJuaRMkI8d
+         DvVA==
+X-Gm-Message-State: AOAM531Y9BzJ0e1PKrHm33JfmeI1ic/bI0W89I4PKMbnKv8V8hmBfeRC
+        56JMKeZJSG5sLRQTnfhxzTLCZF+T5RE=
+X-Google-Smtp-Source: ABdhPJxoqRaN0zOI/6JvZaMIjMwZpYRfPZaj4SveV0iDhsk/xfqEI3N9gGxmXbGsSbGpZHpBGddKhA==
+X-Received: by 2002:a17:903:2352:b0:142:76bc:de3b with SMTP id c18-20020a170903235200b0014276bcde3bmr18098433plh.36.1637756521936;
+        Wed, 24 Nov 2021 04:22:01 -0800 (PST)
 Received: from localhost ([198.11.178.15])
-        by smtp.gmail.com with ESMTPSA id na13sm5293204pjb.11.2021.11.24.04.21.53
+        by smtp.gmail.com with ESMTPSA id m6sm10944871pgc.17.2021.11.24.04.22.00
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 24 Nov 2021 04:21:54 -0800 (PST)
+        Wed, 24 Nov 2021 04:22:01 -0800 (PST)
 From:   Lai Jiangshan <jiangshanlai@gmail.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     kvm@vger.kernel.org, Lai Jiangshan <laijs@linux.alibaba.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
         Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
@@ -60,10 +59,10 @@ Cc:     kvm@vger.kernel.org, Lai Jiangshan <laijs@linux.alibaba.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-doc@vger.kernel.org
-Subject: [PATCH 09/12] KVM: X86: Rename gpte_is_8_bytes to has_4_byte_gpte and invert the direction
-Date:   Wed, 24 Nov 2021 20:20:51 +0800
-Message-Id: <20211124122055.64424-10-jiangshanlai@gmail.com>
+        "H. Peter Anvin" <hpa@zytor.com>
+Subject: [PATCH 10/12] KVM: X86: Remove mmu parameter from load_pdptrs()
+Date:   Wed, 24 Nov 2021 20:20:52 +0800
+Message-Id: <20211124122055.64424-11-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 In-Reply-To: <20211124122055.64424-1-jiangshanlai@gmail.com>
 References: <20211124122055.64424-1-jiangshanlai@gmail.com>
@@ -75,162 +74,139 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Lai Jiangshan <laijs@linux.alibaba.com>
 
-It's a bit more confusing to make gpte_is_8_bytes=1 if there are no
-guest PTEs at all.  And has_4_byte_gpte is only changed to be only set
-when there are guest PTEs and the guest PTE size is 4 bytes.  So when
-nonpaping, the value is not inverted, it is still false.
+It uses vcpu->arch.walk_mmu always.
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
 ---
- Documentation/virt/kvm/mmu.rst  |  8 ++++----
- arch/x86/include/asm/kvm_host.h |  8 ++++----
- arch/x86/kvm/mmu/mmu.c          | 12 ++++++------
- arch/x86/kvm/mmu/mmutrace.h     |  2 +-
- arch/x86/kvm/mmu/tdp_mmu.c      |  2 +-
- 5 files changed, 16 insertions(+), 16 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  2 +-
+ arch/x86/kvm/svm/nested.c       |  4 ++--
+ arch/x86/kvm/svm/svm.c          |  2 +-
+ arch/x86/kvm/vmx/nested.c       |  4 ++--
+ arch/x86/kvm/x86.c              | 12 ++++++------
+ 5 files changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/Documentation/virt/kvm/mmu.rst b/Documentation/virt/kvm/mmu.rst
-index f60f5488e121..5b1ebad24c77 100644
---- a/Documentation/virt/kvm/mmu.rst
-+++ b/Documentation/virt/kvm/mmu.rst
-@@ -161,7 +161,7 @@ Shadow pages contain the following information:
-     If clear, this page corresponds to a guest page table denoted by the gfn
-     field.
-   role.quadrant:
--    When role.gpte_is_8_bytes=0, the guest uses 32-bit gptes while the host uses 64-bit
-+    When role.has_4_byte_gpte=1, the guest uses 32-bit gptes while the host uses 64-bit
-     sptes.  That means a guest page table contains more ptes than the host,
-     so multiple shadow pages are needed to shadow one guest page.
-     For first-level shadow pages, role.quadrant can be 0 or 1 and denotes the
-@@ -177,9 +177,9 @@ Shadow pages contain the following information:
-     The page is invalid and should not be used.  It is a root page that is
-     currently pinned (by a cpu hardware register pointing to it); once it is
-     unpinned it will be destroyed.
--  role.gpte_is_8_bytes:
--    Reflects the size of the guest PTE for which the page is valid, i.e. '1'
--    if 64-bit gptes are in use, '0' if 32-bit gptes are in use.
-+  role.has_4_byte_gpte:
-+    Reflects the size of the guest PTE for which the page is valid, i.e. '0'
-+    if direct map or 64-bit gptes are in use, '1' if 32-bit gptes are in use.
-   role.efer_nx:
-     Contains the value of efer.nx for which the page is valid.
-   role.cr0_wp:
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index e382596baa1d..01e50703c878 100644
+index 01e50703c878..c106ad7efe23 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -296,14 +296,14 @@ struct kvm_kernel_irq_routing_entry;
-  *
-  *   - invalid shadow pages are not accounted, so the bits are effectively 18
-  *
-- *   - quadrant will only be used if gpte_is_8_bytes=0 (non-PAE paging);
-+ *   - quadrant will only be used if has_4_byte_gpte=1 (non-PAE paging);
-  *     execonly and ad_disabled are only used for nested EPT which has
-- *     gpte_is_8_bytes=1.  Therefore, 2 bits are always unused.
-+ *     has_4_byte_gpte=0.  Therefore, 2 bits are always unused.
-  *
-  *   - the 4 bits of level are effectively limited to the values 2/3/4/5,
-  *     as 4k SPs are not tracked (allowed to go unsync).  In addition non-PAE
-  *     paging has exactly one upper level, making level completely redundant
-- *     when gpte_is_8_bytes=0.
-+ *     when has_4_byte_gpte=1.
-  *
-  *   - on top of this, smep_andnot_wp and smap_andnot_wp are only set if
-  *     cr0_wp=0, therefore these three bits only give rise to 5 possibilities.
-@@ -315,7 +315,7 @@ union kvm_mmu_page_role {
- 	u32 word;
- 	struct {
- 		unsigned level:4;
--		unsigned gpte_is_8_bytes:1;
-+		unsigned has_4_byte_gpte:1;
- 		unsigned quadrant:2;
- 		unsigned direct:1;
- 		unsigned access:3;
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index f5a1da112daf..9fb9927264d8 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -2077,7 +2077,7 @@ static struct kvm_mmu_page *kvm_mmu_get_page(struct kvm_vcpu *vcpu,
- 	role.level = level;
- 	role.direct = direct;
- 	role.access = access;
--	if (!direct_mmu && !role.gpte_is_8_bytes) {
-+	if (role.has_4_byte_gpte) {
- 		quadrant = gaddr >> (PAGE_SHIFT + (PT64_PT_BITS * level));
- 		quadrant &= (1 << ((PT32_PT_BITS - PT64_PT_BITS) * level)) - 1;
- 		role.quadrant = quadrant;
-@@ -4727,7 +4727,7 @@ kvm_calc_tdp_mmu_root_page_role(struct kvm_vcpu *vcpu,
- 	role.base.ad_disabled = (shadow_accessed_mask == 0);
- 	role.base.level = kvm_mmu_get_tdp_level(vcpu);
- 	role.base.direct = true;
--	role.base.gpte_is_8_bytes = true;
-+	role.base.has_4_byte_gpte = false;
+@@ -1591,7 +1591,7 @@ void kvm_mmu_zap_all(struct kvm *kvm);
+ void kvm_mmu_invalidate_mmio_sptes(struct kvm *kvm, u64 gen);
+ void kvm_mmu_change_mmu_pages(struct kvm *kvm, unsigned long kvm_nr_mmu_pages);
  
- 	return role;
- }
-@@ -4772,7 +4772,7 @@ kvm_calc_shadow_root_page_role_common(struct kvm_vcpu *vcpu,
+-int load_pdptrs(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu, unsigned long cr3);
++int load_pdptrs(struct kvm_vcpu *vcpu, unsigned long cr3);
  
- 	role.base.smep_andnot_wp = role.ext.cr4_smep && !____is_cr0_wp(regs);
- 	role.base.smap_andnot_wp = role.ext.cr4_smap && !____is_cr0_wp(regs);
--	role.base.gpte_is_8_bytes = ____is_cr0_pg(regs) && ____is_cr4_pae(regs);
-+	role.base.has_4_byte_gpte = ____is_cr0_pg(regs) && !____is_cr4_pae(regs);
+ int emulator_write_phys(struct kvm_vcpu *vcpu, gpa_t gpa,
+ 			  const void *val, int bytes);
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index 598843cfe6c4..6bcea96cdb92 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -461,7 +461,7 @@ static int nested_svm_load_cr3(struct kvm_vcpu *vcpu, unsigned long cr3,
+ 		return -EINVAL;
  
- 	return role;
- }
-@@ -4871,7 +4871,7 @@ kvm_calc_shadow_ept_root_page_role(struct kvm_vcpu *vcpu, bool accessed_dirty,
- 	role.base.smm = vcpu->arch.root_mmu.mmu_role.base.smm;
+ 	if (reload_pdptrs && !nested_npt && is_pae_paging(vcpu) &&
+-	    CC(!load_pdptrs(vcpu, vcpu->arch.walk_mmu, cr3)))
++	    CC(!load_pdptrs(vcpu, cr3)))
+ 		return -EINVAL;
  
- 	role.base.level = level;
--	role.base.gpte_is_8_bytes = true;
-+	role.base.has_4_byte_gpte = false;
- 	role.base.direct = false;
- 	role.base.ad_disabled = !accessed_dirty;
- 	role.base.guest_mode = true;
-@@ -5155,7 +5155,7 @@ static bool detect_write_misaligned(struct kvm_mmu_page *sp, gpa_t gpa,
- 		 gpa, bytes, sp->role.word);
+ 	if (!nested_npt)
+@@ -1518,7 +1518,7 @@ static bool svm_get_nested_state_pages(struct kvm_vcpu *vcpu)
+ 		 * the guest CR3 might be restored prior to setting the nested
+ 		 * state which can lead to a load of wrong PDPTRs.
+ 		 */
+-		if (CC(!load_pdptrs(vcpu, vcpu->arch.walk_mmu, vcpu->arch.cr3)))
++		if (CC(!load_pdptrs(vcpu, vcpu->arch.cr3)))
+ 			return false;
  
- 	offset = offset_in_page(gpa);
--	pte_size = sp->role.gpte_is_8_bytes ? 8 : 4;
-+	pte_size = sp->role.has_4_byte_gpte ? 4 : 8;
+ 	if (!nested_svm_vmrun_msrpm(svm)) {
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index d855ba664fc2..e0c18682cbd0 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -1588,7 +1588,7 @@ static void svm_cache_reg(struct kvm_vcpu *vcpu, enum kvm_reg reg)
+ 	switch (reg) {
+ 	case VCPU_EXREG_PDPTR:
+ 		BUG_ON(!npt_enabled);
+-		load_pdptrs(vcpu, vcpu->arch.walk_mmu, kvm_read_cr3(vcpu));
++		load_pdptrs(vcpu, kvm_read_cr3(vcpu));
+ 		break;
+ 	default:
+ 		KVM_BUG_ON(1, vcpu->kvm);
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 20e126de1c96..d97588bebaaf 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -1097,7 +1097,7 @@ static int nested_vmx_load_cr3(struct kvm_vcpu *vcpu, unsigned long cr3,
+ 	 * must not be dereferenced.
+ 	 */
+ 	if (reload_pdptrs && !nested_ept && is_pae_paging(vcpu) &&
+-	    CC(!load_pdptrs(vcpu, vcpu->arch.walk_mmu, cr3))) {
++	    CC(!load_pdptrs(vcpu, cr3))) {
+ 		*entry_failure_code = ENTRY_FAIL_PDPTE;
+ 		return -EINVAL;
+ 	}
+@@ -3142,7 +3142,7 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+ 		 * the guest CR3 might be restored prior to setting the nested
+ 		 * state which can lead to a load of wrong PDPTRs.
+ 		 */
+-		if (CC(!load_pdptrs(vcpu, vcpu->arch.walk_mmu, vcpu->arch.cr3)))
++		if (CC(!load_pdptrs(vcpu, vcpu->arch.cr3)))
+ 			return false;
+ 	}
  
- 	/*
- 	 * Sometimes, the OS only writes the last one bytes to update status
-@@ -5179,7 +5179,7 @@ static u64 *get_written_sptes(struct kvm_mmu_page *sp, gpa_t gpa, int *nspte)
- 	page_offset = offset_in_page(gpa);
- 	level = sp->role.level;
- 	*nspte = 1;
--	if (!sp->role.gpte_is_8_bytes) {
-+	if (sp->role.has_4_byte_gpte) {
- 		page_offset <<= 1;	/* 32->64 */
- 		/*
- 		 * A 32-bit pde maps 4MB while the shadow pdes map
-diff --git a/arch/x86/kvm/mmu/mmutrace.h b/arch/x86/kvm/mmu/mmutrace.h
-index b8151bbca36a..de5e8e4e1aa7 100644
---- a/arch/x86/kvm/mmu/mmutrace.h
-+++ b/arch/x86/kvm/mmu/mmutrace.h
-@@ -35,7 +35,7 @@
- 			 " %snxe %sad root %u %s%c",			\
- 			 __entry->mmu_valid_gen,			\
- 			 __entry->gfn, role.level,			\
--			 role.gpte_is_8_bytes ? 8 : 4,			\
-+			 role.has_4_byte_gpte ? 4 : 8,			\
- 			 role.quadrant,					\
- 			 role.direct ? " direct" : "",			\
- 			 access_str[role.access],			\
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 377a96718a2e..fb602c025d9d 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -165,7 +165,7 @@ static union kvm_mmu_page_role page_role_for_level(struct kvm_vcpu *vcpu,
- 	role = vcpu->arch.mmu->mmu_role.base;
- 	role.level = level;
- 	role.direct = true;
--	role.gpte_is_8_bytes = true;
-+	role.has_4_byte_gpte = false;
- 	role.access = ACC_ALL;
- 	role.ad_disabled = !shadow_accessed_mask;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 25e278ba4666..f94b0ebe9a4d 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -798,8 +798,9 @@ static inline u64 pdptr_rsvd_bits(struct kvm_vcpu *vcpu)
+ /*
+  * Load the pae pdptrs.  Return 1 if they are all valid, 0 otherwise.
+  */
+-int load_pdptrs(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu, unsigned long cr3)
++int load_pdptrs(struct kvm_vcpu *vcpu, unsigned long cr3)
+ {
++	struct kvm_mmu *mmu = vcpu->arch.walk_mmu;
+ 	gfn_t pdpt_gfn = cr3 >> PAGE_SHIFT;
+ 	gpa_t real_gpa;
+ 	int i;
+@@ -887,7 +888,7 @@ int kvm_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
+ #endif
+ 	if (!(vcpu->arch.efer & EFER_LME) && (cr0 & X86_CR0_PG) &&
+ 	    is_pae(vcpu) && ((cr0 ^ old_cr0) & pdptr_bits) &&
+-	    !load_pdptrs(vcpu, vcpu->arch.walk_mmu, kvm_read_cr3(vcpu)))
++	    !load_pdptrs(vcpu, kvm_read_cr3(vcpu)))
+ 		return 1;
  
+ 	if (!(cr0 & X86_CR0_PG) && kvm_read_cr4_bits(vcpu, X86_CR4_PCIDE))
+@@ -1063,8 +1064,7 @@ int kvm_set_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
+ 			return 1;
+ 	} else if (is_paging(vcpu) && (cr4 & X86_CR4_PAE)
+ 		   && ((cr4 ^ old_cr4) & pdptr_bits)
+-		   && !load_pdptrs(vcpu, vcpu->arch.walk_mmu,
+-				   kvm_read_cr3(vcpu)))
++		   && !load_pdptrs(vcpu, kvm_read_cr3(vcpu)))
+ 		return 1;
+ 
+ 	if ((cr4 & X86_CR4_PCIDE) && !(old_cr4 & X86_CR4_PCIDE)) {
+@@ -1153,7 +1153,7 @@ int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
+ 	if (kvm_vcpu_is_illegal_gpa(vcpu, cr3))
+ 		return 1;
+ 
+-	if (is_pae_paging(vcpu) && !load_pdptrs(vcpu, vcpu->arch.walk_mmu, cr3))
++	if (is_pae_paging(vcpu) && !load_pdptrs(vcpu, cr3))
+ 		return 1;
+ 
+ 	if (cr3 != kvm_read_cr3(vcpu))
+@@ -10553,7 +10553,7 @@ static int __set_sregs_common(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs,
+ 	if (update_pdptrs) {
+ 		idx = srcu_read_lock(&vcpu->kvm->srcu);
+ 		if (is_pae_paging(vcpu)) {
+-			load_pdptrs(vcpu, vcpu->arch.walk_mmu, kvm_read_cr3(vcpu));
++			load_pdptrs(vcpu, kvm_read_cr3(vcpu));
+ 			*mmu_reset_needed = 1;
+ 		}
+ 		srcu_read_unlock(&vcpu->kvm->srcu, idx);
 -- 
 2.19.1.6.gb485710b
 
