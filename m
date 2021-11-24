@@ -2,131 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5599B45CC74
-	for <lists+kvm@lfdr.de>; Wed, 24 Nov 2021 19:50:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1DCFF45CD54
+	for <lists+kvm@lfdr.de>; Wed, 24 Nov 2021 20:35:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242493AbhKXSxP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Nov 2021 13:53:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52402 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244863AbhKXSxO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Nov 2021 13:53:14 -0500
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C57ECC06173E
-        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 10:50:04 -0800 (PST)
-Received: by mail-pf1-x429.google.com with SMTP id c4so3551215pfj.2
-        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 10:50:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=rtxqvmfYyjV5kqAkoLEk1bhpShL7DWU8Cpqaq7bMIag=;
-        b=dIvro56HBbwAQqpGseOSqXPF0mIszsOSaEg9JoPUYaWa147Z6ejhgAB8hwhNtxUYbm
-         58L8uHWX1zI+Cake7GJ+ZgrLgD4P0yeiyLjQjK3jDWOVu8PsOE9th5vDKdLngLK2wH+e
-         tNmAIHnPPpeSL4l7TjzPoQBSpbxwSWMU4Cl/RvYC0K/a2JDMuliRYCeF8/pV/pSCn4Gm
-         X9VLjZMqSdLdJntIbKEeF3eIaZQTingTD8X+AUi4/0USWVFN448dGN1SCwBGnrjXuKAy
-         3Ssm8SQubzFV6dJLuqE6jkUGXXNVYYhyJBndQq10UqxfsgxwAqdGyQ1JqC9AI07p2+JX
-         rKcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=rtxqvmfYyjV5kqAkoLEk1bhpShL7DWU8Cpqaq7bMIag=;
-        b=FxhgbpwGovMrCdPswNJaqkf60VxvPa2Cc0rLODwglD3EHST686s/0APPy3b9HxiXFQ
-         odUnkrMpcju+PX4ihD35j+LcwhIrQadWHcIMNWa/Qm2YmDWAqh78Ws6Mlf9s8ZLoHaAC
-         LZwMW7Wr2Iz0aPDQ+hGbBSKuQxrevfpmpTETntRVZy0k3aYVUTtYmJPgI6zAJpL90pSM
-         J+7dSPCUSy7GfgPGTtVSpp2ADn2crPFv1Or55s/Cj02XIAY0XVbbIfRmHCmdRFKgh4jl
-         uFfs+fiCr6TgKo5r9PChjhCpHG1/riDdUOLdm8K3gG85YLXtpjyD7Zk0G5LSYZr1QYsu
-         q+kA==
-X-Gm-Message-State: AOAM5336x3sKT0pWOt/1P9PhDPoqNurPg98aAVg8OFk30MtMQ9Cv8/Su
-        LkdSlrKreHoHHL0SZ2wVzYVN+Q==
-X-Google-Smtp-Source: ABdhPJyP43zhAcXYQ4mG3ffOeGB2G9GGgULeHqkqp6RRIKGoFpSRv0ppJgaFtd/RNCmj6qvtrEiCVw==
-X-Received: by 2002:a63:680a:: with SMTP id d10mr11840328pgc.116.1637779803945;
-        Wed, 24 Nov 2021 10:50:03 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id e14sm513450pfv.18.2021.11.24.10.50.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Nov 2021 10:50:03 -0800 (PST)
-Date:   Wed, 24 Nov 2021 18:50:00 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] KVM: selftests: Make sure kvm_create_max_vcpus test
- won't hit RLIMIT_NOFILE
-Message-ID: <YZ6JWGCaDihh4KoG@google.com>
-References: <20211123135953.667434-1-vkuznets@redhat.com>
+        id S1343564AbhKXTiv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Nov 2021 14:38:51 -0500
+Received: from smtp-out1.suse.de ([195.135.220.28]:36820 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244374AbhKXTit (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Nov 2021 14:38:49 -0500
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 1236921941;
+        Wed, 24 Nov 2021 19:35:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1637782538; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=9aE3EhkO73udWwtqxOb92KxXE9U0rU8t4YmlonhA+V8=;
+        b=miE5FQ0EmpLG7PCHR31uA10N/ZFm2mNsSBywv0kaSPjh7QYid6lV4IojRLs+VlKK81Kcz3
+        HP/QQoDZuLCY0jea6eF66Twomiem2IgB0bWUCwsD6qaOAyDg31WYutGa3kYCBgatlx0+RL
+        v96Rbmyn4X0VdcSQqUWxHquX7swquLU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1637782538;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=9aE3EhkO73udWwtqxOb92KxXE9U0rU8t4YmlonhA+V8=;
+        b=v/TlsoC9ZbCs9hGeb1ub5z4ev4ke8hB4iEfUxgP8y1NmHSRRbJHHAWZuaaFi2hxNXnDEfW
+        a6gKhCuWtiHulsDQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 4C44513F3D;
+        Wed, 24 Nov 2021 19:35:37 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id IELGEAmUnmELdwAAMHmgww
+        (envelope-from <vbabka@suse.cz>); Wed, 24 Nov 2021 19:35:37 +0000
+Message-ID: <cabdf9d2-0ecf-5ec7-368e-83fea66ef39f@suse.cz>
+Date:   Wed, 24 Nov 2021 20:34:40 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211123135953.667434-1-vkuznets@redhat.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
+ Hypervisor Support
+Content-Language: en-US
+To:     Dave Hansen <dave.hansen@intel.com>, Joerg Roedel <jroedel@suse.de>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>,
+        Peter Gonda <pgonda@google.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Tom Lendacky <Thomas.Lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
+References: <20210820155918.7518-1-brijesh.singh@amd.com>
+ <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
+ <daf5066b-e89b-d377-ed8a-9338f1a04c0d@amd.com>
+ <d673f082-9023-dafb-e42e-eab32a3ddd0c@intel.com>
+ <f15597a0-e7e0-0a57-39fd-20715abddc7f@amd.com>
+ <5f3b3aab-9ec2-c489-eefd-9136874762ee@intel.com>
+ <d83e6668-bec4-8d1f-7f8a-085829146846@amd.com>
+ <38282b0c-7eb5-6a91-df19-2f4cfa8549ce@intel.com> <YZ5iWJuxjSCmZL5l@suse.de>
+ <bd31abd4-c8a2-bdda-ea74-1c24b29beda7@intel.com>
+From:   Vlastimil Babka <vbabka@suse.cz>
+In-Reply-To: <bd31abd4-c8a2-bdda-ea74-1c24b29beda7@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 23, 2021, Vitaly Kuznetsov wrote:
-> With the elevated 'KVM_CAP_MAX_VCPUS' value kvm_create_max_vcpus test
-> may hit RLIMIT_NOFILE limits:
+On 11/24/21 18:48, Dave Hansen wrote:
+> On 11/24/21 8:03 AM, Joerg Roedel wrote:
+>> On Mon, Nov 22, 2021 at 02:51:35PM -0800, Dave Hansen wrote:
+>>> My preference would be that we never have SEV-SNP code in the kernel
+>>> that can panic() the host from guest userspace.  If that means waiting
+>>> until there's common guest unmapping infrastructure around, then I think
+>>> we should wait.
+>> Can you elaborate how to crash host kernel from guest user-space? If I
+>> understood correctly it was about crashing host kernel from _host_
+>> user-space.
 > 
->  # ./kvm_create_max_vcpus
->  KVM_CAP_MAX_VCPU_ID: 4096
->  KVM_CAP_MAX_VCPUS: 1024
->  Testing creating 1024 vCPUs, with IDs 0...1023.
->  /dev/kvm not available (errno: 24), skipping test
+> Sorry, I misspoke there.
 > 
-> Adjust RLIMIT_NOFILE limits to make sure KVM_CAP_MAX_VCPUS fds can be
-> opened. Note, raising hard limit ('rlim_max') requires CAP_SYS_RESOURCE
-> capability which is generally not needed to run kvm selftests (but without
-> raising the limit the test is doomed to fail anyway).
-> 
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
-> Changes since v1:
-> - Drop 'NOFD' define replacing it with 'int nr_fds_wanted' [Sean]
-> - Drop 'errno' printout as TEST_ASSERT() already does that.
-> ---
->  .../selftests/kvm/kvm_create_max_vcpus.c      | 22 +++++++++++++++++++
->  1 file changed, 22 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/kvm/kvm_create_max_vcpus.c b/tools/testing/selftests/kvm/kvm_create_max_vcpus.c
-> index f968dfd4ee88..ca957fe3f903 100644
-> --- a/tools/testing/selftests/kvm/kvm_create_max_vcpus.c
-> +++ b/tools/testing/selftests/kvm/kvm_create_max_vcpus.c
-> @@ -12,6 +12,7 @@
->  #include <stdio.h>
->  #include <stdlib.h>
->  #include <string.h>
-> +#include <sys/resource.h>
->  
->  #include "test_util.h"
->  
-> @@ -40,10 +41,31 @@ int main(int argc, char *argv[])
->  {
->  	int kvm_max_vcpu_id = kvm_check_cap(KVM_CAP_MAX_VCPU_ID);
->  	int kvm_max_vcpus = kvm_check_cap(KVM_CAP_MAX_VCPUS);
-> +	/*
-> +	 * Number of file descriptors reqired, KVM_CAP_MAX_VCPUS for vCPU fds +
-> +	 * an arbitrary number for everything else.
-> +	 */
-> +	int nr_fds_wanted = kvm_max_vcpus + 100;
-> +	struct rlimit rl;
->  
->  	pr_info("KVM_CAP_MAX_VCPU_ID: %d\n", kvm_max_vcpu_id);
->  	pr_info("KVM_CAP_MAX_VCPUS: %d\n", kvm_max_vcpus);
->  
-> +	/*
-> +	 * Check that we're allowed to open nr_fds_wanted file descriptors and
-> +	 * try raising the limits if needed.
-> +	 */
-> +	TEST_ASSERT(!getrlimit(RLIMIT_NOFILE, &rl), "getrlimit() failed!");
-> +
-> +	if (rl.rlim_cur < nr_fds_wanted) {
-> +		rl.rlim_cur = nr_fds_wanted;
-> +
-> +		if (rl.rlim_max <  nr_fds_wanted)
-> +			rl.rlim_max = nr_fds_wanted;
+> My concern is about crashing the host kernel.  It appears that *host*
+> userspace can do that quite easily by inducing the host kernel to access
+> some guest private memory via a kernel mapping.
 
-Nit, this could use max().
+I thought some of the scenarios discussed here also went along "guest
+(doesn't matter if userspace or kernel) shares a page with host, invokes
+some host kernel operation and in parallel makes the page private again".
 
-Reviewed-and-tested-by: Sean Christopherson <seanjc@google.com> 
+>> I think the RMP-fault path in the page-fault handler needs to take the
+>> uaccess exception tables into account before actually causing a panic.
+>> This should solve most of the problems discussed here.
+> 
+> That covers things like copy_from_user().  It does not account for
+> things where kernel mappings are used, like where a
+> get_user_pages()/kmap() is in play.
+> 
+
