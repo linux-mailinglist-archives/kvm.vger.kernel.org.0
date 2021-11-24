@@ -2,112 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F1A8B45C4A1
-	for <lists+kvm@lfdr.de>; Wed, 24 Nov 2021 14:47:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B32C45C75E
+	for <lists+kvm@lfdr.de>; Wed, 24 Nov 2021 15:30:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354371AbhKXNu1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Nov 2021 08:50:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38798 "EHLO
+        id S1353512AbhKXOdz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Nov 2021 09:33:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354190AbhKXNs6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Nov 2021 08:48:58 -0500
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31DF8C04CCA6;
-        Wed, 24 Nov 2021 04:22:14 -0800 (PST)
-Received: by mail-pf1-x432.google.com with SMTP id o4so2412614pfp.13;
-        Wed, 24 Nov 2021 04:22:14 -0800 (PST)
+        with ESMTP id S1355088AbhKXOdv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Nov 2021 09:33:51 -0500
+Received: from mail-oi1-x231.google.com (mail-oi1-x231.google.com [IPv6:2607:f8b0:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C48BC1428D6
+        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 05:09:00 -0800 (PST)
+Received: by mail-oi1-x231.google.com with SMTP id t19so5251316oij.1
+        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 05:09:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=OXQJ/Hg7JktHdh34i19iwQxJ93YDj8UHhHLVZ7kWpcY=;
-        b=XEi4y/CAQgVlQVCvCubc1j39iVAT/KctP+Zr+IKXxwujt30nlQVOPkresY6/jtkF2t
-         f4AfqIJLxHQ0czBKFg7m9gAOPskFijLKFcO21vfPmhsCZ6pHbnrU5Sp9ug4RdqTIfgY3
-         iCpYXt8C6CpnC3gwuIFK4bG7D8bdayvB/Kg0dmfemjZpCg6zm3FrjpBhkvb47j73NDd0
-         QU6ZaHr+YraYS/I9lYWdV7RE4O2Z9cLJ+JUY1IUjf8zHEMWkoICsFbhI5GF6RmCNi98O
-         pV7aI1BpjBB1SiBXG5MZvWngcbKliSX4E3tdGR/ZzIl5eHV6GNhU5aWVf+xXaC2KSEqX
-         1MLw==
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=1rvmNxp+ZtA3HbUdsVCZv4Nlqvs5Xp/+S8TXy0ecUM0=;
+        b=pl/FfakhouFer+0yVcn+lqB8MhZkiNrWzu3kYkf5qnxnJqtGJSIs4PYBZfPz2TD4vP
+         l6N0I7MlQDR0L+5RYQ2pPRcbMCcJOObJKlv1TwjAeqeR5ZQ2QIHK6uC+kfCCwExqX+ef
+         7qxrz0adF7nAZuWapS7EUhelX6F3A8P8KislRj4qV4ey7KJEhASK28fFfEz8N4MSX6zw
+         gn7VKGg342BuZ3GquHXcFojbeTege8EanA9l7BvkHPKf+pOehvz3FE58xZvEffVXdku9
+         TnWo8TNgn4WtWOGJJgr1Tuik0NzcKARfVrYny+xL/r1NDnoeoItfUSp7PmDZ8HcUOket
+         W/pQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=OXQJ/Hg7JktHdh34i19iwQxJ93YDj8UHhHLVZ7kWpcY=;
-        b=6/QnUzx0eJScdTl7fnOYOblLLGqJQtXWbrsxDZlxzfGynwCWw+gs40SN3KMjdha1Lj
-         ZPM/sIau2OuuKnjx4DytAlpB8PmPIVhs/PBhLvGxgV1EFv5tACfc36yIpltbm/cMGZqm
-         HGoKKzsKyZF9yjPX6nG89PP2VDgVHEysSTo0qfMvmGBAPhYQbmOmshxw9Yv1vP2WCDRw
-         TQF9B8DuXrHaUWKUq8iGGq7vSdXx9xxZiybwkTHWZYyDNgAktFR/Vm1W0NWSpj0lr7Sr
-         LjmDMGIxLPEU/JTNhDWLHEY8OW1aDEVrFXs5yKaPexNYmsqjik5d6RZ7JSYnUBmsVdl6
-         s3dw==
-X-Gm-Message-State: AOAM530jgPAoGTGkNIC4EhS55BBqavKImev6bK3y2AMZf8Ts/dfgBTT7
-        teuiYrfDQFSUcgNkeMLK9jvVip+gyjI=
-X-Google-Smtp-Source: ABdhPJxxXqJmN5iCp4ZmgmlA4C44r8063lAnHxAVKEynSAwi+2QYkAON4RiveU4qNwQM6ZOj2W+XjQ==
-X-Received: by 2002:a05:6a00:1584:b0:49f:e5dd:f904 with SMTP id u4-20020a056a00158400b0049fe5ddf904mr5654163pfk.55.1637756533595;
-        Wed, 24 Nov 2021 04:22:13 -0800 (PST)
-Received: from localhost ([198.11.178.15])
-        by smtp.gmail.com with ESMTPSA id t13sm16416367pfl.98.2021.11.24.04.22.12
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 24 Nov 2021 04:22:13 -0800 (PST)
-From:   Lai Jiangshan <jiangshanlai@gmail.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     kvm@vger.kernel.org, Lai Jiangshan <laijs@linux.alibaba.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>
-Subject: [PATCH 12/12] KVM: X86: Walk shadow page starting with shadow_root_level
-Date:   Wed, 24 Nov 2021 20:20:54 +0800
-Message-Id: <20211124122055.64424-13-jiangshanlai@gmail.com>
-X-Mailer: git-send-email 2.19.1.6.gb485710b
-In-Reply-To: <20211124122055.64424-1-jiangshanlai@gmail.com>
-References: <20211124122055.64424-1-jiangshanlai@gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=1rvmNxp+ZtA3HbUdsVCZv4Nlqvs5Xp/+S8TXy0ecUM0=;
+        b=hJ1mUwzflcew4xVkFaBJFls6YJE+Vhwv/VbWK0tFuEBemdEqi+qDfy8C92co29Gzvb
+         r8d7CtV3K0j/HL6S766mHmLd0xpGcJom4HrY78MIoJxE/HWA5HFW0yFavvfu4AxMjQUa
+         HPpLS28HCDBC8u40xpHgQ+Qd/9TY0vEzatXPVAnFQ0e7zKH1Fvfs3Mrd56HMioe0CgDy
+         fxbqyuswU8VyCeNUbmKDY/TmRpv9rAXvbeNXtGk0c30tGADNeAeZIRcSxQkK3rYx6S/m
+         JP6JXykA0bo1Po8N6w1n5PyfC9kfy5VtJO8p9VgPLmIJaTeS9WXqfpp8dXtJApRusYs4
+         oDHw==
+X-Gm-Message-State: AOAM532NTyiP3G6jiVC7y9GmsNbxq504xgWyxBi5OiZ4OscGg92dF3rF
+        VnCyFjWlJDzgpvBCOh2TJrrHjiZID88fVdRwZ3kFZw==
+X-Google-Smtp-Source: ABdhPJyTVHnCyxx52YxNwzJrYF43Uk3OQDtKuXCZO7KVCqWd190uR7WGLd+soVX2N6327m8SSW4aKEgqDjPt01EJeRQ=
+X-Received: by 2002:a05:6808:485:: with SMTP id z5mr5828262oid.96.1637759339134;
+ Wed, 24 Nov 2021 05:08:59 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20211123142247.62532-1-maz@kernel.org> <20211123142247.62532-2-maz@kernel.org>
+In-Reply-To: <20211123142247.62532-2-maz@kernel.org>
+From:   Fuad Tabba <tabba@google.com>
+Date:   Wed, 24 Nov 2021 13:08:23 +0000
+Message-ID: <CA+EHjTx1i0jEhhBJx6T=6sjkj_hpy5FnkkJqFuY0td83d6C08A@mail.gmail.com>
+Subject: Re: [PATCH 1/2] KVM: arm64: Save PSTATE early on exit
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Quentin Perret <qperret@google.com>, kernel-team@android.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Lai Jiangshan <laijs@linux.alibaba.com>
+Hi Marc,
 
-Walking from the root page of the shadow page table should start with
-the level of the shadow page table: shadow_root_level.
 
-Also change a small defect in audit_mappings(), it is believed
-that the current walking level is more valuable to print.
 
-Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
----
- arch/x86/kvm/mmu/mmu_audit.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+On Tue, Nov 23, 2021 at 2:23 PM Marc Zyngier <maz@kernel.org> wrote:
+>
+> In order to be able to use promitives such as vcpu_mode_is_32bit(),
+> we need to synchronize the guest PSTATE. However, this is currently
+> done deep imto the bowels of the world-switch code, and we do have
+> helpers evaluating this much earlier (__vgic_v3_perform_cpuif_access
+> and handle_aarch32_guest, for example).
 
-diff --git a/arch/x86/kvm/mmu/mmu_audit.c b/arch/x86/kvm/mmu/mmu_audit.c
-index 9e7dcf999f08..6bbbf85b3e46 100644
---- a/arch/x86/kvm/mmu/mmu_audit.c
-+++ b/arch/x86/kvm/mmu/mmu_audit.c
-@@ -63,7 +63,7 @@ static void mmu_spte_walk(struct kvm_vcpu *vcpu, inspect_spte_fn fn)
- 		hpa_t root = vcpu->arch.mmu->root_hpa;
- 
- 		sp = to_shadow_page(root);
--		__mmu_spte_walk(vcpu, sp, fn, vcpu->arch.mmu->root_level);
-+		__mmu_spte_walk(vcpu, sp, fn, vcpu->arch.mmu->shadow_root_level);
- 		return;
- 	}
- 
-@@ -119,8 +119,7 @@ static void audit_mappings(struct kvm_vcpu *vcpu, u64 *sptep, int level)
- 	hpa =  pfn << PAGE_SHIFT;
- 	if ((*sptep & PT64_BASE_ADDR_MASK) != hpa)
- 		audit_printk(vcpu->kvm, "levels %d pfn %llx hpa %llx "
--			     "ent %llxn", vcpu->arch.mmu->root_level, pfn,
--			     hpa, *sptep);
-+			     "ent %llxn", level, pfn, hpa, *sptep);
- }
- 
- static void inspect_spte_has_rmap(struct kvm *kvm, u64 *sptep)
--- 
-2.19.1.6.gb485710b
+Couple of nits:
+s/promitives/primitives
+s/imto/into
 
+>
+> Move the saving of the guest pstate into the early fixups, which
+> cures the first issue. The second one will be addressed separately.
+>
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/hyp/include/hyp/switch.h    | 6 ++++++
+>  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 7 ++++++-
+>  2 files changed, 12 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index 7a0af1d39303..d79fd101615f 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -429,6 +429,12 @@ static inline bool kvm_hyp_handle_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+>   */
+>  static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  {
+> +       /*
+> +        * Save PSTATE early so that we can evaluate the vcpu mode
+> +        * early on.
+> +        */
+> +       vcpu->arch.ctxt.regs.pstate = read_sysreg_el2(SYS_SPSR);
+> +
+>         if (ARM_EXCEPTION_CODE(*exit_code) != ARM_EXCEPTION_IRQ)
+>                 vcpu->arch.fault.esr_el2 = read_sysreg_el2(SYS_ESR);
+>
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> index de7e14c862e6..7ecca8b07851 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+> @@ -70,7 +70,12 @@ static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
+>  static inline void __sysreg_save_el2_return_state(struct kvm_cpu_context *ctxt)
+>  {
+>         ctxt->regs.pc                   = read_sysreg_el2(SYS_ELR);
+> -       ctxt->regs.pstate               = read_sysreg_el2(SYS_SPSR);
+> +       /*
+> +        * Guest PSTATE gets saved at guest fixup time in all
+> +        * cases. We still need to handle the nVHE host side here.
+> +        */
+> +       if (!has_vhe() && ctxt->__hyp_running_vcpu)
+> +               ctxt->regs.pstate       = read_sysreg_el2(SYS_SPSR);
+>
+>         if (cpus_have_final_cap(ARM64_HAS_RAS_EXTN))
+>                 ctxt_sys_reg(ctxt, DISR_EL1) = read_sysreg_s(SYS_VDISR_EL2);
+> --
+> 2.30.2
+>
+
+I see that now that you're storing pstate early at the guest exit, and
+therefore no need for vhe path to check for it for the guest when saving
+the return state. Going through the various possibilities, I think
+that all cases are covered.
+
+I tested this code as well and it ran fine.
+
+Tested-by: Fuad Tabba <tabba@google.com>
+Reviewed-by: Fuad Tabba <tabba@google.com>
+
+Thanks,
+/fuad
