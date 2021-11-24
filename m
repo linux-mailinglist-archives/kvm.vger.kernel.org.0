@@ -2,231 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 116A645B8A6
-	for <lists+kvm@lfdr.de>; Wed, 24 Nov 2021 11:48:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8071A45B8D3
+	for <lists+kvm@lfdr.de>; Wed, 24 Nov 2021 12:07:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240784AbhKXKv5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Nov 2021 05:51:57 -0500
-Received: from foss.arm.com ([217.140.110.172]:34840 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235858AbhKXKv5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Nov 2021 05:51:57 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B74B51FB;
-        Wed, 24 Nov 2021 02:48:47 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CD75A3F73B;
-        Wed, 24 Nov 2021 02:48:44 -0800 (PST)
-Date:   Wed, 24 Nov 2021 10:50:38 +0000
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Reiji Watanabe <reijiw@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Peng Liang <liangpeng10@huawei.com>,
-        Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>
-Subject: Re: [RFC PATCH v3 00/29] KVM: arm64: Make CPU ID registers writable
- by userspace
-Message-ID: <YZ4Y/r8BM2hnrlYQ@monolith.localdoman>
-References: <20211117064359.2362060-1-reijiw@google.com>
- <YZ0QMK1QFjw/uznl@monolith.localdoman>
- <CAAeT=FxeXmgM3Pyt_brYRdehMrKHQwZut5xTbHOv-9um7anhYw@mail.gmail.com>
+        id S231701AbhKXLKX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Nov 2021 06:10:23 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:43450 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229729AbhKXLKW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 24 Nov 2021 06:10:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1637752031;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=aMB2sNUsa/0UAP4HkeCP25BsocK+xXuD+P0zzpx3vjI=;
+        b=AqLqQpJRJqvk/Y6uehYF8uDPd/xxM0sUG2BJnnssyJ3lzfyvlRZtVlPI5RmM9divAXSqsj
+        0+qofRjDEsco8asio8HLh1yZs8/R6S1Rdf9CLUpwckwkI5PHQeAxaKKWFOKASkaTngWPz5
+        0ErN/PTuPbPvEviv1Wjp9HHJFZFKKU8=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-138-sPTicXEbO_O3M0eosTZcBg-1; Wed, 24 Nov 2021 06:07:10 -0500
+X-MC-Unique: sPTicXEbO_O3M0eosTZcBg-1
+Received: by mail-ed1-f71.google.com with SMTP id v9-20020a50d849000000b003dcb31eabaaso1979902edj.13
+        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 03:07:10 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=aMB2sNUsa/0UAP4HkeCP25BsocK+xXuD+P0zzpx3vjI=;
+        b=qhMVTakxP4feFdZGCDZBUGOeIwfE2jEkDqqbJhv3igjTVg/lRSdIHgrQTYwjE1bLFA
+         vj97SO+ucds1mUmI8ehKM98QcHiliFLzUm5nmSDPseZGLL07sqrwraKfyW162o9+Aksi
+         RqCDHFAUjhiB+kOBXEADBqa01X6Fox9zwuQWpWCmvTqFdZ9wyXsIK+CPFfez4Z2K+ykM
+         amAdxEL+gP7vXFp3JQY5NPZ6H6Arc/tsuIJAkWNh/HHtzAXJU1EYx/4MBMt057G7oZP4
+         lWL1LfNJwb9jbXv4kwr1gmKye+ACKjb+2rXZLeOjXEsOISsStihLoRt78OZ2arLySc+M
+         Bylw==
+X-Gm-Message-State: AOAM532USz69iEp/5GMxVwUPuoOmlfmW2FSNf7L5xbIVmAxEazb6QoBv
+        pii2THxDVTZQH+DFTkiUCNJDzLgUbpgyy8C4I4Sq5e51vyydwHNl+D8aVwcc7JH6jaUIKAKYA/y
+        07Csfh0zYBTGq
+X-Received: by 2002:a17:906:398:: with SMTP id b24mr18897424eja.49.1637752022455;
+        Wed, 24 Nov 2021 03:07:02 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJw/3AI7n2ydPSF4DuJUj9I55cNiYIR3/zfiBhnY+uMe5uwnnmEx4YLSqiw9/N8tZAOXWIQ/gA==
+X-Received: by 2002:a17:906:398:: with SMTP id b24mr18897369eja.49.1637752022167;
+        Wed, 24 Nov 2021 03:07:02 -0800 (PST)
+Received: from gator.home (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
+        by smtp.gmail.com with ESMTPSA id gt18sm6730329ejc.88.2021.11.24.03.07.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Nov 2021 03:07:01 -0800 (PST)
+Date:   Wed, 24 Nov 2021 12:06:59 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc:     kvm@vger.kernel.org, maz@kernel.org, qemu-arm@nongnu.org,
+        idan.horowitz@gmail.com, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org
+Subject: Re: [kvm-unit-tests PATCH v8 01/10] docs: mention checkpatch in the
+ README
+Message-ID: <20211124110659.jhjuuzez6ij5v7g7@gator.home>
+References: <20211118184650.661575-1-alex.bennee@linaro.org>
+ <20211118184650.661575-2-alex.bennee@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <CAAeT=FxeXmgM3Pyt_brYRdehMrKHQwZut5xTbHOv-9um7anhYw@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20211118184650.661575-2-alex.bennee@linaro.org>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Reiji,
-
-On Tue, Nov 23, 2021 at 09:13:27PM -0800, Reiji Watanabe wrote:
-> HI Alex,
+On Thu, Nov 18, 2021 at 06:46:41PM +0000, Alex Bennée wrote:
+> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> ---
+>  README.md | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
-> On Tue, Nov 23, 2021 at 7:59 AM Alexandru Elisei
-> <alexandru.elisei@arm.com> wrote:
-> >
-> > Hi Reiji,
-> >
-> > I started reviewing the series, but I ended up being very confused, see
-> > below.
-> >
-> > On Tue, Nov 16, 2021 at 10:43:30PM -0800, Reiji Watanabe wrote:
-> > > In KVM/arm64, values of ID registers for a guest are mostly same as
-> > > its host's values except for bits for feature that KVM doesn't support
-> > > and for opt-in features that userspace didn't configure.  Userspace
-> > > can use KVM_SET_ONE_REG to a set ID register value, but it fails
-> > > if userspace attempts to modify the register value.
-> > >
-> > > This patch series adds support to allow userspace to modify a value of
-> > > ID registers (as long as KVM can support features that are indicated
-> > > in the registers) so userspace can have more control of configuring
-> > > and unconfiguring features for guests.
-> >
-> > What not use VCPU features? Isn't that why the field
-> > kvm_vcpu_init->features exists in the first place? This cover letter does
-> > nothing to explaing why any changes are needed.
-> >
-> > Do you require finer grained control over certain feature that you cannot
-> > get with the 32 * 7 = 224 feature flag bits from kvm_vcpu_init? Does using
-> > the ID registers simplify certain aspects of the implementation?
-> 
-> Since some features are not binary in nature (e.g. AA64DFR0_EL1.BRPs
-> fields indicate number of breakpoints minus 1), using
-> kvm_vcpu_init->features to configure such features is inconvenient.
+> diff --git a/README.md b/README.md
+> index b498aaf..5db48e5 100644
+> --- a/README.md
+> +++ b/README.md
+> @@ -182,3 +182,5 @@ the code files.  We also start with common code and finish with unit test
+>  code. git-diff's orderFile feature allows us to specify the order in a
+>  file.  The orderFile we use is `scripts/git.difforder`; adding the config
+>  with `git config diff.orderFile scripts/git.difforder` enables it.
+> +
+> +Please run the kernel's ./scripts/checkpatch.pl on new patches
 
-I see, this makes a lot of sense and this looks like a nice solution to
-that problem.
+This is a bit of a problem for kvm-unit-tests code which still has a mix
+of styles since it was originally written with a strange tab and space
+mixed style. If somebody is patching one of those files we've usually
+tried to maintain the original style rather than reformat the whole
+thing (in hindsight maybe we should have just reformatted). We're also
+more flexible with line length than Linux, although Linux now only warns
+for anything over 80 as long as it's under 100, which is probably good
+enough for us too. Anyway, let's see what Paolo and Thomas say. Personally
+I wouldn't mind adding this line to the documentation, so I'll ack it.
+Anyway, we can also ignore our own advise when it suits us :-)
 
-> 
-> One of the reasons why we want the finer grained control is that
-> we want to expose a uniform set/level of features for a group of
-> guests on systems with different ARM CPUs.
-
-So here you are talking specifically about KVM not checking that all VCPUs
-have the same feature bits set in vcpu->arch.features, which makes it
-possible for userspace to set different features for different VCPUs,
-right?
+Acked-by: Andrew Jones <drjones@redhat.com>
 
 Thanks,
-Alex
+drew
 
-> 
-> I will update the cover letter.
-> 
-> Thanks,
-> Reiji
-> 
-> >
-> > Thanks,
-> > Alex
-> >
-> > >
-> > > The patch series is for both VHE and non-VHE, except for protected VMs,
-> > > which have a different way of configuring ID registers based on its
-> > > different requirements [1].
-> > > There was a patch series that tried to achieve the same thing [2].
-> > > A few snippets of codes in this series were inspired by or came from [2].
-> > >
-> > > The initial value of ID registers for a vCPU will be the host's value
-> > > with bits cleared for unsupported features and for opt-in features that
-> > > were not configured. So, the initial value userspace can see (via
-> > > KVM_GET_ONE_REG) is the upper limit that can be set for the register.
-> > > Any requests to change the value that conflicts with opt-in features'
-> > > configuration will fail.
-> > >
-> > > When a guest tries to use a CPU feature that is not exposed to the guest,
-> > > trapping it (to emulate a real CPU's behavior) would generally be a
-> > > desirable behavior (when it is possible with no or little side effects).
-> > > The later patches in the series add codes for this.  Only features that
-> > > can be trapped independently will be trapped by this series though.
-> > >
-> > > This series adds kunit tests for new functions in sys_regs.c (except for
-> > > trivial ones), and these tests are enabled with a new configuration
-> > > option 'CONFIG_KVM_KUNIT_TEST'.
-> > >
-> > > The series is based on v5.16-rc1.
-> > >
-> > > v3:
-> > >   - Remove ID register consistency checking across vCPUs [Oliver]
-> > >   - Change KVM_CAP_ARM_ID_REG_WRITABLE to
-> > >     KVM_CAP_ARM_ID_REG_CONFIGURABLE [Oliver]
-> > >   - Add KUnit testing for ID register validation and trap initialization.
-> > >   - Change read_id_reg() to take care of ID_AA64PFR0_EL1.GIC
-> > >   - Add a helper of read_id_reg() (__read_id_reg()) and use the helper
-> > >     instead of directly using __vcpu_sys_reg()
-> > >   - Change not to run kvm_id_regs_consistency_check() and
-> > >     kvm_vcpu_init_traps() for protected VMs.
-> > >   - Update selftest to remove test cases for ID register consistency
-> > >     checking across vCPUs and to add test cases for ID_AA64PFR0_EL1.GIC.
-> > >
-> > > v2: https://lore.kernel.org/all/20211103062520.1445832-1-reijiw@google.com/
-> > >   - Remove unnecessary line breaks. [Andrew]
-> > >   - Use @params for comments. [Andrew]
-> > >   - Move arm64_check_features to arch/arm64/kvm/sys_regs.c and
-> > >     change that KVM specific feature check function.  [Andrew]
-> > >   - Remove unnecessary raz handling from __set_id_reg. [Andrew]
-> > >   - Remove sys_val field from the initial id_reg_info and add it
-> > >     in the later patch. [Andrew]
-> > >   - Call id_reg->init() from id_reg_info_init(). [Andrew]
-> > >   - Fix cpuid_feature_cap_perfmon_field() to convert 0xf to 0x0
-> > >     (and use it in the following patches).
-> > >   - Change kvm_vcpu_first_run_init to set has_run_once to false
-> > >     when kvm_id_regs_consistency_check() fails.
-> > >   - Add a patch to introduce id_reg_info for ID_AA64MMFR0_EL1,
-> > >     which requires special validity checking for TGran*_2 fields.
-> > >   - Add patches to introduce id_reg_info for ID_DFR1_EL1 and
-> > >     ID_MMFR0_EL1, which are required due to arm64_check_features
-> > >     implementation change.
-> > >   - Add a new argument, which is a pointer to id_reg_info, for
-> > >     id_reg_info's validate()
-> > >
-> > > v1: https://lore.kernel.org/all/20211012043535.500493-1-reijiw@google.com/
-> > >
-> > > [1] https://lore.kernel.org/kvmarm/20211010145636.1950948-1-tabba@google.com/
-> > > [2] https://lore.kernel.org/kvm/20201102033422.657391-1-liangpeng10@huawei.com/
-> > >
-> > > Reiji Watanabe (29):
-> > >   KVM: arm64: Add has_reset_once flag for vcpu
-> > >   KVM: arm64: Save ID registers' sanitized value per vCPU
-> > >   KVM: arm64: Introduce struct id_reg_info
-> > >   KVM: arm64: Make ID_AA64PFR0_EL1 writable
-> > >   KVM: arm64: Make ID_AA64PFR1_EL1 writable
-> > >   KVM: arm64: Make ID_AA64ISAR0_EL1 writable
-> > >   KVM: arm64: Make ID_AA64ISAR1_EL1 writable
-> > >   KVM: arm64: Make ID_AA64MMFR0_EL1 writable
-> > >   KVM: arm64: Hide IMPLEMENTATION DEFINED PMU support for the guest
-> > >   KVM: arm64: Make ID_AA64DFR0_EL1 writable
-> > >   KVM: arm64: Make ID_DFR0_EL1 writable
-> > >   KVM: arm64: Make ID_DFR1_EL1 writable
-> > >   KVM: arm64: Make ID_MMFR0_EL1 writable
-> > >   KVM: arm64: Make MVFR1_EL1 writable
-> > >   KVM: arm64: Make ID registers without id_reg_info writable
-> > >   KVM: arm64: Add consistency checking for frac fields of ID registers
-> > >   KVM: arm64: Introduce KVM_CAP_ARM_ID_REG_CONFIGURABLE capability
-> > >   KVM: arm64: Add kunit test for ID register validation
-> > >   KVM: arm64: Use vcpu->arch cptr_el2 to track value of cptr_el2 for VHE
-> > >   KVM: arm64: Use vcpu->arch.mdcr_el2 to track value of mdcr_el2
-> > >   KVM: arm64: Introduce framework to trap disabled features
-> > >   KVM: arm64: Trap disabled features of ID_AA64PFR0_EL1
-> > >   KVM: arm64: Trap disabled features of ID_AA64PFR1_EL1
-> > >   KVM: arm64: Trap disabled features of ID_AA64DFR0_EL1
-> > >   KVM: arm64: Trap disabled features of ID_AA64MMFR1_EL1
-> > >   KVM: arm64: Trap disabled features of ID_AA64ISAR1_EL1
-> > >   KVM: arm64: Initialize trapping of disabled CPU features for the guest
-> > >   KVM: arm64: Add kunit test for trap initialization
-> > >   KVM: arm64: selftests: Introduce id_reg_test
-> > >
-> > >  Documentation/virt/kvm/api.rst                |    8 +
-> > >  arch/arm64/include/asm/cpufeature.h           |    2 +-
-> > >  arch/arm64/include/asm/kvm_arm.h              |   32 +
-> > >  arch/arm64/include/asm/kvm_host.h             |   15 +
-> > >  arch/arm64/include/asm/sysreg.h               |    2 +
-> > >  arch/arm64/kvm/Kconfig                        |   11 +
-> > >  arch/arm64/kvm/arm.c                          |   12 +-
-> > >  arch/arm64/kvm/debug.c                        |   13 +-
-> > >  arch/arm64/kvm/hyp/vhe/switch.c               |   14 +-
-> > >  arch/arm64/kvm/reset.c                        |    4 +
-> > >  arch/arm64/kvm/sys_regs.c                     | 1265 +++++++++++++++--
-> > >  arch/arm64/kvm/sys_regs_test.c                | 1109 +++++++++++++++
-> > >  include/uapi/linux/kvm.h                      |    1 +
-> > >  tools/arch/arm64/include/asm/sysreg.h         |    1 +
-> > >  tools/testing/selftests/kvm/.gitignore        |    1 +
-> > >  tools/testing/selftests/kvm/Makefile          |    1 +
-> > >  .../selftests/kvm/aarch64/id_reg_test.c       | 1128 +++++++++++++++
-> > >  17 files changed, 3488 insertions(+), 131 deletions(-)
-> > >  create mode 100644 arch/arm64/kvm/sys_regs_test.c
-> > >  create mode 100644 tools/testing/selftests/kvm/aarch64/id_reg_test.c
-> > >
-> > > --
-> > > 2.34.0.rc1.387.gb447b232ab-goog
-> > >
