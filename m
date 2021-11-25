@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E6A2045E131
-	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 20:55:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7960B45E137
+	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 20:57:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243151AbhKYT6i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Nov 2021 14:58:38 -0500
-Received: from Galois.linutronix.de ([193.142.43.55]:54262 "EHLO
+        id S1356795AbhKYUA3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Nov 2021 15:00:29 -0500
+Received: from Galois.linutronix.de ([193.142.43.55]:54292 "EHLO
         galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242716AbhKYT4h (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Nov 2021 14:56:37 -0500
+        with ESMTP id S229645AbhKYT62 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Nov 2021 14:58:28 -0500
 From:   Thomas Gleixner <tglx@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1637870004;
+        s=2020; t=1637870116;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=1KcQAZJce/LHMHu6cosK/KD7lmKTUsERithFQBNKGrE=;
-        b=Rek4xZvEFJ02e/jBz+tU7rAld9QyqscU5indgVh3csuY3U7rtNcOg/KqxWCIQ7X+mxiLIN
-        EvEMqoyQBJGmMua6jgQMB2k33MZfiJhLzAs0u+wQYc2UjWbB04vxdnomjx78ZuNlIM7dKb
-        t6M8HAXirvbMA31XAbpAvJ4hFEyFeF1uZMBSvMiGDvvlUYqQNVGK1EVIi/qcP8+zTXT38S
-        Xcqdzq+HNHmEhT4ShTxxeLJlOIm8UtLGeK5DhT9n7u9eFEFauOaFvsjlquSVeEUfqp50Rx
-        /9JEg1wYbUhLy/RtLkp3YOZr2X9hqEbrpWCMAgPzySytX5UVfRBC7XfT+oa8oA==
+        bh=hSMowqhqzhm6IutQ/pfqymHz8EouPjwX/7DhgDwhw+A=;
+        b=dOh0OK4juYj+bNo3uMlN4kTYNaWfz4LgLBB9tK74Z8CDGMty7xPey7hE0YeLI7t/DRcC3x
+        cH7yfaf3qv76hgdYFxTsAv77Kk6IcOObjOaBrmodT1WZGjzP5tv/FS+I3J3+WYVnfn2DJZ
+        McDaBGgRzbuo+c0zyBEt7QfRbcItYRwinb0bUHP+Wsd/PratbW/+0vF4RDSq/n9rzQlKAx
+        iIDoayOrNGK+ed6RYEdx7u41hQb5sjVWzLDJ9/zTTXmDfbw1XZKIa+z2fkNYYHqd2oqnJb
+        Jg/uq5SU0qv1I0EnipuI59O6PApZFTk/ycYvkwUE/r7d3HEt1AhUwzIK8kBiMA==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1637870004;
+        s=2020e; t=1637870116;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=1KcQAZJce/LHMHu6cosK/KD7lmKTUsERithFQBNKGrE=;
-        b=9RG12KNm+RgzZ/s957aYusz3doQ5WENq2vxARP73UrKNGMz0yzmC7ruC0kVju5UpxRecKd
-        M2phdOb1TMenbfCA==
+        bh=hSMowqhqzhm6IutQ/pfqymHz8EouPjwX/7DhgDwhw+A=;
+        b=Ql+VbgtR+/I72NyJMGgVKTZLTOjMGhdNBRtccauUMjyXhVdjqUPRldDHspj5I5QQI7Jkig
+        /gjrnRoVDtEufRCQ==
 To:     isaku.yamahata@intel.com, Ingo Molnar <mingo@redhat.com>,
         Borislav Petkov <bp@alien8.de>,
         "H . Peter Anvin" <hpa@zytor.com>,
@@ -44,13 +44,12 @@ To:     isaku.yamahata@intel.com, Ingo Molnar <mingo@redhat.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: Re: [RFC PATCH v3 29/59] KVM: x86: Add option to force LAPIC
- expiration wait
-In-Reply-To: <9cc794352494e0ef4a2a1d4291b937653b39e780.1637799475.git.isaku.yamahata@intel.com>
+Subject: Re: [RFC PATCH v3 30/59] KVM: x86: Add guest_supported_xss placholder
+In-Reply-To: <79e3a44d6b7852b255520ef57b59ce1324695630.1637799475.git.isaku.yamahata@intel.com>
 References: <cover.1637799475.git.isaku.yamahata@intel.com>
- <9cc794352494e0ef4a2a1d4291b937653b39e780.1637799475.git.isaku.yamahata@intel.com>
-Date:   Thu, 25 Nov 2021 20:53:24 +0100
-Message-ID: <877dcwj9l7.ffs@tglx>
+ <79e3a44d6b7852b255520ef57b59ce1324695630.1637799475.git.isaku.yamahata@intel.com>
+Date:   Thu, 25 Nov 2021 20:55:15 +0100
+Message-ID: <874k80j9i4.ffs@tglx>
 MIME-Version: 1.0
 Content-Type: text/plain
 Precedence: bulk
@@ -58,17 +57,20 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Wed, Nov 24 2021 at 16:20, isaku yamahata wrote:
-> Add an option to skip the IRR check in kvm_wait_lapic_expire().
 
-Yay for consistency. $Subject says 'Add option to force wait'. Changelog
-says 'Add option to skip ... check'. Can you make your mind up?
+> From: Sean Christopherson <sean.j.christopherson@intel.com>
+>
+> Add a per-vcpu placeholder for the support XSS of the guest so that the
+> TDX configuration code doesn't need to hack in manual computation of the
+> supported XSS.  KVM XSS enabling is currently being upstreamed, i.e.
+> guest_supported_xss will no longer be a placeholder by the time TDX is
+> ready for upstreaming (hopefully).
 
-Also the change at hand is not adding an option. It's adding a function
-argument. You surely can spot the difference between option and function
-argument, right?
-
-Changelogs are meant to be readable by mere mortals.
+Yes, hope dies last... Definitely technical useful information for a
+changelog. There is a reason why notes should go below the --- separator
+line.
 
 Thanks,
 
         tglx
+
