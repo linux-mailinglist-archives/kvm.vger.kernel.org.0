@@ -2,459 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9605E45D1E4
-	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 01:24:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4001D45D2AD
+	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 02:58:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353226AbhKYA0y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Nov 2021 19:26:54 -0500
-Received: from mga12.intel.com ([192.55.52.136]:16285 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1351197AbhKYAYx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Nov 2021 19:24:53 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10178"; a="215432288"
-X-IronPort-AV: E=Sophos;i="5.87,261,1631602800"; 
-   d="scan'208";a="215432288"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 16:21:30 -0800
-X-IronPort-AV: E=Sophos;i="5.87,261,1631602800"; 
-   d="scan'208";a="675042433"
-Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 16:21:30 -0800
-From:   isaku.yamahata@intel.com
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, erdemaktas@google.com,
-        Connor Kuehl <ckuehl@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com
-Subject: [RFC PATCH v3 59/59] Documentation/virtual/kvm: Add Trust Domain Extensions(TDX)
-Date:   Wed, 24 Nov 2021 16:20:42 -0800
-Message-Id: <76efd2ff089115c9ebccc77bf8b910083e737772.1637799475.git.isaku.yamahata@intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <cover.1637799475.git.isaku.yamahata@intel.com>
-References: <cover.1637799475.git.isaku.yamahata@intel.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        id S1353010AbhKYCBF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Nov 2021 21:01:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34320 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1346893AbhKYB7B (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Nov 2021 20:59:01 -0500
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D06EC061370
+        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 17:29:01 -0800 (PST)
+Received: by mail-pf1-x449.google.com with SMTP id i26-20020aa7909a000000b004a4c417bfa8so2509700pfa.23
+        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 17:29:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=n6VrhSmIgMVGXqXPUcuE2muiMxOU1LDCiBFBeGztrXs=;
+        b=Nz5BRBPEaJwXA+G3x+HKVtaLGr4kqn8Zx1lQ6txrvIAi1rgYmwWrGRk+G3EjTyLxib
+         ECxbsCOlz4Y5LmqY5irzjKVudQyVHWQ6bESjbro+xLzrM2Xv57uUKRxNSQS8QvCK1fHM
+         tX5rlqe1ycOQ6pD4wCQXsffXcoUFq30hyqQ/rDfP86RDpmq11p/fELgViTzv2dxBre1C
+         fmRjxX7AGngEpwvAt5kzMw+WySl7WGLDS9K3KqSuHoAvvAQgZmrjcR/2Ex+rB/hTXNr4
+         XigG4JUOLkahHiV5cNUnBZU3n71CDeHQHDVhd5g5boQjcMOiOUrd/FekJQIUnnId49i2
+         2zBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=n6VrhSmIgMVGXqXPUcuE2muiMxOU1LDCiBFBeGztrXs=;
+        b=0hmNS22gD5VF6uzQdKT/Vk+VKNXQeY5AUqnAtpVjFsD+AxGTKN+Fb2hsMAQATK6NTI
+         yX6h3fA67DSb+NVbqsehGevJQ2D2ElIJ8kXHVRrNUVXoIUxt6b7/DJHKOmAYCNqnU9Dx
+         3pvVbfT0QY+29qjTxIpKhqBWxenMF94UEolLNJProsKTmAlUUdU7YLYQGkuCY6Amku8Q
+         WEDqs80jXf4/mGy0VNVPWe7mKisk5aDLP43xM4XTyxGwpaOMa1+FgUQDQ/zwaz9fxoZK
+         6Vxmspv2XImlHYu8x1t0xhKBqDawBHtjB7Psn1pqq27+aaXyHA5Xe48iRSZ3D/17NsH2
+         PYOQ==
+X-Gm-Message-State: AOAM5318P8SeTlOog9exvJB1haow/CNCF0IM1dH5yP+HZyr1FzB6iRQO
+        JZ9XwyTzoXe72+cB9oPgDQAladzNBMU=
+X-Google-Smtp-Source: ABdhPJwCTiaJO8DXeWNMyVCDbampr7NaCmuvbOHNBWKXmlZ/OZ1gJ7dLK4L+s8p0O4ZNRbKukBDMO/lLWLw=
+X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
+ (user=seanjc job=sendgmr) by 2002:a17:902:8302:b0:143:6e5f:a4a0 with SMTP id
+ bd2-20020a170902830200b001436e5fa4a0mr24796827plb.20.1637803741047; Wed, 24
+ Nov 2021 17:29:01 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Thu, 25 Nov 2021 01:28:18 +0000
+Message-Id: <20211125012857.508243-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.34.0.rc2.393.gf8c9666880-goog
+Subject: [kvm-unit-tests PATCH 00/39] x86/access: nVMX: Big overhaul
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+This started out as a very simple test (patch 39/39) to expose a KVM bug
+where KVM doesn't sync a shadow MMU on a vmcs12->vpid change.  Except the
+test didn't fail.  And it turns out, completely removing INVLPG from the
+base access test doesn't fail when using shadow paging either.
 
-Add a documentation to Intel Trusted Docmain Extensions(TDX) support.
+The underlying problem in both cases is that the access test is flat out
+stupid when it comes to handling page tables.  Instead of allocating page
+tables once and manipulating them on each iteration, it "allocates" a new
+paging structure when necessary on every. single. iteration.  In addition
+to being incredibly inefficient (allocation also zeros the entire 4kb page,
+so the test zeros absurd amounts of memory), writing upper level PTEs on
+every iteration triggers write-protection mechanisms in KVM.  In effect,
+KVM ends up synchronizing the relevant SPTEs on every iteration, which
+again is ridiculously slow and makes it all but impossible to actually
+test that KVM handles other TLB invalidation scenarios.
 
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
----
- Documentation/virt/kvm/api.rst       |   9 +-
- Documentation/virt/kvm/intel-tdx.rst | 359 +++++++++++++++++++++++++++
- 2 files changed, 367 insertions(+), 1 deletion(-)
- create mode 100644 Documentation/virt/kvm/intel-tdx.rst
+Trying to solve that mess by pre-allocating the page tables exposed a
+whole pile of 5-level paging issues.  I'd say the test's 5-level support
+is held together by duct tape, but I've fixed many things with duct tape
+that are far less fragile.
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index aeeb071c7688..72341707d98f 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -1366,6 +1366,9 @@ It is recommended to use this API instead of the KVM_SET_MEMORY_REGION ioctl.
- The KVM_SET_MEMORY_REGION does not allow fine grained control over memory
- allocation and is deprecated.
- 
-+For TDX guest, deleting/moving memory region loses guest memory contents.
-+Read only region isn't supported.  Only as-id 0 is supported.
-+
- 
- 4.36 KVM_SET_TSS_ADDR
- ---------------------
-@@ -4489,7 +4492,7 @@ H_GET_CPU_CHARACTERISTICS hypercall.
- 
- :Capability: basic
- :Architectures: x86
--:Type: vm
-+:Type: vm ioctl, vcpu ioctl
- :Parameters: an opaque platform specific structure (in/out)
- :Returns: 0 on success; -1 on error
- 
-@@ -4501,6 +4504,10 @@ Currently, this ioctl is used for issuing Secure Encrypted Virtualization
- (SEV) commands on AMD Processors. The SEV commands are defined in
- Documentation/virt/kvm/amd-memory-encryption.rst.
- 
-+Currently, this ioctl is used for issuing Trusted Domain Extensions
-+(TDX) commands on Intel Processors. The TDX commands are defined in
-+Documentation/virt/kvm/intel-tdx.rst.
-+
- 4.111 KVM_MEMORY_ENCRYPT_REG_REGION
- -----------------------------------
- 
-diff --git a/Documentation/virt/kvm/intel-tdx.rst b/Documentation/virt/kvm/intel-tdx.rst
-new file mode 100644
-index 000000000000..2b4d6cd852d4
---- /dev/null
-+++ b/Documentation/virt/kvm/intel-tdx.rst
-@@ -0,0 +1,359 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+
-+===================================
-+Intel Trust Dodmain Extensions(TDX)
-+===================================
-+
-+Overview
-+========
-+TDX stands for Trust Domain Extensions which isolates VMs from
-+the virtual-machine manager (VMM)/hypervisor and any other software on
-+the platform. [1]
-+For details, the specifications, [2], [3], [4], [5], [6], [7], are
-+available.
-+
-+
-+API description
-+===============
-+
-+KVM_MEMORY_ENCRYPT_OP
-+---------------------
-+:Type: system ioctl, vm ioctl, vcpu ioctl
-+
-+For TDX operations, KVM_MEMORY_ENCRYPT_OP is re-purposed to be generic
-+ioctl with TDX specific sub ioctl command.
-+
-+::
-+
-+  /* Trust Domain eXtension sub-ioctl() commands. */
-+  enum kvm_tdx_cmd_id {
-+          KVM_TDX_CAPABILITIES = 0,
-+          KVM_TDX_INIT_VM,
-+          KVM_TDX_INIT_VCPU,
-+          KVM_TDX_INIT_MEM_REGION,
-+          KVM_TDX_FINALIZE_VM,
-+
-+          KVM_TDX_CMD_NR_MAX,
-+  };
-+
-+  struct kvm_tdx_cmd {
-+          __u32 id;             /* tdx_cmd_id */
-+          __u32 metadata;       /* sub comamnd specific */
-+          __u64 data;           /* sub command specific */
-+  };
-+
-+
-+KVM_TDX_CAPABILITIES
-+--------------------
-+:Type: system ioctl
-+
-+subset of TDSYSINFO_STRCUCT retrieved by TDH.SYS.INFO TDX SEAM call will be
-+returned. which describes about Intel TDX module.
-+
-+- id: KVM_TDX_CAPABILITIES
-+- metadata: must be 0
-+- data: pointer to struct kvm_tdx_capabilities
-+
-+::
-+
-+  struct kvm_tdx_cpuid_config {
-+          __u32 leaf;
-+          __u32 sub_leaf;
-+          __u32 eax;
-+          __u32 ebx;
-+          __u32 ecx;
-+          __u32 edx;
-+  };
-+
-+  struct kvm_tdx_capabilities {
-+          __u64 attrs_fixed0;
-+          __u64 attrs_fixed1;
-+          __u64 xfam_fixed0;
-+          __u64 xfam_fixed1;
-+
-+          __u32 nr_cpuid_configs;
-+          struct kvm_tdx_cpuid_config cpuid_configs[0];
-+  };
-+
-+
-+KVM_TDX_INIT_VM
-+---------------
-+:Type: vm ioctl
-+
-+Does additional VM initialization specific to TDX which corresponds to
-+TDH.MNG.INIT TDX SEAM call.
-+
-+- id: KVM_TDX_INIT_VM
-+- metadata: must be 0
-+- data: pointer to struct kvm_tdx_init_vm
-+- reserved: must be 0
-+
-+::
-+
-+  struct kvm_tdx_init_vm {
-+          __u32 max_vcpus;
-+          __u32 reserved;
-+          __u64 attributes;
-+          __u64 cpuid;  /* pointer to struct kvm_cpuid2 */
-+          __u64 mrconfigid[6];          /* sha384 digest */
-+          __u64 mrowner[6];             /* sha384 digest */
-+          __u64 mrownerconfig[6];       /* sha348 digest */
-+          __u64 reserved[43];           /* must be zero for future extensibility */
-+  };
-+
-+
-+KVM_TDX_INIT_VCPU
-+-----------------
-+:Type: vcpu ioctl
-+
-+Does additional VCPU initialization specific to TDX which corresponds to
-+TDH.VP.INIT TDX SEAM call.
-+
-+- id: KVM_TDX_INIT_VCPU
-+- metadata: must be 0
-+- data: initial value of the guest TD VCPU RCX
-+
-+
-+KVM_TDX_INIT_MEM_REGION
-+-----------------------
-+:Type: vm ioctl
-+
-+Encrypt a memory continuous region which corresponding to TDH.MEM.PAGE.ADD
-+TDX SEAM call.
-+If KVM_TDX_MEASURE_MEMORY_REGION flag is specified, it also extends measurement
-+which corresponds to TDH.MR.EXTEND TDX SEAM call.
-+
-+- id: KVM_TDX_INIT_VCPU
-+- metadata: flags
-+            currently only KVM_TDX_MEASURE_MEMORY_REGION is defined
-+- data: pointer to struct kvm_tdx_init_mem_region
-+
-+::
-+
-+  #define KVM_TDX_MEASURE_MEMORY_REGION   (1UL << 0)
-+
-+  struct kvm_tdx_init_mem_region {
-+          __u64 source_addr;
-+          __u64 gpa;
-+          __u64 nr_pages;
-+  };
-+
-+
-+KVM_TDX_FINALIZE_VM
-+-------------------
-+:Type: vm ioctl
-+
-+Complete measurement of the initial TD contents and mark it ready to run
-+which corresponds to TDH.MR.FINALIZE
-+
-+- id: KVM_TDX_FINALIZE_VM
-+- metadata: ignored
-+- data: ignored
-+
-+
-+KVM TDX creation flow
-+=====================
-+In addition to KVM normal flow, new TDX ioctls need to be called.  The control flow
-+looks like as follows.
-+
-+#. system wide capability check
-+  * KVM_TDX_CAPABILITIES: query if TDX is supported on the platform.
-+  * KVM_CAP_xxx: check other KVM extensions same to normal KVM case.
-+
-+#. creating VM
-+  * KVM_CREATE_VM
-+  * KVM_TDX_INIT_VM: pass TDX specific VM parameters.
-+
-+#. creating VCPU
-+  * KVM_CREATE_VCPU
-+  * KVM_TDX_INIT_VCPU: pass TDX specific VCPU parameters.
-+
-+#. initializing guest memory
-+  * allocate guest memory and initialize page same to normal KVM case
-+    In TDX case, parse and load TDVF into guest memory in addition.
-+  * KVM_TDX_INIT_MEM_REGION to add and measure guest pages.
-+    If the pages has contents above, those pages need to be added.
-+    Otherwise the contents will be lost and guest sees zero pages.
-+  * KVM_TDX_FINALIAZE_VM: Finalize VM and measurement
-+    This must be after KVM_TDX_INIT_MEM_REGION.
-+
-+#. run vcpu
-+
-+Design discussion
-+=================
-+
-+Coexistence of normal(VMX) VM and TD VM
-+---------------------------------------
-+It's required to allow both legacy(normal VMX) VMs and new TD VMs to
-+coexist. Otherwise the benefits of VM flexibility would be eliminated.
-+The main issue for it is that the logic of kvm_x86_ops callbacks for
-+TDX is different from VMX. On the other hand, the variable,
-+kvm_x86_ops, is global single variable. Not per-VM, not per-vcpu.
-+
-+Several points to be considered.
-+  . No or minimal overhead when TDX is disabled(CONFIG_INTEL_TDX_HOST=n).
-+  . Avoid overhead of indirect call via function pointers.
-+  . Contain the changes under arch/x86/kvm/vmx directory and share logic
-+    with VMX for maintenance.
-+    Even though the ways to operation on VM (VMX instruction vs TDX
-+    SEAM call) is different, the basic idea remains same. So, many
-+    logic can be shared.
-+  . Future maintenance
-+    The huge change of kvm_x86_ops in (near) future isn't expected.
-+    a centralized file is acceptable.
-+
-+- Wrapping kvm x86_ops: The current choice
-+  Introduce dedicated file for arch/x86/kvm/vmx/main.c (the name,
-+  main.c, is just chosen to show main entry points for callbacks.) and
-+  wrapper functions around all the callbacks with
-+  "if (is-tdx) tdx-callback() else vmx-callback()".
-+
-+  Pros:
-+  - No major change in common x86 KVM code. The change is (mostly)
-+    contained under arch/x86/kvm/vmx/.
-+  - When TDX is disabled(CONFIG_INTEL_TDX_HOST=n), the overhead is
-+    optimized out.
-+  - Micro optimization by avoiding function pointer.
-+  Cons:
-+  - Many boiler plates in arch/x86/kvm/vmx/main.c.
-+
-+Alternative:
-+- Introduce another callback layer under arch/x86/kvm/vmx.
-+  Pros:
-+  - No major change in common x86 KVM code. The change is (mostly)
-+    contained under arch/x86/kvm/vmx/.
-+  - clear separation on callbacks.
-+  Cons:
-+  - overhead in VMX even when TDX is disabled(CONFIG_INTEL_TDX_HOST=n).
-+
-+- Allow per-VM kvm_x86_ops callbacks instead of global kvm_x86_ops
-+  Pros:
-+  - clear separation on callbacks.
-+  Cons:
-+  - Big change in common x86 code.
-+  - overhead in common code even when TDX is
-+    disabled(CONFIG_INTEL_TDX_HOST=n).
-+
-+- Introduce new directory arch/x86/kvm/tdx
-+  Pros:
-+  - It clarifies that TDX is different from VMX.
-+  Cons:
-+  - Given the level of code sharing, it complicates code sharing.
-+
-+KVM MMU Changes
-+---------------
-+KVM MMU needs to be enhanced to handle Secure/Shared-EPT. The
-+high-level execution flow is mostly same to normal EPT case.
-+EPT violation/misconfiguration -> invoke TDP fault handler ->
-+resolve TDP fault -> resume execution. (or emulate MMIO)
-+The difference is, that S-EPT is operated(read/write) via TDX SEAM
-+call which is expensive instead of direct read/write EPT entry.
-+One bit of GPA (51 or 47 bit) is repurposed so that it means shared
-+with host(if set to 1) or private to TD(if cleared to 0).
-+
-+- The current implementation
-+  . Reuse the existing MMU code with minimal update.  Because the
-+    execution flow is mostly same. But additional operation, TDX call
-+    for S-EPT, is needed. So add hooks for it to kvm_x86_ops.
-+  . For performance, minimize TDX SEAM call to operate on S-EPT. When
-+    getting corresponding S-EPT pages/entry from faulting GPA, don't
-+    use TDX SEAM call to read S-EPT entry. Instead create shadow copy
-+    in host memory.
-+    Repurpose the existing kvm_mmu_page as shadow copy of S-EPT and
-+    associate S-EPT to it.
-+  . Treats share bit as attributes. mask/unmask the bit where
-+    necessary to keep the existing traversing code works.
-+    Introduce kvm.arch.gfn_shared_mask and use "if (gfn_share_mask)"
-+    for special case.
-+    = 0 : for non-TDX case
-+    = 51 or 47 bit set for TDX case.
-+
-+  Pros:
-+  - Large code reuse with minimal new hooks.
-+  - Execution path is same.
-+  Cons:
-+  - Complicates the existing code.
-+  - Repurpose kvm_mmu_page as shadow of Secure-EPT can be confusing.
-+
-+Alternative:
-+- Replace direct read/write on EPT entry with TDX-SEAM call by
-+  introducing callbacks on EPT entry.
-+  Pros:
-+  - Straightforward.
-+  Cons:
-+  - Too many touching point.
-+  - Too slow due to TDX-SEAM call.
-+  - Overhead even when TDX is disabled(CONFIG_INTEL_TDX_HOST=n).
-+
-+- Sprinkle "if (is-tdx)" for TDX special case
-+  Pros:
-+  - Straightforward.
-+  Cons:
-+  - The result is non-generic and ugly.
-+  - Put TDX specific logic into common KVM MMU code.
-+
-+New KVM API, ioctl (sub)command, to manage TD VMs
-+-------------------------------------------------
-+Additional KVM API are needed to control TD VMs. The operations on TD
-+VMs are specific to TDX.
-+
-+- Piggyback and repurpose KVM_MEMORY_ENCRYPT_OP
-+  Although not all operation isn't memory encryption, repupose to get
-+  TDX specific ioctls.
-+  Pros:
-+  - No major change in common x86 KVM code.
-+  Cons:
-+  - The operations aren't actually memory encryption, but operations
-+    on TD VMs.
-+
-+Alternative:
-+- Introduce new ioctl for guest protection like
-+  KVM_GUEST_PROTECTION_OP and introduce subcommand for TDX.
-+  Pros:
-+  - Clean name.
-+  Cons:
-+  - One more new ioctl for guest protection.
-+  - Confusion with KVM_MEMORY_ENCRYPT_OP with KVM_GUEST_PROTECTION_OP.
-+
-+- Rename KVM_MEMORY_ENCRYPT_OP to KVM_GUEST_PROTECTION_OP and keep
-+  KVM_MEMORY_ENCRYPT_OP as same value for user API for compatibility.
-+  "#define KVM_MEMORY_ENCRYPT_OP KVM_GUEST_PROTECTION_OP" for uapi
-+  compatibility.
-+  Pros:
-+  - No new ioctl with more suitable name.
-+  Cons:
-+  - May cause confusion to the existing user program.
-+
-+
-+References
-+==========
-+
-+.. [1] TDX specification
-+   https://software.intel.com/content/www/us/en/develop/articles/intel-trust-domain-extensions.html
-+.. [2] Intel Trust Domain Extensions (Intel TDX)
-+   https://software.intel.com/content/dam/develop/external/us/en/documents/tdx-whitepaper-final9-17.pdf
-+.. [3] Intel CPU Architectural Extensions Specification
-+   https://software.intel.com/content/dam/develop/external/us/en/documents/intel-tdx-cpu-architectural-specification.pdf
-+.. [4] Intel TDX Module 1.0 EAS
-+   https://software.intel.com/content/dam/develop/external/us/en/documents/intel-tdx-module-1eas.pdf
-+.. [5] Intel TDX Loader Interface Specification
-+   https://software.intel.com/content/dam/develop/external/us/en/documents/intel-tdx-seamldr-interface-specification.pdf
-+.. [6] Intel TDX Guest-Hypervisor Communication Interface
-+   https://software.intel.com/content/dam/develop/external/us/en/documents/intel-tdx-guest-hypervisor-communication-interface.pdf
-+.. [7] Intel TDX Virtual Firmware Design Guide
-+   https://software.intel.com/content/dam/develop/external/us/en/documents/tdx-virtual-firmware-design-guide-rev-1.
-+.. [8] intel public github
-+   kvm TDX branch: https://github.com/intel/tdx/tree/kvm
-+   TDX guest branch: https://github.com/intel/tdx/tree/guest
-+.. [9] tdvf
-+    https://github.com/tianocore/edk2-staging/tree/TDVF
-+.. [10] KVM forum 2020: Intel Virtualization Technology Extensions to
-+     Enable Hardware Isolated VMs
-+     https://osseu2020.sched.com/event/eDzm/intel-virtualization-technology-extensions-to-enable-hardware-isolated-vms-sean-christopherson-intel
-+.. [11] Linux Security Summit EU 2020:
-+     Architectural Extensions for Hardware Virtual Machine Isolation
-+     to Advance Confidential Computing in Public Clouds - Ravi Sahita
-+     & Jun Nakajima, Intel Corporation
-+     https://osseu2020.sched.com/event/eDOx/architectural-extensions-for-hardware-virtual-machine-isolation-to-advance-confidential-computing-in-public-clouds-ravi-sahita-jun-nakajima-intel-corporation
-+.. [12] [RFCv2,00/16] KVM protected memory extension
-+     https://lkml.org/lkml/2020/10/20/66
+The second half of this series is cleanups in the nVMX code to prepare
+for adding the (INV)VPID variants.  Not directly related to the access
+tests, but it annoyed me to no end that simply checking if INVVPID is
+supported was non-trivial.
+
+Sean Christopherson (39):
+  x86/access: Add proper defines for hardcoded addresses
+  x86/access: Cache CR3 to improve performance
+  x86/access:  Use do-while loop for what is obviously a do-while loop
+  x86/access: Stop pretending the test is SMP friendly
+  x86/access: Refactor so called "page table pool" logic
+  x86/access: Stash root page table level in test environment
+  x86/access: Hoist page table allocator helpers above "init" helper
+  x86/access: Rename variables in page table walkers
+  x86/access: Abort if page table insertion hits an unexpected level
+  x86/access: Make SMEP place nice with 5-level paging
+  x86/access: Use upper half of virtual address space
+  x86/access: Print the index when dumping PTEs
+  x86/access: Pre-allocate all page tables at (sub)test init
+  x86/access: Don't write page tables if desired PTE is same as current
+    PTE
+  x86/access: Preserve A/D bits when writing paging structure entries
+  x86/access: Make toggling of PRESENT bit a "higher order" action
+  x86/access: Manually override PMD in effective permissions sub-test
+  x86/access: Remove manual override of PUD/PMD in prefetch sub-test
+  x86/access: Remove PMD/PT target overrides
+  x86/access: Remove timeout overrides now that performance doesn't suck
+  nVMX: Skip EPT tests if INVEPT(SINGLE_CONTEXT) is unsupported
+  nVMX: Hoist assert macros to the top of vmx.h
+  nVMX: Add a non-reporting assertion macro
+  nVMX: Assert success in unchecked INVEPT/INVVPID helpers
+  nVMX: Drop less-than-useless ept_sync() wrapper
+  nVMX: Move EPT capability check helpers to vmx.h
+  nVMX: Drop unused and useless vpid_sync() helper
+  nVMX: Remove "v1" version of INVVPID test
+  nVMX: Add helper to check if INVVPID type is supported
+  nVMX: Add helper to check if INVVPID is supported
+  nVMX: Add helper to get first supported INVVPID type
+  nVMX: Use helper to check for EPT A/D support
+  nVMX: Add helpers to check for 4/5-level EPT support
+  nVMX: Fix name of macro defining EPT execute only capability
+  nVMX: Add helper to check if a memtype is supported for EPT structures
+  nVMX: Get rid of horribly named "ctrl" boolean in test_ept_eptp()
+  nVMX: Rename awful "ctrl" booleans to "is_ctrl_valid"
+  nVMX: Add helper to check if VPID is supported
+  x86/access: nVMX: Add "access" test variants to invalidate via
+    (INV)VPID
+
+ x86/access.c      | 391 ++++++++++++++++++++++++++++------------------
+ x86/unittests.cfg |  10 +-
+ x86/vmx.c         |  71 +--------
+ x86/vmx.h         | 229 ++++++++++++++++++---------
+ x86/vmx_tests.c   | 327 +++++++++++++++++---------------------
+ 5 files changed, 543 insertions(+), 485 deletions(-)
+
 -- 
-2.25.1
+2.34.0.rc2.393.gf8c9666880-goog
 
