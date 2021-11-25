@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B09A45D1B4
-	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 01:24:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EC9CC45D1B7
+	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 01:24:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353352AbhKYAY6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Nov 2021 19:24:58 -0500
+        id S1353429AbhKYAZB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Nov 2021 19:25:01 -0500
 Received: from mga12.intel.com ([192.55.52.136]:16253 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1352986AbhKYAY2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Nov 2021 19:24:28 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10178"; a="215432219"
+        id S1352997AbhKYAYa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Nov 2021 19:24:30 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10178"; a="215432223"
 X-IronPort-AV: E=Sophos;i="5.87,261,1631602800"; 
-   d="scan'208";a="215432219"
+   d="scan'208";a="215432223"
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 16:21:18 -0800
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 16:21:19 -0800
 X-IronPort-AV: E=Sophos;i="5.87,261,1631602800"; 
-   d="scan'208";a="675042280"
+   d="scan'208";a="675042309"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 16:21:17 -0800
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 16:21:18 -0800
 From:   isaku.yamahata@intel.com
 To:     Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
@@ -34,9 +34,9 @@ To:     Thomas Gleixner <tglx@linutronix.de>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [RFC PATCH v3 38/59] KVM: x86/mmu: Allow per-VM override of the TDP max page level
-Date:   Wed, 24 Nov 2021 16:20:21 -0800
-Message-Id: <bd1158dff25ed707e53aca6d7c87d148c4a8f3c6.1637799475.git.isaku.yamahata@intel.com>
+Subject: [RFC PATCH v3 39/59] KVM: VMX: Modify NMI and INTR handlers to take intr_info as param
+Date:   Wed, 24 Nov 2021 16:20:22 -0800
+Message-Id: <9880a5d90658ea473485a03285c5a0ce2960ab93.1637799475.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1637799475.git.isaku.yamahata@intel.com>
 References: <cover.1637799475.git.isaku.yamahata@intel.com>
@@ -48,57 +48,62 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-TODO: This is tentative patch.  Support large page and delete this patch.
-
-Allow TDX to effectively disable large pages, as SEPT will initially
-support only 4k pages.
+Pass intr_info to the NMI and INTR handlers instead of pulling it from
+vcpu_vmx in preparation for sharing the bulk of the handlers with TDX.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/include/asm/kvm_host.h | 1 +
- arch/x86/kvm/mmu.h              | 2 +-
- arch/x86/kvm/mmu/mmu.c          | 2 ++
- 3 files changed, 4 insertions(+), 1 deletion(-)
+ arch/x86/kvm/vmx/vmx.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 7ce0641d54dd..a2027bc14e41 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1054,6 +1054,7 @@ struct kvm_arch {
- 	unsigned long n_requested_mmu_pages;
- 	unsigned long n_max_mmu_pages;
- 	unsigned int indirect_shadow_pages;
-+	int tdp_max_page_level;
- 	u8 mmu_valid_gen;
- 	struct hlist_head mmu_page_hash[KVM_NUM_MMU_PAGES];
- 	struct list_head active_mmu_pages;
-diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
-index 168dcd4e0102..2c4b8fde66d9 100644
---- a/arch/x86/kvm/mmu.h
-+++ b/arch/x86/kvm/mmu.h
-@@ -191,7 +191,7 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 		.is_tdp = likely(vcpu->arch.mmu->page_fault == kvm_tdp_page_fault),
- 		.nx_huge_page_workaround_enabled = is_nx_huge_page_enabled(),
- 
--		.max_level = KVM_MAX_HUGEPAGE_LEVEL,
-+		.max_level = vcpu->kvm->arch.tdp_max_page_level,
- 		.req_level = PG_LEVEL_4K,
- 		.goal_level = PG_LEVEL_4K,
- 	};
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 63d2e3e85c08..7d3830508a44 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -6102,6 +6102,8 @@ void kvm_mmu_init_vm(struct kvm *kvm)
- 	node->track_write = kvm_mmu_pte_write;
- 	node->track_flush_slot = kvm_mmu_invalidate_zap_pages_in_memslot;
- 	kvm_page_track_register_notifier(kvm, node);
-+
-+	kvm->arch.tdp_max_page_level = KVM_MAX_HUGEPAGE_LEVEL;
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 1e20e85a958f..f243d5ecf543 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -6302,25 +6302,24 @@ static void handle_interrupt_nmi_irqoff(struct kvm_vcpu *vcpu,
+ 	kvm_after_interrupt(vcpu);
  }
  
- void kvm_mmu_uninit_vm(struct kvm *kvm)
+-static void handle_exception_nmi_irqoff(struct vcpu_vmx *vmx)
++static void handle_exception_nmi_irqoff(struct kvm_vcpu *vcpu, u32 intr_info)
+ {
+ 	const unsigned long nmi_entry = (unsigned long)asm_exc_nmi_noist;
+-	u32 intr_info = vmx_get_intr_info(&vmx->vcpu);
+ 
+ 	/* if exit due to PF check for async PF */
+ 	if (is_page_fault(intr_info))
+-		vmx->vcpu.arch.apf.host_apf_flags = kvm_read_and_reset_apf_flags();
++		vcpu->arch.apf.host_apf_flags = kvm_read_and_reset_apf_flags();
+ 	/* Handle machine checks before interrupts are enabled */
+ 	else if (is_machine_check(intr_info))
+ 		kvm_machine_check();
+ 	/* We need to handle NMIs before interrupts are enabled */
+ 	else if (is_nmi(intr_info))
+-		handle_interrupt_nmi_irqoff(&vmx->vcpu, nmi_entry);
++		handle_interrupt_nmi_irqoff(vcpu, nmi_entry);
+ }
+ 
+-static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu)
++static void handle_external_interrupt_irqoff(struct kvm_vcpu *vcpu,
++					     u32 intr_info)
+ {
+-	u32 intr_info = vmx_get_intr_info(vcpu);
+ 	unsigned int vector = intr_info & INTR_INFO_VECTOR_MASK;
+ 	gate_desc *desc = (gate_desc *)host_idt_base + vector;
+ 
+@@ -6339,9 +6338,9 @@ static void vmx_handle_exit_irqoff(struct kvm_vcpu *vcpu)
+ 		return;
+ 
+ 	if (vmx->exit_reason.basic == EXIT_REASON_EXTERNAL_INTERRUPT)
+-		handle_external_interrupt_irqoff(vcpu);
++		handle_external_interrupt_irqoff(vcpu, vmx_get_intr_info(vcpu));
+ 	else if (vmx->exit_reason.basic == EXIT_REASON_EXCEPTION_NMI)
+-		handle_exception_nmi_irqoff(vmx);
++		handle_exception_nmi_irqoff(vcpu, vmx_get_intr_info(vcpu));
+ }
+ 
+ /*
 -- 
 2.25.1
 
