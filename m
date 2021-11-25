@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1394745D2C6
-	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 03:00:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F306145D2C3
+	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 03:00:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353056AbhKYCDT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Nov 2021 21:03:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34794 "EHLO
+        id S1352759AbhKYCDQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Nov 2021 21:03:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353052AbhKYCBL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1352965AbhKYCBL (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 24 Nov 2021 21:01:11 -0500
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1F2FC0619E1
-        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 17:29:42 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id g14-20020a17090a578e00b001a79264411cso1688074pji.3
-        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 17:29:42 -0800 (PST)
+Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF271C0619E2
+        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 17:29:44 -0800 (PST)
+Received: by mail-qk1-x749.google.com with SMTP id bl6-20020a05620a1a8600b0046803c08cccso4374492qkb.15
+        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 17:29:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=k8rDEHW4oI9QveoP0Lw9ekRG1NJxuXVCsgMimwWdJ3E=;
-        b=cEtO307JtIZxnCAMVL40d6d0QqGHKFfPZGz0Wz4ptezEo/98x7ZVV1KgZMMrKw8cTx
-         Qf0A4jeohCigFo06Dg8iqPavSd1u342nHPEmFp9OByK8dgMt+Py7n1BRKUdVXEojo082
-         VQlQH7JKFYsD0GgJ8ZKkzot2dia3TWYxEpEmtuJ8MJzX9WL7ayEp8yrAmbQFUohI/R3l
-         IT8wmr9la47A3U3uXePaEx5pMh0ivjb5WbeKfdjehQOvWpQgQKl8kCcc5FTsBQM3oAzj
-         0zwRiJ+WlQMfCNHNfm59753KU6T2HVr9+sk0snWdNmWEVODEaic8DSTEGTsCDTQjTiDG
-         c0nw==
+        bh=WuRnaFSHqSjJ7borPLEG9bJcvlsOL2cdT1Ww4orxAOI=;
+        b=T22yF94hL+DDd2r1JYiqm2P6miPPFxDWmoypeDWoo4YVf8galmUyYu29OE4itIjG7y
+         jokigBRr8E0ERJKf4pr59SCtY5rcJoovaCWPneK/1ImmVjbQEUPp46NQdnQaO3WkkWoX
+         9MBOCvWXNvwqEGJSX3HQ8mn2XHfb9X9RBbfT1UxVf1Mu0cs289wx4feh/VwwcR3Jknkk
+         ZiOq9QErWOeiQleQsjTCxJYdgXy1itJMoWA7tmpgAOrYkQNlaXD4kB3YbUFvkgRTXvt9
+         sAOLzG/m2IvjJ3qALuTmzRXHDgUJYFoERgSrsUF+D6gjx3k2NMwx/G3ljkShibyvywxR
+         xDrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=k8rDEHW4oI9QveoP0Lw9ekRG1NJxuXVCsgMimwWdJ3E=;
-        b=6Urvzuaj1qmTT2AWtJpZtFuRvIZT2mJ7aFmzqND9V7jbcsUWittPhv99sGyOSMPHzB
-         XVKTGZsQaMndJbjdAXSZxrbz60dPaxXZaYJ8oI+of/QGAfcz/foSy7B0LUVIKI6etBbC
-         z0KYVx5ChvdprkaCRNtZLt/OfO0dVx/Pgv59/ImBs9GUKHSPkB/M3wT1OlpaeYqw7r+v
-         IbyUxZX51RD4SCjccxpeWG4uoJglbHUhUnFWwUe1RxU92yYGdebyopNfWlcA/L4gKdw1
-         8j/AFNP6ExquVBoLO2GYoBivU89nP2VSWmewJwbPMgn2H+mhOLKHy07jtHcJ8ca6M5H8
-         NPxw==
-X-Gm-Message-State: AOAM533fmY7mBxW2jokijOMOQI6M8Z1WlPsxmX5KATtB+vOKjKMeHNs7
-        Bw1c/BooexnEBmW6LekHPJ+GHdOJqp4=
-X-Google-Smtp-Source: ABdhPJxxWs1/Y0nlf2APLDypea/xNWhS5fz8lLABJ0sSPyaK5JioPiLYhV62e+4+OL+51SR7SeVe8yiOd88=
+        bh=WuRnaFSHqSjJ7borPLEG9bJcvlsOL2cdT1Ww4orxAOI=;
+        b=6+dl6L6+QKbyz/IFhTF/OQ4eSW8TMbJM33mN/IH3+uV08KRnJQH7B50y1D0PQ7vbm9
+         n351tpJM7T9/0WZRXOfzur+am7EHsYqnc7xU6fCLtt/CAgR6Nrb+4PEk8t28dmj6C1rx
+         Ykl7xJWbBFnuZhaYuIKjURgfDrL3o3cAUHd+So/jfRlupPpZ64qpHajmpa99JnZF+a+X
+         jy/80vxsFC2+L50/ap8NFoO5cSyFp2XhZc4S/33jWH7KcCfRDPMiLA3JbnSw6oTilKXV
+         DKj/FDF+KbUEoK3mFYe5TD/IfdyXsSHNno4MnBzThu62xbSJAj82ELR7V2NlCjPMRdyW
+         XICw==
+X-Gm-Message-State: AOAM531EtJTGvET2/9ie61XK1ve2j7GfMPRx0OX9RIslDFeepDNRl8q5
+        VzExcwQUv7T4OV9GZCkUU0w+VZ2PLvs=
+X-Google-Smtp-Source: ABdhPJwZwWYRbmVCp3TQ33h+msbNbJsgoLFo29qdlfdLlprwyeN5nBhqQxEmm3bXmsiMPn23uoXiTfGV/mY=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:902:b097:b0:141:ec7d:a055 with SMTP id
- p23-20020a170902b09700b00141ec7da055mr25107072plr.3.1637803782176; Wed, 24
- Nov 2021 17:29:42 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a25:2342:: with SMTP id j63mr2070523ybj.22.1637803783873;
+ Wed, 24 Nov 2021 17:29:43 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 25 Nov 2021 01:28:44 +0000
+Date:   Thu, 25 Nov 2021 01:28:45 +0000
 In-Reply-To: <20211125012857.508243-1-seanjc@google.com>
-Message-Id: <20211125012857.508243-27-seanjc@google.com>
+Message-Id: <20211125012857.508243-28-seanjc@google.com>
 Mime-Version: 1.0
 References: <20211125012857.508243-1-seanjc@google.com>
 X-Mailer: git-send-email 2.34.0.rc2.393.gf8c9666880-goog
-Subject: [kvm-unit-tests PATCH 26/39] nVMX: Move EPT capability check helpers
- to vmx.h
+Subject: [kvm-unit-tests PATCH 27/39] nVMX: Drop unused and useless
+ vpid_sync() helper
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
@@ -62,110 +61,55 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move the EPT capability helpers to vmx.h, ept_vpid is available and
-there's no reason to hide the trivial implementations.
+Drop vpid_sync(), it's unused for good reason.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- x86/vmx.c | 30 ------------------------------
- x86/vmx.h | 36 ++++++++++++++++++++++++++++++------
- 2 files changed, 30 insertions(+), 36 deletions(-)
+ x86/vmx.c | 18 ------------------
+ x86/vmx.h |  1 -
+ 2 files changed, 19 deletions(-)
 
 diff --git a/x86/vmx.c b/x86/vmx.c
-index 554cc74..eb5417b 100644
+index eb5417b..e499704 100644
 --- a/x86/vmx.c
 +++ b/x86/vmx.c
-@@ -1164,36 +1164,6 @@ void set_ept_pte(unsigned long *pml4, unsigned long guest_addr,
+@@ -1164,24 +1164,6 @@ void set_ept_pte(unsigned long *pml4, unsigned long guest_addr,
  	pt[offset] = pte_val;
  }
  
--bool ept_2m_supported(void)
+-void vpid_sync(int type, u16 vpid)
 -{
--	return ept_vpid.val & EPT_CAP_2M_PAGE;
+-	switch(type) {
+-	case INVVPID_CONTEXT_GLOBAL:
+-		if (ept_vpid.val & VPID_CAP_INVVPID_CXTGLB) {
+-			invvpid(INVVPID_CONTEXT_GLOBAL, vpid, 0);
+-			break;
+-		}
+-	case INVVPID_ALL:
+-		if (ept_vpid.val & VPID_CAP_INVVPID_ALL) {
+-			invvpid(INVVPID_ALL, vpid, 0);
+-			break;
+-		}
+-	default:
+-		printf("WARNING: invvpid is not supported\n");
+-	}
 -}
 -
--bool ept_1g_supported(void)
--{
--	return ept_vpid.val & EPT_CAP_1G_PAGE;
--}
--
--bool ept_huge_pages_supported(int level)
--{
--	if (level == 2)
--		return ept_2m_supported();
--	else if (level == 3)
--		return ept_1g_supported();
--	else
--		return false;
--}
--
--bool ept_execute_only_supported(void)
--{
--	return ept_vpid.val & EPT_CAP_WT;
--}
--
--bool ept_ad_bits_supported(void)
--{
--	return ept_vpid.val & EPT_CAP_AD_FLAG;
--}
--
- void vpid_sync(int type, u16 vpid)
+ static void init_vmcs_ctrl(void)
  {
- 	switch(type) {
+ 	/* 26.2 CHECKS ON VMX CONTROLS AND HOST-STATE AREA */
 diff --git a/x86/vmx.h b/x86/vmx.h
-index 0212ca6..0b7fb20 100644
+index 0b7fb20..4936120 100644
 --- a/x86/vmx.h
 +++ b/x86/vmx.h
-@@ -785,6 +785,36 @@ extern union vmx_ctrl_msr ctrl_exit_rev;
- extern union vmx_ctrl_msr ctrl_enter_rev;
- extern union vmx_ept_vpid  ept_vpid;
- 
-+static inline bool ept_2m_supported(void)
-+{
-+	return ept_vpid.val & EPT_CAP_2M_PAGE;
-+}
-+
-+static inline bool ept_1g_supported(void)
-+{
-+	return ept_vpid.val & EPT_CAP_1G_PAGE;
-+}
-+
-+static inline bool ept_huge_pages_supported(int level)
-+{
-+	if (level == 2)
-+		return ept_2m_supported();
-+	else if (level == 3)
-+		return ept_1g_supported();
-+	else
-+		return false;
-+}
-+
-+static inline bool ept_execute_only_supported(void)
-+{
-+	return ept_vpid.val & EPT_CAP_WT;
-+}
-+
-+static inline bool ept_ad_bits_supported(void)
-+{
-+	return ept_vpid.val & EPT_CAP_AD_FLAG;
-+}
-+
- static inline bool is_invept_type_supported(u64 type)
- {
- 	if (type < INVEPT_SINGLE || type > INVEPT_GLOBAL)
-@@ -975,12 +1005,6 @@ void check_ept_ad(unsigned long *pml4, u64 guest_cr3,
- void clear_ept_ad(unsigned long *pml4, u64 guest_cr3,
- 		  unsigned long guest_addr);
- 
--bool ept_2m_supported(void);
--bool ept_1g_supported(void);
--bool ept_huge_pages_supported(int level);
--bool ept_execute_only_supported(void);
--bool ept_ad_bits_supported(void);
--
- #define        ABORT_ON_EARLY_VMENTRY_FAIL     0x1
- #define        ABORT_ON_INVALID_GUEST_STATE    0x2
- 
+@@ -983,7 +983,6 @@ int init_vmcs(struct vmcs **vmcs);
+ const char *exit_reason_description(u64 reason);
+ void print_vmexit_info(union exit_reason exit_reason);
+ void print_vmentry_failure_info(struct vmentry_result *result);
+-void vpid_sync(int type, u16 vpid);
+ void install_ept_entry(unsigned long *pml4, int pte_level,
+ 		unsigned long guest_addr, unsigned long pte,
+ 		unsigned long *pt_page);
 -- 
 2.34.0.rc2.393.gf8c9666880-goog
 
