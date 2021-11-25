@@ -2,22 +2,22 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2115445D1C7
-	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 01:24:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0761545D1C9
+	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 01:24:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346650AbhKYAZt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Nov 2021 19:25:49 -0500
-Received: from mga12.intel.com ([192.55.52.136]:16273 "EHLO mga12.intel.com"
+        id S244812AbhKYAZ4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Nov 2021 19:25:56 -0500
+Received: from mga12.intel.com ([192.55.52.136]:16272 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1352851AbhKYAYh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1352857AbhKYAYh (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 24 Nov 2021 19:24:37 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10178"; a="215432261"
+X-IronPort-AV: E=McAfee;i="6200,9189,10178"; a="215432264"
 X-IronPort-AV: E=Sophos;i="5.87,261,1631602800"; 
-   d="scan'208";a="215432261"
+   d="scan'208";a="215432264"
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 16:21:26 -0800
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 16:21:27 -0800
 X-IronPort-AV: E=Sophos;i="5.87,261,1631602800"; 
-   d="scan'208";a="675042394"
+   d="scan'208";a="675042399"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 16:21:26 -0800
 From:   isaku.yamahata@intel.com
@@ -33,10 +33,10 @@ To:     Thomas Gleixner <tglx@linutronix.de>,
         Sean Christopherson <seanjc@google.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [RFC PATCH v3 52/59] KVM: VMX: Move .get_interrupt_shadow() implementation to common VMX code
-Date:   Wed, 24 Nov 2021 16:20:35 -0800
-Message-Id: <fc5fec456f87e8f815813e65f85055fe38e44d10.1637799475.git.isaku.yamahata@intel.com>
+        Chao Gao <chao.gao@intel.com>
+Subject: [RFC PATCH v3 53/59] KVM: x86: Add a helper function to restore 4 host MSRs on exit to user space
+Date:   Wed, 24 Nov 2021 16:20:36 -0800
+Message-Id: <4ede5c987a4ae938a37ab7fe70d5e1d561ee97d4.1637799475.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1637799475.git.isaku.yamahata@intel.com>
 References: <cover.1637799475.git.isaku.yamahata@intel.com>
@@ -46,61 +46,84 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <sean.j.christopherson@intel.com>
+From: Chao Gao <chao.gao@intel.com>
 
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+The TDX module unconditionally reset 4 host MSRs (MSR_SYSCALL_MASK,
+MSR_START, MSR_LSTAR, MSR_TSC_AUX) to architectural INIT state on exit from
+TDX VM to KVM.  KVM needs to save their values before TD enter and restore
+them on exit to userspace.
+
+Reuse current kvm_user_return mechanism and introduce a function to update
+cached values and register the user return notifier in this new function.
+
+The later patch will use the helper function to save/restore 4 host MSRs.
+
+Signed-off-by: Chao Gao <chao.gao@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/vmx/common.h | 14 ++++++++++++++
- arch/x86/kvm/vmx/vmx.c    | 10 +---------
- 2 files changed, 15 insertions(+), 9 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  1 +
+ arch/x86/kvm/x86.c              | 25 ++++++++++++++++++++-----
+ 2 files changed, 21 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/common.h b/arch/x86/kvm/vmx/common.h
-index e45d2d222168..684cd3add46b 100644
---- a/arch/x86/kvm/vmx/common.h
-+++ b/arch/x86/kvm/vmx/common.h
-@@ -120,6 +120,20 @@ static inline int __vmx_handle_ept_violation(struct kvm_vcpu *vcpu, gpa_t gpa,
- 	return kvm_mmu_page_fault(vcpu, gpa, error_code, NULL, 0);
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index a2027bc14e41..17d6e4bcf84b 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1910,6 +1910,7 @@ int kvm_pv_send_ipi(struct kvm *kvm, unsigned long ipi_bitmap_low,
+ int kvm_add_user_return_msr(u32 msr);
+ int kvm_find_user_return_msr(u32 msr);
+ int kvm_set_user_return_msr(unsigned index, u64 val, u64 mask);
++void kvm_user_return_update_cache(unsigned int index, u64 val);
+ 
+ static inline bool kvm_is_supported_user_return_msr(u32 msr)
+ {
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 4dd8ec2641a2..09da7cbedb5f 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -418,6 +418,15 @@ static void kvm_user_return_msr_cpu_online(void)
+ 	}
  }
  
-+static inline u32 __vmx_get_interrupt_shadow(struct kvm_vcpu *vcpu)
++static void kvm_user_return_register_notifier(struct kvm_user_return_msrs *msrs)
 +{
-+	u32 interruptibility;
-+	int ret = 0;
-+
-+	interruptibility = vmread32(vcpu, GUEST_INTERRUPTIBILITY_INFO);
-+	if (interruptibility & GUEST_INTR_STATE_STI)
-+		ret |= KVM_X86_SHADOW_INT_STI;
-+	if (interruptibility & GUEST_INTR_STATE_MOV_SS)
-+		ret |= KVM_X86_SHADOW_INT_MOV_SS;
-+
-+	return ret;
++	if (!msrs->registered) {
++		msrs->urn.on_user_return = kvm_on_user_return;
++		user_return_notifier_register(&msrs->urn);
++		msrs->registered = true;
++	}
 +}
 +
- static inline u32 vmx_encode_ar_bytes(struct kvm_segment *var)
+ int kvm_set_user_return_msr(unsigned slot, u64 value, u64 mask)
  {
- 	u32 ar;
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index a644b9627f9d..6f38e0d2e1b6 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1365,15 +1365,7 @@ void vmx_set_rflags(struct kvm_vcpu *vcpu, unsigned long rflags)
+ 	unsigned int cpu = smp_processor_id();
+@@ -432,15 +441,21 @@ int kvm_set_user_return_msr(unsigned slot, u64 value, u64 mask)
+ 		return 1;
  
- u32 vmx_get_interrupt_shadow(struct kvm_vcpu *vcpu)
- {
--	u32 interruptibility = vmcs_read32(GUEST_INTERRUPTIBILITY_INFO);
--	int ret = 0;
--
--	if (interruptibility & GUEST_INTR_STATE_STI)
--		ret |= KVM_X86_SHADOW_INT_STI;
--	if (interruptibility & GUEST_INTR_STATE_MOV_SS)
--		ret |= KVM_X86_SHADOW_INT_MOV_SS;
--
--	return ret;
-+	return __vmx_get_interrupt_shadow(vcpu);
+ 	msrs->values[slot].curr = value;
+-	if (!msrs->registered) {
+-		msrs->urn.on_user_return = kvm_on_user_return;
+-		user_return_notifier_register(&msrs->urn);
+-		msrs->registered = true;
+-	}
++	kvm_user_return_register_notifier(msrs);
+ 	return 0;
  }
+ EXPORT_SYMBOL_GPL(kvm_set_user_return_msr);
  
- void vmx_set_interrupt_shadow(struct kvm_vcpu *vcpu, int mask)
++/* Update the cache, "curr", and register the notifier */
++void kvm_user_return_update_cache(unsigned int slot, u64 value)
++{
++	struct kvm_user_return_msrs *msrs = this_cpu_ptr(user_return_msrs);
++
++	msrs->values[slot].curr = value;
++	kvm_user_return_register_notifier(msrs);
++}
++EXPORT_SYMBOL_GPL(kvm_user_return_update_cache);
++
+ static void drop_user_return_notifiers(void)
+ {
+ 	unsigned int cpu = smp_processor_id();
 -- 
 2.25.1
 
