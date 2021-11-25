@@ -2,207 +2,259 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 84D4B45CF6A
-	for <lists+kvm@lfdr.de>; Wed, 24 Nov 2021 22:44:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AA72A45D18C
+	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 01:21:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245544AbhKXVrp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Nov 2021 16:47:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35960 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244658AbhKXVro (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Nov 2021 16:47:44 -0500
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 206F0C061574
-        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 13:44:34 -0800 (PST)
-Received: by mail-pf1-x44a.google.com with SMTP id a23-20020a62bd17000000b004a3f6892612so2208398pff.22
-        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 13:44:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc;
-        bh=tLduHLCEhFBJGcWmSSIdFrH+R691pR5vCSBmZR8vuZw=;
-        b=CC1gtVLupTA8rueVdjI6wawbrHV3whgvmB7lktq3CbWDlJgYE5Xoh3R3YmR7xG15wY
-         WmsDDWVcGDHm30fDQR6mvoYLfD/2RKXmsflI2saH+GKIu4h2hO8CvcOjxa4u9JZnoUQn
-         9Jm+ZJPP4tbUfBkUDXd4ivqbi/7paSZRbVabJ25gU5qSQyYyMpbD+HkxuxkhZiUl5aJw
-         Gikx1kcdduPjRWpXPSJLYna3Dxpg7+qROiXBxjdB3ASH8l7N0Blc9cLRwz0ss0iTz4xr
-         9w46X7fZ77nUOrQFs4lmnFLFg22YxpR9bu/VfAxD99z7g15Uo2MpNuCi0/fQrQZvknBA
-         jpGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc;
-        bh=tLduHLCEhFBJGcWmSSIdFrH+R691pR5vCSBmZR8vuZw=;
-        b=ulWz5LFg9UftW4qgECi0U6vz6gNcnZJr7/4Ul1tZT4KfK5yKi4lF7DzDnMrvDhucxT
-         udxwRr6+j8LwGaP3YnJjpipstR/AjW4Js9NgYpdG97IRtQ2qZaybPhqJBW3bMAHt99TA
-         tffTkUEM/6Q++LBLSMB4qSQ0Xs7+EAkQF7hgMkAtFEOGcotiE0OWcmzSe9KYTV4mqoXS
-         HLEEZJ4RC3yH+ZNxpu8TZiqHCx3PCUmEExKuw1e7Mg0q1WLbvUjjz1FUWKj9ulE5mZ95
-         5mx/Pv8McE7ikH4MXBRXT7WiNHlz0PbwBX2AHlJjWAC4l3zstNcMUvKe94ZapodeeISy
-         66aw==
-X-Gm-Message-State: AOAM532u6eEvzU8FAlIuu89WjR+NyW7Bx/m6XD3mCI1glTnp/iSPJbuK
-        y6LhW3M3YTqZtkPvaf0q0BJUgV/PKEmZ
-X-Google-Smtp-Source: ABdhPJxAwhAbOfBn4cRf5CvmBdeRB86tn3Jv7VCI4xG5hdBCs5xuCb6jf2Bd1OteJPkMhIlOQgc+e6g558TL
-X-Received: from mizhang-super.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1071])
- (user=mizhang job=sendgmr) by 2002:a05:6a00:15c7:b0:49f:f48b:f96e with SMTP
- id o7-20020a056a0015c700b0049ff48bf96emr9491719pfu.65.1637790273655; Wed, 24
- Nov 2021 13:44:33 -0800 (PST)
-Reply-To: Mingwei Zhang <mizhang@google.com>
-Date:   Wed, 24 Nov 2021 21:44:21 +0000
-In-Reply-To: <20211124214421.458549-1-mizhang@google.com>
-Message-Id: <20211124214421.458549-3-mizhang@google.com>
-Mime-Version: 1.0
-References: <20211124214421.458549-1-mizhang@google.com>
-X-Mailer: git-send-email 2.34.0.rc2.393.gf8c9666880-goog
-Subject: [PATCH 2/2] KVM: mmu/x86: optimize zapping by retaining non-leaf
- SPTEs and avoid rcu stall
-From:   Mingwei Zhang <mizhang@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
+        id S1346977AbhKYAYK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Nov 2021 19:24:10 -0500
+Received: from mga17.intel.com ([192.55.52.151]:31426 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234573AbhKYAYJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Nov 2021 19:24:09 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10178"; a="216116922"
+X-IronPort-AV: E=Sophos;i="5.87,261,1631602800"; 
+   d="scan'208";a="216116922"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 16:20:58 -0800
+X-IronPort-AV: E=Sophos;i="5.87,261,1631602800"; 
+   d="scan'208";a="607374540"
+Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 16:20:58 -0800
+From:   isaku.yamahata@intel.com
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Mingwei Zhang <mizhang@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Joerg Roedel <joro@8bytes.org>, erdemaktas@google.com,
+        Connor Kuehl <ckuehl@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com
+Subject: [RFC PATCH v3 00/59] KVM: X86: TDX support
+Date:   Wed, 24 Nov 2021 16:19:43 -0800
+Message-Id: <cover.1637799475.git.isaku.yamahata@intel.com>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-TDP MMU SPTE zapping process currently uses two levels of iterations. The
-first level iteration happens at the for loop within the zap_gfn_range()
-with the purpose of calibrating the accurate range for zapping. The second
-level itreration start at tdp_mmu_set_spte{,_atomic}() that tears down the
-whole paging structures (leaf and non-leaf SPTEs) within the range. The
-former iteration is yield safe, while the second one is not.
+From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-In many cases, zapping SPTE process could be optimized since the non-leaf
-SPTEs could most likely be retained for the next allocation. On the other
-hand, for large scale SPTE zapping scenarios, we may end up zapping too
-many SPTEs and use excessive CPU time that causes the RCU stall warning.
+Changes from v2:
+- update based on patch review
+- support TDP MMU
+- drop non-essential fetures (ftrace etc.) to reduce patch size
 
-The follow selftest reproduces the warning:
+TODO:
+- integrate vm type patch
+- integrate unmapping user space mapping
 
-	(env: kvm.tdp_mmu=Y)
-	./dirty_log_perf_test -v 64 -b 8G
+--- 
+* What's TDX?
+TDX stands for Trust Domain Extensions which isolates VMs from the
+virtual-machine manager (VMM)/hypervisor and any other software on the
+platform. [1] For details, the specifications, [2], [3], [4], [5], [6], [7], are
+available.
 
-Optimize the zapping process by skipping all SPTEs above a certain level in
-the first iteration. This allows us to control the granularity of the
-actual zapping and invoke tdp_mmu_iter_cond_resched() on time. In addition,
-we would retain some of the non-leaf SPTEs to accelerate next allocation.
+* Patch organization
+The patch 66 is main change.  The preceding patches(1-65) The preceding
+patches(01-61) are refactoring the code and introducing additional hooks.
 
-For the selection of the `certain level`, we choose the PG_LEVEL_1G because
-it is currently the largest page size supported and it natually fits the
-scenario of splitting large pages.
+- 01-13: They are preparations. introduce architecture constants, code
+         refactoring, export symbols for following patches.
+- 14-30: start to introduce the new type of VM and allow the coexistence of
+         multiple type of VM. allow/disallow KVM ioctl where
+         appropriate. Especially make per-system ioctl to per-VM ioctl.
+- 31-38: refactoring KVM VMX/MMU and adding new hooks for Secure EPT.
+- 39-54: refactoring KVM
+- 55:    main patch to add "basic" support for building/running TDX.
+- 56-57: TDP MMU support
+- 58:    support TDX hypercall, GetQuote and SetupEventNotifyInterrupt, that
+         requires qemu help
+- 59:    Documentation
 
-For `zap_all` case (usually) at VM teardown time, we use a two-phase
-mechanism: the 1st phase zaps all SPTEs at PG_LEVEL_1G level and 2nd phase
-zaps everything else. This is achieved by the helper function
-__zap_gfn_range().
+* Missing features
+Those major features are intentionally missing from this patch series to keep
+this patch series small.  They are addressed as independent patch series.
 
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Ben Gardon <bgardon@google.com>
-Cc: David Matlack <dmatlack@google.com>
+- qemu gdb stub support
+- Large page support
+- guest PMU support
+- and more
 
-Signed-off-by: Mingwei Zhang <mizhang@google.com>
----
- arch/x86/kvm/mmu/tdp_mmu.c | 57 ++++++++++++++++++++++++++------------
- 1 file changed, 40 insertions(+), 17 deletions(-)
+Changes from v1:
+- rebase to v5.13
+- drop load/initialization of TDX module
+- catch up the update of related specifications.
+- rework on C-wrapper function to invoke seamcall
+- various code clean up
 
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 89d16bb104de..3fadc51c004a 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -697,24 +697,16 @@ static inline bool tdp_mmu_iter_cond_resched(struct kvm *kvm,
-  * account for the possibility that other threads are modifying the paging
-  * structures concurrently. If shared is false, this thread should hold the
-  * MMU lock in write mode.
-+ *
-+ * If zap_all is true, eliminate all the paging structures that contains the
-+ * SPTEs.
-  */
--static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
--			  gfn_t start, gfn_t end, bool can_yield, bool flush,
--			  bool shared)
-+static bool __zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
-+			    gfn_t start, gfn_t end, bool can_yield, bool flush,
-+			    bool shared, bool zap_all)
- {
--	gfn_t max_gfn_host = 1ULL << (shadow_phys_bits - PAGE_SHIFT);
--	bool zap_all = (start == 0 && end >= max_gfn_host);
- 	struct tdp_iter iter;
- 
--	/*
--	 * Bound the walk at host.MAXPHYADDR, guest accesses beyond that will
--	 * hit a #PF(RSVD) and never get to an EPT Violation/Misconfig / #NPF,
--	 * and so KVM will never install a SPTE for such addresses.
--	 */
--	end = min(end, max_gfn_host);
--
--	kvm_lockdep_assert_mmu_lock_held(kvm, shared);
--
- 	rcu_read_lock();
- 
- 	tdp_root_for_each_pte(iter, root, start, end) {
-@@ -725,17 +717,24 @@ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
- 			continue;
- 		}
- 
--		if (!is_shadow_present_pte(iter.old_spte))
-+		/*
-+		 * In zap_all case, ignore the checking of present since we have
-+		 * to zap everything.
-+		 */
-+		if (!zap_all && !is_shadow_present_pte(iter.old_spte))
- 			continue;
- 
- 		/*
- 		 * If this is a non-last-level SPTE that covers a larger range
- 		 * than should be zapped, continue, and zap the mappings at a
--		 * lower level, except when zapping all SPTEs.
-+		 * lower level. Actual zapping started at proper granularity
-+		 * that is not so large as to cause a soft lockup when handling
-+		 * the changed pte (which does not yield).
- 		 */
- 		if (!zap_all &&
- 		    (iter.gfn < start ||
--		     iter.gfn + KVM_PAGES_PER_HPAGE(iter.level) > end) &&
-+		     iter.gfn + KVM_PAGES_PER_HPAGE(iter.level) > end ||
-+		     iter.level > PG_LEVEL_1G) &&
- 		    !is_last_spte(iter.old_spte, iter.level))
- 			continue;
- 
-@@ -756,6 +755,30 @@ static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
- 	return flush;
- }
- 
-+static bool zap_gfn_range(struct kvm *kvm, struct kvm_mmu_page *root,
-+			  gfn_t start, gfn_t end, bool can_yield, bool flush,
-+			  bool shared)
-+{
-+	gfn_t max_gfn_host = 1ULL << (shadow_phys_bits - PAGE_SHIFT);
-+	bool zap_all = (start == 0 && end >= max_gfn_host);
-+
-+	/*
-+	 * Bound the walk at host.MAXPHYADDR, guest accesses beyond that will
-+	 * hit a #PF(RSVD) and never get to an EPT Violation/Misconfig / #NPF,
-+	 * and so KVM will never install a SPTE for such addresses.
-+	 */
-+	end = min(end, max_gfn_host);
-+
-+	kvm_lockdep_assert_mmu_lock_held(kvm, shared);
-+
-+	flush = __zap_gfn_range(kvm, root, start, end, can_yield, flush, shared,
-+				false);
-+	if (zap_all)
-+		flush = __zap_gfn_range(kvm, root, start, end, can_yield, flush,
-+					shared, true);
-+	return flush;
-+}
-+
- /*
-  * Tears down the mappings for the range of gfns, [start, end), and frees the
-  * non-root pages mapping GFNs strictly within that range. Returns true if
+[1] TDX specification
+   https://software.intel.com/content/www/us/en/develop/articles/intel-trust-domain-extensions.html
+[2] Intel Trust Domain Extensions (Intel TDX)
+   https://software.intel.com/content/dam/develop/external/us/en/documents/tdx-whitepaper-final9-17.pdf
+[3] Intel CPU Architectural Extensions Specification
+   https://software.intel.com/content/dam/develop/external/us/en/documents-tps/intel-tdx-cpu-architectural-specification.pdf
+[4] Intel TDX Module 1.0 EAS
+   https://software.intel.com/content/dam/develop/external/us/en/documents/tdx-module-1eas-v0.85.039.pdf
+[5] Intel TDX Loader Interface Specification
+  https://software.intel.com/content/dam/develop/external/us/en/documents-tps/intel-tdx-seamldr-interface-specification.pdf
+[6] Intel TDX Guest-Hypervisor Communication Interface
+   https://software.intel.com/content/dam/develop/external/us/en/documents/intel-tdx-guest-hypervisor-communication-interface.pdf
+[7] Intel TDX Virtual Firmware Design Guide
+   https://software.intel.com/content/dam/develop/external/us/en/documents/tdx-virtual-firmware-design-guide-rev-1.pdf
+[8] intel public github
+   kvm TDX branch: https://github.com/intel/tdx/tree/kvm
+   TDX guest branch: https://github.com/intel/tdx/tree/guest
+   qemu TDX https://github.com/intel/qemu-tdx
+[9] TDVF
+    https://github.com/tianocore/edk2-staging/tree/TDVF
+
+Chao Gao (1):
+  KVM: x86: Add a helper function to restore 4 host MSRs on exit to user
+    space
+
+Isaku Yamahata (9):
+  x86/mktme: move out MKTME related constatnts/macro to msr-index.h
+  x86/mtrr: mask out keyid bits from variable mtrr mask register
+  KVM: TDX: Define TDX architectural definitions
+  KVM: TDX: add a helper function for kvm to call seamcall
+  KVM: TDX: Add helper functions to print TDX SEAMCALL error
+  KVM: Add per-VM flag to mark read-only memory as unsupported
+  KVM: x86: add per-VM flags to disable SMI/INIT/SIPI
+  KVM: TDX: exit to user space on GET_QUOTE,
+    SETUP_EVENT_NOTIFY_INTERRUPT
+  Documentation/virtual/kvm: Add Trust Domain Extensions(TDX)
+
+Kai Huang (3):
+  KVM: x86: Add per-VM flag to disable in-kernel I/O APIC and level
+    routes
+  KVM: TDX: Protect private mapping related SEAMCALLs with spinlock
+  KVM, x86/mmu: Support TDX private mapping for TDP MMU
+
+Rick Edgecombe (1):
+  KVM: x86: Add infrastructure for stolen GPA bits
+
+Sean Christopherson (44):
+  KVM: TDX: Add TDX "architectural" error codes
+  KVM: TDX: Add C wrapper functions for TDX SEAMCALLs
+  KVM: Export kvm_io_bus_read for use by TDX for PV MMIO
+  KVM: Enable hardware before doing arch VM initialization
+  KVM: x86: Split core of hypercall emulation to helper function
+  KVM: x86: Export kvm_mmio tracepoint for use by TDX for PV MMIO
+  KVM: x86/mmu: Zap only leaf SPTEs for deleted/moved memslot by default
+  KVM: Add max_vcpus field in common 'struct kvm'
+  KVM: x86: Add vm_type to differentiate legacy VMs from protected VMs
+  KVM: x86: Introduce "protected guest" concept and block disallowed
+    ioctls
+  KVM: x86: Add per-VM flag to disable direct IRQ injection
+  KVM: x86: Add flag to disallow #MC injection / KVM_X86_SETUP_MCE
+  KVM: x86: Add flag to mark TSC as immutable (for TDX)
+  KVM: Add per-VM flag to disable dirty logging of memslots for TDs
+  KVM: x86: Allow host-initiated WRMSR to set X2APIC regardless of CPUID
+  KVM: x86: Add kvm_x86_ops .cache_gprs() and .flush_gprs()
+  KVM: x86: Add support for vCPU and device-scoped KVM_MEMORY_ENCRYPT_OP
+  KVM: x86: Introduce vm_teardown() hook in kvm_arch_vm_destroy()
+  KVM: x86: Add a switch_db_regs flag to handle TDX's auto-switched
+    behavior
+  KVM: x86: Check for pending APICv interrupt in kvm_vcpu_has_events()
+  KVM: x86: Add option to force LAPIC expiration wait
+  KVM: x86: Add guest_supported_xss placholder
+  KVM: x86/mmu: Explicitly check for MMIO spte in fast page fault
+  KVM: x86/mmu: Ignore bits 63 and 62 when checking for "present" SPTEs
+  KVM: x86/mmu: Allow non-zero init value for shadow PTE
+  KVM: x86/mmu: Return old SPTE from mmu_spte_clear_track_bits()
+  KVM: x86/mmu: Frame in support for private/inaccessible shadow pages
+  KVM: x86/mmu: Introduce kvm_mmu_map_tdp_page() for use by TDX
+  KVM: x86/mmu: Allow per-VM override of the TDP max page level
+  KVM: VMX: Modify NMI and INTR handlers to take intr_info as param
+  KVM: VMX: Move NMI/exception handler to common helper
+  KVM: VMX: Split out guts of EPT violation to common/exposed function
+  KVM: VMX: Define EPT Violation architectural bits
+  KVM: VMX: Define VMCS encodings for shared EPT pointer
+  KVM: VMX: Add 'main.c' to wrap VMX and TDX
+  KVM: VMX: Move setting of EPT MMU masks to common VT-x code
+  KVM: VMX: Move register caching logic to common code
+  KVM: TDX: Define TDCALL exit reason
+  KVM: TDX: Stub in tdx.h with structs, accessors, and VMCS helpers
+  KVM: VMX: Add macro framework to read/write VMCS for VMs and TDs
+  KVM: VMX: Move AR_BYTES encoder/decoder helpers to common.h
+  KVM: VMX: MOVE GDT and IDT accessors to common code
+  KVM: VMX: Move .get_interrupt_shadow() implementation to common VMX
+    code
+  KVM: TDX: Add "basic" support for building and running Trust Domains
+
+Xiaoyao Li (1):
+  KVM: X86: Introduce initial_tsc_khz in struct kvm_arch
+
+ Documentation/virt/kvm/api.rst        |    9 +-
+ Documentation/virt/kvm/intel-tdx.rst  |  359 ++++
+ arch/arm64/include/asm/kvm_host.h     |    3 -
+ arch/arm64/kvm/arm.c                  |    7 +-
+ arch/arm64/kvm/vgic/vgic-init.c       |    6 +-
+ arch/x86/events/intel/ds.c            |    1 +
+ arch/x86/include/asm/kvm-x86-ops.h    |   11 +
+ arch/x86/include/asm/kvm_host.h       |   63 +-
+ arch/x86/include/asm/msr-index.h      |   16 +
+ arch/x86/include/asm/vmx.h            |    6 +
+ arch/x86/include/uapi/asm/kvm.h       |   60 +
+ arch/x86/include/uapi/asm/vmx.h       |    7 +-
+ arch/x86/kernel/cpu/intel.c           |   14 -
+ arch/x86/kernel/cpu/mtrr/mtrr.c       |    9 +
+ arch/x86/kvm/Makefile                 |    6 +-
+ arch/x86/kvm/ioapic.c                 |    4 +
+ arch/x86/kvm/irq_comm.c               |   13 +-
+ arch/x86/kvm/lapic.c                  |    7 +-
+ arch/x86/kvm/lapic.h                  |    2 +-
+ arch/x86/kvm/mmu.h                    |   29 +-
+ arch/x86/kvm/mmu/mmu.c                |  667 ++++++-
+ arch/x86/kvm/mmu/mmu_internal.h       |   12 +
+ arch/x86/kvm/mmu/paging_tmpl.h        |   32 +-
+ arch/x86/kvm/mmu/spte.c               |   15 +-
+ arch/x86/kvm/mmu/spte.h               |   51 +-
+ arch/x86/kvm/mmu/tdp_iter.h           |    2 +-
+ arch/x86/kvm/mmu/tdp_mmu.c            |  544 +++++-
+ arch/x86/kvm/mmu/tdp_mmu.h            |   15 +-
+ arch/x86/kvm/svm/svm.c                |   13 +-
+ arch/x86/kvm/vmx/common.h             |  178 ++
+ arch/x86/kvm/vmx/main.c               | 1152 ++++++++++++
+ arch/x86/kvm/vmx/posted_intr.c        |    6 +
+ arch/x86/kvm/vmx/seamcall.h           |  116 ++
+ arch/x86/kvm/vmx/tdx.c                | 2437 +++++++++++++++++++++++++
+ arch/x86/kvm/vmx/tdx.h                |  290 +++
+ arch/x86/kvm/vmx/tdx_arch.h           |  239 +++
+ arch/x86/kvm/vmx/tdx_errno.h          |  111 ++
+ arch/x86/kvm/vmx/tdx_error.c          |   53 +
+ arch/x86/kvm/vmx/tdx_ops.h            |  224 +++
+ arch/x86/kvm/vmx/tdx_stubs.c          |   50 +
+ arch/x86/kvm/vmx/vmenter.S            |  146 ++
+ arch/x86/kvm/vmx/vmx.c                |  689 ++-----
+ arch/x86/kvm/vmx/x86_ops.h            |  203 ++
+ arch/x86/kvm/x86.c                    |  276 ++-
+ include/linux/kvm_host.h              |    5 +
+ include/uapi/linux/kvm.h              |   59 +
+ tools/arch/x86/include/uapi/asm/kvm.h |   55 +
+ tools/include/uapi/linux/kvm.h        |    2 +
+ virt/kvm/kvm_main.c                   |   34 +-
+ 49 files changed, 7469 insertions(+), 839 deletions(-)
+ create mode 100644 Documentation/virt/kvm/intel-tdx.rst
+ create mode 100644 arch/x86/kvm/vmx/common.h
+ create mode 100644 arch/x86/kvm/vmx/main.c
+ create mode 100644 arch/x86/kvm/vmx/seamcall.h
+ create mode 100644 arch/x86/kvm/vmx/tdx.c
+ create mode 100644 arch/x86/kvm/vmx/tdx.h
+ create mode 100644 arch/x86/kvm/vmx/tdx_arch.h
+ create mode 100644 arch/x86/kvm/vmx/tdx_errno.h
+ create mode 100644 arch/x86/kvm/vmx/tdx_error.c
+ create mode 100644 arch/x86/kvm/vmx/tdx_ops.h
+ create mode 100644 arch/x86/kvm/vmx/tdx_stubs.c
+ create mode 100644 arch/x86/kvm/vmx/x86_ops.h
+
 -- 
-2.34.0.rc2.393.gf8c9666880-goog
+2.25.1
 
