@@ -2,94 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3028445DE92
-	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 17:20:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B6AEF45DF3E
+	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 17:59:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233612AbhKYQYB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Nov 2021 11:24:01 -0500
-Received: from mail.kernel.org ([198.145.29.99]:38514 "EHLO mail.kernel.org"
+        id S1357035AbhKYRBL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Nov 2021 12:01:11 -0500
+Received: from foss.arm.com ([217.140.110.172]:53222 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S241686AbhKYQWS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Nov 2021 11:22:18 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9074160FE7;
-        Thu, 25 Nov 2021 16:19:07 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1mqHSj-007qd3-84; Thu, 25 Nov 2021 16:19:05 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Chris January <Chris.January@arm.com>,
-        Fuad Tabba <tabba@google.com>, Will Deacon <will@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, kernel-team@android.com
-Subject: [GIT PULL] KVM/arm64 fixes for 5.16, take #2
-Date:   Thu, 25 Nov 2021 16:19:02 +0000
-Message-Id: <20211125161902.106749-1-maz@kernel.org>
-X-Mailer: git-send-email 2.30.2
+        id S1356652AbhKYQ7J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Nov 2021 11:59:09 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 065761042;
+        Thu, 25 Nov 2021 08:55:58 -0800 (PST)
+Received: from [10.57.29.213] (unknown [10.57.29.213])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 1C75C3F73B;
+        Thu, 25 Nov 2021 08:55:53 -0800 (PST)
+Subject: Re: [RFC v2 PATCH 06/13] KVM: Register/unregister memfd backed
+ memslot
+To:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, qemu-devel@nongnu.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H . Peter Anvin" <hpa@zytor.com>,
+        Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, john.ji@intel.com, susie.li@intel.com,
+        jun.nakajima@intel.com, dave.hansen@intel.com, ak@linux.intel.com,
+        david@redhat.com
+References: <20211119134739.20218-1-chao.p.peng@linux.intel.com>
+ <20211119134739.20218-7-chao.p.peng@linux.intel.com>
+From:   Steven Price <steven.price@arm.com>
+Message-ID: <aff496f2-da53-87ec-0b86-199445bb5159@arm.com>
+Date:   Thu, 25 Nov 2021 16:55:52 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, catalin.marinas@arm.com, Chris.January@arm.com, tabba@google.com, will@kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+In-Reply-To: <20211119134739.20218-7-chao.p.peng@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo,
+On 19/11/2021 13:47, Chao Peng wrote:
+> Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> ---
+>  virt/kvm/kvm_main.c | 23 +++++++++++++++++++----
+>  1 file changed, 19 insertions(+), 4 deletions(-)
+> 
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 271cef8d1cd0..b8673490d301 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1426,7 +1426,7 @@ static void update_memslots(struct kvm_memslots *slots,
+>  static int check_memory_region_flags(struct kvm *kvm,
+>  			     const struct kvm_userspace_memory_region_ext *mem)
+>  {
+> -	u32 valid_flags = 0;
+> +	u32 valid_flags = KVM_MEM_FD;
+>  
+>  	if (!kvm->dirty_log_unsupported)
+>  		valid_flags |= KVM_MEM_LOG_DIRTY_PAGES;
+> @@ -1604,10 +1604,20 @@ static int kvm_set_memslot(struct kvm *kvm,
+>  		kvm_copy_memslots(slots, __kvm_memslots(kvm, as_id));
+>  	}
+>  
+> +	if (mem->flags & KVM_MEM_FD && change == KVM_MR_CREATE) {
+> +		r = kvm_memfd_register(kvm, mem, new);
+> +		if (r)
+> +			goto out_slots;
+> +	}
+> +
+>  	r = kvm_arch_prepare_memory_region(kvm, new, mem, change);
+>  	if (r)
+>  		goto out_slots;
+>  
+> +	if (mem->flags & KVM_MEM_FD && (r || change == KVM_MR_DELETE)) {
+                                        ^
+r will never be non-zero as the 'if' above will catch that case and jump
+to out_slots.
 
-Here's the second set of fixes for 5.16. The main items are a fix for
-an unfortunate signed constant extension, leading to an unbootable
-kernel on ARMv8.7 systems. The two other patches are fixes for the
-rare cases where we evaluate PSTATE too early on guest exit.
+I *think* the intention was that the "if (r)" code should be after this
+check to clean up in the case of error from
+kvm_arch_prepare_memory_region() (as well as an explicit MR_DELETE).
 
-Please pull,
+Steve
 
-	M.
+> +		kvm_memfd_unregister(kvm, new);
+> +	}
+> +
+>  	update_memslots(slots, new, change);
+>  	slots = install_new_memslots(kvm, as_id, slots);
+>  
+> @@ -1683,10 +1693,12 @@ int __kvm_set_memory_region(struct kvm *kvm,
+>  		return -EINVAL;
+>  	if (mem->guest_phys_addr & (PAGE_SIZE - 1))
+>  		return -EINVAL;
+> -	/* We can read the guest memory with __xxx_user() later on. */
+>  	if ((mem->userspace_addr & (PAGE_SIZE - 1)) ||
+> -	    (mem->userspace_addr != untagged_addr(mem->userspace_addr)) ||
+> -	     !access_ok((void __user *)(unsigned long)mem->userspace_addr,
+> +	    (mem->userspace_addr != untagged_addr(mem->userspace_addr)))
+> +		return -EINVAL;
+> +	/* We can read the guest memory with __xxx_user() later on. */
+> +	if (!(mem->flags & KVM_MEM_FD) &&
+> +	    !access_ok((void __user *)(unsigned long)mem->userspace_addr,
+>  			mem->memory_size))
+>  		return -EINVAL;
+>  	if (as_id >= KVM_ADDRESS_SPACE_NUM || id >= KVM_MEM_SLOTS_NUM)
+> @@ -1727,6 +1739,9 @@ int __kvm_set_memory_region(struct kvm *kvm,
+>  		new.dirty_bitmap = NULL;
+>  		memset(&new.arch, 0, sizeof(new.arch));
+>  	} else { /* Modify an existing slot. */
+> +		/* Private memslots are immutable, they can only be deleted. */
+> +		if (mem->flags & KVM_MEM_FD && mem->private_fd >= 0)
+> +			return -EINVAL;
+>  		if ((new.userspace_addr != old.userspace_addr) ||
+>  		    (new.npages != old.npages) ||
+>  		    ((new.flags ^ old.flags) & KVM_MEM_READONLY))
+> 
 
-The following changes since commit fa55b7dcdc43c1aa1ba12bca9d2dd4318c2a0dbf:
-
-  Linux 5.16-rc1 (2021-11-14 13:56:52 -0800)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-fixes-5.16-2
-
-for you to fetch changes up to 1f80d15020d7f130194821feb1432b67648c632d:
-
-  KVM: arm64: Avoid setting the upper 32 bits of TCR_EL2 and CPTR_EL2 to 1 (2021-11-25 15:51:25 +0000)
-
-----------------------------------------------------------------
-KVM/arm64 fixes for 5.16, take #2
-
-- Fix constant sign extension affecting TCR_EL2 and preventing
-  running on ARMv8.7 models due to spurious bits being set
-
-- Fix use of helpers using PSTATE early on exit by always sampling
-  it as soon as the exit takes place
-
-- Move pkvm's 32bit handling into a common helper
-
-----------------------------------------------------------------
-Catalin Marinas (1):
-      KVM: arm64: Avoid setting the upper 32 bits of TCR_EL2 and CPTR_EL2 to 1
-
-Marc Zyngier (2):
-      KVM: arm64: Save PSTATE early on exit
-      KVM: arm64: Move pkvm's special 32bit handling into a generic infrastructure
-
- arch/arm64/include/asm/kvm_arm.h           |  4 ++--
- arch/arm64/kvm/hyp/include/hyp/switch.h    | 14 ++++++++++++++
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h |  7 ++++++-
- arch/arm64/kvm/hyp/nvhe/switch.c           |  8 +-------
- arch/arm64/kvm/hyp/vhe/switch.c            |  4 ++++
- 5 files changed, 27 insertions(+), 10 deletions(-)
