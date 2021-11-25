@@ -2,154 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 95A1D45D36D
-	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 04:06:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A90145D3C3
+	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 04:52:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231565AbhKYDJj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Nov 2021 22:09:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50178 "EHLO
+        id S231490AbhKYDz4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Nov 2021 22:55:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344081AbhKYDHi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Nov 2021 22:07:38 -0500
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCD1FC0619D9
-        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 18:23:47 -0800 (PST)
-Received: by mail-pl1-x62a.google.com with SMTP id y7so3434862plp.0
-        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 18:23:47 -0800 (PST)
+        with ESMTP id S230129AbhKYDxz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Nov 2021 22:53:55 -0500
+Received: from mail-il1-x134.google.com (mail-il1-x134.google.com [IPv6:2607:f8b0:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C822C06173E;
+        Wed, 24 Nov 2021 19:50:45 -0800 (PST)
+Received: by mail-il1-x134.google.com with SMTP id a11so4287113ilj.6;
+        Wed, 24 Nov 2021 19:50:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=xFLS5Osf0Yq9hrh1R+jPqQbxrd4QeHBJiKo15Rlwxss=;
-        b=gt+CnbIhXSWZFRXO+JyoFnk7WgmjKBbkUkhF9Hto5JtuBqgdv4VEkkEN7LTIMqcNo3
-         fJa3lV7sl7T6tVrE5Qxf/hDkbDePK91LPbOxfpI8k9AvkVK5KzLK/K1Weiax6SB0wkdF
-         3n14xLxD1mBRl6dFCKL6GdrGNaTItauZtatK0NnbKxrMw/oyNH8TWvWdSL2IQuAI5IhY
-         roZLPPRcMD3QsruezRFnclk5QhgurJim6oRq3veff6G+nYO6JhYAURzFW3Xf4kb8ylz5
-         KvfgIDali36j+6mqKA/FEpC+Lltqm0xWo0zxvRLD4yPKz8Brr0r8j62VYQoWqHsL4RAv
-         j4Pg==
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=aOsXAIA+CjlrrWv1+HiSUuoeX4fJaK/BXi8fJXg25Ng=;
+        b=eUUaQ+yqghtwoOPYIXgPke1HdQlOUnN5LaDhXBoh9DY1a6kfDSnowXzKr6mgBDidpz
+         t+n4kaKQAZQT6b83DylmoUBkrMyOUN+8mzUmyYE8zLUrSpp/9WGRAb7SbBjAdj9IGR+o
+         dRHs4dPb1+wIjgb6Lepl2eSraztz3SvKARhFeD3sKfl3eFEy3EgxOQAA8XLg8dDkOr/O
+         Zkds79HEEJUQWYHjjCt0pmdjY/JadyjZcJWmS1WIr4mSoiOx/s1o4TkRaYQ9CmvCokim
+         DWTvev04k6Q4prf+aXUsdZxkS0qTpEHzk4PwJe4QNmYTGg2CMSq/+PXDLS+wj8VaYoI3
+         2Eag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=xFLS5Osf0Yq9hrh1R+jPqQbxrd4QeHBJiKo15Rlwxss=;
-        b=LY2yXVHfbJ4dPY1VmQSGZblmsVkUwDcRHPGduPUcMqASC6wxNOzx3liAEWEim6Z34K
-         9SyKkIn6Pfj69lB0gRqW0A6OuefhJ4KrjHVD4uZC/5yMMuHCnLhHNN0R8dT9fZH9mgeG
-         aRECG2M6L33uIWQmGDjr2rFNLQGUeLzGcsxSp3zaXkhqheGnFo2nF7daKEIyr8vvy85l
-         xqHclEX6K0POIpwonptTiJYFyXfB6B3nToIAsXM0WOnJnHCy0xQcRjq/qbi4mLAJ40Ef
-         od/IcIPn19xRe1lQ0gV2vOlq2C96csqIAWGOyvOgtlDuTCVJKFLNjEuomPJTVaQr/uJV
-         B6AQ==
-X-Gm-Message-State: AOAM532rsAIs0PoCEBYOUlvpCuK+FUaS8qBwoll5D768J4XlcXboJxzx
-        EdBrVVloQS8fquyKwwau7I97nQ==
-X-Google-Smtp-Source: ABdhPJyFZuUHjsN9HP6H4qPfFRhjwow47Wx9NzNMHdvs7iUWMDG4eO/Sk4e4+s2lEUImw4f5MDk9ww==
-X-Received: by 2002:a17:90b:1e49:: with SMTP id pi9mr2597640pjb.232.1637807026679;
-        Wed, 24 Nov 2021 18:23:46 -0800 (PST)
-Received: from google.com (150.12.83.34.bc.googleusercontent.com. [34.83.12.150])
-        by smtp.gmail.com with ESMTPSA id z19sm1032446pfe.181.2021.11.24.18.23.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Nov 2021 18:23:46 -0800 (PST)
-Date:   Wed, 24 Nov 2021 18:23:42 -0800
-From:   Ricardo Koller <ricarkol@google.com>
-To:     Andrew Jones <drjones@redhat.com>
-Cc:     kvm@vger.kernel.org, maz@kernel.org, kvmarm@lists.cs.columbia.edu,
-        eric.auger@redhat.com, alexandru.elisei@arm.com,
-        Paolo Bonzini <pbonzini@redhat.com>, oupton@google.com,
-        james.morse@arm.com, suzuki.poulose@arm.com, shuah@kernel.org,
-        jingzhangos@google.com, pshier@google.com, rananta@google.com,
-        reijiw@google.com
-Subject: Re: [PATCH 00/17] KVM: selftests: aarch64: Test userspace IRQ
- injection
-Message-ID: <YZ7zruK4ox/Qge90@google.com>
-References: <20211109023906.1091208-1-ricarkol@google.com>
- <20211123142524.4bjhdvw5pkx3g5ct@gator.home>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=aOsXAIA+CjlrrWv1+HiSUuoeX4fJaK/BXi8fJXg25Ng=;
+        b=8DqakretKXoVRtvLcTKLtr1pTIca47rO/nkehAFU1QV2JcLm6HYHI9Onv8Vxk1TxB+
+         DGVKfDe7HRvnSezkQ6iVHU62KLBVN8hDh6OIPtAhb6+P+pvA/20qPBvLNWrPw78fqw22
+         hHmJ/4TOIk3dM5lYi/f6z31SpfM6ADuOaLsg98s6bc5p9HM/fGeyV8qMpwW87Cx01HfD
+         qM08QIRvrUCOtibQzIH+jgfZ535ZvVE6jR54yHwDxaJMm5BbEowZIYtULqu8oKAp9Gg/
+         AaCvIpg3ZMjJ3JAWcb9b9UZXrEZgD5RXWWDNdA9TssvVjyr6wlbQM95ePx9yi3DzxPBy
+         Hhig==
+X-Gm-Message-State: AOAM533H1zsHKTLEeBEkG/Fk3S+XzVXc94r3TsMigt8lz8ESR9MxPiM6
+        hsMacMWvzjaWop5o1IgZk2aioCG2hMrBDCofez8=
+X-Google-Smtp-Source: ABdhPJyeq5RpKNPyCMqW3EdnsKbhLmlv3yR5AIDLq4YkyFo4QC4NdWDc+VED08HYOEKnD4nKq5veosNcU/5Fnik/2Ig=
+X-Received: by 2002:a05:6e02:1c8f:: with SMTP id w15mr16679701ill.147.1637812244580;
+ Wed, 24 Nov 2021 19:50:44 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211123142524.4bjhdvw5pkx3g5ct@gator.home>
+References: <20211125014944.536398-1-seanjc@google.com> <20211125014944.536398-3-seanjc@google.com>
+In-Reply-To: <20211125014944.536398-3-seanjc@google.com>
+From:   Lai Jiangshan <jiangshanlai@gmail.com>
+Date:   Thu, 25 Nov 2021 11:50:33 +0800
+Message-ID: <CAJhGHyBC1C71wchvqE_YztCvtkNgnmTN9FbBAOSz0K6SA3+WAA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] KVM: nVMX: Emulate guest TLB flush on nested VM-Enter
+ with new vpid12
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 23, 2021 at 03:25:24PM +0100, Andrew Jones wrote:
-> On Mon, Nov 08, 2021 at 06:38:49PM -0800, Ricardo Koller wrote:
-> > This series adds a new test, aarch64/vgic-irq, that validates the injection of
-> > different types of IRQs from userspace using various methods and configurations
-> > (when applicable):
-> > 
-> >     Intid        Method     |       |          Configuration
-> >                             |       |
-> >                IRQ_LINE     |       |
-> >     SGI        LEVEL_INFO   |       |
-> >     PPI    x   IRQFD        |   x   | level-sensitive  x  EOIR + DIR
-> >     SPI        ISPENDR      |       | edge-triggered      EOIR only
-> >     bogus      ISACTIVER    |       |
-> >                             |       |
-> > 
-> > vgic-irq is implemented by having a single vcpu started in any of the 4 (2x2)
-> > configurations above.  The guest then "asks" userspace to inject all intids of
-> > a given IRQ type using each applicable method via a GUEST_SYNC call.  The
-> > applicable methods and intids for a given configuration are specified in tables
-> > like this one:
-> > 
-> >     /* edge-triggered */
-> >     static struct kvm_inject_desc inject_edge_fns[] = {
-> >             /*                            sgi    ppi    spi */
-> >             { KVM_IRQ_LINE,               false, false, true },
-> >             { IRQFD,                      false, false, true },
-> >             { ISPENDR,                    true,  false, true },
-> >     };
-> > 
-> > Based on the (example) table above, a guest running in an edge-triggered
-> > configuration will try injecting SGIs and SPIs.  The specific methods are also
-> > given in the table, e.g.: SGIs are injected from userspace by writing into the
-> > ISPENDR register.
-> > 
-> > This test also adds some extra edge tests like: IRQ preemption, restoring
-> > active IRQs, trying to inject bogus intid's (e.g., above the configured KVM
-> > nr_irqs).
-> > 
-> > Note that vgic-irq is currently limited to a single vcpu, GICv3, and does not
-> > test the vITS (no MSIs).
-> > 
-> > - Commits 1-3 add some GICv3 library functions on the guest side, e.g.: set the
-> >   priority of an IRQ.
-> > - Commits 4-5 add some vGICv3 library functions on the userspace side, e.g.: a
-> >   wrapper for KVM_IRQ_LINE.
-> > - Commit 6 adds the basic version of this test: inject an SPI using
-> >   KVM_IRQ_LINE.
-> > - Commits 7-17 add other IRQs types, methods and configurations.
-> >
-> 
-> Hi Ricardo,
-> 
-> I didn't review this in detail, but it looks good and quite thorough.
+On Thu, Nov 25, 2021 at 9:49 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> Fully emulate a guest TLB flush on nested VM-Enter which changes vpid12,
+> i.e. L2's VPID, instead of simply doing INVVPID to flush real hardware's
+> TLB entries for vpid02.  From L1's perspective, changing L2's VPID is
+> effectively a TLB flush unless "hardware" has previously cached entries
+> for the new vpid12.  Because KVM tracks only a single vpid12, KVM doesn't
+> know if the new vpid12 has been used in the past and so must treat it as
+> a brand new, never been used VPID, i.e. must assume that the new vpid12
+> represents a TLB flush from L1's perspective.
+>
+> For example, if L1 and L2 share a CR3, the first VM-Enter to L2 (with a
+> VPID) is effectively a TLB flush as hardware/KVM has never seen vpid12
+> and thus can't have cached entries in the TLB for vpid12.
+>
+> Reported-by: Lai Jiangshan <jiangshanlai+lkml@gmail.com>
+> Fixes: 5c614b3583e7 ("KVM: nVMX: nested VPID emulation")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/vmx/nested.c | 37 +++++++++++++++++--------------------
+>  1 file changed, 17 insertions(+), 20 deletions(-)
+>
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 2ef1d5562a54..dafe5881ae51 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -1162,29 +1162,26 @@ static void nested_vmx_transition_tlb_flush(struct kvm_vcpu *vcpu,
+>         WARN_ON(!enable_vpid);
+>
+>         /*
+> -        * If VPID is enabled and used by vmc12, but L2 does not have a unique
+> -        * TLB tag (ASID), i.e. EPT is disabled and KVM was unable to allocate
+> -        * a VPID for L2, flush the current context as the effective ASID is
+> -        * common to both L1 and L2.
+> -        *
+> -        * Defer the flush so that it runs after vmcs02.EPTP has been set by
+> -        * KVM_REQ_LOAD_MMU_PGD (if nested EPT is enabled) and to avoid
+> -        * redundant flushes further down the nested pipeline.
+> -        *
+> -        * If a TLB flush isn't required due to any of the above, and vpid12 is
+> -        * changing then the new "virtual" VPID (vpid12) will reuse the same
+> -        * "real" VPID (vpid02), and so needs to be flushed.  There's no direct
+> -        * mapping between vpid02 and vpid12, vpid02 is per-vCPU and reused for
+> -        * all nested vCPUs.  Remember, a flush on VM-Enter does not invalidate
+> -        * guest-physical mappings, so there is no need to sync the nEPT MMU.
+> +        * VPID is enabled and in use by vmcs12.  If vpid12 is changing, then
+> +        * emulate a guest TLB flush as KVM does not track vpid12 history nor
+> +        * is the VPID incorporated into the MMU context.  I.e. KVM must assume
+> +        * that the new vpid12 has never been used and thus represents a new
+> +        * guest ASID that cannot have entries in the TLB.
+>          */
+> -       if (!nested_has_guest_tlb_tag(vcpu)) {
+> -               kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
+> -       } else if (is_vmenter &&
+> -                  vmcs12->virtual_processor_id != vmx->nested.last_vpid) {
+> +       if (is_vmenter && vmcs12->virtual_processor_id != vmx->nested.last_vpid) {
+>                 vmx->nested.last_vpid = vmcs12->virtual_processor_id;
 
-Thanks Andrew!
+How about when vmx->nested.last_vpid == vmcs12->virtual_processor_id == 0?
 
-> Out
-> of curiosity did thoroughness come from attempting to get coverage on KVM
-> code?
+I think KVM_REQ_TLB_FLUSH_GUEST is needed in this case too.
 
-Yes, that was the main reason. Although, keep in mind that there are a
-lot of features not covered, like routing and the ITS.
-
-> I.e were you running some sort of code coverage tool on KVM with
-> these tests?
-
-No, not really. It would be nice to know how much coverage (and
-distribution) we are getting from all tests (selftests and KUT) at the
-moment and maybe use that to decide on future tests.
-
-> 
-> Unfortunately I probably won't have a chance to look much closer than the
-> scan I just did, so FWIW
-> 
-> For the series
-> 
-> Acked-by: Andrew Jones <drjones@redhat.com>
-> 
-> Thanks,
-> drew
-> 
-
-Thanks,
-Ricardo
+> -               vpid_sync_context(nested_get_vpid02(vcpu));
+> +               kvm_make_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu);
+> +               return;
+>         }
+> +
+> +       /*
+> +        * If VPID is enabled, used by vmc12, and vpid12 is not changing but
+> +        * does not have a unique TLB tag (ASID), i.e. EPT is disabled and
+> +        * KVM was unable to allocate a VPID for L2, flush the current context
+> +        * as the effective ASID is common to both L1 and L2.
+> +        */
+> +       if (!nested_has_guest_tlb_tag(vcpu))
+> +               kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
+>  }
+>
+>  static bool is_bitwise_subset(u64 superset, u64 subset, u64 mask)
+> --
+> 2.34.0.rc2.393.gf8c9666880-goog
+>
