@@ -2,58 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 71DA445D2C7
-	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 03:00:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B8E9B45D2C5
+	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 03:00:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353355AbhKYCDU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Nov 2021 21:03:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35662 "EHLO
+        id S240405AbhKYCDS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Nov 2021 21:03:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35660 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353057AbhKYCBM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Nov 2021 21:01:12 -0500
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8680FC0619E4
-        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 17:29:47 -0800 (PST)
-Received: by mail-pj1-x1049.google.com with SMTP id ce19-20020a17090aff1300b001a6f72e2dbdso1683772pjb.7
-        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 17:29:47 -0800 (PST)
+        with ESMTP id S1353056AbhKYCBL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Nov 2021 21:01:11 -0500
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D106C0619E5
+        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 17:29:49 -0800 (PST)
+Received: by mail-pg1-x549.google.com with SMTP id 31-20020a630a1f000000b00324b8186ef0so1129514pgk.23
+        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 17:29:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=yvEUaS/OEcjyq4fYfb/W6xTPdCIC+9s1zuGcq5whCoQ=;
-        b=dUjmtF7frzK7xQ1tq4UovmbCAcWJ3p00JDW94FN82H9Wm5lfDxj37OIbU+zAUQMkHz
-         P5WCxS+xRVD3d2wnYdgOoCej200Azh/nMCOGQMOr/I37U5uDl9Y/fAZfl45U1rjEeYj3
-         M59oDpX0GcvE7A+y+ep9psYCx7biPOpLpSZ63nsYCIDWT1+OV7GRV95lMj5PsZ5J+nHV
-         xdkbwhr+C+8adkJ9FtT44CNyle4Z1E5roYtNF1Bo1vt8NI2geAc3CNft1KIiHCAas5Y/
-         rVeHwEADmsvEV795AoW2ujcvCi9ImjlubOVl5r8+/2NX1ZqfP+xws8D1sH3G10w3USMp
-         RwTQ==
+        bh=8lG4HI+hLMQ//Jep40KzKTe7/NdyFsho496CwO4KKis=;
+        b=KIbXaYg1OzAdCXZPOHME716F5ey1yDdmynL7A8yC2kLicubuGeQzybSMM3HeMh5I0v
+         2KjzqXmWl3C7HzCH0k2bCrZYNQsiJOpdrUzOuFcej78fOTRRoPW8B6GDQwu7Q5FJW/09
+         qT9n7ZUzSQ3am1Y2vm30M9W9/CzcNE/MMp5ttzxub00HUlXX18GvSZsSIwQueAFNotc7
+         6c8ayDxGpkqIzRI+o4sUCgomfOmD1MCKBZQQYbCa9ET+mHR1KkEfmBHf9Z0NFHTmQsts
+         3A2sluS6PSfJoftrB5r5xkPcHI1XCoiW9RwxKPClSSjNAh/b7MsXh16vBWogudnn3C1p
+         ejFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=yvEUaS/OEcjyq4fYfb/W6xTPdCIC+9s1zuGcq5whCoQ=;
-        b=ROWbq7h7HLnH/WyxiUCVRTUGAWhXYgTioXjzWYBZcOXx/jBM9nVQ+uoQqUwklKBV1l
-         3njp0RSAkZy+dgDCc3uG499Td1rCdtVD5S70avM8vcW0auhznrAwBQSDfV7e3PEoOGPn
-         5asVaacSp4tcWAeTiNdrjTwc9tAXzUHIxkbqJdVK2M3AzAhRgfGwnJ2bWhfgjJ7k3GGK
-         ZT/LRoW3jNypYXioiyO17BCoOavDwe51uyji2/AyRgGXhWxYSfhjxjDhuAzfnODoe5U9
-         zeWobltVcZstCzxl4sXvBwgB0Gjw6/4acYaE5WT276BWSSYwnp4A8CKW9+sSTyL9dDeT
-         hlEA==
-X-Gm-Message-State: AOAM530TBTDhgIosvq0OYQaycVKduxkNRKLgce2UCLDeTHIuPAq6OFxs
-        5veOFETkJzf80MEjKWOBH2maP4kmIRU=
-X-Google-Smtp-Source: ABdhPJzMSONCpQ39yA/7nJ5ncwIYo/1pB3MFvAgERTkKZoXZjXq562xGZDta3NtTl1XFw+n2zjgq6HWHTEA=
+        bh=8lG4HI+hLMQ//Jep40KzKTe7/NdyFsho496CwO4KKis=;
+        b=enEGki4fFG0OH1ebn32WAwY9vwYtudymkvnj5O50dyI1BfvKXYmJlLLBqnf7w8wJUf
+         nRDYWRfM3TK5Zw3q5lKbTmWiQRGn0J9QpEmOOBfUpjFTbPc1PriFB0cM1snhlRtsfP31
+         IlCPYyfKImXkjxUDJuzlCJiutRjXdDc2Fu0hRnvoxeIfCOHtoAsJcsYZj05hz02ITj+D
+         N3/iFey9tVlLea19924pqc3U1VwLYWmFLeDFn8lZowdPaO4bIL+GYzdtzBg5UP+ZC+5J
+         lKzF4IswuwgmtNMXEW/JkUdbGzFgNeGzVabOrGsGd2iWX/SmHHYXWiMvNgRx/KVCUMfz
+         GZzw==
+X-Gm-Message-State: AOAM532BecfdCp9exTCUU0oJnyY1UMgBWX1Xyc1ngWWnDvk7SEZoeNL2
+        Z2/4KGpddUASCGi0W+YqziP7mz0ongE=
+X-Google-Smtp-Source: ABdhPJx/2eZbRdKp8iNWjW35nuTR2oUFr1cfupZqV64Tt/OmjYRJYLpvS14TrG0WDg07p8t8IiKZGyO80TM=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:902:e74a:b0:142:114c:1f1e with SMTP id
- p10-20020a170902e74a00b00142114c1f1emr24943826plf.78.1637803787011; Wed, 24
- Nov 2021 17:29:47 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:90b:1486:: with SMTP id
+ js6mr626314pjb.0.1637803788623; Wed, 24 Nov 2021 17:29:48 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 25 Nov 2021 01:28:47 +0000
+Date:   Thu, 25 Nov 2021 01:28:48 +0000
 In-Reply-To: <20211125012857.508243-1-seanjc@google.com>
-Message-Id: <20211125012857.508243-30-seanjc@google.com>
+Message-Id: <20211125012857.508243-31-seanjc@google.com>
 Mime-Version: 1.0
 References: <20211125012857.508243-1-seanjc@google.com>
 X-Mailer: git-send-email 2.34.0.rc2.393.gf8c9666880-goog
-Subject: [kvm-unit-tests PATCH 29/39] nVMX: Add helper to check if INVVPID
- type is supported
+Subject: [kvm-unit-tests PATCH 30/39] nVMX: Add helper to check if INVVPID is supported
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
@@ -62,72 +60,54 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a helper to deduplicate code, now and in the future, and to avoid a
-RDMSR every time a VPID test wants to do a basic functionality check.
+Add a helper to check for basic INVVPID, it will gain more users in the
+future.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- x86/vmx.h       |  8 ++++++++
- x86/vmx_tests.c | 17 +++++------------
- 2 files changed, 13 insertions(+), 12 deletions(-)
+ x86/vmx.h       | 5 +++++
+ x86/vmx_tests.c | 5 +----
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
 diff --git a/x86/vmx.h b/x86/vmx.h
-index 4936120..289f175 100644
+index 289f175..9f91602 100644
 --- a/x86/vmx.h
 +++ b/x86/vmx.h
-@@ -823,6 +823,14 @@ static inline bool is_invept_type_supported(u64 type)
+@@ -823,6 +823,11 @@ static inline bool is_invept_type_supported(u64 type)
  	return ept_vpid.val & (EPT_CAP_INVEPT_SINGLE << (type - INVEPT_SINGLE));
  }
  
-+static inline bool is_invvpid_type_supported(unsigned long type)
++static inline bool is_invvpid_supported(void)
 +{
-+	if (type < INVVPID_ADDR || type > INVVPID_CONTEXT_LOCAL)
-+		return false;
-+
-+	return ept_vpid.val & (VPID_CAP_INVVPID_ADDR << (type - INVVPID_ADDR));
++	return ept_vpid.val & VPID_CAP_INVVPID;
 +}
 +
- extern u64 *bsp_vmxon_region;
- extern bool launched;
- 
+ static inline bool is_invvpid_type_supported(unsigned long type)
+ {
+ 	if (type < INVVPID_ADDR || type > INVVPID_CONTEXT_LOCAL)
 diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index 507e485..950f527 100644
+index 950f527..66f374a 100644
 --- a/x86/vmx_tests.c
 +++ b/x86/vmx_tests.c
-@@ -3161,14 +3161,7 @@ static void ept_access_test_force_2m_page(void)
- 
- static bool invvpid_valid(u64 type, u64 vpid, u64 gla)
+@@ -3300,7 +3300,6 @@ static void invvpid_test_not_in_vmx_operation(void)
+  */
+ static void invvpid_test(void)
  {
--	u64 msr = rdmsr(MSR_IA32_VMX_EPT_VPID_CAP);
--
--	TEST_ASSERT(msr & VPID_CAP_INVVPID);
--
--	if (type < INVVPID_ADDR || type > INVVPID_CONTEXT_LOCAL)
--		return false;
--
--	if (!(msr & (1ull << (type + VPID_CAP_INVVPID_TYPES_SHIFT))))
-+	if (!is_invvpid_type_supported(type))
- 		return false;
+-	u64 msr;
+ 	int i;
+ 	unsigned types = 0;
+ 	unsigned type;
+@@ -3309,9 +3308,7 @@ static void invvpid_test(void)
+ 	    !(ctrl_cpu_rev[1].clr & CPU_VPID))
+ 		test_skip("VPID not supported");
  
- 	if (vpid >> 16)
-@@ -3321,13 +3314,13 @@ static void invvpid_test(void)
- 	if (!(msr & VPID_CAP_INVVPID))
+-	msr = rdmsr(MSR_IA32_VMX_EPT_VPID_CAP);
+-
+-	if (!(msr & VPID_CAP_INVVPID))
++	if (!is_invvpid_supported())
  		test_skip("INVVPID not supported.\n");
  
--	if (msr & VPID_CAP_INVVPID_ADDR)
-+	if (is_invvpid_type_supported(INVVPID_ADDR))
- 		types |= 1u << INVVPID_ADDR;
--	if (msr & VPID_CAP_INVVPID_CXTGLB)
-+	if (is_invvpid_type_supported(INVVPID_CONTEXT_GLOBAL))
- 		types |= 1u << INVVPID_CONTEXT_GLOBAL;
--	if (msr & VPID_CAP_INVVPID_ALL)
-+	if (is_invvpid_type_supported(INVVPID_ALL))
- 		types |= 1u << INVVPID_ALL;
--	if (msr & VPID_CAP_INVVPID_CXTLOC)
-+	if (is_invvpid_type_supported(INVVPID_CONTEXT_LOCAL))
- 		types |= 1u << INVVPID_CONTEXT_LOCAL;
- 
- 	if (!types)
+ 	if (is_invvpid_type_supported(INVVPID_ADDR))
 -- 
 2.34.0.rc2.393.gf8c9666880-goog
 
