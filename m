@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C51A45D1AC
-	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 01:24:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 90BE245D1AA
+	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 01:24:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353185AbhKYAYv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Nov 2021 19:24:51 -0500
+        id S1353141AbhKYAYs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Nov 2021 19:24:48 -0500
 Received: from mga14.intel.com ([192.55.52.115]:6415 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1352887AbhKYAYX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1352892AbhKYAYX (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 24 Nov 2021 19:24:23 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10178"; a="235649703"
+X-IronPort-AV: E=McAfee;i="6200,9189,10178"; a="235649707"
 X-IronPort-AV: E=Sophos;i="5.87,261,1631602800"; 
-   d="scan'208";a="235649703"
+   d="scan'208";a="235649707"
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
   by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 16:21:12 -0800
 X-IronPort-AV: E=Sophos;i="5.87,261,1631602800"; 
-   d="scan'208";a="675042195"
+   d="scan'208";a="675042203"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 16:21:11 -0800
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 16:21:12 -0800
 From:   isaku.yamahata@intel.com
 To:     Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
@@ -33,10 +33,12 @@ To:     Thomas Gleixner <tglx@linutronix.de>,
         Sean Christopherson <seanjc@google.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [RFC PATCH v3 26/59] KVM: x86: Introduce vm_teardown() hook in kvm_arch_vm_destroy()
-Date:   Wed, 24 Nov 2021 16:20:09 -0800
-Message-Id: <1fa2d0db387a99352d44247728c5b8ae5f5cab4d.1637799475.git.isaku.yamahata@intel.com>
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Xiaoyao Li <xiaoyao.li@intel.com>,
+        Chao Gao <chao.gao@intel.com>
+Subject: [RFC PATCH v3 27/59] KVM: x86: Add a switch_db_regs flag to handle TDX's auto-switched behavior
+Date:   Wed, 24 Nov 2021 16:20:10 -0800
+Message-Id: <28dd5933479012c6b4551d5502b51fbdac328de5.1637799475.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1637799475.git.isaku.yamahata@intel.com>
 References: <cover.1637799475.git.isaku.yamahata@intel.com>
@@ -48,118 +50,66 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-Add a second kvm_x86_ops hook in kvm_arch_vm_destroy() to support TDX's
-destruction path, which needs to first put the VM into a teardown state,
-then free per-vCPU resource, and finally free per-VM resources.
+Add a flag, KVM_DEBUGREG_AUTO_SWITCHED_GUEST, to skip saving/restoring DRs
+irrespective of any other flags.  TDX-SEAM unconditionally saves and
+restores guest DRs and reset to architectural INIT state on TD exit.
+So, KVM needs to save host DRs before TD enter without restoring guest DRs
+and restore host DRs after TD exit.
 
-Note, this knowingly creates a discrepancy in nomenclature for SVM as
-svm_vm_teardown() invokes avic_vm_destroy() and sev_vm_destroy().
-Moving the now-misnamed functions or renaming them is left to a future
-patch so as not to introduce a functional change for SVM.
+Opportunistically convert the KVM_DEBUGREG_* definitions to use BIT().
 
+Reported-by: Xiaoyao Li <xiaoyao.li@intel.com>
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Co-developed-by: Chao Gao <chao.gao@intel.com>
+Signed-off-by: Chao Gao <chao.gao@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/include/asm/kvm-x86-ops.h | 1 +
- arch/x86/include/asm/kvm_host.h    | 1 +
- arch/x86/kvm/svm/svm.c             | 5 +++--
- arch/x86/kvm/vmx/vmx.c             | 7 +++++++
- arch/x86/kvm/x86.c                 | 3 ++-
- 5 files changed, 14 insertions(+), 3 deletions(-)
+ arch/x86/include/asm/kvm_host.h | 10 ++++++++--
+ arch/x86/kvm/x86.c              |  3 ++-
+ 2 files changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-index 30754f2b8a99..1009541fd6c2 100644
---- a/arch/x86/include/asm/kvm-x86-ops.h
-+++ b/arch/x86/include/asm/kvm-x86-ops.h
-@@ -20,6 +20,7 @@ KVM_X86_OP(has_emulated_msr)
- KVM_X86_OP(vcpu_after_set_cpuid)
- KVM_X86_OP(is_vm_type_supported)
- KVM_X86_OP(vm_init)
-+KVM_X86_OP_NULL(vm_teardown)
- KVM_X86_OP_NULL(vm_destroy)
- KVM_X86_OP(vcpu_create)
- KVM_X86_OP(vcpu_free)
 diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 74c3c1629563..3bc5417f94ec 100644
+index 3bc5417f94ec..a2bc4d9caaef 100644
 --- a/arch/x86/include/asm/kvm_host.h
 +++ b/arch/x86/include/asm/kvm_host.h
-@@ -1321,6 +1321,7 @@ struct kvm_x86_ops {
- 	bool (*is_vm_type_supported)(unsigned long vm_type);
- 	unsigned int vm_size;
- 	int (*vm_init)(struct kvm *kvm);
-+	void (*vm_teardown)(struct kvm *kvm);
- 	void (*vm_destroy)(struct kvm *kvm);
+@@ -526,8 +526,14 @@ struct kvm_pmu {
+ struct kvm_pmu_ops;
  
- 	/* Create, but do not attach this VCPU */
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 2ef77d4566a9..1bf410add13b 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4556,7 +4556,7 @@ static void svm_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
- 	sev_vcpu_deliver_sipi_vector(vcpu, vector);
- }
+ enum {
+-	KVM_DEBUGREG_BP_ENABLED = 1,
+-	KVM_DEBUGREG_WONT_EXIT = 2,
++	KVM_DEBUGREG_BP_ENABLED		= BIT(0),
++	KVM_DEBUGREG_WONT_EXIT		= BIT(1),
++	KVM_DEBUGREG_RELOAD		= BIT(2),
++	/*
++	 * Guest debug registers are saved/restored by hardware on exit from
++	 * or enter guest. KVM needn't switch them.
++	 */
++	KVM_DEBUGREG_AUTO_SWITCH	= BIT(3),
+ };
  
--static void svm_vm_destroy(struct kvm *kvm)
-+static void svm_vm_teardown(struct kvm *kvm)
- {
- 	avic_vm_destroy(kvm);
- 	sev_vm_destroy(kvm);
-@@ -4597,7 +4597,8 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.is_vm_type_supported = svm_is_vm_type_supported,
- 	.vm_size = sizeof(struct kvm_svm),
- 	.vm_init = svm_vm_init,
--	.vm_destroy = svm_vm_destroy,
-+	.vm_teardown = svm_vm_teardown,
-+	.vm_destroy = NULL,
- 
- 	.prepare_guest_switch = svm_prepare_guest_switch,
- 	.vcpu_load = svm_vcpu_load,
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index f2905e00b063..5e4c6ac9fe69 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6890,6 +6890,11 @@ static int vmx_vm_init(struct kvm *kvm)
- 	return 0;
- }
- 
-+static void vmx_vm_destroy(struct kvm *kvm)
-+{
-+
-+}
-+
- static int __init vmx_check_processor_compat(void)
- {
- 	struct vmcs_config vmcs_conf;
-@@ -7513,6 +7518,8 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
- 	.is_vm_type_supported = vmx_is_vm_type_supported,
- 	.vm_size = sizeof(struct kvm_vmx),
- 	.vm_init = vmx_vm_init,
-+	.vm_teardown = NULL,
-+	.vm_destroy = vmx_vm_destroy,
- 
- 	.vcpu_create = vmx_create_vcpu,
- 	.vcpu_free = vmx_free_vcpu,
+ struct kvm_mtrr_range {
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index f2091c4b928a..88b55ddb22a7 100644
+index 88b55ddb22a7..8161475082a7 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -11613,7 +11613,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
- 		__x86_set_memory_region(kvm, TSS_PRIVATE_MEMSLOT, 0, 0);
- 		mutex_unlock(&kvm->slots_lock);
- 	}
--	static_call_cond(kvm_x86_vm_destroy)(kvm);
-+	static_call_cond(kvm_x86_vm_teardown)(kvm);
- 	kvm_free_msr_filter(srcu_dereference_check(kvm->arch.msr_filter, &kvm->srcu, 1));
- 	kvm_pic_destroy(kvm);
- 	kvm_ioapic_destroy(kvm);
-@@ -11624,6 +11624,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
- 	kvm_page_track_cleanup(kvm);
- 	kvm_xen_destroy_vm(kvm);
- 	kvm_hv_destroy_vm(kvm);
-+	static_call_cond(kvm_x86_vm_destroy)(kvm);
- }
+@@ -9910,7 +9910,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 	if (test_thread_flag(TIF_NEED_FPU_LOAD))
+ 		switch_fpu_return();
  
- static void memslot_rmap_free(struct kvm_memory_slot *slot)
+-	if (unlikely(vcpu->arch.switch_db_regs)) {
++	if (unlikely(vcpu->arch.switch_db_regs & ~KVM_DEBUGREG_AUTO_SWITCH)) {
+ 		set_debugreg(0, 7);
+ 		set_debugreg(vcpu->arch.eff_db[0], 0);
+ 		set_debugreg(vcpu->arch.eff_db[1], 1);
+@@ -9950,6 +9950,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+ 	 */
+ 	if (unlikely(vcpu->arch.switch_db_regs & KVM_DEBUGREG_WONT_EXIT)) {
+ 		WARN_ON(vcpu->guest_debug & KVM_GUESTDBG_USE_HW_BP);
++		WARN_ON(vcpu->arch.switch_db_regs & KVM_DEBUGREG_AUTO_SWITCH);
+ 		static_call(kvm_x86_sync_dirty_debug_regs)(vcpu);
+ 		kvm_update_dr0123(vcpu);
+ 		kvm_update_dr7(vcpu);
 -- 
 2.25.1
 
