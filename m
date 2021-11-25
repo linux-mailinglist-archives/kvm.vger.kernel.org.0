@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 92E2B45D2C1
-	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 03:00:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 845E645D2C0
+	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 03:00:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353276AbhKYCDN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Nov 2021 21:03:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35650 "EHLO
+        id S1350473AbhKYCDM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Nov 2021 21:03:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345640AbhKYCBJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1353033AbhKYCBJ (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 24 Nov 2021 21:01:09 -0500
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC93BC0619DC
-        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 17:29:34 -0800 (PST)
-Received: by mail-pf1-x44a.google.com with SMTP id y124-20020a623282000000b0047a09271e49so2530588pfy.16
-        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 17:29:34 -0800 (PST)
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D435C0619DD
+        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 17:29:36 -0800 (PST)
+Received: by mail-pg1-x54a.google.com with SMTP id h2-20020a632102000000b003210bade52bso1453668pgh.9
+        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 17:29:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=DtLsNUG1mU8KIRQxClZ9QjdX4zKbCeXPIOMPwSqWT4Y=;
-        b=hF6qUlLVu+eRN1BhGcuwF41u3qcd4VGUdlZpq7lZrsQbCAg07gjQnp2ahsmcZHeAMz
-         odH5nWfcpw63HqE9kgmEojD8gqg/XOwwT7DENk8i0/YaiWrjw8odn9ExzHgvOKSUWTBX
-         e3nuy0sGsBeorMXG50a7hq/pnjCoUUyavv3gwG/sV9cXoq7L6aCjKlegbICatEyX+zXX
-         zGo6yU2FqmNbaWKxqQWsqUJdL0ELbzoHfvXOZSB7/+2HxdOToV4Tpfv7rhPfhUdAG+TD
-         v/DUAen32WQ38j/ZAOeb7XVfoiwNmy9nsUHySu8Un4m4FFH/EWHjcxszedao0GO/RNqc
-         ID7g==
+        bh=5vSVPBigmNIme2AkNVboa6ak5Pq0W7IDtNkaUSwN8Oc=;
+        b=Nr2lWnaI/rOy6NvALh7DRRS2Hn66IhQ/9vpSjT5p4I/ZD54dxghJKWAGy1JVNa0bA6
+         4OyjVYAZDQYgpmzKjGviMsoGJV//YkwLobiQD0drZAdAYUPNdpIzdBuji80TI2lKOupH
+         TBUD9jBR2Lm9tGYl8lk/WBZulYQJHUScXj66QGP9SBBy3byEEIaGwZU66naJkJvpeyBZ
+         nPJx+RLzAp2MMqu6ybtC87fzwyi3r0KkeM1Gz9e44ZBIbSgJSF6zTdFJL6maaMLZEDYr
+         AnD1aE3MnRAyYhyLtvp6YtP/4In/8enh7qBroPwP9o4XfJsKrPnl/hy7HW+QkTcyoYDV
+         WyYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=DtLsNUG1mU8KIRQxClZ9QjdX4zKbCeXPIOMPwSqWT4Y=;
-        b=20DrTJ+njjvKYndNZt6sWcYjDjOtG13Z0KMeuVqMetmP3A3L9p+Oq700WSGwTDYZvX
-         xWPoyPcfGUfI/rkSzeWwGEnuDxjJ6elBVizjXBclQKpQla8SvnVQqznYjbPDrG6RQgTU
-         PIDfEKQL11NH9yXXpo0WvBI9duBNZbqN7nzlCIMs6OJXrvnDxWjLz50GzYisSkeintBn
-         Bgl/EhLCChNXycOPGvYRe8pk9DS0rd9lWmiGTKnxjNJIt1AVr99HNmzukteztrWAgyXE
-         NL1TQUhD8X0ploe11k4FURhw19EiuJ7QRdtlc4IGpTXhI3qo1dB+4g2ImqLy+EPOqQUz
-         14Ow==
-X-Gm-Message-State: AOAM531D0FRIva+u9b2THYHAwf8lQOgNMT71+BJhl84/HvXIp+PqHcGM
-        E1yLWEBWR/coU5EKnaXopD7urGPPG8M=
-X-Google-Smtp-Source: ABdhPJzts8t8UItHvMueVFEAU2i+zVIOTkSmj7rsysB2mJbdsVzx9dg02qi5Cfts5QSuSqDUYBaM9Ppvbww=
+        bh=5vSVPBigmNIme2AkNVboa6ak5Pq0W7IDtNkaUSwN8Oc=;
+        b=s/1nljjxbpSgTXrvOp8hjMiV9hkpLJ0eGizxs5qPHWvbWOf5YOzcd9V14f3w2o2Lmb
+         dPclVgkWhEUna9+BU14hJRBWujkiI9xeJG1FfS1cxq4+PtaMN1+RoOvv4E5gEqkPAGy7
+         5UxOvyxghSlwqHUpfbkhDNtsDud0X+Z5fNT/rfTvBWpjOWKwzbDM6nyQ3u1m+jIirRXH
+         8ZlUTat91xxkV/sD1Ed0M2X3GvKJZmWCB+2mMFhOZGOqkmZhDqcfY2VBRglPEbMggHkj
+         rUXBpJMel3us4TeIBiSDZT8dzXQJwNcMh8Rae/8YqKlt0EqWBXQ9jpiECSj5BPM+fjZ8
+         arZg==
+X-Gm-Message-State: AOAM5323dEC550ag+sOcUsUYmpte/u9QJaHTO0mmV5+3nPcXKRd/UC1r
+        27f4LaLJjMQNCNGfBGYvoQd+SKi8GAI=
+X-Google-Smtp-Source: ABdhPJz0rHqJiNdxP4CJ8bB0XdKQstiOrkmAd2OxRaYdk2TOPjO+pF931y2C9kjUE6DglgE29TbRuvvs1Zo=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:902:b7c6:b0:141:9a3a:f213 with SMTP id
- v6-20020a170902b7c600b001419a3af213mr24716982plz.15.1637803774359; Wed, 24
- Nov 2021 17:29:34 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:aa7:93c4:0:b0:49f:a7f5:7f5a with SMTP id
+ y4-20020aa793c4000000b0049fa7f57f5amr11169901pff.8.1637803775956; Wed, 24 Nov
+ 2021 17:29:35 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 25 Nov 2021 01:28:39 +0000
+Date:   Thu, 25 Nov 2021 01:28:40 +0000
 In-Reply-To: <20211125012857.508243-1-seanjc@google.com>
-Message-Id: <20211125012857.508243-22-seanjc@google.com>
+Message-Id: <20211125012857.508243-23-seanjc@google.com>
 Mime-Version: 1.0
 References: <20211125012857.508243-1-seanjc@google.com>
 X-Mailer: git-send-email 2.34.0.rc2.393.gf8c9666880-goog
-Subject: [kvm-unit-tests PATCH 21/39] nVMX: Skip EPT tests if
- INVEPT(SINGLE_CONTEXT) is unsupported
+Subject: [kvm-unit-tests PATCH 22/39] nVMX: Hoist assert macros to the top of vmx.h
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
@@ -62,53 +61,140 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-EPT can technically be supported without INVEPT(SINGLE_CONTEXT), skip the
-EPT tests if SINGLE_CONTEXT isn't supported as it's heavily used (without
-the result being checked, yay).
+Move VMX's assert macros to the top of vmx.h so that they can be used in
+inlined helpers.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- x86/vmx.h       | 8 ++++++++
- x86/vmx_tests.c | 5 +++++
- 2 files changed, 13 insertions(+)
+ x86/vmx.h | 110 +++++++++++++++++++++++++++---------------------------
+ 1 file changed, 55 insertions(+), 55 deletions(-)
 
 diff --git a/x86/vmx.h b/x86/vmx.h
-index dd869c2..472b28a 100644
+index 472b28a..c1a8f6a 100644
 --- a/x86/vmx.h
 +++ b/x86/vmx.h
-@@ -725,6 +725,14 @@ extern union vmx_ctrl_msr ctrl_exit_rev;
- extern union vmx_ctrl_msr ctrl_enter_rev;
- extern union vmx_ept_vpid  ept_vpid;
+@@ -7,6 +7,61 @@
+ #include "asm/page.h"
+ #include "asm/io.h"
  
-+static inline bool is_invept_type_supported(u64 type)
-+{
-+	if (type < INVEPT_SINGLE || type > INVEPT_GLOBAL)
-+		return false;
++void __abort_test(void);
 +
-+	return ept_vpid.val & (EPT_CAP_INVEPT_SINGLE << (type - INVEPT_SINGLE));
-+}
++#define TEST_ASSERT(cond)					\
++do {								\
++	if (!(cond)) {						\
++		report_fail("%s:%d: Assertion failed: %s",	\
++			    __FILE__, __LINE__, #cond);		\
++		dump_stack();					\
++		__abort_test();					\
++	}							\
++	report_passed();					\
++} while (0)
 +
- extern u64 *bsp_vmxon_region;
- extern bool launched;
++#define TEST_ASSERT_MSG(cond, fmt, args...)			\
++do {								\
++	if (!(cond)) {						\
++		report_fail("%s:%d: Assertion failed: %s\n" fmt,\
++			    __FILE__, __LINE__, #cond, ##args);	\
++		dump_stack();					\
++		__abort_test();					\
++	}							\
++	report_passed();					\
++} while (0)
++
++#define __TEST_EQ(a, b, a_str, b_str, assertion, fmt, args...)	\
++do {								\
++	typeof(a) _a = a;					\
++	typeof(b) _b = b;					\
++	if (_a != _b) {						\
++		char _bin_a[BINSTR_SZ];				\
++		char _bin_b[BINSTR_SZ];				\
++		binstr(_a, _bin_a);				\
++		binstr(_b, _bin_b);				\
++		report_fail("%s:%d: %s failed: (%s) == (%s)\n"	\
++			    "\tLHS: %#018lx - %s - %lu\n"	\
++			    "\tRHS: %#018lx - %s - %lu%s" fmt,	\
++			    __FILE__, __LINE__,			\
++			    assertion ? "Assertion" : "Expectation", a_str, b_str,	\
++			    (unsigned long) _a, _bin_a, (unsigned long) _a,		\
++			    (unsigned long) _b, _bin_b, (unsigned long) _b,		\
++			    fmt[0] == '\0' ? "" : "\n", ## args);			\
++		dump_stack();					\
++		if (assertion)					\
++			__abort_test();				\
++	}							\
++	report_passed();					\
++} while (0)
++
++#define TEST_ASSERT_EQ(a, b) __TEST_EQ(a, b, #a, #b, 1, "")
++#define TEST_ASSERT_EQ_MSG(a, b, fmt, args...) \
++	__TEST_EQ(a, b, #a, #b, 1, fmt, ## args)
++#define TEST_EXPECT_EQ(a, b) __TEST_EQ(a, b, #a, #b, 0, "")
++#define TEST_EXPECT_EQ_MSG(a, b, fmt, args...) \
++	__TEST_EQ(a, b, #a, #b, 0, fmt, ## args)
++
+ struct vmcs_hdr {
+ 	u32 revision_id:31;
+ 	u32 shadow_vmcs:1;
+@@ -926,59 +981,4 @@ void test_set_guest(test_guest_func func);
+ void test_add_teardown(test_teardown_func func, void *data);
+ void test_skip(const char *msg);
  
-diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index 97fa8ce..cbf22e3 100644
---- a/x86/vmx_tests.c
-+++ b/x86/vmx_tests.c
-@@ -1148,8 +1148,13 @@ static int ept_init_common(bool have_ad)
- 	int ret;
- 	struct pci_dev pcidev;
- 
-+	/* INVEPT is required by the EPT violation handler. */
-+	if (!is_invept_type_supported(INVEPT_SINGLE))
-+		return VMX_TEST_EXIT;
-+
- 	if (setup_ept(have_ad))
- 		return VMX_TEST_EXIT;
-+
- 	data_page1 = alloc_page();
- 	data_page2 = alloc_page();
- 	*((u32 *)data_page1) = MAGIC_VAL_1;
+-void __abort_test(void);
+-
+-#define TEST_ASSERT(cond) \
+-do { \
+-	if (!(cond)) { \
+-		report_fail("%s:%d: Assertion failed: %s", \
+-			    __FILE__, __LINE__, #cond); \
+-		dump_stack(); \
+-		__abort_test(); \
+-	} \
+-	report_passed(); \
+-} while (0)
+-
+-#define TEST_ASSERT_MSG(cond, fmt, args...) \
+-do { \
+-	if (!(cond)) { \
+-		report_fail("%s:%d: Assertion failed: %s\n" fmt, \
+-			    __FILE__, __LINE__, #cond, ##args); \
+-		dump_stack(); \
+-		__abort_test(); \
+-	} \
+-	report_passed(); \
+-} while (0)
+-
+-#define __TEST_EQ(a, b, a_str, b_str, assertion, fmt, args...) \
+-do { \
+-	typeof(a) _a = a; \
+-	typeof(b) _b = b; \
+-	if (_a != _b) { \
+-		char _bin_a[BINSTR_SZ]; \
+-		char _bin_b[BINSTR_SZ]; \
+-		binstr(_a, _bin_a); \
+-		binstr(_b, _bin_b); \
+-		report_fail("%s:%d: %s failed: (%s) == (%s)\n" \
+-			    "\tLHS: %#018lx - %s - %lu\n" \
+-			    "\tRHS: %#018lx - %s - %lu%s" fmt, \
+-			    __FILE__, __LINE__, \
+-			    assertion ? "Assertion" : "Expectation", a_str, b_str, \
+-			    (unsigned long) _a, _bin_a, (unsigned long) _a, \
+-			    (unsigned long) _b, _bin_b, (unsigned long) _b, \
+-			    fmt[0] == '\0' ? "" : "\n", ## args); \
+-		dump_stack(); \
+-		if (assertion) \
+-			__abort_test(); \
+-	} \
+-	report_passed(); \
+-} while (0)
+-
+-#define TEST_ASSERT_EQ(a, b) __TEST_EQ(a, b, #a, #b, 1, "")
+-#define TEST_ASSERT_EQ_MSG(a, b, fmt, args...) \
+-	__TEST_EQ(a, b, #a, #b, 1, fmt, ## args)
+-#define TEST_EXPECT_EQ(a, b) __TEST_EQ(a, b, #a, #b, 0, "")
+-#define TEST_EXPECT_EQ_MSG(a, b, fmt, args...) \
+-	__TEST_EQ(a, b, #a, #b, 0, fmt, ## args)
+-
+ #endif
 -- 
 2.34.0.rc2.393.gf8c9666880-goog
 
