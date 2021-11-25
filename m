@@ -2,223 +2,197 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8065E45D4E6
-	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 07:44:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E65645D66A
+	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 09:45:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347672AbhKYGr2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Nov 2021 01:47:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40932 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345544AbhKYGp2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Nov 2021 01:45:28 -0500
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B83FC06175E
-        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 22:40:48 -0800 (PST)
-Received: by mail-pl1-x62a.google.com with SMTP id q17so3777919plr.11
-        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 22:40:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=D1RYje+PCYqZsPfLK7s7y/IRS9cjxQyf0CMrO3/xSrc=;
-        b=rNkZyu+N7Yym1NzmAo6q7NA+nCsHL1zSv4j41jHy5uuI0UwcnIW5PWPySWkQ+5rYAL
-         mgl/raaaWTAhxcB1PQW+uqdMny/JpKxBzspIPtycIHPjkPADaAMwkJyDfaVihzxEVeVY
-         Enp4fmyhCB5rbdEbyktyNMeWPzkJSCYsIsZWr1Bg/4ez0LiA/3nBRnsxO8dGOtBq/4Tb
-         Prszvbu/AXfSUk9as4B1t8BxvC/fE8bYkg1WfQLNpXnutzqVS4orTrm7QnqHwJ6WhTrK
-         ErWf69Q3Pzn9vBmrzmpEYWJTOHRmEi+jptJ++Fp1K1vuCJC8hNndmPczNM7qcq2qLZKB
-         W6Aw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=D1RYje+PCYqZsPfLK7s7y/IRS9cjxQyf0CMrO3/xSrc=;
-        b=4Va84TiNWiFQ5UpNDI63daY/BM2IY0LLFrfcAKLn/iYVBVb6VJ5CSDNMH2W9iNT1Kw
-         OK9rrpREe4aGJN1dqEW0Vo0cupExgUdYSfn0DmyKz3hv5n16UaKp0qOWbvvsSN/eWIqR
-         CTn0seFiMTvH8P3V9YKrHPAH4TJ0+LbA69WojGtCMhTcjcLOfMKCS/fpNr1cbe474gmu
-         HzPzoAboJ8L8qVh9yDCyNMsrnl0mYiedeUyA6WZQVi68SLa4KhB/W8mcxLelw+A3F9UF
-         eYMpyKmIjdvDkIqirp/ozm2r/lL7JJ+q25nydJB+/iHrRm7Fe0OcPvly0zV1UfYjf+54
-         bq/g==
-X-Gm-Message-State: AOAM531bLg3Ptq3NIUJpo9gbTsgqAoldSdaG4EUUNbl+318Cv3/4gm4W
-        4tmUVf5FGvcC8RXuaDgrxBn49ePi/aBUkt0UZP9H8Q==
-X-Google-Smtp-Source: ABdhPJxk8EJxvu4OyMIvTaNh/09irmr6NEN1cBHNSk7ZAo6K/TTeMK/De3q/IU39RNOG79YqwrGTJHOy1Bt4SW0l8l0=
-X-Received: by 2002:a17:90b:380d:: with SMTP id mq13mr4391591pjb.110.1637822447922;
- Wed, 24 Nov 2021 22:40:47 -0800 (PST)
+        id S1350013AbhKYItE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Nov 2021 03:49:04 -0500
+Received: from mx0a-002c1b01.pphosted.com ([148.163.151.68]:20904 "EHLO
+        mx0a-002c1b01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235403AbhKYIrD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 25 Nov 2021 03:47:03 -0500
+Received: from pps.filterd (m0127840.ppops.net [127.0.0.1])
+        by mx0a-002c1b01.pphosted.com (8.16.1.2/8.16.1.2) with ESMTP id 1AP74pdD013291;
+        Thu, 25 Nov 2021 00:43:49 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com; h=message-id : date :
+ subject : from : to : cc : references : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=proofpoint20171006;
+ bh=/HituqRzfT0/F3HI0lq/u84GmBICjugM0YWKwYJycX4=;
+ b=DfjerGNLaRjk9mPNBEn5XQvWkWG0OUD6sQZDXCEE+00GlZeAiugIfxyyGiYmnMChvy35
+ 3HWMEecKre3TB9kBVmrbb+vgxYrDUIshBn00lTqeYCz6VAI/oqZKpoYog/IKeqDAdrG2
+ v2L4Wo5AFFhj9H5Jhn5yDT08W28I9MkGKZ0MtlaZr0jJhQ8G03nphTWxjkRKITVBltkF
+ FTgVsDMBkeBkPRqQy30jgaCxPgPkiNOku7Bhc5duCgzMPuAYXgY0DMHKciTGoCd5smYk
+ nocfh15M1NnXUtOuEfl3BNGHpjp62+8SZVm08tJp5iShFkh0PEpnrZ6PGLaULjQTjXm5 eA== 
+Received: from nam04-mw2-obe.outbound.protection.outlook.com (mail-mw2nam08lp2169.outbound.protection.outlook.com [104.47.73.169])
+        by mx0a-002c1b01.pphosted.com (PPS) with ESMTPS id 3chjvet6eq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 25 Nov 2021 00:43:48 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bCX9M2JmXRILYMU6IZsv4hARMIOSe6R7YOOfLBNWjrAc7t7BQBsKYaTvtgpsz9kVyzHFOoN6Io0PLsdHVu+QdJT3P+uCkl2LqBHfDQ4rZ1Qak8chZCv9MISBkBdMUqsxp87h0do7ebt8B+f0sJ3SWQv7z4m2gw6eFtggae2eZxA7e0vR8WCpe6ld9cgudOY8B21ML6QRkcRFxg65Id6ggdrvYOh3SlckIb8+NZY87xg6cmFO1Yx+eNClurbg54U6BiJUjg3TJ99otC+fqiQMJnLm4OsUT/AhRwWUcUOvWehkN5Hvmkf/kaBB5BSyzfOXv4qYegMVAlSCaZJth6TBYA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/HituqRzfT0/F3HI0lq/u84GmBICjugM0YWKwYJycX4=;
+ b=O1eYDYSMR6tiCYuY4gX2sWjRe+mG+kauWEP+qYgHs1GDS2QKLTyLP9hlmtFCWDSdoPEKANWwoHUCMP3VcSS1u9Xs1AhbcEeQz/U77nMQQk4bgtiek/U6FaY8fyEQKJB5xf3hsGwK1UIx53eIOoJL7lpdWi+1Im8AMUeC4zqMpCtdBjBYGdC/Gzs48WNQqkz+aun5pEtdganNjudLLka8FcOye5/aKSlsWXFHs+zbFRrdBG3rhk+rriBFeXRUfFF0RhG3foPRQTM/et+g2dFset7d+Bg2BAC7sBSWDFjud0TKDkBM9z5kMQnO02ixTZNoAMTSujtyXkCywSa1uBo7ew==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
+ dkim=pass header.d=nutanix.com; arc=none
+Received: from CO6PR02MB7555.namprd02.prod.outlook.com (2603:10b6:303:b3::20)
+ by CO1PR02MB8618.namprd02.prod.outlook.com (2603:10b6:303:15d::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4734.19; Thu, 25 Nov
+ 2021 08:43:47 +0000
+Received: from CO6PR02MB7555.namprd02.prod.outlook.com
+ ([fe80::8d99:ba07:279:25c3]) by CO6PR02MB7555.namprd02.prod.outlook.com
+ ([fe80::8d99:ba07:279:25c3%9]) with mapi id 15.20.4734.022; Thu, 25 Nov 2021
+ 08:43:47 +0000
+Message-ID: <d9129cda-ebd9-aec3-3f04-bb989c509ac1@nutanix.com>
+Date:   Thu, 25 Nov 2021 14:13:36 +0530
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.3.2
+Subject: Re: [PATCH 3/6] Add KVM_CAP_DIRTY_QUOTA_MIGRATION and handle vCPU
+ page faults.
+From:   Shivam Kumar <shivam.kumar1@nutanix.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
+        Anurag Madnawat <anurag.madnawat@nutanix.com>,
+        Shaju Abraham <shaju.abraham@nutanix.com>,
+        Manish Mishra <manish.mishra@nutanix.com>
+References: <20211114145721.209219-1-shivam.kumar1@nutanix.com>
+ <20211114145721.209219-4-shivam.kumar1@nutanix.com>
+ <YZaUENi0ZyQi/9M0@google.com>
+ <02b8fa86-a86b-969e-2137-1953639cb6d2@nutanix.com>
+ <YZgD0D4536s2DMem@google.com>
+ <2a329e03-1b44-1cb3-f00c-1ee138bb74de@nutanix.com>
+In-Reply-To: <2a329e03-1b44-1cb3-f00c-1ee138bb74de@nutanix.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: MA1PR01CA0146.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:a00:71::16) To CO6PR02MB7555.namprd02.prod.outlook.com
+ (2603:10b6:303:b3::20)
 MIME-Version: 1.0
-References: <20211117064359.2362060-1-reijiw@google.com> <20211117064359.2362060-4-reijiw@google.com>
- <57519386-0a30-40a6-b46f-d20595df0b86@redhat.com>
-In-Reply-To: <57519386-0a30-40a6-b46f-d20595df0b86@redhat.com>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Wed, 24 Nov 2021 22:40:31 -0800
-Message-ID: <CAAeT=Fx8Z_W0ePxb+5O4OO4myJOr5SRLAFY38FrJJVtXXTxJQw@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 03/29] KVM: arm64: Introduce struct id_reg_info
-To:     Eric Auger <eauger@redhat.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
-        Peter Shier <pshier@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        linux-arm-kernel@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
+Received: from [192.168.1.6] (117.200.233.202) by MA1PR01CA0146.INDPRD01.PROD.OUTLOOK.COM (2603:1096:a00:71::16) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4734.20 via Frontend Transport; Thu, 25 Nov 2021 08:43:44 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 1d68a800-cc17-4e68-1360-08d9afefb232
+X-MS-TrafficTypeDiagnostic: CO1PR02MB8618:
+X-Microsoft-Antispam-PRVS: <CO1PR02MB8618C0CCED55001FDE9029CBB3629@CO1PR02MB8618.namprd02.prod.outlook.com>
+x-proofpoint-crosstenant: true
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: H60yYqYoYeRl70BPq+NY3cheNQ6CyF5IZAqvM+ifqAm4PmotPKc9LA4Vlw11+iMNoFK4Zgg10Z2ppEpliY8LZXco+EHo+ERdg1J79MdSBedFIhzx8W/AlOCfWT5YY9hvxHeVEmcp3eVz+ruo7P/qq8jrq3vfG7fv9ZitcYfluNnpUiXUUOKlDxEJFsv4nhlUIwR9o9Hv9zqUBOuGU3NpYmzqeqciUlfklwTQ6OVxVkC2Wq/75XCQNa6CKWueTLIksjJPkO/MwPUt/gYlBz+hYkaTLXC+XjSY4auk2DVS0x86bORuws9jO6BXH7ZxdruvnQxnw15Jzl7QgeP5p0mlI3D6AEnFcYfJTnOQkDUv3L2PFxaGVHJLxVb+B3ON2SBAPY9yZKxPwWQcoDi6QJFIFE/YJvR17vWSeAa1P43DIe/iqhFTjQWd3GNZDWagqo+EYuPIOprKAjY7T5W0EyIL3aIuBptz/S3ahB/bj0R7wfCbO3wjtBcHvMWgaVgm6bJbB3dQaitgO67ltmPpYW8Rn8lNMdzHvepVeJBdr24F+ZXf9dHENx/HQ8E7DnpiH9LQMn1OKG653DUlVszkLVhZBO0yKvzZpCRr3r12BMEWu0Fb/4AiiobQGN5jE5+CEgF4KsWfpc8X6QUW1bgLHoFD5H2QhbcOCSXN6CmO99IzWwrDXLLxG3hW/ony0FX/5XakUj78sMV3LhVaDT2nozXRHp4Al5SwYhoGcQuZiHB3/EIITvldXLv7t8XsOZEKZG6A
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO6PR02MB7555.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(2616005)(508600001)(956004)(8676002)(31696002)(4326008)(107886003)(5660300002)(66476007)(66946007)(6666004)(38100700002)(31686004)(66556008)(6486002)(54906003)(36756003)(2906002)(8936002)(6916009)(86362001)(316002)(16576012)(55236004)(186003)(26005)(53546011)(83380400001)(14143004)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NFN3WXl2VnZlcGJ3RTgwUjAyWTdJY2pjNkhqZWxTREUvdnBYWkFFTjNaSE4x?=
+ =?utf-8?B?dGNXMzBzQ0lNb1A2Qk5RTGNkRjZFOTRTbVVybTBnR2ZNUjhWa3NzM2hXaGho?=
+ =?utf-8?B?aXFacTZJTHZvbzNlbVJ0U0kyU1pnTkNkY0JucUdXM3ErS08wcXVqMkZPb01k?=
+ =?utf-8?B?Q05JSlVnUGtlclhDWjcwUThjejlYdThJWU5VZGhhVGMwbE9uUVpHSW53VGpj?=
+ =?utf-8?B?Rjl0Q1JYUmlWTjh3L2h0bEtOQnRFY1NEb2lKd0ZXM3lJVFd6djBaY08yWE92?=
+ =?utf-8?B?RHFxbVhtRW9kcnE1c1VMbS9BNVZOZUFiVWVJaFZKWnFHbWpHZUZlWlprc0RC?=
+ =?utf-8?B?ZlVBR3J1TVFnWFhoaW1FYW9UZUhlQXRIaVJybVIxdTIzRTRUT2VtZzNsSGNW?=
+ =?utf-8?B?N2xlUVJuN2pSWWwxdXNVMFNQNVRVR2tQOVMrTHlITDRMZDBhVnFNZXNVelVq?=
+ =?utf-8?B?cUpsQ1dYWDQxRTgzd1hsSHlzNWUvTmdqYXdYL1NrWGd2ZEN5dnp3S3VOMUNL?=
+ =?utf-8?B?cjJiR2QyYWhmdjUxdFhXNG1aMEZ3ckQ3aitKTnQ3dDIxbXNCUWxOcHNjUUdx?=
+ =?utf-8?B?b1ZweTB0UFpXSDIrcSthU2xEM242V0tmRDU5cTh0SHFOM0JicWIyL0IxU3BF?=
+ =?utf-8?B?QUhveG41VkszWEEvaVFxZzFVVVJzZ2tNTk81bTlnbVhvK3h2SXNhS3UyOGRL?=
+ =?utf-8?B?Y1ZCZysya05KMXpUb0k1anJMUEFTWWc3NmhWQ1c1blFDVTBGd09SV0g3bnZZ?=
+ =?utf-8?B?NDl5dlN5bHZrVTRtanZDbklMNVBBYXljcEdzQk1KaHQ2SC95YTFFZC94eGMx?=
+ =?utf-8?B?SGNJNWwxb0hDMDVGNG5Qc0c0YTFScFp2UTFhYUxJeXlRaHJPbjNBaEJRai80?=
+ =?utf-8?B?WnE2THRKV3lNMmQwUGNyd2MvZDcxUWs2cEtXdU9Wc2ZuTUIzWmZvYW5LZ2lS?=
+ =?utf-8?B?N2U0eWhSaGVkejAyeWRhUmxjbnVHYTB0clR2a3VYeEZva0lUNWV4YXFaUmdP?=
+ =?utf-8?B?VWFPeUh5Tmg1NlBDa1JtUmNXaEFWQUc2dy9rNXh3OEFLSEQ5ZzFMOXNkR3Z4?=
+ =?utf-8?B?aVU3ckxpa1ZJYktkVlVjQWFJUy9Cem5CNU1YSFQ1eTducU5TTlk3U2NvdUo4?=
+ =?utf-8?B?RVZkcDJoUzJ5YlVxNm9NQlJMRzBFSVpMWnk5WG1HS2dIS0FHM0xhN1NzaVcx?=
+ =?utf-8?B?QnBpbDVxam9OdFZtT2RobDlyR3pLaTVIZmVNOFlVVlBCNWFnRmpwMU9SZkx3?=
+ =?utf-8?B?OWUxK2YyS3BvVjlvMTAxWVlOM25YbklvTTBoS0ZjZ0FTaTkxWU1sNi9YZU9y?=
+ =?utf-8?B?UGcwNmxiZFE1a3BlVkxZbnRxdW12WStRK1BGVjZYNnhIOS9pTGFTa2x4dlhu?=
+ =?utf-8?B?dVRjcER0M3RMazlKcDllSUJqLzViQlJPYXJOOWRaV2FNdGFEZGFVeVlQeUFx?=
+ =?utf-8?B?eXNCQ3U4Y2lJMWNpRTRiZlVGb0VMK1hCWHpjQWhZaXNZOXIyMGp3aU02ejJH?=
+ =?utf-8?B?N1BLeVRTMzBTckt5M0RVcW8xREpPL1VGdkI1dDZHaWh5SG5RRGVjRUg5RGUx?=
+ =?utf-8?B?UC8yc09aUWd4UldEME1LODRoNTZCMGpGU3V1Vk5YeEFNdHJYTU0yeExJNkJJ?=
+ =?utf-8?B?UEY2RUxhVUJWTVVHaEFjWnZuNENHbFp2YVNXK2Fmb0NUbG5EM0NnajBJNVlH?=
+ =?utf-8?B?R3NTdjdZR1FiRWFwc3U2T1daNHFaZHdrVUN0NEpmSEZGaldyeVc2ajEyY2Nv?=
+ =?utf-8?B?UWI2WUhKK2NSTDJTSTI0N3lMOWRDM3A0azRXTFBUcWZ3QW9MbWN3b3h3MElD?=
+ =?utf-8?B?bWplZDNEQU5jRVJhcm5hQzRtbzYzbUlSS0VvY1l2WjdYSTlwVnh2SkUvbldR?=
+ =?utf-8?B?YitETjMrSnlQd2pOK2c2TnRQdWlaSi9ZRTV0S2tRc2dJeldBSjFPZ1hkd3Zi?=
+ =?utf-8?B?S25VejZZQjhWQTJQK3orSFo1VmNVSVd5dzFFZTgvNDJqbzJEWWJ2UjdCODVi?=
+ =?utf-8?B?dTdWZFExQUx1MVZwSzg3VTd5YWhGWXVXNFZ0VytZT2xEOEVuM3dZZGZGbUt4?=
+ =?utf-8?B?dEZCM2NoQkxYUWdKalZjaVQzSEVRVDRJYlNCY3NaYXNxazdjNzk1RkQrQnRy?=
+ =?utf-8?B?U2pGL2JOYXZZMldEVjhiTklub3Y1ZERTVzUyQ3B5V0NYNTJjMitmYk5WRFFJ?=
+ =?utf-8?B?bGxhYmlGV29GdDhGSmZEVUJLRElmUFFSczlGb0RGSnI1bTFXVFBTaHpPaXAv?=
+ =?utf-8?Q?1wtd8IXzycKwPqCr3KwtkNr+vYyG4CkbJJ6hzOagTE=3D?=
+X-OriginatorOrg: nutanix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1d68a800-cc17-4e68-1360-08d9afefb232
+X-MS-Exchange-CrossTenant-AuthSource: CO6PR02MB7555.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Nov 2021 08:43:47.3536
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: bb047546-786f-4de1-bd75-24e5b6f79043
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ozoYaaaK4WRs7Kz8Ua9ou9oVioXd/k5bntPiOmwIorIAtZtv6Au+OXyhGb9guddagLxF5s7Uo/8fw7Rnx5ccXOEFx2FnR6iZ//p2hydWLmU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR02MB8618
+X-Proofpoint-GUID: he7zKD-_7PvqihTPAoV3IOzOa1xK1Gg8
+X-Proofpoint-ORIG-GUID: he7zKD-_7PvqihTPAoV3IOzOa1xK1Gg8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
+ definitions=2021-11-25_04,2021-11-24_01,2020-04-07_01
+X-Proofpoint-Spam-Reason: safe
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
 
-On Wed, Nov 24, 2021 at 1:07 PM Eric Auger <eauger@redhat.com> wrote:
+On 20/11/21 1:51 am, Shivam Kumar wrote:
 >
-> Hi Reiji,
->
-> On 11/17/21 7:43 AM, Reiji Watanabe wrote:
-> > This patch lays the groundwork to make ID registers writable.
-> >
-> > Introduce struct id_reg_info for an ID register to manage the
-> > register specific control of its value for the guest, and provide set
-> > of functions commonly used for ID registers to make them writable.
-> >
-> > The id_reg_info is used to do register specific initialization,
-> > validation of the ID register and etc.  Not all ID registers must
-> > have the id_reg_info. ID registers that don't have the id_reg_info
-> > are handled in a common way that is applied to all ID registers.
-> >
-> > At present, changing an ID register from userspace is allowed only
-> > if the ID register has the id_reg_info, but that will be changed
-> > by the following patches.
-> >
-> > No ID register has the structure yet and the following patches
-> > will add the id_reg_info for some ID registers.
-> >
-> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> > ---
-> >  arch/arm64/include/asm/sysreg.h |   1 +
-> >  arch/arm64/kvm/sys_regs.c       | 226 ++++++++++++++++++++++++++++++--
-> >  2 files changed, 218 insertions(+), 9 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> > index 16b3f1a1d468..597609f26331 100644
-> > --- a/arch/arm64/include/asm/sysreg.h
-> > +++ b/arch/arm64/include/asm/sysreg.h
-> > @@ -1197,6 +1197,7 @@
-> >  #define ICH_VTR_TDS_MASK     (1 << ICH_VTR_TDS_SHIFT)
-> >
-> >  #define ARM64_FEATURE_FIELD_BITS     4
-> > +#define ARM64_FEATURE_FIELD_MASK     ((1ull << ARM64_FEATURE_FIELD_BITS) - 1)
-> >
-> >  /* Create a mask for the feature bits of the specified feature. */
-> >  #define ARM64_FEATURE_MASK(x)        (GENMASK_ULL(x##_SHIFT + ARM64_FEATURE_FIELD_BITS - 1, x##_SHIFT))
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 5608d3410660..1552cd5581b7 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -265,6 +265,181 @@ static bool trap_raz_wi(struct kvm_vcpu *vcpu,
-> >               return read_zero(vcpu, p);
-> >  }
-> >
-> > +/*
-> > + * A value for FCT_LOWER_SAFE must be zero and changing that will affect
-> > + * ftr_check_types of id_reg_info.
-> > + */
-> > +enum feature_check_type {
-> > +     FCT_LOWER_SAFE = 0,
-> > +     FCT_HIGHER_SAFE,
-> > +     FCT_HIGHER_OR_ZERO_SAFE,
-> > +     FCT_EXACT,
-> > +     FCT_EXACT_OR_ZERO_SAFE,
-> > +     FCT_IGNORE,     /* Don't check (any value is fine) */
-> > +};
-> > +
-> > +static int arm64_check_feature_one(enum feature_check_type type, int val,
-> > +                                int limit)
-> > +{
-> > +     bool is_safe = false;
-> > +
-> > +     if (val == limit)
-> > +             return 0;
-> > +
-> > +     switch (type) {
-> > +     case FCT_LOWER_SAFE:
-> > +             is_safe = (val <= limit);
-> > +             break;
-> > +     case FCT_HIGHER_OR_ZERO_SAFE:
-> > +             if (val == 0) {
-> > +                     is_safe = true;
-> > +                     break;
-> > +             }
-> > +             fallthrough;
-> > +     case FCT_HIGHER_SAFE:
-> > +             is_safe = (val >= limit);
-> > +             break;
-> > +     case FCT_EXACT:
-> > +             break;
-> > +     case FCT_EXACT_OR_ZERO_SAFE:
-> > +             is_safe = (val == 0);
-> > +             break;
-> > +     case FCT_IGNORE:
-> > +             is_safe = true;
-> > +             break;
-> > +     default:
-> > +             WARN_ONCE(1, "Unexpected feature_check_type (%d)\n", type);
-> > +             break;
-> > +     }
-> > +
-> > +     return is_safe ? 0 : -1;
-> > +}
-> > +
-> > +#define      FCT_TYPE_MASK           0x7
-> > +#define      FCT_TYPE_SHIFT          1
-> > +#define      FCT_SIGN_MASK           0x1
-> > +#define      FCT_SIGN_SHIFT          0
-> > +#define      FCT_TYPE(val)   ((val >> FCT_TYPE_SHIFT) & FCT_TYPE_MASK)
-> > +#define      FCT_SIGN(val)   ((val >> FCT_SIGN_SHIFT) & FCT_SIGN_MASK)
-> > +
-> > +#define      MAKE_FCT(shift, type, sign)                             \
-> > +     ((u64)((((type) & FCT_TYPE_MASK) << FCT_TYPE_SHIFT) |   \
-> > +            (((sign) & FCT_SIGN_MASK) << FCT_SIGN_SHIFT)) << (shift))
-> > +
-> > +/* For signed field */
-> > +#define      S_FCT(shift, type)      MAKE_FCT(shift, type, 1)
-> > +/* For unigned field */
-> > +#define      U_FCT(shift, type)      MAKE_FCT(shift, type, 0)
-> > +
-> > +/*
-> > + * @val and @lim are both a value of the ID register. The function checks
-> > + * if all features indicated in @val can be supported for guests on the host,
-> > + * which supports features indicated in @lim. @check_types indicates how
-> > + * features in the ID register needs to be checked.
-> > + * See comments for id_reg_info's ftr_check_types field for more detail.
-> > + */
-> > +static int arm64_check_features(u64 check_types, u64 val, u64 lim)
-> > +{
-> > +     int i;
-> > +
-> > +     for (i = 0; i < 64; i += ARM64_FEATURE_FIELD_BITS) {
-> > +             u8 ftr_check = (check_types >> i) & ARM64_FEATURE_FIELD_MASK;
-> > +             bool is_sign = FCT_SIGN(ftr_check);
-> > +             enum feature_check_type fctype = FCT_TYPE(ftr_check);
-> > +             int fval, flim, ret;
-> > +
-> > +             fval = cpuid_feature_extract_field(val, i, is_sign);
-> > +             flim = cpuid_feature_extract_field(lim, i, is_sign);
-> > +
-> > +             ret = arm64_check_feature_one(fctype, fval, flim);
-> > +             if (ret)
-> > +                     return -E2BIG;
-> nit: -EINVAL may be better because depending on the check type this may
-> not mean too big.
-
-Yes, that is correct.
-
-This error case means that userspace tried to configure features
-or a higher level of features that were not supported on the host.
-In that sense, I chose -E2BIG.
-
-I wanted to use an error code specific to this particular case, which
-I think makes debugging userspace issue easier when KVM_SET_ONE_REG
-fails, and I couldn't find other error codes that fit this case better.
-So, I'm trying to avoid using -EINVAL, which is used for other failure
-cases.
-
-If you have any other suggested error code for this,
-that would be very helpful:)
-
-Thanks,
-Reiji
+> On 20/11/21 1:36 am, Sean Christopherson wrote:
+>> On Sat, Nov 20, 2021, Shivam Kumar wrote:
+>>> On 18/11/21 11:27 pm, Sean Christopherson wrote:
+>>>>> +        return -EINVAL;
+>>>> Probably more idiomatic to return 0 if the desired value is the 
+>>>> current value.
+>>> Keeping the case in mind when the userspace is trying to enable it 
+>>> while the
+>>> migration is already going on(which shouldn't happen), we are returning
+>>> -EINVAL. Please let me know if 0 still makes more sense.
+>> If the semantics are not "enable/disable", but rather "(re)set the 
+>> quota",
+>> then it makes sense to allow changing the quota arbitrarily.
+> I agree that the semantics are not apt. Will modify it. Thanks.
+>>
+>>>>> +    mutex_lock(&kvm->lock);
+>>>>> +    kvm->dirty_quota_migration_enabled = enabled;
+>>>> Needs to check vCPU creation.
+>>> In our current implementation, we are using the
+>>> KVM_CAP_DIRTY_QUOTA_MIGRATION ioctl to start dirty logging (through 
+>>> dirty
+>>> counter) on the kernel side. This ioctl is called each time a new 
+>>> migration
+>>> starts and ends.
+>> Ah, and from the cover letter discussion, you want the count and 
+>> quota to be
+>> reset when a new migration occurs.  That makes sense.
+>>
+>> Actually, if we go the route of using kvm_run to report and update 
+>> the count/quota,
+>> we don't even need a capability.  Userspace can signal each vCPU to 
+>> induce an exit
+>> to userspace, e.g. at the start of migration, then set the desired 
+>> quota/count in
+>> vcpu->kvm_run and stuff exit_reason so that KVM updates the 
+>> quota/count on the
+>> subsequent KVM_RUN.  No locking or requests needed, and userspace can 
+>> reset the
+>> count at will, it just requires a signal.
+>>
+>> It's a little weird to overload exit_reason like that, but if that's 
+>> a sticking
+>> point we could add a flag in kvm_run somewhere.  Requiring an exit to 
+>> userspace
+>> at the start of migration doesn't seem too onerous.
+> Yes, this path looks flaw-free. We will explore the complexity and how 
+> we can simplify its implementation.
+Is it okay to define the per-vcpu dirty quota and dirty count in the 
+kvm_run structure itself? It can save space and reduce the complexity of 
+the implemenation by large margin.
