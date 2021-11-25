@@ -2,38 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EBC0B45E195
-	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 21:30:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 339FC45E189
+	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 21:27:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356915AbhKYUdj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Nov 2021 15:33:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53512 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244587AbhKYUbi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Nov 2021 15:31:38 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C24FC061759;
-        Thu, 25 Nov 2021 12:24:54 -0800 (PST)
+        id S1357003AbhKYUan (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Nov 2021 15:30:43 -0500
+Received: from Galois.linutronix.de ([193.142.43.55]:54562 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243229AbhKYU2l (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Nov 2021 15:28:41 -0500
 From:   Thomas Gleixner <tglx@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1637871892;
+        s=2020; t=1637871929;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=7Pow8ZvIwto7WGV9kVhPczJYtDBpiQ5V4PVYGLMe0Ss=;
-        b=VMXOt4UStl3V8dSj6uFxjc5Co+bpM+ITkdzXe+35Mvgi2ia3/VcE4HLv3GZ7lB6Xxj95cO
-        snPUv3fF7ZM7IXP2D6BZfbHgvU+PM3Vw/7CBc9uCbvqnak715cbdElAENuZmxHOF8agP65
-        Rn1bUXrc9VjuFYt0IbO1WKUjTjPtmOsERMGd74IDMwpCupzUw+CX0STx72IP6BS9mQsWaP
-        TMOLih4LxKgM8YqRblX8Q06TrnYfePKexqyYTZUvES/3/Vt99lYVrXEUtKeiEon63aa+/w
-        ngTMttGGEcfVZ+vUYayhLCdGq8EkmPCnuor4NFf3/NCYed4be24UjOGD0HbOQw==
+        bh=ACrtMgpepSAq8VWqDAegilqf67iQGYiLFW/hlfps1pI=;
+        b=mOfTM+Q4Y5of4UvJ1c2IXOsXhYVnhdDK7TNCXC45vaCYpL8UNR/b0UkbJ7Mswmn3O26ZPH
+        ygq4sK9A8dyK5gMvP1LW7JgARdrSPtUkOk/b1U7NngmDztYKb4ChiYBdXtuO5j3h6kj/Tr
+        ltXHawLVk9yihl3GgX+UxTB321Qz8WTQlsk2/cWZkAR+d+kycDZHvRck0HW+3h96i/oOEg
+        QLJLU/NlUbUP7Z/Ivw72ZRxDJCL1JeKqKra4t5/TH6euFPlHGQJbdbIqGZvlL0WfbQVTPu
+        4AwLwdONdXr5tfhqpkmIypJPQQLnG0/9WfCD7bN9I3TgrG9WDrOGdzkzddE22Q==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1637871892;
+        s=2020e; t=1637871929;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=7Pow8ZvIwto7WGV9kVhPczJYtDBpiQ5V4PVYGLMe0Ss=;
-        b=PUdUfjMZRwsTtAj6X0/r1fGLZEJ2y3YjXZ2wl/qB9uOgjnkr+8LccX1teirglLHAX8XMr1
-        MpJbR0PU88vzVeDw==
+        bh=ACrtMgpepSAq8VWqDAegilqf67iQGYiLFW/hlfps1pI=;
+        b=wZBIGhzFyv6XWRQX9ayXsoD/S5GFBOhHxlvGnrdf6u81XXWHOuVN42tQ5mOo1qwL3s1LSr
+        7KbIyUnhRI6y5zBw==
 To:     isaku.yamahata@intel.com, Ingo Molnar <mingo@redhat.com>,
         Borislav Petkov <bp@alien8.de>,
         "H . Peter Anvin" <hpa@zytor.com>,
@@ -47,13 +44,13 @@ To:     isaku.yamahata@intel.com, Ingo Molnar <mingo@redhat.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: Re: [RFC PATCH v3 49/59] KVM: VMX: Add macro framework to
- read/write VMCS for VMs and TDs
-In-Reply-To: <87a52a66a43bf05ccb8ef3ebd1f93bd00e7b07c4.1637799475.git.isaku.yamahata@intel.com>
+Subject: Re: [RFC PATCH v3 51/59] KVM: VMX: MOVE GDT and IDT accessors to
+ common code
+In-Reply-To: <a83e5fb3ef9fbffd3968895bab6f42bf780dbacd.1637799475.git.isaku.yamahata@intel.com>
 References: <cover.1637799475.git.isaku.yamahata@intel.com>
- <87a52a66a43bf05ccb8ef3ebd1f93bd00e7b07c4.1637799475.git.isaku.yamahata@intel.com>
-Date:   Thu, 25 Nov 2021 21:24:52 +0100
-Message-ID: <87h7c0htkb.ffs@tglx>
+ <a83e5fb3ef9fbffd3968895bab6f42bf780dbacd.1637799475.git.isaku.yamahata@intel.com>
+Date:   Thu, 25 Nov 2021 21:25:28 +0100
+Message-ID: <87ee74htjb.ffs@tglx>
 MIME-Version: 1.0
 Content-Type: text/plain
 Precedence: bulk
@@ -61,40 +58,7 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Wed, Nov 24 2021 at 16:20, isaku yamahata wrote:
-
 > From: Sean Christopherson <sean.j.christopherson@intel.com>
->
-> Add a macro framework to hide VMX vs. TDX details of VMREAD and VMWRITE
-> so the VMX and TDX can shared common flows, e.g. accessing DTs.
 
-s/shared/share/
+Again: Why?
 
-> Note, the TDX paths are dead code at this time.  There is no great way
-> to deal with the chicken-and-egg scenario of having things in place for
-> TDX without first having TDX.
-
-That's more than obvious and the whole point of building infrastructure
-in the first place, isn't it?
-
-> +#ifdef CONFIG_INTEL_TDX_HOST
-> +#define VT_BUILD_VMCS_HELPERS(type, bits, tdbits)			   \
-> +static __always_inline type vmread##bits(struct kvm_vcpu *vcpu,		   \
-> +					 unsigned long field)		   \
-> +{									   \
-> +	if (unlikely(is_td_vcpu(vcpu))) {				   \
-> +		if (KVM_BUG_ON(!is_debug_td(vcpu), vcpu->kvm))		   \
-> +			return 0;					   \
-> +		return td_vmcs_read##tdbits(to_tdx(vcpu), field);	   \
-> +	}								   \
-> +	return vmcs_read##bits(field);					   \
-> +}									   \
-
-New lines exist for a reason to visually separate things and are even
-possible in macro blocks. This includes the defines.
-
-Aside of that is there any reason why the end of the macro block has to
-be 3 spaces instead of a tab?
-
-Thanks,
-
-        tglx
