@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4333C45D2CD
-	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 03:01:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5DBD645D2CF
+	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 03:01:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353653AbhKYCFE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Nov 2021 21:05:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35624 "EHLO
+        id S1347838AbhKYCFF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Nov 2021 21:05:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353462AbhKYCDC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1353464AbhKYCDC (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 24 Nov 2021 21:03:02 -0500
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81387C0619EC
-        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 17:30:00 -0800 (PST)
-Received: by mail-pl1-x649.google.com with SMTP id v18-20020a170902e8d200b00141df2da949so1514904plg.10
-        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 17:30:00 -0800 (PST)
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 259FBC0619ED
+        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 17:30:02 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id mn13-20020a17090b188d00b001a64f277c1eso3884603pjb.2
+        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 17:30:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=vAe3I3R0ljUR1SuEkrtojHDrAkJO+GvXbKGWe5WLhco=;
-        b=H0p7LYpDpX/XgKSR+tGFXUjjZIVA9CedsLxx3A1s4ZNX269AexuKy7aIHeFmnmYI7K
-         cyLNiHU1ZQBEld1cfZJbKXE9L2ni6YL2LtvVZmvRu0LExiD7zaXhGtlXjLzhOHw1n8Kk
-         x52XAf+f3Yeaf3YJwYsnhRWhVo5Xgqd5kd8WHYPnuKM6UVe2kwFUIv8YZ7fOXzVpyPrC
-         SGb1UHrR/R3g3kg5Qv3oLCJ25ujrJvW7K/aT+j1Fy1tqy+RiWBLP2kg8K6XmylRgVPoh
-         mNfgEk2W+QjSXRn9axM9l72cUsdLbk50Vb5SZRQSFgMh/7Ou+k2qvrowO6pb58SDf4/h
-         7cRw==
+        bh=hNIMol95TlBJFRh2G21KJT1228y59kbdDegrV8nCH8w=;
+        b=eUOU0gcnhgMS9S0jytJVjeJLwXALsKN3z45InbabzFJh1+rn0VXaRVKf9AkUZxBlKW
+         rmjBi0mmK503oFyH1UDbUX+ElSy0yIrstE2kdVohlg7Q+DFPWW/QRHapWrzXcGrn3wp8
+         mSwkNIUTCOTVVmJDIQygkuD6D3S8nUQgr0ahXbnJEGxN52jAHNrArGSvGlJbuuvTJgYh
+         bLbx9Q38kX0nB662zDjQ8UDZdBYL2h0e7DXwblWxuHNiPdZ3V2Po6bQeK4ixDjim//Fe
+         czD/1eOfVa+69cxe2MopxvXLcdOguSbyyhgYnk5SFAFu0XI3TOr6aNBZkZT6zdN/bxGo
+         b7Kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=vAe3I3R0ljUR1SuEkrtojHDrAkJO+GvXbKGWe5WLhco=;
-        b=43s6sg1PkomPhkz8I4cigFx3TC9kx9nkLVs0/WpvhsGxKDj6fjCsZUH8guR466mbAw
-         pEOUBEYTKT2F2oan0pzyFFdEht9obhMVrmgSEZlAb0FYM4WuKAW0gLvK/91T7aRMF6bj
-         xHBsHEipk1dfO/nznrCv8eTHQNuJXW2rxxGKDPPjJZHxpjABfcgnDS6HuX3whjp3OZbF
-         5ku1bxWiJVXp2T+u9Jai82eHz7sCD/FkRvQ6gzRlMazHXuUgkQK8RmvVyxqCP8tCs4kU
-         z/DOx1q09ksPRkj+J7lMsbIp9yhifAGCk/9ZbOuMiBYSh3vTtUVVgwakl2xFF5+xllcR
-         XMPw==
-X-Gm-Message-State: AOAM5318uB8iGg7li6xR4qslCiXkN5HLWEMT4vLcExHBj8AcK7e52dkf
-        3G6gf8p9uN08dYVURT6TrCluptKY8t8=
-X-Google-Smtp-Source: ABdhPJyJe32hRL31KJ4BKK2yM/Viv1YZz++NRJURxNinJGobF4GZmWhDNsJRBk7Mv4lqflixVSME44gzAJo=
+        bh=hNIMol95TlBJFRh2G21KJT1228y59kbdDegrV8nCH8w=;
+        b=4Q819Z77RW8gXJoEKzPdKzg/JF7F/DxZ9NIuzCtnN6GwF7SI5w1iBqjDOK3fdROJ01
+         yRAIOvpWD7XnRDRMqHHnThfAm8fh9RjMR1lVoYXter7oRSIIMyGY6xlcfxEUs3zOJ6Tw
+         i76U4a3ZCymQsJlv/LnEtASe3etjciXqTCVxLTszr8cb+eU1MshP9nHmY5mjNpYnemQ6
+         FqMFOQRohPrV/iAVQWUYpZfnX4wEtleiAvBua3IAxooSxTeFB1wwDGoNr9nE2U0xMYzw
+         1PtEzfjKm/3SUp1XDR9qaXyrjSr8fW1hocxJxMcAFkX6tE9DtnRvCOA7RQhFVartzO33
+         aMKA==
+X-Gm-Message-State: AOAM5327YbkdObawPRR2BMNWjx+aChPDKZF7mNFn1WiJpcFiz4LNO1Cc
+        0Ayc+gGeS65iecdzOgr9jwpTW+qay2g=
+X-Google-Smtp-Source: ABdhPJxlO11QD16RFdkfgfwbTiX0J0rRPe6VF7uqEPW4zm8pMOW19BvRfjXsKIFiznOV4OGWtbUxPDtQ3IY=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:902:b411:b0:143:6fe8:c60e with SMTP id
- x17-20020a170902b41100b001436fe8c60emr25001890plr.41.1637803800060; Wed, 24
- Nov 2021 17:30:00 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:902:db01:b0:141:ea12:2176 with SMTP id
+ m1-20020a170902db0100b00141ea122176mr25416019plx.44.1637803801694; Wed, 24
+ Nov 2021 17:30:01 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 25 Nov 2021 01:28:55 +0000
+Date:   Thu, 25 Nov 2021 01:28:56 +0000
 In-Reply-To: <20211125012857.508243-1-seanjc@google.com>
-Message-Id: <20211125012857.508243-38-seanjc@google.com>
+Message-Id: <20211125012857.508243-39-seanjc@google.com>
 Mime-Version: 1.0
 References: <20211125012857.508243-1-seanjc@google.com>
 X-Mailer: git-send-email 2.34.0.rc2.393.gf8c9666880-goog
-Subject: [kvm-unit-tests PATCH 37/39] nVMX: Rename awful "ctrl" booleans to "is_ctrl_valid"
+Subject: [kvm-unit-tests PATCH 38/39] nVMX: Add helper to check if VPID is supported
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
@@ -61,79 +61,56 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Rename ctrl to is_ctrl_valid in several tests.  The variables are bools
-that, *** drum roll ***, track if a control setting is valid.
+Add a helper to check for VPID support to deduplicate code, now and in
+the future.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- x86/vmx_tests.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ x86/vmx.h       | 6 ++++++
+ x86/vmx_tests.c | 6 ++----
+ 2 files changed, 8 insertions(+), 4 deletions(-)
 
+diff --git a/x86/vmx.h b/x86/vmx.h
+index 401715c..4423986 100644
+--- a/x86/vmx.h
++++ b/x86/vmx.h
+@@ -844,6 +844,12 @@ static inline bool is_invept_type_supported(u64 type)
+ 	return ept_vpid.val & (EPT_CAP_INVEPT_SINGLE << (type - INVEPT_SINGLE));
+ }
+ 
++static inline bool is_vpid_supported(void)
++{
++	return (ctrl_cpu_rev[0].clr & CPU_SECONDARY) &&
++	       (ctrl_cpu_rev[1].clr & CPU_VPID);
++}
++
+ static inline bool is_invvpid_supported(void)
+ {
+ 	return ept_vpid.val & VPID_CAP_INVVPID;
 diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
-index bdf541b..316105b 100644
+index 316105b..172d385 100644
 --- a/x86/vmx_tests.c
 +++ b/x86/vmx_tests.c
-@@ -3819,7 +3819,7 @@ static void test_apic_virtual_ctls(void)
- 	u32 saved_secondary = vmcs_read(CPU_EXEC_CTRL1);
- 	u32 primary = saved_primary;
- 	u32 secondary = saved_secondary;
--	bool ctrl = false;
-+	bool is_ctrl_valid = false;
- 	char str[10] = "disabled";
- 	u8 i = 0, j;
+@@ -3304,8 +3304,7 @@ static void invvpid_test(void)
+ 	unsigned types = 0;
+ 	unsigned type;
  
-@@ -3838,18 +3838,18 @@ static void test_apic_virtual_ctls(void)
- 		for (j = 1; j < 8; j++) {
- 			secondary &= ~(CPU_VIRT_X2APIC | CPU_APIC_REG_VIRT | CPU_VINTD);
- 			if (primary & CPU_TPR_SHADOW) {
--				ctrl = true;
-+				is_ctrl_valid = true;
- 			} else {
- 				if (! set_bit_pattern(j, &secondary))
--					ctrl = true;
-+					is_ctrl_valid = true;
- 				else
--					ctrl = false;
-+					is_ctrl_valid = false;
- 			}
+-	if (!(ctrl_cpu_rev[0].clr & CPU_SECONDARY) ||
+-	    !(ctrl_cpu_rev[1].clr & CPU_VPID))
++	if (!is_vpid_supported())
+ 		test_skip("VPID not supported");
  
- 			vmcs_write(CPU_EXEC_CTRL1, secondary);
- 			report_prefix_pushf("Use TPR shadow %s, virtualize x2APIC mode %s, APIC-register virtualization %s, virtual-interrupt delivery %s",
- 				str, (secondary & CPU_VIRT_X2APIC) ? "enabled" : "disabled", (secondary & CPU_APIC_REG_VIRT) ? "enabled" : "disabled", (secondary & CPU_VINTD) ? "enabled" : "disabled");
--			if (ctrl)
-+			if (is_ctrl_valid)
- 				test_vmx_valid_controls();
- 			else
- 				test_vmx_invalid_controls();
-@@ -3946,11 +3946,11 @@ static void test_virtual_intr_ctls(void)
- 	vmcs_write(PIN_CONTROLS, saved_pin);
- }
+ 	if (!is_invvpid_supported())
+@@ -4099,8 +4098,7 @@ static void test_vpid(void)
+ 	u16 vpid = 0x0000;
+ 	int i;
  
--static void test_pi_desc_addr(u64 addr, bool ctrl)
-+static void test_pi_desc_addr(u64 addr, bool is_ctrl_valid)
- {
- 	vmcs_write(POSTED_INTR_DESC_ADDR, addr);
- 	report_prefix_pushf("Process-posted-interrupts enabled; posted-interrupt-descriptor-address 0x%lx", addr);
--	if (ctrl)
-+	if (is_ctrl_valid)
- 		test_vmx_valid_controls();
- 	else
- 		test_vmx_invalid_controls();
-@@ -4674,12 +4674,12 @@ done:
- 	vmcs_write(PIN_CONTROLS, pin_ctrls);
- }
- 
--static void test_eptp_ad_bit(u64 eptp, bool ctrl)
-+static void test_eptp_ad_bit(u64 eptp, bool is_ctrl_valid)
- {
- 	vmcs_write(EPTP, eptp);
- 	report_prefix_pushf("Enable-EPT enabled; EPT accessed and dirty flag %s",
- 	    (eptp & EPTP_AD_FLAG) ? "1": "0");
--	if (ctrl)
-+	if (is_ctrl_valid)
- 		test_vmx_valid_controls();
- 	else
- 		test_vmx_invalid_controls();
+-	if (!((ctrl_cpu_rev[0].clr & CPU_SECONDARY) &&
+-	    (ctrl_cpu_rev[1].clr & CPU_VPID))) {
++	if (!is_vpid_supported()) {
+ 		printf("Secondary controls and/or VPID not supported\n");
+ 		return;
+ 	}
 -- 
 2.34.0.rc2.393.gf8c9666880-goog
 
