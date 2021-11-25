@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 176C945D1DD
-	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 01:24:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9605E45D1E4
+	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 01:24:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244448AbhKYA02 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Nov 2021 19:26:28 -0500
-Received: from mga12.intel.com ([192.55.52.136]:16278 "EHLO mga12.intel.com"
+        id S1353226AbhKYA0y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Nov 2021 19:26:54 -0500
+Received: from mga12.intel.com ([192.55.52.136]:16285 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1353187AbhKYAYv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Nov 2021 19:24:51 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10178"; a="215432283"
+        id S1351197AbhKYAYx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Nov 2021 19:24:53 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10178"; a="215432288"
 X-IronPort-AV: E=Sophos;i="5.87,261,1631602800"; 
-   d="scan'208";a="215432283"
+   d="scan'208";a="215432288"
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
   by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 16:21:30 -0800
 X-IronPort-AV: E=Sophos;i="5.87,261,1631602800"; 
-   d="scan'208";a="675042428"
+   d="scan'208";a="675042433"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 16:21:29 -0800
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 16:21:30 -0800
 From:   isaku.yamahata@intel.com
 To:     Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
@@ -33,9 +33,9 @@ To:     Thomas Gleixner <tglx@linutronix.de>,
         Sean Christopherson <seanjc@google.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com
-Subject: [RFC PATCH v3 58/59] KVM: TDX: exit to user space on GET_QUOTE, SETUP_EVENT_NOTIFY_INTERRUPT
-Date:   Wed, 24 Nov 2021 16:20:41 -0800
-Message-Id: <4078d2cec2ca3fa4dd7d07f3fb9401a996c53b78.1637799475.git.isaku.yamahata@intel.com>
+Subject: [RFC PATCH v3 59/59] Documentation/virtual/kvm: Add Trust Domain Extensions(TDX)
+Date:   Wed, 24 Nov 2021 16:20:42 -0800
+Message-Id: <76efd2ff089115c9ebccc77bf8b910083e737772.1637799475.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1637799475.git.isaku.yamahata@intel.com>
 References: <cover.1637799475.git.isaku.yamahata@intel.com>
@@ -47,250 +47,414 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-GET_QUOTE, SETUP_EVENT_NOTIFY_INTERRUPT TDG.VP.VMCALL requires user space
-to handle them on behalf of kvm kernel module.
-
-Introduce new kvm exit, KVM_EXIT_TDX, and when GET_QUOTE and
-SETUP_EVENT_NOTIFY_INTERRUPT is called by TD guest, transfer the execution
-to user space as KVM exit to the user space.  TDG_VP_VMCALL_INVALID_OPERAND
-is set as default return value to avoid random value. User space should
-update R10 if necessary.
+Add a documentation to Intel Trusted Docmain Extensions(TDX) support.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/vmx/tdx.c   | 113 +++++++++++++++++++++++++++++++++++++++
- include/uapi/linux/kvm.h |  57 ++++++++++++++++++++
- 2 files changed, 170 insertions(+)
+ Documentation/virt/kvm/api.rst       |   9 +-
+ Documentation/virt/kvm/intel-tdx.rst | 359 +++++++++++++++++++++++++++
+ 2 files changed, 367 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/virt/kvm/intel-tdx.rst
 
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 53fc01f3bab1..a87db46477cc 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -152,6 +152,18 @@ BUILD_TDVMCALL_ACCESSORS(p2, r13);
- BUILD_TDVMCALL_ACCESSORS(p3, r14);
- BUILD_TDVMCALL_ACCESSORS(p4, r15);
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index aeeb071c7688..72341707d98f 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -1366,6 +1366,9 @@ It is recommended to use this API instead of the KVM_SET_MEMORY_REGION ioctl.
+ The KVM_SET_MEMORY_REGION does not allow fine grained control over memory
+ allocation and is deprecated.
  
-+#define TDX_VMCALL_REG_MASK_RBX	BIT_ULL(2)
-+#define TDX_VMCALL_REG_MASK_RDX	BIT_ULL(3)
-+#define TDX_VMCALL_REG_MASK_RBP	BIT_ULL(5)
-+#define TDX_VMCALL_REG_MASK_RSI	BIT_ULL(6)
-+#define TDX_VMCALL_REG_MASK_RDI	BIT_ULL(7)
-+#define TDX_VMCALL_REG_MASK_R8	BIT_ULL(8)
-+#define TDX_VMCALL_REG_MASK_R9	BIT_ULL(9)
-+#define TDX_VMCALL_REG_MASK_R12	BIT_ULL(12)
-+#define TDX_VMCALL_REG_MASK_R13	BIT_ULL(13)
-+#define TDX_VMCALL_REG_MASK_R14	BIT_ULL(14)
-+#define TDX_VMCALL_REG_MASK_R15	BIT_ULL(15)
++For TDX guest, deleting/moving memory region loses guest memory contents.
++Read only region isn't supported.  Only as-id 0 is supported.
 +
- static __always_inline unsigned long tdvmcall_exit_type(struct kvm_vcpu *vcpu)
- {
- 	return kvm_r10_read(vcpu);
-@@ -1122,6 +1134,91 @@ static int tdx_map_gpa(struct kvm_vcpu *vcpu)
- 	return 1;
- }
  
-+static int tdx_complete_vp_vmcall(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_tdx_vmcall *tdx_vmcall = &vcpu->run->tdx.u.vmcall;
-+	__u64 reg_mask;
-+
-+	tdvmcall_set_return_code(vcpu, tdx_vmcall->status_code);
-+	tdvmcall_set_return_val(vcpu, tdx_vmcall->out_r11);
-+
-+	reg_mask = kvm_rcx_read(vcpu);
-+	if (reg_mask & TDX_VMCALL_REG_MASK_R12)
-+		kvm_r12_write(vcpu, tdx_vmcall->out_r12);
-+	if (reg_mask & TDX_VMCALL_REG_MASK_R13)
-+		kvm_r13_write(vcpu, tdx_vmcall->out_r13);
-+	if (reg_mask & TDX_VMCALL_REG_MASK_R14)
-+		kvm_r14_write(vcpu, tdx_vmcall->out_r14);
-+	if (reg_mask & TDX_VMCALL_REG_MASK_R15)
-+		kvm_r15_write(vcpu, tdx_vmcall->out_r15);
-+	if (reg_mask & TDX_VMCALL_REG_MASK_RBX)
-+		kvm_rbx_write(vcpu, tdx_vmcall->out_rbx);
-+	if (reg_mask & TDX_VMCALL_REG_MASK_RDI)
-+		kvm_rdi_write(vcpu, tdx_vmcall->out_rdi);
-+	if (reg_mask & TDX_VMCALL_REG_MASK_RSI)
-+		kvm_rsi_write(vcpu, tdx_vmcall->out_rsi);
-+	if (reg_mask & TDX_VMCALL_REG_MASK_R8)
-+		kvm_r8_write(vcpu, tdx_vmcall->out_r8);
-+	if (reg_mask & TDX_VMCALL_REG_MASK_R9)
-+		kvm_r9_write(vcpu, tdx_vmcall->out_r9);
-+	if (reg_mask & TDX_VMCALL_REG_MASK_RDX)
-+		kvm_rdx_write(vcpu, tdx_vmcall->out_rdx);
-+
-+	return 1;
-+}
-+
-+static int tdx_vp_vmcall_to_user(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_tdx_vmcall *tdx_vmcall = &vcpu->run->tdx.u.vmcall;
-+	__u64 reg_mask;
-+
-+	vcpu->arch.complete_userspace_io = tdx_complete_vp_vmcall;
-+	memset(tdx_vmcall, 0, sizeof(*tdx_vmcall));
-+
-+	vcpu->run->exit_reason = KVM_EXIT_TDX;
-+	vcpu->run->tdx.type = KVM_EXIT_TDX_VMCALL;
-+	tdx_vmcall->type = tdvmcall_exit_type(vcpu);
-+	tdx_vmcall->subfunction = tdvmcall_exit_reason(vcpu);
-+
-+	reg_mask = kvm_rcx_read(vcpu);
-+	tdx_vmcall->reg_mask = reg_mask;
-+	if (reg_mask & TDX_VMCALL_REG_MASK_R12)
-+		tdx_vmcall->in_r12 = kvm_r12_read(vcpu);
-+	if (reg_mask & TDX_VMCALL_REG_MASK_R13)
-+		tdx_vmcall->in_r13 = kvm_r13_read(vcpu);
-+	if (reg_mask & TDX_VMCALL_REG_MASK_R14)
-+		tdx_vmcall->in_r14 = kvm_r14_read(vcpu);
-+	if (reg_mask & TDX_VMCALL_REG_MASK_R15)
-+		tdx_vmcall->in_r15 = kvm_r15_read(vcpu);
-+	if (reg_mask & TDX_VMCALL_REG_MASK_RBX)
-+		tdx_vmcall->in_rbx = kvm_rbx_read(vcpu);
-+	if (reg_mask & TDX_VMCALL_REG_MASK_RDI)
-+		tdx_vmcall->in_rdi = kvm_rdi_read(vcpu);
-+	if (reg_mask & TDX_VMCALL_REG_MASK_RSI)
-+		tdx_vmcall->in_rsi = kvm_rsi_read(vcpu);
-+	if (reg_mask & TDX_VMCALL_REG_MASK_R8)
-+		tdx_vmcall->in_r8 = kvm_r8_read(vcpu);
-+	if (reg_mask & TDX_VMCALL_REG_MASK_R9)
-+		tdx_vmcall->in_r9 = kvm_r9_read(vcpu);
-+	if (reg_mask & TDX_VMCALL_REG_MASK_RDX)
-+		tdx_vmcall->in_rdx = kvm_rdx_read(vcpu);
-+
-+	/* notify userspace to handle the request */
-+	return 0;
-+}
-+
-+static int tdx_get_quote(struct kvm_vcpu *vcpu)
-+{
-+	gpa_t gpa = tdvmcall_p1_read(vcpu);
-+
-+	if (!IS_ALIGNED(gpa, PAGE_SIZE)) {
-+		tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_INVALID_OPERAND);
-+		return 1;
-+	}
-+
-+	return tdx_vp_vmcall_to_user(vcpu);
-+}
-+
- static int tdx_report_fatal_error(struct kvm_vcpu *vcpu)
- {
- 	vcpu->run->exit_reason = KVM_EXIT_SYSTEM_EVENT;
-@@ -1130,6 +1227,18 @@ static int tdx_report_fatal_error(struct kvm_vcpu *vcpu)
- 	return 0;
- }
+ 4.36 KVM_SET_TSS_ADDR
+ ---------------------
+@@ -4489,7 +4492,7 @@ H_GET_CPU_CHARACTERISTICS hypercall.
  
-+static int tdx_setup_event_notify_interrupt(struct kvm_vcpu *vcpu)
-+{
-+	u64 vector = tdvmcall_p1_read(vcpu);
-+
-+	if (!(vector >= 32 && vector <= 255)) {
-+		tdvmcall_set_return_code(vcpu, TDG_VP_VMCALL_INVALID_OPERAND);
-+		return 1;
-+	}
-+
-+	return tdx_vp_vmcall_to_user(vcpu);
-+}
-+
- static int handle_tdvmcall(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_tdx *tdx = to_tdx(vcpu);
-@@ -1158,8 +1267,12 @@ static int handle_tdvmcall(struct kvm_vcpu *vcpu)
- 		return tdx_emulate_mmio(vcpu);
- 	case TDG_VP_VMCALL_MAP_GPA:
- 		return tdx_map_gpa(vcpu);
-+	case TDG_VP_VMCALL_GET_QUOTE:
-+		return tdx_get_quote(vcpu);
- 	case TDG_VP_VMCALL_REPORT_FATAL_ERROR:
- 		return tdx_report_fatal_error(vcpu);
-+	case TDG_VP_VMCALL_SETUP_EVENT_NOTIFY_INTERRUPT:
-+		return tdx_setup_event_notify_interrupt(vcpu);
- 	default:
- 		break;
- 	}
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index bb49e095867e..6d036b3ccd25 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -231,6 +231,60 @@ struct kvm_xen_exit {
- 	} u;
- };
+ :Capability: basic
+ :Architectures: x86
+-:Type: vm
++:Type: vm ioctl, vcpu ioctl
+ :Parameters: an opaque platform specific structure (in/out)
+ :Returns: 0 on success; -1 on error
  
-+struct kvm_tdx_exit {
-+#define KVM_EXIT_TDX_VMCALL	1
-+	__u32 type;
-+	__u32 pad;
-+
-+	union {
-+		struct kvm_tdx_vmcall {
-+			/*
-+			 * Guest-Host-Communication Interface for TDX spec
-+			 * defines the ABI for TDG.VP.VMCALL.
-+			 */
-+
-+			/* Input parameters: guest -> VMM */
-+			__u64 type;		/* r10 */
-+			__u64 subfunction;	/* r11 */
-+			__u64 reg_mask;		/* rcx */
-+			/*
-+			 * Subfunction specific.
-+			 * Registers are used in this order to pass input
-+			 * arguments.  r12=arg0, r13=arg1, etc.
-+			 */
-+			__u64 in_r12;
-+			__u64 in_r13;
-+			__u64 in_r14;
-+			__u64 in_r15;
-+			__u64 in_rbx;
-+			__u64 in_rdi;
-+			__u64 in_rsi;
-+			__u64 in_r8;
-+			__u64 in_r9;
-+			__u64 in_rdx;
-+
-+			/* Output parameters: VMM -> guest */
-+			__u64 status_code;	/* r10 */
-+			/*
-+			 * Subfunction specific.
-+			 * Registers are used in this order to output return
-+			 * values.  r11=ret0, r12=ret1, etc.
-+			 */
-+			__u64 out_r11;
-+			__u64 out_r12;
-+			__u64 out_r13;
-+			__u64 out_r14;
-+			__u64 out_r15;
-+			__u64 out_rbx;
-+			__u64 out_rdi;
-+			__u64 out_rsi;
-+			__u64 out_r8;
-+			__u64 out_r9;
-+			__u64 out_rdx;
-+		} vmcall;
-+	} u;
-+};
-+
- #define KVM_S390_GET_SKEYS_NONE   1
- #define KVM_S390_SKEYS_MAX        1048576
+@@ -4501,6 +4504,10 @@ Currently, this ioctl is used for issuing Secure Encrypted Virtualization
+ (SEV) commands on AMD Processors. The SEV commands are defined in
+ Documentation/virt/kvm/amd-memory-encryption.rst.
  
-@@ -270,6 +324,7 @@ struct kvm_xen_exit {
- #define KVM_EXIT_X86_BUS_LOCK     33
- #define KVM_EXIT_XEN              34
- #define KVM_EXIT_RISCV_SBI        35
-+#define KVM_EXIT_TDX              50	/* dump number to avoid conflict. */
++Currently, this ioctl is used for issuing Trusted Domain Extensions
++(TDX) commands on Intel Processors. The TDX commands are defined in
++Documentation/virt/kvm/intel-tdx.rst.
++
+ 4.111 KVM_MEMORY_ENCRYPT_REG_REGION
+ -----------------------------------
  
- /* For KVM_EXIT_INTERNAL_ERROR */
- /* Emulate instruction failed. */
-@@ -487,6 +542,8 @@ struct kvm_run {
- 			unsigned long args[6];
- 			unsigned long ret[2];
- 		} riscv_sbi;
-+		/* KVM_EXIT_TDX_VMCALL */
-+		struct kvm_tdx_exit tdx;
- 		/* Fix the size of the union. */
- 		char padding[256];
- 	};
+diff --git a/Documentation/virt/kvm/intel-tdx.rst b/Documentation/virt/kvm/intel-tdx.rst
+new file mode 100644
+index 000000000000..2b4d6cd852d4
+--- /dev/null
++++ b/Documentation/virt/kvm/intel-tdx.rst
+@@ -0,0 +1,359 @@
++.. SPDX-License-Identifier: GPL-2.0
++
++===================================
++Intel Trust Dodmain Extensions(TDX)
++===================================
++
++Overview
++========
++TDX stands for Trust Domain Extensions which isolates VMs from
++the virtual-machine manager (VMM)/hypervisor and any other software on
++the platform. [1]
++For details, the specifications, [2], [3], [4], [5], [6], [7], are
++available.
++
++
++API description
++===============
++
++KVM_MEMORY_ENCRYPT_OP
++---------------------
++:Type: system ioctl, vm ioctl, vcpu ioctl
++
++For TDX operations, KVM_MEMORY_ENCRYPT_OP is re-purposed to be generic
++ioctl with TDX specific sub ioctl command.
++
++::
++
++  /* Trust Domain eXtension sub-ioctl() commands. */
++  enum kvm_tdx_cmd_id {
++          KVM_TDX_CAPABILITIES = 0,
++          KVM_TDX_INIT_VM,
++          KVM_TDX_INIT_VCPU,
++          KVM_TDX_INIT_MEM_REGION,
++          KVM_TDX_FINALIZE_VM,
++
++          KVM_TDX_CMD_NR_MAX,
++  };
++
++  struct kvm_tdx_cmd {
++          __u32 id;             /* tdx_cmd_id */
++          __u32 metadata;       /* sub comamnd specific */
++          __u64 data;           /* sub command specific */
++  };
++
++
++KVM_TDX_CAPABILITIES
++--------------------
++:Type: system ioctl
++
++subset of TDSYSINFO_STRCUCT retrieved by TDH.SYS.INFO TDX SEAM call will be
++returned. which describes about Intel TDX module.
++
++- id: KVM_TDX_CAPABILITIES
++- metadata: must be 0
++- data: pointer to struct kvm_tdx_capabilities
++
++::
++
++  struct kvm_tdx_cpuid_config {
++          __u32 leaf;
++          __u32 sub_leaf;
++          __u32 eax;
++          __u32 ebx;
++          __u32 ecx;
++          __u32 edx;
++  };
++
++  struct kvm_tdx_capabilities {
++          __u64 attrs_fixed0;
++          __u64 attrs_fixed1;
++          __u64 xfam_fixed0;
++          __u64 xfam_fixed1;
++
++          __u32 nr_cpuid_configs;
++          struct kvm_tdx_cpuid_config cpuid_configs[0];
++  };
++
++
++KVM_TDX_INIT_VM
++---------------
++:Type: vm ioctl
++
++Does additional VM initialization specific to TDX which corresponds to
++TDH.MNG.INIT TDX SEAM call.
++
++- id: KVM_TDX_INIT_VM
++- metadata: must be 0
++- data: pointer to struct kvm_tdx_init_vm
++- reserved: must be 0
++
++::
++
++  struct kvm_tdx_init_vm {
++          __u32 max_vcpus;
++          __u32 reserved;
++          __u64 attributes;
++          __u64 cpuid;  /* pointer to struct kvm_cpuid2 */
++          __u64 mrconfigid[6];          /* sha384 digest */
++          __u64 mrowner[6];             /* sha384 digest */
++          __u64 mrownerconfig[6];       /* sha348 digest */
++          __u64 reserved[43];           /* must be zero for future extensibility */
++  };
++
++
++KVM_TDX_INIT_VCPU
++-----------------
++:Type: vcpu ioctl
++
++Does additional VCPU initialization specific to TDX which corresponds to
++TDH.VP.INIT TDX SEAM call.
++
++- id: KVM_TDX_INIT_VCPU
++- metadata: must be 0
++- data: initial value of the guest TD VCPU RCX
++
++
++KVM_TDX_INIT_MEM_REGION
++-----------------------
++:Type: vm ioctl
++
++Encrypt a memory continuous region which corresponding to TDH.MEM.PAGE.ADD
++TDX SEAM call.
++If KVM_TDX_MEASURE_MEMORY_REGION flag is specified, it also extends measurement
++which corresponds to TDH.MR.EXTEND TDX SEAM call.
++
++- id: KVM_TDX_INIT_VCPU
++- metadata: flags
++            currently only KVM_TDX_MEASURE_MEMORY_REGION is defined
++- data: pointer to struct kvm_tdx_init_mem_region
++
++::
++
++  #define KVM_TDX_MEASURE_MEMORY_REGION   (1UL << 0)
++
++  struct kvm_tdx_init_mem_region {
++          __u64 source_addr;
++          __u64 gpa;
++          __u64 nr_pages;
++  };
++
++
++KVM_TDX_FINALIZE_VM
++-------------------
++:Type: vm ioctl
++
++Complete measurement of the initial TD contents and mark it ready to run
++which corresponds to TDH.MR.FINALIZE
++
++- id: KVM_TDX_FINALIZE_VM
++- metadata: ignored
++- data: ignored
++
++
++KVM TDX creation flow
++=====================
++In addition to KVM normal flow, new TDX ioctls need to be called.  The control flow
++looks like as follows.
++
++#. system wide capability check
++  * KVM_TDX_CAPABILITIES: query if TDX is supported on the platform.
++  * KVM_CAP_xxx: check other KVM extensions same to normal KVM case.
++
++#. creating VM
++  * KVM_CREATE_VM
++  * KVM_TDX_INIT_VM: pass TDX specific VM parameters.
++
++#. creating VCPU
++  * KVM_CREATE_VCPU
++  * KVM_TDX_INIT_VCPU: pass TDX specific VCPU parameters.
++
++#. initializing guest memory
++  * allocate guest memory and initialize page same to normal KVM case
++    In TDX case, parse and load TDVF into guest memory in addition.
++  * KVM_TDX_INIT_MEM_REGION to add and measure guest pages.
++    If the pages has contents above, those pages need to be added.
++    Otherwise the contents will be lost and guest sees zero pages.
++  * KVM_TDX_FINALIAZE_VM: Finalize VM and measurement
++    This must be after KVM_TDX_INIT_MEM_REGION.
++
++#. run vcpu
++
++Design discussion
++=================
++
++Coexistence of normal(VMX) VM and TD VM
++---------------------------------------
++It's required to allow both legacy(normal VMX) VMs and new TD VMs to
++coexist. Otherwise the benefits of VM flexibility would be eliminated.
++The main issue for it is that the logic of kvm_x86_ops callbacks for
++TDX is different from VMX. On the other hand, the variable,
++kvm_x86_ops, is global single variable. Not per-VM, not per-vcpu.
++
++Several points to be considered.
++  . No or minimal overhead when TDX is disabled(CONFIG_INTEL_TDX_HOST=n).
++  . Avoid overhead of indirect call via function pointers.
++  . Contain the changes under arch/x86/kvm/vmx directory and share logic
++    with VMX for maintenance.
++    Even though the ways to operation on VM (VMX instruction vs TDX
++    SEAM call) is different, the basic idea remains same. So, many
++    logic can be shared.
++  . Future maintenance
++    The huge change of kvm_x86_ops in (near) future isn't expected.
++    a centralized file is acceptable.
++
++- Wrapping kvm x86_ops: The current choice
++  Introduce dedicated file for arch/x86/kvm/vmx/main.c (the name,
++  main.c, is just chosen to show main entry points for callbacks.) and
++  wrapper functions around all the callbacks with
++  "if (is-tdx) tdx-callback() else vmx-callback()".
++
++  Pros:
++  - No major change in common x86 KVM code. The change is (mostly)
++    contained under arch/x86/kvm/vmx/.
++  - When TDX is disabled(CONFIG_INTEL_TDX_HOST=n), the overhead is
++    optimized out.
++  - Micro optimization by avoiding function pointer.
++  Cons:
++  - Many boiler plates in arch/x86/kvm/vmx/main.c.
++
++Alternative:
++- Introduce another callback layer under arch/x86/kvm/vmx.
++  Pros:
++  - No major change in common x86 KVM code. The change is (mostly)
++    contained under arch/x86/kvm/vmx/.
++  - clear separation on callbacks.
++  Cons:
++  - overhead in VMX even when TDX is disabled(CONFIG_INTEL_TDX_HOST=n).
++
++- Allow per-VM kvm_x86_ops callbacks instead of global kvm_x86_ops
++  Pros:
++  - clear separation on callbacks.
++  Cons:
++  - Big change in common x86 code.
++  - overhead in common code even when TDX is
++    disabled(CONFIG_INTEL_TDX_HOST=n).
++
++- Introduce new directory arch/x86/kvm/tdx
++  Pros:
++  - It clarifies that TDX is different from VMX.
++  Cons:
++  - Given the level of code sharing, it complicates code sharing.
++
++KVM MMU Changes
++---------------
++KVM MMU needs to be enhanced to handle Secure/Shared-EPT. The
++high-level execution flow is mostly same to normal EPT case.
++EPT violation/misconfiguration -> invoke TDP fault handler ->
++resolve TDP fault -> resume execution. (or emulate MMIO)
++The difference is, that S-EPT is operated(read/write) via TDX SEAM
++call which is expensive instead of direct read/write EPT entry.
++One bit of GPA (51 or 47 bit) is repurposed so that it means shared
++with host(if set to 1) or private to TD(if cleared to 0).
++
++- The current implementation
++  . Reuse the existing MMU code with minimal update.  Because the
++    execution flow is mostly same. But additional operation, TDX call
++    for S-EPT, is needed. So add hooks for it to kvm_x86_ops.
++  . For performance, minimize TDX SEAM call to operate on S-EPT. When
++    getting corresponding S-EPT pages/entry from faulting GPA, don't
++    use TDX SEAM call to read S-EPT entry. Instead create shadow copy
++    in host memory.
++    Repurpose the existing kvm_mmu_page as shadow copy of S-EPT and
++    associate S-EPT to it.
++  . Treats share bit as attributes. mask/unmask the bit where
++    necessary to keep the existing traversing code works.
++    Introduce kvm.arch.gfn_shared_mask and use "if (gfn_share_mask)"
++    for special case.
++    = 0 : for non-TDX case
++    = 51 or 47 bit set for TDX case.
++
++  Pros:
++  - Large code reuse with minimal new hooks.
++  - Execution path is same.
++  Cons:
++  - Complicates the existing code.
++  - Repurpose kvm_mmu_page as shadow of Secure-EPT can be confusing.
++
++Alternative:
++- Replace direct read/write on EPT entry with TDX-SEAM call by
++  introducing callbacks on EPT entry.
++  Pros:
++  - Straightforward.
++  Cons:
++  - Too many touching point.
++  - Too slow due to TDX-SEAM call.
++  - Overhead even when TDX is disabled(CONFIG_INTEL_TDX_HOST=n).
++
++- Sprinkle "if (is-tdx)" for TDX special case
++  Pros:
++  - Straightforward.
++  Cons:
++  - The result is non-generic and ugly.
++  - Put TDX specific logic into common KVM MMU code.
++
++New KVM API, ioctl (sub)command, to manage TD VMs
++-------------------------------------------------
++Additional KVM API are needed to control TD VMs. The operations on TD
++VMs are specific to TDX.
++
++- Piggyback and repurpose KVM_MEMORY_ENCRYPT_OP
++  Although not all operation isn't memory encryption, repupose to get
++  TDX specific ioctls.
++  Pros:
++  - No major change in common x86 KVM code.
++  Cons:
++  - The operations aren't actually memory encryption, but operations
++    on TD VMs.
++
++Alternative:
++- Introduce new ioctl for guest protection like
++  KVM_GUEST_PROTECTION_OP and introduce subcommand for TDX.
++  Pros:
++  - Clean name.
++  Cons:
++  - One more new ioctl for guest protection.
++  - Confusion with KVM_MEMORY_ENCRYPT_OP with KVM_GUEST_PROTECTION_OP.
++
++- Rename KVM_MEMORY_ENCRYPT_OP to KVM_GUEST_PROTECTION_OP and keep
++  KVM_MEMORY_ENCRYPT_OP as same value for user API for compatibility.
++  "#define KVM_MEMORY_ENCRYPT_OP KVM_GUEST_PROTECTION_OP" for uapi
++  compatibility.
++  Pros:
++  - No new ioctl with more suitable name.
++  Cons:
++  - May cause confusion to the existing user program.
++
++
++References
++==========
++
++.. [1] TDX specification
++   https://software.intel.com/content/www/us/en/develop/articles/intel-trust-domain-extensions.html
++.. [2] Intel Trust Domain Extensions (Intel TDX)
++   https://software.intel.com/content/dam/develop/external/us/en/documents/tdx-whitepaper-final9-17.pdf
++.. [3] Intel CPU Architectural Extensions Specification
++   https://software.intel.com/content/dam/develop/external/us/en/documents/intel-tdx-cpu-architectural-specification.pdf
++.. [4] Intel TDX Module 1.0 EAS
++   https://software.intel.com/content/dam/develop/external/us/en/documents/intel-tdx-module-1eas.pdf
++.. [5] Intel TDX Loader Interface Specification
++   https://software.intel.com/content/dam/develop/external/us/en/documents/intel-tdx-seamldr-interface-specification.pdf
++.. [6] Intel TDX Guest-Hypervisor Communication Interface
++   https://software.intel.com/content/dam/develop/external/us/en/documents/intel-tdx-guest-hypervisor-communication-interface.pdf
++.. [7] Intel TDX Virtual Firmware Design Guide
++   https://software.intel.com/content/dam/develop/external/us/en/documents/tdx-virtual-firmware-design-guide-rev-1.
++.. [8] intel public github
++   kvm TDX branch: https://github.com/intel/tdx/tree/kvm
++   TDX guest branch: https://github.com/intel/tdx/tree/guest
++.. [9] tdvf
++    https://github.com/tianocore/edk2-staging/tree/TDVF
++.. [10] KVM forum 2020: Intel Virtualization Technology Extensions to
++     Enable Hardware Isolated VMs
++     https://osseu2020.sched.com/event/eDzm/intel-virtualization-technology-extensions-to-enable-hardware-isolated-vms-sean-christopherson-intel
++.. [11] Linux Security Summit EU 2020:
++     Architectural Extensions for Hardware Virtual Machine Isolation
++     to Advance Confidential Computing in Public Clouds - Ravi Sahita
++     & Jun Nakajima, Intel Corporation
++     https://osseu2020.sched.com/event/eDOx/architectural-extensions-for-hardware-virtual-machine-isolation-to-advance-confidential-computing-in-public-clouds-ravi-sahita-jun-nakajima-intel-corporation
++.. [12] [RFCv2,00/16] KVM protected memory extension
++     https://lkml.org/lkml/2020/10/20/66
 -- 
 2.25.1
 
