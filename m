@@ -2,245 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2334C45DE50
-	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 17:08:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A852545DE83
+	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 17:16:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241395AbhKYQLT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Nov 2021 11:11:19 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:54987 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1356163AbhKYQJS (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 25 Nov 2021 11:09:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637856367;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=z7v5LkznOHba3ktVnhjZF1P8VI+6ofhfR3vcT+eZqR4=;
-        b=SW1jazeTH7NQRHIqR1VQ1J71LN6G0QECnH4+z5So15HVO2QllQu7CRwswJWTofwW5JH5nA
-        RyQoTpG+LWLBq4naq3eD9RKfHDS4lRZnm6kogJrFQawSQI6s6AGNt8vNrheF8j+cxo7QbW
-        5qhtkXbvKemQQrD2gELTphpEuOBjy8k=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-266-vq_gs0juOyCybrMgV3r1Ug-1; Thu, 25 Nov 2021 11:06:06 -0500
-X-MC-Unique: vq_gs0juOyCybrMgV3r1Ug-1
-Received: by mail-wm1-f70.google.com with SMTP id i131-20020a1c3b89000000b00337f92384e0so5193993wma.5
-        for <kvm@vger.kernel.org>; Thu, 25 Nov 2021 08:06:05 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=z7v5LkznOHba3ktVnhjZF1P8VI+6ofhfR3vcT+eZqR4=;
-        b=I3+1fc73z0mDGP8fSZpTbpebVv/YHIUNof6NEN+URBHpSttqEn1aIGNTgAPLLokMAF
-         7o2FM87hKGv6zphVu6fgx1NdjpaBv3h/couM9OdiEdbRPhI0t6USZDcNM3Bt5trfLTLZ
-         xayXCnKEbSUR1d5rdJuq8m3oFp5YthyQBqvk9SQCtVxixSu+2myRbNIjD4mYSbBtd17J
-         Vuzo+MBuSZjh1+kUlbo/MrdVcGH6QxKzEpfj7A4cjV2X+1s12PdiXsM3+1uq5muqQt1R
-         EysgGCD22ZbsmUoqQS2NLWlO7SPe76L9SSPXB0q+0FmMBrSy3Fozjr9DmZYQVKwd0HFe
-         KsdA==
-X-Gm-Message-State: AOAM5308EHJ3vgm1MkbKlvf3yg6bX7/yl2cfUctBUf/t/Qwt/U+B2RWU
-        VfYpITGA/ClYSrxMb3V6QFUM2UKm8LzKcRlQPGFtF7HsVOiA3rlUUieUTZAre0rQxmgD4AKmmpX
-        TgVOnrAaQXa8W
-X-Received: by 2002:a5d:42cc:: with SMTP id t12mr7715763wrr.129.1637856364558;
-        Thu, 25 Nov 2021 08:06:04 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyXSd8x7Zltdq8vas15ZASgM2LsIyw7HgLASJ8vVhlr+0+9JdEvOTEQgRsEOup2nZVsmSgO8Q==
-X-Received: by 2002:a5d:42cc:: with SMTP id t12mr7715713wrr.129.1637856364263;
-        Thu, 25 Nov 2021 08:06:04 -0800 (PST)
-Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id z18sm3171710wrq.11.2021.11.25.08.06.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Nov 2021 08:06:03 -0800 (PST)
-Subject: Re: [RFC PATCH v3 08/29] KVM: arm64: Make ID_AA64MMFR0_EL1 writable
-To:     Reiji Watanabe <reijiw@google.com>, Marc Zyngier <maz@kernel.org>,
-        kvmarm@lists.cs.columbia.edu
-Cc:     kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
-        Peter Shier <pshier@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        linux-arm-kernel@lists.infradead.org
-References: <20211117064359.2362060-1-reijiw@google.com>
- <20211117064359.2362060-9-reijiw@google.com>
-From:   Eric Auger <eauger@redhat.com>
-Message-ID: <107f1a3e-2f1a-4810-0a54-eb9998c513cf@redhat.com>
-Date:   Thu, 25 Nov 2021 17:06:02 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        id S1356507AbhKYQUC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Nov 2021 11:20:02 -0500
+Received: from mail-dm6nam08on2074.outbound.protection.outlook.com ([40.107.102.74]:43009
+        "EHLO NAM04-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S241521AbhKYQSB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Nov 2021 11:18:01 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=m4j3njhmigYqvWUS6ho6Z15Mr6dy0G62Wm2aEztnxN1hgl3StU8jakwfgLuscl2Yy058+wVYKcVvVFS5rbfbQq6QL5EPSflwpv//GZKcMsaGpxiXcwO50sKpgdZ5JPi6bWwp7NgVzqg+jDp1O5j92my+jDqV9cHdH6dDaLhggMtJzLU/ltD9wwuNLlVM7WRWw/eViZtF9u1pxBCFCmS+zb7YplmE2aEYTsxpxfYPM38PQA0ftyCHHlJJOgeBiC+a6iGOrU2jmRXktgIRIuZxV9bcbhWjGnVUUFDnwiRTAB5VdEujG/Xrb6upYtms9OBFwWNCn8ur5DcPYUGh7IzQiQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tKNThpPsSCa6XFv0pbDtYZJElIxBPxMkHtRiQMD8zAc=;
+ b=Jd79OxpkLXPVLRDDL6XUskxX5ZEVGnIaJvtOarzuql1Rb+aS6/oi20Wl2d73d9dPWp6kSp4bU9cS0PXoYKeY/BP6CBIbn/5nfCg5LPvaDfhFAy7VWkRNhntspDmYzjUI+YHLJzTUWLA744ty5ciY8c8xs3jvobiqwV8khyqFe9/GUxIXyTZeekKCwyBvOuFR6BISMIj4dHl7S6butIn77F+bbrwdYOGTb8KiqSmD2sn1UllMbXD/sPxVnTwku0Xw6Vsu/5RZmGmxmBghRddIygqTxcFmV58b7w1aRL+CxADSu2ElHrKZURP7Ny2ybY6cvMqxSYQUgzKGG0eK6J/W0A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tKNThpPsSCa6XFv0pbDtYZJElIxBPxMkHtRiQMD8zAc=;
+ b=iUGYzPMp1QvXHbVpd2/T+j+z0r0aa3tl6q0yrC5PsFUmSi1AgE9qJN5XneXke4nLOxxfq0uipRqGpbQTbGf/nBIud13fey9fDXcAhZ93jP71aI7nHfxz62izbKcNAN0SbnfzN9/G7WQ4MfkayYEBWe0xurygGNbsVLgLCECWoIQTBrzMSj8Tw9mN7IE/5XTKQBfh9paY8JQk8yz8MuCaK//lqjd5tUliC49fN+Uj4bS88DpHMDXFp3Xp70wt1sfuw7x8IyLLtCF0c+Bt2kVxjr1iZSS4fqDIuiOUT3FAxVgioT+/2030K3QftESqgsVeyLyDCzpTAAslMygHF6sZvg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5288.namprd12.prod.outlook.com (2603:10b6:208:314::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4713.19; Thu, 25 Nov
+ 2021 16:14:49 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::5897:83b2:a704:7909]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::5897:83b2:a704:7909%8]) with mapi id 15.20.4734.023; Thu, 25 Nov 2021
+ 16:14:48 +0000
+Date:   Thu, 25 Nov 2021 12:14:47 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Cornelia Huck <cohuck@redhat.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Yishai Hadas <yishaih@nvidia.com>
+Subject: Re: [PATCH RFC] vfio: Documentation for the migration region
+Message-ID: <20211125161447.GN4670@nvidia.com>
+References: <0-v1-0ec87874bede+123-vfio_mig_doc_jgg@nvidia.com>
+ <87zgpvj6lp.fsf@redhat.com>
+ <20211123165352.GA4670@nvidia.com>
+ <87fsrljxwq.fsf@redhat.com>
+ <20211124184020.GM4670@nvidia.com>
+ <87a6hsju8v.fsf@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87a6hsju8v.fsf@redhat.com>
+X-ClientProxiedBy: MN2PR11CA0020.namprd11.prod.outlook.com
+ (2603:10b6:208:23b::25) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
 MIME-Version: 1.0
-In-Reply-To: <20211117064359.2362060-9-reijiw@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Received: from mlx.ziepe.ca (142.162.113.129) by MN2PR11CA0020.namprd11.prod.outlook.com (2603:10b6:208:23b::25) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4734.20 via Frontend Transport; Thu, 25 Nov 2021 16:14:48 +0000
+Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1mqHOZ-0021oP-AC; Thu, 25 Nov 2021 12:14:47 -0400
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: c7d1ff48-dc44-4e60-a0f1-08d9b02eb414
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5288:
+X-Microsoft-Antispam-PRVS: <BL1PR12MB5288F7270F35B878A236BAD8C2629@BL1PR12MB5288.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: fZrnROGY7Ovdb9UKDohsi9J19klta9gVPereBnTJwnHlFUjURTim85hwfZCQACsFh9qacFK/XW5Az/8GVfDIn6cW/8PDjcuEUS/ueEn2p+w2YuxYYyqXSleZclAHwoX+ALpt8t+owOwUiPBSWvxoe+YoHHRGZSu1LlEGrORoghOsXg79gg6KK1OwoLnJqVgao0UbZOCWYunI/0RdDa0one4S34ZfesDX8woIsDwRodBrANBATP6WwadLXbAJHIIo0mf5gQnNxhbYHyaVSLZNf62n1ZzHpO9aojo1cAkkmRnv1S0RaZmxlcv2Uuic5d6nCf1CVyP/lgWWm7o5yZw2vYUHpKBJfPTdKXHZg+mK7CTKb4I5Onqaapk0HhXJTA2cH4K+y2Jk3v7IfCd4UhB5RcOiNZZiR3V2yEO5WBA18JjJKdWysS0TnYhRR3Bpbieasp8zRLGG3v42wSPaRBcWhHmuEARVNMH7/FPOpV6binp/H+guJicACZoxfzyOGG4VQ9m8BSv9pIlXuu9TDNmCpDaVVnto9u8NW+KqxwlKxGbRA/ESW5Fn6YLb0iZ5dqf9KZlVtFNwyk/J7K3t01Wf93F0jASh2Fz4/5cKF8KXM8fVGLQAHUBfhUoX6+XbWFngmYhrdgjz0BEyEqwauPlZSA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(508600001)(316002)(86362001)(83380400001)(426003)(8936002)(107886003)(2906002)(8676002)(6916009)(186003)(66946007)(66556008)(66476007)(38100700002)(26005)(54906003)(36756003)(33656002)(4326008)(2616005)(5660300002)(9786002)(9746002)(1076003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?86PAxUP3bXK0h5+STeJAZwGmI67M29kRmx+tpdZvOGGUYbPU0Hd5ego+plSJ?=
+ =?us-ascii?Q?ynnPsGIviCTm60Nam00/0pKUCcTlKglHXFGXZ+4usGYn0ER9uoLAXxDzM7f9?=
+ =?us-ascii?Q?jNVHbaDx1eY96jF0cOXc6pG8BS3FI3os7cVlnMKsXU+f+yMYqhxonziRRW94?=
+ =?us-ascii?Q?vndT3Fo4vgdb3kCwoL3CewcWsgYS0Gmir7wE5XFxp7N/obJ5btsnlCizjnsi?=
+ =?us-ascii?Q?555DI37oP2MmsO6SqPf2DAM6qxv40+NN6JRaQTO9RAQtbhzeuLhcp+gotCOl?=
+ =?us-ascii?Q?nA2Lig8yYOKSBzLpAVluVeGRyB8cgPy7sSWhyZIIeOGnX5+9FPBbsewU7O8Q?=
+ =?us-ascii?Q?TgZPMzq8emQ+zmB1zV5wCHLpXhTQSxwqCwYohz/9rxsXJWotJH0+Vw6/xJN1?=
+ =?us-ascii?Q?dg3ISRJFTu1GZVdSvjg8Q+98/MRFLjPACt/vSLF8ggP+MMc5lwwHmkSP9q9w?=
+ =?us-ascii?Q?d3x4lqcsM+9arvYWnnUv4INxxOp0HIvCVMO2dHpsli+Vr5jy4v72EaekpOVP?=
+ =?us-ascii?Q?6FHLlIZgrQdfR4Z7px3gVXoCNgcNzb4Uxds7Q8Bl4mwVXFJVvyg7PQguw9t1?=
+ =?us-ascii?Q?fCEYYpiZaSnQivRZUwUZcze6eMtqd0Hq/epH2QMBWV6yvFFHNEY6C2GplNk/?=
+ =?us-ascii?Q?GFKh6jQGDy9qHjwtxer8j/fPYKtKhdipQA6jHDrPbC5SrMuNbwwkgkS6KJqi?=
+ =?us-ascii?Q?NxfLCxWr9bfLrWrguCH+znKVaM1GvwemPUl+C6OBvDXuxyxK9vyF/cBHOQue?=
+ =?us-ascii?Q?lr9baX4fe8HlSiD8JwLhFqHAEDQR6ND1cG2QK5fByA+Bkyqp20x4mZpERUiI?=
+ =?us-ascii?Q?KlheJwF0HZktylD31VYKzEfyE2JTQFZkGZNh/m8USPDIMTke4DJ1kx7bysnX?=
+ =?us-ascii?Q?4YuHxu2lKa7IQ1y57ulmtzweoZRQrVwAs/4v40iSqbD1/cl1lbpGhk50Z5Uu?=
+ =?us-ascii?Q?VcOII6+2CGO0VoqcXN4UUmIvCR1CjidnnyRkCzDIlsobAhb94w50pJiUoxuj?=
+ =?us-ascii?Q?z9G4BkdEJc6qBmFnIc1c6AC1bBmqoBfTV0Lwfzvg7wRjqLx3PwyQmWVk8es2?=
+ =?us-ascii?Q?t5AdtUVb3PpPVfSoSDhTUPsXEnnozOLcFzaZ87uIZBC1h7Elt8rEMiAkRKdE?=
+ =?us-ascii?Q?hPZ1AnqvXM74NJZzA77609NFjbsAuaD5zosESpmtRkBJNfYHrT9qtK09F/16?=
+ =?us-ascii?Q?yAN0RTiBm4wPhbC777yJXGeWEjENzlUJK+r4JsUH6whMeYAls2pZKvmJ+kjX?=
+ =?us-ascii?Q?noWp6/Efqov5WhHbOZ5CXQFfFQAvlWs7d9NvDy88N6akPoUDhVKn2D3kU0hx?=
+ =?us-ascii?Q?/G9TqviVUTVVnQfPYREpM8JMS+lHKF/Oaq8UcvY/0kSt/H9POkupSD36kr1u?=
+ =?us-ascii?Q?QU9TIcdYaJt5WcKEphvaGCSTkqotG2M0jkmF0BDdiFK6GrrBjYzZxlxl6/2p?=
+ =?us-ascii?Q?a7ioLqkkLMzv0lA1Ev0hhFZM15QsCZE2sKVyW0gQEasgSng1R741cIOdzCJo?=
+ =?us-ascii?Q?JEoJIFnk1Xlg8T9PF6ecEVHHM7EFbJOlFBF9/YFoyLKsM6tNLBZ9zBUNY/3T?=
+ =?us-ascii?Q?SbrBhHIHbZ5GDQENvew=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c7d1ff48-dc44-4e60-a0f1-08d9b02eb414
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Nov 2021 16:14:48.8788
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: wzWveEfbinyZMmhpdkeKgcQNyV/YdN4OBFPBVGt1vYnrvH7LxhCs7sWl2XmAiTTy
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5288
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Reiji,
-On 11/17/21 7:43 AM, Reiji Watanabe wrote:
-> This patch adds id_reg_info for ID_AA64MMFR0_EL1 to make it
-> writable by userspace.
+On Thu, Nov 25, 2021 at 01:27:12PM +0100, Cornelia Huck wrote:
+> On Wed, Nov 24 2021, Jason Gunthorpe <jgg@nvidia.com> wrote:
 > 
-> Since ID_AA64MMFR0_EL1 stage 2 granule size fields don't follow the
-> standard ID scheme, we need a special handling to validate those fields.
+> > On Wed, Nov 24, 2021 at 05:55:49PM +0100, Cornelia Huck wrote:
 > 
-> Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> ---
->  arch/arm64/kvm/sys_regs.c | 118 ++++++++++++++++++++++++++++++++++++++
->  1 file changed, 118 insertions(+)
+> >> What I meant to say: If we give userspace the flexibility to operate
+> >> this, we also must give different device types some flexibility. While
+> >> subchannels will follow the general flow, they'll probably condense/omit
+> >> some steps, as I/O is quite different to PCI there.
+> >
+> > I would say no - migration is general, no device type should get to
+> > violate this spec.  Did you have something specific in mind? There is
+> > very little PCI specific here already
 > 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 5812e39602fe..772e3d3067b2 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -519,6 +519,113 @@ static int validate_id_aa64isar1_el1(struct kvm_vcpu *vcpu,
->  	return 0;
->  }
->  
-> +/*
-> + * Check if the requested stage2 translation granule size indicated in
-> + * @mmfr0 is also indicated in @mmfr0_lim.  This function assumes that
-> + * the stage1 granule size indicated in @mmfr0 has been validated already.
-> + */
-> +static int aa64mmfr0_tgran2_check(int field, u64 mmfr0, u64 mmfr0_lim)
-> +{
-> +	s64 tgran2, lim_tgran2, rtgran1;
-> +	int f1;
-> +	bool is_signed = true;
-> +
-> +	tgran2 = cpuid_feature_extract_unsigned_field(mmfr0, field);
-> +	lim_tgran2 = cpuid_feature_extract_unsigned_field(mmfr0_lim, field);
-> +	if (tgran2 == lim_tgran2)
-> +		return 0;
-> +
-> +	if (tgran2 && lim_tgran2)
-> +		return (tgran2 > lim_tgran2) ? -E2BIG : 0;
-> +
-> +	/*
-> +	 * Either tgran2 or lim_tgran2 is zero.
-> +	 * Need stage1 granule size to validate tgran2.
-> +	 */
-> +	switch (field) {
-> +	case ID_AA64MMFR0_TGRAN4_2_SHIFT:
-> +		f1 = ID_AA64MMFR0_TGRAN4_SHIFT;
-> +		break;
-> +	case ID_AA64MMFR0_TGRAN64_2_SHIFT:
-> +		f1 = ID_AA64MMFR0_TGRAN64_SHIFT;
-> +		break;
-> +	case ID_AA64MMFR0_TGRAN16_2_SHIFT:
-> +		f1 = ID_AA64MMFR0_TGRAN16_SHIFT;
-> +		is_signed = false;
-> +		break;
-> +	default:
-> +		/* Should never happen */
-> +		WARN_ONCE(1, "Unexpected stage2 granule field (%d)\n", field);
-> +		return 0;
-> +	}
+> I'm not really thinking about violating the spec, but more omitting
+> things that do not really apply to the hardware. For example, it is
+> really easy to shut up a subchannel, we don't really need to wait until
+> nothing happens anymore, and it doesn't even have MMIO. 
 
-sorry my previous message was sent while I haven't finished :-(
+I've never really looked closely at the s390 mdev drivers..
 
-if I understand correctly you forbid setting a granule that is not set
-in the lim. So I would first compute whether the granule is set, would
-it be through the TGranX (if _2 == 0) or though TGranX_2 if this latter
-is not not. Do those computations both on val and lim and eventually
-check if gran_val > gran_lim. The current code looks overly complicated
-but maybe I miss the actual reason.
+What does something like AP even do anyhow? The ioctl handler doesn't
+do anything, there is no mmap hook, how does the VFIO userspace
+interact with this thing?
 
-Eric
-> +
-> +	/*
-> +	 * If tgran2 == 0 (&& lim_tgran2 != 0), the requested stage2 granule
-> +	 * size is indicated in the stage1 granule size field of @mmfr0.
-> +	 * So, validate the stage1 granule size against the stage2 limit
-> +	 * granule size.
-> +	 * If lim_tgran2 == 0 (&& tgran2 != 0), the stage2 limit granule size
-> +	 * is indicated in the stage1 granule size field of @mmfr0_lim.
-> +	 * So, validate the requested stage2 granule size against the stage1
-> +	 * limit granule size.
-> +	 */
-> +
-> +	 /* Get the relevant stage1 granule size to validate tgran2 */
-> +	if (tgran2 == 0)
-> +		/* The requested stage1 granule size */
-> +		rtgran1 = cpuid_feature_extract_field(mmfr0, f1, is_signed);
-> +	else /* lim_tgran2 == 0 */
-> +		/* The stage1 limit granule size */
-> +		rtgran1 = cpuid_feature_extract_field(mmfr0_lim, f1, is_signed);
-> +
-> +	/*
-> +	 * Adjust the value of rtgran1 to compare with stage2 granule size,
-> +	 * which indicates: 1: Not supported, 2: Supported, etc.
-> +	 */
-> +	if (is_signed)
-> +		/* For signed, -1: Not supported, 0: Supported, etc. */
-> +		rtgran1 += 0x2;
-> +	else
-> +		/* For unsigned, 0: Not supported, 1: Supported, etc. */
-> +		rtgran1 += 0x1;
-> +
-> +	if ((tgran2 == 0) && (rtgran1 > lim_tgran2))
-> +		/*
-> +		 * The requested stage1 granule size (== the requested stage2
-> +		 * granule size) is larger than the stage2 limit granule size.
-> +		 */
-> +		return -E2BIG;
-> +	else if ((lim_tgran2 == 0) && (tgran2 > rtgran1))
-> +		/*
-> +		 * The requested stage2 granule size is larger than the stage1
-> +		 * limit granulze size (== the stage2 limit granule size).
-> +		 */
-> +		return -E2BIG;
-> +
-> +	return 0;
-> +}
-> +
-> +static int validate_id_aa64mmfr0_el1(struct kvm_vcpu *vcpu,
-> +				     const struct id_reg_info *id_reg, u64 val)
-> +{
-> +	u64 limit = id_reg->vcpu_limit_val;
-> +	int ret;
-> +
-> +	ret = aa64mmfr0_tgran2_check(ID_AA64MMFR0_TGRAN4_2_SHIFT, val, limit);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = aa64mmfr0_tgran2_check(ID_AA64MMFR0_TGRAN64_2_SHIFT, val, limit);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = aa64mmfr0_tgran2_check(ID_AA64MMFR0_TGRAN16_2_SHIFT, val, limit);
-> +	if (ret)
-> +		return ret;
-> +
-> +	return 0;
-> +}
-> +
->  static void init_id_aa64pfr0_el1_info(struct id_reg_info *id_reg)
->  {
->  	u64 limit = id_reg->vcpu_limit_val;
-> @@ -625,6 +732,16 @@ static struct id_reg_info id_aa64isar1_el1_info = {
->  	.get_reset_val = get_reset_id_aa64isar1_el1,
->  };
->  
-> +static struct id_reg_info id_aa64mmfr0_el1_info = {
-> +	.sys_reg = SYS_ID_AA64MMFR0_EL1,
-> +	.ftr_check_types = S_FCT(ID_AA64MMFR0_TGRAN4_SHIFT, FCT_LOWER_SAFE) |
-> +			   S_FCT(ID_AA64MMFR0_TGRAN64_SHIFT, FCT_LOWER_SAFE) |
-> +			   U_FCT(ID_AA64MMFR0_TGRAN4_2_SHIFT, FCT_IGNORE) |
-> +			   U_FCT(ID_AA64MMFR0_TGRAN64_2_SHIFT, FCT_IGNORE) |
-> +			   U_FCT(ID_AA64MMFR0_TGRAN16_2_SHIFT, FCT_IGNORE),
-> +	.validate = validate_id_aa64mmfr0_el1,
-> +};
-> +
->  /*
->   * An ID register that needs special handling to control the value for the
->   * guest must have its own id_reg_info in id_reg_info_table.
-> @@ -638,6 +755,7 @@ static struct id_reg_info *id_reg_info_table[KVM_ARM_ID_REG_MAX_NUM] = {
->  	[IDREG_IDX(SYS_ID_AA64PFR1_EL1)] = &id_aa64pfr1_el1_info,
->  	[IDREG_IDX(SYS_ID_AA64ISAR0_EL1)] = &id_aa64isar0_el1_info,
->  	[IDREG_IDX(SYS_ID_AA64ISAR1_EL1)] = &id_aa64isar1_el1_info,
-> +	[IDREG_IDX(SYS_ID_AA64MMFR0_EL1)] = &id_aa64mmfr0_el1_info,
->  };
->  
->  static int validate_id_reg(struct kvm_vcpu *vcpu,
+> > In general, userspace can issue a VFIO_DEVICE_RESET ioctl and recover the
+> > device back to device_state RUNNING. When a migration driver executes this
+> > ioctl it should discard the data window and set migration_state to RUNNING as
+> > part of resetting the device to a clean state. This must happen even if the
+> > migration_state has errored. A freshly opened device FD should always be in
+> > the RUNNING state.
 > 
+> Can the state immediately change from RUNNING to ERROR again?
 
+Immediately? State change can only happen in response to the ioctl or
+the reset.
+
+""The migration_state cannot change asynchronously, upon writing the
+migration_state the driver will either keep the current state and return
+failure, return failure and go to ERROR, or succeed and go to the new state.""
+
+> > However, a device may not compromise system integrity if it is subjected to a
+> > MMIO. It can not trigger an error TLP, it can not trigger a Machine Check, and
+> > it can not compromise device isolation.
+> 
+> "Machine Check" may be confusing to readers coming from s390; there, the
+> device does not trigger the machine check, but the channel subsystem
+> does, and we cannot prevent it. Maybe we can word it more as an example,
+> so readers get an idea what the limits in this state are?
+
+Lets say x86 machine check then which is a kernel-fatal event.
+
+> Although I would like to see some more feedback from others, I think
+> this is already a huge step in the right direction.
+
+Thanks, I made all your other changes
+
+Will send a v2 next week
+
+Jason 
