@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DE0C545DD88
-	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 16:34:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3185B45DD91
+	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 16:37:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356031AbhKYPhL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Nov 2021 10:37:11 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:27811 "EHLO
+        id S1356113AbhKYPkW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Nov 2021 10:40:22 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:24672 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231860AbhKYPfL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 25 Nov 2021 10:35:11 -0500
+        by vger.kernel.org with ESMTP id S240693AbhKYPiV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 25 Nov 2021 10:38:21 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637854319;
+        s=mimecast20190719; t=1637854510;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=cnVCzP5Ph3HfcaXljAj+4m7ThxDrMRTU+FYGU/FtLpo=;
-        b=HaMh7jlF89n98oof/uxkf0o1w1YjjwM6Mz19GCIO9uHNa33ggaeb5qDihkpE4SzlaZguUB
-        c3jfVSGfv+nD9WRxEs/VCKx8OYzQHiz5S/wldcVY62XPhcTw4z8HFiQitI7xxbgtOtjwnk
-        fVNK9BCK8rPnnyCcjrpRQ+bwiOa8VuA=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=Go3/6t5i9YcKtZRxRTqTsP/4631+JUTyvogPitjQiZI=;
+        b=SKbK+ksD9cQTOUAVTQijYFxBZZk0jNp/FUuH9J0raa+B5vKx0drfx/vgRxCk6m703Op1F3
+        P5nHOgwq8Y0m9yds2CcrWvIbU1/2FjZwzhtlREBcH7Cd/uAzwEivJ+eklzSmNlQUqNxHaa
+        YFuORyOtHa6jzPg6wN8CqAm0XeDgRng=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-369-snrR-1AaOVmIbhBLMYJrtg-1; Thu, 25 Nov 2021 10:31:58 -0500
-X-MC-Unique: snrR-1AaOVmIbhBLMYJrtg-1
-Received: by mail-wm1-f72.google.com with SMTP id 69-20020a1c0148000000b0033214e5b021so3417206wmb.3
-        for <kvm@vger.kernel.org>; Thu, 25 Nov 2021 07:31:58 -0800 (PST)
+ us-mta-215-8ETH0L5rOia0Ciri931X8g-1; Thu, 25 Nov 2021 10:35:09 -0500
+X-MC-Unique: 8ETH0L5rOia0Ciri931X8g-1
+Received: by mail-wm1-f69.google.com with SMTP id z138-20020a1c7e90000000b003319c5f9164so5147537wmc.7
+        for <kvm@vger.kernel.org>; Thu, 25 Nov 2021 07:35:08 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=cnVCzP5Ph3HfcaXljAj+4m7ThxDrMRTU+FYGU/FtLpo=;
-        b=PQ3IqfGeZbO67Cmp/27JSVWNzuLZbnc3NwXlrNjAuLaXUh+GIUVWxvTpfKCD7m5x6P
-         Fge1tZfUmDI5o429NGApS0LpOlEBNf4mT2iow0BW31KCL2StiKJVF6Y6vGpMVVFcalkQ
-         /lRuBzOtaiCvSxb6KWQncowsMiVnm7ThBDnhu8a0QIByaH5/OXoxk+mZALEkVdXd/wBs
-         h2YgT764SLVAUqthxCCZOCOuSu9+K+4BqS8JHhdseLa4n465DZvvSHMNXnMkDvJV2w/P
-         tPNWeanBLfh9SJ7Jk4A/xNUbswnXDRkZxAqrfnJSN9Sao29ZMuhEWCKo26ex/kDlD4kH
-         jBGg==
-X-Gm-Message-State: AOAM531EVmT20tEoKTpItNkyZwL7Jw/5uU+rqNe4ETLNFZw5iiD/sdEi
-        QI3RJFutQSM6hsAyd0nzEYktxy50zQ9mzlY654Ioq2gFQrvwBQvx9bsIuV+1HQtkVIfzpxW8A1U
-        7JqIGOVoC+WBm
-X-Received: by 2002:a1c:1b15:: with SMTP id b21mr8153045wmb.174.1637854316721;
-        Thu, 25 Nov 2021 07:31:56 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwemXoFmNVjJcaWjKBX8bFRZCHriCtd5cmiBgm8uZbMA6g/Y4cpCrDzQpBcKt3wIs6WdTxneQ==
-X-Received: by 2002:a1c:1b15:: with SMTP id b21mr8153007wmb.174.1637854316436;
-        Thu, 25 Nov 2021 07:31:56 -0800 (PST)
+        bh=Go3/6t5i9YcKtZRxRTqTsP/4631+JUTyvogPitjQiZI=;
+        b=bWJH6wCpyQNHd2ACt7Mwv7Q+dpQLbYy6srCw7FT+kVS+QCFqR66rw0tPznXfl2S8dm
+         FAt1/HZN3hIhHENNdHzZ6jR0rm11n2q7OPvf9RoIN0kzLiB/mSqpxXb6FDjsMqMAecF8
+         8aAR1YIOCnNjpFKjtyHyzWQtI2QztjvPJst3HwE43jFdB0JDFPJrhZR/BHYTF6M587lw
+         QUF/e9QD7pBYP0nYHvRBllqNiwJdvOXjCgCp4doNLKramIX++NcqcqK5D0lu7VNQiGwN
+         rrDIu6yzfyFTEka4bDaIlDNbhu8N299lnigCSx+ui1r3eoLs9ySmA5R7Aan559xztvDy
+         muhw==
+X-Gm-Message-State: AOAM532LWsYnj6YDYzk3qTTyqF2dEEEGmM+TBACxXSTt9SkWnolRW7oH
+        aPswJURJ2Cit8sc8h/N9WGdQOz4DIOqZhEnLJslle6nXPBIlxdb5bLra8m0KQoQppE26syxTGoW
+        3IivGSXCFdMbD
+X-Received: by 2002:a5d:47a9:: with SMTP id 9mr7627993wrb.42.1637854507692;
+        Thu, 25 Nov 2021 07:35:07 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxONaqPlckK5+oTOGtTwnKy0JFj0xHVhrtDeA6V1AujrPVzPnIdMrmMdMFO/BwzAAN9h9y53w==
+X-Received: by 2002:a5d:47a9:: with SMTP id 9mr7627951wrb.42.1637854507436;
+        Thu, 25 Nov 2021 07:35:07 -0800 (PST)
 Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id j17sm4677748wmq.41.2021.11.25.07.31.55
+        by smtp.gmail.com with ESMTPSA id f7sm3828066wri.74.2021.11.25.07.35.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Nov 2021 07:31:55 -0800 (PST)
-Subject: Re: [RFC PATCH v3 08/29] KVM: arm64: Make ID_AA64MMFR0_EL1 writable
+        Thu, 25 Nov 2021 07:35:06 -0800 (PST)
+Subject: Re: [RFC PATCH v3 04/29] KVM: arm64: Make ID_AA64PFR0_EL1 writable
 To:     Reiji Watanabe <reijiw@google.com>, Marc Zyngier <maz@kernel.org>,
         kvmarm@lists.cs.columbia.edu
 Cc:     kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
@@ -60,14 +60,14 @@ Cc:     kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
         linux-arm-kernel@lists.infradead.org
 References: <20211117064359.2362060-1-reijiw@google.com>
- <20211117064359.2362060-9-reijiw@google.com>
+ <20211117064359.2362060-5-reijiw@google.com>
 From:   Eric Auger <eauger@redhat.com>
-Message-ID: <cef4fecc-b2c0-6f1b-b61d-68b830ae0bcd@redhat.com>
-Date:   Thu, 25 Nov 2021 16:31:54 +0100
+Message-ID: <b56f871c-11da-e8ff-e90e-0ec3b4c0207f@redhat.com>
+Date:   Thu, 25 Nov 2021 16:35:05 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <20211117064359.2362060-9-reijiw@google.com>
+In-Reply-To: <20211117064359.2362060-5-reijiw@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -75,173 +75,236 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
+Hi Reiji,
 
 On 11/17/21 7:43 AM, Reiji Watanabe wrote:
-> This patch adds id_reg_info for ID_AA64MMFR0_EL1 to make it
-> writable by userspace.
+> This patch adds id_reg_info for ID_AA64PFR0_EL1 to make it writable by
+> userspace.
 > 
-> Since ID_AA64MMFR0_EL1 stage 2 granule size fields don't follow the
-> standard ID scheme, we need a special handling to validate those fields.
+> The CSV2/CSV3 fields of the register were already writable and values
+> that were written for them affected all vCPUs before. Now they only
+> affect the vCPU.
+> Return an error if userspace tries to set SVE/GIC field of the register
+> to a value that conflicts with SVE/GIC configuration for the guest.
+> SIMD/FP/SVE fields of the requested value are validated according to
+> Arm ARM.
 > 
 > Signed-off-by: Reiji Watanabe <reijiw@google.com>
 > ---
->  arch/arm64/kvm/sys_regs.c | 118 ++++++++++++++++++++++++++++++++++++++
->  1 file changed, 118 insertions(+)
+>  arch/arm64/kvm/sys_regs.c | 159 ++++++++++++++++++++++++--------------
+>  1 file changed, 103 insertions(+), 56 deletions(-)
 > 
 > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 5812e39602fe..772e3d3067b2 100644
+> index 1552cd5581b7..35400869067a 100644
 > --- a/arch/arm64/kvm/sys_regs.c
 > +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -519,6 +519,113 @@ static int validate_id_aa64isar1_el1(struct kvm_vcpu *vcpu,
->  	return 0;
+> @@ -401,6 +401,92 @@ static void id_reg_info_init(struct id_reg_info *id_reg)
+>  		id_reg->init(id_reg);
 >  }
 >  
-> +/*
-> + * Check if the requested stage2 translation granule size indicated in
-> + * @mmfr0 is also indicated in @mmfr0_lim.  This function assumes that
-> + * the stage1 granule size indicated in @mmfr0 has been validated already.
-I would suggest: relies on the fact TGranX fields are validated before
-through the arm64_check_features lookup
-> + */
-> +static int aa64mmfr0_tgran2_check(int field, u64 mmfr0, u64 mmfr0_lim)
+> +#define	kvm_has_gic3(kvm)		\
+> +	(irqchip_in_kernel(kvm) &&	\
+> +	 (kvm)->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
+you may move this macro to kvm/arm_vgic.h as this may be used in
+vgic/vgic-v3.c too
+> +
+> +static int validate_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+> +				    const struct id_reg_info *id_reg, u64 val)
 > +{
-> +	s64 tgran2, lim_tgran2, rtgran1;
-> +	int f1;
-> +	bool is_signed = true;
+> +	int fp, simd;
+> +	bool vcpu_has_sve = vcpu_has_sve(vcpu);
+> +	bool pfr0_has_sve = id_aa64pfr0_sve(val);
+> +	int gic;
 > +
-> +	tgran2 = cpuid_feature_extract_unsigned_field(mmfr0, field);
-> +	lim_tgran2 = cpuid_feature_extract_unsigned_field(mmfr0_lim, field);
-> +	if (tgran2 == lim_tgran2)
-> +		return 0;
+> +	simd = cpuid_feature_extract_signed_field(val, ID_AA64PFR0_ASIMD_SHIFT);
+> +	fp = cpuid_feature_extract_signed_field(val, ID_AA64PFR0_FP_SHIFT);
+> +	if (simd != fp)
+> +		return -EINVAL;
 > +
-> +	if (tgran2 && lim_tgran2)
-> +		return (tgran2 > lim_tgran2) ? -E2BIG : 0;
+> +	/* fp must be supported when sve is supported */
+> +	if (pfr0_has_sve && (fp < 0))
+> +		return -EINVAL;
 > +
-> +	/*
-> +	 * Either tgran2 or lim_tgran2 is zero.
-> +	 * Need stage1 granule size to validate tgran2.
-> +	 */
-> +	switch (field) {
-> +	case ID_AA64MMFR0_TGRAN4_2_SHIFT:
-> +		f1 = ID_AA64MMFR0_TGRAN4_SHIFT;
-> +		break;
-> +	case ID_AA64MMFR0_TGRAN64_2_SHIFT:
-> +		f1 = ID_AA64MMFR0_TGRAN64_SHIFT;
-> +		break;
-> +	case ID_AA64MMFR0_TGRAN16_2_SHIFT:
-> +		f1 = ID_AA64MMFR0_TGRAN16_SHIFT;
-> +		is_signed = false;
-I don't get the is_signed setting. Don't the TGRAN_x have the same
-format? Beside you can get the shift by substracting 12 to @field.
+> +	/* Check if there is a conflict with a request via KVM_ARM_VCPU_INIT */
+> +	if (vcpu_has_sve ^ pfr0_has_sve)
+> +		return -EPERM;
+> +
+> +	gic = cpuid_feature_extract_unsigned_field(val, ID_AA64PFR0_GIC_SHIFT);
+> +	if ((gic > 0) ^ kvm_has_gic3(vcpu->kvm))
+> +		return -EPERM;
 
-can't you directly compute if the granule is supported
-
-> +		break;
-> +	default:
-> +		/* Should never happen */
-> +		WARN_ONCE(1, "Unexpected stage2 granule field (%d)\n", field);
-> +		return 0;
-> +	}
-> +
-> +	/*
-> +	 * If tgran2 == 0 (&& lim_tgran2 != 0), the requested stage2 granule
-> +	 * size is indicated in the stage1 granule size field of @mmfr0.
-> +	 * So, validate the stage1 granule size against the stage2 limit
-> +	 * granule size.
-> +	 * If lim_tgran2 == 0 (&& tgran2 != 0), the stage2 limit granule size
-> +	 * is indicated in the stage1 granule size field of @mmfr0_lim.
-> +	 * So, validate the requested stage2 granule size against the stage1
-> +	 * limit granule size.
-> +	 */
-> +
-> +	 /* Get the relevant stage1 granule size to validate tgran2 */
-> +	if (tgran2 == 0)
-> +		/* The requested stage1 granule size */
-> +		rtgran1 = cpuid_feature_extract_field(mmfr0, f1, is_signed);
-> +	else /* lim_tgran2 == 0 */
-> +		/* The stage1 limit granule size */
-> +		rtgran1 = cpuid_feature_extract_field(mmfr0_lim, f1, is_signed);
-> +
-> +	/*
-> +	 * Adjust the value of rtgran1 to compare with stage2 granule size,
-> +	 * which indicates: 1: Not supported, 2: Supported, etc.
-> +	 */
-> +	if (is_signed)
-> +		/* For signed, -1: Not supported, 0: Supported, etc. */
-> +		rtgran1 += 0x2;
-> +	else
-> +		/* For unsigned, 0: Not supported, 1: Supported, etc. */
-> +		rtgran1 += 0x1;
-> +
-> +	if ((tgran2 == 0) && (rtgran1 > lim_tgran2))
-> +		/*
-> +		 * The requested stage1 granule size (== the requested stage2
-> +		 * granule size) is larger than the stage2 limit granule size.
-> +		 */
-> +		return -E2BIG;
-> +	else if ((lim_tgran2 == 0) && (tgran2 > rtgran1))
-> +		/*
-> +		 * The requested stage2 granule size is larger than the stage1
-> +		 * limit granulze size (== the stage2 limit granule size).
-> +		 */
-> +		return -E2BIG;
+Sometimes from a given architecture version, some lower values are not
+allowed. For instance from ARMv8.5 onlt 1 is permitted for CSV3.
+Shouldn't we handle that kind of check?
 > +
 > +	return 0;
 > +}
 > +
-> +static int validate_id_aa64mmfr0_el1(struct kvm_vcpu *vcpu,
-> +				     const struct id_reg_info *id_reg, u64 val)
+> +static void init_id_aa64pfr0_el1_info(struct id_reg_info *id_reg)
 > +{
 > +	u64 limit = id_reg->vcpu_limit_val;
-> +	int ret;
-
-shouldn't you forbid reserved values for TGran4, 64?
+> +	unsigned int gic;
 > +
-> +	ret = aa64mmfr0_tgran2_check(ID_AA64MMFR0_TGRAN4_2_SHIFT, val, limit);
-> +	if (ret)
-> +		return ret;
+> +	limit &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_AMU);
+> +	if (!system_supports_sve())
+> +		limit &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_SVE);
 > +
-> +	ret = aa64mmfr0_tgran2_check(ID_AA64MMFR0_TGRAN64_2_SHIFT, val, limit);
-> +	if (ret)
-> +		return ret;
+> +	/*
+> +	 * The default is to expose CSV2 == 1 and CSV3 == 1 if the HW
+> +	 * isn't affected.  Userspace can override this as long as it
+> +	 * doesn't promise the impossible.
+> +	 */
+> +	limit &= ~(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV2) |
+> +		   ARM64_FEATURE_MASK(ID_AA64PFR0_CSV3));
 > +
-> +	ret = aa64mmfr0_tgran2_check(ID_AA64MMFR0_TGRAN16_2_SHIFT, val, limit);
-> +	if (ret)
-> +		return ret;
+> +	if (arm64_get_spectre_v2_state() == SPECTRE_UNAFFECTED)
+> +		limit |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV2), 1);
+> +	if (arm64_get_meltdown_state() == SPECTRE_UNAFFECTED)
+> +		limit |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV3), 1);
 > +
-> +	return 0;
+> +	gic = cpuid_feature_extract_unsigned_field(limit, ID_AA64PFR0_GIC_SHIFT);
+> +	if (gic > 1) {
+> +		/* Limit to GICv3.0/4.0 */
+> +		limit &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_GIC);
+> +		limit |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_GIC), 1);
+> +	}
+> +	id_reg->vcpu_limit_val = limit;
 > +}
 > +
->  static void init_id_aa64pfr0_el1_info(struct id_reg_info *id_reg)
->  {
->  	u64 limit = id_reg->vcpu_limit_val;
-> @@ -625,6 +732,16 @@ static struct id_reg_info id_aa64isar1_el1_info = {
->  	.get_reset_val = get_reset_id_aa64isar1_el1,
->  };
->  
-> +static struct id_reg_info id_aa64mmfr0_el1_info = {
-> +	.sys_reg = SYS_ID_AA64MMFR0_EL1,
-> +	.ftr_check_types = S_FCT(ID_AA64MMFR0_TGRAN4_SHIFT, FCT_LOWER_SAFE) |
-> +			   S_FCT(ID_AA64MMFR0_TGRAN64_SHIFT, FCT_LOWER_SAFE) |
-the default?
-> +			   U_FCT(ID_AA64MMFR0_TGRAN4_2_SHIFT, FCT_IGNORE) |
-> +			   U_FCT(ID_AA64MMFR0_TGRAN64_2_SHIFT, FCT_IGNORE) |
-> +			   U_FCT(ID_AA64MMFR0_TGRAN16_2_SHIFT, FCT_IGNORE),
-maybe add comment telling the actual check is handled in the validate cb
-> +	.validate = validate_id_aa64mmfr0_el1,
+> +static u64 get_reset_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+> +				     const struct id_reg_info *idr)
+> +{
+> +	u64 val = idr->vcpu_limit_val;
+> +
+> +	if (!vcpu_has_sve(vcpu))
+> +		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_SVE);
+> +
+> +	if (!kvm_has_gic3(vcpu->kvm))
+> +		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_GIC);
+> +
+> +	return val;
+> +}
+> +
+> +static struct id_reg_info id_aa64pfr0_el1_info = {
+> +	.sys_reg = SYS_ID_AA64PFR0_EL1,
+> +	.ftr_check_types = S_FCT(ID_AA64PFR0_ASIMD_SHIFT, FCT_LOWER_SAFE) |
+> +			   S_FCT(ID_AA64PFR0_FP_SHIFT, FCT_LOWER_SAFE),
+is it needed as it is the default?
+> +	.init = init_id_aa64pfr0_el1_info,
+> +	.validate = validate_id_aa64pfr0_el1,
+> +	.get_reset_val = get_reset_id_aa64pfr0_el1,
 > +};
 > +
 >  /*
 >   * An ID register that needs special handling to control the value for the
 >   * guest must have its own id_reg_info in id_reg_info_table.
-> @@ -638,6 +755,7 @@ static struct id_reg_info *id_reg_info_table[KVM_ARM_ID_REG_MAX_NUM] = {
->  	[IDREG_IDX(SYS_ID_AA64PFR1_EL1)] = &id_aa64pfr1_el1_info,
->  	[IDREG_IDX(SYS_ID_AA64ISAR0_EL1)] = &id_aa64isar0_el1_info,
->  	[IDREG_IDX(SYS_ID_AA64ISAR1_EL1)] = &id_aa64isar1_el1_info,
-> +	[IDREG_IDX(SYS_ID_AA64MMFR0_EL1)] = &id_aa64mmfr0_el1_info,
->  };
+> @@ -409,7 +495,9 @@ static void id_reg_info_init(struct id_reg_info *id_reg)
+>   * validation, etc.)
+>   */
+>  #define	GET_ID_REG_INFO(id)	(id_reg_info_table[IDREG_IDX(id)])
+> -static struct id_reg_info *id_reg_info_table[KVM_ARM_ID_REG_MAX_NUM] = {};
+> +static struct id_reg_info *id_reg_info_table[KVM_ARM_ID_REG_MAX_NUM] = {
+> +	[IDREG_IDX(SYS_ID_AA64PFR0_EL1)] = &id_aa64pfr0_el1_info,
+> +};
 >  
 >  static int validate_id_reg(struct kvm_vcpu *vcpu,
+>  			   const struct sys_reg_desc *rd, u64 val)
+> @@ -1239,20 +1327,22 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
+>  static u64 __read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
+>  {
+>  	u64 val = __vcpu_sys_reg(vcpu, IDREG_SYS_IDX(id));
+> +	u64 lim, gic, gic_lim;
+> +	const struct id_reg_info *id_reg;
+>  
+>  	switch (id) {
+>  	case SYS_ID_AA64PFR0_EL1:
+> -		if (!vcpu_has_sve(vcpu))
+> -			val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_SVE);
+> -		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_AMU);
+> -		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_CSV2);
+> -		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV2), (u64)vcpu->kvm->arch.pfr0_csv2);
+> -		val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_CSV3);
+> -		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV3), (u64)vcpu->kvm->arch.pfr0_csv3);
+> -		if (irqchip_in_kernel(vcpu->kvm) &&
+> -		    vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
+> -			val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_GIC);
+> -			val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_GIC), 1);
+> +		gic = cpuid_feature_extract_unsigned_field(val, ID_AA64PFR0_GIC_SHIFT);
+> +		if (kvm_has_gic3(vcpu->kvm) && (gic == 0)) {
+> +			/*
+> +			 * This is a case where userspace configured gic3 after
+> +			 * the vcpu was created, and then it didn't set
+> +			 * ID_AA64PFR0_EL1.
+> +			 */
+> +			id_reg = GET_ID_REG_INFO(id);
+> +			lim = id_reg->vcpu_limit_val;
+> +			gic_lim = cpuid_feature_extract_unsigned_field(lim, ID_AA64PFR0_GIC_SHIFT);
+> +			val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_GIC), gic_lim);
+>  		}
+>  		break;
+>  	case SYS_ID_AA64PFR1_EL1:
+> @@ -1373,48 +1463,6 @@ static void reset_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd)
+>  	__vcpu_sys_reg(vcpu, IDREG_SYS_IDX(id)) = val;
+>  }
+>  
+> -static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+> -			       const struct sys_reg_desc *rd,
+> -			       const struct kvm_one_reg *reg, void __user *uaddr)
+> -{
+> -	const u64 id = sys_reg_to_index(rd);
+> -	u8 csv2, csv3;
+> -	int err;
+> -	u64 val;
+> -
+> -	err = reg_from_user(&val, uaddr, id);
+> -	if (err)
+> -		return err;
+> -
+> -	/*
+> -	 * Allow AA64PFR0_EL1.CSV2 to be set from userspace as long as
+> -	 * it doesn't promise more than what is actually provided (the
+> -	 * guest could otherwise be covered in ectoplasmic residue).
+> -	 */
+> -	csv2 = cpuid_feature_extract_unsigned_field(val, ID_AA64PFR0_CSV2_SHIFT);
+> -	if (csv2 > 1 ||
+> -	    (csv2 && arm64_get_spectre_v2_state() != SPECTRE_UNAFFECTED))
+> -		return -EINVAL;
+> -
+> -	/* Same thing for CSV3 */
+> -	csv3 = cpuid_feature_extract_unsigned_field(val, ID_AA64PFR0_CSV3_SHIFT);
+> -	if (csv3 > 1 ||
+> -	    (csv3 && arm64_get_meltdown_state() != SPECTRE_UNAFFECTED))
+> -		return -EINVAL;
+> -
+> -	/* We can only differ with CSV[23], and anything else is an error */
+> -	val ^= read_id_reg(vcpu, rd, false);
+> -	val &= ~((0xFUL << ID_AA64PFR0_CSV2_SHIFT) |
+> -		 (0xFUL << ID_AA64PFR0_CSV3_SHIFT));
+> -	if (val)
+> -		return -EINVAL;
+> -
+> -	vcpu->kvm->arch.pfr0_csv2 = csv2;
+> -	vcpu->kvm->arch.pfr0_csv3 = csv3 ;
+> -
+> -	return 0;
+> -}
+> -
+>  /* cpufeature ID register user accessors */
+>  static int __get_id_reg(const struct kvm_vcpu *vcpu,
+>  			const struct sys_reg_desc *rd, void __user *uaddr,
+> @@ -1705,8 +1753,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+>  
+>  	/* AArch64 ID registers */
+>  	/* CRm=4 */
+> -	{ SYS_DESC(SYS_ID_AA64PFR0_EL1), .access = access_id_reg,
+> -	  .get_user = get_id_reg, .set_user = set_id_aa64pfr0_el1, },
+> +	ID_SANITISED(ID_AA64PFR0_EL1),
+>  	ID_SANITISED(ID_AA64PFR1_EL1),
+>  	ID_UNALLOCATED(4,2),
+>  	ID_UNALLOCATED(4,3),
 > 
+
+Thanks
+
+Eric
 
