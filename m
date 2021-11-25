@@ -2,115 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B4F6845E1A9
-	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 21:32:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D3B1845E1AB
+	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 21:37:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242258AbhKYUgH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Nov 2021 15:36:07 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:51491 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1357135AbhKYUeG (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 25 Nov 2021 15:34:06 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637872254;
+        id S1350602AbhKYUkM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Nov 2021 15:40:12 -0500
+Received: from Galois.linutronix.de ([193.142.43.55]:54652 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S242104AbhKYUiM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Nov 2021 15:38:12 -0500
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1637872499;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=dEpF0Ya03y+5CSbJ4wmHYDmPmNwCt74NIwf3iLZqZgg=;
-        b=TASQIoYmL2vjnHpoNdfU97cmT0YpWCmIYRiyv7BcXfMtqCjtWSSmmK+WAcbBuMASdFHQoa
-        ohunlHd2WS2R9GU6L0oQjQlLI8MaMyHRyEn2HG363FFLYnuYryE9V0W0whcs6lPuPVVvTC
-        igqVvPg2YEswJLF6XugT+Wh2x+eKuvM=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-438-gHNA8ShbNOqfyUga9CZ0jQ-1; Thu, 25 Nov 2021 15:30:53 -0500
-X-MC-Unique: gHNA8ShbNOqfyUga9CZ0jQ-1
-Received: by mail-wm1-f72.google.com with SMTP id 187-20020a1c02c4000000b003335872db8dso3770945wmc.2
-        for <kvm@vger.kernel.org>; Thu, 25 Nov 2021 12:30:53 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=dEpF0Ya03y+5CSbJ4wmHYDmPmNwCt74NIwf3iLZqZgg=;
-        b=PWKISvHD42xeteCSVz/qUdbxelKpUapxpBCIOkO/F1hU999cLtbeVXNRapzw3xspsx
-         +tD+XYMAFJmjjf2TJXUN/Hha/PMpv5NpG+koz6oPXSRkHX9HM6fymKqIvobro8wo/eqJ
-         L1OihnX56w8n/3h9XkzdI1jwqFA0Ed5knAmPomdKZtJOVSFJBCGW2vW9s1t1T8loPqBa
-         SO+LIutGBFnx9o+JYLTt8sB0wKLHUm7uahqREyEIG0JLH7GZuc2INhhA9OZiH6Axez0l
-         hPN+hAoA6IyCmQ/vcpdFTIkmAcmcY4Njv6fz2o1evUP3kVl4VphSlPYV4TaMAVvvWpVa
-         KOhw==
-X-Gm-Message-State: AOAM530qs/8dESDL1TnS2hCb9y/x5saN6M+oM8EhxzIVjO+lq1AGwhCV
-        zMpX3jJUT5h0Uw1dEXP+7S8K6Ls3B7Seg8CqZ0EaGHwdnKgDZDVYJbbUb8W+vuYmvaBwTvBbcsh
-        K+EltVheazcua
-X-Received: by 2002:a5d:6312:: with SMTP id i18mr10186648wru.475.1637872251640;
-        Thu, 25 Nov 2021 12:30:51 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJx0gaKevT6dubAbNdgl8Mlg1Ca3d8cwo7W4YwZVK8nM2ffYuZwM+HX5qjU1mVul0Cey+e9psA==
-X-Received: by 2002:a5d:6312:: with SMTP id i18mr10186629wru.475.1637872251479;
-        Thu, 25 Nov 2021 12:30:51 -0800 (PST)
-Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id h2sm3566055wrz.23.2021.11.25.12.30.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Nov 2021 12:30:50 -0800 (PST)
-Subject: Re: [RFC PATCH v3 09/29] KVM: arm64: Hide IMPLEMENTATION DEFINED PMU
- support for the guest
-To:     Reiji Watanabe <reijiw@google.com>, Marc Zyngier <maz@kernel.org>,
-        kvmarm@lists.cs.columbia.edu
-Cc:     kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
-        Peter Shier <pshier@google.com>,
+        bh=/kowRQz/X1emYsPJm380BhD45fBrknAHK9ZvzfZLhJ4=;
+        b=TxPcFNdJN8ZJ1cb4d5pPjpJNd+sPqfcJljRzYDywq8JAOpjxCAmjY6VTW78zhKb7e8zPDI
+        JFGfI5pZ5kaiRoLA6S5k8D7MTg/57ZYOd731LTf/jvv2aLgVab0k1Yn3lEHdL9BHoJJ0nb
+        fDFpxJhNMS/h+eBeeV8G2a2BrdrU+TsPYRwxFJNGUqr4ARCqiJCWBejm+BCRKkPRbr0TMr
+        AQzhzYuyo9TdauSmJ7JYxs9hgvaMdhFZabfnLuoAA8Oa2C8mMm4uw5lckVDQNqLJUbt/yT
+        xHQCejkwQKXsm262CcC/0QN5OwBAiQvAy3S4QBDEvhbV0/s4lq3FoLTwx8/8Rw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1637872499;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=/kowRQz/X1emYsPJm380BhD45fBrknAHK9ZvzfZLhJ4=;
+        b=s/JyHzL9+1IjI0h7h2P7EN0krBhwFHpNUHQkCXIV/9Rs5DrSeMhpk/pyhKpMYyi+DOAhXZ
+        I19dsvLWWXYv7JCA==
+To:     isaku.yamahata@intel.com, Ingo Molnar <mingo@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        linux-arm-kernel@lists.infradead.org
-References: <20211117064359.2362060-1-reijiw@google.com>
- <20211117064359.2362060-10-reijiw@google.com>
-From:   Eric Auger <eauger@redhat.com>
-Message-ID: <d09e53a7-b8df-e8fd-c34a-f76a37d664d6@redhat.com>
-Date:   Thu, 25 Nov 2021 21:30:49 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, erdemaktas@google.com,
+        Connor Kuehl <ckuehl@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
+        Chao Gao <chao.gao@intel.com>
+Subject: Re: [RFC PATCH v3 53/59] KVM: x86: Add a helper function to restore
+ 4 host MSRs on exit to user space
+In-Reply-To: <4ede5c987a4ae938a37ab7fe70d5e1d561ee97d4.1637799475.git.isaku.yamahata@intel.com>
+References: <cover.1637799475.git.isaku.yamahata@intel.com>
+ <4ede5c987a4ae938a37ab7fe70d5e1d561ee97d4.1637799475.git.isaku.yamahata@intel.com>
+Date:   Thu, 25 Nov 2021 21:34:59 +0100
+Message-ID: <878rxcht3g.ffs@tglx>
 MIME-Version: 1.0
-In-Reply-To: <20211117064359.2362060-10-reijiw@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Reiji,
+On Wed, Nov 24 2021 at 16:20, isaku yamahata wrote:
+> From: Chao Gao <chao.gao@intel.com>
 
-On 11/17/21 7:43 AM, Reiji Watanabe wrote:
-> When ID_AA64DFR0_EL1.PMUVER or ID_DFR0_EL1.PERFMON is 0xf, which
-> means IMPLEMENTATION DEFINED PMU supported, KVM unconditionally
-> expose the value for the guest as it is.  Since KVM doesn't support
-> IMPLEMENTATION DEFINED PMU for the guest, in that case KVM should
-> exopse 0x0 (PMU is not implemented) instead.
-s/exopse/expose
-> 
-> Change cpuid_feature_cap_perfmon_field() to update the field value
-> to 0x0 when it is 0xf.
-is it wrong to expose the guest with a Perfmon value of 0xF? Then the
-guest should not use it as a PMUv3?
+> $Subject: KVM: x86: Add a helper function to restore 4 host MSRs on exit to user space
 
-Eric
-> 
-> Fixes: 8e35aa642ee4 ("arm64: cpufeature: Extract capped perfmon fields")
-> Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> ---
->  arch/arm64/include/asm/cpufeature.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-> index ef6be92b1921..fd7ad8193827 100644
-> --- a/arch/arm64/include/asm/cpufeature.h
-> +++ b/arch/arm64/include/asm/cpufeature.h
-> @@ -553,7 +553,7 @@ cpuid_feature_cap_perfmon_field(u64 features, int field, u64 cap)
->  
->  	/* Treat IMPLEMENTATION DEFINED functionality as unimplemented */
->  	if (val == ID_AA64DFR0_PMUVER_IMP_DEF)
-> -		val = 0;
-> +		return (features & ~mask);
->  
->  	if (val > cap) {
->  		features &= ~mask;
-> 
+Which user space are you talking about? This subject line is misleading
+at best. The unconditional reset is happening when a TDX VM exits
+because the SEAM firmware enforces this to prevent unformation leaks.
 
+It also does not matter whether this are four or ten MSR. Fact is that
+the SEAM firmware is buggy because it does not save/restore those MSRs.
+
+So the proper subject line is:
+
+   KVM: x86: Add infrastructure to handle MSR corruption by broken TDX firmware 
+
+> The TDX module unconditionally reset 4 host MSRs (MSR_SYSCALL_MASK,
+> MSR_START, MSR_LSTAR, MSR_TSC_AUX) to architectural INIT state on exit from
+> TDX VM to KVM.  KVM needs to save their values before TD enter and restore
+> them on exit to userspace.
+>
+> Reuse current kvm_user_return mechanism and introduce a function to update
+> cached values and register the user return notifier in this new function.
+>
+> The later patch will use the helper function to save/restore 4 host
+> MSRs.
+
+'The later patch ...' is useless information. Of course there will be a
+later patch to make use of this which is implied by 'Add infrastructure
+...'. Can we please get rid of these useless phrases which have no value
+at patch submission time and are even more confusing once the pile is
+merged?
+
+Thanks,
+
+        tglx
