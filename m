@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 174AF45D1F8
-	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 01:25:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 48B3C45D194
+	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 01:24:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352789AbhKYAYT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Nov 2021 19:24:19 -0500
+        id S1352825AbhKYAYU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Nov 2021 19:24:20 -0500
 Received: from mga18.intel.com ([134.134.136.126]:32610 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1347605AbhKYAYL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Nov 2021 19:24:11 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10178"; a="222281268"
+        id S1352690AbhKYAYM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Nov 2021 19:24:12 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10178"; a="222281269"
 X-IronPort-AV: E=Sophos;i="5.87,261,1631602800"; 
-   d="scan'208";a="222281268"
+   d="scan'208";a="222281269"
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
   by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 16:21:01 -0800
 X-IronPort-AV: E=Sophos;i="5.87,261,1631602800"; 
-   d="scan'208";a="675042085"
+   d="scan'208";a="675042089"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 16:21:00 -0800
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 16:21:01 -0800
 From:   isaku.yamahata@intel.com
 To:     Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
@@ -33,10 +33,10 @@ To:     Thomas Gleixner <tglx@linutronix.de>,
         Sean Christopherson <seanjc@google.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [RFC PATCH v3 04/59] KVM: TDX: Add TDX "architectural" error codes
-Date:   Wed, 24 Nov 2021 16:19:47 -0800
-Message-Id: <86922d54da6a5b0f21dd87bb94613e5a048c1054.1637799475.git.isaku.yamahata@intel.com>
+        Xiaoyao Li <xiaoyao.li@intel.com>
+Subject: [RFC PATCH v3 05/59] KVM: TDX: add a helper function for kvm to call seamcall
+Date:   Wed, 24 Nov 2021 16:19:48 -0800
+Message-Id: <d089468157dddab3e231a4d757aa1770b380224d.1637799475.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1637799475.git.isaku.yamahata@intel.com>
 References: <cover.1637799475.git.isaku.yamahata@intel.com>
@@ -46,139 +46,138 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <sean.j.christopherson@intel.com>
+From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Add error codes for the TDX SEAMCALLs both for TDX VMM side and TDX guest
-side.
+Add a helper function for kvm to call seamcall and a helper macro to check
+its return value.  The later patches will use them.
 
-TDX SEAMCALL uses bits 31:0 to return more information, so these error
-codes will only exactly match RAX[63:32].  Error codes for TDG.VP.VMCALL is
-defined by TDX Guest-Host-Communication interface spec.
-
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
+Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/vmx/tdx_errno.h | 111 +++++++++++++++++++++++++++++++++++
- 1 file changed, 111 insertions(+)
- create mode 100644 arch/x86/kvm/vmx/tdx_errno.h
+ arch/x86/kvm/vmx/seamcall.h | 113 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 113 insertions(+)
+ create mode 100644 arch/x86/kvm/vmx/seamcall.h
 
-diff --git a/arch/x86/kvm/vmx/tdx_errno.h b/arch/x86/kvm/vmx/tdx_errno.h
+diff --git a/arch/x86/kvm/vmx/seamcall.h b/arch/x86/kvm/vmx/seamcall.h
 new file mode 100644
-index 000000000000..395dd3099254
+index 000000000000..f27e9d27137d
 --- /dev/null
-+++ b/arch/x86/kvm/vmx/tdx_errno.h
-@@ -0,0 +1,111 @@
++++ b/arch/x86/kvm/vmx/seamcall.h
+@@ -0,0 +1,113 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
-+/* architectural status code for SEAMCALL */
++#ifndef __KVM_VMX_SEAMCALL_H
++#define __KVM_VMX_SEAMCALL_H
 +
-+#ifndef __KVM_X86_TDX_ERRNO_H
-+#define __KVM_X86_TDX_ERRNO_H
++#include <asm/asm.h>
 +
-+#define TDX_SEAMCALL_STATUS_MASK		0xFFFFFFFF00000000ULL
++#ifdef CONFIG_INTEL_TDX_HOST
 +
-+/*
-+ * TDX SEAMCALL Status Codes (returned in RAX)
-+ */
-+#define TDX_SUCCESS				0x0000000000000000ULL
-+#define TDX_NON_RECOVERABLE_VCPU		0x4000000100000000ULL
-+#define TDX_NON_RECOVERABLE_TD			0x4000000200000000ULL
-+#define TDX_INTERRUPTED_RESUMABLE		0x8000000300000000ULL
-+#define TDX_INTERRUPTED_RESTARTABLE		0x8000000400000000ULL
-+#define TDX_NON_RECOVERABLE_TD_FATAL		0x4000000500000000ULL
-+#define TDX_INVALID_RESUMPTION			0xC000000600000000ULL
-+#define TDX_NON_RECOVERABLE_TD_NO_APIC		0xC000000700000000ULL
-+#define TDX_OPERAND_INVALID			0xC000010000000000ULL
-+#define TDX_OPERAND_ADDR_RANGE_ERROR		0xC000010100000000ULL
-+#define TDX_OPERAND_BUSY			0x8000020000000000ULL
-+#define TDX_PREVIOUS_TLB_EPOCH_BUSY		0x8000020100000000ULL
-+#define TDX_SYS_BUSY				0x8000020200000000ULL
-+#define TDX_PAGE_METADATA_INCORRECT		0xC000030000000000ULL
-+#define TDX_PAGE_ALREADY_FREE			0x0000030100000000ULL
-+#define TDX_PAGE_NOT_OWNED_BY_TD		0xC000030200000000ULL
-+#define TDX_PAGE_NOT_FREE			0xC000030300000000ULL
-+#define TDX_TD_ASSOCIATED_PAGES_EXIST		0xC000040000000000ULL
-+#define TDX_SYSINIT_NOT_PENDING			0xC000050000000000ULL
-+#define TDX_SYSINIT_NOT_DONE			0xC000050100000000ULL
-+#define TDX_SYSINITLP_NOT_DONE			0xC000050200000000ULL
-+#define TDX_SYSINITLP_DONE			0xC000050300000000ULL
-+#define TDX_SYS_NOT_READY			0xC000050500000000ULL
-+#define TDX_SYS_SHUTDOWN			0xC000050600000000ULL
-+#define TDX_SYSCONFIG_NOT_DONE			0xC000050700000000ULL
-+#define TDX_TD_NOT_INITIALIZED			0xC000060000000000ULL
-+#define TDX_TD_INITIALIZED			0xC000060100000000ULL
-+#define TDX_TD_NOT_FINALIZED			0xC000060200000000ULL
-+#define TDX_TD_FINALIZED			0xC000060300000000ULL
-+#define TDX_TD_FATAL				0xC000060400000000ULL
-+#define TDX_TD_NON_DEBUG			0xC000060500000000ULL
-+#define TDX_LIFECYCLE_STATE_INCORRECT		0xC000060700000000ULL
-+#define TDX_TDCX_NUM_INCORRECT			0xC000061000000000ULL
-+#define TDX_VCPU_STATE_INCORRECT		0xC000070000000000ULL
-+#define TDX_VCPU_ASSOCIATED			0x8000070100000000ULL
-+#define TDX_VCPU_NOT_ASSOCIATED			0x8000070200000000ULL
-+#define TDX_TDVPX_NUM_INCORRECT			0xC000070300000000ULL
-+#define TDX_NO_VALID_VE_INFO			0xC000070400000000ULL
-+#define TDX_MAX_VCPUS_EXCEEDED			0xC000070500000000ULL
-+#define TDX_TSC_ROLLBACK			0xC000070600000000ULL
-+#define TDX_FIELD_NOT_WRITABLE			0xC000072000000000ULL
-+#define TDX_FIELD_NOT_READABLE			0xC000072100000000ULL
-+#define TDX_TD_VMCS_FIELD_NOT_INITIALIZED	0xC000073000000000ULL
-+#define TDX_KEY_GENERATION_FAILED		0x8000080000000000ULL
-+#define TDX_TD_KEYS_NOT_CONFIGURED		0x8000081000000000ULL
-+#define TDX_KEY_STATE_INCORRECT			0xC000081100000000ULL
-+#define TDX_KEY_CONFIGURED			0x0000081500000000ULL
-+#define TDX_WBCACHE_NOT_COMPLETE		0x8000081700000000ULL
-+#define TDX_HKID_NOT_FREE			0xC000082000000000ULL
-+#define TDX_NO_HKID_READY_TO_WBCACHE		0x0000082100000000ULL
-+#define TDX_WBCACHE_RESUME_ERROR		0xC000082300000000ULL
-+#define TDX_FLUSHVP_NOT_DONE			0x8000082400000000ULL
-+#define TDX_NUM_ACTIVATED_HKIDS_NOT_SUPPORTED	0xC000082500000000ULL
-+#define TDX_INCORRECT_CPUID_VALUE		0xC000090000000000ULL
-+#define TDX_BOOT_NT4_SET			0xC000090100000000ULL
-+#define TDX_INCONSISTENT_CPUID_FIELD		0xC000090200000000ULL
-+#define TDX_CPUID_LEAF_1F_FORMAT_UNRECOGNIZED	0xC000090400000000ULL
-+#define TDX_INVALID_WBINVD_SCOPE		0xC000090500000000ULL
-+#define TDX_INVALID_PKG_ID			0xC000090600000000ULL
-+#define TDX_CPUID_LEAF_NOT_SUPPORTED		0xC000090800000000ULL
-+#define TDX_SMRR_NOT_LOCKED			0xC000091000000000ULL
-+#define TDX_INVALID_SMRR_CONFIGURATION		0xC000091100000000ULL
-+#define TDX_SMRR_OVERLAPS_CMR			0xC000091200000000ULL
-+#define TDX_SMRR_LOCK_NOT_SUPPORTED		0xC000091300000000ULL
-+#define TDX_SMRR_NOT_SUPPORTED			0xC000091400000000ULL
-+#define TDX_INCONSISTENT_MSR			0xC000092000000000ULL
-+#define TDX_INCORRECT_MSR_VALUE			0xC000092100000000ULL
-+#define TDX_SEAMREPORT_NOT_AVAILABLE		0xC000093000000000ULL
-+#define TDX_PERF_COUNTERS_ARE_PEBS_ENABLED	0x8000094000000000ULL
-+#define TDX_INVALID_TDMR			0xC0000A0000000000ULL
-+#define TDX_NON_ORDERED_TDMR			0xC0000A0100000000ULL
-+#define TDX_TDMR_OUTSIDE_CMRS			0xC0000A0200000000ULL
-+#define TDX_TDMR_ALREADY_INITIALIZED		0x00000A0300000000ULL
-+#define TDX_INVALID_PAMT			0xC0000A1000000000ULL
-+#define TDX_PAMT_OUTSIDE_CMRS			0xC0000A1100000000ULL
-+#define TDX_PAMT_OVERLAP			0xC0000A1200000000ULL
-+#define TDX_INVALID_RESERVED_IN_TDMR		0xC0000A2000000000ULL
-+#define TDX_NON_ORDERED_RESERVED_IN_TDMR	0xC0000A2100000000ULL
-+#define TDX_CMR_LIST_INVALID			0xC0000A2200000000ULL
-+#define TDX_EPT_WALK_FAILED			0xC0000B0000000000ULL
-+#define TDX_EPT_ENTRY_FREE			0xC0000B0100000000ULL
-+#define TDX_EPT_ENTRY_NOT_FREE			0xC0000B0200000000ULL
-+#define TDX_EPT_ENTRY_NOT_PRESENT		0xC0000B0300000000ULL
-+#define TDX_EPT_ENTRY_NOT_LEAF			0xC0000B0400000000ULL
-+#define TDX_EPT_ENTRY_LEAF			0xC0000B0500000000ULL
-+#define TDX_GPA_RANGE_NOT_BLOCKED		0xC0000B0600000000ULL
-+#define TDX_GPA_RANGE_ALREADY_BLOCKED		0x00000B0700000000ULL
-+#define TDX_TLB_TRACKING_NOT_DONE		0xC0000B0800000000ULL
-+#define TDX_EPT_INVALID_PROMOTE_CONDITIONS	0xC0000B0900000000ULL
-+#define TDX_PAGE_ALREADY_ACCEPTED		0x00000B0A00000000ULL
-+#define TDX_PAGE_SIZE_MISMATCH			0xC0000B0B00000000ULL
++#ifdef __ASSEMBLER__
++
++.macro seamcall
++	.byte 0x66, 0x0f, 0x01, 0xcf
++.endm
++
++#else
 +
 +/*
-+ * TDG.VP.VMCALL Status Codes (returned in R10)
++ * TDX extended return:
++ * Some of The "TDX module" SEAMCALLs return extended values (which are function
++ * leaf specific) in registers in addition to the completion status code in
++ %rax.
 + */
-+#define TDG_VP_VMCALL_SUCCESS			0x0000000000000000ULL
-+#define TDG_VP_VMCALL_INVALID_OPERAND		0x8000000000000000ULL
-+#define TDG_VP_VMCALL_TDREPORT_FAILED		0x8000000000000001ULL
++struct tdx_ex_ret {
++	union {
++		struct {
++			u64 rcx;
++			u64 rdx;
++			u64 r8;
++			u64 r9;
++			u64 r10;
++			u64 r11;
++		} regs;
++		/* TDH_MNG_INIT returns CPUID info on error. */
++		struct {
++			u32 leaf;
++			u32 subleaf;
++		} mng_init;
++		/* Functions that walk SEPT */
++		struct {
++			u64 septe;
++			struct {
++				u64 level		:3;
++				u64 sept_reserved_0	:5;
++				u64 state		:8;
++				u64 sept_reserved_1	:48;
++			};
++		} sept_walk;
++		/* TDH_MNG_{RD,WR} return the field value. */
++		struct {
++			u64 field_val;
++		} mng_rdwr;
++		/* TDH_MEM_{RD,WR} return the error info and value. */
++		struct {
++			u64 ext_err_info_1;
++			u64 ext_err_info_2;
++			u64 mem_val;
++		} mem_rdwr;
++		/* TDH_PHYMEM_PAGE_RDMD and TDH_PHYMEM_PAGE_RECLAIM return page metadata. */
++		struct {
++			u64 page_type;
++			u64 owner;
++			u64 page_size;
++		} phymem_page_md;
++	};
++};
 +
-+#endif /* __KVM_X86_TDX_ERRNO_H */
++static inline u64 seamcall(u64 op, u64 rcx, u64 rdx, u64 r8, u64 r9, u64 r10,
++			struct tdx_ex_ret *ex)
++{
++	register unsigned long r8_in asm("r8");
++	register unsigned long r9_in asm("r9");
++	register unsigned long r10_in asm("r10");
++	register unsigned long r8_out asm("r8");
++	register unsigned long r9_out asm("r9");
++	register unsigned long r10_out asm("r10");
++	register unsigned long r11_out asm("r11");
++	struct tdx_ex_ret dummy;
++	u64 ret;
++
++	if (!ex)
++		/* The following inline assembly requires non-NULL ex. */
++		ex = &dummy;
++
++	/*
++	 * Because the TDX module is known to be already initialized, seamcall
++	 * instruction should always succeed without exceptions.  Don't check
++	 * the instruction error with CF=1 for the availability of the TDX
++	 * module.
++	 */
++	r8_in = r8;
++	r9_in = r9;
++	r10_in = r10;
++	asm volatile (
++		".byte 0x66, 0x0f, 0x01, 0xcf\n\t"	/* seamcall instruction */
++		: ASM_CALL_CONSTRAINT, "=a"(ret),
++		  "=c"(ex->regs.rcx), "=d"(ex->regs.rdx),
++		  "=r"(r8_out), "=r"(r9_out), "=r"(r10_out), "=r"(r11_out)
++		: "a"(op), "c"(rcx), "d"(rdx),
++		  "r"(r8_in), "r"(r9_in), "r"(r10_in)
++		: "cc", "memory");
++	ex->regs.r8 = r8_out;
++	ex->regs.r9 = r9_out;
++	ex->regs.r10 = r10_out;
++	ex->regs.r11 = r11_out;
++
++	return ret;
++}
++
++#endif /* !__ASSEMBLER__ */
++
++#endif	/* CONFIG_INTEL_TDX_HOST */
++
++#endif /* __KVM_VMX_SEAMCALL_H */
 -- 
 2.25.1
 
