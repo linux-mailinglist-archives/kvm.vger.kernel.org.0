@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A1B445D190
-	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 01:24:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 174AF45D1F8
+	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 01:25:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352739AbhKYAYQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Nov 2021 19:24:16 -0500
+        id S1352789AbhKYAYT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Nov 2021 19:24:19 -0500
 Received: from mga18.intel.com ([134.134.136.126]:32610 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1347567AbhKYAYL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1347605AbhKYAYL (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 24 Nov 2021 19:24:11 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10178"; a="222281264"
+X-IronPort-AV: E=McAfee;i="6200,9189,10178"; a="222281268"
 X-IronPort-AV: E=Sophos;i="5.87,261,1631602800"; 
-   d="scan'208";a="222281264"
+   d="scan'208";a="222281268"
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 16:21:00 -0800
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 16:21:01 -0800
 X-IronPort-AV: E=Sophos;i="5.87,261,1631602800"; 
-   d="scan'208";a="675042080"
+   d="scan'208";a="675042085"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 16:20:59 -0800
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 16:21:00 -0800
 From:   isaku.yamahata@intel.com
 To:     Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
@@ -33,12 +33,10 @@ To:     Thomas Gleixner <tglx@linutronix.de>,
         Sean Christopherson <seanjc@google.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
-        Kai Huang <kai.huang@intel.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>,
         Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [RFC PATCH v3 03/59] KVM: TDX: Define TDX architectural definitions
-Date:   Wed, 24 Nov 2021 16:19:46 -0800
-Message-Id: <5c4d620cee6b8179d9c14dfc3f83490e6f81f726.1637799475.git.isaku.yamahata@intel.com>
+Subject: [RFC PATCH v3 04/59] KVM: TDX: Add TDX "architectural" error codes
+Date:   Wed, 24 Nov 2021 16:19:47 -0800
+Message-Id: <86922d54da6a5b0f21dd87bb94613e5a048c1054.1637799475.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1637799475.git.isaku.yamahata@intel.com>
 References: <cover.1637799475.git.isaku.yamahata@intel.com>
@@ -48,250 +46,139 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-Define architectural definitions for KVM to issue TDX SEAMCALLs.
+Add error codes for the TDX SEAMCALLs both for TDX VMM side and TDX guest
+side.
 
-Structures and values that are architecturally defined in the TDX module
-specifications the chapter of ABI Reference
+TDX SEAMCALL uses bits 31:0 to return more information, so these error
+codes will only exactly match RAX[63:32].  Error codes for TDG.VP.VMCALL is
+defined by TDX Guest-Host-Communication interface spec.
 
-Co-developed-by: Kai Huang <kai.huang@intel.com>
-Signed-off-by: Kai Huang <kai.huang@intel.com>
-Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
-Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-Co-developed-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/vmx/tdx_arch.h | 219 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 219 insertions(+)
- create mode 100644 arch/x86/kvm/vmx/tdx_arch.h
+ arch/x86/kvm/vmx/tdx_errno.h | 111 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 111 insertions(+)
+ create mode 100644 arch/x86/kvm/vmx/tdx_errno.h
 
-diff --git a/arch/x86/kvm/vmx/tdx_arch.h b/arch/x86/kvm/vmx/tdx_arch.h
+diff --git a/arch/x86/kvm/vmx/tdx_errno.h b/arch/x86/kvm/vmx/tdx_errno.h
 new file mode 100644
-index 000000000000..f57f9bfb7007
+index 000000000000..395dd3099254
 --- /dev/null
-+++ b/arch/x86/kvm/vmx/tdx_arch.h
-@@ -0,0 +1,219 @@
++++ b/arch/x86/kvm/vmx/tdx_errno.h
+@@ -0,0 +1,111 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
-+/* architectural constants/data definitions for TDX SEAMCALLs */
++/* architectural status code for SEAMCALL */
 +
-+#ifndef __KVM_X86_TDX_ARCH_H
-+#define __KVM_X86_TDX_ARCH_H
++#ifndef __KVM_X86_TDX_ERRNO_H
++#define __KVM_X86_TDX_ERRNO_H
 +
-+#include <linux/types.h>
-+
-+/*
-+ * TDX SEAMCALL API function leaves
-+ */
-+#define TDH_VP_ENTER			0
-+#define TDH_MNG_ADDCX			1
-+#define TDH_MEM_PAGE_ADD		2
-+#define TDH_MEM_SEPT_ADD		3
-+#define TDH_VP_ADDCX			4
-+#define TDH_MEM_PAGE_AUG		6
-+#define TDH_MEM_RANGE_BLOCK		7
-+#define TDH_MNG_KEY_CONFIG		8
-+#define TDH_MNG_CREATE			9
-+#define TDH_VP_CREATE			10
-+#define TDH_MNG_RD			11
-+#define TDH_MEM_RD			12
-+#define TDH_MNG_WR			13
-+#define TDH_MEM_WR			14
-+#define TDH_MEM_PAGE_DEMOTE		15
-+#define TDH_MR_EXTEND			16
-+#define TDH_MR_FINALIZE			17
-+#define TDH_VP_FLUSH			18
-+#define TDH_MNG_VPFLUSHDONE		19
-+#define TDH_MNG_KEY_FREEID		20
-+#define TDH_MNG_INIT			21
-+#define TDH_VP_INIT			22
-+#define TDH_MEM_PAGE_PROMOTE		23
-+#define TDH_PHYMEM_PAGE_RDMD		24
-+#define TDH_MEM_SEPT_RD			25
-+#define TDH_VP_RD			26
-+#define TDH_MNG_KEY_RECLAIMID		27
-+#define TDH_PHYMEM_PAGE_RECLAIM		28
-+#define TDH_MEM_PAGE_REMOVE		29
-+#define TDH_MEM_SEPT_REMOVE		30
-+#define TDH_MEM_TRACK			38
-+#define TDH_MEM_RANGE_UNBLOCK		39
-+#define TDH_PHYMEM_CACHE_WB		40
-+#define TDH_PHYMEM_PAGE_WBINVD		41
-+#define TDH_MEM_SEPT_WR			42
-+#define TDH_VP_WR			43
-+#define TDH_SYS_LP_SHUTDOWN		44
-+
-+#define TDG_VP_VMCALL_GET_TD_VM_CALL_INFO		0x10000
-+#define TDG_VP_VMCALL_MAP_GPA				0x10001
-+#define TDG_VP_VMCALL_GET_QUOTE				0x10002
-+#define TDG_VP_VMCALL_REPORT_FATAL_ERROR		0x10003
-+#define TDG_VP_VMCALL_SETUP_EVENT_NOTIFY_INTERRUPT	0x10004
-+
-+/* TDX control structure (TDR/TDCS/TDVPS) field access codes */
-+#define TDX_CLASS_SHIFT			56
-+#define TDX_FIELD_MASK			GENMASK_ULL(31, 0)
-+
-+#define BUILD_TDX_FIELD(class, field)	\
-+	(((u64)(class) << TDX_CLASS_SHIFT) | ((u64)(field) & TDX_FIELD_MASK))
-+
-+/* @field is the VMCS field encoding */
-+#define TDVPS_VMCS(field)		BUILD_TDX_FIELD(0, (field))
++#define TDX_SEAMCALL_STATUS_MASK		0xFFFFFFFF00000000ULL
 +
 +/*
-+ * @offset is the offset (in bytes) from the beginning of the architectural
-+ * virtual APIC page.
++ * TDX SEAMCALL Status Codes (returned in RAX)
 + */
-+#define TDVPS_APIC(offset)		BUILD_TDX_FIELD(1, (offset))
-+
-+/* @gpr is the index of a general purpose register, e.g. eax=0 */
-+#define TDVPS_GPR(gpr)			BUILD_TDX_FIELD(16, (gpr))
-+
-+#define TDVPS_DR(dr)			BUILD_TDX_FIELD(17, (0 + (dr)))
-+
-+enum tdx_guest_other_state {
-+	TD_VCPU_XCR0 = 32,
-+	TD_VCPU_IWK_ENCKEY0 = 64,
-+	TD_VCPU_IWK_ENCKEY1,
-+	TD_VCPU_IWK_ENCKEY2,
-+	TD_VCPU_IWK_ENCKEY3,
-+	TD_VCPU_IWK_INTKEY0 = 68,
-+	TD_VCPU_IWK_INTKEY1,
-+	TD_VCPU_IWK_FLAGS = 70,
-+};
-+
-+/* @field is any of enum tdx_guest_other_state */
-+#define TDVPS_STATE(field)		BUILD_TDX_FIELD(17, (field))
-+
-+/* @msr is the MSR index */
-+#define TDVPS_MSR(msr)			BUILD_TDX_FIELD(19, (msr))
-+
-+/* Management class fields */
-+enum tdx_guest_management {
-+	TD_VCPU_PEND_NMI = 11,
-+};
-+
-+/* @field is any of enum tdx_guest_management */
-+#define TDVPS_MANAGEMENT(field)		BUILD_TDX_FIELD(32, (field))
-+
-+enum tdx_tdcs_execution_control {
-+	TD_TDCS_EXEC_TSC_OFFSET = 10,
-+};
-+
-+/* @field is any of enum tdx_tdcs_execution_control */
-+#define TDCS_EXEC(field)		BUILD_TDX_FIELD(17, (field))
++#define TDX_SUCCESS				0x0000000000000000ULL
++#define TDX_NON_RECOVERABLE_VCPU		0x4000000100000000ULL
++#define TDX_NON_RECOVERABLE_TD			0x4000000200000000ULL
++#define TDX_INTERRUPTED_RESUMABLE		0x8000000300000000ULL
++#define TDX_INTERRUPTED_RESTARTABLE		0x8000000400000000ULL
++#define TDX_NON_RECOVERABLE_TD_FATAL		0x4000000500000000ULL
++#define TDX_INVALID_RESUMPTION			0xC000000600000000ULL
++#define TDX_NON_RECOVERABLE_TD_NO_APIC		0xC000000700000000ULL
++#define TDX_OPERAND_INVALID			0xC000010000000000ULL
++#define TDX_OPERAND_ADDR_RANGE_ERROR		0xC000010100000000ULL
++#define TDX_OPERAND_BUSY			0x8000020000000000ULL
++#define TDX_PREVIOUS_TLB_EPOCH_BUSY		0x8000020100000000ULL
++#define TDX_SYS_BUSY				0x8000020200000000ULL
++#define TDX_PAGE_METADATA_INCORRECT		0xC000030000000000ULL
++#define TDX_PAGE_ALREADY_FREE			0x0000030100000000ULL
++#define TDX_PAGE_NOT_OWNED_BY_TD		0xC000030200000000ULL
++#define TDX_PAGE_NOT_FREE			0xC000030300000000ULL
++#define TDX_TD_ASSOCIATED_PAGES_EXIST		0xC000040000000000ULL
++#define TDX_SYSINIT_NOT_PENDING			0xC000050000000000ULL
++#define TDX_SYSINIT_NOT_DONE			0xC000050100000000ULL
++#define TDX_SYSINITLP_NOT_DONE			0xC000050200000000ULL
++#define TDX_SYSINITLP_DONE			0xC000050300000000ULL
++#define TDX_SYS_NOT_READY			0xC000050500000000ULL
++#define TDX_SYS_SHUTDOWN			0xC000050600000000ULL
++#define TDX_SYSCONFIG_NOT_DONE			0xC000050700000000ULL
++#define TDX_TD_NOT_INITIALIZED			0xC000060000000000ULL
++#define TDX_TD_INITIALIZED			0xC000060100000000ULL
++#define TDX_TD_NOT_FINALIZED			0xC000060200000000ULL
++#define TDX_TD_FINALIZED			0xC000060300000000ULL
++#define TDX_TD_FATAL				0xC000060400000000ULL
++#define TDX_TD_NON_DEBUG			0xC000060500000000ULL
++#define TDX_LIFECYCLE_STATE_INCORRECT		0xC000060700000000ULL
++#define TDX_TDCX_NUM_INCORRECT			0xC000061000000000ULL
++#define TDX_VCPU_STATE_INCORRECT		0xC000070000000000ULL
++#define TDX_VCPU_ASSOCIATED			0x8000070100000000ULL
++#define TDX_VCPU_NOT_ASSOCIATED			0x8000070200000000ULL
++#define TDX_TDVPX_NUM_INCORRECT			0xC000070300000000ULL
++#define TDX_NO_VALID_VE_INFO			0xC000070400000000ULL
++#define TDX_MAX_VCPUS_EXCEEDED			0xC000070500000000ULL
++#define TDX_TSC_ROLLBACK			0xC000070600000000ULL
++#define TDX_FIELD_NOT_WRITABLE			0xC000072000000000ULL
++#define TDX_FIELD_NOT_READABLE			0xC000072100000000ULL
++#define TDX_TD_VMCS_FIELD_NOT_INITIALIZED	0xC000073000000000ULL
++#define TDX_KEY_GENERATION_FAILED		0x8000080000000000ULL
++#define TDX_TD_KEYS_NOT_CONFIGURED		0x8000081000000000ULL
++#define TDX_KEY_STATE_INCORRECT			0xC000081100000000ULL
++#define TDX_KEY_CONFIGURED			0x0000081500000000ULL
++#define TDX_WBCACHE_NOT_COMPLETE		0x8000081700000000ULL
++#define TDX_HKID_NOT_FREE			0xC000082000000000ULL
++#define TDX_NO_HKID_READY_TO_WBCACHE		0x0000082100000000ULL
++#define TDX_WBCACHE_RESUME_ERROR		0xC000082300000000ULL
++#define TDX_FLUSHVP_NOT_DONE			0x8000082400000000ULL
++#define TDX_NUM_ACTIVATED_HKIDS_NOT_SUPPORTED	0xC000082500000000ULL
++#define TDX_INCORRECT_CPUID_VALUE		0xC000090000000000ULL
++#define TDX_BOOT_NT4_SET			0xC000090100000000ULL
++#define TDX_INCONSISTENT_CPUID_FIELD		0xC000090200000000ULL
++#define TDX_CPUID_LEAF_1F_FORMAT_UNRECOGNIZED	0xC000090400000000ULL
++#define TDX_INVALID_WBINVD_SCOPE		0xC000090500000000ULL
++#define TDX_INVALID_PKG_ID			0xC000090600000000ULL
++#define TDX_CPUID_LEAF_NOT_SUPPORTED		0xC000090800000000ULL
++#define TDX_SMRR_NOT_LOCKED			0xC000091000000000ULL
++#define TDX_INVALID_SMRR_CONFIGURATION		0xC000091100000000ULL
++#define TDX_SMRR_OVERLAPS_CMR			0xC000091200000000ULL
++#define TDX_SMRR_LOCK_NOT_SUPPORTED		0xC000091300000000ULL
++#define TDX_SMRR_NOT_SUPPORTED			0xC000091400000000ULL
++#define TDX_INCONSISTENT_MSR			0xC000092000000000ULL
++#define TDX_INCORRECT_MSR_VALUE			0xC000092100000000ULL
++#define TDX_SEAMREPORT_NOT_AVAILABLE		0xC000093000000000ULL
++#define TDX_PERF_COUNTERS_ARE_PEBS_ENABLED	0x8000094000000000ULL
++#define TDX_INVALID_TDMR			0xC0000A0000000000ULL
++#define TDX_NON_ORDERED_TDMR			0xC0000A0100000000ULL
++#define TDX_TDMR_OUTSIDE_CMRS			0xC0000A0200000000ULL
++#define TDX_TDMR_ALREADY_INITIALIZED		0x00000A0300000000ULL
++#define TDX_INVALID_PAMT			0xC0000A1000000000ULL
++#define TDX_PAMT_OUTSIDE_CMRS			0xC0000A1100000000ULL
++#define TDX_PAMT_OVERLAP			0xC0000A1200000000ULL
++#define TDX_INVALID_RESERVED_IN_TDMR		0xC0000A2000000000ULL
++#define TDX_NON_ORDERED_RESERVED_IN_TDMR	0xC0000A2100000000ULL
++#define TDX_CMR_LIST_INVALID			0xC0000A2200000000ULL
++#define TDX_EPT_WALK_FAILED			0xC0000B0000000000ULL
++#define TDX_EPT_ENTRY_FREE			0xC0000B0100000000ULL
++#define TDX_EPT_ENTRY_NOT_FREE			0xC0000B0200000000ULL
++#define TDX_EPT_ENTRY_NOT_PRESENT		0xC0000B0300000000ULL
++#define TDX_EPT_ENTRY_NOT_LEAF			0xC0000B0400000000ULL
++#define TDX_EPT_ENTRY_LEAF			0xC0000B0500000000ULL
++#define TDX_GPA_RANGE_NOT_BLOCKED		0xC0000B0600000000ULL
++#define TDX_GPA_RANGE_ALREADY_BLOCKED		0x00000B0700000000ULL
++#define TDX_TLB_TRACKING_NOT_DONE		0xC0000B0800000000ULL
++#define TDX_EPT_INVALID_PROMOTE_CONDITIONS	0xC0000B0900000000ULL
++#define TDX_PAGE_ALREADY_ACCEPTED		0x00000B0A00000000ULL
++#define TDX_PAGE_SIZE_MISMATCH			0xC0000B0B00000000ULL
 +
 +/*
-+ * Hard code those values for simplicity and efficiency.  They are constant for
-+ * the TDX 1.0.  TDH.SYS.INIT enumerates those values.  On kvm initialization,
-+ * do sanity checks so that they are correct values.
-+ *
-+ * TODO: If they are bumped in future, increase those value.
-+ *       (or make them full runtime values)
++ * TDG.VP.VMCALL Status Codes (returned in R10)
 + */
-+#define TDX_NR_TDCX_PAGES		4
-+#define TDX_NR_TDVPX_PAGES		5
-+#define TDX_MAX_NR_CPUID_CONFIGS	6
++#define TDG_VP_VMCALL_SUCCESS			0x0000000000000000ULL
++#define TDG_VP_VMCALL_INVALID_OPERAND		0x8000000000000000ULL
++#define TDG_VP_VMCALL_TDREPORT_FAILED		0x8000000000000001ULL
 +
-+#define TDX_EXTENDMR_CHUNKSIZE		256
-+
-+struct tdx_cpuid_value {
-+	u32 eax;
-+	u32 ebx;
-+	u32 ecx;
-+	u32 edx;
-+} __packed;
-+
-+struct tdx_cpuid_config {
-+	u32 leaf;
-+	u32 sub_leaf;
-+	u32 eax;
-+	u32 ebx;
-+	u32 ecx;
-+	u32 edx;
-+} __packed;
-+
-+struct tdsysinfo_struct {
-+	/* TDX-SEAM Module Info */
-+	u32 attributes;
-+	u32 vendor_id;
-+	u32 build_date;
-+	u16 build_num;
-+	u16 minor_version;
-+	u16 major_version;
-+	u8 reserved0[14];
-+	/* Memory Info */
-+	u16 max_tdmrs;
-+	u16 max_reserved_per_tdmr;
-+	u16 pamt_entry_size;
-+	u8 reserved1[10];
-+	/* Control Struct Info */
-+	u16 tdcs_base_size;
-+	u8 reserved2[2];
-+	u16 tdvps_base_size;
-+	u8 tdvps_xfam_dependent_size;
-+	u8 reserved3[9];
-+	/* TD Capabilities */
-+	u64 attributes_fixed0;
-+	u64 attributes_fixed1;
-+	u64 xfam_fixed0;
-+	u64 xfam_fixed1;
-+	u8 reserved4[32];
-+	u32 num_cpuid_config;
-+	union {
-+		struct tdx_cpuid_config cpuid_configs[0];
-+		u8 reserved5[892];
-+	};
-+} __packed __aligned(1024);
-+
-+#define TDX_TD_ATTRIBUTE_DEBUG		BIT_ULL(0)
-+#define TDX_TD_ATTRIBUTE_PKS		BIT_ULL(30)
-+#define TDX_TD_ATTRIBUTE_KL		BIT_ULL(31)
-+#define TDX_TD_ATTRIBUTE_PERFMON	BIT_ULL(63)
-+
-+#define TDX_TD_XFAM_LBR			BIT_ULL(15)
-+#define TDX_TD_XFAM_AMX			(BIT_ULL(17) | BIT_ULL(18))
-+
-+/*
-+ * TD_PARAMS is provided as an input to TDH_MNG_INIT, the size of which is 1024B.
-+ */
-+struct td_params {
-+	u64 attributes;
-+	u64 xfam;
-+	u32 max_vcpus;
-+	u32 reserved0;
-+
-+	u64 eptp_controls;
-+	u64 exec_controls;
-+	u16 tsc_frequency;
-+	u8  reserved1[38];
-+
-+	u64 mrconfigid[6];
-+	u64 mrowner[6];
-+	u64 mrownerconfig[6];
-+	u64 reserved2[4];
-+
-+	union {
-+		struct tdx_cpuid_value cpuid_values[0];
-+		u8 reserved3[768];
-+	};
-+} __packed __aligned(1024);
-+
-+/* Guest uses MAX_PA for GPAW when set. */
-+#define TDX_EXEC_CONTROL_MAX_GPAW      BIT_ULL(0)
-+
-+/*
-+ * TDX requires the frequency to be defined in units of 25MHz, which is the
-+ * frequency of the core crystal clock on TDX-capable platforms, i.e. TDX-SEAM
-+ * can only program frequencies that are multiples of 25MHz.  The frequency
-+ * must be between 1ghz and 10ghz (inclusive).
-+ */
-+#define TDX_TSC_KHZ_TO_25MHZ(tsc_in_khz)	((tsc_in_khz) / (25 * 1000))
-+#define TDX_TSC_25MHZ_TO_KHZ(tsc_in_25mhz)	((tsc_in_25mhz) * (25 * 1000))
-+#define TDX_MIN_TSC_FREQUENCY_KHZ		(100 * 1000)
-+#define TDX_MAX_TSC_FREQUENCY_KHZ		(10 * 1000 * 1000)
-+
-+#endif /* __KVM_X86_TDX_ARCH_H */
++#endif /* __KVM_X86_TDX_ERRNO_H */
 -- 
 2.25.1
 
