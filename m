@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1122745D2F5
+	by mail.lfdr.de (Postfix) with ESMTP id 659B645D2F6
 	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 03:10:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235619AbhKYCNa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Nov 2021 21:13:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37420 "EHLO
+        id S236117AbhKYCNb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Nov 2021 21:13:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236312AbhKYCNL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S236323AbhKYCNL (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 24 Nov 2021 21:13:11 -0500
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D243BC0698D4
-        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 17:49:50 -0800 (PST)
-Received: by mail-pj1-x1049.google.com with SMTP id b11-20020a17090acc0b00b001a9179dc89fso3914571pju.6
-        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 17:49:50 -0800 (PST)
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADC12C0698D7
+        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 17:49:52 -0800 (PST)
+Received: by mail-pf1-x449.google.com with SMTP id q82-20020a627555000000b004a4f8cadb6fso2565410pfc.20
+        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 17:49:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=MEUK24U0BQI/RmjuOG97a0RuEOXEO0NMWXCnh+8+ycU=;
-        b=eDboZQ7bAZLZFpTY4V9ag/VJHXK9axmnoZewEZ90DQ4ZejeVXatOVmfwgXELv+ei53
-         nyrtat4EvFy5cpDW6ptxHxfl4UpTg8tzpvgr4VAqKpuGO1/QJlSTb2giRiJwVccGl46T
-         s5gMFVUacOxrm84iYAawtYru1AT/hbBYXF7T+oFFPARELkFDEvjs/FyfP6mkomYfe8Op
-         Yu+Pi2UUnT/XBV/I24KBfVchlbGTgMYU2qRrwCibuGX0L8HOwK2eAY1bIh6Gd4bmDHOK
-         jvdH5w+ZVhRnszQUqkgVXBfxqIWLfpNBa5tZ1Y+Xn8EzjJ0yAfsiq4pMs3EnGU0GtvzV
-         /r5A==
+        bh=pxR1NPHuzRsrzxrqk2JiOjLQ1DwZgeXTpOJUqyHl/6A=;
+        b=rSBoDxu1CW93c7R6xJJRfcuRY078jGLz4wFBtqM+zyfp65HEi9ztAQrKnVsOH4kUV2
+         R5Dm7EgrY+/mi9ssk/lGFsS8+j6hEbZ6/M9z1N33izQVxIYxgg54Z7hNkI6oPKdaYKYH
+         URPpcnrXKMol6M3hOV6Nf+fj/HiglfEt050rt9/h/dNWtydN7zUaHsaEl3mbCA9YwWOt
+         dPe0toi9LEpKA8GpjB9E/QXHkNNWLGRe7zLijTwqFalNQRFngDuywMocIJ2+LdlP8Dud
+         RuGkTKsBUMsI/zZQl4pqlJYwexR2oYQAqqWJVA9F3fEQ3Q4KHApcG5rFY+EoDdDhb58R
+         QU9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=MEUK24U0BQI/RmjuOG97a0RuEOXEO0NMWXCnh+8+ycU=;
-        b=mQyY4gwShNZzU4CTGse84YGMCFZx7cPTrprUv0M68+Bav0PUrGQLm0sVOWbTGi6L4G
-         7m6oxjn7SCSkQhogy/VNSxSaj9z4KWLLITkW2ls26A7tsanHFZsR05nVW7z2VpGCi8A/
-         xWzOjyphXE37gmMPLvcUMa9Qn2PmSLvUnTblZlQ9sx+NAc1o+xWWvCzVLFZehEyRW3Tp
-         Rv9ymEqhX2w/1H89JlJscK1BfX5DJOuriyE0zG+JCOAzTvyJNf6Kf0Cz5cvmrQkAmrMt
-         eSeGHVuRi9GdGNSMZ70MxMSW6CjjpSUfBtIJovLt1WzG5LUWzkaCb9ULiaZxPsYKg87L
-         hNOA==
-X-Gm-Message-State: AOAM531/x0qT0Smh8gk/EzkFiSaXuLlVHADsRI9LrZuiLJGtmXVEMtJ2
-        3hdB4+Ia072UyOQYfaFY7EnUFsLHBt8=
-X-Google-Smtp-Source: ABdhPJwDCB+Xy4Ty0MSdlI0yhG4DHFkzbkkzr5WuulNpPfT5/m/vDOOFMEE92KNI2QS0sKDOX4Eo4/jpSt8=
+        bh=pxR1NPHuzRsrzxrqk2JiOjLQ1DwZgeXTpOJUqyHl/6A=;
+        b=1EWxPq0FA9UxRerdxtobrVzuoHb5nGOCDafypWULLmHpFmziC+25qAeelHITc79f/K
+         RVocXG4xGHCEs20gS9XzHT9fC2l/gjLUxYjnplxRXoHFJhqeCrrN6V5ovxPTjnAg7uLa
+         xLla/DT1Q+9bCT6CNrlo+f1x/zBkA9VtmmmfTrtu2HlGhS9+k3R7LV6wn268ZvYJpJR6
+         1Xmlo5bm3HyjJr/imFP3ZqNXRS8T41G2Kgm/qO1SxuRRgYD3jJVd7foupEDsqTWPE01O
+         Ks11WSyYDt+FQ6c5JWFZw6BYXX1nYQ+LE6MJExFFCNjBevkfeWVyCxkwuK1W3YvpNvJc
+         jpuw==
+X-Gm-Message-State: AOAM531C1eNv8tYgK8LdjLXHCku6adWXg/r6XGrGibeSy4/gBQg637+x
+        ALlrBAFaqVaXl8os5LyP/dOwviCqOsU=
+X-Google-Smtp-Source: ABdhPJxqCKMdDjiz9nRFieKO+Z5+ZKjQxR7J5i2ChEtGh0fTtZksT9j1/QVz/G9W6693lvym+0RucwnfVXw=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:90b:94:: with SMTP id
- bb20mr2309851pjb.210.1637804990280; Wed, 24 Nov 2021 17:49:50 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:284f:: with SMTP id
+ p15mr455456pjf.1.1637804991895; Wed, 24 Nov 2021 17:49:51 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 25 Nov 2021 01:49:43 +0000
+Date:   Thu, 25 Nov 2021 01:49:44 +0000
 In-Reply-To: <20211125014944.536398-1-seanjc@google.com>
-Message-Id: <20211125014944.536398-2-seanjc@google.com>
+Message-Id: <20211125014944.536398-3-seanjc@google.com>
 Mime-Version: 1.0
 References: <20211125014944.536398-1-seanjc@google.com>
 X-Mailer: git-send-email 2.34.0.rc2.393.gf8c9666880-goog
-Subject: [PATCH 1/2] KVM: nVMX: Flush current VPID (L1 vs. L2) for KVM_REQ_TLB_FLUSH_GUEST
+Subject: [PATCH 2/2] KVM: nVMX: Emulate guest TLB flush on nested VM-Enter
+ with new vpid12
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -66,187 +67,78 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Flush the current VPID when handling KVM_REQ_TLB_FLUSH_GUEST instead of
-always flushing vpid01.  Any TLB flush that is triggered when L2 is
-active is scoped to L2's VPID (if it has one), e.g. if L2 toggles CR4.PGE
-and L1 doesn't intercept PGE writes, then KVM's emulation of the TLB
-flush needs to be applied to L2's VPID.
+Fully emulate a guest TLB flush on nested VM-Enter which changes vpid12,
+i.e. L2's VPID, instead of simply doing INVVPID to flush real hardware's
+TLB entries for vpid02.  From L1's perspective, changing L2's VPID is
+effectively a TLB flush unless "hardware" has previously cached entries
+for the new vpid12.  Because KVM tracks only a single vpid12, KVM doesn't
+know if the new vpid12 has been used in the past and so must treat it as
+a brand new, never been used VPID, i.e. must assume that the new vpid12
+represents a TLB flush from L1's perspective.
 
-Like KVM_REQ_TLB_FLUSH_CURRENT, the GUEST variant needs to be serviced at
-nested transitions, as KVM doesn't track requests for L1 vs L2.  E.g. if
-there's a pending flush when a nested VM-Exit occurs, then the flush was
-requested in the context of L2 and needs to be handled before switching
-to L1, otherwise the flush for L2 would effectiely be lost.
-
-Opportunistically add a helper to handle CURRENT and GUEST as a pair, the
-logic for when they need to be serviced is identical as both requests are
-tied to L1 vs. L2, the only difference is the scope of the flush.
+For example, if L1 and L2 share a CR3, the first VM-Enter to L2 (with a
+VPID) is effectively a TLB flush as hardware/KVM has never seen vpid12
+and thus can't have cached entries in the TLB for vpid12.
 
 Reported-by: Lai Jiangshan <jiangshanlai+lkml@gmail.com>
-Fixes: 07ffaf343e34 ("KVM: nVMX: Sync all PGDs on nested transition with shadow paging")
+Fixes: 5c614b3583e7 ("KVM: nVMX: nested VPID emulation")
 Cc: stable@vger.kernel.org
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/nested.c |  8 +++-----
- arch/x86/kvm/vmx/vmx.c    | 23 ++++++++++++++---------
- arch/x86/kvm/x86.c        | 28 ++++++++++++++++++++++++----
- arch/x86/kvm/x86.h        |  7 +------
- 4 files changed, 42 insertions(+), 24 deletions(-)
+ arch/x86/kvm/vmx/nested.c | 37 +++++++++++++++++--------------------
+ 1 file changed, 17 insertions(+), 20 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 2d9565b37fe0..2ef1d5562a54 100644
+index 2ef1d5562a54..dafe5881ae51 100644
 --- a/arch/x86/kvm/vmx/nested.c
 +++ b/arch/x86/kvm/vmx/nested.c
-@@ -3344,8 +3344,7 @@ enum nvmx_vmentry_status nested_vmx_enter_non_root_mode(struct kvm_vcpu *vcpu,
- 	};
- 	u32 failed_index;
- 
--	if (kvm_check_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu))
--		kvm_vcpu_flush_tlb_current(vcpu);
-+	kvm_service_local_tlb_flush_requests(vcpu);
- 
- 	evaluate_pending_interrupts = exec_controls_get(vmx) &
- 		(CPU_BASED_INTR_WINDOW_EXITING | CPU_BASED_NMI_WINDOW_EXITING);
-@@ -4502,9 +4501,8 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
- 		(void)nested_get_evmcs_page(vcpu);
- 	}
- 
--	/* Service the TLB flush request for L2 before switching to L1. */
--	if (kvm_check_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu))
--		kvm_vcpu_flush_tlb_current(vcpu);
-+	/* Service pending TLB flush requests for L2 before switching to L1. */
-+	kvm_service_local_tlb_flush_requests(vcpu);
+@@ -1162,29 +1162,26 @@ static void nested_vmx_transition_tlb_flush(struct kvm_vcpu *vcpu,
+ 	WARN_ON(!enable_vpid);
  
  	/*
- 	 * VCPU_EXREG_PDPTR will be clobbered in arch/x86/kvm/vmx/vmx.h between
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 3127c66a1651..226b06f1ddd1 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2918,6 +2918,13 @@ static void vmx_flush_tlb_all(struct kvm_vcpu *vcpu)
- 	}
- }
- 
-+static inline int vmx_get_current_vpid(struct kvm_vcpu *vcpu)
-+{
-+	if (is_guest_mode(vcpu))
-+		return nested_get_vpid02(vcpu);
-+	return to_vmx(vcpu)->vpid;
-+}
-+
- static void vmx_flush_tlb_current(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_mmu *mmu = vcpu->arch.mmu;
-@@ -2930,31 +2937,29 @@ static void vmx_flush_tlb_current(struct kvm_vcpu *vcpu)
- 	if (enable_ept)
- 		ept_sync_context(construct_eptp(vcpu, root_hpa,
- 						mmu->shadow_root_level));
--	else if (!is_guest_mode(vcpu))
--		vpid_sync_context(to_vmx(vcpu)->vpid);
- 	else
+-	 * If VPID is enabled and used by vmc12, but L2 does not have a unique
+-	 * TLB tag (ASID), i.e. EPT is disabled and KVM was unable to allocate
+-	 * a VPID for L2, flush the current context as the effective ASID is
+-	 * common to both L1 and L2.
+-	 *
+-	 * Defer the flush so that it runs after vmcs02.EPTP has been set by
+-	 * KVM_REQ_LOAD_MMU_PGD (if nested EPT is enabled) and to avoid
+-	 * redundant flushes further down the nested pipeline.
+-	 *
+-	 * If a TLB flush isn't required due to any of the above, and vpid12 is
+-	 * changing then the new "virtual" VPID (vpid12) will reuse the same
+-	 * "real" VPID (vpid02), and so needs to be flushed.  There's no direct
+-	 * mapping between vpid02 and vpid12, vpid02 is per-vCPU and reused for
+-	 * all nested vCPUs.  Remember, a flush on VM-Enter does not invalidate
+-	 * guest-physical mappings, so there is no need to sync the nEPT MMU.
++	 * VPID is enabled and in use by vmcs12.  If vpid12 is changing, then
++	 * emulate a guest TLB flush as KVM does not track vpid12 history nor
++	 * is the VPID incorporated into the MMU context.  I.e. KVM must assume
++	 * that the new vpid12 has never been used and thus represents a new
++	 * guest ASID that cannot have entries in the TLB.
+ 	 */
+-	if (!nested_has_guest_tlb_tag(vcpu)) {
+-		kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
+-	} else if (is_vmenter &&
+-		   vmcs12->virtual_processor_id != vmx->nested.last_vpid) {
++	if (is_vmenter && vmcs12->virtual_processor_id != vmx->nested.last_vpid) {
+ 		vmx->nested.last_vpid = vmcs12->virtual_processor_id;
 -		vpid_sync_context(nested_get_vpid02(vcpu));
-+		vpid_sync_context(vmx_get_current_vpid(vcpu));
- }
- 
- static void vmx_flush_tlb_gva(struct kvm_vcpu *vcpu, gva_t addr)
- {
- 	/*
--	 * vpid_sync_vcpu_addr() is a nop if vmx->vpid==0, see the comment in
-+	 * vpid_sync_vcpu_addr() is a nop if vpid==0, see the comment in
- 	 * vmx_flush_tlb_guest() for an explanation of why this is ok.
- 	 */
--	vpid_sync_vcpu_addr(to_vmx(vcpu)->vpid, addr);
-+	vpid_sync_vcpu_addr(vmx_get_current_vpid(vcpu), addr);
- }
- 
- static void vmx_flush_tlb_guest(struct kvm_vcpu *vcpu)
- {
- 	/*
--	 * vpid_sync_context() is a nop if vmx->vpid==0, e.g. if enable_vpid==0
--	 * or a vpid couldn't be allocated for this vCPU.  VM-Enter and VM-Exit
--	 * are required to flush GVA->{G,H}PA mappings from the TLB if vpid is
-+	 * vpid_sync_context() is a nop if vpid==0, e.g. if enable_vpid==0 or a
-+	 * vpid couldn't be allocated for this vCPU.  VM-Enter and VM-Exit are
-+	 * required to flush GVA->{G,H}PA mappings from the TLB if vpid is
- 	 * disabled (VM-Enter with vpid enabled and vpid==0 is disallowed),
- 	 * i.e. no explicit INVVPID is necessary.
- 	 */
--	vpid_sync_context(to_vmx(vcpu)->vpid);
-+	vpid_sync_context(vmx_get_current_vpid(vcpu));
- }
- 
- void vmx_ept_load_pdptrs(struct kvm_vcpu *vcpu)
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 04e8dabc187d..9b9b27ef3655 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3258,6 +3258,29 @@ static void kvm_vcpu_flush_tlb_guest(struct kvm_vcpu *vcpu)
- 	static_call(kvm_x86_tlb_flush_guest)(vcpu);
- }
- 
++		kvm_make_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu);
++		return;
+ 	}
 +
-+static inline void kvm_vcpu_flush_tlb_current(struct kvm_vcpu *vcpu)
-+{
-+	++vcpu->stat.tlb_flush;
-+	static_call(kvm_x86_tlb_flush_current)(vcpu);
-+}
-+
-+/*
-+ * Service "local" TLB flush requests, which are specific to the current MMU
-+ * context.  In addition to the generic event handling in vcpu_enter_guest(),
-+ * TLB flushes that are targeted at an MMU context also need to be serviced
-+ * prior before nested VM-Enter/VM-Exit.
-+ */
-+void kvm_service_local_tlb_flush_requests(struct kvm_vcpu *vcpu)
-+{
-+	if (kvm_check_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu))
-+		kvm_vcpu_flush_tlb_current(vcpu);
-+
-+	if (kvm_check_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu))
-+		kvm_vcpu_flush_tlb_guest(vcpu);
-+}
-+EXPORT_SYMBOL_GPL(kvm_service_local_tlb_flush_requests);
-+
- static void record_steal_time(struct kvm_vcpu *vcpu)
- {
- 	struct gfn_to_hva_cache *ghc = &vcpu->arch.st.cache;
-@@ -9653,10 +9676,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 			/* Flushing all ASIDs flushes the current ASID... */
- 			kvm_clear_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
- 		}
--		if (kvm_check_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu))
--			kvm_vcpu_flush_tlb_current(vcpu);
--		if (kvm_check_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu))
--			kvm_vcpu_flush_tlb_guest(vcpu);
-+		kvm_service_local_tlb_flush_requests(vcpu);
- 
- 		if (kvm_check_request(KVM_REQ_REPORT_TPR_ACCESS, vcpu)) {
- 			vcpu->run->exit_reason = KVM_EXIT_TPR_ACCESS;
-diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-index 997669ae9caa..4abcd8d9836d 100644
---- a/arch/x86/kvm/x86.h
-+++ b/arch/x86/kvm/x86.h
-@@ -103,6 +103,7 @@ static inline unsigned int __shrink_ple_window(unsigned int val,
- 
- #define MSR_IA32_CR_PAT_DEFAULT  0x0007040600070406ULL
- 
-+void kvm_service_local_tlb_flush_requests(struct kvm_vcpu *vcpu);
- int kvm_check_nested_events(struct kvm_vcpu *vcpu);
- 
- static inline void kvm_clear_exception_queue(struct kvm_vcpu *vcpu)
-@@ -185,12 +186,6 @@ static inline bool mmu_is_nested(struct kvm_vcpu *vcpu)
- 	return vcpu->arch.walk_mmu == &vcpu->arch.nested_mmu;
++	/*
++	 * If VPID is enabled, used by vmc12, and vpid12 is not changing but
++	 * does not have a unique TLB tag (ASID), i.e. EPT is disabled and
++	 * KVM was unable to allocate a VPID for L2, flush the current context
++	 * as the effective ASID is common to both L1 and L2.
++	 */
++	if (!nested_has_guest_tlb_tag(vcpu))
++		kvm_make_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
  }
  
--static inline void kvm_vcpu_flush_tlb_current(struct kvm_vcpu *vcpu)
--{
--	++vcpu->stat.tlb_flush;
--	static_call(kvm_x86_tlb_flush_current)(vcpu);
--}
--
- static inline int is_pae(struct kvm_vcpu *vcpu)
- {
- 	return kvm_read_cr4_bits(vcpu, X86_CR4_PAE);
+ static bool is_bitwise_subset(u64 superset, u64 subset, u64 mask)
 -- 
 2.34.0.rc2.393.gf8c9666880-goog
 
