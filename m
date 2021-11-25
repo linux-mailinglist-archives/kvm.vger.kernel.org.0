@@ -2,22 +2,22 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0E9FE45D1A5
-	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 01:24:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B425445D204
+	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 01:27:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352928AbhKYAYi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Nov 2021 19:24:38 -0500
-Received: from mga18.intel.com ([134.134.136.126]:32622 "EHLO mga18.intel.com"
+        id S1347116AbhKYA2Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Nov 2021 19:28:25 -0500
+Received: from mga18.intel.com ([134.134.136.126]:32626 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1352749AbhKYAYR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1352766AbhKYAYR (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 24 Nov 2021 19:24:17 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10178"; a="222281285"
+X-IronPort-AV: E=McAfee;i="6200,9189,10178"; a="222281286"
 X-IronPort-AV: E=Sophos;i="5.87,261,1631602800"; 
-   d="scan'208";a="222281285"
+   d="scan'208";a="222281286"
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 16:21:05 -0800
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 16:21:06 -0800
 X-IronPort-AV: E=Sophos;i="5.87,261,1631602800"; 
-   d="scan'208";a="675042126"
+   d="scan'208";a="675042132"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 16:21:05 -0800
 From:   isaku.yamahata@intel.com
@@ -34,9 +34,9 @@ To:     Thomas Gleixner <tglx@linutronix.de>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [RFC PATCH v3 12/59] KVM: x86/mmu: Zap only leaf SPTEs for deleted/moved memslot by default
-Date:   Wed, 24 Nov 2021 16:19:55 -0800
-Message-Id: <2d195882a4f834256c319aaf669ab933cbe6688a.1637799475.git.isaku.yamahata@intel.com>
+Subject: [RFC PATCH v3 13/59] KVM: Add max_vcpus field in common 'struct kvm'
+Date:   Wed, 24 Nov 2021 16:19:56 -0800
+Message-Id: <cb707c90542c9ad4768dae88c80fefcc15a264d6.1637799475.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1637799475.git.isaku.yamahata@intel.com>
 References: <cover.1637799475.git.isaku.yamahata@intel.com>
@@ -48,59 +48,114 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-Zap only leaf SPTEs when deleting/moving a memslot by default, and add a
-module param to allow reverting to the old behavior of zapping all SPTEs
-at all levels and memslots when any memslot is updated.
-
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 21 ++++++++++++++++++++-
- 1 file changed, 20 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_host.h | 3 ---
+ arch/arm64/kvm/arm.c              | 7 ++-----
+ arch/arm64/kvm/vgic/vgic-init.c   | 6 +++---
+ include/linux/kvm_host.h          | 1 +
+ virt/kvm/kvm_main.c               | 3 ++-
+ 5 files changed, 8 insertions(+), 12 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 33794379949e..1e11b14f4f82 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -91,6 +91,9 @@ __MODULE_PARM_TYPE(nx_huge_pages_recovery_period_ms, "uint");
- static bool __read_mostly force_flush_and_sync_on_reuse;
- module_param_named(flush_on_reuse, force_flush_and_sync_on_reuse, bool, 0644);
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 2a5f7f38006f..ff3f4ab57eba 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -108,9 +108,6 @@ struct kvm_arch {
+ 	/* VTCR_EL2 value for this VM */
+ 	u64    vtcr;
  
-+static bool __read_mostly memslot_update_zap_all;
-+module_param(memslot_update_zap_all, bool, 0444);
-+
- /*
-  * When setting this variable to true it enables Two-Dimensional-Paging
-  * where the hardware walks 2 page tables:
-@@ -5681,11 +5684,27 @@ static bool kvm_has_zapped_obsolete_pages(struct kvm *kvm)
- 	return unlikely(!list_empty_careful(&kvm->arch.zapped_obsolete_pages));
+-	/* The maximum number of vCPUs depends on the used GIC model */
+-	int max_vcpus;
+-
+ 	/* Interrupt controller */
+ 	struct vgic_dist	vgic;
+ 
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 2f03cbfefe67..14df7ee047e4 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -153,7 +153,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
+ 	kvm_vgic_early_init(kvm);
+ 
+ 	/* The maximum number of VCPUs is limited by the host's GIC model */
+-	kvm->arch.max_vcpus = kvm_arm_default_max_vcpus();
++	kvm->max_vcpus = kvm_arm_default_max_vcpus();
+ 
+ 	set_default_spectre(kvm);
+ 
+@@ -228,7 +228,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_MAX_VCPUS:
+ 	case KVM_CAP_MAX_VCPU_ID:
+ 		if (kvm)
+-			r = kvm->arch.max_vcpus;
++			r = kvm->max_vcpus;
+ 		else
+ 			r = kvm_arm_default_max_vcpus();
+ 		break;
+@@ -304,9 +304,6 @@ int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
+ 	if (irqchip_in_kernel(kvm) && vgic_initialized(kvm))
+ 		return -EBUSY;
+ 
+-	if (id >= kvm->arch.max_vcpus)
+-		return -EINVAL;
+-
+ 	return 0;
  }
  
-+static void kvm_mmu_zap_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
-+{
-+	/*
-+	 * Zapping non-leaf SPTEs, a.k.a. not-last SPTEs, isn't required, worst
-+	 * case scenario we'll have unused shadow pages lying around until they
-+	 * are recycled due to age or when the VM is destroyed.
-+	 */
-+	write_lock(&kvm->mmu_lock);
-+	slot_handle_level(kvm, slot, kvm_zap_rmapp, PG_LEVEL_4K,
-+			  KVM_MAX_HUGEPAGE_LEVEL, true);
-+	write_unlock(&kvm->mmu_lock);
-+}
-+
- static void kvm_mmu_invalidate_zap_pages_in_memslot(struct kvm *kvm,
- 			struct kvm_memory_slot *slot,
- 			struct kvm_page_track_notifier_node *node)
- {
--	kvm_mmu_zap_all_fast(kvm);
-+	if (memslot_update_zap_all)
-+		kvm_mmu_zap_all_fast(kvm);
-+	else
-+		kvm_mmu_zap_memslot(kvm, slot);
- }
+diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
+index 0a06d0648970..906aee52f2bc 100644
+--- a/arch/arm64/kvm/vgic/vgic-init.c
++++ b/arch/arm64/kvm/vgic/vgic-init.c
+@@ -97,11 +97,11 @@ int kvm_vgic_create(struct kvm *kvm, u32 type)
+ 	ret = 0;
  
- void kvm_mmu_init_vm(struct kvm *kvm)
+ 	if (type == KVM_DEV_TYPE_ARM_VGIC_V2)
+-		kvm->arch.max_vcpus = VGIC_V2_MAX_CPUS;
++		kvm->max_vcpus = VGIC_V2_MAX_CPUS;
+ 	else
+-		kvm->arch.max_vcpus = VGIC_V3_MAX_CPUS;
++		kvm->max_vcpus = VGIC_V3_MAX_CPUS;
+ 
+-	if (atomic_read(&kvm->online_vcpus) > kvm->arch.max_vcpus) {
++	if (atomic_read(&kvm->online_vcpus) > kvm->max_vcpus) {
+ 		ret = -E2BIG;
+ 		goto out_unlock;
+ 	}
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 9e0667e3723e..625de21ceb43 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -566,6 +566,7 @@ struct kvm {
+ 	 * and is accessed atomically.
+ 	 */
+ 	atomic_t online_vcpus;
++	int max_vcpus;
+ 	int created_vcpus;
+ 	int last_boosted_vcpu;
+ 	struct list_head vm_list;
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 8544e92db2da..4a1dbf0b1d3d 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1052,6 +1052,7 @@ static struct kvm *kvm_create_vm(unsigned long type)
+ 	rcuwait_init(&kvm->mn_memslots_update_rcuwait);
+ 
+ 	INIT_LIST_HEAD(&kvm->devices);
++	kvm->max_vcpus = KVM_MAX_VCPUS;
+ 
+ 	BUILD_BUG_ON(KVM_MEM_SLOTS_NUM > SHRT_MAX);
+ 
+@@ -3599,7 +3600,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
+ 		return -EINVAL;
+ 
+ 	mutex_lock(&kvm->lock);
+-	if (kvm->created_vcpus == KVM_MAX_VCPUS) {
++	if (kvm->created_vcpus >= kvm->max_vcpus) {
+ 		mutex_unlock(&kvm->lock);
+ 		return -EINVAL;
+ 	}
 -- 
 2.25.1
 
