@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1303845D2BD
-	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 03:00:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 92E2B45D2C1
+	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 03:00:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245252AbhKYCDK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Nov 2021 21:03:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34782 "EHLO
+        id S1353276AbhKYCDN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Nov 2021 21:03:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348639AbhKYCBJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S1345640AbhKYCBJ (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 24 Nov 2021 21:01:09 -0500
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5793FC0619DB
-        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 17:29:33 -0800 (PST)
-Received: by mail-pj1-x1049.google.com with SMTP id iq9-20020a17090afb4900b001a54412feb0so2325190pjb.1
-        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 17:29:33 -0800 (PST)
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC93BC0619DC
+        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 17:29:34 -0800 (PST)
+Received: by mail-pf1-x44a.google.com with SMTP id y124-20020a623282000000b0047a09271e49so2530588pfy.16
+        for <kvm@vger.kernel.org>; Wed, 24 Nov 2021 17:29:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=rE/NaZRrlbtu4MW3X7vDSEmrgKkxvryqyHCMV3coc/E=;
-        b=Cluc57s7+WyrdKpeZCKeXW7Yh+/og7vqwWAf1ldCDcy6GAi1hhEzrgtotKjl+ZVIy3
-         Addmwc/DnFo6oVj2ELAhWyFdENLYcLXWt7plPTgw0HlLcGLhSBlzfoI5JROH6z6N0bD3
-         gfk1q0E5hfpEkGFb1kT36V99dPpUOCcPHMcodC0h5xtR1uD/htiGWvMphGTC12hDI+VY
-         bxwMbgDFFzhF4Lqd14QSeJYQlEq8oRDx/SrQsr8SLtanI8+y1i5Rrqf3wRyr+AR5wuby
-         9dCXGxfIim75IjlGvi3hgaVWnkLJbKyA6MM0YFeroHOscNuwVPuf4Ky2rqFC4vc/dzpP
-         0tfw==
+        bh=DtLsNUG1mU8KIRQxClZ9QjdX4zKbCeXPIOMPwSqWT4Y=;
+        b=hF6qUlLVu+eRN1BhGcuwF41u3qcd4VGUdlZpq7lZrsQbCAg07gjQnp2ahsmcZHeAMz
+         odH5nWfcpw63HqE9kgmEojD8gqg/XOwwT7DENk8i0/YaiWrjw8odn9ExzHgvOKSUWTBX
+         e3nuy0sGsBeorMXG50a7hq/pnjCoUUyavv3gwG/sV9cXoq7L6aCjKlegbICatEyX+zXX
+         zGo6yU2FqmNbaWKxqQWsqUJdL0ELbzoHfvXOZSB7/+2HxdOToV4Tpfv7rhPfhUdAG+TD
+         v/DUAen32WQ38j/ZAOeb7XVfoiwNmy9nsUHySu8Un4m4FFH/EWHjcxszedao0GO/RNqc
+         ID7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=rE/NaZRrlbtu4MW3X7vDSEmrgKkxvryqyHCMV3coc/E=;
-        b=pokE7z4li96z4yHv0aXqu+nEYfvS1nf3nJu2xHeV+Ci1m55pRlMIposwHEvvqyw8bi
-         myf+ufRpCYGtONwIbZniNhkAz7DLYcCYH93kToDOi3AKayBaLqSdYduvS+vDdrkkCMAO
-         ZXODud5PF6J8S5Ru9Dgtp/0p6zmGWOJzpI8JhM6eSk25jNN4J12UOwbZD5WWvwmc6IHG
-         bTl9wJQoWtOpzvPV93xYWYN4vhsK6kkzOHBhVFlsdOyXj9by0jj4eOw4b3O6siWdwi0B
-         APNaek1uhzZbqnHwkhNYJbbWoekeJdQSx29HKRXwjY0uPeEE6RalO8npsRiwx0OwvUkG
-         GAGg==
-X-Gm-Message-State: AOAM533pf7mSaztfuPxYJENu4SQe6TBh39xYu12GC0nl2vb2QQJT3rTY
-        i5fbqDQPJAGASU/+9S5xdXG/t2Dm0Nc=
-X-Google-Smtp-Source: ABdhPJyyMvcCv1uw8GVakhr3QkhUHgJVdRwGWcglijruUJxhOHr0M1wwWwxwwjQVW21tlSmi64/nU7Frgqw=
+        bh=DtLsNUG1mU8KIRQxClZ9QjdX4zKbCeXPIOMPwSqWT4Y=;
+        b=20DrTJ+njjvKYndNZt6sWcYjDjOtG13Z0KMeuVqMetmP3A3L9p+Oq700WSGwTDYZvX
+         xWPoyPcfGUfI/rkSzeWwGEnuDxjJ6elBVizjXBclQKpQla8SvnVQqznYjbPDrG6RQgTU
+         PIDfEKQL11NH9yXXpo0WvBI9duBNZbqN7nzlCIMs6OJXrvnDxWjLz50GzYisSkeintBn
+         Bgl/EhLCChNXycOPGvYRe8pk9DS0rd9lWmiGTKnxjNJIt1AVr99HNmzukteztrWAgyXE
+         NL1TQUhD8X0ploe11k4FURhw19EiuJ7QRdtlc4IGpTXhI3qo1dB+4g2ImqLy+EPOqQUz
+         14Ow==
+X-Gm-Message-State: AOAM531D0FRIva+u9b2THYHAwf8lQOgNMT71+BJhl84/HvXIp+PqHcGM
+        E1yLWEBWR/coU5EKnaXopD7urGPPG8M=
+X-Google-Smtp-Source: ABdhPJzts8t8UItHvMueVFEAU2i+zVIOTkSmj7rsysB2mJbdsVzx9dg02qi5Cfts5QSuSqDUYBaM9Ppvbww=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:902:7883:b0:144:ccb8:674b with SMTP id
- q3-20020a170902788300b00144ccb8674bmr25004157pll.63.1637803772878; Wed, 24
- Nov 2021 17:29:32 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:902:b7c6:b0:141:9a3a:f213 with SMTP id
+ v6-20020a170902b7c600b001419a3af213mr24716982plz.15.1637803774359; Wed, 24
+ Nov 2021 17:29:34 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu, 25 Nov 2021 01:28:38 +0000
+Date:   Thu, 25 Nov 2021 01:28:39 +0000
 In-Reply-To: <20211125012857.508243-1-seanjc@google.com>
-Message-Id: <20211125012857.508243-21-seanjc@google.com>
+Message-Id: <20211125012857.508243-22-seanjc@google.com>
 Mime-Version: 1.0
 References: <20211125012857.508243-1-seanjc@google.com>
 X-Mailer: git-send-email 2.34.0.rc2.393.gf8c9666880-goog
-Subject: [kvm-unit-tests PATCH 20/39] x86/access: Remove timeout overrides now
- that performance doesn't suck
+Subject: [kvm-unit-tests PATCH 21/39] nVMX: Skip EPT tests if
+ INVEPT(SINGLE_CONTEXT) is unsupported
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
@@ -62,50 +62,53 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The access test now takes less than 5 seconds when TDP is enabled, and
-is well under the default 90 second timeout when TDP is disabled.  Ditto
-for VMX's #PF interception variant, which is no longer being penalized by
-unnecessary CR exits and other general stupidity.
+EPT can technically be supported without INVEPT(SINGLE_CONTEXT), skip the
+EPT tests if SINGLE_CONTEXT isn't supported as it's heavily used (without
+the result being checked, yay).
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- x86/unittests.cfg | 4 ----
- 1 file changed, 4 deletions(-)
+ x86/vmx.h       | 8 ++++++++
+ x86/vmx_tests.c | 5 +++++
+ 2 files changed, 13 insertions(+)
 
-diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-index 4402287..f3f9f17 100644
---- a/x86/unittests.cfg
-+++ b/x86/unittests.cfg
-@@ -117,13 +117,11 @@ extra_params = -cpu qemu64,+x2apic,+tsc-deadline -append tscdeadline_immed
- file = access_test.flat
- arch = x86_64
- extra_params = -cpu max
--timeout = 180
+diff --git a/x86/vmx.h b/x86/vmx.h
+index dd869c2..472b28a 100644
+--- a/x86/vmx.h
++++ b/x86/vmx.h
+@@ -725,6 +725,14 @@ extern union vmx_ctrl_msr ctrl_exit_rev;
+ extern union vmx_ctrl_msr ctrl_enter_rev;
+ extern union vmx_ept_vpid  ept_vpid;
  
- [access-reduced-maxphyaddr]
- file = access_test.flat
- arch = x86_64
- extra_params = -cpu IvyBridge,phys-bits=36,host-phys-bits=off
--timeout = 180
- check = /sys/module/kvm_intel/parameters/allow_smaller_maxphyaddr=Y
++static inline bool is_invept_type_supported(u64 type)
++{
++	if (type < INVEPT_SINGLE || type > INVEPT_GLOBAL)
++		return false;
++
++	return ept_vpid.val & (EPT_CAP_INVEPT_SINGLE << (type - INVEPT_SINGLE));
++}
++
+ extern u64 *bsp_vmxon_region;
+ extern bool launched;
  
- [smap]
-@@ -358,7 +356,6 @@ file = vmx.flat
- extra_params = -cpu max,+vmx -append vmx_pf_exception_test
- arch = x86_64
- groups = vmx nested_exception
--timeout = 300
+diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+index 97fa8ce..cbf22e3 100644
+--- a/x86/vmx_tests.c
++++ b/x86/vmx_tests.c
+@@ -1148,8 +1148,13 @@ static int ept_init_common(bool have_ad)
+ 	int ret;
+ 	struct pci_dev pcidev;
  
- [vmx_pf_exception_test_reduced_maxphyaddr]
- file = vmx.flat
-@@ -366,7 +363,6 @@ extra_params = -cpu IvyBridge,phys-bits=36,host-phys-bits=off,+vmx -append vmx_p
- arch = x86_64
- groups = vmx nested_exception
- check = /sys/module/kvm_intel/parameters/allow_smaller_maxphyaddr=Y
--timeout = 300
- 
- [debug]
- file = debug.flat
++	/* INVEPT is required by the EPT violation handler. */
++	if (!is_invept_type_supported(INVEPT_SINGLE))
++		return VMX_TEST_EXIT;
++
+ 	if (setup_ept(have_ad))
+ 		return VMX_TEST_EXIT;
++
+ 	data_page1 = alloc_page();
+ 	data_page2 = alloc_page();
+ 	*((u32 *)data_page1) = MAGIC_VAL_1;
 -- 
 2.34.0.rc2.393.gf8c9666880-goog
 
