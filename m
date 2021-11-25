@@ -2,72 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A59345E1A3
-	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 21:32:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A49045E1A4
+	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 21:32:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356931AbhKYUfr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Nov 2021 15:35:47 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:55617 "EHLO
+        id S1357061AbhKYUfx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Nov 2021 15:35:53 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:41416 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1357035AbhKYUdr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 25 Nov 2021 15:33:47 -0500
+        by vger.kernel.org with ESMTP id S1349824AbhKYUdx (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 25 Nov 2021 15:33:53 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637872235;
+        s=mimecast20190719; t=1637872241;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=iNfrKVVQE1EpKSUQXL266KgcPgP5LAHIUbP4H9pnx5A=;
-        b=WBp68Dhk8Zr83ZE6kfPgWuN18VooJgKT1wOV1JRC9m+uzSFqPOgEYpE/u0bHIDtScEX3To
-        Z3U6uO321cMBlrJ9LAPjrAecWsaT17wIgf912vn2IuoFjekqDqw8gr/B66RRTGJu3TUy/P
-        mqHFFr2Os1ZA++2pxTGj7VYisWSIltw=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=2ShhUEy+E07PE6bTnG2bcJwf8K2GrtR8GlOvuCWDf3g=;
+        b=N6DrpoWKxZV1Ofg2+KXPchcnyvdfBEc2qRphVMTWWdzExXD6U7kwz6XBL0+RJIZr+WXQyc
+        UU66NuZw+no3+mWbHPYFNLQF2ou4rONw8jpIrU5jqyUZgnrMbYcBec0KY1FznoTiyQ/XtC
+        c6wgu7LZWoNqkLbL4P7CrCbC6HzCQd8=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-107--2Ppii6jNdmyFxxds1SU8g-1; Thu, 25 Nov 2021 15:30:33 -0500
-X-MC-Unique: -2Ppii6jNdmyFxxds1SU8g-1
-Received: by mail-wm1-f69.google.com with SMTP id l4-20020a05600c1d0400b00332f47a0fa3so4062083wms.8
-        for <kvm@vger.kernel.org>; Thu, 25 Nov 2021 12:30:33 -0800 (PST)
+ us-mta-359-iGkC60mdPFWdBYMhfPLxUQ-1; Thu, 25 Nov 2021 15:30:40 -0500
+X-MC-Unique: iGkC60mdPFWdBYMhfPLxUQ-1
+Received: by mail-wm1-f71.google.com with SMTP id m14-20020a05600c3b0e00b0033308dcc933so4063658wms.7
+        for <kvm@vger.kernel.org>; Thu, 25 Nov 2021 12:30:39 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=iNfrKVVQE1EpKSUQXL266KgcPgP5LAHIUbP4H9pnx5A=;
-        b=vQRRP4SV9nt1Hxq6+sVfdqw/ToTaOe0v6sK8vh92P0MkXxPGLbASFtDmBTCSZrpH5B
-         oztRNIzMHN+0xjRIVdRt8EnYsmtw0PX2WRgx8QzRLpI79lHhQyLRw5kdYXVtmDZvJN51
-         XnSgsezTAyTYa7Npm0BGKHQeSXccMy0qL5jsZna4Q185HzvOluAY7dbZs9KhPZsCjM7r
-         lZzHn9Q5/Gc6ZXbNxskDqfGnMZEcyPDMzbwSEK9QXcIRMnVdWV+VbGTk0O69xDDupEIF
-         xH+4MWtQ/gyc/9uczcl51Unq6CmS033prsHUx0mIHt0TebSwObGHhz2fHj+1UfKhisWu
-         y1NQ==
-X-Gm-Message-State: AOAM532LCeqKZrTMUzt9wphqA3ohn+/fhjRZa5GbGtkw5IZngMyRmpz9
-        1oTC39ZrGfxuU1jD4+RzykCvDLMGBQRbTdlFgq9+kmHF5HCU0D5m57x45OxbO8NrROJf2INKRgs
-        b7TUZzLuFxMao
-X-Received: by 2002:a05:600c:4e4a:: with SMTP id e10mr11045998wmq.155.1637872232464;
-        Thu, 25 Nov 2021 12:30:32 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxpB9Sne6bt528o4LNrZerhkHTAF8WsnuzTgtVSd8aKZYeAIsgjjsTr9RNNaL6WNzAIXffHmw==
-X-Received: by 2002:a05:600c:4e4a:: with SMTP id e10mr11045959wmq.155.1637872232202;
-        Thu, 25 Nov 2021 12:30:32 -0800 (PST)
+        bh=2ShhUEy+E07PE6bTnG2bcJwf8K2GrtR8GlOvuCWDf3g=;
+        b=Fv/iFoz5UNaglLeKZdEP54fIpj/pKNQBqvNr5XEuvhWF9Ywl1fj+pqcy2hBcGNQ2nV
+         MbRta/j7yXvxgJDqz5Ng1ZWYUjpwJ9bensc/JbOFbqxU91tNYjjh2qk48lULFRfAWpyY
+         PdGMO6ZcpFOIwuYKzVTDN1g8+Tj7h/dlPVjEA64TU8Z0MeiD15Q0yCvnotK0pHTHy0Dl
+         GqfpLbn4f3UKFEJZzDKp+9BP3bviDhDBfa9Pcwt6f8WIYqinMOZhCA27qGSROHEVkShl
+         2YuQC7FhBDCEqsQ4tMTMeJ3YSgHG4aA66uujOmLOgPOFVkGA0kVQlqBKO5nE2mNys9gl
+         uFcw==
+X-Gm-Message-State: AOAM532fY8SHrHPA4pvAJYuA9fjvHivNGw5KhT+8VyiQAAYs+MX5PiZk
+        pujjaQMb41mYB3pTgavNJoVoU2Ty84e/U10GvOLHt+101F4aTZdOEjge+O21kfjOdRDXEH8Qovm
+        jwF/T7W1YFcA1
+X-Received: by 2002:adf:dd0a:: with SMTP id a10mr9806970wrm.60.1637872238918;
+        Thu, 25 Nov 2021 12:30:38 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxoQfLwsVNStdvgHx055e1d9E4GwQpVIsWLlaEilliddpDqSQaqHalFf+ziOP3Fem0ERY7sCw==
+X-Received: by 2002:adf:dd0a:: with SMTP id a10mr9806937wrm.60.1637872238693;
+        Thu, 25 Nov 2021 12:30:38 -0800 (PST)
 Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id h27sm10008150wmc.43.2021.11.25.12.30.30
+        by smtp.gmail.com with ESMTPSA id d8sm3719945wrm.76.2021.11.25.12.30.37
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 25 Nov 2021 12:30:31 -0800 (PST)
-Subject: Re: [RFC PATCH v3 10/29] KVM: arm64: Make ID_AA64DFR0_EL1 writable
+        Thu, 25 Nov 2021 12:30:38 -0800 (PST)
+Subject: Re: [RFC PATCH v3 12/29] KVM: arm64: Make ID_DFR1_EL1 writable
 To:     Reiji Watanabe <reijiw@google.com>, Marc Zyngier <maz@kernel.org>,
         kvmarm@lists.cs.columbia.edu
-Cc:     kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
-        Peter Shier <pshier@google.com>,
+Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        linux-arm-kernel@lists.infradead.org
+        Will Deacon <will@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        Peng Liang <liangpeng10@huawei.com>,
+        Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>
 References: <20211117064359.2362060-1-reijiw@google.com>
- <20211117064359.2362060-11-reijiw@google.com>
+ <20211117064359.2362060-13-reijiw@google.com>
 From:   Eric Auger <eauger@redhat.com>
-Message-ID: <bb557b85-8d28-486e-d22c-b3021888bcf8@redhat.com>
-Date:   Thu, 25 Nov 2021 21:30:29 +0100
+Message-ID: <44073484-639e-3d23-2068-ae5c2cac3276@redhat.com>
+Date:   Thu, 25 Nov 2021 21:30:36 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <20211117064359.2362060-11-reijiw@google.com>
+In-Reply-To: <20211117064359.2362060-13-reijiw@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -78,154 +87,40 @@ X-Mailing-List: kvm@vger.kernel.org
 Hi Reiji,
 
 On 11/17/21 7:43 AM, Reiji Watanabe wrote:
-> This patch adds id_reg_info for ID_AA64DFR0_EL1 to make it writable
+> This patch adds id_reg_info for ID_DFR1_EL1 to make it writable
 > by userspace.
-> 
-> Return an error if userspace tries to set PMUVER field of the
-> register to a value that conflicts with the PMU configuration.
-> 
-> Since number of context-aware breakpoints must be no more than number
-> of supported breakpoints according to Arm ARM, return an error
-> if userspace tries to set CTX_CMPS field to such value.
 > 
 > Signed-off-by: Reiji Watanabe <reijiw@google.com>
 > ---
->  arch/arm64/kvm/sys_regs.c | 84 ++++++++++++++++++++++++++++++++++-----
->  1 file changed, 73 insertions(+), 11 deletions(-)
+>  arch/arm64/kvm/sys_regs.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
 > 
 > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 772e3d3067b2..0faf458b0efb 100644
+> index fbd335ac5e6b..dda7001959f6 100644
 > --- a/arch/arm64/kvm/sys_regs.c
 > +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -626,6 +626,45 @@ static int validate_id_aa64mmfr0_el1(struct kvm_vcpu *vcpu,
->  	return 0;
->  }
->  
-> +static bool id_reg_has_pmu(u64 val, u64 shift, unsigned int min)
-I would rename the function as the name currently is misleading. The
-function validate the val filed @shift againt @min
-> +{
-> +	unsigned int pmu = cpuid_feature_extract_unsigned_field(val, shift);
-> +
-> +	/*
-> +	 * Treat IMPLEMENTATION DEFINED functionality as unimplemented for
-> +	 * ID_AA64DFR0_EL1.PMUVer/ID_DFR0_EL1.PerfMon.
-> +	 */
-> +	if (pmu == 0xf)
-> +		pmu = 0;
-Shouldn't we simply forbid the userspace to set 0xF?
-> +
-> +	return (pmu >= min);
-> +}
-> +
-> +static int validate_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
-> +				    const struct id_reg_info *id_reg, u64 val)
-> +{
-> +	unsigned int brps, ctx_cmps;
-> +	bool vcpu_pmu, dfr0_pmu;
-> +
-> +	brps = cpuid_feature_extract_unsigned_field(val, ID_AA64DFR0_BRPS_SHIFT);
-> +	ctx_cmps = cpuid_feature_extract_unsigned_field(val, ID_AA64DFR0_CTX_CMPS_SHIFT);
-> +
-> +	/*
-> +	 * Number of context-aware breakpoints can be no more than number of
-> +	 * supported breakpoints.
-> +	 */
-> +	if (ctx_cmps > brps)
-> +		return -EINVAL;
-> +
-> +	vcpu_pmu = kvm_vcpu_has_pmu(vcpu);
-> +	dfr0_pmu = id_reg_has_pmu(val, ID_AA64DFR0_PMUVER_SHIFT, ID_AA64DFR0_PMUVER_8_0);
-> +	/* Check if there is a conflict with a request via KVM_ARM_VCPU_INIT */
-> +	if (vcpu_pmu ^ dfr0_pmu)
-> +		return -EPERM;
-> +
-> +	return 0;
-> +}
-> +
->  static void init_id_aa64pfr0_el1_info(struct id_reg_info *id_reg)
->  {
->  	u64 limit = id_reg->vcpu_limit_val;
-> @@ -669,6 +708,23 @@ static void init_id_aa64isar1_el1_info(struct id_reg_info *id_reg)
->  		id_reg->vcpu_limit_val &= ~PTRAUTH_MASK;
->  }
->  
-> +static void init_id_aa64dfr0_el1_info(struct id_reg_info *id_reg)
-> +{
-> +	u64 limit = id_reg->vcpu_limit_val;
-> +
-> +	/* Limit guests to PMUv3 for ARMv8.4 */
-> +	limit = cpuid_feature_cap_perfmon_field(limit, ID_AA64DFR0_PMUVER_SHIFT,
-> +						ID_AA64DFR0_PMUVER_8_4);
-> +	/* Limit debug to ARMv8.0 */
-> +	limit &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER);
-> +	limit |= (FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER), 6));
-> +
-> +	/* Hide SPE from guests */
-> +	limit &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_PMSVER);
-> +
-> +	id_reg->vcpu_limit_val = limit;
-> +}
-> +
->  static u64 get_reset_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
->  				     const struct id_reg_info *idr)
->  {
-> @@ -698,6 +754,14 @@ static u64 get_reset_id_aa64isar1_el1(struct kvm_vcpu *vcpu,
->  	       idr->vcpu_limit_val : (idr->vcpu_limit_val & ~PTRAUTH_MASK);
->  }
->  
-> +static u64 get_reset_id_aa64dfr0_el1(struct kvm_vcpu *vcpu,
-> +				     const struct id_reg_info *idr)
-> +{
-> +	return kvm_vcpu_has_pmu(vcpu) ?
-> +	       idr->vcpu_limit_val :
-> +	       (idr->vcpu_limit_val & ~(ARM64_FEATURE_MASK(ID_AA64DFR0_PMUVER)));
-> +}
-> +
->  static struct id_reg_info id_aa64pfr0_el1_info = {
->  	.sys_reg = SYS_ID_AA64PFR0_EL1,
->  	.ftr_check_types = S_FCT(ID_AA64PFR0_ASIMD_SHIFT, FCT_LOWER_SAFE) |
-> @@ -742,6 +806,14 @@ static struct id_reg_info id_aa64mmfr0_el1_info = {
->  	.validate = validate_id_aa64mmfr0_el1,
+> @@ -859,6 +859,11 @@ static struct id_reg_info id_dfr0_el1_info = {
+>  	.get_reset_val = get_reset_id_dfr0_el1,
 >  };
 >  
-> +static struct id_reg_info id_aa64dfr0_el1_info = {
-> +	.sys_reg = SYS_ID_AA64DFR0_EL1,
-> +	.ftr_check_types = S_FCT(ID_AA64DFR0_DOUBLELOCK_SHIFT, FCT_LOWER_SAFE),
-> +	.init = init_id_aa64dfr0_el1_info,
-> +	.validate = validate_id_aa64dfr0_el1,
-> +	.get_reset_val = get_reset_id_aa64dfr0_el1,
+> +static struct id_reg_info id_dfr1_el1_info = {
+> +	.sys_reg = SYS_ID_DFR1_EL1,
+> +	.ftr_check_types = S_FCT(ID_DFR1_MTPMU_SHIFT, FCT_LOWER_SAFE),
+what about the 0xF value which indicates the MTPMU is not implemented?
+
+Eric
 > +};
 > +
 >  /*
 >   * An ID register that needs special handling to control the value for the
 >   * guest must have its own id_reg_info in id_reg_info_table.
-> @@ -753,6 +825,7 @@ static struct id_reg_info id_aa64mmfr0_el1_info = {
+> @@ -869,6 +874,7 @@ static struct id_reg_info id_dfr0_el1_info = {
+>  #define	GET_ID_REG_INFO(id)	(id_reg_info_table[IDREG_IDX(id)])
 >  static struct id_reg_info *id_reg_info_table[KVM_ARM_ID_REG_MAX_NUM] = {
+>  	[IDREG_IDX(SYS_ID_DFR0_EL1)] = &id_dfr0_el1_info,
+> +	[IDREG_IDX(SYS_ID_DFR1_EL1)] = &id_dfr1_el1_info,
 >  	[IDREG_IDX(SYS_ID_AA64PFR0_EL1)] = &id_aa64pfr0_el1_info,
 >  	[IDREG_IDX(SYS_ID_AA64PFR1_EL1)] = &id_aa64pfr1_el1_info,
-> +	[IDREG_IDX(SYS_ID_AA64DFR0_EL1)] = &id_aa64dfr0_el1_info,
->  	[IDREG_IDX(SYS_ID_AA64ISAR0_EL1)] = &id_aa64isar0_el1_info,
->  	[IDREG_IDX(SYS_ID_AA64ISAR1_EL1)] = &id_aa64isar1_el1_info,
->  	[IDREG_IDX(SYS_ID_AA64MMFR0_EL1)] = &id_aa64mmfr0_el1_info,
-> @@ -1604,17 +1677,6 @@ static u64 __read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
->  			val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_GIC), gic_lim);
->  		}
->  		break;
-> -	case SYS_ID_AA64DFR0_EL1:
-> -		/* Limit debug to ARMv8.0 */
-> -		val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER);
-> -		val |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64DFR0_DEBUGVER), 6);
-> -		/* Limit guests to PMUv3 for ARMv8.4 */
-> -		val = cpuid_feature_cap_perfmon_field(val,
-> -						      ID_AA64DFR0_PMUVER_SHIFT,
-> -						      kvm_vcpu_has_pmu(vcpu) ? ID_AA64DFR0_PMUVER_8_4 : 0);
-> -		/* Hide SPE from guests */
-> -		val &= ~ARM64_FEATURE_MASK(ID_AA64DFR0_PMSVER);
-> -		break;
->  	case SYS_ID_DFR0_EL1:
->  		/* Limit guests to PMUv3 for ARMv8.4 */
->  		val = cpuid_feature_cap_perfmon_field(val,
+>  	[IDREG_IDX(SYS_ID_AA64DFR0_EL1)] = &id_aa64dfr0_el1_info,
 > 
-Eric
 
