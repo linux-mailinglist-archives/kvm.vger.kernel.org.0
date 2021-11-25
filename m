@@ -2,22 +2,22 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B7F2F45D1A4
-	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 01:24:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5695D45D200
+	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 01:27:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352730AbhKYAYg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Nov 2021 19:24:36 -0500
-Received: from mga06.intel.com ([134.134.136.31]:60247 "EHLO mga06.intel.com"
+        id S1345051AbhKYA2W (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Nov 2021 19:28:22 -0500
+Received: from mga14.intel.com ([192.55.52.115]:6408 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1352753AbhKYAYR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1352764AbhKYAYR (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 24 Nov 2021 19:24:17 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10178"; a="296214852"
+X-IronPort-AV: E=McAfee;i="6200,9189,10178"; a="235649672"
 X-IronPort-AV: E=Sophos;i="5.87,261,1631602800"; 
-   d="scan'208";a="296214852"
+   d="scan'208";a="235649672"
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 16:21:06 -0800
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 16:21:07 -0800
 X-IronPort-AV: E=Sophos;i="5.87,261,1631602800"; 
-   d="scan'208";a="675042137"
+   d="scan'208";a="675042140"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 16:21:06 -0800
 From:   isaku.yamahata@intel.com
@@ -35,9 +35,9 @@ To:     Thomas Gleixner <tglx@linutronix.de>,
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Sean Christopherson <sean.j.christopherson@intel.com>,
         Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: [RFC PATCH v3 14/59] KVM: x86: Add vm_type to differentiate legacy VMs from protected VMs
-Date:   Wed, 24 Nov 2021 16:19:57 -0800
-Message-Id: <60a163e818b9101dce94973a2b44662ba3d53f97.1637799475.git.isaku.yamahata@intel.com>
+Subject: [RFC PATCH v3 15/59] KVM: x86: Introduce "protected guest" concept and block disallowed ioctls
+Date:   Wed, 24 Nov 2021 16:19:58 -0800
+Message-Id: <3e78c301460dfabc2aec22bde3907207011435b9.1637799475.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1637799475.git.isaku.yamahata@intel.com>
 References: <cover.1637799475.git.isaku.yamahata@intel.com>
@@ -49,186 +49,240 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-Add a capability to effectively allow userspace to query what VM types
-are supported by KVM.
+Add 'guest_state_protected' to mark a VM's state as being protected by
+hardware/firmware, e.g. SEV-ES or TDX-SEAM.  Use the flag to disallow
+ioctls() and/or flows that attempt to access protected state.
+
+Return an error if userspace attempts to get/set register state for a
+protected VM, e.g. a non-debug TDX guest.  KVM can't provide sane data,
+it's userspace's responsibility to avoid attempting to read guest state
+when it's known to be inaccessible.
+
+Retrieving vCPU events is the one exception, as the userspace VMM is
+allowed to inject NMIs.
 
 Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/include/asm/kvm-x86-ops.h    | 1 +
- arch/x86/include/asm/kvm_host.h       | 2 ++
- arch/x86/include/uapi/asm/kvm.h       | 4 ++++
- arch/x86/kvm/svm/svm.c                | 6 ++++++
- arch/x86/kvm/vmx/vmx.c                | 6 ++++++
- arch/x86/kvm/x86.c                    | 9 ++++++++-
- include/uapi/linux/kvm.h              | 2 ++
- tools/arch/x86/include/uapi/asm/kvm.h | 4 ++++
- tools/include/uapi/linux/kvm.h        | 2 ++
- 9 files changed, 35 insertions(+), 1 deletion(-)
+ arch/x86/kvm/x86.c | 80 ++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 66 insertions(+), 14 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-index cefe1d81e2e8..4aa0a1c10b84 100644
---- a/arch/x86/include/asm/kvm-x86-ops.h
-+++ b/arch/x86/include/asm/kvm-x86-ops.h
-@@ -18,6 +18,7 @@ KVM_X86_OP_NULL(hardware_unsetup)
- KVM_X86_OP_NULL(cpu_has_accelerated_tpr)
- KVM_X86_OP(has_emulated_msr)
- KVM_X86_OP(vcpu_after_set_cpuid)
-+KVM_X86_OP(is_vm_type_supported)
- KVM_X86_OP(vm_init)
- KVM_X86_OP_NULL(vm_destroy)
- KVM_X86_OP(vcpu_create)
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 5b31d8e5fcbf..cdb908ed7d5b 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1037,6 +1037,7 @@ struct kvm_x86_msr_filter {
- #define APICV_INHIBIT_REASON_BLOCKIRQ	6
- 
- struct kvm_arch {
-+	unsigned long vm_type;
- 	unsigned long n_used_mmu_pages;
- 	unsigned long n_requested_mmu_pages;
- 	unsigned long n_max_mmu_pages;
-@@ -1311,6 +1312,7 @@ struct kvm_x86_ops {
- 	bool (*has_emulated_msr)(struct kvm *kvm, u32 index);
- 	void (*vcpu_after_set_cpuid)(struct kvm_vcpu *vcpu);
- 
-+	bool (*is_vm_type_supported)(unsigned long vm_type);
- 	unsigned int vm_size;
- 	int (*vm_init)(struct kvm *kvm);
- 	void (*vm_destroy)(struct kvm *kvm);
-diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-index 5a776a08f78c..a0805a2a81f8 100644
---- a/arch/x86/include/uapi/asm/kvm.h
-+++ b/arch/x86/include/uapi/asm/kvm.h
-@@ -508,4 +508,8 @@ struct kvm_pmu_event_filter {
- #define KVM_VCPU_TSC_CTRL 0 /* control group for the timestamp counter (TSC) */
- #define   KVM_VCPU_TSC_OFFSET 0 /* attribute for the TSC offset */
- 
-+#define KVM_X86_LEGACY_VM	0
-+#define KVM_X86_SEV_ES_VM	1
-+#define KVM_X86_TDX_VM		2
-+
- #endif /* _ASM_X86_KVM_H */
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 5630c241d5f6..2ef77d4566a9 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4562,6 +4562,11 @@ static void svm_vm_destroy(struct kvm *kvm)
- 	sev_vm_destroy(kvm);
- }
- 
-+static bool svm_is_vm_type_supported(unsigned long type)
-+{
-+	return type == KVM_X86_LEGACY_VM;
-+}
-+
- static int svm_vm_init(struct kvm *kvm)
- {
- 	if (!pause_filter_count || !pause_filter_thresh)
-@@ -4589,6 +4594,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.vcpu_free = svm_free_vcpu,
- 	.vcpu_reset = svm_vcpu_reset,
- 
-+	.is_vm_type_supported = svm_is_vm_type_supported,
- 	.vm_size = sizeof(struct kvm_svm),
- 	.vm_init = svm_vm_init,
- 	.vm_destroy = svm_vm_destroy,
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index fe4f3ee61db3..f2905e00b063 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -6851,6 +6851,11 @@ static int vmx_create_vcpu(struct kvm_vcpu *vcpu)
- 	return err;
- }
- 
-+static bool vmx_is_vm_type_supported(unsigned long type)
-+{
-+	return type == KVM_X86_LEGACY_VM;
-+}
-+
- #define L1TF_MSG_SMT "L1TF CPU bug present and SMT on, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.\n"
- #define L1TF_MSG_L1D "L1TF CPU bug present and virtualization mitigation disabled, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.\n"
- 
-@@ -7505,6 +7510,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
- 	.cpu_has_accelerated_tpr = report_flexpriority,
- 	.has_emulated_msr = vmx_has_emulated_msr,
- 
-+	.is_vm_type_supported = vmx_is_vm_type_supported,
- 	.vm_size = sizeof(struct kvm_vmx),
- 	.vm_init = vmx_vm_init,
- 
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 6f3c77524426..5f4b6f70489b 100644
+index 5f4b6f70489b..b21fcf3c0cc8 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -4225,6 +4225,11 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		else
- 			r = 0;
- 		break;
-+	case KVM_CAP_VM_TYPES:
-+		r = BIT(KVM_X86_LEGACY_VM);
-+		if (static_call(kvm_x86_is_vm_type_supported)(KVM_X86_TDX_VM))
-+			r |= BIT(KVM_X86_TDX_VM);
-+		break;
- 	default:
- 		break;
- 	}
-@@ -11320,9 +11325,11 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 	int ret;
- 	unsigned long flags;
+@@ -4539,6 +4539,10 @@ static int kvm_vcpu_ioctl_nmi(struct kvm_vcpu *vcpu)
  
--	if (type)
-+	if (!static_call(kvm_x86_is_vm_type_supported)(type))
+ static int kvm_vcpu_ioctl_smi(struct kvm_vcpu *vcpu)
+ {
++	/* TODO: use more precise flag */
++	if (vcpu->arch.guest_state_protected)
++		return -EINVAL;
++
+ 	kvm_make_request(KVM_REQ_SMI, vcpu);
+ 
+ 	return 0;
+@@ -4585,6 +4589,10 @@ static int kvm_vcpu_ioctl_x86_set_mce(struct kvm_vcpu *vcpu,
+ 	unsigned bank_num = mcg_cap & 0xff;
+ 	u64 *banks = vcpu->arch.mce_banks;
+ 
++	/* TODO: use more precise flag */
++	if (vcpu->arch.guest_state_protected)
++		return -EINVAL;
++
+ 	if (mce->bank >= bank_num || !(mce->status & MCI_STATUS_VAL))
+ 		return -EINVAL;
+ 	/*
+@@ -4680,7 +4688,8 @@ static void kvm_vcpu_ioctl_x86_get_vcpu_events(struct kvm_vcpu *vcpu,
+ 		vcpu->arch.interrupt.injected && !vcpu->arch.interrupt.soft;
+ 	events->interrupt.nr = vcpu->arch.interrupt.nr;
+ 	events->interrupt.soft = 0;
+-	events->interrupt.shadow = static_call(kvm_x86_get_interrupt_shadow)(vcpu);
++	if (!vcpu->arch.guest_state_protected)
++		events->interrupt.shadow = static_call(kvm_x86_get_interrupt_shadow)(vcpu);
+ 
+ 	events->nmi.injected = vcpu->arch.nmi_injected;
+ 	events->nmi.pending = vcpu->arch.nmi_pending != 0;
+@@ -4709,11 +4718,17 @@ static void kvm_smm_changed(struct kvm_vcpu *vcpu, bool entering_smm);
+ static int kvm_vcpu_ioctl_x86_set_vcpu_events(struct kvm_vcpu *vcpu,
+ 					      struct kvm_vcpu_events *events)
+ {
+-	if (events->flags & ~(KVM_VCPUEVENT_VALID_NMI_PENDING
+-			      | KVM_VCPUEVENT_VALID_SIPI_VECTOR
+-			      | KVM_VCPUEVENT_VALID_SHADOW
+-			      | KVM_VCPUEVENT_VALID_SMM
+-			      | KVM_VCPUEVENT_VALID_PAYLOAD))
++	u32 allowed_flags = KVM_VCPUEVENT_VALID_NMI_PENDING |
++			    KVM_VCPUEVENT_VALID_SIPI_VECTOR |
++			    KVM_VCPUEVENT_VALID_SHADOW |
++			    KVM_VCPUEVENT_VALID_SMM |
++			    KVM_VCPUEVENT_VALID_PAYLOAD;
++
++	/* TODO: introduce more precise flag */
++	if (vcpu->arch.guest_state_protected)
++		allowed_flags = KVM_VCPUEVENT_VALID_NMI_PENDING;
++
++	if (events->flags & ~allowed_flags)
  		return -EINVAL;
  
-+	kvm->arch.vm_type = type;
+ 	if (events->flags & KVM_VCPUEVENT_VALID_PAYLOAD) {
+@@ -4789,17 +4804,22 @@ static int kvm_vcpu_ioctl_x86_set_vcpu_events(struct kvm_vcpu *vcpu,
+ 	return 0;
+ }
+ 
+-static void kvm_vcpu_ioctl_x86_get_debugregs(struct kvm_vcpu *vcpu,
+-					     struct kvm_debugregs *dbgregs)
++static int kvm_vcpu_ioctl_x86_get_debugregs(struct kvm_vcpu *vcpu,
++					    struct kvm_debugregs *dbgregs)
+ {
+ 	unsigned long val;
+ 
++	if (vcpu->arch.guest_state_protected)
++		return -EINVAL;
 +
- 	ret = kvm_page_track_init(kvm);
- 	if (ret)
- 		return ret;
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 1daa45268de2..bb49e095867e 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1132,6 +1132,8 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_ARM_MTE 205
- #define KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM 206
- 
-+#define KVM_CAP_VM_TYPES 1000
+ 	memcpy(dbgregs->db, vcpu->arch.db, sizeof(vcpu->arch.db));
+ 	kvm_get_dr(vcpu, 6, &val);
+ 	dbgregs->dr6 = val;
+ 	dbgregs->dr7 = vcpu->arch.dr7;
+ 	dbgregs->flags = 0;
+ 	memset(&dbgregs->reserved, 0, sizeof(dbgregs->reserved));
 +
- #ifdef KVM_CAP_IRQ_ROUTING
++	return 0;
+ }
  
- struct kvm_irq_routing_irqchip {
-diff --git a/tools/arch/x86/include/uapi/asm/kvm.h b/tools/arch/x86/include/uapi/asm/kvm.h
-index 2ef1f6513c68..96b0064cff5c 100644
---- a/tools/arch/x86/include/uapi/asm/kvm.h
-+++ b/tools/arch/x86/include/uapi/asm/kvm.h
-@@ -504,4 +504,8 @@ struct kvm_pmu_event_filter {
- #define KVM_PMU_EVENT_ALLOW 0
- #define KVM_PMU_EVENT_DENY 1
+ static int kvm_vcpu_ioctl_x86_set_debugregs(struct kvm_vcpu *vcpu,
+@@ -4813,6 +4833,9 @@ static int kvm_vcpu_ioctl_x86_set_debugregs(struct kvm_vcpu *vcpu,
+ 	if (!kvm_dr7_valid(dbgregs->dr7))
+ 		return -EINVAL;
  
-+#define KVM_X86_LEGACY_VM	0
-+#define KVM_X86_SEV_ES_VM	1
-+#define KVM_X86_TDX_VM		2
++	if (vcpu->arch.guest_state_protected)
++		return -EINVAL;
 +
- #endif /* _ASM_X86_KVM_H */
-diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
-index a067410ebea5..e5aadad54ced 100644
---- a/tools/include/uapi/linux/kvm.h
-+++ b/tools/include/uapi/linux/kvm.h
-@@ -1113,6 +1113,8 @@ struct kvm_ppc_resize_hpt {
- #define KVM_CAP_EXIT_ON_EMULATION_FAILURE 204
- #define KVM_CAP_ARM_MTE 205
+ 	memcpy(vcpu->arch.db, dbgregs->db, sizeof(vcpu->arch.db));
+ 	kvm_update_dr0123(vcpu);
+ 	vcpu->arch.dr6 = dbgregs->dr6;
+@@ -4845,18 +4868,22 @@ static int kvm_vcpu_ioctl_x86_set_xsave(struct kvm_vcpu *vcpu,
+ 					      supported_xcr0, &vcpu->arch.pkru);
+ }
  
-+#define KVM_CAP_VM_TYPES 1000
+-static void kvm_vcpu_ioctl_x86_get_xcrs(struct kvm_vcpu *vcpu,
+-					struct kvm_xcrs *guest_xcrs)
++static int kvm_vcpu_ioctl_x86_get_xcrs(struct kvm_vcpu *vcpu,
++				       struct kvm_xcrs *guest_xcrs)
+ {
++	if (vcpu->arch.guest_state_protected)
++		return -EINVAL;
 +
- #ifdef KVM_CAP_IRQ_ROUTING
+ 	if (!boot_cpu_has(X86_FEATURE_XSAVE)) {
+ 		guest_xcrs->nr_xcrs = 0;
+-		return;
++		return 0;
+ 	}
  
- struct kvm_irq_routing_irqchip {
+ 	guest_xcrs->nr_xcrs = 1;
+ 	guest_xcrs->flags = 0;
+ 	guest_xcrs->xcrs[0].xcr = XCR_XFEATURE_ENABLED_MASK;
+ 	guest_xcrs->xcrs[0].value = vcpu->arch.xcr0;
++	return 0;
+ }
+ 
+ static int kvm_vcpu_ioctl_x86_set_xcrs(struct kvm_vcpu *vcpu,
+@@ -4864,6 +4891,9 @@ static int kvm_vcpu_ioctl_x86_set_xcrs(struct kvm_vcpu *vcpu,
+ {
+ 	int i, r = 0;
+ 
++	if (vcpu->arch.guest_state_protected)
++		return -EINVAL;
++
+ 	if (!boot_cpu_has(X86_FEATURE_XSAVE))
+ 		return -EINVAL;
+ 
+@@ -5247,7 +5277,9 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 	case KVM_GET_DEBUGREGS: {
+ 		struct kvm_debugregs dbgregs;
+ 
+-		kvm_vcpu_ioctl_x86_get_debugregs(vcpu, &dbgregs);
++		r = kvm_vcpu_ioctl_x86_get_debugregs(vcpu, &dbgregs);
++		if (r)
++			break;
+ 
+ 		r = -EFAULT;
+ 		if (copy_to_user(argp, &dbgregs,
+@@ -5297,7 +5329,9 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 		if (!u.xcrs)
+ 			break;
+ 
+-		kvm_vcpu_ioctl_x86_get_xcrs(vcpu, u.xcrs);
++		r = kvm_vcpu_ioctl_x86_get_xcrs(vcpu, u.xcrs);
++		if (r)
++			break;
+ 
+ 		r = -EFAULT;
+ 		if (copy_to_user(argp, u.xcrs,
+@@ -10188,6 +10222,12 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 		goto out;
+ 	}
+ 
++	if (vcpu->arch.guest_state_protected &&
++	    (kvm_run->kvm_valid_regs || kvm_run->kvm_dirty_regs)) {
++		r = -EINVAL;
++		goto out;
++	}
++
+ 	if (kvm_run->kvm_dirty_regs) {
+ 		r = sync_regs(vcpu);
+ 		if (r != 0)
+@@ -10218,7 +10258,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
+ 
+ out:
+ 	kvm_put_guest_fpu(vcpu);
+-	if (kvm_run->kvm_valid_regs)
++	if (kvm_run->kvm_valid_regs && !vcpu->arch.guest_state_protected)
+ 		store_regs(vcpu);
+ 	post_kvm_run_save(vcpu);
+ 	kvm_sigset_deactivate(vcpu);
+@@ -10265,6 +10305,9 @@ static void __get_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
+ 
+ int kvm_arch_vcpu_ioctl_get_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
+ {
++	if (vcpu->arch.guest_state_protected)
++		return -EINVAL;
++
+ 	vcpu_load(vcpu);
+ 	__get_regs(vcpu, regs);
+ 	vcpu_put(vcpu);
+@@ -10305,6 +10348,9 @@ static void __set_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
+ 
+ int kvm_arch_vcpu_ioctl_set_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
+ {
++	if (vcpu->arch.guest_state_protected)
++		return -EINVAL;
++
+ 	vcpu_load(vcpu);
+ 	__set_regs(vcpu, regs);
+ 	vcpu_put(vcpu);
+@@ -10387,6 +10433,9 @@ static void __get_sregs2(struct kvm_vcpu *vcpu, struct kvm_sregs2 *sregs2)
+ int kvm_arch_vcpu_ioctl_get_sregs(struct kvm_vcpu *vcpu,
+ 				  struct kvm_sregs *sregs)
+ {
++	if (vcpu->arch.guest_state_protected)
++		return -EINVAL;
++
+ 	vcpu_load(vcpu);
+ 	__get_sregs(vcpu, sregs);
+ 	vcpu_put(vcpu);
+@@ -10635,6 +10684,9 @@ int kvm_arch_vcpu_ioctl_set_sregs(struct kvm_vcpu *vcpu,
+ {
+ 	int ret;
+ 
++	if (vcpu->arch.guest_state_protected)
++		return -EINVAL;
++
+ 	vcpu_load(vcpu);
+ 	ret = __set_sregs(vcpu, sregs);
+ 	vcpu_put(vcpu);
 -- 
 2.25.1
 
