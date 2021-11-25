@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1AC9645D1D4
-	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 01:24:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3936A45D1AF
+	for <lists+kvm@lfdr.de>; Thu, 25 Nov 2021 01:24:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353840AbhKYA0N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 24 Nov 2021 19:26:13 -0500
-Received: from mga09.intel.com ([134.134.136.24]:6524 "EHLO mga09.intel.com"
+        id S1353251AbhKYAYx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 24 Nov 2021 19:24:53 -0500
+Received: from mga12.intel.com ([192.55.52.136]:16249 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1352966AbhKYAY1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 24 Nov 2021 19:24:27 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10178"; a="235227034"
+        id S1352952AbhKYAY0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 24 Nov 2021 19:24:26 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10178"; a="215432204"
 X-IronPort-AV: E=Sophos;i="5.87,261,1631602800"; 
-   d="scan'208";a="235227034"
+   d="scan'208";a="215432204"
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 16:21:15 -0800
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 16:21:15 -0800
 X-IronPort-AV: E=Sophos;i="5.87,261,1631602800"; 
-   d="scan'208";a="675042231"
+   d="scan'208";a="675042235"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 16:21:14 -0800
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 16:21:15 -0800
 From:   isaku.yamahata@intel.com
 To:     Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
@@ -34,9 +34,9 @@ To:     Thomas Gleixner <tglx@linutronix.de>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: [RFC PATCH v3 32/59] KVM: x86/mmu: Explicitly check for MMIO spte in fast page fault
-Date:   Wed, 24 Nov 2021 16:20:15 -0800
-Message-Id: <530d97b430b592207eccf063bfa2fdf7c0b50e4d.1637799475.git.isaku.yamahata@intel.com>
+Subject: [RFC PATCH v3 33/59] KVM: x86/mmu: Ignore bits 63 and 62 when checking for "present" SPTEs
+Date:   Wed, 24 Nov 2021 16:20:16 -0800
+Message-Id: <93d466c4850603ea73703a3a39f82e9f3cba5cc5.1637799475.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1637799475.git.isaku.yamahata@intel.com>
 References: <cover.1637799475.git.isaku.yamahata@intel.com>
@@ -48,29 +48,55 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Sean Christopherson <sean.j.christopherson@intel.com>
 
-Explicity check for an MMIO spte in the fast page fault flow.  TDX will
-use a not-present entry for MMIO sptes, which can be mistaken for an
-access-tracked spte since both have SPTE_SPECIAL_MASK set.
+Ignore bits 63 and 62 when checking for present SPTEs to allow setting
+said bits in not-present SPTEs.  TDX will set bit 63 in "zero" SPTEs to
+suppress #VEs (TDX-SEAM unconditionally enables EPT Violation #VE), and
+will use bit 62 to track zapped private SPTEs.
 
 Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/x86/kvm/mmu/paging_tmpl.h |  2 +-
+ arch/x86/kvm/mmu/spte.h        | 13 +++++++++++++
+ 2 files changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 5305d1d9a976..01569913f1f0 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3186,7 +3186,7 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 			break;
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index 3a515c71e09c..80e821996728 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -1102,7 +1102,7 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
+ 		gpa_t pte_gpa;
+ 		gfn_t gfn;
  
- 		sp = sptep_to_sp(sptep);
--		if (!is_last_spte(spte, sp->role.level))
-+		if (!is_last_spte(spte, sp->role.level) || is_mmio_spte(spte))
- 			break;
+-		if (!sp->spt[i])
++		if (!__is_shadow_present_pte(sp->spt[i]))
+ 			continue;
  
- 		/*
+ 		pte_gpa = first_pte_gpa + i * sizeof(pt_element_t);
+diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+index cc432f9a966b..56b6dd750fb1 100644
+--- a/arch/x86/kvm/mmu/spte.h
++++ b/arch/x86/kvm/mmu/spte.h
+@@ -208,6 +208,19 @@ static inline bool is_mmio_spte(u64 spte)
+ 	       likely(shadow_mmio_value);
+ }
+ 
++static inline bool __is_shadow_present_pte(u64 pte)
++{
++	/*
++	 * Ignore bits 63 and 62 so that they can be set in SPTEs that are well
++	 * and truly not present.  We can't use the sane/obvious approach of
++	 * querying bits 2:0 (RWX or P) because EPT without A/D bits will clear
++	 * RWX of a "present" SPTE to do access tracking.  Tracking updates can
++	 * be done out of mmu_lock, so even the flushing logic needs to treat
++	 * such SPTEs as present.
++	 */
++	return !!(pte << 2);
++}
++
+ static inline bool is_shadow_present_pte(u64 pte)
+ {
+ 	return !!(pte & SPTE_MMU_PRESENT_MASK);
 -- 
 2.25.1
 
