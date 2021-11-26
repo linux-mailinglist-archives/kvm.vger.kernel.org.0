@@ -2,133 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 751E045E952
-	for <lists+kvm@lfdr.de>; Fri, 26 Nov 2021 09:24:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C188F45EA02
+	for <lists+kvm@lfdr.de>; Fri, 26 Nov 2021 10:11:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359587AbhKZI1W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Nov 2021 03:27:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39474 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1359656AbhKZIZR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Nov 2021 03:25:17 -0500
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01B36C061746;
-        Fri, 26 Nov 2021 00:19:14 -0800 (PST)
-Received: by mail-ed1-x529.google.com with SMTP id z5so35624067edd.3;
-        Fri, 26 Nov 2021 00:19:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=kjPIuejmixJMckieSdz7EIHII2l1faqnfhtqJyiLPM4=;
-        b=fK9prnbv0PgpM0XPK1J1kI3fYoKY1EnF26gdp4hAdKZqzqcdAyMykY/pJuWeRfy/PP
-         LFwYrs0duVCYpYc0xMUUNZAz5JvDemy+BxEV/+9NXgLcokMtKtbeh39HRqcL+Z9erQcs
-         4SkRvNsIZgVh2z1Yzw4371DyMD8xz4ik2R0bHJV51vh/XI6SZgjweua1jgE79JFnaBgv
-         jdx2vO9NNWbfnGeGak//yYO8h6LHfyDcNGktZNGnBY+UhySfucH9RBZI8gIylwYA/0WV
-         S7DTWjrlyb3s/R73ktFJI2kBVDvoFk/UZtepflRPF6iBJqVjCnDaEWOYd8sEcHSjoR8g
-         ie6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=kjPIuejmixJMckieSdz7EIHII2l1faqnfhtqJyiLPM4=;
-        b=ETJoYmQkNIQi1us71XWv4AlxPBi/jbAtknWl6RbmoB5pKmym/jT6eedr+5+/O9CsaT
-         38NChhI3kmmDVj5AlMnvqBpSz/Faj0uCVc0lIR1PUBz4htVZm3NuxVG4BRKZ1Nakpdln
-         s5LHwe6Z5wbrds///9quSOpY4IBaqV8fu6s8OciIQqxTwE/usQut1GUlVnlAoz2dLm7/
-         bJfEJQ8td8NcCQjzq5qOHQ/tpdQtm+WP3gHKz+KotWkzA3XvolohZfmT5hJdvY8jQ9mC
-         dBeS+xWrjcK+AEsT7pbxejpxPAF8HoqzZkT1If2B6B8WQLTO1CsZOEl/YJslqzEfW04e
-         TbHQ==
-X-Gm-Message-State: AOAM532Q819r3O306pISBN1t8uST1KF2vCxu3AZvji1jD1jhXMv5iys5
-        1Bg37K/2llHNqemJi9mC1Ic=
-X-Google-Smtp-Source: ABdhPJwWcSXj8uTzn0NQlmVjeVOpfI6OHn7sYLjajMwrHTgztjLUvEUmX3agGBpOD5IVUeNaFWwy0Q==
-X-Received: by 2002:a17:906:6a1a:: with SMTP id qw26mr37453031ejc.489.1637914752497;
-        Fri, 26 Nov 2021 00:19:12 -0800 (PST)
-Received: from ?IPV6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a? ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
-        by smtp.googlemail.com with ESMTPSA id m22sm3309711eda.97.2021.11.26.00.19.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 26 Nov 2021 00:19:12 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <d449a4c2-131d-5406-b7a2-7549bacc02f9@redhat.com>
-Date:   Fri, 26 Nov 2021 09:18:59 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [RFC PATCH v3 23/59] KVM: x86: Allow host-initiated WRMSR to set
- X2APIC regardless of CPUID
-Content-Language: en-US
-To:     Thomas Gleixner <tglx@linutronix.de>, isaku.yamahata@intel.com,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        id S245030AbhKZJOj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Nov 2021 04:14:39 -0500
+Received: from mga05.intel.com ([192.55.52.43]:48223 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231132AbhKZJMj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Nov 2021 04:12:39 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10179"; a="321868485"
+X-IronPort-AV: E=Sophos;i="5.87,265,1631602800"; 
+   d="scan'208";a="321868485"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2021 01:09:26 -0800
+X-IronPort-AV: E=Sophos;i="5.87,265,1631602800"; 
+   d="scan'208";a="498342613"
+Received: from gao-cwp.sh.intel.com (HELO gao-cwp) ([10.239.159.99])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2021 01:09:21 -0800
+Date:   Fri, 26 Nov 2021 17:19:15 +0800
+From:   Chao Gao <chao.gao@intel.com>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     isaku.yamahata@intel.com, Ingo Molnar <mingo@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
         "H . Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, erdemaktas@google.com,
         Connor Kuehl <ckuehl@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     isaku.yamahata@gmail.com,
-        Sean Christopherson <sean.j.christopherson@intel.com>
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        isaku.yamahata@gmail.com
+Subject: Re: [RFC PATCH v3 53/59] KVM: x86: Add a helper function to restore
+ 4 host MSRs on exit to user space
+Message-ID: <20211126091913.GA11523@gao-cwp>
 References: <cover.1637799475.git.isaku.yamahata@intel.com>
- <63556f13e9608cbccf97d356be46a345772d76d3.1637799475.git.isaku.yamahata@intel.com>
- <87fsrkja4j.ffs@tglx>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <87fsrkja4j.ffs@tglx>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+ <4ede5c987a4ae938a37ab7fe70d5e1d561ee97d4.1637799475.git.isaku.yamahata@intel.com>
+ <878rxcht3g.ffs@tglx>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <878rxcht3g.ffs@tglx>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/25/21 20:41, Thomas Gleixner wrote:
-> On Wed, Nov 24 2021 at 16:20, isaku yamahata wrote:
->> Let userspace, or in the case of TDX, KVM itself, enable X2APIC even if
->> X2APIC is not reported as supported in the guest's CPU model.  KVM
->> generally does not force specific ordering between ioctls(), e.g. this
->> forces userspace to configure CPUID before MSRs.  And for TDX, vCPUs
->> will always run with X2APIC enabled, e.g. KVM will want/need to enable
->> X2APIC from time zero.
-> 
-> This is complete crap. Fix the broken user space and do not add
-> horrible hacks to the kernel.
+On Thu, Nov 25, 2021 at 09:34:59PM +0100, Thomas Gleixner wrote:
+>On Wed, Nov 24 2021 at 16:20, isaku yamahata wrote:
+>> From: Chao Gao <chao.gao@intel.com>
+>
+>> $Subject: KVM: x86: Add a helper function to restore 4 host MSRs on exit to user space
+>
+>Which user space are you talking about? This subject line is misleading
 
-tl;dr: I agree that it's a userspace issue but "configure CPUID before 
-MSR" is not the issue (in fact QEMU calls KVM_SET_CPUID2 before any call 
-to KVM_SET_MSRS).
+Host Ring3.
 
-We have quite a few other cases in which KVM_GET/SET_MSR is allowed to 
-get/set MSRs in ways that the guests are not allowed to do.
+>at best. The unconditional reset is happening when a TDX VM exits
+>because the SEAM firmware enforces this to prevent unformation leaks.
 
-In general, there are several reasons for this:
+Yes.
 
-- simplifying userspace so that it can use the same list of MSRs for all 
-guests (likely, the list that KVM provides with KVM_GET_MSR_INDEX_LIST). 
-  For example MSR_TSC_AUX is only exposed to the guest if RDTSCP or 
-RDPID are available, but the host can always access it.  This is usually 
-the reason why host accesses to MSRs override CPUID.
+>
+>It also does not matter whether this are four or ten MSR.
 
-- simplifying userspace so that it does not have to go through the 
-various steps of a state machine; for example, it's okay if userspace 
-goes DISABLED->X2APIC instead of having to do DISABLED->XAPIC->X2APIC.
+Indeed, the number of MSRs doesn't matter.
 
-- allowing userspace to set a reset value, for example overriding the 
-lock bit in MSR_IA32_FEAT_CTL.
+>Fact is that
+>the SEAM firmware is buggy because it does not save/restore those MSRs.
 
-- read-only MSRs that are really "CPUID-like", i.e. they give the guest 
-information about processor features (for example the VMX feature MSRs)
+It is done deliberately. It gives host a chance to do "lazy" restoration.
+"lazy" means don't save/restore them on each TD entry/exit but defer
+restoration to when it is neccesary e.g., when vCPU is scheduled out or
+when kernel is about to return to Ring3.
 
-- MSRs had some weird limitations that were lifted later by introducing 
-additional MSRs; for example KVM always allows the host to write to the 
-full-width MSR_IA32_PMC0 counters, because they are a saner version of 
-MSR_IA32_PERFCTR0 and there's no reason for userspace to inflict 
-MSR_IA32_PERFCTR0 on userspace.
+>
+>So the proper subject line is:
+>
+>   KVM: x86: Add infrastructure to handle MSR corruption by broken TDX firmware
 
-So the host_initiated check doesn't _necessarily_ count as a horrible 
-hack in the kernel.  However, in this case we have a trusted domain 
-without X2APIC.  I'm not sure this configuration is clearly bogus.  One 
-could imagine special-purpose VMs that don't need interrupts at all. 
-For full guests such as the ones that QEMU runs, I agree with Thomas 
-that userspace must be fixed to enforce x2apic for TDX guests.
+I rewrote the commit message:
 
-Paolo
+    KVM: x86: Allow to update cached values in kvm_user_return_msrs w/o wrmsr
+
+    Several MSRs are constant and only used in userspace. But VMs may have
+    different values. KVM uses kvm_set_user_return_msr() to switch to guest's
+    values and leverages user return notifier to restore them when kernel is
+    to return to userspace. In order to save unnecessary wrmsr, KVM also caches
+    the value it wrote to a MSR last time.
+
+    TDX module unconditionally resets some of these MSRs to architectural INIT
+    state on TD exit. It makes the cached values in kvm_user_return_msrs are
+    inconsistent with values in hardware. This inconsistency needs to be fixed
+    otherwise, it may mislead kvm_on_user_return() to skip restoring some MSRs
+    to host's values. kvm_set_user_return_msr() can help to correct this case
+    but it is not optimal as it always does a wrmsr. So, introduce a variation
+    of kvm_set_user_return_msr() to update the cached value but skip the wrmsr.
+
+>
+>> The TDX module unconditionally reset 4 host MSRs (MSR_SYSCALL_MASK,
+>> MSR_START, MSR_LSTAR, MSR_TSC_AUX) to architectural INIT state on exit from
+>> TDX VM to KVM.  KVM needs to save their values before TD enter and restore
+>> them on exit to userspace.
+>>
+>> Reuse current kvm_user_return mechanism and introduce a function to update
+>> cached values and register the user return notifier in this new function.
+>>
+>> The later patch will use the helper function to save/restore 4 host
+>> MSRs.
+>
+>'The later patch ...' is useless information. Of course there will be a
+>later patch to make use of this which is implied by 'Add infrastructure
+>...'. Can we please get rid of these useless phrases which have no value
+>at patch submission time and are even more confusing once the pile is
+>merged?
+
+Of course. Will remove all "later patch" phrases.
+
+Thanks
+Chao
+
+>
+>Thanks,
+>
+>        tglx
