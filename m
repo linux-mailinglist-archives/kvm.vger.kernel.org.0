@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D8C645E3B3
-	for <lists+kvm@lfdr.de>; Fri, 26 Nov 2021 01:33:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D5DA45E3B5
+	for <lists+kvm@lfdr.de>; Fri, 26 Nov 2021 01:33:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351600AbhKZAgl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 25 Nov 2021 19:36:41 -0500
-Received: from vps-vb.mhejs.net ([37.28.154.113]:55270 "EHLO vps-vb.mhejs.net"
+        id S1352047AbhKZAgr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 25 Nov 2021 19:36:47 -0500
+Received: from vps-vb.mhejs.net ([37.28.154.113]:55292 "EHLO vps-vb.mhejs.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238820AbhKZAek (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 25 Nov 2021 19:34:40 -0500
+        id S239062AbhKZAep (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 25 Nov 2021 19:34:45 -0500
 Received: from MUA
         by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <mail@maciej.szmigiero.name>)
-        id 1mqP96-0007Gx-JD; Fri, 26 Nov 2021 01:31:20 +0100
+        id 1mqP9B-0007H6-VT; Fri, 26 Nov 2021 01:31:26 +0100
 From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -25,9 +25,9 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Joerg Roedel <joro@8bytes.org>,
         Igor Mammedov <imammedo@redhat.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 1/3] KVM: x86: Avoid overflowing nr_mmu_pages in kvm_arch_commit_memory_region()
-Date:   Fri, 26 Nov 2021 01:31:07 +0100
-Message-Id: <44edcde46d12c2f5376a1cd1429650acb506ebaf.1637884349.git.maciej.szmigiero@oracle.com>
+Subject: [PATCH 2/3] KVM: Use atomic_long_cmpxchg() instead of an open-coded variant
+Date:   Fri, 26 Nov 2021 01:31:08 +0100
+Message-Id: <7bdc7ee3dcc09a109cfaf9fb8662fb49ca0bec2c.1637884349.git.maciej.szmigiero@oracle.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <cover.1637884349.git.maciej.szmigiero@oracle.com>
 References: <cover.1637884349.git.maciej.szmigiero@oracle.com>
@@ -39,43 +39,37 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
 
-With kvm->nr_memslot_pages capped at ULONG_MAX we can't safely multiply it
-by KVM_PERMILLE_MMU_PAGES (20) since this operation can possibly overflow
-an unsigned long variable.
+Open-coding a cmpxchg()-like operation is significantly less readable than
+a direct call.
 
-Rewrite this "* 20 / 1000" operation as "/ 50" instead to avoid such
-overflow.
+Also, the open-coded version compiles to multiple instructions with
+a branch on x86, instead of just a single instruction.
+
+Since technically the open-coded variant didn't guarantee actual atomicity
+add a comment there, too, that this property isn't strictly required in
+this case.
 
 Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
 ---
- arch/x86/include/asm/kvm_host.h | 2 +-
- arch/x86/kvm/x86.c              | 3 +--
- 2 files changed, 2 insertions(+), 3 deletions(-)
+ virt/kvm/kvm_main.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 1fcb345bc107..8cd1d254c948 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -135,7 +135,7 @@
- #define KVM_HPAGE_MASK(x)	(~(KVM_HPAGE_SIZE(x) - 1))
- #define KVM_PAGES_PER_HPAGE(x)	(KVM_HPAGE_SIZE(x) / PAGE_SIZE)
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index d4399db06d49..367c1cba26d2 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1378,8 +1378,12 @@ static void kvm_replace_memslot(struct kvm *kvm,
+ 		hash_del(&old->id_node[idx]);
+ 		interval_tree_remove(&old->hva_node[idx], &slots->hva_tree);
  
--#define KVM_PERMILLE_MMU_PAGES 20
-+#define KVM_MEMSLOT_PAGES_TO_MMU_PAGES_RATIO 50
- #define KVM_MIN_ALLOC_MMU_PAGES 64UL
- #define KVM_MMU_HASH_SHIFT 12
- #define KVM_NUM_MMU_PAGES (1 << KVM_MMU_HASH_SHIFT)
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 04e8dabc187d..69330b395f12 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11753,8 +11753,7 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
- 	    (change == KVM_MR_CREATE || change == KVM_MR_DELETE)) {
- 		unsigned long nr_mmu_pages;
+-		if ((long)old == atomic_long_read(&slots->last_used_slot))
+-			atomic_long_set(&slots->last_used_slot, (long)new);
++		/*
++		 * The atomicity isn't strictly required here since we are
++		 * operating on an inactive memslots set anyway.
++		 */
++		atomic_long_cmpxchg(&slots->last_used_slot,
++				    (unsigned long)old, (unsigned long)new);
  
--		nr_mmu_pages = kvm->nr_memslot_pages * KVM_PERMILLE_MMU_PAGES;
--		nr_mmu_pages /= 1000;
-+		nr_mmu_pages = kvm->nr_memslot_pages / KVM_MEMSLOT_PAGES_TO_MMU_PAGES_RATIO;
- 		nr_mmu_pages = max(nr_mmu_pages, KVM_MIN_ALLOC_MMU_PAGES);
- 		kvm_mmu_change_mmu_pages(kvm, nr_mmu_pages);
- 	}
+ 		if (!new) {
+ 			kvm_erase_gfn_node(slots, old);
