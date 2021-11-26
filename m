@@ -2,31 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C188F45EA02
-	for <lists+kvm@lfdr.de>; Fri, 26 Nov 2021 10:11:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D74A545EA97
+	for <lists+kvm@lfdr.de>; Fri, 26 Nov 2021 10:42:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245030AbhKZJOj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Nov 2021 04:14:39 -0500
-Received: from mga05.intel.com ([192.55.52.43]:48223 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231132AbhKZJMj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Nov 2021 04:12:39 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10179"; a="321868485"
-X-IronPort-AV: E=Sophos;i="5.87,265,1631602800"; 
-   d="scan'208";a="321868485"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2021 01:09:26 -0800
-X-IronPort-AV: E=Sophos;i="5.87,265,1631602800"; 
-   d="scan'208";a="498342613"
-Received: from gao-cwp.sh.intel.com (HELO gao-cwp) ([10.239.159.99])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Nov 2021 01:09:21 -0800
-Date:   Fri, 26 Nov 2021 17:19:15 +0800
-From:   Chao Gao <chao.gao@intel.com>
-To:     Thomas Gleixner <tglx@linutronix.de>
+        id S1352869AbhKZJqB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Nov 2021 04:46:01 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:23020 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1346393AbhKZJoA (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 26 Nov 2021 04:44:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1637919647;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=7UUe35TCPwnWrlRfuadrJjdwO/yhSUHrYr8BjHXjKnE=;
+        b=Ea7G5scEc+rTInZf23f1EBlc5ID6NWLLy7ydgOX7XSiyLzyPoDwJRSBVtia8T9D38kODPd
+        t0sVCnybAOnGJSfkUZB3knqpwtswcREzOfZoyjosVg6Il5tU7TvlykgtMzoR+Xgf3Szcif
+        GjNijYtWPAX2blUFl7q+0z3LJmMfQKI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-537-iMtrPbjDPVKCij-lsuqYIQ-1; Fri, 26 Nov 2021 04:40:44 -0500
+X-MC-Unique: iMtrPbjDPVKCij-lsuqYIQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3B2FE83DD20;
+        Fri, 26 Nov 2021 09:40:42 +0000 (UTC)
+Received: from [10.39.194.96] (unknown [10.39.194.96])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F1B8E19C46;
+        Fri, 26 Nov 2021 09:40:17 +0000 (UTC)
+Message-ID: <7693d3a8-fea7-fb61-b3fb-d0bf8a89c57b@redhat.com>
+Date:   Fri, 26 Nov 2021 10:40:16 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [RFC PATCH v3 53/59] KVM: x86: Add a helper function to restore 4
+ host MSRs on exit to user space
+Content-Language: en-US
+To:     Chao Gao <chao.gao@intel.com>, Thomas Gleixner <tglx@linutronix.de>
 Cc:     isaku.yamahata@intel.com, Ingo Molnar <mingo@redhat.com>,
         Borislav Petkov <bp@alien8.de>,
         "H . Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
@@ -35,96 +54,24 @@ Cc:     isaku.yamahata@intel.com, Ingo Molnar <mingo@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         isaku.yamahata@gmail.com
-Subject: Re: [RFC PATCH v3 53/59] KVM: x86: Add a helper function to restore
- 4 host MSRs on exit to user space
-Message-ID: <20211126091913.GA11523@gao-cwp>
 References: <cover.1637799475.git.isaku.yamahata@intel.com>
  <4ede5c987a4ae938a37ab7fe70d5e1d561ee97d4.1637799475.git.isaku.yamahata@intel.com>
- <878rxcht3g.ffs@tglx>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <878rxcht3g.ffs@tglx>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+ <878rxcht3g.ffs@tglx> <20211126091913.GA11523@gao-cwp>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20211126091913.GA11523@gao-cwp>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 25, 2021 at 09:34:59PM +0100, Thomas Gleixner wrote:
->On Wed, Nov 24 2021 at 16:20, isaku yamahata wrote:
->> From: Chao Gao <chao.gao@intel.com>
->
->> $Subject: KVM: x86: Add a helper function to restore 4 host MSRs on exit to user space
->
->Which user space are you talking about? This subject line is misleading
+On 11/26/21 10:19, Chao Gao wrote:
+> Of course. Will remove all "later patch" phrases.
 
-Host Ring3.
+Chao, see my comment on patch 54, for how to do this.  In this case, 
+this patch would be right before the one that enables KVM_RUN on a TDX 
+module.
 
->at best. The unconditional reset is happening when a TDX VM exits
->because the SEAM firmware enforces this to prevent unformation leaks.
+Paolo
 
-Yes.
-
->
->It also does not matter whether this are four or ten MSR.
-
-Indeed, the number of MSRs doesn't matter.
-
->Fact is that
->the SEAM firmware is buggy because it does not save/restore those MSRs.
-
-It is done deliberately. It gives host a chance to do "lazy" restoration.
-"lazy" means don't save/restore them on each TD entry/exit but defer
-restoration to when it is neccesary e.g., when vCPU is scheduled out or
-when kernel is about to return to Ring3.
-
->
->So the proper subject line is:
->
->   KVM: x86: Add infrastructure to handle MSR corruption by broken TDX firmware
-
-I rewrote the commit message:
-
-    KVM: x86: Allow to update cached values in kvm_user_return_msrs w/o wrmsr
-
-    Several MSRs are constant and only used in userspace. But VMs may have
-    different values. KVM uses kvm_set_user_return_msr() to switch to guest's
-    values and leverages user return notifier to restore them when kernel is
-    to return to userspace. In order to save unnecessary wrmsr, KVM also caches
-    the value it wrote to a MSR last time.
-
-    TDX module unconditionally resets some of these MSRs to architectural INIT
-    state on TD exit. It makes the cached values in kvm_user_return_msrs are
-    inconsistent with values in hardware. This inconsistency needs to be fixed
-    otherwise, it may mislead kvm_on_user_return() to skip restoring some MSRs
-    to host's values. kvm_set_user_return_msr() can help to correct this case
-    but it is not optimal as it always does a wrmsr. So, introduce a variation
-    of kvm_set_user_return_msr() to update the cached value but skip the wrmsr.
-
->
->> The TDX module unconditionally reset 4 host MSRs (MSR_SYSCALL_MASK,
->> MSR_START, MSR_LSTAR, MSR_TSC_AUX) to architectural INIT state on exit from
->> TDX VM to KVM.  KVM needs to save their values before TD enter and restore
->> them on exit to userspace.
->>
->> Reuse current kvm_user_return mechanism and introduce a function to update
->> cached values and register the user return notifier in this new function.
->>
->> The later patch will use the helper function to save/restore 4 host
->> MSRs.
->
->'The later patch ...' is useless information. Of course there will be a
->later patch to make use of this which is implied by 'Add infrastructure
->...'. Can we please get rid of these useless phrases which have no value
->at patch submission time and are even more confusing once the pile is
->merged?
-
-Of course. Will remove all "later patch" phrases.
-
-Thanks
-Chao
-
->
->Thanks,
->
->        tglx
