@@ -2,78 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B6E0345EF0C
-	for <lists+kvm@lfdr.de>; Fri, 26 Nov 2021 14:22:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9669045EF13
+	for <lists+kvm@lfdr.de>; Fri, 26 Nov 2021 14:23:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347139AbhKZNZP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Nov 2021 08:25:15 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:24171 "EHLO
+        id S242422AbhKZN0u (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Nov 2021 08:26:50 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:37388 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1346771AbhKZNXO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 26 Nov 2021 08:23:14 -0500
+        by vger.kernel.org with ESMTP id S1344932AbhKZNYu (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 26 Nov 2021 08:24:50 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637932801;
+        s=mimecast20190719; t=1637932897;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xMn0IHt58hMhIYB979E572IPiSJRHUyGPP5ZDhseN6I=;
-        b=YZIvCLkh86ytu6Bm2DFQz4YudY9zvJ/MwhXGy3xnXH7+oNCZ32H9+aTUPJrHiyhDqya7CX
-        H9y0QB5bkkcJyurSGpAkz/PZW4Ia46Q+FCyKZ1AzdFidMwmbnH6eswRPXYU4m4KilKmtd2
-        Ir9BB1k6KbDyFhlSNlujNOm0GFipqIk=
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=34sYTYVyXuYs+CPwdd7XUd+SQ49NoZZow/8OSNllSUk=;
+        b=fBGiYappsV0rJWI403NUjBPV0RbzkWQA8ZGJzlFJiGPP/H2SeWRxe4wycMfvrPYJ5l48F0
+        bUpCwxjlGmM4BxyUrpUzj5l1mYP6tdmG5IjPzR/cWvhnCrV8UjrqTl+fOKexE/EpMzdEP2
+        53rIVq8uRUCC3z6DjSjHgNjt71zrdjg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-556-ooLAGVwWOnG5hwONK6pyHw-1; Fri, 26 Nov 2021 08:19:58 -0500
-X-MC-Unique: ooLAGVwWOnG5hwONK6pyHw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-554-w7tcNeMNOCyLupiTaHXOFA-1; Fri, 26 Nov 2021 08:21:34 -0500
+X-MC-Unique: w7tcNeMNOCyLupiTaHXOFA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7079A92500;
-        Fri, 26 Nov 2021 13:19:56 +0000 (UTC)
-Received: from [10.39.195.16] (unknown [10.39.195.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3058E60854;
-        Fri, 26 Nov 2021 13:19:54 +0000 (UTC)
-Message-ID: <5611a352-7c09-5192-63fb-a00716ea051c@redhat.com>
-Date:   Fri, 26 Nov 2021 14:19:53 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH 0/3] KVM: Scalable memslots implementation additional
- patches
-Content-Language: en-US
-To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Igor Mammedov <imammedo@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <cover.1637884349.git.maciej.szmigiero@oracle.com>
- <743fffd6-e0fb-6531-bfa6-c30103357ce2@redhat.com>
- <4062e0ca-88cf-3521-3cf1-b420fc6ca2f6@maciej.szmigiero.name>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E7FFD80F051;
+        Fri, 26 Nov 2021 13:21:32 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5911F5C1CF;
+        Fri, 26 Nov 2021 13:21:32 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <4062e0ca-88cf-3521-3cf1-b420fc6ca2f6@maciej.szmigiero.name>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     laijs@linux.alibaba.com, stable@vger.kernel.org
+Subject: [PATCH] KVM: MMU: shadow nested paging does not have PKU
+Date:   Fri, 26 Nov 2021 08:21:31 -0500
+Message-Id: <20211126132131.26077-1-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/26/21 14:18, Maciej S. Szmigiero wrote:
->>
->> You can go ahead and post v6, I'll replace.
-> 
-> Which tree should I target then?
-> kvm/queue already has these commits so git refuses to rebase on top of it.
-> 
-> By the way, v6 will have more changes than this series since there will be
-> patches for intermediate forms of code, too.
+Initialize the mask for PKU permissions as if CR4.PKE=0, avoiding
+incorrect interpretations of the nested hypervisor's page tables.
 
-I'll undo them from kvm/queue shortly, since I've now updated all my 
-development machines to 5.16-rc2.
+Cc: stable@vger.kernel.org
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Paolo
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 5942e9c6dd6e..a33b5361bc67 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4855,7 +4855,7 @@ void kvm_init_shadow_npt_mmu(struct kvm_vcpu *vcpu, unsigned long cr0,
+ 	struct kvm_mmu *context = &vcpu->arch.guest_mmu;
+ 	struct kvm_mmu_role_regs regs = {
+ 		.cr0 = cr0,
+-		.cr4 = cr4,
++		.cr4 = cr4 & ~X86_CR4_PKE,
+ 		.efer = efer,
+ 	};
+ 	union kvm_mmu_role new_role;
+@@ -4919,7 +4919,7 @@ void kvm_init_shadow_ept_mmu(struct kvm_vcpu *vcpu, bool execonly,
+ 	context->direct_map = false;
+ 
+ 	update_permission_bitmask(context, true);
+-	update_pkru_bitmask(context);
++	context->pkru_mask = 0;
+ 	reset_rsvds_bits_mask_ept(vcpu, context, execonly);
+ 	reset_ept_shadow_zero_bits_mask(vcpu, context, execonly);
+ }
+-- 
+2.31.1
 
