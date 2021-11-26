@@ -2,88 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BC91D45EBB0
-	for <lists+kvm@lfdr.de>; Fri, 26 Nov 2021 11:33:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E8D1745EBC9
+	for <lists+kvm@lfdr.de>; Fri, 26 Nov 2021 11:36:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377065AbhKZKgm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Nov 2021 05:36:42 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:43253 "EHLO
+        id S1376895AbhKZKj7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Nov 2021 05:39:59 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:43277 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1377123AbhKZKel (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 26 Nov 2021 05:34:41 -0500
+        by vger.kernel.org with ESMTP id S1376898AbhKZKh7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 26 Nov 2021 05:37:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637922688;
+        s=mimecast20190719; t=1637922886;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=lfDWgoSwBK/MbRVa0hEi5B9pRdTSSilaYnNnpfFZZdo=;
-        b=RFJ+KsXjXt0SclGaHzoDCIa0VfFA7vk7B3ranDCJNHNfbL0+Ee8r7BJrOWYtMTiM+76DSP
-        mNnFn3qvhR2Cq3JlBw4r8XKtxHq3rZQddcK3KPsZpPL1iNH23dOm9w2kXrz6xVva9dPNkV
-        UKOb2qyfy+iCwvNfFT/dUuZpX2cabzs=
+        bh=FvamVlY8+eH2d6eZ0kPB9KuGqvbC7YHJ0BAgKSSORyo=;
+        b=GefqusZP3kpHjBPdX0A4ROr/Nk1t2N8j49Yia2xOh8KKy1MSaJk+o/whNEdNF9MwTMnH8A
+        7bl+UnzHQ/l2vor751smD+CuSxQEpFEZesEBk8i4EdCdyvu9hyIe6nMs7Bb2zMu/YiuOCw
+        ZMz9u+xi06F3TUFNfu+3XVI14lzg/FQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-211-atf-egpfOHGIpfERul5uyg-1; Fri, 26 Nov 2021 05:31:25 -0500
-X-MC-Unique: atf-egpfOHGIpfERul5uyg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+ us-mta-255-jo1_Ghq0MKmABYCWdo-0gA-1; Fri, 26 Nov 2021 05:34:43 -0500
+X-MC-Unique: jo1_Ghq0MKmABYCWdo-0gA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D68BC2F22;
-        Fri, 26 Nov 2021 10:31:23 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1821F100CCC2;
+        Fri, 26 Nov 2021 10:34:42 +0000 (UTC)
 Received: from [10.39.195.16] (unknown [10.39.195.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0DCD25D740;
-        Fri, 26 Nov 2021 10:31:18 +0000 (UTC)
-Message-ID: <48dc971d-e5ee-0024-e539-89a050e7cf5e@redhat.com>
-Date:   Fri, 26 Nov 2021 11:31:17 +0100
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BB90A19C46;
+        Fri, 26 Nov 2021 10:34:29 +0000 (UTC)
+Message-ID: <14e0bf75-27f4-83ec-d52f-82d7d4dab5a7@redhat.com>
+Date:   Fri, 26 Nov 2021 11:34:28 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.2.0
-Subject: Re: [PATCH] KVM: selftests: use ARRAY_SIZE
+Subject: Re: [PATCH 2/3] KVM: Use atomic_long_cmpxchg() instead of an
+ open-coded variant
 Content-Language: en-US
-To:     Greg KH <greg@kroah.com>, cgel.zte@gmail.com
-Cc:     shuah@kernel.org, deng.changcheng@zte.com.cn, mlevitsk@redhat.com,
-        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Zeal Robot <zealci@zte.com.cn>
-References: <20211124092256.37966-1-deng.changcheng@zte.com.cn>
- <YZ4J23oFTTDpjSa8@kroah.com>
+To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Igor Mammedov <imammedo@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <cover.1637884349.git.maciej.szmigiero@oracle.com>
+ <7bdc7ee3dcc09a109cfaf9fb8662fb49ca0bec2c.1637884349.git.maciej.szmigiero@oracle.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YZ4J23oFTTDpjSa8@kroah.com>
+In-Reply-To: <7bdc7ee3dcc09a109cfaf9fb8662fb49ca0bec2c.1637884349.git.maciej.szmigiero@oracle.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/24/21 10:46, Greg KH wrote:
->> From: Changcheng Deng<deng.changcheng@zte.com.cn>
->>
->> Use ARRAY_SIZE instead of dividing sizeof array with sizeof an element.
->>
->> Reported-by: Zeal Robot<zealci@zte.com.cn>
->> Signed-off-by: Changcheng Deng<deng.changcheng@zte.com.cn>
-> Your email address does not match these here, you need to provide a
-> signed-off-by as well.
-> 
-> And are you_SURE_  that you can use kernel #defines in userspace testing
-> code?
+On 11/26/21 01:31, Maciej S. Szmigiero wrote:
+> -		if ((long)old == atomic_long_read(&slots->last_used_slot))
+> -			atomic_long_set(&slots->last_used_slot, (long)new);
+> +		/*
+> +		 * The atomicity isn't strictly required here since we are
+> +		 * operating on an inactive memslots set anyway.
+> +		 */
+> +		atomic_long_cmpxchg(&slots->last_used_slot,
+> +				    (unsigned long)old, (unsigned long)new);
 
-Dpeends on which, but ARRAY_SIZE is among those that can be used:
+I think using read/set is more readable than a comment saying that 
+atomicity is not required.
 
-$ git grep '#define ARRAY_SIZE' 'tools/*.h'
-tools/gpio/gpio-utils.h:#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
-tools/iio/iio_utils.h:#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof(arr[0]))
-tools/include/linux/kernel.h:#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]) + __must_be_array(arr))
-tools/testing/selftests/bpf/progs/profiler.inc.h:#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof(arr[0]))
-tools/testing/selftests/cgroup/cgroup_util.h:#define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
-tools/testing/selftests/kselftest_harness.h:#define ARRAY_SIZE(a)	(sizeof(a) / sizeof(a[0]))
-tools/testing/selftests/landlock/common.h:#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
-tools/testing/selftests/vm/pkey-helpers.h:#define ARRAY_SIZE(x) (sizeof(x) / sizeof(*(x)))
-tools/virtio/linux/kernel.h:#define ARRAY_SIZE(x) (sizeof(x)/sizeof(x[0]))
-
-In particular, most KVM tests already include linux/kernel.h
-indirectly via linux/list.h.
+It's a fairly common pattern, and while I agree that it's a PITA to 
+write atomic_long_read and atomic_long_set, the person that reads the 
+code is also helped by read/set, because they know they have to think 
+about ownership invariants rather than concurrency invariants.
 
 Paolo
 
