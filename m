@@ -2,82 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 017DC45ED30
-	for <lists+kvm@lfdr.de>; Fri, 26 Nov 2021 12:57:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 79BB045ED52
+	for <lists+kvm@lfdr.de>; Fri, 26 Nov 2021 13:03:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377198AbhKZMAy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Nov 2021 07:00:54 -0500
-Received: from mail.kernel.org ([198.145.29.99]:58610 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1346217AbhKZL6x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Nov 2021 06:58:53 -0500
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id AAE6E61107;
-        Fri, 26 Nov 2021 11:55:40 +0000 (UTC)
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1mqZpK-00818T-FY; Fri, 26 Nov 2021 11:55:38 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        kernel-team@android.com
-Subject: [PATCH] KVM: arm64: Add minimal handling for the ARMv8.7 PMU
-Date:   Fri, 26 Nov 2021 11:55:33 +0000
-Message-Id: <20211126115533.217903-1-maz@kernel.org>
-X-Mailer: git-send-email 2.30.2
+        id S1377271AbhKZMGd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Nov 2021 07:06:33 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:42724 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229924AbhKZMEc (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 26 Nov 2021 07:04:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1637928079;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=htVA9Ky3eiWU2ZLKAstUa1VUWll1GNmlBwV0oBfJQmA=;
+        b=T3hzlUTdnojPEMIp9O2wIB6V8q+jlXLoW7qO2n9Gy0w249yOaHiEv0KIOAY/3VuJ90GV2T
+        q7PpgG01MdRRbcO+rUB1OI1Kts7I+BLKvxE83lWkoU4VmbxyY46NIwW2e3lG5PqPOKJU+d
+        Qc2EFmL8QZZ/VP2DRRpss4kKrge+1fA=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-112-ObSBvuHzNI6B_3J0sIZ2SQ-1; Fri, 26 Nov 2021 07:01:18 -0500
+X-MC-Unique: ObSBvuHzNI6B_3J0sIZ2SQ-1
+Received: by mail-pj1-f71.google.com with SMTP id g14-20020a17090a578e00b001a79264411cso3202231pji.3
+        for <kvm@vger.kernel.org>; Fri, 26 Nov 2021 04:01:17 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=htVA9Ky3eiWU2ZLKAstUa1VUWll1GNmlBwV0oBfJQmA=;
+        b=FPxMheBIpKhCfW+Ebbe44GT5xodRIItfbB49YHQSHlxzZwnEpHA/hOctcas+3ovit2
+         ieJgyog5pxg3tNd79L8UszSLdZTTNuWtzvr0U1rTIEBb1SY8kg/iPLKi4j5TepVmVmSj
+         o8jOp1kUMObi76e9fiQvsEdJCc0dcw0pl72rR0og80dCCnO6diYUWe2jtZ+QJ7uEVUPg
+         pcAGDtfV2/PUfKh999Ns/O0umm7arZz+ssRb4/ekxunNu0Qf7nLMLyHKEW1UT0+OWP1D
+         v4ypjHf0RIFsL3ZmH3BfXAXPNDSXqXUVTAWKbYzZgtbJpAEyg4gIElgv3P5ZXIntVkJ5
+         rTmg==
+X-Gm-Message-State: AOAM5308nnZjmtvXLu7HbVkdf4vZZgj8+//oQ1f6Bb0TFjWtkeqx3/4Z
+        6zeUZXuD/2geG873R879zPiGK9kn4yPU/rUSuWGgVCGWO+aEx5tgwv1WK+BpcCKw37S6j54obtb
+        wgHAiMp/ksBoS
+X-Received: by 2002:a17:903:41ca:b0:142:1dff:1cb7 with SMTP id u10-20020a17090341ca00b001421dff1cb7mr37703652ple.37.1637928076101;
+        Fri, 26 Nov 2021 04:01:16 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxIql08PEapGRemLjFWrtEU7v/b+qUA0AyLdnzK/fvNxilo9JnHiuEaIVrDTmt75sycwefQhA==
+X-Received: by 2002:a17:903:41ca:b0:142:1dff:1cb7 with SMTP id u10-20020a17090341ca00b001421dff1cb7mr37703617ple.37.1637928075834;
+        Fri, 26 Nov 2021 04:01:15 -0800 (PST)
+Received: from xz-m1.local ([94.177.118.150])
+        by smtp.gmail.com with ESMTPSA id g22sm7295763pfj.29.2021.11.26.04.01.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Nov 2021 04:01:14 -0800 (PST)
+Date:   Fri, 26 Nov 2021 20:01:07 +0800
+From:   Peter Xu <peterx@redhat.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Ben Gardon <bgardon@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>,
+        Junaid Shahid <junaids@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Harish Barathvajasankar <hbarath@google.com>,
+        Peter Shier <pshier@google.com>
+Subject: Re: [RFC PATCH 12/15] KVM: x86/mmu: Split large pages when dirty
+ logging is enabled
+Message-ID: <YaDMg3/xUSwL5+Ei@xz-m1.local>
+References: <20211119235759.1304274-1-dmatlack@google.com>
+ <20211119235759.1304274-13-dmatlack@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20211119235759.1304274-13-dmatlack@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When running a KVM guest hosted on an ARMv8.7 machine, the host
-kernel complains that it doesn't know about the architected number
-of events.
+Hi, David,
 
-Fix it by adding the PMUver code corresponding to PMUv3 for ARMv8.7.
+On Fri, Nov 19, 2021 at 11:57:56PM +0000, David Matlack wrote:
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 2a7564703ea6..432a4df817ec 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1232,6 +1232,9 @@ struct kvm_arch {
+>  	hpa_t	hv_root_tdp;
+>  	spinlock_t hv_root_tdp_lock;
+>  #endif
+> +
+> +	/* MMU caches used when splitting large pages during VM-ioctls. */
+> +	struct kvm_mmu_memory_caches split_caches;
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/sysreg.h | 1 +
- arch/arm64/kvm/pmu-emul.c       | 1 +
- 2 files changed, 2 insertions(+)
+Are mmu_gfn_array_cache and mmu_pte_list_desc_cache wasted here?  I saw that
+"struct kvm_mmu_memory_cache" still takes up quite a few hundreds of bytes,
+just want to make sure we won't waste them in vain.
 
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index cdb590840b3f..5de90138d0a4 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -1036,6 +1036,7 @@
- #define ID_AA64DFR0_PMUVER_8_1		0x4
- #define ID_AA64DFR0_PMUVER_8_4		0x5
- #define ID_AA64DFR0_PMUVER_8_5		0x6
-+#define ID_AA64DFR0_PMUVER_8_7		0x7
- #define ID_AA64DFR0_PMUVER_IMP_DEF	0xf
- 
- #define ID_AA64DFR0_PMSVER_8_2		0x1
-diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-index a5e4bbf5e68f..ca92cc5c71c6 100644
---- a/arch/arm64/kvm/pmu-emul.c
-+++ b/arch/arm64/kvm/pmu-emul.c
-@@ -28,6 +28,7 @@ static u32 kvm_pmu_event_mask(struct kvm *kvm)
- 	case ID_AA64DFR0_PMUVER_8_1:
- 	case ID_AA64DFR0_PMUVER_8_4:
- 	case ID_AA64DFR0_PMUVER_8_5:
-+	case ID_AA64DFR0_PMUVER_8_7:
- 		return GENMASK(15, 0);
- 	default:		/* Shouldn't be here, just for sanity */
- 		WARN_ONCE(1, "Unknown PMU version %d\n", kvm->arch.pmuver);
+[...]
+
+> +int mmu_topup_split_caches(struct kvm *kvm)
+> +{
+> +	struct kvm_mmu_memory_caches *split_caches = &kvm->arch.split_caches;
+> +	int r;
+> +
+> +	assert_split_caches_invariants(kvm);
+> +
+> +	r = kvm_mmu_topup_memory_cache(&split_caches->page_header_cache, 1);
+> +	if (r)
+> +		goto out;
+> +
+> +	r = kvm_mmu_topup_memory_cache(&split_caches->shadow_page_cache, 1);
+> +	if (r)
+> +		goto out;
+
+Is it intended to only top-up with one cache object?  IIUC this means we'll try
+to proactively yield the cpu for each of the huge page split right after the
+object is consumed.
+
+Wondering whether it be more efficient to make it a slightly larger number, so
+we don't overload the memory but also make the loop a bit more efficient.
+
+> +
+> +	return 0;
+> +
+> +out:
+> +	pr_warn("Failed to top-up split caches. Will not split large pages.\n");
+> +	return r;
+> +}
+
+Thanks,
+
 -- 
-2.30.2
+Peter Xu
 
