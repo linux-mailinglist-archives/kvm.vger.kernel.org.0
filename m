@@ -2,84 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1CFD445F0B4
-	for <lists+kvm@lfdr.de>; Fri, 26 Nov 2021 16:31:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0171245F0F7
+	for <lists+kvm@lfdr.de>; Fri, 26 Nov 2021 16:44:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354515AbhKZPeU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Nov 2021 10:34:20 -0500
-Received: from vps-vb.mhejs.net ([37.28.154.113]:33326 "EHLO vps-vb.mhejs.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1346110AbhKZPcU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Nov 2021 10:32:20 -0500
-Received: from MUA
-        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        id S1378134AbhKZPrj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Nov 2021 10:47:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51950 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1378079AbhKZPpj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 26 Nov 2021 10:45:39 -0500
+X-Greylist: delayed 467 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 26 Nov 2021 07:36:37 PST
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF252C06173E
+        for <kvm@vger.kernel.org>; Fri, 26 Nov 2021 07:36:37 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id EB324B8280F
+        for <kvm@vger.kernel.org>; Fri, 26 Nov 2021 15:28:47 +0000 (UTC)
+Received: from disco-boy.misterjones.org (disco-boy.misterjones.org [51.254.78.96])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by smtp.kernel.org (Postfix) with ESMTPS id B9A10C9305D;
+        Fri, 26 Nov 2021 15:28:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 smtp.kernel.org B9A10C9305D
+Authentication-Results: smtp.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.kernel.org; spf=fail smtp.mailfrom=kernel.org
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
-        (envelope-from <mail@maciej.szmigiero.name>)
-        id 1mqd9R-0000FR-T0; Fri, 26 Nov 2021 16:28:37 +0100
-From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Shuah Khan <shuah@kernel.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Yanan Wang <wangyanan55@huawei.com>,
-        Andrew Jones <drjones@redhat.com>, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: selftests: page_table_test: fix calculation of guest_test_phys_mem
-Date:   Fri, 26 Nov 2021 16:28:31 +0100
-Message-Id: <52e487458c3172923549bbcf9dfccfbe6faea60b.1637940473.git.maciej.szmigiero@oracle.com>
-X-Mailer: git-send-email 2.33.0
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        (envelope-from <maz@kernel.org>)
+        id 1mqd9X-0083Jm-KF; Fri, 26 Nov 2021 15:28:43 +0000
+Date:   Fri, 26 Nov 2021 15:28:43 +0000
+Message-ID: <8735njc4wk.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Cc:     catalin.marinas@arm.com, will@kernel.org, andre.przywara@arm.com,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, darren@os.amperecomputing.com,
+        D Scott Phillips <scott@os.amperecomputing.com>
+Subject: Re: [PATCH 2/2] KVM: arm64: nv: fixup! Support multiple nested Stage-2 mmu structures
+In-Reply-To: <a32b4390-a735-783f-9351-a71334d67572@os.amperecomputing.com>
+References: <20211122095803.28943-1-gankulkarni@os.amperecomputing.com>
+        <20211122095803.28943-3-gankulkarni@os.amperecomputing.com>
+        <877dcwco1m.wl-maz@kernel.org>
+        <a32b4390-a735-783f-9351-a71334d67572@os.amperecomputing.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, catalin.marinas@arm.com, will@kernel.org, andre.przywara@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, darren@os.amperecomputing.com, scott@os.amperecomputing.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+On Fri, 26 Nov 2021 05:59:00 +0000,
+Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> 
+> Hi Marc,
+> 
+> On 25-11-2021 07:53 pm, Marc Zyngier wrote:
+> > On Mon, 22 Nov 2021 09:58:03 +0000,
+> > Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> >> 
+> >> Commit 1776c91346b6 ("KVM: arm64: nv: Support multiple nested Stage-2 mmu
+> >> structures")[1] added a function kvm_vcpu_init_nested which expands the
+> >> stage-2 mmu structures array when ever a new vCPU is created. The array
+> >> is expanded using krealloc() and results in a stale mmu address pointer
+> >> in pgt->mmu. Adding a fix to update the pointer with the new address after
+> >> successful krealloc.
+> >> 
+> >> [1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/
+> >> branch kvm-arm64/nv-5.13
+> >> 
+> >> Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+> >> ---
+> >>   arch/arm64/kvm/nested.c | 9 +++++++++
+> >>   1 file changed, 9 insertions(+)
+> >> 
+> >> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> >> index 4ffbc14d0245..57ad8d8f4ee5 100644
+> >> --- a/arch/arm64/kvm/nested.c
+> >> +++ b/arch/arm64/kvm/nested.c
+> >> @@ -68,6 +68,8 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+> >>   		       num_mmus * sizeof(*kvm->arch.nested_mmus),
+> >>   		       GFP_KERNEL | __GFP_ZERO);
+> >>   	if (tmp) {
+> >> +		int i;
+> >> +
+> >>   		if (kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 1]) ||
+> >>   		    kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 2])) {
+> >>   			kvm_free_stage2_pgd(&tmp[num_mmus - 1]);
+> >> @@ -80,6 +82,13 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+> >>   		}
+> >>     		kvm->arch.nested_mmus = tmp;
+> >> +
+> >> +		/* Fixup pgt->mmu after krealloc */
+> >> +		for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
+> >> +			struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
+> >> +
+> >> +			mmu->pgt->mmu = mmu;
+> >> +		}
+> >>   	}
+> >>     	mutex_unlock(&kvm->lock);
+> > 
+> > Another good catch. I've tweaked a bit to avoid some unnecessary
+> > repainting, see below.
+> > 
+> > Thanks again,
+> > 
+> > 	M.
+> > 
+> > diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
+> > index a4dfffa1dae0..92b225db59ac 100644
+> > --- a/arch/arm64/kvm/nested.c
+> > +++ b/arch/arm64/kvm/nested.c
+> > @@ -66,8 +66,19 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
+> >   	num_mmus = atomic_read(&kvm->online_vcpus) * 2;
+> >   	tmp = krealloc(kvm->arch.nested_mmus,
+> >   		       num_mmus * sizeof(*kvm->arch.nested_mmus),
+> > -		       GFP_KERNEL | __GFP_ZERO);
+> > +		       GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+> >   	if (tmp) {
+> > +		/*
+> > +		 * If we went through a realocation, adjust the MMU
+> 
+> Is it more precise to say?
+> > +		 * back-pointers in the pg_table structures.
+> * back-pointers in the pg_table structures of previous inits.
 
-A kvm_page_table_test run with its default settings fails on VMX due to
-memory region add failure:
-> ==== Test Assertion Failure ====
->  lib/kvm_util.c:952: ret == 0
->  pid=10538 tid=10538 errno=17 - File exists
->     1  0x00000000004057d1: vm_userspace_mem_region_add at kvm_util.c:947
->     2  0x0000000000401ee9: pre_init_before_test at kvm_page_table_test.c:302
->     3   (inlined by) run_test at kvm_page_table_test.c:374
->     4  0x0000000000409754: for_each_guest_mode at guest_modes.c:53
->     5  0x0000000000401860: main at kvm_page_table_test.c:500
->     6  0x00007f82ae2d8554: ?? ??:0
->     7  0x0000000000401894: _start at ??:?
->  KVM_SET_USER_MEMORY_REGION IOCTL failed,
->  rc: -1 errno: 17
->  slot: 1 flags: 0x0
->  guest_phys_addr: 0xc0000000 size: 0x40000000
+Yes. I have added something along those lines.
 
-This is because the memory range that this test is trying to add
-(0x0c0000000 - 0x100000000) conflicts with LAPIC mapping at 0x0fee00000.
+> > +		 */
+> > +		if (kvm->arch.nested_mmus != tmp) {
+> > +			int i;
+> > +
+> > +			for (i = 0; i < num_mms - 2; i++)
+> > +				tmp[i].pgt->mmu = &tmp[i];
+> > +		}
+> 
+> Thanks for this optimization, it saves 2 redundant iterations.
+> > +
+> >   		if (kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 1]) ||
+> >   		    kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 2])) {
+> >   			kvm_free_stage2_pgd(&tmp[num_mmus - 1]);
+> > 
+> 
+> Feel free to add,
+> Reviewed-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
 
-Looking at the code it seems that guest_test_*phys*_mem variable gets
-mistakenly overwritten with guest_test_*virt*_mem while trying to adjust
-the former for alignment.
-With the correct variable adjusted this test runs successfully.
+Given that this was a fixup, I haven't taken this tag. I will Cc you
+on the whole series, and you can give you tag on the whole patch if
+you are happy with it.
 
-Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
----
- tools/testing/selftests/kvm/kvm_page_table_test.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+BTW, I have now fixed the bug that was preventing L2 userspace from
+running (bad interaction with the pgtable code which was unhappy about
+my use of the SW bits when relaxing the permissions). You should now
+be able to test the whole series.
 
-diff --git a/tools/testing/selftests/kvm/kvm_page_table_test.c b/tools/testing/selftests/kvm/kvm_page_table_test.c
-index 3836322add00..ba1fdc3dcf4a 100644
---- a/tools/testing/selftests/kvm/kvm_page_table_test.c
-+++ b/tools/testing/selftests/kvm/kvm_page_table_test.c
-@@ -280,7 +280,7 @@ static struct kvm_vm *pre_init_before_test(enum vm_guest_mode mode, void *arg)
- #ifdef __s390x__
- 	alignment = max(0x100000, alignment);
- #endif
--	guest_test_phys_mem = align_down(guest_test_virt_mem, alignment);
-+	guest_test_phys_mem = align_down(guest_test_phys_mem, alignment);
- 
- 	/* Set up the shared data structure test_args */
- 	test_args.vm = vm;
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
