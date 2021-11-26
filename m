@@ -2,92 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F46445EDCC
-	for <lists+kvm@lfdr.de>; Fri, 26 Nov 2021 13:21:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AF84E45EDCE
+	for <lists+kvm@lfdr.de>; Fri, 26 Nov 2021 13:22:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377188AbhKZMYR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Nov 2021 07:24:17 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:33477 "EHLO
+        id S1352759AbhKZMZu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Nov 2021 07:25:50 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:32647 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S244365AbhKZMWQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 26 Nov 2021 07:22:16 -0500
+        by vger.kernel.org with ESMTP id S235290AbhKZMXt (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 26 Nov 2021 07:23:49 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637929143;
+        s=mimecast20190719; t=1637929236;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=5WkxyGGreyu/PhUR7qQXkxF/UT6auliTNGcHoU1VQhg=;
-        b=DzsOxG/xT+QU9Z+ao8+HS32BUArz4FUIvBkUAewEIzAqs1e2aWn6QBFotRSJlB6foOoFv1
-        bVfN5tNRJ1sDR1tXjsPekTbDk1sdNUkZ9CBVim4gvq6QqNy3O+9mJBXoYnstCrqoYn195Y
-        0YFfhUReYWp4eUA3Jy5+raW9K6WmF80=
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
- [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=G6NT3DrZmCCNBPqWpyXXbQjjwiq+lUHxRUgVi/aTnUw=;
+        b=H8J0PxvT2GoTc0Bb1J//3lJp/tH+GhuiYpUT7QDTNxHww6jwRwyjMs9uccFwqEZ6ljMfi2
+        GKxYJMeCVEe/p3o74+imascDrsdegwudGvHlo8MM0HSSI5PmaFHNSQOqDQ7GMDqgVg4yr7
+        rpmS1FwLnoxfy7fd84N+fimxiiDu9JQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-184-ldgeDwhmMwuPNxl5bYzbCQ-1; Fri, 26 Nov 2021 07:19:02 -0500
-X-MC-Unique: ldgeDwhmMwuPNxl5bYzbCQ-1
-Received: by mail-pl1-f198.google.com with SMTP id l14-20020a170903120e00b00143cc292bc3so3894729plh.1
-        for <kvm@vger.kernel.org>; Fri, 26 Nov 2021 04:19:02 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=5WkxyGGreyu/PhUR7qQXkxF/UT6auliTNGcHoU1VQhg=;
-        b=2pi09ZbY/Hd4chBwGi9UhBPAWqO/Vu2nsZ0QBOqGifk1hUV3ppPxMSDtkF0cstM5FA
-         XvKPwRS/xGNke5mXyR/yQpTxkiCqdAuH2VUPapGsSpwwSjvLo5OK4YrNkRFRlTAsNK+D
-         xpZ9T2LDeYrnq7ersFazKlJCcWR4G3JUZNeWE1H10Lt5CmyirB0wF0OgnAC1DiekQsoT
-         RVm/Q0WZBzDDBwqQQQnhtNE0OKFnhMVZsXS14s8wk6NYUijEAoBJHmh0VygAhhEA9U+u
-         LbSq2EAitSKtivj0GxnNnghDe8H4Y/McCPld0YMQkmSsK0tRoMr4gxwZOMWsSYODhJlR
-         yz6Q==
-X-Gm-Message-State: AOAM5333dZhHXpZo69WHxanQOz8erXKsRnFVgncgu/PF8R3fJDJ7K16w
-        7st/csS6hB+/dAqXYXOjJ4oSGY37pDTLZNPUIYXtXZsjAOihsvQZMIkMW+OR6mZPQKkbVEjp0e6
-        31NtTKT2YnFdI
-X-Received: by 2002:a17:902:c105:b0:142:2441:aa24 with SMTP id 5-20020a170902c10500b001422441aa24mr37849620pli.44.1637929141341;
-        Fri, 26 Nov 2021 04:19:01 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJygyg8mjLb5Jne8Ms2ec5RvJHc+ZWiG+P2/JE2sGi2DVTgK0PGvwjB7mtbk7RxbyMZeZgJVLw==
-X-Received: by 2002:a17:902:c105:b0:142:2441:aa24 with SMTP id 5-20020a170902c10500b001422441aa24mr37849588pli.44.1637929141099;
-        Fri, 26 Nov 2021 04:19:01 -0800 (PST)
-Received: from xz-m1.local ([94.177.118.150])
-        by smtp.gmail.com with ESMTPSA id t4sm7324062pfq.163.2021.11.26.04.18.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 26 Nov 2021 04:19:00 -0800 (PST)
-Date:   Fri, 26 Nov 2021 20:18:53 +0800
-From:   Peter Xu <peterx@redhat.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Ben Gardon <bgardon@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>,
-        Junaid Shahid <junaids@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Harish Barathvajasankar <hbarath@google.com>,
-        Peter Shier <pshier@google.com>
-Subject: Re: [RFC PATCH 02/15] KVM: x86/mmu: Rename __rmap_write_protect to
- rmap_write_protect
-Message-ID: <YaDQrX/tt7ZD5Rm8@xz-m1.local>
-References: <20211119235759.1304274-1-dmatlack@google.com>
- <20211119235759.1304274-3-dmatlack@google.com>
+ us-mta-358-2BDCmzvePa-8jGaiSRT3vg-1; Fri, 26 Nov 2021 07:20:33 -0500
+X-MC-Unique: 2BDCmzvePa-8jGaiSRT3vg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 953D9839A42;
+        Fri, 26 Nov 2021 12:20:32 +0000 (UTC)
+Received: from [10.39.195.16] (unknown [10.39.195.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DD7EA608BA;
+        Fri, 26 Nov 2021 12:20:29 +0000 (UTC)
+Message-ID: <16368a89-99ea-e52c-47b6-bd006933ec1f@redhat.com>
+Date:   Fri, 26 Nov 2021 13:20:28 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20211119235759.1304274-3-dmatlack@google.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH 2/2] KVM: x86: Forbid KVM_SET_CPUID{,2} after KVM_RUN
+Content-Language: en-US
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
+References: <20211122175818.608220-1-vkuznets@redhat.com>
+ <20211122175818.608220-3-vkuznets@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20211122175818.608220-3-vkuznets@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 19, 2021 at 11:57:46PM +0000, David Matlack wrote:
-> Now that rmap_write_protect has been renamed, there is no need for the
-> double underscores in front of __rmap_write_protect.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: David Matlack <dmatlack@google.com>
+On 11/22/21 18:58, Vitaly Kuznetsov wrote:
+> -	 * KVM does not correctly handle changing guest CPUID after KVM_RUN, as
+> -	 * MAXPHYADDR, GBPAGES support, AMD reserved bit behavior, etc.. aren't
+> -	 * tracked in kvm_mmu_page_role.  As a result, KVM may miss guest page
+> -	 * faults due to reusing SPs/SPTEs.  Alert userspace, but otherwise
+> -	 * sweep the problem under the rug.
+> -	 *
+> -	 * KVM's horrific CPUID ABI makes the problem all but impossible to
+> -	 * solve, as correctly handling multiple vCPU models (with respect to
+> -	 * paging and physical address properties) in a single VM would require
+> -	 * tracking all relevant CPUID information in kvm_mmu_page_role.  That
+> -	 * is very undesirable as it would double the memory requirements for
+> -	 * gfn_track (see struct kvm_mmu_page_role comments), and in practice
+> -	 * no sane VMM mucks with the core vCPU model on the fly.
+> +	 * Changing guest CPUID after KVM_RUN is forbidden, see the comment in
+> +	 * kvm_arch_vcpu_ioctl().
+>   	 */
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+The second part of the comment still applies to kvm_mmu_after_set_cpuid 
+more than to kvm_arch_vcpu_ioctl().
 
--- 
-Peter Xu
+>  		r = -EFAULT;
+> [...]
+> +		if (vcpu->arch.last_vmentry_cpu != -1)
+> +			goto out;
+> +
+>  		if (copy_from_user(&cpuid, cpuid_arg, sizeof(cpuid)))
+>  			goto out;
+>  		r = kvm_vcpu_ioctl_set_cpuid(vcpu, &cpuid, cpuid_arg->entries);
+
+This should be an EINVAL.
+
+Tweaked and queued nevertheless, thanks.
+
+Paolo
 
