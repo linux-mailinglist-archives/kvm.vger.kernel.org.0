@@ -2,90 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D836945F25D
-	for <lists+kvm@lfdr.de>; Fri, 26 Nov 2021 17:47:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F76345F260
+	for <lists+kvm@lfdr.de>; Fri, 26 Nov 2021 17:48:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234245AbhKZQud (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Nov 2021 11:50:33 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:51791 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1354878AbhKZQsb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 26 Nov 2021 11:48:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1637945118;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=fWhj8Ei8VNBGMV1RUlYTd0W4q8HWoUTqSuYcyOuxPvQ=;
-        b=ewQfN/GuG/ZAasj5jXzlIuf2BXx2YuTZP6m9rgV1KPNjOxgwroMbwCPQ9Dn5zoHpqFL4o+
-        enTteBw0JiKmrCD0g3yhjQZR+wQhAcuB3z0msO1ndTt9bkjlsKDHSjv/U2RCqv39Z4Stxi
-        mKlqfEQkWilH1+jyak3uMuwMb2ZsNS8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-198-4a39x2c-P3OcLNLz6bI1sA-1; Fri, 26 Nov 2021 11:45:17 -0500
-X-MC-Unique: 4a39x2c-P3OcLNLz6bI1sA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E960A1808321;
-        Fri, 26 Nov 2021 16:45:15 +0000 (UTC)
-Received: from [10.39.195.16] (unknown [10.39.195.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0492F67840;
-        Fri, 26 Nov 2021 16:45:11 +0000 (UTC)
-Message-ID: <1f9722a5-9f8f-415f-88c7-29cee05831d0@redhat.com>
-Date:   Fri, 26 Nov 2021 17:45:10 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH] KVM: x86/mmu: Use yield-safe TDP MMU root iter in MMU
- notifier unmapping
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        id S236777AbhKZQvN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Nov 2021 11:51:13 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46510 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1349352AbhKZQtM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 26 Nov 2021 11:49:12 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1AQGEJ2A030556;
+        Fri, 26 Nov 2021 16:45:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=hkEWBp0FWiO4JBBYiuCIKiraO696DE2ToO66MHvtzJs=;
+ b=of71cOhEltdWGfwyKAJ/HtMf0sOblUxtLM8CrZ+u/atKZHLH8cBoiCplS0yIWgBvV5hK
+ N+6VTdh7ecvaXbxYQ9AvK5P2XS5kbw8SOtBQa31CrZW428kKktxwNzrB0BEojj98PVq6
+ zDEouAs/jv6dUHLYGPD0AVBVQTjGAn8RqvtjffKmU6BAbwIDyVUe1KEx95GtLFCmBlbW
+ F9Q0s4ualAQClFNGa2s7tThM8vED0eovfABtQW1jspdbPU1vsEE9/t909o79JC2MsLd1
+ 43v3pJ/CFMWNktooEP9hF6lfkztGNxEqrkIOvWY1LROkfyrjYV1IXHdqNTVBfrU6ZIdl bA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3ck1972spn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 26 Nov 2021 16:45:58 +0000
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1AQGQV2j026795;
+        Fri, 26 Nov 2021 16:45:58 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3ck1972spa-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 26 Nov 2021 16:45:58 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1AQGb801014234;
+        Fri, 26 Nov 2021 16:45:56 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma03ams.nl.ibm.com with ESMTP id 3cernawanx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 26 Nov 2021 16:45:56 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1AQGjroD29360602
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 26 Nov 2021 16:45:53 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 500A611C04C;
+        Fri, 26 Nov 2021 16:45:53 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EBB2E11C052;
+        Fri, 26 Nov 2021 16:45:52 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 26 Nov 2021 16:45:52 +0000 (GMT)
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>
+Cc:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
         linux-kernel@vger.kernel.org
-References: <20211120015008.3780032-1-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211120015008.3780032-1-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Subject: [PATCH v3 0/3] KVM: s390: Some gaccess cleanup
+Date:   Fri, 26 Nov 2021 17:45:46 +0100
+Message-Id: <20211126164549.7046-1-scgl@linux.ibm.com>
+X-Mailer: git-send-email 2.32.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: rsfFx3E_hJS-oo5GDoNBqFccQPbFwGUv
+X-Proofpoint-ORIG-GUID: 5eaLLeIVPoYi87IBYkk-YEgPMTKTBKIZ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
+ definitions=2021-11-26_04,2021-11-25_02,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 impostorscore=0
+ clxscore=1015 priorityscore=1501 malwarescore=0 mlxscore=0 bulkscore=0
+ suspectscore=0 mlxlogscore=999 adultscore=0 phishscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2111260095
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/20/21 02:50, Sean Christopherson wrote:
-> Use the yield-safe variant of the TDP MMU iterator when handling an
-> unmapping event from the MMU notifier, as most occurences of the event
-> allow yielding.
-> 
-> Fixes: e1eed5847b09 ("KVM: x86/mmu: Allow yielding during MMU notifier unmap/zap, if possible")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   arch/x86/kvm/mmu/tdp_mmu.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 377a96718a2e..a29ebff1cfa0 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -1031,7 +1031,7 @@ bool kvm_tdp_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range,
->   {
->   	struct kvm_mmu_page *root;
->   
-> -	for_each_tdp_mmu_root(kvm, root, range->slot->as_id)
-> +	for_each_tdp_mmu_root_yield_safe(kvm, root, range->slot->as_id, false)
->   		flush |= zap_gfn_range(kvm, root, range->start, range->end,
->   				       range->may_block, flush, false);
->   
-> 
+Cleanup s390 guest access code a bit, getting rid of some code
+duplication and improving readability.
 
-Queued, thanks.
+v2 -> v3
+	minor changes only
+		typo fixes
+		whitespace
+		line reordering
+		picked up Reviewed-by's
 
-Paolo
+v1 -> v2
+	separate patch for renamed variable
+		fragment_len instead of seg
+	expand comment of guest_range_to_gpas
+	fix nits
+
+Janis Schoetterl-Glausch (3):
+  KVM: s390: gaccess: Refactor gpa and length calculation
+  KVM: s390: gaccess: Refactor access address range check
+  KVM: s390: gaccess: Cleanup access to guest pages
+
+ arch/s390/kvm/gaccess.c | 158 +++++++++++++++++++++++-----------------
+ 1 file changed, 92 insertions(+), 66 deletions(-)
+
+Range-diff against v2:
+1:  60d050210198 ! 1:  e5d7d2d7a4da KVM: s390: gaccess: Refactor gpa and length calculation
+    @@ Metadata
+      ## Commit message ##
+         KVM: s390: gaccess: Refactor gpa and length calculation
+     
+    -    Improve readability be renaming the length variable and
+    +    Improve readability by renaming the length variable and
+         not calculating the offset manually.
+     
+         Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+    +    Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+     
+      ## arch/s390/kvm/gaccess.c ##
+     @@ arch/s390/kvm/gaccess.c: int access_guest(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar, void *data,
+    @@ arch/s390/kvm/gaccess.c: int access_guest(struct kvm_vcpu *vcpu, unsigned long g
+      	psw_t *psw = &vcpu->arch.sie_block->gpsw;
+     -	unsigned long _len, nr_pages, gpa, idx;
+     +	unsigned long nr_pages, gpa, idx;
+    -+	unsigned int fragment_len;
+      	unsigned long pages_array[2];
+    ++	unsigned int fragment_len;
+      	unsigned long *pages;
+      	int need_ipte_lock;
+    + 	union asce asce;
+     @@ arch/s390/kvm/gaccess.c: int access_guest(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar, void *data,
+      		ipte_lock(vcpu);
+      	rc = guest_page_range(vcpu, ga, ar, pages, nr_pages, asce, mode);
+2:  7080846c8c07 ! 2:  91cadb42cbbc KVM: s390: gaccess: Refactor access address range check
+    @@ Commit message
+         range.
+     
+         Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+    +    Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+     
+      ## arch/s390/kvm/gaccess.c ##
+     @@ arch/s390/kvm/gaccess.c: static int low_address_protection_enabled(struct kvm_vcpu *vcpu,
+    @@ arch/s390/kvm/gaccess.c: static int low_address_protection_enabled(struct kvm_vc
+     + * a correct exception into the guest.
+     + * The resulting gpas are stored into @gpas, unless it is NULL.
+     + *
+    -+ * Note: All gpas except the first one start at the beginning of a page.
+    ++ * Note: All fragments except the first one start at the beginning of a page.
+     + *       When deriving the boundaries of a fragment from a gpa, all but the last
+     + *       fragment end at the end of the page.
+     + *
+    @@ arch/s390/kvm/gaccess.c: int access_guest(struct kvm_vcpu *vcpu, unsigned long g
+      {
+      	psw_t *psw = &vcpu->arch.sie_block->gpsw;
+     -	unsigned long nr_pages, gpa, idx;
+    +-	unsigned long pages_array[2];
+     +	unsigned long nr_pages, idx;
+    ++	unsigned long gpa_array[2];
+      	unsigned int fragment_len;
+    --	unsigned long pages_array[2];
+     -	unsigned long *pages;
+    -+	unsigned long gpa_array[2];
+     +	unsigned long *gpas;
+      	int need_ipte_lock;
+      	union asce asce;
+3:  c991cbdbfbd5 ! 3:  f5000a22efcd KVM: s390: gaccess: Cleanup access to guest frames
+    @@ Metadata
+     Author: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+     
+      ## Commit message ##
+    -    KVM: s390: gaccess: Cleanup access to guest frames
+    +    KVM: s390: gaccess: Cleanup access to guest pages
+     
+         Introduce a helper function for guest frame access.
+     
+         Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+    +    Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+     
+      ## arch/s390/kvm/gaccess.c ##
+     @@ arch/s390/kvm/gaccess.c: static int guest_range_to_gpas(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar,
+    @@ arch/s390/kvm/gaccess.c: static int guest_range_to_gpas(struct kvm_vcpu *vcpu, u
+      }
+      
+     +static int access_guest_page(struct kvm *kvm, enum gacc_mode mode, gpa_t gpa,
+    -+			      void *data, unsigned int len)
+    ++			     void *data, unsigned int len)
+     +{
+     +	const unsigned int offset = offset_in_page(gpa);
+     +	const gfn_t gfn = gpa_to_gfn(gpa);
+
+base-commit: d25f27432f80a800a3592db128254c8140bd71bf
+-- 
+2.32.0
 
