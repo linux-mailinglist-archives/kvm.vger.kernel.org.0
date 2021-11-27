@@ -2,74 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 742AA45FD39
-	for <lists+kvm@lfdr.de>; Sat, 27 Nov 2021 08:22:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 70A0745FE15
+	for <lists+kvm@lfdr.de>; Sat, 27 Nov 2021 11:27:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349698AbhK0HZm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 27 Nov 2021 02:25:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57500 "EHLO
+        id S234723AbhK0Kaj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 27 Nov 2021 05:30:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40826 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352519AbhK0HXl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 27 Nov 2021 02:23:41 -0500
-Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD3E6C061746
-        for <kvm@vger.kernel.org>; Fri, 26 Nov 2021 23:20:27 -0800 (PST)
-Received: by mail-io1-xd2c.google.com with SMTP id k21so14188736ioh.4
-        for <kvm@vger.kernel.org>; Fri, 26 Nov 2021 23:20:27 -0800 (PST)
+        with ESMTP id S229794AbhK0K2j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 27 Nov 2021 05:28:39 -0500
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF60DC061574;
+        Sat, 27 Nov 2021 02:25:24 -0800 (PST)
+Received: by mail-ed1-x529.google.com with SMTP id y12so49021207eda.12;
+        Sat, 27 Nov 2021 02:25:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=AqEf7higuPYivgES8BLuRJ3L5TTzmclGsKWi9as4OKc=;
-        b=NWzcYvCStriyWpvomLalYmI4R+wE9Tb1oynljlHGhIfl/2Iys4V6LvDU7Yv6F3g2LO
-         mpwXVD/kkNJTrCaYRTvbPgZtb5tL5YQqcCFCpckQue3L+vuYfgTqsO8FAIFoj9nQG1F9
-         ca9lSM2Zw167c/6oNYanp2KPv08JgIgNqpFgsXbfABAo0ympwegElKT17y5ZpNUb9tpI
-         Kp0PnEj+yCx0Hg5nzBS+dHW1N9p4psCgbV0cU5+26s7I9/a4sAwrJoP3v9GhdWn21sYk
-         e2Ba5pO8vZq34NhmUGMntY1fnzi/NHYFCLiO0m2Pbo4TzwokoXG0K7N8LzXH5GkXhMnb
-         4Z+w==
+        h=sender:message-id:date:mime-version:user-agent:content-language:to
+         :cc:references:from:subject:in-reply-to:content-transfer-encoding;
+        bh=IAH8eQywKcQXyygvt8sMxPMX5sEe/5OuFPFc3e44zPM=;
+        b=TDUxD80SMUrquWn2GJa19LWBifFELy9ctNFAuQiopqsV8xnpQsANgdyxZ6gCAsFtSB
+         UosANVUtXBN9h8pMt59yxpmX0633f3CyUl82J+LPgWijhE5zVwi2+aWclLKkG8qU2S3Q
+         tzzKXbibFX2ApmgxJZM9WQBHitgv8iICGA61kHUk1MQ3wu6lzN6JOAdFY7I2vtxNKbZK
+         qnYez4grFv2Kji82aZLUkqs+kCHOYgACxF8a52oicU+olibCzQfX37wynfbBpTiF1MrR
+         Q+54zkOlpFqyxkpqJji+nuUWwfwtbojedKAlkQqx9OdqEimPbS2X0iuszGfawHF09TY+
+         qekA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=AqEf7higuPYivgES8BLuRJ3L5TTzmclGsKWi9as4OKc=;
-        b=T1uiXTr6zWOuBM56e9dEK2ki3T9Itbhy7M1HdHg/b5t9Nk3Hms0vcYyXJ7Q0SWEeIv
-         +iMpxey/IQ66rFe6hqS64morvhvDUvzBhGxXOh4abmSFSEUZEGAgxSZHc1JBcQjvToFm
-         pE6KydK6KUh/cJmYtZvOG7/8IKqVJPdNMimMV9lw2ijfi6v7n9feNckg332OiJXzUG4y
-         /HoJL3bUgrhG9Aw2FVZzVvrxnuYeuLrV6n0hP0U7HucIu93RsSNyJJyTIBx5feHr0I0H
-         Kt79g3JmheC0ZjGBMCv5DOTeIdnGiEMlmK7SQTq+afsZY3Uk/1JYQhxtqCqQCN5zC3Fe
-         xsWQ==
-X-Gm-Message-State: AOAM530SzlxmP6XD0OuTq+18/B84mOaw1EAuL5WUhoQT7gKO3m//nFGc
-        CyEM2/6wOhrpu+cmEqHGddAp9HdEh5mdMK66sNw=
-X-Google-Smtp-Source: ABdhPJzf+ujTT/dAfJleOrj3eDvLC3jiRTNJV7tupLLGDEuZ0eFx29aMw99oSh8Fe1OKoY6p+51bc1wTnPH0R0a71Ik=
-X-Received: by 2002:a5d:9f01:: with SMTP id q1mr43076261iot.144.1637997627145;
- Fri, 26 Nov 2021 23:20:27 -0800 (PST)
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :content-language:to:cc:references:from:subject:in-reply-to
+         :content-transfer-encoding;
+        bh=IAH8eQywKcQXyygvt8sMxPMX5sEe/5OuFPFc3e44zPM=;
+        b=GsMwkOkk0iLmZ/K4GzMtwW4536ke5TaXIhw6RFjKFYR6VYQjX2dhoWHKKyCJ/meEq4
+         7hiQIVBkC2Binxekq7r9oUnSVRxTAZB7or58cxaFmb2xR9mH49/ySW4nYwmi/9frwGuC
+         tuXXKrMaRU9X9DvrG1p8A83LcWjQ11hKYkCyPXlE5CxLTpplrw9cLEe03jXKNsy/Cm3w
+         yZDI+FpmEZaYpfjfNXKYXYRTyWSIlfYO1sBc7w9L4tEXOm1llQFx5i+bQ5MXvhKW29kK
+         j2X/jUkkRrMlLn2m3bGelddxo7qj/mPg3pPcPjmGDU/UdPaIwb553qCtRtjd6iO4zvCR
+         nxeA==
+X-Gm-Message-State: AOAM531kimm9ibzxuGx8clbaX/fQP6a3xd4Hqj/ex2EiXli1JqYNOsyt
+        JAQATDRkJ+SjO9OJu8EHpSY=
+X-Google-Smtp-Source: ABdhPJwp9FZxKpc89c921E5Gk9DJjdAAbI37HUmRmNixcN21oFuT7Rrf1BDb3Z37gKXpWEdCo9wCcw==
+X-Received: by 2002:a17:906:bcce:: with SMTP id lw14mr45139426ejb.411.1638008723383;
+        Sat, 27 Nov 2021 02:25:23 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.googlemail.com with ESMTPSA id u10sm5208993edo.16.2021.11.27.02.25.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 27 Nov 2021 02:25:23 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <b5e2c332-59a8-7fa8-5e59-4cb2e5be3b8d@redhat.com>
+Date:   Sat, 27 Nov 2021 11:25:15 +0100
 MIME-Version: 1.0
-Received: by 2002:a05:6e04:182:0:0:0:0 with HTTP; Fri, 26 Nov 2021 23:20:26
- -0800 (PST)
-Reply-To: johnlillian76@gmail.com
-From:   Lillian John <oparabest16@gmail.com>
-Date:   Sat, 27 Nov 2021 07:20:26 +0000
-Message-ID: <CALve6FMaSWyjyT0E5AiE2zho8VE2Gx8u5k0xhrTyDfZst4ZU3A@mail.gmail.com>
-Subject: Urgent from hospital
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Content-Language: en-US
+To:     Lai Jiangshan <laijs@linux.alibaba.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     stable@vger.kernel.org, Tom Lendacky <thomas.lendacky@amd.com>
+References: <20211126132131.26077-1-pbonzini@redhat.com>
+ <2091ec8e-299a-8b3d-596e-75cf4b68fde1@linux.alibaba.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] KVM: MMU: shadow nested paging does not have PKU
+In-Reply-To: <2091ec8e-299a-8b3d-596e-75cf4b68fde1@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
--- 
-Urgent from hospital
+On 11/27/21 02:21, Lai Jiangshan wrote:
+> 
+> 
+> On 2021/11/26 21:21, Paolo Bonzini wrote:
+>> Initialize the mask for PKU permissions as if CR4.PKE=0, avoiding
+>> incorrect interpretations of the nested hypervisor's page tables.
+> 
+> I think the AMD64 volume2 Architecture Programmer’s Manual does not
+> specify it, but it seems that for a sane NPT walk, PKU should not work
+> in NPT.
 
-I am Mrs  Lillian John a widow suffering from long time illness
-(Cancer) writing from a hospital here in Ivory Coast, there is funds I
-inherited from my late husband Mr Lakic John, the sum of ($7.8
-million) which he kept in a bank before his death, I need a honest
-person that can use these funds for humanitarian work. I want to
-donate this money to be used to assist the poor and needy, the less
-privileges, the widows and the sick in the society, If you are ready
-to carry out this missionary work, kindly get back to me.kindly
-contact me with the email address
+The PK bit is not defined in the nested page fault EXITINFO1, too. 
+Thomas, can you have it fixed in the APM that the host's SMEP, SMAP and 
+PKE bits do not affect nested page table walks?
 
-johnlillian76@gmail.com
+> I once planed to set
+> 
+>      cr0 = X86_CR0_PG | X86_CR0_WP;
+>      cr4 = cr4 & ~(X86_CR4_SMEP | X86_CR4_SMAP | X86_CR4_PKE);
+> 
+> It adds X86_CR0_WP and removes smep smap just because it is always usermode
+> access, and it has no meaning for CR0_WP, smep, smap.  Setting it like this
+> ways can reduce the role combination.
 
-Yours beloved sister,
-Mrs. Lillian John.
+Adding WP is a good idea (the host hCR0.WP bit is ignored under nested 
+paging).  Adding PG is unnecessary though, it must be on.
+
+Removing SMEP and SMAP makes sense, but not really because of the role 
+(if you add WP, then SMEP and SMAP are not part of the role because SMEP 
+& ~WP and SMAP & ~WP are both zero).  Special-casing hCR4.SMEP basically 
+allows us to implement Guest Mode Execute Trap essentially for free and 
+even on older processors, because it's the same thing as SMEP---just 
+governed by a field in the VMCB control area instead of host CR4.
+
+I'll send a v2 that also removes WP, SMEP and SMAP.
+
+>> -    update_pkru_bitmask(context);
+>> +    context->pkru_mask = 0;
+> 
+> It is not worth to optimize it since update_pkru_bitmask() will also just
+> set context->pkru_mask = 0 and then return.
+
+I didn't think of it as an optimization, but I can undo it.
+
+Paolo
