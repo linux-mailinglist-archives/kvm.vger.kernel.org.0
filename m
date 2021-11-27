@@ -2,89 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 33A9045FC4B
-	for <lists+kvm@lfdr.de>; Sat, 27 Nov 2021 04:16:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 742AA45FD39
+	for <lists+kvm@lfdr.de>; Sat, 27 Nov 2021 08:22:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242917AbhK0DUH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Nov 2021 22:20:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60968 "EHLO
+        id S1349698AbhK0HZm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 27 Nov 2021 02:25:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233665AbhK0DSH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 26 Nov 2021 22:18:07 -0500
-Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE62BC0613B8
-        for <kvm@vger.kernel.org>; Fri, 26 Nov 2021 18:07:13 -0800 (PST)
-Received: by mail-io1-xd2a.google.com with SMTP id m9so13704833iop.0
-        for <kvm@vger.kernel.org>; Fri, 26 Nov 2021 18:07:13 -0800 (PST)
+        with ESMTP id S1352519AbhK0HXl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 27 Nov 2021 02:23:41 -0500
+Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD3E6C061746
+        for <kvm@vger.kernel.org>; Fri, 26 Nov 2021 23:20:27 -0800 (PST)
+Received: by mail-io1-xd2c.google.com with SMTP id k21so14188736ioh.4
+        for <kvm@vger.kernel.org>; Fri, 26 Nov 2021 23:20:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=LATOJn5m8fahTHVuH0nIk/gUvXuWjK1IVkO6R3jO5To=;
-        b=CYaDQPAEmKgw7s4qm0zStzT+z/faJwJ2JfvXHuRpOrZBup6b077a8Usm24sqmsMJa6
-         qbK1i1qtC4dbqCFG4F1KV54BrC/FZNSybFKQIZu/sDaTnoBCEP7/h97WXgd+F6B/vNby
-         ZUb/5DqURd89rGUNQoRRGA9xu8olRGBE3+46ArXehk34WtHli/F/Ineib7DHDPdwJnc4
-         73ouMIXROpUpnJjfDxGLWXLG+RDng3khSJrbWteO4I+YD1KGG9c+6nSo6liPo4Ps1BZ/
-         B4kaiDRu+wEAlMmXlUJHohDy9uaFCsT1kdD05jfyH/OXpGkVe+QlvzpZDRfp1U1aw83P
-         r2YA==
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=AqEf7higuPYivgES8BLuRJ3L5TTzmclGsKWi9as4OKc=;
+        b=NWzcYvCStriyWpvomLalYmI4R+wE9Tb1oynljlHGhIfl/2Iys4V6LvDU7Yv6F3g2LO
+         mpwXVD/kkNJTrCaYRTvbPgZtb5tL5YQqcCFCpckQue3L+vuYfgTqsO8FAIFoj9nQG1F9
+         ca9lSM2Zw167c/6oNYanp2KPv08JgIgNqpFgsXbfABAo0ympwegElKT17y5ZpNUb9tpI
+         Kp0PnEj+yCx0Hg5nzBS+dHW1N9p4psCgbV0cU5+26s7I9/a4sAwrJoP3v9GhdWn21sYk
+         e2Ba5pO8vZq34NhmUGMntY1fnzi/NHYFCLiO0m2Pbo4TzwokoXG0K7N8LzXH5GkXhMnb
+         4Z+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=LATOJn5m8fahTHVuH0nIk/gUvXuWjK1IVkO6R3jO5To=;
-        b=bhUhnhFbxio1jYQBQOWY3oFlOG30xkiPscmfhyFs5GvmAkfKAfPEw/wtimWxHGVW4a
-         MIASKrj446wJ15KnLRAblOqI5ByzJW3yzjjBNfHQ7/2+VSy8oiySDYy0cx2GUagAC+Ap
-         VR9O2nssi46y/+/jP8ewPBo0HqXXK0GW+oVE/YN2AH/Ov2sbyXBZAI+R8T2uXkSCLZgL
-         RonqyyuqoNxcc2m9CApdmr/rSljNOiAbTwe8yToZ5XwvKAUSCoRL6fXzfxUreNAmg8Ka
-         Vl11CXvOutAdmHEz+ePeBT3Y1W2NX00DWDh4aInNOuj7wpK19qPwapTD7cWdeH/jvqrC
-         vqRw==
-X-Gm-Message-State: AOAM531NSeySjS7VT51t+itcVcGD8c87mnEZguPu12tkiWwFbiuFRfbH
-        7p6kVz/wKexERBL+u/JEnY+pnak2ewYDyi1Q+RU=
-X-Google-Smtp-Source: ABdhPJyCaN+AmVtbuMUEErrqdk/UtRn9GrtChLQISgDDVUUrnzUu74Rye6ETFCjFmk3Wj4kTvB1JBBLdOkdtZ2GuBTQ=
-X-Received: by 2002:a05:6638:3048:: with SMTP id u8mr31579601jak.148.1637978833219;
- Fri, 26 Nov 2021 18:07:13 -0800 (PST)
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=AqEf7higuPYivgES8BLuRJ3L5TTzmclGsKWi9as4OKc=;
+        b=T1uiXTr6zWOuBM56e9dEK2ki3T9Itbhy7M1HdHg/b5t9Nk3Hms0vcYyXJ7Q0SWEeIv
+         +iMpxey/IQ66rFe6hqS64morvhvDUvzBhGxXOh4abmSFSEUZEGAgxSZHc1JBcQjvToFm
+         pE6KydK6KUh/cJmYtZvOG7/8IKqVJPdNMimMV9lw2ijfi6v7n9feNckg332OiJXzUG4y
+         /HoJL3bUgrhG9Aw2FVZzVvrxnuYeuLrV6n0hP0U7HucIu93RsSNyJJyTIBx5feHr0I0H
+         Kt79g3JmheC0ZjGBMCv5DOTeIdnGiEMlmK7SQTq+afsZY3Uk/1JYQhxtqCqQCN5zC3Fe
+         xsWQ==
+X-Gm-Message-State: AOAM530SzlxmP6XD0OuTq+18/B84mOaw1EAuL5WUhoQT7gKO3m//nFGc
+        CyEM2/6wOhrpu+cmEqHGddAp9HdEh5mdMK66sNw=
+X-Google-Smtp-Source: ABdhPJzf+ujTT/dAfJleOrj3eDvLC3jiRTNJV7tupLLGDEuZ0eFx29aMw99oSh8Fe1OKoY6p+51bc1wTnPH0R0a71Ik=
+X-Received: by 2002:a5d:9f01:: with SMTP id q1mr43076261iot.144.1637997627145;
+ Fri, 26 Nov 2021 23:20:27 -0800 (PST)
 MIME-Version: 1.0
-References: <20211119235759.1304274-1-dmatlack@google.com> <20211119235759.1304274-7-dmatlack@google.com>
- <62bd6567-bde5-7bb3-ec73-abf0e2874706@redhat.com>
-In-Reply-To: <62bd6567-bde5-7bb3-ec73-abf0e2874706@redhat.com>
-From:   Lai Jiangshan <jiangshanlai@gmail.com>
-Date:   Sat, 27 Nov 2021 10:07:02 +0800
-Message-ID: <CAJhGHyD5uu9+77nWMmg7sW_s0uuO_zfPW+8MjWd__ZZzKpL34A@mail.gmail.com>
-Subject: Re: [RFC PATCH 06/15] KVM: x86/mmu: Derive page role from parent
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     David Matlack <dmatlack@google.com>, kvm@vger.kernel.org,
-        Ben Gardon <bgardon@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>,
-        Junaid Shahid <junaids@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Harish Barathvajasankar <hbarath@google.com>,
-        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>
+Received: by 2002:a05:6e04:182:0:0:0:0 with HTTP; Fri, 26 Nov 2021 23:20:26
+ -0800 (PST)
+Reply-To: johnlillian76@gmail.com
+From:   Lillian John <oparabest16@gmail.com>
+Date:   Sat, 27 Nov 2021 07:20:26 +0000
+Message-ID: <CALve6FMaSWyjyT0E5AiE2zho8VE2Gx8u5k0xhrTyDfZst4ZU3A@mail.gmail.com>
+Subject: Urgent from hospital
+To:     undisclosed-recipients:;
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Nov 20, 2021 at 9:02 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+-- 
+Urgent from hospital
 
->
-> I have a similar patch for the old MMU, but it was also replacing
-> shadow_root_level with shadow_root_role.  I'll see if I can adapt it to
-> the TDP MMU, since the shadow_root_role is obviously the same for both.
->
+I am Mrs  Lillian John a widow suffering from long time illness
+(Cancer) writing from a hospital here in Ivory Coast, there is funds I
+inherited from my late husband Mr Lakic John, the sum of ($7.8
+million) which he kept in a bank before his death, I need a honest
+person that can use these funds for humanitarian work. I want to
+donate this money to be used to assist the poor and needy, the less
+privileges, the widows and the sick in the society, If you are ready
+to carry out this missionary work, kindly get back to me.kindly
+contact me with the email address
 
-Hello, Paolo
+johnlillian76@gmail.com
 
-I'm sorry to ask something unrelated to this patchset, but related
-to my pending work.
-
-I will still continue to do something on shadow_root_level.  But I
-would like to wait until your shadow_root_role work is queued.
-And is it a part of work splitting the struct kvm_mmu?
-
-Thanks
-Lai
+Yours beloved sister,
+Mrs. Lillian John.
