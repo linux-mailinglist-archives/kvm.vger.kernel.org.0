@@ -2,115 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 70A0745FE15
-	for <lists+kvm@lfdr.de>; Sat, 27 Nov 2021 11:27:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A7A2345FE18
+	for <lists+kvm@lfdr.de>; Sat, 27 Nov 2021 11:29:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234723AbhK0Kaj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 27 Nov 2021 05:30:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40826 "EHLO
+        id S1350919AbhK0KcR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 27 Nov 2021 05:32:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41170 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229794AbhK0K2j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 27 Nov 2021 05:28:39 -0500
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF60DC061574;
-        Sat, 27 Nov 2021 02:25:24 -0800 (PST)
-Received: by mail-ed1-x529.google.com with SMTP id y12so49021207eda.12;
-        Sat, 27 Nov 2021 02:25:24 -0800 (PST)
+        with ESMTP id S231149AbhK0KaQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 27 Nov 2021 05:30:16 -0500
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97EAAC06173E
+        for <kvm@vger.kernel.org>; Sat, 27 Nov 2021 02:27:02 -0800 (PST)
+Received: by mail-ed1-x533.google.com with SMTP id v1so49126596edx.2
+        for <kvm@vger.kernel.org>; Sat, 27 Nov 2021 02:27:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:content-language:to
-         :cc:references:from:subject:in-reply-to:content-transfer-encoding;
-        bh=IAH8eQywKcQXyygvt8sMxPMX5sEe/5OuFPFc3e44zPM=;
-        b=TDUxD80SMUrquWn2GJa19LWBifFELy9ctNFAuQiopqsV8xnpQsANgdyxZ6gCAsFtSB
-         UosANVUtXBN9h8pMt59yxpmX0633f3CyUl82J+LPgWijhE5zVwi2+aWclLKkG8qU2S3Q
-         tzzKXbibFX2ApmgxJZM9WQBHitgv8iICGA61kHUk1MQ3wu6lzN6JOAdFY7I2vtxNKbZK
-         qnYez4grFv2Kji82aZLUkqs+kCHOYgACxF8a52oicU+olibCzQfX37wynfbBpTiF1MrR
-         Q+54zkOlpFqyxkpqJji+nuUWwfwtbojedKAlkQqx9OdqEimPbS2X0iuszGfawHF09TY+
-         qekA==
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=MPZpJPH66VvgDjLv023Lj2UNPGCsEr/n3q5iz+bRalU=;
+        b=aMxDJ2lPFm7aC0ZsSu6loXxtx8uNuCrhhAE2Qp3DNDuwSmdU+YgkrFjlfdoaKxiFlE
+         /Y5jID2mNvRr07ACNxC6yKoDc6wZ1W8XRuoXGfwkRwCc+r8vAQ9ZOuKawaErZExUC/py
+         ZedlWoVYBe0WG4TaA0fPPu41uPpbds1ajbHVkfZ1EI6meCG9zipriFB3X15bfNsSaPXA
+         TeXUdIaYAfEvsi4Q6BQiwQU1CF0aq7VV7Q8076VYHAydYdxeaZJ+rYVmEihPx+3CbJT4
+         EyvEtZbyND6K1rmaCIWQ3nJ5OgxY9FDx4kK9StCEYgqquKAXFHH0GN83LEhTsHN69G7l
+         fgnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :content-language:to:cc:references:from:subject:in-reply-to
+         :subject:content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=IAH8eQywKcQXyygvt8sMxPMX5sEe/5OuFPFc3e44zPM=;
-        b=GsMwkOkk0iLmZ/K4GzMtwW4536ke5TaXIhw6RFjKFYR6VYQjX2dhoWHKKyCJ/meEq4
-         7hiQIVBkC2Binxekq7r9oUnSVRxTAZB7or58cxaFmb2xR9mH49/ySW4nYwmi/9frwGuC
-         tuXXKrMaRU9X9DvrG1p8A83LcWjQ11hKYkCyPXlE5CxLTpplrw9cLEe03jXKNsy/Cm3w
-         yZDI+FpmEZaYpfjfNXKYXYRTyWSIlfYO1sBc7w9L4tEXOm1llQFx5i+bQ5MXvhKW29kK
-         j2X/jUkkRrMlLn2m3bGelddxo7qj/mPg3pPcPjmGDU/UdPaIwb553qCtRtjd6iO4zvCR
-         nxeA==
-X-Gm-Message-State: AOAM531kimm9ibzxuGx8clbaX/fQP6a3xd4Hqj/ex2EiXli1JqYNOsyt
-        JAQATDRkJ+SjO9OJu8EHpSY=
-X-Google-Smtp-Source: ABdhPJwp9FZxKpc89c921E5Gk9DJjdAAbI37HUmRmNixcN21oFuT7Rrf1BDb3Z37gKXpWEdCo9wCcw==
-X-Received: by 2002:a17:906:bcce:: with SMTP id lw14mr45139426ejb.411.1638008723383;
-        Sat, 27 Nov 2021 02:25:23 -0800 (PST)
+        bh=MPZpJPH66VvgDjLv023Lj2UNPGCsEr/n3q5iz+bRalU=;
+        b=YyTOgLR6GtAf0BFS5UZikHtccicrhJpjaCKjz6D9YBiPCPAGm1zkWqg/9JCKpaWT8R
+         rvglQJxIqy2vxEgeER3y6CoRrxhcdRbimXb5r3xHdlQOORIGim04HsXK3s3KJ8iY47Av
+         JxEHup/7C66aH+0cTXqyz323aQBvJDeC6GPt7yFW1wzKkpLu1ZK9qiFzVWi9oGOTCjsI
+         mZsr5p3EEGgXOk0U4lw+d1fse6UGTb1nG7v5HXHaDe+zSaUsDJ4IciXh7BNWXqzhrtKW
+         RxmosIsOddcZzjUktsSrkUoBQ2XorvQTzi2oKEtmsOx+GaW+iKQPXtG05ISp7U/e08K4
+         Y+/Q==
+X-Gm-Message-State: AOAM5330U5oKg6IWJ9JyWUA3Rp/K3jqhjdPHOIwYljliF4fnMa5xVwVW
+        deidqebHO9vNBWvOTjW9pNo=
+X-Google-Smtp-Source: ABdhPJxKG0HURUYAvOumSqHLk1n7uSBsGKRn/eHePctUqd3P7XGsArrb2hS7XNx3MLOAy0wsqUFg/w==
+X-Received: by 2002:aa7:c353:: with SMTP id j19mr55475557edr.227.1638008821254;
+        Sat, 27 Nov 2021 02:27:01 -0800 (PST)
 Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.googlemail.com with ESMTPSA id u10sm5208993edo.16.2021.11.27.02.25.21
+        by smtp.googlemail.com with ESMTPSA id h10sm5569259edr.95.2021.11.27.02.26.59
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 27 Nov 2021 02:25:23 -0800 (PST)
+        Sat, 27 Nov 2021 02:27:00 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <b5e2c332-59a8-7fa8-5e59-4cb2e5be3b8d@redhat.com>
-Date:   Sat, 27 Nov 2021 11:25:15 +0100
+Message-ID: <669c9fff-e044-d580-8eac-9f83e122d273@redhat.com>
+Date:   Sat, 27 Nov 2021 11:26:58 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.2.0
+Subject: Re: [RFC PATCH 06/15] KVM: x86/mmu: Derive page role from parent
 Content-Language: en-US
-To:     Lai Jiangshan <laijs@linux.alibaba.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     stable@vger.kernel.org, Tom Lendacky <thomas.lendacky@amd.com>
-References: <20211126132131.26077-1-pbonzini@redhat.com>
- <2091ec8e-299a-8b3d-596e-75cf4b68fde1@linux.alibaba.com>
+To:     Lai Jiangshan <jiangshanlai@gmail.com>
+Cc:     David Matlack <dmatlack@google.com>, kvm@vger.kernel.org,
+        Ben Gardon <bgardon@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>,
+        Junaid Shahid <junaids@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Harish Barathvajasankar <hbarath@google.com>,
+        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>
+References: <20211119235759.1304274-1-dmatlack@google.com>
+ <20211119235759.1304274-7-dmatlack@google.com>
+ <62bd6567-bde5-7bb3-ec73-abf0e2874706@redhat.com>
+ <CAJhGHyD5uu9+77nWMmg7sW_s0uuO_zfPW+8MjWd__ZZzKpL34A@mail.gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] KVM: MMU: shadow nested paging does not have PKU
-In-Reply-To: <2091ec8e-299a-8b3d-596e-75cf4b68fde1@linux.alibaba.com>
+In-Reply-To: <CAJhGHyD5uu9+77nWMmg7sW_s0uuO_zfPW+8MjWd__ZZzKpL34A@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/27/21 02:21, Lai Jiangshan wrote:
+On 11/27/21 03:07, Lai Jiangshan wrote:
+> On Sat, Nov 20, 2021 at 9:02 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
 > 
+>>
+>> I have a similar patch for the old MMU, but it was also replacing
+>> shadow_root_level with shadow_root_role.  I'll see if I can adapt it to
+>> the TDP MMU, since the shadow_root_role is obviously the same for both.
+>>
 > 
-> On 2021/11/26 21:21, Paolo Bonzini wrote:
->> Initialize the mask for PKU permissions as if CR4.PKE=0, avoiding
->> incorrect interpretations of the nested hypervisor's page tables.
+> Hello, Paolo
 > 
-> I think the AMD64 volume2 Architecture Programmer’s Manual does not
-> specify it, but it seems that for a sane NPT walk, PKU should not work
-> in NPT.
-
-The PK bit is not defined in the nested page fault EXITINFO1, too. 
-Thomas, can you have it fixed in the APM that the host's SMEP, SMAP and 
-PKE bits do not affect nested page table walks?
-
-> I once planed to set
+> I'm sorry to ask something unrelated to this patchset, but related
+> to my pending work.
 > 
->      cr0 = X86_CR0_PG | X86_CR0_WP;
->      cr4 = cr4 & ~(X86_CR4_SMEP | X86_CR4_SMAP | X86_CR4_PKE);
-> 
-> It adds X86_CR0_WP and removes smep smap just because it is always usermode
-> access, and it has no meaning for CR0_WP, smep, smap.  Setting it like this
-> ways can reduce the role combination.
+> I will still continue to do something on shadow_root_level.  But I
+> would like to wait until your shadow_root_role work is queued.
+> And is it a part of work splitting the struct kvm_mmu?
 
-Adding WP is a good idea (the host hCR0.WP bit is ignored under nested 
-paging).  Adding PG is unnecessary though, it must be on.
-
-Removing SMEP and SMAP makes sense, but not really because of the role 
-(if you add WP, then SMEP and SMAP are not part of the role because SMEP 
-& ~WP and SMAP & ~WP are both zero).  Special-casing hCR4.SMEP basically 
-allows us to implement Guest Mode Execute Trap essentially for free and 
-even on older processors, because it's the same thing as SMEP---just 
-governed by a field in the VMCB control area instead of host CR4.
-
-I'll send a v2 that also removes WP, SMEP and SMAP.
-
->> -    update_pkru_bitmask(context);
->> +    context->pkru_mask = 0;
-> 
-> It is not worth to optimize it since update_pkru_bitmask() will also just
-> set context->pkru_mask = 0 and then return.
-
-I didn't think of it as an optimization, but I can undo it.
+Yes, more or less.  I'm basically splitting the "CPU role" (the basic 
+and extended role from the processor registers) used for emulation, from 
+the "MMU role" (the basic role used for the root shadow page tables). 
+Then shadow_root_level/root_level become respectively mmu_role->level 
+and cpu_role->base.level.
 
 Paolo
+
