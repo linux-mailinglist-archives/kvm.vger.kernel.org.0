@@ -2,69 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 292AA45F711
-	for <lists+kvm@lfdr.de>; Sat, 27 Nov 2021 00:07:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D16845F95F
+	for <lists+kvm@lfdr.de>; Sat, 27 Nov 2021 02:23:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245487AbhKZXKM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 26 Nov 2021 18:10:12 -0500
-Received: from [175.207.13.15] ([175.207.13.15]:48048 "EHLO
-        forestfire.localdomain" rhost-flags-FAIL-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1343511AbhKZXIL (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 26 Nov 2021 18:08:11 -0500
-X-Greylist: delayed 34256 seconds by postgrey-1.27 at vger.kernel.org; Fri, 26 Nov 2021 18:08:11 EST
-Received: from User (localhost [127.0.0.1])
-        by forestfire.localdomain (Postfix) with SMTP id 284FBDC157F;
-        Fri, 26 Nov 2021 18:33:01 +0900 (KST)
-Reply-To: <hihulwarence@gmail.com>
-From:   "Mrs.Barbara Sharon" <hihulwarence@gmail.com>
-Subject: US. Security Exchange & Commission 
-Date:   Fri, 26 Nov 2021 10:33:31 +0100
+        id S1345479AbhK0B0r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 26 Nov 2021 20:26:47 -0500
+Received: from out30-130.freemail.mail.aliyun.com ([115.124.30.130]:50834 "EHLO
+        out30-130.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1346730AbhK0BYp (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 26 Nov 2021 20:24:45 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01424;MF=laijs@linux.alibaba.com;NM=1;PH=DS;RN=4;SR=0;TI=SMTPD_---0UyQ7PKr_1637976089;
+Received: from 192.168.43.193(mailfrom:laijs@linux.alibaba.com fp:SMTPD_---0UyQ7PKr_1637976089)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Sat, 27 Nov 2021 09:21:30 +0800
+Message-ID: <2091ec8e-299a-8b3d-596e-75cf4b68fde1@linux.alibaba.com>
+Date:   Sat, 27 Nov 2021 09:21:29 +0800
 MIME-Version: 1.0
-Content-Type: text/plain;
-        charset="Windows-1251"
-Content-Transfer-Encoding: 7bit
-X-Priority: 3
-X-MSMail-Priority: Normal
-X-Mailer: Microsoft Outlook Express 6.00.2600.0000
-X-MimeOLE: Produced By Microsoft MimeOLE V6.00.2600.0000
-Message-Id: <20211126093303.284FBDC157F@forestfire.localdomain>
-To:     unlisted-recipients:; (no To-header on input)
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.2.1
+Subject: Re: [PATCH] KVM: MMU: shadow nested paging does not have PKU
+Content-Language: en-US
+To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     stable@vger.kernel.org
+References: <20211126132131.26077-1-pbonzini@redhat.com>
+From:   Lai Jiangshan <laijs@linux.alibaba.com>
+In-Reply-To: <20211126132131.26077-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Security Exchange and Commission
-200 Vesey Street, Suite 400.
-New York, NY 10281.
-Tel: +1(716-608-3814
-Emai:SEC.hihulwarence@gmail.com
 
 
-Attn: Sir,
+On 2021/11/26 21:21, Paolo Bonzini wrote:
+> Initialize the mask for PKU permissions as if CR4.PKE=0, avoiding
+> incorrect interpretations of the nested hypervisor's page tables.
 
-We are the US.Security Exchange and Commission pay centre point
-attachedwith  the Deutsche Bank branch in New York City hereby contact
-you today to inform you on  the transfer on transit with this bank
-(Bank of America ) in your favour.
+I think the AMD64 volume2 Architecture Programmer’s Manual does not
+specify it, but it seems that for a sane NPT walk, PKU should not work
+in NPT.
 
-Fund worth TEN MILLION, FIVE HUNDRED  THOUSAND US DOLLARS ONLY (US$10.
-500,000.00) You are requested to confirm the ownership so that we can
-proceed with the transaction to transmit your fund to your choice
-account.
+I once planed to set
+	
+	cr0 = X86_CR0_PG | X86_CR0_WP;
+	cr4 = cr4 & ~(X86_CR4_SMEP | X86_CR4_SMAP | X86_CR4_PKE);
 
-We request you to send any form of Identification which will
-substantiate your claims. We have been Authorised by the Federal
-Government of Nigeria and the United Nations to wire the above funds
-into your account without any further delay or interception kindly get
-back to us as soon as possible to enable the paying bank to process
-the bank Draft on your behalf which was issued by the Federal
-Government of Nigeria.
+It adds X86_CR0_WP and removes smep smap just because it is always usermode
+access, and it has no meaning for CR0_WP, smep, smap.  Setting it like this
+ways can reduce the role combination.
 
-Thank you.
+> 
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>   arch/x86/kvm/mmu/mmu.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 5942e9c6dd6e..a33b5361bc67 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -4855,7 +4855,7 @@ void kvm_init_shadow_npt_mmu(struct kvm_vcpu *vcpu, unsigned long cr0,
+>   	struct kvm_mmu *context = &vcpu->arch.guest_mmu;
+>   	struct kvm_mmu_role_regs regs = {
+>   		.cr0 = cr0,
+> -		.cr4 = cr4,
+> +		.cr4 = cr4 & ~X86_CR4_PKE,
+>   		.efer = efer,
+>   	};
+>   	union kvm_mmu_role new_role;
+> @@ -4919,7 +4919,7 @@ void kvm_init_shadow_ept_mmu(struct kvm_vcpu *vcpu, bool execonly,
+>   	context->direct_map = false;
+>   
+>   	update_permission_bitmask(context, true);
+> -	update_pkru_bitmask(context);
+> +	context->pkru_mask = 0;
 
-Yours Faithfully
-Mrs.Barbara Sharon (P.A.)to,
-Mrs. Stephanie Avakian
-Director  US Security Exchange
-and Commission (SEC).
+It is not worth to optimize it since update_pkru_bitmask() will also just
+set context->pkru_mask = 0 and then return.
 
+>   	reset_rsvds_bits_mask_ept(vcpu, context, execonly);
+>   	reset_ept_shadow_zero_bits_mask(vcpu, context, execonly);
+>   }
+> 
