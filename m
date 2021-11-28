@@ -2,30 +2,30 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B99F3460866
-	for <lists+kvm@lfdr.de>; Sun, 28 Nov 2021 19:07:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 717F7460874
+	for <lists+kvm@lfdr.de>; Sun, 28 Nov 2021 19:12:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359067AbhK1SKh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 28 Nov 2021 13:10:37 -0500
-Received: from rere.qmqm.pl ([91.227.64.183]:30059 "EHLO rere.qmqm.pl"
+        id S1353068AbhK1SPo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 28 Nov 2021 13:15:44 -0500
+Received: from rere.qmqm.pl ([91.227.64.183]:47062 "EHLO rere.qmqm.pl"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231276AbhK1SIg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 28 Nov 2021 13:08:36 -0500
+        id S238059AbhK1SNo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 28 Nov 2021 13:13:44 -0500
 Received: from remote.user (localhost [127.0.0.1])
-        by rere.qmqm.pl (Postfix) with ESMTPSA id 4J2Gbw0CGMzWG;
-        Sun, 28 Nov 2021 19:05:15 +0100 (CET)
+        by rere.qmqm.pl (Postfix) with ESMTPSA id 4J2Gjn33d2zW8;
+        Sun, 28 Nov 2021 19:10:21 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=rere.qmqm.pl; s=1;
-        t=1638122717; bh=sEqOa0ZEPEWEUlBRSLFAiVwd6iLDymwK+DV3juGIkQI=;
-        h=Date:From:To:Cc:Subject:From;
-        b=XxvJmPPWazylznPkDFNVygPkohQ37AeYwywQvuepL1w31LahkAW0gP0LAhZyVJpcw
-         QCkB6BljQdra5dN8zW66BSxqJNFsOQZ3SXN/IvfR7aJdEfhChJ01RFDgEXy7ZRidew
-         5AuU0watcW2VhJ8VLEKa/g48uwHd6hUjzetMQJoBwvwxwQVSA3IWggzLzC2joJiPHp
-         8JY+UhUQ+oYzz2QsWC6IREdA0RA0M1lN6rt3R0c026YIrrdzB0zCSa9TOmB+kCXZPl
-         HMxpZwG7mci2iV7G+PnmCZt5b87M/uk6yQ9shXg1YFXT3Bi4Ka8VZS9Szm3f/vvMWn
-         w1e6Lkbu+s3yw==
+        t=1638123024; bh=JZhqOAoOJwkFLsUnNQo8o++CiFK7HEGKhePgc/FSOF4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=BSqkw57UlW2pW1NXQ5wZ96M5n0daMnNFg3ZZGk4QpT65f28st6tvSbAjCuaDYp0Y0
+         CmyX5dp3fxa/1bsCgFSoiXvYl/Ivrvk/XW5Lhr31jLklN0/6fnKbeszxM4AJMOo6b9
+         hs1WVqqJVnnkAxwtLxudxAhzHN+6r0DPz2i1TcI1//mgPfBMhwBro3m3CGjmkmEKO0
+         zFXYptfKQJ6Xhp//QSGLBmM8xlFJVmHJ9/rNfVpoRczyIK6/HJ5953QI6d4A5Zxyqw
+         UnYVoDxFeKZcNpL0K/UJMA5pXP8gOMjtVWWYJxoXBIppSPMAs/Uq2+pv87S9vD8wOI
+         LfWcTnK2w+pRg==
 X-Virus-Status: Clean
 X-Virus-Scanned: clamav-milter 0.103.3 at mail
-Date:   Sun, 28 Nov 2021 19:05:14 +0100
+Date:   Sun, 28 Nov 2021 19:10:20 +0100
 From:   =?iso-8859-2?Q?Micha=B3_Miros=B3aw?= <mirq-linux@rere.qmqm.pl>
 To:     Yury Norov <yury.norov@gmail.com>
 Cc:     linux-kernel@vger.kernel.org,
@@ -114,84 +114,59 @@ Cc:     linux-kernel@vger.kernel.org,
         linux-mm@kvack.org, linux-perf-users@vger.kernel.org,
         linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
         linux-snps-arc@lists.infradead.org, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH 0/9] lib/bitmap: optimize bitmap_weight() usage
-Message-ID: <YaPEfZ0t9UFGwpml@qmqm.qmqm.pl>
+Subject: Re: [PATCH 2/9] lib/bitmap: implement bitmap_{empty,full} with
+ bitmap_weight_eq()
+Message-ID: <YaPGDOvBzhiRFcOP@qmqm.qmqm.pl>
+References: <20211128035704.270739-1-yury.norov@gmail.com>
+ <20211128035704.270739-3-yury.norov@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-2
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20211128035704.270739-3-yury.norov@gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Nov 27, 2021 at 07:56:55PM -0800, Yury Norov wrote:
-> In many cases people use bitmap_weight()-based functions like this:
+On Sat, Nov 27, 2021 at 07:56:57PM -0800, Yury Norov wrote:
+> Now as we have bitmap_weight_eq(), switch bitmap_full() and
+> bitmap_empty() to using it.
 > 
-> 	if (num_present_cpus() > 1)
-> 		do_something();
+> Signed-off-by: Yury Norov <yury.norov@gmail.com>
+> ---
+>  include/linux/bitmap.h | 26 ++++++++++----------------
+>  1 file changed, 10 insertions(+), 16 deletions(-)
 > 
-> This may take considerable amount of time on many-cpus machines because
-> num_present_cpus() will traverse every word of underlying cpumask
-> unconditionally.
-> 
-> We can significantly improve on it for many real cases if stop traversing
-> the mask as soon as we count present cpus to any number greater than 1:
-> 
-> 	if (num_present_cpus_gt(1))
-> 		do_something();
-> 
-> To implement this idea, the series adds bitmap_weight_{eq,gt,le}
-> functions together with corresponding wrappers in cpumask and nodemask.
+> diff --git a/include/linux/bitmap.h b/include/linux/bitmap.h
+> index 996041f771c8..2d951e4dc814 100644
+> --- a/include/linux/bitmap.h
+> +++ b/include/linux/bitmap.h
+> @@ -386,22 +386,6 @@ static inline int bitmap_subset(const unsigned long *src1,
+>  		return __bitmap_subset(src1, src2, nbits);
+>  }
+>  
+> -static inline bool bitmap_empty(const unsigned long *src, unsigned nbits)
+> -{
+> -	if (small_const_nbits(nbits))
+> -		return ! (*src & BITMAP_LAST_WORD_MASK(nbits));
+> -
+> -	return find_first_bit(src, nbits) == nbits;
+> -}
 
-Having slept on it I have more structured thoughts:
+Since this is supposed to be an optimization, I would go all the way and
+replace this with the trivial implementation instead:
 
-First, I like substituting bitmap_empty/full where possible - I think
-the change stands on its own, so could be split and sent as is.
-
-I don't like the proposed API very much. One problem is that it hides
-the comparison operator and makes call sites less readable:
-
-	bitmap_weight(...) > N
-
-becomes:
-
-	bitmap_weight_gt(..., N)
-
-and:
-	bitmap_weight(...) <= N
-
-becomes:
-
-	bitmap_weight_lt(..., N+1)
-or:
-	!bitmap_weight_gt(..., N)
-
-I'd rather see something resembling memcmp() API that's known enough
-to be easier to grasp. For above examples:
-
-	bitmap_weight_cmp(..., N) > 0
-	bitmap_weight_cmp(..., N) <= 0
-	...
-
-This would also make the implementation easier in not having to
-copy and paste the code three times. Could also use a simple
-optimization reducing code size:
-
-#include <linux/overflow.h>
-
-int bitmap_weight_cmp(long *bits, size_t nbits, size_t cmp)
+bool bitmap_empty(long *bits, size_t nbits)
 {
-	for (size_t i = 0; i < nbits / BITS_PER_LONG; ++i, ++bits)
-		if (check_sub_overflow(cmp, popcount(*bits), &cmp))
-			return 1;
+	for (; nbits >= BITS_PER_LONG; ++bits, nbits -= BITS_PER_LONG)
+		if (*bits)
+			return false;
 
-	nbits %= BITS_PER_LONG;
-	if (nbits && check_sub_overflow(cmp,
-			popcount(*bits & GENMASK(nbits)), &cmp))
-		return 1;
+	if (nbits && *bits & BITMAP_LAST_WORD_MASK(nbits))
+		return false;
 
-	return cmp ? -1 : 0;
+	return true;
 }
-
+ 
 Best Regards
 Micha³ Miros³aw
