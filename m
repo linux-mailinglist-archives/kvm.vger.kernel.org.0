@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 11C60460342
-	for <lists+kvm@lfdr.de>; Sun, 28 Nov 2021 03:54:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E86D460345
+	for <lists+kvm@lfdr.de>; Sun, 28 Nov 2021 03:54:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355151AbhK1C5w (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 27 Nov 2021 21:57:52 -0500
-Received: from mga05.intel.com ([192.55.52.43]:4540 "EHLO mga05.intel.com"
+        id S1355443AbhK1C54 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 27 Nov 2021 21:57:56 -0500
+Received: from mga01.intel.com ([192.55.52.88]:21628 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S240145AbhK1Czs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 27 Nov 2021 21:55:48 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10181"; a="322035386"
+        id S240295AbhK1Cz4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 27 Nov 2021 21:55:56 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10181"; a="259712830"
 X-IronPort-AV: E=Sophos;i="5.87,270,1631602800"; 
-   d="scan'208";a="322035386"
+   d="scan'208";a="259712830"
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Nov 2021 18:52:33 -0800
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Nov 2021 18:52:40 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.87,270,1631602800"; 
-   d="scan'208";a="652489129"
+   d="scan'208";a="652489146"
 Received: from allen-box.sh.intel.com ([10.239.159.118])
-  by fmsmga001.fm.intel.com with ESMTP; 27 Nov 2021 18:52:26 -0800
+  by fmsmga001.fm.intel.com with ESMTP; 27 Nov 2021 18:52:33 -0800
 From:   Lu Baolu <baolu.lu@linux.intel.com>
 To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Joerg Roedel <joro@8bytes.org>,
@@ -47,9 +47,9 @@ Cc:     Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
         Li Yang <leoyang.li@nxp.com>, iommu@lists.linux-foundation.org,
         linux-pci@vger.kernel.org, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, Lu Baolu <baolu.lu@linux.intel.com>
-Subject: [PATCH v2 13/17] vfio: Remove use of vfio_group_viable()
-Date:   Sun, 28 Nov 2021 10:50:47 +0800
-Message-Id: <20211128025051.355578-14-baolu.lu@linux.intel.com>
+Subject: [PATCH v2 14/17] vfio: Delete the unbound_list
+Date:   Sun, 28 Nov 2021 10:50:48 +0800
+Message-Id: <20211128025051.355578-15-baolu.lu@linux.intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20211128025051.355578-1-baolu.lu@linux.intel.com>
 References: <20211128025051.355578-1-baolu.lu@linux.intel.com>
@@ -59,71 +59,182 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-As DMA USER ownership is claimed for the iommu group when a vfio group is
-added to a vfio container, the vfio group viability is guaranteed as long
-as group->container_users > 0. Remove those unnecessary group viability
-checks which are only hit when group->container_users is not zero.
+From: Jason Gunthorpe <jgg@nvidia.com>
 
-The only remaining reference is in GROUP_GET_STATUS, which could be called
-at any time when group fd is valid. Here we just replace the
-vfio_group_viable() by directly calling iommu core to get viability status.
+commit 60720a0fc646 ("vfio: Add device tracking during unbind") added the
+unbound list to plug a problem with KVM where KVM_DEV_VFIO_GROUP_DEL
+relied on vfio_group_get_external_user() succeeding to return the
+vfio_group from a group file descriptor. The unbound list allowed
+vfio_group_get_external_user() to continue to succeed in edge cases.
 
+However commit 5d6dee80a1e9 ("vfio: New external user group/file match")
+deleted the call to vfio_group_get_external_user() during
+KVM_DEV_VFIO_GROUP_DEL. Instead vfio_external_group_match_file() is used
+to directly match the file descriptor to the group pointer.
+
+This in turn avoids the call down to vfio_dev_viable() during
+KVM_DEV_VFIO_GROUP_DEL and also avoids the trouble the first commit was
+trying to fix.
+
+There are no other users of vfio_dev_viable() that care about the time
+after vfio_unregister_group_dev() returns, so simply delete the
+unbound_list entirely.
+
+Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
 ---
- drivers/vfio/vfio.c | 18 ++++++------------
- 1 file changed, 6 insertions(+), 12 deletions(-)
+ drivers/vfio/vfio.c | 74 ++-------------------------------------------
+ 1 file changed, 2 insertions(+), 72 deletions(-)
 
 diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-index 00f89acfec39..63e24f746b82 100644
+index 63e24f746b82..5c81346367b1 100644
 --- a/drivers/vfio/vfio.c
 +++ b/drivers/vfio/vfio.c
-@@ -1316,12 +1316,6 @@ static int vfio_group_set_container(struct vfio_group *group, int container_fd)
- 	return ret;
+@@ -62,11 +62,6 @@ struct vfio_container {
+ 	bool				noiommu;
+ };
+ 
+-struct vfio_unbound_dev {
+-	struct device			*dev;
+-	struct list_head		unbound_next;
+-};
+-
+ struct vfio_group {
+ 	struct device 			dev;
+ 	struct cdev			cdev;
+@@ -79,8 +74,6 @@ struct vfio_group {
+ 	struct notifier_block		nb;
+ 	struct list_head		vfio_next;
+ 	struct list_head		container_next;
+-	struct list_head		unbound_list;
+-	struct mutex			unbound_lock;
+ 	atomic_t			opened;
+ 	wait_queue_head_t		container_q;
+ 	enum vfio_group_type		type;
+@@ -340,16 +333,8 @@ vfio_group_get_from_iommu(struct iommu_group *iommu_group)
+ static void vfio_group_release(struct device *dev)
+ {
+ 	struct vfio_group *group = container_of(dev, struct vfio_group, dev);
+-	struct vfio_unbound_dev *unbound, *tmp;
+-
+-	list_for_each_entry_safe(unbound, tmp,
+-				 &group->unbound_list, unbound_next) {
+-		list_del(&unbound->unbound_next);
+-		kfree(unbound);
+-	}
+ 
+ 	mutex_destroy(&group->device_lock);
+-	mutex_destroy(&group->unbound_lock);
+ 	iommu_group_put(group->iommu_group);
+ 	ida_free(&vfio.group_ida, MINOR(group->dev.devt));
+ 	kfree(group);
+@@ -381,8 +366,6 @@ static struct vfio_group *vfio_group_alloc(struct iommu_group *iommu_group,
+ 	refcount_set(&group->users, 1);
+ 	INIT_LIST_HEAD(&group->device_list);
+ 	mutex_init(&group->device_lock);
+-	INIT_LIST_HEAD(&group->unbound_list);
+-	mutex_init(&group->unbound_lock);
+ 	init_waitqueue_head(&group->container_q);
+ 	group->iommu_group = iommu_group;
+ 	/* put in vfio_group_release() */
+@@ -571,19 +554,8 @@ static int vfio_dev_viable(struct device *dev, void *data)
+ 	struct vfio_group *group = data;
+ 	struct vfio_device *device;
+ 	struct device_driver *drv = READ_ONCE(dev->driver);
+-	struct vfio_unbound_dev *unbound;
+-	int ret = -EINVAL;
+ 
+-	mutex_lock(&group->unbound_lock);
+-	list_for_each_entry(unbound, &group->unbound_list, unbound_next) {
+-		if (dev == unbound->dev) {
+-			ret = 0;
+-			break;
+-		}
+-	}
+-	mutex_unlock(&group->unbound_lock);
+-
+-	if (!ret || !drv || vfio_dev_driver_allowed(dev, drv))
++	if (!drv || vfio_dev_driver_allowed(dev, drv))
+ 		return 0;
+ 
+ 	device = vfio_group_get_device(group, dev);
+@@ -592,7 +564,7 @@ static int vfio_dev_viable(struct device *dev, void *data)
+ 		return 0;
+ 	}
+ 
+-	return ret;
++	return -EINVAL;
  }
  
--static bool vfio_group_viable(struct vfio_group *group)
--{
--	return (iommu_group_for_each_dev(group->iommu_group,
--					 group, vfio_dev_viable) == 0);
--}
--
- static int vfio_group_add_container_user(struct vfio_group *group)
+ /**
+@@ -634,7 +606,6 @@ static int vfio_iommu_group_notifier(struct notifier_block *nb,
  {
- 	if (!atomic_inc_not_zero(&group->container_users))
-@@ -1331,7 +1325,7 @@ static int vfio_group_add_container_user(struct vfio_group *group)
- 		atomic_dec(&group->container_users);
- 		return -EPERM;
- 	}
--	if (!group->container->iommu_driver || !vfio_group_viable(group)) {
-+	if (!group->container->iommu_driver) {
- 		atomic_dec(&group->container_users);
- 		return -EINVAL;
- 	}
-@@ -1349,7 +1343,7 @@ static int vfio_group_get_device_fd(struct vfio_group *group, char *buf)
- 	int ret = 0;
+ 	struct vfio_group *group = container_of(nb, struct vfio_group, nb);
+ 	struct device *dev = data;
+-	struct vfio_unbound_dev *unbound;
  
- 	if (0 == atomic_read(&group->container_users) ||
--	    !group->container->iommu_driver || !vfio_group_viable(group))
-+	    !group->container->iommu_driver)
- 		return -EINVAL;
- 
- 	if (group->type == VFIO_NO_IOMMU && !capable(CAP_SYS_RAWIO))
-@@ -1441,11 +1435,11 @@ static long vfio_group_fops_unl_ioctl(struct file *filep,
- 
- 		status.flags = 0;
- 
--		if (vfio_group_viable(group))
--			status.flags |= VFIO_GROUP_FLAGS_VIABLE;
+ 	switch (action) {
+ 	case IOMMU_GROUP_NOTIFY_ADD_DEVICE:
+@@ -663,28 +634,6 @@ static int vfio_iommu_group_notifier(struct notifier_block *nb,
+ 			__func__, iommu_group_id(group->iommu_group),
+ 			dev->driver->name);
+ 		break;
+-	case IOMMU_GROUP_NOTIFY_UNBOUND_DRIVER:
+-		dev_dbg(dev, "%s: group %d unbound from driver\n", __func__,
+-			iommu_group_id(group->iommu_group));
+-		/*
+-		 * XXX An unbound device in a live group is ok, but we'd
+-		 * really like to avoid the above BUG_ON by preventing other
+-		 * drivers from binding to it.  Once that occurs, we have to
+-		 * stop the system to maintain isolation.  At a minimum, we'd
+-		 * want a toggle to disable driver auto probe for this device.
+-		 */
 -
- 		if (group->container)
--			status.flags |= VFIO_GROUP_FLAGS_CONTAINER_SET;
-+			status.flags |= VFIO_GROUP_FLAGS_CONTAINER_SET |
-+					VFIO_GROUP_FLAGS_VIABLE;
-+		else if (iommu_group_dma_owner_unclaimed(group->iommu_group))
-+			status.flags |= VFIO_GROUP_FLAGS_VIABLE;
+-		mutex_lock(&group->unbound_lock);
+-		list_for_each_entry(unbound,
+-				    &group->unbound_list, unbound_next) {
+-			if (dev == unbound->dev) {
+-				list_del(&unbound->unbound_next);
+-				kfree(unbound);
+-				break;
+-			}
+-		}
+-		mutex_unlock(&group->unbound_lock);
+-		break;
+ 	}
+ 	return NOTIFY_OK;
+ }
+@@ -889,29 +838,10 @@ static struct vfio_device *vfio_device_get_from_name(struct vfio_group *group,
+ void vfio_unregister_group_dev(struct vfio_device *device)
+ {
+ 	struct vfio_group *group = device->group;
+-	struct vfio_unbound_dev *unbound;
+ 	unsigned int i = 0;
+ 	bool interrupted = false;
+ 	long rc;
  
- 		if (copy_to_user((void __user *)arg, &status, minsz))
- 			return -EFAULT;
+-	/*
+-	 * When the device is removed from the group, the group suddenly
+-	 * becomes non-viable; the device has a driver (until the unbind
+-	 * completes), but it's not present in the group.  This is bad news
+-	 * for any external users that need to re-acquire a group reference
+-	 * in order to match and release their existing reference.  To
+-	 * solve this, we track such devices on the unbound_list to bridge
+-	 * the gap until they're fully unbound.
+-	 */
+-	unbound = kzalloc(sizeof(*unbound), GFP_KERNEL);
+-	if (unbound) {
+-		unbound->dev = device->dev;
+-		mutex_lock(&group->unbound_lock);
+-		list_add(&unbound->unbound_next, &group->unbound_list);
+-		mutex_unlock(&group->unbound_lock);
+-	}
+-	WARN_ON(!unbound);
+-
+ 	vfio_device_put(device);
+ 	rc = try_wait_for_completion(&device->comp);
+ 	while (rc <= 0) {
 -- 
 2.25.1
 
