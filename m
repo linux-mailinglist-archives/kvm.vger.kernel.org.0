@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DE9B3460335
-	for <lists+kvm@lfdr.de>; Sun, 28 Nov 2021 03:54:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C94A4460339
+	for <lists+kvm@lfdr.de>; Sun, 28 Nov 2021 03:54:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351513AbhK1C5W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 27 Nov 2021 21:57:22 -0500
-Received: from mga09.intel.com ([134.134.136.24]:64278 "EHLO mga09.intel.com"
+        id S1352143AbhK1C53 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 27 Nov 2021 21:57:29 -0500
+Received: from mga04.intel.com ([192.55.52.120]:38185 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239838AbhK1CzW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 27 Nov 2021 21:55:22 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10181"; a="235619889"
+        id S239973AbhK1Cz2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 27 Nov 2021 21:55:28 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10181"; a="234533071"
 X-IronPort-AV: E=Sophos;i="5.87,270,1631602800"; 
-   d="scan'208";a="235619889"
+   d="scan'208";a="234533071"
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Nov 2021 18:52:06 -0800
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Nov 2021 18:52:13 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.87,270,1631602800"; 
-   d="scan'208";a="652489062"
+   d="scan'208";a="652489080"
 Received: from allen-box.sh.intel.com ([10.239.159.118])
-  by fmsmga001.fm.intel.com with ESMTP; 27 Nov 2021 18:51:59 -0800
+  by fmsmga001.fm.intel.com with ESMTP; 27 Nov 2021 18:52:06 -0800
 From:   Lu Baolu <baolu.lu@linux.intel.com>
 To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Joerg Roedel <joro@8bytes.org>,
@@ -47,9 +47,9 @@ Cc:     Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
         Li Yang <leoyang.li@nxp.com>, iommu@lists.linux-foundation.org,
         linux-pci@vger.kernel.org, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, Lu Baolu <baolu.lu@linux.intel.com>
-Subject: [PATCH v2 09/17] iommu: Add security context management for assigned devices
-Date:   Sun, 28 Nov 2021 10:50:43 +0800
-Message-Id: <20211128025051.355578-10-baolu.lu@linux.intel.com>
+Subject: [PATCH v2 10/17] iommu: Expose group variants of dma ownership interfaces
+Date:   Sun, 28 Nov 2021 10:50:44 +0800
+Message-Id: <20211128025051.355578-11-baolu.lu@linux.intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20211128025051.355578-1-baolu.lu@linux.intel.com>
 References: <20211128025051.355578-1-baolu.lu@linux.intel.com>
@@ -59,99 +59,128 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When an iommu group has DMA_OWNER_PRIVATE_DOMAIN_USER set for the first
-time, it is a contract that the group could be assigned to userspace from
-now on. The group must be detached from the default iommu domain and all
-devices in this group are blocked from doing DMA until it is attached to a
-user controlled iommu_domain. Correspondingly, the default domain should
-be reattached after the last DMA_OWNER_USER is released.
+The vfio needs to set DMA_OWNER_PRIVATE_DOMAIN_USER for the entire group
+when attaching it to a vfio container. Expose group variants of setting/
+releasing dma ownership for this purpose.
+
+This also exposes the helper iommu_group_dma_owner_unclaimed() for vfio
+to report to userspace if the group is viable to user assignment for
+compatibility with VFIO_GROUP_FLAGS_VIABLE.
 
 Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
 ---
- drivers/iommu/iommu.c | 42 +++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 39 insertions(+), 3 deletions(-)
+ include/linux/iommu.h | 21 ++++++++++++++++
+ drivers/iommu/iommu.c | 58 +++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 79 insertions(+)
 
-diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-index 1de520a07518..0cba04a8ea3b 100644
---- a/drivers/iommu/iommu.c
-+++ b/drivers/iommu/iommu.c
-@@ -292,7 +292,12 @@ int iommu_probe_device(struct device *dev)
- 	mutex_lock(&group->mutex);
- 	iommu_alloc_default_domain(group, dev);
+diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+index 24676b498f38..afcc07bc8d41 100644
+--- a/include/linux/iommu.h
++++ b/include/linux/iommu.h
+@@ -701,6 +701,10 @@ u32 iommu_sva_get_pasid(struct iommu_sva *handle);
+ int iommu_device_set_dma_owner(struct device *dev, enum iommu_dma_owner owner,
+ 			       void *owner_cookie);
+ void iommu_device_release_dma_owner(struct device *dev, enum iommu_dma_owner owner);
++int iommu_group_set_dma_owner(struct iommu_group *group, enum iommu_dma_owner owner,
++			      void *owner_cookie);
++void iommu_group_release_dma_owner(struct iommu_group *group, enum iommu_dma_owner owner);
++bool iommu_group_dma_owner_unclaimed(struct iommu_group *group);
  
--	if (group->default_domain) {
-+	/*
-+	 * If any device in the group has been initialized for user dma,
-+	 * avoid attaching the default domain.
-+	 */
-+	if (group->default_domain &&
-+	    group->dma_owner != DMA_OWNER_PRIVATE_DOMAIN_USER) {
- 		ret = __iommu_attach_device(group->default_domain, dev);
- 		if (ret) {
- 			mutex_unlock(&group->mutex);
-@@ -2324,7 +2329,7 @@ static int __iommu_attach_group(struct iommu_domain *domain,
+ #else /* CONFIG_IOMMU_API */
+ 
+@@ -1117,6 +1121,23 @@ static inline void iommu_device_release_dma_owner(struct device *dev,
+ 						  enum iommu_dma_owner owner)
  {
- 	int ret;
- 
--	if (group->default_domain && group->domain != group->default_domain)
-+	if (group->domain && group->domain != group->default_domain)
- 		return -EBUSY;
- 
- 	ret = __iommu_group_for_each_dev(group, domain,
-@@ -2361,7 +2366,12 @@ static void __iommu_detach_group(struct iommu_domain *domain,
- {
- 	int ret;
- 
--	if (!group->default_domain) {
-+	/*
-+	 * If any device in the group has been initialized for user dma,
-+	 * avoid re-attaching the default domain.
-+	 */
-+	if (!group->default_domain ||
-+	    group->dma_owner == DMA_OWNER_PRIVATE_DOMAIN_USER) {
- 		__iommu_group_for_each_dev(group, domain,
- 					   iommu_group_do_detach_device);
- 		group->domain = NULL;
-@@ -3371,6 +3381,23 @@ static int __iommu_group_set_dma_owner(struct iommu_group *group,
- 	}
- 
- 	group->dma_owner = owner;
-+
-+	/*
-+	 * We must ensure that any device DMAs issued after this call
-+	 * are discarded. DMAs can only reach real memory once someone
-+	 * has attached a real domain.
-+	 */
-+	if (owner == DMA_OWNER_PRIVATE_DOMAIN_USER) {
-+		if (group->domain) {
-+			if (group->domain != group->default_domain) {
-+				group->dma_owner = DMA_OWNER_NONE;
-+				return -EBUSY;
-+			}
-+
-+			__iommu_detach_group(group->domain, group);
-+		}
-+	}
-+
- 	group->owner_cookie = owner_cookie;
- 	refcount_set(&group->owner_cnt, 1);
- 
-@@ -3387,6 +3414,15 @@ static void __iommu_group_release_dma_owner(struct iommu_group *group,
- 		return;
- 
- 	group->dma_owner = DMA_OWNER_NONE;
-+
-+	/*
-+	 * The UNMANAGED domain should be detached before all USER
-+	 * owners have been released.
-+	 */
-+	if (owner == DMA_OWNER_PRIVATE_DOMAIN_USER) {
-+		if (!WARN_ON(group->domain) && group->default_domain)
-+			__iommu_attach_group(group->default_domain, group);
-+	}
  }
++
++static inline int iommu_group_set_dma_owner(struct iommu_group *group,
++					    enum iommu_dma_owner owner,
++					    void *owner_cookie)
++{
++	return -EINVAL;
++}
++
++static inline void iommu_group_release_dma_owner(struct iommu_group *group,
++						 enum iommu_dma_owner owner)
++{
++}
++
++static inline bool iommu_group_dma_owner_unclaimed(struct iommu_group *group)
++{
++	return false;
++}
+ #endif /* CONFIG_IOMMU_API */
  
  /**
+diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
+index 0cba04a8ea3b..423197db99a9 100644
+--- a/drivers/iommu/iommu.c
++++ b/drivers/iommu/iommu.c
+@@ -3425,6 +3425,64 @@ static void __iommu_group_release_dma_owner(struct iommu_group *group,
+ 	}
+ }
+ 
++/**
++ * iommu_group_set_dma_owner() - Set DMA ownership of a group
++ * @group: The group.
++ * @owner: DMA owner type.
++ * @owner_cookie: Caller specified pointer. Could be used for exclusive
++ *                declaration. Could be NULL.
++ *
++ * This is to support backward compatibility for legacy vfio which manages
++ * dma ownership in group level. New invocations on this interface should be
++ * prohibited. Instead, please turn to iommu_device_set_dma_owner().
++ */
++int iommu_group_set_dma_owner(struct iommu_group *group, enum iommu_dma_owner owner,
++			      void *owner_cookie)
++{
++	int ret;
++
++	mutex_lock(&group->mutex);
++	ret = __iommu_group_set_dma_owner(group, owner, owner_cookie);
++	mutex_unlock(&group->mutex);
++
++	return ret;
++}
++EXPORT_SYMBOL_GPL(iommu_group_set_dma_owner);
++
++/**
++ * iommu_group_release_dma_owner() - Release DMA ownership of a group
++ * @group: The group.
++ * @owner: DMA owner type.
++ *
++ * Release the DMA ownership claimed by iommu_group_set_dma_owner().
++ */
++void iommu_group_release_dma_owner(struct iommu_group *group, enum iommu_dma_owner owner)
++{
++	mutex_lock(&group->mutex);
++	__iommu_group_release_dma_owner(group, owner);
++	mutex_unlock(&group->mutex);
++}
++EXPORT_SYMBOL_GPL(iommu_group_release_dma_owner);
++
++/**
++ * iommu_group_dma_owner_unclaimed() - Is group dma ownership claimed
++ * @group: The group.
++ *
++ * This provides status check on a given group. It is racey and only for
++ * non-binding status reporting.
++ */
++bool iommu_group_dma_owner_unclaimed(struct iommu_group *group)
++{
++	enum iommu_dma_owner owner;
++
++	mutex_lock(&group->mutex);
++	owner = group->dma_owner;
++	mutex_unlock(&group->mutex);
++
++	return owner == DMA_OWNER_NONE;
++}
++EXPORT_SYMBOL_GPL(iommu_group_dma_owner_unclaimed);
++
+ /**
+  * iommu_device_set_dma_owner() - Set DMA ownership of a device
+  * @dev: The device.
 -- 
 2.25.1
 
