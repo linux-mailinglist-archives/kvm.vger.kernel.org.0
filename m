@@ -2,53 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C5964604F9
-	for <lists+kvm@lfdr.de>; Sun, 28 Nov 2021 07:29:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FACB460502
+	for <lists+kvm@lfdr.de>; Sun, 28 Nov 2021 07:36:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243086AbhK1Gcr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 28 Nov 2021 01:32:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46088 "EHLO
+        id S1344015AbhK1GkG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 28 Nov 2021 01:40:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232356AbhK1Gaq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 28 Nov 2021 01:30:46 -0500
-Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80254C061574;
-        Sat, 27 Nov 2021 22:27:30 -0800 (PST)
-Received: by mail-qk1-x731.google.com with SMTP id t83so19290690qke.8;
-        Sat, 27 Nov 2021 22:27:30 -0800 (PST)
+        with ESMTP id S232356AbhK1GiF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 28 Nov 2021 01:38:05 -0500
+Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47D87C061574;
+        Sat, 27 Nov 2021 22:34:50 -0800 (PST)
+Received: by mail-qt1-x82f.google.com with SMTP id p19so13083910qtw.12;
+        Sat, 27 Nov 2021 22:34:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=UUaWw2/vndQwOuhRc6j6PRwXuBODm2Svdcs9xeM4FlQ=;
-        b=RUU7MzRkdirUtowuDWCiM08P7YQBQBC0acoWzbBj+T+XJI6vVMBSu6aGIKh4+icUwh
-         a8q9bMYJuHCqFTUz0wNigsRNRIbsDwqKoKMNa0qnfF66qijICeNv/dPkbz+/087xhZlV
-         f64hTvJmbUAx1It3pzpI4UUvGtwyNbU+zmtX09eMQ0ByGsuhC27g5T60WwoNMBivtuLQ
-         VUm/Sp71jqGs+1C8GEcrf12fOpYmPWgYxCrrC9gGrggZZRnsjHL5/c7LM3QqhQgnqCqj
-         LxxzrdrvicV7rQvSx7+bgEc8nFcDr55sjaFrS6W7kwXrGHkLvw0E6R41fTx7A36r5Slm
-         hdow==
+        h=date:from:to:cc:subject:message-id:mime-version:content-disposition
+         :content-transfer-encoding:in-reply-to;
+        bh=rKuklq8jxCETHcjcAENlFbP3nl/uNBZqDfuGt3bzd1Q=;
+        b=N/urFmV2NmOFP42e1LVLW8fwa/hr9KDv3ZUpw+lC8WGtW8rc7tWztvbdFPuGBjub1O
+         wspFhVe7cCjM3GiHaTs/o61wPhHvRulBbX8eWk+oUvPHasNmnTk9fguzetRPFqMAMSbw
+         NSq70yUrota4HuwP2mw6e4EdU69PrQnC7+N7r+KW5WUjDm+ME76HZpk50UYeWuhhvrtv
+         jzlo36RajlwI73FqiorEZUjBdSjpmlO3li6nkrgdjIjD0UyBvsHE9SsWB4qkZCd+owE5
+         cwmTSVDOhxhxddNAGQkE0CL6sKvMvIJPhAZNBZoNO0tLt8RIHXr/GUyMzCFG050MR/6f
+         IXaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=UUaWw2/vndQwOuhRc6j6PRwXuBODm2Svdcs9xeM4FlQ=;
-        b=P2zgZuLkMdeIie8+ajuEUT0Z5ZPxwXdbbYZzDUyemG+xIYkV/Axp5N0JkJ97KCVz1w
-         8kRuC5SAwEgLFPhudHmmCvermmeo3KBAooYslxFZgX3VIQBlYVI4sBqwGiWmw9f6keCO
-         QcOiNtufyyubg/x5UKxBJyDM1ftQ9DYnsCXof4/cH0f/A0f3peLNcGxa3g737iut/aBn
-         ABUeXkOw0jvdp0huHIMrvxR1UeGBPrAvNGl+MYgF1CyJkxTsxqtSiMi2XQoy1F3OkzWa
-         rQU0vXxk3jMghwIhKmExeaM241tqt2PFh5CzQg8GqjLU/fmwZHyPJFCJhHRRcwrXbKII
-         sS4A==
-X-Gm-Message-State: AOAM530QQ+dU++2QOBYKqARdhv0mvDMMy77LZ8EaJW+Brt6aU6bIZ4iB
-        rF1mWoTQd0gTTlkgqRQyXKA=
-X-Google-Smtp-Source: ABdhPJxAVXtuKFpo3xQALAgWXmZbnwidtxXikhe9UCcw/0T4+58Z974u1PPCzNdv2+qiERrm5clSCw==
-X-Received: by 2002:a05:620a:2153:: with SMTP id m19mr32383206qkm.77.1638080848758;
-        Sat, 27 Nov 2021 22:27:28 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=rKuklq8jxCETHcjcAENlFbP3nl/uNBZqDfuGt3bzd1Q=;
+        b=Pa80BKMN59lCsJjnNbgSKArKhYsSHTbwTyZdaLszu61Eq1nWBjNEjQOHxz7EdvC7vL
+         oSrFrUT8QYtWq8xbe0sRfmtof1vQjHid40cNlXnlK3Mqlrz4knwp1vv0QswMbS0LlMBb
+         wpOcDBBuXSAzIB15fSgwSph31VG5R5db6uJrmjcbUlMsSK3SCAWlO8ZvXCwtWGok3Hhg
+         bYYyxsuz9uJFWaVuQHyMZUTLpb7HwJapCl/iQ1CEDgtuDS6zhSe5UF0uRLR5BDgqWEBe
+         DeSMR4qUsze6spOYQrbR9cg2nfwoIVXhXOIvHwD3ZvK+AzZpJh5LCC51RTpPoODwdTPs
+         F1vw==
+X-Gm-Message-State: AOAM5326QRBlJ8UUkGW7nDB1bnPZnFyQb+S0TIdkKqiv+KG9AYU1uGAS
+        DwwMJd341SsMv1Gst8Ree84=
+X-Google-Smtp-Source: ABdhPJyJzVPAC11UsMz+HJsW0TzZJUpS9rijQwW94Vpknlgpg+/mG8cwCXUq1qsThYXJdJN6S8tP7Q==
+X-Received: by 2002:ac8:5fcc:: with SMTP id k12mr35432768qta.346.1638081289128;
+        Sat, 27 Nov 2021 22:34:49 -0800 (PST)
 Received: from localhost ([66.216.211.25])
-        by smtp.gmail.com with ESMTPSA id z4sm6611865qtj.42.2021.11.27.22.27.28
+        by smtp.gmail.com with ESMTPSA id f18sm6419326qko.34.2021.11.27.22.34.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 27 Nov 2021 22:27:28 -0800 (PST)
-Date:   Sat, 27 Nov 2021 22:27:27 -0800
+        Sat, 27 Nov 2021 22:34:48 -0800 (PST)
+Date:   Sat, 27 Nov 2021 22:34:47 -0800
 From:   Yury Norov <yury.norov@gmail.com>
 To:     =?utf-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>
 Cc:     linux-kernel@vger.kernel.org,
@@ -137,43 +136,41 @@ Cc:     linux-kernel@vger.kernel.org,
         linux-mm@kvack.org, linux-perf-users@vger.kernel.org,
         linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
         linux-snps-arc@lists.infradead.org, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH 2/9] lib/bitmap: implement bitmap_{empty,full} with
- bitmap_weight_eq()
-Message-ID: <20211128062727.GA276670@lapt>
-References: <20211128035704.270739-1-yury.norov@gmail.com>
- <20211128035704.270739-3-yury.norov@gmail.com>
- <YaMHfzZ5PBn0714Z@qmqm.qmqm.pl>
+Subject: Re: [PATCH 7/9] lib/cpumask: add
+ num_{possible,present,active}_cpus_{eq,gt,le}
+Message-ID: <20211128063447.GA270945@lapt>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <YaMHfzZ5PBn0714Z@qmqm.qmqm.pl>
+In-Reply-To: <YaMME60Jfiz5BeJF@qmqm.qmqm.pl>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Nov 28, 2021 at 05:37:19AM +0100, Michał Mirosław wrote:
-> On Sat, Nov 27, 2021 at 07:56:57PM -0800, Yury Norov wrote:
-> > Now as we have bitmap_weight_eq(), switch bitmap_full() and
-> > bitmap_empty() to using it.
+(restore CC list)
+
+On Sun, Nov 28, 2021 at 05:56:51AM +0100, Michał Mirosław wrote:
+> On Sat, Nov 27, 2021 at 07:57:02PM -0800, Yury Norov wrote:
+> > Add num_{possible,present,active}_cpus_{eq,gt,le} and replace num_*_cpus()
+> > with one of new functions where appropriate. This allows num_*_cpus_*()
+> > to return earlier depending on the condition.
 > [...]
-> > -static inline bool bitmap_empty(const unsigned long *src, unsigned nbits)
-> > -{
-> > -	if (small_const_nbits(nbits))
-> > -		return ! (*src & BITMAP_LAST_WORD_MASK(nbits));
-> > -
-> > -	return find_first_bit(src, nbits) == nbits;
-> > -}
-> [...]
-> > +static __always_inline bool bitmap_empty(const unsigned long *src, unsigned int nbits)
-> > +{
-> > +	return bitmap_weight_eq(src, nbits, 0);
-> > +}
-> [..]
+> > @@ -3193,7 +3193,7 @@ int __init pcpu_page_first_chunk(size_t reserved_size,
+> >  
+> >  	/* allocate pages */
+> >  	j = 0;
+> > -	for (unit = 0; unit < num_possible_cpus(); unit++) {
+> > +	for (unit = 0; num_possible_cpus_gt(unit); unit++) {
 > 
-> What's the speed difference? Have you benchmarked this?
+> This looks dubious.
 
-bitmap_weight_eq() should be faster than find_first_bit(), but the
-difference is few cycles, so I didn't bother measuring it.
+Only this?
 
-New version looks just better.
+> The old version I could hope the compiler would call
+> num_possible_cpus() only once if it's marked const or pure, but the
+> alternative is going to count the bits every time making this a guaranteed
+> O(n^2) even though the bitmap doesn't change.
+
+num_possible_cpus() is not const neither pure. This is O(n^2) before and after.
+
