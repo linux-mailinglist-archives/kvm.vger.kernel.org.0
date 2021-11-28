@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E77D460861
-	for <lists+kvm@lfdr.de>; Sun, 28 Nov 2021 19:06:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B99F3460866
+	for <lists+kvm@lfdr.de>; Sun, 28 Nov 2021 19:07:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358732AbhK1SJO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 28 Nov 2021 13:09:14 -0500
-Received: from rere.qmqm.pl ([91.227.64.183]:52591 "EHLO rere.qmqm.pl"
+        id S1359067AbhK1SKh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 28 Nov 2021 13:10:37 -0500
+Received: from rere.qmqm.pl ([91.227.64.183]:30059 "EHLO rere.qmqm.pl"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231344AbhK1SHN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 28 Nov 2021 13:07:13 -0500
+        id S231276AbhK1SIg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 28 Nov 2021 13:08:36 -0500
 Received: from remote.user (localhost [127.0.0.1])
-        by rere.qmqm.pl (Postfix) with ESMTPSA id 4J2GZ84l0lzGX;
-        Sun, 28 Nov 2021 19:03:44 +0100 (CET)
+        by rere.qmqm.pl (Postfix) with ESMTPSA id 4J2Gbw0CGMzWG;
+        Sun, 28 Nov 2021 19:05:15 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=rere.qmqm.pl; s=1;
-        t=1638122634; bh=sEqOa0ZEPEWEUlBRSLFAiVwd6iLDymwK+DV3juGIkQI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=c8BMIb6Ys1MM9jtnUFS+OzCZESND169gxM1+qoGuDHQxJkjYTnLg1dYXL65SLSeBD
-         OptKwwF3f6jjeAWkz8hKGEIpBsOyA7AZLbEyI0Ul8i9xig/dKvGR9NZ6kh+Ny2ulTW
-         NSMm5sqIVijexkgrukA2T59koDDkGancK18mcZt702hpU7mgoZQDDZbSDYgNkFc9BO
-         VIw8ONHFtRVbVnzFi4YPF5fViRQnoyL8aNWKj0ctBrm3IfLQEgZY5IGVCfNRdmPFM4
-         VnIE/zolNmZ9Tr6q4VJbIye3TlVbgURGaBOqFwsRQiEoMGrVw4g28fuRp3xh+IiOQd
-         dpDJSAp182XbQ==
+        t=1638122717; bh=sEqOa0ZEPEWEUlBRSLFAiVwd6iLDymwK+DV3juGIkQI=;
+        h=Date:From:To:Cc:Subject:From;
+        b=XxvJmPPWazylznPkDFNVygPkohQ37AeYwywQvuepL1w31LahkAW0gP0LAhZyVJpcw
+         QCkB6BljQdra5dN8zW66BSxqJNFsOQZ3SXN/IvfR7aJdEfhChJ01RFDgEXy7ZRidew
+         5AuU0watcW2VhJ8VLEKa/g48uwHd6hUjzetMQJoBwvwxwQVSA3IWggzLzC2joJiPHp
+         8JY+UhUQ+oYzz2QsWC6IREdA0RA0M1lN6rt3R0c026YIrrdzB0zCSa9TOmB+kCXZPl
+         HMxpZwG7mci2iV7G+PnmCZt5b87M/uk6yQ9shXg1YFXT3Bi4Ka8VZS9Szm3f/vvMWn
+         w1e6Lkbu+s3yw==
 X-Virus-Status: Clean
 X-Virus-Scanned: clamav-milter 0.103.3 at mail
-Date:   Sun, 28 Nov 2021 19:03:41 +0100
-From:   mirq-test@rere.qmqm.pl
+Date:   Sun, 28 Nov 2021 19:05:14 +0100
+From:   =?iso-8859-2?Q?Micha=B3_Miros=B3aw?= <mirq-linux@rere.qmqm.pl>
 To:     Yury Norov <yury.norov@gmail.com>
 Cc:     linux-kernel@vger.kernel.org,
         "James E.J. Bottomley" <jejb@linux.ibm.com>,
@@ -116,12 +116,10 @@ Cc:     linux-kernel@vger.kernel.org,
         linux-snps-arc@lists.infradead.org, linuxppc-dev@lists.ozlabs.org
 Subject: Re: [PATCH 0/9] lib/bitmap: optimize bitmap_weight() usage
 Message-ID: <YaPEfZ0t9UFGwpml@qmqm.qmqm.pl>
-References: <20211128035704.270739-1-yury.norov@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=iso-8859-2
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20211128035704.270739-1-yury.norov@gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
