@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 448D546034B
-	for <lists+kvm@lfdr.de>; Sun, 28 Nov 2021 03:55:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8799946034E
+	for <lists+kvm@lfdr.de>; Sun, 28 Nov 2021 03:55:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356012AbhK1C6L (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 27 Nov 2021 21:58:11 -0500
-Received: from mga14.intel.com ([192.55.52.115]:46180 "EHLO mga14.intel.com"
+        id S1356600AbhK1C6V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 27 Nov 2021 21:58:21 -0500
+Received: from mga14.intel.com ([192.55.52.115]:46183 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235821AbhK1C4K (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 27 Nov 2021 21:56:10 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10181"; a="236040295"
+        id S240916AbhK1C4Q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 27 Nov 2021 21:56:16 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10181"; a="236040305"
 X-IronPort-AV: E=Sophos;i="5.87,270,1631602800"; 
-   d="scan'208";a="236040295"
+   d="scan'208";a="236040305"
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Nov 2021 18:52:54 -0800
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Nov 2021 18:53:01 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.87,270,1631602800"; 
-   d="scan'208";a="652489201"
+   d="scan'208";a="652489221"
 Received: from allen-box.sh.intel.com ([10.239.159.118])
-  by fmsmga001.fm.intel.com with ESMTP; 27 Nov 2021 18:52:47 -0800
+  by fmsmga001.fm.intel.com with ESMTP; 27 Nov 2021 18:52:54 -0800
 From:   Lu Baolu <baolu.lu@linux.intel.com>
 To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Joerg Roedel <joro@8bytes.org>,
@@ -46,11 +46,10 @@ Cc:     Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
         Jonathan Hunter <jonathanh@nvidia.com>,
         Li Yang <leoyang.li@nxp.com>, iommu@lists.linux-foundation.org,
         linux-pci@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Lu Baolu <baolu.lu@linux.intel.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v2 16/17] iommu: Remove iommu group changes notifier
-Date:   Sun, 28 Nov 2021 10:50:50 +0800
-Message-Id: <20211128025051.355578-17-baolu.lu@linux.intel.com>
+        linux-kernel@vger.kernel.org, Lu Baolu <baolu.lu@linux.intel.com>
+Subject: [PATCH v2 17/17] drm/tegra: Use the iommu dma_owner mechanism
+Date:   Sun, 28 Nov 2021 10:50:51 +0800
+Message-Id: <20211128025051.355578-18-baolu.lu@linux.intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20211128025051.355578-1-baolu.lu@linux.intel.com>
 References: <20211128025051.355578-1-baolu.lu@linux.intel.com>
@@ -60,201 +59,164 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The iommu group changes notifer is not referenced in the tree. Remove it
-to avoid dead code.
+From: Jason Gunthorpe <jgg@nvidia.com>
 
-Suggested-by: Christoph Hellwig <hch@lst.de>
+Tegra joins many platform devices onto the same iommu_domain and builds
+sort-of a DMA API on top of it.
+
+Given that iommu_attach/detatch_device_shared() has supported this usage
+model. Each device that wants to use the special domain will use
+suppress_auto_claim_dma_owner and call iommu_attach_device_shared() which
+will use dma owner framework to lock out other usages of the group and
+refcount the domain attachment.
+
+When the last device calls detatch the domain will be disconnected.
+
+Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
 ---
- include/linux/iommu.h | 23 -------------
- drivers/iommu/iommu.c | 75 -------------------------------------------
- 2 files changed, 98 deletions(-)
+ drivers/gpu/drm/tegra/dc.c   |  1 +
+ drivers/gpu/drm/tegra/drm.c  | 55 ++++++++++++++++++------------------
+ drivers/gpu/drm/tegra/gr2d.c |  1 +
+ drivers/gpu/drm/tegra/gr3d.c |  1 +
+ drivers/gpu/drm/tegra/vic.c  |  1 +
+ 5 files changed, 32 insertions(+), 27 deletions(-)
 
-diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index 8c81ba11ae8c..e7eeac801bcd 100644
---- a/include/linux/iommu.h
-+++ b/include/linux/iommu.h
-@@ -419,13 +419,6 @@ static inline void iommu_iotlb_gather_init(struct iommu_iotlb_gather *gather)
- 	};
- }
- 
--#define IOMMU_GROUP_NOTIFY_ADD_DEVICE		1 /* Device added */
--#define IOMMU_GROUP_NOTIFY_DEL_DEVICE		2 /* Pre Device removed */
--#define IOMMU_GROUP_NOTIFY_BIND_DRIVER		3 /* Pre Driver bind */
--#define IOMMU_GROUP_NOTIFY_BOUND_DRIVER		4 /* Post Driver bind */
--#define IOMMU_GROUP_NOTIFY_UNBIND_DRIVER	5 /* Pre Driver unbind */
--#define IOMMU_GROUP_NOTIFY_UNBOUND_DRIVER	6 /* Post Driver unbind */
--
- extern int bus_set_iommu(struct bus_type *bus, const struct iommu_ops *ops);
- extern int bus_iommu_probe(struct bus_type *bus);
- extern bool iommu_present(struct bus_type *bus);
-@@ -498,10 +491,6 @@ extern int iommu_group_for_each_dev(struct iommu_group *group, void *data,
- extern struct iommu_group *iommu_group_get(struct device *dev);
- extern struct iommu_group *iommu_group_ref_get(struct iommu_group *group);
- extern void iommu_group_put(struct iommu_group *group);
--extern int iommu_group_register_notifier(struct iommu_group *group,
--					 struct notifier_block *nb);
--extern int iommu_group_unregister_notifier(struct iommu_group *group,
--					   struct notifier_block *nb);
- extern int iommu_register_device_fault_handler(struct device *dev,
- 					iommu_dev_fault_handler_t handler,
- 					void *data);
-@@ -915,18 +904,6 @@ static inline void iommu_group_put(struct iommu_group *group)
- {
- }
- 
--static inline int iommu_group_register_notifier(struct iommu_group *group,
--						struct notifier_block *nb)
--{
--	return -ENODEV;
--}
--
--static inline int iommu_group_unregister_notifier(struct iommu_group *group,
--						  struct notifier_block *nb)
--{
--	return 0;
--}
--
- static inline
- int iommu_register_device_fault_handler(struct device *dev,
- 					iommu_dev_fault_handler_t handler,
-diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-index f9cb96acbac8..9cb1cebfd884 100644
---- a/drivers/iommu/iommu.c
-+++ b/drivers/iommu/iommu.c
-@@ -18,7 +18,6 @@
- #include <linux/errno.h>
- #include <linux/iommu.h>
- #include <linux/idr.h>
--#include <linux/notifier.h>
- #include <linux/err.h>
- #include <linux/pci.h>
- #include <linux/bitops.h>
-@@ -40,7 +39,6 @@ struct iommu_group {
- 	struct kobject *devices_kobj;
- 	struct list_head devices;
- 	struct mutex mutex;
--	struct blocking_notifier_head notifier;
- 	void *iommu_data;
- 	void (*iommu_data_release)(void *iommu_data);
- 	char *name;
-@@ -629,7 +627,6 @@ struct iommu_group *iommu_group_alloc(void)
- 	mutex_init(&group->mutex);
- 	INIT_LIST_HEAD(&group->devices);
- 	INIT_LIST_HEAD(&group->entry);
--	BLOCKING_INIT_NOTIFIER_HEAD(&group->notifier);
- 	group->dma_owner = DMA_OWNER_NONE;
- 
- 	ret = ida_simple_get(&iommu_group_ida, 0, 0, GFP_KERNEL);
-@@ -905,10 +902,6 @@ int iommu_group_add_device(struct iommu_group *group, struct device *dev)
- 	if (ret)
- 		goto err_put_group;
- 
--	/* Notify any listeners about change to group. */
--	blocking_notifier_call_chain(&group->notifier,
--				     IOMMU_GROUP_NOTIFY_ADD_DEVICE, dev);
--
- 	trace_add_device_to_group(group->id, dev);
- 
- 	dev_info(dev, "Adding to iommu group %d\n", group->id);
-@@ -950,10 +943,6 @@ void iommu_group_remove_device(struct device *dev)
- 
- 	dev_info(dev, "Removing from iommu group %d\n", group->id);
- 
--	/* Pre-notify listeners that a device is being removed. */
--	blocking_notifier_call_chain(&group->notifier,
--				     IOMMU_GROUP_NOTIFY_DEL_DEVICE, dev);
--
- 	mutex_lock(&group->mutex);
- 	list_for_each_entry(tmp_device, &group->devices, list) {
- 		if (tmp_device->dev == dev) {
-@@ -1076,36 +1065,6 @@ void iommu_group_put(struct iommu_group *group)
- }
- EXPORT_SYMBOL_GPL(iommu_group_put);
- 
--/**
-- * iommu_group_register_notifier - Register a notifier for group changes
-- * @group: the group to watch
-- * @nb: notifier block to signal
-- *
-- * This function allows iommu group users to track changes in a group.
-- * See include/linux/iommu.h for actions sent via this notifier.  Caller
-- * should hold a reference to the group throughout notifier registration.
-- */
--int iommu_group_register_notifier(struct iommu_group *group,
--				  struct notifier_block *nb)
--{
--	return blocking_notifier_chain_register(&group->notifier, nb);
--}
--EXPORT_SYMBOL_GPL(iommu_group_register_notifier);
--
--/**
-- * iommu_group_unregister_notifier - Unregister a notifier
-- * @group: the group to watch
-- * @nb: notifier block to signal
-- *
-- * Unregister a previously registered group notifier block.
-- */
--int iommu_group_unregister_notifier(struct iommu_group *group,
--				    struct notifier_block *nb)
--{
--	return blocking_notifier_chain_unregister(&group->notifier, nb);
--}
--EXPORT_SYMBOL_GPL(iommu_group_unregister_notifier);
--
- /**
-  * iommu_register_device_fault_handler() - Register a device fault handler
-  * @dev: the device
-@@ -1654,14 +1613,8 @@ static int remove_iommu_group(struct device *dev, void *data)
- static int iommu_bus_notifier(struct notifier_block *nb,
- 			      unsigned long action, void *data)
- {
--	unsigned long group_action = 0;
- 	struct device *dev = data;
--	struct iommu_group *group;
- 
--	/*
--	 * ADD/DEL call into iommu driver ops if provided, which may
--	 * result in ADD/DEL notifiers to group->notifier
--	 */
- 	if (action == BUS_NOTIFY_ADD_DEVICE) {
- 		int ret;
- 
-@@ -1672,34 +1625,6 @@ static int iommu_bus_notifier(struct notifier_block *nb,
- 		return NOTIFY_OK;
- 	}
- 
--	/*
--	 * Remaining BUS_NOTIFYs get filtered and republished to the
--	 * group, if anyone is listening
--	 */
--	group = iommu_group_get(dev);
--	if (!group)
--		return 0;
--
--	switch (action) {
--	case BUS_NOTIFY_BIND_DRIVER:
--		group_action = IOMMU_GROUP_NOTIFY_BIND_DRIVER;
--		break;
--	case BUS_NOTIFY_BOUND_DRIVER:
--		group_action = IOMMU_GROUP_NOTIFY_BOUND_DRIVER;
--		break;
--	case BUS_NOTIFY_UNBIND_DRIVER:
--		group_action = IOMMU_GROUP_NOTIFY_UNBIND_DRIVER;
--		break;
--	case BUS_NOTIFY_UNBOUND_DRIVER:
--		group_action = IOMMU_GROUP_NOTIFY_UNBOUND_DRIVER;
--		break;
--	}
--
--	if (group_action)
--		blocking_notifier_call_chain(&group->notifier,
--					     group_action, dev);
--
--	iommu_group_put(group);
+diff --git a/drivers/gpu/drm/tegra/dc.c b/drivers/gpu/drm/tegra/dc.c
+index a29d64f87563..3a2458f56fbc 100644
+--- a/drivers/gpu/drm/tegra/dc.c
++++ b/drivers/gpu/drm/tegra/dc.c
+@@ -3111,4 +3111,5 @@ struct platform_driver tegra_dc_driver = {
+ 	},
+ 	.probe = tegra_dc_probe,
+ 	.remove = tegra_dc_remove,
++	.suppress_auto_claim_dma_owner = true,
+ };
+diff --git a/drivers/gpu/drm/tegra/drm.c b/drivers/gpu/drm/tegra/drm.c
+index 8d37d6b00562..e6e2da799674 100644
+--- a/drivers/gpu/drm/tegra/drm.c
++++ b/drivers/gpu/drm/tegra/drm.c
+@@ -928,12 +928,15 @@ int tegra_drm_unregister_client(struct tegra_drm *tegra,
  	return 0;
  }
  
++/*
++ * Clients which use this function must set suppress_auto_claim_dma_owner in
++ * their platform_driver's device_driver struct.
++ */
+ int host1x_client_iommu_attach(struct host1x_client *client)
+ {
+ 	struct iommu_domain *domain = iommu_get_domain_for_dev(client->dev);
+ 	struct drm_device *drm = dev_get_drvdata(client->host);
+ 	struct tegra_drm *tegra = drm->dev_private;
+-	struct iommu_group *group = NULL;
+ 	int err;
+ 
+ 	/*
+@@ -941,47 +944,45 @@ int host1x_client_iommu_attach(struct host1x_client *client)
+ 	 * not the shared IOMMU domain, don't try to attach it to a different
+ 	 * domain. This allows using the IOMMU-backed DMA API.
+ 	 */
++	client->group = NULL;
+ 	if (domain && domain != tegra->domain)
++		return iommu_device_set_dma_owner(client->dev,
++						  DMA_OWNER_DMA_API, NULL);
++
++	if (!tegra->domain)
+ 		return 0;
+ 
+-	if (tegra->domain) {
+-		group = iommu_group_get(client->dev);
+-		if (!group)
+-			return -ENODEV;
+-
+-		if (domain != tegra->domain) {
+-			err = iommu_attach_group(tegra->domain, group);
+-			if (err < 0) {
+-				iommu_group_put(group);
+-				return err;
+-			}
+-		}
++	err = iommu_device_set_dma_owner(client->dev,
++					 DMA_OWNER_PRIVATE_DOMAIN, NULL);
++	if (err)
++		return err;
+ 
+-		tegra->use_explicit_iommu = true;
++	err = iommu_attach_device_shared(tegra->domain, client->dev);
++	if (err) {
++		iommu_device_release_dma_owner(client->dev,
++					       DMA_OWNER_PRIVATE_DOMAIN);
++		return err;
+ 	}
+ 
+-	client->group = group;
+-
++	tegra->use_explicit_iommu = true;
++	client->group = client->dev->iommu_group;
+ 	return 0;
+ }
+ 
+ void host1x_client_iommu_detach(struct host1x_client *client)
+ {
++	struct iommu_domain *domain = iommu_get_domain_for_dev(client->dev);
+ 	struct drm_device *drm = dev_get_drvdata(client->host);
+ 	struct tegra_drm *tegra = drm->dev_private;
+-	struct iommu_domain *domain;
+ 
+-	if (client->group) {
+-		/*
+-		 * Devices that are part of the same group may no longer be
+-		 * attached to a domain at this point because their group may
+-		 * have been detached by an earlier client.
+-		 */
+-		domain = iommu_get_domain_for_dev(client->dev);
+-		if (domain)
+-			iommu_detach_group(tegra->domain, client->group);
++	if (domain && domain != tegra->domain)
++		return iommu_device_release_dma_owner(client->dev,
++						      DMA_OWNER_DMA_API);
+ 
+-		iommu_group_put(client->group);
++	if (client->group) {
++		iommu_detach_device_shared(tegra->domain, client->dev);
++		iommu_device_release_dma_owner(client->dev,
++					       DMA_OWNER_PRIVATE_DOMAIN);
+ 		client->group = NULL;
+ 	}
+ }
+diff --git a/drivers/gpu/drm/tegra/gr2d.c b/drivers/gpu/drm/tegra/gr2d.c
+index de288cba3905..8d92141c3c86 100644
+--- a/drivers/gpu/drm/tegra/gr2d.c
++++ b/drivers/gpu/drm/tegra/gr2d.c
+@@ -271,4 +271,5 @@ struct platform_driver tegra_gr2d_driver = {
+ 	},
+ 	.probe = gr2d_probe,
+ 	.remove = gr2d_remove,
++	.suppress_auto_claim_dma_owner = true,
+ };
+diff --git a/drivers/gpu/drm/tegra/gr3d.c b/drivers/gpu/drm/tegra/gr3d.c
+index 24442ade0da3..33c4954977ab 100644
+--- a/drivers/gpu/drm/tegra/gr3d.c
++++ b/drivers/gpu/drm/tegra/gr3d.c
+@@ -400,4 +400,5 @@ struct platform_driver tegra_gr3d_driver = {
+ 	},
+ 	.probe = gr3d_probe,
+ 	.remove = gr3d_remove,
++	.suppress_auto_claim_dma_owner = true,
+ };
+diff --git a/drivers/gpu/drm/tegra/vic.c b/drivers/gpu/drm/tegra/vic.c
+index c02010ff2b7f..114df067ea00 100644
+--- a/drivers/gpu/drm/tegra/vic.c
++++ b/drivers/gpu/drm/tegra/vic.c
+@@ -527,6 +527,7 @@ struct platform_driver tegra_vic_driver = {
+ 	},
+ 	.probe = vic_probe,
+ 	.remove = vic_remove,
++	.suppress_auto_claim_dma_owner = true,
+ };
+ 
+ #if IS_ENABLED(CONFIG_ARCH_TEGRA_124_SOC)
 -- 
 2.25.1
 
