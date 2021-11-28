@@ -2,41 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 08394460832
-	for <lists+kvm@lfdr.de>; Sun, 28 Nov 2021 18:56:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 977EE460853
+	for <lists+kvm@lfdr.de>; Sun, 28 Nov 2021 19:02:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358784AbhK1R7W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 28 Nov 2021 12:59:22 -0500
-Received: from mail-qt1-f182.google.com ([209.85.160.182]:33414 "EHLO
-        mail-qt1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346095AbhK1R5V (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 28 Nov 2021 12:57:21 -0500
-Received: by mail-qt1-f182.google.com with SMTP id n15so14133120qta.0;
-        Sun, 28 Nov 2021 09:54:05 -0800 (PST)
+        id S1358755AbhK1SFf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 28 Nov 2021 13:05:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53514 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1358807AbhK1SDd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 28 Nov 2021 13:03:33 -0500
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DA88C0617A2;
+        Sun, 28 Nov 2021 09:57:02 -0800 (PST)
+Received: by mail-pl1-x62d.google.com with SMTP id b13so10249269plg.2;
+        Sun, 28 Nov 2021 09:57:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=GIVU/9w51Ef2hg0ubArEuNU4cyYrytLI0Mp9d442l5g=;
+        b=MOV5U2nrdRxFhWxyR7bOZpWlabqXOjxSoT999ssZl4Mq0S6JAhQfWyHw7OPilcdHmF
+         6BGRpZnEpe8f9bpa77XQqQiPPBLd4gqEwap2s83tCamJXoetkbl6hCD0wkZTc5ZtL81/
+         0oBwvtx8A8nEwcdqAvCz07X70fdDjUOrb88hgxJCEmCDBMTsfM8MgzFpsGuihBTo3i4/
+         BO5H2USw15PhIR9jKFnq7EoAkCha2k8c7ry0hA6yyRozC0i3UkUk9dhKZX7Fdkb9vjGS
+         8k1hfy+ikEeJEGfeYwNOOXgwgIH5nCo9f2fvYp5m9MjcvWjKnN995P4PSF7zBTJOShEa
+         Axzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=CTle792AODDh5EJBSlHCgdnz2AP0iG3Ix/URPyjXa5E=;
-        b=ayKKcGsaMPX+AGiBixvOw9Q/wrboovbodUgIipZR+9Tq8NsRSQg3yj9Pfj9D4HZY/4
-         Y3bTbs9HSxYK6ChRtkxceFNMDGPpuQNTsol38+kPYLpzB3DfTGU3J8wYixiX7pqVN9Rg
-         g+RCFfY5ra3RO6Z3f5E3l/yBfe5TVRD5kAlr8RaTlIaHNlLPHJt7vuvry6rAuF3F6t/m
-         jWf5k0daiSUbIoj0XvFiGHDFfs+9ye2Jaeri16diY61J9zwYkGzSxVxZcZgTHvdaUQot
-         /ZoEbbT7xqFCalQYRYyPEP0zyTwzLotyfmt+xlEhFqnmYnknduM9PqjtEaexb3Fn9gNz
-         MW7A==
-X-Gm-Message-State: AOAM530nLHk8EO2pKIeNJ7SucYlm9M4US4hbJph4GueL4mwY+UWO6wc+
-        Ux+A17VoSPgnhA8MRjzPipmdWL8kUA8CGQ==
-X-Google-Smtp-Source: ABdhPJx25AEVnfH0h4sZET5x0dxImad0u4ySfFGiKfI+WvQd75qCTeFgZjdPUL+9cNE2+e8o/NeT8g==
-X-Received: by 2002:ac8:5b87:: with SMTP id a7mr38253502qta.196.1638122044539;
-        Sun, 28 Nov 2021 09:54:04 -0800 (PST)
-Received: from fedora (pool-173-68-57-129.nycmny.fios.verizon.net. [173.68.57.129])
-        by smtp.gmail.com with ESMTPSA id r16sm7298126qta.46.2021.11.28.09.54.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 28 Nov 2021 09:54:03 -0800 (PST)
-Date:   Sun, 28 Nov 2021 12:54:00 -0500
-From:   Dennis Zhou <dennis@kernel.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=GIVU/9w51Ef2hg0ubArEuNU4cyYrytLI0Mp9d442l5g=;
+        b=SNOr0Vk7t+2s5St7ZpxT1BZXRRkotlRASZZHgItDe5FHMqh/Vq2973XYX0YxhxYV2R
+         sSD1LSxcgRuDiwbVjq/mC1c6DbJVWe8L+xmJZTVdo3ds0bGOHnv2GIyOKY5IySEwYo/g
+         VwAd3RoheYvjyOfH+Obm4kaTaNiOaIMTj/QOWm8SnBpkuMr5jGFKNDelpqs3RPpnFc6q
+         d24W76Wx7BbvqhYICtmP7pywWQQ/bj72P92iqZbH9TCHsYqMFL00hHHn1r3J8HkN6RU2
+         nX0Jy267as/4U9Y3pWCd35Qa9ILfdeqULZjpw/bnFYeyoG6tV94u63OOZdfwjSoikZpe
+         vbmA==
+X-Gm-Message-State: AOAM5317DfD3Phv3xb7Y2gCl7ZE7oBsX8MFIXt0fN4FF+EYD03dDAIss
+        hmaH2NP1op04j4/PZ0Iwpv7D3daa+nse8bcJcqA=
+X-Google-Smtp-Source: ABdhPJwg/YAIedkhsO4JO/I1SvpK80O+jGy4LgSO12zXzv7Z2PPdL5Fb+4vML+arhaNI5Rnxj3zFEocQ77wPSF7XA5Q=
+X-Received: by 2002:a17:902:b581:b0:144:e601:de7 with SMTP id
+ a1-20020a170902b58100b00144e6010de7mr54292000pls.71.1638122222149; Sun, 28
+ Nov 2021 09:57:02 -0800 (PST)
+MIME-Version: 1.0
+References: <20211128035704.270739-1-yury.norov@gmail.com> <20211128035704.270739-8-yury.norov@gmail.com>
+ <8f389151c39a8a5b6b31d5238cb680305225d9f2.camel@perches.com> <20211128174320.GA304543@lapt>
+In-Reply-To: <20211128174320.GA304543@lapt>
+From:   Emil Renner Berthing <emil.renner.berthing@gmail.com>
+Date:   Sun, 28 Nov 2021 18:56:51 +0100
+Message-ID: <CANBLGczYBaxES12eCurm6fELat0U-9+VbuKUG_Fea3iK6d9RVA@mail.gmail.com>
+Subject: Re: [PATCH 7/9] lib/cpumask: add num_{possible,present,active}_cpus_{eq,gt,le}
 To:     Yury Norov <yury.norov@gmail.com>
-Cc:     Joe Perches <joe@perches.com>, linux-kernel@vger.kernel.org,
+Cc:     Joe Perches <joe@perches.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         "James E.J. Bottomley" <jejb@linux.ibm.com>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
         "Paul E. McKenney" <paulmck@kernel.org>,
@@ -116,30 +134,20 @@ Cc:     Joe Perches <joe@perches.com>, linux-kernel@vger.kernel.org,
         Vlastimil Babka <vbabka@suse.cz>,
         Will Deacon <will@kernel.org>,
         bcm-kernel-feedback-list@broadcom.com, kvm@vger.kernel.org,
-        linux-alpha@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-alpha@vger.kernel.org,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
         linux-crypto@vger.kernel.org, linux-csky@vger.kernel.org,
         linux-ia64@vger.kernel.org, linux-mips@vger.kernel.org,
         linux-mm@kvack.org, linux-perf-users@vger.kernel.org,
-        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-snps-arc@lists.infradead.org, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH 7/9] lib/cpumask: add
- num_{possible,present,active}_cpus_{eq,gt,le}
-Message-ID: <YaPCOPqpI/oKrTXl@fedora>
-References: <20211128035704.270739-1-yury.norov@gmail.com>
- <20211128035704.270739-8-yury.norov@gmail.com>
- <8f389151c39a8a5b6b31d5238cb680305225d9f2.camel@perches.com>
- <20211128174320.GA304543@lapt>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211128174320.GA304543@lapt>
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        linux-s390@vger.kernel.org, linux-snps-arc@lists.infradead.org,
+        linuxppc-dev@lists.ozlabs.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
-
-On Sun, Nov 28, 2021 at 09:43:20AM -0800, Yury Norov wrote:
+On Sun, 28 Nov 2021 at 18:43, Yury Norov <yury.norov@gmail.com> wrote:
 > On Sun, Nov 28, 2021 at 09:07:52AM -0800, Joe Perches wrote:
 > > On Sat, 2021-11-27 at 19:57 -0800, Yury Norov wrote:
 > > > Add num_{possible,present,active}_cpus_{eq,gt,le} and replace num_*_cpus()
@@ -149,36 +157,16 @@ On Sun, Nov 28, 2021 at 09:43:20AM -0800, Yury Norov wrote:
 > > > diff --git a/arch/arc/kernel/smp.c b/arch/arc/kernel/smp.c
 > > []
 > > > @@ -103,7 +103,7 @@ void __init smp_prepare_cpus(unsigned int max_cpus)
-> > >  	 * if platform didn't set the present map already, do it now
-> > >  	 * boot cpu is set to present already by init/main.c
-> > >  	 */
-> > > -	if (num_present_cpus() <= 1)
-> > > +	if (num_present_cpus_le(2))
-> > >  		init_cpu_present(cpu_possible_mask);
-> > 
+> > >      * if platform didn't set the present map already, do it now
+> > >      * boot cpu is set to present already by init/main.c
+> > >      */
+> > > -   if (num_present_cpus() <= 1)
+> > > +   if (num_present_cpus_le(2))
+> > >             init_cpu_present(cpu_possible_mask);
+> >
 > > ?  is this supposed to be 2 or 1
-> 
+>
 > X <= 1 is the equivalent of X < 2.
-> 
-> > > diff --git a/drivers/cpufreq/pcc-cpufreq.c b/drivers/cpufreq/pcc-cpufreq.c
-> > []
-> > > @@ -593,7 +593,7 @@ static int __init pcc_cpufreq_init(void)
-> > >  		return ret;
-> > >  	}
-> > >  
-> > > -	if (num_present_cpus() > 4) {
-> > > +	if (num_present_cpus_gt(4)) {
-> > >  		pcc_cpufreq_driver.flags |= CPUFREQ_NO_AUTO_DYNAMIC_SWITCHING;
-> > >  		pr_err("%s: Too many CPUs, dynamic performance scaling disabled\n",
-> > >  		       __func__);
-> > 
-> > It looks as if the present variants should be using the same values
-> > so the _le test above with 1 changed to 2 looks odd.
->  
 
-I think the confusion comes from le meaning less than rather than lt.
-Given the general convention of: lt (<), le (<=), eg (=), ge (>=),
-gt (>), I'd consider renaming your le to lt.
-
-Thanks,
-Dennis
+Ah, then the function is confusing. Usually it's lt = less than and lt
+= less than or equal. Same idea for gt vs ge.
