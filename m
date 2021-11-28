@@ -2,54 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4FACB460502
-	for <lists+kvm@lfdr.de>; Sun, 28 Nov 2021 07:36:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D8EA0460531
+	for <lists+kvm@lfdr.de>; Sun, 28 Nov 2021 09:03:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344015AbhK1GkG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 28 Nov 2021 01:40:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47668 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232356AbhK1GiF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 28 Nov 2021 01:38:05 -0500
-Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47D87C061574;
-        Sat, 27 Nov 2021 22:34:50 -0800 (PST)
-Received: by mail-qt1-x82f.google.com with SMTP id p19so13083910qtw.12;
-        Sat, 27 Nov 2021 22:34:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:mime-version:content-disposition
-         :content-transfer-encoding:in-reply-to;
-        bh=rKuklq8jxCETHcjcAENlFbP3nl/uNBZqDfuGt3bzd1Q=;
-        b=N/urFmV2NmOFP42e1LVLW8fwa/hr9KDv3ZUpw+lC8WGtW8rc7tWztvbdFPuGBjub1O
-         wspFhVe7cCjM3GiHaTs/o61wPhHvRulBbX8eWk+oUvPHasNmnTk9fguzetRPFqMAMSbw
-         NSq70yUrota4HuwP2mw6e4EdU69PrQnC7+N7r+KW5WUjDm+ME76HZpk50UYeWuhhvrtv
-         jzlo36RajlwI73FqiorEZUjBdSjpmlO3li6nkrgdjIjD0UyBvsHE9SsWB4qkZCd+owE5
-         cwmTSVDOhxhxddNAGQkE0CL6sKvMvIJPhAZNBZoNO0tLt8RIHXr/GUyMzCFG050MR/6f
-         IXaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=rKuklq8jxCETHcjcAENlFbP3nl/uNBZqDfuGt3bzd1Q=;
-        b=Pa80BKMN59lCsJjnNbgSKArKhYsSHTbwTyZdaLszu61Eq1nWBjNEjQOHxz7EdvC7vL
-         oSrFrUT8QYtWq8xbe0sRfmtof1vQjHid40cNlXnlK3Mqlrz4knwp1vv0QswMbS0LlMBb
-         wpOcDBBuXSAzIB15fSgwSph31VG5R5db6uJrmjcbUlMsSK3SCAWlO8ZvXCwtWGok3Hhg
-         bYYyxsuz9uJFWaVuQHyMZUTLpb7HwJapCl/iQ1CEDgtuDS6zhSe5UF0uRLR5BDgqWEBe
-         DeSMR4qUsze6spOYQrbR9cg2nfwoIVXhXOIvHwD3ZvK+AzZpJh5LCC51RTpPoODwdTPs
-         F1vw==
-X-Gm-Message-State: AOAM5326QRBlJ8UUkGW7nDB1bnPZnFyQb+S0TIdkKqiv+KG9AYU1uGAS
-        DwwMJd341SsMv1Gst8Ree84=
-X-Google-Smtp-Source: ABdhPJyJzVPAC11UsMz+HJsW0TzZJUpS9rijQwW94Vpknlgpg+/mG8cwCXUq1qsThYXJdJN6S8tP7Q==
-X-Received: by 2002:ac8:5fcc:: with SMTP id k12mr35432768qta.346.1638081289128;
-        Sat, 27 Nov 2021 22:34:49 -0800 (PST)
-Received: from localhost ([66.216.211.25])
-        by smtp.gmail.com with ESMTPSA id f18sm6419326qko.34.2021.11.27.22.34.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 27 Nov 2021 22:34:48 -0800 (PST)
-Date:   Sat, 27 Nov 2021 22:34:47 -0800
-From:   Yury Norov <yury.norov@gmail.com>
-To:     =?utf-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>
+        id S1356812AbhK1IHG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 28 Nov 2021 03:07:06 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:39560 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1356924AbhK1IFF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 28 Nov 2021 03:05:05 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id D1043B80B51;
+        Sun, 28 Nov 2021 08:01:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E507C004E1;
+        Sun, 28 Nov 2021 08:01:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1638086506;
+        bh=b48YjTY/pVez8afNE+wzU+3WaQKxxQEURvaxADRtwDg=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Cf1UpbBDGUG/i+3B7710UJDtWCf5AiS+xYwJdJrswHkaMxwXqtghSrAeHqtG4ZEHm
+         kjNjM7/02WtoShcjN6FHzZa/U5USbrnlhn4XjHsJy9PjfumjC3FQHsmSzJbZZYb97a
+         uqjFGttZAm3d3AQ44noz4515EJlyQkKjujhY+AU0=
+Date:   Sun, 28 Nov 2021 09:01:41 +0100
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Yury Norov <yury.norov@gmail.com>
 Cc:     linux-kernel@vger.kernel.org,
         "James E.J. Bottomley" <jejb@linux.ibm.com>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
@@ -78,7 +56,6 @@ Cc:     linux-kernel@vger.kernel.org,
         Dinh Nguyen <dinguyen@kernel.org>,
         Geetha sowjanya <gakula@marvell.com>,
         Geert Uytterhoeven <geert@linux-m68k.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Guo Ren <guoren@kernel.org>,
         Hans de Goede <hdegoede@redhat.com>,
         Heiko Carstens <hca@linux.ibm.com>,
@@ -136,41 +113,72 @@ Cc:     linux-kernel@vger.kernel.org,
         linux-mm@kvack.org, linux-perf-users@vger.kernel.org,
         linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
         linux-snps-arc@lists.infradead.org, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH 7/9] lib/cpumask: add
- num_{possible,present,active}_cpus_{eq,gt,le}
-Message-ID: <20211128063447.GA270945@lapt>
+Subject: Re: [PATCH 3/9] all: replace bitmap_weigth() with
+ bitmap_{empty,full,eq,gt,le}
+Message-ID: <YaM3ZeQS4tHzsRkK@kroah.com>
+References: <20211128035704.270739-1-yury.norov@gmail.com>
+ <20211128035704.270739-4-yury.norov@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <YaMME60Jfiz5BeJF@qmqm.qmqm.pl>
+In-Reply-To: <20211128035704.270739-4-yury.norov@gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-(restore CC list)
-
-On Sun, Nov 28, 2021 at 05:56:51AM +0100, Michał Mirosław wrote:
-> On Sat, Nov 27, 2021 at 07:57:02PM -0800, Yury Norov wrote:
-> > Add num_{possible,present,active}_cpus_{eq,gt,le} and replace num_*_cpus()
-> > with one of new functions where appropriate. This allows num_*_cpus_*()
-> > to return earlier depending on the condition.
-> [...]
-> > @@ -3193,7 +3193,7 @@ int __init pcpu_page_first_chunk(size_t reserved_size,
-> >  
-> >  	/* allocate pages */
-> >  	j = 0;
-> > -	for (unit = 0; unit < num_possible_cpus(); unit++) {
-> > +	for (unit = 0; num_possible_cpus_gt(unit); unit++) {
+On Sat, Nov 27, 2021 at 07:56:58PM -0800, Yury Norov wrote:
+> bitmap_weight() counts all set bits in the bitmap unconditionally.
+> However in some cases we can traverse a part of bitmap when we
+> only need to check if number of set bits is greater, less or equal
+> to some number.
 > 
-> This looks dubious.
+> This patch replaces bitmap_weight() with one of
+> bitmap_{empty,full,eq,gt,le), as appropriate.
+> 
+> In some places driver code has been optimized further, where it's
+> trivial.
+> 
+> Signed-off-by: Yury Norov <yury.norov@gmail.com>
+> ---
+>  arch/nds32/kernel/perf_event_cpu.c                 |  4 +---
+>  arch/x86/kernel/cpu/resctrl/rdtgroup.c             |  4 ++--
+>  arch/x86/kvm/hyperv.c                              |  8 ++++----
+>  drivers/crypto/ccp/ccp-dev-v5.c                    |  5 +----
+>  drivers/gpu/drm/msm/disp/mdp5/mdp5_smp.c           |  2 +-
+>  drivers/iio/adc/mxs-lradc-adc.c                    |  3 +--
+>  drivers/iio/dummy/iio_simple_dummy_buffer.c        |  4 ++--
+>  drivers/iio/industrialio-buffer.c                  |  2 +-
+>  drivers/iio/industrialio-trigger.c                 |  2 +-
+>  drivers/memstick/core/ms_block.c                   |  4 ++--
+>  drivers/net/dsa/b53/b53_common.c                   |  2 +-
+>  drivers/net/ethernet/broadcom/bcmsysport.c         |  6 +-----
+>  drivers/net/ethernet/intel/ice/ice_virtchnl_pf.c   |  4 ++--
+>  drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c     |  2 +-
+>  .../ethernet/marvell/octeontx2/nic/otx2_ethtool.c  |  2 +-
+>  .../ethernet/marvell/octeontx2/nic/otx2_flows.c    |  8 ++++----
+>  .../net/ethernet/marvell/octeontx2/nic/otx2_pf.c   |  2 +-
+>  drivers/net/ethernet/mellanox/mlx4/cmd.c           | 10 +++-------
+>  drivers/net/ethernet/mellanox/mlx4/eq.c            |  4 ++--
+>  drivers/net/ethernet/mellanox/mlx4/main.c          |  2 +-
+>  .../net/ethernet/mellanox/mlx5/core/en_ethtool.c   |  2 +-
+>  drivers/net/ethernet/qlogic/qed/qed_dev.c          |  3 +--
+>  drivers/net/ethernet/qlogic/qed/qed_rdma.c         |  4 ++--
+>  drivers/net/ethernet/qlogic/qed/qed_roce.c         |  2 +-
+>  drivers/perf/arm-cci.c                             |  2 +-
+>  drivers/perf/arm_pmu.c                             |  4 ++--
+>  drivers/perf/hisilicon/hisi_uncore_pmu.c           |  2 +-
+>  drivers/perf/thunderx2_pmu.c                       |  3 +--
+>  drivers/perf/xgene_pmu.c                           |  2 +-
+>  drivers/pwm/pwm-pca9685.c                          |  2 +-
+>  drivers/staging/media/tegra-video/vi.c             |  2 +-
+>  drivers/thermal/intel/intel_powerclamp.c           | 10 ++++------
+>  fs/ocfs2/cluster/heartbeat.c                       | 14 +++++++-------
+>  33 files changed, 57 insertions(+), 75 deletions(-)
 
-Only this?
+After you get the new functions added to the kernel tree, this patch
+should be broken up into one-patch-per-subsystem and submitted through
+the various subsystem trees.
 
-> The old version I could hope the compiler would call
-> num_possible_cpus() only once if it's marked const or pure, but the
-> alternative is going to count the bits every time making this a guaranteed
-> O(n^2) even though the bitmap doesn't change.
+thanks,
 
-num_possible_cpus() is not const neither pure. This is O(n^2) before and after.
-
+greg k-h
