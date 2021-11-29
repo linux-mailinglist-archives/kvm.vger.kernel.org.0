@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C72C4621B5
-	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 21:08:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AD8EF4621B3
+	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 21:08:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233598AbhK2UMJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Nov 2021 15:12:09 -0500
-Received: from sin.source.kernel.org ([145.40.73.55]:50856 "EHLO
-        sin.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241950AbhK2UKI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Nov 2021 15:10:08 -0500
+        id S233189AbhK2UL4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Nov 2021 15:11:56 -0500
+Received: from ams.source.kernel.org ([145.40.68.75]:42322 "EHLO
+        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235687AbhK2UJ4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Nov 2021 15:09:56 -0500
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id DC91ACE1582
-        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 20:06:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57588C53FD0;
-        Mon, 29 Nov 2021 20:06:48 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 562E2B815EB
+        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 20:06:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D2EDC53FCF;
+        Mon, 29 Nov 2021 20:06:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1638216408;
-        bh=5RWTuHCcT/NzXwjHXEmEf2WlTNGpWMr+EAFCdFEO4UA=;
+        s=k20201202; t=1638216396;
+        bh=H3AaFkblo8PjcjwlndSlAD9qu3bXi9UTi+PNsCoShEk=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=hj7A7QRdCifiqUwhQXxUiyS1K/kg+1DXLRYtYgx++mxLK+DXxN0dOu63VggZrkTet
-         pOGcfv6YFWR5X1XPCzKRUbahZI2zChMnNbQYcBjDBFBgqAFcrPcZDJTvtpFUJu6eIp
-         w2aHqlJ6oxxOYK3UKjEzeWLjSVGexGoPtMum0GxogOsoMVnYwH1NXL4slIX2wTqknE
-         Blw7mpyqaMQsykhQKj9wC0VoLoG4+kBIdSPg/Pc6iUi557T2qbekySX/1Wekd4t3UX
-         LAXQKY9Crwk/fp7BlGBLALhIVM4/TKYKYiKuVXOzL3KqCREvXh6aTW8L1Zt9PmxL1S
-         lE/5fPyKUyKDQ==
+        b=EadVzWt9vGMarSCDkpBlahNGeixUO+siTuCrFLHOUWmRpgKkQ9zq23Ga6cnJ6BPzx
+         6sY1g/L/fDaxGB/6NwCs6cn3lo9F7hRIjpYVxFdCsbEvvJpkSW3Lu2jTwuQPS+RkKz
+         HJeI2FL2pFpdw4Qm0ReGLMHi5v2eG58XtHSb/MDWUKFfwQomivGHyNeEcVCb44POZp
+         X4SYulSk/iPXVX0Dp8kL/PJpcooBC6LtTUN2jV0LIXLkiF3fTRp4232AMQ7k6soYne
+         pluycdg/SekzgZDomuqmT3O4kNKgup9yTzKlJU9KXfsdelrOiHfFUgwlcryc/mBCwU
+         lgOd2V9tUJRpQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1mrmqr-008gvR-Et; Mon, 29 Nov 2021 20:02:13 +0000
+        id 1mrmqt-008gvR-Bd; Mon, 29 Nov 2021 20:02:15 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
@@ -45,9 +45,9 @@ Cc:     Andre Przywara <andre.przywara@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         kernel-team@android.com
-Subject: [PATCH v5 13/69] KVM: arm64: nv: Reset VMPIDR_EL2 and VPIDR_EL2 to sane values
-Date:   Mon, 29 Nov 2021 20:00:54 +0000
-Message-Id: <20211129200150.351436-14-maz@kernel.org>
+Subject: [PATCH v5 19/69] KVM: arm64: nv: Handle SPSR_EL2 specially
+Date:   Mon, 29 Nov 2021 20:01:00 +0000
+Message-Id: <20211129200150.351436-20-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211129200150.351436-1-maz@kernel.org>
 References: <20211129200150.351436-1-maz@kernel.org>
@@ -61,68 +61,129 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Christoffer Dall <christoffer.dall@arm.com>
+SPSR_EL2 needs special attention when running nested on ARMv8.3:
 
-The VMPIDR_EL2 and VPIDR_EL2 are architecturally UNKNOWN at reset, but
-let's be nice to a guest hypervisor behaving foolishly and reset these
-to something reasonable anyway.
+If taking an exception while running at vEL2 (actually EL1), the
+HW will update the SPSR_EL1 register with the EL1 mode. We need
+to track this in order to make sure that accesses to the virtual
+view of SPSR_EL2 is correct.
 
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+To do so, we place an illegal value in SPSR_EL1.M, and patch it
+accordingly if required when accessing it.
+
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 25 +++++++++++++++++++++----
- 1 file changed, 21 insertions(+), 4 deletions(-)
+ arch/arm64/include/asm/kvm_emulate.h | 37 ++++++++++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c            | 23 +++++++++++++++--
+ 2 files changed, 58 insertions(+), 2 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 46c849ba281e..2db11ff3fdad 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -241,6 +241,43 @@ static inline bool is_hyp_ctxt(const struct kvm_vcpu *vcpu)
+ 	return __is_hyp_ctxt(&vcpu->arch.ctxt);
+ }
+ 
++static inline u64 __fixup_spsr_el2_write(struct kvm_cpu_context *ctxt, u64 val)
++{
++	if (!__vcpu_el2_e2h_is_set(ctxt)) {
++		/*
++		 * Clear the .M field when writing SPSR to the CPU, so that we
++		 * can detect when the CPU clobbered our SPSR copy during a
++		 * local exception.
++		 */
++		val &= ~0xc;
++	}
++
++	return val;
++}
++
++static inline u64 __fixup_spsr_el2_read(const struct kvm_cpu_context *ctxt, u64 val)
++{
++	if (__vcpu_el2_e2h_is_set(ctxt))
++		return val;
++
++	/*
++	 * SPSR.M == 0 means the CPU has not touched the SPSR, so the
++	 * register has still the value we saved on the last write.
++	 */
++	if ((val & 0xc) == 0)
++		return ctxt_sys_reg(ctxt, SPSR_EL2);
++
++	/*
++	 * Otherwise there was a "local" exception on the CPU,
++	 * which from the guest's point of view was being taken from
++	 * EL2 to EL2, although it actually happened to be from
++	 * EL1 to EL1.
++	 * So we need to fix the .M field in SPSR, to make it look
++	 * like EL2, which is what the guest would expect.
++	 */
++	return (val & ~0x0c) | CurrentEL_EL2;
++}
++
+ /*
+  * The layout of SPSR for an AArch32 state is different when observed from an
+  * AArch64 SPSR_ELx or an AArch32 SPSR_*. This function generates the AArch32
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index a23701f29858..730a24468915 100644
+index 61596355e42d..875040bcfbe1 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -618,7 +618,7 @@ static void reset_actlr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
- 	vcpu_write_sys_reg(vcpu, actlr, ACTLR_EL1);
+@@ -133,11 +133,14 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+ 			goto memory_read;
+ 
+ 		/*
+-		 * ELR_EL2 is special cased for now.
++		 * ELR_EL2 and SPSR_EL2 are special cased for now.
+ 		 */
+ 		switch (reg) {
+ 		case ELR_EL2:
+ 			return read_sysreg_el1(SYS_ELR);
++		case SPSR_EL2:
++			val = read_sysreg_el1(SYS_SPSR);
++			return __fixup_spsr_el2_read(&vcpu->arch.ctxt, val);
+ 		}
+ 
+ 		/*
+@@ -194,6 +197,10 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
+ 		case ELR_EL2:
+ 			write_sysreg_el1(val, SYS_ELR);
+ 			return;
++		case SPSR_EL2:
++			val = __fixup_spsr_el2_write(&vcpu->arch.ctxt, val);
++			write_sysreg_el1(val, SYS_SPSR);
++			return;
+ 		}
+ 
+ 		/* No EL1 counterpart? We're done here.? */
+@@ -1620,6 +1627,18 @@ static bool access_sp_el1(struct kvm_vcpu *vcpu,
+ 	return true;
  }
  
--static void reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-+static u64 compute_reset_mpidr(struct kvm_vcpu *vcpu)
- {
- 	u64 mpidr;
- 
-@@ -632,7 +632,24 @@ static void reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
- 	mpidr = (vcpu->vcpu_id & 0x0f) << MPIDR_LEVEL_SHIFT(0);
- 	mpidr |= ((vcpu->vcpu_id >> 4) & 0xff) << MPIDR_LEVEL_SHIFT(1);
- 	mpidr |= ((vcpu->vcpu_id >> 12) & 0xff) << MPIDR_LEVEL_SHIFT(2);
--	vcpu_write_sys_reg(vcpu, (1ULL << 31) | mpidr, MPIDR_EL1);
-+	mpidr |= (1ULL << 31);
++static bool access_spsr_el2(struct kvm_vcpu *vcpu,
++			    struct sys_reg_params *p,
++			    const struct sys_reg_desc *r)
++{
++	if (p->is_write)
++		vcpu_write_sys_reg(vcpu, p->regval, SPSR_EL2);
++	else
++		p->regval = vcpu_read_sys_reg(vcpu, SPSR_EL2);
 +
-+	return mpidr;
++	return true;
 +}
 +
-+static void reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-+{
-+	vcpu_write_sys_reg(vcpu, compute_reset_mpidr(vcpu), MPIDR_EL1);
-+}
-+
-+static void reset_vmpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-+{
-+	vcpu_write_sys_reg(vcpu, compute_reset_mpidr(vcpu), VMPIDR_EL2);
-+}
-+
-+static void reset_vpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
-+{
-+	vcpu_write_sys_reg(vcpu, read_cpuid_id(), VPIDR_EL2);
- }
+ /*
+  * Architected system registers.
+  * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
+@@ -2052,7 +2071,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_VTCR_EL2), access_rw, reset_val, VTCR_EL2, 0 },
  
- static unsigned int pmu_visibility(const struct kvm_vcpu *vcpu,
-@@ -1882,8 +1899,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ PMU_SYS_REG(SYS_PMCCFILTR_EL0), .access = access_pmu_evtyper,
- 	  .reset = reset_val, .reg = PMCCFILTR_EL0, .val = 0 },
+ 	{ SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
+-	{ SYS_DESC(SYS_SPSR_EL2), access_rw, reset_val, SPSR_EL2, 0 },
++	{ SYS_DESC(SYS_SPSR_EL2), access_spsr_el2, reset_val, SPSR_EL2, 0 },
+ 	{ SYS_DESC(SYS_ELR_EL2), access_rw, reset_val, ELR_EL2, 0 },
+ 	{ SYS_DESC(SYS_SP_EL1), access_sp_el1},
  
--	{ SYS_DESC(SYS_VPIDR_EL2), access_rw, reset_val, VPIDR_EL2, 0 },
--	{ SYS_DESC(SYS_VMPIDR_EL2), access_rw, reset_val, VMPIDR_EL2, 0 },
-+	{ SYS_DESC(SYS_VPIDR_EL2), access_rw, reset_vpidr, VPIDR_EL2 },
-+	{ SYS_DESC(SYS_VMPIDR_EL2), access_rw, reset_vmpidr, VMPIDR_EL2 },
- 
- 	{ SYS_DESC(SYS_SCTLR_EL2), access_sctlr_el2, reset_val, SCTLR_EL2, SCTLR_EL2_RES1 },
- 	{ SYS_DESC(SYS_ACTLR_EL2), access_rw, reset_val, ACTLR_EL2, 0 },
 -- 
 2.30.2
 
