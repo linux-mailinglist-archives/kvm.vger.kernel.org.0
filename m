@@ -2,83 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 893CC4624DD
-	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 23:29:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B2A224624D8
+	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 23:28:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231975AbhK2WcT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Nov 2021 17:32:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60674 "EHLO
+        id S231501AbhK2WbW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Nov 2021 17:31:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60516 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230388AbhK2WcB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Nov 2021 17:32:01 -0500
-Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C65CC0613F2
-        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 14:20:05 -0800 (PST)
-Received: by mail-lj1-x22b.google.com with SMTP id t11so37268848ljh.6
-        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 14:20:04 -0800 (PST)
+        with ESMTP id S229540AbhK2WbS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Nov 2021 17:31:18 -0500
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91634C0698E6
+        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 14:28:00 -0800 (PST)
+Received: by mail-pf1-x434.google.com with SMTP id r130so18498290pfc.1
+        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 14:28:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=gjDXjTb2S4YdT6O3f7qNTTb1NJzMdjs/cBxmgHAdDVY=;
-        b=UpAucgfoCVQYq+csJVFaM89/8myyHMKIJT1Vpy6+DXjtcLYb5geF4KKW4d4aR/XfOV
-         3suwyWdPFQMKRslkyk2YJZv+qFYehshNU6c/fXkqwdv2W0ATJstjbUgvtIFAuJEqFncb
-         6D/nHv8ar6h8nJ/LAnxPBlU0JdwfPj8hGwpE7ktdPO5lmoChBoPsHYZjlkSeHUUUiJSk
-         +XQhpekheKSqaVELaRukMyV2OTTlFhXM7anRYsqxpF+vxSoIA7XqaK+sXe6vZ8fy43Kd
-         TV+Lbg7f7nEl1NkHmInYFZtVbXm6qVTMXOwy9F+cf8gvNQcrUuYonpY87QKT4mK7ANt5
-         mJVQ==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=eS0xBQSNpWM8rifaE/0iM5kGD78qcIWMWAK2A3ymkdA=;
+        b=PWdoqGdu4TF8dO7Kpd7AP7ISxaGSg6Cu4pA3K4SoRCDZiAnpuuGsd+hBmdl3/y/naO
+         P18oIBNf556ugqw/0t7NygXXx8s8lA9vJRn3/apF26Zz7pFmmZD+xWkdn3rsLAm4lX3K
+         rWKi3zQC40NfUZ1wlGfeYTNRv4XTxe2E1hN2272GTwui5BVLBik2TYvD1in6YTKiNc5Y
+         zjxWQqZLNE1qfkOPOD11c/Yrhzia1RavRjri00C6i2bav1BHxGauGTIae5RlbuUSqGlO
+         7C/3lfQF17wkXpScoAAAGvbnMldkgTXjEz74eVZxiFBSGIE5Lve9fKBlxE5VCyN68Xlt
+         lkKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=gjDXjTb2S4YdT6O3f7qNTTb1NJzMdjs/cBxmgHAdDVY=;
-        b=KPe5bMwE9rOUr2DmETEwOiiFNixARB3xocpiFF6T4dmJeRjvwnCqkXkyibiu3Z5cqx
-         Z2yJFufUrn0bDcRv9z5c1zoz9sl4h5lEw1mpUhsY1xfYp8+AKGJsuRU6qcVUA/srQWK7
-         ucLpzqr0ABSqgS8WpArH0YIsvADkoDfKa3scaI+QMcFjuuGqGmka6zAn4ZWkkeiWOsqX
-         Q72/qWCb5SY/1O25Zg6IRbljVgG64D7PsaInc0GN8Bo9UHsa7BOTEiBSE5HryOIqGbf7
-         UvE7s+7YFAYFoOoMf8i0easNkiSWi1371VlcmBD15E7EaKCWTun9Ooobtk6YvZZJzFeU
-         67ww==
-X-Gm-Message-State: AOAM530V+L8NSZbc0LE2UARE1Y6K8PCR/7mQaaVz+eQE8qpmNmQ96oW1
-        N2WnzZQxyuGfiFeJ86Tq8lyCVQmJEb+5m63EkcpkCvsZMJnNsQ==
-X-Google-Smtp-Source: ABdhPJwRyODR1G2Qd+Gm1zGVtDC6Ox5M8wlESUlXUBwwqPioTQfRFnUGrTpxp7oxqhtuFPjM8F2yowDIj906OEA6Zsg=
-X-Received: by 2002:a2e:98c6:: with SMTP id s6mr35377513ljj.49.1638224403135;
- Mon, 29 Nov 2021 14:20:03 -0800 (PST)
-MIME-Version: 1.0
-References: <20211015195530.301237-1-jmattson@google.com> <ec57f5d2-f3bb-1fa6-bcdf-9217608756f5@redhat.com>
-In-Reply-To: <ec57f5d2-f3bb-1fa6-bcdf-9217608756f5@redhat.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Mon, 29 Nov 2021 14:19:36 -0800
-Message-ID: <CALzav=c63DpoBYzhkWeU20tiiH7uv1HfsUaM=RFTuAWOZSybMg@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH v2 0/3] Regression test for L1 LDTR
- persistence bug
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=eS0xBQSNpWM8rifaE/0iM5kGD78qcIWMWAK2A3ymkdA=;
+        b=xn7h2/TOKab5C8VCr4zEXGGjlT+WpeqIsF94QiTYEl01V+xsE9l2cRtB/LacSE5avU
+         4/7KUpltUuJOucrSWqKS2BmaIqeCFWCvgchkNUhlIJGBXez1MCvjsauY5d8OWHlIr8Lg
+         P5OuJUK7/vTyOmqbcgqninuka82wbf3F8xH3jW8GxhXuNDvJH6JIHE535FGJQkt9YkBj
+         4BkXvOylaa3lJZyWmoNTxi6wZq0RlplnNXCTf29bX/0lJSniclrLlEii6Zbq4gT0OxuW
+         ank2O4EQ6M0akYBkj7KBmmcGvThnwDwYLlsTnH3PCZd47V/wkJ9XmcpyyxYqPjqKQyuX
+         HA6w==
+X-Gm-Message-State: AOAM53259u+vFTFAi3QY0TmETMzeM6TtYrql1flcfGo6MJ6WDW6AISwF
+        /y5L2aYGZX/On9OmSm24ctGdRA==
+X-Google-Smtp-Source: ABdhPJzaVzvyLzh0ispHWCx0+vAn/2fDXv42xJJZ6n6j2Jk1cI+5pyPsP4sgJd34CptCRfBxcxrpag==
+X-Received: by 2002:a05:6a00:178c:b0:4a2:f71e:36aa with SMTP id s12-20020a056a00178c00b004a2f71e36aamr42059423pfg.68.1638224879958;
+        Mon, 29 Nov 2021 14:27:59 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id c3sm19414634pfv.67.2021.11.29.14.27.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Nov 2021 14:27:59 -0800 (PST)
+Date:   Mon, 29 Nov 2021 22:27:55 +0000
+From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        pgonda@google.com
+Subject: Re: [PATCH 04/12] KVM: SEV: do not use list_replace_init on an empty
+ list
+Message-ID: <YaVT638kTtgF64/i@google.com>
+References: <20211123005036.2954379-1-pbonzini@redhat.com>
+ <20211123005036.2954379-5-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211123005036.2954379-5-pbonzini@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 10, 2021 at 1:45 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 10/15/21 21:55, Jim Mattson wrote:
-> > This issue is significant enough that it warrants a regression
-> > test. Unfortunately, at the moment, the best we can do is check for
-> > the LDTR persistence bug. I'd like to be able to trigger a
-> > save/restore from within the L2 guest, but AFAICT, there's no way to
-> > do that under qemu. Does anyone want to implement a qemu ISA test
-> > device that triggers a save/restore when its configured I/O port is
-> > written to?
->
-> The selftests infrastructure already has save/restore tests at
-> instruction granularity (state_test.c) so you should have more luck that
-> way; these tests are worthwhile anyway.
+On Mon, Nov 22, 2021, Paolo Bonzini wrote:
+> list_replace_init cannot be used if the source is an empty list,
+> because "new->next->prev = new" will overwrite "old->next":
+> 
+> 				new				old
+> 				prev = new, next = new		prev = old, next = old
+> new->next = old->next		prev = new, next = old		prev = old, next = old
+> new->next->prev = new		prev = new, next = old		prev = old, next = new
+> new->prev = old->prev		prev = old, next = old		prev = old, next = old
+> new->next->prev = new		prev = old, next = old		prev = new, next = new
+> 
+> The desired outcome instead would be to leave both old and new the same
+> as they were (two empty circular lists).  Use list_cut_before, which
+> already has the necessary check and is documented to discard the
+> previous contents of the list that will hold the result.
+> 
+> Fixes: b56639318bb2 ("KVM: SEV: Add support for SEV intra host migration")
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  arch/x86/kvm/svm/sev.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 21ac0a5de4e0..75955beb3770 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -1613,8 +1613,7 @@ static void sev_migrate_from(struct kvm_sev_info *dst,
+>  	src->handle = 0;
+>  	src->pages_locked = 0;
+>  
+> -	INIT_LIST_HEAD(&dst->regions_list);
+> -	list_replace_init(&src->regions_list, &dst->regions_list);
+> +	list_cut_before(&dst->regions_list, &src->regions_list, &src->regions_list);
 
-There is also (I just discovered) support for guest-triggerable
-migration in the kvm-unit-tests [1]. You could use that to trigger a
-save/restore.
+Yeesh, that is tricky.  A list_move_all() helper in list.h to do 
 
-[1] Example: https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/blob/master/arm/gic.c#L798
+	list_cut_before(dst, src, src);
 
->
-> Paolo
->
+would be nice.
+
+Reviewed-by: Sean Christopherson <seanjc@google.com>
+
+>  }
+>  
+>  static int sev_es_migrate_from(struct kvm *dst, struct kvm *src)
+> -- 
+> 2.27.0
+> 
+> 
