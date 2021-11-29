@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AD8EF4621B3
-	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 21:08:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C8254621B1
+	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 21:08:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233189AbhK2UL4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Nov 2021 15:11:56 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:42322 "EHLO
-        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235687AbhK2UJ4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Nov 2021 15:09:56 -0500
+        id S233130AbhK2ULw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Nov 2021 15:11:52 -0500
+Received: from sin.source.kernel.org ([145.40.73.55]:50696 "EHLO
+        sin.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230220AbhK2UJs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Nov 2021 15:09:48 -0500
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 562E2B815EB
-        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 20:06:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D2EDC53FCF;
-        Mon, 29 Nov 2021 20:06:36 +0000 (UTC)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 09FC1CE13F9
+        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 20:06:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 576C4C53FAD;
+        Mon, 29 Nov 2021 20:06:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1638216396;
-        bh=H3AaFkblo8PjcjwlndSlAD9qu3bXi9UTi+PNsCoShEk=;
+        s=k20201202; t=1638216387;
+        bh=r0zuLK3lw1N9AgFVnRFi6s6vtDbl4C1MSE/bfxIwS0E=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=EadVzWt9vGMarSCDkpBlahNGeixUO+siTuCrFLHOUWmRpgKkQ9zq23Ga6cnJ6BPzx
-         6sY1g/L/fDaxGB/6NwCs6cn3lo9F7hRIjpYVxFdCsbEvvJpkSW3Lu2jTwuQPS+RkKz
-         HJeI2FL2pFpdw4Qm0ReGLMHi5v2eG58XtHSb/MDWUKFfwQomivGHyNeEcVCb44POZp
-         X4SYulSk/iPXVX0Dp8kL/PJpcooBC6LtTUN2jV0LIXLkiF3fTRp4232AMQ7k6soYne
-         pluycdg/SekzgZDomuqmT3O4kNKgup9yTzKlJU9KXfsdelrOiHfFUgwlcryc/mBCwU
-         lgOd2V9tUJRpQ==
+        b=gn/YQhouLH6ioc0jJYvye40Yq8u7cd/dCcA5akegBakhVDo69D0S/i5F11tB71wta
+         4TdYNnquMEbQgQlYnrdH2Y8J9WV2qJQ2IIShfju4T/2ztzG44h6okIOgmeHmHhKw4H
+         VKqJOvQeaS9Dyuoot0EFOIhb6+dVywmcUOkuKQ3+e223A+Kpbt23768pCTeHSTxcgH
+         N61cefzLhB7gZNe5kqsrcDi6j8SBWNT6C9R5zRlxBGBvdo/kV4U5VVoK3yjYz8SkHs
+         2DXdsMmWKYjlPIhgdHoUeNZwF3tL2HzDegCjEGcKxbqsMQQpjlCdqyrAc4Ur3JLhQs
+         rFIqae8O7eVbw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1mrmqt-008gvR-Bd; Mon, 29 Nov 2021 20:02:15 +0000
+        id 1mrmqu-008gvR-A5; Mon, 29 Nov 2021 20:02:16 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
@@ -45,9 +45,9 @@ Cc:     Andre Przywara <andre.przywara@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         kernel-team@android.com
-Subject: [PATCH v5 19/69] KVM: arm64: nv: Handle SPSR_EL2 specially
-Date:   Mon, 29 Nov 2021 20:01:00 +0000
-Message-Id: <20211129200150.351436-20-maz@kernel.org>
+Subject: [PATCH v5 22/69] KVM: arm64: nv: Emulate PSTATE.M for a guest hypervisor
+Date:   Mon, 29 Nov 2021 20:01:03 +0000
+Message-Id: <20211129200150.351436-23-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211129200150.351436-1-maz@kernel.org>
 References: <20211129200150.351436-1-maz@kernel.org>
@@ -61,129 +61,109 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-SPSR_EL2 needs special attention when running nested on ARMv8.3:
+From: Christoffer Dall <christoffer.dall@arm.com>
 
-If taking an exception while running at vEL2 (actually EL1), the
-HW will update the SPSR_EL1 register with the EL1 mode. We need
-to track this in order to make sure that accesses to the virtual
-view of SPSR_EL2 is correct.
+We can no longer blindly copy the VCPU's PSTATE into SPSR_EL2 and return
+to the guest and vice versa when taking an exception to the hypervisor,
+because we emulate virtual EL2 in EL1 and therefore have to translate
+the mode field from EL2 to EL1 and vice versa.
 
-To do so, we place an illegal value in SPSR_EL1.M, and patch it
-accordingly if required when accessing it.
+This requires keeping track of the state we enter the guest, for which
+we transiently use a dedicated flag.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_emulate.h | 37 ++++++++++++++++++++++++++++
- arch/arm64/kvm/sys_regs.c            | 23 +++++++++++++++--
- 2 files changed, 58 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/kvm_host.h          |  1 +
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 19 ++++++++++++++++-
+ arch/arm64/kvm/hyp/vhe/switch.c            | 24 ++++++++++++++++++++++
+ 3 files changed, 43 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 46c849ba281e..2db11ff3fdad 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -241,6 +241,43 @@ static inline bool is_hyp_ctxt(const struct kvm_vcpu *vcpu)
- 	return __is_hyp_ctxt(&vcpu->arch.ctxt);
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 7b6fe18ee450..6a7b13edc5cb 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -456,6 +456,7 @@ struct kvm_vcpu_arch {
+ #define KVM_ARM64_EXCEPT_MASK		(7 << 9) /* Target EL/MODE */
+ #define KVM_ARM64_DEBUG_STATE_SAVE_SPE	(1 << 12) /* Save SPE context if active  */
+ #define KVM_ARM64_DEBUG_STATE_SAVE_TRBE	(1 << 13) /* Save TRBE context if active  */
++#define KVM_ARM64_IN_HYP_CONTEXT	(1 << 14) /* Guest running in HYP context */
+ 
+ #define KVM_GUESTDBG_VALID_MASK (KVM_GUESTDBG_ENABLE | \
+ 				 KVM_GUESTDBG_USE_SW_BP | \
+diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+index 283f780f5f56..e3689c6ce4cc 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
++++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
+@@ -157,9 +157,26 @@ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt,
+ 	write_sysreg_el1(ctxt_sys_reg(ctxt, SPSR_EL1),	SYS_SPSR);
  }
  
-+static inline u64 __fixup_spsr_el2_write(struct kvm_cpu_context *ctxt, u64 val)
++/* Read the VCPU state's PSTATE, but translate (v)EL2 to EL1. */
++static inline u64 to_hw_pstate(const struct kvm_cpu_context *ctxt)
 +{
-+	if (!__vcpu_el2_e2h_is_set(ctxt)) {
-+		/*
-+		 * Clear the .M field when writing SPSR to the CPU, so that we
-+		 * can detect when the CPU clobbered our SPSR copy during a
-+		 * local exception.
-+		 */
-+		val &= ~0xc;
++	u64 mode = ctxt->regs.pstate & (PSR_MODE_MASK | PSR_MODE32_BIT);
++
++	switch (mode) {
++	case PSR_MODE_EL2t:
++		mode = PSR_MODE_EL1t;
++		break;
++	case PSR_MODE_EL2h:
++		mode = PSR_MODE_EL1h;
++		break;
 +	}
 +
-+	return val;
++	return (ctxt->regs.pstate & ~(PSR_MODE_MASK | PSR_MODE32_BIT)) | mode;
 +}
 +
-+static inline u64 __fixup_spsr_el2_read(const struct kvm_cpu_context *ctxt, u64 val)
-+{
-+	if (__vcpu_el2_e2h_is_set(ctxt))
-+		return val;
-+
+ static inline void __sysreg_restore_el2_return_state(struct kvm_cpu_context *ctxt)
+ {
+-	u64 pstate = ctxt->regs.pstate;
++	u64 pstate = to_hw_pstate(ctxt);
+ 	u64 mode = pstate & PSR_AA32_MODE_MASK;
+ 
+ 	/*
+diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+index fbb26b93c347..9d5572ceb001 100644
+--- a/arch/arm64/kvm/hyp/vhe/switch.c
++++ b/arch/arm64/kvm/hyp/vhe/switch.c
+@@ -114,6 +114,25 @@ static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm_vcpu *vcpu)
+ 
+ static void early_exit_filter(struct kvm_vcpu *vcpu, u64 *exit_code)
+ {
 +	/*
-+	 * SPSR.M == 0 means the CPU has not touched the SPSR, so the
-+	 * register has still the value we saved on the last write.
++	 * If we were in HYP context on entry, adjust the PSTATE view
++	 * so that the usual helpers work correctly.
 +	 */
-+	if ((val & 0xc) == 0)
-+		return ctxt_sys_reg(ctxt, SPSR_EL2);
++	if (unlikely(vcpu->arch.flags & KVM_ARM64_IN_HYP_CONTEXT)) {
++		u64 mode = *vcpu_cpsr(vcpu) & (PSR_MODE_MASK | PSR_MODE32_BIT);
 +
-+	/*
-+	 * Otherwise there was a "local" exception on the CPU,
-+	 * which from the guest's point of view was being taken from
-+	 * EL2 to EL2, although it actually happened to be from
-+	 * EL1 to EL1.
-+	 * So we need to fix the .M field in SPSR, to make it look
-+	 * like EL2, which is what the guest would expect.
-+	 */
-+	return (val & ~0x0c) | CurrentEL_EL2;
-+}
++		switch (mode) {
++		case PSR_MODE_EL1t:
++			mode = PSR_MODE_EL2t;
++			break;
++		case PSR_MODE_EL1h:
++			mode = PSR_MODE_EL2h;
++			break;
++		}
 +
- /*
-  * The layout of SPSR for an AArch32 state is different when observed from an
-  * AArch64 SPSR_ELx or an AArch32 SPSR_*. This function generates the AArch32
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 61596355e42d..875040bcfbe1 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -133,11 +133,14 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
- 			goto memory_read;
- 
- 		/*
--		 * ELR_EL2 is special cased for now.
-+		 * ELR_EL2 and SPSR_EL2 are special cased for now.
- 		 */
- 		switch (reg) {
- 		case ELR_EL2:
- 			return read_sysreg_el1(SYS_ELR);
-+		case SPSR_EL2:
-+			val = read_sysreg_el1(SYS_SPSR);
-+			return __fixup_spsr_el2_read(&vcpu->arch.ctxt, val);
- 		}
- 
- 		/*
-@@ -194,6 +197,10 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
- 		case ELR_EL2:
- 			write_sysreg_el1(val, SYS_ELR);
- 			return;
-+		case SPSR_EL2:
-+			val = __fixup_spsr_el2_write(&vcpu->arch.ctxt, val);
-+			write_sysreg_el1(val, SYS_SPSR);
-+			return;
- 		}
- 
- 		/* No EL1 counterpart? We're done here.? */
-@@ -1620,6 +1627,18 @@ static bool access_sp_el1(struct kvm_vcpu *vcpu,
- 	return true;
++		*vcpu_cpsr(vcpu) &= ~(PSR_MODE_MASK | PSR_MODE32_BIT);
++		*vcpu_cpsr(vcpu) |= mode;
++	}
  }
  
-+static bool access_spsr_el2(struct kvm_vcpu *vcpu,
-+			    struct sys_reg_params *p,
-+			    const struct sys_reg_desc *r)
-+{
-+	if (p->is_write)
-+		vcpu_write_sys_reg(vcpu, p->regval, SPSR_EL2);
+ /* Switch to the guest for VHE systems running in EL2 */
+@@ -148,6 +167,11 @@ static int __kvm_vcpu_run_vhe(struct kvm_vcpu *vcpu)
+ 	sysreg_restore_guest_state_vhe(guest_ctxt);
+ 	__debug_switch_to_guest(vcpu);
+ 
++	if (is_hyp_ctxt(vcpu))
++		vcpu->arch.flags |= KVM_ARM64_IN_HYP_CONTEXT;
 +	else
-+		p->regval = vcpu_read_sys_reg(vcpu, SPSR_EL2);
++		vcpu->arch.flags &= ~KVM_ARM64_IN_HYP_CONTEXT;
 +
-+	return true;
-+}
-+
- /*
-  * Architected system registers.
-  * Important: Must be sorted ascending by Op0, Op1, CRn, CRm, Op2
-@@ -2052,7 +2071,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_VTCR_EL2), access_rw, reset_val, VTCR_EL2, 0 },
- 
- 	{ SYS_DESC(SYS_DACR32_EL2), NULL, reset_unknown, DACR32_EL2 },
--	{ SYS_DESC(SYS_SPSR_EL2), access_rw, reset_val, SPSR_EL2, 0 },
-+	{ SYS_DESC(SYS_SPSR_EL2), access_spsr_el2, reset_val, SPSR_EL2, 0 },
- 	{ SYS_DESC(SYS_ELR_EL2), access_rw, reset_val, ELR_EL2, 0 },
- 	{ SYS_DESC(SYS_SP_EL1), access_sp_el1},
- 
+ 	do {
+ 		/* Jump in the fire! */
+ 		exit_code = __guest_enter(vcpu);
 -- 
 2.30.2
 
