@@ -2,154 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D2FD460D72
-	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 04:42:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B2FF7460DBC
+	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 04:47:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376750AbhK2DqM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 28 Nov 2021 22:46:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39154 "EHLO
+        id S1377117AbhK2Dt7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 28 Nov 2021 22:49:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347455AbhK2DoM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 28 Nov 2021 22:44:12 -0500
-Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 156D0C061746
-        for <kvm@vger.kernel.org>; Sun, 28 Nov 2021 19:40:49 -0800 (PST)
-Received: by mail-wm1-x334.google.com with SMTP id az34-20020a05600c602200b0033bf8662572so11415208wmb.0
-        for <kvm@vger.kernel.org>; Sun, 28 Nov 2021 19:40:49 -0800 (PST)
+        with ESMTP id S1352168AbhK2Dr6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 28 Nov 2021 22:47:58 -0500
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67018C0613F7
+        for <kvm@vger.kernel.org>; Sun, 28 Nov 2021 19:43:38 -0800 (PST)
+Received: by mail-pl1-x62d.google.com with SMTP id k4so11042767plx.8
+        for <kvm@vger.kernel.org>; Sun, 28 Nov 2021 19:43:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=SHoWN3qsrC9PjO8f+fhaJ1a87+hWxCOTLw3EtpXfuKo=;
-        b=6BnctyDHGkdqp5PF0QNSAgoJ6HrlI6ALPrdjxjj1/Vtv+HDCN4xmasn1GbjHiMyKMc
-         u4eG4kh9FSX1wmSF0EoprhkiNL7NWt3n3lU16XjzsWj5Yfh3aiwtpCW6orLBtvkimPzH
-         518o2kfAe3MpRwu5scQ8v9mEGxqbJExhSO5OVtg3Fv6noQYr4MDDmjU0EPtCaEBuTMpJ
-         NyeTwgVy5p+nJAAVh1qh6iDgGeBpLMKH+YN8NankGfnvOaqMI8q2ZEpUQlOJFoQ78VXU
-         AErhlh4vPQF826DPhb+4BsKM+xWnQdkrFHDiUhqzEZpcmHtj6uDVhSwHOKEPwAxiyY4D
-         Eh9A==
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=g1AjNx0u4QsH0ydDfhoNnZaeQc7rEh0mvCty4L4f7eQ=;
+        b=Wt8FaLZ08KUnARUpfZuFUX8/aWHCXUzDWW38X2tieklC/DI06HFADNTel2urdcLghd
+         6xuwD96bktbINCX1L48Tnqrgt/rnLZX0XjKzef2OqinmBYRmyB92QmVHjIXnsa4D3adc
+         Ewoo7Xso2SY8bIPCIsveHyTJlUKvgLq1OWVdg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=SHoWN3qsrC9PjO8f+fhaJ1a87+hWxCOTLw3EtpXfuKo=;
-        b=B7k4bbi8oB8J8CosvYJHapAdaDw93+xQzr6S09fvZAS92d10105s8w5maOOnyap5hq
-         JBQ6rAFvtTfHJtpeDK6vgRJuXDbvBIT798fM9tX/WIEF6yio1lzPlvON3HRvdEpDqaDG
-         zeRYn5E9R1eSWQG5frx9+tsLtcks3w1KVXAsxgAxM0E2d5gYTL8Njp/H6Vz1CyZCMkHn
-         e+Kaltrl4QsjA+e27U1YVs2iQ+8Kns8ENJ23xOulJk7JRUdQTMKL6wQN3E7L1ru5UeLv
-         4JU7zqV+ub5/fkMR1zWcafo9yFq4+ZWLkTkTweYN/NF0MaIgocAQeV+CkX/VAnq8NhS9
-         Z25Q==
-X-Gm-Message-State: AOAM533BK7xVqho61YScp8LIemfqyzohKj7yi18WAZiX+mALMnz6/9KU
-        ezMJXR750OJBjkOCVP6MRyss5wj7KQETxUfFmCwwrQ==
-X-Google-Smtp-Source: ABdhPJye1t6ElsPCeS1s6UZ/CRrpaWYJ5xKmqKZNSpbvlCjLK9dQjMtOM2OpdagX1S7Yl7xZiLvXmuXsti1liEKcAA8=
-X-Received: by 2002:a7b:c017:: with SMTP id c23mr33597189wmb.137.1638157247562;
- Sun, 28 Nov 2021 19:40:47 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=g1AjNx0u4QsH0ydDfhoNnZaeQc7rEh0mvCty4L4f7eQ=;
+        b=0l0Z/EKgzQQ7lA3OaAO0EWE9/L8hYHa5/SqPFMTDJEp7YOppBqYVSqsaFcc+V3XXts
+         CI9o7VfdRHjVOM9KLVkVAMvFbUn2jlpibjhKtGnh1HccP6FcmuEJ3o4QSybURhQ6QNXp
+         91KuwFRc3/F10a1BnnWB5QLUmKcI6tqXiuIL75VAj8Gr6647Pw1sgmkV5g0HoCjswdGo
+         cd6NGTsvoji3g9Bc9K81hK7ghePTJ3N6FjosbfI7tW3B/poymD9uVDsG9kLCUoejvDEj
+         cHdtMiMXsdD48B9tjR+dNmiW87cVgywkJ+OynG9tf3GoljnndRzUNLqfENaV0rOW5mph
+         eexQ==
+X-Gm-Message-State: AOAM533qa6Cbv1ys9atJbGvD6bhi1E5TP9WSml8K5A65JImhVE/qLxLk
+        mn1+E1RTYVZl366NKM29oyJn9g==
+X-Google-Smtp-Source: ABdhPJxLhGhNYMx62P8hwpiqGSK0LeOGFyNZHJnZlg3ztGeJOu1G+77rZi203d7zD5d/O00+rTeohw==
+X-Received: by 2002:a17:902:ee95:b0:141:f28f:7296 with SMTP id a21-20020a170902ee9500b00141f28f7296mr58161089pld.50.1638157417973;
+        Sun, 28 Nov 2021 19:43:37 -0800 (PST)
+Received: from localhost ([2401:fa00:8f:203:72d1:80f6:e1c9:ed0a])
+        by smtp.gmail.com with UTF8SMTPSA id r14sm6895238pgj.64.2021.11.28.19.43.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 28 Nov 2021 19:43:37 -0800 (PST)
+From:   David Stevens <stevensd@chromium.org>
+X-Google-Original-From: David Stevens <stevensd@google.com>
+To:     Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        David Stevens <stevensd@chromium.org>
+Subject: [PATCH v5 0/4] KVM: allow mapping non-refcounted pages
+Date:   Mon, 29 Nov 2021 12:43:13 +0900
+Message-Id: <20211129034317.2964790-1-stevensd@google.com>
+X-Mailer: git-send-email 2.34.0.rc2.393.gf8c9666880-goog
 MIME-Version: 1.0
-References: <20211126154020.342924-1-anup.patel@wdc.com> <20211126154020.342924-3-anup.patel@wdc.com>
- <4fcb162a-738b-64e7-6326-9f9967d1b8a8@redhat.com>
-In-Reply-To: <4fcb162a-738b-64e7-6326-9f9967d1b8a8@redhat.com>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Mon, 29 Nov 2021 09:10:36 +0530
-Message-ID: <CAAhSdy0EVLVjbD9XdM_-DyjRjH4C3Bo9=WUbm6HUJ8NmPpeH_g@mail.gmail.com>
-Subject: Re: [PATCH 2/4] RISC-V: KVM: Add VM capability to allow userspace get
- GPA size
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Anup Patel <anup.patel@wdc.com>, Shuah Khan <shuah@kernel.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        KVM General <kvm@vger.kernel.org>,
-        kvm-riscv@lists.infradead.org,
-        linux-riscv <linux-riscv@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
-        linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 26, 2021 at 9:43 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 11/26/21 16:40, Anup Patel wrote:
-> > The GPA size supported for a RISC-V Guest/VM is based on the MMU mode
-> > used by G-stage translation. The KVM RISC-V will detect and use the
-> > best possible MMU mode for the G-stage in kvm_arch_init().
-> >
-> > We add a RISC-V specific VM capability KVM_CAP_RISCV_VM_GPA_SIZE which
->
-> You can make it just KVM_CAP_VM_GPA_BITS instead - it's useful on other
-> architectures as well.
+From: David Stevens <stevensd@chromium.org>
 
-Sure, I will update.
+This patch series adds support for mapping non-refcount VM_IO and
+VM_PFNMAP memory into the guest.
 
-Regards,
-Anup
+Currently, the gfn_to_pfn functions require being able to pin the target
+pfn, so they will fail if the pfn returned by follow_pte isn't a
+ref-counted page.  However, the KVM secondary MMUs do not require that
+the pfn be pinned, since they are integrated with the mmu notifier API.
+This series adds a new set of gfn_to_pfn_page functions which parallel
+the gfn_to_pfn functions but do not pin the pfn. The new functions
+return the page from gup if it was present, so callers can use it and
+call put_page when done.
 
->
-> Paolo
->
-> > can be used by KVM userspace to get guest physical address (GPA) size
-> > (i.e. number of GPA bits) supported for a Guest/VM.
-> >
-> > Signed-off-by: Anup Patel <anup.patel@wdc.com>
-> > ---
-> >   arch/riscv/include/asm/kvm_host.h | 1 +
-> >   arch/riscv/kvm/mmu.c              | 5 +++++
-> >   arch/riscv/kvm/vm.c               | 3 +++
-> >   include/uapi/linux/kvm.h          | 1 +
-> >   4 files changed, 10 insertions(+)
-> >
-> > diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
-> > index 37589b953bcb..ae5d238607fe 100644
-> > --- a/arch/riscv/include/asm/kvm_host.h
-> > +++ b/arch/riscv/include/asm/kvm_host.h
-> > @@ -221,6 +221,7 @@ void kvm_riscv_stage2_free_pgd(struct kvm *kvm);
-> >   void kvm_riscv_stage2_update_hgatp(struct kvm_vcpu *vcpu);
-> >   void kvm_riscv_stage2_mode_detect(void);
-> >   unsigned long kvm_riscv_stage2_mode(void);
-> > +int kvm_riscv_stage2_gpa_size(void);
-> >
-> >   void kvm_riscv_stage2_vmid_detect(void);
-> >   unsigned long kvm_riscv_stage2_vmid_bits(void);
-> > diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
-> > index 9ffd0255af43..9b6d6465094f 100644
-> > --- a/arch/riscv/kvm/mmu.c
-> > +++ b/arch/riscv/kvm/mmu.c
-> > @@ -760,3 +760,8 @@ unsigned long kvm_riscv_stage2_mode(void)
-> >   {
-> >       return stage2_mode >> HGATP_MODE_SHIFT;
-> >   }
-> > +
-> > +int kvm_riscv_stage2_gpa_size(void)
-> > +{
-> > +     return stage2_gpa_bits;
-> > +}
-> > diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
-> > index fb18af34a4b5..ae97f6929897 100644
-> > --- a/arch/riscv/kvm/vm.c
-> > +++ b/arch/riscv/kvm/vm.c
-> > @@ -82,6 +82,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
-> >       case KVM_CAP_NR_MEMSLOTS:
-> >               r = KVM_USER_MEM_SLOTS;
-> >               break;
-> > +     case KVM_CAP_RISCV_VM_GPA_SIZE:
-> > +             r = kvm_riscv_stage2_gpa_size();
-> > +             break;
-> >       default:
-> >               r = 0;
-> >               break;
-> > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> > index 1daa45268de2..dac98df3101d 100644
-> > --- a/include/uapi/linux/kvm.h
-> > +++ b/include/uapi/linux/kvm.h
-> > @@ -1131,6 +1131,7 @@ struct kvm_ppc_resize_hpt {
-> >   #define KVM_CAP_EXIT_ON_EMULATION_FAILURE 204
-> >   #define KVM_CAP_ARM_MTE 205
-> >   #define KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM 206
-> > +#define KVM_CAP_RISCV_VM_GPA_SIZE 207
-> >
-> >   #ifdef KVM_CAP_IRQ_ROUTING
-> >
-> >
->
+The gfn_to_pfn functions should be depreciated, since as they are unsafe
+due to relying on trying to obtain a struct page from a pfn returned by
+follow_pte. I added new functions instead of simply adding another
+optional parameter to the existing functions to make it easier to track
+down users of the deprecated functions.
+
+This series updates x86 and arm64 secondary MMUs to the new API.
+
+v4 -> v5:
+ - rebase on kvm next branch again
+v3 -> v4:
+ - rebase on kvm next branch again
+ - Add some more context to a comment in ensure_pfn_ref
+v2 -> v3:
+ - rebase on kvm next branch
+v1 -> v2:
+ - Introduce new gfn_to_pfn_page functions instead of modifying the
+   behavior of existing gfn_to_pfn functions, to make the change less
+   invasive.
+ - Drop changes to mmu_audit.c
+ - Include Nicholas Piggin's patch to avoid corrupting refcount in the
+   follow_pte case, and use it in depreciated gfn_to_pfn functions.
+ - Rebase on kvm/next
+
+David Stevens (4):
+  KVM: mmu: introduce new gfn_to_pfn_page functions
+  KVM: x86/mmu: use gfn_to_pfn_page
+  KVM: arm64/mmu: use gfn_to_pfn_page
+  KVM: mmu: remove over-aggressive warnings
+
+ arch/arm64/kvm/mmu.c           |  27 +++--
+ arch/x86/kvm/mmu.h             |   1 +
+ arch/x86/kvm/mmu/mmu.c         |  25 ++---
+ arch/x86/kvm/mmu/paging_tmpl.h |   9 +-
+ arch/x86/kvm/x86.c             |   6 +-
+ include/linux/kvm_host.h       |  17 +++
+ virt/kvm/kvm_main.c            | 198 ++++++++++++++++++++++++---------
+ 7 files changed, 202 insertions(+), 81 deletions(-)
+
+-- 
+2.34.0.rc2.393.gf8c9666880-goog
+
