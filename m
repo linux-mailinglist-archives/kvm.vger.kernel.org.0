@@ -2,123 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 487DA461154
-	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 10:49:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F9DF46128A
+	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 11:36:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245708AbhK2Jwm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Nov 2021 04:52:42 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:55252 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S245703AbhK2Jul (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 29 Nov 2021 04:50:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1638179243;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2e7BBYNyfeJ3j26HLvF1h21JoMQnpGkno1GRZ9YylHM=;
-        b=htqJe2rXTTV7xEeJOA0f3bGMHr8ByZiYLgeo8oGGHTKtL3wSuVgRdn3eVfqLw2Ewq/MC7H
-        OZw7Pl3tzphrJEd44JeREUmwFmyPMNVUHIjwH1F38ejTSPdZQiBmgJkUQ82ZzEqzSSIlH2
-        J5maGwu7vCca69oY8fT/gF7a9eHTjns=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-197-3wY4d_IfPPOJ27w8HcCF5Q-1; Mon, 29 Nov 2021 04:47:20 -0500
-X-MC-Unique: 3wY4d_IfPPOJ27w8HcCF5Q-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        id S244604AbhK2KkA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Nov 2021 05:40:00 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:44306 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236074AbhK2KiA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Nov 2021 05:38:00 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F0C38344E0;
-        Mon, 29 Nov 2021 09:47:18 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.39.195.203])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DAC505D6B1;
-        Mon, 29 Nov 2021 09:47:17 +0000 (UTC)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>,
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 848AF61257;
+        Mon, 29 Nov 2021 10:34:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DF91C004E1;
+        Mon, 29 Nov 2021 10:34:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1638182082;
+        bh=nsUtuRmqSAZRV1KPWJ/+I0Ioj0cagz0JXdcAo35Ew4w=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=bKx6n4W8Hl5/MY40EORD0pKOk49Qj+zzSZ1XiYB2e6CWBPHA3Yj20wSC2c4oujZZS
+         9OGj+NNIpXp73UDrmyxQD7emWWQu6MYggvcI8LLBhJQCC9CsacRPxu+qCkMBka+eT1
+         mUB7O6bQsu12OCzw4VBrjGpU8NgxDz2wE9tOdIQ4=
+Date:   Mon, 29 Nov 2021 11:34:39 +0100
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>, Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Dan Williams <dan.j.williams@intel.com>, rafael@kernel.org,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Liu Yi L <yi.l.liu@intel.com>,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Stuart Yoder <stuyoder@gmail.com>,
+        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Li Yang <leoyang.li@nxp.com>, iommu@lists.linux-foundation.org,
+        linux-pci@vger.kernel.org, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v5 4/4] KVM: nVMX: Implement Enlightened MSR Bitmap feature
-Date:   Mon, 29 Nov 2021 10:47:04 +0100
-Message-Id: <20211129094704.326635-5-vkuznets@redhat.com>
-In-Reply-To: <20211129094704.326635-1-vkuznets@redhat.com>
-References: <20211129094704.326635-1-vkuznets@redhat.com>
+Subject: Re: [PATCH v2 04/17] driver core: platform: Add driver dma ownership
+ management
+Message-ID: <YaSsv5Z1WS7ldgu3@kroah.com>
+References: <20211128025051.355578-1-baolu.lu@linux.intel.com>
+ <20211128025051.355578-5-baolu.lu@linux.intel.com>
+ <YaM5Zv1RrdidycKe@kroah.com>
+ <20211128231509.GA966332@nvidia.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211128231509.GA966332@nvidia.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Updating MSR bitmap for L2 is not cheap and rearly needed. TLFS for Hyper-V
-offers 'Enlightened MSR Bitmap' feature which allows L1 hypervisor to
-inform L0 when it changes MSR bitmap, this eliminates the need to examine
-L1's MSR bitmap for L2 every time when 'real' MSR bitmap for L2 gets
-constructed.
+On Sun, Nov 28, 2021 at 07:15:09PM -0400, Jason Gunthorpe wrote:
+> On Sun, Nov 28, 2021 at 09:10:14AM +0100, Greg Kroah-Hartman wrote:
+> > On Sun, Nov 28, 2021 at 10:50:38AM +0800, Lu Baolu wrote:
+> > > Multiple platform devices may be placed in the same IOMMU group because
+> > > they cannot be isolated from each other. These devices must either be
+> > > entirely under kernel control or userspace control, never a mixture. This
+> > > checks and sets DMA ownership during driver binding, and release the
+> > > ownership during driver unbinding.
+> > > 
+> > > Driver may set a new flag (suppress_auto_claim_dma_owner) to disable auto
+> > > claiming DMA_OWNER_DMA_API ownership in the binding process. For instance,
+> > > the userspace framework drivers (vfio etc.) which need to manually claim
+> > > DMA_OWNER_PRIVATE_DOMAIN_USER when assigning a device to userspace.
+> > 
+> > Why would any vfio driver be a platform driver?  
+> 
+> Why not? VFIO implements drivers for most physical device types
+> these days. Why wouldn't platform be included?
 
-Use 'vmx->nested.msr_bitmap_changed' flag to implement the feature.
+Because "platform" is not a real device type.  It's a catch-all for
+devices that are only described by firmware, so why would you have a
+virtual device for that?  Why would that be needed?
 
-Note, KVM already uses 'Enlightened MSR bitmap' feature when it runs as a
-nested hypervisor on top of Hyper-V. The newly introduced feature is going
-to be used by Hyper-V guests on KVM.
+> > > diff --git a/include/linux/platform_device.h b/include/linux/platform_device.h
+> > > index 7c96f169d274..779bcf2a851c 100644
+> > > +++ b/include/linux/platform_device.h
+> > > @@ -210,6 +210,7 @@ struct platform_driver {
+> > >  	struct device_driver driver;
+> > >  	const struct platform_device_id *id_table;
+> > >  	bool prevent_deferred_probe;
+> > > +	bool suppress_auto_claim_dma_owner;
+> > 
+> > What platform driver needs this change?
+> 
+> It is in patch 12:
+> 
+> --- a/drivers/vfio/platform/vfio_platform.c
+> +++ b/drivers/vfio/platform/vfio_platform.c
 
-When the feature is enabled for Win10+WSL2, it shaves off around 700 CPU
-cycles from a nested vmexit cost (tight cpuid loop test).
+Ok, nevermind, you do have a virtual platform device, which personally,
+I find crazy as why would firmware export a "virtual device"?
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- arch/x86/kvm/hyperv.c     |  2 ++
- arch/x86/kvm/vmx/nested.c | 14 ++++++++++++++
- 2 files changed, 16 insertions(+)
+> @@ -76,6 +76,7 @@ static struct platform_driver vfio_platform_driver = {
+>         .driver = {
+>                 .name   = "vfio-platform",
+>         },
+> +       .suppress_auto_claim_dma_owner = true,
+>  };
+> 
+> Which is how VFIO provides support to DPDK for some Ethernet
+> controllers embedded in a few ARM SOCs.
 
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index 7179fa645eda..a91424ed436d 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -2517,6 +2517,8 @@ int kvm_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
- 
- 		case HYPERV_CPUID_NESTED_FEATURES:
- 			ent->eax = evmcs_ver;
-+			if (evmcs_ver)
-+				ent->eax |= HV_X64_NESTED_MSR_BITMAP;
- 
- 			break;
- 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 2fe26fc4a4d5..fcb1685f893e 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -599,6 +599,7 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
- 	int msr;
- 	unsigned long *msr_bitmap_l1;
- 	unsigned long *msr_bitmap_l0 = vmx->nested.vmcs02.msr_bitmap;
-+	struct hv_enlightened_vmcs *evmcs = vmx->nested.hv_evmcs;
- 	struct kvm_host_map *map = &vmx->nested.msr_bitmap_map;
- 
- 	/* Nothing to do if the MSR bitmap is not in use.  */
-@@ -606,6 +607,19 @@ static inline bool nested_vmx_prepare_msr_bitmap(struct kvm_vcpu *vcpu,
- 	    !nested_cpu_has(vmcs12, CPU_BASED_USE_MSR_BITMAPS))
- 		return false;
- 
-+	/*
-+	 * MSR bitmap update can be skipped when:
-+	 * - MSR bitmap for L1 hasn't changed.
-+	 * - Nested hypervisor (L1) is attempting to launch the same L2 as
-+	 *   before.
-+	 * - Nested hypervisor (L1) has enabled 'Enlightened MSR Bitmap' feature
-+	 *   and tells KVM (L0) there were no changes in MSR bitmap for L2.
-+	 */
-+	if (!vmx->nested.force_msr_bitmap_recalc && evmcs &&
-+	    evmcs->hv_enlightenments_control.msr_bitmap &&
-+	    evmcs->hv_clean_fields & HV_VMX_ENLIGHTENED_CLEAN_FIELD_MSR_BITMAP)
-+		return true;
-+
- 	if (kvm_vcpu_map(vcpu, gpa_to_gfn(vmcs12->msr_bitmap), map))
- 		return false;
- 
--- 
-2.33.1
+Ick.  Where does the DT file for these devices live that describe a
+"virtual device" to match with this driver?
 
+> It is also used in patch 17 in five tegra platform_drivers to make
+> their sharing of an iommu group between possibly related
+> platform_driver's safer.
+
+Safer how?
+
+> > >  	USE_PLATFORM_PM_SLEEP_OPS
+> > > @@ -1478,7 +1505,8 @@ struct bus_type platform_bus_type = {
+> > >  	.probe		= platform_probe,
+> > >  	.remove		= platform_remove,
+> > >  	.shutdown	= platform_shutdown,
+> > > -	.dma_configure	= platform_dma_configure,
+> > > +	.dma_configure	= _platform_dma_configure,
+> > 
+> > What happened to the original platform_dma_configure() function?
+> 
+> It is still called. The issue here is that platform_dma_configure has
+> nothing to do with platform and is being re-used by AMBA.
+
+Ick, why?  AMBA needs to be a real bus type and use their own functions
+if needed.  There is nothing here that makes this obvious that someone
+else is using those functions and that the platform bus should only be
+using these "new" functions.
+
+> Probably the resolution to both remarks is to rename
+> platform_dma_configure to something sensible (firwmare dma configure
+> maybe?) and use it in all places that do the of & acpi stuff -
+> pci/amba/platform at least.
+
+That would be better than what is being proposed here.
+
+thanks,
+
+greg k-h
