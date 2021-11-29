@@ -2,127 +2,246 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C7A9461100
-	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 10:23:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 57AB046113B
+	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 10:40:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239317AbhK2J05 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Nov 2021 04:26:57 -0500
-Received: from mga18.intel.com ([134.134.136.126]:49003 "EHLO mga18.intel.com"
+        id S244973AbhK2Jnq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Nov 2021 04:43:46 -0500
+Received: from mga01.intel.com ([192.55.52.88]:22861 "EHLO mga01.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239963AbhK2JY5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Nov 2021 04:24:57 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10182"; a="222814491"
+        id S243170AbhK2Jlp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Nov 2021 04:41:45 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10182"; a="259846274"
 X-IronPort-AV: E=Sophos;i="5.87,272,1631602800"; 
-   d="scan'208";a="222814491"
+   d="scan'208";a="259846274"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2021 01:16:17 -0800
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2021 01:38:28 -0800
 X-IronPort-AV: E=Sophos;i="5.87,272,1631602800"; 
-   d="scan'208";a="511610085"
-Received: from gao-cwp.sh.intel.com (HELO gao-cwp) ([10.239.159.99])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2021 01:16:13 -0800
-Date:   Mon, 29 Nov 2021 17:26:07 +0800
-From:   Chao Gao <chao.gao@intel.com>
-To:     Lai Jiangshan <jiangshanlai@gmail.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>, isaku.yamahata@intel.com,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Connor Kuehl <ckuehl@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        isaku.yamahata@gmail.com
-Subject: Re: [RFC PATCH v3 53/59] KVM: x86: Add a helper function to restore
- 4 host MSRs on exit to user space
-Message-ID: <20211129092605.GA30191@gao-cwp>
-References: <cover.1637799475.git.isaku.yamahata@intel.com>
- <4ede5c987a4ae938a37ab7fe70d5e1d561ee97d4.1637799475.git.isaku.yamahata@intel.com>
- <878rxcht3g.ffs@tglx>
- <20211126091913.GA11523@gao-cwp>
- <CAJhGHyAbBUyyVKL7=Cior_uat9rij1BB4iBwX+EDCAUVs1Npgg@mail.gmail.com>
+   d="scan'208";a="511616065"
+Received: from unknown (HELO cra01infra01.deacluster.intel.com) ([10.240.193.73])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Nov 2021 01:38:25 -0800
+From:   Zhu Lingshan <lingshan.zhu@intel.com>
+To:     jasowang@redhat.com, mst@redhat.com, sgarzare@redhat.com
+Cc:     virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, Zhu Lingshan <lingshan.zhu@intel.com>,
+        stable@vger.kernel.org
+Subject: [PATCH] ifcvf/vDPA: fix misuse virtio-net device config size for blk dev
+Date:   Mon, 29 Nov 2021 17:31:44 +0800
+Message-Id: <20211129093144.8033-1-lingshan.zhu@intel.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJhGHyAbBUyyVKL7=Cior_uat9rij1BB4iBwX+EDCAUVs1Npgg@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 29, 2021 at 03:08:39PM +0800, Lai Jiangshan wrote:
->On Mon, Nov 29, 2021 at 2:00 AM Chao Gao <chao.gao@intel.com> wrote:
->>
->> On Thu, Nov 25, 2021 at 09:34:59PM +0100, Thomas Gleixner wrote:
->> >On Wed, Nov 24 2021 at 16:20, isaku yamahata wrote:
->> >> From: Chao Gao <chao.gao@intel.com>
->> >
->> >> $Subject: KVM: x86: Add a helper function to restore 4 host MSRs on exit to user space
->> >
->> >Which user space are you talking about? This subject line is misleading
->>
->> Host Ring3.
->>
->> >at best. The unconditional reset is happening when a TDX VM exits
->> >because the SEAM firmware enforces this to prevent unformation leaks.
->>
->> Yes.
->>
->> >
->> >It also does not matter whether this are four or ten MSR.
->>
->> Indeed, the number of MSRs doesn't matter.
->>
->> >Fact is that
->> >the SEAM firmware is buggy because it does not save/restore those MSRs.
->>
->> It is done deliberately. It gives host a chance to do "lazy" restoration.
->> "lazy" means don't save/restore them on each TD entry/exit but defer
->> restoration to when it is neccesary e.g., when vCPU is scheduled out or
->> when kernel is about to return to Ring3.
->>
->> The TDX module unconditionally reset 4 host MSRs (MSR_SYSCALL_MASK,
->> MSR_START, MSR_LSTAR, MSR_TSC_AUX) to architectural INIT state on exit from
->> TDX VM to KVM.
->
->I did not find the information in intel-tdx-module-1eas.pdf nor
->intel-tdx-cpu-architectural-specification.pdf.
->
->Maybe the version I downloaded is outdated.
+This commit fixes a misuse of virtio-net device config size issue
+for virtio-block devices.
 
-Hi Jiangshan,
+A new member config_size in struct ifcvf_hw is introduced and would
+be initialized through vdpa_dev_add() to record correct device
+config size.
 
-Please refer to Table 22.162 MSRs that may be Modified by TDH.VP.ENTER,
-in section 22.2.40 TDH.VP.ENTER leaf.
+Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
+Reported-and-suggested-by: Stefano Garzarella <sgarzare@redhat.com>
+Fixes: 6ad31d162a4e ("vDPA/ifcvf: enable Intel C5000X-PL virtio-block for vDPA")
+Cc: <stable@vger.kernel.org>
+---
+ drivers/vdpa/ifcvf/ifcvf_base.c | 41 +++++++++++++++++++++++++--------
+ drivers/vdpa/ifcvf/ifcvf_base.h |  9 +++++---
+ drivers/vdpa/ifcvf/ifcvf_main.c | 24 ++++---------------
+ 3 files changed, 41 insertions(+), 33 deletions(-)
 
->
->I guess that the "lazy" restoration mode is not a valid optimization.
->The SEAM module should restore it to the original value when it tries
->to reset it to architectural INIT state on exit from TDX VM to KVM
->since the SEAM module also does it via wrmsr (correct me if not).
+diff --git a/drivers/vdpa/ifcvf/ifcvf_base.c b/drivers/vdpa/ifcvf/ifcvf_base.c
+index 2808f1ba9f7b..7d41dfe48ade 100644
+--- a/drivers/vdpa/ifcvf/ifcvf_base.c
++++ b/drivers/vdpa/ifcvf/ifcvf_base.c
+@@ -143,8 +143,8 @@ int ifcvf_init_hw(struct ifcvf_hw *hw, struct pci_dev *pdev)
+ 			IFCVF_DBG(pdev, "hw->isr = %p\n", hw->isr);
+ 			break;
+ 		case VIRTIO_PCI_CAP_DEVICE_CFG:
+-			hw->net_cfg = get_cap_addr(hw, &cap);
+-			IFCVF_DBG(pdev, "hw->net_cfg = %p\n", hw->net_cfg);
++			hw->dev_cfg = get_cap_addr(hw, &cap);
++			IFCVF_DBG(pdev, "hw->dev_cfg = %p\n", hw->dev_cfg);
+ 			break;
+ 		}
+ 
+@@ -153,7 +153,7 @@ int ifcvf_init_hw(struct ifcvf_hw *hw, struct pci_dev *pdev)
+ 	}
+ 
+ 	if (hw->common_cfg == NULL || hw->notify_base == NULL ||
+-	    hw->isr == NULL || hw->net_cfg == NULL) {
++	    hw->isr == NULL || hw->dev_cfg == NULL) {
+ 		IFCVF_ERR(pdev, "Incomplete PCI capabilities\n");
+ 		return -EIO;
+ 	}
+@@ -174,7 +174,7 @@ int ifcvf_init_hw(struct ifcvf_hw *hw, struct pci_dev *pdev)
+ 	IFCVF_DBG(pdev,
+ 		  "PCI capability mapping: common cfg: %p, notify base: %p\n, isr cfg: %p, device cfg: %p, multiplier: %u\n",
+ 		  hw->common_cfg, hw->notify_base, hw->isr,
+-		  hw->net_cfg, hw->notify_off_multiplier);
++		  hw->dev_cfg, hw->notify_off_multiplier);
+ 
+ 	return 0;
+ }
+@@ -242,33 +242,54 @@ int ifcvf_verify_min_features(struct ifcvf_hw *hw, u64 features)
+ 	return 0;
+ }
+ 
+-void ifcvf_read_net_config(struct ifcvf_hw *hw, u64 offset,
++u32 ifcvf_get_config_size(struct ifcvf_hw *hw)
++{
++	struct ifcvf_adapter *adapter;
++	u32 config_size;
++
++	adapter = vf_to_adapter(hw);
++	switch (hw->dev_type) {
++	case VIRTIO_ID_NET:
++		config_size = sizeof(struct virtio_net_config);
++		break;
++	case VIRTIO_ID_BLOCK:
++		config_size = sizeof(struct virtio_blk_config);
++		break;
++	default:
++		config_size = 0;
++		IFCVF_ERR(adapter->pdev, "VIRTIO ID %u not supported\n", hw->dev_type);
++	}
++
++	return config_size;
++}
++
++void ifcvf_read_dev_config(struct ifcvf_hw *hw, u64 offset,
+ 			   void *dst, int length)
+ {
+ 	u8 old_gen, new_gen, *p;
+ 	int i;
+ 
+-	WARN_ON(offset + length > sizeof(struct virtio_net_config));
++	WARN_ON(offset + length > hw->config_size);
+ 	do {
+ 		old_gen = ifc_ioread8(&hw->common_cfg->config_generation);
+ 		p = dst;
+ 		for (i = 0; i < length; i++)
+-			*p++ = ifc_ioread8(hw->net_cfg + offset + i);
++			*p++ = ifc_ioread8(hw->dev_cfg + offset + i);
+ 
+ 		new_gen = ifc_ioread8(&hw->common_cfg->config_generation);
+ 	} while (old_gen != new_gen);
+ }
+ 
+-void ifcvf_write_net_config(struct ifcvf_hw *hw, u64 offset,
++void ifcvf_write_dev_config(struct ifcvf_hw *hw, u64 offset,
+ 			    const void *src, int length)
+ {
+ 	const u8 *p;
+ 	int i;
+ 
+ 	p = src;
+-	WARN_ON(offset + length > sizeof(struct virtio_net_config));
++	WARN_ON(offset + length > hw->config_size);
+ 	for (i = 0; i < length; i++)
+-		ifc_iowrite8(*p++, hw->net_cfg + offset + i);
++		ifc_iowrite8(*p++, hw->dev_cfg + offset + i);
+ }
+ 
+ static void ifcvf_set_features(struct ifcvf_hw *hw, u64 features)
+diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h b/drivers/vdpa/ifcvf/ifcvf_base.h
+index 09918af3ecf8..c486873f370a 100644
+--- a/drivers/vdpa/ifcvf/ifcvf_base.h
++++ b/drivers/vdpa/ifcvf/ifcvf_base.h
+@@ -71,12 +71,14 @@ struct ifcvf_hw {
+ 	u64 hw_features;
+ 	u32 dev_type;
+ 	struct virtio_pci_common_cfg __iomem *common_cfg;
+-	void __iomem *net_cfg;
++	void __iomem *dev_cfg;
+ 	struct vring_info vring[IFCVF_MAX_QUEUES];
+ 	void __iomem * const *base;
+ 	char config_msix_name[256];
+ 	struct vdpa_callback config_cb;
+ 	unsigned int config_irq;
++	/* virtio-net or virtio-blk device config size */
++	u32 config_size;
+ };
+ 
+ struct ifcvf_adapter {
+@@ -105,9 +107,9 @@ int ifcvf_init_hw(struct ifcvf_hw *hw, struct pci_dev *dev);
+ int ifcvf_start_hw(struct ifcvf_hw *hw);
+ void ifcvf_stop_hw(struct ifcvf_hw *hw);
+ void ifcvf_notify_queue(struct ifcvf_hw *hw, u16 qid);
+-void ifcvf_read_net_config(struct ifcvf_hw *hw, u64 offset,
++void ifcvf_read_dev_config(struct ifcvf_hw *hw, u64 offset,
+ 			   void *dst, int length);
+-void ifcvf_write_net_config(struct ifcvf_hw *hw, u64 offset,
++void ifcvf_write_dev_config(struct ifcvf_hw *hw, u64 offset,
+ 			    const void *src, int length);
+ u8 ifcvf_get_status(struct ifcvf_hw *hw);
+ void ifcvf_set_status(struct ifcvf_hw *hw, u8 status);
+@@ -120,4 +122,5 @@ u16 ifcvf_get_vq_state(struct ifcvf_hw *hw, u16 qid);
+ int ifcvf_set_vq_state(struct ifcvf_hw *hw, u16 qid, u16 num);
+ struct ifcvf_adapter *vf_to_adapter(struct ifcvf_hw *hw);
+ int ifcvf_probed_virtio_net(struct ifcvf_hw *hw);
++u32 ifcvf_get_config_size(struct ifcvf_hw *hw);
+ #endif /* _IFCVF_H_ */
+diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
+index 6dc75ca70b37..92ba7126e5d6 100644
+--- a/drivers/vdpa/ifcvf/ifcvf_main.c
++++ b/drivers/vdpa/ifcvf/ifcvf_main.c
+@@ -366,24 +366,9 @@ static u32 ifcvf_vdpa_get_vq_align(struct vdpa_device *vdpa_dev)
+ 
+ static size_t ifcvf_vdpa_get_config_size(struct vdpa_device *vdpa_dev)
+ {
+-	struct ifcvf_adapter *adapter = vdpa_to_adapter(vdpa_dev);
+ 	struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
+-	struct pci_dev *pdev = adapter->pdev;
+-	size_t size;
+-
+-	switch (vf->dev_type) {
+-	case VIRTIO_ID_NET:
+-		size = sizeof(struct virtio_net_config);
+-		break;
+-	case VIRTIO_ID_BLOCK:
+-		size = sizeof(struct virtio_blk_config);
+-		break;
+-	default:
+-		size = 0;
+-		IFCVF_ERR(pdev, "VIRTIO ID %u not supported\n", vf->dev_type);
+-	}
+ 
+-	return size;
++	return  vf->config_size;
+ }
+ 
+ static void ifcvf_vdpa_get_config(struct vdpa_device *vdpa_dev,
+@@ -392,8 +377,7 @@ static void ifcvf_vdpa_get_config(struct vdpa_device *vdpa_dev,
+ {
+ 	struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
+ 
+-	WARN_ON(offset + len > sizeof(struct virtio_net_config));
+-	ifcvf_read_net_config(vf, offset, buf, len);
++	ifcvf_read_dev_config(vf, offset, buf, len);
+ }
+ 
+ static void ifcvf_vdpa_set_config(struct vdpa_device *vdpa_dev,
+@@ -402,8 +386,7 @@ static void ifcvf_vdpa_set_config(struct vdpa_device *vdpa_dev,
+ {
+ 	struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
+ 
+-	WARN_ON(offset + len > sizeof(struct virtio_net_config));
+-	ifcvf_write_net_config(vf, offset, buf, len);
++	ifcvf_write_dev_config(vf, offset, buf, len);
+ }
+ 
+ static void ifcvf_vdpa_set_config_cb(struct vdpa_device *vdpa_dev,
+@@ -542,6 +525,7 @@ static int ifcvf_vdpa_dev_add(struct vdpa_mgmt_dev *mdev, const char *name,
+ 		vf->vring[i].irq = -EINVAL;
+ 
+ 	vf->hw_features = ifcvf_get_hw_features(vf);
++	vf->config_size = ifcvf_get_config_size(vf);
+ 
+ 	adapter->vdpa.mdev = &ifcvf_mgmt_dev->mdev;
+ 	ret = _vdpa_register_device(&adapter->vdpa, vf->nr_vring);
+-- 
+2.27.0
 
-Correct.
-
->
->If the SEAM module doesn't know "the original value" of the these
->MSRs, it would be mere an optimization to save an rdmsr in SEAM.
-
-Yes. Just a rdmsr is saved in TDX module at the cost of host's
-restoring a MSR. If restoration (wrmsr) can be done in a lazy fashion
-or even the MSR isn't used by host, some CPU cycles can be saved.
-
->But there are a lot of other ways for the host to share the values
->to SEAM in zero overhead.
-
-I am not sure. Looks it requests a new interface between host and TDX
-module. I guess one problem is how/when to verify host's inputs in case
-they are invalid.
-
-Thanks
-Chao
-
->
->Could you provide more information?
