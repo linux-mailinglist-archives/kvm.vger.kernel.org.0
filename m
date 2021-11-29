@@ -2,152 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ED1C8462274
-	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 21:47:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C6314461FEF
+	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 20:10:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234716AbhK2Uu1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Nov 2021 15:50:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36404 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234885AbhK2UsY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Nov 2021 15:48:24 -0500
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E321C0C085F
-        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 09:25:30 -0800 (PST)
-Received: by mail-pl1-x62b.google.com with SMTP id z6so12740797plk.6
-        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 09:25:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Bxpm877ucu29+swtwCcWrV9CPuVdsV2sIZfuT/jfRmc=;
-        b=OQsEdj0rbR41/5YmIUdSrIJYCBGgCTUy9MQ5b9N87MM6uHjwmzAsHY1InGAtcJzzT0
-         kXYHaRVbVnijPR96HzFaJq33Sw0nxu7KBR5alKkujlnpJgTb7ASLVjrwO1SSGsYoOkaQ
-         K7cyD5kT9W1uMzNVmFhkVgYWGz7yTXUI7MuAi/f6xjABudDnAM1CxSfahAqvYF0vFr+z
-         P1vOrLjB/9DR5TYDkZ2qVm7gvSexhNg5yeXAFAs7Vo4H0IrRkItMjbCy7SznqoFOYmJJ
-         HNBdnQMeynqmiQ4BF5DB9MM0TzHLeCRZF1Krj6haC25keEJILJKSu+fr0lje3TcmjayD
-         +Y/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Bxpm877ucu29+swtwCcWrV9CPuVdsV2sIZfuT/jfRmc=;
-        b=xEYY8ZpStkgqQyXyy5Xox35AKLGAfmfF405lYGUjVPAuFE1WSrSd7gM3uznvGMz1e/
-         SwHwKwcHqNLNway5LIKpy7RVPHgTTXo7/vwXxQMn4IyEZWNs4EegvgzpcFmA45++hDae
-         rqcy+Infpq5aiA8rQHfu3O455m941ROe0uINcMWvmj2oYfM96ETsmkRnCItoYIR7PIhZ
-         EaA4R81iXzwdbEbHrs7xl0AJxtxGcqAS5Y+vGhqOirvJSHXggUwbksIVHFGB9mdmcAof
-         jrnvRnI//aFHxRQ25a+cqQy+/6EDyI5nizNHGwC3hQe5J8/+vSuuFutm4IxvP2KTrILT
-         wi6Q==
-X-Gm-Message-State: AOAM5323N1UXN9nUzvwHj692zqkKxsM5t6LoYQC7ZHQZt1/4ACbvgvlS
-        mRYKPFMHuzRhI2EQ4twuyq1dOg==
-X-Google-Smtp-Source: ABdhPJykBaUp6Ra73BKveHHRMZh4OnjUi7muGD2LnVC8BwpUUYIBB4aGQnyy+EYpnJ0P8dJ+mpdu6Q==
-X-Received: by 2002:a17:902:7289:b0:142:805f:e2c with SMTP id d9-20020a170902728900b00142805f0e2cmr61761710pll.42.1638206729695;
-        Mon, 29 Nov 2021 09:25:29 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id m15sm18877279pjc.35.2021.11.29.09.25.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Nov 2021 09:25:29 -0800 (PST)
-Date:   Mon, 29 Nov 2021 17:25:25 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        David Matlack <dmatlack@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>
-Subject: Re: [PATCH v2 11/43] KVM: Don't block+unblock when halt-polling is
- successful
-Message-ID: <YaUNBfJh35WXMV0M@google.com>
-References: <20211009021236.4122790-1-seanjc@google.com>
- <20211009021236.4122790-12-seanjc@google.com>
- <cceb33be9e2a6ac504bb95a7b2b8cf5fe0b1ff26.camel@redhat.com>
- <4e883728e3e5201a94eb46b56315afca5e95ad9c.camel@redhat.com>
+        id S1344222AbhK2TNr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Nov 2021 14:13:47 -0500
+Received: from mail-dm6nam12on2083.outbound.protection.outlook.com ([40.107.243.83]:8360
+        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S233999AbhK2TLo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Nov 2021 14:11:44 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Q5PryMhWCn3YVbu6U57xsiDi2V3sv/Ymo0U0elwrjU4e10z9yqN1fWhHlmVKTN1bAUuTcKoqJQzIthpPDbIFsT3Ju9FPgDhF0NpOBBg2TQPuCN6TqvvntPyjr941hUsmQwVw7S75HXFrk7ihh1qaWE+iqmASCFwzTWm5dDyEutuONw1w6QRg6gAUENdxiPbOO6flXKLeakGbKGkzVO2BXGnUaIdGZwg5zoAJ0T5GpLEsZmuvgUAtV80pjMAzEZ7qC73Vskxse3LimKfaBQDT1edkuN7/0sVxag2aQwUdk4rgDNV/nCf2NcHqWC0+X/lkFyj1LyIPkhSfJlBuZPNN5Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=buoPcLNv7ygYept2gHLWD8Xof/w+BbT/cMoaBJQROjI=;
+ b=HMlPSuK9b3ckXj7JVBGPl79wpDVGz5ryF96o64thnK9wK6PmgK0yLOzIQhvXGni9uGDzVHfRvTdZikSfd0mIm+cKzqmIP0oun8UZv8/HJvq3+dBrYCHjvpYKh99LwO9z/Gc1hWm6JkLcrgtp5D+hvjrrhFCZqvg2qgiyfheYev7xN0JZr0qk1WN0AJUvVYk2oD1szQJELZ+2cT2vLwAWQIyyPIfqzpA5dq2OiDO5h2JgyAn5526NG/9rx/csI1QE5XNTGNN4CU4q4mQyzioumn8tdxrHjyg9fbz1osUKhiQKTl7w2hkwYkfb8bIejy5euZmfCbRrDStFTwqZSzVVtQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=buoPcLNv7ygYept2gHLWD8Xof/w+BbT/cMoaBJQROjI=;
+ b=ICwRBwORZ6czX3pfunUktfaIxIbNqH34eZTINEkyYw2n0Z3THEISX3DMRZU1jSStZfy4sbaLD25wQ4/Thpk3bQeo2yOqoQaXuuyu5kcUwcbHhR6T07upixsZ+hhB7zIoWWNc5AzbZjDF0+gmFpbfJElbkEo7CmXxD534jEAEka0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
+ by DM4PR12MB5086.namprd12.prod.outlook.com (2603:10b6:5:389::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4734.23; Mon, 29 Nov
+ 2021 19:08:25 +0000
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::1ddd:71e4:5803:e44a]) by DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::1ddd:71e4:5803:e44a%3]) with mapi id 15.20.4734.020; Mon, 29 Nov 2021
+ 19:08:25 +0000
+Subject: Re: [PATCH] KVM: MMU: shadow nested paging does not have PKU
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Lai Jiangshan <laijs@linux.alibaba.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     stable@vger.kernel.org
+References: <20211126132131.26077-1-pbonzini@redhat.com>
+ <2091ec8e-299a-8b3d-596e-75cf4b68fde1@linux.alibaba.com>
+ <b5e2c332-59a8-7fa8-5e59-4cb2e5be3b8d@redhat.com>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+Message-ID: <9f56fc4c-9842-a125-0f95-c32e248b677c@amd.com>
+Date:   Mon, 29 Nov 2021 13:08:22 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
+In-Reply-To: <b5e2c332-59a8-7fa8-5e59-4cb2e5be3b8d@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: MN2PR08CA0008.namprd08.prod.outlook.com
+ (2603:10b6:208:239::13) To DM4PR12MB5229.namprd12.prod.outlook.com
+ (2603:10b6:5:398::12)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4e883728e3e5201a94eb46b56315afca5e95ad9c.camel@redhat.com>
+Received: from [10.236.30.241] (165.204.77.1) by MN2PR08CA0008.namprd08.prod.outlook.com (2603:10b6:208:239::13) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4734.20 via Frontend Transport; Mon, 29 Nov 2021 19:08:24 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: f1c8c740-5ac3-4c83-82f3-08d9b36b9e46
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5086:
+X-Microsoft-Antispam-PRVS: <DM4PR12MB50868EA2C9C439624C2EDC79EC669@DM4PR12MB5086.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: WTiq/uHUaFBrfNX1/2qE9F9CAH34OKtxgGc/IekPvfCEqGknGWU0bQ5O1u4S3mG3GKfyFSvSMz0w+fXdxQXmjGwpCoK2av+QJzwkzaxQ3s+om7LcasOUOzXbKUdcuFy2VN6U9O/SBWpA7ZlKx5PsQu8hpcN7EZ7EIo+rhY2J8RVaRl5jHkMOxH+lOaLPY9fS0c17EkMP6i4OO58RrLWXDMadRsQrFWNuTyZH0NHmS4MN11jnTDo38EtYjBu0sVi3k8OZo4psjj0yvg0EJEzFPM91C+oUwDgv4PLiIfTnwPJpfVKhWdiPWpoXfkbRbfpzuF+WgH4L72ibn05KlEoCIj3Fe4NhjrLSmr69vVFw4UPRq31kwbTYTnR0qhnHPxIpvlRSAsWOuxCTdWWOjhii9feKuBaL8NBzevfgmkatmvTXd8Eii3UKbwjZ6601w8SecTr8hpHeaA0xrAwFzemXOWC0//fidpTSD2q+HWoC6HdZqZv3tWlcQGLoAdwKWZXHxHEifE8evfAvD9EiueP4WphmXnCUSgpW0uH7H7jP3IAcW3QjVJX+trSiW8DJKhvJ18Ic2nMpgOXz3LdkpOL6rsAaU8q8aQvaMFNaWuo487MyOOR5D2YGtOdoPC35f2pOcdqYxbCYnD7zvQe5g6ua7GrQxm6rX8lMaJA7n6Ed6YKCRIhhZ76eIKpE5E2crqVvuGSYlZzdx8wfjd/2hd+OGx1aQlQr0oYfbuibN2I2HHctKEGuAXb9Z9sf/pBzJntN
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(66946007)(186003)(66556008)(2616005)(8936002)(66476007)(6486002)(956004)(16576012)(26005)(31696002)(53546011)(4326008)(83380400001)(316002)(508600001)(8676002)(38100700002)(36756003)(5660300002)(86362001)(31686004)(2906002)(4744005)(110136005)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NzRydnZhajMwVXZMOC9hR2w3WXE1SkZXNzk3YjFnTnJtcGNWSXR2Wm93NFRo?=
+ =?utf-8?B?eVhkckljZm5NZFVRWC8rRStSUDRPRGxZVDNoSEo0bU40S2pLNDhNV1hjTDBY?=
+ =?utf-8?B?Wk1PUTRicWw1K1hXaFZnV0wzRTUzd0tnalFRak5YNy9td0JlZjg3dVAxbGE5?=
+ =?utf-8?B?SEtqUDNVbEhHaUhlcVhmVGpMTUVTSmUvYjM4TWpuZ2VJSlV0RDJkckhSa2lz?=
+ =?utf-8?B?djFHTEx2T0JJZUg3NUxxZklyTmQ5SGsyaG1tRnA2eGRqWW9NbU0zSXN4UU5K?=
+ =?utf-8?B?SFJTbkU0VEsvWWlsL3FTNGlsS2pmKzllbGVSTW42S3dmK1JMQlRQQlFvSFpW?=
+ =?utf-8?B?bWppWXI5NXc3REphZWUwQld1ZS95SmxMNS9aRHZ4a1Z5Um50S2xRUVYzRnZy?=
+ =?utf-8?B?aGFLRVJ5YTEzdlFNWnVHVFlHWk5lSHVXQnk3RGJpVWFESDJyVXk1Vy8xd2dL?=
+ =?utf-8?B?MlIrUXNwU1l4ZEdTdERWTEtQZFZQSEQ1QnJFTVoza2VXOWVsWDQ1RldiOSsw?=
+ =?utf-8?B?MmhiTVpaWUowTElHTjFBM0ZHS29qQW41Wm5GUklqTVYwNjBNaHhTbmVZMXV5?=
+ =?utf-8?B?U3BYWUtMUTZOd2FqWk1XMTFreWE5VWZwbTVjSGdhNGg0a0Zlc2c4cjZETXpl?=
+ =?utf-8?B?QTYwVDQrSlhlbW1pc3N6bmJ6S05MRFdGMmdkOEtoZEFQbjZDeUJmWE1pNHp1?=
+ =?utf-8?B?N3dJTTdiSmEzMDNwbnhJZnpEZytJeWdaQ0ovTHVZdEVpUDIwVEpoUXZ1OVVF?=
+ =?utf-8?B?bHpVVU15WXE0Q1RuRkg1QzB2ZEhSQUtuV0NOd2x5MVFaZ2RrRnpobUswa2V2?=
+ =?utf-8?B?T1hTdlp5c1VaMDltaG1XS01nNnNPMTR4SmpXcEQ4V0Z3MDNJWVdzQ3FRaG0x?=
+ =?utf-8?B?aUo2aFpuZW5qNXdwMVB2Ri9NazRLMnZUajhwUVpNelMxZlpFTDVMQ0Z4ekor?=
+ =?utf-8?B?OG9nSnJIb2JTYlJET3NFT2hGNXBvQzE2R1NPcVc3ajhrOW9RM3pOYkorbSth?=
+ =?utf-8?B?ejlaRVR4OWVVb2c2K29GNGx1ZktyOUREZzNQRllyNlE5L2ZtU0xsYW81TDNV?=
+ =?utf-8?B?WURhRWRsaHhtMFZweGY3NWVMckpBMmMzaHVUYlRJTTFtR0NKaDQ2NTFucVlt?=
+ =?utf-8?B?T3gyVGxRdm5NSi8wUW1FMDlrU2NaeUR3cmxncVpXc0FQNjBVS2NDL09JRjFK?=
+ =?utf-8?B?N1dkbU5DVlVDdVRDclNDMkE2NXByaVVLcFVxbE1Ca2JkblhjckJ6RWhveW0y?=
+ =?utf-8?B?ZjlpRG91OC81L3dTUXJSeTQ2UkRjN2Q3aDBvNEZWRUJ2Q2hZTDY1NXppRUdN?=
+ =?utf-8?B?WXFhNnNBbDJvWmxzb3R6N0FJUmdYUGh5OVJEZmhza2hUTGdUNk03WnpveHdv?=
+ =?utf-8?B?ZmJ4RFQ3QVBQcnZzZk52OVNoekRTemF0TU9nYm9UV1RCb0VWWUZIQlNvb2hL?=
+ =?utf-8?B?eDZHZ3ZRalVSRHhWRHJJS25QeHU0SERXTFYyNlVmOTBqRFBrUjRoVTFIN24z?=
+ =?utf-8?B?V1lHRFpnUDF4RTBwdjRndlhjQVdDeTQrVzlWcG93SlUzMGFqY0FBREh2WjR4?=
+ =?utf-8?B?TXJ2OGV1YVAwL0E4N0hDS014MDUwenJUVzNNcElYL2o5MGtvL1gxWnA0bnYv?=
+ =?utf-8?B?SDFGOGZOWmJmNGN6TW9GTnl5NGJ5b1RSV04zemptTUdldU4xWkdFclBlQ0dI?=
+ =?utf-8?B?cnJVcCtWYmlkZ0lIZFIxd3d2NHJKREZ3VFJhNUNraFVVYlFEWWRrZUJMVEVL?=
+ =?utf-8?B?cWdoVm1uc1lMWFlNaHJmY3pPbTczeDNMRzAvTzZ4M2VERlVDYmlQbFdVQW9V?=
+ =?utf-8?B?UDF4ZW1kdThhcnlDOFNHcU9NdkdkVU8zVzFmY0VsdURDd1ovYm1UV21XN2Q0?=
+ =?utf-8?B?TGswZkJoZVpubWM3dWNPRlM1RFVKdHhQRVZaOFRNQ1B6TjJvblVyTzJhaWdi?=
+ =?utf-8?B?Nk1wREJyMjVvTW5YNmVLQVZvaEp0VW40ZkJiUXRHbkh1L0NtZEh0b2FNVzQz?=
+ =?utf-8?B?TnBYWGxpaUtqLzIrQnFmempzbG5CMHBHWmwvemovYUdzU3Y3SkxpNnNuUjJO?=
+ =?utf-8?B?MWI0dVZ5cW9OZXdiYW4zajBrdTdBRWJNNWNDcnIzcnpORC9ReXpPQ2dVcE1X?=
+ =?utf-8?B?MXkzZWwrSGtEd1BEVnF2YjhzL3hJWmZwVUZpaWRFZ0RrSkJzaGJGT1FobGhl?=
+ =?utf-8?Q?9hplSf6nuPl8+8iz1y7vmnY=3D?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f1c8c740-5ac3-4c83-82f3-08d9b36b9e46
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Nov 2021 19:08:24.8905
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: mKHSozQ7DYkMENWoHClg3vrQSObnbvLBwlVIjQ8bg8xjbhcC8C+xy37M07E2ldDWKeLzRkNwShO6kJT1M2qRkg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5086
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 29, 2021, Maxim Levitsky wrote:
-> (This thing is that when you tell the IOMMU that a vCPU is not running,
-> Another thing I discovered that this patch series totally breaks my VMs,
-> without cpu_pm=on The whole series (I didn't yet bisect it) makes even my
-> fedora32 VM be very laggy, almost unusable, and it only has one
-> passed-through device, a nic).
+On 11/27/21 4:25 AM, Paolo Bonzini wrote:
+> On 11/27/21 02:21, Lai Jiangshan wrote:
+>>
+>>
+>> On 2021/11/26 21:21, Paolo Bonzini wrote:
+>>> Initialize the mask for PKU permissions as if CR4.PKE=0, avoiding
+>>> incorrect interpretations of the nested hypervisor's page tables.
+>>
+>> I think the AMD64 volume2 Architecture Programmer’s Manual does not
+>> specify it, but it seems that for a sane NPT walk, PKU should not work
+>> in NPT.
+> 
+> The PK bit is not defined in the nested page fault EXITINFO1, too. Thomas, 
+> can you have it fixed in the APM that the host's SMEP, SMAP and PKE bits 
+> do not affect nested page table walks?
+> 
 
-Grrrr, the complete lack of comments in the KVM code and the separate paths for
-VMX vs SVM when handling HLT with APICv make this all way for difficult to
-understand than it should be.
+I talked to our documentation folks and they will look to update the APM 
+with the appropriate information.
 
-The hangs are likely due to:
-
-  KVM: SVM: Unconditionally mark AVIC as running on vCPU load (with APICv)
-
-If a posted interrupt arrives after KVM has done its final search through the vIRR,
-but before avic_update_iommu_vcpu_affinity() is called, the posted interrupt will
-be set in the vIRR without triggering a host IRQ to wake the vCPU via the GA log.
-
-I.e. KVM is missing an equivalent to VMX's posted interrupt check for an outstanding
-notification after switching to the wakeup vector.
-
-For now, the least awful approach is sadly to keep the vcpu_(un)blocking() hooks.
-Unlike VMX's PI support, there's no fast check for an interrupt being posted (KVM
-would have to rewalk the vIRR), no easy to signal the current CPU to do wakeup (I
-don't think KVM even has access to the IRQ used by the owning IOMMU), and there's
-no simplification of load/put code.
-
-If the scheduler were changed to support waking in the sched_out path, then I'd be
-more inclined to handle this in avic_vcpu_put() by rewalking the vIRR one final
-time, but for now it's not worth it.
-
-> If I apply though only the patch series up to this patch, my fedora VM seems
-> to work fine, but my windows VM still locks up hard when I run 'LatencyTop'
-> in it, which doesn't happen without this patch.
-
-Buy "run 'LatencyTop' in it", do you mean running something in the Windows guest?
-The only search results I can find for LatencyTop are Linux specific.
-
-> So far the symptoms I see is that on VCPU 0, ISR has quite high interrupt
-> (0xe1 last time I seen it), TPR and PPR are 0xe0 (although I have seen TPR to
-> have different values), and IRR has plenty of interrupts with lower priority.
-> The VM seems to be stuck in this case. As if its EOI got lost or something is
-> preventing the IRQ handler from issuing EOI.
->  
-> LatencyTop does install some form of a kernel driver which likely does meddle
-> with interrupts (maybe it sends lots of self IPIs?).
->  
-> 100% reproducible as soon as I start monitoring with LatencyTop.
->  
-> Without this patch it works (or if disabling halt polling),
-
-Huh.  I assume everything works if you disable halt polling _without_ this patch
-applied?
-
-If so, that implies that successful halt polling without mucking with vCPU IOMMU
-affinity is somehow problematic.  I can't think of any relevant side effects other
-than timing.
+Thanks,
+Tom
