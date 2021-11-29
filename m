@@ -2,254 +2,230 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A88B4460EAA
-	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 07:04:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 53A9B460ECE
+	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 07:40:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242608AbhK2GGQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Nov 2021 01:06:16 -0500
-Received: from mail-bn1nam07on2109.outbound.protection.outlook.com ([40.107.212.109]:29762
-        "EHLO NAM02-BN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S238977AbhK2GEO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Nov 2021 01:04:14 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hj6Q/HiR143zPYtxBnybvKS8mvXAcM5Xg04UVdGP11/lIfduysZhPer02CHplfEXINqvZv1uAZty3gbrY5/ayCcRHgV+DQZnqbBRLhKB2DQvAZMCdPXb/pXOlc6zkNGIV7sYu6uvaa0kGAu5I3+yUJJziB2I8l03zGIO/VSFd7IRYSFaddW5A76QbjaHEu4JGWVtWamTkdf3TP0jKjbb8Og+7D3NRSRhk4bwpY6mFxwKF9hf8mdFWPMgiTyiZ5L8zbxN5xQAMAHCRmOACoZZ/HgKXgWnH1eBMsq+8NMOeiveTsUnt2m2W+WDl1yb/j5WLEF+4RiY4mni397WkNmNhw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kIRu1x6KQoOkOSRcYQ/Wj3+Z12JlaVDLVItjuLRjFGo=;
- b=bi+dC9q4iuINLNNwC2CBccFZjledfsXwR6AcfDKB9ERgT40EYXJT4yaCgCrzMHxoZ34N/9aCU1PJCJ3oCstYnxst6eC9o+HxezBOBSnFOFYkP21w+XldmQEc0RKKSL5mviFsTUoVtTaELv0+4bwuHLtryiLylcygHbMXrheD7l28DJ+VgKLQd9lhOz2EaH78yqC4NB58iaWFKYHis/DUjmUjGSAXXklgAlKN0Hsfstkac0HX3KotVzrhSqd56YheeF2UtJf0vKIIj4VYtG+J4dKTNkcT5hRcfPvKZR+goizYdFFM/cpsIyq8JLeMG7KzVUyNUOHZ1LBAvK2SxH1mmg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=os.amperecomputing.com; dkim=pass
- header.d=os.amperecomputing.com; arc=none
+        id S1347441AbhK2GoC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Nov 2021 01:44:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49158 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233836AbhK2GmA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Nov 2021 01:42:00 -0500
+Received: from mail-qv1-xf2b.google.com (mail-qv1-xf2b.google.com [IPv6:2607:f8b0:4864:20::f2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D43BEC061748;
+        Sun, 28 Nov 2021 22:38:43 -0800 (PST)
+Received: by mail-qv1-xf2b.google.com with SMTP id gu12so13619689qvb.6;
+        Sun, 28 Nov 2021 22:38:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=os.amperecomputing.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kIRu1x6KQoOkOSRcYQ/Wj3+Z12JlaVDLVItjuLRjFGo=;
- b=FY+FglbxQY9mVabf6QwQRBM8FkNLF3ZYUlOsyYxnx6E5ljwVIwYZU+EoLwoJ9zzTHyKf6HD5SlE5DjXzeqXjNpxA3Pa7Dr8zPprclFBH6uiiWW+V5JKR3F1Q2rgkIAc2AeObh/yikqfweUpnjIvaNoqzLE3uJQCWDBnN1YzhlmU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
-Received: from DM8PR01MB6824.prod.exchangelabs.com (2603:10b6:8:23::24) by
- DM6PR01MB5385.prod.exchangelabs.com (2603:10b6:5:17b::23) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4734.23; Mon, 29 Nov 2021 06:00:54 +0000
-Received: from DM8PR01MB6824.prod.exchangelabs.com
- ([fe80::ec55:306:a75d:8529]) by DM8PR01MB6824.prod.exchangelabs.com
- ([fe80::ec55:306:a75d:8529%7]) with mapi id 15.20.4734.024; Mon, 29 Nov 2021
- 06:00:54 +0000
-Message-ID: <afbf8081-1b56-cf38-f3db-4499b3692d9d@os.amperecomputing.com>
-Date:   Mon, 29 Nov 2021 11:30:46 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.2
-Subject: Re: [PATCH 2/2] KVM: arm64: nv: fixup! Support multiple nested
- Stage-2 mmu structures
-Content-Language: en-US
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     catalin.marinas@arm.com, will@kernel.org, andre.przywara@arm.com,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, darren@os.amperecomputing.com,
-        D Scott Phillips <scott@os.amperecomputing.com>
-References: <20211122095803.28943-1-gankulkarni@os.amperecomputing.com>
- <20211122095803.28943-3-gankulkarni@os.amperecomputing.com>
- <877dcwco1m.wl-maz@kernel.org>
- <a32b4390-a735-783f-9351-a71334d67572@os.amperecomputing.com>
- <87bl26bu68.wl-maz@kernel.org>
-From:   Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-In-Reply-To: <87bl26bu68.wl-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CH0P220CA0005.NAMP220.PROD.OUTLOOK.COM
- (2603:10b6:610:ef::8) To DM8PR01MB6824.prod.exchangelabs.com
- (2603:10b6:8:23::24)
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=GW7wD7qKvROu8z9xZL5o2Gh9JvMEXrXNdc/d8bAaPNs=;
+        b=Ximtyy9D6hF34jeHkx2abhxO2fEDksv5f5qJu4CbvoNWokti3yxmfDL3L7TYPRNI1N
+         nLBExnAtE1kHxfW3UuSIcTZjpfdkrYaWw77PtYlgHprrRWmhg8onSirLlPaay6tbmdGV
+         QOolCDulR6Tk/EKA2Gv8Xlb2VKcWxKtuMIpV9m8bP/Y2OIkRrwh1D8Uy/bj62ViSMN2l
+         ZvGgVYwmHud/XyWXGXVdXp5Qsb6Tf/NpieRKvdWwCGOCaqCRU7xxjxP8pUys/Y0my6pK
+         DI87mJm/+MqXPnLUnP7Gv+O+UoGKFiXftZWbYzOV5qGvrEcopuUsleS20idOc1qycgZd
+         CJ3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=GW7wD7qKvROu8z9xZL5o2Gh9JvMEXrXNdc/d8bAaPNs=;
+        b=ZJNzQ26Pb9b5MJ1h3uUNqYGv1DaF8OI97Y1jXO35e62sIp4N/U+id1FQbIb1zKi+8n
+         QKlv6MnvQlACW6tq4DYgO2P2XGDXXmwikomWVIzzVHN6aghoX+BwKX6cWG8+e6akI3l+
+         Ozvclk1Yedo0wVR/WvvQj7PXMQlTOQm48qqzsUfXt5rc+eWaY15RPknM97CG9Xb6fv07
+         YF5wLyZ6Xm8X5bZ67A2PbR6MN2gsFdGO1DL/GCbYIbfYDGWSERBVVgnvVotH/0QVkt6D
+         DR+Y3vwLW4oPazxAcrRIf0acgfZDdryEtnu6UP2qQ1X+szodvu6Rippkk530utTMvaSg
+         9fKw==
+X-Gm-Message-State: AOAM533YI1rNKv+SqHSIcx46h56bqj2sV4uMFtHOzX73HR9Rm2iuz7yU
+        9217RHcBLVci45zm4BX7KW8=
+X-Google-Smtp-Source: ABdhPJwSywxmnS7RgaW8ur/GbWm8YSeTFfi4rMgLh/NdfnxtrZBeDnmatO6ciZp/cAThb6LO+btZbw==
+X-Received: by 2002:a05:6214:984:: with SMTP id dt4mr30031399qvb.120.1638167922796;
+        Sun, 28 Nov 2021 22:38:42 -0800 (PST)
+Received: from localhost ([66.216.211.25])
+        by smtp.gmail.com with ESMTPSA id h19sm8495514qth.63.2021.11.28.22.38.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 28 Nov 2021 22:38:42 -0800 (PST)
+Date:   Sun, 28 Nov 2021 22:38:39 -0800
+From:   Yury Norov <yury.norov@gmail.com>
+To:     mirq-test@rere.qmqm.pl
+Cc:     linux-kernel@vger.kernel.org, Yury Norov <yury.norov@gmail.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Alexey Klimov <aklimov@redhat.com>,
+        Amitkumar Karwar <amitkarwar@gmail.com>,
+        Andi Kleen <ak@linux.intel.com>, Andrew Lunn <andrew@lunn.ch>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andy Gross <agross@kernel.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Andy Shevchenko <andy@infradead.org>,
+        Anup Patel <anup.patel@wdc.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>, Borislav Petkov <bp@alien8.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Christoph Lameter <cl@linux.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        David Airlie <airlied@linux.ie>,
+        David Laight <David.Laight@aculab.com>,
+        Dennis Zhou <dennis@kernel.org>,
+        Dinh Nguyen <dinguyen@kernel.org>,
+        Geetha sowjanya <gakula@marvell.com>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Guo Ren <guoren@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Ian Rogers <irogers@google.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jason Wessel <jason.wessel@windriver.com>,
+        Jens Axboe <axboe@fb.com>, Jiri Olsa <jolsa@redhat.com>,
+        Jonathan Cameron <jic23@kernel.org>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Kees Cook <keescook@chromium.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
+        Lee Jones <lee.jones@linaro.org>,
+        Marc Zyngier <maz@kernel.org>, Marcin Wojtas <mw@semihalf.com>,
+        Mark Gross <markgross@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Matti Vaittinen <mazziesaccount@gmail.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Mel Gorman <mgorman@suse.de>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Mike Marciniszyn <mike.marciniszyn@cornelisnetworks.com>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Petr Mladek <pmladek@suse.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Roy Pledge <Roy.Pledge@nxp.com>,
+        Russell King <linux@armlinux.org.uk>,
+        Saeed Mahameed <saeedm@nvidia.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Solomon Peachy <pizza@shaftnet.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Subbaraya Sundeep <sbhatta@marvell.com>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Sunil Goutham <sgoutham@marvell.com>,
+        Tariq Toukan <tariqt@nvidia.com>, Tejun Heo <tj@kernel.org>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Vineet Gupta <vgupta@kernel.org>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Vivien Didelot <vivien.didelot@gmail.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Will Deacon <will@kernel.org>,
+        bcm-kernel-feedback-list@broadcom.com, kvm@vger.kernel.org,
+        linux-alpha@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-csky@vger.kernel.org,
+        linux-ia64@vger.kernel.org, linux-mips@vger.kernel.org,
+        linux-mm@kvack.org, linux-perf-users@vger.kernel.org,
+        linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+        linux-snps-arc@lists.infradead.org, linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH 0/9] lib/bitmap: optimize bitmap_weight() usage
+Message-ID: <20211129063839.GA338729@lapt>
+References: <20211128035704.270739-1-yury.norov@gmail.com>
+ <YaPEfZ0t9UFGwpml@qmqm.qmqm.pl>
 MIME-Version: 1.0
-Received: from [192.168.1.22] (122.177.50.160) by CH0P220CA0005.NAMP220.PROD.OUTLOOK.COM (2603:10b6:610:ef::8) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4734.21 via Frontend Transport; Mon, 29 Nov 2021 06:00:51 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 48d7c26e-02a1-41a2-29c3-08d9b2fd9aed
-X-MS-TrafficTypeDiagnostic: DM6PR01MB5385:
-X-Microsoft-Antispam-PRVS: <DM6PR01MB538539C2A3BCF808734AAE159C669@DM6PR01MB5385.prod.exchangelabs.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: rjXlgBCDv2x4CjPACXgoX2jsRvzXwogdJzQZCQz3yINI62ekpwoe7aYhYN7JrE5nvIocN9rNiygKqgCxFGqVI8DoW+so+uNz5ELutLm2zW0tFccwsavwkhaipKb9c2XdtLDzkxNpYJPSDPgPejh0K2+wQEmmaOGI3zjW7PzghRZIXtblk+Tjung5wr/7M82+tBmfGSpY+vw9vasJBGDgfzOGOJuaZjQeMKpPwNwE42T92A0JytTSqZq23Rb7wgL8lRcsB3BUyIUPrV+oFPnL/mQrMwFnFkbDoZnRlOGv7P5c0sRg8VPTfk9R4TsBjpiuOXl+U/0J0I7GFO1ShbV2n/KEzQGsj28mgWSnFhs3ZvPU0DvVb1fI36tdAogR2AqmcK4H9maT8GNaGj+Y1VHcnrC6RnU9Z95ltSi6m0Y14iWxR7y5Te8+FW3UCnSa2D1DFqkBf3exebdLonRZOqRMu6Tn0vwEeV91egOC3Xq74JAFbMasAsOSU+ESMJMXjD8c3a+HPwqA1cuRxPiBn4OK/7myJxTnCCqzh8jq4h5kxG5SUMp3L3QOAHRosCXw9Tp1Z1cYErhcyE9wU8jHKFme1kUeJi8td5u9sO/SMFFfKSQ5XBh2sRlESh1wRzTYmKpsnBQ02BeQhzABrfuiZFzKsIT0tfbfGj4HmTSYvvNKcySONlqe7WMi7xWT8sp7efaQZCdVvAoFTcbQx+FXA/uJ+2tK6zNfj1kqF7U8VUKgLRr5ZAoLgNKpt4EvnTZP8WByK9aj3DElsw52NQgnSKiUW7piFPdOEgVUbp7BBNi/uth6wJiQ0m5sbQPumOnFz+EpKsvdMjCcF/FkNIR7jngvB67XDP/bOmgXEmNSplxGs2M=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR01MB6824.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(316002)(2906002)(55236004)(26005)(956004)(8936002)(508600001)(6486002)(966005)(83380400001)(4326008)(8676002)(6666004)(53546011)(16576012)(66556008)(31686004)(6916009)(38350700002)(5660300002)(66476007)(38100700002)(86362001)(186003)(107886003)(2616005)(52116002)(31696002)(66946007)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UmFBQ3FZVkxmZlcvUHF4Y285SE5ZT2Nna1FUVXRLRVFlcGZPMGVCanY0eUZ1?=
- =?utf-8?B?eVhEWERqaytWYjcza2tobVJ6aXdWRkVFbzhMbDVyL3F6b0VKdzU5K0pWQ2Zp?=
- =?utf-8?B?SGpWTWVnZnpib04rN2ZNckVJaUF0SHZuaTI1OFFCdXFIdkthQlllcG5WMnB5?=
- =?utf-8?B?d1drRXVFeEVkblM4K1lQbCsvYzBqd2pGVThJci9BWWx5dGZUUk5PQjlhbytX?=
- =?utf-8?B?U0wweSttMkR4eGtzQ1l5azRwRlc0UllaU0xLYjZkOEpYd1I1cFYvd3BPZHpM?=
- =?utf-8?B?dktJTkozdmxwZlpac2d4dkwzU3VkZkRlNVF3dnUwa3lXMWhrY3g2dDNDZVJH?=
- =?utf-8?B?REV2Y2EyWlhFaitHVXJJZFlQYWUzN0RDNC9GVklORGhFUStKOTlJcWVCc1JJ?=
- =?utf-8?B?dGFMQzV4a1RaNEdyeVJLSFdMaTNFS25hQWdmSkpZL2NoRVloSTBJOURkVzdu?=
- =?utf-8?B?cGtLN3B6RS8zMGsxbklCUVhJUDFISlZRbFJ6eE5kbE0xMzI3TGo2RlkvSzU2?=
- =?utf-8?B?Wks0M0p3cE5PTndMWVlmcnlYSTRCN3V4TDNZdjh6cDRydktvVkpNQXl6NGt0?=
- =?utf-8?B?aHBvdjVBdHY3WlpGTXhvUmJpMktIaE1KR0VueGlTNTRIQ0NDWUtRcVV6RlNU?=
- =?utf-8?B?NndQMDhQR2dESVg0bDBDd0FkUkh0cmd1a0tya09jK1F4LzdLR3V6UVJMM3pm?=
- =?utf-8?B?V3NMdS9sY2dta2o4WW9TU2lEVk5YMzUwemRqdVByMm82NSsvTVZSNXBtVEVj?=
- =?utf-8?B?ZGs0T3FmdncrS0h0Wk5yUFhDclRTd25kOFV5Sjl5b09WM085RHNQbGNFeko5?=
- =?utf-8?B?ZGdRcHd1MTFPMUZMdHUraDFHQXYralNUc29taFRhQW1jTHB1TGV4bWwrSk1B?=
- =?utf-8?B?SmFOU2M5bmsxd2dNVm9KRmRFR1l2Z0wvSVEvVEtQNEUyK0EzZnVQanlqMEVO?=
- =?utf-8?B?L2dhV0hZVEJsOURWbXZVMUVjV0lFSDI1TUdtcG9rYysvVVhHbUpvUEZ4ZG9u?=
- =?utf-8?B?cmxyZ3JaVjVxUSsraUhJVGVnRWZMV2o3TU43czVQMDY2RDM0VWpNYUp6RDhz?=
- =?utf-8?B?Yk9VbTFYeE9nbGNYY3d0WmJGWExVSzhxVkhNS2p3bmhHK0V4RWZmOVJJaFo0?=
- =?utf-8?B?M3FHS2xhNEJoUE4vWnJQaGRhL2puLzd6OG1mOGxDcXB1azlhczhvYzA2RFJr?=
- =?utf-8?B?bFA4UU10UkJWTVk5R3pMckFBNEw0YkdWN3h1aTl5Nnc0SW1KWU9RRnUrSlNa?=
- =?utf-8?B?V2R4b0k3aENvd1dBUnRDaFVRNk9BNDRzMlFDY0lQczF3c0R6cGtvWEtkUkxF?=
- =?utf-8?B?SFJ4S1d5MFg0cjBiMTZhaVU3NWR2L0o2Q1JBZkFvQ09QZnVMV3h5bjY0Nkpy?=
- =?utf-8?B?R0J6OU9UNFhxWWlKNC9mS2pYSFArd2t6TTFzUlZCcWdzQlM2aDA3YUFCeFNn?=
- =?utf-8?B?YmEwQlM1ODFkZnprVjgreUpsUGdteVV2NXVseDNINFYycFRwb1JrZWZJOGVt?=
- =?utf-8?B?cWVzb21JVVg2Y0lBbjZrR2lMa21xSThVV1ZXOHI0c3hyNjRGZENIYlZON1p6?=
- =?utf-8?B?b05wVjlkbG9TNzBHenhKNFYvUnRlYXV3TzNSUlRabEw5anQrWTYvYklWaFhv?=
- =?utf-8?B?NWYveVUraVpCR2JpamxUYTdWZTJIVFpyd2tuYndhYTY3eEJLRUw0NmZXT0pv?=
- =?utf-8?B?UWxCeWV5azVETytWN0tranBncm15a2tUUVZET2dab05hTmxhQzVJdTFoWGQ4?=
- =?utf-8?B?ZEg2TStFMUhycjZlYWU0c0tvZ0g0SGU2eUpEWTRpSXNra0NPYmY4aXNheXMy?=
- =?utf-8?B?YXdtWnlSeWxIYXd0VCt3Y1I2N0lnY3NCVEkreUJiVmE5OC9sRnF1VXJDa2dn?=
- =?utf-8?B?VVIrWThPbFlQbjQ0ZHY3eTltclhNd0hnTjQ4RUdGSFo2bHc4NkZEU1VlM0g3?=
- =?utf-8?B?Vmt1T3ErWHFPNzVudTNSTFo4V1pVTUVHM2gvUFF4aXB2dHRDRHg1Y2RhTXJo?=
- =?utf-8?B?WDVDN3VwRm15TWNMb0pLQ3lURXdTNHdsTG5YSWV0bVJYRUhYNVJEY2NMWlBP?=
- =?utf-8?B?TVR4YWRpeityZzdOaUpIT1Zxcmx5Y0pOOStMUWFwMGtkZ0x6Q1AwVzE1MGlH?=
- =?utf-8?B?RnlUTTVESUJtMkQ5Zlpmeld2YUZkd21kTnV0eG9QZHBmczk2bjZ0ZVFoVThw?=
- =?utf-8?B?ckFnMjlwcVRwTzZoNmVMa2o2R1AvWVZaR3l3VEl1R3pFdkhWWUxZYlcvQ1ZW?=
- =?utf-8?B?QjJzeXpkRUVpb3ZwU2JCc2t6cTlpQ1NVeEZzVlpaTjdJcThVdGNYcDlTaEh0?=
- =?utf-8?B?OVZDV0hyVDM0YVFCSXRQTUdOamNaMnBxMHRHMzRwbzdXYmtrUG14UT09?=
-X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 48d7c26e-02a1-41a2-29c3-08d9b2fd9aed
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR01MB6824.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Nov 2021 06:00:54.6713
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: GggCfCfWi6b5vL9VdxEzSBXG+WSYNYvBW8ThJRTPHyyUXH7Wm1ds2/je2uTrVbXXF9pGE/ZMD3+Z4wX3inysNWAlkPMoJyr94zoOhzrLswkduHFbr2YRP72dG5hWyUgH
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR01MB5385
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YaPEfZ0t9UFGwpml@qmqm.qmqm.pl>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Sun, Nov 28, 2021 at 07:03:41PM +0100, mirq-test@rere.qmqm.pl wrote:
+> On Sat, Nov 27, 2021 at 07:56:55PM -0800, Yury Norov wrote:
+> > In many cases people use bitmap_weight()-based functions like this:
+> > 
+> > 	if (num_present_cpus() > 1)
+> > 		do_something();
+> > 
+> > This may take considerable amount of time on many-cpus machines because
+> > num_present_cpus() will traverse every word of underlying cpumask
+> > unconditionally.
+> > 
+> > We can significantly improve on it for many real cases if stop traversing
+> > the mask as soon as we count present cpus to any number greater than 1:
+> > 
+> > 	if (num_present_cpus_gt(1))
+> > 		do_something();
+> > 
+> > To implement this idea, the series adds bitmap_weight_{eq,gt,le}
+> > functions together with corresponding wrappers in cpumask and nodemask.
+> 
+> Having slept on it I have more structured thoughts:
+> 
+> First, I like substituting bitmap_empty/full where possible - I think
+> the change stands on its own, so could be split and sent as is.
 
-On 27-11-2021 12:50 am, Marc Zyngier wrote:
-> [resending after having sorted my email config]
-> 
-> On Fri, 26 Nov 2021 05:59:00 +0000,
-> Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
->>
->> Hi Marc,
->>
->> On 25-11-2021 07:53 pm, Marc Zyngier wrote:
->>> On Mon, 22 Nov 2021 09:58:03 +0000,
->>> Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
->>>>
->>>> Commit 1776c91346b6 ("KVM: arm64: nv: Support multiple nested Stage-2 mmu
->>>> structures")[1] added a function kvm_vcpu_init_nested which expands the
->>>> stage-2 mmu structures array when ever a new vCPU is created. The array
->>>> is expanded using krealloc() and results in a stale mmu address pointer
->>>> in pgt->mmu. Adding a fix to update the pointer with the new address after
->>>> successful krealloc.
->>>>
->>>> [1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/
->>>> branch kvm-arm64/nv-5.13
->>>>
->>>> Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
->>>> ---
->>>>    arch/arm64/kvm/nested.c | 9 +++++++++
->>>>    1 file changed, 9 insertions(+)
->>>>
->>>> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
->>>> index 4ffbc14d0245..57ad8d8f4ee5 100644
->>>> --- a/arch/arm64/kvm/nested.c
->>>> +++ b/arch/arm64/kvm/nested.c
->>>> @@ -68,6 +68,8 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
->>>>    		       num_mmus * sizeof(*kvm->arch.nested_mmus),
->>>>    		       GFP_KERNEL | __GFP_ZERO);
->>>>    	if (tmp) {
->>>> +		int i;
->>>> +
->>>>    		if (kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 1]) ||
->>>>    		    kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 2])) {
->>>>    			kvm_free_stage2_pgd(&tmp[num_mmus - 1]);
->>>> @@ -80,6 +82,13 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
->>>>    		}
->>>>      		kvm->arch.nested_mmus = tmp;
->>>> +
->>>> +		/* Fixup pgt->mmu after krealloc */
->>>> +		for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
->>>> +			struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
->>>> +
->>>> +			mmu->pgt->mmu = mmu;
->>>> +		}
->>>>    	}
->>>>      	mutex_unlock(&kvm->lock);
->>>
->>> Another good catch. I've tweaked a bit to avoid some unnecessary
->>> repainting, see below.
->>>
->>> Thanks again,
->>>
->>> 	M.
->>>
->>> diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
->>> index a4dfffa1dae0..92b225db59ac 100644
->>> --- a/arch/arm64/kvm/nested.c
->>> +++ b/arch/arm64/kvm/nested.c
->>> @@ -66,8 +66,19 @@ int kvm_vcpu_init_nested(struct kvm_vcpu *vcpu)
->>>    	num_mmus = atomic_read(&kvm->online_vcpus) * 2;
->>>    	tmp = krealloc(kvm->arch.nested_mmus,
->>>    		       num_mmus * sizeof(*kvm->arch.nested_mmus),
->>> -		       GFP_KERNEL | __GFP_ZERO);
->>> +		       GFP_KERNEL_ACCOUNT | __GFP_ZERO);
->>>    	if (tmp) {
->>> +		/*
->>> +		 * If we went through a realocation, adjust the MMU
->>
->> Is it more precise to say?
->>> +		 * back-pointers in the pg_table structures.
->> * back-pointers in the pg_table structures of previous inits.
-> 
-> Yes. I have added something along those lines.
-> 
->>> +		 */
->>> +		if (kvm->arch.nested_mmus != tmp) {
->>> +			int i;
->>> +
->>> +			for (i = 0; i < num_mms - 2; i++)
->>> +				tmp[i].pgt->mmu = &tmp[i];
->>> +		}
->>
->> Thanks for this optimization, it saves 2 redundant iterations.
->>> +
->>>    		if (kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 1]) ||
->>>    		    kvm_init_stage2_mmu(kvm, &tmp[num_mmus - 2])) {
->>>    			kvm_free_stage2_pgd(&tmp[num_mmus - 1]);
->>>
->>
->> Feel free to add,
->> Reviewed-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-> 
-> Given that this was a fixup, I haven't taken this tag. I will Cc you
+Ok, I can do it.
 
-no problem, makes sense to fold this in to original patch.
-
-> on the whole series, and you can give you tag on the whole patch if
-> you are happy with it.
-
-Sure.
+> I don't like the proposed API very much. One problem is that it hides
+> the comparison operator and makes call sites less readable:
 > 
-> BTW, I have now fixed the bug that was preventing L2 userspace from
-> running (bad interaction with the pgtable code which was unhappy about
-> my use of the SW bits when relaxing the permissions). You should now
-> be able to test the whole series.
+> 	bitmap_weight(...) > N
+> 
+> becomes:
+> 
+> 	bitmap_weight_gt(..., N)
+> 
+> and:
+> 	bitmap_weight(...) <= N
+> 
+> becomes:
+> 
+> 	bitmap_weight_lt(..., N+1)
+> or:
+> 	!bitmap_weight_gt(..., N)
+> 
+> I'd rather see something resembling memcmp() API that's known enough
+> to be easier to grasp. For above examples:
+> 
+> 	bitmap_weight_cmp(..., N) > 0
+> 	bitmap_weight_cmp(..., N) <= 0
+> 	...
 
-Yes, I have rebased to latest branch kvm-arm64/nv-5.16 and I am able to 
-boot L1 and L2.
+bitmap_weight_cmp() cannot be efficient. Consider this example:
 
-> 
-> Thanks,
-> 
-> 	M.
-> 
+bitmap_weight_lt(1000 0000 0000 0000, 1) == false
+                 ^
+                 stop here
+
+bitmap_weight_cmp(1000 0000 0000 0000, 1) == 0
+                                 ^
+                                 stop here
+
+I agree that '_gt' is less verbose than '>', but the advantage of 
+'_gt' over '>' is proportional to length of bitmap, and it means
+that this API should exist.
+
+> This would also make the implementation easier in not having to
+> copy and paste the code three times. Could also use a simple
+> optimization reducing code size:
+
+In the next version I'll reduce code duplication like this:
+
+bool bitmap_eq(..., N);
+bool bitmap_ge(..., N);
+
+#define bitmap_weight_gt(..., N)  bitmap_weight_ge(..., N + 1)
+#define bitmap_weight_lt(..., N) !bitmap_weight_ge(..., N)
+#define bitmap_weight_le(..., N) !bitmap_weight_gt(..., N)
 
 Thanks,
-Ganapat
+Yury
