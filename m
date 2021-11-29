@@ -2,125 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F09FF46147B
-	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 13:04:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 744EB4615D0
+	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 14:07:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244869AbhK2MHg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Nov 2021 07:07:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34814 "EHLO
+        id S239288AbhK2NLL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Nov 2021 08:11:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241440AbhK2MFf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Nov 2021 07:05:35 -0500
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10864C094246
-        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 03:04:57 -0800 (PST)
-Received: by mail-pg1-x52a.google.com with SMTP id m15so15715256pgu.11
-        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 03:04:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:reply-to:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=KFfRT2lRkFEqjXhqgHAkc5Xn/fCyNiJ1cySM/29/zvo=;
-        b=Yz5NXtbkDx2lEw7t+SOSCF3N7Khn4AGIiDr3cZyZYC49OlNtJmUWu5fRS1iFkeBBPe
-         L0HXaM5mpYslDrMBaXolmFwi+F1tMHmsiyGzZ3nkXvfviEKT0OouvOqOcIEkmOw4Mogq
-         DT4Ob7z6PcqMHUKQbPzOduMumKmk19QA9Eeqon7wwyoILvtbUF0U0Dxb9LHPzLtiIb5C
-         racOAaLWVomeahjc0sJI0z4Ja2wLKQ1buzqpxT2iWu5uJKs4aowy/5ahKgrhDpzxtxwD
-         YQ1ahArD3YeSDZUHQGzEWrRBg2VLg45FrJ880vfqOO+7frdMEqTIxcN8f/Sy7fHmtWnT
-         LVvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to:content-transfer-encoding;
-        bh=KFfRT2lRkFEqjXhqgHAkc5Xn/fCyNiJ1cySM/29/zvo=;
-        b=gPexHUEOKuNFBVZkW1RWchsZrEq8D/lgQ+JovYdRxhNbDqhoR36+wCMYyDJt2lD2GA
-         wofuYxmZctJategBj6Lg/IglxPuCpmfOuaIqBFLB6/fjqIq52NvSZJlnEZ4TnhOEK/O/
-         UIN/9jmCmSPGAnQ9EwKz22r4QVmZ3I5+Tb6/JkXTT2P8NA8P4/EDY2tlm/4Gf/aP94KV
-         57hVxsPLCXgMASPzON6dzd809RUxrFF+HN5g8s2x/eLGUlV8AVoTb7cQQrMOjGUw9Fjx
-         NijhHxuicgturLPsb81oqk488+e7/eoQuJlv5dZlsIimGx5xp3mVsV7aqt5UMygZyfQP
-         RIHw==
-X-Gm-Message-State: AOAM533l3Z0rtu035WL0AUVC5QmC7eOWiDgPHGO8JnUbABSFdwCsNIUh
-        8hF4vE+6vH4oC/hjfG6HgThy5TETlbRIsLab2w==
-X-Google-Smtp-Source: ABdhPJz2Y30Hka1PFo7QeJP48wRUpDllXWUXqFLzBWbx70f1mOKPsOPtp0AevwlrZzf/sIEJjx0T1NVf30wsWGd/IXg=
-X-Received: by 2002:a05:6a00:a8b:b0:44d:ef7c:94b9 with SMTP id
- b11-20020a056a000a8b00b0044def7c94b9mr38582775pfl.36.1638183896534; Mon, 29
- Nov 2021 03:04:56 -0800 (PST)
-MIME-Version: 1.0
-Received: by 2002:a17:522:16c9:b0:3db:6e05:78bb with HTTP; Mon, 29 Nov 2021
- 03:04:55 -0800 (PST)
-Reply-To: bintou_deme2011@aol.com
-From:   Bintou Deme <jindaratdaosornprasat20147@gmail.com>
-Date:   Mon, 29 Nov 2021 11:04:55 +0000
-Message-ID: <CAJY0BCnF-EXhMWZJ4Crowov1rROegH4dn5TwBAZL-DFO4W17Sw@mail.gmail.com>
-Subject: Von Bintou
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S1377386AbhK2NJL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Nov 2021 08:09:11 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 612C0C08EBAC
+        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 03:51:03 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 0CF3FB80EE1
+        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 11:51:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B639DC004E1;
+        Mon, 29 Nov 2021 11:51:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1638186660;
+        bh=lrK+a3jcmhGjZtxTNTcoM9mfBFGiWHtUo3XC+pCiPbM=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Wm4oHoBahW9bOxUD93ohtlHGMO6RsgOq8vTONwttdz0Ughf/4KfMbQGNtYrRJmIuM
+         2VSIhn4nX8E+u2L97L92kDYzRPtN1pxg7EhlipeU8ul/Zi1GwAyUvbmNppIffWms95
+         E/6DHycLLY7DYvgnTYLQLJ/O0/d+6zmNKPziDEH1J4sxA1ULcVcGd8OfXYOpkNMy+d
+         KzoRAaEaNqABaEtOJm/EdT94nUTbLvBepgjFuVcXF53GtEnUbRZL+CYagKmKW7AAMR
+         Lnv+KLyUWAT9R3ffRG4ZP26MJLQHlguCk0Jj9DNxavKxspqqjT869z3N36JyqRhz/+
+         ugu/MSHGkp7og==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mrfBS-008agL-N5; Mon, 29 Nov 2021 11:50:58 +0000
+Date:   Mon, 29 Nov 2021 11:50:58 +0000
+Message-ID: <87sfvfmb8d.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oupton@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Andrew Jones <drjones@redhat.com>,
+        Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Reiji Watanabe <reijiw@google.com>
+Subject: Re: [PATCH v3 3/6] KVM: arm64: Allow guest to set the OSLK bit
+In-Reply-To: <20211123210109.1605642-4-oupton@google.com>
+References: <20211123210109.1605642-1-oupton@google.com>
+        <20211123210109.1605642-4-oupton@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oupton@google.com, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, linux-arm-kernel@lists.infradead.org, drjones@redhat.com, pshier@google.com, ricarkol@google.com, reijiw@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Von: Bintou Deme
-Liebste,
-Guten Tag und vielen Dank f=C3=BCr Ihre Aufmerksamkeit. Bitte, ich m=C3=B6c=
-hte,
-dass Sie meine E-Mail sorgf=C3=A4ltig lesen und mir helfen, dieses Projekt
-zu bearbeiten. Ich bin Miss Bintou Deme und m=C3=B6chte Sie in aller
-Bescheidenheit um Ihre Partnerschaft und Unterst=C3=BCtzung bei der
-=C3=9Cbertragung und Anlage meiner Erbschaftsgelder in H=C3=B6he von
-6.500.000,00 US-Dollar (sechs Millionen f=C3=BCnfhunderttausend US-Dollar)
-bitten, die mein verstorbener geliebter Vater vor seinem Tod bei einer
-Bank hinterlegt hat.
+On Tue, 23 Nov 2021 21:01:06 +0000,
+Oliver Upton <oupton@google.com> wrote:
+> 
+> Allow writes to OSLAR and forward the OSLK bit to OSLSR. Do nothing with
+> the value for now.
+> 
+> Reviewed-by: Reiji Watanabe <reijiw@google.com>
+> Signed-off-by: Oliver Upton <oupton@google.com>
+> ---
+>  arch/arm64/include/asm/sysreg.h |  6 ++++++
+>  arch/arm64/kvm/sys_regs.c       | 33 ++++++++++++++++++++++++++-------
+>  2 files changed, 32 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+> index 16b3f1a1d468..9fad61a82047 100644
+> --- a/arch/arm64/include/asm/sysreg.h
+> +++ b/arch/arm64/include/asm/sysreg.h
+> @@ -129,7 +129,13 @@
+>  #define SYS_DBGWCRn_EL1(n)		sys_reg(2, 0, 0, n, 7)
+>  #define SYS_MDRAR_EL1			sys_reg(2, 0, 1, 0, 0)
+>  #define SYS_OSLAR_EL1			sys_reg(2, 0, 1, 0, 4)
+> +
+> +#define SYS_OSLAR_OSLK			BIT(0)
+> +
+>  #define SYS_OSLSR_EL1			sys_reg(2, 0, 1, 1, 4)
+> +
+> +#define SYS_OSLSR_OSLK			BIT(1)
+> +
+>  #define SYS_OSDLR_EL1			sys_reg(2, 0, 1, 3, 4)
+>  #define SYS_DBGPRCR_EL1			sys_reg(2, 0, 1, 4, 4)
+>  #define SYS_DBGCLAIMSET_EL1		sys_reg(2, 0, 7, 8, 6)
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index 7bf350b3d9cd..5dbdb45d6d44 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -44,6 +44,10 @@
+>   * 64bit interface.
+>   */
+>  
+> +static int reg_from_user(u64 *val, const void __user *uaddr, u64 id);
+> +static int reg_to_user(void __user *uaddr, const u64 *val, u64 id);
+> +static u64 sys_reg_to_index(const struct sys_reg_desc *reg);
+> +
+>  static bool read_from_write_only(struct kvm_vcpu *vcpu,
+>  				 struct sys_reg_params *params,
+>  				 const struct sys_reg_desc *r)
+> @@ -287,6 +291,24 @@ static bool trap_loregion(struct kvm_vcpu *vcpu,
+>  	return trap_raz_wi(vcpu, p, r);
+>  }
+>  
+> +static bool trap_oslar_el1(struct kvm_vcpu *vcpu,
+> +			   struct sys_reg_params *p,
+> +			   const struct sys_reg_desc *r)
+> +{
+> +	u64 oslsr;
+> +
+> +	if (!p->is_write)
+> +		return read_from_write_only(vcpu, p, r);
+> +
+> +	/* Forward the OSLK bit to OSLSR */
+> +	oslsr = __vcpu_sys_reg(vcpu, OSLSR_EL1) & ~SYS_OSLSR_OSLK;
+> +	if (p->regval & SYS_OSLAR_OSLK)
+> +		oslsr |= SYS_OSLSR_OSLK;
+> +
+> +	__vcpu_sys_reg(vcpu, OSLSR_EL1) = oslsr;
+> +	return true;
+> +}
+> +
+>  static bool trap_oslsr_el1(struct kvm_vcpu *vcpu,
+>  			   struct sys_reg_params *p,
+>  			   const struct sys_reg_desc *r)
+> @@ -309,9 +331,10 @@ static int set_oslsr_el1(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
+>  	if (err)
+>  		return err;
+>  
+> -	if (val != rd->val)
+> +	if ((val & ~SYS_OSLSR_OSLK) != rd->val)
+>  		return -EINVAL;
 
-Ich m=C3=B6chte Ihnen versichern, dass dieser Fonds legal von meinem
-verstorbenen Vater erworben wurde und keinen kriminellen Hintergrund
-hat. Mein Vater hat diesen Fonds legal durch ein legitimes Gesch=C3=A4ft
-erworben, bevor er w=C3=A4hrend seiner Gesch=C3=A4ftsreise zu Tode vergifte=
-t
-wurde. Der Tod meines Vaters wurde von seinen Verwandten, die ihn
-w=C3=A4hrend seiner Dienstreise begleiteten, vermutet. Denn nach 3 Monaten
-nach dem Tod meines Vaters begannen Seine Verwandten, alle Besitzt=C3=BCmer
-meines verstorbenen Vaters zu beanspruchen und zu verkaufen.
+This looks odd. It means that once I have set the lock from userspace,
+I can't clear it?
 
-Die Verwandten meines verstorbenen Vaters wissen nichts von den
-6.500.000,00 US-Dollar (sechs Millionen f=C3=BCnfhunderttausend US-Dollar),
-die mein verstorbener Vater auf die Bank eingezahlt hat und mein
-verstorbener Vater sagte mir heimlich, bevor er starb, dass ich in
-jedem Land nach einem ausl=C3=A4ndischen Partner suchen sollte meiner Wahl,
-wohin ich diese Gelder f=C3=BCr meine eigenen Zwecke =C3=BCberweise.
+Thanks,
 
-Bitte helfen Sie mir, dieses Geld f=C3=BCr gesch=C3=A4ftliche Zwecke in Ihr=
-em
-Land auf Ihr Konto zu =C3=BCberweisen. Ich habe diese Entscheidung
-getroffen, weil ich viele Dem=C3=BCtigungen von den Verwandten meines
-verstorbenen Vaters erlitten habe. Zur Zeit habe ich Kommunikation mit
-dem Direktor der Bank, bei der mein verstorbener Vater dieses Geld
-hinterlegt hat. Ich habe dem Direktor der Bank die Dringlichkeit
-erkl=C3=A4rt, sicherzustellen, dass das Geld ins Ausland =C3=BCberwiesen wi=
-rd,
-damit ich dieses Land zu meiner Sicherheit verlassen kann. Der
-Direktor der Bank hat mir zugesichert, dass das Geld =C3=BCberwiesen wird,
-sobald ich jemanden vorlege, der den Geldbetrag in meinem Namen f=C3=BCr
-diesen Zweck ehrlich entgegennimmt.
+	M.
 
-Seien Sie versichert, dass die Bank den Betrag auf Ihr Konto =C3=BCberweist
-und es keine Probleme geben wird. Diese Transaktion ist 100%
-risikofrei und legitim. Ich bin bereit, Ihnen nach erfolgreicher
-=C3=9Cberweisung dieses Geldes auf Ihr Konto 30% der Gesamtsumme als
-Entsch=C3=A4digung f=C3=BCr Ihren Aufwand anzubieten. Sie werden mir auch
-helfen, 10% an Wohlt=C3=A4tigkeitsorganisationen und Heime f=C3=BCr mutterl=
-ose
-Babys in Ihrem Land zu spenden.
-
-Bitte alles, was ich m=C3=B6chte, ist, dass Sie f=C3=BCr mich als mein
-ausl=C3=A4ndischer Partner auftreten, damit die Bank dieses Geld auf Ihr
-Konto =C3=BCberweist, damit ich in diesem Land leben kann. Bitte, ich
-brauche Ihre dringende Hilfe wegen meines jetzigen Zustands. Mit Ihrer
-vollen Zustimmung, mit mir zu diesem Zweck zusammenzuarbeiten,
-bekunden Sie bitte Ihr Interesse, indem Sie mir antworten, damit ich
-Ihnen die notwendigen Informationen und die Details zum weiteren
-Vorgehen geben kann. Ich werde Ihnen 30% des Geldes f=C3=BCr Ihre Hilfe
-anbieten und Hilfestellung, damit umzugehen.
-
-Ihre dringende Antwort wird gesch=C3=A4tzt.
-Mit freundlichen Gr=C3=BC=C3=9Fen
-Bintou Deme
+-- 
+Without deviation from the norm, progress is not possible.
