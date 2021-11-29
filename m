@@ -2,95 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 606BE46284E
-	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 00:32:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B9CA462857
+	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 00:34:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231734AbhK2XgC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Nov 2021 18:36:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48022 "EHLO
+        id S231938AbhK2Xha (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Nov 2021 18:37:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229752AbhK2XgB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Nov 2021 18:36:01 -0500
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA104C061714
-        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 15:32:43 -0800 (PST)
-Received: by mail-pj1-x102d.google.com with SMTP id v23so13888059pjr.5
-        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 15:32:43 -0800 (PST)
+        with ESMTP id S231849AbhK2Xh3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Nov 2021 18:37:29 -0500
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 666EDC061746
+        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 15:34:11 -0800 (PST)
+Received: by mail-pg1-x52b.google.com with SMTP id s137so17738337pgs.5
+        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 15:34:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=fMhxAW0T00dvOtfbIMr5O066vKcGP3SQExpqDRyb3WI=;
-        b=cffpanKjPtvjrPkkCaMv+twsIVyfexum4ivNlUeJ+sya9EJi1umlnito1t0x1EhPqo
-         azxJRxRkVNPksEDt4MmYp8AudkLlOthcsy9YDYQjJ0Ivotfu7TB3gqLTSDQ11Qx+ROO7
-         Q2PY+PNIplcM4MO69JFfxGzIGLyGmIweVTE8tuq72errjdAutTLwk1zbyppAD03kwIk2
-         VrXMCjjJeJUqfcJiFTYJXmuN0fz5DepO8EG3T1RYagelB5ZhgijsDbQHFhpV6nDjEXoy
-         q+v5UJV0j0hr0SzwOwEi94EgkOenG1Ta15bud0u8SgnavglOV9GkXDgfzbkeqOx62tQP
-         5GUw==
+        bh=V+grPLT6Bm3LhOVZVdNMjtG46j07YUiETl+a4utgQZk=;
+        b=EtJujCxQlViEVHo2kgejeoQDRVoY9ANAeyj1xNgJln48hBzh6oVuTC+ZmM91X0+WpY
+         a+yYH6PsYg55uEyor2vPdmg2dLXM4Gj2jDkZdTaT2x3+SQcMr750PrRhZESV9bf7y13s
+         hlQvo17V6G4wbwxBtgecPc0PxgDVia+LWju/Sz6sUwd4ilNlAR2PaT/49nyZZSZOlZEU
+         E4Ve7e+xFUicAGZOoqkNPLwcckkR5AvFAnnPBLOrmF8/O1pMAHHwRw7SkucEfgdmfZp5
+         LOuvmeWES1DtRoCG9HqfnUFDOKeDeUoSyiq+zrxPfxcnkg04H4vVC3xasA6HBq7zCKzG
+         DuSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=fMhxAW0T00dvOtfbIMr5O066vKcGP3SQExpqDRyb3WI=;
-        b=Axf+mAEwofuViXUdjhslOU+O9DLbwd6KiTDysoSwXML2zVQx9bRjVbukOjYI1P7PEO
-         6eR41tUXBfUsXr/GNA6fGcYXhlK8StgHSIINLucXxPipybl+MrrYSmBS+VBPe3ENjO7j
-         4dtXdHS99Ke6gj39t1pAPwNJDQ9n3BRkB0siFfKo9h45u2wHUI+yvoxa/MOtbLY7CRdQ
-         XSnhUlUY+MjTNRsj509GUUp8nqrcvaiqJPw4cCW+C3H36ASgH46uOTLNVO+hxFvshC1L
-         FJeS8HGjL4iQsJ6nllFlzvEYheHQFah1je9oPA7yipOEvtVVb3/7X6V+uj7CuXC7j/vY
-         N/rg==
-X-Gm-Message-State: AOAM532FHSf8ZDr48Nhxf7op502sva3w/XZIcxDtP89roR8hyezOgToy
-        o6CyQBUAdZGIx4h6Q2YvSRHNng==
-X-Google-Smtp-Source: ABdhPJzwzJuC3gagMd9tSbUh5ZqFZWBAYUO8sRrzlOWFg6qVHh0Z9bIfV0+kv3QC3HmYXb22dRQNTw==
-X-Received: by 2002:a17:902:b28b:b0:142:4abc:ac20 with SMTP id u11-20020a170902b28b00b001424abcac20mr64623518plr.88.1638228763144;
-        Mon, 29 Nov 2021 15:32:43 -0800 (PST)
+        bh=V+grPLT6Bm3LhOVZVdNMjtG46j07YUiETl+a4utgQZk=;
+        b=4OiRUfxV+H+hTXrb7nFhInDJIT5lYJ/rgIVtWS5c1/ROACwflrb8jr+3D6xklICaDP
+         fDgQC8HRrRLA4eSLzyEMxR97EqyQsgD6XIY9pCz6LCyK8MulWUroqRcd2tFTBMUt/rg9
+         TlCTUMtP3ee5N3cvD8aLvv+P2hbHk3tLNdmz1DbbZi3oBIHhvoYMVnvAGXvU6zxCgztc
+         9gbg/xGS9YqgBHUhoFo/lRr38M67gbKMBsulEk2Ya0gTumA1qp1FtPd9Qnof/QaMOjej
+         QWOTAgC4EwmrFID5lqpA46anRdaIQ8RGOvshlKD6YEvKdhaDUVGC2hI7WUvKG535kEaJ
+         FiKw==
+X-Gm-Message-State: AOAM532pD/nsOD7VN6MDh/+Le943bnYxhLkZdrmgX8dor+OKOdgyb+Js
+        7lnw48FwvG0jkJwm0QJqoTgivw==
+X-Google-Smtp-Source: ABdhPJwLGvFjaNBvgrufSbjdJ8H6tplhXNHnW2JND2X5sR2Kyov4IRBsozN6q0njvyeYoUwuqUAgfw==
+X-Received: by 2002:a65:6145:: with SMTP id o5mr6810928pgv.134.1638228850750;
+        Mon, 29 Nov 2021 15:34:10 -0800 (PST)
 Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
-        by smtp.gmail.com with ESMTPSA id fs21sm1085316pjb.1.2021.11.29.15.32.42
+        by smtp.gmail.com with ESMTPSA id pj12sm373641pjb.51.2021.11.29.15.34.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Nov 2021 15:32:42 -0800 (PST)
-Date:   Mon, 29 Nov 2021 23:32:38 +0000
+        Mon, 29 Nov 2021 15:34:09 -0800 (PST)
+Date:   Mon, 29 Nov 2021 23:34:06 +0000
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         seanjc@google.com, stable@vger.kernel.org
-Subject: Re: [PATCH 1/4] KVM: x86: ignore APICv if LAPIC is not enabled
-Message-ID: <YaVjFlTjpoD6XyP3@google.com>
+Subject: Re: [PATCH 2/4] KVM: VMX: prepare sync_pir_to_irr for running with
+ APICv disabled
+Message-ID: <YaVjbgiv/6Zqunzx@google.com>
 References: <20211123004311.2954158-1-pbonzini@redhat.com>
- <20211123004311.2954158-2-pbonzini@redhat.com>
+ <20211123004311.2954158-3-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211123004311.2954158-2-pbonzini@redhat.com>
+In-Reply-To: <20211123004311.2954158-3-pbonzini@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 22, 2021 at 07:43:08PM -0500, Paolo Bonzini wrote:
-> Synchronize the condition for the two calls to kvm_x86_sync_pir_to_irr.
-> The one in the reenter-guest fast path invoked the callback
-> unconditionally even if LAPIC is disabled.
+On Mon, Nov 22, 2021 at 07:43:09PM -0500, Paolo Bonzini wrote:
+> If APICv is disabled for this vCPU, assigned devices may
+> still attempt to post interrupts.  In that case, we need
+> to cancel the vmentry and deliver the interrupt with
+> KVM_REQ_EVENT.  Extend the existing code that handles
+> injection of L1 interrupts into L2 to cover this case
+> as well.
+> 
+> vmx_hwapic_irr_update is only called when APICv is active
+> so it would be confusing to add a check for
+> vcpu->arch.apicv_active in there.  Instead, just use
+> vmx_set_rvi directly in vmx_sync_pir_to_irr.
 > 
 > Cc: stable@vger.kernel.org
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
 Reviewed-by: David Matlack <dmatlack@google.com>
 
+(Although I agree with Sean's suggestions and 1 nit below.)
+
 > ---
->  arch/x86/kvm/x86.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  arch/x86/kvm/vmx/vmx.c | 35 +++++++++++++++++++++++------------
+>  1 file changed, 23 insertions(+), 12 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 5a403d92833f..441f4769173e 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -9849,7 +9849,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
->  		if (likely(exit_fastpath != EXIT_FASTPATH_REENTER_GUEST))
->  			break;
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index ba66c171d951..cccf1eab58ac 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -6264,7 +6264,7 @@ static int vmx_sync_pir_to_irr(struct kvm_vcpu *vcpu)
+>  	int max_irr;
+>  	bool max_irr_updated;
 >  
-> -		if (vcpu->arch.apicv_active)
-> +		if (kvm_lapic_enabled(vcpu) && vcpu->arch.apicv_active)
->  			static_call(kvm_x86_sync_pir_to_irr)(vcpu);
+> -	if (KVM_BUG_ON(!vcpu->arch.apicv_active, vcpu->kvm))
+> +	if (KVM_BUG_ON(!enable_apicv, vcpu->kvm))
+>  		return -EIO;
 >  
->  		if (unlikely(kvm_vcpu_exit_request(vcpu))) {
+>  	if (pi_test_on(&vmx->pi_desc)) {
+> @@ -6276,20 +6276,31 @@ static int vmx_sync_pir_to_irr(struct kvm_vcpu *vcpu)
+>  		smp_mb__after_atomic();
+>  		max_irr_updated =
+>  			kvm_apic_update_irr(vcpu, vmx->pi_desc.pir, &max_irr);
+> -
+> -		/*
+> -		 * If we are running L2 and L1 has a new pending interrupt
+> -		 * which can be injected, this may cause a vmexit or it may
+> -		 * be injected into L2.  Either way, this interrupt will be
+> -		 * processed via KVM_REQ_EVENT, not RVI, because we do not use
+> -		 * virtual interrupt delivery to inject L1 interrupts into L2.
+> -		 */
+> -		if (is_guest_mode(vcpu) && max_irr_updated)
+> -			kvm_make_request(KVM_REQ_EVENT, vcpu);
+>  	} else {
+>  		max_irr = kvm_lapic_find_highest_irr(vcpu);
+> +		max_irr_updated = false;
+>  	}
+> -	vmx_hwapic_irr_update(vcpu, max_irr);
+> +
+> +	/*
+> +	 * If virtual interrupt delivery is not in use, the interrupt
+> +	 * will be processed via KVM_REQ_EVENT, not RVI.  This can happen
+> +	 * in two cases:
+> +	 *
+> +	 * 1) If we are running L2 and L1 has a new pending interrupt
+> +	 * which can be injected, this may cause a vmexit or it may
+> +	 * be injected into L2.  We do not use virtual interrupt
+> +	 * delivery to inject L1 interrupts into L2.
+> +	 *
+> +	 * 2) If APICv is disabled for this vCPU, assigned devices may
+> +	 * still attempt to post interrupts.  The posted interrupt
+> +	 * vector will cause a vmexit and the subsequent entry will
+> +	 * call sync_pir_to_irr.
+> +	 */
+> +	if (!is_guest_mode(vcpu) && vcpu->arch.apicv_active)
+> +		vmx_set_rvi(max_irr);
+> +	else if (max_irr_updated)
+> +		kvm_make_request(KVM_REQ_EVENT, vcpu);
+
+nit: In the version of this code that is currently in kvm/queue the
+indentation of the previous 3 lines uses spaces instead of tabs. I see
+tabs in this mail though.
+
+> +
+>  	return max_irr;
+>  }
+>  
 > -- 
 > 2.27.0
 > 
