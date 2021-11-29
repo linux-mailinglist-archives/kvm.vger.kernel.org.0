@@ -2,200 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 227F84621BC
-	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 21:09:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 23B104624BA
+	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 23:23:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231637AbhK2UMl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Nov 2021 15:12:41 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:42994 "EHLO
-        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229935AbhK2UKl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Nov 2021 15:10:41 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id A5C22B815D4
-        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 20:07:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56279C53FD1;
-        Mon, 29 Nov 2021 20:07:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1638216441;
-        bh=KgGc5JJnyi+xoK5NH4X6bBiIwukmrEnb3nTjfxdMvYs=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=P5/kxhwLYUpTNjFQPl07X15iWM7Puie4W0qXKlsI0nCQIwSm2vNPGG4JXlAPmMbqL
-         leElLrzDLpKJj8clKWKzpBWKLGhjGWMouOK+t71bKIB0+J/Gsh4L0zGOV1MqRvqQiM
-         LwW9Pb116GhM8Bpr4ql6tf3zVXsrYjzgrN627OJkt8uVSyZUKkdKGEQYTaVFUiKSWP
-         NCRnEGHfx61c4ztDdCErsrtapGmKDg10bkTL95O3NTQkb08beSWiDGHmdCITxl2b9W
-         VGzB+gaYA7Xfe54zOrcE0RAUYCAtlDAy+Ip9hqBhki6Fb1LkJNXfvjEFVnH8f+yBkx
-         l/iPWDAWbCROw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1mrmrJ-008gvR-0I; Mon, 29 Nov 2021 20:02:41 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org
-Cc:     Andre Przywara <andre.przywara@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        Haibo Xu <haibo.xu@linaro.org>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        id S232306AbhK2W0U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Nov 2021 17:26:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58582 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233693AbhK2WZO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Nov 2021 17:25:14 -0500
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E321C0C085F
+        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 09:25:30 -0800 (PST)
+Received: by mail-pl1-x62b.google.com with SMTP id z6so12740797plk.6
+        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 09:25:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Bxpm877ucu29+swtwCcWrV9CPuVdsV2sIZfuT/jfRmc=;
+        b=OQsEdj0rbR41/5YmIUdSrIJYCBGgCTUy9MQ5b9N87MM6uHjwmzAsHY1InGAtcJzzT0
+         kXYHaRVbVnijPR96HzFaJq33Sw0nxu7KBR5alKkujlnpJgTb7ASLVjrwO1SSGsYoOkaQ
+         K7cyD5kT9W1uMzNVmFhkVgYWGz7yTXUI7MuAi/f6xjABudDnAM1CxSfahAqvYF0vFr+z
+         P1vOrLjB/9DR5TYDkZ2qVm7gvSexhNg5yeXAFAs7Vo4H0IrRkItMjbCy7SznqoFOYmJJ
+         HNBdnQMeynqmiQ4BF5DB9MM0TzHLeCRZF1Krj6haC25keEJILJKSu+fr0lje3TcmjayD
+         +Y/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Bxpm877ucu29+swtwCcWrV9CPuVdsV2sIZfuT/jfRmc=;
+        b=xEYY8ZpStkgqQyXyy5Xox35AKLGAfmfF405lYGUjVPAuFE1WSrSd7gM3uznvGMz1e/
+         SwHwKwcHqNLNway5LIKpy7RVPHgTTXo7/vwXxQMn4IyEZWNs4EegvgzpcFmA45++hDae
+         rqcy+Infpq5aiA8rQHfu3O455m941ROe0uINcMWvmj2oYfM96ETsmkRnCItoYIR7PIhZ
+         EaA4R81iXzwdbEbHrs7xl0AJxtxGcqAS5Y+vGhqOirvJSHXggUwbksIVHFGB9mdmcAof
+         jrnvRnI//aFHxRQ25a+cqQy+/6EDyI5nizNHGwC3hQe5J8/+vSuuFutm4IxvP2KTrILT
+         wi6Q==
+X-Gm-Message-State: AOAM5323N1UXN9nUzvwHj692zqkKxsM5t6LoYQC7ZHQZt1/4ACbvgvlS
+        mRYKPFMHuzRhI2EQ4twuyq1dOg==
+X-Google-Smtp-Source: ABdhPJykBaUp6Ra73BKveHHRMZh4OnjUi7muGD2LnVC8BwpUUYIBB4aGQnyy+EYpnJ0P8dJ+mpdu6Q==
+X-Received: by 2002:a17:902:7289:b0:142:805f:e2c with SMTP id d9-20020a170902728900b00142805f0e2cmr61761710pll.42.1638206729695;
+        Mon, 29 Nov 2021 09:25:29 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id m15sm18877279pjc.35.2021.11.29.09.25.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Nov 2021 09:25:29 -0800 (PST)
+Date:   Mon, 29 Nov 2021 17:25:25 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Anup Patel <anup.patel@wdc.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
-        kernel-team@android.com
-Subject: [PATCH v5 68/69] KVM: arm64: nv: Fast-track 'InHost' exception returns
-Date:   Mon, 29 Nov 2021 20:01:49 +0000
-Message-Id: <20211129200150.351436-69-maz@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20211129200150.351436-1-maz@kernel.org>
-References: <20211129200150.351436-1-maz@kernel.org>
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Atish Patra <atish.patra@wdc.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        David Matlack <dmatlack@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH v2 11/43] KVM: Don't block+unblock when halt-polling is
+ successful
+Message-ID: <YaUNBfJh35WXMV0M@google.com>
+References: <20211009021236.4122790-1-seanjc@google.com>
+ <20211009021236.4122790-12-seanjc@google.com>
+ <cceb33be9e2a6ac504bb95a7b2b8cf5fe0b1ff26.camel@redhat.com>
+ <4e883728e3e5201a94eb46b56315afca5e95ad9c.camel@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, andre.przywara@arm.com, christoffer.dall@arm.com, jintack@cs.columbia.edu, haibo.xu@linaro.org, gankulkarni@os.amperecomputing.com, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4e883728e3e5201a94eb46b56315afca5e95ad9c.camel@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-A significant part of the ARMv8.3-NV extension is to trap ERET
-instructions so that the hypervisor gets a chance to switch
-from a vEL2 L1 guest to an EL1 L2 guest.
+On Mon, Nov 29, 2021, Maxim Levitsky wrote:
+> (This thing is that when you tell the IOMMU that a vCPU is not running,
+> Another thing I discovered that this patch series totally breaks my VMs,
+> without cpu_pm=on The whole series (I didn't yet bisect it) makes even my
+> fedora32 VM be very laggy, almost unusable, and it only has one
+> passed-through device, a nic).
 
-But this also has the unfortunate consequence of trapping ERET
-in unsuspecting circumstances, such as staying at vEL2 (interrupt
-handling while being in the guest hypervisor), or returning to host
-userspace in the case of a VHE guest.
+Grrrr, the complete lack of comments in the KVM code and the separate paths for
+VMX vs SVM when handling HLT with APICv make this all way for difficult to
+understand than it should be.
 
-Although we already make some effort to handle these ERET quicker
-by not doing the put/load dance, it is still way too far down the
-line for it to be efficient enough.
+The hangs are likely due to:
 
-For these cases, it would ideal to ERET directly, no question asked.
-Of course, we can't do that. But the next best thing is to do it as
-early as possible, in fixup_guest_exit(), much as we would handle
-FPSIMD exceptions.
+  KVM: SVM: Unconditionally mark AVIC as running on vCPU load (with APICv)
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/emulate-nested.c | 26 ++-----------------
- arch/arm64/kvm/hyp/vhe/switch.c | 46 +++++++++++++++++++++++++++++++++
- 2 files changed, 48 insertions(+), 24 deletions(-)
+If a posted interrupt arrives after KVM has done its final search through the vIRR,
+but before avic_update_iommu_vcpu_affinity() is called, the posted interrupt will
+be set in the vIRR without triggering a host IRQ to wake the vCPU via the GA log.
 
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 5fbf8978acf2..97e26a4539a9 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -52,8 +52,7 @@ bool forward_nv_traps(struct kvm_vcpu *vcpu)
- 
- void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
- {
--	u64 spsr, elr, mode;
--	bool direct_eret;
-+	u64 spsr, elr;
- 
- 	/*
- 	 * Forward this trap to the virtual EL2 if the virtual
-@@ -62,31 +61,10 @@ void kvm_emulate_nested_eret(struct kvm_vcpu *vcpu)
- 	if (forward_nv_traps(vcpu))
- 		return;
- 
--	/*
--	 * Going through the whole put/load motions is a waste of time
--	 * if this is a VHE guest hypervisor returning to its own
--	 * userspace, or the hypervisor performing a local exception
--	 * return. No need to save/restore registers, no need to
--	 * switch S2 MMU. Just do the canonical ERET.
--	 */
--	spsr = vcpu_read_sys_reg(vcpu, SPSR_EL2);
--	mode = spsr & (PSR_MODE_MASK | PSR_MODE32_BIT);
--
--	direct_eret  = (mode == PSR_MODE_EL0t &&
--			vcpu_el2_e2h_is_set(vcpu) &&
--			vcpu_el2_tge_is_set(vcpu));
--	direct_eret |= (mode == PSR_MODE_EL2h || mode == PSR_MODE_EL2t);
--
--	if (direct_eret) {
--		*vcpu_pc(vcpu) = vcpu_read_sys_reg(vcpu, ELR_EL2);
--		*vcpu_cpsr(vcpu) = spsr;
--		trace_kvm_nested_eret(vcpu, *vcpu_pc(vcpu), spsr);
--		return;
--	}
--
- 	preempt_disable();
- 	kvm_arch_vcpu_put(vcpu);
- 
-+	spsr = __vcpu_sys_reg(vcpu, SPSR_EL2);
- 	elr = __vcpu_sys_reg(vcpu, ELR_EL2);
- 
- 	trace_kvm_nested_eret(vcpu, elr, spsr);
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index 5cadda79089a..6cbe6a89dbdb 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -162,6 +162,51 @@ void deactivate_traps_vhe_put(struct kvm_vcpu *vcpu)
- 	__deactivate_traps_common(vcpu);
- }
- 
-+static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
-+{
-+	struct kvm_cpu_context *ctxt = &vcpu->arch.ctxt;
-+	u64 spsr, mode;
-+
-+	/*
-+	 * Going through the whole put/load motions is a waste of time
-+	 * if this is a VHE guest hypervisor returning to its own
-+	 * userspace, or the hypervisor performing a local exception
-+	 * return. No need to save/restore registers, no need to
-+	 * switch S2 MMU. Just do the canonical ERET.
-+	 *
-+	 * Unless the trap has to be forwarded further down the line,
-+	 * of course...
-+	 */
-+	if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_NV)
-+		return false;
-+
-+	spsr = read_sysreg_el1(SYS_SPSR);
-+	spsr = __fixup_spsr_el2_read(ctxt, spsr);
-+	mode = spsr & (PSR_MODE_MASK | PSR_MODE32_BIT);
-+
-+	switch (mode) {
-+	case PSR_MODE_EL0t:
-+		if (!(vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu)))
-+			return false;
-+		break;
-+	case PSR_MODE_EL2t:
-+		mode = PSR_MODE_EL1t;
-+		break;
-+	case PSR_MODE_EL2h:
-+		mode = PSR_MODE_EL1h;
-+		break;
-+	default:
-+		return false;
-+	}
-+
-+	spsr = (spsr & ~(PSR_MODE_MASK | PSR_MODE32_BIT)) | mode;
-+
-+	write_sysreg_el2(spsr, SYS_SPSR);
-+	write_sysreg_el2(read_sysreg_el1(SYS_ELR), SYS_ELR);
-+
-+	return true;
-+}
-+
- static const exit_handler_fn hyp_exit_handlers[] = {
- 	[0 ... ESR_ELx_EC_MAX]		= NULL,
- 	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15_32,
-@@ -171,6 +216,7 @@ static const exit_handler_fn hyp_exit_handlers[] = {
- 	[ESR_ELx_EC_IABT_LOW]		= kvm_hyp_handle_iabt_low,
- 	[ESR_ELx_EC_DABT_LOW]		= kvm_hyp_handle_dabt_low,
- 	[ESR_ELx_EC_PAC]		= kvm_hyp_handle_ptrauth,
-+	[ESR_ELx_EC_ERET]		= kvm_hyp_handle_eret,
- };
- 
- static const exit_handler_fn *kvm_get_exit_handler_array(struct kvm_vcpu *vcpu)
--- 
-2.30.2
+I.e. KVM is missing an equivalent to VMX's posted interrupt check for an outstanding
+notification after switching to the wakeup vector.
 
+For now, the least awful approach is sadly to keep the vcpu_(un)blocking() hooks.
+Unlike VMX's PI support, there's no fast check for an interrupt being posted (KVM
+would have to rewalk the vIRR), no easy to signal the current CPU to do wakeup (I
+don't think KVM even has access to the IRQ used by the owning IOMMU), and there's
+no simplification of load/put code.
+
+If the scheduler were changed to support waking in the sched_out path, then I'd be
+more inclined to handle this in avic_vcpu_put() by rewalking the vIRR one final
+time, but for now it's not worth it.
+
+> If I apply though only the patch series up to this patch, my fedora VM seems
+> to work fine, but my windows VM still locks up hard when I run 'LatencyTop'
+> in it, which doesn't happen without this patch.
+
+Buy "run 'LatencyTop' in it", do you mean running something in the Windows guest?
+The only search results I can find for LatencyTop are Linux specific.
+
+> So far the symptoms I see is that on VCPU 0, ISR has quite high interrupt
+> (0xe1 last time I seen it), TPR and PPR are 0xe0 (although I have seen TPR to
+> have different values), and IRR has plenty of interrupts with lower priority.
+> The VM seems to be stuck in this case. As if its EOI got lost or something is
+> preventing the IRQ handler from issuing EOI.
+>  
+> LatencyTop does install some form of a kernel driver which likely does meddle
+> with interrupts (maybe it sends lots of self IPIs?).
+>  
+> 100% reproducible as soon as I start monitoring with LatencyTop.
+>  
+> Without this patch it works (or if disabling halt polling),
+
+Huh.  I assume everything works if you disable halt polling _without_ this patch
+applied?
+
+If so, that implies that successful halt polling without mucking with vCPU IOMMU
+affinity is somehow problematic.  I can't think of any relevant side effects other
+than timing.
