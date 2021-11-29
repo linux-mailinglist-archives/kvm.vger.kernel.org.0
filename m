@@ -2,106 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B825B461422
-	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 12:48:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F09FF46147B
+	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 13:04:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238335AbhK2Lvf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Nov 2021 06:51:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59086 "EHLO
+        id S244869AbhK2MHg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Nov 2021 07:07:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239648AbhK2Lte (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Nov 2021 06:49:34 -0500
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37A01C0698D3
-        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 02:54:15 -0800 (PST)
-Received: by mail-pl1-x629.google.com with SMTP id q17so11822263plr.11
-        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 02:54:15 -0800 (PST)
+        with ESMTP id S241440AbhK2MFf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Nov 2021 07:05:35 -0500
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10864C094246
+        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 03:04:57 -0800 (PST)
+Received: by mail-pg1-x52a.google.com with SMTP id m15so15715256pgu.11
+        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 03:04:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:reply-to:from:date:message-id:subject:to
          :content-transfer-encoding;
-        bh=bPBq6esMoTOYDubs7AvTlt6cnYaycdCJ0j5SVwERB7E=;
-        b=qIyinbQ5mrEPSTdl2ccnrNym8KXEFn5mi20Rwf35NJ4yrjGAPI/8R1/u7YVW7o428z
-         fsN3Nd05bLLgfD2uNIbITsjOBdp8FeK4muc+F2eU5bBKadLxOyQhTdZP4zR2JZ63HR36
-         XhVO0cuU4cYxPfa5KdvpOhutUWk8Wdn0l5k8Pryo31Ka18wHQWLD9iHoq5eeY2sVMQ61
-         jtsyAaqTbupABZZ1l2jjyOpJTdsE0lGDQEu7V7bY4MaRYdYuhS5efD99cBFh16Y74Xiq
-         NikxxP5x3MOrdoyWc+Ah/TglhQssfDfyeZIlWtu914zO9hK6AOFTZNq4jk2+ARFo6K5s
-         W6dA==
+        bh=KFfRT2lRkFEqjXhqgHAkc5Xn/fCyNiJ1cySM/29/zvo=;
+        b=Yz5NXtbkDx2lEw7t+SOSCF3N7Khn4AGIiDr3cZyZYC49OlNtJmUWu5fRS1iFkeBBPe
+         L0HXaM5mpYslDrMBaXolmFwi+F1tMHmsiyGzZ3nkXvfviEKT0OouvOqOcIEkmOw4Mogq
+         DT4Ob7z6PcqMHUKQbPzOduMumKmk19QA9Eeqon7wwyoILvtbUF0U0Dxb9LHPzLtiIb5C
+         racOAaLWVomeahjc0sJI0z4Ja2wLKQ1buzqpxT2iWu5uJKs4aowy/5ahKgrhDpzxtxwD
+         YQ1ahArD3YeSDZUHQGzEWrRBg2VLg45FrJ880vfqOO+7frdMEqTIxcN8f/Sy7fHmtWnT
+         LVvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:reply-to:from:date:message-id
          :subject:to:content-transfer-encoding;
-        bh=bPBq6esMoTOYDubs7AvTlt6cnYaycdCJ0j5SVwERB7E=;
-        b=mfTmxTuUBI1Mvz62dyDh6pn7YvVZSYNlT7x6q+SlN/Zsy/Lc1D7EYQEONLeHPfk+8V
-         /8NEXvkHDKzS0QKQAU89OyC563ilj62NEr8GH030Fw9QaGDIbwb/HitMiuRncl2U9uWB
-         wGojUlPF21sWmX+udJeF5KWWIoxoGJ1XK6GOeyxt+tTTWkzX0kIs8X4viQWK9S6ixaA6
-         Rg3wK/jslc7m0XAJholyBXBLhzx3BWeL7eaeJYkz1hE5ny6KdSOV9146xjPHtcyRp2qE
-         MjzHcFd29wGnH+8PEHpBec+l7ymvjtMp0sTZzpV4qpEgSnuqiUPhN8MAAHpoi56yN4iZ
-         aI4A==
-X-Gm-Message-State: AOAM530QNOo5z/Fk1crqLrO90LdavQgJAnoBbFjgzIUQEa9dYN6YD8lR
-        lbhytJIVknXXVRKap3op/hQPfinhNQlNGfzdkTE=
-X-Google-Smtp-Source: ABdhPJzYNKwS3UUMLzHT/Ym+5uax36cb7pAJ+tm/37LTNKjB9rUnPgLu2QE+xQHu5+02iPvHEKMICQvYDXxFM2wjivg=
-X-Received: by 2002:a17:902:ab0c:b0:142:343d:4548 with SMTP id
- ik12-20020a170902ab0c00b00142343d4548mr58399899plb.14.1638183254368; Mon, 29
- Nov 2021 02:54:14 -0800 (PST)
+        bh=KFfRT2lRkFEqjXhqgHAkc5Xn/fCyNiJ1cySM/29/zvo=;
+        b=gPexHUEOKuNFBVZkW1RWchsZrEq8D/lgQ+JovYdRxhNbDqhoR36+wCMYyDJt2lD2GA
+         wofuYxmZctJategBj6Lg/IglxPuCpmfOuaIqBFLB6/fjqIq52NvSZJlnEZ4TnhOEK/O/
+         UIN/9jmCmSPGAnQ9EwKz22r4QVmZ3I5+Tb6/JkXTT2P8NA8P4/EDY2tlm/4Gf/aP94KV
+         57hVxsPLCXgMASPzON6dzd809RUxrFF+HN5g8s2x/eLGUlV8AVoTb7cQQrMOjGUw9Fjx
+         NijhHxuicgturLPsb81oqk488+e7/eoQuJlv5dZlsIimGx5xp3mVsV7aqt5UMygZyfQP
+         RIHw==
+X-Gm-Message-State: AOAM533l3Z0rtu035WL0AUVC5QmC7eOWiDgPHGO8JnUbABSFdwCsNIUh
+        8hF4vE+6vH4oC/hjfG6HgThy5TETlbRIsLab2w==
+X-Google-Smtp-Source: ABdhPJz2Y30Hka1PFo7QeJP48wRUpDllXWUXqFLzBWbx70f1mOKPsOPtp0AevwlrZzf/sIEJjx0T1NVf30wsWGd/IXg=
+X-Received: by 2002:a05:6a00:a8b:b0:44d:ef7c:94b9 with SMTP id
+ b11-20020a056a000a8b00b0044def7c94b9mr38582775pfl.36.1638183896534; Mon, 29
+ Nov 2021 03:04:56 -0800 (PST)
 MIME-Version: 1.0
-Received: by 2002:a17:90b:17d2:0:0:0:0 with HTTP; Mon, 29 Nov 2021 02:54:13
- -0800 (PST)
-Reply-To: jesspayne72@gmail.com
-From:   Jess Payne <adamujoeal12@gmail.com>
-Date:   Mon, 29 Nov 2021 02:54:13 -0800
-Message-ID: <CAEPnHZq=QaWywk4+o8cb6esNN3BB8dn6_CaEpNT7qakquZYc4Q@mail.gmail.com>
-Subject: =?UTF-8?B?5oiR6ZyA6KaB5L2g55qE5biu5YqpIC8gSSBuZWVkIHlvdXIgYXNzaXN0YW5jZQ==?=
+Received: by 2002:a17:522:16c9:b0:3db:6e05:78bb with HTTP; Mon, 29 Nov 2021
+ 03:04:55 -0800 (PST)
+Reply-To: bintou_deme2011@aol.com
+From:   Bintou Deme <jindaratdaosornprasat20147@gmail.com>
+Date:   Mon, 29 Nov 2021 11:04:55 +0000
+Message-ID: <CAJY0BCnF-EXhMWZJ4Crowov1rROegH4dn5TwBAZL-DFO4W17Sw@mail.gmail.com>
+Subject: Von Bintou
 To:     undisclosed-recipients:;
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-5oiR5biM5pyb5L2g6IO955CG6Kej6L+Z5p2h5L+h5oGv77yM5Zug5Li65oiR5q2j5Zyo5Yip55So
-57+76K+R57uZ5L2g5YaZ5L+h44CCDQoNCuaIkeaYr+adsOilv+S9qeaBqeS4reWjq+Wkq+S6uuOA
-gg0K5Zyo576O5Zu96ZmG5Yab55qE5Yab5LqL6YOo6Zeo44CC576O5Zu977yM5LiA5ZCN5Lit5aOr
-77yMMzIg5bKB77yM5oiR5Y2V6Lqr77yM5p2l6Ieq576O5Zu955Sw57qz6KW/5bee5YWL5Yip5aSr
-5YWw77yM55uu5YmN6am75omO5Zyo5Y+Z5Yip5Lqa77yM5LiO5oGQ5oCW5Li75LmJ5L2c5oiY44CC
-5oiR55qE5Y2V5L2N5piv56ysNOaKpOeQhumYn+esrDc4MuaXheS/nemanOiQpeOAgg0KDQrmiJHm
-mK/kuIDkuKrlhYXmu6HniLHlv4PjgIHor5rlrp7lkozmt7Hmg4XnmoTkurrvvIzlhbfmnInoia/l
-pb3nmoTlub3pu5jmhJ/vvIzmiJHllpzmrKLnu5Por4bmlrDmnIvlj4vlubbkuobop6Pku5bku6zn
-moTnlJ/mtLvmlrnlvI/vvIzmiJHllpzmrKLnnIvliLDlpKfmtbfnmoTms6LmtarlkozlsbHohInn
-moTnvo7kuL3ku6Xlj4rlpKfoh6rnhLbmiYDmi6XmnInnmoTkuIDliIfmj5DkvpvjgILlvojpq5jl
-hbTog73mm7TlpJrlnLDkuobop6PmgqjvvIzmiJHorqTkuLrmiJHku6zlj6/ku6Xlu7rnq4voia/l
-pb3nmoTllYbkuJrlj4vosIrjgIINCg0K5oiR5LiA55u05b6I5LiN5byA5b+D77yM5Zug5Li66L+Z
-5Lqb5bm05p2l55Sf5rS75a+55oiR5LiN5YWs5bmz77yb5oiR5aSx5Y675LqG54i25q+N77yM6YKj
-5bm05oiRIDIxDQrlsoHjgILmiJHniLbkurLlj6vkuZTlsJTCt+S9qeaBqe+8jOavjeS6suWPq+eO
-m+S4vcK35L2p5oGp44CC5rKh5pyJ5Lq65biu5Yqp5oiR77yM5L2G5b6I6auY5YW05oiR57uI5LqO
-5Zyo576O5Yab5Lit5om+5Yiw5LqG6Ieq5bex44CCDQoNCuaIkee7k+WpmueUn+S6huWtqeWtkO+8
-jOS9huS7luatu+S6hu+8jOS4jeS5heaIkeS4iOWkq+W8gOWni+asuumql+aIke+8jOaJgOS7peaI
-keS4jeW+l+S4jeaUvuW8g+WpmuWnu+OAgg0KDQrmiJHkuZ/lvojlubjov5DvvIzlnKjmiJHnmoTl
-m73lrrbjgIHnvo7lm73lkozlj5nliKnkuprov5nph4zvvIzmi6XmnInmiJHnlJ/mtLvkuK3pnIDo
-poHnmoTkuIDliIfvvIzkvYbmsqHmnInkurrnu5nmiJHlu7rorq7jgILmiJHpnIDopoHkuIDkuKro
-r5rlrp7nmoTkurrmnaXkv6Hku7vvvIzku5bkuZ/kvJrlsLHlpoLkvZXmipXotYTlkJHmiJHmj5Dk
-vpvlu7rorq7jgILlm6DkuLrmiJHmmK/miJHniLbmr43lnKjku5bku6zljrvkuJbliY3nlJ/kuIvn
-moTllK/kuIDlpbPlranjgIINCg0K5oiR5LiN6K6k6K+G5L2g5pys5Lq677yM5L2G5oiR6K6k5Li6
-5pyJ5LiA5Liq5YC85b6X5L+h6LWW55qE5aW95Lq677yM5LuW5Y+v5Lul5bu656uL55yf5q2j55qE
-5L+h5Lu75ZKM6Imv5aW955qE5ZWG5Lia5Y+L6LCK77yM5aaC5p6c5L2g55yf55qE5pyJ5LiA5Liq
-6K+a5a6e55qE5ZCN5a2X77yM5oiR5Lmf5pyJ5LiA5Lqb5Lic6KW/6KaB5ZKM5L2g5YiG5Lqr55u4
-5L+h44CC5Zyo5L2g6Lqr5LiK77yM5Zug5Li65oiR6ZyA6KaB5L2g55qE5biu5Yqp44CC5oiR5oul
-5pyJ5oiR5Zyo5Y+Z5Yip5Lqa6L+Z6YeM6LWa5Yiw55qE5oC76aKd77yINTUwDQrkuIfnvo7lhYPv
-vInjgILmiJHkvJrlnKjkuIvkuIDlsIHnlLXlrZDpgq7ku7bkuK3lkYror4nkvaDmiJHmmK/lpoLk
-vZXlgZrliLDnmoTvvIzkuI3opoHmg4rmhYzvvIzku5bku6zmmK/ml6Dpo47pmannmoTvvIzmiJHo
-v5jlnKjkuI4gUmVkDQrmnInogZTns7vnmoTkurrpgZPkuLvkuYnljLvnlJ/nmoTluK7liqnkuIvl
-sIbov5nnrJTpkrHlrZjlhaXkuobpk7booYzjgILmiJHluIzmnJvmgqjlsIboh6rlt7HkvZzkuLrm
-iJHnmoTlj5fnm4rkurrmnaXmjqXmlLbln7rph5HlubblnKjmiJHlnKjov5nph4zlrozmiJDlkI7n
-oa7kv53lroPnmoTlronlhajlubbojrflvpfmiJHnmoTlhpvkuovpgJrooYzor4Hku6XlnKjmgqjn
-moTlm73lrrbkuI7mgqjkvJrpnaLvvJvkuI3opoHlrrPmgJXpk7booYzkvJrlsIbotYTph5HlrZjl
-gqjlnKgNCkFUTSBWSVNBIOWNoeS4re+8jOi/meWvueaIkeS7rOadpeivtOaYr+WuieWFqOS4lOW/
-q+aNt+eahOOAgg0KDQrnrJTorrA75oiR5LiN55+l6YGT5oiR5Lus6KaB5Zyo6L+Z6YeM5ZGG5aSa
-5LmF77yM5oiR55qE5ZG96L+Q77yM5Zug5Li65oiR5Zyo6L+Z6YeM5Lik5qyh54K45by56KKt5Ye7
-5Lit5bm45a2Y5LiL5p2l77yM6L+Z5a+86Ie05oiR5a+75om+5LiA5Liq5YC85b6X5L+h6LWW55qE
-5Lq65p2l5biu5Yqp5oiR5o6l5pS25ZKM5oqV6LWE5Z+66YeR77yM5Zug5Li65oiR5bCG5p2l5Yiw
-5L2g5Lus55qE5Zu95a625Ye66Lqr5oqV6LWE77yM5byA5aeL5paw55Sf5rS777yM5LiN5YaN5b2T
-5YW144CCDQoNCuWmguaenOaCqOaEv+aEj+iwqOaFjuWkhOeQhu+8jOivt+WbnuWkjeaIkeOAguaI
-keS8muWRiuivieS9oOS4i+S4gOatpeeahOa1geeoi++8jOW5tue7meS9oOWPkemAgeabtOWkmuWF
-s+S6juWfuumHkeWtmOWFpemTtuihjOeahOS/oeaBr+OAguS7peWPiumTtuihjOWwhuWmguS9leW4
-ruWKqeaIkeS7rOmAmui/hyBBVE0gVklTQQ0KQ0FSRCDlsIbotYTph5Hovaznp7vliLDmgqjnmoTl
-m73lrrYv5Zyw5Yy644CC5aaC5p6c5L2g5pyJ5YW06Laj77yM6K+35LiO5oiR6IGU57O744CCDQo=
+Von: Bintou Deme
+Liebste,
+Guten Tag und vielen Dank f=C3=BCr Ihre Aufmerksamkeit. Bitte, ich m=C3=B6c=
+hte,
+dass Sie meine E-Mail sorgf=C3=A4ltig lesen und mir helfen, dieses Projekt
+zu bearbeiten. Ich bin Miss Bintou Deme und m=C3=B6chte Sie in aller
+Bescheidenheit um Ihre Partnerschaft und Unterst=C3=BCtzung bei der
+=C3=9Cbertragung und Anlage meiner Erbschaftsgelder in H=C3=B6he von
+6.500.000,00 US-Dollar (sechs Millionen f=C3=BCnfhunderttausend US-Dollar)
+bitten, die mein verstorbener geliebter Vater vor seinem Tod bei einer
+Bank hinterlegt hat.
+
+Ich m=C3=B6chte Ihnen versichern, dass dieser Fonds legal von meinem
+verstorbenen Vater erworben wurde und keinen kriminellen Hintergrund
+hat. Mein Vater hat diesen Fonds legal durch ein legitimes Gesch=C3=A4ft
+erworben, bevor er w=C3=A4hrend seiner Gesch=C3=A4ftsreise zu Tode vergifte=
+t
+wurde. Der Tod meines Vaters wurde von seinen Verwandten, die ihn
+w=C3=A4hrend seiner Dienstreise begleiteten, vermutet. Denn nach 3 Monaten
+nach dem Tod meines Vaters begannen Seine Verwandten, alle Besitzt=C3=BCmer
+meines verstorbenen Vaters zu beanspruchen und zu verkaufen.
+
+Die Verwandten meines verstorbenen Vaters wissen nichts von den
+6.500.000,00 US-Dollar (sechs Millionen f=C3=BCnfhunderttausend US-Dollar),
+die mein verstorbener Vater auf die Bank eingezahlt hat und mein
+verstorbener Vater sagte mir heimlich, bevor er starb, dass ich in
+jedem Land nach einem ausl=C3=A4ndischen Partner suchen sollte meiner Wahl,
+wohin ich diese Gelder f=C3=BCr meine eigenen Zwecke =C3=BCberweise.
+
+Bitte helfen Sie mir, dieses Geld f=C3=BCr gesch=C3=A4ftliche Zwecke in Ihr=
+em
+Land auf Ihr Konto zu =C3=BCberweisen. Ich habe diese Entscheidung
+getroffen, weil ich viele Dem=C3=BCtigungen von den Verwandten meines
+verstorbenen Vaters erlitten habe. Zur Zeit habe ich Kommunikation mit
+dem Direktor der Bank, bei der mein verstorbener Vater dieses Geld
+hinterlegt hat. Ich habe dem Direktor der Bank die Dringlichkeit
+erkl=C3=A4rt, sicherzustellen, dass das Geld ins Ausland =C3=BCberwiesen wi=
+rd,
+damit ich dieses Land zu meiner Sicherheit verlassen kann. Der
+Direktor der Bank hat mir zugesichert, dass das Geld =C3=BCberwiesen wird,
+sobald ich jemanden vorlege, der den Geldbetrag in meinem Namen f=C3=BCr
+diesen Zweck ehrlich entgegennimmt.
+
+Seien Sie versichert, dass die Bank den Betrag auf Ihr Konto =C3=BCberweist
+und es keine Probleme geben wird. Diese Transaktion ist 100%
+risikofrei und legitim. Ich bin bereit, Ihnen nach erfolgreicher
+=C3=9Cberweisung dieses Geldes auf Ihr Konto 30% der Gesamtsumme als
+Entsch=C3=A4digung f=C3=BCr Ihren Aufwand anzubieten. Sie werden mir auch
+helfen, 10% an Wohlt=C3=A4tigkeitsorganisationen und Heime f=C3=BCr mutterl=
+ose
+Babys in Ihrem Land zu spenden.
+
+Bitte alles, was ich m=C3=B6chte, ist, dass Sie f=C3=BCr mich als mein
+ausl=C3=A4ndischer Partner auftreten, damit die Bank dieses Geld auf Ihr
+Konto =C3=BCberweist, damit ich in diesem Land leben kann. Bitte, ich
+brauche Ihre dringende Hilfe wegen meines jetzigen Zustands. Mit Ihrer
+vollen Zustimmung, mit mir zu diesem Zweck zusammenzuarbeiten,
+bekunden Sie bitte Ihr Interesse, indem Sie mir antworten, damit ich
+Ihnen die notwendigen Informationen und die Details zum weiteren
+Vorgehen geben kann. Ich werde Ihnen 30% des Geldes f=C3=BCr Ihre Hilfe
+anbieten und Hilfestellung, damit umzugehen.
+
+Ihre dringende Antwort wird gesch=C3=A4tzt.
+Mit freundlichen Gr=C3=BC=C3=9Fen
+Bintou Deme
