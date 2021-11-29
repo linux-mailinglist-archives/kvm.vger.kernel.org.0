@@ -2,123 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 45DD5460F30
-	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 08:10:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D0389460FAA
+	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 08:56:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232994AbhK2HOP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Nov 2021 02:14:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55748 "EHLO
+        id S241155AbhK2IAH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Nov 2021 03:00:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36722 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235462AbhK2HMO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Nov 2021 02:12:14 -0500
-Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5F17C061758;
-        Sun, 28 Nov 2021 23:08:51 -0800 (PST)
-Received: by mail-il1-x129.google.com with SMTP id h16so15495047ila.4;
-        Sun, 28 Nov 2021 23:08:51 -0800 (PST)
+        with ESMTP id S241678AbhK2H6G (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Nov 2021 02:58:06 -0500
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98466C06175D
+        for <kvm@vger.kernel.org>; Sun, 28 Nov 2021 23:54:13 -0800 (PST)
+Received: by mail-wr1-x42a.google.com with SMTP id a9so34706868wrr.8
+        for <kvm@vger.kernel.org>; Sun, 28 Nov 2021 23:54:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=C6dWNYHfNwwMDgVTMEboS2qGaBs9EpK0Y12B3cYYsgg=;
-        b=C0tD1BqFaEplnOhJnFwDHJhyFgPbQFoN9FvL1JOLT5AdvrVJgWiUPpniceEW1cqDOH
-         E19ZmdqGQi59jeH3EYMbSeNyCW3fbsb0U6ssN+8O8PqgJukh0rZoXSE9JHQV+31U7tp1
-         B0pWiN9m0KVPR4STeIZqgMNnIslRpPBhpoengRyzTcTkE9Lctae+nfFIU6V0xxDBwqM2
-         IvWoK1yxFBgxiDUiTlSGnNvr7m13eJ2kXEseOZiLKZOxyeA3okz8E1LzZsCvnyx+c62O
-         UyNgkct8hZrvp4LrV99N8pguI9SKinyBmg1m/DkYXFRNdJHvn7hWpS3lrLPmhB4Bk75C
-         lydA==
+        h=mime-version:sender:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=FF43797rWa/tW0tYpwzS9I9ZcuXL/DtjRV/ubKLJ9Io=;
+        b=FTNdWdN1N7nwOepyVYBlQMBJHnA9lB9f15tJiZBrrzsPAZ7d07miaK/zxkTpdDIkUt
+         fqY83zP3kLkdicNKYPEbTi1hXCx0sbrDzpRjZld9+Yovsajxr1Xlf+p2ReWZDuzNKkQl
+         oVTXMm1rj05oGDVljtpqQGquntvyZFXqsdCtziiFfZ9rwLPX/bsRnlHzUdmS5eVfuzfS
+         APJILt0mqOEubj4teeSM/g7BPFWCIPmBMZcfx8BARf1W/1XidWj6z4nj/wASQMGiURkY
+         uCHIy4KNk2gDY7RDYXYVGlGlAy9bWiW99qf0454VJwXsl4G95wL0NBrg9tBweAkJEo1v
+         qIMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=C6dWNYHfNwwMDgVTMEboS2qGaBs9EpK0Y12B3cYYsgg=;
-        b=lD3Gl67DmKPqCo/+qeyA63R2uziHc4UdYoYIRskz1jE551LfLgw8SdXaMVUO8xvK5v
-         jRVlJnogcbDJGJcgyF3h2gVji6HMOaXzL5ZOZdhpMNuvvgM6nY9a0QXHhBtkF9smv4xy
-         HCwFtZbxdsA5RCt0LsUmmXVksrJN21KYrKoSbCRuV52BcNVOsQ21qvsbVZz+BCmAymK4
-         iqNMa7afYtbTSx/OtFtOWy4tAQ6YwiPGDW/kC2IeBrbUPz26w7FMBSo0le/rCNQ1wWWz
-         2wkmt7yCZy1mVVVisBrqadjhFpfU50A7C6O3LgknDs4tCBBt0YtZt5eXRS4Q+Hqyrtj/
-         ljnA==
-X-Gm-Message-State: AOAM533Kk5WHwPoZKwoMbRFRhY6J9e8A8Zu1qnqJFvmUzsTOG55+MDmS
-        h8+TWhznUo3667Sq5NMTdC7TFdFuQbjX+b5skWQ=
-X-Google-Smtp-Source: ABdhPJwRzUi0ufVkIonkdgzoXFmfE5f5AFaR6B23puAjAUxq7OqWG6MpDlFr9lmrQVFYVIYDJ7iGkVuI34DBBVPzHNg=
-X-Received: by 2002:a05:6e02:1a63:: with SMTP id w3mr47043107ilv.230.1638169731221;
- Sun, 28 Nov 2021 23:08:51 -0800 (PST)
+        h=x-gm-message-state:mime-version:sender:from:date:message-id:subject
+         :to:content-transfer-encoding;
+        bh=FF43797rWa/tW0tYpwzS9I9ZcuXL/DtjRV/ubKLJ9Io=;
+        b=fiDlrhPhONgvGwaQZdgyL9lcf1eG1VTD7zK12D/nfFD+VhrrSS/a9tBFoqtNP9Me7U
+         52zEDRb90pfS88Z31dWN1TFssaoxH+bbsBiSeXAHPohvA4yCvH8oZVp5ybpkWIt2mgCs
+         tgoH1uiW6ynf0d3rhk5w+Gk0/xFM6dN1AZnexvqUeXAaZApTTT7/5XCV+U+5B3KcpsWF
+         qhW3Wl3AN26v28asWkdkd7NDNrJOZtbyg5U9wbHf8jgxJYW5ogqbf7unljyGXqvixva/
+         Ufs1x8jKvOrbdxCi7CqABqDa8IPp2ZotIImuOCfQ1cNKjvXWFHK8dRZYpynjNZyJ3h7j
+         5yQQ==
+X-Gm-Message-State: AOAM532kpJdbmv9+WmeyeDCq9r1149lCohVqCJkpokS2P7sea5Fq1FK7
+        lN1JRSTwsyzFEKd4H9aHTSm9NAIaOEhbqjmvz90=
+X-Google-Smtp-Source: ABdhPJxxpCc54gSfy2W+SOA3eFnnakyw49qBOMcNe1tc5W2v+GhIKoTOfmtgNjXDPMu9mMzIyW+rPBgZz35LsrweJsY=
+X-Received: by 2002:a05:6000:181:: with SMTP id p1mr32397192wrx.292.1638172451953;
+ Sun, 28 Nov 2021 23:54:11 -0800 (PST)
 MIME-Version: 1.0
-References: <cover.1637799475.git.isaku.yamahata@intel.com>
- <4ede5c987a4ae938a37ab7fe70d5e1d561ee97d4.1637799475.git.isaku.yamahata@intel.com>
- <878rxcht3g.ffs@tglx> <20211126091913.GA11523@gao-cwp>
-In-Reply-To: <20211126091913.GA11523@gao-cwp>
-From:   Lai Jiangshan <jiangshanlai@gmail.com>
-Date:   Mon, 29 Nov 2021 15:08:39 +0800
-Message-ID: <CAJhGHyAbBUyyVKL7=Cior_uat9rij1BB4iBwX+EDCAUVs1Npgg@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 53/59] KVM: x86: Add a helper function to restore 4
- host MSRs on exit to user space
-To:     Chao Gao <chao.gao@intel.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>, isaku.yamahata@intel.com,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Connor Kuehl <ckuehl@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        isaku.yamahata@gmail.com
+Sender: dr.aisha80gaddafi@gmail.com
+Received: by 2002:a5d:4d86:0:0:0:0:0 with HTTP; Sun, 28 Nov 2021 23:54:11
+ -0800 (PST)
+From:   "MRS. Maya Olivia" <mrs.mayaolivia@gmail.com>
+Date:   Mon, 29 Nov 2021 07:54:11 +0000
+X-Google-Sender-Auth: WniPMns57bPmSHjFT6qAasd04Lg
+Message-ID: <CA+B9LK0DJ5zWZr=psa9MwUHdAxKSNaZsnDyS_x5nMaKE2biO7A@mail.gmail.com>
+Subject: THIS IS MY HUSBAND WISH a
+To:     undisclosed-recipients:;
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 29, 2021 at 2:00 AM Chao Gao <chao.gao@intel.com> wrote:
->
-> On Thu, Nov 25, 2021 at 09:34:59PM +0100, Thomas Gleixner wrote:
-> >On Wed, Nov 24 2021 at 16:20, isaku yamahata wrote:
-> >> From: Chao Gao <chao.gao@intel.com>
-> >
-> >> $Subject: KVM: x86: Add a helper function to restore 4 host MSRs on exit to user space
-> >
-> >Which user space are you talking about? This subject line is misleading
->
-> Host Ring3.
->
-> >at best. The unconditional reset is happening when a TDX VM exits
-> >because the SEAM firmware enforces this to prevent unformation leaks.
->
-> Yes.
->
-> >
-> >It also does not matter whether this are four or ten MSR.
->
-> Indeed, the number of MSRs doesn't matter.
->
-> >Fact is that
-> >the SEAM firmware is buggy because it does not save/restore those MSRs.
->
-> It is done deliberately. It gives host a chance to do "lazy" restoration.
-> "lazy" means don't save/restore them on each TD entry/exit but defer
-> restoration to when it is neccesary e.g., when vCPU is scheduled out or
-> when kernel is about to return to Ring3.
->
-> The TDX module unconditionally reset 4 host MSRs (MSR_SYSCALL_MASK,
-> MSR_START, MSR_LSTAR, MSR_TSC_AUX) to architectural INIT state on exit from
-> TDX VM to KVM.
+THIS IS MY HUSBAND WISH
+MY NAME IS Mrs. Maya Oliver,
+My Name is Mrs. Maya Oliver, from Norway. I know that this message
+will be a surprise to you. Firstly, I am married to Mr. Patrick
+Oliver, A diamond and gold merchant who owns a small gold Mine in
+Burkina Faso and Egypt Cairo; He died of Cardiovascular Disease in
+mid-March 2011. During his lifetime he deposited the sum of =E2=82=AC 18.5
+Million Euro) Eighteen million, Five hundred thousand Euros in a bank
+in Ouagadougou the capital city of Burkina Faso. The deposited money
+was from the sale of the shares, death benefits payment and
+entitlements of my deceased husband by his company.
+Please reply to my privet mail after reading: mrs.mayaolivia90@gmail.com
 
-I did not find the information in intel-tdx-module-1eas.pdf nor
-intel-tdx-cpu-architectural-specification.pdf.
+I am sending this message to you praying that it will reach you in
+good health, since I am not in good health in which I sleep every
+night without knowing if I may be alive to see the next day. I am
+suffering from long term cancer and presently I am partially suffering
+from a stroke illness which has become almost impossible for me to
+move around. I was married to my late husband for over 4 years before
+he died and unfortunately that we don't have a child, my doctor
+confided in me that i have less chance to live. Having known my health
+condition, I decided to contact you to claim the fund since I don't
+have any relation. I grew up in an orphanage.
 
-Maybe the version I downloaded is outdated.
+I have decided to donate what I have to you for the support of helping
+Motherless babies/Less privileged/Widows' because I am dying and
+diagnosed with cancer about 2 years ago. I have been touched by God
+Almighty to donate from what I have inherited from my late husband to
+you for the good work of God Almighty. I have asked Almighty God to
+forgive me and believe he has, because He is a Merciful God I will be
+going in for an operation soon.
 
-I guess that the "lazy" restoration mode is not a valid optimization.
-The SEAM module should restore it to the original value when it tries
-to reset it to architectural INIT state on exit from TDX VM to KVM
-since the SEAM module also does it via wrmsr (correct me if not).
+This is the reason I need your services to stand as my next of kin or
+an executor to claim the funds for charity purposes. If this money
+remains unclaimed after my death, the bank executives or the
+government will take the money as unclaimed fund and maybe use it for
+selfish and worthless ventures, I need a very honest person who can
+claim this money and use it for Charity works, for orphanages, widows
+and also build schools for less privilege that will be named after my
+late husband and my name; I need your urgent answer to know if you
+will be able to execute this project, and I will give you more
+information on how the fund will be transferred to your bank account
+from the  Burkina Faso bank.
+Please reply to my privet mail after reading: mrs.mayaolivia90@gmail.com
 
-If the SEAM module doesn't know "the original value" of the these
-MSRs, it would be mere an optimization to save an rdmsr in SEAM.
-But there are a lot of other ways for the host to share the values
-to SEAM in zero overhead.
-
-Could you provide more information?
+Thanks
+Mrs. Maya
