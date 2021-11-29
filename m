@@ -2,92 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 219F0461C52
-	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 17:59:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EDDB4461D66
+	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 19:14:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347466AbhK2RCt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Nov 2021 12:02:49 -0500
-Received: from foss.arm.com ([217.140.110.172]:43604 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1346849AbhK2RAs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Nov 2021 12:00:48 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5A0371063;
-        Mon, 29 Nov 2021 08:57:30 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B16303F5A1;
-        Mon, 29 Nov 2021 08:57:28 -0800 (PST)
-Date:   Mon, 29 Nov 2021 16:59:21 +0000
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        kernel-team@android.com
-Subject: Re: [PATCH] KVM: arm64: Add minimal handling for the ARMv8.7 PMU
-Message-ID: <YaUG6TtiiIRyzL/y@monolith.localdoman>
-References: <20211126115533.217903-1-maz@kernel.org>
+        id S1348991AbhK2SRb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Nov 2021 13:17:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59812 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243892AbhK2SPb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Nov 2021 13:15:31 -0500
+Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B88FBC03AA1D
+        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 06:44:29 -0800 (PST)
+Received: by mail-oi1-x229.google.com with SMTP id t23so35027557oiw.3
+        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 06:44:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=GKVLc/+rKV8jGy2xEcynwei/dkKPZddCEj3hjl6BCNw=;
+        b=aiIF26m2Bx/DCiuLkyAb/6bPaGWkUC+/qHtiZZr4r1ZI0We3gymnzY6VY5Yje3Jqk6
+         og5UCLprBp3lz/a5OwlxIpiMalLzKwh8V0h0UQsV/mP0tsXcpyJ5d1itENcGdIbvbrLW
+         2LyP+ZQwels3Zb15KSnD5GYcUlmR3p1J8JoiGi273Rvgju8zD4AzKAe7PhP62qo7NGWv
+         3ivOxuHPqEHir1F1txJw1Jprg0GzuiJxotlvltD5qA41671IZqNgyMpTW0Ig/nkT7Sem
+         dGdYe+Rd+W5vavS6NTK8+RwxxPl+Fo5Irw0+c0hug3/d9RoMw5eyuJge7DgJVSWzw1mG
+         h1UQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=GKVLc/+rKV8jGy2xEcynwei/dkKPZddCEj3hjl6BCNw=;
+        b=YqV3vcrEzFMTqpc5HNtFL20WQGyxlxGVdZZa9pAU+6WJXzyqSWAQSSufqmty+LgwkR
+         sYP1LhKb049IVEXnyr19hKdL9jJcyjVhoxd7Ro6pVv0iyQM+qlNeylvgj9M0Ie7RZ61R
+         z+DmvDROu8gvoRmTlq7HLlU1x+GwdIyImNjdN8L52af7JNja8xfVntzeJfNGlLI5HJH/
+         kHECFLqLnzIwOnZAMjn0oiiohh+u/LWuKvWzcAkAOUUhlvw5QstGrOgK4NyJLlyXzSx+
+         ZiNo/i9pNAEDqnXlTyewlO2gpkomYlNE0iZ5Bu7iUxZwlhhrRCKIj0uuvcVHkLpk/QZ2
+         rppA==
+X-Gm-Message-State: AOAM530IuywpcF/TVeM4hEwdzKANxU1IpfyHT9CC+7IE/6ooHVpAYu04
+        qcQwdvvZJVAj2wNgqWJqoUuzdBWcHTK8gXjI2nueYA==
+X-Google-Smtp-Source: ABdhPJwsv9m1Z+kTXlkk8ZggjP0sVUSHNaYvl1vSb8VjV9N76Rwea6ppsCKe1/KJmf8nf5sSFXHyppB/ueUCSeL+tfg=
+X-Received: by 2002:a54:4515:: with SMTP id l21mr41384907oil.15.1638197068915;
+ Mon, 29 Nov 2021 06:44:28 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211126115533.217903-1-maz@kernel.org>
+References: <20211004204931.1537823-1-zxwang42@gmail.com> <4d3b7ca8-2484-e45c-9551-c4f67fc88da6@redhat.com>
+ <81f95dad-b1e3-edfb-685f-8dafc92cd5db@suse.com>
+In-Reply-To: <81f95dad-b1e3-edfb-685f-8dafc92cd5db@suse.com>
+From:   Marc Orr <marcorr@google.com>
+Date:   Mon, 29 Nov 2021 06:44:17 -0800
+Message-ID: <CAA03e5FGj3FGeL-nfMBY_TA4UNFjaP73Hxkhkr1s2qGApHFCmQ@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH v3 00/17] x86_64 UEFI and AMD SEV/SEV-ES support
+To:     Varad Gautam <varad.gautam@suse.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Zixuan Wang <zxwang42@gmail.com>, kvm@vger.kernel.org,
+        drjones@redhat.com, baekhw@google.com, tmroeder@google.com,
+        erdemaktas@google.com, rientjes@google.com, seanjc@google.com,
+        brijesh.singh@amd.com, Thomas.Lendacky@amd.com, jroedel@suse.de,
+        bp@suse.de
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
+On Thu, Nov 25, 2021 at 7:21 AM Varad Gautam <varad.gautam@suse.com> wrote:
+>
+> On 10/21/21 4:10 PM, Paolo Bonzini wrote:
+> > On 04/10/21 22:49, Zixuan Wang wrote:
+> >> Hello,
+> >
+> > WHOA IT WORKS! XD
+> >
+> > There are still a few rough edges around the build system (and in gener=
+al, the test harness is starting to really show its limits), but this is aw=
+esome work.  Thanks Drew, Varad and Zixuan (in alphabetic and temporal orde=
+r) for the combined contribution!
+> >
+> > For now I've placed it at a 'uefi' branch on gitlab, while I'm waiting =
+for some reviews of my GDT cleanup work.  Any future improvements can be do=
+ne on top.
+> >
+>
+> While doing the #VC handler support for test binaries [1], I realised I c=
+an't seem
+> to run any of the tests from the uefi branch [2] that write to cr3 via se=
+tup_vm()
+> on SEV-ES. These tests (eg., tscdeadline_latency) crash with SEV-ES, and =
+work with
+> uefi without SEV-ES (policy=3D0x0). I'm wondering if I am missing somethi=
+ng, is
+> setup_vm->setup_mmu->write_cr3() known to work on SEV-ES elsewhere?
+>
+> [1] https://lore.kernel.org/all/20211117134752.32662-1-varad.gautam@suse.=
+com/
+> [2] https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/tree/uefi
 
-Tested on FVP and the nasty splat goes away, so it works for me:
-
-Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-The guest visible PMCR_EL0.FZ0 bit added by FEAT_PMUv3p7 is cleared on
-register reset/write because ARMV8_PMU_PMCR_MASK is 0xff. This makes the
-bit behave as RES0, which is the architectural value for the field when
-FEAT_PMUv3p7 is absent. So the patch looks correct to me:
-
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-
-Thanks,
-Alex
-
-On Fri, Nov 26, 2021 at 11:55:33AM +0000, Marc Zyngier wrote:
-> When running a KVM guest hosted on an ARMv8.7 machine, the host
-> kernel complains that it doesn't know about the architected number
-> of events.
-> 
-> Fix it by adding the PMUver code corresponding to PMUv3 for ARMv8.7.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/sysreg.h | 1 +
->  arch/arm64/kvm/pmu-emul.c       | 1 +
->  2 files changed, 2 insertions(+)
-> 
-> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> index cdb590840b3f..5de90138d0a4 100644
-> --- a/arch/arm64/include/asm/sysreg.h
-> +++ b/arch/arm64/include/asm/sysreg.h
-> @@ -1036,6 +1036,7 @@
->  #define ID_AA64DFR0_PMUVER_8_1		0x4
->  #define ID_AA64DFR0_PMUVER_8_4		0x5
->  #define ID_AA64DFR0_PMUVER_8_5		0x6
-> +#define ID_AA64DFR0_PMUVER_8_7		0x7
->  #define ID_AA64DFR0_PMUVER_IMP_DEF	0xf
->  
->  #define ID_AA64DFR0_PMSVER_8_2		0x1
-> diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> index a5e4bbf5e68f..ca92cc5c71c6 100644
-> --- a/arch/arm64/kvm/pmu-emul.c
-> +++ b/arch/arm64/kvm/pmu-emul.c
-> @@ -28,6 +28,7 @@ static u32 kvm_pmu_event_mask(struct kvm *kvm)
->  	case ID_AA64DFR0_PMUVER_8_1:
->  	case ID_AA64DFR0_PMUVER_8_4:
->  	case ID_AA64DFR0_PMUVER_8_5:
-> +	case ID_AA64DFR0_PMUVER_8_7:
->  		return GENMASK(15, 0);
->  	default:		/* Shouldn't be here, just for sanity */
->  		WARN_ONCE(1, "Unknown PMU version %d\n", kvm->arch.pmuver);
-> -- 
-> 2.30.2
-> 
+I've only been running amd_sev under SEV-ES up to now. I just tried
+tscdeadline_latency on my setup, and can confirm that it does indeed
+fail under SEV-ES.
