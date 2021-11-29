@@ -2,120 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E1504461D35
-	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 18:58:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F5D9461D69
+	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 19:14:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348699AbhK2SBz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Nov 2021 13:01:55 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:57247 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1349425AbhK2R7x (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 29 Nov 2021 12:59:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1638208594;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=1vzx8zkonNlgqsej18YvSiZADgZZl0ApWDT4xKZBBxE=;
-        b=XWBTkUedNZDDDjjRn5OZfgbVU6Ki3hJF2qYKif8Wnx6oc/bnoH0md+KbgbWgQJSaHzECHR
-        Ks3wX5kAj7BSjbX53eXaG4s+E78aUJOb2Xs+KMivpVYHB5qBpwdEogYWAkSxumkEckAjSi
-        X3FLPpoO4Qwzhj5V+yDZVYyifO250TY=
-Received: from mail-ot1-f72.google.com (mail-ot1-f72.google.com
- [209.85.210.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-85-in_V1F1vNIONnmM1xH-Urg-1; Mon, 29 Nov 2021 12:56:32 -0500
-X-MC-Unique: in_V1F1vNIONnmM1xH-Urg-1
-Received: by mail-ot1-f72.google.com with SMTP id f79-20020a9d03d5000000b0055c7d2f07ffso10023335otf.14
-        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 09:56:32 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=1vzx8zkonNlgqsej18YvSiZADgZZl0ApWDT4xKZBBxE=;
-        b=Z7HqebeDm4giJq5gcVJJDazTh4opCHeuKBffnNq6ubjXfki8KokikU/Gpf+5Vgl6R2
-         Oa1pDg3nnT68LNyfsLZ5qnWkEG2b4Ry35b53AAtyXvDQiw+gPRQ00TLzBjB03zyl5S3J
-         Jr6rTVgBBcOMPbfOmKYeHDPIIq90DBY+frKwGlnpiiqTCau2g/lF3adZQd52X4OAV/Dk
-         1MQoHRWIJ5QqoCFn/gV0r8aoc9KLWiBz8LvF7fnfGEZvpMYSWqBx5nXHJwzuWIbm/c0T
-         M8m1CkGaCoe/PjfR8wdzViRBc0OqsVS1U9EZ/sUj1OEVeqQzVGZxItTWE++fIGGBtdPv
-         ba1A==
-X-Gm-Message-State: AOAM531EHoBcLwUVJwPu8kKz4gz9vjitv8k/maVwGurmutnils7dSrby
-        qfSyry+uAwC72IFidOWJmVqqiGGW3F60+gwHdxqICN4gR75+jvN0qBipykiZUZ043MqNM1mvWqg
-        zpn8daFxqQuWW
-X-Received: by 2002:a9d:6e06:: with SMTP id e6mr45288991otr.381.1638208592180;
-        Mon, 29 Nov 2021 09:56:32 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxZSz0QhJHiP90aeY9fuv0nh7inMxCOR/7HjTqjhc+RxIh8h/aLcnLrkrQrn1dVajxB49ufoQ==
-X-Received: by 2002:a9d:6e06:: with SMTP id e6mr45288975otr.381.1638208591973;
-        Mon, 29 Nov 2021 09:56:31 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id i3sm2322837ooq.39.2021.11.29.09.56.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Nov 2021 09:56:31 -0800 (PST)
-Date:   Mon, 29 Nov 2021 10:56:29 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Matthew Ruffell <matthew.ruffell@canonical.com>
-Cc:     linux-pci@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>,
-        kvm@vger.kernel.org, nathan.langford@xcelesunifiedtechnologies.com
-Subject: Re: [PROBLEM] Frequently get "irq 31: nobody cared" when passing
- through 2x GPUs that share same pci switch via vfio
-Message-ID: <20211129105629.5ddfb6cf.alex.williamson@redhat.com>
-In-Reply-To: <CAKAwkKs=p3bHQL5VXuh_Xhu3A+mg0mSEuFJ_fy4Zh6E6YG4aag@mail.gmail.com>
-References: <d4084296-9d36-64ec-8a79-77d82ac6d31c@canonical.com>
-        <20210914104301.48270518.alex.williamson@redhat.com>
-        <9e8d0e9e-1d94-35e8-be1f-cf66916c24b2@canonical.com>
-        <20210915103235.097202d2.alex.williamson@redhat.com>
-        <2fadf33d-8487-94c2-4460-2a20fdb2ea12@canonical.com>
-        <20211005171326.3f25a43a.alex.williamson@redhat.com>
-        <CAKAwkKtJQ1mE3=iaDA1B_Dkn1+ZbN0jTSWrQon0=SAszRv5xFw@mail.gmail.com>
-        <20211012140516.6838248b.alex.williamson@redhat.com>
-        <CAKAwkKsF3Kn1HLAg55cBVmPmo2y0QAf7g6Zc7q6ZsQZBXGW9bg@mail.gmail.com>
-        <CAKAwkKsoKELnR=--06sRZL3S6_rQVi5J_Kcv6iRQ6w2tY71WCQ@mail.gmail.com>
-        <20211104160541.4aedc593.alex.williamson@redhat.com>
-        <CAKAwkKs=p3bHQL5VXuh_Xhu3A+mg0mSEuFJ_fy4Zh6E6YG4aag@mail.gmail.com>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
+        id S1349784AbhK2SSG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Nov 2021 13:18:06 -0500
+Received: from sin.source.kernel.org ([145.40.73.55]:45146 "EHLO
+        sin.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1345452AbhK2SQE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Nov 2021 13:16:04 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 6E77ECE13CF
+        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 18:12:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68732C53FC7;
+        Mon, 29 Nov 2021 18:12:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1638209563;
+        bh=vt+bCjT54jnhEeJkuJHIggsLka/2q/tr/Bf8TSjbSSw=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=MPWv1s2hDNbos+VP+oWbMhK59eGz/ddvi5GXTo2nvaO7h4MvAmJXAJzB766RKNsbl
+         5+Bt7NTPIW2esg9KESWbl0r/U9+ZxElKbrgViZ8hJjz2vuLZhno1uZmxvrGZuMRPIM
+         cWLx90DPxkWR3xFqc/IHqgUKAnP5Tm7jSG9FMBjH8FurrtU+DXrAJ3FI8jcm2QaTMm
+         AjdCMTSW5rd6oLCflNCkgkZUheU6YnikuxQnOZHwEPgX4uhlkzJJYrfeSbCCHFeH2h
+         te9gbNt+pcUoVAOaQvL7yn6fqCzJFhKpP5940v1AjUbNYeVHWrjx1CF+aSf9QOefSc
+         0zYIAtQvgYHWg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=why.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1mrl8r-008ewb-69; Mon, 29 Nov 2021 18:12:41 +0000
+Date:   Mon, 29 Nov 2021 18:12:40 +0000
+Message-ID: <87o862n84n.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Chase Conklin <chase.conklin@arm.com>
+Cc:     alexandru.elisei@arm.com, andre.przywara@arm.com,
+        christoffer.dall@arm.com, haibo.xu@linaro.org, james.morse@arm.com,
+        jintack.lim@linaro.org, jintack@cs.columbia.edu,
+        kernel-team@android.com, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
+        suzuki.poulose@arm.com
+Subject: Re: [PATCH v4 41/66] KVM: arm64: nv: Trap and emulate TLBI instructions from virtual EL2
+In-Reply-To: <20210714164002.84527-1-chase.conklin@arm.com>
+References: <20210510165920.1913477-42-maz@kernel.org>
+        <20210714164002.84527-1-chase.conklin@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: chase.conklin@arm.com, alexandru.elisei@arm.com, andre.przywara@arm.com, christoffer.dall@arm.com, haibo.xu@linaro.org, james.morse@arm.com, jintack.lim@linaro.org, jintack@cs.columbia.edu, kernel-team@android.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org, suzuki.poulose@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 24 Nov 2021 18:52:16 +1300
-Matthew Ruffell <matthew.ruffell@canonical.com> wrote:
+Hi Chase,
 
-> Hi Alex,
+Yes, it took that long for me to get back to the NV series. Sorry
+about that.
+
+On Wed, 14 Jul 2021 17:40:03 +0100,
+Chase Conklin <chase.conklin@arm.com> wrote:
+
+> I'm noticing a hang while an L2 is booting. From what I can tell, the
+> L0 is issuing TLBIs to the wrong VMID, so the L2 is getting stuck
+> taking the same abort repeatedly.
 > 
-> I have forward ported your patch to 5.16-rc2 to account for the vfio module
-> refactor that happened recently. Attached below.
+> It seems that kvm_unmap_stage2_range doesn't perform the invalidations
+> using the mmu passed to it here. Instead, it uses the passed mmu to
+> get back the kvm before passing that to stage2_apply_range which gets
+> its mmu from kvm->arch.mmu. This has the effect of applying
+> invalidations intended for the nested stage-2 of the L2 onto the
+> stage-2 for the L1.
 > 
-> Have you had an opportunity to research if it is possible to conditionalise
-> clearing DisINTx by looking at the interrupt status and seeing if there is a
-> pending interrupt but no handler set?
+> It also turns out that for the L2, the mmu != mmu->pgt->mmu. This is
+> because pgt->mmu is always set to &kvm->arch.mmu by
+> kvm_pgtable_stage2_init_flags. This too will cause the VMID for the
+> TLBI to be incorrect because the stage2_unmap_walker gets its mmu from
+> the pgt passed to it.
 
-Sorry, I've not had any time to continue looking at this.  When I last
-left it I had found that interrupt bit in the status register was not
-set prior to clearing INTxDisable in the command register, but the
-status register was immediately set upon clearing INTxDisable.  That
-suggests we could generalize re-masking INTx since we know there's not
-a handler for it at this point, but it's not clear how this state gets
-reported and cleared.  More generally, should the interrupt code leave
-INTx unmasked for any case where there's no handler.  I'm not sure.
+Yup, and Ganapatrao noticed the same thing[1] (I obviously botched the
+conversion to the new pgtable code). I *think* this is now fixed in my
+nv-5.16 branch, but I'd really appreciate if you could have a look.
 
-> We are testing a 5.16-rc2 kernel with the patch applied on Nathan's server
-> currently, and we are also trying out the pci=clearmsi command line parameter
-> that was discussed on linux-pci a few years ago in [1][2][3][4] along with
-> setting snd-hda-intel.enable_msi=1 to see if it helps the crashkernel not get
-> stuck copying IR tables.
-> 
-> [1] https://marc.info/?l=linux-pci&m=153988799707413
-> [2] https://lore.kernel.org/linux-pci/20181018183721.27467-1-gpiccoli@canonical.com/
-> [3] https://lore.kernel.org/linux-pci/20181018183721.27467-2-gpiccoli@canonical.com/
-> [4] https://lore.kernel.org/linux-pci/20181018183721.27467-3-gpiccoli@canonical.com/
-> 
-> I will let you know how we get on.
+Bonus points if you have access to actual HW (even in emulation), as
+doing this on the model is majorly frustrating.
 
-Ok.  I've not had any luck reproducing audio INTx issues, any trying to
-test it has led me on several tangent bug hunts :-\  Thanks,
+Thanks,
 
-Alex
+	M.
 
+[1] https://lore.kernel.org/r/20211122095803.28943-1-gankulkarni@os.amperecomputing.com
+
+-- 
+Without deviation from the norm, progress is not possible.
