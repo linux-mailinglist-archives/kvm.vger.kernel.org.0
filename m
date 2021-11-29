@@ -2,73 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6000E4613B4
-	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 12:13:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 78BE9461405
+	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 12:42:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243550AbhK2LRE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Nov 2021 06:17:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52380 "EHLO
+        id S236391AbhK2LqK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Nov 2021 06:46:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240796AbhK2LPA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Nov 2021 06:15:00 -0500
-Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08126C0613E0
-        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 02:27:08 -0800 (PST)
-Received: by mail-wm1-x32a.google.com with SMTP id 137so14147744wma.1
-        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 02:27:07 -0800 (PST)
+        with ESMTP id S236388AbhK2LoK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Nov 2021 06:44:10 -0500
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E27DBC08EB25
+        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 02:50:28 -0800 (PST)
+Received: by mail-pj1-x102b.google.com with SMTP id np3so12407669pjb.4
+        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 02:50:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:sender:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=qWMLDC334a28uF2aOXUclG6/xl7HV/EnLkjmVIuz9NM=;
-        b=DON3Z6gcyqt48NnCUvAPeD3Lv1JhCE6oiEJJUxUCW0NGsJ1eEYo4RSSC5GPiY3BH1Q
-         y53ryN1RTCJiN4lMWF4f9VIfXlvGUjZw2edeuTUzu+bFIqE0nFl+Nn4ehQyXe6HSVyF2
-         Op4kmZ4ZKT6cmYPbjwcKmRJd0zCBOVsETjaEo049jsBnM5fG/5YAdAAd2fH9FxwHzttx
-         vRS6svs8zRtlVt9iDLzvOeqG2RJ+YaI9hCgCr/ItnBVyMdjjYy4yVlQSbE/UBRw1Z8pQ
-         or0sgAaNoqdqtWK0lDPqOQupKqnW5uHSWM+98elMKACW7hshD4GGWOoMv51Lz53RcUN2
-         Y5Ng==
+        h=mime-version:from:date:message-id:subject:to;
+        bh=gStws1BsQA7ChV+ZSOVJ9jMVkmG66GOwFLh7gMjyE60=;
+        b=eFKqu69J/Xgt/F4Of/guUi6aEe+helelYIpfX+KeICrG5Rzdt8j+JFGrckSGfKG7iE
+         hiSL6y4lrUxN2EaYjWpezUfjBviv9HrdLyI90giBnknKV0ftt6PyVGxpcwdDm1nIqxRI
+         uyXgfysMboWLQEqnOf+FHDm8pkBKAJFXAndwBkhJFMR9Zc4gvvL4A8h6LTe/4p1rb9sS
+         R0Rnxn4c+ub0ZdNoBPpyIzlZFEpXJmVpNAQY5l5TIkydTk4hXvGjzFX5CHREJy03x6jF
+         JpQaDL3q/YWUymDyinOcTVmYfXub5uyx6uLyszaTsuzY2fhqiSYfQFWjKrPJVeyhjYG8
+         7PAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:sender:from:date:message-id:subject
-         :to:content-transfer-encoding;
-        bh=qWMLDC334a28uF2aOXUclG6/xl7HV/EnLkjmVIuz9NM=;
-        b=hUxNqsxX1G+235toG8qDELBL8t7CWvhfd1RBrUCa+lx+lH+bpHlhS/cR8y/u2Byolq
-         2gReytsfAXsx2bcq8nqGqUUztuHCXBLlJZAMViwsvW3H+yK96YlcDK/9oo9uUdf2PDAP
-         igAqzQe2RJ/+dCCG7rmeRkuzB6iewf4tMRWPVhRuDYaSDmLHSII41kt7GrvVBaOcwq9G
-         j0zpxUMTnqFeRrdgT5IQho+15X04I/wvCrm6BD5qlIxRVEelvrqKkUBTG4ZlGVCZh3yO
-         cOh9mfMsvnCeLUzxvTNlV3qFicFPb1X/Vz9BsuEA14qBXZPIvYjnZwCF2zk9xCCm11bU
-         YBAg==
-X-Gm-Message-State: AOAM532VPq02s9TfnWho/0lgJ7RvncA6h5yi/CoXafd8xLcS5HGKMOxb
-        OwlE4W2mkB9GI7FNxWbUNb3ZK6UIaFsF1NWsxMo=
-X-Google-Smtp-Source: ABdhPJxyDcsEx7VJVi1wOg+SZHE+KgBh0w+pyNty6l5o5EuVYlaziembd6bSWt9bj/aZbaa8VSUuJ+51nFtl4PNtkJk=
-X-Received: by 2002:a05:600c:4113:: with SMTP id j19mr36591218wmi.48.1638181626482;
- Mon, 29 Nov 2021 02:27:06 -0800 (PST)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=gStws1BsQA7ChV+ZSOVJ9jMVkmG66GOwFLh7gMjyE60=;
+        b=sfC7O83W3fr+fxXwJkO7hPgNOeyJoy75H1JZou/m6bNNTJUyK1WeMQelULd5fk6v4l
+         a8GluF3kdE2AMF5U8NiiNtot+4en/YfLjb4Sb7O9up1Y2Ytiemf6XOtBSKvTW9zoQubS
+         uMwA7hxSsB//kp7KnVIgh71CIK7kiuY1DGYWAndJMy7BPEvsBiHegEXX3R55qxCumsxa
+         U4GZFf3s5whbc1kQ51U77nsv2T6Oma+6UkUENU5evK2TZCIRKRW6v/kRgws9OeI+eyED
+         VdquGzmh+D+8GO6TZMfX8IOefeIY9TdAaylQtfWiE/Qu9Hdjb/rCJN7QUXAL89jHps4S
+         qd5Q==
+X-Gm-Message-State: AOAM5312KhdmPqpkGpP5Jrruq0FDzNWlwgK5HhlIYtDg9wcjbyTnbmFD
+        AehJ6B9QfweXgBmgbwaqogt/IIXSfxbNiCE7Qzz6sIYf0xOIIg==
+X-Google-Smtp-Source: ABdhPJyLpiR54bj8wEc5kd9QSP7ECQOnGRiHdUENcm6EwCf3Iqcexd5Y0gvCXhvAnpEEHG4be4ZYB+UN0h3MfIaDqdE=
+X-Received: by 2002:a17:902:c20d:b0:142:21e:b1e8 with SMTP id
+ 13-20020a170902c20d00b00142021eb1e8mr57188517pll.27.1638183028486; Mon, 29
+ Nov 2021 02:50:28 -0800 (PST)
 MIME-Version: 1.0
-Sender: thomasemem3@gmail.com
-Received: by 2002:adf:e48b:0:0:0:0:0 with HTTP; Mon, 29 Nov 2021 02:27:06
- -0800 (PST)
-From:   "Mrs. Peninnah Ariel Benaiah" <mrspeninnaharielb01@gmail.com>
-Date:   Mon, 29 Nov 2021 02:27:06 -0800
-X-Google-Sender-Auth: Y-Ud6JwTgFJuwXaBWOy51yVXPSI
-Message-ID: <CAOH2t157dLxu4PQRGxEvpvLRoxFKj6NifMD8NU23=jzH_3hxXQ@mail.gmail.com>
-Subject: HELLO
-To:     undisclosed-recipients:;
+From:   Stefan Hajnoczi <stefanha@gmail.com>
+Date:   Mon, 29 Nov 2021 10:50:17 +0000
+Message-ID: <CAJSP0QWB=-CaLHFz_0qxrQpkAKgXVoki=bHjpWcFSR-bunqXSw@mail.gmail.com>
+Subject: FOSDEM 2022 call for participation
+To:     qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello Friend,
-I'm "Mrs.Peninnah Ariel Benaiah I am a Norway Citizen" married to
-Mr.Benaiah jeremiah ( an International Contractor and Oil Merchant/
-jointly in Exposition of Agro Equipment ) who died in the Burkina Faso
-attack, and i diagnosed of cancer for about 2 years ago and my husband
-informed me that he deposited the sum of =E2=82=AC 8.5 Million Euro) Eight
-million, Five hundred thousand Euros in a bank in Brussels the capital
-city of Belgium in Europe I want you to help me to use this money for
-a charity project before I die, for the Poor, Less-privileged and
-ORPHANAGES in your country.  Please kindly respond quickly for further
-details.
-Yours fairly friend,
-Mrs. Peninnah Ariel Benaiah
+Dear QEMU and KVM community,
+The FOSDEM free and open source software conference takes place on 5 &
+6 February, 2022. It is free to attend and will be a virtual
+conference.
+
+You can now propose talks about QEMU or KVM at
+https://penta.fosdem.org/submission/FOSDEM22. The deadline is December
+28th.
+
+If you have something fun or interesting to share, please go ahead and
+submit a talk! Don't worry if this is your first talk or you are not a
+regular contributor. If you still have doubts, email me and I can help
+you with your proposal.
+
+You may be interested in the following devrooms:
+
+Emulator Development:
+https://lists.fosdem.org/pipermail/fosdem/2021q4/003293.html
+
+Virtualization and IaaS:
+https://fosdem.org/2022/schedule/track/virtualization_and_iaas/
+
+Retrocomputing:
+https://fosdem.org/2022/schedule/track/retrocomputing/
+
+FOSDEM website:
+https://fosdem.org/2022/
+
+I hope to see you at FOSDEM!
+
+Stefan
