@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EE6604623B0
-	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 22:46:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 102E1462394
+	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 22:44:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232141AbhK2Vt6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Nov 2021 16:49:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49910 "EHLO
+        id S232310AbhK2Vrs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Nov 2021 16:47:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232111AbhK2Vr5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Nov 2021 16:47:57 -0500
+        with ESMTP id S232341AbhK2Vpq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Nov 2021 16:45:46 -0500
 Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71D51C091D2F
-        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 12:07:14 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89B38C08EB32
+        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 12:05:51 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id C5A78CE140F
-        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 20:07:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 250B4C53FC7;
-        Mon, 29 Nov 2021 20:07:11 +0000 (UTC)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 0E8D2CE13DE
+        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 20:05:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 401A3C53FCF;
+        Mon, 29 Nov 2021 20:05:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1638216431;
-        bh=YRAEqvmApOPt3HyGrB4klDsv8OSyIsYUJiXxEthpNUM=;
+        s=k20201202; t=1638216349;
+        bh=7k18Z+x3oCj8uRXPCQOA9rwRPaRgEpzPws/JgwdeSx0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=L3ct5Z8TQjnonyp4pxIOjkzfYbb7yl8+AekAsdpVb6G2nmBRjawQiFlyrgXFUGhTw
-         RYXmCjMpqHyEU4pRahXRIXTLoar/nSEdtg809HDhfADxbXl7odo6LRFUwyUPIo3IeC
-         iZNtUAk+6deWyz/r0gof3d+pEY9HTDboN6RqYJLZgnwmRtikF1Az5fDxW1Ezjt8o+q
-         FuamczylYMg2g2330GuOkjLopqdhrRIevSJRjRVvJahGR4LAN/ZniE32qGxEohZ8e+
-         ixLOaAZ4+SFEuxrf+vUbQGp8FdnfSMqExU0BW7y619QtdGZkTGKbY9NuLf3jGEVE8h
-         4PQOhAoxJuzJw==
+        b=Xe/TL8h/UsLgyA3rkGLGcvBkSsrDe6dXeDSLzrEYhwhLUmMW4Uc918FMRMj/Ogb71
+         idghjVuj6pjBpZW5kfQudV3ZhF+OYL7EHaTz0eR1oxMQ53wrCkM8UsVqbwHV/c0KLb
+         QcgT+7WxhNdspyUq37JRUQj7epU/WWZEarlbD0KNZbC7EGshIQlxxXsiSC8ncEa4fZ
+         6/qDi6uZ+LCr/FM8tnS0j/M6skvqXEryCUWcV9vpp1kVbMqv9mna0Xm4rZKhjUBmNm
+         cLQLymX2QuWIYdZAGjf6NgvsMrK7J+CGxO/EabYFzvXwlN9okNAZMB2hiATUzknWAP
+         3rf+SKGQwpoKw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1mrmrE-008gvR-AI; Mon, 29 Nov 2021 20:02:37 +0000
+        id 1mrmrF-008gvR-G4; Mon, 29 Nov 2021 20:02:37 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
@@ -48,9 +48,9 @@ Cc:     Andre Przywara <andre.przywara@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         kernel-team@android.com
-Subject: [PATCH v5 56/69] KVM: arm64: nv: Add nested GICv3 tracepoints
-Date:   Mon, 29 Nov 2021 20:01:37 +0000
-Message-Id: <20211129200150.351436-57-maz@kernel.org>
+Subject: [PATCH v5 57/69] KVM: arm64: nv: Allow userspace to request KVM_ARM_VCPU_NESTED_VIRT
+Date:   Mon, 29 Nov 2021 20:01:38 +0000
+Message-Id: <20211129200150.351436-58-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211129200150.351436-1-maz@kernel.org>
 References: <20211129200150.351436-1-maz@kernel.org>
@@ -64,208 +64,58 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Christoffer Dall <christoffer.dall@arm.com>
+Since we're (almost) feature complete, let's allow userspace to
+request KVM_ARM_VCPU_NESTED_VIRT by bumping the KVM_VCPU_MAX_FEATURES
+up. We also now advertise the feature to userspace with a new capability.
 
-Adding tracepoints to be able to peek into the shadow LRs used when
-running a guest guest.
+It's going to be great...
 
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic-nested-trace.h | 137 ++++++++++++++++++++++++
- arch/arm64/kvm/vgic/vgic-v3-nested.c    |  13 ++-
- 2 files changed, 149 insertions(+), 1 deletion(-)
- create mode 100644 arch/arm64/kvm/vgic/vgic-nested-trace.h
+ arch/arm64/include/asm/kvm_host.h | 2 +-
+ arch/arm64/kvm/arm.c              | 3 +++
+ include/uapi/linux/kvm.h          | 1 +
+ 3 files changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-nested-trace.h b/arch/arm64/kvm/vgic/vgic-nested-trace.h
-new file mode 100644
-index 000000000000..f1a074c791a6
---- /dev/null
-+++ b/arch/arm64/kvm/vgic/vgic-nested-trace.h
-@@ -0,0 +1,137 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#if !defined(_TRACE_VGIC_NESTED_H) || defined(TRACE_HEADER_MULTI_READ)
-+#define _TRACE_VGIC_NESTED_H
-+
-+#include <linux/tracepoint.h>
-+
-+#undef TRACE_SYSTEM
-+#define TRACE_SYSTEM kvm
-+
-+#define SLR_ENTRY_VALS(x)							\
-+	" ",									\
-+	!!(__entry->lrs[x] & ICH_LR_HW),		   			\
-+	!!(__entry->lrs[x] & ICH_LR_PENDING_BIT),	   			\
-+	!!(__entry->lrs[x] & ICH_LR_ACTIVE_BIT),	   			\
-+	__entry->lrs[x] & ICH_LR_VIRTUAL_ID_MASK,				\
-+	(__entry->lrs[x] & ICH_LR_PHYS_ID_MASK) >> ICH_LR_PHYS_ID_SHIFT,	\
-+	(__entry->orig_lrs[x] & ICH_LR_PHYS_ID_MASK) >> ICH_LR_PHYS_ID_SHIFT
-+
-+TRACE_EVENT(vgic_create_shadow_lrs,
-+	TP_PROTO(struct kvm_vcpu *vcpu, int nr_lr, u64 *lrs, u64 *orig_lrs),
-+	TP_ARGS(vcpu, nr_lr, lrs, orig_lrs),
-+
-+	TP_STRUCT__entry(
-+		__field(	int,	nr_lr			)
-+		__array(	u64,	lrs,		16	)
-+		__array(	u64,	orig_lrs,	16	)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->nr_lr		= nr_lr;
-+		memcpy(__entry->lrs, lrs, 16 * sizeof(u64));
-+		memcpy(__entry->orig_lrs, orig_lrs, 16 * sizeof(u64));
-+	),
-+
-+	TP_printk("nr_lr: %d\n"
-+		  "%50sLR[ 0]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
-+		  "%50sLR[ 1]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
-+		  "%50sLR[ 2]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
-+		  "%50sLR[ 3]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
-+		  "%50sLR[ 4]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
-+		  "%50sLR[ 5]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
-+		  "%50sLR[ 6]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
-+		  "%50sLR[ 7]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
-+		  "%50sLR[ 8]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
-+		  "%50sLR[ 9]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
-+		  "%50sLR[10]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
-+		  "%50sLR[11]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
-+		  "%50sLR[12]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
-+		  "%50sLR[13]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
-+		  "%50sLR[14]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)\n"
-+		  "%50sLR[15]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu (%5llu)",
-+		  __entry->nr_lr,
-+		  SLR_ENTRY_VALS(0), SLR_ENTRY_VALS(1), SLR_ENTRY_VALS(2),
-+		  SLR_ENTRY_VALS(3), SLR_ENTRY_VALS(4), SLR_ENTRY_VALS(5),
-+		  SLR_ENTRY_VALS(6), SLR_ENTRY_VALS(7), SLR_ENTRY_VALS(8),
-+		  SLR_ENTRY_VALS(9), SLR_ENTRY_VALS(10), SLR_ENTRY_VALS(11),
-+		  SLR_ENTRY_VALS(12), SLR_ENTRY_VALS(13), SLR_ENTRY_VALS(14),
-+		  SLR_ENTRY_VALS(15))
-+);
-+
-+#define LR_ENTRY_VALS(x)							\
-+	" ",									\
-+	!!(__entry->lrs[x] & ICH_LR_HW),		   			\
-+	!!(__entry->lrs[x] & ICH_LR_PENDING_BIT),	   			\
-+	!!(__entry->lrs[x] & ICH_LR_ACTIVE_BIT),	   			\
-+	__entry->lrs[x] & ICH_LR_VIRTUAL_ID_MASK,				\
-+	(__entry->lrs[x] & ICH_LR_PHYS_ID_MASK) >> ICH_LR_PHYS_ID_SHIFT
-+
-+TRACE_EVENT(vgic_put_nested,
-+	TP_PROTO(struct kvm_vcpu *vcpu, int nr_lr, u64 *lrs),
-+	TP_ARGS(vcpu, nr_lr, lrs),
-+
-+	TP_STRUCT__entry(
-+		__field(	int,	nr_lr			)
-+		__array(	u64,	lrs,		16	)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->nr_lr		= nr_lr;
-+		memcpy(__entry->lrs, lrs, 16 * sizeof(u64));
-+	),
-+
-+	TP_printk("nr_lr: %d\n"
-+		  "%50sLR[ 0]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
-+		  "%50sLR[ 1]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
-+		  "%50sLR[ 2]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
-+		  "%50sLR[ 3]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
-+		  "%50sLR[ 4]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
-+		  "%50sLR[ 5]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
-+		  "%50sLR[ 6]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
-+		  "%50sLR[ 7]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
-+		  "%50sLR[ 8]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
-+		  "%50sLR[ 9]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
-+		  "%50sLR[10]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
-+		  "%50sLR[11]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
-+		  "%50sLR[12]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
-+		  "%50sLR[13]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
-+		  "%50sLR[14]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu\n"
-+		  "%50sLR[15]: HW: %d P: %d: A: %d vINTID: %5llu pINTID: %5llu",
-+		  __entry->nr_lr,
-+		  LR_ENTRY_VALS(0), LR_ENTRY_VALS(1), LR_ENTRY_VALS(2),
-+		  LR_ENTRY_VALS(3), LR_ENTRY_VALS(4), LR_ENTRY_VALS(5),
-+		  LR_ENTRY_VALS(6), LR_ENTRY_VALS(7), LR_ENTRY_VALS(8),
-+		  LR_ENTRY_VALS(9), LR_ENTRY_VALS(10), LR_ENTRY_VALS(11),
-+		  LR_ENTRY_VALS(12), LR_ENTRY_VALS(13), LR_ENTRY_VALS(14),
-+		  LR_ENTRY_VALS(15))
-+);
-+
-+TRACE_EVENT(vgic_nested_hw_emulate,
-+	TP_PROTO(int lr, u64 lr_val, u32 l1_intid),
-+	TP_ARGS(lr, lr_val, l1_intid),
-+
-+	TP_STRUCT__entry(
-+		__field(	int,	lr		)
-+		__field(	u64,	lr_val		)
-+		__field(	u32,	l1_intid	)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->lr		= lr;
-+		__entry->lr_val		= lr_val;
-+		__entry->l1_intid	= l1_intid;
-+	),
-+
-+	TP_printk("lr: %d LR %llx L1 INTID: %u\n",
-+		  __entry->lr, __entry->lr_val, __entry->l1_intid)
-+);
-+
-+#endif /* _TRACE_VGIC_NESTED_H */
-+
-+#undef TRACE_INCLUDE_PATH
-+#define TRACE_INCLUDE_PATH vgic/
-+#undef TRACE_INCLUDE_FILE
-+#define TRACE_INCLUDE_FILE vgic-nested-trace
-+
-+/* This part must be outside protection */
-+#include <trace/define_trace.h>
-diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-index 4ba426e2324d..94b1edb67011 100644
---- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
-@@ -13,6 +13,9 @@
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 323215873388..911dd25dba8e 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -38,7 +38,7 @@
  
- #include "vgic.h"
+ #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
  
-+#define CREATE_TRACE_POINTS
-+#include "vgic-nested-trace.h"
-+
- static inline struct vgic_v3_cpu_if *vcpu_nested_if(struct kvm_vcpu *vcpu)
- {
- 	return &vcpu->arch.vgic_cpu.nested_vgic_v3;
-@@ -119,6 +122,9 @@ static void vgic_v3_create_shadow_lr(struct kvm_vcpu *vcpu)
- 		used_lrs = i + 1;
- 	}
+-#define KVM_VCPU_MAX_FEATURES 7
++#define KVM_VCPU_MAX_FEATURES 8
  
-+	trace_vgic_create_shadow_lrs(vcpu, kvm_vgic_global_state.nr_lr,
-+				     s_cpu_if->vgic_lr, cpu_if->vgic_lr);
-+
- 	s_cpu_if->used_lrs = used_lrs;
- }
+ #define KVM_REQ_SLEEP \
+ 	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 0bb46bce5ffb..dc1fda709cf5 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -257,6 +257,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_ARM_EL1_32BIT:
+ 		r = cpus_have_const_cap(ARM64_HAS_32BIT_EL1);
+ 		break;
++	case KVM_CAP_ARM_EL2:
++		r = cpus_have_const_cap(ARM64_HAS_NESTED_VIRT);
++		break;
+ 	case KVM_CAP_GUEST_DEBUG_HW_BPS:
+ 		r = get_num_brps();
+ 		break;
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 1daa45268de2..65d1862ab093 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1131,6 +1131,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_EXIT_ON_EMULATION_FAILURE 204
+ #define KVM_CAP_ARM_MTE 205
+ #define KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM 206
++#define KVM_CAP_ARM_EL2 207
  
-@@ -163,8 +169,10 @@ void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
- 			continue; /* oh well, the guest hyp is broken */
+ #ifdef KVM_CAP_IRQ_ROUTING
  
- 		lr = __gic_v3_get_lr(i);
--		if (!(lr & ICH_LR_STATE))
-+		if (!(lr & ICH_LR_STATE)) {
-+			trace_vgic_nested_hw_emulate(i, lr, l1_irq);
- 			irq->active = false;
-+		}
- 
- 		vgic_put_irq(vcpu->kvm, irq);
- 	}
-@@ -195,6 +203,9 @@ void vgic_v3_put_nested(struct kvm_vcpu *vcpu)
- 
- 	__vgic_v3_save_state(vcpu_shadow_if(vcpu));
- 
-+	trace_vgic_put_nested(vcpu, kvm_vgic_global_state.nr_lr,
-+			      vcpu_shadow_if(vcpu)->vgic_lr);
-+
- 	/*
- 	 * Translate the shadow state HW fields back to the virtual ones
- 	 * before copying the shadow struct back to the nested one.
 -- 
 2.30.2
 
