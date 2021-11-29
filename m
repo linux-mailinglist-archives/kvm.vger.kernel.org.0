@@ -2,115 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B2A224624D8
-	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 23:28:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F2CEE4624D9
+	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 23:28:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231501AbhK2WbW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Nov 2021 17:31:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60516 "EHLO
+        id S229658AbhK2Wbu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Nov 2021 17:31:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229540AbhK2WbS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Nov 2021 17:31:18 -0500
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91634C0698E6
-        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 14:28:00 -0800 (PST)
-Received: by mail-pf1-x434.google.com with SMTP id r130so18498290pfc.1
-        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 14:28:00 -0800 (PST)
+        with ESMTP id S230151AbhK2Wbp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Nov 2021 17:31:45 -0500
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C239C0698E6
+        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 14:28:27 -0800 (PST)
+Received: by mail-pl1-x631.google.com with SMTP id k4so13325074plx.8
+        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 14:28:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=eS0xBQSNpWM8rifaE/0iM5kGD78qcIWMWAK2A3ymkdA=;
-        b=PWdoqGdu4TF8dO7Kpd7AP7ISxaGSg6Cu4pA3K4SoRCDZiAnpuuGsd+hBmdl3/y/naO
-         P18oIBNf556ugqw/0t7NygXXx8s8lA9vJRn3/apF26Zz7pFmmZD+xWkdn3rsLAm4lX3K
-         rWKi3zQC40NfUZ1wlGfeYTNRv4XTxe2E1hN2272GTwui5BVLBik2TYvD1in6YTKiNc5Y
-         zjxWQqZLNE1qfkOPOD11c/Yrhzia1RavRjri00C6i2bav1BHxGauGTIae5RlbuUSqGlO
-         7C/3lfQF17wkXpScoAAAGvbnMldkgTXjEz74eVZxiFBSGIE5Lve9fKBlxE5VCyN68Xlt
-         lkKg==
+        bh=qb3aXm+BA5Ia7gXPfB86sDSJOCEYidsMA7C1EHNFxFE=;
+        b=NOsZWOJOfJXO1Pk9eoMVSVfCfxt3B+3igQuJqyokpPIUVHfg/7HIIdrDgLmRkOLsot
+         HJuNDMd6AyuIixsg4fTvZ3VrPRnhz6rWB9JSJHBizWqm78CZYaNd7jLHj/QOzNnLx3y5
+         PrnYMI0L539PXaAl/Oml1cKsb7j34Qi6NaLvL/+Okla9Tb0n+1JaNK4jgL9FHH+MuGkX
+         cGeovkF/Go7RZMsPzEdcEYsDXL8oIFYZYe49B1L4eefUSPpP9lkC7et/m4T1uf/57Ei8
+         sfBQOplfL/CjxVQfOnrCcgZ9SOzQq+e5vKH0loz0M2pohnISIsoW6EfniyZZSbxJrYfa
+         YuyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=eS0xBQSNpWM8rifaE/0iM5kGD78qcIWMWAK2A3ymkdA=;
-        b=xn7h2/TOKab5C8VCr4zEXGGjlT+WpeqIsF94QiTYEl01V+xsE9l2cRtB/LacSE5avU
-         4/7KUpltUuJOucrSWqKS2BmaIqeCFWCvgchkNUhlIJGBXez1MCvjsauY5d8OWHlIr8Lg
-         P5OuJUK7/vTyOmqbcgqninuka82wbf3F8xH3jW8GxhXuNDvJH6JIHE535FGJQkt9YkBj
-         4BkXvOylaa3lJZyWmoNTxi6wZq0RlplnNXCTf29bX/0lJSniclrLlEii6Zbq4gT0OxuW
-         ank2O4EQ6M0akYBkj7KBmmcGvThnwDwYLlsTnH3PCZd47V/wkJ9XmcpyyxYqPjqKQyuX
-         HA6w==
-X-Gm-Message-State: AOAM53259u+vFTFAi3QY0TmETMzeM6TtYrql1flcfGo6MJ6WDW6AISwF
-        /y5L2aYGZX/On9OmSm24ctGdRA==
-X-Google-Smtp-Source: ABdhPJzaVzvyLzh0ispHWCx0+vAn/2fDXv42xJJZ6n6j2Jk1cI+5pyPsP4sgJd34CptCRfBxcxrpag==
-X-Received: by 2002:a05:6a00:178c:b0:4a2:f71e:36aa with SMTP id s12-20020a056a00178c00b004a2f71e36aamr42059423pfg.68.1638224879958;
-        Mon, 29 Nov 2021 14:27:59 -0800 (PST)
+        bh=qb3aXm+BA5Ia7gXPfB86sDSJOCEYidsMA7C1EHNFxFE=;
+        b=BQQF94xIzMERp7OSoIMXwt2f0AQA6WeynpGwpl7vVG4OXDk4sjoqHcK88FO+ObL48d
+         tCJAFj6D4HATHuMAjE+GMtATakBa2cqJ+AOh65LPq9URk2f0wj/i1iCqFQ2stsaxZzjY
+         fmsb1EKBOcvKJCxUi1chxZut5edgCSTo1OhYVfykhpb+cZf7FaIHwIkT1t+CpyjMcDEP
+         /mva04OwXXIRN+MuduR3K1e69zGBeL8IyCHQUC7p+T3+OAfNI/4Ver24oGabF27m4TmZ
+         qTvPXuOYlfCny/RSRmifI6WMD171nsC1ifT1unvrUDanTsT1eyx2fAgBM2qRxMmE+ACv
+         6PsQ==
+X-Gm-Message-State: AOAM532idM3a9S8w26jK8xiBQez+0ulZ8hKdjNMwTNhDh2U5JdEnD2KF
+        WAdYM415Wxd4Apnp0JITotnnpg==
+X-Google-Smtp-Source: ABdhPJxvABtMr1ja365UozpBKiWE0/Yp9OkEqo54cSSBleqV2UXwGArNbbe9CYtub7yCgoR5cHgMKg==
+X-Received: by 2002:a17:902:aa86:b0:145:90c:f4aa with SMTP id d6-20020a170902aa8600b00145090cf4aamr62802971plr.79.1638224906469;
+        Mon, 29 Nov 2021 14:28:26 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id c3sm19414634pfv.67.2021.11.29.14.27.59
+        by smtp.gmail.com with ESMTPSA id f2sm19668270pfe.132.2021.11.29.14.28.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Nov 2021 14:27:59 -0800 (PST)
-Date:   Mon, 29 Nov 2021 22:27:55 +0000
+        Mon, 29 Nov 2021 14:28:26 -0800 (PST)
+Date:   Mon, 29 Nov 2021 22:28:22 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         pgonda@google.com
-Subject: Re: [PATCH 04/12] KVM: SEV: do not use list_replace_init on an empty
- list
-Message-ID: <YaVT638kTtgF64/i@google.com>
+Subject: Re: [PATCH 03/12] KVM: SEV: expose KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM
+ capability
+Message-ID: <YaVUBv9ILIkElc/2@google.com>
 References: <20211123005036.2954379-1-pbonzini@redhat.com>
- <20211123005036.2954379-5-pbonzini@redhat.com>
+ <20211123005036.2954379-4-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211123005036.2954379-5-pbonzini@redhat.com>
+In-Reply-To: <20211123005036.2954379-4-pbonzini@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Mon, Nov 22, 2021, Paolo Bonzini wrote:
-> list_replace_init cannot be used if the source is an empty list,
-> because "new->next->prev = new" will overwrite "old->next":
-> 
-> 				new				old
-> 				prev = new, next = new		prev = old, next = old
-> new->next = old->next		prev = new, next = old		prev = old, next = old
-> new->next->prev = new		prev = new, next = old		prev = old, next = new
-> new->prev = old->prev		prev = old, next = old		prev = old, next = old
-> new->next->prev = new		prev = old, next = old		prev = new, next = new
-> 
-> The desired outcome instead would be to leave both old and new the same
-> as they were (two empty circular lists).  Use list_cut_before, which
-> already has the necessary check and is documented to discard the
-> previous contents of the list that will hold the result.
+> The capability, albeit present, was never exposed via KVM_CHECK_EXTENSION.
 > 
 > Fixes: b56639318bb2 ("KVM: SEV: Add support for SEV intra host migration")
+> Cc: Peter Gonda <pgonda@google.com>
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  arch/x86/kvm/svm/sev.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 21ac0a5de4e0..75955beb3770 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -1613,8 +1613,7 @@ static void sev_migrate_from(struct kvm_sev_info *dst,
->  	src->handle = 0;
->  	src->pages_locked = 0;
->  
-> -	INIT_LIST_HEAD(&dst->regions_list);
-> -	list_replace_init(&src->regions_list, &dst->regions_list);
-> +	list_cut_before(&dst->regions_list, &src->regions_list, &src->regions_list);
-
-Yeesh, that is tricky.  A list_move_all() helper in list.h to do 
-
-	list_cut_before(dst, src, src);
-
-would be nice.
 
 Reviewed-by: Sean Christopherson <seanjc@google.com>
-
->  }
->  
->  static int sev_es_migrate_from(struct kvm *dst, struct kvm *src)
-> -- 
-> 2.27.0
-> 
-> 
