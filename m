@@ -2,126 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CE4E74625D4
-	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 23:40:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C4883462665
+	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 23:49:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234653AbhK2Wn4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Nov 2021 17:43:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35142 "EHLO
+        id S234673AbhK2Wvu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Nov 2021 17:51:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234502AbhK2WnS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Nov 2021 17:43:18 -0500
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EFFCC203968;
-        Mon, 29 Nov 2021 11:18:55 -0800 (PST)
-Received: by mail-ed1-x534.google.com with SMTP id l25so76130772eda.11;
-        Mon, 29 Nov 2021 11:18:54 -0800 (PST)
+        with ESMTP id S235741AbhK2WuO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Nov 2021 17:50:14 -0500
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49530C061784
+        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 11:20:15 -0800 (PST)
+Received: by mail-pl1-x632.google.com with SMTP id z6so12986550plk.6
+        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 11:20:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=b6e11+CJLAryPIw/7DDSWmANxwHaOEFVgPmI0eD1ehw=;
-        b=Yv9EDK6h14i2Dbj+iAIYK0HlvK2JERVyMLo4AC4eEaaM5uGAacc8HtxG8w/Y/N1eKa
-         zoqVyYrJgoymLJ79VszdPFvZOcROHF7XsZML04k5ATYUCAQQQYdmRFM1zliBw5sA+fUR
-         rGCOh7Dkwc25orqYcXeHYn5++zj+NoIkUF+txgA7cbkgTIdSaLJPMhb1GiDwryyn0Wfc
-         MU5Gbh+ysqRcMgmq6XO0rBfKo/INnGwUPA9nBrqjSM7nJ1s+plFGQd3Vr5vlky9IMZdn
-         wkdyjWJAJzkiJ+6yukZdQ5xwMk5wTjTGyWuy1lXhP9nJ6WRZVyGbloAAqLRFAE+sHa2m
-         tnMw==
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=d/VHE146EldVzZNw053jCy2kU4sOJkhWa9AFjMEeYoU=;
+        b=YBcKV5I1ym6Pq7HiM97mJe8JffgQeVmv6n81aPdg1LdcXvMb5DDee9hehpcU2S5M3c
+         BGJ45psgrvHdHycV0IE+CR3wdkzK8JyomKPu9G6LENGuUDwhP8c7l5RPSxHWi8j+6pAP
+         aHuCKFQIrQe4CHw/mhO+Fo0tuMS1jtOQ8d0eR+8L2z9p5XgV0UEnYv5GGS6k6aNnZ8l1
+         pJeAuwcOKlVtHzQnpgt3ywE8/xzeHJYFzXZrogBuLN3crQIRgOGMB/baaGB3Bz/aeXrM
+         441Ors5L6Z+2Ral71vtIJQ45PP7nt4JCd+0FpSpVs8iEQmJc2NCGXvE1H448S7lZ0kU8
+         +T3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=b6e11+CJLAryPIw/7DDSWmANxwHaOEFVgPmI0eD1ehw=;
-        b=SLP5O1d7fkwxL+83NBeKa4ZhuHfdQtripEi5FgV/ql2UwS7HJCKA9BbyMMptW9HGAA
-         k98Iu139eSUf0Gq3C+ffm5HQC63D/r3zLxCvfL5R9VnQw8zBTYKXUGh0pcToYJek2qDn
-         GUcn+BWDEqjHYboiuqLSr92RGt78Iz+/0UKGyToa6sUWaUzvhntT6NjAIKOD8Fp4De0D
-         gyXp7Wxx/f3PUPMH1JFIXXstY4KMRYmE9qrxocj52Q0JOrzsnDqWspXlvPzdTMeDnHxD
-         EH9qVyJITsyn54CyUBoFki1XjuQHkxvNbyfTfmOouFSZyTDqVvcmVayq2F1qyOXJ4kgL
-         qTyA==
-X-Gm-Message-State: AOAM5338hzw0w5OtfifO4qWh0FzeyQ5HPjltl/I633k8EQb3NTyC+5Ik
-        KOFKWMIR6NPdAsbzMOellLE=
-X-Google-Smtp-Source: ABdhPJx2YJ0juUfs4Yk6vuSEcojrZsOKQtVYCvzwUVoRUJT0twH/9lzRN0MjKMCkmooXwTOepr8KsQ==
-X-Received: by 2002:a17:906:c9d2:: with SMTP id hk18mr4315253ejb.523.1638213533689;
-        Mon, 29 Nov 2021 11:18:53 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.googlemail.com with ESMTPSA id ch28sm9615535edb.72.2021.11.29.11.18.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 29 Nov 2021 11:18:53 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <880a5727-69d1-72a1-b129-b053781625ad@redhat.com>
-Date:   Mon, 29 Nov 2021 20:18:50 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH v2 11/43] KVM: Don't block+unblock when halt-polling is
- successful
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=d/VHE146EldVzZNw053jCy2kU4sOJkhWa9AFjMEeYoU=;
+        b=kM2/xyHOw2zSnoXpggEw/hfq6swag/Sk0HaFEiRLiTUfG2gl5QJOYhcv4tZ0qrcf81
+         fT8xv4P5+G/SL6TlJPAyqWoW75qV9G/5oxmNZc4mzm9urQ5+PSFfr6euAgf+0SF38t9l
+         8JKYZhkM7g/5iir7GMfl8ds2osFFB9pyXNzaTf9chvkxkmaNpRUgXNeZfVBX/R5Ns3Rp
+         jAY+6U468roxrT5HqrkEikz5NvkEsW3rANJ8PPjUmrN+qXd8s44DeIZrsI/J3FVuNOqN
+         yllBEbuxwZoI/hAkgrgZN6co1YEAe8zMjs6yuSayfZWXWL1ZRMvRZTSOofjqO7EdnKBF
+         a/gQ==
+X-Gm-Message-State: AOAM5331FU30DP0lLfJss1p7IvxfcWMOOR9XEEi9UpcLCY3kRKdppjS6
+        gU2QC526l8f4wmMkWn8/rrLHew==
+X-Google-Smtp-Source: ABdhPJx5mPquBYmd3HZ+xgzwlI10sjg8adXl/sVFthLKnKT7q6ioiplN6tT7LIB+rq1eoWgT3xCe/w==
+X-Received: by 2002:a17:90b:1b06:: with SMTP id nu6mr313709pjb.155.1638213614692;
+        Mon, 29 Nov 2021 11:20:14 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id h15sm19910986pfc.134.2021.11.29.11.20.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Nov 2021 11:20:14 -0800 (PST)
+Date:   Mon, 29 Nov 2021 19:20:10 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     isaku.yamahata@intel.com, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        David Matlack <dmatlack@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>
-References: <20211009021236.4122790-1-seanjc@google.com>
- <20211009021236.4122790-12-seanjc@google.com>
- <cceb33be9e2a6ac504bb95a7b2b8cf5fe0b1ff26.camel@redhat.com>
- <4e883728e3e5201a94eb46b56315afca5e95ad9c.camel@redhat.com>
- <YaUNBfJh35WXMV0M@google.com>
- <496c2fc6-26b0-9b5d-32f4-2f9e9dd6a064@redhat.com>
- <YaUiEquKYi5eqWC0@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YaUiEquKYi5eqWC0@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        Joerg Roedel <joro@8bytes.org>, erdemaktas@google.com,
+        Connor Kuehl <ckuehl@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, isaku.yamahata@gmail.com,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: [RFC PATCH v3 28/59] KVM: x86: Check for pending APICv interrupt
+ in kvm_vcpu_has_events()
+Message-ID: <YaUn6pqZHrw4Z8zn@google.com>
+References: <cover.1637799475.git.isaku.yamahata@intel.com>
+ <9852ad79d1078088743a57008226c869b0316da1.1637799475.git.isaku.yamahata@intel.com>
+ <4708e92c-373b-a07f-c80c-fe194ca706df@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4708e92c-373b-a07f-c80c-fe194ca706df@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/29/21 19:55, Sean Christopherson wrote:
->> Still it does seem to be a race that happens when IS_RUNNING=true but
->> vcpu->mode == OUTSIDE_GUEST_MODE.  This patch makes the race easier to
->> trigger because it moves IS_RUNNING=false later.
+On Thu, Nov 25, 2021, Paolo Bonzini wrote:
+> On 11/25/21 01:20, isaku.yamahata@intel.com wrote:
+> > From: Sean Christopherson<sean.j.christopherson@intel.com>
+> > 
+> > Return true for kvm_vcpu_has_events() if the vCPU has a pending APICv
+> > interrupt to support TDX's usage of APICv.  Unlike VMX, TDX doesn't have
+> > access to vmcs.GUEST_INTR_STATUS and so can't emulate posted interrupts,
+> > i.e. needs to generate a posted interrupt and more importantly can't
+> > manually move requested interrupts into the vIRR (which it also doesn't
+> > have access to).
 > 
-> Oh!  Any chance the bug only repros with preemption enabled?  That would explain
-> why I don't see problems, I'm pretty sure I've only run AVIC with a PREEMPT=n.
+> Does this mean it is impossible to disable APICv on TDX?  If so, please add
+> a WARN.
 
-Me too.
+Yes, APICv is forced.
 
-> svm_vcpu_{un}blocking() are called with preemption enabled, and avic_set_running()
-> passes in vcpu->cpu.  If the vCPU is preempted and scheduled in on a different CPU,
-> avic_vcpu_load() will overwrite the vCPU's entry with the wrong CPU info.
+Rereading this patch, checking only for a pending posted interrupt isn't correct,
+a pending interrupt that's below the PPR shouldn't be considered a wake event.
 
-That would make a lot of sense.  avic_vcpu_load() can handle 
-svm->avic_is_running = false, but avic_set_running still needs its body 
-wrapped by preempt_disable/preempt_enable.
-
-Fedora's kernel is CONFIG_PREEMPT_VOLUNTARY, but I know Maxim uses his 
-own build so it would not surprise me if he used CONFIG_PREEMPT=y.
-
-Paolo
+A much better approach would be to have vt_sync_pir_to_irr() redirect to a TDX
+implementation to read the PIR but not update the vIRR, that way common x86 doesn't
+need to be touched.  Hopefully that can be done in a race-free way.
