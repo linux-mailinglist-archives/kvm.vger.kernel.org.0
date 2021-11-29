@@ -2,37 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DE5654621AA
-	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 21:07:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 347724621C4
+	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 21:09:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232597AbhK2ULO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Nov 2021 15:11:14 -0500
-Received: from sin.source.kernel.org ([145.40.73.55]:50374 "EHLO
+        id S234207AbhK2UNC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Nov 2021 15:13:02 -0500
+Received: from sin.source.kernel.org ([145.40.73.55]:51378 "EHLO
         sin.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238888AbhK2UJN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Nov 2021 15:09:13 -0500
+        with ESMTP id S232336AbhK2ULB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Nov 2021 15:11:01 -0500
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 9629BCE1409
-        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 20:05:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6C12C53FCF;
-        Mon, 29 Nov 2021 20:05:52 +0000 (UTC)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 14402CE1685
+        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 20:07:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5DABEC53FAD;
+        Mon, 29 Nov 2021 20:07:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1638216352;
-        bh=iTAjg+2Hz6NY3nku7Tg2LsgdREFDIXDRK8hNw6p9WrY=;
+        s=k20201202; t=1638216460;
+        bh=1V+tSJ47CQKMJjjBnFGrwulS3BEp8dzYBPSx5F6d1xg=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Jv2CpZdt/f6zWR+0mCulX33+j5p6SuWMGFU6zIPsrAwq2Oz0RoumGD+XxViNAFdga
-         qU+/KcLchDn5KyTHDMteqm1c7HEESaEXl8eJXITVcFfp7e1mtRnMsWi8Fiux/FOJC1
-         fPn0zq54Iy32zWOl68tT/PnBpJwCRyY+YghPdppuQ0PB/3gCPDoCxiWrBOb8GkejEz
-         WClNbKS+xz+nuOzY148carnVY4Frvhu1vAgGP9PTYKVTigFX2yQ2ODxxV3bDlVJ/mw
-         l+kfqEB551n4d7NbdRav7Tt3PNmohevyquJoYGFiDYupKrf/0RhcCoz40OKwMo528b
-         Vd11y6ei3sGqg==
+        b=Ivh9zUktPPU5JLepP58QrEPSQHNPFkllJpR6WUNviJEwg/vwcV15zNcby65cM9Tqx
+         P5UQ8ODxxU0vGPm2voN00Wj9rPPRQOy0Lq55AZ+ORo0rkWhXEfBNLCqkmP+iSeQ4nM
+         t3F+uOI9QiXCxEzEACpOHF2HErFj+1dH+85sm6TmTzi/CAg1UG5yM2dl4h286fnsoo
+         6SpGptL/FPrJJdDM9AVoHpNxjKipzpppkr9jDOpSSqdeQvIYuvz45Ohke7JxwUkWB/
+         OiBEwKv9A6sQoz8Du7smT1KwlcUNFCy6xhVMLAZOS2IyNTz1WuAvAn0T5TKa32El7v
+         lfsuySoyD225g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1mrmqv-008gvR-ML; Mon, 29 Nov 2021 20:02:17 +0000
+        id 1mrmqx-008gvR-9J; Mon, 29 Nov 2021 20:02:19 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org
@@ -45,9 +45,9 @@ Cc:     Andre Przywara <andre.przywara@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         kernel-team@android.com
-Subject: [PATCH v5 26/69] KVM: arm64: nv: Handle PSCI call via smc from the guest
-Date:   Mon, 29 Nov 2021 20:01:07 +0000
-Message-Id: <20211129200150.351436-27-maz@kernel.org>
+Subject: [PATCH v5 31/69] KVM: arm64: nv: Respect the virtual HCR_EL2.NV1 bit setting
+Date:   Mon, 29 Nov 2021 20:01:12 +0000
+Message-Id: <20211129200150.351436-32-maz@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211129200150.351436-1-maz@kernel.org>
 References: <20211129200150.351436-1-maz@kernel.org>
@@ -61,70 +61,106 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Jintack Lim <jintack.lim@linaro.org>
+From: Jintack Lim <jintack@cs.columbia.edu>
 
-VMs used to execute hvc #0 for the psci call if EL3 is not implemented.
-However, when we come to provide the virtual EL2 mode to the VM, the
-host OS inside the VM calls kvm_call_hyp() which is also hvc #0. So,
-it's hard to differentiate between them from the host hypervisor's point
-of view.
+Forward ELR_EL1, SPSR_EL1 and VBAR_EL1 traps to the virtual EL2 if the
+virtual HCR_EL2.NV bit is set.
 
-So, let the VM execute smc instruction for the psci call. On ARMv8.3,
-even if EL3 is not implemented, a smc instruction executed at non-secure
-EL1 is trapped to EL2 if HCR_EL2.TSC==1, rather than being treated as
-UNDEFINED. So, the host hypervisor can handle this psci call without any
-confusion.
+This is for recursive nested virtualization.
 
-Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+Signed-off-by: Jintack Lim <jintack@cs.columbia.edu>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/handle_exit.c | 24 ++++++++++++++++++++++--
- 1 file changed, 22 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/kvm_arm.h |  1 +
+ arch/arm64/kvm/sys_regs.c        | 28 +++++++++++++++++++++++++++-
+ 2 files changed, 28 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 95ae624d6aa8..72b981004b1d 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -62,6 +62,8 @@ static int handle_hvc(struct kvm_vcpu *vcpu)
- 
- static int handle_smc(struct kvm_vcpu *vcpu)
- {
-+	int ret;
-+
- 	/*
- 	 * "If an SMC instruction executed at Non-secure EL1 is
- 	 * trapped to EL2 because HCR_EL2.TSC is 1, the exception is a
-@@ -69,10 +71,28 @@ static int handle_smc(struct kvm_vcpu *vcpu)
- 	 *
- 	 * We need to advance the PC after the trap, as it would
- 	 * otherwise return to the same address...
-+	 *
-+	 * If imm is non-zero, it's not defined, so just skip it.
-+	 */
-+	if (kvm_vcpu_hvc_get_imm(vcpu)) {
-+		vcpu_set_reg(vcpu, 0, ~0UL);
-+		kvm_incr_pc(vcpu);
-+		return 1;
-+	}
-+
-+	/*
-+	 * If imm is zero, it's a psci call.
-+	 * Note that on ARMv8.3, even if EL3 is not implemented, SMC executed
-+	 * at Non-secure EL1 is trapped to EL2 if HCR_EL2.TSC==1, rather than
-+	 * being treated as UNDEFINED.
- 	 */
--	vcpu_set_reg(vcpu, 0, ~0UL);
-+	ret = kvm_hvc_call_handler(vcpu);
-+	if (ret < 0)
-+		vcpu_set_reg(vcpu, 0, ~0UL);
-+
- 	kvm_incr_pc(vcpu);
--	return 1;
-+
-+	return ret;
+diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+index 9759bc893a51..68af5509e4b0 100644
+--- a/arch/arm64/include/asm/kvm_arm.h
++++ b/arch/arm64/include/asm/kvm_arm.h
+@@ -20,6 +20,7 @@
+ #define HCR_AMVOFFEN	(UL(1) << 51)
+ #define HCR_FIEN	(UL(1) << 47)
+ #define HCR_FWB		(UL(1) << 46)
++#define HCR_NV1		(UL(1) << 43)
+ #define HCR_NV		(UL(1) << 42)
+ #define HCR_API		(UL(1) << 41)
+ #define HCR_APK		(UL(1) << 40)
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index e96877fc3b2a..511e06b6f603 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -288,6 +288,22 @@ static bool access_rw(struct kvm_vcpu *vcpu,
+ 	return true;
  }
  
- /*
++/* This function is to support the recursive nested virtualization */
++static bool forward_nv1_traps(struct kvm_vcpu *vcpu, struct sys_reg_params *p)
++{
++	return forward_traps(vcpu, HCR_NV1);
++}
++
++static bool access_vbar_el1(struct kvm_vcpu *vcpu,
++			    struct sys_reg_params *p,
++			    const struct sys_reg_desc *r)
++{
++	if (forward_nv1_traps(vcpu, p))
++		return false;
++
++	return access_rw(vcpu, p, r);
++}
++
+ static bool access_sctlr_el2(struct kvm_vcpu *vcpu,
+ 			     struct sys_reg_params *p,
+ 			     const struct sys_reg_desc *r)
+@@ -1682,6 +1698,7 @@ static bool access_sp_el1(struct kvm_vcpu *vcpu,
+ 	return true;
+ }
+ 
++
+ static bool access_elr(struct kvm_vcpu *vcpu,
+ 		       struct sys_reg_params *p,
+ 		       const struct sys_reg_desc *r)
+@@ -1689,6 +1706,9 @@ static bool access_elr(struct kvm_vcpu *vcpu,
+ 	if (el12_reg(p) && forward_nv_traps(vcpu))
+ 		return false;
+ 
++	if (!el12_reg(p) && forward_nv1_traps(vcpu, p))
++		return false;
++
+ 	if (p->is_write)
+ 		vcpu_write_sys_reg(vcpu, p->regval, ELR_EL1);
+ 	else
+@@ -1704,6 +1724,9 @@ static bool access_spsr(struct kvm_vcpu *vcpu,
+ 	if (el12_reg(p) && forward_nv_traps(vcpu))
+ 		return false;
+ 
++	if (!el12_reg(p) && forward_nv1_traps(vcpu, p))
++		return false;
++
+ 	if (p->is_write)
+ 		__vcpu_sys_reg(vcpu, SPSR_EL1) = p->regval;
+ 	else
+@@ -1719,6 +1742,9 @@ static bool access_spsr_el2(struct kvm_vcpu *vcpu,
+ 	if (el12_reg(p) && forward_nv_traps(vcpu))
+ 		return false;
+ 
++	if (!el12_reg(p) && forward_nv1_traps(vcpu, p))
++		return false;
++
+ 	if (p->is_write)
+ 		vcpu_write_sys_reg(vcpu, p->regval, SPSR_EL2);
+ 	else
+@@ -1927,7 +1953,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_LORC_EL1), trap_loregion },
+ 	{ SYS_DESC(SYS_LORID_EL1), trap_loregion },
+ 
+-	{ SYS_DESC(SYS_VBAR_EL1), access_rw, reset_val, VBAR_EL1, 0 },
++	{ SYS_DESC(SYS_VBAR_EL1), access_vbar_el1, reset_val, VBAR_EL1, 0 },
+ 	{ SYS_DESC(SYS_DISR_EL1), NULL, reset_val, DISR_EL1, 0 },
+ 
+ 	{ SYS_DESC(SYS_ICC_IAR0_EL1), write_to_read_only },
 -- 
 2.30.2
 
