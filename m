@@ -2,231 +2,209 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5EFD0461BA8
-	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 17:15:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1638C461BDC
+	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 17:36:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233837AbhK2QSw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Nov 2021 11:18:52 -0500
-Received: from mail-mw2nam12on2051.outbound.protection.outlook.com ([40.107.244.51]:47456
-        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S245088AbhK2QQq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Nov 2021 11:16:46 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Qw2VenD81CvsvdJQsuO94NcSy4SY5FdPdlvivp9n4PIW6JSdITXM5lBdEUdqeE2Wwrd/bnleENT1oT8iOwiYwexUZP25dDzNF1M8L3pt3Pe1Tn7KxUgV5Ej7FCKqQLpF09ZDAPaXGZxdyk4kCzYqEchUyAK7TG2gIoc+6WAO2PT742O/6bbMFogXoQ+vuXobDlpQQ396Hf9bktDqrsiJyJlTYw9So3Bbsri5+me47JmO3uulp0DGBc4UubLr36Eyjygf80BwkgC64+BSUfSOxeAoZttcdGOkAEDYmf+nihLhZFdsm4gMneEx7Jz/ViPUoAZtiU8wCj+FP7WklVXBng==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6HLFArhKx2jXLFMKyFEmhMDwMmzNWOmTD9a5RqJRSRI=;
- b=gU7uPccv9ckUlz2f1iZcO5mstfsa37fGxaL1/jGKQ3GScuCfs60ChnnFzSifsVNASkheed5UwhUpjpGhuBlDYlPhNemQvoD1uAQlmJw1N6qzc6wv2GAqy0l58gh6MFRZcxipT9HbMJsHfqq7z1F6+nkEjzlHequsDiAJvuzmXmmdFlmQwb9AuSKJDbhifMxCbkbyzE+80q9IjXipKND8QrCXOu65uVjqrPpTmIOyzd4FQOgAyJ1tspHK1Loz5X8kzi5uBXJnQiNJH/MBCAc2pgeaNTDK2+jgapotfwGb8i4RUiX4o5T9QqVUQk9kplZbmXSEL6js3hLNVXtM1UEvkQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6HLFArhKx2jXLFMKyFEmhMDwMmzNWOmTD9a5RqJRSRI=;
- b=Eor9wsws6begCEkNs3HhzdfVtTo8J+3VzKTD6esDEfUAQ0/CeDOsnO38DYNPHwdAkMxGereE2eDcmJw67WGVekGHtAuYWwvL9PieNLpfOtbJgq5O2aaMbidezNR8QkgJq9ubS5EOwBzUsob4gHwtkgM22GUuQDIxpFKb5NhtOXw=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SN6PR12MB2686.namprd12.prod.outlook.com (2603:10b6:805:72::30) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4713.24; Mon, 29 Nov
- 2021 16:13:21 +0000
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::35:281:b7f8:ed4c]) by SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::35:281:b7f8:ed4c%5]) with mapi id 15.20.4734.024; Mon, 29 Nov 2021
- 16:13:21 +0000
-Cc:     brijesh.singh@amd.com, Peter Gonda <pgonda@google.com>,
-        x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Tom Lendacky <Thomas.Lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
+        id S1346560AbhK2Qjr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Nov 2021 11:39:47 -0500
+Received: from rere.qmqm.pl ([91.227.64.183]:50146 "EHLO rere.qmqm.pl"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1345506AbhK2Qhq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Nov 2021 11:37:46 -0500
+Received: from remote.user (localhost [127.0.0.1])
+        by rere.qmqm.pl (Postfix) with ESMTPSA id 4J2rXL58g0z9h;
+        Mon, 29 Nov 2021 17:34:10 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=rere.qmqm.pl; s=1;
+        t=1638203665; bh=qlu3mL+FOvVS9aPE/gZoS7KdAdQ/avBctxZ8QxqT38I=;
+        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+        b=GV8Md+4wLJhNSJZqrJvdjyVU0DlzlhbpPkGnTNqVApkG+uUQ6A+MoaqEQT9dgrjXq
+         q+escBY9SwJTtDVYNHqesyY22ZcfBKeLVi2I4yINeaBpICc3EsCTOMz8/JkEhkxKwH
+         5jlUqEb0yuAf8eVUX8cWy9bi6RovdDbzWpM+g8ZdNeFAwiFdkLHHM+FUiQ+x0Dv37t
+         bEpCos1VGSJffWt42H8cWp9GNUDKdAgiFLCcBLScmau30GyMgUFylkw6qvpMGUFype
+         xiTzGA2klsrhcAXTQoeGJ7H6y00R/3ukWQ3tN7aMIYo31vE1Ni41oAjMZVdXQclWDE
+         FhYcDpXStxEZw==
+X-Virus-Status: Clean
+X-Virus-Scanned: clamav-milter 0.103.3 at mail
+Date:   Mon, 29 Nov 2021 16:34:07 +0000
+From:   =?UTF-8?Q?Micha=C5=82_Miros=C5=82aw?= <mirq-linux@rere.qmqm.pl>
+To:     Yury Norov <yury.norov@gmail.com>
+CC:     linux-kernel@vger.kernel.org,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Russell King <linux@armlinux.org.uk>,
+        Amitkumar Karwar <amitkarwar@gmail.com>,
+        Alexey Klimov <aklimov@redhat.com>,
+        linux-alpha@vger.kernel.org,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Andy Gross <agross@kernel.org>,
+        Mike Marciniszyn <mike.marciniszyn@cornelisnetworks.com>,
+        Petr Mladek <pmladek@suse.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andrew Lunn <andrew@lunn.ch>, Andi Kleen <ak@linux.intel.com>,
+        Tejun Heo <tj@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Anup Patel <anup.patel@wdc.com>, linux-ia64@vger.kernel.org,
+        Andy Shevchenko <andy@infradead.org>,
         Andy Lutomirski <luto@kernel.org>,
+        Matti Vaittinen <mazziesaccount@gmail.com>,
+        Mel Gorman <mgorman@suse.de>, Christoph Hellwig <hch@lst.de>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Borislav Petkov <bp@alien8.de>, Arnd Bergmann <arnd@arndb.de>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        David Laight <David.Laight@aculab.com>,
+        Sunil Goutham <sgoutham@marvell.com>,
+        David Airlie <airlied@linux.ie>,
+        Thomas Gleixner <tglx@linutronix.de>,
         Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        bcm-kernel-feedback-list@broadcom.com,
+        Christoph Lameter <cl@linux.com>, linux-crypto@vger.kernel.org,
+        Hans de Goede <hdegoede@redhat.com>, linux-mm@kvack.org,
+        Guo Ren <guoren@kernel.org>,
+        linux-snps-arc@lists.infradead.org,
+        Geetha sowjanya <gakula@marvell.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Dinh Nguyen <dinguyen@kernel.org>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Dennis Zhou <dennis@kernel.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH Part2 v5 00/45] Add AMD Secure Nested Paging (SEV-SNP)
- Hypervisor Support
-To:     Vlastimil Babka <vbabka@suse.cz>, Joerg Roedel <jroedel@suse.de>,
-        Dave Hansen <dave.hansen@intel.com>
-References: <20210820155918.7518-1-brijesh.singh@amd.com>
- <CAMkAt6o0ySn1=iLYsH0LCnNARrUbfaS0cvtxB__y_d+Q6DUzfA@mail.gmail.com>
- <daf5066b-e89b-d377-ed8a-9338f1a04c0d@amd.com>
- <d673f082-9023-dafb-e42e-eab32a3ddd0c@intel.com>
- <f15597a0-e7e0-0a57-39fd-20715abddc7f@amd.com>
- <5f3b3aab-9ec2-c489-eefd-9136874762ee@intel.com>
- <d83e6668-bec4-8d1f-7f8a-085829146846@amd.com>
- <38282b0c-7eb5-6a91-df19-2f4cfa8549ce@intel.com> <YZ5iWJuxjSCmZL5l@suse.de>
- <bd31abd4-c8a2-bdda-ea74-1c24b29beda7@intel.com> <YZ9gAMHdEo6nQ6a0@suse.de>
- <9503ac53-1323-eade-2863-df11a5f36b6a@amd.com>
- <7e368c50-ff94-d87e-e93f-bae044659152@suse.cz>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <bf96f5d1-1cc3-1d0c-fd70-ade00cb46671@amd.com>
-Date:   Mon, 29 Nov 2021 10:13:16 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
-In-Reply-To: <7e368c50-ff94-d87e-e93f-bae044659152@suse.cz>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: BL0PR0102CA0050.prod.exchangelabs.com
- (2603:10b6:208:25::27) To SN6PR12MB2718.namprd12.prod.outlook.com
- (2603:10b6:805:6f::22)
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Roy Pledge <Roy.Pledge@nxp.com>,
+        Saeed Mahameed <saeedm@nvidia.com>, Jens Axboe <axboe@fb.com>,
+        Jason Wessel <jason.wessel@windriver.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Ian Rogers <irogers@google.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Tariq Toukan <tariqt@nvidia.com>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Jonathan Cameron <jic23@kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Jiri Olsa <jolsa@redhat.com>, Vineet Gupta <vgupta@kernel.org>,
+        Solomon Peachy <pizza@shaftnet.org>,
+        Vivien Didelot <vivien.didelot@gmail.com>,
+        Lee Jones <lee.jones@linaro.org>,
+        Will Deacon <will@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
+        kvm@vger.kernel.org, Kees Cook <keescook@chromium.org>,
+        linux-arm-kernel@lists.infradead.org,
+        Subbaraya Sundeep <sbhatta@marvell.com>,
+        linux-csky@vger.kernel.org, Marcin Wojtas <mw@semihalf.com>,
+        linux-mips@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+        linux-perf-users@vger.kernel.org,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        linux-s390@vger.kernel.org, Mark Gross <markgross@kernel.org>,
+        linux-riscv@lists.infradead.org, linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH 0/9] lib/bitmap: optimize bitmap_weight() usage
+User-Agent: K-9 Mail for Android
+In-Reply-To: <20211129063839.GA338729@lapt>
+References: <20211128035704.270739-1-yury.norov@gmail.com> <YaPEfZ0t9UFGwpml@qmqm.qmqm.pl> <20211129063839.GA338729@lapt>
+Message-ID: <3CD9ECD8-901E-497B-9AE1-0DDB02346892@rere.qmqm.pl>
 MIME-Version: 1.0
-Received: from [10.236.30.107] (165.204.77.1) by BL0PR0102CA0050.prod.exchangelabs.com (2603:10b6:208:25::27) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4734.23 via Frontend Transport; Mon, 29 Nov 2021 16:13:18 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 957639e1-19ca-438f-3f56-08d9b35329ad
-X-MS-TrafficTypeDiagnostic: SN6PR12MB2686:
-X-Microsoft-Antispam-PRVS: <SN6PR12MB26864C86B97BE3CD55AE6623E5669@SN6PR12MB2686.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 1S/0ZSXMXnRJkml1RPK5I9ObYXNYtpSpYxISEp3i4Ey8DtwnGHai7zUFkUTGznWU1riYKoAd9UNmOKJbpVD3VZ1bkPHaWb1A6GA1oXoFjoCRYyWmiWxD07XL76j2pK7Jcf4WnDGFh0L2HCvQpNXZNkWcuM6sWAWnf5x5nSnqHQ0maGoVbwppw9km590S9p5Ka19cTjFTxNhZMxodG7wFPWnF9OGYoB49VYtUiIdy8gpYniD6OVLrHwh5QIDZ8N/W2/Op7epQvSjZsvMZ9Vw8YR+kWkETGx5pk33mfzclfx+71JYzOaISg6Q+wPVkeCtgUv+tseRVP00JMdP611uLHPhPmiQpD6zZTCo9xN80wkE/z4Suio1fE9mDRL5xww8vE8M4V5NP3uv7EwAcfcoQ8fw1bAn75FzcdrxaE2EPHxZgopgndCESuFv6yEP42hbOmDrF/Pjotcnc+wEmrFHOyfsyx1lVAnIgwaxnhABSUOx7qo7KIOrhE6Q3hvb0hYpKhSjQoERryGnR5fHl9/Uh6dQYxh1ijqE7kKxilqbjeTZvvIyLkfQrGJ785JdKWKppIbaq9cSiXbSm5TBlEjUvvcpdbCopTMRPa/c/C0AbY7XhbEKKwa+soFZ6eQqpRi47RM0HWyJWSoTkJCEI06dMpaANKcu9ijQXqbItllxdLGLGPHC5qi9f/mh/iR3sZwwKWpl1Zn9gGIAnS3mz8NuEVQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(86362001)(16576012)(2906002)(54906003)(316002)(7416002)(7406005)(38100700002)(83380400001)(5660300002)(110136005)(508600001)(8936002)(53546011)(8676002)(31696002)(26005)(44832011)(36756003)(6486002)(31686004)(4326008)(956004)(66556008)(66476007)(66946007)(2616005)(186003)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YnU3czl5OU9ndmdSWFZjZWFHQzE1ekFjK282T1ZVempqRy9keFg4Vm9BY0hH?=
- =?utf-8?B?NWdCQm52REVwRllBWnAxVjZIZmd3R2hGVzd5dWJMWWtsU0g5MmNOSXdIOTVm?=
- =?utf-8?B?eWVweUExUUdocFRBVWd4SFVTenpTRW1SdnNKb1VFU25vY0J5ZWEyd3pXbHpo?=
- =?utf-8?B?OVNkdjdoVkorLzZyMWZSZnhHT1FGTlNpRGloUy9TWHdZWmlRdWJBaHRzajNs?=
- =?utf-8?B?THp2WTNPSzlNdjliNWNidlZTWkJtRnJtN1ljajBBekx4YnpWT2k1V2JhUHdY?=
- =?utf-8?B?TGc0a1p0Y3Q4b0tnTU05RDVjbENZbEFMNDgya3Q2b0RXejJ2K2hvSVZKdGd5?=
- =?utf-8?B?Z1hzczVib1hWZFh4TU5zTFM0TDBSOS9FRjlNNTl0Z0QzS3RkMlpVYWNZOE5G?=
- =?utf-8?B?cU1XZ0lQVXcwVUczNG1tQWpVME1jRHNlWm5xNXllT2dGdzJGSmN0Q2lJRXNx?=
- =?utf-8?B?blhIYmgreTNBd0NOaE9mNzNzYnphZmZrQTZuSkxRWGI5NEdYQzZQanNuaW9a?=
- =?utf-8?B?SXpXOU9IQUI0dWxCWVg1c0FxMjZpM3RpSlBVbE9LOCtBZkhYTTdYTnZmT3p2?=
- =?utf-8?B?NUJFMlFEbHhUampibW1VT2F5M3R0MURyNUFTTkZnVWtSY2FqQjBXckdpNVFF?=
- =?utf-8?B?SENhbWxXRVBOZ25QMzg2NERvdWRydWdVQjl1NWIxVFFhOUtlWXg0Y280ZDFa?=
- =?utf-8?B?OTZpNFRieHhaR2wyWXMyRlZCTjFoT290UGM1SVgzS1d5WERCMkhnUE16WDlP?=
- =?utf-8?B?N2J6K05LSGtFZXduUzVLdDZGRHo5SVloTkdiRk52NTcrSFFoQWU1M1JLcjVU?=
- =?utf-8?B?OHlOSXNVWkxHMWc3WHA3czljTjUzUEkrSGFSNkdyRU9RVkQrSG9XcmpVKy9x?=
- =?utf-8?B?eldwL0dsSWkxYWxwSkIvRzVSTXdCRWdkWWt3akNSeWxGUHBpTFB2bTdpaGdX?=
- =?utf-8?B?Z1U1WDIwb2VTRkFld2ZUMmZoYmd5c1ZQWVRLaWNnSlFQbDc4K3A2SFFESUsy?=
- =?utf-8?B?QU1BWndOaGhpMzFVb3gzL29TaUdsM2F2MUVaV2hvYXR6NURmK1Frdyt4VTVn?=
- =?utf-8?B?b3lpdDcyWDJTeHBtMTYrRGlPYjhlc1VTNDFJTDBhL3B1WmpzbHRsazBmcktJ?=
- =?utf-8?B?WkRmcWxUeVZ6NC95NG1kaDNTOFRHZWVMVXZ2aHhSRWdkRmFZUGZBQ05NODZG?=
- =?utf-8?B?QS9MSGg0emZWV3RKbzczMmR5UUFLL2hMdW5LVUR6dm9BUVpGMkFKRjJhZlFO?=
- =?utf-8?B?enZQKzhaZEVYUFNNWmtMMnFsRDBWSCt4eGV6ZU00VUk0K3JVdExZMjQwb0xt?=
- =?utf-8?B?dU5xdEk0V2laRmU2bTI3LysyOGdvdHMzNVlqQnpzMkh2Zk9IRHZoOGJCb2ky?=
- =?utf-8?B?L0w1WWhEMXpiMUJ5Q1lQWHlRY3d0NWpYWHU4M0NRRXdTNEkrRG56Q2t4K293?=
- =?utf-8?B?Z3FoUzlWSElZblN5RURFd3ZBUmYrajFZWkhWVG5aWEVnTHJDWTFhUEl1SVpa?=
- =?utf-8?B?WWFaUnQ3WWZ2cGJuOWFRMkdDNnYzM2h4K2RLR051YkFZZHQzdmtSd3BPelFN?=
- =?utf-8?B?QTZEUnA3L05vTGxqUUtjeFhaYmZBU0d0WW8waHc4T0pIQzlwamFSNGdlTmh4?=
- =?utf-8?B?Q05HL3dSTGtKcElDYXVCOVIzd1I3SlRPOWlXTXA4R21Bd0VlRnBxdmcwaHFv?=
- =?utf-8?B?eEtjWlI0UVpLS2RtbmlKMm5XV29Oa0Y4SktITkFyYityQS93TmYrQWlDZzl4?=
- =?utf-8?B?ZHZqdE5lZVNCR0lLQ0RXUEpBbEx6VDhISHdwVCtjZ3BnMW1rMG1iNjFNeldv?=
- =?utf-8?B?NDFoOExEbVRLd2lzQWNLcThaTVNYU2lqZ0R4bGJOU29QeVh5OFNleEs2MTZm?=
- =?utf-8?B?c3JXbzZqOFVySndMVFp3Q2VxQ01Nd1JsSmdsMjYrUkdYWmtLeSttS1JFQnpn?=
- =?utf-8?B?TDRHc2dvc0QxNDFjRHhuUFlXVmJEWEY2SkJvQkZDQUVmd243QXlzWTZGVG1x?=
- =?utf-8?B?eGVmbjRMQ1RlQUFiWkFNTHZ5dWp0V1NJL21YTWI3TTB5OEpZMXM0clBHQzIr?=
- =?utf-8?B?anE0QWJXZERsZEJaTUUycFUvRUM0cG1sOGpRcEdON1FicTRjbDVtTWNsY25t?=
- =?utf-8?B?Y1RBQ2FnbTNqSnRXTzR4UENTT0FQRCtmVCtDbzhsYXhBOEY1VFUwZmloNkJJ?=
- =?utf-8?Q?1hbjacKWz+gY07RVk2nKblQ=3D?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 957639e1-19ca-438f-3f56-08d9b35329ad
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Nov 2021 16:13:21.4811
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: bErSQVYjybdhzklDicKaOheeBFJBsIEZWL3b8na79w+bIX5afENZm1/TDdgZou+vvyB86H7rlJ/pvB1J1+SfCw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2686
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Dnia 29 listopada 2021 06:38:39 UTC, Yury Norov <yury=2Enorov@gmail=2Ecom> =
+napisa=C5=82/a:
+>On Sun, Nov 28, 2021 at 07:03:41PM +0100, mirq-test@rere=2Eqmqm=2Epl wrot=
+e:
+>> On Sat, Nov 27, 2021 at 07:56:55PM -0800, Yury Norov wrote:
+>> > In many cases people use bitmap_weight()-based functions like this:
+>> >=20
+>> > 	if (num_present_cpus() > 1)
+>> > 		do_something();
+>> >=20
+>> > This may take considerable amount of time on many-cpus machines becau=
+se
+>> > num_present_cpus() will traverse every word of underlying cpumask
+>> > unconditionally=2E
+>> >=20
+>> > We can significantly improve on it for many real cases if stop traver=
+sing
+>> > the mask as soon as we count present cpus to any number greater than =
+1:
+>> >=20
+>> > 	if (num_present_cpus_gt(1))
+>> > 		do_something();
+>> >=20
+>> > To implement this idea, the series adds bitmap_weight_{eq,gt,le}
+>> > functions together with corresponding wrappers in cpumask and nodemas=
+k=2E
+>>=20
+>> Having slept on it I have more structured thoughts:
+>>=20
+>> First, I like substituting bitmap_empty/full where possible - I think
+>> the change stands on its own, so could be split and sent as is=2E
+>
+>Ok, I can do it=2E
+>
+>> I don't like the proposed API very much=2E One problem is that it hides
+>> the comparison operator and makes call sites less readable:
+>>=20
+>> 	bitmap_weight(=2E=2E=2E) > N
+>>=20
+>> becomes:
+>>=20
+>> 	bitmap_weight_gt(=2E=2E=2E, N)
+>>=20
+>> and:
+>> 	bitmap_weight(=2E=2E=2E) <=3D N
+>>=20
+>> becomes:
+>>=20
+>> 	bitmap_weight_lt(=2E=2E=2E, N+1)
+>> or:
+>> 	!bitmap_weight_gt(=2E=2E=2E, N)
+>>=20
+>> I'd rather see something resembling memcmp() API that's known enough
+>> to be easier to grasp=2E For above examples:
+>>=20
+>> 	bitmap_weight_cmp(=2E=2E=2E, N) > 0
+>> 	bitmap_weight_cmp(=2E=2E=2E, N) <=3D 0
+>> 	=2E=2E=2E
+>
+>bitmap_weight_cmp() cannot be efficient=2E Consider this example:
+>
+>bitmap_weight_lt(1000 0000 0000 0000, 1) =3D=3D false
+>                 ^
+>                 stop here
+>
+>bitmap_weight_cmp(1000 0000 0000 0000, 1) =3D=3D 0
+>                                 ^
+>                                 stop here
+>
+>I agree that '_gt' is less verbose than '>', but the advantage of=20
+>'_gt' over '>' is proportional to length of bitmap, and it means
+>that this API should exist=2E
 
+Thank you for the example=2E Indeed, for less-than to be efficient here yo=
+u would need to replace
+ bitmap_weight_cmp(=2E=2E=2E, N) < 0
+with
+ bitmap_weight_cmp(=2E=2E=2E, N-1) <=3D 0
 
-On 11/29/21 8:58 AM, Vlastimil Babka wrote:
-> On 11/29/21 15:44, Brijesh Singh wrote:
->>
->>
->> On 11/25/21 4:05 AM, Joerg Roedel wrote:
->>> On Wed, Nov 24, 2021 at 09:48:14AM -0800, Dave Hansen wrote:
->>>> That covers things like copy_from_user().  It does not account for
->>>> things where kernel mappings are used, like where a
->>>> get_user_pages()/kmap() is in play.
->>>
->>> The kmap case is guarded by KVM code, which locks the page first so that
->>> the guest can't change the page state, then checks the page state, and
->>> if it is shared does the kmap and the access.
->>
->>
->> The KVM use-case is well covered in the series, but I believe Dave is
->> highlighting what if the access happens outside of the KVM driver (such as a
->> ptrace() or others).
-> 
-> AFAIU ptrace() is a scenario where the userspace mapping is being gup-ped,
-> not a kernel page being kmap()ed?
-> 
+It would still be more readable, I think=2E
 
-Yes that is correct.
-
->> One possible approach to fix this is to enlighten the kmap/unmap().
->> Basically, move the per page locking mechanism used by the KVM in the
->> arch-specific code and have kmap/kunmap() call the arch hooks. The arch
->> hooks will do this:
->>
->> Before the map, check whether the page is added as a shared in the RMP
->> table. If not shared, then error.
->> Acquire a per-page map_lock.
->> Release the per-page map_lock on the kunmap().
->>
->> The current patch set provides helpers to change the page from private to
->> shared. Enhance the helpers to check for the per-page map_lock, if the
->> map_lock is held then do not allow changing the page from shared to private.
-> 
-> That could work for the kmap() context.
-> What to do for the userspace context (host userspace)?
-> - shared->private transition - page has to be unmapped from all userspace,
-> elevated refcount (gup() in progress) can block this unmap until it goes
-> away - could be doable
-
-An unmap of the page from all the userspace process during the page 
-state transition will be great. If we can somehow store the state 
-information in the 'struct page' then it can be later used to make 
-better decision. I am not sure that relying on the elevated refcount is 
-the correct approach. e.g in the case of encrypted guests, the HV may 
-pin the page to prevent it from migration.
-
-Thoughts on how you want to approach unmaping the page from userspace 
-page table?
-
-
-> - still, what to do if host userspace then tries to access the unmapped
-> page? SIGSEGV instead of SIGBUS and it can recover?
-> 
-
-Yes, SIGSEGV makes sense to me.
-
-
-> 
-> 
->> Thoughts ?
->>
->>>
->>> This should turn an RMP fault in the kernel which is not covered in the
->>> uaccess exception table into a fatal error.
->>>
->>> Regards,
->>>
-> 
+Best Regards
+Micha=C5=82 Miros=C5=82aw
