@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C4D064626FF
-	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 23:56:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D329F462514
+	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 23:32:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235795AbhK2XAA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Nov 2021 18:00:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38888 "EHLO
+        id S233142AbhK2WfU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Nov 2021 17:35:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235933AbhK2W7s (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Nov 2021 17:59:48 -0500
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABED9C08ED82;
-        Mon, 29 Nov 2021 09:53:55 -0800 (PST)
-Received: by mail-ed1-x52d.google.com with SMTP id y12so75362755eda.12;
-        Mon, 29 Nov 2021 09:53:55 -0800 (PST)
+        with ESMTP id S233429AbhK2We5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Nov 2021 17:34:57 -0500
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A23AC0D8C9F;
+        Mon, 29 Nov 2021 09:55:23 -0800 (PST)
+Received: by mail-ed1-x529.google.com with SMTP id y12so75379205eda.12;
+        Mon, 29 Nov 2021 09:55:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=sender:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=1y5DEAA90y8cYxRCLd33wqhLVpAEzLmdNKss0/RInBo=;
-        b=E58dL1Cy0ML/Fq7U+4vMD/XpyhySESNFxGtsJEr0iGA5QuLlhcOX/A4/jdDRZEzDIQ
-         fPsLvJxXz3PX63V9su/FgauAMqwxco+y+olI1dCd3mpfxLlYlBPlhWOjrxeLq9guNxSM
-         eEfi9IneXptokJh8diXl/ugbj5GCH/6ELhKn4aofNdddGLZ+OqUWg1z9TxLUnKXffmNg
-         lUaqpY0k7AwGkJ3OL2ZtKNoHyBmTZ4KtwmtpxoPlTCt2JnQOPjXQ7vH4M7rfgBjlRgND
-         uViwUXN3LorpSW+ON86lkQL5g7/VvacQD/GzeWK08eJHfKwJKQfnwt7i4lLeeVe5Mvw/
-         ad3w==
+        bh=Jo8G3WIFnCXJv/Wl58UbY8LXKhGKq56nydp8ornyGvw=;
+        b=AjLExKPDvZxJIAf93isJIQG5owoNwi20rpmLOoVH2+s0ZWunJFmYMjECqAXAa31ExM
+         qP4APhy58+cgNzSgs7CZp9bi9ZLfh1Um4f0T4CPKtFMqEQtoIPcbCG5ECCW+4/RpN3qP
+         1k3CIsFPt6dBLkWzV5yOedKG0phAVvwwuaHgAci5hCbOZz8Yy6GMFp/NPR+R+K6sin3x
+         5VGYrAKTVs66DntrIpjFBpn/bDtGwX2tdoIaZvud6hNaP1K0MD3EhI9p5XlWWUFTNrfc
+         xT0cVpHPnGNOA0p342OPsO0F8T5HlLM3fktULYfIDujE1Zx4qHlH1POPSzpbzwUrncLW
+         GVzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
          :subject:content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=1y5DEAA90y8cYxRCLd33wqhLVpAEzLmdNKss0/RInBo=;
-        b=x4bbK/cjcMnOoyxtkDp7Z3F+2SdUFuT80avz2Tmcu44Jfj+dh6AzycwELMXJuXzPcQ
-         vLpc+he5hqyOnGi+y5qiJxfLNrR0Px3Wt6aLL7yl7fj2aXHZWueJE0MrCS7ZI/+PoFEe
-         k0n9zKbA2jvYjlGXKpeG363N68FxqZgmcISOMaGOG5G6GZgM4MtFvmn9AkkK1aW2nKuU
-         l4c6HdItYcDeosAS9qSTXFEEArBMqXqsNE2ot/WSimKSPVspAoO/UCVplylraCTuaOa6
-         hU62QT7UchN8fQtuLGLaSaDqOt1SCvEpurFiyvxFzwTo8KT6cAkFt2omJTbgx3wsZLyC
-         Votg==
-X-Gm-Message-State: AOAM5310EUJg1Dqp0pxtKg0+W7O6Mn/q6iTwmgRsFiYZdWD+0d+TjoQ9
-        x4b/oOfmOg2XQw+uGhep+5g=
-X-Google-Smtp-Source: ABdhPJyEFZTCnn35jIBM5GkhncH3CSPbL5gmVmWsUh9Tr+ztH5c8bc9QO9Acd3UAKwaA5P3qYhybfg==
-X-Received: by 2002:a05:6402:2744:: with SMTP id z4mr77472004edd.310.1638208434290;
-        Mon, 29 Nov 2021 09:53:54 -0800 (PST)
+        bh=Jo8G3WIFnCXJv/Wl58UbY8LXKhGKq56nydp8ornyGvw=;
+        b=Y3UxfDcyF0qmMRjjjgfWddyCmOiRu+ZT1p2bTtgeMAAJkOoiobR8rD9fohvAfJnxS1
+         Bqec1RGf7kRxXc5TRZ7EJ760OaL8ihF4rOCauHkujCJoJOFICbA0RpeCnkZiMNe2oYaQ
+         DJh1pbsxu+nIpeK4cJqokrJBpDuI4C7yCsEmhWonbfIKXFXI224eCUFnN+K2Acolclgl
+         pbTDiuuGRui6c8p/zvDRJFTYLw9NPIgS2DMTO431tQIeEiYArjJGg1/EkTqmOMHabTtJ
+         amdk25LoWunXBdQFGw+O9iyvhmYHWI22+t227+3KpP/EMbs5OO7s6qprELVMRcv4kwfu
+         IZUg==
+X-Gm-Message-State: AOAM530fct9t3JvZKws23sziAm7FyIez+WJYIOzco3ea/dOw5/XjniCr
+        W4G0dlTNAWDx4c0PD2RFYS0=
+X-Google-Smtp-Source: ABdhPJzV0Hp7Xr2kSqyy1FejCYUnhDh4xLCC02qQtKZ+cbHbGKkW71ueP1pw91X6C27D1KEW8+5Gvw==
+X-Received: by 2002:a17:907:68e:: with SMTP id wn14mr62415481ejb.258.1638208522107;
+        Mon, 29 Nov 2021 09:55:22 -0800 (PST)
 Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.googlemail.com with ESMTPSA id gt18sm7974997ejc.46.2021.11.29.09.53.49
+        by smtp.googlemail.com with ESMTPSA id og38sm7559529ejc.5.2021.11.29.09.55.20
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 29 Nov 2021 09:53:53 -0800 (PST)
+        Mon, 29 Nov 2021 09:55:21 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <496c2fc6-26b0-9b5d-32f4-2f9e9dd6a064@redhat.com>
-Date:   Mon, 29 Nov 2021 18:53:48 +0100
+Message-ID: <ba8341d6-7ee7-1af1-1385-0a9226bbf952@redhat.com>
+Date:   Mon, 29 Nov 2021 18:55:19 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.2.0
@@ -101,50 +101,13 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 11/29/21 18:25, Sean Christopherson wrote:
-> If a posted interrupt arrives after KVM has done its final search through the vIRR,
-> but before avic_update_iommu_vcpu_affinity() is called, the posted interrupt will
-> be set in the vIRR without triggering a host IRQ to wake the vCPU via the GA log.
+>> If I apply though only the patch series up to this patch, my fedora VM seems
+>> to work fine, but my windows VM still locks up hard when I run 'LatencyTop'
+>> in it, which doesn't happen without this patch.
 > 
-> I.e. KVM is missing an equivalent to VMX's posted interrupt check for an outstanding
-> notification after switching to the wakeup vector.
+> Buy "run 'LatencyTop' in it", do you mean running something in the Windows guest?
+> The only search results I can find for LatencyTop are Linux specific.
 
-BTW Maxim reported that it can break even without assigned devices.
-
-> For now, the least awful approach is sadly to keep the vcpu_(un)blocking() hooks.
-
-I agree that the hooks cannot be dropped but the bug is reproducible 
-with this patch, where the hooks are still there.
-
-With the hooks in place, you have:
-
-	kvm_vcpu_blocking(vcpu)
-	  avic_set_running(vcpu, false)
-	    avic_vcpu_put(vcpu)
-	      avic_update_iommu_vcpu_affinity()
-	      WRITE_ONCE(...) // clear IS_RUNNING bit
-
-	set_current_state()
-	  smp_mb()
-
-	kvm_vcpu_check_block()
-	  return kvm_arch_vcpu_runnable() || ...
-	    return kvm_vcpu_has_events() || ...
-	      return kvm_cpu_has_interrupt() || ...
-		return kvm_apic_has_interrupt() || ...
-		  return apic_has_interrupt_for_ppr()
-		    apic_find_highest_irr()
-		      scan vIRR
-
-This covers the barrier between the write of is_running and the read of 
-vIRR, and the other side should be correct as well.  in particular, 
-reads of is_running always come after an atomic write to vIRR, and hence 
-after an implicit full memory barrier.  svm_deliver_avic_intr() has an 
-smp_mb__after_atomic() after writing IRR; avic_kick_target_vcpus() even 
-has an explicit barrier in srcu_read_lock(), between the microcode's 
-write to vIRR and its own call to avic_vcpu_is_running().
-
-Still it does seem to be a race that happens when IS_RUNNING=true but 
-vcpu->mode == OUTSIDE_GUEST_MODE.  This patch makes the race easier to 
-trigger because it moves IS_RUNNING=false later.
+I think it's LatencyMon, https://www.resplendence.com/latencymon.
 
 Paolo
