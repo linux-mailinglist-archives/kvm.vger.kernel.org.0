@@ -2,103 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C1804462727
-	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 23:59:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 337774626B6
+	for <lists+kvm@lfdr.de>; Mon, 29 Nov 2021 23:53:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236947AbhK2XBK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Nov 2021 18:01:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38900 "EHLO
+        id S236261AbhK2W4R (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Nov 2021 17:56:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237093AbhK2XAn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Nov 2021 18:00:43 -0500
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 582CCC1A0D1D
-        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 10:36:36 -0800 (PST)
-Received: by mail-pj1-x102b.google.com with SMTP id j5-20020a17090a318500b001a6c749e697so12240126pjb.1
-        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 10:36:36 -0800 (PST)
+        with ESMTP id S235647AbhK2Wz3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Nov 2021 17:55:29 -0500
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67C72C1EB41D
+        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 10:55:19 -0800 (PST)
+Received: by mail-pl1-x62c.google.com with SMTP id p18so12902957plf.13
+        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 10:55:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=tlAzD3aQxZNbhH82DiZEqP09YfqX3PXGzrFEKOt1BUE=;
-        b=VMyEtGnE90jgPkfdArsfFQ73biEKasoDaOcmKYoZKhQrm4TkNFsD5TTOC+i1xSw4IA
-         QwSOEIYqYFet0ZZuJcRlz/K5uFQE/fenSx0d0EnnQ6oZbMNHkjflfqpu20QoV/0Nih3R
-         nMzQUwHTrrLjS0cxhTgTVwhC7ZASBaqm1glT2gMVZ9zfl+0rqU/1lxZr1KBKehahtfy9
-         cXLL/bvyEMQd0qujLL/xmH/ESnBM3510+1Nuicl2fKEThRU8WVOA8JCJKg3STPnXD26P
-         DDqxVmJCx2aXGJ6DArW+HHKb8MeCVbRgGp2m7sZZjJfZ78gCHNoKusXy9dix+Y0oTbAR
-         QSXA==
+        bh=TYbgQqCpCmOsVo/Ud6S4W0dWbGKnEHCC/sbfSrxRU2Q=;
+        b=V9NdrM9IGQ8TORtVAjZzUck1RI7UtY24/5ryhbIDx46VwTLIEKKddxeNbMrV6TQpIl
+         KTCIPozOyBw/wCgOEJPsKU3C9LENDNILuHldgqEm6W55x2AEOVy9zbC+oB0Q8kNXcib2
+         utENfqKkezcYzZnD0pmUAjWeJ/cGQai7wseSy0Tb7+ezAyGs24Tiec69FywheOS97WPw
+         hiOKPwklIAtqAAVwW+TVa82nOI4oJHItJIs2sHILKArSIy33/Br5zlJSRUemG17TIymQ
+         2z90v41HGfafPsWOqjYsVFIk8gpVXUcAMJTfJevG+nopt2huTRvy9U+7v5siSDcfSs81
+         05ZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=tlAzD3aQxZNbhH82DiZEqP09YfqX3PXGzrFEKOt1BUE=;
-        b=aCqWqlP+M5rLm42auFx5fXRSCgiztHgg3L5pRjnHT9cEDsa0BFDam9zJedBTl71AwU
-         KQ+JlsvXbBgH9NCWw6tjfoRx0ZGgr2B3AuiGF8ce1hd3fRD7ReqIC8p/I4/21bsgckI3
-         Y2Yfd2JsNpKDHJl8YeP3hbBTl49PGlrgpwf9vtkXt297uydl8Bo4gb6qN3MtFLeFFpN9
-         v88PX7tkdrbX1GxmrGqDSthZ8jcdAVUK0y4kALvcdD/XijA6bJGxYujBabxsbU3OTiy6
-         amUVTNAJt2mioazMhvd5OIDdXFdHuCvl0dwJNr3+n1bwh3e63OvBMdHA1SWZ9Vz45Va+
-         Gu6w==
-X-Gm-Message-State: AOAM5333aNnHTM52yzB8XuOdJk6v+H1Qm5fjTnvq2kxskfFqq5Jw80lv
-        7SqV3OaBM4hZBfcCGD0ImV6yKg==
-X-Google-Smtp-Source: ABdhPJx8WtPK3FSjNprjLl/l1toByBy/n2qpSmC6t2XTOO85rqwFTlV9d2tAz2CyzikyPU9sLpNeRg==
-X-Received: by 2002:a17:902:aa43:b0:143:e20b:f37f with SMTP id c3-20020a170902aa4300b00143e20bf37fmr61456504plr.65.1638210995742;
-        Mon, 29 Nov 2021 10:36:35 -0800 (PST)
+        bh=TYbgQqCpCmOsVo/Ud6S4W0dWbGKnEHCC/sbfSrxRU2Q=;
+        b=wfC+xZZi4xPsl2Jv2A0r68XRIKzqtLuDPGkMkGolfoUAMmWxLStTpmlHmzd5wxTYPD
+         yj2/QR4G5fpafi7r2xjjFhvR3FJyYMFSzKtmmKvoVYQH9GiHHYbvGgYdyI+WJNlGFJ2/
+         +I49iQZOWO1tq9Rgzwcu7i16LO7/zCBymFOfGmhtUPyrReYMAkBTDj0dAvzjckCqB69o
+         alUYhqeId/B5tfFWCsmvx8c+PxZoHk50IBb0/iafThAtJeCDcLHY6o57Bhkg0eXIdLzy
+         6F6Ioildo00wg5ssfxkat9tksKgXBHAIHTVoigjJ8d648jrhtd5EYXmrHUaT80Lg703d
+         kF1w==
+X-Gm-Message-State: AOAM531p5/gnaPKMpCWgBpBzsEFxZk4XWalJo02ICfvJRfY6WCQRgS0b
+        +W3D7bFevNogZvreYLuZ+/xVUw==
+X-Google-Smtp-Source: ABdhPJzGwlSa9NgpBenMt4CKt9Ftf4k4qsHL0lT0KjuZVEYivrfeFPAQn3AoVSiAs1eAB5ezweh9DQ==
+X-Received: by 2002:a17:90b:2251:: with SMTP id hk17mr189639pjb.31.1638212118683;
+        Mon, 29 Nov 2021 10:55:18 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id 95sm62436pjo.2.2021.11.29.10.36.34
+        by smtp.gmail.com with ESMTPSA id d17sm17979027pfj.215.2021.11.29.10.55.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Nov 2021 10:36:35 -0800 (PST)
-Date:   Mon, 29 Nov 2021 18:36:31 +0000
+        Mon, 29 Nov 2021 10:55:18 -0800 (PST)
+Date:   Mon, 29 Nov 2021 18:55:14 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     isaku.yamahata@intel.com, Ingo Molnar <mingo@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Maxim Levitsky <mlevitsk@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Anup Patel <anup.patel@wdc.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Atish Patra <atish.patra@wdc.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, erdemaktas@google.com,
-        Connor Kuehl <ckuehl@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, isaku.yamahata@gmail.com,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: Re: [RFC PATCH v3 47/59] KVM: TDX: Define TDCALL exit reason
-Message-ID: <YaUdr5tL7d+kpsX5@google.com>
-References: <cover.1637799475.git.isaku.yamahata@intel.com>
- <eb5dd2a1d02c7afe320ab3beb6390da43a9bf0bc.1637799475.git.isaku.yamahata@intel.com>
- <87k0gwhttc.ffs@tglx>
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        David Matlack <dmatlack@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+Subject: Re: [PATCH v2 11/43] KVM: Don't block+unblock when halt-polling is
+ successful
+Message-ID: <YaUiEquKYi5eqWC0@google.com>
+References: <20211009021236.4122790-1-seanjc@google.com>
+ <20211009021236.4122790-12-seanjc@google.com>
+ <cceb33be9e2a6ac504bb95a7b2b8cf5fe0b1ff26.camel@redhat.com>
+ <4e883728e3e5201a94eb46b56315afca5e95ad9c.camel@redhat.com>
+ <YaUNBfJh35WXMV0M@google.com>
+ <496c2fc6-26b0-9b5d-32f4-2f9e9dd6a064@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87k0gwhttc.ffs@tglx>
+In-Reply-To: <496c2fc6-26b0-9b5d-32f4-2f9e9dd6a064@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 25, 2021, Thomas Gleixner wrote:
-> On Wed, Nov 24 2021 at 16:20, isaku yamahata wrote:
-> > From: Sean Christopherson <sean.j.christopherson@intel.com>
-> >
-> > Define the TDCALL exit reason, which is carved out from the VMX exit
-> > reason namespace as the TDCALL exit from TDX guest to TDX-SEAM is really
-> > just a VM-Exit.
+On Mon, Nov 29, 2021, Paolo Bonzini wrote:
+> On 11/29/21 18:25, Sean Christopherson wrote:
+> > If a posted interrupt arrives after KVM has done its final search through the vIRR,
+> > but before avic_update_iommu_vcpu_affinity() is called, the posted interrupt will
+> > be set in the vIRR without triggering a host IRQ to wake the vCPU via the GA log.
+> > 
+> > I.e. KVM is missing an equivalent to VMX's posted interrupt check for an outstanding
+> > notification after switching to the wakeup vector.
 > 
-> How is this carved out? What's the value of this word salad?
+> BTW Maxim reported that it can break even without assigned devices.
 > 
-> It's simply a new exit reason. Not more, not less. So what?
-
-The changelog is alluding to the fact that KVM should never directly see a TDCALL
-VM-Exit.  For TDX, KVM deals only with "returns" from the TDX-Module.  The "carved
-out" bit is calling out that the transition from SEAM Non-Root (the TDX guest) to
-SEAM Root (the TDX Module) is actually a VT-x/VMX VM-Exit, e.g. if TDX were somehow
-implemented without relying on VT-x/VMX, then the TDCALL exit reason wouldn't exist.
-
-> > Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> > Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> > Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> > For now, the least awful approach is sadly to keep the vcpu_(un)blocking() hooks.
 > 
-> I'm pretty sure that it does not take two engineers to add a new exit
-> reason define, but it takes at least two engineers to come up with a
-> convoluted explanation for it.
+> I agree that the hooks cannot be dropped but the bug is reproducible with
+> this patch, where the hooks are still there.
 
-Nah, just one ;-)
+...
+
+> Still it does seem to be a race that happens when IS_RUNNING=true but
+> vcpu->mode == OUTSIDE_GUEST_MODE.  This patch makes the race easier to
+> trigger because it moves IS_RUNNING=false later.
+
+Oh!  Any chance the bug only repros with preemption enabled?  That would explain
+why I don't see problems, I'm pretty sure I've only run AVIC with a PREEMPT=n.
+
+svm_vcpu_{un}blocking() are called with preemption enabled, and avic_set_running()
+passes in vcpu->cpu.  If the vCPU is preempted and scheduled in on a different CPU,
+avic_vcpu_load() will overwrite the vCPU's entry with the wrong CPU info.
