@@ -2,94 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 65A8D463A7E
-	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 16:45:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BB7F4463ADF
+	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 17:02:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237639AbhK3Psa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Nov 2021 10:48:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45780 "EHLO
+        id S243308AbhK3QFS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Nov 2021 11:05:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231672AbhK3PsY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Nov 2021 10:48:24 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5301C061574
-        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 07:45:04 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id gb13-20020a17090b060d00b001a674e2c4a8so17594574pjb.4
-        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 07:45:04 -0800 (PST)
+        with ESMTP id S239833AbhK3QFP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Nov 2021 11:05:15 -0500
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9198EC061746
+        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 08:01:55 -0800 (PST)
+Received: by mail-pf1-x42a.google.com with SMTP id z6so21071986pfe.7
+        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 08:01:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=dwL/N/0r33z1J+yxcqYeak1UGCvqy061/ybnlClImC4=;
-        b=DzHYJSEDFeQhlh2V1wl/Olwddpz1XECXeRCQscX33t7syLnYQJHPGUp/iAx7ycqIm6
-         sIrqsYTpuINIArwuiRlVbw3OZN8LCWAjG0GtZ7P/qRSQWn/WRlaL/4fvTIhYDOjcV9vl
-         ZdL25iOeSmi33Q0PcusvosQm5dwlvBf5oLwdiuHDleuNu9YCfdMZfMSORd0ATQhoAZi7
-         rT70s5XsP8R7Fgi99iVJRZi9Or7Gt5+Ev5VA1FkD4ITYPZ1j8y0V7ERtQGNp1tbu3M5F
-         lXFmzgGHlYI0hnrCrAkqsMKnZPn+jp+cfR6UKsU5z3nHoa9UjOvQyYObsgZ1ZOIpgWSF
-         JjBw==
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=u7qkJO95z6PA+5n1Ta+ydAPJV1GYiaGJee3oSFozDEQ=;
+        b=IFt8Tn+vxT21IpZwc1G2oIIymlaJa/rS9tPtD65lbJffdgHBV1ma5O+UrZYwQ+fpdE
+         uwo6I7onE1BcdE7rFH+Hyh0hfFqAisvMusQkVDnpcHVSrvYxwu/WDFInlFXrsly+Ij2o
+         2/e4EmCPBpf191/pzWGolf7xwlV4RVdA29Ob/MYDXJBNJmWraO+ef5IZrdWd5kTDzB4e
+         d43mrcg7DtKvEkstc8pI3DgJG4GKmHwqmVLDDfyMhJ97ZgjBvOWiiQyopaZ3i2tEV+Wm
+         Ley8rcpzQAb/T5TWz2UVrLchpAFSSyi8rw3PYzcbp2+rhJJ9SoKb3AYBUyt5a90Advl4
+         9BwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=dwL/N/0r33z1J+yxcqYeak1UGCvqy061/ybnlClImC4=;
-        b=wQ1we6xxmfkmAX2AlRkfPVn3WGdSCYZLrIenvPeakrvLg3eMCluTyTenn+ERGLZhg2
-         gfwumyYtoCgZHd96/mDfU+7XakvG+POPloQCJ8snlpZagb/tm951Czfo9qR5RbNw1w/T
-         Gqo83QxaZqAZkmSeja+BVnAGFrMPPDvaubyNTgOSCSSklLJPz267aeaWZ8G0g9X4tBYz
-         miKUHYnRB0bT19+6UKL1HYVPKx1sod7WyPm6D96HYka7+68Mx6Ck2yPGAv5ks7bXSyuc
-         d3bMIpyOF9EhOU+8988uBKqdxRbIvCaqa1crIzQStZMPLCdGVdHLsU5nhcU459VV/VIX
-         MrvA==
-X-Gm-Message-State: AOAM531BSY47RiDiLG2oxaGWylwsFDSlQX+GcgkbZZLYNAPhjFZeNAX8
-        uETCZ7TCJjsN1tN1uVJAGzEAZQ==
-X-Google-Smtp-Source: ABdhPJylVbFuOqgAdsqa3Cmb2dwe8PNZRVgirN7DPSZqHTeweb0oWnD/Zt7w1UPJ7BtiBbIxh/3btA==
-X-Received: by 2002:a17:902:c78a:b0:142:1b7a:930 with SMTP id w10-20020a170902c78a00b001421b7a0930mr213746pla.8.1638287104019;
-        Tue, 30 Nov 2021 07:45:04 -0800 (PST)
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=u7qkJO95z6PA+5n1Ta+ydAPJV1GYiaGJee3oSFozDEQ=;
+        b=WaGGDOLOtJxeEVpxGTUuztPDTeDh0JT0pQIw2UGKvJp780GpA0AS0nQiTiVsCccXDm
+         s/hOHnNUEKafcuTs54ancJzoNmAmgyOoFJa8sOW9XL91doVrvNd97U7qn4gDNSeX38TY
+         Jj0g70ytOgTfnQbQxaFNGCmSdpv0raqZCMWkOZ8b4zgrmU0qd3WwbsX/JJNsXvLCRvEF
+         fV4BbEjuTNeKFK4P35eKlQGnm9YPNo52ludx4l8HJsif+cRtprIXvv1XAGi6WiQ2aXaj
+         T6Kl2YNXxkQXvcZunPPxQmNhJW/G3k/XON/JBS4keQeR77BKIUceTi1MhRV44iBx7M2r
+         43eA==
+X-Gm-Message-State: AOAM533nhSGHrtfmYnzvnXFPTAQySeXHtxFZOYxNMuDp5AGzUEzD0WjZ
+        DZBOQiKqNivhQThorV/5afROZVV2HhzfFA==
+X-Google-Smtp-Source: ABdhPJzONHfSHYXg+nJ0762Y3NxbBOp1zkuKvTXs/1E3XWI7EUSQt6W9dr/3AVTdAHDoxFeRyZbz9A==
+X-Received: by 2002:a65:4bc6:: with SMTP id p6mr23381pgr.544.1638288114791;
+        Tue, 30 Nov 2021 08:01:54 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id q9sm14364894pfj.9.2021.11.30.07.45.03
+        by smtp.gmail.com with ESMTPSA id lp12sm3366048pjb.24.2021.11.30.08.01.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Nov 2021 07:45:03 -0800 (PST)
-Date:   Tue, 30 Nov 2021 15:45:00 +0000
+        Tue, 30 Nov 2021 08:01:54 -0800 (PST)
+Date:   Tue, 30 Nov 2021 16:01:50 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Hou Wenlong <houwenlong93@linux.alibaba.com>,
-        Ben Gardon <bgardon@google.com>
-Subject: Re: [PATCH 27/28] KVM: x86/mmu: Do remote TLB flush before dropping
- RCU in TDP MMU resched
-Message-ID: <YaZG/NopJ7YaVUjD@google.com>
-References: <20211120045046.3940942-1-seanjc@google.com>
- <20211120045046.3940942-28-seanjc@google.com>
- <df9d430c-2065-804b-2343-d4bcdb7b2464@redhat.com>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Shier <pshier@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Keqian Zhu <zhukeqian1@huawei.com>,
+        David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH 15/15] KVM: x86/mmu: Promote pages in-place when
+ disabling dirty logging
+Message-ID: <YaZK7lxaBMGfYIdz@google.com>
+References: <20211115234603.2908381-1-bgardon@google.com>
+ <20211115234603.2908381-16-bgardon@google.com>
+ <YZ8OpQmB/8k3/Maj@xz-m1.local>
+ <CANgfPd9pK83S+yoRokLg7wiroE6-OkieATTqgGn3yCCzwNFi4A@mail.gmail.com>
+ <YaXSh6RUOH7NHG8G@xz-m1.local>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <df9d430c-2065-804b-2343-d4bcdb7b2464@redhat.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <YaXSh6RUOH7NHG8G@xz-m1.local>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 30, 2021, Paolo Bonzini wrote:
-> On 11/20/21 05:50, Sean Christopherson wrote:
-> >   	if (need_resched() || rwlock_needbreak(&kvm->mmu_lock)) {
-> > -		rcu_read_unlock();
-> > -
-> >   		if (flush)
-> >   			kvm_flush_remote_tlbs(kvm);
-> > +		rcu_read_unlock();
-> > +
+On Tue, Nov 30, 2021, Peter Xu wrote:
+> On Mon, Nov 29, 2021 at 10:31:14AM -0800, Ben Gardon wrote:
+> > 2. There could be a pointer to the page table in a vCPU's paging
+> > structure caches, which are similar to the TLB but cache partial
+> > translations. These are also cleared out on TLB flush.
 > 
-> Couldn't this sleep in kvm_make_all_cpus_request, whilst in an RCU read-side
-> critical section?
+> Could you elaborate what's the structure cache that you mentioned?  I thought
+> the processor page walker will just use the data cache (L1-L3) as pgtable
+> caches, in which case IIUC the invalidation happens when we do WRITE_ONCE()
+> that'll invalidate all the rest data cache besides the writter core.  But I
+> could be completely missing something..
 
-No.  And if kvm_make_all_cpus_request() can sleep, the TDP MMU is completely hosed
-as tdp_mmu_zap_spte_atomic() and handle_removed_tdp_mmu_page() currently call
-kvm_flush_remote_tlbs_with_range() while under RCU protection.
+Ben is referring to the Intel SDM's use of the term "paging-structure caches"
+Intel CPUs, and I'm guessing other x86 CPUs, cache upper level entries, e.g. the
+L4 PTE for a given address, to avoid having to do data cache lookups, reserved
+bits checked, A/D assists, etc...   Like full VA=>PA TLB entries, these entries
+are associated with the PCID, VPID, EPT4A, etc...
 
-kvm_make_all_cpus_request_except() disables preemption via get_cpu(), and
-smp_call_function() doubles down on disabling preemption as the inner helpers
-require preemption to be disabled, so anything below them should complain if
-there's a might_sleep().  hv_remote_flush_tlb_with_range() takes a spinlock, so
-nothing in there should be sleeping either.
+The data caches are still used when reading PTEs that aren't cached in the TLB,
+the extra caching in the "TLB" is optimization on top.
+
+  28.3.1 Information That May Be Cached
+  Section 4.10, “Caching Translation Information” in Intel® 64 and IA-32 Architectures
+  Software Developer’s Manual, Volume 3A identifies two kinds of translation-related
+  information that may be cached by a logical processor: translations, which are mappings
+  from linear page numbers to physical page frames, and paging-structure caches, which
+  map the upper bits of a linear page number to information from the paging-structure
+  entries used to translate linear addresses matching those upper bits.
