@@ -2,94 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3BDE7463F2C
-	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 21:23:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 48D23463F51
+	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 21:32:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343667AbhK3U07 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Nov 2021 15:26:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53124 "EHLO
+        id S240293AbhK3Ufq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Nov 2021 15:35:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235402AbhK3U06 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Nov 2021 15:26:58 -0500
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FEBAC061574
-        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 12:23:39 -0800 (PST)
-Received: by mail-pj1-x1036.google.com with SMTP id gf14-20020a17090ac7ce00b001a7a2a0b5c3so19157657pjb.5
-        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 12:23:39 -0800 (PST)
+        with ESMTP id S231542AbhK3Ufp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Nov 2021 15:35:45 -0500
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B3B2C061746
+        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 12:32:26 -0800 (PST)
+Received: by mail-pg1-x530.google.com with SMTP id j11so11197017pgs.2
+        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 12:32:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=8NDR0yS5itWLwMQdcFMzAMIrcAwRbstFRp+zcJupYCQ=;
-        b=kw07Ilt3TfWovbf4YoY/b+YLBHrmelv8xlne3fk+/qeBFP9ZOx7MAndQeDEVviEuLi
-         P8j4cYRoSy3jLt1rp7TlrbtugB9D2nv7LlpL0pWMLWHaMNaqdOIHwoyOLEQaRotjfh1p
-         7GeGMBLZ0O1tz10eYsCMPSLia66RR2VXuhI64ls0IKSO9s7sCfT4PVrVMUPvgOAREXaL
-         bMwh1X0Y1q4h5ZyXYpFO7nf1IQwRSgyadlmdgfjCy+yGxJs3szrrWcOQNGZnjvd6QOLS
-         tQFLyqdmyHDO5FpVceU0gUWLNJ4tnJp5w9qJyAApsZ8sTH3nfNg3dveBKcEvuD7V/ich
-         Zr/Q==
+        bh=B+eD0AWbPxjSOvumJqLuOeGMxfPK4HMsAqhFNdXov90=;
+        b=Y8unY17G21VVGtvXgLMaiTe0aRZDMVmNcBpHL5Tvibr0/N+lPkYqsBLYBHPo/MIV4e
+         IjJfBocLcZ8PH46WvEexLvilRwexBuHTHF6CxXQ8gLDCHByzmptGoDcDUNYF1Yk1GfRr
+         0VBAVBc6jRiVRKvHTqfSnJgYMXT0jrBt2f+Q+zX1JdO5GbeRMKVn4xEQocSXLQZuSlA4
+         DKqlEvUadJ7ueEQcLaIkJDNMPlYU5EcniJkUmdFLaICbUQyTzUgQI2iGxNsTwmymudOL
+         /HFnxJc4vHCryD1Jouh6CPw/5YOsJiStegwB3MT9HlAtj/I4tAN6Dtvkn6CbuS6gwGH+
+         0Mpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=8NDR0yS5itWLwMQdcFMzAMIrcAwRbstFRp+zcJupYCQ=;
-        b=r52auuMAYcZLZox9BJ3GX5HAaWiBy4K4lvtCscmsRKy/wrS9UeXgIKh9bfjAUKELCY
-         5hxc0xI/qX2MJfShMp8djG43sXykzFzTufEUtohuk80sKO4Ol1qyiONVZ6PHGNk7Umpk
-         ZM5i4BsyX8MTwp1RoMd9Qqy8RVs/j7kNo90CONeKaft66yKZg3U7nfKb4Nm8DRZ6IBHl
-         QqTInYGFK9m16OC1VmZSyytrvls/hzsgfsoOghAxNhzeQ7PWFIsfRNKIvNRbHqNjDklC
-         a06Xf5MEjNXtbqLhvvRrKsHm3VBTqfXqxf1t8RTe/+n9noqZ3L4O2jDaHJAWcbdXfUdi
-         aZWQ==
-X-Gm-Message-State: AOAM531fzZ8B4ClRoF6UHiwiqwQjYdX4wjDUy1h8jdp7ei6HVUNRRxgq
-        YAvWPDWjMi+rCj06RVJSQHZ33Q==
-X-Google-Smtp-Source: ABdhPJyfhNir0edzU6VGggikB5es2NZVbK831kXfyVbrSliP9J+M8IFJ3gSEpPdJeMtU9sZ7XalgRg==
-X-Received: by 2002:a17:902:7c8a:b0:143:bb4a:7bb3 with SMTP id y10-20020a1709027c8a00b00143bb4a7bb3mr1742790pll.46.1638303818679;
-        Tue, 30 Nov 2021 12:23:38 -0800 (PST)
+        bh=B+eD0AWbPxjSOvumJqLuOeGMxfPK4HMsAqhFNdXov90=;
+        b=S3kS6hAyB7ulrVX/yuBpkIxK2mDGwI/n7fOPQsi39fMmkPgChzV3YB28DlvgZEK1kd
+         wcJfpzkfhkW8DE6J/8etd2WldOLrfl3alyu9K1hfB16CoKCSgm9rU74sZZMuLzke52c7
+         /kk1DwEMnVH7oMdTY5rL+VUFXGVZ2up8Y1+DvaLcB2bzip0I6MM+tAtjhuXhtvKup84p
+         2bHi67WfxYAf5zOnsAokGCSoVuOxxku+sqmcCQjFyeOeWdXeKRDkpLjelqMcH/WmvJ8n
+         +TQL1R3aP5gjKlPryXylDclYL+6ciMgD0ijHptCsYcFlw7B6WBaWBeTfzvJdEz8k1gPK
+         YTYA==
+X-Gm-Message-State: AOAM531+d9KuQJ5H/ZJYvoMihPppW25KyWi601wdkpgJIVxsSL5xI8XO
+        ubUrjnydnh/N3AWcCG9ZjUfUcw==
+X-Google-Smtp-Source: ABdhPJyofkir993EDxQcwXyX/oKLHP9Wy/1ZcLGZ8iP3L8T645GoCvVeVd/SxI0QHz4G0sZTSCBcDA==
+X-Received: by 2002:a05:6a00:1305:b0:4a2:75cd:883b with SMTP id j5-20020a056a00130500b004a275cd883bmr1630196pfu.44.1638304345435;
+        Tue, 30 Nov 2021 12:32:25 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id k18sm15427818pgb.70.2021.11.30.12.23.37
+        by smtp.gmail.com with ESMTPSA id q1sm22754763pfu.33.2021.11.30.12.32.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Nov 2021 12:23:38 -0800 (PST)
-Date:   Tue, 30 Nov 2021 20:23:34 +0000
+        Tue, 30 Nov 2021 12:32:24 -0800 (PST)
+Date:   Tue, 30 Nov 2021 20:32:21 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Ignat Korchagin <ignat@cloudflare.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        stevensd@chromium.org, kernel-team <kernel-team@cloudflare.com>
-Subject: Re: Potential bug in TDP MMU
-Message-ID: <YaaIRv0n2E8F5YpX@google.com>
-References: <CALrw=nEaWhpG1y7VNTGDFfF1RWbPvm5ka5xWxD-YWTS3U=r9Ng@mail.gmail.com>
- <d49e157a-5915-fbdc-8103-d7ba2621aea9@redhat.com>
- <CALrw=nHTJpoSFFadmDL2EL95D2kAiH5G-dgLvU0L7X=emxrP2A@mail.gmail.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH] KVM: VMX: clear vmx_x86_ops.sync_pir_to_irr if APICv is
+ disabled
+Message-ID: <YaaKVYnM2hNfI4J6@google.com>
+References: <20211130123746.293379-2-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CALrw=nHTJpoSFFadmDL2EL95D2kAiH5G-dgLvU0L7X=emxrP2A@mail.gmail.com>
+In-Reply-To: <20211130123746.293379-2-pbonzini@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 30, 2021, Ignat Korchagin wrote:
-> I have managed to reliably reproduce the issue on a QEMU VM (on a host
-> with nested virtualisation enabled). Here are the steps:
+On Tue, Nov 30, 2021, Paolo Bonzini wrote:
+> There is nothing to synchronize if APICv is disabled, since neither
+> other vCPUs nor assigned devices can set PIR.ON.
 > 
-> 1. Install gvisor as per
-> https://gvisor.dev/docs/user_guide/install/#install-latest
-> 2. Run
-> $ for i in $(seq 1 100); do sudo runsc --platform=kvm --network=none
-> do echo ok; done
-> 
-> I've tried to recompile the kernel with the above patch, but
-> unfortunately it does fix the issue. I'm happy to try other
-> patches/fixes queued for 5.16-rc4
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
 
-My best guest would be https://lore.kernel.org/all/20211120045046.3940942-5-seanjc@google.com/,
-that bug results in KVM installing SPTEs into an invalid root.  I think that could
-lead to a use-after-free and/or double-free, which is usually what leads to the
-"Bad page state" errors.
-
-In the meantime, I'll try to repro.
-
-> > > arch/x86/kvm/../../../virt/kvm/kvm_main.c:171
-
-...
-
-> > > After this the machine starts spitting some traces starting with:
-> > >
-> > > [177247.871683][T2343516] BUG: Bad page state in process <comm>  pfn:fe680a
+Reviewed-by: Sean Christopherson <seanjc@google.com>
