@@ -2,391 +2,406 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DFDFA46409C
-	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 22:46:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D973046415A
+	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 23:35:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233379AbhK3Vtk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Nov 2021 16:49:40 -0500
-Received: from vps-vb.mhejs.net ([37.28.154.113]:56964 "EHLO vps-vb.mhejs.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233416AbhK3Vsq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Nov 2021 16:48:46 -0500
-Received: from MUA
-        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <mail@maciej.szmigiero.name>)
-        id 1msAvH-0006HM-HW; Tue, 30 Nov 2021 22:44:23 +0100
-From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        Ben Gardon <bgardon@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v6 29/29] KVM: Dynamically allocate "new" memslots from the get-go
-Date:   Tue, 30 Nov 2021 22:41:42 +0100
-Message-Id: <78c28a71d1bf19c14151ef8bddb72250a1896826.1638304316.git.maciej.szmigiero@oracle.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <cover.1638304315.git.maciej.szmigiero@oracle.com>
-References: <cover.1638304315.git.maciej.szmigiero@oracle.com>
+        id S1344325AbhK3WjJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Nov 2021 17:39:09 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:30033 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232707AbhK3WjJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 30 Nov 2021 17:39:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1638311747;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=aehA/LyWSA8yjoOnZsODq8zQuC97nuUVPDCPz8dLdpg=;
+        b=hf84C/wzfKvl6ShJoOkFH3xpAGPnDPgSWDvu4HXabVTiufllMeZaZiEZANxlkUalVyo8Wn
+        vCmKY51EvEgx2wlS5xGpNzVbhzCrSJFfOfbMpZTAQQxYTrzr991aTQgiQkcMqQJl8JUrUO
+        IYu2HnRF2kD3BHCPUyjJMFAq3HxRr+s=
+Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com
+ [209.85.161.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-291-yp2uRZU9MKWGSCuodVvM0w-1; Tue, 30 Nov 2021 17:35:46 -0500
+X-MC-Unique: yp2uRZU9MKWGSCuodVvM0w-1
+Received: by mail-oo1-f70.google.com with SMTP id i27-20020a4a929b000000b002c672a291dfso11358617ooh.23
+        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 14:35:45 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=aehA/LyWSA8yjoOnZsODq8zQuC97nuUVPDCPz8dLdpg=;
+        b=dBjfs6C+l8wbOmTZCPIFK0GiW/IuecGUmJrhMl8PX1/4YensnD5RH3Jle4nqqhKyrd
+         mgC1OluWNpwv9LyF2l3ZVdHyso9aW7ZtliZlWcxWwohqMhVxW7geSrcr86Rrn8+j0tcn
+         jPoDRbg0J+xNvYTcFE1M4SLWm7bimcxKrIU4zuwzI+RNQdv6bX6yI1Vp4E3vyU/iko66
+         w7QeduzOsB7xdwZONJWvNpbe+DxKsgj9ef+pKg4IJXRsO6EiwnwF4HKtenX0s4J2zG17
+         KD2NcsuxfuLdXTxNc4tSMtKfcS+hCbWdIlsSlLpgMT0gFTXFS7xqr2EM1nJ53Tsrrmzz
+         QDbw==
+X-Gm-Message-State: AOAM531SRrdrIKd5bg3/7T0AWND5BI/qRGXgvsPKzvb5O4xmULvP0fXO
+        ym4bk04QxP+J2vwyVFrtQ9qV9k5AYkfAnY/+5EFUOTnGrzxltlXpUY7S56i/3EMbMCuXGvdRDtn
+        8htyWthJzd3bt
+X-Received: by 2002:a9d:20a1:: with SMTP id x30mr2039794ota.44.1638311744814;
+        Tue, 30 Nov 2021 14:35:44 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxUA40o4VxHQgEcKf6j7upM+X29sYaRycFjGleV4PlyLhGyA0XVNon2/IwIESM2PW/fI5latQ==
+X-Received: by 2002:a9d:20a1:: with SMTP id x30mr2039754ota.44.1638311744412;
+        Tue, 30 Nov 2021 14:35:44 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id n23sm3977198oic.26.2021.11.30.14.35.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Nov 2021 14:35:43 -0800 (PST)
+Date:   Tue, 30 Nov 2021 15:35:41 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Yishai Hadas <yishaih@nvidia.com>
+Subject: Re: [PATCH RFC v2] vfio: Documentation for the migration region
+Message-ID: <20211130153541.131c9729.alex.williamson@redhat.com>
+In-Reply-To: <20211130185910.GD4670@nvidia.com>
+References: <0-v2-45a95932a4c6+37-vfio_mig_doc_jgg@nvidia.com>
+        <20211130102611.71394253.alex.williamson@redhat.com>
+        <20211130185910.GD4670@nvidia.com>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <seanjc@google.com>
+On Tue, 30 Nov 2021 14:59:10 -0400
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-Allocate the "new" memslot for !DELETE memslot updates straight away
-instead of filling an intermediate on-stack object and forcing
-kvm_set_memslot() to juggle the allocation and do weird things like reuse
-the old memslot object in MOVE.
+> On Tue, Nov 30, 2021 at 10:26:11AM -0700, Alex Williamson wrote:
+> > On Mon, 29 Nov 2021 10:45:52 -0400
+> > Jason Gunthorpe <jgg@nvidia.com> wrote:
+> >   
+> > > Provide some more complete documentation for the migration regions
+> > > behavior, specifically focusing on the device_state bits and the whole
+> > > system view from a VMM.
+> > > 
+> > > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> > >  Documentation/driver-api/vfio.rst | 277 +++++++++++++++++++++++++++++-
+> > >  1 file changed, 276 insertions(+), 1 deletion(-)
+> > > 
+> > > Alex/Cornelia, here is the second draft of the requested documentation I promised
+> > > 
+> > > We think it includes all the feedback from hns, Intel and NVIDIA on this mechanism.
+> > > 
+> > > Our thinking is that NDMA would be implemented like this:
+> > > 
+> > >    +#define VFIO_DEVICE_STATE_NDMA      (1 << 3)
+> > > 
+> > > And a .add_capability ops will be used to signal to userspace driver support:
+> > > 
+> > >    +#define VFIO_REGION_INFO_CAP_MIGRATION_NDMA    6  
+> > 
+> > So based on this and the discussion later in the doc, NDMA is an
+> > optional device feature, is this specifically to support HNS?   
+> 
+> Yes. It is not trivial to implement NDMA in a device, we already have
+> HNS as a public existing example that cannot do it, so it is a
+> permanent optional feature.
+> 
+> > IIRC, this is a simple queue based device, but is it the fact that
+> > the queue lives in non-device memory that makes it such that the
+> > driver cannot mediate queue entries and simply add them to the to
+> > migration stream?  
+> 
+> From what HNS said the device driver would have to trap every MMIO to
+> implement NDMA as it must prevent touches to the physical HW MMIO to
+> maintain the NDMA state.
+> 
+> The issue is that the HW migration registers can stop processing the
+> queue and thus enter NDMA but a MMIO touch can resume queue
+> processing, so NDMA cannot be sustained.
+> 
+> Trapping every MMIO would have a huge negative performance impact.  So
+> it doesn't make sense to do so for a device that is not intended to be
+> used in any situation where NDMA is required.
 
-In the MOVE case, this results in an "extra" memslot allocation due to
-allocating both the "new" slot and the "invalid" slot, but that's a
-temporary and not-huge allocation, and MOVE is a relatively rare memslot
-operation.
+But migration is a cooperative activity with userspace.  If necessary
+we can impose a requirement that mmap access to regions (other than the
+migration region itself) are dropped when we're in the NDMA or !RUNNING
+device_state.  We can define additional sparse mmap capabilities for
+regions for various device states if we need more fine grained control.
+There's no reason that mediation while in the NDMA state needs to
+impose any performance penalty against the default RUNNING state.  In
+fact, it seems rather the migration driver's job to provide such
+mediation.
 
-Regarding MOVE, drop the open-coded management of the gfn tree with a
-call to kvm_replace_memslot(), which already handles the case where
-new->base_gfn != old->base_gfn.  This is made possible by virtue of not
-having to copy the "new" memslot data after erasing the old memslot from
-the gfn tree.  Using kvm_replace_memslot(), and more specifically not
-reusing the old memslot, means the MOVE case now does hva tree and hash
-list updates, but that's a small price to pay for simplifying the code
-and making MOVE align with all the other flavors of updates.  The "extra"
-updates are firmly in the noise from a performance perspective, e.g. the
-"move (in)active area" selfttests show a (very, very) slight improvement.
+> > Some discussion of this requirement would be useful in the doc,
+> > otherwise it seems easier to deprecate the v1 migration region
+> > sub-type, and increment to a v2 where NDMA is a required feature.  
+> 
+> I can add some words a the bottom, but since NDMA is a completely
+> transparent optional feature I don't see any reason to have v2.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
-Reviewed-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
-Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
----
- virt/kvm/kvm_main.c | 178 +++++++++++++++++++-------------------------
- 1 file changed, 77 insertions(+), 101 deletions(-)
+It's hardly transparent, aiui userspace is going to need to impose a
+variety of loosely defined restrictions for devices without NDMA
+support.  It would be far easier if we could declare NDMA support to be
+a requirement.
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 8295d87c07b5..b0360afb127b 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -1505,23 +1505,25 @@ static int kvm_prepare_memory_region(struct kvm *kvm,
- 	 * new and KVM isn't using a ring buffer, allocate and initialize a
- 	 * new bitmap.
- 	 */
--	if (!(new->flags & KVM_MEM_LOG_DIRTY_PAGES))
--		new->dirty_bitmap = NULL;
--	else if (old->dirty_bitmap)
--		new->dirty_bitmap = old->dirty_bitmap;
--	else if (!kvm->dirty_ring_size) {
--		r = kvm_alloc_dirty_bitmap(new);
--		if (r)
--			return r;
-+	if (change != KVM_MR_DELETE) {
-+		if (!(new->flags & KVM_MEM_LOG_DIRTY_PAGES))
-+			new->dirty_bitmap = NULL;
-+		else if (old && old->dirty_bitmap)
-+			new->dirty_bitmap = old->dirty_bitmap;
-+		else if (!kvm->dirty_ring_size) {
-+			r = kvm_alloc_dirty_bitmap(new);
-+			if (r)
-+				return r;
+> > There are so many implicit concepts here, I'm not sure I'm making a
+> > correct interpretation, let alone someone coming to this document for
+> > understanding.  
+> 
+> That isn't really helpful feedback..
+> 
+> The above is something like a summary to give context to the below
+> which provides a lot of detail to each step.
+> 
+> If you read the above/below together and find stuff is lacking, then
+> please point to it and let's add it
+
+As I think Connie also had trouble with, combining device_state with
+IOMMU migration features and VMM state, without any preceding context
+and visual cues makes the section confusing.  I did gain context as I
+read further though the doc, but I also had the advantage of being
+rather familiar with the topic.  Maybe a table format would help to
+segment the responsibilities?
+
+> > > +If the VMM has multiple VFIO devices undergoing migration then the grace
+> > > +states act as cross device synchronization points. The VMM must bring all
+> > > +devices to the grace state before advancing past it.
+> > > +
+> > > +The above reference flows are built around specific requirements on the
+> > > +migration driver for its implementation of the migration_state input.  
+> > 
+> > I can't glean any meaning from this sentence.  "device_state" here and
+> > throughout?  We don't have a "migration_state".  
+> 
+> Yes, migration_state is a spello for device_state, I'll fix them all
+> 
+> > > + !RESUMING
+> > > +   All the data transferred into the data window is loaded into the device's
+> > > +   internal state. The migration driver can rely on user-space issuing a
+> > > +   VFIO_DEVICE_RESET prior to starting RESUMING.  
+> > 
+> > We can't really rely on userspace to do anything, nor has this sequence
+> > been part of the specified protocol.  
+> 
+> It is exsisting behavior of qemu - which is why we documented it.
+
+QEMU resets devices as part of initializing the VM, but I don't see
+that QEMU specifically resets a device in order to transition it to
+the RESUMING device_state. 
+
+> Either qemu shouldn't do it as devices must fully self-reset, or we
+> should have it part of the canonical flow and devices may as well
+> expect it. It is useful because post VFIO_DEVICE_RESET all DMA is
+> quiet, no outstanding PRIs exist, etc etc.
+
+It's valid for QEMU to reset the device any time it wants, saying that
+it cannot perform a reset before transitioning to the RESUMING state is
+absurd.  Userspace can do redundant things for their own convenience.
+
+We don't currently specify any precondition for a device to enter the
+RESUMING state.  The driver can of course nak the state change with an
+errno, or hard nak it with an errno and ERROR device_state, which would
+require userspace to make use of VFIO_DEVICE_RESET.  I think I would
+also consider if valid if the driver internally performed a reset on a
+RUNNING -> RESUMING state change, but we've never previously expressed
+any linkage of a userspace requirement to reset the device here. 
+
+> > As with the previous flows, it seems like there's a ton of implicit
+> > knowledge here.  Why are we documenting these here rather than in the
+> > uAPI header?  
+> 
+> Because this is 300 lines already and is too complicated/long to
+> properly live in a uapi header.
+
+Minimally we need to resolve that this document must be consistent with
+the uAPI.  I'm not sure that's entirely the case in this draft.
+
+> >  I'm having a difficult time trying to understand what are
+> > proposals to modify the uAPI and what are interpretations of the
+> > existing protocol.  
+> 
+> As far as we know this describes what current qemu does in the success
+> path with a single VFIO device. ie we think mlx5 conforms to this spec
+> and we see it works as-is with qemu, up to qemu's limitations:
+> 
+>  - qemu has no support for errors or error recovery, it just calls
+>    abort()
+>  - qemu does not stress the device_state and only does a few
+>    transition patterns
+>  - qemu doesn't support P2P cases due to the NDMA topic
+
+Or rather QEMU does support p2p cases regardless of the NDMA topic.
+
+>  - simple devices like HNS will work, but not robustly in the face of
+>    a hostile VM and multiple VFIO devices.
+
+So what's the goal here, are we trying to make the one currently
+implemented and unsupported userspace be the gold standard to which
+drivers should base their implementation?  We've tried to define a
+specification that's more flexible than a single implementation and by
+these standards we seem to be flipping that implementation back into
+the specification.
+
+> > > +   To abort a RESUMING issue a VFIO_DEVICE_RESET.  
+> >
+> > Any use of VFIO_DEVICE_RESET should return the device to the default
+> > state, but a user is free to try to use device_state to transition
+> > from RESUMING to any other state.    
+> 
+> Userspace can attempt all transitions, of course. 
+> 
+> However, notice this spec doesn't specify what happens on non-success
+> RESUMING->RUNNING. So, I'm calling that undefined behavior.
+> 
+> As you say:
+> 
+> > The driver can choose to fail that transition and even make use of
+> > the error device_state, but there's no expectation that a  
+> 
+> Thus, the above advice. To reliably abort RESUMING use DEVICE_RESET,
+> do not use ->RUNNING.
+
+Userspace can attempt RESUMING -> RUNNING regardless of what we specify,
+so a driver needs to be prepared for such an attempted state change
+either way.  So what's the advantage to telling a driver author that
+they can expect a given behavior?
+
+It doesn't make much sense to me to glue two separate userspace
+operations together to say these must be done in this sequence, back to
+back.  If we want the device to be reset in order to enter RESUMING, the
+driver should simply reset the device as necessary during the state
+transition.  The outward effect to the user is to specify that device
+internal state may not be retained on transition from RUNNING ->
+RESUMING.
  
--		if (kvm_dirty_log_manual_protect_and_init_set(kvm))
--			bitmap_set(new->dirty_bitmap, 0, new->npages);
-+			if (kvm_dirty_log_manual_protect_and_init_set(kvm))
-+				bitmap_set(new->dirty_bitmap, 0, new->npages);
-+		}
- 	}
- 
- 	r = kvm_arch_prepare_memory_region(kvm, old, new, change);
- 
- 	/* Free the bitmap on failure if it was allocated above. */
--	if (r && new->dirty_bitmap && !old->dirty_bitmap)
-+	if (r && new && new->dirty_bitmap && old && !old->dirty_bitmap)
- 		kvm_destroy_dirty_bitmap(new);
- 
- 	return r;
-@@ -1608,16 +1610,16 @@ static void kvm_copy_memslot(struct kvm_memory_slot *dest,
- 
- static void kvm_invalidate_memslot(struct kvm *kvm,
- 				   struct kvm_memory_slot *old,
--				   struct kvm_memory_slot *working_slot)
-+				   struct kvm_memory_slot *invalid_slot)
- {
- 	/*
- 	 * Mark the current slot INVALID.  As with all memslot modifications,
- 	 * this must be done on an unreachable slot to avoid modifying the
- 	 * current slot in the active tree.
- 	 */
--	kvm_copy_memslot(working_slot, old);
--	working_slot->flags |= KVM_MEMSLOT_INVALID;
--	kvm_replace_memslot(kvm, old, working_slot);
-+	kvm_copy_memslot(invalid_slot, old);
-+	invalid_slot->flags |= KVM_MEMSLOT_INVALID;
-+	kvm_replace_memslot(kvm, old, invalid_slot);
- 
- 	/*
- 	 * Activate the slot that is now marked INVALID, but don't propagate
-@@ -1644,20 +1646,15 @@ static void kvm_invalidate_memslot(struct kvm *kvm,
- 	 * above.  Writers are required to retrieve memslots *after* acquiring
- 	 * slots_arch_lock, thus the active slot's data is guaranteed to be fresh.
- 	 */
--	old->arch = working_slot->arch;
-+	old->arch = invalid_slot->arch;
- }
- 
- static void kvm_create_memslot(struct kvm *kvm,
--			       const struct kvm_memory_slot *new,
--			       struct kvm_memory_slot *working)
-+			       struct kvm_memory_slot *new)
- {
--	/*
--	 * Add the new memslot to the inactive set as a copy of the
--	 * new memslot data provided by userspace.
--	 */
--	kvm_copy_memslot(working, new);
--	kvm_replace_memslot(kvm, NULL, working);
--	kvm_activate_memslot(kvm, NULL, working);
-+	/* Add the new memslot to the inactive set and activate. */
-+	kvm_replace_memslot(kvm, NULL, new);
-+	kvm_activate_memslot(kvm, NULL, new);
- }
- 
- static void kvm_delete_memslot(struct kvm *kvm,
-@@ -1666,65 +1663,36 @@ static void kvm_delete_memslot(struct kvm *kvm,
- {
- 	/*
- 	 * Remove the old memslot (in the inactive memslots) by passing NULL as
--	 * the "new" slot.
-+	 * the "new" slot, and for the invalid version in the active slots.
- 	 */
- 	kvm_replace_memslot(kvm, old, NULL);
--
--	/* And do the same for the invalid version in the active slot. */
- 	kvm_activate_memslot(kvm, invalid_slot, NULL);
--
--	/* Free the invalid slot, the caller will clean up the old slot. */
--	kfree(invalid_slot);
- }
- 
--static struct kvm_memory_slot *kvm_move_memslot(struct kvm *kvm,
--						struct kvm_memory_slot *old,
--						const struct kvm_memory_slot *new,
--						struct kvm_memory_slot *invalid_slot)
-+static void kvm_move_memslot(struct kvm *kvm,
-+			     struct kvm_memory_slot *old,
-+			     struct kvm_memory_slot *new,
-+			     struct kvm_memory_slot *invalid_slot)
- {
--	struct kvm_memslots *slots = kvm_get_inactive_memslots(kvm, old->as_id);
--
--	/*
--	 * The memslot's gfn is changing, remove it from the inactive tree, it
--	 * will be re-added with its updated gfn. Because its range is
--	 * changing, an in-place replace is not possible.
--	 */
--	kvm_erase_gfn_node(slots, old);
--
--	/*
--	 * The old slot is now fully disconnected, reuse its memory for the
--	 * persistent copy of "new".
--	 */
--	kvm_copy_memslot(old, new);
--
--	/* Re-add to the gfn tree with the updated gfn */
--	kvm_insert_gfn_node(slots, old);
--
--	/* Replace the current INVALID slot with the updated memslot. */
--	kvm_activate_memslot(kvm, invalid_slot, old);
--
- 	/*
--	 * Clear the INVALID flag so that the invalid_slot is now a perfect
--	 * copy of the old slot.  Return it for cleanup in the caller.
-+	 * Replace the old memslot in the inactive slots, and then swap slots
-+	 * and replace the current INVALID with the new as well.
- 	 */
--	WARN_ON_ONCE(!(invalid_slot->flags & KVM_MEMSLOT_INVALID));
--	invalid_slot->flags &= ~KVM_MEMSLOT_INVALID;
--	return invalid_slot;
-+	kvm_replace_memslot(kvm, old, new);
-+	kvm_activate_memslot(kvm, invalid_slot, new);
- }
- 
- static void kvm_update_flags_memslot(struct kvm *kvm,
- 				     struct kvm_memory_slot *old,
--				     const struct kvm_memory_slot *new,
--				     struct kvm_memory_slot *working_slot)
-+				     struct kvm_memory_slot *new)
- {
- 	/*
- 	 * Similar to the MOVE case, but the slot doesn't need to be zapped as
- 	 * an intermediate step. Instead, the old memslot is simply replaced
- 	 * with a new, updated copy in both memslot sets.
- 	 */
--	kvm_copy_memslot(working_slot, new);
--	kvm_replace_memslot(kvm, old, working_slot);
--	kvm_activate_memslot(kvm, old, working_slot);
-+	kvm_replace_memslot(kvm, old, new);
-+	kvm_activate_memslot(kvm, old, new);
- }
- 
- static int kvm_set_memslot(struct kvm *kvm,
-@@ -1732,19 +1700,9 @@ static int kvm_set_memslot(struct kvm *kvm,
- 			   struct kvm_memory_slot *new,
- 			   enum kvm_mr_change change)
- {
--	struct kvm_memory_slot *working;
-+	struct kvm_memory_slot *invalid_slot;
- 	int r;
- 
--	/*
--	 * Modifications are done on an unreachable slot.  Any changes are then
--	 * (eventually) propagated to both the active and inactive slots.  This
--	 * allocation would ideally be on-demand (in helpers), but is done here
--	 * to avoid having to handle failure after kvm_prepare_memory_region().
--	 */
--	working = kzalloc(sizeof(*working), GFP_KERNEL_ACCOUNT);
--	if (!working)
--		return -ENOMEM;
--
- 	/*
- 	 * Released in kvm_swap_active_memslots.
- 	 *
-@@ -1769,9 +1727,19 @@ static int kvm_set_memslot(struct kvm *kvm,
- 	 * (and without a lock), a window would exist between effecting the
- 	 * delete/move and committing the changes in arch code where KVM or a
- 	 * guest could access a non-existent memslot.
-+	 *
-+	 * Modifications are done on a temporary, unreachable slot.  The old
-+	 * slot needs to be preserved in case a later step fails and the
-+	 * invalidation needs to be reverted.
- 	 */
--	if (change == KVM_MR_DELETE || change == KVM_MR_MOVE)
--		kvm_invalidate_memslot(kvm, old, working);
-+	if (change == KVM_MR_DELETE || change == KVM_MR_MOVE) {
-+		invalid_slot = kzalloc(sizeof(*invalid_slot), GFP_KERNEL_ACCOUNT);
-+		if (!invalid_slot) {
-+			mutex_unlock(&kvm->slots_arch_lock);
-+			return -ENOMEM;
-+		}
-+		kvm_invalidate_memslot(kvm, old, invalid_slot);
-+	}
- 
- 	r = kvm_prepare_memory_region(kvm, old, new, change);
- 	if (r) {
-@@ -1781,11 +1749,12 @@ static int kvm_set_memslot(struct kvm *kvm,
- 		 * in the inactive slots.  Changing the active memslots also
- 		 * release slots_arch_lock.
- 		 */
--		if (change == KVM_MR_DELETE || change == KVM_MR_MOVE)
--			kvm_activate_memslot(kvm, working, old);
--		else
-+		if (change == KVM_MR_DELETE || change == KVM_MR_MOVE) {
-+			kvm_activate_memslot(kvm, invalid_slot, old);
-+			kfree(invalid_slot);
-+		} else {
- 			mutex_unlock(&kvm->slots_arch_lock);
--		kfree(working);
-+		}
- 		return r;
- 	}
- 
-@@ -1797,16 +1766,20 @@ static int kvm_set_memslot(struct kvm *kvm,
- 	 * old slot is detached but otherwise preserved.
- 	 */
- 	if (change == KVM_MR_CREATE)
--		kvm_create_memslot(kvm, new, working);
-+		kvm_create_memslot(kvm, new);
- 	else if (change == KVM_MR_DELETE)
--		kvm_delete_memslot(kvm, old, working);
-+		kvm_delete_memslot(kvm, old, invalid_slot);
- 	else if (change == KVM_MR_MOVE)
--		old = kvm_move_memslot(kvm, old, new, working);
-+		kvm_move_memslot(kvm, old, new, invalid_slot);
- 	else if (change == KVM_MR_FLAGS_ONLY)
--		kvm_update_flags_memslot(kvm, old, new, working);
-+		kvm_update_flags_memslot(kvm, old, new);
- 	else
- 		BUG();
- 
-+	/* Free the temporary INVALID slot used for DELETE and MOVE. */
-+	if (change == KVM_MR_DELETE || change == KVM_MR_MOVE)
-+		kfree(invalid_slot);
-+
- 	/*
- 	 * No need to refresh new->arch, changes after dropping slots_arch_lock
- 	 * will directly hit the final, active memsot.  Architectures are
-@@ -1840,8 +1813,7 @@ static bool kvm_check_memslot_overlap(struct kvm_memslots *slots, int id,
- int __kvm_set_memory_region(struct kvm *kvm,
- 			    const struct kvm_userspace_memory_region *mem)
- {
--	struct kvm_memory_slot *old;
--	struct kvm_memory_slot new;
-+	struct kvm_memory_slot *old, *new;
- 	struct kvm_memslots *slots;
- 	enum kvm_mr_change change;
- 	unsigned long npages;
-@@ -1890,11 +1862,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
- 		if (WARN_ON_ONCE(kvm->nr_memslot_pages < old->npages))
- 			return -EIO;
- 
--		memset(&new, 0, sizeof(new));
--		new.id = id;
--		new.as_id = as_id;
--
--		return kvm_set_memslot(kvm, old, &new, KVM_MR_DELETE);
-+		return kvm_set_memslot(kvm, old, NULL, KVM_MR_DELETE);
- 	}
- 
- 	base_gfn = (mem->guest_phys_addr >> PAGE_SHIFT);
-@@ -1927,14 +1895,22 @@ int __kvm_set_memory_region(struct kvm *kvm,
- 	    kvm_check_memslot_overlap(slots, id, base_gfn, base_gfn + npages))
- 		return -EEXIST;
- 
--	new.as_id = as_id;
--	new.id = id;
--	new.base_gfn = base_gfn;
--	new.npages = npages;
--	new.flags = mem->flags;
--	new.userspace_addr = mem->userspace_addr;
-+	/* Allocate a slot that will persist in the memslot. */
-+	new = kzalloc(sizeof(*new), GFP_KERNEL_ACCOUNT);
-+	if (!new)
-+		return -ENOMEM;
-+
-+	new->as_id = as_id;
-+	new->id = id;
-+	new->base_gfn = base_gfn;
-+	new->npages = npages;
-+	new->flags = mem->flags;
-+	new->userspace_addr = mem->userspace_addr;
- 
--	return kvm_set_memslot(kvm, old, &new, change);
-+	r = kvm_set_memslot(kvm, old, new, change);
-+	if (r)
-+		kfree(new);
-+	return r;
- }
- EXPORT_SYMBOL_GPL(__kvm_set_memory_region);
- 
+> > > +Continuous actions are in effect when migration_state bit groups are active:
+> > > +
+> > > + RUNNING | NDMA
+> > > +   The device is not allowed to issue new DMA operations.
+> > > +
+> > > +   Whenever the kernel returns with a migration_state of NDMA there can be no
+> > > +   in progress DMAs.
+> > > +  
+> > 
+> > There are certainly event triggered actions based on setting NDMA as
+> > well, ex. completion of outstanding DMA.  
+> 
+> I'm leaving it implied that there is always some work required to
+> begin/end these continuous behaviors
+> 
+> > > + !RUNNING
+> > > +   The device should not change its internal state. Further implies the NDMA
+> > > +   behavior above.  
+> > 
+> > Does this also imply other device regions cannot be accessed as has
+> > previously been suggested?  Which?  
+> 
+> This question is discussed/answered below
+> 
+> > > + - SAVING | RUNNING
+> > > + - NDMA
+> > > + - !RUNNING
+> > > + - SAVING | !RUNNING
+> > > + - RESUMING
+> > > + - !RESUMING
+> > > + - RUNNING
+> > > + - !NDMA  
+> > 
+> > Lots of deduction left to the reader...  
+> 
+> Do you have an alternative language? This is quite complicated, I
+> advise people to refer to mlx5's implementation.
+
+I agree with Connie on this, if the reader of the documentation needs
+to look at a specific driver implementation to understand the
+reasoning, the documentation has failed.  If it can be worked out by
+looking at the device_state write function of the mlx5 driver, then
+surely a sentence or two for each priority item can be added here.
+
+Part of the problem is that the nomenclature is unclear, we're listing
+bit combinations, but not the changed bit(s) and we need to infer the
+state.  The mlx5 driver specifically looks for individual state bit
+flips in the presence of an existing state.  I'm not able to obviously
+map the listing above to the latest posted version of the mlx5 driver.
+
+> > > +  As Peer to Peer DMA is a MMIO touch like any other, it is important that
+> > > +  userspace suspend these accesses before entering any device_state where MMIO
+> > > +  is not permitted, such as !RUNNING. This can be accomplished with the NDMA
+> > > +  state. Userspace may also choose to remove MMIO mappings from the IOMMU if the
+> > > +  device does not support NDMA and rely on that to guarantee quiet MMIO.  
+> > 
+> > Seems that would have its own set of consequences.  
+> 
+> Sure, userspace has to make choices here.
+
+It seems a bit loaded to suggest an alternative choice if it's not
+practical or equivalent.  Maybe it's largely the phrasing, I read
+"remove MMIO mappings" as to drop them dynamically, when I think we've
+discussed that userspace might actually preclude these mappings for
+non-NDMA devices such that p2p DMA cannot exist, ever.
+
+> > > +  Device that do not support NDMA cannot be configured to generate page faults
+> > > +  that require the VCPU to complete.  
+> > 
+> > So the VMM is required to hide features like PRI based on NDMA support?  
+> 
+> Yep, looks like.
+> 
+> > > +- pre-copy allows the device to implement a dirty log for its internal state.
+> > > +  During the SAVING | RUNNING state the data window should present the device
+> > > +  state being logged and during SAVING | !RUNNING the data window should present
+> > > +  the unlogged device state as well as the changes from the internal dirty log.  
+> > 
+> > This is getting a bit close to specifying an implementation.  
+> 
+> Bit close, but not too close :) I think it is clarifying to
+> describe the general working of pre-copy - at least people here raised
+> questions about what it is doing.
+> 
+> Overall it must work in this basic way, and devices have freedom about
+> what internal state they can/will log. There is just a clear division
+> that every internal state in the first step is either immutable or
+> logged, and that the second step is a delta over the first.
+
+I agree that it's a reasonable approach, though as I read the proposed
+text, there's no mention of immutable state and no reason a driver
+would implement a dirty log for immutable state, therefore we seem to
+be suggesting such data for the stop-and-copy phase when it would
+actually be preferable to include it in pre-copy.  I think the fact
+that a user is not required to run the pre-copy phase until completion
+is also noteworthy.
+
+> > > +- Migration control registers inside the same iommu_group as the VFIO device.  
+> > 
+> > Not a complete sentence, is this meant as a topic header?  
+> 
+> Sure
+>  
+> > > +  This immediately raises a security concern as user-space can use Peer to Peer
+> > > +  DMA to manipulate these migration control registers concurrently with
+> > > +  any kernel actions.
+> > > +  
+> > 
+> > We haven't defined "migration control registers" beyond device_state,
+> > which is software defined "register".  What physical registers that are
+> > subject to p2p DMA is this actually referring to?  
+> 
+> Here this is talking about the device's physical HW control registers.
+> 
+> > > +TDB - discoverable feature flag for NDMA  
+> > 
+> > Is the goal to release mlx5 support without the NDMA feature and add it
+> > later?    
+> 
+> Yishai has a patch already to add NDMA to mlx5, it will come in the
+> next iteration once we can agree on this document. qemu will follow
+> sometime later.
+
+So it's not really a TBD, it's resolved in a uAPI update that will be
+included with the next revision?  Thanks,
+
+Alex
+
