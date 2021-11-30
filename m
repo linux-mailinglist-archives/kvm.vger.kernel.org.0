@@ -2,117 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 17767463BC5
-	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 17:30:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A82E463C5F
+	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 17:57:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243878AbhK3Qdt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Nov 2021 11:33:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56604 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243846AbhK3Qdr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Nov 2021 11:33:47 -0500
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F679C061574;
-        Tue, 30 Nov 2021 08:30:27 -0800 (PST)
-Received: by mail-ed1-x531.google.com with SMTP id y12so89207439eda.12;
-        Tue, 30 Nov 2021 08:30:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=DsOmc2w83jCCkTXB0HfUYzD8fzPF4maqoG8bwemsFe0=;
-        b=lFtV6fWeCTpRcm2a4AhNpgWYrWDfsAzdKy4YtOAaANNrMnJV1NLNnh3wp7w9gerQ1Q
-         j5M3hm8t+QFiGcar3EcHCckfTmMi42KOd3p5KAQF3tu4czTS5vd738EWM3uUwqsLY8vd
-         OBlx42vvejYzVh8vESWOm5hnM2TvSa2CdvqQsADAfQXRb3/8/8vZmqMpL4Hr2q0biaNM
-         QOeXZjJvnEiWhmmzMOPNysLY8Apjp0FdsZQ6FoEShzVy8Xj+nwhH57Kc6S09NoV10tMW
-         TkTEu5TTu2lNfkSkSoILtELCmY49pSSwr4OgeaEA7MZmSjhn0TZX+uR0kwIPHNvoEb5o
-         J7Tg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=DsOmc2w83jCCkTXB0HfUYzD8fzPF4maqoG8bwemsFe0=;
-        b=d+PXk6zRnUkaxNjWJFzSvIFlWLfqlwuhRSGaqQ7s+bw4zXScOQjh9GPXuPEQWdCRHg
-         Wl947hVd/sLbRMjGrosCiiqFkGRkcPR83Sjj3Ol9YsHvSM5INzgYowPPBBRmTfkHTU9V
-         cV4egkujbE0E3FSZoxkmVy1rH5hlC8vsxIFO8sHgsXSTbZBlEzVIKJSVO2V6MNjU9kqz
-         dhHG68nZYrgZFIko5n2Z+uREy751rk8+YwasjCIaWvaN7DowZhPTJ0vxTuMo0LDwDwL2
-         DwW2jLlV3ubjh7m+8ejD8F1QcbJjnt8w+uZQOZlE4qOYtb5btGzcY83jybmCY4CrUHL0
-         jOmw==
-X-Gm-Message-State: AOAM530exYQQgyyrhCyYnvIsMu6WhctmcNpa9kTDZuRD7RsmWi0UFNIm
-        E3XLvm5oA1ijfEHGeCdL9Zw=
-X-Google-Smtp-Source: ABdhPJzDajCFfIB/lSvWEvM3dafZmgJCtC0I/KBdzagN9LMhqmokukLs3ifBB7smg58lNBRAtoVh7w==
-X-Received: by 2002:a17:906:6a08:: with SMTP id qw8mr197371ejc.200.1638289826211;
-        Tue, 30 Nov 2021 08:30:26 -0800 (PST)
-Received: from ?IPV6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a? ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
-        by smtp.googlemail.com with ESMTPSA id sc7sm10677827ejc.50.2021.11.30.08.30.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Nov 2021 08:30:25 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <edcdcf27-384c-6dd9-ec91-4b0e45c8cade@redhat.com>
-Date:   Tue, 30 Nov 2021 17:30:12 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH] KVM: VMX: Set failure code in prepare_vmcs02()
-Content-Language: en-US
-To:     Dan Carpenter <dan.carpenter@oracle.com>,
-        Oliver Upton <oupton@google.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        Peter Shier <pshier@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-References: <20211130125337.GB24578@kili>
+        id S241905AbhK3RBE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Nov 2021 12:01:04 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:27130 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231626AbhK3RBD (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 30 Nov 2021 12:01:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1638291463;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=o3GqI+aQzSaZmc8uceGxj8T0XIl/xXTBH7K23L4gwg8=;
+        b=aHUYZGzqQrrFehdTo85n9NLRFCqd6+VHG8vFBx2feWFucolCqTTbwmNfo2NYEcTlkny3Py
+        7D4So7z7qaA9fgszy29+PADHVYfyajXnCI++EDqV2wXPfnvGm1oPL4obnxXZyirGi2y9xN
+        xxct0wnNRZfonvirhzcI1AJrFkdAxC8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-557-8fA2DhY6Nta_OeExNDqJGw-1; Tue, 30 Nov 2021 11:57:40 -0500
+X-MC-Unique: 8fA2DhY6Nta_OeExNDqJGw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4014B1006AAC;
+        Tue, 30 Nov 2021 16:57:39 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E452B76612;
+        Tue, 30 Nov 2021 16:57:38 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211130125337.GB24578@kili>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [GIT PULL] KVM fixes for 5.16-rc4
+Date:   Tue, 30 Nov 2021 11:57:38 -0500
+Message-Id: <20211130165738.358058-1-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/30/21 13:53, Dan Carpenter wrote:
-> The error paths in the prepare_vmcs02() function are supposed to set
-> *entry_failure_code but this path does not.  It leads to using an
-> uninitialized variable in the caller.
-> 
-> Fixes: 71f7347025bf ("KVM: nVMX: Load GUEST_IA32_PERF_GLOBAL_CTRL MSR on VM-Entry")
-> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
-> ---
->   arch/x86/kvm/vmx/nested.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 315fa456d368..f321300883f9 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -2594,8 +2594,10 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
->   
->   	if ((vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL) &&
->   	    WARN_ON_ONCE(kvm_set_msr(vcpu, MSR_CORE_PERF_GLOBAL_CTRL,
-> -				     vmcs12->guest_ia32_perf_global_ctrl)))
-> +				     vmcs12->guest_ia32_perf_global_ctrl))) {
-> +		*entry_failure_code = ENTRY_FAIL_DEFAULT;
->   		return -EINVAL;
-> +	}
->   
->   	kvm_rsp_write(vcpu, vmcs12->guest_rsp);
->   	kvm_rip_write(vcpu, vmcs12->guest_rip);
-> 
+Linus,
 
-Yeah, I suppose that's the right thing to do (though it really shouldn't 
-happen because the value is checked earlier in 
-nested_vmx_check_guest_state).
+The following changes since commit 136057256686de39cc3a07c2e39ef6bc43003ff6:
 
-Queued, thanks.
+  Linux 5.16-rc2 (2021-11-21 13:47:39 -0800)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+
+for you to fetch changes up to 7cfc5c653b07782e7059527df8dc1e3143a7591e:
+
+  KVM: fix avic_set_running for preemptable kernels (2021-11-30 07:40:48 -0500)
+
+----------------------------------------------------------------
+ARM64:
+
+* Fix constant sign extension affecting TCR_EL2 and preventing
+running on ARMv8.7 models due to spurious bits being set
+
+* Fix use of helpers using PSTATE early on exit by always sampling
+it as soon as the exit takes place
+
+* Move pkvm's 32bit handling into a common helper
+
+RISC-V:
+
+* Fix incorrect KVM_MAX_VCPUS value
+
+* Unmap stage2 mapping when deleting/moving a memslot
+
+x86:
+
+* Fix and downgrade BUG_ON due to uninitialized cache
+
+* Many APICv and MOVE_ENC_CONTEXT_FROM fixes
+
+* Correctly emulate TLB flushes around nested vmentry/vmexit
+and when the nested hypervisor uses VPID
+
+* Prevent modifications to CPUID after the VM has run
+
+* Other smaller bugfixes
+
+Generic:
+
+* Memslot handling bugfixes
+
+----------------------------------------------------------------
+This is the large bugfix pull request that I mentioned just before rc2,
+with the APICv and MOVE_ENC_CONTEXT_FROM/COPY_ENC_CONTEXT_FROM bug
+shakedown.  It missed rc3 due to Thanksgiving (half of the patches
+are mine and I wanted to get reviews on them for obvious reasons).
+
+Thanks,
 
 Paolo
+
+Anup Patel (1):
+      RISC-V: KVM: Fix incorrect KVM_MAX_VCPUS value
+
+Ben Gardon (1):
+      KVM: x86/mmu: Fix TLB flush range when handling disconnected pt
+
+Catalin Marinas (1):
+      KVM: arm64: Avoid setting the upper 32 bits of TCR_EL2 and CPTR_EL2 to 1
+
+Hou Wenlong (2):
+      KVM: x86/mmu: Skip tlb flush if it has been done in zap_gfn_range()
+      KVM: x86/mmu: Pass parameter flush as false in kvm_tdp_mmu_zap_collapsible_sptes()
+
+Juergen Gross (1):
+      x86/kvm: remove unused ack_notifier callbacks
+
+Lai Jiangshan (2):
+      KVM: X86: Fix when shadow_root_level=5 && guest root_level<4
+      KVM: X86: Use vcpu->arch.walk_mmu for kvm_mmu_invlpg()
+
+Maciej S. Szmigiero (1):
+      KVM: selftests: page_table_test: fix calculation of guest_test_phys_mem
+
+Marc Zyngier (2):
+      KVM: arm64: Save PSTATE early on exit
+      KVM: arm64: Move pkvm's special 32bit handling into a generic infrastructure
+
+Paolo Bonzini (24):
+      Merge tag 'kvm-riscv-fixes-5.16-1' of https://github.com/kvm-riscv/linux into HEAD
+      Merge tag 'kvmarm-fixes-5.16-2' of git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm into HEAD
+      Merge branch 'kvm-5.16-fixes-pre-rc2' into HEAD
+      KVM: VMX: do not use uninitialized gfn_to_hva_cache
+      KVM: downgrade two BUG_ONs to WARN_ON_ONCE
+      KVM: x86: ignore APICv if LAPIC is not enabled
+      selftests: fix check for circular KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM
+      selftests: sev_migrate_tests: free all VMs
+      KVM: SEV: expose KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM capability
+      KVM: MMU: shadow nested paging does not have PKU
+      KVM: VMX: prepare sync_pir_to_irr for running with APICv disabled
+      KVM: x86: check PIR even for vCPUs with disabled APICv
+      KVM: x86: Use a stable condition around all VT-d PI paths
+      KVM: SEV: do not use list_replace_init on an empty list
+      KVM: SEV: cleanup locking for KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM
+      KVM: SEV: initialize regions_list of a mirror VM
+      KVM: SEV: move mirror status to destination of KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM
+      selftests: sev_migrate_tests: add tests for KVM_CAP_VM_COPY_ENC_CONTEXT_FROM
+      KVM: SEV: Do COPY_ENC_CONTEXT_FROM with both VMs locked
+      KVM: SEV: Prohibit migration of a VM that has mirrors
+      KVM: SEV: do not take kvm->lock when destroying
+      KVM: SEV: accept signals in sev_lock_two_vms
+      KVM: VMX: clear vmx_x86_ops.sync_pir_to_irr if APICv is disabled
+      KVM: fix avic_set_running for preemptable kernels
+
+Sean Christopherson (9):
+      KVM: Ensure local memslot copies operate on up-to-date arch-specific data
+      KVM: Disallow user memslot with size that exceeds "unsigned long"
+      KVM: RISC-V: Unmap stage2 mapping when deleting/moving a memslot
+      KVM: nVMX: Flush current VPID (L1 vs. L2) for KVM_REQ_TLB_FLUSH_GUEST
+      KVM: nVMX: Abide to KVM_REQ_TLB_FLUSH_GUEST request on nested vmentry/vmexit
+      KVM: nVMX: Emulate guest TLB flush on nested VM-Enter with new vpid12
+      KVM: x86/mmu: Use yield-safe TDP MMU root iter in MMU notifier unmapping
+      KVM: x86/mmu: Remove spurious TLB flushes in TDP MMU zap collapsible path
+      KVM: x86/mmu: Handle "default" period when selectively waking kthread
+
+Vitaly Kuznetsov (3):
+      KVM: selftests: Avoid KVM_SET_CPUID2 after KVM_RUN in hyperv_features test
+      KVM: x86: Forbid KVM_SET_CPUID{,2} after KVM_RUN
+      KVM: selftests: Make sure kvm_create_max_vcpus test won't hit RLIMIT_NOFILE
+
+ arch/arm64/include/asm/kvm_arm.h                   |   4 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h            |  14 ++
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h         |   7 +-
+ arch/arm64/kvm/hyp/nvhe/switch.c                   |   8 +-
+ arch/arm64/kvm/hyp/vhe/switch.c                    |   4 +
+ arch/riscv/include/asm/kvm_host.h                  |   8 +-
+ arch/riscv/kvm/mmu.c                               |   6 +
+ arch/x86/kvm/ioapic.h                              |   1 -
+ arch/x86/kvm/irq.h                                 |   1 -
+ arch/x86/kvm/lapic.c                               |   2 +-
+ arch/x86/kvm/mmu/mmu.c                             |  97 ++++++------
+ arch/x86/kvm/mmu/tdp_mmu.c                         |  38 ++---
+ arch/x86/kvm/mmu/tdp_mmu.h                         |   5 +-
+ arch/x86/kvm/svm/avic.c                            |  16 +-
+ arch/x86/kvm/svm/sev.c                             | 161 ++++++++++----------
+ arch/x86/kvm/svm/svm.c                             |   1 -
+ arch/x86/kvm/svm/svm.h                             |   1 +
+ arch/x86/kvm/vmx/nested.c                          |  49 +++---
+ arch/x86/kvm/vmx/posted_intr.c                     |  20 +--
+ arch/x86/kvm/vmx/vmx.c                             |  66 +++++----
+ arch/x86/kvm/x86.c                                 |  66 +++++++--
+ arch/x86/kvm/x86.h                                 |   7 +-
+ tools/testing/selftests/kvm/kvm_create_max_vcpus.c |  30 ++++
+ tools/testing/selftests/kvm/kvm_page_table_test.c  |   2 +-
+ .../testing/selftests/kvm/x86_64/hyperv_features.c | 140 ++++++++---------
+ .../selftests/kvm/x86_64/sev_migrate_tests.c       | 165 +++++++++++++++++++--
+ virt/kvm/kvm_main.c                                |  56 ++++---
+ 27 files changed, 623 insertions(+), 352 deletions(-)
+
