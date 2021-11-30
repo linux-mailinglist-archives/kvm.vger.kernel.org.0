@@ -2,112 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F1203463605
-	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 15:05:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F297046363C
+	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 15:12:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241970AbhK3OJN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Nov 2021 09:09:13 -0500
-Received: from Galois.linutronix.de ([193.142.43.55]:33360 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232664AbhK3OJM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Nov 2021 09:09:12 -0500
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1638281151;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=mcbj+bCt1LhWTJK3ZC+zwpXOVsK4oyc59ez8+ffOKxw=;
-        b=QiOhhXMhOivM0rbq0f+06dO8N41512FnI6RYNs0+MbOnpP8z6/8doVCE0nr/WNMA0T3WN9
-        LC2MXBUgY74N48xfsExCmsweYcgE4nppQ5iQbgGGrdy1zfT5H6Cb6+GYEhyiMGmxugpPb4
-        fWPYoz5xsna40HPs3W/UuXVZafSw2o7Q86+xNEFGyOz/whdMCjXsdmhV/PQEpl5+bLxcX0
-        nURNgrP/k6Nk9WBgUMG7ewl4nGRCs8DxYRAmPJbLFlB1PA8zTWJAuqct9jHWc723qA0bRT
-        WWM6VcwQtiD1i5nqkBBUZ7hb8Yn13RD44SIUPzcjO3DhXahnrC3ZQsmlM2p/zQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1638281151;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=mcbj+bCt1LhWTJK3ZC+zwpXOVsK4oyc59ez8+ffOKxw=;
-        b=QKR6FiQ2F4rmzipAg07BQx6w4qnJrXCOOE4/X8Ux1eS9Tn0IwA5BaK5BCQbAiEdKUE6ITR
-        njQYvzefz3NLR4Ag==
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "Huang, Kai" <kai.huang@intel.com>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        "Hansen, Dave" <dave.hansen@intel.com>,
-        "Gao, Chao" <chao.gao@intel.com>,
-        Peter Zijlstra <peterz@infradead.org>
-Subject: Re: Q. about KVM and CPU hotplug
-In-Reply-To: <3d3296f0-9245-40f9-1b5a-efffdb082de9@redhat.com>
-References: <BL1PR11MB54295ADE4D7A81523EA50B2D8C679@BL1PR11MB5429.namprd11.prod.outlook.com>
- <3d3296f0-9245-40f9-1b5a-efffdb082de9@redhat.com>
-Date:   Tue, 30 Nov 2021 15:05:50 +0100
-Message-ID: <8735ndd9hd.ffs@tglx>
+        id S236969AbhK3OQN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Nov 2021 09:16:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51510 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232213AbhK3OQM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Nov 2021 09:16:12 -0500
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08566C061574
+        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 06:12:53 -0800 (PST)
+Received: by mail-wm1-x335.google.com with SMTP id c6-20020a05600c0ac600b0033c3aedd30aso14858700wmr.5
+        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 06:12:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=references:user-agent:from:to:cc:subject:date:in-reply-to
+         :message-id:mime-version:content-transfer-encoding;
+        bh=8Xn93JXcXYRTtOD7EOYXIoNbaeFJmOBsAiqitoLCgJk=;
+        b=ywuB381uBd+1hkeF830EzjJV9PawMLMyPgGheyiUNoGiytxE9CgXK+tu0Xcv2uisGh
+         RTRhw0w36uD0f/XK/ILRhM7WJEcb5SL+qJn5P0DLZLzilOOstZS8Kx7s81HK8HEDhv8/
+         Z+Simda2xsu44BdPlX3XXhLBt+cv/SdxOCwNdGgaPrzlDFuomkTZkofVEd0g01KNoI+m
+         QjEGkdpVfjkvGaDwfemisa30Z4SMegqTCYo+gqm9AK6A/74rUV0xdkzeNmSKIeG3q2ZJ
+         Sxw0XnIj2SK8ZvN/J1W/x41xIlUHWJg9TFajZFfsFIbiEb1Myyr5ZjgZXA0a1ikJDoiN
+         XLOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:references:user-agent:from:to:cc:subject:date
+         :in-reply-to:message-id:mime-version:content-transfer-encoding;
+        bh=8Xn93JXcXYRTtOD7EOYXIoNbaeFJmOBsAiqitoLCgJk=;
+        b=1zrSv34v87ZLG0DlsBaXxqb1ZL6uG/wKes2lLBrdbKjkFDqbH8WtowNEV3hd6wg/ZE
+         SkCfiWUor2djUbI5uyoRYe+6L+5jM42Mk0r8q2vP7dekfk+tuM+ZmNdfvuf38l9gjKlX
+         BCJSCLehRzsOdvvPU6+xvCsBjZA/Vrtjw4sjIRYcPwIH4kVjJ7LQjpytWx2YxRI9nygO
+         MWxk+AiMueVD1IbSvUmzjwTG2oHjXBL0mIFLfkiERoAVVi3Yzql8/qWHoJh8DSBVEAp/
+         eNba9IkoezYDzNSGB8qVK5CHr8pKQWHLS5Y18CrPKyAS4D2gnHM+oETf34a0t712aS1W
+         6vbw==
+X-Gm-Message-State: AOAM5307PHkjeaBy5bBhRV+KoDH/xy0YGI0ktAKHST7xFVGsgu+NXLFw
+        pBdh/Noo2iQHpo/mKPaCn8epuQ==
+X-Google-Smtp-Source: ABdhPJzSykfHQLSLPFOrDvCzXmZApy1OjVhVgAuZ/JmM7o9Bb+dUIPemMJrbmTKFbG6uFli3i/0RRg==
+X-Received: by 2002:a05:600c:294c:: with SMTP id n12mr5276099wmd.71.1638281571604;
+        Tue, 30 Nov 2021 06:12:51 -0800 (PST)
+Received: from zen.linaroharston ([51.148.130.216])
+        by smtp.gmail.com with ESMTPSA id x13sm16592862wrr.47.2021.11.30.06.12.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Nov 2021 06:12:50 -0800 (PST)
+Received: from zen (localhost [127.0.0.1])
+        by zen.linaroharston (Postfix) with ESMTP id 1E4681FF96;
+        Tue, 30 Nov 2021 14:12:50 +0000 (GMT)
+References: <20211112114734.3058678-1-alex.bennee@linaro.org>
+ <20211112132312.qrgmby55mlenj72p@gator.home> <87wnldfoul.fsf@linaro.org>
+ <20211112145442.5ktlpwyolwdsxlnx@gator.home> <877dd4umy6.fsf@linaro.org>
+ <20211119183059.jwrhb77jfjbv5rbz@gator.home>
+User-agent: mu4e 1.7.5; emacs 28.0.60
+From:   Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To:     Andrew Jones <drjones@redhat.com>
+Cc:     kvm@vger.kernel.org, maz@kernel.org, shashi.mallela@linaro.org,
+        qemu-arm@nongnu.org, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org, eric.auger@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v3 0/3] GIC ITS tests
+Date:   Tue, 30 Nov 2021 14:11:34 +0000
+In-reply-to: <20211119183059.jwrhb77jfjbv5rbz@gator.home>
+Message-ID: <87a6hlzq8t.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 30 2021 at 10:28, Paolo Bonzini wrote:
 
-> On 11/30/21 09:27, Tian, Kevin wrote:
->> 		r = kvm_arch_hardware_enable();
->> 
->> 		if (r) {
->> 			cpumask_clear_cpu(cpu, cpus_hardware_enabled);
->> 			atomic_inc(&hardware_enable_failed);
->> 			pr_info("kvm: enabling virtualization on CPU%d failed\n", cpu);
->> 		}
->> 	}
->> 
->> Upon error hardware_enable_failed is incremented. However this variable
->> is checked only in hardware_enable_all() called when the 1st VM is called.
->> 
->> This implies that KVM may be left in a state where it doesn't know a CPU
->> not ready to host VMX operations.
->> 
->> Then I'm curious what will happen if a vCPU is scheduled to this CPU. Does
->> KVM indirectly catch it (e.g. vmenter fail) and return a deterministic error
->> to Qemu at some point or may it lead to undefined behavior? And is there
->> any method to prevent vCPU thread from being scheduled to the CPU?
+Andrew Jones <drjones@redhat.com> writes:
+
+> On Fri, Nov 19, 2021 at 04:30:47PM +0000, Alex Benn=C3=A9e wrote:
+>>=20
+>> Andrew Jones <drjones@redhat.com> writes:
+>>=20
+>> > On Fri, Nov 12, 2021 at 02:08:01PM +0000, Alex Benn=C3=A9e wrote:
+>> >>=20
+>> >> Andrew Jones <drjones@redhat.com> writes:
+>> >>=20
+>> >> > On Fri, Nov 12, 2021 at 11:47:31AM +0000, Alex Benn=C3=A9e wrote:
+>> >> >> Hi,
+>> >> >>=20
+>> >> >> Sorry this has been sitting in my tree so long. The changes are fa=
+irly
+>> >> >> minor from v2. I no longer split the tests up into TCG and KVM
+>> >> >> versions and instead just ensure that ERRATA_FORCE is always set w=
+hen
+>> >> >> run under TCG.
+>> >> >>=20
+>> >> >> Alex Benn=C3=A9e (3):
+>> >> >>   arm64: remove invalid check from its-trigger test
+>> >> >>   arm64: enable its-migration tests for TCG
+>> >> >>   arch-run: do not process ERRATA when running under TCG
+>> >> >>=20
+>> >> >>  scripts/arch-run.bash |  4 +++-
+>> >> >>  arm/gic.c             | 16 ++++++----------
+>> >> >>  arm/unittests.cfg     |  3 ---
+>> >> >>  3 files changed, 9 insertions(+), 14 deletions(-)
+>> >> >>=20
+>> >> >> --=20
+>> >> >> 2.30.2
+>> >> >>=20
+>> >> >> _______________________________________________
+>> >> >> kvmarm mailing list
+>> >> >> kvmarm@lists.cs.columbia.edu
+>> >> >> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+>> >> >
+>> >> > Hi Alex,
+>> >> >
+>> >> > Thanks for this. I've applied to arm/queue, but I see that
+>> >> >
+>> >> > FAIL: gicv3: its-trigger: inv/invall: dev2/eventid=3D20 pending LPI=
+ is received
+>> >> >
+>> >> > consistently fails for me. Is that expected? Does it work for you?
+>> >>=20
+>> >> doh - looks like I cocked up the merge conflict...
+>> >>=20
+>> >> Did it fail for TCG or for KVM (or both)?
+>> >
+>> > Just TCG, which was why I was wondering if it was expected. I've never=
+ run
+>> > these tests with TCG before.
+>>=20
+>> Hmm I think expecting the IRQ at all is broken so I think I should
+>> delete the whole pending test.
 >
-> It should fail the first vmptrld instruction.  It will result in a few 
-> WARN_ONCE and pr_warn_ratelimited (see vmx_insn_failed).  For VMX this 
-> should be a pretty bad firmware bug, and it has never been reported. 
-> KVM did find some undocumented errata but not this one!
+> Feel free to repost. I'll update the patches in arm/queue before my next
+> MR.
+
+Actually I think the problem was with a regression in the TCG ITS
+support (now fixed in master). So I believe as of v3 everything is
+correct (and v4 should be ignored).
+
+Are you happy to apply this series or do you want me to repost it as v5?
+
 >
-> I don't think there's any fix other than pinning userspace.  The WARNs 
-> can be eliminated by calling KVM_BUG_ON in the sched_in notifier, plus 
-> checking if the VM is bugged before entering the guest or doing a 
-> VMREAD/VMWRITE (usually the check is done only in a ioctl).  But some 
-> refactoring is probably needed to make the code more robust in general.
+> Thanks,
+> drew
 
-Why is this hotplug callback in the CPU starting section to begin with?
 
-If you stick it into the online section which runs on the hotplugged CPU
-in thread context:
-
-	CPUHP_AP_ONLINE_IDLE,
-
--->   	CPUHP_AP_KVM_STARTING,
-
-	CPUHP_AP_SCHED_WAIT_EMPTY,
-
-then it is allowed to fail and it still works in the right way.
-
-When onlining a CPU then there cannot be any vCPU task run on the
-CPU at that point.
-
-When offlining a CPU then it's guaranteed that all user tasks and
-non-pinned kernel tasks have left the CPU, i.e. there cannot be a vCPU
-task around either.
-
-Thanks,
-
-        tglx
-
+--=20
+Alex Benn=C3=A9e
