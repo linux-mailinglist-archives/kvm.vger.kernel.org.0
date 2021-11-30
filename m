@@ -2,108 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BB7F4463ADF
-	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 17:02:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 39155463B3A
+	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 17:09:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243308AbhK3QFS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Nov 2021 11:05:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49666 "EHLO
+        id S243920AbhK3QLz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Nov 2021 11:11:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51166 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239833AbhK3QFP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Nov 2021 11:05:15 -0500
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9198EC061746
-        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 08:01:55 -0800 (PST)
-Received: by mail-pf1-x42a.google.com with SMTP id z6so21071986pfe.7
-        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 08:01:55 -0800 (PST)
+        with ESMTP id S243677AbhK3QLZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Nov 2021 11:11:25 -0500
+Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61182C061757;
+        Tue, 30 Nov 2021 08:07:49 -0800 (PST)
+Received: by mail-wm1-x329.google.com with SMTP id p3-20020a05600c1d8300b003334fab53afso19937380wms.3;
+        Tue, 30 Nov 2021 08:07:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=u7qkJO95z6PA+5n1Ta+ydAPJV1GYiaGJee3oSFozDEQ=;
-        b=IFt8Tn+vxT21IpZwc1G2oIIymlaJa/rS9tPtD65lbJffdgHBV1ma5O+UrZYwQ+fpdE
-         uwo6I7onE1BcdE7rFH+Hyh0hfFqAisvMusQkVDnpcHVSrvYxwu/WDFInlFXrsly+Ij2o
-         2/e4EmCPBpf191/pzWGolf7xwlV4RVdA29Ob/MYDXJBNJmWraO+ef5IZrdWd5kTDzB4e
-         d43mrcg7DtKvEkstc8pI3DgJG4GKmHwqmVLDDfyMhJ97ZgjBvOWiiQyopaZ3i2tEV+Wm
-         Ley8rcpzQAb/T5TWz2UVrLchpAFSSyi8rw3PYzcbp2+rhJJ9SoKb3AYBUyt5a90Advl4
-         9BwQ==
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=3a/iKsjufsiAbrGQuBxVCPIZkwax7Upszpd7LsuYfCk=;
+        b=ZI1KOydZ+qECl1hqlo+ZNsiRXNRPZ13T8K4/YJ6MoYcN5dN+LuRV3/IQ1KEUDcU0Vw
+         Vjwuujw+ZbUsGVxN5Eebh9Z/n26MQhlQ8ehFqn4X/Hvewkjsw0COQl31001ZyKeNY6Mz
+         nuTJWwgKAs8576y3o//cH27vL1awmnJNNBybZbxu9KQow1/gfFg/9iui3rvWtw7fesoJ
+         uB58hek4VV+WXZz0jg3T4XAAPkiLiwUG82CWXZnawo+wiwrKp8M/XU1sqUquvCA81ibB
+         cUgcgGRDa/rJerB9C4tYdPDW2u0xS9fOOZeboK+o+lFF3SNVDw/1NfjIHFtj7/tD9ggY
+         AZhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=u7qkJO95z6PA+5n1Ta+ydAPJV1GYiaGJee3oSFozDEQ=;
-        b=WaGGDOLOtJxeEVpxGTUuztPDTeDh0JT0pQIw2UGKvJp780GpA0AS0nQiTiVsCccXDm
-         s/hOHnNUEKafcuTs54ancJzoNmAmgyOoFJa8sOW9XL91doVrvNd97U7qn4gDNSeX38TY
-         Jj0g70ytOgTfnQbQxaFNGCmSdpv0raqZCMWkOZ8b4zgrmU0qd3WwbsX/JJNsXvLCRvEF
-         fV4BbEjuTNeKFK4P35eKlQGnm9YPNo52ludx4l8HJsif+cRtprIXvv1XAGi6WiQ2aXaj
-         T6Kl2YNXxkQXvcZunPPxQmNhJW/G3k/XON/JBS4keQeR77BKIUceTi1MhRV44iBx7M2r
-         43eA==
-X-Gm-Message-State: AOAM533nhSGHrtfmYnzvnXFPTAQySeXHtxFZOYxNMuDp5AGzUEzD0WjZ
-        DZBOQiKqNivhQThorV/5afROZVV2HhzfFA==
-X-Google-Smtp-Source: ABdhPJzONHfSHYXg+nJ0762Y3NxbBOp1zkuKvTXs/1E3XWI7EUSQt6W9dr/3AVTdAHDoxFeRyZbz9A==
-X-Received: by 2002:a65:4bc6:: with SMTP id p6mr23381pgr.544.1638288114791;
-        Tue, 30 Nov 2021 08:01:54 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id lp12sm3366048pjb.24.2021.11.30.08.01.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Nov 2021 08:01:54 -0800 (PST)
-Date:   Tue, 30 Nov 2021 16:01:50 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Shier <pshier@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Keqian Zhu <zhukeqian1@huawei.com>,
-        David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH 15/15] KVM: x86/mmu: Promote pages in-place when
- disabling dirty logging
-Message-ID: <YaZK7lxaBMGfYIdz@google.com>
-References: <20211115234603.2908381-1-bgardon@google.com>
- <20211115234603.2908381-16-bgardon@google.com>
- <YZ8OpQmB/8k3/Maj@xz-m1.local>
- <CANgfPd9pK83S+yoRokLg7wiroE6-OkieATTqgGn3yCCzwNFi4A@mail.gmail.com>
- <YaXSh6RUOH7NHG8G@xz-m1.local>
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=3a/iKsjufsiAbrGQuBxVCPIZkwax7Upszpd7LsuYfCk=;
+        b=iGKGBL2bKj0s0qj+KzC1NpusPpvVp+EHB+cA1KEchyQMPLH7OHCYwwDc8VPUDoLZ2a
+         8ngwre1MCAYxB6OkOHgxOzkQREba1F4WVDJ9arvG/N0nEJxigfM9JD7K3RSsA18bWOk3
+         tzzVzIcvWxPSHlBOFTu9EnNHTuTzv7WZ2d8YPWzb5vUlQOpcqK61dIC7VUd/NFfVo07e
+         oCiJLIunN1ZUOugMQ4AVkku+Mj1QuiaBcSyifBTKo00ciIzoPznbxdTDrdDrXcFtnx19
+         sO4WsVE6j+Z9oN61k84LGzpsc60tP49jDm0uuihQBYeZw6vv10ByHJDE/GBRLewZhCWg
+         zeMg==
+X-Gm-Message-State: AOAM5320CuEJNaoLdDl4AssCgYNASqKactXgSa6CzY0NiorueH9y6CSM
+        QsqWPrqMM+cs/T5Y+xdDa+k=
+X-Google-Smtp-Source: ABdhPJx5Dhy4cMIe37LwwIVlRqxg9qfG8bQ1tYjpplU8k4zyM3CqmxKNVQMvmem1SJ3HAhFFd8xyTQ==
+X-Received: by 2002:a05:600c:3489:: with SMTP id a9mr411960wmq.120.1638288467956;
+        Tue, 30 Nov 2021 08:07:47 -0800 (PST)
+Received: from ?IPV6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a? ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
+        by smtp.googlemail.com with ESMTPSA id m36sm3269698wms.25.2021.11.30.08.07.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 Nov 2021 08:07:47 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <3f5adff7-f321-0688-c817-84975ebd3d14@redhat.com>
+Date:   Tue, 30 Nov 2021 17:07:36 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH v2 10/43] KVM: arm64: Move vGIC v4 handling for WFI out
+ arch callback hook
+Content-Language: en-US
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Anup Patel <anup.patel@wdc.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Atish Patra <atish.patra@wdc.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        David Matlack <dmatlack@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+References: <20211009021236.4122790-1-seanjc@google.com>
+ <20211009021236.4122790-11-seanjc@google.com>
+ <9236e715-c471-e1c8-6117-6f37b908a6bd@redhat.com>
+ <875ytjbxpq.wl-maz@kernel.org>
+ <be1cf8c7-ed87-b8eb-1bca-0a6c7505d7f8@redhat.com>
+ <3490c50e-50d2-f906-3383-b87e14b14fab@redhat.com>
+ <4826a7e2dbecc5d57323d18d725d6d69@kernel.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <4826a7e2dbecc5d57323d18d725d6d69@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <YaXSh6RUOH7NHG8G@xz-m1.local>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 30, 2021, Peter Xu wrote:
-> On Mon, Nov 29, 2021 at 10:31:14AM -0800, Ben Gardon wrote:
-> > 2. There could be a pointer to the page table in a vCPU's paging
-> > structure caches, which are similar to the TLB but cache partial
-> > translations. These are also cleared out on TLB flush.
+On 11/30/21 13:04, Marc Zyngier wrote:
+>>>
+>>> I have "queued" it, but that's just my queue - it's not on kernel.org 
+>>> and it's not going to be in 5.16, at least not in the first batch.
+>>>
+>>> There's plenty of time for me to rebase on top of a fix, if you want 
+>>> to send the fix through your kvm-arm pull request.  Just Cc me so 
+>>> that I understand what's going on.
+>>
+>> Since a month has passed and I didn't see anything related in the
+>> KVM-ARM pull requests, I am going to queue this patch.  Any conflicts
+>> can be resolved through a kvmarm->kvm merge of either a topic branch
+>> or a tag that is destined to 5.16.
 > 
-> Could you elaborate what's the structure cache that you mentioned?  I thought
-> the processor page walker will just use the data cache (L1-L3) as pgtable
-> caches, in which case IIUC the invalidation happens when we do WRITE_ONCE()
-> that'll invalidate all the rest data cache besides the writter core.  But I
-> could be completely missing something..
+> Can you at least spell out *when* this will land?
 
-Ben is referring to the Intel SDM's use of the term "paging-structure caches"
-Intel CPUs, and I'm guessing other x86 CPUs, cache upper level entries, e.g. the
-L4 PTE for a given address, to avoid having to do data cache lookups, reserved
-bits checked, A/D assists, etc...   Like full VA=>PA TLB entries, these entries
-are associated with the PCID, VPID, EPT4A, etc...
+It will be in kvm/next as soon as I finish running tests on it, which 
+may take a couple more days because I'm updating my machines to newer 
+operating systems.
 
-The data caches are still used when reading PTEs that aren't cached in the TLB,
-the extra caching in the "TLB" is optimization on top.
+> There is, in general, a certain lack of clarity about what you are queuing,
+> where you are queuing it, and what release it targets.
 
-  28.3.1 Information That May Be Cached
-  Section 4.10, “Caching Translation Information” in Intel® 64 and IA-32 Architectures
-  Software Developer’s Manual, Volume 3A identifies two kinds of translation-related
-  information that may be cached by a logical processor: translations, which are mappings
-  from linear page numbers to physical page frames, and paging-structure caches, which
-  map the upper bits of a linear page number to information from the paging-structure
-  entries used to translate linear addresses matching those upper bits.
+Ok, thanks for the suggestion.  Generally speaking:
+
+- kvm/master is stuff that is merged and will be in the next -rc, right 
+now 5.16-rc4.  It shouldn't ever rewind (though it may happen, it is rare)
+
+- kvm/next is stuff that is merged and will be in the next merge window, 
+right now 5.17.  It also shouldn't rewind.
+
+- kvm/queue is stuff that the submitter shouldn't care about, and that 
+other people should only care about to check for conflicts.  When I say 
+I "queued" a patch it goes in kvm/queue, and there's time to remove it 
+if something breaks.
+
+Regarding this series:
+
+- I am queuing it up to this patch
+
+- I am queuing it to kvm/next, meaning it targets 5.17
+
+- it looks like the next one (11/43) triggers a known AMD errata, so I'm 
+holding on the rest until we understand if it actually does, and if so 
+if AMD AVIC is doomed.  For the time being, it will stay in kvm/queue.
+
+Paolo
