@@ -2,110 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 458A5463BBC
-	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 17:27:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 17767463BC5
+	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 17:30:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243920AbhK3Qat (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Nov 2021 11:30:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55856 "EHLO
+        id S243878AbhK3Qdt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Nov 2021 11:33:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244030AbhK3Qa3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Nov 2021 11:30:29 -0500
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0EF8C061574;
-        Tue, 30 Nov 2021 08:27:09 -0800 (PST)
-Received: by mail-ed1-x52c.google.com with SMTP id z5so24012550edd.3;
-        Tue, 30 Nov 2021 08:27:09 -0800 (PST)
+        with ESMTP id S243846AbhK3Qdr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Nov 2021 11:33:47 -0500
+Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F679C061574;
+        Tue, 30 Nov 2021 08:30:27 -0800 (PST)
+Received: by mail-ed1-x531.google.com with SMTP id y12so89207439eda.12;
+        Tue, 30 Nov 2021 08:30:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=sender:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=gseVlYCCu9tLJSTOHUcBNWkzNUHx5NAVjG9KtVrF/70=;
-        b=evCZzS0VaSrgQVmqh2o+0NLlibjGGYOSqiDMLtkbyRCf6zAMwzRtuRW+18pgaYtclP
-         f7rI8tFdZRP69pDOxdjr9q0KvklCtNp+ubOoHTMylPKYS3KniZ/krHIcdB4LaFnFJGFK
-         mRd3Co3z2xxUv/utFUVgAFunHzOYhGFWLbuzQoM7MN9EqW5DWMklB3Ss1cPSfDWLgCVl
-         RI44aNzZLrmci8U06uAQSnbY3VXT+KAkhLU5iTS5uqU3Dv9avlSKZ48neamRtTLngWd8
-         jXRl+KsvWhUrI73HT0cskYR10YbL6omMO+gzWNCsrKwkWRYy3PMMkXpEurvjACOlTN3r
-         pDxw==
+        bh=DsOmc2w83jCCkTXB0HfUYzD8fzPF4maqoG8bwemsFe0=;
+        b=lFtV6fWeCTpRcm2a4AhNpgWYrWDfsAzdKy4YtOAaANNrMnJV1NLNnh3wp7w9gerQ1Q
+         j5M3hm8t+QFiGcar3EcHCckfTmMi42KOd3p5KAQF3tu4czTS5vd738EWM3uUwqsLY8vd
+         OBlx42vvejYzVh8vESWOm5hnM2TvSa2CdvqQsADAfQXRb3/8/8vZmqMpL4Hr2q0biaNM
+         QOeXZjJvnEiWhmmzMOPNysLY8Apjp0FdsZQ6FoEShzVy8Xj+nwhH57Kc6S09NoV10tMW
+         TkTEu5TTu2lNfkSkSoILtELCmY49pSSwr4OgeaEA7MZmSjhn0TZX+uR0kwIPHNvoEb5o
+         J7Tg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
          :subject:content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=gseVlYCCu9tLJSTOHUcBNWkzNUHx5NAVjG9KtVrF/70=;
-        b=Q8/whHjnJD8qE5jzS6wjtanRGKqLqVaeiUyJHyPA1Vw1IbVI7JvTxL+OjcJgaMPgeN
-         qMPvegfOqE3VjQiqf6AqldtCgXo2cGKnXSa7+tUMsvBWfnj8K6Q0FDNatgyDUcA2morf
-         Ucj0qsodE6vaZB47WGHcQ+lNS8M3hHY4BroIPq5ATZVeIpOTZ5jCs/CzilcKSH0RjuYH
-         g50QIlrfxLfp+smRzp0Oveo393YctJNuAQGAmH2dKWpiiqzDNZRGlVTN3cWP7jYeTRJO
-         7hT2GV3RF3q6sSEa5ft/L3SHcksWDc1Alv/fka5ATwYaYzGvYiap795WPbT8PTvag3e2
-         i+CQ==
-X-Gm-Message-State: AOAM532FsbCMiClDa+EfGHrEsMd4Ytjx3WrLLkl7VdTugVrOEeTy6Uxx
-        4Rj3I0X9z05I9HqHC/ca0AcR+6GK2DM=
-X-Google-Smtp-Source: ABdhPJzVyOCSGpRPVxDg1bgQ9dpiLa+XdW4dLaMlSMGX75wPCKXmOPQV7MApgugUEEDTh5PuUbPWmg==
-X-Received: by 2002:a17:907:2d21:: with SMTP id gs33mr72020ejc.549.1638289628406;
-        Tue, 30 Nov 2021 08:27:08 -0800 (PST)
+        bh=DsOmc2w83jCCkTXB0HfUYzD8fzPF4maqoG8bwemsFe0=;
+        b=d+PXk6zRnUkaxNjWJFzSvIFlWLfqlwuhRSGaqQ7s+bw4zXScOQjh9GPXuPEQWdCRHg
+         Wl947hVd/sLbRMjGrosCiiqFkGRkcPR83Sjj3Ol9YsHvSM5INzgYowPPBBRmTfkHTU9V
+         cV4egkujbE0E3FSZoxkmVy1rH5hlC8vsxIFO8sHgsXSTbZBlEzVIKJSVO2V6MNjU9kqz
+         dhHG68nZYrgZFIko5n2Z+uREy751rk8+YwasjCIaWvaN7DowZhPTJ0vxTuMo0LDwDwL2
+         DwW2jLlV3ubjh7m+8ejD8F1QcbJjnt8w+uZQOZlE4qOYtb5btGzcY83jybmCY4CrUHL0
+         jOmw==
+X-Gm-Message-State: AOAM530exYQQgyyrhCyYnvIsMu6WhctmcNpa9kTDZuRD7RsmWi0UFNIm
+        E3XLvm5oA1ijfEHGeCdL9Zw=
+X-Google-Smtp-Source: ABdhPJzDajCFfIB/lSvWEvM3dafZmgJCtC0I/KBdzagN9LMhqmokukLs3ifBB7smg58lNBRAtoVh7w==
+X-Received: by 2002:a17:906:6a08:: with SMTP id qw8mr197371ejc.200.1638289826211;
+        Tue, 30 Nov 2021 08:30:26 -0800 (PST)
 Received: from ?IPV6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a? ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
-        by smtp.googlemail.com with ESMTPSA id g1sm9163514eje.105.2021.11.30.08.27.04
+        by smtp.googlemail.com with ESMTPSA id sc7sm10677827ejc.50.2021.11.30.08.30.14
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Nov 2021 08:27:07 -0800 (PST)
+        Tue, 30 Nov 2021 08:30:25 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <527c1261-8f21-bcbe-e28e-652a1e37ab14@redhat.com>
-Date:   Tue, 30 Nov 2021 17:27:02 +0100
+Message-ID: <edcdcf27-384c-6dd9-ec91-4b0e45c8cade@redhat.com>
+Date:   Tue, 30 Nov 2021 17:30:12 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.2.0
-Subject: Re: Q. about KVM and CPU hotplug
+Subject: Re: [PATCH] KVM: VMX: Set failure code in prepare_vmcs02()
 Content-Language: en-US
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "Huang, Kai" <kai.huang@intel.com>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        "Hansen, Dave" <dave.hansen@intel.com>,
-        "Gao, Chao" <chao.gao@intel.com>,
-        Peter Zijlstra <peterz@infradead.org>
-References: <BL1PR11MB54295ADE4D7A81523EA50B2D8C679@BL1PR11MB5429.namprd11.prod.outlook.com>
- <3d3296f0-9245-40f9-1b5a-efffdb082de9@redhat.com> <8735ndd9hd.ffs@tglx>
+To:     Dan Carpenter <dan.carpenter@oracle.com>,
+        Oliver Upton <oupton@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        Peter Shier <pshier@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+References: <20211130125337.GB24578@kili>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <8735ndd9hd.ffs@tglx>
+In-Reply-To: <20211130125337.GB24578@kili>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/30/21 15:05, Thomas Gleixner wrote:
-> Why is this hotplug callback in the CPU starting section to begin with?
+On 11/30/21 13:53, Dan Carpenter wrote:
+> The error paths in the prepare_vmcs02() function are supposed to set
+> *entry_failure_code but this path does not.  It leads to using an
+> uninitialized variable in the caller.
+> 
+> Fixes: 71f7347025bf ("KVM: nVMX: Load GUEST_IA32_PERF_GLOBAL_CTRL MSR on VM-Entry")
+> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+> ---
+>   arch/x86/kvm/vmx/nested.c | 4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> index 315fa456d368..f321300883f9 100644
+> --- a/arch/x86/kvm/vmx/nested.c
+> +++ b/arch/x86/kvm/vmx/nested.c
+> @@ -2594,8 +2594,10 @@ static int prepare_vmcs02(struct kvm_vcpu *vcpu, struct vmcs12 *vmcs12,
+>   
+>   	if ((vmcs12->vm_entry_controls & VM_ENTRY_LOAD_IA32_PERF_GLOBAL_CTRL) &&
+>   	    WARN_ON_ONCE(kvm_set_msr(vcpu, MSR_CORE_PERF_GLOBAL_CTRL,
+> -				     vmcs12->guest_ia32_perf_global_ctrl)))
+> +				     vmcs12->guest_ia32_perf_global_ctrl))) {
+> +		*entry_failure_code = ENTRY_FAIL_DEFAULT;
+>   		return -EINVAL;
+> +	}
+>   
+>   	kvm_rsp_write(vcpu, vmcs12->guest_rsp);
+>   	kvm_rip_write(vcpu, vmcs12->guest_rip);
+> 
 
-Just because the old notifier implementation used CPU_STARTING - in fact 
-the commit messages say that CPU_STARTING was added partly *for* KVM 
-(commit e545a6140b69, "kernel/cpu.c: create a CPU_STARTING cpu_chain 
-notifier", 2008-09-08).
+Yeah, I suppose that's the right thing to do (though it really shouldn't 
+happen because the value is checked earlier in 
+nested_vmx_check_guest_state).
 
-> If you stick it into the online section which runs on the hotplugged CPU
-> in thread context:
-> 
-> 	CPUHP_AP_ONLINE_IDLE,
-> 
-> -->   	CPUHP_AP_KVM_STARTING,
-> 
-> 	CPUHP_AP_SCHED_WAIT_EMPTY,
-> 
-> then it is allowed to fail and it still works in the right way.
-
-Yes, moving it to the online section should be fine; it wouldn't solve 
-the TDX problem however.  Failure would rollback the hotplug and forbid 
-hotplug altogether when TDX is loaded, which is not acceptable.
+Queued, thanks.
 
 Paolo
-
-> When onlining a CPU then there cannot be any vCPU task run on the
-> CPU at that point.
-> 
-> When offlining a CPU then it's guaranteed that all user tasks and
-> non-pinned kernel tasks have left the CPU, i.e. there cannot be a vCPU
-> task around either.
-
