@@ -2,285 +2,205 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D86694629A4
-	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 02:25:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A10434629BA
+	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 02:30:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236182AbhK3B2d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Nov 2021 20:28:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45562 "EHLO
+        id S236373AbhK3Bdc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Nov 2021 20:33:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46706 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236046AbhK3B2c (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Nov 2021 20:28:32 -0500
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80BD6C061574
-        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 17:25:13 -0800 (PST)
-Received: by mail-lj1-x22e.google.com with SMTP id d11so37935712ljg.8
-        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 17:25:13 -0800 (PST)
+        with ESMTP id S236332AbhK3Bdc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Nov 2021 20:33:32 -0500
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2616C061574
+        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 17:30:13 -0800 (PST)
+Received: by mail-pl1-x634.google.com with SMTP id b11so13596323pld.12
+        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 17:30:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=1aOU62sEoY17NbFNbDybiVS0K59KvQupYrTSRVeXj/A=;
-        b=HyW4IaEHVteybeW/M0Z4jR0YqK2TCk5Kkdv1RkQqD8D63Kpi89zOcDlp1la7UYPsRS
-         3EUwKSVoEsmMH6gkBc59W0P+RrUoBliJY+1gb8XdHPOd/FtlvxAGHeD3qyZsdSkUVLb6
-         bIhlwFqWm2PDTEjHHzRbs7dgZQBjQAecMmwBN7M9oEcoTaTxDdXsnrxej2SdVtW6nG4U
-         m/D77jWQ5ICZeLrA5bUJPb2eBR9fvBHLMsVWYSzz0R6nas82QcrAih0esrPjyMYuA7Px
-         jbeDuTMnj+dbsOl+xhtClgUXR5IA3vr3pj1aJlnVWvoIdj0oLMVJb/oMar+Frtef+gYy
-         ASjQ==
+         :cc;
+        bh=z6k0u76oLfrxFnRfCQqpgH3a7DGT8Svyiv/OozS9s8Q=;
+        b=e+pDAbhA3qgo5VrRLD3GioZhOJH88Y+ZobynMlP5+GQ3GX6zzk43B/1yG+rsEjTK2j
+         jDOwaSNw3exODm+rdBqEbseuVL90SfGErs9xFCBOAFKDOnF2L47MddrQrzeBo49E67Ac
+         xawvOZp1p9ika1lAvGxvLrtaSlCN/xAwB6Nl1eK33Iixtbjn3fJMew6EpmlxshrqqTww
+         5/sixT3Bp6t/lvEBrEIIuZnD0FvTLRX8glF8VI7PW4vkXKw/5gDN2XKrn5/l0rP5wF/x
+         5Tp0aZXrijks003EJUQX09dSEA3bhgVpqSOt36HfY699jD2sNR9secXTNrMHHrLVRa9D
+         pODg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=1aOU62sEoY17NbFNbDybiVS0K59KvQupYrTSRVeXj/A=;
-        b=2jRA4/MohN9ETwGpb7fELlFuagIYCRXVQGu1UTQCuL12fADP9kJbu9CU8AtaLgpyEw
-         YLcnJZoEXdZbQBsazEg1LGQcm6I3/2i1kQOn5UoHn+qi5Xhuxzk4YrCff+2P+Zkkjd8L
-         DEAD3HQI22TYF8tKvxufrPsqgipT8iAPMuslvdGQwubCgqgBKh1PvQGaSBEQjcsqmz9p
-         xTOmBALHC0qho9dmVnrohCDBSYmfY+9aQHsW4G3TLYKM7rP6H1D8PtV8Xbao3xaTyJFj
-         CTSVU24vngIPgU97sUpNCZl2vZMG5erBh9JXhOyc035f94hy+sn4pTldgpaRL3IqQqYz
-         lveA==
-X-Gm-Message-State: AOAM533NRZbnJt6F6lKUyxdx9b4sWPK/0GpZ3ONfG3hWjj5ZlGJzuIVa
-        HrFBPlRVuuaJpgoyryNfFgpRCQMdW/HPQKESxtDVWtnDl6E=
-X-Google-Smtp-Source: ABdhPJxttSh9XdFPcNOWvXNMWWNt8QdUamM0+EPygp4nvEYFPqPBpnT8xC/kB4mnwwwxF+M2bDGZyQUl/U4Ro5fhkAU=
-X-Received: by 2002:a2e:8991:: with SMTP id c17mr50284659lji.361.1638235511602;
- Mon, 29 Nov 2021 17:25:11 -0800 (PST)
+         :message-id:subject:to:cc;
+        bh=z6k0u76oLfrxFnRfCQqpgH3a7DGT8Svyiv/OozS9s8Q=;
+        b=DRti9o9DoOoUEzb5bzoAog2mjvQzqMHjw/B79xM+769ZlNHW22rCY7/NEGybS6H1H2
+         K6ArZyvS4OCuHfd4uCLbjHU+QtgcZQyIun3QcFzyfQrpxx949u//jckBXH0nh1RjS4uw
+         LqOTQxWCpQrG0S3204GPYFfdeJ7BdBYmlm2JGUbAG25dpDoVU9adJTpZug+WgYbLygBY
+         YuvwhWgcLCfa0ZSa+i55mbT5WloTAHl8F3lBXfw5SSJECYxhXaX9pcg8XniAx0gKnL5C
+         qeTYoR0Mf+DL8F4e3o2E+tvUmy3vkA1XlJ6vtWut3Bn+TKEcjnL6ctPiKxVsG84NXXyQ
+         z1BA==
+X-Gm-Message-State: AOAM532lL/lQLUN8M17eXc3xv4aJyRiPnIgA1J1Ujr3iw7704sJ/4MTz
+        osovKRuEnfvVkXOF2mNNkz9czaXvysIDZ6HUnbfQcg==
+X-Google-Smtp-Source: ABdhPJzq1HYUtohDmdrT9AteQ7TOnwp5TltRApAUwblcjchFt88a9JJpwnFl4yiZ3v/V9q0A0N9AnzGuPZTdwUJXvTg=
+X-Received: by 2002:a17:902:aa43:b0:142:6919:73da with SMTP id
+ c3-20020a170902aa4300b00142691973damr63733052plr.39.1638235813148; Mon, 29
+ Nov 2021 17:30:13 -0800 (PST)
 MIME-Version: 1.0
-References: <20211115211704.2621644-1-bgardon@google.com> <YZL1ZiKQVRQd8rZi@google.com>
-In-Reply-To: <YZL1ZiKQVRQd8rZi@google.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Mon, 29 Nov 2021 17:24:45 -0800
-Message-ID: <CALzav=cXWUUrKFwKgTEKjb=TQTLTNcQv62BwjdyUqsLjwYZ=hQ@mail.gmail.com>
-Subject: Re: [PATCH 1/1] KVM: x86/mmu: Fix TLB flush range when handling
- disconnected pt
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Keqian Zhu <zhukeqian1@huawei.com>,
-        David Hildenbrand <david@redhat.com>, stable@vger.kernel.org
+References: <20211117064359.2362060-1-reijiw@google.com> <20211117064359.2362060-5-reijiw@google.com>
+ <b56f871c-11da-e8ff-e90e-0ec3b4c0207f@redhat.com>
+In-Reply-To: <b56f871c-11da-e8ff-e90e-0ec3b4c0207f@redhat.com>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Mon, 29 Nov 2021 17:29:57 -0800
+Message-ID: <CAAeT=Fz96dYR2m7UbgVw_SjNV6wheYBfSx+m+zCWbnHWHkcQdw@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 04/29] KVM: arm64: Make ID_AA64PFR0_EL1 writable
+To:     Eric Auger <eauger@redhat.com>
+Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+        Peter Shier <pshier@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-arm-kernel@lists.infradead.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 15, 2021 at 4:03 PM Sean Christopherson <seanjc@google.com> wro=
-te:
+Hi Eric,
+
+On Thu, Nov 25, 2021 at 7:35 AM Eric Auger <eauger@redhat.com> wrote:
 >
-> On Mon, Nov 15, 2021, Ben Gardon wrote:
-> > When recursively clearing out disconnected pts, the range based TLB
-> > flush in handle_removed_tdp_mmu_page uses the wrong starting GFN,
-> > resulting in the flush mostly missing the affected range. Fix this by
-> > using base_gfn for the flush.
+> Hi Reiji,
+>
+> On 11/17/21 7:43 AM, Reiji Watanabe wrote:
+> > This patch adds id_reg_info for ID_AA64PFR0_EL1 to make it writable by
+> > userspace.
 > >
-> > In response to feedback from David Matlack on the RFC version of this
-> > patch, also move a few definitions into the for loop in the function to
-> > prevent unintended references to them in the future.
->
-> Rats, I didn't read David's feedback or I would've responded there.
->
-> > Fixes: a066e61f13cf ("KVM: x86/mmu: Factor out handling of removed page=
- tables")
-> > CC: stable@vger.kernel.org
+> > The CSV2/CSV3 fields of the register were already writable and values
+> > that were written for them affected all vCPUs before. Now they only
+> > affect the vCPU.
+> > Return an error if userspace tries to set SVE/GIC field of the register
+> > to a value that conflicts with SVE/GIC configuration for the guest.
+> > SIMD/FP/SVE fields of the requested value are validated according to
+> > Arm ARM.
 > >
-> > Signed-off-by: Ben Gardon <bgardon@google.com>
+> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
 > > ---
-> >  arch/x86/kvm/mmu/tdp_mmu.c | 10 ++++------
-> >  1 file changed, 4 insertions(+), 6 deletions(-)
+> >  arch/arm64/kvm/sys_regs.c | 159 ++++++++++++++++++++++++--------------
+> >  1 file changed, 103 insertions(+), 56 deletions(-)
 > >
-> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> > index 7c5dd83e52de..4bd541050d21 100644
-> > --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> > @@ -317,9 +317,6 @@ static void handle_removed_tdp_mmu_page(struct kvm =
-*kvm, tdp_ptep_t pt,
-> >       struct kvm_mmu_page *sp =3D sptep_to_sp(rcu_dereference(pt));
-> >       int level =3D sp->role.level;
-> >       gfn_t base_gfn =3D sp->gfn;
-> > -     u64 old_child_spte;
-> > -     u64 *sptep;
-> > -     gfn_t gfn;
-> >       int i;
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index 1552cd5581b7..35400869067a 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -401,6 +401,92 @@ static void id_reg_info_init(struct id_reg_info *id_reg)
+> >               id_reg->init(id_reg);
+> >  }
 > >
-> >       trace_kvm_mmu_prepare_zap_page(sp);
-> > @@ -327,8 +324,9 @@ static void handle_removed_tdp_mmu_page(struct kvm =
-*kvm, tdp_ptep_t pt,
-> >       tdp_mmu_unlink_page(kvm, sp, shared);
-> >
-> >       for (i =3D 0; i < PT64_ENT_PER_PAGE; i++) {
-> > -             sptep =3D rcu_dereference(pt) + i;
-> > -             gfn =3D base_gfn + i * KVM_PAGES_PER_HPAGE(level);
-> > +             u64 *sptep =3D rcu_dereference(pt) + i;
-> > +             gfn_t gfn =3D base_gfn + i * KVM_PAGES_PER_HPAGE(level);
-> > +             u64 old_child_spte;
->
-> TL;DR: this type of optional refactoring doesn't belong in a patch Cc'd f=
-or stable,
+> > +#define      kvm_has_gic3(kvm)               \
+> > +     (irqchip_in_kernel(kvm) &&      \
+> > +      (kvm)->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
+> you may move this macro to kvm/arm_vgic.h as this may be used in
+> vgic/vgic-v3.c too
 
-This is a great point. Regardless of our stance on variable function
-declaration, the refactor wouldn't make sense to send to stable (or at
-the minimum it should be considered separately in its own patch).
+Thank you for the suggestion. I will move that to kvm/arm_vgic.h.
 
-> and my personal preference is to always declare variables at function sco=
-pe (it's
-> not a hard rule though, Paolo has overruled me at least once :-) ).
->
-> Declaring variables in an inner scope is not always "better".  In particu=
-lar, it
-> can lead to variable shadowing, which can lead to functional issues of a =
-different
-> sort.  Most shadowing is fairly obvious, and truly egregious bugs will of=
-ten result
-> in the compiler complaining about consuming an uninitialized variable.
->
-> But the worst-case scenario is if the inner scope shadows a function para=
-meter, in
-> which the case the compiler will not complain and will even consume an un=
-initialized
-> variable without warning.  IIRC, we actually had a Hyper-V bug of that na=
-ture
-> where an incoming @vcpu was shadowed.  Examples below.
->
-> So yes, on one hand moving the declarations inside the loop avoid potenti=
-al flavor
-> of bug, but they create the possibility for an entirely different class o=
-f bugs.
-> The main reason I prefer declaring at function scope is that I find it ea=
-sier to
-> visually detect using variables after a for loop, versus detecting that a=
- variable
-> is being shadowed, especially if the function is largish and the two decl=
-arations
-> don't fit on the screen.
 
-Ah I have not had the pleasure of debugging a variable shadowing bug
-before :), so I never even considered this.
+> > +
+> > +static int validate_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+> > +                                 const struct id_reg_info *id_reg, u64 val)
+> > +{
+> > +     int fp, simd;
+> > +     bool vcpu_has_sve = vcpu_has_sve(vcpu);
+> > +     bool pfr0_has_sve = id_aa64pfr0_sve(val);
+> > +     int gic;
+> > +
+> > +     simd = cpuid_feature_extract_signed_field(val, ID_AA64PFR0_ASIMD_SHIFT);
+> > +     fp = cpuid_feature_extract_signed_field(val, ID_AA64PFR0_FP_SHIFT);
+> > +     if (simd != fp)
+> > +             return -EINVAL;
+> > +
+> > +     /* fp must be supported when sve is supported */
+> > +     if (pfr0_has_sve && (fp < 0))
+> > +             return -EINVAL;
+> > +
+> > +     /* Check if there is a conflict with a request via KVM_ARM_VCPU_INIT */
+> > +     if (vcpu_has_sve ^ pfr0_has_sve)
+> > +             return -EPERM;
+> > +
+> > +     gic = cpuid_feature_extract_unsigned_field(val, ID_AA64PFR0_GIC_SHIFT);
+> > +     if ((gic > 0) ^ kvm_has_gic3(vcpu->kvm))
+> > +             return -EPERM;
+>
+> Sometimes from a given architecture version, some lower values are not
+> allowed. For instance from ARMv8.5 onlt 1 is permitted for CSV3.
+> Shouldn't we handle that kind of check?
 
-This is something that a compiler could easily detect and disallow for
-us. In fact GCC has the -Wshadow=3Dlocal option which disallows local
-variables shadowing other local variables and function parameters.
-Unfortunately, Clang either doesn't support this option or spells it
-differently (but I haven't been able to find it). I tried to build KVM
-with -Wshadow=3Dlocal today but it looks like I need to get a newer
-version of GCC and that's as far as I got.
+As far as I know, there is no way for guests to identify the
+architecture revision (e.g. v8.1, v8.2, etc).  It might be able
+to indirectly infer the revision though (from features that are
+available or etc).
 
-Both Clang and GCC support -Wshadow but that is too broad. It prevents
-local variables from shadowing global variables, which would prevent
-us from having local variables named "apic" among other common names.
 
->
-> There are of course counter-examples, e.g. commit 5c49d1850ddd ("KVM: VMX=
-: Fix a
-> TSX_CTRL_CPUID_CLEAR field mask issue") immediately jumps to mind, so the=
-re's
-> certainly an element of personal preference.
->
-> E.g. this will fail with "error: =E2=80=98sptep=E2=80=99 redeclared as di=
-fferent kind of symbol
->
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 4e226cdb40d9..011639bf633c 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -369,7 +369,7 @@ static void tdp_mmu_unlink_page(struct kvm *kvm, stru=
-ct kvm_mmu_page *sp,
->   * early rcu_dereferences in the function.
->   */
->  static void handle_removed_tdp_mmu_page(struct kvm *kvm, tdp_ptep_t pt,
-> -                                       bool shared)
-> +                                       bool shared, u64 *sptep)
->  {
->         struct kvm_mmu_page *sp =3D sptep_to_sp(rcu_dereference(pt));
->         int level =3D sp->role.level;
-> @@ -431,8 +431,9 @@ static void handle_removed_tdp_mmu_page(struct kvm *k=
-vm, tdp_ptep_t pt,
->                                     shared);
->         }
->
-> -       kvm_flush_remote_tlbs_with_address(kvm, gfn,
-> -                                          KVM_PAGES_PER_HPAGE(level + 1)=
-);
-> +       if (sptep)
-> +               kvm_flush_remote_tlbs_with_address(kvm, gfn,
-> +                                                  KVM_PAGES_PER_HPAGE(le=
-vel + 1));
->
->         call_rcu(&sp->rcu_head, tdp_mmu_free_sp_rcu_callback);
->  }
-> @@ -532,7 +533,7 @@ static void __handle_changed_spte(struct kvm *kvm, in=
-t as_id, gfn_t gfn,
->          */
->         if (was_present && !was_leaf && (is_leaf || !is_present))
->                 handle_removed_tdp_mmu_page(kvm,
-> -                               spte_to_child_pt(old_spte, level), shared=
-);
-> +                               spte_to_child_pt(old_spte, level), shared=
-, NULL);
->  }
->
->  static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
->
->
-> whereas moving the second declaration into the loop will compile happily.
->
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 4e226cdb40d9..3e83fd66c0dc 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -369,13 +369,12 @@ static void tdp_mmu_unlink_page(struct kvm *kvm, st=
-ruct kvm_mmu_page *sp,
->   * early rcu_dereferences in the function.
->   */
->  static void handle_removed_tdp_mmu_page(struct kvm *kvm, tdp_ptep_t pt,
-> -                                       bool shared)
-> +                                       bool shared, u64 *sptep)
->  {
->         struct kvm_mmu_page *sp =3D sptep_to_sp(rcu_dereference(pt));
->         int level =3D sp->role.level;
->         gfn_t base_gfn =3D sp->gfn;
->         u64 old_child_spte;
-> -       u64 *sptep;
->         gfn_t gfn;
->         int i;
->
-> @@ -384,7 +383,7 @@ static void handle_removed_tdp_mmu_page(struct kvm *k=
-vm, tdp_ptep_t pt,
->         tdp_mmu_unlink_page(kvm, sp, shared);
->
->         for (i =3D 0; i < PT64_ENT_PER_PAGE; i++) {
-> -               sptep =3D rcu_dereference(pt) + i;
-> +               u64 *sptep =3D rcu_dereference(pt) + i;
->                 gfn =3D base_gfn + i * KVM_PAGES_PER_HPAGE(level);
->
->                 if (shared) {
-> @@ -431,8 +430,9 @@ static void handle_removed_tdp_mmu_page(struct kvm *k=
-vm, tdp_ptep_t pt,
->                                     shared);
->         }
->
-> -       kvm_flush_remote_tlbs_with_address(kvm, gfn,
-> -                                          KVM_PAGES_PER_HPAGE(level + 1)=
-);
-> +       if (sptep)
-> +               kvm_flush_remote_tlbs_with_address(kvm, gfn,
-> +                                                  KVM_PAGES_PER_HPAGE(le=
-vel + 1));
->
->         call_rcu(&sp->rcu_head, tdp_mmu_free_sp_rcu_callback);
->  }
-> @@ -532,7 +532,7 @@ static void __handle_changed_spte(struct kvm *kvm, in=
-t as_id, gfn_t gfn,
->          */
->         if (was_present && !was_leaf && (is_leaf || !is_present))
->                 handle_removed_tdp_mmu_page(kvm,
-> -                               spte_to_child_pt(old_spte, level), shared=
-);
-> +                               spte_to_child_pt(old_spte, level), shared=
-, NULL);
->  }
->
->  static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+> > +
+> > +     return 0;
+> > +}
+> > +
+> > +static void init_id_aa64pfr0_el1_info(struct id_reg_info *id_reg)
+> > +{
+> > +     u64 limit = id_reg->vcpu_limit_val;
+> > +     unsigned int gic;
+> > +
+> > +     limit &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_AMU);
+> > +     if (!system_supports_sve())
+> > +             limit &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_SVE);
+> > +
+> > +     /*
+> > +      * The default is to expose CSV2 == 1 and CSV3 == 1 if the HW
+> > +      * isn't affected.  Userspace can override this as long as it
+> > +      * doesn't promise the impossible.
+> > +      */
+> > +     limit &= ~(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV2) |
+> > +                ARM64_FEATURE_MASK(ID_AA64PFR0_CSV3));
+> > +
+> > +     if (arm64_get_spectre_v2_state() == SPECTRE_UNAFFECTED)
+> > +             limit |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV2), 1);
+> > +     if (arm64_get_meltdown_state() == SPECTRE_UNAFFECTED)
+> > +             limit |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV3), 1);
+> > +
+> > +     gic = cpuid_feature_extract_unsigned_field(limit, ID_AA64PFR0_GIC_SHIFT);
+> > +     if (gic > 1) {
+> > +             /* Limit to GICv3.0/4.0 */
+> > +             limit &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_GIC);
+> > +             limit |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_GIC), 1);
+> > +     }
+> > +     id_reg->vcpu_limit_val = limit;
+> > +}
+> > +
+> > +static u64 get_reset_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+> > +                                  const struct id_reg_info *idr)
+> > +{
+> > +     u64 val = idr->vcpu_limit_val;
+> > +
+> > +     if (!vcpu_has_sve(vcpu))
+> > +             val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_SVE);
+> > +
+> > +     if (!kvm_has_gic3(vcpu->kvm))
+> > +             val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_GIC);
+> > +
+> > +     return val;
+> > +}
+> > +
+> > +static struct id_reg_info id_aa64pfr0_el1_info = {
+> > +     .sys_reg = SYS_ID_AA64PFR0_EL1,
+> > +     .ftr_check_types = S_FCT(ID_AA64PFR0_ASIMD_SHIFT, FCT_LOWER_SAFE) |
+> > +                        S_FCT(ID_AA64PFR0_FP_SHIFT, FCT_LOWER_SAFE),
+> is it needed as it is the default?
+
+> > +     .ftr_check_types = S_FCT(ID_AA64PFR0_ASIMD_SHIFT, FCT_LOWER_SAFE) |
+> > +                        S_FCT(ID_AA64PFR0_FP_SHIFT, FCT_LOWER_SAFE),
+> is it needed as it is the default?
+
+They are needed because they are signed fields (the default is unsigned
+and FCT_LOWER_SAFE).  Having said that, ftr_check_types itself will be
+gone in the next version (as arm64_ftr_bits will be used instead).
+
+Thanks,
+Reiji
