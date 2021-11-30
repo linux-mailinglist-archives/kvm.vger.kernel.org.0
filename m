@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B62EE462DBA
-	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 08:43:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 92403462DB6
+	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 08:42:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239195AbhK3HqM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Nov 2021 02:46:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44848 "EHLO
+        id S239142AbhK3HqG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Nov 2021 02:46:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239158AbhK3HqB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Nov 2021 02:46:01 -0500
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B221BC061714;
-        Mon, 29 Nov 2021 23:42:42 -0800 (PST)
-Received: by mail-pg1-x534.google.com with SMTP id s137so18899069pgs.5;
-        Mon, 29 Nov 2021 23:42:42 -0800 (PST)
+        with ESMTP id S239181AbhK3HqE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Nov 2021 02:46:04 -0500
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7159C061714;
+        Mon, 29 Nov 2021 23:42:45 -0800 (PST)
+Received: by mail-pg1-x52b.google.com with SMTP id 133so730968pgc.12;
+        Mon, 29 Nov 2021 23:42:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=uzxmwMQ1+XpebIcj0dAIJF5e91X774jV/0PiDyig/tg=;
-        b=eGuOk5LwZTS4WxwE6yO7tuIIm3QJ4fRAn2EQs1dmdCxVaeiKgiouYYjDjrongZ+yx/
-         fLSVkl1BaYjNb9wFgnOkTc1MFjl+9G9X2ozXRgTIrh0fwKjFIfqxmdRTUGDDxmpatbMJ
-         mswz5KvxyVlIlzC5ndtebDCTHWA2CIiW5kJO+uxZF/XTtAI+/yhgp2Kwtc9hJOwYZSvY
-         fjTW3UzMUY/7beldPufNaPBnHQv6NErx3cEpFVTMLfxkmIoFnaftVvQgxdam3u3Yqfy2
-         fcgDLx2TneCj8DNYj3MIR01Pif2efJi5csXWnsoffgBPBsPhyUiTBWsG8yEEsU6xDtjS
-         KIzQ==
+        bh=vayFNaDVZE3ZpmipANEaG4wpIWUVVgu6ZcSxACk3VoM=;
+        b=YgIwgC+6WL8eCjCKoFb5ydJbiH8Tqze/sR3txrbvIJBHBZHf300LPgRASkQ/hAt3yY
+         TtdfRctazrBtFmS9dxkku+V/f6Fo3wlFloEOuprnG4j2XGX22KKlNWGNT7wUl42Fi1m5
+         JsscAndsRpiPD2nGwkmD1iXhOfJ7JAlh5fCB54vJQoQxzgelO/dZP+6s2mjYdyzfPJvq
+         wxxfc3oERDibzlYCgIyExyr1Do7bwJsm8YAsG90dD4Wxg0Re+D4jpGjKVcvQMMrjzbvE
+         7BgMznpooysUAtAN1nKn5NDeKjFYeyYKmrGsrWJNR1ay53L6N8rXhiLTjdZ5K7jQFZvC
+         wLRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=uzxmwMQ1+XpebIcj0dAIJF5e91X774jV/0PiDyig/tg=;
-        b=oHXRTfp9ao4dJIu2lI0WMKC59107gidGYfd60UspLWxb4yBlaF3fN2C2wxUbJ8BtMb
-         l7e1w5za6tpa/lvvjzDwblWp7d/V4y40zmlJR/w+l8GKfYrVM24neX2jDF3sD1o1u69G
-         NQC+4CwOR0Z/5/5/n/qLNrC6W/8usknCYdcsh3pkI0vyJcEBUZkppryC+ExrGiW1nMSb
-         OIVzLDM6wDQvRwbTh7gFNdwWBxdv1yM6mEh8xzSQTw91edy8X6dsaCcTfxt+GTAZalJO
-         N2AswH0TGfzx+iCt8Re/1rJHCrCL4i5pNfY9ceQL12qZY0amjkEBvWlgh1RJQ+E3TYWm
-         3YJg==
-X-Gm-Message-State: AOAM531DbuV7maczh63+Y7a8xZFEveQt0bd6/vpfrS5OxH086NNyPojD
-        1WQdQvNGpsy5rUJbOG7UmX5MMpT1dR8=
-X-Google-Smtp-Source: ABdhPJzdGRN8Yq7ZWzA+pyX/vaZOSo2Ki/dSXZlXF84BzQLecbyqdyFS32B/iBnk7RY3zyUmu6SKMA==
-X-Received: by 2002:a62:1544:0:b0:49f:f74e:8327 with SMTP id 65-20020a621544000000b0049ff74e8327mr43063648pfv.55.1638258162265;
-        Mon, 29 Nov 2021 23:42:42 -0800 (PST)
+        bh=vayFNaDVZE3ZpmipANEaG4wpIWUVVgu6ZcSxACk3VoM=;
+        b=7bTwsU9ufyM68xlElppPW0IimLBsyVUbp62R9V6Su+4RH6bnnS5mC4q24XFwea8W54
+         R+qZm2uNiHMNSBHdM2mcSlmU1pwhP1X0d50ZRFGgxuzbxg1Tl1SwCP4WhHeTUgxUGVSf
+         AzhGeo1efBK9Q5KGiXidzS8DWVNlCQlZaP0kzVN0j6O3FbuQH89Du7rh8NXChgMBxYsc
+         dBER2kfV0UKFxf6rLoRNvC2GER5l3+X1/jNQ/CmjMazF0JE7RnTESZh5pzNtpl1XCcZF
+         Mtbbhkok8qUH/vefJi7jAaOI5iC702uWv21Xvtoef42gle6jA6I8YEZmzU7H3fcyW4EL
+         uHXg==
+X-Gm-Message-State: AOAM533bKaUYDzzxd63h0Ymidhhu30vBE2fIKZxfTF/OXZmo0LKg+gpd
+        A/zreO5nMVzYqSEE1ERsz0o=
+X-Google-Smtp-Source: ABdhPJwllg1gfnFgER/MJxRVVKDvt4R7xZJCOO23stSFAWc7Wh/VnMchJoFQNe/ldAWB3BAwlMXUOw==
+X-Received: by 2002:a63:2444:: with SMTP id k65mr24835324pgk.606.1638258165460;
+        Mon, 29 Nov 2021 23:42:45 -0800 (PST)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id h13sm19066010pfv.84.2021.11.29.23.42.39
+        by smtp.gmail.com with ESMTPSA id h13sm19066010pfv.84.2021.11.29.23.42.42
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 29 Nov 2021 23:42:42 -0800 (PST)
+        Mon, 29 Nov 2021 23:42:45 -0800 (PST)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
@@ -55,10 +55,11 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>
-Subject: [PATCH v2 4/6] KVM: x86/pmu: Add pmc->intr to refactor kvm_perf_overflow{_intr}()
-Date:   Tue, 30 Nov 2021 15:42:19 +0800
-Message-Id: <20211130074221.93635-5-likexu@tencent.com>
+        linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>,
+        Peter Zijlstra <peterz@infradead.org>
+Subject: [PATCH v2 5/6] KVM: x86: Update vPMCs when retiring instructions
+Date:   Tue, 30 Nov 2021 15:42:20 +0800
+Message-Id: <20211130074221.93635-6-likexu@tencent.com>
 X-Mailer: git-send-email 2.33.1
 In-Reply-To: <20211130074221.93635-1-likexu@tencent.com>
 References: <20211130074221.93635-1-likexu@tencent.com>
@@ -70,129 +71,140 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <likexu@tencent.com>
 
-Depending on whether intr should be triggered or not, KVM registers
-two different event overflow callbacks in the perf_event context.
+When KVM retires a guest instruction through emulation, increment any
+vPMCs that are configured to monitor "instructions retired," and
+update the sample period of those counters so that they will overflow
+at the right time.
 
-The code skeleton of these two functions is very similar, so
-the pmc->intr can be stored into pmc from pmc_reprogram_counter()
-which provides smaller instructions footprint against the
-u-architecture branch predictor.
-
-The __kvm_perf_overflow() can be called in non-nmi contexts
-and a flag is needed to distinguish the caller context and thus
-avoid a check on kvm_is_in_guest(), otherwise we might get
-warnings from suspicious RCU or check_preemption_disabled().
-
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Eric Hankland <ehankland@google.com>
+[jmattson:
+  - Split the code to increment "branch instructions retired" into a
+    separate commit.
+  - Added 'static' to kvm_pmu_incr_counter() definition.
+  - Modified kvm_pmu_incr_counter() to check pmc->perf_event->state ==
+    PERF_EVENT_STATE_ACTIVE.
+]
+Fixes: f5132b01386b ("KVM: Expose a version 2 architectural PMU to a guests")
+Signed-off-by: Jim Mattson <jmattson@google.com>
+[likexu:
+  - Drop checks for pmc->perf_event or event state or event type
+  - Increase a counter once its umask bits and the first 8 select bits are matched
+  - Rewrite kvm_pmu_incr_counter() with a less invasive approach to the host perf;
+  - Rename kvm_pmu_record_event to kvm_pmu_trigger_event;
+  - Add counter enable and CPL check for kvm_pmu_trigger_event();
+]
+Cc: Peter Zijlstra <peterz@infradead.org>
 Signed-off-by: Like Xu <likexu@tencent.com>
 ---
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/pmu.c              | 58 ++++++++++++++++-----------------
- 2 files changed, 29 insertions(+), 30 deletions(-)
+ arch/x86/kvm/pmu.c | 60 ++++++++++++++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/pmu.h |  1 +
+ arch/x86/kvm/x86.c |  3 +++
+ 3 files changed, 64 insertions(+)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index e41ad1ead721..6c2b2331ffeb 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -495,6 +495,7 @@ struct kvm_pmc {
- 	 */
- 	u64 current_config;
- 	bool is_paused;
-+	bool intr;
- };
- 
- struct kvm_pmu {
 diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index b7a1ae28ab87..a20207ee4014 100644
+index a20207ee4014..8abdadb7e22a 100644
 --- a/arch/x86/kvm/pmu.c
 +++ b/arch/x86/kvm/pmu.c
-@@ -55,43 +55,41 @@ static void kvm_pmi_trigger_fn(struct irq_work *irq_work)
- 	kvm_pmu_deliver_pmi(vcpu);
+@@ -482,6 +482,66 @@ void kvm_pmu_destroy(struct kvm_vcpu *vcpu)
+ 	kvm_pmu_reset(vcpu);
  }
  
--static void kvm_perf_overflow(struct perf_event *perf_event,
--			      struct perf_sample_data *data,
--			      struct pt_regs *regs)
-+static inline void __kvm_perf_overflow(struct kvm_pmc *pmc, bool in_pmi)
++static void kvm_pmu_incr_counter(struct kvm_pmc *pmc)
++{
++	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
++	u64 prev_count;
++
++	prev_count = pmc->counter;
++	pmc->counter = (pmc->counter + 1) & pmc_bitmask(pmc);
++
++	reprogram_counter(pmu, pmc->idx);
++	if (pmc->counter < prev_count)
++		__kvm_perf_overflow(pmc, false);
++}
++
++static inline bool eventsel_match_perf_hw_id(struct kvm_pmc *pmc,
++	unsigned int perf_hw_id)
++{
++	u64 old_eventsel = pmc->eventsel;
++	unsigned int config;
++
++	pmc->eventsel &= (ARCH_PERFMON_EVENTSEL_EVENT | ARCH_PERFMON_EVENTSEL_UMASK);
++	config = kvm_x86_ops.pmu_ops->pmc_perf_hw_id(pmc);
++	pmc->eventsel = old_eventsel;
++	return config == perf_hw_id;
++}
++
++static inline bool cpl_is_matched(struct kvm_pmc *pmc)
++{
++	bool select_os, select_user;
++	u64 config = pmc->current_config;
++
++	if (pmc_is_gp(pmc)) {
++		select_os = config & ARCH_PERFMON_EVENTSEL_OS;
++		select_user = config & ARCH_PERFMON_EVENTSEL_USR;
++	} else {
++		select_os = config & 0x1;
++		select_user = config & 0x2;
++	}
++
++	return (static_call(kvm_x86_get_cpl)(pmc->vcpu) == 0) ? select_os : select_user;
++}
++
++void kvm_pmu_trigger_event(struct kvm_vcpu *vcpu, u64 perf_hw_id)
++{
++	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
++	struct kvm_pmc *pmc;
++	int i;
++
++	for_each_set_bit(i, pmu->all_valid_pmc_idx, X86_PMC_IDX_MAX) {
++		pmc = kvm_x86_ops.pmu_ops->pmc_idx_to_pmc(pmu, i);
++
++		if (!pmc || !pmc_is_enabled(pmc) || !pmc_speculative_in_use(pmc))
++			continue;
++
++		/* Ignore checks for edge detect, pin control, invert and CMASK bits */
++		if (eventsel_match_perf_hw_id(pmc, perf_hw_id) && cpl_is_matched(pmc))
++			kvm_pmu_incr_counter(pmc);
++	}
++}
++EXPORT_SYMBOL_GPL(kvm_pmu_trigger_event);
++
+ int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp)
  {
--	struct kvm_pmc *pmc = perf_event->overflow_handler_context;
- 	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
+ 	struct kvm_pmu_event_filter tmp, *filter;
+diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+index c91d9725aafd..7a7b8d5b775e 100644
+--- a/arch/x86/kvm/pmu.h
++++ b/arch/x86/kvm/pmu.h
+@@ -157,6 +157,7 @@ void kvm_pmu_init(struct kvm_vcpu *vcpu);
+ void kvm_pmu_cleanup(struct kvm_vcpu *vcpu);
+ void kvm_pmu_destroy(struct kvm_vcpu *vcpu);
+ int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp);
++void kvm_pmu_trigger_event(struct kvm_vcpu *vcpu, u64 perf_hw_id);
  
--	if (!test_and_set_bit(pmc->idx, pmu->reprogram_pmi)) {
--		__set_bit(pmc->idx, (unsigned long *)&pmu->global_status);
--		kvm_make_request(KVM_REQ_PMU, pmc->vcpu);
--	}
-+	/* Ignore counters that have been reprogrammed already. */
-+	if (test_and_set_bit(pmc->idx, pmu->reprogram_pmi))
-+		return;
+ bool is_vmware_backdoor_pmc(u32 pmc_idx);
+ 
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index a05a26471f19..83371be00771 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -7978,6 +7978,8 @@ int kvm_skip_emulated_instruction(struct kvm_vcpu *vcpu)
+ 	if (unlikely(!r))
+ 		return 0;
+ 
++	kvm_pmu_trigger_event(vcpu, PERF_COUNT_HW_INSTRUCTIONS);
 +
-+	__set_bit(pmc->idx, (unsigned long *)&pmu->global_status);
-+	kvm_make_request(KVM_REQ_PMU, pmc->vcpu);
-+
-+	if (!pmc->intr)
-+		return;
-+
-+	/*
-+	 * Inject PMI. If vcpu was in a guest mode during NMI PMI
-+	 * can be ejected on a guest mode re-entry. Otherwise we can't
-+	 * be sure that vcpu wasn't executing hlt instruction at the
-+	 * time of vmexit and is not going to re-enter guest mode until
-+	 * woken up. So we should wake it, but this is impossible from
-+	 * NMI context. Do it from irq work instead.
-+	 */
-+	if (in_pmi && !kvm_is_in_guest())
-+		irq_work_queue(&pmc_to_pmu(pmc)->irq_work);
-+	else
-+		kvm_make_request(KVM_REQ_PMI, pmc->vcpu);
- }
- 
--static void kvm_perf_overflow_intr(struct perf_event *perf_event,
--				   struct perf_sample_data *data,
--				   struct pt_regs *regs)
-+static void kvm_perf_overflow(struct perf_event *perf_event,
-+			      struct perf_sample_data *data,
-+			      struct pt_regs *regs)
- {
- 	struct kvm_pmc *pmc = perf_event->overflow_handler_context;
--	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
--
--	if (!test_and_set_bit(pmc->idx, pmu->reprogram_pmi)) {
--		__set_bit(pmc->idx, (unsigned long *)&pmu->global_status);
--		kvm_make_request(KVM_REQ_PMU, pmc->vcpu);
- 
--		/*
--		 * Inject PMI. If vcpu was in a guest mode during NMI PMI
--		 * can be ejected on a guest mode re-entry. Otherwise we can't
--		 * be sure that vcpu wasn't executing hlt instruction at the
--		 * time of vmexit and is not going to re-enter guest mode until
--		 * woken up. So we should wake it, but this is impossible from
--		 * NMI context. Do it from irq work instead.
--		 */
--		if (!kvm_is_in_guest())
--			irq_work_queue(&pmc_to_pmu(pmc)->irq_work);
--		else
--			kvm_make_request(KVM_REQ_PMI, pmc->vcpu);
--	}
-+	__kvm_perf_overflow(pmc, true);
- }
- 
- static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
-@@ -126,7 +124,6 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
- 	}
- 
- 	event = perf_event_create_kernel_counter(&attr, -1, current,
--						 intr ? kvm_perf_overflow_intr :
- 						 kvm_perf_overflow, pmc);
- 	if (IS_ERR(event)) {
- 		pr_debug_ratelimited("kvm_pmu: event creation failed %ld for pmc->idx = %d\n",
-@@ -138,6 +135,7 @@ static void pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type,
- 	pmc_to_pmu(pmc)->event_count++;
- 	clear_bit(pmc->idx, pmc_to_pmu(pmc)->reprogram_pmi);
- 	pmc->is_paused = false;
-+	pmc->intr = intr;
- }
- 
- static void pmc_pause_counter(struct kvm_pmc *pmc)
+ 	/*
+ 	 * rflags is the old, "raw" value of the flags.  The new value has
+ 	 * not been saved yet.
+@@ -8240,6 +8242,7 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ 		vcpu->arch.emulate_regs_need_sync_to_vcpu = false;
+ 		if (!ctxt->have_exception ||
+ 		    exception_type(ctxt->exception.vector) == EXCPT_TRAP) {
++			kvm_pmu_trigger_event(vcpu, PERF_COUNT_HW_INSTRUCTIONS);
+ 			kvm_rip_write(vcpu, ctxt->eip);
+ 			if (r && (ctxt->tf || (vcpu->guest_debug & KVM_GUESTDBG_SINGLESTEP)))
+ 				r = kvm_vcpu_do_singlestep(vcpu);
 -- 
 2.33.1
 
