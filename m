@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 17DA446409A
-	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 22:46:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D7B45464099
+	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 22:46:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344444AbhK3Vtj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Nov 2021 16:49:39 -0500
-Received: from vps-vb.mhejs.net ([37.28.154.113]:56938 "EHLO vps-vb.mhejs.net"
+        id S233150AbhK3Vth (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Nov 2021 16:49:37 -0500
+Received: from vps-vb.mhejs.net ([37.28.154.113]:56940 "EHLO vps-vb.mhejs.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1344752AbhK3Vsm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1344754AbhK3Vsm (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 30 Nov 2021 16:48:42 -0500
 Received: from MUA
         by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <mail@maciej.szmigiero.name>)
-        id 1msAv6-0006Fr-SB; Tue, 30 Nov 2021 22:44:12 +0100
+        id 1msAvC-0006Gr-6E; Tue, 30 Nov 2021 22:44:18 +0100
 From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>
@@ -44,9 +44,9 @@ Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Atish Patra <atish.patra@wdc.com>,
         Ben Gardon <bgardon@google.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v6 27/29] KVM: Optimize overlapping memslots check
-Date:   Tue, 30 Nov 2021 22:41:40 +0100
-Message-Id: <9698a99ccd1938a36dd0c7399262f888dcdf01ac.1638304316.git.maciej.szmigiero@oracle.com>
+Subject: [PATCH v6 28/29] KVM: Wait 'til the bitter end to initialize the "new" memslot
+Date:   Tue, 30 Nov 2021 22:41:41 +0100
+Message-Id: <bf8566098eb06cafa53d25c6a669a3eb2502beaa.1638304316.git.maciej.szmigiero@oracle.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <cover.1638304315.git.maciej.szmigiero@oracle.com>
 References: <cover.1638304315.git.maciej.szmigiero@oracle.com>
@@ -56,87 +56,102 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+From: Sean Christopherson <seanjc@google.com>
 
-Do a quick lookup for possibly overlapping gfns when creating or moving
-a memslot instead of performing a linear scan of the whole memslot set.
+Initialize the "new" memslot in the !DELETE path only after the various
+sanity checks have passed.  This will allow a future commit to allocate
+@new dynamically without having to copy a memslot, and without having to
+deal with freeing @new in error paths and in the "nothing to change" path
+that's hiding in the sanity checks.
 
-Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
-[sean: tweaked params to avoid churn in future cleanup]
+No functional change intended.
+
 Signed-off-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
 ---
- virt/kvm/kvm_main.c | 35 +++++++++++++++++++++--------------
- 1 file changed, 21 insertions(+), 14 deletions(-)
+ virt/kvm/kvm_main.c | 37 ++++++++++++++++++++-----------------
+ 1 file changed, 20 insertions(+), 17 deletions(-)
 
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 086f18969bc3..52117f65bc5b 100644
+index 52117f65bc5b..8295d87c07b5 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -1817,6 +1817,18 @@ static int kvm_set_memslot(struct kvm *kvm,
- 	return 0;
- }
- 
-+static bool kvm_check_memslot_overlap(struct kvm_memslots *slots, int id,
-+				      gfn_t start, gfn_t end)
-+{
-+	struct kvm_memslot_iter iter;
-+
-+	kvm_for_each_memslot_in_gfn_range(&iter, slots, start, end)
-+		if (kvm_memslot_iter_slot(&iter)->id != id)
-+			return true;
-+
-+	return false;
-+}
-+
- /*
-  * Allocate some memory and give it an address in the guest physical address
-  * space.
-@@ -1828,8 +1840,9 @@ static int kvm_set_memslot(struct kvm *kvm,
- int __kvm_set_memory_region(struct kvm *kvm,
- 			    const struct kvm_userspace_memory_region *mem)
- {
--	struct kvm_memory_slot *old, *tmp;
-+	struct kvm_memory_slot *old;
+@@ -1844,6 +1844,8 @@ int __kvm_set_memory_region(struct kvm *kvm,
  	struct kvm_memory_slot new;
-+	struct kvm_memslots *slots;
+ 	struct kvm_memslots *slots;
  	enum kvm_mr_change change;
++	unsigned long npages;
++	gfn_t base_gfn;
  	int as_id, id;
  	int r;
-@@ -1858,11 +1871,13 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 
+@@ -1870,6 +1872,8 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 		return -EINVAL;
  	if (mem->guest_phys_addr + mem->memory_size < mem->guest_phys_addr)
  		return -EINVAL;
++	if ((mem->memory_size >> PAGE_SHIFT) > KVM_MEM_MAX_NR_PAGES)
++		return -EINVAL;
  
-+	slots = __kvm_memslots(kvm, as_id);
-+
- 	/*
- 	 * Note, the old memslot (and the pointer itself!) may be invalidated
- 	 * and/or destroyed by kvm_set_memslot().
- 	 */
--	old = id_to_memslot(__kvm_memslots(kvm, as_id), id);
-+	old = id_to_memslot(slots, id);
+ 	slots = __kvm_memslots(kvm, as_id);
  
- 	if (!mem->memory_size) {
- 		if (!old || !old->npages)
-@@ -1911,18 +1926,10 @@ int __kvm_set_memory_region(struct kvm *kvm,
+@@ -1893,15 +1897,8 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 		return kvm_set_memslot(kvm, old, &new, KVM_MR_DELETE);
+ 	}
+ 
+-	new.as_id = as_id;
+-	new.id = id;
+-	new.base_gfn = mem->guest_phys_addr >> PAGE_SHIFT;
+-	new.npages = mem->memory_size >> PAGE_SHIFT;
+-	new.flags = mem->flags;
+-	new.userspace_addr = mem->userspace_addr;
+-
+-	if (new.npages > KVM_MEM_MAX_NR_PAGES)
+-		return -EINVAL;
++	base_gfn = (mem->guest_phys_addr >> PAGE_SHIFT);
++	npages = (mem->memory_size >> PAGE_SHIFT);
+ 
+ 	if (!old || !old->npages) {
+ 		change = KVM_MR_CREATE;
+@@ -1910,27 +1907,33 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 		 * To simplify KVM internals, the total number of pages across
+ 		 * all memslots must fit in an unsigned long.
+ 		 */
+-		if ((kvm->nr_memslot_pages + new.npages) < kvm->nr_memslot_pages)
++		if ((kvm->nr_memslot_pages + npages) < kvm->nr_memslot_pages)
+ 			return -EINVAL;
+ 	} else { /* Modify an existing slot. */
+-		if ((new.userspace_addr != old->userspace_addr) ||
+-		    (new.npages != old->npages) ||
+-		    ((new.flags ^ old->flags) & KVM_MEM_READONLY))
++		if ((mem->userspace_addr != old->userspace_addr) ||
++		    (npages != old->npages) ||
++		    ((mem->flags ^ old->flags) & KVM_MEM_READONLY))
+ 			return -EINVAL;
+ 
+-		if (new.base_gfn != old->base_gfn)
++		if (base_gfn != old->base_gfn)
+ 			change = KVM_MR_MOVE;
+-		else if (new.flags != old->flags)
++		else if (mem->flags != old->flags)
+ 			change = KVM_MR_FLAGS_ONLY;
+ 		else /* Nothing to change. */
  			return 0;
  	}
  
--	if ((change == KVM_MR_CREATE) || (change == KVM_MR_MOVE)) {
--		int bkt;
--
--		/* Check for overlaps */
--		kvm_for_each_memslot(tmp, bkt, __kvm_memslots(kvm, as_id)) {
--			if (tmp->id == id)
--				continue;
--			if (!((new.base_gfn + new.npages <= tmp->base_gfn) ||
--			      (new.base_gfn >= tmp->base_gfn + tmp->npages)))
--				return -EEXIST;
--		}
--	}
-+	if ((change == KVM_MR_CREATE || change == KVM_MR_MOVE) &&
-+	    kvm_check_memslot_overlap(slots, id, new.base_gfn,
-+				      new.base_gfn + new.npages))
-+		return -EEXIST;
+ 	if ((change == KVM_MR_CREATE || change == KVM_MR_MOVE) &&
+-	    kvm_check_memslot_overlap(slots, id, new.base_gfn,
+-				      new.base_gfn + new.npages))
++	    kvm_check_memslot_overlap(slots, id, base_gfn, base_gfn + npages))
+ 		return -EEXIST;
  
++	new.as_id = as_id;
++	new.id = id;
++	new.base_gfn = base_gfn;
++	new.npages = npages;
++	new.flags = mem->flags;
++	new.userspace_addr = mem->userspace_addr;
++
  	return kvm_set_memslot(kvm, old, &new, change);
  }
+ EXPORT_SYMBOL_GPL(__kvm_set_memory_region);
