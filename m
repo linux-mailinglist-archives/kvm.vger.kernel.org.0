@@ -2,70 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 44D3B463FB7
-	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 22:09:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 198A7464053
+	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 22:36:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240473AbhK3VNO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Nov 2021 16:13:14 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:29018 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1343957AbhK3VMv (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 30 Nov 2021 16:12:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1638306570;
+        id S1344210AbhK3VkI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Nov 2021 16:40:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41846 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235087AbhK3VkH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Nov 2021 16:40:07 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1288C061574;
+        Tue, 30 Nov 2021 13:36:47 -0800 (PST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1638308204;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=vRB0jIIZXNaYYuntWB3mFkvxtYXPPauos8UWrZOu2Ig=;
-        b=NCoeH7f4H9K6kBNL4hQfiyGw5mFhWDc6CroqQYxLjwNkiangp0HidFZx7xMATs7iQTnuyM
-        WEk3IgvAkYokLQP4Xkt2G8/QrtFlarMA90+A6yHQD+BAOLXVwD/bvl6po3ic/52ZqufxBi
-        pusjyu+2rJXinwp4Suxbf3ZO+HPR1bU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-521-Cy-L5SpqOxWp9ZVsNGWBlA-1; Tue, 30 Nov 2021 16:09:28 -0500
-X-MC-Unique: Cy-L5SpqOxWp9ZVsNGWBlA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 950E110168DB;
-        Tue, 30 Nov 2021 21:09:27 +0000 (UTC)
-Received: from starship (unknown [10.40.192.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0C52460C0F;
-        Tue, 30 Nov 2021 21:09:25 +0000 (UTC)
-Message-ID: <160133d3f2760d636414ff067dd4b44b6e311c6f.camel@redhat.com>
-Subject: Re: [PATCH] KVM: VMX: clear vmx_x86_ops.sync_pir_to_irr if APICv is
- disabled
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Date:   Tue, 30 Nov 2021 23:09:24 +0200
-In-Reply-To: <YaaKVYnM2hNfI4J6@google.com>
-References: <20211130123746.293379-2-pbonzini@redhat.com>
-         <YaaKVYnM2hNfI4J6@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        bh=XB+2u5uEBJEn4Qm0c+1ERye9sFiy1dxB5m1DCsCRIdU=;
+        b=lYKsjQggunBjL//xtzE/JaYSyEicoLfIP7C2ag+SfIKg5zJT3qSryEVhpm6FQhZJf+ZWFX
+        04tDjFlnWaBo5DT60Gloq90FMqmyhV5nmMj7vlxoexKqrCF9yMFc7vzG2L9xEizsdepbk+
+        My6/gRPMT2ahdUIASrk2Vsm9DxgaElpRwffWh4SNIJ3qiQ0UF2nHIF2HMWTr0dUiy4jSFg
+        Vy8Ir48C56SdrMw/QLtQLlwNJCZRQFeCZIeq4rJQ9wGdlcZOsi1U4XbI+PlUI6/tPsWT2d
+        XuqXU8fy/DX+ICv7l1uEaXHWVvGqt2EOYoV4+srchMwFgoCMmY8edqhCjA4wKw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1638308204;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=XB+2u5uEBJEn4Qm0c+1ERye9sFiy1dxB5m1DCsCRIdU=;
+        b=EtGNw3/2HkClYokrjpc8z7ivJxVQb0a6HsEsOkaPJ8e55RcS5bFYLxZVpJRg2KuyTC48R5
+        0mTpLkYGI80NZWCA==
+To:     zhenwei pi <pizhenwei@bytedance.com>, pbonzini@redhat.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
+        zhenwei pi <pizhenwei@bytedance.com>
+Subject: Re: [PATCH 1/2] x86/cpu: introduce x86_get_freq
+In-Reply-To: <20211129052038.43758-1-pizhenwei@bytedance.com>
+References: <20211129052038.43758-1-pizhenwei@bytedance.com>
+Date:   Tue, 30 Nov 2021 22:36:43 +0100
+Message-ID: <87lf15ba1g.ffs@tglx>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2021-11-30 at 20:32 +0000, Sean Christopherson wrote:
-> On Tue, Nov 30, 2021, Paolo Bonzini wrote:
-> > There is nothing to synchronize if APICv is disabled, since neither
-> > other vCPUs nor assigned devices can set PIR.ON.
-> > 
-> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > ---
-> 
-> Reviewed-by: Sean Christopherson <seanjc@google.com>
-> 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+On Mon, Nov 29 2021 at 13:20, zhenwei pi wrote:
 
-Best regards,
-	Maxim Levitsky
+> Wrapper function x86_get_freq to get freq on a x86 platform, hide
+> detailed implementation for proc routine.
 
+Please rename this to x86_get_cpufreq_khz() simply because
+x86_get_freq() is way too unspecific.
+
+Please mention function names with 'function()' which makes it obvious
+what it is. Here and in the Subject.
+
+Also spell out frequency all over the place in the change log. There is
+no reason for using abbreviations in text.
+
+> +
+> +unsigned int x86_get_freq(unsigned int cpu)
+> +{
+> +	unsigned int freq = 0;
+> +
+> +	if (cpu_has(&cpu_data(cpu), X86_FEATURE_TSC)) {
+
+Please use cpu_feature_enabled(X86....) and make this condition
+negated:
+
+     if (!cpu_feature_enabled(X86_FEATURE_TSC))
+            return 0;
+
+which spares an indentation level and the 0 initialization of the variable.
+
+Thanks,
+
+        tglx
