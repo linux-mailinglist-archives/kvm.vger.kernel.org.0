@@ -2,141 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 093A646289D
-	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 00:52:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7FB8F4628F4
+	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 01:14:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230153AbhK2Xz7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Nov 2021 18:55:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52788 "EHLO
+        id S232770AbhK3ARX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Nov 2021 19:17:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229729AbhK2Xzy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Nov 2021 18:55:54 -0500
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D569C061714
-        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 15:52:36 -0800 (PST)
-Received: by mail-pj1-x1049.google.com with SMTP id bf17-20020a17090b0b1100b001a634dbd737so10469927pjb.9
-        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 15:52:36 -0800 (PST)
+        with ESMTP id S232588AbhK3ARW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Nov 2021 19:17:22 -0500
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1892BC061574
+        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 16:14:04 -0800 (PST)
+Received: by mail-pj1-x1033.google.com with SMTP id gf14-20020a17090ac7ce00b001a7a2a0b5c3so16870598pjb.5
+        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 16:14:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
-        bh=0Gmtrp3NH5uXwCtG181ObBI/n19QY3gSbtUjJkb+q2M=;
-        b=D5xlL7hwJPlgWEiwJTo08vPV9G0H5ZA+oRdXuIj9NCStElLvjUsHJ7NA9Xav/D5RHa
-         fyZ7B7YsMaeg9SEzLMOHwCBeKNRRxlK92Tn4CI3MezwnPW18upIXoDvfLVYsFqSd40sH
-         xBMA3kGHIYnIulZDhOsboTHQubK7mLy5ndSJMPzFA3twmpxfds9XDEm9AxrTFc3m5BSe
-         W25Hzq5llNSSCRXt27wFUTBkCxXWXArULqojzDivAU+A0QIS+qQKh09FGs6lu+1ACgej
-         UFJEl5MiN/aDsW2KyWVQpUQrIa8tlnK8JJ1KG70wNsmArRKqFPI2sh59z2XQqdpT2i7l
-         8N3g==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=N4oQ5nsHnuyqNnK3H0H8mAWujsRpP5GrUWo0jZNgTTM=;
+        b=l5FCTULeQNbQN2lAn0hLRugpBy22ZFU1i1IqLebP7XVtvQnM0GOQWX1a7OZH33nEP9
+         TINO+upQk44QFZzIqeChSROdlccw9HvLq9vPHnbccWuelBkkwheYNj77hf48zW7kZQMk
+         tHnZYIJCSVAcqd3MoqKg4ch6MbWjG1OlrkkHtaHfS7zRF7QeZG9wqYLrI1fczk7c4fAM
+         644OnpA8WKSb/V7euEDMwdJNp9CRlQAZtSUVpomw/vIt3rXBx8JlQJLxYHDhZYvcw9KS
+         WP1jPHqKtiGeI/sHnX4DoXwxB6miZHnnreraWvCpeUSVVFIjZbzFQjbpo7eWdvdh7ouW
+         klbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
-         :from:to:cc;
-        bh=0Gmtrp3NH5uXwCtG181ObBI/n19QY3gSbtUjJkb+q2M=;
-        b=isV33kyd439jrkCP6lgoFGXSrXBUtBtL6REyTXwKEbOW+RcRpguBNwqw0D3X+ViwEr
-         Q6pwKZF86iPlLeF2NSz5LxIZue5gJvNdLsWpg+Vdb7GBpKV04PQWYlBZCcdm/4BQv4OZ
-         k77lrmU4Y9jGoRsDhjilXZS84YuJZglvag4xvf5prl6K5Hptt3GBqnOsBZ0cTuF8uDqR
-         kY4JwujMJeJ7Rop9DujaMzRC7++8+i5Af2zhHAa8CSn+dwOTFrP1ryg1ea7xtblMZQtY
-         KmZ4bN9LOHC9m5s7EsYN15z4UNL2jSoNTDuMHVkG4Cp6KdxmLQQpobTrc8SFPHEnIRud
-         rU2w==
-X-Gm-Message-State: AOAM533T9P8VPgw/fXfd46JVHxwxnTxfocDR7BS+nN7mTaiBWCIfv7e0
-        xlFIpDUmuNELBN5Iyi0LVPdr6SwY7yw=
-X-Google-Smtp-Source: ABdhPJx5/Zc7ZiQKs9kKczsYqMkf748/5k1+Bg3UxWj5lVtqGKqQRrhURDo1NOy8lml7KuRt5m2jB2Rr6ic=
-X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:8c2:b0:4a8:3013:145a with SMTP id
- s2-20020a056a0008c200b004a83013145amr4172981pfu.5.1638229955970; Mon, 29 Nov
- 2021 15:52:35 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Mon, 29 Nov 2021 23:52:33 +0000
-Message-Id: <20211129235233.1277558-1-seanjc@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.34.0.rc2.393.gf8c9666880-goog
-Subject: [PATCH v2] KVM: x86/mmu: Update number of zapped pages even if page
- list is stable
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=N4oQ5nsHnuyqNnK3H0H8mAWujsRpP5GrUWo0jZNgTTM=;
+        b=Mc3W+Hzsfqf1aQ5NXlEgHnwVtuix7/+AGqPd9u2xzXLGcs8hB/6R/qvNOfhX5wLJBO
+         HKCRXbC/1gQ4aShgiS74U6TqqIhvnG6Ob4X2VbCelqAMx6d51r7UUt/O0i6ic49/QiLI
+         1+UosTyHj2C+SSqhq1uuSRdvsA3oY6crCsnQ+puYR//ldpZs29jrv2dSfi7kQTxh4tP8
+         FYRA7vRpjiHa0nIFcM/54YsTQ3pbCx7vhqk2Kw+CJLNZ5BwRdh/y+m+D+UaX+FH3yp0I
+         oROqfJzOf9AY+KoJK2SnRQRiywx1If0suPUMQDFyWG1AqsBSPeV1XL8WqfO0CkjRG5Ih
+         le+Q==
+X-Gm-Message-State: AOAM531vk1R7h8TsxNl7ItphP9CScqcgr9Ctfn4nVHHnzHOKef6FjXNu
+        kUOF6aftKkorI0Gx4aiiiU9gTA==
+X-Google-Smtp-Source: ABdhPJwvDdfGiexibonb/HWlMGNitjQuz3LfqR3AijmZovgZpXGFNX6Z29BHZrkdI9lvaO/oyuROFw==
+X-Received: by 2002:a17:90a:fd96:: with SMTP id cx22mr1647813pjb.151.1638231243456;
+        Mon, 29 Nov 2021 16:14:03 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id q89sm438335pjk.50.2021.11.29.16.14.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Nov 2021 16:14:02 -0800 (PST)
+Date:   Tue, 30 Nov 2021 00:13:59 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>
-Content-Type: text/plain; charset="UTF-8"
+To:     Ben Gardon <bgardon@google.com>
+Cc:     Peter Xu <peterx@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Shier <pshier@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Keqian Zhu <zhukeqian1@huawei.com>,
+        David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH 15/15] KVM: x86/mmu: Promote pages in-place when
+ disabling dirty logging
+Message-ID: <YaVsxzfkbYpr7Ck9@google.com>
+References: <20211115234603.2908381-1-bgardon@google.com>
+ <20211115234603.2908381-16-bgardon@google.com>
+ <YZ8OpQmB/8k3/Maj@xz-m1.local>
+ <CANgfPd9pK83S+yoRokLg7wiroE6-OkieATTqgGn3yCCzwNFi4A@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANgfPd9pK83S+yoRokLg7wiroE6-OkieATTqgGn3yCCzwNFi4A@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When zapping obsolete pages, update the running count of zapped pages
-regardless of whether or not the list has become unstable due to zapping
-a shadow page with its own child shadow pages.  If the VM is backed by
-mostly 4kb pages, KVM can zap an absurd number of SPTEs without bumping
-the batch count and thus without yielding.  In the worst case scenario,
-this can cause a soft lokcup.
+On Mon, Nov 29, 2021, Ben Gardon wrote:
+> On Wed, Nov 24, 2021 at 8:19 PM Peter Xu <peterx@redhat.com> wrote:
+> > I've got a few comments below, but before that I've also got one off-topic
+> > question too; it'll be great if you can help answer.
+> >
+> > When I was looking into how the old code recovers the huge pages I found that
+> > we'll leave the full-zero pgtable page there until the next page fault, then I
+> > _think_ it'll be released only until the __handle_changed_spte() when we're
+> > dropping the old spte (handle_removed_tdp_mmu_page).
+> 
+> That seems likely, though Sean's recent series that heavily refactored
+> zapping probably changed that.
 
- watchdog: BUG: soft lockup - CPU#12 stuck for 22s! [dirty_log_perf_:13020]
-   RIP: 0010:workingset_activation+0x19/0x130
-   mark_page_accessed+0x266/0x2e0
-   kvm_set_pfn_accessed+0x31/0x40
-   mmu_spte_clear_track_bits+0x136/0x1c0
-   drop_spte+0x1a/0xc0
-   mmu_page_zap_pte+0xef/0x120
-   __kvm_mmu_prepare_zap_page+0x205/0x5e0
-   kvm_mmu_zap_all_fast+0xd7/0x190
-   kvm_mmu_invalidate_zap_pages_in_memslot+0xe/0x10
-   kvm_page_track_flush_slot+0x5c/0x80
-   kvm_arch_flush_shadow_memslot+0xe/0x10
-   kvm_set_memslot+0x1a8/0x5d0
-   __kvm_set_memory_region+0x337/0x590
-   kvm_vm_ioctl+0xb08/0x1040
+Hmm, no, that behavior shouldn't change for this path in my series.  Only the leaf
+SPTEs are zapped, the shadow page hangs around until its replaced by a hugepage,
+reclaimed due to memory pressure, etc...  FWIW, that's consistent with the
+legacy/full MMU.
 
-Fixes: fbb158cb88b6 ("KVM: x86/mmu: Revert "Revert "KVM: MMU: zap pages in batch""")
-Reported-by: David Matlack <dmatlack@google.com>
-Reviewed-by: Ben Gardon <bgardon@google.com>
-Cc: stable@vger.kernel.org
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
-
-v2:
- - Rebase to kvm/master, commit 30d7c5d60a88 ("KVM: SEV: expose...")
- - Collect Ben's review, modulo bad splat.
- - Copy+paste the correct splat and symptom. [David].
-
-@David, I kept the unstable declaration out of the loop, mostly because I
-really don't like putting declarations in loops, but also because
-nr_zapped is declared out of the loop and I didn't want to change that
-unnecessarily or make the code inconsistent.
-
- arch/x86/kvm/mmu/mmu.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 0c839ee1282c..208c892136bf 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -5576,6 +5576,7 @@ static void kvm_zap_obsolete_pages(struct kvm *kvm)
- {
- 	struct kvm_mmu_page *sp, *node;
- 	int nr_zapped, batch = 0;
-+	bool unstable;
- 
- restart:
- 	list_for_each_entry_safe_reverse(sp, node,
-@@ -5607,11 +5608,12 @@ static void kvm_zap_obsolete_pages(struct kvm *kvm)
- 			goto restart;
- 		}
- 
--		if (__kvm_mmu_prepare_zap_page(kvm, sp,
--				&kvm->arch.zapped_obsolete_pages, &nr_zapped)) {
--			batch += nr_zapped;
-+		unstable = __kvm_mmu_prepare_zap_page(kvm, sp,
-+				&kvm->arch.zapped_obsolete_pages, &nr_zapped);
-+		batch += nr_zapped;
-+
-+		if (unstable)
- 			goto restart;
--		}
- 	}
- 
- 	/*
--- 
-2.34.0.rc2.393.gf8c9666880-goog
-
+Zapping the SP is doable in theory, but it would require completely different
+iteration behavior and small amount of additional logic to check the entire gfn
+range covered by the SP for compability.  If we were starting from scratch, I
+would probably advocate zapping the parent SP directly, but since the net work
+done is roughly equivalent, the cost of keeping the page around is negligible,
+and we have functional code already...
