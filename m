@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DFA9C4640AA
-	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 22:47:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 17DA446409A
+	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 22:46:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344760AbhK3Vu7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Nov 2021 16:50:59 -0500
-Received: from vps-vb.mhejs.net ([37.28.154.113]:56896 "EHLO vps-vb.mhejs.net"
+        id S1344444AbhK3Vtj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Nov 2021 16:49:39 -0500
+Received: from vps-vb.mhejs.net ([37.28.154.113]:56938 "EHLO vps-vb.mhejs.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1344565AbhK3Vsb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Nov 2021 16:48:31 -0500
+        id S1344752AbhK3Vsm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Nov 2021 16:48:42 -0500
 Received: from MUA
         by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <mail@maciej.szmigiero.name>)
-        id 1msAv1-0006F8-IU; Tue, 30 Nov 2021 22:44:07 +0100
+        id 1msAv6-0006Fr-SB; Tue, 30 Nov 2021 22:44:12 +0100
 From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>
@@ -44,9 +44,9 @@ Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Atish Patra <atish.patra@wdc.com>,
         Ben Gardon <bgardon@google.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v6 26/29] KVM: Optimize gfn lookup in kvm_zap_gfn_range()
-Date:   Tue, 30 Nov 2021 22:41:39 +0100
-Message-Id: <a39db04edcacfe955c660e2f139f948cf29362f5.1638304316.git.maciej.szmigiero@oracle.com>
+Subject: [PATCH v6 27/29] KVM: Optimize overlapping memslots check
+Date:   Tue, 30 Nov 2021 22:41:40 +0100
+Message-Id: <9698a99ccd1938a36dd0c7399262f888dcdf01ac.1638304316.git.maciej.szmigiero@oracle.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <cover.1638304315.git.maciej.szmigiero@oracle.com>
 References: <cover.1638304315.git.maciej.szmigiero@oracle.com>
@@ -58,164 +58,85 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
 
-Introduce a memslots gfn upper bound operation and use it to optimize
-kvm_zap_gfn_range().
-This way this handler can do a quick lookup for intersecting gfns and won't
-have to do a linear scan of the whole memslot set.
+Do a quick lookup for possibly overlapping gfns when creating or moving
+a memslot instead of performing a linear scan of the whole memslot set.
 
 Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+[sean: tweaked params to avoid churn in future cleanup]
+Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c   | 12 +++--
- include/linux/kvm_host.h | 99 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 108 insertions(+), 3 deletions(-)
+ virt/kvm/kvm_main.c | 35 +++++++++++++++++++++--------------
+ 1 file changed, 21 insertions(+), 14 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index f5a89942f054..89d34bcfa9c3 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -5704,19 +5704,22 @@ static bool __kvm_zap_rmaps(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
- {
- 	const struct kvm_memory_slot *memslot;
- 	struct kvm_memslots *slots;
-+	struct kvm_memslot_iter iter;
- 	bool flush = false;
- 	gfn_t start, end;
--	int i, bkt;
-+	int i;
- 
- 	if (!kvm_memslots_have_rmaps(kvm))
- 		return flush;
- 
- 	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
- 		slots = __kvm_memslots(kvm, i);
--		kvm_for_each_memslot(memslot, bkt, slots) {
-+
-+		kvm_for_each_memslot_in_gfn_range(&iter, slots, gfn_start, gfn_end) {
-+			memslot = kvm_memslot_iter_slot(&iter);
- 			start = max(gfn_start, memslot->base_gfn);
- 			end = min(gfn_end, memslot->base_gfn + memslot->npages);
--			if (start >= end)
-+			if (WARN_ON_ONCE(start >= end))
- 				continue;
- 
- 			flush = slot_handle_level_range(kvm, memslot, kvm_zap_rmapp,
-@@ -5737,6 +5740,9 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
- 	bool flush;
- 	int i;
- 
-+	if (WARN_ON_ONCE(gfn_end <= gfn_start))
-+		return;
-+
- 	write_lock(&kvm->mmu_lock);
- 
- 	kvm_inc_notifier_count(kvm, gfn_start, gfn_end);
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 41efe53cf150..6fce6eb797a7 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -848,6 +848,105 @@ struct kvm_memory_slot *id_to_memslot(struct kvm_memslots *slots, int id)
- 	return NULL;
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 086f18969bc3..52117f65bc5b 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1817,6 +1817,18 @@ static int kvm_set_memslot(struct kvm *kvm,
+ 	return 0;
  }
  
-+/* Iterator used for walking memslots that overlap a gfn range. */
-+struct kvm_memslot_iter {
-+	struct kvm_memslots *slots;
-+	gfn_t end;
-+	struct rb_node *node;
-+};
-+
-+static inline void kvm_memslot_iter_start(struct kvm_memslot_iter *iter,
-+					  struct kvm_memslots *slots,
-+					  gfn_t start, gfn_t end)
++static bool kvm_check_memslot_overlap(struct kvm_memslots *slots, int id,
++				      gfn_t start, gfn_t end)
 +{
-+	int idx = slots->node_idx;
-+	struct rb_node *tmp;
-+	struct kvm_memory_slot *slot;
++	struct kvm_memslot_iter iter;
 +
-+	iter->slots = slots;
-+	iter->end = end;
++	kvm_for_each_memslot_in_gfn_range(&iter, slots, start, end)
++		if (kvm_memslot_iter_slot(&iter)->id != id)
++			return true;
 +
-+	/*
-+	 * Find the so called "upper bound" of a key - the first node that has
-+	 * its key strictly greater than the searched one (the start gfn in our case).
-+	 */
-+	iter->node = NULL;
-+	for (tmp = slots->gfn_tree.rb_node; tmp; ) {
-+		slot = container_of(tmp, struct kvm_memory_slot, gfn_node[idx]);
-+		if (start < slot->base_gfn) {
-+			iter->node = tmp;
-+			tmp = tmp->rb_left;
-+		} else {
-+			tmp = tmp->rb_right;
-+		}
-+	}
-+
-+	/*
-+	 * Find the slot with the lowest gfn that can possibly intersect with
-+	 * the range, so we'll ideally have slot start <= range start
-+	 */
-+	if (iter->node) {
-+		/*
-+		 * A NULL previous node means that the very first slot
-+		 * already has a higher start gfn.
-+		 * In this case slot start > range start.
-+		 */
-+		tmp = rb_prev(iter->node);
-+		if (tmp)
-+			iter->node = tmp;
-+	} else {
-+		/* a NULL node below means no slots */
-+		iter->node = rb_last(&slots->gfn_tree);
-+	}
-+
-+	if (iter->node) {
-+		/*
-+		 * It is possible in the slot start < range start case that the
-+		 * found slot ends before or at range start (slot end <= range start)
-+		 * and so it does not overlap the requested range.
-+		 *
-+		 * In such non-overlapping case the next slot (if it exists) will
-+		 * already have slot start > range start, otherwise the logic above
-+		 * would have found it instead of the current slot.
-+		 */
-+		slot = container_of(iter->node, struct kvm_memory_slot, gfn_node[idx]);
-+		if (slot->base_gfn + slot->npages <= start)
-+			iter->node = rb_next(iter->node);
-+	}
++	return false;
 +}
-+
-+static inline struct kvm_memory_slot *kvm_memslot_iter_slot(struct kvm_memslot_iter *iter)
-+{
-+	return container_of(iter->node, struct kvm_memory_slot, gfn_node[iter->slots->node_idx]);
-+}
-+
-+static inline bool kvm_memslot_iter_is_valid(struct kvm_memslot_iter *iter)
-+{
-+	struct kvm_memory_slot *memslot;
-+
-+	if (!iter->node)
-+		return false;
-+
-+	memslot = kvm_memslot_iter_slot(iter);
-+
-+	/*
-+	 * If this slot starts beyond or at the end of the range so does
-+	 * every next one
-+	 */
-+	return memslot->base_gfn < iter->end;
-+}
-+
-+static inline void kvm_memslot_iter_next(struct kvm_memslot_iter *iter)
-+{
-+	iter->node = rb_next(iter->node);
-+}
-+
-+/* Iterate over each memslot at least partially intersecting [start, end) range */
-+#define kvm_for_each_memslot_in_gfn_range(iter, slots, start, end)	 \
-+	for (kvm_memslot_iter_start(iter, slots, start, end);		 \
-+	     kvm_memslot_iter_is_valid(iter);				 \
-+	     kvm_memslot_iter_next(iter))
 +
  /*
-  * KVM_SET_USER_MEMORY_REGION ioctl allows the following operations:
-  * - create a new memory slot
+  * Allocate some memory and give it an address in the guest physical address
+  * space.
+@@ -1828,8 +1840,9 @@ static int kvm_set_memslot(struct kvm *kvm,
+ int __kvm_set_memory_region(struct kvm *kvm,
+ 			    const struct kvm_userspace_memory_region *mem)
+ {
+-	struct kvm_memory_slot *old, *tmp;
++	struct kvm_memory_slot *old;
+ 	struct kvm_memory_slot new;
++	struct kvm_memslots *slots;
+ 	enum kvm_mr_change change;
+ 	int as_id, id;
+ 	int r;
+@@ -1858,11 +1871,13 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 	if (mem->guest_phys_addr + mem->memory_size < mem->guest_phys_addr)
+ 		return -EINVAL;
+ 
++	slots = __kvm_memslots(kvm, as_id);
++
+ 	/*
+ 	 * Note, the old memslot (and the pointer itself!) may be invalidated
+ 	 * and/or destroyed by kvm_set_memslot().
+ 	 */
+-	old = id_to_memslot(__kvm_memslots(kvm, as_id), id);
++	old = id_to_memslot(slots, id);
+ 
+ 	if (!mem->memory_size) {
+ 		if (!old || !old->npages)
+@@ -1911,18 +1926,10 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 			return 0;
+ 	}
+ 
+-	if ((change == KVM_MR_CREATE) || (change == KVM_MR_MOVE)) {
+-		int bkt;
+-
+-		/* Check for overlaps */
+-		kvm_for_each_memslot(tmp, bkt, __kvm_memslots(kvm, as_id)) {
+-			if (tmp->id == id)
+-				continue;
+-			if (!((new.base_gfn + new.npages <= tmp->base_gfn) ||
+-			      (new.base_gfn >= tmp->base_gfn + tmp->npages)))
+-				return -EEXIST;
+-		}
+-	}
++	if ((change == KVM_MR_CREATE || change == KVM_MR_MOVE) &&
++	    kvm_check_memslot_overlap(slots, id, new.base_gfn,
++				      new.base_gfn + new.npages))
++		return -EEXIST;
+ 
+ 	return kvm_set_memslot(kvm, old, &new, change);
+ }
