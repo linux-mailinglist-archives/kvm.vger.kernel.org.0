@@ -2,164 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E3367462E13
-	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 08:58:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 49EA7462E29
+	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 09:03:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237911AbhK3IBk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Nov 2021 03:01:40 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:21817 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234605AbhK3IBf (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 30 Nov 2021 03:01:35 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1638259096;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ofQ+mTAvWB+lgCzceqE6eZM4DqOGEYL7WnumgczCy5o=;
-        b=QHj4XHD1IWfLWWxn3kY4kEq8kakorG6YKXQdLoI8/OE9aU9xo/9WSfcFw2wVv0qL8m3z3m
-        y+emExU7EPQv98QHPGlTnvDvmFZtf6nFRq7XGCwRBegmJwofhFY9DQZ9gfMDLIb8WfVCCL
-        w7M+OXr6xC+LP4zUw/4g1TuHCczu23o=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-461-LUw9QfZNPaa6gwh_icSZSg-1; Tue, 30 Nov 2021 02:58:11 -0500
-X-MC-Unique: LUw9QfZNPaa6gwh_icSZSg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3634785EE62;
-        Tue, 30 Nov 2021 07:58:10 +0000 (UTC)
-Received: from starship (unknown [10.40.192.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5F2221002388;
-        Tue, 30 Nov 2021 07:58:08 +0000 (UTC)
-Message-ID: <f73c491ce789234d92275e0529b55ebd48f4cfb6.camel@redhat.com>
-Subject: Re: [PATCH 3/4] KVM: x86: check PIR even for vCPUs with disabled
- APICv
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     seanjc@google.com, stable@vger.kernel.org
-Date:   Tue, 30 Nov 2021 09:58:07 +0200
-In-Reply-To: <20211123004311.2954158-4-pbonzini@redhat.com>
-References: <20211123004311.2954158-1-pbonzini@redhat.com>
-         <20211123004311.2954158-4-pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        id S239407AbhK3IGv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Nov 2021 03:06:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49862 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239390AbhK3IGv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Nov 2021 03:06:51 -0500
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F908C061574;
+        Tue, 30 Nov 2021 00:03:32 -0800 (PST)
+Received: by mail-ed1-x529.google.com with SMTP id r11so83220195edd.9;
+        Tue, 30 Nov 2021 00:03:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=Y3OjoArPACL/x2z/KPmqVt1SHQfGrEG51zBDxpyeVJ4=;
+        b=Rc0Rnyd5FBS1g11SUugefNt50KNwWJifSMXXpkvM2zEgUikS4qVbAdhPmfyv492dJD
+         aWk2rq4E/Ho/TiYxXqGOAbsntJX2DybjZlncwcb/1EkhOG9nRwVOzRu6pJD8DC85mG6I
+         vyq5DqFFdooE3k+4VZdKbqT1+scpG0H7Tceb3/zps/a2WpRmuBGNjRcL04I6OF56eQPc
+         VMbaA3wILpOgzx+7RokJIVB+MU7M9Gf1Ww87yzrIDv4oDV/2NSOOwzt5GGQY0dU8caUb
+         Y+zi7KLF+vUzaIocaKuSmrebziuhSZ9Tx+Orf/x5Jbhy6Y/sinzuHy/F7PzLzD4y+0uw
+         ZqCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=Y3OjoArPACL/x2z/KPmqVt1SHQfGrEG51zBDxpyeVJ4=;
+        b=tkHshgERqHzr1ZcjaCluTyiWjsCL3w0dT/mu9XhPBQrm2iuVvF1PVTEqGyZpCrGl6k
+         1xgLXe61oLJl1BYcg70+vErObx9aYY01cKfqB+cdVWuu0NtbbumNpbIhIrkrv0vDhKbB
+         lpFyCGXO+aSgXPjQqcXlI7voyPSdz57zxvAgw99nY1aGxWM4PDF2pwp2ucuslpuqNx6L
+         ybO68ki7KLwqxPbPFjEKTSgL8xjS4TiVJv706cXy+ZlwFi43jYM6okLICrh95bi4J9Ol
+         FR3vGo8avilwtWlzYf+7GrkOm9oUi9/7tCul1Fo4Otpm3nIr+ZbX76L+RF3yKbBSHPaa
+         mcLA==
+X-Gm-Message-State: AOAM530ml2BogUaFAo5+vt8oMKp9+ic2gswvPR9YRPF5ns/g2UYJSxUl
+        V31+VN4EWR0IY2isUatdXmA=
+X-Google-Smtp-Source: ABdhPJxIWTfddArRgY9lnTND2FNXQy7NujYHAcrA/2ukXnM9X6Bj32tjvj/dqG4bjqgyNr1bJECVeg==
+X-Received: by 2002:a17:907:3e96:: with SMTP id hs22mr66982659ejc.139.1638259410717;
+        Tue, 30 Nov 2021 00:03:30 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.googlemail.com with ESMTPSA id jz4sm8590408ejc.19.2021.11.30.00.03.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 Nov 2021 00:03:30 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <4fa1e465-1939-aff2-94bb-fbc400d6c323@redhat.com>
+Date:   Tue, 30 Nov 2021 09:03:29 +0100
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH 01/28] KVM: x86/mmu: Use yield-safe TDP MMU root iter in
+ MMU notifier unmapping
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Hou Wenlong <houwenlong93@linux.alibaba.com>,
+        Ben Gardon <bgardon@google.com>
+References: <20211120045046.3940942-1-seanjc@google.com>
+ <20211120045046.3940942-2-seanjc@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20211120045046.3940942-2-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2021-11-22 at 19:43 -0500, Paolo Bonzini wrote:
-> The IRTE for an assigned device can trigger a POSTED_INTR_VECTOR even
-> if APICv is disabled on the vCPU that receives it.  In that case, the
-> interrupt will just cause a vmexit and leave the ON bit set together
-> with the PIR bit corresponding to the interrupt.
+On 11/20/21 05:50, Sean Christopherson wrote:
+> Use the yield-safe variant of the TDP MMU iterator when handling an
+> unmapping event from the MMU notifier, as most occurences of the event
+> allow yielding.
 > 
-> Right now, the interrupt would not be delivered until APICv is re-enabled.
-> However, fixing this is just a matter of always doing the PIR->IRR
-> synchronization, even if the vCPU has temporarily disabled APICv.
-> 
-> This is not a problem for performance, or if anything it is an
-> improvement.  First, in the common case where vcpu->arch.apicv_active is
-> true, one fewer check has to be performed.  Second, static_call_cond will
-> elide the function call if APICv is not present or disabled.  Finally,
-> in the case for AMD hardware we can remove the sync_pir_to_irr callback:
-> it is only needed for apic_has_interrupt_for_ppr, and that function
-> already has a fallback for !APICv.
-> 
+> Fixes: e1eed5847b09 ("KVM: x86/mmu: Allow yielding during MMU notifier unmap/zap, if possible")
 > Cc: stable@vger.kernel.org
-> Co-developed-by: Sean Christopherson <seanjc@google.com>
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  arch/x86/kvm/lapic.c   |  2 +-
->  arch/x86/kvm/svm/svm.c |  1 -
->  arch/x86/kvm/x86.c     | 18 +++++++++---------
->  3 files changed, 10 insertions(+), 11 deletions(-)
+>   arch/x86/kvm/mmu/tdp_mmu.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 759952dd1222..f206fc35deff 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -707,7 +707,7 @@ static void pv_eoi_clr_pending(struct kvm_vcpu *vcpu)
->  static int apic_has_interrupt_for_ppr(struct kvm_lapic *apic, u32 ppr)
->  {
->  	int highest_irr;
-> -	if (apic->vcpu->arch.apicv_active)
-> +	if (kvm_x86_ops.sync_pir_to_irr)
->  		highest_irr = static_call(kvm_x86_sync_pir_to_irr)(apic->vcpu);
->  	else
->  		highest_irr = apic_find_highest_irr(apic);
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 5630c241d5f6..d0f68d11ec70 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -4651,7 +4651,6 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
->  	.load_eoi_exitmap = svm_load_eoi_exitmap,
->  	.hwapic_irr_update = svm_hwapic_irr_update,
->  	.hwapic_isr_update = svm_hwapic_isr_update,
-> -	.sync_pir_to_irr = kvm_lapic_find_highest_irr,
->  	.apicv_post_state_restore = avic_post_state_restore,
->  
->  	.set_tss_addr = svm_set_tss_addr,
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 441f4769173e..a8f12c83db4b 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -4448,8 +4448,7 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->  static int kvm_vcpu_ioctl_get_lapic(struct kvm_vcpu *vcpu,
->  				    struct kvm_lapic_state *s)
->  {
-> -	if (vcpu->arch.apicv_active)
-> -		static_call(kvm_x86_sync_pir_to_irr)(vcpu);
-> +	static_call_cond(kvm_x86_sync_pir_to_irr)(vcpu);
->  
->  	return kvm_apic_get_state(vcpu, s);
->  }
-> @@ -9528,8 +9527,7 @@ static void vcpu_scan_ioapic(struct kvm_vcpu *vcpu)
->  	if (irqchip_split(vcpu->kvm))
->  		kvm_scan_ioapic_routes(vcpu, vcpu->arch.ioapic_handled_vectors);
->  	else {
-> -		if (vcpu->arch.apicv_active)
-> -			static_call(kvm_x86_sync_pir_to_irr)(vcpu);
-> +		static_call_cond(kvm_x86_sync_pir_to_irr)(vcpu);
->  		if (ioapic_in_kernel(vcpu->kvm))
->  			kvm_ioapic_scan_entry(vcpu, vcpu->arch.ioapic_handled_vectors);
->  	}
-> @@ -9802,10 +9800,12 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
->  
->  	/*
->  	 * This handles the case where a posted interrupt was
-> -	 * notified with kvm_vcpu_kick.
-> +	 * notified with kvm_vcpu_kick.  Assigned devices can
-> +	 * use the POSTED_INTR_VECTOR even if APICv is disabled,
-> +	 * so do it even if APICv is disabled on this vCPU.
->  	 */
-> -	if (kvm_lapic_enabled(vcpu) && vcpu->arch.apicv_active)
-> -		static_call(kvm_x86_sync_pir_to_irr)(vcpu);
-> +	if (kvm_lapic_enabled(vcpu))
-> +		static_call_cond(kvm_x86_sync_pir_to_irr)(vcpu);
->  
->  	if (kvm_vcpu_exit_request(vcpu)) {
->  		vcpu->mode = OUTSIDE_GUEST_MODE;
-> @@ -9849,8 +9849,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
->  		if (likely(exit_fastpath != EXIT_FASTPATH_REENTER_GUEST))
->  			break;
->  
-> -		if (kvm_lapic_enabled(vcpu) && vcpu->arch.apicv_active)
-> -			static_call(kvm_x86_sync_pir_to_irr)(vcpu);
-> +		if (kvm_lapic_enabled(vcpu))
-> +			static_call_cond(kvm_x86_sync_pir_to_irr)(vcpu);
->  
->  		if (unlikely(kvm_vcpu_exit_request(vcpu))) {
->  			exit_fastpath = EXIT_FASTPATH_EXIT_HANDLED;
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 377a96718a2e..a29ebff1cfa0 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -1031,7 +1031,7 @@ bool kvm_tdp_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range,
+>   {
+>   	struct kvm_mmu_page *root;
+>   
+> -	for_each_tdp_mmu_root(kvm, root, range->slot->as_id)
+> +	for_each_tdp_mmu_root_yield_safe(kvm, root, range->slot->as_id, false)
+>   		flush |= zap_gfn_range(kvm, root, range->start, range->end,
+>   				       range->may_block, flush, false);
+>   
+> 
 
-Best regards,
-	Maxim Levitsky
+Queued, thanks.
 
+Paolo
