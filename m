@@ -2,124 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CCDFF462C47
-	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 06:40:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ED03F462D79
+	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 08:28:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238365AbhK3FnZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Nov 2021 00:43:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45564 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238360AbhK3FnT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Nov 2021 00:43:19 -0500
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09F95C061574
-        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 21:40:00 -0800 (PST)
-Received: by mail-pf1-x42b.google.com with SMTP id u80so19410206pfc.9
-        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 21:40:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=2O/hiQ03MFaYbbx3qyaBx+GPTTjxo7NbQIxhjjvNI2w=;
-        b=FJaoREo5lr4D3hO1iEHEr3xWdnD0wwrtf7Ef1X1rSs8S4PWjhTbbX6jnw6DBltbsJX
-         6i9Ywnw7JCOsnCL/UwEWjqp17HJkt4EzbZTxyBxuoWJG8/Of+n/SqA6za6RkHdE6SASr
-         t6wu10M8KcnN+UXjYsY9yGCelVtKnbGPoQhZ/rPLX3b85pSxj+RB3R/kmxfVxxpG54+m
-         FjTcQGEc9YCx64+fwylV3ylCk+0ERgSyEiXZ87vXZfSFh7ajfHECA38JLabu1lYOUZ4J
-         1ktEAlEFRS5l1KibAPtXqfVpQMMEVdyQZjAA9POS4cKpRUN4R8mV+hoW2fGgdNxpid+B
-         KG3Q==
+        id S239030AbhK3Hbl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Nov 2021 02:31:41 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:23085 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233413AbhK3Hbk (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 30 Nov 2021 02:31:40 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1638257301;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=QYG0xlXta5uqZ69e7PNkPe7Wbsl/KNZHtSSSmrsdMFw=;
+        b=PFx7Oh+p5R0dpQmGsS6sdUi+mK2wv6lJdJuz1MYgj297h8wvZr8+/KumA5IWy0duFNMnyk
+        5Eexf8degRWrxDquD2cz06T4tvqftFxltIvRDl+6pUXLJNKNJ0+qRX+U8fVF+ziO9Ga9c/
+        kyqH7x50FjeIAOsRvqWWCwCupWmzhnc=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-20-I94cH0tEMPCq8hstjQ6wKA-1; Tue, 30 Nov 2021 02:28:18 -0500
+X-MC-Unique: I94cH0tEMPCq8hstjQ6wKA-1
+Received: by mail-wm1-f69.google.com with SMTP id z138-20020a1c7e90000000b003319c5f9164so13283587wmc.7
+        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 23:28:18 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=2O/hiQ03MFaYbbx3qyaBx+GPTTjxo7NbQIxhjjvNI2w=;
-        b=lcD6GtEE9LgDoeMHK+ZrqNMs3tCT/5X4sRx71PLuiFRYR+Ccgaut9c91dN88hP4Dks
-         7RT3iDxARAa0kdIXX+ZqnyqJyteuNVwcedPJKnM6W+gpJAnDoTAUC2p2+Q7I/s/OTAXW
-         Vy5qAu057KWtR8rCizkCZgQEock8Mb4+2aXtlwBHd3UdScFneuPJ4eUSwE1GuLsh1pkO
-         KQ+jBLSLXPdSGAh+WRDHK/grFIz8VZWZp1YjY3DJb56HTGW/TQoDylSnwlagkb1p3an0
-         deAcC1/O+2KUJOm5Gr4alcJ5iLLudnxBai5f4V0f+9Xmr71moaRFlSUes5e7pT242L8i
-         k51A==
-X-Gm-Message-State: AOAM533VWfvuOVUqdRPx1ydY5Crba/PJbaxi9Rf5T/WhzBAT8xNjEmp0
-        BJ6HmI7b7Dxw8jzDNVwJJQoKX0whcpFU9kDdB0BS0Hj68Bkj7w==
-X-Google-Smtp-Source: ABdhPJzYoUPHGrIYMegTjTSSCO7W+6mHt9oLHSQoSM1blfLYXTNnPxnKfkEzBg1Vu3CUu/4qR3k0I2UA4fV59wak9oI=
-X-Received: by 2002:a63:82c6:: with SMTP id w189mr26026217pgd.491.1638250799398;
- Mon, 29 Nov 2021 21:39:59 -0800 (PST)
-MIME-Version: 1.0
-References: <20211117064359.2362060-1-reijiw@google.com> <20211117064359.2362060-13-reijiw@google.com>
- <44073484-639e-3d23-2068-ae5c2cac3276@redhat.com>
-In-Reply-To: <44073484-639e-3d23-2068-ae5c2cac3276@redhat.com>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Mon, 29 Nov 2021 21:39:43 -0800
-Message-ID: <CAAeT=FyBaKvof6BpPB021MN6k797BcMP+sPMDeiZ9SR6nvXdCA@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 12/29] KVM: arm64: Make ID_DFR1_EL1 writable
-To:     Eric Auger <eauger@redhat.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=QYG0xlXta5uqZ69e7PNkPe7Wbsl/KNZHtSSSmrsdMFw=;
+        b=XlcxZ/oq9U/gLh73ulNPzu1BHlnFTxSM3w45b0BNyqDk7T014n3tEcJKMov643ec+5
+         d4j3NtSLnHQIUMCn32ZN2UzO3qFVWtivAcJVH1HGmjSEanfluhQRNU29u/9ObH8qoBl/
+         5lfIx7n8V5ZNnt9KT2UvQs4D1rElBoqJz6y2lqHUo53Fd999i+6UR1pmEVmz85i2+PtQ
+         xpEAqCqYNSpNo2+xA/VG05pODfgGXrKyxrXFfuXjmPwP/ekkXm88C68duKuS7QlC57f3
+         x83oKUMD8Cf5hK6UetgjemtdArSxsB6AhdNEUf43DRObc6RKUfvBCONbKNDT3HTNsD56
+         CV6A==
+X-Gm-Message-State: AOAM533xIYAQ3Mgz3wZvqKCGX67VZFLfxao1/FGYZqTs4lNjrTiSOu3p
+        s4AISW78o3DC2fRbMaYWV7oljSBdFo27OJG+zDEirCO0wHCKsnewpfjML4JDQG0VyXk88UVIaFE
+        6qEXUdIm3Ua3I
+X-Received: by 2002:a7b:ce16:: with SMTP id m22mr2979792wmc.39.1638257297487;
+        Mon, 29 Nov 2021 23:28:17 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxK2rwcIrtv4RtfQ983prRIkRD0ZG7sfC5n89ECduXultLEnEEQ2+nrWzvlBkIc4L2PPkSzQA==
+X-Received: by 2002:a7b:ce16:: with SMTP id m22mr2979769wmc.39.1638257297217;
+        Mon, 29 Nov 2021 23:28:17 -0800 (PST)
+Received: from xz-m1.local ([85.203.46.194])
+        by smtp.gmail.com with ESMTPSA id g198sm1574235wme.23.2021.11.29.23.28.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Nov 2021 23:28:16 -0800 (PST)
+Date:   Tue, 30 Nov 2021 15:28:07 +0800
+From:   Peter Xu <peterx@redhat.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>,
-        Andrew Jones <drjones@redhat.com>,
-        Peng Liang <liangpeng10@huawei.com>,
+        Sean Christopherson <seanjc@google.com>,
         Peter Shier <pshier@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        David Matlack <dmatlack@google.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Keqian Zhu <zhukeqian1@huawei.com>,
+        David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH 15/15] KVM: x86/mmu: Promote pages in-place when
+ disabling dirty logging
+Message-ID: <YaXSh6RUOH7NHG8G@xz-m1.local>
+References: <20211115234603.2908381-1-bgardon@google.com>
+ <20211115234603.2908381-16-bgardon@google.com>
+ <YZ8OpQmB/8k3/Maj@xz-m1.local>
+ <CANgfPd9pK83S+yoRokLg7wiroE6-OkieATTqgGn3yCCzwNFi4A@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CANgfPd9pK83S+yoRokLg7wiroE6-OkieATTqgGn3yCCzwNFi4A@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
+On Mon, Nov 29, 2021 at 10:31:14AM -0800, Ben Gardon wrote:
+> > As comment above handle_removed_tdp_mmu_page() showed, at this point IIUC
+> > current thread should have exclusive ownership of this orphaned and abandoned
+> > pgtable page, then why in handle_removed_tdp_mmu_page() we still need all the
+> > atomic operations and REMOVED_SPTE tricks to protect from concurrent access?
+> > Since that's cmpxchg-ed out of the old pgtable, what can be accessing it
+> > besides the current thread?
+> 
+> The cmpxchg does nothing to guarantee that other threads can't have a
+> pointer to the page table, only that this thread knows it's the one
+> that removed it from the page table. Other threads could still have
+> pointers to it in two ways:
+> 1. A kernel thread could be in the process of modifying an SPTE in the
+> page table, under the MMU lock in read mode. In that case, there's no
+> guarantee that there's not another kernel thread with a pointer to the
+> SPTE until the end of an RCU grace period.
 
-On Thu, Nov 25, 2021 at 12:30 PM Eric Auger <eauger@redhat.com> wrote:
->
-> Hi Reiji,
->
-> On 11/17/21 7:43 AM, Reiji Watanabe wrote:
-> > This patch adds id_reg_info for ID_DFR1_EL1 to make it writable
-> > by userspace.
-> >
-> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> > ---
-> >  arch/arm64/kvm/sys_regs.c | 6 ++++++
-> >  1 file changed, 6 insertions(+)
-> >
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index fbd335ac5e6b..dda7001959f6 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -859,6 +859,11 @@ static struct id_reg_info id_dfr0_el1_info = {
-> >       .get_reset_val = get_reset_id_dfr0_el1,
-> >  };
-> >
-> > +static struct id_reg_info id_dfr1_el1_info = {
-> > +     .sys_reg = SYS_ID_DFR1_EL1,
-> > +     .ftr_check_types = S_FCT(ID_DFR1_MTPMU_SHIFT, FCT_LOWER_SAFE),
-> what about the 0xF value which indicates the MTPMU is not implemented?
+Right, I definitely missed that whole picture of the RCU usage.  Thanks.
 
-The field is treated as a signed field.
-So, 0xf(== -1) is handled correctly.
-(Does it answer your question?)
+> 2. There could be a pointer to the page table in a vCPU's paging
+> structure caches, which are similar to the TLB but cache partial
+> translations. These are also cleared out on TLB flush.
 
-Thanks,
-Reiji
+Could you elaborate what's the structure cache that you mentioned?  I thought
+the processor page walker will just use the data cache (L1-L3) as pgtable
+caches, in which case IIUC the invalidation happens when we do WRITE_ONCE()
+that'll invalidate all the rest data cache besides the writter core.  But I
+could be completely missing something..
 
->
-> Eric
-> > +};
-> > +
-> >  /*
-> >   * An ID register that needs special handling to control the value for the
-> >   * guest must have its own id_reg_info in id_reg_info_table.
-> > @@ -869,6 +874,7 @@ static struct id_reg_info id_dfr0_el1_info = {
-> >  #define      GET_ID_REG_INFO(id)     (id_reg_info_table[IDREG_IDX(id)])
-> >  static struct id_reg_info *id_reg_info_table[KVM_ARM_ID_REG_MAX_NUM] = {
-> >       [IDREG_IDX(SYS_ID_DFR0_EL1)] = &id_dfr0_el1_info,
-> > +     [IDREG_IDX(SYS_ID_DFR1_EL1)] = &id_dfr1_el1_info,
-> >       [IDREG_IDX(SYS_ID_AA64PFR0_EL1)] = &id_aa64pfr0_el1_info,
-> >       [IDREG_IDX(SYS_ID_AA64PFR1_EL1)] = &id_aa64pfr1_el1_info,
-> >       [IDREG_IDX(SYS_ID_AA64DFR0_EL1)] = &id_aa64dfr0_el1_info,
-> >
->
+> Sean's recent series linked the RCU grace period and TLB flush in a
+> clever way so that we can ensure that the end of a grace period
+> implies that the necessary flushes have happened already, but we still
+> need to clear out the disconnected page table with atomic operations.
+> We need to clear it out mostly to collect dirty / accessed bits and
+> update page size stats.
+
+Yes, this sounds reasonable too.
+
+-- 
+Peter Xu
+
