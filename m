@@ -2,89 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 331C94633F9
-	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 13:13:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3FEC646348E
+	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 13:38:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234237AbhK3MQf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Nov 2021 07:16:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51898 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241456AbhK3MQc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Nov 2021 07:16:32 -0500
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CF42C061574
-        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 04:13:13 -0800 (PST)
-Received: by mail-ed1-x535.google.com with SMTP id w1so86049148edc.6
-        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 04:13:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=Mg3S7keeNQsFddDdCnyVQDVRGZGZ3klUFjvQ3PmiQMY=;
-        b=aE2RcWZO0LOsvV0n2NqC2NsNUFpfXigbXbEQoNbVrFu5S6QfGXdjlyEiZ43+9vRS6t
-         We/QqJLCESxeb3GN/HO7RlP+P4OYU7hq0R0qc1ZFqPlhJ+BQG7nBa4j/fn+o4cxynDhW
-         xNOvGHcgR2dw2HzMuIoAowjWmPbip0tLtA91BtFfYoK0oMil1/R7hFlZSaCpXTfdjANV
-         Zp5jMUkCMa/lgnmQLQx/fQpI1lnNQ0sqshHt7GGtalex17YKySkWWYQ+6SAhMMNnpcgh
-         3j3pcFG8yfW0SXnm0bjd0HkbeLZFPKV9jvyHgTxop1HuBnYN4qDUL5ktvr2FUPLQcy7l
-         4eqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=Mg3S7keeNQsFddDdCnyVQDVRGZGZ3klUFjvQ3PmiQMY=;
-        b=5w3eShzP5vS93JofFaO1ZcmNkPMJF+IeghQbRt2283ymjmBN6KCmiqLpyn94jUT9GS
-         r8EznRtDS4LpVpLlyaJlieQlFOqkTlczm5g9DQexINdMRbkv/rPof0RZ1njnQ3cXlXh4
-         SayCK06bFnk52NEN+CciVwOHWPeRjiv9xow4w3RLyUxipqZyLt4ldaOYwo0Mteqh7WUs
-         mC1Ii96FSKvNLh+DfMo3uJliTuYya7YyUgYOvK2JkhrKxRuZrU73mSHNhBzHiE7pI7el
-         pTzJLh11/PGuqR6rhsXKbINBlfolPvdbbWUVo/MRg0es5rKwlVRMckz8t6muni3pB/Zt
-         9Klw==
-X-Gm-Message-State: AOAM532CmF/fwD2S6MQlB8AXlbdenn+WvqdLJS8bPXLIL3Zy6DjYgoqW
-        n0tSBAuinpOeHj1NvyAVbFKavUom0yo=
-X-Google-Smtp-Source: ABdhPJwTGmkp/Q6ii5xDsL10w1615S0Ur70/2LVcmM97B4ySRB9Y0L3BD+HOnL8fS/Ydo+nTDC1P3w==
-X-Received: by 2002:a17:906:9744:: with SMTP id o4mr69639404ejy.322.1638274391884;
-        Tue, 30 Nov 2021 04:13:11 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id p13sm11371240eds.38.2021.11.30.04.13.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Nov 2021 04:13:11 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <0c3c24ff-831e-d558-6f8b-2a34fc51381d@redhat.com>
-Date:   Tue, 30 Nov 2021 13:13:10 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: Potential bug in TDP MMU
-Content-Language: en-US
-To:     Ignat Korchagin <ignat@cloudflare.com>, kvm@vger.kernel.org
-Cc:     stevensd@chromium.org, kernel-team <kernel-team@cloudflare.com>
-References: <CALrw=nEaWhpG1y7VNTGDFfF1RWbPvm5ka5xWxD-YWTS3U=r9Ng@mail.gmail.com>
- <d49e157a-5915-fbdc-8103-d7ba2621aea9@redhat.com>
- <CALrw=nHTJpoSFFadmDL2EL95D2kAiH5G-dgLvU0L7X=emxrP2A@mail.gmail.com>
- <041803a2-e7cc-4c0a-c04a-af30d6502b45@redhat.com>
- <CALrw=nHFy7rG4FbUf+sGMWbWfWzzDizjPonrUEqN89SQNdWTWg@mail.gmail.com>
- <CALrw=nFzEhrfLR=sQwCz_eyrSbksn4qKqgkNyxG9LGQvkw8_fg@mail.gmail.com>
+        id S241730AbhK3Ml0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Nov 2021 07:41:26 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34972 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S241709AbhK3MlK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 30 Nov 2021 07:41:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1638275869;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=b9RUc1KenMVYPgulRiVkI4pBlYROLXc+pKQPY3IUtvg=;
+        b=DS5/HNAxPgTOP8UwhBpNS/OnhJtNpNSZEa2jFDtMS0wMaH+WTqWkUp5qiJHc63YGIbox88
+        gvp502NdUbd9NBae0T9Gp/XVJ28q/0UZRgcBSSgv2EKEv0AzLKEatktAEKhT1w+cK3GegP
+        zTT8zt6XO+Gpy8+eVwxT+RNfzIogT8M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-168-VdZpJQ-IN02mMf2p80spig-1; Tue, 30 Nov 2021 07:37:48 -0500
+X-MC-Unique: VdZpJQ-IN02mMf2p80spig-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E9581018723;
+        Tue, 30 Nov 2021 12:37:47 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E31ED10013D6;
+        Tue, 30 Nov 2021 12:37:46 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <CALrw=nFzEhrfLR=sQwCz_eyrSbksn4qKqgkNyxG9LGQvkw8_fg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Ignat Korchagin <ignat@cloudflare.com>
+Subject: [PATCH] KVM: ensure APICv is considered inactive if there is no APIC
+Date:   Tue, 30 Nov 2021 07:37:45 -0500
+Message-Id: <20211130123746.293379-1-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/30/21 12:43, Ignat Korchagin wrote:
-> I have also noticed another new warning, when running this on the
-> kernel from kvm.git branch:
-> 
-> [   70.284354][ T2928] WARNING: CPU: 4 PID: 2928 at
-> arch/x86/kvm/x86.c:9886 kvm_arch_vcpu_ioctl_run+0x126c/0x17d0
-> [   70.284354][ T2928] Modules linked in:
-> [   70.284354][ T2928] CPU: 4 PID: 2928 Comm: exe Not tainted 5.16.0-rc2 #2
-> [   70.284354][ T2928] Hardware name: QEMU Standard PC (Q35 + ICH9,
+kvm_vcpu_apicv_active() returns false if a virtual machine has no in-kernel
+local APIC, however kvm_apicv_activated might still be true if there are
+no reasons to disable APICv; in fact it is quite likely that there is none
+because APICv is inhibited by specific configurations of the local APIC
+and those configurations cannot be programmed.  This triggers a WARN:
 
-Doh, sorry I was on the wrong branch so I couldn't find a WARN at 9886. :)
+   WARN_ON_ONCE(kvm_apicv_activated(vcpu->kvm) != kvm_vcpu_apicv_active(vcpu));
 
-I'll Cc you on a patch.
+To avoid this, introduce another cause for APICv inhibition, namely the
+absence of an in-kernel local APIC.  This cause is enabled by default,
+and is dropped by either KVM_CREATE_IRQCHIP or the enabling of
+KVM_CAP_IRQCHIP_SPLIT.
 
-Paolo
+Reported-by: Ignat Korchagin <ignat@cloudflare.com>
+Fixes: ee49a8932971 ("KVM: x86: Move SVM's APICv sanity check to common x86", 2021-10-22)
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/include/asm/kvm_host.h | 1 +
+ arch/x86/kvm/svm/avic.c         | 1 +
+ arch/x86/kvm/vmx/vmx.c          | 1 +
+ arch/x86/kvm/x86.c              | 9 +++++----
+ 4 files changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 6ac61f85e07b..860ed500580c 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1036,6 +1036,7 @@ struct kvm_x86_msr_filter {
+ #define APICV_INHIBIT_REASON_PIT_REINJ  4
+ #define APICV_INHIBIT_REASON_X2APIC	5
+ #define APICV_INHIBIT_REASON_BLOCKIRQ	6
++#define APICV_INHIBIT_REASON_ABSENT	7
+ 
+ struct kvm_arch {
+ 	unsigned long n_used_mmu_pages;
+diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+index affc0ea98d30..5a55a78e2f50 100644
+--- a/arch/x86/kvm/svm/avic.c
++++ b/arch/x86/kvm/svm/avic.c
+@@ -900,6 +900,7 @@ int svm_update_pi_irte(struct kvm *kvm, unsigned int host_irq,
+ bool svm_check_apicv_inhibit_reasons(ulong bit)
+ {
+ 	ulong supported = BIT(APICV_INHIBIT_REASON_DISABLE) |
++			  BIT(APICV_INHIBIT_REASON_ABSENT) |
+ 			  BIT(APICV_INHIBIT_REASON_HYPERV) |
+ 			  BIT(APICV_INHIBIT_REASON_NESTED) |
+ 			  BIT(APICV_INHIBIT_REASON_IRQWIN) |
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 1fadec8cbf96..ca1fd93c1dc9 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -7525,6 +7525,7 @@ static void hardware_unsetup(void)
+ static bool vmx_check_apicv_inhibit_reasons(ulong bit)
+ {
+ 	ulong supported = BIT(APICV_INHIBIT_REASON_DISABLE) |
++			  BIT(APICV_INHIBIT_REASON_ABSENT) |
+ 			  BIT(APICV_INHIBIT_REASON_HYPERV) |
+ 			  BIT(APICV_INHIBIT_REASON_BLOCKIRQ);
+ 
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 0ee1a039b490..e0aa4dd53c7f 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -5740,6 +5740,7 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 		smp_wmb();
+ 		kvm->arch.irqchip_mode = KVM_IRQCHIP_SPLIT;
+ 		kvm->arch.nr_reserved_ioapic_pins = cap->args[0];
++		kvm_request_apicv_update(kvm, true, APICV_INHIBIT_REASON_ABSENT);
+ 		r = 0;
+ split_irqchip_unlock:
+ 		mutex_unlock(&kvm->lock);
+@@ -6120,6 +6121,7 @@ long kvm_arch_vm_ioctl(struct file *filp,
+ 		/* Write kvm->irq_routing before enabling irqchip_in_kernel. */
+ 		smp_wmb();
+ 		kvm->arch.irqchip_mode = KVM_IRQCHIP_KERNEL;
++		kvm_request_apicv_update(kvm, true, APICV_INHIBIT_REASON_ABSENT);
+ 	create_irqchip_unlock:
+ 		mutex_unlock(&kvm->lock);
+ 		break;
+@@ -8818,10 +8820,9 @@ static void kvm_apicv_init(struct kvm *kvm)
+ {
+ 	init_rwsem(&kvm->arch.apicv_update_lock);
+ 
+-	if (enable_apicv)
+-		clear_bit(APICV_INHIBIT_REASON_DISABLE,
+-			  &kvm->arch.apicv_inhibit_reasons);
+-	else
++	set_bit(APICV_INHIBIT_REASON_ABSENT,
++		&kvm->arch.apicv_inhibit_reasons);
++	if (!enable_apicv)
+ 		set_bit(APICV_INHIBIT_REASON_DISABLE,
+ 			&kvm->arch.apicv_inhibit_reasons);
+ }
+-- 
+2.31.1
+
