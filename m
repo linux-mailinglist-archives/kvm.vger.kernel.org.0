@@ -2,90 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CE375462EA5
-	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 09:42:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D1B7D462ED6
+	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 09:47:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239664AbhK3Ipb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Nov 2021 03:45:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58640 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234779AbhK3Ipa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Nov 2021 03:45:30 -0500
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE88BC061574
-        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 00:42:11 -0800 (PST)
-Received: by mail-ed1-x534.google.com with SMTP id y12so83472443eda.12
-        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 00:42:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=QLbMQzl1X+oHEzaxcOOqKrksyfgto3xGZeHdEUiRnVs=;
-        b=RdbKO6wreiFqS+T4UuJh6APikHHMMDD1xcLpVsI4sagoj9YoK1vqJd+kY/OswfT3Ql
-         /eRFNpCI3Me//CGSocy2lAsyhtRk2XeG5H6eTiqgXlhFiFNq1PhVMWjs/1Sa5BuaRSri
-         nybMsCzqsMkqXfK7LJdNTOSTT/VL9eqdjSnuMUU2/Cme1o7vvlnytFg5YLAbQQz52l81
-         71MxewiYzx+LIkG+qxixKuScGqMz5OY06kHM7YhbjMkSG7mrn1eHdFPoCTN6wlq18+/D
-         bY3ExYQ1pT8wa9lrVkEjkyhwWlzYcGfILXpctxwD0HfX8Pf2Qs8T7NpwrOKOt7TylOMs
-         HNBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=QLbMQzl1X+oHEzaxcOOqKrksyfgto3xGZeHdEUiRnVs=;
-        b=1jfCgWAWBp2f3AMb2pyDSmWDF317nYdBoTAMQa3QijazqHwszQwAqAHiTAhDlvLjfJ
-         7QAx29JkL1bJdeSlNY7h149bo426DKuciZ7AN2jEy/9YWA/vTThPnOtlNIDOJNtL8doo
-         Z2cZYVMGEq5dA8TSKpiHIG0I3v0oB1iTvgyciBKwyQ72G+C+8Nyz0e/TwZQCssV5bgaK
-         fQjX6ln6Y8ZUMZYu4i0Fi2EY2pV5fgBpShKPTLFQNT7bBYUQEwu2SZYe7GfBt2TtOswZ
-         303kBNWgUckoRxzdd+ZtufaO2jFmdrVMnJ2GGeeGHv8MJx42sHdPvhZWiSIDw4ZFGD2O
-         SOFw==
-X-Gm-Message-State: AOAM533RxCzYMELDoUbTZvuYUmC4Y6EmtxaaoTrzU8Pyte++g1iAWf7N
-        IqKTFxm9izhsLorqvrKdL4g=
-X-Google-Smtp-Source: ABdhPJy2SlvJPNwkAeQbv3fpT+6k+hx1j6I2rVfP2tOJ0wt19hzEXcChbO04aKIis7fIx14EfTku6A==
-X-Received: by 2002:a17:906:d54d:: with SMTP id cr13mr22216716ejc.409.1638261730235;
-        Tue, 30 Nov 2021 00:42:10 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.googlemail.com with ESMTPSA id nc24sm4711525ejc.94.2021.11.30.00.42.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Nov 2021 00:42:09 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <8aaac107-4b90-4eb3-8c73-a5e323462707@redhat.com>
-Date:   Tue, 30 Nov 2021 09:42:08 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [kvm-unit-tests PATCH v2 0/3] Regression test for L1 LDTR
- persistence bug
-Content-Language: en-US
-To:     David Matlack <dmatlack@google.com>
-Cc:     Jim Mattson <jmattson@google.com>, kvm@vger.kernel.org
-References: <20211015195530.301237-1-jmattson@google.com>
- <ec57f5d2-f3bb-1fa6-bcdf-9217608756f5@redhat.com>
- <CALzav=c63DpoBYzhkWeU20tiiH7uv1HfsUaM=RFTuAWOZSybMg@mail.gmail.com>
+        id S235807AbhK3Iul (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Nov 2021 03:50:41 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45514 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S239783AbhK3Iud (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 30 Nov 2021 03:50:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1638262033;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=iHEcxWX/hnu+skhv46r4CV8pF6jbkPwZ6560HYUpego=;
+        b=Y3Efly1pd0RStRYyNiOMrEMAZRGqRsZyokaS3IYhk231VUNstX/ntKo+J1outAOETivJK+
+        Ky8VKl5TTD5MP2zX+RyCQCySXTZlIcrVTtky+mkIhqYf/OxBgeLn1dJos6XKqy+7Mm7emZ
+        /5iLn3cxpROmJHsEwYTgredQcU8sh5U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-442-ekjKe4tSMBe_3qw00V5qcg-1; Tue, 30 Nov 2021 03:47:09 -0500
+X-MC-Unique: ekjKe4tSMBe_3qw00V5qcg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6D23410168C3;
+        Tue, 30 Nov 2021 08:47:08 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B72045DF3A;
+        Tue, 30 Nov 2021 08:46:44 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <CALzav=c63DpoBYzhkWeU20tiiH7uv1HfsUaM=RFTuAWOZSybMg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     mlevitsk@redhat.com, Sean Christopherson <seanjc@google.com>
+Subject: [PATCH] KVM: fix avic_set_running for preemptable kernels
+Date:   Tue, 30 Nov 2021 03:46:44 -0500
+Message-Id: <20211130084644.248435-1-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/29/21 23:19, David Matlack wrote:
->> The selftests infrastructure already has save/restore tests at
->> instruction granularity (state_test.c) so you should have more luck that
->> way; these tests are worthwhile anyway.
-> There is also (I just discovered) support for guest-triggerable
-> migration in the kvm-unit-tests [1]. You could use that to trigger a
-> save/restore.
+avic_set_running() passes the current CPU to avic_vcpu_load(), albeit
+via vcpu->cpu rather than smp_processor_id().  If the thread is migrated
+while avic_set_running runs, the call to avic_vcpu_load() can use a stale
+value for the processor id.  Avoid this by blocking preemption over the
+entire execution of avic_set_running().
 
-There is, but I don't think it's good.  Save/restore bugs almost 
-invariably depend on very specific processor state, and it's hard to 
-ensure that in kvm-unit-tests (except probabilistically, but we can do 
-better).
+Reported-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/svm/avic.c | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
 
-Paolo
-
-> [1] Example:https://gitlab.com/kvm-unit-tests/kvm-unit-tests/-/blob/master/arm/gic.c#L798
-> 
+diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+index 0a58283005f3..560807a2edd4 100644
+--- a/arch/x86/kvm/svm/avic.c
++++ b/arch/x86/kvm/svm/avic.c
+@@ -1000,16 +1000,18 @@ void avic_vcpu_put(struct kvm_vcpu *vcpu)
+ static void avic_set_running(struct kvm_vcpu *vcpu, bool is_run)
+ {
+ 	struct vcpu_svm *svm = to_svm(vcpu);
++	int cpu = get_cpu();
+ 
++	WARN_ON(cpu != vcpu->cpu);
+ 	svm->avic_is_running = is_run;
+ 
+-	if (!kvm_vcpu_apicv_active(vcpu))
+-		return;
+-
+-	if (is_run)
+-		avic_vcpu_load(vcpu, vcpu->cpu);
+-	else
+-		avic_vcpu_put(vcpu);
++	if (kvm_vcpu_apicv_active(vcpu)) {
++		if (is_run)
++			avic_vcpu_load(vcpu, cpu);
++		else
++			avic_vcpu_put(vcpu);
++	}
++	put_cpu();
+ }
+ 
+ void svm_vcpu_blocking(struct kvm_vcpu *vcpu)
+-- 
+2.31.1
 
