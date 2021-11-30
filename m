@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 097FB462DAD
-	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 08:42:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BBAD6462DAF
+	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 08:42:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234474AbhK3Hpu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Nov 2021 02:45:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44774 "EHLO
+        id S239111AbhK3Hpx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Nov 2021 02:45:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232795AbhK3Hpu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Nov 2021 02:45:50 -0500
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A8A5C061574;
-        Mon, 29 Nov 2021 23:42:31 -0800 (PST)
-Received: by mail-pf1-x434.google.com with SMTP id i12so19736286pfd.6;
-        Mon, 29 Nov 2021 23:42:31 -0800 (PST)
+        with ESMTP id S239100AbhK3Hpw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Nov 2021 02:45:52 -0500
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20828C061574;
+        Mon, 29 Nov 2021 23:42:34 -0800 (PST)
+Received: by mail-pf1-x42d.google.com with SMTP id o4so19701347pfp.13;
+        Mon, 29 Nov 2021 23:42:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=xS7DiSXPiwXIXVS3bMn+o90IeUNq7sqrwQBrl7B1pTY=;
-        b=nhahWABz1xtVJyr3rZhdRMAbs0tZ1KjI8ZpVWUQW7v1YEjocgQCAq15syPEBCs4xme
-         xNT+RYAFgWOmbHaSdxrn2x39Nde/+yOBMR9JwQWeKhyqQZ33+ZgXOk5BV7fBDnwJihHg
-         KZ7NnW0Sk/GYfRQlJBpM4r9g4aPSvdfOCJi47Ha0aeytSjdbXdEmWJfc7ToNFQRebHvc
-         45znFqSip27NbI58PERrLBMAgeR/sARHTKVizKh7ANOpd0NOB2H9hFxaCMRtbpSYjmHU
-         pNJKwpyVRdlIBONmCC9qRm6EnFwozQYeid1lxblDuuDuQ09VRmIN7uTEsphOP7XXF9fv
-         h6iQ==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=ySY5gs4YmNlohZdoUrGBvO2t4ksP1moPL1VkuQOudcA=;
+        b=XgJFvNg09Gdtz8x5xAK2L/MmHGIT8RZmo/pEGWoGD9+NE/J54ZK0VXCayTxE4ohAxZ
+         pdVL+8f1DNgLEt8VuccErQxrz98Nui5d4PFSTZ6tdBU5FX51aaJoZC5w79Hu/RRKLf+Q
+         K5xdSAboJJFGjdyKsQGuSpNadbOQbmWnB1hbz5y0KGKKN4gQ38e5Io26K8schL2RVNCF
+         pkLlbuhNtTN4+fTpZnBuEVc7WyB4S1zKdqYkZKhITOmcr4Czr7WG8QluM5UBRyV/hTlX
+         mOJmXc2WVy0DKi8LPT4qf5Ssab7J3cfmEL+ev47y6SGOFqCbypbfrMkbHX8F4M+O8MIb
+         XDew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=xS7DiSXPiwXIXVS3bMn+o90IeUNq7sqrwQBrl7B1pTY=;
-        b=uywglGLjrVqHaTe5a7uqGoLDTStmiHgejx9E3ya3YAxni9MIZg4EUntYDtEMUU6x2+
-         UyVN1TcXRlzpGbvnRwbPuanlXq7zq3rOvmEE6UE6EoJTX/po+hmIzjPDphpdZTNQNB5i
-         KZJnFZmC4yebHKUkK9jaPB2KRNZqty4b0mGkOfT4gS8sPJkvFBR5yHoKYED2FmXR5dTs
-         FYW4e2W6AHZqpc+5P2v6w0f3qnVW5Dw95/Nno3WjEtHZEd/6GZ9VFkl3oiuPPBZ6rgR6
-         S205VX1l1vL09yGwBMGjo6CY+GvQxbmDWQ3pQH/izgamgPCTypJmyR8NWS/cymoAlzU9
-         bvcA==
-X-Gm-Message-State: AOAM533UR7IP4oGUfSVlFxWD18fULdUBkx2ib03Pa8j8ZuMH0Uf8kX0u
-        u+BF4xVurlP/Bks1xIRmiZaPxFXZAQI=
-X-Google-Smtp-Source: ABdhPJze2OYhZJHSDl089lBw18AKk3BAPRklyW0dQdAp7N+o4rjOvICnQwRsPsox/sLJ9Tc7dnEi5A==
-X-Received: by 2002:a62:1cc4:0:b0:49f:99b6:3507 with SMTP id c187-20020a621cc4000000b0049f99b63507mr45010524pfc.76.1638258150888;
-        Mon, 29 Nov 2021 23:42:30 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=ySY5gs4YmNlohZdoUrGBvO2t4ksP1moPL1VkuQOudcA=;
+        b=mBWZ3YcR6UmOH4iv6Vs13vQzrWH8rl66NuUKP9OmLcozyws9NbbPTt9eBIbNMyfqw+
+         WvRSXt/ZUfZaWnS/9QIf4K8IKF6gAFNbJg4G9iLCN29sPI2HPt9frf0KsBABayYfhJw5
+         33E2Q37WFUW0l3cYmW9L3Nt9yOEfNXd4Lf1/muYa+85N68QQCp8AmAVHsdV2dfLZ1Zgq
+         IUYZ+tI/BjlPjHIB+u3SYggktrEXafOJgVXDGElNgIbc77iu1x91PWF9+XZHgthjptj5
+         uYpTvgwvqTdpkpbTMRygUYotPuAPcN0NdV8EIaogXE+NFMQdkC5tfHFB+ZKoQL5J/hrg
+         glGA==
+X-Gm-Message-State: AOAM533NzAZ/09/XgCJDbv0muBgnmpG3TA0IXrV6PIJ8LLbeu61075UC
+        r0z2rggTSvEoHwc1a+5xLME=
+X-Google-Smtp-Source: ABdhPJyS/8uN9LDDNxbK5mQUO6ZcKb/OZOARz1X1CnAVdseszQ7/miVlmsO7RnqH4kxSU45uxZL4zQ==
+X-Received: by 2002:a05:6a00:1783:b0:49f:c134:c6e2 with SMTP id s3-20020a056a00178300b0049fc134c6e2mr45261010pfg.0.1638258153697;
+        Mon, 29 Nov 2021 23:42:33 -0800 (PST)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id h13sm19066010pfv.84.2021.11.29.23.42.28
+        by smtp.gmail.com with ESMTPSA id h13sm19066010pfv.84.2021.11.29.23.42.31
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 29 Nov 2021 23:42:30 -0800 (PST)
+        Mon, 29 Nov 2021 23:42:33 -0800 (PST)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
@@ -56,69 +56,67 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>
-Subject: [PATCH v2 0/6] KVM: x86/pmu: Count two basic events for emulated instructions
-Date:   Tue, 30 Nov 2021 15:42:15 +0800
-Message-Id: <20211130074221.93635-1-likexu@tencent.com>
+Subject: [PATCH v2 1/6] KVM: x86/pmu: Setup pmc->eventsel for fixed PMCs
+Date:   Tue, 30 Nov 2021 15:42:16 +0800
+Message-Id: <20211130074221.93635-2-likexu@tencent.com>
 X-Mailer: git-send-email 2.33.1
+In-Reply-To: <20211130074221.93635-1-likexu@tencent.com>
+References: <20211130074221.93635-1-likexu@tencent.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+From: Like Xu <likexu@tencent.com>
 
-[ Jim is on holiday, so I'm here to continue this work. ]
+The current pmc->eventsel for fixed counter is underutilised. The
+pmc->eventsel can be setup for all known available fixed counters
+since we have mapping between fixed pmc index and
+the intel_arch_events array.
 
-Some cloud customers need accurate virtualization of two
-basic PMU events on x86 hardware: "instructions retired" and
-"branch instructions retired". The existing PMU virtualization code
-fails to account for instructions (e.g, CPUID) that are emulated by KVM.
+Either gp or fixed counter, it will simplify the later checks for
+consistency between eventsel and perf_hw_id.
 
-Accurately virtualizing all PMU events for all microarchitectures is a
-herculean task, let's just stick to the two events covered by this set.
+Signed-off-by: Like Xu <likexu@tencent.com>
+---
+ arch/x86/kvm/vmx/pmu_intel.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-Eric Hankland wrote this code originally, but his plate is full, so Jim
-and I volunteered to shepherd the changes through upstream acceptance.
-
-Thanks,
-
-v1 -> v2 Changelog:
-- Include the patch set [1] and drop the intel_find_fixed_event(); [Paolo]
-  (we will fix the misleading Intel CPUID events in another patch set)
-- Drop checks for pmc->perf_event or event state or event type;
-- Increase a counter once its umask bits and the first 8 select bits are matched;
-- Rewrite kvm_pmu_incr_counter() with a less invasive approach to the host perf;
-- Rename kvm_pmu_record_event to kvm_pmu_trigger_event;
-- Add counter enable check for kvm_pmu_trigger_event();
-- Add vcpu CPL check for kvm_pmu_trigger_event(); [Jim]
-
-Previous:
-https://lore.kernel.org/kvm/20211112235235.1125060-2-jmattson@google.com/
-
-[1] https://lore.kernel.org/kvm/20211119064856.77948-1-likexu@tencent.com/
-
-Jim Mattson (1):
-  KVM: x86: Update vPMCs when retiring branch instructions
-
-Like Xu (5):
-  KVM: x86/pmu: Setup pmc->eventsel for fixed PMCs
-  KVM: x86/pmu: Refactoring find_arch_event() to pmc_perf_hw_id()
-  KVM: x86/pmu: Reuse pmc_perf_hw_id() and drop find_fixed_event()
-  KVM: x86/pmu: Add pmc->intr to refactor kvm_perf_overflow{_intr}()
-  KVM: x86: Update vPMCs when retiring instructions
-
- arch/x86/include/asm/kvm_host.h |   1 +
- arch/x86/kvm/emulate.c          |  55 ++++++++------
- arch/x86/kvm/kvm_emulate.h      |   1 +
- arch/x86/kvm/pmu.c              | 128 ++++++++++++++++++++++----------
- arch/x86/kvm/pmu.h              |   5 +-
- arch/x86/kvm/svm/pmu.c          |  19 ++---
- arch/x86/kvm/vmx/nested.c       |   7 +-
- arch/x86/kvm/vmx/pmu_intel.c    |  44 ++++++-----
- arch/x86/kvm/x86.c              |   5 ++
- 9 files changed, 167 insertions(+), 98 deletions(-)
-
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index 1b7456b2177b..b7ab5fd03681 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -459,6 +459,21 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 	return 1;
+ }
+ 
++static void setup_fixed_pmc_eventsel(struct kvm_pmu *pmu)
++{
++	size_t size = ARRAY_SIZE(fixed_pmc_events);
++	struct kvm_pmc *pmc;
++	u32 event;
++	int i;
++
++	for (i = 0; i < pmu->nr_arch_fixed_counters; i++) {
++		pmc = &pmu->fixed_counters[i];
++		event = fixed_pmc_events[array_index_nospec(i, size)];
++		pmc->eventsel = (intel_arch_events[event].unit_mask << 8) |
++			intel_arch_events[event].eventsel;
++	}
++}
++
+ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+@@ -506,6 +521,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+ 			edx.split.bit_width_fixed, x86_pmu.bit_width_fixed);
+ 		pmu->counter_bitmask[KVM_PMC_FIXED] =
+ 			((u64)1 << edx.split.bit_width_fixed) - 1;
++		setup_fixed_pmc_eventsel(pmu);
+ 	}
+ 
+ 	pmu->global_ctrl = ((1ull << pmu->nr_arch_gp_counters) - 1) |
 -- 
 2.33.1
 
