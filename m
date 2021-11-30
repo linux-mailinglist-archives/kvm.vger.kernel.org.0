@@ -2,93 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1CC81463927
-	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 16:04:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 65A8D463A7E
+	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 16:45:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239016AbhK3PH2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Nov 2021 10:07:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33464 "EHLO
+        id S237639AbhK3Psa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Nov 2021 10:48:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243216AbhK3O6p (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Nov 2021 09:58:45 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCF45C0613B8;
-        Tue, 30 Nov 2021 06:51:52 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 9425BB81A4D;
-        Tue, 30 Nov 2021 14:51:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7293BC53FD1;
-        Tue, 30 Nov 2021 14:51:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1638283910;
-        bh=rG5KoghkyfV7pz9bOTRLk+mJ5sE6VXKu+6Aw2KfwALs=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=fSWbO6Wl8mkWUWZb0MZTPDpEd4fKnV21ullPuVPeHLmrWgmjuXnXFVp5n5U8iutea
-         UNuPojMMcHTIM/ORAiUWk0LmF+nzqyR65orluwgdHOqGhzY27CfCpOtcBxrILYVsnB
-         E7B2LdWEbdmhyYCoNrtHXEObxVZw4dEN37n0C5qUZ7fUSoCM47pPd3rgIuB+oEZFHJ
-         Izi2st7ME7GGBgYNOsoRGhCaWRrtAdxZE30dSzt2lyZCgWF3GBAuB3hEGdoGpMwAvA
-         7aslSIFd+uPbsssuYTTKvv2UBJ/VFZuVfVqEDD1T+cHN8hrE35PdxLNsxfAwPz1JDE
-         Jelk/vReB9nGA==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Wu Zongyong <wuzongyong@linux.alibaba.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Sasha Levin <sashal@kernel.org>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 40/43] vhost-vdpa: clean irqs before reseting vdpa device
-Date:   Tue, 30 Nov 2021 09:50:17 -0500
-Message-Id: <20211130145022.945517-40-sashal@kernel.org>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20211130145022.945517-1-sashal@kernel.org>
-References: <20211130145022.945517-1-sashal@kernel.org>
+        with ESMTP id S231672AbhK3PsY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Nov 2021 10:48:24 -0500
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5301C061574
+        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 07:45:04 -0800 (PST)
+Received: by mail-pj1-x1033.google.com with SMTP id gb13-20020a17090b060d00b001a674e2c4a8so17594574pjb.4
+        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 07:45:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=dwL/N/0r33z1J+yxcqYeak1UGCvqy061/ybnlClImC4=;
+        b=DzHYJSEDFeQhlh2V1wl/Olwddpz1XECXeRCQscX33t7syLnYQJHPGUp/iAx7ycqIm6
+         sIrqsYTpuINIArwuiRlVbw3OZN8LCWAjG0GtZ7P/qRSQWn/WRlaL/4fvTIhYDOjcV9vl
+         ZdL25iOeSmi33Q0PcusvosQm5dwlvBf5oLwdiuHDleuNu9YCfdMZfMSORd0ATQhoAZi7
+         rT70s5XsP8R7Fgi99iVJRZi9Or7Gt5+Ev5VA1FkD4ITYPZ1j8y0V7ERtQGNp1tbu3M5F
+         lXFmzgGHlYI0hnrCrAkqsMKnZPn+jp+cfR6UKsU5z3nHoa9UjOvQyYObsgZ1ZOIpgWSF
+         JjBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=dwL/N/0r33z1J+yxcqYeak1UGCvqy061/ybnlClImC4=;
+        b=wQ1we6xxmfkmAX2AlRkfPVn3WGdSCYZLrIenvPeakrvLg3eMCluTyTenn+ERGLZhg2
+         gfwumyYtoCgZHd96/mDfU+7XakvG+POPloQCJ8snlpZagb/tm951Czfo9qR5RbNw1w/T
+         Gqo83QxaZqAZkmSeja+BVnAGFrMPPDvaubyNTgOSCSSklLJPz267aeaWZ8G0g9X4tBYz
+         miKUHYnRB0bT19+6UKL1HYVPKx1sod7WyPm6D96HYka7+68Mx6Ck2yPGAv5ks7bXSyuc
+         d3bMIpyOF9EhOU+8988uBKqdxRbIvCaqa1crIzQStZMPLCdGVdHLsU5nhcU459VV/VIX
+         MrvA==
+X-Gm-Message-State: AOAM531BSY47RiDiLG2oxaGWylwsFDSlQX+GcgkbZZLYNAPhjFZeNAX8
+        uETCZ7TCJjsN1tN1uVJAGzEAZQ==
+X-Google-Smtp-Source: ABdhPJylVbFuOqgAdsqa3Cmb2dwe8PNZRVgirN7DPSZqHTeweb0oWnD/Zt7w1UPJ7BtiBbIxh/3btA==
+X-Received: by 2002:a17:902:c78a:b0:142:1b7a:930 with SMTP id w10-20020a170902c78a00b001421b7a0930mr213746pla.8.1638287104019;
+        Tue, 30 Nov 2021 07:45:04 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id q9sm14364894pfj.9.2021.11.30.07.45.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Nov 2021 07:45:03 -0800 (PST)
+Date:   Tue, 30 Nov 2021 15:45:00 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Hou Wenlong <houwenlong93@linux.alibaba.com>,
+        Ben Gardon <bgardon@google.com>
+Subject: Re: [PATCH 27/28] KVM: x86/mmu: Do remote TLB flush before dropping
+ RCU in TDP MMU resched
+Message-ID: <YaZG/NopJ7YaVUjD@google.com>
+References: <20211120045046.3940942-1-seanjc@google.com>
+ <20211120045046.3940942-28-seanjc@google.com>
+ <df9d430c-2065-804b-2343-d4bcdb7b2464@redhat.com>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <df9d430c-2065-804b-2343-d4bcdb7b2464@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Wu Zongyong <wuzongyong@linux.alibaba.com>
+On Tue, Nov 30, 2021, Paolo Bonzini wrote:
+> On 11/20/21 05:50, Sean Christopherson wrote:
+> >   	if (need_resched() || rwlock_needbreak(&kvm->mmu_lock)) {
+> > -		rcu_read_unlock();
+> > -
+> >   		if (flush)
+> >   			kvm_flush_remote_tlbs(kvm);
+> > +		rcu_read_unlock();
+> > +
+> 
+> Couldn't this sleep in kvm_make_all_cpus_request, whilst in an RCU read-side
+> critical section?
 
-[ Upstream commit ea8f17e44fa7d54fae287ccbe30ce269afb5ee42 ]
+No.  And if kvm_make_all_cpus_request() can sleep, the TDP MMU is completely hosed
+as tdp_mmu_zap_spte_atomic() and handle_removed_tdp_mmu_page() currently call
+kvm_flush_remote_tlbs_with_range() while under RCU protection.
 
-Vdpa devices should be reset after unseting irqs of virtqueues, or we
-will get errors when killing qemu process:
-
->> pi_update_irte: failed to update PI IRTE
->> irq bypass consumer (token 0000000065102a43) unregistration fails: -22
-
-Signed-off-by: Wu Zongyong <wuzongyong@linux.alibaba.com>
-Link: https://lore.kernel.org/r/a2cb60cf73be9da5c4e6399242117d8818f975ae.1636946171.git.wuzongyong@linux.alibaba.com
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Acked-by: Jason Wang <jasowang@redhat.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/vhost/vdpa.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-index fdeb20f2f174c..dc4dccd35f59b 100644
---- a/drivers/vhost/vdpa.c
-+++ b/drivers/vhost/vdpa.c
-@@ -928,12 +928,12 @@ static int vhost_vdpa_release(struct inode *inode, struct file *filep)
- 
- 	mutex_lock(&d->mutex);
- 	filep->private_data = NULL;
-+	vhost_vdpa_clean_irq(v);
- 	vhost_vdpa_reset(v);
- 	vhost_dev_stop(&v->vdev);
- 	vhost_vdpa_iotlb_free(v);
- 	vhost_vdpa_free_domain(v);
- 	vhost_vdpa_config_put(v);
--	vhost_vdpa_clean_irq(v);
- 	vhost_dev_cleanup(&v->vdev);
- 	kfree(v->vdev.vqs);
- 	mutex_unlock(&d->mutex);
--- 
-2.33.0
-
+kvm_make_all_cpus_request_except() disables preemption via get_cpu(), and
+smp_call_function() doubles down on disabling preemption as the inner helpers
+require preemption to be disabled, so anything below them should complain if
+there's a might_sleep().  hv_remote_flush_tlb_with_range() takes a spinlock, so
+nothing in there should be sleeping either.
