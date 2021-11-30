@@ -2,95 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8BBD4463B80
-	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 17:18:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 458A5463BBC
+	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 17:27:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238558AbhK3QVX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Nov 2021 11:21:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53348 "EHLO
+        id S243920AbhK3Qat (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Nov 2021 11:30:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238704AbhK3QUL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Nov 2021 11:20:11 -0500
-Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86496C061574;
-        Tue, 30 Nov 2021 08:16:43 -0800 (PST)
-Received: by mail-ed1-x536.google.com with SMTP id g14so89072912edb.8;
-        Tue, 30 Nov 2021 08:16:43 -0800 (PST)
+        with ESMTP id S244030AbhK3Qa3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Nov 2021 11:30:29 -0500
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0EF8C061574;
+        Tue, 30 Nov 2021 08:27:09 -0800 (PST)
+Received: by mail-ed1-x52c.google.com with SMTP id z5so24012550edd.3;
+        Tue, 30 Nov 2021 08:27:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=sender:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=mzJ6JGKckSdI9QVOm/WqgiUaO2eWSx9RlGb8CUcCl4w=;
-        b=BGtDTNJa6yl+3sQvIYCTCRiKOhxJrICeiKUd60ghIrHc2JQUA+Eqx2tTD5dNTf3ZkG
-         XWZUJ3n2XZoQGZ/95AZ8JD2PJM4Fxnr3T23YyBkCkacY9C1VdaMM/UVQx7kyizhGWIng
-         6um8VK7YEm4EcrQbDz/mH71PuCrfbNbLl4LRDoKILRik+pciV4t9X/JG9kU5vr/45n+Y
-         JPywVfgr1/KmeuRNF+9Gcu3ECbqpdLhtH4T3lhTVNa5ruU4PPAGual4qZuYTPRXe2DRJ
-         Anwb16sT8Yz+bYLJouW98HYyI8WWk4qFDE7zi9SRSvGASwtKDTQzoQOD75liaDJbMulJ
-         nFMA==
+        bh=gseVlYCCu9tLJSTOHUcBNWkzNUHx5NAVjG9KtVrF/70=;
+        b=evCZzS0VaSrgQVmqh2o+0NLlibjGGYOSqiDMLtkbyRCf6zAMwzRtuRW+18pgaYtclP
+         f7rI8tFdZRP69pDOxdjr9q0KvklCtNp+ubOoHTMylPKYS3KniZ/krHIcdB4LaFnFJGFK
+         mRd3Co3z2xxUv/utFUVgAFunHzOYhGFWLbuzQoM7MN9EqW5DWMklB3Ss1cPSfDWLgCVl
+         RI44aNzZLrmci8U06uAQSnbY3VXT+KAkhLU5iTS5uqU3Dv9avlSKZ48neamRtTLngWd8
+         jXRl+KsvWhUrI73HT0cskYR10YbL6omMO+gzWNCsrKwkWRYy3PMMkXpEurvjACOlTN3r
+         pDxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
          :subject:content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=mzJ6JGKckSdI9QVOm/WqgiUaO2eWSx9RlGb8CUcCl4w=;
-        b=tPYtuJzR5vqafd66Yk2WlpWNonnyCmATlzZRnzHxEWCPePdaQdKFimFTkXJdCbbo+I
-         cdZSH5XOqnIoFxFuZmYcRHzubjhffORnTy9b8avNNlSDjeXX/oDap8dbTZ0niV4SCcPE
-         nBNC27H8LbAToFWkux2JAOFzJY/O/ptDmHJL+mfs1DrYHioUia5LrnzTUCRF+3+/uP+J
-         wQb4hhAXpwuLXA7dhufShfBPCAl4ksLIEeGMk3X1I8+Bvser1PbV+ehX+ntafwRHFJuj
-         UcvpyDZFFIE41Ucl3hxa5tD0BZhNKbO1UWgm0mTsXu5beR3O7jbqcRtDaN5y+K+vZlqg
-         wM6g==
-X-Gm-Message-State: AOAM533s42An43zgH6e3VLJ/UD9eZr7NQqWUQY/anWun5jQ/UocTRSED
-        cJZ//Va8c+gs276h3wwVk1E=
-X-Google-Smtp-Source: ABdhPJw2yRCId66xKjvWGOtJo37/MAUXUgEWlbSJBwdXpQc8hXYzqfCbuoni1K2nh9m8fWU22U0H2w==
-X-Received: by 2002:a05:6402:5188:: with SMTP id q8mr86125381edd.181.1638289002148;
-        Tue, 30 Nov 2021 08:16:42 -0800 (PST)
+        bh=gseVlYCCu9tLJSTOHUcBNWkzNUHx5NAVjG9KtVrF/70=;
+        b=Q8/whHjnJD8qE5jzS6wjtanRGKqLqVaeiUyJHyPA1Vw1IbVI7JvTxL+OjcJgaMPgeN
+         qMPvegfOqE3VjQiqf6AqldtCgXo2cGKnXSa7+tUMsvBWfnj8K6Q0FDNatgyDUcA2morf
+         Ucj0qsodE6vaZB47WGHcQ+lNS8M3hHY4BroIPq5ATZVeIpOTZ5jCs/CzilcKSH0RjuYH
+         g50QIlrfxLfp+smRzp0Oveo393YctJNuAQGAmH2dKWpiiqzDNZRGlVTN3cWP7jYeTRJO
+         7hT2GV3RF3q6sSEa5ft/L3SHcksWDc1Alv/fka5ATwYaYzGvYiap795WPbT8PTvag3e2
+         i+CQ==
+X-Gm-Message-State: AOAM532FsbCMiClDa+EfGHrEsMd4Ytjx3WrLLkl7VdTugVrOEeTy6Uxx
+        4Rj3I0X9z05I9HqHC/ca0AcR+6GK2DM=
+X-Google-Smtp-Source: ABdhPJzVyOCSGpRPVxDg1bgQ9dpiLa+XdW4dLaMlSMGX75wPCKXmOPQV7MApgugUEEDTh5PuUbPWmg==
+X-Received: by 2002:a17:907:2d21:: with SMTP id gs33mr72020ejc.549.1638289628406;
+        Tue, 30 Nov 2021 08:27:08 -0800 (PST)
 Received: from ?IPV6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a? ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
-        by smtp.googlemail.com with ESMTPSA id hr17sm9270702ejc.57.2021.11.30.08.16.34
+        by smtp.googlemail.com with ESMTPSA id g1sm9163514eje.105.2021.11.30.08.27.04
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Nov 2021 08:16:41 -0800 (PST)
+        Tue, 30 Nov 2021 08:27:07 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <1469b131-cd76-e8bb-304b-73c59e81cb3b@redhat.com>
-Date:   Tue, 30 Nov 2021 17:16:29 +0100
+Message-ID: <527c1261-8f21-bcbe-e28e-652a1e37ab14@redhat.com>
+Date:   Tue, 30 Nov 2021 17:27:02 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.2.0
-Subject: Re: [PATCH 27/28] KVM: x86/mmu: Do remote TLB flush before dropping
- RCU in TDP MMU resched
+Subject: Re: Q. about KVM and CPU hotplug
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Hou Wenlong <houwenlong93@linux.alibaba.com>,
-        Ben Gardon <bgardon@google.com>
-References: <20211120045046.3940942-1-seanjc@google.com>
- <20211120045046.3940942-28-seanjc@google.com>
- <df9d430c-2065-804b-2343-d4bcdb7b2464@redhat.com>
- <YaZG/NopJ7YaVUjD@google.com>
+To:     Thomas Gleixner <tglx@linutronix.de>,
+        "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "Huang, Kai" <kai.huang@intel.com>,
+        "Nakajima, Jun" <jun.nakajima@intel.com>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "Gao, Chao" <chao.gao@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>
+References: <BL1PR11MB54295ADE4D7A81523EA50B2D8C679@BL1PR11MB5429.namprd11.prod.outlook.com>
+ <3d3296f0-9245-40f9-1b5a-efffdb082de9@redhat.com> <8735ndd9hd.ffs@tglx>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YaZG/NopJ7YaVUjD@google.com>
+In-Reply-To: <8735ndd9hd.ffs@tglx>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/30/21 16:45, Sean Christopherson wrote:
->> Couldn't this sleep in kvm_make_all_cpus_request, whilst in an RCU read-side
->> critical section?
-> No.  And if kvm_make_all_cpus_request() can sleep, the TDP MMU is completely hosed
-> as tdp_mmu_zap_spte_atomic() and handle_removed_tdp_mmu_page() currently call
-> kvm_flush_remote_tlbs_with_range() while under RCU protection.
-> 
-> kvm_make_all_cpus_request_except() disables preemption via get_cpu(), and
-> smp_call_function() doubles down on disabling preemption as the inner helpers
-> require preemption to be disabled, so anything below them should complain if
-> there's a might_sleep().  hv_remote_flush_tlb_with_range() takes a spinlock, so
-> nothing in there should be sleeping either.
+On 11/30/21 15:05, Thomas Gleixner wrote:
+> Why is this hotplug callback in the CPU starting section to begin with?
 
-Yeah, of course you're right.
+Just because the old notifier implementation used CPU_STARTING - in fact 
+the commit messages say that CPU_STARTING was added partly *for* KVM 
+(commit e545a6140b69, "kernel/cpu.c: create a CPU_STARTING cpu_chain 
+notifier", 2008-09-08).
+
+> If you stick it into the online section which runs on the hotplugged CPU
+> in thread context:
+> 
+> 	CPUHP_AP_ONLINE_IDLE,
+> 
+> -->   	CPUHP_AP_KVM_STARTING,
+> 
+> 	CPUHP_AP_SCHED_WAIT_EMPTY,
+> 
+> then it is allowed to fail and it still works in the right way.
+
+Yes, moving it to the online section should be fine; it wouldn't solve 
+the TDX problem however.  Failure would rollback the hotplug and forbid 
+hotplug altogether when TDX is loaded, which is not acceptable.
 
 Paolo
+
+> When onlining a CPU then there cannot be any vCPU task run on the
+> CPU at that point.
+> 
+> When offlining a CPU then it's guaranteed that all user tasks and
+> non-pinned kernel tasks have left the CPU, i.e. there cannot be a vCPU
+> task around either.
+
