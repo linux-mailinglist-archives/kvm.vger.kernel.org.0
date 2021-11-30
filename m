@@ -2,129 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 21E01462BE0
-	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 05:59:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8BC6C462BFE
+	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 06:22:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230031AbhK3FCS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Nov 2021 00:02:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36532 "EHLO
+        id S238299AbhK3FZe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Nov 2021 00:25:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41636 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229524AbhK3FCR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Nov 2021 00:02:17 -0500
-Received: from mail-io1-xd2b.google.com (mail-io1-xd2b.google.com [IPv6:2607:f8b0:4864:20::d2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C34EC061574;
-        Mon, 29 Nov 2021 20:58:59 -0800 (PST)
-Received: by mail-io1-xd2b.google.com with SMTP id w22so24512469ioa.1;
-        Mon, 29 Nov 2021 20:58:59 -0800 (PST)
+        with ESMTP id S229692AbhK3FZd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Nov 2021 00:25:33 -0500
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C8D6C061574
+        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 21:22:15 -0800 (PST)
+Received: by mail-pg1-x529.google.com with SMTP id s137so18525922pgs.5
+        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 21:22:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
+        d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=gtKz9hsBDu7Obb6zzumSNymu+cyQreT9aTnqVNXMp/I=;
-        b=S9kTowrIayOMPGZVZh6Jos/AUNGX1yLqsDD4ynYktXEiNuOR5QWJpiS/gbEilaedUn
-         CujOeUtBYCZrunm0zcUEPiJAqygbBU8vmoLQPq7ojAg8O295ClcD2DTODu/dujFM/pXw
-         CZXfbqSIja/WY5jtozJIvlg0rOzbQTZ0jVnEl7LU4gblkezwIa7sout2zc9XLrvT62g4
-         nUYkdPZ/aaCb+lDZ/9sU+nHCvRWd6pAhsWQncL/vbafP88spsDLzGPgM0R1tDgdwcoZc
-         sQV+guSQL8/vwRkgCFMmYt1ZEKo592H8RsWXwK4lR8845Juknd4agiT6s91D65q7P7/3
-         Vx4A==
+        bh=nMzdk7WdQ8L/HP0hzBLAG2QVUEAIjcUDryoTsnqwXLE=;
+        b=j1EfdfUnVBej9nEQbRyBAto+p5BeBeWJB5e/BtcbuTktC5IOpismY9XzOhyKnFuW/G
+         CwvztOqzmum15yJxT13kcTqhT4ia1tLNBmSMKuLRFCozTTrtMODetJAZBtw+fnBP/b6X
+         NM3yo9jBcjgrtJoUeGv3TlE5GFjizOtXpkzwoEm98Gj6HKnENHmF7KxuU4TVJyTilia9
+         H4VcjlkC3x0I4qAjgwJ09Ayiww35c8Lz+oYzSbOyoNwxUq/OePB2UrK7AZG3noeDAdQt
+         1Rv0PbBAxE3NYTCCmtu6qmPeM5Uj+MJ/yzYYDwmiJe8D86fuXEOFKiGn+B+r/T3XwULn
+         daww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=gtKz9hsBDu7Obb6zzumSNymu+cyQreT9aTnqVNXMp/I=;
-        b=7YuFDD/md9E6NY6ZwWu0keVp9ZXXtozWzJjrKKFsFGr8F0hL++MJVwXwizWfQEdL0a
-         HOy1JgkfMiQFJcKfjIcHJ6HufRinDwBzR5lvCEQu3G4NM7pkdssfZw5xp4hHzd5GnDuV
-         wwLRMyHc9YU167DMrqkYzsieZ6np61sSS7FjVSoGQZPZvReK54Jfczp8Mqf2m7/t+8hr
-         KrmjWkWvpnTIyAZ+ahmw5mWoQWK5O6YjV8A09cktq/lNZ9700eEc0naxFgy+zo6SY48Q
-         fXfSJrNbVvQ83H2MrPfb/VR7M6AjT5Npyr2fwvfOBqadc3FyU3RljhNz4yC+TMxauxlD
-         IRlQ==
-X-Gm-Message-State: AOAM532vKAQBwbjLiRM1VQNdGJCHMqQ/mAPGLy8+NPlY8tQKPsMYNA47
-        SDo3OHQlRcdaWj4nY81m6n7Pm+kdBri/37zQS2E=
-X-Google-Smtp-Source: ABdhPJx14joOukbs/npCKbBGVK8YQViVPXdjEWFILXvIEaMrSHCvRU9nw1tXRwPQjixMs7U2CA/Js/GXFIpzpFQctJ0=
-X-Received: by 2002:a05:6602:3303:: with SMTP id b3mr60217026ioz.45.1638248338942;
- Mon, 29 Nov 2021 20:58:58 -0800 (PST)
+        bh=nMzdk7WdQ8L/HP0hzBLAG2QVUEAIjcUDryoTsnqwXLE=;
+        b=wDoMUw3z6ikhojxx0gB9c0Q9yuAFOmEURseoj3W70+C/6Nbl5fkOqUhp2xjueqZDUp
+         T2573xbvy/hAGblNnNTCgUHqsLoQVLpSg7GQCE16bk82l6fTezDJSnaNriSJtdm7Clw2
+         OEfKJBzjpAtEDtbm4SKok4lfzl3PHll0U1OgVjKbEJdDrYy2/H2DeTBVHnjmgQolazrx
+         n4d0j/pyt7N5R+cTIkIJIDiPnkBMaUN/7Sq0NjNmkPriyCeXyq8on6yWF7MxfWQfp3gA
+         Iycc4eigz5RrDNMFp1sa1B2vnRL39CRWSrecvNGIbJfHwSc32KWeDJZoFij1YgH/mXvl
+         qyaA==
+X-Gm-Message-State: AOAM533V1OAnoL+zFdAOntlImde1+BlYURA7v5tNyVFLiiaX1U9Lck/T
+        kartJIsEvxV0z83FdQvf8vdFolRxKecSOQi6Si+5zw==
+X-Google-Smtp-Source: ABdhPJxWZ/PB1tDWrTWrdQnIfBdcsVY7+Ir97BsmQlGLYsjIg2R5RFwEdXK4R9zRLS/FQk9SU8UmlTgMNk2bjt6aIMI=
+X-Received: by 2002:aa7:9d9e:0:b0:4a0:25d0:a06f with SMTP id
+ f30-20020aa79d9e000000b004a025d0a06fmr45090946pfq.82.1638249734570; Mon, 29
+ Nov 2021 21:22:14 -0800 (PST)
 MIME-Version: 1.0
-References: <cover.1637799475.git.isaku.yamahata@intel.com>
- <4ede5c987a4ae938a37ab7fe70d5e1d561ee97d4.1637799475.git.isaku.yamahata@intel.com>
- <878rxcht3g.ffs@tglx> <20211126091913.GA11523@gao-cwp> <CAJhGHyAbBUyyVKL7=Cior_uat9rij1BB4iBwX+EDCAUVs1Npgg@mail.gmail.com>
- <20211129092605.GA30191@gao-cwp>
-In-Reply-To: <20211129092605.GA30191@gao-cwp>
-From:   Lai Jiangshan <jiangshanlai@gmail.com>
-Date:   Tue, 30 Nov 2021 12:58:47 +0800
-Message-ID: <CAJhGHyCiZn8ZwBbVepU+tfmTV6gcDhXxzvS39BwpgUj+6LCZ0g@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 53/59] KVM: x86: Add a helper function to restore 4
- host MSRs on exit to user space
-To:     Chao Gao <chao.gao@intel.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>, isaku.yamahata@intel.com,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>,
+References: <20211117064359.2362060-1-reijiw@google.com> <20211117064359.2362060-11-reijiw@google.com>
+ <bb557b85-8d28-486e-d22c-b3021888bcf8@redhat.com>
+In-Reply-To: <bb557b85-8d28-486e-d22c-b3021888bcf8@redhat.com>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Mon, 29 Nov 2021 21:21:58 -0800
+Message-ID: <CAAeT=FwBpc0Ue=rUiCaL=7p7e_SmKPLG=74EK+GZN4kftdJJtA@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 10/29] KVM: arm64: Make ID_AA64DFR0_EL1 writable
+To:     Eric Auger <eauger@redhat.com>
+Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+        Peter Shier <pshier@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Erdem Aktas <erdemaktas@google.com>,
-        Connor Kuehl <ckuehl@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        LKML <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        isaku.yamahata@gmail.com
+        linux-arm-kernel@lists.infradead.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 29, 2021 at 5:16 PM Chao Gao <chao.gao@intel.com> wrote:
+Hi Eric,
 
-> >I did not find the information in intel-tdx-module-1eas.pdf nor
-> >intel-tdx-cpu-architectural-specification.pdf.
+On Thu, Nov 25, 2021 at 12:30 PM Eric Auger <eauger@redhat.com> wrote:
+>
+> Hi Reiji,
+>
+> On 11/17/21 7:43 AM, Reiji Watanabe wrote:
+> > This patch adds id_reg_info for ID_AA64DFR0_EL1 to make it writable
+> > by userspace.
 > >
-> >Maybe the version I downloaded is outdated.
->
-> Hi Jiangshan,
->
-> Please refer to Table 22.162 MSRs that may be Modified by TDH.VP.ENTER,
-> in section 22.2.40 TDH.VP.ENTER leaf.
-
-No file in this link:
-https://www.intel.com/content/www/us/en/developer/articles/technical/intel-trust-domain-extensions.html
-has chapter 22.
-
->
+> > Return an error if userspace tries to set PMUVER field of the
+> > register to a value that conflicts with the PMU configuration.
 > >
-> >I guess that the "lazy" restoration mode is not a valid optimization.
-> >The SEAM module should restore it to the original value when it tries
-> >to reset it to architectural INIT state on exit from TDX VM to KVM
-> >since the SEAM module also does it via wrmsr (correct me if not).
->
-> Correct.
->
+> > Since number of context-aware breakpoints must be no more than number
+> > of supported breakpoints according to Arm ARM, return an error
+> > if userspace tries to set CTX_CMPS field to such value.
 > >
-> >If the SEAM module doesn't know "the original value" of the these
-> >MSRs, it would be mere an optimization to save an rdmsr in SEAM.
->
-> Yes. Just a rdmsr is saved in TDX module at the cost of host's
-> restoring a MSR. If restoration (wrmsr) can be done in a lazy fashion
-> or even the MSR isn't used by host, some CPU cycles can be saved.
+> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > ---
+> >  arch/arm64/kvm/sys_regs.c | 84 ++++++++++++++++++++++++++++++++++-----
+> >  1 file changed, 73 insertions(+), 11 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index 772e3d3067b2..0faf458b0efb 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -626,6 +626,45 @@ static int validate_id_aa64mmfr0_el1(struct kvm_vcpu *vcpu,
+> >       return 0;
+> >  }
+> >
+> > +static bool id_reg_has_pmu(u64 val, u64 shift, unsigned int min)
+> I would rename the function as the name currently is misleading. The
+> function validate the val filed @shift againt @min
 
-But it adds overall overhead because the wrmsr in TDX module
-can't be skipped while the unneeded potential overhead of
-wrmsr is added in user return path.
+Thank you for the comment.
 
-If TDX module restores the original MSR value, the host hypervisor
-doesn't need to step in.
+The @min is the minimum value that indicates PMUv3 support.
+So, if the field value is >= @min, it means PMUv3 is supported.
+I want the function to check whether or not @val indicates PMUv3 support,
+and that's how the function is used.
+I can see what you meant focusing on the function though.
+But, if we renaming it to xxx_validate, that would be misleading in the
+codes that use the function.
 
-I think I'm reviewing the code without the code.  It is definitely
-wrong design to (ab)use the host's user-return-msr mechanism.
+> > +{
+> > +     unsigned int pmu = cpuid_feature_extract_unsigned_field(val, shift);
+> > +
+> > +     /*
+> > +      * Treat IMPLEMENTATION DEFINED functionality as unimplemented for
+> > +      * ID_AA64DFR0_EL1.PMUVer/ID_DFR0_EL1.PerfMon.
+> > +      */
+> > +     if (pmu == 0xf)
+> > +             pmu = 0;
+> Shouldn't we simply forbid the userspace to set 0xF?
 
->
-> >But there are a lot of other ways for the host to share the values
-> >to SEAM in zero overhead.
->
-> I am not sure. Looks it requests a new interface between host and TDX
-> module. I guess one problem is how/when to verify host's inputs in case
-> they are invalid.
->
+This function is to check whether or not the field value indicates PMUv3.
+Setting the field to 0xf is forbidden by arm64_check_features().
+Having said that, since arm64_check_features() will be implemented by
+using arm64_ftr_bits, which treats AA64DFR0.PMUVER and DFR0.PERFMON
+as signed fields.
+So, it will be forbidden in a different way in the next version.
 
-If the requirement of "lazy restoration" is being added (not seen in the
-published document yet), you are changing the ABI between the host and
-the TDX module.
+Thanks,
+Reiji
+
+> > +
+> > +     return (pmu >= min);
+> > +}
