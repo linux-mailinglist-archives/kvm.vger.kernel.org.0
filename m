@@ -2,84 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D822463232
-	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 12:19:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 10169463264
+	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 12:29:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238724AbhK3LXA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Nov 2021 06:23:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38958 "EHLO
+        id S236835AbhK3Lc6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Nov 2021 06:32:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238708AbhK3LWl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Nov 2021 06:22:41 -0500
-Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D75F3C061746
-        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 03:19:22 -0800 (PST)
-Received: by mail-io1-xd2f.google.com with SMTP id v23so25448088iom.12
-        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 03:19:22 -0800 (PST)
+        with ESMTP id S232569AbhK3Lc6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Nov 2021 06:32:58 -0500
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E43B7C061574;
+        Tue, 30 Nov 2021 03:29:38 -0800 (PST)
+Received: by mail-ed1-x535.google.com with SMTP id g14so85339322edb.8;
+        Tue, 30 Nov 2021 03:29:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=G9k5ttvheQZ7XCgPQsOVjadQf9e0m2Yq+Z4vNX+4tyM=;
-        b=RtAG8N1bigjEX1NnUcI3PR8xai/dCOT3sSuB2ucpHff7ZXtd1Rh9XLtFiafXQ5ndwC
-         xoHgHek1lnHtoVd2FUKJC82z2m5+7hY66q/MoVQ/8/NyKUYyUe0tyPuBhsVJYirZdf55
-         fjMzF1WsUNQRIhmbrCNmsYO6mCPk6+eD9dNQw=
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=4ZJYK5Pyg6M1OZI8R6OhktHvKj8jONfwxsgyqS7zKVw=;
+        b=hS3xdsuhLh825Zy5CyXqy8kdkjallgGS9ThnPKsUscIhTlNXuE6CejEfZljPIGaRuS
+         oc7ADJYJNccl+iIS+fb435+kT+Wo5w123ioG7scg6MMSsuz6aHhDoNbNX8jXCces5K0F
+         PYjM4g+cfZ2gNNcIqQh/s9hcryBHhQBsIb49ziFJEAIx5EXi74/YY3XfzUiXOe18ECIo
+         bu7Egs9Ck/npOx62zHI52FWVmY9ihQKPeevV9cXirPD/e+LgPMqRaWL+kLq51qPSTFOA
+         wxTvZBWNXewy9P/5UDCdMpWexvKVyhoS29YHyJi/92EVrkOB80KkptXB1ZoBj2CZavVE
+         mxxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=G9k5ttvheQZ7XCgPQsOVjadQf9e0m2Yq+Z4vNX+4tyM=;
-        b=a880xhlMvW7SnY5LJg0cNhswrhFZI9az4DDkuUVtvGSphPByT9RGIZGjqhfJUL9AOW
-         P1WPnP7ZPHKWiDVVIv7WussxzGoQbtqethuBg/FfYNadgDAXRpLUL0zF/XzlYQR6iGCl
-         BZcv0t77xveSEMku9UIZb3TwoWKZHIu5+eT8OeS+nQvt8VMngIz7O+6QSagEu1X8La/x
-         sqJouw/rr93b79TRJbrOnGPThYsKctT1CB7lV/XwB25BTSqkoMkTazFcBDttY7EZ21Ho
-         txp5KkJab/MUJADqFaw73y+cxrUZhp2FxIE4RGxK8fR6m/kOXg//Yk2M7bjbuGTLEE/z
-         hnhg==
-X-Gm-Message-State: AOAM533VDQUvpe2r8MfSbMbNdKQvlejrC9S8Slqt8J8h3hnWaXPorAIL
-        WFdBxtW/K5iqIRvv1JgdVQ2IzSdPmH7MOyCa/cLNWA==
-X-Google-Smtp-Source: ABdhPJx6prJSnER1Xuq460zyn6em+OV8GocEcLbZlYkw90BvodR9Xlr6GGiVjrMKeHX6vEQ6yg0bLlBr2Qzlu9nOl2w=
-X-Received: by 2002:a02:ab8f:: with SMTP id t15mr75894253jan.147.1638271162226;
- Tue, 30 Nov 2021 03:19:22 -0800 (PST)
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=4ZJYK5Pyg6M1OZI8R6OhktHvKj8jONfwxsgyqS7zKVw=;
+        b=xTONBY5nwMsWrvwhuPxG8aLxc3FSYm2OaE8PyJvsqykWjePuvE8jp6ciD9lPpU3aiQ
+         ktCYGCV3VEYJgdZmaJESegJxGTOY2oE0ZmBS79h+cLuh2U/66enfMu/sNQd3I3AwI/Gc
+         Tv1L5mIh//PCvNh3rXFO7C7WCUn7+2G9moTRJDKFeM8yNT234t+t22uoBULuxWbfHdK5
+         dqHLLEOoFiGaT7YxG6uqszGYUhRzwV2XUXVK56+YiamjB+t5J6Rnd38TeXo5B0FLlAd1
+         MhYG6l0M2Zo2ASDlTxm+bYIsheQnZsj+4yYsOcV4bQHn7VxUm1RL4B57X1aSJ6PgpQ65
+         UxhA==
+X-Gm-Message-State: AOAM531141JdUtFgWB3UjEkvtasMeemuo+Rs/A2bisbehlWHxaiY0Opy
+        M2TmF/BveIXzMAb65wHZLPGm/kGbDT4=
+X-Google-Smtp-Source: ABdhPJxWSSekJtGQrdd4lB7tQwJ9KjEr5N4mPYhMxXVyQrmrgXJrf5XZQFVeleF2doedUDkfSYSvQQ==
+X-Received: by 2002:a17:906:1697:: with SMTP id s23mr68766522ejd.60.1638271777525;
+        Tue, 30 Nov 2021 03:29:37 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id he14sm8981167ejc.55.2021.11.30.03.29.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 Nov 2021 03:29:37 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <df9d430c-2065-804b-2343-d4bcdb7b2464@redhat.com>
+Date:   Tue, 30 Nov 2021 12:29:36 +0100
 MIME-Version: 1.0
-References: <CALrw=nEaWhpG1y7VNTGDFfF1RWbPvm5ka5xWxD-YWTS3U=r9Ng@mail.gmail.com>
- <d49e157a-5915-fbdc-8103-d7ba2621aea9@redhat.com> <CALrw=nHTJpoSFFadmDL2EL95D2kAiH5G-dgLvU0L7X=emxrP2A@mail.gmail.com>
- <041803a2-e7cc-4c0a-c04a-af30d6502b45@redhat.com>
-In-Reply-To: <041803a2-e7cc-4c0a-c04a-af30d6502b45@redhat.com>
-From:   Ignat Korchagin <ignat@cloudflare.com>
-Date:   Tue, 30 Nov 2021 11:19:11 +0000
-Message-ID: <CALrw=nHFy7rG4FbUf+sGMWbWfWzzDizjPonrUEqN89SQNdWTWg@mail.gmail.com>
-Subject: Re: Potential bug in TDP MMU
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     stevensd@chromium.org, kernel-team <kernel-team@cloudflare.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH 27/28] KVM: x86/mmu: Do remote TLB flush before dropping
+ RCU in TDP MMU resched
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Hou Wenlong <houwenlong93@linux.alibaba.com>,
+        Ben Gardon <bgardon@google.com>
+References: <20211120045046.3940942-1-seanjc@google.com>
+ <20211120045046.3940942-28-seanjc@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20211120045046.3940942-28-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 30, 2021 at 11:11 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 11/30/21 11:58, Ignat Korchagin wrote:
-> > I have managed to reliably reproduce the issue on a QEMU VM (on a host
-> > with nested virtualisation enabled). Here are the steps:
-> >
-> > 1. Install gvisor as per
-> > https://gvisor.dev/docs/user_guide/install/#install-latest
-> > 2. Run
-> > $ for i in $(seq 1 100); do sudo runsc --platform=kvm --network=none
-> > do echo ok; done
-> >
-> > I've tried to recompile the kernel with the above patch, but
-> > unfortunately it does fix the issue. I'm happy to try other
-> > patches/fixes queued for 5.16-rc4
->
-> You can find them already in the "for-linus" tag of kvm.git as well as
-> in the master branch, but there isn't much else.
->
-> Paolo
+On 11/20/21 05:50, Sean Christopherson wrote:
+>   	if (need_resched() || rwlock_needbreak(&kvm->mmu_lock)) {
+> -		rcu_read_unlock();
+> -
+>   		if (flush)
+>   			kvm_flush_remote_tlbs(kvm);
+>   
+> +		rcu_read_unlock();
+> +
 
-Thanks. I've tried to compile the kernel from kvm.git "for-linus" tag,
-but the issue is still there, so probably no commits address the
-problem.
-Will keep digging.
+Couldn't this sleep in kvm_make_all_cpus_request, whilst in an RCU 
+read-side critical section?
 
-Ignat
+Paolo
