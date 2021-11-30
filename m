@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A3FA0464089
-	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 22:43:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 30EE6464086
+	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 22:43:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344466AbhK3VrC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Nov 2021 16:47:02 -0500
-Received: from vps-vb.mhejs.net ([37.28.154.113]:56370 "EHLO vps-vb.mhejs.net"
+        id S1344477AbhK3VrB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Nov 2021 16:47:01 -0500
+Received: from vps-vb.mhejs.net ([37.28.154.113]:56400 "EHLO vps-vb.mhejs.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236184AbhK3Vqo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Nov 2021 16:46:44 -0500
+        id S1344343AbhK3Vqq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Nov 2021 16:46:46 -0500
 Received: from MUA
         by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <mail@maciej.szmigiero.name>)
-        id 1msAtu-000647-Ad; Tue, 30 Nov 2021 22:42:58 +0100
+        id 1msAtz-00064r-LS; Tue, 30 Nov 2021 22:43:03 +0100
 From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>
@@ -44,9 +44,9 @@ Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Atish Patra <atish.patra@wdc.com>,
         Ben Gardon <bgardon@google.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v6 13/29] KVM: Use prepare/commit hooks to handle generic memslot metadata updates
-Date:   Tue, 30 Nov 2021 22:41:26 +0100
-Message-Id: <de67b73a05f583505f9c54479b1442afc326fc94.1638304316.git.maciej.szmigiero@oracle.com>
+Subject: [PATCH v6 14/29] KVM: x86: Don't assume old/new memslots are non-NULL at memslot commit
+Date:   Tue, 30 Nov 2021 22:41:27 +0100
+Message-Id: <ed4cc6958f789236ed7ce5ca53542aa011325957.1638304316.git.maciej.szmigiero@oracle.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <cover.1638304315.git.maciej.szmigiero@oracle.com>
 References: <cover.1638304315.git.maciej.szmigiero@oracle.com>
@@ -58,11 +58,9 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Sean Christopherson <seanjc@google.com>
 
-Handle the generic memslot metadata, a.k.a. dirty bitmap, updates at the
-same time that arch handles it's own metadata updates, i.e. at memslot
-prepare and commit.  This will simplify converting @new to a dynamically
-allocated object, and more closely aligns common KVM with architecture
-code.
+Play nice with a NULL @old or @new when handling memslot updates so that
+common KVM can pass NULL for one or the other in CREATE and DELETE cases
+instead of having to synthesize a dummy memslot.
 
 No functional change intended.
 
@@ -70,160 +68,46 @@ Signed-off-by: Sean Christopherson <seanjc@google.com>
 Reviewed-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
 Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
 ---
- virt/kvm/kvm_main.c | 109 +++++++++++++++++++++++++++-----------------
- 1 file changed, 66 insertions(+), 43 deletions(-)
+ arch/x86/kvm/x86.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index b778b8ab1885..1689f598fe9e 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -1551,6 +1551,69 @@ static void kvm_copy_memslots_arch(struct kvm_memslots *to,
- 		to->memslots[i].arch = from->memslots[i].arch;
- }
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 1a598b0c3e36..f25d224d21d9 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -11758,13 +11758,15 @@ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
+ 				     const struct kvm_memory_slot *new,
+ 				     enum kvm_mr_change change)
+ {
+-	bool log_dirty_pages = new->flags & KVM_MEM_LOG_DIRTY_PAGES;
++	u32 old_flags = old ? old->flags : 0;
++	u32 new_flags = new ? new->flags : 0;
++	bool log_dirty_pages = new_flags & KVM_MEM_LOG_DIRTY_PAGES;
  
-+static int kvm_prepare_memory_region(struct kvm *kvm,
-+				     const struct kvm_memory_slot *old,
-+				     struct kvm_memory_slot *new,
-+				     enum kvm_mr_change change)
-+{
-+	int r;
-+
-+	/*
-+	 * If dirty logging is disabled, nullify the bitmap; the old bitmap
-+	 * will be freed on "commit".  If logging is enabled in both old and
-+	 * new, reuse the existing bitmap.  If logging is enabled only in the
-+	 * new and KVM isn't using a ring buffer, allocate and initialize a
-+	 * new bitmap.
-+	 */
-+	if (!(new->flags & KVM_MEM_LOG_DIRTY_PAGES))
-+		new->dirty_bitmap = NULL;
-+	else if (old->dirty_bitmap)
-+		new->dirty_bitmap = old->dirty_bitmap;
-+	else if (!kvm->dirty_ring_size) {
-+		r = kvm_alloc_dirty_bitmap(new);
-+		if (r)
-+			return r;
-+
-+		if (kvm_dirty_log_manual_protect_and_init_set(kvm))
-+			bitmap_set(new->dirty_bitmap, 0, new->npages);
-+	}
-+
-+	r = kvm_arch_prepare_memory_region(kvm, old, new, change);
-+
-+	/* Free the bitmap on failure if it was allocated above. */
-+	if (r && new->dirty_bitmap && !old->dirty_bitmap)
-+		kvm_destroy_dirty_bitmap(new);
-+
-+	return r;
-+}
-+
-+static void kvm_commit_memory_region(struct kvm *kvm,
-+				     struct kvm_memory_slot *old,
-+				     const struct kvm_memory_slot *new,
-+				     enum kvm_mr_change change)
-+{
-+	/*
-+	 * Update the total number of memslot pages before calling the arch
-+	 * hook so that architectures can consume the result directly.
-+	 */
-+	if (change == KVM_MR_DELETE)
-+		kvm->nr_memslot_pages -= old->npages;
-+	else if (change == KVM_MR_CREATE)
-+		kvm->nr_memslot_pages += new->npages;
-+
-+	kvm_arch_commit_memory_region(kvm, old, new, change);
-+
-+	/*
-+	 * Free the old memslot's metadata.  On DELETE, free the whole thing,
-+	 * otherwise free the dirty bitmap as needed (the below effectively
-+	 * checks both the flags and whether a ring buffer is being used).
-+	 */
-+	if (change == KVM_MR_DELETE)
-+		kvm_free_memslot(kvm, old);
-+	else if (old->dirty_bitmap && !new->dirty_bitmap)
-+		kvm_destroy_dirty_bitmap(old);
-+}
-+
- static int kvm_set_memslot(struct kvm *kvm,
- 			   struct kvm_memory_slot *new,
- 			   enum kvm_mr_change change)
-@@ -1637,27 +1700,14 @@ static int kvm_set_memslot(struct kvm *kvm,
- 		old.as_id = new->as_id;
- 	}
+ 	/*
+ 	 * Update CPU dirty logging if dirty logging is being toggled.  This
+ 	 * applies to all operations.
+ 	 */
+-	if ((old->flags ^ new->flags) & KVM_MEM_LOG_DIRTY_PAGES)
++	if ((old_flags ^ new_flags) & KVM_MEM_LOG_DIRTY_PAGES)
+ 		kvm_mmu_update_cpu_dirty_logging(kvm, log_dirty_pages);
  
--	r = kvm_arch_prepare_memory_region(kvm, &old, new, change);
-+	r = kvm_prepare_memory_region(kvm, &old, new, change);
- 	if (r)
- 		goto out_slots;
+ 	/*
+@@ -11782,7 +11784,7 @@ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
+ 	 * MOVE/DELETE: The old mappings will already have been cleaned up by
+ 	 *		kvm_arch_flush_shadow_memslot().
+ 	 */
+-	if ((change != KVM_MR_FLAGS_ONLY) || (new->flags & KVM_MEM_READONLY))
++	if ((change != KVM_MR_FLAGS_ONLY) || (new_flags & KVM_MEM_READONLY))
+ 		return;
  
- 	update_memslots(slots, new, change);
- 	slots = install_new_memslots(kvm, new->as_id, slots);
+ 	/*
+@@ -11790,7 +11792,7 @@ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
+ 	 * other flag is LOG_DIRTY_PAGES, i.e. something is wrong if dirty
+ 	 * logging isn't being toggled on or off.
+ 	 */
+-	if (WARN_ON_ONCE(!((old->flags ^ new->flags) & KVM_MEM_LOG_DIRTY_PAGES)))
++	if (WARN_ON_ONCE(!((old_flags ^ new_flags) & KVM_MEM_LOG_DIRTY_PAGES)))
+ 		return;
  
--	/*
--	 * Update the total number of memslot pages before calling the arch
--	 * hook so that architectures can consume the result directly.
--	 */
--	if (change == KVM_MR_DELETE)
--		kvm->nr_memslot_pages -= old.npages;
--	else if (change == KVM_MR_CREATE)
--		kvm->nr_memslot_pages += new->npages;
--
--	kvm_arch_commit_memory_region(kvm, &old, new, change);
--
--	/* Free the old memslot's metadata.  Note, this is the full copy!!! */
--	if (change == KVM_MR_DELETE)
--		kvm_free_memslot(kvm, &old);
-+	kvm_commit_memory_region(kvm, &old, new, change);
- 
- 	kvfree(slots);
- 	return 0;
-@@ -1753,7 +1803,6 @@ int __kvm_set_memory_region(struct kvm *kvm,
- 
- 	if (!old.npages) {
- 		change = KVM_MR_CREATE;
--		new.dirty_bitmap = NULL;
- 
- 		/*
- 		 * To simplify KVM internals, the total number of pages across
-@@ -1773,9 +1822,6 @@ int __kvm_set_memory_region(struct kvm *kvm,
- 			change = KVM_MR_FLAGS_ONLY;
- 		else /* Nothing to change. */
- 			return 0;
--
--		/* Copy dirty_bitmap from the current memslot. */
--		new.dirty_bitmap = old.dirty_bitmap;
- 	}
- 
- 	if ((change == KVM_MR_CREATE) || (change == KVM_MR_MOVE)) {
-@@ -1789,30 +1835,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
- 		}
- 	}
- 
--	/* Allocate/free page dirty bitmap as needed */
--	if (!(new.flags & KVM_MEM_LOG_DIRTY_PAGES))
--		new.dirty_bitmap = NULL;
--	else if (!new.dirty_bitmap && !kvm->dirty_ring_size) {
--		r = kvm_alloc_dirty_bitmap(&new);
--		if (r)
--			return r;
--
--		if (kvm_dirty_log_manual_protect_and_init_set(kvm))
--			bitmap_set(new.dirty_bitmap, 0, new.npages);
--	}
--
--	r = kvm_set_memslot(kvm, &new, change);
--	if (r)
--		goto out_bitmap;
--
--	if (old.dirty_bitmap && !new.dirty_bitmap)
--		kvm_destroy_dirty_bitmap(&old);
--	return 0;
--
--out_bitmap:
--	if (new.dirty_bitmap && !old.dirty_bitmap)
--		kvm_destroy_dirty_bitmap(&new);
--	return r;
-+	return kvm_set_memslot(kvm, &new, change);
- }
- EXPORT_SYMBOL_GPL(__kvm_set_memory_region);
- 
+ 	if (!log_dirty_pages) {
