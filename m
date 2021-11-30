@@ -2,126 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CCFA463288
-	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 12:39:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C83B4632B3
+	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 12:43:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235599AbhK3Lmt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Nov 2021 06:42:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43514 "EHLO
+        id S240944AbhK3Lqu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Nov 2021 06:46:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44516 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240794AbhK3Lmp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Nov 2021 06:42:45 -0500
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B33CCC061574;
-        Tue, 30 Nov 2021 03:39:25 -0800 (PST)
-Received: by mail-ed1-x530.google.com with SMTP id l25so85213600eda.11;
-        Tue, 30 Nov 2021 03:39:25 -0800 (PST)
+        with ESMTP id S240934AbhK3Lqr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Nov 2021 06:46:47 -0500
+Received: from mail-il1-x136.google.com (mail-il1-x136.google.com [IPv6:2607:f8b0:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65E9DC061574
+        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 03:43:28 -0800 (PST)
+Received: by mail-il1-x136.google.com with SMTP id h16so20001102ila.4
+        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 03:43:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:from:to:cc:references:in-reply-to
-         :content-transfer-encoding;
-        bh=yGHiGFZ+rE1fvnI8baTnrP2jm+L8strqrdJ5iul7hp0=;
-        b=c6P0wlF3uxLM9zmSs2xQkvwdYDteITQrAo0DrsrznSF9sEOH28QP1fFa6xhItTgTpS
-         KkU6+3vbY7zvYbaGplUg6NAOHI1i7wZaB3YsPHKiJwSv7fAraYSJOmBsIPcxDa1GRc0A
-         PiiJWBQEcwSH6cUNsH7cKZjAdxgXOazBahtafC3Gs9rh9Srzhdp4SMH53zgHkiQE4Got
-         FG3pFo/MwoBD/bEwOxiDmocGqSzd1aaMmn3Q9da/d+qNqxzu9ZAjjXwyK04+bd+g1kuu
-         faXB8tkRVfsTXc+ZCCEjhbpUn7X9sEvfPMvPv6y6fB24K84rc8fMZl0EoSsfLlnsoaMi
-         6+Bw==
+        d=cloudflare.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=TCS2bGpkGcGNOjEhIkoZP+JBBkRjbad4XzV2yfeGegE=;
+        b=lYGav0q3UtkGNjXGbYDoXoOuVXne8rSReckngHQ32dw6+rKsXFdUkCRtppHQEnCvSD
+         fV+3RqtnGOo6YDuuC3uCHD1K6IZwCViFsq9Hu++84jzR7IXYkcWxnP/BWV1e++EbzCG+
+         4xoUGY3MpPxBSeOU8YPR3H9ppafw8SWTGqwzA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:from:to:cc:references:in-reply-to
-         :content-transfer-encoding;
-        bh=yGHiGFZ+rE1fvnI8baTnrP2jm+L8strqrdJ5iul7hp0=;
-        b=bJy6NaXQDh8ADM4mg/f3KrhI2h6hI8fQ/SibQuRqj93AqLrM4BFNfoLXnLUt57miJn
-         AGSSKlJNdRpR4RS8eZD9wahB07qkNHjSH2bOYoqKcbQ5Wka1ioc+4UFRvx9vWvYM9KEO
-         ++BoqJpUVBx/jfbED7RG8m/QYNNNRRJ1jAQnSlXDOwaClnG8BasQomzDAFTfyFRLQebL
-         g1I7f8hmW7UbvHdAZq5feMglLAEMk1iTodWuKXL7gbaQdBCapJlxJXlPD+PmP3CHhwjF
-         rr8Uo5UObnqyhZmWZmyDtA2BLM0DiXiyL0tMFLmBkrgJQrmuqQk2W+NUo/NHQblB6a8D
-         zKsw==
-X-Gm-Message-State: AOAM532nuLURkpatoS9eCqvjAQ/Pr9FVpH9VK4vP2Swex00tufDvtNL/
-        Z2r1l70J8+0hSAt+0CkJ7iY=
-X-Google-Smtp-Source: ABdhPJzBmlKlxbZEZjGdZkld9KClqoQPE65iifbnAftOVfFURI+3gCywK4yL4F/szmL3PzOccPRpRg==
-X-Received: by 2002:a17:906:6a1a:: with SMTP id qw26mr67292465ejc.489.1638272364301;
-        Tue, 30 Nov 2021 03:39:24 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id m22sm11049796eda.97.2021.11.30.03.39.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Nov 2021 03:39:23 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <3490c50e-50d2-f906-3383-b87e14b14fab@redhat.com>
-Date:   Tue, 30 Nov 2021 12:39:22 +0100
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=TCS2bGpkGcGNOjEhIkoZP+JBBkRjbad4XzV2yfeGegE=;
+        b=Ed31cNC7uLsrVcJzObx6LFAfubug/Pa+QmgTpYdiB2wK1P6tNdNdpNHzfGlQNN9hn+
+         sc0tVsnHBmYYKlnmPiXXSoXliTmr5C9aR9NhbgchXwko2IfobLKO8mRdOkWr7+G4GGwp
+         awhiqjqSUGod/PXeh5Gs9j16/O3uVlr0GiOIs+eFArnTp2jCyb8DnvK56Z9/gDHdSC4z
+         UB7DEEvDca4ZMrklZhhyu1QreY+0rnnz2jskeFmVvx9pK05oqRmsKBGe1iGekrEp/tPh
+         fjGsFRkF41zctexm5t2vc4dp8QwvKFdChsgv4OotQNxC4E5UukBkiB6/m3LUviPOHoEH
+         vFcA==
+X-Gm-Message-State: AOAM532d3k/oCSixEdEWhJ+o4oYYYc2iDEnilxW0d2Lf/dN+vraNWtDq
+        gpGiqTcqXzEMX4WnvjzVaZaVWgFNtVuEAZg9n+W91w==
+X-Google-Smtp-Source: ABdhPJxpooor/IdzxnADX6o9JAsjqWzzeIA7xvW2S/VGTxE1b4/r1G7ViF/xTukKS0/R2Rfudh6iNJH6ZkRA8iuzmG4=
+X-Received: by 2002:a05:6e02:1a03:: with SMTP id s3mr58624687ild.309.1638272607763;
+ Tue, 30 Nov 2021 03:43:27 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH v2 10/43] KVM: arm64: Move vGIC v4 handling for WFI out
- arch callback hook
-Content-Language: en-US
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        David Matlack <dmatlack@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>
-References: <20211009021236.4122790-1-seanjc@google.com>
- <20211009021236.4122790-11-seanjc@google.com>
- <9236e715-c471-e1c8-6117-6f37b908a6bd@redhat.com>
- <875ytjbxpq.wl-maz@kernel.org>
- <be1cf8c7-ed87-b8eb-1bca-0a6c7505d7f8@redhat.com>
-In-Reply-To: <be1cf8c7-ed87-b8eb-1bca-0a6c7505d7f8@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <CALrw=nEaWhpG1y7VNTGDFfF1RWbPvm5ka5xWxD-YWTS3U=r9Ng@mail.gmail.com>
+ <d49e157a-5915-fbdc-8103-d7ba2621aea9@redhat.com> <CALrw=nHTJpoSFFadmDL2EL95D2kAiH5G-dgLvU0L7X=emxrP2A@mail.gmail.com>
+ <041803a2-e7cc-4c0a-c04a-af30d6502b45@redhat.com> <CALrw=nHFy7rG4FbUf+sGMWbWfWzzDizjPonrUEqN89SQNdWTWg@mail.gmail.com>
+In-Reply-To: <CALrw=nHFy7rG4FbUf+sGMWbWfWzzDizjPonrUEqN89SQNdWTWg@mail.gmail.com>
+From:   Ignat Korchagin <ignat@cloudflare.com>
+Date:   Tue, 30 Nov 2021 11:43:16 +0000
+Message-ID: <CALrw=nFzEhrfLR=sQwCz_eyrSbksn4qKqgkNyxG9LGQvkw8_fg@mail.gmail.com>
+Subject: Re: Potential bug in TDP MMU
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Cc:     stevensd@chromium.org, kernel-team <kernel-team@cloudflare.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/26/21 18:12, Paolo Bonzini wrote:
-> On 26/10/21 17:41, Marc Zyngier wrote:
->>> This needs a word on why kvm_psci_vcpu_suspend does not need the
->>> hooks.  Or it needs to be changed to also use kvm_vcpu_wfi in the PSCI
->>> code, I don't know.
->>>
->>> Marc, can you review and/or advise?
->> I was looking at that over the weekend, and that's a pre-existing
->> bug. I would have addressed it independently, but it looks like you
->> already have queued the patch.
-> 
-> I have "queued" it, but that's just my queue - it's not on kernel.org 
-> and it's not going to be in 5.16, at least not in the first batch.
-> 
-> There's plenty of time for me to rebase on top of a fix, if you want to 
-> send the fix through your kvm-arm pull request.  Just Cc me so that I 
-> understand what's going on.
+On Tue, Nov 30, 2021 at 11:19 AM Ignat Korchagin <ignat@cloudflare.com> wrote:
+>
+> On Tue, Nov 30, 2021 at 11:11 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+> >
+> > On 11/30/21 11:58, Ignat Korchagin wrote:
+> > > I have managed to reliably reproduce the issue on a QEMU VM (on a host
+> > > with nested virtualisation enabled). Here are the steps:
+> > >
+> > > 1. Install gvisor as per
+> > > https://gvisor.dev/docs/user_guide/install/#install-latest
+> > > 2. Run
+> > > $ for i in $(seq 1 100); do sudo runsc --platform=kvm --network=none
+> > > do echo ok; done
+> > >
+> > > I've tried to recompile the kernel with the above patch, but
+> > > unfortunately it does fix the issue. I'm happy to try other
+> > > patches/fixes queued for 5.16-rc4
+> >
+> > You can find them already in the "for-linus" tag of kvm.git as well as
+> > in the master branch, but there isn't much else.
+> >
+> > Paolo
+>
+> Thanks. I've tried to compile the kernel from kvm.git "for-linus" tag,
+> but the issue is still there, so probably no commits address the
+> problem.
+> Will keep digging.
+>
+> Ignat
 
-Since a month has passed and I didn't see anything related in the 
-KVM-ARM pull requests, I am going to queue this patch.  Any conflicts 
-can be resolved through a kvmarm->kvm merge of either a topic branch or 
-a tag that is destined to 5.16.
+I have also noticed another new warning, when running this on the
+kernel from kvm.git branch:
 
-Paolo
+[   70.284354][ T2928] WARNING: CPU: 4 PID: 2928 at
+arch/x86/kvm/x86.c:9886 kvm_arch_vcpu_ioctl_run+0x126c/0x17d0
+[   70.284354][ T2928] Modules linked in:
+[   70.284354][ T2928] CPU: 4 PID: 2928 Comm: exe Not tainted 5.16.0-rc2 #2
+[   70.284354][ T2928] Hardware name: QEMU Standard PC (Q35 + ICH9,
+2009), BIOS 0.0.0 02/06/2015
+[   70.284354][ T2928] RIP: 0010:kvm_arch_vcpu_ioctl_run+0x126c/0x17d0
+[   70.284354][ T2928] Code: 49 89 b7 f8 01 00 00 e9 8e ee ff ff 49 8b
+87 80 00 00 00 45 31 e4 c7 40 08 07 00 00 00 49 83 87 b8 20 00 00 01
+e9 35 f2 ff ff <0f> 0b 4c 89 ff e8 ea 72 03 00 83 f8 01 41 89 c4 0f 85
+47 f9 ff ff
+[   70.284354][ T2928] RSP: 0018:ffffb09fc0653d60 EFLAGS: 00010002
+[   70.284354][ T2928] RAX: 0000000000000000 RBX: 0000000000000000
+RCX: ffff9d9083929cc0
+[   70.284354][ T2928] RDX: ffff9d9083929c01 RSI: ffffffff92f2e509
+RDI: ffffffff92e8010e
+[   70.284354][ T2928] RBP: ffffb09fc0653df0 R08: 0000000000000000
+R09: ffffb09fc052c340
+[   70.284354][ T2928] R10: ffff9d91fffde000 R11: 0000000000034800
+R12: 0000000000000000
+[   70.284354][ T2928] R13: ffffb09fc052c440 R14: ffff9d90839fc038
+R15: ffff9d90839fc000
+[   70.284354][ T2928] FS:  0000000001cc6c30(0000)
+GS:ffff9d91f7d00000(0000) knlGS:0000000000000000
+[   70.284354][ T2928] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   70.284354][ T2928] CR2: 000000c000316000 CR3: 0000000102b4c006
+CR4: 0000000000172ee0
+[   70.284354][ T2928] Call Trace:
+[   70.284354][ T2928]  <TASK>
+[   70.284354][ T2928]  ? memcg_slab_free_hook+0xcc/0x190
+[   70.284354][ T2928]  ? kmem_cache_free+0x264/0x2b0
+[   70.284354][ T2928]  kvm_vcpu_ioctl+0x274/0x680
+[   70.284354][ T2928]  ? _raw_spin_lock_irq+0x14/0x2f
+[   70.284354][ T2928]  ? _raw_spin_unlock_irq+0x13/0x30
+[   70.284354][ T2928]  ? signal_setup_done+0xe9/0x160
+[   70.284354][ T2928]  ? fpregs_mark_activate+0x32/0x90
+[   70.284354][ T2928]  ? arch_do_signal_or_restart+0x525/0x6b0
+[   70.284354][ T2928]  __x64_sys_ioctl+0x40a/0x950
+[   70.284354][ T2928]  do_syscall_64+0x3b/0x90
+[   70.284354][ T2928]  entry_SYSCALL_64_after_hwframe+0x44/0xae
+[   70.284354][ T2928] RIP: 0033:0x489516
+[   70.284354][ T2928] Code: cc cc cc cc cc cc cc cc cc cc cc cc cc cc
+cc cc cc cc cc cc 48 8b 7c 24 10 48 8b 74 24 18 48 8b 54 24 20 48 8b
+44 24 08 0f 05 <48> 3d 01 f0 ff ff 76 1b 48 c7 44 24 28 ff ff ff ff 48
+c7 44 24 30
+[   70.284354][ T2928] RSP: 002b:000000c000009a10 EFLAGS: 00000246
+ORIG_RAX: 0000000000000010
+[   70.284354][ T2928] RAX: ffffffffffffffda RBX: 000000c0002fa480
+RCX: 0000000000489516
+[   70.284354][ T2928] RDX: 0000000000000000 RSI: 000000000000ae80
+RDI: 0000000000000008
+[   70.284354][ T2928] RBP: 000000c000009aa0 R08: 0000000000000001
+R09: 0000000000000000
+[   70.284354][ T2928] R10: 0000000000000000 R11: 0000000000000246
+R12: 0000000000000000
+[   70.639977][ T2928] R13: 0000000000000000 R14: 000000000142fb48
+R15: 0000000000000000
+[   70.639977][ T2928]  </TASK>
+[   70.639977][ T2928] ---[ end trace a3a88c91ba4a4df8 ]---
 
+Ignat
