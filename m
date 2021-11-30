@@ -2,157 +2,285 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4520B462960
-	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 02:01:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D86694629A4
+	for <lists+kvm@lfdr.de>; Tue, 30 Nov 2021 02:25:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230144AbhK3BEa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 29 Nov 2021 20:04:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40162 "EHLO
+        id S236182AbhK3B2d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 29 Nov 2021 20:28:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229803AbhK3BE3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 29 Nov 2021 20:04:29 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD408C061574
-        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 17:01:11 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id p18-20020a17090ad31200b001a78bb52876so16952108pju.3
-        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 17:01:11 -0800 (PST)
+        with ESMTP id S236046AbhK3B2c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 29 Nov 2021 20:28:32 -0500
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80BD6C061574
+        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 17:25:13 -0800 (PST)
+Received: by mail-lj1-x22e.google.com with SMTP id d11so37935712ljg.8
+        for <kvm@vger.kernel.org>; Mon, 29 Nov 2021 17:25:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=uqZ6KaX/LZNKK/U1xMm7U20FtP5AZfHeKxb0hw08vyk=;
-        b=aMxplbiofMx/l/2R2IQPCkTg1T5J09NQ3zL48go3w6Xxhm/V5rvdRtFsMaHMHg9Nd2
-         P5mN6Erhdlxr9mvxH7Qo9Xw5L+c3Hje4iLdSnfACOQ/sZbF55UNymhCA5XBLVz5BkrOr
-         1/lnMOFFr20T3Oxj0Xrv2iQGAsKAJOiaIVnHcAHbwU4WF8MOpNgZJxyNtmawXAAZ+8cl
-         68b73Vg90QWbSs9kVyEgBh5Eqk5+3Ar/rbzqu88E6MtJWhKvw0RdSKUCGDivHcmBAr5m
-         8NxApU9aKU0vWBsfZO4H1QJTftHTuBneimUTjt5wE13tM+nRE6nNyijB4BMbiJgy/oKa
-         B/QQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=1aOU62sEoY17NbFNbDybiVS0K59KvQupYrTSRVeXj/A=;
+        b=HyW4IaEHVteybeW/M0Z4jR0YqK2TCk5Kkdv1RkQqD8D63Kpi89zOcDlp1la7UYPsRS
+         3EUwKSVoEsmMH6gkBc59W0P+RrUoBliJY+1gb8XdHPOd/FtlvxAGHeD3qyZsdSkUVLb6
+         bIhlwFqWm2PDTEjHHzRbs7dgZQBjQAecMmwBN7M9oEcoTaTxDdXsnrxej2SdVtW6nG4U
+         m/D77jWQ5ICZeLrA5bUJPb2eBR9fvBHLMsVWYSzz0R6nas82QcrAih0esrPjyMYuA7Px
+         jbeDuTMnj+dbsOl+xhtClgUXR5IA3vr3pj1aJlnVWvoIdj0oLMVJb/oMar+Frtef+gYy
+         ASjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=uqZ6KaX/LZNKK/U1xMm7U20FtP5AZfHeKxb0hw08vyk=;
-        b=uB1quzd9fja8gcpoMknLAImHr1427FGM9F+tWONoA77j8RVJKF0VWSWZxD1TwsB5Zw
-         U9bLQGOrcUWR0QiJcnNFRLMlG58n0SeZNUP4can8QYaa98ac6D/U42IcLJWZ4FXywIFQ
-         Tyscsved0gSdyTQQQ4gNEopf37OnEVf6zEQnR2qGwMaAxzc2LQtpucYjnnhLRXfgEn3x
-         BLSOs1ajg9n2FYA7NoUVDha48/P9WDyti5RdnVNiwX3LH1NSNoN4ARgZajMTA/Wca2mS
-         GLM83DrenABq/I6QRalSXNR2EMB5E7EB+DZXENohH89tAwp3pzbukoDU91GWWGyxSBU3
-         khwg==
-X-Gm-Message-State: AOAM530F2i4jdHUGlgDICR/Z0sDUfoZB2gumj9gC1N7BjvPvxGTJMxJ1
-        t9rC6MEQWA0ndximRIzOowWWjA==
-X-Google-Smtp-Source: ABdhPJymdCi6qiFw9ovg+bQ4gteXYrrpV4iWt+iuznTWOlJjne73F5Yvgo+UINos1pmeuZSGGavBBQ==
-X-Received: by 2002:a17:902:dad2:b0:141:fbea:178d with SMTP id q18-20020a170902dad200b00141fbea178dmr63857671plx.78.1638234070897;
-        Mon, 29 Nov 2021 17:01:10 -0800 (PST)
-Received: from google.com (254.80.82.34.bc.googleusercontent.com. [34.82.80.254])
-        by smtp.gmail.com with ESMTPSA id lt5sm465983pjb.43.2021.11.29.17.01.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Nov 2021 17:01:09 -0800 (PST)
-Date:   Tue, 30 Nov 2021 01:01:06 +0000
-From:   David Matlack <dmatlack@google.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>
-Subject: Re: [PATCH v2] KVM: x86/mmu: Update number of zapped pages even if
- page list is stable
-Message-ID: <YaV30lD5ipdB642C@google.com>
-References: <20211129235233.1277558-1-seanjc@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=1aOU62sEoY17NbFNbDybiVS0K59KvQupYrTSRVeXj/A=;
+        b=2jRA4/MohN9ETwGpb7fELlFuagIYCRXVQGu1UTQCuL12fADP9kJbu9CU8AtaLgpyEw
+         YLcnJZoEXdZbQBsazEg1LGQcm6I3/2i1kQOn5UoHn+qi5Xhuxzk4YrCff+2P+Zkkjd8L
+         DEAD3HQI22TYF8tKvxufrPsqgipT8iAPMuslvdGQwubCgqgBKh1PvQGaSBEQjcsqmz9p
+         xTOmBALHC0qho9dmVnrohCDBSYmfY+9aQHsW4G3TLYKM7rP6H1D8PtV8Xbao3xaTyJFj
+         CTSVU24vngIPgU97sUpNCZl2vZMG5erBh9JXhOyc035f94hy+sn4pTldgpaRL3IqQqYz
+         lveA==
+X-Gm-Message-State: AOAM533NRZbnJt6F6lKUyxdx9b4sWPK/0GpZ3ONfG3hWjj5ZlGJzuIVa
+        HrFBPlRVuuaJpgoyryNfFgpRCQMdW/HPQKESxtDVWtnDl6E=
+X-Google-Smtp-Source: ABdhPJxttSh9XdFPcNOWvXNMWWNt8QdUamM0+EPygp4nvEYFPqPBpnT8xC/kB4mnwwwxF+M2bDGZyQUl/U4Ro5fhkAU=
+X-Received: by 2002:a2e:8991:: with SMTP id c17mr50284659lji.361.1638235511602;
+ Mon, 29 Nov 2021 17:25:11 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211129235233.1277558-1-seanjc@google.com>
+References: <20211115211704.2621644-1-bgardon@google.com> <YZL1ZiKQVRQd8rZi@google.com>
+In-Reply-To: <YZL1ZiKQVRQd8rZi@google.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Mon, 29 Nov 2021 17:24:45 -0800
+Message-ID: <CALzav=cXWUUrKFwKgTEKjb=TQTLTNcQv62BwjdyUqsLjwYZ=hQ@mail.gmail.com>
+Subject: Re: [PATCH 1/1] KVM: x86/mmu: Fix TLB flush range when handling
+ disconnected pt
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Keqian Zhu <zhukeqian1@huawei.com>,
+        David Hildenbrand <david@redhat.com>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 29, 2021 at 11:52:33PM +0000, Sean Christopherson wrote:
-> When zapping obsolete pages, update the running count of zapped pages
-> regardless of whether or not the list has become unstable due to zapping
-> a shadow page with its own child shadow pages.  If the VM is backed by
-> mostly 4kb pages, KVM can zap an absurd number of SPTEs without bumping
-> the batch count and thus without yielding.  In the worst case scenario,
-> this can cause a soft lokcup.
-> 
->  watchdog: BUG: soft lockup - CPU#12 stuck for 22s! [dirty_log_perf_:13020]
->    RIP: 0010:workingset_activation+0x19/0x130
->    mark_page_accessed+0x266/0x2e0
->    kvm_set_pfn_accessed+0x31/0x40
->    mmu_spte_clear_track_bits+0x136/0x1c0
->    drop_spte+0x1a/0xc0
->    mmu_page_zap_pte+0xef/0x120
->    __kvm_mmu_prepare_zap_page+0x205/0x5e0
->    kvm_mmu_zap_all_fast+0xd7/0x190
->    kvm_mmu_invalidate_zap_pages_in_memslot+0xe/0x10
->    kvm_page_track_flush_slot+0x5c/0x80
->    kvm_arch_flush_shadow_memslot+0xe/0x10
->    kvm_set_memslot+0x1a8/0x5d0
->    __kvm_set_memory_region+0x337/0x590
->    kvm_vm_ioctl+0xb08/0x1040
-> 
-> Fixes: fbb158cb88b6 ("KVM: x86/mmu: Revert "Revert "KVM: MMU: zap pages in batch""")
-> Reported-by: David Matlack <dmatlack@google.com>
-> Reviewed-by: Ben Gardon <bgardon@google.com>
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+On Mon, Nov 15, 2021 at 4:03 PM Sean Christopherson <seanjc@google.com> wro=
+te:
+>
+> On Mon, Nov 15, 2021, Ben Gardon wrote:
+> > When recursively clearing out disconnected pts, the range based TLB
+> > flush in handle_removed_tdp_mmu_page uses the wrong starting GFN,
+> > resulting in the flush mostly missing the affected range. Fix this by
+> > using base_gfn for the flush.
+> >
+> > In response to feedback from David Matlack on the RFC version of this
+> > patch, also move a few definitions into the for loop in the function to
+> > prevent unintended references to them in the future.
+>
+> Rats, I didn't read David's feedback or I would've responded there.
+>
+> > Fixes: a066e61f13cf ("KVM: x86/mmu: Factor out handling of removed page=
+ tables")
+> > CC: stable@vger.kernel.org
+> >
+> > Signed-off-by: Ben Gardon <bgardon@google.com>
+> > ---
+> >  arch/x86/kvm/mmu/tdp_mmu.c | 10 ++++------
+> >  1 file changed, 4 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> > index 7c5dd83e52de..4bd541050d21 100644
+> > --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> > @@ -317,9 +317,6 @@ static void handle_removed_tdp_mmu_page(struct kvm =
+*kvm, tdp_ptep_t pt,
+> >       struct kvm_mmu_page *sp =3D sptep_to_sp(rcu_dereference(pt));
+> >       int level =3D sp->role.level;
+> >       gfn_t base_gfn =3D sp->gfn;
+> > -     u64 old_child_spte;
+> > -     u64 *sptep;
+> > -     gfn_t gfn;
+> >       int i;
+> >
+> >       trace_kvm_mmu_prepare_zap_page(sp);
+> > @@ -327,8 +324,9 @@ static void handle_removed_tdp_mmu_page(struct kvm =
+*kvm, tdp_ptep_t pt,
+> >       tdp_mmu_unlink_page(kvm, sp, shared);
+> >
+> >       for (i =3D 0; i < PT64_ENT_PER_PAGE; i++) {
+> > -             sptep =3D rcu_dereference(pt) + i;
+> > -             gfn =3D base_gfn + i * KVM_PAGES_PER_HPAGE(level);
+> > +             u64 *sptep =3D rcu_dereference(pt) + i;
+> > +             gfn_t gfn =3D base_gfn + i * KVM_PAGES_PER_HPAGE(level);
+> > +             u64 old_child_spte;
+>
+> TL;DR: this type of optional refactoring doesn't belong in a patch Cc'd f=
+or stable,
 
-Reviewed-by: David Matlack <dmatlack@google.com>
+This is a great point. Regardless of our stance on variable function
+declaration, the refactor wouldn't make sense to send to stable (or at
+the minimum it should be considered separately in its own patch).
 
-> ---
-> 
-> v2:
->  - Rebase to kvm/master, commit 30d7c5d60a88 ("KVM: SEV: expose...")
->  - Collect Ben's review, modulo bad splat.
->  - Copy+paste the correct splat and symptom. [David].
-> 
-> @David, I kept the unstable declaration out of the loop, mostly because I
-> really don't like putting declarations in loops, but also because
-> nr_zapped is declared out of the loop and I didn't want to change that
-> unnecessarily or make the code inconsistent.
+> and my personal preference is to always declare variables at function sco=
+pe (it's
+> not a hard rule though, Paolo has overruled me at least once :-) ).
+>
+> Declaring variables in an inner scope is not always "better".  In particu=
+lar, it
+> can lead to variable shadowing, which can lead to functional issues of a =
+different
+> sort.  Most shadowing is fairly obvious, and truly egregious bugs will of=
+ten result
+> in the compiler complaining about consuming an uninitialized variable.
+>
+> But the worst-case scenario is if the inner scope shadows a function para=
+meter, in
+> which the case the compiler will not complain and will even consume an un=
+initialized
+> variable without warning.  IIRC, we actually had a Hyper-V bug of that na=
+ture
+> where an incoming @vcpu was shadowed.  Examples below.
+>
+> So yes, on one hand moving the declarations inside the loop avoid potenti=
+al flavor
+> of bug, but they create the possibility for an entirely different class o=
+f bugs.
+> The main reason I prefer declaring at function scope is that I find it ea=
+sier to
+> visually detect using variables after a for loop, versus detecting that a=
+ variable
+> is being shadowed, especially if the function is largish and the two decl=
+arations
+> don't fit on the screen.
 
-Sounds good. For stable patches I definitely agree with not changing
-variable declarations needlessly. And as a general rule, I get your
-point on the other thread about shadowing variables and therefore
-preferring to declare all variables at function scope.
+Ah I have not had the pleasure of debugging a variable shadowing bug
+before :), so I never even considered this.
 
-I have some other ideas on this topic but it's out of scope for this
-patch so I'll post it on the other thread.
+This is something that a compiler could easily detect and disallow for
+us. In fact GCC has the -Wshadow=3Dlocal option which disallows local
+variables shadowing other local variables and function parameters.
+Unfortunately, Clang either doesn't support this option or spells it
+differently (but I haven't been able to find it). I tried to build KVM
+with -Wshadow=3Dlocal today but it looks like I need to get a newer
+version of GCC and that's as far as I got.
 
-> 
->  arch/x86/kvm/mmu/mmu.c | 10 ++++++----
->  1 file changed, 6 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 0c839ee1282c..208c892136bf 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -5576,6 +5576,7 @@ static void kvm_zap_obsolete_pages(struct kvm *kvm)
+Both Clang and GCC support -Wshadow but that is too broad. It prevents
+local variables from shadowing global variables, which would prevent
+us from having local variables named "apic" among other common names.
+
+>
+> There are of course counter-examples, e.g. commit 5c49d1850ddd ("KVM: VMX=
+: Fix a
+> TSX_CTRL_CPUID_CLEAR field mask issue") immediately jumps to mind, so the=
+re's
+> certainly an element of personal preference.
+>
+> E.g. this will fail with "error: =E2=80=98sptep=E2=80=99 redeclared as di=
+fferent kind of symbol
+>
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 4e226cdb40d9..011639bf633c 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -369,7 +369,7 @@ static void tdp_mmu_unlink_page(struct kvm *kvm, stru=
+ct kvm_mmu_page *sp,
+>   * early rcu_dereferences in the function.
+>   */
+>  static void handle_removed_tdp_mmu_page(struct kvm *kvm, tdp_ptep_t pt,
+> -                                       bool shared)
+> +                                       bool shared, u64 *sptep)
 >  {
->  	struct kvm_mmu_page *sp, *node;
->  	int nr_zapped, batch = 0;
-> +	bool unstable;
->  
->  restart:
->  	list_for_each_entry_safe_reverse(sp, node,
-> @@ -5607,11 +5608,12 @@ static void kvm_zap_obsolete_pages(struct kvm *kvm)
->  			goto restart;
->  		}
->  
-> -		if (__kvm_mmu_prepare_zap_page(kvm, sp,
-> -				&kvm->arch.zapped_obsolete_pages, &nr_zapped)) {
-> -			batch += nr_zapped;
-> +		unstable = __kvm_mmu_prepare_zap_page(kvm, sp,
-> +				&kvm->arch.zapped_obsolete_pages, &nr_zapped);
-> +		batch += nr_zapped;
-> +
-> +		if (unstable)
->  			goto restart;
-> -		}
->  	}
->  
->  	/*
-> -- 
-> 2.34.0.rc2.393.gf8c9666880-goog
-> 
+>         struct kvm_mmu_page *sp =3D sptep_to_sp(rcu_dereference(pt));
+>         int level =3D sp->role.level;
+> @@ -431,8 +431,9 @@ static void handle_removed_tdp_mmu_page(struct kvm *k=
+vm, tdp_ptep_t pt,
+>                                     shared);
+>         }
+>
+> -       kvm_flush_remote_tlbs_with_address(kvm, gfn,
+> -                                          KVM_PAGES_PER_HPAGE(level + 1)=
+);
+> +       if (sptep)
+> +               kvm_flush_remote_tlbs_with_address(kvm, gfn,
+> +                                                  KVM_PAGES_PER_HPAGE(le=
+vel + 1));
+>
+>         call_rcu(&sp->rcu_head, tdp_mmu_free_sp_rcu_callback);
+>  }
+> @@ -532,7 +533,7 @@ static void __handle_changed_spte(struct kvm *kvm, in=
+t as_id, gfn_t gfn,
+>          */
+>         if (was_present && !was_leaf && (is_leaf || !is_present))
+>                 handle_removed_tdp_mmu_page(kvm,
+> -                               spte_to_child_pt(old_spte, level), shared=
+);
+> +                               spte_to_child_pt(old_spte, level), shared=
+, NULL);
+>  }
+>
+>  static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+>
+>
+> whereas moving the second declaration into the loop will compile happily.
+>
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 4e226cdb40d9..3e83fd66c0dc 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -369,13 +369,12 @@ static void tdp_mmu_unlink_page(struct kvm *kvm, st=
+ruct kvm_mmu_page *sp,
+>   * early rcu_dereferences in the function.
+>   */
+>  static void handle_removed_tdp_mmu_page(struct kvm *kvm, tdp_ptep_t pt,
+> -                                       bool shared)
+> +                                       bool shared, u64 *sptep)
+>  {
+>         struct kvm_mmu_page *sp =3D sptep_to_sp(rcu_dereference(pt));
+>         int level =3D sp->role.level;
+>         gfn_t base_gfn =3D sp->gfn;
+>         u64 old_child_spte;
+> -       u64 *sptep;
+>         gfn_t gfn;
+>         int i;
+>
+> @@ -384,7 +383,7 @@ static void handle_removed_tdp_mmu_page(struct kvm *k=
+vm, tdp_ptep_t pt,
+>         tdp_mmu_unlink_page(kvm, sp, shared);
+>
+>         for (i =3D 0; i < PT64_ENT_PER_PAGE; i++) {
+> -               sptep =3D rcu_dereference(pt) + i;
+> +               u64 *sptep =3D rcu_dereference(pt) + i;
+>                 gfn =3D base_gfn + i * KVM_PAGES_PER_HPAGE(level);
+>
+>                 if (shared) {
+> @@ -431,8 +430,9 @@ static void handle_removed_tdp_mmu_page(struct kvm *k=
+vm, tdp_ptep_t pt,
+>                                     shared);
+>         }
+>
+> -       kvm_flush_remote_tlbs_with_address(kvm, gfn,
+> -                                          KVM_PAGES_PER_HPAGE(level + 1)=
+);
+> +       if (sptep)
+> +               kvm_flush_remote_tlbs_with_address(kvm, gfn,
+> +                                                  KVM_PAGES_PER_HPAGE(le=
+vel + 1));
+>
+>         call_rcu(&sp->rcu_head, tdp_mmu_free_sp_rcu_callback);
+>  }
+> @@ -532,7 +532,7 @@ static void __handle_changed_spte(struct kvm *kvm, in=
+t as_id, gfn_t gfn,
+>          */
+>         if (was_present && !was_leaf && (is_leaf || !is_present))
+>                 handle_removed_tdp_mmu_page(kvm,
+> -                               spte_to_child_pt(old_spte, level), shared=
+);
+> +                               spte_to_child_pt(old_spte, level), shared=
+, NULL);
+>  }
+>
+>  static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
