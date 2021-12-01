@@ -2,112 +2,206 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DDA9E4644D8
-	for <lists+kvm@lfdr.de>; Wed,  1 Dec 2021 03:21:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ABD8D4644E5
+	for <lists+kvm@lfdr.de>; Wed,  1 Dec 2021 03:29:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346029AbhLACZH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Nov 2021 21:25:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50428 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345957AbhLACZF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Nov 2021 21:25:05 -0500
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05AFAC061746
-        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 18:21:46 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id p18-20020a17090ad31200b001a78bb52876so19785174pju.3
-        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 18:21:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=gie1EwZxonCzFvugUYBX8WOXYkfnwgMVP4++lOOlv+c=;
-        b=BHHWYuF18555l0y3u6rGa+kEPLUpRnTak219rl+ifA1BegpvG+NBgLb0it0I4y1PBo
-         opX2RyrCSzAxdaDMxLHZgYuQBb3UVPD2vfYENDpOiOvKud4gngvK2ESBdq2wzO7bvYFs
-         Uom+60iWQDBpxbmPU70HUiBcp58Q+IzMSy+kvlJ0vEJ1p8v4tuSDuU8pkpbNTFB618qG
-         GRyKbd/AR+lkFA4jCgEvLeAjD26ZWOnk3TJw1kKRu0Qd77in9KBkimE5/N26zN4jm81l
-         dcBG7UIm2ufF53HRCOZW7kupF9U+VKWo5L41OJTTQxhPRxp8ZLBeqKPhTwxyhB0gaVmZ
-         Kypw==
+        id S1346162AbhLACdO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Nov 2021 21:33:14 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:39257 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1345986AbhLACdN (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 30 Nov 2021 21:33:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1638325793;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=uF9Fy6ni5PnBeiS/CdAuJ/Fft8Orpw66x56ETZ461hk=;
+        b=SIuxid9vDBBsUZGlM5LCUV9CRcETDTD3HQQJ8xWkgTgaYXabsSn5r/7xX8ZEETwpy4hp4n
+        M8EY8cHF8XOMo7Q8CLS9J4Z26Uh9Y1IMfMeYYEkWz9aLhoqh4AERTEbOZHQjwR/pV2RhlP
+        E3xuIYbAapzOF9JLThth7jO6ugHEDV8=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-286-hefOZ1XwOHqL4WwS-iWYsg-1; Tue, 30 Nov 2021 21:29:52 -0500
+X-MC-Unique: hefOZ1XwOHqL4WwS-iWYsg-1
+Received: by mail-wm1-f70.google.com with SMTP id a85-20020a1c7f58000000b0033ddc0eacc8so12988755wmd.9
+        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 18:29:51 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=gie1EwZxonCzFvugUYBX8WOXYkfnwgMVP4++lOOlv+c=;
-        b=dmJdTO/siK+hCdiWmurxO9ZHDm9U4utoiGY8o8gKKFUJyPM15Pu0SzY70k/CNZ8uV6
-         dV89jsJidFkDIqLWWXMp8dnGDevGms5rLe+IDdlQc2JYPzJhBSaKxG+SDkRbT8BMgVDA
-         1X+ZHyUF4nRsBjikmSDNixKdoRarG7RmIJw59ZJOC6z0Q9BvLweENIzlkdUqsTeQXNOq
-         Sr1e2DBrOVWp3Tzt1vZo32Li3Jf33rT9hkykRPaJksa/uwURGslkGoz9DQm0uXAeaRo4
-         qw6P+fCjJL7Ba3DmV1+tHt3JjtQ/g1eZBHnXlfbglrrbQN3Mg7si/hFDxft20I7j5ysf
-         xDyw==
-X-Gm-Message-State: AOAM532xRnFQPABOQ8dfoTiB2QXZ3HZ3vNpGTc1xw0NkU02FNaaDOGS9
-        elSZ7By//x6CeLkbTLT9y0fuGw==
-X-Google-Smtp-Source: ABdhPJx7ckMHu0ZBbHoG3wVdN35yNz+jTnr/6AkXoHITLna8yQnOkJAuMipyrJqERvLCPmT0P99eUg==
-X-Received: by 2002:a17:902:748c:b0:141:c45e:c612 with SMTP id h12-20020a170902748c00b00141c45ec612mr3544713pll.73.1638325305343;
-        Tue, 30 Nov 2021 18:21:45 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id j13sm21251711pfc.151.2021.11.30.18.21.44
+        bh=uF9Fy6ni5PnBeiS/CdAuJ/Fft8Orpw66x56ETZ461hk=;
+        b=2h20N8QV2myg97MkOoT3OYKf/u9CJBW9V/s6dD3q8ULl/RvA7ON3IXA8mm3yy8NxzS
+         n50wwlFWY5tIk/c4xFKIucPQrbom4sa0wm9EK4BWngNyHYmX+rhAvIRMNbWXNgUW0YLf
+         pIOLD5lttmIcBD6wRS36mOQFzvlclL0MJNs+t5ALXGjMpxAfdxOparwMXwoRN4rgplcB
+         ml3ztMOdsRpuNlHL8AI85KYsswzpUz3XnxuAh17iGNTpfVMHz/bpMrClgCWIoD6M2r7C
+         vivbwfc1mhew+TjkwbgHwHWTeNOxfLpikvXA2nNLd/nYFruCPZBTNHqqvGk5Tl5a60tA
+         0zPg==
+X-Gm-Message-State: AOAM533/kEE61elsiiwzLkuSQxmWf9UkbGDD/Xkvfsrsw/QKNmw1o7IQ
+        QrnvlaDtoT2lePenB5Dwm9XParRFXlPomGFL8KytRFazwdthnVz01f41Oyq0xKrwB6bgCG2xL8Y
+        HXrkE8b5dgp59
+X-Received: by 2002:a5d:4d81:: with SMTP id b1mr3420074wru.366.1638325790253;
+        Tue, 30 Nov 2021 18:29:50 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzC2WmMPEofBjJpY9UNpUzWnlXp8IVrKbGIWga0IuS/0tDmL4KMFzMZD3vDYyVsyGf24fhG5w==
+X-Received: by 2002:a5d:4d81:: with SMTP id b1mr3420052wru.366.1638325790038;
+        Tue, 30 Nov 2021 18:29:50 -0800 (PST)
+Received: from xz-m1.local ([64.64.123.10])
+        by smtp.gmail.com with ESMTPSA id p2sm4485011wmq.23.2021.11.30.18.29.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Nov 2021 18:21:44 -0800 (PST)
-Date:   Wed, 1 Dec 2021 02:21:41 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
+        Tue, 30 Nov 2021 18:29:49 -0800 (PST)
+Date:   Wed, 1 Dec 2021 10:29:41 +0800
+From:   Peter Xu <peterx@redhat.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Ben Gardon <bgardon@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        Ben Gardon <bgardon@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 18/29] KVM: x86: Use nr_memslot_pages to avoid
- traversing the memslots array
-Message-ID: <YabcNaCb88s/CTop@google.com>
-References: <cover.1638304315.git.maciej.szmigiero@oracle.com>
- <74663af27fd6e25b7846da343f7013b1e9885a4b.1638304316.git.maciej.szmigiero@oracle.com>
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>,
+        Junaid Shahid <junaids@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Harish Barathvajasankar <hbarath@google.com>,
+        Peter Shier <pshier@google.com>
+Subject: Re: [RFC PATCH 12/15] KVM: x86/mmu: Split large pages when dirty
+ logging is enabled
+Message-ID: <YabeFZxWqPAuoEtZ@xz-m1.local>
+References: <20211119235759.1304274-1-dmatlack@google.com>
+ <20211119235759.1304274-13-dmatlack@google.com>
+ <YaDMg3/xUSwL5+Ei@xz-m1.local>
+ <CALzav=cXgCSP3RLh+gss65==B6eYXC82V3zNjv2KCNehUMQewA@mail.gmail.com>
+ <YabJSdRklj3T6FWJ@google.com>
+ <CALzav=cJpWPF1RzsEZcoN+ZX8kM3OquKQR-8rdTksZ6cs1R+EQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <74663af27fd6e25b7846da343f7013b1e9885a4b.1638304316.git.maciej.szmigiero@oracle.com>
+In-Reply-To: <CALzav=cJpWPF1RzsEZcoN+ZX8kM3OquKQR-8rdTksZ6cs1R+EQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 30, 2021, Maciej S. Szmigiero wrote:
-> From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
-> 
-> There is no point in recalculating from scratch the total number of pages
-> in all memslots each time a memslot is created or deleted.  Use KVM's
-> cached nr_memslot_pages to compute the default max number of MMU pages.
-> 
-> Note that even with nr_memslot_pages capped at ULONG_MAX we can't safely
-> multiply it by KVM_PERMILLE_MMU_PAGES (20) since this operation can
-> possibly overflow an unsigned long variable.
-> 
-> Write this "* 20 / 1000" operation as "/ 50" instead to avoid such
-> overflow.
-> 
-> Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
-> [sean: use common KVM field and rework changelog accordingly]
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+On Tue, Nov 30, 2021 at 05:29:10PM -0800, David Matlack wrote:
+> On Tue, Nov 30, 2021 at 5:01 PM Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > On Tue, Nov 30, 2021, David Matlack wrote:
+> > > On Fri, Nov 26, 2021 at 4:01 AM Peter Xu <peterx@redhat.com> wrote:
+> > > >
+> > > > Hi, David,
+> > > >
+> > > > On Fri, Nov 19, 2021 at 11:57:56PM +0000, David Matlack wrote:
+> > > > > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > > > > index 2a7564703ea6..432a4df817ec 100644
+> > > > > --- a/arch/x86/include/asm/kvm_host.h
+> > > > > +++ b/arch/x86/include/asm/kvm_host.h
+> > > > > @@ -1232,6 +1232,9 @@ struct kvm_arch {
+> > > > >       hpa_t   hv_root_tdp;
+> > > > >       spinlock_t hv_root_tdp_lock;
+> > > > >  #endif
+> > > > > +
+> > > > > +     /* MMU caches used when splitting large pages during VM-ioctls. */
+> > > > > +     struct kvm_mmu_memory_caches split_caches;
+> > > >
+> > > > Are mmu_gfn_array_cache and mmu_pte_list_desc_cache wasted here?  I saw that
+> > > > "struct kvm_mmu_memory_cache" still takes up quite a few hundreds of bytes,
+> > > > just want to make sure we won't waste them in vain.
+> > >
+> > > Yes they are wasted right now. But there's a couple of things to keep in mind:
+> > >
+> > > 1. They are also wasted in every vCPU (in the per-vCPU caches) that
+> > > does not use the shadow MMU.
+> > > 2. They will (I think) be used eventually when I add Eager Page
+> > > Splitting support to the shadow MMU.
+> > > 3. split_caches is per-VM so it's only a few hundred bytes per VM.
+> > >
+> > > If we really want to save the memory the right way forward might be to
+> > > make each kvm_mmu_memory_cache a pointer instead of an embedded
+> > > struct. Then we can allocate each dynamically only as needed. I can
+> > > add that to my TODO list but I don't think it'd be worth blocking this
+> > > on it given the points above.
 
-My SoB can definitely be dropped for this one, just consider it review feedback
-that happened to have an SoB attached.
+Yeah I never meant to block this series just for this. :)
 
-Reviewed-by: Sean Christopherson <seanjc@google.com> 
+If there's plan to move forward with shadow mmu support and they'll be needed
+at last, then it's good to me to keep it as is.  Maybe before adding the shadow
+mmu support we add a comment above the structure?  Depending on whether the
+shadow mmu support is in schedule or not, I think.
+
+> > >
+> > > >
+> > > > [...]
+> > > >
+> > > > > +int mmu_topup_split_caches(struct kvm *kvm)
+> > > > > +{
+> > > > > +     struct kvm_mmu_memory_caches *split_caches = &kvm->arch.split_caches;
+> > > > > +     int r;
+> > > > > +
+> > > > > +     assert_split_caches_invariants(kvm);
+> > > > > +
+> > > > > +     r = kvm_mmu_topup_memory_cache(&split_caches->page_header_cache, 1);
+> > > > > +     if (r)
+> > > > > +             goto out;
+> > > > > +
+> > > > > +     r = kvm_mmu_topup_memory_cache(&split_caches->shadow_page_cache, 1);
+> > > > > +     if (r)
+> > > > > +             goto out;
+> > > >
+> > > > Is it intended to only top-up with one cache object?  IIUC this means we'll try
+> > > > to proactively yield the cpu for each of the huge page split right after the
+> > > > object is consumed.
+> > > >
+> > > > Wondering whether it be more efficient to make it a slightly larger number, so
+> > > > we don't overload the memory but also make the loop a bit more efficient.
+> > >
+> > > IIUC, 1 here is just the min needed for kvm_mmu_topup_memory_cache to
+> > > return success. I chose 1 for each because it's the minimum necessary
+> > > to make forward progress (split one large page).
+> >
+> > The @min parameter is minimum number of pages that _must_ be available in the
+> > cache, i.e. it's the maximum number of pages that can theoretically be used by
+> > whatever upcoming operation is going to be consuming pages from the cache.
+> >
+> > So '1' is technically correct, but I think it's the wrong choice given the behavior
+> > of this code.  E.g. if there's 1 object in the cache, the initial top-up will do
+> > nothing,
+> 
+> This scenario will not happen though, since we free the caches after
+> splitting. So, the next time userspace enables dirty logging on a
+> memslot and we go to do the initial top-up the caches will have 0
+> objects.
+> 
+> > and then tdp_mmu_split_large_pages_root() will almost immediately drop
+> > mmu_lock to topup the cache.  Since the in-loop usage explicitly checks for an
+> > empty cache, i.e. any non-zero @min will have identical behavior, I think it makes
+> > sense to use KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE _and_ add a comment explaining why.
+> 
+> If we set the min to KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE,
+> kvm_mmu_topup_memory_cache will return ENOMEM if it can't allocate at
+> least KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE objects, even though we really
+> only need 1 to make forward progress.
+> 
+> It's a total edge case but there could be a scenario where userspace
+> sets the cgroup memory limits so tight that we can't allocate
+> KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE objects when splitting the last few
+> pages and in the end we only needed 1 or 2 objects to finish
+> splitting. In this case we'd end up with a spurious pr_warn and may
+> not split the last few pages depending on which cache failed to get
+> topped up.
+
+IMHO when -ENOMEM happens, instead of keep trying with 1 shadow sp we should
+just bail out even earlier.
+
+Say, if we only have 10 (<40) pages left for shadow sp's use, we'd better make
+good use of them lazily to be consumed in follow up page faults when the guest
+accessed any of the huge pages, rather than we take them all over to split the
+next continuous huge pages assuming it'll be helpful..
+
+From that POV I have a slight preference over Sean's suggestion because that'll
+make us fail earlier.  But I agree it shouldn't be a big deal.
+
+Thanks,
+
+-- 
+Peter Xu
+
