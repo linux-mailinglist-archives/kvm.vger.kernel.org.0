@@ -2,70 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 46A5C464A89
-	for <lists+kvm@lfdr.de>; Wed,  1 Dec 2021 10:25:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B8B18464B0E
+	for <lists+kvm@lfdr.de>; Wed,  1 Dec 2021 10:54:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348159AbhLAJ3D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Dec 2021 04:29:03 -0500
-Received: from mga07.intel.com ([134.134.136.100]:64263 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1348188AbhLAJ2u (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Dec 2021 04:28:50 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10184"; a="299812438"
-X-IronPort-AV: E=Sophos;i="5.87,278,1631602800"; 
-   d="scan'208";a="299812438"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2021 01:25:27 -0800
-X-IronPort-AV: E=Sophos;i="5.87,278,1631602800"; 
-   d="scan'208";a="500164248"
-Received: from duan-client-optiplex-7080.bj.intel.com ([10.238.156.117])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2021 01:25:25 -0800
-From:   Zhenzhong Duan <zhenzhong.duan@intel.com>
-To:     kvm@vger.kernel.org
-Cc:     chao.gao@intel.com, Xiaoyao.Li@intel.com, yuan.yao@intel.com
-Subject: [kvm-unit-tests PATCH] x86: Remove invalid clwb test code
-Date:   Wed,  1 Dec 2021 17:26:19 +0800
-Message-Id: <20211201092619.60298-1-zhenzhong.duan@intel.com>
-X-Mailer: git-send-email 2.25.1
+        id S242457AbhLAJ5x convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Wed, 1 Dec 2021 04:57:53 -0500
+Received: from szxga03-in.huawei.com ([45.249.212.189]:28211 "EHLO
+        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232736AbhLAJ5w (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Dec 2021 04:57:52 -0500
+Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.56])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4J3vWz6sJ1z8vhN;
+        Wed,  1 Dec 2021 17:52:31 +0800 (CST)
+Received: from kwepemm600005.china.huawei.com (7.193.23.191) by
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Wed, 1 Dec 2021 17:54:30 +0800
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ kwepemm600005.china.huawei.com (7.193.23.191) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Wed, 1 Dec 2021 17:54:29 +0800
+Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
+ lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
+ 15.01.2308.020; Wed, 1 Dec 2021 09:54:27 +0000
+From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+CC:     Jonathan Corbet <corbet@lwn.net>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Yishai Hadas <yishaih@nvidia.com>,
+        "Zengtao (B)" <prime.zeng@hisilicon.com>,
+        liulongfang <liulongfang@huawei.com>
+Subject: RE: [PATCH RFC v2] vfio: Documentation for the migration region
+Thread-Topic: [PATCH RFC v2] vfio: Documentation for the migration region
+Thread-Index: AQHX5S/pH80pYVu+o0az8lQb+t8Cn6wcVFyAgAAZ+wCAADx+gIAATcuAgABn8BA=
+Date:   Wed, 1 Dec 2021 09:54:27 +0000
+Message-ID: <90226a3c13a2404086dc555e4aced7cb@huawei.com>
+References: <0-v2-45a95932a4c6+37-vfio_mig_doc_jgg@nvidia.com>
+ <20211130102611.71394253.alex.williamson@redhat.com>
+ <20211130185910.GD4670@nvidia.com>
+ <20211130153541.131c9729.alex.williamson@redhat.com>
+ <20211201031407.GG4670@nvidia.com>
+In-Reply-To: <20211201031407.GG4670@nvidia.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.202.227.178]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When X86_FEATURE_WAITPKG(CPUID.7.0:ECX.WAITPKG[bit 5]) supported,
-".byte 0x66, 0x0f, 0xae, 0xf0" sequence no longer represents clwb
-instruction with invalid operand but tpause instruction with %eax
-as input register.
 
-Execute tpause with invalid input triggers #GP with below customed
-qemu command line:
 
-qemu -kernel x86/memory.flat -overcommit cpu-pm=on ...
+> -----Original Message-----
+> From: Jason Gunthorpe [mailto:jgg@nvidia.com]
+> Sent: 01 December 2021 03:14
+> To: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Jonathan Corbet <corbet@lwn.net>; linux-doc@vger.kernel.org; Cornelia
+> Huck <cohuck@redhat.com>; kvm@vger.kernel.org; Kirti Wankhede
+> <kwankhede@nvidia.com>; Max Gurtovoy <mgurtovoy@nvidia.com>;
+> Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>; Yishai
+> Hadas <yishaih@nvidia.com>
+> Subject: Re: [PATCH RFC v2] vfio: Documentation for the migration region
+> 
+> On Tue, Nov 30, 2021 at 03:35:41PM -0700, Alex Williamson wrote:
+> 
+> > > From what HNS said the device driver would have to trap every MMIO to
+> > > implement NDMA as it must prevent touches to the physical HW MMIO to
+> > > maintain the NDMA state.
+> > >
+> > > The issue is that the HW migration registers can stop processing the
+> > > queue and thus enter NDMA but a MMIO touch can resume queue
+> > > processing, so NDMA cannot be sustained.
+> > >
+> > > Trapping every MMIO would have a huge negative performance impact.
+> So
+> > > it doesn't make sense to do so for a device that is not intended to be
+> > > used in any situation where NDMA is required.
+> >
+> > But migration is a cooperative activity with userspace.  If necessary
+> > we can impose a requirement that mmap access to regions (other than the
+> > migration region itself) are dropped when we're in the NDMA or !RUNNING
+> > device_state.
+> 
+> It is always NDMA|RUNNING, so we can't fully drop access to
+> MMIO. Userspace would have to transfer from direct MMIO to
+> trapping. With enough new kernel infrastructure and qemu support it
+> could be done.
 
-Signed-off-by: Zhenzhong Duan <zhenzhong.duan@intel.com>
----
- x86/memory.c | 7 -------
- 1 file changed, 7 deletions(-)
+As far as our devices are concerned we put the dev queue into a PAUSE state
+in the !RUNNUNG state. And since we don't have any P2P support, is it ok
+to put the onus on userspace here that it won't try to access the MMIO during
+!RUNNUNG state?
 
-diff --git a/x86/memory.c b/x86/memory.c
-index 8f61020..351e7c0 100644
---- a/x86/memory.c
-+++ b/x86/memory.c
-@@ -67,13 +67,6 @@ int main(int ac, char **av)
- 	asm volatile(".byte 0x66, 0x0f, 0xae, 0x33" : : "b" (&target));
- 	report(ud == expected, "clwb (%s)", expected ? "ABSENT" : "present");
- 
--	ud = 0;
--	/* clwb requires a memory operand, the following is NOT a valid
--	 * CLWB instruction (modrm == 0xF0).
--	 */
--	asm volatile(".byte 0x66, 0x0f, 0xae, 0xf0");
--	report(ud, "invalid clwb");
--
- 	expected = !this_cpu_has(X86_FEATURE_PCOMMIT); /* PCOMMIT */
- 	ud = 0;
- 	/* pcommit: */
--- 
-2.25.1
+So just to make it clear , if a device declares that it doesn't support NDMA
+and P2P, is the v1 version of the spec good enough or we still need to take
+care the case that a malicious user might try MMIO access in !RUNNING
+state and should have kernel infrastructure in place to safe guard that?
 
+> 
+> Even so, we can't trap accesses through the IOMMU so such a scheme
+> would still require removing IOMMU acess to the device. Given that the
+> basic qemu mitigation for no NDMA support is to eliminate P2P cases by
+> removing the IOMMU mappings this doesn't seem to advance anything and
+> only creates complexity.
+> 
+> At least I'm not going to insist that hns do all kinds of work like
+> this for a edge case they don't care about as a precondition to get a
+> migration driver.
+
+Yes. That's our concern too.
+
+(Just a note to clarify that these are not HNS devices per se. HNS actually
+stands for HiSilicon Network Subsystem and doesn't currently have live
+migration capability. The devices capable of live migration are HiSilicon
+Accelerator devices).
+
+Thanks,
+Shameer
