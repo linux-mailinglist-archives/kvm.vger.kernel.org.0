@@ -2,65 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D2BD46586C
-	for <lists+kvm@lfdr.de>; Wed,  1 Dec 2021 22:36:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0CCB146588C
+	for <lists+kvm@lfdr.de>; Wed,  1 Dec 2021 22:47:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241688AbhLAVkC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Dec 2021 16:40:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60904 "EHLO
+        id S1343519AbhLAVvK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Dec 2021 16:51:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234546AbhLAVkB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Dec 2021 16:40:01 -0500
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D62D8C061574
-        for <kvm@vger.kernel.org>; Wed,  1 Dec 2021 13:36:39 -0800 (PST)
-Received: by mail-lf1-x12a.google.com with SMTP id f18so66387427lfv.6
-        for <kvm@vger.kernel.org>; Wed, 01 Dec 2021 13:36:39 -0800 (PST)
+        with ESMTP id S1353142AbhLAVu1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Dec 2021 16:50:27 -0500
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85320C061574
+        for <kvm@vger.kernel.org>; Wed,  1 Dec 2021 13:47:05 -0800 (PST)
+Received: by mail-lf1-x12c.google.com with SMTP id t26so66432089lfk.9
+        for <kvm@vger.kernel.org>; Wed, 01 Dec 2021 13:47:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=uUM8jHDIsoW8/oVyD5hYUWrRUgQvAR4uN8LsA/SmPbA=;
-        b=G8w5Z5Z5/cmXcvw3GWCfTbHIkD33p/HmhIzVhk06kAVCtAoQiT3nGIWKKxQ/J8Sw39
-         Qbxu7RT6n0W1aB89uCoY0sHosketfWuKscY8uxRJcTddlUr2MPWr/WX2WJuYq7dsls7d
-         NwYhkj/Wiqj82eL6c8aQs2Vac2e7rwlr7IuGPWdr8ZugrxcUMpvCG6quHx7scRjNy1VT
-         U2EQXhxH3Rw0N+Uyuoa0BUJTqCz5HOQEQOhKhPpxv1a3IQIUR2bt5XJ5Jy1skqnkR/mt
-         LOlCGZVMpcFEpfPJNM6Rb5E9/xNOdw75v8ZMZPtz/+UdBbxn1bDuWRAHrHBV4qNgDLG6
-         9HZg==
+        bh=F99WCI455FQ9yLpRrO5kIrSFWi87ma7VQ3wbenSp+wo=;
+        b=n5RLlkTlYO7omnP4HFzunmDZnoEsyC8jebThaW9ZVaQe72tOBZiqTqc/QVuwH8fqIY
+         QjhlSO40ccldAtVgeXVfG1+7/R+nWkM2iYU3/psQzviQ71CwUK//iAKAhTHnO7El98wi
+         ai0m1vlzlJKrhrt0zFgNX/pL99J7DPPHRZkRasIh760Jv8AJWKrbntd1p2Cq+Z7RYYSV
+         uk6Gx4imYLyexUjcfuwlehC73jI6qKPtGTkPGgPy+VJ5rEL6sc3DZn0g5dCx9ZG9LkZm
+         QMU9fXUxUm948jMxLLrHX3PqnLqJHkzssDlnyn8x33jET5Jw9xMBi0fbPVUtQFxREs96
+         adPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=uUM8jHDIsoW8/oVyD5hYUWrRUgQvAR4uN8LsA/SmPbA=;
-        b=X1s4vmWuD7+6k87sRMZe6gzWgkwFJ+76fn4rkLxd8UUm1Y5zdBC25Thm5e0elHlQga
-         BwPRAvzFY7VLK8GsPUqW1R1AwPEQ8NEsXaoV2D+nNiDVS+7zIRsJHFFIouPNJf6+sM/i
-         XfYHUvU0p5HQ1CcAv1VipBz57lDyxxW+aPs19jeYKJTpfHY4Qzs8yV0B4byCAE/4KBe8
-         aqMVv18Zr+IJo9onaqdfm3ozwJh3kS/MLzL7CDxdfM7XRKURTLoJyyX/JowcL6mHQNKA
-         noH9e0X6iRPyzvdThkXZ8Umc4OKqmZ6xfKO3DiYLi7ykOf1m60qL47DtJ+9aKsk60rc2
-         UJIQ==
-X-Gm-Message-State: AOAM531/DjBgW7QOS96jR/9KmdJGdRfFvuQU2xGCRwgIoT37Et9iFHBK
-        79FqZsFaqtegKbEOcSUeYKeFuER67TLXyjzx+30Awg==
-X-Google-Smtp-Source: ABdhPJwy20dG+I/hexboBwMgC6uDlNh7qZWIAiGoLN55OfU5iLk1n5tSQhOscBPwFuuIXY6d4jUo46YIdCkcLydUiWA=
-X-Received: by 2002:a05:6512:11e5:: with SMTP id p5mr7998037lfs.537.1638394597894;
- Wed, 01 Dec 2021 13:36:37 -0800 (PST)
+        bh=F99WCI455FQ9yLpRrO5kIrSFWi87ma7VQ3wbenSp+wo=;
+        b=mnDXQn9mnOeqDoGaO73zqZztsKYiS2WkCUqKXM+aq1vEzPBCER2x4Rg2dUBgPKUemT
+         OwK8Yo8WlUarohmKMo/TevR/jeg5UWUzcUhSJJUWjGnYFSuosV5DKqafH3iOUGOjFYyN
+         F4gTMbHMgfLYPKIomIN+gROXPb/AuaRMEKWA8b/M9aX6Tyg02tBGvIzXHUS6ZwszFKZ8
+         mtJf2pLAZpoD5MVPSb3zhDnBnx0uKrJStBcYelFkwxsy23KAuFaOZiLYuGjO9spiwHnp
+         2YhaHKcUCH+l6ER+hqTQuoTNbybufLm649ee43DQE0v1Mp5wpsg01QvlGVUyydDLjEEV
+         G9tg==
+X-Gm-Message-State: AOAM531QVIcstOvkK8tcJLRYs4Z3mQENR2BznI/mXddJePQ6nahh2XkM
+        DLcLk3VVqWvqTsLSbfELojrA96qFjWb1T1q5zgUiig==
+X-Google-Smtp-Source: ABdhPJy6Z9CLzEIpGNBHyJyy/bkpIl7+3sQuG11i8+64p50J3LXAFO+xc0UHgVSIBT/pVUiXhGgnwWOg56X5Q2kzijo=
+X-Received: by 2002:ac2:558d:: with SMTP id v13mr8363685lfg.190.1638395223614;
+ Wed, 01 Dec 2021 13:47:03 -0800 (PST)
 MIME-Version: 1.0
-References: <20211119235759.1304274-1-dmatlack@google.com> <20211119235759.1304274-13-dmatlack@google.com>
- <YaDMg3/xUSwL5+Ei@xz-m1.local> <CALzav=cXgCSP3RLh+gss65==B6eYXC82V3zNjv2KCNehUMQewA@mail.gmail.com>
- <YabJSdRklj3T6FWJ@google.com> <CALzav=cJpWPF1RzsEZcoN+ZX8kM3OquKQR-8rdTksZ6cs1R+EQ@mail.gmail.com>
- <YabeFZxWqPAuoEtZ@xz-m1.local> <Yae+8Oshu9sVrrvd@google.com>
-In-Reply-To: <Yae+8Oshu9sVrrvd@google.com>
+References: <20211119235759.1304274-1-dmatlack@google.com> <YaDrmNVsXSMXR72Z@xz-m1.local>
+ <CALzav=c7Px_X-MvoRixs=yy7wW4GdhavOAD=ZfHKy+n+Kih+bQ@mail.gmail.com> <Yab1vgF6ls5KFkVk@xz-m1.local>
+In-Reply-To: <Yab1vgF6ls5KFkVk@xz-m1.local>
 From:   David Matlack <dmatlack@google.com>
-Date:   Wed, 1 Dec 2021 13:36:11 -0800
-Message-ID: <CALzav=c9F+f=UqBjQD9sotNC72j2Gq1Fa=cdLoz2xOjRd5hypg@mail.gmail.com>
-Subject: Re: [RFC PATCH 12/15] KVM: x86/mmu: Split large pages when dirty
- logging is enabled
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-        kvm@vger.kernel.org, Ben Gardon <bgardon@google.com>,
+Date:   Wed, 1 Dec 2021 13:46:37 -0800
+Message-ID: <CALzav=cJO1FuP9KFq8WqnEBy=30s1Q6v90ais3eQnzHKHupsNg@mail.gmail.com>
+Subject: Re: [RFC PATCH 00/15] KVM: x86/mmu: Eager Page Splitting for the TDP MMU
+To:     Peter Xu <peterx@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Ben Gardon <bgardon@google.com>,
         Joerg Roedel <joro@8bytes.org>,
         Jim Mattson <jmattson@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>,
         Junaid Shahid <junaids@google.com>,
         Oliver Upton <oupton@google.com>,
@@ -71,206 +69,125 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 1, 2021 at 10:29 AM Sean Christopherson <seanjc@google.com> wrote:
+On Tue, Nov 30, 2021 at 8:10 PM Peter Xu <peterx@redhat.com> wrote:
 >
-> On Wed, Dec 01, 2021, Peter Xu wrote:
-> > On Tue, Nov 30, 2021 at 05:29:10PM -0800, David Matlack wrote:
-> > > On Tue, Nov 30, 2021 at 5:01 PM Sean Christopherson <seanjc@google.com> wrote:
-> > > > So '1' is technically correct, but I think it's the wrong choice given the behavior
-> > > > of this code.  E.g. if there's 1 object in the cache, the initial top-up will do
-> > > > nothing,
+> On Tue, Nov 30, 2021 at 03:22:29PM -0800, David Matlack wrote:
+> > On Fri, Nov 26, 2021 at 6:13 AM Peter Xu <peterx@redhat.com> wrote:
 > > >
-> > > This scenario will not happen though, since we free the caches after
-> > > splitting. So, the next time userspace enables dirty logging on a
-> > > memslot and we go to do the initial top-up the caches will have 0
-> > > objects.
->
-> Ah.
->
-> > > > and then tdp_mmu_split_large_pages_root() will almost immediately drop
-> > > > mmu_lock to topup the cache.  Since the in-loop usage explicitly checks for an
-> > > > empty cache, i.e. any non-zero @min will have identical behavior, I think it makes
-> > > > sense to use KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE _and_ add a comment explaining why.
+> > > Hi, David,
 > > >
-> > > If we set the min to KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE,
-> > > kvm_mmu_topup_memory_cache will return ENOMEM if it can't allocate at
-> > > least KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE objects, even though we really
-> > > only need 1 to make forward progress.
+> > > On Fri, Nov 19, 2021 at 11:57:44PM +0000, David Matlack wrote:
+> > > > This series is a first pass at implementing Eager Page Splitting for the
+> > > > TDP MMU. For context on the motivation and design of Eager Page
+> > > > Splitting, please see the RFC design proposal and discussion [1].
+> > > >
+> > > > Paolo, I went ahead and added splitting in both the intially-all-set
+> > > > case (only splitting the region passed to CLEAR_DIRTY_LOG) and the
+> > > > case where we are not using initially-all-set (splitting the entire
+> > > > memslot when dirty logging is enabled) to give you an idea of what
+> > > > both look like.
+> > > >
+> > > > Note: I will be on vacation all of next week so I will not be able to
+> > > > respond to reviews until Monday November 29. I thought it would be
+> > > > useful to seed discussion and reviews with an early version of the code
+> > > > rather than putting it off another week. But feel free to also ignore
+> > > > this until I get back :)
+> > > >
+> > > > This series compiles and passes the most basic splitting test:
+> > > >
+> > > > $ ./dirty_log_perf_test -s anonymous_hugetlb_2mb -v 2 -i 4
+> > > >
+> > > > But please operate under the assumption that this code is probably
+> > > > buggy.
+> > > >
+> > > > [1] https://lore.kernel.org/kvm/CALzav=dV_U4r1K9oDq4esb4mpBQDQ2ROQ5zH5wV3KpOaZrRW-A@mail.gmail.com/#t
 > > >
-> > > It's a total edge case but there could be a scenario where userspace
-> > > sets the cgroup memory limits so tight that we can't allocate
-> > > KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE objects when splitting the last few
-> > > pages and in the end we only needed 1 or 2 objects to finish
-> > > splitting. In this case we'd end up with a spurious pr_warn and may
-> > > not split the last few pages depending on which cache failed to get
-> > > topped up.
+> > > Will there be more numbers to show in the formal patchset?
 > >
-> > IMHO when -ENOMEM happens, instead of keep trying with 1 shadow sp we should
-> > just bail out even earlier.
+> > Yes definitely. I didn't have a lot of time to test this series, hence
+> > the RFC status. I'll include more thorough testing and performance
+> > evaluation in the cover letter for v1.
 > >
-> > Say, if we only have 10 (<40) pages left for shadow sp's use, we'd better make
-> > good use of them lazily to be consumed in follow up page faults when the guest
-> > accessed any of the huge pages, rather than we take them all over to split the
-> > next continuous huge pages assuming it'll be helpful..
 > >
-> > From that POV I have a slight preference over Sean's suggestion because that'll
-> > make us fail earlier.  But I agree it shouldn't be a big deal.
+> > > It's interesting to
+> > > know how "First Pass Dirty Memory Time" will change comparing to the rfc
+> > > numbers; I can have a feel of it, but still. :) Also, not only how it speedup
+> > > guest dirty apps, but also some general measurement on how it slows down
+> > > KVM_SET_USER_MEMORY_REGION (!init-all-set) or CLEAR_LOG (init-all-set) would be
+> > > even nicer (for CLEAR, I guess the 1st/2nd+ round will have different overhead).
+> > >
+> > > Besides that, I'm also wondering whether we should still have a knob for it, as
+> > > I'm wondering what if the use case is the kind where eager split huge page may
+> > > not help at all.  What I'm thinking:
+> > >
+> > >   - Read-mostly guest overload; split huge page will speed up rare writes, but
+> > >     at the meantime drag readers down due to huge->small page mappings.
+> > >
+> > >   - Writes-over-very-limited-region workload: say we have 1T guest and the app
+> > >     in the guest only writes 10G part of it.  Hmm not sure whether it exists..
+> > >
+> > >   - Postcopy targeted: it means precopy may only run a few iterations just to
+> > >     send the static pages, so the migration duration will be relatively short,
+> > >     and the write just didn't spread a lot to the whole guest mem.
+> > >
+> > > I don't really think any of the example is strong enough as they're all very
+> > > corner cased, but just to show what I meant to raise this question on whether
+> > > unconditionally eager split is the best approach.
+> >
+> > I'd be happy to add a knob if there's a userspace that wants to use
+> > it. I think the main challenge though is knowing when it is safe to
+> > disable eager splitting.
 >
-> Hmm, in this particular case, I think using the caches is the wrong approach.  The
-> behavior of pre-filling the caches makes sense for vCPUs because faults may need
-> multiple objects and filling the cache ensures the entire fault can be handled
-> without dropping mmu_lock.  And any extra/unused objects can be used by future
-> faults.  For page splitting, neither of those really holds true.  If there are a
-> lot of pages to split, KVM will have to drop mmu_lock to refill the cache.  And if
-> there are few pages to split, or the caches are refilled toward the end of the walk,
-> KVM may end up with a pile of unused objects it needs to free.
->
-> Since this code already needs to handle failure, and more importantly, it's a
-> best-effort optimization, I think trying to use the caches is a square peg, round
-> hole scenario.
->
-> Rather than use the caches, we could do allocation 100% on-demand and never drop
-> mmu_lock to do allocation.  The one caveat is that direct reclaim would need to be
-> disallowed so that the allocation won't sleep.  That would mean that eager splitting
-> would fail under heavy memory pressure when it otherwise might succeed by reclaiming.
-> That would mean vCPUs get penalized as they'd need to do the splitting on fault and
-> potentially do direct reclaim as well.  It's not obvious that that would be a problem
-> in practice, e.g. the vCPU is probably already seeing a fair amount of disruption due
-> to memory pressure, and slowing down vCPUs might alleviate some of that pressure.
+> Isn't it a performance feature?  Why it'll be not safe?
 
-Not necessarily. The vCPUs might be running just fine in the VM being
-split because they are in their steady state and not faulting in any
-new memory. (Memory pressure might be coming from another VM landing
-on the host.)
-
-IMO, if we have an opportunity to avoid doing direct reclaim in the
-critical path of customer execution we should take it.
-
-The on-demand approach will also increase the amount of time we have
-to hold the MMU lock to page splitting. This is not too terrible for
-the TDP MMU since we are holding the MMU lock in read mode, but is
-going to become a problem when we add page splitting support for the
-shadow MMU.
-
-I do agree that the caches approach, as implemented, will inevitably
-end up with a pile of unused objects at the end that need to be freed.
-I'd be happy to take a look and see if there's anyway to reduce the
-amount of unused objects at the end with a bit smarter top-up logic.
+Heh, "safe" is a bit overzealous. But we've found that as the vCPU
+count scales in VMs, not doing Eager Page Splitting leads to
+unacceptable performance degradations (per customers), especially when
+using the shadow MMU where hugepage write-protection faults are done
+while holding the MMU lock in write mode. So from that perspective,
+it's "unsafe" to skip Eager Page Splitting unless you are absolutely
+sure the guest workload will not be doing much writes.
 
 >
-> Not using the cache would also reduce the extra complexity, e.g. no need for
-> special mmu_cache handling or a variant of tdp_mmu_iter_cond_resched().
+> > For a small deployment where you know the VM workload, it might make
+> > sense. But for a public cloud provider the only feasible way would be to
+> > dynamically monitor the guest writing patterns. But then we're back at square
+> > one because that would require dirty logging. And even then, there's no
+> > guaranteed way to predict future guest write patterns based on past patterns.
 >
-> I'm thinking something like this (very incomplete):
+> Agreed, what I was thinking was not for public cloud usages, but for the cases
+> where we can do specific tunings on some specific scenarios.  It normally won't
+> matter a lot with small or medium sized VMs but extreme use cases.
+
+Ack. I'll include a module parameter in v1 like you suggested your other email.
+
 >
-> static void init_tdp_mmu_page(struct kvm_mmu_page *sp, u64 *spt, gfn_t gfn,
->                               union kvm_mmu_page_role role)
-> {
->         sp->spt = spt;
->         set_page_private(virt_to_page(sp->spt), (unsigned long)sp);
+> >
+> > The way forward here might be to do a hybrid of 2M and 4K dirty
+> > tracking (and maybe even 1G). For example, first start dirty logging
+> > at 2M granularity, and then log at 4K for any specific regions or
+> > memslots that aren't making progress. We'd still use Eager Page
+> > Splitting unconditionally though, first to split to 2M and then to
+> > split to 4K.
 >
->         sp->role = role;
->         sp->gfn = gfn;
->         sp->tdp_mmu_page = true;
+> Do you mean we'd also offer different granule dirty bitmap to the userspace
+> too?
+
+Perhaps. The 2M dirty tracking work is still in very early research
+phases and the first version will likely not be so dynamic. But I
+could imagine we eventually get to the point where we are doing some
+hybrid approach.
+
 >
->         trace_kvm_mmu_get_page(sp, true);
-> }
+> I remembered you mentioned 2mb dirty tracking in your rfc series, but I didn't
+> expect it can be dynamically switched during tracking.  That sounds a very
+> intersting idea.
 >
-> static struct kvm_mmu_page *alloc_tdp_mmu_page(struct kvm_vcpu *vcpu, gfn_t gfn,
->                                                union kvm_mmu_page_role role)
-> {
->         struct kvm_mmu_page *sp;
->         u64 *spt;
+> Thanks,
+
+Thanks for all the reviews and feedback on this series!
+
 >
->         sp = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_page_header_cache);
->         spt = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_shadow_page_cache);
+> --
+> Peter Xu
 >
->         init_tdp_mmu_page(sp, spt, gfn, role);
-> }
->
-> static union kvm_mmu_page_role get_child_page_role(struct tdp_iter *iter)
-> {
->         struct kvm_mmu_page *parent = sptep_to_sp(rcu_dereference(iter->sptep));
->         union kvm_mmu_page_role role = parent->role;
->
->         role.level--;
->         return role;
-> }
->
-> static bool tdp_mmu_install_sp_atomic(struct kvm *kvm,
->                                       struct tdp_iter *iter,
->                                       struct kvm_mmu_page *sp,
->                                       bool account_nx)
-> {
->         u64 spte;
->
->         spte = make_nonleaf_spte(sp->spt, !shadow_accessed_mask);
->
->         if (tdp_mmu_set_spte_atomic(kvm, iter, spte)) {
->                 tdp_mmu_link_page(kvm, sp, account_nx);
->                 return true;
->         }
->         return false;
-> }
->
-> static void tdp_mmu_split_large_pages_root(struct kvm *kvm, struct kvm_mmu_page *root,
->                                            gfn_t start, gfn_t end, int target_level)
-> {
->         /*
->          * Disallow direct reclaim, allocations will be made while holding
->          * mmu_lock and must not sleep.
->          */
->         gfp_t gfp = (GFP_KERNEL_ACCOUNT | __GFP_ZERO) & ~__GFP_DIRECT_RECLAIM;
->         struct kvm_mmu_page *sp = NULL;
->         struct tdp_iter iter;
->         bool flush = false;
->         u64 *spt = NULL;
->         int r;
->
->         rcu_read_lock();
->
->         /*
->          * Traverse the page table splitting all large pages above the target
->          * level into one lower level. For example, if we encounter a 1GB page
->          * we split it into 512 2MB pages.
->          *
->          * Since the TDP iterator uses a pre-order traversal, we are guaranteed
->          * to visit an SPTE before ever visiting its children, which means we
->          * will correctly recursively split large pages that are more than one
->          * level above the target level (e.g. splitting 1GB to 2MB to 4KB).
->          */
->         for_each_tdp_pte_min_level(iter, root, target_level + 1, start, end) {
-> retry:
->                 if (tdp_mmu_iter_cond_resched(kvm, &iter, flush, true))
->                         continue;
->
->                 if (!is_shadow_present_pte(iter.old_spte || !is_large_pte(pte))
->                         continue;
->
->                 if (!sp) {
->                         sp = kmem_cache_alloc(mmu_page_header_cache, gfp);
->                         if (!sp)
->                                 break;
->                         spt = (void *)__get_free_page(gfp);
->                         if (!spt)
->                                 break;
->                 }
->
->                 init_tdp_mmu_page(sp, spt, iter->gfn,
->                                   get_child_page_role(&iter));
->
->                 if (!tdp_mmu_split_large_page(kvm, &iter, sp))
->                         goto retry;
->
->                 sp = NULL;
->                 spt = NULL;
->         }
->
->         free_page((unsigned long)spt);
->         kmem_cache_free(mmu_page_header_cache, sp);
->
->         rcu_read_unlock();
->
->         if (flush)
->                 kvm_flush_remote_tlbs(kvm);
-> }
