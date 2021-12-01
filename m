@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 29BF14651FA
-	for <lists+kvm@lfdr.de>; Wed,  1 Dec 2021 16:46:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D900C4651FD
+	for <lists+kvm@lfdr.de>; Wed,  1 Dec 2021 16:46:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351125AbhLAPt1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Dec 2021 10:49:27 -0500
-Received: from vps-vb.mhejs.net ([37.28.154.113]:46354 "EHLO vps-vb.mhejs.net"
+        id S1351145AbhLAPth (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Dec 2021 10:49:37 -0500
+Received: from vps-vb.mhejs.net ([37.28.154.113]:46364 "EHLO vps-vb.mhejs.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1351093AbhLAPtM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Dec 2021 10:49:12 -0500
+        id S236266AbhLAPtQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Dec 2021 10:49:16 -0500
 Received: from MUA
         by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
         (Exim 4.94.2)
         (envelope-from <mail@maciej.szmigiero.name>)
-        id 1msRnQ-0008GM-47; Wed, 01 Dec 2021 16:45:24 +0100
+        id 1msRnb-0008Gg-11; Wed, 01 Dec 2021 16:45:35 +0100
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
@@ -44,17 +44,17 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Ben Gardon <bgardon@google.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
 References: <cover.1638304315.git.maciej.szmigiero@oracle.com>
- <74663af27fd6e25b7846da343f7013b1e9885a4b.1638304316.git.maciej.szmigiero@oracle.com>
- <YabcNaCb88s/CTop@google.com>
+ <a6b62e0bdba2a82bbc31dcad3c8525ccc5ff0bff.1638304316.git.maciej.szmigiero@oracle.com>
+ <Yabj3Qr8e85qhSg3@google.com>
 From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Subject: Re: [PATCH v6 18/29] KVM: x86: Use nr_memslot_pages to avoid
- traversing the memslots array
-Message-ID: <54e434b1-2bbd-d6ad-7b35-5b9b9aeea2f3@maciej.szmigiero.name>
-Date:   Wed, 1 Dec 2021 16:45:18 +0100
+Subject: Re: [PATCH v6 21/29] KVM: Resolve memslot ID via a hash table instead
+ of via a static array
+Message-ID: <c1dca71f-99d7-93b2-b4fe-d02526fefc81@maciej.szmigiero.name>
+Date:   Wed, 1 Dec 2021 16:45:29 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.13.0
 MIME-Version: 1.0
-In-Reply-To: <YabcNaCb88s/CTop@google.com>
+In-Reply-To: <Yabj3Qr8e85qhSg3@google.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
@@ -62,32 +62,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 01.12.2021 03:21, Sean Christopherson wrote:
+On 01.12.2021 03:54, Sean Christopherson wrote:
 > On Tue, Nov 30, 2021, Maciej S. Szmigiero wrote:
 >> From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
 >>
->> There is no point in recalculating from scratch the total number of pages
->> in all memslots each time a memslot is created or deleted.  Use KVM's
->> cached nr_memslot_pages to compute the default max number of MMU pages.
+>> Memslot ID to the corresponding memslot mappings are currently kept as
+>> indices in static id_to_index array.
+>> The size of this array depends on the maximum allowed memslot count
+>> (regardless of the number of memslots actually in use).
 >>
->> Note that even with nr_memslot_pages capped at ULONG_MAX we can't safely
->> multiply it by KVM_PERMILLE_MMU_PAGES (20) since this operation can
->> possibly overflow an unsigned long variable.
+>> This has become especially problematic recently, when memslot count cap was
+>> removed, so the maximum count is now full 32k memslots - the maximum
+>> allowed by the current KVM API.
 >>
->> Write this "* 20 / 1000" operation as "/ 50" instead to avoid such
->> overflow.
+>> Keeping these IDs in a hash table (instead of an array) avoids this
+>> problem.
+>>
+>> Resolving a memslot ID to the actual memslot (instead of its index) will
+>> also enable transitioning away from an array-based implementation of the
+>> whole memslots structure in a later commit.
 >>
 >> Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
->> [sean: use common KVM field and rework changelog accordingly]
+>> Co-developed-by: Sean Christopherson <seanjc@google.com>
 >> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > 
-> My SoB can definitely be dropped for this one, just consider it review feedback
-> that happened to have an SoB attached.
-> 
-> Reviewed-by: Sean Christopherson <seanjc@google.com>
+> Nit, your SoB should come last since you were the last person to handle the patch.
 > 
 
-...and on this one, too.
+Thought that my SoB should come first as coming from the author of this
+patch.
+
+Documentation/process/submitting-patches.rst says that:
+> Any further SoBs (Signed-off-by:'s) following the author's SoB are from
+> people handling and transporting the patch, but were not involved in its
+> development. SoB chains should reflect the **real** route a patch took
+> as it was propagated to the maintainers and ultimately to Linus, with
+> the first SoB entry signalling primary authorship of a single author.
+
+So "further SoBs follow[] the author's SoB" and "the first SoB entry
+signal[s] primary authorship".
+But at the same time "SoB chains should reflect the **real** route a
+patch took" - these rules contradict each other in our case.
 
 Thanks,
 Maciej
