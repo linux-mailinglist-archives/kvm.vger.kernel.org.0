@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 253494658AF
-	for <lists+kvm@lfdr.de>; Wed,  1 Dec 2021 22:57:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 202E54658F3
+	for <lists+kvm@lfdr.de>; Wed,  1 Dec 2021 23:11:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236910AbhLAWAg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Dec 2021 17:00:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37286 "EHLO
+        id S1343784AbhLAWOk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Dec 2021 17:14:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40542 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232253AbhLAWAf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Dec 2021 17:00:35 -0500
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3153BC061574
-        for <kvm@vger.kernel.org>; Wed,  1 Dec 2021 13:57:14 -0800 (PST)
-Received: by mail-lf1-x129.google.com with SMTP id t26so66490205lfk.9
-        for <kvm@vger.kernel.org>; Wed, 01 Dec 2021 13:57:14 -0800 (PST)
+        with ESMTP id S1343722AbhLAWOj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Dec 2021 17:14:39 -0500
+Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F24A6C061574
+        for <kvm@vger.kernel.org>; Wed,  1 Dec 2021 14:11:17 -0800 (PST)
+Received: by mail-io1-xd36.google.com with SMTP id p23so32932854iod.7
+        for <kvm@vger.kernel.org>; Wed, 01 Dec 2021 14:11:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=ritQ6Z4SV2U5axc0nyhYpmB+kPfOgvuSU0NQX4GU+mU=;
-        b=ox/F6F5ak0j4Rxt2RbMo89SxBAZRztdyVa/oQfyXC94fpYNgOw2PAVt1byTOE6QXGq
-         R8698Gw53L0NB5iUe5zmwBQJ/fpr9u0A2AcEdJsQOwd/Yel01ryYAFYaoPzx6wUwFNml
-         JLBVdKWqgheVaaYBEw6z9DEfqegRmJORDuVEFjYG4y0a1oB1YrgF4s8tu8KpCjEgMl28
-         pDILmos32OX/302Hedy0TWElCD2L1BhcpfK5OLgB2MhwEUA+KP6xo/heIaqmaPFw/Rge
-         RPAueGilRq9fiIYmA+AczCKECyRTiCw5uvBptcLvixFBMM/wgGnK5wksCVLbUaAYvDAB
-         5muA==
+        bh=reEy9NsiS52zGPWswsWY6KD4yxA5Be1vtjoXpbKeRXc=;
+        b=rJjUz8q3jutEO1+4TbK3+wqB4YyqM3vXtmhu7hI88pewgTJ7jIaABKHYy3bZbqASsP
+         164T5sVgGQdPTCnMscjV3zDosu1T2UR7E1GVPLxCjC92FOddHYf9ydKnOKRxBDW9EUqF
+         NmzwPSZOWkFidABHp2D7Xeoxv5wq8gEkORreAcpVH/Xmq4z5fXbZlBv9LK76oEgdUpaI
+         AN3VHf/7OgaQHw2xlzkQ/L8Rtv9ZSMLXDOw4uqZnj91h8Xn/7aAlTQ7x5uesqlpAf8lw
+         Ih+X+Tr699B5rn7Rgl1TkGIB/v9uFuBvXIIRb6Tr+fhafsRJEFBf8IN5o1as1bWsJ9lt
+         7I4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=ritQ6Z4SV2U5axc0nyhYpmB+kPfOgvuSU0NQX4GU+mU=;
-        b=UjKMTDCP1BhL1nYfWptzAPlx0Cf3qdTdIIrnhjB3hRdZsVQ/u+Mtw7ckzAOFNlJCoR
-         szbVr7cccbuEg47qIRG9yD3yaaUoZnlP1HJKz0OL77p1BzfmGw0JXY5K6KwjrUouAAdj
-         e4HYRRMUFZdxhBdBcsi1Bhq6ZnrTR+N3vXrxq4l5ghypr4khRCk+ICx7tS5U7xYTUEXY
-         9kUjDnwBSnz3tgMnO8NNREgHJ8qbb+AKl+ZP3r/BjGkU4R+iWNV67uB49JizKnaa1N7Z
-         X8jyM+JD0GVg2+X+6vbwxPXB1CQO3getUP3ebnIYmHHR/cDfck22ZzkRV4Tf8PKW9MDs
-         MndA==
-X-Gm-Message-State: AOAM532tx5A0uOj8enUQEqlJH2dltsr5MSRLSMA7p9L9dWuecgOyYA6S
-        X7NGkSUK7cduIYTYECHHMwaxBYizXuN5jAm7RsqUQA==
-X-Google-Smtp-Source: ABdhPJzmxre8jLW7X0pVkVbZc5d2NZ7hk4xlptOCnwe2ZihDCTirVSVPjhIyFPYZKcuA3wmeR9Kj6FQecARv04lNeN4=
-X-Received: by 2002:a05:6512:3503:: with SMTP id h3mr8385998lfs.235.1638395832362;
- Wed, 01 Dec 2021 13:57:12 -0800 (PST)
+        bh=reEy9NsiS52zGPWswsWY6KD4yxA5Be1vtjoXpbKeRXc=;
+        b=5mUInUoV4yvg3OZyn76oauzb6rqU1fcLuMC1AuTplGPKjoK2/xldzHTBFu+CPnYTH5
+         yvVJfaX4Z/e858ZUlQpepF3eaGa/L864F4aO/7eijbqyurMWe/Hnvxr3BtAdU/GnxOAN
+         atc02XWpoV9n6HHQbajzP0BI4vr9+qLyhBZvQnGuarXntD6fM4R3Xlj8RBqLx/V6+7nA
+         DL7EfT9fKRjS39ODis1boxYO2wN5HPDU1C5pI/AU/yMUQKwZZwtjWP/mm8ZplqoGSGIz
+         x81umxdqZUXBnryvYjUk00EA8IBYi2D1nCfEoeScECS3VeI85TrukGJMlsV4Av5lmb9f
+         lZ3g==
+X-Gm-Message-State: AOAM533h5bPCt5RIXZUwmk7fvxnqFYsQfJ453fgHxUmOw3Wgbc+qM+GR
+        y7vT2pZ4S+aql6+C6fD3N5kVfoLPPH41RyYgVQGi6A==
+X-Google-Smtp-Source: ABdhPJw4lyLQ5vpp8zEvI2Qo3ffrsyXJPMcE28092jHs3P3VEjRmXiTqboLaoHHqjx3Y84MqXQtLHZ3kXBwj/xcPdlg=
+X-Received: by 2002:a6b:7602:: with SMTP id g2mr12593262iom.37.1638396677295;
+ Wed, 01 Dec 2021 14:11:17 -0800 (PST)
 MIME-Version: 1.0
-References: <20211119235759.1304274-1-dmatlack@google.com> <20211119235759.1304274-7-dmatlack@google.com>
- <62bd6567-bde5-7bb3-ec73-abf0e2874706@redhat.com> <CALzav=d59jLY6CNL9U8_Lh_pe-BviL_oKZGCAhJcnKxGGAMF6g@mail.gmail.com>
- <YabFqf0fZqe9RZii@google.com>
-In-Reply-To: <YabFqf0fZqe9RZii@google.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Wed, 1 Dec 2021 13:56:46 -0800
-Message-ID: <CALzav=cRAENeD+nLZ0H=1gKPX1Fim-Y542wMTkiVR9GsPF6xWQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 06/15] KVM: x86/mmu: Derive page role from parent
+References: <20211119235759.1304274-1-dmatlack@google.com> <20211119235759.1304274-14-dmatlack@google.com>
+ <YafLdpkoTrtyoEjy@google.com> <CANgfPd_K9kBu9Fd83wx0heMiWziLthg9tXD=6GsvLsFd0GapYA@mail.gmail.com>
+ <YafYOYdMqxzWiHRL@google.com>
+In-Reply-To: <YafYOYdMqxzWiHRL@google.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Wed, 1 Dec 2021 14:11:06 -0800
+Message-ID: <CANgfPd8ctCiSyAF7yrxaVXAqxuS8dWU5YWMf_rsXfqosc5qRDA@mail.gmail.com>
+Subject: Re: [RFC PATCH 13/15] KVM: x86/mmu: Split large pages during CLEAR_DIRTY_LOG
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Ben Gardon <bgardon@google.com>,
+Cc:     David Matlack <dmatlack@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
         Joerg Roedel <joro@8bytes.org>,
         Jim Mattson <jmattson@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
@@ -69,41 +69,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 30, 2021 at 4:45 PM Sean Christopherson <seanjc@google.com> wrote:
+On Wed, Dec 1, 2021 at 12:17 PM Sean Christopherson <seanjc@google.com> wrote:
 >
-> On Tue, Nov 30, 2021, David Matlack wrote:
-> > > I have a similar patch for the old MMU, but it was also replacing
-> > > shadow_root_level with shadow_root_role.  I'll see if I can adapt it to
-> > > the TDP MMU, since the shadow_root_role is obviously the same for both.
+> On Wed, Dec 01, 2021, Ben Gardon wrote:
+> > On Wed, Dec 1, 2021 at 11:22 AM Sean Christopherson <seanjc@google.com> wrote:
+> > > I would prefer we use hugepage when possible, mostly because that's the terminology
+> > > used by the kernel.  KVM is comically inconsistent, but if we make an effort to use
+> > > hugepage when adding new code, hopefully someday we'll have enough inertia to commit
+> > > fully to hugepage.
 > >
-> > While I was writing this patch it got me wondering if we can do an
-> > even more general refactor and replace root_hpa and shadow_root_level
-> > with a pointer to the root kvm_mmu_page struct. But I didn't get a
-> > chance to look into it further.
+> > In my mind "huge page" implies 2M and "large page" is generic to 2m
+> > and 1g. (IDK if we settled on a name for 1G pages)
 >
-> For TDP MUU, yes, as root_hpa == __pa(sp->spt) in all cases.  For the legacy/full
-> MMU, not without additional refactoring since root_hpa doesn't point at a kvm_mmu_page
-> when KVM shadows a non-paging guest with PAE paging (uses pae_root), or when KVM
-> shadows nested NPT and the guest is using fewer paging levels that the host (uses
-> pml5_root or pml4_root).
+> What about 4m PSE pages?  :-)
 >
->         if (mmu->shadow_root_level == PT64_ROOT_5LEVEL)
->                 mmu->root_hpa = __pa(mmu->pml5_root);
->         else if (mmu->shadow_root_level == PT64_ROOT_4LEVEL)
->                 mmu->root_hpa = __pa(mmu->pml4_root);
->         else
->                 mmu->root_hpa = __pa(mmu->pae_root);
+> I'm mostly joking, but it does raise the point that trying to provide unique names
+> for each size is a bit of a fools errand, especially on non-x86 architectures that
+> support a broader variety of hugepage sizes.  IMO, the least ambiguous way to refer
+> to hugepages is to say that everything that isn't a 4k page (or whatever PAGE_SIZE
+> is on the architecture) is a hugepage, and then explicitly state the size of the
+> page if it matters.
 >
-> That's definitely a solvable problem, e.g. it wouldn't be a problem to burn a few
-> kvm_mmu_page for the special root.  The biggest issue is probably the sheer amount
-> of code that would need to be updated.  I do think it would be a good change, but
-> I think we'd want to do it in a release that isn't expected to have many other MMU
-> changes.
+> > I've definitely been guilty of reinforcing this inconsistent
+> > terminology. (Though it was consistent in my head, of course.) If we
+> > want to pick one and use it everywhere, I'm happy to get onboard with
+> > a standard terminology.
+>
+> I hear you on using "large page", I've had to undo a solid decade of "large page"
+> terminology from my pre-Linux days.  But for better or worse, the kernel uses
+> hugepage, e.g. hugetlbfs supports 1gb and 2mb pages.  I think we should follow
+> the kernel, especially since we have aspirations of unifying more of KVM's MMU
+> across multiple architectures.
 
-Thanks for the explanation! I had a feeling this refactor would start
-getting hairy when I ventured outside of the TDP MMU.
-
->
-> shadow_root_level can also be replaced by mmu_role.base.level.  I've never bothered
-> to do the replacement because there's zero memory savings and it would undoubtedly
-> take me some time to retrain my brain :-)
+Sounds good to me. I'll keep that in mind in future patches. I'm happy
+to call them anything as long as we all use the same terms.
