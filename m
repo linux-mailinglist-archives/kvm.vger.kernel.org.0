@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A6B34658AB
-	for <lists+kvm@lfdr.de>; Wed,  1 Dec 2021 22:53:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 253494658AF
+	for <lists+kvm@lfdr.de>; Wed,  1 Dec 2021 22:57:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235267AbhLAV4v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Dec 2021 16:56:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36410 "EHLO
+        id S236910AbhLAWAg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Dec 2021 17:00:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353329AbhLAV4h (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Dec 2021 16:56:37 -0500
-Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72D9DC06174A
-        for <kvm@vger.kernel.org>; Wed,  1 Dec 2021 13:53:13 -0800 (PST)
-Received: by mail-lj1-x233.google.com with SMTP id m12so12790837ljj.6
-        for <kvm@vger.kernel.org>; Wed, 01 Dec 2021 13:53:13 -0800 (PST)
+        with ESMTP id S232253AbhLAWAf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Dec 2021 17:00:35 -0500
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3153BC061574
+        for <kvm@vger.kernel.org>; Wed,  1 Dec 2021 13:57:14 -0800 (PST)
+Received: by mail-lf1-x129.google.com with SMTP id t26so66490205lfk.9
+        for <kvm@vger.kernel.org>; Wed, 01 Dec 2021 13:57:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=TUEj3i8K6dYoh6AYzrusPWhHZOvQfVMcv8PQ1ogRx6s=;
-        b=PmvgKTEagBg2xzZDkD1xesEoDTkrkTEpDK8EtVtpo69d5mnlgYsJdXdEaWANuYGeBj
-         kqfRGu85szuGEoZfRVa0r5FiouybScN3bl4gKilS/tSy6u5byzD8n/DFZhSiUJrNz2gs
-         UGZzPCFzGqqqNH3Bkgaf0FywqpZ0roN67DucM/aWda5pX8M9UN9Vm5yHqCdlSEISwDzc
-         1sL13FR4NELeWigdBIE+Kap1zs4WlEdkVw8nwMqQat3GZ/lNXlz3JdSJF0wKBEGO6U1R
-         bOkhtD9inHTFsHcrmOQLXQoquK68NU8kjWYfvldjkF88kof59CwKvn07rHZ3+p3z73XJ
-         QGsA==
+        bh=ritQ6Z4SV2U5axc0nyhYpmB+kPfOgvuSU0NQX4GU+mU=;
+        b=ox/F6F5ak0j4Rxt2RbMo89SxBAZRztdyVa/oQfyXC94fpYNgOw2PAVt1byTOE6QXGq
+         R8698Gw53L0NB5iUe5zmwBQJ/fpr9u0A2AcEdJsQOwd/Yel01ryYAFYaoPzx6wUwFNml
+         JLBVdKWqgheVaaYBEw6z9DEfqegRmJORDuVEFjYG4y0a1oB1YrgF4s8tu8KpCjEgMl28
+         pDILmos32OX/302Hedy0TWElCD2L1BhcpfK5OLgB2MhwEUA+KP6xo/heIaqmaPFw/Rge
+         RPAueGilRq9fiIYmA+AczCKECyRTiCw5uvBptcLvixFBMM/wgGnK5wksCVLbUaAYvDAB
+         5muA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=TUEj3i8K6dYoh6AYzrusPWhHZOvQfVMcv8PQ1ogRx6s=;
-        b=HD9S1Wj4lyoklThOy+8B/q7D9slcbvvJ4tW1EYWL4Hwus+OW6BLaooyYCitPhMBJuD
-         wkWZvQzY7YM9G6ExKp/7Nr2nNNY4uIyAnnnN2JiKaBWzcPS0FlDUphHh949WXErnCvkp
-         I5k7Lvu9mYTrKhB7KG3VkNxwZ3kUxpHkDncgLixPMMHYRBTs88HlbVy9301ftOheqG7L
-         DmbJbygDSkCX2E4nq1sELV6L4Y+A440crZneE0dLP0lYwuYi4RW9sB61LXzgBTq3Vsru
-         XTZ1KbrSSl6SKtB1vJiKB+LCW9ZPrhv7AbzImbnTbGNY44Mgm1r8V6shtG+azbc7fNhJ
-         +FsA==
-X-Gm-Message-State: AOAM533vf6xBD5wcbqp28UjS2hcm+XcpkFtHE6k6hISthvVs8+G3z5jL
-        YnuTOOx4Xpdup64etgdX9V9UgwRlFv07RBi37oCIpA==
-X-Google-Smtp-Source: ABdhPJxGJOsgWe+jhHJ3sEj8rkDd2Smj+HcB92Q2JaRr7pXLQhq/M4WDXZKYh0d1To1KYkk0FIBhKukT+LpIaeDXhWA=
-X-Received: by 2002:a2e:8156:: with SMTP id t22mr8145254ljg.223.1638395591566;
- Wed, 01 Dec 2021 13:53:11 -0800 (PST)
+        bh=ritQ6Z4SV2U5axc0nyhYpmB+kPfOgvuSU0NQX4GU+mU=;
+        b=UjKMTDCP1BhL1nYfWptzAPlx0Cf3qdTdIIrnhjB3hRdZsVQ/u+Mtw7ckzAOFNlJCoR
+         szbVr7cccbuEg47qIRG9yD3yaaUoZnlP1HJKz0OL77p1BzfmGw0JXY5K6KwjrUouAAdj
+         e4HYRRMUFZdxhBdBcsi1Bhq6ZnrTR+N3vXrxq4l5ghypr4khRCk+ICx7tS5U7xYTUEXY
+         9kUjDnwBSnz3tgMnO8NNREgHJ8qbb+AKl+ZP3r/BjGkU4R+iWNV67uB49JizKnaa1N7Z
+         X8jyM+JD0GVg2+X+6vbwxPXB1CQO3getUP3ebnIYmHHR/cDfck22ZzkRV4Tf8PKW9MDs
+         MndA==
+X-Gm-Message-State: AOAM532tx5A0uOj8enUQEqlJH2dltsr5MSRLSMA7p9L9dWuecgOyYA6S
+        X7NGkSUK7cduIYTYECHHMwaxBYizXuN5jAm7RsqUQA==
+X-Google-Smtp-Source: ABdhPJzmxre8jLW7X0pVkVbZc5d2NZ7hk4xlptOCnwe2ZihDCTirVSVPjhIyFPYZKcuA3wmeR9Kj6FQecARv04lNeN4=
+X-Received: by 2002:a05:6512:3503:: with SMTP id h3mr8385998lfs.235.1638395832362;
+ Wed, 01 Dec 2021 13:57:12 -0800 (PST)
 MIME-Version: 1.0
-References: <20211119235759.1304274-1-dmatlack@google.com> <20211119235759.1304274-5-dmatlack@google.com>
- <YafJc1GHcxTG19p7@google.com>
-In-Reply-To: <YafJc1GHcxTG19p7@google.com>
+References: <20211119235759.1304274-1-dmatlack@google.com> <20211119235759.1304274-7-dmatlack@google.com>
+ <62bd6567-bde5-7bb3-ec73-abf0e2874706@redhat.com> <CALzav=d59jLY6CNL9U8_Lh_pe-BviL_oKZGCAhJcnKxGGAMF6g@mail.gmail.com>
+ <YabFqf0fZqe9RZii@google.com>
+In-Reply-To: <YabFqf0fZqe9RZii@google.com>
 From:   David Matlack <dmatlack@google.com>
-Date:   Wed, 1 Dec 2021 13:52:45 -0800
-Message-ID: <CALzav=d+674x+q+mx7i8WjGBNMcAzRZhryxdUFHc8g4P2oaPSQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 04/15] KVM: x86/mmu: Factor out logic to atomically
- install a new page table
+Date:   Wed, 1 Dec 2021 13:56:46 -0800
+Message-ID: <CALzav=cRAENeD+nLZ0H=1gKPX1Fim-Y542wMTkiVR9GsPF6xWQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 06/15] KVM: x86/mmu: Derive page role from parent
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
         Ben Gardon <bgardon@google.com>,
@@ -69,78 +69,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 1, 2021 at 11:14 AM Sean Christopherson <seanjc@google.com> wrote:
+On Tue, Nov 30, 2021 at 4:45 PM Sean Christopherson <seanjc@google.com> wrote:
 >
-> On Fri, Nov 19, 2021, David Matlack wrote:
-> > Factor out the logic to atomically replace an SPTE with an SPTE that
-> > points to a new page table. This will be used in a follow-up commit to
-> > split a large page SPTE into one level lower.
+> On Tue, Nov 30, 2021, David Matlack wrote:
+> > > I have a similar patch for the old MMU, but it was also replacing
+> > > shadow_root_level with shadow_root_role.  I'll see if I can adapt it to
+> > > the TDP MMU, since the shadow_root_role is obviously the same for both.
 > >
-> > Signed-off-by: David Matlack <dmatlack@google.com>
-> > ---
-> >  arch/x86/kvm/mmu/tdp_mmu.c | 53 ++++++++++++++++++++++++++------------
-> >  1 file changed, 37 insertions(+), 16 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> > index cc9fe33c9b36..9ee3f4f7fdf5 100644
-> > --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> > @@ -945,6 +945,39 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
-> >       return ret;
-> >  }
-> >
-> > +/*
-> > + * tdp_mmu_install_sp_atomic - Atomically replace the given spte with an
-> > + * spte pointing to the provided page table.
-> > + *
-> > + * @kvm: kvm instance
-> > + * @iter: a tdp_iter instance currently on the SPTE that should be set
-> > + * @sp: The new TDP page table to install.
-> > + * @account_nx: True if this page table is being installed to split a
-> > + *              non-executable huge page.
-> > + *
-> > + * Returns: True if the new page table was installed. False if spte being
-> > + *          replaced changed, causing the atomic compare-exchange to fail.
-> > + *          If this function returns false the sp will be freed before
-> > + *          returning.
-> > + */
-> > +static bool tdp_mmu_install_sp_atomic(struct kvm *kvm,
-> > +                                   struct tdp_iter *iter,
-> > +                                   struct kvm_mmu_page *sp,
-> > +                                   bool account_nx)
-> > +{
-> > +     u64 spte;
-> > +
-> > +     spte = make_nonleaf_spte(sp->spt, !shadow_accessed_mask);
+> > While I was writing this patch it got me wondering if we can do an
+> > even more general refactor and replace root_hpa and shadow_root_level
+> > with a pointer to the root kvm_mmu_page struct. But I didn't get a
+> > chance to look into it further.
 >
-> This can easily go on one line.
+> For TDP MUU, yes, as root_hpa == __pa(sp->spt) in all cases.  For the legacy/full
+> MMU, not without additional refactoring since root_hpa doesn't point at a kvm_mmu_page
+> when KVM shadows a non-paging guest with PAE paging (uses pae_root), or when KVM
+> shadows nested NPT and the guest is using fewer paging levels that the host (uses
+> pml5_root or pml4_root).
 >
->         u64 spte = make_nonleaf_spte(sp->spt, !shadow_accessed_mask);
-> > +
-> > +     if (tdp_mmu_set_spte_atomic(kvm, iter, spte)) {
-> > +             tdp_mmu_link_page(kvm, sp, account_nx);
-> > +             return true;
-> > +     } else {
-> > +             tdp_mmu_free_sp(sp);
-> > +             return false;
+>         if (mmu->shadow_root_level == PT64_ROOT_5LEVEL)
+>                 mmu->root_hpa = __pa(mmu->pml5_root);
+>         else if (mmu->shadow_root_level == PT64_ROOT_4LEVEL)
+>                 mmu->root_hpa = __pa(mmu->pml4_root);
+>         else
+>                 mmu->root_hpa = __pa(mmu->pae_root);
 >
-> I don't think this helper should free the sp on failure, even if that's what all
-> paths end up doing.  When reading the calling code, it really looks like the sp
-> is being leaked because the allocation and free are in different contexts.  That
-> the sp is consumed on success is fairly intuitive given the "install" action, but
-> freeing on failure not so much.
->
-> And for the eager splitting, freeing on failure is wasteful.  It's extremely
-> unlikely to happen often, so in practice it's unlikely to be an issue, but it's
-> certainly odd since the loop is likely going to immediately allocate another sp,
-> either for the current spte or for the next spte.
+> That's definitely a solvable problem, e.g. it wouldn't be a problem to burn a few
+> kvm_mmu_page for the special root.  The biggest issue is probably the sheer amount
+> of code that would need to be updated.  I do think it would be a good change, but
+> I think we'd want to do it in a release that isn't expected to have many other MMU
+> changes.
 
-Good point. I'll fix this in v1.
+Thanks for the explanation! I had a feeling this refactor would start
+getting hairy when I ventured outside of the TDP MMU.
 
 >
-> Side topic, tdp_mmu_set_spte_atomic() and friends really should return 0/-EBUSY.
-> Boolean returns for errors usually end in tears sooner or later.
-
-Agreed. I was sticking with local style here but would like to see
-more of this code switch to returning ints. I'll take a look at
-including that cleanup as well in v1, if not a separate pre-series.
+> shadow_root_level can also be replaced by mmu_role.base.level.  I've never bothered
+> to do the replacement because there's zero memory savings and it would undoubtedly
+> take me some time to retrain my brain :-)
