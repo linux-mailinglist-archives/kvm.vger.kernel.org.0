@@ -2,73 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 492AA46522B
-	for <lists+kvm@lfdr.de>; Wed,  1 Dec 2021 16:55:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8079946528B
+	for <lists+kvm@lfdr.de>; Wed,  1 Dec 2021 17:10:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351215AbhLAP6p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Dec 2021 10:58:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37536 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351160AbhLAP6o (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Dec 2021 10:58:44 -0500
-Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50B35C061748
-        for <kvm@vger.kernel.org>; Wed,  1 Dec 2021 07:55:23 -0800 (PST)
-Received: by mail-lf1-x135.google.com with SMTP id n12so64159442lfe.1
-        for <kvm@vger.kernel.org>; Wed, 01 Dec 2021 07:55:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=xL/SpxsRDGwnkxLz+6BUFTtHIU21cRhV7c5wnSAq5Yw=;
-        b=I9ghR7dt4Gsu2/sYeRlTJJVcMRtr/3zIlV90L93Rm2vWQQlekO0Gh/KlB+6MCE9mh/
-         juwc6AzqEs6nuuZfCfIT0KtgAq4d8EPA+f1TyawHpHBGFqlagkI1HRMoaokxQe1oLeTI
-         3+nwmHhW9uCJTy1yQjGwikexKvJy8O/+WwGbH4ni0za9FZKFfu/j2DiwCLI9vlWjz0Ck
-         loIEZyFSE05BB2FEUebNqKkCSIs5xrOKRHLL+3SE/O2PRgpeOQY10NypbaUy18r5XAyx
-         HpWpUZ2O9GxMYTvzRyByPETbnLA1n4a4CCXhzNR/9pJEWugmO5XVUH1hXskJbIQj+hge
-         RnJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=xL/SpxsRDGwnkxLz+6BUFTtHIU21cRhV7c5wnSAq5Yw=;
-        b=N6AmeOJULKNBtiyDGDsRqI233QEgya8Wt3T/zBkjO/CRHsbpaioYw5cjzAiHOrxyDv
-         6EKIlLn62kHFxqEoJFE86VSROiLGLRpckJr2TvR5ZjowwT4cJ91LyAmj9l/sI93A9ZJ2
-         1S9j+gr3aGbfRYLUnB+DfFXfKLNixLfkjCE7LnADs0Y/Iaou7chIz/wfdtCB/2+d4RLD
-         WMPXEd/S58KVnWIAFARINRbCnvyz4CnekjxxDiV7qE2IcwGGc1lqBMzc8aOXJLkW9b8a
-         D/tQjU9fte/IzseFmAJe1rVT70BdgGkS0t7k0Ql3ME3qzER4r6bS3SSyI8nZWYo0OLSm
-         S6kA==
-X-Gm-Message-State: AOAM5300m1/6uQDcpYkagqgyh1Jmg3j39IjysxdCZkHYkCGzT+GpQBKs
-        xg7Wjv+aVX9yJmMNeHQEjy9PiVBnesOL9jGnzXYPYg==
-X-Google-Smtp-Source: ABdhPJy/+/3rg39jeP45zH9ymgRTv59GH1CjAnXh2e39aAzfNKAr8HYBD2a8dwlALIOyVHSFKkWKQev3T2wRxUjX9aw=
-X-Received: by 2002:a05:6512:1148:: with SMTP id m8mr6362883lfg.456.1638374121401;
- Wed, 01 Dec 2021 07:55:21 -0800 (PST)
+        id S1351400AbhLAQNh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Dec 2021 11:13:37 -0500
+Received: from foss.arm.com ([217.140.110.172]:40994 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1351420AbhLAQMi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Dec 2021 11:12:38 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EA79F143B;
+        Wed,  1 Dec 2021 08:09:16 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 58FC13F766;
+        Wed,  1 Dec 2021 08:09:15 -0800 (PST)
+Date:   Wed, 1 Dec 2021 16:09:09 +0000
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     Eric Auger <eauger@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-arm-kernel@lists.infradead.org
+Subject: Re: [RFC PATCH v3 09/29] KVM: arm64: Hide IMPLEMENTATION DEFINED PMU
+ support for the guest
+Message-ID: <YaeeJUGRwZN00byk@monolith.localdoman>
+References: <20211117064359.2362060-1-reijiw@google.com>
+ <20211117064359.2362060-10-reijiw@google.com>
+ <d09e53a7-b8df-e8fd-c34a-f76a37d664d6@redhat.com>
+ <CAAeT=FzM=sLF=PkY_shhcYmfo+ReGEBN8XX=QQObavXDtwxFJQ@mail.gmail.com>
+ <YaeabhZnYNLQcejs@monolith.localdoman>
 MIME-Version: 1.0
-References: <20211123005036.2954379-1-pbonzini@redhat.com> <20211123005036.2954379-4-pbonzini@redhat.com>
- <YaVUBv9ILIkElc/2@google.com>
-In-Reply-To: <YaVUBv9ILIkElc/2@google.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Wed, 1 Dec 2021 08:55:10 -0700
-Message-ID: <CAMkAt6obMZp9hBS02-AxNLEeYfCs2vLu0dxpJUaP9mOfUGAxdA@mail.gmail.com>
-Subject: Re: [PATCH 03/12] KVM: SEV: expose KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM capability
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YaeabhZnYNLQcejs@monolith.localdoman>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 29, 2021 at 3:28 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Mon, Nov 22, 2021, Paolo Bonzini wrote:
-> > The capability, albeit present, was never exposed via KVM_CHECK_EXTENSION.
-> >
-> > Fixes: b56639318bb2 ("KVM: SEV: Add support for SEV intra host migration")
-> > Cc: Peter Gonda <pgonda@google.com>
-> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > ---
->
-> Reviewed-by: Sean Christopherson <seanjc@google.com>
+Hi Reiji,
 
-Reviewed-by: Peter Gonda <pgonda@google.com>
+On Wed, Dec 01, 2021 at 03:53:18PM +0000, Alexandru Elisei wrote:
+> Hi Reiji,
+> 
+> On Mon, Nov 29, 2021 at 09:32:02PM -0800, Reiji Watanabe wrote:
+> > Hi Eric,
+> > 
+> > On Thu, Nov 25, 2021 at 12:30 PM Eric Auger <eauger@redhat.com> wrote:
+> > >
+> > > Hi Reiji,
+> > >
+> > > On 11/17/21 7:43 AM, Reiji Watanabe wrote:
+> > > > When ID_AA64DFR0_EL1.PMUVER or ID_DFR0_EL1.PERFMON is 0xf, which
+> > > > means IMPLEMENTATION DEFINED PMU supported, KVM unconditionally
+> > > > expose the value for the guest as it is.  Since KVM doesn't support
+> > > > IMPLEMENTATION DEFINED PMU for the guest, in that case KVM should
+> > > > exopse 0x0 (PMU is not implemented) instead.
+> > > s/exopse/expose
+> > > >
+> > > > Change cpuid_feature_cap_perfmon_field() to update the field value
+> > > > to 0x0 when it is 0xf.
+> > > is it wrong to expose the guest with a Perfmon value of 0xF? Then the
+> > > guest should not use it as a PMUv3?
+> > 
+> > > is it wrong to expose the guest with a Perfmon value of 0xF? Then the
+> > > guest should not use it as a PMUv3?
+> > 
+> > For the value 0xf in ID_AA64DFR0_EL1.PMUVER and ID_DFR0_EL1.PERFMON,
+> > Arm ARM says:
+> >   "IMPLEMENTATION DEFINED form of performance monitors supported,
+> >    PMUv3 not supported."
+> > 
+> > Since the PMU that KVM supports for guests is PMUv3, 0xf shouldn't
+> > be exposed to guests (And this patch series doesn't allow userspace
+> > to set the fields to 0xf for guests).
+> 
+> While it's true that a value of 0xf means that PMUv3 is not present (both
+> KVM and the PMU driver handle it this way) this is an userspace visible
+> change.
+> 
+> Are you sure there isn't software in the wild that relies on this value
+> being 0xf to detect that some non-Arm architected hardware is present?
+> 
+> Since both 0 and 0xf are valid values that mean that PMUv3 is not present,
+> I think it's best that both are kept.
+
+Sorry, somehow I managed to get myself confused and didn't realize that
+this is only used by KVM.
+
+What I said above about the possibility of software existing that pokes IMP
+DEF registers when PMUVer = 0xf is in fact a good argument for this patch,
+because KVM injects an undefined exception when a guest tries to access
+such registers.
+
+Thanks,
+Alex
+
+> 
+> Thanks,
+> Alex
+> 
+> > 
+> > Thanks,
+> > Reiji
+> > 
+> > >
+> > > Eric
+> > > >
+> > > > Fixes: 8e35aa642ee4 ("arm64: cpufeature: Extract capped perfmon fields")
+> > > > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > > > ---
+> > > >  arch/arm64/include/asm/cpufeature.h | 2 +-
+> > > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > >
+> > > > diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
+> > > > index ef6be92b1921..fd7ad8193827 100644
+> > > > --- a/arch/arm64/include/asm/cpufeature.h
+> > > > +++ b/arch/arm64/include/asm/cpufeature.h
+> > > > @@ -553,7 +553,7 @@ cpuid_feature_cap_perfmon_field(u64 features, int field, u64 cap)
+> > > >
+> > > >       /* Treat IMPLEMENTATION DEFINED functionality as unimplemented */
+> > > >       if (val == ID_AA64DFR0_PMUVER_IMP_DEF)
+> > > > -             val = 0;
+> > > > +             return (features & ~mask);
+> > > >
+> > > >       if (val > cap) {
+> > > >               features &= ~mask;
+> > > >
+> > >
