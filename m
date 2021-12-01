@@ -2,250 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C755346497C
-	for <lists+kvm@lfdr.de>; Wed,  1 Dec 2021 09:19:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 10703464A0E
+	for <lists+kvm@lfdr.de>; Wed,  1 Dec 2021 09:46:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241826AbhLAIXH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Dec 2021 03:23:07 -0500
-Received: from mga09.intel.com ([134.134.136.24]:42259 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229564AbhLAIXG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Dec 2021 03:23:06 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10184"; a="236232410"
-X-IronPort-AV: E=Sophos;i="5.87,278,1631602800"; 
-   d="scan'208";a="236232410"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2021 00:19:45 -0800
-X-IronPort-AV: E=Sophos;i="5.87,278,1631602800"; 
-   d="scan'208";a="512594157"
-Received: from unknown (HELO cra01infra01.deacluster.intel.com) ([10.240.193.73])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2021 00:19:43 -0800
-From:   Zhu Lingshan <lingshan.zhu@intel.com>
-To:     jasowang@redhat.com, mst@redhat.com, sgarzare@redhat.com
-Cc:     virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, Zhu Lingshan <lingshan.zhu@intel.com>,
-        stable@vger.kernel.org
-Subject: [PATCH V2] ifcvf/vDPA: fix misuse virtio-net device config size for blk dev
-Date:   Wed,  1 Dec 2021 16:12:55 +0800
-Message-Id: <20211201081255.60187-1-lingshan.zhu@intel.com>
-X-Mailer: git-send-email 2.27.0
+        id S241974AbhLAItT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Dec 2021 03:49:19 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42000 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S231397AbhLAItS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 1 Dec 2021 03:49:18 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B18ICQd013840;
+        Wed, 1 Dec 2021 08:45:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=I+sGg/VdPgJ7aMEo6GW8MJglfDFgVcm6SN2xhuLvAj4=;
+ b=kxR+VrQyrJl2iKfJ11/B0msDV9O6VkzofLa2BjFkaEGC97Cl5iQnLxEDJvSP0EdzZAj+
+ Cxk7ea9Y3NtSUh8abQzH5IRvBjch9QAO7sxOvGUu3JH6cH3M34gSgATlu7gzASDO+GWN
+ oEHXcw8wdvEOFcZWEBg3WstwmFfIIUoM1uj2ljMKs4bQW5vj5BG7vZv4kXHrVjwVAVYJ
+ RGfUeyGqhT82YYh0tq8RWsvwLHcFbZQuBppdGSIuNl5fy1E4EMkjRpYebVOx0fWebbGX
+ oL5P/NzKwjOCpuJG4QfeRUIWn8hLJUE/8pcFXUTmPZjZm4t4xeCuXqbFR3tBF7woviVL pQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3cp5dqgkkt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 01 Dec 2021 08:45:55 +0000
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1B18jtE6017131;
+        Wed, 1 Dec 2021 08:45:55 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3cp5dqgkjk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 01 Dec 2021 08:45:55 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1B18fhSh008040;
+        Wed, 1 Dec 2021 08:45:53 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma06ams.nl.ibm.com with ESMTP id 3ckbxk7h97-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 01 Dec 2021 08:45:53 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1B18cNlR23134716
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 1 Dec 2021 08:38:23 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8AF81A4068;
+        Wed,  1 Dec 2021 08:45:49 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 322F4A405F;
+        Wed,  1 Dec 2021 08:45:49 +0000 (GMT)
+Received: from [9.145.42.85] (unknown [9.145.42.85])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  1 Dec 2021 08:45:49 +0000 (GMT)
+Message-ID: <6b781b76-28a9-c375-30cb-ee6764ecd7c8@linux.ibm.com>
+Date:   Wed, 1 Dec 2021 09:45:48 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH] KVM: s390: Fix names of skey constants in api
+ documentation
+Content-Language: en-US
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>
+Cc:     kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20211118102522.569660-1-scgl@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20211118102522.569660-1-scgl@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Ca5KCzTII-m_H1mWHoHJJpJ2rAEemIsK
+X-Proofpoint-ORIG-GUID: 7YdmZGa1hZsUCd0VZoCfFqUoefehnIPv
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
+ definitions=2021-11-30_10,2021-11-28_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 malwarescore=0
+ clxscore=1011 priorityscore=1501 impostorscore=0 phishscore=0
+ mlxlogscore=999 lowpriorityscore=0 spamscore=0 suspectscore=0 adultscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2112010049
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This commit fixes a misuse of virtio-net device config size issue
-for virtio-block devices.
+On 11/18/21 11:25, Janis Schoetterl-Glausch wrote:
+> The are defined in include/uapi/linux/kvm.h as
 
-A new member config_size in struct ifcvf_hw is introduced and would
-be initialized through vdpa_dev_add() to record correct device
-config size.
+s/The/They/
 
-To be more generic, rename ifcvf_hw.net_config to ifcvf_hw.dev_config,
-the helpers ifcvf_read/write_net_config() to ifcvf_read/write_dev_config()
+I can fix that up when picking if you want.
 
-Signed-off-by: Zhu Lingshan <lingshan.zhu@intel.com>
-Reported-and-suggested-by: Stefano Garzarella <sgarzare@redhat.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Fixes: 6ad31d162a4e ("vDPA/ifcvf: enable Intel C5000X-PL virtio-block for vDPA")
-Cc: <stable@vger.kernel.org>
----
- drivers/vdpa/ifcvf/ifcvf_base.c | 41 +++++++++++++++++++++++++--------
- drivers/vdpa/ifcvf/ifcvf_base.h |  9 +++++---
- drivers/vdpa/ifcvf/ifcvf_main.c | 24 ++++---------------
- 3 files changed, 41 insertions(+), 33 deletions(-)
+> KVM_S390_GET_SKEYS_NONE and KVM_S390_SKEYS_MAX, but the
+> api documetation talks of KVM_S390_GET_KEYS_NONE and
+> KVM_S390_SKEYS_ALLOC_MAX respectively.
+> 
+> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
 
-diff --git a/drivers/vdpa/ifcvf/ifcvf_base.c b/drivers/vdpa/ifcvf/ifcvf_base.c
-index 2808f1ba9f7b..7d41dfe48ade 100644
---- a/drivers/vdpa/ifcvf/ifcvf_base.c
-+++ b/drivers/vdpa/ifcvf/ifcvf_base.c
-@@ -143,8 +143,8 @@ int ifcvf_init_hw(struct ifcvf_hw *hw, struct pci_dev *pdev)
- 			IFCVF_DBG(pdev, "hw->isr = %p\n", hw->isr);
- 			break;
- 		case VIRTIO_PCI_CAP_DEVICE_CFG:
--			hw->net_cfg = get_cap_addr(hw, &cap);
--			IFCVF_DBG(pdev, "hw->net_cfg = %p\n", hw->net_cfg);
-+			hw->dev_cfg = get_cap_addr(hw, &cap);
-+			IFCVF_DBG(pdev, "hw->dev_cfg = %p\n", hw->dev_cfg);
- 			break;
- 		}
- 
-@@ -153,7 +153,7 @@ int ifcvf_init_hw(struct ifcvf_hw *hw, struct pci_dev *pdev)
- 	}
- 
- 	if (hw->common_cfg == NULL || hw->notify_base == NULL ||
--	    hw->isr == NULL || hw->net_cfg == NULL) {
-+	    hw->isr == NULL || hw->dev_cfg == NULL) {
- 		IFCVF_ERR(pdev, "Incomplete PCI capabilities\n");
- 		return -EIO;
- 	}
-@@ -174,7 +174,7 @@ int ifcvf_init_hw(struct ifcvf_hw *hw, struct pci_dev *pdev)
- 	IFCVF_DBG(pdev,
- 		  "PCI capability mapping: common cfg: %p, notify base: %p\n, isr cfg: %p, device cfg: %p, multiplier: %u\n",
- 		  hw->common_cfg, hw->notify_base, hw->isr,
--		  hw->net_cfg, hw->notify_off_multiplier);
-+		  hw->dev_cfg, hw->notify_off_multiplier);
- 
- 	return 0;
- }
-@@ -242,33 +242,54 @@ int ifcvf_verify_min_features(struct ifcvf_hw *hw, u64 features)
- 	return 0;
- }
- 
--void ifcvf_read_net_config(struct ifcvf_hw *hw, u64 offset,
-+u32 ifcvf_get_config_size(struct ifcvf_hw *hw)
-+{
-+	struct ifcvf_adapter *adapter;
-+	u32 config_size;
-+
-+	adapter = vf_to_adapter(hw);
-+	switch (hw->dev_type) {
-+	case VIRTIO_ID_NET:
-+		config_size = sizeof(struct virtio_net_config);
-+		break;
-+	case VIRTIO_ID_BLOCK:
-+		config_size = sizeof(struct virtio_blk_config);
-+		break;
-+	default:
-+		config_size = 0;
-+		IFCVF_ERR(adapter->pdev, "VIRTIO ID %u not supported\n", hw->dev_type);
-+	}
-+
-+	return config_size;
-+}
-+
-+void ifcvf_read_dev_config(struct ifcvf_hw *hw, u64 offset,
- 			   void *dst, int length)
- {
- 	u8 old_gen, new_gen, *p;
- 	int i;
- 
--	WARN_ON(offset + length > sizeof(struct virtio_net_config));
-+	WARN_ON(offset + length > hw->config_size);
- 	do {
- 		old_gen = ifc_ioread8(&hw->common_cfg->config_generation);
- 		p = dst;
- 		for (i = 0; i < length; i++)
--			*p++ = ifc_ioread8(hw->net_cfg + offset + i);
-+			*p++ = ifc_ioread8(hw->dev_cfg + offset + i);
- 
- 		new_gen = ifc_ioread8(&hw->common_cfg->config_generation);
- 	} while (old_gen != new_gen);
- }
- 
--void ifcvf_write_net_config(struct ifcvf_hw *hw, u64 offset,
-+void ifcvf_write_dev_config(struct ifcvf_hw *hw, u64 offset,
- 			    const void *src, int length)
- {
- 	const u8 *p;
- 	int i;
- 
- 	p = src;
--	WARN_ON(offset + length > sizeof(struct virtio_net_config));
-+	WARN_ON(offset + length > hw->config_size);
- 	for (i = 0; i < length; i++)
--		ifc_iowrite8(*p++, hw->net_cfg + offset + i);
-+		ifc_iowrite8(*p++, hw->dev_cfg + offset + i);
- }
- 
- static void ifcvf_set_features(struct ifcvf_hw *hw, u64 features)
-diff --git a/drivers/vdpa/ifcvf/ifcvf_base.h b/drivers/vdpa/ifcvf/ifcvf_base.h
-index 09918af3ecf8..c486873f370a 100644
---- a/drivers/vdpa/ifcvf/ifcvf_base.h
-+++ b/drivers/vdpa/ifcvf/ifcvf_base.h
-@@ -71,12 +71,14 @@ struct ifcvf_hw {
- 	u64 hw_features;
- 	u32 dev_type;
- 	struct virtio_pci_common_cfg __iomem *common_cfg;
--	void __iomem *net_cfg;
-+	void __iomem *dev_cfg;
- 	struct vring_info vring[IFCVF_MAX_QUEUES];
- 	void __iomem * const *base;
- 	char config_msix_name[256];
- 	struct vdpa_callback config_cb;
- 	unsigned int config_irq;
-+	/* virtio-net or virtio-blk device config size */
-+	u32 config_size;
- };
- 
- struct ifcvf_adapter {
-@@ -105,9 +107,9 @@ int ifcvf_init_hw(struct ifcvf_hw *hw, struct pci_dev *dev);
- int ifcvf_start_hw(struct ifcvf_hw *hw);
- void ifcvf_stop_hw(struct ifcvf_hw *hw);
- void ifcvf_notify_queue(struct ifcvf_hw *hw, u16 qid);
--void ifcvf_read_net_config(struct ifcvf_hw *hw, u64 offset,
-+void ifcvf_read_dev_config(struct ifcvf_hw *hw, u64 offset,
- 			   void *dst, int length);
--void ifcvf_write_net_config(struct ifcvf_hw *hw, u64 offset,
-+void ifcvf_write_dev_config(struct ifcvf_hw *hw, u64 offset,
- 			    const void *src, int length);
- u8 ifcvf_get_status(struct ifcvf_hw *hw);
- void ifcvf_set_status(struct ifcvf_hw *hw, u8 status);
-@@ -120,4 +122,5 @@ u16 ifcvf_get_vq_state(struct ifcvf_hw *hw, u16 qid);
- int ifcvf_set_vq_state(struct ifcvf_hw *hw, u16 qid, u16 num);
- struct ifcvf_adapter *vf_to_adapter(struct ifcvf_hw *hw);
- int ifcvf_probed_virtio_net(struct ifcvf_hw *hw);
-+u32 ifcvf_get_config_size(struct ifcvf_hw *hw);
- #endif /* _IFCVF_H_ */
-diff --git a/drivers/vdpa/ifcvf/ifcvf_main.c b/drivers/vdpa/ifcvf/ifcvf_main.c
-index 6dc75ca70b37..92ba7126e5d6 100644
---- a/drivers/vdpa/ifcvf/ifcvf_main.c
-+++ b/drivers/vdpa/ifcvf/ifcvf_main.c
-@@ -366,24 +366,9 @@ static u32 ifcvf_vdpa_get_vq_align(struct vdpa_device *vdpa_dev)
- 
- static size_t ifcvf_vdpa_get_config_size(struct vdpa_device *vdpa_dev)
- {
--	struct ifcvf_adapter *adapter = vdpa_to_adapter(vdpa_dev);
- 	struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
--	struct pci_dev *pdev = adapter->pdev;
--	size_t size;
--
--	switch (vf->dev_type) {
--	case VIRTIO_ID_NET:
--		size = sizeof(struct virtio_net_config);
--		break;
--	case VIRTIO_ID_BLOCK:
--		size = sizeof(struct virtio_blk_config);
--		break;
--	default:
--		size = 0;
--		IFCVF_ERR(pdev, "VIRTIO ID %u not supported\n", vf->dev_type);
--	}
- 
--	return size;
-+	return  vf->config_size;
- }
- 
- static void ifcvf_vdpa_get_config(struct vdpa_device *vdpa_dev,
-@@ -392,8 +377,7 @@ static void ifcvf_vdpa_get_config(struct vdpa_device *vdpa_dev,
- {
- 	struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
- 
--	WARN_ON(offset + len > sizeof(struct virtio_net_config));
--	ifcvf_read_net_config(vf, offset, buf, len);
-+	ifcvf_read_dev_config(vf, offset, buf, len);
- }
- 
- static void ifcvf_vdpa_set_config(struct vdpa_device *vdpa_dev,
-@@ -402,8 +386,7 @@ static void ifcvf_vdpa_set_config(struct vdpa_device *vdpa_dev,
- {
- 	struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
- 
--	WARN_ON(offset + len > sizeof(struct virtio_net_config));
--	ifcvf_write_net_config(vf, offset, buf, len);
-+	ifcvf_write_dev_config(vf, offset, buf, len);
- }
- 
- static void ifcvf_vdpa_set_config_cb(struct vdpa_device *vdpa_dev,
-@@ -542,6 +525,7 @@ static int ifcvf_vdpa_dev_add(struct vdpa_mgmt_dev *mdev, const char *name,
- 		vf->vring[i].irq = -EINVAL;
- 
- 	vf->hw_features = ifcvf_get_hw_features(vf);
-+	vf->config_size = ifcvf_get_config_size(vf);
- 
- 	adapter->vdpa.mdev = &ifcvf_mgmt_dev->mdev;
- 	ret = _vdpa_register_device(&adapter->vdpa, vf->nr_vring);
--- 
-2.27.0
+Thanks for fixing this up.
+
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+
+> ---
+>   Documentation/virt/kvm/api.rst | 6 +++---
+>   1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index aeeb071c7688..b86c7edae888 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -3701,7 +3701,7 @@ KVM with the currently defined set of flags.
+>   :Architectures: s390
+>   :Type: vm ioctl
+>   :Parameters: struct kvm_s390_skeys
+> -:Returns: 0 on success, KVM_S390_GET_KEYS_NONE if guest is not using storage
+> +:Returns: 0 on success, KVM_S390_GET_SKEYS_NONE if guest is not using storage
+>             keys, negative value on error
+>   
+>   This ioctl is used to get guest storage key values on the s390
+> @@ -3720,7 +3720,7 @@ you want to get.
+>   
+>   The count field is the number of consecutive frames (starting from start_gfn)
+>   whose storage keys to get. The count field must be at least 1 and the maximum
+> -allowed value is defined as KVM_S390_SKEYS_ALLOC_MAX. Values outside this range
+> +allowed value is defined as KVM_S390_SKEYS_MAX. Values outside this range
+>   will cause the ioctl to return -EINVAL.
+>   
+>   The skeydata_addr field is the address to a buffer large enough to hold count
+> @@ -3744,7 +3744,7 @@ you want to set.
+>   
+>   The count field is the number of consecutive frames (starting from start_gfn)
+>   whose storage keys to get. The count field must be at least 1 and the maximum
+> -allowed value is defined as KVM_S390_SKEYS_ALLOC_MAX. Values outside this range
+> +allowed value is defined as KVM_S390_SKEYS_MAX. Values outside this range
+>   will cause the ioctl to return -EINVAL.
+>   
+>   The skeydata_addr field is the address to a buffer containing count bytes of
+> 
 
