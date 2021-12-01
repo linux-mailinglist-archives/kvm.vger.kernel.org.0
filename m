@@ -2,138 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A40D646564D
-	for <lists+kvm@lfdr.de>; Wed,  1 Dec 2021 20:22:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 08C6F46567F
+	for <lists+kvm@lfdr.de>; Wed,  1 Dec 2021 20:32:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245101AbhLATZ6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Dec 2021 14:25:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58352 "EHLO
+        id S239741AbhLATfo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Dec 2021 14:35:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232671AbhLATZ4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Dec 2021 14:25:56 -0500
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99A1AC061574
-        for <kvm@vger.kernel.org>; Wed,  1 Dec 2021 11:22:35 -0800 (PST)
-Received: by mail-pg1-x52d.google.com with SMTP id 137so17576597pgg.3
-        for <kvm@vger.kernel.org>; Wed, 01 Dec 2021 11:22:35 -0800 (PST)
+        with ESMTP id S234593AbhLATfo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Dec 2021 14:35:44 -0500
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D30C5C061574
+        for <kvm@vger.kernel.org>; Wed,  1 Dec 2021 11:32:22 -0800 (PST)
+Received: by mail-pf1-x42e.google.com with SMTP id z6so25562345pfe.7
+        for <kvm@vger.kernel.org>; Wed, 01 Dec 2021 11:32:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=cykQBNG3mId7jLMKHUCeUk87p57y0lh/UsD9vvVFphc=;
-        b=fWU8RDTyU+5BLdqlwPetohRlPQPQbRIhv1YxXs8T5B0kcPBODP1abj1K0B8wGvVOVj
-         +YS54wXB9drNFOVSjd/DfG6ip1lolwAcdADVR+093zCRuXos4j7mi1OAoNmE8JsxwHz/
-         j/SZwwGpO5A0B9O9vv4qo3iLLhTi2uto9dnyrimykZLppjrJZGLqVzq4FRvJCkRpLdfd
-         xTAT3pdzB7vyBQMg6hDVSialYHt6HBVdjYSOR742Q3cBX4HSeW89BDJjonSqyMIHOLT3
-         du6uMPIFzGszbpBvHwIU6R12OW93zpGqYr4PeYv2nQbaWL+OpQGkwgX3Edd9JJO4pOwn
-         TziQ==
+        bh=CZWjS73ddwqy1irW9SF57Z1/5+llpSsF/UlHdpLsf20=;
+        b=WwZ+uZal5LDSsVbb8ggDuyptB5vW613ix+E43x1vM8/MNv5RvFx3Htru6Jk08HPdr9
+         sFytDMsZIeJ4INkdxZK4lCDgEw5TsxrS4hCrWy+E4Omz0b+3kYmft/mrCOTvF1w52fZ4
+         zZq70NTZlSSQ0HJU6HEuB0N8HGNMhZtQS3XBIAwgf67jn48pYuc/7y2ArEsdp6B2u5hZ
+         UPpKiZW/hyb5fF3ZClfJFymNFQx65UfUYfJhSd0KSvpQk9gH8oTmlmCaq4/8wAX7Z3kW
+         owDEfZ0yhQiu0G7jniuk4JF7OK0B28kfzXM86z8IETzqAINVKMUZWqywQrC5Vw3a5Nji
+         pArw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=cykQBNG3mId7jLMKHUCeUk87p57y0lh/UsD9vvVFphc=;
-        b=RDX9m9nDMacA646zx7W44wzlgfTkHS5EIIWi26+462awSl+vZhBeM2fOFkV7DccjQV
-         BX91Gzw7uuFMCoj6RgeJUnW+NzRqbDQYDZsRFe4FoqUdcqujMB7jauv7v3FcJH9xYTWc
-         mYnyAIj2pXPT18X7d2Ft7S6XjOfaKB/RU1WBXVCJcFaekFiCz6fOfetKrydefj7ogdKr
-         jxzO2Sdw/jipbsJ7KnRrVsocyttC3WHMoVbrrOKEBtn+Egzzz/bRdu7Z3qilXOVNlBYG
-         9i/C+gUcdMn6IhZPDwOOwcUT4jvFCUM2Te+KJa4/D9b1jh8oFxgddE09sUwe7ZMdQEMR
-         vZYw==
-X-Gm-Message-State: AOAM530e8jvODUQe971UpircZ0rIeWivZUlGKEz388h/tjVdx9++9YIX
-        6REwU2KAO62hcJN0heBjZT5ALA==
-X-Google-Smtp-Source: ABdhPJyfEmm2Ns8oaK/9Q5S0EdVkPtSvAV4Vq9AIN6wg7AVezvtpVyJ6ljcdCbXEFWvaC+K3kX2/uw==
-X-Received: by 2002:a62:5215:0:b0:49f:a996:b724 with SMTP id g21-20020a625215000000b0049fa996b724mr8147153pfb.3.1638386554944;
-        Wed, 01 Dec 2021 11:22:34 -0800 (PST)
+        bh=CZWjS73ddwqy1irW9SF57Z1/5+llpSsF/UlHdpLsf20=;
+        b=77jUIs6vDpElvZFwWTp1oy/iKqKUtzC8Ns7C9gC8fs6FF3KRb5s98xWOPrMUxsAvuv
+         xtKFDukBnYIiwiluuIRuLDo/XJc2XTg5hWr6ylcZ+MNUKWkgOvgEzn3z0o7tsLXKz/4E
+         hF5nLtk3X3FaPDj+s3MpqvYMuJwEyxbNinwwbUFe35HDjS/IS0hy069ZLCcajOG9SH58
+         P0hRz6aEY3RZ8g0AYGuWM4q9pC144EM7m7xgsasLlwv0WlTkalCQ6H5bpL34E6dJ9j2H
+         uQnDm3v8NV1sdN3f/vS84G8TsbALW7Dd1+9oaBKTMsvyiF7ajBEuwKru7O7bjcOzgM3i
+         lXeQ==
+X-Gm-Message-State: AOAM533Scqf4t46/69Hx2dfi+C7ySBdrgaMhfFVTIyc/S2dOYVbV8s16
+        lHmezTRsZcjwZJqTRPH1zSqNkg==
+X-Google-Smtp-Source: ABdhPJw/cQM94bmIq3e1bnf5ez0hbCDPrBfwYK8LB/d0cYiit7zFSsLheZVrRaVltfAEG650aNE5Bg==
+X-Received: by 2002:a62:5a02:0:b0:4a2:a6ee:4d8e with SMTP id o2-20020a625a02000000b004a2a6ee4d8emr7996251pfb.47.1638387142244;
+        Wed, 01 Dec 2021 11:32:22 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id q2sm619145pfj.62.2021.12.01.11.22.33
+        by smtp.gmail.com with ESMTPSA id j1sm573948pfe.158.2021.12.01.11.32.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Dec 2021 11:22:34 -0800 (PST)
-Date:   Wed, 1 Dec 2021 19:22:30 +0000
+        Wed, 01 Dec 2021 11:32:21 -0800 (PST)
+Date:   Wed, 1 Dec 2021 19:32:18 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Ben Gardon <bgardon@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+To:     Isaku Yamahata <isaku.yamahata@gmail.com>
+Cc:     Kai Huang <kai.huang@intel.com>, isaku.yamahata@intel.com,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>,
-        Junaid Shahid <junaids@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Harish Barathvajasankar <hbarath@google.com>,
-        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>
-Subject: Re: [RFC PATCH 13/15] KVM: x86/mmu: Split large pages during
- CLEAR_DIRTY_LOG
-Message-ID: <YafLdpkoTrtyoEjy@google.com>
-References: <20211119235759.1304274-1-dmatlack@google.com>
- <20211119235759.1304274-14-dmatlack@google.com>
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, erdemaktas@google.com,
+        Connor Kuehl <ckuehl@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [RFC PATCH v3 00/59] KVM: X86: TDX support
+Message-ID: <YafNwoPumWQ/77Q6@google.com>
+References: <cover.1637799475.git.isaku.yamahata@intel.com>
+ <YaZyyNMY80uVi5YA@google.com>
+ <20211202022227.acc0b613e6c483be4736c196@intel.com>
+ <20211201190856.GA1166703@private.email.ne.jp>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211119235759.1304274-14-dmatlack@google.com>
+In-Reply-To: <20211201190856.GA1166703@private.email.ne.jp>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 19, 2021, David Matlack wrote:
-> When using initially-all-set, large pages are not write-protected when
-> dirty logging is enabled on the memslot. Instead they are
-> write-protected once userspace invoked CLEAR_DIRTY_LOG for the first
-> time, and only for the specific sub-region of the memslot that userspace
-> whishes to clear.
+On Wed, Dec 01, 2021, Isaku Yamahata wrote:
+> On Thu, Dec 02, 2021 at 02:22:27AM +1300,
+> Kai Huang <kai.huang@intel.com> wrote:
 > 
-> Enhance CLEAR_DIRTY_LOG to also try to split large pages prior to
-> write-protecting to avoid causing write-protection faults on vCPU
-> threads. This also allows userspace to smear the cost of large page
-> splitting across multiple ioctls rather than splitting the entire
-> memslot when not using initially-all-set.
+> > On Tue, 30 Nov 2021 18:51:52 +0000 Sean Christopherson wrote:
+> > > On Wed, Nov 24, 2021, isaku.yamahata@intel.com wrote:
+> > > > - drop load/initialization of TDX module
+> > > 
+> > > So what's the plan for loading and initializing TDX modules?
+> > 
+> > Although I don't quite understand what does Isaku mean here (I thought
+> > loading/initializing TDX module was never part of TDX KVM series), for this part
+> > we are working internally to improve the quality and finalize the code, but
+> > currently I don't have ETA of being able to send patches out, but we are trying
+> > to send out asap.  Sorry this is what I can say for now : (
 > 
-> Signed-off-by: David Matlack <dmatlack@google.com>
-> ---
->  arch/x86/include/asm/kvm_host.h |  4 ++++
->  arch/x86/kvm/mmu/mmu.c          | 30 ++++++++++++++++++++++--------
->  2 files changed, 26 insertions(+), 8 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 432a4df817ec..6b5bf99f57af 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1591,6 +1591,10 @@ void kvm_mmu_reset_context(struct kvm_vcpu *vcpu);
->  void kvm_mmu_slot_remove_write_access(struct kvm *kvm,
->  				      const struct kvm_memory_slot *memslot,
->  				      int start_level);
-> +void kvm_mmu_try_split_large_pages(struct kvm *kvm,
+> v1/v2 has it.
 
-I would prefer we use hugepage when possible, mostly because that's the terminology
-used by the kernel.  KVM is comically inconsistent, but if we make an effort to use
-hugepage when adding new code, hopefully someday we'll have enough inertia to commit
-fully to hugepage.
+No, v1 had support for the old architecture where SEAMLDR was a single ACM, it
+did not support the new split persistent/non-persistent architcture.  v2 didn't
+have support for either architecture.
 
-> +				   const struct kvm_memory_slot *memslot,
-> +				   u64 start, u64 end,
-> +				   int target_level);
->  void kvm_mmu_slot_try_split_large_pages(struct kvm *kvm,
->  					const struct kvm_memory_slot *memslot,
->  					int target_level);
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 6768ef9c0891..4e78ef2dd352 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -1448,6 +1448,12 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
->  		gfn_t start = slot->base_gfn + gfn_offset + __ffs(mask);
->  		gfn_t end = slot->base_gfn + gfn_offset + __fls(mask);
->  
-> +		/*
-> +		 * Try to proactively split any large pages down to 4KB so that
-> +		 * vCPUs don't have to take write-protection faults.
-> +		 */
-> +		kvm_mmu_try_split_large_pages(kvm, slot, start, end, PG_LEVEL_4K);
+> Anyway The plan is what Kai said.  The code will reside in the x86 common
+> directory instead of kvm.
 
-This should return a value.  If splitting succeeds, there should be no hugepages
-and so walking the page tables to write-protect 2M is unnecessary.  Same for the
-previous patch, although skipping the write-protect path is a little less
-straightforward in that case.
+But what's the plan at a higher level?  Will the kernel load the ACM or is that
+done by firmware?  If it's done by firmware, which entity is responsibile for
+loading the TDX module?  If firmware loads the module, what's the plan for
+upgrading the module without a reboot?  When will the kernel initialize the
+module, regardless of who loads it?
 
-> +
->  		kvm_mmu_slot_gfn_write_protect(kvm, slot, start, PG_LEVEL_2M);
->  
->  		/* Cross two large pages? */
+All of those unanswered questions make it nigh impossible to review the KVM
+support because the code organization and APIs provided will differ based on how
+the kernel handles loading and initializing the TDX module.
