@@ -2,114 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A88B9465696
-	for <lists+kvm@lfdr.de>; Wed,  1 Dec 2021 20:37:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 495874656BA
+	for <lists+kvm@lfdr.de>; Wed,  1 Dec 2021 20:49:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245485AbhLATlD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Dec 2021 14:41:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33790 "EHLO
+        id S245430AbhLATws (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Dec 2021 14:52:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239157AbhLATlB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Dec 2021 14:41:01 -0500
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4830FC061574;
-        Wed,  1 Dec 2021 11:37:39 -0800 (PST)
-Received: by mail-pg1-x52d.google.com with SMTP id 71so24691639pgb.4;
-        Wed, 01 Dec 2021 11:37:39 -0800 (PST)
+        with ESMTP id S238837AbhLATwo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Dec 2021 14:52:44 -0500
+Received: from mail-il1-x12f.google.com (mail-il1-x12f.google.com [IPv6:2607:f8b0:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD26DC061574
+        for <kvm@vger.kernel.org>; Wed,  1 Dec 2021 11:49:22 -0800 (PST)
+Received: by mail-il1-x12f.google.com with SMTP id w4so26558410ilv.12
+        for <kvm@vger.kernel.org>; Wed, 01 Dec 2021 11:49:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=2pQR4NmCSaxcgp6K9YVXVHlggEsM7Bp75xK/vJqmsa0=;
-        b=JGtt7aFtGVaGBNVoM5LP+n2i55DPMQv3JN/bKvjlOrjjtGEOzhdDHL7Pb8h9mu/7Cu
-         mkLhCxVGFlwTIc5DEvc9HpCIAuf8zIYygEuqrBz0RcD8bBViQeYNFQlqBaTdJCmBCJbN
-         o+74+3yf5GO3Xiu5EO/NLLu5bZdkWg+gnMVWC3pH+VfngCEA9d4A9qvfW1/fbWVgDBVs
-         7VF7aTuntdE0b3uiULHKWH3NN6m56r2r6dzdp8OjZGXtZrxveuDmuuRDMyYgXvm/iBB5
-         iDVdirUqPy1mzh8jgk+qK2Bfy8shbOZVULsvjG48jHLQqp3IP8Jagd9GwmFUEZAQajoe
-         w47A==
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=jDU8/pih7kWOumekbcpn6tedUi/knOPA6/2DfdBMPWw=;
+        b=FAY1DNqOa9kOLqNAsnttqIOKyXX5zRyJ5iV2ZYoIzcN1jMy5614TBzQdMd/4YP6Z4g
+         7vJbq+dn2I8An2uNsjl+7sNeT2AY+Pw1cFnu39fFvA/3ITJG/rjKovdBg3zXAdFvGzpU
+         aQCR7yQXQACOWOKplpgLSVuMKkOJpq4z5jEuXIt78J89FjAgbWRKHczBmSX9qQcO/YQo
+         4j6mYqPvNRJGUKQc/LOiNt03NcQyuZeU0/XVada4jnKmcehClW0Fe6jPkhZGt495e0TI
+         N/cgTpdV2IdTe8CAbHAcC5qOUeqVw4Zq25q/RSPf1cmXWlwWmjHxtN1v4U2u9H9EKb48
+         L2JA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=2pQR4NmCSaxcgp6K9YVXVHlggEsM7Bp75xK/vJqmsa0=;
-        b=OKngJl7o7JG37ueuQ+JNn+L/QXVFwcIFQSOo9hmww9jFl1YlJBVSxCqzsKmWeAx9Go
-         1XDMcaqgMTkrY2CR9ier9tnM7ubumEZHbHZRQmkDbXniW5R2aLiaxnP2DOMm46wujlXt
-         S9ygratm21kyRu0dh21xliV7YUSK8WFrjmKFZ1twthWk/iYd7Ung90m1jDkOLRZL71et
-         277Q4Pi8KY3cmqB5rl8XkUwGZFLFHinPLA7O+QXMVTqP2ZFGbECNyiy4QCk1FmeIZn7X
-         NcTcRkYuJHLbnSpMf3t2hdZdN8UIhaIPbzUcnxhHYCce1cLgWMz6Kk7hkdGNi5ierfOA
-         8+2w==
-X-Gm-Message-State: AOAM533k0LKMGTXnys8PlHdpdDuSyNcG5LMSoIzkM5Dvhi0EFgD8C9PW
-        OzJ2+/aU6mlNCi5TwcQtKrA=
-X-Google-Smtp-Source: ABdhPJxHXcCwmQKA5iVtujrmdj750ZdrGnnPFT9YbWf3XHCcFPS3qqtpS5+jKg2Bip0m4SVWlJOXEA==
-X-Received: by 2002:a63:904a:: with SMTP id a71mr6278803pge.528.1638387458755;
-        Wed, 01 Dec 2021 11:37:38 -0800 (PST)
-Received: from localhost ([2601:647:4600:a5:6f71:8916:71a8:8af8])
-        by smtp.gmail.com with ESMTPSA id e4sm418588pgi.21.2021.12.01.11.37.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Dec 2021 11:37:38 -0800 (PST)
-Date:   Wed, 1 Dec 2021 11:37:37 -0800
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>, isaku.yamahata@intel.com,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, erdemaktas@google.com,
-        Connor Kuehl <ckuehl@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, isaku.yamahata@gmail.com,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: Re: [RFC PATCH v3 14/59] KVM: x86: Add vm_type to differentiate
- legacy VMs from protected VMs
-Message-ID: <20211201193737.GB1166703@private.email.ne.jp>
-References: <cover.1637799475.git.isaku.yamahata@intel.com>
- <60a163e818b9101dce94973a2b44662ba3d53f97.1637799475.git.isaku.yamahata@intel.com>
- <87tug0jbno.ffs@tglx>
- <YaUPZj4ja5FY7Fvh@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=jDU8/pih7kWOumekbcpn6tedUi/knOPA6/2DfdBMPWw=;
+        b=nwix6GEnjklIxSXmCP1ksXi/Mxdmz5iFfqCKOXgyEBoH6jmuclbOk6xn2FG4o1cwUj
+         WSGvjEAaHVvtIWSZSwa/ftV6TwFfLDeV3E1toA/h5Xlwa1PPfq0ZwENg22LayyV7knz7
+         uTRDiPeJMr3mbp9nDyHD5NVdgnlwWMTKojZCFWZvHX1eO0m3W/iY5q/L1xcRGeHuN7s2
+         Qc+koKWrXCPi5QwvSQPzrIDxfBM6lvR+v3xx5tspXzadFORB96PG8a4TKb0P36RydnnJ
+         9CnULyxHS4Nfw/L7nBlN9vCyL+/jX9teLjWFVyJaMP0TeEuYU1YJymqD3AThuNG01K3P
+         bNxw==
+X-Gm-Message-State: AOAM532Y48lZYFzmwMqsORRIp4iLPGKN7sqrcMnqGIGCrDJlCeW20Tmd
+        7Eb6tgNx65bYtb5FZUXcrffRsQtVdu2hJLkfafRFEQ==
+X-Google-Smtp-Source: ABdhPJwWnrDz/WFoPrMuEpHfToPVe1GxNBoZdEXOfIdZzMMWJhNewiGV12UL4jzLQsqbakjRvYCDVFlEtK5zCnpGm78=
+X-Received: by 2002:a05:6e02:1686:: with SMTP id f6mr11728625ila.298.1638388162054;
+ Wed, 01 Dec 2021 11:49:22 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YaUPZj4ja5FY7Fvh@google.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20211119235759.1304274-1-dmatlack@google.com> <20211119235759.1304274-14-dmatlack@google.com>
+ <YafLdpkoTrtyoEjy@google.com>
+In-Reply-To: <YafLdpkoTrtyoEjy@google.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Wed, 1 Dec 2021 11:49:11 -0800
+Message-ID: <CANgfPd_K9kBu9Fd83wx0heMiWziLthg9tXD=6GsvLsFd0GapYA@mail.gmail.com>
+Subject: Re: [RFC PATCH 13/15] KVM: x86/mmu: Split large pages during CLEAR_DIRTY_LOG
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     David Matlack <dmatlack@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>,
+        Junaid Shahid <junaids@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Harish Barathvajasankar <hbarath@google.com>,
+        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 29, 2021 at 05:35:34PM +0000,
-Sean Christopherson <seanjc@google.com> wrote:
+On Wed, Dec 1, 2021 at 11:22 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Fri, Nov 19, 2021, David Matlack wrote:
+> > When using initially-all-set, large pages are not write-protected when
+> > dirty logging is enabled on the memslot. Instead they are
+> > write-protected once userspace invoked CLEAR_DIRTY_LOG for the first
+> > time, and only for the specific sub-region of the memslot that userspace
+> > whishes to clear.
+> >
+> > Enhance CLEAR_DIRTY_LOG to also try to split large pages prior to
+> > write-protecting to avoid causing write-protection faults on vCPU
+> > threads. This also allows userspace to smear the cost of large page
+> > splitting across multiple ioctls rather than splitting the entire
+> > memslot when not using initially-all-set.
+> >
+> > Signed-off-by: David Matlack <dmatlack@google.com>
+> > ---
+> >  arch/x86/include/asm/kvm_host.h |  4 ++++
+> >  arch/x86/kvm/mmu/mmu.c          | 30 ++++++++++++++++++++++--------
+> >  2 files changed, 26 insertions(+), 8 deletions(-)
+> >
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > index 432a4df817ec..6b5bf99f57af 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -1591,6 +1591,10 @@ void kvm_mmu_reset_context(struct kvm_vcpu *vcpu);
+> >  void kvm_mmu_slot_remove_write_access(struct kvm *kvm,
+> >                                     const struct kvm_memory_slot *memslot,
+> >                                     int start_level);
+> > +void kvm_mmu_try_split_large_pages(struct kvm *kvm,
+>
+> I would prefer we use hugepage when possible, mostly because that's the terminology
+> used by the kernel.  KVM is comically inconsistent, but if we make an effort to use
+> hugepage when adding new code, hopefully someday we'll have enough inertia to commit
+> fully to hugepage.
 
-> On Thu, Nov 25, 2021, Thomas Gleixner wrote:
-> > On Wed, Nov 24 2021 at 16:19, isaku yamahata wrote:
-> > > From: Sean Christopherson <sean.j.christopherson@intel.com>
-> > >
-> > > Add a capability to effectively allow userspace to query what VM types
-> > > are supported by KVM.
-> > 
-> > I really don't see why this has to be named legacy. There are enough
-> > reasonable use cases which are perfectly fine using the non-encrypted
-> > muck. Just because there is a new hyped feature does not make anything
-> > else legacy.
-> 
-> Yeah, this was brought up in the past.  The current proposal is to use
-> KVM_X86_DEFAULT_VM[1], though at one point the plan was to use a generic
-> KVM_VM_TYPE_DEFAULT for all architectures[2], not sure what happened to that idea.
-> 
-> [1] https://lore.kernel.org/all/YY6aqVkHNEfEp990@google.com/
-> [2] https://lore.kernel.org/all/YQsjQ5aJokV1HZ8N@google.com/
+In my mind "huge page" implies 2M and "large page" is generic to 2m
+and 1g. (IDK if we settled on a name for 1G pages)
+I've definitely been guilty of reinforcing this inconsistent
+terminology. (Though it was consistent in my head, of course.) If we
+want to pick one and use it everywhere, I'm happy to get onboard with
+a standard terminology.
 
-Currently <feature>_{unsupported, disallowed} are added and the check is
- sprinkled and warn in the corresponding low level tdx code.  It helped to
- detect dubious behavior of guest or qemu.
-
-The other approach is to silently ignore them (SMI, INIT, IRQ etc) without
-such check.  The pros is, the code would be simpler and it's what SEV does today.
-the cons is, it would bes hard to track down such cases and the user would
-be confused.  For example, when user requests reset/SMI, it's silently ignored.
-The some check would still be needed.
-Any thoughts?
-
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+>
+> > +                                const struct kvm_memory_slot *memslot,
+> > +                                u64 start, u64 end,
+> > +                                int target_level);
+> >  void kvm_mmu_slot_try_split_large_pages(struct kvm *kvm,
+> >                                       const struct kvm_memory_slot *memslot,
+> >                                       int target_level);
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index 6768ef9c0891..4e78ef2dd352 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -1448,6 +1448,12 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+> >               gfn_t start = slot->base_gfn + gfn_offset + __ffs(mask);
+> >               gfn_t end = slot->base_gfn + gfn_offset + __fls(mask);
+> >
+> > +             /*
+> > +              * Try to proactively split any large pages down to 4KB so that
+> > +              * vCPUs don't have to take write-protection faults.
+> > +              */
+> > +             kvm_mmu_try_split_large_pages(kvm, slot, start, end, PG_LEVEL_4K);
+>
+> This should return a value.  If splitting succeeds, there should be no hugepages
+> and so walking the page tables to write-protect 2M is unnecessary.  Same for the
+> previous patch, although skipping the write-protect path is a little less
+> straightforward in that case.
+>
+> > +
+> >               kvm_mmu_slot_gfn_write_protect(kvm, slot, start, PG_LEVEL_2M);
+> >
+> >               /* Cross two large pages? */
