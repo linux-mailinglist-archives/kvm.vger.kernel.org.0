@@ -2,93 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7406B4659EB
-	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 00:44:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4014B4659EC
+	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 00:45:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353823AbhLAXsF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Dec 2021 18:48:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33310 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353809AbhLAXsD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Dec 2021 18:48:03 -0500
-Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DB99C061574
-        for <kvm@vger.kernel.org>; Wed,  1 Dec 2021 15:44:42 -0800 (PST)
-Received: by mail-il1-x129.google.com with SMTP id i9so27243142ilu.1
-        for <kvm@vger.kernel.org>; Wed, 01 Dec 2021 15:44:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=fqzOTW5eXkzj6FlzjiKmsbJBVIVlloyfRwo0n+Y/YXE=;
-        b=BoKJEErBDIvVP8aBQN2xUKYa0brpU2aexQCIcqnjBmbGRn3jpb3Z6AgKGW6SOJCo9m
-         5d/iv9A5VKfnXH0bCeET+JwuxvNRvaU62SyAHToIDfUyuIkCv5XmSeLqUK6Vn1plROzH
-         jV5xp7NZSPhUxPYvW/AZKCshmUZzibvVOEe/s=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=fqzOTW5eXkzj6FlzjiKmsbJBVIVlloyfRwo0n+Y/YXE=;
-        b=To5nM+1sQYE3v0YK58GaF/sAu50zvxqDnwBWmefAWeo7Z6t3KFuyYAS+ntqi7NlLzT
-         gcHGzALnOYe9mkwTMq+/M26tKuMIVwOZzXf2An5RGzn040jI+w3NI11XSp3Xr4qTnnut
-         vTEBP7lpNN9XQ9144iWOZ35jRthm4Xz54VCboxKVFMNManSgfAo5RaH4U2Xgd5UEG23r
-         4Uxtslgba94eVQyDc47FCwacqNQ4HxLL0gRDqTVyWBNkNknlZVF76UjgqZEDu3fUucFJ
-         mPdvn58XBpl9q5B/5jL3uGs3xVykurYW6yTl5rFdTGnOhKdqXd+a6OcW/tIdfjspDEXj
-         kQRw==
-X-Gm-Message-State: AOAM533K5UvpGXHKDk60MeIeRO63zJSQDrPM7HtA3TIo4hArGU8V1m2M
-        FvDqQ85EKBw3yxQcoGiev7dVg+EITwwHKj9A5sPtgg==
-X-Google-Smtp-Source: ABdhPJyGqLReI15PHfkWHviFDsrsXsSg1pBdEqQRI8HiR3VGmwSTv7pzJwkFG8nI+fHhUgcjwtZMHhIWZ3TCU/RA85k=
-X-Received: by 2002:a05:6e02:160e:: with SMTP id t14mr12628184ilu.16.1638402281353;
- Wed, 01 Dec 2021 15:44:41 -0800 (PST)
+        id S1353828AbhLAXtN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Dec 2021 18:49:13 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:44977 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1353809AbhLAXtM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 1 Dec 2021 18:49:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1638402348;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=snCVb5fbZV6vUruHANKIGvnBOyU9q8ZLGqcF9z3ztd4=;
+        b=NPPghUy5wDu+TPBhLbTJuHLC+dUpTAt7WyPOq48kNOgHu8u5Xu71nBN3JsPkiZY2fO89B7
+        QhIhhZBxze7KbkklGsrBovgfLpFpd6NEYVveMVAk9B1tybFp6bITRgf6cypY68SpR5VJg5
+        kgM5sVsxwVoEq2V2tItooDuZRdiYb/0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-350-dCV-kQihNemiLgjPHwW1tg-1; Wed, 01 Dec 2021 18:45:47 -0500
+X-MC-Unique: dCV-kQihNemiLgjPHwW1tg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C423E180830C;
+        Wed,  1 Dec 2021 23:45:46 +0000 (UTC)
+Received: from [172.30.41.16] (unknown [10.2.17.225])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C814960843;
+        Wed,  1 Dec 2021 23:45:41 +0000 (UTC)
+Subject: [PATCH] vfio/pci: Resolve sparse endian warnings in IGD support
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     alex.williamson@redhat.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Wed, 01 Dec 2021 16:45:41 -0700
+Message-ID: <163840226123.138003.7668320168896210328.stgit@omen>
+User-Agent: StGit/1.0-8-g6af9-dirty
 MIME-Version: 1.0
-References: <CALrw=nEaWhpG1y7VNTGDFfF1RWbPvm5ka5xWxD-YWTS3U=r9Ng@mail.gmail.com>
- <d49e157a-5915-fbdc-8103-d7ba2621aea9@redhat.com> <CALrw=nHTJpoSFFadmDL2EL95D2kAiH5G-dgLvU0L7X=emxrP2A@mail.gmail.com>
- <YaaIRv0n2E8F5YpX@google.com>
-In-Reply-To: <YaaIRv0n2E8F5YpX@google.com>
-From:   Ignat Korchagin <ignat@cloudflare.com>
-Date:   Wed, 1 Dec 2021 23:44:30 +0000
-Message-ID: <CALrw=nGrAhSn=MkW-wvNr=UnaS5=t24yY-TWjSvcNJa1oJ85ww@mail.gmail.com>
-Subject: Re: Potential bug in TDP MMU
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        stevensd@chromium.org, kernel-team <kernel-team@cloudflare.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 30, 2021 at 8:23 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Tue, Nov 30, 2021, Ignat Korchagin wrote:
-> > I have managed to reliably reproduce the issue on a QEMU VM (on a host
-> > with nested virtualisation enabled). Here are the steps:
-> >
-> > 1. Install gvisor as per
-> > https://gvisor.dev/docs/user_guide/install/#install-latest
-> > 2. Run
-> > $ for i in $(seq 1 100); do sudo runsc --platform=kvm --network=none
-> > do echo ok; done
-> >
-> > I've tried to recompile the kernel with the above patch, but
-> > unfortunately it does fix the issue. I'm happy to try other
-> > patches/fixes queued for 5.16-rc4
->
-> My best guest would be https://lore.kernel.org/all/20211120045046.3940942-5-seanjc@google.com/,
-> that bug results in KVM installing SPTEs into an invalid root.  I think that could
-> lead to a use-after-free and/or double-free, which is usually what leads to the
-> "Bad page state" errors.
+Sparse warns:
 
-Unfortunately, that patch (alone) does not fix it in my repro environment.
+sparse warnings: (new ones prefixed by >>)
+>> drivers/vfio/pci/vfio_pci_igd.c:146:21: sparse: sparse: incorrect type in assignment (different base types) @@     expected unsigned short [addressable] [usertype] val @@     got restricted __le16 [usertype] @@
+   drivers/vfio/pci/vfio_pci_igd.c:146:21: sparse:     expected unsigned short [addressable] [usertype] val
+   drivers/vfio/pci/vfio_pci_igd.c:146:21: sparse:     got restricted __le16 [usertype]
+>> drivers/vfio/pci/vfio_pci_igd.c:161:21: sparse: sparse: incorrect type in assignment (different base types) @@     expected unsigned int [addressable] [usertype] val @@     got restricted __le32 [usertype] @@
+   drivers/vfio/pci/vfio_pci_igd.c:161:21: sparse:     expected unsigned int [addressable] [usertype] val
+   drivers/vfio/pci/vfio_pci_igd.c:161:21: sparse:     got restricted __le32 [usertype]
+   drivers/vfio/pci/vfio_pci_igd.c:176:21: sparse: sparse: incorrect type in assignment (different base types) @@     expected unsigned short [addressable] [usertype] val @@     got restricted __le16 [usertype] @@
+   drivers/vfio/pci/vfio_pci_igd.c:176:21: sparse:     expected unsigned short [addressable] [usertype] val
+   drivers/vfio/pci/vfio_pci_igd.c:176:21: sparse:     got restricted __le16 [usertype]
 
-Ignat
+These are due to trying to use an unsigned to store the result of
+a cpu_to_leXX() conversion.  These are small variables, so pointer
+tricks are wasteful and casting just generates different sparse
+warnings.  Store to and copy results from a separate little endian
+variable.
 
->
-> In the meantime, I'll try to repro.
->
-> > > > arch/x86/kvm/../../../virt/kvm/kvm_main.c:171
->
-> ...
->
-> > > > After this the machine starts spitting some traces starting with:
-> > > >
-> > > > [177247.871683][T2343516] BUG: Bad page state in process <comm>  pfn:fe680a
+Reported-by: kernel test robot <lkp@intel.com>
+Link: https://lore.kernel.org/r/202111290026.O3vehj03-lkp@intel.com/
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+---
+ drivers/vfio/pci/vfio_pci_igd.c |   15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/vfio/pci/vfio_pci_igd.c b/drivers/vfio/pci/vfio_pci_igd.c
+index 362f91ec8845..352c725ccf18 100644
+--- a/drivers/vfio/pci/vfio_pci_igd.c
++++ b/drivers/vfio/pci/vfio_pci_igd.c
+@@ -309,13 +309,14 @@ static ssize_t vfio_pci_igd_cfg_rw(struct vfio_pci_core_device *vdev,
+ 
+ 	if ((pos & 3) && size > 2) {
+ 		u16 val;
++		__le16 lval;
+ 
+ 		ret = pci_user_read_config_word(pdev, pos, &val);
+ 		if (ret)
+ 			return ret;
+ 
+-		val = cpu_to_le16(val);
+-		if (copy_to_user(buf + count - size, &val, 2))
++		lval = cpu_to_le16(val);
++		if (copy_to_user(buf + count - size, &lval, 2))
+ 			return -EFAULT;
+ 
+ 		pos += 2;
+@@ -324,13 +325,14 @@ static ssize_t vfio_pci_igd_cfg_rw(struct vfio_pci_core_device *vdev,
+ 
+ 	while (size > 3) {
+ 		u32 val;
++		__le32 lval;
+ 
+ 		ret = pci_user_read_config_dword(pdev, pos, &val);
+ 		if (ret)
+ 			return ret;
+ 
+-		val = cpu_to_le32(val);
+-		if (copy_to_user(buf + count - size, &val, 4))
++		lval = cpu_to_le32(val);
++		if (copy_to_user(buf + count - size, &lval, 4))
+ 			return -EFAULT;
+ 
+ 		pos += 4;
+@@ -339,13 +341,14 @@ static ssize_t vfio_pci_igd_cfg_rw(struct vfio_pci_core_device *vdev,
+ 
+ 	while (size >= 2) {
+ 		u16 val;
++		__le16 lval;
+ 
+ 		ret = pci_user_read_config_word(pdev, pos, &val);
+ 		if (ret)
+ 			return ret;
+ 
+-		val = cpu_to_le16(val);
+-		if (copy_to_user(buf + count - size, &val, 2))
++		lval = cpu_to_le16(val);
++		if (copy_to_user(buf + count - size, &lval, 2))
+ 			return -EFAULT;
+ 
+ 		pos += 2;
+
+
