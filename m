@@ -2,159 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5EFEF464455
-	for <lists+kvm@lfdr.de>; Wed,  1 Dec 2021 02:01:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A68FA46446D
+	for <lists+kvm@lfdr.de>; Wed,  1 Dec 2021 02:08:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233553AbhLABEX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Nov 2021 20:04:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60780 "EHLO
+        id S1345925AbhLABL0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Nov 2021 20:11:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229450AbhLABEW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Nov 2021 20:04:22 -0500
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66C8DC061574
-        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 17:01:02 -0800 (PST)
-Received: by mail-pg1-x531.google.com with SMTP id 133so3575973pgc.12
-        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 17:01:02 -0800 (PST)
+        with ESMTP id S231445AbhLABLU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Nov 2021 20:11:20 -0500
+Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7795C061746
+        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 17:08:00 -0800 (PST)
+Received: by mail-pg1-x532.google.com with SMTP id 133so3592936pgc.12
+        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 17:08:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=zmFqBEQlvltO6acviVLYEbC1w3hF1kHBhe0mktEwzGk=;
-        b=gmUqS/1+VFLEhCIyad8Xcqaqs88aotTEEq/v1N3jGPaCTz0zt4xo5DybyKQ14uJMu5
-         d1tcw4XQCBXcesEXtb7GV68bJ6MoS1vTfscgB9ChAatirailMSR7psHutEKyWkfIN5Al
-         LMQlxiZ3dDA6TQkSCDNk+tIl1B8w6fXG4wt+kBcNBNcfBcujMO1x4FE5R49f+SfIR9YZ
-         Hy5GnV3/IK+Ukcm5mzsVZQiFHTyudUHFkCQ/lzMWQmFFjt1EXiscxFZh9o7t37SBXs43
-         kWsKRQ54x8dTsyf5m/oY7ch+/sgdtvFfUH26kPDq+r+ywNsL3Vwo3FE6k7OF6FJcb/6A
-         tI3w==
+        bh=vbRT8aXA3F1xt3PU8F3O8agTqIaZlbDpUx5b8CZCQKY=;
+        b=fT5iWAGZX+tpuhGkx/az1x5XGClubCRCkpS/kkCJTV1/53Yx3PUbOe9L1df2WtXSt+
+         AKZKjPqXgpiF2ya71hO4+ewV37JU7xx461fYNP5jIyMNyADtvVLswuURNf5mFl+xUagL
+         CN0eMhGMZo9pv7hYyCr/dOc8QKCASC00WIXlKcr0bW0ET7iatUb7Ohd7QylxEPJHtjLq
+         TbQZiZndthKKq7i+qvfI0urd1fUyR6xgl0YDaybr0kL7I7LCuE1jnIGOOj5+IADI5hy1
+         v2D0EnTLgVmNjW1SkQczO1tTXivxHClJnpgKUHiPqwN+0SWyEGRjNJWP0btYog4LBEUN
+         KZxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=zmFqBEQlvltO6acviVLYEbC1w3hF1kHBhe0mktEwzGk=;
-        b=JcoNUg3DVR2cTiweV6+/yquLkn0CPRrau5wkaL2oCYwsBdi98waEc2+pLMpLa8uHn4
-         W++4EFvpaJ2hKMWfuM3+zTPuS/qxXOi9zO49Iw5/JuaV8j+S1/+3jLaSh+jUVHUVfypm
-         HI4QH3NPv2V3EQE5uwhaH9XcQoiwznURfEEirHMaIrRYSwbqFK1gl+a4VTL5ym7O9X5Z
-         XbuPdz3XRsdWWoRGJkF3KtKRMhVM30c2kpnY+IFRkMrdxkQRxbfRFCdygblYGAhD+cX+
-         Ppe+kOaTwMDaiPkse/DkWaQCmI0OXrdvQdmI9VEO0hS6UyaKwcEr07bgHrcVg1ZOt27x
-         Zbmw==
-X-Gm-Message-State: AOAM530899L5KtN3eHJV31iVxQ9H2l5jZm/PBpEzWi6AZ7NsZNjFh01i
-        Id49OBTSSR6tYOV0jDCCC8lvWw==
-X-Google-Smtp-Source: ABdhPJxS/T8hRfTSUQusFRjWv1dbEuETNftI5GKso8ggTAhLHoWNzSPqJc0b5tiVkEGa9yowTlDHEw==
-X-Received: by 2002:a62:dd54:0:b0:4a2:93f7:c20a with SMTP id w81-20020a62dd54000000b004a293f7c20amr2874377pff.46.1638320461624;
-        Tue, 30 Nov 2021 17:01:01 -0800 (PST)
+        bh=vbRT8aXA3F1xt3PU8F3O8agTqIaZlbDpUx5b8CZCQKY=;
+        b=QAajVAe/CCG7ZWS1eF9KggOxswcPperdkBZkp8YS1ydUpqEMx/NsuCONdULuGelMGi
+         UDiL5avG/Z2ljaCdg/CQN2i663TbNeS9GX508nHhYGACDdHwHR8PRhomUXsi9dX4ZUcj
+         et6ugk0QboUaQLm0RpzXlaku4QpvbMNhGoEcfSRWe6nVUH4iUGUuUZakupu2aHxrl1Ig
+         dK9tN5Un84KZm7Cnzk/dgdekSVKp4Zn+3cFdwCSCSxDxAGhc2uE5RqHPHy2d3Mnyt9Yq
+         YFJWIZHocRdvfwo0plkL6p5t63YeHRt4a+5HqtUI9yB2191ATxA/H401eBTonJaC2HeE
+         LQkw==
+X-Gm-Message-State: AOAM531ZyrsAC/tHnUnPwmVYRtLFbRznp09+ZN78WOB9J1OIrx2MMSHY
+        dHjNV+Eb+iKT4divJPgfDBVzcw==
+X-Google-Smtp-Source: ABdhPJzC1qeyr70CZme3ye39kJgvSth76594RljQ4Bv+NT1siBBapSHrb4rL7Ge5ghX0RunE32HUpw==
+X-Received: by 2002:a05:6a00:2349:b0:4a8:d87:e8ad with SMTP id j9-20020a056a00234900b004a80d87e8admr2962268pfj.15.1638320880128;
+        Tue, 30 Nov 2021 17:08:00 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id l9sm1982994pfu.55.2021.11.30.17.01.00
+        by smtp.gmail.com with ESMTPSA id m24sm15869121pgk.39.2021.11.30.17.07.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Nov 2021 17:01:01 -0800 (PST)
-Date:   Wed, 1 Dec 2021 01:00:57 +0000
+        Tue, 30 Nov 2021 17:07:59 -0800 (PST)
+Date:   Wed, 1 Dec 2021 01:07:56 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-        kvm@vger.kernel.org, Ben Gardon <bgardon@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>,
-        Junaid Shahid <junaids@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Harish Barathvajasankar <hbarath@google.com>,
-        Peter Shier <pshier@google.com>
-Subject: Re: [RFC PATCH 12/15] KVM: x86/mmu: Split large pages when dirty
- logging is enabled
-Message-ID: <YabJSdRklj3T6FWJ@google.com>
-References: <20211119235759.1304274-1-dmatlack@google.com>
- <20211119235759.1304274-13-dmatlack@google.com>
- <YaDMg3/xUSwL5+Ei@xz-m1.local>
- <CALzav=cXgCSP3RLh+gss65==B6eYXC82V3zNjv2KCNehUMQewA@mail.gmail.com>
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Anup Patel <anup.patel@wdc.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Atish Patra <atish.patra@wdc.com>,
+        Ben Gardon <bgardon@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 03/29] KVM: Resync only arch fields when
+ slots_arch_lock gets reacquired
+Message-ID: <YabK7IOM74ag2CcS@google.com>
+References: <cover.1638304315.git.maciej.szmigiero@oracle.com>
+ <a47c93c2fe40e7ed27eb0ff6ac2b173254058b6c.1638304315.git.maciej.szmigiero@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CALzav=cXgCSP3RLh+gss65==B6eYXC82V3zNjv2KCNehUMQewA@mail.gmail.com>
+In-Reply-To: <a47c93c2fe40e7ed27eb0ff6ac2b173254058b6c.1638304315.git.maciej.szmigiero@oracle.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 30, 2021, David Matlack wrote:
-> On Fri, Nov 26, 2021 at 4:01 AM Peter Xu <peterx@redhat.com> wrote:
-> >
-> > Hi, David,
-> >
-> > On Fri, Nov 19, 2021 at 11:57:56PM +0000, David Matlack wrote:
-> > > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > > index 2a7564703ea6..432a4df817ec 100644
-> > > --- a/arch/x86/include/asm/kvm_host.h
-> > > +++ b/arch/x86/include/asm/kvm_host.h
-> > > @@ -1232,6 +1232,9 @@ struct kvm_arch {
-> > >       hpa_t   hv_root_tdp;
-> > >       spinlock_t hv_root_tdp_lock;
-> > >  #endif
-> > > +
-> > > +     /* MMU caches used when splitting large pages during VM-ioctls. */
-> > > +     struct kvm_mmu_memory_caches split_caches;
-> >
-> > Are mmu_gfn_array_cache and mmu_pte_list_desc_cache wasted here?  I saw that
-> > "struct kvm_mmu_memory_cache" still takes up quite a few hundreds of bytes,
-> > just want to make sure we won't waste them in vain.
+On Tue, Nov 30, 2021, Maciej S. Szmigiero wrote:
+> From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
 > 
-> Yes they are wasted right now. But there's a couple of things to keep in mind:
+> There is no need to copy the whole memslot data after releasing
+> slots_arch_lock for a moment to install temporary memslots copy in
+> kvm_set_memslot() since this lock only protects the arch field of each
+> memslot.
 > 
-> 1. They are also wasted in every vCPU (in the per-vCPU caches) that
-> does not use the shadow MMU.
-> 2. They will (I think) be used eventually when I add Eager Page
-> Splitting support to the shadow MMU.
-> 3. split_caches is per-VM so it's only a few hundred bytes per VM.
+> Just resync this particular field after reacquiring slots_arch_lock.
 > 
-> If we really want to save the memory the right way forward might be to
-> make each kvm_mmu_memory_cache a pointer instead of an embedded
-> struct. Then we can allocate each dynamically only as needed. I can
-> add that to my TODO list but I don't think it'd be worth blocking this
-> on it given the points above.
+> Note, this also eliminates the need to manually clear the INVALID flag
+> when restoring memslots; the "setting" of the INVALID flag was an
+> unwanted side effect of copying the entire memslots.
 > 
-> >
-> > [...]
-> >
-> > > +int mmu_topup_split_caches(struct kvm *kvm)
-> > > +{
-> > > +     struct kvm_mmu_memory_caches *split_caches = &kvm->arch.split_caches;
-> > > +     int r;
-> > > +
-> > > +     assert_split_caches_invariants(kvm);
-> > > +
-> > > +     r = kvm_mmu_topup_memory_cache(&split_caches->page_header_cache, 1);
-> > > +     if (r)
-> > > +             goto out;
-> > > +
-> > > +     r = kvm_mmu_topup_memory_cache(&split_caches->shadow_page_cache, 1);
-> > > +     if (r)
-> > > +             goto out;
-> >
-> > Is it intended to only top-up with one cache object?  IIUC this means we'll try
-> > to proactively yield the cpu for each of the huge page split right after the
-> > object is consumed.
-> >
-> > Wondering whether it be more efficient to make it a slightly larger number, so
-> > we don't overload the memory but also make the loop a bit more efficient.
+> Since kvm_copy_memslots() has just one caller remaining now
+> open-code it instead.
 > 
-> IIUC, 1 here is just the min needed for kvm_mmu_topup_memory_cache to
-> return success. I chose 1 for each because it's the minimum necessary
-> to make forward progress (split one large page).
+> Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+> [sean: tweak shortlog, note INVALID flag in changelog, revert comment]
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-The @min parameter is minimum number of pages that _must_ be available in the
-cache, i.e. it's the maximum number of pages that can theoretically be used by
-whatever upcoming operation is going to be consuming pages from the cache.
+Heh, I think you can drop my SoB?  This is new territory for me, I don't know the
+rules for this particular situation.
 
-So '1' is technically correct, but I think it's the wrong choice given the behavior
-of this code.  E.g. if there's 1 object in the cache, the initial top-up will do
-nothing, and then tdp_mmu_split_large_pages_root() will almost immediately drop
-mmu_lock to topup the cache.  Since the in-loop usage explicitly checks for an
-empty cache, i.e. any non-zero @min will have identical behavior, I think it makes
-sense to use KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE _and_ add a comment explaining why.
- 
-> No matter what you pass for min kvm_mmu_topup_memory_cache() will
-> still always try to allocate KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE
-> objects.
-
-No, it will try to allocate KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE if and only if there
-are fewer than @min objects in the cache. 
+Reviewed-by: Sean Christopherson <seanjc@google.com>
