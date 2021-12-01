@@ -2,102 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 39D3446520A
-	for <lists+kvm@lfdr.de>; Wed,  1 Dec 2021 16:48:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4125346521F
+	for <lists+kvm@lfdr.de>; Wed,  1 Dec 2021 16:53:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351220AbhLAPv0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Dec 2021 10:51:26 -0500
-Received: from vps-vb.mhejs.net ([37.28.154.113]:46482 "EHLO vps-vb.mhejs.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1351133AbhLAPtd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Dec 2021 10:49:33 -0500
-Received: from MUA
-        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <mail@maciej.szmigiero.name>)
-        id 1msRo4-0008Ik-Ke; Wed, 01 Dec 2021 16:46:04 +0100
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Igor Mammedov <imammedo@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Julien Thierry <julien.thierry.kdev@gmail.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        Ben Gardon <bgardon@google.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <cover.1638304315.git.maciej.szmigiero@oracle.com>
- <a39db04edcacfe955c660e2f139f948cf29362f5.1638304316.git.maciej.szmigiero@oracle.com>
- <YabvBW90COsfdoYx@google.com>
-From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Subject: Re: [PATCH v6 26/29] KVM: Optimize gfn lookup in kvm_zap_gfn_range()
-Message-ID: <7119b08c-e82a-8b81-7f9e-2e79f8276d51@maciej.szmigiero.name>
-Date:   Wed, 1 Dec 2021 16:45:58 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        id S1351166AbhLAP4c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Dec 2021 10:56:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36948 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1351168AbhLAP4S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Dec 2021 10:56:18 -0500
+Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4D27C061757
+        for <kvm@vger.kernel.org>; Wed,  1 Dec 2021 07:52:56 -0800 (PST)
+Received: by mail-lj1-x22d.google.com with SMTP id 13so48970469ljj.11
+        for <kvm@vger.kernel.org>; Wed, 01 Dec 2021 07:52:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=mx5dsdfz5OCSLF2KexsR17z+OQVCcJktBVTzMjmEoJ8=;
+        b=pexgAzRgXY/1geXePlsTBZDrzBDu1p2gRtnq2cRAfzBigxzIRbaII3NH13sBhkLIee
+         /nFW/nNnG9+OMmAxicgRbZFlKD2OV7cYVtEU2o1q4gT7TsuTO2+ooiICqsSJJJ0rJV7G
+         xB0agkG8fYIRXG6gvbc9if22pm9BgEZEo/ypoWkUr7z5662IqhIdZB5qqVhHIsE60s0/
+         RpRRuCQdkd+3Fm81SDwxk0BahKKEH8QM05C+Awzy9IT4GfS3OnlxwDvD2FMXNMsIlqPx
+         Ab/b63eleqMsZzTomJZ/RQ9pknKr72R+bJ/Z04b00bqCZX/E27c4YzIyEgMxp66HfSNz
+         dxnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=mx5dsdfz5OCSLF2KexsR17z+OQVCcJktBVTzMjmEoJ8=;
+        b=Q7DWX6eeqEnyRcvhHValDtXhFTU5m23Dj/jQnCVywjwpSkQFD2o+o1UjE2lEFBentm
+         16CAX8irXV4aHKkJBVoYsiHAnFnGqfqmSK5g/ka+2C3GsxAZYakyDj5Z8Z78ZPBUsGrY
+         /o1/CZnAbhln8ggjIwDxg9QUoxskqWFMGAlb+/y3Vb/JVqVUZZqBbDK3uKXZAM9iN312
+         lmLmHO1ybmp08hvSzzRyB1vcHlerKiLRPyCoWxkuRgwzLno7VD8P0QJa7/xuQlALa7eO
+         7Us/UF0lCU4NBtDqgraMmxabJxG1rFVDC288hiG597GfGCKQsc9wZ355KqAKMxie5OyC
+         ZG3w==
+X-Gm-Message-State: AOAM530tUWw13kFf6bMwu1p6W6c54lmj4g6Hh1/jxfB8JmoN5V9YPZDn
+        ayQpCf4fTgoSvjpuPgbSuJxqfh9zVJj6hGA18IMB+3yuznc=
+X-Google-Smtp-Source: ABdhPJyQQe0BOvRpWo1wHLFVy65HP5wS2wZVjEw+auOl6P3ynLiLkdMNzIgQDrp1SMsIPpe3icDwQCYfW2jHpS+lgvs=
+X-Received: by 2002:a05:651c:1035:: with SMTP id w21mr6160729ljm.278.1638373974799;
+ Wed, 01 Dec 2021 07:52:54 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <YabvBW90COsfdoYx@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20211123005036.2954379-1-pbonzini@redhat.com> <20211123005036.2954379-2-pbonzini@redhat.com>
+In-Reply-To: <20211123005036.2954379-2-pbonzini@redhat.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Wed, 1 Dec 2021 08:52:43 -0700
+Message-ID: <CAMkAt6qOuXX1NCe=wwVXP7CeWdUiPQ0cdJr21jQn=h5pyEkpSA@mail.gmail.com>
+Subject: Re: [PATCH 01/12] selftests: fix check for circular KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 01.12.2021 04:41, Sean Christopherson wrote:
-> On Tue, Nov 30, 2021, Maciej S. Szmigiero wrote:
->> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
->> index 41efe53cf150..6fce6eb797a7 100644
->> --- a/include/linux/kvm_host.h
->> +++ b/include/linux/kvm_host.h
->> @@ -848,6 +848,105 @@ struct kvm_memory_slot *id_to_memslot(struct kvm_memslots *slots, int id)
->>   	return NULL;
->>   }
->>   
->> +/* Iterator used for walking memslots that overlap a gfn range. */
->> +struct kvm_memslot_iter {
->> +	struct kvm_memslots *slots;
->> +	gfn_t end;
->> +	struct rb_node *node;
->> +};
-> 
-> ...
-> 
->> +static inline struct kvm_memory_slot *kvm_memslot_iter_slot(struct kvm_memslot_iter *iter)
->> +{
->> +	return container_of(iter->node, struct kvm_memory_slot, gfn_node[iter->slots->node_idx]);
-> 
-> Having to use a helper in callers of kvm_for_each_memslot_in_gfn_range() is a bit
-> ugly, any reason not to grab @slot as well?  Then the callers just do iter.slot,
-> which IMO is much more readable.
+On Mon, Nov 22, 2021 at 5:50 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM leaves the source VM in a dead state,
+> so migrating back to the original source VM fails the ioctl.  Adjust
+> the test.
+>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-"slot" can be easily calculated from "node" together with either "slots" or
-"node_idx" (the code above just adjusts a pointer) so storing it in the
-iterator makes little sense if the later are already stored there.
-
-> And if we do that, I'd also vote to omit slots and end from the iterator.  It would
-> mean passing in slots and end to kvm_memslot_iter_is_valid() and kvm_memslot_iter_next(),
-> but that's more idiomatic in a for-loop if iter is considered to be _just_ the iterator
-> part.  "slots" is arguable, but "end" really shouldn't be part of the iterator.
-
-You're right that we can get away with not storing "end", will remove it.
-
-Thanks,
-Maciej
+Reviewed-by: Peter Gonda <pgonda@google.com>
