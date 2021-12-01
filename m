@@ -2,90 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B0838464D7A
-	for <lists+kvm@lfdr.de>; Wed,  1 Dec 2021 13:04:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 90C19464E46
+	for <lists+kvm@lfdr.de>; Wed,  1 Dec 2021 13:56:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349112AbhLAMIL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Dec 2021 07:08:11 -0500
-Received: from sin.source.kernel.org ([145.40.73.55]:54904 "EHLO
-        sin.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349148AbhLAMII (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Dec 2021 07:08:08 -0500
+        id S244740AbhLANAH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Dec 2021 08:00:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52300 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1349444AbhLANAG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Dec 2021 08:00:06 -0500
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FB99C061574
+        for <kvm@vger.kernel.org>; Wed,  1 Dec 2021 04:56:45 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id BEAB1CE1DD5
-        for <kvm@vger.kernel.org>; Wed,  1 Dec 2021 12:04:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72751C58321;
-        Wed,  1 Dec 2021 12:04:44 +0000 (UTC)
+        by sin.source.kernel.org (Postfix) with ESMTPS id CB312CE1DB3
+        for <kvm@vger.kernel.org>; Wed,  1 Dec 2021 12:56:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADC8AC53FCC;
+        Wed,  1 Dec 2021 12:56:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1638360284;
-        bh=mGMA0LdI86boJc0KzjqubEoj0yuCdbIywxvtvcR4UZQ=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=KBVpPhPnx4WCCeo8UdKJkpMJ1uU1UI/jjwkKwL0olZVAxBn0+6pNJ53yZM2TvYzaE
-         b1N2LmKsqSNyIG8ODMFs3AK/XTutaWZj/oZ1XSG/bfLDsjWOk1gG3qI96O1VQHpp3v
-         dA8goNAYUOlB3z/t3cxvvQWBEbsNhpoeJV+fzeY4szG/6jpFJO5lB7t3WVJiGY+TAR
-         pb5cZe2YNKupZRSLyjAEyzuTIG3cll4MT2zSoWlyf75x8aUJbibFmXBLvJpcQb3KtV
-         RAljay7YQ0kFwJTJgxL+HQ6e0XllS8jhmoU16JDKfGZEV2QKzM5uSLvK4aGu9Iurmi
-         tnY5zg9BBBtZw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=why.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1msOLq-0097Ab-Jh; Wed, 01 Dec 2021 12:04:42 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Cc:     James Morse <james.morse@arm.com>,
+        s=k20201202; t=1638363402;
+        bh=cnf6mfxlAvT1EOVOQLzydeQXHEFrZLvejOYfDA/BBzU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=SimVJWW+qLh2pH2sPCh8qp7C4Lli3mx0D3w0p0GxOWg1GIAmJeGsCk/iF7IHk+0mq
+         aqb+L0EpbrdzsL9y9BnjWt7rPEkaxIiaFKMLVfTWuge4JfxPJAZhwppYtddXYqlItd
+         hcVRET9aiMMfOO3Y+DbpOHdjtXSTBSlKtXJkxtW7Z1yO2VKaRCfTTxfOdt80KepEtZ
+         o6tFVxquQg3hUs6eQC7M2VU7x+SI7Ep08kGerYaOsDXvX0/GsCf1hwCZi63kmTzENM
+         YSH8l0NN5vmOxQF/u5ypaiAw8K3CVn96fhRKR8DIgxQT6WExXyp+E60Rl102SPev/K
+         rVbFWP8HfXXpg==
+Date:   Wed, 1 Dec 2021 12:56:36 +0000
+From:   Mark Brown <broonie@kernel.org>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Quentin Perret <qperret@google.com>,
-        Will Deacon <will@kernel.org>, broonie@kernel.org,
+        Will Deacon <will@kernel.org>,
         Zenghui Yu <yuzenghui@huawei.com>, kernel-team@android.com
-Subject: [PATCH v3 6/6] arm64/fpsimd: Document the use of TIF_FOREIGN_FPSTATE by KVM
-Date:   Wed,  1 Dec 2021 12:04:36 +0000
-Message-Id: <20211201120436.389756-7-maz@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20211201120436.389756-1-maz@kernel.org>
+Subject: Re: [PATCH v3 3/6] KVM: arm64: Remove unused __sve_save_state
+Message-ID: <YadxBLbaSxkBuqaF@sirena.org.uk>
 References: <20211201120436.389756-1-maz@kernel.org>
+ <20211201120436.389756-4-maz@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, qperret@google.com, will@kernel.org, broonie@kernel.org, yuzenghui@huawei.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="SujizcpWR574KISM"
+Content-Disposition: inline
+In-Reply-To: <20211201120436.389756-4-maz@kernel.org>
+X-Cookie: All true wisdom is found on T-shirts.
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The bit of documentation that talks about TIF_FOREIGN_FPSTATE
-does not mention the ungodly tricks that KVM plays with this flag.
 
-Try and document this for the posterity.
+--SujizcpWR574KISM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Reviewed-by: Mark Brown <broonie@kernel.org>
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kernel/fpsimd.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+On Wed, Dec 01, 2021 at 12:04:33PM +0000, Marc Zyngier wrote:
+> Now that we don't have any users left for __sve_save_state, remove
+> it altogether. Should we ever need to save the SVE state from the
+> hypervisor again, we can always re-introduce it.
 
-diff --git a/arch/arm64/kernel/fpsimd.c b/arch/arm64/kernel/fpsimd.c
-index fa244c426f61..6fb361e8bed8 100644
---- a/arch/arm64/kernel/fpsimd.c
-+++ b/arch/arm64/kernel/fpsimd.c
-@@ -78,7 +78,11 @@
-  * indicate whether or not the userland FPSIMD state of the current task is
-  * present in the registers. The flag is set unless the FPSIMD registers of this
-  * CPU currently contain the most recent userland FPSIMD state of the current
-- * task.
-+ * task. If the task is behaving as a VMM, then this is will be managed by
-+ * KVM which will clear it to indicate that the vcpu FPSIMD state is currently
-+ * loaded on the CPU, allowing the state to be saved if a FPSIMD-aware
-+ * softirq kicks in. Upon vcpu_put(), KVM will save the vcpu FP state and
-+ * flag the register state as invalid.
-  *
-  * In order to allow softirq handlers to use FPSIMD, kernel_neon_begin() may
-  * save the task's FPSIMD context back to task_struct from softirq context.
--- 
-2.30.2
+Reviwed-by: Mark Brown <broonie@kernel.org>
 
+--SujizcpWR574KISM
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmGncQMACgkQJNaLcl1U
+h9CaowgAgKZUZSBDBwrJAF4oArHVKzIxedIFVD0xv22xdR4NfTcy2Dmv3sbM08Va
+41yJc4LOvrd51ybnaFI6zrhSBk/TKUR+/ayCmKnR/lgchfIdipAyDTYWsR+KXuF3
+TUpo6HlxvvDkYf5VkoM1cBz1l8AX6ooLrT9e0Ndc2FUmBKkpVZS69FasbEw8Odzj
+vzkjUe+ThdgHV1K4lwHZX1vzf78A6XTAE8eqTjM2oF+6XIBGBR0ZKvPGQ6SHij47
+29oGnpXpg9M2v+1hHlffr3oT0XWdelA58Bh1TJifF3fdIOMX1Ys3IkhAVtIJcezT
+HD7ctSuEw7HGwOKl/OYsku062y9QRA==
+=0x81
+-----END PGP SIGNATURE-----
+
+--SujizcpWR574KISM--
