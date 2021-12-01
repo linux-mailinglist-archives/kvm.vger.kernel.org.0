@@ -2,177 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 203EA46447E
-	for <lists+kvm@lfdr.de>; Wed,  1 Dec 2021 02:29:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 56CD84644AF
+	for <lists+kvm@lfdr.de>; Wed,  1 Dec 2021 02:59:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233553AbhLABdB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Nov 2021 20:33:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38930 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230183AbhLABdA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 30 Nov 2021 20:33:00 -0500
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EC9CC061574
-        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 17:29:40 -0800 (PST)
-Received: by mail-lf1-x12b.google.com with SMTP id k37so58590313lfv.3
-        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 17:29:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=I7QkS/3LaNMozeuLEGU+HVMk+GdSSdWWWQ+92EhjyI8=;
-        b=iacrYMXKGfrjS3oBHOvTG0bqUadxV0p9tNOrTYgt4cIzOvxorFa1IE8G4TAJP5yLUu
-         AGu2N8LiMinxnjessPh/axosV/pgu8EQbQql0FGIxzMJYE5drWQBc2Y3+iKAMnMKJL0/
-         JqL01nQtvsdv2Jnf/utoZJOJZGL8FuEFe0bYK75XTb2PsznvuQc1pOX2m6yC09M+rTeG
-         +3IoqCdI5PnDjlLXOiIKlKh9ETtKcUyuNu8wtsfcmUHirr9iJ54RidUrj4hE5ppRjSlZ
-         Y32FiZwwl0SYO+rY34GkGXQ5/RnYFx7thHxhYg9OYrfqb5Z24ulKCMsSDcCpZDA5EWkp
-         QCjg==
+        id S1345743AbhLACC6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Nov 2021 21:02:58 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:50113 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1345678AbhLACC5 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 30 Nov 2021 21:02:57 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1638323975;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ZjQnk43BT/VD1oLUmaOofcdkEDVX+UP+GWGYl4tKu+A=;
+        b=enzhrFwRAVvFgMDxEvfV7Rp48c7PKV2gpPr6ZDHbLu0FgO4gq40KdSZXVPPd03DW/DVCUo
+        aU3Bb6QOfxyQQo38BkycZN2ViN4TNLW+kyjsxTWjSujVJSJznkgLXiUUXPCLM0q45qNx2W
+        tpWmw9diEHEpDGhyofXa01w+mMBKzH8=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-8-ifq25Eh-NLS10NylumMOGQ-1; Tue, 30 Nov 2021 20:59:34 -0500
+X-MC-Unique: ifq25Eh-NLS10NylumMOGQ-1
+Received: by mail-wm1-f70.google.com with SMTP id l6-20020a05600c4f0600b0033321934a39so13851412wmq.9
+        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 17:59:34 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=I7QkS/3LaNMozeuLEGU+HVMk+GdSSdWWWQ+92EhjyI8=;
-        b=Z/pIoOw+f9COSBEdDStpSErHrB6ZNYaPakf0RgDmb447iwqXE3vckG48JDEyuW3FMd
-         m1KUFVghqKt4BeuEyCiDNYrBspo5ml0LmwRyeYzR2LCJjgKBDztIvgfjd0Li2LrKnEQi
-         mZVLkohb37wHqPtJCJnpDA87AEloijuOVbVEPrr7kPO3KQqW/ANKr9qJSzVWuSmVbt0h
-         JWIaXlhewQUbNAX53k5AK4T6tXsws2sKJPOBCNQMzhz9RKb23dybnI4dn8bR5dwa5nuR
-         g73kikVDdS6FuFg+mnNHjO4BfI2zc0J5vFwTJbqeUqdN/tT/xwrcCA58W88fqrhO0Utf
-         wG/w==
-X-Gm-Message-State: AOAM533vulk/8hqITBcEqwgLT+o1xkH7rq4HyDgdM8Xu+0d7rszG99d2
-        PrU5wrtmCV7QBkj+Vy6bWKUUxaVoTNgVZopSBfoxHw==
-X-Google-Smtp-Source: ABdhPJz3l2xFLj/ItGNLJ4Oumy5TDOgJRnvZzVks4yyZ0jHEQSTDatWqVbAfo5UCfWS5BLH1NKgCFvYEVU+1xGdKkjo=
-X-Received: by 2002:ac2:558d:: with SMTP id v13mr2842625lfg.190.1638322177271;
- Tue, 30 Nov 2021 17:29:37 -0800 (PST)
-MIME-Version: 1.0
-References: <20211119235759.1304274-1-dmatlack@google.com> <20211119235759.1304274-13-dmatlack@google.com>
- <YaDMg3/xUSwL5+Ei@xz-m1.local> <CALzav=cXgCSP3RLh+gss65==B6eYXC82V3zNjv2KCNehUMQewA@mail.gmail.com>
- <YabJSdRklj3T6FWJ@google.com>
-In-Reply-To: <YabJSdRklj3T6FWJ@google.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Tue, 30 Nov 2021 17:29:10 -0800
-Message-ID: <CALzav=cJpWPF1RzsEZcoN+ZX8kM3OquKQR-8rdTksZ6cs1R+EQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 12/15] KVM: x86/mmu: Split large pages when dirty
- logging is enabled
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=ZjQnk43BT/VD1oLUmaOofcdkEDVX+UP+GWGYl4tKu+A=;
+        b=Yt+w5cE5etkfli9VAWZZQiCCx99WzdIqXgl8wjQENrObCWd65wZfLSH8bPuRSO3b5t
+         5qvU2gjk1U28XxPq45xvuPny7Zfxxw5P5j4+uJg4t1/EFaRus4UEsyDL6gJG6CGU8+oU
+         DCbZSZEXHqb2NNZbx+DjwL45O5gUuPEfQgr0+j6Zwh+I9C6JcPrhg0sqWTAlT++fGjeW
+         Y4X/FyV6aMjC+0LxVU8YS0uwI0s6rRAfR3EnNHhvTKLqbUvUIHoOZVO9WjEpKbcp0nYr
+         sI5LaQQCsnUckmlhIsWBpKTM2oS/VQzG5+wY5b/T/1nKxkLPra9uJsts/wXBedeESCu6
+         VSKQ==
+X-Gm-Message-State: AOAM5300sxgRjZc094nqaD+3lD+UTO7UMRaDwwS3ZNynM7mjQWjAD7nM
+        wj3Mjg9k2pJtxpzh/a1Y4H7ToJ5ABbkwFRSYUFm8uTLZWNzC61q8PgCscF23/7B5ni/ThcT00EV
+        XD/AEeboR36ie
+X-Received: by 2002:a5d:548b:: with SMTP id h11mr3125540wrv.11.1638323973118;
+        Tue, 30 Nov 2021 17:59:33 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzuk71/wV2y9/bQ4LxtxPbfJ4SEHLcWQJW2cVRdxDpeqJqquGGrYI3PHv7TYazTBv5GLMio0Q==
+X-Received: by 2002:a5d:548b:: with SMTP id h11mr3125514wrv.11.1638323972906;
+        Tue, 30 Nov 2021 17:59:32 -0800 (PST)
+Received: from xz-m1.local ([64.64.123.10])
+        by smtp.gmail.com with ESMTPSA id u23sm3922459wmc.7.2021.11.30.17.59.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Nov 2021 17:59:32 -0800 (PST)
+Date:   Wed, 1 Dec 2021 09:59:23 +0800
+From:   Peter Xu <peterx@redhat.com>
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-        kvm@vger.kernel.org, Ben Gardon <bgardon@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>,
-        Junaid Shahid <junaids@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Harish Barathvajasankar <hbarath@google.com>,
-        Peter Shier <pshier@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Cc:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Shier <pshier@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Yulei Zhang <yulei.kernel@gmail.com>,
+        Wanpeng Li <kernellwp@gmail.com>,
+        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
+        Kai Huang <kai.huang@intel.com>,
+        Keqian Zhu <zhukeqian1@huawei.com>,
+        David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH 15/15] KVM: x86/mmu: Promote pages in-place when
+ disabling dirty logging
+Message-ID: <YabW+7Fp03JTQHSW@xz-m1.local>
+References: <20211115234603.2908381-1-bgardon@google.com>
+ <20211115234603.2908381-16-bgardon@google.com>
+ <YZ8OpQmB/8k3/Maj@xz-m1.local>
+ <CANgfPd9pK83S+yoRokLg7wiroE6-OkieATTqgGn3yCCzwNFi4A@mail.gmail.com>
+ <YaXSh6RUOH7NHG8G@xz-m1.local>
+ <YaZK7lxaBMGfYIdz@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <YaZK7lxaBMGfYIdz@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 30, 2021 at 5:01 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Tue, Nov 30, 2021, David Matlack wrote:
-> > On Fri, Nov 26, 2021 at 4:01 AM Peter Xu <peterx@redhat.com> wrote:
-> > >
-> > > Hi, David,
-> > >
-> > > On Fri, Nov 19, 2021 at 11:57:56PM +0000, David Matlack wrote:
-> > > > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > > > index 2a7564703ea6..432a4df817ec 100644
-> > > > --- a/arch/x86/include/asm/kvm_host.h
-> > > > +++ b/arch/x86/include/asm/kvm_host.h
-> > > > @@ -1232,6 +1232,9 @@ struct kvm_arch {
-> > > >       hpa_t   hv_root_tdp;
-> > > >       spinlock_t hv_root_tdp_lock;
-> > > >  #endif
-> > > > +
-> > > > +     /* MMU caches used when splitting large pages during VM-ioctls. */
-> > > > +     struct kvm_mmu_memory_caches split_caches;
-> > >
-> > > Are mmu_gfn_array_cache and mmu_pte_list_desc_cache wasted here?  I saw that
-> > > "struct kvm_mmu_memory_cache" still takes up quite a few hundreds of bytes,
-> > > just want to make sure we won't waste them in vain.
-> >
-> > Yes they are wasted right now. But there's a couple of things to keep in mind:
-> >
-> > 1. They are also wasted in every vCPU (in the per-vCPU caches) that
-> > does not use the shadow MMU.
-> > 2. They will (I think) be used eventually when I add Eager Page
-> > Splitting support to the shadow MMU.
-> > 3. split_caches is per-VM so it's only a few hundred bytes per VM.
-> >
-> > If we really want to save the memory the right way forward might be to
-> > make each kvm_mmu_memory_cache a pointer instead of an embedded
-> > struct. Then we can allocate each dynamically only as needed. I can
-> > add that to my TODO list but I don't think it'd be worth blocking this
-> > on it given the points above.
-> >
-> > >
-> > > [...]
-> > >
-> > > > +int mmu_topup_split_caches(struct kvm *kvm)
-> > > > +{
-> > > > +     struct kvm_mmu_memory_caches *split_caches = &kvm->arch.split_caches;
-> > > > +     int r;
-> > > > +
-> > > > +     assert_split_caches_invariants(kvm);
-> > > > +
-> > > > +     r = kvm_mmu_topup_memory_cache(&split_caches->page_header_cache, 1);
-> > > > +     if (r)
-> > > > +             goto out;
-> > > > +
-> > > > +     r = kvm_mmu_topup_memory_cache(&split_caches->shadow_page_cache, 1);
-> > > > +     if (r)
-> > > > +             goto out;
-> > >
-> > > Is it intended to only top-up with one cache object?  IIUC this means we'll try
-> > > to proactively yield the cpu for each of the huge page split right after the
-> > > object is consumed.
-> > >
-> > > Wondering whether it be more efficient to make it a slightly larger number, so
-> > > we don't overload the memory but also make the loop a bit more efficient.
-> >
-> > IIUC, 1 here is just the min needed for kvm_mmu_topup_memory_cache to
-> > return success. I chose 1 for each because it's the minimum necessary
-> > to make forward progress (split one large page).
->
-> The @min parameter is minimum number of pages that _must_ be available in the
-> cache, i.e. it's the maximum number of pages that can theoretically be used by
-> whatever upcoming operation is going to be consuming pages from the cache.
->
-> So '1' is technically correct, but I think it's the wrong choice given the behavior
-> of this code.  E.g. if there's 1 object in the cache, the initial top-up will do
-> nothing,
+On Tue, Nov 30, 2021 at 04:01:50PM +0000, Sean Christopherson wrote:
+> On Tue, Nov 30, 2021, Peter Xu wrote:
+> > On Mon, Nov 29, 2021 at 10:31:14AM -0800, Ben Gardon wrote:
+> > > 2. There could be a pointer to the page table in a vCPU's paging
+> > > structure caches, which are similar to the TLB but cache partial
+> > > translations. These are also cleared out on TLB flush.
+> > 
+> > Could you elaborate what's the structure cache that you mentioned?  I thought
+> > the processor page walker will just use the data cache (L1-L3) as pgtable
+> > caches, in which case IIUC the invalidation happens when we do WRITE_ONCE()
+> > that'll invalidate all the rest data cache besides the writter core.  But I
+> > could be completely missing something..
+> 
+> Ben is referring to the Intel SDM's use of the term "paging-structure caches"
+> Intel CPUs, and I'm guessing other x86 CPUs, cache upper level entries, e.g. the
+> L4 PTE for a given address, to avoid having to do data cache lookups, reserved
+> bits checked, A/D assists, etc...   Like full VA=>PA TLB entries, these entries
+> are associated with the PCID, VPID, EPT4A, etc...
+> 
+> The data caches are still used when reading PTEs that aren't cached in the TLB,
+> the extra caching in the "TLB" is optimization on top.
+> 
+>   28.3.1 Information That May Be Cached
+>   Section 4.10, “Caching Translation Information” in Intel® 64 and IA-32 Architectures
+>   Software Developer’s Manual, Volume 3A identifies two kinds of translation-related
+>   information that may be cached by a logical processor: translations, which are mappings
+>   from linear page numbers to physical page frames, and paging-structure caches, which
+>   map the upper bits of a linear page number to information from the paging-structure
+>   entries used to translate linear addresses matching those upper bits.
 
-This scenario will not happen though, since we free the caches after
-splitting. So, the next time userspace enables dirty logging on a
-memslot and we go to do the initial top-up the caches will have 0
-objects.
+Ah, I should have tried harder when reading the spec, where I just stopped at
+4.10.2... :) They're also described in general section of 4.10.3 and also on
+how TLB invalidations affect these caches in 4.10.4.
 
-> and then tdp_mmu_split_large_pages_root() will almost immediately drop
-> mmu_lock to topup the cache.  Since the in-loop usage explicitly checks for an
-> empty cache, i.e. any non-zero @min will have identical behavior, I think it makes
-> sense to use KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE _and_ add a comment explaining why.
+Thanks again to both!
 
-If we set the min to KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE,
-kvm_mmu_topup_memory_cache will return ENOMEM if it can't allocate at
-least KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE objects, even though we really
-only need 1 to make forward progress.
+-- 
+Peter Xu
 
-It's a total edge case but there could be a scenario where userspace
-sets the cgroup memory limits so tight that we can't allocate
-KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE objects when splitting the last few
-pages and in the end we only needed 1 or 2 objects to finish
-splitting. In this case we'd end up with a spurious pr_warn and may
-not split the last few pages depending on which cache failed to get
-topped up.
-
-
->
-> > No matter what you pass for min kvm_mmu_topup_memory_cache() will
-> > still always try to allocate KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE
-> > objects.
->
-> No, it will try to allocate KVM_ARCH_NR_OBJS_PER_MEMORY_CACHE if and only if there
-> are fewer than @min objects in the cache.
