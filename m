@@ -2,132 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8079946528B
-	for <lists+kvm@lfdr.de>; Wed,  1 Dec 2021 17:10:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B090A46528C
+	for <lists+kvm@lfdr.de>; Wed,  1 Dec 2021 17:10:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351400AbhLAQNh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S1351420AbhLAQNh (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Wed, 1 Dec 2021 11:13:37 -0500
-Received: from foss.arm.com ([217.140.110.172]:40994 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1351420AbhLAQMi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Dec 2021 11:12:38 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EA79F143B;
-        Wed,  1 Dec 2021 08:09:16 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 58FC13F766;
-        Wed,  1 Dec 2021 08:09:15 -0800 (PST)
-Date:   Wed, 1 Dec 2021 16:09:09 +0000
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Reiji Watanabe <reijiw@google.com>
-Cc:     Eric Auger <eauger@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        linux-arm-kernel@lists.infradead.org
-Subject: Re: [RFC PATCH v3 09/29] KVM: arm64: Hide IMPLEMENTATION DEFINED PMU
- support for the guest
-Message-ID: <YaeeJUGRwZN00byk@monolith.localdoman>
-References: <20211117064359.2362060-1-reijiw@google.com>
- <20211117064359.2362060-10-reijiw@google.com>
- <d09e53a7-b8df-e8fd-c34a-f76a37d664d6@redhat.com>
- <CAAeT=FzM=sLF=PkY_shhcYmfo+ReGEBN8XX=QQObavXDtwxFJQ@mail.gmail.com>
- <YaeabhZnYNLQcejs@monolith.localdoman>
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38608 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1351397AbhLAQMq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 1 Dec 2021 11:12:46 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B1FBhND002239
+        for <kvm@vger.kernel.org>; Wed, 1 Dec 2021 16:09:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=gMXlWQpTv2o3MQmkizQTdhfpg7GduVKpeSUPw/TGKfk=;
+ b=gSy1wiiyceGTrNVzu76oYsGdJHB7Ro/H2NzLS+xSDmYaQ+OVk9/YSelbuoE2sLx70TJA
+ 21jiTRtKDP7+OEtxY7keUebDVelXZcx+lvZTZLW2gfqftt1jbi0HaU1Fc4lSrphEk+KF
+ jEoEc1w6rfusm13oJ2cnH4Z984Kxv2E7GozpJ5CSCYF9Gdz+x+PFpvv6HT9CaCrI/MND
+ Qt9gqyaLsKcmSe99w0z3msLqAIub8dcx0dRf/9rcWHl/EnaDzXipedsqjlGyc6aoYkZ3
+ 19YPkEBVqkAZR1VRHgZudTBBlVJMOQjix7Ibfdtebq6C6lYdGjz3XxM6GyuuRCaEpcl7 eA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3cpb6m219d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 01 Dec 2021 16:09:24 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1B1FD395011119
+        for <kvm@vger.kernel.org>; Wed, 1 Dec 2021 16:09:24 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3cpb6m218m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 01 Dec 2021 16:09:24 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1B1FvNgm017136;
+        Wed, 1 Dec 2021 16:09:22 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma03fra.de.ibm.com with ESMTP id 3ckcaa1u9g-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 01 Dec 2021 16:09:22 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1B1G1pfT19792304
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 1 Dec 2021 16:01:51 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CFE4FAE061;
+        Wed,  1 Dec 2021 16:09:18 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BF5BCAE059;
+        Wed,  1 Dec 2021 16:09:18 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Wed,  1 Dec 2021 16:09:18 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
+        id 6559EE1261; Wed,  1 Dec 2021 17:09:18 +0100 (CET)
+From:   Christian Borntraeger <borntraeger@linux.ibm.com>
+To:     kvm@vger.kernel.org, Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>
+Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>
+Subject: [kvm-unit-tests PATCH] s390x/cpumodel: give each test a unique output line
+Date:   Wed,  1 Dec 2021 17:09:17 +0100
+Message-Id: <20211201160917.331509-1-borntraeger@linux.ibm.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YaeabhZnYNLQcejs@monolith.localdoman>
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: ZWfrhVMqY7aj60eJeUrJa8fT-8uqLpop
+X-Proofpoint-GUID: a46uJangq_H7H3ISoqjGjw8iN3YdQX0o
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
+ definitions=2021-11-30_10,2021-12-01_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
+ priorityscore=1501 mlxscore=0 phishscore=0 lowpriorityscore=0
+ suspectscore=0 mlxlogscore=672 clxscore=1015 bulkscore=0 impostorscore=0
+ adultscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2110150000 definitions=main-2112010089
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Reiji,
+Until now we had multiple tests running under the same prefix. This can
+result in multiple identical lines like
+SKIP: cpumodel: dependency: facility 5 not present
+SKIP: cpumodel: dependency: facility 5 not present
 
-On Wed, Dec 01, 2021 at 03:53:18PM +0000, Alexandru Elisei wrote:
-> Hi Reiji,
-> 
-> On Mon, Nov 29, 2021 at 09:32:02PM -0800, Reiji Watanabe wrote:
-> > Hi Eric,
-> > 
-> > On Thu, Nov 25, 2021 at 12:30 PM Eric Auger <eauger@redhat.com> wrote:
-> > >
-> > > Hi Reiji,
-> > >
-> > > On 11/17/21 7:43 AM, Reiji Watanabe wrote:
-> > > > When ID_AA64DFR0_EL1.PMUVER or ID_DFR0_EL1.PERFMON is 0xf, which
-> > > > means IMPLEMENTATION DEFINED PMU supported, KVM unconditionally
-> > > > expose the value for the guest as it is.  Since KVM doesn't support
-> > > > IMPLEMENTATION DEFINED PMU for the guest, in that case KVM should
-> > > > exopse 0x0 (PMU is not implemented) instead.
-> > > s/exopse/expose
-> > > >
-> > > > Change cpuid_feature_cap_perfmon_field() to update the field value
-> > > > to 0x0 when it is 0xf.
-> > > is it wrong to expose the guest with a Perfmon value of 0xF? Then the
-> > > guest should not use it as a PMUv3?
-> > 
-> > > is it wrong to expose the guest with a Perfmon value of 0xF? Then the
-> > > guest should not use it as a PMUv3?
-> > 
-> > For the value 0xf in ID_AA64DFR0_EL1.PMUVER and ID_DFR0_EL1.PERFMON,
-> > Arm ARM says:
-> >   "IMPLEMENTATION DEFINED form of performance monitors supported,
-> >    PMUv3 not supported."
-> > 
-> > Since the PMU that KVM supports for guests is PMUv3, 0xf shouldn't
-> > be exposed to guests (And this patch series doesn't allow userspace
-> > to set the fields to 0xf for guests).
-> 
-> While it's true that a value of 0xf means that PMUv3 is not present (both
-> KVM and the PMU driver handle it this way) this is an userspace visible
-> change.
-> 
-> Are you sure there isn't software in the wild that relies on this value
-> being 0xf to detect that some non-Arm architected hardware is present?
-> 
-> Since both 0 and 0xf are valid values that mean that PMUv3 is not present,
-> I think it's best that both are kept.
+Make this unique by adding a proper prefix.
 
-Sorry, somehow I managed to get myself confused and didn't realize that
-this is only used by KVM.
+Signed-off-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+---
+ s390x/cpumodel.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-What I said above about the possibility of software existing that pokes IMP
-DEF registers when PMUVer = 0xf is in fact a good argument for this patch,
-because KVM injects an undefined exception when a guest tries to access
-such registers.
+diff --git a/s390x/cpumodel.c b/s390x/cpumodel.c
+index 67bb6543f4a8..12bc82c1d0ec 100644
+--- a/s390x/cpumodel.c
++++ b/s390x/cpumodel.c
+@@ -116,14 +116,15 @@ int main(void)
+ 
+ 	report_prefix_push("dependency");
+ 	for (i = 0; i < ARRAY_SIZE(dep); i++) {
++		report_prefix_pushf("%d implies %d", dep[i].facility, dep[i].implied);
+ 		if (test_facility(dep[i].facility)) {
+ 			report_xfail(dep[i].expected_tcg_fail && vm_is_tcg(),
+ 				     test_facility(dep[i].implied),
+-				     "%d implies %d",
+-				     dep[i].facility, dep[i].implied);
++				     "but not available");
+ 		} else {
+ 			report_skip("facility %d not present", dep[i].facility);
+ 		}
++		report_prefix_pop();
+ 	}
+ 	report_prefix_pop();
+ 
+-- 
+2.31.1
 
-Thanks,
-Alex
-
-> 
-> Thanks,
-> Alex
-> 
-> > 
-> > Thanks,
-> > Reiji
-> > 
-> > >
-> > > Eric
-> > > >
-> > > > Fixes: 8e35aa642ee4 ("arm64: cpufeature: Extract capped perfmon fields")
-> > > > Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> > > > ---
-> > > >  arch/arm64/include/asm/cpufeature.h | 2 +-
-> > > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > >
-> > > > diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-> > > > index ef6be92b1921..fd7ad8193827 100644
-> > > > --- a/arch/arm64/include/asm/cpufeature.h
-> > > > +++ b/arch/arm64/include/asm/cpufeature.h
-> > > > @@ -553,7 +553,7 @@ cpuid_feature_cap_perfmon_field(u64 features, int field, u64 cap)
-> > > >
-> > > >       /* Treat IMPLEMENTATION DEFINED functionality as unimplemented */
-> > > >       if (val == ID_AA64DFR0_PMUVER_IMP_DEF)
-> > > > -             val = 0;
-> > > > +             return (features & ~mask);
-> > > >
-> > > >       if (val > cap) {
-> > > >               features &= ~mask;
-> > > >
-> > >
