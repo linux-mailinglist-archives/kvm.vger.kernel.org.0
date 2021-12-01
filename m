@@ -2,116 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B2A13465222
-	for <lists+kvm@lfdr.de>; Wed,  1 Dec 2021 16:53:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A0376465229
+	for <lists+kvm@lfdr.de>; Wed,  1 Dec 2021 16:54:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351220AbhLAP4o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Dec 2021 10:56:44 -0500
-Received: from foss.arm.com ([217.140.110.172]:40472 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1351198AbhLAP4n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Dec 2021 10:56:43 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8E489143B;
-        Wed,  1 Dec 2021 07:53:22 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9CDF13F766;
-        Wed,  1 Dec 2021 07:53:20 -0800 (PST)
-Date:   Wed, 1 Dec 2021 15:53:18 +0000
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Reiji Watanabe <reijiw@google.com>
-Cc:     Eric Auger <eauger@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Will Deacon <will@kernel.org>, Peter Shier <pshier@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        linux-arm-kernel@lists.infradead.org
-Subject: Re: [RFC PATCH v3 09/29] KVM: arm64: Hide IMPLEMENTATION DEFINED PMU
- support for the guest
-Message-ID: <YaeabhZnYNLQcejs@monolith.localdoman>
-References: <20211117064359.2362060-1-reijiw@google.com>
- <20211117064359.2362060-10-reijiw@google.com>
- <d09e53a7-b8df-e8fd-c34a-f76a37d664d6@redhat.com>
- <CAAeT=FzM=sLF=PkY_shhcYmfo+ReGEBN8XX=QQObavXDtwxFJQ@mail.gmail.com>
+        id S1351195AbhLAP6F (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Dec 2021 10:58:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37358 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1350990AbhLAP6D (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Dec 2021 10:58:03 -0500
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EEC5C061574
+        for <kvm@vger.kernel.org>; Wed,  1 Dec 2021 07:54:42 -0800 (PST)
+Received: by mail-lf1-x135.google.com with SMTP id t26so64052867lfk.9
+        for <kvm@vger.kernel.org>; Wed, 01 Dec 2021 07:54:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=mvTtuysyQCI1n/oqJGGYBcob/YefOLkNXx9pXmlLQOU=;
+        b=gGZyz8AEbKWulwrqym0HTU3OkuaPPJtecaG0GD22vJz5yqjmk8O1rH6zvW9beeVKOS
+         racMMC7dIuXCxv7ctrnhYX6h+lRWfi+zDnT1T+zc9pFunu9oVEZW2EvCIK8H4iOsdvDH
+         Up+O5jipF4CbMTV17o6prZM33ewJ5Da0tMnb+1u21UqzmPOykb8Ek8rNtthP+ni6G4iT
+         e40mET9MAfIhL79MFv6X40Z349akKQz9uBLx6qQuUZyPqhNtUd+xiGefq1ga3xBQ+Tuc
+         w3v3imPwF9oiyOvx+pMTU33nL4lngBOouZ5j25Uotf9wGWyuosDB5MfY37NVezmODNGj
+         ujXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=mvTtuysyQCI1n/oqJGGYBcob/YefOLkNXx9pXmlLQOU=;
+        b=YHAyjzgy505pLPOtU6QH/jbOlLRTldhx/CE8Q/VQlpNcJUwPZSb1umVGeHmzNDJVlm
+         0jN14kppun4lprxScJ3U7SDFBrUIxkaaQHyfXTB+9TxGNdXJl1umD67LCW/QVDo+EQlZ
+         FsFOqpNYasTgYxx5RyX0HZFq4u3zkXkwZf/oQwv2v9sCu7x8fCxpLbT80Z27GeUhr0u9
+         ugU76yiTPBp7+WG2eRERWXrC4oXWYAIl7lnz7xQa6G/WJ98lRvuz74e7kycwYIqc5Cze
+         DkdIfFyUhm5INQRthuwgRsYzhisBxSGMMXjvbrtNUstjb3TEC9Nti+933xsriS/Lyjc8
+         kVJQ==
+X-Gm-Message-State: AOAM530VEpjUQFMzeZKDNg7QmI5rEnIfNIH4R3//gvMWznwGdX1dddDQ
+        NX+Bc9ZLleFVTt9jvsEds1zTWSARr5Vo5J8/X3DGYg==
+X-Google-Smtp-Source: ABdhPJy9YLJEVJOb1DOptKyECwI0us301AsNtFEhmcHCSxbXMpdayiHW+iyIukMr7Ch0XyJto2ma0t12zErJ9jQ32ps=
+X-Received: by 2002:ac2:4ad9:: with SMTP id m25mr6757568lfp.193.1638374080289;
+ Wed, 01 Dec 2021 07:54:40 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAAeT=FzM=sLF=PkY_shhcYmfo+ReGEBN8XX=QQObavXDtwxFJQ@mail.gmail.com>
+References: <20211123005036.2954379-1-pbonzini@redhat.com> <20211123005036.2954379-3-pbonzini@redhat.com>
+In-Reply-To: <20211123005036.2954379-3-pbonzini@redhat.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Wed, 1 Dec 2021 08:54:28 -0700
+Message-ID: <CAMkAt6p_9YR05T3TQH4abzAKXX3y_H46R60JZ2Qb_9idV5m1qg@mail.gmail.com>
+Subject: Re: [PATCH 02/12] selftests: sev_migrate_tests: free all VMs
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Reiji,
+On Mon, Nov 22, 2021 at 5:50 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> Ensure that the ASID are freed promptly, which becomes more important
+> when more tests are added to this file.
+>
+> Cc: Peter Gonda <pgonda@google.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-On Mon, Nov 29, 2021 at 09:32:02PM -0800, Reiji Watanabe wrote:
-> Hi Eric,
-> 
-> On Thu, Nov 25, 2021 at 12:30 PM Eric Auger <eauger@redhat.com> wrote:
-> >
-> > Hi Reiji,
-> >
-> > On 11/17/21 7:43 AM, Reiji Watanabe wrote:
-> > > When ID_AA64DFR0_EL1.PMUVER or ID_DFR0_EL1.PERFMON is 0xf, which
-> > > means IMPLEMENTATION DEFINED PMU supported, KVM unconditionally
-> > > expose the value for the guest as it is.  Since KVM doesn't support
-> > > IMPLEMENTATION DEFINED PMU for the guest, in that case KVM should
-> > > exopse 0x0 (PMU is not implemented) instead.
-> > s/exopse/expose
-> > >
-> > > Change cpuid_feature_cap_perfmon_field() to update the field value
-> > > to 0x0 when it is 0xf.
-> > is it wrong to expose the guest with a Perfmon value of 0xF? Then the
-> > guest should not use it as a PMUv3?
-> 
-> > is it wrong to expose the guest with a Perfmon value of 0xF? Then the
-> > guest should not use it as a PMUv3?
-> 
-> For the value 0xf in ID_AA64DFR0_EL1.PMUVER and ID_DFR0_EL1.PERFMON,
-> Arm ARM says:
->   "IMPLEMENTATION DEFINED form of performance monitors supported,
->    PMUv3 not supported."
-> 
-> Since the PMU that KVM supports for guests is PMUv3, 0xf shouldn't
-> be exposed to guests (And this patch series doesn't allow userspace
-> to set the fields to 0xf for guests).
-
-While it's true that a value of 0xf means that PMUv3 is not present (both
-KVM and the PMU driver handle it this way) this is an userspace visible
-change.
-
-Are you sure there isn't software in the wild that relies on this value
-being 0xf to detect that some non-Arm architected hardware is present?
-
-Since both 0 and 0xf are valid values that mean that PMUv3 is not present,
-I think it's best that both are kept.
-
-Thanks,
-Alex
-
-> 
-> Thanks,
-> Reiji
-> 
-> >
-> > Eric
-> > >
-> > > Fixes: 8e35aa642ee4 ("arm64: cpufeature: Extract capped perfmon fields")
-> > > Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> > > ---
-> > >  arch/arm64/include/asm/cpufeature.h | 2 +-
-> > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > >
-> > > diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
-> > > index ef6be92b1921..fd7ad8193827 100644
-> > > --- a/arch/arm64/include/asm/cpufeature.h
-> > > +++ b/arch/arm64/include/asm/cpufeature.h
-> > > @@ -553,7 +553,7 @@ cpuid_feature_cap_perfmon_field(u64 features, int field, u64 cap)
-> > >
-> > >       /* Treat IMPLEMENTATION DEFINED functionality as unimplemented */
-> > >       if (val == ID_AA64DFR0_PMUVER_IMP_DEF)
-> > > -             val = 0;
-> > > +             return (features & ~mask);
-> > >
-> > >       if (val > cap) {
-> > >               features &= ~mask;
-> > >
-> >
+Reviewed-by: Peter Gonda <pgonda@google.com>
