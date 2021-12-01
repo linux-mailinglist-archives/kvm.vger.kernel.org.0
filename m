@@ -2,124 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 56CD84644AF
-	for <lists+kvm@lfdr.de>; Wed,  1 Dec 2021 02:59:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DDA9E4644D8
+	for <lists+kvm@lfdr.de>; Wed,  1 Dec 2021 03:21:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345743AbhLACC6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 30 Nov 2021 21:02:58 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:50113 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1345678AbhLACC5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 30 Nov 2021 21:02:57 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1638323975;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZjQnk43BT/VD1oLUmaOofcdkEDVX+UP+GWGYl4tKu+A=;
-        b=enzhrFwRAVvFgMDxEvfV7Rp48c7PKV2gpPr6ZDHbLu0FgO4gq40KdSZXVPPd03DW/DVCUo
-        aU3Bb6QOfxyQQo38BkycZN2ViN4TNLW+kyjsxTWjSujVJSJznkgLXiUUXPCLM0q45qNx2W
-        tpWmw9diEHEpDGhyofXa01w+mMBKzH8=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-8-ifq25Eh-NLS10NylumMOGQ-1; Tue, 30 Nov 2021 20:59:34 -0500
-X-MC-Unique: ifq25Eh-NLS10NylumMOGQ-1
-Received: by mail-wm1-f70.google.com with SMTP id l6-20020a05600c4f0600b0033321934a39so13851412wmq.9
-        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 17:59:34 -0800 (PST)
+        id S1346029AbhLACZH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 30 Nov 2021 21:25:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50428 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1345957AbhLACZF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 30 Nov 2021 21:25:05 -0500
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05AFAC061746
+        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 18:21:46 -0800 (PST)
+Received: by mail-pj1-x102f.google.com with SMTP id p18-20020a17090ad31200b001a78bb52876so19785174pju.3
+        for <kvm@vger.kernel.org>; Tue, 30 Nov 2021 18:21:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=gie1EwZxonCzFvugUYBX8WOXYkfnwgMVP4++lOOlv+c=;
+        b=BHHWYuF18555l0y3u6rGa+kEPLUpRnTak219rl+ifA1BegpvG+NBgLb0it0I4y1PBo
+         opX2RyrCSzAxdaDMxLHZgYuQBb3UVPD2vfYENDpOiOvKud4gngvK2ESBdq2wzO7bvYFs
+         Uom+60iWQDBpxbmPU70HUiBcp58Q+IzMSy+kvlJ0vEJ1p8v4tuSDuU8pkpbNTFB618qG
+         GRyKbd/AR+lkFA4jCgEvLeAjD26ZWOnk3TJw1kKRu0Qd77in9KBkimE5/N26zN4jm81l
+         dcBG7UIm2ufF53HRCOZW7kupF9U+VKWo5L41OJTTQxhPRxp8ZLBeqKPhTwxyhB0gaVmZ
+         Kypw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=ZjQnk43BT/VD1oLUmaOofcdkEDVX+UP+GWGYl4tKu+A=;
-        b=Yt+w5cE5etkfli9VAWZZQiCCx99WzdIqXgl8wjQENrObCWd65wZfLSH8bPuRSO3b5t
-         5qvU2gjk1U28XxPq45xvuPny7Zfxxw5P5j4+uJg4t1/EFaRus4UEsyDL6gJG6CGU8+oU
-         DCbZSZEXHqb2NNZbx+DjwL45O5gUuPEfQgr0+j6Zwh+I9C6JcPrhg0sqWTAlT++fGjeW
-         Y4X/FyV6aMjC+0LxVU8YS0uwI0s6rRAfR3EnNHhvTKLqbUvUIHoOZVO9WjEpKbcp0nYr
-         sI5LaQQCsnUckmlhIsWBpKTM2oS/VQzG5+wY5b/T/1nKxkLPra9uJsts/wXBedeESCu6
-         VSKQ==
-X-Gm-Message-State: AOAM5300sxgRjZc094nqaD+3lD+UTO7UMRaDwwS3ZNynM7mjQWjAD7nM
-        wj3Mjg9k2pJtxpzh/a1Y4H7ToJ5ABbkwFRSYUFm8uTLZWNzC61q8PgCscF23/7B5ni/ThcT00EV
-        XD/AEeboR36ie
-X-Received: by 2002:a5d:548b:: with SMTP id h11mr3125540wrv.11.1638323973118;
-        Tue, 30 Nov 2021 17:59:33 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzuk71/wV2y9/bQ4LxtxPbfJ4SEHLcWQJW2cVRdxDpeqJqquGGrYI3PHv7TYazTBv5GLMio0Q==
-X-Received: by 2002:a5d:548b:: with SMTP id h11mr3125514wrv.11.1638323972906;
-        Tue, 30 Nov 2021 17:59:32 -0800 (PST)
-Received: from xz-m1.local ([64.64.123.10])
-        by smtp.gmail.com with ESMTPSA id u23sm3922459wmc.7.2021.11.30.17.59.26
+         :mime-version:content-disposition:in-reply-to;
+        bh=gie1EwZxonCzFvugUYBX8WOXYkfnwgMVP4++lOOlv+c=;
+        b=dmJdTO/siK+hCdiWmurxO9ZHDm9U4utoiGY8o8gKKFUJyPM15Pu0SzY70k/CNZ8uV6
+         dV89jsJidFkDIqLWWXMp8dnGDevGms5rLe+IDdlQc2JYPzJhBSaKxG+SDkRbT8BMgVDA
+         1X+ZHyUF4nRsBjikmSDNixKdoRarG7RmIJw59ZJOC6z0Q9BvLweENIzlkdUqsTeQXNOq
+         Sr1e2DBrOVWp3Tzt1vZo32Li3Jf33rT9hkykRPaJksa/uwURGslkGoz9DQm0uXAeaRo4
+         qw6P+fCjJL7Ba3DmV1+tHt3JjtQ/g1eZBHnXlfbglrrbQN3Mg7si/hFDxft20I7j5ysf
+         xDyw==
+X-Gm-Message-State: AOAM532xRnFQPABOQ8dfoTiB2QXZ3HZ3vNpGTc1xw0NkU02FNaaDOGS9
+        elSZ7By//x6CeLkbTLT9y0fuGw==
+X-Google-Smtp-Source: ABdhPJx7ckMHu0ZBbHoG3wVdN35yNz+jTnr/6AkXoHITLna8yQnOkJAuMipyrJqERvLCPmT0P99eUg==
+X-Received: by 2002:a17:902:748c:b0:141:c45e:c612 with SMTP id h12-20020a170902748c00b00141c45ec612mr3544713pll.73.1638325305343;
+        Tue, 30 Nov 2021 18:21:45 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id j13sm21251711pfc.151.2021.11.30.18.21.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Nov 2021 17:59:32 -0800 (PST)
-Date:   Wed, 1 Dec 2021 09:59:23 +0800
-From:   Peter Xu <peterx@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Shier <pshier@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Yulei Zhang <yulei.kernel@gmail.com>,
-        Wanpeng Li <kernellwp@gmail.com>,
-        Xiao Guangrong <xiaoguangrong.eric@gmail.com>,
-        Kai Huang <kai.huang@intel.com>,
-        Keqian Zhu <zhukeqian1@huawei.com>,
-        David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH 15/15] KVM: x86/mmu: Promote pages in-place when
- disabling dirty logging
-Message-ID: <YabW+7Fp03JTQHSW@xz-m1.local>
-References: <20211115234603.2908381-1-bgardon@google.com>
- <20211115234603.2908381-16-bgardon@google.com>
- <YZ8OpQmB/8k3/Maj@xz-m1.local>
- <CANgfPd9pK83S+yoRokLg7wiroE6-OkieATTqgGn3yCCzwNFi4A@mail.gmail.com>
- <YaXSh6RUOH7NHG8G@xz-m1.local>
- <YaZK7lxaBMGfYIdz@google.com>
+        Tue, 30 Nov 2021 18:21:44 -0800 (PST)
+Date:   Wed, 1 Dec 2021 02:21:41 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Igor Mammedov <imammedo@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Anup Patel <anup.patel@wdc.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Atish Patra <atish.patra@wdc.com>,
+        Ben Gardon <bgardon@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 18/29] KVM: x86: Use nr_memslot_pages to avoid
+ traversing the memslots array
+Message-ID: <YabcNaCb88s/CTop@google.com>
+References: <cover.1638304315.git.maciej.szmigiero@oracle.com>
+ <74663af27fd6e25b7846da343f7013b1e9885a4b.1638304316.git.maciej.szmigiero@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <YaZK7lxaBMGfYIdz@google.com>
+In-Reply-To: <74663af27fd6e25b7846da343f7013b1e9885a4b.1638304316.git.maciej.szmigiero@oracle.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 30, 2021 at 04:01:50PM +0000, Sean Christopherson wrote:
-> On Tue, Nov 30, 2021, Peter Xu wrote:
-> > On Mon, Nov 29, 2021 at 10:31:14AM -0800, Ben Gardon wrote:
-> > > 2. There could be a pointer to the page table in a vCPU's paging
-> > > structure caches, which are similar to the TLB but cache partial
-> > > translations. These are also cleared out on TLB flush.
-> > 
-> > Could you elaborate what's the structure cache that you mentioned?  I thought
-> > the processor page walker will just use the data cache (L1-L3) as pgtable
-> > caches, in which case IIUC the invalidation happens when we do WRITE_ONCE()
-> > that'll invalidate all the rest data cache besides the writter core.  But I
-> > could be completely missing something..
+On Tue, Nov 30, 2021, Maciej S. Szmigiero wrote:
+> From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
 > 
-> Ben is referring to the Intel SDM's use of the term "paging-structure caches"
-> Intel CPUs, and I'm guessing other x86 CPUs, cache upper level entries, e.g. the
-> L4 PTE for a given address, to avoid having to do data cache lookups, reserved
-> bits checked, A/D assists, etc...   Like full VA=>PA TLB entries, these entries
-> are associated with the PCID, VPID, EPT4A, etc...
+> There is no point in recalculating from scratch the total number of pages
+> in all memslots each time a memslot is created or deleted.  Use KVM's
+> cached nr_memslot_pages to compute the default max number of MMU pages.
 > 
-> The data caches are still used when reading PTEs that aren't cached in the TLB,
-> the extra caching in the "TLB" is optimization on top.
+> Note that even with nr_memslot_pages capped at ULONG_MAX we can't safely
+> multiply it by KVM_PERMILLE_MMU_PAGES (20) since this operation can
+> possibly overflow an unsigned long variable.
 > 
->   28.3.1 Information That May Be Cached
->   Section 4.10, “Caching Translation Information” in Intel® 64 and IA-32 Architectures
->   Software Developer’s Manual, Volume 3A identifies two kinds of translation-related
->   information that may be cached by a logical processor: translations, which are mappings
->   from linear page numbers to physical page frames, and paging-structure caches, which
->   map the upper bits of a linear page number to information from the paging-structure
->   entries used to translate linear addresses matching those upper bits.
+> Write this "* 20 / 1000" operation as "/ 50" instead to avoid such
+> overflow.
+> 
+> Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+> [sean: use common KVM field and rework changelog accordingly]
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-Ah, I should have tried harder when reading the spec, where I just stopped at
-4.10.2... :) They're also described in general section of 4.10.3 and also on
-how TLB invalidations affect these caches in 4.10.4.
+My SoB can definitely be dropped for this one, just consider it review feedback
+that happened to have an SoB attached.
 
-Thanks again to both!
-
--- 
-Peter Xu
-
+Reviewed-by: Sean Christopherson <seanjc@google.com> 
