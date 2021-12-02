@@ -2,254 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CEF7D46610B
-	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 10:59:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C81EC46615C
+	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 11:21:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240993AbhLBKDE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Dec 2021 05:03:04 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:57818 "EHLO
+        id S1356918AbhLBKYm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Dec 2021 05:24:42 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:38862 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231446AbhLBKC6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 2 Dec 2021 05:02:58 -0500
+        by vger.kernel.org with ESMTP id S1356910AbhLBKYl (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 2 Dec 2021 05:24:41 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1638439176;
+        s=mimecast20190719; t=1638440478;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=6yN5hveEfujHo9to4/YhvNOcbUorOwiHB//UhyWng2g=;
-        b=FnfQrOCww7u8GILmwvvr2RtKqS67PK1fleldhulwf6WGaYLbA1M00HWGiZzrdi1cU7suV7
-        oznYiBdmuChu0BFUa4312yCtQRuiZUv2P0QGVJ/dutvu6O+l3InREAx2smCVLNUOZAqVVS
-        mFvgm6HcTr+UVLfVWqRNcB2aQOrIfHE=
+        bh=m4HlULEGQ+u/lfRbooSYsdnXMPgjmp3tTKFINSv7JFM=;
+        b=jR2Jxz3tP2VpsAq9tl8h1fuMHXT3d4aRFjfL2YL8Yp8+fL9yNCSBCk2M2XUVxcPZUeImuj
+        Kdztr1P5c1mfOqvLncQKKkERVbc4JwxdRYYZKRA8+2cy8p0EZ7gYyahQPUAijxFYxvXy/3
+        cWsYE8UIY7EEbOF2kmPSSiMoXuB1Aig=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-559-_nfj5OrnMyOxMG1LV9oFXg-1; Thu, 02 Dec 2021 04:59:33 -0500
-X-MC-Unique: _nfj5OrnMyOxMG1LV9oFXg-1
+ us-mta-590-FTxu8o4JPGuzaC45aDiDWA-1; Thu, 02 Dec 2021 05:21:13 -0500
+X-MC-Unique: FTxu8o4JPGuzaC45aDiDWA-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C10CF81EE61;
-        Thu,  2 Dec 2021 09:59:31 +0000 (UTC)
-Received: from t480s.redhat.com (unknown [10.39.194.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8607C5D9CA;
-        Thu,  2 Dec 2021 09:59:05 +0000 (UTC)
-From:   David Hildenbrand <david@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ABDFE81EE60;
+        Thu,  2 Dec 2021 10:21:09 +0000 (UTC)
+Received: from starship (unknown [10.40.192.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D73445D9CA;
+        Thu,  2 Dec 2021 10:20:56 +0000 (UTC)
+Message-ID: <f55056c55892dd42592e5c242fa7a1561c6cee90.camel@redhat.com>
+Subject: Re: [PATCH v2 11/43] KVM: Don't block+unblock when halt-polling is
+ successful
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Paul Mackerras <paulus@ozlabs.org>,
+        Anup Patel <anup.patel@wdc.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Atish Patra <atish.patra@wdc.com>,
+        David Hildenbrand <david@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Sebastian Mitterle <smitterl@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
-        David Hildenbrand <david@redhat.com>
-Subject: [kvm-unit-tests PATCH v1 2/2] s390x: firq: floating interrupt test
-Date:   Thu,  2 Dec 2021 10:58:43 +0100
-Message-Id: <20211202095843.41162-3-david@redhat.com>
-In-Reply-To: <20211202095843.41162-1-david@redhat.com>
-References: <20211202095843.41162-1-david@redhat.com>
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
+        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        David Matlack <dmatlack@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jing Zhang <jingzhangos@google.com>
+Date:   Thu, 02 Dec 2021 12:20:55 +0200
+In-Reply-To: <YaUNBfJh35WXMV0M@google.com>
+References: <20211009021236.4122790-1-seanjc@google.com>
+         <20211009021236.4122790-12-seanjc@google.com>
+         <cceb33be9e2a6ac504bb95a7b2b8cf5fe0b1ff26.camel@redhat.com>
+         <4e883728e3e5201a94eb46b56315afca5e95ad9c.camel@redhat.com>
+         <YaUNBfJh35WXMV0M@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We had a KVM BUG fixed by kernel commit a3e03bc1368c ("KVM: s390: index
-kvm->arch.idle_mask by vcpu_idx"), whereby a floating interrupt might get
-stuck forever because a CPU in the wait state would not get woken up.
+On Mon, 2021-11-29 at 17:25 +0000, Sean Christopherson wrote:
+> On Mon, Nov 29, 2021, Maxim Levitsky wrote:
+> > (This thing is that when you tell the IOMMU that a vCPU is not running,
+> > Another thing I discovered that this patch series totally breaks my VMs,
+> > without cpu_pm=on The whole series (I didn't yet bisect it) makes even my
+> > fedora32 VM be very laggy, almost unusable, and it only has one
+> > passed-through device, a nic).
+> 
+> Grrrr, the complete lack of comments in the KVM code and the separate paths for
+> VMX vs SVM when handling HLT with APICv make this all way for difficult to
+> understand than it should be.
+> 
+> The hangs are likely due to:
+> 
+>   KVM: SVM: Unconditionally mark AVIC as running on vCPU load (with APICv)
+> 
+> If a posted interrupt arrives after KVM has done its final search through the vIRR,
+> but before avic_update_iommu_vcpu_affinity() is called, the posted interrupt will
+> be set in the vIRR without triggering a host IRQ to wake the vCPU via the GA log.
+> 
+> I.e. KVM is missing an equivalent to VMX's posted interrupt check for an outstanding
+> notification after switching to the wakeup vector.
+> 
+> For now, the least awful approach is sadly to keep the vcpu_(un)blocking() hooks.
+> Unlike VMX's PI support, there's no fast check for an interrupt being posted (KVM
+> would have to rewalk the vIRR), no easy to signal the current CPU to do wakeup (I
+> don't think KVM even has access to the IRQ used by the owning IOMMU), and there's
+> no simplification of load/put code.
 
-The issue can be triggered when CPUs are created in a nonlinear fashion,
-such that the CPU address ("core-id") and the KVM cpu id don't match.
-
-So let's start with a floating interrupt test that will trigger a
-floating interrupt (via SCLP) to be delivered to a CPU in the wait state.
-
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- s390x/Makefile      |   1 +
- s390x/firq.c        | 141 ++++++++++++++++++++++++++++++++++++++++++++
- s390x/unittests.cfg |  10 ++++
- 3 files changed, 152 insertions(+)
- create mode 100644 s390x/firq.c
-
-diff --git a/s390x/Makefile b/s390x/Makefile
-index f95f2e6..1e567c1 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -25,6 +25,7 @@ tests += $(TEST_DIR)/uv-host.elf
- tests += $(TEST_DIR)/edat.elf
- tests += $(TEST_DIR)/mvpg-sie.elf
- tests += $(TEST_DIR)/spec_ex-sie.elf
-+tests += $(TEST_DIR)/firq.elf
+I have an idea.
  
- tests_binary = $(patsubst %.elf,%.bin,$(tests))
- ifneq ($(HOST_KEY_DOCUMENT),)
-diff --git a/s390x/firq.c b/s390x/firq.c
-new file mode 100644
-index 0000000..3e60681
---- /dev/null
-+++ b/s390x/firq.c
-@@ -0,0 +1,141 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Floating interrupt tests.
-+ *
-+ * Copyright 2021 Red Hat Inc
-+ *
-+ * Authors:
-+ *    David Hildenbrand <david@redhat.com>
-+ */
-+#include <libcflat.h>
-+#include <asm/asm-offsets.h>
-+#include <asm/interrupt.h>
-+#include <asm/page.h>
-+#include <asm-generic/barrier.h>
-+
-+#include <sclp.h>
-+#include <smp.h>
-+#include <alloc_page.h>
-+
-+static int testflag = 0;
-+
-+static void wait_for_flag(void)
-+{
-+	while (!testflag)
-+		mb();
-+}
-+
-+static void set_flag(int val)
-+{
-+	mb();
-+	testflag = val;
-+	mb();
-+}
-+
-+static void wait_for_sclp_int(void)
-+{
-+	/* Enable SCLP interrupts on this CPU only. */
-+	ctl_set_bit(0, CTL0_SERVICE_SIGNAL);
-+
-+	set_flag(1);
-+
-+	/* Enable external interrupts and go to the wait state. */
-+	wait_for_interrupt(PSW_MASK_EXT);
-+}
-+
-+/*
-+ * Some KVM versions might mix CPUs when looking for a floating IRQ target,
-+ * accidentially detecting a stopped CPU as waiting and resulting in the actually
-+ * waiting CPU not getting woken up for the interrupt.
-+ */
-+static void test_wait_state_delivery(void)
-+{
-+	struct psw psw;
-+	SCCBHeader *h;
-+	int ret;
-+
-+	report_prefix_push("wait state delivery");
-+
-+	if (smp_query_num_cpus() < 3) {
-+		report_skip("need at least 3 CPUs for this test");
-+		goto out;
-+	}
-+
-+	if (stap()) {
-+		report_skip("need to start on CPU #0");
-+		goto out;
-+	}
-+
-+	/*
-+	 * We want CPU #2 to be stopped. This should be the case at this
-+	 * point, however, we want to sense if it even exists as well.
-+	 */
-+	ret = smp_cpu_stop(2);
-+	if (ret) {
-+		report_skip("CPU #2 not found");
-+		goto out;
-+	}
-+
-+	/*
-+	 * We're going to perform an SCLP service call but expect
-+	 * the interrupt on CPU #1 while it is in the wait state.
-+	 */
-+	sclp_mark_busy();
-+	set_flag(0);
-+
-+	/* Start CPU #1 and let it wait for the interrupt. */
-+	psw.mask = extract_psw_mask();
-+	psw.addr = (unsigned long)wait_for_sclp_int;
-+	ret = smp_cpu_setup(1, psw);
-+	if (ret) {
-+		report_skip("cpu #1 not found");
-+		goto out;
-+	}
-+
-+	/* Wait until the CPU #1 at least enabled SCLP interrupts. */
-+	wait_for_flag();
-+
-+	/*
-+	 * We'd have to jump trough some hoops to sense e.g., via SIGP
-+	 * CONDITIONAL EMERGENCY SIGNAL if CPU #1 is already in the
-+	 * wait state.
-+	 *
-+	 * Although not completely reliable, use SIGP SENSE RUNNING STATUS
-+	 * until not reported as running -- after all, our SCLP processing
-+	 * will take some time as well and make races very rare.
-+	 */
-+	while(smp_sense_running_status(1));
-+
-+	h = alloc_page();
-+	memset(h, 0, sizeof(*h));
-+	h->length = 4096;
-+	ret = servc(SCLP_CMDW_READ_CPU_INFO, __pa(h));
-+	if (ret) {
-+		report_fail("SCLP_CMDW_READ_CPU_INFO failed");
-+		goto out_destroy;
-+	}
-+
-+	/*
-+	 * Wait until the interrupt gets delivered on CPU #1, marking the
-+	 * SCLP requests as done.
-+	 */
-+	sclp_wait_busy();
-+
-+	report(true, "firq delivered");
-+
-+out_destroy:
-+	smp_cpu_destroy(1);
-+	free_page(h);
-+out:
-+	report_prefix_pop();
-+}
-+
-+int main(void)
-+{
-+	report_prefix_push("firq");
-+
-+	test_wait_state_delivery();
-+
-+	report_prefix_pop();
-+	return report_summary();
-+}
-diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-index 3b454b7..054560c 100644
---- a/s390x/unittests.cfg
-+++ b/s390x/unittests.cfg
-@@ -112,3 +112,13 @@ file = mvpg-sie.elf
+Why do we even use/need the GA log?
+Why not, just disable the 'guest mode' in the iommu and let it sent good old normal interrupt
+when a vCPU is not running, just like we do when we inhibit the AVIC?
  
- [spec_ex-sie]
- file = spec_ex-sie.elf
-+
-+[firq-linear-cpu-ids]
-+file = firq.elf
-+timeout = 20
-+extra_params = -smp 1,maxcpus=3 -cpu qemu -device qemu-s390x-cpu,core-id=1 -device qemu-s390x-cpu,core-id=2
-+
-+[firq-nonlinear-cpu-ids]
-+file = firq.elf
-+timeout = 20
-+extra_params = -smp 1,maxcpus=3 -cpu qemu -device qemu-s390x-cpu,core-id=2 -device qemu-s390x-cpu,core-id=1
--- 
-2.31.1
+GA log makes all devices that share an iommu (there are 4 iommus per package these days,
+some without useful devices) go through a single (!) msi like interrupt,
+which is even for some reason implemented by a threaded IRQ in the linux kernel.
+
+ 
+Best regards,
+	Maxim Levitsky
+
+> 
+> If the scheduler were changed to support waking in the sched_out path, then I'd be
+> more inclined to handle this in avic_vcpu_put() by rewalking the vIRR one final
+> time, but for now it's not worth it.
+> 
+> > If I apply though only the patch series up to this patch, my fedora VM seems
+> > to work fine, but my windows VM still locks up hard when I run 'LatencyTop'
+> > in it, which doesn't happen without this patch.
+> 
+> Buy "run 'LatencyTop' in it", do you mean running something in the Windows guest?
+> The only search results I can find for LatencyTop are Linux specific.
+> 
+> > So far the symptoms I see is that on VCPU 0, ISR has quite high interrupt
+> > (0xe1 last time I seen it), TPR and PPR are 0xe0 (although I have seen TPR to
+> > have different values), and IRR has plenty of interrupts with lower priority.
+> > The VM seems to be stuck in this case. As if its EOI got lost or something is
+> > preventing the IRQ handler from issuing EOI.
+> >  
+> > LatencyTop does install some form of a kernel driver which likely does meddle
+> > with interrupts (maybe it sends lots of self IPIs?).
+> >  
+> > 100% reproducible as soon as I start monitoring with LatencyTop.
+> >  
+> > Without this patch it works (or if disabling halt polling),
+> 
+> Huh.  I assume everything works if you disable halt polling _without_ this patch
+> applied?
+> 
+> If so, that implies that successful halt polling without mucking with vCPU IOMMU
+> affinity is somehow problematic.  I can't think of any relevant side effects other
+> than timing.
+> 
+
 
