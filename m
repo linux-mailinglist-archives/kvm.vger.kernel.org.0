@@ -2,161 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C81EC46615C
-	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 11:21:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B79C746616E
+	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 11:30:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356918AbhLBKYm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Dec 2021 05:24:42 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:38862 "EHLO
+        id S1356786AbhLBKdf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Dec 2021 05:33:35 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35631 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1356910AbhLBKYl (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 2 Dec 2021 05:24:41 -0500
+        by vger.kernel.org with ESMTP id S1356760AbhLBKde (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 2 Dec 2021 05:33:34 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1638440478;
+        s=mimecast20190719; t=1638441012;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=m4HlULEGQ+u/lfRbooSYsdnXMPgjmp3tTKFINSv7JFM=;
-        b=jR2Jxz3tP2VpsAq9tl8h1fuMHXT3d4aRFjfL2YL8Yp8+fL9yNCSBCk2M2XUVxcPZUeImuj
-        Kdztr1P5c1mfOqvLncQKKkERVbc4JwxdRYYZKRA8+2cy8p0EZ7gYyahQPUAijxFYxvXy/3
-        cWsYE8UIY7EEbOF2kmPSSiMoXuB1Aig=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=BYsLP2MP00b1oH3DtRnSUpLrjUtCpztF+PeHvMRQbAg=;
+        b=RBSicacWJ11I2/bbfz2s8Rz34gVLHEh9bRK+NxnTHSQG/NBkdpVg6Sd50O1oDkRnt4mnzh
+        FmRRZTcaGI18KSmia0fK4QAt4Zupd5X0CttUnkJuLml+xN2FBMMqYV3oOlHVtmbRWeA/aG
+        tgnksBaOqQSI3hz+EsNl/KDcT07QXjg=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-590-FTxu8o4JPGuzaC45aDiDWA-1; Thu, 02 Dec 2021 05:21:13 -0500
-X-MC-Unique: FTxu8o4JPGuzaC45aDiDWA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ABDFE81EE60;
-        Thu,  2 Dec 2021 10:21:09 +0000 (UTC)
-Received: from starship (unknown [10.40.192.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D73445D9CA;
-        Thu,  2 Dec 2021 10:20:56 +0000 (UTC)
-Message-ID: <f55056c55892dd42592e5c242fa7a1561c6cee90.camel@redhat.com>
-Subject: Re: [PATCH v2 11/43] KVM: Don't block+unblock when halt-polling is
- successful
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Paul Mackerras <paulus@ozlabs.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Atish Patra <atish.patra@wdc.com>,
-        David Hildenbrand <david@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-mips@vger.kernel.org, kvm@vger.kernel.org,
-        kvm-ppc@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        David Matlack <dmatlack@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Jing Zhang <jingzhangos@google.com>
-Date:   Thu, 02 Dec 2021 12:20:55 +0200
-In-Reply-To: <YaUNBfJh35WXMV0M@google.com>
-References: <20211009021236.4122790-1-seanjc@google.com>
-         <20211009021236.4122790-12-seanjc@google.com>
-         <cceb33be9e2a6ac504bb95a7b2b8cf5fe0b1ff26.camel@redhat.com>
-         <4e883728e3e5201a94eb46b56315afca5e95ad9c.camel@redhat.com>
-         <YaUNBfJh35WXMV0M@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+ us-mta-168-PXL-r0UKMDanZU3Y7XGC5A-1; Thu, 02 Dec 2021 05:30:11 -0500
+X-MC-Unique: PXL-r0UKMDanZU3Y7XGC5A-1
+Received: by mail-wr1-f70.google.com with SMTP id y4-20020adfd084000000b00186b16950f3so4903113wrh.14
+        for <kvm@vger.kernel.org>; Thu, 02 Dec 2021 02:30:10 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=BYsLP2MP00b1oH3DtRnSUpLrjUtCpztF+PeHvMRQbAg=;
+        b=CfVUWTSR7ha6hlS1+86wgJvK8hX9w4/WjX+qlFwwYgA8aTIeZaHP55gv+AebuzcjX/
+         8Jd8gC0pE5a4BWeOpIHRj0IQwZepR16BPsOFTRYAe0qIfE5PjiahXfCY4A4RWChHw+gX
+         Vu/4CL1q7Fc3vk4vkRygIGI+3cOFvJeSanKWSSzzDlNSUWRQTmRq3ApiAsKAF4sUGjWE
+         F8yXDMvrvZHkcVvsgQHTCZhbXmS9wBAYAnme3qd9enLaAhsLGsBhPRKFIuOFLf/H6ZzD
+         dOBoT318ilNmVutGEi77e6KtCEP5sAYO1BqyxpIOTXzKECNiDVbKm3wZI/C6zPUZb1VW
+         obzQ==
+X-Gm-Message-State: AOAM531qMgDTe4Z9u/Grp7gV55pdI39FgYMjjWMoVKo/k2THDpy9Qqkr
+        0q3aiHILOVVrltkKr1gkSdmo7WwMuBxF7CEjYcDyXz6qTbeAX26HHJOLd+Em4tWEEkePu4Omhws
+        txKVuON0SX3w6
+X-Received: by 2002:a1c:447:: with SMTP id 68mr5335596wme.69.1638441009880;
+        Thu, 02 Dec 2021 02:30:09 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJx4e0l4QmJap0Ltd3O3NXcmX4oslOmpQ87IkX1xwbcf4AZjE1poLYtPmREDNqOy75l9ACRqCA==
+X-Received: by 2002:a1c:447:: with SMTP id 68mr5335573wme.69.1638441009708;
+        Thu, 02 Dec 2021 02:30:09 -0800 (PST)
+Received: from [10.33.192.183] (nat-pool-str-t.redhat.com. [149.14.88.106])
+        by smtp.gmail.com with ESMTPSA id o4sm1955473wmq.31.2021.12.02.02.30.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 Dec 2021 02:30:08 -0800 (PST)
+Message-ID: <94d78a53-cb59-d712-65c5-d31e909f13d4@redhat.com>
+Date:   Thu, 2 Dec 2021 11:30:08 +0100
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [kvm-unit-tests PATCH v1 1/2] s390x: make smp_cpu_setup() return
+ 0 on success
+Content-Language: en-US
+To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
+Cc:     Janosch Frank <frankja@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sebastian Mitterle <smitterl@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org
+References: <20211202095843.41162-1-david@redhat.com>
+ <20211202095843.41162-2-david@redhat.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <20211202095843.41162-2-david@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2021-11-29 at 17:25 +0000, Sean Christopherson wrote:
-> On Mon, Nov 29, 2021, Maxim Levitsky wrote:
-> > (This thing is that when you tell the IOMMU that a vCPU is not running,
-> > Another thing I discovered that this patch series totally breaks my VMs,
-> > without cpu_pm=on The whole series (I didn't yet bisect it) makes even my
-> > fedora32 VM be very laggy, almost unusable, and it only has one
-> > passed-through device, a nic).
+On 02/12/2021 10.58, David Hildenbrand wrote:
+> Properly return "0" on success so callers can check if the setup was
+> successful.
 > 
-> Grrrr, the complete lack of comments in the KVM code and the separate paths for
-> VMX vs SVM when handling HLT with APICv make this all way for difficult to
-> understand than it should be.
+> The return value is yet unused, which is why this wasn't noticed so far.
 > 
-> The hangs are likely due to:
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>   lib/s390x/smp.c | 1 +
+>   1 file changed, 1 insertion(+)
 > 
->   KVM: SVM: Unconditionally mark AVIC as running on vCPU load (with APICv)
-> 
-> If a posted interrupt arrives after KVM has done its final search through the vIRR,
-> but before avic_update_iommu_vcpu_affinity() is called, the posted interrupt will
-> be set in the vIRR without triggering a host IRQ to wake the vCPU via the GA log.
-> 
-> I.e. KVM is missing an equivalent to VMX's posted interrupt check for an outstanding
-> notification after switching to the wakeup vector.
-> 
-> For now, the least awful approach is sadly to keep the vcpu_(un)blocking() hooks.
-> Unlike VMX's PI support, there's no fast check for an interrupt being posted (KVM
-> would have to rewalk the vIRR), no easy to signal the current CPU to do wakeup (I
-> don't think KVM even has access to the IRQ used by the owning IOMMU), and there's
-> no simplification of load/put code.
-
-I have an idea.
- 
-Why do we even use/need the GA log?
-Why not, just disable the 'guest mode' in the iommu and let it sent good old normal interrupt
-when a vCPU is not running, just like we do when we inhibit the AVIC?
- 
-GA log makes all devices that share an iommu (there are 4 iommus per package these days,
-some without useful devices) go through a single (!) msi like interrupt,
-which is even for some reason implemented by a threaded IRQ in the linux kernel.
-
- 
-Best regards,
-	Maxim Levitsky
-
-> 
-> If the scheduler were changed to support waking in the sched_out path, then I'd be
-> more inclined to handle this in avic_vcpu_put() by rewalking the vIRR one final
-> time, but for now it's not worth it.
-> 
-> > If I apply though only the patch series up to this patch, my fedora VM seems
-> > to work fine, but my windows VM still locks up hard when I run 'LatencyTop'
-> > in it, which doesn't happen without this patch.
-> 
-> Buy "run 'LatencyTop' in it", do you mean running something in the Windows guest?
-> The only search results I can find for LatencyTop are Linux specific.
-> 
-> > So far the symptoms I see is that on VCPU 0, ISR has quite high interrupt
-> > (0xe1 last time I seen it), TPR and PPR are 0xe0 (although I have seen TPR to
-> > have different values), and IRR has plenty of interrupts with lower priority.
-> > The VM seems to be stuck in this case. As if its EOI got lost or something is
-> > preventing the IRQ handler from issuing EOI.
-> >  
-> > LatencyTop does install some form of a kernel driver which likely does meddle
-> > with interrupts (maybe it sends lots of self IPIs?).
-> >  
-> > 100% reproducible as soon as I start monitoring with LatencyTop.
-> >  
-> > Without this patch it works (or if disabling halt polling),
-> 
-> Huh.  I assume everything works if you disable halt polling _without_ this patch
-> applied?
-> 
-> If so, that implies that successful halt polling without mucking with vCPU IOMMU
-> affinity is somehow problematic.  I can't think of any relevant side effects other
-> than timing.
+> diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
+> index da6d32f..b753eab 100644
+> --- a/lib/s390x/smp.c
+> +++ b/lib/s390x/smp.c
+> @@ -212,6 +212,7 @@ int smp_cpu_setup(uint16_t addr, struct psw psw)
+>   	/* Wait until the cpu has finished setup and started the provided psw */
+>   	while (lc->restart_new_psw.addr != psw.addr)
+>   		mb();
+> +	rc = 0;
+>   out:
+>   	spin_unlock(&lock);
+>   	return rc;
 > 
 
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
