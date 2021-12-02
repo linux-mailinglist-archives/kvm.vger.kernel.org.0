@@ -2,143 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0659346645B
-	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 14:12:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 976B3466457
+	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 14:12:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358200AbhLBNPl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Dec 2021 08:15:41 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45020 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1358285AbhLBNPQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 2 Dec 2021 08:15:16 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B2ArSkQ012723;
-        Thu, 2 Dec 2021 13:11:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=CXiRJqvA8YBaqB/qDp3UuyUAyVQ8eyUzpKhj4I1PyuE=;
- b=gLS102+OiNl4fBk8ZMRyhrw4QfPXhl6pZhauAhExWhZd7RGhxWcdspcVL1yRkWAbUjvr
- qGU03uJyjl2hSRYj0Pb1N8L9oi08tgxPy6Ar8vbdtj3nJ4U5FSvAgWMPcobi0aek/2//
- vOgLw18cje12lnG32+v3ZRRWeYayIao29pWS9z+wOgGPPZ0OxnaJNsMKYAILxlnctvp8
- Cx6eM90xfT1CG2+YekcDMNArcw0OYcJHQbGOrxrbx6RTBFEn+9LPtCl5SSvd12SK85S5
- MBjCZ7q6K7Yr1F6RNgU7ddvNMxza2Qx4j96I7Ujxj0m3+TrcnPo7Z/4o3sKq4RljrasW Ew== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cpvssarur-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 02 Dec 2021 13:11:52 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1B2CijIq025078;
-        Thu, 2 Dec 2021 13:11:52 GMT
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cpvssaru5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 02 Dec 2021 13:11:52 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1B2D3Rix023034;
-        Thu, 2 Dec 2021 13:11:49 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma04fra.de.ibm.com with ESMTP id 3cncgms0d2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 02 Dec 2021 13:11:49 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1B2DBkW912648838
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 2 Dec 2021 13:11:46 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B928642049;
-        Thu,  2 Dec 2021 13:11:46 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DCE1C4204B;
-        Thu,  2 Dec 2021 13:11:45 +0000 (GMT)
-Received: from linux6.. (unknown [9.114.12.104])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  2 Dec 2021 13:11:45 +0000 (GMT)
-From:   Janosch Frank <frankja@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        thuth@redhat.com
-Subject: [kvm-unit-tests PATCH] s390x: uv: Fix UVC cmd prepare reset name
-Date:   Thu,  2 Dec 2021 13:11:22 +0000
-Message-Id: <20211202131122.2948-1-frankja@linux.ibm.com>
-X-Mailer: git-send-email 2.32.0
+        id S1358189AbhLBNPk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Dec 2021 08:15:40 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:55697 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1358266AbhLBNOz (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 2 Dec 2021 08:14:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1638450691;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=+ORZwySvXsS7bVMV6iSSKGBVEj6KTyOWMLSUM7WG+EM=;
+        b=CtM7bNFm1bMCYK6mSnvMSdQj6h9KG8gqZG5c9BMdf6lTS9jBnzGCavUlZPUEk4Ao641gKJ
+        v4vuYacmLhhhvoPbQThKen1R5kopNmieAyNl+V6ooCGqqa7ATrtoigzNMAS0ev4gxoouam
+        vlMbIlTf2LXxAcH9bzIlvni1kGiob2I=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-507-n_lAM_xhOkWDnRIGUb7T5A-1; Thu, 02 Dec 2021 08:11:30 -0500
+X-MC-Unique: n_lAM_xhOkWDnRIGUb7T5A-1
+Received: by mail-wm1-f71.google.com with SMTP id a64-20020a1c7f43000000b003335e5dc26bso13963041wmd.8
+        for <kvm@vger.kernel.org>; Thu, 02 Dec 2021 05:11:30 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=+ORZwySvXsS7bVMV6iSSKGBVEj6KTyOWMLSUM7WG+EM=;
+        b=feszcswNIiQ0GYI72JTvMImgI/s47yBVlNes7i5khgIZJCexX7MPWh8N+iPTczO3f6
+         fEPhffyVH+wUs/RhqPybRsQiyEIQKPv/wH69yD73pyEaKOyKcl49fYxG8sXCkMWQ+pjd
+         n0gkh1JzeDb1fa0EpcYQPyvkRY4p7iyc5szJyjx8vttmu7Cwj0x/ya8jK4YMpDD/IL9e
+         XzXp+3ilFM3l5Ocbo8/gjp/yQ3s8ooiWQdVeU9nzPoqNzD70JL9hZ2kcBKk6CCielGwJ
+         s0YwBJounUcnmdRXPSLMSghX5JS113LcUks62ahCIVVK6oFUbAuBqUIp1ofniR7s7M1S
+         04ow==
+X-Gm-Message-State: AOAM531o9QdZd40O9+ySZJtKusYb83keBLkoQSkseFlR639l+Uskjvji
+        +SAcMZi7iXxPI/iUQiL68OuU2z7lavPd8kPPUAUyHLAGL05jR/WzqSTRlMdCzFi/nykCT3MpreJ
+        n3I8IPawm+78k
+X-Received: by 2002:adf:dc47:: with SMTP id m7mr14456746wrj.576.1638450689186;
+        Thu, 02 Dec 2021 05:11:29 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzRywFER8Vz2gbwjUzZSItMbLcPLhaPUjX8ZwPMMxFDRKOO8TYuB0M5JAWiIxd6BSWzMOBhjg==
+X-Received: by 2002:adf:dc47:: with SMTP id m7mr14456719wrj.576.1638450689005;
+        Thu, 02 Dec 2021 05:11:29 -0800 (PST)
+Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id h22sm2174819wmq.14.2021.12.02.05.11.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 Dec 2021 05:11:28 -0800 (PST)
+Subject: Re: [RFC PATCH v3 12/29] KVM: arm64: Make ID_DFR1_EL1 writable
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>,
+        Andrew Jones <drjones@redhat.com>,
+        Peng Liang <liangpeng10@huawei.com>,
+        Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>
+References: <20211117064359.2362060-1-reijiw@google.com>
+ <20211117064359.2362060-13-reijiw@google.com>
+ <44073484-639e-3d23-2068-ae5c2cac3276@redhat.com>
+ <CAAeT=FyBaKvof6BpPB021MN6k797BcMP+sPMDeiZ9SR6nvXdCA@mail.gmail.com>
+From:   Eric Auger <eauger@redhat.com>
+Message-ID: <7a2ef550-eadb-7fa3-8aa4-f666a14d6efa@redhat.com>
+Date:   Thu, 2 Dec 2021 14:11:26 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: gIvIpsGV_0wlNJWd5L_Imu07K24KbRvp
-X-Proofpoint-ORIG-GUID: SPg4Wvpk_uRRdF30T5d2nhQ6ZrIM469k
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-12-02_07,2021-12-02_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
- spamscore=0 mlxlogscore=887 mlxscore=0 priorityscore=1501 impostorscore=0
- bulkscore=0 lowpriorityscore=0 clxscore=1015 suspectscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
- definitions=main-2112020084
+In-Reply-To: <CAAeT=FyBaKvof6BpPB021MN6k797BcMP+sPMDeiZ9SR6nvXdCA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The specification and the kernel use UVC_CMD_PREPARE_RESET so let's
-fix our naming up.
 
-The call bit is named correctly but is not the same as the name we use
-on KVM. So let's clear that up too.
 
-Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
----
- lib/s390x/asm/uv.h | 4 ++--
- s390x/uv-guest.c   | 2 +-
- s390x/uv-host.c    | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
+On 11/30/21 6:39 AM, Reiji Watanabe wrote:
+> Hi Eric,
+> 
+> On Thu, Nov 25, 2021 at 12:30 PM Eric Auger <eauger@redhat.com> wrote:
+>>
+>> Hi Reiji,
+>>
+>> On 11/17/21 7:43 AM, Reiji Watanabe wrote:
+>>> This patch adds id_reg_info for ID_DFR1_EL1 to make it writable
+>>> by userspace.
+>>>
+>>> Signed-off-by: Reiji Watanabe <reijiw@google.com>
+>>> ---
+>>>  arch/arm64/kvm/sys_regs.c | 6 ++++++
+>>>  1 file changed, 6 insertions(+)
+>>>
+>>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>>> index fbd335ac5e6b..dda7001959f6 100644
+>>> --- a/arch/arm64/kvm/sys_regs.c
+>>> +++ b/arch/arm64/kvm/sys_regs.c
+>>> @@ -859,6 +859,11 @@ static struct id_reg_info id_dfr0_el1_info = {
+>>>       .get_reset_val = get_reset_id_dfr0_el1,
+>>>  };
+>>>
+>>> +static struct id_reg_info id_dfr1_el1_info = {
+>>> +     .sys_reg = SYS_ID_DFR1_EL1,
+>>> +     .ftr_check_types = S_FCT(ID_DFR1_MTPMU_SHIFT, FCT_LOWER_SAFE),
+>> what about the 0xF value which indicates the MTPMU is not implemented?
+> 
+> The field is treated as a signed field.
+> So, 0xf(== -1) is handled correctly.
+> (Does it answer your question?)
 
-diff --git a/lib/s390x/asm/uv.h b/lib/s390x/asm/uv.h
-index 97c90e81..70bf65c4 100644
---- a/lib/s390x/asm/uv.h
-+++ b/lib/s390x/asm/uv.h
-@@ -39,7 +39,7 @@
- #define UVC_CMD_VERIFY_IMG		0x0302
- #define UVC_CMD_CPU_RESET		0x0310
- #define UVC_CMD_CPU_RESET_INITIAL	0x0311
--#define UVC_CMD_PERF_CONF_CLEAR_RESET	0x0320
-+#define UVC_CMD_PREPARE_RESET		0x0320
- #define UVC_CMD_CPU_RESET_CLEAR		0x0321
- #define UVC_CMD_CPU_SET_STATE		0x0330
- #define UVC_CMD_SET_UNSHARED_ALL	0x0340
-@@ -66,7 +66,7 @@ enum uv_cmds_inst {
- 	BIT_UVC_CMD_CPU_RESET = 15,
- 	BIT_UVC_CMD_CPU_RESET_INITIAL = 16,
- 	BIT_UVC_CMD_CPU_SET_STATE = 17,
--	BIT_UVC_CMD_PREPARE_CLEAR_RESET = 18,
-+	BIT_UVC_CMD_PREPARE_RESET = 18,
- 	BIT_UVC_CMD_CPU_PERFORM_CLEAR_RESET = 19,
- 	BIT_UVC_CMD_UNSHARE_ALL = 20,
- 	BIT_UVC_CMD_PIN_PAGE_SHARED = 21,
-diff --git a/s390x/uv-guest.c b/s390x/uv-guest.c
-index 44ad2154..99120cae 100644
---- a/s390x/uv-guest.c
-+++ b/s390x/uv-guest.c
-@@ -142,7 +142,7 @@ static struct {
- 	{ "verify", UVC_CMD_VERIFY_IMG, sizeof(struct uv_cb_nodata), BIT_UVC_CMD_VERIFY_IMG },
- 	{ "cpu reset", UVC_CMD_CPU_RESET, sizeof(struct uv_cb_nodata), BIT_UVC_CMD_CPU_RESET },
- 	{ "cpu initial reset", UVC_CMD_CPU_RESET_INITIAL, sizeof(struct uv_cb_nodata), BIT_UVC_CMD_CPU_RESET_INITIAL },
--	{ "conf clear reset", UVC_CMD_PERF_CONF_CLEAR_RESET, sizeof(struct uv_cb_nodata), BIT_UVC_CMD_PREPARE_CLEAR_RESET },
-+	{ "prepare clear reset", UVC_CMD_PREPARE_RESET, sizeof(struct uv_cb_nodata), BIT_UVC_CMD_PREPARE_RESET },
- 	{ "cpu clear reset", UVC_CMD_CPU_RESET_CLEAR, sizeof(struct uv_cb_nodata), BIT_UVC_CMD_CPU_PERFORM_CLEAR_RESET },
- 	{ "cpu set state", UVC_CMD_CPU_SET_STATE, sizeof(struct uv_cb_cpu_set_state), BIT_UVC_CMD_CPU_SET_STATE },
- 	{ "pin shared", UVC_CMD_PIN_PAGE_SHARED, sizeof(struct uv_cb_cfs), BIT_UVC_CMD_PIN_PAGE_SHARED },
-diff --git a/s390x/uv-host.c b/s390x/uv-host.c
-index 92a41069..de2e4850 100644
---- a/s390x/uv-host.c
-+++ b/s390x/uv-host.c
-@@ -55,7 +55,7 @@ static struct cmd_list cmds[] = {
- 	{ "verify", UVC_CMD_VERIFY_IMG, sizeof(struct uv_cb_nodata), BIT_UVC_CMD_VERIFY_IMG },
- 	{ "cpu reset", UVC_CMD_CPU_RESET, sizeof(struct uv_cb_nodata), BIT_UVC_CMD_CPU_RESET },
- 	{ "cpu initial reset", UVC_CMD_CPU_RESET_INITIAL, sizeof(struct uv_cb_nodata), BIT_UVC_CMD_CPU_RESET_INITIAL },
--	{ "conf clear reset", UVC_CMD_PERF_CONF_CLEAR_RESET, sizeof(struct uv_cb_nodata), BIT_UVC_CMD_PREPARE_CLEAR_RESET },
-+	{ "conf clear reset", UVC_CMD_PREPARE_RESET, sizeof(struct uv_cb_nodata), BIT_UVC_CMD_PREPARE_RESET },
- 	{ "cpu clear reset", UVC_CMD_CPU_RESET_CLEAR, sizeof(struct uv_cb_nodata), BIT_UVC_CMD_CPU_PERFORM_CLEAR_RESET },
- 	{ "cpu set state", UVC_CMD_CPU_SET_STATE, sizeof(struct uv_cb_cpu_set_state), BIT_UVC_CMD_CPU_SET_STATE },
- 	{ "pin shared", UVC_CMD_PIN_PAGE_SHARED, sizeof(struct uv_cb_cfs), BIT_UVC_CMD_PIN_PAGE_SHARED },
--- 
-2.32.0
+yes thanks
+
+Eric
+> 
+> Thanks,
+> Reiji
+> 
+>>
+>> Eric
+>>> +};
+>>> +
+>>>  /*
+>>>   * An ID register that needs special handling to control the value for the
+>>>   * guest must have its own id_reg_info in id_reg_info_table.
+>>> @@ -869,6 +874,7 @@ static struct id_reg_info id_dfr0_el1_info = {
+>>>  #define      GET_ID_REG_INFO(id)     (id_reg_info_table[IDREG_IDX(id)])
+>>>  static struct id_reg_info *id_reg_info_table[KVM_ARM_ID_REG_MAX_NUM] = {
+>>>       [IDREG_IDX(SYS_ID_DFR0_EL1)] = &id_dfr0_el1_info,
+>>> +     [IDREG_IDX(SYS_ID_DFR1_EL1)] = &id_dfr1_el1_info,
+>>>       [IDREG_IDX(SYS_ID_AA64PFR0_EL1)] = &id_aa64pfr0_el1_info,
+>>>       [IDREG_IDX(SYS_ID_AA64PFR1_EL1)] = &id_aa64pfr1_el1_info,
+>>>       [IDREG_IDX(SYS_ID_AA64DFR0_EL1)] = &id_aa64dfr0_el1_info,
+>>>
+>>
+> 
 
