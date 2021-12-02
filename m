@@ -2,64 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F04794662D8
-	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 12:54:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B15D54662DC
+	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 12:54:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357491AbhLBL52 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Dec 2021 06:57:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57246 "EHLO
+        id S1357501AbhLBL5b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Dec 2021 06:57:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357464AbhLBL50 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Dec 2021 06:57:26 -0500
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEEA8C061757
-        for <kvm@vger.kernel.org>; Thu,  2 Dec 2021 03:54:03 -0800 (PST)
-Received: by mail-wm1-x335.google.com with SMTP id n33-20020a05600c502100b0032fb900951eso2078526wmr.4
-        for <kvm@vger.kernel.org>; Thu, 02 Dec 2021 03:54:03 -0800 (PST)
+        with ESMTP id S1357473AbhLBL53 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Dec 2021 06:57:29 -0500
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E70DC061759
+        for <kvm@vger.kernel.org>; Thu,  2 Dec 2021 03:54:06 -0800 (PST)
+Received: by mail-wr1-x431.google.com with SMTP id a18so59170824wrn.6
+        for <kvm@vger.kernel.org>; Thu, 02 Dec 2021 03:54:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=YvIcgLxrIDvH3u3VEeMqsMbudoeAwAVc7Uo9Je5NGBY=;
-        b=pSIzMsaslA9EVJaNgs3xMkTko2prnzFfJrTevKg9mX+roOdF4fP23gzHkQ7VCvZ1g0
-         oXNEXmhJubYKXuBnlwEy9cd52uqnFBx/25KkRfIJR5l0JZRphzKsuCbdFWZcoNfMzUy+
-         CO3dnMWYWkSIVVgH9k752Npsn0zGo4GpbsD+WvWEu55Zt2TWrDSqx9ameh7tEUfyWwgl
-         YpFEtLFr9eCVF8AETZ/3Bxe+OC3+Jd7X+Sz1mRRZKZHLrkbWghexJcz6gmLw10nfcZee
-         3PBb0KzQE0DyI2EwZ6neSRND9T+8PNb2i6npDxjbspj19dB7rzjnhVyv/F4WhJ/QF1Y8
-         XYIg==
+        bh=5qrZomYEfS1eQv8dSqIYkm1o8Qv98maLqRFTfMX4vPc=;
+        b=nUEiK5nR6AdzMizvXdj6V06/i75iEb/LRYTcMFVkucIBk0/9Plk+0XmBiDq9swFkS0
+         mXcaUjY+vbvFUVbFS+mHQeE1SA6S8GXlCqY7Q1wtVR1+mBxffDm1db4F5HD/lStV5j6J
+         w2m1hXQATS4/4yjIgS/f73yvXH2KeT5VLJ1KCr5ynQgsgnB2Qxe3+YEEV4Q9cEtQwzfY
+         K8a+R2E9g6p/wnHh+PxgdkcAzgJ7XSGuaoa+lzZT5ZJANpDLVL4d5XxOM3aPkl5nCFWB
+         KOxwC8/Oc1wOQhlvrxXOgcMS1XBI0f+POR9VJQrqOSQssIYQo+I8cNG4AahfNmLYBgr3
+         +B8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=YvIcgLxrIDvH3u3VEeMqsMbudoeAwAVc7Uo9Je5NGBY=;
-        b=MR1paeXMnj4xIvCeUXh/WflBk38LR5NotIw/ly5KbO4t0pP0HNk7/mOB0fCeEckmN3
-         uQs7bkj0IbmQKGyFEAWLiX1tilFvRVKtKfsyIJkuuwN6sSefOcSi7ecHi63PMM17ApY3
-         9FeQRHMsUiTKikJ9RHOkt+KYquRlbCBgPp8Uc+iP+MNAuleMTf2V0zqhvzTfyOZq9Wxz
-         /PUyhseRJB+HOcEupwpKhwglsDBbkJaE3wdB1bKU5Wh5phhWPtygP8arDwlAFokti6n3
-         6Xg4V5tOwmIVDAwe+ReMxaVny7gBjXs7DfHo+DxibQqrhvToqVnzmiqOnGAPZyJDQBjE
-         lTzw==
-X-Gm-Message-State: AOAM531xYqd0ijVFll9A6fxXDNgYGotmsodzEFavQlewxrWm3d2BBOZ7
-        GPSHM7Y7MmuPVjQmL/TLgXa3F5Rcw32Xgw==
-X-Google-Smtp-Source: ABdhPJwWre1np96zYEEAG1G85CB6tdS9Z4+KdP/oDY6HW2w48L0J621+a9wJdSQ0VjBOVUC06fo7UA==
-X-Received: by 2002:a05:600c:4f55:: with SMTP id m21mr5860807wmq.68.1638446042164;
-        Thu, 02 Dec 2021 03:54:02 -0800 (PST)
+        bh=5qrZomYEfS1eQv8dSqIYkm1o8Qv98maLqRFTfMX4vPc=;
+        b=n7RIiVZBaR/rc9i0+5NQv7HSJF8yAfzx7zuMFZmqjbDr0gjvOTCYNCvaxPGf1m2IGt
+         PqxqVxbyXlU0Cjhza2M8TNuRzvjuP+KF8OmXHBuX9AY0udpozz/4TVO+KqfeVFZtP/nJ
+         Q9SF2lFOnJ49M7miiNGGvvqji33anJwUms/T7LzohgfS374/qgtaqk30heUh6BCKhivM
+         VGJ6hW5f3dwcKUf21JmF+LLdGKFrgsGbmaPgRf2hPnnWdJA6npzTNDhJc2TvLvSnUsr9
+         T0vADvnDTjLdF1Y/w2EW+MtSUWBLAJ6uMScIlnFw1ogz6Vr87IL7DwN1GpV+9CJcBuY8
+         BNIQ==
+X-Gm-Message-State: AOAM532v8/isLfKpVcp4puzSBUJim9nhgSgFAHbB8L1GL4IYDSrsp6c4
+        UwoKMmPBEI2aWc3qOpeJp1iGQw==
+X-Google-Smtp-Source: ABdhPJxbbpYZ0p2rsevY+kRWjTuw212pPJF0u3W7uB5ncxf7vNnsTFJHQ/+xiHqlNhuFpiDogKN6rA==
+X-Received: by 2002:adf:fb09:: with SMTP id c9mr13716612wrr.223.1638446045065;
+        Thu, 02 Dec 2021 03:54:05 -0800 (PST)
 Received: from zen.linaroharston ([51.148.130.216])
-        by smtp.gmail.com with ESMTPSA id n32sm2101850wms.1.2021.12.02.03.53.54
+        by smtp.gmail.com with ESMTPSA id s63sm2154085wme.22.2021.12.02.03.53.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Thu, 02 Dec 2021 03:53:59 -0800 (PST)
 Received: from zen.lan (localhost [127.0.0.1])
-        by zen.linaroharston (Postfix) with ESMTP id CA4531FF9C;
+        by zen.linaroharston (Postfix) with ESMTP id DFFEF1FF9D;
         Thu,  2 Dec 2021 11:53:52 +0000 (GMT)
 From:   =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To:     pbonzini@redhat.com, drjones@redhat.com, thuth@redhat.com
 Cc:     kvm@vger.kernel.org, qemu-arm@nongnu.org,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         christoffer.dall@arm.com, maz@kernel.org,
-        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-        Mark Rutland <mark.rutland@arm.com>
-Subject: [kvm-unit-tests PATCH v9 5/9] arm/tlbflush-code: TLB flush during code execution
-Date:   Thu,  2 Dec 2021 11:53:48 +0000
-Message-Id: <20211202115352.951548-6-alex.bennee@linaro.org>
+        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: [kvm-unit-tests PATCH v9 6/9] arm/locking-tests: add comprehensive locking test
+Date:   Thu,  2 Dec 2021 11:53:49 +0000
+Message-Id: <20211202115352.951548-7-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211202115352.951548-1-alex.bennee@linaro.org>
 References: <20211202115352.951548-1-alex.bennee@linaro.org>
@@ -70,67 +69,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This adds a fairly brain dead torture test for TLB flushes intended
-for stressing the MTTCG QEMU build. It takes the usual -smp option for
-multiple CPUs.
+This test has been written mainly to stress multi-threaded TCG behaviour
+but will demonstrate failure by default on real hardware. The test takes
+the following parameters:
 
-By default it CPU0 will do a TLBIALL flush after each cycle. You can
-pass options via -append to control additional aspects of the test:
+  - "lock" use GCC's locking semantics
+  - "atomic" use GCC's __atomic primitives
+  - "wfelock" use WaitForEvent sleep
+  - "excl" use load/store exclusive semantics
 
-  - "page" flush each page in turn (one per function)
-  - "self" do the flush after each computation cycle
-  - "verbose" report progress on each computation cycle
+Also two more options allow the test to be tweaked
+
+  - "noshuffle" disables the memory shuffling
+  - "count=%ld" set your own per-CPU increment count
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-CC: Mark Rutland <mark.rutland@arm.com>
-Message-Id: <20211118184650.661575-7-alex.bennee@linaro.org>
+Message-Id: <20211118184650.661575-8-alex.bennee@linaro.org>
 
 ---
 v9
-  - move tests back into unittests.cfg (with nodefault mttcg)
-  - replace printf with report_info
-  - drop accel = tcg
+  - move back to unittests.cfg, drop accel=tcg
+  - s/printf/report_info
 ---
- arm/Makefile.common |   1 +
- arm/tlbflush-code.c | 209 ++++++++++++++++++++++++++++++++++++++++++++
- arm/unittests.cfg   |  25 ++++++
- 3 files changed, 235 insertions(+)
- create mode 100644 arm/tlbflush-code.c
+ arm/Makefile.common |   2 +-
+ arm/locking-test.c  | 322 ++++++++++++++++++++++++++++++++++++++++++++
+ arm/spinlock-test.c |  87 ------------
+ arm/unittests.cfg   |  30 +++++
+ 4 files changed, 353 insertions(+), 88 deletions(-)
+ create mode 100644 arm/locking-test.c
+ delete mode 100644 arm/spinlock-test.c
 
 diff --git a/arm/Makefile.common b/arm/Makefile.common
-index 99bcf3fc..e3f04f2d 100644
+index e3f04f2d..f9059718 100644
 --- a/arm/Makefile.common
 +++ b/arm/Makefile.common
-@@ -12,6 +12,7 @@ tests-common += $(TEST_DIR)/gic.flat
- tests-common += $(TEST_DIR)/psci.flat
+@@ -5,7 +5,6 @@
+ #
+ 
+ tests-common  = $(TEST_DIR)/selftest.flat
+-tests-common += $(TEST_DIR)/spinlock-test.flat
+ tests-common += $(TEST_DIR)/pci-test.flat
+ tests-common += $(TEST_DIR)/pmu.flat
+ tests-common += $(TEST_DIR)/gic.flat
+@@ -13,6 +12,7 @@ tests-common += $(TEST_DIR)/psci.flat
  tests-common += $(TEST_DIR)/sieve.flat
  tests-common += $(TEST_DIR)/pl031.flat
-+tests-common += $(TEST_DIR)/tlbflush-code.flat
+ tests-common += $(TEST_DIR)/tlbflush-code.flat
++tests-common += $(TEST_DIR)/locking-test.flat
  
  tests-all = $(tests-common) $(tests)
  all: directories $(tests-all)
-diff --git a/arm/tlbflush-code.c b/arm/tlbflush-code.c
+diff --git a/arm/locking-test.c b/arm/locking-test.c
 new file mode 100644
-index 00000000..bf9eb111
+index 00000000..93d9250c
 --- /dev/null
-+++ b/arm/tlbflush-code.c
-@@ -0,0 +1,209 @@
++++ b/arm/locking-test.c
+@@ -0,0 +1,322 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
 +/*
-+ * TLB Flush Race Tests
++ * Locking Test
 + *
-+ * These tests are designed to test for incorrect TLB flush semantics
-+ * under emulation. The initial CPU will set all the others working a
-+ * compuation task and will then trigger TLB flushes across the
-+ * system. It doesn't actually need to re-map anything but the flushes
-+ * themselves will trigger QEMU's TCG self-modifying code detection
-+ * which will invalidate any generated  code causing re-translation.
-+ * Eventually the code buffer will fill and a general tb_lush() will
-+ * be triggered.
++ * This test allows us to stress the various atomic primitives of a VM
++ * guest. A number of methods are available that use various patterns
++ * to implement a lock.
 + *
-+ * Copyright (C) 2016-2021, Linaro, Alex Bennée <alex.bennee@linaro.org>
++ * Copyright (C) 2017 Linaro
++ * Author: Alex Bennée <alex.bennee@linaro.org>
 + *
-+ * This work is licensed under the terms of the GNU LGPL, version 2.
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
 + */
 +
 +#include <libcflat.h>
@@ -139,223 +147,436 @@ index 00000000..bf9eb111
 +#include <asm/barrier.h>
 +#include <asm/mmu.h>
 +
-+#define SEQ_LENGTH 10
-+#define SEQ_HASH 0x7cd707fe
++#include <prng.h>
 +
-+static cpumask_t smp_test_complete;
-+static int flush_count = 1000000;
-+static bool flush_self;
-+static bool flush_page;
-+static bool flush_verbose;
++#define MAX_CPUS 8
++
++/* Test definition structure
++ *
++ * A simple structure that describes the test name, expected pass and
++ * increment function.
++ */
++
++/* Function pointers for test */
++typedef void (*inc_fn)(int cpu);
++
++typedef struct {
++	const char *test_name;
++	bool  should_pass;
++	inc_fn main_fn;
++} test_descr_t;
++
++/* How many increments to do */
++static int increment_count = 1000000;
++static bool do_shuffle = true;
++
++/* Shared value all the tests attempt to safely increment using
++ * various forms of atomic locking and exclusive behaviour.
++ */
++static unsigned int shared_value;
++
++/* PAGE_SIZE * uint32_t means we span several pages */
++__attribute__((aligned(PAGE_SIZE))) static uint32_t memory_array[PAGE_SIZE];
++
++/* We use the alignment of the following to ensure accesses to locking
++ * and synchronisation primatives don't interfere with the page of the
++ * shared value
++ */
++__attribute__((aligned(PAGE_SIZE))) static unsigned int per_cpu_value[MAX_CPUS];
++__attribute__((aligned(PAGE_SIZE))) static cpumask_t smp_test_complete;
++__attribute__((aligned(PAGE_SIZE))) struct isaac_ctx prng_context[MAX_CPUS];
++
++/* Some of the approaches use a global lock to prevent contention. */
++static int global_lock;
++
++/* In any SMP setting this *should* fail due to cores stepping on
++ * each other updating the shared variable
++ */
++static void increment_shared(int cpu)
++{
++	(void)cpu;
++
++	shared_value++;
++}
++
++/* GCC __sync primitives are deprecated in favour of __atomic */
++static void increment_shared_with_lock(int cpu)
++{
++	(void)cpu;
++
++	while (__sync_lock_test_and_set(&global_lock, 1));
++
++	shared_value++;
++
++	__sync_lock_release(&global_lock);
++}
 +
 +/*
-+ * Work functions
-+ *
-+ * These work functions need to be:
-+ *
-+ *  - page aligned, so we can flush one function at a time
-+ *  - have branches, so QEMU TCG generates multiple basic blocks
-+ *  - call across pages, so we exercise the TCG basic block slow path
++ * In practice even __ATOMIC_RELAXED uses ARM's ldxr/stex exclusive
++ * semantics
 + */
-+
-+/* Adler32 */
-+__attribute__((aligned(PAGE_SIZE))) static
-+uint32_t hash_array(const void *buf, size_t buflen)
++static void increment_shared_with_atomic(int cpu)
 +{
-+	const uint8_t *data = (uint8_t *) buf;
-+	uint32_t s1 = 1;
-+	uint32_t s2 = 0;
++	(void)cpu;
 +
-+	for (size_t n = 0; n < buflen; n++) {
-+		s1 = (s1 + data[n]) % 65521;
-+		s2 = (s2 + s1) % 65521;
-+	}
-+	return (s2 << 16) | s1;
++	__atomic_add_fetch(&shared_value, 1, __ATOMIC_SEQ_CST);
 +}
 +
-+__attribute__((aligned(PAGE_SIZE))) static
-+void create_fib_sequence(int length, unsigned int *array)
++
++/*
++ * Load/store exclusive with WFE (wait-for-event)
++ *
++ * See ARMv8 ARM examples:
++ *   Use of Wait For Event (WFE) and Send Event (SEV) with locks
++ */
++
++static void increment_shared_with_wfelock(int cpu)
++{
++	(void)cpu;
++
++#if defined(__aarch64__)
++	asm volatile(
++	"	mov     w1, #1\n"
++	"       sevl\n"
++	"       prfm PSTL1KEEP, [%[lock]]\n"
++	"1:     wfe\n"
++	"	ldaxr	w0, [%[lock]]\n"
++	"	cbnz    w0, 1b\n"
++	"	stxr    w0, w1, [%[lock]]\n"
++	"	cbnz	w0, 1b\n"
++	/* lock held */
++	"	ldr	w0, [%[sptr]]\n"
++	"	add	w0, w0, #0x1\n"
++	"	str	w0, [%[sptr]]\n"
++	/* now release */
++	"	stlr	wzr, [%[lock]]\n"
++	: /* out */
++	: [lock] "r" (&global_lock), [sptr] "r" (&shared_value) /* in */
++	: "w0", "w1", "cc");
++#else
++	asm volatile(
++	"	mov     r1, #1\n"
++	"1:	ldrex	r0, [%[lock]]\n"
++	"	cmp     r0, #0\n"
++	"	wfene\n"
++	"	strexeq r0, r1, [%[lock]]\n"
++	"	cmpeq	r0, #0\n"
++	"	bne	1b\n"
++	"	dmb\n"
++	/* lock held */
++	"	ldr	r0, [%[sptr]]\n"
++	"	add	r0, r0, #0x1\n"
++	"	str	r0, [%[sptr]]\n"
++	/* now release */
++	"	mov	r0, #0\n"
++	"	dmb\n"
++	"	str	r0, [%[lock]]\n"
++	"	dsb\n"
++	"	sev\n"
++	: /* out */
++	: [lock] "r" (&global_lock), [sptr] "r" (&shared_value) /* in */
++	: "r0", "r1", "cc");
++#endif
++}
++
++
++/*
++ * Hand-written version of the load/store exclusive
++ */
++static void increment_shared_with_excl(int cpu)
++{
++	(void)cpu;
++
++#if defined(__aarch64__)
++	asm volatile(
++	"1:	ldxr	w0, [%[sptr]]\n"
++	"	add     w0, w0, #0x1\n"
++	"	stxr	w1, w0, [%[sptr]]\n"
++	"	cbnz	w1, 1b\n"
++	: /* out */
++	: [sptr] "r" (&shared_value) /* in */
++	: "w0", "w1", "cc");
++#else
++	asm volatile(
++	"1:	ldrex	r0, [%[sptr]]\n"
++	"	add     r0, r0, #0x1\n"
++	"	strex	r1, r0, [%[sptr]]\n"
++	"	cmp	r1, #0\n"
++	"	bne	1b\n"
++	: /* out */
++	: [sptr] "r" (&shared_value) /* in */
++	: "r0", "r1", "cc");
++#endif
++}
++
++/* Test array */
++static test_descr_t tests[] = {
++	{ "none", false, increment_shared },
++	{ "lock", true, increment_shared_with_lock },
++	{ "atomic", true, increment_shared_with_atomic },
++	{ "wfelock", true, increment_shared_with_wfelock },
++	{ "excl", true, increment_shared_with_excl }
++};
++
++/* The idea of this is just to generate some random load/store
++ * activity which may or may not race with an un-barried incremented
++ * of the shared counter
++ */
++static void shuffle_memory(int cpu)
 +{
 +	int i;
++	uint32_t lspat = isaac_next_uint32(&prng_context[cpu]);
++	uint32_t seq = isaac_next_uint32(&prng_context[cpu]);
++	int count = seq & 0x1f;
++	uint32_t val = 0;
 +
-+	/* first two values */
-+	array[0] = 0;
-+	array[1] = 1;
-+	for (i = 2; i < length; i++)
-+		array[i] = array[i-2] + array[i-1];
-+}
++	seq >>= 5;
 +
-+__attribute__((aligned(PAGE_SIZE))) static
-+unsigned long long factorial(unsigned int n)
-+{
-+	unsigned int i;
-+	unsigned long long fac = 1;
++	for (i = 0; i < count; i++) {
++		int index = seq & ~PAGE_MASK;
 +
-+	for (i = 1; i <= n; i++)
-+		fac = fac * i;
-+	return fac;
-+}
++		if (lspat & 1)
++			val ^= memory_array[index];
++		else
++			memory_array[index] = val;
 +
-+__attribute__((aligned(PAGE_SIZE))) static
-+void factorial_array(unsigned int n, unsigned int *input,
-+		     unsigned long long *output)
-+{
-+	unsigned int i;
-+
-+	for (i = 0; i < n; i++)
-+		output[i] = factorial(input[i]);
-+}
-+
-+__attribute__((aligned(PAGE_SIZE))) static
-+unsigned int do_computation(void)
-+{
-+	unsigned int fib_array[SEQ_LENGTH];
-+	unsigned long long facfib_array[SEQ_LENGTH];
-+	uint32_t fib_hash, facfib_hash;
-+
-+	create_fib_sequence(SEQ_LENGTH, &fib_array[0]);
-+	fib_hash = hash_array(&fib_array[0], sizeof(fib_array));
-+	factorial_array(SEQ_LENGTH, &fib_array[0], &facfib_array[0]);
-+	facfib_hash = hash_array(&facfib_array[0], sizeof(facfib_array));
-+
-+	return (fib_hash ^ facfib_hash);
-+}
-+
-+/* This provides a table of the work functions so we can flush each
-+ * page individually
-+ */
-+static void *pages[] = {&hash_array, &create_fib_sequence, &factorial,
-+			&factorial_array, &do_computation};
-+
-+static void do_flush(int i)
-+{
-+	if (flush_page)
-+		flush_tlb_page((unsigned long)pages[i % ARRAY_SIZE(pages)]);
-+	else
-+		flush_tlb_all();
-+}
-+
-+
-+static void just_compute(void)
-+{
-+	int i, errors = 0;
-+	int cpu = smp_processor_id();
-+
-+	uint32_t result;
-+
-+	report_info("CPU%d online", cpu);
-+
-+	for (i = 0 ; i < flush_count; i++) {
-+		result = do_computation();
-+
-+		if (result != SEQ_HASH) {
-+			errors++;
-+			report_info("CPU%d: seq%d 0x%"PRIx32"!=0x%x",
-+				    cpu, i, result, SEQ_HASH);
-+		}
-+
-+		if (flush_verbose && (i % 1000) == 0)
-+			report_info("CPU%d: seq%d", cpu, i);
-+
-+		if (flush_self)
-+			do_flush(i);
++		seq >>= PAGE_SHIFT;
++		seq ^= lspat;
++		lspat >>= 1;
 +	}
 +
-+	report(errors == 0, "CPU%d: Done - Errors: %d", cpu, errors);
++}
++
++static inc_fn increment_function;
++
++static void do_increment(void)
++{
++	int i;
++	int cpu = smp_processor_id();
++
++	report_info("CPU%d: online and ++ing", cpu);
++
++	for (i = 0; i < increment_count; i++) {
++		per_cpu_value[cpu]++;
++		increment_function(cpu);
++
++		if (do_shuffle)
++			shuffle_memory(cpu);
++	}
++
++	report_info("CPU%d: Done, %d incs\n", cpu, per_cpu_value[cpu]);
 +
 +	cpumask_set_cpu(cpu, &smp_test_complete);
 +	if (cpu != 0)
 +		halt();
 +}
 +
-+static void just_flush(void)
++static void setup_and_run_test(test_descr_t *test)
 +{
-+	int cpu = smp_processor_id();
-+	int i = 0;
++	unsigned int i, sum = 0;
++	int cpu, cpu_cnt = 0;
 +
-+	/*
-+	 * Set our CPU as done, keep flushing until everyone else
-+	 * finished
-+	 */
-+	cpumask_set_cpu(cpu, &smp_test_complete);
++	increment_function = test->main_fn;
 +
-+	while (!cpumask_full(&smp_test_complete))
-+		do_flush(i++);
-+
-+	report_info("CPU%d: Done - Triggered %d flushes", cpu, i);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	int cpu, i;
-+	char prefix[100];
-+
-+	for (i = 0; i < argc; i++) {
-+		char *arg = argv[i];
-+
-+		if (strcmp(arg, "page") == 0)
-+			flush_page = true;
-+
-+		if (strcmp(arg, "self") == 0)
-+			flush_self = true;
-+
-+		if (strcmp(arg, "verbose") == 0)
-+			flush_verbose = true;
-+	}
-+
-+	snprintf(prefix, sizeof(prefix), "tlbflush_%s_%s",
-+		 flush_page ? "page" : "all",
-+		 flush_self ? "self" : "other");
-+	report_prefix_push(prefix);
++	/* fill our random page */
++	for (i = 0; i < PAGE_SIZE; i++)
++		memory_array[i] = isaac_next_uint32(&prng_context[0]);
 +
 +	for_each_present_cpu(cpu) {
++		uint32_t seed2 = isaac_next_uint32(&prng_context[0]);
++
++		cpu_cnt++;
 +		if (cpu == 0)
 +			continue;
-+		smp_boot_secondary(cpu, just_compute);
++
++		isaac_init(&prng_context[cpu], (unsigned char *) &seed2, sizeof(seed2));
++		smp_boot_secondary(cpu, do_increment);
 +	}
 +
-+	if (flush_self)
-+		just_compute();
-+	else
-+		just_flush();
++	do_increment();
 +
 +	while (!cpumask_full(&smp_test_complete))
 +		cpu_relax();
 +
++	/* All CPUs done, do we add up */
++	for_each_present_cpu(cpu) {
++		sum += per_cpu_value[cpu];
++	}
++
++	if (test->should_pass)
++		report(sum == shared_value, "total incs %d", shared_value);
++	else
++		report_xfail(true, sum == shared_value, "total incs %d", shared_value);
++}
++
++int main(int argc, char **argv)
++{
++	static const unsigned char seed[] = "myseed";
++	test_descr_t *test = &tests[0];
++	int i;
++	unsigned int j;
++
++	isaac_init(&prng_context[0], &seed[0], sizeof(seed));
++
++	for (i = 0; i < argc; i++) {
++		char *arg = argv[i];
++
++		/* Check for test name */
++		for (j = 0; j < ARRAY_SIZE(tests); j++) {
++			if (strcmp(arg, tests[j].test_name) == 0)
++				test = &tests[j];
++		}
++
++		/* Test modifiers */
++		if (strcmp(arg, "noshuffle") == 0) {
++			do_shuffle = false;
++			report_prefix_push("noshuffle");
++		} else if (strstr(arg, "count=") != NULL) {
++			char *p = strstr(arg, "=");
++
++			increment_count = atol(p+1);
++		} else {
++			isaac_reseed(&prng_context[0], (unsigned char *) arg, strlen(arg));
++		}
++	}
++
++	if (test)
++		setup_and_run_test(test);
++	else
++		report(false, "Unknown test");
++
 +	return report_summary();
 +}
+diff --git a/arm/spinlock-test.c b/arm/spinlock-test.c
+deleted file mode 100644
+index 73aea76a..00000000
+--- a/arm/spinlock-test.c
++++ /dev/null
+@@ -1,87 +0,0 @@
+-/*
+- * Spinlock test
+- *
+- * This code is based on code from the tcg_baremetal_tests.
+- *
+- * Copyright (C) 2015 Virtual Open Systems SAS
+- *
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License version 2 as
+- * published by the Free Software Foundation.
+- */
+-
+-#include <libcflat.h>
+-#include <asm/smp.h>
+-#include <asm/barrier.h>
+-
+-#define LOOP_SIZE 10000000
+-
+-struct lock_ops {
+-	void (*lock)(int *v);
+-	void (*unlock)(int *v);
+-};
+-static struct lock_ops lock_ops;
+-
+-static void gcc_builtin_lock(int *lock_var)
+-{
+-	while (__sync_lock_test_and_set(lock_var, 1));
+-}
+-static void gcc_builtin_unlock(int *lock_var)
+-{
+-	__sync_lock_release(lock_var);
+-}
+-static void none_lock(int *lock_var)
+-{
+-	while (*(volatile int *)lock_var != 0);
+-	*(volatile int *)lock_var = 1;
+-}
+-static void none_unlock(int *lock_var)
+-{
+-	*(volatile int *)lock_var = 0;
+-}
+-
+-static int global_a, global_b;
+-static int global_lock;
+-
+-static void test_spinlock(void *data __unused)
+-{
+-	int i, errors = 0;
+-	int cpu = smp_processor_id();
+-
+-	printf("CPU%d online\n", cpu);
+-
+-	for (i = 0; i < LOOP_SIZE; i++) {
+-
+-		lock_ops.lock(&global_lock);
+-
+-		if (global_a == (cpu + 1) % 2) {
+-			global_a = 1;
+-			global_b = 0;
+-		} else {
+-			global_a = 0;
+-			global_b = 1;
+-		}
+-
+-		if (global_a == global_b)
+-			errors++;
+-
+-		lock_ops.unlock(&global_lock);
+-	}
+-	report(errors == 0, "CPU%d: Done - Errors: %d", cpu, errors);
+-}
+-
+-int main(int argc, char **argv)
+-{
+-	report_prefix_push("spinlock");
+-	if (argc > 1 && strcmp(argv[1], "bad") != 0) {
+-		lock_ops.lock = gcc_builtin_lock;
+-		lock_ops.unlock = gcc_builtin_unlock;
+-	} else {
+-		lock_ops.lock = none_lock;
+-		lock_ops.unlock = none_unlock;
+-	}
+-
+-	on_cpus(test_spinlock, NULL);
+-
+-	return report_summary();
+-}
 diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index 945c2d07..34c8a95b 100644
+index 34c8a95b..0a757556 100644
 --- a/arm/unittests.cfg
 +++ b/arm/unittests.cfg
-@@ -241,3 +241,28 @@ arch = arm64
- file = cache.flat
- arch = arm64
- groups = cache
-+
-+# TLB Torture Tests
-+[tlbflush-code::all_other]
-+file = tlbflush-code.flat
+@@ -266,3 +266,33 @@ smp = $(($MAX_SMP>4?4:$MAX_SMP))
+ extra_params = -append 'page self'
+ groups = nodefault mttcg
+ 
++# Locking tests
++[locking::none]
++file = locking-test.flat
 +smp = $(($MAX_SMP>4?4:$MAX_SMP))
-+groups = nodefault mttcg
++groups = nodefault mttcg locking
 +
-+[tlbflush-code::page_other]
-+file = tlbflush-code.flat
++[locking::lock]
++file = locking-test.flat
 +smp = $(($MAX_SMP>4?4:$MAX_SMP))
-+extra_params = -append 'page'
-+groups = nodefault mttcg
++extra_params = -append 'lock'
++groups = nodefault mttcg locking
 +
-+[tlbflush-code::all_self]
-+file = tlbflush-code.flat
++[locking::atomic]
++file = locking-test.flat
 +smp = $(($MAX_SMP>4?4:$MAX_SMP))
-+extra_params = -append 'self'
-+groups = nodefault mttcg
++extra_params = -append 'atomic'
++groups = nodefault mttcg locking
 +
-+[tlbflush-code::page_self]
-+file = tlbflush-code.flat
++[locking::wfelock]
++file = locking-test.flat
 +smp = $(($MAX_SMP>4?4:$MAX_SMP))
-+extra_params = -append 'page self'
-+groups = nodefault mttcg
++extra_params = -append 'wfelock'
++groups = nodefault mttcg locking
++
++[locking::excl]
++file = locking-test.flat
++smp = $(($MAX_SMP>4?4:$MAX_SMP))
++extra_params = -append 'excl'
++groups = nodefault mttcg locking
 +
 -- 
 2.30.2
