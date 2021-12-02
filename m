@@ -2,315 +2,247 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F1A24663EC
-	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 13:46:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 015404663FF
+	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 13:52:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358008AbhLBMtV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Dec 2021 07:49:21 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33558 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1347388AbhLBMtT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 2 Dec 2021 07:49:19 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B2C0RNh012031;
-        Thu, 2 Dec 2021 12:45:57 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=GgPk0wOzh9cnRT2AV+KNgN1eD7g0Vm02C+ygvejE3wc=;
- b=EI/Iga9MORZgUho48oHlV+7ksuYJCtDH3twfFN0Kl2XSCYRZtkJZd4m9BbojmIreGJi/
- DR48cCszx7Dc1kwWgwEQHbCD/mOQuQXBBCjicUHQayD0QVKYouLWY4VGm78dqKFIrQda
- wyH+8szeEFxbuft8LNEuF9j2CXIA5mhCtCx5nFpMYC98/MqlhVIg9CoFLUWK7UE6CyUc
- YdQ2qlFeCU7T0XLtVxMHM7aul+b7JtXMIPY7BvRLw9wZJGFZgIqfpACbHplODBXvIUQG
- JVw1xNs2Wy9N2voaWjbMKGAHcwkFTfx99Z6zaVp2OmpdEiirwbZ0MyQm+wnjRHbfvfB8 Mw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3cpuvgbats-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 02 Dec 2021 12:45:56 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1B2CaDk8023852;
-        Thu, 2 Dec 2021 12:45:56 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3cpuvgbat5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 02 Dec 2021 12:45:56 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1B2CdZuA025220;
-        Thu, 2 Dec 2021 12:45:54 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 3ckcaa487k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 02 Dec 2021 12:45:53 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1B2CjobF25297384
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 2 Dec 2021 12:45:50 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 827174C05C;
-        Thu,  2 Dec 2021 12:45:50 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 076C94C04A;
-        Thu,  2 Dec 2021 12:45:50 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.8.140])
-        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  2 Dec 2021 12:45:49 +0000 (GMT)
-Date:   Thu, 2 Dec 2021 13:45:48 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     kvm@vger.kernel.org, Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Sebastian Mitterle <smitterl@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v2 2/2] s390x: firq: floating interrupt
- test
-Message-ID: <20211202134548.24aa2e4d@p-imbrenda>
-In-Reply-To: <20211202123553.96412-3-david@redhat.com>
-References: <20211202123553.96412-1-david@redhat.com>
-        <20211202123553.96412-3-david@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S1358151AbhLBMzV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Dec 2021 07:55:21 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:37246 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S241642AbhLBMyy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 2 Dec 2021 07:54:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1638449492;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=deqfuKvFlU9prDfs0QlbobyXt/WvDKmo8HiTDuibat4=;
+        b=Jrf4LoOzRu8gg2vObo/QVPgiyYUObOcb0lugO3TcY37KcbWJfZ1MZK0GzXFdZPVQfYAwoH
+        PHwdNN582cmdxAGpbxaZS+VkWWv96BrpaP43U8mQc/vMw3ckh1hhkFZh2EYZsRSmYY8kzX
+        SS5CK76R1bz2Jd+iSlztrGF6mImoghc=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-112-0OQzfM4-NceA4QSy_piXoQ-1; Thu, 02 Dec 2021 07:51:28 -0500
+X-MC-Unique: 0OQzfM4-NceA4QSy_piXoQ-1
+Received: by mail-wm1-f70.google.com with SMTP id y141-20020a1c7d93000000b0033c2ae3583fso13939755wmc.5
+        for <kvm@vger.kernel.org>; Thu, 02 Dec 2021 04:51:28 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=deqfuKvFlU9prDfs0QlbobyXt/WvDKmo8HiTDuibat4=;
+        b=xTu7pjgpkDlNAdizouk0G59CzUgEp1RxFZs797o1JoQZxIDFwjEihy/QbmNdbCY+Q7
+         GoicmxSQQSeB4youJCSnq4IZ0ZeCLUeCcYVqtx8ZhYfLDJ6PKd1TB5+Wbo/WlOAnelVH
+         uNkjidT7jyzU9mFGsFX2i1XGK/fqgtyel7sEB3fq6uYr9q1A7mf6baLAEvWzMes64oY6
+         HxTuoqk5eK5UblKEneL3+ZTPX72H4zD0hFdCBnLjycm3ZzZ/Ujx0FQ7ec/CAdBm0xcEn
+         qbDBucao/M/vKhs4RzzLFYNNGv52SHb6Ne2UMst9QeJmNsGyG/R5u26Qpo1pq2TGfXfE
+         +YvA==
+X-Gm-Message-State: AOAM530RXmY3xmoT6WNrHUb5VYVMlAfTT1E5rkiAaBtiIE8suBuu2jbH
+        OnpR3iyzxVOn604ARgVKlXtXaXGJu112gPZo/L6Er9ph/Vnx86Vs9zEVpsNswnqiqvOfxnAaYYw
+        FkItEuBKuG5se
+X-Received: by 2002:a5d:6ac7:: with SMTP id u7mr14240043wrw.57.1638449486951;
+        Thu, 02 Dec 2021 04:51:26 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzQ4L4RACt5bxDAh35D/Rf+GaYVbUyzp4mc9eCtgosGSFiC+k8s5hy2mnjiEMXjE86duU5msA==
+X-Received: by 2002:a5d:6ac7:: with SMTP id u7mr14240024wrw.57.1638449486677;
+        Thu, 02 Dec 2021 04:51:26 -0800 (PST)
+Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id g18sm2622717wmq.4.2021.12.02.04.51.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 Dec 2021 04:51:26 -0800 (PST)
+Subject: Re: [RFC PATCH v3 03/29] KVM: arm64: Introduce struct id_reg_info
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+        Peter Shier <pshier@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-arm-kernel@lists.infradead.org
+References: <20211117064359.2362060-1-reijiw@google.com>
+ <20211117064359.2362060-4-reijiw@google.com>
+ <57519386-0a30-40a6-b46f-d20595df0b86@redhat.com>
+ <CAAeT=Fx8Z_W0ePxb+5O4OO4myJOr5SRLAFY38FrJJVtXXTxJQw@mail.gmail.com>
+From:   Eric Auger <eauger@redhat.com>
+Message-ID: <7bfd6fb8-40af-1da0-6336-8289c417d175@redhat.com>
+Date:   Thu, 2 Dec 2021 13:51:24 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <CAAeT=Fx8Z_W0ePxb+5O4OO4myJOr5SRLAFY38FrJJVtXXTxJQw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: A2udH9L4ZikQJURhvpJDZLy27FVaF3tk
-X-Proofpoint-GUID: Algwm3Y_AYs9eNoyxq8HgczZ0L78N_Ur
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
- definitions=2021-12-02_07,2021-12-02_01,2020-04-07_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
- clxscore=1015 phishscore=0 mlxlogscore=999 suspectscore=0 spamscore=0
- adultscore=0 lowpriorityscore=0 priorityscore=1501 malwarescore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2112020080
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu,  2 Dec 2021 13:35:53 +0100
-David Hildenbrand <david@redhat.com> wrote:
 
-> We had a KVM BUG fixed by kernel commit a3e03bc1368c ("KVM: s390: index
-> kvm->arch.idle_mask by vcpu_idx"), whereby a floating interrupt might get
-> stuck forever because a CPU in the wait state would not get woken up.
-> 
-> The issue can be triggered when CPUs are created in a nonlinear fashion,
-> such that the CPU address ("core-id") and the KVM cpu id don't match.
-> 
-> So let's start with a floating interrupt test that will trigger a
-> floating interrupt (via SCLP) to be delivered to a CPU in the wait state.
-> 
-> Signed-off-by: David Hildenbrand <david@redhat.com>
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-
-> ---
->  lib/s390x/sclp.c    |  11 ++--
->  lib/s390x/sclp.h    |   1 +
->  s390x/Makefile      |   1 +
->  s390x/firq.c        | 122 ++++++++++++++++++++++++++++++++++++++++++++
->  s390x/unittests.cfg |  10 ++++
->  5 files changed, 142 insertions(+), 3 deletions(-)
->  create mode 100644 s390x/firq.c
+On 11/25/21 7:40 AM, Reiji Watanabe wrote:
+> Hi Eric,
 > 
-> diff --git a/lib/s390x/sclp.c b/lib/s390x/sclp.c
-> index 0272249..33985eb 100644
-> --- a/lib/s390x/sclp.c
-> +++ b/lib/s390x/sclp.c
-> @@ -60,9 +60,7 @@ void sclp_setup_int(void)
->  void sclp_handle_ext(void)
->  {
->  	ctl_clear_bit(0, CTL0_SERVICE_SIGNAL);
-> -	spin_lock(&sclp_lock);
-> -	sclp_busy = false;
-> -	spin_unlock(&sclp_lock);
-> +	sclp_clear_busy();
->  }
->  
->  void sclp_wait_busy(void)
-> @@ -89,6 +87,13 @@ void sclp_mark_busy(void)
->  	}
->  }
->  
-> +void sclp_clear_busy(void)
-> +{
-> +	spin_lock(&sclp_lock);
-> +	sclp_busy = false;
-> +	spin_unlock(&sclp_lock);
-> +}
-> +
->  static void sclp_read_scp_info(ReadInfo *ri, int length)
->  {
->  	unsigned int commands[] = { SCLP_CMDW_READ_SCP_INFO_FORCED,
-> diff --git a/lib/s390x/sclp.h b/lib/s390x/sclp.h
-> index 61e9cf5..fead007 100644
-> --- a/lib/s390x/sclp.h
-> +++ b/lib/s390x/sclp.h
-> @@ -318,6 +318,7 @@ void sclp_setup_int(void);
->  void sclp_handle_ext(void);
->  void sclp_wait_busy(void);
->  void sclp_mark_busy(void);
-> +void sclp_clear_busy(void);
->  void sclp_console_setup(void);
->  void sclp_print(const char *str);
->  void sclp_read_info(void);
-> diff --git a/s390x/Makefile b/s390x/Makefile
-> index f95f2e6..1e567c1 100644
-> --- a/s390x/Makefile
-> +++ b/s390x/Makefile
-> @@ -25,6 +25,7 @@ tests += $(TEST_DIR)/uv-host.elf
->  tests += $(TEST_DIR)/edat.elf
->  tests += $(TEST_DIR)/mvpg-sie.elf
->  tests += $(TEST_DIR)/spec_ex-sie.elf
-> +tests += $(TEST_DIR)/firq.elf
->  
->  tests_binary = $(patsubst %.elf,%.bin,$(tests))
->  ifneq ($(HOST_KEY_DOCUMENT),)
-> diff --git a/s390x/firq.c b/s390x/firq.c
-> new file mode 100644
-> index 0000000..1f87718
-> --- /dev/null
-> +++ b/s390x/firq.c
-> @@ -0,0 +1,122 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Floating interrupt tests.
-> + *
-> + * Copyright 2021 Red Hat Inc
-> + *
-> + * Authors:
-> + *    David Hildenbrand <david@redhat.com>
-> + */
-> +#include <libcflat.h>
-> +#include <asm/asm-offsets.h>
-> +#include <asm/interrupt.h>
-> +#include <asm/page.h>
-> +#include <asm-generic/barrier.h>
-> +
-> +#include <sclp.h>
-> +#include <smp.h>
-> +#include <alloc_page.h>
-> +
-> +static void wait_for_sclp_int(void)
-> +{
-> +	/* Enable SCLP interrupts on this CPU only. */
-> +	ctl_set_bit(0, CTL0_SERVICE_SIGNAL);
-> +
-> +	/* Enable external interrupts and go to the wait state. */
-> +	wait_for_interrupt(PSW_MASK_EXT);
-> +}
-> +
-> +/*
-> + * Some KVM versions might mix CPUs when looking for a floating IRQ target,
-> + * accidentially detecting a stopped CPU as waiting and resulting in the actually
-> + * waiting CPU not getting woken up for the interrupt.
-> + */
-> +static void test_wait_state_delivery(void)
-> +{
-> +	struct psw psw;
-> +	SCCBHeader *h;
-> +	int ret;
-> +
-> +	report_prefix_push("wait state delivery");
-> +
-> +	if (smp_query_num_cpus() < 3) {
-> +		report_skip("need at least 3 CPUs for this test");
-> +		goto out;
-> +	}
-> +
-> +	if (stap()) {
-> +		report_skip("need to start on CPU #0");
-> +		goto out;
-> +	}
-> +
-> +	/*
-> +	 * We want CPU #2 to be stopped. This should be the case at this
-> +	 * point, however, we want to sense if it even exists as well.
-> +	 */
-> +	ret = smp_cpu_stop(2);
-> +	if (ret) {
-> +		report_skip("CPU #2 not found");
-> +		goto out;
-> +	}
-> +
-> +	/*
-> +	 * We're going to perform an SCLP service call but expect
-> +	 * the interrupt on CPU #1 while it is in the wait state.
-> +	 */
-> +	sclp_mark_busy();
-> +
-> +	/* Start CPU #1 and let it wait for the interrupt. */
-> +	psw.mask = extract_psw_mask();
-> +	psw.addr = (unsigned long)wait_for_sclp_int;
-> +	ret = smp_cpu_setup(1, psw);
-> +	if (ret) {
-> +		sclp_clear_busy();
-> +		report_skip("cpu #1 not found");
-> +		goto out;
-> +	}
-> +
-> +	/*
-> +	 * We'd have to jump trough some hoops to sense e.g., via SIGP
-> +	 * CONDITIONAL EMERGENCY SIGNAL if CPU #1 is already in the
-> +	 * wait state.
-> +	 *
-> +	 * Although not completely reliable, use SIGP SENSE RUNNING STATUS
-> +	 * until not reported as running -- after all, our SCLP processing
-> +	 * will take some time as well and smp_cpu_setup() returns when we're
-> +	 * either already in wait_for_sclp_int() or just about to execute it.
-> +	 */
-> +	while(smp_sense_running_status(1));
-> +
-> +	h = alloc_page();
-> +	h->length = 4096;
-> +	ret = servc(SCLP_CMDW_READ_CPU_INFO, __pa(h));
-> +	if (ret) {
-> +		sclp_clear_busy();
-> +		report_fail("SCLP_CMDW_READ_CPU_INFO failed");
-> +		goto out_destroy;
-> +	}
-> +
-> +	/*
-> +	 * Wait until the interrupt gets delivered on CPU #1, marking the
-> +	 * SCLP requests as done.
-> +	 */
-> +	sclp_wait_busy();
-> +
-> +	report(true, "sclp interrupt delivered");
-> +
-> +out_destroy:
-> +	free_page(h);
-> +	smp_cpu_destroy(1);
-> +out:
-> +	report_prefix_pop();
-> +}
-> +
-> +int main(void)
-> +{
-> +	report_prefix_push("firq");
-> +
-> +	test_wait_state_delivery();
-> +
-> +	report_prefix_pop();
-> +	return report_summary();
-> +}
-> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-> index 3b454b7..054560c 100644
-> --- a/s390x/unittests.cfg
-> +++ b/s390x/unittests.cfg
-> @@ -112,3 +112,13 @@ file = mvpg-sie.elf
->  
->  [spec_ex-sie]
->  file = spec_ex-sie.elf
-> +
-> +[firq-linear-cpu-ids]
-> +file = firq.elf
-> +timeout = 20
-> +extra_params = -smp 1,maxcpus=3 -cpu qemu -device qemu-s390x-cpu,core-id=1 -device qemu-s390x-cpu,core-id=2
-> +
-> +[firq-nonlinear-cpu-ids]
-> +file = firq.elf
-> +timeout = 20
-> +extra_params = -smp 1,maxcpus=3 -cpu qemu -device qemu-s390x-cpu,core-id=2 -device qemu-s390x-cpu,core-id=1
+> On Wed, Nov 24, 2021 at 1:07 PM Eric Auger <eauger@redhat.com> wrote:
+>>
+>> Hi Reiji,
+>>
+>> On 11/17/21 7:43 AM, Reiji Watanabe wrote:
+>>> This patch lays the groundwork to make ID registers writable.
+>>>
+>>> Introduce struct id_reg_info for an ID register to manage the
+>>> register specific control of its value for the guest, and provide set
+>>> of functions commonly used for ID registers to make them writable.
+>>>
+>>> The id_reg_info is used to do register specific initialization,
+>>> validation of the ID register and etc.  Not all ID registers must
+>>> have the id_reg_info. ID registers that don't have the id_reg_info
+>>> are handled in a common way that is applied to all ID registers.
+>>>
+>>> At present, changing an ID register from userspace is allowed only
+>>> if the ID register has the id_reg_info, but that will be changed
+>>> by the following patches.
+>>>
+>>> No ID register has the structure yet and the following patches
+>>> will add the id_reg_info for some ID registers.
+>>>
+>>> Signed-off-by: Reiji Watanabe <reijiw@google.com>
+>>> ---
+>>>  arch/arm64/include/asm/sysreg.h |   1 +
+>>>  arch/arm64/kvm/sys_regs.c       | 226 ++++++++++++++++++++++++++++++--
+>>>  2 files changed, 218 insertions(+), 9 deletions(-)
+>>>
+>>> diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+>>> index 16b3f1a1d468..597609f26331 100644
+>>> --- a/arch/arm64/include/asm/sysreg.h
+>>> +++ b/arch/arm64/include/asm/sysreg.h
+>>> @@ -1197,6 +1197,7 @@
+>>>  #define ICH_VTR_TDS_MASK     (1 << ICH_VTR_TDS_SHIFT)
+>>>
+>>>  #define ARM64_FEATURE_FIELD_BITS     4
+>>> +#define ARM64_FEATURE_FIELD_MASK     ((1ull << ARM64_FEATURE_FIELD_BITS) - 1)
+>>>
+>>>  /* Create a mask for the feature bits of the specified feature. */
+>>>  #define ARM64_FEATURE_MASK(x)        (GENMASK_ULL(x##_SHIFT + ARM64_FEATURE_FIELD_BITS - 1, x##_SHIFT))
+>>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>>> index 5608d3410660..1552cd5581b7 100644
+>>> --- a/arch/arm64/kvm/sys_regs.c
+>>> +++ b/arch/arm64/kvm/sys_regs.c
+>>> @@ -265,6 +265,181 @@ static bool trap_raz_wi(struct kvm_vcpu *vcpu,
+>>>               return read_zero(vcpu, p);
+>>>  }
+>>>
+>>> +/*
+>>> + * A value for FCT_LOWER_SAFE must be zero and changing that will affect
+>>> + * ftr_check_types of id_reg_info.
+>>> + */
+>>> +enum feature_check_type {
+>>> +     FCT_LOWER_SAFE = 0,
+>>> +     FCT_HIGHER_SAFE,
+>>> +     FCT_HIGHER_OR_ZERO_SAFE,
+>>> +     FCT_EXACT,
+>>> +     FCT_EXACT_OR_ZERO_SAFE,
+>>> +     FCT_IGNORE,     /* Don't check (any value is fine) */
+>>> +};
+>>> +
+>>> +static int arm64_check_feature_one(enum feature_check_type type, int val,
+>>> +                                int limit)
+>>> +{
+>>> +     bool is_safe = false;
+>>> +
+>>> +     if (val == limit)
+>>> +             return 0;
+>>> +
+>>> +     switch (type) {
+>>> +     case FCT_LOWER_SAFE:
+>>> +             is_safe = (val <= limit);
+>>> +             break;
+>>> +     case FCT_HIGHER_OR_ZERO_SAFE:
+>>> +             if (val == 0) {
+>>> +                     is_safe = true;
+>>> +                     break;
+>>> +             }
+>>> +             fallthrough;
+>>> +     case FCT_HIGHER_SAFE:
+>>> +             is_safe = (val >= limit);
+>>> +             break;
+>>> +     case FCT_EXACT:
+>>> +             break;
+>>> +     case FCT_EXACT_OR_ZERO_SAFE:
+>>> +             is_safe = (val == 0);
+>>> +             break;
+>>> +     case FCT_IGNORE:
+>>> +             is_safe = true;
+>>> +             break;
+>>> +     default:
+>>> +             WARN_ONCE(1, "Unexpected feature_check_type (%d)\n", type);
+>>> +             break;
+>>> +     }
+>>> +
+>>> +     return is_safe ? 0 : -1;
+>>> +}
+>>> +
+>>> +#define      FCT_TYPE_MASK           0x7
+>>> +#define      FCT_TYPE_SHIFT          1
+>>> +#define      FCT_SIGN_MASK           0x1
+>>> +#define      FCT_SIGN_SHIFT          0
+>>> +#define      FCT_TYPE(val)   ((val >> FCT_TYPE_SHIFT) & FCT_TYPE_MASK)
+>>> +#define      FCT_SIGN(val)   ((val >> FCT_SIGN_SHIFT) & FCT_SIGN_MASK)
+>>> +
+>>> +#define      MAKE_FCT(shift, type, sign)                             \
+>>> +     ((u64)((((type) & FCT_TYPE_MASK) << FCT_TYPE_SHIFT) |   \
+>>> +            (((sign) & FCT_SIGN_MASK) << FCT_SIGN_SHIFT)) << (shift))
+>>> +
+>>> +/* For signed field */
+>>> +#define      S_FCT(shift, type)      MAKE_FCT(shift, type, 1)
+>>> +/* For unigned field */
+>>> +#define      U_FCT(shift, type)      MAKE_FCT(shift, type, 0)
+>>> +
+>>> +/*
+>>> + * @val and @lim are both a value of the ID register. The function checks
+>>> + * if all features indicated in @val can be supported for guests on the host,
+>>> + * which supports features indicated in @lim. @check_types indicates how
+>>> + * features in the ID register needs to be checked.
+>>> + * See comments for id_reg_info's ftr_check_types field for more detail.
+>>> + */
+>>> +static int arm64_check_features(u64 check_types, u64 val, u64 lim)
+>>> +{
+>>> +     int i;
+>>> +
+>>> +     for (i = 0; i < 64; i += ARM64_FEATURE_FIELD_BITS) {
+>>> +             u8 ftr_check = (check_types >> i) & ARM64_FEATURE_FIELD_MASK;
+>>> +             bool is_sign = FCT_SIGN(ftr_check);
+>>> +             enum feature_check_type fctype = FCT_TYPE(ftr_check);
+>>> +             int fval, flim, ret;
+>>> +
+>>> +             fval = cpuid_feature_extract_field(val, i, is_sign);
+>>> +             flim = cpuid_feature_extract_field(lim, i, is_sign);
+>>> +
+>>> +             ret = arm64_check_feature_one(fctype, fval, flim);
+>>> +             if (ret)
+>>> +                     return -E2BIG;
+>> nit: -EINVAL may be better because depending on the check type this may
+>> not mean too big.
+> 
+> Yes, that is correct.
+> 
+> This error case means that userspace tried to configure features
+> or a higher level of features that were not supported on the host.
+> In that sense, I chose -E2BIG.
+> 
+> I wanted to use an error code specific to this particular case, which
+> I think makes debugging userspace issue easier when KVM_SET_ONE_REG
+> fails, and I couldn't find other error codes that fit this case better.
+> So, I'm trying to avoid using -EINVAL, which is used for other failure
+> cases.
+> 
+> If you have any other suggested error code for this,
+> that would be very helpful:)
+
+OK faire enought, that's a nit anyway
+
+Eric
+> 
+> Thanks,
+> Reiji
+> 
 
