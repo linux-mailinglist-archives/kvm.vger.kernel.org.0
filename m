@@ -2,162 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F90D466647
-	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 16:16:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BC310466693
+	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 16:34:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358897AbhLBPUK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Dec 2021 10:20:10 -0500
-Received: from mail-cusazlp17010001.outbound.protection.outlook.com ([40.93.13.1]:10995
-        "EHLO na01-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S236157AbhLBPUC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Dec 2021 10:20:02 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=G/U6g3c60MSqZkToKv/3tv9cDehF1NhqFG7wWvSdhGO23mdX8oqSJF0farvfcaN4VbeP3ZQ1ElyCrOAHRJN/n74YgSESI/PvqXQqDdj3pBVQl++I6TKDcOSv8fZo8rbr4l/48Bf+G1+w4BC3Ex3poh+yJ4dkFkL7ZmAUhOpSYS12fCqAUys/udYMiavEgly3hoMTBiGFVD8rivCEHwHC37n7X2gDCk2eMCaBK3pMmQm0r7NNSndhpDwE6gJ9b/CVtoDtjZ6b1kDThHe2/ImvxzsmoJHSSqbjQ33m92kJQKw5zr8DTYmkRdsmKHeunKsM5nYdm6zh2hHwp4PszQn3BQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IXuPOeJAPbtwczpiM1Kfwe/KvtCvjVzt9ieOZUplcxw=;
- b=Ko94BSdY/0jxvfi5kJpHTmGDQ5m20/PF9QzWn/qclwnFUDpRAu198yZl6yTnJ3xGvc9+seSUbsHyVh1y57QjgAaaVEhcvpsuVI09rL6OBSINi7nJyGViLoAib0VPkv1burXC5CIU+NcrwQXqJ3o9UvewBQY1keY0jPT5BVUUWatTlJGe9k5yfegKTPQVjS9pz1NW5vr4E20AgIrv9/Hs17s/oiKa74Hb5muePpiCtwDLKLqQo9evnl8YUrZZqFxoiRFMOwV2mkc5kEgmT1OCWxV6k4gDZFOasqf4LE7UN420eGIIhrV39kNcQa79nk4cmp7C3cnOZAB2NF3WE7dqSw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IXuPOeJAPbtwczpiM1Kfwe/KvtCvjVzt9ieOZUplcxw=;
- b=Drd8fYJFj5bnFG8hIIFuExVVWWdph7dvsNrCfx8Nqfs0em+nFhtpz2VWjTz86l3uIrWVRHzpIg/ev4+DMNm/OcZ8efJSM4gL9EK9xXLDwJDqVM1NfH+miXKCSkQADqS+RB194gy33FoGTwAcvKPN9ARUYhniDoIrJDuEpfDFtlk=
-Received: from MWHPR21MB1593.namprd21.prod.outlook.com (2603:10b6:301:7c::11)
- by MW4PR21MB3030.namprd21.prod.outlook.com (2603:10b6:303:133::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4734.5; Thu, 2 Dec
- 2021 15:16:35 +0000
-Received: from MWHPR21MB1593.namprd21.prod.outlook.com
- ([fe80::9401:9c8b:c334:4336]) by MWHPR21MB1593.namprd21.prod.outlook.com
- ([fe80::9401:9c8b:c334:4336%2]) with mapi id 15.20.4755.001; Thu, 2 Dec 2021
- 15:16:35 +0000
-From:   "Michael Kelley (LINUX)" <mikelley@microsoft.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        vkuznets <vkuznets@redhat.com>
-CC:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Ajay Garg <ajaygargnsit@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        KY Srinivasan <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-        Arnd Bergmann <arnd@arndb.de>
-Subject: RE: [PATCH v2 8/8] KVM: x86: Add checks for reserved-to-zero Hyper-V
- hypercall fields
-Thread-Topic: [PATCH v2 8/8] KVM: x86: Add checks for reserved-to-zero Hyper-V
- hypercall fields
-Thread-Index: AQHXzSJh65/VHj4xikGNZ9FzYT3jdKvufX8AgDAsmgCAANqFoA==
-Date:   Thu, 2 Dec 2021 15:16:35 +0000
-Message-ID: <MWHPR21MB1593E284E412873C64B54A32D7699@MWHPR21MB1593.namprd21.prod.outlook.com>
-References: <20211030000800.3065132-1-seanjc@google.com>
- <20211030000800.3065132-9-seanjc@google.com>
- <87v91cjhch.fsf@vitty.brq.redhat.com> <YagrxIknF9DX8l8L@google.com>
-In-Reply-To: <YagrxIknF9DX8l8L@google.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=a26e8b93-53af-4503-a5ab-6b6c42f9dce0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2021-12-02T15:15:30Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 40e5ac26-24f8-474a-c9bb-08d9b5a6bb2f
-x-ms-traffictypediagnostic: MW4PR21MB3030:EE_
-x-ld-processed: 72f988bf-86f1-41af-91ab-2d7cd011db47,ExtAddr
-x-microsoft-antispam-prvs: <MW4PR21MB303039CACDDA6EAD5D5FFFEAD7699@MW4PR21MB3030.namprd21.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7691;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: /q3OxKW94+Kj9Ewz3gSDbhgbORJaMa/zfm7CCOMhATcGJJ73lELOqpKERMqCuMNGZQMPlPgYLe2H0j3gVHKGULPIVyVLEXOHbzaAxIKaJDGzHlcdwPCsSIDNN11NU/6y3Yvl2ljwKpg6RQuqj1fClFHBNaFtxcDQ12Q/mw6KuEs9+9RMK06HKhZlo73N2/6wI4aVa1qkfVtuAnMjBIFa0P1IGJXfRfOBDS1SiQuzZyw9GcKYhBFi6lQBoKeSErgan1P1Co3t2IdaeNj1vycRA17P6h9NauocjAODSjm7aWk8jEV54cKeEgXJugm5fEzG23A0yGJmtZpSa40z+2Uxt/oWbiBst6XsnLIyz4BjZYxMQkIIGRfMvMqHT1BQB+dXpDvKtCisyAvA+rAZ2DxYXqy0q7sby63L4BonzPEfzKMSMeBKfQeR4j3iW1BSANgD1oUT3JgOMu1XUfXgd5G76lUhUFLgAAssa/4NEy6Y+tJxH763YkIWdmLzV5ExV/uReoJN+/djgqm/5d4hHJAHAjvBxJzFAUsOEyAEM0VZGeBcB2AT2MyacuBixCnDAzPb5reEM8yIiGyUVzLBS2g34BIxvamI0cLH/9depGA0f5BLRvUPBubbESo+7DiPf36/z/jv9YygPXZDdq3N/AnVzhXd1vHHT5QsQq0k84GcIL/XAigtwMSp2FEMPKSszXaPCF7uizzazio2b8bkXiMAVfR5qKHj3FMaEVNQbJNdp+yuw1hFkM/chKNF4NG4bX0q0ndwGxjGdCdbKRy7EbLpF91CY/3YeKRO9VbGKxClTnzXgAVBw3rDY9S22iYSsgysGxiOBD0XOHNpyy6/Fsnc7A==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR21MB1593.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(9686003)(33656002)(38070700005)(38100700002)(6506007)(7416002)(8990500004)(66556008)(186003)(55016003)(2906002)(26005)(122000001)(4326008)(8936002)(54906003)(7696005)(66476007)(316002)(64756008)(52536014)(66446008)(82960400001)(76116006)(8676002)(966005)(66946007)(4744005)(5660300002)(82950400001)(71200400001)(110136005)(508600001)(86362001)(10290500003)(20210929001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?8pzP9tZ3jqGvhuppaNuVc2TIHkk9ifk+XKfPJLa9xBv5Mglz9xAAYaiAa2ER?=
- =?us-ascii?Q?3qYW+wMguO9l5u51TGTlfxSC6JsnkZuSZmxfbgb3UTsN+J9N7q3jj5FhAIJP?=
- =?us-ascii?Q?9XUtJ1ejJc52YlKFD5nNHxwwdVCUeaDFyY6dzDVoyyPYqgHwiuBySck7oyQk?=
- =?us-ascii?Q?NgbOzePAwXtFj1bSit5zOA26cOb2gtApZ91+Mk6RSSu1WDqNvKM3IVhgKoVd?=
- =?us-ascii?Q?LAYGbC0jO+rvWuaIGw/f1AWleZiP55Xa+3ndn59sWCj+nBHmUlU48vCKAvdR?=
- =?us-ascii?Q?lf9kqfi++VMHXeF+iK+7O1D5YQK5kQNRaI5ieTpY2V0G3QhdxDmPsmO2abaa?=
- =?us-ascii?Q?nJeeeqhQFG+lqwoVBaVACRIyEVdH2Rb6OzAxHqfnEAGX3O92R3KmYneue2ks?=
- =?us-ascii?Q?xTd5KIPG76y0p4ttz0F0qsqQVjqudx3+caDhiTced/g0B5Gd3EI/MQ0qV865?=
- =?us-ascii?Q?XLDun+sMW5/cxXssfuGGNIy+b3a0BncwLmhWUmePbNW0Pa7qo/27wAkPDgJ0?=
- =?us-ascii?Q?9vt/JSfaMEl4BlBjQ9jUeKR2KlHOxPiTPyMJ2LvsCvIdrFNon6BrJP29qioc?=
- =?us-ascii?Q?KWfJV64FQ0IrWsv4Eavdr2nLJ/08kBKxKRuLqNbnwbkb/UZuCsbd/rzXG0ej?=
- =?us-ascii?Q?xjdJn+nSm6OvnnH+Gf1CpTl96/3+4tzhOwAoCStZeHLPySS9HqPLK+e/5DqT?=
- =?us-ascii?Q?yDo624K7Rqvty6n42N69QKMLQs6bZry70dOsP351GRFmnYwOJTeESi9sft0G?=
- =?us-ascii?Q?ET8VHllG8fiRdbFev55sKA+8mAs0oFxsUZ5YJIpwJS/e0y9VGn3fJBfW2mQS?=
- =?us-ascii?Q?DV51I3cQ8WvAB2bXSPxdMpAGP1kzV9n6lf8dtCs2vI3sRPYaUX+AogMNigv9?=
- =?us-ascii?Q?JrwQYhi4NjWgqfHMGtlKZuEqM4iZdN6BDfQ+5nS0NNiHeQbHdKlMPTszmtGj?=
- =?us-ascii?Q?iQsSrSklzLDxS8AGraV59EF2LRNoPfgU3DZJLZgNJ6v5qLiCbk5yL1QxAvdt?=
- =?us-ascii?Q?+k425IZdrYP8hFlDzs3wCPAv9RGpuo0qUX/uLo1nezJNmxK5uem4MZ3aXAJz?=
- =?us-ascii?Q?KpYwoRTplz8Hkc7Ibg4CrUEkaCq2QNPJPedS9LyQsMZZC5lM5VyzGigj2vYS?=
- =?us-ascii?Q?OwEvoDn1pF2vuPBGBqOXjlcoUwZiDUVl9SOTQdYtwb+5dipWOclMYOKm0jQa?=
- =?us-ascii?Q?V9iYkqZk9CNykAtHKbOB+KbIG9rTvydrjRmolMfGOlMWsC0xHKdsb86QDYjs?=
- =?us-ascii?Q?hDN0V1qIn6H8DI8+RWS4ve8rnTsIvbK12j2wTCQaQfohQ2AJ4CypKFbJ0hm/?=
- =?us-ascii?Q?RnLZNVCyRZZwtL0eh/YsFs2r3H83nicb8lsQYkmiARuiILkNn3pQ+YwrJWqq?=
- =?us-ascii?Q?UWQkBG1IRN8vRTWUtQGE6+ghJFGMj+tewUXJyYI4Jf2SUQDDlXm1k4IHue1F?=
- =?us-ascii?Q?R1MJabw6pQiGhsUjk6lj4pgABLxgCyI9/1Ey2Mo/Ow/wcP48dUo9jLf3UL3D?=
- =?us-ascii?Q?aLSGEznaYrEsSS3uDcDGik3g3jAhsykbzxwrP2OgokbkwvuYUOcNqADk1JAY?=
- =?us-ascii?Q?/XJgm9BaXjlF5cbp3ifWT5UsC80J3Sob56VqmUpe7OGjz2KqYcyy2g35eV0K?=
- =?us-ascii?Q?7yDv3HOIrEdDA6vzF7mVwkSrOFhcKyzNrF7YJ6Ut9kpU6uPTMqM4uq1NlmcD?=
- =?us-ascii?Q?lohwaQ=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S1359029AbhLBPiL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Dec 2021 10:38:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51748 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1358984AbhLBPiK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Dec 2021 10:38:10 -0500
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7515AC06174A;
+        Thu,  2 Dec 2021 07:34:47 -0800 (PST)
+Received: by mail-pl1-x62c.google.com with SMTP id u11so20495031plf.3;
+        Thu, 02 Dec 2021 07:34:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=uDWxolb0OqtHKB4fKXPCc+zsagXL08BS8V3CqyXaOR4=;
+        b=X6AiT4U8iUfomEWuT1XhKlXnFMYwOmjeg/ucbcvfGTcQHDH9naMZnZRRJNw7Wp1nm5
+         jLaUzr3w7qIWRH9UpxqeULBIQYSWSdDOCS6vmxYWCeuz45Hv2ojOp4KsAENUyht/mViE
+         Jy/E5FjF+w6vnca5qNN47VQTOXCbUfC5OsBtLBvGwyKec41HDVwbCBTibycVScSpldrt
+         I0JhrLr3Uh946GCYYGpPUdfE5xf2HWRMHB/bEPEh2pVwvU4jkc1tAtXmb4nude5L4NMf
+         Z9WS9NimwocCDAalKX9JioFVkvj/iDiO4sNRJ8DTuqo4PcCyfnj7neQdPEPr8U2KXrju
+         2XQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=uDWxolb0OqtHKB4fKXPCc+zsagXL08BS8V3CqyXaOR4=;
+        b=6VVuq7o+kcWEFY2wycELFLn6NTNX14/gyaQI5EUht1zrYCtXkibS00y5y+Uc65M6S6
+         ojwdamwhzwysukTZ3IwJxMT43PJDsuXuQFZ3gKU80CTdLdvzpwSYs6d6SbLHzXSKCR61
+         3QvmwMTBXPr+Pf3PtymujcZPQki0drF0VHE2yo3OlGicq63WQ6QDOgKaNy6cOfTuL3ey
+         ywjet/aOHvO84TtpDrmEcRIrx3t2LqfnThxIZ5eI6eVT2blQghrGR9Ws1eFRw72HJF+0
+         +G7NhkUHWMMMzOwID0UAcAue7UtvAZDdjMn6b4h9RAwD+Xx751zJxCSjuuFnB055Iieg
+         R+Fg==
+X-Gm-Message-State: AOAM531s7j3gSUr+XXTp7jMwUVs8eEYgchwJcam/g/Q4MAs7bslEHyNx
+        s3/Q+u8fbYt8mXQwYj/Yv4B6PHdOHG0oLe6moyU3oO78
+X-Google-Smtp-Source: ABdhPJyLbnAxanq+pggWtpgv5XgeL/6gLOqJ+UyeprNu4u/eezoRktisT2yjFB+ZKKcQAc9tf0H+5jnCY/j9ioB+OFk=
+X-Received: by 2002:a17:902:b588:b0:143:b732:834 with SMTP id
+ a8-20020a170902b58800b00143b7320834mr16304369pls.22.1638459286910; Thu, 02
+ Dec 2021 07:34:46 -0800 (PST)
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MWHPR21MB1593.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 40e5ac26-24f8-474a-c9bb-08d9b5a6bb2f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Dec 2021 15:16:35.7406
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Li/Qvu9m74m4LFq2rZP0ubOD25fzzqVVMmiwsZyzq3SRrhNg8MtVVu3p6jekMl8DvKfGDgDIMBQ4uXXF0YWxXGHwacCp7P9TlP2fEkuqKXA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR21MB3030
+References: <1638410784-48646-1-git-send-email-cuibixuan@linux.alibaba.com>
+ <20211201192643.ecb0586e0d53bf8454c93669@linux-foundation.org>
+ <10cb0382-012b-5012-b664-c29461ce4de8@linux.alibaba.com> <20211201202905.b9892171e3f5b9a60f9da251@linux-foundation.org>
+ <YaiiFxD7jfFT9cSR@azazel.net>
+In-Reply-To: <YaiiFxD7jfFT9cSR@azazel.net>
+From:   Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date:   Thu, 2 Dec 2021 07:34:36 -0800
+Message-ID: <CAADnVQLV4Tf3LemvZoZHw7jcywZ4qqckv_EMQx3JF9kXtHhY-Q@mail.gmail.com>
+Subject: Re: [PATCH -next] mm: delete oversized WARN_ON() in kvmalloc() calls
+To:     Jeremy Sowden <jeremy@azazel.net>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Bixuan Cui <cuibixuan@linux.alibaba.com>,
+        linux-mm <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Leon Romanovsky <leon@kernel.org>, Willy Tarreau <w@1wt.eu>,
+        Kees Cook <keescook@chromium.org>, bpf <bpf@vger.kernel.org>,
+        Network Development <netdev@vger.kernel.org>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jakub Kicinski <kuba@kernel.org>, kvm@vger.kernel.org,
+        netfilter-devel <netfilter-devel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <seanjc@google.com> Sent: Wednesday, December 1, =
-2021 6:13 PM
->=20
-> On Mon, Nov 01, 2021, Vitaly Kuznetsov wrote:
-> > Sean Christopherson <seanjc@google.com> writes:
-> >
-> > > Add checks for the three fields in Hyper-V's hypercall params that mu=
-st
-> > > be zero.  Per the TLFS, HV_STATUS_INVALID_HYPERCALL_INPUT is returned=
- if
-> > > "A reserved bit in the specified hypercall input value is non-zero."
+On Thu, Dec 2, 2021 at 2:38 AM Jeremy Sowden <jeremy@azazel.net> wrote:
+>
+> On 2021-12-01, at 20:29:05 -0800, Andrew Morton wrote:
+> > On Thu, 2 Dec 2021 12:05:15 +0800 Bixuan Cui wrote:
+> > > =E5=9C=A8 2021/12/2 =E4=B8=8A=E5=8D=8811:26, Andrew Morton =E5=86=99=
+=E9=81=93:
+> > > >> Delete the WARN_ON() and return NULL directly for oversized
+> > > >> parameter in kvmalloc() calls.
+> > > >> Also add unlikely().
+> > > >>
+> > > >> Fixes: 7661809d493b ("mm: don't allow oversized kvmalloc() calls")
+> > > >> Signed-off-by: Bixuan Cui<cuibixuan@linux.alibaba.com>
+> > > >> ---
+> > > >> There are a lot of oversize warnings and patches about kvmalloc()
+> > > >> calls recently. Maybe these warnings are not very necessary.
+> > > >
+> > > > Or maybe they are.  Please let's take a look at these warnings,
+> > > > one at a time.  If a large number of them are bogus then sure,
+> > > > let's disable the runtime test.  But perhaps it's the case that
+> > > > calling code has genuine issues and should be repaired.
 > > >
-> > > Note, the TLFS has an off-by-one bug for the last reserved field, whi=
-ch
-> > > it defines as being bits 64:60.  The same section states "The input f=
-ield
-> > > 64-bit value called a hypercall input value.", i.e. bit 64 doesn't
-> > > exist.
+> > > Such as=EF=BC=9A
 > >
-> > This version are you looking at? I can't see this issue in 6.0b
->=20
-> It's the web-based documentation, the 6.0b PDF indeed does not have the s=
-ame bug.
->=20
-> https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/tlfs/h=
-ypercall-interface#hypercall-inputs
+> > Thanks, that's helpful.
+> >
+> > Let's bring all these to the attention of the relevant developers.
+> >
+> > If the consensus is "the code's fine, the warning is bogus" then let's
+> > consider retiring the warning.
+> >
+> > If the consensus is otherwise then hopefully they will fix their stuff!
+> >
+> > > https://syzkaller.appspot.com/bug?id=3D24452f89446639c901ac07379ccc70=
+2808471e8e
+> >
+> > (cc bpf@vger.kernel.org)
+> >
+> > > https://syzkaller.appspot.com/bug?id=3Df7c5a86e747f9b7ce333e7295875cd=
+4ede2c7a0d
+> >
+> > (cc netdev@vger.kernel.org, maintainers)
+> >
+> > > https://syzkaller.appspot.com/bug?id=3D8f306f3db150657a1f6bbe19274670=
+84531602c7
+> >
+> > (cc kvm@vger.kernel.org)
+> >
+> > > https://syzkaller.appspot.com/bug?id=3D6f30adb592d476978777a1125d1f68=
+0edfc23e00
+> >
+> > (cc netfilter-devel@vger.kernel.org)
+>
+> The netfilter bug has since been fixed:
+>
+>   https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/log/=
+?id=3D7bbc3d385bd813077acaf0e6fdb2a86a901f5382
 
-Did you (or Vitaly) file a bug report on this doc issue?  If not, I can do =
-so.
+How is this a "fix" ?
+u32 was the limit and because of the new warn the limit
+got reduced to s32.
+Every subsystem is supposed to do this "fix" now?
 
-Michael
+> > > https://syzkaller.appspot.com/bug?id=3D4c9ab8c7d0f8b551950db06559dc9c=
+de4119ac83
+> >
+> > (bpf again).
+>
+> J.
