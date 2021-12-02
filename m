@@ -2,87 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1AF93466008
-	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 09:56:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D71146610F
+	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 10:59:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240807AbhLBI7c (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Dec 2021 03:59:32 -0500
-Received: from mga11.intel.com ([192.55.52.93]:12358 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229891AbhLBI7b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Dec 2021 03:59:31 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10185"; a="234173597"
-X-IronPort-AV: E=Sophos;i="5.87,281,1631602800"; 
-   d="scan'208";a="234173597"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2021 00:56:09 -0800
-X-IronPort-AV: E=Sophos;i="5.87,281,1631602800"; 
-   d="scan'208";a="513105132"
-Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.255.31.236]) ([10.255.31.236])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2021 00:56:05 -0800
-Message-ID: <ee4934e1-e1e6-68dd-df67-424783c0f812@intel.com>
-Date:   Thu, 2 Dec 2021 16:56:03 +0800
+        id S233553AbhLBKDJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Dec 2021 05:03:09 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:56610 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1345752AbhLBKC0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 2 Dec 2021 05:02:26 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1638439144;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=OgwYURLKfRsAm9+GAZglDNSkPIsZcRJ6yZviZEoxLLU=;
+        b=YpUytqxatKK4Uh5AXECTlAogpzaNOsxa9Z/YEptc2wq1bqwtlvmoBy1znhrV5CUiHuZgF3
+        VTfH/vGUpIxZd0Bgqz3OMICPwR5qy3Ls1QQAGiGacMiAj1DOae7sYHosW1rVNHEsOHsiTI
+        DJG8lFpWsDedLOW9+baLcDXDX8YgNeM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-595-nwCTtHLnNTWVfjQiDuKGOw-1; Thu, 02 Dec 2021 04:58:59 -0500
+X-MC-Unique: nwCTtHLnNTWVfjQiDuKGOw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DAE10802925;
+        Thu,  2 Dec 2021 09:58:57 +0000 (UTC)
+Received: from t480s.redhat.com (unknown [10.39.194.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 48FBF5D9CA;
+        Thu,  2 Dec 2021 09:58:44 +0000 (UTC)
+From:   David Hildenbrand <david@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Sebastian Mitterle <smitterl@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org,
+        David Hildenbrand <david@redhat.com>
+Subject: [kvm-unit-tests PATCH v1 0/2] s390x: firq: floating interrupt test
+Date:   Thu,  2 Dec 2021 10:58:41 +0100
+Message-Id: <20211202095843.41162-1-david@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.3.2
-Subject: Re: [RFC PATCH v2 11/44] i386/tdx: Implement user specified tsc
- frequency
-Content-Language: en-US
-To:     Connor Kuehl <ckuehl@redhat.com>, isaku.yamahata@gmail.com,
-        qemu-devel@nongnu.org, pbonzini@redhat.com, alistair@alistair23.me,
-        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, mst@redhat.com,
-        cohuck@redhat.com, mtosatti@redhat.com, seanjc@google.com,
-        erdemaktas@google.com
-Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org
-References: <cover.1625704980.git.isaku.yamahata@intel.com>
- <564e6ae089c30aaba9443294ecca72da9ee7b7c4.1625704981.git.isaku.yamahata@intel.com>
- <42187f1c-26b5-b039-8fcf-f9268129feb8@redhat.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <42187f1c-26b5-b039-8fcf-f9268129feb8@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/23/2021 1:53 AM, Connor Kuehl wrote:
-> On 7/7/21 7:54 PM, isaku.yamahata@gmail.com wrote:
->> From: Xiaoyao Li <xiaoyao.li@intel.com>
->>
->> Reuse -cpu,tsc-frequency= to get user wanted tsc frequency and pass it
->> to KVM_TDX_INIT_VM.
->>
->> Besides, sanity check the tsc frequency to be in the legal range and
->> legal granularity (required by SEAM module).
->>
->> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
->> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
->> ---
->> [..]
->> +    if (env->tsc_khz && (env->tsc_khz < TDX1_MIN_TSC_FREQUENCY_KHZ ||
->> +                         env->tsc_khz > TDX1_MAX_TSC_FREQUENCY_KHZ)) {
->> +        error_report("Invalid TSC %ld KHz, must specify cpu_frequecy 
->> between [%d, %d] kHz\n",
-> 
-> s/frequecy/frequency
+From patch #2:
 
-will fix it, thanks!
+"
+We had a KVM BUG fixed by kernel commit a3e03bc1368c ("KVM: s390: index
+kvm->arch.idle_mask by vcpu_idx"), whereby a floating interrupt might get
+stuck forever because a CPU in the wait state would not get woken up.
 
->> +                      env->tsc_khz, TDX1_MIN_TSC_FREQUENCY_KHZ,
->> +                      TDX1_MAX_TSC_FREQUENCY_KHZ);
->> +        exit(1);
->> +    }
->> +
->> +    if (env->tsc_khz % (25 * 1000)) {
->> +        error_report("Invalid TSC %ld KHz, it must be multiple of 
->> 25MHz\n", env->tsc_khz);
-> 
-> Should this be 25KHz instead of 25MHz?
+The issue can be triggered when CPUs are created in a nonlinear fashion,
+such that the CPU address ("core-id") and the KVM cpu id don't match.
 
-No. It equals to
+So let's start with a floating interrupt test that will trigger a
+floating interrupt (via SCLP) to be delivered to a CPU in the wait state.
+"
 
-	(evn->tsc_khz * 1000) % (25 * 1000 * 1000)
+David Hildenbrand (2):
+  s390x: make smp_cpu_setup() return 0 on success
+  s390x: firq: floating interrupt test
 
+ lib/s390x/smp.c     |   1 +
+ s390x/Makefile      |   1 +
+ s390x/firq.c        | 141 ++++++++++++++++++++++++++++++++++++++++++++
+ s390x/unittests.cfg |  10 ++++
+ 4 files changed, 153 insertions(+)
+ create mode 100644 s390x/firq.c
 
-
+-- 
+2.31.1
 
