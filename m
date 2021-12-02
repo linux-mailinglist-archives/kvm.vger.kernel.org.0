@@ -2,98 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 69B6F465BFD
-	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 03:03:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 92615465C0B
+	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 03:13:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344397AbhLBCHD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Dec 2021 21:07:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37454 "EHLO
+        id S238879AbhLBCQv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Dec 2021 21:16:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232114AbhLBCHD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Dec 2021 21:07:03 -0500
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B466C061748
-        for <kvm@vger.kernel.org>; Wed,  1 Dec 2021 18:03:41 -0800 (PST)
-Received: by mail-pg1-x52a.google.com with SMTP id r5so25423761pgi.6
-        for <kvm@vger.kernel.org>; Wed, 01 Dec 2021 18:03:41 -0800 (PST)
+        with ESMTP id S234726AbhLBCQu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Dec 2021 21:16:50 -0500
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D239CC061574
+        for <kvm@vger.kernel.org>; Wed,  1 Dec 2021 18:13:28 -0800 (PST)
+Received: by mail-pj1-x1034.google.com with SMTP id x7so19478175pjn.0
+        for <kvm@vger.kernel.org>; Wed, 01 Dec 2021 18:13:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=y8Yop8ED3EGPor3MCeQDZ51Vt374HnVayFIUSI65N6A=;
-        b=sIjZA7JIHVVZwIUFPNucSbWS+MSXfMTMzlZmQnQHVSImkyNOA0ikxtiRmRg1UJczm4
-         H0eKu02maxMH4wYxhoiicyPYecKAjHe5u4lzYr7scg8AGJRvxIVxha9ctIVeZjgyQ5Ci
-         fO8ekC1hfjREVU0oweV/GwYY8R1Q5b1DbWwTxXkZxem4+xHM5U6Vvpqzp/IsA/WIHqot
-         vAhCf00qH6MNbJ7AlbC7JdJbO+WLBc6cJOFbEV5uk19G/hUrX2ni5uGCxPpV2WCWzoE+
-         vEWl5m0IUu6lqsgQndiKsR1wEKJ6rwwgBL4q1unvF0NzGxlTZ9E+4vQxD+AMBPnzsJ+1
-         Pi/A==
+        bh=xqdq69bklkVGPaiuC/hhcniUDsb69a5Tsomp+eMdT8Y=;
+        b=kLe2Jr2E6gqbImzVXFbWuWelxOvMTjUr3eE3r6UXGeXlSFHQJujz3lKGG1L8GrT/jA
+         tZc+qlJVZ58JjH0g5XNMGk6jNl01J+5YdmbMgSs4RYG+rZnunYfoVS5CVwrghZldDJyO
+         QsL/vfDrNDDfrswvVpKh4G3/Rp546pliFVtuK/l3YPREcTeI5wXswL8GsLhOo8t+L3zO
+         eEWvcu/xAKtGB5MCBINyHO9v189tvqdZBzA343XYcBSiMvbmvZ5h5HhvMN1neTO3sFuf
+         4KjN5JhpI1gvBnhZ1ekaA2hzk6QsMmK5uzhPhUAXOQETZO338FaIlVCWBJjU9Mdq9WON
+         fmYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=y8Yop8ED3EGPor3MCeQDZ51Vt374HnVayFIUSI65N6A=;
-        b=RjyRFkEAmfiVG0aVDFTyxSiIWnD98FS1eXrhrWVttheie5EZ+OFIBe/HRHnDN6Juzz
-         Zp14N8obwDR6mliSRdY0xUv8xBlvvLQsI6AW0nsXjOXhZKcepEToLq7aV778wtE9QwIj
-         /xMQQpTv8BJNa/oy+o3Z9HxUkuWCBCPb+lUPJp0ZxQeNQdVxyv4sqS699DIJEmYoCbfP
-         G0pVYBDEPz+oPCf4/CfKT3c4SAj1Np3HuwuRZbb7L1Lwm3b3ynYWZQFrssaevg1yyneg
-         D8eHD/vkoXCzhdzISKYOIvR/IQbpYO3NbziWzwGIv1iok0pPFghJJpqXrKpZ1D5Hh1Sb
-         +ERQ==
-X-Gm-Message-State: AOAM532YuYeiyFP6hqI2u3TQ861LQ+9E5nzMnvs/yHmyPJSKWKpihZvu
-        zSRCjyXii7NWK6R9AHGzRFFYtQ==
-X-Google-Smtp-Source: ABdhPJw0HWd/CJFMh+gN5JsMT2ryNIzesyfy/X4sft27BnKZ+Ws5ipI2UW199ZRiXe8J2frwd78eag==
-X-Received: by 2002:a63:f651:: with SMTP id u17mr7248306pgj.256.1638410620966;
-        Wed, 01 Dec 2021 18:03:40 -0800 (PST)
+        bh=xqdq69bklkVGPaiuC/hhcniUDsb69a5Tsomp+eMdT8Y=;
+        b=nkEbqtEWOA2WiD1R1vk8sDeqm52Q9abr7mxS6MpW13dzzUFgT2uhNhQOF5ZgmeoFb3
+         xVUH81fUR0IrZFM8TNjdYJ5kEBBlCMrKMjcEgVqkI6LoxRX0Aq8Wgai48lAfefiViA4H
+         tTaviUyGfEo2tEHZOtznK3ihoSl9lPMAU2KqNoTLvvAd97XOQJk+zU7UXiGf1M1xTrL4
+         e8vzzg3EEyPlcogrnC9RfN+lu8EyDNBbai6j8cLoEqAclFoqr9LlK1/xiE/kWGupnIiZ
+         xJBYQYoODPtL0ZL47RZJf9H/rnWqB4+7xhPHTcYz1zixejKDmE9yLBem/m4E8vF5Q3V7
+         7pfw==
+X-Gm-Message-State: AOAM530Alv2Z6eMxlihXbsFpzt2PypUPzqv9uFpsC/Ka0WaRW1xceSZ8
+        565pVamjEartQDr6iDH6iau9DQ==
+X-Google-Smtp-Source: ABdhPJwI9/kW+841BCq3bJVjpyet3MmhhrawiCLnHAmmZ9PuYqso3ZTZlCgmtcoT/lCxdVVnUZYA0g==
+X-Received: by 2002:a17:90b:92:: with SMTP id bb18mr2454366pjb.133.1638411208204;
+        Wed, 01 Dec 2021 18:13:28 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id v10sm1123864pfu.123.2021.12.01.18.03.40
+        by smtp.gmail.com with ESMTPSA id j7sm1152501pfc.74.2021.12.01.18.13.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Dec 2021 18:03:40 -0800 (PST)
-Date:   Thu, 2 Dec 2021 02:03:37 +0000
+        Wed, 01 Dec 2021 18:13:27 -0800 (PST)
+Date:   Thu, 2 Dec 2021 02:13:24 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Hou Wenlong <houwenlong93@linux.alibaba.com>,
-        Ben Gardon <bgardon@google.com>
-Subject: Re: [PATCH 00/28] KVM: x86/mmu: Overhaul TDP MMU zapping and flushing
-Message-ID: <YagpeekJ6I52f4U1@google.com>
-References: <20211120045046.3940942-1-seanjc@google.com>
- <CALzav=cRRW2ZdotseqV+eKcu2oxehkkzKjYYDc3PA=Lw16JrGQ@mail.gmail.com>
+        linux-hyperv@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ajay Garg <ajaygargnsit@gmail.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+        Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH v2 8/8] KVM: x86: Add checks for reserved-to-zero Hyper-V
+ hypercall fields
+Message-ID: <YagrxIknF9DX8l8L@google.com>
+References: <20211030000800.3065132-1-seanjc@google.com>
+ <20211030000800.3065132-9-seanjc@google.com>
+ <87v91cjhch.fsf@vitty.brq.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CALzav=cRRW2ZdotseqV+eKcu2oxehkkzKjYYDc3PA=Lw16JrGQ@mail.gmail.com>
+In-Reply-To: <87v91cjhch.fsf@vitty.brq.redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 01, 2021, David Matlack wrote:
-> On Fri, Nov 19, 2021 at 8:51 PM Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > Overhaul TDP MMU's handling of zapping and TLB flushing to reduce the
-> > number of TLB flushes, and to clean up the zapping code.  The final patch
-> > realizes the biggest change, which is to use RCU to defer any TLB flush
-> > due to zapping a SP to the caller.  The largest cleanup is to separate the
-> > flows for zapping roots (zap _everything_), zapping leaf SPTEs (zap guest
-> > mappings for whatever reason), and zapping a specific SP (NX recovery).
-> > They're currently smushed into a single zap_gfn_range(), which was a good
-> > idea at the time, but became a mess when trying to handle the different
-> > rules, e.g. TLB flushes aren't needed when zapping a root because KVM can
-> > safely zap a root if and only if it's unreachable.
-> >
-> > For booting an 8 vCPU, remote_tlb_flush (requests) goes from roughly
-> > 180 (600) to 130 (215).
-> >
-> > Please don't apply patches 02 and 03, they've been posted elsehwere and by
-> > other people.  I included them here because some of the patches have
-> > pseudo-dependencies on their changes.  Patch 01 is also posted separately.
-> > I had a brain fart and sent it out realizing that doing so would lead to
-> > oddities.
+On Mon, Nov 01, 2021, Vitaly Kuznetsov wrote:
+> Sean Christopherson <seanjc@google.com> writes:
 > 
-> What's the base commit for this series?
+> > Add checks for the three fields in Hyper-V's hypercall params that must
+> > be zero.  Per the TLFS, HV_STATUS_INVALID_HYPERCALL_INPUT is returned if
+> > "A reserved bit in the specified hypercall input value is non-zero."
+> >
+> > Note, the TLFS has an off-by-one bug for the last reserved field, which
+> > it defines as being bits 64:60.  The same section states "The input field
+> > 64-bit value called a hypercall input value.", i.e. bit 64 doesn't
+> > exist.
+> 
+> This version are you looking at? I can't see this issue in 6.0b
 
-Pretty sure it's based on a stale kvm/queue, commit 81d7c6659da0 ("KVM: VMX: Remove
-vCPU from PI wakeup list before updating PID.NV").  Time to add useAutoBase=true...
+It's the web-based documentation, the 6.0b PDF indeed does not have the same bug.
+
+https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/tlfs/hypercall-interface#hypercall-inputs
