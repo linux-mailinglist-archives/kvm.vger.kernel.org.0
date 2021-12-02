@@ -2,75 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 751B54661D1
-	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 11:57:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 50FE84661D6
+	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 11:58:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357072AbhLBLAm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Dec 2021 06:00:42 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:38585 "EHLO
+        id S1357087AbhLBLCS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Dec 2021 06:02:18 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:48664 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1356693AbhLBLAk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 2 Dec 2021 06:00:40 -0500
+        by vger.kernel.org with ESMTP id S1356693AbhLBLCQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 2 Dec 2021 06:02:16 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1638442635;
+        s=mimecast20190719; t=1638442734;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=D2VcVFQrB5DiBW+WXhArOQYyBQnCLPGn334r2cU2z28=;
-        b=KtToVVO3GJ+iE/K/cpWwEBpqq1DtbnBOGMCuXrCu8ukgIBRsQeEGmxBUGqJ1/3s+zACfxB
-        Z0VExgTeq/PSBIkyGGI3qRXFtkttn175rLGKy9UqpH8JywRgJ+CmtHmk03ZuEn2OHLIBkX
-        LILjnuG/D2EbSOUE0AuR1cdXn108uz4=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=wRIl4oD7Y5fkUN5tfay4kekz4HgS1IifoWLggGlVW1I=;
+        b=PqTU0J2QvLYOTWuMuXOYgSfWcNEfElkSvQjzdV82ylVbk8FmneTiTArWGLGE0m+kcC1fMT
+        YrT4lthFlI0Dqh+XGdtq2825o+Jl3uu4KifjIxmCljcey+QeFpyF51om+eB7ffSBgx3EeW
+        YbA/0PpDC/X7Z97g5vTl6nrvqv5z/hI=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-99-5VZFunW4MUy6qnRPYN8oSw-1; Thu, 02 Dec 2021 05:57:14 -0500
-X-MC-Unique: 5VZFunW4MUy6qnRPYN8oSw-1
-Received: by mail-wr1-f70.google.com with SMTP id v17-20020adfedd1000000b0017c5e737b02so4914403wro.18
-        for <kvm@vger.kernel.org>; Thu, 02 Dec 2021 02:57:14 -0800 (PST)
+ us-mta-564-qA7IP1TAPFOYNs0UNunuhw-1; Thu, 02 Dec 2021 05:58:53 -0500
+X-MC-Unique: qA7IP1TAPFOYNs0UNunuhw-1
+Received: by mail-wr1-f69.google.com with SMTP id q17-20020adff791000000b00183e734ba48so4919166wrp.8
+        for <kvm@vger.kernel.org>; Thu, 02 Dec 2021 02:58:53 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:subject:to:cc:references:from:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=D2VcVFQrB5DiBW+WXhArOQYyBQnCLPGn334r2cU2z28=;
-        b=5emQIvKbSVkkD9KkBvMn7bJ87RIAnpHAMtpTcrj/ojWBCOSuGh4VjWQlyJpSfYoDmT
-         v/PHJUkbzGkY2ZWe9oDGfkmffjgBYlohCiBXUgej3mSym3u/GWVsJt7x4Rplu5Nxzdwp
-         UGk2S1PEDJ/vRw4BHfeU1Jb5I2ZLQ2kwGDoDdDMSTxvF77hzKTZaiyhItGFB2EPPY0Yj
-         QAWuUdJPJ+x9JfOcfSr7QiUXDCg5sIDipI4CDa6aHeGQC3gWd7gEHRZbK49xsInqD1S8
-         wizX4u/8FIQ/FyxkBTl0h9adCERK5Sw4Z/ILOm5N6j4IeuwhjPjb7dLmT6RtaO2NhWWg
-         zlkA==
-X-Gm-Message-State: AOAM530Lu/NwiSb0httUHO04HDbiRJXgBUBlfCbaB61EsSaXTDM1hLoP
-        kVm24h9yTU8qTEcG+zIeJmElJDT/m+SH9LfFtuxdMJDtDUi9OYseHkJKplIvpr73BSHpc0rFiLG
-        h/MJOak4Gl6Vy
-X-Received: by 2002:adf:aac5:: with SMTP id i5mr13864059wrc.67.1638442633662;
-        Thu, 02 Dec 2021 02:57:13 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyX44La4y5VA1cgP3RPzlda8vKuQzx3m3QaQe/i+Qj0upafaYqtzXJF52EratMa3sVUXhqR4g==
-X-Received: by 2002:adf:aac5:: with SMTP id i5mr13864039wrc.67.1638442633487;
-        Thu, 02 Dec 2021 02:57:13 -0800 (PST)
+        bh=wRIl4oD7Y5fkUN5tfay4kekz4HgS1IifoWLggGlVW1I=;
+        b=MLKzriAo/oglQzmL2MLmHcglyKxXclFZcMmnoFak4NekrwwZ4GcpN97qEWd6SxnWmA
+         81iMHs89FPgbQ65wUc7QgI4bWI7pGPJ0gJ1sJ+nyMy1bvoLSS4Wyn5XwHnFebe6dJGdU
+         /y/Ho9IspXtmHGO8fg5Jw/o/UEsIYdqJbPB0It3Qs5uvBbOKqP/VE4cTS56ZSbzoeRLM
+         6O1emh8wHoOCnyxdvgZqyyMMs+AzyfP0IW2wtgfdnNqjUzySetNutvNInMIBUslOurxz
+         5/TOQfujyGpBun3C3uzjozVODs1kEpTeqrgZ3Kdr1jSDfN4cnapkhYDPN9HIJgvLA09J
+         n7KA==
+X-Gm-Message-State: AOAM5312Wy/mpQ6iJC6ONlfbYzc1lvdEpY2kCYR/ylAVeEGcu2qwFuBt
+        7zacY8lRQhf91InT+Fc/oZWcj8oJEdeUeZFfis1ZP9cYgkJZAEe4hR2JNpVpqyyCEH3fTwORlNv
+        5OAUdfHB4KPwu
+X-Received: by 2002:a5d:59ae:: with SMTP id p14mr13407439wrr.365.1638442732141;
+        Thu, 02 Dec 2021 02:58:52 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwdyKWGj2oyPnzq4Mdj75inkETU6TFWFE6xL8kZngxharwOb3Jh07jKn6KFiajYEjau2R9aEw==
+X-Received: by 2002:a5d:59ae:: with SMTP id p14mr13407422wrr.365.1638442731933;
+        Thu, 02 Dec 2021 02:58:51 -0800 (PST)
 Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id ay21sm1902044wmb.7.2021.12.02.02.57.12
+        by smtp.gmail.com with ESMTPSA id c1sm2247743wrt.14.2021.12.02.02.58.50
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Dec 2021 02:57:12 -0800 (PST)
-Subject: Re: [RFC PATCH v3 09/29] KVM: arm64: Hide IMPLEMENTATION DEFINED PMU
- support for the guest
-To:     Reiji Watanabe <reijiw@google.com>
-Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+        Thu, 02 Dec 2021 02:58:51 -0800 (PST)
+Subject: Re: [RFC PATCH v3 02/29] KVM: arm64: Save ID registers' sanitized
+ value per vCPU
+To:     Reiji Watanabe <reijiw@google.com>, Marc Zyngier <maz@kernel.org>,
+        kvmarm@lists.cs.columbia.edu
+Cc:     kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
         Peter Shier <pshier@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
         linux-arm-kernel@lists.infradead.org
 References: <20211117064359.2362060-1-reijiw@google.com>
- <20211117064359.2362060-10-reijiw@google.com>
- <d09e53a7-b8df-e8fd-c34a-f76a37d664d6@redhat.com>
- <CAAeT=FzM=sLF=PkY_shhcYmfo+ReGEBN8XX=QQObavXDtwxFJQ@mail.gmail.com>
+ <20211117064359.2362060-3-reijiw@google.com>
 From:   Eric Auger <eauger@redhat.com>
-Message-ID: <5bd01c9c-6ac8-4034-6f49-be636a3b287c@redhat.com>
-Date:   Thu, 2 Dec 2021 11:57:11 +0100
+Message-ID: <9f6e8b7e-c2b3-5883-f934-5b537c4ce19b@redhat.com>
+Date:   Thu, 2 Dec 2021 11:58:50 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.10.1
 MIME-Version: 1.0
-In-Reply-To: <CAAeT=FzM=sLF=PkY_shhcYmfo+ReGEBN8XX=QQObavXDtwxFJQ@mail.gmail.com>
+In-Reply-To: <20211117064359.2362060-3-reijiw@google.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -80,75 +78,158 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Hi Reiji,
 
-On 11/30/21 6:32 AM, Reiji Watanabe wrote:
-> Hi Eric,
+On 11/17/21 7:43 AM, Reiji Watanabe wrote:
+> Extend sys_regs[] of kvm_cpu_context for ID registers and save ID
+> registers' sanitized value in the array for the vCPU at the first
+> vCPU reset. Use the saved ones when ID registers are read by
+> userspace (via KVM_GET_ONE_REG) or the guest.
 > 
-> On Thu, Nov 25, 2021 at 12:30 PM Eric Auger <eauger@redhat.com> wrote:
->>
->> Hi Reiji,
->>
->> On 11/17/21 7:43 AM, Reiji Watanabe wrote:
->>> When ID_AA64DFR0_EL1.PMUVER or ID_DFR0_EL1.PERFMON is 0xf, which
->>> means IMPLEMENTATION DEFINED PMU supported, KVM unconditionally
->>> expose the value for the guest as it is.  Since KVM doesn't support
->>> IMPLEMENTATION DEFINED PMU for the guest, in that case KVM should
->>> exopse 0x0 (PMU is not implemented) instead.
->> s/exopse/expose
->>>
->>> Change cpuid_feature_cap_perfmon_field() to update the field value
->>> to 0x0 when it is 0xf.
->> is it wrong to expose the guest with a Perfmon value of 0xF? Then the
->> guest should not use it as a PMUv3?
+> Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 10 +++++++
+>  arch/arm64/kvm/sys_regs.c         | 43 +++++++++++++++++++------------
+>  2 files changed, 37 insertions(+), 16 deletions(-)
 > 
->> is it wrong to expose the guest with a Perfmon value of 0xF? Then the
->> guest should not use it as a PMUv3?
-> 
-> For the value 0xf in ID_AA64DFR0_EL1.PMUVER and ID_DFR0_EL1.PERFMON,
-> Arm ARM says:
->   "IMPLEMENTATION DEFINED form of performance monitors supported,
->    PMUv3 not supported."
-> 
-> Since the PMU that KVM supports for guests is PMUv3, 0xf shouldn't
-> be exposed to guests (And this patch series doesn't allow userspace
-> to set the fields to 0xf for guests).
-What I don't get is why this isn't detected before (in kvm_reset_vcpu).
-if the VCPU was initialized with KVM_ARM_VCPU_PMU_V3 can we honor this
-init request if the host pmu is implementation defined?
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index edbe2cb21947..72db73c79403 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -146,6 +146,14 @@ struct kvm_vcpu_fault_info {
+>  	u64 disr_el1;		/* Deferred [SError] Status Register */
+>  };
+>  
+> +/*
+> + * (Op0, Op1, CRn, CRm, Op2) of ID registers is (3, 0, 0, crm, op2),
+> + * where 0<=crm<8, 0<=op2<8.
+> + */
+> +#define KVM_ARM_ID_REG_MAX_NUM 64
+> +#define IDREG_IDX(id)		((sys_reg_CRm(id) << 3) | sys_reg_Op2(id))
+> +#define IDREG_SYS_IDX(id)	(ID_REG_BASE + IDREG_IDX(id))
+> +
+>  enum vcpu_sysreg {
+>  	__INVALID_SYSREG__,   /* 0 is reserved as an invalid value */
+>  	MPIDR_EL1,	/* MultiProcessor Affinity Register */
+> @@ -210,6 +218,8 @@ enum vcpu_sysreg {
+>  	CNTP_CVAL_EL0,
+>  	CNTP_CTL_EL0,
+>  
+> +	ID_REG_BASE,
+> +	ID_REG_END = ID_REG_BASE + KVM_ARM_ID_REG_MAX_NUM - 1,
+>  	/* Memory Tagging Extension registers */
+>  	RGSR_EL1,	/* Random Allocation Tag Seed Register */
+>  	GCR_EL1,	/* Tag Control Register */
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index e3ec1a44f94d..5608d3410660 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -33,6 +33,8 @@
+>  
+>  #include "trace.h"
+>  
+> +static u64 __read_id_reg(const struct kvm_vcpu *vcpu, u32 id);
+> +
+>  /*
+>   * All of this file is extremely similar to the ARM coproc.c, but the
+>   * types are different. My gut feeling is that it should be pretty
+> @@ -273,7 +275,7 @@ static bool trap_loregion(struct kvm_vcpu *vcpu,
+>  			  struct sys_reg_params *p,
+>  			  const struct sys_reg_desc *r)
+>  {
+> -	u64 val = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
+> +	u64 val = __read_id_reg(vcpu, SYS_ID_AA64MMFR1_EL1);
+>  	u32 sr = reg_to_encoding(r);
+>  
+>  	if (!(val & (0xfUL << ID_AA64MMFR1_LOR_SHIFT))) {
+> @@ -1059,17 +1061,9 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
+>  	return true;
+>  }
+>  
+> -/* Read a sanitised cpufeature ID register by sys_reg_desc */
+> -static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+> -		struct sys_reg_desc const *r, bool raz)
+> +static u64 __read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
+>  {
+> -	u32 id = reg_to_encoding(r);
+> -	u64 val;
+> -
+> -	if (raz)
+> -		return 0;
+> -
+> -	val = read_sanitised_ftr_reg(id);
+> +	u64 val = __vcpu_sys_reg(vcpu, IDREG_SYS_IDX(id));
+>  
+>  	switch (id) {
+>  	case SYS_ID_AA64PFR0_EL1:
+> @@ -1119,6 +1113,14 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+>  	return val;
+>  }
+>  
+> +static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+> +		       struct sys_reg_desc const *r, bool raz)
+> +{
+> +	u32 id = reg_to_encoding(r);
+> +
+> +	return raz ? 0 : __read_id_reg(vcpu, id);
+> +}
+> +
+>  static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
+>  				  const struct sys_reg_desc *r)
+>  {
+> @@ -1178,6 +1180,16 @@ static unsigned int sve_visibility(const struct kvm_vcpu *vcpu,
+>  	return REG_HIDDEN;
+>  }
+>  
+> +static void reset_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd)
+> +{
+> +	u32 id = reg_to_encoding(rd);
+> +
+> +	if (vcpu_has_reset_once(vcpu))
+> +		return;
+The KVM API allows to call VCPU_INIT several times (with same
+target/feature). With above check on the second call the ID_REGS won't
+be reset. Somehow this is aligned with target/feature behavior. However
+if this is what we want, I think we would need to document it in the KVM
+API doc.
 
 Thanks
 
 Eric
-> 
-> Thanks,
-> Reiji
-> 
->>
->> Eric
->>>
->>> Fixes: 8e35aa642ee4 ("arm64: cpufeature: Extract capped perfmon fields")
->>> Signed-off-by: Reiji Watanabe <reijiw@google.com>
->>> ---
->>>  arch/arm64/include/asm/cpufeature.h | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/arch/arm64/include/asm/cpufeature.h b/arch/arm64/include/asm/cpufeature.h
->>> index ef6be92b1921..fd7ad8193827 100644
->>> --- a/arch/arm64/include/asm/cpufeature.h
->>> +++ b/arch/arm64/include/asm/cpufeature.h
->>> @@ -553,7 +553,7 @@ cpuid_feature_cap_perfmon_field(u64 features, int field, u64 cap)
->>>
->>>       /* Treat IMPLEMENTATION DEFINED functionality as unimplemented */
->>>       if (val == ID_AA64DFR0_PMUVER_IMP_DEF)
->>> -             val = 0;
->>> +             return (features & ~mask);
->>>
->>>       if (val > cap) {
->>>               features &= ~mask;
->>>
->>
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> +
+> +	__vcpu_sys_reg(vcpu, IDREG_SYS_IDX(id)) = read_sanitised_ftr_reg(id);
+> +}
+> +
+>  static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+>  			       const struct sys_reg_desc *rd,
+>  			       const struct kvm_one_reg *reg, void __user *uaddr)
+> @@ -1223,9 +1235,7 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
+>  /*
+>   * cpufeature ID register user accessors
+>   *
+> - * For now, these registers are immutable for userspace, so no values
+> - * are stored, and for set_id_reg() we don't allow the effective value
+> - * to be changed.
+> + * We don't allow the effective value to be changed.
+>   */
+>  static int __get_id_reg(const struct kvm_vcpu *vcpu,
+>  			const struct sys_reg_desc *rd, void __user *uaddr,
+> @@ -1382,6 +1392,7 @@ static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
+>  #define ID_SANITISED(name) {			\
+>  	SYS_DESC(SYS_##name),			\
+>  	.access	= access_id_reg,		\
+> +	.reset	= reset_id_reg,			\
+>  	.get_user = get_id_reg,			\
+>  	.set_user = set_id_reg,			\
+>  	.visibility = id_visibility,		\
+> @@ -1837,8 +1848,8 @@ static bool trap_dbgdidr(struct kvm_vcpu *vcpu,
+>  	if (p->is_write) {
+>  		return ignore_write(vcpu, p);
+>  	} else {
+> -		u64 dfr = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
+> -		u64 pfr = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
+> +		u64 dfr = __read_id_reg(vcpu, SYS_ID_AA64DFR0_EL1);
+> +		u64 pfr = __read_id_reg(vcpu, SYS_ID_AA64PFR0_EL1);
+>  		u32 el3 = !!cpuid_feature_extract_unsigned_field(pfr, ID_AA64PFR0_EL3_SHIFT);
+>  
+>  		p->regval = ((((dfr >> ID_AA64DFR0_WRPS_SHIFT) & 0xf) << 28) |
 > 
 
