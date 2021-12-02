@@ -2,106 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 53A8446624A
-	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 12:26:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 01201466255
+	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 12:29:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345845AbhLBL3r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Dec 2021 06:29:47 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:54553 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241462AbhLBL3o (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 2 Dec 2021 06:29:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1638444382;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=lDz7Gl7O/a6QxEzSyH8lRwP13RtbZV0kax667QfBu/c=;
-        b=EF9rm+keEA60ywDxV1dna3wR2KkANUzHGCsw65kDpGAoU6QDqFBXtu+MsjI7HcYu3G4XYg
-        XZ1mgKSGuS1GWeGHBNFhN4LGNpGSOZI35q1P4dsnET4TmUKQ8xplT1Z4QqkildXyMaGYJ+
-        3aG+dm/ZOfGKWrRFzXHvVhW4vje6L7I=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-62-arAzDW3xNzSXdtg9MXmVIQ-1; Thu, 02 Dec 2021 06:26:21 -0500
-X-MC-Unique: arAzDW3xNzSXdtg9MXmVIQ-1
-Received: by mail-wr1-f69.google.com with SMTP id v18-20020a5d5912000000b001815910d2c0so4941933wrd.1
-        for <kvm@vger.kernel.org>; Thu, 02 Dec 2021 03:26:21 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:from:to:cc:references:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=lDz7Gl7O/a6QxEzSyH8lRwP13RtbZV0kax667QfBu/c=;
-        b=Drc3EJMUZU9L4WtcgdOaB5sPst8HZQpQjw0DhHa79fukTygaA8WgKjFc7hYs2x6qRu
-         uBH8Wb42EoCso5PpTNoFD40G5ArRg15/3yqq5FuKgRsjkbXeUT0BbbrhioFJuD8sPdGR
-         Wu4okbx7sikxhDRpO0M7Tav9A5qowfr3gh7DSoyukfOs0h9fxe+M8OYGXcBfIFe+0IhY
-         617wtFELGP/gt+CEJpjnzxU4JYwvuimRTLa19BxTKbGC5p4EV9cpQsDZvFM8gTymMEpW
-         SDZ9+4Gwprs6ajqM7rR/rO5K0I8/O/FwDKFc4z36Qo+ol0AMsFBO3oc+4WplZs7DFN4d
-         tfkA==
-X-Gm-Message-State: AOAM532s2Rdm7GoU00y2MoC0K1xNrYpJzcuZK8HpYadHXU63zI7ehbsd
-        gk8UW9TC5OtVlyykiOSo3XibY9PZ9LRV4RzLvVwS+ryRImLEDMi8Qkj7yxrhJIkzaXzvKqK4RMk
-        l1xluKA3FQPnu
-X-Received: by 2002:a05:600c:202:: with SMTP id 2mr5681811wmi.134.1638444380196;
-        Thu, 02 Dec 2021 03:26:20 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxMDm2ZHgmwsMQE5O2JaJyj6R5MG6Z9006cnJBbuG9m6i0+3MgupmDqot5W08j+xUfC3Vawig==
-X-Received: by 2002:a05:600c:202:: with SMTP id 2mr5681780wmi.134.1638444379976;
-        Thu, 02 Dec 2021 03:26:19 -0800 (PST)
-Received: from ?IPV6:2003:d8:2f44:9200:3344:447e:353c:bf0b? (p200300d82f4492003344447e353cbf0b.dip0.t-ipconnect.de. [2003:d8:2f44:9200:3344:447e:353c:bf0b])
-        by smtp.gmail.com with ESMTPSA id j11sm2402688wrt.3.2021.12.02.03.26.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Dec 2021 03:26:19 -0800 (PST)
-Message-ID: <ea6ec055-2682-44b1-2aae-20dfcebf9b85@redhat.com>
-Date:   Thu, 2 Dec 2021 12:26:18 +0100
+        id S1346409AbhLBLcZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Dec 2021 06:32:25 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:2264 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1346365AbhLBLcY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 2 Dec 2021 06:32:24 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B2ArUTJ012749;
+        Thu, 2 Dec 2021 11:29:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=noEevvq+X3UDU6g9F9ZWu1mwW5kq4C3VT+JbblUPRSk=;
+ b=Hzb0gUZjQsxjGJ/mUUsXKlpW9jhnSK2bB5UnBb7n8kUE13ZbZzkHCUlQZnewKbwrNsge
+ wJrmgXFwd2D3EeFeOppq0MqmC/hPG+YI6kAAzFeu6n+bIqSg7D6zD8Fynxgl9A65wLWO
+ maMS9JIviY09jg3wNhcpEAsnjSt0Da23CXhUskXU9sZZzCDMSh3N2WUNMx+Ga0ImmChW
+ GYK2MP7ayQpTtiPRgMlOaQjyBHt39fKQBWwBGjle9inkb/w1nmPXSd4LFoDbC/WLJh/g
+ zzQJFruFortxq3q47AKmV0OMI6yPbNXAB3F7vN3NKWPPHhoMtbMF0MCZqiVR/rgOigM6 tQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cpvss8q2m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Dec 2021 11:29:02 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1B2ArUE2012747;
+        Thu, 2 Dec 2021 11:29:02 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cpvss8q1n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Dec 2021 11:29:02 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1B2BJV36012082;
+        Thu, 2 Dec 2021 11:28:59 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma03fra.de.ibm.com with ESMTP id 3ckcaa9anf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Dec 2021 11:28:59 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1B2BSujH25231832
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 2 Dec 2021 11:28:56 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4A06111C05C;
+        Thu,  2 Dec 2021 11:28:56 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D6F6811C04A;
+        Thu,  2 Dec 2021 11:28:55 +0000 (GMT)
+Received: from [9.145.49.22] (unknown [9.145.49.22])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  2 Dec 2021 11:28:55 +0000 (GMT)
+Message-ID: <0b4dff4c-62d4-a656-69e8-bc3ea356f7ae@linux.ibm.com>
+Date:   Thu, 2 Dec 2021 12:28:55 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [kvm-unit-tests PATCH v1 2/2] s390x: firq: floating interrupt
- test
+ Thunderbird/91.3.0
+Subject: Re: [kvm-unit-tests PATCH v1 1/2] s390x: make smp_cpu_setup() return
+ 0 on success
 Content-Language: en-US
-From:   David Hildenbrand <david@redhat.com>
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
+To:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org
+Cc:     Thomas Huth <thuth@redhat.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Sebastian Mitterle <smitterl@redhat.com>,
         Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org
 References: <20211202095843.41162-1-david@redhat.com>
- <20211202095843.41162-3-david@redhat.com>
- <20211202120113.2dd279a8@p-imbrenda>
- <95160439-2aa9-765f-9f06-16952e42a495@redhat.com>
-Organization: Red Hat
-In-Reply-To: <95160439-2aa9-765f-9f06-16952e42a495@redhat.com>
-Content-Type: text/plain; charset=UTF-8
+ <20211202095843.41162-2-david@redhat.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20211202095843.41162-2-david@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: o_FF9vBSsiqIbd1VEDd1IZi9IKCpxI2s
+X-Proofpoint-ORIG-GUID: 5d2zrJ5SJygLWODR2jG9J8SURlbWdnU5
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
+ definitions=2021-12-02_06,2021-12-02_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
+ spamscore=0 mlxlogscore=999 mlxscore=0 priorityscore=1501 impostorscore=0
+ bulkscore=0 lowpriorityscore=0 clxscore=1015 suspectscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
+ definitions=main-2112020069
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 02.12.21 12:13, David Hildenbrand wrote:
->>> +static void wait_for_sclp_int(void)
->>> +{
->>> +	/* Enable SCLP interrupts on this CPU only. */
->>> +	ctl_set_bit(0, CTL0_SERVICE_SIGNAL);
->>> +
->>> +	set_flag(1);
->>
->> why not just WRITE_ONCE/READ_ONCE?
+On 12/2/21 10:58, David Hildenbrand wrote:
+> Properly return "0" on success so callers can check if the setup was
+> successful.
 > 
-> Because I shamelessly copied that from s390x/smp.c ;)
+> The return value is yet unused, which is why this wasn't noticed so far.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+> ---
+>   lib/s390x/smp.c | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+> diff --git a/lib/s390x/smp.c b/lib/s390x/smp.c
+> index da6d32f..b753eab 100644
+> --- a/lib/s390x/smp.c
+> +++ b/lib/s390x/smp.c
+> @@ -212,6 +212,7 @@ int smp_cpu_setup(uint16_t addr, struct psw psw)
+>   	/* Wait until the cpu has finished setup and started the provided psw */
+>   	while (lc->restart_new_psw.addr != psw.addr)
+>   		mb();
+> +	rc = 0;
+>   out:
+>   	spin_unlock(&lock);
+>   	return rc;
+> 
 
-Oh, and also because WRITE_ONCE/READ_ONCE are semantically the wrong
-thing to use:
+oops
 
-"Prevent the compiler from merging or refetching reads or writes. The
-compiler is also forbidden from reordering successive instances of
-READ_ONCE and WRITE_ONCE"
-
-We need memory barriers to prevent reordering with surrounding code.
-
--- 
-Thanks,
-
-David / dhildenb
-
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
