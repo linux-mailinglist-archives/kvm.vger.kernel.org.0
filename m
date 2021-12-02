@@ -2,63 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EA971466A58
-	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 20:19:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D66D1466A8E
+	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 20:39:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348483AbhLBTXJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Dec 2021 14:23:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46960 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237532AbhLBTXI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Dec 2021 14:23:08 -0500
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FFBDC06174A;
-        Thu,  2 Dec 2021 11:19:45 -0800 (PST)
-Received: by mail-ed1-x52e.google.com with SMTP id z5so2227390edd.3;
-        Thu, 02 Dec 2021 11:19:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=4qUxqviDTHh9ZqdUoqsbMdepwbHFZ421wjUHBBfI/fA=;
-        b=nFWZpROIs47v4BfM2Vq+0sABVA/9P+RAcm7YMfFrD4iv+RqWyqjFYOyNcYCnAuMIuk
-         apFhe3t31tSuRebjeKuYTVqHfGbUQHhqJUjbPr5hSf/w3vGQgipS/Qin66Vm08DklEYl
-         uYZV4/LpYI9GhMia0tFkpqLculZTNX6dLFWwTpCqfGUusSna771RKyeXsuSPzcR48nnQ
-         XqaLJ415V7OrL1XaQR78v1suRE/MX0tNhlm+DMzCwdz3HL0bDzFrggsrpWwKBXQz2w99
-         tISTJYinvZWoJJmhCTHTnHrunP0GEBXL7MXLBoTvi9mB8b4uwu+8/d8RXBN1dTxSrYhY
-         /4Og==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=4qUxqviDTHh9ZqdUoqsbMdepwbHFZ421wjUHBBfI/fA=;
-        b=pMko6WhvAWBiRwQDsetH7IePbZKn+FKrXi3SHYT4+pU8rI5+/H7zTpeJH4V7tJRzTe
-         KgVd5ph+3YsS7yfhHXA/QGB6rJDKY+AXcU7g4f2bHYHjRoljiykU3HVsTgldc1zU/i1j
-         ZD4nckTOLsn6gi772iv7SxcjiHvD6KE1eZduc0/Co5TCYgNHzDnpcoS0iYrhg4bGbBKF
-         Fm4HjKV42A39ALEt4ZVO5O7i6X4M2PVb1GiDIjqomPVzTRNJADXEbzmnAp2BK9DFVwf7
-         AJNzoX8FjTbpW3QQTMKmTMACiac4R7lZ+b8ON2Kmjiz4EC09KEL/9gaqWHA8wMDbChaq
-         /ZYg==
-X-Gm-Message-State: AOAM530mA5RtwDXaZTTqjQUV3+IOgHTL99LedlktDzHlCuzVrzLha7Z9
-        xkLKelp3SS0o4D4gmCkBr88+yo16lwU=
-X-Google-Smtp-Source: ABdhPJzGr7GWl23YkoBK/+1IqNu79afXMBj10GqIlXmZjkEFmm0S6XuUtpgO/WF67RZ9JvF4v6geEA==
-X-Received: by 2002:a05:6402:26d4:: with SMTP id x20mr20228218edd.119.1638472784104;
-        Thu, 02 Dec 2021 11:19:44 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id eg8sm369916edb.75.2021.12.02.11.19.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Dec 2021 11:19:43 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <5ce26a04-8766-7472-0a15-fc91eab0a903@redhat.com>
-Date:   Thu, 2 Dec 2021 20:19:27 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
+        id S233193AbhLBTmo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Dec 2021 14:42:44 -0500
+Received: from mail-bn7nam10on2054.outbound.protection.outlook.com ([40.107.92.54]:60257
+        "EHLO NAM10-BN7-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229793AbhLBTmh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Dec 2021 14:42:37 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=A64/ti9RmPi/plbiLrFkPD6CPFwyTRwg2fVdIA4wnsyjoZGijP4luO731ji4uFlvaRVJ78YJyIewz8T6FFm4nh2QRt+PmgCGN/Y7CHckvIv0Yu6lJka+aAhs4oy1HKQHWLpm51NcagX9Qcw9rs6Wr6F4TiXqBD96j4bK6pZ2Qp5oGgULK5it2CJ3Bm53bYLnSZLQjBrJrQHEUEEmuU1TB6aBj4zFWPSyzCX+2RBSNWnKYgkJ+MB3y3nPsbKRqIJHQJh5/9koNgzZrMwhrkK0a0TzxhPEjY4j2+D3a5pKPl/BkKVQ/VJhWXVyOJ1hQTvRvZnQsGYTriQLJF1QdopjDw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=DiPB72rwKwwo719xLNI97gG6p7gvyw0sVafMjlmVL/Q=;
+ b=ZoyGyWG7sr3forcrZZIAC2QwcxRuGYuZMCqwa9I7AcNYD37ne99D7CJwEPEsnmOl6C/doYOqfbcPYMJEkwSP+4UBiigV72IY1eQexE9LhdpKuf1h5CPQwgE7Ylj62N3ZGnn3F6oBcpfCM27KG5mQT+XDut89rIYKJRUog4Xm3rI7d3Tz7ds4ZUyQ1DCNNOO2Q1pip68dhBABYwBo3BcMIVRCRBM0KIonY2Di4TxrfJq1z3TaoOkcHQi2WNStmeJoW10Njrint/5Z65Kvi6Hy8TL2OcHohvyf75KVy/HVjkKYKuvvp5uP9WCFgMhUWQ8YwutoSYIH9wjqd+fvCgssiA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=DiPB72rwKwwo719xLNI97gG6p7gvyw0sVafMjlmVL/Q=;
+ b=BY6xE5WUbbCdsefhX2+KTk0Ts/b3SzNkQKnkaRpvD+tMrT6cLAnIWUyGAX4P0m0Ya62bnt4MMD43BKKiKEADIPuFhPmd9GD6dHBczCZaFBXZaAhWIeKjySOnuvwVd8fZLj53zXceC9A8GfieD0d5dNhWjMUXcv6ZEYNw/dgglOY=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
+ by DM4PR12MB5056.namprd12.prod.outlook.com (2603:10b6:5:38b::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4755.11; Thu, 2 Dec
+ 2021 19:39:13 +0000
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::1ddd:71e4:5803:e44a]) by DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::1ddd:71e4:5803:e44a%3]) with mapi id 15.20.4734.020; Thu, 2 Dec 2021
+ 19:39:13 +0000
 Subject: Re: [PATCH] KVM: SVM: Do not terminate SEV-ES guests on GHCB
  validation failure
-Content-Language: en-US
-To:     Tom Lendacky <thomas.lendacky@amd.com>, kvm@vger.kernel.org,
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, x86@kernel.org
 Cc:     Jim Mattson <jmattson@google.com>, Joerg Roedel <joro@8bytes.org>,
         Sean Christopherson <seanjc@google.com>,
@@ -71,334 +52,97 @@ Cc:     Jim Mattson <jmattson@google.com>, Joerg Roedel <joro@8bytes.org>,
         "H. Peter Anvin" <hpa@zytor.com>,
         Brijesh Singh <brijesh.singh@amd.com>
 References: <b57280b5562893e2616257ac9c2d4525a9aeeb42.1638471124.git.thomas.lendacky@amd.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <b57280b5562893e2616257ac9c2d4525a9aeeb42.1638471124.git.thomas.lendacky@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+ <5ce26a04-8766-7472-0a15-fc91eab0a903@redhat.com>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+Message-ID: <b0443caf-d822-f671-d930-ff317833d701@amd.com>
+Date:   Thu, 2 Dec 2021 13:39:09 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
+In-Reply-To: <5ce26a04-8766-7472-0a15-fc91eab0a903@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: MN2PR06CA0028.namprd06.prod.outlook.com
+ (2603:10b6:208:23d::33) To DM4PR12MB5229.namprd12.prod.outlook.com
+ (2603:10b6:5:398::12)
+MIME-Version: 1.0
+Received: from [10.236.30.241] (165.204.77.1) by MN2PR06CA0028.namprd06.prod.outlook.com (2603:10b6:208:23d::33) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4755.17 via Frontend Transport; Thu, 2 Dec 2021 19:39:11 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 80343dfa-1194-4ec0-0f8e-08d9b5cb6ae6
+X-MS-TrafficTypeDiagnostic: DM4PR12MB5056:
+X-Microsoft-Antispam-PRVS: <DM4PR12MB50568B35BC5D33FDB6690DE2EC699@DM4PR12MB5056.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 6/Um2G5IiRF/8Wq10NgGFqEO0UO+2Nz1VIrcTC9gWDF3geTuKv6BvbRw1/a/HS2BFEh7ZBCFV7PKMBzONZDScLPsxPF9Vz27bxMGPvlddWoTYCmyOli/Ph7B0PVahKVOoAoWws0lVZERA58wB0hYaQhRZVl8V8jzT8D96VeFNx1CpgHTMCMdwfN/ENVCMyB4r62dg61yVJoN44l+r5ec6+dr4HaWBmBEYwKSwZB262F4MSN6emRdjmtlh2YTMw4Yqamn0WW7p/mKolI39N4fAxwf2ZPlY6i7X8D5SIh9tQXU0rMg2wJrVYjCGH8/0HZSBuDJDbShlfj1dMLw5pidFG0KmM4k4MzrcvA9UzvZV2zCl2/LUPVZvUxaKUv9aCpS2oAmpEi4XdMowH+Ty5/zXE1fUjf6Cwu4za9QgJ/ZC6lqcByII0WiFOhVR3gn+E0bv9bP5MHlt+fxz6hyfZ7tkuhlW/QgSyC9OYLxCWc3eroSYE6y4ybLcmDY7BGMWxNbhd1/fIaInpPF8BHQxtIXVhC7kwIh1zv5ah3aip4XfacQCdqB4izMsjbLo/UKGwiwtvmYacKvlu+W3Zcznxqp/dPiMprxfNE995rpt4+BvOp2nrqE3NeLQPS43GuopyL/P64R/+dE6sxd/SAL9lbExW8j3zEEYWSgmqBEUrJ25LxyOBCX4RAVr/2fV0TI1/nsTdb80QpGRa23NZ5tzGimEPdnLLxW0d7Uh7WZiN8rVJvONSQGJI9tkCn6lHlx+ifR
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(316002)(186003)(956004)(16576012)(4326008)(26005)(4744005)(86362001)(5660300002)(2616005)(66556008)(83380400001)(508600001)(66476007)(31686004)(8676002)(53546011)(8936002)(2906002)(7416002)(31696002)(6486002)(54906003)(36756003)(38100700002)(66946007)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eTZiTXJuTDFERXl5dGUybXFiV2ZsaTdwdmtLVGtmdjZSQjhMVHBNclJOVnE0?=
+ =?utf-8?B?c0lZZHVnV1pKNVVXeldpNFBUcnFidlozTDZoV1VIallSRFlQSGFZMlc3Z1dY?=
+ =?utf-8?B?dXJhZEpURUM0TGI4Y0xyUFl3Zks2Q2RuOCtsUzFoTnFyNUl2UlFrTFppY1dP?=
+ =?utf-8?B?OE1jV3lwcm4yYUlZUzB5NUVWbkkzay80ZUl3K2MvemU3UUZCSzhyYU5aZHNR?=
+ =?utf-8?B?azBkdFBKSHRTV0JheFZ5a2ZYRDZHS2lwUW4wK29FdFhIMUlkdTF5c2wrenZy?=
+ =?utf-8?B?WnBjK3JSZVFSVHZlenlkSHdHMU9hOUE1Vlo1VGhsNE5TdkYzYi9qNlA0Skhy?=
+ =?utf-8?B?aWt4RU9VQVcxaHNpOFNUTllyNXBMeSs5WGp3bEE5QlM1UUV0RytOTmtRaEZP?=
+ =?utf-8?B?clgwWC9EZUlYQlQwNCticWFRTVB5Kzl0QmZIRWtzcjNCZDFncUUvZy8wYlNN?=
+ =?utf-8?B?TlIzK0J3Z1J3ekprY0ZyeFVSTmJhTUVLTXBRaXcrbUZZSXRBUCt1TElsVUlK?=
+ =?utf-8?B?RG95U0xFMkkyMXYzTzFWM1J6eWRWcnoyYnExODR4RWZWTnhVMVB3Ujh0YVNL?=
+ =?utf-8?B?Z3FyWHFPemV5cktzcHpCLzdCcVhwUDZYeHFZQy9XY0hHL2hwcnM0c25aRXVS?=
+ =?utf-8?B?TjN6cCs3L051MlVmZkRFbDdML3BNSmF1RXBTTTM3TXZkVE5ZTDAzNDAybllO?=
+ =?utf-8?B?Z0UxTWNDZlNyUmNPYlZMSjRhUlRnNkViejlzSlgvbFJOeDZGNmlzNXdzQjdP?=
+ =?utf-8?B?ODJEMWJoT2orR0U1RklVV3ZsbjRvWHJITy9Ncno0VER0OXVTSDFIWkhjV2Vx?=
+ =?utf-8?B?bjI4SEx0aUJUMHJndy8vMnVBNUQrbC85RXBObnBKUzRpc29UamV0WEsrOWdR?=
+ =?utf-8?B?SHVpS3dlV0xZNEVNbWNqWUFKR0tpNU5qc0JBYmVhN2NrSWNCN0JuY1BYWk9w?=
+ =?utf-8?B?anJJSGRPeXNxRFZ3cDM4bHdaSEFDTGxCNUtWR1pMMmJoMlcrcElOZjRscS9N?=
+ =?utf-8?B?bTlONnExaEozNEZiejNZc1pOTlQrR01jWDRTWTNhZElGd3JIRkpNc3FIN3gr?=
+ =?utf-8?B?TFpPcm13bXRhZm5DMGt3RXZlaG5uanNCUk9EOE1vSE54eHI3SEZ6VTQxVWpu?=
+ =?utf-8?B?TENLZXJRQ2J1dUx6K2NxbnNpSTgwWXptb05lM1VvcFdtd21tTG51Q01LNjZO?=
+ =?utf-8?B?Z3ZSalQ3QmJUV24xTzZVSm5UbzBtNm5aZk5VZFlyN0ZGeCtPTFg3SzhlK05j?=
+ =?utf-8?B?Y20zNFRHNkh3QWlBR0JVVjRNa2QxQS9TRGdrbG1oMElHR0M1ZXIyQ05lSEp5?=
+ =?utf-8?B?M1dRcS9MMkZQNzQ5eEtvN25LZHZqVVk4aDFLNUthakg5UnhzL3IxYkszT213?=
+ =?utf-8?B?Q1pMQVR0NjBOMi9yL05ucTRoUVJvcUVuZUVIQzZsbndsemxncWd1U0Nvc0t5?=
+ =?utf-8?B?RnZqQkNNaUo1ME9JSk1yMjNVNkVRLzZaQTlUMHBWN2ZUdUdkb25abDJEdGR2?=
+ =?utf-8?B?WWdHeFVzc3pMeWphTU42THE0TXlqVTVPUHNQeXZWakVTZkhLSk4wMndGMDR1?=
+ =?utf-8?B?dExmVnZYSWgzSUdRU1lQVUpwOENRTGhSSFdhbUc1VEVENWgwSEpPMS9aNVZq?=
+ =?utf-8?B?SG9scFBLbjZOTGxhSDN4M2VhNlNGNFRKVTFtWk1DandxT0htS1BIWkhFQnNN?=
+ =?utf-8?B?YitCeTg2RUhTWHh6emthczZITUlNaDhqSVh3TkREbXdOcE9ycGVPSzFjdXhN?=
+ =?utf-8?B?bWlHVU4rTlgzMFp5U2FhSlRFRUlISThyaTYvUGdpbVh5MXRkNE1COHF6bkRU?=
+ =?utf-8?B?WkRpcENVU0M3R251UDB0UnUxSCtaYUphRFZWYWNmUi9Db2ErUnRMWWxjUW00?=
+ =?utf-8?B?bEp2MjFLTWZ0Sk9nSzMzeTJQNXgzejNkaVdwTlBEM3ZhQnZkMHlURDY3bU5E?=
+ =?utf-8?B?NTJxSGQ3RDdLaXNlblQrM1UzSkZhRThZUW9WOVViQVJCWE14OVlCUXZlUE0v?=
+ =?utf-8?B?YXRZYW9zdFpORnJ2WTN1cG1DbVQ4cTRHbVk3bzExbE55SWVsRStZeXlua0pq?=
+ =?utf-8?B?NTRLeSs3VjdZKzZEenVLU1YxSDZFeURuc2dTYktBbGZrZVJ3MkYrcnV2NjFE?=
+ =?utf-8?B?bFdESXpaZElKUmVOUlIrUi9TU3M5S2s2SE92TTRpWlgwZUpUN2drUFZScURO?=
+ =?utf-8?Q?HgzJfYmbmQWBC+QFbKYKx+Y=3D?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 80343dfa-1194-4ec0-0f8e-08d9b5cb6ae6
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Dec 2021 19:39:13.1204
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: us7ww9bSoK8CvRwcLZ+A3kzfbkUomEdTT2D97DTx/Z0WGRnJ2AG92YB8vSut/aDpf3Rx9+5s410092OTtcKu3Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5056
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/2/21 19:52, Tom Lendacky wrote:
-> Currently, an SEV-ES guest is terminated if the validation of the VMGEXIT
-> exit code or exit parameters fails.
+On 12/2/21 1:19 PM, Paolo Bonzini wrote:
+> On 12/2/21 19:52, Tom Lendacky wrote:
 > 
-> The VMGEXIT instruction can be issued from userspace, even though
-> userspace (likely) can't update the GHCB. To prevent userspace from being
-> able to kill the guest, return an error through the GHCB when validation
-> fails rather than terminating the guest. For cases where the GHCB can't be
-> updated (e.g. the GHCB can't be mapped, etc.), just return back to the
-> guest.
-> 
-> The new error codes are documented in the lasest update to the GHCB
-> specification.
-> 
-> Fixes: 291bd20d5d88 ("KVM: SVM: Add initial support for a VMGEXIT VMEXIT")
-> Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
-> ---
->   arch/x86/include/asm/sev-common.h |  11 ++++
->   arch/x86/kvm/svm/sev.c            | 106 +++++++++++++++++-------------
->   2 files changed, 71 insertions(+), 46 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
-> index 2cef6c5a52c2..6acaf5af0a3d 100644
-> --- a/arch/x86/include/asm/sev-common.h
-> +++ b/arch/x86/include/asm/sev-common.h
-> @@ -73,4 +73,15 @@
->   
->   #define GHCB_RESP_CODE(v)		((v) & GHCB_MSR_INFO_MASK)
->   
-> +/*
-> + * Error codes related to GHCB input that can be communicated back to the guest
-> + * by setting the lower 32-bits of the GHCB SW_EXITINFO1 field to 2.
-> + */
-> +#define GHCB_ERR_NOT_REGISTERED		1
-> +#define GHCB_ERR_INVALID_USAGE		2
-> +#define GHCB_ERR_INVALID_SCRATCH_AREA	3
-> +#define GHCB_ERR_MISSING_INPUT		4
-> +#define GHCB_ERR_INVALID_INPUT		5
-> +#define GHCB_ERR_INVALID_EVENT		6
-> +
->   #endif
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 713e3daa9574..322553322202 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -2353,24 +2353,29 @@ static void sev_es_sync_from_ghcb(struct vcpu_svm *svm)
->   	memset(ghcb->save.valid_bitmap, 0, sizeof(ghcb->save.valid_bitmap));
->   }
->   
-> -static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
-> +static bool sev_es_validate_vmgexit(struct vcpu_svm *svm)
->   {
->   	struct kvm_vcpu *vcpu;
->   	struct ghcb *ghcb;
-> -	u64 exit_code = 0;
-> +	u64 exit_code;
-> +	u64 reason;
->   
->   	ghcb = svm->sev_es.ghcb;
->   
-> -	/* Only GHCB Usage code 0 is supported */
-> -	if (ghcb->ghcb_usage)
-> -		goto vmgexit_err;
-> -
->   	/*
-> -	 * Retrieve the exit code now even though is may not be marked valid
-> +	 * Retrieve the exit code now even though it may not be marked valid
->   	 * as it could help with debugging.
->   	 */
->   	exit_code = ghcb_get_sw_exit_code(ghcb);
->   
-> +	/* Only GHCB Usage code 0 is supported */
-> +	if (ghcb->ghcb_usage) {
-> +		reason = GHCB_ERR_INVALID_USAGE;
-> +		goto vmgexit_err;
-> +	}
-> +
-> +	reason = GHCB_ERR_MISSING_INPUT;
-> +
->   	if (!ghcb_sw_exit_code_is_valid(ghcb) ||
->   	    !ghcb_sw_exit_info_1_is_valid(ghcb) ||
->   	    !ghcb_sw_exit_info_2_is_valid(ghcb))
-> @@ -2449,30 +2454,34 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
->   	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
->   		break;
->   	default:
-> +		reason = GHCB_ERR_INVALID_EVENT;
->   		goto vmgexit_err;
->   	}
->   
-> -	return 0;
-> +	return true;
->   
->   vmgexit_err:
->   	vcpu = &svm->vcpu;
->   
-> -	if (ghcb->ghcb_usage) {
-> +	if (reason == GHCB_ERR_INVALID_USAGE) {
->   		vcpu_unimpl(vcpu, "vmgexit: ghcb usage %#x is not valid\n",
->   			    ghcb->ghcb_usage);
-> +	} else if (reason == GHCB_ERR_INVALID_EVENT) {
-> +		vcpu_unimpl(vcpu, "vmgexit: exit code %#llx is not valid\n",
-> +			    exit_code);
->   	} else {
-> -		vcpu_unimpl(vcpu, "vmgexit: exit reason %#llx is not valid\n",
-> +		vcpu_unimpl(vcpu, "vmgexit: exit code %#llx input is not valid\n",
->   			    exit_code);
->   		dump_ghcb(svm);
->   	}
->   
-> -	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
-> -	vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON;
-> -	vcpu->run->internal.ndata = 2;
-> -	vcpu->run->internal.data[0] = exit_code;
-> -	vcpu->run->internal.data[1] = vcpu->arch.last_vmentry_cpu;
-> +	/* Clear the valid entries fields */
-> +	memset(ghcb->save.valid_bitmap, 0, sizeof(ghcb->save.valid_bitmap));
-> +
-> +	ghcb_set_sw_exit_info_1(ghcb, 2);
-> +	ghcb_set_sw_exit_info_2(ghcb, reason);
->   
-> -	return -EINVAL;
-> +	return false;
->   }
->   
->   void sev_es_unmap_ghcb(struct vcpu_svm *svm)
-> @@ -2531,7 +2540,7 @@ void pre_sev_run(struct vcpu_svm *svm, int cpu)
->   }
->   
->   #define GHCB_SCRATCH_AREA_LIMIT		(16ULL * PAGE_SIZE)
-> -static int setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
-> +static bool setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
->   {
->   	struct vmcb_control_area *control = &svm->vmcb->control;
->   	struct ghcb *ghcb = svm->sev_es.ghcb;
-> @@ -2542,14 +2551,14 @@ static int setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
->   	scratch_gpa_beg = ghcb_get_sw_scratch(ghcb);
->   	if (!scratch_gpa_beg) {
->   		pr_err("vmgexit: scratch gpa not provided\n");
-> -		return -EINVAL;
-> +		goto e_scratch;
->   	}
->   
->   	scratch_gpa_end = scratch_gpa_beg + len;
->   	if (scratch_gpa_end < scratch_gpa_beg) {
->   		pr_err("vmgexit: scratch length (%#llx) not valid for scratch address (%#llx)\n",
->   		       len, scratch_gpa_beg);
-> -		return -EINVAL;
-> +		goto e_scratch;
->   	}
->   
->   	if ((scratch_gpa_beg & PAGE_MASK) == control->ghcb_gpa) {
-> @@ -2567,7 +2576,7 @@ static int setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
->   		    scratch_gpa_end > ghcb_scratch_end) {
->   			pr_err("vmgexit: scratch area is outside of GHCB shared buffer area (%#llx - %#llx)\n",
->   			       scratch_gpa_beg, scratch_gpa_end);
-> -			return -EINVAL;
-> +			goto e_scratch;
->   		}
->   
->   		scratch_va = (void *)svm->sev_es.ghcb;
-> @@ -2580,18 +2589,18 @@ static int setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
->   		if (len > GHCB_SCRATCH_AREA_LIMIT) {
->   			pr_err("vmgexit: scratch area exceeds KVM limits (%#llx requested, %#llx limit)\n",
->   			       len, GHCB_SCRATCH_AREA_LIMIT);
-> -			return -EINVAL;
-> +			goto e_scratch;
->   		}
->   		scratch_va = kvzalloc(len, GFP_KERNEL_ACCOUNT);
->   		if (!scratch_va)
-> -			return -ENOMEM;
-> +			goto e_scratch;
->   
->   		if (kvm_read_guest(svm->vcpu.kvm, scratch_gpa_beg, scratch_va, len)) {
->   			/* Unable to copy scratch area from guest */
->   			pr_err("vmgexit: kvm_read_guest for scratch area failed\n");
->   
->   			kvfree(scratch_va);
-> -			return -EFAULT;
-> +			goto e_scratch;
->   		}
->   
->   		/*
-> @@ -2607,7 +2616,13 @@ static int setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
->   	svm->sev_es.ghcb_sa = scratch_va;
->   	svm->sev_es.ghcb_sa_len = len;
->   
-> -	return 0;
-> +	return true;
-> +
-> +e_scratch:
-> +	ghcb_set_sw_exit_info_1(ghcb, 2);
-> +	ghcb_set_sw_exit_info_2(ghcb, GHCB_ERR_INVALID_SCRATCH_AREA);
-> +
-> +	return false;
->   }
->   
->   static void set_ghcb_msr_bits(struct vcpu_svm *svm, u64 value, u64 mask,
-> @@ -2658,7 +2673,7 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
->   
->   		ret = svm_invoke_exit_handler(vcpu, SVM_EXIT_CPUID);
->   		if (!ret) {
-> -			ret = -EINVAL;
-> +			/* Error, keep GHCB MSR value as-is */
->   			break;
->   		}
->   
-> @@ -2694,10 +2709,13 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
->   						GHCB_MSR_TERM_REASON_POS);
->   		pr_info("SEV-ES guest requested termination: %#llx:%#llx\n",
->   			reason_set, reason_code);
-> -		fallthrough;
-> +
-> +		ret = -EINVAL;
-> +		break;
->   	}
->   	default:
-> -		ret = -EINVAL;
-> +		/* Error, keep GHCB MSR value as-is */
-> +		break;
->   	}
->   
->   	trace_kvm_vmgexit_msr_protocol_exit(svm->vcpu.vcpu_id,
-> @@ -2721,14 +2739,18 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
->   
->   	if (!ghcb_gpa) {
->   		vcpu_unimpl(vcpu, "vmgexit: GHCB gpa is not set\n");
-> -		return -EINVAL;
-> +
-> +		/* Without a GHCB, just return right back to the guest */
-> +		return 1;
->   	}
->   
->   	if (kvm_vcpu_map(vcpu, ghcb_gpa >> PAGE_SHIFT, &svm->sev_es.ghcb_map)) {
->   		/* Unable to map GHCB from guest */
->   		vcpu_unimpl(vcpu, "vmgexit: error mapping GHCB [%#llx] from guest\n",
->   			    ghcb_gpa);
-> -		return -EINVAL;
-> +
-> +		/* Without a GHCB, just return right back to the guest */
-> +		return 1;
->   	}
->   
->   	svm->sev_es.ghcb = svm->sev_es.ghcb_map.hva;
-> @@ -2738,18 +2760,17 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
->   
->   	exit_code = ghcb_get_sw_exit_code(ghcb);
->   
-> -	ret = sev_es_validate_vmgexit(svm);
-> -	if (ret)
-> -		return ret;
-> +	if (!sev_es_validate_vmgexit(svm))
-> +		return 1;
->   
->   	sev_es_sync_from_ghcb(svm);
->   	ghcb_set_sw_exit_info_1(ghcb, 0);
->   	ghcb_set_sw_exit_info_2(ghcb, 0);
->   
-> +	ret = 1;
->   	switch (exit_code) {
->   	case SVM_VMGEXIT_MMIO_READ:
-> -		ret = setup_vmgexit_scratch(svm, true, control->exit_info_2);
-> -		if (ret)
-> +		if (!setup_vmgexit_scratch(svm, true, control->exit_info_2))
->   			break;
->   
->   		ret = kvm_sev_es_mmio_read(vcpu,
-> @@ -2758,8 +2779,7 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
->   					   svm->sev_es.ghcb_sa);
->   		break;
->   	case SVM_VMGEXIT_MMIO_WRITE:
-> -		ret = setup_vmgexit_scratch(svm, false, control->exit_info_2);
-> -		if (ret)
-> +		if (!setup_vmgexit_scratch(svm, false, control->exit_info_2))
->   			break;
->   
->   		ret = kvm_sev_es_mmio_write(vcpu,
-> @@ -2788,14 +2808,10 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
->   		default:
->   			pr_err("svm: vmgexit: unsupported AP jump table request - exit_info_1=%#llx\n",
->   			       control->exit_info_1);
-> -			ghcb_set_sw_exit_info_1(ghcb, 1);
-> -			ghcb_set_sw_exit_info_2(ghcb,
-> -						X86_TRAP_UD |
-> -						SVM_EVTINJ_TYPE_EXEPT |
-> -						SVM_EVTINJ_VALID);
-> +			ghcb_set_sw_exit_info_1(ghcb, 2);
-> +			ghcb_set_sw_exit_info_2(ghcb, GHCB_ERR_INVALID_INPUT);
->   		}
->   
-> -		ret = 1;
->   		break;
->   	}
->   	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
-> @@ -2815,7 +2831,6 @@ int sev_es_string_io(struct vcpu_svm *svm, int size, unsigned int port, int in)
->   {
->   	int count;
->   	int bytes;
-> -	int r;
->   
->   	if (svm->vmcb->control.exit_info_2 > INT_MAX)
->   		return -EINVAL;
-> @@ -2824,9 +2839,8 @@ int sev_es_string_io(struct vcpu_svm *svm, int size, unsigned int port, int in)
->   	if (unlikely(check_mul_overflow(count, size, &bytes)))
->   		return -EINVAL;
->   
-> -	r = setup_vmgexit_scratch(svm, in, bytes);
-> -	if (r)
-> -		return r;
-> +	if (!setup_vmgexit_scratch(svm, in, bytes))
-> +		return 1;
->   
->   	return kvm_sev_es_string_io(&svm->vcpu, size, port, svm->sev_es.ghcb_sa,
->   				    count, in);
-> 
+> Queued, thanks.  Though it would have been nicer to split the changes in 
+> the return values (e.g. for setup_vmgexit_scratch and 
+> sev_es_validate_vmgexit) from the introduction of the new GHCB exitinfo.
 
-Queued, thanks.  Though it would have been nicer to split the changes in 
-the return values (e.g. for setup_vmgexit_scratch and 
-sev_es_validate_vmgexit) from the introduction of the new GHCB exitinfo.
+I can still do that if it will help make things easier. Let me know.
 
-Paolo
+Thanks,
+Tom
 
-Paolo
+> 
+> Paolo
+> 
+> Paolo
