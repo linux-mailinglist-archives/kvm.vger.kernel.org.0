@@ -2,151 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 92ABA466224
-	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 12:14:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D4BBE46621F
+	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 12:13:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357227AbhLBLSH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Dec 2021 06:18:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48112 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234763AbhLBLSG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Dec 2021 06:18:06 -0500
-X-Greylist: delayed 2149 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 02 Dec 2021 03:14:43 PST
-Received: from kadath.azazel.net (unknown [IPv6:2001:8b0:135f:bcd1:e0cb:4eff:fedf:e608])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D35D5C06174A;
-        Thu,  2 Dec 2021 03:14:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=azazel.net;
-        s=20190108; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-        :Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-        List-Post:List-Owner:List-Archive;
-        bh=6ZX4/rDyI9TC6fZAy8o9U/KWfl5nBYItNLL25UAVrsg=; b=DhAdne7fPcy62bDjH98bPlxMg/
-        zddh7n20+1xp+S9rgOZHz4iKc+4/KU3KbB1mIKlN4uvPLokHjkiBg39Sc2jLMQr6IP+NSbc3+2zUv
-        Yh2yS0ZYyrjnv4OBL4g1jb/sB8Ydb6BgR07htGaum4J7eCFEmtmjdzGOIJKwapSLFL0fM3IXGjfOl
-        QFlOGCoPqRzEBm8sTHSFbpTTKHXKlkaalEjveqe5HcPLPPu/e4N3jVs6yYTAXcORH6LyyYaQJgH1z
-        J9yVbYxy3clvBfR43CAid6ZBQWhtQ0Q3hB7Xe5Ls9+51pnrACzjbwgPTf9wAeyMRnrm40ynTAzHjc
-        lBo7DtrA==;
-Received: from celephais.dreamlands ([192.168.96.3] helo=azazel.net)
-        by kadath.azazel.net with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <jeremy@azazel.net>)
-        id 1msjTn-00Cwc2-G8; Thu, 02 Dec 2021 10:38:19 +0000
-Date:   Thu, 2 Dec 2021 10:38:15 +0000
-From:   Jeremy Sowden <jeremy@azazel.net>
-To:     Andrew Morton <akpm@linux-foundation.org>
-Cc:     Bixuan Cui <cuibixuan@linux.alibaba.com>, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org, torvalds@linux-foundation.org,
-        leon@kernel.org, w@1wt.eu, keescook@chromium.org,
-        bpf@vger.kernel.org, netdev@vger.kernel.org,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jakub Kicinski <kuba@kernel.org>, kvm@vger.kernel.org,
-        netfilter-devel@vger.kernel.org
-Subject: Re: [PATCH -next] mm: delete oversized WARN_ON() in kvmalloc() calls
-Message-ID: <YaiiFxD7jfFT9cSR@azazel.net>
-References: <1638410784-48646-1-git-send-email-cuibixuan@linux.alibaba.com>
- <20211201192643.ecb0586e0d53bf8454c93669@linux-foundation.org>
- <10cb0382-012b-5012-b664-c29461ce4de8@linux.alibaba.com>
- <20211201202905.b9892171e3f5b9a60f9da251@linux-foundation.org>
+        id S1357220AbhLBLQg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Dec 2021 06:16:36 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:23265 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233144AbhLBLQe (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 2 Dec 2021 06:16:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1638443592;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=zDx7pyskBIHWNmIa7jFxsgFUTyyGtRftiQzsPbzbtNA=;
+        b=P/4vKxMlXMmk3XGcqk8TdEqSDZJXh7nXy2d0ipf/hon+lDzUmhqOWVZ2u/HgzHvudX0i2l
+        KjuztmnRHrm0OQmTSS1aNsJspBXKUqd9XTSDL1Y8dyXR+eNjpMTmNwbKrQotafV/MTL5Ep
+        JaFhBtJeNoqQAw3HUh5zBCpp5hr3lI4=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-599-So8ULs3TPF-7N1j3Ihn92g-1; Thu, 02 Dec 2021 06:13:11 -0500
+X-MC-Unique: So8ULs3TPF-7N1j3Ihn92g-1
+Received: by mail-wm1-f72.google.com with SMTP id k25-20020a05600c1c9900b00332f798ba1dso1516154wms.4
+        for <kvm@vger.kernel.org>; Thu, 02 Dec 2021 03:13:11 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:cc:references:from:organization:subject
+         :in-reply-to:content-transfer-encoding;
+        bh=zDx7pyskBIHWNmIa7jFxsgFUTyyGtRftiQzsPbzbtNA=;
+        b=dD6RZBVN1sNElNbK3YI9odm49LcmkPfIOW6YzHkZt3Pvy2OVShOaacYWc9Om07qrtn
+         XfYRodn1Dj4TKbIlNfN4cm+j2y5fAetJ7TBEFOCdKGuXZjRw5h/0QgViihMWwZXAoKH5
+         vdYEWaVeZV76IA5nfSlKNAvUjOuKqpsLRqYZVxcV4briZO3VfF5KW2NT8XCeCXnmDkqv
+         j1C2OwmiBj8YEXpsEKDlUPklEjHqPmSldKvhIhDOH/928a+0JhQmS9JQPPPjQbaC97jJ
+         c4Xqkc+9uSe87IIV9YZEno6Hs5bnGMhWRIieGbCWIwA2s61ydv7E2uVGYtAiRSh8Tehp
+         Qd/Q==
+X-Gm-Message-State: AOAM531Us2tzbTm75X9Zpwmcg14BmimVRyj0MqC+SIF3Z9LOlENlUlTZ
+        cMcBJDTq776n6iJR6bjLlLOwgXyE+7HlukeXzYFLQqBOaQXRJZ7N28wnU3ELz8ugcEhonaWxYBw
+        njW+qgMRoKjq4
+X-Received: by 2002:adf:aa08:: with SMTP id p8mr13699009wrd.572.1638443590171;
+        Thu, 02 Dec 2021 03:13:10 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJyzObIE/bfAsh/wgaVECiwfDHjoqoOJjiYXV4XCikcLWWPCsFub6kr0pn3SA7/j8ZQURAjT1w==
+X-Received: by 2002:adf:aa08:: with SMTP id p8mr13698979wrd.572.1638443589924;
+        Thu, 02 Dec 2021 03:13:09 -0800 (PST)
+Received: from ?IPV6:2003:d8:2f44:9200:3344:447e:353c:bf0b? (p200300d82f4492003344447e353cbf0b.dip0.t-ipconnect.de. [2003:d8:2f44:9200:3344:447e:353c:bf0b])
+        by smtp.gmail.com with ESMTPSA id r17sm1940286wmq.5.2021.12.02.03.13.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 Dec 2021 03:13:09 -0800 (PST)
+Message-ID: <95160439-2aa9-765f-9f06-16952e42a495@redhat.com>
+Date:   Thu, 2 Dec 2021 12:13:08 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="sT98d0V/FmLH+krX"
-Content-Disposition: inline
-In-Reply-To: <20211201202905.b9892171e3f5b9a60f9da251@linux-foundation.org>
-X-SA-Exim-Connect-IP: 192.168.96.3
-X-SA-Exim-Mail-From: jeremy@azazel.net
-X-SA-Exim-Scanned: No (on kadath.azazel.net); SAEximRunCond expanded to false
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Content-Language: en-US
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Sebastian Mitterle <smitterl@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org
+References: <20211202095843.41162-1-david@redhat.com>
+ <20211202095843.41162-3-david@redhat.com>
+ <20211202120113.2dd279a8@p-imbrenda>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+Subject: Re: [kvm-unit-tests PATCH v1 2/2] s390x: firq: floating interrupt
+ test
+In-Reply-To: <20211202120113.2dd279a8@p-imbrenda>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+>> +static void wait_for_sclp_int(void)
+>> +{
+>> +	/* Enable SCLP interrupts on this CPU only. */
+>> +	ctl_set_bit(0, CTL0_SERVICE_SIGNAL);
+>> +
+>> +	set_flag(1);
+> 
+> why not just WRITE_ONCE/READ_ONCE?
 
---sT98d0V/FmLH+krX
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Because I shamelessly copied that from s390x/smp.c ;)
 
-On 2021-12-01, at 20:29:05 -0800, Andrew Morton wrote:
-> On Thu, 2 Dec 2021 12:05:15 +0800 Bixuan Cui wrote:
-> > =E5=9C=A8 2021/12/2 =E4=B8=8A=E5=8D=8811:26, Andrew Morton =E5=86=99=E9=
-=81=93:
-> > >> Delete the WARN_ON() and return NULL directly for oversized
-> > >> parameter in kvmalloc() calls.
-> > >> Also add unlikely().
-> > >>
-> > >> Fixes: 7661809d493b ("mm: don't allow oversized kvmalloc() calls")
-> > >> Signed-off-by: Bixuan Cui<cuibixuan@linux.alibaba.com>
-> > >> ---
-> > >> There are a lot of oversize warnings and patches about kvmalloc()
-> > >> calls recently. Maybe these warnings are not very necessary.
-> > >
-> > > Or maybe they are.  Please let's take a look at these warnings,
-> > > one at a time.  If a large number of them are bogus then sure,
-> > > let's disable the runtime test.  But perhaps it's the case that
-> > > calling code has genuine issues and should be repaired.
-> >
-> > Such as=EF=BC=9A
->
-> Thanks, that's helpful.
->
-> Let's bring all these to the attention of the relevant developers.
->
-> If the consensus is "the code's fine, the warning is bogus" then let's
-> consider retiring the warning.
->
-> If the consensus is otherwise then hopefully they will fix their stuff!
->
-> > https://syzkaller.appspot.com/bug?id=3D24452f89446639c901ac07379ccc7028=
-08471e8e
->
-> (cc bpf@vger.kernel.org)
->
-> > https://syzkaller.appspot.com/bug?id=3Df7c5a86e747f9b7ce333e7295875cd4e=
-de2c7a0d
->
-> (cc netdev@vger.kernel.org, maintainers)
->
-> > https://syzkaller.appspot.com/bug?id=3D8f306f3db150657a1f6bbe1927467084=
-531602c7
->
-> (cc kvm@vger.kernel.org)
->
-> > https://syzkaller.appspot.com/bug?id=3D6f30adb592d476978777a1125d1f680e=
-dfc23e00
->
-> (cc netfilter-devel@vger.kernel.org)
+>> +	set_flag(0);
+>> +
+>> +	/* Start CPU #1 and let it wait for the interrupt. */
+>> +	psw.mask = extract_psw_mask();
+>> +	psw.addr = (unsigned long)wait_for_sclp_int;
+>> +	ret = smp_cpu_setup(1, psw);
+>> +	if (ret) {
+>> +		report_skip("cpu #1 not found");
+> 
+> ...which means that this will hang, and so will all the other report*
+> functions. maybe you should manually unset the flag before calling the
+> various report* functions.
 
-The netfilter bug has since been fixed:
+Good point, thanks!
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/log/?i=
-d=3D7bbc3d385bd813077acaf0e6fdb2a86a901f5382
+> 
+>> +		goto out;
+>> +	}
+>> +
+>> +	/* Wait until the CPU #1 at least enabled SCLP interrupts. */
+>> +	wait_for_flag();
+>> +
+>> +	/*
+>> +	 * We'd have to jump trough some hoops to sense e.g., via SIGP
+>> +	 * CONDITIONAL EMERGENCY SIGNAL if CPU #1 is already in the
+>> +	 * wait state.
+>> +	 *
+>> +	 * Although not completely reliable, use SIGP SENSE RUNNING STATUS
+>> +	 * until not reported as running -- after all, our SCLP processing
+>> +	 * will take some time as well and make races very rare.
+>> +	 */
+>> +	while(smp_sense_running_status(1));
+>> +
+>> +	h = alloc_page();
+> 
+> do you really need to dynamically allocate one page?
+> is there a reason for not using a simple static buffer? (which you can
+> have aligned and statically initialized)
 
-> > https://syzkaller.appspot.com/bug?id=3D4c9ab8c7d0f8b551950db06559dc9cde=
-4119ac83
->
-> (bpf again).
+I don't really have a strong opinion. I do prefer dynamic alloctions,
+though, if there isn't a good reason not to use them. No need to mess
+with page alignments manually.
 
-J.
+> 
+>> +	memset(h, 0, sizeof(*h));
+> 
+> otherwise, if you really want to allocate the memory, get rid of the
+> memset; the allocator always returns zeroed memory (unless you
+> explicitly ask not to by using flags)
 
---sT98d0V/FmLH+krX
-Content-Type: application/pgp-signature; name="signature.asc"
+Right. "special" FLAG_DONTZERO in that semantics in that allocator.
 
------BEGIN PGP SIGNATURE-----
+> 
+>> +	h->length = 4096;
+>> +	ret = servc(SCLP_CMDW_READ_CPU_INFO, __pa(h));
+>> +	if (ret) {
+>> +		report_fail("SCLP_CMDW_READ_CPU_INFO failed");
+>> +		goto out_destroy;
+>> +	}
+>> +
+>> +	/*
+>> +	 * Wait until the interrupt gets delivered on CPU #1, marking the
+> 
+> why do you expect the interrupt to be delivered on CPU1? could it not
+> be delivered on CPU0?
 
-iQIzBAABCgAdFiEEbB20U2PvQDe9VtUXKYasCr3xBA0FAmGoohAACgkQKYasCr3x
-BA1LEg/9EsWoxlPj8GB9UCjUy4vKBvWJalWrQpvWej9DHMbRhV2UH4SOMXMyEoro
-ukt29Co69KOMZ5HpPRGMmcjA0P+ZtCIk7zCD1c4wCmVssGpH9agykLfpgRzqyS8C
-21S94Uy7hJjK4j3LuYZHFBMacFATP5ejqx6xdgB7ANuqu/sMAKFcp3S6NxskrADc
-Kq+dCd0M5yhNodBn0STRP/91MeQNxFfAdzKGphyF3iRwratHJkjmuoevaa6lZEn1
-wND3FYczcWYROaKHdnWxORcwAPrveAwZNjnuDZIuDrws7jO58PCGh3E1wBla5u9A
-i77mqMC298p6+7ms2/H49illteoyo3+mVvMoECA7xf/B4VKCnw8kn+bA25tNNrNw
-gX0Q8KWNagQe7HPeKXvoHY5XgEauCHq6aOEORNgzm96Bi3HAQZxSHVgNmAkV2GBG
-TXia7IUAqoqoOuABryAWsO52NpjSXND6GuFixbbIrfXBDiic2Vimk1MSQcwSV7om
-ybTKdZWLyo6ARJzLx/yxFNiiWU63FJi/6twlOMgoQAFVBIY4UsgWYJYix8RD1E5o
-56m/B49uEaLI/Vdd9YanE0yIVIpAxMSzf5DmIj1pfOQ2g3NplmjR3TH2MCpwB5jt
-EN3oIIfoNunZPSh0rzPrzurSBX5nBSiA2vJgOeb1zZOPm1kJHNs=
-=z1bg
------END PGP SIGNATURE-----
+We don't enable SCLP interrupts + external interrupts on CPU #0 because
+we'll only call sclp_setup_int() on CPU #1.
 
---sT98d0V/FmLH+krX--
+> 
+>> +	 * SCLP requests as done.
+>> +	 */
+>> +	sclp_wait_busy();
+> 
+> this is logically not wrong (and should stay, because it makes clear
+> what you are trying to do), but strictly speaking it's not needed since
+> the report below will hang as long as the SCLP busy flag is set. 
+
+Right. But it's really clearer to just have this in the code.
+
+
+-- 
+Thanks,
+
+David / dhildenb
+
