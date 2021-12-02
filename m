@@ -2,241 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BC528466439
-	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 14:02:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0659346645B
+	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 14:12:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346633AbhLBNFd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Dec 2021 08:05:33 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:35040 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232890AbhLBNFc (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 2 Dec 2021 08:05:32 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1638450129;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=x1DDUlEbW7+TEcKrOe/PwHbaKXvgftYv4zFADOMy298=;
-        b=cHijUvy92GgHlTfGpXiWSMaNyVnwZouO58KsDYTCL/25hQftOfxnLyOpXRnOlsGTgjXRkk
-        q8ZpMdEkWiIETJRWLOmwH84CuyD7wGSCmDR21IJZqrA/GNux/hA+cFS/NKzXgzXUhNVsPx
-        aZGKgytmt0DchN7HFptIqx2ROdpJVJg=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-294-ygrPi9dcOmWDreVNo01PsQ-1; Thu, 02 Dec 2021 08:02:08 -0500
-X-MC-Unique: ygrPi9dcOmWDreVNo01PsQ-1
-Received: by mail-wr1-f69.google.com with SMTP id r2-20020adfe682000000b00198af042b0dso5030461wrm.23
-        for <kvm@vger.kernel.org>; Thu, 02 Dec 2021 05:02:08 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=x1DDUlEbW7+TEcKrOe/PwHbaKXvgftYv4zFADOMy298=;
-        b=fvLQyDdSu5U9M+9pLL12LomsesoxFn5rRS03PNGbZxZS85Ntgvg7njLj9ZDB09DnTq
-         a6vFOiF49z0cYjE143ag57t8YF5UBEISqiw+5dY9a+APyrlfkCnyYcM2YRaC3y4kxH+B
-         SBAc7MOfGjXuTqcDs16+1aZD5ypDOb4b2r4S9xQHw07jlsAhb7+qJXQIH9iVyYYjgFOg
-         FUgtRODpGxJHD2EatqMsBtblX3SqsYGxPrQvykh7kXHCVV5lcPe9MnwGQP3/b1LrIFG3
-         yChL2e/f8HI5IjJJGV9mJxjabt/k25BHNKzV34XHvkzpkIABy4l+K/XKybYgkC0FzDk/
-         LlmQ==
-X-Gm-Message-State: AOAM531UwmUVizQJV2eev//oAcVVd2HO5mDk4kiKT9KBA5EzUMvyn54P
-        oqcDdSzuSdJAQriJY/jDqhQ7J65Id3yLCTzDn1zHOkR4NLnLoVWj6iuTYOrbA89REudiybY9kOB
-        9E0XRKEeRL3+8
-X-Received: by 2002:a05:6000:143:: with SMTP id r3mr14462652wrx.236.1638450127213;
-        Thu, 02 Dec 2021 05:02:07 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzMvw1j4167feOTyg3bdIJl0KldZ/+JDB+tLVdpAglu6yx0xuOJYBL7gNenCbomHVVt1er+1Q==
-X-Received: by 2002:a05:6000:143:: with SMTP id r3mr14462621wrx.236.1638450126984;
-        Thu, 02 Dec 2021 05:02:06 -0800 (PST)
-Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id a22sm2110828wme.19.2021.12.02.05.02.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Dec 2021 05:02:06 -0800 (PST)
-Subject: Re: [RFC PATCH v3 04/29] KVM: arm64: Make ID_AA64PFR0_EL1 writable
-To:     Reiji Watanabe <reijiw@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
-        Peter Shier <pshier@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        linux-arm-kernel@lists.infradead.org
-References: <20211117064359.2362060-1-reijiw@google.com>
- <20211117064359.2362060-5-reijiw@google.com>
- <b56f871c-11da-e8ff-e90e-0ec3b4c0207f@redhat.com>
- <CAAeT=Fz96dYR2m7UbgVw_SjNV6wheYBfSx+m+zCWbnHWHkcQdw@mail.gmail.com>
-From:   Eric Auger <eauger@redhat.com>
-Message-ID: <f9aa15c3-5d7a-36a0-82c9-1db81dca5beb@redhat.com>
-Date:   Thu, 2 Dec 2021 14:02:04 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        id S1358200AbhLBNPl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Dec 2021 08:15:41 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:45020 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1358285AbhLBNPQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 2 Dec 2021 08:15:16 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B2ArSkQ012723;
+        Thu, 2 Dec 2021 13:11:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=CXiRJqvA8YBaqB/qDp3UuyUAyVQ8eyUzpKhj4I1PyuE=;
+ b=gLS102+OiNl4fBk8ZMRyhrw4QfPXhl6pZhauAhExWhZd7RGhxWcdspcVL1yRkWAbUjvr
+ qGU03uJyjl2hSRYj0Pb1N8L9oi08tgxPy6Ar8vbdtj3nJ4U5FSvAgWMPcobi0aek/2//
+ vOgLw18cje12lnG32+v3ZRRWeYayIao29pWS9z+wOgGPPZ0OxnaJNsMKYAILxlnctvp8
+ Cx6eM90xfT1CG2+YekcDMNArcw0OYcJHQbGOrxrbx6RTBFEn+9LPtCl5SSvd12SK85S5
+ MBjCZ7q6K7Yr1F6RNgU7ddvNMxza2Qx4j96I7Ujxj0m3+TrcnPo7Z/4o3sKq4RljrasW Ew== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cpvssarur-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Dec 2021 13:11:52 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1B2CijIq025078;
+        Thu, 2 Dec 2021 13:11:52 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cpvssaru5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Dec 2021 13:11:52 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1B2D3Rix023034;
+        Thu, 2 Dec 2021 13:11:49 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma04fra.de.ibm.com with ESMTP id 3cncgms0d2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Dec 2021 13:11:49 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1B2DBkW912648838
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 2 Dec 2021 13:11:46 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B928642049;
+        Thu,  2 Dec 2021 13:11:46 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DCE1C4204B;
+        Thu,  2 Dec 2021 13:11:45 +0000 (GMT)
+Received: from linux6.. (unknown [9.114.12.104])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  2 Dec 2021 13:11:45 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        thuth@redhat.com
+Subject: [kvm-unit-tests PATCH] s390x: uv: Fix UVC cmd prepare reset name
+Date:   Thu,  2 Dec 2021 13:11:22 +0000
+Message-Id: <20211202131122.2948-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-In-Reply-To: <CAAeT=Fz96dYR2m7UbgVw_SjNV6wheYBfSx+m+zCWbnHWHkcQdw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: gIvIpsGV_0wlNJWd5L_Imu07K24KbRvp
+X-Proofpoint-ORIG-GUID: SPg4Wvpk_uRRdF30T5d2nhQ6ZrIM469k
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
+ definitions=2021-12-02_07,2021-12-02_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
+ spamscore=0 mlxlogscore=887 mlxscore=0 priorityscore=1501 impostorscore=0
+ bulkscore=0 lowpriorityscore=0 clxscore=1015 suspectscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
+ definitions=main-2112020084
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Reiji,
+The specification and the kernel use UVC_CMD_PREPARE_RESET so let's
+fix our naming up.
 
-On 11/30/21 2:29 AM, Reiji Watanabe wrote:
-> Hi Eric,
-> 
-> On Thu, Nov 25, 2021 at 7:35 AM Eric Auger <eauger@redhat.com> wrote:
->>
->> Hi Reiji,
->>
->> On 11/17/21 7:43 AM, Reiji Watanabe wrote:
->>> This patch adds id_reg_info for ID_AA64PFR0_EL1 to make it writable by
->>> userspace.
->>>
->>> The CSV2/CSV3 fields of the register were already writable and values
->>> that were written for them affected all vCPUs before. Now they only
->>> affect the vCPU.
->>> Return an error if userspace tries to set SVE/GIC field of the register
->>> to a value that conflicts with SVE/GIC configuration for the guest.
->>> SIMD/FP/SVE fields of the requested value are validated according to
->>> Arm ARM.
->>>
->>> Signed-off-by: Reiji Watanabe <reijiw@google.com>
->>> ---
->>>  arch/arm64/kvm/sys_regs.c | 159 ++++++++++++++++++++++++--------------
->>>  1 file changed, 103 insertions(+), 56 deletions(-)
->>>
->>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
->>> index 1552cd5581b7..35400869067a 100644
->>> --- a/arch/arm64/kvm/sys_regs.c
->>> +++ b/arch/arm64/kvm/sys_regs.c
->>> @@ -401,6 +401,92 @@ static void id_reg_info_init(struct id_reg_info *id_reg)
->>>               id_reg->init(id_reg);
->>>  }
->>>
->>> +#define      kvm_has_gic3(kvm)               \
->>> +     (irqchip_in_kernel(kvm) &&      \
->>> +      (kvm)->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3)
->> you may move this macro to kvm/arm_vgic.h as this may be used in
->> vgic/vgic-v3.c too
-> 
-> Thank you for the suggestion. I will move that to kvm/arm_vgic.h.
-> 
-> 
->>> +
->>> +static int validate_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
->>> +                                 const struct id_reg_info *id_reg, u64 val)
->>> +{
->>> +     int fp, simd;
->>> +     bool vcpu_has_sve = vcpu_has_sve(vcpu);
->>> +     bool pfr0_has_sve = id_aa64pfr0_sve(val);
->>> +     int gic;
->>> +
->>> +     simd = cpuid_feature_extract_signed_field(val, ID_AA64PFR0_ASIMD_SHIFT);
->>> +     fp = cpuid_feature_extract_signed_field(val, ID_AA64PFR0_FP_SHIFT);
->>> +     if (simd != fp)
->>> +             return -EINVAL;
->>> +
->>> +     /* fp must be supported when sve is supported */
->>> +     if (pfr0_has_sve && (fp < 0))
->>> +             return -EINVAL;
->>> +
->>> +     /* Check if there is a conflict with a request via KVM_ARM_VCPU_INIT */
->>> +     if (vcpu_has_sve ^ pfr0_has_sve)
->>> +             return -EPERM;
->>> +
->>> +     gic = cpuid_feature_extract_unsigned_field(val, ID_AA64PFR0_GIC_SHIFT);
->>> +     if ((gic > 0) ^ kvm_has_gic3(vcpu->kvm))
->>> +             return -EPERM;
->>
->> Sometimes from a given architecture version, some lower values are not
->> allowed. For instance from ARMv8.5 onlt 1 is permitted for CSV3.
->> Shouldn't we handle that kind of check?
-> 
-> As far as I know, there is no way for guests to identify the
-> architecture revision (e.g. v8.1, v8.2, etc).  It might be able
-> to indirectly infer the revision though (from features that are
-> available or etc).
+The call bit is named correctly but is not the same as the name we use
+on KVM. So let's clear that up too.
 
-OK. That sounds weird to me as we do many checks accross different IDREG
-settings but we may eventually have a wrong "CPU model" exposed by the
-user space violating those spec revision minima. Shouldn't we introduce
-some way for the userspace to provide his requirements? via new VCPU
-targets for instance?
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+---
+ lib/s390x/asm/uv.h | 4 ++--
+ s390x/uv-guest.c   | 2 +-
+ s390x/uv-host.c    | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-Thanks
-
-Eric
-> 
-> 
->>> +
->>> +     return 0;
->>> +}
->>> +
->>> +static void init_id_aa64pfr0_el1_info(struct id_reg_info *id_reg)
->>> +{
->>> +     u64 limit = id_reg->vcpu_limit_val;
->>> +     unsigned int gic;
->>> +
->>> +     limit &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_AMU);
->>> +     if (!system_supports_sve())
->>> +             limit &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_SVE);
->>> +
->>> +     /*
->>> +      * The default is to expose CSV2 == 1 and CSV3 == 1 if the HW
->>> +      * isn't affected.  Userspace can override this as long as it
->>> +      * doesn't promise the impossible.
->>> +      */
->>> +     limit &= ~(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV2) |
->>> +                ARM64_FEATURE_MASK(ID_AA64PFR0_CSV3));
->>> +
->>> +     if (arm64_get_spectre_v2_state() == SPECTRE_UNAFFECTED)
->>> +             limit |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV2), 1);
->>> +     if (arm64_get_meltdown_state() == SPECTRE_UNAFFECTED)
->>> +             limit |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_CSV3), 1);
->>> +
->>> +     gic = cpuid_feature_extract_unsigned_field(limit, ID_AA64PFR0_GIC_SHIFT);
->>> +     if (gic > 1) {
->>> +             /* Limit to GICv3.0/4.0 */
->>> +             limit &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_GIC);
->>> +             limit |= FIELD_PREP(ARM64_FEATURE_MASK(ID_AA64PFR0_GIC), 1);
->>> +     }
->>> +     id_reg->vcpu_limit_val = limit;
->>> +}
->>> +
->>> +static u64 get_reset_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
->>> +                                  const struct id_reg_info *idr)
->>> +{
->>> +     u64 val = idr->vcpu_limit_val;
->>> +
->>> +     if (!vcpu_has_sve(vcpu))
->>> +             val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_SVE);
->>> +
->>> +     if (!kvm_has_gic3(vcpu->kvm))
->>> +             val &= ~ARM64_FEATURE_MASK(ID_AA64PFR0_GIC);
->>> +
->>> +     return val;
->>> +}
->>> +
->>> +static struct id_reg_info id_aa64pfr0_el1_info = {
->>> +     .sys_reg = SYS_ID_AA64PFR0_EL1,
->>> +     .ftr_check_types = S_FCT(ID_AA64PFR0_ASIMD_SHIFT, FCT_LOWER_SAFE) |
->>> +                        S_FCT(ID_AA64PFR0_FP_SHIFT, FCT_LOWER_SAFE),
->> is it needed as it is the default?
-> 
->>> +     .ftr_check_types = S_FCT(ID_AA64PFR0_ASIMD_SHIFT, FCT_LOWER_SAFE) |
->>> +                        S_FCT(ID_AA64PFR0_FP_SHIFT, FCT_LOWER_SAFE),
->> is it needed as it is the default?
-> 
-> They are needed because they are signed fields (the default is unsigned
-
-Ah OK, I did not catch it at first glance while looking at the ARM ARM.
-
-Thanks
-
-Eric
-
-> and FCT_LOWER_SAFE).  Having said that, ftr_check_types itself will be
-> gone in the next version (as arm64_ftr_bits will be used instead).
-> 
-> Thanks,
-> Reiji
-> 
+diff --git a/lib/s390x/asm/uv.h b/lib/s390x/asm/uv.h
+index 97c90e81..70bf65c4 100644
+--- a/lib/s390x/asm/uv.h
++++ b/lib/s390x/asm/uv.h
+@@ -39,7 +39,7 @@
+ #define UVC_CMD_VERIFY_IMG		0x0302
+ #define UVC_CMD_CPU_RESET		0x0310
+ #define UVC_CMD_CPU_RESET_INITIAL	0x0311
+-#define UVC_CMD_PERF_CONF_CLEAR_RESET	0x0320
++#define UVC_CMD_PREPARE_RESET		0x0320
+ #define UVC_CMD_CPU_RESET_CLEAR		0x0321
+ #define UVC_CMD_CPU_SET_STATE		0x0330
+ #define UVC_CMD_SET_UNSHARED_ALL	0x0340
+@@ -66,7 +66,7 @@ enum uv_cmds_inst {
+ 	BIT_UVC_CMD_CPU_RESET = 15,
+ 	BIT_UVC_CMD_CPU_RESET_INITIAL = 16,
+ 	BIT_UVC_CMD_CPU_SET_STATE = 17,
+-	BIT_UVC_CMD_PREPARE_CLEAR_RESET = 18,
++	BIT_UVC_CMD_PREPARE_RESET = 18,
+ 	BIT_UVC_CMD_CPU_PERFORM_CLEAR_RESET = 19,
+ 	BIT_UVC_CMD_UNSHARE_ALL = 20,
+ 	BIT_UVC_CMD_PIN_PAGE_SHARED = 21,
+diff --git a/s390x/uv-guest.c b/s390x/uv-guest.c
+index 44ad2154..99120cae 100644
+--- a/s390x/uv-guest.c
++++ b/s390x/uv-guest.c
+@@ -142,7 +142,7 @@ static struct {
+ 	{ "verify", UVC_CMD_VERIFY_IMG, sizeof(struct uv_cb_nodata), BIT_UVC_CMD_VERIFY_IMG },
+ 	{ "cpu reset", UVC_CMD_CPU_RESET, sizeof(struct uv_cb_nodata), BIT_UVC_CMD_CPU_RESET },
+ 	{ "cpu initial reset", UVC_CMD_CPU_RESET_INITIAL, sizeof(struct uv_cb_nodata), BIT_UVC_CMD_CPU_RESET_INITIAL },
+-	{ "conf clear reset", UVC_CMD_PERF_CONF_CLEAR_RESET, sizeof(struct uv_cb_nodata), BIT_UVC_CMD_PREPARE_CLEAR_RESET },
++	{ "prepare clear reset", UVC_CMD_PREPARE_RESET, sizeof(struct uv_cb_nodata), BIT_UVC_CMD_PREPARE_RESET },
+ 	{ "cpu clear reset", UVC_CMD_CPU_RESET_CLEAR, sizeof(struct uv_cb_nodata), BIT_UVC_CMD_CPU_PERFORM_CLEAR_RESET },
+ 	{ "cpu set state", UVC_CMD_CPU_SET_STATE, sizeof(struct uv_cb_cpu_set_state), BIT_UVC_CMD_CPU_SET_STATE },
+ 	{ "pin shared", UVC_CMD_PIN_PAGE_SHARED, sizeof(struct uv_cb_cfs), BIT_UVC_CMD_PIN_PAGE_SHARED },
+diff --git a/s390x/uv-host.c b/s390x/uv-host.c
+index 92a41069..de2e4850 100644
+--- a/s390x/uv-host.c
++++ b/s390x/uv-host.c
+@@ -55,7 +55,7 @@ static struct cmd_list cmds[] = {
+ 	{ "verify", UVC_CMD_VERIFY_IMG, sizeof(struct uv_cb_nodata), BIT_UVC_CMD_VERIFY_IMG },
+ 	{ "cpu reset", UVC_CMD_CPU_RESET, sizeof(struct uv_cb_nodata), BIT_UVC_CMD_CPU_RESET },
+ 	{ "cpu initial reset", UVC_CMD_CPU_RESET_INITIAL, sizeof(struct uv_cb_nodata), BIT_UVC_CMD_CPU_RESET_INITIAL },
+-	{ "conf clear reset", UVC_CMD_PERF_CONF_CLEAR_RESET, sizeof(struct uv_cb_nodata), BIT_UVC_CMD_PREPARE_CLEAR_RESET },
++	{ "conf clear reset", UVC_CMD_PREPARE_RESET, sizeof(struct uv_cb_nodata), BIT_UVC_CMD_PREPARE_RESET },
+ 	{ "cpu clear reset", UVC_CMD_CPU_RESET_CLEAR, sizeof(struct uv_cb_nodata), BIT_UVC_CMD_CPU_PERFORM_CLEAR_RESET },
+ 	{ "cpu set state", UVC_CMD_CPU_SET_STATE, sizeof(struct uv_cb_cpu_set_state), BIT_UVC_CMD_CPU_SET_STATE },
+ 	{ "pin shared", UVC_CMD_PIN_PAGE_SHARED, sizeof(struct uv_cb_cfs), BIT_UVC_CMD_PIN_PAGE_SHARED },
+-- 
+2.32.0
 
