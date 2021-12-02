@@ -2,234 +2,319 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 50FE84661D6
-	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 11:58:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DC92E4661E9
+	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 12:01:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357087AbhLBLCS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Dec 2021 06:02:18 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:48664 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1356693AbhLBLCQ (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 2 Dec 2021 06:02:16 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1638442734;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=wRIl4oD7Y5fkUN5tfay4kekz4HgS1IifoWLggGlVW1I=;
-        b=PqTU0J2QvLYOTWuMuXOYgSfWcNEfElkSvQjzdV82ylVbk8FmneTiTArWGLGE0m+kcC1fMT
-        YrT4lthFlI0Dqh+XGdtq2825o+Jl3uu4KifjIxmCljcey+QeFpyF51om+eB7ffSBgx3EeW
-        YbA/0PpDC/X7Z97g5vTl6nrvqv5z/hI=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-564-qA7IP1TAPFOYNs0UNunuhw-1; Thu, 02 Dec 2021 05:58:53 -0500
-X-MC-Unique: qA7IP1TAPFOYNs0UNunuhw-1
-Received: by mail-wr1-f69.google.com with SMTP id q17-20020adff791000000b00183e734ba48so4919166wrp.8
-        for <kvm@vger.kernel.org>; Thu, 02 Dec 2021 02:58:53 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=wRIl4oD7Y5fkUN5tfay4kekz4HgS1IifoWLggGlVW1I=;
-        b=MLKzriAo/oglQzmL2MLmHcglyKxXclFZcMmnoFak4NekrwwZ4GcpN97qEWd6SxnWmA
-         81iMHs89FPgbQ65wUc7QgI4bWI7pGPJ0gJ1sJ+nyMy1bvoLSS4Wyn5XwHnFebe6dJGdU
-         /y/Ho9IspXtmHGO8fg5Jw/o/UEsIYdqJbPB0It3Qs5uvBbOKqP/VE4cTS56ZSbzoeRLM
-         6O1emh8wHoOCnyxdvgZqyyMMs+AzyfP0IW2wtgfdnNqjUzySetNutvNInMIBUslOurxz
-         5/TOQfujyGpBun3C3uzjozVODs1kEpTeqrgZ3Kdr1jSDfN4cnapkhYDPN9HIJgvLA09J
-         n7KA==
-X-Gm-Message-State: AOAM5312Wy/mpQ6iJC6ONlfbYzc1lvdEpY2kCYR/ylAVeEGcu2qwFuBt
-        7zacY8lRQhf91InT+Fc/oZWcj8oJEdeUeZFfis1ZP9cYgkJZAEe4hR2JNpVpqyyCEH3fTwORlNv
-        5OAUdfHB4KPwu
-X-Received: by 2002:a5d:59ae:: with SMTP id p14mr13407439wrr.365.1638442732141;
-        Thu, 02 Dec 2021 02:58:52 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwdyKWGj2oyPnzq4Mdj75inkETU6TFWFE6xL8kZngxharwOb3Jh07jKn6KFiajYEjau2R9aEw==
-X-Received: by 2002:a5d:59ae:: with SMTP id p14mr13407422wrr.365.1638442731933;
-        Thu, 02 Dec 2021 02:58:51 -0800 (PST)
-Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
-        by smtp.gmail.com with ESMTPSA id c1sm2247743wrt.14.2021.12.02.02.58.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Dec 2021 02:58:51 -0800 (PST)
-Subject: Re: [RFC PATCH v3 02/29] KVM: arm64: Save ID registers' sanitized
- value per vCPU
-To:     Reiji Watanabe <reijiw@google.com>, Marc Zyngier <maz@kernel.org>,
-        kvmarm@lists.cs.columbia.edu
-Cc:     kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
-        Peter Shier <pshier@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        linux-arm-kernel@lists.infradead.org
-References: <20211117064359.2362060-1-reijiw@google.com>
- <20211117064359.2362060-3-reijiw@google.com>
-From:   Eric Auger <eauger@redhat.com>
-Message-ID: <9f6e8b7e-c2b3-5883-f934-5b537c4ce19b@redhat.com>
-Date:   Thu, 2 Dec 2021 11:58:50 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        id S1346214AbhLBLFO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Dec 2021 06:05:14 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:24716 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1357113AbhLBLEy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 2 Dec 2021 06:04:54 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B2ApAq6023077;
+        Thu, 2 Dec 2021 11:01:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=UDu1/KqloCRJmOmqgG+HzlAXgcg3ZXFexKu2bFjTSYc=;
+ b=n3rXlkCIiJf+f9NsO27ofEqSAK6EC7T0mcZHyEYsY4jG4rd/9WZ7QZl4HNXtAw9wLKyR
+ r9p7AJkwODHrLETyi731MKsHgRdUniBHzPWgU3bOnEgDOPVbr3hF8uRNP3Kutyk86gPt
+ IEJGvaTMSOkjWg+grGJ8npeOGAc4aeZrs8thravAsSateFFIegg6wUZk6wS/A2RSUvJT
+ F0F1o3D5LlJOWHM/qzhW7Yen3BIcn+dEGtjg7IsZX/C8S9BhfeVxRvK5Qx7GE+Qxyi7A
+ pPtR4HUY7C0RgIvDgguYx98lYPfeLx1jAKEimcas7KsnjqKNSqJ75hUSJaFG7jI0heAq cQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3cpvrpg5xw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Dec 2021 11:01:29 +0000
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1B2ArhME000798;
+        Thu, 2 Dec 2021 11:01:28 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3cpvrpg5x8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Dec 2021 11:01:28 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1B2AxWxt009048;
+        Thu, 2 Dec 2021 11:01:26 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma04fra.de.ibm.com with ESMTP id 3cncgmqnsy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Dec 2021 11:01:26 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1B2ArrmM25035042
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 2 Dec 2021 10:53:53 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 067C442049;
+        Thu,  2 Dec 2021 11:01:23 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7F60342059;
+        Thu,  2 Dec 2021 11:01:22 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.8.140])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  2 Dec 2021 11:01:22 +0000 (GMT)
+Date:   Thu, 2 Dec 2021 12:01:13 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     David Hildenbrand <david@redhat.com>
+Cc:     kvm@vger.kernel.org, Thomas Huth <thuth@redhat.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Sebastian Mitterle <smitterl@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v1 2/2] s390x: firq: floating interrupt
+ test
+Message-ID: <20211202120113.2dd279a8@p-imbrenda>
+In-Reply-To: <20211202095843.41162-3-david@redhat.com>
+References: <20211202095843.41162-1-david@redhat.com>
+        <20211202095843.41162-3-david@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20211117064359.2362060-3-reijiw@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: H4g7Ms1_1azqFUauAANU0KH9Luk5vfDh
+X-Proofpoint-ORIG-GUID: FBo99-HsDiT75D8xLT2IhbS6O467eCcS
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.0.607.475
+ definitions=2021-12-02_05,2021-12-02_01,2020-04-07_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
+ impostorscore=0 malwarescore=0 priorityscore=1501 phishscore=0
+ clxscore=1015 lowpriorityscore=0 suspectscore=0 adultscore=0 bulkscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2112020065
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Reiji,
+On Thu,  2 Dec 2021 10:58:43 +0100
+David Hildenbrand <david@redhat.com> wrote:
 
-On 11/17/21 7:43 AM, Reiji Watanabe wrote:
-> Extend sys_regs[] of kvm_cpu_context for ID registers and save ID
-> registers' sanitized value in the array for the vCPU at the first
-> vCPU reset. Use the saved ones when ID registers are read by
-> userspace (via KVM_GET_ONE_REG) or the guest.
+> We had a KVM BUG fixed by kernel commit a3e03bc1368c ("KVM: s390: index
+> kvm->arch.idle_mask by vcpu_idx"), whereby a floating interrupt might get
+> stuck forever because a CPU in the wait state would not get woken up.
 > 
-> Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> The issue can be triggered when CPUs are created in a nonlinear fashion,
+> such that the CPU address ("core-id") and the KVM cpu id don't match.
+> 
+> So let's start with a floating interrupt test that will trigger a
+> floating interrupt (via SCLP) to be delivered to a CPU in the wait state.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
 > ---
->  arch/arm64/include/asm/kvm_host.h | 10 +++++++
->  arch/arm64/kvm/sys_regs.c         | 43 +++++++++++++++++++------------
->  2 files changed, 37 insertions(+), 16 deletions(-)
+>  s390x/Makefile      |   1 +
+>  s390x/firq.c        | 141 ++++++++++++++++++++++++++++++++++++++++++++
+>  s390x/unittests.cfg |  10 ++++
+>  3 files changed, 152 insertions(+)
+>  create mode 100644 s390x/firq.c
 > 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index edbe2cb21947..72db73c79403 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -146,6 +146,14 @@ struct kvm_vcpu_fault_info {
->  	u64 disr_el1;		/* Deferred [SError] Status Register */
->  };
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index f95f2e6..1e567c1 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -25,6 +25,7 @@ tests += $(TEST_DIR)/uv-host.elf
+>  tests += $(TEST_DIR)/edat.elf
+>  tests += $(TEST_DIR)/mvpg-sie.elf
+>  tests += $(TEST_DIR)/spec_ex-sie.elf
+> +tests += $(TEST_DIR)/firq.elf
 >  
+>  tests_binary = $(patsubst %.elf,%.bin,$(tests))
+>  ifneq ($(HOST_KEY_DOCUMENT),)
+> diff --git a/s390x/firq.c b/s390x/firq.c
+> new file mode 100644
+> index 0000000..3e60681
+> --- /dev/null
+> +++ b/s390x/firq.c
+> @@ -0,0 +1,141 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
 > +/*
-> + * (Op0, Op1, CRn, CRm, Op2) of ID registers is (3, 0, 0, crm, op2),
-> + * where 0<=crm<8, 0<=op2<8.
+> + * Floating interrupt tests.
+> + *
+> + * Copyright 2021 Red Hat Inc
+> + *
+> + * Authors:
+> + *    David Hildenbrand <david@redhat.com>
 > + */
-> +#define KVM_ARM_ID_REG_MAX_NUM 64
-> +#define IDREG_IDX(id)		((sys_reg_CRm(id) << 3) | sys_reg_Op2(id))
-> +#define IDREG_SYS_IDX(id)	(ID_REG_BASE + IDREG_IDX(id))
+> +#include <libcflat.h>
+> +#include <asm/asm-offsets.h>
+> +#include <asm/interrupt.h>
+> +#include <asm/page.h>
+> +#include <asm-generic/barrier.h>
 > +
->  enum vcpu_sysreg {
->  	__INVALID_SYSREG__,   /* 0 is reserved as an invalid value */
->  	MPIDR_EL1,	/* MultiProcessor Affinity Register */
-> @@ -210,6 +218,8 @@ enum vcpu_sysreg {
->  	CNTP_CVAL_EL0,
->  	CNTP_CTL_EL0,
->  
-> +	ID_REG_BASE,
-> +	ID_REG_END = ID_REG_BASE + KVM_ARM_ID_REG_MAX_NUM - 1,
->  	/* Memory Tagging Extension registers */
->  	RGSR_EL1,	/* Random Allocation Tag Seed Register */
->  	GCR_EL1,	/* Tag Control Register */
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index e3ec1a44f94d..5608d3410660 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -33,6 +33,8 @@
->  
->  #include "trace.h"
->  
-> +static u64 __read_id_reg(const struct kvm_vcpu *vcpu, u32 id);
+> +#include <sclp.h>
+> +#include <smp.h>
+> +#include <alloc_page.h>
 > +
->  /*
->   * All of this file is extremely similar to the ARM coproc.c, but the
->   * types are different. My gut feeling is that it should be pretty
-> @@ -273,7 +275,7 @@ static bool trap_loregion(struct kvm_vcpu *vcpu,
->  			  struct sys_reg_params *p,
->  			  const struct sys_reg_desc *r)
->  {
-> -	u64 val = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
-> +	u64 val = __read_id_reg(vcpu, SYS_ID_AA64MMFR1_EL1);
->  	u32 sr = reg_to_encoding(r);
->  
->  	if (!(val & (0xfUL << ID_AA64MMFR1_LOR_SHIFT))) {
-> @@ -1059,17 +1061,9 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
->  	return true;
->  }
->  
-> -/* Read a sanitised cpufeature ID register by sys_reg_desc */
-> -static u64 read_id_reg(const struct kvm_vcpu *vcpu,
-> -		struct sys_reg_desc const *r, bool raz)
-> +static u64 __read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
->  {
-> -	u32 id = reg_to_encoding(r);
-> -	u64 val;
-> -
-> -	if (raz)
-> -		return 0;
-> -
-> -	val = read_sanitised_ftr_reg(id);
-> +	u64 val = __vcpu_sys_reg(vcpu, IDREG_SYS_IDX(id));
->  
->  	switch (id) {
->  	case SYS_ID_AA64PFR0_EL1:
-> @@ -1119,6 +1113,14 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
->  	return val;
->  }
->  
-> +static u64 read_id_reg(const struct kvm_vcpu *vcpu,
-> +		       struct sys_reg_desc const *r, bool raz)
+> +static int testflag = 0;
+> +
+> +static void wait_for_flag(void)
 > +{
-> +	u32 id = reg_to_encoding(r);
-> +
-> +	return raz ? 0 : __read_id_reg(vcpu, id);
+> +	while (!testflag)
+> +		mb();
 > +}
 > +
->  static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
->  				  const struct sys_reg_desc *r)
->  {
-> @@ -1178,6 +1180,16 @@ static unsigned int sve_visibility(const struct kvm_vcpu *vcpu,
->  	return REG_HIDDEN;
->  }
->  
-> +static void reset_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd)
+> +static void set_flag(int val)
 > +{
-> +	u32 id = reg_to_encoding(rd);
-> +
-> +	if (vcpu_has_reset_once(vcpu))
-> +		return;
-The KVM API allows to call VCPU_INIT several times (with same
-target/feature). With above check on the second call the ID_REGS won't
-be reset. Somehow this is aligned with target/feature behavior. However
-if this is what we want, I think we would need to document it in the KVM
-API doc.
-
-Thanks
-
-Eric
-> +
-> +	__vcpu_sys_reg(vcpu, IDREG_SYS_IDX(id)) = read_sanitised_ftr_reg(id);
+> +	mb();
+> +	testflag = val;
+> +	mb();
 > +}
 > +
->  static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
->  			       const struct sys_reg_desc *rd,
->  			       const struct kvm_one_reg *reg, void __user *uaddr)
-> @@ -1223,9 +1235,7 @@ static int set_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
->  /*
->   * cpufeature ID register user accessors
->   *
-> - * For now, these registers are immutable for userspace, so no values
-> - * are stored, and for set_id_reg() we don't allow the effective value
-> - * to be changed.
-> + * We don't allow the effective value to be changed.
->   */
->  static int __get_id_reg(const struct kvm_vcpu *vcpu,
->  			const struct sys_reg_desc *rd, void __user *uaddr,
-> @@ -1382,6 +1392,7 @@ static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
->  #define ID_SANITISED(name) {			\
->  	SYS_DESC(SYS_##name),			\
->  	.access	= access_id_reg,		\
-> +	.reset	= reset_id_reg,			\
->  	.get_user = get_id_reg,			\
->  	.set_user = set_id_reg,			\
->  	.visibility = id_visibility,		\
-> @@ -1837,8 +1848,8 @@ static bool trap_dbgdidr(struct kvm_vcpu *vcpu,
->  	if (p->is_write) {
->  		return ignore_write(vcpu, p);
->  	} else {
-> -		u64 dfr = read_sanitised_ftr_reg(SYS_ID_AA64DFR0_EL1);
-> -		u64 pfr = read_sanitised_ftr_reg(SYS_ID_AA64PFR0_EL1);
-> +		u64 dfr = __read_id_reg(vcpu, SYS_ID_AA64DFR0_EL1);
-> +		u64 pfr = __read_id_reg(vcpu, SYS_ID_AA64PFR0_EL1);
->  		u32 el3 = !!cpuid_feature_extract_unsigned_field(pfr, ID_AA64PFR0_EL3_SHIFT);
+> +static void wait_for_sclp_int(void)
+> +{
+> +	/* Enable SCLP interrupts on this CPU only. */
+> +	ctl_set_bit(0, CTL0_SERVICE_SIGNAL);
+> +
+> +	set_flag(1);
+
+why not just WRITE_ONCE/READ_ONCE?
+
+> +
+> +	/* Enable external interrupts and go to the wait state. */
+> +	wait_for_interrupt(PSW_MASK_EXT);
+> +}
+> +
+> +/*
+> + * Some KVM versions might mix CPUs when looking for a floating IRQ target,
+> + * accidentially detecting a stopped CPU as waiting and resulting in the actually
+> + * waiting CPU not getting woken up for the interrupt.
+> + */
+> +static void test_wait_state_delivery(void)
+> +{
+> +	struct psw psw;
+> +	SCCBHeader *h;
+> +	int ret;
+> +
+> +	report_prefix_push("wait state delivery");
+> +
+> +	if (smp_query_num_cpus() < 3) {
+> +		report_skip("need at least 3 CPUs for this test");
+> +		goto out;
+> +	}
+> +
+> +	if (stap()) {
+> +		report_skip("need to start on CPU #0");
+> +		goto out;
+> +	}
+> +
+> +	/*
+> +	 * We want CPU #2 to be stopped. This should be the case at this
+> +	 * point, however, we want to sense if it even exists as well.
+> +	 */
+> +	ret = smp_cpu_stop(2);
+> +	if (ret) {
+> +		report_skip("CPU #2 not found");
+> +		goto out;
+> +	}
+> +
+> +	/*
+> +	 * We're going to perform an SCLP service call but expect
+> +	 * the interrupt on CPU #1 while it is in the wait state.
+> +	 */
+> +	sclp_mark_busy();
+
+this means that now no SCLP command can happen as long as the flag
+stays set....
+
+> +	set_flag(0);
+> +
+> +	/* Start CPU #1 and let it wait for the interrupt. */
+> +	psw.mask = extract_psw_mask();
+> +	psw.addr = (unsigned long)wait_for_sclp_int;
+> +	ret = smp_cpu_setup(1, psw);
+> +	if (ret) {
+> +		report_skip("cpu #1 not found");
+
+...which means that this will hang, and so will all the other report*
+functions. maybe you should manually unset the flag before calling the
+various report* functions.
+
+> +		goto out;
+> +	}
+> +
+> +	/* Wait until the CPU #1 at least enabled SCLP interrupts. */
+> +	wait_for_flag();
+> +
+> +	/*
+> +	 * We'd have to jump trough some hoops to sense e.g., via SIGP
+> +	 * CONDITIONAL EMERGENCY SIGNAL if CPU #1 is already in the
+> +	 * wait state.
+> +	 *
+> +	 * Although not completely reliable, use SIGP SENSE RUNNING STATUS
+> +	 * until not reported as running -- after all, our SCLP processing
+> +	 * will take some time as well and make races very rare.
+> +	 */
+> +	while(smp_sense_running_status(1));
+> +
+> +	h = alloc_page();
+
+do you really need to dynamically allocate one page?
+is there a reason for not using a simple static buffer? (which you can
+have aligned and statically initialized)
+
+> +	memset(h, 0, sizeof(*h));
+
+otherwise, if you really want to allocate the memory, get rid of the
+memset; the allocator always returns zeroed memory (unless you
+explicitly ask not to by using flags)
+
+> +	h->length = 4096;
+> +	ret = servc(SCLP_CMDW_READ_CPU_INFO, __pa(h));
+> +	if (ret) {
+> +		report_fail("SCLP_CMDW_READ_CPU_INFO failed");
+> +		goto out_destroy;
+> +	}
+> +
+> +	/*
+> +	 * Wait until the interrupt gets delivered on CPU #1, marking the
+
+why do you expect the interrupt to be delivered on CPU1? could it not
+be delivered on CPU0?
+
+> +	 * SCLP requests as done.
+> +	 */
+> +	sclp_wait_busy();
+
+this is logically not wrong (and should stay, because it makes clear
+what you are trying to do), but strictly speaking it's not needed since
+the report below will hang as long as the SCLP busy flag is set. 
+
+> +
+> +	report(true, "firq delivered");
+> +
+> +out_destroy:
+> +	smp_cpu_destroy(1);
+> +	free_page(h);
+> +out:
+> +	report_prefix_pop();
+> +}
+> +
+> +int main(void)
+> +{
+> +	report_prefix_push("firq");
+> +
+> +	test_wait_state_delivery();
+> +
+> +	report_prefix_pop();
+> +	return report_summary();
+> +}
+> diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
+> index 3b454b7..054560c 100644
+> --- a/s390x/unittests.cfg
+> +++ b/s390x/unittests.cfg
+> @@ -112,3 +112,13 @@ file = mvpg-sie.elf
 >  
->  		p->regval = ((((dfr >> ID_AA64DFR0_WRPS_SHIFT) & 0xf) << 28) |
-> 
+>  [spec_ex-sie]
+>  file = spec_ex-sie.elf
+> +
+> +[firq-linear-cpu-ids]
+> +file = firq.elf
+> +timeout = 20
+> +extra_params = -smp 1,maxcpus=3 -cpu qemu -device qemu-s390x-cpu,core-id=1 -device qemu-s390x-cpu,core-id=2
+> +
+> +[firq-nonlinear-cpu-ids]
+> +file = firq.elf
+> +timeout = 20
+> +extra_params = -smp 1,maxcpus=3 -cpu qemu -device qemu-s390x-cpu,core-id=2 -device qemu-s390x-cpu,core-id=1
 
