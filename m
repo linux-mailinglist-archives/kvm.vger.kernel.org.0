@@ -2,150 +2,253 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 558B9466950
-	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 18:42:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A9E13466951
+	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 18:42:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354749AbhLBRp1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Dec 2021 12:45:27 -0500
-Received: from mail-bn8nam08on2081.outbound.protection.outlook.com ([40.107.100.81]:54369
-        "EHLO NAM04-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1376441AbhLBRov (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Dec 2021 12:44:51 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=K0dNrDFh98sf+pt3aizHLngGXeNsvyneW9JXLKnqdB4jgblWdqG7dugxJ7l369zxyyzxqNFmx+3tkoyB/DwtWI1IpznJAKKrGelMKBKuFGAaN6cDaEzB9eJOy5GzcRFIaustZ3peVOr0h0xFSOKk7Ia/3wV6OQDrdiky6RVk1K1Kic8MdClcHR+wxFSslRRG+5OdrJbpZQVkR8DggDdjlKTuna0h7tbKyzhoGOarp5WqrnwVYfzzoikuPHQaW7tbhmXrd+W94ErHpfNdSohsdar9TZZJJWMM9jZPjhu72jdqqkLIu9apnFfTdl8iTkH2wmx/ntnDUtJ1Pg/VpncXxw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=n1nt2P2Quj5cvAFxcbjvONBTEk3oHsIaWRMJR2KR5ik=;
- b=IDq46pwu6pwX474RWBRhCGdY08DHtqjUEC6kN9XUIbmYd48aDe4LqgBhzYeS5ZzgZsyQiXJ2Hw8DYrviP+gE2LYd3Sn/UQ+F6oT3HVbKRG59vUCD+OUKQPd5EQOld7jcd8YwdiBr9+18JBD4dHBO13/5GXsFFLmvlpupBOXgsJ23sFACb9ZfoVefMpZH5rskfkyjbRw8ASzJcDYyYuVMxGB3bFfuxZKEHqNSJhEYc/bgPiwaJUwRKL5ge/+DvTM2PSnRzsiiiFNNYJvbccHeFIm/RMlc1vPJOVvwiV+Do1fr9cFjpbvfXeablmonkuwvkj1LUC51WIGxwsMiFf+Y+Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=n1nt2P2Quj5cvAFxcbjvONBTEk3oHsIaWRMJR2KR5ik=;
- b=BRlPGw2KIOE/ZDroxYIvJTpp5JyrspxSIm9NfkDUcDvrvghVhV+uKFj93Sj/S67kEBUc21ZF9pVU0okYjWciGGbzbekrsoD8QtX2yeOf/wVauI15mMVHAuzXXn6DpRcYeIAmIZpHq5hIkGobjUTk3fGETu9PhpLY0N059SG/b9tXe6pXBovnICBuCp4TH9rtxb5W7RQFUStc/H2zX3NoBwMMjo9VxgjsKopo/zZlplni3VfFrCVTgmU0cSNCBMJsF7/02zBHmpnHMIN25FxtuYyZzNg2hgdd8HPUFQ298o7MtBX8Y+zYPmt79BJ1EHmngFFf0Y2ZxUOcZR+TdwLMFg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
- by BL1PR12MB5380.namprd12.prod.outlook.com (2603:10b6:208:314::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4734.23; Thu, 2 Dec
- 2021 17:41:26 +0000
-Received: from BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::d8be:e4e4:ce53:6d11]) by BL0PR12MB5506.namprd12.prod.outlook.com
- ([fe80::d8be:e4e4:ce53:6d11%5]) with mapi id 15.20.4755.016; Thu, 2 Dec 2021
- 17:41:26 +0000
-Date:   Thu, 2 Dec 2021 13:41:25 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Cornelia Huck <cohuck@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org
-Cc:     Alex Williamson <alex.williamson@redhat.com>, kvm@vger.kernel.org,
-        Kirti Wankhede <kwankhede@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Yishai Hadas <yishaih@nvidia.com>
-Subject: Re: [PATCH RFC v2] vfio: Documentation for the migration region
-Message-ID: <20211202174125.GR4670@nvidia.com>
-References: <0-v2-45a95932a4c6+37-vfio_mig_doc_jgg@nvidia.com>
- <20211130102611.71394253.alex.williamson@redhat.com>
- <20211130185910.GD4670@nvidia.com>
- <20211130153541.131c9729.alex.williamson@redhat.com>
- <20211201031407.GG4670@nvidia.com>
- <20211201130314.69ed679c@omen>
- <20211201232502.GO4670@nvidia.com>
- <87tufrgcnz.fsf@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87tufrgcnz.fsf@redhat.com>
-X-ClientProxiedBy: BL0PR1501CA0029.namprd15.prod.outlook.com
- (2603:10b6:207:17::42) To BL0PR12MB5506.namprd12.prod.outlook.com
- (2603:10b6:208:1cb::22)
+        id S1376433AbhLBRpk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Dec 2021 12:45:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53256 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1355887AbhLBRph (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Dec 2021 12:45:37 -0500
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C13FEC06174A
+        for <kvm@vger.kernel.org>; Thu,  2 Dec 2021 09:42:13 -0800 (PST)
+Received: by mail-lj1-x22e.google.com with SMTP id d11so1138955ljg.8
+        for <kvm@vger.kernel.org>; Thu, 02 Dec 2021 09:42:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=/Mtu/P5l08sEi/n5zb1dtFgBLlGj4ksR0RWc6fjZQRA=;
+        b=n6T5XRzCy1lawNrs68/ro6DBPrAjL1TKiofqlULGUg9AI7IilmwmjZT62PgjiOC70D
+         zHBtshCsBm4ZNBTpvnSypYIcRgAKVL7wwYQNz2r8PEm/rcMyGxpjEa/0JdXVLC7rS8G1
+         7oi3+pgh+lDpR4W+xI+RinEfhGXknecek9P2r1ql/pNoOug8KPuSNx5U/BNCtMcM1zo+
+         RFgyVyIX3EAOwuXjEAepO+CHShz5NXzO4NFz6W18VpsXkSnrPHxmeatedt0Hoc0vhQYm
+         Sh41JU47I8E+OQnyey90EFdhqE4M1vVN7VtqXeyKHQCfcWGK4IYV0K2EdRpyJhdGs7C7
+         KXcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=/Mtu/P5l08sEi/n5zb1dtFgBLlGj4ksR0RWc6fjZQRA=;
+        b=4xnV+qpCgaaws0YezSCBCzMeMK52kMhQf965SaxrkBnK5GTeYyzWLNucoiV7HdgOcw
+         rvTODYaowj7Ylw7O3T726MVGDGzpTF/FKMm+ruhnlvt4HRI7nWsbyxoNozZic8pMNFHg
+         qrCS/qIpezijLLRR73PQmz67wO/euqffcZfMPZbEX43P8K2IWfVT5UC9J9st4lKs3TZi
+         Un7j9CB3zxGgMsGjQvRUm/aiNanaEEu0yxmlZWiM0vIqf1R2t7cORsZDS4+9b7lABPCU
+         RkZcw63Sh2yP65t/Wa/sP4F0cV0imsqNuafTeeW1jRiz+KgzrPf8+nmXboJTsWDXRMfm
+         MRmw==
+X-Gm-Message-State: AOAM531DDKyC/9qFCYXk3Qit1Za3l0CBMAYOnlmrBtYYwhusD11A5MoK
+        Yq8ZM3BWkvCBp8Z7jkzvDeQ3ZePvb44AF9qCdHu3bg==
+X-Google-Smtp-Source: ABdhPJybT0y9yUS1iOCsWkQSQDx4UTEeAIKGduGdHfHviU8mp5tiy5OOKeCavUAaVOpl9c5XM/Ej/LraevK+tAT8cKE=
+X-Received: by 2002:a2e:8156:: with SMTP id t22mr13332353ljg.223.1638466931794;
+ Thu, 02 Dec 2021 09:42:11 -0800 (PST)
 MIME-Version: 1.0
-Received: from mlx.ziepe.ca (142.162.113.129) by BL0PR1501CA0029.namprd15.prod.outlook.com (2603:10b6:207:17::42) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4755.11 via Frontend Transport; Thu, 2 Dec 2021 17:41:26 +0000
-Received: from jgg by mlx with local (Exim 4.94)        (envelope-from <jgg@nvidia.com>)        id 1msq5F-0072NJ-2k; Thu, 02 Dec 2021 13:41:25 -0400
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: e36cb96c-f384-4631-a5b3-08d9b5baf730
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5380:
-X-Microsoft-Antispam-PRVS: <BL1PR12MB53809EBA8F3E713B548CF550C2699@BL1PR12MB5380.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 0tlJdMOOocoL/T7ku0dfq743y0Xa/5mQQyJwY+ToNA+UDSK3ugDDGwz7SKgcYbJnXpcHz4SJKEPQOkEU/qxm5brXXl2nzBoBwngdzblTw0K3k/Ofl1WPoveVPI9AkfapdUSIl3eJKb0y5vIgJcnAtA0yGm2i+SIDv++L8XycI8um4bAugvMaqCBv+eEPt0Iw5z5VjHBRbymGw9V7vdLuseTegkjQ0EHSTmaoEkfH/BA019G673ZEbjQwALjWwGsq/7/pptzwMKIXvUfiF6l3J+ZB0j01UFsVvRPxHz2BylprE6FvjzXNL3GyaNv7Eflp+1vu2uRy7ly2Z4LVnQ3CvaNetpFpAJq+IhpJ0yOHIn3e+kxMV2Y4d+CHhzgvLRxKgozzWD6MMXfcgVeo4EgCxyX2QmbuHmjOsGt+gU4tj5dHpIcxumjFmXSnS7L2e+p8evR+NX9ljGs+VNIApLBW8TjBB2WJnJVmgGikjhQ2WYBVK3GOGIEcSsgSlkoub2CAL4awb69eiCHoCer3jP/mSiUVBmG/6AlVDKApAHpfK1d9sfDlCGN7CQcebWAaZ5zFlBxwWhR4H4tD2n1IzQSUplbz0tDnOi01f8pTv07dkAj1VtW5D6euIw+78X13BLrz+aW89Ml20t3QQyBHCeZVWA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(316002)(5660300002)(2616005)(107886003)(110136005)(9746002)(54906003)(2906002)(508600001)(33656002)(86362001)(66476007)(8936002)(38100700002)(186003)(4326008)(1076003)(9786002)(26005)(8676002)(66946007)(36756003)(426003)(66556008);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?5dCu/Zz3qYicxmYXqw49hfSsvzD6n84Fr7cdkLeTwYsEUtKGyxhtiXzBf8XQ?=
- =?us-ascii?Q?GWc/OHql/QGk12oE2TvRpT7lRVx6KNdzJ+4AMCmoFlob+NcXLYPTRF54O9Id?=
- =?us-ascii?Q?bp3MB79DDabe+Mo2dMHbrzJOCiHeKe/P8IZscE0KO5srVVvZv97FSMAj3l7e?=
- =?us-ascii?Q?go3jgGbXjjHYmr3qFQcZCw+W51ES6qzHqCmI3FY3Yw8RI/+0QUWbgM6bzNnE?=
- =?us-ascii?Q?rgp18snjrNWnK8ULJ4bwPMtim7nKePzZCisdnejEpQCY0atTwTneT5kLWGtH?=
- =?us-ascii?Q?SD7dg1GK68wTpKTgYb1p68ouyQaXVtL9LGU5FLHlooWIOC38mqvIPy3qCQBH?=
- =?us-ascii?Q?V8245XiiMTnr06Pff1UrQcOYsCw0i1IMHPlCxds7lZnR6Z2uI1YTJRmHbBiM?=
- =?us-ascii?Q?0gmx0Y59hVqgKsYO8bW+PLBAfZ9vne9F5JEL6yf2StSaBXR9tHL9PSmIw4XA?=
- =?us-ascii?Q?KWbdqVBWGvaGUuismSkAC82MYJ49rfGIPnGFrTmvsAGFlMNIjqn7BqNek/0s?=
- =?us-ascii?Q?sGR0oeUw78EmFzIBPsFxPFKzvRUAgb2IYjksbWn1N0mhlxTTrrk/ho7yLIjp?=
- =?us-ascii?Q?4CB6H5Oyuck9bIy6WJQVIVjNDyKREpLk8xtZz7xIRPcMb5OUttH2a8bo67xI?=
- =?us-ascii?Q?H4cEROAyGadDlaV4qwY8hCpT2MxqIelTE9p3BCr4BeB3MFuK+piqeMhKfIKE?=
- =?us-ascii?Q?YTHCzoAgRK/xwGYMNIFlinSN6rQjS05WAnLWOOTMGI1FlkiC9b/VSXJ+kuGF?=
- =?us-ascii?Q?IDvv5yWd8eZALkqI3jZDqtRu6bK1Q0owfOOS0I17pHEEfSC0MgnC+d187G57?=
- =?us-ascii?Q?6zDWw/9eB9MrdH57MgJLZZCO3U0kLaikzl34QhQttE7ma8POzqPO7rvGeiBw?=
- =?us-ascii?Q?sIg2ukMUFXsKI6kLumq0r0lpF+ASaoDwOmNFQGef5l02+8K2pmdBUSG1HA0A?=
- =?us-ascii?Q?hkxtEhtUXaiPozRgeyTR2mcHpA1OGPdFe4YREiuQ3vsOjJKycAViNZ3LQUa0?=
- =?us-ascii?Q?rxqpKYMWLadkA1oTrWOYR6Q/1hCpTibKuduCe+h0iOKC3HndZGuux77cmMCT?=
- =?us-ascii?Q?RMDYAP340s8EAAX0f0atAV+zjaYQqCfVp8KxSpv7JnTtWdhs918UgyG/VKqk?=
- =?us-ascii?Q?sPxbgb0VgP2cwkWtHIxTJA3wNMPn8qzCZOcl6q9kBaLv+/JbfjOQ1tc9tHNG?=
- =?us-ascii?Q?/rIsFPSWwRqn8yNchtwxqH5hdQ4b51XqmRGMzdqgaQbAekpG1qIazdKApFNe?=
- =?us-ascii?Q?iBl9nqzdGTahkxEKbBGpsjh+RvHtbR1I8CyYTdmJUUtKwf5ntuumrE5UAYQt?=
- =?us-ascii?Q?1jkKdGp6f/n1lAFXjjc0bniXmwwlngDMVUSqSUuxt0LfsxpqeHeVi79nE2UM?=
- =?us-ascii?Q?TmhW/vxJzE48BcRbFJgsD0a6BqZxQ4Gaf2lhKznZTKoz7/H0PjTMLN11DLgU?=
- =?us-ascii?Q?8k3/Ll9gahNjwVl9cGGHR/LJhu1isExOYkdsUU/mMYvPXXXP+AqJ2w/pwe4P?=
- =?us-ascii?Q?KWUyvQnmFpj2aTFqoUs7mviGvtpMh5/VLmB8j/Zqg1uwi2u7kxvihfMXJAba?=
- =?us-ascii?Q?iOpg33OetYxezL0dhtA=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e36cb96c-f384-4631-a5b3-08d9b5baf730
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Dec 2021 17:41:26.7059
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: S8DqUBPCGAblJrrrsnRgNGpT0F2R8CaZ6BqsNJ0T9WjUY1QCs2H/3PFjDDWnQL3+
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5380
+References: <20211119235759.1304274-1-dmatlack@google.com> <20211119235759.1304274-13-dmatlack@google.com>
+ <YaDMg3/xUSwL5+Ei@xz-m1.local> <CALzav=cXgCSP3RLh+gss65==B6eYXC82V3zNjv2KCNehUMQewA@mail.gmail.com>
+ <YabJSdRklj3T6FWJ@google.com> <CALzav=cJpWPF1RzsEZcoN+ZX8kM3OquKQR-8rdTksZ6cs1R+EQ@mail.gmail.com>
+ <YabeFZxWqPAuoEtZ@xz-m1.local> <Yae+8Oshu9sVrrvd@google.com>
+ <CALzav=c9F+f=UqBjQD9sotNC72j2Gq1Fa=cdLoz2xOjRd5hypg@mail.gmail.com> <YagHRESjukJoS7NQ@google.com>
+In-Reply-To: <YagHRESjukJoS7NQ@google.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Thu, 2 Dec 2021 09:41:45 -0800
+Message-ID: <CALzav=dDEhU3uN9CofYQqCukT3QJUm+pjRz2WTr-Ss9TNVBgLg@mail.gmail.com>
+Subject: Re: [RFC PATCH 12/15] KVM: x86/mmu: Split large pages when dirty
+ logging is enabled
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+        kvm@vger.kernel.org, Ben Gardon <bgardon@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>,
+        Junaid Shahid <junaids@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Harish Barathvajasankar <hbarath@google.com>,
+        Peter Shier <pshier@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 02, 2021 at 06:05:36PM +0100, Cornelia Huck wrote:
-> On Wed, Dec 01 2021, Jason Gunthorpe <jgg@nvidia.com> wrote:
-> 
-> > On Wed, Dec 01, 2021 at 01:03:14PM -0700, Alex Williamson wrote:
-> >> But if this document is suggesting the mlx5/QEMU interpretation is the
-> >> only valid interpretations for driver authors, those clarifications
-> >> should be pushed back into the uAPI header.
+On Wed, Dec 1, 2021 at 3:37 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Wed, Dec 01, 2021, David Matlack wrote:
+> > On Wed, Dec 1, 2021 at 10:29 AM Sean Christopherson <seanjc@google.com> wrote:
+> > > Hmm, in this particular case, I think using the caches is the wrong approach.  The
+> > > behavior of pre-filling the caches makes sense for vCPUs because faults may need
+> > > multiple objects and filling the cache ensures the entire fault can be handled
+> > > without dropping mmu_lock.  And any extra/unused objects can be used by future
+> > > faults.  For page splitting, neither of those really holds true.  If there are a
+> > > lot of pages to split, KVM will have to drop mmu_lock to refill the cache.  And if
+> > > there are few pages to split, or the caches are refilled toward the end of the walk,
+> > > KVM may end up with a pile of unused objects it needs to free.
+> > >
+> > > Since this code already needs to handle failure, and more importantly, it's a
+> > > best-effort optimization, I think trying to use the caches is a square peg, round
+> > > hole scenario.
+> > >
+> > > Rather than use the caches, we could do allocation 100% on-demand and never drop
+> > > mmu_lock to do allocation.  The one caveat is that direct reclaim would need to be
+> > > disallowed so that the allocation won't sleep.  That would mean that eager splitting
+> > > would fail under heavy memory pressure when it otherwise might succeed by reclaiming.
+> > > That would mean vCPUs get penalized as they'd need to do the splitting on fault and
+> > > potentially do direct reclaim as well.  It's not obvious that that would be a problem
+> > > in practice, e.g. the vCPU is probably already seeing a fair amount of disruption due
+> > > to memory pressure, and slowing down vCPUs might alleviate some of that pressure.
 > >
-> > Can we go the other way and move more of the uAPI header text here?
-> 
-> Where should a userspace author look when they try to implement support
-> for vfio migration? I think we need to answer that question first.
-> 
-> Maybe we should separate "these are the rules that an implementation
-> must obey" from "here's a more verbose description of how things work,
-> and how you can arrive at a working implementation". The former would go
-> into the header, while the latter can go into this document. (The
-> generated documentation can be linked from the header file.)
+> > Not necessarily. The vCPUs might be running just fine in the VM being
+> > split because they are in their steady state and not faulting in any
+> > new memory. (Memory pressure might be coming from another VM landing
+> > on the host.)
+>
+> Hrm, true.
+>
+> > IMO, if we have an opportunity to avoid doing direct reclaim in the
+> > critical path of customer execution we should take it.
+> >
+> >
+> > The on-demand approach will also increase the amount of time we have
+> > to hold the MMU lock to page splitting. This is not too terrible for
+> > the TDP MMU since we are holding the MMU lock in read mode, but is
+> > going to become a problem when we add page splitting support for the
+> > shadow MMU.
+> >
+> > I do agree that the caches approach, as implemented, will inevitably
+> > end up with a pile of unused objects at the end that need to be freed.
+> > I'd be happy to take a look and see if there's anyway to reduce the
+> > amount of unused objects at the end with a bit smarter top-up logic.
+>
+> It's not just the extra objects, it's the overall complexity that bothers me.
+> Complexity isn't really the correct word, it's more that as written, the logic
+> is spread over several files and is disingenuous from the perspective that the
+> split_cache is in kvm->arch, which implies persistence, but the cache are
+> completely torn down after evey memslot split.
+>
+> I suspect part of the problem is that the code is trying to plan for a future
+> where nested MMUs also support splitting large pages.  Usually I'm all for that
+> sort of thing, but in this case it creates a lot of APIs that should not exist,
+> either because the function is not needed at all, or because it's a helper buried
+> in tdp_mmu.c.  E.g. assert_split_caches_invariants() is overkill.
+>
+> That's solvable by refactoring and shuffling code, but using kvm_mmu_memory_cache
+> still feels wrong.  The caches don't fully solve the might_sleep() problem since
+> the loop still has to drop mmu_lock purely because it needs to allocate memory,
 
-I think the usual kernel expectation now is to find userspace
-information either in man pages or in the Documentation/ html pages?
+I thought dropping the lock to allocate memory was a good thing. It
+reduces the length of time we hold the RCU read lock and mmu_lock in
+read mode. Plus it avoids the retry-with-reclaim and lets us reuse the
+existing sp allocation code.
 
-The uapi header is fine to be a terse summary of what the ioctl does
-and some important points, but I wouldn't try to write a spec for
-anything complicated in a header file.
+Eager page splitting itself does not need to be that performant since
+it's not on the critical path of vCPU execution. But holding the MMU
+lock can negatively affect vCPU performance.
 
-Maybe Jonathan has an advice?
+But your preference is to allocate without dropping the lock when possible. Why?
 
-Thanks,
-Jason
+> and at the same time the caches are too agressive because we can theoretically get
+> false positives on OOM scenarios, e.g. a topup could fail when trying to allocate
+> 25 objects, when only 1 is needed.
+
+This is why I picked a min of 1 for the cache top-up. But this would
+be true if we increased the min beyond 1.
+
+> We could enhance the cache code, which is
+> pretty rudimentary, but it still feels forced.
+>
+> One thing we can take advantage of is that remote TLB flushes can be deferred
+> until after all roots are done, and don't need to be serviced if mmu_lock is
+> dropped.
+
+Good point. I'll revise the TLB flushing in v1 regardless.
+
+
+> Changes from a hugepage to a collection of smaller pages is atomic, no
+> memory is freed, and there are no changes in gfn=>pfn made by the split.  If
+> something else comes along and modifies the newly created sp or its children,
+> then it will flush accordingly.  Similar to write-protecting the page, the only
+> requirement is that all vCPUs see the small pages before the ioctl() returns,
+> i.e. before userspace can query the dirty log.  Never needing to flush is one
+> less reason to use a variant of tdp_mmu_iter_cond_resched().
+>
+> So, what if we do something like this?  Try to allocate on-demand without dropping
+> mmu_lock.  In the happy case, it will succeed and there's no need to drop mmu_lock.
+> If allocation fails, drop RCU and mmu_lock and retry with direct relcaim allowed.
+>
+> Some ugly gotos to reduce indentation, there's probably a better way to dress
+> this up.  Comments obviously needed.  This also doesn't track whether or not a
+> flush is needed, that will sadly need to be an in/out param, assuming we want to
+> return success/failure.
+>
+> static struct kvm_mmu_page *tdp_mmu_alloc_sp(gfp_t allow_direct_reclaim)
+> {
+>         gfp_t gfp = GFP_KERNEL_ACCOUNT | __GFP_ZERO | allow_direct_reclaim;
+>         struct kvm_mmu_page *sp;
+>         u64 *spt;
+>
+>         spt = (void *)__get_free_page(gfp);
+>         if (!spt)
+>                 return NULL;
+>
+>         sp = kmem_cache_alloc(mmu_page_header_cache, gfp);
+>         if (!sp) {
+>                 free_page((unsigned long)spt);
+>                 return NULL;
+>         }
+>
+>         sp->spt = spt;
+>
+>         return sp;
+> }
+>
+> static int tdp_mmu_split_large_pages(struct kvm *kvm, struct kvm_mmu_page *root,
+>                                      gfn_t start, gfn_t end, int target_level)
+> {
+>         struct kvm_mmu_page *sp = NULL;
+>         struct tdp_iter iter;
+>
+>         rcu_read_lock();
+>
+>         for_each_tdp_pte_min_level(iter, root, target_level + 1, start, end) {
+> retry:
+>                 if (tdp_mmu_iter_cond_resched(kvm, &iter, false, true))
+>                         continue;
+>
+>                 if (!is_shadow_present_pte(iter.old_spte || !is_large_pte(pte))
+>                         continue;
+>
+>                 if (likely(sp))
+>                         goto do_split;
+>
+>                 sp = tdp_mmu_alloc_sp(0);
+>                 if (!sp) {
+>                         rcu_read_unlock();
+>                         read_unlock(&kvm->mmu_lock);
+>
+>                         sp = tdp_mmu_alloc_sp(__GFP_DIRECT_RECLAIM);
+>
+>                         read_lock(&kvm->mmu_lock);
+>
+>                         if (!sp)
+>                                 return -ENOMEM;
+>
+>                         rcu_read_lock();
+>                         tdp_iter_restart(iter);
+>                         continue;
+>                 }
+>
+> do_split:
+>                 init_tdp_mmu_page(sp, iter->gfn, get_child_page_role(&iter));
+>
+>                 if (!tdp_mmu_split_large_page(kvm, &iter, sp))
+>                         goto retry;
+>
+>                 sp = NULL;
+>         }
+>
+>         rcu_read_unlock();
+>
+>         return 0;
+> }
+>
