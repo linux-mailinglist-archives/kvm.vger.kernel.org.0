@@ -2,118 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 526C4466001
-	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 09:52:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1AF93466008
+	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 09:56:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356337AbhLBI4H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Dec 2021 03:56:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42884 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241518AbhLBIz5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Dec 2021 03:55:57 -0500
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AB2DC0617A2
-        for <kvm@vger.kernel.org>; Thu,  2 Dec 2021 00:50:41 -0800 (PST)
-Received: by mail-wm1-x335.google.com with SMTP id 77-20020a1c0450000000b0033123de3425so1757585wme.0
-        for <kvm@vger.kernel.org>; Thu, 02 Dec 2021 00:50:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=es9/Tr6MB1CFpBQoW+wl/y/nUnYLARczzVgZp7MOScI=;
-        b=trU/HvMQ7/qXEGbT8w2fuzq/IzVhjJo+jv5NUg97R9B4KBq+JW0d+bzZ1KJjEAK6ZM
-         ax5M3PsJWAjI2vzfu2sMLO7qV3P7qSDDAnL6vv1rwo5uyk70CxUE8yApTF8fNO+oz4AY
-         C23hGwNotMUxbk8vGAWP2Vt/C9uakdv/pllQwixjZ2MmtQ8tLGPkYOhcipT1zc2UZYX5
-         tKBp/C1S/izliKNLO9oHECStzQONlfh5uNBKeGqQYQK18XBOfAJJfJNOo9VmEAnPE9iD
-         nWHDSSVC2V9hDPoUdLi26pGumLWISp1H08yXOuPpQAu8w2W8DddVx3y/uTxUQGsBO4ZJ
-         w4vQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=es9/Tr6MB1CFpBQoW+wl/y/nUnYLARczzVgZp7MOScI=;
-        b=N0bCG4nT9foEypv2mLtZ3DP5wobKCqFPkxUmjP4632XDJZY3dK8yk66M3YWzk/1lkK
-         +iOw4tSg8it0bYUH6jIk25+do1/xaztkWO1rjq+ZHyMOb9Kash9Ccgk/kXUNXWFSzMTm
-         25mrNtOJ/yuf2/ulFZpHlQbrLToTb9Ity9NxMAZoqwWPCPYBUGwmyTbN/RtNwrAd5ZCs
-         lTkeEEIKF6hpqtGyyTFquBa6zDzQXGU+QfGnVkmkRn0BTxmyggTgV/ipXrrFFjtPWgmT
-         00370HxI0gwxfDtL5sUHrxeOGl2EPvUu4oO9xujfSVozjvRZRv6MtY7JeVaNFNmWXmQV
-         UWsA==
-X-Gm-Message-State: AOAM533218zgEFYtf2DEOTDdg7Xz6SZ9d8GCloabwWo8C4afxbDcSsY7
-        xEget2Zg0yv+6kz7JapY19kLHiXmPLRMYLaguybQl02l86iUc2Vm
-X-Google-Smtp-Source: ABdhPJxJlghneRv8O/VzzShZ0fGp35zLfia3JcnzpVsZAO4FM0BD2ejTpkwZZafmtDg20KSSZI+Y6E7Ul+5Cdpiffks=
-X-Received: by 2002:a7b:c256:: with SMTP id b22mr4687630wmj.176.1638435039573;
- Thu, 02 Dec 2021 00:50:39 -0800 (PST)
+        id S240807AbhLBI7c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Dec 2021 03:59:32 -0500
+Received: from mga11.intel.com ([192.55.52.93]:12358 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229891AbhLBI7b (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Dec 2021 03:59:31 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10185"; a="234173597"
+X-IronPort-AV: E=Sophos;i="5.87,281,1631602800"; 
+   d="scan'208";a="234173597"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2021 00:56:09 -0800
+X-IronPort-AV: E=Sophos;i="5.87,281,1631602800"; 
+   d="scan'208";a="513105132"
+Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.255.31.236]) ([10.255.31.236])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Dec 2021 00:56:05 -0800
+Message-ID: <ee4934e1-e1e6-68dd-df67-424783c0f812@intel.com>
+Date:   Thu, 2 Dec 2021 16:56:03 +0800
 MIME-Version: 1.0
-References: <20211126193111.559874-1-atishp@atishpatra.org>
-In-Reply-To: <20211126193111.559874-1-atishp@atishpatra.org>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Thu, 2 Dec 2021 14:20:28 +0530
-Message-ID: <CAAhSdy0bKWCBT+b1w1Z5YO+Vq8xYgyYQoR8yvPK2SuK=VXwWXw@mail.gmail.com>
-Subject: Re: [PATCH v2] MAINTAINERS: Update Atish's email address
-To:     Atish Patra <atishp@atishpatra.org>
-Cc:     "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        KVM General <kvm@vger.kernel.org>,
-        kvm-riscv@lists.infradead.org,
-        linux-riscv <linux-riscv@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.3.2
+Subject: Re: [RFC PATCH v2 11/44] i386/tdx: Implement user specified tsc
+ frequency
+Content-Language: en-US
+To:     Connor Kuehl <ckuehl@redhat.com>, isaku.yamahata@gmail.com,
+        qemu-devel@nongnu.org, pbonzini@redhat.com, alistair@alistair23.me,
+        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, mst@redhat.com,
+        cohuck@redhat.com, mtosatti@redhat.com, seanjc@google.com,
+        erdemaktas@google.com
+Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org
+References: <cover.1625704980.git.isaku.yamahata@intel.com>
+ <564e6ae089c30aaba9443294ecca72da9ee7b7c4.1625704981.git.isaku.yamahata@intel.com>
+ <42187f1c-26b5-b039-8fcf-f9268129feb8@redhat.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <42187f1c-26b5-b039-8fcf-f9268129feb8@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Nov 27, 2021 at 1:01 AM Atish Patra <atishp@atishpatra.org> wrote:
->
-> I am no longer employed by western digital. Update my email address to
-> personal one and add entries to .mailmap as well.
->
-> Signed-off-by: Atish Patra <atishp@atishpatra.org>
-> ---
->  .mailmap    | 3 +++
->  MAINTAINERS | 2 +-
->  2 files changed, 4 insertions(+), 1 deletion(-)
->
-> diff --git a/.mailmap b/.mailmap
-> index 14314e3c5d5e..5878de9783e4 100644
-> --- a/.mailmap
-> +++ b/.mailmap
-> @@ -50,6 +50,9 @@ Archit Taneja <archit@ti.com>
->  Ard Biesheuvel <ardb@kernel.org> <ard.biesheuvel@linaro.org>
->  Arnaud Patard <arnaud.patard@rtp-net.org>
->  Arnd Bergmann <arnd@arndb.de>
-> +Atish Patra <atish.patra@wdc.com>
-> +Atish Patra <atishp@atishpatra.org>
-> +Atish Patra <atishp@rivosinc.com>
+On 7/23/2021 1:53 AM, Connor Kuehl wrote:
+> On 7/7/21 7:54 PM, isaku.yamahata@gmail.com wrote:
+>> From: Xiaoyao Li <xiaoyao.li@intel.com>
+>>
+>> Reuse -cpu,tsc-frequency= to get user wanted tsc frequency and pass it
+>> to KVM_TDX_INIT_VM.
+>>
+>> Besides, sanity check the tsc frequency to be in the legal range and
+>> legal granularity (required by SEAM module).
+>>
+>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+>> ---
+>> [..]
+>> +    if (env->tsc_khz && (env->tsc_khz < TDX1_MIN_TSC_FREQUENCY_KHZ ||
+>> +                         env->tsc_khz > TDX1_MAX_TSC_FREQUENCY_KHZ)) {
+>> +        error_report("Invalid TSC %ld KHz, must specify cpu_frequecy 
+>> between [%d, %d] kHz\n",
+> 
+> s/frequecy/frequency
 
-I think you just need one-line entry to map WDC email (OLD) to
-Personal/Rivos email (NEW)
+will fix it, thanks!
 
-Something like:
-Atish Patra <atishp@atishpatra.org> <atish.patra@wdc.com>
+>> +                      env->tsc_khz, TDX1_MIN_TSC_FREQUENCY_KHZ,
+>> +                      TDX1_MAX_TSC_FREQUENCY_KHZ);
+>> +        exit(1);
+>> +    }
+>> +
+>> +    if (env->tsc_khz % (25 * 1000)) {
+>> +        error_report("Invalid TSC %ld KHz, it must be multiple of 
+>> 25MHz\n", env->tsc_khz);
+> 
+> Should this be 25KHz instead of 25MHz?
 
-Regards,
-Anup
+No. It equals to
 
->  Axel Dyks <xl@xlsigned.net>
->  Axel Lin <axel.lin@gmail.com>
->  Bart Van Assche <bvanassche@acm.org> <bart.vanassche@sandisk.com>
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 7a2345ce8521..b22af4edcd08 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -10434,7 +10434,7 @@ F:      arch/powerpc/kvm/
->
->  KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)
->  M:     Anup Patel <anup.patel@wdc.com>
-> -R:     Atish Patra <atish.patra@wdc.com>
-> +R:     Atish Patra <atishp@atishpatra.org>
->  L:     kvm@vger.kernel.org
->  L:     kvm-riscv@lists.infradead.org
->  L:     linux-riscv@lists.infradead.org
-> --
-> 2.33.1
->
->
-> --
-> kvm-riscv mailing list
-> kvm-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/kvm-riscv
+	(evn->tsc_khz * 1000) % (25 * 1000 * 1000)
+
+
+
+
