@@ -2,142 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BC310466693
-	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 16:34:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 89ACF4668D1
+	for <lists+kvm@lfdr.de>; Thu,  2 Dec 2021 18:05:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359029AbhLBPiL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Dec 2021 10:38:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51748 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358984AbhLBPiK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Dec 2021 10:38:10 -0500
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7515AC06174A;
-        Thu,  2 Dec 2021 07:34:47 -0800 (PST)
-Received: by mail-pl1-x62c.google.com with SMTP id u11so20495031plf.3;
-        Thu, 02 Dec 2021 07:34:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=uDWxolb0OqtHKB4fKXPCc+zsagXL08BS8V3CqyXaOR4=;
-        b=X6AiT4U8iUfomEWuT1XhKlXnFMYwOmjeg/ucbcvfGTcQHDH9naMZnZRRJNw7Wp1nm5
-         jLaUzr3w7qIWRH9UpxqeULBIQYSWSdDOCS6vmxYWCeuz45Hv2ojOp4KsAENUyht/mViE
-         Jy/E5FjF+w6vnca5qNN47VQTOXCbUfC5OsBtLBvGwyKec41HDVwbCBTibycVScSpldrt
-         I0JhrLr3Uh946GCYYGpPUdfE5xf2HWRMHB/bEPEh2pVwvU4jkc1tAtXmb4nude5L4NMf
-         Z9WS9NimwocCDAalKX9JioFVkvj/iDiO4sNRJ8DTuqo4PcCyfnj7neQdPEPr8U2KXrju
-         2XQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=uDWxolb0OqtHKB4fKXPCc+zsagXL08BS8V3CqyXaOR4=;
-        b=6VVuq7o+kcWEFY2wycELFLn6NTNX14/gyaQI5EUht1zrYCtXkibS00y5y+Uc65M6S6
-         ojwdamwhzwysukTZ3IwJxMT43PJDsuXuQFZ3gKU80CTdLdvzpwSYs6d6SbLHzXSKCR61
-         3QvmwMTBXPr+Pf3PtymujcZPQki0drF0VHE2yo3OlGicq63WQ6QDOgKaNy6cOfTuL3ey
-         ywjet/aOHvO84TtpDrmEcRIrx3t2LqfnThxIZ5eI6eVT2blQghrGR9Ws1eFRw72HJF+0
-         +G7NhkUHWMMMzOwID0UAcAue7UtvAZDdjMn6b4h9RAwD+Xx751zJxCSjuuFnB055Iieg
-         R+Fg==
-X-Gm-Message-State: AOAM531s7j3gSUr+XXTp7jMwUVs8eEYgchwJcam/g/Q4MAs7bslEHyNx
-        s3/Q+u8fbYt8mXQwYj/Yv4B6PHdOHG0oLe6moyU3oO78
-X-Google-Smtp-Source: ABdhPJyLbnAxanq+pggWtpgv5XgeL/6gLOqJ+UyeprNu4u/eezoRktisT2yjFB+ZKKcQAc9tf0H+5jnCY/j9ioB+OFk=
-X-Received: by 2002:a17:902:b588:b0:143:b732:834 with SMTP id
- a8-20020a170902b58800b00143b7320834mr16304369pls.22.1638459286910; Thu, 02
- Dec 2021 07:34:46 -0800 (PST)
+        id S1359562AbhLBRJE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Dec 2021 12:09:04 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:30503 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1347960AbhLBRJE (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 2 Dec 2021 12:09:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1638464741;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=mUrN1A9hYkigJ+nEx2jcstUeT4FNegKPka9a1x+mxz4=;
+        b=jEX1PF47UAbd4YK1RALgkxPzcV7+6RlDpoyaD+/KzqcFGmkSuTkvwwuwja+F1ppHCW5G2k
+        LmBpL345p2mTw/oPBkeukhYdims67wFeFUtXK/aaGH4qvBjuzGp+tNq5FU3kJPfPBhSSf0
+        SjWt87WHP2oHEPdC5mggdXbMnZfdw8A=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-223-iccA8fSPN7u8aTPGVXqo7w-1; Thu, 02 Dec 2021 12:05:40 -0500
+X-MC-Unique: iccA8fSPN7u8aTPGVXqo7w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 898AB839A53;
+        Thu,  2 Dec 2021 17:05:38 +0000 (UTC)
+Received: from localhost (unknown [10.39.192.13])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 218D360C05;
+        Thu,  2 Dec 2021 17:05:37 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+Cc:     Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Yishai Hadas <yishaih@nvidia.com>
+Subject: Re: [PATCH RFC v2] vfio: Documentation for the migration region
+In-Reply-To: <20211201232502.GO4670@nvidia.com>
+Organization: Red Hat GmbH
+References: <0-v2-45a95932a4c6+37-vfio_mig_doc_jgg@nvidia.com>
+ <20211130102611.71394253.alex.williamson@redhat.com>
+ <20211130185910.GD4670@nvidia.com>
+ <20211130153541.131c9729.alex.williamson@redhat.com>
+ <20211201031407.GG4670@nvidia.com> <20211201130314.69ed679c@omen>
+ <20211201232502.GO4670@nvidia.com>
+User-Agent: Notmuch/0.33.1 (https://notmuchmail.org)
+Date:   Thu, 02 Dec 2021 18:05:36 +0100
+Message-ID: <87tufrgcnz.fsf@redhat.com>
 MIME-Version: 1.0
-References: <1638410784-48646-1-git-send-email-cuibixuan@linux.alibaba.com>
- <20211201192643.ecb0586e0d53bf8454c93669@linux-foundation.org>
- <10cb0382-012b-5012-b664-c29461ce4de8@linux.alibaba.com> <20211201202905.b9892171e3f5b9a60f9da251@linux-foundation.org>
- <YaiiFxD7jfFT9cSR@azazel.net>
-In-Reply-To: <YaiiFxD7jfFT9cSR@azazel.net>
-From:   Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date:   Thu, 2 Dec 2021 07:34:36 -0800
-Message-ID: <CAADnVQLV4Tf3LemvZoZHw7jcywZ4qqckv_EMQx3JF9kXtHhY-Q@mail.gmail.com>
-Subject: Re: [PATCH -next] mm: delete oversized WARN_ON() in kvmalloc() calls
-To:     Jeremy Sowden <jeremy@azazel.net>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Bixuan Cui <cuibixuan@linux.alibaba.com>,
-        linux-mm <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Leon Romanovsky <leon@kernel.org>, Willy Tarreau <w@1wt.eu>,
-        Kees Cook <keescook@chromium.org>, bpf <bpf@vger.kernel.org>,
-        Network Development <netdev@vger.kernel.org>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jakub Kicinski <kuba@kernel.org>, kvm@vger.kernel.org,
-        netfilter-devel <netfilter-devel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 2, 2021 at 2:38 AM Jeremy Sowden <jeremy@azazel.net> wrote:
->
-> On 2021-12-01, at 20:29:05 -0800, Andrew Morton wrote:
-> > On Thu, 2 Dec 2021 12:05:15 +0800 Bixuan Cui wrote:
-> > > =E5=9C=A8 2021/12/2 =E4=B8=8A=E5=8D=8811:26, Andrew Morton =E5=86=99=
-=E9=81=93:
-> > > >> Delete the WARN_ON() and return NULL directly for oversized
-> > > >> parameter in kvmalloc() calls.
-> > > >> Also add unlikely().
-> > > >>
-> > > >> Fixes: 7661809d493b ("mm: don't allow oversized kvmalloc() calls")
-> > > >> Signed-off-by: Bixuan Cui<cuibixuan@linux.alibaba.com>
-> > > >> ---
-> > > >> There are a lot of oversize warnings and patches about kvmalloc()
-> > > >> calls recently. Maybe these warnings are not very necessary.
-> > > >
-> > > > Or maybe they are.  Please let's take a look at these warnings,
-> > > > one at a time.  If a large number of them are bogus then sure,
-> > > > let's disable the runtime test.  But perhaps it's the case that
-> > > > calling code has genuine issues and should be repaired.
-> > >
-> > > Such as=EF=BC=9A
-> >
-> > Thanks, that's helpful.
-> >
-> > Let's bring all these to the attention of the relevant developers.
-> >
-> > If the consensus is "the code's fine, the warning is bogus" then let's
-> > consider retiring the warning.
-> >
-> > If the consensus is otherwise then hopefully they will fix their stuff!
-> >
-> > > https://syzkaller.appspot.com/bug?id=3D24452f89446639c901ac07379ccc70=
-2808471e8e
-> >
-> > (cc bpf@vger.kernel.org)
-> >
-> > > https://syzkaller.appspot.com/bug?id=3Df7c5a86e747f9b7ce333e7295875cd=
-4ede2c7a0d
-> >
-> > (cc netdev@vger.kernel.org, maintainers)
-> >
-> > > https://syzkaller.appspot.com/bug?id=3D8f306f3db150657a1f6bbe19274670=
-84531602c7
-> >
-> > (cc kvm@vger.kernel.org)
-> >
-> > > https://syzkaller.appspot.com/bug?id=3D6f30adb592d476978777a1125d1f68=
-0edfc23e00
-> >
-> > (cc netfilter-devel@vger.kernel.org)
->
-> The netfilter bug has since been fixed:
->
->   https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/log/=
-?id=3D7bbc3d385bd813077acaf0e6fdb2a86a901f5382
+On Wed, Dec 01 2021, Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-How is this a "fix" ?
-u32 was the limit and because of the new warn the limit
-got reduced to s32.
-Every subsystem is supposed to do this "fix" now?
-
-> > > https://syzkaller.appspot.com/bug?id=3D4c9ab8c7d0f8b551950db06559dc9c=
-de4119ac83
-> >
-> > (bpf again).
+> On Wed, Dec 01, 2021 at 01:03:14PM -0700, Alex Williamson wrote:
+>> But if this document is suggesting the mlx5/QEMU interpretation is the
+>> only valid interpretations for driver authors, those clarifications
+>> should be pushed back into the uAPI header.
 >
-> J.
+> Can we go the other way and move more of the uAPI header text here?
+
+Where should a userspace author look when they try to implement support
+for vfio migration? I think we need to answer that question first.
+
+Maybe we should separate "these are the rules that an implementation
+must obey" from "here's a more verbose description of how things work,
+and how you can arrive at a working implementation". The former would go
+into the header, while the latter can go into this document. (The
+generated documentation can be linked from the header file.)
+
