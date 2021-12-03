@@ -2,86 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 39AC24672AB
-	for <lists+kvm@lfdr.de>; Fri,  3 Dec 2021 08:36:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 41F654672B2
+	for <lists+kvm@lfdr.de>; Fri,  3 Dec 2021 08:39:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350756AbhLCHjl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Dec 2021 02:39:41 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:36926 "EHLO
+        id S1378925AbhLCHnR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Dec 2021 02:43:17 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:20907 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238378AbhLCHjj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 3 Dec 2021 02:39:39 -0500
+        by vger.kernel.org with ESMTP id S1350852AbhLCHnQ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 3 Dec 2021 02:43:16 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1638516975;
+        s=mimecast20190719; t=1638517192;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=eQYyhredCKvJvtuWlGf1vBWT69o93MUm/9UVItQcKys=;
-        b=g4odFjggYh36p9xPwu+fk+2p1alecaJvlMtOaTFeRLF8Tk7GFIFlMJVydvZWfHWPKOThfj
-        4aY9L2sMVkWKLVsbZ+y6wJF6EIXujBq4ShA4deMhic+zBUcLWK6rFmw+Pmw3cbuh0yFslA
-        b0QC8riyBP2c2I3MWV49BS9+cjg0tSc=
+        bh=GGCgUfjn6OQpQU13zAQTWzs7Dy28ymhp2sUo8niZZ6o=;
+        b=X9MzZuPhX+3v8PLaYSmZFMR0sB6xdE4sa10dZlPqxbNNesp+80W+oJ97NYbJeHUrqXfaqC
+        VlJCM3IWr4PtP/Mtat/hk1PP7KUp58Cnr5LuHnwAb3F2Q3p09Eoo0qESFxQgX6TEsrhNn5
+        puCtGYi8p3TATHx1/ivNIZBdsZL/Nz8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-594-6nthxne1P6yKLiOSWUleTQ-1; Fri, 03 Dec 2021 02:36:14 -0500
-X-MC-Unique: 6nthxne1P6yKLiOSWUleTQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-64-3uS5TebrOO6TTghhs9fQ8g-1; Fri, 03 Dec 2021 02:39:49 -0500
+X-MC-Unique: 3uS5TebrOO6TTghhs9fQ8g-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B528A190D342;
-        Fri,  3 Dec 2021 07:36:13 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5F79A190D340;
+        Fri,  3 Dec 2021 07:39:47 +0000 (UTC)
 Received: from starship (unknown [10.40.192.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A15E210016FE;
-        Fri,  3 Dec 2021 07:36:11 +0000 (UTC)
-Message-ID: <c77e17b70f420b6ba1d7ccf092c439f35456ccd8.camel@redhat.com>
-Subject: Re: [PATCH] KVM: x86: selftests: svm_int_ctl_test: fix intercept
- calculation
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 234005D9D5;
+        Fri,  3 Dec 2021 07:39:41 +0000 (UTC)
+Message-ID: <6a97d0ab100e596c3f4c26c64aaf945018d82a5e.camel@redhat.com>
+Subject: Re: [PATCH v2 1/3] KVM: SVM: Refactor AVIC hardware setup logic
+ into helper function
 From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Fri, 03 Dec 2021 09:36:09 +0200
-In-Reply-To: <49b9571d25588870db5380b0be1a41df4bbaaf93.1638486479.git.maciej.szmigiero@oracle.com>
-References: <49b9571d25588870db5380b0be1a41df4bbaaf93.1638486479.git.maciej.szmigiero@oracle.com>
+To:     Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org
+Cc:     pbonzini@redhat.com, joro@8bytes.org, seanjc@google.com,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        peterz@infradead.org, hpa@zytor.com, thomas.lendacky@amd.com,
+        jon.grimm@amd.com
+Date:   Fri, 03 Dec 2021 09:39:40 +0200
+In-Reply-To: <20211202235825.12562-2-suravee.suthikulpanit@amd.com>
+References: <20211202235825.12562-1-suravee.suthikulpanit@amd.com>
+         <20211202235825.12562-2-suravee.suthikulpanit@amd.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2021-12-03 at 00:10 +0100, Maciej S. Szmigiero wrote:
-> From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+On Thu, 2021-12-02 at 17:58 -0600, Suravee Suthikulpanit wrote:
+> To prepare for upcoming AVIC changes. There is no functional change.
 > 
-> INTERCEPT_x are bit positions, but the code was using the raw value of
-> INTERCEPT_VINTR (4) instead of BIT(INTERCEPT_VINTR).
-> This resulted in masking of bit 2 - that is, SMI instead of VINTR.
-> 
-> Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+> Signed-off-by: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
 > ---
->  tools/testing/selftests/kvm/x86_64/svm_int_ctl_test.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  arch/x86/kvm/svm/avic.c | 10 ++++++++++
+>  arch/x86/kvm/svm/svm.c  |  8 +-------
+>  arch/x86/kvm/svm/svm.h  |  1 +
+>  3 files changed, 12 insertions(+), 7 deletions(-)
 > 
-> diff --git a/tools/testing/selftests/kvm/x86_64/svm_int_ctl_test.c b/tools/testing/selftests/kvm/x86_64/svm_int_ctl_test.c
-> index df04f56ce859..30a81038df46 100644
-> --- a/tools/testing/selftests/kvm/x86_64/svm_int_ctl_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/svm_int_ctl_test.c
-> @@ -75,7 +75,7 @@ static void l1_guest_code(struct svm_test_data *svm)
->  	vmcb->control.int_ctl &= ~V_INTR_MASKING_MASK;
+> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> index 8052d92069e0..6aca1682f4b7 100644
+> --- a/arch/x86/kvm/svm/avic.c
+> +++ b/arch/x86/kvm/svm/avic.c
+> @@ -1011,3 +1011,13 @@ void svm_vcpu_unblocking(struct kvm_vcpu *vcpu)
+>  		kvm_vcpu_update_apicv(vcpu);
+>  	avic_set_running(vcpu, true);
+>  }
+> +
+> +bool avic_hardware_setup(bool avic, bool npt)
+> +{
+> +	if (!avic || !npt || !boot_cpu_has(X86_FEATURE_AVIC))
+> +		return false;
+Nitpick: Why to pass these as local variables? npt_enabled for example is
+used in many places directly.
+
+> +
+> +	pr_info("AVIC enabled\n");
+> +	amd_iommu_register_ga_log_notifier(&avic_ga_log_notifier);
+> +	return true;
+> +}
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 989685098b3e..d23bc7a7c48e 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -1031,13 +1031,7 @@ static __init int svm_hardware_setup(void)
+>  			nrips = false;
+>  	}
 >  
->  	/* No intercepts for real and virtual interrupts */
-> -	vmcb->control.intercept &= ~(1ULL << INTERCEPT_INTR | INTERCEPT_VINTR);
-> +	vmcb->control.intercept &= ~(BIT(INTERCEPT_INTR) | BIT(INTERCEPT_VINTR));
+> -	enable_apicv = avic = avic && npt_enabled && boot_cpu_has(X86_FEATURE_AVIC);
+> -
+> -	if (enable_apicv) {
+> -		pr_info("AVIC enabled\n");
+> -
+> -		amd_iommu_register_ga_log_notifier(&avic_ga_log_notifier);
+> -	}
+> +	enable_apicv = avic = avic_hardware_setup(avic, npt_enabled);
 >  
->  	/* Make a virtual interrupt VINTR_IRQ_NUMBER pending */
->  	vmcb->control.int_ctl |= V_IRQ_MASK | (0x1 << V_INTR_PRIO_SHIFT);
-> 
-Sorry about that.
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+>  	if (vls) {
+>  		if (!npt_enabled ||
+> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+> index 5d30db599e10..1d2d72e56dd1 100644
+> --- a/arch/x86/kvm/svm/svm.h
+> +++ b/arch/x86/kvm/svm/svm.h
+> @@ -515,6 +515,7 @@ static inline bool avic_vcpu_is_running(struct kvm_vcpu *vcpu)
+>  	return (READ_ONCE(*entry) & AVIC_PHYSICAL_ID_ENTRY_IS_RUNNING_MASK);
+>  }
+>  
+> +bool avic_hardware_setup(bool avic, bool npt);
+>  int avic_ga_log_notifier(u32 ga_tag);
+>  void avic_vm_destroy(struct kvm *kvm);
+>  int avic_vm_init(struct kvm *kvm);
 
 Best regards,
 	Maxim Levitsky
