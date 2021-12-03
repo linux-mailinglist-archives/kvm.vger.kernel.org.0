@@ -2,113 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DB89E467921
-	for <lists+kvm@lfdr.de>; Fri,  3 Dec 2021 15:09:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7041C467B01
+	for <lists+kvm@lfdr.de>; Fri,  3 Dec 2021 17:10:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1381354AbhLCOM6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Dec 2021 09:12:58 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:55739 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1352539AbhLCOM5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 3 Dec 2021 09:12:57 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1638540572;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Th3/AwwdNWFRMVyXQbUB5Zn699vPcry9PjQt24tDZNs=;
-        b=BnvbZmSxAKuvvWFBMi779uHrkQGll0hXImSlHmkSWpO7ywlwSlsIBz6Kj5TGGYEcqZt+Ws
-        1EKfjkacukyWiUhKPTrWxTecZc1X4Dgjgm5kwpcHdAXK9vAbKkpY+WyWSaAvdKDHI3nlDq
-        ESj7hRUa5t32cu+XiS1ieiPE9Q5u/nA=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-591-uY2Buk0JMayWCLSef6KRlg-1; Fri, 03 Dec 2021 09:09:31 -0500
-X-MC-Unique: uY2Buk0JMayWCLSef6KRlg-1
-Received: by mail-wr1-f70.google.com with SMTP id v17-20020adfedd1000000b0017c5e737b02so647175wro.18
-        for <kvm@vger.kernel.org>; Fri, 03 Dec 2021 06:09:30 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=Th3/AwwdNWFRMVyXQbUB5Zn699vPcry9PjQt24tDZNs=;
-        b=DUdUkOvUhm05TEL7ax/IFz4+QNY7gLtzNgcNK2dOq7wZtAL6C5Ia+c4d86cijX2/ph
-         NdYz3ZwDAqBeTqY7ozHSPO14p8NvdUgqoWTtj2VBwcEhx/0nUd+bQQ2OxYCErcjrM2mw
-         JNQXMjNvPaSmy+6nkV+0CymCRfTXEoi5esI/Y6ZhQhzZoHbURYSAXGMYP9WGkpnNOjK4
-         8WLzSbAF1oRk3DmYAHYDAHvCYlbGtlYQjwiZqcSJxUNj344txjLBWBidUF4khejfSAjW
-         azBnnuvz9bjeMyKkdL8NhLkRkQsP2toU+ZE97JSSqfbdhpLgfI1S9PsudDVsN/YQ1KdB
-         q3qw==
-X-Gm-Message-State: AOAM533078s/jGkQKj/OUtvuxvN8HsFELqZ/s6WD1K4Hr7dOgvlq1rN5
-        dSXsnsFOxSN09pxTnU0H7uBDGfZxy1zND8sSKZSyjGgPKKBtwcA1qGu27ovOfJnBmGSIofoyhw4
-        8NVGxa7E0Ge1e
-X-Received: by 2002:adf:e2c5:: with SMTP id d5mr21726919wrj.338.1638540569911;
-        Fri, 03 Dec 2021 06:09:29 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwn8SCemCKl3G0iSjXXF2Z8BcbWnjoIe4SW0+H1SuKLyllcsxQUH/Bt1H7vpADvQabw8WfPDw==
-X-Received: by 2002:adf:e2c5:: with SMTP id d5mr21726875wrj.338.1638540569626;
-        Fri, 03 Dec 2021 06:09:29 -0800 (PST)
-Received: from fedora (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id f15sm3497480wmg.30.2021.12.03.06.09.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Dec 2021 06:09:29 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     "Michael Kelley (LINUX)" <mikelley@microsoft.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Ajay Garg <ajaygargnsit@gmail.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        KY Srinivasan <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-        Arnd Bergmann <arnd@arndb.de>
-Subject: Re: ** POTENTIAL FRAUD ALERT - RED HAT ** RE: [PATCH v2 8/8] KVM:
- x86: Add checks for reserved-to-zero Hyper-V hypercall fields
-In-Reply-To: <MWHPR21MB1593E284E412873C64B54A32D7699@MWHPR21MB1593.namprd21.prod.outlook.com>
-References: <20211030000800.3065132-1-seanjc@google.com>
- <20211030000800.3065132-9-seanjc@google.com>
- <87v91cjhch.fsf@vitty.brq.redhat.com> <YagrxIknF9DX8l8L@google.com>
- <MWHPR21MB1593E284E412873C64B54A32D7699@MWHPR21MB1593.namprd21.prod.outlook.com>
-Date:   Fri, 03 Dec 2021 15:09:27 +0100
-Message-ID: <87o85x7pbc.fsf@redhat.com>
+        id S236459AbhLCQN6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Dec 2021 11:13:58 -0500
+Received: from foss.arm.com ([217.140.110.172]:50998 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230370AbhLCQN5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Dec 2021 11:13:57 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B02A81435;
+        Fri,  3 Dec 2021 08:10:33 -0800 (PST)
+Received: from [10.1.38.15] (e122027.cambridge.arm.com [10.1.38.15])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 783AC3F73B;
+        Fri,  3 Dec 2021 08:10:32 -0800 (PST)
+Subject: Re: [PATCH v3] MAINTAINERS: Update Atish's email address
+To:     Atish Patra <atishp@atishpatra.org>, linux-kernel@vger.kernel.org
+Cc:     anup.patel@wdc.com, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org
+References: <20211202235823.1926970-1-atishp@atishpatra.org>
+From:   Steven Price <steven.price@arm.com>
+Message-ID: <f63e9f1b-4b8e-6c3e-8e21-f9a5f97ca17d@arm.com>
+Date:   Fri, 3 Dec 2021 16:10:30 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20211202235823.1926970-1-atishp@atishpatra.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-"Michael Kelley (LINUX)" <mikelley@microsoft.com> writes:
+On 02/12/2021 23:58, Atish Patra wrote:
+> I am no longer employed by western digital. Update my email address to
+> personal one and add entries to .mailmap as well.
+> 
+> Signed-off-by: Atish Patra <atishp@atishpatra.org>
+> ---
+>  .mailmap    | 1 +
+>  MAINTAINERS | 2 +-
+>  2 files changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/.mailmap b/.mailmap
+> index 6277bb27b4bf..23f6b0a60adf 100644
+> --- a/.mailmap
+> +++ b/.mailmap
+> @@ -50,6 +50,7 @@ Archit Taneja <archit@ti.com>
+>  Ard Biesheuvel <ardb@kernel.org> <ard.biesheuvel@linaro.org>
+>  Arnaud Patard <arnaud.patard@rtp-net.org>
+>  Arnd Bergmann <arnd@arndb.de>
+> +Atish Patra <atishp@atishpatra.org> <atish.patra@wdc.com> <atishp@rivosinc.com>
 
-> From: Sean Christopherson <seanjc@google.com> Sent: Wednesday, December 1, 2021 6:13 PM
->> 
->> On Mon, Nov 01, 2021, Vitaly Kuznetsov wrote:
->> > Sean Christopherson <seanjc@google.com> writes:
->> >
->> > > Add checks for the three fields in Hyper-V's hypercall params that must
->> > > be zero.  Per the TLFS, HV_STATUS_INVALID_HYPERCALL_INPUT is returned if
->> > > "A reserved bit in the specified hypercall input value is non-zero."
->> > >
->> > > Note, the TLFS has an off-by-one bug for the last reserved field, which
->> > > it defines as being bits 64:60.  The same section states "The input field
->> > > 64-bit value called a hypercall input value.", i.e. bit 64 doesn't
->> > > exist.
->> >
->> > This version are you looking at? I can't see this issue in 6.0b
->> 
->> It's the web-based documentation, the 6.0b PDF indeed does not have the same bug.
->> 
->> https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/tlfs/hypercall-interface#hypercall-inputs
->
-> Did you (or Vitaly) file a bug report on this doc issue?  If not, I can do so.
->
+I don't think this does what you expect. You can't list more than one
+email address to replace on the same line. You can use the command "git
+check-mailmap" to test what happens, e.g. with this change applied:
 
-Done, https://github.com/MicrosoftDocs/Virtualization-Documentation/pull/1682
+  $ git check-mailmap "<atishp@rivosinc.com>"
+  <atishp@rivosinc.com>
+  $ git check-mailmap "<atish.patra@wdc.com>"
+  Atish Patra <atishp@atishpatra.org>
+  $ git check-mailmap "<atishp@atishpatra.org>"
+  <atishp@atishpatra.org>
 
--- 
-Vitaly
+So only your @wdc.com address is translated. If you want to translate
+the @rivosinc.com address as well you need a second line. As the file says:
+
+# For format details, see "MAPPING AUTHORS" in "man git-shortlog".
+
+Steve
+
+>  Axel Dyks <xl@xlsigned.net>
+>  Axel Lin <axel.lin@gmail.com>
+>  Bart Van Assche <bvanassche@acm.org> <bart.vanassche@sandisk.com>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 5250298d2817..6c2a34da0314 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -10434,7 +10434,7 @@ F:	arch/powerpc/kvm/
+>  
+>  KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)
+>  M:	Anup Patel <anup.patel@wdc.com>
+> -R:	Atish Patra <atish.patra@wdc.com>
+> +R:	Atish Patra <atishp@atishpatra.org>
+>  L:	kvm@vger.kernel.org
+>  L:	kvm-riscv@lists.infradead.org
+>  L:	linux-riscv@lists.infradead.org
+> 
 
