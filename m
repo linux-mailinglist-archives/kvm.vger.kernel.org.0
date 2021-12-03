@@ -2,419 +2,205 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 22BE3467B9C
-	for <lists+kvm@lfdr.de>; Fri,  3 Dec 2021 17:39:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F2FBC467BE9
+	for <lists+kvm@lfdr.de>; Fri,  3 Dec 2021 17:58:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1382118AbhLCQmm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Dec 2021 11:42:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55236 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245508AbhLCQmm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Dec 2021 11:42:42 -0500
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27EFDC061353
-        for <kvm@vger.kernel.org>; Fri,  3 Dec 2021 08:39:18 -0800 (PST)
-Received: by mail-pj1-x102e.google.com with SMTP id gf14-20020a17090ac7ce00b001a7a2a0b5c3so5582911pjb.5
-        for <kvm@vger.kernel.org>; Fri, 03 Dec 2021 08:39:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=57Kulmp5q4O2ps0m6S9rdcKyd+t5YdMdTDoqyt+nW4M=;
-        b=UvB8UDbdbOrxz/dVoecna26z37ARKbHnAKKaCJwS38jhSdDcFINSHJvuEtlY3J5wKD
-         bm4ScH+re97ENzrSU+fq83+eD+qjZLJJhJSSbCHcjg9kxbtbmqYNjkDgewSD3eFCIsFT
-         R40HkGk9gc48w32ToeY2F706sK9k3x2hz/9zBW3FX+drAbXbOneR5d/PMU46HnjnvZrZ
-         x1vn6lXPfSsHD3o1mVo/aUV8zoAWM6laaq9P97TvM2pjJ/2+PWgF28o3KW0Z9o81xFLs
-         0RmAJK7QHgyALx+R3j1ttfhQbqGey5T15GUSPQzLbiJmbEMTqnBs5lYpncYAwnhr2zaq
-         zoHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=57Kulmp5q4O2ps0m6S9rdcKyd+t5YdMdTDoqyt+nW4M=;
-        b=4SGO+amN5NpQym5FxIaMpGX0Yqi84Hw+Pt1ubw4qPnMZcaWgBGIEok+Wccz4CPhwlC
-         UDlmXilRYxEikvGzXf26h7sJDRnSStfLBlgI3d4Ay69VvMttB99/V0RgCIIQQv2V5Ey7
-         gX96n+YML9q7N8wmWoH+eDTjww0QXC90stF7uOc3MAIOUCGb5i5jJidG/yyZyUz2P6Qc
-         OUBbtcauHNdQGV7tTuEVNdgtuIBU+O132V4EPFJF+hLAZb9mZENlpnqOLtuU8+jFJ/WD
-         06EgGIcQX8QyZksYOFN4ixEH9vG/Xw1wI9eUgP6TO5jTmPQJGhqTXWRaJ6tlcvSkmLI7
-         Dg9g==
-X-Gm-Message-State: AOAM531zqaFpAX4oFsv3MM/ZV80X2ubQlpxUvi+1HASlLAZNdwm9j8TG
-        E5MSyX7Ik4P5JGotAABCxFj0QlBGiTQDxw==
-X-Google-Smtp-Source: ABdhPJxbVibK91sCwv7hpQd10e+ax+0wH9Sly1dUk+qNTWgzaMG5o0Btq/lcV+cwXJHmqdGIdhU/fA==
-X-Received: by 2002:a17:90b:1217:: with SMTP id gl23mr15156126pjb.191.1638549557389;
-        Fri, 03 Dec 2021 08:39:17 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id 13sm3700700pfp.216.2021.12.03.08.39.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Dec 2021 08:39:16 -0800 (PST)
-Date:   Fri, 3 Dec 2021 16:39:13 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH] KVM: SVM: Do not terminate SEV-ES guests on GHCB
- validation failure
-Message-ID: <YapIMYiJ+iIfHI+c@google.com>
-References: <b57280b5562893e2616257ac9c2d4525a9aeeb42.1638471124.git.thomas.lendacky@amd.com>
+        id S1382237AbhLCRBq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Dec 2021 12:01:46 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:1796 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S240527AbhLCRBq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 3 Dec 2021 12:01:46 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B3GIJFg015330;
+        Fri, 3 Dec 2021 16:58:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=Srv5VCJ2D5KvzxADRBHhOU8B6d/fo6TUR/8qPva/6w0=;
+ b=Q4TvyJIT2Vi+gAGoRGWGs1Yqv6UuOwmOVpYOjpDG9JTvPrTTCS0oPJhJcVFe6U/gJ5P6
+ t86+FqB8M0GkZzlyUC/dpgC4pCh0gYrE8TwhQU8HkSyrERnRdFgpaX14Ag7EN8+1hZQ/
+ vj0D9ppRSSWS6uwqRCEilksV4DLuQYJ2frJyxcrbvdxGCBt+voBQFjCamWvl+vaarflV
+ ViK10CXRC807uWmNDvAd40OzfRbF7ZsoKdtEvZpgrElCeNqC9jb9kMA8/h/raSRI5yjR
+ vUk8U/mDhVeKx6EHVXGC1LbDF0geUbR4AAEIGQFHgF95ELjhIZCifm7sGawpjscotwYr BA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cqpn28rwm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 03 Dec 2021 16:58:21 +0000
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1B3GfO8T022194;
+        Fri, 3 Dec 2021 16:58:21 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cqpn28rvr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 03 Dec 2021 16:58:21 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1B3GwGZh023119;
+        Fri, 3 Dec 2021 16:58:19 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma06ams.nl.ibm.com with ESMTP id 3ckbxkyv8v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 03 Dec 2021 16:58:18 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1B3GwF7T29295042
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 3 Dec 2021 16:58:15 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7584152051;
+        Fri,  3 Dec 2021 16:58:15 +0000 (GMT)
+Received: from p-imbrenda.bredband2.com (unknown [9.145.14.21])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id E60E352054;
+        Fri,  3 Dec 2021 16:58:14 +0000 (GMT)
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     cohuck@redhat.com, borntraeger@de.ibm.com, frankja@linux.ibm.com,
+        thuth@redhat.com, pasic@linux.ibm.com, david@redhat.com,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v6 00/17] KVM: s390: pv: implement lazy destroy for reboot
+Date:   Fri,  3 Dec 2021 17:57:57 +0100
+Message-Id: <20211203165814.73016-1-imbrenda@linux.ibm.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b57280b5562893e2616257ac9c2d4525a9aeeb42.1638471124.git.thomas.lendacky@amd.com>
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: KvNVnndubEgsOxDleDnomS18gTT96_0k
+X-Proofpoint-ORIG-GUID: kBDC5uEAN2XxS470W9tx2sz8K0NcbUl5
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2021-12-03_07,2021-12-02_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
+ malwarescore=0 spamscore=0 priorityscore=1501 impostorscore=0
+ suspectscore=0 mlxscore=0 bulkscore=0 mlxlogscore=887 clxscore=1015
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2112030105
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 02, 2021, Tom Lendacky wrote:
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 713e3daa9574..322553322202 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -2353,24 +2353,29 @@ static void sev_es_sync_from_ghcb(struct vcpu_svm *svm)
->  	memset(ghcb->save.valid_bitmap, 0, sizeof(ghcb->save.valid_bitmap));
->  }
->  
-> -static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
-> +static bool sev_es_validate_vmgexit(struct vcpu_svm *svm)
->  {
+Previously, when a protected VM was rebooted or when it was shut down,
+its memory was made unprotected, and then the protected VM itself was
+destroyed. Looping over the whole address space can take some time,
+considering the overhead of the various Ultravisor Calls (UVCs). This
+means that a reboot or a shutdown would take a potentially long amount
+of time, depending on the amount of used memory.
 
-...
+This patchseries implements a deferred destroy mechanism for protected
+guests. When a protected guest is destroyed, its memory can be cleared
+in background, allowing the guest to restart or terminate significantly
+faster than before.
 
-> -	return 0;
-> +	return true;
->  
->  vmgexit_err:
->  	vcpu = &svm->vcpu;
->  
-> -	if (ghcb->ghcb_usage) {
-> +	if (reason == GHCB_ERR_INVALID_USAGE) {
->  		vcpu_unimpl(vcpu, "vmgexit: ghcb usage %#x is not valid\n",
->  			    ghcb->ghcb_usage);
-> +	} else if (reason == GHCB_ERR_INVALID_EVENT) {
-> +		vcpu_unimpl(vcpu, "vmgexit: exit code %#llx is not valid\n",
-> +			    exit_code);
->  	} else {
-> -		vcpu_unimpl(vcpu, "vmgexit: exit reason %#llx is not valid\n",
-> +		vcpu_unimpl(vcpu, "vmgexit: exit code %#llx input is not valid\n",
->  			    exit_code);
->  		dump_ghcb(svm);
->  	}
->  
-> -	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
-> -	vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON;
-> -	vcpu->run->internal.ndata = 2;
-> -	vcpu->run->internal.data[0] = exit_code;
-> -	vcpu->run->internal.data[1] = vcpu->arch.last_vmentry_cpu;
-> +	/* Clear the valid entries fields */
-> +	memset(ghcb->save.valid_bitmap, 0, sizeof(ghcb->save.valid_bitmap));
-> +
-> +	ghcb_set_sw_exit_info_1(ghcb, 2);
-> +	ghcb_set_sw_exit_info_2(ghcb, reason);
->  
-> -	return -EINVAL;
-> +	return false;
+There are 2 possibilities when a protected VM is torn down:
+* it still has an address space associated (reboot case)
+* it does not have an address space anymore (shutdown case)
 
-I'd really prefer that this helper continue to return 0/-EINVAL, there's no hint
-in the function name that this return true/false.  And given the usage, there's
-no advantage to returning true/false.  On the contrary, if there's a future
-condition where this needs to exit to userspace, we'll end up switching this all
-back to int.
+For the reboot case, two new commands are available for the
+KVM_S390_PV_COMMAND:
 
->  }
->  
->  void sev_es_unmap_ghcb(struct vcpu_svm *svm)
-> @@ -2531,7 +2540,7 @@ void pre_sev_run(struct vcpu_svm *svm, int cpu)
->  }
->  
->  #define GHCB_SCRATCH_AREA_LIMIT		(16ULL * PAGE_SIZE)
-> -static int setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
-> +static bool setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
+KVM_PV_ASYNC_DISABLE_PREPARE: prepares the current protected VM for
+asynchronous teardown. The current VM will then continue immediately
+as non-protected. If a protected VM had already been set aside without
+starting the teardown process, this call will fail. In this case the
+userspace process should issue a normal KVM_PV_DISABLE
 
-Same here, but now there's an actual need to return an int...
+KVM_PV_ASYNC_DISABLE: tears down the protected VM previously set aside
+for asychronous teardown. This PV command should ideally be issued by
+userspace from a separate thread. If a fatal signal is received (or
+the process terminates naturally), the command will terminate
+immediately without completing.
 
->  {
->  	struct vmcb_control_area *control = &svm->vmcb->control;
->  	struct ghcb *ghcb = svm->sev_es.ghcb;
-> @@ -2542,14 +2551,14 @@ static int setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
->  	scratch_gpa_beg = ghcb_get_sw_scratch(ghcb);
->  	if (!scratch_gpa_beg) {
->  		pr_err("vmgexit: scratch gpa not provided\n");
-> -		return -EINVAL;
-> +		goto e_scratch;
->  	}
->  
->  	scratch_gpa_end = scratch_gpa_beg + len;
->  	if (scratch_gpa_end < scratch_gpa_beg) {
->  		pr_err("vmgexit: scratch length (%#llx) not valid for scratch address (%#llx)\n",
->  		       len, scratch_gpa_beg);
-> -		return -EINVAL;
-> +		goto e_scratch;
->  	}
->  
->  	if ((scratch_gpa_beg & PAGE_MASK) == control->ghcb_gpa) {
-> @@ -2567,7 +2576,7 @@ static int setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
->  		    scratch_gpa_end > ghcb_scratch_end) {
->  			pr_err("vmgexit: scratch area is outside of GHCB shared buffer area (%#llx - %#llx)\n",
->  			       scratch_gpa_beg, scratch_gpa_end);
-> -			return -EINVAL;
-> +			goto e_scratch;
->  		}
->  
->  		scratch_va = (void *)svm->sev_es.ghcb;
-> @@ -2580,18 +2589,18 @@ static int setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
->  		if (len > GHCB_SCRATCH_AREA_LIMIT) {
->  			pr_err("vmgexit: scratch area exceeds KVM limits (%#llx requested, %#llx limit)\n",
->  			       len, GHCB_SCRATCH_AREA_LIMIT);
-> -			return -EINVAL;
-> +			goto e_scratch;
->  		}
->  		scratch_va = kvzalloc(len, GFP_KERNEL_ACCOUNT);
->  		if (!scratch_va)
-> -			return -ENOMEM;
+The idea is that userspace should first issue the
+KVM_PV_ASYNC_DISABLE_PREPARE command, and in case of success, create a
+new thread and issue KVM_PV_ASYNC_DISABLE from there. This also allows
+for proper accounting of the CPU time needed for the asynchronous
+teardown.
 
-...because this is wrong.  Failure to allocate memory should exit to userspace,
-not report an error to the guest.
+This means that the same address space can have memory belonging to
+more than one protected guest, although only one will be running, the
+others will in fact not even have any CPUs.
 
-> +			goto e_scratch;
->  
->  		if (kvm_read_guest(svm->vcpu.kvm, scratch_gpa_beg, scratch_va, len)) {
->  			/* Unable to copy scratch area from guest */
->  			pr_err("vmgexit: kvm_read_guest for scratch area failed\n");
->  
->  			kvfree(scratch_va);
-> -			return -EFAULT;
-> +			goto e_scratch;
+The shutdown case should be dealt with in userspace (e.g. using
+clone(CLONE_VM)).
 
-Same here, failure to read guest memory is a userspace issue and needs to be
-reported to userspace.
+A module parameter is also provided to disable the new functionality,
+which is otherwise enabled by default. This should not be an issue
+since the new functionality is opt-in anyway. This is mainly thought to
+aid debugging.
 
->  		}
->  
->  		/*
+v5->v6
+* completely reworked the series
+* removed kernel thread for asynchronous teardown
+* added new commands to KVM_S390_PV_COMMAND ioctl
 
-IMO, this should be the patch (compile tested only).
+v4->v5
+* fixed and improved some patch descriptions
+* added some comments to better explain what's going on
+* use vma_lookup instead of find_vma
+* rename is_protected to protected_count since now it's used as a counter
 
----
- arch/x86/include/asm/sev-common.h | 11 +++++
- arch/x86/kvm/svm/sev.c            | 75 +++++++++++++++++++------------
- 2 files changed, 58 insertions(+), 28 deletions(-)
+v3->v4
+* added patch 2
+* split patch 3
+* removed the shutdown part -- will be a separate patchseries
+* moved the patch introducing the module parameter
 
-diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
-index 2cef6c5a52c2..6acaf5af0a3d 100644
---- a/arch/x86/include/asm/sev-common.h
-+++ b/arch/x86/include/asm/sev-common.h
-@@ -73,4 +73,15 @@
+v2->v3
+* added definitions for CC return codes for the UVC instruction
+* improved make_secure_pte:
+  - renamed rc to cc
+  - added comments to explain why returning -EAGAIN is ok
+* fixed kvm_s390_pv_replace_asce and kvm_s390_pv_remove_old_asce:
+  - renamed
+  - added locking
+  - moved to gmap.c
+* do proper error management in do_secure_storage_access instead of
+  trying again hoping to get a different exception
+* fix outdated patch descriptions
 
- #define GHCB_RESP_CODE(v)		((v) & GHCB_MSR_INFO_MASK)
+v1->v2
+* rebased on a more recent kernel
+* improved/expanded some patch descriptions
+* improves/expanded some comments
+* added patch 1, which prevents stall notification when the system is
+  under heavy load.
+* rename some members of struct deferred_priv to improve readability
+* avoid an use-after-free bug of the struct mm in case of shutdown
+* add missing return when lazy destroy is disabled
+* add support for OOM notifier
 
-+/*
-+ * Error codes related to GHCB input that can be communicated back to the guest
-+ * by setting the lower 32-bits of the GHCB SW_EXITINFO1 field to 2.
-+ */
-+#define GHCB_ERR_NOT_REGISTERED		1
-+#define GHCB_ERR_INVALID_USAGE		2
-+#define GHCB_ERR_INVALID_SCRATCH_AREA	3
-+#define GHCB_ERR_MISSING_INPUT		4
-+#define GHCB_ERR_INVALID_INPUT		5
-+#define GHCB_ERR_INVALID_EVENT		6
-+
- #endif
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 713e3daa9574..60c6d7b216eb 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -2357,20 +2357,25 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
- {
- 	struct kvm_vcpu *vcpu;
- 	struct ghcb *ghcb;
--	u64 exit_code = 0;
-+	u64 exit_code;
-+	u64 reason;
+Claudio Imbrenda (17):
+  KVM: s390: pv: leak the topmost page table when destroy fails
+  KVM: s390: pv: handle secure storage violations for protected guests
+  KVM: s390: pv: handle secure storage exceptions for normal guests
+  KVM: s390: pv: refactor s390_reset_acc
+  KVM: s390: pv: usage counter instead of flag
+  KVM: s390: pv: add export before import
+  KVM: s390: pv: module parameter to fence lazy destroy
+  KVM: s390: pv: make kvm_s390_cpus_from_pv global
+  KVM: s390: pv: clear the state without memset
+  KVM: s390: pv: add mmu_notifier
+  s390/mm: KVM: pv: when tearing down, try to destroy protected pages
+  KVM: s390: pv: refactoring of kvm_s390_pv_deinit_vm
+  KVM: s390: pv: cleanup leftover protected VMs if needed
+  KVM: s390: pv: asynchronous destroy for reboot
+  KVM: s390: pv: api documentation for asynchronous destroy
+  KVM: s390: pv: add KVM_CAP_S390_PROT_REBOOT_ASYNC
+  KVM: s390: pv: avoid export before import if possible
 
- 	ghcb = svm->sev_es.ghcb;
+ Documentation/virt/kvm/api.rst      |  21 ++-
+ arch/s390/include/asm/gmap.h        |  38 +++-
+ arch/s390/include/asm/kvm_host.h    |   3 +
+ arch/s390/include/asm/mmu.h         |   2 +-
+ arch/s390/include/asm/mmu_context.h |   2 +-
+ arch/s390/include/asm/pgtable.h     |  11 +-
+ arch/s390/include/asm/uv.h          |   1 +
+ arch/s390/kernel/uv.c               |  64 +++++++
+ arch/s390/kvm/kvm-s390.c            |  59 ++++++-
+ arch/s390/kvm/kvm-s390.h            |   3 +
+ arch/s390/kvm/pv.c                  | 259 ++++++++++++++++++++++++++--
+ arch/s390/mm/fault.c                |  20 ++-
+ arch/s390/mm/gmap.c                 | 152 +++++++++++++---
+ include/uapi/linux/kvm.h            |   3 +
+ 14 files changed, 591 insertions(+), 47 deletions(-)
 
--	/* Only GHCB Usage code 0 is supported */
--	if (ghcb->ghcb_usage)
--		goto vmgexit_err;
--
- 	/*
--	 * Retrieve the exit code now even though is may not be marked valid
-+	 * Retrieve the exit code now even though it may not be marked valid
- 	 * as it could help with debugging.
- 	 */
- 	exit_code = ghcb_get_sw_exit_code(ghcb);
-
-+	/* Only GHCB Usage code 0 is supported */
-+	if (ghcb->ghcb_usage) {
-+		reason = GHCB_ERR_INVALID_USAGE;
-+		goto vmgexit_err;
-+	}
-+
-+	reason = GHCB_ERR_MISSING_INPUT;
-+
- 	if (!ghcb_sw_exit_code_is_valid(ghcb) ||
- 	    !ghcb_sw_exit_info_1_is_valid(ghcb) ||
- 	    !ghcb_sw_exit_info_2_is_valid(ghcb))
-@@ -2449,6 +2454,7 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
- 	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
- 		break;
- 	default:
-+		reason = GHCB_ERR_INVALID_EVENT;
- 		goto vmgexit_err;
- 	}
-
-@@ -2457,22 +2463,25 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
- vmgexit_err:
- 	vcpu = &svm->vcpu;
-
--	if (ghcb->ghcb_usage) {
-+	if (reason == GHCB_ERR_INVALID_USAGE) {
- 		vcpu_unimpl(vcpu, "vmgexit: ghcb usage %#x is not valid\n",
- 			    ghcb->ghcb_usage);
-+	} else if (reason == GHCB_ERR_INVALID_EVENT) {
-+		vcpu_unimpl(vcpu, "vmgexit: exit code %#llx is not valid\n",
-+			    exit_code);
- 	} else {
--		vcpu_unimpl(vcpu, "vmgexit: exit reason %#llx is not valid\n",
-+		vcpu_unimpl(vcpu, "vmgexit: exit code %#llx input is not valid\n",
- 			    exit_code);
- 		dump_ghcb(svm);
- 	}
-
--	vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
--	vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_UNEXPECTED_EXIT_REASON;
--	vcpu->run->internal.ndata = 2;
--	vcpu->run->internal.data[0] = exit_code;
--	vcpu->run->internal.data[1] = vcpu->arch.last_vmentry_cpu;
-+	/* Clear the valid entries fields */
-+	memset(ghcb->save.valid_bitmap, 0, sizeof(ghcb->save.valid_bitmap));
-
--	return -EINVAL;
-+	ghcb_set_sw_exit_info_1(ghcb, 2);
-+	ghcb_set_sw_exit_info_2(ghcb, reason);
-+
-+	return 1;
- }
-
- void sev_es_unmap_ghcb(struct vcpu_svm *svm)
-@@ -2542,14 +2551,14 @@ static int setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
- 	scratch_gpa_beg = ghcb_get_sw_scratch(ghcb);
- 	if (!scratch_gpa_beg) {
- 		pr_err("vmgexit: scratch gpa not provided\n");
--		return -EINVAL;
-+		goto e_scratch;
- 	}
-
- 	scratch_gpa_end = scratch_gpa_beg + len;
- 	if (scratch_gpa_end < scratch_gpa_beg) {
- 		pr_err("vmgexit: scratch length (%#llx) not valid for scratch address (%#llx)\n",
- 		       len, scratch_gpa_beg);
--		return -EINVAL;
-+		goto e_scratch;
- 	}
-
- 	if ((scratch_gpa_beg & PAGE_MASK) == control->ghcb_gpa) {
-@@ -2567,7 +2576,7 @@ static int setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
- 		    scratch_gpa_end > ghcb_scratch_end) {
- 			pr_err("vmgexit: scratch area is outside of GHCB shared buffer area (%#llx - %#llx)\n",
- 			       scratch_gpa_beg, scratch_gpa_end);
--			return -EINVAL;
-+			goto e_scratch;
- 		}
-
- 		scratch_va = (void *)svm->sev_es.ghcb;
-@@ -2580,7 +2589,7 @@ static int setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
- 		if (len > GHCB_SCRATCH_AREA_LIMIT) {
- 			pr_err("vmgexit: scratch area exceeds KVM limits (%#llx requested, %#llx limit)\n",
- 			       len, GHCB_SCRATCH_AREA_LIMIT);
--			return -EINVAL;
-+			goto e_scratch;
- 		}
- 		scratch_va = kvzalloc(len, GFP_KERNEL_ACCOUNT);
- 		if (!scratch_va)
-@@ -2608,6 +2617,12 @@ static int setup_vmgexit_scratch(struct vcpu_svm *svm, bool sync, u64 len)
- 	svm->sev_es.ghcb_sa_len = len;
-
- 	return 0;
-+
-+e_scratch:
-+	ghcb_set_sw_exit_info_1(ghcb, 2);
-+	ghcb_set_sw_exit_info_2(ghcb, GHCB_ERR_INVALID_SCRATCH_AREA);
-+
-+	return 1;
- }
-
- static void set_ghcb_msr_bits(struct vcpu_svm *svm, u64 value, u64 mask,
-@@ -2658,7 +2673,7 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
-
- 		ret = svm_invoke_exit_handler(vcpu, SVM_EXIT_CPUID);
- 		if (!ret) {
--			ret = -EINVAL;
-+			/* Error, keep GHCB MSR value as-is */
- 			break;
- 		}
-
-@@ -2694,10 +2709,13 @@ static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
- 						GHCB_MSR_TERM_REASON_POS);
- 		pr_info("SEV-ES guest requested termination: %#llx:%#llx\n",
- 			reason_set, reason_code);
--		fallthrough;
-+
-+		ret = -EINVAL;
-+		break;
- 	}
- 	default:
--		ret = -EINVAL;
-+		/* Error, keep GHCB MSR value as-is */
-+		break;
- 	}
-
- 	trace_kvm_vmgexit_msr_protocol_exit(svm->vcpu.vcpu_id,
-@@ -2721,14 +2739,18 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
-
- 	if (!ghcb_gpa) {
- 		vcpu_unimpl(vcpu, "vmgexit: GHCB gpa is not set\n");
--		return -EINVAL;
-+
-+		/* Without a GHCB, just return right back to the guest */
-+		return 1;
- 	}
-
- 	if (kvm_vcpu_map(vcpu, ghcb_gpa >> PAGE_SHIFT, &svm->sev_es.ghcb_map)) {
- 		/* Unable to map GHCB from guest */
- 		vcpu_unimpl(vcpu, "vmgexit: error mapping GHCB [%#llx] from guest\n",
- 			    ghcb_gpa);
--		return -EINVAL;
-+
-+		/* Without a GHCB, just return right back to the guest */
-+		return 1;
- 	}
-
- 	svm->sev_es.ghcb = svm->sev_es.ghcb_map.hva;
-@@ -2788,11 +2810,8 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
- 		default:
- 			pr_err("svm: vmgexit: unsupported AP jump table request - exit_info_1=%#llx\n",
- 			       control->exit_info_1);
--			ghcb_set_sw_exit_info_1(ghcb, 1);
--			ghcb_set_sw_exit_info_2(ghcb,
--						X86_TRAP_UD |
--						SVM_EVTINJ_TYPE_EXEPT |
--						SVM_EVTINJ_VALID);
-+			ghcb_set_sw_exit_info_1(ghcb, 2);
-+			ghcb_set_sw_exit_info_2(ghcb, GHCB_ERR_INVALID_INPUT);
- 		}
-
- 		ret = 1;
-
-base-commit: 70f433c2193fbfb5541ef98f973e087ddf2f9dfb
---
+-- 
+2.31.1
 
