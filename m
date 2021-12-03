@@ -2,105 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A9C13467C03
-	for <lists+kvm@lfdr.de>; Fri,  3 Dec 2021 17:59:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C200467C70
+	for <lists+kvm@lfdr.de>; Fri,  3 Dec 2021 18:23:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1382462AbhLCRCL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Dec 2021 12:02:11 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:3496 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1382251AbhLCRB4 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 3 Dec 2021 12:01:56 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B3GlUrY007617;
-        Fri, 3 Dec 2021 16:58:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=sN7ig15cTuudwMhjSIMPGl7CzWlQaYl4qV5UPqKOS2s=;
- b=IpV/KYlNHd6yaZ21NyYGwvxtlkYnA3dJZGLtzVXj8N89/PCCQd/9uiU1QExLOKGvU65I
- 3aqtMJPLSHY0VcjsAzXnED/EhAVOsobemvzldtvFOsZhjF34cgyndsI4KTjEpPgzW0Rz
- e3rBTl4Qo/Swy5I7JrsIQh4Iu3e8M4BjEHbUk6pXuCPNSkVmGtvi02ZTaPIV6EV9OCzD
- bzUNaJvSsmGsvWDfZh2jIQULaX4wFL4P+JIJuqJ3kGCtQKsneJPtoERIFG2nYYDEFW1p
- YcQx8nhuWHbdFqVGrtEtnDLKISdrD88QkLZg2bZcXgd789YSEPpIyG+SQqBzX25zrpA1 3g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cqq2qr5ty-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Dec 2021 16:58:31 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1B3Gn9Bj014194;
-        Fri, 3 Dec 2021 16:58:31 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cqq2qr5tk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Dec 2021 16:58:30 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1B3Gv4B8014034;
-        Fri, 3 Dec 2021 16:58:28 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma04ams.nl.ibm.com with ESMTP id 3ckcadfrx7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Dec 2021 16:58:28 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1B3GwPVH30867828
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 3 Dec 2021 16:58:25 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7AD645204E;
-        Fri,  3 Dec 2021 16:58:25 +0000 (GMT)
-Received: from p-imbrenda.bredband2.com (unknown [9.145.14.21])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id E288F52057;
-        Fri,  3 Dec 2021 16:58:24 +0000 (GMT)
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     cohuck@redhat.com, borntraeger@de.ibm.com, frankja@linux.ibm.com,
-        thuth@redhat.com, pasic@linux.ibm.com, david@redhat.com,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v6 17/17] KVM: s390: pv: avoid export before import if possible
-Date:   Fri,  3 Dec 2021 17:58:14 +0100
-Message-Id: <20211203165814.73016-18-imbrenda@linux.ibm.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20211203165814.73016-1-imbrenda@linux.ibm.com>
-References: <20211203165814.73016-1-imbrenda@linux.ibm.com>
+        id S1343613AbhLCR0m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Dec 2021 12:26:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37356 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239848AbhLCR0l (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Dec 2021 12:26:41 -0500
+Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD59EC061751
+        for <kvm@vger.kernel.org>; Fri,  3 Dec 2021 09:23:16 -0800 (PST)
+Received: by mail-lj1-x231.google.com with SMTP id i63so7548852lji.3
+        for <kvm@vger.kernel.org>; Fri, 03 Dec 2021 09:23:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=l02lQoSCGh1EaiSwo0T+yN3gGp3mV+NBh6pkyuKV7us=;
+        b=RWJjsUletK79oB7F9TyROvFcLim5V437zugs8L7zA2Yibvc2UHiyuLFOHLgqvGnbMq
+         RrFvUx2/rYpbQ8co1mkuND/k/FOEmdf7baQm4xN5dKpNVPX4+PRP2wtqFpsxt6OYI9ou
+         G00Qd93ZkjcdaJy2aVzR73FLR+XjrO9CRPEN+irdqXTTbGPhYRczyHDMImX42/RTH5TJ
+         NzB1vXFNuDc+oRhBdIfXiKvKeTA8zhVK5+YTQIbFFOtRggFafCrEb+BhYyc6Inq9XqdE
+         Fbz2P0XuAT+afrBvUbWhbDf2cwgg+mhq7OFSltrtQnKe9L+SC+0XSC1XFysu9IN4270C
+         bFRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=l02lQoSCGh1EaiSwo0T+yN3gGp3mV+NBh6pkyuKV7us=;
+        b=5LCLbn+tv1lIYNEGtWdZp6VUcQXEwtdq4f2hWL1954yLW7wAf3PVDSj2RDZDzjwRJn
+         WrIKYZq3vWSXatUiboN4y5tKTBb5M7FF4oSM1JX4Mjp9E/f1dQyhd4JDkHtuHOEce2qu
+         MKsUIFL0jnuKGAFLX+/qz5l9HnSDRW5O78ylFwevag2TPrIqPwXh+X6L9KNFFLTIILsR
+         ccBNQ+CAq1gId1itwxYBoqgElfVDK0qcitpcSQ01XTOUByqI0DPdYJXfQKHH05hf0TYD
+         f7x5+wzYOLCyI9aFyE13ZS4fCYOhPmJ80McmBKLc5RfAL1pQyArGaZ03dFL97BkCWIWV
+         yjpw==
+X-Gm-Message-State: AOAM533V+Aay27505OwyBvyruP+oqVXtRb2hiHiwSmwPfn5Bwk14dG+V
+        7b7FLYm0VlkpsTPCrVYN86EIl9oEtDeF+xE1NLCTrg==
+X-Google-Smtp-Source: ABdhPJwYc/b0WK/dxEdLEZl/zZ12xKBnlf8kxnrnkoKWCZNjoRXJw949tfzJyk88K4QQjMp8nQ3wRW+VhzftQ3M1gns=
+X-Received: by 2002:a2e:7a06:: with SMTP id v6mr19397058ljc.198.1638552194789;
+ Fri, 03 Dec 2021 09:23:14 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Yvkz6aRIeorxeMs7fqmIuV6wLBZHuPxP
-X-Proofpoint-ORIG-GUID: 1kyTWO5bzS4nyGnGD7R4QWG6GsgkS1ei
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2021-12-03_07,2021-12-02_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- suspectscore=0 priorityscore=1501 malwarescore=0 mlxlogscore=999
- spamscore=0 mlxscore=0 clxscore=1015 lowpriorityscore=0 adultscore=0
- phishscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2112030105
+References: <CALzav=cXgCSP3RLh+gss65==B6eYXC82V3zNjv2KCNehUMQewA@mail.gmail.com>
+ <YabJSdRklj3T6FWJ@google.com> <CALzav=cJpWPF1RzsEZcoN+ZX8kM3OquKQR-8rdTksZ6cs1R+EQ@mail.gmail.com>
+ <YabeFZxWqPAuoEtZ@xz-m1.local> <Yae+8Oshu9sVrrvd@google.com>
+ <CALzav=c9F+f=UqBjQD9sotNC72j2Gq1Fa=cdLoz2xOjRd5hypg@mail.gmail.com>
+ <YagHRESjukJoS7NQ@google.com> <CALzav=dDEhU3uN9CofYQqCukT3QJUm+pjRz2WTr-Ss9TNVBgLg@mail.gmail.com>
+ <YakTrkA6xzD5dzyN@google.com> <CALzav=et40yLPOWsbx7iGjW3c8CR-88xRQ46rGU=1XDVEjVwWA@mail.gmail.com>
+ <Yalt19BcT6pcnRX8@google.com>
+In-Reply-To: <Yalt19BcT6pcnRX8@google.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Fri, 3 Dec 2021 09:22:48 -0800
+Message-ID: <CALzav=dS=Hvv8KR5VWt+sKGvMkDRJnoMaFghXMc_jPKBgVxAPw@mail.gmail.com>
+Subject: Re: [RFC PATCH 12/15] KVM: x86/mmu: Split large pages when dirty
+ logging is enabled
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+        kvm@vger.kernel.org, Ben Gardon <bgardon@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>,
+        Junaid Shahid <junaids@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Harish Barathvajasankar <hbarath@google.com>,
+        Peter Shier <pshier@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If the appropriate UV feature bit is set, there is no need to perform
-an export before import.
+On Thu, Dec 2, 2021 at 5:07 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Thu, Dec 02, 2021, David Matlack wrote:
+> > Is there really no risk of long tail latency in kmem_cache_alloc() or
+> > __get_free_page()? Even if it's rare, they will be common at scale.
+>
+> If there is a potentially long latency in __get_free_page(), then we're hosed no
+> matter what because per alloc_pages(), it's allowed in any context, including NMI,
+> IRQ, and Soft-IRQ.  I've no idea how often those contexts allocate, but I assume
+> it's not _that_ rare given the amount of stuff that networking does in Soft-IRQ
+> context, e.g. see the stack trace from commit 2620fe268e80, the use of PF_MEMALLOC,
+> the use of GFP_ATOMIC in napi_alloc_skb, etc...  Anb it's not just direct
+> allocations, e.g. anything that uses a radix tree or XArray will potentially
+> trigger allocation on insertion.
+>
+> But I would be very, very surprised if alloc_pages() without GFP_DIRECT_RECLAIM
+> has a long tail latency, otherwise allocating from any atomic context would be
+> doomed.
 
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
----
- arch/s390/kernel/uv.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+In that case I agree your approach should not introduce any more MMU
+lock contention than the split_caches approach in practice, and will
+require a lot less new code. I'll attempt to do some testing to
+confirm, but assuming that goes fine I'll go with your approach in v1.
 
-diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
-index ec01c3f8b13c..a29c7b3085b1 100644
---- a/arch/s390/kernel/uv.c
-+++ b/arch/s390/kernel/uv.c
-@@ -236,7 +236,8 @@ static int make_secure_pte(pte_t *ptep, unsigned long addr,
- 
- static bool should_export_before_import(struct uv_cb_header *uvcb, struct mm_struct *mm)
- {
--	return uvcb->cmd != UVC_CMD_UNPIN_PAGE_SHARED &&
-+	return !test_bit_inv(BIT_UV_FEAT_MISC, &uv_info.uv_feature_indications) &&
-+		uvcb->cmd != UVC_CMD_UNPIN_PAGE_SHARED &&
- 		atomic_read(&mm->context.protected_count) > 1;
- }
- 
--- 
-2.31.1
-
+Thanks!
