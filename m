@@ -2,236 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D1984676B1
-	for <lists+kvm@lfdr.de>; Fri,  3 Dec 2021 12:46:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BDA44467765
+	for <lists+kvm@lfdr.de>; Fri,  3 Dec 2021 13:27:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1380543AbhLCLt5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Dec 2021 06:49:57 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:28602 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234517AbhLCLty (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 3 Dec 2021 06:49:54 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B3BGTpM029109;
-        Fri, 3 Dec 2021 11:46:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=7nEPitOQgvr+4RmmwmtposdjRghdpHuA5VE2oEPOO4A=;
- b=SuHXHhoJqB+BrFMeNMRLQo7UIM8QUL8hk+BVt+i7d4J3KWa2tPUNvF0ZpTXRN0cnTwYN
- rlAU18pnsB77RNxK52oRQQkDaeTs2xpX6MHN6SasncclNvUNxYX4fipNEHFUyQvp3usU
- 7JfTh1Wg4aFeqQiHH0gEH5+3VVQApuZEdSn8OCLCLaxaYbiAAAQhPaF3+OZmmBIMRBC8
- Kx14IxyHgal7KTtcZ/pLfw3wZlaRk37YrndBntAcVU9dX/fvt1dk0JC7jUV1Ry7rPB+n
- bcJfY+dNzoJlIEtMRc86935pPAvIvGBZHEEaUQ+MPrpoHJkyWnXBFPeTf3ra7p9aF9cJ eA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cqj7j8emu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Dec 2021 11:46:31 +0000
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1B3BHTBk005211;
-        Fri, 3 Dec 2021 11:46:30 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cqj7j8em8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Dec 2021 11:46:30 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1B3Bdi91017632;
-        Fri, 3 Dec 2021 11:46:27 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma05fra.de.ibm.com with ESMTP id 3ckcaaaks9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Dec 2021 11:46:27 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1B3BkOrk26214692
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 3 Dec 2021 11:46:24 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 30A4811C05B;
-        Fri,  3 Dec 2021 11:46:24 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C78D011C04C;
-        Fri,  3 Dec 2021 11:46:23 +0000 (GMT)
-Received: from [9.171.91.109] (unknown [9.171.91.109])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri,  3 Dec 2021 11:46:23 +0000 (GMT)
-Message-ID: <81dce30b-5432-05ab-f2a5-1d995ff51d81@linux.vnet.ibm.com>
-Date:   Fri, 3 Dec 2021 12:46:23 +0100
+        id S236479AbhLCMbN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Dec 2021 07:31:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53306 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235590AbhLCMbM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Dec 2021 07:31:12 -0500
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6A84C06173E
+        for <kvm@vger.kernel.org>; Fri,  3 Dec 2021 04:27:48 -0800 (PST)
+Received: by mail-pf1-x42d.google.com with SMTP id 8so2777387pfo.4
+        for <kvm@vger.kernel.org>; Fri, 03 Dec 2021 04:27:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=EA1du2e/ZPRzAt8K2DwIBgKjt5fsYwCbvSbLazp7FLA=;
+        b=LnM14K0IH4hYWcx02Er5ag2+HMiyqlgR3Q0bBB0hoE/Yc+j2TzxgPYYBQHoDDQVheC
+         2a1bjHXoHd+TLSDN5O7+t0DRX69uBDy1EpyIyLNnxRNBGd2czsiIHVDxr5tuI7xBzqYB
+         /zTgw0PRoCeM4qOjNA7MACeNFmJfs7LtjmdeeHv7B+nhBnrKOEMjQtDmTh2gWHD+pkAG
+         NCQfOnkp188m9zVsO6H4hFy6PPLm3lptrOhWxNYp//2esTtA4RfdwB6rAbNuhzZmdTJb
+         jKTb7az+bf+exKCMGMRr61twCq1sgAWX500Y21LfOvfxR4xiz15JmzzH0kxo7NXy8oup
+         Yj5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=EA1du2e/ZPRzAt8K2DwIBgKjt5fsYwCbvSbLazp7FLA=;
+        b=Xi/e/4gSi9NDIJQU9PPjhgi7ThSqt+fVCidgPLnkNyUYjKMuY2d5Mh9UwhqK97OUoW
+         WMvSrt8nzzY6+K1icLM1ysAjNhYsOrmaswuOUOE116BCo+tHKmoTFAPzLMCL/25FxN0o
+         wucjXADV3ka5G+f+ohx0FqSFTuT2he8FNm7Lb3AxwgxKvfwqfNnUSkJ5T8qqt9NHb5C9
+         /7Tkrhb0C22m1gh4VRRNzXIb237McznoBIdDWbDDH0m8EWceF13G5ckIStRWpLBTOrPT
+         KNi7bXYUaLtTerMXgQnEABUHTlW1eDKk0KrQ8YxuYt8G7RCPfgc7VEg+KMOKlyw4wdAc
+         iVPg==
+X-Gm-Message-State: AOAM532shvenc2NJiZSG/lqaMbbNZQ55Owf+bf+ACJ4/j3Yi9PXFpxvg
+        vxV+PuQnFLL7dRcmuSh6TLUREQ==
+X-Google-Smtp-Source: ABdhPJyrxTUXmZtazjCg/eZ+NyB0KowH4QAVCWqZOWtphbHo3fiDsky8cC6Lf9QHm8d5ncPuLQ4aIg==
+X-Received: by 2002:a63:6687:: with SMTP id a129mr4131270pgc.477.1638534468248;
+        Fri, 03 Dec 2021 04:27:48 -0800 (PST)
+Received: from [10.152.0.6] ([94.177.118.64])
+        by smtp.gmail.com with ESMTPSA id mp12sm5226964pjb.39.2021.12.03.04.27.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 03 Dec 2021 04:27:47 -0800 (PST)
+Subject: Re: [RFC v16 0/9] SMMUv3 Nested Stage Setup (IOMMU part)
+To:     Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
+        iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, joro@8bytes.org,
+        will@kernel.org, robin.murphy@arm.com, jean-philippe@linaro.org,
+        zhukeqian1@huawei.com
+Cc:     alex.williamson@redhat.com, jacob.jun.pan@linux.intel.com,
+        yi.l.liu@intel.com, kevin.tian@intel.com, ashok.raj@intel.com,
+        maz@kernel.org, peter.maydell@linaro.org, vivek.gautam@arm.com,
+        shameerali.kolothum.thodi@huawei.com, wangxingang5@huawei.com,
+        jiangkunkun@huawei.com, yuzenghui@huawei.com,
+        nicoleotsuka@gmail.com, chenxiang66@hisilicon.com,
+        sumitg@nvidia.com, nicolinc@nvidia.com, vdumpa@nvidia.com,
+        zhangfei.gao@gmail.com, lushenming@huawei.com, vsethi@nvidia.com
+References: <20211027104428.1059740-1-eric.auger@redhat.com>
+From:   Zhangfei Gao <zhangfei.gao@linaro.org>
+Message-ID: <ee119b42-92b1-5744-4321-6356bafb498f@linaro.org>
+Date:   Fri, 3 Dec 2021 20:27:39 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [kvm-unit-tests PATCH] s390x: Add strict mode to specification
- exception interpretation test
-Content-Language: en-US
-To:     Thomas Huth <thuth@redhat.com>,
-        Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-References: <82750b44-6246-3f3c-4562-3d64d7378448@redhat.com>
- <20211125144726.1414645-1-scgl@linux.ibm.com>
- <6e8f0354-bf35-3e59-c99d-046ee1979d1f@redhat.com>
-From:   Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>
-In-Reply-To: <6e8f0354-bf35-3e59-c99d-046ee1979d1f@redhat.com>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20211027104428.1059740-1-eric.auger@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: bqnHSYoOJ1QLe6ujDlskY9cib91EVbJo
-X-Proofpoint-GUID: xNV2JNdD2N7mUXGSRVx5d1l5VctocJrO
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2021-12-03_06,2021-12-02_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
- priorityscore=1501 lowpriorityscore=0 malwarescore=0 clxscore=1015
- phishscore=0 mlxlogscore=999 bulkscore=0 suspectscore=0 spamscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2112030072
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/3/21 12:15, Thomas Huth wrote:
-> On 25/11/2021 15.47, Janis Schoetterl-Glausch wrote:
->> While specification exception interpretation is not required to occur,
->> it can be useful for automatic regression testing to fail the test if it
->> does not occur.
->> Add a `--strict` argument to enable this.
-> 
-> Thank you very much for adding this!
 
-Sure :)
-> 
-> Some comments below...
-> 
->> `--strict` takes a list of machine types (as reported by STIDP)
->> for which to enable strict mode, for example
->> `--strict 8562,8561,3907,3906,2965,2964`
->> will enable it for models z15 - z13.
->> Alternatively, strict mode can be enabled for all but the listed machine
->> types by prefixing the list with a `!`, for example
->> `--strict !1090,1091,2064,2066,2084,2086,2094,2096,2097,2098,2817,2818,2827,2828`
->> will enable it for z/Architecture models except those older than z13.
->>
->> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
->> ---
->>
->> Apparently my message with inline patch did not make it to the mailing
->> list for some reason, so here's the patch again.
->>
->>   s390x/spec_ex-sie.c | 59 ++++++++++++++++++++++++++++++++++++++++-----
->>   1 file changed, 53 insertions(+), 6 deletions(-)
->>
->> diff --git a/s390x/spec_ex-sie.c b/s390x/spec_ex-sie.c
->> index 5dea411..9a063f9 100644
->> --- a/s390x/spec_ex-sie.c
->> +++ b/s390x/spec_ex-sie.c
->> @@ -7,6 +7,7 @@
->>    * specification exception interpretation is off/on.
->>    */
->>   #include <libcflat.h>
->> +#include <stdlib.h>
->>   #include <sclp.h>
->>   #include <asm/page.h>
->>   #include <asm/arch_def.h>
->> @@ -36,7 +37,7 @@ static void reset_guest(void)
->>       vm.sblk->icptcode = 0;
->>   }
->>   -static void test_spec_ex_sie(void)
->> +static void test_spec_ex_sie(bool strict)
->>   {
->>       setup_guest();
->>   @@ -61,14 +62,60 @@ static void test_spec_ex_sie(void)
->>       report(vm.sblk->icptcode == ICPT_PROGI
->>              && vm.sblk->iprcc == PGM_INT_CODE_SPECIFICATION,
->>              "Received specification exception intercept");
->> -    if (vm.sblk->gpsw.addr == 0xdeadbeee)
->> -        report_info("Interpreted initial exception, intercepted invalid program new PSW exception");
->> -    else
->> -        report_info("Did not interpret initial exception");
->> +    {
->> +        const char *msg;
-> 
-> Could you please move the variable declaration to the beginning of the function? Then you could get rid of the curly brackets and one level of indentation.
+Hi, Eric
 
-Yes.
-> 
->> +        msg = "Interpreted initial exception, intercepted invalid program new PSW exception";
->> +        if (strict)
->> +            report(vm.sblk->gpsw.addr == 0xdeadbeee, msg);
->> +        else if (vm.sblk->gpsw.addr == 0xdeadbeee)
->> +            report_info(msg);
->> +        else
->> +            report_info("Did not interpret initial exception");
->> +    }
->>       report_prefix_pop();
->>       report_prefix_pop();
->>   }
->>   +static bool parse_strict(char **argv)
->> +{
->> +    uint16_t machine_id;
->> +    char *list;
->> +    bool ret;
->> +
->> +    if (!*argv)
->> +        return false;
-> 
-> I think this works ok with out current implementation of argv, but that's an "inofficial" implementation detail, so in case this ever gets changed, it might be better to check argc first before dereferencing argv here ... so could you please add a check for argc, too?
+On 2021/10/27 下午6:44, Eric Auger wrote:
+> This series brings the IOMMU part of HW nested paging support
+> in the SMMUv3.
+>
+> The SMMUv3 driver is adapted to support 2 nested stages.
+>
+> The IOMMU API is extended to convey the guest stage 1
+> configuration and the hook is implemented in the SMMUv3 driver.
+>
+> This allows the guest to own the stage 1 tables and context
+> descriptors (so-called PASID table) while the host owns the
+> stage 2 tables and main configuration structures (STE).
+>
+> This work mainly is provided for test purpose as the upper
+> layer integration is under rework and bound to be based on
+> /dev/iommu instead of VFIO tunneling. In this version we also get
+> rid of the MSI BINDING ioctl, assuming the guest enforces
+> flat mapping of host IOVAs used to bind physical MSI doorbells.
+> In the current QEMU integration this is achieved by exposing
+> RMRs to the guest, using Shameer's series [1]. This approach
+> is RFC as the IORT spec is not really meant to do that
+> (single mapping flag limitation).
+>
+> Best Regards
+>
+> Eric
+>
+> This series (Host) can be found at:
+> https://github.com/eauger/linux/tree/v5.15-rc7-nested-v16
+> This includes a rebased VFIO integration (although not meant
+> to be upstreamed)
+>
+> Guest kernel branch can be found at:
+> https://github.com/eauger/linux/tree/shameer_rmrr_v7
+> featuring [1]
+>
+> QEMU integration (still based on VFIO and exposing RMRs)
+> can be found at:
+> https://github.com/eauger/qemu/tree/v6.1.0-rmr-v2-nested_smmuv3_v10
+> (use iommu=nested-smmuv3 ARM virt option)
+>
+> Guest dependency:
+> [1] [PATCH v7 0/9] ACPI/IORT: Support for IORT RMR node
 
-This is required by POSIX, isn't it? But then whether or not we comply with it is another question.
-> 
->> +    if (strcmp("--strict", *argv))
->> +        return false;
->> +
->> +    machine_id = get_machine_id();
->> +    list = argv[1];
+Thanks a lot for upgrading these patches.
 
-This needs to be covered by the argc check too, then.
+I have basically verified these patches on HiSilicon Kunpeng920.
+And integrated them to these branches.
+https://github.com/Linaro/linux-kernel-uadk/tree/uacce-devel-5.16
+https://github.com/Linaro/qemu/tree/v6.1.0-rmr-v2-nested_smmuv3_v10
 
->> +    if (!list) {
->> +        printf("No argument to --strict, ignoring\n");
->> +        return false;
-> 
-> You could also support --strict without arguments - that could turn on the strict mode unconditionally, I think.
+Though they are provided for test purpose,
 
---strict ! works. Granted it's not the best UI, but it is more consistent,
-you could do --strict $(get list of ids from somewhere) and if the list is empty the semantics stay the same. 
-> 
->> +    }
->> +    if (list[0] == '!') {
->> +        ret = true;
->> +        list++;
->> +    } else
->> +        ret = false;
->> +    while (true) {
->> +        long input = 0;
->> +
->> +        if (strlen(list) == 0)
->> +            return ret;
->> +        input = strtol(list, &list, 16);
->> +        if (*list == ',')
->> +            list++;
->> +        else if (*list != '\0')
->> +            break;
->> +        if (input == machine_id)
->> +            return !ret;
->> +    }
->> +    printf("Invalid --strict argument \"%s\", ignoring\n", list);
->> +    return ret;
->> +}
->> +
->>   int main(int argc, char **argv)
->>   {
->>       if (!sclp_facilities.has_sief2) {
->> @@ -76,7 +123,7 @@ int main(int argc, char **argv)
->>           goto out;
->>       }
->>   -    test_spec_ex_sie();
->> +    test_spec_ex_sie(parse_strict(argv + 1));
->>   out:
->>       return report_summary();
->>   }
->>
-> 
->  Thomas
-> 
+Tested-by: Zhangfei Gao <zhangfei.gao@linaro.org>
 
+Thanks
