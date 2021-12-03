@@ -2,160 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B8991466FAB
-	for <lists+kvm@lfdr.de>; Fri,  3 Dec 2021 03:18:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EA173467073
+	for <lists+kvm@lfdr.de>; Fri,  3 Dec 2021 04:03:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378055AbhLCCVf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Dec 2021 21:21:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56434 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244477AbhLCCVe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Dec 2021 21:21:34 -0500
-Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6C6CC06174A;
-        Thu,  2 Dec 2021 18:18:10 -0800 (PST)
-Received: by mail-oi1-x233.google.com with SMTP id n66so2929613oia.9;
-        Thu, 02 Dec 2021 18:18:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ID68FmgYdJ08/2DpLeu3xV7W5csGpDe7raph8daXNiE=;
-        b=O+hkwaxiNwrVXImb3meYbf/Te3Ad3ClwDv8bCxeXzYNuyzlZ00bwQoXxZLg/AyKhFS
-         1+IUWTZm8jR1cyxShU8Nd3TYGxDbKoBkqK1zJaWib/JLhjBgVN+/P5YRMa2p9LSmQ87Y
-         43fAHmvaoIUOQP6ivE4g2Vu0V6jtP8DfYwxO6IKPLSNsqC9L4RsGKWVJU4mCnL1Ho5i3
-         73E1fwJI94xt9aVyEW07QNhFdyV144s2JVR/u4MDgCQ7ZSoflBIwUZMdE8eKktRGKk+R
-         vwi564IffPKHiQg7Y1A1YbCcl9I8+mWgp4VQ1hDIgkpZMut726hFhYQHj2yCeQO4U+d6
-         y5hA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ID68FmgYdJ08/2DpLeu3xV7W5csGpDe7raph8daXNiE=;
-        b=H7VcNxuLKu6GL++vqczMJzOefbUDjN39lV5vVlEtUGaFocwOX8qTCx+/zQ+Uvf6pPf
-         hzN2qjeuwIOBCJVfzxUm8UeVz/J3wgCN2U1MDoR3U3Bxe5tXYQ03P8UwhPb54HXOtnql
-         vymTNxVGEkK36zL79QC9JvZJARSItxLdji04Np2RCHWbu4rtC5K62y+Uto2WpvYfqomf
-         zoGUcfPbFv6wJycYNd2YpnUBpahY8C7kjq0Gr3/Uws//aDAQV35AY5f/z1FzAHqcI0r9
-         WqZP/46oDe2Ioc9S3OAB6XQq3p1dj2szae5sHF+A3xdWDNDOvQA46Yg3PqAHH61TchCC
-         aMpA==
-X-Gm-Message-State: AOAM533YwO8cds5O2qahJvMK6ROAUmuX+9pbkGhk/R9sDNhzDvb7K63d
-        o9YBZ2H4HAKFedTDdxH07FoaM3OKTjWMus9seik=
-X-Google-Smtp-Source: ABdhPJzu9pqRgJ91mqDl0i7dnrkE9ql0LMNO0UQNBe+FHfN2MO85arM5tMuCpB4zY4i3O0UWT7ba3c+TUg+DDTCEYFs=
-X-Received: by 2002:a05:6808:1919:: with SMTP id bf25mr7691558oib.33.1638497890165;
- Thu, 02 Dec 2021 18:18:10 -0800 (PST)
+        id S1378353AbhLCDHC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Dec 2021 22:07:02 -0500
+Received: from szxga01-in.huawei.com ([45.249.212.187]:15690 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239667AbhLCDHB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Dec 2021 22:07:01 -0500
+Received: from dggpemm500021.china.huawei.com (unknown [172.30.72.56])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4J4yJ42NjvzZdNW;
+        Fri,  3 Dec 2021 11:00:52 +0800 (CST)
+Received: from dggpemm100005.china.huawei.com (7.185.36.231) by
+ dggpemm500021.china.huawei.com (7.185.36.109) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Fri, 3 Dec 2021 11:03:36 +0800
+Received: from dggpeml100016.china.huawei.com (7.185.36.216) by
+ dggpemm100005.china.huawei.com (7.185.36.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Fri, 3 Dec 2021 11:03:35 +0800
+Received: from dggpeml100016.china.huawei.com ([7.185.36.216]) by
+ dggpeml100016.china.huawei.com ([7.185.36.216]) with mapi id 15.01.2308.020;
+ Fri, 3 Dec 2021 11:03:35 +0800
+From:   "Longpeng (Mike, Cloud Infrastructure Service Product Dept.)" 
+        <longpeng2@huawei.com>
+To:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>
+CC:     "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Gonglei (Arei)" <arei.gonglei@huawei.com>
+Subject: RE: [PATCH] kvm/eventfd: fix the misleading comment in
+ kvm_irqfd_assign
+Thread-Topic: [PATCH] kvm/eventfd: fix the misleading comment in
+ kvm_irqfd_assign
+Thread-Index: AQHX5NNH1Leb7fxkY0SkUYfU1jQEjawaOSSAgAXTy/A=
+Date:   Fri, 3 Dec 2021 03:03:35 +0000
+Message-ID: <5c5f0f0982df4fc6a858f8e095c4eaa5@huawei.com>
+References: <20211129034328.1604-1-longpeng2@huawei.com>
+ <c6b7c933-2d48-1504-7c45-110b0ab317ad@linux.ibm.com>
+In-Reply-To: <c6b7c933-2d48-1504-7c45-110b0ab317ad@linux.ibm.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.174.148.223]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20211130123746.293379-1-pbonzini@redhat.com>
-In-Reply-To: <20211130123746.293379-1-pbonzini@redhat.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Fri, 3 Dec 2021 10:17:59 +0800
-Message-ID: <CANRm+Cz8aKsoLpiuiL0qkgQ7HW9Ao2zS=WAUoYpM=CX5yh_8OA@mail.gmail.com>
-Subject: Re: [PATCH] KVM: ensure APICv is considered inactive if there is no APIC
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, kvm <kvm@vger.kernel.org>,
-        Ignat Korchagin <ignat@cloudflare.com>
-Content-Type: text/plain; charset="UTF-8"
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 1 Dec 2021 at 12:14, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> kvm_vcpu_apicv_active() returns false if a virtual machine has no in-kernel
-> local APIC, however kvm_apicv_activated might still be true if there are
-> no reasons to disable APICv; in fact it is quite likely that there is none
-> because APICv is inhibited by specific configurations of the local APIC
-> and those configurations cannot be programmed.  This triggers a WARN:
->
->    WARN_ON_ONCE(kvm_apicv_activated(vcpu->kvm) != kvm_vcpu_apicv_active(vcpu));
->
-> To avoid this, introduce another cause for APICv inhibition, namely the
-> absence of an in-kernel local APIC.  This cause is enabled by default,
-> and is dropped by either KVM_CREATE_IRQCHIP or the enabling of
-> KVM_CAP_IRQCHIP_SPLIT.
->
-> Reported-by: Ignat Korchagin <ignat@cloudflare.com>
-> Fixes: ee49a8932971 ("KVM: x86: Move SVM's APICv sanity check to common x86", 2021-10-22)
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-Reviewed-by: Wanpeng Li <wanpengli@tencent.com>
-
-> ---
->  arch/x86/include/asm/kvm_host.h | 1 +
->  arch/x86/kvm/svm/avic.c         | 1 +
->  arch/x86/kvm/vmx/vmx.c          | 1 +
->  arch/x86/kvm/x86.c              | 9 +++++----
->  4 files changed, 8 insertions(+), 4 deletions(-)
->
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 6ac61f85e07b..860ed500580c 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1036,6 +1036,7 @@ struct kvm_x86_msr_filter {
->  #define APICV_INHIBIT_REASON_PIT_REINJ  4
->  #define APICV_INHIBIT_REASON_X2APIC    5
->  #define APICV_INHIBIT_REASON_BLOCKIRQ  6
-> +#define APICV_INHIBIT_REASON_ABSENT    7
->
->  struct kvm_arch {
->         unsigned long n_used_mmu_pages;
-> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> index affc0ea98d30..5a55a78e2f50 100644
-> --- a/arch/x86/kvm/svm/avic.c
-> +++ b/arch/x86/kvm/svm/avic.c
-> @@ -900,6 +900,7 @@ int svm_update_pi_irte(struct kvm *kvm, unsigned int host_irq,
->  bool svm_check_apicv_inhibit_reasons(ulong bit)
->  {
->         ulong supported = BIT(APICV_INHIBIT_REASON_DISABLE) |
-> +                         BIT(APICV_INHIBIT_REASON_ABSENT) |
->                           BIT(APICV_INHIBIT_REASON_HYPERV) |
->                           BIT(APICV_INHIBIT_REASON_NESTED) |
->                           BIT(APICV_INHIBIT_REASON_IRQWIN) |
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 1fadec8cbf96..ca1fd93c1dc9 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -7525,6 +7525,7 @@ static void hardware_unsetup(void)
->  static bool vmx_check_apicv_inhibit_reasons(ulong bit)
->  {
->         ulong supported = BIT(APICV_INHIBIT_REASON_DISABLE) |
-> +                         BIT(APICV_INHIBIT_REASON_ABSENT) |
->                           BIT(APICV_INHIBIT_REASON_HYPERV) |
->                           BIT(APICV_INHIBIT_REASON_BLOCKIRQ);
->
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 0ee1a039b490..e0aa4dd53c7f 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -5740,6 +5740,7 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
->                 smp_wmb();
->                 kvm->arch.irqchip_mode = KVM_IRQCHIP_SPLIT;
->                 kvm->arch.nr_reserved_ioapic_pins = cap->args[0];
-> +               kvm_request_apicv_update(kvm, true, APICV_INHIBIT_REASON_ABSENT);
->                 r = 0;
->  split_irqchip_unlock:
->                 mutex_unlock(&kvm->lock);
-> @@ -6120,6 +6121,7 @@ long kvm_arch_vm_ioctl(struct file *filp,
->                 /* Write kvm->irq_routing before enabling irqchip_in_kernel. */
->                 smp_wmb();
->                 kvm->arch.irqchip_mode = KVM_IRQCHIP_KERNEL;
-> +               kvm_request_apicv_update(kvm, true, APICV_INHIBIT_REASON_ABSENT);
->         create_irqchip_unlock:
->                 mutex_unlock(&kvm->lock);
->                 break;
-> @@ -8818,10 +8820,9 @@ static void kvm_apicv_init(struct kvm *kvm)
->  {
->         init_rwsem(&kvm->arch.apicv_update_lock);
->
-> -       if (enable_apicv)
-> -               clear_bit(APICV_INHIBIT_REASON_DISABLE,
-> -                         &kvm->arch.apicv_inhibit_reasons);
-> -       else
-> +       set_bit(APICV_INHIBIT_REASON_ABSENT,
-> +               &kvm->arch.apicv_inhibit_reasons);
-> +       if (!enable_apicv)
->                 set_bit(APICV_INHIBIT_REASON_DISABLE,
->                         &kvm->arch.apicv_inhibit_reasons);
->  }
-> --
-> 2.31.1
->
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogQ2hyaXN0aWFuIEJvcm50
+cmFlZ2VyIFttYWlsdG86Ym9ybnRyYWVnZXJAbGludXguaWJtLmNvbV0NCj4gU2VudDogVHVlc2Rh
+eSwgTm92ZW1iZXIgMzAsIDIwMjEgMToxNCBBTQ0KPiBUbzogTG9uZ3BlbmcgKE1pa2UsIENsb3Vk
+IEluZnJhc3RydWN0dXJlIFNlcnZpY2UgUHJvZHVjdCBEZXB0LikNCj4gPGxvbmdwZW5nMkBodWF3
+ZWkuY29tPjsgcGJvbnppbmlAcmVkaGF0LmNvbQ0KPiBDYzogY29ybmVsaWEuaHVja0BkZS5pYm0u
+Y29tOyBrdm1Admdlci5rZXJuZWwub3JnOw0KPiBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3Jn
+OyBHb25nbGVpIChBcmVpKSA8YXJlaS5nb25nbGVpQGh1YXdlaS5jb20+DQo+IFN1YmplY3Q6IFJl
+OiBbUEFUQ0hdIGt2bS9ldmVudGZkOiBmaXggdGhlIG1pc2xlYWRpbmcgY29tbWVudCBpbiBrdm1f
+aXJxZmRfYXNzaWduDQo+IA0KPiANCj4gDQo+IEFtIDI5LjExLjIxIHVtIDA0OjQzIHNjaHJpZWIg
+TG9uZ3BlbmcoTWlrZSk6DQo+ID4gRnJvbTogTG9uZ3BlbmcgPGxvbmdwZW5nMkBodWF3ZWkuY29t
+Pg0KPiA+DQo+ID4gVGhlIGNvbW1lbnQgYWJvdmUgdGhlIGludm9jYXRpb24gb2YgdmZzX3BvbGwo
+KSBpcyBtaXNsZWFkaW5nLCBtb3ZlDQo+ID4gaXQgdG8gdGhlIHJpZ2h0IHBsYWNlLg0KPiA+DQo+
+IEkgdGhpbmsgdGhhdCB0aGUgY3VycmVudCB2YXJpYW50IGlzIGJldHRlci4NCj4gZXZlbnRzIGlz
+IG9ubHkgdXNlZCBpbiB0aGF0IGZ1bmN0aW9uIHRvIGNoZWNrIGZvciBFUE9MTElOLCBzbyB0aGUN
+Cj4gYXNzaWdubWVudCBhbmQgdGhlIGlmIGJlbG9uZyB0b2dldGhlciBmcm9tIGEgIndoYXQgYW0g
+SSBkb2luZyBoZXJlIiBwZXJzcGVjdGl2ZS4NCj4gDQoNCkhpIENocmlzdGlhbiwNCg0KSSB0aGlu
+ayB0aGF0IGFkZCB0aGUgaXJxZmQtPndhaXQgdG8gdGhlIGZpbGUncyB3YWl0IHF1ZXVlIGlzIG11
+Y2ggbW9yZQ0KaW1wb3J0YW50LCB0aGUgY3VycmVudCB2YXJpYW50IG1heSBsZWFkIHRvIGlnbm9y
+aW5nIGl0Lg0KDQpCb3RoIG9mIHRoZXNlIHR3byB2YXJpYW50cyBhcmUgc3VwcG9ydGVkIGluIHRo
+ZSBjdXJyZW50IGtlcm5lbDoNCg0KWzFdIGh0dHBzOi8vZWxpeGlyLmJvb3RsaW4uY29tL2xpbnV4
+L2xhdGVzdC9zb3VyY2UvZHJpdmVycy92ZmlvL3ZpcnFmZC5jI0wxNjkNCmBgYA0KCWV2ZW50cyA9
+IHZmc19wb2xsKGlycWZkLmZpbGUsICZ2aXJxZmQtPnB0KTsNCg0KCS8qDQoJICogQ2hlY2sgaWYg
+dGhlcmUgd2FzIGFuIGV2ZW50IGFscmVhZHkgcGVuZGluZyBvbiB0aGUgZXZlbnRmZA0KCSAqIGJl
+Zm9yZSB3ZSByZWdpc3RlcmVkIGFuZCB0cmlnZ2VyIGl0IGFzIGlmIHdlIGRpZG4ndCBtaXNzIGl0
+Lg0KCSAqLw0KCWlmIChldmVudHMgJiBFUE9MTElOKSB7DQoJCWlmICgoIWhhbmRsZXIgfHwgaGFu
+ZGxlcihvcGFxdWUsIGRhdGEpKSAmJiB0aHJlYWQpDQoJCQlzY2hlZHVsZV93b3JrKCZ2aXJxZmQt
+PmluamVjdCk7DQoJfQ0KYGBgDQoNClsyXSBodHRwczovL2VsaXhpci5ib290bGluLmNvbS9saW51
+eC9sYXRlc3Qvc291cmNlL2RyaXZlcnMvdmlydC9hY3JuL2lycWZkLmMjTDE2MQ0KYGBgDQoJLyog
+Q2hlY2sgdGhlIHBlbmRpbmcgZXZlbnQgaW4gdGhpcyBzdGFnZSAqLw0KCWV2ZW50cyA9IHZmc19w
+b2xsKGYuZmlsZSwgJmlycWZkLT5wdCk7DQoNCglpZiAoZXZlbnRzICYgRVBPTExJTikNCgkJYWNy
+bl9pcnFmZF9pbmplY3QoaXJxZmQpOw0KYGBgDQoNClNpbmNlIHRoZXJlJ3Mgbm8gYW55IGNvZGUg
+Y2hhbmdlcywgSSBhZ3JlZSB0byBkcm9wIHRoaXMgdW5tZWFuaW5nIGNoYW5nZS4NCg0KVGhhbmtz
+Lg0KDQo+ID4gRml4ZXM6IDY4NGEwYjcxOWRkYiAoIktWTTogZXZlbnRmZDogRml4IGxvY2sgb3Jk
+ZXIgaW52ZXJzaW9uIikNCj4gPiBTaWduZWQtb2ZmLWJ5OiBMb25ncGVuZyA8bG9uZ3BlbmcyQGh1
+YXdlaS5jb20+DQo+ID4gLS0tDQo+ID4gICB2aXJ0L2t2bS9ldmVudGZkLmMgfCA0ICsrLS0NCj4g
+PiAgIDEgZmlsZSBjaGFuZ2VkLCAyIGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pDQo+ID4N
+Cj4gPiBkaWZmIC0tZ2l0IGEvdmlydC9rdm0vZXZlbnRmZC5jIGIvdmlydC9rdm0vZXZlbnRmZC5j
+DQo+ID4gaW5kZXggMmFkMDEzYi4uY2QwMTgxNCAxMDA2NDQNCj4gPiAtLS0gYS92aXJ0L2t2bS9l
+dmVudGZkLmMNCj4gPiArKysgYi92aXJ0L2t2bS9ldmVudGZkLmMNCj4gPiBAQCAtNDA2LDEyICs0
+MDYsMTIgQEAgYm9vbCBfX2F0dHJpYnV0ZV9fKCh3ZWFrKSkNCj4ga3ZtX2FyY2hfaXJxZmRfcm91
+dGVfY2hhbmdlZCgNCj4gPg0KPiA+ICAgCXNwaW5fdW5sb2NrX2lycSgma3ZtLT5pcnFmZHMubG9j
+ayk7DQo+ID4NCj4gPiArCWV2ZW50cyA9IHZmc19wb2xsKGYuZmlsZSwgJmlycWZkLT5wdCk7DQo+
+ID4gKw0KPiA+ICAgCS8qDQo+ID4gICAJICogQ2hlY2sgaWYgdGhlcmUgd2FzIGFuIGV2ZW50IGFs
+cmVhZHkgcGVuZGluZyBvbiB0aGUgZXZlbnRmZA0KPiA+ICAgCSAqIGJlZm9yZSB3ZSByZWdpc3Rl
+cmVkLCBhbmQgdHJpZ2dlciBpdCBhcyBpZiB3ZSBkaWRuJ3QgbWlzcyBpdC4NCj4gPiAgIAkgKi8N
+Cj4gPiAtCWV2ZW50cyA9IHZmc19wb2xsKGYuZmlsZSwgJmlycWZkLT5wdCk7DQo+ID4gLQ0KPiA+
+ICAgCWlmIChldmVudHMgJiBFUE9MTElOKQ0KPiA+ICAgCQlzY2hlZHVsZV93b3JrKCZpcnFmZC0+
+aW5qZWN0KTsNCj4gPg0K
