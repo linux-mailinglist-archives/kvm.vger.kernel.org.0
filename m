@@ -2,125 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C699467B18
-	for <lists+kvm@lfdr.de>; Fri,  3 Dec 2021 17:14:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A690467B80
+	for <lists+kvm@lfdr.de>; Fri,  3 Dec 2021 17:35:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235261AbhLCQSM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Dec 2021 11:18:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49484 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229643AbhLCQSL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Dec 2021 11:18:11 -0500
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E820EC061751
-        for <kvm@vger.kernel.org>; Fri,  3 Dec 2021 08:14:47 -0800 (PST)
-Received: by mail-pj1-x1032.google.com with SMTP id p18-20020a17090ad31200b001a78bb52876so5535933pju.3
-        for <kvm@vger.kernel.org>; Fri, 03 Dec 2021 08:14:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=mDEuCH3n+yniaEStC/bTIvAFijRLrGRV0ZCyXMk9t/M=;
-        b=oqUYSbutqJteauH4QzJUU1tERxwyPAPDs3EM1sc0ukykTNiWq39o1dov0dglm/5QqV
-         XvTnRgBdPVRgoGKaQMRYn0HK7ai7kM+8aWEPTo8HUUtJdLm/9D3J1VVTChAGdn4AHd98
-         VEmIkkCkynqxDfng4apt3z7nBS65wq8VEEzI3bh+gcihDy7bYlq0nsQDqYn64U4lge4M
-         QMmchmZ50jnEjuZnsoeCW2OoPLJMXrUiSPcQT+/h8Nrn66ZzDGtonMlqo3AqPjre3K5/
-         JPYmUMKkRqHh31DXge2eRfYWyhhTqGB036sKzb5T6taryxdgDuDPqD/B0oUffI2cWSfe
-         k5+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=mDEuCH3n+yniaEStC/bTIvAFijRLrGRV0ZCyXMk9t/M=;
-        b=KAXXv3M6o7cdqSYqgZCKzPGApMH4gZSrTVK+OXjEDt6bpLBNPjbjPoBplNkDPe1e00
-         vwAzGWfoqdCfdKmO4GhXEka9QRY8OSVL4uyE9vCYqEsnKmuUZ2ooMkICGkmzcnCJtKcb
-         IQPAXww2Yt8oTJ5nI7dma8zx9wJQdhtyzfNmNqI+ZV6SlgA+lZ9LL0EdyIZtkLmG0WD9
-         8OHGwEPSQ8qRUDJL1oijBmox8GS27mo4Qui5r5c8MrZCznEKFN38Ek7uU4tEkMqbc1ED
-         ZRIzTYzRA0zoevRiX+Ou5y8tk8ObEGB3RMU+ZVX0DvwSWOZpW8LmDh29rtKQk/Aoq0C5
-         mfSw==
-X-Gm-Message-State: AOAM530hUVhRuUAEipPeAaIChmMtW9B0uNtU4siAM0LukTw+NqOpg9Gm
-        F9REdEWE7CDa+QuR45777ehj2Q==
-X-Google-Smtp-Source: ABdhPJxvvSjINFqQcAHf2+Clt4J5Cn7W5SqPzyCyKfYyq/bvZNquHePCmEG8d2EWGpoFnpbBVV59ag==
-X-Received: by 2002:a17:90b:17c4:: with SMTP id me4mr15106820pjb.15.1638548086685;
-        Fri, 03 Dec 2021 08:14:46 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id v38sm2826654pgl.38.2021.12.03.08.14.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Dec 2021 08:14:45 -0800 (PST)
-Date:   Fri, 3 Dec 2021 16:14:42 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Isaku Yamahata <isaku.yamahata@gmail.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>, isaku.yamahata@intel.com,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, erdemaktas@google.com,
-        Connor Kuehl <ckuehl@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: Re: [RFC PATCH v3 14/59] KVM: x86: Add vm_type to differentiate
- legacy VMs from protected VMs
-Message-ID: <YapCclOiQXWGXVEr@google.com>
-References: <cover.1637799475.git.isaku.yamahata@intel.com>
- <60a163e818b9101dce94973a2b44662ba3d53f97.1637799475.git.isaku.yamahata@intel.com>
- <87tug0jbno.ffs@tglx>
- <YaUPZj4ja5FY7Fvh@google.com>
- <20211201193737.GB1166703@private.email.ne.jp>
+        id S1382057AbhLCQiZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Dec 2021 11:38:25 -0500
+Received: from mail-dm6nam11on2074.outbound.protection.outlook.com ([40.107.223.74]:8566
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1382027AbhLCQiY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Dec 2021 11:38:24 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=g8I/xYWJztSY4dmiBdalN44kIHX8b5H5t8xPJwYb10Zu3N/zymYZUrZ/ltmpMaCHTrRWSpsV9CwZYQIXWwJoRRFJ4MgEpRgUEZEil5APtp5Ox30LikY4fI/SdgPiHd2IIKdswFV0OUcPse7nuz72GVLbgeNEgxlsRGVy/a7rcU/jeV34iUcFnXivsqCD6Z7klxv4HITiUOhGYWB+gqUUjUXFsoRn/hRQMMfM6iqFwbGlSJou4Zq1YFgMatXCSRD0eqW59VY26hWHSvTkFPLu+CsBDCO+ju7xec+LZXnrGvL+6iFUNFn9WP22EItHFROyVTJhxDgaeTwoBnCUxbWZKQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=r4QXUT0Bv1j70jxI/9Fa2wAS5oEiTpBhhsLcr9ZRuiE=;
+ b=R2jsUm1n+u/Uaq64TGjc3LZOSBG0oUm+GZyCWtX80TF8hGiodXsm0qA0mf6q/+ncjw8n1FMlzu++IDQ2OgfE6gx3r0Nzuv0Rt8CozttjlUdWpWqFQGbUM82hOsnagqLDJ4AgqEYuhMApcwvXwhmTNQVfkH9DS6HqH7MhiKLAEyKSxpsuAL2PwTg60eCNkQNKJ9TH3l+e+/PEjGHq9uWomGbFtQh2WP+nK0DfPv9lC6WBY0FqJ4WzVfSMT0ZrGXnX1R+lGEFgBFhDWqopuvI/wzP7l1t7Fl6929e21fn6Q2RoSg1pOEvasQ6074QoxQ1GX7P87fy43Ln0dPXrweucUA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=r4QXUT0Bv1j70jxI/9Fa2wAS5oEiTpBhhsLcr9ZRuiE=;
+ b=p4nG15eQj3HDycJrnVeTc+42oDYs61MXlQw60M/43kdJoxAmi1jqWdBDyEl4Dc2sKvfO2HILqUS/A5yNgrdEjJfnJRXgycSWh6bBPxWkMf+f1tyu7KcJ5BM+blC4ufuczG61DOI2e5kiGS4JLpQGWE3yRIoLEj+60okzhs5YsU0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
+ by DM6PR12MB5565.namprd12.prod.outlook.com (2603:10b6:5:1b6::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4734.22; Fri, 3 Dec
+ 2021 16:34:59 +0000
+Received: from DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::1ddd:71e4:5803:e44a]) by DM4PR12MB5229.namprd12.prod.outlook.com
+ ([fe80::1ddd:71e4:5803:e44a%3]) with mapi id 15.20.4734.028; Fri, 3 Dec 2021
+ 16:34:59 +0000
+Subject: Re: [PATCH v2 3/3] KVM: SVM: Extend host physical APIC ID field to
+ support more than 8-bit
+To:     Maxim Levitsky <mlevitsk@redhat.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org, x86@kernel.org
+Cc:     pbonzini@redhat.com, joro@8bytes.org, seanjc@google.com,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        peterz@infradead.org, hpa@zytor.com, jon.grimm@amd.com
+References: <20211202235825.12562-1-suravee.suthikulpanit@amd.com>
+ <20211202235825.12562-4-suravee.suthikulpanit@amd.com>
+ <7dd1e7d1510f17f1140b7174dd42fed752eefc38.camel@redhat.com>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+Message-ID: <6cc9848a-9f04-b923-453a-6dbe03b73e58@amd.com>
+Date:   Fri, 3 Dec 2021 10:34:56 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+In-Reply-To: <7dd1e7d1510f17f1140b7174dd42fed752eefc38.camel@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN7PR04CA0113.namprd04.prod.outlook.com
+ (2603:10b6:806:122::28) To DM4PR12MB5229.namprd12.prod.outlook.com
+ (2603:10b6:5:398::12)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211201193737.GB1166703@private.email.ne.jp>
+Received: from office-ryzen.texastahm.com (67.79.209.213) by SN7PR04CA0113.namprd04.prod.outlook.com (2603:10b6:806:122::28) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4734.22 via Frontend Transport; Fri, 3 Dec 2021 16:34:58 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 947d2ea4-6624-4dd2-c8a8-08d9b67ad8d4
+X-MS-TrafficTypeDiagnostic: DM6PR12MB5565:
+X-Microsoft-Antispam-PRVS: <DM6PR12MB556518822A7B3FFA1F823470EC6A9@DM6PR12MB5565.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:4125;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 9JCPEdmPiYP988/kuTPC1lyG8LP/wtslJhc1WeBt5OOtQRFUfC9EhrNvqs6Avtl9RBU1jhi+3sD/xVVmocvTKWLqdge4ZTMSp/fle3syqJGv+6o7R56eqYZlZoGBhduQ18/O6DemMJ11Q+e5r0ZQGILYPOqLKnbANUV4zxwSoqEHyUq1MDF9HE2+dTLAcTwS7tuuVDHuZWi2Exk/5AC7JREvFo3azkQ56CPc/vwp3aBqGmaeQXtgs2UBz+oarf9o62QYXUCwSK0RBPkmIxbGAVF191wBFZ6xWRgBlxslb7h/lY0PkYyWzWYMbRugxaWI/iE/DiMsfOBaU+AJdZEt25CoNz+PQ/H96I5f4hWBoSJjE95PeAMCsI4BkZBB7seCyZVpTBqAHFZuAyU6L184ehN7cjjFMdgLjp9PZ+LHjun89emq+or3xMgk3qAwOQUnBCzWBRD//foATQeiMgq1xC4QJZV6FM49thZqhpPkK4Fh0JI317OocgRQ/bkpft7ulPVy4AEfDmKo6aElOvtazOF1zwXS302E+1aQDvgSk+7g1cDvc8ssvw8/7Ea7m4WcqqHdiy2GvEja3AbIShCD2h8gLwkFh9uGo3/1FAqxUT87SzJ3v2F07gWgISahfspNrBUux8N3fi09teI1I3LtmewvzbDALXz11uRV57OJb7TqIGNA2pbVHIroaCoKikBBa1a1r7HDJ9FvXbRf0BT0QS6S74+SWZ5zjriO9+8zkLE=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(6506007)(53546011)(26005)(83380400001)(508600001)(66946007)(5660300002)(110136005)(6512007)(31696002)(86362001)(36756003)(186003)(4326008)(316002)(2616005)(2906002)(66476007)(8936002)(66556008)(31686004)(8676002)(6486002)(38100700002)(956004)(7416002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UGIrbTZrVTFCTUx5aVVzL09nTytqUWUrbVJ2NFo5KzVSRDEwS01PVmp4c3hW?=
+ =?utf-8?B?NXBQNTlHYk5IamYrYytjT3lSb090ZzFFa21vOVVsY0V1dGlyZzJ1L2gyaDJm?=
+ =?utf-8?B?TlQyVVVJbjJHbDhsSmhWbmw1SUNZaXZoUEFXdktuT1lsR2s2WlZIdUJvdjRz?=
+ =?utf-8?B?bXIwOHg2bk9DWU1NM0NpWFF6M1VSMkYzS1VjVGdZMVVyVEpHczRNeThuWVho?=
+ =?utf-8?B?S3RRa1phSXg2NFFpMTFNc3lrOHVZNHQ4VUh1cU1KMTNHbjJVQVdCRmZOWitS?=
+ =?utf-8?B?djFiMFNhLy8vdTFHS3lFL3ZMeE1uTG1JQ0xLUEN6UjEyL014SmtyUjhQUGgz?=
+ =?utf-8?B?Nys5MzNyTG5QVjVCTGF2L3hTU0tNN2VFWk1GcHh1RzYramVVTmtobm9BVzBJ?=
+ =?utf-8?B?UExlK1JhV0VnblBnZWxLaXdhSmJ5YUlBcGkzQmZTeElCa2RYQ0xPV2g5bFVi?=
+ =?utf-8?B?bDg3UDFKUDdpWUY4M05Ca3R3aGxuckhjd1cvSy9yektHMnAzQldGaDZDQnY5?=
+ =?utf-8?B?K0pOYnpGbmY1V21uSG03ZjYwcUM2UElJaExvMjBxemdxSHMxUnIxc01pOFNB?=
+ =?utf-8?B?OHl0anhKZ2I4YWFHRlVueGhxTWRVYXQvcitwUC8zSnBvcTFpcEZ5UExsVEFp?=
+ =?utf-8?B?Rm1KR2hqR1d5dXBKbVNnKzJhT3FVSnE4RnZvZURyemtyMVExYkxERW5XVTlN?=
+ =?utf-8?B?MnQzTXE0ZGN2WGRML3VuV1hWL3ZGMlQ0KzhibkVMNFM1V0JKT3J6QnJaNWd2?=
+ =?utf-8?B?ak1WVktYd255VXgrL3NnOEc3SE5BYVdwM00rSTlzTGZuUjVLT1RGQ2h2Y210?=
+ =?utf-8?B?Znk2SzkzTnBGbkd2YzJzN3VOWUM1dm5kbTZ5bXI4MDg5SDBUcHIvSC83NGdV?=
+ =?utf-8?B?NlFmcTllMnI3RnI1YmNiOGtwSlJQMUg4YmgxLzJxSlFXRXhlcTBFVzQ4WW95?=
+ =?utf-8?B?S1UwR0ZPUjQ1VGNRdTBpanZsbzFsMkNTaXJTSUlqUGNnNVA3ZW4wM1J4Rjk1?=
+ =?utf-8?B?UkY2Y1RBeEx6Z3pNUFBaT0RWRFA5Wmd2SjU0b0hYWEJndUVnUW9YWDdnRGRU?=
+ =?utf-8?B?WEx5WlVJQVI0cFBiNzlGY1d1SVJaQUhUaG5HNjhEdHZyNlloZFlSamtDMVJo?=
+ =?utf-8?B?OVBwWUttOWVUSG5hS1Qxb2FGWU8yQlJhR2Y2N0xVNXVGbXh2UjNHRU1oVCsx?=
+ =?utf-8?B?RHMvaFdmTXBzYmRaa2JVSitYaWJoVG05eXlSU1BmRTU1NEptdGtVejZXcXVK?=
+ =?utf-8?B?VndNVXY5cHdNbmhDczYwcjdCbUVtODJkVjNjbGdaOVVxTVorTHlkSjF6ZURj?=
+ =?utf-8?B?NmhydkcvczBTYXJsSVVFaDMwYVM4c3Vob0hHdU9vSHk3RUlYbURwVjNYWHdI?=
+ =?utf-8?B?bVBPWnFncHNJeFVYakJwWE5xeTM3UEk2eHRwbnpiLzRLYWx3RzhTMVVNY3dj?=
+ =?utf-8?B?RGV3OXJFNHQ0b3NsTkhaOTkwdUNjU2F0ck51dGw4SmN1bU9xM3dhajlrZnNR?=
+ =?utf-8?B?SlpOTGRoZmRMTmVjOEY5Z1U5bTlrS25OZDhyM1pVRTUyWW9rUXdZV1J2V3pp?=
+ =?utf-8?B?ZG83OHBPNXlYMVhlZXB1K2xpQ1hXMjlUc291RjhVM0RSdzh5KzQ1QWxWK1BI?=
+ =?utf-8?B?MnJDZllOaERsa0p6Z3lPbWU1UTBoMGlEK1NvMmU2OWtteWN0aGw1K0hjMTJp?=
+ =?utf-8?B?YVdQVUE4UmFXaEgzcVBtKzZ4b2o1WU1YM2FibzBZVHhoY1hqUXlQc25Sak5U?=
+ =?utf-8?B?WnhDZlJlc2dIclpUZWtvNm04S2ErUmpNdXpkM2tFZ1V2eW5ZWlVCejl5czR5?=
+ =?utf-8?B?cW9iZUV5bFhGUDRFMnRVaDJIVzNRZW1OT3paOTBRUmU0c1VOSEhsOXZFRzNZ?=
+ =?utf-8?B?dWdYNllTWjYveVhLeG5wNk1kU2psQXBJU0wwMkdINkFlRllwMDBPeDI0ZlJy?=
+ =?utf-8?B?OWlWTW01SlVVak5BL05XWVA0bnMwSFM4cmlPQnk4UVJPcXdSWnhCT1F0UDFP?=
+ =?utf-8?B?UjA4bytnNTZaeG0vTVA1YXJmWGV4OXlZQ0twS0E5MFowZmhvc1pybVR3NXRY?=
+ =?utf-8?B?akRrSFpnUUU0Q2wzUHdveGJXOS9MS0JEY0Z5bjZWUHJBSzBOVEV4WFdRZ25L?=
+ =?utf-8?B?cGt0SUl1dXJzNFFiZmdXN3R2SEMxRnFZWFFNWE9KNFlBS05IWjlVZCszK0Ja?=
+ =?utf-8?Q?FdCy6qcJd7nhxYh2f54NeTk=3D?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 947d2ea4-6624-4dd2-c8a8-08d9b67ad8d4
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Dec 2021 16:34:59.1497
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: fUDIwB30ZjqJGwnY42jS2rLBxAThQyjvBdjmUyEx0BQoEeSZ/0MaIj/ax91x53by4X5bS2dQqSiZjqjtxrH1Ng==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB5565
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 01, 2021, Isaku Yamahata wrote:
-> On Mon, Nov 29, 2021 at 05:35:34PM +0000,
-> Sean Christopherson <seanjc@google.com> wrote:
-> 
-> > On Thu, Nov 25, 2021, Thomas Gleixner wrote:
-> > > On Wed, Nov 24 2021 at 16:19, isaku yamahata wrote:
-> > > > From: Sean Christopherson <sean.j.christopherson@intel.com>
-> > > >
-> > > > Add a capability to effectively allow userspace to query what VM types
-> > > > are supported by KVM.
-> > > 
-> > > I really don't see why this has to be named legacy. There are enough
-> > > reasonable use cases which are perfectly fine using the non-encrypted
-> > > muck. Just because there is a new hyped feature does not make anything
-> > > else legacy.
-> > 
-> > Yeah, this was brought up in the past.  The current proposal is to use
-> > KVM_X86_DEFAULT_VM[1], though at one point the plan was to use a generic
-> > KVM_VM_TYPE_DEFAULT for all architectures[2], not sure what happened to that idea.
-> > 
-> > [1] https://lore.kernel.org/all/YY6aqVkHNEfEp990@google.com/
-> > [2] https://lore.kernel.org/all/YQsjQ5aJokV1HZ8N@google.com/
-> 
-> Currently <feature>_{unsupported, disallowed} are added and the check is
->  sprinkled and warn in the corresponding low level tdx code.  It helped to
->  detect dubious behavior of guest or qemu.
+On 12/3/21 1:46 AM, Maxim Levitsky wrote:
+> On Thu, 2021-12-02 at 17:58 -0600, Suravee Suthikulpanit wrote:
 
-KVM shouldn't log a message or WARN unless the issue is detected at a late sanity
-check, i.e. where failure indicates a KVM bug.  Other than that, I agree that KVM
-should reject ioctls() that directly violate the rules of a confidential VM with
-an appropriate error code.  I don't think KVM should reject everything though,
-e.g. if the guest attempts to send an SMI, dropping the request on the floor is
-the least awful option because we can't communicate an error to the guest without
-making up our own architecture, and exiting to userspace with -EINVAL from deep
-in KVM would be both painful to implement and an overreaction since doing so would
-likely kill the guest.
+>> @@ -63,6 +64,7 @@
+>>   static DEFINE_HASHTABLE(svm_vm_data_hash, SVM_VM_DATA_HASH_BITS);
+>>   static u32 next_vm_id = 0;
+>>   static bool next_vm_id_wrapped = 0;
+>> +static u64 avic_host_physical_id_mask;
+>>   static DEFINE_SPINLOCK(svm_vm_data_hash_lock);
+>>   
+>>   /*
+>> @@ -133,6 +135,20 @@ void avic_vm_destroy(struct kvm *kvm)
+>>   	spin_unlock_irqrestore(&svm_vm_data_hash_lock, flags);
+>>   }
+>>   
+>> +static void avic_init_host_physical_apicid_mask(void)
+>> +{
+>> +	if (!x2apic_mode) {
+> Wonder why this is a exported  global variable and not function.
+> Not the patch fault though.
+>> +		/* If host is in xAPIC mode, default to only 8-bit mask. */
+>> +		avic_host_physical_id_mask = 0xffULL;
+>> +	} else {
+>> +		u32 count = get_count_order(apic_get_max_phys_apicid());
+>> +
+>> +		avic_host_physical_id_mask = BIT(count) - 1;
+> I think that there were some complains about using this macro and instead encouraged
+> to use 1 << x directly, but I see it used already in other places in avic.c so I don't know.
 
-> The other approach is to silently ignore them (SMI, INIT, IRQ etc) without
-> such check.  The pros is, the code would be simpler and it's what SEV does today.
-> the cons is, it would bes hard to track down such cases and the user would
-> be confused.  For example, when user requests reset/SMI, it's silently ignored.
-> The some check would still be needed.
-> Any thoughts?
+And I think it should be BIT_ULL() since avic_host_physical_id_mask is a u64.
+
+Thanks,
+Tom
+
 > 
-> -- 
-> Isaku Yamahata <isaku.yamahata@gmail.com>
