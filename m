@@ -2,100 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 45DB4467EBB
-	for <lists+kvm@lfdr.de>; Fri,  3 Dec 2021 21:18:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D9931467F09
+	for <lists+kvm@lfdr.de>; Fri,  3 Dec 2021 22:03:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1383073AbhLCUVc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Dec 2021 15:21:32 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:53472 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234814AbhLCUVb (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 3 Dec 2021 15:21:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1638562686;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=qDFnWUE6JGYMviWRrPTghPiCW8vABttFA9L8VJUfZ6o=;
-        b=N0xHrU6Zc6jjESzcKcaYEZWU0WDgiSmCI8d9QH/muzQW69I4P7Q/R9IAt0ZxlM4OQjqtfe
-        L5eXlzvOzuY71vI83X4EX6y8f6jz42SHOFGRcQssc8sj+OlrwaRfbrWPPxP3E20PKhnvNx
-        0j0qIKBbmGrwPYQj6D7DG0UExXp3Axw=
-Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com
- [209.85.167.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-143-PSXL2yy8N0W48-XzvIGTwg-1; Fri, 03 Dec 2021 15:18:05 -0500
-X-MC-Unique: PSXL2yy8N0W48-XzvIGTwg-1
-Received: by mail-oi1-f200.google.com with SMTP id y20-20020acaaf14000000b002a817a23a1eso2787602oie.23
-        for <kvm@vger.kernel.org>; Fri, 03 Dec 2021 12:18:05 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-transfer-encoding;
-        bh=qDFnWUE6JGYMviWRrPTghPiCW8vABttFA9L8VJUfZ6o=;
-        b=4vKOai7R0xUk37UgdLWSUW5z2MaUwtCwP0oEyDpLsdZO2zn3kI2kjg7EmwyDBpviPH
-         cCuuyEvfWeRG08yjk1yg7vnWZlZZTLv+v0EJRsnudb/LGYoVlh5SE7HBQrLSJOeAu4Tw
-         aQSs8vakUWeRwmfRid3PkNZjWZJ05VyfZZHsYWzg3KVuTK7JfIK9IwHfeX9qsbiIhrAG
-         fqYGUAzZD6ipxEUQZwFrxv/WIlk93cfnsN4hVfD7yNiZAXXiHl9tIt37XVfQpzT1lDMT
-         rc6K67xX8DQXZO5eaJqTet9jF2D8zUuoc107tdXym4rdR1ZKrkWU0F00SzL3O1eB++XR
-         Kw1Q==
-X-Gm-Message-State: AOAM532MENKg7P0lF5qQ4tL/KuF0/zjj5ZdGMOpbAfJ5T5W5BHqnIwPi
-        8Z5oBvvNuT90bhBDSFGA6uuYBqzwVCCekHnARBsUSC00Uf8cUFpL0ICvUNzocwJfhwqz9gFM9NX
-        BhZdS0j6BoCgQ
-X-Received: by 2002:a9d:f45:: with SMTP id 63mr17759562ott.350.1638562684817;
-        Fri, 03 Dec 2021 12:18:04 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyRXVzV1Dg3EtPBTdHlWj1hDenP/dLOgDBfCJx7/8cXL0CVfU9F+s57MDiqXf4fgPuj46YhKA==
-X-Received: by 2002:a9d:f45:: with SMTP id 63mr17759546ott.350.1638562684581;
-        Fri, 03 Dec 2021 12:18:04 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id s2sm759026otr.69.2021.12.03.12.18.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Dec 2021 12:18:04 -0800 (PST)
-Date:   Fri, 3 Dec 2021 13:18:03 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
+        id S1358974AbhLCVGY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Dec 2021 16:06:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59066 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243206AbhLCVGY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Dec 2021 16:06:24 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5B26C061751;
+        Fri,  3 Dec 2021 13:02:59 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 9C1F9B82958;
+        Fri,  3 Dec 2021 21:02:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 48482C53FCB;
+        Fri,  3 Dec 2021 21:02:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1638565377;
+        bh=LLXZLQbHwT3AlxfaBOmz4VHwls9ttIGOTI57YT0CMmE=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=VGJ8XOMsSQbCE7nbwbh8Sm/5NnI056/1l+HgjOalNQl3Pv+CDE7KXJcmuXDb2pUmE
+         bc5dV6mA75pui0ZBScHvOLxjzXDZm1T6Yutqm3Lz/1sNDidKp6Yt1aQUkGUtXcs1OG
+         dhzK0CNJwenmJqA0CGzyMr94NvIJiK9Q6xE1G9kh3kNgSfhB4Si2P2jmiENx09tJkR
+         yv/GNXcjDebPVdv6E/zhdym2iPlw2szRANSUhyVBGBeUC2neTdvVnK284cIuyPQNSy
+         RsuCuvq4rQ7y2PcQ+y+r8NRNC0KcqAeYGcojnkOA8ys44mf3iR7vCrkbCwpZfLlMLi
+         JTQcNTfjO306A==
+Received: from pdx-korg-docbuild-2.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by pdx-korg-docbuild-2.ci.codeaurora.org (Postfix) with ESMTP id 3252C60A5A;
+        Fri,  3 Dec 2021 21:02:57 +0000 (UTC)
+Subject: Re: [GIT PULL] VFIO updates for v5.16-rc4
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <20211203131803.7fb40f46.alex.williamson@redhat.com>
+References: <20211203131803.7fb40f46.alex.williamson@redhat.com>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20211203131803.7fb40f46.alex.williamson@redhat.com>
+X-PR-Tracked-Remote: git://github.com/awilliam/linux-vfio.git tags/vfio-v5.16-rc4
+X-PR-Tracked-Commit-Id: 8704e89349080bd640d1755c46d8cdc359a89748
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 12119cfa1052d512a92524e90ebee85029a918f8
+Message-Id: <163856537719.7508.10680291123254494117.pr-tracker-bot@kernel.org>
+Date:   Fri, 03 Dec 2021 21:02:57 +0000
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        linux-kernel@vger.kernel.org,
         Zhenyu Wang <zhenyuw@linux.intel.com>,
         Randy Dunlap <rdunlap@infradead.org>
-Subject: [GIT PULL] VFIO updates for v5.16-rc4
-Message-ID: <20211203131803.7fb40f46.alex.williamson@redhat.com>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Linus,
+The pull request you sent on Fri, 3 Dec 2021 13:18:03 -0700:
 
-The following changes since commit d58071a8a76d779eedab38033ae4c821c30295a5:
+> git://github.com/awilliam/linux-vfio.git tags/vfio-v5.16-rc4
 
-  Linux 5.16-rc3 (2021-11-28 14:09:19 -0800)
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/12119cfa1052d512a92524e90ebee85029a918f8
 
-are available in the Git repository at:
+Thank you!
 
-  git://github.com/awilliam/linux-vfio.git tags/vfio-v5.16-rc4
-
-for you to fetch changes up to 8704e89349080bd640d1755c46d8cdc359a89748:
-
-  vfio/pci: Fix OpRegion read (2021-11-30 11:41:49 -0700)
-
-----------------------------------------------------------------
-VFIO fixes for v5.16-rc4
-
- - Fix OpRegion pointer arithmetic (Zhenyu Wang)
-
- - Fix comment format triggering kernel-doc warnings (Randy Dunlap)
-
-----------------------------------------------------------------
-Randy Dunlap (1):
-      vfio: remove all kernel-doc notation
-
-Zhenyu Wang (1):
-      vfio/pci: Fix OpRegion read
-
- drivers/vfio/pci/vfio_pci_igd.c |  5 +++--
- drivers/vfio/vfio.c             | 28 ++++++++++++++--------------
- 2 files changed, 17 insertions(+), 16 deletions(-)
-
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
