@@ -2,105 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EA173467073
-	for <lists+kvm@lfdr.de>; Fri,  3 Dec 2021 04:03:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 52754467147
+	for <lists+kvm@lfdr.de>; Fri,  3 Dec 2021 05:57:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378353AbhLCDHC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Dec 2021 22:07:02 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:15690 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239667AbhLCDHB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Dec 2021 22:07:01 -0500
-Received: from dggpemm500021.china.huawei.com (unknown [172.30.72.56])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4J4yJ42NjvzZdNW;
-        Fri,  3 Dec 2021 11:00:52 +0800 (CST)
-Received: from dggpemm100005.china.huawei.com (7.185.36.231) by
- dggpemm500021.china.huawei.com (7.185.36.109) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Fri, 3 Dec 2021 11:03:36 +0800
-Received: from dggpeml100016.china.huawei.com (7.185.36.216) by
- dggpemm100005.china.huawei.com (7.185.36.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Fri, 3 Dec 2021 11:03:35 +0800
-Received: from dggpeml100016.china.huawei.com ([7.185.36.216]) by
- dggpeml100016.china.huawei.com ([7.185.36.216]) with mapi id 15.01.2308.020;
- Fri, 3 Dec 2021 11:03:35 +0800
-From:   "Longpeng (Mike, Cloud Infrastructure Service Product Dept.)" 
-        <longpeng2@huawei.com>
-To:     Christian Borntraeger <borntraeger@linux.ibm.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>
-CC:     "cornelia.huck@de.ibm.com" <cornelia.huck@de.ibm.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Gonglei (Arei)" <arei.gonglei@huawei.com>
-Subject: RE: [PATCH] kvm/eventfd: fix the misleading comment in
- kvm_irqfd_assign
-Thread-Topic: [PATCH] kvm/eventfd: fix the misleading comment in
- kvm_irqfd_assign
-Thread-Index: AQHX5NNH1Leb7fxkY0SkUYfU1jQEjawaOSSAgAXTy/A=
-Date:   Fri, 3 Dec 2021 03:03:35 +0000
-Message-ID: <5c5f0f0982df4fc6a858f8e095c4eaa5@huawei.com>
-References: <20211129034328.1604-1-longpeng2@huawei.com>
- <c6b7c933-2d48-1504-7c45-110b0ab317ad@linux.ibm.com>
-In-Reply-To: <c6b7c933-2d48-1504-7c45-110b0ab317ad@linux.ibm.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.174.148.223]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S229741AbhLCFBH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Dec 2021 00:01:07 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:52389 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229548AbhLCFBG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 3 Dec 2021 00:01:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1638507462;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=XaG12ubYE6ngbdheeEwWE4DGS+ZWBFAUkKRVGo3LS/w=;
+        b=TeBoJPP3kRxi+2FHY+w/ef6V6MaB6uosggt2ASwYm6CZJE3nXvySWcZe9ri6a6Y5++8AtQ
+        bGsvHKa2HkS3l5h1oUt6Y64qvNoTQIwwlWnva9Ha2VBxnhhzZxaVR1k5A6YMTuz6tbkP/F
+        k84dFle8z2cKsproVc84UWxwhFJ9sKo=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-281-7U0ELZXzMTmeWkXgRGg6OQ-1; Thu, 02 Dec 2021 23:57:41 -0500
+X-MC-Unique: 7U0ELZXzMTmeWkXgRGg6OQ-1
+Received: by mail-wm1-f72.google.com with SMTP id r129-20020a1c4487000000b00333629ed22dso2814456wma.6
+        for <kvm@vger.kernel.org>; Thu, 02 Dec 2021 20:57:41 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=XaG12ubYE6ngbdheeEwWE4DGS+ZWBFAUkKRVGo3LS/w=;
+        b=hBgHRhbvifeoSmH0evD2Xs4oPOd9msW77appl+q57zA1Jno5TF3me8iYKLnUjCDevz
+         18AeO81uxNdj7EXafBMJPNCWSqyECMQD5/v+x2rTq0rLxg5gqlPKoCOpj4C/+uBp4AOc
+         nTahCGXiEWJJGaKSiAvQLKsofWYn8vGU6AFHbyFk61b45V9xsQMIE5NsjMSBBjCxVHB3
+         v3lFR0qad/CMl9BoPjRzT6xmQIUOtMN62YC728scz5PwWLP8v74jBLAfW5GDEonPtBDy
+         7fREg1unm/0fAMxoM1ku3ApXUZt7fpMFJFFUnlBF/zirkM2iKgK1hggGxioLDxuoqdxH
+         WPwg==
+X-Gm-Message-State: AOAM532GNJAPm6Ek/HgiH8RfA8Kt/fuKUfM0IOq23Deb4Y4hP/zkvy+T
+        Weg54JBSfrGekK5X+gW67t+RaKWTtInkKq1ZHT3tW+pq8WCz17Jb0IQdsjvN/rqpPOBSxaCFlcF
+        mecNY1HE9lRVI
+X-Received: by 2002:a5d:4563:: with SMTP id a3mr19103887wrc.130.1638507460551;
+        Thu, 02 Dec 2021 20:57:40 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwiRtsiGLJhbwI3cEymcTSZvr9YNwLpNElvMUCWxxWEeRj7X0y8qvM8PJ7bxqtbhLayBQZhlg==
+X-Received: by 2002:a5d:4563:: with SMTP id a3mr19103874wrc.130.1638507460392;
+        Thu, 02 Dec 2021 20:57:40 -0800 (PST)
+Received: from xz-m1.local ([64.64.123.26])
+        by smtp.gmail.com with ESMTPSA id 21sm1422838wmj.18.2021.12.02.20.57.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Dec 2021 20:57:39 -0800 (PST)
+Date:   Fri, 3 Dec 2021 12:57:32 +0800
+From:   Peter Xu <peterx@redhat.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Ben Gardon <bgardon@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Jim Mattson <jmattson@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>,
+        Junaid Shahid <junaids@google.com>,
+        Oliver Upton <oupton@google.com>,
+        Harish Barathvajasankar <hbarath@google.com>,
+        Peter Shier <pshier@google.com>
+Subject: Re: [RFC PATCH 13/15] KVM: x86/mmu: Split large pages during
+ CLEAR_DIRTY_LOG
+Message-ID: <YamjvO+vCO2PAWyr@xz-m1.local>
+References: <20211119235759.1304274-1-dmatlack@google.com>
+ <20211119235759.1304274-14-dmatlack@google.com>
+ <YaDQSKnZ3bN501Ml@xz-m1.local>
+ <CALzav=fVd4mLMyf6RBS=yDuN+hMM0hoa7+YHdYucRcJDjD4EfA@mail.gmail.com>
+ <CALzav=ex+5y7-5a-8Vum2-eOKuKYe=RU9NvrS82H=sTwj2mqaw@mail.gmail.com>
+ <Yab0JRVmwyr1GL3Y@xz-m1.local>
+ <CALzav=etCjq=9BukQ4vF49wOsE+pdGRGLHqy5jfzFaeHaZBoUg@mail.gmail.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CALzav=etCjq=9BukQ4vF49wOsE+pdGRGLHqy5jfzFaeHaZBoUg@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogQ2hyaXN0aWFuIEJvcm50
-cmFlZ2VyIFttYWlsdG86Ym9ybnRyYWVnZXJAbGludXguaWJtLmNvbV0NCj4gU2VudDogVHVlc2Rh
-eSwgTm92ZW1iZXIgMzAsIDIwMjEgMToxNCBBTQ0KPiBUbzogTG9uZ3BlbmcgKE1pa2UsIENsb3Vk
-IEluZnJhc3RydWN0dXJlIFNlcnZpY2UgUHJvZHVjdCBEZXB0LikNCj4gPGxvbmdwZW5nMkBodWF3
-ZWkuY29tPjsgcGJvbnppbmlAcmVkaGF0LmNvbQ0KPiBDYzogY29ybmVsaWEuaHVja0BkZS5pYm0u
-Y29tOyBrdm1Admdlci5rZXJuZWwub3JnOw0KPiBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3Jn
-OyBHb25nbGVpIChBcmVpKSA8YXJlaS5nb25nbGVpQGh1YXdlaS5jb20+DQo+IFN1YmplY3Q6IFJl
-OiBbUEFUQ0hdIGt2bS9ldmVudGZkOiBmaXggdGhlIG1pc2xlYWRpbmcgY29tbWVudCBpbiBrdm1f
-aXJxZmRfYXNzaWduDQo+IA0KPiANCj4gDQo+IEFtIDI5LjExLjIxIHVtIDA0OjQzIHNjaHJpZWIg
-TG9uZ3BlbmcoTWlrZSk6DQo+ID4gRnJvbTogTG9uZ3BlbmcgPGxvbmdwZW5nMkBodWF3ZWkuY29t
-Pg0KPiA+DQo+ID4gVGhlIGNvbW1lbnQgYWJvdmUgdGhlIGludm9jYXRpb24gb2YgdmZzX3BvbGwo
-KSBpcyBtaXNsZWFkaW5nLCBtb3ZlDQo+ID4gaXQgdG8gdGhlIHJpZ2h0IHBsYWNlLg0KPiA+DQo+
-IEkgdGhpbmsgdGhhdCB0aGUgY3VycmVudCB2YXJpYW50IGlzIGJldHRlci4NCj4gZXZlbnRzIGlz
-IG9ubHkgdXNlZCBpbiB0aGF0IGZ1bmN0aW9uIHRvIGNoZWNrIGZvciBFUE9MTElOLCBzbyB0aGUN
-Cj4gYXNzaWdubWVudCBhbmQgdGhlIGlmIGJlbG9uZyB0b2dldGhlciBmcm9tIGEgIndoYXQgYW0g
-SSBkb2luZyBoZXJlIiBwZXJzcGVjdGl2ZS4NCj4gDQoNCkhpIENocmlzdGlhbiwNCg0KSSB0aGlu
-ayB0aGF0IGFkZCB0aGUgaXJxZmQtPndhaXQgdG8gdGhlIGZpbGUncyB3YWl0IHF1ZXVlIGlzIG11
-Y2ggbW9yZQ0KaW1wb3J0YW50LCB0aGUgY3VycmVudCB2YXJpYW50IG1heSBsZWFkIHRvIGlnbm9y
-aW5nIGl0Lg0KDQpCb3RoIG9mIHRoZXNlIHR3byB2YXJpYW50cyBhcmUgc3VwcG9ydGVkIGluIHRo
-ZSBjdXJyZW50IGtlcm5lbDoNCg0KWzFdIGh0dHBzOi8vZWxpeGlyLmJvb3RsaW4uY29tL2xpbnV4
-L2xhdGVzdC9zb3VyY2UvZHJpdmVycy92ZmlvL3ZpcnFmZC5jI0wxNjkNCmBgYA0KCWV2ZW50cyA9
-IHZmc19wb2xsKGlycWZkLmZpbGUsICZ2aXJxZmQtPnB0KTsNCg0KCS8qDQoJICogQ2hlY2sgaWYg
-dGhlcmUgd2FzIGFuIGV2ZW50IGFscmVhZHkgcGVuZGluZyBvbiB0aGUgZXZlbnRmZA0KCSAqIGJl
-Zm9yZSB3ZSByZWdpc3RlcmVkIGFuZCB0cmlnZ2VyIGl0IGFzIGlmIHdlIGRpZG4ndCBtaXNzIGl0
-Lg0KCSAqLw0KCWlmIChldmVudHMgJiBFUE9MTElOKSB7DQoJCWlmICgoIWhhbmRsZXIgfHwgaGFu
-ZGxlcihvcGFxdWUsIGRhdGEpKSAmJiB0aHJlYWQpDQoJCQlzY2hlZHVsZV93b3JrKCZ2aXJxZmQt
-PmluamVjdCk7DQoJfQ0KYGBgDQoNClsyXSBodHRwczovL2VsaXhpci5ib290bGluLmNvbS9saW51
-eC9sYXRlc3Qvc291cmNlL2RyaXZlcnMvdmlydC9hY3JuL2lycWZkLmMjTDE2MQ0KYGBgDQoJLyog
-Q2hlY2sgdGhlIHBlbmRpbmcgZXZlbnQgaW4gdGhpcyBzdGFnZSAqLw0KCWV2ZW50cyA9IHZmc19w
-b2xsKGYuZmlsZSwgJmlycWZkLT5wdCk7DQoNCglpZiAoZXZlbnRzICYgRVBPTExJTikNCgkJYWNy
-bl9pcnFmZF9pbmplY3QoaXJxZmQpOw0KYGBgDQoNClNpbmNlIHRoZXJlJ3Mgbm8gYW55IGNvZGUg
-Y2hhbmdlcywgSSBhZ3JlZSB0byBkcm9wIHRoaXMgdW5tZWFuaW5nIGNoYW5nZS4NCg0KVGhhbmtz
-Lg0KDQo+ID4gRml4ZXM6IDY4NGEwYjcxOWRkYiAoIktWTTogZXZlbnRmZDogRml4IGxvY2sgb3Jk
-ZXIgaW52ZXJzaW9uIikNCj4gPiBTaWduZWQtb2ZmLWJ5OiBMb25ncGVuZyA8bG9uZ3BlbmcyQGh1
-YXdlaS5jb20+DQo+ID4gLS0tDQo+ID4gICB2aXJ0L2t2bS9ldmVudGZkLmMgfCA0ICsrLS0NCj4g
-PiAgIDEgZmlsZSBjaGFuZ2VkLCAyIGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pDQo+ID4N
-Cj4gPiBkaWZmIC0tZ2l0IGEvdmlydC9rdm0vZXZlbnRmZC5jIGIvdmlydC9rdm0vZXZlbnRmZC5j
-DQo+ID4gaW5kZXggMmFkMDEzYi4uY2QwMTgxNCAxMDA2NDQNCj4gPiAtLS0gYS92aXJ0L2t2bS9l
-dmVudGZkLmMNCj4gPiArKysgYi92aXJ0L2t2bS9ldmVudGZkLmMNCj4gPiBAQCAtNDA2LDEyICs0
-MDYsMTIgQEAgYm9vbCBfX2F0dHJpYnV0ZV9fKCh3ZWFrKSkNCj4ga3ZtX2FyY2hfaXJxZmRfcm91
-dGVfY2hhbmdlZCgNCj4gPg0KPiA+ICAgCXNwaW5fdW5sb2NrX2lycSgma3ZtLT5pcnFmZHMubG9j
-ayk7DQo+ID4NCj4gPiArCWV2ZW50cyA9IHZmc19wb2xsKGYuZmlsZSwgJmlycWZkLT5wdCk7DQo+
-ID4gKw0KPiA+ICAgCS8qDQo+ID4gICAJICogQ2hlY2sgaWYgdGhlcmUgd2FzIGFuIGV2ZW50IGFs
-cmVhZHkgcGVuZGluZyBvbiB0aGUgZXZlbnRmZA0KPiA+ICAgCSAqIGJlZm9yZSB3ZSByZWdpc3Rl
-cmVkLCBhbmQgdHJpZ2dlciBpdCBhcyBpZiB3ZSBkaWRuJ3QgbWlzcyBpdC4NCj4gPiAgIAkgKi8N
-Cj4gPiAtCWV2ZW50cyA9IHZmc19wb2xsKGYuZmlsZSwgJmlycWZkLT5wdCk7DQo+ID4gLQ0KPiA+
-ICAgCWlmIChldmVudHMgJiBFUE9MTElOKQ0KPiA+ICAgCQlzY2hlZHVsZV93b3JrKCZpcnFmZC0+
-aW5qZWN0KTsNCj4gPg0K
+On Wed, Dec 01, 2021 at 02:14:27PM -0800, David Matlack wrote:
+> > > > Thanks for calling this out. Could the same be said about the existing
+> > > > code that unconditionally tries to write-protect 2M+ pages?
+> >
+> > They're different because wr-protect can be restored (to be not-wr-protected)
+> > when vcpu threads write to the pages, so they need to be always done.
+> 
+> That's true for 4K pages, but not for write-protecting 2M+ pages
+> (which is what we're discussing here). Once KVM write-protects a 2M+
+> page, it should never need to write-protect it again, but we always
+> try to here. Same goes with splitting.
+
+Ah I see, that's fair point. :)
+
+Yeah let's see how it goes with the numbers, I'd hope it's trivial to do both
+wr-protect 2m and the split unconditionally, because for CLEAR_LOG the major
+overhead should be walking the small pages instead, afaiu.
+
+-- 
+Peter Xu
+
