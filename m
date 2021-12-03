@@ -2,102 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 132D4467320
-	for <lists+kvm@lfdr.de>; Fri,  3 Dec 2021 09:09:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8DD3146735E
+	for <lists+kvm@lfdr.de>; Fri,  3 Dec 2021 09:42:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379154AbhLCIMm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Dec 2021 03:12:42 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:60776 "EHLO
+        id S1379250AbhLCIpZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Dec 2021 03:45:25 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:39385 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1379138AbhLCIMj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 3 Dec 2021 03:12:39 -0500
+        by vger.kernel.org with ESMTP id S1379251AbhLCIpX (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 3 Dec 2021 03:45:23 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1638518953;
+        s=mimecast20190719; t=1638520919;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=K72XFDGEYeL3BH76EKWe4JnJXzEuCnG0ewjh8OGemjI=;
-        b=V2HYlXhP3DPBS57VrK1hXliAxhNaVxmLKs8soSADVE8SQSHC5cRyEwkdP33tz78yDB5LtY
-        WAeWxod5rZwE1KxM4k9ZJdaKPXZEdw9qLl0YFN9ahKhhfH9PXlG/YGsDHwyo00c7YWduHt
-        XZZ/w/x3Fz5gDs/WmmRtGam01TDwK60=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=6GZB4B1N+7654kHtpQfNF47RaDJVwe0bhDq5s6FRHyg=;
+        b=RKnk/VC+UB4KX6FRQdz9/0Ei49OMNuOB82OgJiYQzA6jZ9cQox+b0k+2mdKYrihUYLpAAS
+        DlaEmnnBEkmxe/Q4g/SBlHV3FzDYMp4J1k1SA70/iETNQRiKWWkQHvww17zoU2F4+TUm+o
+        4Sxb50AADVSJNwltxnrr697Tgf9A1Bg=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-199-TOoQJzcXMq6zv5JOR5VvGg-1; Fri, 03 Dec 2021 03:09:12 -0500
-X-MC-Unique: TOoQJzcXMq6zv5JOR5VvGg-1
-Received: by mail-ed1-f71.google.com with SMTP id t9-20020aa7d709000000b003e83403a5cbso1847131edq.19
-        for <kvm@vger.kernel.org>; Fri, 03 Dec 2021 00:09:12 -0800 (PST)
+ us-mta-135-S2NJFWt2OgmeMEnxvWkP-g-1; Fri, 03 Dec 2021 03:41:59 -0500
+X-MC-Unique: S2NJFWt2OgmeMEnxvWkP-g-1
+Received: by mail-ed1-f72.google.com with SMTP id v10-20020aa7d9ca000000b003e7bed57968so1891361eds.23
+        for <kvm@vger.kernel.org>; Fri, 03 Dec 2021 00:41:58 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=K72XFDGEYeL3BH76EKWe4JnJXzEuCnG0ewjh8OGemjI=;
-        b=Mm935Pki7NU1xAcLD1Wu7pEjlpeUhftPWJSL3CsB1hn5f0tLqQ1H8lwAp3guj3VitE
-         TqOSckya26lbPBHIs1jKIb5RX5bOxW8tdsryEmlBYTUyfmG3/fGz9xeF2joOAkZ+WbLa
-         63nAkqenvT04mmFGIQeqbChQflqZzqnIYvhmDcDp+kNRdMwy+8aOitmnf1lkCqYQ9TG9
-         ReQmrUfukHhylJQULXZGkJZEni8kE09srmFqBlu2NF2j6qGpXB5pZzv7oPSHlkQRGI8n
-         9I0jPQqvmij7OwFbg5eXPrVeZNw6/XON7dxIBwdA9K4b4DlA+/i0zDzHOb447DL2G42s
-         2/Gw==
-X-Gm-Message-State: AOAM531R6iMXayu48UrmIzGz5UbLYZ6l8qqYaKTS7rYewpdymphCnQRy
-        p3IBlJow6OMnG69KxHVcArR4QOeN2XQRjLjNKJXBuaxQTdIuzBKVAmCGlFHVJSlInplBFAkr5Th
-        SNDJlCXk7pbPPysjjpUg//BiQH2p/Stf40uvnWJD7tWqyCg0vnKEBQwtfnCj8Wj5m
-X-Received: by 2002:a17:907:94c6:: with SMTP id dn6mr21735493ejc.490.1638518951537;
-        Fri, 03 Dec 2021 00:09:11 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJx6I4RP2/lUv59uHDaNyDb4H3IbpHUzm5Vz3ZMPuwbZxcR1ab3u+vSBZTxFJelWHLViNDfLrg==
-X-Received: by 2002:a17:907:94c6:: with SMTP id dn6mr21735468ejc.490.1638518951273;
-        Fri, 03 Dec 2021 00:09:11 -0800 (PST)
-Received: from fedora (g-server-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id de15sm1357866ejc.70.2021.12.03.00.09.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Dec 2021 00:09:10 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Makarand Sonare <makarandsonare@google.com>,
-        kvm <kvm@vger.kernel.org>
-Subject: Re: KVM patches for Hyper-V improvements
-In-Reply-To: <CA+qz5sqUKk46BcRKCyM1rdvtGL3QE7C8gDt0D7qx8_x_M8bKtQ@mail.gmail.com>
-References: <CA+qz5sqUKk46BcRKCyM1rdvtGL3QE7C8gDt0D7qx8_x_M8bKtQ@mail.gmail.com>
-Date:   Fri, 03 Dec 2021 09:09:09 +0100
-Message-ID: <87r1au6rfe.fsf@redhat.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=6GZB4B1N+7654kHtpQfNF47RaDJVwe0bhDq5s6FRHyg=;
+        b=qj+AaO5/vIi47j6MzHIp626ssv42JXAvNDdyaqQBQpf4idevoknT+4nbI5B1YSUhOa
+         vqvJixG33Myx09XhJlgGWCOX0So+3AHlZ8usgtt/TudW1vT+ay9Mw9oSvONFuKP0EPCf
+         xpwCJ6MD1XGNNwl7bgmgJ4HEhxZN0jZaAr/io46/h8joSxnf5Rddc6SYPFPYqQuMUjxo
+         FbpWIqVzJ1HgBtnEhI1eP75R9pIWXimlWTQXAg5wjNZFLSwcppRy50mgsFMH50juAyNX
+         QUkf+vnhS6h+khTsxaX80KU3LdTqGD3uL2jVjGwwzUxr/o1BXJPWrFuZojT9BfShZ0Sc
+         1BxA==
+X-Gm-Message-State: AOAM530YZlt2J0QHj7+uHs9+xe4Uhh045ZXhEA0ABid5yBsQcCANvH27
+        vPpkXR2ITAVKUhlLpwQPzDlM278hUFhKZkJ61EYJObQONXsnuQ3WIkYsjoGYYENmBR+Z0OmjoN6
+        DRryGiEXxOWgk
+X-Received: by 2002:a17:907:2da5:: with SMTP id gt37mr22331296ejc.316.1638520917554;
+        Fri, 03 Dec 2021 00:41:57 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzb/7LfnJkZdygdHrdv8Opu/P8GNBZ71fU2X1d4rvGa3jMNrBM7Vo1vtI9fJLdAjbdMVuP/5Q==
+X-Received: by 2002:a17:907:2da5:: with SMTP id gt37mr22331277ejc.316.1638520917422;
+        Fri, 03 Dec 2021 00:41:57 -0800 (PST)
+Received: from [10.43.2.64] (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id j17sm1535384edj.0.2021.12.03.00.41.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 03 Dec 2021 00:41:57 -0800 (PST)
+Message-ID: <63d013c1-bacf-2c06-896a-fd9c2b010653@redhat.com>
+Date:   Fri, 3 Dec 2021 09:41:56 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.1
+Subject: Re: [PATCH v1 00/12] Add riscv kvm accel support
+Content-Language: en-US
+To:     Yifei Jiang <jiangyifei@huawei.com>, qemu-devel@nongnu.org,
+        qemu-riscv@nongnu.org
+Cc:     bin.meng@windriver.com, kvm@vger.kernel.org,
+        libvir-list@redhat.com, anup.patel@wdc.com, wanbo13@huawei.com,
+        Alistair.Francis@wdc.com, kvm-riscv@lists.infradead.org,
+        wanghaibin.wang@huawei.com, palmer@dabbelt.com,
+        fanliang@huawei.com, wu.wubin@huawei.com
+References: <20211120074644.729-1-jiangyifei@huawei.com>
+From:   =?UTF-8?B?TWljaGFsIFByw612b3puw61r?= <mprivozn@redhat.com>
+In-Reply-To: <20211120074644.729-1-jiangyifei@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Makarand Sonare <makarandsonare@google.com> writes:
+On 11/20/21 08:46, Yifei Jiang wrote:
+> This series adds both riscv32 and riscv64 kvm support, and implements
+> migration based on riscv.
 
-> Hello Vitaly,
->                   I am interested in knowing the exact set of KVM
-> patches that were added for the Nested Hyper-V scenario. Could you
-> please point me to them?
+What libvirt does when detecting KVM support is issuing query-kvm
+monitor command and checking if both 'present' and 'enabled' bools are
+true. If this is what these patches end up with we should get KVM
+acceleration in Libvirt for free.
 
-Hi Makarand,
-
-are you interested in patches since some upstream kernel version or
-since the beginning of time? Thing is, some Hyper-V enlightenments
-benefit both Windows and Hyper-V and some are specific to Hyper-V. Out
-of top of my head, 'direct synthetic timers', 'Enlightened VMCS', and
-'Enlightened MSR-Bitmap' features are Hyper-V specific. Patch list is
-pretty long, see for example
-
-$ git log --author vkuznets@redhat.com --oneline -i --grep 'enlightened.*vmcs' arch/x86/kvm/
-
-and 
-
-$ git log --author vkuznets@redhat.com --oneline -i --grep 'direct.*syn' arch/x86/kvm/
-
-Enlightened MSR-Bitmap is only in kvm/master:
-ceef7d10dfb6 KVM: x86: VMX: hyper-v: Enlightened MSR-Bitmap support
-
-The list is likely incomplete as there are pre-requisites for these
-patches which may not have the required keywords. There were fixes in
-other parts of KVM for nested Hyper-V as well but I don't know an easy
-way to find them (grepping for 'Hyper-V/hyperv' in the log would be a
-good start but we'll certainly miss something).
-
-Please let me know if that's what you're looking for and I'll try to
-give you more precise information.
-
--- 
-Vitaly
+Michal
 
