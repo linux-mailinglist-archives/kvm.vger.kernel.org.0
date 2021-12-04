@@ -2,76 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CF2C2468542
-	for <lists+kvm@lfdr.de>; Sat,  4 Dec 2021 15:09:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2AF24468546
+	for <lists+kvm@lfdr.de>; Sat,  4 Dec 2021 15:14:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1385162AbhLDOMv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 4 Dec 2021 09:12:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57740 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1385108AbhLDOMu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 4 Dec 2021 09:12:50 -0500
-Received: from mail-vk1-xa41.google.com (mail-vk1-xa41.google.com [IPv6:2607:f8b0:4864:20::a41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E90F4C061751
-        for <kvm@vger.kernel.org>; Sat,  4 Dec 2021 06:09:24 -0800 (PST)
-Received: by mail-vk1-xa41.google.com with SMTP id u68so3737689vke.11
-        for <kvm@vger.kernel.org>; Sat, 04 Dec 2021 06:09:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=sjZXHJMUq7uvoUrcjUJzKAwi12OhaiQKRqagT7avtE0=;
-        b=iXXbQVSCBE0OM4QYMWNU7ciivZ1WS19fZgDXxrSwreE/sNERI4w+B4mSzU60lbWoLB
-         p5XGzUV+FVfDTQE473jp74QR1ammQe51NPVkdGejyjU5f4kN6IYCy7Yw+obeC2MfQAl6
-         WmLr2jfbK+M1t53KsmtYwxWbSWrz6RXplVHMaXPuFo0g3Hfe6LFq2h0Y1oOdiCjy3iwn
-         pZQy4ThUaThT3cAi1fIruVqBkg0OqORooREj1gLe/04bceVwNFrgJulgJRSJzZcrlwAH
-         WWvmoewDqwFWQOkKFG5MIca+EOsp0yWJj10kwxz7lGcI8GhmI4ibNhKMEUqA43GBgcxE
-         E6aQ==
+        id S1385178AbhLDORe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 4 Dec 2021 09:17:34 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:52529 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1385174AbhLDORd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 4 Dec 2021 09:17:33 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1638627246;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=g0dO/BpdJD9jOnz6LtLs4iLIZSLA8GKvweu8a6+ian4=;
+        b=hS77y2//qwClYiI3sXGTLa2cBsSWEMLmTp5t/VZRQgJ3pv8Xt1ZlOpWzwjrits9qzE9Oru
+        dux0CdYAO96eSKbpwuHlzKz42IEuteAkRz0FYn56uYHIu1eAbxClJz5UR82EDpP9g2nqmq
+        +lnmsHMOiWbtmyTSHISrvJAHqWAN7Fo=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-480-IUeZWay1NlO_7M8kXl8rkw-1; Sat, 04 Dec 2021 09:14:05 -0500
+X-MC-Unique: IUeZWay1NlO_7M8kXl8rkw-1
+Received: by mail-wr1-f70.google.com with SMTP id u4-20020a5d4684000000b0017c8c1de97dso1134708wrq.16
+        for <kvm@vger.kernel.org>; Sat, 04 Dec 2021 06:14:05 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=sjZXHJMUq7uvoUrcjUJzKAwi12OhaiQKRqagT7avtE0=;
-        b=ortMgH0gAEvAY9U40rg13GhcdozpQcIjuai09m6hPAVGHKx5OmeAYxVIPyMJxxah/Z
-         dr+qpEIoujscuoajXbSrjrcQ0/ffs2dtNb+GtHNfelxD9hUEsB7qmzrT48bmns5r64Z9
-         ztEaqDiaXn7Vd3qk5Zii3fanp2rpBuauoQXZUr+UJKVT86x0CzAuKVV6xSwZ7v6MM5dF
-         KlPP+1p+glqlXVab4lGNyK5Zoiqeew8jgcCR4bF8VS8yQKVGuZOsnFN4EQLalEDQuIds
-         awVbKpzwAgBpdRkchLMZgJNknfORaGnmYGcPaafRNMIrfjz45JF/pTboLa6H5UP7Xv0l
-         GNIg==
-X-Gm-Message-State: AOAM531gHHYip9ajGRjyQrcd8/kP/eGuNfw2fFblAaAYF33TSWFD1KdA
-        CWUs70QuZXGaxs5O2Qrii8V03q2J5x1OVILifTuKb3xmUC0=
-X-Google-Smtp-Source: ABdhPJxJobMxoWbdELpt5KJRdtS83ebD8c2VRhadRtFkJrLa9RRbemf/FytMk+L0ytADjb634Dt4siso2Q8LqfBOdwE=
-X-Received: by 2002:a1f:c605:: with SMTP id w5mr29160048vkf.28.1638626963432;
- Sat, 04 Dec 2021 06:09:23 -0800 (PST)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=g0dO/BpdJD9jOnz6LtLs4iLIZSLA8GKvweu8a6+ian4=;
+        b=Z+iuiH+ars+qLQY6lKVhrZcdRWvziS5h+kh+6RmDx1/GD82Mt2ZiUwu1XOGhnpUy2c
+         xjGRNr4cpc2Z30AkFDEnrHGo/29IXlSfrxv0as3EJDKRpt6EVDDzhilFDm3bigUctbmZ
+         oAA2kqlbBf2PIfJtByag02sCA3JHZ4Q2WLP5dFi6YobuXq43cLOOF0Xrv7ObIGEk9PJ3
+         3lVOKlEMh7yr/Q511VXxtlfbwWOPBVOJ3tSRveoLa6/cVuuI89NxPnUyIFv74DckY1LS
+         pac89BlgSCEJDDr2mRKfqfly2t9WDeAZUqvy1xtkmQuj/lagcsfQIyok7uyhXuxgaIAV
+         yOeQ==
+X-Gm-Message-State: AOAM533cnXqPvW5uRyF76g3jBr5/IpaYWvU4W4h0xUIQjwrIck6RJvQN
+        X0bEGzImW4M6rqlAcup1pvww5w0XqXKPxWicqHzsOgA35/oadrrUGOTuu1Ndk+MwcpGfvskK4Kg
+        ecD1/Xt1bIXOD
+X-Received: by 2002:a5d:5445:: with SMTP id w5mr30131990wrv.163.1638627244219;
+        Sat, 04 Dec 2021 06:14:04 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwP+cc5bD8j/sZ62eB1LAUdM7vgu+TLoJMaRrRrzwWGIK2bb03aFe0LSJreofrDN5481/3qWw==
+X-Received: by 2002:a5d:5445:: with SMTP id w5mr30131964wrv.163.1638627243963;
+        Sat, 04 Dec 2021 06:14:03 -0800 (PST)
+Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id d6sm5686326wrx.60.2021.12.04.06.14.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 04 Dec 2021 06:14:03 -0800 (PST)
+Subject: Re: [RFC PATCH v3 09/29] KVM: arm64: Hide IMPLEMENTATION DEFINED PMU
+ support for the guest
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+        Peter Shier <pshier@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org
+References: <20211117064359.2362060-1-reijiw@google.com>
+ <20211117064359.2362060-10-reijiw@google.com>
+ <d09e53a7-b8df-e8fd-c34a-f76a37d664d6@redhat.com>
+ <CAAeT=FzM=sLF=PkY_shhcYmfo+ReGEBN8XX=QQObavXDtwxFJQ@mail.gmail.com>
+ <5bd01c9c-6ac8-4034-6f49-be636a3b287c@redhat.com>
+ <CAAeT=FwEogskDQVwwTkZSstYX7-X0r1B+hUUHbZOE5T5o9V=ww@mail.gmail.com>
+From:   Eric Auger <eauger@redhat.com>
+Message-ID: <2ed3072b-f83d-1b17-0949-ca38267ba94e@redhat.com>
+Date:   Sat, 4 Dec 2021 15:14:01 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-From:   =?UTF-8?Q?Musa_=C3=9Cnal?= <umusasadik@gmail.com>
-Date:   Sat, 4 Dec 2021 17:09:12 +0300
-Message-ID: <CAMjwK+d_H2qYjMjdQo=0ouz87u1XS1Cv+daLRj9_jLe6_FOkQw@mail.gmail.com>
-Subject: Trap and Emulate RDTSC Instructions
-To:     kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAAeT=FwEogskDQVwwTkZSstYX7-X0r1B+hUUHbZOE5T5o9V=ww@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello all,
-For an academic project we need to trap and emulate each RDTSC
-instruction executed in a virtual machine. (Our main aim is to
-calculate how many rdtsc instructions are executed in a virtual
-machine.) Currently we can intercept each of them. But we have a
-problem to give the correct tsc values (values are not stable). So we
-don't want to mess up the rdtsc reads. We just need to count rdtscs.
-Our current approach looks like this.
+Hi Reiji,
 
-static int handle_rdtsc(struct kvm_vcpu *vcpu)
-{
-counter += 1;
-vcpu->arch.regs[VCPU_REGS_RAX] = (rdtsc() - VM_EXIT_COS) & -1u;
-vcpu->arch.regs[VCPU_REGS_RDX] = ((rdtsc() -  VM_EXIT_COST) >> 32) & -1u;
-return skip_emulated_instruction(vcpu);
+On 12/4/21 2:04 AM, Reiji Watanabe wrote:
+> Hi Eric,
+> 
+> On Thu, Dec 2, 2021 at 2:57 AM Eric Auger <eauger@redhat.com> wrote:
+>>
+>> Hi Reiji,
+>>
+>> On 11/30/21 6:32 AM, Reiji Watanabe wrote:
+>>> Hi Eric,
+>>>
+>>> On Thu, Nov 25, 2021 at 12:30 PM Eric Auger <eauger@redhat.com> wrote:
+>>>>
+>>>> Hi Reiji,
+>>>>
+>>>> On 11/17/21 7:43 AM, Reiji Watanabe wrote:
+>>>>> When ID_AA64DFR0_EL1.PMUVER or ID_DFR0_EL1.PERFMON is 0xf, which
+>>>>> means IMPLEMENTATION DEFINED PMU supported, KVM unconditionally
+>>>>> expose the value for the guest as it is.  Since KVM doesn't support
+>>>>> IMPLEMENTATION DEFINED PMU for the guest, in that case KVM should
+>>>>> exopse 0x0 (PMU is not implemented) instead.
+>>>> s/exopse/expose
+>>>>>
+>>>>> Change cpuid_feature_cap_perfmon_field() to update the field value
+>>>>> to 0x0 when it is 0xf.
+>>>> is it wrong to expose the guest with a Perfmon value of 0xF? Then the
+>>>> guest should not use it as a PMUv3?
+>>>
+>>>> is it wrong to expose the guest with a Perfmon value of 0xF? Then the
+>>>> guest should not use it as a PMUv3?
+>>>
+>>> For the value 0xf in ID_AA64DFR0_EL1.PMUVER and ID_DFR0_EL1.PERFMON,
+>>> Arm ARM says:
+>>>   "IMPLEMENTATION DEFINED form of performance monitors supported,
+>>>    PMUv3 not supported."
+>>>
+>>> Since the PMU that KVM supports for guests is PMUv3, 0xf shouldn't
+>>> be exposed to guests (And this patch series doesn't allow userspace
+>>> to set the fields to 0xf for guests).
+>> What I don't get is why this isn't detected before (in kvm_reset_vcpu).
+>> if the VCPU was initialized with KVM_ARM_VCPU_PMU_V3 can we honor this
+>> init request if the host pmu is implementation defined?
+> 
+> KVM_ARM_VCPU_INIT with KVM_ARM_VCPU_PMU_V3 will fail in
+> kvm_reset_vcpu() if the host PMU is implementation defined.
 
-}
+OK. This was not obvsious to me.
 
-VM_EXIT_COST calculated by how many clock cycles are executed during
-host to guest transition (for RDTSC exits only). Can KVM handle these
-operations built-in or do you have any idea how we can achieve this?
+                if (kvm_vcpu_has_pmu(vcpu) && !kvm_arm_support_pmu_v3()) {
+                        ret = -EINVAL;
+                        goto out;
+                }
 
-Thanks a lot.
+kvm_perf_init
++	if (perf_num_counters() > 0)
++		static_branch_enable(&kvm_arm_pmu_available);
+
+But I believe you ;-), sorry for the noise
+
+Eric
+
+> 
+> The AA64DFR0 and DFR0 registers for a vCPU without KVM_ARM_VCPU_PMU_V3
+> indicates IMPLEMENTATION DEFINED PMU support, which is not correct.
+
+
+> 
+> Thanks,
+> Reiji
+> 
+
