@@ -2,264 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6013146823F
-	for <lists+kvm@lfdr.de>; Sat,  4 Dec 2021 05:35:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F0DC2468253
+	for <lists+kvm@lfdr.de>; Sat,  4 Dec 2021 06:14:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239621AbhLDEiy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Dec 2021 23:38:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45580 "EHLO
+        id S229706AbhLDFR5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 4 Dec 2021 00:17:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53940 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231192AbhLDEix (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Dec 2021 23:38:53 -0500
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B296DC061751
-        for <kvm@vger.kernel.org>; Fri,  3 Dec 2021 20:35:28 -0800 (PST)
-Received: by mail-pl1-x630.google.com with SMTP id k4so3441795plx.8
-        for <kvm@vger.kernel.org>; Fri, 03 Dec 2021 20:35:28 -0800 (PST)
+        with ESMTP id S229556AbhLDFR4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 4 Dec 2021 00:17:56 -0500
+Received: from mail-ot1-x331.google.com (mail-ot1-x331.google.com [IPv6:2607:f8b0:4864:20::331])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98340C061751
+        for <kvm@vger.kernel.org>; Fri,  3 Dec 2021 21:14:31 -0800 (PST)
+Received: by mail-ot1-x331.google.com with SMTP id h19-20020a9d3e53000000b0056547b797b2so6177437otg.4
+        for <kvm@vger.kernel.org>; Fri, 03 Dec 2021 21:14:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=p+rPr7XIjjwvjYiHeBShUBv79Kxgl9YRLiKJd4X5MRw=;
-        b=kGVlNYxU8zT2Lququ5VgSBP0nQ45wZTEGEgvuyU4OVZsVO1lwA9lagkzOpUA4g/EQ7
-         TXaXsO+mkVN573fITVcPytDhHzg8qRpgW56/PErvxV9/tpZB5asKku3QwTDqHf32Eg6G
-         eHm/01DIYGdDiGmt36KUpgpxd9MJHrtJmN5nyRLjgf6NcVEItuim35WYBTbbTxdsSejz
-         JQz3Aj7uHfygPIdJzEItt3OW4v1aqeyroZYDMqYVJxPqLhuFcnftcjWJbtx/nKyTOaiu
-         hUeNAy0yv2MJqajFSkqND6KwyeZl9eMtXRfhfObjFu/aCifWRKeUJozGeUt52pqfaqiP
-         cH1Q==
+        bh=Y/BPPy9m8im+hhuoZQePxpZc51/ab2hLFWDQfb5X/9I=;
+        b=H/yNUwm9CmyzcLUNDWhTAbx9TbIVhmUtwt6S8HUeOWOQUkumfeJyGUUBwJZCkQCGEU
+         Wd5v6YpjOsoRq+h9GBVAuMtKOkHWzYBXzGI/hojTku8VZe0d9CuWMfyV72VPe4Py4DQU
+         RAyZwjgaTFtPBYZMNLJmYJAPkRZAVt5IqbAuuKXaEP5X0r/tyY7PPBA4+IMB/0ZsmJkg
+         BdhsVki9tZHwgatH9YKV+VFltcFLkLMbljykbb2zQ3yusTle/TLdcx9Qi6Wm66Ahm+V/
+         Oyn6yc2xM28C8AgaLPkN+cqwLDtuQtDm2F0hPD0elLYgtMFTyRTS7Y2QzS8SexxWs25E
+         ENtw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=p+rPr7XIjjwvjYiHeBShUBv79Kxgl9YRLiKJd4X5MRw=;
-        b=fQYRvPSbXCFTTgs6tRjWAEIhnETjcrgI+vwAGigjv8gH/GmWhtpWd2pJ1Kz3ShhhwL
-         AVzZ3pxwJsHF7tnNUvokIGvE5ntImR56e3PnrQgMf/I/ZvRxt8w9WU8jQWWvZrBH/ODs
-         dfZHnK2D9UBzNU20GU9vKfV5Dq3nRUmAJFrp6Uy1vN1fGYz/bcMP6OW4fkbGQN2ygEgs
-         ALFMMU+j+03iByExwzfzbKzheo5+VXgyMFTay0oDwZR+AQsjEcSoGBC+Xqzo3mymZ3eZ
-         luxKuFWcWzPfMCw9WYCta2etFXwadQ5slPHFspOirLHAslnpfdip2eHbjabZ1d+NQ+aF
-         RtPw==
-X-Gm-Message-State: AOAM531c1jqQyGYiIUc1nldWenWQgsTym4So/l1ROYWVqOdKZi0qYGCa
-        piy46jyTrR2KsQPmqS8QTym4lpQ5xTUNHqBzuiKg4lNzz9wyIA==
-X-Google-Smtp-Source: ABdhPJzCG4DFgxCKBZ/sAMV1Fc1BhJOLsH6djfvGO/LrhKBAeyqV2cIP3G8zKthT11vht/hjbxPoewAGf0Qv/JdUG7w=
-X-Received: by 2002:a17:902:d703:b0:144:e012:d550 with SMTP id
- w3-20020a170902d70300b00144e012d550mr27390851ply.38.1638592527674; Fri, 03
- Dec 2021 20:35:27 -0800 (PST)
+        bh=Y/BPPy9m8im+hhuoZQePxpZc51/ab2hLFWDQfb5X/9I=;
+        b=zwIzD1X9lfPbOXfiif/ioU703wKh86KXmb4/ORwDa15jAGSVqRh0dRwASeE1Hk2hdV
+         1LVMIdQ2IacNkIm8u9h1+YLaw9chkUttulSNMsy0ttMNwQzu6Ydjg1fZ/OBsFiNcAcPg
+         ScU4AI5WRHGATTe8xmFuSoAO51AVe8nI8OHoVZejYipEu7cKpY9vpY8pl0c4dIEenxd9
+         fmbtYjCcJ7G4iRFz9CIg8YvfdsQLDxkcDKnPdCBORQhduClZOGihpXQ82aWiqNCgscmT
+         nSpnVt4TDJODktVEis1nB/wjNohHLvh11L/MRpVQjKIEKDtn9xM3HdAC9rRgesYxaa7y
+         luYg==
+X-Gm-Message-State: AOAM533P//UKvWG2sIqzw9PX/2DY5o3vHC+vUyrSIYnUN3uqeD2JoURK
+        Kog+Jw/ZZlm4JVyKUyjXmAjDs3AQHX+0DXgeb1ATaQ==
+X-Google-Smtp-Source: ABdhPJxghcCQpyrr8AC+WikPzYCuxK5sEzUgYuWtzGi5NXwaoYNBCMWGWG914X6+tpfyQSCRghgwxpXCcIclt3k0vsw=
+X-Received: by 2002:a9d:6389:: with SMTP id w9mr19659797otk.29.1638594870449;
+ Fri, 03 Dec 2021 21:14:30 -0800 (PST)
 MIME-Version: 1.0
-References: <20211117064359.2362060-1-reijiw@google.com> <20211117064359.2362060-4-reijiw@google.com>
- <e480d851-2d88-6f79-daf4-22c4841f88a4@redhat.com>
-In-Reply-To: <e480d851-2d88-6f79-daf4-22c4841f88a4@redhat.com>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Fri, 3 Dec 2021 20:35:11 -0800
-Message-ID: <CAAeT=FwEbJrK5afynLFfgFU199iHd093UvbkWRzxJ_j6fssB2g@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 03/29] KVM: arm64: Introduce struct id_reg_info
-To:     Eric Auger <eauger@redhat.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
-        Peter Shier <pshier@google.com>,
+References: <b57280b5562893e2616257ac9c2d4525a9aeeb42.1638471124.git.thomas.lendacky@amd.com>
+ <YapIMYiJ+iIfHI+c@google.com> <9ac5cf9c-0afb-86d1-1ef2-b3a7138010f2@amd.com>
+In-Reply-To: <9ac5cf9c-0afb-86d1-1ef2-b3a7138010f2@amd.com>
+From:   Marc Orr <marcorr@google.com>
+Date:   Fri, 3 Dec 2021 21:14:19 -0800
+Message-ID: <CAA03e5EYV785FSEh2mXK=jzEhp-wM8XcaBk0S4vx7h-f7jevjA@mail.gmail.com>
+Subject: Re: [PATCH] KVM: SVM: Do not terminate SEV-ES guests on GHCB
+ validation failure
+To:     Tom Lendacky <Thomas.Lendacky@amd.com>
+Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, x86@kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        linux-arm-kernel@lists.infradead.org
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Brijesh Singh <brijesh.singh@amd.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Eric,
-
-On Thu, Dec 2, 2021 at 4:51 AM Eric Auger <eauger@redhat.com> wrote:
+On Fri, Dec 3, 2021 at 11:00 AM Tom Lendacky <thomas.lendacky@amd.com> wrote:
 >
-> Hi Reiji,
+> On 12/3/21 10:39 AM, Sean Christopherson wrote:
+> > On Thu, Dec 02, 2021, Tom Lendacky wrote:
 >
-> On 11/17/21 7:43 AM, Reiji Watanabe wrote:
-> > This patch lays the groundwork to make ID registers writable.
+> >>
+> >> -    return -EINVAL;
+> >> +    return false;
 > >
-> > Introduce struct id_reg_info for an ID register to manage the
-> > register specific control of its value for the guest, and provide set
-> > of functions commonly used for ID registers to make them writable.
-> >
-> > The id_reg_info is used to do register specific initialization,
-> > validation of the ID register and etc.  Not all ID registers must
-> > have the id_reg_info. ID registers that don't have the id_reg_info
-> > are handled in a common way that is applied to all ID registers.
-> >
-> > At present, changing an ID register from userspace is allowed only
-> > if the ID register has the id_reg_info, but that will be changed
-> > by the following patches.
-> >
-> > No ID register has the structure yet and the following patches
-> > will add the id_reg_info for some ID registers.
-> >
-> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> > ---
-> >  arch/arm64/include/asm/sysreg.h |   1 +
-> >  arch/arm64/kvm/sys_regs.c       | 226 ++++++++++++++++++++++++++++++--
-> >  2 files changed, 218 insertions(+), 9 deletions(-)
-> >
-> > diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-> > index 16b3f1a1d468..597609f26331 100644
-> > --- a/arch/arm64/include/asm/sysreg.h
-> > +++ b/arch/arm64/include/asm/sysreg.h
-> > @@ -1197,6 +1197,7 @@
-> >  #define ICH_VTR_TDS_MASK     (1 << ICH_VTR_TDS_SHIFT)
-> >
-> >  #define ARM64_FEATURE_FIELD_BITS     4
-> > +#define ARM64_FEATURE_FIELD_MASK     ((1ull << ARM64_FEATURE_FIELD_BITS) - 1)
-> >
-> >  /* Create a mask for the feature bits of the specified feature. */
-> >  #define ARM64_FEATURE_MASK(x)        (GENMASK_ULL(x##_SHIFT + ARM64_FEATURE_FIELD_BITS - 1, x##_SHIFT))
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 5608d3410660..1552cd5581b7 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -265,6 +265,181 @@ static bool trap_raz_wi(struct kvm_vcpu *vcpu,
-> >               return read_zero(vcpu, p);
-> >  }
-> >
-> > +/*
-> > + * A value for FCT_LOWER_SAFE must be zero and changing that will affect
-> > + * ftr_check_types of id_reg_info.
-> > + */
-> > +enum feature_check_type {
-> > +     FCT_LOWER_SAFE = 0,
-> > +     FCT_HIGHER_SAFE,
-> > +     FCT_HIGHER_OR_ZERO_SAFE,
-> > +     FCT_EXACT,
-> > +     FCT_EXACT_OR_ZERO_SAFE,
-> > +     FCT_IGNORE,     /* Don't check (any value is fine) */
-> > +};
-> > +
-> > +static int arm64_check_feature_one(enum feature_check_type type, int val,
-> > +                                int limit)
-> > +{
-> > +     bool is_safe = false;
-> > +
-> > +     if (val == limit)
-> > +             return 0;
-> > +
-> > +     switch (type) {
-> > +     case FCT_LOWER_SAFE:
-> > +             is_safe = (val <= limit);
-> > +             break;
-> > +     case FCT_HIGHER_OR_ZERO_SAFE:
-> > +             if (val == 0) {
-> > +                     is_safe = true;
-> > +                     break;
-> > +             }
-> > +             fallthrough;
-> > +     case FCT_HIGHER_SAFE:
-> > +             is_safe = (val >= limit);
-> > +             break;
-> > +     case FCT_EXACT:
-> > +             break;
-> > +     case FCT_EXACT_OR_ZERO_SAFE:
-> > +             is_safe = (val == 0);
-> > +             break;
-> > +     case FCT_IGNORE:
-> > +             is_safe = true;
-> > +             break;
-> > +     default:
-> > +             WARN_ONCE(1, "Unexpected feature_check_type (%d)\n", type);
-> > +             break;
-> > +     }
-> > +
-> > +     return is_safe ? 0 : -1;
-> > +}
-> > +
-> > +#define      FCT_TYPE_MASK           0x7
-> > +#define      FCT_TYPE_SHIFT          1
-> > +#define      FCT_SIGN_MASK           0x1
-> > +#define      FCT_SIGN_SHIFT          0
-> > +#define      FCT_TYPE(val)   ((val >> FCT_TYPE_SHIFT) & FCT_TYPE_MASK)
-> > +#define      FCT_SIGN(val)   ((val >> FCT_SIGN_SHIFT) & FCT_SIGN_MASK)
-> > +
-> > +#define      MAKE_FCT(shift, type, sign)                             \
-> > +     ((u64)((((type) & FCT_TYPE_MASK) << FCT_TYPE_SHIFT) |   \
-> > +            (((sign) & FCT_SIGN_MASK) << FCT_SIGN_SHIFT)) << (shift))
-> > +
-> > +/* For signed field */
-> > +#define      S_FCT(shift, type)      MAKE_FCT(shift, type, 1)
-> > +/* For unigned field */
-> > +#define      U_FCT(shift, type)      MAKE_FCT(shift, type, 0)
-> > +
-> > +/*
-> > + * @val and @lim are both a value of the ID register. The function checks
-> > + * if all features indicated in @val can be supported for guests on the host,
-> > + * which supports features indicated in @lim. @check_types indicates how
-> > + * features in the ID register needs to be checked.
-> > + * See comments for id_reg_info's ftr_check_types field for more detail.
-> > + */
-> > +static int arm64_check_features(u64 check_types, u64 val, u64 lim)
-> > +{
-> > +     int i;
-> > +
-> > +     for (i = 0; i < 64; i += ARM64_FEATURE_FIELD_BITS) {
-> > +             u8 ftr_check = (check_types >> i) & ARM64_FEATURE_FIELD_MASK;
-> > +             bool is_sign = FCT_SIGN(ftr_check);
-> > +             enum feature_check_type fctype = FCT_TYPE(ftr_check);
-> > +             int fval, flim, ret;
-> > +
-> > +             fval = cpuid_feature_extract_field(val, i, is_sign);
-> > +             flim = cpuid_feature_extract_field(lim, i, is_sign);
-> > +
-> > +             ret = arm64_check_feature_one(fctype, fval, flim);
-> > +             if (ret)
-> > +                     return -E2BIG;
-> > +     }
-> > +     return 0;
-> > +}
-> > +
-> > +struct id_reg_info {
-> > +     u32     sys_reg;        /* Register ID */
-> > +
-> > +     /*
-> > +      * Limit value of the register for a vcpu. The value is the sanitized
-> > +      * system value with bits cleared for unsupported features for the
-> > +      * guest.
-> > +      */
-> > +     u64     vcpu_limit_val;
-> > +
-> > +     /*
-> > +      * The ftr_check_types is comprised of a set of 4 bits fields.
-> > +      * Each 4 bits field is for a feature indicated by the same bits
-> > +      * field of the ID register and indicates how the feature support
-> > +      * for guests needs to be checked.
-> > +      * The bit 0 indicates that the corresponding ID register field
-> > +      * is signed(1) or unsigned(0).
-> > +      * The bits [3:1] hold feature_check_type for the field.
-> > +      * If all zero, all features in the ID register are treated as unsigned
-> > +      * fields and checked based on Principles of the ID scheme for fields
-> > +      * in ID registers (FCT_LOWER_SAFE of feature_check_type).
-> > +      */
-> > +     u64     ftr_check_types;
-> > +
-> > +     /* Initialization function of the id_reg_info */
-> > +     void (*init)(struct id_reg_info *id_reg);
-> > +
-> > +     /* Register specific validation function */
-> > +     int (*validate)(struct kvm_vcpu *vcpu, const struct id_reg_info *id_reg,
-> > +                     u64 val);
-> > +
-> > +     /* Return the reset value of the register for the vCPU */
-> > +     u64 (*get_reset_val)(struct kvm_vcpu *vcpu,
-> > +                          const struct id_reg_info *id_reg);
-> It is unclear to me why we need 2 different callbacks, ie. init and
-> get_reset_val. ID_REGS can only be accessed from user space after the
-> vcpu reset, right? So couldn't we have a single cb instead of this
-> overwrite mechanism?
+> > I'd really prefer that this helper continue to return 0/-EINVAL, there's no hint
+> > in the function name that this return true/false.  And given the usage, there's
+> > no advantage to returning true/false.  On the contrary, if there's a future
+> > condition where this needs to exit to userspace, we'll end up switching this all
+> > back to int.
+>
+> I don't have any objection to that.
 
-Thank you for the comment.
+I think Sean's review makes a pretty compelling case that we should
+keep the int return value for `setup_vmgexit_scratch()`. In
+particular, failing to allocate a host kernel buffer definitely seems
+like a host error that should return to userspace. Though, failing to
+read the guest GPA seems less clear cut on who is at fault (host vs.
+guest), as Tom mentioned. My understanding from the commit description
+is that the entire point of the patch is to protect the guest from
+mis-behaving guest userspace code. So I would think that if we have a
+case like mapping the guest GPA that could fail due to the guest or
+the host, we should probably go ahead and use the new GHCB error codes
+to return back to the guest in this case. But either way, having an
+int return code seems like the way to go for
+`setup_vmgexit_scratch()`. Because if we are wrong in either
+direction, it's a trivial fix.
 
-What the init() does needs to be done just once.
-It initializes the id_reg_info itself (not for the ID register of vCPU).
-And the data initialized by the init() is used not just for the
-overwrite mechanism at the vcpu reset but for other purposes as well.
-
-What the get_reset_val does needs to be done for every initial vCPU reset.
-It provides the initial value for the vCPU, which depends on its feature
-configuration that is configured by KVM_ARM_VCPU_INIT (or other APIs).
-
-Of course there are other ways to achieve the same, and it's entirely
-possible to have a single function though.  I just chose to use a
-separate function for each of those two different purposes.
-
-Thanks,
-Reiji
+It's not as obvious to me that converting `sev_es_validate_vmgexit()`
+to return a bool is not cleaner than returning an int. This function
+seems to pretty much just process the GHCB buffer as a self-contained
+set of bits. So it's hard to imagine how this could fail in a way
+where exiting to userspace is the right thing to do. That being said,
+I do not have a strong objection to returning an int. Sean is right
+that an int is definitely more future proof. And I'm sure Sean (and
+Tom) have much better insight into how validating the bits written
+into the GHCB could potentially require code that could justify
+exiting out to userspace.
