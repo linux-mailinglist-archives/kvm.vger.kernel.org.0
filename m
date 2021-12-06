@@ -2,102 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D33FB46908D
-	for <lists+kvm@lfdr.de>; Mon,  6 Dec 2021 07:55:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 80EF84690A9
+	for <lists+kvm@lfdr.de>; Mon,  6 Dec 2021 08:12:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238108AbhLFG6x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Dec 2021 01:58:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53444 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231181AbhLFG6x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Dec 2021 01:58:53 -0500
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7510C0613F8;
-        Sun,  5 Dec 2021 22:55:24 -0800 (PST)
-Received: by mail-ed1-x52d.google.com with SMTP id x15so38933217edv.1;
-        Sun, 05 Dec 2021 22:55:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=o9/QtGK9oR+PrbKeE9O4NaKGRuklRnvYi5sQipG8Enc=;
-        b=d6IND9OTMwwK50ar0cFqieEXuAWqFDOjyT4zVU1m7cKjMdYwZxA8jeXxZCySLM9vZX
-         smZ3ygaYolkzkTSSuPtY512CN/k8I4UrZQeer7nHJc1GACuZAjuBqsFXlU0Btaz2MvhB
-         2E38s1yMnK7t6gKj2qm19als4cKUbY4+TacDRzrQ2K7BkI7aWIQm26Vp4OVqb1qT4eSx
-         wewmqb6sbk64O0kH1qahQFNhga8r3z9DDY+nGaYKVYhYEGXyz72DpUuHe5FhyDWL63Bt
-         5xHWLtABvwfAoP3zltTS9pZbzOmYMcd6lgiI9/lXa/NPO5/U2GV4sPMQRE+GvcJqr689
-         +jSw==
+        id S238382AbhLFHPr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Dec 2021 02:15:47 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:39292 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S238367AbhLFHPr (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 6 Dec 2021 02:15:47 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1638774738;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=s80mS0oS6VA8hHFmNGuRkp6f0ywSZXv8mbp9txN0j8M=;
+        b=XwU5Wx5GzVKc6Tq8NltREYnfuzYEqPy2q2okGGB8OL0EvLdr7xXEWPQP5ji6rS6wX3lXfj
+        DHlnDAnbTJ0qxU4S3JuCVKmRmv8trqIYYwA7IWO5W5+U2lG0Gtyl0z4SHnWoftsofdiqw1
+        9qqPwpUGVox03qMtXRkzOhQzP7hFkmI=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-542-NwpJsSj0PgKP52CvjfhtWA-1; Mon, 06 Dec 2021 02:12:17 -0500
+X-MC-Unique: NwpJsSj0PgKP52CvjfhtWA-1
+Received: by mail-wm1-f70.google.com with SMTP id 69-20020a1c0148000000b0033214e5b021so5664612wmb.3
+        for <kvm@vger.kernel.org>; Sun, 05 Dec 2021 23:12:16 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:cc:references:from:subject:in-reply-to
          :content-transfer-encoding;
-        bh=o9/QtGK9oR+PrbKeE9O4NaKGRuklRnvYi5sQipG8Enc=;
-        b=3dz6jSyBB3E5XqfGaZRCPfbmIsiWoYhnmvDHqIzxcu+B4CmX6ByhzRRaoOB0dRwL0e
-         0pui6EsY198ZlIwyzWmXJs3dnFzranUZxwio7VzCgT/Z9AuRbL5XhOWzWJ3EDIRBraGp
-         lH3k4RYcoN+sCOfC2V+7tJj8eVa3q4qme+UXGktuWwFuxaCDUMn14v76hB/tlzUs1SMh
-         us65E++mHpL2RZ/gbbZfHHwGssmcwsm5XGF/3CfXBNhsIU9q6A8Emj3/w1+O5L2FpdME
-         8iu5zUiRvJdjIJUVBQ2ziGD/LmQyywRgdVzEyfrkzo7nULsD5yJlZ0N/WijUYRA95ThM
-         rweg==
-X-Gm-Message-State: AOAM531RvENt2QusX8orTgNakFkXyaRrswLutY1uNl+F66wa6uG1gD30
-        8TgDppb23AbvndkCA3Rw1pM=
-X-Google-Smtp-Source: ABdhPJwYqKZmlCWEZj0I93ny3t+QY6z5iqs2bFYfD74gFkyEWa9hwKRH/foduwTPpflNmOjjj1BuBA==
-X-Received: by 2002:a17:907:3e8a:: with SMTP id hs10mr42611615ejc.58.1638773723166;
-        Sun, 05 Dec 2021 22:55:23 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id g11sm7466198edz.53.2021.12.05.22.55.20
+        bh=s80mS0oS6VA8hHFmNGuRkp6f0ywSZXv8mbp9txN0j8M=;
+        b=QqStGao20ITl/zzjANHh9ZuinrE+WpH70jfbXWbqvXGsAfLed9wsS8nGjfxJ+eyrKu
+         Li9ML2u0m5s20beEZLEKbJR4mC48XtOplHem94ZBgcvTUNLwtTNus1r3+pqUt8pN2G7e
+         ff32eKHxlyqVFTlnLDWiV2oMsxYFrpJ/BT5E/Lfh/1r0CULBU6Mn+yzUUSKw8TzcFADo
+         BwkC/GUtcMENh2jhiAuKejSW7gU6MF4uRLrn25dmnCJLviGtB7Ala2Lq9CJCKfY1sRh/
+         jPOCN1w8tgxHtVCqTWRaZiCDK9DQVwyxbG4/XKpCF0VWUcqBknb3OFV5WUqz5pcFrhZg
+         j9tQ==
+X-Gm-Message-State: AOAM532Vtqh3Uasu/8+Z9ysoJxz/qi4/HFWDaLruCbtLs7H9Y4JmkLCr
+        wDCnp/Pvc8o3bGjw9UPRQYFSnLIruAw9xkpZLqa8UOQJPoS0kNXkgLSQIUHegXIleA3R+1JT6fT
+        6T6TF5hgaFfVs
+X-Received: by 2002:a05:600c:1083:: with SMTP id e3mr36133110wmd.167.1638774735935;
+        Sun, 05 Dec 2021 23:12:15 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwmgj5d1pHUsIBWklPylwjGlJ3R+iMEI+cUrriNE82Ux1hGbXdVPcGawwYcCauy2yVUmATaaA==
+X-Received: by 2002:a05:600c:1083:: with SMTP id e3mr36133090wmd.167.1638774735719;
+        Sun, 05 Dec 2021 23:12:15 -0800 (PST)
+Received: from [10.33.192.183] (nat-pool-str-t.redhat.com. [149.14.88.106])
+        by smtp.gmail.com with ESMTPSA id b11sm12363197wmj.35.2021.12.05.23.12.14
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 05 Dec 2021 22:55:22 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <56b9d000-8743-52cb-4f10-4d3fa2b30f29@redhat.com>
-Date:   Mon, 6 Dec 2021 07:55:18 +0100
+        Sun, 05 Dec 2021 23:12:15 -0800 (PST)
+Message-ID: <babd1100-844b-e00c-3e5b-30f7bca65636@redhat.com>
+Date:   Mon, 6 Dec 2021 08:12:14 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [KVM] d3750a0923:
- WARNING:possible_circular_locking_dependency_detected
+ Thunderbird/91.3.0
 Content-Language: en-US
-To:     kernel test robot <oliver.sang@intel.com>,
-        David Matlack <dmatlack@google.com>
-Cc:     0day robot <lkp@intel.com>, LKML <linux-kernel@vger.kernel.org>,
-        lkp@lists.01.org, kvm@vger.kernel.org,
-        Ben Gardon <bgardon@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Jim Mattson <jmattson@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>,
-        Junaid Shahid <junaids@google.com>,
-        Oliver Upton <oupton@google.com>,
-        Harish Barathvajasankar <hbarath@google.com>,
-        Peter Xu <peterx@redhat.com>, Peter Shier <pshier@google.com>
-References: <20211205133039.GD33002@xsang-OptiPlex-9020>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211205133039.GD33002@xsang-OptiPlex-9020>
+To:     David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, Janosch Frank <frankja@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Sebastian Mitterle <smitterl@redhat.com>,
+        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org
+References: <20211202123553.96412-1-david@redhat.com>
+ <20211202123553.96412-3-david@redhat.com>
+ <11f0ff2f-2bae-0f1b-753f-b0e9dc24b345@redhat.com>
+ <20211203121819.145696b0@p-imbrenda>
+ <fa95d6e6-27be-7abf-7b1e-bb6bb9d62214@redhat.com>
+From:   Thomas Huth <thuth@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v2 2/2] s390x: firq: floating interrupt
+ test
+In-Reply-To: <fa95d6e6-27be-7abf-7b1e-bb6bb9d62214@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/5/21 14:30, kernel test robot wrote:
->
-> Chain exists of:
->   fs_reclaim --> mmu_notifier_invalidate_range_start --> &(kvm)->mmu_lock
->
->  Possible unsafe locking scenario:
->
->        CPU0                    CPU1
->        ----                    ----
->   lock(&(kvm)->mmu_lock);
->                                lock(mmu_notifier_invalidate_range_start);
->                                lock(&(kvm)->mmu_lock);
->   lock(fs_reclaim);
->
+On 03/12/2021 19.23, David Hildenbrand wrote:
+> 
+>>>> +	if (smp_query_num_cpus() < 3) {
+>>>> +		report_skip("need at least 3 CPUs for this test");
+>>>> +		goto out;
+>>>> +	}
+>>>> +
+>>>> +	if (stap()) {
+>>>> +		report_skip("need to start on CPU #0");
+>>>> +		goto out;
+>>>> +	}
+>>>
+>>> I think I'd rather turn this into an assert() instead ... no strong opinion
+>>> about it, though.
+>>
+>> I agree, including the part about no strong opinions (which is why I
+>> did not comment on it before)
+> 
+> Would it be the case on any system we might end up running, even under
+> LPAR ... and whoever could run these tests ?
 
-David, this is yours; basically, kvm_mmu_topup_memory_cache must be 
-called outside the mmu_lock.
+Well, ok, since it likely doesn't happen in real life anyway, simply keep 
+the report_skip().
 
-Paolo
+>>
+>>>
+>>>> +
+>>>> +	/*
+>>>> +	 * We want CPU #2 to be stopped. This should be the case at this
+>>>> +	 * point, however, we want to sense if it even exists as well.
+>>>> +	 */
+>>>> +	ret = smp_cpu_stop(2);
+>>>> +	if (ret) {
+>>>> +		report_skip("CPU #2 not found");
+>>>
+>>> Since you already queried for the availablity of at least 3 CPUs above, I
+>>> think you could turn this into a report_fail() instead?
+>>
+>> either that or an assert, but again, no strong opinions
+>>
+> 
+> Just because there are >= 3 CPUs doesn't imply that CPU #2 is around.
+
+Ok, fair point. But if #2 is not around, it means that the test has been run 
+in the wrong way by the user... I wonder what's better in that case - to 
+skip this test or to go out with a bang. Skipping the test has the advantage 
+of looking a little bit more "polite", but it has the disadvantage that it 
+might get lost in automation, e.g. if somebody enabled the test in their CI, 
+but did something wrong in the settings, they might not notice that the test 
+is not run at all...
+
+> What we could remove is the "if (smp_query_num_cpus() < 3) {" check, though!
+
+Yes, that seems to be redundant, indeed.
+
+  Thomas
+
