@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C4EE4468EB0
-	for <lists+kvm@lfdr.de>; Mon,  6 Dec 2021 02:59:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A47D5468EB2
+	for <lists+kvm@lfdr.de>; Mon,  6 Dec 2021 02:59:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231919AbhLFCC7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 5 Dec 2021 21:02:59 -0500
-Received: from mga06.intel.com ([134.134.136.31]:51453 "EHLO mga06.intel.com"
+        id S232007AbhLFCDF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 5 Dec 2021 21:03:05 -0500
+Received: from mga12.intel.com ([192.55.52.136]:1386 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231851AbhLFCC4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 5 Dec 2021 21:02:56 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10189"; a="298027408"
+        id S231851AbhLFCDF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 5 Dec 2021 21:03:05 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10189"; a="217255471"
 X-IronPort-AV: E=Sophos;i="5.87,290,1631602800"; 
-   d="scan'208,223";a="298027408"
+   d="scan'208";a="217255471"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2021 17:59:26 -0800
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2021 17:59:37 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.87,290,1631602800"; 
-   d="scan'208,223";a="514541932"
+   d="scan'208";a="514541949"
 Received: from allen-box.sh.intel.com ([10.239.159.118])
-  by orsmga008.jf.intel.com with ESMTP; 05 Dec 2021 17:59:19 -0800
+  by orsmga008.jf.intel.com with ESMTP; 05 Dec 2021 17:59:26 -0800
 From:   Lu Baolu <baolu.lu@linux.intel.com>
 To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Joerg Roedel <joro@8bytes.org>,
@@ -49,9 +49,9 @@ Cc:     Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
         iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Lu Baolu <baolu.lu@linux.intel.com>
-Subject: [PATCH v3 01/18] iommu: Add device dma ownership set/release interfaces
-Date:   Mon,  6 Dec 2021 09:58:46 +0800
-Message-Id: <20211206015903.88687-2-baolu.lu@linux.intel.com>
+Subject: [PATCH v3 02/18] driver core: Add dma_cleanup callback in bus_type
+Date:   Mon,  6 Dec 2021 09:58:47 +0800
+Message-Id: <20211206015903.88687-3-baolu.lu@linux.intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20211206015903.88687-1-baolu.lu@linux.intel.com>
 References: <20211206015903.88687-1-baolu.lu@linux.intel.com>
@@ -61,231 +61,89 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From the perspective of who is initiating the device to do DMA, device
-DMA could be divided into the following types:
+The bus_type structure defines dma_configure() callback for bus drivers
+to configure DMA on the devices. This adds the paired dma_cleanup()
+callback and calls it during driver unbinding so that bus drivers can do
+some cleanup work.
 
-        DMA_OWNER_DMA_API: Device DMAs are initiated by a kernel driver
-			through the kernel DMA API.
-        DMA_OWNER_PRIVATE_DOMAIN: Device DMAs are initiated by a kernel
-			driver with its own PRIVATE domain.
-	DMA_OWNER_PRIVATE_DOMAIN_USER: Device DMAs are initiated by
-			userspace.
+One use case for this paired DMA callbacks is for the bus driver to check
+for DMA ownership conflicts during driver binding, where multiple devices
+belonging to a same IOMMU group (the minimum granularity of isolation and
+protection) may be assigned to kernel drivers or user space respectively.
 
-Different DMA ownerships are exclusive for all devices in the same iommu
-group as an iommu group is the smallest granularity of device isolation
-and protection that the IOMMU subsystem can guarantee. This extends the
-iommu core to enforce this exclusion.
+Without this change, for example, the vfio driver has to listen to a bus
+BOUND_DRIVER event and then BUG_ON() in case of dma ownership conflict.
+This leads to bad user experience since careless driver binding operation
+may crash the system if the admin overlooks the group restriction. Aside
+from bad design, this leads to a security problem as a root user, even with
+lockdown=integrity, can force the kernel to BUG.
 
-Basically two new interfaces are provided:
+With this change, the bus driver could check and set the DMA ownership in
+driver binding process and fail on ownership conflicts. The DMA ownership
+should be released during driver unbinding.
 
-        int iommu_device_set_dma_owner(struct device *dev,
-                enum iommu_dma_owner type, void *owner_cookie);
-        void iommu_device_release_dma_owner(struct device *dev,
-                enum iommu_dma_owner type);
-
-Although above interfaces are per-device, DMA owner is tracked per group
-under the hood. An iommu group cannot have different dma ownership set
-at the same time. Violation of this assumption fails
-iommu_device_set_dma_owner().
-
-Kernel driver which does DMA have DMA_OWNER_DMA_API automatically set/
-released in the driver binding/unbinding process (see next patch).
-
-Kernel driver which doesn't do DMA could avoid setting the owner type.
-Device bound to such driver is considered same as a driver-less device
-which is compatible to all owner types.
-
-Userspace driver framework (e.g. vfio) should set
-DMA_OWNER_PRIVATE_DOMAIN_USER for a device before the userspace is allowed
-to access it, plus a owner cookie pointer to mark the user identity so a
-single group cannot be operated by multiple users simultaneously. Vice
-versa, the owner type should be released after the user access permission
-is withdrawn.
-
-Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-Signed-off-by: Kevin Tian <kevin.tian@intel.com>
+Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+Link: https://lore.kernel.org/linux-iommu/20210922123931.GI327412@nvidia.com/
+Link: https://lore.kernel.org/linux-iommu/20210928115751.GK964074@nvidia.com/
 Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
 ---
- include/linux/iommu.h | 36 +++++++++++++++++
- drivers/iommu/iommu.c | 93 +++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 129 insertions(+)
+ include/linux/device/bus.h | 3 +++
+ drivers/base/dd.c          | 7 ++++++-
+ 2 files changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/iommu.h b/include/linux/iommu.h
-index d2f3435e7d17..24676b498f38 100644
---- a/include/linux/iommu.h
-+++ b/include/linux/iommu.h
-@@ -162,6 +162,23 @@ enum iommu_dev_features {
- 	IOMMU_DEV_FEAT_IOPF,
- };
+diff --git a/include/linux/device/bus.h b/include/linux/device/bus.h
+index a039ab809753..d8b29ccd07e5 100644
+--- a/include/linux/device/bus.h
++++ b/include/linux/device/bus.h
+@@ -59,6 +59,8 @@ struct fwnode_handle;
+  *		bus supports.
+  * @dma_configure:	Called to setup DMA configuration on a device on
+  *			this bus.
++ * @dma_cleanup:	Called to cleanup DMA configuration on a device on
++ *			this bus.
+  * @pm:		Power management operations of this bus, callback the specific
+  *		device driver's pm-ops.
+  * @iommu_ops:  IOMMU specific operations for this bus, used to attach IOMMU
+@@ -103,6 +105,7 @@ struct bus_type {
+ 	int (*num_vf)(struct device *dev);
  
-+/**
-+ * enum iommu_dma_owner - IOMMU DMA ownership
-+ * @DMA_OWNER_NONE: No DMA ownership.
-+ * @DMA_OWNER_DMA_API: Device DMAs are initiated by a kernel driver through
-+ *			the kernel DMA API.
-+ * @DMA_OWNER_PRIVATE_DOMAIN: Device DMAs are initiated by a kernel driver
-+ *			which provides an UNMANAGED domain.
-+ * @DMA_OWNER_PRIVATE_DOMAIN_USER: Device DMAs are initiated by userspace,
-+ *			kernel ensures that DMAs never go to kernel memory.
-+ */
-+enum iommu_dma_owner {
-+	DMA_OWNER_NONE,
-+	DMA_OWNER_DMA_API,
-+	DMA_OWNER_PRIVATE_DOMAIN,
-+	DMA_OWNER_PRIVATE_DOMAIN_USER,
-+};
-+
- #define IOMMU_PASID_INVALID	(-1U)
+ 	int (*dma_configure)(struct device *dev);
++	void (*dma_cleanup)(struct device *dev);
  
- #ifdef CONFIG_IOMMU_API
-@@ -681,6 +698,10 @@ struct iommu_sva *iommu_sva_bind_device(struct device *dev,
- void iommu_sva_unbind_device(struct iommu_sva *handle);
- u32 iommu_sva_get_pasid(struct iommu_sva *handle);
+ 	const struct dev_pm_ops *pm;
  
-+int iommu_device_set_dma_owner(struct device *dev, enum iommu_dma_owner owner,
-+			       void *owner_cookie);
-+void iommu_device_release_dma_owner(struct device *dev, enum iommu_dma_owner owner);
-+
- #else /* CONFIG_IOMMU_API */
+diff --git a/drivers/base/dd.c b/drivers/base/dd.c
+index 68ea1f949daa..ae457fa2bca6 100644
+--- a/drivers/base/dd.c
++++ b/drivers/base/dd.c
+@@ -577,7 +577,7 @@ static int really_probe(struct device *dev, struct device_driver *drv)
+ 	if (dev->bus->dma_configure) {
+ 		ret = dev->bus->dma_configure(dev);
+ 		if (ret)
+-			goto probe_failed;
++			goto pinctrl_bind_failed;
+ 	}
  
- struct iommu_ops {};
-@@ -1081,6 +1102,21 @@ static inline struct iommu_fwspec *dev_iommu_fwspec_get(struct device *dev)
- {
- 	return NULL;
- }
-+
-+static inline int iommu_device_set_dma_owner(struct device *dev,
-+					     enum iommu_dma_owner owner,
-+					     void *owner_cookie)
-+{
-+	if (owner != DMA_OWNER_DMA_API)
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
-+static inline void iommu_device_release_dma_owner(struct device *dev,
-+						  enum iommu_dma_owner owner)
-+{
-+}
- #endif /* CONFIG_IOMMU_API */
+ 	ret = driver_sysfs_add(dev);
+@@ -660,6 +660,8 @@ static int really_probe(struct device *dev, struct device_driver *drv)
+ 	if (dev->bus)
+ 		blocking_notifier_call_chain(&dev->bus->p->bus_notifier,
+ 					     BUS_NOTIFY_DRIVER_NOT_BOUND, dev);
++	if (dev->bus->dma_cleanup)
++		dev->bus->dma_cleanup(dev);
+ pinctrl_bind_failed:
+ 	device_links_no_driver(dev);
+ 	devres_release_all(dev);
+@@ -1204,6 +1206,9 @@ static void __device_release_driver(struct device *dev, struct device *parent)
+ 		else if (drv->remove)
+ 			drv->remove(dev);
  
- /**
-diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-index 8b86406b7162..1de520a07518 100644
---- a/drivers/iommu/iommu.c
-+++ b/drivers/iommu/iommu.c
-@@ -48,6 +48,9 @@ struct iommu_group {
- 	struct iommu_domain *default_domain;
- 	struct iommu_domain *domain;
- 	struct list_head entry;
-+	enum iommu_dma_owner dma_owner;
-+	refcount_t owner_cnt;
-+	void *owner_cookie;
- };
++		if (dev->bus->dma_cleanup)
++			dev->bus->dma_cleanup(dev);
++
+ 		device_links_driver_cleanup(dev);
  
- struct group_device {
-@@ -621,6 +624,7 @@ struct iommu_group *iommu_group_alloc(void)
- 	INIT_LIST_HEAD(&group->devices);
- 	INIT_LIST_HEAD(&group->entry);
- 	BLOCKING_INIT_NOTIFIER_HEAD(&group->notifier);
-+	group->dma_owner = DMA_OWNER_NONE;
- 
- 	ret = ida_simple_get(&iommu_group_ida, 0, 0, GFP_KERNEL);
- 	if (ret < 0) {
-@@ -3351,3 +3355,92 @@ static ssize_t iommu_group_store_type(struct iommu_group *group,
- 
- 	return ret;
- }
-+
-+static int __iommu_group_set_dma_owner(struct iommu_group *group,
-+				       enum iommu_dma_owner owner,
-+				       void *owner_cookie)
-+{
-+	if (refcount_inc_not_zero(&group->owner_cnt)) {
-+		if (group->dma_owner != owner ||
-+		    group->owner_cookie != owner_cookie) {
-+			refcount_dec(&group->owner_cnt);
-+			return -EBUSY;
-+		}
-+
-+		return 0;
-+	}
-+
-+	group->dma_owner = owner;
-+	group->owner_cookie = owner_cookie;
-+	refcount_set(&group->owner_cnt, 1);
-+
-+	return 0;
-+}
-+
-+static void __iommu_group_release_dma_owner(struct iommu_group *group,
-+					    enum iommu_dma_owner owner)
-+{
-+	if (WARN_ON(group->dma_owner != owner))
-+		return;
-+
-+	if (!refcount_dec_and_test(&group->owner_cnt))
-+		return;
-+
-+	group->dma_owner = DMA_OWNER_NONE;
-+}
-+
-+/**
-+ * iommu_device_set_dma_owner() - Set DMA ownership of a device
-+ * @dev: The device.
-+ * @owner: DMA ownership type.
-+ * @owner_cookie: Caller specified pointer. Could be used for exclusive
-+ *                declaration. Could be NULL.
-+ *
-+ * Set the DMA ownership of a device. The different ownerships are
-+ * exclusive. The caller could specify a owner_cookie pointer so that
-+ * the same DMA ownership could be exclusive among different owners.
-+ */
-+int iommu_device_set_dma_owner(struct device *dev, enum iommu_dma_owner owner,
-+			       void *owner_cookie)
-+{
-+	struct iommu_group *group = iommu_group_get(dev);
-+	int ret;
-+
-+	if (!group) {
-+		if (owner == DMA_OWNER_DMA_API)
-+			return 0;
-+		else
-+			return -ENODEV;
-+	}
-+
-+	mutex_lock(&group->mutex);
-+	ret = __iommu_group_set_dma_owner(group, owner, owner_cookie);
-+	mutex_unlock(&group->mutex);
-+	iommu_group_put(group);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(iommu_device_set_dma_owner);
-+
-+/**
-+ * iommu_device_release_dma_owner() - Release DMA ownership of a device
-+ * @dev: The device.
-+ * @owner: The DMA ownership type.
-+ *
-+ * Release the DMA ownership claimed by iommu_device_set_dma_owner().
-+ */
-+void iommu_device_release_dma_owner(struct device *dev, enum iommu_dma_owner owner)
-+{
-+	struct iommu_group *group = iommu_group_get(dev);
-+
-+	if (!group) {
-+		WARN_ON(owner != DMA_OWNER_DMA_API);
-+		return;
-+	}
-+
-+	mutex_lock(&group->mutex);
-+	__iommu_group_release_dma_owner(group, owner);
-+	mutex_unlock(&group->mutex);
-+	iommu_group_put(group);
-+}
-+EXPORT_SYMBOL_GPL(iommu_device_release_dma_owner);
+ 		devres_release_all(dev);
 -- 
 2.25.1
 
