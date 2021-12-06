@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 337B746A631
-	for <lists+kvm@lfdr.de>; Mon,  6 Dec 2021 20:55:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 42C4046A635
+	for <lists+kvm@lfdr.de>; Mon,  6 Dec 2021 20:56:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349085AbhLFT7X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Dec 2021 14:59:23 -0500
-Received: from vps-vb.mhejs.net ([37.28.154.113]:49986 "EHLO vps-vb.mhejs.net"
+        id S1349140AbhLFT7l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Dec 2021 14:59:41 -0500
+Received: from vps-vb.mhejs.net ([37.28.154.113]:50024 "EHLO vps-vb.mhejs.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1349075AbhLFT7T (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Dec 2021 14:59:19 -0500
+        id S1349103AbhLFT73 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Dec 2021 14:59:29 -0500
 Received: from MUA
         by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <mail@maciej.szmigiero.name>)
-        id 1muK5B-0000pB-Hs; Mon, 06 Dec 2021 20:55:29 +0100
+        id 1muK5G-0000pz-Rs; Mon, 06 Dec 2021 20:55:34 +0100
 From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>
@@ -43,9 +43,9 @@ Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Ben Gardon <bgardon@google.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v7 09/29] KVM: s390: Use "new" memslot instead of userspace memory region
-Date:   Mon,  6 Dec 2021 20:54:15 +0100
-Message-Id: <917ed131c06a4c7b35dd7fb7ed7955be899ad8cc.1638817639.git.maciej.szmigiero@oracle.com>
+Subject: [PATCH v7 10/29] KVM: x86: Use "new" memslot instead of userspace memory region
+Date:   Mon,  6 Dec 2021 20:54:16 +0100
+Message-Id: <ef44892eb615f5c28e682bbe06af96aff9ce2a9f.1638817639.git.maciej.szmigiero@oracle.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <cover.1638817637.git.maciej.szmigiero@oracle.com>
 References: <cover.1638817637.git.maciej.szmigiero@oracle.com>
@@ -57,60 +57,42 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Sean Christopherson <seanjc@google.com>
 
-Get the gfn, size, and hva from the new memslot instead of the userspace
-memory region when preparing/committing memory region changes.  This will
-allow a future commit to drop the @mem param.
+Get the number of pages directly from the new memslot instead of
+computing the same from the userspace memory region when allocating
+memslot metadata.  This will allow a future patch to drop @mem.
 
-Note, this has a subtle functional change as KVM would previously reject
-DELETE if userspace provided a garbage userspace_addr or guest_phys_addr,
-whereas KVM zeros those fields in the "new" memslot when deleting an
-existing memslot.  Arguably the old behavior is more correct, but there's
-zero benefit into requiring userspace to provide sane values for hva and
-gfn.
+No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
 Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
 ---
- arch/s390/kvm/kvm-s390.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+ arch/x86/kvm/x86.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 3d943c78a770..6947edf3da60 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -5012,18 +5012,20 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 				   struct kvm_memory_slot *new,
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index d6362406a82e..e657c238b642 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -11642,9 +11642,9 @@ int memslot_rmap_alloc(struct kvm_memory_slot *slot, unsigned long npages)
+ }
+ 
+ static int kvm_alloc_memslot_metadata(struct kvm *kvm,
+-				      struct kvm_memory_slot *slot,
+-				      unsigned long npages)
++				      struct kvm_memory_slot *slot)
+ {
++	unsigned long npages = slot->npages;
+ 	int i, r;
+ 
+ 	/*
+@@ -11729,8 +11729,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
  				   enum kvm_mr_change change)
  {
-+	gpa_t size = new->npages * PAGE_SIZE;
-+
- 	/* A few sanity checks. We can have memory slots which have to be
- 	   located/ended at a segment boundary (1MB). The memory in userland is
- 	   ok to be fragmented into various different vmas. It is okay to mmap()
- 	   and munmap() stuff in this slot after doing this call at any time */
+ 	if (change == KVM_MR_CREATE || change == KVM_MR_MOVE)
+-		return kvm_alloc_memslot_metadata(kvm, new,
+-						  mem->memory_size >> PAGE_SHIFT);
++		return kvm_alloc_memslot_metadata(kvm, new);
  
--	if (mem->userspace_addr & 0xffffful)
-+	if (new->userspace_addr & 0xffffful)
- 		return -EINVAL;
- 
--	if (mem->memory_size & 0xffffful)
-+	if (size & 0xffffful)
- 		return -EINVAL;
- 
--	if (mem->guest_phys_addr + mem->memory_size > kvm->arch.mem_limit)
-+	if ((new->base_gfn * PAGE_SIZE) + size > kvm->arch.mem_limit)
- 		return -EINVAL;
- 
- 	/* When we are protected, we should not change the memory slots */
-@@ -5052,8 +5054,9 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
- 			break;
- 		fallthrough;
- 	case KVM_MR_CREATE:
--		rc = gmap_map_segment(kvm->arch.gmap, mem->userspace_addr,
--				      mem->guest_phys_addr, mem->memory_size);
-+		rc = gmap_map_segment(kvm->arch.gmap, new->userspace_addr,
-+				      new->base_gfn * PAGE_SIZE,
-+				      new->npages * PAGE_SIZE);
- 		break;
- 	case KVM_MR_FLAGS_ONLY:
- 		break;
+ 	if (change == KVM_MR_FLAGS_ONLY)
+ 		memcpy(&new->arch, &old->arch, sizeof(old->arch));
