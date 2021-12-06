@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 55A3946A62E
-	for <lists+kvm@lfdr.de>; Mon,  6 Dec 2021 20:55:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C859A46A633
+	for <lists+kvm@lfdr.de>; Mon,  6 Dec 2021 20:55:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348974AbhLFT7L (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Dec 2021 14:59:11 -0500
-Received: from vps-vb.mhejs.net ([37.28.154.113]:49914 "EHLO vps-vb.mhejs.net"
+        id S1349009AbhLFT7V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Dec 2021 14:59:21 -0500
+Received: from vps-vb.mhejs.net ([37.28.154.113]:49976 "EHLO vps-vb.mhejs.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1349008AbhLFT7J (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Dec 2021 14:59:09 -0500
+        id S1349086AbhLFT7T (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Dec 2021 14:59:19 -0500
 Received: from MUA
         by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <mail@maciej.szmigiero.name>)
-        id 1muK50-0000n1-SA; Mon, 06 Dec 2021 20:55:18 +0100
+        id 1muK56-0000nt-6a; Mon, 06 Dec 2021 20:55:24 +0100
 From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>
@@ -43,9 +43,9 @@ Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Ben Gardon <bgardon@google.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v7 07/29] KVM: MIPS: Drop pr_debug from memslot commit to avoid using "mem"
-Date:   Mon,  6 Dec 2021 20:54:13 +0100
-Message-Id: <446929a668f6e1346751571b71db41e94e976cdf.1638817639.git.maciej.szmigiero@oracle.com>
+Subject: [PATCH v7 08/29] KVM: PPC: Avoid referencing userspace memory region in memslot updates
+Date:   Mon,  6 Dec 2021 20:54:14 +0100
+Message-Id: <1e97fb5198be25f98ef82e63a8d770c682264cc9.1638817639.git.maciej.szmigiero@oracle.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <cover.1638817637.git.maciej.szmigiero@oracle.com>
 References: <cover.1638817637.git.maciej.szmigiero@oracle.com>
@@ -57,36 +57,186 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Sean Christopherson <seanjc@google.com>
 
-Remove an old (circa 2012) kvm_debug from kvm_arch_commit_memory_region()
-to print basic information when committing a memslot change.  The primary
-motivation for removing the kvm_debug is to avoid using @mem, the user
-memory region, so that said param can be removed.
+For PPC HV, get the number of pages directly from the new memslot instead
+of computing the same from the userspace memory region, and explicitly
+check for !DELETE instead of inferring the same when toggling mmio_update.
+The motivation for these changes is to avoid referencing the @mem param
+so that it can be dropped in a future commit.
 
-Alternatively, the debug message could be converted to use @new, but that
-would require synthesizing select state to play nice with the DELETED
-case, which will pass NULL for @new in the future.  And there's no
-argument to be had for dumping generic information in an arch callback,
-i.e. if there's a good reason for the debug message, then it belongs in
-common KVM code where all architectures can benefit.
+No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
 ---
- arch/mips/kvm/mips.c | 4 ----
- 1 file changed, 4 deletions(-)
+ arch/powerpc/include/asm/kvm_ppc.h |  4 ----
+ arch/powerpc/kvm/book3s.c          |  6 ++----
+ arch/powerpc/kvm/book3s_hv.c       | 12 +++---------
+ arch/powerpc/kvm/book3s_pr.c       |  2 --
+ arch/powerpc/kvm/booke.c           |  2 --
+ arch/powerpc/kvm/powerpc.c         |  4 ++--
+ 6 files changed, 7 insertions(+), 23 deletions(-)
 
-diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-index b2ce10784eb0..bda717301db8 100644
---- a/arch/mips/kvm/mips.c
-+++ b/arch/mips/kvm/mips.c
-@@ -230,10 +230,6 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
- {
- 	int needs_flush;
+diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
+index b01760dd1374..935c58dc38c4 100644
+--- a/arch/powerpc/include/asm/kvm_ppc.h
++++ b/arch/powerpc/include/asm/kvm_ppc.h
+@@ -200,12 +200,10 @@ extern void kvmppc_core_destroy_vm(struct kvm *kvm);
+ extern void kvmppc_core_free_memslot(struct kvm *kvm,
+ 				     struct kvm_memory_slot *slot);
+ extern int kvmppc_core_prepare_memory_region(struct kvm *kvm,
+-				const struct kvm_userspace_memory_region *mem,
+ 				const struct kvm_memory_slot *old,
+ 				struct kvm_memory_slot *new,
+ 				enum kvm_mr_change change);
+ extern void kvmppc_core_commit_memory_region(struct kvm *kvm,
+-				const struct kvm_userspace_memory_region *mem,
+ 				struct kvm_memory_slot *old,
+ 				const struct kvm_memory_slot *new,
+ 				enum kvm_mr_change change);
+@@ -275,12 +273,10 @@ struct kvmppc_ops {
+ 	int (*get_dirty_log)(struct kvm *kvm, struct kvm_dirty_log *log);
+ 	void (*flush_memslot)(struct kvm *kvm, struct kvm_memory_slot *memslot);
+ 	int (*prepare_memory_region)(struct kvm *kvm,
+-				     const struct kvm_userspace_memory_region *mem,
+ 				     const struct kvm_memory_slot *old,
+ 				     struct kvm_memory_slot *new,
+ 				     enum kvm_mr_change change);
+ 	void (*commit_memory_region)(struct kvm *kvm,
+-				     const struct kvm_userspace_memory_region *mem,
+ 				     struct kvm_memory_slot *old,
+ 				     const struct kvm_memory_slot *new,
+ 				     enum kvm_mr_change change);
+diff --git a/arch/powerpc/kvm/book3s.c b/arch/powerpc/kvm/book3s.c
+index 8250e8308674..6d525285dbe8 100644
+--- a/arch/powerpc/kvm/book3s.c
++++ b/arch/powerpc/kvm/book3s.c
+@@ -847,21 +847,19 @@ void kvmppc_core_flush_memslot(struct kvm *kvm, struct kvm_memory_slot *memslot)
+ }
  
--	kvm_debug("%s: kvm: %p slot: %d, GPA: %llx, size: %llx, QVA: %llx\n",
--		  __func__, kvm, mem->slot, mem->guest_phys_addr,
--		  mem->memory_size, mem->userspace_addr);
+ int kvmppc_core_prepare_memory_region(struct kvm *kvm,
+-				      const struct kvm_userspace_memory_region *mem,
+ 				      const struct kvm_memory_slot *old,
+ 				      struct kvm_memory_slot *new,
+ 				      enum kvm_mr_change change)
+ {
+-	return kvm->arch.kvm_ops->prepare_memory_region(kvm, mem, old, new, change);
++	return kvm->arch.kvm_ops->prepare_memory_region(kvm, old, new, change);
+ }
+ 
+ void kvmppc_core_commit_memory_region(struct kvm *kvm,
+-				const struct kvm_userspace_memory_region *mem,
+ 				struct kvm_memory_slot *old,
+ 				const struct kvm_memory_slot *new,
+ 				enum kvm_mr_change change)
+ {
+-	kvm->arch.kvm_ops->commit_memory_region(kvm, mem, old, new, change);
++	kvm->arch.kvm_ops->commit_memory_region(kvm, old, new, change);
+ }
+ 
+ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index d7594d49d288..2b59ecc5f8c6 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -4854,15 +4854,12 @@ static void kvmppc_core_free_memslot_hv(struct kvm_memory_slot *slot)
+ }
+ 
+ static int kvmppc_core_prepare_memory_region_hv(struct kvm *kvm,
+-				const struct kvm_userspace_memory_region *mem,
+ 				const struct kvm_memory_slot *old,
+ 				struct kvm_memory_slot *new,
+ 				enum kvm_mr_change change)
+ {
+-	unsigned long npages = mem->memory_size >> PAGE_SHIFT;
+-
+ 	if (change == KVM_MR_CREATE) {
+-		new->arch.rmap = vzalloc(array_size(npages,
++		new->arch.rmap = vzalloc(array_size(new->npages,
+ 					  sizeof(*new->arch.rmap)));
+ 		if (!new->arch.rmap)
+ 			return -ENOMEM;
+@@ -4874,20 +4871,17 @@ static int kvmppc_core_prepare_memory_region_hv(struct kvm *kvm,
+ }
+ 
+ static void kvmppc_core_commit_memory_region_hv(struct kvm *kvm,
+-				const struct kvm_userspace_memory_region *mem,
+ 				struct kvm_memory_slot *old,
+ 				const struct kvm_memory_slot *new,
+ 				enum kvm_mr_change change)
+ {
+-	unsigned long npages = mem->memory_size >> PAGE_SHIFT;
 -
  	/*
- 	 * If dirty page logging is enabled, write protect all pages in the slot
- 	 * ready for dirty logging.
+-	 * If we are making a new memslot, it might make
++	 * If we are creating or modifying a memslot, it might make
+ 	 * some address that was previously cached as emulated
+ 	 * MMIO be no longer emulated MMIO, so invalidate
+ 	 * all the caches of emulated MMIO translations.
+ 	 */
+-	if (npages)
++	if (change != KVM_MR_DELETE)
+ 		atomic64_inc(&kvm->arch.mmio_update);
+ 
+ 	/*
+diff --git a/arch/powerpc/kvm/book3s_pr.c b/arch/powerpc/kvm/book3s_pr.c
+index 6a94831487ae..34a801c3604a 100644
+--- a/arch/powerpc/kvm/book3s_pr.c
++++ b/arch/powerpc/kvm/book3s_pr.c
+@@ -1899,7 +1899,6 @@ static void kvmppc_core_flush_memslot_pr(struct kvm *kvm,
+ }
+ 
+ static int kvmppc_core_prepare_memory_region_pr(struct kvm *kvm,
+-				const struct kvm_userspace_memory_region *mem,
+ 				const struct kvm_memory_slot *old,
+ 				struct kvm_memory_slot *new,
+ 				enum kvm_mr_change change)
+@@ -1908,7 +1907,6 @@ static int kvmppc_core_prepare_memory_region_pr(struct kvm *kvm,
+ }
+ 
+ static void kvmppc_core_commit_memory_region_pr(struct kvm *kvm,
+-				const struct kvm_userspace_memory_region *mem,
+ 				struct kvm_memory_slot *old,
+ 				const struct kvm_memory_slot *new,
+ 				enum kvm_mr_change change)
+diff --git a/arch/powerpc/kvm/booke.c b/arch/powerpc/kvm/booke.c
+index 47f691387171..06c5830a93f9 100644
+--- a/arch/powerpc/kvm/booke.c
++++ b/arch/powerpc/kvm/booke.c
+@@ -1821,7 +1821,6 @@ void kvmppc_core_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
+ }
+ 
+ int kvmppc_core_prepare_memory_region(struct kvm *kvm,
+-				      const struct kvm_userspace_memory_region *mem,
+ 				      const struct kvm_memory_slot *old,
+ 				      struct kvm_memory_slot *new,
+ 				      enum kvm_mr_change change)
+@@ -1830,7 +1829,6 @@ int kvmppc_core_prepare_memory_region(struct kvm *kvm,
+ }
+ 
+ void kvmppc_core_commit_memory_region(struct kvm *kvm,
+-				const struct kvm_userspace_memory_region *mem,
+ 				struct kvm_memory_slot *old,
+ 				const struct kvm_memory_slot *new,
+ 				enum kvm_mr_change change)
+diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+index cf0422c41359..e207de17958d 100644
+--- a/arch/powerpc/kvm/powerpc.c
++++ b/arch/powerpc/kvm/powerpc.c
+@@ -703,7 +703,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 				   struct kvm_memory_slot *new,
+ 				   enum kvm_mr_change change)
+ {
+-	return kvmppc_core_prepare_memory_region(kvm, mem, old, new, change);
++	return kvmppc_core_prepare_memory_region(kvm, old, new, change);
+ }
+ 
+ void kvm_arch_commit_memory_region(struct kvm *kvm,
+@@ -712,7 +712,7 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
+ 				   const struct kvm_memory_slot *new,
+ 				   enum kvm_mr_change change)
+ {
+-	kvmppc_core_commit_memory_region(kvm, mem, old, new, change);
++	kvmppc_core_commit_memory_region(kvm, old, new, change);
+ }
+ 
+ void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
