@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F1F1D46A642
-	for <lists+kvm@lfdr.de>; Mon,  6 Dec 2021 20:57:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2CD7346A646
+	for <lists+kvm@lfdr.de>; Mon,  6 Dec 2021 20:57:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245176AbhLFUAO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Dec 2021 15:00:14 -0500
-Received: from vps-vb.mhejs.net ([37.28.154.113]:50302 "EHLO vps-vb.mhejs.net"
+        id S1349119AbhLFUAT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Dec 2021 15:00:19 -0500
+Received: from vps-vb.mhejs.net ([37.28.154.113]:50344 "EHLO vps-vb.mhejs.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1349432AbhLFUAI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Dec 2021 15:00:08 -0500
+        id S229592AbhLFUAN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Dec 2021 15:00:13 -0500
 Received: from MUA
         by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <mail@maciej.szmigiero.name>)
-        id 1muK5x-0000wB-El; Mon, 06 Dec 2021 20:56:17 +0100
+        id 1muK62-0000wp-Ps; Mon, 06 Dec 2021 20:56:22 +0100
 From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>
@@ -43,9 +43,9 @@ Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Ben Gardon <bgardon@google.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v7 18/29] KVM: x86: Use nr_memslot_pages to avoid traversing the memslots array
-Date:   Mon,  6 Dec 2021 20:54:24 +0100
-Message-Id: <d14c5a24535269606675437d5602b7dac4ad8c0e.1638817640.git.maciej.szmigiero@oracle.com>
+Subject: [PATCH v7 19/29] KVM: Integrate gfn_to_memslot_approx() into search_memslots()
+Date:   Mon,  6 Dec 2021 20:54:25 +0100
+Message-Id: <171cd89b52c718dbe180ecd909b4437a64a7e2ec.1638817640.git.maciej.szmigiero@oracle.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <cover.1638817637.git.maciej.szmigiero@oracle.com>
 References: <cover.1638817637.git.maciej.szmigiero@oracle.com>
@@ -57,100 +57,178 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
 
-There is no point in recalculating from scratch the total number of pages
-in all memslots each time a memslot is created or deleted.  Use KVM's
-cached nr_memslot_pages to compute the default max number of MMU pages.
+s390 arch has gfn_to_memslot_approx() which is almost identical to
+search_memslots(), differing only in that in case the gfn falls in a hole
+one of the memslots bordering the hole is returned.
 
-Note that even with nr_memslot_pages capped at ULONG_MAX we can't safely
-multiply it by KVM_PERMILLE_MMU_PAGES (20) since this operation can
-possibly overflow an unsigned long variable.
-
-Write this "* 20 / 1000" operation as "/ 50" instead to avoid such
-overflow.
+Add this lookup mode as an option to search_memslots() so we don't have two
+almost identical functions for looking up a memslot by its gfn.
 
 Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
-[sean: use common KVM field and rework changelog accordingly]
+[sean: tweaked helper names to keep gfn_to_memslot_approx() in s390]
 Reviewed-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/include/asm/kvm_host.h |  3 +--
- arch/x86/kvm/mmu/mmu.c          | 24 ------------------------
- arch/x86/kvm/x86.c              | 10 +++++++---
- 3 files changed, 8 insertions(+), 29 deletions(-)
+ arch/s390/kvm/kvm-s390.c | 45 +++++++---------------------------------
+ include/linux/kvm_host.h | 35 ++++++++++++++++++++++++-------
+ virt/kvm/kvm_main.c      |  2 +-
+ 3 files changed, 36 insertions(+), 46 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index e41ad1ead721..a5daf399e033 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -135,7 +135,7 @@
- #define KVM_HPAGE_MASK(x)	(~(KVM_HPAGE_SIZE(x) - 1))
- #define KVM_PAGES_PER_HPAGE(x)	(KVM_HPAGE_SIZE(x) / PAGE_SIZE)
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index a92e36d8a827..b0fa2592b4ef 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -1943,41 +1943,6 @@ static long kvm_s390_set_skeys(struct kvm *kvm, struct kvm_s390_skeys *args)
+ /* for consistency */
+ #define KVM_S390_CMMA_SIZE_MAX ((u32)KVM_S390_SKEYS_MAX)
  
--#define KVM_PERMILLE_MMU_PAGES 20
-+#define KVM_MEMSLOT_PAGES_TO_MMU_PAGES_RATIO 50
- #define KVM_MIN_ALLOC_MMU_PAGES 64UL
- #define KVM_MMU_HASH_SHIFT 12
- #define KVM_NUM_MMU_PAGES (1 << KVM_MMU_HASH_SHIFT)
-@@ -1590,7 +1590,6 @@ void kvm_mmu_slot_leaf_clear_dirty(struct kvm *kvm,
- 				   const struct kvm_memory_slot *memslot);
- void kvm_mmu_zap_all(struct kvm *kvm);
- void kvm_mmu_invalidate_mmio_sptes(struct kvm *kvm, u64 gen);
--unsigned long kvm_mmu_calculate_default_mmu_pages(struct kvm *kvm);
- void kvm_mmu_change_mmu_pages(struct kvm *kvm, unsigned long kvm_nr_mmu_pages);
+-/*
+- * Similar to gfn_to_memslot, but returns the index of a memslot also when the
+- * address falls in a hole. In that case the index of one of the memslots
+- * bordering the hole is returned.
+- */
+-static int gfn_to_memslot_approx(struct kvm_memslots *slots, gfn_t gfn)
+-{
+-	int start = 0, end = slots->used_slots;
+-	int slot = atomic_read(&slots->last_used_slot);
+-	struct kvm_memory_slot *memslots = slots->memslots;
+-
+-	if (gfn >= memslots[slot].base_gfn &&
+-	    gfn < memslots[slot].base_gfn + memslots[slot].npages)
+-		return slot;
+-
+-	while (start < end) {
+-		slot = start + (end - start) / 2;
+-
+-		if (gfn >= memslots[slot].base_gfn)
+-			end = slot;
+-		else
+-			start = slot + 1;
+-	}
+-
+-	if (start >= slots->used_slots)
+-		return slots->used_slots - 1;
+-
+-	if (gfn >= memslots[start].base_gfn &&
+-	    gfn < memslots[start].base_gfn + memslots[start].npages) {
+-		atomic_set(&slots->last_used_slot, start);
+-	}
+-
+-	return start;
+-}
+-
+ static int kvm_s390_peek_cmma(struct kvm *kvm, struct kvm_s390_cmma_log *args,
+ 			      u8 *res, unsigned long bufsize)
+ {
+@@ -2001,11 +1966,17 @@ static int kvm_s390_peek_cmma(struct kvm *kvm, struct kvm_s390_cmma_log *args,
+ 	return 0;
+ }
  
- int load_pdptrs(struct kvm_vcpu *vcpu, unsigned long cr3);
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 63c04c25fd66..64b6181f7757 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -6131,30 +6131,6 @@ int kvm_mmu_module_init(void)
- 	return ret;
++static struct kvm_memory_slot *gfn_to_memslot_approx(struct kvm_memslots *slots,
++						     gfn_t gfn)
++{
++	return ____gfn_to_memslot(slots, gfn, true);
++}
++
+ static unsigned long kvm_s390_next_dirty_cmma(struct kvm_memslots *slots,
+ 					      unsigned long cur_gfn)
+ {
+-	int slotidx = gfn_to_memslot_approx(slots, cur_gfn);
+-	struct kvm_memory_slot *ms = slots->memslots + slotidx;
++	struct kvm_memory_slot *ms = gfn_to_memslot_approx(slots, cur_gfn);
++	int slotidx = ms - slots->memslots;
+ 	unsigned long ofs = cur_gfn - ms->base_gfn;
+ 
+ 	if (ms->base_gfn + ms->npages <= cur_gfn) {
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 9f984867c297..86562ffb6ea4 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -1250,10 +1250,14 @@ try_get_memslot(struct kvm_memslots *slots, int slot_index, gfn_t gfn)
+  * Returns a pointer to the memslot that contains gfn and records the index of
+  * the slot in index. Otherwise returns NULL.
+  *
++ * With "approx" set returns the memslot also when the address falls
++ * in a hole. In that case one of the memslots bordering the hole is
++ * returned.
++ *
+  * IMPORTANT: Slots are sorted from highest GFN to lowest GFN!
+  */
+ static inline struct kvm_memory_slot *
+-search_memslots(struct kvm_memslots *slots, gfn_t gfn, int *index)
++search_memslots(struct kvm_memslots *slots, gfn_t gfn, int *index, bool approx)
+ {
+ 	int start = 0, end = slots->used_slots;
+ 	struct kvm_memory_slot *memslots = slots->memslots;
+@@ -1271,22 +1275,26 @@ search_memslots(struct kvm_memslots *slots, gfn_t gfn, int *index)
+ 			start = slot + 1;
+ 	}
+ 
++	if (approx && start >= slots->used_slots) {
++		*index = slots->used_slots - 1;
++		return &memslots[slots->used_slots - 1];
++	}
++
+ 	slot = try_get_memslot(slots, start, gfn);
+ 	if (slot) {
+ 		*index = start;
+ 		return slot;
+ 	}
++	if (approx) {
++		*index = start;
++		return &memslots[start];
++	}
+ 
+ 	return NULL;
  }
  
 -/*
-- * Calculate mmu pages needed for kvm.
+- * __gfn_to_memslot() and its descendants are here because it is called from
+- * non-modular code in arch/powerpc/kvm/book3s_64_vio{,_hv}.c. gfn_to_memslot()
+- * itself isn't here as an inline because that would bloat other code too much.
 - */
--unsigned long kvm_mmu_calculate_default_mmu_pages(struct kvm *kvm)
--{
--	unsigned long nr_mmu_pages;
--	unsigned long nr_pages = 0;
--	struct kvm_memslots *slots;
--	struct kvm_memory_slot *memslot;
--	int i;
--
--	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
--		slots = __kvm_memslots(kvm, i);
--
--		kvm_for_each_memslot(memslot, slots)
--			nr_pages += memslot->npages;
--	}
--
--	nr_mmu_pages = nr_pages * KVM_PERMILLE_MMU_PAGES / 1000;
--	nr_mmu_pages = max(nr_mmu_pages, KVM_MIN_ALLOC_MMU_PAGES);
--
--	return nr_mmu_pages;
--}
--
- void kvm_mmu_destroy(struct kvm_vcpu *vcpu)
+ static inline struct kvm_memory_slot *
+-__gfn_to_memslot(struct kvm_memslots *slots, gfn_t gfn)
++____gfn_to_memslot(struct kvm_memslots *slots, gfn_t gfn, bool approx)
  {
- 	kvm_mmu_unload(vcpu);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 13048683db60..5c770447f8c5 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11833,9 +11833,13 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
- 				enum kvm_mr_change change)
- {
- 	if (!kvm->arch.n_requested_mmu_pages &&
--	    (change == KVM_MR_CREATE || change == KVM_MR_DELETE))
--		kvm_mmu_change_mmu_pages(kvm,
--				kvm_mmu_calculate_default_mmu_pages(kvm));
-+	    (change == KVM_MR_CREATE || change == KVM_MR_DELETE)) {
-+		unsigned long nr_mmu_pages;
+ 	struct kvm_memory_slot *slot;
+ 	int slot_index = atomic_read(&slots->last_used_slot);
+@@ -1295,7 +1303,7 @@ __gfn_to_memslot(struct kvm_memslots *slots, gfn_t gfn)
+ 	if (slot)
+ 		return slot;
+ 
+-	slot = search_memslots(slots, gfn, &slot_index);
++	slot = search_memslots(slots, gfn, &slot_index, approx);
+ 	if (slot) {
+ 		atomic_set(&slots->last_used_slot, slot_index);
+ 		return slot;
+@@ -1304,6 +1312,17 @@ __gfn_to_memslot(struct kvm_memslots *slots, gfn_t gfn)
+ 	return NULL;
+ }
+ 
++/*
++ * __gfn_to_memslot() and its descendants are here to allow arch code to inline
++ * the lookups in hot paths.  gfn_to_memslot() itself isn't here as an inline
++ * because that would bloat other code too much.
++ */
++static inline struct kvm_memory_slot *
++__gfn_to_memslot(struct kvm_memslots *slots, gfn_t gfn)
++{
++	return ____gfn_to_memslot(slots, gfn, false);
++}
 +
-+		nr_mmu_pages = kvm->nr_memslot_pages / KVM_MEMSLOT_PAGES_TO_MMU_PAGES_RATIO;
-+		nr_mmu_pages = max(nr_mmu_pages, KVM_MIN_ALLOC_MMU_PAGES);
-+		kvm_mmu_change_mmu_pages(kvm, nr_mmu_pages);
-+	}
- 
- 	kvm_mmu_slot_apply_flags(kvm, old, new, change);
- 
+ static inline unsigned long
+ __gfn_to_hva_memslot(const struct kvm_memory_slot *slot, gfn_t gfn)
+ {
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 1f37c4ce5f97..aca39b587cdb 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -2143,7 +2143,7 @@ struct kvm_memory_slot *kvm_vcpu_gfn_to_memslot(struct kvm_vcpu *vcpu, gfn_t gfn
+ 	 * search_memslots() instead of __gfn_to_memslot() to avoid
+ 	 * thrashing the VM-wide last_used_index in kvm_memslots.
+ 	 */
+-	slot = search_memslots(slots, gfn, &slot_index);
++	slot = search_memslots(slots, gfn, &slot_index, false);
+ 	if (slot) {
+ 		vcpu->last_used_slot = slot_index;
+ 		return slot;
