@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8079D46A61C
+	by mail.lfdr.de (Postfix) with ESMTP id CF23446A61D
 	for <lists+kvm@lfdr.de>; Mon,  6 Dec 2021 20:55:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348826AbhLFT6v (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Dec 2021 14:58:51 -0500
-Received: from vps-vb.mhejs.net ([37.28.154.113]:49748 "EHLO vps-vb.mhejs.net"
+        id S1348844AbhLFT6w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Dec 2021 14:58:52 -0500
+Received: from vps-vb.mhejs.net ([37.28.154.113]:49762 "EHLO vps-vb.mhejs.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234586AbhLFT6u (ORCPT <rfc822;kvm@vger.kernel.org>);
+        id S1347815AbhLFT6u (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 6 Dec 2021 14:58:50 -0500
 Received: from MUA
         by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <mail@maciej.szmigiero.name>)
-        id 1muK4P-0000kW-CR; Mon, 06 Dec 2021 20:54:41 +0100
+        id 1muK4U-0000kY-Nc; Mon, 06 Dec 2021 20:54:46 +0100
 From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>
@@ -43,108 +43,114 @@ Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Ben Gardon <bgardon@google.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v7 00/29] KVM: Scalable memslots implementation
-Date:   Mon,  6 Dec 2021 20:54:06 +0100
-Message-Id: <cover.1638817637.git.maciej.szmigiero@oracle.com>
+Subject: [PATCH v7 01/29] KVM: Require total number of memslot pages to fit in an unsigned long
+Date:   Mon,  6 Dec 2021 20:54:07 +0100
+Message-Id: <1c2c91baf8e78acccd4dad38da591002e61c013c.1638817638.git.maciej.szmigiero@oracle.com>
 X-Mailer: git-send-email 2.33.0
+In-Reply-To: <cover.1638817637.git.maciej.szmigiero@oracle.com>
+References: <cover.1638817637.git.maciej.szmigiero@oracle.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: "Maciej S. Szmigiero" <maciej.szmigiero@oracle.com>
+From: Sean Christopherson <seanjc@google.com>
 
-This series is the seventh iteration of the scalable memslots patch set.
-It contains a few minor changes that were pointed out during the review
-of the previous version.
+Explicitly disallow creating more memslot pages than can fit in an
+unsigned long, KVM doesn't correctly handle a total number of memslot
+pages that doesn't fit in an unsigned long and remedying that would be a
+waste of time.
 
-The series was tested on x86 with KASAN on and booted various guests
-successfully (including nested ones; with TDP MMU both enabled and disabled).
+For a 64-bit kernel, this is a nop as memslots are not allowed to overlap
+in the gfn address space.
 
-The previous version (6) is available here:
-https://lore.kernel.org/kvm/cover.1638304315.git.maciej.szmigiero@oracle.com/
+With a 32-bit kernel, userspace can at most address 3gb of virtual memory,
+whereas wrapping the total number of pages would require 4tb+ of guest
+physical memory.  Even with x86's second address space for SMM, userspace
+would need to alias all of guest memory more than one _thousand_ times.
+And on older x86 hardware with MAXPHYADDR < 43, the guest couldn't
+actually access any of those aliases even if userspace lied about
+guest.MAXPHYADDR.
 
+On 390 and arm64, this is a nop as they don't support 32-bit hosts.
 
-Changes from v6:
-* Add braces around a "for" loop in kvm_check_memslot_overlap(),
+On x86, practically speaking this is simply acknowledging reality as the
+existing kvm_mmu_calculate_default_mmu_pages() assumes the total number
+of pages fits in an "unsigned long".
 
-* Add a note to commit 25 that kvm_arch_flush_shadow_memslot() might now
-  receive a memslot with stale data in the "arch" field,	       
+On PPC, this is likely a nop as every flavor of PPC KVM assumes gfns (and
+gpas!) fit in unsigned long.  arch/powerpc/kvm/book3s_32_mmu_host.c goes
+a step further and fails the build if CONFIG_PTE_64BIT=y, which
+presumably means that it does't support 64-bit physical addresses.
 
-* Keep "slot" in kvm_for_each_memslot_in_gfn_range() iterator and remove
-  the "end" field there,
+On MIPS, this is also likely a nop as the core MMU helpers assume gpas
+fit in unsigned long, e.g. see kvm_mips_##name##_pte.
 
-* Reorder my SoB on patches so it's always the last SoB on a patch,
+And finally, RISC-V is a "don't care" as it doesn't exist in any release,
+i.e. there is no established ABI to break.
 
-* Convert some of Sean's SoBs to "Reviewed-by:",
-  keeping his SoB on patches that are either from him or co-developed by
-  him while removing this tag on the remaining ones.
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
+---
+ include/linux/kvm_host.h |  1 +
+ virt/kvm/kvm_main.c      | 19 +++++++++++++++++++
+ 2 files changed, 20 insertions(+)
 
-
-Maciej S. Szmigiero (12):
-  KVM: Resync only arch fields when slots_arch_lock gets reacquired
-  KVM: x86: Don't call kvm_mmu_change_mmu_pages() if the count hasn't
-    changed
-  KVM: x86: Use nr_memslot_pages to avoid traversing the memslots array
-  KVM: Integrate gfn_to_memslot_approx() into search_memslots()
-  KVM: Move WARN on invalid memslot index to update_memslots()
-  KVM: Resolve memslot ID via a hash table instead of via a static array
-  KVM: Use interval tree to do fast hva lookup in memslots
-  KVM: s390: Introduce kvm_s390_get_gfn_end()
-  KVM: Keep memslots in tree-based structures instead of array-based
-    ones
-  KVM: Call kvm_arch_flush_shadow_memslot() on the old slot in
-    kvm_invalidate_memslot()
-  KVM: Optimize gfn lookup in kvm_zap_gfn_range()
-  KVM: Optimize overlapping memslots check
-
-Sean Christopherson (17):
-  KVM: Require total number of memslot pages to fit in an unsigned long
-  KVM: Open code kvm_delete_memslot() into its only caller
-  KVM: Use "new" memslot's address space ID instead of dedicated param
-  KVM: Let/force architectures to deal with arch specific memslot data
-  KVM: arm64: Use "new" memslot instead of userspace memory region
-  KVM: MIPS: Drop pr_debug from memslot commit to avoid using "mem"
-  KVM: PPC: Avoid referencing userspace memory region in memslot updates
-  KVM: s390: Use "new" memslot instead of userspace memory region
-  KVM: x86: Use "new" memslot instead of userspace memory region
-  KVM: RISC-V: Use "new" memslot instead of userspace memory region
-  KVM: Stop passing kvm_userspace_memory_region to arch memslot hooks
-  KVM: Use prepare/commit hooks to handle generic memslot metadata
-    updates
-  KVM: x86: Don't assume old/new memslots are non-NULL at memslot commit
-  KVM: s390: Skip gfn/size sanity checks on memslot DELETE or FLAGS_ONLY
-  KVM: Don't make a full copy of the old memslot in
-    __kvm_set_memory_region()
-  KVM: Wait 'til the bitter end to initialize the "new" memslot
-  KVM: Dynamically allocate "new" memslots from the get-go
-
- arch/arm64/kvm/Kconfig              |   1 +
- arch/arm64/kvm/mmu.c                |  27 +-
- arch/mips/kvm/Kconfig               |   1 +
- arch/mips/kvm/mips.c                |   9 +-
- arch/powerpc/include/asm/kvm_ppc.h  |  14 +-
- arch/powerpc/kvm/Kconfig            |   1 +
- arch/powerpc/kvm/book3s.c           |  14 +-
- arch/powerpc/kvm/book3s_64_mmu_hv.c |   4 +-
- arch/powerpc/kvm/book3s_hv.c        |  28 +-
- arch/powerpc/kvm/book3s_hv_nested.c |   4 +-
- arch/powerpc/kvm/book3s_hv_uvmem.c  |  14 +-
- arch/powerpc/kvm/book3s_pr.c        |   9 +-
- arch/powerpc/kvm/booke.c            |   7 +-
- arch/powerpc/kvm/powerpc.c          |   9 +-
- arch/riscv/kvm/mmu.c                |  31 +-
- arch/s390/kvm/Kconfig               |   1 +
- arch/s390/kvm/kvm-s390.c            |  98 ++--
- arch/s390/kvm/kvm-s390.h            |  14 +
- arch/s390/kvm/pv.c                  |   4 +-
- arch/x86/include/asm/kvm_host.h     |   3 +-
- arch/x86/kvm/Kconfig                |   1 +
- arch/x86/kvm/debugfs.c              |   6 +-
- arch/x86/kvm/mmu/mmu.c              |  38 +-
- arch/x86/kvm/x86.c                  |  41 +-
- include/linux/kvm_host.h            | 272 ++++++---
- virt/kvm/kvm_main.c                 | 836 ++++++++++++++++------------
- 26 files changed, 850 insertions(+), 637 deletions(-)
-
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index a745efe389ab..a6830966f8eb 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -554,6 +554,7 @@ struct kvm {
+ 	 */
+ 	struct mutex slots_arch_lock;
+ 	struct mm_struct *mm; /* userspace tied to this vm */
++	unsigned long nr_memslot_pages;
+ 	struct kvm_memslots __rcu *memslots[KVM_ADDRESS_SPACE_NUM];
+ 	struct xarray vcpu_array;
+ 
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 863112783ed9..4a1b484518a9 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1640,6 +1640,15 @@ static int kvm_set_memslot(struct kvm *kvm,
+ 	update_memslots(slots, new, change);
+ 	slots = install_new_memslots(kvm, as_id, slots);
+ 
++	/*
++	 * Update the total number of memslot pages before calling the arch
++	 * hook so that architectures can consume the result directly.
++	 */
++	if (change == KVM_MR_DELETE)
++		kvm->nr_memslot_pages -= old.npages;
++	else if (change == KVM_MR_CREATE)
++		kvm->nr_memslot_pages += new->npages;
++
+ 	kvm_arch_commit_memory_region(kvm, mem, &old, new, change);
+ 
+ 	/* Free the old memslot's metadata.  Note, this is the full copy!!! */
+@@ -1670,6 +1679,9 @@ static int kvm_delete_memslot(struct kvm *kvm,
+ 	if (!old->npages)
+ 		return -EINVAL;
+ 
++	if (WARN_ON_ONCE(kvm->nr_memslot_pages < old->npages))
++		return -EIO;
++
+ 	memset(&new, 0, sizeof(new));
+ 	new.id = old->id;
+ 	/*
+@@ -1753,6 +1765,13 @@ int __kvm_set_memory_region(struct kvm *kvm,
+ 	if (!old.npages) {
+ 		change = KVM_MR_CREATE;
+ 		new.dirty_bitmap = NULL;
++
++		/*
++		 * To simplify KVM internals, the total number of pages across
++		 * all memslots must fit in an unsigned long.
++		 */
++		if ((kvm->nr_memslot_pages + new.npages) < kvm->nr_memslot_pages)
++			return -EINVAL;
+ 	} else { /* Modify an existing slot. */
+ 		if ((new.userspace_addr != old.userspace_addr) ||
+ 		    (new.npages != old.npages) ||
