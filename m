@@ -2,165 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 31C9246A1AA
-	for <lists+kvm@lfdr.de>; Mon,  6 Dec 2021 17:45:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E1ED846A22B
+	for <lists+kvm@lfdr.de>; Mon,  6 Dec 2021 18:06:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234517AbhLFQso (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Dec 2021 11:48:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50758 "EHLO
+        id S238859AbhLFRJC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Dec 2021 12:09:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234175AbhLFQsk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Dec 2021 11:48:40 -0500
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2083C0611F7
-        for <kvm@vger.kernel.org>; Mon,  6 Dec 2021 08:45:11 -0800 (PST)
-Received: by mail-pf1-x42a.google.com with SMTP id z6so10679038pfe.7
-        for <kvm@vger.kernel.org>; Mon, 06 Dec 2021 08:45:11 -0800 (PST)
+        with ESMTP id S1349851AbhLFRFf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Dec 2021 12:05:35 -0500
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78C32C0613F8
+        for <kvm@vger.kernel.org>; Mon,  6 Dec 2021 09:02:06 -0800 (PST)
+Received: by mail-pg1-x52e.google.com with SMTP id l64so5527395pgl.9
+        for <kvm@vger.kernel.org>; Mon, 06 Dec 2021 09:02:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=Kr+JaHE4rxPgEMAj4CiYvS9ERF4arFyvma7ueUhBYKQ=;
-        b=gp1JhwgXzLgzzsvJYuHH+5gZ60Z0lGc33kEEo4Srx2QzhbK0d/egjaJILZuVUc2x6h
-         eI3w0ISWsJ1ZOgCfhBr/zzYhEyfc5K3GK08BZOFT9fBBNOXSkaAv9LtDgkHf0VEB+Zxk
-         orfRVtW9sM/K2OJgMZWySKx2YlCE0givkDwAWf/fCthh00hGDJpc5mOtzhXVVyFYoeS7
-         jbGK7bxVTvpsyOkBTDKSx41y5sy2TG/wcr3m7CyxA37/f2h7FY/3k9FmRC4DczsYSlj2
-         6SDrYGJf9QxTtUiMlX4fbnHo7NntnwjI4LCE7CJgZh2bGvqtNqbnAynZBa1GbpmdTEcM
-         0K7w==
+        bh=IDr+xC7Hxg1cElvQGV3Z7CgphH2JwHEXV2UO5AQdC08=;
+        b=fwuKH/tQko9yQe3Pkuyix3eSRhkCkES82tEdJ/DjimVKfubp8G4FVAyIj+tQUR1Xbe
+         U7P+S2oUI5qJ5yCFy7QSz/IuPiffv0ya9N7Aisqn6tb6UPDNpVyr3uL4RRWV5P9/tVbt
+         jsQnwm2BLuzlC0qBWSzZY6/5+mhL1LL+ZlUElenZ++B1mGTYnHenZfsI17vXkBMCiQE9
+         +yxG4GS7WEDzNt6mLd6qNuEA4YNRP5C/+gn6mcyvSSgWKNuNSh9r6wN/8PI2EsqOxPbq
+         +b3LmMF70bt4ne/z00zjpwCytwdO0ui7CE2dL1Zr35TCsPOicAuneY62cJSVFgqhnAtp
+         YYAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=Kr+JaHE4rxPgEMAj4CiYvS9ERF4arFyvma7ueUhBYKQ=;
-        b=o913GfnVu6xbPU8JmMdBYN1A6FZ1U/Mc+rYpWmxBjXCbcdORW1I+Yy8nRgar8PxDzV
-         f2pxOSgQRajP4Crzy+fNmlpFryefIaLmU7JNeZRquEpdhczvity45SwS/83xdLO4vIAS
-         bKDo/v5SRe6cQFMjGesbdDWizzQuYo0/Qzs6I7i5eLucqhB9Alp1DduwXEtlieIzi6SQ
-         PJqhhYmMnURRCHGDJncggcgIfglBMGOwOMP9ni44pJuhqrD8zQ0l1Lcviath1UoAhRvl
-         68qwZOxNcqYrcrJrkNsnm27+JpzyU6oAkifU1tCR2897Z63ls86jWOACis13maTNKCRI
-         XgNw==
-X-Gm-Message-State: AOAM530X8OAKAYDQSsKDeyDOc8gtU+WA6idavYARH/7/DNtI4ZXqx8kc
-        y+ZtCPH063tFhHLD7p1J1734vg==
-X-Google-Smtp-Source: ABdhPJxf1a3uQAsmHxOlirkjOASik+f994ErP9f1daMIYHEzC9KZQoMcgpiOqeNvdFzZaVJ3QzcmCQ==
-X-Received: by 2002:a62:640c:0:b0:4a2:e5af:d2a9 with SMTP id y12-20020a62640c000000b004a2e5afd2a9mr36887446pfb.43.1638809110964;
-        Mon, 06 Dec 2021 08:45:10 -0800 (PST)
+        bh=IDr+xC7Hxg1cElvQGV3Z7CgphH2JwHEXV2UO5AQdC08=;
+        b=cenDFa3TIQi89GaHMfVYkY9Zqqz8ku5YDDB2hDMM8TkmVhnnEI6Y/3gctVMT5V32o7
+         b7Y/KglMKhOGkxiFooMdeTNGo2v/nl5zI5tjvjRx5TJViqeKUQ8uReuH/dp0XYnIH5qC
+         6mslZA5mz7dFWmbNoxZDRRTPXikXjCQHlFfuwd5ujiAsVkoEPh7jYE5lAdEqvpEc9RwG
+         qTuGW5XN3hY2RYLRb9NuhR+RIjtSgQSerl4+V/tnipBei5ir5p4TJqEXAOaYxFDqeJaf
+         sqbhigvUaeUI9LTuttMaraJu4MgD4MdyLRymXLr7h4Tl4aDKdkptfUHUvPSGtCXaGBOs
+         I9bQ==
+X-Gm-Message-State: AOAM531PPQpM1BKLsA8jyd9gxQ7ur8FR5/FpmTEpOngFqftJE9ta8qch
+        oFCTiy6JcEWrKoUFF+iaNSzjxg==
+X-Google-Smtp-Source: ABdhPJy75Ia/PuA9TG+KDKmlgjT4JcIiwA2FpkVyXmKyf9mPcIl728/gC4B1UAkcOIeTotazwIEIUQ==
+X-Received: by 2002:aa7:9903:0:b0:49f:e368:4fc3 with SMTP id z3-20020aa79903000000b0049fe3684fc3mr38258039pff.1.1638810125718;
+        Mon, 06 Dec 2021 09:02:05 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id ot7sm14713658pjb.21.2021.12.06.08.45.10
+        by smtp.gmail.com with ESMTPSA id l2sm13021794pfc.42.2021.12.06.09.02.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Dec 2021 08:45:10 -0800 (PST)
-Date:   Mon, 6 Dec 2021 16:45:06 +0000
+        Mon, 06 Dec 2021 09:02:05 -0800 (PST)
+Date:   Mon, 6 Dec 2021 17:02:01 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
-        jmattson@google.com,
-        syzbot <syzbot+f1d2136db9c80d4733e8@syzkaller.appspotmail.com>,
-        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
-        joro@8bytes.org, linux-kernel@vger.kernel.org, mingo@redhat.com,
-        pbonzini@redhat.com, syzkaller-bugs@googlegroups.com,
-        tglx@linutronix.de, wanpengli@tencent.com, x86@kernel.org
-Subject: Re: [syzbot] WARNING in nested_vmx_vmexit
-Message-ID: <Ya4+EprYtyvj5J5U@google.com>
-References: <00000000000051f90e05d2664f1d@google.com>
- <87bl1u6qku.fsf@redhat.com>
- <Ya40sXNcLzBUlpdW@google.com>
- <87k0gh675j.fsf@redhat.com>
+To:     Ameer Hamza <amhamza.mgc@gmail.com>
+Cc:     vkuznets@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com
+Subject: Re: [PATCH v3] KVM: x86: fix for missing initialization of return
+ status variable
+Message-ID: <Ya5CCU0zf+MzMwcX@google.com>
+References: <20211206160813.GA37599@hamza-OptiPlex-7040>
+ <20211206164503.135917-1-amhamza.mgc@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87k0gh675j.fsf@redhat.com>
+In-Reply-To: <20211206164503.135917-1-amhamza.mgc@gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 06, 2021, Vitaly Kuznetsov wrote:
-> Sean Christopherson <seanjc@google.com> writes:
-> > I objected to the patch[*], but looking back at the dates, it appears that I did
-> > so after the patch was queued and my comments were never addressed.  
-> > I'll see if I can reproduce this with a selftest.  The fix is likely just:
-> >
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index dc4909b67c5c..927a7c43b73b 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -6665,10 +6665,6 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
-> >          * consistency check VM-Exit due to invalid guest state and bail.
-> >          */
-> >         if (unlikely(vmx->emulation_required)) {
-> > -
-> > -               /* We don't emulate invalid state of a nested guest */
-> > -               vmx->fail = is_guest_mode(vcpu);
-> > -
-> >                 vmx->exit_reason.full = EXIT_REASON_INVALID_STATE;
-> >                 vmx->exit_reason.failed_vmentry = 1;
-> >                 kvm_register_mark_available(vcpu, VCPU_EXREG_EXIT_INFO_1);
-> >
-> > [*] https://lore.kernel.org/all/YWDWPbgJik5spT1D@google.com/
+On Mon, Dec 06, 2021, Ameer Hamza wrote:
+> If undefined ioctl number is passed to the kvm_vcpu_ioctl_device_attr
+> ioctl, we should trigger KVM_BUG_ON() and return with EIO to silent
+> coverity warning.
+> 
+> Addresses-Coverity: 1494124 ("Uninitialized scalar variable")
+> Signed-off-by: Ameer Hamza <amhamza.mgc@gmail.com>
+> ---
+> Changes in v3:
+> Added KVM_BUG_ON() as default case and returned -EIO
+> ---
+>  arch/x86/kvm/x86.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index e0aa4dd53c7f..b37068f847ff 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -5019,6 +5019,9 @@ static int kvm_vcpu_ioctl_device_attr(struct kvm_vcpu *vcpu,
+>  	case KVM_SET_DEVICE_ATTR:
+>  		r = kvm_arch_tsc_set_attr(vcpu, &attr);
+>  		break;
+> +	default:
+> +		KVM_BUG_ON(1, vcpu->kvm);
+> +		r = -EIO;
 
-Boom.  VCPU_RUN exits with KVM_EXIT_INTERNAL_ERROR.
+At least have a
 
-diff --git a/tools/testing/selftests/kvm/x86_64/vmx_close_while_nested_test.c b/tools/testing/selftests/kvm/x86_64/vmx_close_while_nested_test.c
-index 2835a17f1b7a..4f77c5d7c7b9 100644
---- a/tools/testing/selftests/kvm/x86_64/vmx_close_while_nested_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/vmx_close_while_nested_test.c
-@@ -27,6 +27,11 @@ enum {
- /* The virtual machine object. */
- static struct kvm_vm *vm;
- 
-+static void l2_guest_infinite_loop(void)
-+{
-+       while (1);
-+}
-+
- static void l2_guest_code(void)
- {
-        /* Exit to L0 */
-@@ -53,6 +58,9 @@ static void l1_guest_code(struct vmx_pages *vmx_pages)
- int main(int argc, char *argv[])
- {
-        vm_vaddr_t vmx_pages_gva;
-+       struct kvm_sregs sregs;
-+       struct kvm_regs regs;
-+       int r;
- 
-        nested_vmx_check_supported();
- 
-@@ -83,4 +91,17 @@ int main(int argc, char *argv[])
-                        TEST_FAIL("Unknown ucall %lu", uc.cmd);
-                }
-        }
-+
-+       memset(&regs, 0, sizeof(regs));
-+       vcpu_regs_get(vm, VCPU_ID, &regs);
-+       regs.rip = (u64)l2_guest_infinite_loop;
-+       vcpu_regs_set(vm, VCPU_ID, &regs);
-+
-+       memset(&sregs, 0, sizeof(sregs));
-+       vcpu_sregs_get(vm, VCPU_ID, &sregs);
-+       sregs.tr.unusable = 1;
-+       vcpu_sregs_set(vm, VCPU_ID, &sregs);
-+
-+       r = _vcpu_run(vm, VCPU_ID);
-+       TEST_ASSERT(0, "Unexpected return from L2, r = %d, exit_reason = %d", r, vcpu_state(vm, VCPU_ID)->exit_reason);
- }
+		break;
 
-  ------------[ cut here ]------------
-  WARNING: CPU: 6 PID: 273926 at arch/x86/kvm/vmx/nested.c:4565 nested_vmx_vmexit+0xd59/0xdb0 [kvm_intel]
-  CPU: 6 PID: 273926 Comm: vmx_close_while Not tainted 5.15.2-7cc36c3e14ae-pop #279
-  Hardware name: ASUS Q87M-E/Q87M-E, BIOS 1102 03/03/2014
-  RIP: 0010:nested_vmx_vmexit+0xd59/0xdb0 [kvm_intel]
-  Call Trace:
-   vmx_leave_nested+0x30/0x40 [kvm_intel]
-   nested_vmx_free_vcpu+0x16/0x20 [kvm_intel]
-   vmx_free_vcpu+0x4b/0x60 [kvm_intel]
-   kvm_arch_vcpu_destroy+0x40/0x160 [kvm]
-   kvm_vcpu_destroy+0x1d/0x50 [kvm]
-   kvm_arch_destroy_vm+0xc1/0x1c0 [kvm]
-   kvm_put_kvm+0x187/0x2a0 [kvm]
-   kvm_vm_release+0x1d/0x30 [kvm]
-   __fput+0x95/0x250
-   task_work_run+0x5f/0x90
-   do_exit+0x3c8/0xab0
-   do_group_exit+0x47/0xb0
-   __x64_sys_exit_group+0x14/0x20
-   do_syscall_64+0x3b/0xc0
-   entry_SYSCALL_64_after_hwframe+0x44/0xae
+if we're going to be pedantic about things.
 
+>  	}
+>  
+>  	return r;
+> -- 
+> 2.25.1
+> 
