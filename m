@@ -2,120 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8DB5C469152
-	for <lists+kvm@lfdr.de>; Mon,  6 Dec 2021 09:15:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A78D04691F7
+	for <lists+kvm@lfdr.de>; Mon,  6 Dec 2021 10:06:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239064AbhLFISe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Dec 2021 03:18:34 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31628 "EHLO
+        id S239961AbhLFJJ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Dec 2021 04:09:59 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:57572 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239080AbhLFISd (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 6 Dec 2021 03:18:33 -0500
+        by vger.kernel.org with ESMTP id S239928AbhLFJJ7 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 6 Dec 2021 04:09:59 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1638778504;
+        s=mimecast20190719; t=1638781590;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=fB0uNa7PodpnqT7F7hvVjyUv/QEUaHoehSHnEO9u53o=;
-        b=fbgBfFYOOcnr5RFDLTETJCUHXERaq+xaLWMhytpwJ798pzNxJek4ea0f5UFB5iapATzfnN
-        9fH6L/xKnB421bO22TAehFbSeT5vt3QBlzNpsKVpxYynZdCHnqkcWrPTU4GTOYCRHRxovG
-        PaDvhY7bbIn7iGTh950sb/Vs+QZGT9Y=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=vVIHKBsFBEu5zZ965qZJ2FXtzIGfRwaA3qUe2cZhBzw=;
+        b=fgPsjWeqvcfWVYt/LyMoMyOq0WW4xsr3/P09RYEhq4745kcHb5XPaW73KlsHJ3BZ9VdY0O
+        u3aTdVKhNhk27EDHlnUFfYlCirj6tH6PcrywWliRnBqyAkfu1pOEbME9v7UHBv7POYZJjZ
+        AgE/Y1gwXvTqwZIzlZjCqqIp5MLAny0=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-444-WQyPvQvlOeWFzdsR0Zr9zA-1; Mon, 06 Dec 2021 03:15:02 -0500
-X-MC-Unique: WQyPvQvlOeWFzdsR0Zr9zA-1
-Received: by mail-wr1-f70.google.com with SMTP id q17-20020adfcd91000000b0017bcb12ad4fso1756170wrj.12
-        for <kvm@vger.kernel.org>; Mon, 06 Dec 2021 00:15:02 -0800 (PST)
+ us-mta-231-kEG1AlYLPzCQKNzj3e8CIQ-1; Mon, 06 Dec 2021 04:06:28 -0500
+X-MC-Unique: kEG1AlYLPzCQKNzj3e8CIQ-1
+Received: by mail-ed1-f69.google.com with SMTP id m12-20020a056402430c00b003e9f10bbb7dso7746364edc.18
+        for <kvm@vger.kernel.org>; Mon, 06 Dec 2021 01:06:28 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent
-         :content-language:to:cc:references:from:organization:subject
-         :in-reply-to:content-transfer-encoding;
-        bh=fB0uNa7PodpnqT7F7hvVjyUv/QEUaHoehSHnEO9u53o=;
-        b=L2Sr87l0XZBKyfh3/3yUl2+7bvPPv6IMfSMEzz+X4W9mkndvpAE2RJs2uIk4Rojgcc
-         q2ruZjUEum2wNPB6GWOvbicNais5RdhbIIeEfP9hECjp++2QZISGr7HuFwnbkNZ/PSEm
-         HBXKADYqWskt0qSZ7iTV3eFi6nYVfDC2RpQ/dMfZj9KoShNXlxS97fC7tgEAtqhn7C0U
-         fhkz7USWmeZssXLXV+CueX9JXqpeB5XtxohGDVvmyrQLk4u/LzzN3vmoCX6sIb8d8XzP
-         l3VSl/9GK6x2+3/Jzq5a9rjUhEcJtC4KMfADz+wZGS5PN6qYgTiiJ9UpMQA1Ladm+8PW
-         KqPg==
-X-Gm-Message-State: AOAM5333AQ0MKZ6WrTZxm0zIQTVxKRUBVVL0iZWRgmQbP2Z64zzPjolt
-        Br39ZHXZunhDGjh9F4KWwOcTVQsUu6xkHv61g6aNwwNqmFLXHnATCL6jDEZUjMqkcjOtwGgeVDd
-        ndHuPsR9xrTQG
-X-Received: by 2002:a05:6000:381:: with SMTP id u1mr41471972wrf.302.1638778501479;
-        Mon, 06 Dec 2021 00:15:01 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzmUXhNhKnLPvIQt8a+QUVzIPPnSI1aNA4wwthV8Rb32aUbw1BzFLyOMK32juv6Gqb/sAgQyA==
-X-Received: by 2002:a05:6000:381:: with SMTP id u1mr41471955wrf.302.1638778501260;
-        Mon, 06 Dec 2021 00:15:01 -0800 (PST)
-Received: from [192.168.3.132] (p5b0c62c6.dip0.t-ipconnect.de. [91.12.98.198])
-        by smtp.gmail.com with ESMTPSA id y12sm10434324wrn.73.2021.12.06.00.15.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 06 Dec 2021 00:15:00 -0800 (PST)
-Message-ID: <959de529-503e-6dbf-b4ea-67e13252a86a@redhat.com>
-Date:   Mon, 6 Dec 2021 09:15:00 +0100
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=vVIHKBsFBEu5zZ965qZJ2FXtzIGfRwaA3qUe2cZhBzw=;
+        b=VEAhtQaOt18HVdKMfjgxy1qMYn90EFoanB1coBXk03VUIf+Tyf2uIxJDLg1aX5NZ2v
+         CaAFgKPco7aUiB9BlDStkV8i8Dew8+tFtkcCpqtEgRgXl6k6VXiIAq7lGtKzBRYwCyqw
+         gBDICZrQejXstCpjOV4hwMmWnKI7l2dQFA1GEeFzZiHVjfFSC2x+wMjuAeDonbiiBduI
+         1jaIaPOylazAnhzEdvUSuJ1g8c3AgOAj4auDS8N1OyzIpkcMMyeWn2m8RFj4pO417Zjo
+         YESUtADLrA1GeTHo4aL8A/1sU9nhTGkkbw3G2R0N3ki26edsjzLDeJUmBddIqwIW9m/4
+         CfQA==
+X-Gm-Message-State: AOAM533iKUWecqqLNMLHCr4MolGS5ogBdsGpDuk6fWTUXmt5EakuGb7R
+        dAy7eBL6VYXWdWqRtvBOwi3kDwgYZhlUOckmzC0BJfkqQfA6YlFp4x/G87INTFpKszw+mUGm057
+        zVjgeJP9+KZTi
+X-Received: by 2002:a50:9514:: with SMTP id u20mr52142564eda.117.1638781587837;
+        Mon, 06 Dec 2021 01:06:27 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxNCU153xrFqJiuFOZtm9RCUodEdli+fDVWDvQKBTNgkxa9VBQ5k3uG8wPNQRYAsOJmsj2Jeg==
+X-Received: by 2002:a50:9514:: with SMTP id u20mr52142542eda.117.1638781587686;
+        Mon, 06 Dec 2021 01:06:27 -0800 (PST)
+Received: from fedora (g-server-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id h2sm7467053edl.85.2021.12.06.01.06.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 06 Dec 2021 01:06:27 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Ameer Hamza <amhamza.mgc@gmail.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        amhamza.mgc@gmail.com, pbonzini@redhat.com, seanjc@google.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com
+Subject: Re: [PATCH] KVM: x86: fix for missing initialization of return
+ status variable
+In-Reply-To: <20211205194719.16987-1-amhamza.mgc@gmail.com>
+References: <20211205194719.16987-1-amhamza.mgc@gmail.com>
+Date:   Mon, 06 Dec 2021 10:06:26 +0100
+Message-ID: <87ee6q6r1p.fsf@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Content-Language: en-US
-To:     Thomas Huth <thuth@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, Janosch Frank <frankja@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Sebastian Mitterle <smitterl@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org
-References: <20211202123553.96412-1-david@redhat.com>
- <20211202123553.96412-3-david@redhat.com>
- <11f0ff2f-2bae-0f1b-753f-b0e9dc24b345@redhat.com>
- <20211203121819.145696b0@p-imbrenda>
- <fa95d6e6-27be-7abf-7b1e-bb6bb9d62214@redhat.com>
- <babd1100-844b-e00c-3e5b-30f7bca65636@redhat.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-Subject: Re: [kvm-unit-tests PATCH v2 2/2] s390x: firq: floating interrupt
- test
-In-Reply-To: <babd1100-844b-e00c-3e5b-30f7bca65636@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
->>>
->>>>
->>>>> +
->>>>> +	/*
->>>>> +	 * We want CPU #2 to be stopped. This should be the case at this
->>>>> +	 * point, however, we want to sense if it even exists as well.
->>>>> +	 */
->>>>> +	ret = smp_cpu_stop(2);
->>>>> +	if (ret) {
->>>>> +		report_skip("CPU #2 not found");
->>>>
->>>> Since you already queried for the availablity of at least 3 CPUs above, I
->>>> think you could turn this into a report_fail() instead?
->>>
->>> either that or an assert, but again, no strong opinions
->>>
->>
->> Just because there are >= 3 CPUs doesn't imply that CPU #2 is around.
-> 
-> Ok, fair point. But if #2 is not around, it means that the test has been run 
-> in the wrong way by the user... I wonder what's better in that case - to 
-> skip this test or to go out with a bang. Skipping the test has the advantage 
-> of looking a little bit more "polite", but it has the disadvantage that it 
-> might get lost in automation, e.g. if somebody enabled the test in their CI, 
-> but did something wrong in the settings, they might not notice that the test 
-> is not run at all...
+Ameer Hamza <amhamza.mgc@gmail.com> writes:
 
-I sticked to what we have in s390x/smp.c, where we fail if we only have
-a single CPU.
+> If undefined ioctl number is passed to the kvm_vcpu_ioctl_device_attr
+> function, it should return with error status.
+>
+> Addresses-Coverity: 1494124 ("Uninitialized scalar variable")
+>
+> Signed-off-by: Ameer Hamza <amhamza.mgc@gmail.com>
+> ---
+>  arch/x86/kvm/x86.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index e0aa4dd53c7f..55b90c185717 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -5001,7 +5001,7 @@ static int kvm_vcpu_ioctl_device_attr(struct kvm_vcpu *vcpu,
+>  				      void __user *argp)
+>  {
+>  	struct kvm_device_attr attr;
+> -	int r;
+> +	int r = -EINVAL;
+>  
+>  	if (copy_from_user(&attr, argp, sizeof(attr)))
+>  		return -EFAULT;
 
-But I don't particularly care (and have to move on doing other stuff),
-so I'll do whatever maintainers want and resend :)
+The reported issue is not real, kvm_vcpu_ioctl_device_attr() is never
+called with anything but [KVM_HAS_DEVICE_ATTR, KVM_GET_DEVICE_ATTR,
+KVM_SET_DEVICE_ATTR] as 'ioctl' and the switch below covers all
+three. Instead of initializing 'r' we could've added a 'default' case to
+the switch, either returning something like EINVAL or just BUG(). Hope
+it'll silence coverity.
 
 -- 
-Thanks,
-
-David / dhildenb
+Vitaly
 
