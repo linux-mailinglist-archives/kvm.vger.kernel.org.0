@@ -2,114 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 80BC846A3CB
-	for <lists+kvm@lfdr.de>; Mon,  6 Dec 2021 19:07:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D823A46A3FC
+	for <lists+kvm@lfdr.de>; Mon,  6 Dec 2021 19:26:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346528AbhLFSKa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Dec 2021 13:10:30 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:59523 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229880AbhLFSK3 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 6 Dec 2021 13:10:29 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1638814020;
+        id S1346908AbhLFS32 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Dec 2021 13:29:28 -0500
+Received: from mail.skyhub.de ([5.9.137.197]:57400 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1346873AbhLFS31 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Dec 2021 13:29:27 -0500
+Received: from zn.tnic (dslb-088-067-202-008.088.067.pools.vodafone-ip.de [88.67.202.8])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 93E411EC04EC;
+        Mon,  6 Dec 2021 19:25:52 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1638815152;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=PBGplgX21hKu/O0vqc5DMO4mb2aatMiYVoGa3cXoCCE=;
-        b=PIyrisNdVonHb7N/2itS7OOgQGTLI5QCww1NaF/vaW4mf2RBnnbZdko0r0Lybc6Sp5sWF/
-        ezTH54W/Qoq0ei9C4Kty8M1jhaAHpa2RfbnIXwBOT2pw8yJ7YvJaVNNwKzUq/4VUKZEO0N
-        PhHRdSKVJQtLf/QMvdv2QTNjObP1Oq8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-561-IP9VbVaBP3iQQmqwPCsydQ-1; Mon, 06 Dec 2021 13:06:57 -0500
-X-MC-Unique: IP9VbVaBP3iQQmqwPCsydQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F19E6190D37A;
-        Mon,  6 Dec 2021 18:06:37 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.91])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0772C19EF9;
-        Mon,  6 Dec 2021 18:06:36 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Yishai Hadas <yishaih@nvidia.com>
-Subject: Re: [PATCH RFC v2] vfio: Documentation for the migration region
-In-Reply-To: <20211206173422.GK4670@nvidia.com>
-Organization: Red Hat GmbH
-References: <0-v2-45a95932a4c6+37-vfio_mig_doc_jgg@nvidia.com>
- <20211130102611.71394253.alex.williamson@redhat.com>
- <20211130185910.GD4670@nvidia.com>
- <20211130153541.131c9729.alex.williamson@redhat.com>
- <20211201031407.GG4670@nvidia.com> <20211201130314.69ed679c@omen>
- <20211201232502.GO4670@nvidia.com>
- <20211203110619.1835e584.alex.williamson@redhat.com>
- <87zgpdu3ez.fsf@redhat.com> <20211206173422.GK4670@nvidia.com>
-User-Agent: Notmuch/0.34 (https://notmuchmail.org)
-Date:   Mon, 06 Dec 2021 19:06:35 +0100
-Message-ID: <87tufltxp0.fsf@redhat.com>
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=IQf1Aykvr0b9qh7v/aw8uwWh6TGGRbXZxaugyfZJEIU=;
+        b=jQJDfprBX9STJpmWLtePKc1tSSDwspxyBah1ghZ3nAe8tJ5k0wXElkUD+W6a30r7AWnl27
+        FGffroW/b0INl0Z1xMkePlp5g2X1IjvYEFFUVDpjwqiR8fVJZVyky8QAhUNlgw8/ddhPU2
+        6ByUvko7IcMgRj9+XIxxvhr6IaIm47k=
+Date:   Mon, 6 Dec 2021 19:25:54 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH v7 13/45] x86/sev: Check the vmpl level
+Message-ID: <Ya5VsraetesqEkRi@zn.tnic>
+References: <20211110220731.2396491-1-brijesh.singh@amd.com>
+ <20211110220731.2396491-14-brijesh.singh@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20211110220731.2396491-14-brijesh.singh@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 06 2021, Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Wed, Nov 10, 2021 at 04:06:59PM -0600, Brijesh Singh wrote:
+> Virtual Machine Privilege Level (VMPL) is an optional feature in the
+> SEV-SNP architecture, which allows a guest VM to divide its address space
+> into four levels. The level can be used to provide the hardware isolated
+> abstraction layers with a VM.
 
-> On Mon, Dec 06, 2021 at 05:03:00PM +0100, Cornelia Huck wrote:
->
->> > If we're writing a specification, that's really a MAY statement,
->> > userspace MAY issue a reset to abort the RESUMING process and return
->> > the device to RUNNING.  They MAY also write the device_state directly,
->> > which MAY return an error depending on various factors such as whether
->> > data has been written to the migration state and whether that data is
->> > complete.  If a failed transitions results in an ERROR device_state,
->> > the user MUST issue a reset in order to return it to a RUNNING state
->> > without closing the interface.
->> 
->> Are we actually writing a specification? If yes, we need to be more
->> clear on what is mandatory (MUST), advised (SHOULD), or allowed
->> (MAY). If I look at the current proposal, I'm not sure into which
->> category some of the statements fall.
->
-> I deliberately didn't use such formal language because this is far
-> from what I'd consider an acceptable spec. It is more words about how
-> things work and some kind of basis for agreement between user and
-> kernel.
+That sentence needs improving.
 
-We don't really need formal language, but there are too many unclear
-statements, as the discussion above showed. Therefore my question: What
-are we actually writing? Even if it is not a formal specification, it
-still needs to be clear.
+> The VMPL0 is the highest privilege, and
+> VMPL3 is the least privilege. Certain operations must be done by the VMPL0
+> software, such as:
+> 
+> * Validate or invalidate memory range (PVALIDATE instruction)
+> * Allocate VMSA page (RMPADJUST instruction when VMSA=1)
+> 
+> The initial SEV-SNP support assumes that the guest kernel is running on
 
->
-> Under Linus's "don't break userspace" guideline whatever userspace
-> ends up doing becomes the spec the kernel is wedded to, regardless of
-> what we write down here.
+assumes? I think it is "requires".
 
-All the more important that we actually agree before this is merged! I
-don't want choices hidden deep inside the mlx5 driver dictating what
-other drivers should do, it must be reasonably easy to figure out
-(including what is mandatory, and what is flexible.)
+> VMPL0. Let's add a check to make sure that kernel is running at VMPL0
 
-> Which basically means whatever mlx5 and qemu does after we go forward
-> is the definitive spec and we cannot change qemu in a way that is
-> incompatible with mlx5 or introduce a new driver that is incompatible
-> with qemu.
+s/Let's //
 
-TBH, I'm not too happy with the current QEMU state, either. We need to
-take a long, hard look first and figure out what we need to do to make
-the QEMU support non-experimental.
+> before continuing the boot. There is no easy method to query the current
+> VMPL level, so use the RMPADJUST instruction to determine whether its
 
-We're discussing a complex topic here, and we really don't want to
-perpetuate an unclear uAPI. This is where my push for more precise
-statements is coming from.
+"... whether the guest is running at VMPL0."
 
+> booted at the VMPL0.
+> 
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> ---
+>  arch/x86/boot/compressed/sev.c    | 34 ++++++++++++++++++++++++++++---
+>  arch/x86/include/asm/sev-common.h |  1 +
+>  arch/x86/include/asm/sev.h        | 16 +++++++++++++++
+>  3 files changed, 48 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/boot/compressed/sev.c b/arch/x86/boot/compressed/sev.c
+> index e525fa74a551..21feb7f4f76f 100644
+> --- a/arch/x86/boot/compressed/sev.c
+> +++ b/arch/x86/boot/compressed/sev.c
+> @@ -124,6 +124,29 @@ static inline bool sev_snp_enabled(void)
+>  	return sev_status & MSR_AMD64_SEV_SNP_ENABLED;
+>  }
+>  
+> +static bool is_vmpl0(void)
+> +{
+> +	u64 attrs;
+> +	int err;
+> +
+> +	/*
+> +	 * There is no straightforward way to query the current VMPL level. The
+> +	 * simplest method is to use the RMPADJUST instruction to change a page
+> +	 * permission to a VMPL level-1, and if the guest kernel is launched at
+> +	 * a level <= 1, then RMPADJUST instruction will return an error.
+> +	 */
+
+So I was wondering what this is changing because if the change you do is
+relevant, you'd have to undo it.
+
+But looking at RMPADJUST, TARGET_PERM_MASK is 0 for target VMPL1 so
+you're basically clearing all permissions for boot_ghcb_page on VMPL1.
+Which is fine currently as we do only VMPL0 but pls write that out
+explicitly what you're doing here and why it is ok to use RMPADJUST
+without having to restore any changes it has done to the RMP table.
+
+> +	attrs = 1;
+> +
+> +	/*
+> +	 * Any page-aligned virtual address is sufficient to test the VMPL level.
+> +	 * The boot_ghcb_page is page aligned memory, so lets use for the test.
+> +	 */
+> +	if (rmpadjust((unsigned long)&boot_ghcb_page, RMP_PG_SIZE_4K, attrs))
+> +		return false;
+> +
+> +	return true;
+> +}
+> +
+>  static bool do_early_sev_setup(void)
+>  {
+>  	if (!sev_es_negotiate_protocol())
+> @@ -132,10 +155,15 @@ static bool do_early_sev_setup(void)
+>  	/*
+>  	 * SNP is supported in v2 of the GHCB spec which mandates support for HV
+>  	 * features. If SEV-SNP is enabled, then check if the hypervisor supports
+> -	 * the SEV-SNP features.
+> +	 * the SEV-SNP features and is launched at VMPL-0 level.
+
+"VMPL0" - no hyphen - like in the APM. Below too.
+
+>  	 */
+> -	if (sev_snp_enabled() && !(sev_hv_features & GHCB_HV_FT_SNP))
+> -		sev_es_terminate(SEV_TERM_SET_GEN, GHCB_SNP_UNSUPPORTED);
+> +	if (sev_snp_enabled()) {
+> +		if (!(sev_hv_features & GHCB_HV_FT_SNP))
+> +			sev_es_terminate(SEV_TERM_SET_GEN, GHCB_SNP_UNSUPPORTED);
+> +
+> +		if (!is_vmpl0())
+> +			sev_es_terminate(SEV_TERM_SET_LINUX, GHCB_TERM_NOT_VMPL0);
+> +	}
+>  
+>  	if (set_page_decrypted((unsigned long)&boot_ghcb_page))
+>  		return false;
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
