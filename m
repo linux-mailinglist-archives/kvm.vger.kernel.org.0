@@ -2,20 +2,20 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6EC1D46A62B
-	for <lists+kvm@lfdr.de>; Mon,  6 Dec 2021 20:55:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 55A3946A62E
+	for <lists+kvm@lfdr.de>; Mon,  6 Dec 2021 20:55:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348865AbhLFT7K (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Dec 2021 14:59:10 -0500
-Received: from vps-vb.mhejs.net ([37.28.154.113]:49886 "EHLO vps-vb.mhejs.net"
+        id S1348974AbhLFT7L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Dec 2021 14:59:11 -0500
+Received: from vps-vb.mhejs.net ([37.28.154.113]:49914 "EHLO vps-vb.mhejs.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1348915AbhLFT7F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Dec 2021 14:59:05 -0500
+        id S1349008AbhLFT7J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Dec 2021 14:59:09 -0500
 Received: from MUA
         by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <mail@maciej.szmigiero.name>)
-        id 1muK4v-0000m1-HM; Mon, 06 Dec 2021 20:55:13 +0100
+        id 1muK50-0000n1-SA; Mon, 06 Dec 2021 20:55:18 +0100
 From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>
@@ -43,9 +43,9 @@ Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Ben Gardon <bgardon@google.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v7 06/29] KVM: arm64: Use "new" memslot instead of userspace memory region
-Date:   Mon,  6 Dec 2021 20:54:12 +0100
-Message-Id: <c019d00c2531520c52e0b52dfda1be5aa898103c.1638817639.git.maciej.szmigiero@oracle.com>
+Subject: [PATCH v7 07/29] KVM: MIPS: Drop pr_debug from memslot commit to avoid using "mem"
+Date:   Mon,  6 Dec 2021 20:54:13 +0100
+Message-Id: <446929a668f6e1346751571b71db41e94e976cdf.1638817639.git.maciej.szmigiero@oracle.com>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <cover.1638817637.git.maciej.szmigiero@oracle.com>
 References: <cover.1638817637.git.maciej.szmigiero@oracle.com>
@@ -57,59 +57,36 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Sean Christopherson <seanjc@google.com>
 
-Get the slot ID, hva, etc... from the "new" memslot instead of the
-userspace memory region when preparing/committing a memory region.  This
-will allow a future commit to drop @mem from the prepare/commit hooks
-once all architectures convert to using "new".
+Remove an old (circa 2012) kvm_debug from kvm_arch_commit_memory_region()
+to print basic information when committing a memslot change.  The primary
+motivation for removing the kvm_debug is to avoid using @mem, the user
+memory region, so that said param can be removed.
 
-Opportunistically wait to get the hva begin+end until after filtering out
-the DELETE case in anticipation of a future commit passing NULL for @new
-when deleting a memslot.
+Alternatively, the debug message could be converted to use @new, but that
+would require synthesizing select state to play nice with the DELETED
+case, which will pass NULL for @new in the future.  And there's no
+argument to be had for dumping generic information in an arch callback,
+i.e. if there's a good reason for the debug message, then it belongs in
+common KVM code where all architectures can benefit.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Maciej S. Szmigiero <maciej.szmigiero@oracle.com>
 ---
- arch/arm64/kvm/mmu.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ arch/mips/kvm/mips.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 5d474360bf6c..dd95350ea15d 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1473,14 +1473,14 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
- 	 * allocated dirty_bitmap[], dirty pages will be tracked while the
- 	 * memory slot is write protected.
- 	 */
--	if (change != KVM_MR_DELETE && mem->flags & KVM_MEM_LOG_DIRTY_PAGES) {
-+	if (change != KVM_MR_DELETE && new->flags & KVM_MEM_LOG_DIRTY_PAGES) {
- 		/*
- 		 * If we're with initial-all-set, we don't need to write
- 		 * protect any pages because they're all reported as dirty.
- 		 * Huge pages and normal pages will be write protect gradually.
- 		 */
- 		if (!kvm_dirty_log_manual_protect_and_init_set(kvm)) {
--			kvm_mmu_wp_memory_region(kvm, mem->slot);
-+			kvm_mmu_wp_memory_region(kvm, new->id);
- 		}
- 	}
- }
-@@ -1491,8 +1491,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 				   struct kvm_memory_slot *new,
- 				   enum kvm_mr_change change)
+diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+index b2ce10784eb0..bda717301db8 100644
+--- a/arch/mips/kvm/mips.c
++++ b/arch/mips/kvm/mips.c
+@@ -230,10 +230,6 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
  {
--	hva_t hva = mem->userspace_addr;
--	hva_t reg_end = hva + mem->memory_size;
-+	hva_t hva, reg_end;
- 	int ret = 0;
+ 	int needs_flush;
  
- 	if (change != KVM_MR_CREATE && change != KVM_MR_MOVE &&
-@@ -1506,6 +1505,9 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 	if ((new->base_gfn + new->npages) > (kvm_phys_size(kvm) >> PAGE_SHIFT))
- 		return -EFAULT;
- 
-+	hva = new->userspace_addr;
-+	reg_end = hva + (new->npages << PAGE_SHIFT);
-+
- 	mmap_read_lock(current->mm);
+-	kvm_debug("%s: kvm: %p slot: %d, GPA: %llx, size: %llx, QVA: %llx\n",
+-		  __func__, kvm, mem->slot, mem->guest_phys_addr,
+-		  mem->memory_size, mem->userspace_addr);
+-
  	/*
- 	 * A memory region could potentially cover multiple VMAs, and any holes
+ 	 * If dirty page logging is enabled, write protect all pages in the slot
+ 	 * ready for dirty logging.
