@@ -2,87 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D8947469E53
-	for <lists+kvm@lfdr.de>; Mon,  6 Dec 2021 16:36:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F3B6D469FEA
+	for <lists+kvm@lfdr.de>; Mon,  6 Dec 2021 16:55:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358004AbhLFPiI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Dec 2021 10:38:08 -0500
-Received: from mail-oi1-f175.google.com ([209.85.167.175]:41930 "EHLO
-        mail-oi1-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1387701AbhLFPbo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 6 Dec 2021 10:31:44 -0500
-Received: by mail-oi1-f175.google.com with SMTP id u74so22006763oie.8;
-        Mon, 06 Dec 2021 07:28:15 -0800 (PST)
+        id S1390245AbhLFPzC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Dec 2021 10:55:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35572 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1357615AbhLFPwf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Dec 2021 10:52:35 -0500
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82D36C036FAA
+        for <kvm@vger.kernel.org>; Mon,  6 Dec 2021 07:37:48 -0800 (PST)
+Received: by mail-pj1-x1030.google.com with SMTP id f18-20020a17090aa79200b001ad9cb23022so150466pjq.4
+        for <kvm@vger.kernel.org>; Mon, 06 Dec 2021 07:37:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=7HzwmvjWwTv0FeXPfbk2piEjvWmlmu/Ix95bAO30KVA=;
+        b=ZhuBW1c4dJPnblkwVVq7/i5JD1acaN3vKRPqk1vt1l4/1WVncLZ6/XF7i5mu75gzgu
+         gjeCchw5SEdKY9IS6B7CPAfcmRrUtycY7KuXQmFjBHQHAkwiOcZJ9z0v/+YNWbTW74ju
+         WW96J+3JEIUppGf6QeHbGWa7GVsgIexlxyh9hOk48GZohQPBwAtQkqiajM6rP2eObXpU
+         BB9FK4L4OBLFpwyu9xrfcQ8X7jt5+ieR5WZzveGHAm+q8YpxPYGnxSwBq7pubQ1wuMhA
+         A0WTx//Jdi0jZnVSCUhuNTOI/Ivk6mePXx6gLqDkkdRd+Kgm/eFjcy+0vGQqU+5gDD/C
+         DlVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=vmY9WY/IdHkBubH/d9+H2NnZMjAMu0umDpKHxPiSoSU=;
-        b=Jrg7IbYxtnNeP+fRmAsa1q5NHAFnrjui64xBACd1AENxji6+7hIFdIld6eJ1acRjAC
-         wXZ8lkl1jxQn1yJ5Mhj2wuKIs4Rbr8EULUD3TSKnnoD79YJL0z6pYupseU3ZTUGGKKmx
-         yJ3Rlc/REdpufwwa13+371WDKPdnAMMZ3E0tvQSDhNVIuK6Ch2pv3qdGXhQkm4oZqWaY
-         UxQe/a4DMnl7tQVtAilUnLDo8RvNn+Z+Z864WfbE8WBqclvUI84G+LnXdiBSmSlf2/Rz
-         zz/rQGuxvPvVL0IWLLf052G7eDInRGXcZNAmHaJVJf6DrQ3BdQqENq/1KvxyVZXZLA/m
-         4ejg==
-X-Gm-Message-State: AOAM533BgTBbtOrFxOO58v/7bLYS5pe+9dcRYqt+wjUNl96NnLcO3CxU
-        AdvZdlrskmJ6ep+K9EGtWw==
-X-Google-Smtp-Source: ABdhPJyfHepTpy+8C5WIBaswVad+pb+ARigaK7+tiIrrbzB1awNCTodg/k/StbwlXs0D2pl0zwBHtg==
-X-Received: by 2002:a05:6808:218b:: with SMTP id be11mr25541435oib.80.1638804495458;
-        Mon, 06 Dec 2021 07:28:15 -0800 (PST)
-Received: from robh.at.kernel.org (66-90-148-213.dyn.grandenetworks.net. [66.90.148.213])
-        by smtp.gmail.com with ESMTPSA id o10sm2141225oom.32.2021.12.06.07.28.14
+        bh=7HzwmvjWwTv0FeXPfbk2piEjvWmlmu/Ix95bAO30KVA=;
+        b=K3agPRpmS4W21PiH2RTAFGF0idSDgGfpv8OAtU9PDs35t08ZwDmdY4+WcyI20kwANm
+         eIAASqnNC3e24kZbBZB086nDun3SjhsgaIkuxSALwlcH+IA4ViOF/StZ6RSBKfw6XaXp
+         3xWz3pKB5U+HlfcFncUy0pjio5ayw2gNK4rxVaRSmbmEPX/x9xvkzmHMRuMjvdgr3iLY
+         ONiyda44KmlQC8vTZRNPhgNBBETrJo8ATgq38enFpyPPhQ1PQ8YsYm8f75Q/AgXlLlzR
+         HSjp7QetCq7pmsvgCcIiyMRyh/qNn9Z9qJwBD3LDz6itnB1TVIPDW8TKIhWGhehoeN+L
+         3zAA==
+X-Gm-Message-State: AOAM530AfFgAP3aMXPpC9coPHzF6rMGc/zDtgPknUDBl7216bx1XTciv
+        kiET6EacA9APsvcKEPJED5To2TOwmSJ5zQ==
+X-Google-Smtp-Source: ABdhPJwcn3YT+bEUgsZ2X+gC+fgtI4ggBTfe1/BDgoKckLhZ5wuo1mJvX1iNXW4oitVJUGRb6dnE1Q==
+X-Received: by 2002:a17:90b:4c03:: with SMTP id na3mr37953644pjb.62.1638805067801;
+        Mon, 06 Dec 2021 07:37:47 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id lr6sm11226043pjb.0.2021.12.06.07.37.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Dec 2021 07:28:14 -0800 (PST)
-Received: (nullmailer pid 2069157 invoked by uid 1000);
-        Mon, 06 Dec 2021 15:28:13 -0000
-Date:   Mon, 6 Dec 2021 09:28:13 -0600
-From:   Rob Herring <robh@kernel.org>
-To:     Atish Patra <atishp@atishpatra.org>
-Cc:     linux-kernel@vger.kernel.org, Alexandre Ghiti <alex@ghiti.fr>,
-        Anup Patel <anup.patel@wdc.com>,
-        Greentime Hu <greentime.hu@sifive.com>,
-        Guo Ren <guoren@linux.alibaba.com>,
-        Heinrich Schuchardt <xypron.glpk@gmx.de>,
-        Ingo Molnar <mingo@kernel.org>,
-        Jisheng Zhang <jszhang@kernel.org>,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        linux-riscv@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
-        Nanyong Sun <sunnanyong@huawei.com>,
-        Nick Kossifidis <mick@ics.forth.gr>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Pekka Enberg <penberg@kernel.org>,
-        Vincent Chen <vincent.chen@sifive.com>,
-        Vitaly Wool <vitaly.wool@konsulko.com>
-Subject: Re: [RFC 0/6] Sparse HART id support
-Message-ID: <Ya4sDX974/dVEOQw@robh.at.kernel.org>
-References: <20211204002038.113653-1-atishp@atishpatra.org>
+        Mon, 06 Dec 2021 07:37:47 -0800 (PST)
+Date:   Mon, 6 Dec 2021 15:37:43 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Ameer Hamza <amhamza.mgc@gmail.com>
+Cc:     vkuznets@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com
+Subject: Re: [PATCH v2] KVM: x86: fix for missing initialization of return
+ status variable
+Message-ID: <Ya4uR7I/7yvrgl6c@google.com>
+References: <87ee6q6r1p.fsf@redhat.com>
+ <20211206102403.10797-1-amhamza.mgc@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211204002038.113653-1-atishp@atishpatra.org>
+In-Reply-To: <20211206102403.10797-1-amhamza.mgc@gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 03, 2021 at 04:20:32PM -0800, Atish Patra wrote:
-> Currently, sparse hartid is not supported for Linux RISC-V for the following
-> reasons.
-> 1. Both spinwait and ordered booting method uses __cpu_up_stack/task_pointer
->    which is an array size of NR_CPUs.
-> 2. During early booting, any hartid greater than NR_CPUs are not booted at all.
-> 3. riscv_cpuid_to_hartid_mask uses struct cpumask for generating hartid bitmap.
-> 4. SBI v0.2 implementation uses NR_CPUs as the maximum hartid number while
->    generating hartmask.
-> 
-> In order to support sparse hartid, the hartid & NR_CPUS needs to be disassociated
-> which was logically incorrect anyways. NR_CPUs represent the maximum logical|
-> CPU id configured in the kernel while the hartid represent the physical hartid
-> stored in mhartid CSR defined by the privilege specification. Thus, hartid
-> can have much greater value than logical cpuid.
+On Mon, Dec 06, 2021, Ameer Hamza wrote:
+> If undefined ioctl number is passed to the kvm_vcpu_ioctl_device_attr
+> function, it should return with error status.
 
-We already have a couple of architectures with logical to physical CPU 
-id maps. See cpu_logical_map. Can we make that common and use it here? 
-That would also possibly allow for common populating the map from DT.
-
-Rob
+No, if anything KVM should do KVM_BUG_ON() and return -EIO, because @ioctl is
+completely KVM controlled.  But I'd personally prefer we leave it as is, there's
+one call site that very clearly invokes the helper with only the three ioctls.
+It's not a strong preference though.
