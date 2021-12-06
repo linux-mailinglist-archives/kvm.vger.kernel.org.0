@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A47D5468EB2
-	for <lists+kvm@lfdr.de>; Mon,  6 Dec 2021 02:59:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 36748468EBD
+	for <lists+kvm@lfdr.de>; Mon,  6 Dec 2021 03:00:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232007AbhLFCDF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 5 Dec 2021 21:03:05 -0500
-Received: from mga12.intel.com ([192.55.52.136]:1386 "EHLO mga12.intel.com"
+        id S231816AbhLFCDZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 5 Dec 2021 21:03:25 -0500
+Received: from mga02.intel.com ([134.134.136.20]:22553 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231851AbhLFCDF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 5 Dec 2021 21:03:05 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10189"; a="217255471"
+        id S232179AbhLFCDY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 5 Dec 2021 21:03:24 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10189"; a="224482778"
 X-IronPort-AV: E=Sophos;i="5.87,290,1631602800"; 
-   d="scan'208";a="217255471"
+   d="scan'208";a="224482778"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2021 17:59:37 -0800
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2021 17:59:44 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.87,290,1631602800"; 
-   d="scan'208";a="514541949"
+   d="scan'208";a="514541979"
 Received: from allen-box.sh.intel.com ([10.239.159.118])
-  by orsmga008.jf.intel.com with ESMTP; 05 Dec 2021 17:59:26 -0800
+  by orsmga008.jf.intel.com with ESMTP; 05 Dec 2021 17:59:37 -0800
 From:   Lu Baolu <baolu.lu@linux.intel.com>
 To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Joerg Roedel <joro@8bytes.org>,
@@ -49,9 +49,9 @@ Cc:     Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
         iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Lu Baolu <baolu.lu@linux.intel.com>
-Subject: [PATCH v3 02/18] driver core: Add dma_cleanup callback in bus_type
-Date:   Mon,  6 Dec 2021 09:58:47 +0800
-Message-Id: <20211206015903.88687-3-baolu.lu@linux.intel.com>
+Subject: [PATCH v3 03/18] driver core: platform: Rename platform_dma_configure()
+Date:   Mon,  6 Dec 2021 09:58:48 +0800
+Message-Id: <20211206015903.88687-4-baolu.lu@linux.intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20211206015903.88687-1-baolu.lu@linux.intel.com>
 References: <20211206015903.88687-1-baolu.lu@linux.intel.com>
@@ -61,89 +61,67 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The bus_type structure defines dma_configure() callback for bus drivers
-to configure DMA on the devices. This adds the paired dma_cleanup()
-callback and calls it during driver unbinding so that bus drivers can do
-some cleanup work.
+The platform_dma_configure() is shared between platform and amba bus
+drivers. Rename the common helper to firmware_dma_configure() so that
+both platform and amba bus drivers could customize their dma_configure
+callbacks.
 
-One use case for this paired DMA callbacks is for the bus driver to check
-for DMA ownership conflicts during driver binding, where multiple devices
-belonging to a same IOMMU group (the minimum granularity of isolation and
-protection) may be assigned to kernel drivers or user space respectively.
-
-Without this change, for example, the vfio driver has to listen to a bus
-BOUND_DRIVER event and then BUG_ON() in case of dma ownership conflict.
-This leads to bad user experience since careless driver binding operation
-may crash the system if the admin overlooks the group restriction. Aside
-from bad design, this leads to a security problem as a root user, even with
-lockdown=integrity, can force the kernel to BUG.
-
-With this change, the bus driver could check and set the DMA ownership in
-driver binding process and fail on ownership conflicts. The DMA ownership
-should be released during driver unbinding.
-
-Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
-Link: https://lore.kernel.org/linux-iommu/20210922123931.GI327412@nvidia.com/
-Link: https://lore.kernel.org/linux-iommu/20210928115751.GK964074@nvidia.com/
 Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
 ---
- include/linux/device/bus.h | 3 +++
- drivers/base/dd.c          | 7 ++++++-
- 2 files changed, 9 insertions(+), 1 deletion(-)
+ include/linux/platform_device.h | 2 +-
+ drivers/amba/bus.c              | 2 +-
+ drivers/base/platform.c         | 5 ++---
+ 3 files changed, 4 insertions(+), 5 deletions(-)
 
-diff --git a/include/linux/device/bus.h b/include/linux/device/bus.h
-index a039ab809753..d8b29ccd07e5 100644
---- a/include/linux/device/bus.h
-+++ b/include/linux/device/bus.h
-@@ -59,6 +59,8 @@ struct fwnode_handle;
-  *		bus supports.
-  * @dma_configure:	Called to setup DMA configuration on a device on
-  *			this bus.
-+ * @dma_cleanup:	Called to cleanup DMA configuration on a device on
-+ *			this bus.
-  * @pm:		Power management operations of this bus, callback the specific
-  *		device driver's pm-ops.
-  * @iommu_ops:  IOMMU specific operations for this bus, used to attach IOMMU
-@@ -103,6 +105,7 @@ struct bus_type {
- 	int (*num_vf)(struct device *dev);
+diff --git a/include/linux/platform_device.h b/include/linux/platform_device.h
+index 7c96f169d274..4381c34af7e0 100644
+--- a/include/linux/platform_device.h
++++ b/include/linux/platform_device.h
+@@ -328,7 +328,7 @@ extern int platform_pm_restore(struct device *dev);
+ #define platform_pm_restore		NULL
+ #endif
  
- 	int (*dma_configure)(struct device *dev);
-+	void (*dma_cleanup)(struct device *dev);
+-extern int platform_dma_configure(struct device *dev);
++extern int firmware_dma_configure(struct device *dev);
  
- 	const struct dev_pm_ops *pm;
+ #ifdef CONFIG_PM_SLEEP
+ #define USE_PLATFORM_PM_SLEEP_OPS \
+diff --git a/drivers/amba/bus.c b/drivers/amba/bus.c
+index 720aa6cdd402..08c094124c0e 100644
+--- a/drivers/amba/bus.c
++++ b/drivers/amba/bus.c
+@@ -319,7 +319,7 @@ struct bus_type amba_bustype = {
+ 	.probe		= amba_probe,
+ 	.remove		= amba_remove,
+ 	.shutdown	= amba_shutdown,
+-	.dma_configure	= platform_dma_configure,
++	.dma_configure	= firmware_dma_configure,
+ 	.pm		= &amba_pm,
+ };
+ EXPORT_SYMBOL_GPL(amba_bustype);
+diff --git a/drivers/base/platform.c b/drivers/base/platform.c
+index 598acf93a360..125d708c0eb3 100644
+--- a/drivers/base/platform.c
++++ b/drivers/base/platform.c
+@@ -1449,8 +1449,7 @@ static void platform_shutdown(struct device *_dev)
+ 		drv->shutdown(dev);
+ }
  
-diff --git a/drivers/base/dd.c b/drivers/base/dd.c
-index 68ea1f949daa..ae457fa2bca6 100644
---- a/drivers/base/dd.c
-+++ b/drivers/base/dd.c
-@@ -577,7 +577,7 @@ static int really_probe(struct device *dev, struct device_driver *drv)
- 	if (dev->bus->dma_configure) {
- 		ret = dev->bus->dma_configure(dev);
- 		if (ret)
--			goto probe_failed;
-+			goto pinctrl_bind_failed;
- 	}
- 
- 	ret = driver_sysfs_add(dev);
-@@ -660,6 +660,8 @@ static int really_probe(struct device *dev, struct device_driver *drv)
- 	if (dev->bus)
- 		blocking_notifier_call_chain(&dev->bus->p->bus_notifier,
- 					     BUS_NOTIFY_DRIVER_NOT_BOUND, dev);
-+	if (dev->bus->dma_cleanup)
-+		dev->bus->dma_cleanup(dev);
- pinctrl_bind_failed:
- 	device_links_no_driver(dev);
- 	devres_release_all(dev);
-@@ -1204,6 +1206,9 @@ static void __device_release_driver(struct device *dev, struct device *parent)
- 		else if (drv->remove)
- 			drv->remove(dev);
- 
-+		if (dev->bus->dma_cleanup)
-+			dev->bus->dma_cleanup(dev);
-+
- 		device_links_driver_cleanup(dev);
- 
- 		devres_release_all(dev);
+-
+-int platform_dma_configure(struct device *dev)
++int firmware_dma_configure(struct device *dev)
+ {
+ 	enum dev_dma_attr attr;
+ 	int ret = 0;
+@@ -1478,7 +1477,7 @@ struct bus_type platform_bus_type = {
+ 	.probe		= platform_probe,
+ 	.remove		= platform_remove,
+ 	.shutdown	= platform_shutdown,
+-	.dma_configure	= platform_dma_configure,
++	.dma_configure	= firmware_dma_configure,
+ 	.pm		= &platform_dev_pm_ops,
+ };
+ EXPORT_SYMBOL_GPL(platform_bus_type);
 -- 
 2.25.1
 
