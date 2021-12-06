@@ -2,128 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 47591469737
-	for <lists+kvm@lfdr.de>; Mon,  6 Dec 2021 14:35:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 58D1946973C
+	for <lists+kvm@lfdr.de>; Mon,  6 Dec 2021 14:36:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244111AbhLFNix (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 6 Dec 2021 08:38:53 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:26792 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S240974AbhLFNiw (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 6 Dec 2021 08:38:52 -0500
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B6BkrCp014929;
-        Mon, 6 Dec 2021 13:35:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=laFtNKd/4jJtFp1QIZggWcepBXEGZGc17z4Y74H1+Z8=;
- b=f0q6z2yZe64Xg9SrWgFpHIONtn8DxInMgZMvAuFDsIDwh+sYL+OcUAfwhCs5/HS/VwIh
- TI+HCAr1qM5wZiIpdbQE0HlcU5hNU8Ck8E/sLiAng1EcnZ8VGpCou6MTzdhcgQ/uKK9Q
- Sb2ymNduYskk9mP94ehAM2zyOcdv1uP1u8zZtqGgZt4WlXLYr5aZks5Mot6iG+2MQ9Kj
- JvWg75+lbOI2NfblwMkUslPbQ8Y7fmBYshnWqY/JwwTBPVWpYjRHDbuQH3jiYTliXMpN
- qTlJZ+Eo5IAaXSOzHtsiDHHsiCdGnY0tOYJmLZublo0Fxd9rsHmmAhF7s2k6Ze+FoDEy bg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cshxst2qs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 06 Dec 2021 13:35:22 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1B6CULbu013103;
-        Mon, 6 Dec 2021 13:35:22 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cshxst2qb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 06 Dec 2021 13:35:22 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1B6DWNau004610;
-        Mon, 6 Dec 2021 13:35:20 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma01fra.de.ibm.com with ESMTP id 3cqyy94mjv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 06 Dec 2021 13:35:20 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1B6DZGMr26739036
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 6 Dec 2021 13:35:16 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CAF674204D;
-        Mon,  6 Dec 2021 13:35:16 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 51D2F4204B;
-        Mon,  6 Dec 2021 13:35:16 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.145.0.173])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon,  6 Dec 2021 13:35:16 +0000 (GMT)
-Date:   Mon, 6 Dec 2021 14:35:13 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     David Hildenbrand <david@redhat.com>
-Cc:     kvm@vger.kernel.org, Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Sebastian Mitterle <smitterl@redhat.com>,
-        Halil Pasic <pasic@linux.ibm.com>, linux-s390@vger.kernel.org
-Subject: Re: [kvm-unit-tests PATCH v2 0/2] s390x: firq: floating interrupt
- test
-Message-ID: <20211206143513.76a304f2@p-imbrenda>
-In-Reply-To: <20211202123553.96412-1-david@redhat.com>
-References: <20211202123553.96412-1-david@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S244465AbhLFNja (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 6 Dec 2021 08:39:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60546 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240974AbhLFNja (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 6 Dec 2021 08:39:30 -0500
+Received: from theia.8bytes.org (8bytes.org [IPv6:2a01:238:4383:600:38bc:a715:4b6d:a889])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 849DEC061746;
+        Mon,  6 Dec 2021 05:36:01 -0800 (PST)
+Received: by theia.8bytes.org (Postfix, from userid 1000)
+        id A88E1396; Mon,  6 Dec 2021 14:35:58 +0100 (CET)
+Date:   Mon, 6 Dec 2021 14:35:55 +0100
+From:   Joerg Roedel <joro@8bytes.org>
+To:     Lu Baolu <baolu.lu@linux.intel.com>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>, Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Dan Williams <dan.j.williams@intel.com>, rafael@kernel.org,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Liu Yi L <yi.l.liu@intel.com>,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Stuart Yoder <stuyoder@gmail.com>,
+        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Li Yang <leoyang.li@nxp.com>,
+        Dmitry Osipenko <digetx@gmail.com>,
+        iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 01/18] iommu: Add device dma ownership set/release
+ interfaces
+Message-ID: <Ya4Ru/GtILJYzI6j@8bytes.org>
+References: <20211206015903.88687-1-baolu.lu@linux.intel.com>
+ <20211206015903.88687-2-baolu.lu@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: a6pp4K1V2rFVN1S5G-Oc3WK9XUQniNjU
-X-Proofpoint-ORIG-GUID: cR1_J50LfWewSng_PqDrwYcSAtN1fKWr
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2021-12-06_04,2021-12-06_02,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
- lowpriorityscore=0 bulkscore=0 spamscore=0 mlxscore=0 phishscore=0
- impostorscore=0 mlxlogscore=999 malwarescore=0 adultscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2112060084
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211206015903.88687-2-baolu.lu@linux.intel.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu,  2 Dec 2021 13:35:51 +0100
-David Hildenbrand <david@redhat.com> wrote:
+On Mon, Dec 06, 2021 at 09:58:46AM +0800, Lu Baolu wrote:
+> >From the perspective of who is initiating the device to do DMA, device
+> DMA could be divided into the following types:
+> 
+>         DMA_OWNER_DMA_API: Device DMAs are initiated by a kernel driver
+> 			through the kernel DMA API.
+>         DMA_OWNER_PRIVATE_DOMAIN: Device DMAs are initiated by a kernel
+> 			driver with its own PRIVATE domain.
+> 	DMA_OWNER_PRIVATE_DOMAIN_USER: Device DMAs are initiated by
+> 			userspace.
 
-> From patch #2:
-> 
-> "
-> We had a KVM BUG fixed by kernel commit a3e03bc1368c ("KVM: s390: index
-> kvm->arch.idle_mask by vcpu_idx"), whereby a floating interrupt might get
-> stuck forever because a CPU in the wait state would not get woken up.
-> 
-> The issue can be triggered when CPUs are created in a nonlinear fashion,
-> such that the CPU address ("core-id") and the KVM cpu id don't match.
-> 
-> So let's start with a floating interrupt test that will trigger a
-> floating interrupt (via SCLP) to be delivered to a CPU in the wait state.
-> "
+I have looked at the other iommu patches in this series, but I still
+don't quite get what the difference in the code flow is between
+DMA_OWNER_PRIVATE_DOMAIN and DMA_OWNER_PRIVATE_DOMAIN_USER. What are the
+differences in the iommu core behavior based on this setting?
 
-ok I'll try picking this series
+>         int iommu_device_set_dma_owner(struct device *dev,
+>                 enum iommu_dma_owner type, void *owner_cookie);
+>         void iommu_device_release_dma_owner(struct device *dev,
+>                 enum iommu_dma_owner type);
 
-> 
-> v1 -> v2:
-> - Remove flag logic
-> - Extend comments
-> - Minor cleanups
-> - sclp_clear_busy() before printing to the SCLP console
-> 
-> David Hildenbrand (2):
->   s390x: make smp_cpu_setup() return 0 on success
->   s390x: firq: floating interrupt test
-> 
->  lib/s390x/sclp.c    |  11 ++--
->  lib/s390x/sclp.h    |   1 +
->  lib/s390x/smp.c     |   1 +
->  s390x/Makefile      |   1 +
->  s390x/firq.c        | 122 ++++++++++++++++++++++++++++++++++++++++++++
->  s390x/unittests.cfg |  10 ++++
->  6 files changed, 143 insertions(+), 3 deletions(-)
->  create mode 100644 s390x/firq.c
-> 
+It the owner is a group-wide setting, it should be called with the group
+instead of the device. I have seen the group-specific funcitons are
+added later, but that leaves the question why the device-specific ones
+are needed at all.
 
+> +	enum iommu_dma_owner dma_owner;
+> +	refcount_t owner_cnt;
+> +	void *owner_cookie;
+>  };
+
+I am also not quite happy yet with calling this dma_owner, but can't
+come up with a better name yet.
+
+>  
+>  struct group_device {
+> @@ -621,6 +624,7 @@ struct iommu_group *iommu_group_alloc(void)
+>  	INIT_LIST_HEAD(&group->devices);
+>  	INIT_LIST_HEAD(&group->entry);
+>  	BLOCKING_INIT_NOTIFIER_HEAD(&group->notifier);
+> +	group->dma_owner = DMA_OWNER_NONE;
+
+
+DMA_OWNER_NONE is also questionable. All devices are always in one
+domain, and the default domain is always the one used for DMA-API, so
+why isn't the initial value DMA_OWNER_DMA_API?
+
+Regards,
+
+	Joerg
