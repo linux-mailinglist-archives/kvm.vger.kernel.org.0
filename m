@@ -2,139 +2,207 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3206C46B6E2
-	for <lists+kvm@lfdr.de>; Tue,  7 Dec 2021 10:18:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 135B746B704
+	for <lists+kvm@lfdr.de>; Tue,  7 Dec 2021 10:27:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233810AbhLGJV7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Dec 2021 04:21:59 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:32806 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S233794AbhLGJV7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 7 Dec 2021 04:21:59 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B77GdYF021812;
-        Tue, 7 Dec 2021 09:18:24 GMT
+        id S233859AbhLGJar (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Dec 2021 04:30:47 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:8158 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231250AbhLGJaq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 7 Dec 2021 04:30:46 -0500
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B79IiPS005096;
+        Tue, 7 Dec 2021 09:27:16 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
  mime-version : subject : to : cc : references : from : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=wJwR0qPRphkBEbKGeEnRyEEXwyY66K6vr8D3jkbrj/U=;
- b=T1tj3LX7EocfckPOxrOpeOASuNNk2Y/T2DAaL/uiHZG4vZjA4uqpBf96E77O9k+3zRWc
- deibsbV6Gg50YnMzf6ZlVgC7yqzNoLEzJ3MDiGs/eRoj1/4b/0MwMEXQnEC/CZ+0XNyg
- IHo74qPNyEwxYPj5+G2gObHG36guHZH1AhasAWNeWQdM76ypH8+eUDu0/mB6NQ+nJnBC
- hhUAk6bzCYGBeZnFnYyOnjflCI4UgxTf4+mP2q+2roMqItDLHmEUZvR2fsUkAmV3uatv
- xRIyOJMp+bNbpVYg/iHkg5DnUikjG51d4rrlb7quvvMc4bOeqcNh/aRv4Ce7yGXdvJXk qQ== 
+ bh=V2Q5oxnMQx3uk57DHKUmBUi4N+cjLpm4PKacLQprv7E=;
+ b=m5a2xMNzPnkPA9cFbRNqlJwrJijUmohjK3UaC254UVKiC0J49iswFD5uPnJZr6IagPF/
+ fJjm96+n12U92pt9dNG4fiRPZN8i7HxabeakBgIzGQA6PRSGoazP6HI0xeF7HKN7hANx
+ 1REIhayQuVnki/n81240PW2UnOp7ghb+qgBvC+8NlzPma4+YM3v0O/pqrvuSXQuvTkIZ
+ fl3PfpTINY0/k9jV2jVyTkjBjdsGdvSUSSQBdjoabH6GWdX8TW7NUxnIJvsZPWbCdX68
+ za7Dp/OfsJTkMjRSTo3rozqqmPKhd9BB5da2O0pMdroD1Rd0quj+eAGThTtbedq63mVw qw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3ct334tben-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ct4vag4c2-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Dec 2021 09:18:24 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1B794Rkq027632;
-        Tue, 7 Dec 2021 09:18:23 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3ct334tbe9-1
+        Tue, 07 Dec 2021 09:27:16 +0000
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1B79JXNT006268;
+        Tue, 7 Dec 2021 09:27:15 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ct4vag4b9-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Dec 2021 09:18:23 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1B798PW5025617;
-        Tue, 7 Dec 2021 09:18:21 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma01fra.de.ibm.com with ESMTP id 3cqyy9bk9w-1
+        Tue, 07 Dec 2021 09:27:15 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1B797xpa010660;
+        Tue, 7 Dec 2021 09:27:13 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma03fra.de.ibm.com with ESMTP id 3cqyy9bmb0-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Dec 2021 09:18:21 +0000
+        Tue, 07 Dec 2021 09:27:13 +0000
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1B79IImk29360520
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1B79R9ac29688084
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 7 Dec 2021 09:18:18 GMT
+        Tue, 7 Dec 2021 09:27:09 GMT
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 414B7A4062;
-        Tue,  7 Dec 2021 09:18:18 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 7D3D2A4064;
+        Tue,  7 Dec 2021 09:27:09 +0000 (GMT)
 Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B7BD0A405B;
-        Tue,  7 Dec 2021 09:18:17 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id E1F32A405B;
+        Tue,  7 Dec 2021 09:27:08 +0000 (GMT)
 Received: from [9.145.93.53] (unknown [9.145.93.53])
         by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  7 Dec 2021 09:18:17 +0000 (GMT)
-Message-ID: <4b839336-2dcb-6506-5d2d-149a8a31a765@linux.ibm.com>
-Date:   Tue, 7 Dec 2021 10:18:17 +0100
+        Tue,  7 Dec 2021 09:27:08 +0000 (GMT)
+Message-ID: <c6896c31-b9db-e241-5f47-fc96fd53a2cb@linux.ibm.com>
+Date:   Tue, 7 Dec 2021 10:27:08 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.3.0
-Subject: Re: [PATCH] KVM: s390: Fix names of skey constants in api
- documentation
+Subject: Re: [PATCH v3 0/3] KVM: s390: Some gaccess cleanup
 Content-Language: en-US
-To:     Janis Schoetterl-Glausch <scgl@linux.vnet.ibm.com>,
-        Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
         Christian Borntraeger <borntraeger@de.ibm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>
-Cc:     kvm@vger.kernel.org, linux-doc@vger.kernel.org,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
         linux-kernel@vger.kernel.org
-References: <20211118102522.569660-1-scgl@linux.ibm.com>
- <6b781b76-28a9-c375-30cb-ee6764ecd7c8@linux.ibm.com>
- <fd0aa191-4b43-76a1-cb0c-7ed4298ffecb@linux.vnet.ibm.com>
+References: <20211126164549.7046-1-scgl@linux.ibm.com>
 From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <fd0aa191-4b43-76a1-cb0c-7ed4298ffecb@linux.vnet.ibm.com>
+In-Reply-To: <20211126164549.7046-1-scgl@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: OxLtbJV70BlPfgR4QLkqMKLHDZWQb_0-
-X-Proofpoint-ORIG-GUID: PZ17YJ8c9e13h2nwFIiZ_h3mxQI4ONAf
+X-Proofpoint-ORIG-GUID: kt7cm8b2ih5EJj38F1nOtP_toeUlZ0Xs
+X-Proofpoint-GUID: URCbZb5jyrKevbnIeM_0QHCAx0oIilHF
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
  definitions=2021-12-07_03,2021-12-06_02,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- adultscore=0 mlxscore=0 malwarescore=0 lowpriorityscore=0 bulkscore=0
- suspectscore=0 phishscore=0 mlxlogscore=999 impostorscore=0 clxscore=1015
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2112070054
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
+ adultscore=0 clxscore=1015 impostorscore=0 phishscore=0 suspectscore=0
+ spamscore=0 malwarescore=0 mlxlogscore=999 priorityscore=1501 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
+ definitions=main-2112070054
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gMTIvMi8yMSAxMTozMSwgSmFuaXMgU2Nob2V0dGVybC1HbGF1c2NoIHdyb3RlOg0KPiBP
-biAxMi8xLzIxIDA5OjQ1LCBKYW5vc2NoIEZyYW5rIHdyb3RlOg0KPj4gT24gMTEvMTgvMjEg
-MTE6MjUsIEphbmlzIFNjaG9ldHRlcmwtR2xhdXNjaCB3cm90ZToNCj4+PiBUaGUgYXJlIGRl
-ZmluZWQgaW4gaW5jbHVkZS91YXBpL2xpbnV4L2t2bS5oIGFzDQo+Pg0KPj4gcy9UaGUvVGhl
-eS8NCj4+DQo+PiBJIGNhbiBmaXggdGhhdCB1cCB3aGVuIHBpY2tpbmcgaWYgeW91IHdhbnQu
-DQo+IA0KPiBUaGFua3MsIHBsZWFzZSBkby4NCj4+DQo+Pj4gS1ZNX1MzOTBfR0VUX1NLRVlT
-X05PTkUgYW5kIEtWTV9TMzkwX1NLRVlTX01BWCwgYnV0IHRoZQ0KPj4+IGFwaSBkb2N1bWV0
-YXRpb24gdGFsa3Mgb2YgS1ZNX1MzOTBfR0VUX0tFWVNfTk9ORSBhbmQNCj4+PiBLVk1fUzM5
-MF9TS0VZU19BTExPQ19NQVggcmVzcGVjdGl2ZWx5Lg0KPj4+DQo+Pj4gU2lnbmVkLW9mZi1i
-eTogSmFuaXMgU2Nob2V0dGVybC1HbGF1c2NoIDxzY2dsQGxpbnV4LmlibS5jb20+DQo+Pg0K
-Pj4gVGhhbmtzIGZvciBmaXhpbmcgdGhpcyB1cC4NCg0KVGhhbmtzLCBwaWNrZWQNCg0KPj4N
-Cj4+IFJldmlld2VkLWJ5OiBKYW5vc2NoIEZyYW5rIDxmcmFua2phQGxpbnV4LmlibS5jb20+
-DQo+Pg0KPj4+IC0tLQ0KPj4+ICDCoCBEb2N1bWVudGF0aW9uL3ZpcnQva3ZtL2FwaS5yc3Qg
-fCA2ICsrKy0tLQ0KPj4+ICDCoCAxIGZpbGUgY2hhbmdlZCwgMyBpbnNlcnRpb25zKCspLCAz
-IGRlbGV0aW9ucygtKQ0KPj4+DQo+Pj4gZGlmZiAtLWdpdCBhL0RvY3VtZW50YXRpb24vdmly
-dC9rdm0vYXBpLnJzdCBiL0RvY3VtZW50YXRpb24vdmlydC9rdm0vYXBpLnJzdA0KPj4+IGlu
-ZGV4IGFlZWIwNzFjNzY4OC4uYjg2YzdlZGFlODg4IDEwMDY0NA0KPj4+IC0tLSBhL0RvY3Vt
-ZW50YXRpb24vdmlydC9rdm0vYXBpLnJzdA0KPj4+ICsrKyBiL0RvY3VtZW50YXRpb24vdmly
-dC9rdm0vYXBpLnJzdA0KPj4+IEBAIC0zNzAxLDcgKzM3MDEsNyBAQCBLVk0gd2l0aCB0aGUg
-Y3VycmVudGx5IGRlZmluZWQgc2V0IG9mIGZsYWdzLg0KPj4+ICDCoCA6QXJjaGl0ZWN0dXJl
-czogczM5MA0KPj4+ICDCoCA6VHlwZTogdm0gaW9jdGwNCj4+PiAgwqAgOlBhcmFtZXRlcnM6
-IHN0cnVjdCBrdm1fczM5MF9za2V5cw0KPj4+IC06UmV0dXJuczogMCBvbiBzdWNjZXNzLCBL
-Vk1fUzM5MF9HRVRfS0VZU19OT05FIGlmIGd1ZXN0IGlzIG5vdCB1c2luZyBzdG9yYWdlDQo+
-Pj4gKzpSZXR1cm5zOiAwIG9uIHN1Y2Nlc3MsIEtWTV9TMzkwX0dFVF9TS0VZU19OT05FIGlm
-IGd1ZXN0IGlzIG5vdCB1c2luZyBzdG9yYWdlDQo+Pj4gIMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqAga2V5cywgbmVnYXRpdmUgdmFsdWUgb24gZXJyb3INCj4+PiAgwqAgwqAgVGhpcyBpb2N0
-bCBpcyB1c2VkIHRvIGdldCBndWVzdCBzdG9yYWdlIGtleSB2YWx1ZXMgb24gdGhlIHMzOTAN
-Cj4+PiBAQCAtMzcyMCw3ICszNzIwLDcgQEAgeW91IHdhbnQgdG8gZ2V0Lg0KPj4+ICDCoCDC
-oCBUaGUgY291bnQgZmllbGQgaXMgdGhlIG51bWJlciBvZiBjb25zZWN1dGl2ZSBmcmFtZXMg
-KHN0YXJ0aW5nIGZyb20gc3RhcnRfZ2ZuKQ0KPj4+ICDCoCB3aG9zZSBzdG9yYWdlIGtleXMg
-dG8gZ2V0LiBUaGUgY291bnQgZmllbGQgbXVzdCBiZSBhdCBsZWFzdCAxIGFuZCB0aGUgbWF4
-aW11bQ0KPj4+IC1hbGxvd2VkIHZhbHVlIGlzIGRlZmluZWQgYXMgS1ZNX1MzOTBfU0tFWVNf
-QUxMT0NfTUFYLiBWYWx1ZXMgb3V0c2lkZSB0aGlzIHJhbmdlDQo+Pj4gK2FsbG93ZWQgdmFs
-dWUgaXMgZGVmaW5lZCBhcyBLVk1fUzM5MF9TS0VZU19NQVguIFZhbHVlcyBvdXRzaWRlIHRo
-aXMgcmFuZ2UNCj4+PiAgwqAgd2lsbCBjYXVzZSB0aGUgaW9jdGwgdG8gcmV0dXJuIC1FSU5W
-QUwuDQo+Pj4gIMKgIMKgIFRoZSBza2V5ZGF0YV9hZGRyIGZpZWxkIGlzIHRoZSBhZGRyZXNz
-IHRvIGEgYnVmZmVyIGxhcmdlIGVub3VnaCB0byBob2xkIGNvdW50DQo+Pj4gQEAgLTM3NDQs
-NyArMzc0NCw3IEBAIHlvdSB3YW50IHRvIHNldC4NCj4+PiAgwqAgwqAgVGhlIGNvdW50IGZp
-ZWxkIGlzIHRoZSBudW1iZXIgb2YgY29uc2VjdXRpdmUgZnJhbWVzIChzdGFydGluZyBmcm9t
-IHN0YXJ0X2dmbikNCj4+PiAgwqAgd2hvc2Ugc3RvcmFnZSBrZXlzIHRvIGdldC4gVGhlIGNv
-dW50IGZpZWxkIG11c3QgYmUgYXQgbGVhc3QgMSBhbmQgdGhlIG1heGltdW0NCj4+PiAtYWxs
-b3dlZCB2YWx1ZSBpcyBkZWZpbmVkIGFzIEtWTV9TMzkwX1NLRVlTX0FMTE9DX01BWC4gVmFs
-dWVzIG91dHNpZGUgdGhpcyByYW5nZQ0KPj4+ICthbGxvd2VkIHZhbHVlIGlzIGRlZmluZWQg
-YXMgS1ZNX1MzOTBfU0tFWVNfTUFYLiBWYWx1ZXMgb3V0c2lkZSB0aGlzIHJhbmdlDQo+Pj4g
-IMKgIHdpbGwgY2F1c2UgdGhlIGlvY3RsIHRvIHJldHVybiAtRUlOVkFMLg0KPj4+ICDCoCDC
-oCBUaGUgc2tleWRhdGFfYWRkciBmaWVsZCBpcyB0aGUgYWRkcmVzcyB0byBhIGJ1ZmZlciBj
-b250YWluaW5nIGNvdW50IGJ5dGVzIG9mDQo+Pj4NCj4+DQo+IA0KDQo=
+On 11/26/21 17:45, Janis Schoetterl-Glausch wrote:
+> Cleanup s390 guest access code a bit, getting rid of some code
+> duplication and improving readability.
+> 
+> v2 -> v3
+> 	minor changes only
+> 		typo fixes
+> 		whitespace
+> 		line reordering
+> 		picked up Reviewed-by's
+> 
+> v1 -> v2
+> 	separate patch for renamed variable
+> 		fragment_len instead of seg
+> 	expand comment of guest_range_to_gpas
+> 	fix nits
+
+Thanks, picked
+
+> 
+> Janis Schoetterl-Glausch (3):
+>    KVM: s390: gaccess: Refactor gpa and length calculation
+>    KVM: s390: gaccess: Refactor access address range check
+>    KVM: s390: gaccess: Cleanup access to guest pages
+> 
+>   arch/s390/kvm/gaccess.c | 158 +++++++++++++++++++++++-----------------
+>   1 file changed, 92 insertions(+), 66 deletions(-)
+> 
+> Range-diff against v2:
+> 1:  60d050210198 ! 1:  e5d7d2d7a4da KVM: s390: gaccess: Refactor gpa and length calculation
+>      @@ Metadata
+>        ## Commit message ##
+>           KVM: s390: gaccess: Refactor gpa and length calculation
+>       
+>      -    Improve readability be renaming the length variable and
+>      +    Improve readability by renaming the length variable and
+>           not calculating the offset manually.
+>       
+>           Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+>      +    Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+>       
+>        ## arch/s390/kvm/gaccess.c ##
+>       @@ arch/s390/kvm/gaccess.c: int access_guest(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar, void *data,
+>      @@ arch/s390/kvm/gaccess.c: int access_guest(struct kvm_vcpu *vcpu, unsigned long g
+>        	psw_t *psw = &vcpu->arch.sie_block->gpsw;
+>       -	unsigned long _len, nr_pages, gpa, idx;
+>       +	unsigned long nr_pages, gpa, idx;
+>      -+	unsigned int fragment_len;
+>        	unsigned long pages_array[2];
+>      ++	unsigned int fragment_len;
+>        	unsigned long *pages;
+>        	int need_ipte_lock;
+>      + 	union asce asce;
+>       @@ arch/s390/kvm/gaccess.c: int access_guest(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar, void *data,
+>        		ipte_lock(vcpu);
+>        	rc = guest_page_range(vcpu, ga, ar, pages, nr_pages, asce, mode);
+> 2:  7080846c8c07 ! 2:  91cadb42cbbc KVM: s390: gaccess: Refactor access address range check
+>      @@ Commit message
+>           range.
+>       
+>           Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+>      +    Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+>       
+>        ## arch/s390/kvm/gaccess.c ##
+>       @@ arch/s390/kvm/gaccess.c: static int low_address_protection_enabled(struct kvm_vcpu *vcpu,
+>      @@ arch/s390/kvm/gaccess.c: static int low_address_protection_enabled(struct kvm_vc
+>       + * a correct exception into the guest.
+>       + * The resulting gpas are stored into @gpas, unless it is NULL.
+>       + *
+>      -+ * Note: All gpas except the first one start at the beginning of a page.
+>      ++ * Note: All fragments except the first one start at the beginning of a page.
+>       + *       When deriving the boundaries of a fragment from a gpa, all but the last
+>       + *       fragment end at the end of the page.
+>       + *
+>      @@ arch/s390/kvm/gaccess.c: int access_guest(struct kvm_vcpu *vcpu, unsigned long g
+>        {
+>        	psw_t *psw = &vcpu->arch.sie_block->gpsw;
+>       -	unsigned long nr_pages, gpa, idx;
+>      +-	unsigned long pages_array[2];
+>       +	unsigned long nr_pages, idx;
+>      ++	unsigned long gpa_array[2];
+>        	unsigned int fragment_len;
+>      --	unsigned long pages_array[2];
+>       -	unsigned long *pages;
+>      -+	unsigned long gpa_array[2];
+>       +	unsigned long *gpas;
+>        	int need_ipte_lock;
+>        	union asce asce;
+> 3:  c991cbdbfbd5 ! 3:  f5000a22efcd KVM: s390: gaccess: Cleanup access to guest frames
+>      @@ Metadata
+>       Author: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+>       
+>        ## Commit message ##
+>      -    KVM: s390: gaccess: Cleanup access to guest frames
+>      +    KVM: s390: gaccess: Cleanup access to guest pages
+>       
+>           Introduce a helper function for guest frame access.
+>       
+>           Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+>      +    Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+>       
+>        ## arch/s390/kvm/gaccess.c ##
+>       @@ arch/s390/kvm/gaccess.c: static int guest_range_to_gpas(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar,
+>      @@ arch/s390/kvm/gaccess.c: static int guest_range_to_gpas(struct kvm_vcpu *vcpu, u
+>        }
+>        
+>       +static int access_guest_page(struct kvm *kvm, enum gacc_mode mode, gpa_t gpa,
+>      -+			      void *data, unsigned int len)
+>      ++			     void *data, unsigned int len)
+>       +{
+>       +	const unsigned int offset = offset_in_page(gpa);
+>       +	const gfn_t gfn = gpa_to_gfn(gpa);
+> 
+> base-commit: d25f27432f80a800a3592db128254c8140bd71bf
+> 
+
