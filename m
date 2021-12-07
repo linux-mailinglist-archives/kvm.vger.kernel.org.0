@@ -2,68 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5480946C851
-	for <lists+kvm@lfdr.de>; Wed,  8 Dec 2021 00:39:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4AA1846C85D
+	for <lists+kvm@lfdr.de>; Wed,  8 Dec 2021 00:43:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238270AbhLGXmm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Dec 2021 18:42:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35586 "EHLO
+        id S242659AbhLGXrX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Dec 2021 18:47:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231416AbhLGXml (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Dec 2021 18:42:41 -0500
-Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB429C061574
-        for <kvm@vger.kernel.org>; Tue,  7 Dec 2021 15:39:10 -0800 (PST)
-Received: by mail-oi1-x232.google.com with SMTP id bf8so1539244oib.6
-        for <kvm@vger.kernel.org>; Tue, 07 Dec 2021 15:39:10 -0800 (PST)
+        with ESMTP id S242650AbhLGXrW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Dec 2021 18:47:22 -0500
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29EFCC061748
+        for <kvm@vger.kernel.org>; Tue,  7 Dec 2021 15:43:52 -0800 (PST)
+Received: by mail-pf1-x430.google.com with SMTP id n26so889838pff.3
+        for <kvm@vger.kernel.org>; Tue, 07 Dec 2021 15:43:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=y0HrPBwcAFwIEMtY9UPWt+7UTVE+tRhBMJIFTdr4Pzk=;
-        b=gaFYFNpl3Ef92OOwbILyY09G/ZTT+XwJ19tje7c2Smaq9lcMIA3VkQOimnYIjSnj6W
-         2CY8HJ1IP6hgokGHUwxbhUWqeGLhWhZUG4DRHMhPh2cA2eDPx4rgCbgnMBn85GKgSY52
-         GMMf+zSxxfoQ2AzygMUVE3JejOCGP2t9kpLesNPqGUxBg5SSGcL1uecQkZITKGe/UqNl
-         DHAX13xUOPe813+gKwBBkvTg4IikSnL1kyuL0GMRgTTL6+EmGOdVthkjKtgt+vAdIBIl
-         sxptjcrOD7HBLBvpsTOM93TnEukYSPADaWa0h7NJF09//2UrbrzscbdsSNlEyrxalk87
-         e3xQ==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=gYp2DzxK1joVr3jiyTurY0/zwc2R2+PwLXfgju6vouA=;
+        b=Ae3LF1Klq9HeyREkoOxoL5jPB3p2i/u1/szy0oSm1JardG5YubXcYPlzRmLbou3ERn
+         48x+Ff+n0+2pEA0uF2I7gON8OJZzttboBoOsNg63h1din1Q4OOTORuwLsxOExLvtOhjM
+         +T//YSQYUOpqfT3C/aKvPMtaTxxGSfNvPKaO0iV312mdQNRDmYft8wHiN3BjCKCI8NVe
+         3gIUWGIkvV7bM8YfI6JhA8rJcij/4T4AfvFYQqYndjtWYsb+hCtsBWY+USLLJbOaxlJq
+         8Oh1FV4Ro69cirnNM8TLA8UnGTD0G14KLVTA9wXSPXAKuJTFgCM7j4II+vaRjsQYdpWu
+         S6Bg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=y0HrPBwcAFwIEMtY9UPWt+7UTVE+tRhBMJIFTdr4Pzk=;
-        b=F49yPpxLov8KJnSepW0IBSUDaa8tGoytNQUqNTAuPpqai0zxR1za3mmT37jKsjuRAG
-         PUJmLReVx40L+8kmzMtk+iCu584A9yiJk4iMZ4XYynLGyUk8B4TKF0pVRxg87n77elm+
-         813Kodj/Pf5BLRt25kWSpW0/ENhqHqfLkxTzH68z/CAjGBRnsFb1KLeF+UchwGOQTLHl
-         +bkRrFsFUUeMGW7LcGxVKlmJOv6fWzEOJmT8rQZjL153Tc5yDz7Qia+snrTb5EnEy+Py
-         UbVQhYUtXEj5FZkimlboD67WAn+vXy3C6v11CvBe0Ab2ajyjeoAlkhrGSlC75M2AgxAV
-         FrXg==
-X-Gm-Message-State: AOAM531wGm2j6gV+CEnjt0cs7pDrOJqd9aixMk9jCuV65LvX0Yj2PfIC
-        +75vSFqXIiUXhGY9SznDLI2DBLhPST14dCzFwX8pWKU5syCEMQ==
-X-Google-Smtp-Source: ABdhPJwejACRf6xB8ynudVufmH+WSphOngyOq1Ihn/aC5wUuC3I83I0oCLd5Bf8G83uwsVYq9te1MY75XG6fnPp8ODo=
-X-Received: by 2002:aca:674a:: with SMTP id b10mr8484801oiy.66.1638920349725;
- Tue, 07 Dec 2021 15:39:09 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=gYp2DzxK1joVr3jiyTurY0/zwc2R2+PwLXfgju6vouA=;
+        b=caU89pAPOd/kHdRqWIDwz4J4x3SA0KbpUAoURf1fCB9ilU1Pk2q6ZyHXpg9BEGD5pE
+         oyo8M3ryfxJLTN/dVRIQxnU9IGK+Tbs5V3bDayKAD93eOk1bm2/LLG0ofvSd+HyFd5zl
+         MpV6RsdLlhhg4VFZn1reAAmrZgdCGtfroRWEJsSqD0Y3f53CjgjURbUth6/bfCdzAb9K
+         hi6sJuh0BF+NMb1vLIEx1mHaHWvxZOQjj7fiUwAuAWySHdNPDqDUqzD6vvz6VCatc/+V
+         /FPhZ9YU8+QaFNkE65+DXrOj38echwu1C+2F5DdXwMRNoZTHsLEGzr08FTHoSvvcAs8Q
+         SPvQ==
+X-Gm-Message-State: AOAM530swpNi0CJPiHWMAnMkTu2Fi955Gzqwn8GiePctrETLk40FaWdU
+        FBEbj7T6Lw6w3yevO2CUk1A+aQ==
+X-Google-Smtp-Source: ABdhPJxmkkxGmdyO/JpGqq2H28H9dDLraA9Ntf1o//ODVHEaLAifAouREYlZPB7NSPmU0xwN373BvQ==
+X-Received: by 2002:a05:6a00:1412:b0:4a7:ec46:29d1 with SMTP id l18-20020a056a00141200b004a7ec4629d1mr2454569pfu.16.1638920631504;
+        Tue, 07 Dec 2021 15:43:51 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id z22sm906718pfe.108.2021.12.07.15.43.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Dec 2021 15:43:51 -0800 (PST)
+Date:   Tue, 7 Dec 2021 23:43:47 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Lai Jiangshan <jiangshanlai@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Lai Jiangshan <laijs@linux.alibaba.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH 16/15] KVM: X86: Update mmu->pdptrs only when it is
+ changed
+Message-ID: <Ya/xsx1pcB0Pq/Pm@google.com>
+References: <20211108124407.12187-1-jiangshanlai@gmail.com>
+ <20211111144527.88852-1-jiangshanlai@gmail.com>
 MIME-Version: 1.0
-References: <20211207010801.79955-1-krish.sadhukhan@oracle.com>
- <20211207010801.79955-2-krish.sadhukhan@oracle.com> <CALMp9eS9_z6_47nRTaj4+dygzwA0-DsUT2UGMqjb-GnqEWHEuQ@mail.gmail.com>
- <594c0c00-f0ce-9d17-157e-242ad91f69fe@oracle.com>
-In-Reply-To: <594c0c00-f0ce-9d17-157e-242ad91f69fe@oracle.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 7 Dec 2021 15:38:58 -0800
-Message-ID: <CALMp9eQy=PdUomH4Pa66CjUd=qZMR8LxeQDpM7h6Vk1znSxTwg@mail.gmail.com>
-Subject: Re: [PATCH 1/2] KVM: nSVM: Test MBZ bits in nested CR3 (nCR3)
-To:     Krish Sadhukhan <krish.sadhukhan@oracle.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211111144527.88852-1-jiangshanlai@gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 7, 2021 at 12:09 PM Krish Sadhukhan
-<krish.sadhukhan@oracle.com> wrote:
+On Thu, Nov 11, 2021, Lai Jiangshan wrote:
+> From: Lai Jiangshan <laijs@linux.alibaba.com>
+> 
+> It is unchanged in most cases.
+> 
+> Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
+> ---
+>  arch/x86/kvm/x86.c | 11 +++++++----
+>  1 file changed, 7 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 6ca19cac4aff..0176eaa86a35 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -828,10 +828,13 @@ int load_pdptrs(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu, unsigned long cr3)
+>  		}
+>  	}
+>  
+> -	memcpy(mmu->pdptrs, pdpte, sizeof(mmu->pdptrs));
+> -	kvm_register_mark_dirty(vcpu, VCPU_EXREG_PDPTR);
+> -	/* Ensure the dirty PDPTEs to be loaded. */
+> -	kvm_make_request(KVM_REQ_LOAD_MMU_PGD, vcpu);
+> +	kvm_register_mark_available(vcpu, VCPU_EXREG_PDPTR);
+> +	if (memcmp(mmu->pdptrs, pdpte, sizeof(mmu->pdptrs))) {
+> +		memcpy(mmu->pdptrs, pdpte, sizeof(mmu->pdptrs));
+> +		kvm_register_mark_dirty(vcpu, VCPU_EXREG_PDPTR);
+> +		/* Ensure the dirty PDPTEs to be loaded. */
+> +		kvm_make_request(KVM_REQ_LOAD_MMU_PGD, vcpu);
+> +	}
 
-> OK. If the processor's physical address width determines the MBZ mask,
-> should we also fix the existing test_cr3() in kvm-unit-tests ? That one
-> also uses the same fixed mask.
+Can this be unqueued until there's sufficient justification that (a) this is
+correct and (b) actually provides a meaningful performance optimization?  There
+have been far too many PDPTR caching bugs to make this change without an analysis
+of why it's safe, e.g. what guarantees the that PDPTRs in the VMCS are sync'd
+with mmu->pdptrs?  I'm not saying they aren't, I just want the changelog to prove
+that they are.
 
-Yep.
+The next patch does add a fairly heavy unload of the current root for !TDP, but
+that's a bug fix and should be ordered before any optimizations anyways.
+
+>  	vcpu->arch.pdptrs_from_userspace = false;
+>  
+>  	return 1;
+> -- 
+> 2.19.1.6.gb485710b
+> 
