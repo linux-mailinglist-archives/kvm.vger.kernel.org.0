@@ -2,115 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4323746C015
-	for <lists+kvm@lfdr.de>; Tue,  7 Dec 2021 16:56:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D00946C02E
+	for <lists+kvm@lfdr.de>; Tue,  7 Dec 2021 17:02:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239291AbhLGQAB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Dec 2021 11:00:01 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:44589 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239265AbhLGQAA (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 7 Dec 2021 11:00:00 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1638892588;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=qVjy2Lwsez23TXi55s3xtBv8BUsuKro2drSiELcWbqs=;
-        b=a8oraGeTK3nCJQ5c6tJkUD2NUp14fxAMDMT5cW6gWdnqwRjLDMU7MC4VchQcrW40bA2hHV
-        XicElusFyT0xAk0IK+kqtWeThPJVa0Vzd7UgzTXVY9MzR5NSjDApxRt79Xcgag5cya4ctf
-        yGQc7wfBbEPKiMn1VDDCbXRVaIsNzLs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-553-NlK8JtzRMaiBJsBYZLCWAw-1; Tue, 07 Dec 2021 10:56:22 -0500
-X-MC-Unique: NlK8JtzRMaiBJsBYZLCWAw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2C5E585B665;
-        Tue,  7 Dec 2021 15:56:20 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 62A5560843;
-        Tue,  7 Dec 2021 15:56:19 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Yishai Hadas <yishaih@nvidia.com>
-Subject: Re: [PATCH RFC v2] vfio: Documentation for the migration region
-In-Reply-To: <20211207153743.GC6385@nvidia.com>
-Organization: Red Hat GmbH
-References: <0-v2-45a95932a4c6+37-vfio_mig_doc_jgg@nvidia.com>
- <20211130102611.71394253.alex.williamson@redhat.com>
- <20211130185910.GD4670@nvidia.com>
- <20211130153541.131c9729.alex.williamson@redhat.com>
- <20211201031407.GG4670@nvidia.com> <20211201130314.69ed679c@omen>
- <20211201232502.GO4670@nvidia.com>
- <20211203110619.1835e584.alex.williamson@redhat.com>
- <20211206191500.GL4670@nvidia.com> <87r1aou1rs.fsf@redhat.com>
- <20211207153743.GC6385@nvidia.com>
-User-Agent: Notmuch/0.34 (https://notmuchmail.org)
-Date:   Tue, 07 Dec 2021 16:56:17 +0100
-Message-ID: <87lf0wtnmm.fsf@redhat.com>
+        id S239369AbhLGQFe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Dec 2021 11:05:34 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:34508 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S238770AbhLGQFd (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 7 Dec 2021 11:05:33 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B7FmJZp004610;
+        Tue, 7 Dec 2021 16:02:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=Bbn7eq9aN6lyo+pJKLyzdDZEzdov6fujey+OqEpeewk=;
+ b=VNWoBKrETah4mIlexRikvGt9RoaOcf7qJMLyI2Bb6cjz6hVvGxMohQdaEYJ/CUE9B/OO
+ PLDF/6u30bxKNC54X9Wx4PIc1c7kzDPJByulzRtQ0Z0HgmVaXnQTl/6vv6WMMD7RnoMx
+ +IK9w0e7j3+R3N8Byzn3c4CK34bZ722aWVXh1IszUWPJAcXIU4NxZyL4W4bwE5OLaWoM
+ FBZ7rx2KT2utdTCjxVrHQjcCUxnzK+xMuxyBvHfkdD+LA/Yha/qSchymhNa1nH/7rzuG
+ Vgm9qetxmbde6hFl8VGlWCdf+BDmorJEbvRReIw4l4U0sDPW6JWSaLeflQ5PJpY7ye4s bg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ctajy095p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 07 Dec 2021 16:02:03 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1B7FpsqH017316;
+        Tue, 7 Dec 2021 16:02:02 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ctajy094j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 07 Dec 2021 16:02:02 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1B7Frn5u031715;
+        Tue, 7 Dec 2021 16:02:00 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma05fra.de.ibm.com with ESMTP id 3cqyy9eys9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 07 Dec 2021 16:02:00 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1B7G1vU626477052
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 7 Dec 2021 16:01:57 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id F1DC74C046;
+        Tue,  7 Dec 2021 16:01:56 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B56554C04A;
+        Tue,  7 Dec 2021 16:01:55 +0000 (GMT)
+Received: from linux6.. (unknown [9.114.12.104])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  7 Dec 2021 16:01:55 +0000 (GMT)
+From:   Janosch Frank <frankja@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        david@redhat.com, thuth@redhat.com, seiden@linux.ibm.com
+Subject: [kvm-unit-tests PATCH v2 00/10] s390x: sie: Add PV snippet support
+Date:   Tue,  7 Dec 2021 15:59:55 +0000
+Message-Id: <20211207160005.1586-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: jzjk-udpBieXSe4EVWp8MlV4KlS3iAby
+X-Proofpoint-GUID: m01x0RWMim2kv-B9zrKB3UpaYlRFx7VD
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2021-12-07_06,2021-12-06_02,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=999
+ mlxscore=0 lowpriorityscore=0 clxscore=1015 adultscore=0 malwarescore=0
+ suspectscore=0 impostorscore=0 spamscore=0 priorityscore=1501 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
+ definitions=main-2112070098
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 07 2021, Jason Gunthorpe <jgg@nvidia.com> wrote:
+Adding PV virtualization support was only a matter of time so here it
+is.
 
-> On Tue, Dec 07, 2021 at 11:50:47AM +0100, Cornelia Huck wrote:
->> On Mon, Dec 06 2021, Jason Gunthorpe <jgg@nvidia.com> wrote:
->> 
->> > On Fri, Dec 03, 2021 at 11:06:19AM -0700, Alex Williamson wrote:
->> 
->> >> This is exactly the sort of "designed for QEMU implementation"
->> >> inter-operability that I want to avoid.  It doesn't take much of a
->> >> crystal ball to guess that gratuitous and redundant device resets
->> >> slow VM instantiation and are a likely target for optimization.
->> >
->> > Sorry, but Linus's "don't break userspace" forces us to this world.
->> >
->> > It does not matter what is written in text files, only what userspace
->> > actually does and the kernel must accommodate existing userspace going
->> > forward. So once released qemu forms some definitive spec and the
->> > guardrails that limit what we can do going forward.
->> 
->> But QEMU support is *experimental*, i.e. if it breaks, you get to keep
->> the pieces, things may change in incompatible ways. And it is
->> experimental for good reason!
->
-> And we can probably make an breakage exception for this existing
-> experimental qemu.
->
-> My point was going forward, once we userspace starts to become
-> deployed, it doesn't matter what we write in these text files and
-> comments. It only matters what deployed userspace actually does.
+The biggest problem that needed solving was having the SE header as a
+separate file. The genprotimg tool generates the header and adds a
+short bit of code to the image which will put the guest into PV mode
+via the diagnose 308 PV subcodes. We don't have and want an emulation
+for the diagnose so we don't support this way of starting a PV guest.
 
-Absolutely, as soon as QEMU support is made non-experimental, this needs
-to be stable.
+Therefore we needed a new tool that generates the PV image separate
+from the SE header so we can link both as binary blobs. Marc created
+this tool by writing a library which lets users create a SE header and
+has bindings to multiple languages. Unfortunately we didn't yet have
+time to upstream this but we plan to publish it once we find some.
 
->
->> It would mean that we must never introduce experimental interfaces
->> in QEMU that may need some rework of the kernel interface, but need
->> to keep those out of the tree -- and that can't be in the best
->> interest of implementing things requiring interaction between the
->> kernel and QEMU.
->
-> In general we should not be merging uAPI to the kernel that is so
-> incomplete as to be unusable. 
->
-> I'm sorry, this whole thing from the day the migration stuff was first
-> merged to include/uapi is a textbook example how not to do things in
-> the kernel community.
+The first PV snippet test checks the "easy" diagnose calls 0x44, 0x9c,
+0x288 and 0x500. We check register contents and responses to PGM
+injects.
 
-Honestly, I regret ever acking this and the QEMU part. Maybe the history
-of this and the archived discussions are instructive to others so that
-they don't repeat this :/
+v2:
+	- Moved snippet management code into library uv.h and snippet.h files
+	- Added a fixpatch for mvpg-sie.c making it use the snippet helpers
+
+Janosch Frank (10):
+  lib: s390x: sie: Add sca allocation and freeing
+  s390x: sie: Add PV fields to SIE control block
+  s390x: sie: Add UV information into VM struct
+  s390x: uv: Add more UV call functions
+  s390x: lib: Extend UV library with PV guest management
+  lib: s390: sie: Add PV guest register handling
+  s390x: snippets: Add PV support
+  lib: s390x: Introduce snippet helpers
+  s390x: mvpg-sie: Use snippet helpers
+  s390x: sie: Add PV diag test
+
+ .gitignore                                 |   2 +
+ configure                                  |   8 +
+ lib/s390x/asm/uv.h                         |  99 +++++++++++
+ lib/s390x/sie.c                            |  20 +++
+ lib/s390x/sie.h                            |  54 +++++-
+ lib/s390x/snippet.h                        | 110 ++++++++++++
+ lib/s390x/uv.c                             | 128 ++++++++++++++
+ lib/s390x/uv.h                             |  28 +++
+ s390x/Makefile                             |  73 ++++++--
+ s390x/mvpg-sie.c                           |  24 +--
+ s390x/pv-diags.c                           | 187 +++++++++++++++++++++
+ s390x/snippets/asm/snippet-pv-diag-288.S   |  25 +++
+ s390x/snippets/asm/snippet-pv-diag-500.S   |  39 +++++
+ s390x/snippets/asm/snippet-pv-diag-yield.S |   7 +
+ 14 files changed, 770 insertions(+), 34 deletions(-)
+ create mode 100644 s390x/pv-diags.c
+ create mode 100644 s390x/snippets/asm/snippet-pv-diag-288.S
+ create mode 100644 s390x/snippets/asm/snippet-pv-diag-500.S
+ create mode 100644 s390x/snippets/asm/snippet-pv-diag-yield.S
+
+-- 
+2.32.0
 
