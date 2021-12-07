@@ -2,151 +2,209 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5CD2846B2D8
-	for <lists+kvm@lfdr.de>; Tue,  7 Dec 2021 07:22:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B22D46B365
+	for <lists+kvm@lfdr.de>; Tue,  7 Dec 2021 08:08:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233599AbhLGG0X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Dec 2021 01:26:23 -0500
-Received: from mail-eopbgr1300134.outbound.protection.outlook.com ([40.107.130.134]:36592
-        "EHLO APC01-HK2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230027AbhLGG0W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Dec 2021 01:26:22 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EFBcnNlA0574p36+oIrUtF5+srWnuYPIjdh/0DX3NMvIv0B1dU+QqvogAtiG2hkoNlWaJlDOoLO18EJRkPA7NlMF7YwofrqHIRv4ygV7q0hIz90r/baFHdMDuLSQYQTaH6ShukaElt+7VAjmic3OIjpw1hstx1BaZ+ihdMGcwOMxM1dxkr7OQAk+oBH+JEWxmr7nF2hbGQda7gj7qQ4RovCl1KciXVNJgwRsPpxxS2JgX87gPKagrM6aGXCcKnt5IMmbI5KG49UJZolkQOnDI0ZMMaCGiNpVIiRVupMHuVsi/n/zx1Uy8L7LHRSaTBo9URQsX+IcWszLMOlAB3OGUQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KY+vuJNfvdvW9cCdpBrf2sow3gipSX8U76go3p7CLUs=;
- b=LhdSihEVbU/sfwWuP4snWqLX059PcTUZDwKLrGiUbgEqNVP06G2pxkQjqNffTjHFVQO3iBB9QEpVSh5j2Pi0r6mnrN9Owf9gDtvo9FssyQD4OcFxXLVAr6PICxlrAFxaSbheP42Vvcj/YngsFDkcbz4THCGCQwS1W4J/TIZKQM4anRODDpY6FCAvx0G1fV9EPd1/JZSNck3PKli7kbufzmJ557cC+nLDpvXxdFp87DCzoaOU0b+caIX6DPgIRx0sxrIYpwE6zt3CNeByePwgvLXEGoQ3VrDTXK4+1MYxkfrxWiqKR1VyDZ5n/zXxxaiiikdEDZM/3zfhLUVu+xM0mw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
- dkim=pass header.d=vivo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo0.onmicrosoft.com;
- s=selector2-vivo0-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KY+vuJNfvdvW9cCdpBrf2sow3gipSX8U76go3p7CLUs=;
- b=d3fWgUFdWJHd2ebuIAg9edtfeT+QW6L57uthqzxRkKBDBRmLsQ8nZFKCgV7Lb0za8RP/qV+oUd/ELKaRB8oMEnPAsS3XezVCN5kxEV5JVBvesuV8Yu2ADFFXWXzOJC31mHeCIFlY5NLEUv8P1kweV+ZGNSakudqAC1A5+AVXvB0=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=vivo.com;
-Received: from TYZPR06MB4173.apcprd06.prod.outlook.com (2603:1096:400:26::14)
- by TY2PR06MB3358.apcprd06.prod.outlook.com (2603:1096:404:fc::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4755.16; Tue, 7 Dec
- 2021 06:22:49 +0000
-Received: from TYZPR06MB4173.apcprd06.prod.outlook.com
- ([fe80::6093:831:2123:6092]) by TYZPR06MB4173.apcprd06.prod.outlook.com
- ([fe80::6093:831:2123:6092%8]) with mapi id 15.20.4755.022; Tue, 7 Dec 2021
- 06:22:49 +0000
-From:   Yihao Han <hanyihao@vivo.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     kernel@vivo.com, Yihao Han <hanyihao@vivo.com>
-Subject: [PATCH] KVM: x86/mmu: fix boolreturn.cocci warning
-Date:   Mon,  6 Dec 2021 22:22:32 -0800
-Message-Id: <20211207062233.38101-1-hanyihao@vivo.com>
-X-Mailer: git-send-email 2.17.1
-Content-Type: text/plain
-X-ClientProxiedBy: SG2PR06CA0178.apcprd06.prod.outlook.com
- (2603:1096:1:1e::32) To TYZPR06MB4173.apcprd06.prod.outlook.com
- (2603:1096:400:26::14)
+        id S231466AbhLGHLc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Dec 2021 02:11:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52682 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230480AbhLGHL0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Dec 2021 02:11:26 -0500
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E206BC061746
+        for <kvm@vger.kernel.org>; Mon,  6 Dec 2021 23:07:56 -0800 (PST)
+Received: by mail-pl1-x636.google.com with SMTP id b13so8798033plg.2
+        for <kvm@vger.kernel.org>; Mon, 06 Dec 2021 23:07:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=rn4+v2QcqaALO4pnCHE9/BztptlFZRDNfxFrHECjVow=;
+        b=DAo2hH7qiCVrbWqY/8uGgaz7SaaqMfQXZuHeW7/LHckJzCpf9TUGL6n4lH92Sftm2w
+         VKqAkhcDniJMQ2MsdtfbnDtQeWYmcKL6qKnvWTZ392bLjBIRsVl9CJIObRGywneCAI/d
+         emMK8hOc51w56tWJJ6ZyvEiH28Utm1z64oDE/DvtOhn8BNoOtT+iikpMyW4VxHSukhze
+         udWvDdCB5I5CECBv/ZDjSCigB/7lD9/7JVkrYa7IuJU8Czh/fAaAsOdJyishf2u+uAsZ
+         0+4U/Frf1n7XuT2Iq6RSuUlmxMsdFryHlYFlfvZ5pQPjOWzhoYzlFzo3O+cTTNrGx9y6
+         YkIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=rn4+v2QcqaALO4pnCHE9/BztptlFZRDNfxFrHECjVow=;
+        b=atQHIMyZ3e2G2u4X+/I2z+qSmacRdEmlhSpCx7eq2LwxCCwV+8pvHITJPAcPU47yGB
+         W4AcSRGfE4NB0Fqi5u4nCzcmp6G3FL0krrg+gb1NhTSyz0BvTNEABT1S6O8TIvN8zR1+
+         LsVkntoGFsGJVLfjY76hJvT0u3KVEY11hvkdU9GmdjMV3YP2LYdtNfgITcLUQuLfmmMX
+         dK0bu9xhD2mM6MS02wetVFAo1Qnh5rPmRZrxmghWNwsmXhd/7u9QsjfMZUfA+92gO7T4
+         qqNmJtifCINCjR8tvw1uQsHz+agq3WS8cwhUAZsk/OW5u5LM9OhKk0BDiTiCQdq8G5Uh
+         FmHQ==
+X-Gm-Message-State: AOAM532elS317Iy57BBMkdCVoGI3ziYkGPev4CR9Edt7mFGbXgrmVRW+
+        D+vmwoz0a4xKHuImzpBE/8lM3QXmOVMEfWnKwLa87A==
+X-Google-Smtp-Source: ABdhPJwEa9nptEMlsMtfQEwTkUlEcsKIH5P7KRVQtqfdruLH1lQNqxc9o7Q3Eo854lDqcKIK3+6Y6Daea8XvsgbvO7A=
+X-Received: by 2002:a17:90b:380d:: with SMTP id mq13mr4526813pjb.110.1638860876153;
+ Mon, 06 Dec 2021 23:07:56 -0800 (PST)
 MIME-Version: 1.0
-Received: from ubuntu.vivo.xyz (103.220.76.181) by SG2PR06CA0178.apcprd06.prod.outlook.com (2603:1096:1:1e::32) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4755.16 via Frontend Transport; Tue, 7 Dec 2021 06:22:47 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 06b55217-da7b-4731-3236-08d9b949fe07
-X-MS-TrafficTypeDiagnostic: TY2PR06MB3358:EE_
-X-Microsoft-Antispam-PRVS: <TY2PR06MB3358C006E245EFC772023A97A26E9@TY2PR06MB3358.apcprd06.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:655;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: KtwBeM0WccDp79vl09odePJaMtsd9jtQU9pAOCimP9C7F7JpJAkXpyEOgxM9mfODgSG/dEx3/F4/y7sHkZ77B1ipi+lhVtgvncGVzEtnMeTZMoYH4rHWgy7li1G5aG/QLigKkDG7CRBLOLtFPSgPfI6NvRa6t8fPAJkl5z/a9BdJhJOfU3B3auhn8Rc8l8lEKg4C9WKkVclYnv+H5yojd/FXnYEcIcyNcUdFJAyRSMaGegL8nutYlbCU+HiItQTvy4moTKitVrYO8l6NwiaJsjrtSQkf7Trg/xk8F9fnCF6sdkvVkWSTMb9qj6aYe5dysSp4ZZ9fnxG5/7EHtY/Yg0GJnPy3zAjU4A2172D/xKN12upeUJPMunuFLsDoboTYkZ9nbOQJt8zhh9fYiWFN8CSx2m5E0EUBbeI77jj+Ac9ZwXhP6fA/FBfqTqrvP5ihToW7a5RQQyDC8jsqmmDeLJMsfbeLpARnHJIqrkqPeZP7PRM9AmHuw+ApMTODPPT2/nUdt9qy2hSyNWZOi8U80r8upl+DI10yeFMiYChI++JPEOJDqDadlOJ4cUZCOqDLLVg6ytzHXASNIG1XrhUrmlF1eBgyzVSUEir7byHipVQaw4h8ftMjqNKn1uS5K+MrzrxuYTVDyceMugJxZiEaS1oxqbWED1uo0sNN85QtiHTNp9G6/rzPiYudWJKZK1VO8h1mdV8M3GHIFTB1kOjQ7AGHWXk8r2SuR4sGCZSRBW+DBGddEck1Didv88p74ck9
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TYZPR06MB4173.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(66946007)(2906002)(110136005)(316002)(4744005)(186003)(8936002)(66476007)(83380400001)(66556008)(1076003)(107886003)(6666004)(4326008)(8676002)(6486002)(7416002)(52116002)(86362001)(508600001)(921005)(38350700002)(38100700002)(6512007)(2616005)(956004)(26005)(5660300002)(36756003)(6506007)(182500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?akPFiSmNeifm8llK3jaJKA9fKbATBpbRpjxE18ebl7bD42qeEpnJptRQL66V?=
- =?us-ascii?Q?2wxLHypgbgqKPrtkr+lOERlBlygHduEchSeg/UUs/WP692mMeiWefVyXZTqg?=
- =?us-ascii?Q?0svZk7CVEu5EaPSBG7ezdfQrxrJf/O0ILtZYaNbLKCVySzVr4fntfOq7SV4t?=
- =?us-ascii?Q?Tek5ILuuZQG1C/yVNp+2qUEz0YY3E6o+G0aMLHkWFT2oH+hC33ga/Bl1WpHO?=
- =?us-ascii?Q?VVMuvgG6W6lsYRMUmsqiOqQxSmsuWOrTMz+hqXWOjifvtrpI6ntDK+/2hQ7p?=
- =?us-ascii?Q?b7SSQ89Bi1o39zhu1WdFQOV0TD+U+VbxNIOQM2hBp8trZs5MG8P62aB5Z7s5?=
- =?us-ascii?Q?/hM1OA6V8bkGa3lOO0/Kxqq2n5sWBQtNF3UippDRN5UzgCp/WwdrZcTrUtS/?=
- =?us-ascii?Q?MYiJYcwk6wzTaSCpQHPPzxdbz4avSDE+Z//w6GRbNpCzxd9xql3gkr4tbGtH?=
- =?us-ascii?Q?D8hbB9zOURuYwA/nwGwuPa6gyv/o+gNa/fj/FOG3wyatDdavmouNe1zceZ9p?=
- =?us-ascii?Q?0z4xxio9V7Gx+59ovwMeYFSp72FTmjpZLLUpDF6V2aFFvFzxT315lI0XuNoU?=
- =?us-ascii?Q?VkRWgFfZedkBxcr6bx2B+c8QDUZxXfhdJr7PkWQ9H2FvbQyLA7NHVapYShOJ?=
- =?us-ascii?Q?fbvh1KJyDkWiT3B+Eh/gD9DSqILQG0CugRatwQiaKwE1BFUsDZ8pVwHsq4f+?=
- =?us-ascii?Q?M+yEqVmQHJaTvKsBJJlOl4fyu09ps/ZIbvq+Non6lZY/7kUP24cTSEPN9IeU?=
- =?us-ascii?Q?acSaDQrQCW9st5MtF5d+oiMKteUY5cGa5vZRFd4ltSotnpItIQhoin23S1D4?=
- =?us-ascii?Q?1HBFQXadxtwXzJF/IXPV6UQoShQNHz6oFTed9YwVjPg7VsnhUuUSHyjmmVlq?=
- =?us-ascii?Q?uw+le8MGrmGYQ7oRhvmLTFZjEGcyVxBCGaeZW2jcc7JD6xXNjpTP1wpzBSaO?=
- =?us-ascii?Q?aH9+yUNk0WDKoNM9oxDX2brJufFPh1PFO0dE5VNmplK0R8Q0gy8H0zmTfHv5?=
- =?us-ascii?Q?VaW7HZtSityRuhmT64mCSEnpwpHvdXqqcUV4M4WorNVxXuj7OpDViKz7FmT1?=
- =?us-ascii?Q?YONEftB8uvl+IHUs+qE01ZLZzNrovDUnCGC4rvnm7U2c+gNji9F0VobNl8Uc?=
- =?us-ascii?Q?3b3MDxafgO9WySZdoSWl/KYbMxlQHRKadYql8sSK8t8A3XUoo1epcDSHFUFc?=
- =?us-ascii?Q?v+np6pRjk2cMKzJ/w7quhHYUQlSPzkuM/GstxoTlyxphV/du98wLyWBaky/s?=
- =?us-ascii?Q?SHkSIdGDODm7vj6EmIhHmmLmz6FGil7eraP0LMb2Ve7FRqCVnxnUFT785avR?=
- =?us-ascii?Q?TP7yJfo0Cu9Fm9gihEL/cMNR36l5xo/NlpLveaGsBOGiPERO8GFMaZx6xiXC?=
- =?us-ascii?Q?YWvdI+CbQT56yU17osruSdCjpPy/yKOdUYsmpFTPqSgX+05nJgw4NYOa4GTO?=
- =?us-ascii?Q?J/R5FmWaEH4F4IkpzZW43ePxaLE9fJauYIsTZskUylrfDpIH4jk82bsIkfyE?=
- =?us-ascii?Q?R1EZpllklieLBwtp1CEVBsops1eNHzsz9WJsGtuOoiF/Sdg+sq3X+pyiuOLg?=
- =?us-ascii?Q?OcY5qrU38gCzvuLNjQCAz65TL8fDwXhBIyhybpaKx3yfk/pBlUUA3YjTwwKN?=
- =?us-ascii?Q?52NDf2Hs6VI1RYiBBdYOqL8=3D?=
-X-OriginatorOrg: vivo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 06b55217-da7b-4731-3236-08d9b949fe07
-X-MS-Exchange-CrossTenant-AuthSource: TYZPR06MB4173.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Dec 2021 06:22:49.7023
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: OjsQ6OtRqr7LUb3aS3sYpXZPhycvF/YbbaZfNAnn2Mpdu46wUuv2blsOokmD0LHFt242bbPviLDgndDZiut7jA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TY2PR06MB3358
+References: <20211117064359.2362060-1-reijiw@google.com> <20211117064359.2362060-10-reijiw@google.com>
+ <d09e53a7-b8df-e8fd-c34a-f76a37d664d6@redhat.com> <CAAeT=FzM=sLF=PkY_shhcYmfo+ReGEBN8XX=QQObavXDtwxFJQ@mail.gmail.com>
+ <5bd01c9c-6ac8-4034-6f49-be636a3b287c@redhat.com> <CAAeT=FwEogskDQVwwTkZSstYX7-X0r1B+hUUHbZOE5T5o9V=ww@mail.gmail.com>
+ <2ed3072b-f83d-1b17-0949-ca38267ba94e@redhat.com> <CAAeT=Fy7JuCQKgy-ZaS9wPe6h93_WRMYmhihovYDjyg2a+BqNw@mail.gmail.com>
+ <Ya3dQeXjUxAG8cCJ@monolith.localdoman> <d914471e-53a4-e8a4-cc79-402940519747@redhat.com>
+In-Reply-To: <d914471e-53a4-e8a4-cc79-402940519747@redhat.com>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Mon, 6 Dec 2021 23:07:39 -0800
+Message-ID: <CAAeT=Fy7BmrL7n7YTgA4sfwsSLiKkWHgNB_UeK29pVjfFJJ_fQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 09/29] KVM: arm64: Hide IMPLEMENTATION DEFINED PMU
+ support for the guest
+To:     Eric Auger <eauger@redhat.com>
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>, kvm@vger.kernel.org,
+        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Return statements in functions returning bool should use true/false
-instead of 1/0.
+Hi Eric,
 
-Signed-off-by: Yihao Han <hanyihao@vivo.com>
----
- arch/x86/kvm/mmu/mmu.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+On Mon, Dec 6, 2021 at 2:25 AM Eric Auger <eauger@redhat.com> wrote:
+>
+> Hi
+>
+> On 12/6/21 10:52 AM, Alexandru Elisei wrote:
+> > Hi,
+> >
+> > On Sat, Dec 04, 2021 at 09:39:59AM -0800, Reiji Watanabe wrote:
+> >> Hi Eric,
+> >>
+> >> On Sat, Dec 4, 2021 at 6:14 AM Eric Auger <eauger@redhat.com> wrote:
+> >>>
+> >>> Hi Reiji,
+> >>>
+> >>> On 12/4/21 2:04 AM, Reiji Watanabe wrote:
+> >>>> Hi Eric,
+> >>>>
+> >>>> On Thu, Dec 2, 2021 at 2:57 AM Eric Auger <eauger@redhat.com> wrote:
+> >>>>>
+> >>>>> Hi Reiji,
+> >>>>>
+> >>>>> On 11/30/21 6:32 AM, Reiji Watanabe wrote:
+> >>>>>> Hi Eric,
+> >>>>>>
+> >>>>>> On Thu, Nov 25, 2021 at 12:30 PM Eric Auger <eauger@redhat.com> wrote:
+> >>>>>>>
+> >>>>>>> Hi Reiji,
+> >>>>>>>
+> >>>>>>> On 11/17/21 7:43 AM, Reiji Watanabe wrote:
+> >>>>>>>> When ID_AA64DFR0_EL1.PMUVER or ID_DFR0_EL1.PERFMON is 0xf, which
+> >>>>>>>> means IMPLEMENTATION DEFINED PMU supported, KVM unconditionally
+> >>>>>>>> expose the value for the guest as it is.  Since KVM doesn't support
+> >>>>>>>> IMPLEMENTATION DEFINED PMU for the guest, in that case KVM should
+> >>>>>>>> exopse 0x0 (PMU is not implemented) instead.
+> >>>>>>> s/exopse/expose
+> >>>>>>>>
+> >>>>>>>> Change cpuid_feature_cap_perfmon_field() to update the field value
+> >>>>>>>> to 0x0 when it is 0xf.
+> >>>>>>> is it wrong to expose the guest with a Perfmon value of 0xF? Then the
+> >>>>>>> guest should not use it as a PMUv3?
+> >>>>>>
+> >>>>>>> is it wrong to expose the guest with a Perfmon value of 0xF? Then the
+> >>>>>>> guest should not use it as a PMUv3?
+> >>>>>>
+> >>>>>> For the value 0xf in ID_AA64DFR0_EL1.PMUVER and ID_DFR0_EL1.PERFMON,
+> >>>>>> Arm ARM says:
+> >>>>>>   "IMPLEMENTATION DEFINED form of performance monitors supported,
+> >>>>>>    PMUv3 not supported."
+> >>>>>>
+> >>>>>> Since the PMU that KVM supports for guests is PMUv3, 0xf shouldn't
+> >>>>>> be exposed to guests (And this patch series doesn't allow userspace
+> >>>>>> to set the fields to 0xf for guests).
+> >>>>> What I don't get is why this isn't detected before (in kvm_reset_vcpu).
+> >>>>> if the VCPU was initialized with KVM_ARM_VCPU_PMU_V3 can we honor this
+> >>>>> init request if the host pmu is implementation defined?
+> >>>>
+> >>>> KVM_ARM_VCPU_INIT with KVM_ARM_VCPU_PMU_V3 will fail in
+> >>>> kvm_reset_vcpu() if the host PMU is implementation defined.
+> >>>
+> >>> OK. This was not obvsious to me.
+> >>>
+> >>>                 if (kvm_vcpu_has_pmu(vcpu) && !kvm_arm_support_pmu_v3()) {
+> >>>                         ret = -EINVAL;
+> >>>                         goto out;
+> >>>                 }
+> >>>
+> >>> kvm_perf_init
+> >>> +       if (perf_num_counters() > 0)
+> >>> +               static_branch_enable(&kvm_arm_pmu_available);
+> >>>
+> >>> But I believe you ;-), sorry for the noise
+> >>
+> >> Thank you for the review !
+> >>
+> >> I didn't find the code above in v5.16-rc3, which is the base code of
+> >> this series.  So, I'm not sure where the code came from (any kvmarm
+> >> repository branch ??).
+> >>
+> >> What I see in v5.16-rc3 is:
+> >> ----
+> >> int kvm_perf_init(void)
+> >> {
+> >>         return perf_register_guest_info_callbacks(&kvm_guest_cbs);
+> >> }
+> >>
+> >> void kvm_host_pmu_init(struct arm_pmu *pmu)
+> >> {
+> >>         if (pmu->pmuver != 0 && pmu->pmuver != ID_AA64DFR0_PMUVER_IMP_DEF &&
+> >>             !kvm_arm_support_pmu_v3() && !is_protected_kvm_enabled())
+> >>                 static_branch_enable(&kvm_arm_pmu_available);
+> >> }
+> >> ----
+> >>
+> >> And I don't find any other code that enables kvm_arm_pmu_available.
+> >
+> > The code was recently changed (in v5.15 I think), I think Eric is looking
+> > at an older version.
+>
+> Yes I was "googling" kvm_arm_pmu_available enablement and I missed the
+> kvm_pmu_probe_pmuver() != ID_AA64DFR0_PMUVER_IMP_DEF check addition. So
+> except the heterogenous case reported by Alexandru below, we should be
+> fine. Sorry for the noise.
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index e2e1d012df22..fcaa0bf8a1e6 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1482,7 +1482,7 @@ static bool kvm_set_pte_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
- 
- 	if (need_flush && kvm_available_flush_tlb_with_range()) {
- 		kvm_flush_remote_tlbs_with_address(kvm, gfn, 1);
--		return 0;
-+		return false;
- 	}
- 
- 	return need_flush;
-@@ -1623,8 +1623,8 @@ static bool kvm_test_age_rmapp(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
- 
- 	for_each_rmap_spte(rmap_head, &iter, sptep)
- 		if (is_accessed_spte(*sptep))
--			return 1;
--	return 0;
-+			return true;
-+	return false;
- }
- 
- #define RMAP_RECYCLE_THRESHOLD 1000
--- 
-2.17.1
+Understood. Thank you for the confirmation.
 
+Regards,
+Reiji
+
+
+> >>
+> >> Looking at the KVM's PMUV3 support code for guests in v5.16-rc3,
+> >> if KVM allows userspace to configure KVM_ARM_VCPU_PMU_V3 even with
+> >> ID_AA64DFR0_PMUVER_IMP_DEF on the host (, which I don't think it does),
+> >> I think we should fix that to not allow that.
+> >
+> > I recently started looking into that too. If there's only one PMU, then the
+> > guest won't see the value IMP DEF for PMUVer (userspace cannot set the PMU
+> > feature because !kvm_arm_support_pmu_v3()).
+> >
+> > On heterogeneous systems with multiple PMUs, it gets complicated. I don't
+> > have any such hardware, but what I think will happen is that KVM will
+> > enable the static branch if there is at least one PMU with
+> > PMUVer != IMP_DEF, even if there are other PMUs with PMUVer = IMP_DEF. But
+> > read_sanitised_ftr_reg() will always return 0 for the
+> > PMUVer field because the field is defined as FTR_EXACT with a safe value of
+> > 0 in cpufeature.c. So the guest ends up seeing PMUVer = 0.
+> >
+> > I'm not sure if this is the case because I'm not familiar with the cpu
+> > features code, but I planning to investigate further.
+> >
+> > Thanks,
+> > Alex
+> >
+> >> (I'm not sure how KVM's PMUV3 support code is implemented in the
+> >> code that you are looking at though)
+> >>
+> >> Thanks,
+> >> Reiji
+> >
+>
