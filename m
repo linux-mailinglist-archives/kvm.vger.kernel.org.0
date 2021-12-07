@@ -2,92 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C03946C701
-	for <lists+kvm@lfdr.de>; Tue,  7 Dec 2021 22:57:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6EFA846C71E
+	for <lists+kvm@lfdr.de>; Tue,  7 Dec 2021 23:09:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237678AbhLGWBU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Dec 2021 17:01:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40506 "EHLO
+        id S242058AbhLGWNI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Dec 2021 17:13:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231280AbhLGWBT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Dec 2021 17:01:19 -0500
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A1C4C061574
-        for <kvm@vger.kernel.org>; Tue,  7 Dec 2021 13:57:48 -0800 (PST)
-Received: by mail-pj1-x102d.google.com with SMTP id gf14-20020a17090ac7ce00b001a7a2a0b5c3so2895006pjb.5
-        for <kvm@vger.kernel.org>; Tue, 07 Dec 2021 13:57:48 -0800 (PST)
+        with ESMTP id S231390AbhLGWNI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Dec 2021 17:13:08 -0500
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63C71C061574
+        for <kvm@vger.kernel.org>; Tue,  7 Dec 2021 14:09:37 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id b11-20020a17090acc0b00b001a9179dc89fso2430467pju.6
+        for <kvm@vger.kernel.org>; Tue, 07 Dec 2021 14:09:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=79gSIRlh17e8UNdhk1lnvWs5UXDP8Wc8qj8y2nanflY=;
-        b=HII8I8N4bFzOOTgtyEfqLSlTs1ozwu3jd9Tie1CSyO0avbiNCHMvZXpu4wuBEj8xL/
-         7l+xd0kFWM2XLtQNMDheDtaUDVpypBVtNJ48UbGxhH8f3WHABcTk1ibgqXz2UJ0TRznk
-         UnFcSXgKgzydLcmDMTpRR2tYNuWeyrU7XiuQM9tD/nT8dtkMWobln+8wdNLOcLWPl4yD
-         fj6ZmuhGLvr91KZTvXI5c3oYdRoiqAJ76wcQhNSi9jHrd0wfJcXVZO7vLoLORGvxRgKN
-         nk2cY5qlJnnPirlh/zywv5Ry5x/sQa+G9CKPJHnIX52inJyAAN5vFMpP5PQiIkkLDFZm
-         ozYQ==
+        h=reply-to:date:message-id:mime-version:subject:from:to:cc;
+        bh=H9d3b7ySfPUUkyj8WwGO7YINvSuZ61NMD+2fSI/NRIQ=;
+        b=kavNo4w//awmdXO5HpD/p+k8j6D9sG5ed5rnhy6iRwkpibbidw6pxcuAlSF08ANNHS
+         AuzRlasPHS5c+2qkBbl5iC6XWKTL0VtiGFM5Y9jNipsSu8Mt+rVitZBMQ/C3fdD0W9no
+         Gd7C9tHsD6AdQ40xfJlyUtRCxUb240E1fWiSd3/AFwMrxRZf1GTcv21jiPBDjdKx8EGV
+         KcwMnMhh205HO6lvj5rdnxQA/wEvoQYWKnoJjlQ3J8fRr9WYhaGxfBBulxET05qUcXTi
+         KL+VA8Iu0l+JerJE1K4vUqVNe66UTgxBGsyfCm0HJDihzF2XKvzmMO3k3OgspObBZ+VL
+         p8+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=79gSIRlh17e8UNdhk1lnvWs5UXDP8Wc8qj8y2nanflY=;
-        b=0fAjVGjIteGqh00shvL3qkbRzpSGocGCUHQJ51h9Xya6s6HWJIcwLmzWnHmt6fzkpC
-         SfTtgJ3jk3s1Myj5ijI+45f9O0tci6NX+HqWTMZbHC2scbevxiocprPHwkEyxRMMu9Le
-         0B04SHxzTEBb14/9PpWNfoG0xD+5hoWQAZE8n3sfBc7xLUyWa2gzkC7fq5EmgQ01eWfb
-         27+GmAqWpty3qyznq8/Y78cAKDmdTrczopD055+IlH0/YS2e8+EUGabGFPYEcCrHGpEE
-         3OH1q2NIlle73yIQ7u1KW6xtdLveFsmpJvq61WTz6x3vYeIGTABDsdEw4iaTOuiZCxkO
-         5w5A==
-X-Gm-Message-State: AOAM531IDIVERDpl0Lto794aww7vVB+sal6eUzD8cX6UFZx/3ToWbiwk
-        hN9IDN6vjJyQRfZI7Cp/usajSQ==
-X-Google-Smtp-Source: ABdhPJz+qGO0w2Z/Slu6Gq14krFl2gnoxtZ3oOaAAu4DF0SJhOU3QW4ke5BxMk9EOfTabAZNahNtIQ==
-X-Received: by 2002:a17:90b:2412:: with SMTP id nr18mr2345451pjb.233.1638914267914;
-        Tue, 07 Dec 2021 13:57:47 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id na13sm493507pjb.11.2021.12.07.13.57.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Dec 2021 13:57:47 -0800 (PST)
-Date:   Tue, 7 Dec 2021 21:57:43 +0000
+        h=x-gm-message-state:reply-to:date:message-id:mime-version:subject
+         :from:to:cc;
+        bh=H9d3b7ySfPUUkyj8WwGO7YINvSuZ61NMD+2fSI/NRIQ=;
+        b=x9kGwdhUeiQ7s6jN6XBYohWgCBEgkspgH17T8xg15BcuyalxJPjxRfNl/UU63qVxY3
+         C1mH+kK8v64TBhIk3Buo3sc3JcgLr7AZ0cTjfodIeQxEI4EqhEmGuPS26y9g5SJFsVz0
+         ZK+GNNVcaFSrNjDsyhgLK/a/9pNPg79TX891hPxedc+/XItmpbrKNFAPbS1gQANGnnyc
+         TfWhHnwdhpBixMS5gaw7SUIvhkOmrQvqhDvdjpnRYqk10KxE/gu9tgPezGBn4bSHe+nB
+         Ov0Qft/HM9DaEj8zpeoanGVPp2uKV22+L/WrSkO9LtsIoYyAKtdDmCOrf6v4hTp97kON
+         VT1A==
+X-Gm-Message-State: AOAM532tdBIuT+M9PserMzGHuHCVMlK1WBi9gJ07MBdahw2dc3oGZKiF
+        uFXkbBt9mGc0vLO6oUxI+UkTQjTt3m0=
+X-Google-Smtp-Source: ABdhPJzYigwKgXuf4QjKrxXjkaHgzzD+/k5Wx9tZeXK3ngvuCH9gJt9PRu0YFmMirUBJBLh3UP201FwOiaY=
+X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
+ (user=seanjc job=sendgmr) by 2002:a17:90b:4a0e:: with SMTP id
+ kk14mr2401871pjb.42.1638914976806; Tue, 07 Dec 2021 14:09:36 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Tue,  7 Dec 2021 22:09:18 +0000
+Message-Id: <20211207220926.718794-1-seanjc@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.34.1.400.ga245620fadb-goog
+Subject: [PATCH v3 0/8] KVM: x86: Hyper-V hypercall fix and cleanups
 From:   Sean Christopherson <seanjc@google.com>
-To:     Lai Jiangshan <jiangshanlai@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Lai Jiangshan <laijs@linux.alibaba.com>,
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        "K. Y. Srinivasan" <kys@microsoft.com>,
+        Haiyang Zhang <haiyangz@microsoft.com>,
+        Stephen Hemminger <sthemmin@microsoft.com>,
+        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+        Arnd Bergmann <arnd@arndb.de>
+Cc:     Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH 4/4] KVM: X86: Only get rflags when needed in
- permission_fault()
-Message-ID: <Ya/Y1+6BR4exkTKK@google.com>
-References: <20211207095039.53166-1-jiangshanlai@gmail.com>
- <20211207095039.53166-5-jiangshanlai@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211207095039.53166-5-jiangshanlai@gmail.com>
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ajay Garg <ajaygargnsit@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 07, 2021, Lai Jiangshan wrote:
-> From: Lai Jiangshan <laijs@linux.alibaba.com>
-> 
-> In same cases, it doesn't need to get rflags for SMAP checks.
-> 
-> For example: it is user mode access, it could have contained other
-> permission fault, SMAP is not enabled, it is implicit supervisor
-> access, or it is nested TDP pagetable.
+Fix a bug where KVM incorrectly skips an "all_cpus" IPI request, and misc
+cleanups and enhancements for KVM handling of Hyper-V hypercalls.
 
-I don't disagree that reading RFLAGS is silly and _may_ have worse performance,
-but I'd prefer any change have actual numbers to justify that it's an improvement
-or at least a wash / in the noise.
+Based on kvm/queue, commit 1cf84614b04a ("KVM: x86: Exit to ...").
 
-Too much of the MMU code (and KVM in general) has optimizations like this that
-have bitrotted horribly over the years.  And in many/most cases, the original commit
-didn't provide performance numbers, so it's not even clear that the "optimizations"
-were _ever_ a net win.
+v3:
+  - Collect reviews. [Vitaly]
+  - Add BUILD_BUG_ON() to protect KVM_HV_MAX_SPARSE_VCPU_SET_BITS. [Vitaly]
+  - Fix misc typos. [Vitaly]
+  - Opportunistically rename "cnt" to "rep_cnt" in tracepoint. [Vitaly]
+  - Drop var_cnt checks for debug hypercalls due to lack of documentation
+    as to their expected behavior. [Vitaly]
+  - Tweak the changelog regarding the TLFS spec issue to reference the
+    bug filed by Vitaly.
+
+v2: https://lore.kernel.org/all/20211030000800.3065132-1-seanjc@google.com/
+
+Sean Christopherson (8):
+  KVM: x86: Ignore sparse banks size for an "all CPUs", non-sparse IPI
+    req
+  KVM: x86: Get the number of Hyper-V sparse banks from the VARHEAD
+    field
+  KVM: x86: Refactor kvm_hv_flush_tlb() to reduce indentation
+  KVM: x86: Add a helper to get the sparse VP_SET for IPIs and TLB
+    flushes
+  KVM: x86: Don't bother reading sparse banks that end up being ignored
+  KVM: x86: Shove vp_bitmap handling down into sparse_set_to_vcpu_mask()
+  KVM: x86: Reject fixeds-size Hyper-V hypercalls with non-zero
+    "var_cnt"
+  KVM: x86: Add checks for reserved-to-zero Hyper-V hypercall fields
+
+ arch/x86/kvm/hyperv.c             | 175 ++++++++++++++++++------------
+ arch/x86/kvm/trace.h              |  14 ++-
+ include/asm-generic/hyperv-tlfs.h |   7 ++
+ 3 files changed, 123 insertions(+), 73 deletions(-)
+
+-- 
+2.34.1.400.ga245620fadb-goog
+
