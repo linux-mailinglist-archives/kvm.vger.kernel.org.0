@@ -2,101 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C30E46B80C
-	for <lists+kvm@lfdr.de>; Tue,  7 Dec 2021 10:52:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A457646B8C6
+	for <lists+kvm@lfdr.de>; Tue,  7 Dec 2021 11:22:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234519AbhLGJzv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Dec 2021 04:55:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35958 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234508AbhLGJzu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Dec 2021 04:55:50 -0500
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F1DBC061574;
-        Tue,  7 Dec 2021 01:52:20 -0800 (PST)
-Received: by mail-pj1-x1031.google.com with SMTP id nh10-20020a17090b364a00b001a69adad5ebso2203019pjb.2;
-        Tue, 07 Dec 2021 01:52:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=AggZV2m9pqXxnzeFQjDaBo+amTkLh6dgZ3TEXgFqWsI=;
-        b=jPzFBXftZgwL/u/b+dpxrnveAEUhqe17Ub1F3EsLObND8KZPmoZXS+h1g9Ruq/Bu7L
-         tLNRtcbwos5SL3ILogmtiGVDLuWmbYDovOQIj8h0KrecZB6XywdfJGzxuXp3cm49CntF
-         Jk6rmlAslHbwZL0qGkEG8PzNtA4npiECpTZnseuLzas7/McE1/9518jyPxcUXpd0UBMn
-         clWCY+dWgTHJqSHPRMvl+bpNLBoQcAgp1Rjic45gFMC2qrRgZUcTHyQzSXUZy+ylgAKR
-         8F/MufYIv8yDSndeqMx0hkkPivpVpNZNjnlg1zYd5gafOrb+DNYqW2tjdoCwZuguphN1
-         QCPA==
+        id S235045AbhLGK0H (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Dec 2021 05:26:07 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:51499 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235024AbhLGK0F (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 7 Dec 2021 05:26:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1638872554;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vIblGTzXX40hR9szafjbMCGgx30k6YagvsBGLTnN0YI=;
+        b=BTDOiJ5TJMdVA0OeZUlCpys29dUUgn83u++Cd8E2huJfN8Z3qTb1VrxgkeAPbXm9tGWon3
+        /2ZKpoQr8JXbzPU6d2+DcsUcR//Eklj4v70MZ03tXpsMUOdlhnRxN5bZ6wdohzgNKIUFMX
+        CVRerwo4ZUgTAErBhPTr8f4ym+2/q0A=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-109-h8xtBGv9N1KJ8b1txTzoRQ-1; Tue, 07 Dec 2021 05:22:33 -0500
+X-MC-Unique: h8xtBGv9N1KJ8b1txTzoRQ-1
+Received: by mail-wm1-f71.google.com with SMTP id ay34-20020a05600c1e2200b00337fd217772so1169103wmb.4
+        for <kvm@vger.kernel.org>; Tue, 07 Dec 2021 02:22:33 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=AggZV2m9pqXxnzeFQjDaBo+amTkLh6dgZ3TEXgFqWsI=;
-        b=T0c5F5uw16KIHkwsHWeGxX32yfrRi4zqUi8ILGGMskDKERVbdd8+9buv6p5vMx80v7
-         HB393WCCnIbHH1Nk4KrO4FMvhdRS1Xdv+eMECzqI3keb9KCkZiStGcYQrH1vEwXulHDS
-         EpHP2y5zQR99O6opGiEeccP3qkRVfHqqKDLbcssW8gq3MtszGMR3wW3WkmZO8IK9XQsE
-         sm+8rtFhULXoizVYI8CzWiVUbfRKBj47+LNpOjsHVgkr6dty5Gp/ILUo7D/S+MqhG4HR
-         xh8/dd9sK6sNFsegMAmtJDhaZ/M/ja5mZMCc6RxG5alFiLBwUbtVD3kNFla6zToWAJMi
-         gX9g==
-X-Gm-Message-State: AOAM53087a1+L8A4+w/hR7G3kCl+oTXsDmdTVur/Xi7HQEl4pBxs8Qbn
-        VWCOBtBfeYvH08kRA7AjHdBnhHXOT34=
-X-Google-Smtp-Source: ABdhPJwXzoP30B10NeSDpYRv0Zs/d3AIA+fHzA1z8/M0HJteC7Rk9UQ+4mEz3IzgEzEUPjf9d+EvWA==
-X-Received: by 2002:a17:903:2341:b0:142:1b63:98f3 with SMTP id c1-20020a170903234100b001421b6398f3mr49926698plh.49.1638870739547;
-        Tue, 07 Dec 2021 01:52:19 -0800 (PST)
-Received: from localhost ([47.88.60.64])
-        by smtp.gmail.com with ESMTPSA id n3sm12377373pgc.76.2021.12.07.01.52.18
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 07 Dec 2021 01:52:19 -0800 (PST)
-From:   Lai Jiangshan <jiangshanlai@gmail.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>
-Subject: [PATCH] KVM: X86: Raise #GP when clearing CR0_PG in 64 bit mode
-Date:   Tue,  7 Dec 2021 17:52:30 +0800
-Message-Id: <20211207095230.53437-1-jiangshanlai@gmail.com>
-X-Mailer: git-send-email 2.19.1.6.gb485710b
+        h=x-gm-message-state:reply-to:subject:to:cc:references:from
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-transfer-encoding:content-language;
+        bh=vIblGTzXX40hR9szafjbMCGgx30k6YagvsBGLTnN0YI=;
+        b=S3DjKm1ooMeHPy4Pg7B7SzPaRJIOej7pVqeUK3qckYej+K3LX8N+L46wQ+M24+m/Fb
+         L8KVBmS1w741sSo+QBuU/zir24DVE6rXCxX4vSCGPPu+V41XD3Yz+4W3PduAxqoCe8OC
+         9y6n92KUF0w04LPrWKXobh+kxyUG5nwjuKaPpbN//lRISswjqvqVd08sCm3ilaKkxjtH
+         bLnvRa5/KphhVGfgE0zWdWsI2PQkhq9tV4rUJlPitpj93tYr3KCQcnPUSuvY4Kckwcd7
+         oTFTmivM3sBWuH+CZMn+HAFmT1chqyKcoanOo2b8fBraBkD2/2UrJ0JfLNODBoeqHtlf
+         IW8A==
+X-Gm-Message-State: AOAM532wsZCegC01tseJUcG7bprZvyFrF98bRxmDOHNqagR8x48HzlTL
+        A+GceRh3wG9gVjiBOWTws3YKUXOIBARnq851vONKX78/iv7QAKSoeQimPP4DV9pimMijVjijk6F
+        HGMYqq/iE9WZn
+X-Received: by 2002:a05:600c:4f55:: with SMTP id m21mr5891521wmq.68.1638872552020;
+        Tue, 07 Dec 2021 02:22:32 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzOgIcH/ywM872FWWEzo4wI3r37JDW61iH1Cfi/iZw3pSmHii9bhQ9WabrWC9ggWBBYhH9xLg==
+X-Received: by 2002:a05:600c:4f55:: with SMTP id m21mr5891493wmq.68.1638872551786;
+        Tue, 07 Dec 2021 02:22:31 -0800 (PST)
+Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id k8sm13945681wrn.91.2021.12.07.02.22.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Dec 2021 02:22:31 -0800 (PST)
+Reply-To: eric.auger@redhat.com
+Subject: Re: [RFC v16 1/9] iommu: Introduce attach/detach_pasid_table API
+To:     Joerg Roedel <joro@8bytes.org>
+Cc:     eric.auger.pro@gmail.com, iommu@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, will@kernel.org,
+        robin.murphy@arm.com, jean-philippe@linaro.org,
+        zhukeqian1@huawei.com, alex.williamson@redhat.com,
+        jacob.jun.pan@linux.intel.com, yi.l.liu@intel.com,
+        kevin.tian@intel.com, ashok.raj@intel.com, maz@kernel.org,
+        peter.maydell@linaro.org, vivek.gautam@arm.com,
+        shameerali.kolothum.thodi@huawei.com, wangxingang5@huawei.com,
+        jiangkunkun@huawei.com, yuzenghui@huawei.com,
+        nicoleotsuka@gmail.com, chenxiang66@hisilicon.com,
+        sumitg@nvidia.com, nicolinc@nvidia.com, vdumpa@nvidia.com,
+        zhangfei.gao@linaro.org, zhangfei.gao@gmail.com,
+        lushenming@huawei.com, vsethi@nvidia.com
+References: <20211027104428.1059740-1-eric.auger@redhat.com>
+ <20211027104428.1059740-2-eric.auger@redhat.com>
+ <Ya3qd6mT/DpceSm8@8bytes.org>
+From:   Eric Auger <eric.auger@redhat.com>
+Message-ID: <c7e26722-f78c-a93f-c425-63413aa33dde@redhat.com>
+Date:   Tue, 7 Dec 2021 11:22:28 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <Ya3qd6mT/DpceSm8@8bytes.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Lai Jiangshan <laijs@linux.alibaba.com>
+Hi Joerg,
 
-In the SDM:
-If the logical processor is in 64-bit mode or if CR4.PCIDE = 1, an
-attempt to clear CR0.PG causes a general-protection exception (#GP).
-Software should transition to compatibility mode and clear CR4.PCIDE
-before attempting to disable paging.
+On 12/6/21 11:48 AM, Joerg Roedel wrote:
+> On Wed, Oct 27, 2021 at 12:44:20PM +0200, Eric Auger wrote:
+>> Signed-off-by: Jean-Philippe Brucker <jean-philippe.brucker@arm.com>
+>> Signed-off-by: Liu, Yi L <yi.l.liu@linux.intel.com>
+>> Signed-off-by: Ashok Raj <ashok.raj@intel.com>
+>> Signed-off-by: Jacob Pan <jacob.jun.pan@linux.intel.com>
+>> Signed-off-by: Eric Auger <eric.auger@redhat.com>
+> This Signed-of-by chain looks dubious, you are the author but the last
+> one in the chain?
+The 1st RFC in Aug 2018
+(https://lists.cs.columbia.edu/pipermail/kvmarm/2018-August/032478.html)
+said this was a generalization of Jacob's patch
 
-Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
----
- arch/x86/kvm/x86.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 00f5b2b82909..78c40ac3b197 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -906,7 +906,8 @@ int kvm_set_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
- 	    !load_pdptrs(vcpu, kvm_read_cr3(vcpu)))
- 		return 1;
- 
--	if (!(cr0 & X86_CR0_PG) && kvm_read_cr4_bits(vcpu, X86_CR4_PCIDE))
-+	if (!(cr0 & X86_CR0_PG) &&
-+	    (is_64_bit_mode(vcpu) || kvm_read_cr4_bits(vcpu, X86_CR4_PCIDE)))
- 		return 1;
- 
- 	static_call(kvm_x86_set_cr0)(vcpu, cr0);
--- 
-2.19.1.6.gb485710b
+  [PATCH v5 01/23] iommu: introduce bind_pasid_table API function
+
+
+  https://lists.linuxfoundation.org/pipermail/iommu/2018-May/027647.html
+
+So indeed Jacob should be the author. I guess the multiple rebases got
+this eventually replaced at some point, which is not an excuse. Please
+forgive me for that.
+Now the original patch already had this list of SoB so I don't know if I
+shall simplify it.
+
+
+>
+>> +int iommu_uapi_attach_pasid_table(struct iommu_domain *domain,
+>> +				  void __user *uinfo)
+>> +{
+> [...]
+>
+>> +	if (pasid_table_data.format == IOMMU_PASID_FORMAT_SMMUV3 &&
+>> +	    pasid_table_data.argsz <
+>> +		offsetofend(struct iommu_pasid_table_config, vendor_data.smmuv3))
+>> +		return -EINVAL;
+> This check looks like it belongs in driver specific code.
+Indeed, I will fix that in my next respin :-)
+
+Thanks!
+
+Eric
+>
+> Regards,
+>
+> 	Joerg
+>
 
