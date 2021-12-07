@@ -2,207 +2,229 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 135B746B704
-	for <lists+kvm@lfdr.de>; Tue,  7 Dec 2021 10:27:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 493E846B76F
+	for <lists+kvm@lfdr.de>; Tue,  7 Dec 2021 10:35:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233859AbhLGJar (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Dec 2021 04:30:47 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:8158 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231250AbhLGJaq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 7 Dec 2021 04:30:46 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B79IiPS005096;
-        Tue, 7 Dec 2021 09:27:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=V2Q5oxnMQx3uk57DHKUmBUi4N+cjLpm4PKacLQprv7E=;
- b=m5a2xMNzPnkPA9cFbRNqlJwrJijUmohjK3UaC254UVKiC0J49iswFD5uPnJZr6IagPF/
- fJjm96+n12U92pt9dNG4fiRPZN8i7HxabeakBgIzGQA6PRSGoazP6HI0xeF7HKN7hANx
- 1REIhayQuVnki/n81240PW2UnOp7ghb+qgBvC+8NlzPma4+YM3v0O/pqrvuSXQuvTkIZ
- fl3PfpTINY0/k9jV2jVyTkjBjdsGdvSUSSQBdjoabH6GWdX8TW7NUxnIJvsZPWbCdX68
- za7Dp/OfsJTkMjRSTo3rozqqmPKhd9BB5da2O0pMdroD1Rd0quj+eAGThTtbedq63mVw qw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ct4vag4c2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Dec 2021 09:27:16 +0000
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1B79JXNT006268;
-        Tue, 7 Dec 2021 09:27:15 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ct4vag4b9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Dec 2021 09:27:15 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1B797xpa010660;
-        Tue, 7 Dec 2021 09:27:13 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma03fra.de.ibm.com with ESMTP id 3cqyy9bmb0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 07 Dec 2021 09:27:13 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1B79R9ac29688084
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 7 Dec 2021 09:27:09 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7D3D2A4064;
-        Tue,  7 Dec 2021 09:27:09 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E1F32A405B;
-        Tue,  7 Dec 2021 09:27:08 +0000 (GMT)
-Received: from [9.145.93.53] (unknown [9.145.93.53])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue,  7 Dec 2021 09:27:08 +0000 (GMT)
-Message-ID: <c6896c31-b9db-e241-5f47-fc96fd53a2cb@linux.ibm.com>
-Date:   Tue, 7 Dec 2021 10:27:08 +0100
+        id S234076AbhLGJii (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Dec 2021 04:38:38 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:20991 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234047AbhLGJiW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 7 Dec 2021 04:38:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1638869691;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jntWsPS26FPQws4Ie+qb5ML/rS+nfMYjGqNeZvx+ke0=;
+        b=P42cuSumCnfMWBNpHER9Nt51E9UQfbahyIm6+AbzYDXJZeQ7DoUZlfOlEDgOIamiyZpuCM
+        HMLnJG9P6HAeA4hst7W+bqgpKdRfcBwkExLAciwtt3YtzwooXy6YG+D8mEgfNHsBKXOv1H
+        WRqSFP5cgaVWH5msFFX4olvhh1gdm0U=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-101-7px41rYFMTiWh5zF3JI-ow-1; Tue, 07 Dec 2021 04:34:50 -0500
+X-MC-Unique: 7px41rYFMTiWh5zF3JI-ow-1
+Received: by mail-wm1-f70.google.com with SMTP id g11-20020a1c200b000000b003320d092d08so7445092wmg.9
+        for <kvm@vger.kernel.org>; Tue, 07 Dec 2021 01:34:50 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=jntWsPS26FPQws4Ie+qb5ML/rS+nfMYjGqNeZvx+ke0=;
+        b=lCNi1TqoGkZd1dpcG/FJln8aGiMrBkn8e7JZNFRpncGIzBiSIchzzhbUi64q7rQpA+
+         CbBslxiTTIpznZM4uNJKgU7M0pjvJN04xjx09nJO8VaMl0BAZx3wRg5d2VtOYxB3BWzL
+         oAPgfHGrMjESMsJcJEZQVq7+pHTwJmgKmb5TyrnzKzSzXkm6ucYzDfv0T4DMmIO3yj/q
+         6Q4oxFzYVj3yX/1ldI1KAnNrezeNTeMJ9fbowftYoaAcFw2E9freFUYLR1Y/7XnI/7mM
+         THpGAcKAsgGLggM7Jx/NBXtw5fJtBv/fnmerFMH3XWLr9/kb53Hsbf3Fr0lR3N+E6E9D
+         iT1Q==
+X-Gm-Message-State: AOAM530h1QJpqrqy+6sYg0JExe0ru82gjWjrkMC+BajD3dIVxfwHRR86
+        vHB0Fb0i6Wv5s5Id1Sw4IjKhcvuhc/FSZNqRw9Bwbt7fan+Z23UrJAWCZjhYu/BGFoXvdrQL+8w
+        Jo/cdQS7LkBii
+X-Received: by 2002:a05:600c:4e07:: with SMTP id b7mr5580448wmq.8.1638869689100;
+        Tue, 07 Dec 2021 01:34:49 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxw6rsYdhre9JCyOWOtS+Bx8UKF46khNYBUCIaxEF2jZXOFOSQOgs/0Py2E8rPIYlOyt4LFAw==
+X-Received: by 2002:a05:600c:4e07:: with SMTP id b7mr5580435wmq.8.1638869688864;
+        Tue, 07 Dec 2021 01:34:48 -0800 (PST)
+Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id bd18sm1974988wmb.43.2021.12.07.01.34.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Dec 2021 01:34:48 -0800 (PST)
+Subject: Re: [RFC PATCH v3 02/29] KVM: arm64: Save ID registers' sanitized
+ value per vCPU
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, Will Deacon <will@kernel.org>,
+        Peter Shier <pshier@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-arm-kernel@lists.infradead.org
+References: <20211117064359.2362060-1-reijiw@google.com>
+ <20211117064359.2362060-3-reijiw@google.com>
+ <9f6e8b7e-c2b3-5883-f934-5b537c4ce19b@redhat.com>
+ <CAAeT=Fw+zW+CDnye+XzokmQtQYBfzrEEfLr=78UfFQZsQb_wuA@mail.gmail.com>
+From:   Eric Auger <eauger@redhat.com>
+Message-ID: <e0a5817e-27c1-8181-a595-f38c2d399b90@redhat.com>
+Date:   Tue, 7 Dec 2021 10:34:47 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH v3 0/3] KVM: s390: Some gaccess cleanup
+In-Reply-To: <CAAeT=Fw+zW+CDnye+XzokmQtQYBfzrEEfLr=78UfFQZsQb_wuA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20211126164549.7046-1-scgl@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <20211126164549.7046-1-scgl@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: kt7cm8b2ih5EJj38F1nOtP_toeUlZ0Xs
-X-Proofpoint-GUID: URCbZb5jyrKevbnIeM_0QHCAx0oIilHF
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2021-12-07_03,2021-12-06_02,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
- adultscore=0 clxscore=1015 impostorscore=0 phishscore=0 suspectscore=0
- spamscore=0 malwarescore=0 mlxlogscore=999 priorityscore=1501 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
- definitions=main-2112070054
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/26/21 17:45, Janis Schoetterl-Glausch wrote:
-> Cleanup s390 guest access code a bit, getting rid of some code
-> duplication and improving readability.
-> 
-> v2 -> v3
-> 	minor changes only
-> 		typo fixes
-> 		whitespace
-> 		line reordering
-> 		picked up Reviewed-by's
-> 
-> v1 -> v2
-> 	separate patch for renamed variable
-> 		fragment_len instead of seg
-> 	expand comment of guest_range_to_gpas
-> 	fix nits
+Hi Reiji,
 
-Thanks, picked
+On 12/4/21 2:45 AM, Reiji Watanabe wrote:
+> Hi Eric,
+> 
+> On Thu, Dec 2, 2021 at 2:58 AM Eric Auger <eauger@redhat.com> wrote:
+>>
+>> Hi Reiji,
+>>
+>> On 11/17/21 7:43 AM, Reiji Watanabe wrote:
+>>> Extend sys_regs[] of kvm_cpu_context for ID registers and save ID
+>>> registers' sanitized value in the array for the vCPU at the first
+>>> vCPU reset. Use the saved ones when ID registers are read by
+>>> userspace (via KVM_GET_ONE_REG) or the guest.
+>>>
+>>> Signed-off-by: Reiji Watanabe <reijiw@google.com>
+>>> ---
+>>>  arch/arm64/include/asm/kvm_host.h | 10 +++++++
+>>>  arch/arm64/kvm/sys_regs.c         | 43 +++++++++++++++++++------------
+>>>  2 files changed, 37 insertions(+), 16 deletions(-)
+>>>
+>>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>>> index edbe2cb21947..72db73c79403 100644
+>>> --- a/arch/arm64/include/asm/kvm_host.h
+>>> +++ b/arch/arm64/include/asm/kvm_host.h
+>>> @@ -146,6 +146,14 @@ struct kvm_vcpu_fault_info {
+>>>       u64 disr_el1;           /* Deferred [SError] Status Register */
+>>>  };
+>>>
+>>> +/*
+>>> + * (Op0, Op1, CRn, CRm, Op2) of ID registers is (3, 0, 0, crm, op2),
+>>> + * where 0<=crm<8, 0<=op2<8.
+>>> + */
+>>> +#define KVM_ARM_ID_REG_MAX_NUM 64
+>>> +#define IDREG_IDX(id)                ((sys_reg_CRm(id) << 3) | sys_reg_Op2(id))
+>>> +#define IDREG_SYS_IDX(id)    (ID_REG_BASE + IDREG_IDX(id))
+>>> +
+>>>  enum vcpu_sysreg {
+>>>       __INVALID_SYSREG__,   /* 0 is reserved as an invalid value */
+>>>       MPIDR_EL1,      /* MultiProcessor Affinity Register */
+>>> @@ -210,6 +218,8 @@ enum vcpu_sysreg {
+>>>       CNTP_CVAL_EL0,
+>>>       CNTP_CTL_EL0,
+>>>
+>>> +     ID_REG_BASE,
+>>> +     ID_REG_END = ID_REG_BASE + KVM_ARM_ID_REG_MAX_NUM - 1,
+>>>       /* Memory Tagging Extension registers */
+>>>       RGSR_EL1,       /* Random Allocation Tag Seed Register */
+>>>       GCR_EL1,        /* Tag Control Register */
+>>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>>> index e3ec1a44f94d..5608d3410660 100644
+>>> --- a/arch/arm64/kvm/sys_regs.c
+>>> +++ b/arch/arm64/kvm/sys_regs.c
+>>> @@ -33,6 +33,8 @@
+>>>
+>>>  #include "trace.h"
+>>>
+>>> +static u64 __read_id_reg(const struct kvm_vcpu *vcpu, u32 id);
+>>> +
+>>>  /*
+>>>   * All of this file is extremely similar to the ARM coproc.c, but the
+>>>   * types are different. My gut feeling is that it should be pretty
+>>> @@ -273,7 +275,7 @@ static bool trap_loregion(struct kvm_vcpu *vcpu,
+>>>                         struct sys_reg_params *p,
+>>>                         const struct sys_reg_desc *r)
+>>>  {
+>>> -     u64 val = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
+>>> +     u64 val = __read_id_reg(vcpu, SYS_ID_AA64MMFR1_EL1);
+>>>       u32 sr = reg_to_encoding(r);
+>>>
+>>>       if (!(val & (0xfUL << ID_AA64MMFR1_LOR_SHIFT))) {
+>>> @@ -1059,17 +1061,9 @@ static bool access_arch_timer(struct kvm_vcpu *vcpu,
+>>>       return true;
+>>>  }
+>>>
+>>> -/* Read a sanitised cpufeature ID register by sys_reg_desc */
+>>> -static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+>>> -             struct sys_reg_desc const *r, bool raz)
+>>> +static u64 __read_id_reg(const struct kvm_vcpu *vcpu, u32 id)
+>>>  {
+>>> -     u32 id = reg_to_encoding(r);
+>>> -     u64 val;
+>>> -
+>>> -     if (raz)
+>>> -             return 0;
+>>> -
+>>> -     val = read_sanitised_ftr_reg(id);
+>>> +     u64 val = __vcpu_sys_reg(vcpu, IDREG_SYS_IDX(id));
+>>>
+>>>       switch (id) {
+>>>       case SYS_ID_AA64PFR0_EL1:
+>>> @@ -1119,6 +1113,14 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+>>>       return val;
+>>>  }
+>>>
+>>> +static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+>>> +                    struct sys_reg_desc const *r, bool raz)
+>>> +{
+>>> +     u32 id = reg_to_encoding(r);
+>>> +
+>>> +     return raz ? 0 : __read_id_reg(vcpu, id);
+>>> +}
+>>> +
+>>>  static unsigned int id_visibility(const struct kvm_vcpu *vcpu,
+>>>                                 const struct sys_reg_desc *r)
+>>>  {
+>>> @@ -1178,6 +1180,16 @@ static unsigned int sve_visibility(const struct kvm_vcpu *vcpu,
+>>>       return REG_HIDDEN;
+>>>  }
+>>>
+>>> +static void reset_id_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd)
+>>> +{
+>>> +     u32 id = reg_to_encoding(rd);
+>>> +
+>>> +     if (vcpu_has_reset_once(vcpu))
+>>> +             return;
+>> The KVM API allows to call VCPU_INIT several times (with same
+>> target/feature). With above check on the second call the ID_REGS won't
+>> be reset. Somehow this is aligned with target/feature behavior. However
+>> if this is what we want, I think we would need to document it in the KVM
+>> API doc.
+> 
+> Thank you for the comment.
+> 
+> That is what we want.  Since ID registers are read only registers,
+> their values must not change across the reset.
+> 
+> '4.82 KVM_ARM_VCPU_INIT' in api.rst says:
+> 
+>   System registers: Reset to their architecturally defined
+>   values as for a warm reset to EL1 (resp. SVC)
+> 
+> Since this reset behavior for the ID registers follows what is
+> described above, I'm not sure if we need to document the reset
+> behavior of the ID registers specifically.
+> If KVM changes the values across the resets, I would think it
+> rather needs to be documented though.
 
+Makes sense to freeze the ID REGs on the 1st reset. Was just wondering
+if we shouldn't add that the ID REG values are immutable after the 1st
+VCPU_INIT.
+
+Thanks
+
+Eric
 > 
-> Janis Schoetterl-Glausch (3):
->    KVM: s390: gaccess: Refactor gpa and length calculation
->    KVM: s390: gaccess: Refactor access address range check
->    KVM: s390: gaccess: Cleanup access to guest pages
-> 
->   arch/s390/kvm/gaccess.c | 158 +++++++++++++++++++++++-----------------
->   1 file changed, 92 insertions(+), 66 deletions(-)
-> 
-> Range-diff against v2:
-> 1:  60d050210198 ! 1:  e5d7d2d7a4da KVM: s390: gaccess: Refactor gpa and length calculation
->      @@ Metadata
->        ## Commit message ##
->           KVM: s390: gaccess: Refactor gpa and length calculation
->       
->      -    Improve readability be renaming the length variable and
->      +    Improve readability by renaming the length variable and
->           not calculating the offset manually.
->       
->           Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
->      +    Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
->       
->        ## arch/s390/kvm/gaccess.c ##
->       @@ arch/s390/kvm/gaccess.c: int access_guest(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar, void *data,
->      @@ arch/s390/kvm/gaccess.c: int access_guest(struct kvm_vcpu *vcpu, unsigned long g
->        	psw_t *psw = &vcpu->arch.sie_block->gpsw;
->       -	unsigned long _len, nr_pages, gpa, idx;
->       +	unsigned long nr_pages, gpa, idx;
->      -+	unsigned int fragment_len;
->        	unsigned long pages_array[2];
->      ++	unsigned int fragment_len;
->        	unsigned long *pages;
->        	int need_ipte_lock;
->      + 	union asce asce;
->       @@ arch/s390/kvm/gaccess.c: int access_guest(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar, void *data,
->        		ipte_lock(vcpu);
->        	rc = guest_page_range(vcpu, ga, ar, pages, nr_pages, asce, mode);
-> 2:  7080846c8c07 ! 2:  91cadb42cbbc KVM: s390: gaccess: Refactor access address range check
->      @@ Commit message
->           range.
->       
->           Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
->      +    Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
->       
->        ## arch/s390/kvm/gaccess.c ##
->       @@ arch/s390/kvm/gaccess.c: static int low_address_protection_enabled(struct kvm_vcpu *vcpu,
->      @@ arch/s390/kvm/gaccess.c: static int low_address_protection_enabled(struct kvm_vc
->       + * a correct exception into the guest.
->       + * The resulting gpas are stored into @gpas, unless it is NULL.
->       + *
->      -+ * Note: All gpas except the first one start at the beginning of a page.
->      ++ * Note: All fragments except the first one start at the beginning of a page.
->       + *       When deriving the boundaries of a fragment from a gpa, all but the last
->       + *       fragment end at the end of the page.
->       + *
->      @@ arch/s390/kvm/gaccess.c: int access_guest(struct kvm_vcpu *vcpu, unsigned long g
->        {
->        	psw_t *psw = &vcpu->arch.sie_block->gpsw;
->       -	unsigned long nr_pages, gpa, idx;
->      +-	unsigned long pages_array[2];
->       +	unsigned long nr_pages, idx;
->      ++	unsigned long gpa_array[2];
->        	unsigned int fragment_len;
->      --	unsigned long pages_array[2];
->       -	unsigned long *pages;
->      -+	unsigned long gpa_array[2];
->       +	unsigned long *gpas;
->        	int need_ipte_lock;
->        	union asce asce;
-> 3:  c991cbdbfbd5 ! 3:  f5000a22efcd KVM: s390: gaccess: Cleanup access to guest frames
->      @@ Metadata
->       Author: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
->       
->        ## Commit message ##
->      -    KVM: s390: gaccess: Cleanup access to guest frames
->      +    KVM: s390: gaccess: Cleanup access to guest pages
->       
->           Introduce a helper function for guest frame access.
->       
->           Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
->      +    Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
->       
->        ## arch/s390/kvm/gaccess.c ##
->       @@ arch/s390/kvm/gaccess.c: static int guest_range_to_gpas(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar,
->      @@ arch/s390/kvm/gaccess.c: static int guest_range_to_gpas(struct kvm_vcpu *vcpu, u
->        }
->        
->       +static int access_guest_page(struct kvm *kvm, enum gacc_mode mode, gpa_t gpa,
->      -+			      void *data, unsigned int len)
->      ++			     void *data, unsigned int len)
->       +{
->       +	const unsigned int offset = offset_in_page(gpa);
->       +	const gfn_t gfn = gpa_to_gfn(gpa);
-> 
-> base-commit: d25f27432f80a800a3592db128254c8140bd71bf
+> Thanks,
+> Reiji
 > 
 
