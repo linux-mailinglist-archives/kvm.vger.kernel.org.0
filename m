@@ -2,251 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A09F46C442
-	for <lists+kvm@lfdr.de>; Tue,  7 Dec 2021 21:12:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C982F46C4BD
+	for <lists+kvm@lfdr.de>; Tue,  7 Dec 2021 21:38:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241162AbhLGUP0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Dec 2021 15:15:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42454 "EHLO
+        id S241218AbhLGUln (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Dec 2021 15:41:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241155AbhLGUPZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Dec 2021 15:15:25 -0500
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAF8CC061574
-        for <kvm@vger.kernel.org>; Tue,  7 Dec 2021 12:11:53 -0800 (PST)
-Received: by mail-lj1-x235.google.com with SMTP id u22so232472lju.7
-        for <kvm@vger.kernel.org>; Tue, 07 Dec 2021 12:11:53 -0800 (PST)
+        with ESMTP id S238038AbhLGUlm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Dec 2021 15:41:42 -0500
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58111C061746
+        for <kvm@vger.kernel.org>; Tue,  7 Dec 2021 12:38:12 -0800 (PST)
+Received: by mail-pf1-x430.google.com with SMTP id z6so473029pfe.7
+        for <kvm@vger.kernel.org>; Tue, 07 Dec 2021 12:38:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=2z7VIjH3TRs3FpPaGmEQIvXC55nA6LV8PLAtnIHRqT8=;
-        b=fqQnRafBkW372Q6GgBqp6mQfANVcsgQqnqRwUd5sbog1eoIAwA6G2hqLrxexyjJlV2
-         xu46/rqUqcPRGuQlH5v71fIaSUpe1jw1eAL0nyCBiIciXfVcXFA3MEuZ/hQokpki77e4
-         GWwpIFN7NB6IYAbwQDkmkV2H7RN0VCQ9T90SF2HxuLObzfbIS0wgVLWgP45bx0RItHIh
-         QwoCs40wt1E0+fGNO6Ts+ZZ7pVLIB6QTL7WPel5CmZA/muJkS5nZ0FHqTQ9GBecuNyVw
-         h9YxY4lzouo9rRzCAezaQ1am54bKLaJA+kZLKZyyi0jSfLHl4hcPnuOpY+Yx/uPVQN2n
-         MvGA==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=tahw8lr7Eo912eVNmXdwIVFgh3iBz1otD8cy1FuG8Cg=;
+        b=OmzCiDKsu5J4DzIaB5MMSPO6KacFic5zES9uE2LRjQwuYUVqw/QwUNiuiEWVdgaZLg
+         eNduadsDzhJuvz/mSkv/2H0PHwbXrImNTQ+1OW1C7Ag0xmiZcqcrdKnvu+K+3Gnj6rlo
+         3u9cggyGj/AiXzdcM/oQEP7kpts/QVdb6Yqzb/7O7UKtlPvwezjnPutSx3pvuDjH9TWq
+         IJmnXaAErs/tn0sAd7aQvn6l6UUY4WndUSV/nno0FbeC33/uMwIwCz7EBkv6jAXVBNGh
+         +mYsrGXxK+iyOiI15r3jnOCOx2txoVzXxApt9EkHKXosyChJpGS+CWkMKS/eMN7ifuiX
+         M46A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=2z7VIjH3TRs3FpPaGmEQIvXC55nA6LV8PLAtnIHRqT8=;
-        b=EaLcNQ+Jbm9ycXhwryrhtq1IogDjN+4MA8222rhGjUd9UFkPIiqK8C9GouEheXInc2
-         NFaawb2A5EUPH5D8F38CeVNSApxt2l7MARfa5J3ORA/2keAWTXUdbKTdfAB7dD2hgJBV
-         P1MbQqZfkYrrEHF4BCprGPvGP1AVLaoN9CjwMHSIrDNXdo56NNyIA5CdWGBzpBFg4uC8
-         2DnOtYQmA1JFbh47FEgk5lhC9hBZASnLxgik/QSRagKk3sLr5TXmoEBYJuN4YNmlL3Eg
-         KijLUWYOdtaMOqx4LRFAmjuMlmfsZkOX+Ohyc01CVI9bOgtjquYEYJDRTVd7buwaIGqo
-         /a6g==
-X-Gm-Message-State: AOAM532iDAgZwEY1bNOf1gfBUAkvbf6ZWb59nuldZDNcrK92YdQtykHA
-        TFcyjzO/JCNMHIBnw9jJQ4QFhO7RfEnixEkpmh6+dA==
-X-Google-Smtp-Source: ABdhPJwojJy7U4uludZX2r0j1VHbxE3KFK7XAT9u9QEQIuXEvNWRi5p0VU92qo30YTets9rMe0Fg6wazCsw6TVWXyCs=
-X-Received: by 2002:a05:651c:1507:: with SMTP id e7mr44503454ljf.83.1638907911864;
- Tue, 07 Dec 2021 12:11:51 -0800 (PST)
-MIME-Version: 1.0
-References: <20211123005036.2954379-1-pbonzini@redhat.com> <20211123005036.2954379-9-pbonzini@redhat.com>
- <CAMkAt6ouPVpRAAEhT1SgYEr3egiVCziKxV0viRiQxg7MD0dHHQ@mail.gmail.com>
-In-Reply-To: <CAMkAt6ouPVpRAAEhT1SgYEr3egiVCziKxV0viRiQxg7MD0dHHQ@mail.gmail.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Tue, 7 Dec 2021 13:11:40 -0700
-Message-ID: <CAMkAt6pLD-r9Zi+31nZYZKh=EpeYPc-nyc8pA_5DtspB3Xv03w@mail.gmail.com>
-Subject: Re: [PATCH 08/12] selftests: sev_migrate_tests: add tests for KVM_CAP_VM_COPY_ENC_CONTEXT_FROM
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=tahw8lr7Eo912eVNmXdwIVFgh3iBz1otD8cy1FuG8Cg=;
+        b=Ze/yAs/DBEr3UCmeunkf1hXsjnNL5Ozimu3Siw4FBbk7TzWKRK4SlUQj0wJNRNkElm
+         ab8F/BKDg13MTvSBZ9yAw8/i7SCTjih6WUU6sQTOFzfyS73qSEf+IdKH1ZoGoo0lFIDE
+         BM3JvTeF0v1XeRmg/uUx1FyJF9cbdP6FTqAAlbPo+rKffNwZBPaAY7U7B+sKKgt8PxW5
+         Rf1L/RSF0O1lxDI5N4mq7dnYI9f9m0P94Z9Hv1gc54qJYciZLY9RfToSmqyUT8iJA0e9
+         bkg0HKG/bVCeLlCJhRkbaVYAxGxFUlf676ni4Wg/bx/jvqGcNd97Bg6l2nbd574420ro
+         rygQ==
+X-Gm-Message-State: AOAM5329qcOxqqgf0OyIpaVVuA0NiJ2MufjHFPU3K12Sn2TD3jZJdkPf
+        Jd0ydhpjKQu4y5tq3VCiyMqsmg==
+X-Google-Smtp-Source: ABdhPJzlswD2/fTrqx7DkQ75CY5WTclgyGqyPn8nSQijFnbfMbm3xn3hDTx9KEgZoTes5fg4RVGQ4Q==
+X-Received: by 2002:a05:6a00:148c:b0:49f:e048:25dc with SMTP id v12-20020a056a00148c00b0049fe04825dcmr1429664pfu.12.1638909491636;
+        Tue, 07 Dec 2021 12:38:11 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id t2sm663266pfd.36.2021.12.07.12.38.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Dec 2021 12:38:11 -0800 (PST)
+Date:   Tue, 7 Dec 2021 20:38:07 +0000
+From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Cc:     Lai Jiangshan <jiangshanlai@gmail.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Lai Jiangshan <laijs@linux.alibaba.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH 05/15] KVM: VMX: Add document to state that write to uret
+ msr should always be intercepted
+Message-ID: <Ya/GL0zyobfM1rUF@google.com>
+References: <20211118110814.2568-1-jiangshanlai@gmail.com>
+ <20211118110814.2568-6-jiangshanlai@gmail.com>
+ <226fc242-ae46-3214-4e01-dbfdf5f7c0fb@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <226fc242-ae46-3214-4e01-dbfdf5f7c0fb@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 1, 2021 at 11:09 AM Peter Gonda <pgonda@google.com> wrote:
->
-> On Mon, Nov 22, 2021 at 5:50 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
-> >
-> > I am putting the tests in sev_migrate_tests because the failure conditions are
-> > very similar and some of the setup code can be reused, too.
-> >
-> > The tests cover both successful creation of a mirror VM, and error
-> > conditions.
-> >
-> > Cc: Peter Gonda <pgonda@google.com>
-> > Cc: Sean Christopherson <seanjc@google.com>
-> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+On Thu, Nov 18, 2021, Paolo Bonzini wrote:
+> On 11/18/21 12:08, Lai Jiangshan wrote:
+> > From: Lai Jiangshan <laijs@linux.alibaba.com>
+> > 
+> > And adds a corresponding sanity check code.
+> > 
+> > Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
 > > ---
-> >  .../selftests/kvm/x86_64/sev_migrate_tests.c  | 112 ++++++++++++++++--
-> >  1 file changed, 105 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c b/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c
-> > index 0cd7e2eaa895..d265cea5de85 100644
-> > --- a/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c
-> > +++ b/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c
-> > @@ -54,12 +54,15 @@ static struct kvm_vm *sev_vm_create(bool es)
-> >         return vm;
-> >  }
-> >
-> > -static struct kvm_vm *__vm_create(void)
-> > +static struct kvm_vm *aux_vm_create(bool with_vcpus)
-> >  {
-> >         struct kvm_vm *vm;
-> >         int i;
-> >
-> >         vm = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
-> > +       if (!with_vcpus)
-> > +               return vm;
+> >   arch/x86/kvm/vmx/vmx.c | 10 +++++++++-
+> >   1 file changed, 9 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > index e8a41fdc3c4d..cd081219b668 100644
+> > --- a/arch/x86/kvm/vmx/vmx.c
+> > +++ b/arch/x86/kvm/vmx/vmx.c
+> > @@ -3703,13 +3703,21 @@ void vmx_disable_intercept_for_msr(struct kvm_vcpu *vcpu, u32 msr, int type)
+> >   	if (!cpu_has_vmx_msr_bitmap())
+> >   		return;
+> > +	/*
+> > +	 * Write to uret msr should always be intercepted due to the mechanism
+> > +	 * must know the current value.  Santity check to avoid any inadvertent
+> > +	 * mistake in coding.
+> > +	 */
+> > +	if (WARN_ON_ONCE(vmx_find_uret_msr(vmx, msr) && (type & MSR_TYPE_W)))
+> > +		return;
 > > +
-> >         for (i = 0; i < NR_MIGRATE_TEST_VCPUS; ++i)
-> >                 vm_vcpu_add(vm, i);
-> >
-> > @@ -93,7 +96,7 @@ static void test_sev_migrate_from(bool es)
-> >
-> >         src_vm = sev_vm_create(es);
-> >         for (i = 0; i < NR_MIGRATE_TEST_VMS; ++i)
-> > -               dst_vms[i] = __vm_create();
-> > +               dst_vms[i] = aux_vm_create(true);
-> >
-> >         /* Initial migration from the src to the first dst. */
-> >         sev_migrate_from(dst_vms[0]->fd, src_vm->fd);
-> > @@ -162,7 +165,7 @@ static void test_sev_migrate_parameters(void)
-> >         sev_vm = sev_vm_create(/* es= */ false);
-> >         sev_es_vm = sev_vm_create(/* es= */ true);
-> >         vm_no_vcpu = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
-> > -       vm_no_sev = __vm_create();
-> > +       vm_no_sev = aux_vm_create(true);
-> >         sev_es_vm_no_vmsa = vm_create(VM_MODE_DEFAULT, 0, O_RDWR);
-> >         sev_ioctl(sev_es_vm_no_vmsa->fd, KVM_SEV_ES_INIT, NULL);
-> >         vm_vcpu_add(sev_es_vm_no_vmsa, 1);
-> > @@ -203,11 +206,106 @@ static void test_sev_migrate_parameters(void)
-> >         kvm_vm_free(vm_no_sev);
-> >  }
-> >
-> > +static int __sev_mirror_create(int dst_fd, int src_fd)
-> > +{
-> > +       struct kvm_enable_cap cap = {
-> > +               .cap = KVM_CAP_VM_COPY_ENC_CONTEXT_FROM,
-> > +               .args = { src_fd }
-> > +       };
-> > +
-> > +       return ioctl(dst_fd, KVM_ENABLE_CAP, &cap);
-> > +}
-> > +
-> > +
-> > +static void sev_mirror_create(int dst_fd, int src_fd)
-> > +{
-> > +       int ret;
-> > +
-> > +       ret = __sev_mirror_create(dst_fd, src_fd);
-> > +       TEST_ASSERT(!ret, "Copying context failed, ret: %d, errno: %d\n", ret, errno);
-> > +}
-> > +
-> > +static void test_sev_mirror(bool es)
-> > +{
-> > +       struct kvm_vm *src_vm, *dst_vm;
-> > +       struct kvm_sev_launch_start start = {
-> > +               .policy = es ? SEV_POLICY_ES : 0
-> > +       };
-> > +       int i;
-> > +
-> > +       src_vm = sev_vm_create(es);
-> > +       dst_vm = aux_vm_create(false);
-> > +
-> > +       sev_mirror_create(dst_vm->fd, src_vm->fd);
-> > +
-> > +       /* Check that we can complete creation of the mirror VM.  */
-> > +       for (i = 0; i < NR_MIGRATE_TEST_VCPUS; ++i)
-> > +               vm_vcpu_add(dst_vm, i);
-> > +       sev_ioctl(dst_vm->fd, KVM_SEV_LAUNCH_START, &start);
->
-> I don't think this should be called on the mirror and I think it
-> should be an error.
->
-> In  is_cmd_allowed_from_mirror() KVM_SEV_LAUNCH_START should not be allowed:
->
-> if (cmd_id == KVM_SEV_LAUNCH_UPDATE_VMSA ||
->    cmd_id == KVM_SEV_GUEST_STATUS || cmd_id == KVM_SEV_DBG_DECRYPT ||
->    cmd_id == KVM_SEV_DBG_ENCRYPT)
-> return true;
->
-> This overrides the mirrored values and sets up the VM as a new SEV
-> context. I would have thought the sev_bind_asid() in
-> sev_launch_start() would fail because the asid is already used by the
-> source.
+> 
+> I'm not sure about this one, it's relatively expensive to call
+> vmx_find_uret_msr.
+> 
+> User-return MSRs and disable-intercept MSRs are almost the opposite: uret is
+> for MSRs that the host (not even the processor) never uses,
+> disable-intercept is for MSRs that the guest reads/writes often.  As such it
+> seems almost impossible that they overlap.
 
-Since you already queue'd this I sent another patch to fix the issue
-with sev_ioctl() and remove this call.
-
->
-> > +       if (es)
-> > +               sev_ioctl(dst_vm->fd, KVM_SEV_LAUNCH_UPDATE_VMSA, NULL);
-> > +
-> > +       kvm_vm_free(src_vm);
-> > +       kvm_vm_free(dst_vm);
-> > +}
-> > +
-> > +static void test_sev_mirror_parameters(void)
-> > +{
-> > +       struct kvm_vm *sev_vm, *sev_es_vm, *vm_no_vcpu, *vm_with_vcpu;
-> > +       int ret;
-> > +
-> > +       sev_vm = sev_vm_create(/* es= */ false);
-> > +       sev_es_vm = sev_vm_create(/* es= */ true);
-> > +       vm_with_vcpu = aux_vm_create(true);
-> > +       vm_no_vcpu = aux_vm_create(false);
-> > +
-> > +       ret = __sev_mirror_create(sev_vm->fd, sev_vm->fd);
-> > +       TEST_ASSERT(
-> > +               ret == -1 && errno == EINVAL,
-> > +               "Should not be able copy context to self. ret: %d, errno: %d\n",
-> > +               ret, errno);
-> > +
-> > +       ret = __sev_mirror_create(sev_vm->fd, sev_es_vm->fd);
-> > +       TEST_ASSERT(
-> > +               ret == -1 && errno == EINVAL,
-> > +               "Should not be able copy context to SEV enabled VM. ret: %d, errno: %d\n",
-> > +               ret, errno);
-> > +
-> > +       ret = __sev_mirror_create(sev_es_vm->fd, sev_vm->fd);
-> > +       TEST_ASSERT(
-> > +               ret == -1 && errno == EINVAL,
-> > +               "Should not be able copy context to SEV-ES enabled VM. ret: %d, errno: %d\n",
-> > +               ret, errno);
-> > +
-> > +       ret = __sev_mirror_create(vm_no_vcpu->fd, vm_with_vcpu->fd);
-> > +       TEST_ASSERT(ret == -1 && errno == EINVAL,
-> > +                   "Copy context requires SEV enabled. ret %d, errno: %d\n", ret,
-> > +                   errno);
-> > +
-> > +       ret = __sev_mirror_create(vm_with_vcpu->fd, sev_vm->fd);
-> > +       TEST_ASSERT(
-> > +               ret == -1 && errno == EINVAL,
-> > +               "SEV copy context requires no vCPUS on the destination. ret: %d, errno: %d\n",
-> > +               ret, errno);
-> > +
-> > +       kvm_vm_free(sev_vm);
-> > +       kvm_vm_free(sev_es_vm);
-> > +       kvm_vm_free(vm_with_vcpu);
-> > +       kvm_vm_free(vm_no_vcpu);
-> > +}
-> > +
-> >  int main(int argc, char *argv[])
-> >  {
-> > -       test_sev_migrate_from(/* es= */ false);
-> > -       test_sev_migrate_from(/* es= */ true);
-> > -       test_sev_migrate_locking();
-> > -       test_sev_migrate_parameters();
-> > +       if (kvm_check_cap(KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM)) {
-> > +               test_sev_migrate_from(/* es= */ false);
-> > +               test_sev_migrate_from(/* es= */ true);
-> > +               test_sev_migrate_locking();
-> > +               test_sev_migrate_parameters();
-> > +       }
-> > +       if (kvm_check_cap(KVM_CAP_VM_COPY_ENC_CONTEXT_FROM)) {
-> > +               test_sev_mirror(/* es= */ false);
-> > +               test_sev_mirror(/* es= */ true);
-> > +               test_sev_mirror_parameters();
-> > +       }
-> >         return 0;
-> >  }
-> > --
-> > 2.27.0
-> >
-> >
+And they aren't fundamentally mutually exclusive, e.g. KVM could pass-through an
+MSR and then do RDMSR in vmx_prepare_switch_to_host() to refresh the uret data
+with the current (guest) value.  It'd be silly, but it would work.
