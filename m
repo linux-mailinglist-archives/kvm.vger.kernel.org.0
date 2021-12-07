@@ -2,198 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F37BC46B567
-	for <lists+kvm@lfdr.de>; Tue,  7 Dec 2021 09:10:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E369446B598
+	for <lists+kvm@lfdr.de>; Tue,  7 Dec 2021 09:21:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231158AbhLGIOY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Dec 2021 03:14:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39556 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230228AbhLGIOY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Dec 2021 03:14:24 -0500
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7950DC061746
-        for <kvm@vger.kernel.org>; Tue,  7 Dec 2021 00:10:54 -0800 (PST)
-Received: by mail-pj1-x1035.google.com with SMTP id nh10-20020a17090b364a00b001a69adad5ebso2000688pjb.2
-        for <kvm@vger.kernel.org>; Tue, 07 Dec 2021 00:10:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=kw180PlZm49P4EPCW2Fkk5Cc6NuxVYiIeRmKk9+4sDw=;
-        b=e3toeNpChZlvg+QWvmXtYC1DYZUZ6o4jwHITasU8lv9Di1mHWtdAkz/x29pbbsAfN9
-         Vo/U4vxKnjRVwlghM41B1dynnyifYBDzbqRhJtWnSvFdSG+a77S0CN5AvDWQYnTBiVdn
-         tMZA1Wimx+WnS2yCLqfPFd0clwVdHZm8JNKpmoeJRBHNDS59OPR9EcKJ7UbyZJNNvuXG
-         pSHW7YLDdlA+ADkKfIsgH3K8c16JGA9413zVBTnVW6NlC2EFQFkpfthpfsarNPTgrIUx
-         DmLQMVQlj8ns/JEm4nJRioEh+0Irp2ZR97gUdaz0q8jiLRAkljhlgZT1L1oUykQPARAu
-         ndRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=kw180PlZm49P4EPCW2Fkk5Cc6NuxVYiIeRmKk9+4sDw=;
-        b=wvrgY8obxwC5a+7VKKLV8R3ZkalMFfNzKvTPsP4DR3u+5UCl3UEhoNaHYrQcZfKPeL
-         Jq/GXo1OmgCPJQNM11Zwupk9yOVsTAMRSdk0tTplvE6vB3YK31qLNebCqX6WCUeur5Ns
-         /uWqsW2OUGEL2zXOxO9RD8UI9URRJKiRRrQ+R4gBiIA5sXLTd+q8ZTRWOUoqGYq+wDj4
-         efh6Uj14BWxdt+9F/UPf1nCfvuEZdA3WWInNKqj8QNxrYa7Zq80wjmqYpKlXoMRSO2mX
-         ioJDrsT+7QeYPlNBcmoiJjTqjyshDy0hojiOPyfKnHeR0nGfc0OszKNnLUTnL6DPFeK6
-         LQqA==
-X-Gm-Message-State: AOAM532SO7p4Y+k22ff7fIohMvZ6M+eonFDs+pViMkMroR3ZmXxlJJ8j
-        Tnfyv+pEXzQsDf2JvwbsBmTK24ZIjp2FrUEuYaaiNg==
-X-Google-Smtp-Source: ABdhPJxwj8S+xE14NCZvmFndNf8YkjU5XEOXBG3g6u7YNHZDkHAouVhacZUsFavr+AD7MnjDkuwYLc5RCekiD4fMyuA=
-X-Received: by 2002:a17:902:d703:b0:144:e012:d550 with SMTP id
- w3-20020a170902d70300b00144e012d550mr48891341ply.38.1638864653767; Tue, 07
- Dec 2021 00:10:53 -0800 (PST)
-MIME-Version: 1.0
-References: <20211117064359.2362060-1-reijiw@google.com> <20211117064359.2362060-10-reijiw@google.com>
- <d09e53a7-b8df-e8fd-c34a-f76a37d664d6@redhat.com> <CAAeT=FzM=sLF=PkY_shhcYmfo+ReGEBN8XX=QQObavXDtwxFJQ@mail.gmail.com>
- <5bd01c9c-6ac8-4034-6f49-be636a3b287c@redhat.com> <CAAeT=FwEogskDQVwwTkZSstYX7-X0r1B+hUUHbZOE5T5o9V=ww@mail.gmail.com>
- <2ed3072b-f83d-1b17-0949-ca38267ba94e@redhat.com> <CAAeT=Fy7JuCQKgy-ZaS9wPe6h93_WRMYmhihovYDjyg2a+BqNw@mail.gmail.com>
- <Ya3dQeXjUxAG8cCJ@monolith.localdoman>
-In-Reply-To: <Ya3dQeXjUxAG8cCJ@monolith.localdoman>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Tue, 7 Dec 2021 00:10:37 -0800
-Message-ID: <CAAeT=FxnjQw=zdYJzM4sB3zgs+7fE9KXV-wT_cDMGTXeVfqSvA@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 09/29] KVM: arm64: Hide IMPLEMENTATION DEFINED PMU
- support for the guest
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     Eric Auger <eauger@redhat.com>, kvm@vger.kernel.org,
-        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel@lists.infradead.org
+        id S232342AbhLGIYj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Dec 2021 03:24:39 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:29733 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229567AbhLGIYj (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 7 Dec 2021 03:24:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1638865268;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jVt80OLLqyDLKlOzN/rfCCQXvXMRis170dBXGGpPZsQ=;
+        b=ZWPrlsbjTxwR9p8Vmpq/FGuVrrt/jXRoWhVoT40ntGex4PFTnLgHlUF4+n3rctkQ5lal0K
+        ssiRglPaEriusz9aTQUWilrTtulTXnYwBLzZVh0qvvVnqi2lsxrkTnd3LjMz3vlmxPO6bt
+        OGQrMgO8gDEut1f6WyhVwQjMYY7Z85U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-204-iikRPffrNsGR4o7bdUOr3A-1; Tue, 07 Dec 2021 03:21:04 -0500
+X-MC-Unique: iikRPffrNsGR4o7bdUOr3A-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 14AA010199B9;
+        Tue,  7 Dec 2021 08:20:45 +0000 (UTC)
+Received: from starship (unknown [10.40.192.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C0B735D6CF;
+        Tue,  7 Dec 2021 08:20:38 +0000 (UTC)
+Message-ID: <35c1f907338fdc418a64c685d5a0a44669774627.camel@redhat.com>
+Subject: Re: [syzbot] WARNING in nested_vmx_vmexit
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, jmattson@google.com,
+        syzbot <syzbot+f1d2136db9c80d4733e8@syzkaller.appspotmail.com>,
+        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+        joro@8bytes.org, linux-kernel@vger.kernel.org, mingo@redhat.com,
+        pbonzini@redhat.com, syzkaller-bugs@googlegroups.com,
+        tglx@linutronix.de, wanpengli@tencent.com, x86@kernel.org
+Date:   Tue, 07 Dec 2021 10:20:37 +0200
+In-Reply-To: <87k0gh675j.fsf@redhat.com>
+References: <00000000000051f90e05d2664f1d@google.com>
+         <87bl1u6qku.fsf@redhat.com> <Ya40sXNcLzBUlpdW@google.com>
+         <87k0gh675j.fsf@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Alex,
+On Mon, 2021-12-06 at 17:16 +0100, Vitaly Kuznetsov wrote:
+> Sean Christopherson <seanjc@google.com> writes:
+> 
+> > On Mon, Dec 06, 2021, Vitaly Kuznetsov wrote:
+> > > syzbot <syzbot+f1d2136db9c80d4733e8@syzkaller.appspotmail.com> writes:
+> > > 
+> > > > Hello,
+> > > > 
+> > > > syzbot found the following issue on:
+> > > > 
+> > > > HEAD commit:    5f58da2befa5 Merge tag 'drm-fixes-2021-12-03-1' of git://a..
+> > > > git tree:       upstream
+> > > > console output: https://syzkaller.appspot.com/x/log.txt?x=14927309b00000
+> > > > kernel config:  https://syzkaller.appspot.com/x/.config?x=e9ea28d2c3c2c389
+> > > > dashboard link: https://syzkaller.appspot.com/bug?extid=f1d2136db9c80d4733e8
+> > > > compiler:       Debian clang version 11.0.1-2, GNU ld (GNU Binutils for Debian) 2.35.2
+> > > > 
+> > > > Unfortunately, I don't have any reproducer for this issue yet.
+> > > > 
+> > > > IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> > > > Reported-by: syzbot+f1d2136db9c80d4733e8@syzkaller.appspotmail.com
+> > > > 
+> > > > ------------[ cut here ]------------
+> > > > WARNING: CPU: 0 PID: 21158 at arch/x86/kvm/vmx/nested.c:4548 nested_vmx_vmexit+0x16bd/0x17e0 arch/x86/kvm/vmx/nested.c:4547
+> > > > Modules linked in:
+> > > > CPU: 0 PID: 21158 Comm: syz-executor.1 Not tainted 5.16.0-rc3-syzkaller #0
+> > > > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+> > > > RIP: 0010:nested_vmx_vmexit+0x16bd/0x17e0 arch/x86/kvm/vmx/nested.c:4547
+> > > 
+> > > The comment above this WARN_ON_ONCE() says:
+> > > 
+> > > 4541)              /*
+> > > 4542)               * The only expected VM-instruction error is "VM entry with
+> > > 4543)               * invalid control field(s)." Anything else indicates a
+> > > 4544)               * problem with L0.  And we should never get here with a
+> > > 4545)               * VMFail of any type if early consistency checks are enabled.
+> > > 4546)               */
+> > > 4547)              WARN_ON_ONCE(vmcs_read32(VM_INSTRUCTION_ERROR) !=
+> > > 4548)                           VMXERR_ENTRY_INVALID_CONTROL_FIELD);
+> > > 
+> > > which I think should still be valid and so the problem needs to be
+> > > looked at L0 (GCE infrastructure). Sean, Jim, your call :-)
+> > 
+> > The assertion itself is still valid, but look at the call stack.  This is firing
+> > when KVM tears down the VM, i.e. vmx->fail is likely stale.
+> 
+> Oh, I see, true that!
+> 
+> >  I'll bet dollars to
+> > donuts that commit c8607e4a086f ("KVM: x86: nVMX: don't fail nested VM entry on
+> > invalid guest state if !from_vmentry") is to blame.  L1 is running with
+> > unrestricted_guest=Y, so the only way vmx->emulation_required should become true
+> > is if L2 is active and is not an unrestricted guest.
+> > 
+> > I objected to the patch[*], but looking back at the dates, it appears that I did
+> > so after the patch was queued and my comments were never addressed.  
+> > I'll see if I can reproduce this with a selftest.  The fix is likely just:
+> > 
+> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > index dc4909b67c5c..927a7c43b73b 100644
+> > --- a/arch/x86/kvm/vmx/vmx.c
+> > +++ b/arch/x86/kvm/vmx/vmx.c
+> > @@ -6665,10 +6665,6 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
+> >          * consistency check VM-Exit due to invalid guest state and bail.
+> >          */
+> >         if (unlikely(vmx->emulation_required)) {
+> > -
+> > -               /* We don't emulate invalid state of a nested guest */
+> > -               vmx->fail = is_guest_mode(vcpu);
+> > -
+> >                 vmx->exit_reason.full = EXIT_REASON_INVALID_STATE;
+> >                 vmx->exit_reason.failed_vmentry = 1;
+> >                 kvm_register_mark_available(vcpu, VCPU_EXREG_EXIT_INFO_1);
+> > 
+> > [*] https://lore.kernel.org/all/YWDWPbgJik5spT1D@google.com/
+> > 
+> 
+> Let's also summon Max to the discussion to get his thoughts.
 
-On Mon, Dec 6, 2021 at 1:52 AM Alexandru Elisei
-<alexandru.elisei@arm.com> wrote:
->
-> Hi,
->
-> On Sat, Dec 04, 2021 at 09:39:59AM -0800, Reiji Watanabe wrote:
-> > Hi Eric,
-> >
-> > On Sat, Dec 4, 2021 at 6:14 AM Eric Auger <eauger@redhat.com> wrote:
-> > >
-> > > Hi Reiji,
-> > >
-> > > On 12/4/21 2:04 AM, Reiji Watanabe wrote:
-> > > > Hi Eric,
-> > > >
-> > > > On Thu, Dec 2, 2021 at 2:57 AM Eric Auger <eauger@redhat.com> wrote:
-> > > >>
-> > > >> Hi Reiji,
-> > > >>
-> > > >> On 11/30/21 6:32 AM, Reiji Watanabe wrote:
-> > > >>> Hi Eric,
-> > > >>>
-> > > >>> On Thu, Nov 25, 2021 at 12:30 PM Eric Auger <eauger@redhat.com> wrote:
-> > > >>>>
-> > > >>>> Hi Reiji,
-> > > >>>>
-> > > >>>> On 11/17/21 7:43 AM, Reiji Watanabe wrote:
-> > > >>>>> When ID_AA64DFR0_EL1.PMUVER or ID_DFR0_EL1.PERFMON is 0xf, which
-> > > >>>>> means IMPLEMENTATION DEFINED PMU supported, KVM unconditionally
-> > > >>>>> expose the value for the guest as it is.  Since KVM doesn't support
-> > > >>>>> IMPLEMENTATION DEFINED PMU for the guest, in that case KVM should
-> > > >>>>> exopse 0x0 (PMU is not implemented) instead.
-> > > >>>> s/exopse/expose
-> > > >>>>>
-> > > >>>>> Change cpuid_feature_cap_perfmon_field() to update the field value
-> > > >>>>> to 0x0 when it is 0xf.
-> > > >>>> is it wrong to expose the guest with a Perfmon value of 0xF? Then the
-> > > >>>> guest should not use it as a PMUv3?
-> > > >>>
-> > > >>>> is it wrong to expose the guest with a Perfmon value of 0xF? Then the
-> > > >>>> guest should not use it as a PMUv3?
-> > > >>>
-> > > >>> For the value 0xf in ID_AA64DFR0_EL1.PMUVER and ID_DFR0_EL1.PERFMON,
-> > > >>> Arm ARM says:
-> > > >>>   "IMPLEMENTATION DEFINED form of performance monitors supported,
-> > > >>>    PMUv3 not supported."
-> > > >>>
-> > > >>> Since the PMU that KVM supports for guests is PMUv3, 0xf shouldn't
-> > > >>> be exposed to guests (And this patch series doesn't allow userspace
-> > > >>> to set the fields to 0xf for guests).
-> > > >> What I don't get is why this isn't detected before (in kvm_reset_vcpu).
-> > > >> if the VCPU was initialized with KVM_ARM_VCPU_PMU_V3 can we honor this
-> > > >> init request if the host pmu is implementation defined?
-> > > >
-> > > > KVM_ARM_VCPU_INIT with KVM_ARM_VCPU_PMU_V3 will fail in
-> > > > kvm_reset_vcpu() if the host PMU is implementation defined.
-> > >
-> > > OK. This was not obvsious to me.
-> > >
-> > >                 if (kvm_vcpu_has_pmu(vcpu) && !kvm_arm_support_pmu_v3()) {
-> > >                         ret = -EINVAL;
-> > >                         goto out;
-> > >                 }
-> > >
-> > > kvm_perf_init
-> > > +       if (perf_num_counters() > 0)
-> > > +               static_branch_enable(&kvm_arm_pmu_available);
-> > >
-> > > But I believe you ;-), sorry for the noise
-> >
-> > Thank you for the review !
-> >
-> > I didn't find the code above in v5.16-rc3, which is the base code of
-> > this series.  So, I'm not sure where the code came from (any kvmarm
-> > repository branch ??).
-> >
-> > What I see in v5.16-rc3 is:
-> > ----
-> > int kvm_perf_init(void)
-> > {
-> >         return perf_register_guest_info_callbacks(&kvm_guest_cbs);
-> > }
-> >
-> > void kvm_host_pmu_init(struct arm_pmu *pmu)
-> > {
-> >         if (pmu->pmuver != 0 && pmu->pmuver != ID_AA64DFR0_PMUVER_IMP_DEF &&
-> >             !kvm_arm_support_pmu_v3() && !is_protected_kvm_enabled())
-> >                 static_branch_enable(&kvm_arm_pmu_available);
-> > }
-> > ----
-> >
-> > And I don't find any other code that enables kvm_arm_pmu_available.
->
-> The code was recently changed (in v5.15 I think), I think Eric is looking
-> at an older version.
->
-> >
-> > Looking at the KVM's PMUV3 support code for guests in v5.16-rc3,
-> > if KVM allows userspace to configure KVM_ARM_VCPU_PMU_V3 even with
-> > ID_AA64DFR0_PMUVER_IMP_DEF on the host (, which I don't think it does),
-> > I think we should fix that to not allow that.
->
-> I recently started looking into that too. If there's only one PMU, then the
-> guest won't see the value IMP DEF for PMUVer (userspace cannot set the PMU
-> feature because !kvm_arm_support_pmu_v3()).
->
-> On heterogeneous systems with multiple PMUs, it gets complicated. I don't
-> have any such hardware, but what I think will happen is that KVM will
-> enable the static branch if there is at least one PMU with
-> PMUVer != IMP_DEF, even if there are other PMUs with PMUVer = IMP_DEF. But
-> read_sanitised_ftr_reg() will always return 0 for the
-> PMUVer field because the field is defined as FTR_EXACT with a safe value of
-> 0 in cpufeature.c. So the guest ends up seeing PMUVer = 0.
->
-> I'm not sure if this is the case because I'm not familiar with the cpu
-> features code, but I planning to investigate further.
+I'll take a look at that soon. Need to page in the reason why
+this has to be done.
 
-Thank you for the comment !
 
-Yes, it looks like that KVM will enable the static branch if there
-is at least one PMU with PMUVer != 0 && PMUVer != IMP_DEF.
-(then, yes, AA64DFR0.PMUVER will be 0 even for a vCPU that
- KVM_ARM_VCPU_PMU_V3 is successfully configured for in the case)
+I remember that we have wierd case of L1 beeing in invalid state,
+because some of the SMM's invalid state is leaking to L1 after a migration,
+and otherwise L1 while nested has to be in valid state:
 
-I will look into it some more.
+L1 really can't be in invalid state while in VMXON (even if it could theoretically,
+no way it can reach that point - I need to refresh my VMX knowelege to be sure about it), 
+and L2 has to have valid state since that is the defintion of VMX
+- if L2 were in invalid state, then L1 would have to emualte L2 and not use VMX.
 
-Thanks,
-Reiji
+I'll take a more detailed look soon at this.
+
+Best regards,
+	Maxim Levitsky
+
+> 
+> > > >  <TASK>
+> > > >  vmx_leave_nested arch/x86/kvm/vmx/nested.c:6220 [inline]
+> > > >  nested_vmx_free_vcpu+0x83/0xc0 arch/x86/kvm/vmx/nested.c:330
+> > > >  vmx_free_vcpu+0x11f/0x2a0 arch/x86/kvm/vmx/vmx.c:6799
+> > > >  kvm_arch_vcpu_destroy+0x6b/0x240 arch/x86/kvm/x86.c:10989
+> > > >  kvm_vcpu_destroy+0x29/0x90 arch/x86/kvm/../../../virt/kvm/kvm_main.c:441
+> > > >  kvm_free_vcpus arch/x86/kvm/x86.c:11426 [inline]
+> > > >  kvm_arch_destroy_vm+0x3ef/0x6b0 arch/x86/kvm/x86.c:11545
+> > > >  kvm_destroy_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:1189 [inline]
+> > > >  kvm_put_kvm+0x751/0xe40 arch/x86/kvm/../../../virt/kvm/kvm_main.c:1220
+> > > >  kvm_vcpu_release+0x53/0x60 arch/x86/kvm/../../../virt/kvm/kvm_main.c:3489
+> > > >  __fput+0x3fc/0x870 fs/file_table.c:280
+> > > >  task_work_run+0x146/0x1c0 kernel/task_work.c:164
+> > > >  exit_task_work include/linux/task_work.h:32 [inline]
+> > > >  do_exit+0x705/0x24f0 kernel/exit.c:832
+> > > >  do_group_exit+0x168/0x2d0 kernel/exit.c:929
+> > > >  get_signal+0x1740/0x2120 kernel/signal.c:2852
+> > > >  arch_do_signal_or_restart+0x9c/0x730 arch/x86/kernel/signal.c:868
+> > > >  handle_signal_work kernel/entry/common.c:148 [inline]
+> > > >  exit_to_user_mode_loop kernel/entry/common.c:172 [inline]
+> > > >  exit_to_user_mode_prepare+0x191/0x220 kernel/entry/common.c:207
+> > > >  __syscall_exit_to_user_mode_work kernel/entry/common.c:289 [inline]
+> > > >  syscall_exit_to_user_mode+0x2e/0x70 kernel/entry/common.c:300
+> > > >  do_syscall_64+0x53/0xd0 arch/x86/entry/common.c:86
+> > > >  entry_SYSCALL_64_after_hwframe+0x44/0xae
+> > > > RIP: 0033:0x7f3388806b19
+> > > > Code: Unable to access opcode bytes at RIP 0x7f3388806aef.
+> > > > RSP: 002b:00007f338773a218 EFLAGS: 00000246 ORIG_RAX: 00000000000000ca
+> > > > RAX: fffffffffffffe00 RBX: 00007f338891a0e8 RCX: 00007f3388806b19
+> > > > RDX: 0000000000000000 RSI: 0000000000000080 RDI: 00007f338891a0e8
+> > > > RBP: 00007f338891a0e0 R08: 0000000000000000 R09: 0000000000000000
+> > > > R10: 0000000000000000 R11: 0000000000000246 R12: 00007f338891a0ec
+> > > > R13: 00007fffbe0e838f R14: 00007f338773a300 R15: 0000000000022000
+> > > >  </TASK>
+
+
