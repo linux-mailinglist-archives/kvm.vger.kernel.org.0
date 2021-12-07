@@ -2,192 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 816D146C0BE
-	for <lists+kvm@lfdr.de>; Tue,  7 Dec 2021 17:30:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8B6C746C0C7
+	for <lists+kvm@lfdr.de>; Tue,  7 Dec 2021 17:34:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234957AbhLGQeJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Dec 2021 11:34:09 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:39341 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232748AbhLGQeI (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 7 Dec 2021 11:34:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1638894637;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZI8DDXBtMcsQTTWl4J78FS+UoJsIi2WLN7f77nuHbQY=;
-        b=i549l7lYkdVRxvJCN4gMTnyd0QAzH72xWj0aiUWrjI+tpRiu8fcKlblDDGbcUPwem2wa3O
-        Xsln0/00rJIdMcNrFIXiqMK7XwVbUosKytJv1y9mXdDKhYHMUIgS9y0hczieQHtfFFeWnb
-        8/Wci/0kkQ/f2qOPVD6U+VQ8HYnYdbw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-73-egm9lRoFPte4-rOzsNnBVA-1; Tue, 07 Dec 2021 11:30:34 -0500
-X-MC-Unique: egm9lRoFPte4-rOzsNnBVA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5068B8015B7;
-        Tue,  7 Dec 2021 16:30:32 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.160])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7BE6E60BF1;
-        Tue,  7 Dec 2021 16:30:31 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Yishai Hadas <yishaih@nvidia.com>
-Subject: Re: [PATCH RFC v2] vfio: Documentation for the migration region
-In-Reply-To: <20211207155145.GD6385@nvidia.com>
-Organization: Red Hat GmbH
-References: <20211130153541.131c9729.alex.williamson@redhat.com>
- <20211201031407.GG4670@nvidia.com> <20211201130314.69ed679c@omen>
- <20211201232502.GO4670@nvidia.com>
- <20211203110619.1835e584.alex.williamson@redhat.com>
- <87zgpdu3ez.fsf@redhat.com> <20211206173422.GK4670@nvidia.com>
- <87tufltxp0.fsf@redhat.com> <20211206191933.GM4670@nvidia.com>
- <87o85su0kv.fsf@redhat.com> <20211207155145.GD6385@nvidia.com>
-User-Agent: Notmuch/0.34 (https://notmuchmail.org)
-Date:   Tue, 07 Dec 2021 17:30:29 +0100
-Message-ID: <87ilw0tm1m.fsf@redhat.com>
+        id S234767AbhLGQiT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Dec 2021 11:38:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47176 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230168AbhLGQiT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Dec 2021 11:38:19 -0500
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4ACDC061574
+        for <kvm@vger.kernel.org>; Tue,  7 Dec 2021 08:34:48 -0800 (PST)
+Received: by mail-pj1-x102e.google.com with SMTP id fv9-20020a17090b0e8900b001a6a5ab1392so3163253pjb.1
+        for <kvm@vger.kernel.org>; Tue, 07 Dec 2021 08:34:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=+yUBqxu9B4OCb5TwZ4H4vttXKxpedHDjwAf994pwiwA=;
+        b=SoF2kONijeu1/oY0BHxa4NB2dILfWoPAKiLOn8+Okg9XuAkFRjWDXk5jtApKt7hUN7
+         +T5EuZ+l2+uF0az6+5WrZnrEXUM38CJ4U30lTslEHU/FS5cKX/U9MEOH6oW72fOtfPOt
+         l3OJ/QGD+l2WZnAgsS+e2RiCwQR6JAiQwDQaYK10BMzPRW+c05AGKWbEZ+tyjtF/DEL+
+         D8t2ILMmwOCAqHzoXcCF6ghzrBkV6niB8IV30d0WwykMWa+3xX6rZXHpszC7taEmrnjI
+         vljzlF1RGjOXQSdIEJsYR8IfAJkKSOoPl4weAbKiXjsNGCpnjS2O3Rju7zVCXLAcMVeK
+         W/CA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=+yUBqxu9B4OCb5TwZ4H4vttXKxpedHDjwAf994pwiwA=;
+        b=X2DQkuNC33gCzF2KqU7wPdjZHroKMJ8q0RApXl3UTCtmKRRc/ToUmFqtqFCudNonW7
+         VJN4Y+RCmWhONAnXS+Uz6dIlZYgkUXw61BxG1cL+r98iC24wxzXQlDn3JvLjFf/GA2qV
+         pTp6EmRsHko9YAyEwYv005yoBIS2kPXJWFxI377n6LVTqLlhOUn61OBJyQUGaTY3TALu
+         bfNf5TsyhxQjBlGhKpgv8QXj2uAT6Tx12OjZHWW7Ur2ASg+IsNkVUIaRr7zksGErKv9g
+         qKWieQuglajfWuSRyf9iOE4nnVn4BzD7s+aUNpQAdbGEvufZDxYAkXVZSZEbkOqVnx4y
+         yh6Q==
+X-Gm-Message-State: AOAM533R2YLs2fbRRzDNrEQEqoT5YncmCKDx3YgrNksDBGK7oIEOg3j4
+        Lk8wZ99OmwfCwDdyU1/9KjuDww==
+X-Google-Smtp-Source: ABdhPJyG4cYzUuiyRbDHCDGh5vaEieF+gNeJKctz5okJuJvgGTmNH4Mmzz/alr9l4aoIB5oHNuDG2A==
+X-Received: by 2002:a17:90b:e83:: with SMTP id fv3mr67275pjb.115.1638894888012;
+        Tue, 07 Dec 2021 08:34:48 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id j22sm166712pfj.130.2021.12.07.08.34.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Dec 2021 08:34:46 -0800 (PST)
+Date:   Tue, 7 Dec 2021 16:34:43 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     Marc Orr <marcorr@google.com>, pbonzini@redhat.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+        hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: x86: Always set kvm_run->if_flag
+Message-ID: <Ya+NIxO5pIkB8057@google.com>
+References: <20211207043100.3357474-1-marcorr@google.com>
+ <c8889028-9c4e-cade-31b6-ea92a32e4f66@amd.com>
+ <CAA03e5E7-ns7w9B9Tu7pSWzCo0Nh7Ba5jwQXcn_XYPf_reRq9Q@mail.gmail.com>
+ <5e69c0ca-389c-3ace-7559-edd901a0ab3c@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5e69c0ca-389c-3ace-7559-edd901a0ab3c@amd.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 07 2021, Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Tue, Dec 07, 2021, Tom Lendacky wrote:
+> On 12/7/21 9:14 AM, Marc Orr wrote:
+> > On Tue, Dec 7, 2021 at 6:43 AM Tom Lendacky <thomas.lendacky@amd.com> wrote:
+> > > > +static bool svm_get_if_flag(struct kvm_vcpu *vcpu)
+> > > > +{
+> > > > +     struct vmcb *vmcb = to_svm(vcpu)->vmcb;
+> > > > +
+> > > > +     return !!(vmcb->control.int_state & SVM_GUEST_INTERRUPT_MASK);
+> > > 
+> > > I'm not sure if this is always valid to use for non SEV-ES guests. Maybe
+> > > the better thing would be:
+> > > 
+> > >          return sev_es_guest(vcpu->kvm) ? vmcb->control.int_state & SVM_GUEST_INTERRUPT_MASK
+> > >                                         : kvm_get_rflags(vcpu) & X86_EFLAGS_IF;
+> > > 
+> > > (Since this function returns a bool, I don't think you need the !!)
+> > 
+> > I had the same reservations when writing the patch. (Why fix what's
+> > not broken.) The reason I wrote the patch this way is based on what I
+> > read in APM vol2: Appendix B Layout of VMCB: "GUEST_INTERRUPT_MASK -
+> > Value of the RFLAGS.IF bit for the guest."
+> 
+> I just verified with the hardware team that this flag is indeed only set for
+> a guest with protected state (SEV-ES / SEV-SNP). An update to the APM will
+> be made.
 
-> On Tue, Dec 07, 2021 at 12:16:32PM +0100, Cornelia Huck wrote:
->> On Mon, Dec 06 2021, Jason Gunthorpe <jgg@nvidia.com> wrote:
->> 
->> > On Mon, Dec 06, 2021 at 07:06:35PM +0100, Cornelia Huck wrote:
->> >
->> >> We're discussing a complex topic here, and we really don't want to
->> >> perpetuate an unclear uAPI. This is where my push for more precise
->> >> statements is coming from.
->> >
->> > I appreciate that, and I think we've made a big effort toward that
->> > direction.
->> >
->> > Can we have some crisp feedback which statements need SHOULD/MUST/MUST
->> > NOT and come to something?
->> 
->> I'm not sure what I should actually comment on, some general remarks:
->
-> You should comment on the paragraphs that prevent you from adding a
-> reviewed-by.
+svm_interrupt_blocked() should be modified to use the new svm_get_if_flag()
+helper so that the SEV-{ES,SN} behavior is contained in a single location, e.g.
 
-On which copy? There have been updates, and I haven't found a conchise
-email to reply to.
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 208566f63bce..fef04e9fa9c9 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3583,14 +3583,10 @@ bool svm_interrupt_blocked(struct kvm_vcpu *vcpu)
+        if (!gif_set(svm))
+                return true;
 
->
->> - If we consider a possible vfio-ccw implementation that will quiesce
->>   the device and not rely on tracking I/O, we need to make the parts
->>   that talk about tracking non-mandatory.
->
-> I'm not sure what you mean by 'tracking I/O'?
+-       if (sev_es_guest(vcpu->kvm)) {
+-               /*
+-                * SEV-ES guests to not expose RFLAGS. Use the VMCB interrupt mask
+-                * bit to determine the state of the IF flag.
+-                */
+-               if (!(vmcb->control.int_state & SVM_GUEST_INTERRUPT_MASK))
++       if (!is_guest_mode(vcpu)) {
++               if (!svm_get_if_flag(vcpu))
+                        return true;
+-       } else if (is_guest_mode(vcpu)) {
++       } else {
+                /* As long as interrupts are being delivered...  */
+                if ((svm->nested.ctl.int_ctl & V_INTR_MASKING_MASK)
+                    ? !(svm->vmcb01.ptr->save.rflags & X86_EFLAGS_IF)
+@@ -3600,9 +3596,6 @@ bool svm_interrupt_blocked(struct kvm_vcpu *vcpu)
+                /* ... vmexits aren't blocked by the interrupt shadow  */
+                if (nested_exit_on_intr(svm))
+                        return false;
+-       } else {
+-               if (!(kvm_get_rflags(vcpu) & X86_EFLAGS_IF))
+-                       return true;
+        }
 
-MMIO.
-
->
-> I thought we were good on ccw?
-
-We are, if we don't make things mandatory that are not needed for
-non-MMIO.
-
->
->> - NDMA sounds like something that needs to be non-mandatory as well.
->
-> I agree, Alex are we agreed now ?
->
->> - The discussion regarding bit group changes has me confused. You seem
->>   to be saying that mlx5 needs that, so it needs to have some mandatory
->>   component; but are actually all devices able to deal with those bits
->>   changing as a group?
->
-> Yes, all devices can support this as written.
->
-> If you think of the device_state as initiating some action pre bit
-> group then we have multiple bit group that can change at once and thus
-> multiple actions that can be triggered.
->
-> All devices must support userspace initiating actions one by one in a
-> manner that supports the reference flow. 
->
-> Thus, every driver can decompose a request for multiple actions into
-> an ordered list of single actions and execute those actions exactly as
-> if userspace had issued single actions.
->
-> The precedence follows the reference flow so that any conflicts
-> resolve along the path that already has defined behaviors.
-
-Well, yes. I'm just wondering where bit groups are coming in
-then. That's where I'm confused (by the discussion).
-
->
-> I honestly don't know why this is such a discussion point, beyond
-> being a big oversight of the original design.
->
->> - In particular, the flow needs definitive markings about what is
->>   mandatory to implement, what is strongly suggested, and what is
->>   optional. It is unclear to me what is really expected, and what is
->>   simply one way to implement it.
->
-> I'm not sure either, this hasn't been clear at all to me. Alex has
-> asked for things to be general and left undefined, but we need some
-> minimum definition to actually implement driver/VMM interoperability
-> for what we need to do.
->
-> Really what qemu does will set the mandatory to implement.
-
-We really, really need to revisit QEMU before that. I'm staring at the
-code and I'm not quite sure if that really is what we want. We might
-have been too tired after years of review cycles when merging that.
-
->
->> > The world needs to move forward, we can't debate this endlessly
->> > forever. It is already another 6 weeks past since the last mlx5 driver
->> > posting.
->> 
->> 6 weeks is already blazingly fast in any vfio migration discussion. /s
->
-> We've invested a lot of engineer months in this project, it is
-> disrespectful to all of this effort to leave us hanging with no clear
-> path forward and no actionable review comments after so much
-> time. This is another kernel cycle lost.
-
-Well... it's not only you who are spending time on this. I'm trying to
-follow the discussion, which is not easy, and try to come up with
-feedback, which is not easy, either. This is using up a huge chunk of my
-time. Compared with the long and tedious discussions that led to the
-initial code being merged, we're really going very fast. And expecting
-people to drop everything and make a definite desicion quickly when
-there are still open questions on a complex topic does not strike me as
-particularly respectful, either.
-
->
->> Remember that we have other things to do as well, not all of which will
->> be visible to you.
->
-> As do we all, but your name is in the maintainer file, and that comes
-> with some responsibility.
-
-It, however, does not mean that someone listed in MAINTAINERS must
-immediately deal with anything that is thrown at them to the detriment
-of everything else. It *especially* does not mean that someone listed in
-MAINTAINERS is neglecting their responsibilies if things are not going
-as well as you'd hope them to go.
-
-[There is a reason why I have dropped out of some maintainership entries
-recently, the asymmetry of people requiring feedback and merging and
-people actually giving feedback and merging seems to have gotten worse
-over the last years. I can certainly delist myself as a vfio reviewer as
-well, and while that would certainly help my wellbeing, I'm not sure
-whether that is what you want.]
-
+        return (vmcb->control.int_state & SVM_INTERRUPT_SHADOW_MASK);
