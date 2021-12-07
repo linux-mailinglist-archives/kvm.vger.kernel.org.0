@@ -2,130 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DA74A46C736
-	for <lists+kvm@lfdr.de>; Tue,  7 Dec 2021 23:09:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 62C9746C766
+	for <lists+kvm@lfdr.de>; Tue,  7 Dec 2021 23:25:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242188AbhLGWN2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Dec 2021 17:13:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43284 "EHLO
+        id S241971AbhLGW31 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Dec 2021 17:29:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47062 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242134AbhLGWNV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Dec 2021 17:13:21 -0500
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87563C061574
-        for <kvm@vger.kernel.org>; Tue,  7 Dec 2021 14:09:50 -0800 (PST)
-Received: by mail-pj1-x1049.google.com with SMTP id jx2-20020a17090b46c200b001a62e9db321so364171pjb.7
-        for <kvm@vger.kernel.org>; Tue, 07 Dec 2021 14:09:50 -0800 (PST)
+        with ESMTP id S238024AbhLGW30 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Dec 2021 17:29:26 -0500
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17031C061574
+        for <kvm@vger.kernel.org>; Tue,  7 Dec 2021 14:25:56 -0800 (PST)
+Received: by mail-pg1-x536.google.com with SMTP id f125so393378pgc.0
+        for <kvm@vger.kernel.org>; Tue, 07 Dec 2021 14:25:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc;
-        bh=JNBI+S2Jw5Vs4x4pkp+oETPJ8WHMJe4kYnIfeY40RAo=;
-        b=H0Ol+y/a13fDttBnOc0z9kTIyBRa7LB9zOK5FeI6QQMlBRx6rp+ElP7mpguG1NFW6Q
-         3TrlFcPjXek6+IluQsPwdB/sH+raBYdQvJkp8XfHLIohUErExFS5iMOsjdNxUAUyMjii
-         ZIED1vVYFbjCovBwJhmBTSVw4Vc3KldLKGLDNJbwhwxwbH4zZk2jEpQabC+nlDTIXfz4
-         lUnW46E8xqCkKwNd2SRQGrzNcdREWA1Bf8c2fX6bGf3rLxk/BXR65nLxbpAUFaxIj65Q
-         jWISYOmjde1Cb0/nRiB9BS4KijuJ5KTG5oYZHghGblqQbtSfMkypGOln6kCYugCOAJbM
-         sbCg==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=RQXmYAMR/sXSk9XmD70R29tOokpsn7xvqpKh45eus90=;
+        b=AMfTYoLJN06fTTFwC2yJfyu6lGNUXEC17ykoxSfV2PycL8DftRMG5kABvLZCTOLPVr
+         QxmNF6xTxHHmBsIitPiVNlFPBvlQ2GQup9roZL0McwoO4oc6HxCW08h2vPM+9XFPV6uf
+         LhTN07hZOShLzPQ7h98ZzyALDfBbRequfAqum8odfrXdawrKzylOhwBOaSpvyGKaag6J
+         XmSyJd4WL2Iarw0fv4BZjwZ4Awa5ku6jjqod9Wme2S9jL3vSqZXIWAuvf05VjC9HKSTN
+         Rez6A+32yWy2XGfr8y8SkgUOkxHbej1lPRMVt6wTzLnHSs+2t0Uf5oKKp6OrQiUsLWuv
+         +vtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc;
-        bh=JNBI+S2Jw5Vs4x4pkp+oETPJ8WHMJe4kYnIfeY40RAo=;
-        b=0ooVQ/DUsObakjuBL/c//3g/4+jimz1Y5Xri7f8n23VO6+QAMlNzkVROdM2wyYKIJn
-         FN6L4LluOuHRe4htu37HlSZlaNYjuzcpofDYPTEXwp+6Kr32++fL5oP7MjIglXPb2eki
-         drSJy7/iddRVp/NEP79kROehsnhEp8v6vaG7FqqvIcLVh2rqBWjliMXsgJZ2hDcTYaNa
-         AwnDDjFCPcNp2lT28Z7iKouTsw8ATVsCtlUAMhcZ+ly91T8Dnut8FpK5jJUFhc5axm4g
-         kaVSF0arKYfWynO+wMZ+YYK4LkFFv6dmrcSMNJ4vApblt05OH1XLIrYx4D5VjnVF6QpR
-         T+Tw==
-X-Gm-Message-State: AOAM533scLlGtUZX34Lj86xOZFUWkNR1QfTHQm2vQpF3kHMbUiNzZO1v
-        q8jh5r4+oZkB5xomqoQ0UCjbqnXh9XA=
-X-Google-Smtp-Source: ABdhPJzYI9Ielu744KQZUdFhLMEjd4KuXafE47GaJMqZ01zbaWxslijUvytjk8sHKu8mR2UEuWlq6yHLnvk=
-X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:902:b7cb:b0:141:b33a:9589 with SMTP id
- v11-20020a170902b7cb00b00141b33a9589mr54924224plz.9.1638914990041; Tue, 07
- Dec 2021 14:09:50 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue,  7 Dec 2021 22:09:26 +0000
-In-Reply-To: <20211207220926.718794-1-seanjc@google.com>
-Message-Id: <20211207220926.718794-9-seanjc@google.com>
-Mime-Version: 1.0
-References: <20211207220926.718794-1-seanjc@google.com>
-X-Mailer: git-send-email 2.34.1.400.ga245620fadb-goog
-Subject: [PATCH v3 8/8] KVM: x86: Add checks for reserved-to-zero Hyper-V
- hypercall fields
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=RQXmYAMR/sXSk9XmD70R29tOokpsn7xvqpKh45eus90=;
+        b=bAEVIJIeNEBkJCk/HlcsDu8J+NxD/Q7/A1BbffOd5wk9idSdjJ4oNCW6SuIxUx1GhG
+         Uyt+B+kGhZO7CE0bvND1PdvV77Pheiwt+xn5FnRqWeCCzqJe7v7mQhxjxzy8ewwPvEPg
+         CtlI5OtFGFxdtdgPHot6bgeOJS8jMOD12MeXA6ZF8P8Ak+Pml3+8ncF8EblxWJOQlEUF
+         GL7S1FRDzreJUzTizzSbCNih97jIKPGWN9tYku81/gtbe7kyWMqY7b8uNXJRmijTpvPs
+         eF8HKzGIYHdvNg73X8JRnBqCcquxNuu13X7Kal8sbq50jwHr8hDGQpb4QoHwUFX0HsuF
+         APaQ==
+X-Gm-Message-State: AOAM532l0MMpLtxp8PQSBGkMbbx3t+jrhe2yyco6dHiOgNlQNnue4JBZ
+        4hxJ9BveW3weFETfiIRiIrJIyA==
+X-Google-Smtp-Source: ABdhPJxQlLRiK0ua2RsOrTNvNVPEqsBLOWGVBdtjDau8f/z0OimiB1Zz37Y3lgjb700ozB120/xmQg==
+X-Received: by 2002:a05:6a00:a23:b0:4a4:e9f5:d890 with SMTP id p35-20020a056a000a2300b004a4e9f5d890mr2050692pfh.82.1638915955458;
+        Tue, 07 Dec 2021 14:25:55 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id on5sm526932pjb.23.2021.12.07.14.25.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Dec 2021 14:25:55 -0800 (PST)
+Date:   Tue, 7 Dec 2021 22:25:51 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Stephen Hemminger <sthemmin@microsoft.com>,
-        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-        Arnd Bergmann <arnd@arndb.de>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ajay Garg <ajaygargnsit@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+To:     Chris Murphy <lists@colorremedies.com>
+Cc:     kvm@vger.kernel.org, qemu-devel@nongnu.org
+Subject: Re: dozens of qemu/kvm VMs getting into stuck states since kernel
+ ~5.13
+Message-ID: <Ya/fb2Lc6OoHw7CP@google.com>
+References: <CAJCQCtSx_OFkN1csWGQ2-pP1jLgziwr0oXoMMb4q8Y=UYPGqAg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJCQCtSx_OFkN1csWGQ2-pP1jLgziwr0oXoMMb4q8Y=UYPGqAg@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add checks for the three fields in Hyper-V's hypercall params that must
-be zero.  Per the TLFS, HV_STATUS_INVALID_HYPERCALL_INPUT is returned if
-"A reserved bit in the specified hypercall input value is non-zero."
+On Tue, Dec 07, 2021, Chris Murphy wrote:
+> cc: qemu-devel
+> 
+> Hi,
+> 
+> I'm trying to help progress a very troublesome and so far elusive bug
+> we're seeing in Fedora infrastructure. When running dozens of qemu-kvm
+> VMs simultaneously, eventually they become unresponsive, as well as
+> new processes as we try to extract information from the host about
+> what's gone wrong.
 
-Note, some versions of the TLFS have an off-by-one bug for the last
-reserved field, and define it as being bits 64:60.  See
-https://github.com/MicrosoftDocs/Virtualization-Documentation/pull/1682.
+Have you tried bisecting?  IIUC, the issues showed up between v5.11 and v5.12.12,
+bisecting should be relatively straightforward.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
-Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
- arch/x86/kvm/hyperv.c             | 5 +++++
- include/asm-generic/hyperv-tlfs.h | 6 ++++++
- 2 files changed, 11 insertions(+)
+> Systems (Fedora openQA worker hosts) on kernel 5.12.12+ wind up in a
+> state where forking does not work correctly, breaking most things
+> https://bugzilla.redhat.com/show_bug.cgi?id=2009585
+> 
+> In subsequent testing, we used newer kernels with lockdep and other
+> debug stuff enabled, and managed to capture a hung task with a bunch
+> of locks listed, including kvm and qemu processes. But I can't parse
+> it.
+> 
+> 5.15-rc7
+> https://bugzilla-attachments.redhat.com/attachment.cgi?id=1840941
+> 5.15+
+> https://bugzilla-attachments.redhat.com/attachment.cgi?id=1840939
+> 
+> If anyone can take a glance at those kernel messages, and/or give
+> hints how we can extract more information for debugging, it'd be
+> appreciated. Maybe all of that is normal and the actual problem isn't
+> in any of these traces.
 
-diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
-index 522ccd2f0db4..3be59f13b467 100644
---- a/arch/x86/kvm/hyperv.c
-+++ b/arch/x86/kvm/hyperv.c
-@@ -2237,6 +2237,11 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
- 		goto hypercall_complete;
- 	}
- 
-+	if (unlikely(hc.param & HV_HYPERCALL_RSVD_MASK)) {
-+		ret = HV_STATUS_INVALID_HYPERCALL_INPUT;
-+		goto hypercall_complete;
-+	}
-+
- 	if (hc.fast && is_xmm_fast_hypercall(&hc)) {
- 		if (unlikely(hv_vcpu->enforce_cpuid &&
- 			     !(hv_vcpu->cpuid_cache.features_edx &
-diff --git a/include/asm-generic/hyperv-tlfs.h b/include/asm-generic/hyperv-tlfs.h
-index 8a04c8fba598..2354378eef4c 100644
---- a/include/asm-generic/hyperv-tlfs.h
-+++ b/include/asm-generic/hyperv-tlfs.h
-@@ -184,11 +184,17 @@ enum HV_GENERIC_SET_FORMAT {
- #define HV_HYPERCALL_FAST_BIT		BIT(16)
- #define HV_HYPERCALL_VARHEAD_OFFSET	17
- #define HV_HYPERCALL_VARHEAD_MASK	GENMASK_ULL(26, 17)
-+#define HV_HYPERCALL_RSVD0_MASK		GENMASK_ULL(31, 27)
- #define HV_HYPERCALL_REP_COMP_OFFSET	32
- #define HV_HYPERCALL_REP_COMP_1		BIT_ULL(32)
- #define HV_HYPERCALL_REP_COMP_MASK	GENMASK_ULL(43, 32)
-+#define HV_HYPERCALL_RSVD1_MASK		GENMASK_ULL(47, 44)
- #define HV_HYPERCALL_REP_START_OFFSET	48
- #define HV_HYPERCALL_REP_START_MASK	GENMASK_ULL(59, 48)
-+#define HV_HYPERCALL_RSVD2_MASK		GENMASK_ULL(63, 60)
-+#define HV_HYPERCALL_RSVD_MASK		(HV_HYPERCALL_RSVD0_MASK | \
-+					 HV_HYPERCALL_RSVD1_MASK | \
-+					 HV_HYPERCALL_RSVD2_MASK)
- 
- /* hypercall status code */
- #define HV_STATUS_SUCCESS			0
--- 
-2.34.1.400.ga245620fadb-goog
+All the instances of
 
+  (&vcpu->mutex){+.+.}-{3:3}, at: kvm_vcpu_ioctl+0x77/0x720 [kvm]
+
+are uninteresting and expected, that's just each vCPU task taking its associated
+vcpu->mutex, likely for KVM_RUN.
+
+At a glance, the XFS stuff looks far more interesting/suspect.
