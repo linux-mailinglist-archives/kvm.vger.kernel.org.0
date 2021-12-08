@@ -2,106 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 699AC46D8F9
-	for <lists+kvm@lfdr.de>; Wed,  8 Dec 2021 17:54:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D23046D948
+	for <lists+kvm@lfdr.de>; Wed,  8 Dec 2021 18:09:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237390AbhLHQ5x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Dec 2021 11:57:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47542 "EHLO
+        id S237604AbhLHRNL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Dec 2021 12:13:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51192 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237375AbhLHQ5w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Dec 2021 11:57:52 -0500
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87330C0617A1
-        for <kvm@vger.kernel.org>; Wed,  8 Dec 2021 08:54:20 -0800 (PST)
-Received: by mail-pg1-x52e.google.com with SMTP id r138so2521574pgr.13
-        for <kvm@vger.kernel.org>; Wed, 08 Dec 2021 08:54:20 -0800 (PST)
+        with ESMTP id S237601AbhLHRNL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Dec 2021 12:13:11 -0500
+Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15BEEC061746
+        for <kvm@vger.kernel.org>; Wed,  8 Dec 2021 09:09:39 -0800 (PST)
+Received: by mail-yb1-xb2f.google.com with SMTP id q74so7433280ybq.11
+        for <kvm@vger.kernel.org>; Wed, 08 Dec 2021 09:09:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=wDsVhbUZQwon98TZc0uQWii9L9HtueN7zt3xozWU+o0=;
-        b=qjKkcDy2Vnd99F+FcvoO1bC64kXXPcSt3EJIU+wYN4wrB3WKm+GgpQkRK8vgG4EyIP
-         yEmXVWLQikSBg2dl3KZBUVIO21pKCDAL5+UQcr/qWb8OA/qHpthYaB0XLGbQbVpSjdRd
-         1w8aSVUXoZ9N/w2CCkBzUFjOi21cIX7FhfwEcc+0AFCTNu+XCFz29xYyQDRNWEI0UeOq
-         XqLrgs12InSPFGTplPogvsmGvPMtB2wrVCg2Jd9H4ieohL+3kkioqBbLXbluWuW/sHMJ
-         36Ex+MxfgiTF+1zUstFYEUZi+55M56v4UMTV4U8oV/cYOlOYYOW5nQz9JbJICVp6wGII
-         Wylg==
+        d=colorremedies-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=nUOCCwERsiAdkftIilxYjt7sMB07w0Aw7ZE6U72nToY=;
+        b=ydwJqeSrwGb5kN9CFJL2J40jM6FNTAbaqRAmuH4a+1dG69EjKIjsUxoRr/3INzl/mh
+         bvHj1l4mHw/40ly3ZpIw9jRw48NosBJgbQcDYLoPIpAvBDKxh+GGYw7bKRNcToISOnbc
+         9L4p/wsWuEJvl0wk8qh/67ffFX8ZMXbpZkpPyoF8JROl0i0lMi2gM051+5bbcf/4uDIH
+         TRi+Y9OYi3jeDYxZjiYAk4rZQ/aav9IwpwQIYyTL6NmTilQzlmXDm8hl4cJzo/OxpeEw
+         iG1OnZwJR4Uc5+r0mkSw7hBO5zou99d/az2nm6gqwoIEdpgihoV4rWRJJyxtfxN3zQN6
+         Vy2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=wDsVhbUZQwon98TZc0uQWii9L9HtueN7zt3xozWU+o0=;
-        b=kN+YsLAah59n3KAb3Qwq2q/oSeyotF8EjhKc4l3DLK3qqJlL9NL1eit0Sp62uLmA2O
-         EUTbEjQONVYkXz5lJOcWJ8JqchcQCMNKsO5fXTJ3QosdaK9sO4eiRi64nupdzA3FoAAn
-         V9XOLN29/0Uk/k6y5ZFUGrriz14Wu+brlJ2Z9MPkZPYHFVxVoS95s8mwKxicQ3iL1Zqb
-         EJNWGef80gXzMEOQOB5aJXFikIEuts3d/k/7I3nGPEAHv22h/1LIadROCMsHDG4FZYof
-         8gjfhX3Qx8UkMnCT9uFmQY3KtsnYXo9owTPkcs+gww+d/LJwsA6dde231ZSCECTE7FkZ
-         F/vQ==
-X-Gm-Message-State: AOAM530H34prYUsA5upYJmBDAjzez+0TLQ1loBEaXON9nlu6HLuCwOVp
-        7XXOjHi0jVUPmrtCDKEzpDXfAw==
-X-Google-Smtp-Source: ABdhPJxE3wYM+bIKVuUEjBr3ldRIzan4Rc3pmkStEhIojWk4Ag4lA1gCH7zbcEfstO/sqqo2+3iiiA==
-X-Received: by 2002:a05:6a00:a14:b0:4a0:945:16fa with SMTP id p20-20020a056a000a1400b004a0094516famr6527927pfh.9.1638982459816;
-        Wed, 08 Dec 2021 08:54:19 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id f3sm3090411pgv.51.2021.12.08.08.54.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Dec 2021 08:54:19 -0800 (PST)
-Date:   Wed, 8 Dec 2021 16:54:15 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Joao Martins <joao.m.martins@oracle.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>, stable@vger.kernel.org,
-        David Matlack <dmatlack@google.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH] selftests: KVM: avoid failures due to reserved
- HyperTransport region
-Message-ID: <YbDjN68ALDavh1WQ@google.com>
-References: <20210805105423.412878-1-pbonzini@redhat.com>
- <4b530fb6-81cc-be36-aa68-92ec01c65775@oracle.com>
- <5f3c13be-f65d-1793-bd91-7491d3e149b0@redhat.com>
- <bab67d1c-f9b7-0a91-2d4f-9881e3f47218@oracle.com>
- <ac72b77c-f633-923b-8019-69347db706be@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=nUOCCwERsiAdkftIilxYjt7sMB07w0Aw7ZE6U72nToY=;
+        b=mi6Vr7WIqQ3r1+6B5iSlE9aJzyWqU9QpGrKDJvmWUR3odxPj55OSA96eeWAS7tQaDu
+         XhAH+RX78iGCnHG7AymcPmQ6H6yMfiriPKRFvcvKIUBUxxrywT5YO9JXzzJsOJvc7+v3
+         gkAPxcSkX537afIfzqfoGun4+Gg9AazzyLWryKr5SbdU+RHNMhSX5YzLosz7bLbByH0i
+         Z9QZUY9UWo3OT+sM6+tLQCfZBpAogfwCda/JaI3+wpfilIpvwUGMGYnMTF90qLiRqhR1
+         QyyX5bWCxXMypbo5WGKkvAuXrdeER7jVlZ7g+Cxtbgpn2MD1rgKZVsBUdSKbWzP2qjNy
+         bP+w==
+X-Gm-Message-State: AOAM5300K7T6S7/gBo7T0m2S2oOZV/5k+pQmsaTztPnU/BaFrO/g4dxy
+        HLhsUwxqrmoy37tOtnsMIBqkZu3KcVJ1AqRMsiJVyQ==
+X-Google-Smtp-Source: ABdhPJx1JNbWtK7HoaHftGxEdC8QXoFVlqqI4oL/Q7n9xsAzch2AQKRq4GthFfjo9C+wc8clvH9ZTMt9Tc0L2yGdiIU=
+X-Received: by 2002:a25:287:: with SMTP id 129mr63010099ybc.524.1638983378187;
+ Wed, 08 Dec 2021 09:09:38 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ac72b77c-f633-923b-8019-69347db706be@redhat.com>
+References: <CAJCQCtSx_OFkN1csWGQ2-pP1jLgziwr0oXoMMb4q8Y=UYPGqAg@mail.gmail.com>
+ <Ya/fb2Lc6OoHw7CP@google.com>
+In-Reply-To: <Ya/fb2Lc6OoHw7CP@google.com>
+From:   Chris Murphy <lists@colorremedies.com>
+Date:   Wed, 8 Dec 2021 12:09:22 -0500
+Message-ID: <CAJCQCtTzQAWdMOp_JKMw-UTocBg=qBhm2ZCU_ykiY5Epe9Bn_Q@mail.gmail.com>
+Subject: Re: dozens of qemu/kvm VMs getting into stuck states since kernel ~5.13
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Chris Murphy <lists@colorremedies.com>, kvm@vger.kernel.org,
+        qemu-devel@nongnu.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Aug 09, 2021, Paolo Bonzini wrote:
-> So this HyperTransport region is not related to this issue, but the errata
-> does point out that FFFD_0000_0000h and upwards is special in guests.
-> 
-> The Xen folks also had to deal with it only a couple months ago
-> (https://yhbt.net/lore/all/1eb16baa-6b1b-3b18-c712-4459bd83e1aa@citrix.com/):
-> 
->   From "Open-Source Register Reference for AMD Family 17h Processors (PUB)":
->   https://developer.amd.com/wp-content/resources/56255_3_03.PDF
-> 
->   "The processor defines a reserved memory address region starting at
->   FFFD_0000_0000h and extending up to FFFF_FFFF_FFFFh."
-> 
->   It's still doesn't say that it's at the top of physical address space
->   although I understand that's how it's now implemented. The official
->   document doesn't confirm it will move along with physical address space
->   extension.
-> 
->   [...]
-> 
->   1) On parts with <40 bits, its fully hidden from software
->   2) Before Fam17h, it was always 12G just below 1T, even if there was
->   more RAM above this location
->   3) On Fam17h and later, it is variable based on SME, and is either
->   just below 2^48 (no encryption) or 2^43 (encryption)
-> 
-> > It's interesting that fn8000_000A EDX[28] is part of the reserved bits from
-> > that CPUID leaf.
-> 
-> It's only been defined after AMD deemed that the errata was not fixable in
-> current generation processors); it's X86_FEATURE_SVME_ADDR_CHK now.
-> 
-> I'll update the patch based on the findings from the Xen team.
+On Tue, Dec 7, 2021 at 5:25 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Tue, Dec 07, 2021, Chris Murphy wrote:
+> > cc: qemu-devel
+> >
+> > Hi,
+> >
+> > I'm trying to help progress a very troublesome and so far elusive bug
+> > we're seeing in Fedora infrastructure. When running dozens of qemu-kvm
+> > VMs simultaneously, eventually they become unresponsive, as well as
+> > new processes as we try to extract information from the host about
+> > what's gone wrong.
+>
+> Have you tried bisecting?  IIUC, the issues showed up between v5.11 and v5.12.12,
+> bisecting should be relatively straightforward.
 
-So, about that update... :-)
+We haven't tried bisecting. Due to limited access since it's a
+production machine, and limited resources for those who have that
+access, I think the chance of bisecting is low, but I've asked. We
+could do something of a faux-bisect by running already built kernels
+in Fedora infrastructure. We could start by running x.y.0 kernels to
+see when it first appeared, then once hitting the problem, start
+testing rc1, rc2, ... in that series. We also have approximately daily
+git builds in between those rc's. That might be enough to deduce a
+culprit, but I'm not sure. At the least this would get us a ~1-3 day
+window within two rc's for bisecting.
+
+>
+> > Systems (Fedora openQA worker hosts) on kernel 5.12.12+ wind up in a
+> > state where forking does not work correctly, breaking most things
+> > https://bugzilla.redhat.com/show_bug.cgi?id=2009585
+> >
+> > In subsequent testing, we used newer kernels with lockdep and other
+> > debug stuff enabled, and managed to capture a hung task with a bunch
+> > of locks listed, including kvm and qemu processes. But I can't parse
+> > it.
+> >
+> > 5.15-rc7
+> > https://bugzilla-attachments.redhat.com/attachment.cgi?id=1840941
+> > 5.15+
+> > https://bugzilla-attachments.redhat.com/attachment.cgi?id=1840939
+> >
+> > If anyone can take a glance at those kernel messages, and/or give
+> > hints how we can extract more information for debugging, it'd be
+> > appreciated. Maybe all of that is normal and the actual problem isn't
+> > in any of these traces.
+>
+> All the instances of
+>
+>   (&vcpu->mutex){+.+.}-{3:3}, at: kvm_vcpu_ioctl+0x77/0x720 [kvm]
+>
+> are uninteresting and expected, that's just each vCPU task taking its associated
+> vcpu->mutex, likely for KVM_RUN.
+>
+> At a glance, the XFS stuff looks far more interesting/suspect.
+
+Thanks for the reply.
+
+-- 
+Chris Murphy
