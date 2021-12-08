@@ -2,161 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 559DD46DAA9
-	for <lists+kvm@lfdr.de>; Wed,  8 Dec 2021 19:01:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B257046DAAD
+	for <lists+kvm@lfdr.de>; Wed,  8 Dec 2021 19:04:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238513AbhLHSEu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Dec 2021 13:04:50 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:31580 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238424AbhLHSEt (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 8 Dec 2021 13:04:49 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B8HrVx9016831;
-        Wed, 8 Dec 2021 18:01:05 GMT
+        id S238528AbhLHSID (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Dec 2021 13:08:03 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:15554 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S232619AbhLHSIC (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 8 Dec 2021 13:08:02 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B8HrN1F009069;
+        Wed, 8 Dec 2021 18:04:30 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
  mime-version : subject : to : cc : references : from : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=icNS/hUNTZOizlARzmU3ZuuwS3Cil4+EuDX+1J989XA=;
- b=quK1iRPj1wdLDc52theVqpsIOMn6+jROqrkVuyVJj/RAVKmzT1Ne/tkSX5YOa3pqndTy
- II57fJ1yMbitQbhzs2KfzgldQU3j3bKqUM8yVaYAuVCgzNk3KOiYD1nPjMd/IPZ3eAOx
- dhbhBqnA5kY/I4NhsDADEAXikQMCO73gUsB5jzp4ILZKyqOvcta0MVLeulZSouwbK/9t
- n3nHTIMdngUXpqJgQH9dRwq6RXMUHv5KDzq1l8FMOj6u3GkR/fW2e2w/GMEEJK6Mmi0t
- iPJRvSuQDB+hmLW2pcXyIAYlX0Tyq1i5/JLqjpTRkFUsBGXU/utEGhRlFmqbv27nNQ+P Fw== 
+ bh=lcsH5uBVVZ7wWcQqhdR9FrF4NMNzd0QUAXCBwgL+e+4=;
+ b=ofD5GIq5Yvj1g7T3Jo0Ork/ZFHc9YtkBQmj2YHuycdL0lV4/RogYGFBE74vkZGj8Yrn3
+ bJm4K6EBkm4bXrvKbA4glI5sletZqomaFPinw4lAvPqDEQil/zHFM7hFLEdKKW8YFTtr
+ r6CixBySJN9qcdXXjRGeHmXYEc+aMv6QLjBs//T6JINdQrc1MpT5/XoYWDrbkFHWJMu+
+ 4H9C9DZLa1NiXpdU9GP2KabQcVA8I9nks67gH8spMvtB1d0ewdpvVYziY8OglcqnJeBg
+ rdQwrDtGENqwmT+4NDEyQX09O+cKcpza/6o9mFsLmNSqSw9bDPaed7H54liE9dNWXcc1 mQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cu1gp83g2-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3cu1gjr6as-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 08 Dec 2021 18:01:05 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1B8HwfrK002195;
-        Wed, 8 Dec 2021 18:01:04 GMT
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cu1gp83fe-1
+        Wed, 08 Dec 2021 18:04:30 +0000
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1B8Ht2Xp012428;
+        Wed, 8 Dec 2021 18:04:29 GMT
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3cu1gjr6ak-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 08 Dec 2021 18:01:04 +0000
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
-        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1B8HwVXT009300;
-        Wed, 8 Dec 2021 18:01:03 GMT
-Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
-        by ppma01wdc.us.ibm.com with ESMTP id 3cqyyb7hgq-1
+        Wed, 08 Dec 2021 18:04:29 +0000
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1B8I1uUr030500;
+        Wed, 8 Dec 2021 18:04:29 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
+        by ppma03dal.us.ibm.com with ESMTP id 3cqyybtr57-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 08 Dec 2021 18:01:03 +0000
+        Wed, 08 Dec 2021 18:04:28 +0000
 Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
-        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1B8I11oD44040630
+        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1B8I4R9E21038002
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 8 Dec 2021 18:01:01 GMT
+        Wed, 8 Dec 2021 18:04:27 GMT
 Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 80C9BB2072;
-        Wed,  8 Dec 2021 18:01:01 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id E6D36B206B;
+        Wed,  8 Dec 2021 18:04:26 +0000 (GMT)
 Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0783AB2066;
-        Wed,  8 Dec 2021 18:00:55 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id D10DEB205F;
+        Wed,  8 Dec 2021 18:04:21 +0000 (GMT)
 Received: from [9.211.152.43] (unknown [9.211.152.43])
         by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
-        Wed,  8 Dec 2021 18:00:55 +0000 (GMT)
-Message-ID: <d3d4c643-0d97-e16e-b505-a81c2a8f19e3@linux.ibm.com>
-Date:   Wed, 8 Dec 2021 13:00:54 -0500
+        Wed,  8 Dec 2021 18:04:21 +0000 (GMT)
+Message-ID: <e54bd244-06eb-6217-8511-4867df085ff5@linux.ibm.com>
+Date:   Wed, 8 Dec 2021 13:04:20 -0500
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.3.0
-Subject: Re: [PATCH 06/12] target/s390x: add zpci-interp to cpu models
+Subject: Re: [PATCH 23/32] KVM: s390: pci: handle refresh of PCI translations
 Content-Language: en-US
-To:     Christian Borntraeger <borntraeger@linux.ibm.com>,
-        qemu-s390x@nongnu.org
-Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
-        cohuck@redhat.com, thuth@redhat.com, farman@linux.ibm.com,
-        pmorel@linux.ibm.com, richard.henderson@linaro.org,
-        david@redhat.com, pasic@linux.ibm.com, mst@redhat.com,
-        pbonzini@redhat.com, qemu-devel@nongnu.org, kvm@vger.kernel.org
-References: <20211207210425.150923-1-mjrosato@linux.ibm.com>
- <20211207210425.150923-7-mjrosato@linux.ibm.com>
- <77f66828-b947-da7a-fe8c-35b698eca841@linux.ibm.com>
+To:     Niklas Schnelle <schnelle@linux.ibm.com>,
+        linux-s390@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
+        farman@linux.ibm.com, pmorel@linux.ibm.com,
+        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
+        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
+        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20211207205743.150299-1-mjrosato@linux.ibm.com>
+ <20211207205743.150299-24-mjrosato@linux.ibm.com>
+ <fc3c836ccb697a7e7123ab70015bd2a40b7cb5d4.camel@linux.ibm.com>
 From:   Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <77f66828-b947-da7a-fe8c-35b698eca841@linux.ibm.com>
+In-Reply-To: <fc3c836ccb697a7e7123ab70015bd2a40b7cb5d4.camel@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: RF81MBEXchmr9Zq_YvHs3EONs2KvAWgP
-X-Proofpoint-ORIG-GUID: LeZZ6_VsQVpt8bV5kHJ61Rqlhrrj7yKn
+X-Proofpoint-GUID: 2BcVULNEX31Tx4Wn_41d_L4khGm7Lz1t
+X-Proofpoint-ORIG-GUID: nuAJZYHxFSAYTbfaOZNPzm1XLLKoCcvE
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
  definitions=2021-12-08_07,2021-12-08_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxscore=0
- suspectscore=0 impostorscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxlogscore=999 phishscore=0 priorityscore=1501
- bulkscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ priorityscore=1501 clxscore=1015 spamscore=0 phishscore=0 malwarescore=0
+ mlxscore=0 impostorscore=0 lowpriorityscore=0 adultscore=0 bulkscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2110150000 definitions=main-2112080102
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/8/21 5:16 AM, Christian Borntraeger wrote:
-> Am 07.12.21 um 22:04 schrieb Matthew Rosato:
->> The zpci-interp feature is used to specify whether zPCI interpretation is
->> to be used for this guest.
+On 12/8/21 5:30 AM, Niklas Schnelle wrote:
+> On Tue, 2021-12-07 at 15:57 -0500, Matthew Rosato wrote:
+>> Add a routine that will perform a shadow operation between a guest
+>> and host IOAT.  A subsequent patch will invoke this in response to
+>> an 04 RPCIT instruction intercept.
 >>
 >> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
 >> ---
->>   target/s390x/cpu_features_def.h.inc | 1 +
->>   target/s390x/gen-features.c         | 2 ++
->>   target/s390x/kvm/kvm.c              | 1 +
->>   3 files changed, 4 insertions(+)
+>>   arch/s390/include/asm/kvm_pci.h |   1 +
+>>   arch/s390/include/asm/pci_dma.h |   1 +
+>>   arch/s390/kvm/pci.c             | 191 ++++++++++++++++++++++++++++++++
+>>   arch/s390/kvm/pci.h             |   4 +-
+>>   4 files changed, 196 insertions(+), 1 deletion(-)
 >>
->> diff --git a/target/s390x/cpu_features_def.h.inc 
->> b/target/s390x/cpu_features_def.h.inc
->> index e86662bb3b..4ade3182aa 100644
->> --- a/target/s390x/cpu_features_def.h.inc
->> +++ b/target/s390x/cpu_features_def.h.inc
->> @@ -146,6 +146,7 @@ DEF_FEAT(SIE_CEI, "cei", SCLP_CPU, 43, "SIE: 
->> Conditional-external-interception f
->>   DEF_FEAT(DAT_ENH_2, "dateh2", MISC, 0, "DAT-enhancement facility 2")
->>   DEF_FEAT(CMM, "cmm", MISC, 0, "Collaborative-memory-management 
->> facility")
->>   DEF_FEAT(AP, "ap", MISC, 0, "AP instructions installed")
->> +DEF_FEAT(ZPCI_INTERP, "zpci-interp", MISC, 0, "zPCI interpretation")
->>   /* Features exposed via the PLO instruction. */
->>   DEF_FEAT(PLO_CL, "plo-cl", PLO, 0, "PLO Compare and load (32 bit in 
->> general registers)")
->> diff --git a/target/s390x/gen-features.c b/target/s390x/gen-features.c
->> index 7cb1a6ec10..7005d22415 100644
->> --- a/target/s390x/gen-features.c
->> +++ b/target/s390x/gen-features.c
->> @@ -554,6 +554,7 @@ static uint16_t full_GEN14_GA1[] = {
->>       S390_FEAT_HPMA2,
->>       S390_FEAT_SIE_KSS,
->>       S390_FEAT_GROUP_MULTIPLE_EPOCH_PTFF,
->> +    S390_FEAT_ZPCI_INTERP,
->>   };
->>   #define full_GEN14_GA2 EmptyFeat
->> @@ -650,6 +651,7 @@ static uint16_t default_GEN14_GA1[] = {
->>       S390_FEAT_GROUP_MSA_EXT_8,
->>       S390_FEAT_MULTIPLE_EPOCH,
->>       S390_FEAT_GROUP_MULTIPLE_EPOCH_PTFF,
->> +    S390_FEAT_ZPCI_INTERP,
->>   };
+>> diff --git a/arch/s390/include/asm/kvm_pci.h b/arch/s390/include/asm/kvm_pci.h
+>> index 254275399f21..97e3a369135d 100644
+>> --- a/arch/s390/include/asm/kvm_pci.h
+>> +++ b/arch/s390/include/asm/kvm_pci.h
+>> @@ -30,6 +30,7 @@ struct kvm_zdev_ioat {
+>>   struct kvm_zdev {
+>>   	struct zpci_dev *zdev;
+>>   	struct kvm *kvm;
+>> +	u64 rpcit_count;
+>>   	struct kvm_zdev_ioat ioat;
+>>   	struct zpci_fib fib;
+>>   };
+>> diff --git a/arch/s390/include/asm/pci_dma.h b/arch/s390/include/asm/pci_dma.h
+>> index e1d3c1d3fc8a..0ca15e5db3d9 100644
+>> --- a/arch/s390/include/asm/pci_dma.h
+>> +++ b/arch/s390/include/asm/pci_dma.h
+>> @@ -52,6 +52,7 @@ enum zpci_ioat_dtype {
+>>   #define ZPCI_TABLE_ENTRIES		(ZPCI_TABLE_SIZE / ZPCI_TABLE_ENTRY_SIZE)
+>>   #define ZPCI_TABLE_PAGES		(ZPCI_TABLE_SIZE >> PAGE_SHIFT)
+>>   #define ZPCI_TABLE_ENTRIES_PAGES	(ZPCI_TABLE_ENTRIES * ZPCI_TABLE_PAGES)
+>> +#define ZPCI_TABLE_ENTRIES_PER_PAGE	(ZPCI_TABLE_ENTRIES / ZPCI_TABLE_PAGES)
+>>   
+>>   #define ZPCI_TABLE_BITS			11
+>>   #define ZPCI_PT_BITS			8
+>> diff --git a/arch/s390/kvm/pci.c b/arch/s390/kvm/pci.c
+>> index a1c0c0881332..858c5ecdc8b9 100644
+>> --- a/arch/s390/kvm/pci.c
+>> +++ b/arch/s390/kvm/pci.c
+>> @@ -123,6 +123,195 @@ int kvm_s390_pci_aen_init(u8 nisc)
+>>   	return rc;
+>>   }
+>>   
+>> +static int dma_shadow_cpu_trans(struct kvm_vcpu *vcpu, unsigned long *entry,
+>> +				unsigned long *gentry)
+>> +{
+>> +	unsigned long idx;
+>> +	struct page *page;
+>> +	void *gaddr = NULL;
+>> +	kvm_pfn_t pfn;
+>> +	gpa_t addr;
+>> +	int rc = 0;
+>> +
+>> +	if (pt_entry_isvalid(*gentry)) {
+>> +		/* pin and validate */
+>> +		addr = *gentry & ZPCI_PTE_ADDR_MASK;
+>> +		idx = srcu_read_lock(&vcpu->kvm->srcu);
+>> +		page = gfn_to_page(vcpu->kvm, gpa_to_gfn(addr));
+>> +		srcu_read_unlock(&vcpu->kvm->srcu, idx);
+>> +		if (is_error_page(page))
+>> +			return -EIO;
+>> +		gaddr = page_to_virt(page) + (addr & ~PAGE_MASK);
 > 
-> For the default model you need to be careful.
-> Is this in any way guest visible? then you definitely need to fence this
-> off for older QEMU versions so that when you migrate with older QEMUs
-> See the s390_cpudef_featoff_greater calls in  hw/s390x/s390-virtio-ccw.c
+> Hmm, this looks like a virtual vs physical address mixup to me that is
+> currently not a problem because kernel virtual addresses are equal to
+> their physical address. Here page_to_virt(page) gives us a virtual
+> address but the entries in the I/O translation table have to be
+> physical (aka absolute) addresses.
 > 
-> I know its more of a theoretical aspect, since PCI currently forbids 
-> migration
-> but we should try to have the cpu model consistent I guess.
+> With my commit "s390/pci: use physical addresses in DMA tables"
+> currently in the s390 feature branch this is also reflected in the
+> argument types taken by set_pt_pfaa() below so gaddr should have type
+> phys_addr_t not void *. That should also remove the need for the cast
+> to unsigned long for the duplicate check.
 
-Ah, good idea.  Thanks for the pointer.
-
->>   #define default_GEN14_GA2 EmptyFeat
->> diff --git a/target/s390x/kvm/kvm.c b/target/s390x/kvm/kvm.c
->> index 5b1fdb55c4..b13d78f988 100644
->> --- a/target/s390x/kvm/kvm.c
->> +++ b/target/s390x/kvm/kvm.c
->> @@ -2290,6 +2290,7 @@ static int kvm_to_feat[][2] = {
->>       { KVM_S390_VM_CPU_FEAT_PFMFI, S390_FEAT_SIE_PFMFI},
->>       { KVM_S390_VM_CPU_FEAT_SIGPIF, S390_FEAT_SIE_SIGPIF},
->>       { KVM_S390_VM_CPU_FEAT_KSS, S390_FEAT_SIE_KSS},
->> +    { KVM_S390_VM_CPU_FEAT_ZPCI_INTERP, S390_FEAT_ZPCI_INTERP },
->>   };
->>   static int query_cpu_feat(S390FeatBitmap features)
->>
-
+Right...  Like the other comment re: virtual vs physical address I will 
+take a look and fix for v2.
