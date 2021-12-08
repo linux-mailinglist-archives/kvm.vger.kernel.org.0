@@ -2,161 +2,224 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C3FC046D47A
-	for <lists+kvm@lfdr.de>; Wed,  8 Dec 2021 14:33:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2ED0646D4D8
+	for <lists+kvm@lfdr.de>; Wed,  8 Dec 2021 14:53:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232342AbhLHNhA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Dec 2021 08:37:00 -0500
-Received: from szxga08-in.huawei.com ([45.249.212.255]:29103 "EHLO
-        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231299AbhLHNhA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Dec 2021 08:37:00 -0500
-Received: from kwepemi500002.china.huawei.com (unknown [172.30.72.56])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4J8J2M1rlSz1DJwS;
-        Wed,  8 Dec 2021 21:30:35 +0800 (CST)
-Received: from kwepemm600016.china.huawei.com (7.193.23.20) by
- kwepemi500002.china.huawei.com (7.221.188.171) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Wed, 8 Dec 2021 21:33:25 +0800
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- kwepemm600016.china.huawei.com (7.193.23.20) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Wed, 8 Dec 2021 21:33:24 +0800
-Received: from lhreml710-chm.china.huawei.com ([169.254.81.184]) by
- lhreml710-chm.china.huawei.com ([169.254.81.184]) with mapi id
- 15.01.2308.020; Wed, 8 Dec 2021 13:33:23 +0000
-From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To:     "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        Zhangfei Gao <zhangfei.gao@linaro.org>,
-        "eric.auger.pro@gmail.com" <eric.auger.pro@gmail.com>,
-        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "will@kernel.org" <will@kernel.org>,
-        "robin.murphy@arm.com" <robin.murphy@arm.com>,
-        "jean-philippe@linaro.org" <jean-philippe@linaro.org>,
-        zhukeqian <zhukeqian1@huawei.com>
-CC:     "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "jacob.jun.pan@linux.intel.com" <jacob.jun.pan@linux.intel.com>,
-        "yi.l.liu@intel.com" <yi.l.liu@intel.com>,
-        "kevin.tian@intel.com" <kevin.tian@intel.com>,
-        "ashok.raj@intel.com" <ashok.raj@intel.com>,
-        "maz@kernel.org" <maz@kernel.org>,
-        "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
-        "vivek.gautam@arm.com" <vivek.gautam@arm.com>,
-        wangxingang <wangxingang5@huawei.com>,
-        jiangkunkun <jiangkunkun@huawei.com>,
-        yuzenghui <yuzenghui@huawei.com>,
-        "nicoleotsuka@gmail.com" <nicoleotsuka@gmail.com>,
-        "chenxiang (M)" <chenxiang66@hisilicon.com>,
-        "sumitg@nvidia.com" <sumitg@nvidia.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "vdumpa@nvidia.com" <vdumpa@nvidia.com>,
-        "zhangfei.gao@gmail.com" <zhangfei.gao@gmail.com>,
-        "vsethi@nvidia.com" <vsethi@nvidia.com>
-Subject: RE: [RFC v16 0/9] SMMUv3 Nested Stage Setup (IOMMU part)
-Thread-Topic: [RFC v16 0/9] SMMUv3 Nested Stage Setup (IOMMU part)
-Thread-Index: AQHXyx+ynNPh4l6d+UCGL4y4ns48GKwg7BKAgAYnz4CAAAIkgIAACKEAgAG5fXA=
-Date:   Wed, 8 Dec 2021 13:33:22 +0000
-Message-ID: <e78864fff56041848eda08c60e694160@huawei.com>
-References: <20211027104428.1059740-1-eric.auger@redhat.com>
- <ee119b42-92b1-5744-4321-6356bafb498f@linaro.org>
- <7763531a-625d-10c6-c35e-2ce41e75f606@redhat.com>
- <c1e9dd67-0000-28b5-81c0-239ceda560ed@linaro.org>
- <15a9875b-130a-e889-4e13-e063ef2ce4f9@redhat.com>
-In-Reply-To: <15a9875b-130a-e889-4e13-e063ef2ce4f9@redhat.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.47.84.149]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+        id S234426AbhLHN4q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Dec 2021 08:56:46 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33574 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229490AbhLHN4p (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 8 Dec 2021 08:56:45 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B8CelIZ005464;
+        Wed, 8 Dec 2021 13:53:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=qaUbAiA1N4hUD2ko6JAEOAtgSUiTNDn1yZbeu5EGDW4=;
+ b=aXHdVsIbDJoHOEGEaR+Xv+N6Nf3x4meAU/Pq06FSRcpdxHOftPP8VShSbpIvF/76ZkWg
+ LB1UZcyjaCIAbmALjOuXW8+vipCRs6PkZXU0JD0FAaN4SJ3EoMAatEmhd/giyUFsN9/O
+ n2tvSMJZ6AI0VwBWuYI2kjkvRrkoWkRadDQsVA4McnxeDtPxbdkKduocBH3Iih1bPJX9
+ 0Ep7qgkC+wkn2d4HVxYy86Ai1st64m4r5PyQpdfOodJ5ec10dM2X4PAVTZghk+eSE8D+
+ ncGWSTBbXarCWgcbooDg1ty2Aq/v+wn11iIhKQhjKnv6D8ELcCznxmCzRKsMBaE65iih fA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ctusv2wh0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 08 Dec 2021 13:53:13 +0000
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1B8CrP6M019525;
+        Wed, 8 Dec 2021 13:53:13 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ctusv2wg7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 08 Dec 2021 13:53:12 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1B8Dpq6X019268;
+        Wed, 8 Dec 2021 13:53:09 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma04fra.de.ibm.com with ESMTP id 3cqyy9xrxb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 08 Dec 2021 13:53:09 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1B8Dr6M131588798
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 8 Dec 2021 13:53:06 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 36CD011C058;
+        Wed,  8 Dec 2021 13:53:06 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EAF4611C052;
+        Wed,  8 Dec 2021 13:53:04 +0000 (GMT)
+Received: from sig-9-145-190-99.de.ibm.com (unknown [9.145.190.99])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  8 Dec 2021 13:53:04 +0000 (GMT)
+Message-ID: <614215b5aa14102c7b43913b234463199401a156.camel@linux.ibm.com>
+Subject: Re: [PATCH 07/32] s390/pci: externalize the SIC operation controls
+ and routine
+From:   Niklas Schnelle <schnelle@linux.ibm.com>
+To:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        linux-s390@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
+        farman@linux.ibm.com, pmorel@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, gerald.schaefer@linux.ibm.com,
+        agordeev@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
+        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Date:   Wed, 08 Dec 2021 14:53:04 +0100
+In-Reply-To: <bc3b60f7-833d-6d50-dcd0-b102a190c69d@linux.ibm.com>
+References: <20211207205743.150299-1-mjrosato@linux.ibm.com>
+         <20211207205743.150299-8-mjrosato@linux.ibm.com>
+         <bc3b60f7-833d-6d50-dcd0-b102a190c69d@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-16.el8) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: ANezq2W-3VWWQ-dz_JNa_Y196y7U-vz3
+X-Proofpoint-ORIG-GUID: iBxRDrU4pfpUqcbT_pusaRgiGllwh0Tj
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2021-12-08_05,2021-12-08_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 impostorscore=0 mlxscore=0 adultscore=0 bulkscore=0
+ suspectscore=0 clxscore=1015 lowpriorityscore=0 spamscore=0 phishscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2112080083
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogRXJpYyBBdWdlciBbbWFp
-bHRvOmVyaWMuYXVnZXJAcmVkaGF0LmNvbV0NCj4gU2VudDogMDcgRGVjZW1iZXIgMjAyMSAxMTow
-Ng0KPiBUbzogWmhhbmdmZWkgR2FvIDx6aGFuZ2ZlaS5nYW9AbGluYXJvLm9yZz47IGVyaWMuYXVn
-ZXIucHJvQGdtYWlsLmNvbTsNCj4gaW9tbXVAbGlzdHMubGludXgtZm91bmRhdGlvbi5vcmc7IGxp
-bnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7DQo+IGt2bUB2Z2VyLmtlcm5lbC5vcmc7IGt2bWFy
-bUBsaXN0cy5jcy5jb2x1bWJpYS5lZHU7IGpvcm9AOGJ5dGVzLm9yZzsNCj4gd2lsbEBrZXJuZWwu
-b3JnOyByb2Jpbi5tdXJwaHlAYXJtLmNvbTsgamVhbi1waGlsaXBwZUBsaW5hcm8ub3JnOw0KPiB6
-aHVrZXFpYW4gPHpodWtlcWlhbjFAaHVhd2VpLmNvbT4NCj4gQ2M6IGFsZXgud2lsbGlhbXNvbkBy
-ZWRoYXQuY29tOyBqYWNvYi5qdW4ucGFuQGxpbnV4LmludGVsLmNvbTsNCj4geWkubC5saXVAaW50
-ZWwuY29tOyBrZXZpbi50aWFuQGludGVsLmNvbTsgYXNob2sucmFqQGludGVsLmNvbTsNCj4gbWF6
-QGtlcm5lbC5vcmc7IHBldGVyLm1heWRlbGxAbGluYXJvLm9yZzsgdml2ZWsuZ2F1dGFtQGFybS5j
-b207DQo+IFNoYW1lZXJhbGkgS29sb3RodW0gVGhvZGkgPHNoYW1lZXJhbGkua29sb3RodW0udGhv
-ZGlAaHVhd2VpLmNvbT47DQo+IHdhbmd4aW5nYW5nIDx3YW5neGluZ2FuZzVAaHVhd2VpLmNvbT47
-IGppYW5na3Vua3VuDQo+IDxqaWFuZ2t1bmt1bkBodWF3ZWkuY29tPjsgeXV6ZW5naHVpIDx5dXpl
-bmdodWlAaHVhd2VpLmNvbT47DQo+IG5pY29sZW90c3VrYUBnbWFpbC5jb207IGNoZW54aWFuZyAo
-TSkgPGNoZW54aWFuZzY2QGhpc2lsaWNvbi5jb20+Ow0KPiBzdW1pdGdAbnZpZGlhLmNvbTsgbmlj
-b2xpbmNAbnZpZGlhLmNvbTsgdmR1bXBhQG52aWRpYS5jb207DQo+IHpoYW5nZmVpLmdhb0BnbWFp
-bC5jb207IGx1c2hlbm1pbmdAaHVhd2VpLmNvbTsgdnNldGhpQG52aWRpYS5jb20NCj4gU3ViamVj
-dDogUmU6IFtSRkMgdjE2IDAvOV0gU01NVXYzIE5lc3RlZCBTdGFnZSBTZXR1cCAoSU9NTVUgcGFy
-dCkNCj4gDQo+IEhpIFpoYW5nZmVpLA0KPiANCj4gT24gMTIvNy8yMSAxMTozNSBBTSwgWmhhbmdm
-ZWkgR2FvIHdyb3RlOg0KPiA+DQo+ID4NCj4gPiBPbiAyMDIxLzEyLzcg5LiL5Y2INjoyNywgRXJp
-YyBBdWdlciB3cm90ZToNCj4gPj4gSGkgWmhhbmdmZWksDQo+ID4+DQo+ID4+IE9uIDEyLzMvMjEg
-MToyNyBQTSwgWmhhbmdmZWkgR2FvIHdyb3RlOg0KPiA+Pj4gSGksIEVyaWMNCj4gPj4+DQo+ID4+
-PiBPbiAyMDIxLzEwLzI3IOS4i+WNiDY6NDQsIEVyaWMgQXVnZXIgd3JvdGU6DQo+ID4+Pj4gVGhp
-cyBzZXJpZXMgYnJpbmdzIHRoZSBJT01NVSBwYXJ0IG9mIEhXIG5lc3RlZCBwYWdpbmcgc3VwcG9y
-dA0KPiA+Pj4+IGluIHRoZSBTTU1VdjMuDQo+ID4+Pj4NCj4gPj4+PiBUaGUgU01NVXYzIGRyaXZl
-ciBpcyBhZGFwdGVkIHRvIHN1cHBvcnQgMiBuZXN0ZWQgc3RhZ2VzLg0KPiA+Pj4+DQo+ID4+Pj4g
-VGhlIElPTU1VIEFQSSBpcyBleHRlbmRlZCB0byBjb252ZXkgdGhlIGd1ZXN0IHN0YWdlIDENCj4g
-Pj4+PiBjb25maWd1cmF0aW9uIGFuZCB0aGUgaG9vayBpcyBpbXBsZW1lbnRlZCBpbiB0aGUgU01N
-VXYzIGRyaXZlci4NCj4gPj4+Pg0KPiA+Pj4+IFRoaXMgYWxsb3dzIHRoZSBndWVzdCB0byBvd24g
-dGhlIHN0YWdlIDEgdGFibGVzIGFuZCBjb250ZXh0DQo+ID4+Pj4gZGVzY3JpcHRvcnMgKHNvLWNh
-bGxlZCBQQVNJRCB0YWJsZSkgd2hpbGUgdGhlIGhvc3Qgb3ducyB0aGUNCj4gPj4+PiBzdGFnZSAy
-IHRhYmxlcyBhbmQgbWFpbiBjb25maWd1cmF0aW9uIHN0cnVjdHVyZXMgKFNURSkuDQo+ID4+Pj4N
-Cj4gPj4+PiBUaGlzIHdvcmsgbWFpbmx5IGlzIHByb3ZpZGVkIGZvciB0ZXN0IHB1cnBvc2UgYXMg
-dGhlIHVwcGVyDQo+ID4+Pj4gbGF5ZXIgaW50ZWdyYXRpb24gaXMgdW5kZXIgcmV3b3JrIGFuZCBi
-b3VuZCB0byBiZSBiYXNlZCBvbg0KPiA+Pj4+IC9kZXYvaW9tbXUgaW5zdGVhZCBvZiBWRklPIHR1
-bm5lbGluZy4gSW4gdGhpcyB2ZXJzaW9uIHdlIGFsc28gZ2V0DQo+ID4+Pj4gcmlkIG9mIHRoZSBN
-U0kgQklORElORyBpb2N0bCwgYXNzdW1pbmcgdGhlIGd1ZXN0IGVuZm9yY2VzDQo+ID4+Pj4gZmxh
-dCBtYXBwaW5nIG9mIGhvc3QgSU9WQXMgdXNlZCB0byBiaW5kIHBoeXNpY2FsIE1TSSBkb29yYmVs
-bHMuDQo+ID4+Pj4gSW4gdGhlIGN1cnJlbnQgUUVNVSBpbnRlZ3JhdGlvbiB0aGlzIGlzIGFjaGll
-dmVkIGJ5IGV4cG9zaW5nDQo+ID4+Pj4gUk1ScyB0byB0aGUgZ3Vlc3QsIHVzaW5nIFNoYW1lZXIn
-cyBzZXJpZXMgWzFdLiBUaGlzIGFwcHJvYWNoDQo+ID4+Pj4gaXMgUkZDIGFzIHRoZSBJT1JUIHNw
-ZWMgaXMgbm90IHJlYWxseSBtZWFudCB0byBkbyB0aGF0DQo+ID4+Pj4gKHNpbmdsZSBtYXBwaW5n
-IGZsYWcgbGltaXRhdGlvbikuDQo+ID4+Pj4NCj4gPj4+PiBCZXN0IFJlZ2FyZHMNCj4gPj4+Pg0K
-PiA+Pj4+IEVyaWMNCj4gPj4+Pg0KPiA+Pj4+IFRoaXMgc2VyaWVzIChIb3N0KSBjYW4gYmUgZm91
-bmQgYXQ6DQo+ID4+Pj4gaHR0cHM6Ly9naXRodWIuY29tL2VhdWdlci9saW51eC90cmVlL3Y1LjE1
-LXJjNy1uZXN0ZWQtdjE2DQo+ID4+Pj4gVGhpcyBpbmNsdWRlcyBhIHJlYmFzZWQgVkZJTyBpbnRl
-Z3JhdGlvbiAoYWx0aG91Z2ggbm90IG1lYW50DQo+ID4+Pj4gdG8gYmUgdXBzdHJlYW1lZCkNCj4g
-Pj4+Pg0KPiA+Pj4+IEd1ZXN0IGtlcm5lbCBicmFuY2ggY2FuIGJlIGZvdW5kIGF0Og0KPiA+Pj4+
-IGh0dHBzOi8vZ2l0aHViLmNvbS9lYXVnZXIvbGludXgvdHJlZS9zaGFtZWVyX3JtcnJfdjcNCj4g
-Pj4+PiBmZWF0dXJpbmcgWzFdDQo+ID4+Pj4NCj4gPj4+PiBRRU1VIGludGVncmF0aW9uIChzdGls
-bCBiYXNlZCBvbiBWRklPIGFuZCBleHBvc2luZyBSTVJzKQ0KPiA+Pj4+IGNhbiBiZSBmb3VuZCBh
-dDoNCj4gPj4+Pg0KPiBodHRwczovL2dpdGh1Yi5jb20vZWF1Z2VyL3FlbXUvdHJlZS92Ni4xLjAt
-cm1yLXYyLW5lc3RlZF9zbW11djNfdjEwDQo+ID4+Pj4gKHVzZSBpb21tdT1uZXN0ZWQtc21tdXYz
-IEFSTSB2aXJ0IG9wdGlvbikNCj4gPj4+Pg0KPiA+Pj4+IEd1ZXN0IGRlcGVuZGVuY3k6DQo+ID4+
-Pj4gWzFdIFtQQVRDSCB2NyAwLzldIEFDUEkvSU9SVDogU3VwcG9ydCBmb3IgSU9SVCBSTVIgbm9k
-ZQ0KPiA+Pj4gVGhhbmtzIGEgbG90IGZvciB1cGdyYWRpbmcgdGhlc2UgcGF0Y2hlcy4NCj4gPj4+
-DQo+ID4+PiBJIGhhdmUgYmFzaWNhbGx5IHZlcmlmaWVkIHRoZXNlIHBhdGNoZXMgb24gSGlTaWxp
-Y29uIEt1bnBlbmc5MjAuDQo+ID4+PiBBbmQgaW50ZWdyYXRlZCB0aGVtIHRvIHRoZXNlIGJyYW5j
-aGVzLg0KPiA+Pj4gaHR0cHM6Ly9naXRodWIuY29tL0xpbmFyby9saW51eC1rZXJuZWwtdWFkay90
-cmVlL3VhY2NlLWRldmVsLTUuMTYNCj4gPj4+IGh0dHBzOi8vZ2l0aHViLmNvbS9MaW5hcm8vcWVt
-dS90cmVlL3Y2LjEuMC1ybXItdjItbmVzdGVkX3NtbXV2M192MTANCj4gPj4+DQo+ID4+PiBUaG91
-Z2ggdGhleSBhcmUgcHJvdmlkZWQgZm9yIHRlc3QgcHVycG9zZSwNCj4gPj4+DQo+ID4+PiBUZXN0
-ZWQtYnk6IFpoYW5nZmVpIEdhbyA8emhhbmdmZWkuZ2FvQGxpbmFyby5vcmc+DQo+ID4+IFRoYW5r
-IHlvdSB2ZXJ5IG11Y2guIEFzIHlvdSBtZW50aW9uZWQsIHVudGlsIHdlIGRvIG5vdCBoYXZlIHRo
-ZQ0KPiA+PiAvZGV2L2lvbW11IGludGVncmF0aW9uIHRoaXMgaXMgbWFpbnRhaW5lZCBmb3IgdGVz
-dGluZyBwdXJwb3NlLiBUaGUgU01NVQ0KPiA+PiBjaGFuZ2VzIHNob3VsZG4ndCBiZSBtdWNoIGlt
-cGFjdGVkIHRob3VnaC4NCj4gPj4gVGhlIGFkZGVkIHZhbHVlIG9mIHRoaXMgcmVzcGluIHdhcyB0
-byBwcm9wb3NlIGFuIE1TSSBiaW5kaW5nIHNvbHV0aW9uDQo+ID4+IGJhc2VkIG9uIFJNUlJzIHdo
-aWNoIHNpbXBsaWZ5IHRoaW5ncyBhdCBrZXJuZWwgbGV2ZWwuDQo+ID4NCj4gPiBDdXJyZW50IFJN
-UlIgc29sdXRpb24gcmVxdWlyZXMgdWVmaSBlbmFibGVkLA0KPiA+IGFuZCBRRU1VX0VGSS5mZMKg
-IGhhcyB0byBiZSBwcm92aWRlZCB0byBzdGFydCBxZW11Lg0KPiA+DQo+ID4gQW55IHBsYW4gdG8g
-c3VwcG9ydCBkdGIgYXMgd2VsbCwgd2hpY2ggd2lsbCBiZSBzaW1wbGVyIHNpbmNlIG5vIG5lZWQN
-Cj4gPiBRRU1VX0VGSS5mZCBhbnltb3JlLg0KPiBZZXMgdGhlIHNvbHV0aW9uIGlzIGJhc2VkIG9u
-IEFDUEkgSU9SVCBub2Rlcy4gTm8gY2x1ZSBpZiBzb21lIERUDQo+IGludGVncmF0aW9uIGlzIHVu
-ZGVyIHdvcmsuIFNoYW1lZXI/DQoNClRoZXJlIHdhcyBzb21lIGF0dGVtcHQgaW4gdGhlIHBhc3Qg
-dG8gY3JlYXRlIGlkZW50aXR5IG1hcHBpbmdzIHVzaW5nIERULg0KVGhpcyBpcyB0aGUgbGF0ZXN0
-IEkgY2FuIGZpbmQgb24gaXQsDQpodHRwczovL2xvcmUua2VybmVsLm9yZy9saW51eC1pb21tdS9Z
-VGVsREh4MlJFSUl2ViUyRk5Ab3JvbWUuZnJpdHouYm94L1QvDQoNClRoYW5rcywNClNoYW1lZXIN
-Cg0K
+On Wed, 2021-12-08 at 14:09 +0100, Christian Borntraeger wrote:
+> Am 07.12.21 um 21:57 schrieb Matthew Rosato:
+> > A subsequent patch will be issuing SIC from KVM -- export the necessary
+> > routine and make the operation control definitions available from a header.
+> > Because the routine will now be exported, let's swap the purpose of
+> > zpci_set_irq_ctrl and __zpci_set_irq_ctrl, leaving the latter as a static
+> > within pci_irq.c only for SIC calls that don't specify an iib.
+> 
+> Maybe it would be simpler to export the __ version instead of renaming everything.
+> Whatever Niklas prefers.
+
+See below I think it's just not worth it having both variants at all.
+
+> > Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> > ---
+> >   arch/s390/include/asm/pci_insn.h | 17 +++++++++--------
+> >   arch/s390/pci/pci_insn.c         |  3 ++-
+> >   arch/s390/pci/pci_irq.c          | 28 ++++++++++++++--------------
+> >   3 files changed, 25 insertions(+), 23 deletions(-)
+> > 
+> > diff --git a/arch/s390/include/asm/pci_insn.h b/arch/s390/include/asm/pci_insn.h
+> > index 61cf9531f68f..5331082fa516 100644
+> > --- a/arch/s390/include/asm/pci_insn.h
+> > +++ b/arch/s390/include/asm/pci_insn.h
+> > @@ -98,6 +98,14 @@ struct zpci_fib {
+> >   	u32 gd;
+> >   } __packed __aligned(8);
+> >   
+> > +/* Set Interruption Controls Operation Controls  */
+> > +#define	SIC_IRQ_MODE_ALL		0
+> > +#define	SIC_IRQ_MODE_SINGLE		1
+> > +#define	SIC_IRQ_MODE_DIRECT		4
+> > +#define	SIC_IRQ_MODE_D_ALL		16
+> > +#define	SIC_IRQ_MODE_D_SINGLE		17
+> > +#define	SIC_IRQ_MODE_SET_CPU		18
+> > +
+> >   /* directed interruption information block */
+> >   struct zpci_diib {
+> >   	u32 : 1;
+> > @@ -134,13 +142,6 @@ int __zpci_store(u64 data, u64 req, u64 offset);
+> >   int zpci_store(const volatile void __iomem *addr, u64 data, unsigned long len);
+> >   int __zpci_store_block(const u64 *data, u64 req, u64 offset);
+> >   void zpci_barrier(void);
+> > -int __zpci_set_irq_ctrl(u16 ctl, u8 isc, union zpci_sic_iib *iib);
+> > -
+> > -static inline int zpci_set_irq_ctrl(u16 ctl, u8 isc)
+> > -{
+> > -	union zpci_sic_iib iib = {{0}};
+> > -
+> > -	return __zpci_set_irq_ctrl(ctl, isc, &iib);
+> > -}
+> > +int zpci_set_irq_ctrl(u16 ctl, u8 isc, union zpci_sic_iib *iib);
+
+Since the __zpci_set_irq_ctrl() was already non static/inline the above
+inline to non-inline change shouldn't make a performance difference.
+
+Looking at this makes me wonder though. Wouldn't it make sense to just
+have the zpci_set_irq_ctrl() function inline in the header. Its body is
+a single instruction inline asm plus a test_facility(). The latter by
+the way I think also looks rather out of place there considering we
+call zpci_set_irq_ctrl() in the interrupt handler and facilities can't
+go away so it's pretty silly to check for it on every single
+interrupt.. unless I'm totally missing something.
+
+> >   
+> >   #endif
+> > diff --git a/arch/s390/pci/pci_insn.c b/arch/s390/pci/pci_insn.c
+> > index 28d863aaafea..d1a8bd43ce26 100644
+> > --- a/arch/s390/pci/pci_insn.c
+> > +++ b/arch/s390/pci/pci_insn.c
+> > @@ -97,7 +97,7 @@ int zpci_refresh_trans(u64 fn, u64 addr, u64 range)
+> >   }
+> >   
+> >   /* Set Interruption Controls */
+> > -int __zpci_set_irq_ctrl(u16 ctl, u8 isc, union zpci_sic_iib *iib)
+> > +int zpci_set_irq_ctrl(u16 ctl, u8 isc, union zpci_sic_iib *iib)
+> >   {
+> >   	if (!test_facility(72))
+> >   		return -EIO;
+> > @@ -108,6 +108,7 @@ int __zpci_set_irq_ctrl(u16 ctl, u8 isc, union zpci_sic_iib *iib)
+> >   
+> >   	return 0;
+> >   }
+> > +EXPORT_SYMBOL_GPL(zpci_set_irq_ctrl);
+> >   
+> >   /* PCI Load */
+> >   static inline int ____pcilg(u64 *data, u64 req, u64 offset, u8 *status)
+> > diff --git a/arch/s390/pci/pci_irq.c b/arch/s390/pci/pci_irq.c
+> > index dfd4f3276a6d..6b29e39496d1 100644
+> > --- a/arch/s390/pci/pci_irq.c
+> > +++ b/arch/s390/pci/pci_irq.c
+> > @@ -15,13 +15,6 @@
+> >   
+> >   static enum {FLOATING, DIRECTED} irq_delivery;
+> >   
+> > -#define	SIC_IRQ_MODE_ALL		0
+> > -#define	SIC_IRQ_MODE_SINGLE		1
+> > -#define	SIC_IRQ_MODE_DIRECT		4
+> > -#define	SIC_IRQ_MODE_D_ALL		16
+> > -#define	SIC_IRQ_MODE_D_SINGLE		17
+> > -#define	SIC_IRQ_MODE_SET_CPU		18
+> > -
+> >   /*
+> >    * summary bit vector
+> >    * FLOATING - summary bit per function
+> > @@ -145,6 +138,13 @@ static int zpci_set_irq_affinity(struct irq_data *data, const struct cpumask *de
+> >   	return IRQ_SET_MASK_OK;
+> >   }
+> >   
+> > +static inline int __zpci_set_irq_ctrl(u16 ctl, u8 isc)
+> > +{
+> > +	union zpci_sic_iib iib = {{0}};
+> > +
+> > +	return zpci_set_irq_ctrl(ctl, isc, &iib);
+> > +}
+> > +
+
+I would be totally fine and slighlt prefer to have the 0 iib repeated
+at those 3 call sites that don't need it. On first glance that should
+come out to pretty much the same number of lines of code and it removes
+the potential confusion of swapping the __ prefixed and non-prefixed
+variants. What do you think?
+
+> >   static struct irq_chip zpci_irq_chip = {
+> >   	.name = "PCI-MSI",
+> >   	.irq_unmask = pci_msi_unmask_irq,
+> > @@ -165,7 +165,7 @@ static void zpci_handle_cpu_local_irq(bool rescan)
+> > 
+---8<---
+
