@@ -2,145 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 32FC046D3E9
-	for <lists+kvm@lfdr.de>; Wed,  8 Dec 2021 13:59:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F0D1B46D559
+	for <lists+kvm@lfdr.de>; Wed,  8 Dec 2021 15:12:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233940AbhLHNC6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Dec 2021 08:02:58 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:61134 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232257AbhLHNC5 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 8 Dec 2021 08:02:57 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B8CrIHI020548;
-        Wed, 8 Dec 2021 12:59:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
+        id S234843AbhLHOQR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Dec 2021 09:16:17 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43448 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S232641AbhLHOQO (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 8 Dec 2021 09:16:14 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B8CemjT023610;
+        Wed, 8 Dec 2021 14:12:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
  content-type : content-transfer-encoding; s=pp1;
- bh=2R23eaCrrVtdZBHHaFMGUQMsilAYzl2387ZDrVoF20Q=;
- b=oIMMaX4HfOwTx9zkYLVRL+qBqAUgUy+ukVDIqRZ8K6uCWlRXuBjRSRDDBIC1WvRHJ3Kx
- /8FjfO2jjeRlTxXT5y9ksRK678W05Wj4IQSkJ2MKyhNnC0WkXZ33LNM4e02fXVyIQ4c0
- QBSlTMmyq+KCMylneS81td8UDUZ1NxbUcg524pEvlEVVYauX8woyOGwk3AHUTHs+E8jN
- JzTlrH4uVTQp1/l7NE02wpX9fUShHHjsFQtjOiLc0Y5umIOWBv5RGzutn76EY/i/QwU6
- WSSYeLvPaeNqH8KQNqTkQCqd/r28RRJGR880ZTfp/Z4OJ3lA8+cJNMT66JXjIguzvD8H uQ== 
+ bh=HlGJLnOczjtt2ujifmTiLDXcYUWE56/nOPhLdkaDazM=;
+ b=H5aMf/8Zk0pqESBsfgwlcIk5WPERD9FN6EnaUj8jumdENIpuvsnR/D85mjyCWAy3Db+7
+ /f9nR+PPSdkF2e2ko6lA/WenpcyYQnTU3FxgaGFM/KanIH+YoUEz52VUF5C0bRVQ1XO0
+ giucElHMUR20QXslICmVJejAG94EFX7cgKCl5VW0LxPoGJ2iHFXVTqMBz+o2c+kFKAMK
+ 3xqiOAtbfsnMWUQycnz/O2Pg/qi45ShdZYmqGYoVfKKBf9ghTq94ya40+zdDrunm5q2/
+ vWhZ6GtJdetxH99zd3ug+bxwr3tv7w13c5iPTfmb+I0xQMSmzC1laV3+fHq3Ddwwx5yT CQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ctw3w83e8-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3ctuq2bf6k-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 08 Dec 2021 12:59:26 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1B8Cv3wB031807;
-        Wed, 8 Dec 2021 12:59:25 GMT
+        Wed, 08 Dec 2021 14:12:41 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1B8EBus6004805;
+        Wed, 8 Dec 2021 14:12:41 GMT
 Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3ctw3w83d4-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3ctuq2bf5m-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 08 Dec 2021 12:59:25 +0000
+        Wed, 08 Dec 2021 14:12:41 +0000
 Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1B8CsBta018166;
-        Wed, 8 Dec 2021 12:59:22 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma03fra.de.ibm.com with ESMTP id 3cqyy9p9qc-1
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1B8E8EkN006729;
+        Wed, 8 Dec 2021 14:12:39 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma03fra.de.ibm.com with ESMTP id 3cqyy9q0aa-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 08 Dec 2021 12:59:22 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1B8CxJqF25624894
+        Wed, 08 Dec 2021 14:12:39 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1B8ECacM24314124
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 8 Dec 2021 12:59:19 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E8B2EA404D;
-        Wed,  8 Dec 2021 12:59:18 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EEE58A4040;
-        Wed,  8 Dec 2021 12:59:17 +0000 (GMT)
-Received: from [9.171.54.177] (unknown [9.171.54.177])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed,  8 Dec 2021 12:59:17 +0000 (GMT)
-Message-ID: <2a5ec1f1-a0f4-9c55-38df-c48dfe9234f7@linux.ibm.com>
-Date:   Wed, 8 Dec 2021 13:59:17 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH 06/32] s390/airq: allow for airq structure that uses an
- input vector
-Content-Language: en-US
-To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
-        hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
+        Wed, 8 Dec 2021 14:12:36 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 53EC652059;
+        Wed,  8 Dec 2021 14:12:36 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.3.179])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 39C8E52050;
+        Wed,  8 Dec 2021 14:12:35 +0000 (GMT)
+Date:   Wed, 8 Dec 2021 14:06:51 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, alex.williamson@redhat.com,
+        cohuck@redhat.com, schnelle@linux.ibm.com, farman@linux.ibm.com,
+        pmorel@linux.ibm.com, borntraeger@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, gerald.schaefer@linux.ibm.com,
+        agordeev@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
         vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
         thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 01/32] s390/sclp: detect the zPCI interpretation
+ facility
+Message-ID: <20211208140651.5c7cdb1e@p-imbrenda>
+In-Reply-To: <20211207205743.150299-2-mjrosato@linux.ibm.com>
 References: <20211207205743.150299-1-mjrosato@linux.ibm.com>
- <20211207205743.150299-7-mjrosato@linux.ibm.com>
-From:   Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <20211207205743.150299-7-mjrosato@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+        <20211207205743.150299-2-mjrosato@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: O0E25g8EFfYFOGfwJlLLldFUlYMRmlk-
-X-Proofpoint-GUID: YHMG5Sn74x3c_OLc-6WQ-9EgbMV5m5Xp
+X-Proofpoint-ORIG-GUID: Sshp_8gbK3MJOvB1gj7no5-JfaT9D0KA
+X-Proofpoint-GUID: D0i4WkiXvlJ6S5avSW5ErP9fAjuK9vV-
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2021-12-08_04,2021-12-08_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
- impostorscore=0 mlxlogscore=999 mlxscore=0 suspectscore=0 bulkscore=0
- lowpriorityscore=0 priorityscore=1501 spamscore=0 malwarescore=0
+ definitions=2021-12-08_05,2021-12-08_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ mlxlogscore=999 suspectscore=0 mlxscore=0 malwarescore=0 bulkscore=0
+ impostorscore=0 spamscore=0 phishscore=0 adultscore=0 lowpriorityscore=0
  clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2112080080
+ engine=8.12.0-2110150000 definitions=main-2112080089
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue,  7 Dec 2021 15:57:12 -0500
+Matthew Rosato <mjrosato@linux.ibm.com> wrote:
 
-
-Am 07.12.21 um 21:57 schrieb Matthew Rosato:
-> When doing device passthrough where interrupts are being forwarded
-> from host to guest, we wish to use a pinned section of guest memory
-> as the vector (the same memory used by the guest as the vector).
+> Detect the zPCI Load/Store Interpretation facility.
 > 
+> Reviewed-by: Eric Farman <farman@linux.ibm.com>
 > Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> ---
->   arch/s390/include/asm/airq.h     |  4 +++-
->   arch/s390/pci/pci_irq.c          |  8 ++++----
->   drivers/s390/cio/airq.c          | 10 +++++++---
->   drivers/s390/virtio/virtio_ccw.c |  2 +-
->   4 files changed, 15 insertions(+), 9 deletions(-)
-> 
-> diff --git a/arch/s390/include/asm/airq.h b/arch/s390/include/asm/airq.h
-> index 7918a7d09028..e82e5626e139 100644
-> --- a/arch/s390/include/asm/airq.h
-> +++ b/arch/s390/include/asm/airq.h
-> @@ -47,8 +47,10 @@ struct airq_iv {
->   #define AIRQ_IV_PTR		4	/* Allocate the ptr array */
->   #define AIRQ_IV_DATA		8	/* Allocate the data array */
->   #define AIRQ_IV_CACHELINE	16	/* Cacheline alignment for the vector */
-> +#define AIRQ_IV_GUESTVEC	32	/* Vector is a pinned guest page */
->   
-> -struct airq_iv *airq_iv_create(unsigned long bits, unsigned long flags);
-> +struct airq_iv *airq_iv_create(unsigned long bits, unsigned long flags,
-> +			       unsigned long *vec);
->   void airq_iv_release(struct airq_iv *iv);
->   unsigned long airq_iv_alloc(struct airq_iv *iv, unsigned long num);
->   void airq_iv_free(struct airq_iv *iv, unsigned long bit, unsigned long num);
-> diff --git a/arch/s390/pci/pci_irq.c b/arch/s390/pci/pci_irq.c
-> index 880bcd73f11a..dfd4f3276a6d 100644
-> --- a/arch/s390/pci/pci_irq.c
-> +++ b/arch/s390/pci/pci_irq.c
-> @@ -296,7 +296,7 @@ int arch_setup_msi_irqs(struct pci_dev *pdev, int nvec, int type)
->   		zdev->aisb = bit;
->   
->   		/* Create adapter interrupt vector */
-> -		zdev->aibv = airq_iv_create(msi_vecs, AIRQ_IV_DATA | AIRQ_IV_BITLOCK);
-> +		zdev->aibv = airq_iv_create(msi_vecs, AIRQ_IV_DATA | AIRQ_IV_BITLOCK, 0);
->   		if (!zdev->aibv)
->   			return -ENOMEM;
->   
-> @@ -421,7 +421,7 @@ static int __init zpci_directed_irq_init(void)
->   	union zpci_sic_iib iib = {{0}};
->   	unsigned int cpu;
->   
-> -	zpci_sbv = airq_iv_create(num_possible_cpus(), 0);
-> +	zpci_sbv = airq_iv_create(num_possible_cpus(), 0, 0);
 
-For a pointer use NULL? Also in other places. With the indentation fix this looks sane.
+I have the same comment as Christian; with that fixed:
+
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+
+> ---
+>  arch/s390/include/asm/sclp.h   | 1 +
+>  drivers/s390/char/sclp_early.c | 1 +
+>  2 files changed, 2 insertions(+)
+> 
+> diff --git a/arch/s390/include/asm/sclp.h b/arch/s390/include/asm/sclp.h
+> index c68ea35de498..c84e8e0ca344 100644
+> --- a/arch/s390/include/asm/sclp.h
+> +++ b/arch/s390/include/asm/sclp.h
+> @@ -88,6 +88,7 @@ struct sclp_info {
+>  	unsigned char has_diag318 : 1;
+>  	unsigned char has_sipl : 1;
+>  	unsigned char has_dirq : 1;
+> +	unsigned char has_zpci_interp : 1;
+>  	unsigned int ibc;
+>  	unsigned int mtid;
+>  	unsigned int mtid_cp;
+> diff --git a/drivers/s390/char/sclp_early.c b/drivers/s390/char/sclp_early.c
+> index b64feab62caa..2e8199b7ae50 100644
+> --- a/drivers/s390/char/sclp_early.c
+> +++ b/drivers/s390/char/sclp_early.c
+> @@ -45,6 +45,7 @@ static void __init sclp_early_facilities_detect(void)
+>  	sclp.has_gisaf = !!(sccb->fac118 & 0x08);
+>  	sclp.has_hvs = !!(sccb->fac119 & 0x80);
+>  	sclp.has_kss = !!(sccb->fac98 & 0x01);
+> +	sclp.has_zpci_interp = !!(sccb->fac118 & 0x01);
+>  	if (sccb->fac85 & 0x02)
+>  		S390_lowcore.machine_flags |= MACHINE_FLAG_ESOP;
+>  	if (sccb->fac91 & 0x40)
+
