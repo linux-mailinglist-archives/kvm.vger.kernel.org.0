@@ -2,164 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E407B46D622
-	for <lists+kvm@lfdr.de>; Wed,  8 Dec 2021 15:51:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0342C46D65B
+	for <lists+kvm@lfdr.de>; Wed,  8 Dec 2021 16:03:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235521AbhLHOzH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Dec 2021 09:55:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46756 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231923AbhLHOzG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Dec 2021 09:55:06 -0500
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 610D0C061746;
-        Wed,  8 Dec 2021 06:51:34 -0800 (PST)
-Received: by mail-ed1-x532.google.com with SMTP id x6so9247401edr.5;
-        Wed, 08 Dec 2021 06:51:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=QWHLsi58iBRKLpnRUwKPYaAT671ZxtkhBU1FfVlVdXg=;
-        b=K+4tRxGphRbws1f4Rrz0JYGa2Qx/72RzMwQUficOEbDv1SlOEhtiw3VGzPcnLY3Jo2
-         1P1jH2DJ2Il+6mtk7fPD06NeoCXeeNnt2d95pXGlX5eWBMj/BalrT7AJOOOFH5y4B+Yh
-         b8/2uLh2bql/u5eRW9MQFgc6RCd3QhgJOBn/VzNrFN+K03/4iWwEiusX0q52KMF94+9w
-         J7Ciwb0oFbIlV1xP3Q5cI99NcmtmsYgSsVKyS9dXEuTU3n0Y6frI6wYMO9YbKq4gRIE+
-         YIu3o09Kn/5UNq4wSkPPAnn1vwABqCMS/QkwAmQ2i9tW+t2V5+C6zjqZk2zV+Y3arYOb
-         XWPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=QWHLsi58iBRKLpnRUwKPYaAT671ZxtkhBU1FfVlVdXg=;
-        b=jqbmYugse+5yrZnypmzDkPNtON6vMfc0R8H5wqPxTwmHwKwwzlpmh2ZjZSjHIINnGL
-         FX9H76nIWTtSpi4nTt0d7ytNdafdhreCMUlTNuiKIWHQqGbL+JCPQbnNggyUKfOf0iFs
-         YrcxpKwkBD/JCdd8aHknyTdJ+i9sef1Yy3tO0u0okyaZ8MmAWZxsnliUElx9QLohMvqv
-         DHKpqZGX28g91b0064GsDKePDrO9STa4xYYIdZs2g8fSLcGX2vO24+GwGzu03n5qM/R6
-         u49pda0je5VaIpmDz5PsvBgVtlZ0R7TykMHETHEyh/E6Nbanw7feUnAkpJT+eFVIx1mr
-         OvhQ==
-X-Gm-Message-State: AOAM530KgfGo1d8eEmaPS4FoZ3iZPFbdqhLzAd6GMKouXrc6AKGqDOS4
-        r/R9YXpq4z9XnOvPdv92fBI=
-X-Google-Smtp-Source: ABdhPJxCx1VEvF7FzfkCtA0NwaIDc28iCguT9i8qNKGCpeXl8YVLWLN6FoGepTtKHBM7AnLSsJFzHw==
-X-Received: by 2002:a05:6402:4302:: with SMTP id m2mr19576689edc.349.1638975092953;
-        Wed, 08 Dec 2021 06:51:32 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id h10sm2087524edr.95.2021.12.08.06.51.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 08 Dec 2021 06:51:32 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <518c3e07-41c8-feeb-5298-702c101994c7@redhat.com>
-Date:   Wed, 8 Dec 2021 15:51:28 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH v3 00/26] KVM: x86: Halt and APICv overhaul
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
+        id S233820AbhLHPHW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Dec 2021 10:07:22 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:60872 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229496AbhLHPHV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 8 Dec 2021 10:07:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1638975829;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=R2jrd2Kf9So+x8Xz8AeO7h4+6EIMVdYK/e/smQ/H8MM=;
+        b=f6Aq8dbIU1Gh0qzz5/zABRu0zkITXm0KVFJ/0RD3i4DQTNZYNpM9SgArRGcKE40xXhQFI/
+        J9KxuNbY+Po0k23gfuE5FJJTPzxV47aPkFaSW+uymOgrxdQkSP8wXHryduB4sYddALsvpl
+        SuwBcaKYJP0+/oHVTOwS6HoaZmWmn30=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-589-cf0uzvLzM2eUCw3rji32Lg-1; Wed, 08 Dec 2021 10:03:45 -0500
+X-MC-Unique: cf0uzvLzM2eUCw3rji32Lg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E6647802C99;
+        Wed,  8 Dec 2021 15:03:42 +0000 (UTC)
+Received: from starship (unknown [10.40.192.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1E4F019724;
+        Wed,  8 Dec 2021 15:03:38 +0000 (UTC)
+Message-ID: <f5b75c4d99c1f9e94ab9e639bc2fc8fddb9c7366.camel@redhat.com>
+Subject: Re: [PATCH v3 21/26] KVM: SVM: Drop AVIC's intermediate
+ avic_set_running() helper
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
         Joerg Roedel <joro@8bytes.org>
 Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
         kvm@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>
+        linux-kernel@vger.kernel.org
+Date:   Wed, 08 Dec 2021 17:03:37 +0200
+In-Reply-To: <e1c4ec6a-7c1e-b96c-63e6-d07b35820def@redhat.com>
 References: <20211208015236.1616697-1-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211208015236.1616697-1-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+         <20211208015236.1616697-22-seanjc@google.com>
+         <e1c4ec6a-7c1e-b96c-63e6-d07b35820def@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/8/21 02:52, Sean Christopherson wrote:
-> Overhaul and cleanup APIC virtualization (Posted Interrupts on Intel VMX,
-> AVIC on AMD SVM) to streamline things as much as possible, remove a bunch
-> of cruft, and document the lurking gotchas along the way.
+On Wed, 2021-12-08 at 15:43 +0100, Paolo Bonzini wrote:
+> On 12/8/21 02:52, Sean Christopherson wrote:
+> > +	/*
+> > +	 * Unload the AVIC when the vCPU is about to block,_before_  the vCPU
+> > +	 * actually blocks.  The vCPU needs to be marked IsRunning=0 before the
+> > +	 * final pass over the vIRR via kvm_vcpu_check_block().  Any IRQs that
+> > +	 * arrive before IsRunning=0 will not signal the doorbell, i.e. it's
+> > +	 * KVM's responsibility to ensure there are no pending IRQs in the vIRR
+> > +	 * after IsRunning is cleared, prior to scheduling out the vCPU.
 > 
-> Patch 01 is a fix from Paolo that's already been merged but hasn't made
-> its way to kvm/queue.  It's included here to avoid a number of conflicts.
+> I prefer to phrase this around paired memory barriers and the usual 
+> store/smp_mb/load lockless idiom:
 > 
-> Based on kvm/queue, commit 1cf84614b04a ("KVM: x86: Exit to ...")
+> 	/*
+> 	 * Unload the AVIC when the vCPU is about to block, _before_
+> 	 * the vCPU actually blocks.
+> 	 *
+> 	 * Any IRQs that arrive before IsRunning=0 will not cause an
+> 	 * incomplete IPI vmexit on the source, therefore vIRR will also
+> 	 * be checked by kvm_vcpu_check_block() before blocking.  The
+> 	 * memory barrier implicit in set_current_state orders writing
 
-Queued, thanks; patches 24-26 for 5.16 and the rest for 5.17.
+If I understand correctly this is a full memory barrier and not only a write barrier?
 
-Just one nit: please tune the language to have a little fewer idiomatic 
-phrases, as that can be a bit taxing on non-native speakers.  I for one 
-enjoy learning a few new words, and it even adds some "personality" to 
-the remote interactions, but it probably distracts people that aren't 
-too preficient in English.
+ 
+Also, just to document, I also found out that lack of subsequent vIRR checking
+in the 'KVM: SVM: Unconditionally mark AVIC as running on vCPU load (with APICv)'
+is what made AVIC totally unusable on my systems.
+That patch would set is_running right in the middle of schedule() and then
+no vIRR check would be done afterwards.
+ 
+Small update on my adventures with AVIC: On two Milan machines I got my hands on,
+on both AVIC is disabled in CPUID, but seems to work. None of my reproducers
+manage to hit that errata and on top of that I have set of patches that make
+AVIC co-exist with nesting and it appears to work while stress tested with
+my KVM unit test which I updated to run a nested guest on one of the vCPUs.
+I mostly testing the second machine though this week.
+ 
+I'll post my patches as soon as I rebase them on top of this patch series,
+after I review it.
+I’ll post the unit test soon too.
+ 
+Still my gut feeling is that the errata is still there - I am still waiting for
+AMD to provide any info they could on this.
 
-Paolo
 
-> v3:
->   - Rebase to kvm/queue (and drop non-x86 patches as they've been queued).
->   - Redo AVIC patches, sadly the vcpu_(un)blocking() hooks need to stay.
->   - Add a patch to fix a missing (docuentation-only) barrier in nested
->     posted interrupt delivery. [Paolo]
->   - Collect reviews.
+Best regards,
+	Maxim Levitsky
+
+
+> 	 * IsRunning=0 before reading the vIRR.  The processor needs a
+> 	 * matching memory barrier on interrupt delivery between writing
+> 	 * IRR and reading IsRunning; the lack of this barrier might be
+> 	 * the cause of errata #1235).
+> 	 */
 > 
-> v2:
->   - https://lore.kernel.org/all/20211009021236.4122790-1-seanjc@google.com/
->   - Collect reviews. [Christian, David]
->   - Add patch to move arm64 WFI functionality out of hooks. [Marc]
->   - Add RISC-V to the fun.
->   - Add all the APICv fun.
+> Is there any nuance that I am missing?
 > 
-> v1: https://lkml.kernel.org/r/20210925005528.1145584-1-seanjc@google.com
+> Paolo
 > 
-> Paolo Bonzini (1):
->    KVM: fix avic_set_running for preemptable kernels
-> 
-> Sean Christopherson (25):
->    KVM: nVMX: Ensure vCPU honors event request if posting nested IRQ
->      fails
->    KVM: VMX: Clean up PI pre/post-block WARNs
->    KVM: VMX: Handle PI wakeup shenanigans during vcpu_put/load
->    KVM: Drop unused kvm_vcpu.pre_pcpu field
->    KVM: Move x86 VMX's posted interrupt list_head to vcpu_vmx
->    KVM: VMX: Move preemption timer <=> hrtimer dance to common x86
->    KVM: x86: Unexport LAPIC's switch_to_{hv,sw}_timer() helpers
->    KVM: x86: Remove defunct pre_block/post_block kvm_x86_ops hooks
->    KVM: SVM: Signal AVIC doorbell iff vCPU is in guest mode
->    KVM: SVM: Don't bother checking for "running" AVIC when kicking for
->      IPIs
->    KVM: SVM: Remove unnecessary APICv/AVIC update in vCPU unblocking path
->    KVM: SVM: Use kvm_vcpu_is_blocking() in AVIC load to handle preemption
->    KVM: SVM: Skip AVIC and IRTE updates when loading blocking vCPU
->    iommu/amd: KVM: SVM: Use pCPU to infer IsRun state for IRTE
->    KVM: VMX: Don't do full kick when triggering posted interrupt "fails"
->    KVM: VMX: Wake vCPU when delivering posted IRQ even if vCPU == this
->      vCPU
->    KVM: VMX: Pass desired vector instead of bool for triggering posted
->      IRQ
->    KVM: VMX: Fold fallback path into triggering posted IRQ helper
->    KVM: VMX: Don't do full kick when handling posted interrupt wakeup
->    KVM: SVM: Drop AVIC's intermediate avic_set_running() helper
->    KVM: SVM: Move svm_hardware_setup() and its helpers below svm_x86_ops
->    KVM: SVM: Nullify vcpu_(un)blocking() hooks if AVIC is disabled
->    KVM: x86: Skip APICv update if APICv is disable at the module level
->    KVM: x86: Drop NULL check on kvm_x86_ops.check_apicv_inhibit_reasons
->    KVM: x86: Unexport __kvm_request_apicv_update()
-> 
->   arch/x86/include/asm/kvm-x86-ops.h |   2 -
->   arch/x86/include/asm/kvm_host.h    |  12 -
->   arch/x86/kvm/hyperv.c              |   3 +
->   arch/x86/kvm/lapic.c               |   2 -
->   arch/x86/kvm/svm/avic.c            | 116 ++++---
->   arch/x86/kvm/svm/svm.c             | 479 ++++++++++++++---------------
->   arch/x86/kvm/svm/svm.h             |  16 +-
->   arch/x86/kvm/vmx/posted_intr.c     | 234 +++++++-------
->   arch/x86/kvm/vmx/posted_intr.h     |   8 +-
->   arch/x86/kvm/vmx/vmx.c             |  66 ++--
->   arch/x86/kvm/vmx/vmx.h             |   3 +
->   arch/x86/kvm/x86.c                 |  41 ++-
->   drivers/iommu/amd/iommu.c          |   6 +-
->   include/linux/amd-iommu.h          |   6 +-
->   include/linux/kvm_host.h           |   3 -
->   virt/kvm/kvm_main.c                |   3 -
->   16 files changed, 510 insertions(+), 490 deletions(-)
-> 
+> > +	 */
+> > +	avic_vcpu_put(vcpu);
+> > +
+
 
