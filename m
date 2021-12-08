@@ -2,95 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 51FE246CAA3
-	for <lists+kvm@lfdr.de>; Wed,  8 Dec 2021 02:56:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E775A46CAFD
+	for <lists+kvm@lfdr.de>; Wed,  8 Dec 2021 03:44:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243909AbhLHB7n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Dec 2021 20:59:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38330 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243659AbhLHB7H (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Dec 2021 20:59:07 -0500
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D5ECC0698CB
-        for <kvm@vger.kernel.org>; Tue,  7 Dec 2021 17:55:31 -0800 (PST)
-Received: by mail-pg1-x549.google.com with SMTP id z4-20020a656104000000b00321790921fbso449722pgu.4
-        for <kvm@vger.kernel.org>; Tue, 07 Dec 2021 17:55:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc;
-        bh=VCkxR8iIoNYN3L1RJkz/btGuEUMw40noTB+y7+zqLJ0=;
-        b=LHBsLMi3udo6BrUeQlkY0pT4Oc4Ew+wh9tNDgI5U1zVhU/K0iQ3l6PitAe/In7no9G
-         OXT3y7uz44mqs4JDXqIHQ7BK0RaSWSDltzRyPHd0OyFaaR3vrpx63cneXeF3DTx93b9g
-         F2/KpKN4IMYf61J/Il7a3FpMeSlYTvqPqK3MgdLFbpzQb7rQbMFPHsRQvt8Ph6dTV4nC
-         MW/pjtPm8rI9cn9uQZFXTuJxhW36O6IqgaBHmFE+cCoTQkTPNd5oVzxa6qMc527PBa6Q
-         kGs0fFfa+c8qKWopEJ+pQD8z9ov9+LAS3ZGWNB92YYF6/oohgLIDMWPUTgJwXVZpYg95
-         K0Jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc;
-        bh=VCkxR8iIoNYN3L1RJkz/btGuEUMw40noTB+y7+zqLJ0=;
-        b=w7dv+TtmwdRl5WSlrItjZe1GN+0ob9VcHpmeSjR15BTitFzJd28fhu1/fHZ6c6JFzX
-         7fZnpm/9ZR2Zzu1jT+dXeXk31iNypCeybVtDWORCoxFOaAhWwBx4TKUxKnenTJogH+5c
-         7Ktp+l3ATe1LMvm+LSMQInGo7f8q+tDIqDWC3Q4xlDfUAv0SCdCmwAMtYLCXiw8T744g
-         TrmIGMj8V9QZzNNZGRvNM6mLCQCBb1WVrYbShnyqttJWq5KvFBDnB4EeJUoKirr3r63q
-         5DGvmkgBy9eLpS1PsVNRPKVTyjcj9zPoi/d9spQzb8+r5ciDb9r455NNVDQATmfA1cu8
-         bs8Q==
-X-Gm-Message-State: AOAM531dbNzSsLM7WA/3ifYLE1nTqRz173bZmB/BqRSh0X4dsxmhDMzh
-        N/0MR8vSFDj7BXeka1OF4eLRXwmXWZg=
-X-Google-Smtp-Source: ABdhPJyQ9IDS5uYE2qNrBofLqK0XEq3FDd5eSHH0h+fuqLKFddQUMDjOnZnO89YNMResi94warafDO7Gz7o=
-X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:903:124e:b0:143:a388:a5de with SMTP id
- u14-20020a170903124e00b00143a388a5demr55869342plh.73.1638928530566; Tue, 07
- Dec 2021 17:55:30 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  8 Dec 2021 01:52:36 +0000
-In-Reply-To: <20211208015236.1616697-1-seanjc@google.com>
-Message-Id: <20211208015236.1616697-27-seanjc@google.com>
-Mime-Version: 1.0
-References: <20211208015236.1616697-1-seanjc@google.com>
-X-Mailer: git-send-email 2.34.1.400.ga245620fadb-goog
-Subject: [PATCH v3 26/26] KVM: x86: Unexport __kvm_request_apicv_update()
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, Joerg Roedel <joro@8bytes.org>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        kvm@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S243086AbhLHCsA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Dec 2021 21:48:00 -0500
+Received: from mga06.intel.com ([134.134.136.31]:34242 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233825AbhLHCsA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Dec 2021 21:48:00 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10191"; a="298538167"
+X-IronPort-AV: E=Sophos;i="5.87,296,1631602800"; 
+   d="scan'208";a="298538167"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2021 18:44:29 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.87,296,1631602800"; 
+   d="scan'208";a="515586056"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.118]) ([10.239.159.118])
+  by orsmga008.jf.intel.com with ESMTP; 07 Dec 2021 18:44:23 -0800
+Cc:     baolu.lu@linux.intel.com, peter.maydell@linaro.org,
+        kvm@vger.kernel.org, vivek.gautam@arm.com,
+        kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com,
+        jean-philippe@linaro.org, ashok.raj@intel.com, maz@kernel.org,
+        vsethi@nvidia.com, zhangfei.gao@linaro.org, kevin.tian@intel.com,
+        will@kernel.org, alex.williamson@redhat.com,
+        wangxingang5@huawei.com, linux-kernel@vger.kernel.org,
+        lushenming@huawei.com, iommu@lists.linux-foundation.org,
+        robin.murphy@arm.com, Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [RFC v16 1/9] iommu: Introduce attach/detach_pasid_table API
+To:     eric.auger@redhat.com, Joerg Roedel <joro@8bytes.org>
+References: <20211027104428.1059740-1-eric.auger@redhat.com>
+ <20211027104428.1059740-2-eric.auger@redhat.com>
+ <Ya3qd6mT/DpceSm8@8bytes.org>
+ <c7e26722-f78c-a93f-c425-63413aa33dde@redhat.com>
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+Message-ID: <e6733c59-ffcb-74d4-af26-273c1ae8ce68@linux.intel.com>
+Date:   Wed, 8 Dec 2021 10:44:14 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
+MIME-Version: 1.0
+In-Reply-To: <c7e26722-f78c-a93f-c425-63413aa33dde@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Unexport __kvm_request_apicv_update(), it's not used by vendor code and
-should never be used by vendor code.  The only reason it's exposed at all
-is because Hyper-V's SynIC needs to track how many auto-EOIs are in use,
-and it's convenient to use apicv_update_lock to guard that tracking.
+Hi Eric,
 
-No functional change intended.
+On 12/7/21 6:22 PM, Eric Auger wrote:
+> On 12/6/21 11:48 AM, Joerg Roedel wrote:
+>> On Wed, Oct 27, 2021 at 12:44:20PM +0200, Eric Auger wrote:
+>>> Signed-off-by: Jean-Philippe Brucker<jean-philippe.brucker@arm.com>
+>>> Signed-off-by: Liu, Yi L<yi.l.liu@linux.intel.com>
+>>> Signed-off-by: Ashok Raj<ashok.raj@intel.com>
+>>> Signed-off-by: Jacob Pan<jacob.jun.pan@linux.intel.com>
+>>> Signed-off-by: Eric Auger<eric.auger@redhat.com>
+>> This Signed-of-by chain looks dubious, you are the author but the last
+>> one in the chain?
+> The 1st RFC in Aug 2018
+> (https://lists.cs.columbia.edu/pipermail/kvmarm/2018-August/032478.html)
+> said this was a generalization of Jacob's patch
+> 
+> 
+>    [PATCH v5 01/23] iommu: introduce bind_pasid_table API function
+> 
+> 
+>    https://lists.linuxfoundation.org/pipermail/iommu/2018-May/027647.html
+> 
+> So indeed Jacob should be the author. I guess the multiple rebases got
+> this eventually replaced at some point, which is not an excuse. Please
+> forgive me for that.
+> Now the original patch already had this list of SoB so I don't know if I
+> shall simplify it.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/x86.c | 1 -
- 1 file changed, 1 deletion(-)
+As we have decided to move the nested mode (dual stages) implementation
+onto the developing iommufd framework, what's the value of adding this
+into iommu core?
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index fc52b97d6aa1..0774cf4ccd88 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9597,7 +9597,6 @@ void __kvm_request_apicv_update(struct kvm *kvm, bool activate, ulong bit)
- 	} else
- 		kvm->arch.apicv_inhibit_reasons = new;
- }
--EXPORT_SYMBOL_GPL(__kvm_request_apicv_update);
- 
- void kvm_request_apicv_update(struct kvm *kvm, bool activate, ulong bit)
- {
--- 
-2.34.1.400.ga245620fadb-goog
-
+Best regards,
+baolu
