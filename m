@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 777D746BEC6
+	by mail.lfdr.de (Postfix) with ESMTP id C0A9E46BEC7
 	for <lists+kvm@lfdr.de>; Tue,  7 Dec 2021 16:11:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238594AbhLGPNL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Dec 2021 10:13:11 -0500
+        id S238562AbhLGPNP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Dec 2021 10:13:15 -0500
 Received: from mga14.intel.com ([192.55.52.115]:5480 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238582AbhLGPNI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Dec 2021 10:13:08 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10190"; a="237821133"
+        id S238582AbhLGPNM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Dec 2021 10:13:12 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10190"; a="237821152"
 X-IronPort-AV: E=Sophos;i="5.87,293,1631602800"; 
-   d="scan'208";a="237821133"
+   d="scan'208";a="237821152"
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2021 07:09:38 -0800
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2021 07:09:41 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.87,293,1631602800"; 
-   d="scan'208";a="461289843"
+   d="scan'208";a="461289855"
 Received: from icx.bj.intel.com ([10.240.192.117])
-  by orsmga003.jf.intel.com with ESMTP; 07 Dec 2021 07:09:34 -0800
+  by orsmga003.jf.intel.com with ESMTP; 07 Dec 2021 07:09:38 -0800
 From:   Yang Zhong <yang.zhong@intel.com>
 To:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
@@ -28,9 +28,9 @@ To:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 Cc:     seanjc@google.com, jun.nakajima@intel.com, kevin.tian@intel.com,
         jing2.liu@linux.intel.com, jing2.liu@intel.com,
         yang.zhong@intel.com
-Subject: [PATCH 08/19] x86/fpu: Move xfd_update_state() to xstate.c and export symbol
-Date:   Tue,  7 Dec 2021 19:03:48 -0500
-Message-Id: <20211208000359.2853257-9-yang.zhong@intel.com>
+Subject: [PATCH 09/19] kvm: x86: Prepare reallocation check
+Date:   Tue,  7 Dec 2021 19:03:49 -0500
+Message-Id: <20211208000359.2853257-10-yang.zhong@intel.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211208000359.2853257-1-yang.zhong@intel.com>
 References: <20211208000359.2853257-1-yang.zhong@intel.com>
@@ -42,86 +42,69 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Jing Liu <jing2.liu@intel.com>
 
-xfd_update_state() is the interface to update IA32_XFD and its per-cpu
-cache. All callers of this interface are currently in fpu core. KVM only
-indirectly triggers IA32_XFD update via a helper function
-(fpu_swap_kvm_fpstate()) when switching between user fpu and guest fpu.
+On native fpstate reallocation is triggered by #NM because IA32_XFD
+is initialized to 1 for all native tasks.
 
-Supporting AMX in guest now requires KVM to directly update IA32_XFD
-with the guest value (when emulating WRMSR) so XSAVE/XRSTOR can manage
-XSTATE components correctly inside guest.
+However #NM in guest is not trapped by KVM. Instead, guest enabling
+of a dynamic extended feature can be captured via emulation of
+IA32_XFD and XSETBV. Basically having guest XCR0[i]=1 and XFD[i]=0
+indicates that the feature[i] is activated by the guest.
 
-This patch moves xfd_update_state() from fpu/xstate.h to fpu/xstate.c
-and export it for reference outside of fpu core.
+This patch provides a helper function for such check, invoked when
+either XCR0 or XFD is changed in the emulation path.
 
 Signed-off-by: Jing Liu <jing2.liu@intel.com>
+Signed-off-by: Kevin Tian <kevin.tian@intel.com>
 Signed-off-by: Yang Zhong <yang.zhong@intel.com>
 ---
- arch/x86/include/asm/fpu/api.h |  2 ++
- arch/x86/kernel/fpu/xstate.c   | 12 ++++++++++++
- arch/x86/kernel/fpu/xstate.h   | 14 +-------------
- 3 files changed, 15 insertions(+), 13 deletions(-)
+ arch/x86/kvm/x86.c | 24 ++++++++++++++++++++++++
+ arch/x86/kvm/x86.h |  1 +
+ 2 files changed, 25 insertions(+)
 
-diff --git a/arch/x86/include/asm/fpu/api.h b/arch/x86/include/asm/fpu/api.h
-index 7532f73c82a6..999d89026be9 100644
---- a/arch/x86/include/asm/fpu/api.h
-+++ b/arch/x86/include/asm/fpu/api.h
-@@ -131,8 +131,10 @@ DECLARE_PER_CPU(struct fpu *, fpu_fpregs_owner_ctx);
- /* Process cleanup */
- #ifdef CONFIG_X86_64
- extern void fpstate_free(struct fpu *fpu);
-+extern void xfd_update_state(struct fpstate *fpstate);
- #else
- static inline void fpstate_free(struct fpu *fpu) { }
-+static void xfd_update_state(struct fpstate *fpstate) { }
- #endif
- 
- /* fpstate-related functions which are exported to KVM */
-diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
-index fe3d8ed3db0e..3c39789deeb9 100644
---- a/arch/x86/kernel/fpu/xstate.c
-+++ b/arch/x86/kernel/fpu/xstate.c
-@@ -1750,6 +1750,18 @@ int xfd_enable_guest_features(struct fpu_guest *guest_fpu)
- 	return __xfd_enable_feature(xfd_err, guest_fpu);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 05f2cda73d69..91cc6f69a7ca 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -956,6 +956,30 @@ void kvm_load_host_xsave_state(struct kvm_vcpu *vcpu)
  }
+ EXPORT_SYMBOL_GPL(kvm_load_host_xsave_state);
  
-+void xfd_update_state(struct fpstate *fpstate)
++bool kvm_check_guest_realloc_fpstate(struct kvm_vcpu *vcpu, u64 xfd)
 +{
-+	if (fpu_state_size_dynamic()) {
-+		u64 xfd = fpstate->xfd;
++	u64 xcr0 = vcpu->arch.xcr0 & XFEATURE_MASK_USER_DYNAMIC;
 +
-+		if (__this_cpu_read(xfd_state) != xfd) {
-+			wrmsrl(MSR_IA32_XFD, xfd);
-+			__this_cpu_write(xfd_state, xfd);
++	/* For any state which is enabled dynamically */
++	if ((xfd & xcr0) != xcr0) {
++		u64 request = (xcr0 ^ xfd) & xcr0;
++		struct fpu_guest *guest_fpu = &vcpu->arch.guest_fpu;
++
++		/*
++		 * If requested features haven't been enabled, update
++		 * the request bitmap and tell the caller to request
++		 * dynamic buffer reallocation.
++		 */
++		if ((guest_fpu->user_xfeatures & request) != request) {
++			vcpu->arch.guest_fpu.realloc_request = request;
++			return true;
 +		}
 +	}
++
++	return false;
 +}
-+EXPORT_SYMBOL_GPL(xfd_update_state);
- #else /* CONFIG_X86_64 */
- static inline int xstate_request_perm(unsigned long idx, bool guest)
++EXPORT_SYMBOL_GPL(kvm_check_guest_realloc_fpstate);
++
+ static int __kvm_set_xcr(struct kvm_vcpu *vcpu, u32 index, u64 xcr)
  {
-diff --git a/arch/x86/kernel/fpu/xstate.h b/arch/x86/kernel/fpu/xstate.h
-index 3254e2b5f17f..651bd29977b9 100644
---- a/arch/x86/kernel/fpu/xstate.h
-+++ b/arch/x86/kernel/fpu/xstate.h
-@@ -149,19 +149,7 @@ static inline void xfd_validate_state(struct fpstate *fpstate, u64 mask, bool rs
- #endif
+ 	u64 xcr0 = xcr;
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index 4abcd8d9836d..24a323980146 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -445,6 +445,7 @@ static inline void kvm_machine_check(void)
  
- #ifdef CONFIG_X86_64
--static inline void xfd_update_state(struct fpstate *fpstate)
--{
--	if (fpu_state_size_dynamic()) {
--		u64 xfd = fpstate->xfd;
--
--		if (__this_cpu_read(xfd_state) != xfd) {
--			wrmsrl(MSR_IA32_XFD, xfd);
--			__this_cpu_write(xfd_state, xfd);
--		}
--	}
--}
--#else
--static inline void xfd_update_state(struct fpstate *fpstate) { }
-+extern void xfd_update_state(struct fpstate *fpstate);
- #endif
- 
- /*
+ void kvm_load_guest_xsave_state(struct kvm_vcpu *vcpu);
+ void kvm_load_host_xsave_state(struct kvm_vcpu *vcpu);
++bool kvm_check_guest_realloc_fpstate(struct kvm_vcpu *vcpu, u64 new_xfd);
+ int kvm_spec_ctrl_test_value(u64 value);
+ bool kvm_is_valid_cr4(struct kvm_vcpu *vcpu, unsigned long cr4);
+ int kvm_handle_memory_failure(struct kvm_vcpu *vcpu, int r,
