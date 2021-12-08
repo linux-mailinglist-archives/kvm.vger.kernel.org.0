@@ -2,127 +2,198 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0342C46D65B
-	for <lists+kvm@lfdr.de>; Wed,  8 Dec 2021 16:03:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E0CA46D664
+	for <lists+kvm@lfdr.de>; Wed,  8 Dec 2021 16:04:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233820AbhLHPHW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Dec 2021 10:07:22 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:60872 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229496AbhLHPHV (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 8 Dec 2021 10:07:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1638975829;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=R2jrd2Kf9So+x8Xz8AeO7h4+6EIMVdYK/e/smQ/H8MM=;
-        b=f6Aq8dbIU1Gh0qzz5/zABRu0zkITXm0KVFJ/0RD3i4DQTNZYNpM9SgArRGcKE40xXhQFI/
-        J9KxuNbY+Po0k23gfuE5FJJTPzxV47aPkFaSW+uymOgrxdQkSP8wXHryduB4sYddALsvpl
-        SuwBcaKYJP0+/oHVTOwS6HoaZmWmn30=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-589-cf0uzvLzM2eUCw3rji32Lg-1; Wed, 08 Dec 2021 10:03:45 -0500
-X-MC-Unique: cf0uzvLzM2eUCw3rji32Lg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E6647802C99;
-        Wed,  8 Dec 2021 15:03:42 +0000 (UTC)
-Received: from starship (unknown [10.40.192.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 1E4F019724;
-        Wed,  8 Dec 2021 15:03:38 +0000 (UTC)
-Message-ID: <f5b75c4d99c1f9e94ab9e639bc2fc8fddb9c7366.camel@redhat.com>
-Subject: Re: [PATCH v3 21/26] KVM: SVM: Drop AVIC's intermediate
- avic_set_running() helper
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Joerg Roedel <joro@8bytes.org>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        kvm@vger.kernel.org, iommu@lists.linux-foundation.org,
-        linux-kernel@vger.kernel.org
-Date:   Wed, 08 Dec 2021 17:03:37 +0200
-In-Reply-To: <e1c4ec6a-7c1e-b96c-63e6-d07b35820def@redhat.com>
-References: <20211208015236.1616697-1-seanjc@google.com>
-         <20211208015236.1616697-22-seanjc@google.com>
-         <e1c4ec6a-7c1e-b96c-63e6-d07b35820def@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        id S229496AbhLHPI2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Dec 2021 10:08:28 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:10024 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235616AbhLHPIW (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 8 Dec 2021 10:08:22 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B8ErGRc017260;
+        Wed, 8 Dec 2021 15:04:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=5ZzGJFNHOId4Fg8Lm8qhIqr7WLjSOU+9kIfRCaUQ4Ck=;
+ b=nH1KyjX0pXYieqXIUNScTM1kvGu0IGoNrSdSZxe8T0ld6i7kjjC9nHSHqNRs9ewhQFpJ
+ BzEyOyFTOipR41W+Q61CJJ0FK5pP3TYYosqnw8HVy6ygqIPcJINJyw21Un0lSOdz2owI
+ n2U5HjKmurGUX27sBMgr9hHLmaaxwoQi6f9MbZEfHMYHQGHkeLf9lm0dBEOjmeuiR1bz
+ CngrVawlhZsn3DhOn9MAQwrN7ouS7Jl6Hn04is0WG9tDrJ1uXN1jn/GI2Rx4jFYyoDnI
+ MGF5ZIiGw7v6/dTkTx3RJuMum05KK3gRlhM0a4/nieg15l6aP3y0x63EYJIphSKBbhXl zg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ctxv688pe-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 08 Dec 2021 15:04:49 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1B8EvCwp028277;
+        Wed, 8 Dec 2021 15:04:49 GMT
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ctxv688p0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 08 Dec 2021 15:04:48 +0000
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+        by ppma04wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1B8Elsxv017866;
+        Wed, 8 Dec 2021 15:04:47 GMT
+Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
+        by ppma04wdc.us.ibm.com with ESMTP id 3cqyyb3nxp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 08 Dec 2021 15:04:47 +0000
+Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com [9.57.199.108])
+        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1B8F4k3t27001156
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 8 Dec 2021 15:04:46 GMT
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EA9D6B2066;
+        Wed,  8 Dec 2021 15:04:45 +0000 (GMT)
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 60D9DB206C;
+        Wed,  8 Dec 2021 15:04:38 +0000 (GMT)
+Received: from [9.211.152.43] (unknown [9.211.152.43])
+        by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
+        Wed,  8 Dec 2021 15:04:37 +0000 (GMT)
+Message-ID: <97f867f3-d582-c8d2-9336-98a92d184961@linux.ibm.com>
+Date:   Wed, 8 Dec 2021 10:04:36 -0500
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH 20/32] KVM: s390: pci: provide routines for
+ enabling/disabling interpretation
+Content-Language: en-US
+To:     Niklas Schnelle <schnelle@linux.ibm.com>,
+        linux-s390@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
+        farman@linux.ibm.com, pmorel@linux.ibm.com,
+        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
+        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
+        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20211207205743.150299-1-mjrosato@linux.ibm.com>
+ <20211207205743.150299-21-mjrosato@linux.ibm.com>
+ <8c2f83d2186e93965eba74356126df7fd35d9a41.camel@linux.ibm.com>
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+In-Reply-To: <8c2f83d2186e93965eba74356126df7fd35d9a41.camel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: VYcW3kS46ytNN2s9cpT_PSjtLMj7etNf
+X-Proofpoint-ORIG-GUID: N3yFQjtM4d6m7eWHLPpL1QjRC_br2zB6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2021-12-08_06,2021-12-08_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
+ adultscore=0 mlxlogscore=999 malwarescore=0 spamscore=0 clxscore=1015
+ suspectscore=0 lowpriorityscore=0 impostorscore=0 phishscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2112080093
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2021-12-08 at 15:43 +0100, Paolo Bonzini wrote:
-> On 12/8/21 02:52, Sean Christopherson wrote:
-> > +	/*
-> > +	 * Unload the AVIC when the vCPU is about to block,_before_  the vCPU
-> > +	 * actually blocks.  The vCPU needs to be marked IsRunning=0 before the
-> > +	 * final pass over the vIRR via kvm_vcpu_check_block().  Any IRQs that
-> > +	 * arrive before IsRunning=0 will not signal the doorbell, i.e. it's
-> > +	 * KVM's responsibility to ensure there are no pending IRQs in the vIRR
-> > +	 * after IsRunning is cleared, prior to scheduling out the vCPU.
+On 12/8/21 4:44 AM, Niklas Schnelle wrote:
+> On Tue, 2021-12-07 at 15:57 -0500, Matthew Rosato wrote:
+>> These routines will be wired into the vfio_pci_zdev ioctl handlers to
+>> respond to requests to enable / disable a device for zPCI Load/Store
+>> interpretation.
+>>
+>> The first time such a request is received, enable the necessary facilities
+>> for the guest.
+>>
+>> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+>> ---
+>>   arch/s390/include/asm/kvm_pci.h |  4 ++
+>>   arch/s390/kvm/pci.c             | 91 +++++++++++++++++++++++++++++++++
+>>   arch/s390/pci/pci.c             |  3 ++
+>>   3 files changed, 98 insertions(+)
+>>
+>> diff --git a/arch/s390/include/asm/kvm_pci.h b/arch/s390/include/asm/kvm_pci.h
+>> index 3e491a39704c..5d6283acb54c 100644
+>> --- a/arch/s390/include/asm/kvm_pci.h
+>>
+> ---8<---
+>> 		return rc;
+>> +	}
+>> +
+>> +	/*
+>> +	 * Store information about the identity of the kvm guest allowed to
+>> +	 * access this device via interpretation to be used by host CLP
+>> +	 */
+>> +	zdev->gd = gd;
+>> +
+>> +	rc = zpci_enable_device(zdev);
+>> +	if (rc)
+>> +		goto err;
+>> +
+>> +	/* Re-register the IOMMU that was already created */
+>> +	rc = zpci_register_ioat(zdev, 0, zdev->start_dma, zdev->end_dma,
+>> +				(u64)zdev->dma_table);
 > 
-> I prefer to phrase this around paired memory barriers and the usual 
-> store/smp_mb/load lockless idiom:
+> The zdev->dma_table is a virtual address but we need an absolute
+> address in the MPCIFC so the above should use
+> virt_to_phys(zdev->dma_table) to be compatible with future V != R
+> kernel memory. As of now since virtual and absolute kernel addresses
+> are the same this is not a bug and we've had this (wrong) pattern in
+> the rest of the code but let's get it righht here from the start.
 > 
-> 	/*
-> 	 * Unload the AVIC when the vCPU is about to block, _before_
-> 	 * the vCPU actually blocks.
-> 	 *
-> 	 * Any IRQs that arrive before IsRunning=0 will not cause an
-> 	 * incomplete IPI vmexit on the source, therefore vIRR will also
-> 	 * be checked by kvm_vcpu_check_block() before blocking.  The
-> 	 * memory barrier implicit in set_current_state orders writing
+> See also my commit "s390/pci: use physical addresses in DMA tables"
+> that is currently in the s390 feature branch.
 
-If I understand correctly this is a full memory barrier and not only a write barrier?
+You're right of course -- I saw those changes happening as I prepared 
+this series but I didn't want to delay getting comments any longer, what 
+with the holidays approaching.  Of course, I didn't realize they were 
+already out on the feature branch.
 
- 
-Also, just to document, I also found out that lack of subsequent vIRR checking
-in the 'KVM: SVM: Unconditionally mark AVIC as running on vCPU load (with APICv)'
-is what made AVIC totally unusable on my systems.
-That patch would set is_running right in the middle of schedule() and then
-no vIRR check would be done afterwards.
- 
-Small update on my adventures with AVIC: On two Milan machines I got my hands on,
-on both AVIC is disabled in CPUID, but seems to work. None of my reproducers
-manage to hit that errata and on top of that I have set of patches that make
-AVIC co-exist with nesting and it appears to work while stress tested with
-my KVM unit test which I updated to run a nested guest on one of the vCPUs.
-I mostly testing the second machine though this week.
- 
-I'll post my patches as soon as I rebase them on top of this patch series,
-after I review it.
-I’ll post the unit test soon too.
- 
-Still my gut feeling is that the errata is still there - I am still waiting for
-AMD to provide any info they could on this.
+I suspect there is some more of this also in the code related to 
+handling RPCIT.  AEN setup too.
 
-
-Best regards,
-	Maxim Levitsky
-
-
-> 	 * IsRunning=0 before reading the vIRR.  The processor needs a
-> 	 * matching memory barrier on interrupt delivery between writing
-> 	 * IRR and reading IsRunning; the lack of this barrier might be
-> 	 * the cause of errata #1235).
-> 	 */
 > 
-> Is there any nuance that I am missing?
+>> +	if (rc)
+>> +		goto err;
+>> +
+>> +	return rc;
+>> +
+>> +err:
+>> +	zdev->gd = 0;
+>> +	return rc;
+>> +}
+>> +EXPORT_SYMBOL_GPL(kvm_s390_pci_interp_enable);
+>> +
+>> +int kvm_s390_pci_interp_disable(struct zpci_dev *zdev)
+>> +{
+>> +	int rc;
+>> +
+>> +	if (zdev->gd == 0)
+>> +		return -EINVAL;
+>> +
+>> +	/* Remove the host CLP guest designation */
+>> +	zdev->gd = 0;
+>> +
+>> +	if (zdev_enabled(zdev)) {
+>> +		rc = zpci_disable_device(zdev);
+>> +		if (rc)
+>> +			return rc;
+>> +	}
+>> +
+>> +	rc = zpci_enable_device(zdev);
+>> +	if (rc)
+>> +		return rc;
+>> +
+>> +	/* Re-register the IOMMU that was already created */
+>> +	rc = zpci_register_ioat(zdev, 0, zdev->start_dma, zdev->end_dma,
+>> +				(u64)zdev->dma_table);
 > 
-> Paolo
+> Same as above
 > 
-> > +	 */
-> > +	avic_vcpu_put(vcpu);
-> > +
-
+>> +
+>> +	return rc;
+>> +}
+>> +EXPORT_SYMBOL_GPL(kvm_s390_pci_interp_disable);
+>> +
+>>
+> ---8<---
+> 
 
