@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1688746BEB5
-	for <lists+kvm@lfdr.de>; Tue,  7 Dec 2021 16:09:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D88AF46BEB7
+	for <lists+kvm@lfdr.de>; Tue,  7 Dec 2021 16:11:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238473AbhLGPMh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Dec 2021 10:12:37 -0500
+        id S237781AbhLGPMm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Dec 2021 10:12:42 -0500
 Received: from mga14.intel.com ([192.55.52.115]:5480 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229503AbhLGPMh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Dec 2021 10:12:37 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10190"; a="237820954"
+        id S229503AbhLGPMl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Dec 2021 10:12:41 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10190"; a="237820979"
 X-IronPort-AV: E=Sophos;i="5.87,293,1631602800"; 
-   d="scan'208";a="237820954"
+   d="scan'208";a="237820979"
 Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2021 07:09:06 -0800
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2021 07:09:10 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.87,293,1631602800"; 
-   d="scan'208";a="461289713"
+   d="scan'208";a="461289739"
 Received: from icx.bj.intel.com ([10.240.192.117])
-  by orsmga003.jf.intel.com with ESMTP; 07 Dec 2021 07:09:01 -0800
+  by orsmga003.jf.intel.com with ESMTP; 07 Dec 2021 07:09:05 -0800
 From:   Yang Zhong <yang.zhong@intel.com>
 To:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
@@ -28,167 +28,313 @@ To:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 Cc:     seanjc@google.com, jun.nakajima@intel.com, kevin.tian@intel.com,
         jing2.liu@linux.intel.com, jing2.liu@intel.com,
         yang.zhong@intel.com
-Subject: [PATCH 00/19] AMX Support in KVM
-Date:   Tue,  7 Dec 2021 19:03:40 -0500
-Message-Id: <20211208000359.2853257-1-yang.zhong@intel.com>
+Subject: [PATCH 01/19] x86/fpu: Extend prctl() with guest permissions
+Date:   Tue,  7 Dec 2021 19:03:41 -0500
+Message-Id: <20211208000359.2853257-2-yang.zhong@intel.com>
 X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20211208000359.2853257-1-yang.zhong@intel.com>
+References: <20211208000359.2853257-1-yang.zhong@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-(send on behalf of Jing who is currently on leave)
+From: Thomas Gleixner <tglx@linutronix.de>
 
-This series brings AMX (Advanced Matrix eXtensions) virtualization
-support to KVM. The three preparation patches in fpu core from 
-Thomas [1] are also included. 
+Add guest permission control for dynamic XSTATE components, including
+extension to prctl() with two new options (ARCH_GET_XCOMP_GUEST_PERM
+and ARCH_REQ_XCOMP_GUEST_PERM) and to struct fpu with a new member
+(guest_perm).
 
-A large portion of the changes in this series is to deal with eXtended
-Feature Disable (XFD) which allows resizing of the fpstate buffer to 
-support dynamically-enabled XSTATE features with large state component
-(e.g. 8K for AMX).
+Userspace VMM has to request guest permissions before it exposes any
+XSAVE feature using dynamic XSTATE components. The permission can be
+set only once when the first vCPU is created. A new flag
+FPU_GUEST_PERM_LOCKED is introduced to lock the change for this purpose
 
-The support is based on several key changes (design discussions can be
-found in [2]):
+Similar to native permissions this doesn't actually enable the
+permitted feature. KVM is expected to install a larger kernel buffer
+and enable the feature when detecting the intention from the guest.
 
-  - Guest permissions for dynamically-enabled XSAVE features
-
-    Native tasks have to request permission via prctl() before touching
-    a dynamic-resized XSTATE compoenent. Introduce guest permissions 
-    for the similar purpose. Userspace VMM is expected to request guest
-    permission only once when the first vCPU is created.
-
-    KVM checks guest permission in KVM_SET_CPUID2. Setting XFD in guest
-    cpuid w/o proper permissions fails this operation.
-
-  - Extend fpstate reallocation mechanism to cover guest fpu
-
-    Unlike native tasks which have reallocation triggered from #NM 
-    handler, guest fpstate reallocation is requested by KVM when it
-    detects the guest intention to use dynamically-enabled XSAVE
-    features.
-
-    The reallocation request is handled when exiting to userspace
-    VMM. This implies that KVM must break vcpu_run() loop and exit
-    to userspace VMM instead of immediately resuming back to the guest
-    when reallocation is required.
-
-  - Detect fpstate reallocation in the emulation code
-
-    Because guest #NM is not trapped in KVM (costly), the guest 
-    intention of using a dynamically-enabled XSAVE feature[i] can be
-    indirectly represented by guest XCR0[i]=1 and XFD[i]=0. This 
-    requires the emulation logic of both WRMSR(IA32_XFD) and XSETBV 
-    to check reallocation requirement when one of the two conditions
-    is changed.
-
-  - Disable WRMSR interception for IA32_XFD
-
-    IA32_XFD can be frequently updated by the guest, as it is part of
-    the task state and swapped in context switch when prev and next have
-    different XFD setting. Always intercepting WRMSR can easily cause
-    non-negligible overhead.
-
-    Disable WRMSR interception for IA32_XFD after fpstate reallocation
-    succeeds. After that point the guest direct writes IA32_XFD without
-    causing VM-exits.
-
-    However MSR passthrough implies that guest_fpstate::xfd and per-cpu
-    xfd cache might be out of sync with the current IA32_XFD value set by
-    the guest. This suggests KVM needs to re-sync the software state
-    with IA32_XFD before the vCPU thread might be preempted or interrupted.
-
-  - Save/restore guest XFD_ERR
-
-    When XFD causes an instruction to generate #NM, XFD_ERR contains
-    information about which disabled state components are being accessed.
-    The #NM handler is expected to check this information and then enable
-    the state components by clearing IA32_XFD for the faulting task (if 
-    having permission).
-
-    #NM can be triggered in both host and guest. It'd be problematic if
-    the XFD_ERR value generated in guest is consumed/clobbered by the 
-    host before the guest itself doing so. This may lead to non-XFD-
-    related #NM treated as XFD #NM in host (due to guest XFD_ERR value),
-    or XFD-related #NM treated as non-XFD #NM in guest (XFD_ERR cleared 
-    by the host #NM handler).
-
-    KVM needs to save the guest XFD_ERR value before this register
-    might be accessed by the host and restore it before entering the 
-    guest.
-
-    One open remains in this area about when to start saving/restoring
-    guest XFD_ERR. Several options are discussed in patch 15.
-
-  - Expose related cpuid bits to guest
-
-    The last step is to allow exposing XFD, AMX_TILE, AMX_INT8 and
-    AMX_BF16 in guest cpuid. Adding those bits into kvm_cpu_caps finally
-    activates all previous logics in this series
-
-To verify AMX virtualization overhead on non-AMX usages, we run the
-Phoronix kernel build test in the guest w/ and w/o AMX in cpuid. The 
-result shows no observable difference between two configurations.
-
-Live migration support is still being worked on. Userspace VMM needs
-to use the new KVM_{G|S}SET_XSAVE2 ioctl in this series to migrate state
-for dynamically-enabled XSAVE features.
-
-Thanks Thomas for the thoughts and patches on the KVM FPU and AMX
-support. Thanks Jun Nakajima for the design suggestions.
-
-[1] git://git.kernel.org/pub/scm/linux/kernel/git/tglx/devel.git x86/fpu-kvm
-[2] https://www.spinics.net/lists/kvm/msg259015.html
-
-Thanks,
-Yang
-
+Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+Signed-off-by: Jing Liu <jing2.liu@intel.com>
+Signed-off-by: Yang Zhong <yang.zhong@intel.com>
 ---
-Jing Liu (13):
-  kvm: x86: Fix xstate_required_size() to follow XSTATE alignment rule
-  kvm: x86: Check guest xstate permissions when KVM_SET_CPUID2
-  x86/fpu: Move xfd initialization out of __fpstate_reset() to the
-    callers
-  kvm: x86: Propagate fpstate reallocation error to userspace
-  x86/fpu: Move xfd_update_state() to xstate.c and export symbol
-  kvm: x86: Prepare reallocation check
-  kvm: x86: Emulate WRMSR of guest IA32_XFD
-  kvm: x86: Disable WRMSR interception for IA32_XFD on demand
-  x86/fpu: Prepare for KVM XFD_ERR handling
-  kvm: x86: Introduce KVM_{G|S}ET_XSAVE2 ioctl
-  docs: virt: api.rst: Document the new KVM_{G, S}ET_XSAVE2 ioctls
-  kvm: x86: AMX XCR0 support for guest
-  kvm: x86: Add AMX CPUIDs support
+(To Thomas) We change the definition of xstate_get_guest_group_perm()
+from xstate.h to api.h since this will be called by KVM.
 
-Thomas Gleixner (4):
-  x86/fpu: Extend prctl() with guest permissions
-  x86/fpu: Prepare KVM for dynamically enabled states
-  x86/fpu: Add reallocation mechanims for KVM
-  x86/fpu: Prepare KVM for bringing XFD state back in-sync
+ arch/x86/include/asm/fpu/api.h    |  2 ++
+ arch/x86/include/asm/fpu/types.h  |  9 ++++++
+ arch/x86/include/uapi/asm/prctl.h | 26 ++++++++--------
+ arch/x86/kernel/fpu/core.c        |  3 ++
+ arch/x86/kernel/fpu/xstate.c      | 50 +++++++++++++++++++++++--------
+ arch/x86/kernel/fpu/xstate.h      | 13 ++++++--
+ arch/x86/kernel/process.c         |  2 ++
+ 7 files changed, 78 insertions(+), 27 deletions(-)
 
-Yang Zhong (2):
-  kvm: x86: Check fpstate reallocation in XSETBV emulation
-  kvm: x86: Save and restore guest XFD_ERR properly
-
- Documentation/virt/kvm/api.rst     |  47 +++++++
- arch/x86/include/asm/cpufeatures.h |   2 +
- arch/x86/include/asm/fpu/api.h     |  12 ++
- arch/x86/include/asm/fpu/types.h   |  56 +++++++++
- arch/x86/include/asm/fpu/xstate.h  |   2 +
- arch/x86/include/asm/kvm-x86-ops.h |   1 +
- arch/x86/include/asm/kvm_host.h    |   2 +
- arch/x86/include/uapi/asm/kvm.h    |   6 +
- arch/x86/include/uapi/asm/prctl.h  |  26 ++--
- arch/x86/kernel/fpu/core.c         | 109 ++++++++++++++++-
- arch/x86/kernel/fpu/xstate.c       | 119 +++++++++++++++---
- arch/x86/kernel/fpu/xstate.h       |  29 +++--
- arch/x86/kernel/process.c          |   2 +
- arch/x86/kvm/cpuid.c               |  36 +++++-
- arch/x86/kvm/vmx/vmx.c             |  20 +++
- arch/x86/kvm/vmx/vmx.h             |   2 +-
- arch/x86/kvm/x86.c                 | 189 ++++++++++++++++++++++++++++-
- arch/x86/kvm/x86.h                 |   2 +
- include/uapi/linux/kvm.h           |   8 +-
- 19 files changed, 607 insertions(+), 63 deletions(-)
-
+diff --git a/arch/x86/include/asm/fpu/api.h b/arch/x86/include/asm/fpu/api.h
+index 6053674f9132..7532f73c82a6 100644
+--- a/arch/x86/include/asm/fpu/api.h
++++ b/arch/x86/include/asm/fpu/api.h
+@@ -138,6 +138,8 @@ static inline void fpstate_free(struct fpu *fpu) { }
+ /* fpstate-related functions which are exported to KVM */
+ extern void fpstate_clear_xstate_component(struct fpstate *fps, unsigned int xfeature);
+ 
++extern inline u64 xstate_get_guest_group_perm(void);
++
+ /* KVM specific functions */
+ extern bool fpu_alloc_guest_fpstate(struct fpu_guest *gfpu);
+ extern void fpu_free_guest_fpstate(struct fpu_guest *gfpu);
+diff --git a/arch/x86/include/asm/fpu/types.h b/arch/x86/include/asm/fpu/types.h
+index 3c06c82ab355..6ddf80637697 100644
+--- a/arch/x86/include/asm/fpu/types.h
++++ b/arch/x86/include/asm/fpu/types.h
+@@ -387,6 +387,8 @@ struct fpstate {
+ 	/* @regs is dynamically sized! Don't add anything after @regs! */
+ } __aligned(64);
+ 
++#define FPU_GUEST_PERM_LOCKED		BIT_ULL(63)
++
+ struct fpu_state_perm {
+ 	/*
+ 	 * @__state_perm:
+@@ -476,6 +478,13 @@ struct fpu {
+ 	 */
+ 	struct fpu_state_perm		perm;
+ 
++	/*
++	 * @guest_perm:
++	 *
++	 * Permission related information for guest pseudo FPUs
++	 */
++	struct fpu_state_perm		guest_perm;
++
+ 	/*
+ 	 * @__fpstate:
+ 	 *
+diff --git a/arch/x86/include/uapi/asm/prctl.h b/arch/x86/include/uapi/asm/prctl.h
+index 754a07856817..500b96e71f18 100644
+--- a/arch/x86/include/uapi/asm/prctl.h
++++ b/arch/x86/include/uapi/asm/prctl.h
+@@ -2,20 +2,22 @@
+ #ifndef _ASM_X86_PRCTL_H
+ #define _ASM_X86_PRCTL_H
+ 
+-#define ARCH_SET_GS		0x1001
+-#define ARCH_SET_FS		0x1002
+-#define ARCH_GET_FS		0x1003
+-#define ARCH_GET_GS		0x1004
++#define ARCH_SET_GS			0x1001
++#define ARCH_SET_FS			0x1002
++#define ARCH_GET_FS			0x1003
++#define ARCH_GET_GS			0x1004
+ 
+-#define ARCH_GET_CPUID		0x1011
+-#define ARCH_SET_CPUID		0x1012
++#define ARCH_GET_CPUID			0x1011
++#define ARCH_SET_CPUID			0x1012
+ 
+-#define ARCH_GET_XCOMP_SUPP	0x1021
+-#define ARCH_GET_XCOMP_PERM	0x1022
+-#define ARCH_REQ_XCOMP_PERM	0x1023
++#define ARCH_GET_XCOMP_SUPP		0x1021
++#define ARCH_GET_XCOMP_PERM		0x1022
++#define ARCH_REQ_XCOMP_PERM		0x1023
++#define ARCH_GET_XCOMP_GUEST_PERM	0x1024
++#define ARCH_REQ_XCOMP_GUEST_PERM	0x1025
+ 
+-#define ARCH_MAP_VDSO_X32	0x2001
+-#define ARCH_MAP_VDSO_32	0x2002
+-#define ARCH_MAP_VDSO_64	0x2003
++#define ARCH_MAP_VDSO_X32		0x2001
++#define ARCH_MAP_VDSO_32		0x2002
++#define ARCH_MAP_VDSO_64		0x2003
+ 
+ #endif /* _ASM_X86_PRCTL_H */
+diff --git a/arch/x86/kernel/fpu/core.c b/arch/x86/kernel/fpu/core.c
+index 8ea306b1bf8e..ab19b3d8b2f7 100644
+--- a/arch/x86/kernel/fpu/core.c
++++ b/arch/x86/kernel/fpu/core.c
+@@ -450,6 +450,8 @@ void fpstate_reset(struct fpu *fpu)
+ 	fpu->perm.__state_perm		= fpu_kernel_cfg.default_features;
+ 	fpu->perm.__state_size		= fpu_kernel_cfg.default_size;
+ 	fpu->perm.__user_state_size	= fpu_user_cfg.default_size;
++	/* Same defaults for guests */
++	fpu->guest_perm = fpu->perm;
+ }
+ 
+ static inline void fpu_inherit_perms(struct fpu *dst_fpu)
+@@ -460,6 +462,7 @@ static inline void fpu_inherit_perms(struct fpu *dst_fpu)
+ 		spin_lock_irq(&current->sighand->siglock);
+ 		/* Fork also inherits the permissions of the parent */
+ 		dst_fpu->perm = src_fpu->perm;
++		dst_fpu->guest_perm = src_fpu->guest_perm;
+ 		spin_unlock_irq(&current->sighand->siglock);
+ 	}
+ }
+diff --git a/arch/x86/kernel/fpu/xstate.c b/arch/x86/kernel/fpu/xstate.c
+index d28829403ed0..9856d579aa6e 100644
+--- a/arch/x86/kernel/fpu/xstate.c
++++ b/arch/x86/kernel/fpu/xstate.c
+@@ -1595,7 +1595,7 @@ static int validate_sigaltstack(unsigned int usize)
+ 	return 0;
+ }
+ 
+-static int __xstate_request_perm(u64 permitted, u64 requested)
++static int __xstate_request_perm(u64 permitted, u64 requested, bool guest)
+ {
+ 	/*
+ 	 * This deliberately does not exclude !XSAVES as we still might
+@@ -1605,6 +1605,7 @@ static int __xstate_request_perm(u64 permitted, u64 requested)
+ 	 */
+ 	bool compacted = cpu_feature_enabled(X86_FEATURE_XSAVES);
+ 	struct fpu *fpu = &current->group_leader->thread.fpu;
++	struct fpu_state_perm *perm;
+ 	unsigned int ksize, usize;
+ 	u64 mask;
+ 	int ret;
+@@ -1621,15 +1622,18 @@ static int __xstate_request_perm(u64 permitted, u64 requested)
+ 	mask &= XFEATURE_MASK_USER_SUPPORTED;
+ 	usize = xstate_calculate_size(mask, false);
+ 
+-	ret = validate_sigaltstack(usize);
+-	if (ret)
+-		return ret;
++	if (!guest) {
++		ret = validate_sigaltstack(usize);
++		if (ret)
++			return ret;
++	}
+ 
++	perm = guest ? &fpu->guest_perm : &fpu->perm;
+ 	/* Pairs with the READ_ONCE() in xstate_get_group_perm() */
+-	WRITE_ONCE(fpu->perm.__state_perm, requested);
++	WRITE_ONCE(perm->__state_perm, requested);
+ 	/* Protected by sighand lock */
+-	fpu->perm.__state_size = ksize;
+-	fpu->perm.__user_state_size = usize;
++	perm->__state_size = ksize;
++	perm->__user_state_size = usize;
+ 	return ret;
+ }
+ 
+@@ -1640,7 +1644,7 @@ static const u64 xstate_prctl_req[XFEATURE_MAX] = {
+ 	[XFEATURE_XTILE_DATA] = XFEATURE_MASK_XTILE_DATA,
+ };
+ 
+-static int xstate_request_perm(unsigned long idx)
++static int xstate_request_perm(unsigned long idx, bool guest)
+ {
+ 	u64 permitted, requested;
+ 	int ret;
+@@ -1661,14 +1665,19 @@ static int xstate_request_perm(unsigned long idx)
+ 		return -EOPNOTSUPP;
+ 
+ 	/* Lockless quick check */
+-	permitted = xstate_get_host_group_perm();
++	permitted = xstate_get_group_perm(guest);
+ 	if ((permitted & requested) == requested)
+ 		return 0;
+ 
+ 	/* Protect against concurrent modifications */
+ 	spin_lock_irq(&current->sighand->siglock);
+-	permitted = xstate_get_host_group_perm();
+-	ret = __xstate_request_perm(permitted, requested);
++	permitted = xstate_get_group_perm(guest);
++
++	/* First vCPU allocation locks the permissions. */
++	if (guest && (permitted & FPU_GUEST_PERM_LOCKED))
++		ret = -EBUSY;
++	else
++		ret = __xstate_request_perm(permitted, requested, guest);
+ 	spin_unlock_irq(&current->sighand->siglock);
+ 	return ret;
+ }
+@@ -1713,12 +1722,17 @@ int xfd_enable_feature(u64 xfd_err)
+ 	return 0;
+ }
+ #else /* CONFIG_X86_64 */
+-static inline int xstate_request_perm(unsigned long idx)
++static inline int xstate_request_perm(unsigned long idx, bool guest)
+ {
+ 	return -EPERM;
+ }
+ #endif  /* !CONFIG_X86_64 */
+ 
++inline u64 xstate_get_guest_group_perm(void)
++{
++	return xstate_get_group_perm(true);
++}
++EXPORT_SYMBOL_GPL(xstate_get_guest_group_perm);
+ /**
+  * fpu_xstate_prctl - xstate permission operations
+  * @tsk:	Redundant pointer to current
+@@ -1742,6 +1756,7 @@ long fpu_xstate_prctl(struct task_struct *tsk, int option, unsigned long arg2)
+ 	u64 __user *uptr = (u64 __user *)arg2;
+ 	u64 permitted, supported;
+ 	unsigned long idx = arg2;
++	bool guest = false;
+ 
+ 	if (tsk != current)
+ 		return -EPERM;
+@@ -1760,11 +1775,20 @@ long fpu_xstate_prctl(struct task_struct *tsk, int option, unsigned long arg2)
+ 		permitted &= XFEATURE_MASK_USER_SUPPORTED;
+ 		return put_user(permitted, uptr);
+ 
++	case ARCH_GET_XCOMP_GUEST_PERM:
++		permitted = xstate_get_guest_group_perm();
++		permitted &= XFEATURE_MASK_USER_SUPPORTED;
++		return put_user(permitted, uptr);
++
++	case ARCH_REQ_XCOMP_GUEST_PERM:
++		guest = true;
++		fallthrough;
++
+ 	case ARCH_REQ_XCOMP_PERM:
+ 		if (!IS_ENABLED(CONFIG_X86_64))
+ 			return -EOPNOTSUPP;
+ 
+-		return xstate_request_perm(idx);
++		return xstate_request_perm(idx, guest);
+ 
+ 	default:
+ 		return -EINVAL;
+diff --git a/arch/x86/kernel/fpu/xstate.h b/arch/x86/kernel/fpu/xstate.h
+index 86ea7c0fa2f6..98a472775c97 100644
+--- a/arch/x86/kernel/fpu/xstate.h
++++ b/arch/x86/kernel/fpu/xstate.h
+@@ -20,10 +20,19 @@ static inline void xstate_init_xcomp_bv(struct xregs_state *xsave, u64 mask)
+ 		xsave->header.xcomp_bv = mask | XCOMP_BV_COMPACTED_FORMAT;
+ }
+ 
+-static inline u64 xstate_get_host_group_perm(void)
++static inline u64 xstate_get_group_perm(bool guest)
+ {
++	struct fpu *fpu = &current->group_leader->thread.fpu;
++	struct fpu_state_perm *perm;
++
+ 	/* Pairs with WRITE_ONCE() in xstate_request_perm() */
+-	return READ_ONCE(current->group_leader->thread.fpu.perm.__state_perm);
++	perm = guest ? &fpu->guest_perm : &fpu->perm;
++	return READ_ONCE(perm->__state_perm);
++}
++
++static inline u64 xstate_get_host_group_perm(void)
++{
++	return xstate_get_group_perm(false);
+ }
+ 
+ enum xstate_copy_mode {
+diff --git a/arch/x86/kernel/process.c b/arch/x86/kernel/process.c
+index 04143a653a8a..d7bc23589062 100644
+--- a/arch/x86/kernel/process.c
++++ b/arch/x86/kernel/process.c
+@@ -993,6 +993,8 @@ long do_arch_prctl_common(struct task_struct *task, int option,
+ 	case ARCH_GET_XCOMP_SUPP:
+ 	case ARCH_GET_XCOMP_PERM:
+ 	case ARCH_REQ_XCOMP_PERM:
++	case ARCH_GET_XCOMP_GUEST_PERM:
++	case ARCH_REQ_XCOMP_GUEST_PERM:
+ 		return fpu_xstate_prctl(task, option, arg2);
+ 	}
+ 
