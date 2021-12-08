@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C8BC446CA97
-	for <lists+kvm@lfdr.de>; Wed,  8 Dec 2021 02:55:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 075E546CA99
+	for <lists+kvm@lfdr.de>; Wed,  8 Dec 2021 02:56:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239171AbhLHB7T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Dec 2021 20:59:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38358 "EHLO
+        id S243295AbhLHB7Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Dec 2021 20:59:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38378 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243525AbhLHB6x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Dec 2021 20:58:53 -0500
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4473C0698D4
-        for <kvm@vger.kernel.org>; Tue,  7 Dec 2021 17:55:18 -0800 (PST)
-Received: by mail-pg1-x54a.google.com with SMTP id g10-20020a63520a000000b003316b108e1aso444423pgb.6
-        for <kvm@vger.kernel.org>; Tue, 07 Dec 2021 17:55:18 -0800 (PST)
+        with ESMTP id S243553AbhLHB64 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Dec 2021 20:58:56 -0500
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F077C0698DC
+        for <kvm@vger.kernel.org>; Tue,  7 Dec 2021 17:55:20 -0800 (PST)
+Received: by mail-pg1-x549.google.com with SMTP id s8-20020a63af48000000b002e6c10ac245so415622pgo.21
+        for <kvm@vger.kernel.org>; Tue, 07 Dec 2021 17:55:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=rsEyQZ3DP35HLKbmnGk57dHMCfFGAuWmWI/6PgsECHs=;
-        b=hmKYUrxitUrLwoogjptnDL/ItRNyBWfvVS9Wu829MCVieaIX/69uvnMqZoWgsv4/Sq
-         KDhuHw01hnhIklE4ptBeKj3ufvxBQ4lnCrnn/qi7szxPYTTl/+WMp4gsAqmSl7HbeSxr
-         Kl6Is8rRCv9pnDzLHe10jdOzymQ3C1BE7AFq3WOgNf+2dcRyiY/PMBzZLplZqf2+K1qU
-         5gLqaGdirXNOKlVwItpG5Ngw09mQMVdBqSDxbAWy2O1xsdMfl4U4QGuMeO5gOJfLjjm6
-         ImLq1x3TtdSq8N5XABQHSr/HqN4q3QwMqB4vnhIkvHlX932XlxC+PfHF6L36lUGb4pqn
-         L2+A==
+        bh=lL7Ah91e3ij9X4ILfB+Eg7xuVQkNKOT75fKaL9t5euc=;
+        b=YSkEa/Mi2ETQaGznq3e7ke6p7MfXvU6iPcOcmhxmAvTs7sJ7NbWla5aE4B0uEs1nRy
+         F0/iwWE6PUu0hOSvBJ/7aNJmQH6vdpWYxfaLudRsjwldpfZsZZ2B9x2Bu1R1EWYphKQs
+         XkUtLYvcOQvHKpTedcFRv//lPbXRhXUQwpfhaJKYLDvtw+6kEXx+JCbdpCq0K9uFGpp+
+         vZ8ZSRzWiswdm1gyWLiA27FEX/hNeBiWA9s3YTfL84CHkSdJ/aawxd0NN0KRjJ6nXMwR
+         RMqf96pxDFadpqFZBuPFtqwAYJiJVdRSE1EYSJtvAkFFEZzDjqpG3SlPu0ZA4T4qoPiM
+         pFKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=rsEyQZ3DP35HLKbmnGk57dHMCfFGAuWmWI/6PgsECHs=;
-        b=1OH/7OXkmwtWW9B/r0/NTy8eQ2k4PguMF6GB41CSxNinaczxxOBZQgyO2FQ86Qksq3
-         M3LC4xJDbPTXzwQeUI+18Cp1qx2ANYPv9XvcP+WSh0x+HlFElgpYnzcj27l8wJJJK1FI
-         ym3sdYg1LJW/0D/CshybQHIAm6BYewSq2M3xEuJinYHjUK4WN1Yk5791f/5WwLU8QvO2
-         KQ/A1LLJmwX3oNTPbOeQUMWxM4yOmi6A9HgcQ0dQ4k2gNh6FlCIbe1topFgiAxYrtTiQ
-         kB6qHQXf8nDa3QJy8NueXirLlwGN7oAGtj5deWkxccr/LJBl6ke1BARIhNkw71D9lPTl
-         n7eA==
-X-Gm-Message-State: AOAM532omiBPSmBli6hegnCRJZJMH924DqzqyYJOHPNcWCwnedlVO/1A
-        PXJqN0cwsGu2rzpb/ixDJkdK8xgqNtc=
-X-Google-Smtp-Source: ABdhPJxc6ZNvK2ni0NY4zn1pqNTbfF6S4S3QCEyDwLu/l6woBMqErCmjW6iRbSGR/2Al2p3yHA0CHhwy/Z0=
+        bh=lL7Ah91e3ij9X4ILfB+Eg7xuVQkNKOT75fKaL9t5euc=;
+        b=fVUPEVVabiKhJsk/KhQmYtLbXFbHrR0hOEf7LdA1NRUcys9OXif6AHpxX7K9QipUG8
+         5BQxODLhGvP0vjAh5z6cZhGDFwBICGXuk4u7zLpycDJbsdaLMclWQs2JA9ofnwFqhepT
+         wHtRAQvcyP9HhX1BwbNtMUXjkGn7OCBnjedCBsQHodGf+UUE/Zb7A4jyx6xhTDcoWIrO
+         9jmz017bD7J8UBGCmeCeyDBHUwiMDUxt/UiRViSXI7SEasJKgo5gghI/ciRxyKyV9lBx
+         NLgIanRqKTjgCEAKiW4GZHuyL8pqrZWGpiCh+E0HTYcsA8KW2OO6DQ8FxWnDDtQV+CRZ
+         6biw==
+X-Gm-Message-State: AOAM531sPirsN5D/v5nGozdqs3wmeHI5MCjoeQSPH9Jedu2+kZQPav45
+        uWHU+6FCeL7pH4ZHxSJ9Hv8plnoFeP4=
+X-Google-Smtp-Source: ABdhPJwVoW65XdPki0wHByMFQDgUosdqBIe36fXCy42y0RYnEbdN8YqqHxyWCjIdH47J58cqyCGvdf6eS+I=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:902:e810:b0:141:d8e9:a8b0 with SMTP id
- u16-20020a170902e81000b00141d8e9a8b0mr55667312plg.9.1638928518234; Tue, 07
- Dec 2021 17:55:18 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:db02:: with SMTP id
+ g2mr3692938pjv.76.1638928519864; Tue, 07 Dec 2021 17:55:19 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  8 Dec 2021 01:52:29 +0000
+Date:   Wed,  8 Dec 2021 01:52:30 +0000
 In-Reply-To: <20211208015236.1616697-1-seanjc@google.com>
-Message-Id: <20211208015236.1616697-20-seanjc@google.com>
+Message-Id: <20211208015236.1616697-21-seanjc@google.com>
 Mime-Version: 1.0
 References: <20211208015236.1616697-1-seanjc@google.com>
 X-Mailer: git-send-email 2.34.1.400.ga245620fadb-goog
-Subject: [PATCH v3 19/26] KVM: VMX: Fold fallback path into triggering posted
- IRQ helper
+Subject: [PATCH v3 20/26] KVM: VMX: Don't do full kick when handling posted
+ interrupt wakeup
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>, Joerg Roedel <joro@8bytes.org>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -68,69 +67,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move the fallback "wake_up" path into the helper to trigger posted
-interrupt helper now that the nested and non-nested paths are identical.
-
-No functional change intended.
+When waking vCPUs in the posted interrupt wakeup handling, do exactly
+that and no more.  There is no need to kick the vCPU as the wakeup
+handler just needs to get the vCPU task running, and if it's in the guest
+then it's definitely running.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
+ arch/x86/kvm/vmx/posted_intr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index ff309ebe9f2c..9153f5f5d424 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -3889,7 +3889,7 @@ static void vmx_msr_filter_changed(struct kvm_vcpu *vcpu)
- 	pt_update_intercept_for_msr(vcpu);
- }
+diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
+index 023a6b9b0fa4..f4169c009400 100644
+--- a/arch/x86/kvm/vmx/posted_intr.c
++++ b/arch/x86/kvm/vmx/posted_intr.c
+@@ -209,7 +209,7 @@ void pi_wakeup_handler(void)
+ 			    pi_wakeup_list) {
  
--static inline bool kvm_vcpu_trigger_posted_interrupt(struct kvm_vcpu *vcpu,
-+static inline void kvm_vcpu_trigger_posted_interrupt(struct kvm_vcpu *vcpu,
- 						     int pi_vec)
- {
- #ifdef CONFIG_SMP
-@@ -3920,10 +3920,15 @@ static inline bool kvm_vcpu_trigger_posted_interrupt(struct kvm_vcpu *vcpu,
- 		 */
- 
- 		apic->send_IPI_mask(get_cpu_mask(vcpu->cpu), pi_vec);
--		return true;
-+		return;
+ 		if (pi_test_on(&vmx->pi_desc))
+-			kvm_vcpu_kick(&vmx->vcpu);
++			kvm_vcpu_wake_up(&vmx->vcpu);
  	}
- #endif
--	return false;
-+	/*
-+	 * The vCPU isn't in the guest; wake the vCPU in case it is blocking,
-+	 * otherwise do nothing as KVM will grab the highest priority pending
-+	 * IRQ via ->sync_pir_to_irr() in vcpu_enter_guest().
-+	 */
-+	kvm_vcpu_wake_up(vcpu);
+ 	spin_unlock(&per_cpu(wakeup_vcpus_on_cpu_lock, cpu));
  }
- 
- static int vmx_deliver_nested_posted_interrupt(struct kvm_vcpu *vcpu,
-@@ -3953,8 +3958,7 @@ static int vmx_deliver_nested_posted_interrupt(struct kvm_vcpu *vcpu,
- 		smp_mb__after_atomic();
- 
- 		/* the PIR and ON have been set by L1. */
--		if (!kvm_vcpu_trigger_posted_interrupt(vcpu, POSTED_INTR_NESTED_VECTOR))
--			kvm_vcpu_wake_up(vcpu);
-+		kvm_vcpu_trigger_posted_interrupt(vcpu, POSTED_INTR_NESTED_VECTOR);
- 		return 0;
- 	}
- 	return -1;
-@@ -3991,9 +3995,7 @@ static int vmx_deliver_posted_interrupt(struct kvm_vcpu *vcpu, int vector)
- 	 * guaranteed to see PID.ON=1 and sync the PIR to IRR if triggering a
- 	 * posted interrupt "fails" because vcpu->mode != IN_GUEST_MODE.
- 	 */
--	if (!kvm_vcpu_trigger_posted_interrupt(vcpu, POSTED_INTR_VECTOR))
--		kvm_vcpu_wake_up(vcpu);
--
-+	kvm_vcpu_trigger_posted_interrupt(vcpu, POSTED_INTR_VECTOR);
- 	return 0;
- }
- 
 -- 
 2.34.1.400.ga245620fadb-goog
 
