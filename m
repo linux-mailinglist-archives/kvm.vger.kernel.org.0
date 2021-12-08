@@ -2,203 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 79F7A46CE57
-	for <lists+kvm@lfdr.de>; Wed,  8 Dec 2021 08:23:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1801346CE64
+	for <lists+kvm@lfdr.de>; Wed,  8 Dec 2021 08:33:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244502AbhLHH0z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Dec 2021 02:26:55 -0500
-Received: from mga11.intel.com ([192.55.52.93]:49707 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S240685AbhLHH0y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Dec 2021 02:26:54 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10191"; a="235287395"
-X-IronPort-AV: E=Sophos;i="5.87,296,1631602800"; 
-   d="scan'208";a="235287395"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2021 23:23:23 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.87,296,1631602800"; 
-   d="scan'208";a="502946986"
-Received: from orsmsx606.amr.corp.intel.com ([10.22.229.19])
-  by orsmga007.jf.intel.com with ESMTP; 07 Dec 2021 23:23:22 -0800
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX606.amr.corp.intel.com (10.22.229.19) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Tue, 7 Dec 2021 23:23:22 -0800
-Received: from orsmsx605.amr.corp.intel.com (10.22.229.18) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Tue, 7 Dec 2021 23:23:22 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx605.amr.corp.intel.com (10.22.229.18) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20 via Frontend Transport; Tue, 7 Dec 2021 23:23:22 -0800
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.45) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2308.20; Tue, 7 Dec 2021 23:23:21 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=guxqnNUYM33L/SsGSzZaKYB52ygo+PZelG3txC9O6Q1TlahKEbZLO/3HJYcFNlRX6yxdQNPei6bQ6+ZnRZ/JC4LL2Z62JytkYoRlytbPJmg2p7tzl9FIstw7Ej5Dvr3D6mMQRFAj4RnsAtELg0UE3vg4qRZAoIK7fWSDn4RS3rdDwL4hrEfCBNA79qLKh+BO+D0LzLXKolN31t4dV55DT3LCagUgNCiiL1VZJ/E7ZICT+x6SDWWjECAaSzjLOWFIvNKVHY4s27he5VJ/RNKyTXXzraFLePiZxUVD5IzZPnt61ZBFoe2pJ0dg0LQYpe0RpXoxyAb9tmSxsqCf64JqBA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oW1MqK6DEt0tcYpeXvm37Y5mKkdKqSPPkuPW/RPWNIM=;
- b=XEbmTm65fTs25m/mcCTZq/rzL1FoDU/0iu4LqVxfoAg1zftXVAeEcksIDOL7lL+5JpaY0/VqLPYRmkbxvHRiP0WHke+Hn6lSdTENsOPxXFit/oZ7TCPKoWPsHokGymxF3hbAo2tQLDKjJ7QnPZlEGJ3n+0/jS0/mOFBaWq+CR5niUnbl0qhht5So41IcXmcmB6PDxVrUYeUAiyOr3V9Mm3+m1uzyu58waBORLhcWGeGf7mO2p1MDUEw0ERWrTTM1rQuSSf4WhlH56/klgWfnczagKBRteBaYwzv8Nd1exP1kSxTUul5C1t8VZpOdHYJQwYzorTzy1jAn4lQhHFUC7A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oW1MqK6DEt0tcYpeXvm37Y5mKkdKqSPPkuPW/RPWNIM=;
- b=e4e+X29k1LlA9bGbYJxExI2pCXGdp4JBFgf8Nc4wPmpsGXo30gWnUd/eq3Xl5Uw/PYYWRYMwPz182ysCj8aELl6eVKKIFAfRj933nB6ySPck6tKuiEqCfx+SmwTI35ROBUhIfSpUFgx3daTuHt9QAQ/GlIDY5JRqhPDNS7fHaR8=
-Received: from MWHPR11MB1245.namprd11.prod.outlook.com (2603:10b6:300:28::11)
- by MWHPR11MB1600.namprd11.prod.outlook.com (2603:10b6:301:b::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4755.11; Wed, 8 Dec
- 2021 07:23:18 +0000
-Received: from MWHPR11MB1245.namprd11.prod.outlook.com
- ([fe80::9dd3:f8f0:48a8:1506]) by MWHPR11MB1245.namprd11.prod.outlook.com
- ([fe80::9dd3:f8f0:48a8:1506%12]) with mapi id 15.20.4755.023; Wed, 8 Dec 2021
- 07:23:17 +0000
-From:   "Liu, Jing2" <jing2.liu@intel.com>
-To:     "Zhong, Yang" <yang.zhong@intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>
-CC:     "seanjc@google.com" <seanjc@google.com>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "jing2.liu@linux.intel.com" <jing2.liu@linux.intel.com>
-Subject: RE: [PATCH 13/19] kvm: x86: Disable WRMSR interception for IA32_XFD
- on demand
-Thread-Topic: [PATCH 13/19] kvm: x86: Disable WRMSR interception for IA32_XFD
- on demand
-Thread-Index: AQHX63yGGH5XLxNQFUm1O2KZf2XoyawoKZ6w
-Date:   Wed, 8 Dec 2021 07:23:17 +0000
-Message-ID: <MWHPR11MB1245DFEAEBDC57298ED4E073A96F9@MWHPR11MB1245.namprd11.prod.outlook.com>
-References: <20211208000359.2853257-1-yang.zhong@intel.com>
- <20211208000359.2853257-14-yang.zhong@intel.com>
-In-Reply-To: <20211208000359.2853257-14-yang.zhong@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-reaction: no-action
-dlp-version: 11.6.200.16
-dlp-product: dlpe-windows
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: ea2c1918-33ba-4315-bee0-08d9ba1b9b23
-x-ms-traffictypediagnostic: MWHPR11MB1600:EE_
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-microsoft-antispam-prvs: <MWHPR11MB1600E7FDB82B2C6158F91966A96F9@MWHPR11MB1600.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ERwep9qOmgrM2m9IUusJyC5bcZMYYWLIPx4VApvqlcQ8L6K09VhxmNmiHDp0UyT5FqbaW3a9JnvY+Y8FhIJ6hzFdCRt39G+91XfIPcm1AkKiIa9VimhDDOlctVAsaDG49mlN+OWDhlyNX86PcJABcODXJaXbNmVZn2TlPD//756QcUnZudDgn1+TQ2P0L/Ov7gqSxjE9CQPeZIxqvdsb6FUi50G5Pxzc+LMpWpfBGEFyG3PCI1q9rCrjVou1TvF+gYOmBHgsRhScdlpNdHF6Cnfbtj9WntfVBJ/qxRqyO0PK+/DmuJqHkuuA4917MxnWIon7HlJ1LU17v2rBFiq4nOqueIhGTHew47vopNWKRbYc0GVRK5TkDcAzhclKUsYodwo2otd0o8o/Fm10uPkvlGk2djXDSRBwU3tXxPVn4qj8vXaA5ZVBDkyKs6pkx7fXPq1elBUI+/oIDMb822goj9aP4SOAeOS1jABnzO6o4E4oHqubxRU3pQ/+v/kjwu+40y3SB61NUXBau/DMGW0EqT4ZGnZgbK8/UlYU92p5z504H6tqgSHy4l6ToqdV6fb9cJXvmda7vqPKOvYJ6nulWXEPTBYv9fVwkYEpnGSe/WjS5smmmzjpLGKb8TDB6Tx7W6QYhMwFP2tIh/mXsKBXix1eIp3bsew5HYtnPLAL4h2G7UcDjHMhdxWZdEBF8wD0AStbYx+FHIO3e72Bz/XnE7IP6PXds3a5IS3iDhKgkqU=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR11MB1245.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(55016003)(2906002)(8676002)(82960400001)(316002)(9686003)(26005)(5660300002)(7416002)(53546011)(6506007)(66476007)(71200400001)(54906003)(38070700005)(76116006)(86362001)(7696005)(33656002)(508600001)(83380400001)(64756008)(66556008)(122000001)(66446008)(52536014)(8936002)(110136005)(921005)(66946007)(38100700002)(186003)(4326008);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?HAh3XZnFhjuDKEXKB3EkLoZa/ctXADb415rCxzMJu2aLwXzg5FROwQIWccZb?=
- =?us-ascii?Q?FDunNcv4sbuNwavZI3ENdpJy78snXCQtTyk62ISzuCxI4MdkpKfURNPw3zmA?=
- =?us-ascii?Q?6XI4dAncCU2xj5k2bI192GkC0kE6Obkgnes56T4ts/x1lAgKsZZn2aSb0TRj?=
- =?us-ascii?Q?VfG72X7MARYvZOZm4wDZFJs1qmBYD8qcHAEmN0UGWq4spbNZPkT0zUV0WTpg?=
- =?us-ascii?Q?Kr5Vtw912j2mAeannOozIaAIuPz0gO1C/l5DLW2eVd/nv8j/DOo+wFemjHwh?=
- =?us-ascii?Q?ahG4YDOcIn6Qdrtu+bDs59IFi0remvltdb74n4ZbH9VFX7Yjc14fzpnoGFlT?=
- =?us-ascii?Q?I05LwQI48mIqmIdb0figxVKSZ3J46Dw2D7cCJypv3X+XlzSw6YK7Ix37g5V6?=
- =?us-ascii?Q?F49DDLlMHxG2+hLfcDFYOoax4NeWn5fbl0Q5Ki6or9nf6hQipzvO4zZbyYFt?=
- =?us-ascii?Q?00xA9VmjJbISl6nEKK12b5JRxQau9LMcCs8n4MddFkwsUYxJBeqJ8s1nAP8o?=
- =?us-ascii?Q?7nClcABUD1ghMyci6sTQHjVZhvEDnD11ZH8G7GQMd90tZkeVdMx1HpyeKYw0?=
- =?us-ascii?Q?2rQnHcxV1D+1gqlFsCIRkTEVy1fb3OL/AJZ/PQ5sTcLHIms41hiuyjBbXmd0?=
- =?us-ascii?Q?MeLNDwaMVu3xHQ32KflmOT7COmwJhhIxfS4oHp4yowKxrVs1ZVa1vuT9wWkH?=
- =?us-ascii?Q?c7cM42v9st7zPZPTbZimR0pjSncslun5tbKhIoWwMIk+HnMdurbD2zF1PT5k?=
- =?us-ascii?Q?4wuoI9jNQXUrG4E/ivuE39tjzmRqHuFTROGQ4kd9c94Rb+6soi30e+ylVlDO?=
- =?us-ascii?Q?fxHtF6XnNLInwEKvK2y3yFzr6OFSMN+SSyL9zXqUPxnLjPY8r2dsmNhoj7qk?=
- =?us-ascii?Q?JEJvpr//H749AojA6X6jjYl+Usk9ndke0c5sCquJHzzGGYW8YOWwtA2BLpzP?=
- =?us-ascii?Q?tVqibQP3ebDS+hSID+Qy7gh/EyXfxUeeHl5I3eKYTLbtlLMli9bWBkdM4bNN?=
- =?us-ascii?Q?CYAxTMGELtWhBMqO4W8NtkR54ns9cho8qioca1qbeK4uqLvRzKNxFZVGBLyH?=
- =?us-ascii?Q?msKcR2SsSBeD1bwgcHiHGs6TlcguLxIMrDQYemLX447UGaI9lLIg9Ai9Vcwk?=
- =?us-ascii?Q?gwC0bTpGBEJBhk2watDGaZU2a4XCl2ZoU+zytIF2bOqt2dls3skmUE9Bu3aB?=
- =?us-ascii?Q?QdgFoAj7PufIpfAjgqasjJqANI/QlaffaN70MlgITjnqzlgMFz6TG2ssl6t7?=
- =?us-ascii?Q?ntEvvgT/9Oj5kS7NGGpS5lGqTNeoHeu0qSEzhTmbDoq44JffG6juRurORB4L?=
- =?us-ascii?Q?utPHK+Po8quHwa4NJhiPbc9ZbSMgcx/vt299xmANr5PqIWxoUcbZQn0OKact?=
- =?us-ascii?Q?lspP/IzYArXqg11FvQGCob3fFFYlq2P5Y/v90xnTUJdBZaffZxMAsJ0HRLNo?=
- =?us-ascii?Q?zOg0flGRHsomhugU/myzwVu89N1wG0Sx+r46AgY/jdAJ8q3imaJWKtiZaEFA?=
- =?us-ascii?Q?WkcqwrXB3AfNsWVdD1ar0WEtI4F78/pCSAjCAfJGSe04p+MfDbFthhpnDhIs?=
- =?us-ascii?Q?DCDNR8HibRe6vRHIi1FKOPo7SOx/ke2YNg5li3JkdfduLCW2oZnrWpVvspss?=
- =?us-ascii?Q?1A=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S244535AbhLHHhM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Dec 2021 02:37:12 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:60351 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231760AbhLHHhL (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 8 Dec 2021 02:37:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1638948819;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=VaQgBFKDWPtyW4rX+GpfnPjaazD4SfZz/ToOHd0Wuzc=;
+        b=YU2eE5Zy2pdmBM5UwvMsJw2CCDMctOfUiBbeZ/EzC6oggS6rnguVStrUu6EscRL/svVa+u
+        0e+ezvm2vuxcmBCCLIpGBwrKIG1Te74Km5WvIyZ5ooklHPObyJHZz8b8jdAOG7RaTeND9R
+        yGglM4KnwkZKlRKa6+5ZysRhJNXTw0Y=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-51-cJn4B6w4NTarZ6iI4nXc2g-1; Wed, 08 Dec 2021 02:33:37 -0500
+X-MC-Unique: cJn4B6w4NTarZ6iI4nXc2g-1
+Received: by mail-wm1-f72.google.com with SMTP id v62-20020a1cac41000000b0033719a1a714so869862wme.6
+        for <kvm@vger.kernel.org>; Tue, 07 Dec 2021 23:33:37 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:reply-to:subject:to:cc:references:from
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-transfer-encoding:content-language;
+        bh=VaQgBFKDWPtyW4rX+GpfnPjaazD4SfZz/ToOHd0Wuzc=;
+        b=fniPGMSWOwCl6CBA/pvWa7rYq7j7ntrYKGSEoIEEQox0nmBertjSBkepeYnPDkhTNQ
+         so+bFisMWfDAXKgP3bXsdUJ591lqcYdzVLu6sPFaBMlGzEzHTx7EKu4ivVsGhnPYmh53
+         fzP+hKSjjI3l+ZEnf3kOX/lEeZ4EsB3d363rbmgIfWZDYSv1V4stI5/PVaSFGd1DayGm
+         PCHp7kbBWg5UTyzfwaQYqgt22rnyOWCeLSFmUWHjJP3WzRSrOmR4Li8plSP+HDSJ3Cau
+         MOVZFEKt/2IHqNYKXTrUNIWSWq9DdR8tbmH8BVmexSImSF9OPBxTgmVgGjLT2qT5hRlv
+         otxw==
+X-Gm-Message-State: AOAM531A2ImobJOIUFMmVoLJJfOxmM/dnF1U2hlKA+9Ypn86HFgarLmj
+        zxIJN3rs8M01p+O7Ks/x4RJa+oRVtWAK9q8Mw5RL9m69joMnYu8t9G5EJ5hf/pho33h8o0C6dUG
+        3Gc8O6gyjnSbF
+X-Received: by 2002:adf:f708:: with SMTP id r8mr57333461wrp.198.1638948816619;
+        Tue, 07 Dec 2021 23:33:36 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJy7KoV5p8PVF3If5VE3e/tXMfPoPdiN58LX+mhb+Qk/apSQFS8E5N4maEwm2dxUTEGR+YL9hQ==
+X-Received: by 2002:adf:f708:: with SMTP id r8mr57333432wrp.198.1638948816394;
+        Tue, 07 Dec 2021 23:33:36 -0800 (PST)
+Received: from ?IPv6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id l3sm2033529wmq.46.2021.12.07.23.33.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 07 Dec 2021 23:33:35 -0800 (PST)
+Reply-To: eric.auger@redhat.com
+Subject: Re: [RFC v16 1/9] iommu: Introduce attach/detach_pasid_table API
+To:     Lu Baolu <baolu.lu@linux.intel.com>, Joerg Roedel <joro@8bytes.org>
+Cc:     peter.maydell@linaro.org, kvm@vger.kernel.org,
+        vivek.gautam@arm.com, kvmarm@lists.cs.columbia.edu,
+        eric.auger.pro@gmail.com, jean-philippe@linaro.org,
+        ashok.raj@intel.com, maz@kernel.org, vsethi@nvidia.com,
+        zhangfei.gao@linaro.org, kevin.tian@intel.com, will@kernel.org,
+        alex.williamson@redhat.com, wangxingang5@huawei.com,
+        linux-kernel@vger.kernel.org, lushenming@huawei.com,
+        iommu@lists.linux-foundation.org, robin.murphy@arm.com,
+        Jason Gunthorpe <jgg@nvidia.com>
+References: <20211027104428.1059740-1-eric.auger@redhat.com>
+ <20211027104428.1059740-2-eric.auger@redhat.com>
+ <Ya3qd6mT/DpceSm8@8bytes.org>
+ <c7e26722-f78c-a93f-c425-63413aa33dde@redhat.com>
+ <e6733c59-ffcb-74d4-af26-273c1ae8ce68@linux.intel.com>
+From:   Eric Auger <eric.auger@redhat.com>
+Message-ID: <fbeabcff-a6d4-dcc5-6687-7b32d6358fe3@redhat.com>
+Date:   Wed, 8 Dec 2021 08:33:33 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MWHPR11MB1245.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ea2c1918-33ba-4315-bee0-08d9ba1b9b23
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Dec 2021 07:23:17.4462
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: gvEo3iZnlNa+XQYVA0ZxlX0dBZ9AOvKweI3JS+U7e01niix6TXAu9Cg/3j0J3SoPgwtiDld2Q7pW3rcEYdlc/A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR11MB1600
-X-OriginatorOrg: intel.com
+In-Reply-To: <e6733c59-ffcb-74d4-af26-273c1ae8ce68@linux.intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Baolu,
 
-On 12/8/2021 8:03 AM, Yang Zhong wrote:=20
-> From: Jing Liu <jing2.liu@intel.com>
->=20
-> Always intercepting IA32_XFD causes non-negligible overhead when this
-> register is updated frequently in the guest.
->=20
-> Disable WRMSR interception to IA32_XFD after fpstate reallocation is
-> completed. There are three options for when to disable the
-> interception:
->=20
->   1) When emulating the 1st WRMSR which requires reallocation,
->      disable interception before exiting to userapce with the
->      assumption that the userspace VMM should not bounch back to
->      the kernel if reallocation fails. However it's not good to
->      design kernel based on application behavior. If due to bug
->      the vCPU thread comes back to the kernel after reallocation
->      fails, XFD passthrough may lead to host memory corruption
->      when doing XSAVES for guest fpstate which has a smaller size
->      than what guest XFD allows.
->=20
->   2) Disable interception when coming back from the userspace VMM
->      (for the 1st WRMSR which triggers reallocation). Re-check
->      whether fpstate size can serve the new guest XFD value. Disable
->      interception only when the check succeeds. This requires KVM
->      to store guest XFD value in some place and then compare it
->      to guest_fpu::user_xfeatures in the completion handler.
+On 12/8/21 3:44 AM, Lu Baolu wrote:
+> Hi Eric,
+>
+> On 12/7/21 6:22 PM, Eric Auger wrote:
+>> On 12/6/21 11:48 AM, Joerg Roedel wrote:
+>>> On Wed, Oct 27, 2021 at 12:44:20PM +0200, Eric Auger wrote:
+>>>> Signed-off-by: Jean-Philippe Brucker<jean-philippe.brucker@arm.com>
+>>>> Signed-off-by: Liu, Yi L<yi.l.liu@linux.intel.com>
+>>>> Signed-off-by: Ashok Raj<ashok.raj@intel.com>
+>>>> Signed-off-by: Jacob Pan<jacob.jun.pan@linux.intel.com>
+>>>> Signed-off-by: Eric Auger<eric.auger@redhat.com>
+>>> This Signed-of-by chain looks dubious, you are the author but the last
+>>> one in the chain?
+>> The 1st RFC in Aug 2018
+>> (https://lists.cs.columbia.edu/pipermail/kvmarm/2018-August/032478.html)
+>> said this was a generalization of Jacob's patch
+>>
+>>
+>>    [PATCH v5 01/23] iommu: introduce bind_pasid_table API function
+>>
+>>
+>>   
+>> https://lists.linuxfoundation.org/pipermail/iommu/2018-May/027647.html
+>>
+>> So indeed Jacob should be the author. I guess the multiple rebases got
+>> this eventually replaced at some point, which is not an excuse. Please
+>> forgive me for that.
+>> Now the original patch already had this list of SoB so I don't know if I
+>> shall simplify it.
+>
+> As we have decided to move the nested mode (dual stages) implementation
+> onto the developing iommufd framework, what's the value of adding this
+> into iommu core?
 
-For option 2), we are considering that fpstate->size can be used to indicat=
-e
-if reallocation is successful. Because once one of the XFD features (today,
-it's AMX) is enabled, kernel need reallocate full size, otherwise, KVM has =
-no
-chance to reallocate for other XFD features later since it's non-trapped (t=
-o
-avoid WRMSR VM EXITs due to guest toggling XFD).=20
+The iommu_uapi_attach_pasid_table uapi should disappear indeed as it is
+is bound to be replaced by /dev/iommu fellow API.
+However until I can rebase on /dev/iommu code I am obliged to keep it to
+maintain this integration, hence the RFC.
 
-Then KVM doesn't need to store guest XFD value in some place. And kernel
-fpu core may need an API to tell guest permitted size for KVM.
+Thanks
 
-Thanks,
-Jing
-
->=20
->   3) Disable interception at the 2nd WRMSR which enables dynamic
->      XSTATE features. If guest_fpu::user_xfeatures already includes
->      bits for dynamic features set in guest XFD value, disable
->      interception.
->=20
+Eric
+>
+> Best regards,
+> baolu
+>
 
