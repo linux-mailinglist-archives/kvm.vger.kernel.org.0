@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 075E546CA99
+	by mail.lfdr.de (Postfix) with ESMTP id 99EC646CA9B
 	for <lists+kvm@lfdr.de>; Wed,  8 Dec 2021 02:56:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243295AbhLHB7Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Dec 2021 20:59:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38378 "EHLO
+        id S243824AbhLHB7c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Dec 2021 20:59:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243553AbhLHB64 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Dec 2021 20:58:56 -0500
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F077C0698DC
-        for <kvm@vger.kernel.org>; Tue,  7 Dec 2021 17:55:20 -0800 (PST)
-Received: by mail-pg1-x549.google.com with SMTP id s8-20020a63af48000000b002e6c10ac245so415622pgo.21
-        for <kvm@vger.kernel.org>; Tue, 07 Dec 2021 17:55:20 -0800 (PST)
+        with ESMTP id S243611AbhLHB7B (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Dec 2021 20:59:01 -0500
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE1EDC061D76
+        for <kvm@vger.kernel.org>; Tue,  7 Dec 2021 17:55:22 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id iq9-20020a17090afb4900b001a54412feb0so678776pjb.1
+        for <kvm@vger.kernel.org>; Tue, 07 Dec 2021 17:55:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=lL7Ah91e3ij9X4ILfB+Eg7xuVQkNKOT75fKaL9t5euc=;
-        b=YSkEa/Mi2ETQaGznq3e7ke6p7MfXvU6iPcOcmhxmAvTs7sJ7NbWla5aE4B0uEs1nRy
-         F0/iwWE6PUu0hOSvBJ/7aNJmQH6vdpWYxfaLudRsjwldpfZsZZ2B9x2Bu1R1EWYphKQs
-         XkUtLYvcOQvHKpTedcFRv//lPbXRhXUQwpfhaJKYLDvtw+6kEXx+JCbdpCq0K9uFGpp+
-         vZ8ZSRzWiswdm1gyWLiA27FEX/hNeBiWA9s3YTfL84CHkSdJ/aawxd0NN0KRjJ6nXMwR
-         RMqf96pxDFadpqFZBuPFtqwAYJiJVdRSE1EYSJtvAkFFEZzDjqpG3SlPu0ZA4T4qoPiM
-         pFKg==
+        bh=lSh30i++wti8tFPA9afgXl8JTEqp4ySOIwGy8kr7tR8=;
+        b=Htlzvs+plCJtV9VSlYiOapDMHz3HBEbpS8QE4+92NjOXvayrW/KMXuarwtdNEXrpSX
+         CQzYdPtUTaqKXHFKtWn39LWRyJsx5U5FDn/zca9RHCNWYIKcc6ekwGgXx3zNFChT39w2
+         ph15CtPxFYriuAhHfTVmCm0z/pjlrfV1KY5qkZpqcgLlt/u+s9/7i4WV8RSoE5UbH7vF
+         todxgJWzRlHRpkzl9dETXe5B97vq9tbL2jSOL83irp6bZgsbX0XYvqFCYxzcMplw5vri
+         1X8vG/Cej3k3m0FK+GHH0XitfECppGUvIPk+wOHRA0n340lY3QJkVDF+F2Vl5lJOBcuN
+         0fTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=lL7Ah91e3ij9X4ILfB+Eg7xuVQkNKOT75fKaL9t5euc=;
-        b=fVUPEVVabiKhJsk/KhQmYtLbXFbHrR0hOEf7LdA1NRUcys9OXif6AHpxX7K9QipUG8
-         5BQxODLhGvP0vjAh5z6cZhGDFwBICGXuk4u7zLpycDJbsdaLMclWQs2JA9ofnwFqhepT
-         wHtRAQvcyP9HhX1BwbNtMUXjkGn7OCBnjedCBsQHodGf+UUE/Zb7A4jyx6xhTDcoWIrO
-         9jmz017bD7J8UBGCmeCeyDBHUwiMDUxt/UiRViSXI7SEasJKgo5gghI/ciRxyKyV9lBx
-         NLgIanRqKTjgCEAKiW4GZHuyL8pqrZWGpiCh+E0HTYcsA8KW2OO6DQ8FxWnDDtQV+CRZ
-         6biw==
-X-Gm-Message-State: AOAM531sPirsN5D/v5nGozdqs3wmeHI5MCjoeQSPH9Jedu2+kZQPav45
-        uWHU+6FCeL7pH4ZHxSJ9Hv8plnoFeP4=
-X-Google-Smtp-Source: ABdhPJwVoW65XdPki0wHByMFQDgUosdqBIe36fXCy42y0RYnEbdN8YqqHxyWCjIdH47J58cqyCGvdf6eS+I=
+        bh=lSh30i++wti8tFPA9afgXl8JTEqp4ySOIwGy8kr7tR8=;
+        b=KeD0KQmQgldAtELR+7T8bcMwRlNfwmbntTa90i9+TWpzsfyQej8GWxLfsxPiIy9h71
+         kB6RtpJt+d7cOEdPJ4WmEOcxeOvbUAGw3mmc7ri7bl5xnPv5My+1V8XRPD2SP6xR4RPx
+         BiAz7iurqq4v6ALpH5aCUZX7amGU+L+g+2czgltQ0lRnnqgnN96nQ1qyASovtMmagwAY
+         2776FqgfEOKaMs83v2ejgOGK3FwLah3sFMhzrsenfVwlHJA34vWgzpMtA2MxnzdLO/wJ
+         TrAjvf1xrTgvK4UVj66mEPjt6nqjvWZ+gVf+lSTiljiAP2YoRmTyn88k6jLxVh/MqCsQ
+         hExw==
+X-Gm-Message-State: AOAM533oDjx4t3J1uElkcP0A3Un8vy7nYkuEjQ53+xlllO/fb97RkaYX
+        pCKUozqsJymz1gXJgJ9qkGmxSvVptag=
+X-Google-Smtp-Source: ABdhPJxBRvOj5N/bhP8b+AjMFz0tiJwLiByWoRzaCUE9KYasIigz5qVHTot6i47figsMioG93rRFft4c9is=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:90a:db02:: with SMTP id
- g2mr3692938pjv.76.1638928519864; Tue, 07 Dec 2021 17:55:19 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:2ec8:: with SMTP id
+ h8mr3521139pjs.168.1638928522214; Tue, 07 Dec 2021 17:55:22 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  8 Dec 2021 01:52:30 +0000
+Date:   Wed,  8 Dec 2021 01:52:31 +0000
 In-Reply-To: <20211208015236.1616697-1-seanjc@google.com>
-Message-Id: <20211208015236.1616697-21-seanjc@google.com>
+Message-Id: <20211208015236.1616697-22-seanjc@google.com>
 Mime-Version: 1.0
 References: <20211208015236.1616697-1-seanjc@google.com>
 X-Mailer: git-send-email 2.34.1.400.ga245620fadb-goog
-Subject: [PATCH v3 20/26] KVM: VMX: Don't do full kick when handling posted
- interrupt wakeup
+Subject: [PATCH v3 21/26] KVM: SVM: Drop AVIC's intermediate
+ avic_set_running() helper
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>, Joerg Roedel <joro@8bytes.org>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -67,29 +67,100 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When waking vCPUs in the posted interrupt wakeup handling, do exactly
-that and no more.  There is no need to kick the vCPU as the wakeup
-handler just needs to get the vCPU task running, and if it's in the guest
-then it's definitely running.
+Drop avic_set_running() in favor of calling avic_vcpu_{load,put}()
+directly, and modify the block+put path to use preempt_disable/enable()
+instead of get/put_cpu(), as it doesn't actually care about the current
+pCPU associated with the vCPU.  Opportunistically add lockdep assertions
+as being preempted in avic_vcpu_put() would lead to consuming stale data,
+even though doing so _in the current code base_ would not be fatal.
+
+Add a much needed comment explaining why svm_vcpu_blocking() needs to
+unload the AVIC and update the IRTE _before_ the vCPU starts blocking.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/x86/kvm/vmx/posted_intr.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/x86/kvm/svm/avic.c | 50 ++++++++++++++++++++++++-----------------
+ 1 file changed, 30 insertions(+), 20 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/posted_intr.c b/arch/x86/kvm/vmx/posted_intr.c
-index 023a6b9b0fa4..f4169c009400 100644
---- a/arch/x86/kvm/vmx/posted_intr.c
-+++ b/arch/x86/kvm/vmx/posted_intr.c
-@@ -209,7 +209,7 @@ void pi_wakeup_handler(void)
- 			    pi_wakeup_list) {
+diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+index 88b3c315b34f..dd0d688bc342 100644
+--- a/arch/x86/kvm/svm/avic.c
++++ b/arch/x86/kvm/svm/avic.c
+@@ -977,6 +977,8 @@ void avic_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+ 	int h_physical_id = kvm_cpu_get_apicid(cpu);
+ 	struct vcpu_svm *svm = to_svm(vcpu);
  
- 		if (pi_test_on(&vmx->pi_desc))
--			kvm_vcpu_kick(&vmx->vcpu);
-+			kvm_vcpu_wake_up(&vmx->vcpu);
- 	}
- 	spin_unlock(&per_cpu(wakeup_vcpus_on_cpu_lock, cpu));
++	lockdep_assert_preemption_disabled();
++
+ 	/*
+ 	 * Since the host physical APIC id is 8 bits,
+ 	 * we can support host APIC ID upto 255.
+@@ -1010,6 +1012,8 @@ void avic_vcpu_put(struct kvm_vcpu *vcpu)
+ 	u64 entry;
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 
++	lockdep_assert_preemption_disabled();
++
+ 	entry = READ_ONCE(*(svm->avic_physical_id_cache));
+ 
+ 	/* Nothing to do if IsRunning == '0' due to vCPU blocking. */
+@@ -1022,31 +1026,37 @@ void avic_vcpu_put(struct kvm_vcpu *vcpu)
+ 	WRITE_ONCE(*(svm->avic_physical_id_cache), entry);
+ }
+ 
+-/*
+- * This function is called during VCPU halt/unhalt.
+- */
+-static void avic_set_running(struct kvm_vcpu *vcpu, bool is_run)
+-{
+-	int cpu = get_cpu();
+-
+-	WARN_ON(cpu != vcpu->cpu);
+-
+-	if (kvm_vcpu_apicv_active(vcpu)) {
+-		if (is_run)
+-			avic_vcpu_load(vcpu, cpu);
+-		else
+-			avic_vcpu_put(vcpu);
+-	}
+-	put_cpu();
+-}
+-
+ void svm_vcpu_blocking(struct kvm_vcpu *vcpu)
+ {
+-	avic_set_running(vcpu, false);
++	if (!kvm_vcpu_apicv_active(vcpu))
++		return;
++
++	preempt_disable();
++
++	/*
++	 * Unload the AVIC when the vCPU is about to block, _before_ the vCPU
++	 * actually blocks.  The vCPU needs to be marked IsRunning=0 before the
++	 * final pass over the vIRR via kvm_vcpu_check_block().  Any IRQs that
++	 * arrive before IsRunning=0 will not signal the doorbell, i.e. it's
++	 * KVM's responsibility to ensure there are no pending IRQs in the vIRR
++	 * after IsRunning is cleared, prior to scheduling out the vCPU.
++	 */
++	avic_vcpu_put(vcpu);
++
++	preempt_enable();
+ }
+ 
+ void svm_vcpu_unblocking(struct kvm_vcpu *vcpu)
+ {
++	int cpu;
+ 
+-	avic_set_running(vcpu, true);
++	if (!kvm_vcpu_apicv_active(vcpu))
++		return;
++
++	cpu = get_cpu();
++	WARN_ON(cpu != vcpu->cpu);
++
++	avic_vcpu_load(vcpu, cpu);
++
++	put_cpu();
  }
 -- 
 2.34.1.400.ga245620fadb-goog
