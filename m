@@ -2,56 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A8ED146CA5B
-	for <lists+kvm@lfdr.de>; Wed,  8 Dec 2021 02:54:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A53F46CA5D
+	for <lists+kvm@lfdr.de>; Wed,  8 Dec 2021 02:54:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243225AbhLHB6V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Dec 2021 20:58:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38132 "EHLO
+        id S234060AbhLHB6Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Dec 2021 20:58:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243208AbhLHB6U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 7 Dec 2021 20:58:20 -0500
+        with ESMTP id S243239AbhLHB6W (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Dec 2021 20:58:22 -0500
 Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93C47C061574
-        for <kvm@vger.kernel.org>; Tue,  7 Dec 2021 17:54:49 -0800 (PST)
-Received: by mail-pg1-x54a.google.com with SMTP id 66-20020a630545000000b0032e4e898d24so437335pgf.10
-        for <kvm@vger.kernel.org>; Tue, 07 Dec 2021 17:54:49 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 216E9C061746
+        for <kvm@vger.kernel.org>; Tue,  7 Dec 2021 17:54:51 -0800 (PST)
+Received: by mail-pg1-x54a.google.com with SMTP id m129-20020a632687000000b00324df4ad6c7so420160pgm.19
+        for <kvm@vger.kernel.org>; Tue, 07 Dec 2021 17:54:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=reply-to:date:in-reply-to:message-id:mime-version:references
          :subject:from:to:cc;
-        bh=t+Ei0itOPUqCS4bP4MpGZr4Y0AKiyZYQUO3shvC6OH4=;
-        b=k2YwbuxAPGemjRBHL7uFYlBdoruRLQIFroSCqiVqW7M9ZBvnUQQ9jGvvoRM5wp50BU
-         zIgGQ7HGQFBmuNg7A+QIp+NCeTdN/K7rIpyetOEYv0fFftMX25G2HHMkN4qtIQ0LfZMv
-         nEZ0SJpr3uyAnIWFfnfoFOuoynn+5sugfYnXc8Zu5xGttDxjBfbR1pzNtBX3wmGo5Eh4
-         tc+DrZgmJZQlP0JmnQUhMMdwg4C1ob1gWVBL3GTQuYBEqUYWxacTaSRVkDaRkCGPvyNC
-         fBrkeiQfSYOSRFEFYUtRYvG8vJlWJMCUTEIGnMXeL5T96k3SQN4J7z95j0CLBBRC0fn1
-         ygmg==
+        bh=dJfQR7SNrodeHl+1uM4QnaH90bN7dxbb2nVm/KO0Fr0=;
+        b=E6q7ZoNKap3puayKpMyApx5aMM7cpIA29jNBAm9RU9qZ2GsBRZJfo9m90cE5YibjKS
+         /Oqgenvs55WfnwkYUvBoCk+My3oUfiaTjkyMxYFWO3kk1h8G8HtGhEo6Irx/isGI39P8
+         YAupJ+v5JJALrli/83tKDSLpVhDiUSKDU/wVs7ag7lbqCuykiVB1elNOTh55hiyT8D9v
+         jmnX+mcFaHf8KkrFeSKV3qxr2kd4tBBqfQlKRW6eshGxdpztNEqJsQJh8QwW4i9TNc0q
+         rlqaM09jieisbicgfB7o9jhF24ra4lV3zdBRr9IhEOVwZ6sT5TUz2j1F46A73P/S5cS7
+         l4RQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:reply-to:date:in-reply-to:message-id
          :mime-version:references:subject:from:to:cc;
-        bh=t+Ei0itOPUqCS4bP4MpGZr4Y0AKiyZYQUO3shvC6OH4=;
-        b=KdPTREYeUSEB6e2bwughnCkPx7JZ/YW1PX3N53Q5rfhoFUIqPRHqsIyBomsLSy2O2y
-         HZJ7lryL7NhSt1gdNLzcXvTpeYY82CaLnexBjxnZ1x29N1nz2ywxExljoIgCCKGLtCWx
-         eMpvg1/CHfK67+xJ4t7FgDVv8cBDNc/xgoC3GI+VXY7TPGEYh36lIsNdWDTjOXwPeq69
-         M9Y4MYwjOBvID/qjt/XKPMX3HHY4NjJs8Xca9wIJzoprm2GsqtFpScTlOrkFTnmeswpc
-         jI5SCgjOP9DJ/7Tq/YYHGhYjBg5qY0Ew3e7Tbp3E+zyjdanWhe8pOVm8JETv9jRebzZU
-         zcxw==
-X-Gm-Message-State: AOAM530koU+WRctJb1sWLboyBA1iHTa9nhDmRE359SgfpUKnsPPDoI0K
-        x7HxMR0zBaRE72nzHmuxhOOWV4xRpC8=
-X-Google-Smtp-Source: ABdhPJydNGMZpFjjQ57G1ZC66ywbHz44PKREG9EyVwHjLHfG2SNsZYM0b6sqBp1lD+CDQVcAS7e/s6aPdYs=
+        bh=dJfQR7SNrodeHl+1uM4QnaH90bN7dxbb2nVm/KO0Fr0=;
+        b=k6fHzs5BiGJxuY4VLottpPDy1pAc9AvBg9BkpbNg/q0qzZT7l5dbHdPGcsDJMrvIZ1
+         WJ4qufSkEVUgEk05IGm0lBmzclOPDzedX+ANsdoSM8pMa0ll04RbtjHrrxZS6eCUuJ58
+         7moWK3KunL7F3eeLT9Lf1sPXwb6wGPN5LWZn0EIhCiv5pmLSVcTRh7o9fjIsPV7Xw87a
+         iiD6m+IFrX9hhd31J5mmY4tbTVwZsNAuGy65rkyTKxBiWyr95ebmziClLJFAF1JDEog9
+         81fsQYRzaosmbiN87V1pu6HaaKvSoui6+ZOJlsMiGnftklc6HabUinn29/znCM2FJjvw
+         NPhg==
+X-Gm-Message-State: AOAM530TCV5bupKPuN97SvgzNbgnFcgH7YmqpA0NeCtfUHfEApCN3gtH
+        VH0n9u0fA0niLHEXnGerTT7a5+pHkIM=
+X-Google-Smtp-Source: ABdhPJzRAo1jT1w67ssZL5EULvdAsrstbRdTXsE4od1JORZJT4BANLfRDFxRIq1Nz+VdNTWiu5B+Wyay4gI=
 X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:90b:1486:: with SMTP id
- js6mr342701pjb.0.1638928488764; Tue, 07 Dec 2021 17:54:48 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:903:300d:b0:142:744f:c74d with SMTP id
+ o13-20020a170903300d00b00142744fc74dmr56964166pla.26.1638928490614; Tue, 07
+ Dec 2021 17:54:50 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed,  8 Dec 2021 01:52:11 +0000
+Date:   Wed,  8 Dec 2021 01:52:12 +0000
 In-Reply-To: <20211208015236.1616697-1-seanjc@google.com>
-Message-Id: <20211208015236.1616697-2-seanjc@google.com>
+Message-Id: <20211208015236.1616697-3-seanjc@google.com>
 Mime-Version: 1.0
 References: <20211208015236.1616697-1-seanjc@google.com>
 X-Mailer: git-send-email 2.34.1.400.ga245620fadb-goog
-Subject: [PATCH v3 01/26] KVM: fix avic_set_running for preemptable kernels
+Subject: [PATCH v3 02/26] KVM: nVMX: Ensure vCPU honors event request if
+ posting nested IRQ fails
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>, Joerg Roedel <joro@8bytes.org>
 Cc:     Sean Christopherson <seanjc@google.com>,
@@ -66,52 +68,61 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+Add a memory barrier between writing vcpu->requests and reading
+vcpu->guest_mode to ensure the read is ordered after the write when
+(potentially) delivering an IRQ to L2 via nested posted interrupt.  If
+the request were to be completed after reading vcpu->mode, it would be
+possible for the target vCPU to enter the guest without posting the
+interrupt and without handling the event request.
 
-avic_set_running() passes the current CPU to avic_vcpu_load(), albeit
-via vcpu->cpu rather than smp_processor_id().  If the thread is migrated
-while avic_set_running runs, the call to avic_vcpu_load() can use a stale
-value for the processor id.  Avoid this by blocking preemption over the
-entire execution of avic_set_running().
+Note, the barrier is only for documentation since atomic operations are
+serializing on x86.
 
-Reported-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-Not-signed-off-by: Sean Christopherson <seanjc@google.com>
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Fixes: 6b6977117f50 ("KVM: nVMX: Fix races when sending nested PI while dest enters/leaves L2")
+Fixes: 705699a13994 ("KVM: nVMX: Enable nested posted interrupt processing")
+Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/avic.c | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index 1d8ada5b01f8..d7132a4551a2 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -997,16 +997,18 @@ void avic_vcpu_put(struct kvm_vcpu *vcpu)
- static void avic_set_running(struct kvm_vcpu *vcpu, bool is_run)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
-+	int cpu = get_cpu();
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index efcc5a58abbc..a94f0fb80fd4 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -3941,6 +3941,19 @@ static int vmx_deliver_nested_posted_interrupt(struct kvm_vcpu *vcpu,
+ 		 */
+ 		vmx->nested.pi_pending = true;
+ 		kvm_make_request(KVM_REQ_EVENT, vcpu);
++
++		/*
++		 * This pairs with the smp_mb_*() after setting vcpu->mode in
++		 * vcpu_enter_guest() to guarantee the vCPU sees the event
++		 * request if triggering a posted interrupt "fails" because
++		 * vcpu->mode != IN_GUEST_MODE.  The extra barrier is needed as
++		 * the smb_wmb() in kvm_make_request() only ensures everything
++		 * done before making the request is visible when the request
++		 * is visible, it doesn't ensure ordering between the store to
++		 * vcpu->requests and the load from vcpu->mode.
++		 */
++		smp_mb__after_atomic();
++
+ 		/* the PIR and ON have been set by L1. */
+ 		if (!kvm_vcpu_trigger_posted_interrupt(vcpu, true))
+ 			kvm_vcpu_kick(vcpu);
+@@ -3974,6 +3987,12 @@ static int vmx_deliver_posted_interrupt(struct kvm_vcpu *vcpu, int vector)
+ 	if (pi_test_and_set_on(&vmx->pi_desc))
+ 		return 0;
  
-+	WARN_ON(cpu != vcpu->cpu);
- 	svm->avic_is_running = is_run;
- 
--	if (!kvm_vcpu_apicv_active(vcpu))
--		return;
--
--	if (is_run)
--		avic_vcpu_load(vcpu, vcpu->cpu);
--	else
--		avic_vcpu_put(vcpu);
-+	if (kvm_vcpu_apicv_active(vcpu)) {
-+		if (is_run)
-+			avic_vcpu_load(vcpu, cpu);
-+		else
-+			avic_vcpu_put(vcpu);
-+	}
-+	put_cpu();
- }
- 
- void svm_vcpu_blocking(struct kvm_vcpu *vcpu)
++	/*
++	 * The implied barrier in pi_test_and_set_on() pairs with the smp_mb_*()
++	 * after setting vcpu->mode in vcpu_enter_guest(), thus the vCPU is
++	 * guaranteed to see PID.ON=1 and sync the PIR to IRR if triggering a
++	 * posted interrupt "fails" because vcpu->mode != IN_GUEST_MODE.
++	 */
+ 	if (vcpu != kvm_get_running_vcpu() &&
+ 	    !kvm_vcpu_trigger_posted_interrupt(vcpu, false))
+ 		kvm_vcpu_kick(vcpu);
 -- 
 2.34.1.400.ga245620fadb-goog
 
