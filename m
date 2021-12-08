@@ -2,135 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8119446CBD0
-	for <lists+kvm@lfdr.de>; Wed,  8 Dec 2021 05:00:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C84246CC24
+	for <lists+kvm@lfdr.de>; Wed,  8 Dec 2021 05:13:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233263AbhLHEEP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 7 Dec 2021 23:04:15 -0500
-Received: from out30-45.freemail.mail.aliyun.com ([115.124.30.45]:51931 "EHLO
-        out30-45.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229958AbhLHEEO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 7 Dec 2021 23:04:14 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R681e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04357;MF=laijs@linux.alibaba.com;NM=1;PH=DS;RN=15;SR=0;TI=SMTPD_---0Uzq5Sf3_1638936038;
-Received: from 30.22.113.150(mailfrom:laijs@linux.alibaba.com fp:SMTPD_---0Uzq5Sf3_1638936038)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Wed, 08 Dec 2021 12:00:39 +0800
-Message-ID: <04d4d0bc-0ef4-f9a3-593b-149f835c74be@linux.alibaba.com>
-Date:   Wed, 8 Dec 2021 12:00:38 +0800
+        id S234132AbhLHERK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 7 Dec 2021 23:17:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41518 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234163AbhLHERI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 7 Dec 2021 23:17:08 -0500
+Received: from mail-il1-x144.google.com (mail-il1-x144.google.com [IPv6:2607:f8b0:4864:20::144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA8E8C061D76
+        for <kvm@vger.kernel.org>; Tue,  7 Dec 2021 20:13:36 -0800 (PST)
+Received: by mail-il1-x144.google.com with SMTP id j21so1073799ila.5
+        for <kvm@vger.kernel.org>; Tue, 07 Dec 2021 20:13:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=w0n14T57zPuvlg1YaFYy3gRfrUPFN1bDHGIrct+fXgc=;
+        b=cGWxDwe8B66FlIrZtrergIqE5+JvdqJ48sEvPTrvhBJ9xEqZLGyWZmuSPdCEFce/7D
+         /sVR44uqtlb2dmBH+iwgt0kboAu4/HTy3OZt9J6nwOu1H5twbKwVBnMykOKrBLHcBBEb
+         cgMJ7/59oMUtMggaQ9x/N1xe+U0YzN1k+xfCXkO5L7YIW30RFDnvCB0PrD7sMExliX7S
+         joeNtgfdJmxv3l42BA4cQp1HveXj/LpauGoYMsZKrrlYurvW6FC9Nrn9v/z7yklCLUv+
+         2uZJGSHlx+O0Rg+LxyFVcXJ8erZC2O96QnEFLkA1QmSl94RBUxOevwSkF8rG8CDqN06m
+         KdcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=w0n14T57zPuvlg1YaFYy3gRfrUPFN1bDHGIrct+fXgc=;
+        b=rxqIHYv/5OQBqSy4siHs2mZLU6JSaXHUZCkmK8Y9ouMz8AUr0bRYvhi4qHteMc4ela
+         PL33OEcV7Cq487oE9gBILkWJliUbxLPLl9BpT1sz+bs7S/cQC9BcbYt4CCDlvNOlE013
+         akZrGspHCeTFcJ6AmfFM31cvDrWsxGZNnjqjQogbJmT5Bg7rU+2fk0cXoOjDEIhyU/1s
+         HAP61v2Ggnu3aUO5IsMPnA24PwwRZ0JEjZM6K3w7+xHKc9tx5zuRa5f3g+H7tKfnElaB
+         8NAUoDdZecJBejDspFxt6Ngs/qi5lz7JKNtSTZrpfEbRcnbAlkYtOaPeQVOymCEiOiuW
+         v7mg==
+X-Gm-Message-State: AOAM5328/5diQ22se6uiRm90h/JP4ePv2I4ne6rkybYzD675OSd+/F94
+        jwVDYOQVvYAfQ1ZFidDcVo5CLNHgPUomKwQY8BU=
+X-Google-Smtp-Source: ABdhPJx498jQ3rDCAEAukf875uPMCUUvAAHHJyp/169nhahBv8dg1ZTt80/LmlBc7j967yPpWx87fZn4PQyrL4JX27A=
+X-Received: by 2002:a92:600f:: with SMTP id u15mr3954317ilb.292.1638936815828;
+ Tue, 07 Dec 2021 20:13:35 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.2.1
-Subject: Re: [PATCH 17/15] KVM: X86: Ensure pae_root to be reconstructed for
- shadow paging if the guest PDPTEs is changed
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Xiao Guangrong <guangrong.xiao@linux.intel.com>
-References: <20211108124407.12187-1-jiangshanlai@gmail.com>
- <20211111144634.88972-1-jiangshanlai@gmail.com> <Ya/5MOYef4L4UUAb@google.com>
-From:   Lai Jiangshan <laijs@linux.alibaba.com>
-In-Reply-To: <Ya/5MOYef4L4UUAb@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Received: by 2002:a05:6e02:1a07:0:0:0:0 with HTTP; Tue, 7 Dec 2021 20:13:35
+ -0800 (PST)
+Reply-To: dj0015639@gmail.com
+From:   David Jackson <enkenpaul@gmail.com>
+Date:   Wed, 8 Dec 2021 05:13:35 +0100
+Message-ID: <CAG7-cQ_JEx-8fDdxn0Ex314ViSE32kaUjoR=sUvV7wmCUiKRGw@mail.gmail.com>
+Subject: FEDERAL BUREAU OF INVESTIGATION
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Our Ref: RTB /SNT/STB
+To: Beneficiary
 
+This is FBI special agents, David Jackson. I was delegated along side
+others by the United Nations to investigate scammers who has been in
+the business of swindling foreigners especially those that has one
+form of transaction/contracts and another. Please be informed that in
+the course of our investigation, we detected that your name and
+details in our Scammed Monitoring Network. We also found out that you
+were scammed of a huge sum of money by scammers via Western union and
+MoneyGram. Be informed here that in a bid to alleviate the suffering
+of scammed victims, the United Nations initiated this compensation
+program and therefore, you are entitled to the sum of Five Million Two
+Hundred Thousand United States Dollars ($5,200,000.00 USD) for being a
+victim.
 
-On 2021/12/8 08:15, Sean Christopherson wrote:
->>
->> The commit 21823fbda552("KVM: x86: Invalidate all PGDs for the current
->> PCID on MOV CR3 w/ flush") skips kvm_mmu_free_roots() after
->> load_pdptrs() when rewriting the CR3 with the same value.
-> 
-> This isn't accurate, prior to that commit KVM wasn't guaranteed to do
-> kvm_mmu_free_roots() if it got a hit on the current CR3 or if a previous CR3 in
-> the cache matched the new CR3 (the "cache" has done some odd things in the past).
-> 
-> So I think this particular flavor would be:
-> 
->    Fixes: 7c390d350f8b ("kvm: x86: Add fast CR3 switch code path")
+Note that the said fund will be transfer to you via the Citibank being
+the paying bank mandated by the United Nations officials.
 
-If guest is 32bit, fast_cr3_switch() always return false, and
-kvm_mmu_free_roots() is always called, and no cr3 goes in prev_root.
+However, we have to inform you that we have been able to arrest some
+of the swindlers who has been in this illicit business and will all be
+prosecuted accordingly. Be informed as well that we have limited time
+to stay back here, so we will advice that you urgently respond to this
+message ASAP. And do not inform any of the people that collected money
+from you before now about this new development to avoid jeopardizing
+our investigation. All you need to do is to follow our instruction and
+receive your compensation accordingly as directed by the United
+Nations.
 
-And from 21823fbda552, fast_cr3_switch() and kvm_mmu_free_roots() are
-both skipped when cr3 is unchanged.
+We urgently wait to receive your response.
 
-> 
->> The commit a91a7c709600("KVM: X86: Don't reset mmu context when
->> toggling X86_CR4_PGE") skips kvm_mmu_reset_context() after
->> load_pdptrs() when changing CR4.PGE.
->>
->> Normally, the guest doesn't change the PDPTEs before doing only the
->> above operation without touching other bits that can force pae_root to
->> be reconstructed.  Guests like linux would keep the PDPTEs unchaged
->> for every instance of pagetable.
->>
->> Fixes: d81135a57aa6("KVM: x86: do not reset mmu if CR0.CD and CR0.NW are changed")
->> Fixes: 21823fbda552("KVM: x86: Invalidate all PGDs for the current PCID on MOV CR3 w/ flush")
->> Fixes: a91a7c709600("KVM: X86: Don't reset mmu context when toggling X86_CR4_PGE")
->> Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
->> ---
->>   arch/x86/kvm/x86.c | 10 ++++++++--
->>   1 file changed, 8 insertions(+), 2 deletions(-)
->>
->> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
->> index 0176eaa86a35..cfba337e46ab 100644
->> --- a/arch/x86/kvm/x86.c
->> +++ b/arch/x86/kvm/x86.c
->> @@ -832,8 +832,14 @@ int load_pdptrs(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu, unsigned long cr3)
->>   	if (memcmp(mmu->pdptrs, pdpte, sizeof(mmu->pdptrs))) {
->>   		memcpy(mmu->pdptrs, pdpte, sizeof(mmu->pdptrs));
->>   		kvm_register_mark_dirty(vcpu, VCPU_EXREG_PDPTR);
->> -		/* Ensure the dirty PDPTEs to be loaded. */
->> -		kvm_make_request(KVM_REQ_LOAD_MMU_PGD, vcpu);
->> +		/*
->> +		 * Ensure the dirty PDPTEs to be loaded for VMX with EPT
->> +		 * enabled or pae_root to be reconstructed for shadow paging.
->> +		 */
->> +		if (tdp_enabled)
->> +			kvm_make_request(KVM_REQ_LOAD_MMU_PGD, vcpu);
->> +		else
->> +			kvm_mmu_free_roots(vcpu, vcpu->arch.mmu, KVM_MMU_ROOT_CURRENT);
-> 
-> Shouldn't matter since it's legacy shadow paging, but @mmu should be used instead
-> of vcpu->arch.mmuvcpu->arch.mmu.
-
-@mmu is the "guest mmu" (vcpu->arch.walk_mmu), which is used to walk
-including loading pdptr.
-
-vcpu->arch.mmu is for host constructing mmu for shadowed or tdp mmu
-which is used in host side management including kvm_mmu_free_roots().
-
-Even they are the same pointer now for !tdp, the meaning is different.  I prefer
-to distinguish them even before kvm_mmu is split different for guest mmu
-(vcpu->arch.walk_mmu) and host constructing mmu (vcpu->arch.mmu).
-
-(I once searched all the usage of undistinguished usage of kvm_mmu *mmu, and
-found a bug, see "Use vcpu->arch.walk_mmu for kvm_mmu_invlpg()")
-
-I think Paolo is doing the splitting, unless I would take the job because
-I have some patches pending depended them.
-
-> 
-> To avoid a dependency on the previous patch, I think it makes sense to have this be:
-> 
-> 	if (!tdp_enabled && memcmp(mmu->pdptrs, pdpte, sizeof(mmu->pdptrs)))
-> 		kvm_mmu_free_roots(vcpu, mmu, KVM_MMU_ROOT_CURRENT);
-> 
-
-Yes, it is a good idea to add this first.
-
-Thanks for review and suggestion.
-Lai
+Regards,
+DAVID JACKSON
+FEDERAL BUREAU OF INVESTIGATION
+INVESTIGATION ON ALL ONLINE WIRE TRANSFER
