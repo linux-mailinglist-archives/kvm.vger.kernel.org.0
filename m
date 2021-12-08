@@ -2,254 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BCE4246D7B4
-	for <lists+kvm@lfdr.de>; Wed,  8 Dec 2021 17:06:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9634946D7F7
+	for <lists+kvm@lfdr.de>; Wed,  8 Dec 2021 17:19:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229743AbhLHQKZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Dec 2021 11:10:25 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:50912 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232138AbhLHQKY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 8 Dec 2021 11:10:24 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1638979612;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=msQ0FSkz32V6T/y/AuAdwbJEfVeDV6dpvvMZ28J93Gk=;
-        b=VumNgz6NBSwkf9m5HdLxDlbJYCy7gWTJ46NvOzvrVuWOV03PQ5Vz2DE47I73Qf2u9KhGyf
-        uOMk1DtVb6qLFcWel+Jw/JY/SDLHVdWYsiX1w/NnbptWXpSnnsDEdeg8yMYeflGE5oPQhB
-        x6d+hOqKRoG2I0r8pKa+BhbCY22eQ/M=
-Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
- [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-439-b9bQGI2iOsOp6UoCVsFpVg-1; Wed, 08 Dec 2021 11:06:51 -0500
-X-MC-Unique: b9bQGI2iOsOp6UoCVsFpVg-1
-Received: by mail-ot1-f71.google.com with SMTP id z33-20020a9d24a4000000b00579320f89ecso1077615ota.12
-        for <kvm@vger.kernel.org>; Wed, 08 Dec 2021 08:06:51 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=msQ0FSkz32V6T/y/AuAdwbJEfVeDV6dpvvMZ28J93Gk=;
-        b=qc1uFLYCOXY1/zxXu10RsDna4EZKVjeeWVV4mqE7QaYrgcF/7MGPAJAive9vGEggmw
-         bOqIfMCfSanYwT6A97PepZORJHtGy2+TR2wJFJiaSzyfnTj1bprPTAexNdIsh9dapVaq
-         rGdrv2A0AhQsxRRN23BLhrLm75li2HsmKhY+84N+OY4ffpX+rVOxBgHP/e6Wujrx/3Bu
-         0edFJu0Pwe28RxrIMMw0LMY6BxIogj0gNQN0i4kK8mWnEfvkL0kDqmtwJaF2x1dZuWUg
-         C0BbbZLhAIWrQZ90jKaE0MtLS2WjJPCK6ma5bp6rro4+kZ/v9Pd9KD+RBR57DYgcjtsf
-         iqTQ==
-X-Gm-Message-State: AOAM533bItUPO13sm4eTzinDOHmGBqsYDNEUG5MLqLEwzNyYcoQexEmO
-        ZmWbz6YMHmjfua2MJ+AFdYtNBUjstQcdiYhAExUGdm/Y5MP98exLgTPGkYpnn6q2rFNwu8Ja7sc
-        KKQ7rjoOCh52/
-X-Received: by 2002:a05:6808:1210:: with SMTP id a16mr348246oil.161.1638979610118;
-        Wed, 08 Dec 2021 08:06:50 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwoJipexPgoqhGOL3K0JZuiak0CmykKYiB9ZurxmfVsx7HYyJgucWaZu/zUaxi7Tp4ID2udUw==
-X-Received: by 2002:a05:6808:1210:: with SMTP id a16mr348158oil.161.1638979609356;
-        Wed, 08 Dec 2021 08:06:49 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id e21sm537943ote.72.2021.12.08.08.06.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Dec 2021 08:06:48 -0800 (PST)
-Date:   Wed, 8 Dec 2021 09:06:47 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Yishai Hadas <yishaih@nvidia.com>
-Subject: Re: [PATCH RFC v2] vfio: Documentation for the migration region
-Message-ID: <20211208090647.118e6aab.alex.williamson@redhat.com>
-In-Reply-To: <20211207155145.GD6385@nvidia.com>
-References: <20211130153541.131c9729.alex.williamson@redhat.com>
- <20211201031407.GG4670@nvidia.com>
- <20211201130314.69ed679c@omen>
- <20211201232502.GO4670@nvidia.com>
- <20211203110619.1835e584.alex.williamson@redhat.com>
- <87zgpdu3ez.fsf@redhat.com>
- <20211206173422.GK4670@nvidia.com>
- <87tufltxp0.fsf@redhat.com>
- <20211206191933.GM4670@nvidia.com>
- <87o85su0kv.fsf@redhat.com>
- <20211207155145.GD6385@nvidia.com>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+        id S236757AbhLHQWf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Dec 2021 11:22:35 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51410 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236749AbhLHQWe (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 8 Dec 2021 11:22:34 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B8GG58C020344;
+        Wed, 8 Dec 2021 16:19:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=NCVsya2U6FmqSo37J3HNnQHPSsS7M2ZWP1KLU3Y4UD4=;
+ b=fgkUSJgy2i8xMHsCcOFZDe+MwaKKwHB2H05bwreZ8C1ZAJ4PrZMVJI30I6eJszNP43LC
+ JMinebb1fpbBsvNYgkz2jWypCG6CgwkNSmFfrj0FKCzAcrl6rKvcy21GcpEVwd57Kxvr
+ +2QeIHRu4vudkrrrkmVXJFDXSNOJzIpQmQVV+G+62685dyejF9GWQg9iaJEFPcEoFHaz
+ YwBxG1jHEbXHu3td98O/Ar2yPP2PhaWGqgryv2IHaQtwrP2IjG6/FY3x4JktpS1IVdnT
+ a57G/ypbAFu6gyJm8/m30hVuejUx70dgXHXQ/GJrbHNKM8K4eKQW/h++QgNPLdQJ44C9 Lg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ctya4s65g-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 08 Dec 2021 16:19:01 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1B8G54Ox012586;
+        Wed, 8 Dec 2021 16:19:00 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3ctya4s64k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 08 Dec 2021 16:19:00 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1B8FvJsD005136;
+        Wed, 8 Dec 2021 16:18:57 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma04ams.nl.ibm.com with ESMTP id 3cqyyb1qjs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 08 Dec 2021 16:18:57 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1B8GIsmT29688268
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 8 Dec 2021 16:18:54 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4EC9AAE057;
+        Wed,  8 Dec 2021 16:18:54 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 10D37AE058;
+        Wed,  8 Dec 2021 16:18:53 +0000 (GMT)
+Received: from sig-9-145-190-99.de.ibm.com (unknown [9.145.190.99])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  8 Dec 2021 16:18:52 +0000 (GMT)
+Message-ID: <74f8b38e4b36b0cdb0bcef9430c1c47e42ae4b6c.camel@linux.ibm.com>
+Subject: Re: [PATCH 10/32] s390/pci: stash dtsm and maxstbl
+From:   Niklas Schnelle <schnelle@linux.ibm.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
+        farman@linux.ibm.com, pmorel@linux.ibm.com,
+        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
+        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
+        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Date:   Wed, 08 Dec 2021 17:18:52 +0100
+In-Reply-To: <20211207205743.150299-11-mjrosato@linux.ibm.com>
+References: <20211207205743.150299-1-mjrosato@linux.ibm.com>
+         <20211207205743.150299-11-mjrosato@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-16.el8) 
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: jkjmmkSFqowyWrT0yD_RcrrfzKAb9S3r
+X-Proofpoint-ORIG-GUID: m1LAx3SUuIM3ATFnS5ex6fxp5aqHGsYP
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2021-12-08_06,2021-12-08_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
+ priorityscore=1501 bulkscore=0 mlxscore=0 adultscore=0 malwarescore=0
+ spamscore=0 lowpriorityscore=0 suspectscore=0 impostorscore=0
+ mlxlogscore=999 phishscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2110150000 definitions=main-2112080096
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 7 Dec 2021 11:51:45 -0400
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+On Tue, 2021-12-07 at 15:57 -0500, Matthew Rosato wrote:
+> Store information about what IOAT designation types are supported by
+> underlying hardware as well as the largest store block size allowed.
+> These values will be needed by passthrough.
+> 
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> ---
+>  arch/s390/include/asm/pci.h     | 2 ++
+>  arch/s390/include/asm/pci_clp.h | 6 ++++--
+>  arch/s390/pci/pci_clp.c         | 2 ++
+>  3 files changed, 8 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/s390/include/asm/pci.h b/arch/s390/include/asm/pci.h
+> index 2474b8d30f2a..1a8f9f42da3a 100644
+> --- a/arch/s390/include/asm/pci.h
+> +++ b/arch/s390/include/asm/pci.h
+> @@ -126,9 +126,11 @@ struct zpci_dev {
+>  	u32		gd;		/* GISA designation for passthrough */
+>  	u16		vfn;		/* virtual function number */
+>  	u16		pchid;		/* physical channel ID */
+> +	u16		maxstbl;	/* Maximum store block size */
+>  	u8		pfgid;		/* function group ID */
+>  	u8		pft;		/* pci function type */
+>  	u8		port;
+> +	u8		dtsm;		/* Supported DT mask */
+>  	u8		rid_available	: 1;
+>  	u8		has_hp_slot	: 1;
+>  	u8		has_resources	: 1;
+> diff --git a/arch/s390/include/asm/pci_clp.h b/arch/s390/include/asm/pci_clp.h
+> index 3af8d196da74..124fadfb74b9 100644
+> --- a/arch/s390/include/asm/pci_clp.h
+> +++ b/arch/s390/include/asm/pci_clp.h
+> @@ -153,9 +153,11 @@ struct clp_rsp_query_pci_grp {
+>  	u8			:  6;
+>  	u8 frame		:  1;
+>  	u8 refresh		:  1;	/* TLB refresh mode */
+> -	u16 reserved2;
+> +	u16			:  3;
+> +	u16 maxstbl		: 13;	/* Maximum store block size */
+>  	u16 mui;
+> -	u16			: 16;
+> +	u8 dtsm;			/* Supported DT mask */
+> +	u8 reserved3;
+>  	u16 maxfaal;
+>  	u16			:  4;
+>  	u16 dnoi		: 12;
+> diff --git a/arch/s390/pci/pci_clp.c b/arch/s390/pci/pci_clp.c
+> index e9ed0e4a5cf0..bc7446566cbc 100644
+> --- a/arch/s390/pci/pci_clp.c
+> +++ b/arch/s390/pci/pci_clp.c
+> @@ -103,6 +103,8 @@ static void clp_store_query_pci_fngrp(struct zpci_dev *zdev,
+>  	zdev->max_msi = response->noi;
+>  	zdev->fmb_update = response->mui;
+>  	zdev->version = response->version;
+> +	zdev->maxstbl = response->maxstbl;
+> +	zdev->dtsm = response->dtsm;
+>  
+>  	switch (response->version) {
+>  	case 1:
 
-> On Tue, Dec 07, 2021 at 12:16:32PM +0100, Cornelia Huck wrote:
-> > On Mon, Dec 06 2021, Jason Gunthorpe <jgg@nvidia.com> wrote:
-> >   
-> > > On Mon, Dec 06, 2021 at 07:06:35PM +0100, Cornelia Huck wrote:
-> > >  
-> > >> We're discussing a complex topic here, and we really don't want to
-> > >> perpetuate an unclear uAPI. This is where my push for more precise
-> > >> statements is coming from.  
-> > >
-> > > I appreciate that, and I think we've made a big effort toward that
-> > > direction.
-> > >
-> > > Can we have some crisp feedback which statements need SHOULD/MUST/MUST
-> > > NOT and come to something?  
-> > 
-> > I'm not sure what I should actually comment on, some general remarks:  
-> 
-> You should comment on the paragraphs that prevent you from adding a
-> reviewed-by.
-> 
-> > - If we consider a possible vfio-ccw implementation that will quiesce
-> >   the device and not rely on tracking I/O, we need to make the parts
-> >   that talk about tracking non-mandatory.  
-> 
-> I'm not sure what you mean by 'tracking I/O'?
-> 
-> I thought we were good on ccw?
-> 
-> > - NDMA sounds like something that needs to be non-mandatory as well.  
-> 
-> I agree, Alex are we agreed now ?
-
-No.  When last we left our thread, you seemed to be suggesting QEMU
-maintains two IOMMU domains, ie. containers, the first of which would
-include p2p mappings for all PCI devices, the second would include no
-p2p mappings.  Device supporting NDMA get attached to the former,
-non-NDMA devices the latter.
-
-So some devices can access all devices via p2p DMA, other devices can
-access none.  Are there any bare metal systems that expose such
-asymmetric p2p constraints?  I'm not inclined to invent new p2p
-scenarios that only exist in VMs.
-
-In addition to creating this asymmetric topology, forcing QEMU to
-maintain two containers not only increases the overhead, but doubles
-the locked memory requirements for QEMU since our current locked memory
-accounting is unfortunately per container.  Then we need to also
-consider that multi-device groups exist where a group can only be
-attached to one container and also vIOMMU cases where presumably we'd
-only get these dual-containers when multiple groups are attached to a
-container.  Maybe also worth noting that we cannot atomically move a
-device between containers, due to both vfio and often IOMMU constraints
-afaik.
-
-So it still seems like the only QEMU policy that we could manage to
-document and support would require that non-mandatory NDMA support
-implies that migration cannot be enabled by default for any vfio device
-and that enabling migration sets in motion a binary policy regarding
-p2p mappings across the VM.  I'm still not convinced how supportable
-that is, but I can at least imagine explicit per device options that
-need to align.
-
-I don't know if lack of NDMA on ccw was Connie's reasoning for making
-NDMA non-mandatory, but it seems like NDMA is only relevant to buses
-that support DMA, so AIUI it would be just as valid for ccw devices to
-report NDMA as a no-op.
-
-> > - The discussion regarding bit group changes has me confused. You seem
-> >   to be saying that mlx5 needs that, so it needs to have some mandatory
-> >   component; but are actually all devices able to deal with those bits
-> >   changing as a group?  
-> 
-> Yes, all devices can support this as written.
-> 
-> If you think of the device_state as initiating some action pre bit
-> group then we have multiple bit group that can change at once and thus
-> multiple actions that can be triggered.
-> 
-> All devices must support userspace initiating actions one by one in a
-> manner that supports the reference flow. 
-> 
-> Thus, every driver can decompose a request for multiple actions into
-> an ordered list of single actions and execute those actions exactly as
-> if userspace had issued single actions.
-> 
-> The precedence follows the reference flow so that any conflicts
-> resolve along the path that already has defined behaviors.
-> 
-> I honestly don't know why this is such a discussion point, beyond
-> being a big oversight of the original design.
-
-In my case, because it's still not clearly a universal algorithm, yet
-it's being proposed as one.  We already discussed that {!}NDMA
-placement is fairly arbitrary and looking at v3 I'm wondering how a
-RESUMING -> SAVING|!RUNNING transition works.  For an implementation
-that shares a buffer between SAVING and RESUMING, the ordering seems to
-suggest the SAVING action has precedence over the !RESUMING action,
-which is clearly wrong, but for an implementation where migration data
-is read or written to the device directly, the ordering is not such a
-concern.
- 
-> > - In particular, the flow needs definitive markings about what is
-> >   mandatory to implement, what is strongly suggested, and what is
-> >   optional. It is unclear to me what is really expected, and what is
-> >   simply one way to implement it.  
-> 
-> I'm not sure either, this hasn't been clear at all to me. Alex has
-> asked for things to be general and left undefined, but we need some
-> minimum definition to actually implement driver/VMM interoperability
-> for what we need to do.
-> 
-> Really what qemu does will set the mandatory to implement.
-
-And therefore anything that works with QEMU is correct and how a driver
-gets to that correct result can be implementation specific, depending
-on factors like whether device data is buffered or the device is
-accessed directly.  We can have a valid, interoperable uAPI without
-constraining ourselves to a specific implementation.  Largely I think
-that trying to impose an implementation as the specification is the
-source of our friction.
-
-> > > The world needs to move forward, we can't debate this endlessly
-> > > forever. It is already another 6 weeks past since the last mlx5 driver
-> > > posting.  
-> > 
-> > 6 weeks is already blazingly fast in any vfio migration discussion. /s  
-> 
-> We've invested a lot of engineer months in this project, it is
-> disrespectful to all of this effort to leave us hanging with no clear
-> path forward and no actionable review comments after so much
-> time. This is another kernel cycle lost.
-> 
-> > Remember that we have other things to do as well, not all of which will
-> > be visible to you.  
-> 
-> As do we all, but your name is in the maintainer file, and that comes
-> with some responsibility.
-
-This is a bit infuriating, responding to it at all is probably ill
-advised.  We're all investing a lot of time into this.  We're all
-disappointed how the open source use case of the previous
-implementation fell apart and nobody else stepped up until now.
-Rubbing salt in that wound is not helpful or productive.
-
-Regardless, this implementation has highlighted gaps in the initial
-design and it's critical that those known gaps are addressed before we
-commit to the design with an in-kernel driver.  Referring to the notes
-Connie copied from etherpad, those gaps include uAPI clarification
-regarding various device states and accesses allowed in those states,
-definition of a quiescent (NDMA) device state, discussion of per-device
-dirty state, and documentation such as userspace usage and edge cases.
-Only the latter items were specifically requested outside of the header
-and previously provided comments questioned if we're not actually
-creating contradictory documentation to the uAPI and why clarifications
-are not applied to the existing uAPI descriptions.
-
-Personally I'm a bit disappointed to see v3 posted where the diffstat
-indicates no uAPI updates, so we actually have no formal definition of
-this NDMA state, nor does it feel like we've really come to a
-conclusion on that discussion and how it affects userspace.  What is
-this documenting if NDMA is not formally part of the uAPI?  More so, it
-seems we're just trying to push to get a sign-off, demanding specific
-actions to get there.  Isn't that how we got into this situation,
-approving the uAPI, or in this case documentation, without an in-kernel
-implementation and vetted userspace?  Thanks,
-
-Alex
+Reviewed-by: Niklas Schnelle <schnelle@linux.ibm.com>
 
