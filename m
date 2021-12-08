@@ -2,200 +2,254 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C216F46D7A1
-	for <lists+kvm@lfdr.de>; Wed,  8 Dec 2021 16:59:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BCE4246D7B4
+	for <lists+kvm@lfdr.de>; Wed,  8 Dec 2021 17:06:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236473AbhLHQCs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Dec 2021 11:02:48 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:29926 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236421AbhLHQCr (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 8 Dec 2021 11:02:47 -0500
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B8FIEFi029115;
-        Wed, 8 Dec 2021 15:59:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=utmoP5Zpa8d3eUERjbx8XwiQbmqfm898++lg/HT7Kew=;
- b=TdfbfSZRSgXF50Bz6HkpHPcFVmQYNpLcRZJwZtTYUlVfR9RMBNHv07Tcht8R0sj47+0z
- Wvc/XmFfp+p1LuT3r6ZDN6/JPSt7Ni7UOCq+7QTsP7yYXHDYkB0TlhEyCHOPHtcCOQVm
- EFlfP43lxsLTj7ipRD1MS9JjTRNTcOKwuC3Q5p7UVk3COhvzJcBB2O08VOb0PG7H6kME
- t88Aoe6wiJD0pH9fqLzzXJk1bUK4tMNX7uWQmL4Yj+liEzrxyBkxncHlugVvozbE3ON6
- 6yrQATYAfiX0Q8BUkVMsmeOjsYcduH3XMVqAETDkM1tEMGK6W+yovla0NT8EGhcy0qgI nw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cty7vgue0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 08 Dec 2021 15:59:15 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1B8FMDeU002381;
-        Wed, 8 Dec 2021 15:59:14 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cty7vgudh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 08 Dec 2021 15:59:14 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1B8Fwst5008055;
-        Wed, 8 Dec 2021 15:59:12 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma06ams.nl.ibm.com with ESMTP id 3cqykjhmm7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 08 Dec 2021 15:59:12 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1B8Fx9q620447604
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 8 Dec 2021 15:59:09 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5547311C04C;
-        Wed,  8 Dec 2021 15:59:09 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 243BE11C052;
-        Wed,  8 Dec 2021 15:59:08 +0000 (GMT)
-Received: from sig-9-145-190-99.de.ibm.com (unknown [9.145.190.99])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed,  8 Dec 2021 15:59:08 +0000 (GMT)
-Message-ID: <a53b6402cefdef7645d1771a8b74782689b4e6dc.camel@linux.ibm.com>
-Subject: Re: [PATCH 07/32] s390/pci: externalize the SIC operation controls
- and routine
-From:   Niklas Schnelle <schnelle@linux.ibm.com>
-To:     Matthew Rosato <mjrosato@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        linux-s390@vger.kernel.org
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        farman@linux.ibm.com, pmorel@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, gerald.schaefer@linux.ibm.com,
-        agordeev@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
-        imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
-        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
-        pasic@linux.ibm.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date:   Wed, 08 Dec 2021 16:59:07 +0100
-In-Reply-To: <eea46eb2-c14e-3bc1-d8e4-b6b28c677fe2@linux.ibm.com>
-References: <20211207205743.150299-1-mjrosato@linux.ibm.com>
-         <20211207205743.150299-8-mjrosato@linux.ibm.com>
-         <bc3b60f7-833d-6d50-dcd0-b102a190c69d@linux.ibm.com>
-         <614215b5aa14102c7b43913b234463199401a156.camel@linux.ibm.com>
-         <eea46eb2-c14e-3bc1-d8e4-b6b28c677fe2@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-16.el8) 
-Mime-Version: 1.0
+        id S229743AbhLHQKZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Dec 2021 11:10:25 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:50912 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232138AbhLHQKY (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 8 Dec 2021 11:10:24 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1638979612;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=msQ0FSkz32V6T/y/AuAdwbJEfVeDV6dpvvMZ28J93Gk=;
+        b=VumNgz6NBSwkf9m5HdLxDlbJYCy7gWTJ46NvOzvrVuWOV03PQ5Vz2DE47I73Qf2u9KhGyf
+        uOMk1DtVb6qLFcWel+Jw/JY/SDLHVdWYsiX1w/NnbptWXpSnnsDEdeg8yMYeflGE5oPQhB
+        x6d+hOqKRoG2I0r8pKa+BhbCY22eQ/M=
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
+ [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-439-b9bQGI2iOsOp6UoCVsFpVg-1; Wed, 08 Dec 2021 11:06:51 -0500
+X-MC-Unique: b9bQGI2iOsOp6UoCVsFpVg-1
+Received: by mail-ot1-f71.google.com with SMTP id z33-20020a9d24a4000000b00579320f89ecso1077615ota.12
+        for <kvm@vger.kernel.org>; Wed, 08 Dec 2021 08:06:51 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=msQ0FSkz32V6T/y/AuAdwbJEfVeDV6dpvvMZ28J93Gk=;
+        b=qc1uFLYCOXY1/zxXu10RsDna4EZKVjeeWVV4mqE7QaYrgcF/7MGPAJAive9vGEggmw
+         bOqIfMCfSanYwT6A97PepZORJHtGy2+TR2wJFJiaSzyfnTj1bprPTAexNdIsh9dapVaq
+         rGdrv2A0AhQsxRRN23BLhrLm75li2HsmKhY+84N+OY4ffpX+rVOxBgHP/e6Wujrx/3Bu
+         0edFJu0Pwe28RxrIMMw0LMY6BxIogj0gNQN0i4kK8mWnEfvkL0kDqmtwJaF2x1dZuWUg
+         C0BbbZLhAIWrQZ90jKaE0MtLS2WjJPCK6ma5bp6rro4+kZ/v9Pd9KD+RBR57DYgcjtsf
+         iqTQ==
+X-Gm-Message-State: AOAM533bItUPO13sm4eTzinDOHmGBqsYDNEUG5MLqLEwzNyYcoQexEmO
+        ZmWbz6YMHmjfua2MJ+AFdYtNBUjstQcdiYhAExUGdm/Y5MP98exLgTPGkYpnn6q2rFNwu8Ja7sc
+        KKQ7rjoOCh52/
+X-Received: by 2002:a05:6808:1210:: with SMTP id a16mr348246oil.161.1638979610118;
+        Wed, 08 Dec 2021 08:06:50 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwoJipexPgoqhGOL3K0JZuiak0CmykKYiB9ZurxmfVsx7HYyJgucWaZu/zUaxi7Tp4ID2udUw==
+X-Received: by 2002:a05:6808:1210:: with SMTP id a16mr348158oil.161.1638979609356;
+        Wed, 08 Dec 2021 08:06:49 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id e21sm537943ote.72.2021.12.08.08.06.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Dec 2021 08:06:48 -0800 (PST)
+Date:   Wed, 8 Dec 2021 09:06:47 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+        kvm@vger.kernel.org, Kirti Wankhede <kwankhede@nvidia.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+        Yishai Hadas <yishaih@nvidia.com>
+Subject: Re: [PATCH RFC v2] vfio: Documentation for the migration region
+Message-ID: <20211208090647.118e6aab.alex.williamson@redhat.com>
+In-Reply-To: <20211207155145.GD6385@nvidia.com>
+References: <20211130153541.131c9729.alex.williamson@redhat.com>
+ <20211201031407.GG4670@nvidia.com>
+ <20211201130314.69ed679c@omen>
+ <20211201232502.GO4670@nvidia.com>
+ <20211203110619.1835e584.alex.williamson@redhat.com>
+ <87zgpdu3ez.fsf@redhat.com>
+ <20211206173422.GK4670@nvidia.com>
+ <87tufltxp0.fsf@redhat.com>
+ <20211206191933.GM4670@nvidia.com>
+ <87o85su0kv.fsf@redhat.com>
+ <20211207155145.GD6385@nvidia.com>
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: XdoR5-4K30KyLf2GYD1vPHJYCFPi9PnH
-X-Proofpoint-ORIG-GUID: grLgBOgNd9kumXGOwJYkmEy4JW75ZH9M
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2021-12-08_06,2021-12-08_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
- bulkscore=0 priorityscore=1501 suspectscore=0 impostorscore=0 phishscore=0
- malwarescore=0 spamscore=0 adultscore=0 mlxlogscore=999 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
- definitions=main-2112080095
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2021-12-08 at 10:33 -0500, Matthew Rosato wrote:
-> On 12/8/21 8:53 AM, Niklas Schnelle wrote:
-> > On Wed, 2021-12-08 at 14:09 +0100, Christian Borntraeger wrote:
-> > > Am 07.12.21 um 21:57 schrieb Matthew Rosato:
-> > > > A subsequent patch will be issuing SIC from KVM -- export the necessary
-> > > > routine and make the operation control definitions available from a header.
-> > > > Because the routine will now be exported, let's swap the purpose of
-> > > > zpci_set_irq_ctrl and __zpci_set_irq_ctrl, leaving the latter as a static
-> > > > within pci_irq.c only for SIC calls that don't specify an iib.
-> > > 
-> > > Maybe it would be simpler to export the __ version instead of renaming everything.
-> > > Whatever Niklas prefers.
+On Tue, 7 Dec 2021 11:51:45 -0400
+Jason Gunthorpe <jgg@nvidia.com> wrote:
+
+> On Tue, Dec 07, 2021 at 12:16:32PM +0100, Cornelia Huck wrote:
+> > On Mon, Dec 06 2021, Jason Gunthorpe <jgg@nvidia.com> wrote:
+> >   
+> > > On Mon, Dec 06, 2021 at 07:06:35PM +0100, Cornelia Huck wrote:
+> > >  
+> > >> We're discussing a complex topic here, and we really don't want to
+> > >> perpetuate an unclear uAPI. This is where my push for more precise
+> > >> statements is coming from.  
+> > >
+> > > I appreciate that, and I think we've made a big effort toward that
+> > > direction.
+> > >
+> > > Can we have some crisp feedback which statements need SHOULD/MUST/MUST
+> > > NOT and come to something?  
 > > 
-> > See below I think it's just not worth it having both variants at all.
+> > I'm not sure what I should actually comment on, some general remarks:  
+> 
+> You should comment on the paragraphs that prevent you from adding a
+> reviewed-by.
+> 
+> > - If we consider a possible vfio-ccw implementation that will quiesce
+> >   the device and not rely on tracking I/O, we need to make the parts
+> >   that talk about tracking non-mandatory.  
+> 
+> I'm not sure what you mean by 'tracking I/O'?
+> 
+> I thought we were good on ccw?
+> 
+> > - NDMA sounds like something that needs to be non-mandatory as well.  
+> 
+> I agree, Alex are we agreed now ?
+
+No.  When last we left our thread, you seemed to be suggesting QEMU
+maintains two IOMMU domains, ie. containers, the first of which would
+include p2p mappings for all PCI devices, the second would include no
+p2p mappings.  Device supporting NDMA get attached to the former,
+non-NDMA devices the latter.
+
+So some devices can access all devices via p2p DMA, other devices can
+access none.  Are there any bare metal systems that expose such
+asymmetric p2p constraints?  I'm not inclined to invent new p2p
+scenarios that only exist in VMs.
+
+In addition to creating this asymmetric topology, forcing QEMU to
+maintain two containers not only increases the overhead, but doubles
+the locked memory requirements for QEMU since our current locked memory
+accounting is unfortunately per container.  Then we need to also
+consider that multi-device groups exist where a group can only be
+attached to one container and also vIOMMU cases where presumably we'd
+only get these dual-containers when multiple groups are attached to a
+container.  Maybe also worth noting that we cannot atomically move a
+device between containers, due to both vfio and often IOMMU constraints
+afaik.
+
+So it still seems like the only QEMU policy that we could manage to
+document and support would require that non-mandatory NDMA support
+implies that migration cannot be enabled by default for any vfio device
+and that enabling migration sets in motion a binary policy regarding
+p2p mappings across the VM.  I'm still not convinced how supportable
+that is, but I can at least imagine explicit per device options that
+need to align.
+
+I don't know if lack of NDMA on ccw was Connie's reasoning for making
+NDMA non-mandatory, but it seems like NDMA is only relevant to buses
+that support DMA, so AIUI it would be just as valid for ccw devices to
+report NDMA as a no-op.
+
+> > - The discussion regarding bit group changes has me confused. You seem
+> >   to be saying that mlx5 needs that, so it needs to have some mandatory
+> >   component; but are actually all devices able to deal with those bits
+> >   changing as a group?  
+> 
+> Yes, all devices can support this as written.
+> 
+> If you think of the device_state as initiating some action pre bit
+> group then we have multiple bit group that can change at once and thus
+> multiple actions that can be triggered.
+> 
+> All devices must support userspace initiating actions one by one in a
+> manner that supports the reference flow. 
+> 
+> Thus, every driver can decompose a request for multiple actions into
+> an ordered list of single actions and execute those actions exactly as
+> if userspace had issued single actions.
+> 
+> The precedence follows the reference flow so that any conflicts
+> resolve along the path that already has defined behaviors.
+> 
+> I honestly don't know why this is such a discussion point, beyond
+> being a big oversight of the original design.
+
+In my case, because it's still not clearly a universal algorithm, yet
+it's being proposed as one.  We already discussed that {!}NDMA
+placement is fairly arbitrary and looking at v3 I'm wondering how a
+RESUMING -> SAVING|!RUNNING transition works.  For an implementation
+that shares a buffer between SAVING and RESUMING, the ordering seems to
+suggest the SAVING action has precedence over the !RESUMING action,
+which is clearly wrong, but for an implementation where migration data
+is read or written to the device directly, the ordering is not such a
+concern.
+ 
+> > - In particular, the flow needs definitive markings about what is
+> >   mandatory to implement, what is strongly suggested, and what is
+> >   optional. It is unclear to me what is really expected, and what is
+> >   simply one way to implement it.  
+> 
+> I'm not sure either, this hasn't been clear at all to me. Alex has
+> asked for things to be general and left undefined, but we need some
+> minimum definition to actually implement driver/VMM interoperability
+> for what we need to do.
+> 
+> Really what qemu does will set the mandatory to implement.
+
+And therefore anything that works with QEMU is correct and how a driver
+gets to that correct result can be implementation specific, depending
+on factors like whether device data is buffered or the device is
+accessed directly.  We can have a valid, interoperable uAPI without
+constraining ourselves to a specific implementation.  Largely I think
+that trying to impose an implementation as the specification is the
+source of our friction.
+
+> > > The world needs to move forward, we can't debate this endlessly
+> > > forever. It is already another 6 weeks past since the last mlx5 driver
+> > > posting.  
 > > 
-> > > > Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> > > > ---
-> > > >    arch/s390/include/asm/pci_insn.h | 17 +++++++++--------
-> > > >    arch/s390/pci/pci_insn.c         |  3 ++-
-> > > >    arch/s390/pci/pci_irq.c          | 28 ++++++++++++++--------------
-> > > >    3 files changed, 25 insertions(+), 23 deletions(-)
-> > > > 
-> > > > diff --git a/arch/s390/include/asm/pci_insn.h b/arch/s390/include/asm/pci_insn.h
-> > > > index 61cf9531f68f..5331082fa516 100644
-> > > > --- a/arch/s390/include/asm/pci_insn.h
-> > > > +++ b/arch/s390/include/asm/pci_insn.h
-> > > > @@ -98,6 +98,14 @@ struct zpci_fib {
-> > > >    	u32 gd;
-> > > >    } __packed __aligned(8);
-> > > >    
-> > > > +/* Set Interruption Controls Operation Controls  */
-> > > > +#define	SIC_IRQ_MODE_ALL		0
-> > > > +#define	SIC_IRQ_MODE_SINGLE		1
-> > > > +#define	SIC_IRQ_MODE_DIRECT		4
-> > > > +#define	SIC_IRQ_MODE_D_ALL		16
-> > > > +#define	SIC_IRQ_MODE_D_SINGLE		17
-> > > > +#define	SIC_IRQ_MODE_SET_CPU		18
-> > > > +
-> > > >    /* directed interruption information block */
-> > > >    struct zpci_diib {
-> > > >    	u32 : 1;
-> > > > @@ -134,13 +142,6 @@ int __zpci_store(u64 data, u64 req, u64 offset);
-> > > >    int zpci_store(const volatile void __iomem *addr, u64 data, unsigned long len);
-> > > >    int __zpci_store_block(const u64 *data, u64 req, u64 offset);
-> > > >    void zpci_barrier(void);
-> > > > -int __zpci_set_irq_ctrl(u16 ctl, u8 isc, union zpci_sic_iib *iib);
-> > > > -
-> > > > -static inline int zpci_set_irq_ctrl(u16 ctl, u8 isc)
-> > > > -{
-> > > > -	union zpci_sic_iib iib = {{0}};
-> > > > -
-> > > > -	return __zpci_set_irq_ctrl(ctl, isc, &iib);
-> > > > -}
-> > > > +int zpci_set_irq_ctrl(u16 ctl, u8 isc, union zpci_sic_iib *iib);
-> > 
-> > Since the __zpci_set_irq_ctrl() was already non static/inline the above
-> > inline to non-inline change shouldn't make a performance difference.
-> > 
-> > Looking at this makes me wonder though. Wouldn't it make sense to just
-> > have the zpci_set_irq_ctrl() function inline in the header. Its body is
-> > a single instruction inline asm plus a test_facility(). The latter by
-> > the way I think also looks rather out of place there considering we
-> > call zpci_set_irq_ctrl() in the interrupt handler and facilities can't
-> > go away so it's pretty silly to check for it on every single
-> > interrupt.. unless I'm totally missing something.
+> > 6 weeks is already blazingly fast in any vfio migration discussion. /s  
 > 
-> This test_facility isn't new to this patch
-
-Yeah I got that part, your patch just made me look.
-
-> , it was added via
+> We've invested a lot of engineer months in this project, it is
+> disrespectful to all of this effort to leave us hanging with no clear
+> path forward and no actionable review comments after so much
+> time. This is another kernel cycle lost.
 > 
-> commit 48070c73058be6de9c0d754d441ed7092dfc8f12
-> Author: Christian Borntraeger <borntraeger@de.ibm.com>
-> Date:   Mon Oct 30 14:38:58 2017 +0100
+> > Remember that we have other things to do as well, not all of which will
+> > be visible to you.  
 > 
->      s390/pci: do not require AIS facility
-> 
-> It looks like in the past, we would not even initialize zpci at all if 
-> AIS wasn't available.  With this, we initialize PCI but only do the SIC 
-> when we have AIS, which makes sense.
+> As do we all, but your name is in the maintainer file, and that comes
+> with some responsibility.
 
-Ah yes I guess that is the something I was missing. I was wondering why
-that wasn't just tested for during init.
+This is a bit infuriating, responding to it at all is probably ill
+advised.  We're all investing a lot of time into this.  We're all
+disappointed how the open source use case of the previous
+implementation fell apart and nobody else stepped up until now.
+Rubbing salt in that wound is not helpful or productive.
 
-> 
-> So for this patch, the sane thing to do is probably just keep the 
-> test_facility() in place and move to header, inline.
+Regardless, this implementation has highlighted gaps in the initial
+design and it's critical that those known gaps are addressed before we
+commit to the design with an in-kernel driver.  Referring to the notes
+Connie copied from etherpad, those gaps include uAPI clarification
+regarding various device states and accesses allowed in those states,
+definition of a quiescent (NDMA) device state, discussion of per-device
+dirty state, and documentation such as userspace usage and edge cases.
+Only the latter items were specifically requested outside of the header
+and previously provided comments questioned if we're not actually
+creating contradictory documentation to the uAPI and why clarifications
+are not applied to the existing uAPI descriptions.
 
-Yes sounds good.
+Personally I'm a bit disappointed to see v3 posted where the diffstat
+indicates no uAPI updates, so we actually have no formal definition of
+this NDMA state, nor does it feel like we've really come to a
+conclusion on that discussion and how it affects userspace.  What is
+this documenting if NDMA is not formally part of the uAPI?  More so, it
+seems we're just trying to push to get a sign-off, demanding specific
+actions to get there.  Isn't that how we got into this situation,
+approving the uAPI, or in this case documentation, without an in-kernel
+implementation and vetted userspace?  Thanks,
 
-> 
-> Maybe there's a subsequent optimization to be made (setup a static key 
-> like have_mio vs doing test_facility all the time?)
-
-Yeah, looking again more closely at test_facilities() it's probably not
-that expensive either I'll do some tests. Maybe we can also just add a
-comment and a normal unlikely() macro since with this series KVM would
-also support AIS, correct?
-
-> 
-
----8<---
+Alex
 
