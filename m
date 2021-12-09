@@ -2,129 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7CD1B46E732
-	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 12:00:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D7B2546E770
+	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 12:18:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233033AbhLILDs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Dec 2021 06:03:48 -0500
-Received: from foss.arm.com ([217.140.110.172]:54196 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232628AbhLILDr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Dec 2021 06:03:47 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 82FD71FB;
-        Thu,  9 Dec 2021 03:00:14 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7C6683F73B;
-        Thu,  9 Dec 2021 03:00:13 -0800 (PST)
-Date:   Thu, 9 Dec 2021 11:00:09 +0000
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     "haibiao.xiao" <haibiao.xiao@zstack.io>
-Cc:     kvm@vger.kernel.org, will@kernel.org,
-        julien.thierry.kdev@gmail.com,
-        "haibiao.xiao" <xiaohaibiao331@outlook.com>
-Subject: Re: [PATCH kvmtool] Makefile: 'lvm version' works incorrect. Because
- CFLAGS can not get sub-make variable $(KVMTOOLS_VERSION)
-Message-ID: <YbHhuXwJFCGTBAPB@monolith.localdoman>
-References: <20211204061436.36642-1-haibiao.xiao@zstack.io>
- <YbDfecTFlOfPIUs4@monolith.localdoman>
- <a6810407-e9b5-e377-a0bf-ee137d7e5638@zstack.io>
+        id S235428AbhLILVe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Dec 2021 06:21:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45722 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231626AbhLILVd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Dec 2021 06:21:33 -0500
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA756C061746;
+        Thu,  9 Dec 2021 03:17:59 -0800 (PST)
+Received: by mail-ed1-x535.google.com with SMTP id y13so18279029edd.13;
+        Thu, 09 Dec 2021 03:17:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=fo8xWj9D41FfrtS+dBIsbHWboaee5HFZE+LrwQkoquk=;
+        b=JANOOX9PXQg9MyLSpE5MXz6+UYgiTld9Px9vmqpvG35e5np+hl8Zt2lcjJlMjImIq1
+         kt2W5eL92vLnoz+j73wq7zOX4nKLAwdI0jyMc3DFM4ZhRZpN3msIJ8/UanTCdS8vHRpG
+         LvJDVal/jeFawsZyGZOmYO+X9gfZ0YQE33B3TOxdk0vgVARQ9W0K0RqHvjVcuy4/iPSI
+         iDvpnh3GI5/M1PRfCufpCL53+8BZt5aXjAsSbihqUA3fKjejqCy1uJAaRh0ivUrZPaV2
+         u6eliG+ypU8adf4sHR7df/HeLhqjDVEG4dkXPc7xOma66I2t/yYSQhMOS/dCbWtgUFif
+         fkMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=fo8xWj9D41FfrtS+dBIsbHWboaee5HFZE+LrwQkoquk=;
+        b=kheVyVUTZzUFUVeHtJBq1miq1NtCZMfwb1ZADSZSp0RXzbXmUxwA8ai9jD/pKj+MvE
+         wWv4N+iIfbvi9fAbwLmvJ5yx8jpXFLO+unPg31AO1NeSudkZh6XYDixfOcmIsKT6ulrP
+         CSphXHaKzskxHbtaKk/LK/LI4JolpXuRRTv/PeUGDto1KJ4DjVZaKQd2x/Mltx11zgfH
+         5znGxnxaUUV3DzzfkViH+Y0ho1UZLY6OOfeKiKrLKOz5ijG1lnGiLiDLOSsK7u4dUAD6
+         ymT+bjaPRQdf5XhaUixy+rSC3HIPw+/LdcSS3fZlZjxH6J03f8byXkmo4M5ALEDisLS7
+         hErw==
+X-Gm-Message-State: AOAM533lZL1890nYSbmK6UPkCnRbWZTkaspXj0AHaJgxemgHkrVrl14c
+        DnyoLUHKAOUz566JGKAHtOf/blOhB7A=
+X-Google-Smtp-Source: ABdhPJz2dx4N0511IdZHPLodnRrhg3tWUhYzsom0v3rrLBbF6uvreVwRAdtozgqezbtP/0p1e25+Hw==
+X-Received: by 2002:a50:e608:: with SMTP id y8mr28025782edm.39.1639048675798;
+        Thu, 09 Dec 2021 03:17:55 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.googlemail.com with ESMTPSA id ga37sm2685922ejc.65.2021.12.09.03.17.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 Dec 2021 03:17:55 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <5b12fc46-bffb-49dd-8cc7-83ba4e841843@redhat.com>
+Date:   Thu, 9 Dec 2021 12:17:52 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a6810407-e9b5-e377-a0bf-ee137d7e5638@zstack.io>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH] KVM: x86: Wait for IPIs to be delivered when handling
+ Hyper-V TLB flush hypercall
+Content-Language: en-US
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        linux-kernel@vger.kernel.org
+References: <20211209102937.584397-1-vkuznets@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20211209102937.584397-1-vkuznets@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
-
-On Thu, Dec 09, 2021 at 11:31:58AM +0800, haibiao.xiao wrote:
-> Hi,
+On 12/9/21 11:29, Vitaly Kuznetsov wrote:
+> Prior to commit 0baedd792713 ("KVM: x86: make Hyper-V PV TLB flush use
+> tlb_flush_guest()"), kvm_hv_flush_tlb() was using 'KVM_REQ_TLB_FLUSH |
+> KVM_REQUEST_NO_WAKEUP' when making a request to flush TLBs on other vCPUs
+> and KVM_REQ_TLB_FLUSH is/was defined as:
 > 
-> Thanks for your reply. I'd like to changed the subject line 
-> as you suggested. But I don't know how to deal with it, 
-> should I send another patch mail?
-
-Yes, please send version 2 of the patch. The subject line for the email
-should changed to (notice the extra v2):
-
-[PATCH v2 kvmtool] <your summary here>
-
-You can put the Tested-by tag after your Signed-off.
-
-Thanks,
-Alex
-
+>   (0 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
 > 
-> Thanks,
-> haibiao.xiao
+> so KVM_REQUEST_WAIT was lost. Hyper-V TLFS, however, requires that
+> "This call guarantees that by the time control returns back to the
+> caller, the observable effects of all flushes on the specified virtual
+> processors have occurred." and without KVM_REQUEST_WAIT there's a small
+> chance that the vCPU making the TLB flush will resume running before
+> all IPIs get delivered to other vCPUs and a stale mapping can get read
+> there.
 > 
-> On Wed, 8 Dec 2021 16:38:17 +0000, Alexandru Elisei wrote:
-> > Hi,
-> > 
-> > On Sat, Dec 04, 2021 at 02:14:36PM +0800, haibiao.xiao wrote:
-> >> From: "haibiao.xiao" <xiaohaibiao331@outlook.com>
-> > 
-> > The subject line should be a summary of what the patch does (and perhaps
-> > why it does it), not a description of what is broken. How about this:
-> > 
-> > Makefile: Calculate the correct kvmtool version
-> > 
-> > or something else that you prefer. Tested the patch and it works as
-> > advertised:
-> > 
-> > Tested-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > 
-> > Thanks,
-> > Alex
-> > 
-> >>
-> >> Command 'lvm version' works incorrect.
-> >> It is expected to print:
-> >>
-> >>     # ./lvm version
-> >>     # kvm tool [KVMTOOLS_VERSION]
-> >>
-> >> but the KVMTOOLS_VERSION is missed:
-> >>
-> >>     # ./lvm version
-> >>     # kvm tool
-> >>
-> >> The KVMTOOLS_VERSION is defined in the KVMTOOLS-VERSION-FILE file which
-> >> is included at the end of Makefile. Since the CFLAGS is a 'Simply
-> >> expanded variables' which means CFLAGS is only scanned once. So the
-> >> definetion of KVMTOOLS_VERSION at the end of Makefile would not scanned
-> >> by CFLAGS. So the '-DKVMTOOLS_VERSION=' remains empty.
-> >>
-> >> I fixed the bug by moving the '-include $(OUTPUT)KVMTOOLS-VERSION-FILE'
-> >> before the CFLAGS.
-> >>
-> >> Signed-off-by: haibiao.xiao <xiaohaibiao331@outlook.com>
-> >> ---
-> >>  Makefile | 4 ++--
-> >>  1 file changed, 2 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/Makefile b/Makefile
-> >> index bb7ad3e..9afb5e3 100644
-> >> --- a/Makefile
-> >> +++ b/Makefile
-> >> @@ -17,6 +17,7 @@ export E Q
-> >>  
-> >>  include config/utilities.mak
-> >>  include config/feature-tests.mak
-> >> +-include $(OUTPUT)KVMTOOLS-VERSION-FILE
-> >>  
-> >>  CC	:= $(CROSS_COMPILE)gcc
-> >>  CFLAGS	:=
-> >> @@ -559,5 +560,4 @@ ifneq ($(MAKECMDGOALS),clean)
-> >>  
-> >>  KVMTOOLS-VERSION-FILE:
-> >>  	@$(SHELL_PATH) util/KVMTOOLS-VERSION-GEN $(OUTPUT)
-> >> --include $(OUTPUT)KVMTOOLS-VERSION-FILE
-> >> -endif
-> >> +endif
-> >> \ No newline at end of file
-> >> -- 
-> >> 2.32.0
-> >>
+> Fix the issue by adding KVM_REQUEST_WAIT flag to KVM_REQ_TLB_FLUSH_GUEST:
+> kvm_hv_flush_tlb() is the sole caller which uses it for
+> kvm_make_all_cpus_request()/kvm_make_vcpus_request_mask() where
+> KVM_REQUEST_WAIT makes a difference.
+> 
+> Cc: stable@kernel.org
+> Fixes: 0baedd792713 ("KVM: x86: make Hyper-V PV TLB flush use tlb_flush_guest()")
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+> - Note, the issue was found by code inspection. Sporadic crashes of
+> big Windows guests using Hyper-V TLB flush enlightenment were reported
+> but I have no proof that these crashes are anyhow related.
+> ---
+>   arch/x86/include/asm/kvm_host.h | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index e41ad1ead721..8afb21c8a64f 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -97,7 +97,7 @@
+>   	KVM_ARCH_REQ_FLAGS(25, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+>   #define KVM_REQ_TLB_FLUSH_CURRENT	KVM_ARCH_REQ(26)
+>   #define KVM_REQ_TLB_FLUSH_GUEST \
+> -	KVM_ARCH_REQ_FLAGS(27, KVM_REQUEST_NO_WAKEUP)
+> +	KVM_ARCH_REQ_FLAGS(27, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+>   #define KVM_REQ_APF_READY		KVM_ARCH_REQ(28)
+>   #define KVM_REQ_MSR_FILTER_CHANGED	KVM_ARCH_REQ(29)
+>   #define KVM_REQ_UPDATE_CPU_DIRTY_LOGGING \
+> 
+
+Queued, thanks.
+
+Paolo
