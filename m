@@ -2,113 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4673046E248
-	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 07:06:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5870746E28D
+	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 07:32:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232844AbhLIGJp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Dec 2021 01:09:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57974 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232753AbhLIGJm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Dec 2021 01:09:42 -0500
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05941C0617A1
-        for <kvm@vger.kernel.org>; Wed,  8 Dec 2021 22:06:10 -0800 (PST)
-Received: by mail-pg1-x549.google.com with SMTP id d2-20020a656202000000b00325603f7d0bso2696589pgv.12
-        for <kvm@vger.kernel.org>; Wed, 08 Dec 2021 22:06:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc;
-        bh=pPWXqVL2VmGtL+4wfJS4Lr1QCW5EOpCcuVv/bW8wHlA=;
-        b=m445/XdfA4jroI3XDCtAyKS5RcJk3wwnVdhwXsQ243ogOY3c/PyQWynsCn+0RNOCgj
-         meJXf7IP7nbg3lOB2Nba+ytkgp2C8qGV9AUhMCTKgTsfK7gseCSBvupR//ymsixlvIZ1
-         vsGfLv0pKT5VLQ4m0g7imQGazSMcvx4ka6KA8taARhdZlZXJu774R2czYJgOvHjHs/vR
-         /kA9el3lYEGONOqtRy2FuyUMD/ZVx/7qwwnaMoGtIuErlyLX4LUTxVAMa2om/KkntDRn
-         vBdVr6pK4jeGKOWBt3lWtZ4sL1WgyTWQgyxOuypLI0QNVs32ahOiUNCpSA92pF8j/6rS
-         YxFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc;
-        bh=pPWXqVL2VmGtL+4wfJS4Lr1QCW5EOpCcuVv/bW8wHlA=;
-        b=JxU9Gw4DEiK1/5U7XZPC553iuwFvP4eVVJkhkIgDZHo1fM1MafP3fsHwsciPIkOhwt
-         bEAtunB1SfJdTRRT2v81zoHTWQxcXSOwRCAaEDRleIWz4NYPwEOZ9/QdjY/abFBiR4kq
-         A0U4iKaa8/5csVA5WJKezXqsaxbVDzexJ/7jjQJkVHUWm6ewNmV1NckzCsNWAoYUupoz
-         1d5vLruaGh74azYWf/4A5lytQ5Uc3OQszCFAzZ8T/IdPylB1O2atPOy4aDeisei9YlZd
-         eTXtJ87W6BDyzhoeUSQ+guBFu48h0hWfS/jBM7nuEMPMfBGOn7ac+/3YmAYKJsU7dnhg
-         83xw==
-X-Gm-Message-State: AOAM532Uo8PUJaPY2MeOJYCBOJBq211C9zn4HdSMUNEFRHu/DFuFnzfz
-        E/BFZ6GCyOdQBtCG5tUDRpCp1uo/hmw=
-X-Google-Smtp-Source: ABdhPJw5bpr56J/RPTS/V7V8gkVuRzz14Sg1Q/BeN7En+5GJvUuj9YAH473VwOhaqUXE84d1Zl1zpbv79GU=
-X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:84d:b0:4ae:da2:9ce7 with SMTP id
- q13-20020a056a00084d00b004ae0da29ce7mr9809877pfk.16.1639029969489; Wed, 08
- Dec 2021 22:06:09 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu,  9 Dec 2021 06:05:52 +0000
-In-Reply-To: <20211209060552.2956723-1-seanjc@google.com>
-Message-Id: <20211209060552.2956723-8-seanjc@google.com>
-Mime-Version: 1.0
-References: <20211209060552.2956723-1-seanjc@google.com>
-X-Mailer: git-send-email 2.34.1.400.ga245620fadb-goog
-Subject: [PATCH 7/7] KVM: WARN if is_unsync_root() is called on a root without
- a shadow page
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Sean Christopherson <seanjc@google.com>,
+        id S233153AbhLIGfs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Dec 2021 01:35:48 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:27000 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231567AbhLIGfr (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 Dec 2021 01:35:47 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1639031533;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=YGxYW/i2o6T83DzUiYtpl0Te2wL7mcPMqolUgsjb37E=;
+        b=SMPLFbckP9Ju6nTOjpmEiiK6jnQuiDKYBKXQYUQRxUXzcbGGjPaOH9jdNCZEsshGGlx72B
+        X8M34xarzhHZzBvjL0kwAidB4k5JddcMl7zTKsUHoAf4BtrPK4Gck5TxGzl0r9GadrttYk
+        ttY5KDmVlOKQp6zP5bNMgrpIVG9/v7w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-307-_ueZzm7dNzCiGEkOdZx5OQ-1; Thu, 09 Dec 2021 01:32:08 -0500
+X-MC-Unique: _ueZzm7dNzCiGEkOdZx5OQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 771B51006AA2;
+        Thu,  9 Dec 2021 06:32:06 +0000 (UTC)
+Received: from starship (unknown [10.40.192.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 783FF19C59;
+        Thu,  9 Dec 2021 06:31:57 +0000 (UTC)
+Message-ID: <864db5fb7528c84b41bc6580eac2a9f1c3485721.camel@redhat.com>
+Subject: Re: [PATCH v3 00/26] KVM: x86: Halt and APICv overhaul
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>,
-        Ben Gardon <bgardon@google.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        kvm@vger.kernel.org, iommu@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org
+Date:   Thu, 09 Dec 2021 08:31:56 +0200
+In-Reply-To: <YbFdwO3RZf6dg0M5@google.com>
+References: <20211208015236.1616697-1-seanjc@google.com>
+         <39c885fc6455dd0aa2f8643e725422851430f9ec.camel@redhat.com>
+         <8c6c38f3cc201e42629c3b8e5cf8cdb251c9ea8d.camel@redhat.com>
+         <YbFdwO3RZf6dg0M5@google.com>
 Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-WARN and bail if is_unsync_root() is passed a root for which there is no
-shadow page, i.e. is passed the physical address of one of the special
-roots, which do not have an associated shadow page.  The current usage
-squeaks by without bug reports because neither kvm_mmu_sync_roots() nor
-kvm_mmu_sync_prev_roots() calls the helper with pae_root or pml4_root,
-and 5-level AMD CPUs are not generally available, i.e. no one can coerce
-KVM into calling is_unsync_root() on pml5_root.
+On Thu, 2021-12-09 at 01:37 +0000, Sean Christopherson wrote:
+> On Thu, Dec 09, 2021, Maxim Levitsky wrote:
+> > On Thu, 2021-12-09 at 01:00 +0200, Maxim Levitsky wrote:
+> > > Probably just luck (can't reproduce this anymore) but
+> > > while running some kvm unit tests with this patch series (and few my patches
+> > > for AVIC co-existance which shouldn't affect this) I got this
+> > > 
+> > > (warning about is_running already set)
+> 
+> ...
+>  
+> > Also got this while trying a VM with passed through device:
+> 
+> A tangentially related question: have you seen any mysterious crashes on your AMD
+> system?  I've been bisecting (well, attempting to bisect) bizarre crashes that
+> AFAICT showed up between v5.15 and v5.16-rc2.  Things like runqueues being NULL
+> deep in the scheduler when a CPU is coming out of idle.  I _think_ the issues have
+> been fixed as of v5.16-rc4, but I don't have a good reproducer so bisecting in
+> either direction has been a complete mess.  I've reproduced on multiple AMD hosts,
+> but never on an Intel system.  I have a sinking feeling that the issue is
+> relatively unique to our systems :-/
 
-Note, this doesn't fix the mess with 5-level nNPT, it just (hopefully)
-prevents KVM from crashing.
+I did had my 3970X lockup hard once on 5.16-rc2. It locked up completely without even
+sending anything over a a pcie serial port card I. 
 
-Cc: Lai Jiangshan <jiangshanlai@gmail.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/mmu/mmu.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+I don't remember what I was doing during the crash but probably had some VMs running.
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index b6115d8ea696..18ecaadcf616 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3666,6 +3666,14 @@ static bool is_unsync_root(hpa_t root)
- 	 */
- 	smp_rmb();
- 	sp = to_shadow_page(root);
-+
-+	/*
-+	 * PAE roots (somewhat arbitrarily) aren't backed by shadow pages, the
-+	 * PDPTEs for a given PAE root need to be synchronized individually.
-+	 */
-+	if (WARN_ON_ONCE(!sp))
-+		return false;
-+
- 	if (sp->unsync || sp->unsync_children)
- 		return true;
- 
--- 
-2.34.1.400.ga245620fadb-goog
+Since then it didn't happen again, and I am running 5.16-rc3 for some time
+with Paolo's kvm/queue merged and my own patches.
+
+> 
+> And a request: any testing and bug fixes you can throw at the AVIC changes would be
+> greatly appreciated.  I've been partially blocked on testing the AVIC stuff for the
+> better part of the week.  If the crashes I'm seeing have been resolved, then I should
+> be able to help hunt down the issues, but if not...
+> 
+
+This is what I started doing last evening, and I'll go through all of the usual testing
+I do soon.
+
+Best regards,
+	Maxim Levitsky
 
