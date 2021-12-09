@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D39FB46E9A9
-	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 15:11:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 434B946E9AD
+	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 15:12:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238425AbhLIOPE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Dec 2021 09:15:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57672 "EHLO
+        id S230048AbhLIOQQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Dec 2021 09:16:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238416AbhLIOPD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Dec 2021 09:15:03 -0500
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47610C061746;
-        Thu,  9 Dec 2021 06:11:30 -0800 (PST)
-Received: by mail-ed1-x529.google.com with SMTP id o20so20023868eds.10;
-        Thu, 09 Dec 2021 06:11:30 -0800 (PST)
+        with ESMTP id S229449AbhLIOQP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Dec 2021 09:16:15 -0500
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D5ACC061746;
+        Thu,  9 Dec 2021 06:12:42 -0800 (PST)
+Received: by mail-ed1-x52f.google.com with SMTP id y12so19640321eda.12;
+        Thu, 09 Dec 2021 06:12:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=sender:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=S6sz9Atp4rL/yKWgC+JomL+J1EODMe3Iav1XoDK6GSM=;
-        b=ELynI2A8NZ0+8hNP5+URK0b0QCChrJa/X092xEWJm+JQVJaEsRFCUOsrXTQW+1y6qZ
-         fkgejIhxXFmc3QNvt1YWl/mQyrTeafE7QmNzZ8XXvKNyPhUub9Ccz906DtD4FcU8s0ym
-         BNEOE8b/i2lTscJ+IQNrgpVHg1Nk3QBGLmGJSQ2nQq/CydFCmcNZkZSXjvfCf7N76FrY
-         GQcy5DLu+7aVn3hCoGVwGNx3ncS0ro7Ht+fK26tNGH7RR0UTVhSZ+U62xMwRU4O1TeeT
-         IWNMFuasoHC1hJgsYecPlJwexrvqPsED1d+/Gc0So/uibYHfxoQIIfSuH7837c/OOPYu
-         89mw==
+        bh=ZKElaajDOEkfrjEsxS9M6gGKFWTRHDQiJWcgcyRkQpo=;
+        b=GdLNp3j3BpMVlruZDlCF0206p2jRj4VNmaADdXYXeqE8mnqlgOuw3K8Z9/acK2pVsL
+         V3berzH8VSRSZ6FfF0sNADeakU/76SqyNKBOfhNMMoqwxMd9DVr0Eug+oC5EcWGvRF/H
+         deXrZCCcqRCi5h8OuIfpHnkSFQo/0m/HmY4TtIj5ISOsSeZZquYXKpsTh9VnYjEotAcZ
+         42gSX6R0t8275nRRtI+9vV+L6VY6iDhYHQfh0r030OfDpEwCwuZA0HksmrHSNuQQ2EdK
+         BOoNl1o9ZIoxuuqbBWoZ44FqI62xrXwkSKJ4ekK2tBFu2wQ83nETWVN+3sVHvdObcaEP
+         fiOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
          :subject:content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=S6sz9Atp4rL/yKWgC+JomL+J1EODMe3Iav1XoDK6GSM=;
-        b=nOrAXn9zU0MhYEuWSsQta8yXiIvABEWAcy01KIJg/d7aDzyf66h0UouXw+3DyYYKRR
-         kc4nkYFJQnzjDeZDRn3x3btaZO77n60a1pN/E5WCP4nt1uSj+5Al9Ds//LasXheNrqJm
-         KuxMBISLlxIqCzo7NuHlQc16TU+xYRzL1TPqpcX1hWKWa2kw6NL8QkSvya1SACZRqPDw
-         2IuFh4va2JBINzilqw2HeQi/OdzfmYTKaEk3GB5F4oGFhu6+f7VYxfFaGcsjEyGQ026A
-         RLiREe1Gcb518RHOA/FA8zEpZndyu+OrBGUGp1vzKQTAGGz91VzGOq0UjpcJLSn2QC3U
-         LY+A==
-X-Gm-Message-State: AOAM530EcajN7+Xz1Z6vreNHJsKZk9HfpWvW6D5ZLjDyvI2h6Vp6GlE7
-        OJjPz3Hb7lOMSOC5cjox3wA=
-X-Google-Smtp-Source: ABdhPJxabksuPImxrznQuxxEGmI/Khoo9EthgkBYzvVg4ontXCLqpWK2N5yCZ3oT81+tDSGxQj26aA==
-X-Received: by 2002:aa7:ca4f:: with SMTP id j15mr28464368edt.178.1639059085688;
-        Thu, 09 Dec 2021 06:11:25 -0800 (PST)
+        bh=ZKElaajDOEkfrjEsxS9M6gGKFWTRHDQiJWcgcyRkQpo=;
+        b=H6DlGE72wndUR7MCZNFvkbOWPKBL1eNdoxj/s2nX6aP8uQvk+FoJmRZI/Y5zSL6YqE
+         Mf7VX+h/7YB4oqFU4wzE40mdo2iCUNFvnfFdh4BDQ370TPEkLANN293L6c0FeTOMsEXw
+         qDfhnlF4WiCe7C2KobBl8RPTpYbkAwRWfaIGtSBWY9dUIsYlvGe1gPetDOFjAXF4dNY/
+         wrzEdmhnAPh4k+YoE6dqzq/aU384lo+AZgashR6bDCJcNPsp3cayPmsn2esoZyvWABEL
+         6j20gL0d0h0litFbZloYVF91n1TqhoU3UqsqeeIPAUbewhwdCW08u6r2EJDVyTVnXPuR
+         Jd4g==
+X-Gm-Message-State: AOAM5315InCVOva9lK/IZlEnsyNSkclS+8gt3QzjWaDbGzeO5AbfAG8l
+        XherlWXhqKiLa/IjILVq8Hg=
+X-Google-Smtp-Source: ABdhPJyi6eaM2wuf0Zr783a2v1d54lABFpWK/cYQbPoVnv1jrgUKsHUZ9R8QEAiDWCYgEIMKOIDp5A==
+X-Received: by 2002:a17:906:4787:: with SMTP id cw7mr17127226ejc.311.1639059158557;
+        Thu, 09 Dec 2021 06:12:38 -0800 (PST)
 Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id ht7sm1639ejc.27.2021.12.09.06.11.20
+        by smtp.googlemail.com with ESMTPSA id e12sm2832350ejs.86.2021.12.09.06.12.37
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Dec 2021 06:11:25 -0800 (PST)
+        Thu, 09 Dec 2021 06:12:38 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <4d723b07-e626-190d-63f4-fd0b5497dd9b@redhat.com>
-Date:   Thu, 9 Dec 2021 15:11:17 +0100
+Message-ID: <350532d2-b01b-1d7c-fff3-c3cb171996e8@redhat.com>
+Date:   Thu, 9 Dec 2021 15:12:36 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.2.0
-Subject: Re: [PATCH 3/6] KVM: SVM: fix AVIC race of host->guest IPI delivery
- vs AVIC inhibition
+Subject: Re: [PATCH 5/6] KVM: x86: never clear irr_pending in
+ kvm_apic_update_apicv
 Content-Language: en-US
 To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
 Cc:     "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
@@ -72,9 +72,9 @@ Cc:     "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)"
         Jim Mattson <jmattson@google.com>,
         Sean Christopherson <seanjc@google.com>
 References: <20211209115440.394441-1-mlevitsk@redhat.com>
- <20211209115440.394441-4-mlevitsk@redhat.com>
+ <20211209115440.394441-6-mlevitsk@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211209115440.394441-4-mlevitsk@redhat.com>
+In-Reply-To: <20211209115440.394441-6-mlevitsk@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -82,58 +82,10 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 12/9/21 12:54, Maxim Levitsky wrote:
-> If svm_deliver_avic_intr is called just after the target vcpu's AVIC got
-> inhibited, it might read a stale value of vcpu->arch.apicv_active
-> which can lead to the target vCPU not noticing the interrupt.
-> 
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->   arch/x86/kvm/svm/avic.c | 16 +++++++++++++---
->   1 file changed, 13 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> index 859ad2dc50f1..8c1b934bfa9b 100644
-> --- a/arch/x86/kvm/svm/avic.c
-> +++ b/arch/x86/kvm/svm/avic.c
-> @@ -691,6 +691,15 @@ int svm_deliver_avic_intr(struct kvm_vcpu *vcpu, int vec)
->   	 * automatically process AVIC interrupts at VMRUN.
->   	 */
->   	if (vcpu->mode == IN_GUEST_MODE) {
-> +
-> +		/*
-> +		 * At this point we had read the vcpu->arch.apicv_active == true
-> +		 * and the vcpu->mode == IN_GUEST_MODE.
-> +		 * Since we have a memory barrier after setting IN_GUEST_MODE,
-> +		 * it ensures that AVIC inhibition is complete and thus
-> +		 * the target is really running with AVIC enabled.
-> +		 */
-> +
->   		int cpu = READ_ONCE(vcpu->cpu);
+> Also reorder call to kvm_apic_update_apicv to be after
+> .refresh_apicv_exec_ctrl, although that doesn't guarantee
+> that it will see up to date IRR bits.
 
-I don't think it's correct.  The vCPU has apicv_active written (in 
-kvm_vcpu_update_apicv) before vcpu->mode.
-
-For the acquire/release pair to work properly you need to 1) read 
-apicv_active *after* vcpu->mode here 2) use store_release and 
-load_acquire for vcpu->mode, respectively in vcpu_enter_guest and here.
+Can you spell out why do that?
 
 Paolo
-
->   		/*
-> @@ -706,10 +715,11 @@ int svm_deliver_avic_intr(struct kvm_vcpu *vcpu, int vec)
->   		put_cpu();
->   	} else {
->   		/*
-> -		 * Wake the vCPU if it was blocking.  KVM will then detect the
-> -		 * pending IRQ when checking if the vCPU has a wake event.
-> +		 * Kick the target vCPU otherwise, to make sure
-> +		 * it processes the interrupt even if its AVIC is inhibited.
->   		 */
-> -		kvm_vcpu_wake_up(vcpu);
-> +		kvm_make_request(KVM_REQ_EVENT, vcpu);
-> +		kvm_vcpu_kick(vcpu);
->   	}
->   
->   	return 0;
-> 
-
