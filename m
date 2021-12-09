@@ -2,134 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F35946F62D
-	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 22:48:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A201D46F636
+	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 22:52:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230448AbhLIVvi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Dec 2021 16:51:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54620 "EHLO
+        id S232809AbhLIVzg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Dec 2021 16:55:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231634AbhLIVvi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Dec 2021 16:51:38 -0500
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 039FAC061746
-        for <kvm@vger.kernel.org>; Thu,  9 Dec 2021 13:48:04 -0800 (PST)
-Received: by mail-pl1-x62e.google.com with SMTP id y8so4923184plg.1
-        for <kvm@vger.kernel.org>; Thu, 09 Dec 2021 13:48:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=8u1RdndtwaGuHxWx/fyS/o76eZaEiG1iSAyvhYohYQI=;
-        b=knsg3iw10lckcvL/Yr+MVQ58SDQdLFyk8NpPtr5+Vdw3CUkquAyf0ujIde2qMrY/hB
-         jbDhS3XoAdvzOlgh+DGy2LyONMVw4q9rxZSqDoE41QuioOFzL4rvIcJX5q1mJTvvQ6au
-         Ta9hgWDZOLAwO5xcHUhaXSNeeoYbQmfq7B3BzSj+XsSx26UG7pGGLaUJUItwS4RfVHHE
-         EJ/cudYAVo+QMypyH5Jp/EgrQcK2Dep3yC7yV+xA/ZteZoIauYewntyonAGpiX/X+tMd
-         N23B8GWS3+gCxGZGcAyTw9ZbqvlK/IW7dZNOrPB1NSKdotFwwPC9BIrCz7s//poNQv8R
-         ML6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=8u1RdndtwaGuHxWx/fyS/o76eZaEiG1iSAyvhYohYQI=;
-        b=2ZCiGjdSqLsdlp4oZt922NUH/FjRX5W552EVZZmbFu+bAdtJ6HmChBilb+OLYG/iew
-         QV6+phRRr7r8S1O0mv5oT1XwAgXGLvfLFbs5aX3gEPnfbcv4wwvb2eN7z6V1uTfevXHh
-         wbdvWlB05vYrVHjzfSHy84LfTYgnk4Wq5XuJVEe5tPWoUuliMMwb56RusW3CtgLpnloq
-         gHYGMJgcPcErxEJ+9XC843rTCAl1L0d5/q06trZ+wD+lz20aAGBBfJxkcT3YYUjFCrFL
-         +ktvnDXrqh+JeZ6qbirod1U5SOBGlRdTpGnYo7JkgcsjYgl4oWamBegh0SyMPC96v2xB
-         lKJw==
-X-Gm-Message-State: AOAM533kfSpDsILcnul7nnemkEslnO7pQ6Sd8U81zZcM7fyMVXwLXtRU
-        WA/93MzxLf8ha+WhmE4vmCCKwA==
-X-Google-Smtp-Source: ABdhPJx3iAM4QvC/YeiKhY5HZQaxbii/oD8MpYuJCDnaxMX16W9Awm1RxsSLUynoS9utfpNu4vfpFw==
-X-Received: by 2002:a17:90b:4b0e:: with SMTP id lx14mr19384187pjb.160.1639086483348;
-        Thu, 09 Dec 2021 13:48:03 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id u13sm546735pgp.27.2021.12.09.13.48.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Dec 2021 13:48:02 -0800 (PST)
-Date:   Thu, 9 Dec 2021 21:47:59 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        vkuznets@redhat.com, mlevitsk@redhat.com,
-        joao.m.martins@oracle.com, stable@vger.kernel.org,
-        David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH v2] selftests: KVM: avoid failures due to reserved
- HyperTransport region
-Message-ID: <YbJ5jyCyqZwZU3uH@google.com>
-References: <20211209205256.301140-1-pbonzini@redhat.com>
+        with ESMTP id S230448AbhLIVzg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Dec 2021 16:55:36 -0500
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49F59C061746;
+        Thu,  9 Dec 2021 13:52:02 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 625CACE28C0;
+        Thu,  9 Dec 2021 21:52:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D69BC004DD;
+        Thu,  9 Dec 2021 21:51:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1639086718;
+        bh=4+4lPuCdbXqfVpn7bgWrwanLBHcGR1e/UbC82rh+KsY=;
+        h=From:To:Cc:Subject:Date:From;
+        b=LbikyW4mg48hheFkscyzxtG8A2jvMRI+gv2CLJIT53WlxnX21JsX+Z+oBPXsCaSWy
+         t255IUT7iPWp7PdRWYCpkExZGWaItcQC75CNPShI86fwt1fcL9kVyD2zG9IuGj0zoe
+         NJEsqptC46C3rrYfLqp+6nvgKkARd15oKkQThrBTuEXDZa78ag/jR6v1CF5lgka+We
+         mCZYommH3a00CejfbgFrjvFNhKl6gEz2dcftC88BXupHBn19DNAkrb0HDyITR2WNYc
+         u9qLw10iSokE1scDdSgO6+4xNLAVfmnI3NHBZahizs+KmKZstaG/ikygdzrYCs28mT
+         lbD6YIDH8cLXA==
+From:   broonie@kernel.org
+To:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
+Cc:     Mark Brown <broonie@kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Sean Christopherson <seanjc@google.com>
+Subject: linux-next: manual merge of the kvm tree with the perf tree
+Date:   Thu,  9 Dec 2021 21:51:49 +0000
+Message-Id: <20211209215149.2661929-1-broonie@kernel.org>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211209205256.301140-1-pbonzini@redhat.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 09, 2021, Paolo Bonzini wrote:
-> +unsigned long vm_compute_max_gfn(struct kvm_vm *vm)
-> +{
-> +	const unsigned long num_ht_pages = 12 << 18; /* 12 GiB */
-> +	unsigned long ht_gfn, max_gfn, max_pfn;
-> +	uint32_t eax, ebx, ecx, edx;
-> +
-> +	max_gfn = (1ULL << (vm->pa_bits - vm->page_shift)) - 1;
-> +
-> +	/* Avoid reserved HyperTransport region on AMD processors.  */
-> +	eax = ecx = 0;
-> +	cpuid(&eax, &ebx, &ecx, &edx);
-> +	if (ebx != X86EMUL_CPUID_VENDOR_AuthenticAMD_ebx ||
-> +	    ecx != X86EMUL_CPUID_VENDOR_AuthenticAMD_ecx ||
-> +	    edx != X86EMUL_CPUID_VENDOR_AuthenticAMD_edx)
-> +		return max_gfn;
-> +
-> +	/* On parts with <40 physical address bits, the area is fully hidden */
-> +	if (vm->pa_bits < 40)
-> +		return max_gfn;
-> +
-> +	eax = 1;
-> +	cpuid(&eax, &ebx, &ecx, &edx);
-> +	if (x86_family(eax) < 0x17) {
-> +		/* Before family 17h, the HyperTransport area is just below 1T.  */
-> +		ht_gfn = (1 << 28) - num_ht_pages;
-> +	} else {
-> +		/*
-> +		 * Otherwise it's at the top of the physical address
-> +		 * space, possibly reduced due to SME by bits 11:6 of
-> +		 * CPUID[0x8000001f].EBX.
-> +		 */
-> +		eax = 0x80000008;
-> +		cpuid(&eax, &ebx, &ecx, &edx);
+From: Mark Brown <broonie@kernel.org>
 
-Should't this check 0x80000000.eax >= 0x80000008 first?  Or do we just accept
-failure if family==0x17 and there's no 0x80000008?  One paranoid option would be
-to use the pre-fam17 value, e.g.
+Hi all,
 
-        /* Before family 17h, the HyperTransport area is just below 1T. */
-        ht_gfn = (1 << 28) - num_ht_pages;
-        if (x86_family(eax) < 0x17)
-                goto out;
+Today's linux-next merge of the kvm tree got a conflict in:
 
-        eax = 0x80000000;
-        cpuid(&eax, &ebx, &ecx, &edx);
-        max_ext_leaf = eax;
+  arch/arm64/kvm/Kconfig
 
-        /* Use the old, conservative value if MAXPHYADDR isn't enumerated. */
-        if (max_ext_leaf < 0x80000008)
-                goto out;
+between commit:
 
-        /* comment */
-        eax = 0x80000008;
-        cpuid(&eax, &ebx, &ecx, &edx);
-        max_pfn = (1ULL << ((eax & 255) - vm->page_shift)) - 1;
-        if (max_ext_leaf >= 0x8000001f) {
-                <adjust>
-        }
-        ht_gfn = max_pfn - num_ht_pages;
-out:
-        return min(max_gfn, ht_gfn - 1);
+  2aef6f306b39b ("perf: Force architectures to opt-in to guest callbacks")
 
-> +             max_pfn = (1ULL << ((eax & 255) - vm->page_shift)) - 1;
+from the perf tree and commit:
 
-LOL, "& 255", you just couldn't resist, huh?  My version of Rami Code only goes
-up to 15.  :-)
+  ed922739c9199 ("KVM: Use interval tree to do fast hva lookup in memslots")
+
+from the kvm tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+diff --cc arch/arm64/kvm/Kconfig
+index e9761d84f982e,f1f8fc069a970..0000000000000
+--- a/arch/arm64/kvm/Kconfig
++++ b/arch/arm64/kvm/Kconfig
+@@@ -39,7 -39,7 +39,8 @@@ menuconfig KV
+  	select HAVE_KVM_IRQ_BYPASS
+  	select HAVE_KVM_VCPU_RUN_PID_CHANGE
+  	select SCHED_INFO
+ +	select GUEST_PERF_EVENTS if PERF_EVENTS
++ 	select INTERVAL_TREE
+  	help
+  	  Support hosting virtualized guest machines.
+  
