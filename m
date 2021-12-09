@@ -2,129 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E08B46E9FD
-	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 15:32:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F2C0646EA49
+	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 15:48:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238644AbhLIOfg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Dec 2021 09:35:36 -0500
-Received: from mga09.intel.com ([134.134.136.24]:56913 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238563AbhLIOfg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Dec 2021 09:35:36 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1639060322; x=1670596322;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=2M49wV9agpeIXgunzDrncYD71zahzY9cEiKo8KeHXEw=;
-  b=G1l4kXpfhHsFSWannu3QDmD8jcP+ZjD7ALgVpU9uubfSqf0/BaNNLNQA
-   c1ipzDGdFVkmLD87sQ8CwQKCKACfAw6gpRz4zLEgmdn1WeYXyGnLnLusr
-   r4tnBTC6CkbENLS/gK6/1yap+WYeX0KTzmUftZA0B3gzvaRtn9BYgnBZ1
-   vF/PeYIKF2PLw8fmasAutE11ckK6fTG0rrflRxC8tNygzfWAOo9GPaxyv
-   qDFkUr0S7WcntJa/rd80apQ7rBpqwJISIrWd4me4nfKrDER0Y5ie2TWRS
-   yLTgNxT8wUDgtVYW6ngJG5PJnGD6WsJsHfeJ5KkPZAB3c24bLQlbaSb9e
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10192"; a="237914568"
-X-IronPort-AV: E=Sophos;i="5.88,192,1635231600"; 
-   d="scan'208";a="237914568"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2021 06:31:43 -0800
-X-IronPort-AV: E=Sophos;i="5.88,192,1635231600"; 
-   d="scan'208";a="503510703"
-Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.255.29.184]) ([10.255.29.184])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2021 06:31:39 -0800
-Message-ID: <eac9c0b1-30c7-04e9-2c89-9047bebf2683@intel.com>
-Date:   Thu, 9 Dec 2021 22:31:36 +0800
+        id S238900AbhLIOwK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Dec 2021 09:52:10 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:41372 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232430AbhLIOwJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 Dec 2021 09:52:09 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1639061315;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=q9ohOzueGM6Q6CzM/nc70ucDOBZyHf1ga4ugF012GdQ=;
+        b=FGAE+0VwoHpdcyMslmLgggllA5rPWrRgbbyMxXJiu/jlzUpTqmHjs9MD9Aqqy2B3zvL6AA
+        J3/6Z2SAwFIM7tE8AgreKMYhI+5i48hpONxzzFvGLd+6Mt8fjzjz18VVHouLDQSyKUXMt6
+        a7l21l4LwNXDDj0wQl9Zv07Ss/CTam0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-568-bzWYdvgnOhOv5cycTJfqQQ-1; Thu, 09 Dec 2021 09:48:32 -0500
+X-MC-Unique: bzWYdvgnOhOv5cycTJfqQQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2462A343D8;
+        Thu,  9 Dec 2021 14:48:31 +0000 (UTC)
+Received: from starship (unknown [10.40.192.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6A1B760BF1;
+        Thu,  9 Dec 2021 14:48:26 +0000 (UTC)
+Message-ID: <346f5a5e93077ba20188a9b0e67bb3a44e2cad48.camel@redhat.com>
+Subject: Re: [PATCH v3 00/26] KVM: x86: Halt and APICv overhaul
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Joerg Roedel <joro@8bytes.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        kvm@vger.kernel.org, iommu@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org
+Date:   Thu, 09 Dec 2021 16:48:25 +0200
+In-Reply-To: <3bf8d500-0c1e-92dd-20c8-c3c231d2cbed@redhat.com>
+References: <20211208015236.1616697-1-seanjc@google.com>
+         <39c885fc6455dd0aa2f8643e725422851430f9ec.camel@redhat.com>
+         <8c6c38f3cc201e42629c3b8e5cf8cdb251c9ea8d.camel@redhat.com>
+         <YbFHsYJ5ua3J286o@google.com>
+         <3bf8d500-0c1e-92dd-20c8-c3c231d2cbed@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.3.2
-Subject: Re: [RFC PATCH v2 32/44] tdx: add kvm_tdx_enabled() accessor for
- later use
-Content-Language: en-US
-To:     Connor Kuehl <ckuehl@redhat.com>, isaku.yamahata@gmail.com,
-        qemu-devel@nongnu.org, pbonzini@redhat.com, alistair@alistair23.me,
-        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, mst@redhat.com,
-        cohuck@redhat.com, mtosatti@redhat.com, seanjc@google.com,
-        erdemaktas@google.com
-Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org
-References: <cover.1625704980.git.isaku.yamahata@intel.com>
- <26d88e7618038c1fed501352a04144745abd12ae.1625704981.git.isaku.yamahata@intel.com>
- <43a81d27-56da-07e8-b3d7-9800b6ed8da1@redhat.com>
-From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <43a81d27-56da-07e8-b3d7-9800b6ed8da1@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 7/23/2021 1:53 AM, Connor Kuehl wrote:
-> On 7/7/21 7:55 PM, isaku.yamahata@gmail.com wrote:
->> From: Isaku Yamahata <isaku.yamahata@intel.com>
->>
->> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
->> ---
->>   include/sysemu/tdx.h  | 1 +
->>   target/i386/kvm/kvm.c | 5 +++++
->>   2 files changed, 6 insertions(+)
->>
->> diff --git a/include/sysemu/tdx.h b/include/sysemu/tdx.h
->> index 70eb01348f..f3eced10f9 100644
->> --- a/include/sysemu/tdx.h
->> +++ b/include/sysemu/tdx.h
->> @@ -6,6 +6,7 @@
->>   #include "hw/i386/pc.h"
->>   bool kvm_has_tdx(KVMState *s);
->> +bool kvm_tdx_enabled(void);
->>   int tdx_system_firmware_init(PCMachineState *pcms, MemoryRegion 
->> *rom_memory);
->>   #endif
->> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
->> index af6b5f350e..76c3ea9fac 100644
->> --- a/target/i386/kvm/kvm.c
->> +++ b/target/i386/kvm/kvm.c
->> @@ -152,6 +152,11 @@ int kvm_set_vm_type(MachineState *ms, int kvm_type)
->>       return -ENOTSUP;
->>   }
->> +bool kvm_tdx_enabled(void)
->> +{
->> +    return vm_type == KVM_X86_TDX_VM;
->> +}
->> +
+On Thu, 2021-12-09 at 15:29 +0100, Paolo Bonzini wrote:
+> On 12/9/21 01:02, Sean Christopherson wrote:
+> > RDX, a.k.a. ir_data is NULL.  This check in svm_ir_list_add()
+> > 
+> > 	if (pi->ir_data && (pi->prev_ga_tag != 0)) {
+> > 
+> > implies pi->ir_data can be NULL, but neither avic_update_iommu_vcpu_affinity()
+> > nor amd_iommu_update_ga() check ir->data for NULL.
+> > 
+> > amd_ir_set_vcpu_affinity() returns "success" without clearing pi.is_guest_mode
+> > 
+> > 	/* Note:
+> > 	 * This device has never been set up for guest mode.
+> > 	 * we should not modify the IRTE
+> > 	 */
+> > 	if (!dev_data || !dev_data->use_vapic)
+> > 		return 0;
+> > 
+> > so it's plausible svm_ir_list_add() could add to the list with a NULL pi->ir_data.
+> > 
+> > But none of the relevant code has seen any meaningful changes since 5.15, so odds
+> > are good I broke something :-/
+
+Doesn't reproduce here yet even with my iommu changes :-(
+Oh well.
+
+Best regards,
+	Maxim Levitsky
+
+
+> > 
 > 
-> Is this the whole story? Does this guarantee that the VM QEMU is
-> responsible to bring up is a successfully initialized TD?
-
-No, it just means a TDX guest is requested.
-
->  From my reading of the series as it unfolded, this looks like the
-> function proves that KVM can support TDs and that the user requested
-> a TDX kvm-type, not that we have a fully-formed TD.
-
-yes, you are right. We referenced what sev_eanbled() and sev_es_enabled().
-
-If the name is misleading, does it looks better to name it is_tdx_vm()?
-
-> Is it possible to associate this with a more verifiable metric that
-> the TD has been or will be created successfully? I.e., once the VM
-> has successfully called the TDX INIT ioctl or has finalized setup?
+> Ok, I'll take this.
 > 
-> My question mainly comes from a later patch in the series, where the
-> "query-tdx-capabilities" and "query-tdx" QMP commands are added.
+> Paolo
 > 
-> Forgive me if I am misinterpreting the semantics of each of these
-> commands:
 
-what you understood is correct.
-
-> "query-tdx-capabilities" sounds like it answers the question of
-> "can it run a TD?"
-> 
-> and "query-tdx" sounds like it answers the question of "is it a TD?"
-> 
-> Is the assumption with "query-tdx" that anything that's gone wrong
-> with developing a TD will have resulted in the QEMU process exiting
-> and therefore if we get to a point where we can run "query-tdx" then
-> we know the TD was successfully formed?
-> 
 
