@@ -2,377 +2,210 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9880146E956
-	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 14:46:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9ED7B46E9A2
+	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 15:11:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238148AbhLINtq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Dec 2021 08:49:46 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:3646 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S238152AbhLINtk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 Dec 2021 08:49:40 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B9DXUQr029705;
-        Thu, 9 Dec 2021 13:46:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=HtBjouYh/khg0VzKgu31GEOtWucFRevC0aoJP77O1TE=;
- b=kFGjUvYD0v9cv8bONCv9kAtaEex7siOpndv042Q7TXFg/dyFgMc57leKpG8zx4xWvUo0
- YYrRwnqeO0Qeq098r0HAJLnuvGRUfFuZfYT5DNVZRrabQDM+1B/5GeGB6E9H2VrLEVQS
- 9YrKXdqFApTy+IKO0qBp5Fm4HzcGWZe/PI4Yw39Da2sz1JDKmPDAjmZEWUcj9O1nLNWk
- aeNDaAenPMOvpltuvCmUTRUzjAOkT2CDdXUU4N2J+BNW+Nw+BaNECkee9Z/oXeqkPjVx
- yg/mUM8YOBmk8DHBvG0cELNrmc1i/OVig1QLnMrd7l1JHh0KJVTr6zLL3tth9LebjrDf Zw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cuj910yhn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Dec 2021 13:46:02 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1B9DDvLB022030;
-        Thu, 9 Dec 2021 13:46:02 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cuj910yh2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Dec 2021 13:46:02 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1B9DbxeD009243;
-        Thu, 9 Dec 2021 13:46:00 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma03ams.nl.ibm.com with ESMTP id 3cqyyahy0e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Dec 2021 13:46:00 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1B9DjvL730409046
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 9 Dec 2021 13:45:57 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1A2D911C054;
-        Thu,  9 Dec 2021 13:45:57 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4D6C811C04C;
-        Thu,  9 Dec 2021 13:45:56 +0000 (GMT)
-Received: from li-c6ac47cc-293c-11b2-a85c-d421c8e4747b.ibm.com.com (unknown [9.171.63.16])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  9 Dec 2021 13:45:56 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, philmd@redhat.com, eblake@redhat.com,
-        armbru@redhat.com
-Subject: [PATCH v5 12/12] s390: Topology: documentation
-Date:   Thu,  9 Dec 2021 14:46:43 +0100
-Message-Id: <20211209134643.143866-13-pmorel@linux.ibm.com>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20211209134643.143866-1-pmorel@linux.ibm.com>
-References: <20211209134643.143866-1-pmorel@linux.ibm.com>
+        id S238395AbhLIOOs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Dec 2021 09:14:48 -0500
+Received: from foss.arm.com ([217.140.110.172]:57258 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230409AbhLIOOs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Dec 2021 09:14:48 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 480FC1FB;
+        Thu,  9 Dec 2021 06:11:14 -0800 (PST)
+Received: from [10.57.33.188] (unknown [10.57.33.188])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 250F93F73B;
+        Thu,  9 Dec 2021 06:11:13 -0800 (PST)
+Subject: Re: LTP test perf_event_open02.c: possible rounding issue on aarch64
+ KVM
+To:     Petr Vorel <pvorel@suse.cz>, linux-perf-users@vger.kernel.org
+Cc:     ltp@lists.linux.it, Cyril Hrubis <chrubis@suse.cz>,
+        qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvm@vger.kernel.org
+References: <YbH0hQbQw3KNSLOQ@pevik>
+From:   James Clark <james.clark@arm.com>
+Message-ID: <9030714a-35b4-a10b-d8a6-ae56843b841f@arm.com>
+Date:   Thu, 9 Dec 2021 14:11:11 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: StNHNJt1wlHwx7ptZmToUjUV3PS_UzKn
-X-Proofpoint-GUID: 8-wc9X6qvAqPUaq3MsST3PAfunTfxgV6
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2021-12-09_04,2021-12-08_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- priorityscore=1501 impostorscore=0 bulkscore=0 adultscore=0
- mlxlogscore=999 lowpriorityscore=0 spamscore=0 phishscore=0 mlxscore=0
- clxscore=1015 suspectscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2110150000 definitions=main-2112090075
+In-Reply-To: <YbH0hQbQw3KNSLOQ@pevik>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The use of the S390x CPU topology is explain in a new documentation
-file.
-
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
----
- docs/system/s390x/numa-cpu-topology.rst | 273 ++++++++++++++++++++++++
- 1 file changed, 273 insertions(+)
- create mode 100644 docs/system/s390x/numa-cpu-topology.rst
-
-diff --git a/docs/system/s390x/numa-cpu-topology.rst b/docs/system/s390x/numa-cpu-topology.rst
-new file mode 100644
-index 0000000000..9ae15f792f
---- /dev/null
-+++ b/docs/system/s390x/numa-cpu-topology.rst
-@@ -0,0 +1,273 @@
-+NUMA CPU Topology on S390x
-+==========================
-+
-+IBM S390 provides a complex CPU architecture with several cache levels.
-+Using NUMA with the CPU topology is a way to let the guest optimize his
-+accesses to the main memory.
-+
-+The QEMU smp parameter for S390x allows to specify 4 NUMA levels:
-+core, socket, drawer and book and these levels are available for
-+the numa parameter too.
-+
-+
-+Prerequisites
-+-------------
-+
-+To take advantage of the CPU topology, KVM must give support for the
-+Perform Topology Function and to the Store System Information instructions
-+as indicated by the Perform CPU Topology facility (stfle bit 11).
-+
-+If those requirements are met, the capability ``KVM_CAP_S390_CPU_TOPOLOGY``
-+will indicate that KVM can support CPU Topology on that LPAR.
-+
-+
-+Using CPU Topology in QEMU for S390x
-+------------------------------------
-+
-+
-+QEMU -smp parameter
-+~~~~~~~~~~~~~~~~~~~
-+
-+With -smp QEMU provides the user with the possibility to define
-+a Topology based on ::
-+
-+  -smp [[cpus=]n][,maxcpus=maxcpus][,drawers=drawers][,books=books] \
-+       [,sockets=sockets][,cores=cores]
-+
-+The topology reported to the guest in this situation will provide
-+n cpus of a maximum of maxcpus cpus, filling the topology levels one by one
-+starting with CPU0 being the first CPU on drawer[0] book[0] socket[0].
-+
-+For example ``-smp 5,books=2,sockets=2,cores=2`` will provide ::
-+
-+  drawer[0]--+--book[0]--+--socket[0]--+--core[0]-CPU0
-+             |           |             |
-+             |           |             +--core[1]-CPU1
-+             |           |
-+             |           +--socket[1]--+--core[0]-CPU2
-+             |                         |
-+             |                         +--core[1]-CPU3
-+             |
-+             +--book[1]--+--socket[0]--+--core[0]-CPU4
-+
-+
-+Note that the thread parameter can not be defined on S390 as it
-+has no representation on the CPU topology.
-+
-+
-+QEMU -numa parameter
-+~~~~~~~~~~~~~~~~~~~
-+
-+With -numa QEMU provides the user with the possibility to define
-+the Topology in a non uniform way ::
-+
-+  -smp [[cpus=]n][,maxcpus=maxcpus][,drawers=drawers][,books=books] \
-+       [,sockets=sockets][,cores=cores]
-+  -numa node[,memdev=id][,cpus=firstcpu[-lastcpu]][,nodeid=node][,initiator=initiator]
-+  -numa cpu,node-id=node[,drawer-id=x][,book-id=x][,socket-id=x][,core-id=y]
-+
-+The topology reported to the guest in this situation will provide
-+n cpus of a maximum of maxcpus cpus, and the topology entries will be
-+
-+- if there is less cpus than specified by the -numa arguments
-+  the topology will be build by filling the numa definitions
-+  starting with the lowest node.
-+
-+- if there is more cpus than specified by the -numa argument
-+  the numa specification will first be fulfilled and the remaining
-+  CPU will be assigned to unassigned slots starting with the
-+  core 0 on socket 0.
-+
-+- a CPU declared with -device does not count inside the ncpus parameter
-+  of the -smp argument and will be added on the topology based on
-+  its core ID.
-+
-+For example  ::
-+
-+  -smp 3,drawers=8,books=2,sockets=2,cores=2,maxcpus=64
-+  -object memory-backend-ram,id=mem0,size=10G
-+  -numa node,nodeid=0,memdev=mem0
-+  -numa node,nodeid=1
-+  -numa node,nodeid=2
-+  -numa cpu,node-id=0,drawer-id=0
-+  -numa cpu,node-id=1,socket-id=9
-+  -device host-s390x-cpu,core-id=19
-+
-+Will provide the following topology ::
-+
-+  drawer[0]--+--book[0]--+--socket[0]--+--core[0]-CPU0
-+                         |             |
-+                         |             +--core[1]-CPU1
-+                         |
-+                         +--socket[1]--+--core[0]-CPU2
-+
-+  drawer[2]--+--book[0]--+--socket[1]--+--core[1]-CPU19
-+
-+
-+S390 NUMA specificity
-+---------------------
-+
-+Heterogene Memory Attributes
-+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-+
-+The S390 topology implementation does not use ACPI HMAT to specify the
-+cache size and bandwidth between nodes.
-+
-+Memory device
-+~~~~~~~~~~~~~
-+
-+When using NUMA S390 needs a memory device to be associated with
-+the nodes definitions. As we do not use HMAT, it has little sense
-+to assign memory to each node and one should assign all memory to
-+a node without CPU and use other nodes to define the CPU Topology.
-+
-+Exemple ::
-+
-+  -object memory-backend-ram,id=mem0,size=10G
-+  -numa node,nodeid=0,memdev=mem0
-+
-+
-+CPUs
-+~~~~
-+
-+In the S390 topology we do not use threads and the first topology
-+level is the core.
-+The number of threads can no be defined for S390 and is always equal to 1.
-+
-+When using NUMA, QEMU issues a warning for CPUS not assigned to nodes.
-+The S390 topology will silently assign unassigned CPUs to the topology
-+searching for free core starting on the first core of the first socket
-+in the first book.
-+This is of course advised to assign all possible CPUs to nodes to
-+guaranty future compatibility.
-+
-+
-+The topology provided to the guest
-+----------------------------------
-+
-+The guest , when the CPU Topology is available as indicated by the
-+Perform CPU Topology facility (stfle bit 11) may use two instructions
-+to retrieve the CPU topology and optimize its CPU scheduling:
-+
-+- PTF (Perform Topology function) which will give information
-+  about a change in the CPU Topology, that is a change in the
-+  result of the STSI(15,1,2) instruction.
-+
-+- STSI (Stote System Information) with parameters (15,1,2)
-+  to retrieve the CPU Topology.
-+
-+Exemple ::
-+
-+  -smp 3,drawers=8,books=2,sockets=2,cores=2,maxcpus=64
-+  -object memory-backend-ram,id=mem0,size=10G
-+  -numa node,nodeid=0,memdev=mem0
-+  -numa node,nodeid=1
-+  -numa node,nodeid=2
-+  -numa cpu,node-id=1,drawer-id=0
-+  -numa cpu,node-id=2,socket-id=9
-+  -device host-s390x-cpu,core-id=19
-+
-+Formated result for STSI(15,1,2) showing the 6 different levels
-+with:
-+- levels 2 (socket) and 1 (core) used.
-+- 3 sockets with a CPU mask for CPU type 3, non dedicated and
-+  with horizontal polarization.
-+- The first socket contains 2 cores as specified by the -smp argument
-+- The second socket contains the 3rd core defined by the -smp argument
-+- both these sockets belong to drawer-id=0 and to node-1
-+- The third socket hold the CPU with core-id 19 assigned to socket-id 9
-+  and to node-2
-+
-+Here the kernel view ::
-+
-+  mag[6] = 0
-+  mag[5] = 0
-+  mag[4] = 0
-+  mag[3] = 0
-+  mag[2] = 32
-+  mag[1] = 2
-+  MNest  = 2
-+  socket: 1 0
-+  cpu type 03  d: 0 pp: 0
-+  origin : 0000
-+  mask   : c000000000000000
-+
-+  socket: 1 1
-+  cpu type 03  d: 0 pp: 0
-+  origin : 0000
-+  mask   : 2000000000000000
-+
-+  socket: 1 9
-+  cpu type 03  d: 0 pp: 0
-+  origin : 0000
-+  mask   : 0000100000000000
-+
-+And the admin view ::
-+
-+  # lscpu -e
-+  CPU NODE DRAWER BOOK SOCKET CORE L1d:L1i:L2d:L2i ONLINE CONFIGURED POLARIZATION ADDRESS
-+  0   0    0      0    0      0    0:0:0:0         yes    yes        horizontal   0
-+  1   0    0      0    0      1    1:1:1:1         yes    yes        horizontal   1
-+  2   0    0      0    1      2    2:2:2:2         yes    yes        horizontal   2
-+  3   0    1      1    2      3    3:3:3:3         yes    yes        horizontal   19
-+
-+
-+Hotplug with NUMA
-+-----------------
-+
-+Using the core-id the topology is automatically calculated to put the core
-+inside the right socket.
-+
-+Example::
-+
-+  (qemu) device_add host-s390x-cpu,core-id=8
-+
-+  # lscpu -e
-+  CPU NODE DRAWER BOOK SOCKET CORE L1d:L1i:L2d:L2i ONLINE CONFIGURED POLARIZATION ADDRESS
-+  0   0    0      0    0      0    0:0:0:0         yes    yes        horizontal   0
-+  1   0    0      0    0      1    1:1:1:1         yes    yes        horizontal   1
-+  2   0    0      0    1      2    2:2:2:2         yes    yes        horizontal   2
-+  3   0    1      1    2      3    3:3:3:3         yes    yes        horizontal   19
-+  4   -    -      -    -      -    :::             no     yes        horizontal   8
-+
-+  # chcpu -e 4
-+  CPU 4 enabled
-+  # lscpu -e
-+  CPU NODE DRAWER BOOK SOCKET CORE L1d:L1i:L2d:L2i ONLINE CONFIGURED POLARIZATION ADDRESS
-+  0   0    0      0    0      0    0:0:0:0         yes    yes        horizontal   0
-+  1   0    0      0    0      1    1:1:1:1         yes    yes        horizontal   1
-+  2   0    0      0    1      2    2:2:2:2         yes    yes        horizontal   2
-+  3   0    1      1    2      3    3:3:3:3         yes    yes        horizontal   19
-+  4   0    2      2    3      4    4:4:4:4         yes    yes        horizontal   8
-+
-+One can see that the userland tool reports serials IDs which do not correspond
-+to the firmware IDs but does however report the new CPU on it's own socket.
-+
-+The result seen by the kernel looks like ::
-+
-+  mag[6] = 0
-+  mag[5] = 0
-+  mag[4] = 0
-+  mag[3] = 0
-+  mag[2] = 32
-+  mag[1] = 2
-+  MNest  = 2
-+  00 - socket: 1 0
-+  cpu type 03  d: 0 pp: 0
-+  origin : 0000
-+  mask   : c000000000000000
-+
-+  socket: 1 1
-+  cpu type 03  d: 0 pp: 0
-+  origin : 0000
-+  mask   : 2000000000000000
-+
-+  socket: 1 9
-+  cpu type 03  d: 0 pp: 0
-+  origin : 0000
-+  mask   : 0000100000000000
-+
-+  socket: 1 4
-+  cpu type 03  d: 0 pp: 0
-+  origin : 0000
-+  mask   : 0080000000000000
--- 
-2.27.0
-
+DQoNCk9uIDA5LzEyLzIwMjEgMTI6MjAsIFBldHIgVm9yZWwgd3JvdGU6DQo+IEhpLA0KPiAN
+Cj4gSSBoYXZlIHByb2JsZW0gd2l0aCBMVFAgdGVzdCBwZXJmX2V2ZW50X29wZW4wMi5jIFsx
+XSBvbiBRRU1VIHVzaW5nIEtWTSBvbg0KPiBvcGVuU1VTRSBhYXJjaDY0IGtlcm5lbCA1LjE1
+LjUtMS1kZWZhdWx0IChub3QgbXVjaCBkaWZmZXJlbnQgZnJvbSBzdGFibGUga2VybmVsDQo+
+IGZyb20ga2VybmVsLm9yZyk6DQo+IA0KPiAjIC9vcHQvbHRwL3Rlc3RjYXNlcy9iaW4vcGVy
+Zl9ldmVudF9vcGVuMDINCj4gLi4uDQo+IHBlcmZfZXZlbnRfb3BlbjAyLmM6MTA0OiBUSU5G
+TzogYmVuY2hfd29yayBlc3RpbWF0ZWQgbG9vcHMgPSA4MDgzIGluIDUwMCBtcw0KPiBwZXJm
+X2V2ZW50X29wZW4wMi5jOjE0OTogVElORk86IFswXSB2YWx1ZToyNDI1MjkzNzYxIHRpbWVf
+ZW5hYmxlZDo3NDkwOTI4MDAgdGltZV9ydW5uaW5nOjc0OTA5MjgwMA0KPiBwZXJmX2V2ZW50
+X29wZW4wMi5jOjE0OTogVElORk86IFsxXSB2YWx1ZToyNDI1Mjg3MDI3IHRpbWVfZW5hYmxl
+ZDo3NDkxNDE0NzUgdGltZV9ydW5uaW5nOjc0OTE0MTQ3NQ0KPiBwZXJmX2V2ZW50X29wZW4w
+Mi5jOjE0OTogVElORk86IFsyXSB2YWx1ZToyNDMzMDQ2NTgzIHRpbWVfZW5hYmxlZDo3NTcz
+NDYzMDAgdGltZV9ydW5uaW5nOjc1NzM0NjMwMA0KPiBwZXJmX2V2ZW50X29wZW4wMi5jOjE0
+OTogVElORk86IFszXSB2YWx1ZToyNDMyNzcxNTM3IHRpbWVfZW5hYmxlZDo3NTMzNjkzMDAg
+dGltZV9ydW5uaW5nOjc1MzM2OTMwMA0KPiBwZXJmX2V2ZW50X29wZW4wMi5jOjE0OTogVElO
+Rk86IFs0XSB2YWx1ZToyNDMyNTUxNjIwIHRpbWVfZW5hYmxlZDo3NTM3ODQwNzUgdGltZV9y
+dW5uaW5nOjc1Mzc4NDA3NQ0KPiBwZXJmX2V2ZW50X29wZW4wMi5jOjE0OTogVElORk86IFs1
+XSB2YWx1ZToyNDMyMzg2MTA0IHRpbWVfZW5hYmxlZDo3NTM0ODE3NTAgdGltZV9ydW5uaW5n
+Ojc1MzQ4MTc1MA0KPiBwZXJmX2V2ZW50X29wZW4wMi5jOjE0OTogVElORk86IFs2XSB2YWx1
+ZToyMDk1MDg2MTM3IHRpbWVfZW5hYmxlZDo3Njg4NjYwNTAgdGltZV9ydW5uaW5nOjY2MDAy
+MTUyNQ0KPiBwZXJmX2V2ZW50X29wZW4wMi5jOjMwODogVElORk86IG5odzogNiwgb3ZlcmFs
+bCB0YXNrIGNsb2NrOiA0MDk4MTM4NTI1DQo+IHBlcmZfZXZlbnRfb3BlbjAyLmM6MzA5OiBU
+SU5GTzogaHcgc3VtOiAxMTY0NTAyOTQ3NDUsIHRhc2sgY2xvY2sgc3VtOiAyNDU4OTYzNjM1
+MA0KPiBwZXJmX2V2ZW50X29wZW4wMi5jOjMyMTogVElORk86IHJhdGlvOiA2LjAwMDE5Ng0K
+PiBwZXJmX2V2ZW50X29wZW4wMi5jOjMyMzogVEZBSUw6IHRlc3QgZmFpbGVkIChyYXRpbyB3
+YXMgZ3JlYXRlciB0aGFuIDYpDQo+IC4uLg0KPiANCj4gVGhlIHRlc3QgdHJpZXMgdG8gYXNz
+ZXJ0IHRoZSBwcmVjaXNpb24gb2YgaGFyZHdhcmUgY291bnRlcnMgKHVzaW5nIHN0cnVjdA0K
+PiBwZXJmX2V2ZW50X2F0dHIgaHdfZXZlbnQudHlwZSA9IFBFUkZfVFlQRV9IQVJEV0FSRSks
+IGJ1dCBzb21ldGltZXMgaXQgZmFpbHMgd2l0aA0KPiBzbGlnaHQgb3ZlcnJ1bi4gV2Ugc3Vw
+cG9zZSB0aGF0IHRoaXMgaXMgYSByb3VuZGluZyBlcnJvciwgYnV0IGl0J2QgYmUgbmljZSB0
+bw0KPiBnZXQgdGhpcyBjb25maXJtZWQgZnJvbSBrZXJuZWwgZGV2ZWxvcGVycy4NCj4gDQoN
+CkkgZG9uJ3QgYmVsaWV2ZSB0aGlzIGlzIGEgcm91bmRpbmcgZXJyb3IgYmVjYXVzZSB0aGUg
+dGVzdCB1c2VzIGxvbmcgbG9uZ3MgZm9yIHRoZSB0b3RhbHMgYW5kIHRoZW4NCmhhcyBhIHNp
+bmdsZSBkaXZpc2lvbiBpbnRvIGEgZG91YmxlLiBBIGRpZmZlcmVuY2Ugb2YgMC4wMDAxOTYg
+aXMgdG9vIGJpZyB0byBiZSBleHBsYWluZWQgYnkNCnJvdW5kaW5nIGZyb20gYSBzaW5nbGUg
+ZGl2aXNpb24uDQoNClRoZXJlIGlzIGF0IGxlYXN0IG9uZSBvdGhlciBmaXggKGY0YmY5YmEw
+MTgwMikgaW4gdGhlIGNvbW1pdCBoaXN0b3J5IHRoYXQgaW52b2x2ZXMNCnZlcnkgY2xvc2Ug
+YnV0IGZhaWxpbmcgdmFsdWVzLCBhbmQgdGhlIGZpeCB3YXNuJ3QgdG8gY2hhbmdlIHRoZSB0
+b2xlcmFuY2UuIFNvIEknZCBzYXkgdGhlcmUgaXMNCnByb2JhYmx5IGEgYnVnIGluIHRoZSB0
+ZXN0LCBvciB5b3UndmUgZm91bmQgYSByZWFsIGJ1Zy4NCg0KPiBSZWxhdGVkIGtlcm5lbCBz
+ZXR1cCAob3IgeW91IG5lZWQgdG8ga25vdyBzb21ldGhpbmcgZWxzZSkNCj4gZ3JlcCBQRVJG
+X0VWRU5UUyBjb25maWctNS4xNS41LTEtZGVmYXVsdCAjIGFhcmNoNjQNCj4gQ09ORklHX0hB
+VkVfUEVSRl9FVkVOVFM9eQ0KPiBDT05GSUdfUEVSRl9FVkVOVFM9eQ0KPiBDT05GSUdfSFdf
+UEVSRl9FVkVOVFM9eQ0KPiANCj4gVGVzdCBpcyBydW5uaW5nIGluc2lkZSB0ZXN0aW5nIGZy
+YW1ld29yayB3aXRoIHRoaXMgc2V0dXA6DQo+IHFlbXUtc3lzdGVtLWFhcmNoNjQgLWRldmlj
+ZSB2aXJ0aW8tZ3B1LXBjaSAtb25seS1taWdyYXRhYmxlIC1jaGFyZGV2IHJpbmdidWYsaWQ9
+c2VyaWFsMCxsb2dmaWxlPXNlcmlhbDAsbG9nYXBwZW5kPW9uIC1zZXJpYWwgY2hhcmRldjpz
+ZXJpYWwwIC1hdWRpb2RldiBub25lLGlkPXNuZDAgLWRldmljZSBpbnRlbC1oZGEgLWRldmlj
+ZSBoZGEtb3V0cHV0LGF1ZGlvZGV2PXNuZDAgLW0gMjA0OCAtbWFjaGluZSB2aXJ0LGdpYy12
+ZXJzaW9uPWhvc3QgLWNwdSBob3N0IC1tZW0tcHJlYWxsb2MgLW1lbS1wYXRoIC9kZXYvaHVn
+ZXBhZ2VzLyAtbmV0ZGV2IHVzZXIsaWQ9cWFuZXQwIC1kZXZpY2UgdmlydGlvLW5ldCxuZXRk
+ZXY9cWFuZXQwLG1hYz01Mjo1NDowMDoxMjozNDo1NiAtb2JqZWN0IHJuZy1yYW5kb20sZmls
+ZW5hbWU9L2Rldi91cmFuZG9tLGlkPXJuZzAgLWRldmljZSB2aXJ0aW8tcm5nLXBjaSxybmc9
+cm5nMCAtYm9vdCBtZW51PW9uLHNwbGFzaC10aW1lPTUwMDAgLWRldmljZSBuZWMtdXNiLXho
+Y2kgLWRldmljZSB1c2ItdGFibGV0IC1kZXZpY2UgdXNiLWtiZCAtc21wIDIgLWVuYWJsZS1r
+dm0gLW5vLXNodXRkb3duIC12bmMgOjk3LHNoYXJlPWZvcmNlLXNoYXJlZCAtZGV2aWNlIHZp
+cnRpby1zZXJpYWwgLWNoYXJkZXYgcGlwZSxpZD12aXJ0aW9fY29uc29sZSxwYXRoPXZpcnRp
+b19jb25zb2xlLGxvZ2ZpbGU9dmlydGlvX2NvbnNvbGUubG9nLGxvZ2FwcGVuZD1vbiAtZGV2
+aWNlIHZpcnRjb25zb2xlLGNoYXJkZXY9dmlydGlvX2NvbnNvbGUsbmFtZT1vcmcub3BlbnFh
+LmNvbnNvbGUudmlydGlvX2NvbnNvbGUgLWNoYXJkZXYgcGlwZSxpZD12aXJ0aW9fY29uc29s
+ZTEscGF0aD12aXJ0aW9fY29uc29sZTEsbG9nZmlsZT12aXJ0aW9fY29uc29sZTEubG9nLGxv
+Z2FwcGVuZD1vbiAtZGV2aWNlIHZpcnRjb25zb2xlLGNoYXJkZXY9dmlydGlvX2NvbnNvbGUx
+LG5hbWU9b3JnLm9wZW5xYS5jb25zb2xlLnZpcnRpb19jb25zb2xlMSAtY2hhcmRldiBzb2Nr
+ZXQscGF0aD1xbXBfc29ja2V0LHNlcnZlcj1vbix3YWl0PW9mZixpZD1xbXBfc29ja2V0LGxv
+Z2ZpbGU9cW1wX3NvY2tldC5sb2csbG9nYXBwZW5kPW9uIC1xbXAgY2hhcmRldjpxbXBfc29j
+a2V0IC1TIC1kZXZpY2UgdmlydGlvLXNjc2ktcGNpLGlkPXNjc2kwIC1ibG9ja2RldiBkcml2
+ZXI9ZmlsZSxub2RlLW5hbWU9aGQwLW92ZXJsYXkwLWZpbGUsZmlsZW5hbWU9L3Zhci9saWIv
+b3BlbnFhL3Bvb2wvNy9yYWlkL2hkMC1vdmVybGF5MCxjYWNoZS5uby1mbHVzaD1vbiAtYmxv
+Y2tkZXYgZHJpdmVyPXFjb3cyLG5vZGUtbmFtZT1oZDAtb3ZlcmxheTAsZmlsZT1oZDAtb3Zl
+cmxheTAtZmlsZSxjYWNoZS5uby1mbHVzaD1vbiAtZGV2aWNlIHZpcnRpby1ibGstZGV2aWNl
+LGlkPWhkMC1kZXZpY2UsZHJpdmU9aGQwLW92ZXJsYXkwLGJvb3RpbmRleD0wLHNlcmlhbD1o
+ZDAgLWJsb2NrZGV2IGRyaXZlcj1maWxlLG5vZGUtbmFtZT1jZDAtb3ZlcmxheTAtZmlsZSxm
+aWxlbmFtZT0vdmFyL2xpYi9vcGVucWEvcG9vbC83L3JhaWQvY2QwLW92ZXJsYXkwLGNhY2hl
+Lm5vLWZsdXNoPW9uIC1ibG9ja2RldiBkcml2ZXI9cWNvdzIsbm9kZS1uYW1lPWNkMC1vdmVy
+bGF5MCxmaWxlPWNkMC1vdmVybGF5MC1maWxlLGNhY2hlLm5vLWZsdXNoPW9uIC1kZXZpY2Ug
+c2NzaS1jZCxpZD1jZDAtZGV2aWNlLGRyaXZlPWNkMC1vdmVybGF5MCxzZXJpYWw9Y2QwIC1k
+cml2ZSBpZD1wZmxhc2gtY29kZS1vdmVybGF5MCxpZj1wZmxhc2gsZmlsZT0vdmFyL2xpYi9v
+cGVucWEvcG9vbC83L3JhaWQvcGZsYXNoLWNvZGUtb3ZlcmxheTAsdW5pdD0wLHJlYWRvbmx5
+PW9uIC1kcml2ZSBpZD1wZmxhc2gtdmFycy1vdmVybGF5MCxpZj1wZmxhc2gsZmlsZT0vdmFy
+L2xpYi9vcGVucWEvcG9vbC83L3JhaWQvcGZsYXNoLXZhcnMtb3ZlcmxheTAsdW5pdD0xDQo+
+IA0KPiBSdW5uaW5nIHRoZSBzYW1lIE9TIGFuZCBrZXJuZWwgKGFhcmNoNjQgSmVPUyBUdW1i
+bGV3ZWVkIDIwMjExMjAyKSBvbiBSUEkgaXQncyB3b3JraW5nOg0KPiBwZXJmX2V2ZW50X29w
+ZW4wMi5jOjEwNDogVElORk86IGJlbmNoX3dvcmsgZXN0aW1hdGVkIGxvb3BzID0gMzYwMSBp
+biA1MDAgbXMNCj4gcGVyZl9ldmVudF9vcGVuMDIuYzoxNDk6IFRJTkZPOiBbMF0gdmFsdWU6
+MTA4MDYwMTc0OCB0aW1lX2VuYWJsZWQ6NDgwNTI3MDE1IHRpbWVfcnVubmluZzo0ODA1Mjcw
+MTUNCj4gcGVyZl9ldmVudF9vcGVuMDIuYzoxNDk6IFRJTkZPOiBbMV0gdmFsdWU6MTA4MDU5
+OTUzNSB0aW1lX2VuYWJsZWQ6NDgwNTQwNTczIHRpbWVfcnVubmluZzo0ODA1NDA1NzMNCj4g
+cGVyZl9ldmVudF9vcGVuMDIuYzoxNDk6IFRJTkZPOiBbMl0gdmFsdWU6MTA4MDU5Mjc3MCB0
+aW1lX2VuYWJsZWQ6NDgwNTMzODY4IHRpbWVfcnVubmluZzo0ODA1MzM4NjgNCj4gcGVyZl9l
+dmVudF9vcGVuMDIuYzoxNDk6IFRJTkZPOiBbM10gdmFsdWU6MTA4MDYwNzEyMSB0aW1lX2Vu
+YWJsZWQ6NDgwNTcxNTczIHRpbWVfcnVubmluZzo0ODA1NzE1NzMNCj4gcGVyZl9ldmVudF9v
+cGVuMDIuYzoxNDk6IFRJTkZPOiBbNF0gdmFsdWU6MTA4MDU5ODI2NCB0aW1lX2VuYWJsZWQ6
+NDgwNTY4MzMwIHRpbWVfcnVubmluZzo0ODA1NjgzMzANCj4gcGVyZl9ldmVudF9vcGVuMDIu
+YzoxNDk6IFRJTkZPOiBbNV0gdmFsdWU6MTA4MDYwODc5OCB0aW1lX2VuYWJsZWQ6NDgwNjAw
+MDAxIHRpbWVfcnVubmluZzo0ODA2MDAwMDENCj4gcGVyZl9ldmVudF9vcGVuMDIuYzoxNDk6
+IFRJTkZPOiBbNl0gdmFsdWU6OTIzMzkwMzkzIHRpbWVfZW5hYmxlZDo0ODA5MTk0NzkgdGlt
+ZV9ydW5uaW5nOjQxMDk0NzYxMQ0KPiBwZXJmX2V2ZW50X29wZW4wMi5jOjMwODogVElORk86
+IG5odzogNiwgb3ZlcmFsbCB0YXNrIGNsb2NrOiA0OTkwMTA3MDc0DQo+IHBlcmZfZXZlbnRf
+b3BlbjAyLmM6MzA5OiBUSU5GTzogaHcgc3VtOiA1MTg2ODgwNDEzNSwgdGFzayBjbG9jayBz
+dW06IDI5OTQwNjE2NDE3DQo+IHBlcmZfZXZlbnRfb3BlbjAyLmM6MzIxOiBUSU5GTzogcmF0
+aW86IDUuOTk5OTk1DQo+IHBlcmZfZXZlbnRfb3BlbjAyLmM6MzI1OiBUUEFTUzogdGVzdCBw
+YXNzZWQNCj4gDQo+IFRlc3QgaXMgbm90IHN1cHBvcnRlZCBFTk9FTlQgd2hlbiBydW5uaW5n
+IHdpdGggc2ltaWxhciBzZXR1cCBvbiB4ODZfNjQgYW5kDQo+IHMzOTB4IHF1ZXN0czoNCj4g
+cGVyZl9ldmVudF9vcGVuLmg6MzE6IFRDT05GOiBwZXJmX2V2ZW50X29wZW4gdHlwZS9jb25m
+aWcgbm90IHN1cHBvcnRlZDogRU5PRU5UICgyKQ0KPiANCj4gZ3JlcCBQRVJGX0VWRU5UUyBj
+b25maWctNS4xNS41LTEtZGVmYXVsdCAjIHg4Nl82NA0KPiBDT05GSUdfSEFWRV9QRVJGX0VW
+RU5UUz15DQo+IENPTkZJR19QRVJGX0VWRU5UUz15DQo+IENPTkZJR19QRVJGX0VWRU5UU19J
+TlRFTF9VTkNPUkU9eQ0KPiBDT05GSUdfUEVSRl9FVkVOVFNfSU5URUxfUkFQTD15DQo+IENP
+TkZJR19QRVJGX0VWRU5UU19JTlRFTF9DU1RBVEU9eQ0KPiBDT05GSUdfUEVSRl9FVkVOVFNf
+QU1EX1BPV0VSPW0NCj4gQ09ORklHX1BFUkZfRVZFTlRTX0FNRF9VTkNPUkU9bQ0KPiBDT05G
+SUdfSEFWRV9QRVJGX0VWRU5UU19OTUk9eQ0KPiANCj4gQnV0IGl0IHBhc3NlcyBvbiBwcGM2
+NGxlDQo+IA0KPiBwZXJmX2V2ZW50X29wZW4wMi5jOjEwNDogVElORk86IGJlbmNoX3dvcmsg
+ZXN0aW1hdGVkIGxvb3BzID0gNDA3NSBpbiA1MDAgbXMNCj4gcGVyZl9ldmVudF9vcGVuMDIu
+YzoxNTE6IFRJTkZPOiBbMF0gdmFsdWU6ODE1Mjc5NjY5IHRpbWVfZW5hYmxlZDozMTY0NjE1
+NjYgdGltZV9ydW5uaW5nOjMxNjQ2MTU2Ng0KPiBwZXJmX2V2ZW50X29wZW4wMi5jOjE1MTog
+VElORk86IFsxXSB2YWx1ZTo4MTUyODE3OTkgdGltZV9lbmFibGVkOjMxNjQ2Mjc0MCB0aW1l
+X3J1bm5pbmc6MzE2NDYyNzQwDQo+IHBlcmZfZXZlbnRfb3BlbjAyLmM6MTUxOiBUSU5GTzog
+WzJdIHZhbHVlOjgxNTI4MDU4OCB0aW1lX2VuYWJsZWQ6MzE2NTM0MDg2IHRpbWVfcnVubmlu
+ZzozMTY1MzQwODYNCj4gcGVyZl9ldmVudF9vcGVuMDIuYzoxNTE6IFRJTkZPOiBbM10gdmFs
+dWU6ODE1MjgzMjg1IHRpbWVfZW5hYmxlZDozMTY0NjU2NzIgdGltZV9ydW5uaW5nOjMxNjQ2
+NTY3Mg0KPiBwZXJmX2V2ZW50X29wZW4wMi5jOjE1MTogVElORk86IFs0XSB2YWx1ZTo4MTUz
+MDUzOTAgdGltZV9lbmFibGVkOjMxNjQ5MjY5OCB0aW1lX3J1bm5pbmc6MzE2NDkyNjk4DQo+
+IHBlcmZfZXZlbnRfb3BlbjAyLmM6MTUxOiBUSU5GTzogWzVdIHZhbHVlOjY4NjU1MDY0OSB0
+aW1lX2VuYWJsZWQ6MzE2NjMxODY2IHRpbWVfcnVubmluZzoyNjY2MzIzMTYNCj4gcGVyZl9l
+dmVudF9vcGVuMDIuYzozMDg6IFRJTkZPOiBuaHc6IDUsIG92ZXJhbGwgdGFzayBjbG9jazog
+MjUzNDAwNDIwMA0KPiBwZXJmX2V2ZW50X29wZW4wMi5jOjMwOTogVElORk86IGh3IHN1bTog
+MzI2MTI4MTQxODAsIHRhc2sgY2xvY2sgc3VtOiAxMjY2OTk2NjIzMg0KPiBwZXJmX2V2ZW50
+X29wZW4wMi5jOjMyMTogVElORk86IHJhdGlvOiA0Ljk5OTk3OA0KPiBwZXJmX2V2ZW50X29w
+ZW4wMi5jOjMyNTogVFBBU1M6IHRlc3QgcGFzc2VkDQo+IA0KPiBncmVwIFBFUkZfRVZFTlRT
+IGNvbmZpZyAjIHBwYzY0bGUNCj4gQ09ORklHX0hBVkVfUEVSRl9FVkVOVFM9eQ0KPiBDT05G
+SUdfUEVSRl9FVkVOVFM9eQ0KPiBDT05GSUdfSEFWRV9QRVJGX0VWRU5UU19OTUk9eQ0KPiAN
+Cj4gV2hlbiBJIHRyaWVkIHJ1bm5pbmcgYWFyY2g2NCBxdWVzdCB3aXRoIHN0YWJsZSBrZXJu
+ZWwgNS4xMC43NiBmcm9tIGtlcm5lbC5vcmcgb24NCj4gbXkgaW50ZWwgbGFwdG9wLCB1c2lu
+ZyBzaW1wbGlmaWVkIHNldHVwLCB0aGUgZXZlbnQgd2FzIG5vdCBzdXBwb3J0ZWQgKG5vdCBz
+dXJlDQo+IHdoZXRoZXIgdGhhdCB3YXMgY2F1c2VkIHVuYXZhaWxhYmxlIC1lbmFibGUta3Zt
+IG9yIHNvbWV0aGluZyBlbHNlOyBJIGFsc28NCj4gaGF2ZW4ndCBjaGVja2VkIGtlcm5lbCBj
+b25maWcpOg0KPiANCj4gcWVtdS1zeXN0ZW0tYWFyY2g2NCAtTSB2aXJ0IC1jcHUgY29ydGV4
+LWE1MyAtbm9ncmFwaGljIC1zbXAgJFNNUCAta2VybmVsIEltYWdlIC1hcHBlbmQgInJvb3R3
+YWl0IHJvb3Q9L2Rldi92ZGEgY29uc29sZT10dHlBTUEwIiAtbmV0ZGV2IHVzZXIsaWQ9ZXRo
+MCAtZGV2aWNlIHZpcnRpby1uZXQtZGV2aWNlLG5ldGRldj1ldGgwIC1kcml2ZSBmaWxlPXJv
+b3Rmcy5leHQ0LGlmPW5vbmUsZm9ybWF0PXJhdyxpZD1oZDAgLWRldmljZSB2aXJ0aW8tYmxr
+LWRldmljZSxkcml2ZT1oZDANCj4gLi4uDQo+IHBlcmZfZXZlbnRfb3Blbi5oOjI2OiBUSU5G
+TzogcGVyZl9ldmVudF9vcGVuIGV2ZW50LnR5cGU6IDAsIGV2ZW50LmNvbmZpZzogMQ0KPiBw
+ZXJmX2V2ZW50X29wZW4uaDozMDogVENPTkY6IHBlcmZfZXZlbnRfb3BlbiB0eXBlL2NvbmZp
+ZyBub3Qgc3VwcG9ydGVkOiBFTk9FTlQgKDIpDQo+IA0KPiBJIGFsc28gdGVzdGVkIHRoYXQg
+c3RhYmxlIGtlcm5lbCA1LjEwLjc2IG9uIFJQSSBidXQgdGhhdCBwYXNzZWQgKHRoZSBzYW1l
+IGFzIG9wZW5TVVNFIDUuMTUuNS0xLWRlZmF1bHQpDQo+IHBlcmZfZXZlbnRfb3BlbjAyLmM6
+MTA0OiBUSU5GTzogYmVuY2hfd29yayBlc3RpbWF0ZWQgbG9vcHMgPSAxNDk2IGluIDUwMCBt
+cw0KPiBwZXJmX2V2ZW50X29wZW4wMi5jOjE0OTogVElORk86IFswXSB2YWx1ZTo0NDk3MjU2
+NjggdGltZV9lbmFibGVkOjUwMDE5MTA1NCB0aW1lX3J1bm5pbmc6NTAwMTkxMDU0DQo+IHBl
+cmZfZXZlbnRfb3BlbjAyLmM6MTQ5OiBUSU5GTzogWzFdIHZhbHVlOjQ0OTcyODgwMyB0aW1l
+X2VuYWJsZWQ6NTAwMjA0Nzk1IHRpbWVfcnVubmluZzo1MDAyMDQ3OTUNCj4gcGVyZl9ldmVu
+dF9vcGVuMDIuYzoxNDk6IFRJTkZPOiBbMl0gdmFsdWU6NDQ5NzMyOTQ0IHRpbWVfZW5hYmxl
+ZDo1MDAyMTA2NjUgdGltZV9ydW5uaW5nOjUwMDIxMDY2NQ0KPiBwZXJmX2V2ZW50X29wZW4w
+Mi5jOjE0OTogVElORk86IFszXSB2YWx1ZTo0NDk3MzgwOTkgdGltZV9lbmFibGVkOjUwMDIx
+MDQ0MyB0aW1lX3J1bm5pbmc6NTAwMjEwNDQzDQo+IHBlcmZfZXZlbnRfb3BlbjAyLmM6MTQ5
+OiBUSU5GTzogWzRdIHZhbHVlOjQ0OTc0NTEwNCB0aW1lX2VuYWJsZWQ6NTAwMjM0OTYxIHRp
+bWVfcnVubmluZzo1MDAyMzQ5NjENCj4gcGVyZl9ldmVudF9vcGVuMDIuYzoxNDk6IFRJTkZP
+OiBbNV0gdmFsdWU6NDQ5NzU2Njc2IHRpbWVfZW5hYmxlZDo1MDAyNDc2NDcgdGltZV9ydW5u
+aW5nOjUwMDI0NzY0Nw0KPiBwZXJmX2V2ZW50X29wZW4wMi5jOjE0OTogVElORk86IFs2XSB2
+YWx1ZTozODU0NzQyMjQgdGltZV9lbmFibGVkOjUwMjk3NTgxMyB0aW1lX3J1bm5pbmc6NDMw
+OTc2NjEyDQo+IHBlcmZfZXZlbnRfb3BlbjAyLmM6MzA4OiBUSU5GTzogbmh3OiA2LCBvdmVy
+YWxsIHRhc2sgY2xvY2s6IDQwMzEzNDk1MjINCj4gcGVyZl9ldmVudF9vcGVuMDIuYzozMDk6
+IFRJTkZPOiBodyBzdW06IDIxNTkwMzYyODA4LCB0YXNrIGNsb2NrIHN1bTogMjQxODcxMTM4
+MjcNCj4gcGVyZl9ldmVudF9vcGVuMDIuYzozMjE6IFRJTkZPOiByYXRpbzogNS45OTk3NTYN
+Cj4gcGVyZl9ldmVudF9vcGVuMDIuYzozMjU6IFRQQVNTOiB0ZXN0IHBhc3NlZA0KPiANCj4g
+U28gaXMgaXQgYSByb3VuZGluZyBpc3N1ZSBvbiBhYXJjaDY0IFFFTVUvS1ZNPw0KPiBUaGFu
+a3MgZm9yIGFueSBoaW50IHdoYXQgdG8gY2hlY2sgLyB0cnkuDQo+IA0KPiBLaW5kIHJlZ2Fy
+ZHMsDQo+IFBldHINCj4gDQo+IFsxXSBodHRwczovL2dpdGh1Yi5jb20vbGludXgtdGVzdC1w
+cm9qZWN0L2x0cC90cmVlL2MyZDQ4MzZjMDU3ZmI5Zjc4ZTdmNjI1ZDcxNjM4ZDRmNDBmOTg2
+NTkvdGVzdGNhc2VzL2tlcm5lbC9zeXNjYWxscy9wZXJmX2V2ZW50X29wZW4vcGVyZl9ldmVu
+dF9vcGVuMDIuYw0KPiANCg==
