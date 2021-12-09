@@ -2,95 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5827946F2E1
-	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 19:20:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 61C3C46F2E3
+	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 19:21:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243218AbhLISYI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Dec 2021 13:24:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34368 "EHLO
+        id S242802AbhLISYi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Dec 2021 13:24:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237501AbhLISYH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Dec 2021 13:24:07 -0500
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED0FBC061746
-        for <kvm@vger.kernel.org>; Thu,  9 Dec 2021 10:20:33 -0800 (PST)
-Received: by mail-pf1-x434.google.com with SMTP id k64so6150805pfd.11
-        for <kvm@vger.kernel.org>; Thu, 09 Dec 2021 10:20:33 -0800 (PST)
+        with ESMTP id S243180AbhLISYf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Dec 2021 13:24:35 -0500
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C094C061746
+        for <kvm@vger.kernel.org>; Thu,  9 Dec 2021 10:21:02 -0800 (PST)
+Received: by mail-pf1-x42f.google.com with SMTP id k26so6156026pfp.10
+        for <kvm@vger.kernel.org>; Thu, 09 Dec 2021 10:21:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Tvmy9iuHyCNf/Lo2PS/zSkuGC5kcxP0bkqvMrstnVw0=;
-        b=NVqDlwIh2sHhH5QYeeW/d2laVrOu2ZCkrX5i1KWgB76AOG2RQBQs2eQory7cxCXrhR
-         nF9Sk1RJUQmqWcurEx53sgPYE9+1EjHlb5vh3v4TFSa8BYl8AfMFviYEzLVEACUOBq3e
-         vVyN7UXKVfrTz7zA85/wfZXGyZ1LH7smYOcR3nuxwDjvZ2GTU5K12scLVF1WQusWk70e
-         2Q3yGDrH6JbHGSSDUYjntJLtU6INyTpesMqiefJcCPlTwnWrOmpF8321ukShaZ6O4cm4
-         Ij9HSjxGc6rwMnN7reCUtYi9R7z4FCeiSFgQU5xqOhyIpK63FfxTdCvNH7DJ3xv64UZG
-         ltEQ==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Q1B/B6frpMpx5MKHMjooXNn4nRrnCrkfKththO/2mrk=;
+        b=QZ8QWIuEHrIiG9QNQt9qRYwDPoBq3em5nu2AuA0P1pMIEt0dxs1DteeGCHfncp4fd4
+         PgNSPYS4EUncx1AREYRewY6KUYQV5MdovCrXGhe7ePbAqUk7Mqp+vhbnVmMMFtAc9+yk
+         /FBYZI3mlc42e5ILzRmvHZmEkjAb5LXtS2AdXm91XZs6kIMyZxRUYOj/oYquUvz24shM
+         PF9NrRvIVo58R3whJkKUKDouLRtdNILnq2G8obRCyEhZii7up1N/ZqBQKPkaxZELtZ6+
+         mUcBaactaIzGFhB+uU/mkUk18YAzO3o0eQGzVS6G8tctiM8Lx/M0JWORG1F/H+JTofL0
+         IRQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Tvmy9iuHyCNf/Lo2PS/zSkuGC5kcxP0bkqvMrstnVw0=;
-        b=6gjHDggGW9oa9P4hfjlqHGoSpHwj4PdUty7JjTmhVQRH6YgNMtJa34lsAbANegAT/q
-         0kESB6w/rrr7OSjHn9ycmHsafK/v/pYFpnTDbANLjxSfTN7p6HdUcXhTsJ7HPOzUh8D+
-         fADKAXW9nI1LjkYs3NqNqpR1W/g6RW7MG8chGJ9GaHSwhaBkQ524FvSFLJH7GPhj+2No
-         9FkWyQEDFn73m+vL5wnV/Mg7IAadxROkxHOZwz39QaDG1EF6E0CB+BCdJh5N0YWXYn3j
-         HCWKqF0ud+shb/CG7SC6v3BCYoZX5TRP/9RYPMThcqaIsPDAjF6eCa67pxFvyoN4lknx
-         OAzA==
-X-Gm-Message-State: AOAM533FORk/R3bGabxasds0nJ7PJT037IkK+LZdamNkpq1Yu84f836y
-        NSEriCL/rNdAgs2Ng8xRApxZMg2MidZ7Gi6irY+1lg==
-X-Google-Smtp-Source: ABdhPJyD+/hhRaesCxfvIDL8j2lPF4eYq/ATj7b/WPTrGaMg2JzO9vmEOdlSJAt8Mxxn++KBRtz0n28hg1VrkZTfT/8=
-X-Received: by 2002:a05:6a00:b89:b0:4ae:d9a3:ccf9 with SMTP id
- g9-20020a056a000b8900b004aed9a3ccf9mr13242826pfj.13.1639074033142; Thu, 09
- Dec 2021 10:20:33 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Q1B/B6frpMpx5MKHMjooXNn4nRrnCrkfKththO/2mrk=;
+        b=jyImNvwnUYcqtSQoAayNPp21ffZE0/MtJ9kaH+pVJRqd9o2IYvLDXdgO9yFomaaYee
+         bs4WGrb97JCIPs3miVvmRlKZORVmauh68/W3HlWYq0NMPo7vLxkexLxWGR6FyVtKZX90
+         txz9D8kfVi/VjarhaqRyyaG6L9DEBMO6HI6vDobBvRpLdytFbfuHX5Xu9yOArLq5OsjE
+         wqVsiAS9cMEiwhAVFY943GLV3TWkdsQhSxOPYCq7FRKO/jhzb1NUnghEjWXGyoJ96anS
+         JDJ/2/8d/QKoxs4kyaXPBGkQhhbc5QexzrSahWFnvcQZs/TukjvmQ+Z0cyYs/hORxxk9
+         YHMQ==
+X-Gm-Message-State: AOAM532Fy0hHy7BIp3jVqa9gbgWsarKLioHP0lUjaKWNv9by+KMoIAzF
+        jx06/kLSxLmoFznWYlXicD5zKQ==
+X-Google-Smtp-Source: ABdhPJwJJtXqPIepUiw9fOMLWmxYQB6UiOX0HDPFjljJDq8tThT40b1GbYGCfv4sExT7mqWQ6Ee3tQ==
+X-Received: by 2002:a63:5f14:: with SMTP id t20mr27138606pgb.382.1639074061719;
+        Thu, 09 Dec 2021 10:21:01 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id o124sm370842pfb.177.2021.12.09.10.21.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Dec 2021 10:21:01 -0800 (PST)
+Date:   Thu, 9 Dec 2021 18:20:57 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Aili Yao <yaoaili126@gmail.com>
+Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yaoaili@kingsoft.com
+Subject: Re: [PATCH v2] KVM: LAPIC: Per vCPU control over
+ kvm_can_post_timer_interrupt
+Message-ID: <YbJJCf20VdHNnpzY@google.com>
+References: <20211124125409.6eec3938@gmail.com>
+ <Ya/s17QDlGZi9COR@google.com>
+ <20211208182158.571fcdee@gmail.com>
 MIME-Version: 1.0
-References: <20211209155257.128747-1-marcorr@google.com> <5f8c31b4-6223-a965-0e91-15b4ffc0335e@redhat.com>
-In-Reply-To: <5f8c31b4-6223-a965-0e91-15b4ffc0335e@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 9 Dec 2021 10:20:22 -0800
-Message-ID: <CALMp9eThf3UtvoLFjajkrXtvOEWQvc8_=Xf6-m6fHXkOhET+GA@mail.gmail.com>
-Subject: Re: [PATCH v2] KVM: x86: Always set kvm_run->if_flag
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Marc Orr <marcorr@google.com>, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        thomas.lendacky@amd.com, mlevitsk@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211208182158.571fcdee@gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 9, 2021 at 9:48 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 12/9/21 16:52, Marc Orr wrote:
-> > The kvm_run struct's if_flag is a part of the userspace/kernel API. The
-> > SEV-ES patches failed to set this flag because it's no longer needed by
-> > QEMU (according to the comment in the source code). However, other
-> > hypervisors may make use of this flag. Therefore, set the flag for
-> > guests with encrypted registers (i.e., with guest_state_protected set).
-> >
-> > Fixes: f1c6366e3043 ("KVM: SVM: Add required changes to support intercepts under SEV-ES")
-> > Signed-off-by: Marc Orr<marcorr@google.com>
->
-> Applied, though I wonder if it is really needed by those other VMMs
-> (which? gVisor is the only one that comes to mind that is interested in
-> userspace APIC).
+On Wed, Dec 08, 2021, Aili Yao wrote:
+> On Tue, 7 Dec 2021 23:23:03 +0000
+> Sean Christopherson <seanjc@google.com> wrote:
+> 
+> > 
+> >  static bool kvm_can_post_timer_interrupt(struct kvm_vcpu *vcpu)
+> >  {
+> > -       return pi_inject_timer && kvm_vcpu_apicv_active(vcpu);
+> > +       return pi_inject_timer && kvm_vcpu_apicv_active(vcpu) &&
+> > +              (kvm_mwait_in_guest(vcpu) || kvm_hlt_in_guest(vcpu));
+> >  }
+> > 
+> >  bool kvm_can_use_hv_timer(struct kvm_vcpu *vcpu)
+> >  {
+> > -       return kvm_x86_ops.set_hv_timer
+> > -              && !(kvm_mwait_in_guest(vcpu->kvm) ||
+> > -                   kvm_can_post_timer_interrupt(vcpu));
+> > +       /*
+> > +        * Don't use the hypervisor timer, a.k.a. VMX Preemption Timer, if the
+> > +        * guest can execute MWAIT without exiting as the timer will stop
+> > +        * counting if the core enters C3 or lower.  HLT in the guest is ok as
+> > +        * HLT is effectively C1 and the timer counts in C0, C1, and C2.
+> > +        *
+> > +        * Don't use the hypervisor timer if KVM can post a timer interrupt to
+> > +        * the guest since posted the timer avoids taking an extra a VM-Exit
+> > +        * when the timer expires.
+> > +        */
+> > +       return kvm_x86_ops.set_hv_timer &&
+> > +              !kvm_mwait_in_guest(vcpu->kvm) &&
+> > +              !kvm_can_post_timer_interrupt(vcpu));
+> >  }
+> >  EXPORT_SYMBOL_GPL(kvm_can_use_hv_timer);
+> > 
+> 
+> Sorry, I am little confused here now:
+> if kvm_can_post_timer_interrupt(vcpu) return true(cpu-pm enabled), then the kvm_can_use_hv_timer will always be false;
+> if kvm_can_post_timer_interrupt(vcpu) return false(cpu-pm disable),then kvm_mwait_in_guest(vcpu->kvm) can't be true ether;
+> It seems we don't need kvm_mwait_in_guest(vcpu->kvm) here?
 
-Vanadium appears to have one use of it.
-
-> It shouldn't be necessary for in-kernel APIC (where userspace can inject
-> interrupts at any time), and ready_for_interrupt_injection is superior
-> for userspace APIC.
-
-LOL. Here's that one use...
-
-if (vcpu_run_state_->request_interrupt_window &&
-vcpu_run_state_->ready_for_interrupt_injection &&
-vcpu_run_state_->if_flag) {
-...
-}
-
-So, maybe this is much ado about nothing?
+We do, it's to prevent the guest from enter C3+ and stopping the VMX preemption
+timer, e.g. if either kvm_vcpu_apicv_active() or pi_inject_timer evaluates false.
