@@ -2,154 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ABF5E46EB2C
-	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 16:28:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8741D46EB5C
+	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 16:33:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236375AbhLIPcU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Dec 2021 10:32:20 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:18756 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S231371AbhLIPcT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 Dec 2021 10:32:19 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B9FM2Kd013251;
-        Thu, 9 Dec 2021 15:28:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=7OngiWdZx77vIHpZ2oC5RsazscGBNhLbYdx2EDiL50Q=;
- b=dtB5Lsz4MtecMpKIvxzRjzlUDp6IebwCwFAPK/b8dw2L3FO/wR8nHvRYJdCOHmaUX8JE
- Biey/O9Acl52j8oZUMMro1QlZCJGZ6jBZ+44oFceATDBZVHKJmVmbvuVqPgkmMNatSVN
- 4Hl5H2wPNQ2JPmvx82c5Wy5xEK5+d5sWgyv+m5zfTIAkn9rDFa64egvNgnt10xseS9+U
- IznazDbadwg5sL5dCZ0Ec7zgM+dg6sy9gVUFwW5PQUo1A+6ubXo5H57DAoiKmIUy2EKj
- C4dbzX6l3kMUDS171X7cefNwtnWU8RUf8yfaENEi4vEteaPVd6cAGccNwwqqo8f7CicZ Uw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3cukkh1j94-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Dec 2021 15:28:45 +0000
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1B9ET2k6012213;
-        Thu, 9 Dec 2021 15:28:44 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3cukkh1j87-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Dec 2021 15:28:44 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1B9FCUFK029667;
-        Thu, 9 Dec 2021 15:28:42 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma01fra.de.ibm.com with ESMTP id 3cqyya106d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Dec 2021 15:28:42 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1B9FSeDm29491586
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 9 Dec 2021 15:28:40 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E582AA4064;
-        Thu,  9 Dec 2021 15:28:39 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E935EA405B;
-        Thu,  9 Dec 2021 15:28:38 +0000 (GMT)
-Received: from [9.171.49.66] (unknown [9.171.49.66])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  9 Dec 2021 15:28:38 +0000 (GMT)
-Message-ID: <8357aa40-a518-1645-d4f2-bd12975bcb4b@linux.ibm.com>
-Date:   Thu, 9 Dec 2021 16:28:38 +0100
+        id S239760AbhLIPhT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Dec 2021 10:37:19 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:41630 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235087AbhLIPhS (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 Dec 2021 10:37:18 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1639064024;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=5WWwR4PJoOWTgTV1k31XoxiwzWYOL/P05Y/4kMNAfu4=;
+        b=NWU7yB4BmM0mrkWNthtvffm1e6+JKZXElyLtWI/wpkR7VktCqnwcW2vVUhpz2xGy+7vq1V
+        JLfbX5PifQVAg51cguzdGUiwOCrQ2pwD8aGvrtimqluemypCZ2uGbgaWkhvQF20jLR2taX
+        PHFQ9kHjwXs5B22ZDFUOnqYPmWC7t00=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-52-xmwQxUapO9OMD2mvA3EkhQ-1; Thu, 09 Dec 2021 10:33:41 -0500
+X-MC-Unique: xmwQxUapO9OMD2mvA3EkhQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 74FD781430E;
+        Thu,  9 Dec 2021 15:33:39 +0000 (UTC)
+Received: from starship (unknown [10.40.192.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E00CB19D9B;
+        Thu,  9 Dec 2021 15:33:34 +0000 (UTC)
+Message-ID: <14c4784b5e2bfbe813964485b46052315b533744.camel@redhat.com>
+Subject: Re: [PATCH 3/6] KVM: SVM: fix AVIC race of host->guest IPI delivery
+ vs AVIC inhibition
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
+        <linux-kernel@vger.kernel.org>, Wanpeng Li <wanpengli@tencent.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Jim Mattson <jmattson@google.com>
+Date:   Thu, 09 Dec 2021 17:33:33 +0200
+In-Reply-To: <YbIgb4V7jcx2tZ0R@google.com>
+References: <20211209115440.394441-1-mlevitsk@redhat.com>
+         <20211209115440.394441-4-mlevitsk@redhat.com>
+         <4d723b07-e626-190d-63f4-fd0b5497dd9b@redhat.com>
+         <bcf9f9e5922cce979cc11ced8ccda992e22b290a.camel@redhat.com>
+         <YbIgb4V7jcx2tZ0R@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH 11/32] s390/pci: add helper function to find device by
- handle
-Content-Language: en-US
-To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
-        hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
-        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
-        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20211207205743.150299-1-mjrosato@linux.ibm.com>
- <20211207205743.150299-12-mjrosato@linux.ibm.com>
-From:   Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <20211207205743.150299-12-mjrosato@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: V-IfF0SV2WDiAWAHx01LYneFLL4nWb1N
-X-Proofpoint-ORIG-GUID: BPW_wyB90wFSomuiexKh9wdSohW0PZQ_
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2021-12-09_06,2021-12-08_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- lowpriorityscore=0 phishscore=0 adultscore=0 priorityscore=1501
- bulkscore=0 malwarescore=0 mlxlogscore=999 clxscore=1015 impostorscore=0
- mlxscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2112090082
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-Am 07.12.21 um 21:57 schrieb Matthew Rosato:
-> Intercepted zPCI instructions will specify the desired function via a
-> function handle.  Add a routine to find the device with the specified
-> handle.
+On Thu, 2021-12-09 at 15:27 +0000, Sean Christopherson wrote:
+> On Thu, Dec 09, 2021, Maxim Levitsky wrote:
+> > On Thu, 2021-12-09 at 15:11 +0100, Paolo Bonzini wrote:
+> > > On 12/9/21 12:54, Maxim Levitsky wrote:
+> > > > If svm_deliver_avic_intr is called just after the target vcpu's AVIC got
+> > > > inhibited, it might read a stale value of vcpu->arch.apicv_active
+> > > > which can lead to the target vCPU not noticing the interrupt.
+> > > > 
+> > > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > > > ---
+> > > >   arch/x86/kvm/svm/avic.c | 16 +++++++++++++---
+> > > >   1 file changed, 13 insertions(+), 3 deletions(-)
+> > > > 
+> > > > diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> > > > index 859ad2dc50f1..8c1b934bfa9b 100644
+> > > > --- a/arch/x86/kvm/svm/avic.c
+> > > > +++ b/arch/x86/kvm/svm/avic.c
+> > > > @@ -691,6 +691,15 @@ int svm_deliver_avic_intr(struct kvm_vcpu *vcpu, int vec)
+> > > >   	 * automatically process AVIC interrupts at VMRUN.
+> > > >   	 */
+> > > >   	if (vcpu->mode == IN_GUEST_MODE) {
+> > > > +
+> > > > +		/*
+> > > > +		 * At this point we had read the vcpu->arch.apicv_active == true
+> > > > +		 * and the vcpu->mode == IN_GUEST_MODE.
+> > > > +		 * Since we have a memory barrier after setting IN_GUEST_MODE,
+> > > > +		 * it ensures that AVIC inhibition is complete and thus
+> > > > +		 * the target is really running with AVIC enabled.
+> > > > +		 */
+> > > > +
+> > > >   		int cpu = READ_ONCE(vcpu->cpu);
+> > > 
+> > > I don't think it's correct.  The vCPU has apicv_active written (in 
+> > > kvm_vcpu_update_apicv) before vcpu->mode.
+> > 
+> > I thought that we have a full memory barrier just prior to setting IN_GUEST_MODE
+> > thus if I see vcpu->mode == IN_GUEST_MODE then I'll see correct apicv_active value.
+> > But apparently the memory barrier is after setting vcpu->mode.
+> > 
+> > 
+> > > For the acquire/release pair to work properly you need to 1) read 
+> > > apicv_active *after* vcpu->mode here 2) use store_release and 
+> > > load_acquire for vcpu->mode, respectively in vcpu_enter_guest and here.
+> > 
+> > store_release for vcpu->mode in vcpu_enter_guest means a write barrier just before setting it,
+> > which I expected to be there.
+> > 
+> > And yes I see now, I need a read barrier here as well. I am still learning this.
 > 
-> Acked-by: Niklas Schnelle <schnelle@linux.ibm.com>
-> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> Sans barriers and comments, can't this be written as returning an "error" if the
+> vCPU is not IN_GUEST_MODE?  Effectively the same thing, but a little more precise
+> and it avoids duplicating the lapic.c code.
 
-I guess we do not have hundreds of devices, so this should be fast enough.
-I guess long term wit hundreds of VFs we might want to redo the zpci_list
-into a tree but for now as this is just like get_zdev_by_fid
+Yes, beside the fact that we already set the vIRR bit so if I return -1 here, it will be set again..
+(and these are set using atomic ops)
 
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+I don't know how much that matters except the fact that while a vCPU runs a nested guest,
+callers wishing to send IPI to it, will go through this code path a lot 
+(even when I implement nested AVIC as it is a separate thing which is used by L2 only).
 
-> ---
->   arch/s390/include/asm/pci.h |  1 +
->   arch/s390/pci/pci.c         | 16 ++++++++++++++++
->   2 files changed, 17 insertions(+)
+Best regards,
+	Maxim Levitsky
+
 > 
-> diff --git a/arch/s390/include/asm/pci.h b/arch/s390/include/asm/pci.h
-> index 1a8f9f42da3a..00a2c24d6d2b 100644
-> --- a/arch/s390/include/asm/pci.h
-> +++ b/arch/s390/include/asm/pci.h
-> @@ -275,6 +275,7 @@ static inline struct zpci_dev *to_zpci_dev(struct device *dev)
->   }
->   
->   struct zpci_dev *get_zdev_by_fid(u32);
-> +struct zpci_dev *get_zdev_by_fh(u32 fh);
->   
->   /* DMA */
->   int zpci_dma_init(void);
-> diff --git a/arch/s390/pci/pci.c b/arch/s390/pci/pci.c
-> index 9b4d3d78b444..af1c0ae017b1 100644
-> --- a/arch/s390/pci/pci.c
-> +++ b/arch/s390/pci/pci.c
-> @@ -76,6 +76,22 @@ struct zpci_dev *get_zdev_by_fid(u32 fid)
->   	return zdev;
->   }
->   
-> +struct zpci_dev *get_zdev_by_fh(u32 fh)
-> +{
-> +	struct zpci_dev *tmp, *zdev = NULL;
-> +
-> +	spin_lock(&zpci_list_lock);
-> +	list_for_each_entry(tmp, &zpci_list, entry) {
-> +		if (tmp->fh == fh) {
-> +			zdev = tmp;
-> +			break;
-> +		}
-> +	}
-> +	spin_unlock(&zpci_list_lock);
-> +	return zdev;
-> +}
-> +EXPORT_SYMBOL_GPL(get_zdev_by_fh);
-> +
->   void zpci_remove_reserved_devices(void)
->   {
->   	struct zpci_dev *tmp, *zdev;
+> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> index 26ed5325c593..cddf7a8da3ea 100644
+> --- a/arch/x86/kvm/svm/avic.c
+> +++ b/arch/x86/kvm/svm/avic.c
+> @@ -671,7 +671,7 @@ void svm_load_eoi_exitmap(struct kvm_vcpu *vcpu, u64 *eoi_exit_bitmap)
 > 
+>  int svm_deliver_avic_intr(struct kvm_vcpu *vcpu, int vec)
+>  {
+> -       if (!vcpu->arch.apicv_active)
+> +       if (vcpu->mode != IN_GUEST_MODE || !vcpu->arch.apicv_active)
+>                 return -1;
+> 
+>         kvm_lapic_set_irr(vec, vcpu->arch.apic);
+> @@ -706,8 +706,9 @@ int svm_deliver_avic_intr(struct kvm_vcpu *vcpu, int vec)
+>                 put_cpu();
+>         } else {
+>                 /*
+> -                * Wake the vCPU if it was blocking.  KVM will then detect the
+> -                * pending IRQ when checking if the vCPU has a wake event.
+> +                * Wake the vCPU if it is blocking.  If the vCPU exited the
+> +                * guest since the previous vcpu->mode check, it's guaranteed
+> +                * to see the event before re-enterring the guest.
+>                  */
+>                 kvm_vcpu_wake_up(vcpu);
+>         }
+> 
+
+
