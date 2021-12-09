@@ -2,361 +2,205 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0DB6846ECC6
-	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 17:09:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 71E1F46ECFB
+	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 17:22:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231924AbhLIQMk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Dec 2021 11:12:40 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50962 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229598AbhLIQMj (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 Dec 2021 11:12:39 -0500
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B9G0pjx029008;
-        Thu, 9 Dec 2021 16:09:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : to : cc : references : from : subject : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=qGmFSgGiCSVK7MsQVgpiVZgMW4GxL5Nq4qJXTa0AV3U=;
- b=UorX2NiloHCXZZdo+UPsNvXYVpatLI1VXB4t9eMWKGLxCI93OXgmq8aud71ZNmRgJgVY
- dV9Rcb0UaOEJSqEeu5luhL/XgDnqtp1JSyrXIAOqV944xy4gFSvKcUXuzxr6ZPH/Eb2J
- Usbq5jLXebOoBekRxoyFXuCguq0xYXelY9PHKs7saFo00dJWVNxuG1eADAHi37UM+ATJ
- Bq33tsMTPgBGjBcAhBI8lqwdrGcnGJb5wUSvTvYb6MW7KdlypgCcwzPV+Yc/mEnoowMQ
- xOUMtxeHKzgvszv3kIZPHHi8/pw+5rTEKytCHb1+V3LR9X5Tuk3AqznqJk2Dm09TZka1 HA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cumnu0qup-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Dec 2021 16:09:05 +0000
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1B9G149s031950;
-        Thu, 9 Dec 2021 16:09:05 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cumnu0qt8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Dec 2021 16:09:04 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1B9G1vSf004950;
-        Thu, 9 Dec 2021 16:09:00 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 3cqyyakasf-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Dec 2021 16:09:00 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1B9G8v4D34013474
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 9 Dec 2021 16:08:57 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 08122A405F;
-        Thu,  9 Dec 2021 16:08:57 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 814BEA404D;
-        Thu,  9 Dec 2021 16:08:56 +0000 (GMT)
-Received: from [9.145.80.242] (unknown [9.145.80.242])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  9 Dec 2021 16:08:56 +0000 (GMT)
-Message-ID: <4f564761-a646-f80e-2aa7-b4dfca596d02@linux.ibm.com>
-Date:   Thu, 9 Dec 2021 17:08:56 +0100
+        id S241137AbhLIQZo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Dec 2021 11:25:44 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:28859 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235727AbhLIQZo (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 Dec 2021 11:25:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1639066930;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=iwmZYCGbP/jADm04FR44Y9XD4KIBUOm4ZHFvPZTR7F4=;
+        b=B/MOUGc7psPgkXLJ9yfckP/Dx3rLDlluHWXxPm1P7UOLbQJiUD2uvtlq93UY3vH+LiiiXb
+        io1dlo+JGKTuqWC5vGIotQxEQBWZczhUU4OUOHY+CbU9ue9BZj6oQbn4VL4CYOUQksLt6p
+        fTeHrOJ7o6Hv6Ud4bpTOjQoWggY4yUA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-284-m5AGQdacOhusyb5juK3XEQ-1; Thu, 09 Dec 2021 11:22:06 -0500
+X-MC-Unique: m5AGQdacOhusyb5juK3XEQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 174F9760D5;
+        Thu,  9 Dec 2021 16:22:01 +0000 (UTC)
+Received: from starship (unknown [10.40.192.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id BA1077A227;
+        Thu,  9 Dec 2021 16:21:34 +0000 (UTC)
+Message-ID: <b112cb0271fe8eada64639eb1d634effc34f87de.camel@redhat.com>
+Subject: Re: [PATCH v2] KVM: x86: Always set kvm_run->if_flag
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Marc Orr <marcorr@google.com>, pbonzini@redhat.com,
+        seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com, thomas.lendacky@amd.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Thu, 09 Dec 2021 18:21:33 +0200
+In-Reply-To: <20211209155257.128747-1-marcorr@google.com>
+References: <20211209155257.128747-1-marcorr@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com,
-        thuth@redhat.com, imbrenda@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com
-References: <20211122131443.66632-1-pmorel@linux.ibm.com>
- <20211122131443.66632-2-pmorel@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v5 1/1] s390x: KVM: accept STSI for CPU topology
- information
-In-Reply-To: <20211122131443.66632-2-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: iNbGA7VQV3DjgSc8mCE7N2m9D3QxU3Dy
-X-Proofpoint-ORIG-GUID: TQ-lAEoHOEyefHqfBKRS9AVaCl7Ayv-a
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2021-12-09_07,2021-12-08_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
- spamscore=0 impostorscore=0 lowpriorityscore=0 suspectscore=0
- priorityscore=1501 adultscore=0 clxscore=1015 bulkscore=0 malwarescore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2112090087
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/22/21 14:14, Pierre Morel wrote:
-> We let the userland hypervisor know if the machine support the CPU
-> topology facility using a new KVM capability: KVM_CAP_S390_CPU_TOPOLOGY.
+On Thu, 2021-12-09 at 07:52 -0800, Marc Orr wrote:
+> The kvm_run struct's if_flag is a part of the userspace/kernel API. The
+> SEV-ES patches failed to set this flag because it's no longer needed by
+> QEMU (according to the comment in the source code). However, other
+> hypervisors may make use of this flag. Therefore, set the flag for
+> guests with encrypted registers (i.e., with guest_state_protected set).
 > 
-> The PTF instruction will report a topology change if there is any change
-> with a previous STSI_15_1_2 SYSIB.
-> Changes inside a STSI_15_1_2 SYSIB occur if CPU bits are set or clear
-> inside the CPU Topology List Entry CPU mask field, which happens with
-> changes in CPU polarization, dedication, CPU types and adding or
-> removing CPUs in a socket.
-> 
-> The reporting to the guest is done using the Multiprocessor
-> Topology-Change-Report (MTCR) bit of the utility entry of the guest's
-> SCA which will be cleared during the interpretation of PTF.
-> 
-> To check if the topology has been modified we use a new field of the
-> arch vCPU to save the previous real CPU ID at the end of a schedule
-> and verify on next schedule that the CPU used is in the same socket.
-> 
-> We assume in this patch:
-> - no polarization change: only horizontal polarization is currently
->    used in linux.
-> - no CPU Type change: only IFL Type are supported in Linux
-> - Dedication: with this patch, only a complete dedicated CPU stack can
->    take benefit of the CPU Topology.
-> 
-> STSI(15.1.x) gives information on the CPU configuration topology.
-> Let's accept the interception of STSI with the function code 15 and
-> let the userland part of the hypervisor handle it when userland
-> support the CPU Topology facility.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> Fixes: f1c6366e3043 ("KVM: SVM: Add required changes to support intercepts under SEV-ES")
+> Signed-off-by: Marc Orr <marcorr@google.com>
 > ---
->   Documentation/virt/kvm/api.rst   | 16 ++++++++++
->   arch/s390/include/asm/kvm_host.h | 14 ++++++---
->   arch/s390/kvm/kvm-s390.c         | 52 +++++++++++++++++++++++++++++++-
->   arch/s390/kvm/priv.c             |  7 ++++-
->   arch/s390/kvm/vsie.c             |  3 ++
->   include/uapi/linux/kvm.h         |  1 +
->   6 files changed, 87 insertions(+), 6 deletions(-)
+> v1 -> v2
+> - fix typos in commit message
+> - fix `svm_get_if_flag()` to work for non-SEV
+> - remove !! in return for both [svm|vmx]_get_if_flag()
+> - refactor `svm_interrupt_blocked()` to use `svm_get_if_flag()` arch/x86/include/asm/kvm-x86-ops.h |  1 +
 > 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index aeeb071c7688..e5c9da0782a6 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -7484,3 +7484,19 @@ The argument to KVM_ENABLE_CAP is also a bitmask, and must be a subset
->   of the result of KVM_CHECK_EXTENSION.  KVM will forward to userspace
->   the hypercalls whose corresponding bit is in the argument, and return
->   ENOSYS for the others.
+>  arch/x86/include/asm/kvm_host.h    |  1 +
+>  arch/x86/kvm/svm/svm.c             | 21 ++++++++++++---------
+>  arch/x86/kvm/vmx/vmx.c             |  6 ++++++
+>  arch/x86/kvm/x86.c                 |  9 +--------
+>  5 files changed, 21 insertions(+), 17 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+> index cefe1d81e2e8..9e50da3ed01a 100644
+> --- a/arch/x86/include/asm/kvm-x86-ops.h
+> +++ b/arch/x86/include/asm/kvm-x86-ops.h
+> @@ -47,6 +47,7 @@ KVM_X86_OP(set_dr7)
+>  KVM_X86_OP(cache_reg)
+>  KVM_X86_OP(get_rflags)
+>  KVM_X86_OP(set_rflags)
+> +KVM_X86_OP(get_if_flag)
+>  KVM_X86_OP(tlb_flush_all)
+>  KVM_X86_OP(tlb_flush_current)
+>  KVM_X86_OP_NULL(tlb_remote_flush)
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 860ed500580c..a7f868ff23e7 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1349,6 +1349,7 @@ struct kvm_x86_ops {
+>  	void (*cache_reg)(struct kvm_vcpu *vcpu, enum kvm_reg reg);
+>  	unsigned long (*get_rflags)(struct kvm_vcpu *vcpu);
+>  	void (*set_rflags)(struct kvm_vcpu *vcpu, unsigned long rflags);
+> +	bool (*get_if_flag)(struct kvm_vcpu *vcpu);
+>  
+>  	void (*tlb_flush_all)(struct kvm_vcpu *vcpu);
+>  	void (*tlb_flush_current)(struct kvm_vcpu *vcpu);
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index d0f68d11ec70..5151efa424ac 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -1585,6 +1585,15 @@ static void svm_set_rflags(struct kvm_vcpu *vcpu, unsigned long rflags)
+>  	to_svm(vcpu)->vmcb->save.rflags = rflags;
+>  }
+>  
+> +static bool svm_get_if_flag(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vmcb *vmcb = to_svm(vcpu)->vmcb;
 > +
-> +8.17 KVM_CAP_S390_CPU_TOPOLOGY
-> +------------------------------
-> +
-> +:Capability: KVM_CAP_S390_CPU_TOPOLOGY
-> +:Architectures: s390
-> +:Type: vm
-> +
-> +This capability indicates that kvm will provide the S390 CPU Topology facility
-> +which consist of the interpretation of the PTF instruction for the Function
-> +Code 2 along with interception and forwarding of both the PTF instruction
-> +with function Codes 0 or 1 and the STSI(15,1,x) instruction to the userland
-
-The capitalization of "Function code" is inconsistent.
-
-> +hypervisor.
-> +
-> +The stfle facility 11, CPU Topology facility, should not be provided to the
-> +guest without this capability.
-> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-> index a604d51acfc8..cccc09a8fdab 100644
-> --- a/arch/s390/include/asm/kvm_host.h
-> +++ b/arch/s390/include/asm/kvm_host.h
-> @@ -95,15 +95,19 @@ struct bsca_block {
->   	union ipte_control ipte_control;
->   	__u64	reserved[5];
->   	__u64	mcn;
-> -	__u64	reserved2;
-> +#define ESCA_UTILITY_MTCR	0x8000
-> +	__u16	utility;
-> +	__u8	reserved2[6];
->   	struct bsca_entry cpu[KVM_S390_BSCA_CPU_SLOTS];
->   };
->   
->   struct esca_block {
->   	union ipte_control ipte_control;
-> -	__u64   reserved1[7];
-> +	__u64   reserved1[6];
-> +	__u16	utility;
-> +	__u8	reserved2[6];
->   	__u64   mcn[4];
-> -	__u64   reserved2[20];
-> +	__u64   reserved3[20];
-
-Note to self: Prime example for a move to reserved member names based on 
-offsets.
-
->   	struct esca_entry cpu[KVM_S390_ESCA_CPU_SLOTS];
->   };
->   
-> @@ -228,7 +232,7 @@ struct kvm_s390_sie_block {
->   	__u8	icptcode;		/* 0x0050 */
->   	__u8	icptstatus;		/* 0x0051 */
->   	__u16	ihcpu;			/* 0x0052 */
-> -	__u8	reserved54;		/* 0x0054 */
-> +	__u8	mtcr;			/* 0x0054 */
->   #define IICTL_CODE_NONE		 0x00
->   #define IICTL_CODE_MCHK		 0x01
->   #define IICTL_CODE_EXT		 0x02
-> @@ -247,6 +251,7 @@ struct kvm_s390_sie_block {
->   #define ECB_SPECI	0x08
->   #define ECB_SRSI	0x04
->   #define ECB_HOSTPROTINT	0x02
-> +#define ECB_PTF		0x01
->   	__u8	ecb;			/* 0x0061 */
->   #define ECB2_CMMA	0x80
->   #define ECB2_IEP	0x20
-> @@ -748,6 +753,7 @@ struct kvm_vcpu_arch {
->   	bool skey_enabled;
->   	struct kvm_s390_pv_vcpu pv;
->   	union diag318_info diag318_info;
-> +	int prev_cpu;
->   };
->   
->   struct kvm_vm_stat {
-
-[..]
-
->   }
->   
-> -void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
-> +static void kvm_s390_set_mtcr(struct kvm_vcpu *vcpu)
-
-We change a vcpu related data structure, there should be "vcpu" in the 
-function name to indicate that.
-
->   {
-> +	struct esca_block *esca = vcpu->kvm->arch.sca;
->   
-> +	if (vcpu->arch.sie_block->ecb & ECB_PTF) {
-
-I'm wondering if we should replace these checks with the 
-test_kvm_facility() ones. ECB_PTF is never changed after vcpu setup, right?
-
-> +		ipte_lock(vcpu);
-> +		WRITE_ONCE(esca->utility, ESCA_UTILITY_MTCR);
-> +		ipte_unlock(vcpu);
-> +	}
+> +	return sev_es_guest(vcpu->kvm)
+> +		? vmcb->control.int_state & SVM_GUEST_INTERRUPT_MASK
+> +		: kvm_get_rflags(vcpu) & X86_EFLAGS_IF;
 > +}
 > +
-> +void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
+>  static void svm_cache_reg(struct kvm_vcpu *vcpu, enum kvm_reg reg)
+>  {
+>  	switch (reg) {
+> @@ -3568,14 +3577,7 @@ bool svm_interrupt_blocked(struct kvm_vcpu *vcpu)
+>  	if (!gif_set(svm))
+>  		return true;
+>  
+> -	if (sev_es_guest(vcpu->kvm)) {
+> -		/*
+> -		 * SEV-ES guests to not expose RFLAGS. Use the VMCB interrupt mask
+> -		 * bit to determine the state of the IF flag.
+> -		 */
+> -		if (!(vmcb->control.int_state & SVM_GUEST_INTERRUPT_MASK))
+> -			return true;
+> -	} else if (is_guest_mode(vcpu)) {
+> +	if (is_guest_mode(vcpu)) {
+>  		/* As long as interrupts are being delivered...  */
+>  		if ((svm->nested.ctl.int_ctl & V_INTR_MASKING_MASK)
+>  		    ? !(svm->vmcb01.ptr->save.rflags & X86_EFLAGS_IF)
+> @@ -3586,7 +3588,7 @@ bool svm_interrupt_blocked(struct kvm_vcpu *vcpu)
+>  		if (nested_exit_on_intr(svm))
+>  			return false;
+>  	} else {
+> -		if (!(kvm_get_rflags(vcpu) & X86_EFLAGS_IF))
+> +		if (!svm_get_if_flag(vcpu))
+>  			return true;
+>  	}
+>  
+> @@ -4621,6 +4623,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+>  	.cache_reg = svm_cache_reg,
+>  	.get_rflags = svm_get_rflags,
+>  	.set_rflags = svm_set_rflags,
+> +	.get_if_flag = svm_get_if_flag,
+>  
+>  	.tlb_flush_all = svm_flush_tlb,
+>  	.tlb_flush_current = svm_flush_tlb,
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 9453743ce0c4..269de5bb98d7 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -1363,6 +1363,11 @@ void vmx_set_rflags(struct kvm_vcpu *vcpu, unsigned long rflags)
+>  		vmx->emulation_required = vmx_emulation_required(vcpu);
+>  }
+>  
+> +static bool vmx_get_if_flag(struct kvm_vcpu *vcpu)
 > +{
->   	gmap_enable(vcpu->arch.enabled_gmap);
->   	kvm_s390_set_cpuflags(vcpu, CPUSTAT_RUNNING);
->   	if (vcpu->arch.cputm_enabled && !is_vcpu_idle(vcpu))
->   		__start_cpu_timer_accounting(vcpu);
->   	vcpu->cpu = cpu;
+> +	return vmx_get_rflags(vcpu) & X86_EFLAGS_IF;
+> +}
 > +
-> +	/*
-> +	 * With PTF interpretation the guest will be aware of topology
-> +	 * change when the Multiprocessor Topology-Change-Report is pending.
-> +	 * We check for events modifying the result of STSI_15_2:
-> +	 * - A new vCPU has been hotplugged (prev_cpu == -1)
-> +	 * - The real CPU backing up the vCPU moved to another socket
-> +	 */
-> +	if (vcpu->arch.sie_block->ecb & ECB_PTF) {
-> +		if (vcpu->arch.prev_cpu == -1 ||
-> +		    (topology_physical_package_id(cpu) !=
-> +		     topology_physical_package_id(vcpu->arch.prev_cpu)))
+>  u32 vmx_get_interrupt_shadow(struct kvm_vcpu *vcpu)
+>  {
+>  	u32 interruptibility = vmcs_read32(GUEST_INTERRUPTIBILITY_INFO);
+> @@ -7575,6 +7580,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
+>  	.cache_reg = vmx_cache_reg,
+>  	.get_rflags = vmx_get_rflags,
+>  	.set_rflags = vmx_set_rflags,
+> +	.get_if_flag = vmx_get_if_flag,
+>  
+>  	.tlb_flush_all = vmx_flush_tlb_all,
+>  	.tlb_flush_current = vmx_flush_tlb_current,
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index e0aa4dd53c7f..45e836db5bcd 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -8995,14 +8995,7 @@ static void post_kvm_run_save(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm_run *kvm_run = vcpu->run;
+>  
+> -	/*
+> -	 * if_flag is obsolete and useless, so do not bother
+> -	 * setting it for SEV-ES guests.  Userspace can just
+> -	 * use kvm_run->ready_for_interrupt_injection.
+> -	 */
+> -	kvm_run->if_flag = !vcpu->arch.guest_state_protected
+> -		&& (kvm_get_rflags(vcpu) & X86_EFLAGS_IF) != 0;
+> -
+> +	kvm_run->if_flag = static_call(kvm_x86_get_if_flag)(vcpu);
+>  	kvm_run->cr8 = kvm_get_cr8(vcpu);
+>  	kvm_run->apic_base = kvm_get_apic_base(vcpu);
+>  
 
-This is barely readable, might be good to put this check in a separate 
-function in kvm-s390.h.
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 
-> +			kvm_s390_set_mtcr(vcpu);
-> +	}
->   }
->   
->   void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->   {
-> +	/* Remember which CPU was backing the vCPU */
-> +	vcpu->arch.prev_cpu = vcpu->cpu;
->   	vcpu->cpu = -1;
->   	if (vcpu->arch.cputm_enabled && !is_vcpu_idle(vcpu))
->   		__stop_cpu_timer_accounting(vcpu);
-> @@ -3220,6 +3263,13 @@ static int kvm_s390_vcpu_setup(struct kvm_vcpu *vcpu)
->   		vcpu->arch.sie_block->ecb |= ECB_HOSTPROTINT;
->   	if (test_kvm_facility(vcpu->kvm, 9))
->   		vcpu->arch.sie_block->ecb |= ECB_SRSI;
-> +
-> +	/* PTF needs guest facilities to enable interpretation */
-
-Please explain.
-How is this different from any other facility a few lines above in this 
-function?
-
-> +	if (test_kvm_facility(vcpu->kvm, 11))
-> +		vcpu->arch.sie_block->ecb |= ECB_PTF;
-> +	/* Set the prev_cpu value to an impossible value to detect a new vcpu */
-
-We can either change this to:
-"A prev_value of -1 indicates this is a new vcpu"
-
-Or we define a constant which will also make the check in 
-kvm_arch_vcpu_load() easier to understand.
-
-> +	vcpu->arch.prev_cpu = -1;
-> +
->   	if (test_kvm_facility(vcpu->kvm, 73))
->   		vcpu->arch.sie_block->ecb |= ECB_TE;
->   	if (!kvm_is_ucontrol(vcpu->kvm))
-> diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
-> index 417154b314a6..26d165733496 100644
-> --- a/arch/s390/kvm/priv.c
-> +++ b/arch/s390/kvm/priv.c
-> @@ -861,7 +861,8 @@ static int handle_stsi(struct kvm_vcpu *vcpu)
->   	if (vcpu->arch.sie_block->gpsw.mask & PSW_MASK_PSTATE)
->   		return kvm_s390_inject_program_int(vcpu, PGM_PRIVILEGED_OP);
->   
-> -	if (fc > 3) {
-> +	if ((fc > 3 && fc != 15) ||
-> +	    (fc == 15 && !test_kvm_facility(vcpu->kvm, 11))) {
->   		kvm_s390_set_psw_cc(vcpu, 3);
->   		return 0;
->   	}
-
-How about:
-
-if (fc > 3 && fc != 15)
-	goto out_no_data;
-
-/* fc 15 is provided with PTF/CPU topology support */
-if (fc == 15 && !test_kvm_facility(vcpu->kvm, 11))
-	goto out_no_data;
-
-> @@ -898,6 +899,10 @@ static int handle_stsi(struct kvm_vcpu *vcpu)
->   			goto out_no_data;
->   		handle_stsi_3_2_2(vcpu, (void *) mem);
->   		break;
-> +	case 15:
-> +		trace_kvm_s390_handle_stsi(vcpu, fc, sel1, sel2, operand2);
-> +		insert_stsi_usr_data(vcpu, operand2, ar, fc, sel1, sel2);
-> +		return -EREMOTE;
->   	}
->   	if (kvm_s390_pv_cpu_is_protected(vcpu)) {
->   		memcpy((void *)sida_origin(vcpu->arch.sie_block), (void *)mem,
-> diff --git a/arch/s390/kvm/vsie.c b/arch/s390/kvm/vsie.c
-> index acda4b6fc851..da0397cf2cc7 100644
-> --- a/arch/s390/kvm/vsie.c
-> +++ b/arch/s390/kvm/vsie.c
-> @@ -503,6 +503,9 @@ static int shadow_scb(struct kvm_vcpu *vcpu, struct vsie_page *vsie_page)
->   	/* Host-protection-interruption introduced with ESOP */
->   	if (test_kvm_cpu_feat(vcpu->kvm, KVM_S390_VM_CPU_FEAT_ESOP))
->   		scb_s->ecb |= scb_o->ecb & ECB_HOSTPROTINT;
-> +	/* CPU Topology */
-> +	if (test_kvm_facility(vcpu->kvm, 11))
-> +		scb_s->ecb |= scb_o->ecb & ECB_PTF;
->   	/* transactional execution */
->   	if (test_kvm_facility(vcpu->kvm, 73) && wants_tx) {
->   		/* remap the prefix is tx is toggled on */
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 1daa45268de2..273c62dfbe9a 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1131,6 +1131,7 @@ struct kvm_ppc_resize_hpt {
->   #define KVM_CAP_EXIT_ON_EMULATION_FAILURE 204
->   #define KVM_CAP_ARM_MTE 205
->   #define KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM 206
-> +#define KVM_CAP_S390_CPU_TOPOLOGY 207
->   
->   #ifdef KVM_CAP_IRQ_ROUTING
->   
-> 
+Best regards,
+	Maxim Levitsky
 
