@@ -2,161 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A47746E552
-	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 10:12:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B0CA346E560
+	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 10:20:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234190AbhLIJQ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Dec 2021 04:16:28 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43812 "EHLO
+        id S234440AbhLIJYH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Dec 2021 04:24:07 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:30358 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229654AbhLIJQ1 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 Dec 2021 04:16:27 -0500
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B98wRn4005373;
-        Thu, 9 Dec 2021 09:12:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
+        by vger.kernel.org with ESMTP id S232940AbhLIJYG (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 Dec 2021 04:24:06 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B96wVQK021779;
+        Thu, 9 Dec 2021 09:20:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
  content-type : content-transfer-encoding; s=pp1;
- bh=JmcQClMRutBZg0exBO9eE3sOpVbfCJRjME933j2p6Uk=;
- b=hN0hhLJ3icu8akfiIZw0jxrnWu5sMxZYFZClIt4pyxmB2VNDdg7rM7eN7DPvzMzEoRZx
- LwF1dl1mGRmS7yotkmaK1r5mBbMZPu3zBuECVKPnO1SmM4/iKTK1M/Ff1xy++HWc21+9
- PHlzpWTWdEQDLD6YUUJknKTJhUkYsYtMunQDljl/sX+8CBaiq4DIpKwYevVV8ktHAa+n
- nX1TKXpGG9KN3HQNQOorvQgAKcJQybdzZrqxsUWpIGYk+tg6fGVPjV/RSoT3vP3Kr2rt
- XFv8gBSdDS+JsNtjHm8y2IkRN3s/UtNgRYidCh8ss1YZqXNf9yTlfHt+JqfiDiROEDR/ MA== 
+ bh=htgjlyjnR0tQfnlODHTJY7W3N23M44E+GMF0/KyhUSE=;
+ b=CWuW950MZCjkG54jLRsN5sRVSHyW3SanvMGmfXAYkLgqPQeXU372tDIc4faiWdXhr5ZW
+ JXZK2aCkkxJGF1cn3JlvIoFBz3Nyp7KSZPR+tJmGa4t2YJs5dbDQ1h9w9Wfpd68O8xZP
+ OnojEfeM6ZN1UBlTYqS+Ym0SLfSP2ksmhE7rJaCszjyWsLU1sOchWhRbMlpUkz39Bk79
+ aTc+P9DO7TNzrN0uB3yNg7JnxhJqMd65wJNqhWMt0ZVToRTPZV/CJRfaOu0tIfA0NtU0
+ 8zNjRZi8KrqVjn9wETAAeNBFbpPCLE+7fL/k1H6fIhJFMjjGYUtPrfgy5JyoU9r7/A0w +w== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cuert08ag-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cud0n2q7t-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Dec 2021 09:12:54 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1B993dnN022094;
-        Thu, 9 Dec 2021 09:12:53 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cuert089m-1
+        Thu, 09 Dec 2021 09:20:09 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1B99BaTn017529;
+        Thu, 9 Dec 2021 09:20:09 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cud0n2q6c-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Dec 2021 09:12:53 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1B99Bvje019538;
-        Thu, 9 Dec 2021 09:12:51 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
-        by ppma03ams.nl.ibm.com with ESMTP id 3cqyyafc5a-1
+        Thu, 09 Dec 2021 09:20:08 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1B99BSau011026;
+        Thu, 9 Dec 2021 09:20:05 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma04ams.nl.ibm.com with ESMTP id 3cqyyb7cjn-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 09 Dec 2021 09:12:51 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1B99CmQI22937892
+        Thu, 09 Dec 2021 09:20:05 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com [9.149.105.58])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1B998XDe29098426
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 9 Dec 2021 09:12:48 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E3805AE073;
-        Thu,  9 Dec 2021 09:12:47 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E7FDCAE055;
-        Thu,  9 Dec 2021 09:12:46 +0000 (GMT)
-Received: from [9.171.63.16] (unknown [9.171.63.16])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  9 Dec 2021 09:12:46 +0000 (GMT)
-Message-ID: <e4afc101-a85b-8de6-d0db-bc6e93180db6@linux.ibm.com>
-Date:   Thu, 9 Dec 2021 10:13:45 +0100
+        Thu, 9 Dec 2021 09:08:33 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 625354C040;
+        Thu,  9 Dec 2021 09:16:18 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 98CA34C066;
+        Thu,  9 Dec 2021 09:16:17 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.145.4.115])
+        by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  9 Dec 2021 09:16:17 +0000 (GMT)
+Date:   Thu, 9 Dec 2021 10:14:16 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>,
+        Ben Gardon <bgardon@google.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>
+Subject: Re: [PATCH 5/7] KVM: s390: Replace KVM_REQ_MMU_RELOAD usage with
+ arch specific request
+Message-ID: <20211209101416.7f81d946@p-imbrenda>
+In-Reply-To: <20211209060552.2956723-6-seanjc@google.com>
+References: <20211209060552.2956723-1-seanjc@google.com>
+        <20211209060552.2956723-6-seanjc@google.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH 10/32] s390/pci: stash dtsm and maxstbl
-Content-Language: en-US
-To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com,
-        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
-        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
-        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20211207205743.150299-1-mjrosato@linux.ibm.com>
- <20211207205743.150299-11-mjrosato@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <20211207205743.150299-11-mjrosato@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: T1T86lCEi_8TNhrPeo7RXe2m1vddi1Hg
-X-Proofpoint-GUID: jQ3q2uxiqF_kZP-KX03L8w7tfOTk49Yh
+X-Proofpoint-GUID: plf6rlDy0mwNz-4UFJuakyod9zFE2OYG
+X-Proofpoint-ORIG-GUID: vlZAIMVWOQCby1wttP3Nq8-CjRatTM1n
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
  definitions=2021-12-09_04,2021-12-08_01,2021-12-02_01
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- impostorscore=0 suspectscore=0 adultscore=0 mlxscore=0 bulkscore=0
- mlxlogscore=999 phishscore=0 priorityscore=1501 spamscore=0 clxscore=1015
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ mlxlogscore=999 priorityscore=1501 spamscore=0 impostorscore=0 mlxscore=0
+ suspectscore=0 phishscore=0 bulkscore=0 lowpriorityscore=0 clxscore=1015
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2110150000 definitions=main-2112090048
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu,  9 Dec 2021 06:05:50 +0000
+Sean Christopherson <seanjc@google.com> wrote:
 
-
-On 12/7/21 21:57, Matthew Rosato wrote:
-> Store information about what IOAT designation types are supported by
-> underlying hardware as well as the largest store block size allowed.
-> These values will be needed by passthrough.
+> Add an arch request, KVM_REQ_REFRESH_GUEST_PREFIX, to deal with guest
+> prefix changes instead of piggybacking KVM_REQ_MMU_RELOAD.  This will
+> allow for the removal of the generic KVM_REQ_MMU_RELOAD, which isn't
+> actually used by generic KVM.
 > 
-> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> No functional change intended.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+
 > ---
->   arch/s390/include/asm/pci.h     | 2 ++
->   arch/s390/include/asm/pci_clp.h | 6 ++++--
->   arch/s390/pci/pci_clp.c         | 2 ++
->   3 files changed, 8 insertions(+), 2 deletions(-)
+>  arch/s390/include/asm/kvm_host.h | 2 ++
+>  arch/s390/kvm/kvm-s390.c         | 8 ++++----
+>  arch/s390/kvm/kvm-s390.h         | 2 +-
+>  3 files changed, 7 insertions(+), 5 deletions(-)
 > 
-> diff --git a/arch/s390/include/asm/pci.h b/arch/s390/include/asm/pci.h
-> index 2474b8d30f2a..1a8f9f42da3a 100644
-> --- a/arch/s390/include/asm/pci.h
-> +++ b/arch/s390/include/asm/pci.h
-> @@ -126,9 +126,11 @@ struct zpci_dev {
->   	u32		gd;		/* GISA designation for passthrough */
->   	u16		vfn;		/* virtual function number */
->   	u16		pchid;		/* physical channel ID */
-> +	u16		maxstbl;	/* Maximum store block size */
->   	u8		pfgid;		/* function group ID */
->   	u8		pft;		/* pci function type */
->   	u8		port;
-> +	u8		dtsm;		/* Supported DT mask */
->   	u8		rid_available	: 1;
->   	u8		has_hp_slot	: 1;
->   	u8		has_resources	: 1;
-> diff --git a/arch/s390/include/asm/pci_clp.h b/arch/s390/include/asm/pci_clp.h
-> index 3af8d196da74..124fadfb74b9 100644
-> --- a/arch/s390/include/asm/pci_clp.h
-> +++ b/arch/s390/include/asm/pci_clp.h
-> @@ -153,9 +153,11 @@ struct clp_rsp_query_pci_grp {
->   	u8			:  6;
->   	u8 frame		:  1;
->   	u8 refresh		:  1;	/* TLB refresh mode */
-> -	u16 reserved2;
-> +	u16			:  3;
-> +	u16 maxstbl		: 13;	/* Maximum store block size */
->   	u16 mui;
-> -	u16			: 16;
-> +	u8 dtsm;			/* Supported DT mask */
-> +	u8 reserved3;
->   	u16 maxfaal;
->   	u16			:  4;
->   	u16 dnoi		: 12;
-> diff --git a/arch/s390/pci/pci_clp.c b/arch/s390/pci/pci_clp.c
-> index e9ed0e4a5cf0..bc7446566cbc 100644
-> --- a/arch/s390/pci/pci_clp.c
-> +++ b/arch/s390/pci/pci_clp.c
-> @@ -103,6 +103,8 @@ static void clp_store_query_pci_fngrp(struct zpci_dev *zdev,
->   	zdev->max_msi = response->noi;
->   	zdev->fmb_update = response->mui;
->   	zdev->version = response->version;
-> +	zdev->maxstbl = response->maxstbl;
-> +	zdev->dtsm = response->dtsm;
->   
->   	switch (response->version) {
->   	case 1:
-> 
+> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+> index a22c9266ea05..766028d54a3e 100644
+> --- a/arch/s390/include/asm/kvm_host.h
+> +++ b/arch/s390/include/asm/kvm_host.h
+> @@ -45,6 +45,8 @@
+>  #define KVM_REQ_START_MIGRATION KVM_ARCH_REQ(3)
+>  #define KVM_REQ_STOP_MIGRATION  KVM_ARCH_REQ(4)
+>  #define KVM_REQ_VSIE_RESTART	KVM_ARCH_REQ(5)
+> +#define KVM_REQ_REFRESH_GUEST_PREFIX	\
+> +	KVM_ARCH_REQ_FLAGS(6, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+>  
+>  #define SIGP_CTRL_C		0x80
+>  #define SIGP_CTRL_SCN_MASK	0x3f
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index dd099d352753..e161df69520c 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -3394,7 +3394,7 @@ static void kvm_gmap_notifier(struct gmap *gmap, unsigned long start,
+>  		if (prefix <= end && start <= prefix + 2*PAGE_SIZE - 1) {
+>  			VCPU_EVENT(vcpu, 2, "gmap notifier for %lx-%lx",
+>  				   start, end);
+> -			kvm_s390_sync_request(KVM_REQ_MMU_RELOAD, vcpu);
+> +			kvm_s390_sync_request(KVM_REQ_REFRESH_GUEST_PREFIX, vcpu);
+>  		}
+>  	}
+>  }
+> @@ -3796,19 +3796,19 @@ static int kvm_s390_handle_requests(struct kvm_vcpu *vcpu)
+>  	if (!kvm_request_pending(vcpu))
+>  		return 0;
+>  	/*
+> -	 * We use MMU_RELOAD just to re-arm the ipte notifier for the
+> +	 * If the guest prefix changed, re-arm the ipte notifier for the
+>  	 * guest prefix page. gmap_mprotect_notify will wait on the ptl lock.
+>  	 * This ensures that the ipte instruction for this request has
+>  	 * already finished. We might race against a second unmapper that
+>  	 * wants to set the blocking bit. Lets just retry the request loop.
+>  	 */
+> -	if (kvm_check_request(KVM_REQ_MMU_RELOAD, vcpu)) {
+> +	if (kvm_check_request(KVM_REQ_REFRESH_GUEST_PREFIX, vcpu)) {
+>  		int rc;
+>  		rc = gmap_mprotect_notify(vcpu->arch.gmap,
+>  					  kvm_s390_get_prefix(vcpu),
+>  					  PAGE_SIZE * 2, PROT_WRITE);
+>  		if (rc) {
+> -			kvm_make_request(KVM_REQ_MMU_RELOAD, vcpu);
+> +			kvm_make_request(KVM_REQ_REFRESH_GUEST_PREFIX, vcpu);
+>  			return rc;
+>  		}
+>  		goto retry;
+> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
+> index 60f0effcce99..219f92ffd556 100644
+> --- a/arch/s390/kvm/kvm-s390.h
+> +++ b/arch/s390/kvm/kvm-s390.h
+> @@ -105,7 +105,7 @@ static inline void kvm_s390_set_prefix(struct kvm_vcpu *vcpu, u32 prefix)
+>  		   prefix);
+>  	vcpu->arch.sie_block->prefix = prefix >> GUEST_PREFIX_SHIFT;
+>  	kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
+> -	kvm_make_request(KVM_REQ_MMU_RELOAD, vcpu);
+> +	kvm_make_request(KVM_REQ_REFRESH_GUEST_PREFIX, vcpu);
+>  }
+>  
+>  static inline u64 kvm_s390_get_base_disp_s(struct kvm_vcpu *vcpu, u8 *ar)
 
-Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
-
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
