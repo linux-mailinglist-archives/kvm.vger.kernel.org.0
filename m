@@ -2,106 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E76A46E785
-	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 12:22:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 04D6A46E78B
+	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 12:26:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236627AbhLIL00 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Dec 2021 06:26:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46904 "EHLO
+        id S236587AbhLIL3v (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Dec 2021 06:29:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235679AbhLIL0Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Dec 2021 06:26:25 -0500
-Received: from mail-ed1-x530.google.com (mail-ed1-x530.google.com [IPv6:2a00:1450:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5601AC061746;
-        Thu,  9 Dec 2021 03:22:52 -0800 (PST)
-Received: by mail-ed1-x530.google.com with SMTP id y13so18324648edd.13;
-        Thu, 09 Dec 2021 03:22:52 -0800 (PST)
+        with ESMTP id S235554AbhLIL3u (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Dec 2021 06:29:50 -0500
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5850EC061746;
+        Thu,  9 Dec 2021 03:26:17 -0800 (PST)
+Received: by mail-ed1-x52b.google.com with SMTP id w1so18354719edc.6;
+        Thu, 09 Dec 2021 03:26:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:references:from:in-reply-to
+         :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=rBgKd//ugvog+zMB81XepWQ5SSNkSmCsR0N1AvYk8Ck=;
-        b=obJasgqNOElxh1Wb5ygC8wWmrj3fiMpQt6Xzm3aN042RWYx58tBVndRV/un2Qw7o5s
-         aDeuDKQNOpHiGzKqRdS0GIbHXIaeL6q599egRHhlqjNsrtVSOo2Z+OiuAr2/4ddi5kbH
-         VzU7kIKPhRHqJ6jGXfw5jm5sFQV3XByMC7BlKDSo6RZ89j0H2zEDsu83LgIiExuXHjJP
-         726/JoPn+zNfyW+494ApYIBEq0p9bmMovvd+sWBtH1pXVmHzyBGf3IhZ9Vv8R6clT18k
-         APml5NgJhfJexJ2YnulQ6z96JpSaG1uhLv3OtHBfhOYEXscqsvSNlUkqq5kdclE2O8l9
-         9JXg==
+        bh=6I7gcf5wC47jbwDo1JFSLG4r1VHdFOvTP1BivCmF0hY=;
+        b=CS+uz0etQyLnpDt0mL0vLTBDDW4RoOjwnzqNw1rGSH9xPONOjPWZlSlf4K/T1e9KOW
+         RW+eaoU2vCu3/Ci0d1vUsgc8dQ/USnElm3wLZ1zKQSaBhsE2OQUiW9sueTesXxltipWD
+         wUddLZoyjnQrxIa2kUvM7qoOyWcp2teOYzbNERumsfTLLp/qi7ZfT9YPKFDz2D+v7g/E
+         VGRr+wpe2dNDf/bjVvBB60mVPCh5xCc1swjziKTh6os+WN5AmW7p+Ty2ZJc3wdLAugF6
+         lcu4qJE+NfJGMpjX7DInICmmfMMvD/NyxoO08KH+gZxmGtlXTGJy04pI/utcTIX9T0EC
+         yNxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:references:from:in-reply-to
+         :subject:content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=rBgKd//ugvog+zMB81XepWQ5SSNkSmCsR0N1AvYk8Ck=;
-        b=Ms+nPmNyvBGUKN7Q3DZ7n6aVJEZaJBb6WsawDNMHae0H1CDcP5rua45Xj/eiTm4Kw5
-         OoiO9EkPDhdVFmTf+txDZTWMH9lzjImYb01KNUt8PvQ+2mbU3fX5/TTCYHfQ/skWFJHX
-         SaQLWovIEOXVMBnoL3c32dxBDPRh+hNdF/lu1FNw7Pt6Avkx82HAn3rmaGWzhVyTHxpY
-         krFVtOtZZgUPBIPJE5DQbT4+DdM7GC91g+ULgoAE5GqNB322YR8Ae9Ql/Qg4iz3nDy9w
-         3NfjZibYMh+SzIjx1n3aF26sL/q3Uu6HtfBiHexXCLqI08gncPDSLItHmDLvzRoux798
-         nhGw==
-X-Gm-Message-State: AOAM531X87i7QAMOtcGT8PAMwDHCWbzCRnANxH1iF8R6eRhKgAYNMOKa
-        J2C0E3qZaEtr4ef72g2ZBjE=
-X-Google-Smtp-Source: ABdhPJyjheFHR4D4XLt4NDmcxerB9zuiEfrit8/gGLiXAg9UbsRjtlnut0Fl5/P1yG9abeH8mqBBGQ==
-X-Received: by 2002:a17:907:3c7:: with SMTP id su7mr15169796ejb.87.1639048970900;
-        Thu, 09 Dec 2021 03:22:50 -0800 (PST)
+        bh=6I7gcf5wC47jbwDo1JFSLG4r1VHdFOvTP1BivCmF0hY=;
+        b=fvWAfJdYHDs3T3O3eh+vABu2zmrSoQci++CEJ2Z+MYxilWER6SASs0xRgLxPtXa0Ef
+         iuEP7kLq3cBDfCa0tTalwV8tGqNLCoidzSOr7HHLZ9KYi68uZlWQXYXXdz6BP5Mfe6PS
+         yGWn26ZHgXNfgQKJHTR/AMq25eb+PqFZhx8wehtrJRsgWQMgLC9bxR0zqRGMY0VezigM
+         k8ExIr09fV4JY4HcfJleNSew1uykap19gRDU7uPgNftN7UTbxDDmczj9JcfGXqtaBTRw
+         +9R39zexuEWtNbtd01GaWHWPQIlsB/U5ORxhTah3JXf7ep2vquaPxTsqlqdoRWX+sdOP
+         mkVQ==
+X-Gm-Message-State: AOAM530zAz2P1T7RSltZGV/JUalrv6Ywj7rrCNKb+xuramq7vh1hnz/m
+        FIisLoEUKhUHW57gbIS96Kc=
+X-Google-Smtp-Source: ABdhPJzQUAk/nnR/ZGguzZslyhqKPWxv1/TTFLH0O6nxkwyQXgKu+O396y31Jt1KzIsrgwX0LldNwg==
+X-Received: by 2002:a05:6402:190c:: with SMTP id e12mr28771087edz.396.1639049173867;
+        Thu, 09 Dec 2021 03:26:13 -0800 (PST)
 Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id jy28sm2641457ejc.118.2021.12.09.03.22.50
+        by smtp.googlemail.com with ESMTPSA id cw5sm3089837ejc.74.2021.12.09.03.26.11
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Dec 2021 03:22:50 -0800 (PST)
+        Thu, 09 Dec 2021 03:26:13 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <57c83b62-675f-d368-e09f-7f97d3a7e3fb@redhat.com>
-Date:   Thu, 9 Dec 2021 12:22:49 +0100
+Message-ID: <b3f9f46d-a424-a58c-e503-9069f46585f3@redhat.com>
+Date:   Thu, 9 Dec 2021 12:26:09 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.2.0
-Subject: Re: [PATCH 0/2] KVM: x86: Rep string I/O WARN removal and test
+Subject: Re: [PATCH 0/4] KVM: VMX: Fix handling of invalid L2 guest state
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20211025201311.1881846-1-seanjc@google.com>
- <YbGYuDgaqcRH/CZo@google.com>
+        linux-kernel@vger.kernel.org,
+        syzbot+f1d2136db9c80d4733e8@syzkaller.appspotmail.com,
+        Maxim Levitsky <mlevitsk@redhat.com>
+References: <20211207193006.120997-1-seanjc@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YbGYuDgaqcRH/CZo@google.com>
+In-Reply-To: <20211207193006.120997-1-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/9/21 06:48, Sean Christopherson wrote:
-> On Mon, Oct 25, 2021, Sean Christopherson wrote:
->> Remove a WARN that was added as part of the recent I/O overhaul to play
->> nice with SEV-ES string I/O.
->>
->> For the record, my FIXME in lieu of a WARN was deliberate, as I suspected
->> userspace could trigger a WARN ;-)
->>
->> Based on kvm/master, commit 95e16b4792b0 ("KVM: SEV-ES: go over the
->> sev_pio_data buffer in multiple passes if needed").
->>
->> Sean Christopherson (2):
->>    KVM: x86: Don't WARN if userspace mucks with RCX during string I/O
->>      exit
->>    KVM: selftests: Add test to verify KVM doesn't explode on "bad" I/O
->>
->>   arch/x86/kvm/x86.c                            |   9 +-
->>   tools/testing/selftests/kvm/.gitignore        |   1 +
->>   tools/testing/selftests/kvm/Makefile          |   1 +
->>   .../selftests/kvm/x86_64/userspace_io_test.c  | 114 ++++++++++++++++++
->>   4 files changed, 123 insertions(+), 2 deletions(-)
->>   create mode 100644 tools/testing/selftests/kvm/x86_64/userspace_io_test.c
+On 12/7/21 20:30, Sean Christopherson wrote:
+> Fixes and a test for invalid L2 guest state.  TL;DR: KVM should never
+> emulate L2 if L2's guest state is invalid.
 > 
-> Ping.  I completely forgot about this too, until I unintentionally ran a
-> userspace_io_test that was lying around.
+> Patch 01 fixes a regression found by syzbot. Patch 02 closes what I suspect
+> was the hole the buggy patch was trying to close.  Patch 03 is a related
+> docs update.  Patch 04 is a selftest for the regression and for a subset
+> of patch 02's behavior.
+> 
+> Sean Christopherson (4):
+>    KVM: VMX: Always clear vmx->fail on emulation_required
+>    KVM: nVMX: Synthesize TRIPLE_FAULT for L2 if emulation is required
+>    KVM: VMX: Fix stale docs for kvm-intel.emulate_invalid_guest_state
+>    KVM: selftests: Add test to verify TRIPLE_FAULT on invalid L2 guest
+>      state
+> 
+>   .../admin-guide/kernel-parameters.txt         |   8 +-
+>   arch/x86/kvm/vmx/vmx.c                        |  36 ++++--
+>   tools/testing/selftests/kvm/.gitignore        |   1 +
+>   tools/testing/selftests/kvm/Makefile          |   1 +
+>   .../x86_64/vmx_invalid_nested_guest_state.c   | 105 ++++++++++++++++++
+>   5 files changed, 138 insertions(+), 13 deletions(-)
+>   create mode 100644 tools/testing/selftests/kvm/x86_64/vmx_invalid_nested_guest_state.c
 > 
 
-Queued now, thanks.  I don't know if I want the honor of having KVM 
-singled out again on the -rc release message, but these are bugs 
-nevertheless...
+Queued, thanks.
 
 Paolo
