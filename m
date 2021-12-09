@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id AD1FE46F67E
-	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 23:09:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0176D46F67F
+	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 23:09:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233254AbhLIWMw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S231400AbhLIWMw (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Thu, 9 Dec 2021 17:12:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59514 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231272AbhLIWMv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S231253AbhLIWMv (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 9 Dec 2021 17:12:51 -0500
 Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65607C0617A2
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 651B0C0617A1
         for <kvm@vger.kernel.org>; Thu,  9 Dec 2021 14:09:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Reply-To:Content-Type:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=aF2VJz818y4HgBgf3CkuDSyw9YreBIt/kI+rCIY9Axk=; b=pd83DsM8isN2L7/F5QSmaEuF8w
-        Cb72uwtBkx3wLjoJxWtntmtw3vlWCIQD3LoMV3uZkgm5+D45etOzfA7zmbtGEqdFyCMyAm0S+I7Vr
-        b+bMWQr4naWZOfB6WQ9UzAtcCqasZdd3muv8LHwnS9AoaIN4AZ4m0lluZx1QMA+eSTCEimtM6Ervu
-        8TG+R81UWgdBwL8ATQ27MndeLeU9tai/Eg8EP8i1ouSbEwd8STErcItqyiQTO9y4QEJe960w11DcP
-        RbSVgEGQtk2nEN+UAEAmpq3d5AHOxBUn9bafB+bDbmRCU/mv/98/VJZl7dX1XGLRGAUGwtuJq4QIt
-        i6Th7hDg==;
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
+        Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=P6f35iHkW27bYKrXKVfssYuF4aX8DsMoePwrZGh388Y=; b=QFa5QICMSxxiDRr8Beg7VYfEAv
+        p/DL6z6HrvRONhadMeoMETfekFz9AqCkTnmenSpp+Ux4r+8g7TFUvQSQhMnj+vGkjk+A/IAA6S+EE
+        XUAN6akFNVm/0Kz118EXnIGBPwgDbSwlo+7RdRQZ5aYwFWzqdK0+mlZLF+Q0KgKAVp3w473P2nZh+
+        sxoBBlKKukb+0LR9j5k53fyt8//2JvjC/WNzVLxgCyADH3dEUcUjqfe2HzuKAJGvUgyLrhWKjAfXi
+        o1cW6D21kV9tqjLQUKHE9qbQ1kdop9T4k6dJdjcCpheZVJrZCOx5uDo65hAAN9LHlD5Nr5o4dmrQz
+        Vj+QKFsw==;
 Received: from i7.infradead.org ([2001:8b0:10b:1:21e:67ff:fecb:7a92])
         by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mvRaj-000RNe-Aq; Thu, 09 Dec 2021 22:08:50 +0000
+        id 1mvRaj-000RNf-B2; Thu, 09 Dec 2021 22:08:50 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mvRai-0003su-UJ; Thu, 09 Dec 2021 22:08:40 +0000
+        id 1mvRaj-0003sx-0h; Thu, 09 Dec 2021 22:08:41 +0000
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     qemu-devel@nongnu.org
 Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
@@ -38,10 +38,12 @@ Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
         Eduardo Habkost <eduardo@habkost.net>,
         Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
         Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org
-Subject: [PATCH v2 1/4] target/i386: Fix sanity check on max APIC ID / X2APIC enablement
-Date:   Thu,  9 Dec 2021 22:08:37 +0000
-Message-Id: <20211209220840.14889-1-dwmw2@infradead.org>
+Subject: [PATCH v2 2/4] intel_iommu: Support IR-only mode without DMA translation
+Date:   Thu,  9 Dec 2021 22:08:38 +0000
+Message-Id: <20211209220840.14889-2-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20211209220840.14889-1-dwmw2@infradead.org>
+References: <20211209220840.14889-1-dwmw2@infradead.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: David Woodhouse <dwmw2@infradead.org>
@@ -50,91 +52,73 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The check on x86ms->apic_id_limit in pc_machine_done() had two problems.
+From: David Woodhouse <dwmw@amazon.co.uk>
 
-Firstly, we need KVM to support the X2APIC API in order to allow IRQ
-delivery to APICs >= 255. So we need to call/check kvm_enable_x2apic(),
-which was done elsewhere in *some* cases but not all.
+By setting none of the SAGAW bits we can indicate to a guest that DMA
+translation isn't supported. Tested by booting Windows 10, as well as
+Linux guests with the fix at https://git.kernel.org/torvalds/c/c40aaaac10
 
-Secondly, microvm needs the same check. So move it from pc_machine_done()
-to x86_cpus_init() where it will work for both.
-
-The check in kvm_cpu_instance_init() is now redundant and can be dropped.
-
-Signed-off-by: David Woodhouse <dwmw2@infradead.org>
+Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 Acked-by: Claudio Fontana <cfontana@suse.de>
 ---
- hw/i386/pc.c              |  8 --------
- hw/i386/x86.c             | 16 ++++++++++++++++
- target/i386/kvm/kvm-cpu.c |  2 +-
- 3 files changed, 17 insertions(+), 9 deletions(-)
+ hw/i386/intel_iommu.c         | 14 ++++++++++----
+ include/hw/i386/intel_iommu.h |  1 +
+ 2 files changed, 11 insertions(+), 4 deletions(-)
 
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index a2ef40ecbc..9959f93216 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -736,14 +736,6 @@ void pc_machine_done(Notifier *notifier, void *data)
-         /* update FW_CFG_NB_CPUS to account for -device added CPUs */
-         fw_cfg_modify_i16(x86ms->fw_cfg, FW_CFG_NB_CPUS, x86ms->boot_cpus);
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index f584449d8d..9a3cb2b789 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -2202,7 +2202,7 @@ static void vtd_handle_gcmd_write(IntelIOMMUState *s)
+     uint32_t changed = status ^ val;
+ 
+     trace_vtd_reg_write_gcmd(status, val);
+-    if (changed & VTD_GCMD_TE) {
++    if ((changed & VTD_GCMD_TE) && s->dma_translation) {
+         /* Translation enable/disable */
+         vtd_handle_gcmd_te(s, val & VTD_GCMD_TE);
      }
--
--
--    if (x86ms->apic_id_limit > 255 && !xen_enabled() &&
--        !kvm_irqchip_in_kernel()) {
--        error_report("current -smp configuration requires kernel "
--                     "irqchip support.");
--        exit(EXIT_FAILURE);
--    }
- }
+@@ -3100,6 +3100,7 @@ static Property vtd_properties[] = {
+     DEFINE_PROP_BOOL("caching-mode", IntelIOMMUState, caching_mode, FALSE),
+     DEFINE_PROP_BOOL("x-scalable-mode", IntelIOMMUState, scalable_mode, FALSE),
+     DEFINE_PROP_BOOL("dma-drain", IntelIOMMUState, dma_drain, true),
++    DEFINE_PROP_BOOL("dma-translation", IntelIOMMUState, dma_translation, true),
+     DEFINE_PROP_END_OF_LIST(),
+ };
  
- void pc_guest_info_init(PCMachineState *pcms)
-diff --git a/hw/i386/x86.c b/hw/i386/x86.c
-index b84840a1bb..f64639b873 100644
---- a/hw/i386/x86.c
-+++ b/hw/i386/x86.c
-@@ -39,6 +39,7 @@
- #include "sysemu/replay.h"
- #include "sysemu/sysemu.h"
- #include "sysemu/cpu-timers.h"
-+#include "sysemu/xen.h"
- #include "trace.h"
+@@ -3605,12 +3606,17 @@ static void vtd_init(IntelIOMMUState *s)
+     s->next_frcd_reg = 0;
+     s->cap = VTD_CAP_FRO | VTD_CAP_NFR | VTD_CAP_ND |
+              VTD_CAP_MAMV | VTD_CAP_PSI | VTD_CAP_SLLPS |
+-             VTD_CAP_SAGAW_39bit | VTD_CAP_MGAW(s->aw_bits);
++             VTD_CAP_MGAW(s->aw_bits);
+     if (s->dma_drain) {
+         s->cap |= VTD_CAP_DRAIN;
+     }
+-    if (s->aw_bits == VTD_HOST_AW_48BIT) {
+-        s->cap |= VTD_CAP_SAGAW_48bit;
++    if (s->dma_translation) {
++            if (s->aw_bits >= VTD_HOST_AW_39BIT) {
++                    s->cap |= VTD_CAP_SAGAW_39bit;
++            }
++            if (s->aw_bits >= VTD_HOST_AW_48BIT) {
++                    s->cap |= VTD_CAP_SAGAW_48bit;
++            }
+     }
+     s->ecap = VTD_ECAP_QI | VTD_ECAP_IRO;
  
- #include "hw/i386/x86.h"
-@@ -136,6 +137,21 @@ void x86_cpus_init(X86MachineState *x86ms, int default_cpu_version)
-      */
-     x86ms->apic_id_limit = x86_cpu_apic_id_from_index(x86ms,
-                                                       ms->smp.max_cpus - 1) + 1;
-+
-+    /*
-+     * Can we support APIC ID 255 or higher?
-+     *
-+     * Under Xen: yes.
-+     * With userspace emulated lapic: no
-+     * With KVM's in-kernel lapic: only if X2APIC API is enabled.
-+     */
-+    if (x86ms->apic_id_limit > 255 && !xen_enabled() &&
-+        (!kvm_irqchip_in_kernel() || !kvm_enable_x2apic())) {
-+        error_report("current -smp configuration requires kernel "
-+                     "irqchip and X2APIC API support.");
-+        exit(EXIT_FAILURE);
-+    }
-+
-     possible_cpus = mc->possible_cpu_arch_ids(ms);
-     for (i = 0; i < ms->smp.cpus; i++) {
-         x86_cpu_new(x86ms, possible_cpus->cpus[i].arch_id, &error_fatal);
-diff --git a/target/i386/kvm/kvm-cpu.c b/target/i386/kvm/kvm-cpu.c
-index d95028018e..c60cb2dafb 100644
---- a/target/i386/kvm/kvm-cpu.c
-+++ b/target/i386/kvm/kvm-cpu.c
-@@ -165,7 +165,7 @@ static void kvm_cpu_instance_init(CPUState *cs)
-         /* only applies to builtin_x86_defs cpus */
-         if (!kvm_irqchip_in_kernel()) {
-             x86_cpu_change_kvm_default("x2apic", "off");
--        } else if (kvm_irqchip_is_split() && kvm_enable_x2apic()) {
-+        } else if (kvm_irqchip_is_split()) {
-             x86_cpu_change_kvm_default("kvm-msi-ext-dest-id", "on");
-         }
+diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+index 41783ee46d..42d6a6a636 100644
+--- a/include/hw/i386/intel_iommu.h
++++ b/include/hw/i386/intel_iommu.h
+@@ -266,6 +266,7 @@ struct IntelIOMMUState {
+     bool buggy_eim;                 /* Force buggy EIM unless eim=off */
+     uint8_t aw_bits;                /* Host/IOVA address width (in bits) */
+     bool dma_drain;                 /* Whether DMA r/w draining enabled */
++    bool dma_translation;           /* Whether DMA translation supported */
  
+     /*
+      * Protects IOMMU states in general.  Currently it protects the
 -- 
 2.31.1
 
