@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 39BE346F67C
+	by mail.lfdr.de (Postfix) with ESMTP id 3AB6D46F67D
 	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 23:09:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232314AbhLIWMg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S232340AbhLIWMg (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Thu, 9 Dec 2021 17:12:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59440 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59448 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231180AbhLIWMe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Dec 2021 17:12:34 -0500
+        with ESMTP id S231272AbhLIWMg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Dec 2021 17:12:36 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4600BC061746
-        for <kvm@vger.kernel.org>; Thu,  9 Dec 2021 14:08:59 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF913C0617A1
+        for <kvm@vger.kernel.org>; Thu,  9 Dec 2021 14:09:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=6T8H5SlZi4uUdKoCbrgDO6stZljqx7xoEBEiCfG7UWI=; b=CciiV4aJXjCUHa+0cePD85FEhI
-        U9bgUiT8WbOi8acWFbkot4IWwgXOTXp3+SjFSvg9D+ZdgnIy3HBAddxtVtPGNUpOZO3FZRxbDOR1o
-        YTlXxE6zqjNdpNyVNX9ZgNjArRlcEAxgaPQh0q3Nb5B31sOR3uLZRlTR4XfOHeIqDUP24mHMQoj/o
-        6F9VfvYmtqXoA7MBGrObhccuveuFog8Sv+LDkwmbOXxdeGOBu4FdYx67culwfyxRSUI4FpUBRwl7z
-        MnWs7DETKjqWg98b+qIjX500QvWMOyXIU1M0JZj6A3XXXF7Q9AqSAbo+j3hZCFCOxeJqgIm5/UK4m
-        Ep+ls07Q==;
+        bh=/5Qkoh8pYH5HbNhrnTekBbg9zajs4rUylaVCWNLcGsk=; b=BAsinmt782kleeOm9L/2dn1uZI
+        BogZi8zGxKgmuzDQ8eR1ixyoI8wXRrQeO8ZtNPyuuKaeTPl+oHK9OdgGAcugWyLHFoxcFm4IL9MB1
+        IpnAOPlv/Hq3e6kO6zhlI/Q2b1A6MHja1zUiNN80YDtjc9gdFF3g6FHbygB4XR6SvnYGx0OdWI0nV
+        ErhOVOKhK7ktKLccF+INUtnNKntKiVCPUhCecN3xgGJI73IDC0Br0Jp2h9alg7c2epyVDF9SP7Y5E
+        RmLeJIF6IBnRSvCulbySf39JQ6Dx0+FFfP/nfTgwpKzT3/mvfapxyZxbuHudKOn28YkqjFIlzkWrU
+        LbaTBUCQ==;
 Received: from i7.infradead.org ([2001:8b0:10b:1:21e:67ff:fecb:7a92])
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mvRai-009loX-S9; Thu, 09 Dec 2021 22:08:41 +0000
+        id 1mvRai-009loY-Uc; Thu, 09 Dec 2021 22:08:41 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mvRaj-0003t0-31; Thu, 09 Dec 2021 22:08:41 +0000
+        id 1mvRaj-0003t5-53; Thu, 09 Dec 2021 22:08:41 +0000
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     qemu-devel@nongnu.org
 Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
@@ -38,9 +38,9 @@ Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
         Eduardo Habkost <eduardo@habkost.net>,
         Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
         Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org
-Subject: [PATCH v2 3/4] intel_iommu: Only allow interrupt remapping to be enabled if it's supported
-Date:   Thu,  9 Dec 2021 22:08:39 +0000
-Message-Id: <20211209220840.14889-3-dwmw2@infradead.org>
+Subject: [PATCH v2 4/4] intel_iommu: Fix irqchip / X2APIC configuration checks
+Date:   Thu,  9 Dec 2021 22:08:40 +0000
+Message-Id: <20211209220840.14889-4-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20211209220840.14889-1-dwmw2@infradead.org>
 References: <20211209220840.14889-1-dwmw2@infradead.org>
@@ -52,40 +52,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: David Woodhouse <dwmw@amazon.co.uk>
+We don't need to check kvm_enable_x2apic(). It's perfectly OK to support
+interrupt remapping even if we can't address CPUs above 254. Kind of
+pointless, but still functional.
 
-We should probably check if we were meant to be exposing IR, before
-letting the guest turn the IRE bit on.
+The check on kvm_enable_x2apic() needs to happen *anyway* in order to
+allow CPUs above 254 even without an IOMMU, so allow that to happen
+elsewhere.
 
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+However, we do require the *split* irqchip in order to rewrite I/OAPIC
+destinations. So fix that check while we're here.
+
+Signed-off-by: David Woodhouse <dwmw2@infradead.org>
 Reviewed-by: Peter Xu <peterx@redhat.com>
 Acked-by: Jason Wang <jasowang@redhat.com>
 ---
- hw/i386/intel_iommu.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ hw/i386/intel_iommu.c | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
 
 diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-index 9a3cb2b789..bd288d45bb 100644
+index bd288d45bb..0d1c72f08e 100644
 --- a/hw/i386/intel_iommu.c
 +++ b/hw/i386/intel_iommu.c
-@@ -2197,6 +2197,7 @@ static void vtd_handle_gcmd_ire(IntelIOMMUState *s, bool en)
- /* Handle write to Global Command Register */
- static void vtd_handle_gcmd_write(IntelIOMMUState *s)
- {
-+    X86IOMMUState *x86_iommu = X86_IOMMU_DEVICE(s);
-     uint32_t status = vtd_get_long_raw(s, DMAR_GSTS_REG);
-     uint32_t val = vtd_get_long_raw(s, DMAR_GCMD_REG);
-     uint32_t changed = status ^ val;
-@@ -2218,7 +2219,8 @@ static void vtd_handle_gcmd_write(IntelIOMMUState *s)
-         /* Set/update the interrupt remapping root-table pointer */
-         vtd_handle_gcmd_sirtp(s);
+@@ -3760,15 +3760,10 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
+                                               ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
      }
--    if (changed & VTD_GCMD_IRE) {
-+    if ((changed & VTD_GCMD_IRE) &&
-+        x86_iommu_ir_supported(x86_iommu)) {
-         /* Interrupt remap enable/disable */
-         vtd_handle_gcmd_ire(s, val & VTD_GCMD_IRE);
+     if (s->intr_eim == ON_OFF_AUTO_ON && !s->buggy_eim) {
+-        if (!kvm_irqchip_in_kernel()) {
++        if (!kvm_irqchip_is_split()) {
+             error_setg(errp, "eim=on requires accel=kvm,kernel-irqchip=split");
+             return false;
+         }
+-        if (!kvm_enable_x2apic()) {
+-            error_setg(errp, "eim=on requires support on the KVM side"
+-                             "(X2APIC_API, first shipped in v4.7)");
+-            return false;
+-        }
      }
+ 
+     /* Currently only address widths supported are 39 and 48 bits */
 -- 
 2.31.1
 
