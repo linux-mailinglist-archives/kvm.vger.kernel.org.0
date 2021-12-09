@@ -2,285 +2,214 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F25BC46F322
-	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 19:31:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 237A646F32F
+	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 19:34:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243346AbhLISf0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Dec 2021 13:35:26 -0500
-Received: from alexa-out-sd-02.qualcomm.com ([199.106.114.39]:45465 "EHLO
-        alexa-out-sd-02.qualcomm.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231562AbhLISfY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 Dec 2021 13:35:24 -0500
+        id S243373AbhLIShr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Dec 2021 13:37:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37750 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230410AbhLIShq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Dec 2021 13:37:46 -0500
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2027C061746;
+        Thu,  9 Dec 2021 10:34:12 -0800 (PST)
+Received: by mail-ed1-x52f.google.com with SMTP id z5so22927675edd.3;
+        Thu, 09 Dec 2021 10:34:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
-  t=1639074710; x=1670610710;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=jHbm9fqeLjIa7MYTa17OcDiwk+I9tW82E1rHun6NuGI=;
-  b=V6XYCuozBbXu5GqhfyqZtYiyLXV94olrTjEgaz8wTTKWyOscq8oUS+JJ
-   nrnbNtmPy1jJldSW+5hpR5kTdtJuWw0bpP0DHQuRLrY8bdAtTTz6ZSxQ+
-   EZkgbYyWkDB7HDoof5Z7twgsmfwczHydnBVy71YVW0+qOu994SBuGXOWB
-   4=;
-Received: from unknown (HELO ironmsg01-sd.qualcomm.com) ([10.53.140.141])
-  by alexa-out-sd-02.qualcomm.com with ESMTP; 09 Dec 2021 10:31:50 -0800
-X-QCInternal: smtphost
-Received: from nasanex01b.na.qualcomm.com ([10.46.141.250])
-  by ironmsg01-sd.qualcomm.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2021 10:31:49 -0800
-Received: from [10.216.49.130] (10.80.80.8) by nasanex01b.na.qualcomm.com
- (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.922.19; Thu, 9 Dec 2021
- 10:31:43 -0800
-Message-ID: <dfa110f0-8fd0-0f37-2c37-89eccac1ad08@quicinc.com>
-Date:   Fri, 10 Dec 2021 00:01:39 +0530
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=VmHNjKHHTgpu8LKf+wLbu6tr5d2B6TY5WNkaxl4rmr8=;
+        b=gZq6Dj67kII8EQrFcvQRrysaXkPXfgaFl8h/21JGy/fEUeqdUxugDKnd0CNL1EUdHK
+         KJPwK37d4PW840KmytVunGJapbLoZk4G3qw+TbDO8UYWUa2yu8kM7BqASqD3VbTbjPSr
+         uYvvS+DgMUmrivsJTJ5U61ojewQPuA8oKfTgJidcMoKvKd75dFwAseVuJPPbufqS40gT
+         sn9TuVUT5jgHVAMipF5b2yN0DSs3jGlOqB8UJmtZWNWcU0Bopi2mvXa3ytZ+oA/p2nkv
+         P6BXBfcqsPMiZ2N//CV0MDTVNZrb5hlDan1lqFxK+s+uKW5LM3ou1RBnyIftv4h7SWPY
+         xNxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=VmHNjKHHTgpu8LKf+wLbu6tr5d2B6TY5WNkaxl4rmr8=;
+        b=FnuPtWS1r8i3j+ZosldJAoEIJERZ2GFoJ0Sfbp8bJBCttRCk+FF7XWFPjT7qsA0R7r
+         NM3FdiZi915B5XQg03XMGEG7vFu2QoojAZ1+5G3yrWyqTU4aAsrlXfzAvtLjNFFGPBK7
+         SvV1ePRlxlk15y5mOSlD/n2jOzXJG9Kw0kiE8qP92A6MQ0mI7Wwu4xH9GjdMYP+2WQSm
+         G291xLlnPn16LLVv9ST/ahHnnkqpaCZOgWiMiBxtvG0+oIR1LB8W0MiTDWzys8GAga2B
+         mexVdOVrjCir6Qv2/JMLjtHkvauBXyN7ysyKDDVqTg+sIR39INEl4u0ZCD8SiIFyS87t
+         fCaQ==
+X-Gm-Message-State: AOAM5304p81JenlD1I+FxaA1eQsQ8a3QX1difPmrmoiEU6fwcfWiem2J
+        EWHmpsng2rwFuWlBeBJsKp4=
+X-Google-Smtp-Source: ABdhPJzPr2JWAHHRiyW9tf+vJ9HDTL67K/LwoYescyr21dhuVB9iq2UisCXP0bQ++tHwzdvxo9UJXA==
+X-Received: by 2002:a17:906:f43:: with SMTP id h3mr17722168ejj.414.1639074851284;
+        Thu, 09 Dec 2021 10:34:11 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id yd20sm299781ejb.47.2021.12.09.10.34.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 Dec 2021 10:34:10 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <b1bacc6f-be56-4108-6e52-4315a021184b@redhat.com>
+Date:   Thu, 9 Dec 2021 19:34:08 +0100
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.2
-Subject: Re: [PATCH 02/11] rcu: Kill rnp->ofl_seq and use only
- rcu_state.ofl_lock for exclusion
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH v5 08/12] KVM: Reinstate gfn_to_pfn_cache with
+ invalidation support
 Content-Language: en-US
-To:     David Woodhouse <dwmw2@infradead.org>,
-        Thomas Gleixner <tglx@linutronix.de>
-CC:     Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <rcu@vger.kernel.org>, <mimoja@mimoja.de>,
-        <hewenliang4@huawei.com>, <hushiyuan@huawei.com>,
-        <luolongjun@huawei.com>, <hejingxian@huawei.com>
-References: <20211209150938.3518-1-dwmw2@infradead.org>
- <20211209150938.3518-3-dwmw2@infradead.org>
-From:   Neeraj Upadhyay <quic_neeraju@quicinc.com>
-In-Reply-To: <20211209150938.3518-3-dwmw2@infradead.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+To:     David Woodhouse <dwmw2@infradead.org>, kvm <kvm@vger.kernel.org>
+Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        "jmattson @ google . com" <jmattson@google.com>,
+        "wanpengli @ tencent . com" <wanpengli@tencent.com>,
+        "seanjc @ google . com" <seanjc@google.com>,
+        "vkuznets @ redhat . com" <vkuznets@redhat.com>,
+        "mtosatti @ redhat . com" <mtosatti@redhat.com>,
+        "joro @ 8bytes . org" <joro@8bytes.org>, karahmed@amazon.com,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Anup Patel <anup.patel@wdc.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+        butt3rflyh4ck <butterflyhuangxx@gmail.com>
+References: <20211121125451.9489-1-dwmw2@infradead.org>
+ <20211121125451.9489-9-dwmw2@infradead.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20211121125451.9489-9-dwmw2@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+Sorry for the late review...
 
-On 12/9/2021 8:39 PM, David Woodhouse wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
-> 
-> If we allow architectures to bring APs online in parallel, then we end
-> up requiring rcu_cpu_starting() to be reentrant. But currently, the
-> manipulation of rnp->ofl_seq is not thread-safe.
-> 
-> However, rnp->ofl_seq is also fairly much pointless anyway since both
-> rcu_cpu_starting() and rcu_report_dead() hold rcu_state.ofl_lock for
-> fairly much the whole time that rnp->ofl_seq is set to an odd number
-> to indicate that an operation is in progress.
-> 
-> So drop rnp->ofl_seq completely, and use only rcu_state.ofl_lock.
-> 
-> This has a couple of minor complexities: lockdep will complain when we
-> take rcu_state.ofl_lock, and currently accepts the 'excuse' of having
-> an odd value in rnp->ofl_seq. So switch it to an arch_spinlock_t to
-> avoid that false positive complaint. Since we're killing rnp->ofl_seq
-> of course that 'excuse' has to be changed too, so make it check for
-> arch_spin_is_locked(rcu_state.ofl_lock).
-> 
-> There's no arch_spin_lock_irqsave() so we have to manually save and
-> restore local interrupts around the locking.
-> 
-> At Paul's request, make rcu_gp_init not just wait but *exclude* any
-> CPU online/offline activity, which was fairly much true already by
-> virtue of it holding rcu_state.ofl_lock.
-> 
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> ---
->   kernel/rcu/tree.c | 64 +++++++++++++++++++++++------------------------
->   kernel/rcu/tree.h |  4 +--
->   2 files changed, 32 insertions(+), 36 deletions(-)
-> 
-> diff --git a/kernel/rcu/tree.c b/kernel/rcu/tree.c
-> index ef8d36f580fc..a1bb0b1229ed 100644
-> --- a/kernel/rcu/tree.c
-> +++ b/kernel/rcu/tree.c
-> @@ -91,7 +91,7 @@ static struct rcu_state rcu_state = {
->   	.abbr = RCU_ABBR,
->   	.exp_mutex = __MUTEX_INITIALIZER(rcu_state.exp_mutex),
->   	.exp_wake_mutex = __MUTEX_INITIALIZER(rcu_state.exp_wake_mutex),
-> -	.ofl_lock = __RAW_SPIN_LOCK_UNLOCKED(rcu_state.ofl_lock),
-> +	.ofl_lock = __ARCH_SPIN_LOCK_UNLOCKED,
->   };
->   
->   /* Dump rcu_node combining tree at boot to verify correct setup. */
-> @@ -1168,7 +1168,15 @@ bool rcu_lockdep_current_cpu_online(void)
->   	preempt_disable_notrace();
->   	rdp = this_cpu_ptr(&rcu_data);
->   	rnp = rdp->mynode;
-> -	if (rdp->grpmask & rcu_rnp_online_cpus(rnp) || READ_ONCE(rnp->ofl_seq) & 0x1)
-> +	/*
-> +	 * Strictly, we care here about the case where the current CPU is
-> +	 * in rcu_cpu_starting() and thus has an excuse for rdp->grpmask
-> +	 * not being up to date. So arch_spin_is_locked() might have a
-> +	 * false positive if it's held by some *other* CPU, but that's
-> +	 * OK because that just means a false *negative* on the warning.
-> +	 */
-> +	if (rdp->grpmask & rcu_rnp_online_cpus(rnp) ||
-> +	    arch_spin_is_locked(&rcu_state.ofl_lock))
->   		ret = true;
->   	preempt_enable_notrace();
->   	return ret;
-> @@ -1731,7 +1739,6 @@ static void rcu_strict_gp_boundary(void *unused)
->    */
->   static noinline_for_stack bool rcu_gp_init(void)
->   {
-> -	unsigned long firstseq;
->   	unsigned long flags;
->   	unsigned long oldmask;
->   	unsigned long mask;
-> @@ -1774,22 +1781,17 @@ static noinline_for_stack bool rcu_gp_init(void)
->   	 * of RCU's Requirements documentation.
->   	 */
->   	WRITE_ONCE(rcu_state.gp_state, RCU_GP_ONOFF);
-> +	/* Exclude CPU hotplug operations. */
->   	rcu_for_each_leaf_node(rnp) {
-> -		// Wait for CPU-hotplug operations that might have
-> -		// started before this grace period did.
-> -		smp_mb(); // Pair with barriers used when updating ->ofl_seq to odd values.
-> -		firstseq = READ_ONCE(rnp->ofl_seq);
-> -		if (firstseq & 0x1)
-> -			while (firstseq == READ_ONCE(rnp->ofl_seq))
-> -				schedule_timeout_idle(1);  // Can't wake unless RCU is watching.
-> -		smp_mb(); // Pair with barriers used when updating ->ofl_seq to even values.
-> -		raw_spin_lock(&rcu_state.ofl_lock);
-> -		raw_spin_lock_irq_rcu_node(rnp);
-> +		local_irq_save(flags);
-> +		arch_spin_lock(&rcu_state.ofl_lock);
-> +		raw_spin_lock_rcu_node(rnp);
->   		if (rnp->qsmaskinit == rnp->qsmaskinitnext &&
->   		    !rnp->wait_blkd_tasks) {
->   			/* Nothing to do on this leaf rcu_node structure. */
-> -			raw_spin_unlock_irq_rcu_node(rnp);
-> -			raw_spin_unlock(&rcu_state.ofl_lock);
-> +			raw_spin_unlock_rcu_node(rnp);
-> +			arch_spin_unlock(&rcu_state.ofl_lock);
-> +			local_irq_restore(flags);
->   			continue;
->   		}
->   
-> @@ -1824,8 +1826,9 @@ static noinline_for_stack bool rcu_gp_init(void)
->   				rcu_cleanup_dead_rnp(rnp);
->   		}
->   
-> -		raw_spin_unlock_irq_rcu_node(rnp);
-> -		raw_spin_unlock(&rcu_state.ofl_lock);
-> +		raw_spin_unlock_rcu_node(rnp);
-> +		arch_spin_unlock(&rcu_state.ofl_lock);
-> +		local_irq_restore(flags);
->   	}
->   	rcu_gp_slow(gp_preinit_delay); /* Races with CPU hotplug. */
->   
-> @@ -4233,7 +4236,7 @@ int rcutree_offline_cpu(unsigned int cpu)
->    */
->   void rcu_cpu_starting(unsigned int cpu)
->   {
-> -	unsigned long flags;
-> +	unsigned long flags, seq_flags;
->   	unsigned long mask;
->   	struct rcu_data *rdp;
->   	struct rcu_node *rnp;
-> @@ -4246,11 +4249,11 @@ void rcu_cpu_starting(unsigned int cpu)
->   
->   	rnp = rdp->mynode;
->   	mask = rdp->grpmask;
-> -	WRITE_ONCE(rnp->ofl_seq, rnp->ofl_seq + 1);
-> -	WARN_ON_ONCE(!(rnp->ofl_seq & 0x1));
-> +	local_irq_save(seq_flags);
-> +	arch_spin_lock(&rcu_state.ofl_lock);
->   	rcu_dynticks_eqs_online();
->   	smp_mb(); // Pair with rcu_gp_cleanup()'s ->ofl_seq barrier().
+On 11/21/21 13:54, David Woodhouse wrote:
+> +EXPORT_SYMBOL_GPL(kvm_gfn_to_pfn_cache_check);
+> +
+> +static void __release_gpc(struct kvm *kvm, kvm_pfn_t pfn, void *khva,
+> +			  gpa_t gpa, bool dirty)
+> +{
+> +	/* Unmap the old page if it was mapped before, and release it */
+> +	if (!is_error_noslot_pfn(pfn)) {
+> +		if (khva) {
+> +			if (pfn_valid(pfn))
+> +				kunmap(pfn_to_page(pfn));
+> +#ifdef CONFIG_HAS_IOMEM
+> +			else
+> +				memunmap(khva);
+> +#endif
+> +		}
 
-Can we drop this smp_mb(),as arch_spin_lock(&rcu_state.ofl_lock) 
-provides the ordering now?
+Considering that the khva is passed directly to memunmap, perhaps it's
+cleaner to ensure it's page-aligned:
 
-> -	raw_spin_lock_irqsave_rcu_node(rnp, flags);
-> +	raw_spin_lock_rcu_node(rnp);
->   	WRITE_ONCE(rnp->qsmaskinitnext, rnp->qsmaskinitnext | mask);
->   	newcpu = !(rnp->expmaskinitnext & mask);
->   	rnp->expmaskinitnext |= mask;
-> @@ -4269,9 +4272,8 @@ void rcu_cpu_starting(unsigned int cpu)
->   	} else {
->   		raw_spin_unlock_irqrestore_rcu_node(rnp, flags);
-
-'flags' is uninitialized now?
+diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
+index 13cae72d39e9..267477bd2972 100644
+--- a/virt/kvm/pfncache.c
++++ b/virt/kvm/pfncache.c
+@@ -147,7 +147,7 @@ int kvm_gfn_to_pfn_cache_refresh(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
+  
+  	old_gpa = gpc->gpa;
+  	old_pfn = gpc->pfn;
+-	old_khva = gpc->khva;
++	old_khva = (void *)((unsigned long)gpc->khva & ~PAGE_MASK);
+  	old_uhva = gpc->uhva;
+  	old_valid = gpc->valid;
+  	old_dirty = gpc->dirty;
+@@ -209,7 +209,7 @@ int kvm_gfn_to_pfn_cache_refresh(struct kvm *kvm, struct gfn_to_pfn_cache *gpc,
+  
+  		if (gpc->kernel_map) {
+  			if (new_pfn == old_pfn) {
+-				new_khva = (void *)((unsigned long)old_khva - page_offset);
++				new_khva = old_khva;
+  				old_pfn = KVM_PFN_ERR_FAULT;
+  				old_khva = NULL;
+  			} else if (pfn_valid(new_pfn)) {
+@@ -265,7 +265,7 @@ void kvm_gfn_to_pfn_cache_unmap(struct kvm *kvm, struct gfn_to_pfn_cache *gpc)
+  
+  	gpc->valid = false;
+  
+-	old_khva = gpc->khva;
++	old_khva = (void *)((unsigned long)gpc->khva & ~PAGE_MASK);
+  	old_dirty = gpc->dirty;
+  	old_gpa = gpc->gpa;
+  	old_pfn = gpc->pfn;
 
 
-
-Thanks
-Neeraj
-
->   	}
-> -	smp_mb(); // Pair with rcu_gp_cleanup()'s ->ofl_seq barrier().
-> -	WRITE_ONCE(rnp->ofl_seq, rnp->ofl_seq + 1);
-> -	WARN_ON_ONCE(rnp->ofl_seq & 0x1);
-> +	arch_spin_unlock(&rcu_state.ofl_lock);
-> +	local_irq_restore(seq_flags);
->   	smp_mb(); /* Ensure RCU read-side usage follows above initialization. */
->   }
->   
-> @@ -4285,7 +4287,7 @@ void rcu_cpu_starting(unsigned int cpu)
->    */
->   void rcu_report_dead(unsigned int cpu)
->   {
-> -	unsigned long flags;
-> +	unsigned long flags, seq_flags;
->   	unsigned long mask;
->   	struct rcu_data *rdp = per_cpu_ptr(&rcu_data, cpu);
->   	struct rcu_node *rnp = rdp->mynode;  /* Outgoing CPU's rdp & rnp. */
-> @@ -4299,10 +4301,8 @@ void rcu_report_dead(unsigned int cpu)
->   
->   	/* Remove outgoing CPU from mask in the leaf rcu_node structure. */
->   	mask = rdp->grpmask;
-> -	WRITE_ONCE(rnp->ofl_seq, rnp->ofl_seq + 1);
-> -	WARN_ON_ONCE(!(rnp->ofl_seq & 0x1));
-> -	smp_mb(); // Pair with rcu_gp_cleanup()'s ->ofl_seq barrier().
-> -	raw_spin_lock(&rcu_state.ofl_lock);
-> +	local_irq_save(seq_flags);
-> +	arch_spin_lock(&rcu_state.ofl_lock);
->   	raw_spin_lock_irqsave_rcu_node(rnp, flags); /* Enforce GP memory-order guarantee. */
->   	rdp->rcu_ofl_gp_seq = READ_ONCE(rcu_state.gp_seq);
->   	rdp->rcu_ofl_gp_flags = READ_ONCE(rcu_state.gp_flags);
-> @@ -4313,10 +4313,8 @@ void rcu_report_dead(unsigned int cpu)
->   	}
->   	WRITE_ONCE(rnp->qsmaskinitnext, rnp->qsmaskinitnext & ~mask);
->   	raw_spin_unlock_irqrestore_rcu_node(rnp, flags);
-> -	raw_spin_unlock(&rcu_state.ofl_lock);
-> -	smp_mb(); // Pair with rcu_gp_cleanup()'s ->ofl_seq barrier().
-> -	WRITE_ONCE(rnp->ofl_seq, rnp->ofl_seq + 1);
-> -	WARN_ON_ONCE(rnp->ofl_seq & 0x1);
-> +	arch_spin_unlock(&rcu_state.ofl_lock);
-> +	local_irq_restore(seq_flags);
->   
->   	rdp->cpu_started = false;
->   }
-> diff --git a/kernel/rcu/tree.h b/kernel/rcu/tree.h
-> index 305cf6aeb408..aff4cc9303fb 100644
-> --- a/kernel/rcu/tree.h
-> +++ b/kernel/rcu/tree.h
-> @@ -56,8 +56,6 @@ struct rcu_node {
->   				/*  Initialized from ->qsmaskinitnext at the */
->   				/*  beginning of each grace period. */
->   	unsigned long qsmaskinitnext;
-> -	unsigned long ofl_seq;	/* CPU-hotplug operation sequence count. */
-> -				/* Online CPUs for next grace period. */
->   	unsigned long expmask;	/* CPUs or groups that need to check in */
->   				/*  to allow the current expedited GP */
->   				/*  to complete. */
-> @@ -358,7 +356,7 @@ struct rcu_state {
->   	const char *name;			/* Name of structure. */
->   	char abbr;				/* Abbreviated name. */
->   
-> -	raw_spinlock_t ofl_lock ____cacheline_internodealigned_in_smp;
-> +	arch_spinlock_t ofl_lock ____cacheline_internodealigned_in_smp;
->   						/* Synchronize offline with */
->   						/*  GP pre-initialization. */
->   };
 > 
+> +	retry_map:
+> +		mmu_seq = kvm->mmu_notifier_seq;
+> +		smp_rmb();
+> +
+> +		/* We always request a writeable mapping */
+> +		new_pfn = hva_to_pfn(uhva, false, NULL, true, NULL);
+> +		if (is_error_noslot_pfn(new_pfn)) {
+> +			ret = -EFAULT;
+> +			goto map_done;
+> +		}
+> +
+> +		KVM_MMU_READ_LOCK(kvm);
+> +		retry = mmu_notifier_retry_hva(kvm, mmu_seq, uhva);
+> +		KVM_MMU_READ_UNLOCK(kvm);
+> +		if (retry) {
+> +			cond_resched();
+> +			goto retry_map;
+> +		}
+> +
+
+This should also be a separate function, like
+
+static kvm_pfn_t hva_to_pfn_retry(unsigned long uhva)
+{
+         kvm_pfn_t new_pfn
+         unsigned long mmu_seq;
+         int retry;
+
+retry_map:
+         mmu_seq = kvm->mmu_notifier_seq;
+         smp_rmb();
+
+         /* We always request a writeable mapping */
+         new_pfn = hva_to_pfn(uhva, false, NULL, true, NULL);
+         if (is_error_noslot_pfn(new_pfn))
+                 return new_pfn;
+
+         KVM_MMU_READ_LOCK(kvm);
+         retry = mmu_notifier_retry_hva(kvm, mmu_seq, uhva);
+         KVM_MMU_READ_UNLOCK(kvm);
+         if (retry) {
+                 cond_resched();
+                 goto retry_map;
+         }
+         return new_pfn;
+}
+
+> 
+> +		write_lock_irq(&gpc->lock);
+> +		if (ret) {
+> +			gpc->valid = false;
+> +			gpc->pfn = KVM_PFN_ERR_FAULT;
+> +			gpc->khva = NULL;
+> +		} else {
+> +			/* At this point, gpc->valid may already have been cleared */
+> +			gpc->pfn = new_pfn;
+> +			gpc->khva = new_khva + page_offset;
+> +		}
+
+Should set gpc->khva only if new_khva != NULL (i.e. only if gpc->kernel_map
+is true).
+
+Paolo
