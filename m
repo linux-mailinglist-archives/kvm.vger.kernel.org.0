@@ -2,89 +2,205 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9612346E021
-	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 02:16:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E7BA646E02D
+	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 02:20:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239072AbhLIBUB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 8 Dec 2021 20:20:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49708 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231643AbhLIBUB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 8 Dec 2021 20:20:01 -0500
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F872C0617A1
-        for <kvm@vger.kernel.org>; Wed,  8 Dec 2021 17:16:28 -0800 (PST)
-Received: by mail-pj1-x1036.google.com with SMTP id v23so3219667pjr.5
-        for <kvm@vger.kernel.org>; Wed, 08 Dec 2021 17:16:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ngoPwqqbhfOLLeyaWlockMByhsnvfUz95KBFPY/FjQE=;
-        b=THMEvCQ4OgR2pWehVPf4SjhgrdSd0hwGC+zK3eOQX6gtv7UbSwvQZnNFnegvWv5SCl
-         BN6nVQIemMjAC0X1lgvEubz33RbIClBv/bbS51nFydO17TKYOEeA/qEw9O5eugFQLQOO
-         T8vWUQgc1p3bub/SpNfSLPraTa/vrsIyt142Eg4KVh/OZvCJ/duvL1aAhpbiovo+XzGc
-         DCCy6cDK3JySX7UOlITdWRKpGeZzQDEDTyn2eOjY5WzIT+VJBczBwib04FlNNahwLU1q
-         XR0yoRSsQFTsAe4hUQvyn7rqae8ZIYwonPlexVl9ZHco1YzI//sqilUpLp/0IqD2kFUL
-         UxHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ngoPwqqbhfOLLeyaWlockMByhsnvfUz95KBFPY/FjQE=;
-        b=rO/LJWjk6g9MSy+5YbR798K97bZiAzSKPggiIwVqNbaPj1B7vYNNnFbjOJx8KHoS/U
-         HfN8f5haDu2EFlUb7HEycl6hRiLpUZ3oUjnG19fJ+ssOXYhU27QzkYd9+mxuqGV2tORe
-         ZshMdkeBV9QpMEblqI2dS1in/664J+xlq1fCBA8LLjwnq33BWhVHMJ3AA4thWCyG7OPH
-         ZmP+v3FwU+A/0vTWTPLhqHwWOqvkh+K6kO/mpVfzU4f7VIgCisiA1MeBPFaI3XF9SYFB
-         /2oQPvm0JAKOWF1fErKea8waSvCC3PKsyibl58Rtdb8XhOb0/0efuJwVwwa9zIh5v4WI
-         WMFg==
-X-Gm-Message-State: AOAM531Pq/i55Eia+o+2+ozEE786lYtRAObvU3HshE5Cq4vCq0ccVr9v
-        WprmG5juFCuVClLMoIFr4Hm+GQ==
-X-Google-Smtp-Source: ABdhPJxsVffgoFVWKf4rmd52sXQPLLkExYCQayiNn1FIpOuQK1LnqxzzkxJ7jmZOXIFUuuYuPgXl2g==
-X-Received: by 2002:a17:90b:4d08:: with SMTP id mw8mr11845971pjb.236.1639012587943;
-        Wed, 08 Dec 2021 17:16:27 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id q6sm3561347pgs.19.2021.12.08.17.16.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Dec 2021 17:16:27 -0800 (PST)
-Date:   Thu, 9 Dec 2021 01:16:23 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Lai Jiangshan <jiangshanlai@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Lai Jiangshan <laijs@linux.alibaba.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
+        id S233439AbhLIBYA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 8 Dec 2021 20:24:00 -0500
+Received: from mga17.intel.com ([192.55.52.151]:5559 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231267AbhLIBYA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 8 Dec 2021 20:24:00 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10192"; a="218677411"
+X-IronPort-AV: E=Sophos;i="5.88,190,1635231600"; 
+   d="scan'208";a="218677411"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2021 17:20:27 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,190,1635231600"; 
+   d="scan'208";a="516062926"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.118]) ([10.239.159.118])
+  by orsmga008.jf.intel.com with ESMTP; 08 Dec 2021 17:20:20 -0800
+Cc:     baolu.lu@linux.intel.com, Christoph Hellwig <hch@infradead.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: [PATCH 1/12] KVM: X86: Fix when shadow_root_level=5 && guest
- root_level<4
-Message-ID: <YbFY533IT3XSIqAK@google.com>
-References: <20211124122055.64424-1-jiangshanlai@gmail.com>
- <20211124122055.64424-2-jiangshanlai@gmail.com>
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>, Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Dan Williams <dan.j.williams@intel.com>, rafael@kernel.org,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Liu Yi L <yi.l.liu@intel.com>,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Stuart Yoder <stuyoder@gmail.com>,
+        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Li Yang <leoyang.li@nxp.com>,
+        Dmitry Osipenko <digetx@gmail.com>,
+        iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 04/18] driver core: platform: Add driver dma ownership
+ management
+To:     Jason Gunthorpe <jgg@nvidia.com>
+References: <20211206015903.88687-1-baolu.lu@linux.intel.com>
+ <20211206015903.88687-5-baolu.lu@linux.intel.com>
+ <Ya4f662Af+8kE2F/@infradead.org> <20211206150647.GE4670@nvidia.com>
+ <56a63776-48ca-0d6e-c25c-016dc016e0d5@linux.intel.com>
+ <20211207131627.GA6385@nvidia.com>
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+Message-ID: <c170d215-6aef-ff21-8733-1bae4478e39c@linux.intel.com>
+Date:   Thu, 9 Dec 2021 09:20:10 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211124122055.64424-2-jiangshanlai@gmail.com>
+In-Reply-To: <20211207131627.GA6385@nvidia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Nov 24, 2021, Lai Jiangshan wrote:
-> From: Lai Jiangshan <laijs@linux.alibaba.com>
+On 12/7/21 9:16 PM, Jason Gunthorpe wrote:
+> On Tue, Dec 07, 2021 at 10:57:25AM +0800, Lu Baolu wrote:
+>> On 12/6/21 11:06 PM, Jason Gunthorpe wrote:
+>>> On Mon, Dec 06, 2021 at 06:36:27AM -0800, Christoph Hellwig wrote:
+>>>> I really hate the amount of boilerplate code that having this in each
+>>>> bus type causes.
+>>> +1
+>>>
+>>> I liked the first version of this series better with the code near
+>>> really_probe().
+>>>
+>>> Can we go back to that with some device_configure_dma() wrapper
+>>> condtionally called by really_probe as we discussed?
+>>>
+>>
+>> Are you talking about below change?
+>>
+>> diff --git a/drivers/base/dd.c b/drivers/base/dd.c
+>> index 68ea1f949daa..368f9e530515 100644
+>> +++ b/drivers/base/dd.c
+>> @@ -577,7 +577,13 @@ static int really_probe(struct device *dev, struct
+>> device_driver *drv)
+>>   	if (dev->bus->dma_configure) {
+>>   		ret = dev->bus->dma_configure(dev);
+>>   		if (ret)
+>> -			goto probe_failed;
+>> +			goto pinctrl_bind_failed;
+>> +
+>> +		if (!drv->no_kernel_dma) {
+>> +			ret = iommu_device_set_dma_owner(dev, DMA_OWNER_DMA_API, NULL);
+>> +			if (ret)
+>> +				goto pinctrl_bind_failed;
+>> +                }
+>>   	}
 > 
-> If the is an L1 with nNPT in 32bit, the shadow walk starts with
-> pae_root.
-> 
-> Fixes: a717a780fc4e ("KVM: x86/mmu: Support shadowing NPT when 5-level paging is enabled in host)
+> Yes, the suggestion was to put everything that 'if' inside a function
+> and then of course a matching undo function.
 
-Have you actually run with 5-level nNPT?  I don't have access to hardware, at least
-not that I know of :-)
+Followed your suggestion, I refactored the change like below:
 
-I'm staring at kvm_mmu_sync_roots() and don't see how it can possibly work for
-5-level nNPT with a 4-level NPT guest.
+diff --git a/drivers/base/dd.c b/drivers/base/dd.c
+index 68ea1f949daa..68ca5a579eb1 100644
+--- a/drivers/base/dd.c
++++ b/drivers/base/dd.c
+@@ -538,6 +538,32 @@ static int call_driver_probe(struct device *dev, 
+struct device_driver *drv)
+         return ret;
+  }
+
++static int device_dma_configure(struct device *dev, struct 
+device_driver *drv)
++{
++       int ret;
++
++       if (!dev->bus->dma_configure)
++               return 0;
++
++       ret = dev->bus->dma_configure(dev);
++       if (ret)
++               return ret;
++
++       if (!drv->suppress_auto_claim_dma_owner)
++               ret = iommu_device_set_dma_owner(dev, DMA_OWNER_DMA_API, 
+NULL);
++
++       return ret;
++}
++
++static void device_dma_cleanup(struct device *dev, struct device_driver 
+*drv)
++{
++       if (!dev->bus->dma_configure)
++               return;
++
++       if (!drv->suppress_auto_claim_dma_owner)
++               iommu_device_release_dma_owner(dev, DMA_OWNER_DMA_API, 
+NULL);
++}
++
+  static int really_probe(struct device *dev, struct device_driver *drv)
+  {
+         bool test_remove = IS_ENABLED(CONFIG_DEBUG_TEST_DRIVER_REMOVE) &&
+@@ -574,11 +600,8 @@ static int really_probe(struct device *dev, struct 
+device_driver *drv)
+         if (ret)
+                 goto pinctrl_bind_failed;
+
+-       if (dev->bus->dma_configure) {
+-               ret = dev->bus->dma_configure(dev);
+-               if (ret)
+-                       goto probe_failed;
+-       }
++       if (device_dma_configure(dev, drv))
++               goto pinctrl_bind_failed;
+
+         ret = driver_sysfs_add(dev);
+         if (ret) {
+@@ -660,6 +683,8 @@ static int really_probe(struct device *dev, struct 
+device_driver *drv)
+         if (dev->bus)
+                 blocking_notifier_call_chain(&dev->bus->p->bus_notifier,
+ 
+BUS_NOTIFY_DRIVER_NOT_BOUND, dev);
++
++       device_dma_cleanup(dev, drv);
+  pinctrl_bind_failed:
+         device_links_no_driver(dev);
+         devres_release_all(dev);
+@@ -1204,6 +1229,7 @@ static void __device_release_driver(struct device 
+*dev, struct device *parent)
+                 else if (drv->remove)
+                         drv->remove(dev);
+
++               device_dma_cleanup(dev, drv);
+                 device_links_driver_cleanup(dev);
+
+                 devres_release_all(dev);
+diff --git a/include/linux/device/driver.h b/include/linux/device/driver.h
+index a498ebcf4993..374a3c2cc10d 100644
+--- a/include/linux/device/driver.h
++++ b/include/linux/device/driver.h
+@@ -100,6 +100,7 @@ struct device_driver {
+         const char              *mod_name;      /* used for built-in 
+modules */
+
+         bool suppress_bind_attrs;       /* disables bind/unbind via 
+sysfs */
++       bool suppress_auto_claim_dma_owner;
+         enum probe_type probe_type;
+
+         const struct of_device_id       *of_match_table;
+
+Further suggestions?
+
+Best regards,
+baolu
