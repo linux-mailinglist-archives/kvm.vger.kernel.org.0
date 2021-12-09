@@ -2,95 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C48B646F386
-	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 19:57:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BCD9546F3A7
+	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 20:11:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230033AbhLITBH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Dec 2021 14:01:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43198 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230026AbhLITBD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Dec 2021 14:01:03 -0500
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45913C0617A1;
-        Thu,  9 Dec 2021 10:57:29 -0800 (PST)
-Received: by mail-ed1-x535.google.com with SMTP id w1so22482852edc.6;
-        Thu, 09 Dec 2021 10:57:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=aNV9iTbuRCMcyqqkrIODJw+a80kaeU6aMky6NsPwR3o=;
-        b=ELSJBc5tobqgXdS9QgqjJ2TyxAdjhIK7t9CfvCWM0jzTY9EdmcTyEAivFmMI/S9Fe2
-         o+Tx6Hm1DNgEzIJHjhQLoLXzzfJvWDbXF5A6OHwW1i3J5RXEu9t+TgrqIV+i3PdTaj68
-         Ek/xTovrHmUP0+3ORmdHK7/chKUGiUWjtjg9ABDvb9oCpnte3ino14mgG05sw/CqGdAa
-         OtCsI1KZGDNoAljguvNsrLPYdbZa8Cfx3pc82XjK2mvkx9UlnPm0BkZ1GjJBX4pwoGw9
-         iPqy7e2uvs0bunDq7g5H/iB7EXXCvr7HpVzL61DsSehmA3UrYycNLX3MFzg9SUHzMwEu
-         NX/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=aNV9iTbuRCMcyqqkrIODJw+a80kaeU6aMky6NsPwR3o=;
-        b=1xL6ZY8FVwVBBaMupCeThN33qekhz+PySQiUIx46KZNOtV1eAkR7a5tI8VWmqfvgyA
-         t5WnHtfoTL/pSuQHEZnOCtEP7I2bsOFEsXJYe3QRAYIgXjRglhcoP5oeA36+3CGBwXI/
-         1vGqjmFi1lkmD1IckxBQmsJtfOl6OdNfIs7mqGT0zj8ldeB0AyChIWff6+i0Z7Za2z55
-         5ZqCTH4cq6IUlAEnTTgs2GGjEqWBCgRLAUQWXYXj8edZtaIY+x9Pm97ivUiCZvj7Ocif
-         GUSOcR/SvxSHCLOWyOR6+5Eqnyr5rW5Aw1khz6g6qvJOUzadOOVKEPksZVW3wnA7E7Uw
-         JXfw==
-X-Gm-Message-State: AOAM532rmCt0Sh2HjJAtWaKV3ysiQ48Aq5O6MRkVJ9v/npk/qoGn78r7
-        heTLIvaOzOJGQw3CD4dPKWk+e3sqn6M=
-X-Google-Smtp-Source: ABdhPJzaOMS8bQyns7DCEFUWph6gd5S4M4l4hnAcYOvaXqnpOv+SbT8Re+eL1P22uhFWsSU1FqLnlA==
-X-Received: by 2002:a50:d883:: with SMTP id p3mr31519083edj.94.1639076247739;
-        Thu, 09 Dec 2021 10:57:27 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id cw20sm306378ejc.90.2021.12.09.10.57.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Dec 2021 10:57:27 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <81fe9f7a-79d5-a77a-089d-99a3b89d78fb@redhat.com>
-Date:   Thu, 9 Dec 2021 19:57:23 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH v2 1/6] KVM: x86/pmu: Setup pmc->eventsel for fixed PMCs
-Content-Language: en-US
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Like Xu <like.xu.linux@gmail.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>
-References: <20211130074221.93635-1-likexu@tencent.com>
- <20211130074221.93635-2-likexu@tencent.com>
- <CALMp9eT05nb56b16KkybvGSTYMhkRusQnNL4aWFU8tsets0O2w@mail.gmail.com>
- <8ca78cd6-12ad-56c4-ad73-e88757364ba9@redhat.com>
- <CALMp9eR-eniyvu_zsqUHidoDX9V=eAA2zJXKPHdUT6SOY+EQrA@mail.gmail.com>
+        id S230293AbhLITOm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Dec 2021 14:14:42 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34985 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230148AbhLITOl (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 Dec 2021 14:14:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1639077067;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=JMaWWP821bwJCvNI5VTsjKW9n6DlPFaj+di/EZl3hBk=;
+        b=AKwdZHzjNPbog2munRWrzxlHT/rCrr5odyqL81lqkVhToPQwPiXD0ZyEtJ9Ww5qZ4DABsv
+        p+7Zi5FxeJ0Ixx/L2yV5sf03iLcn8dSXlYnvu0MFnbEsZmIlaFNYlCb3ssVXu4oI1VZrWD
+        7CeABpOOB+0ZGUSn5rLl3oV8AhueQRw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-560-kr0UCeqiOa-TMjDIn5vc8g-1; Thu, 09 Dec 2021 14:11:05 -0500
+X-MC-Unique: kr0UCeqiOa-TMjDIn5vc8g-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C8D9480573B;
+        Thu,  9 Dec 2021 19:11:02 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 0F49F78374;
+        Thu,  9 Dec 2021 19:11:02 +0000 (UTC)
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <CALMp9eR-eniyvu_zsqUHidoDX9V=eAA2zJXKPHdUT6SOY+EQrA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     jmattson@google.com, like.xu.linux@gmail.com, wanpengli@tencent.com
+Subject: [PATCH] KVM: x86: avoid out of bounds indices for fixed performance counters
+Date:   Thu,  9 Dec 2021 14:11:01 -0500
+Message-Id: <20211209191101.288041-1-pbonzini@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/9/21 19:53, Jim Mattson wrote:
->> How do we know that i < size? For example, Ice Lake supports 4 fixed
->> counters, but fixed_pmc_events only has three entries.
-> 
-> We don't, and it's a preexisting bug in intel_pmu_refresh.
-> As Like points out, KVM_GET_SUPPORTED_CPUID indicates that only three
-> fixed counters are supported. So, per the KVM contract, if userspace
-> configures four in the guest cpuid info, all bets are off.
+Because IceLake has 4 fixed performance counters but KVM only supports 3,
+it is possible for reprogram_fixed_counters to pass to
+reprogram_fixed_counter an index that is out of bounds for
+the fixed_pmc_events array.
 
-Out of bounds accesses are not part of the contract though, even if 
-squashed by an unorthodox use of array_index_nospec.  So I'll post my hack.
+Ultimately intel_find_fixed_event, which is the only place that uses
+fixed_pmc_events, handles this correctly because it checks against the
+size of fixed_pmc_events anyway.  Every other place
+operates on the fixed_counters[] array which is sized
+according to INTEL_PMC_MAX_FIXED.  However, it is cleaner if
+the unsupported performance counters are culled early on
+in reprogram_fixed_counters.
 
-> I don't like that contract, but changing it means introducing KVM_SET_CPUID3.
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/vmx/pmu_intel.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-And especially it means getting it right, which is the difficult part.
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index 1b7456b2177b..d33e9799276e 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -91,7 +91,7 @@ static unsigned intel_find_fixed_event(int idx)
+ 	u32 event;
+ 	size_t size = ARRAY_SIZE(fixed_pmc_events);
+ 
+-	if (idx >= size)
++	if (WARN_ON_ONCE(idx >= size))
+ 		return PERF_COUNT_HW_MAX;
+ 
+ 	event = fixed_pmc_events[array_index_nospec(idx, size)];
+@@ -500,8 +500,9 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+ 		pmu->nr_arch_fixed_counters = 0;
+ 	} else {
+ 		pmu->nr_arch_fixed_counters =
+-			min_t(int, edx.split.num_counters_fixed,
+-			      x86_pmu.num_counters_fixed);
++			min3(ARRAY_SIZE(fixed_pmc_events),
++			     (size_t) edx.split.num_counters_fixed,
++			     (size_t) x86_pmu.num_counters_fixed);
+ 		edx.split.bit_width_fixed = min_t(int,
+ 			edx.split.bit_width_fixed, x86_pmu.bit_width_fixed);
+ 		pmu->counter_bitmask[KVM_PMC_FIXED] =
+-- 
+2.31.1
 
-Paolo
