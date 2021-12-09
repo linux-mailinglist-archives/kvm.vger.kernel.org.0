@@ -2,111 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6103146E6E3
-	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 11:45:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6391D46E718
+	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 11:53:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235074AbhLIKsE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Dec 2021 05:48:04 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:40729 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234897AbhLIKsC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 Dec 2021 05:48:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1639046668;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=AmL2W9Pf8IhqEAzF6XTiKLt2jbmIJVEez1PbH+6r7VI=;
-        b=aTHk0Rk7fv6PWE743oF+C/trByeDcec/gH6gjR+kuzwJT0saoEe4QAIVgEvdxNZg5vyC9p
-        Hr4TszGGZ6FT3xAOYiexJ9Bbbg4i7na07FD0faGTrnIEv981eyFKgK6bZOyWakcczIoOFQ
-        fulIagk4ebb326TbWvzZ69GXAShMe+Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-237-70iD8k7bNayk9zwg8n6YfQ-1; Thu, 09 Dec 2021 05:44:25 -0500
-X-MC-Unique: 70iD8k7bNayk9zwg8n6YfQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2269180574C;
-        Thu,  9 Dec 2021 10:44:24 +0000 (UTC)
-Received: from starship (unknown [10.40.192.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 954745BE05;
-        Thu,  9 Dec 2021 10:44:21 +0000 (UTC)
-Message-ID: <aacd46cc6514438ec3ee974162cb40ee14d2e2e9.camel@redhat.com>
-Subject: Re: [PATCH] KVM: x86: Wait for IPIs to be delivered when handling
- Hyper-V TLB flush hypercall
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, linux-kernel@vger.kernel.org
-Date:   Thu, 09 Dec 2021 12:44:20 +0200
-In-Reply-To: <20211209102937.584397-1-vkuznets@redhat.com>
-References: <20211209102937.584397-1-vkuznets@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        id S236231AbhLIK4o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Dec 2021 05:56:44 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:3416 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S231745AbhLIK4n (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 Dec 2021 05:56:43 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B99wY6B004429;
+        Thu, 9 Dec 2021 10:52:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=lZ/f/RWB0n7XRFqPDZK1uJikVkO/dU07QZ94OoDGgXA=;
+ b=T9vi5KbEI0bPIg9CyexJ2YYMzcUBZoCsUmd1qVDcUZI08/xeLJ8kJFcFLrD32zMeOUsJ
+ 0iyQED4chL50AfCWePdZlRw2G0+V0O89Z1npo2KvVwchVYb/d0HE1E2+sgKs0zX0rlCg
+ /ILsJYq6hQs3OMCmmlMo0g5cjOCbTJrXouHKsB/lyNEQN2JpryS1cu1AEPc1vk7rYDlr
+ bhyuEpAXpFP+pF3Ws/B6v3OD4BcxS735gPltOwVq+wcImfYX+WDd/uIV9gsGnw9u9KjH
+ o4RunTdoRAACN8eV6or4QklHGKn38YqWAhwoevAGl6NQca1osk8QcZpfX75cGIdkCIZV CA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3cufn10yxs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Dec 2021 10:52:38 +0000
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1B99wo9O004691;
+        Thu, 9 Dec 2021 10:52:37 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3cufn10ywr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Dec 2021 10:52:37 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1B9AlR5f003038;
+        Thu, 9 Dec 2021 10:52:35 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma04ams.nl.ibm.com with ESMTP id 3cqyyb87vh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Dec 2021 10:52:34 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1B9AqVQ417629682
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 9 Dec 2021 10:52:31 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8F41BA4059;
+        Thu,  9 Dec 2021 10:52:31 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EFD2BA404D;
+        Thu,  9 Dec 2021 10:52:30 +0000 (GMT)
+Received: from [9.145.80.242] (unknown [9.145.80.242])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  9 Dec 2021 10:52:30 +0000 (GMT)
+Message-ID: <24c84413-4965-9105-fc02-2f72ab053b2a@linux.ibm.com>
+Date:   Thu, 9 Dec 2021 11:52:30 +0100
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH 5/7] KVM: s390: Replace KVM_REQ_MMU_RELOAD usage with arch
+ specific request
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>,
+        Ben Gardon <bgardon@google.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>
+References: <20211209060552.2956723-1-seanjc@google.com>
+ <20211209060552.2956723-6-seanjc@google.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20211209060552.2956723-6-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: jMDmWYMEscH1G0f_BpWt_od3JtjCUm4s
+X-Proofpoint-GUID: KIL-mJAE3PHe4Zk8fN_axStTrgem2Ibf
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2021-12-09_04,2021-12-08_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 malwarescore=0
+ impostorscore=0 lowpriorityscore=0 priorityscore=1501 clxscore=1011
+ phishscore=0 bulkscore=0 adultscore=0 mlxlogscore=999 spamscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2112090056
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2021-12-09 at 11:29 +0100, Vitaly Kuznetsov wrote:
-> Prior to commit 0baedd792713 ("KVM: x86: make Hyper-V PV TLB flush use
-> tlb_flush_guest()"), kvm_hv_flush_tlb() was using 'KVM_REQ_TLB_FLUSH |
-> KVM_REQUEST_NO_WAKEUP' when making a request to flush TLBs on other vCPUs
-> and KVM_REQ_TLB_FLUSH is/was defined as:
+On 12/9/21 07:05, Sean Christopherson wrote:
+> Add an arch request, KVM_REQ_REFRESH_GUEST_PREFIX, to deal with guest
+> prefix changes instead of piggybacking KVM_REQ_MMU_RELOAD.  This will
+> allow for the removal of the generic KVM_REQ_MMU_RELOAD, which isn't
+> actually used by generic KVM.
+
+Yes, that does sound nicer.
+
 > 
->  (0 | KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+> No functional change intended.
+
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+
 > 
-> so KVM_REQUEST_WAIT was lost. Hyper-V TLFS, however, requires that
-> "This call guarantees that by the time control returns back to the
-> caller, the observable effects of all flushes on the specified virtual
-> processors have occurred." and without KVM_REQUEST_WAIT there's a small
-> chance that the vCPU making the TLB flush will resume running before
-> all IPIs get delivered to other vCPUs and a stale mapping can get read
-> there.
-> 
-> Fix the issue by adding KVM_REQUEST_WAIT flag to KVM_REQ_TLB_FLUSH_GUEST:
-> kvm_hv_flush_tlb() is the sole caller which uses it for
-> kvm_make_all_cpus_request()/kvm_make_vcpus_request_mask() where
-> KVM_REQUEST_WAIT makes a difference.
-> 
-> Cc: stable@kernel.org
-> Fixes: 0baedd792713 ("KVM: x86: make Hyper-V PV TLB flush use tlb_flush_guest()")
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
-> - Note, the issue was found by code inspection. Sporadic crashes of
-> big Windows guests using Hyper-V TLB flush enlightenment were reported
-> but I have no proof that these crashes are anyhow related.
-> ---
->  arch/x86/include/asm/kvm_host.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>   arch/s390/include/asm/kvm_host.h | 2 ++
+>   arch/s390/kvm/kvm-s390.c         | 8 ++++----
+>   arch/s390/kvm/kvm-s390.h         | 2 +-
+>   3 files changed, 7 insertions(+), 5 deletions(-)
 > 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index e41ad1ead721..8afb21c8a64f 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -97,7 +97,7 @@
->  	KVM_ARCH_REQ_FLAGS(25, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
->  #define KVM_REQ_TLB_FLUSH_CURRENT	KVM_ARCH_REQ(26)
->  #define KVM_REQ_TLB_FLUSH_GUEST \
-> -	KVM_ARCH_REQ_FLAGS(27, KVM_REQUEST_NO_WAKEUP)
-> +	KVM_ARCH_REQ_FLAGS(27, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
->  #define KVM_REQ_APF_READY		KVM_ARCH_REQ(28)
->  #define KVM_REQ_MSR_FILTER_CHANGED	KVM_ARCH_REQ(29)
->  #define KVM_REQ_UPDATE_CPU_DIRTY_LOGGING \
-
-Reviewed-by: Maxim Levitsky<mlevitsk@redhat.com>
-
-I wonder if that will fix random and rare windows crashes I have seen
-when I run a HV enabed VM nested. In nesting scenario, such races
-are much more likely to happen.
-
-Best regards,
-	Maxim Levitsky
+> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+> index a22c9266ea05..766028d54a3e 100644
+> --- a/arch/s390/include/asm/kvm_host.h
+> +++ b/arch/s390/include/asm/kvm_host.h
+> @@ -45,6 +45,8 @@
+>   #define KVM_REQ_START_MIGRATION KVM_ARCH_REQ(3)
+>   #define KVM_REQ_STOP_MIGRATION  KVM_ARCH_REQ(4)
+>   #define KVM_REQ_VSIE_RESTART	KVM_ARCH_REQ(5)
+> +#define KVM_REQ_REFRESH_GUEST_PREFIX	\
+> +	KVM_ARCH_REQ_FLAGS(6, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+>   
+>   #define SIGP_CTRL_C		0x80
+>   #define SIGP_CTRL_SCN_MASK	0x3f
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index dd099d352753..e161df69520c 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -3394,7 +3394,7 @@ static void kvm_gmap_notifier(struct gmap *gmap, unsigned long start,
+>   		if (prefix <= end && start <= prefix + 2*PAGE_SIZE - 1) {
+>   			VCPU_EVENT(vcpu, 2, "gmap notifier for %lx-%lx",
+>   				   start, end);
+> -			kvm_s390_sync_request(KVM_REQ_MMU_RELOAD, vcpu);
+> +			kvm_s390_sync_request(KVM_REQ_REFRESH_GUEST_PREFIX, vcpu);
+>   		}
+>   	}
+>   }
+> @@ -3796,19 +3796,19 @@ static int kvm_s390_handle_requests(struct kvm_vcpu *vcpu)
+>   	if (!kvm_request_pending(vcpu))
+>   		return 0;
+>   	/*
+> -	 * We use MMU_RELOAD just to re-arm the ipte notifier for the
+> +	 * If the guest prefix changed, re-arm the ipte notifier for the
+>   	 * guest prefix page. gmap_mprotect_notify will wait on the ptl lock.
+>   	 * This ensures that the ipte instruction for this request has
+>   	 * already finished. We might race against a second unmapper that
+>   	 * wants to set the blocking bit. Lets just retry the request loop.
+>   	 */
+> -	if (kvm_check_request(KVM_REQ_MMU_RELOAD, vcpu)) {
+> +	if (kvm_check_request(KVM_REQ_REFRESH_GUEST_PREFIX, vcpu)) {
+>   		int rc;
+>   		rc = gmap_mprotect_notify(vcpu->arch.gmap,
+>   					  kvm_s390_get_prefix(vcpu),
+>   					  PAGE_SIZE * 2, PROT_WRITE);
+>   		if (rc) {
+> -			kvm_make_request(KVM_REQ_MMU_RELOAD, vcpu);
+> +			kvm_make_request(KVM_REQ_REFRESH_GUEST_PREFIX, vcpu);
+>   			return rc;
+>   		}
+>   		goto retry;
+> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
+> index 60f0effcce99..219f92ffd556 100644
+> --- a/arch/s390/kvm/kvm-s390.h
+> +++ b/arch/s390/kvm/kvm-s390.h
+> @@ -105,7 +105,7 @@ static inline void kvm_s390_set_prefix(struct kvm_vcpu *vcpu, u32 prefix)
+>   		   prefix);
+>   	vcpu->arch.sie_block->prefix = prefix >> GUEST_PREFIX_SHIFT;
+>   	kvm_make_request(KVM_REQ_TLB_FLUSH, vcpu);
+> -	kvm_make_request(KVM_REQ_MMU_RELOAD, vcpu);
+> +	kvm_make_request(KVM_REQ_REFRESH_GUEST_PREFIX, vcpu);
+>   }
+>   
+>   static inline u64 kvm_s390_get_base_disp_s(struct kvm_vcpu *vcpu, u8 *ar)
+> 
 
