@@ -2,52 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A9C4846F350
-	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 19:43:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C5BE46F355
+	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 19:48:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229564AbhLISr1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Dec 2021 13:47:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39896 "EHLO
+        id S229596AbhLISvr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Dec 2021 13:51:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229487AbhLISrZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Dec 2021 13:47:25 -0500
+        with ESMTP id S229487AbhLISvq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Dec 2021 13:51:46 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DB17C061746;
-        Thu,  9 Dec 2021 10:43:51 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B63E0C061746;
+        Thu,  9 Dec 2021 10:48:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=4G3kmEjO1FSeu+BBXIYFvONCqu6PiAfYev3kCcCiBR4=; b=ySW6lxuhIFGTbZV5nCYgdOjV3s
-        OgPi/kNLAx+BrGJ5PWvM4tiO6W6QiqRCVJsU9KxY1a+WKjwW1L2KpyQIJIlJ1gJtWXrXGaR+UO9Z3
-        I/2r7Tx0tFinNPDlGbAoWjns3+RIcYI7tzdssXBPIll8q/wAUzulCDLQQzkankYIq9tN3BHWXN7gl
-        V16Yle3P9t5zrG+aOc7VYHzH6gqpMHOT4w1pRknCX1BXhpXsqKVGQeTr16zwllHyKpxBmg3hvHisv
-        nF7rOd8ZApTug4+OJgKDyL1nmW+fBFGl4vl4jAN3q/vpSCh7/zwatNKofzdAvQoTdDiIK7PN6uhni
-        rlX5FS5g==;
+        bh=jZKgRWY8KAKIPw2gKzqFv7zgp3iE6Rfy4lqdumlk0LA=; b=mcTdgvNi5g+p2ACALZepXAJ25g
+        R3szCQ4KVSmOHNe/E5LH7r7T+OWTBXh1FgBSTDA8PMLfOMrsF0c81HguoZhu3ikLRZ1zRNE+ygPj7
+        1+eZTUENnvVZm93r3x3S1yc345klM2LQEt6712pH0Gfg4Xeln77zT9qcV1pTG4OFiezWJMDlwax17
+        fVMHmYm5MgsTZEf0mbSSP5w84dwB9Qg9uWvz9hbbRmttAAqK81bNwzAsHzlzC40D6cRh8cxU2igTL
+        6iB+6Swb7jbJpgEsg9BpTkUkJUZksbrOoTf4e5hpu5Z2J1bjEeBvEJegH2+APTlKbYTrgBltS0P7p
+        ab27idRg==;
 Received: from 54-240-197-234.amazon.com ([54.240.197.234] helo=freeip.amazon.com)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mvOOE-00HGI5-UW; Thu, 09 Dec 2021 18:43:35 +0000
-Message-ID: <3731b8da4dc46febc8adef331d6c97b21283428a.camel@infradead.org>
-Subject: Re: [PATCH 02/11] rcu: Kill rnp->ofl_seq and use only
- rcu_state.ofl_lock for exclusion
+        id 1mvOSU-00HGb4-OB; Thu, 09 Dec 2021 18:47:59 +0000
+Message-ID: <5706a7fec0ffdb18097792374dad90c0400b17cd.camel@infradead.org>
+Subject: Re: [PATCH v5 00/12] KVM: x86/xen: Add in-kernel Xen event channel
+ delivery
 From:   David Woodhouse <dwmw2@infradead.org>
-To:     Neeraj Upadhyay <quic_neeraju@quicinc.com>,
-        Thomas Gleixner <tglx@linutronix.de>
-Cc:     Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
-        hushiyuan@huawei.com, luolongjun@huawei.com, hejingxian@huawei.com
-Date:   Thu, 09 Dec 2021 18:43:30 +0000
-In-Reply-To: <dfa110f0-8fd0-0f37-2c37-89eccac1ad08@quicinc.com>
-References: <20211209150938.3518-1-dwmw2@infradead.org>
-         <20211209150938.3518-3-dwmw2@infradead.org>
-         <dfa110f0-8fd0-0f37-2c37-89eccac1ad08@quicinc.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>
+Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        "jmattson @ google . com" <jmattson@google.com>,
+        "wanpengli @ tencent . com" <wanpengli@tencent.com>,
+        "seanjc @ google . com" <seanjc@google.com>,
+        "vkuznets @ redhat . com" <vkuznets@redhat.com>,
+        "mtosatti @ redhat . com" <mtosatti@redhat.com>,
+        "joro @ 8bytes . org" <joro@8bytes.org>, karahmed@amazon.com,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Anup Patel <anup.patel@wdc.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        kvmarm@lists.cs.columbia.edu,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+        butt3rflyh4ck <butterflyhuangxx@gmail.com>
+Date:   Thu, 09 Dec 2021 18:47:52 +0000
+In-Reply-To: <2617aea0-af09-5c0d-1fd7-65e2a814b516@redhat.com>
+References: <20211121125451.9489-1-dwmw2@infradead.org>
+         <2617aea0-af09-5c0d-1fd7-65e2a814b516@redhat.com>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-zjrVyy1PKK76w+1F/bJU"
+        boundary="=-GwSDevdtgD1yb4LRKYF4"
 User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
@@ -56,45 +71,25 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-zjrVyy1PKK76w+1F/bJU
+--=-GwSDevdtgD1yb4LRKYF4
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2021-12-10 at 00:01 +0530, Neeraj Upadhyay wrote:
-> > @@ -4246,11 +4249,11 @@ void rcu_cpu_starting(unsigned int cpu)
-> >   =20
-> >        rnp =3D rdp->mynode;
-> >        mask =3D rdp->grpmask;
-> > -     WRITE_ONCE(rnp->ofl_seq, rnp->ofl_seq + 1);
-> > -     WARN_ON_ONCE(!(rnp->ofl_seq & 0x1));
-> > +     local_irq_save(seq_flags);
-> > +     arch_spin_lock(&rcu_state.ofl_lock);
-> >        rcu_dynticks_eqs_online();
-> >        smp_mb(); // Pair with rcu_gp_cleanup()'s ->ofl_seq barrier().
+On Thu, 2021-12-09 at 19:34 +0100, Paolo Bonzini wrote:
+> > As in the previous two rounds, the last patch (this time patch 12) is
+> > included as illustration of how we*might*  use this for fixing the UAF
+> > bugs in nesting, but isn't intended to be applied as-is. Patches 1-11 a=
+re.
 >=20
-> Can we drop this smp_mb(),as arch_spin_lock(&rcu_state.ofl_lock)=20
-> provides the ordering now?
+> Queued 1-7, will be on kvm/next tomorrow though.
 
-Yes, thanks.
+Thanks. I assume you made the changes you wanted to the makefiles then,
+and will work on the gfn_to_pfn_cache changes you suggested.
 
-> > -     raw_spin_lock_irqsave_rcu_node(rnp, flags);
-> > +     raw_spin_lock_rcu_node(rnp);
-> >        WRITE_ONCE(rnp->qsmaskinitnext, rnp->qsmaskinitnext | mask);
-> >        newcpu =3D !(rnp->expmaskinitnext & mask);
-> >        rnp->expmaskinitnext |=3D mask;
-> > @@ -4269,9 +4272,8 @@ void rcu_cpu_starting(unsigned int cpu)
-> >        } else {
-> >                raw_spin_unlock_irqrestore_rcu_node(rnp, flags);
->=20
-> 'flags' is uninitialized now?
 
-Ah yes, that suffered from the fact that saving the flags is pointless
-because we know we already disabled interrupts... but
-rcu_report_qs_rnp() *really* wants to be given some flags to restore.
 
-Will fix that too; thanks again.
 
---=-zjrVyy1PKK76w+1F/bJU
+--=-GwSDevdtgD1yb4LRKYF4
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -177,20 +172,20 @@ BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
 BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
 ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
 ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjEx
-MjA5MTg0MzMwWjAvBgkqhkiG9w0BCQQxIgQga7KgYIWS7Ss7dIhi78Qp+vhrQm45qh8P+eTgdEZV
-yrswgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+MjA5MTg0NzUyWjAvBgkqhkiG9w0BCQQxIgQg7qHeDwtu51cT5vR02ayVu5n6NuscBzg2aAIHluAs
+aWwwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
 TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
 PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
 aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
 A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
 bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBAK2JSfXsrd4UDc+YmSVg8nnF9O9Mli9OiiwecoXdtlevRWWeSr5DcN7YR+JUasjF
-bhUIwT+wwnJ915hXaSnK31aamRgn+SDILgip+hcxBXAH98VCho+gXmMeE6NhVVyy3/gbFpLR2rTF
-vHmCX/dfWOJflFieR9weYK2rJpx+SQn7EaDvdHYxAxQkGOcrZkiCCOEc2gecs37BaQkBprShT6IF
-9dtQDOym/ZwclxJ1ihb8DFlZTeK8U0S4csc0mCG8UQCSGKDvsC05SFtSUlDSVh4EeiCjl0USiGjO
-7CppSGbccWitd+9cBxjY+ykLCbLGrN+5bav/O60vDVO2QSt+KtMAAAAAAAA=
+DQEBAQUABIIBAC91pGY6R7Xu0atqchV9douBCh5Mwkq/6eoOxo/zraTfG+MusDdfuSffEUgwqV2r
+bHePkTwtnA1aNdauP+pXHkUx8U480zEWfkbNECPN7IYLTuM8iA9yJec9OKOow5o/LO5xXdds75T2
+ayhX3AtM1J0BcIQ+FAeTu5iZX96R+K2HcklmTxYoVAVPWWgB7qgDHGIygSE4dRuvL7GwEttz6ean
+0+MrNYOLnisPzvDKErBB/dTDTj7yQy/QWKCT5wG3YRRU+NTqMpdTBkYGudy89OVXB6DIcAdY9tr6
+TQgzAuWymESYYVJcPZEJ0QYqtlqMPmFQ2Wr9yMYLYD0eHDRQVTsAAAAAAAA=
 
 
---=-zjrVyy1PKK76w+1F/bJU--
+--=-GwSDevdtgD1yb4LRKYF4--
 
