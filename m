@@ -2,129 +2,239 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E740846EA8C
-	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 16:04:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1CFFE46EAA8
+	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 16:08:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239154AbhLIPHi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Dec 2021 10:07:38 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:54252 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S239135AbhLIPHh (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 Dec 2021 10:07:37 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1639062243;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2SVG9ZuQN3oM9T8PEcqFpCVIPxpnKX10T1W9r1ZDvJg=;
-        b=ixyOzw+EQRGkYcOzJ8DZXyO6LSN7aOC4JqNUTvr8SXhLfqdxkM8f6zTs7YA5XZxi/qa1Qh
-        n04qTJoB25lD2rbd4vdTnFovWbWS6yL7DLq82TX7R75LTYrpbsLG0+/J91Gl2WvPASsgvH
-        EiNdvOIelDemU0vIvr0K1sHBZEVnhqs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-429-yOzjxFo4Pumpfs4QagQqRw-1; Thu, 09 Dec 2021 10:04:00 -0500
-X-MC-Unique: yOzjxFo4Pumpfs4QagQqRw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D40EB1B18BD3;
-        Thu,  9 Dec 2021 15:03:55 +0000 (UTC)
-Received: from starship (unknown [10.40.192.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 46EA71ABE5;
-        Thu,  9 Dec 2021 15:03:49 +0000 (UTC)
-Message-ID: <be325dd1fbbf9023fb6ce3ceebf0418f631d43c1.camel@redhat.com>
-Subject: Re: [PATCH 5/6] KVM: x86: never clear irr_pending in
- kvm_apic_update_apicv
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
-        <linux-kernel@vger.kernel.org>, Wanpeng Li <wanpengli@tencent.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Jim Mattson <jmattson@google.com>,
-        Sean Christopherson <seanjc@google.com>
-Date:   Thu, 09 Dec 2021 17:03:48 +0200
-In-Reply-To: <350532d2-b01b-1d7c-fff3-c3cb171996e8@redhat.com>
-References: <20211209115440.394441-1-mlevitsk@redhat.com>
-         <20211209115440.394441-6-mlevitsk@redhat.com>
-         <350532d2-b01b-1d7c-fff3-c3cb171996e8@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        id S239211AbhLIPLi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Dec 2021 10:11:38 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:20654 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234269AbhLIPLh (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 Dec 2021 10:11:37 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B9F4DaQ011025;
+        Thu, 9 Dec 2021 15:08:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=jAIufpj5dwywjaqhic/kNyO+DVSpb6FWUpESb5ObnDg=;
+ b=X1ZnrBG94HkOm2otUctqed7nBUUaReFtFwcgwaaGvtp9WOxNoTDYS6iwUZOCPUkN3Bi8
+ eNEJa2jYgy9hqQH89L1P2M7f3HetEcpKDKlrYq5A7eFbwg6796xjTs9kaqs796HYxrxH
+ r7LTUi3NQuZ+5Yv5B254Cf5vFcTaRiZnBrPxL550/rqGaiXXv0C6YvecfcK9lBkcrtn+
+ C/eNRVk2Gush94mNitVc69awqUC01kiBcG26fzUf9Q1AusVY2iSgw6i9NVckvkZVzkka
+ 9+DaHDgweMXDRHFtB4xkFRAsEm8LKd6CKEEnnUZDBebYazyvU6QuV6wAUvIOavZpIc3X eg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cum470363-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Dec 2021 15:08:01 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1B9F4VY8011638;
+        Thu, 9 Dec 2021 15:08:00 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cum47035h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Dec 2021 15:08:00 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1B9F31sx015839;
+        Thu, 9 Dec 2021 15:07:58 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma06ams.nl.ibm.com with ESMTP id 3cqykjts0w-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Dec 2021 15:07:58 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1B9F7tPv29557186
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 9 Dec 2021 15:07:55 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EF67CAE05A;
+        Thu,  9 Dec 2021 15:07:54 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 11504AE051;
+        Thu,  9 Dec 2021 15:07:54 +0000 (GMT)
+Received: from [9.171.49.66] (unknown [9.171.49.66])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  9 Dec 2021 15:07:53 +0000 (GMT)
+Message-ID: <4ba965b7-f5b7-a93c-005b-dece761732a9@linux.ibm.com>
+Date:   Thu, 9 Dec 2021 16:07:53 +0100
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH 08/32] s390/pci: stash associated GISA designation
+Content-Language: en-US
+To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
+        schnelle@linux.ibm.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
+        hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
+        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
+        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20211207205743.150299-1-mjrosato@linux.ibm.com>
+ <20211207205743.150299-9-mjrosato@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <20211207205743.150299-9-mjrosato@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: FuQSgzHMN1wSW617zeWmw5B2kVLTv_rL
+X-Proofpoint-GUID: xQURwOHUN0EpzfcLtW0OxDbFji_3gAdd
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2021-12-09_06,2021-12-08_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=999
+ priorityscore=1501 malwarescore=0 bulkscore=0 impostorscore=0 phishscore=0
+ suspectscore=0 mlxscore=0 lowpriorityscore=0 spamscore=0 clxscore=1015
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
+ definitions=main-2112090082
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2021-12-09 at 15:12 +0100, Paolo Bonzini wrote:
-> On 12/9/21 12:54, Maxim Levitsky wrote:
-> > Also reorder call to kvm_apic_update_apicv to be after
-> > .refresh_apicv_exec_ctrl, although that doesn't guarantee
-> > that it will see up to date IRR bits.
+
+
+Am 07.12.21 um 21:57 schrieb Matthew Rosato:
+> For passthrough devices, we will need to know the GISA designation of the
+> guest if interpretation facilities are to be used.  Setup to stash this in
+> the zdev and set a default of 0 (no GISA designation) for now; a subsequent
+> patch will set a valid GISA designation for passthrough devices.
+> Also, extend mpcific routines to specify this stashed designation as part
+> of the mpcific command.
 > 
-> Can you spell out why do that?
+> Reviewed-by: Niklas Schnelle <schnelle@linux.ibm.com>
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
 
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
 
-Here is what I seen happening during kvm_vcpu_update_apicv when we about to disable AVIC:
-
-1. we call kvm_apic_update_apicv which sets irr_pending == false,
-because there is nothing in IRR yet.
-
-2. we call kvm_x86_refresh_apicv_exec_ctrl which disables AVIC
-
-If IPI arrives in between 1 and 2, the IRR bits are set, and legit there
-is no VMexit happening so no chance of irr_pending to be set to true.
-
-
-This is why I reordered those calls and added a memory barrier between them
-(but I didn't post it in the series)
-
-However I then found out that even with incomplete IPI handler setting irr_pending,
-I can here observe irr_pending = true but no bits in IRR so the kvm_apic_update_apicv
-would reset it. I expected VM exit to be write barrier but it seems that it isn't.
-
-However I ended up fixing the incomplete IPI handler to just always 
-	- set irr_pending
-	- raise KVM_REQ_EVENT
-	- kick the vcpu
-
-Because kicking a sleeping vCPU is just waking it up,
-and otherwise vcpu kick only sends IPI when the target vCPU
-is in guest mode anyway.
-
-That I think ensures for good that interrupt will be processed by
-this vCPU regardless of order of these calls, and barrier between them.
-
-The only thing I kept is that make kvm_apic_update_apicv never clear
-irr_pending to make sure it doesn't reset it if it sees the writes out of order.
-
-Later the KVM_REQ_EVENT should see writes in order because kvm_make_request
-includes a write barrier, and the kick should ensure that the vCPU will
-process that request.
-
-So in summary this reorder is not needed anymore but it seems more logical
-to scan IRR after we disable AVIC.
-Or on the second though I think we should drop the IRR scan from here at all,
-now that the callers do vcpu kicks.
-
-Best regards,
-	Maxim Levitsky
-
-
-
-
-
+> ---
+>   arch/s390/include/asm/pci.h     | 1 +
+>   arch/s390/include/asm/pci_clp.h | 3 ++-
+>   arch/s390/pci/pci.c             | 9 +++++++++
+>   arch/s390/pci/pci_clp.c         | 1 +
+>   arch/s390/pci/pci_irq.c         | 5 +++++
+>   5 files changed, 18 insertions(+), 1 deletion(-)
 > 
-> Paolo
+> diff --git a/arch/s390/include/asm/pci.h b/arch/s390/include/asm/pci.h
+> index 90824be5ce9a..2474b8d30f2a 100644
+> --- a/arch/s390/include/asm/pci.h
+> +++ b/arch/s390/include/asm/pci.h
+> @@ -123,6 +123,7 @@ struct zpci_dev {
+>   	enum zpci_state state;
+>   	u32		fid;		/* function ID, used by sclp */
+>   	u32		fh;		/* function handle, used by insn's */
+> +	u32		gd;		/* GISA designation for passthrough */
+>   	u16		vfn;		/* virtual function number */
+>   	u16		pchid;		/* physical channel ID */
+>   	u8		pfgid;		/* function group ID */
+> diff --git a/arch/s390/include/asm/pci_clp.h b/arch/s390/include/asm/pci_clp.h
+> index 1f4b666e85ee..3af8d196da74 100644
+> --- a/arch/s390/include/asm/pci_clp.h
+> +++ b/arch/s390/include/asm/pci_clp.h
+> @@ -173,7 +173,8 @@ struct clp_req_set_pci {
+>   	u16 reserved2;
+>   	u8 oc;				/* operation controls */
+>   	u8 ndas;			/* number of dma spaces */
+> -	u64 reserved3;
+> +	u32 reserved3;
+> +	u32 gd;				/* GISA designation */
+>   } __packed;
+>   
+>   /* Set PCI function response */
+> diff --git a/arch/s390/pci/pci.c b/arch/s390/pci/pci.c
+> index 2f9b78fa82a5..9b4d3d78b444 100644
+> --- a/arch/s390/pci/pci.c
+> +++ b/arch/s390/pci/pci.c
+> @@ -119,6 +119,7 @@ int zpci_register_ioat(struct zpci_dev *zdev, u8 dmaas,
+>   	fib.pba = base;
+>   	fib.pal = limit;
+>   	fib.iota = iota | ZPCI_IOTA_RTTO_FLAG;
+> +	fib.gd = zdev->gd;
+>   	cc = zpci_mod_fc(req, &fib, &status);
+>   	if (cc)
+>   		zpci_dbg(3, "reg ioat fid:%x, cc:%d, status:%d\n", zdev->fid, cc, status);
+> @@ -132,6 +133,8 @@ int zpci_unregister_ioat(struct zpci_dev *zdev, u8 dmaas)
+>   	struct zpci_fib fib = {0};
+>   	u8 cc, status;
+>   
+> +	fib.gd = zdev->gd;
+> +
+>   	cc = zpci_mod_fc(req, &fib, &status);
+>   	if (cc)
+>   		zpci_dbg(3, "unreg ioat fid:%x, cc:%d, status:%d\n", zdev->fid, cc, status);
+> @@ -159,6 +162,7 @@ int zpci_fmb_enable_device(struct zpci_dev *zdev)
+>   	atomic64_set(&zdev->unmapped_pages, 0);
+>   
+>   	fib.fmb_addr = virt_to_phys(zdev->fmb);
+> +	fib.gd = zdev->gd;
+>   	cc = zpci_mod_fc(req, &fib, &status);
+>   	if (cc) {
+>   		kmem_cache_free(zdev_fmb_cache, zdev->fmb);
+> @@ -177,6 +181,8 @@ int zpci_fmb_disable_device(struct zpci_dev *zdev)
+>   	if (!zdev->fmb)
+>   		return -EINVAL;
+>   
+> +	fib.gd = zdev->gd;
+> +
+>   	/* Function measurement is disabled if fmb address is zero */
+>   	cc = zpci_mod_fc(req, &fib, &status);
+>   	if (cc == 3) /* Function already gone. */
+> @@ -807,6 +813,9 @@ struct zpci_dev *zpci_create_device(u32 fid, u32 fh, enum zpci_state state)
+>   	zdev->fid = fid;
+>   	zdev->fh = fh;
+>   
+> +	/* For now, assume it is not a passthrough device */
+> +	zdev->gd = 0;
+> +
+>   	/* Query function properties and update zdev */
+>   	rc = clp_query_pci_fn(zdev);
+>   	if (rc)
+> diff --git a/arch/s390/pci/pci_clp.c b/arch/s390/pci/pci_clp.c
+> index be077b39da33..e9ed0e4a5cf0 100644
+> --- a/arch/s390/pci/pci_clp.c
+> +++ b/arch/s390/pci/pci_clp.c
+> @@ -240,6 +240,7 @@ static int clp_set_pci_fn(struct zpci_dev *zdev, u32 *fh, u8 nr_dma_as, u8 comma
+>   		rrb->request.fh = zdev->fh;
+>   		rrb->request.oc = command;
+>   		rrb->request.ndas = nr_dma_as;
+> +		rrb->request.gd = zdev->gd;
+>   
+>   		rc = clp_req(rrb, CLP_LPS_PCI);
+>   		if (rrb->response.hdr.rsp == CLP_RC_SETPCIFN_BUSY) {
+> diff --git a/arch/s390/pci/pci_irq.c b/arch/s390/pci/pci_irq.c
+> index 6b29e39496d1..9e8b4507234d 100644
+> --- a/arch/s390/pci/pci_irq.c
+> +++ b/arch/s390/pci/pci_irq.c
+> @@ -43,6 +43,7 @@ static int zpci_set_airq(struct zpci_dev *zdev)
+>   	fib.fmt0.aibvo = 0;	/* each zdev has its own interrupt vector */
+>   	fib.fmt0.aisb = (unsigned long) zpci_sbv->vector + (zdev->aisb/64)*8;
+>   	fib.fmt0.aisbo = zdev->aisb & 63;
+> +	fib.gd = zdev->gd;
+>   
+>   	return zpci_mod_fc(req, &fib, &status) ? -EIO : 0;
+>   }
+> @@ -54,6 +55,8 @@ static int zpci_clear_airq(struct zpci_dev *zdev)
+>   	struct zpci_fib fib = {0};
+>   	u8 cc, status;
+>   
+> +	fib.gd = zdev->gd;
+> +
+>   	cc = zpci_mod_fc(req, &fib, &status);
+>   	if (cc == 3 || (cc == 1 && status == 24))
+>   		/* Function already gone or IRQs already deregistered. */
+> @@ -72,6 +75,7 @@ static int zpci_set_directed_irq(struct zpci_dev *zdev)
+>   	fib.fmt = 1;
+>   	fib.fmt1.noi = zdev->msi_nr_irqs;
+>   	fib.fmt1.dibvo = zdev->msi_first_bit;
+> +	fib.gd = zdev->gd;
+>   
+>   	return zpci_mod_fc(req, &fib, &status) ? -EIO : 0;
+>   }
+> @@ -84,6 +88,7 @@ static int zpci_clear_directed_irq(struct zpci_dev *zdev)
+>   	u8 cc, status;
+>   
+>   	fib.fmt = 1;
+> +	fib.gd = zdev->gd;
+>   	cc = zpci_mod_fc(req, &fib, &status);
+>   	if (cc == 3 || (cc == 1 && status == 24))
+>   		/* Function already gone or IRQs already deregistered. */
 > 
-
-
