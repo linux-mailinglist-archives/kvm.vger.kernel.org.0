@@ -2,133 +2,403 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DE97D46F3F6
-	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 20:30:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BAC2346F45F
+	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 20:54:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230107AbhLITeQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Dec 2021 14:34:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50992 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229710AbhLITeP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Dec 2021 14:34:15 -0500
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20191C061746;
-        Thu,  9 Dec 2021 11:30:41 -0800 (PST)
-Received: by mail-ed1-x52a.google.com with SMTP id g14so22196573edb.8;
-        Thu, 09 Dec 2021 11:30:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=0xRtXJW83Yd8z831Xed6i/iEDs06aIGGNcWdPaz0N3Q=;
-        b=RyfBbQL/vfgxEpy/6Bm0MoQjNUaEqzC9YhtLTbdkQZclUhmdoPWLnj4j2ntG53lwE0
-         omy6N3M4bmOzLNI7Ne1T6qj8w9P0DMe1e2DZr8eadbb9Z2O9mIl1lv9IX3cRsJ7hfHIP
-         QhbYjR3ae1Gk0uojBwN5Mys8RmGuKk1Nttth48tQXiLuDe/lh2psg37ecORjPNW/ZU/m
-         1bDlGV4QzanITlc2q0iT+9KFiWcxeo9fjBOve6X1Csfa8/ZRluRdnntAHT+96yvZo4DW
-         pktOLScd/l3yxeNwxkU9pcdH8HFW+VOU77dSX1K1w8H86+8vFck1nq7VSU9znbXlnn37
-         qQYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=0xRtXJW83Yd8z831Xed6i/iEDs06aIGGNcWdPaz0N3Q=;
-        b=yPbr7WgIYEPrjaTLqqZYrUT+7+qtzA2+FKav3zWcEDjIYRIHoyG5gPGL+CExMP0gf7
-         Cgn5iDo4hZ5I7+GgSj7zthL9XGy0rKwbIcQnYRi0SqdK2ia1CNk6OyGYH1SaDgoYl7zx
-         WsMzbuEb1d9DmDpcaucrl6QX/0Wp8bnjSjANoLbRQ5sR1puJcUMOGu2kHVcY+EsMwUk5
-         BZkemf5sPaB8d4fwWBrg157WSoxLumhsutqnZJuyivb1AAIAu/16Ij2z2k76wSaa23jf
-         WEi1Q9f8YTPq2VRBWOUbuqT6rRrTWGOG6hEeuOMque2+5iNzu8qtgOefBFqsmBpQBfGq
-         E4BA==
-X-Gm-Message-State: AOAM530kv3WaGZmMT779lISiV3TR86hdA3r2jDTqTxiaTLbWHZDvI5h2
-        v/t0HK9ijjhKX7SWlZQGAf64AI5Gn44=
-X-Google-Smtp-Source: ABdhPJzgx/xQHPAUMDm+QCSw2KPPR3pnbY6xJBcSAwv6NcsMZz7bbc1uRMovkuY6avOW0uV6jad8eg==
-X-Received: by 2002:a05:6402:1395:: with SMTP id b21mr32197670edv.299.1639078239733;
-        Thu, 09 Dec 2021 11:30:39 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id sd28sm404766ejc.37.2021.12.09.11.30.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Dec 2021 11:30:39 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <3118559d-8d4e-e080-2849-b526917969eb@redhat.com>
-Date:   Thu, 9 Dec 2021 20:30:34 +0100
+        id S231237AbhLIT6R (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Dec 2021 14:58:17 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:8172 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S229554AbhLIT6Q (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 Dec 2021 14:58:16 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B9Jpv3g009099;
+        Thu, 9 Dec 2021 19:54:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=eq+gQxDBMHrHyZ4ljSLma72E+SoqLxYa2qKFBOkPncc=;
+ b=YvQ1Gwhen/1YKCJzO0Dbl/jfei7cstRhJNCJuJyW92gmBejEhDNUboaf0CAij86lwVXt
+ 0GNOknKXRKVZqhaEyiQy6ubTZDT2utV3Js3mGRNFz6Jo/UljmxQRZpLsf4g3dXcHNYF1
+ SJUOkTyhdfq1mNENfIkJ7M2Lw5Aqthzh7ZLi8h3mDIMSGKLn2sZP4+YR1+AAzFZ2Z0fQ
+ V+66owx26plmWbXRwJjcmOT0EpQkfz9UZ8aLR6yZi29KuZpwnI2PouFik10wOZCw29OD
+ 4FRu+wWJ+qOPYi8G+puswn2xkyEZPYqMBI0MTRxD9lYwADzqe+tHQTlh6uy427oLF/wJ Wg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3cuqhr90hy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Dec 2021 19:54:42 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1B9JmNEU029542;
+        Thu, 9 Dec 2021 19:54:41 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3cuqhr90ha-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Dec 2021 19:54:41 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1B9Jl4of013214;
+        Thu, 9 Dec 2021 19:54:40 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma06ams.nl.ibm.com with ESMTP id 3cqykjw0yn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Dec 2021 19:54:40 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1B9JsaWX31850970
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 9 Dec 2021 19:54:36 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D298E42045;
+        Thu,  9 Dec 2021 19:54:36 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C469E42041;
+        Thu,  9 Dec 2021 19:54:35 +0000 (GMT)
+Received: from [9.171.1.84] (unknown [9.171.1.84])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  9 Dec 2021 19:54:35 +0000 (GMT)
+Message-ID: <596857e3-ab13-7513-eeda-ed407fe22732@linux.ibm.com>
+Date:   Thu, 9 Dec 2021 20:54:35 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH v2 0/6] KVM: x86/pmu: Count two basic events for emulated
- instructions
+ Thunderbird/91.3.0
+Subject: Re: [PATCH 14/32] KVM: s390: pci: do initial setup for AEN
+ interpretation
 Content-Language: en-US
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>
-References: <20211130074221.93635-1-likexu@tencent.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211130074221.93635-1-likexu@tencent.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
+        schnelle@linux.ibm.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
+        hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
+        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
+        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20211207205743.150299-1-mjrosato@linux.ibm.com>
+ <20211207205743.150299-15-mjrosato@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <20211207205743.150299-15-mjrosato@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: wNt2EGKUELc3fCUTvmeo0NsSGPgkNHPJ
+X-Proofpoint-ORIG-GUID: EK7wsKeJ-Wr-bN2XmnalsDAtdccC0lRs
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2021-12-09_09,2021-12-08_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ bulkscore=0 priorityscore=1501 clxscore=1015 mlxlogscore=999
+ suspectscore=0 adultscore=0 impostorscore=0 mlxscore=0 phishscore=0
+ spamscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2112090101
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/30/21 08:42, Like Xu wrote:
-> Hi,
+Am 07.12.21 um 21:57 schrieb Matthew Rosato:
+> Initial setup for Adapter Event Notification Interpretation for zPCI
+> passthrough devices.  Specifically, allocate a structure for forwarding of
+> adapter events and pass the address of this structure to firmware.
 > 
-> [ Jim is on holiday, so I'm here to continue this work. ]
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> ---
+>   arch/s390/include/asm/pci_insn.h |  12 ++++
+>   arch/s390/kvm/interrupt.c        |  17 +++++
+>   arch/s390/kvm/kvm-s390.c         |   3 +
+>   arch/s390/kvm/pci.c              | 113 +++++++++++++++++++++++++++++++
+>   arch/s390/kvm/pci.h              |  42 ++++++++++++
+>   5 files changed, 187 insertions(+)
+>   create mode 100644 arch/s390/kvm/pci.h
 > 
-> Some cloud customers need accurate virtualization of two
-> basic PMU events on x86 hardware: "instructions retired" and
-> "branch instructions retired". The existing PMU virtualization code
-> fails to account for instructions (e.g, CPUID) that are emulated by KVM.
-> 
-> Accurately virtualizing all PMU events for all microarchitectures is a
-> herculean task, let's just stick to the two events covered by this set.
-> 
-> Eric Hankland wrote this code originally, but his plate is full, so Jim
-> and I volunteered to shepherd the changes through upstream acceptance.
-> 
-> Thanks,
-> 
-> v1 -> v2 Changelog:
-> - Include the patch set [1] and drop the intel_find_fixed_event(); [Paolo]
->    (we will fix the misleading Intel CPUID events in another patch set)
-> - Drop checks for pmc->perf_event or event state or event type;
-> - Increase a counter once its umask bits and the first 8 select bits are matched;
-> - Rewrite kvm_pmu_incr_counter() with a less invasive approach to the host perf;
-> - Rename kvm_pmu_record_event to kvm_pmu_trigger_event;
-> - Add counter enable check for kvm_pmu_trigger_event();
-> - Add vcpu CPL check for kvm_pmu_trigger_event(); [Jim]
-> 
-> Previous:
-> https://lore.kernel.org/kvm/20211112235235.1125060-2-jmattson@google.com/
-> 
-> [1] https://lore.kernel.org/kvm/20211119064856.77948-1-likexu@tencent.com/
-> 
-> Jim Mattson (1):
->    KVM: x86: Update vPMCs when retiring branch instructions
-> 
-> Like Xu (5):
->    KVM: x86/pmu: Setup pmc->eventsel for fixed PMCs
->    KVM: x86/pmu: Refactoring find_arch_event() to pmc_perf_hw_id()
->    KVM: x86/pmu: Reuse pmc_perf_hw_id() and drop find_fixed_event()
->    KVM: x86/pmu: Add pmc->intr to refactor kvm_perf_overflow{_intr}()
->    KVM: x86: Update vPMCs when retiring instructions
-> 
->   arch/x86/include/asm/kvm_host.h |   1 +
->   arch/x86/kvm/emulate.c          |  55 ++++++++------
->   arch/x86/kvm/kvm_emulate.h      |   1 +
->   arch/x86/kvm/pmu.c              | 128 ++++++++++++++++++++++----------
->   arch/x86/kvm/pmu.h              |   5 +-
->   arch/x86/kvm/svm/pmu.c          |  19 ++---
->   arch/x86/kvm/vmx/nested.c       |   7 +-
->   arch/x86/kvm/vmx/pmu_intel.c    |  44 ++++++-----
->   arch/x86/kvm/x86.c              |   5 ++
->   9 files changed, 167 insertions(+), 98 deletions(-)
-> 
+> diff --git a/arch/s390/include/asm/pci_insn.h b/arch/s390/include/asm/pci_insn.h
+> index 5331082fa516..e5f57cfe1d45 100644
+> --- a/arch/s390/include/asm/pci_insn.h
+> +++ b/arch/s390/include/asm/pci_insn.h
+> @@ -101,6 +101,7 @@ struct zpci_fib {
+>   /* Set Interruption Controls Operation Controls  */
+>   #define	SIC_IRQ_MODE_ALL		0
+>   #define	SIC_IRQ_MODE_SINGLE		1
+> +#define	SIC_SET_AENI_CONTROLS		2
+>   #define	SIC_IRQ_MODE_DIRECT		4
+>   #define	SIC_IRQ_MODE_D_ALL		16
+>   #define	SIC_IRQ_MODE_D_SINGLE		17
+> @@ -127,9 +128,20 @@ struct zpci_cdiib {
+>   	u64 : 64;
+>   } __packed __aligned(8);
+>   
+> +/* adapter interruption parameters block */
+> +struct zpci_aipb {
+> +	u64 faisb;
+> +	u64 gait;
+> +	u16 : 13;
+> +	u16 afi : 3;
+> +	u32 : 32;
+> +	u16 faal;
+> +} __packed __aligned(8);
+> +
+>   union zpci_sic_iib {
+>   	struct zpci_diib diib;
+>   	struct zpci_cdiib cdiib;
+> +	struct zpci_aipb aipb;
+>   };
+>   
+>   DECLARE_STATIC_KEY_FALSE(have_mio);
+> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
+> index f9b872e358c6..4efe0e95a40f 100644
+> --- a/arch/s390/kvm/interrupt.c
+> +++ b/arch/s390/kvm/interrupt.c
+> @@ -32,6 +32,7 @@
+>   #include "kvm-s390.h"
+>   #include "gaccess.h"
+>   #include "trace-s390.h"
+> +#include "pci.h"
+>   
+>   #define PFAULT_INIT 0x0600
+>   #define PFAULT_DONE 0x0680
+> @@ -3276,8 +3277,16 @@ static struct airq_struct gib_alert_irq = {
+>   
+>   void kvm_s390_gib_destroy(void)
+>   {
+> +	struct zpci_aift *aift;
+> +
+>   	if (!gib)
+>   		return;
+> +	aift = kvm_s390_pci_get_aift();
+> +	if (aift) {
+> +		mutex_lock(&aift->lock)
 
-Queued patches 1-4, thanks.
+aift is a static variable and later patches seem to access that directly without the wrapper.
+Can we get rid of kvm_s390_pci_get_aift?
+;
+> +		kvm_s390_pci_aen_exit();
+> +		mutex_unlock(&aift->lock);
+> +	}
+>   	chsc_sgib(0);
+>   	unregister_adapter_interrupt(&gib_alert_irq);
+>   	free_page((unsigned long)gib);
+> @@ -3315,6 +3324,14 @@ int kvm_s390_gib_init(u8 nisc)
+>   		goto out_unreg_gal;
+>   	}
+>   
+> +	if (IS_ENABLED(CONFIG_PCI) && sclp.has_aeni) {
+> +		if (kvm_s390_pci_aen_init(nisc)) {
+> +			pr_err("Initializing AEN for PCI failed\n");
+> +			rc = -EIO;
+> +			goto out_unreg_gal;
+> +		}
+> +	}
+> +
+>   	KVM_EVENT(3, "gib 0x%pK (nisc=%d) initialized", gib, gib->nisc);
+>   	goto out;
+>   
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 14a18ba5ff2c..9cd3c8eb59e8 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -48,6 +48,7 @@
+>   #include <asm/fpu/api.h>
+>   #include "kvm-s390.h"
+>   #include "gaccess.h"
+> +#include "pci.h"
+>   
+>   #define CREATE_TRACE_POINTS
+>   #include "trace.h"
+> @@ -503,6 +504,8 @@ int kvm_arch_init(void *opaque)
+>   		goto out;
+>   	}
+>   
+> +	kvm_s390_pci_init();
+> +
+>   	rc = kvm_s390_gib_init(GAL_ISC);
+>   	if (rc)
+>   		goto out;
+> diff --git a/arch/s390/kvm/pci.c b/arch/s390/kvm/pci.c
+> index ecfc458a5b39..f0e5386ff943 100644
+> --- a/arch/s390/kvm/pci.c
+> +++ b/arch/s390/kvm/pci.c
+> @@ -10,6 +10,113 @@
+>   #include <linux/kvm_host.h>
+>   #include <linux/pci.h>
+>   #include <asm/kvm_pci.h>
+> +#include "pci.h"
+> +
+> +static struct zpci_aift aift;
 
-Paolo
+see below.
+> +
+> +static inline int __set_irq_noiib(u16 ctl, u8 isc)
+> +{
+> +	union zpci_sic_iib iib = {{0}};
+> +
+> +	return zpci_set_irq_ctrl(ctl, isc, &iib);
+> +}
+> +
+> +struct zpci_aift *kvm_s390_pci_get_aift(void)
+> +{
+> +	return &aift;
+> +}
+> +
+> +/* Caller must hold the aift lock before calling this function */
+> +void kvm_s390_pci_aen_exit(void)
+> +{
+> +	struct zpci_gaite *gait;
+> +	unsigned long flags;
+> +	struct airq_iv *sbv;
+> +	struct kvm_zdev **gait_kzdev;
+> +	int size;
+> +
+> +	/* Clear the GAIT and forwarding summary vector */
+> +	__set_irq_noiib(SIC_SET_AENI_CONTROLS, 0);
+> +
+> +	spin_lock_irqsave(&aift.gait_lock, flags);
+> +	gait = aift.gait;
+> +	sbv = aift.sbv;
+> +	gait_kzdev = aift.kzdev;
+> +	aift.gait = 0;
+> +	aift.sbv = 0;
+> +	aift.kzdev = 0;
+> +	spin_unlock_irqrestore(&aift.gait_lock, flags);
+> +
+> +	if (sbv)
+> +		airq_iv_release(sbv);
+> +	size = get_order(PAGE_ALIGN(ZPCI_NR_DEVICES *
+> +				    sizeof(struct zpci_gaite)));
+> +	free_pages((unsigned long)gait, size);
+> +	kfree(gait_kzdev);
+> +}
+> +
+> +int kvm_s390_pci_aen_init(u8 nisc)
+> +{
+> +	union zpci_sic_iib iib = {{0}};
+> +	struct page *page;
+> +	int rc = 0, size;
+> +
+> +	/* If already enabled for AEN, bail out now */
+> +	if (aift.gait || aift.sbv)
+> +		return -EPERM;
+> +
+> +	mutex_lock(&aift.lock);
+> +	aift.kzdev = kcalloc(ZPCI_NR_DEVICES, sizeof(struct kvm_zdev),
+> +			     GFP_KERNEL);
+> +	if (!aift.kzdev) {
+> +		rc = -ENOMEM;
+> +		goto unlock;
+> +	}
+> +	aift.sbv = airq_iv_create(ZPCI_NR_DEVICES, AIRQ_IV_ALLOC, 0);
+> +	if (!aift.sbv) {
+> +		rc = -ENOMEM;
+> +		goto free_zdev;
+> +	}
+> +	size = get_order(PAGE_ALIGN(ZPCI_NR_DEVICES *
+> +				    sizeof(struct zpci_gaite)));
+> +	page = alloc_pages(GFP_KERNEL | __GFP_ZERO, size);
+> +	if (!page) {
+> +		rc = -ENOMEM;
+> +		goto free_sbv;
+> +	}
+> +	aift.gait = (struct zpci_gaite *)page_to_phys(page);
+> +
+> +	iib.aipb.faisb = (u64)aift.sbv->vector;
+> +	iib.aipb.gait = (u64)aift.gait;
+> +	iib.aipb.afi = nisc;
+> +	iib.aipb.faal = ZPCI_NR_DEVICES;
+> +
+> +	/* Setup Adapter Event Notification Interpretation */
+> +	if (zpci_set_irq_ctrl(SIC_SET_AENI_CONTROLS, 0, &iib)) {
+> +		rc = -EIO;
+> +		goto free_gait;
+> +	}
+> +
+> +	/* Enable floating IRQs */
+> +	if (__set_irq_noiib(SIC_IRQ_MODE_SINGLE, nisc)) {
+> +		rc = -EIO;
+> +		kvm_s390_pci_aen_exit();
+> +	}
+> +
+> +	goto unlock;
+> +
+> +free_gait:
+> +	size = get_order(PAGE_ALIGN(ZPCI_NR_DEVICES *
+> +				    sizeof(struct zpci_gaite)));
+> +	free_pages((unsigned long)aift.gait, size);
+> +free_sbv:
+> +	airq_iv_release(aift.sbv);
+> +free_zdev:
+> +	kfree(aift.kzdev);
+> +unlock:
+> +	mutex_unlock(&aift.lock);
+> +	return rc;
+> +}
+>   
+>   int kvm_s390_pci_dev_open(struct zpci_dev *zdev)
+>   {
+> @@ -55,3 +162,9 @@ int kvm_s390_pci_attach_kvm(struct zpci_dev *zdev, struct kvm *kvm)
+>   	return 0;
+>   }
+>   EXPORT_SYMBOL_GPL(kvm_s390_pci_attach_kvm);
+> +
+> +void kvm_s390_pci_init(void)
+> +{
+> +	spin_lock_init(&aift.gait_lock);
+> +	mutex_init(&aift.lock);
+> +}
+
+Can we maybe use designated initializer for the static definition of aift, e.g. something
+like
+static struct zpci_aift aift = {
+	.gait_lock = __SPIN_LOCK_UNLOCKED(aift.gait_lock),
+	.lock	= __MUTEX_INITIALIZER(aift.lock),
+}
+and get rid of the init function?
+
+
+> diff --git a/arch/s390/kvm/pci.h b/arch/s390/kvm/pci.h
+> new file mode 100644
+> index 000000000000..74b06d39be3b
+> --- /dev/null
+> +++ b/arch/s390/kvm/pci.h
+> @@ -0,0 +1,42 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * s390 kvm PCI passthrough support
+> + *
+> + * Copyright IBM Corp. 2021
+> + *
+> + *    Author(s): Matthew Rosato <mjrosato@linux.ibm.com>
+> + */
+> +
+> +#ifndef __KVM_S390_PCI_H
+> +#define __KVM_S390_PCI_H
+> +
+> +#include <linux/pci.h>
+> +#include <linux/mutex.h>
+> +#include <asm/airq.h>
+> +#include <asm/kvm_pci.h>
+> +
+> +struct zpci_gaite {
+> +	unsigned int gisa;
+
+since we use u8 below, what about u32
+> +	u8 gisc;
+> +	u8 count;
+> +	u8 reserved;
+> +	u8 aisbo;
+> +	unsigned long aisb;
+
+and u64 ?
+> +};
+> +
+> +struct zpci_aift {
+> +	struct zpci_gaite *gait;
+> +	struct airq_iv *sbv;
+> +	struct kvm_zdev **kzdev;
+> +	spinlock_t gait_lock; /* Protects the gait, used during AEN forward */
+> +	struct mutex lock; /* Protects the other structures in aift */
+> +};
+> +
+> +struct zpci_aift *kvm_s390_pci_get_aift(void);
+> +
+> +int kvm_s390_pci_aen_init(u8 nisc);
+> +void kvm_s390_pci_aen_exit(void);
+> +
+> +void kvm_s390_pci_init(void);
+> +
+> +#endif /* __KVM_S390_PCI_H */
+> 
