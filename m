@@ -2,140 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EE61046F2C3
-	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 19:07:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5827946F2E1
+	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 19:20:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243190AbhLISK7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Dec 2021 13:10:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59676 "EHLO
+        id S243218AbhLISYI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Dec 2021 13:24:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237652AbhLISK6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Dec 2021 13:10:58 -0500
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1B6CC061746;
-        Thu,  9 Dec 2021 10:07:24 -0800 (PST)
-Received: by mail-ed1-x52e.google.com with SMTP id y13so21840798edd.13;
-        Thu, 09 Dec 2021 10:07:24 -0800 (PST)
+        with ESMTP id S237501AbhLISYH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Dec 2021 13:24:07 -0500
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED0FBC061746
+        for <kvm@vger.kernel.org>; Thu,  9 Dec 2021 10:20:33 -0800 (PST)
+Received: by mail-pf1-x434.google.com with SMTP id k64so6150805pfd.11
+        for <kvm@vger.kernel.org>; Thu, 09 Dec 2021 10:20:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=/BR1/2RGDScqGY9eUb2OeC+8FFb2k7htqUCGVYcL9Ck=;
-        b=Lhbpmm1UKqlpxT/ebiO1Bba267s4bE94yh07WOHh4nJeWCnmE8+23Eg5C12Rhgfpsc
-         0I4D6URfKKEqBAzSviybZHxAOPOACMyExokRlTYNq44nDkWCuzRtqrXLPqBLh0Q1MX+o
-         Jtx1lpBHXhEr3ddLKS6N/SSGxs76Q2vWnWxLnCwJZn1OqNjqHCU0mb7ID9NFK1G/sQ7f
-         QnXai4TvqSPLltPU5wh6tLAcP4ybsTybXo1I146LDMPVWG7M5ZooS0wo6QoJtRF//8Lt
-         64rO/CTBMU0ZFk+JY57EO2EnzjUHgznePMSl5XKLuc96fG3MU0lOVX14FEeAcqzIaDIb
-         CLtg==
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Tvmy9iuHyCNf/Lo2PS/zSkuGC5kcxP0bkqvMrstnVw0=;
+        b=NVqDlwIh2sHhH5QYeeW/d2laVrOu2ZCkrX5i1KWgB76AOG2RQBQs2eQory7cxCXrhR
+         nF9Sk1RJUQmqWcurEx53sgPYE9+1EjHlb5vh3v4TFSa8BYl8AfMFviYEzLVEACUOBq3e
+         vVyN7UXKVfrTz7zA85/wfZXGyZ1LH7smYOcR3nuxwDjvZ2GTU5K12scLVF1WQusWk70e
+         2Q3yGDrH6JbHGSSDUYjntJLtU6INyTpesMqiefJcCPlTwnWrOmpF8321ukShaZ6O4cm4
+         Ij9HSjxGc6rwMnN7reCUtYi9R7z4FCeiSFgQU5xqOhyIpK63FfxTdCvNH7DJ3xv64UZG
+         ltEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=/BR1/2RGDScqGY9eUb2OeC+8FFb2k7htqUCGVYcL9Ck=;
-        b=SNhgx90mmKagdH+JTqlGon0ew07q7wGGeYEY42uWlpUnNnd/ZO3UZ9Fvqajq+IaYpM
-         oQwy2pfdS42JYG0DnaPE6P6KSf6T0rhr+aIh6a0DIvuvQD1H8MQgIZY6MKhPeDZcT16Z
-         rPMOdT5ZRfvdSGQDM5+AzHbxCKopX1teQ5stKBgqM8ACR8FpO+5ulx6WbH0TEzEKSwsN
-         IhJAmFY5O4436d60dtk7mz5vXqkMta5axIkM3kprkFOkH8O8SSmNqlWM5hA9fwiXt14I
-         j4FWgByRfgFHah0nsNgoe36MATfXIwMecbrIsJjh6OAl+T5oKeo0/SfQdSLT9zgNFV/x
-         6aWA==
-X-Gm-Message-State: AOAM532e5yk80W353CjmDH3zUlBGCwLYFdGf9BgNBpHTe6Y6Tz8QaAzT
-        sStxCHcCzT3vmCh8cshvFoE=
-X-Google-Smtp-Source: ABdhPJyCcY7SoPv6aHO9XYFGu1O783sL+OxwRl4LzsOaKHe6HzGM6Aj5sR6vgOMnSD+1083Jrn4srQ==
-X-Received: by 2002:a05:6402:d05:: with SMTP id eb5mr31407913edb.360.1639073154112;
-        Thu, 09 Dec 2021 10:05:54 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id og38sm275399ejc.5.2021.12.09.10.05.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Dec 2021 10:05:52 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <048a1ef6-193a-eb82-0433-70c97e1a03e5@redhat.com>
-Date:   Thu, 9 Dec 2021 19:05:48 +0100
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Tvmy9iuHyCNf/Lo2PS/zSkuGC5kcxP0bkqvMrstnVw0=;
+        b=6gjHDggGW9oa9P4hfjlqHGoSpHwj4PdUty7JjTmhVQRH6YgNMtJa34lsAbANegAT/q
+         0kESB6w/rrr7OSjHn9ycmHsafK/v/pYFpnTDbANLjxSfTN7p6HdUcXhTsJ7HPOzUh8D+
+         fADKAXW9nI1LjkYs3NqNqpR1W/g6RW7MG8chGJ9GaHSwhaBkQ524FvSFLJH7GPhj+2No
+         9FkWyQEDFn73m+vL5wnV/Mg7IAadxROkxHOZwz39QaDG1EF6E0CB+BCdJh5N0YWXYn3j
+         HCWKqF0ud+shb/CG7SC6v3BCYoZX5TRP/9RYPMThcqaIsPDAjF6eCa67pxFvyoN4lknx
+         OAzA==
+X-Gm-Message-State: AOAM533FORk/R3bGabxasds0nJ7PJT037IkK+LZdamNkpq1Yu84f836y
+        NSEriCL/rNdAgs2Ng8xRApxZMg2MidZ7Gi6irY+1lg==
+X-Google-Smtp-Source: ABdhPJyD+/hhRaesCxfvIDL8j2lPF4eYq/ATj7b/WPTrGaMg2JzO9vmEOdlSJAt8Mxxn++KBRtz0n28hg1VrkZTfT/8=
+X-Received: by 2002:a05:6a00:b89:b0:4ae:d9a3:ccf9 with SMTP id
+ g9-20020a056a000b8900b004aed9a3ccf9mr13242826pfj.13.1639074033142; Thu, 09
+ Dec 2021 10:20:33 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH v5 06/12] KVM: powerpc: Use Makefile.kvm for common files
-Content-Language: en-US
-To:     David Woodhouse <dwmw2@infradead.org>, kvm <kvm@vger.kernel.org>
-Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        "jmattson @ google . com" <jmattson@google.com>,
-        "wanpengli @ tencent . com" <wanpengli@tencent.com>,
-        "seanjc @ google . com" <seanjc@google.com>,
-        "vkuznets @ redhat . com" <vkuznets@redhat.com>,
-        "mtosatti @ redhat . com" <mtosatti@redhat.com>,
-        "joro @ 8bytes . org" <joro@8bytes.org>, karahmed@amazon.com,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-        butt3rflyh4ck <butterflyhuangxx@gmail.com>
-References: <20211121125451.9489-1-dwmw2@infradead.org>
- <20211121125451.9489-7-dwmw2@infradead.org>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211121125451.9489-7-dwmw2@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20211209155257.128747-1-marcorr@google.com> <5f8c31b4-6223-a965-0e91-15b4ffc0335e@redhat.com>
+In-Reply-To: <5f8c31b4-6223-a965-0e91-15b4ffc0335e@redhat.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 9 Dec 2021 10:20:22 -0800
+Message-ID: <CALMp9eThf3UtvoLFjajkrXtvOEWQvc8_=Xf6-m6fHXkOhET+GA@mail.gmail.com>
+Subject: Re: [PATCH v2] KVM: x86: Always set kvm_run->if_flag
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Marc Orr <marcorr@google.com>, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        thomas.lendacky@amd.com, mlevitsk@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/21/21 13:54, David Woodhouse wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
-> 
-> It's all fairly baroque but in the end, I don't think there's any reason
-> for $(KVM)/irqchip.o to have been handled differently, as they all end
-> up in $(kvm-y) in the end anyway, regardless of whether they get there
-> via $(common-objs-y) and the CPU-specific object lists.
-> 
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> Acked-by: Michael Ellerman <mpe@ellerman.id.au> (powerpc)
-> ---
->   arch/powerpc/kvm/Makefile | 6 +-----
->   1 file changed, 1 insertion(+), 5 deletions(-)
-> 
-> diff --git a/arch/powerpc/kvm/Makefile b/arch/powerpc/kvm/Makefile
-> index 583c14ef596e..245f59118413 100644
-> --- a/arch/powerpc/kvm/Makefile
-> +++ b/arch/powerpc/kvm/Makefile
-> @@ -4,11 +4,8 @@
->   #
->   
->   ccflags-y := -Ivirt/kvm -Iarch/powerpc/kvm
-> -KVM := ../../../virt/kvm
->   
-> -common-objs-y = $(KVM)/kvm_main.o $(KVM)/eventfd.o $(KVM)/binary_stats.o
-> -common-objs-$(CONFIG_KVM_VFIO) += $(KVM)/vfio.o
-> -common-objs-$(CONFIG_KVM_MMIO) += $(KVM)/coalesced_mmio.o
-> +include $(srctree)/virt/kvm/Makefile.kvm
->   
->   common-objs-y += powerpc.o emulate_loadstore.o
->   obj-$(CONFIG_KVM_EXIT_TIMING) += timing.o
-> @@ -125,7 +122,6 @@ kvm-book3s_32-objs := \
->   kvm-objs-$(CONFIG_KVM_BOOK3S_32) := $(kvm-book3s_32-objs)
->   
->   kvm-objs-$(CONFIG_KVM_MPIC) += mpic.o
-> -kvm-objs-$(CONFIG_HAVE_KVM_IRQ_ROUTING) += $(KVM)/irqchip.o
->   
->   kvm-objs := $(kvm-objs-m) $(kvm-objs-y)
+On Thu, Dec 9, 2021 at 9:48 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 12/9/21 16:52, Marc Orr wrote:
+> > The kvm_run struct's if_flag is a part of the userspace/kernel API. The
+> > SEV-ES patches failed to set this flag because it's no longer needed by
+> > QEMU (according to the comment in the source code). However, other
+> > hypervisors may make use of this flag. Therefore, set the flag for
+> > guests with encrypted registers (i.e., with guest_state_protected set).
+> >
+> > Fixes: f1c6366e3043 ("KVM: SVM: Add required changes to support intercepts under SEV-ES")
+> > Signed-off-by: Marc Orr<marcorr@google.com>
+>
+> Applied, though I wonder if it is really needed by those other VMMs
+> (which? gVisor is the only one that comes to mind that is interested in
+> userspace APIC).
 
-Same here,
+Vanadium appears to have one use of it.
 
-kvm-y += $(kvm-objs-m) $(kvm-objs-y)
+> It shouldn't be necessary for in-kernel APIC (where userspace can inject
+> interrupts at any time), and ready_for_interrupt_injection is superior
+> for userspace APIC.
 
-would be slightly preferrable IMO.
+LOL. Here's that one use...
 
-Paolo
+if (vcpu_run_state_->request_interrupt_window &&
+vcpu_run_state_->ready_for_interrupt_injection &&
+vcpu_run_state_->if_flag) {
+...
+}
+
+So, maybe this is much ado about nothing?
