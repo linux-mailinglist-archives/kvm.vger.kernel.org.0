@@ -2,144 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6CC9646EBED
-	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 16:39:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8074746EBF9
+	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 16:40:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240097AbhLIPmp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Dec 2021 10:42:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50250 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240316AbhLIPmd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Dec 2021 10:42:33 -0500
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40D16C0698CA
-        for <kvm@vger.kernel.org>; Thu,  9 Dec 2021 07:38:54 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id k6-20020a17090a7f0600b001ad9d73b20bso5130937pjl.3
-        for <kvm@vger.kernel.org>; Thu, 09 Dec 2021 07:38:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=KRgjVkKi95KRmYQZO51YZ/hyLvmjeSEoU+P1R5ObJmQ=;
-        b=kUC7Y0nX0pDX7m7Yt+7ygQiUU1wbPEAsZUiq3ghIfr9GnZERJrj8JmpZI9/9MBFygR
-         oqQQ4aa14uG/BQ3qUVxC/3O67gutxuPCZ8AXLBe2JRnCVw11mgsDHO9CJrzlGP06ePM5
-         n4kj6AuJFu5I4tMfGdC1jCDDBSBhTq35e5ueaZxfYyznLp58poXJ3iNGOZMt0OYlS1RD
-         60ftn8MwxBkTFgPap25Qf0G+PBMrCGtWycVARHAprC+fF+9Ocg2nVlixquTNdMd2l1O+
-         yPe+uUCWeNU5R2UM2qDbeLZwmpkeIeKF+TgnZ1ycecQWaV5ZGRd9+W6Kt8/e734QPe7s
-         6gDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=KRgjVkKi95KRmYQZO51YZ/hyLvmjeSEoU+P1R5ObJmQ=;
-        b=ahCpKETdMulj9HgNzwYfuB6owdLLQr1k3gIqtwrMlfAN+YMIo2dDLk7mUdCY7YgRpS
-         CHPZEIQO7S2Rd+gevAiJzochGylqiSp/zy9fovCIZ6qE2EOaZGHXvVxOgDpIjJr0Q9MK
-         Eox8V/b7t3BLZpEtmaS89NqPtbObn04QLkafAR6pKELM8K2dQTGjKMLt+xpuTg/2SqTb
-         clf4t8fdHFlAzSvZK2LGu/vUXW9wHPkNc86fNXeSqtskbNX/MUZELzhZBCigfk4UmDdL
-         THpQPRkoZsxJBR5PQQV+gbt2v8z0pBNXEPghs+K7LLS7LX6LZF1Ci0wlTJkidOgUssx6
-         JbUw==
-X-Gm-Message-State: AOAM532az9R4EDTewL8rUw7M8PqnISvFYC2ob1SUFSkq8B6E3J+zdhoP
-        OoO+pE2DsWgSfM4nQfZXgqbF6g==
-X-Google-Smtp-Source: ABdhPJy6DgaR3sDOg/QQ8clnEdqj4oJcqzO+5eq9dxexRlzDKEys180588yu5HFJDIiWMd0OOCR3IQ==
-X-Received: by 2002:a17:903:22c6:b0:141:fac1:b722 with SMTP id y6-20020a17090322c600b00141fac1b722mr69560300plg.23.1639064333371;
-        Thu, 09 Dec 2021 07:38:53 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id c3sm112265pfv.67.2021.12.09.07.38.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Dec 2021 07:38:52 -0800 (PST)
-Date:   Thu, 9 Dec 2021 15:38:49 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     kvm@vger.kernel.org,
-        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
-        <linux-kernel@vger.kernel.org>, Wanpeng Li <wanpengli@tencent.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH 4/6] KVM: SVM: fix races in the AVIC incomplete IPI
- delivery to vCPUs
-Message-ID: <YbIjCUAECOyIbsYQ@google.com>
-References: <20211209115440.394441-1-mlevitsk@redhat.com>
- <20211209115440.394441-5-mlevitsk@redhat.com>
-MIME-Version: 1.0
+        id S236613AbhLIPo0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Dec 2021 10:44:26 -0500
+Received: from mail-mw2nam12on2075.outbound.protection.outlook.com ([40.107.244.75]:14496
+        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S236210AbhLIPoZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Dec 2021 10:44:25 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=a/zet3GOPnPRegdMOWZWzJLRxBkH5SmCT3j6m2Ijcba0477ZMvJggdYmqurI4F3ivWJwb09EcvIIqNro2PIZq9moLhutl14OJwN9ZIVKM1psWy1seTsNvsrmm9Gw7M0CvaeGVArm7E9N20IPCeN6M/AYf+28AoqtYp5kMA+yF38R+alW54b/StUJCMBerQgxYs4KqrnkRc91S1M57CKv0Y8sF+fv7GfJFLa/C9HpREDC41/NtXyXDF02OvmGigLt4jk/LngPr78t4AUPJrgt3k+gjvBm1ICnNCJjLG4dEQQpmvQGTuh/GEFtQlVzu4aJy1SXxBBlKsKbfvKoEZfg9g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=H4OibOndAozFWSriX3TG8msS7GN0/heSHM57NC0IrIw=;
+ b=TQMkcM8GsyTY47bB/stQaK9pmwsKR6tHNqQiIYO3ifRGXuiUyOoINpqcDZmvxGjMDBsg6RL6PaibtI42KIuh7grhdPH7HuXwDq40Pl0uoY/tRZaE8wSnuLr1FaZD8PeV0xY5Xat2u4sANwY5p9ytFEUdPaELnNRJuc3/UjPPLG9dI2C4K3x/UteMEm+9MRwUdMUta2V6KXe0VZ5l6DCyLgPLL6aBbq8HJQ2CaPN50xZJ9v0hZdlPgm+18PPiK87vrZcoHM/a23dRG6F7hqNgQIWUybNzGVHMU8aETfSnCF9CptwgZkmBFL153XJ0zvOmdfwbKdA3Mlnq6l5QApxLUQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=H4OibOndAozFWSriX3TG8msS7GN0/heSHM57NC0IrIw=;
+ b=OZMtHfOQwIUsOdzyDrKTAlgUpHed98+JulZQGk4lG226lfhNmVDOj0HTa6hYPKIBqjUtKa39YhHQDdbmH1nR7tXGw8Sjo8EWROVvHpHoNgnGVTm7DLB7Lh9zfXiV1eaTU54w6zonpe93QflVIb5+HdiZ6fY1MKXrCz5I8FJn+Ce5zKVcL7be9qSmxmmmae3bnaJgaH7vs+7P6FNi2+m0ttH1y5liQxLp5ViwhA7/t/cuMzYmn1Ek+Fm4X7Vxd82HlVTd8YrdGmLFXBASRrbsMR75X2WvlJL/GOtmSuI6ADa2YuC2BrUKfkvZmhI0snsOHZpf5IK8XcQzxj+m3UzwcA==
+Received: from BL1PR12MB5032.namprd12.prod.outlook.com (2603:10b6:208:30a::12)
+ by BL1PR12MB5030.namprd12.prod.outlook.com (2603:10b6:208:313::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4778.12; Thu, 9 Dec
+ 2021 15:40:48 +0000
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL1PR12MB5032.namprd12.prod.outlook.com (2603:10b6:208:30a::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4755.20; Thu, 9 Dec
+ 2021 15:40:47 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::d8be:e4e4:ce53:6d11]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::d8be:e4e4:ce53:6d11%7]) with mapi id 15.20.4778.013; Thu, 9 Dec 2021
+ 15:40:47 +0000
+Date:   Thu, 9 Dec 2021 11:40:46 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Eric Auger <eric.auger@redhat.com>
+Cc:     Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>, peter.maydell@linaro.org,
+        kvm@vger.kernel.org, vivek.gautam@arm.com,
+        kvmarm@lists.cs.columbia.edu, eric.auger.pro@gmail.com,
+        ashok.raj@intel.com, maz@kernel.org, vsethi@nvidia.com,
+        zhangfei.gao@linaro.org, kevin.tian@intel.com, will@kernel.org,
+        alex.williamson@redhat.com, wangxingang5@huawei.com,
+        linux-kernel@vger.kernel.org, lushenming@huawei.com,
+        iommu@lists.linux-foundation.org, robin.murphy@arm.com
+Subject: Re: [RFC v16 1/9] iommu: Introduce attach/detach_pasid_table API
+Message-ID: <20211209154046.GQ6385@nvidia.com>
+References: <20211027104428.1059740-1-eric.auger@redhat.com>
+ <20211027104428.1059740-2-eric.auger@redhat.com>
+ <Ya3qd6mT/DpceSm8@8bytes.org>
+ <c7e26722-f78c-a93f-c425-63413aa33dde@redhat.com>
+ <e6733c59-ffcb-74d4-af26-273c1ae8ce68@linux.intel.com>
+ <fbeabcff-a6d4-dcc5-6687-7b32d6358fe3@redhat.com>
+ <20211208125616.GN6385@nvidia.com>
+ <YbDpZ0pf7XeZcc7z@myrica>
+ <20211208183102.GD6385@nvidia.com>
+ <b576084b-482f-bcb7-35a6-d786dbb305e1@redhat.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211209115440.394441-5-mlevitsk@redhat.com>
+In-Reply-To: <b576084b-482f-bcb7-35a6-d786dbb305e1@redhat.com>
+X-ClientProxiedBy: BL0PR02CA0057.namprd02.prod.outlook.com
+ (2603:10b6:207:3d::34) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: c4c0ec46-88a6-4a6e-6649-08d9bb2a4520
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5032:EE_|BL1PR12MB5030:EE_
+X-Microsoft-Antispam-PRVS: <BL1PR12MB5032EBB5BF97DC3A07AD514EC2709@BL1PR12MB5032.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: nf7G3ljSaezRtbMKY37DPkekSRoS6WxDrZttvz2Cd4B49YFSIFMD3kX3bxkgl1MFfnJvzsZP36m1shV2sAaBGnaG/gpyw8dBSMioupJ5s9Hk9stJ+2gC5qCB1lGQlXEM6FgDTjXVJ8amSdhyVpaHa+Ht0+Gbdt7OSG3LcXE0CpSU3nyGQXtZ65wwMH1OM1qTJKxNMZ2SLZ2WlO2S+0aBhWaXo2QWKP7IQxZ6Ju1yyS0nKv5ZnSnwVoykcC5mnN8bdjYJJU38H3g5GGbvbEPQnU8lY2hr518cWPaLZ0KyjGqD3yAYhE2qI9POPFvkFm3pjkfUSu+iq6KpeJucZjm2tdjer7Qh8vJ3/sZlq/7OgABhDQ7oOH7W7DuNIX6Kw6QH0Vvdtva4NXJxI0hluSvg7t3I0momJBH8f2xC9LYptmdtK2QF8ATif9j5lTU1h8rn3FjQyWLKkO0uGqSDFCl2H+bm/8mzxX+5fSkH67TCw/5gMP2s0laQlpVDXA0NobqLuz8IFO0YpY24s3AztH+dY3WU3PcJYYNkDM0jL8CtGBK7BNkzbi2NYHCv9Z4Xcsu15U2zVjgnl0Va1kRLkdjlsXmEjPXSmLOehqtECmBeIqRGY7Xix8SFTRohfxvxjmKAUq0wJzjMi+5MsoKUIllNJA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5032.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(66946007)(33656002)(186003)(26005)(66476007)(1076003)(508600001)(7416002)(6512007)(4326008)(36756003)(2616005)(4744005)(6506007)(66556008)(6486002)(83380400001)(38100700002)(2906002)(6916009)(86362001)(8676002)(8936002)(316002)(5660300002)(54906003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?AmWECveVl0khzBIjkYpqVgvDp6aacsV5FLTpnaK5yY7wpjN4KG/1skL71DrM?=
+ =?us-ascii?Q?Se4PBknmKJ34u0r6qoa8OV+oBkE24nXyxNgEHctbrNrYz5ihJ313wSRbFGxg?=
+ =?us-ascii?Q?+ZG3lNQXkmnJyTIVksChBoPM0qPQt9EXmd5DiyYFIZOpiX7tCsX85n7LmQRh?=
+ =?us-ascii?Q?U8Dsj3QHgqZ5Wi7dij/Wwqz7Zr3hJAA3yM/I2M/ArW6fxSgCn0ojcUeNhJTK?=
+ =?us-ascii?Q?zSQvAeeWML7fGJRIZITslkfBdxIXWlN9ENLr8josQxCnWyBIJpZLeOI/D1vK?=
+ =?us-ascii?Q?xBskEdBfMOqPXkg/oWxYBXwVFrSIH72BswRyqwTzE8Peqqd8/cjjorUqk++n?=
+ =?us-ascii?Q?4ZE2x9hqjiC+nUF8yKhW/VKOgUbw9varhsu20FTMujWQgZKDFWcuX+JRaBYs?=
+ =?us-ascii?Q?PCCsaNHJW1RUr4qutymkNu93x4kbgn06O9fAXdcxc0cRmhqx2E+SkcF11kcq?=
+ =?us-ascii?Q?ScWa9/5TcakLBno/1z0PDXaWXf0zVjvO9kqiuV9S6tLVmL5yo8Mb9+AQ0gNV?=
+ =?us-ascii?Q?5JWfjc8ef1rLRXQSY2qppN7pHtnx9Y8E2TQDX3Favzq8e+FVc/55HpQtu7xO?=
+ =?us-ascii?Q?brKXeBYgHO4LiFMVXG49ViWitOuJZ4f9BkgMc+2rOa21uwwoQEXNTel4lsha?=
+ =?us-ascii?Q?3eSHMvFuNEb4W/dpcKzIo2eiKPaWH17UNQu1wV25btP+qxQTMGwemKCazB/i?=
+ =?us-ascii?Q?8sTI7P03ObAbTvK+36AVhwHKDdnmRBWs15UlMdILHPdry9Zm76veQASED4OS?=
+ =?us-ascii?Q?W1V1H/glVGSrugys2M5P8JbPFqUwSqTJCkO8pl+hspMZvIRJnMH0b1vpHfdt?=
+ =?us-ascii?Q?E12/U6r8meBnRzcFuMJ8gLqJhWeGP5soC0mbZhPUW8ncBwmxQhR7+U97RmTT?=
+ =?us-ascii?Q?3K94oiCI+QeHnnmvq5XRilXdpIZbi3bk4d5Zh0v/hm1U6VhaULCVpi7P0yM6?=
+ =?us-ascii?Q?qzt4DtLxqz0/ss8AHwMm1EK3J0eYQHCzzSUMETJ4pQoIP9VZ4G/eR8AuVx3+?=
+ =?us-ascii?Q?ORevJ/23BEj6UXQKHBu7X6XoDaTKQBPEbsdgRq0Pn4DE2i8Uac216urzZ11+?=
+ =?us-ascii?Q?1RXeffuZy3+eaETxy7dgag5IBQFT2dHfoeC55/ziyahKs5W9aGTSV/lqD+ur?=
+ =?us-ascii?Q?k2qaoUaUdMV11dR4O8jsv3/UmzkkL/5qBG/nnJBKXb/qBZaP1aQPiAdQTN2u?=
+ =?us-ascii?Q?XRJYXZYzMowIrXithBgo/xjZmdzZC1HD6D70aztggQaNmVCoG9Xkg2PIxlWy?=
+ =?us-ascii?Q?REmxZOOtnIYjTFWUJoV3LFOOFttuqJwi5DXZxjgKdtwoPp9tK37+2JwPJ2ts?=
+ =?us-ascii?Q?nYzwK2Ov3Ocj+zVRerI4EZNYZQ2oDyNxpU/YBR5wsBNiYnJkqWg5MbkhfEhX?=
+ =?us-ascii?Q?nnqHa8vB+JfIT514Tx7DY40v+kxGcNnWPISk4MnW7I4w3s0IxztxbjZvpPYb?=
+ =?us-ascii?Q?ealwf3oOSsb0+X+bLZ1Oz3FUPhJgV1qFWwbyJmFXbayC8AWNIm/AKXaNdETW?=
+ =?us-ascii?Q?DFaYlghbCJD3VIH4N0Bu7DIm1XJgWdT0Euca1wQ2Be4eRuIFRV7aOgEeKEYn?=
+ =?us-ascii?Q?xXvHh9BEI4pde5RSXBk=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c4c0ec46-88a6-4a6e-6649-08d9bb2a4520
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Dec 2021 15:40:47.4294
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7hjE6hRRaHC6txDwQsYkggU8ETG1B/onPG84QW6DyTSaDTPkYQ8YZEWW8ogYMcYu
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5030
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 09, 2021, Maxim Levitsky wrote:
-> If the target vCPU has AVIC inhibited while the source vCPU isn't,
-> we need to set irr_pending, for the target to notice the interrupt.
-> Do it always to be safe, the same as in svm_deliver_avic_intr.
-> 
-> Also if the target has AVIC inhibited, the same kind of races
-> that happen in svm_deliver_avic_intr can happen here as well,
-> so apply the same approach of kicking the target vCPUs.
-> 
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->  arch/x86/kvm/svm/avic.c | 13 +++++++++++--
->  1 file changed, 11 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> index 8c1b934bfa9b..bdfc37caa64a 100644
-> --- a/arch/x86/kvm/svm/avic.c
-> +++ b/arch/x86/kvm/svm/avic.c
-> @@ -304,8 +304,17 @@ static void avic_kick_target_vcpus(struct kvm *kvm, struct kvm_lapic *source,
->  	kvm_for_each_vcpu(i, vcpu, kvm) {
->  		if (kvm_apic_match_dest(vcpu, source, icrl & APIC_SHORT_MASK,
->  					GET_APIC_DEST_FIELD(icrh),
-> -					icrl & APIC_DEST_MASK))
-> -			kvm_vcpu_wake_up(vcpu);
-> +					icrl & APIC_DEST_MASK)) {
+On Thu, Dec 09, 2021 at 08:50:04AM +0100, Eric Auger wrote:
 
-What about leveraging svm_deliver_avic_intr() to handle this so that all the
-logic to handle this mess is more or less contained in one location?  And if the
-vCPU has made its way back to the guest with APICv=1, we'd avoid an unnecessary
-kick.
+> > The kernel API should accept the S1ContextPtr IPA and all the parts of
+> > the STE that relate to the defining the layout of what the S1Context
+> > points to an thats it.
 
-diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index 26ed5325c593..cf9f5caa6e1b 100644
---- a/arch/x86/kvm/svm/avic.c
-+++ b/arch/x86/kvm/svm/avic.c
-@@ -304,8 +304,12 @@ static void avic_kick_target_vcpus(struct kvm *kvm, struct kvm_lapic *source,
-        kvm_for_each_vcpu(i, vcpu, kvm) {
-                if (kvm_apic_match_dest(vcpu, source, icrl & APIC_SHORT_MASK,
-                                        GET_APIC_DEST_FIELD(icrh),
--                                       icrl & APIC_DEST_MASK))
--                       kvm_vcpu_wake_up(vcpu);
-+                                       icrl & APIC_DEST_MASK)) {
-+                       if (svm_deliver_avic_intr(vcpu, -1) {
-+                               vcpu->arch.apic->irr_pending = true;
-+                               kvm_make_request(KVM_REQ_EVENT, vcpu);
-+                       }
-+               }
-        }
- }
- 
+> Yes that's exactly what is done currently. At config time the host must
+> trap guest STE changes (format and S1ContextPtr) and "incorporate" those
+> changes into the stage2 related STE information. The STE is owned by the
+> host kernel as it contains the stage2 information (S2TTB).
 
-And change svm_deliver_avic_intr() to ignore a negative vector, probably with a
-comment saying that means the vector has already been set in the IRR.
+[..]
 
-	if (vec > 0) {
-		kvm_lapic_set_irr(vec, vcpu->arch.apic);
+> Note this series only coped with a single CD in the Context Descriptor
+> Table.
 
-		/*
-		* Pairs with the smp_mb_*() after setting vcpu->guest_mode in
-		* vcpu_enter_guest() to ensure the write to the vIRR is ordered before
-		* the read of guest_mode, which guarantees that either VMRUN will see
-		* and process the new vIRR entry, or that the below code will signal
-		* the doorbell if the vCPU is already running in the guest.
-		*/
-		smp_mb__after_atomic();
-	}
+I'm confused, where does this limit arise?
 
+The kernel accepts as input all the bits in the STE that describe the
+layout of the CDT owned by userspace, shouldn't userspace be able to
+construct all forms of CDT with any number of CDs in them?
+
+Or do you mean this is some qemu limitation?
+
+Jason
