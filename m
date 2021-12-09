@@ -2,91 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CE9F546E225
-	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 06:48:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B502846E232
+	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 06:53:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232443AbhLIFwT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Dec 2021 00:52:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54036 "EHLO
+        id S232561AbhLIF5K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Dec 2021 00:57:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232371AbhLIFwS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Dec 2021 00:52:18 -0500
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E44DC0617A1
-        for <kvm@vger.kernel.org>; Wed,  8 Dec 2021 21:48:45 -0800 (PST)
-Received: by mail-pl1-x62d.google.com with SMTP id p18so3066834plf.13
-        for <kvm@vger.kernel.org>; Wed, 08 Dec 2021 21:48:45 -0800 (PST)
+        with ESMTP id S229506AbhLIF5J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Dec 2021 00:57:09 -0500
+Received: from mail-ot1-x333.google.com (mail-ot1-x333.google.com [IPv6:2607:f8b0:4864:20::333])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEE2FC0617A1
+        for <kvm@vger.kernel.org>; Wed,  8 Dec 2021 21:53:36 -0800 (PST)
+Received: by mail-ot1-x333.google.com with SMTP id 35-20020a9d08a6000000b00579cd5e605eso5192640otf.0
+        for <kvm@vger.kernel.org>; Wed, 08 Dec 2021 21:53:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=FzhXQ1DXqGpAK74xOecr+4scScmoJYLSnvomuB1FD0U=;
-        b=BADIb+O6VlmOsH2ot7sr8I/LgM+/1Erp3VzO0L62CYAvfDpT39oYOost1vDELWjJkO
-         PwrZRhUtG5nmMk6DjpXKteDDN6Z1s8gLn95F4wrhK7En/nFNyovupc81mAafHEsI0c6E
-         xuWTxL4eEtG09r7g3exKTtKq9p53nQ2U1OlG0uyAIGqPvwPFKs+toAf1poNNtpZAZ2bH
-         JiGvyZC0n0eztlzps8kQVa6p9f6lrS4Avbd4muNdFg2sG79OJmMkx135z19M52COBoxr
-         6Cep8skFNqrLj43uW0vAApP5/itd8eNd6i97yBErigcPxACewEwlLn+bI1qsPvzkTD1P
-         Je/Q==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=n17CfDjkfVu1x0A2zg/wbnx62qbr1TlYzDoDW7maqgM=;
+        b=BGxKtZWLm9X8tukgLULrnrgzzuYmOH3Lm3z4cFC/ithx5Do/8r6DEv/dZGvCIVDzUa
+         pMAiZ+u1J8JyUrIQVVxFDQO/vSlGNxHRd6JPkqE0a9N5VG9d0d2D7Lez+QVWffs1FB9f
+         cd+4gWsBTa4MRDnf8UYWcMYP/Jmrp30+Cg60J1VjFEa4SKfYTtYLq0Fr42LTOlLdI7Lj
+         ZTzFU0MbgGJmf+30j9R2FpXPSPD0Vre59NJgNjcVGWtFGe9p2ogsU0M9M1c5/4fgbGVU
+         +zBLnvwkGMIE05TkimwOGZcARqpGumwAHaWOxA92Qy71YO6olYgYrAdPYUf4hb72fZMr
+         1+ag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=FzhXQ1DXqGpAK74xOecr+4scScmoJYLSnvomuB1FD0U=;
-        b=DL+sbVnjfiVAnQ92rGyh8RpdzxyRqTC+ZFgerVg8Si+CjSfpsxSK6yWilEnLlcWzNe
-         AZThYfs32440MeyLjw8VhLRlUgGBeb4Ue9GCC5sZ0p6zB15uh7+4AevUTeZXapkokorX
-         b18j2r3tfdG/YSA0fiG5RfazqKm2OvpoUym1B31Pdp53tAxgKBYrpmr+UkDkiFWWif6/
-         GzlC5/xyJqujCgBsWvkeNqLiz+7huRcPV24yu+ZmeX+g61r/cUl/P4YN1QZd62fz69hE
-         MZVpKsjHuIA8A7HXfluiwnl9ez9gtcQlK1qfhaFOb0My1IiqDW20WeKhqjclxOwUDWNr
-         J+CA==
-X-Gm-Message-State: AOAM532Dbc681ytxBt13KqOYRohq/CzC74GYI1qMpO/WAqFGropUPYZ9
-        heZzDCUlUFBROI2Iq5vn69qGzg==
-X-Google-Smtp-Source: ABdhPJz+5oR8X4Gf87uVbWD+Y+QqoIGVsmUwPwjIfHJuMEPDQXLKvLOtsSRCXJIBGBW14OrfMxdazQ==
-X-Received: by 2002:a17:90a:b015:: with SMTP id x21mr13176095pjq.84.1639028924871;
-        Wed, 08 Dec 2021 21:48:44 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id f4sm5229428pfg.34.2021.12.08.21.48.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Dec 2021 21:48:44 -0800 (PST)
-Date:   Thu, 9 Dec 2021 05:48:40 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/2] KVM: x86: Rep string I/O WARN removal and test
-Message-ID: <YbGYuDgaqcRH/CZo@google.com>
-References: <20211025201311.1881846-1-seanjc@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=n17CfDjkfVu1x0A2zg/wbnx62qbr1TlYzDoDW7maqgM=;
+        b=IkmM9TdN3wmJ7UhCCfhGAXZaESMqvR1UCvypSb4nBgKubdBniTiOyv0p19fTuy4TN7
+         jhM1du6X4DMN4GUPcgs+BGQXTfJvSOsf42b0BGd03+saZfRpgjLSj7qotelF5YamgoDz
+         /2MWhtmaixqtG+pWqCn4Q8FkliSTZzydtrvwAC38LkevrSxsVzsHCt6QXzyhpjcl5sc/
+         JgVez36QcasR0S5O3gzq+bXLo//+cvYz8cL5DXQ+URnx0fajDSlhvxZlSAYGptj1+tCY
+         BSAK9XWLrmXeB4oBq+Mi7d+4RD2Wn7hIQ/c10hwHfsyX5hQMv9mLiIEPocsiVOT9zOOz
+         GQfw==
+X-Gm-Message-State: AOAM5315yu4w7vAVKrz5VoCwqfHDS1lZe89ufq+yH0t1QoIftyxWh6Vs
+        HAGIydraZOl7P1pumRAO+5rmzecYig16phtdQB7upA==
+X-Google-Smtp-Source: ABdhPJyafxz4N1Yt1dER7ZAjF/Xyv4Biy1XVnYWlMNPW6NSIkD6ZBaHO6FfdJtHuCY1sHUNKXyuGzxG+Xb+JJT285QI=
+X-Received: by 2002:a9d:ed6:: with SMTP id 80mr3678667otj.35.1639029216036;
+ Wed, 08 Dec 2021 21:53:36 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211025201311.1881846-1-seanjc@google.com>
+References: <20211208191642.3792819-1-pgonda@google.com> <20211208191642.3792819-4-pgonda@google.com>
+In-Reply-To: <20211208191642.3792819-4-pgonda@google.com>
+From:   Marc Orr <marcorr@google.com>
+Date:   Wed, 8 Dec 2021 21:53:25 -0800
+Message-ID: <CAA03e5H6TxcL6WVYcBs5aX5zHLB=sCYcrBLggAtmLZADn_BHyA@mail.gmail.com>
+Subject: Re: [PATCH 3/3] selftests: sev_migrate_tests: Add mirror command tests
+To:     Peter Gonda <pgonda@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Oct 25, 2021, Sean Christopherson wrote:
-> Remove a WARN that was added as part of the recent I/O overhaul to play
-> nice with SEV-ES string I/O.
-> 
-> For the record, my FIXME in lieu of a WARN was deliberate, as I suspected
-> userspace could trigger a WARN ;-)
-> 
-> Based on kvm/master, commit 95e16b4792b0 ("KVM: SEV-ES: go over the
-> sev_pio_data buffer in multiple passes if needed").
-> 
-> Sean Christopherson (2):
->   KVM: x86: Don't WARN if userspace mucks with RCX during string I/O
->     exit
->   KVM: selftests: Add test to verify KVM doesn't explode on "bad" I/O
-> 
->  arch/x86/kvm/x86.c                            |   9 +-
->  tools/testing/selftests/kvm/.gitignore        |   1 +
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../selftests/kvm/x86_64/userspace_io_test.c  | 114 ++++++++++++++++++
->  4 files changed, 123 insertions(+), 2 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/x86_64/userspace_io_test.c
+On Wed, Dec 8, 2021 at 11:16 AM Peter Gonda <pgonda@google.com> wrote:
+>
+> Add tests to confirm mirror vms can only run correct subset of commands.
+>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: Marc Orr <marcorr@google.com>
+> Signed-off-by: Peter Gonda <pgonda@google.com>
+> ---
+>  .../selftests/kvm/x86_64/sev_migrate_tests.c  | 55 +++++++++++++++++--
+>  1 file changed, 51 insertions(+), 4 deletions(-)
+>
+> diff --git a/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c b/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c
+> index 4bb960ca6486..80056bbbb003 100644
+> --- a/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c
+> +++ b/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c
+> @@ -21,7 +21,7 @@
+>  #define NR_LOCK_TESTING_THREADS 3
+>  #define NR_LOCK_TESTING_ITERATIONS 10000
+>
+> -static void sev_ioctl(int vm_fd, int cmd_id, void *data)
+> +static int __sev_ioctl(int vm_fd, int cmd_id, void *data, __u32 *fw_error)
+>  {
+>         struct kvm_sev_cmd cmd = {
+>                 .id = cmd_id,
+> @@ -30,11 +30,20 @@ static void sev_ioctl(int vm_fd, int cmd_id, void *data)
+>         };
+>         int ret;
+>
+> -
+>         ret = ioctl(vm_fd, KVM_MEMORY_ENCRYPT_OP, &cmd);
+> -       TEST_ASSERT(ret == 0 && cmd.error == SEV_RET_SUCCESS,
+> +       *fw_error = cmd.error;
+> +       return ret;
+> +}
+> +
+> +static void sev_ioctl(int vm_fd, int cmd_id, void *data)
+> +{
+> +       int ret;
+> +       __u32 fw_error;
+> +
+> +       ret = __sev_ioctl(vm_fd, cmd_id, data, &fw_error);
+> +       TEST_ASSERT(ret == 0 && fw_error == SEV_RET_SUCCESS,
+>                     "%d failed: return code: %d, errno: %d, fw error: %d",
+> -                   cmd_id, ret, errno, cmd.error);
+> +                   cmd_id, ret, errno, fw_error);
+>  }
+>
+>  static struct kvm_vm *sev_vm_create(bool es)
+> @@ -226,6 +235,42 @@ static void sev_mirror_create(int dst_fd, int src_fd)
+>         TEST_ASSERT(!ret, "Copying context failed, ret: %d, errno: %d\n", ret, errno);
+>  }
+>
+> +static void verify_mirror_allowed_cmds(int vm_fd)
+> +{
+> +       struct kvm_sev_guest_status status;
+> +
+> +       for (int cmd_id = KVM_SEV_INIT; cmd_id < KVM_SEV_NR_MAX; ++cmd_id) {
+> +               int ret;
+> +               __u32 fw_error;
+> +
+> +               /*
+> +                * These commands are allowed for mirror VMs, all others are
+> +                * not.
+> +                */
+> +               switch (cmd_id) {
+> +               case KVM_SEV_LAUNCH_UPDATE_VMSA:
+> +               case KVM_SEV_GUEST_STATUS:
+> +               case KVM_SEV_DBG_DECRYPT:
+> +               case KVM_SEV_DBG_ENCRYPT:
+> +                       continue;
+> +               default:
+> +                       break;
+> +               }
+> +
+> +               /*
+> +                * These commands should be disallowed before the data
+> +                * parameter is examined so NULL is OK here.
+> +                */
+> +               ret = __sev_ioctl(vm_fd, cmd_id, NULL, &fw_error);
+> +               TEST_ASSERT(
+> +                       ret == -1 && errno == EINVAL,
+> +                       "Should not be able call command: %d. ret: %d, errno: %d\n",
+> +                       cmd_id, ret, errno);
+> +       }
+> +
+> +       sev_ioctl(vm_fd, KVM_SEV_GUEST_STATUS, &status);
 
-Ping.  I completely forgot about this too, until I unintentionally ran a
-userspace_io_test that was lying around.
+Why is this here? I'd either delete it or maybe alternatively move it
+into the `case KVM_SEV_GUEST_STATUS` with a corresponding TEST_ASSERT
+to check that the command succeeded. Something like:
+
+...
+               switch (cmd_id) {
+               case KVM_SEV_GUEST_STATUS:
+                    sev_ioctl(vm_fd, KVM_SEV_GUEST_STATUS, &status);
+                    TEST_ASSERT(ret == 0 && fw_error == SEV_RET_SUCCESS, ...);
+                    continue;
+               case KVM_SEV_LAUNCH_UPDATE_VMSA:
+               case KVM_SEV_DBG_DECRYPT:
+               case KVM_SEV_DBG_ENCRYPT:
+                       continue;
+               default:
+                       break;
+               }
+
+> +}
+> +
+>  static void test_sev_mirror(bool es)
+>  {
+>         struct kvm_vm *src_vm, *dst_vm;
+> @@ -243,6 +288,8 @@ static void test_sev_mirror(bool es)
+>         if (es)
+>                 sev_ioctl(dst_vm->fd, KVM_SEV_LAUNCH_UPDATE_VMSA, NULL);
+>
+> +       verify_mirror_allowed_cmds(dst_vm->fd);
+> +
+>         kvm_vm_free(src_vm);
+>         kvm_vm_free(dst_vm);
+>  }
+> --
+> 2.34.1.400.ga245620fadb-goog
+>
