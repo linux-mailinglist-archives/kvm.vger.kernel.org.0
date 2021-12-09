@@ -2,206 +2,243 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1AD5546EC49
-	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 16:53:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0FC0246EC51
+	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 16:54:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240192AbhLIP4j (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Dec 2021 10:56:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54072 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236456AbhLIP4j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Dec 2021 10:56:39 -0500
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2D35C0617A1
-        for <kvm@vger.kernel.org>; Thu,  9 Dec 2021 07:53:05 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id h15-20020a17090a648f00b001a96c2c97abso3829800pjj.9
-        for <kvm@vger.kernel.org>; Thu, 09 Dec 2021 07:53:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=Sd6IF3FCdDDmmw1AgyuvS1fgt7iQ4AjDVZdX/op2tS0=;
-        b=eFmfTts2vyIv3M69plKmEAvCFg3jKCBhPfY4VOiKXG+bpM/GFFC8G2qMF7mpekWtmO
-         e17HFn6nLHwNn2Qe3Ec9960xU2uBP2YhVausn1rGnAQrFYKUngIsDS6px8JxIffNfm1m
-         OaKvax9sxk2WO2xwNj5vYvplyUUDNkp2ESjofJIU00iKINU4ip0MIPXrV4odkVmKzDmi
-         vYw+ZMzGmz2UvWFXW+aQ6CdUqRXmHKkziUprxjvSbS8vM6xRKybWct7Ngm2wQOSkpWHn
-         YfV0nRspy4JTOkKRGJmuJzcf2GMBINlrARkFx7o6EY5+mFDqiN14Wb715huKfg+ewyAk
-         gddw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=Sd6IF3FCdDDmmw1AgyuvS1fgt7iQ4AjDVZdX/op2tS0=;
-        b=ZSqCXCsLH3rCa706UuvC4n8VPQQBjLN5QJoVoEicUceXte/ybHvQUKHTjgbKPM7EDe
-         haAxUpXpAjfH28AwVVmlLGTHlwPlMKuMaVj1wu5gq+z8XnJIMBYS9EiqK4/6wpoAwtJ+
-         nBZBL0oetzqsnbcJrtiPCP9EeMWV5vM5L+M+SItpq96a1sDL4G7XLxddMI73H4afN5WT
-         971fsN1K5/3O6Ci/eGJRPTMxAijK81PSjEgodfe2vk23S9v3+IPv97y1vgl/mig1gdAN
-         QG6JVFl/+spGcnP0dWPmmlrkIujEO2XeVCnc/epOPw2wp5Rc5Ekh2OnkAaMEwlI6QEZ9
-         5Q2g==
-X-Gm-Message-State: AOAM533IJWxZk4ok04Pj3YIVMkPZFlC995tkJdV9yVymDf/ZCR0m1VtK
-        HJA7WspcbtsH64+M105MPbcoyeB/UcXq
-X-Google-Smtp-Source: ABdhPJyWy6nltY/LLrdn4q80t1gjaLvFncYbxLQm4i95vGd10cdE5yZ1CxpagMOYZBUVsMHkKcmq9hOSh96N
-X-Received: from marcorr-sp.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:e50])
- (user=marcorr job=sendgmr) by 2002:a17:90a:284f:: with SMTP id
- p15mr881443pjf.1.1639065185015; Thu, 09 Dec 2021 07:53:05 -0800 (PST)
-Date:   Thu,  9 Dec 2021 07:52:57 -0800
-Message-Id: <20211209155257.128747-1-marcorr@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.34.1.173.g76aa8bc2d0-goog
-Subject: [PATCH v2] KVM: x86: Always set kvm_run->if_flag
-From:   Marc Orr <marcorr@google.com>
-To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        thomas.lendacky@amd.com, mlevitsk@redhat.com, kvm@vger.kernel.org,
+        id S240604AbhLIP5z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Dec 2021 10:57:55 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:22790 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236456AbhLIP5y (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 Dec 2021 10:57:54 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B9FgGbV025865;
+        Thu, 9 Dec 2021 15:54:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=WjhqF8FvEjT0X5Z+sWXTyVJCUWJTm5srS7KWE5DdzrU=;
+ b=mnVi5f1St6GMNO8150VoU/QHNoMhFjaUrcuwM3AJb+7+vtSvQecGcrCByKfPvrVgVLmx
+ bz1VAtqdDQkMRNT4+l03603S6EsmUXDAVMtp12mCTnsc7E9zfgEIGQUXt0r2IQCXJ4gx
+ J6DwjPFVJDAsGhfp2XXQNm25GgSiCE7DKk4kBqKpmNnQI8tesSQ9eAmR1j5X7mjn8qec
+ BQN1Q+u6+tTP7J/4ySfF7uStFyqAsqKqyvjHg7ciTWElK6tqkYiUAH4cEAt1hwWbhpew
+ zm60hrZyHfVkK7ohZgzLYEmf237COTRpOd7iA8zXEm/gZWU+ehuNFo1dk4QwkAe8630V HQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cumnu09v7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Dec 2021 15:54:20 +0000
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1B9FgVjo027048;
+        Thu, 9 Dec 2021 15:54:20 GMT
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cumnu09uj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Dec 2021 15:54:20 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1B9Fidhk013959;
+        Thu, 9 Dec 2021 15:54:18 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma01fra.de.ibm.com with ESMTP id 3cqyya188n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Dec 2021 15:54:17 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1B9FsEOA30212454
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 9 Dec 2021 15:54:14 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5241E42049;
+        Thu,  9 Dec 2021 15:54:14 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8480A4204F;
+        Thu,  9 Dec 2021 15:54:13 +0000 (GMT)
+Received: from [9.171.49.66] (unknown [9.171.49.66])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  9 Dec 2021 15:54:13 +0000 (GMT)
+Message-ID: <31c5cb5a-a027-a4a9-1dc1-c00664b871f9@linux.ibm.com>
+Date:   Thu, 9 Dec 2021 16:54:13 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH 13/32] KVM: s390: pci: add basic kvm_zdev structure
+Content-Language: en-US
+To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
+        schnelle@linux.ibm.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
+        hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
+        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
+        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Cc:     Marc Orr <marcorr@google.com>
-Content-Type: text/plain; charset="UTF-8"
+References: <20211207205743.150299-1-mjrosato@linux.ibm.com>
+ <20211207205743.150299-14-mjrosato@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <20211207205743.150299-14-mjrosato@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: FBy1FrQ0iXIU-y6Q-9ickLgItv_xMVeO
+X-Proofpoint-ORIG-GUID: A7L14lurIopJCp4R8nXOGJryFGH_ZN87
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2021-12-09_07,2021-12-08_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
+ spamscore=0 impostorscore=0 lowpriorityscore=0 suspectscore=0
+ priorityscore=1501 adultscore=0 clxscore=1015 bulkscore=0 malwarescore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2112090084
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The kvm_run struct's if_flag is a part of the userspace/kernel API. The
-SEV-ES patches failed to set this flag because it's no longer needed by
-QEMU (according to the comment in the source code). However, other
-hypervisors may make use of this flag. Therefore, set the flag for
-guests with encrypted registers (i.e., with guest_state_protected set).
+Am 07.12.21 um 21:57 schrieb Matthew Rosato:
+> This structure will be used to carry kvm passthrough information related to
+> zPCI devices.
+> 
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
 
-Fixes: f1c6366e3043 ("KVM: SVM: Add required changes to support intercepts under SEV-ES")
-Signed-off-by: Marc Orr <marcorr@google.com>
----
-v1 -> v2
-- fix typos in commit message
-- fix `svm_get_if_flag()` to work for non-SEV
-- remove !! in return for both [svm|vmx]_get_if_flag()
-- refactor `svm_interrupt_blocked()` to use `svm_get_if_flag()` arch/x86/include/asm/kvm-x86-ops.h |  1 +
+Mostly a skeleton but looks ok
 
- arch/x86/include/asm/kvm_host.h    |  1 +
- arch/x86/kvm/svm/svm.c             | 21 ++++++++++++---------
- arch/x86/kvm/vmx/vmx.c             |  6 ++++++
- arch/x86/kvm/x86.c                 |  9 +--------
- 5 files changed, 21 insertions(+), 17 deletions(-)
+Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
 
-diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-index cefe1d81e2e8..9e50da3ed01a 100644
---- a/arch/x86/include/asm/kvm-x86-ops.h
-+++ b/arch/x86/include/asm/kvm-x86-ops.h
-@@ -47,6 +47,7 @@ KVM_X86_OP(set_dr7)
- KVM_X86_OP(cache_reg)
- KVM_X86_OP(get_rflags)
- KVM_X86_OP(set_rflags)
-+KVM_X86_OP(get_if_flag)
- KVM_X86_OP(tlb_flush_all)
- KVM_X86_OP(tlb_flush_current)
- KVM_X86_OP_NULL(tlb_remote_flush)
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 860ed500580c..a7f868ff23e7 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1349,6 +1349,7 @@ struct kvm_x86_ops {
- 	void (*cache_reg)(struct kvm_vcpu *vcpu, enum kvm_reg reg);
- 	unsigned long (*get_rflags)(struct kvm_vcpu *vcpu);
- 	void (*set_rflags)(struct kvm_vcpu *vcpu, unsigned long rflags);
-+	bool (*get_if_flag)(struct kvm_vcpu *vcpu);
- 
- 	void (*tlb_flush_all)(struct kvm_vcpu *vcpu);
- 	void (*tlb_flush_current)(struct kvm_vcpu *vcpu);
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index d0f68d11ec70..5151efa424ac 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1585,6 +1585,15 @@ static void svm_set_rflags(struct kvm_vcpu *vcpu, unsigned long rflags)
- 	to_svm(vcpu)->vmcb->save.rflags = rflags;
- }
- 
-+static bool svm_get_if_flag(struct kvm_vcpu *vcpu)
-+{
-+	struct vmcb *vmcb = to_svm(vcpu)->vmcb;
-+
-+	return sev_es_guest(vcpu->kvm)
-+		? vmcb->control.int_state & SVM_GUEST_INTERRUPT_MASK
-+		: kvm_get_rflags(vcpu) & X86_EFLAGS_IF;
-+}
-+
- static void svm_cache_reg(struct kvm_vcpu *vcpu, enum kvm_reg reg)
- {
- 	switch (reg) {
-@@ -3568,14 +3577,7 @@ bool svm_interrupt_blocked(struct kvm_vcpu *vcpu)
- 	if (!gif_set(svm))
- 		return true;
- 
--	if (sev_es_guest(vcpu->kvm)) {
--		/*
--		 * SEV-ES guests to not expose RFLAGS. Use the VMCB interrupt mask
--		 * bit to determine the state of the IF flag.
--		 */
--		if (!(vmcb->control.int_state & SVM_GUEST_INTERRUPT_MASK))
--			return true;
--	} else if (is_guest_mode(vcpu)) {
-+	if (is_guest_mode(vcpu)) {
- 		/* As long as interrupts are being delivered...  */
- 		if ((svm->nested.ctl.int_ctl & V_INTR_MASKING_MASK)
- 		    ? !(svm->vmcb01.ptr->save.rflags & X86_EFLAGS_IF)
-@@ -3586,7 +3588,7 @@ bool svm_interrupt_blocked(struct kvm_vcpu *vcpu)
- 		if (nested_exit_on_intr(svm))
- 			return false;
- 	} else {
--		if (!(kvm_get_rflags(vcpu) & X86_EFLAGS_IF))
-+		if (!svm_get_if_flag(vcpu))
- 			return true;
- 	}
- 
-@@ -4621,6 +4623,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.cache_reg = svm_cache_reg,
- 	.get_rflags = svm_get_rflags,
- 	.set_rflags = svm_set_rflags,
-+	.get_if_flag = svm_get_if_flag,
- 
- 	.tlb_flush_all = svm_flush_tlb,
- 	.tlb_flush_current = svm_flush_tlb,
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 9453743ce0c4..269de5bb98d7 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -1363,6 +1363,11 @@ void vmx_set_rflags(struct kvm_vcpu *vcpu, unsigned long rflags)
- 		vmx->emulation_required = vmx_emulation_required(vcpu);
- }
- 
-+static bool vmx_get_if_flag(struct kvm_vcpu *vcpu)
-+{
-+	return vmx_get_rflags(vcpu) & X86_EFLAGS_IF;
-+}
-+
- u32 vmx_get_interrupt_shadow(struct kvm_vcpu *vcpu)
- {
- 	u32 interruptibility = vmcs_read32(GUEST_INTERRUPTIBILITY_INFO);
-@@ -7575,6 +7580,7 @@ static struct kvm_x86_ops vmx_x86_ops __initdata = {
- 	.cache_reg = vmx_cache_reg,
- 	.get_rflags = vmx_get_rflags,
- 	.set_rflags = vmx_set_rflags,
-+	.get_if_flag = vmx_get_if_flag,
- 
- 	.tlb_flush_all = vmx_flush_tlb_all,
- 	.tlb_flush_current = vmx_flush_tlb_current,
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index e0aa4dd53c7f..45e836db5bcd 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -8995,14 +8995,7 @@ static void post_kvm_run_save(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_run *kvm_run = vcpu->run;
- 
--	/*
--	 * if_flag is obsolete and useless, so do not bother
--	 * setting it for SEV-ES guests.  Userspace can just
--	 * use kvm_run->ready_for_interrupt_injection.
--	 */
--	kvm_run->if_flag = !vcpu->arch.guest_state_protected
--		&& (kvm_get_rflags(vcpu) & X86_EFLAGS_IF) != 0;
--
-+	kvm_run->if_flag = static_call(kvm_x86_get_if_flag)(vcpu);
- 	kvm_run->cr8 = kvm_get_cr8(vcpu);
- 	kvm_run->apic_base = kvm_get_apic_base(vcpu);
- 
--- 
-2.34.1.173.g76aa8bc2d0-goog
-
+> ---
+>   arch/s390/include/asm/kvm_pci.h | 29 +++++++++++++++++
+>   arch/s390/include/asm/pci.h     |  3 ++
+>   arch/s390/kvm/Makefile          |  2 +-
+>   arch/s390/kvm/pci.c             | 57 +++++++++++++++++++++++++++++++++
+>   4 files changed, 90 insertions(+), 1 deletion(-)
+>   create mode 100644 arch/s390/include/asm/kvm_pci.h
+>   create mode 100644 arch/s390/kvm/pci.c
+> 
+> diff --git a/arch/s390/include/asm/kvm_pci.h b/arch/s390/include/asm/kvm_pci.h
+> new file mode 100644
+> index 000000000000..3e491a39704c
+> --- /dev/null
+> +++ b/arch/s390/include/asm/kvm_pci.h
+> @@ -0,0 +1,29 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * KVM PCI Passthrough for virtual machines on s390
+> + *
+> + * Copyright IBM Corp. 2021
+> + *
+> + *    Author(s): Matthew Rosato <mjrosato@linux.ibm.com>
+> + */
+> +
+> +
+> +#ifndef ASM_KVM_PCI_H
+> +#define ASM_KVM_PCI_H
+> +
+> +#include <linux/types.h>
+> +#include <linux/kvm_types.h>
+> +#include <linux/kvm_host.h>
+> +#include <linux/kvm.h>
+> +#include <linux/pci.h>
+> +
+> +struct kvm_zdev {
+> +	struct zpci_dev *zdev;
+> +	struct kvm *kvm;
+> +};
+> +
+> +extern int kvm_s390_pci_dev_open(struct zpci_dev *zdev);
+> +extern void kvm_s390_pci_dev_release(struct zpci_dev *zdev);
+> +extern int kvm_s390_pci_attach_kvm(struct zpci_dev *zdev, struct kvm *kvm);
+> +
+> +#endif /* ASM_KVM_PCI_H */
+> diff --git a/arch/s390/include/asm/pci.h b/arch/s390/include/asm/pci.h
+> index 86f43644756d..32810e1ed308 100644
+> --- a/arch/s390/include/asm/pci.h
+> +++ b/arch/s390/include/asm/pci.h
+> @@ -97,6 +97,7 @@ struct zpci_bar_struct {
+>   };
+>   
+>   struct s390_domain;
+> +struct kvm_zdev;
+>   
+>   #define ZPCI_FUNCTIONS_PER_BUS 256
+>   struct zpci_bus {
+> @@ -190,6 +191,8 @@ struct zpci_dev {
+>   	struct dentry	*debugfs_dev;
+>   
+>   	struct s390_domain *s390_domain; /* s390 IOMMU domain data */
+> +
+> +	struct kvm_zdev *kzdev; /* passthrough data */
+>   };
+>   
+>   static inline bool zdev_enabled(struct zpci_dev *zdev)
+> diff --git a/arch/s390/kvm/Makefile b/arch/s390/kvm/Makefile
+> index b3aaadc60ead..95ea865e5d29 100644
+> --- a/arch/s390/kvm/Makefile
+> +++ b/arch/s390/kvm/Makefile
+> @@ -10,6 +10,6 @@ common-objs = $(KVM)/kvm_main.o $(KVM)/eventfd.o  $(KVM)/async_pf.o \
+>   ccflags-y := -Ivirt/kvm -Iarch/s390/kvm
+>   
+>   kvm-objs := $(common-objs) kvm-s390.o intercept.o interrupt.o priv.o sigp.o
+> -kvm-objs += diag.o gaccess.o guestdbg.o vsie.o pv.o
+> +kvm-objs += diag.o gaccess.o guestdbg.o vsie.o pv.o pci.o
+>   
+>   obj-$(CONFIG_KVM) += kvm.o
+> diff --git a/arch/s390/kvm/pci.c b/arch/s390/kvm/pci.c
+> new file mode 100644
+> index 000000000000..ecfc458a5b39
+> --- /dev/null
+> +++ b/arch/s390/kvm/pci.c
+> @@ -0,0 +1,57 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * s390 kvm PCI passthrough support
+> + *
+> + * Copyright IBM Corp. 2021
+> + *
+> + *    Author(s): Matthew Rosato <mjrosato@linux.ibm.com>
+> + */
+> +
+> +#include <linux/kvm_host.h>
+> +#include <linux/pci.h>
+> +#include <asm/kvm_pci.h>
+> +
+> +int kvm_s390_pci_dev_open(struct zpci_dev *zdev)
+> +{
+> +	struct kvm_zdev *kzdev;
+> +
+> +	if (zdev == NULL)
+> +		return -ENODEV;
+> +
+> +	kzdev = kzalloc(sizeof(struct kvm_zdev), GFP_KERNEL);
+> +	if (!kzdev)
+> +		return -ENOMEM;
+> +
+> +	kzdev->zdev = zdev;
+> +	zdev->kzdev = kzdev;
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_s390_pci_dev_open);
+> +
+> +void kvm_s390_pci_dev_release(struct zpci_dev *zdev)
+> +{
+> +	struct kvm_zdev *kzdev;
+> +
+> +	if (!zdev || !zdev->kzdev)
+> +		return;
+> +
+> +	kzdev = zdev->kzdev;
+> +	WARN_ON(kzdev->zdev != zdev);
+> +	zdev->kzdev = 0;
+> +	kfree(kzdev);
+> +
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_s390_pci_dev_release);
+> +
+> +int kvm_s390_pci_attach_kvm(struct zpci_dev *zdev, struct kvm *kvm)
+> +{
+> +	struct kvm_zdev *kzdev = zdev->kzdev;
+> +
+> +	if (!kzdev)
+> +		return -ENODEV;
+> +
+> +	kzdev->kvm = kvm;
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_s390_pci_attach_kvm);
+> 
