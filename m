@@ -2,106 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C9C246EC5D
-	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 16:57:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C586446EC77
+	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 17:03:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240657AbhLIQBY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Dec 2021 11:01:24 -0500
-Received: from foss.arm.com ([217.140.110.172]:58528 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239846AbhLIQBY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Dec 2021 11:01:24 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 669F5ED1;
-        Thu,  9 Dec 2021 07:57:50 -0800 (PST)
-Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9A4DA3F5A1;
-        Thu,  9 Dec 2021 07:57:49 -0800 (PST)
-Date:   Thu, 9 Dec 2021 15:57:46 +0000
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     "haibiao.xiao" <haibiao.xiao@zstack.io>
-Cc:     kvm@vger.kernel.org, will@kernel.org,
-        julien.thierry.kdev@gmail.com,
-        "haibiao.xiao" <xiaohaibiao331@outlook.com>,
-        Alexandru Elisei <Alexandru.Elisei@arm.com>
-Subject: Re: [PATCH kvmtool] Makefile: 'lvm version' works incorrect.
- Because CFLAGS can not get sub-make variable $(KVMTOOLS_VERSION)
-Message-ID: <20211209155746.3f6bd016@donnerap.cambridge.arm.com>
-In-Reply-To: <20211204061436.36642-1-haibiao.xiao@zstack.io>
-References: <20211204061436.36642-1-haibiao.xiao@zstack.io>
-Organization: ARM
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+        id S240119AbhLIQHZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Dec 2021 11:07:25 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:56384 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231765AbhLIQHZ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 Dec 2021 11:07:25 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1639065831;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=88wBNbW8beVEscjJxOr5QDERAx5Xra/tbkHKBTuW1TQ=;
+        b=a4JO/okJW1b/KRS6HHMfIZTSU4ttoptW68cHHNnfmulLBel6hBHrEX0beqmEh9wFsSCOR/
+        B/IvAe8ZBom5SXiUSCYiqZSzlCL0xrEpucvdCHKI0PvWLj31oKxrhdgm6Xy+YLer8W3VnV
+        DM2inb+97jc2QHcfl/+ANhTOZ894ViU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-28-Yh2kklBbPKGEB2Q_VM82HA-1; Thu, 09 Dec 2021 11:03:45 -0500
+X-MC-Unique: Yh2kklBbPKGEB2Q_VM82HA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6F65A101796A;
+        Thu,  9 Dec 2021 16:03:44 +0000 (UTC)
+Received: from starship (unknown [10.40.192.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 57B326B8EA;
+        Thu,  9 Dec 2021 16:03:41 +0000 (UTC)
+Message-ID: <84b493880aecfed52bed62714df77497c46af2ef.camel@redhat.com>
+Subject: Re: [PATCH v3 00/26] KVM: x86: Halt and APICv overhaul
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        kvm@vger.kernel.org, iommu@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org
+Date:   Thu, 09 Dec 2021 18:03:39 +0200
+In-Reply-To: <YbIklNHIFnREGFAp@google.com>
+References: <20211208015236.1616697-1-seanjc@google.com>
+         <39c885fc6455dd0aa2f8643e725422851430f9ec.camel@redhat.com>
+         <8c6c38f3cc201e42629c3b8e5cf8cdb251c9ea8d.camel@redhat.com>
+         <YbFHsYJ5ua3J286o@google.com>
+         <3bf8d500-0c1e-92dd-20c8-c3c231d2cbed@redhat.com>
+         <346f5a5e93077ba20188a9b0e67bb3a44e2cad48.camel@redhat.com>
+         <YbIklNHIFnREGFAp@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat,  4 Dec 2021 14:14:36 +0800
-"haibiao.xiao" <haibiao.xiao@zstack.io> wrote:
+On Thu, 2021-12-09 at 15:45 +0000, Sean Christopherson wrote:
+> On Thu, Dec 09, 2021, Maxim Levitsky wrote:
+> > On Thu, 2021-12-09 at 15:29 +0100, Paolo Bonzini wrote:
+> > > On 12/9/21 01:02, Sean Christopherson wrote:
+> > > > RDX, a.k.a. ir_data is NULL.  This check in svm_ir_list_add()
+> > > > 
+> > > > 	if (pi->ir_data && (pi->prev_ga_tag != 0)) {
+> > > > 
+> > > > implies pi->ir_data can be NULL, but neither avic_update_iommu_vcpu_affinity()
+> > > > nor amd_iommu_update_ga() check ir->data for NULL.
+> > > > 
+> > > > amd_ir_set_vcpu_affinity() returns "success" without clearing pi.is_guest_mode
+> > > > 
+> > > > 	/* Note:
+> > > > 	 * This device has never been set up for guest mode.
+> > > > 	 * we should not modify the IRTE
+> > > > 	 */
+> > > > 	if (!dev_data || !dev_data->use_vapic)
+> > > > 		return 0;
+> > > > 
+> > > > so it's plausible svm_ir_list_add() could add to the list with a NULL pi->ir_data.
+> > > > 
+> > > > But none of the relevant code has seen any meaningful changes since 5.15, so odds
+> > > > are good I broke something :-/
+> > 
+> > Doesn't reproduce here yet even with my iommu changes :-(
+> > Oh well.
+> 
+> Hmm, which suggests it could be an existing corner case.
 
-Hi,
+Could very very be!
+Next Sunday I'll lean the AMD iommu code a bit closer, and see if I can spot more bugs in it.
 
-> From: "haibiao.xiao" <xiaohaibiao331@outlook.com>
-> 
-> Command 'lvm version' works incorrect.
-> It is expected to print:
-> 
->     # ./lvm version
->     # kvm tool [KVMTOOLS_VERSION]
-> 
-> but the KVMTOOLS_VERSION is missed:
-> 
->     # ./lvm version
->     # kvm tool
-> 
-> The KVMTOOLS_VERSION is defined in the KVMTOOLS-VERSION-FILE file which
-> is included at the end of Makefile. Since the CFLAGS is a 'Simply
-> expanded variables' which means CFLAGS is only scanned once. So the
-> definetion of KVMTOOLS_VERSION at the end of Makefile would not scanned
-> by CFLAGS. So the '-DKVMTOOLS_VERSION=' remains empty.
-> 
-> I fixed the bug by moving the '-include $(OUTPUT)KVMTOOLS-VERSION-FILE'
-> before the CFLAGS.
-
-While this is indeed a bug that this patch fixes, I wonder if we should
-actually get rid of this whole versioning attempt altogether at this
-point. Originally this was following the containing kernel version, but
-it is stuck ever since at v3.18, without any change.
-
-So either we introduce proper versioning (not sure it's worth it?), or we
-just remove all code that pretends to print a version number? Or just
-hardcode v3.18 into the printf, at least for now? At the very least I
-think we don't need a KVMTOOLS-VERSION-FILE anymore.
-
-Cheers,
-Andre
+Best regards,
+	Maxim Levitsky
 
 > 
-> Signed-off-by: haibiao.xiao <xiaohaibiao331@outlook.com>
-> ---
->  Makefile | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> Based on the above, this seems prudent and correct:
 > 
-> diff --git a/Makefile b/Makefile
-> index bb7ad3e..9afb5e3 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -17,6 +17,7 @@ export E Q
->  
->  include config/utilities.mak
->  include config/feature-tests.mak
-> +-include $(OUTPUT)KVMTOOLS-VERSION-FILE
->  
->  CC	:= $(CROSS_COMPILE)gcc
->  CFLAGS	:=
-> @@ -559,5 +560,4 @@ ifneq ($(MAKECMDGOALS),clean)
->  
->  KVMTOOLS-VERSION-FILE:
->  	@$(SHELL_PATH) util/KVMTOOLS-VERSION-GEN $(OUTPUT)
-> --include $(OUTPUT)KVMTOOLS-VERSION-FILE
-> -endif
-> +endif
-> \ No newline at end of file
+> @@ -747,7 +754,7 @@ static int svm_ir_list_add(struct vcpu_svm *svm, struct amd_iommu_pi_data *pi)
+>          * so we need to check here if it's already been * added
+>          * to the ir_list.
+>          */
+> -       if (pi->ir_data && (pi->prev_ga_tag != 0)) {
+> +       if (pi->prev_ga_tag != 0) {
+>                 struct kvm *kvm = svm->vcpu.kvm;
+>                 u32 vcpu_id = AVIC_GATAG_TO_VCPUID(pi->prev_ga_tag);
+>                 struct kvm_vcpu *prev_vcpu = kvm_get_vcpu_by_id(kvm, vcpu_id);
+> @@ -877,7 +884,7 @@ int svm_update_pi_irte(struct kvm *kvm, unsigned int host_irq,
+>                          * we can reference to them directly when we update vcpu
+>                          * scheduling information in IOMMU irte.
+>                          */
+> -                       if (!ret && pi.is_guest_mode)
+> +                       if (!ret && pi.is_guest_mode && pi.ir_data)
+>                                 svm_ir_list_add(svm, &pi);
+>                 } else {
+>                         /* Use legacy mode in IRTE */
+> @@ -898,7 +905,7 @@ int svm_update_pi_irte(struct kvm *kvm, unsigned int host_irq,
+>                          * was cached. If so, we need to clean up the per-vcpu
+>                          * ir_list.
+>                          */
+> -                       if (!ret && pi.prev_ga_tag) {
+> +                       if (!ret && pi.prev_ga_tag && !WARN_ON(!pi.ir_data)) {
+>                                 int id = AVIC_GATAG_TO_VCPUID(pi.prev_ga_tag);
+>                                 struct kvm_vcpu *vcpu;
+> 
+> 
+
 
