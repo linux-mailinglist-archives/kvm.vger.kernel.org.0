@@ -2,135 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EA4A646E483
-	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 09:45:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4A47746E552
+	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 10:12:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235154AbhLIIsi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Dec 2021 03:48:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37626 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235135AbhLIIsh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Dec 2021 03:48:37 -0500
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC6D9C061746;
-        Thu,  9 Dec 2021 00:45:04 -0800 (PST)
-Received: by mail-pg1-x535.google.com with SMTP id f125so4533625pgc.0;
-        Thu, 09 Dec 2021 00:45:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:content-language:to:cc
-         :references:from:organization:subject:in-reply-to
-         :content-transfer-encoding;
-        bh=tK1hZ3CV+6USV8fTZ69OnQjQ1kpiKKSPbC+alCWSbhE=;
-        b=ZXhgGsxay71B8CKUCUxzedWhTbOEJQsW/AFkHmYQAXbl1khZBXC6Sz8n5BWkWSd7Db
-         BAefUj4RVYk++F8EBR3xs9qVLqTrtieQ/tFdfUX0AwYb8U+eoKwNlYqWctpXxd20Tii/
-         1J68ojkmEoc0BHW/RbL1Fg13EUJdzhpcM43CTvemEIU3PYfqQCZFx7/u6M9Yj0RtI1vz
-         ttOnELXkmnAC+jP4hIFJknXtdsu4yCgpYid5+J2+/13yRQXGINydwxAZiGj/0RZVhpcH
-         pP4Pqn5wZPjaxnpX0MfUzeGaEefgLm97lmPTS8xTLi92/p1Xwv+1F2rVNj4pUI7ZalBG
-         FeTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent
-         :content-language:to:cc:references:from:organization:subject
-         :in-reply-to:content-transfer-encoding;
-        bh=tK1hZ3CV+6USV8fTZ69OnQjQ1kpiKKSPbC+alCWSbhE=;
-        b=5UD0Mcj3rP34cB2dOr29awZ3pWX+4UHUIiU9Pm9JjknjOcwObFVnZR+7MwHayO0Iqw
-         P2a9YAGLfKLKtVNBaI4YaGH8siADL2bQJITrQQid+XEDgk3f5EoD65MPzHhTois9fXer
-         JGsySnRcBiU9OP7eLYSIm0CccTz86BGnf8Nx03q6SstW+rO4t8ryWxePX487i8Xx3zPn
-         Q/G51vGeG2uvUZYAgJiZJop0NcG89ZyKsnQ5gtKU5Mt2pzQZ0xqls3pBFTVmw6Qt/SJf
-         Bbe1c84DsSwzGAib5rTzv6rWmau+nOHXk22DLBNwromgXSGKe5cFWq+HuQe5gW7pCzRP
-         aogQ==
-X-Gm-Message-State: AOAM532ggIL056DxD7VPpewFLswrwQAKIfsVRM4IanhXbna/BngpRl1t
-        9JofUtDIYvb12Dv+eOANRhXe1FBs0lM=
-X-Google-Smtp-Source: ABdhPJzKAZBqgP3CexyHBX4s7h0WFpJ+F8MHwwVMrTzHMhJZXGKc9WOGbleIwYK06EBL8zi12xKQvg==
-X-Received: by 2002:a63:6b83:: with SMTP id g125mr32404566pgc.578.1639039504383;
-        Thu, 09 Dec 2021 00:45:04 -0800 (PST)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id e35sm4766166pgm.92.2021.12.09.00.45.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Dec 2021 00:45:04 -0800 (PST)
-Message-ID: <ad06fc9f-4617-3262-414d-e061d3d68b9d@gmail.com>
-Date:   Thu, 9 Dec 2021 16:44:54 +0800
+        id S234190AbhLIJQ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Dec 2021 04:16:28 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:43812 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229654AbhLIJQ1 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 Dec 2021 04:16:27 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B98wRn4005373;
+        Thu, 9 Dec 2021 09:12:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=JmcQClMRutBZg0exBO9eE3sOpVbfCJRjME933j2p6Uk=;
+ b=hN0hhLJ3icu8akfiIZw0jxrnWu5sMxZYFZClIt4pyxmB2VNDdg7rM7eN7DPvzMzEoRZx
+ LwF1dl1mGRmS7yotkmaK1r5mBbMZPu3zBuECVKPnO1SmM4/iKTK1M/Ff1xy++HWc21+9
+ PHlzpWTWdEQDLD6YUUJknKTJhUkYsYtMunQDljl/sX+8CBaiq4DIpKwYevVV8ktHAa+n
+ nX1TKXpGG9KN3HQNQOorvQgAKcJQybdzZrqxsUWpIGYk+tg6fGVPjV/RSoT3vP3Kr2rt
+ XFv8gBSdDS+JsNtjHm8y2IkRN3s/UtNgRYidCh8ss1YZqXNf9yTlfHt+JqfiDiROEDR/ MA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cuert08ag-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Dec 2021 09:12:54 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1B993dnN022094;
+        Thu, 9 Dec 2021 09:12:53 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cuert089m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Dec 2021 09:12:53 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1B99Bvje019538;
+        Thu, 9 Dec 2021 09:12:51 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+        by ppma03ams.nl.ibm.com with ESMTP id 3cqyyafc5a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 09 Dec 2021 09:12:51 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1B99CmQI22937892
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 9 Dec 2021 09:12:48 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E3805AE073;
+        Thu,  9 Dec 2021 09:12:47 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E7FDCAE055;
+        Thu,  9 Dec 2021 09:12:46 +0000 (GMT)
+Received: from [9.171.63.16] (unknown [9.171.63.16])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  9 Dec 2021 09:12:46 +0000 (GMT)
+Message-ID: <e4afc101-a85b-8de6-d0db-bc6e93180db6@linux.ibm.com>
+Date:   Thu, 9 Dec 2021 10:13:45 +0100
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.4.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH 10/32] s390/pci: stash dtsm and maxstbl
 Content-Language: en-US
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>,
-        Peter Zijlstra <peterz@infradead.org>
-References: <20211130074221.93635-1-likexu@tencent.com>
- <20211130074221.93635-6-likexu@tencent.com>
- <CALMp9eQxW_0JBe_6doNTGLXHsXM_Y0YSfnrM1yqTumUQqg7A2A@mail.gmail.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-Organization: Tencent
-Subject: Re: [PATCH v2 5/6] KVM: x86: Update vPMCs when retiring instructions
-In-Reply-To: <CALMp9eQxW_0JBe_6doNTGLXHsXM_Y0YSfnrM1yqTumUQqg7A2A@mail.gmail.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
+        schnelle@linux.ibm.com, farman@linux.ibm.com,
+        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
+        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
+        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20211207205743.150299-1-mjrosato@linux.ibm.com>
+ <20211207205743.150299-11-mjrosato@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <20211207205743.150299-11-mjrosato@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: T1T86lCEi_8TNhrPeo7RXe2m1vddi1Hg
+X-Proofpoint-GUID: jQ3q2uxiqF_kZP-KX03L8w7tfOTk49Yh
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2021-12-09_04,2021-12-08_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ impostorscore=0 suspectscore=0 adultscore=0 mlxscore=0 bulkscore=0
+ mlxlogscore=999 phishscore=0 priorityscore=1501 spamscore=0 clxscore=1015
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2112090048
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 9/12/2021 12:33 pm, Jim Mattson wrote:
-> On Mon, Nov 29, 2021 at 11:42 PM Like Xu <like.xu.linux@gmail.com> wrote:
->>
->> From: Like Xu <likexu@tencent.com>
->>
->> When KVM retires a guest instruction through emulation, increment any
->> vPMCs that are configured to monitor "instructions retired," and
->> update the sample period of those counters so that they will overflow
->> at the right time.
->>
->> Signed-off-by: Eric Hankland <ehankland@google.com>
->> [jmattson:
->>    - Split the code to increment "branch instructions retired" into a
->>      separate commit.
->>    - Added 'static' to kvm_pmu_incr_counter() definition.
->>    - Modified kvm_pmu_incr_counter() to check pmc->perf_event->state ==
->>      PERF_EVENT_STATE_ACTIVE.
->> ]
->> Fixes: f5132b01386b ("KVM: Expose a version 2 architectural PMU to a guests")
->> Signed-off-by: Jim Mattson <jmattson@google.com>
->> [likexu:
->>    - Drop checks for pmc->perf_event or event state or event type
->>    - Increase a counter once its umask bits and the first 8 select bits are matched
->>    - Rewrite kvm_pmu_incr_counter() with a less invasive approach to the host perf;
->>    - Rename kvm_pmu_record_event to kvm_pmu_trigger_event;
->>    - Add counter enable and CPL check for kvm_pmu_trigger_event();
->> ]
->> Cc: Peter Zijlstra <peterz@infradead.org>
->> Signed-off-by: Like Xu <likexu@tencent.com>
->> ---
-> 
->> +void kvm_pmu_trigger_event(struct kvm_vcpu *vcpu, u64 perf_hw_id)
->> +{
->> +       struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
->> +       struct kvm_pmc *pmc;
->> +       int i;
->> +
->> +       for_each_set_bit(i, pmu->all_valid_pmc_idx, X86_PMC_IDX_MAX) {
->> +               pmc = kvm_x86_ops.pmu_ops->pmc_idx_to_pmc(pmu, i);
->> +
->> +               if (!pmc || !pmc_is_enabled(pmc) || !pmc_speculative_in_use(pmc))
->> +                       continue;
->> +
->> +               /* Ignore checks for edge detect, pin control, invert and CMASK bits */
-> 
-> I don't understand how we can ignore these checks. Doesn't that
-> violate the architectural specification?
 
-OK, let's take a conservative approach in the V3.
 
+On 12/7/21 21:57, Matthew Rosato wrote:
+> Store information about what IOAT designation types are supported by
+> underlying hardware as well as the largest store block size allowed.
+> These values will be needed by passthrough.
 > 
->> +               if (eventsel_match_perf_hw_id(pmc, perf_hw_id) && cpl_is_matched(pmc))
->> +                       kvm_pmu_incr_counter(pmc);
->> +       }
->> +}
->> +EXPORT_SYMBOL_GPL(kvm_pmu_trigger_event);
->> +
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> ---
+>   arch/s390/include/asm/pci.h     | 2 ++
+>   arch/s390/include/asm/pci_clp.h | 6 ++++--
+>   arch/s390/pci/pci_clp.c         | 2 ++
+>   3 files changed, 8 insertions(+), 2 deletions(-)
 > 
+> diff --git a/arch/s390/include/asm/pci.h b/arch/s390/include/asm/pci.h
+> index 2474b8d30f2a..1a8f9f42da3a 100644
+> --- a/arch/s390/include/asm/pci.h
+> +++ b/arch/s390/include/asm/pci.h
+> @@ -126,9 +126,11 @@ struct zpci_dev {
+>   	u32		gd;		/* GISA designation for passthrough */
+>   	u16		vfn;		/* virtual function number */
+>   	u16		pchid;		/* physical channel ID */
+> +	u16		maxstbl;	/* Maximum store block size */
+>   	u8		pfgid;		/* function group ID */
+>   	u8		pft;		/* pci function type */
+>   	u8		port;
+> +	u8		dtsm;		/* Supported DT mask */
+>   	u8		rid_available	: 1;
+>   	u8		has_hp_slot	: 1;
+>   	u8		has_resources	: 1;
+> diff --git a/arch/s390/include/asm/pci_clp.h b/arch/s390/include/asm/pci_clp.h
+> index 3af8d196da74..124fadfb74b9 100644
+> --- a/arch/s390/include/asm/pci_clp.h
+> +++ b/arch/s390/include/asm/pci_clp.h
+> @@ -153,9 +153,11 @@ struct clp_rsp_query_pci_grp {
+>   	u8			:  6;
+>   	u8 frame		:  1;
+>   	u8 refresh		:  1;	/* TLB refresh mode */
+> -	u16 reserved2;
+> +	u16			:  3;
+> +	u16 maxstbl		: 13;	/* Maximum store block size */
+>   	u16 mui;
+> -	u16			: 16;
+> +	u8 dtsm;			/* Supported DT mask */
+> +	u8 reserved3;
+>   	u16 maxfaal;
+>   	u16			:  4;
+>   	u16 dnoi		: 12;
+> diff --git a/arch/s390/pci/pci_clp.c b/arch/s390/pci/pci_clp.c
+> index e9ed0e4a5cf0..bc7446566cbc 100644
+> --- a/arch/s390/pci/pci_clp.c
+> +++ b/arch/s390/pci/pci_clp.c
+> @@ -103,6 +103,8 @@ static void clp_store_query_pci_fngrp(struct zpci_dev *zdev,
+>   	zdev->max_msi = response->noi;
+>   	zdev->fmb_update = response->mui;
+>   	zdev->version = response->version;
+> +	zdev->maxstbl = response->maxstbl;
+> +	zdev->dtsm = response->dtsm;
+>   
+>   	switch (response->version) {
+>   	case 1:
+> 
+
+Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
+
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
