@@ -2,171 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D21046F526
-	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 21:46:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B8BC46F542
+	for <lists+kvm@lfdr.de>; Thu,  9 Dec 2021 21:53:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231197AbhLIUtg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Dec 2021 15:49:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40202 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230490AbhLIUtf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Dec 2021 15:49:35 -0500
-Received: from mail-oo1-xc31.google.com (mail-oo1-xc31.google.com [IPv6:2607:f8b0:4864:20::c31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 734A9C0617A1
-        for <kvm@vger.kernel.org>; Thu,  9 Dec 2021 12:46:01 -0800 (PST)
-Received: by mail-oo1-xc31.google.com with SMTP id p2-20020a4adfc2000000b002c2676904fdso1940730ood.13
-        for <kvm@vger.kernel.org>; Thu, 09 Dec 2021 12:46:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=uhJJV8+jfZGqLW8Uh+xswuq48sVdhssHqA55xBziPOA=;
-        b=O1KhKxCdBw3WfXh2G2ek1u1qvanuwzp1S2TNYp6SA9ix/9ywEzguFltjztISJn7yFe
-         Li0qZDkExK8aJUPG/bOfrvgQbolGJEQLTWiDWyVh/gBj3mmXzf6z80UM9sKvc5qMoG6y
-         xDnkoCDrkZ5YFlGlbvRLgRbI4fF0xPXXc8w4K3O04P1Z3OYgKy+aju0thL4cZoZ0zvPZ
-         3mo3puIhwDWG6MuNoe0L1JWaiJobNHWqsz47d7vKYkrPztmCh2JvK84ZkZpSbrtsnw4F
-         K7HKboGOjFfr6Jy3ViF+rSqYQIMW4yKGBpYJQAmK6l7SD2YIHZxakjvkC3AasJOpg5V1
-         fiZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=uhJJV8+jfZGqLW8Uh+xswuq48sVdhssHqA55xBziPOA=;
-        b=rq2w6hPkI4lc6ylaJg2FRnByuG3ksrRI55Wv1AiWTDcdnjOHVaAR12EJpLN9PGyNLV
-         yn7fsbvADFMxSQ9bjkH41FfgvPPkEBHr91mQYwyEpn3yJEovnnZI+dy3Njt0lUMcQ4c4
-         U7eIA+/SYHSI3AZ4PKecsHmmr6NHHoHPDpSzKwIX6FyMq7qLpfbWPCA6Ovkn9DLWhrTI
-         ZiJIPwD/n1qOR9OWpUz5UCC1vnbZuoBbce1xl356gTolrKh2NjQSSYlj4VnZcVeVwJC8
-         H4fV4TUN0l/N1f6NgaKa+hR7udWgSD3tdSrzaHMIfSfRWUDw/gWVEyG0ehefV/5Om2ji
-         G+tg==
-X-Gm-Message-State: AOAM531wo04gpmq4QDiE0fsJUNnmcbNoHat/j2N70IFtL7vXPsGklsWf
-        B1aBDNM87JYYfeo2UCeQEwvTSg6P/PfhNaIPJ1q9rQ==
-X-Google-Smtp-Source: ABdhPJx/d3Jt/ua0yxi9PY0fpidFaIwhfxkgwElS+bMUsxz0wFhwUDzbN20c0S9q2VJla/wkbIJtkUWYntPPZiTs+rk=
-X-Received: by 2002:a4a:d854:: with SMTP id g20mr5641122oov.6.1639082760418;
- Thu, 09 Dec 2021 12:46:00 -0800 (PST)
+        id S232177AbhLIU4i (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Dec 2021 15:56:38 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:49261 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231442AbhLIU4i (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 Dec 2021 15:56:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1639083183;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=c4oEqkagy/qMAjzlctANbGGhASHOez2GnoWuetKkoIE=;
+        b=d3XymxJhlR3lxSoryOY3u0HOBagukTMYpxMLZhrBQJRp47VrgFma3P3DfX07nuvScMsFLt
+        UMXv6YhAQpNhMLAWusYTnnoZsb5BGWsscb4CF1yRJ0Uu6cRwrALczNljQj0bBoDWe6y6D/
+        s3dQKGKrUny/shnEXPMJ7JBxS7m2WBI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-103-0Uj2qM8UN3KBIJA2ezlUIQ-1; Thu, 09 Dec 2021 15:53:00 -0500
+X-MC-Unique: 0Uj2qM8UN3KBIJA2ezlUIQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7398A835E22;
+        Thu,  9 Dec 2021 20:52:59 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 8F82C197FC;
+        Thu,  9 Dec 2021 20:52:56 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     seanjc@google.com, vkuznets@redhat.com, mlevitsk@redhat.com,
+        joao.m.martins@oracle.com, stable@vger.kernel.org,
+        David Matlack <dmatlack@google.com>
+Subject: [PATCH v2] selftests: KVM: avoid failures due to reserved HyperTransport region
+Date:   Thu,  9 Dec 2021 15:52:56 -0500
+Message-Id: <20211209205256.301140-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-References: <20211208191642.3792819-1-pgonda@google.com> <20211208191642.3792819-4-pgonda@google.com>
- <CAA03e5H6TxcL6WVYcBs5aX5zHLB=sCYcrBLggAtmLZADn_BHyA@mail.gmail.com>
-In-Reply-To: <CAA03e5H6TxcL6WVYcBs5aX5zHLB=sCYcrBLggAtmLZADn_BHyA@mail.gmail.com>
-From:   Marc Orr <marcorr@google.com>
-Date:   Thu, 9 Dec 2021 12:45:49 -0800
-Message-ID: <CAA03e5FnbZzTH38eJvihYiqQB+JztaoYb3hz98E6D-e6AUuWrA@mail.gmail.com>
-Subject: Re: [PATCH 3/3] selftests: sev_migrate_tests: Add mirror command tests
-To:     Peter Gonda <pgonda@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 8, 2021 at 9:53 PM Marc Orr <marcorr@google.com> wrote:
->
-> On Wed, Dec 8, 2021 at 11:16 AM Peter Gonda <pgonda@google.com> wrote:
-> >
-> > Add tests to confirm mirror vms can only run correct subset of commands.
-> >
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: Sean Christopherson <seanjc@google.com>
-> > Cc: Marc Orr <marcorr@google.com>
-> > Signed-off-by: Peter Gonda <pgonda@google.com>
-> > ---
-> >  .../selftests/kvm/x86_64/sev_migrate_tests.c  | 55 +++++++++++++++++--
-> >  1 file changed, 51 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c b/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c
-> > index 4bb960ca6486..80056bbbb003 100644
-> > --- a/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c
-> > +++ b/tools/testing/selftests/kvm/x86_64/sev_migrate_tests.c
-> > @@ -21,7 +21,7 @@
-> >  #define NR_LOCK_TESTING_THREADS 3
-> >  #define NR_LOCK_TESTING_ITERATIONS 10000
-> >
-> > -static void sev_ioctl(int vm_fd, int cmd_id, void *data)
-> > +static int __sev_ioctl(int vm_fd, int cmd_id, void *data, __u32 *fw_error)
-> >  {
-> >         struct kvm_sev_cmd cmd = {
-> >                 .id = cmd_id,
-> > @@ -30,11 +30,20 @@ static void sev_ioctl(int vm_fd, int cmd_id, void *data)
-> >         };
-> >         int ret;
-> >
-> > -
-> >         ret = ioctl(vm_fd, KVM_MEMORY_ENCRYPT_OP, &cmd);
-> > -       TEST_ASSERT(ret == 0 && cmd.error == SEV_RET_SUCCESS,
-> > +       *fw_error = cmd.error;
-> > +       return ret;
-> > +}
-> > +
-> > +static void sev_ioctl(int vm_fd, int cmd_id, void *data)
-> > +{
-> > +       int ret;
-> > +       __u32 fw_error;
-> > +
-> > +       ret = __sev_ioctl(vm_fd, cmd_id, data, &fw_error);
-> > +       TEST_ASSERT(ret == 0 && fw_error == SEV_RET_SUCCESS,
-> >                     "%d failed: return code: %d, errno: %d, fw error: %d",
-> > -                   cmd_id, ret, errno, cmd.error);
-> > +                   cmd_id, ret, errno, fw_error);
-> >  }
-> >
-> >  static struct kvm_vm *sev_vm_create(bool es)
-> > @@ -226,6 +235,42 @@ static void sev_mirror_create(int dst_fd, int src_fd)
-> >         TEST_ASSERT(!ret, "Copying context failed, ret: %d, errno: %d\n", ret, errno);
-> >  }
-> >
-> > +static void verify_mirror_allowed_cmds(int vm_fd)
-> > +{
-> > +       struct kvm_sev_guest_status status;
-> > +
-> > +       for (int cmd_id = KVM_SEV_INIT; cmd_id < KVM_SEV_NR_MAX; ++cmd_id) {
-> > +               int ret;
-> > +               __u32 fw_error;
-> > +
-> > +               /*
-> > +                * These commands are allowed for mirror VMs, all others are
-> > +                * not.
-> > +                */
-> > +               switch (cmd_id) {
-> > +               case KVM_SEV_LAUNCH_UPDATE_VMSA:
-> > +               case KVM_SEV_GUEST_STATUS:
-> > +               case KVM_SEV_DBG_DECRYPT:
-> > +               case KVM_SEV_DBG_ENCRYPT:
-> > +                       continue;
-> > +               default:
-> > +                       break;
-> > +               }
-> > +
-> > +               /*
-> > +                * These commands should be disallowed before the data
-> > +                * parameter is examined so NULL is OK here.
-> > +                */
-> > +               ret = __sev_ioctl(vm_fd, cmd_id, NULL, &fw_error);
-> > +               TEST_ASSERT(
-> > +                       ret == -1 && errno == EINVAL,
-> > +                       "Should not be able call command: %d. ret: %d, errno: %d\n",
-> > +                       cmd_id, ret, errno);
-> > +       }
-> > +
-> > +       sev_ioctl(vm_fd, KVM_SEV_GUEST_STATUS, &status);
->
-> Why is this here? I'd either delete it or maybe alternatively move it
-> into the `case KVM_SEV_GUEST_STATUS` with a corresponding TEST_ASSERT
-> to check that the command succeeded. Something like:
->
-> ...
->                switch (cmd_id) {
->                case KVM_SEV_GUEST_STATUS:
->                     sev_ioctl(vm_fd, KVM_SEV_GUEST_STATUS, &status);
->                     TEST_ASSERT(ret == 0 && fw_error == SEV_RET_SUCCESS, ...);
->                     continue;
->                case KVM_SEV_LAUNCH_UPDATE_VMSA:
->                case KVM_SEV_DBG_DECRYPT:
->                case KVM_SEV_DBG_ENCRYPT:
->                        continue;
->                default:
->                        break;
->                }
+AMD proceessors define an address range that is reserved by HyperTransport
+and causes a failure if used for guest physical addresses.  Avoid
+selftests failures by reserving those guest physical addresses; the
+rules are:
 
-For posterity: Peter pointed out to me offline that `sev_ioctl()` in
-fact does the TEST_ASSERT internally. Doh! So this line is fine as is.
+- On parts with <40 bits, its fully hidden from software.
+
+- Before Fam17h, it was always 12G just below 1T, even if there was more
+RAM above this location.  In this case we just not use any RAM above 1T.
+
+- On Fam17h and later, it is variable based on SME, and is either just
+below 2^48 (no encryption) or 2^43 (encryption).
+
+Fixes: ef4c9f4f6546 ("KVM: selftests: Fix 32-bit truncation of vm_get_max_gfn()")
+Cc: stable@vger.kernel.org
+Cc: David Matlack <dmatlack@google.com>
+Reported-by: Maxim Levitsky <mlevitsk@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Message-Id: <20210805105423.412878-1-pbonzini@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ .../testing/selftests/kvm/include/kvm_util.h  |  9 +++
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  2 +-
+ .../selftests/kvm/lib/x86_64/processor.c      | 67 +++++++++++++++++++
+ 3 files changed, 77 insertions(+), 1 deletion(-)
+
+diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+index 6a1a37f30494..da2b702da71a 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util.h
++++ b/tools/testing/selftests/kvm/include/kvm_util.h
+@@ -71,6 +71,15 @@ enum vm_guest_mode {
+ 
+ #endif
+ 
++#if defined(__x86_64__)
++unsigned long vm_compute_max_gfn(struct kvm_vm *vm);
++#else
++static inline unsigned long vm_compute_max_gfn(struct kvm_vm *vm)
++{
++	return ((1ULL << vm->pa_bits) >> vm->page_shift) - 1;
++}
++#endif
++
+ #define MIN_PAGE_SIZE		(1U << MIN_PAGE_SHIFT)
+ #define PTES_PER_MIN_PAGE	ptes_per_page(MIN_PAGE_SIZE)
+ 
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index 8f2e0bb1ef96..daf6fdb217a7 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -302,7 +302,7 @@ struct kvm_vm *vm_create(enum vm_guest_mode mode, uint64_t phy_pages, int perm)
+ 		(1ULL << (vm->va_bits - 1)) >> vm->page_shift);
+ 
+ 	/* Limit physical addresses to PA-bits. */
+-	vm->max_gfn = ((1ULL << vm->pa_bits) >> vm->page_shift) - 1;
++	vm->max_gfn = vm_compute_max_gfn(vm);
+ 
+ 	/* Allocate and setup memory for guest. */
+ 	vm->vpages_mapped = sparsebit_alloc();
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+index 82c39db91369..b7105692661b 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
++++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+@@ -1431,3 +1431,70 @@ struct kvm_cpuid2 *vcpu_get_supported_hv_cpuid(struct kvm_vm *vm, uint32_t vcpui
+ 
+ 	return cpuid;
+ }
++
++#define X86EMUL_CPUID_VENDOR_AuthenticAMD_ebx 0x68747541
++#define X86EMUL_CPUID_VENDOR_AuthenticAMD_ecx 0x444d4163
++#define X86EMUL_CPUID_VENDOR_AuthenticAMD_edx 0x69746e65
++
++static inline unsigned x86_family(unsigned int eax)
++{
++        unsigned int x86;
++
++        x86 = (eax >> 8) & 0xf;
++
++        if (x86 == 0xf)
++                x86 += (eax >> 20) & 0xff;
++
++        return x86;
++}
++
++unsigned long vm_compute_max_gfn(struct kvm_vm *vm)
++{
++	const unsigned long num_ht_pages = 12 << 18; /* 12 GiB */
++	unsigned long ht_gfn, max_gfn, max_pfn;
++	uint32_t eax, ebx, ecx, edx;
++
++	max_gfn = (1ULL << (vm->pa_bits - vm->page_shift)) - 1;
++
++	/* Avoid reserved HyperTransport region on AMD processors.  */
++	eax = ecx = 0;
++	cpuid(&eax, &ebx, &ecx, &edx);
++	if (ebx != X86EMUL_CPUID_VENDOR_AuthenticAMD_ebx ||
++	    ecx != X86EMUL_CPUID_VENDOR_AuthenticAMD_ecx ||
++	    edx != X86EMUL_CPUID_VENDOR_AuthenticAMD_edx)
++		return max_gfn;
++
++	/* On parts with <40 physical address bits, the area is fully hidden */
++	if (vm->pa_bits < 40)
++		return max_gfn;
++
++	eax = 1;
++	cpuid(&eax, &ebx, &ecx, &edx);
++	if (x86_family(eax) < 0x17) {
++		/* Before family 17h, the HyperTransport area is just below 1T.  */
++		ht_gfn = (1 << 28) - num_ht_pages;
++	} else {
++		/*
++		 * Otherwise it's at the top of the physical address
++		 * space, possibly reduced due to SME by bits 11:6 of
++		 * CPUID[0x8000001f].EBX.
++		 */
++		eax = 0x80000008;
++		cpuid(&eax, &ebx, &ecx, &edx);
++		max_pfn = (1ULL << ((eax & 255) - vm->page_shift)) - 1;
++
++		eax = 0x80000000;
++		cpuid(&eax, &ebx, &ecx, &edx);
++		if (eax >= 0x8000001f) {
++			eax = 0x8000001f;
++			cpuid(&eax, &ebx, &ecx, &edx);
++			max_pfn >>= (ebx >> 6) & 0x3f;
++		}
++		ht_gfn = max_pfn - num_ht_pages;
++	}
++
++	if (max_gfn < ht_gfn)
++		return max_gfn;
++
++	return ht_gfn - 1;
++}
+-- 
+2.31.1
+
