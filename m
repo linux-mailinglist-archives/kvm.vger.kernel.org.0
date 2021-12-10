@@ -2,94 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C9F746FE8C
-	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 11:13:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EEECD46FEA2
+	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 11:20:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232829AbhLJKRK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Dec 2021 05:17:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53110 "EHLO
+        id S240033AbhLJKY2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Dec 2021 05:24:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229562AbhLJKRJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Dec 2021 05:17:09 -0500
-Received: from mail-il1-x142.google.com (mail-il1-x142.google.com [IPv6:2607:f8b0:4864:20::142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B7CFC061746
-        for <kvm@vger.kernel.org>; Fri, 10 Dec 2021 02:13:35 -0800 (PST)
-Received: by mail-il1-x142.google.com with SMTP id t8so7914789ilu.8
-        for <kvm@vger.kernel.org>; Fri, 10 Dec 2021 02:13:35 -0800 (PST)
+        with ESMTP id S236599AbhLJKYW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Dec 2021 05:24:22 -0500
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99542C061746;
+        Fri, 10 Dec 2021 02:20:47 -0800 (PST)
+Received: by mail-pj1-x1029.google.com with SMTP id h24so6526454pjq.2;
+        Fri, 10 Dec 2021 02:20:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=He9kpFQwq1I68wdOjeNvE0LON5OL4PlSGVKoCJBAUEM=;
-        b=S7gWGKP85tbaJlUaUhZZUOymbozYPmcV6RyNlZFM8TkmYhJDTxvm6ORs0DjHlseaip
-         NwBMer0+98jtolSUiHwP0gZgXZx+izjgKN8f2CMz9CPU38WYv6Vh4nUAsmZBIkFYLU19
-         fAOd8aQ0Fc1TGGe/PNqXRdyGql8szX14APd1rWRUbCY9s/vu4qSe2cyJEacsiG2sTW2c
-         Y32/RFhrdE7ToSY1fozi0cnwYqifkwMO7aIsgWsXw8TsmJ6CXnQHPRb4gNIa1Qpjl1FF
-         YlqX6wn9nQ0hf69HVCIOJsK3m9fS1T5SdJS3UA10880tuq4ACopqpTmtiquVfQcIBYoE
-         cFFw==
+        h=message-id:date:mime-version:user-agent:content-language:to:cc
+         :references:from:organization:subject:in-reply-to
+         :content-transfer-encoding;
+        bh=xpuvc+9Hl9NOllZ3htk7q/dYvdJaqcq3/ayg7ngaxwI=;
+        b=o7dfCqVFokBdFn5RTMIZncQkgRoWwGOhIF4XcgTN8WdqM22C1kOuGobMG4C8vBIK/L
+         6VEKa0AQXihE+Omi11daz1bxLayXaBUgGnk6VCcbItEEm/5jgCRMsL/tzxDLRi33gHJ5
+         9KRdsWjIHoMDqzvuqmsT8NIHQ2dUIWG+hCtGb9A0TumsUtj6wZHBi2dU5AdpMcHbDxE2
+         cv47EBg12yejCF6DmuWYzwI2EyDVf1lKIhoMhEbnrrqgHd7ky1H9y5Qvr8aW/RNUEVa4
+         pOMTYvzsNTn4YzKZVKZ8A23avOhXszCTBjKp13hC+qzYv9nen+CpsLVkOOsDNFJIGJhW
+         eKBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=He9kpFQwq1I68wdOjeNvE0LON5OL4PlSGVKoCJBAUEM=;
-        b=fOv4KrWJubw35aFO+BrsoYi2uuTaIkQ7b2dWUFVXSwkqvOKk/FT9Rrnxx0Fbt531cK
-         lCz8ISbClEdd0iMAPW+G/ioahoPP/GfwV0OSFbch+PwMyBleVvMwrkRCdoAkLzM6Lo52
-         o2cNBfVL5XQiNWshqSI7cYmTZnvrULvl9cbQke451s7Azx+H+OHBGrMTGSWDpS27q21F
-         FgbrHO77ydMYRs7cFzQV/a9CNjzbz7wa1XOIAdi9E3NepxnHN2+KKlpDndZEbAJpeYT0
-         4UutMxRa5eP5IsgloRSYBA36hwJY7zabugbkR4hvf3QlZfu5W+uB1SwalyBO/QMLMiCr
-         KbZw==
-X-Gm-Message-State: AOAM533yZEu/MgfALh+z/i/tzFXzfkFhPQa5AveLYSsLjZ3q3Em8KYAG
-        lOUQpmRiV+F3XjzMUIXLPZ3GIGdmVPndowGzoTI=
-X-Google-Smtp-Source: ABdhPJwzoYlieHz15g+Jvz3KsRxr4lPfFxPXfBYISWn1indqnjl0KbrH+8F8a3OS3+h5m4SPDmeKZqA3Qj8MM/MKJ+I=
-X-Received: by 2002:a05:6e02:ed2:: with SMTP id i18mr21520146ilk.93.1639131214361;
- Fri, 10 Dec 2021 02:13:34 -0800 (PST)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:cc:references:from:organization:subject
+         :in-reply-to:content-transfer-encoding;
+        bh=xpuvc+9Hl9NOllZ3htk7q/dYvdJaqcq3/ayg7ngaxwI=;
+        b=xJb3o+6LIthyNI5pZOU6g2ZNlcNYk13OnCp3h4XG7dCzpGQO3KvrbAwRezbq4elUvA
+         NQh84iBmMHY36bnRJO9SvU1qYsXF1W1WDxwj7RWcV3AIKRcR86zVGYNbDqNAJ0m2Flrh
+         pdITd0wF+lA6DYHCoD+4ZX9ePfqx1I8SHtLHL8gvLDYjqaLQttzZgBjPggYZ8IvO/4iu
+         guff1sztD50GgncGDyE5wqRC/v1kXWwSGxnvW7oiEUcKykwHwVtNnda14v4Q72pF+WTn
+         16nvxPP0AvHEGPG1AoRNxLnVrNc/wt7f347EQpz1RIP7o2YIjsb7t0zwaNDDQxLayCkf
+         zimw==
+X-Gm-Message-State: AOAM532yJS+sIZ619jKClmfA/591DJxhr10qv9CaTjZval73tiVLuYBZ
+        2Mnk0KVkS7dOz29NVIooFxA=
+X-Google-Smtp-Source: ABdhPJwK3FptORjh/RyUz1zT7RXxi5ivrHDnyM1UhbTDZ7dJnN7sMP51cmGp9iQfoI/NErikh0lWbg==
+X-Received: by 2002:a17:902:d50e:b0:142:1b2a:144 with SMTP id b14-20020a170902d50e00b001421b2a0144mr74757099plg.51.1639131647228;
+        Fri, 10 Dec 2021 02:20:47 -0800 (PST)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id w7sm2292559pgo.56.2021.12.10.02.20.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 10 Dec 2021 02:20:46 -0800 (PST)
+Message-ID: <0815b30f-c0e5-4261-df03-bd82d69b05c7@gmail.com>
+Date:   Fri, 10 Dec 2021 18:20:36 +0800
 MIME-Version: 1.0
-Received: by 2002:a05:6622:e02:0:0:0:0 with HTTP; Fri, 10 Dec 2021 02:13:33
- -0800 (PST)
-Reply-To: mrskade@hotmail.com
-From:   mrs kadi <david1kama202@gmail.com>
-Date:   Fri, 10 Dec 2021 02:13:33 -0800
-Message-ID: <CANMgs4H+pwZpXtfdnVT8-4FMFXSts+2Cn0TvDq6Xymxpwd=7yA@mail.gmail.com>
-Subject: Compliment of the day
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.4.0
+Content-Language: en-US
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>,
+        linux-perf-users@vger.kernel.org
+References: <20211130074221.93635-1-likexu@tencent.com>
+ <20211130074221.93635-2-likexu@tencent.com>
+ <CALMp9eT05nb56b16KkybvGSTYMhkRusQnNL4aWFU8tsets0O2w@mail.gmail.com>
+ <8ca78cd6-12ad-56c4-ad73-e88757364ba9@redhat.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+Organization: Tencent
+Subject: Re: [PATCH v2 1/6] KVM: x86/pmu: Setup pmc->eventsel for fixed PMCs
+In-Reply-To: <8ca78cd6-12ad-56c4-ad73-e88757364ba9@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Dear sir/madam
+On 10/12/2021 2:49 am, Paolo Bonzini wrote:
+> 
+> or we modify find_fixed_event and its caller to support PERF_TYPE_RAW
+> counters, and then add support for the IceLake TOPDOWN.SLOTS fixed
+> counter.
 
-My name is Mrs Kadi Hamanin.I have decided to seek a confidential
-co-operation with you for the execution of the deal described
-hereunder for our mutual benefit. I Hope you will keep it a secret due
-to the nature of the transaction. During the course of our audit last
-month, I discovered an unclaimed/abandoned fund total US$3.5 million
-in a bank account that belongs to a customer who unfortunately lost
-his life and entire family in a car accident.
+It looks like the TOPDOWN approach from "Yasin Ahmad"
+has recently been widely advertised among developers.
 
-Now our bank has been waiting for any of the relatives to come-up for
-the claim but nobody has done that. I personally has been unsuccessful
-in locating any of the relatives, now, I sincerely seek your consent
-to present you as the next of kin / Will Beneficiary to the deceased
-so that the proceeds of this account valued at {US$3.5 Million United
-State Dollars} can be paid to you, which we will share in these
-percentages ratio, 60% to me and 40% to you. All I request is your
-utmost sincere co- operation; trust and maximum confidentiality to
-achieve this project successfully. I have carefully mapped out the
-moralities for execution of this transaction under a legitimate
-arrangement to protect you from any breach of the law both in your
-country and here in my country when the fund is being transferred to
-your bank account.
+But I still need bandwidth to clean up some perf driver stuff
+in order to enable topdown counter smoothly in the guest.
 
-I will have to provide the entire relevant document that will be
-requested to indicate that you are the rightful beneficiary of this
-legacy and our bank will release the fund to you without any further
-delay, upon your consideration and acceptance of this offer, please
-send me the following information as stated below so we can proceed
-and get this fund transferred to your designated bank account
-immediately. I know much about the existence of this fund and the
-secrets surrounding this money.
+cc linux-perf-users@vger.kernel.org for user voices.
 
--Your Full Name:
--Your Contact Address:
--Your direct Mobile telephone Number:
--Your Date of Birth:
+> 
+> What's your preference?
+> 
+> Paolo
