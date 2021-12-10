@@ -2,149 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7DD2246FF42
-	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 12:00:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2EBD5470032
+	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 12:38:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240166AbhLJLDn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Dec 2021 06:03:43 -0500
-Received: from foss.arm.com ([217.140.110.172]:40616 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S240141AbhLJLDm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Dec 2021 06:03:42 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A1E5B2B;
-        Fri, 10 Dec 2021 03:00:06 -0800 (PST)
-Received: from donnerap.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B09E33F73B;
-        Fri, 10 Dec 2021 03:00:05 -0800 (PST)
-Date:   Fri, 10 Dec 2021 11:00:02 +0000
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     "haibiao.xiao" <haibiao.xiao@zstack.io>
-Cc:     kvm@vger.kernel.org, will@kernel.org,
-        julien.thierry.kdev@gmail.com,
-        "haibiao.xiao" <xiaohaibiao331@outlook.com>,
-        Alexandru Elisei <Alexandru.Elisei@arm.com>
-Subject: Re: [PATCH kvmtool] Makefile: 'lvm version' works incorrect.
- Because CFLAGS can not get sub-make variable $(KVMTOOLS_VERSION)
-Message-ID: <20211210110002.137a2fc3@donnerap.cambridge.arm.com>
-In-Reply-To: <28ff4bb3-851a-e287-b008-c2a91370c90d@zstack.io>
-References: <20211204061436.36642-1-haibiao.xiao@zstack.io>
-        <20211209155746.3f6bd016@donnerap.cambridge.arm.com>
-        <28ff4bb3-851a-e287-b008-c2a91370c90d@zstack.io>
-Organization: ARM
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+        id S240727AbhLJLlf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Dec 2021 06:41:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44664 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240732AbhLJLld (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Dec 2021 06:41:33 -0500
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 615CCC0617A1;
+        Fri, 10 Dec 2021 03:37:58 -0800 (PST)
+Received: by mail-ed1-x535.google.com with SMTP id t5so28658577edd.0;
+        Fri, 10 Dec 2021 03:37:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=9PGzqzVr2lWR3c2FT6fcegvnLqjE5zdT1FTCSBDISuI=;
+        b=OM3Nsd4ERses81PNwgGaV6Q7lHZ2NrIuizdbzBgNTGK9RHnDCOrAsDnSChO7XKFAZi
+         vLUjMEQcVNFHcGMVfYKcGFH2HBh6Vw3rIMPk91Mzbko3xYPcjWXaD0QhzPgcRCzi/rmz
+         TigzgBdHpHE1kgICxTUm3FPaWKeuU6uYvAJUZCVcvdbmCN0jXN6JZcfN1tyLFT310IQs
+         7O4yK8ofsPkeRg6dtwxD+XD/+2wNTzt9Q0pA3c5hwe74Zk+jsx176dHTG9EnmTmbYPbD
+         tYe4dTjQoFl1jcBSNq1N8m6APJC9eoK8SuIahBSIyDP06/QAkhsmqLyGvpnFOkJO7Mnz
+         G1qA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=9PGzqzVr2lWR3c2FT6fcegvnLqjE5zdT1FTCSBDISuI=;
+        b=1xwpjRNz4ZZi7ifvhev+HPpGx6TBYxmIMWAW/65diX0fgktnDhQZKSvhQE2lh+HVmZ
+         wzHxhsMULbPWbozbxR5mAoYe/FIY4F2dMN94cHwHymg+uneBarqp5Rd2nCaycVuDa1fd
+         Ot34zuU5EI1T/LKR8irL7GFURP4PEey4k0ewr3bWRZuhKVh/T6AXz8+sPso+aOf0Tcak
+         LUSBF+IqB0lqoY7TlmN4gQnTujRj+AaKlKKrTyz2mxtHcSz9MokIN/GZJwTFUMBG8ARS
+         KqdQCn9akKgpGszmr+x3M0BtrXoM2AwIbKgdzKfZWZREMZ2YPEWBZCwy2LeAhbtTLPGB
+         rhKg==
+X-Gm-Message-State: AOAM531eiMeBSIoBg6Uulw+fI/zu0j7QKfQ2EGxspO5WIcoSQg/wvlT3
+        w7awceM7jOrAyMYyFHqbPjY=
+X-Google-Smtp-Source: ABdhPJx6v0WRp3OGfTassW/62i7NBEybv5+nw9b4oMWyDZPAfmhh2AuYeK9X3ZI4bHRxlhTob2it/g==
+X-Received: by 2002:a50:9ea6:: with SMTP id a35mr37180244edf.400.1639136276255;
+        Fri, 10 Dec 2021 03:37:56 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312::973? ([2001:b07:6468:f312::973])
+        by smtp.googlemail.com with ESMTPSA id sa17sm1389929ejc.123.2021.12.10.03.37.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 10 Dec 2021 03:37:55 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <ad666891-a67e-f126-da14-6de382bf0659@redhat.com>
+Date:   Fri, 10 Dec 2021 12:37:54 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH 4/6] KVM: SVM: fix races in the AVIC incomplete IPI
+ delivery to vCPUs
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org,
+        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
+        <linux-kernel@vger.kernel.org>, Wanpeng Li <wanpengli@tencent.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Jim Mattson <jmattson@google.com>
+References: <20211209115440.394441-1-mlevitsk@redhat.com>
+ <20211209115440.394441-5-mlevitsk@redhat.com> <YbIjCUAECOyIbsYQ@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <YbIjCUAECOyIbsYQ@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 10 Dec 2021 10:55:40 +0800
-"haibiao.xiao" <haibiao.xiao@zstack.io> wrote:
+On 12/9/21 16:38, Sean Christopherson wrote:
+> +                       if (svm_deliver_avic_intr(vcpu, -1) {
+> +                               vcpu->arch.apic->irr_pending = true;
+> +                               kvm_make_request(KVM_REQ_EVENT, vcpu);
+> +                       }
 
-Hi,
+This is a good idea, but the details depends on patch 3 so I'll send a 
+series of my own.
 
-> On Thu, 9 Dec 2021 15:57:46 +0000, Andre Przywara wrote:
-> > On Sat,  4 Dec 2021 14:14:36 +0800
-> > "haibiao.xiao" <haibiao.xiao@zstack.io> wrote:
-> > 
-> > Hi,
-> >   
-> >> From: "haibiao.xiao" <xiaohaibiao331@outlook.com>
-> >>
-> >> Command 'lvm version' works incorrect.
-> >> It is expected to print:
-> >>
-> >>     # ./lvm version
-> >>     # kvm tool [KVMTOOLS_VERSION]
-> >>
-> >> but the KVMTOOLS_VERSION is missed:
-> >>
-> >>     # ./lvm version
-> >>     # kvm tool
-> >>
-> >> The KVMTOOLS_VERSION is defined in the KVMTOOLS-VERSION-FILE file which
-> >> is included at the end of Makefile. Since the CFLAGS is a 'Simply
-> >> expanded variables' which means CFLAGS is only scanned once. So the
-> >> definetion of KVMTOOLS_VERSION at the end of Makefile would not scanned
-> >> by CFLAGS. So the '-DKVMTOOLS_VERSION=' remains empty.
-> >>
-> >> I fixed the bug by moving the '-include $(OUTPUT)KVMTOOLS-VERSION-FILE'
-> >> before the CFLAGS.  
-> > 
-> > While this is indeed a bug that this patch fixes, I wonder if we should
-> > actually get rid of this whole versioning attempt altogether at this
-> > point. Originally this was following the containing kernel version, but
-> > it is stuck ever since at v3.18, without any change.
-> > 
-> > So either we introduce proper versioning (not sure it's worth it?), or we
-> > just remove all code that pretends to print a version number? Or just
-> > hardcode v3.18 into the printf, at least for now? At the very least I
-> > think we don't need a KVMTOOLS-VERSION-FILE anymore.
-> >   
-> 
-> Thanks for your reply. 
-> 
-> The reason I look at this project is tend to learn something about kvm. 
-> With the version number I can tell which kernel(kvm) is compatible.
-
-I am afraid this is not what the version number tells you. The Linux
-kernel provides a stable interface to userland, that includes KVM.
-So you should be able to run any kvmtool version on any host kernel
-(ignoring bugs). Granted, you will only get the features implemented in
-both parts, but this only applies to new features (like PMU
-virtualisation), not the main functionality.
-
-> Although it is stuck at v3.18, there still some commits in recent 
-> months, which means the kvmtool still changing according to the kvm 
-> features.
-
-Sure, we keep it alive, but adapting to new kernel features is only one
-part of that. Recently we mostly improved functionality (like
-adding firmware support, emulating later PCIe versions, ...) and were
-fixing bugs, independent of the kernel version.
-
-> So I think what's kvmtool need is a version control, but not 
-> remove/hardcode.
-
-So whether that's really worth it, is the question. If you need some number
-to compare, distributions tend to use the date of the last commit for that.
-
-Cheers,
-Andre
-
-
-> 
-> Thanks,
-> haibiao.xiao
-> > Cheers,
-> > Andre
-> >   
-> >>
-> >> Signed-off-by: haibiao.xiao <xiaohaibiao331@outlook.com>
-> >> ---
-> >>  Makefile | 4 ++--
-> >>  1 file changed, 2 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/Makefile b/Makefile
-> >> index bb7ad3e..9afb5e3 100644
-> >> --- a/Makefile
-> >> +++ b/Makefile
-> >> @@ -17,6 +17,7 @@ export E Q
-> >>  
-> >>  include config/utilities.mak
-> >>  include config/feature-tests.mak
-> >> +-include $(OUTPUT)KVMTOOLS-VERSION-FILE
-> >>  
-> >>  CC	:= $(CROSS_COMPILE)gcc
-> >>  CFLAGS	:=
-> >> @@ -559,5 +560,4 @@ ifneq ($(MAKECMDGOALS),clean)
-> >>  
-> >>  KVMTOOLS-VERSION-FILE:
-> >>  	@$(SHELL_PATH) util/KVMTOOLS-VERSION-GEN $(OUTPUT)
-> >> --include $(OUTPUT)KVMTOOLS-VERSION-FILE
-> >> -endif
-> >> +endif
-> >> \ No newline at end of file  
-
+Paolo
