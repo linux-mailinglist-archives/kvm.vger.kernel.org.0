@@ -2,135 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 14F87470E19
-	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 23:41:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9671E470E25
+	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 23:44:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243773AbhLJWpB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Dec 2021 17:45:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59832 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243624AbhLJWpA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Dec 2021 17:45:00 -0500
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 398CDC061746;
-        Fri, 10 Dec 2021 14:41:25 -0800 (PST)
-Received: by mail-ed1-x52f.google.com with SMTP id g14so33525342edb.8;
-        Fri, 10 Dec 2021 14:41:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=Iy4z+x4q0lS2+KD8bMNwWvDh4rqiXsqu5MkQhFPmH/k=;
-        b=D+Tn27EEZ5zGwVhnuvYSATR3GRvWVhP7BbYJkscXHgdLrbO9n+gmdpEp4UDN81XyFz
-         1/VfyjvCxBuC/0dlfduEPfDloIQkVERp3EKzR+LKFBPh+LPO11MajvyBB6FPXZz3u3lB
-         4N7MiPtzHrCgqdUyp38MZBu24HAsVLAiSxAC/OruOlV0u3s97BbbukG5b5LyYwvvxYCy
-         WYHCNCOSJFPVkkbJIgfaBpZkZielqWELbwcXZziMzNUf22Feg8KYQOFyCK5OqdDbFC27
-         fp8UrRGsCOZSiyi1biiQk7EwNWYQVypabvq/nKZQaYS81GFOHW88PJetO6cToOioCvQK
-         F6TA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=Iy4z+x4q0lS2+KD8bMNwWvDh4rqiXsqu5MkQhFPmH/k=;
-        b=gfwGU/0E5oOVi5IwuEeOCjYXkMXSkt93jY82qaevvkaHSj74ex1akN73Jo3M9r80U7
-         8NH252EG5PEHze1unLuHpv8Y7eAanhl73vZC3W1UcjN9jEbb0WY6cXGepesxdJ2ZFHWD
-         Kl/mtHqcYJZmm8SJeUV6VkbtrHrAHd7D+iI5OShuLL6H91ezJPy8fvFxk1Hiz2vtWnnk
-         gR6DoeEOlYqWWEaS4ekbRZvnG/UuROhd2acPcMbfJ2JRlpT05vmE9EOoC8ojOEIRyeEN
-         pELI1wgtEnXBuNhWYe6CESnfql15YI5unSLEhShfkD7rI7KOPQrAifGmx3R/I0vIHY6z
-         6Mng==
-X-Gm-Message-State: AOAM533N1k+Y0GfhVzmJAKmCkvkVmhTtz0FaXm1AIcFvpAXSAFBQkloV
-        IQq4o+NO5VQE3M6junDQMuw=
-X-Google-Smtp-Source: ABdhPJwr+Zb7BGljYVeH6SG133VT4K2TCRkFcdaEgwOfxJYMhT1eJs1KT/Cy3F6Y6TAA4gHNgRGmJA==
-X-Received: by 2002:a17:907:60d6:: with SMTP id hv22mr27868660ejc.503.1639176083813;
-        Fri, 10 Dec 2021 14:41:23 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id p19sm2007846ejn.97.2021.12.10.14.41.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Dec 2021 14:41:23 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <57313f38-5b2b-e352-7502-1a3a70fa4ef1@redhat.com>
-Date:   Fri, 10 Dec 2021 23:41:14 +0100
+        id S1344707AbhLJWsD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Dec 2021 17:48:03 -0500
+Received: from Galois.linutronix.de ([193.142.43.55]:51380 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239783AbhLJWsD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Dec 2021 17:48:03 -0500
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1639176266;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=sCD67XmQfgY8eyF5DZcnmqHIPLmPlcqEXhs2oDwpWCg=;
+        b=ctjp83lJ0t5QRjhSmgNytxwBVaFdLPzVATqaVRk0SmbeGdG+g+YMd9SNG5kaVgczOOhD1g
+        06GayrOEfvSpZUYsKM+OX/lJ1D4kGdVZmTa7Icco9W9edAL5yP1Xx4FvKVKkcI/YgsmaZB
+        l+Tjp49NY359JqJk/56lF1EWqPZyUAGXITBRyR+6m2ZroaNLAf3t4WPKl1mYWxvdeIZBRh
+        I/5a6rvarEayPX6R9OXP/KuEyEUGQPYc/RAb8a8l33Se43IDpyZdoAiq6rLWf20jS9U3Ns
+        yD+Z0OYEZu6OAyzW/e1LsL3LT1NMb2a6r5tF1fmMdm2h7tsygwCX+SH9TizSFQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1639176266;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=sCD67XmQfgY8eyF5DZcnmqHIPLmPlcqEXhs2oDwpWCg=;
+        b=OU3jl0IQfp2L2rQsO2mronFCWcYYmWoPyLDNmqYrH1+BkgR2SQR3Gi8gQ/kh7Qj+B3JXgN
+        y+3sxUVnVm7ARVBg==
+To:     Yang Zhong <yang.zhong@intel.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        pbonzini@redhat.com
+Cc:     seanjc@google.com, jun.nakajima@intel.com, kevin.tian@intel.com,
+        jing2.liu@linux.intel.com, jing2.liu@intel.com,
+        yang.zhong@intel.com
+Subject: Re: [PATCH 08/19] x86/fpu: Move xfd_update_state() to xstate.c and
+ export symbol
+In-Reply-To: <20211208000359.2853257-9-yang.zhong@intel.com>
+References: <20211208000359.2853257-1-yang.zhong@intel.com>
+ <20211208000359.2853257-9-yang.zhong@intel.com>
+Date:   Fri, 10 Dec 2021 23:44:25 +0100
+Message-ID: <874k7gxepi.ffs@tglx>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH] KVM: x86: Inject #UD on "unsupported" hypercall if
- patching fails
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Hou Wenlong <houwenlong93@linux.alibaba.com>
-References: <20211210222903.3417968-1-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211210222903.3417968-1-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/10/21 23:29, Sean Christopherson wrote:
-> Inject a #UD if patching in the correct hypercall fails, e.g. due to
-> emulator_write_emulated() failing because RIP is mapped not-writable by
-> the guest.  The guest is likely doomed in any case, but observing a #UD
-> in the guest is far friendlier to debug/triage than a !WRITABLE #PF with
-> CR2 pointing at the RIP of the faulting instruction.
-> 
-> Ideally, KVM wouldn't patch at all; it's the guest's responsibility to
-> identify and use the correct hypercall instruction (VMCALL vs. VMMCALL).
-> Sadly, older Linux kernels prior to commit c1118b3602c2 ("x86: kvm: use
-> alternatives for VMCALL vs. VMMCALL if kernel text is read-only") do the
-> wrong thing and blindly use VMCALL, i.e. removing the patching would
-> break running VMs with older kernels.
-> 
-> One could argue that KVM should be "fixed" to ignore guest paging
-> protections instead of injecting #UD, but patching in the first place was
-> a mistake as it was a hack-a-fix for a guest bug.
+On Tue, Dec 07 2021 at 19:03, Yang Zhong wrote:
+> From: Jing Liu <jing2.liu@intel.com>
+>
+> xfd_update_state() is the interface to update IA32_XFD and its per-cpu
+> cache. All callers of this interface are currently in fpu core. KVM only
+> indirectly triggers IA32_XFD update via a helper function
+> (fpu_swap_kvm_fpstate()) when switching between user fpu and guest fpu.
+>
+> Supporting AMX in guest now requires KVM to directly update IA32_XFD
+> with the guest value (when emulating WRMSR) so XSAVE/XRSTOR can manage
+> XSTATE components correctly inside guest.
+>
+> This patch moves xfd_update_state() from fpu/xstate.h to fpu/xstate.c
 
-Sort of.  I agree that patching is awful, but I'm not sure about 
-injecting #UD vs. just doing the hypercall; the original reason for the 
-patching was to allow Intel<->AMD cross-vendor migration to work somewhat.
+s/This patch moves/Move/
 
-That in turn promoted Linux's ill-conceived sloppiness of just using 
-vmcall, which lasted until commit c1118b3602c2.
+please. See Documentation/process/submitting-patches.rst and search for
+'This patch'
 
-> There are myriad fatal
-> issues with KVM's patching:
-> 
->    1. Patches using an emulated guest write, which will fail if RIP is not
->       mapped writable.  This is the issue being mitigated.
-> 
->    2. Doesn't ensure the write is "atomic", e.g. a hypercall that splits a
->       page boundary will be handled as two separate writes, which means
->       that a partial, corrupted instruction can be observed by a vCPU.
+> and export it for reference outside of fpu core.
+>
+> Signed-off-by: Jing Liu <jing2.liu@intel.com>
+> Signed-off-by: Yang Zhong <yang.zhong@intel.com>
+> ---
+>  arch/x86/include/asm/fpu/api.h |  2 ++
+>  arch/x86/kernel/fpu/xstate.c   | 12 ++++++++++++
+>  arch/x86/kernel/fpu/xstate.h   | 14 +-------------
+>  3 files changed, 15 insertions(+), 13 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/fpu/api.h b/arch/x86/include/asm/fpu/api.h
+> index 7532f73c82a6..999d89026be9 100644
+> --- a/arch/x86/include/asm/fpu/api.h
+> +++ b/arch/x86/include/asm/fpu/api.h
+> @@ -131,8 +131,10 @@ DECLARE_PER_CPU(struct fpu *, fpu_fpregs_owner_ctx);
+>  /* Process cleanup */
+>  #ifdef CONFIG_X86_64
+>  extern void fpstate_free(struct fpu *fpu);
+> +extern void xfd_update_state(struct fpstate *fpstate);
+>  #else
+>  static inline void fpstate_free(struct fpu *fpu) { }
+> +static void xfd_update_state(struct fpstate *fpstate) { }
 
-Only the third bytes differs between VMCALL and VMMCALL so that's not 
-really a problem.  (Apparently what happened is that Microsoft asked 
-Intel to use 0xc1 like AMD, and VMware asked AMD to use 0xd9 like Intel, 
-or something like that; and they ended up swapping opcodes.  But this 
-may be an urban legend, no matter how plausible).
+Try a 32bit build to see the warnings this causes. That wants to be
+'static inline void' obviously.
 
-The big ones are 1 and 4.
+>  #ifdef CONFIG_X86_64
+> -static inline void xfd_update_state(struct fpstate *fpstate)
+> -{
+> -	if (fpu_state_size_dynamic()) {
+> -		u64 xfd = fpstate->xfd;
+> -
+> -		if (__this_cpu_read(xfd_state) != xfd) {
+> -			wrmsrl(MSR_IA32_XFD, xfd);
+> -			__this_cpu_write(xfd_state, xfd);
+> -		}
+> -	}
+> -}
+> -#else
+> -static inline void xfd_update_state(struct fpstate *fpstate) { }
+> +extern void xfd_update_state(struct fpstate *fpstate);
+
+Why? It's already declared in the global header. So all of this has to
+be simply removed, no?
 
 Thanks,
 
-Paolo
+        tglx
 
->    3. Doesn't serialize other CPU cores after updating the code stream.
-> 
->    4. Completely fails to account for the case where KVM is emulating due
->       to invalid guest state with unrestricted_guest=0.  Patching and
->       retrying the instruction will result in vCPU getting stuck in an
->       infinite loop.
-> 
-> But, the "support" _so_ awful, especially #1, that there's practically
-> zero chance that a modern guest kernel can rely on KVM to patch the guest.
-> So, rather than proliferate KVM's bad behavior any further than the
-> absolute minimum needed for backwards compatibility, just try to make it
-> suck a little less.
 
