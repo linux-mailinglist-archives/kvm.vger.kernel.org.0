@@ -2,217 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 302304700A2
-	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 13:25:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 441B04700DC
+	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 13:42:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237828AbhLJM26 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Dec 2021 07:28:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55356 "EHLO
+        id S241161AbhLJMpf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Dec 2021 07:45:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59218 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240974AbhLJM25 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Dec 2021 07:28:57 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6446C061746;
-        Fri, 10 Dec 2021 04:25:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=/xS+egC0DslbdYLNDrFkbLhwEWeOB8Z7CBQVM0MYPdg=; b=lO+bpr8i8xSHXv2plQRwfU/RKN
-        mLZ1eQcnJJY2ogCcTq4BLlDYpdsHXE1p/fNhRCEOdSvvs+j5lenrC5FNezkekwzTt4CUHuDPusNK3
-        aS76B16E2rZaemORGESULE2L4AZEedwXtRgN8GfplMIc3FPd4wo1MN3fUWlBfrgvmKLgLYcvP3xip
-        tHtvW8+CXy4Zas6I/P3mnb9pb62CdULZZqF2nQPu/wYlvvAo47qJVsDDnpZOoG1HpcHAgRQBhPRni
-        N370iqu8fMP9TzT1lU7rNCt91U0o7hE+yBpsJHlOpacCjO33AIVd/pbKZIeJG5a3prx8UwtGYsnK8
-        nneNXWEA==;
-Received: from [2001:8b0:10b:1:4a2a:e3ff:fe14:8625] (helo=u3832b3a9db3152.ant.amazon.com)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mvexY-001op2-TS; Fri, 10 Dec 2021 12:25:09 +0000
-Message-ID: <5d0a68cd0d06884a2a58338aace811144990f8f5.camel@infradead.org>
-Subject: Re: [PATCH v5 08/12] KVM: Reinstate gfn_to_pfn_cache with
- invalidation support
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>
-Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        "jmattson @ google . com" <jmattson@google.com>,
-        "wanpengli @ tencent . com" <wanpengli@tencent.com>,
-        "seanjc @ google . com" <seanjc@google.com>,
-        "vkuznets @ redhat . com" <vkuznets@redhat.com>,
-        "mtosatti @ redhat . com" <mtosatti@redhat.com>,
-        "joro @ 8bytes . org" <joro@8bytes.org>, karahmed@amazon.com,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Anup Patel <anup.patel@wdc.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        kvmarm@lists.cs.columbia.edu,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        kvm-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-        butt3rflyh4ck <butterflyhuangxx@gmail.com>
-Date:   Fri, 10 Dec 2021 12:25:03 +0000
-In-Reply-To: <6cb2cd57-16f3-d0ec-adf6-cb8fdcbae035@redhat.com>
-References: <20211121125451.9489-1-dwmw2@infradead.org>
-         <20211121125451.9489-9-dwmw2@infradead.org>
-         <b1bacc6f-be56-4108-6e52-4315a021184b@redhat.com>
-         <b614d9ae0fe7910cfa72eee0b4077776f8012e5f.camel@infradead.org>
-         <6cb2cd57-16f3-d0ec-adf6-cb8fdcbae035@redhat.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-IkgJij8Dvj8ErQVy8kci"
-User-Agent: Evolution 3.36.5-0ubuntu1 
+        with ESMTP id S235838AbhLJMpf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Dec 2021 07:45:35 -0500
+Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66C5DC061746;
+        Fri, 10 Dec 2021 04:42:00 -0800 (PST)
+Received: by mail-ed1-x52e.google.com with SMTP id w1so29385322edc.6;
+        Fri, 10 Dec 2021 04:42:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=e+3kBKYd0gs8YdT/Y0LV1C8OqhIxbxJP+Wplk4g6xBE=;
+        b=cO6r/sVyNXoUzeji7uong2FcLYTZxKa5aNR6uGV6MjIc0UprO3UlEijIrStbVSR0tj
+         u1eY9j6/B/+8DWng0IzeutmNQIULYQqWh5296yK6iANqRhFkgaVpb7lfp2iof5gIpYBD
+         ptX9BEwcB9C44B5cEEwwsNXwyN0HKGmdU2YV9d6iATkG6xZ5FJKb/zECZVo553UETtgN
+         mbz9HIb67AFkS2a+8wp1t+SXhUY8BaMH8yPnm0DebD8zLb/QXJS7kxvz/9JPuTACTgUt
+         5FrxJ8/dHCwI+YSRDr0Jp3Q8LnW7s9FP9FCA/nUYFBqY2PVy6jFcEbtLzhCllt6LFo9A
+         2U1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=e+3kBKYd0gs8YdT/Y0LV1C8OqhIxbxJP+Wplk4g6xBE=;
+        b=aJpTYQGaNyebrI4nqnjHTOrntdyASkSCw6gkjUWHEEN7HUqE2T86w8QS5sm13qFBCm
+         +qdZu7NMgsiazKpsdtlJfzIhWpED2xzmhU7b7gUUqQ04H6Hkd8u2TM/0k3Nzk+I4a6XT
+         PQ0XE4RUtOcS1tPuyg1fK9qBzcMCjQLs8vAW7/l/rGaVCHm2taZ/v1kqqcWEJMLJ3JG8
+         7ECekHNt53/MxTujApgSyqOc7/7X+o+IQhD+dIo+4QWZP2moOS2ORkx3LwOk6jdFlB4O
+         hFzUyYb2VhmsfYYwQVYMKzBSqEc5FJni/BMGF8t+9PGJF3oHAPLEuMXjNBO1d+16+mud
+         o8+g==
+X-Gm-Message-State: AOAM532qcO5iEVqifxAGorxDm36B6Lv1PQNkdeDh0NyfgyUziw7Ma5OD
+        WMIQWo9sDx6yfbcRbvM2Me2XLeN9UV8=
+X-Google-Smtp-Source: ABdhPJxFH9UXDm/WjBpC0VjnpTeUtlGTtiT3mJa7S2K8w5HUCflcNaSGfIfUOMtaGnrY+zVJuWQuJQ==
+X-Received: by 2002:a05:6402:254f:: with SMTP id l15mr36668875edb.12.1639140118979;
+        Fri, 10 Dec 2021 04:41:58 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.googlemail.com with ESMTPSA id g15sm1440029ejt.10.2021.12.10.04.41.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 10 Dec 2021 04:41:58 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <c94b3aec-981e-8557-ba29-0094b075b8e4@redhat.com>
+Date:   Fri, 10 Dec 2021 13:41:56 +0100
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH 1/7] KVM: x86: Retry page fault if MMU reload is pending
+ and root has no sp
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>,
+        Ben Gardon <bgardon@google.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>
+References: <20211209060552.2956723-1-seanjc@google.com>
+ <20211209060552.2956723-2-seanjc@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20211209060552.2956723-2-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 12/9/21 07:05, Sean Christopherson wrote:
+> +	/* Special roots, e.g. pae_root, are not backed by shadow pages. */
+> +	if (sp && is_obsolete_sp(vcpu->kvm, sp))
+> +		return true;
+> +
+> +	/*
+> +	 * Roots without an associated shadow page are considered invalid if
+> +	 * there is a pending request to free obsolete roots.  The request is
+> +	 * only a hint that the current root_may_  be obsolete and needs to be
+> +	 * reloaded, e.g. if the guest frees a PGD that KVM is tracking as a
+> +	 * previous root, then __kvm_mmu_prepare_zap_page() signals all vCPUs
+> +	 * to reload even if no vCPU is actively using the root.
+> +	 */
+> +	if (!sp && kvm_test_request(KVM_REQ_MMU_RELOAD, vcpu))
+>   		return true;
 
---=-IkgJij8Dvj8ErQVy8kci
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Hmm I don't understand this (or maybe I do and I just don't like what I
+understand).
 
-On Thu, 2021-12-09 at 23:34 +0100, Paolo Bonzini wrote:
->=20
-> Compared to the review it's missing this hunk:
->=20
-> @@ -265,7 +265,7 @@ void kvm_gfn_to_pfn_cache_unmap(struct kvm *kvm, stru=
-ct gfn_to_pfn_cache *gpc)  =20
->=20
->         gpc->valid =3D false;
->=20
-> -       old_khva =3D gpc->khva;
-> +       old_khva =3D (void *)((unsigned long)gpc->khva & ~PAGE_MASK);
->         old_dirty =3D gpc->dirty;
+KVM_REQ_MMU_RELOAD is raised after kvm->arch.mmu_valid_gen is fixed (of
+course, otherwise the other CPU might just not see any obsoleted page
+from the legacy MMU), therefore any check on KVM_REQ_MMU_RELOAD is just
+advisory.
 
-Do you know what? I couldn't bring myself to add that a second time. I
-managed it once, but it made me sad.
+This is not a problem per se; in the other commit message you said,
 
-Did it like this instead:
+     For other MMUs, the resulting behavior is far more convoluted,
+     though unlikely to be truly problematic.
 
--       old_khva =3D gpc->khva;
-+       old_khva =3D gpc->khva - offset_in_page(gpc->khva);
+but it's unnecessarily complicating the logic.  I'm more inclined to
+just play it simple and make the special roots process the page fault;
+Jiangshan's work should clean things up a bit:
 
-I checked that for me at least, GCC is clever enough to just do the
-mask.
+--------- 8< -------------
+ From 0c1e30d4e7e17692668d960452107f983dd2c9a9 Mon Sep 17 00:00:00 2001
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 10 Dec 2021 07:41:02 -0500
+Subject: [PATCH] KVM: x86: Do not check obsoleteness of roots that have no sp
+  attached
 
-        old_khva =3D gpc->khva - offset_in_page(gpc->khva);
- 131:   48 8b 43 78             mov    0x78(%rbx),%rax
- 135:   48 25 00 f0 ff ff       and    $0xfffffffffffff000,%rax
+The "special" roots, e.g. pae_root when KVM uses PAE paging, are not
+backed by a shadow page.  Running with TDP disabled or with nested NPT
+explodes spectaculary due to dereferencing a NULL shadow page pointer.
+Play nice with a NULL shadow page when checking for an obsolete root in
+is_page_fault_stale().
 
+Fixes: a955cad84cda ("KVM: x86/mmu: Retry page fault if root is invalidated by memslot update")
+Cc: stable@vger.kernel.org
+Cc: Maxim Levitsky <mlevitsk@redhat.com>
+Analyzed-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-I still don't see the previous patches in kvm/next =E2=80=94 is that an
-automatic push after testing has passed, or is the kernel.org
-infrastructure just *really* slow?
-
-I've pushed based on the currently-visible kvm/next to
-https://git.infradead.org/users/dwmw2/linux.git/shortlog/refs/heads/xen-evt=
-chn
-and can resend when the tree finally surfaces.
-
---=-IkgJij8Dvj8ErQVy8kci
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCECow
-ggUcMIIEBKADAgECAhEA4rtJSHkq7AnpxKUY8ZlYZjANBgkqhkiG9w0BAQsFADCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTkwMTAyMDAwMDAwWhcNMjIwMTAxMjM1
-OTU5WjAkMSIwIAYJKoZIhvcNAQkBFhNkd213MkBpbmZyYWRlYWQub3JnMIIBIjANBgkqhkiG9w0B
-AQEFAAOCAQ8AMIIBCgKCAQEAsv3wObLTCbUA7GJqKj9vHGf+Fa+tpkO+ZRVve9EpNsMsfXhvFpb8
-RgL8vD+L133wK6csYoDU7zKiAo92FMUWaY1Hy6HqvVr9oevfTV3xhB5rQO1RHJoAfkvhy+wpjo7Q
-cXuzkOpibq2YurVStHAiGqAOMGMXhcVGqPuGhcVcVzVUjsvEzAV9Po9K2rpZ52FE4rDkpDK1pBK+
-uOAyOkgIg/cD8Kugav5tyapydeWMZRJQH1vMQ6OVT24CyAn2yXm2NgTQMS1mpzStP2ioPtTnszIQ
-Ih7ASVzhV6csHb8Yrkx8mgllOyrt9Y2kWRRJFm/FPRNEurOeNV6lnYAXOymVJwIDAQABo4IB0zCC
-Ac8wHwYDVR0jBBgwFoAUgq9sjPjF/pZhfOgfPStxSF7Ei8AwHQYDVR0OBBYEFLfuNf820LvaT4AK
-xrGK3EKx1DE7MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUF
-BwMEBggrBgEFBQcDAjBGBgNVHSAEPzA9MDsGDCsGAQQBsjEBAgEDBTArMCkGCCsGAQUFBwIBFh1o
-dHRwczovL3NlY3VyZS5jb21vZG8ubmV0L0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3Js
-LmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWls
-Q0EuY3JsMIGLBggrBgEFBQcBAQR/MH0wVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuY29tb2RvY2Eu
-Y29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYI
-KwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmNvbW9kb2NhLmNvbTAeBgNVHREEFzAVgRNkd213MkBpbmZy
-YWRlYWQub3JnMA0GCSqGSIb3DQEBCwUAA4IBAQALbSykFusvvVkSIWttcEeifOGGKs7Wx2f5f45b
-nv2ghcxK5URjUvCnJhg+soxOMoQLG6+nbhzzb2rLTdRVGbvjZH0fOOzq0LShq0EXsqnJbbuwJhK+
-PnBtqX5O23PMHutP1l88AtVN+Rb72oSvnD+dK6708JqqUx2MAFLMevrhJRXLjKb2Mm+/8XBpEw+B
-7DisN4TMlLB/d55WnT9UPNHmQ+3KFL7QrTO8hYExkU849g58Dn3Nw3oCbMUgny81ocrLlB2Z5fFG
-Qu1AdNiBA+kg/UxzyJZpFbKfCITd5yX49bOriL692aMVDyqUvh8fP+T99PqorH4cIJP6OxSTdxKM
-MIIFHDCCBASgAwIBAgIRAOK7SUh5KuwJ6cSlGPGZWGYwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTE5MDEwMjAwMDAwMFoXDTIyMDEwMTIz
-NTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCASIwDQYJKoZIhvcN
-AQEBBQADggEPADCCAQoCggEBALL98Dmy0wm1AOxiaio/bxxn/hWvraZDvmUVb3vRKTbDLH14bxaW
-/EYC/Lw/i9d98CunLGKA1O8yogKPdhTFFmmNR8uh6r1a/aHr301d8YQea0DtURyaAH5L4cvsKY6O
-0HF7s5DqYm6tmLq1UrRwIhqgDjBjF4XFRqj7hoXFXFc1VI7LxMwFfT6PStq6WedhROKw5KQytaQS
-vrjgMjpICIP3A/CroGr+bcmqcnXljGUSUB9bzEOjlU9uAsgJ9sl5tjYE0DEtZqc0rT9oqD7U57My
-ECIewElc4VenLB2/GK5MfJoJZTsq7fWNpFkUSRZvxT0TRLqznjVepZ2AFzsplScCAwEAAaOCAdMw
-ggHPMB8GA1UdIwQYMBaAFIKvbIz4xf6WYXzoHz0rcUhexIvAMB0GA1UdDgQWBBS37jX/NtC72k+A
-CsaxitxCsdQxOzAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEF
-BQcDBAYIKwYBBQUHAwIwRgYDVR0gBD8wPTA7BgwrBgEEAbIxAQIBAwUwKzApBggrBgEFBQcCARYd
-aHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9DUFMwWgYDVR0fBFMwUTBPoE2gS4ZJaHR0cDovL2Ny
-bC5jb21vZG9jYS5jb20vQ09NT0RPUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFp
-bENBLmNybDCBiwYIKwYBBQUHAQEEfzB9MFUGCCsGAQUFBzAChklodHRwOi8vY3J0LmNvbW9kb2Nh
-LmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3J0MCQG
-CCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAC20spBbrL71ZEiFrbXBHonzhhirO1sdn+X+O
-W579oIXMSuVEY1LwpyYYPrKMTjKECxuvp24c829qy03UVRm742R9Hzjs6tC0oatBF7KpyW27sCYS
-vj5wbal+TttzzB7rT9ZfPALVTfkW+9qEr5w/nSuu9PCaqlMdjABSzHr64SUVy4ym9jJvv/FwaRMP
-gew4rDeEzJSwf3eeVp0/VDzR5kPtyhS+0K0zvIWBMZFPOPYOfA59zcN6AmzFIJ8vNaHKy5QdmeXx
-RkLtQHTYgQPpIP1Mc8iWaRWynwiE3ecl+PWzq4i+vdmjFQ8qlL4fHz/k/fT6qKx+HCCT+jsUk3cS
-jDCCBeYwggPOoAMCAQICEGqb4Tg7/ytrnwHV2binUlYwDQYJKoZIhvcNAQEMBQAwgYUxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMSswKQYDVQQDEyJDT01PRE8gUlNBIENlcnRpZmljYXRp
-b24gQXV0aG9yaXR5MB4XDTEzMDExMDAwMDAwMFoXDTI4MDEwOTIzNTk1OVowgZcxCzAJBgNVBAYT
-AkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNV
-BAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAvrOeV6wodnVAFsc4A5jTxhh2IVDzJXkLTLWg0X06WD6cpzEup/Y0dtmEatrQPTRI5Or1u6zf
-+bGBSyD9aH95dDSmeny1nxdlYCeXIoymMv6pQHJGNcIDpFDIMypVpVSRsivlJTRENf+RKwrB6vcf
-WlP8dSsE3Rfywq09N0ZfxcBa39V0wsGtkGWC+eQKiz4pBZYKjrc5NOpG9qrxpZxyb4o4yNNwTqza
-aPpGRqXB7IMjtf7tTmU2jqPMLxFNe1VXj9XB1rHvbRikw8lBoNoSWY66nJN/VCJv5ym6Q0mdCbDK
-CMPybTjoNCQuelc0IAaO4nLUXk0BOSxSxt8kCvsUtQIDAQABo4IBPDCCATgwHwYDVR0jBBgwFoAU
-u69+Aj36pvE8hI6t7jiY7NkyMtQwHQYDVR0OBBYEFIKvbIz4xf6WYXzoHz0rcUhexIvAMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMBEGA1UdIAQKMAgwBgYEVR0gADBMBgNVHR8E
-RTBDMEGgP6A9hjtodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDZXJ0aWZpY2F0aW9u
-QXV0aG9yaXR5LmNybDBxBggrBgEFBQcBAQRlMGMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9jcnQuY29t
-b2RvY2EuY29tL0NPTU9ET1JTQUFkZFRydXN0Q0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2Nz
-cC5jb21vZG9jYS5jb20wDQYJKoZIhvcNAQEMBQADggIBAHhcsoEoNE887l9Wzp+XVuyPomsX9vP2
-SQgG1NgvNc3fQP7TcePo7EIMERoh42awGGsma65u/ITse2hKZHzT0CBxhuhb6txM1n/y78e/4ZOs
-0j8CGpfb+SJA3GaBQ+394k+z3ZByWPQedXLL1OdK8aRINTsjk/H5Ns77zwbjOKkDamxlpZ4TKSDM
-KVmU/PUWNMKSTvtlenlxBhh7ETrN543j/Q6qqgCWgWuMAXijnRglp9fyadqGOncjZjaaSOGTTFB+
-E2pvOUtY+hPebuPtTbq7vODqzCM6ryEhNhzf+enm0zlpXK7q332nXttNtjv7VFNYG+I31gnMrwfH
-M5tdhYF/8v5UY5g2xANPECTQdu9vWPoqNSGDt87b3gXb1AiGGaI06vzgkejL580ul+9hz9D0S0U4
-jkhJiA7EuTecP/CFtR72uYRBcunwwH3fciPjviDDAI9SnC/2aPY8ydehzuZutLbZdRJ5PDEJM/1t
-yZR2niOYihZ+FCbtf3D9mB12D4ln9icgc7CwaxpNSCPt8i/GqK2HsOgkL3VYnwtx7cJUmpvVdZ4o
-gnzgXtgtdk3ShrtOS1iAN2ZBXFiRmjVzmehoMof06r1xub+85hFQzVxZx5/bRaTKTlL8YXLI8nAb
-R9HWdFqzcOoB/hxfEyIQpx9/s81rgzdEZOofSlZHynoSMYIDyjCCA8YCAQEwga0wgZcxCzAJBgNV
-BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
-BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
-ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
-ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjEx
-MjEwMTIyNTAzWjAvBgkqhkiG9w0BCQQxIgQgeNVeEpbcPyTeI9Qg3p2pcvtWL/qgWJnk60gDnmsd
-pv0wgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
-TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
-PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
-aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
-A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
-bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBAB2cJG6sHuoOVbcNsN0X5gJwD3TdFgEpt11jYqzMApCFTjLM9gBWEgd1jioL69CG
-VcQqrSe3zLh8eFAoDc3ziJP51GMTQJJNf8TQTl1aIurUcQV1AV4y9BMHcAwoY8mLtCa7vrTjnMO0
-jTDmM5gonh13bmfukIVx3HdvFNjVJm8fpRt6oAllIWeYeb5fDAoV2hoptB/Cfn1C53yXqFSL/XhJ
-LftiwVR3CtrHc61RKYX+RdD2ss+RUTcO0QbXxZopg7FYrJhZz4bEWiX9TlHAawCJlSyHbuQyPDhZ
-Vijhp0/snSVlzzUgP0kBm9QG1kfaYm7sE9/xEZwmPp2uHYvnYwEAAAAAAAA=
-
-
---=-IkgJij8Dvj8ErQVy8kci--
-
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index e2e1d012df22..4a3bcdd3cfe7 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3987,7 +3987,17 @@ static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+  static bool is_page_fault_stale(struct kvm_vcpu *vcpu,
+  				struct kvm_page_fault *fault, int mmu_seq)
+  {
+-	if (is_obsolete_sp(vcpu->kvm, to_shadow_page(vcpu->arch.mmu->root_hpa)))
++	struct kvm_mmu_page *sp = to_shadow_page(vcpu->arch.mmu->root_hpa);
++
++	/*
++	 * Special roots, e.g. pae_root, are not backed by shadow pages
++	 * so there isn't an easy way to detect if they're obsolete.
++	 * If they are, any child SPTE created by the fault will be useless
++	 * (they will instantly be treated as obsolete because they don't
++	 * match the mmu_valid_gen); but they will not leak, so just play
++	 * it simple.
++	 */
++	if (sp && is_obsolete_sp(vcpu->kvm, sp))
+  		return true;
+  
+  	return fault->slot &&
