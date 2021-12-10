@@ -2,288 +2,250 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7AD1A4705D4
-	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 17:36:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CACDE47062B
+	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 17:47:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243674AbhLJQkT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Dec 2021 11:40:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58286 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243659AbhLJQkS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Dec 2021 11:40:18 -0500
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEEC2C0617A2
-        for <kvm@vger.kernel.org>; Fri, 10 Dec 2021 08:36:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
-        Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=Dy+EnFe1FApmZyKcptLtP5bmR0mNvgSWFdTb0xnTfpg=; b=jU22HAqWuJEvTxk9WlpqJzPSqC
-        KeVfh4M0s59lHVYE5uYOy1DezU9tTK6rq56AKp404/2mdOH8czNrUbTJOoF187WPS0vODyGDhLYF7
-        lc2CLNn2Q/FVlhvunetCdqjYye0vJEyJ7QBdSrSt/D7zDRTix1XgJzmlN4uhz4tuzmFSMj+R2zkKj
-        M1gNm8aC8O3DGPv9ri7ALDw/5JwnPz46MK4CPoan3FLjXUytQvzrColxBwnmJqvkMx3YmIsgA6ozh
-        hEiATMIPa92gifFTN1WuLWskqdUbzmMr6shUB5m8k44X+SBVBkLf5G3SR1ESsCOnh3sH34X7d1efS
-        QHU8jp/A==;
-Received: from i7.infradead.org ([2001:8b0:10b:1:21e:67ff:fecb:7a92])
-        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mvisl-000abx-LD; Fri, 10 Dec 2021 16:36:27 +0000
-Received: from dwoodhou by i7.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mvisl-0000lr-AN; Fri, 10 Dec 2021 16:36:27 +0000
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm <kvm@vger.kernel.org>
-Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        "jmattson @ google . com" <jmattson@google.com>,
-        "wanpengli @ tencent . com" <wanpengli@tencent.com>,
-        "seanjc @ google . com" <seanjc@google.com>,
-        "vkuznets @ redhat . com" <vkuznets@redhat.com>,
-        "mtosatti @ redhat . com" <mtosatti@redhat.com>,
-        "joro @ 8bytes . org" <joro@8bytes.org>, karahmed@amazon.com,
-        butt3rflyh4ck <butterflyhuangxx@gmail.com>
-Subject: [PATCH v6 6/6] KVM: x86: First attempt at converting nested virtual APIC page to gpc
-Date:   Fri, 10 Dec 2021 16:36:25 +0000
-Message-Id: <20211210163625.2886-7-dwmw2@infradead.org>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20211210163625.2886-1-dwmw2@infradead.org>
-References: <20211210163625.2886-1-dwmw2@infradead.org>
+        id S244018AbhLJQvb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Dec 2021 11:51:31 -0500
+Received: from mail-mw2nam10on2089.outbound.protection.outlook.com ([40.107.94.89]:63201
+        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S244008AbhLJQv2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Dec 2021 11:51:28 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=V0acFJUId6weqZvWPAUm0du5kE9A2nDwulhL04xPb7JQyPqa4sCwJTEH8PgX9AEs7tKDM/Evcnml1+v1pKjhBWzd1l+nTf30lpl5a7e+5g8ESoi5htuFP/MhmvA+KNvur2MNRPq0QZnHbk9cDva02mhP2z1sWQB4IjuigqxMQhOFSZGwwUtZRg7yKTJH5cqnDKpiJn+kILkAUqX8tzSui3gcekSY/63jCxOS0MIXIcPLCiRkGFLkO9j7YG0gPjsWeKrp0csA+RVb7smtobE9u2aY+xJ/lEwQANXAaKOWP1mfYM0STrIXPIcVzI3W1LjGjhu/sCcPDqowwi+Zetf18A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QuQaYKCvPOEErmoktodgSJ1pfqms9WhM5PkpkYAk2AM=;
+ b=QipYgUu/FooS1U9U9jasjNY6A2JYPf574SCMU/Ep4IBSdaXvBH8GZWBY4I03F+bI9vQxtcC1Gesax6iT4TFmbpCWvW0+Qp6hYLmT8Hu2mBMBIb9pO0KcGFIjOLAfDMO466O/iJ90OOALej7xuz8vTae3XbKQGPa1rnWKi+GlOpTCUaA5l70YpKpfLb8EmmhLL7Tiu6S/2A7M/Ioj7hKmhWDZkub7cYNFyXq19KWdmBCcpP1fJ/lPQmJzC0jfpH+1VNIIJcJnQsHDB6ejLS9WJfP5lJrDSXfQXnTsT3QsLXbbV+Gw8xArghw/mmC3UMBjA26ndjbqWLqvTLzy71iESA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QuQaYKCvPOEErmoktodgSJ1pfqms9WhM5PkpkYAk2AM=;
+ b=2xXVFzKIT1Wbg2UdBHOZDOha2X2udzsQBlPUdi0AZl/5AYZ66l4tsyvgA/Erweq6+vmpC0pM1keo4b2yvAWUu9XJbiIGmmzY8QWjXdXCTNlE5NOoAAfoA+x2sjya7YwlL6ZfAXP9xjQdxgFm5I9AyUDVz6ZjHeEc0kFqYqav57g=
+Received: from DM5PR18CA0081.namprd18.prod.outlook.com (2603:10b6:3:3::19) by
+ DM6PR12MB3418.namprd12.prod.outlook.com (2603:10b6:5:116::31) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4755.25; Fri, 10 Dec 2021 16:47:50 +0000
+Received: from DM6NAM11FT066.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:3:3:cafe::f2) by DM5PR18CA0081.outlook.office365.com
+ (2603:10b6:3:3::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4778.12 via Frontend
+ Transport; Fri, 10 Dec 2021 16:47:50 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB03.amd.com;
+Received: from SATLEXMB03.amd.com (165.204.84.17) by
+ DM6NAM11FT066.mail.protection.outlook.com (10.13.173.179) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.4778.13 via Frontend Transport; Fri, 10 Dec 2021 16:47:50 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.17; Fri, 10 Dec
+ 2021 10:47:49 -0600
+From:   Michael Roth <michael.roth@amd.com>
+To:     <linux-kselftest@vger.kernel.org>
+CC:     <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <x86@kernel.org>, Nathan Tempelman <natet@google.com>,
+        Marc Orr <marcorr@google.com>,
+        "Steve Rutherford" <srutherford@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Varad Gautam <varad.gautam@suse.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "David Woodhouse" <dwmw@amazon.co.uk>,
+        Ricardo Koller <ricarkol@google.com>,
+        "Jim Mattson" <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        "Thomas Gleixner" <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "Borislav Petkov" <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        "Christian Borntraeger" <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        "Claudio Imbrenda" <imbrenda@linux.ibm.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        "Suzuki K Poulose" <suzuki.poulose@arm.com>,
+        <kvmarm@lists.cs.columbia.edu>
+Subject: [RFC PATCH 00/10] KVM: selftests: Add support for test-selectable ucall implementations
+Date:   Fri, 10 Dec 2021 10:46:10 -0600
+Message-ID: <20211210164620.11636-1-michael.roth@amd.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Sender: David Woodhouse <dwmw2@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB03.amd.com
+ (10.181.40.144)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: d41b73b3-d8c8-4a13-b21d-08d9bbfccd7e
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3418:EE_
+X-Microsoft-Antispam-PRVS: <DM6PR12MB3418E90A938A66D088AB9F0295719@DM6PR12MB3418.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: YY05IGuiEYSEsMjqXtFcHmDTmaw1Id0kqHQAX3OjtXvWREvxOExrrjvnJD4tKQstYNl3OVjm9CbfBU2dxsc5WHW4PLYC5Qt8kN5ac5gW4vfQblU7oZah2jZbWL/d8vkt+U2JvyJ337SrkBfuZCosVq5uUoayYjAdmTMLvGnMNNWT6udPaRuHjL8vTv4VnHiGt8Vrq5L2Gc/pF2MSLg4Se/oHJlJS6L7Q6MRDAwtTCLtv0qcMAaOF9mz5g6Y9OSUOSjZpRbghO3jIhFmqVXv/T9aYOcyzpoSYPa24ACYd+FpoAaTvUKVIrp296qMwBrJwmUPgLqgkXrcJFPEaqy79tNfCYwhFDeQMAo08lid28766WmWij4MTu/lTlSa6Q64+/gYsIpMrdmf+733r22QutTMF+v52RQXnqxCYRtUmIPebmHOwQBsiDFPkK2rLvbUR27xI5jtuGffss521wc/xf0URuX41szWGcgxgEKsGkGIdZJl3M0Xr+SmQg0QTTU7yVf/sdosheoB8iT50Fu+j9NIEZAOQw4Nnwh/22AbGpfK7C1EDzp60gBc7w+1PaATtMSOU+Wfa2ceIadD3OrzLeIGVUZoDKx6bbvAwcXMYDfoZlp1/KMZRluvi045f21tgfxMabc2sSMHBsZb+Z2K6v+ldHNhEHFGS7o9CQecu0RMuJVdhy7Uz+Q4qFxmFFlu0NCn5W7WQg0Rzh9FqDybMjSW3kSgFZOyweSzSRwEo3wBOt2uKSaaTKQTeiYEgqb+2sYliHHvGQuSGhn4vWzI4JAlpL0LqpZHKENCVKwEADPgJ5bJgHtjoL9qRy2XL9ClDox7x5te9btgCVAHMyWRUmVO8DRquO1hS7Qq1SnAjuFvo7RYDuq4TD9gOFrcvK9F+V+NlZJ/fU0j3MgQApFgf4jFFZnKMRtcB2oC+kAqo+mY=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(4636009)(46966006)(36840700001)(40470700001)(2906002)(6666004)(81166007)(356005)(47076005)(26005)(36756003)(186003)(2616005)(4326008)(336012)(16526019)(508600001)(426003)(44832011)(1076003)(316002)(8936002)(8676002)(54906003)(5660300002)(70206006)(86362001)(6916009)(70586007)(966005)(7416002)(40460700001)(82310400004)(83380400001)(36860700001)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Dec 2021 16:47:50.2327
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: d41b73b3-d8c8-4a13-b21d-08d9bbfccd7e
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT066.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3418
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: David Woodhouse <dwmw@amazon.co.uk>
+These patches are based on kvm/next, and are also available at:
 
-This is what evolved during the discussion at
-https://lore.kernel.org/kvm/960E233F-EC0B-4FB5-BA2E-C8D2CCB38B12@infradead.org/T/#m11d75fcfe2da357ec1dabba0d0e3abb91fd13665
+  https://github.com/mdroth/linux/commits/sev-selftests-ucall-rfc1
 
-As discussed, an alternative approach might be to augment
-kvm_arch_memslots_updated() to raise KVM_REQ_GET_NESTED_STATE_PAGES to
-each vCPU (and make that req only do anything on a given vCPU if that
-vCPU is actually in L2 guest mode).
+== BACKGROUND ==
 
-That would mean the reload gets actively triggered even on memslot
-changes rather than only on MMU notifiers as is the case now. It could
-*potentially* mean we can drop the new 'check_guest_maps' function.
+These patches are a prerequisite for adding selftest support for SEV guests
+and possibly other confidential computing implementations in the future.
+They were motivated by a suggestion Paolo made in response to the initial
+SEV selftest RFC:
 
-The 'check_guest_maps' function could be a lot simpler than it is,
-though. It only really needs to get kvm->memslots->generation, then
-check each gpc->generation against that, and each gpc->valid.
+  https://lore.kernel.org/lkml/20211025035833.yqphcnf5u3lk4zgg@amd.com/T/#m959b56f9fb4ae6ab973f6ab50fe3ddfacd7c5617
 
-Also I suspect we *shouldn't* destroy the virtual_apic_cache in
-nested_vmx_vmexit(). We can just leave it there for next time the
-vCPU enters guest mode. If it happens to get invalidated in the
-meantime, that's fine and we'll refresh it on the way back in.
-We probably *would* want to actively do something on memslot changes
-in that case though, to ensure that even if the vCPU isn't in guest
-mode any more, we *release* the cached page.
+Since the changes touch multiple archs and ended up creating a bit more churn
+than expected, I thought it would be a good idea to carve this out into a
+separate standalone series for reviewers who may be more interested in the
+ucall changes than anything SEV-related.
 
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
----
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/vmx/nested.c       | 50 ++++++++++++++++++++++++++++-----
- arch/x86/kvm/vmx/vmx.c          | 12 +++++---
- arch/x86/kvm/vmx/vmx.h          |  2 +-
- arch/x86/kvm/x86.c              | 10 +++++++
- 5 files changed, 63 insertions(+), 12 deletions(-)
+To summarize, x86 relies on a ucall based on using PIO intructions to generate
+an exit to userspace and provide the GVA of a dynamically-allocated ucall
+struct that resides in guest memory and contains information about how to
+handle/interpret the exit. This doesn't work for SEV guests for 3 main reasons:
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 392d13c36083..8216ae8d1b38 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1517,6 +1517,7 @@ struct kvm_x86_nested_ops {
- 	int (*enable_evmcs)(struct kvm_vcpu *vcpu,
- 			    uint16_t *vmcs_version);
- 	uint16_t (*get_evmcs_version)(struct kvm_vcpu *vcpu);
-+	void (*check_guest_maps)(struct kvm_vcpu *vcpu);
- };
- 
- struct kvm_x86_init_ops {
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 2f6f465e575f..09fab0f3c472 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -315,7 +315,7 @@ static void free_nested(struct kvm_vcpu *vcpu)
- 		kvm_release_page_clean(vmx->nested.apic_access_page);
- 		vmx->nested.apic_access_page = NULL;
- 	}
--	kvm_vcpu_unmap(vcpu, &vmx->nested.virtual_apic_map, true);
-+	kvm_gfn_to_pfn_cache_destroy(vcpu->kvm, &vmx->nested.virtual_apic_cache);
- 	kvm_vcpu_unmap(vcpu, &vmx->nested.pi_desc_map, true);
- 	vmx->nested.pi_desc = NULL;
- 
-@@ -3199,10 +3199,12 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
- 	}
- 
- 	if (nested_cpu_has(vmcs12, CPU_BASED_TPR_SHADOW)) {
--		map = &vmx->nested.virtual_apic_map;
-+		struct gfn_to_pfn_cache *gpc = &vmx->nested.virtual_apic_cache;
- 
--		if (!kvm_vcpu_map(vcpu, gpa_to_gfn(vmcs12->virtual_apic_page_addr), map)) {
--			vmcs_write64(VIRTUAL_APIC_PAGE_ADDR, pfn_to_hpa(map->pfn));
-+ 		if (!kvm_gfn_to_pfn_cache_init(vcpu->kvm, gpc, vcpu, true, true,
-+					       vmcs12->virtual_apic_page_addr,
-+					       PAGE_SIZE, true)) {
-+			vmcs_write64(VIRTUAL_APIC_PAGE_ADDR, pfn_to_hpa(gpc->pfn));
- 		} else if (nested_cpu_has(vmcs12, CPU_BASED_CR8_LOAD_EXITING) &&
- 		           nested_cpu_has(vmcs12, CPU_BASED_CR8_STORE_EXITING) &&
- 			   !nested_cpu_has2(vmcs12, SECONDARY_EXEC_VIRTUALIZE_APIC_ACCESSES)) {
-@@ -3227,6 +3229,9 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
- 	if (nested_cpu_has_posted_intr(vmcs12)) {
- 		map = &vmx->nested.pi_desc_map;
- 
-+		if (kvm_vcpu_mapped(map))
-+			kvm_vcpu_unmap(vcpu, map, true);
-+
- 		if (!kvm_vcpu_map(vcpu, gpa_to_gfn(vmcs12->posted_intr_desc_addr), map)) {
- 			vmx->nested.pi_desc =
- 				(struct pi_desc *)(((void *)map->hva) +
-@@ -3271,6 +3276,29 @@ static bool vmx_get_nested_state_pages(struct kvm_vcpu *vcpu)
- 	return true;
- }
- 
-+static void nested_vmx_check_guest_maps(struct kvm_vcpu *vcpu)
-+{
-+	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
-+	struct vcpu_vmx *vmx = to_vmx(vcpu);
-+	struct gfn_to_pfn_cache *gpc;
-+
-+	int valid;
-+
-+	if (nested_cpu_has_posted_intr(vmcs12)) {
-+		gpc = &vmx->nested.virtual_apic_cache;
-+
-+		read_lock(&gpc->lock);
-+		valid = kvm_gfn_to_pfn_cache_check(vcpu->kvm, gpc,
-+						   vmcs12->virtual_apic_page_addr,
-+						   PAGE_SIZE);
-+		read_unlock(&gpc->lock);
-+		if (!valid) {
-+			kvm_make_request(KVM_REQ_GET_NESTED_STATE_PAGES, vcpu);
-+			return;
-+		}
-+	}
-+}
-+
- static int nested_vmx_write_pml_buffer(struct kvm_vcpu *vcpu, gpa_t gpa)
- {
- 	struct vmcs12 *vmcs12;
-@@ -3768,9 +3796,15 @@ static int vmx_complete_nested_posted_interrupt(struct kvm_vcpu *vcpu)
- 
- 	max_irr = find_last_bit((unsigned long *)vmx->nested.pi_desc->pir, 256);
- 	if (max_irr != 256) {
--		vapic_page = vmx->nested.virtual_apic_map.hva;
--		if (!vapic_page)
-+		struct gfn_to_pfn_cache *gpc = &vmx->nested.virtual_apic_cache;
-+
-+		read_lock(&gpc->lock);
-+		if (!kvm_gfn_to_pfn_cache_check(vcpu->kvm, gpc, gpc->gpa, PAGE_SIZE)) {
-+			read_unlock(&gpc->lock);
- 			goto mmio_needed;
-+		}
-+
-+		vapic_page = gpc->khva;
- 
- 		__kvm_apic_update_irr(vmx->nested.pi_desc->pir,
- 			vapic_page, &max_irr);
-@@ -3780,6 +3814,7 @@ static int vmx_complete_nested_posted_interrupt(struct kvm_vcpu *vcpu)
- 			status |= (u8)max_irr;
- 			vmcs_write16(GUEST_INTR_STATUS, status);
- 		}
-+		read_unlock(&gpc->lock);
- 	}
- 
- 	nested_mark_vmcs12_pages_dirty(vcpu);
-@@ -4599,7 +4634,7 @@ void nested_vmx_vmexit(struct kvm_vcpu *vcpu, u32 vm_exit_reason,
- 		kvm_release_page_clean(vmx->nested.apic_access_page);
- 		vmx->nested.apic_access_page = NULL;
- 	}
--	kvm_vcpu_unmap(vcpu, &vmx->nested.virtual_apic_map, true);
-+	kvm_gfn_to_pfn_cache_unmap(vcpu->kvm, &vmx->nested.virtual_apic_cache);
- 	kvm_vcpu_unmap(vcpu, &vmx->nested.pi_desc_map, true);
- 	vmx->nested.pi_desc = NULL;
- 
-@@ -6776,4 +6811,5 @@ struct kvm_x86_nested_ops vmx_nested_ops = {
- 	.write_log_dirty = nested_vmx_write_pml_buffer,
- 	.enable_evmcs = nested_enable_evmcs,
- 	.get_evmcs_version = nested_get_evmcs_version,
-+	.check_guest_maps = nested_vmx_check_guest_maps,
- };
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 63615d242bdf..d7c36ca544e3 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -3852,19 +3852,23 @@ void pt_update_intercept_for_msr(struct kvm_vcpu *vcpu)
- static bool vmx_guest_apic_has_interrupt(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
--	void *vapic_page;
-+	struct gfn_to_pfn_cache *gpc = &vmx->nested.virtual_apic_cache;
- 	u32 vppr;
- 	int rvi;
- 
- 	if (WARN_ON_ONCE(!is_guest_mode(vcpu)) ||
- 		!nested_cpu_has_vid(get_vmcs12(vcpu)) ||
--		WARN_ON_ONCE(!vmx->nested.virtual_apic_map.gfn))
-+		WARN_ON_ONCE(gpc->gpa == GPA_INVALID))
- 		return false;
- 
- 	rvi = vmx_get_rvi();
- 
--	vapic_page = vmx->nested.virtual_apic_map.hva;
--	vppr = *((u32 *)(vapic_page + APIC_PROCPRI));
-+	read_lock(&gpc->lock);
-+	if (!kvm_gfn_to_pfn_cache_check(vcpu->kvm, gpc, gpc->gpa, PAGE_SIZE))
-+		vppr = *((u32 *)(gpc->khva + APIC_PROCPRI));
-+	else
-+		vppr = 0xff;
-+	read_unlock(&gpc->lock);
- 
- 	return ((rvi & 0xf0) > (vppr & 0xf0));
- }
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 6c2c1aff1c3d..400e7bed11fc 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -204,7 +204,7 @@ struct nested_vmx {
- 	 * pointers, so we must keep them pinned while L2 runs.
- 	 */
- 	struct page *apic_access_page;
--	struct kvm_host_map virtual_apic_map;
-+	struct gfn_to_pfn_cache virtual_apic_cache;
- 	struct kvm_host_map pi_desc_map;
- 
- 	struct kvm_host_map msr_bitmap_map;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 5e7a4982fb90..e9d89bc3f7dd 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9826,6 +9826,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 
- 		if (kvm_check_request(KVM_REQ_UPDATE_CPU_DIRTY_LOGGING, vcpu))
- 			static_call(kvm_x86_update_cpu_dirty_logging)(vcpu);
-+		if (kvm_check_request(KVM_REQ_GPC_INVALIDATE, vcpu))
-+			; /* Nothing to do. It just wanted to wake us */
- 	}
- 
- 	if (kvm_check_request(KVM_REQ_EVENT, vcpu) || req_int_win ||
-@@ -9872,6 +9874,14 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
- 	local_irq_disable();
- 	vcpu->mode = IN_GUEST_MODE;
- 
-+	/*
-+	 * If the guest requires direct access to mapped L1 pages, check
-+	 * the caches are valid. Will raise KVM_REQ_GET_NESTED_STATE_PAGES
-+	 * to go and revalidate them, if necessary.
-+	 */
-+	if (is_guest_mode(vcpu) && kvm_x86_ops.nested_ops->check_guest_maps)
-+		kvm_x86_ops.nested_ops->check_guest_maps(vcpu);
-+
- 	srcu_read_unlock(&vcpu->kvm->srcu, vcpu->srcu_idx);
- 
- 	/*
--- 
-2.31.1
+  1) The guest memory is generally encrypted during run-time, so the guest
+     needs to ensure the ucall struct is allocated in shared memory.
+  2) The guest page table is also encrypted, so the address would need to be a
+     GPA instead of a GVA.
+  3) The guest vCPU register may also be encrypted in the case of
+     SEV-ES/SEV-SNP, so the approach of examining vCPU register state has
+     additional requirements such as requiring guest code to implement a #VC
+     handler that can provide the appropriate registers via a vmgexit.
+
+To address these issues, the SEV selftest RFC1 patchset introduced a set of new
+SEV-specific interfaces that closely mirrored the functionality of
+ucall()/get_ucall(), but relied on a pre-allocated/static ucall buffer in
+shared guest memory so it that guest code could pass messages/state to the host
+by simply writing to this pre-arranged shared memory region and then generating
+an exit to userspace (via a halt instruction).
+
+Paolo suggested instead implementing support for test/guest-specific ucall
+implementations that could be used as an alternative to the default PIO-based
+ucall implementations as-needed based on test/guest requirements, while still
+allowing for tests to use a common set interfaces like ucall()/get_ucall().
+
+== OVERVIEW ==
+
+This series implements the above functionality by introducing a new ucall_ops
+struct that can be used to register a particular ucall implementation as need,
+then re-implements x86/arm64/s390x in terms of the ucall_ops.
+
+But for the purposes of introducing a new ucall_ops implementation appropriate
+for SEV, there are a couple issues that resulted in the need for some additional
+ucall interfaces as well:
+
+  a) ucall() doesn't take a pointer to the ucall struct it modifies, so to make
+     it work in the case of an implementation that relies a pre-allocated ucall
+     struct in shared guest memory some sort of global lookup functionality
+     would be needed to locate the appropriate ucall struct for a particular
+     VM/vcpu combination, and this would need to be made accessible for use by
+     the guest as well. guests would then need some way of determining what
+     VM/vcpu identifiers they need to use to do the lookup, which to do reliably
+     would likely require seeding the guest with those identifiers in advance,
+     which is possible, but much more easily achievable by simply adding a
+     ucall() alternative that accepts a pointer to the ucall struct for that
+     particular VM/vcpu.
+
+  b) get_ucall() *does* take a pointer to a ucall struct, but currently zeroes
+     it out and uses it to copy the guest's ucall struct into. It *could* be
+     re-purposed to handle the case where the pointer is an actual pointer to
+     the ucall struct in shared guest memory, but that could cause problems
+     since callers would need some idea of what the underlying ucall
+     implementation expects. Ideally the interfaces would be agnostic to the
+     ucall implementation.
+
+So to address those issues, this series also allows ucall implementations to
+optionally be extended to support a set of 'shared' ops that are used in the
+following manner:
+
+  host:
+    uc_gva = ucall_shared_alloc()
+    setup_vm_args(vm, uc_gva)
+
+  guest:
+    ucall_shared(uc_gva, ...)
+
+  host:
+    uget_ucall_shared(uc_gva, ...)
+
+and then implements a new ucall implementation, ucall_ops_halt, based around
+these shared interfaces and halt instructions.
+
+While this doesn't really meet the initial goal of re-using the existing
+ucall interfaces as-is, the hope is that these *_shared interfaces are
+general enough to be re-usable things other than SEV, or at least improve on
+code readability over the initial SEV-specific interfaces.
+
+Any review/comments are greatly appreciated!
+
+----------------------------------------------------------------
+Michael Roth (10):
+      kvm: selftests: move base kvm_util.h declarations to kvm_util_base.h
+      kvm: selftests: move ucall declarations into ucall_common.h
+      kvm: selftests: introduce ucall_ops for test/arch-specific ucall implementations
+      kvm: arm64: selftests: use ucall_ops to define default ucall implementation
+      (COMPILE-TESTED ONLY) kvm: s390: selftests: use ucall_ops to define default ucall implementation
+      kvm: selftests: add ucall interfaces based around shared memory
+      kvm: selftests: add ucall_shared ops for PIO
+      kvm: selftests: introduce ucall implementation based on halt instructions
+      kvm: selftests: add GUEST_SHARED_* macros for shared ucall implementations
+      kvm: selftests: add ucall_test to test various ucall functionality
+
+ tools/testing/selftests/kvm/.gitignore             |   1 +
+ tools/testing/selftests/kvm/Makefile               |   5 +-
+ .../testing/selftests/kvm/include/aarch64/ucall.h  |  18 +
+ tools/testing/selftests/kvm/include/kvm_util.h     | 408 +--------------------
+ .../testing/selftests/kvm/include/kvm_util_base.h  | 368 +++++++++++++++++++
+ tools/testing/selftests/kvm/include/s390x/ucall.h  |  18 +
+ tools/testing/selftests/kvm/include/ucall_common.h | 147 ++++++++
+ tools/testing/selftests/kvm/include/x86_64/ucall.h |  19 +
+ tools/testing/selftests/kvm/lib/aarch64/ucall.c    |  43 +--
+ tools/testing/selftests/kvm/lib/s390x/ucall.c      |  45 +--
+ tools/testing/selftests/kvm/lib/ucall_common.c     | 133 +++++++
+ tools/testing/selftests/kvm/lib/x86_64/ucall.c     |  82 +++--
+ tools/testing/selftests/kvm/ucall_test.c           | 182 +++++++++
+ 13 files changed, 982 insertions(+), 487 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/ucall.h
+ create mode 100644 tools/testing/selftests/kvm/include/kvm_util_base.h
+ create mode 100644 tools/testing/selftests/kvm/include/s390x/ucall.h
+ create mode 100644 tools/testing/selftests/kvm/include/ucall_common.h
+ create mode 100644 tools/testing/selftests/kvm/include/x86_64/ucall.h
+ create mode 100644 tools/testing/selftests/kvm/lib/ucall_common.c
+ create mode 100644 tools/testing/selftests/kvm/ucall_test.c
+
 
