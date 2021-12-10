@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C84E04701E5
-	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 14:37:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C415E4701E9
+	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 14:37:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242574AbhLJNkv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Dec 2021 08:40:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43690 "EHLO
+        id S242096AbhLJNk4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Dec 2021 08:40:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43516 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242322AbhLJNkY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Dec 2021 08:40:24 -0500
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71BE8C061D5F;
-        Fri, 10 Dec 2021 05:36:33 -0800 (PST)
-Received: by mail-pf1-x42a.google.com with SMTP id r130so8534596pfc.1;
-        Fri, 10 Dec 2021 05:36:33 -0800 (PST)
+        with ESMTP id S242348AbhLJNk0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Dec 2021 08:40:26 -0500
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C14FC0698DE;
+        Fri, 10 Dec 2021 05:36:37 -0800 (PST)
+Received: by mail-pf1-x42e.google.com with SMTP id n26so8513462pff.3;
+        Fri, 10 Dec 2021 05:36:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=BUiijKRugCFKHfUrzCq3Xknkp/kY3YXTtm4X5J5lOSY=;
-        b=i4/q98DEUgsofKSi74+YiF98DOe555gdE2dxaSnwrxoVg3ZmcmiksieflZRaveeMpJ
-         0+E52GVIyT/r09NOxPygT1pUgIQ3UwYY4rQU4OpZ92VhmdfpunsO/j0s2TU3jr7/ETkk
-         k8IQbqVxKpmDnsPlL+MtaoZlSGQMQ1beW0cRURJ9lNn9zwHGZLWpq1HqMyrfu5JAJr6c
-         T5p0d9DxHK22ppgAJf3VgCmu57rjLwQBGj+Xr3SMgJzm1IkuWTXj+NS4d0+Xbo63d0Yw
-         ere5VMf/ogpnrW8BEQGlS+cEoghGEdmdPohTCkPvRs0RgYEJDT7z3ia/klfgkQXpDMTx
-         NDbg==
+        bh=2ykxillP8HPbXSqX4iVaAV/uW81eRwsuhWePvtMN1nM=;
+        b=DT6FWpArUSEWrEXjX6iYpU4WuSAK2N7uhdwaKx7Ft+4rxF6i09/aryxMUkyg3k8gKT
+         AsE8fUermbmD47ZkSew8mrd9gaYdxlwt2Q5vy7r8YD/9+L0ijtJaDgPd25P1taTPAfAo
+         72vqoKF/Db8HWvajpkc4GeQwbezcceFidKRTc5I6nl5tdPPl4vf+HR9TUWZ8ZWnA1SCz
+         juBnCH/Snru4b8jmeWYMPnnXw6shWBX4fTxQGZ2gzD4IUWpTibT4L2pQJ3oXiMAXUpC+
+         Tkc+Gx7lHD4bdM4ArpTpywzMvZUtn9x41a6AUaal9tH5kzxi2in7cPPEXtVCpgAZIPNF
+         c71w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=BUiijKRugCFKHfUrzCq3Xknkp/kY3YXTtm4X5J5lOSY=;
-        b=0mETExbq6JlZIqtjHL0U60BIGGwNcmLmDTYclG10z7EAPkKd8hoW6TAGjgOyu6bQY/
-         SSEZcUTQxZLLk4QLqlUtPmk1YZOs189y9Xj2M/vaLVVYFAAHcVXXUUDITAcYOvPREaWl
-         aW0/rObJ228Mznw7CSyqZNvIXDMYp7nR7LJ+yFptTT1o4bv5eBgpJe5v1i0YtFMc8bgK
-         iuonVWUXmF75SWMU1pmDcUkGbcOuAd4u1T9PGkczuMeFshTuXAsIe0BYrZwl48/Wz/mx
-         6KaRqE7ejzxblAC5UE7lxQfENft28AdLeDrX4A5ufsCThB4nqP0zPvcofjxS/rIKjS1k
-         1f4A==
-X-Gm-Message-State: AOAM531jOGMHcvP/u0ZjWVqsLLLaYAgCpGNaApndu1dSM07UTvyUPL6Z
-        HYc4LWH6Giu9RXyHc4jjwXlg0hFopIM=
-X-Google-Smtp-Source: ABdhPJwuh0YaT3OOzkPoUSn3BmwmahRPjn9wnZsShTiIEKJlFd5eBL1u28WAELPaJXkz1TPBkXz4Xg==
-X-Received: by 2002:a63:ea52:: with SMTP id l18mr24572792pgk.114.1639143393017;
-        Fri, 10 Dec 2021 05:36:33 -0800 (PST)
+        bh=2ykxillP8HPbXSqX4iVaAV/uW81eRwsuhWePvtMN1nM=;
+        b=SGxlxSPEjh0DotYdho1+sG+5GibGEur6E0L62XOg5MZ4+ryKqfPwBK5I14CiW/jsr3
+         bdGkqNnkmA4mPrdVB+bmXRo0YVa+lDBLfVdwGEpN2b2ZpC9lavQ9RF7fT/Dyz8az+v9Z
+         fNCvdeohQcb0lzg1hWJf9D2dqw49km1sxDiwcIbuedMBs6oF01E9lvCO3uqxBGH3WC7L
+         TYn5WPkp9WfAFovocAM6jqHlxX9LysaIhPNzE1fm7IyjPvjex9LzyBFs3QM22qoltz44
+         9ViozGpRYYPlMucIMP6S0K/S3RGEI3OJnhH+m33aCNmwE3fU/q304kK6hvCoI6lVP2ZR
+         GYZg==
+X-Gm-Message-State: AOAM530ph/hytNeAMyB1QO5mhsYSbYx+Ew+3oFkMhOu4zibLlzuobJEI
+        f+aFfyVlYlBPIeDpAY7b8Oo4YKmmjns=
+X-Google-Smtp-Source: ABdhPJzEeOyMELGbuDeBsmjD8Kau/JUIgRJfD7wd/EHEO/2FG3/b15ii/lD5Ym+H0CUpZzOcuEYHjw==
+X-Received: by 2002:a05:6a00:230b:b0:4ae:d8b2:dc0c with SMTP id h11-20020a056a00230b00b004aed8b2dc0cmr18302250pfh.67.1639143396811;
+        Fri, 10 Dec 2021 05:36:36 -0800 (PST)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id t4sm3596068pfj.168.2021.12.10.05.36.30
+        by smtp.gmail.com with ESMTPSA id t4sm3596068pfj.168.2021.12.10.05.36.33
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 10 Dec 2021 05:36:32 -0800 (PST)
+        Fri, 10 Dec 2021 05:36:36 -0800 (PST)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
@@ -58,9 +58,9 @@ Cc:     Jim Mattson <jmattson@google.com>,
         Peter Zijlstra <peterz@infradead.org>,
         Like Xu <likexu@tencent.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v11 16/17] KVM: x86/cpuid: Refactor host/guest CPU model consistency check
-Date:   Fri, 10 Dec 2021 21:35:24 +0800
-Message-Id: <20211210133525.46465-17-likexu@tencent.com>
+Subject: [PATCH v11 17/17] KVM: x86/pmu: Expose CPUIDs feature bits PDCM, DS, DTES64
+Date:   Fri, 10 Dec 2021 21:35:25 +0800
+Message-Id: <20211210133525.46465-18-likexu@tencent.com>
 X-Mailer: git-send-email 2.33.1
 In-Reply-To: <20211210133525.46465-1-likexu@tencent.com>
 References: <20211210133525.46465-1-likexu@tencent.com>
@@ -74,90 +74,105 @@ From: Like Xu <like.xu@linux.intel.com>
 
 From: Like Xu <like.xu@linux.intel.com>
 
-For the same purpose, the leagcy intel_pmu_lbr_is_compatible() can be
-renamed for reuse by more callers, and remove the comment about LBR
-use case can be deleted by the way.
+The CPUID features PDCM, DS and DTES64 are required for PEBS feature.
+KVM would expose CPUID feature PDCM, DS and DTES64 to guest when PEBS
+is supported in the KVM on the Ice Lake server platforms.
 
+Originally-by: Andi Kleen <ak@linux.intel.com>
+Co-developed-by: Kan Liang <kan.liang@linux.intel.com>
+Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
+Co-developed-by: Luwei Kang <luwei.kang@intel.com>
+Signed-off-by: Luwei Kang <luwei.kang@intel.com>
 Signed-off-by: Like Xu <like.xu@linux.intel.com>
 Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 ---
- arch/x86/kvm/cpuid.h         |  5 +++++
- arch/x86/kvm/vmx/pmu_intel.c | 12 +-----------
- arch/x86/kvm/vmx/vmx.c       |  2 +-
- arch/x86/kvm/vmx/vmx.h       |  1 -
- 4 files changed, 7 insertions(+), 13 deletions(-)
+ arch/x86/kvm/vmx/capabilities.h | 26 ++++++++++++++++++--------
+ arch/x86/kvm/vmx/vmx.c          | 15 +++++++++++++++
+ 2 files changed, 33 insertions(+), 8 deletions(-)
 
-diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
-index c99edfff7f82..439ce776b9a0 100644
---- a/arch/x86/kvm/cpuid.h
-+++ b/arch/x86/kvm/cpuid.h
-@@ -143,6 +143,11 @@ static inline int guest_cpuid_model(struct kvm_vcpu *vcpu)
- 	return x86_model(best->eax);
+diff --git a/arch/x86/kvm/vmx/capabilities.h b/arch/x86/kvm/vmx/capabilities.h
+index c8029b7845b6..1c47c266aca4 100644
+--- a/arch/x86/kvm/vmx/capabilities.h
++++ b/arch/x86/kvm/vmx/capabilities.h
+@@ -5,6 +5,7 @@
+ #include <asm/vmx.h>
+ 
+ #include "lapic.h"
++#include "pmu.h"
+ 
+ extern bool __read_mostly enable_vpid;
+ extern bool __read_mostly flexpriority_enabled;
+@@ -385,20 +386,29 @@ static inline bool vmx_pt_mode_is_host_guest(void)
+ 	return pt_mode == PT_MODE_HOST_GUEST;
  }
  
-+static inline bool cpuid_model_is_consistent(struct kvm_vcpu *vcpu)
-+{
-+	return boot_cpu_data.x86_model == guest_cpuid_model(vcpu);
-+}
-+
- static inline int guest_cpuid_stepping(struct kvm_vcpu *vcpu)
+-static inline u64 vmx_get_perf_capabilities(void)
++static inline bool vmx_pebs_supported(void)
  {
- 	struct kvm_cpuid_entry2 *best;
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 26a6eee1a9f7..f7827b8f0eea 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -161,16 +161,6 @@ static inline struct kvm_pmc *get_fw_gp_pmc(struct kvm_pmu *pmu, u32 msr)
- 	return get_gp_pmc(pmu, msr, MSR_IA32_PMC0);
- }
- 
--bool intel_pmu_lbr_is_compatible(struct kvm_vcpu *vcpu)
--{
--	/*
--	 * As a first step, a guest could only enable LBR feature if its
--	 * cpu model is the same as the host because the LBR registers
--	 * would be pass-through to the guest and they're model specific.
--	 */
--	return boot_cpu_data.x86_model == guest_cpuid_model(vcpu);
--}
+-	u64 perf_cap = 0;
 -
- bool intel_pmu_lbr_is_enabled(struct kvm_vcpu *vcpu)
- {
- 	struct x86_pmu_lbr *lbr = vcpu_to_lbr_records(vcpu);
-@@ -581,7 +571,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+-	if (boot_cpu_has(X86_FEATURE_PDCM))
+-		rdmsrl(MSR_IA32_PERF_CAPABILITIES, perf_cap);
+-
+-	perf_cap &= PMU_CAP_LBR_FMT;
++	return boot_cpu_has(X86_FEATURE_PEBS) && kvm_pmu_cap.pebs_vmx;
++}
  
- 	nested_vmx_pmu_entry_exit_ctls_update(vcpu);
++static inline u64 vmx_get_perf_capabilities(void)
++{
+ 	/*
+ 	 * Since counters are virtualized, KVM would support full
+ 	 * width counting unconditionally, even if the host lacks it.
+ 	 */
+-	return PMU_CAP_FW_WRITES | perf_cap;
++	u64 perf_cap = PMU_CAP_FW_WRITES;
++	u64 host_perf_cap = 0;
++
++	if (boot_cpu_has(X86_FEATURE_PDCM))
++		rdmsrl(MSR_IA32_PERF_CAPABILITIES, host_perf_cap);
++
++	perf_cap |= host_perf_cap & PMU_CAP_LBR_FMT;
++
++	if (vmx_pebs_supported())
++		perf_cap |= host_perf_cap & PERF_CAP_PEBS_MASK;
++
++	return perf_cap;
+ }
  
--	if (intel_pmu_lbr_is_compatible(vcpu))
-+	if (cpuid_model_is_consistent(vcpu))
- 		x86_perf_get_lbr(&lbr_desc->records);
- 	else
- 		lbr_desc->records.nr = 0;
+ static inline u64 vmx_supported_debugctl(void)
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 8d0df12a608c..bd53f39e6283 100644
+index bd53f39e6283..42e46ef9e20f 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -2216,7 +2216,7 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 			if ((data & PMU_CAP_LBR_FMT) !=
- 			    (vmx_get_perf_capabilities() & PMU_CAP_LBR_FMT))
- 				return 1;
--			if (!intel_pmu_lbr_is_compatible(vcpu))
-+			if (!cpuid_model_is_consistent(vcpu))
+@@ -2219,6 +2219,17 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 			if (!cpuid_model_is_consistent(vcpu))
  				return 1;
  		}
++		if (data & PERF_CAP_PEBS_FORMAT) {
++			if ((data & PERF_CAP_PEBS_MASK) !=
++			    (vmx_get_perf_capabilities() & PERF_CAP_PEBS_MASK))
++				return 1;
++			if (!guest_cpuid_has(vcpu, X86_FEATURE_DS))
++				return 1;
++			if (!guest_cpuid_has(vcpu, X86_FEATURE_DTES64))
++				return 1;
++			if (!cpuid_model_is_consistent(vcpu))
++				return 1;
++		}
  		ret = kvm_set_msr_common(vcpu, msr_info);
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 1b2daf6b9c10..172df8739640 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -95,7 +95,6 @@ union vmx_exit_reason {
- #define vcpu_to_lbr_records(vcpu) (&to_vmx(vcpu)->lbr_desc.records)
+ 		break;
  
- void intel_pmu_cross_mapped_check(struct kvm_pmu *pmu);
--bool intel_pmu_lbr_is_compatible(struct kvm_vcpu *vcpu);
- bool intel_pmu_lbr_is_enabled(struct kvm_vcpu *vcpu);
+@@ -7255,6 +7266,10 @@ static __init void vmx_set_cpu_caps(void)
+ 		kvm_cpu_cap_clear(X86_FEATURE_INVPCID);
+ 	if (vmx_pt_mode_is_host_guest())
+ 		kvm_cpu_cap_check_and_set(X86_FEATURE_INTEL_PT);
++	if (vmx_pebs_supported()) {
++		kvm_cpu_cap_check_and_set(X86_FEATURE_DS);
++		kvm_cpu_cap_check_and_set(X86_FEATURE_DTES64);
++	}
  
- int intel_pmu_create_guest_lbr_event(struct kvm_vcpu *vcpu);
+ 	if (!enable_sgx) {
+ 		kvm_cpu_cap_clear(X86_FEATURE_SGX);
 -- 
 2.33.1
 
