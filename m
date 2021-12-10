@@ -2,139 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0241246FE86
-	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 11:11:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C9F746FE8C
+	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 11:13:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236599AbhLJKPM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Dec 2021 05:15:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52664 "EHLO
+        id S232829AbhLJKRK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Dec 2021 05:17:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53110 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229562AbhLJKPL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Dec 2021 05:15:11 -0500
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22659C061746;
-        Fri, 10 Dec 2021 02:11:37 -0800 (PST)
-Received: by mail-pg1-x534.google.com with SMTP id m24so7631196pgn.7;
-        Fri, 10 Dec 2021 02:11:37 -0800 (PST)
+        with ESMTP id S229562AbhLJKRJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Dec 2021 05:17:09 -0500
+Received: from mail-il1-x142.google.com (mail-il1-x142.google.com [IPv6:2607:f8b0:4864:20::142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B7CFC061746
+        for <kvm@vger.kernel.org>; Fri, 10 Dec 2021 02:13:35 -0800 (PST)
+Received: by mail-il1-x142.google.com with SMTP id t8so7914789ilu.8
+        for <kvm@vger.kernel.org>; Fri, 10 Dec 2021 02:13:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:content-language:to:cc
-         :references:from:organization:subject:in-reply-to
-         :content-transfer-encoding;
-        bh=LY1mQWWaMvke+UWIweZH9XREVkdzI6MKWI9ATeJso/c=;
-        b=emGWNtCB2IHeYhgUmIqeWo/4q7vSbDFtMxUwfdfrm7mWPyEs+Q2o8OUCnqSYC4qmec
-         A1VU7U2HelneqTVJ4lfN+J8p4n4jt1XLTfcXvpH34j/2iws/8F6pP7zHq0h9A4WY/iIO
-         ecjZqOmE2ixSaq7D3c/FreZWn2UBAShLKdk22SisCMHUEvj22RwqZJ60YWu8qBysSbp0
-         DXBas8oFIxwtaW19RFPiWTChf0QvaZgP1kIqkzjYTyZzTXdgUgWtUoPdE4i7BttY+pKU
-         fkyMliIw6cB35/wSW3lFjmMJ1QtXWJAPnmBs/exYGpeDqUX+vUvwOJzEW7epZ4kTrA/v
-         dJxA==
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=He9kpFQwq1I68wdOjeNvE0LON5OL4PlSGVKoCJBAUEM=;
+        b=S7gWGKP85tbaJlUaUhZZUOymbozYPmcV6RyNlZFM8TkmYhJDTxvm6ORs0DjHlseaip
+         NwBMer0+98jtolSUiHwP0gZgXZx+izjgKN8f2CMz9CPU38WYv6Vh4nUAsmZBIkFYLU19
+         fAOd8aQ0Fc1TGGe/PNqXRdyGql8szX14APd1rWRUbCY9s/vu4qSe2cyJEacsiG2sTW2c
+         Y32/RFhrdE7ToSY1fozi0cnwYqifkwMO7aIsgWsXw8TsmJ6CXnQHPRb4gNIa1Qpjl1FF
+         YlqX6wn9nQ0hf69HVCIOJsK3m9fS1T5SdJS3UA10880tuq4ACopqpTmtiquVfQcIBYoE
+         cFFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent
-         :content-language:to:cc:references:from:organization:subject
-         :in-reply-to:content-transfer-encoding;
-        bh=LY1mQWWaMvke+UWIweZH9XREVkdzI6MKWI9ATeJso/c=;
-        b=48pNGIcX/TDHRnK6iObxCtL+WuiwyD7+68+3j4vEmEX9BZEj9HYtSZ8brBo3irjdLm
-         LVrSUQ1uguRkXzut2700nyZzm1hx4Bx4jk9NeI+1hV00ghd4pAEH+W1psDtCB75zjRqf
-         EMWmrCqmiCLbjj3zFTxueFGRpW+Pef1KdBl8gpBLe+GZNfI1AMFlnbsyf2DPBHssZJoi
-         3SFXrAms8fSc59I7U3J8g3BfeAOkIJ/Ur2HiwLuYDBN3E2n/eH3BICMag9vmREAvI/D+
-         0TjMnFxkMsHDdXM0ZLL6tP4c+sb9U3ksJdca9kSQg8HuLGnEnG8jdp1dw71hSMJ/XZiH
-         mzig==
-X-Gm-Message-State: AOAM531+MjY3gR6GfvVNpHHthu1VhW/T4pyZBW8FzIINNctnLIy5/hu3
-        hCSAEXpBUlb11H0c0JgFNmG8uY/pg9w=
-X-Google-Smtp-Source: ABdhPJyh4b8qta3pDyTa35UIoOcxyHQNi58jjvvFPr/c7XCH5DgFZWlvWC5VIwC2rFYPgy/UyOIDgA==
-X-Received: by 2002:a05:6a00:a89:b0:4a4:e9f5:d88a with SMTP id b9-20020a056a000a8900b004a4e9f5d88amr17217052pfl.28.1639131096636;
-        Fri, 10 Dec 2021 02:11:36 -0800 (PST)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id p6sm2328286pjb.48.2021.12.10.02.11.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Dec 2021 02:11:36 -0800 (PST)
-Message-ID: <8659b829-6437-17f1-3e35-7c9f123a6c3e@gmail.com>
-Date:   Fri, 10 Dec 2021 18:11:26 +0800
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=He9kpFQwq1I68wdOjeNvE0LON5OL4PlSGVKoCJBAUEM=;
+        b=fOv4KrWJubw35aFO+BrsoYi2uuTaIkQ7b2dWUFVXSwkqvOKk/FT9Rrnxx0Fbt531cK
+         lCz8ISbClEdd0iMAPW+G/ioahoPP/GfwV0OSFbch+PwMyBleVvMwrkRCdoAkLzM6Lo52
+         o2cNBfVL5XQiNWshqSI7cYmTZnvrULvl9cbQke451s7Azx+H+OHBGrMTGSWDpS27q21F
+         FgbrHO77ydMYRs7cFzQV/a9CNjzbz7wa1XOIAdi9E3NepxnHN2+KKlpDndZEbAJpeYT0
+         4UutMxRa5eP5IsgloRSYBA36hwJY7zabugbkR4hvf3QlZfu5W+uB1SwalyBO/QMLMiCr
+         KbZw==
+X-Gm-Message-State: AOAM533yZEu/MgfALh+z/i/tzFXzfkFhPQa5AveLYSsLjZ3q3Em8KYAG
+        lOUQpmRiV+F3XjzMUIXLPZ3GIGdmVPndowGzoTI=
+X-Google-Smtp-Source: ABdhPJwzoYlieHz15g+Jvz3KsRxr4lPfFxPXfBYISWn1indqnjl0KbrH+8F8a3OS3+h5m4SPDmeKZqA3Qj8MM/MKJ+I=
+X-Received: by 2002:a05:6e02:ed2:: with SMTP id i18mr21520146ilk.93.1639131214361;
+ Fri, 10 Dec 2021 02:13:34 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.4.0
-Content-Language: en-US
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>
-Cc:     Andi Kleen <ak@linux.intel.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>
-References: <20211130074221.93635-1-likexu@tencent.com>
- <20211130074221.93635-5-likexu@tencent.com>
- <CALMp9eRAxBFE5mYw=isUSsMTWZS2VOjqZfgh0r3hFuF+5npCAQ@mail.gmail.com>
- <0ca44f61-f7f1-0440-e1e1-8d5e8aa9b540@gmail.com>
- <CALMp9eTtsMuEsimONp7TOjJ-uskwJBD-52kZzOefSKXeCwn_5A@mail.gmail.com>
- <b6c1eb18-9237-f604-9a96-9e6ca397121c@redhat.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-Organization: Tencent
-Subject: Re: [PATCH v2 4/6] KVM: x86/pmu: Add pmc->intr to refactor
- kvm_perf_overflow{_intr}()
-In-Reply-To: <b6c1eb18-9237-f604-9a96-9e6ca397121c@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Received: by 2002:a05:6622:e02:0:0:0:0 with HTTP; Fri, 10 Dec 2021 02:13:33
+ -0800 (PST)
+Reply-To: mrskade@hotmail.com
+From:   mrs kadi <david1kama202@gmail.com>
+Date:   Fri, 10 Dec 2021 02:13:33 -0800
+Message-ID: <CANMgs4H+pwZpXtfdnVT8-4FMFXSts+2Cn0TvDq6Xymxpwd=7yA@mail.gmail.com>
+Subject: Compliment of the day
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/12/2021 5:35 pm, Paolo Bonzini wrote:
-> On 12/10/21 01:54, Jim Mattson wrote:
->> On Thu, Dec 9, 2021 at 12:28 AM Like Xu <like.xu.linux@gmail.com> wrote:
->>>
->>> On 9/12/2021 12:25 pm, Jim Mattson wrote:
->>>>
->>>> Not your change, but if the event is counting anything based on
->>>> cycles, and the guest TSC is scaled to run at a different rate from
->>>> the host TSC, doesn't the initial value of the underlying hardware
->>>> counter have to be adjusted as well, so that the interrupt arrives
->>>> when the guest's counter overflows rather than when the host's counter
->>>> overflows?
->>>
->>> I've thought about this issue too and at least the Intel Specification
->>> did not let me down on this detail:
->>>
->>>          "The counter changes in the VMX non-root mode will follow
->>>          VMM's use of the TSC offset or TSC scaling VMX controls"
->>
+Dear sir/madam
 
-Emm, before I left Intel to play AMD, my hardware architect gave
-me a verbal yes about any reported TSC values for vmx non-root mode
-(including the Timed LBR or PEBS records or PT packages) as long as
-we enable the relevant VM execution control bits.
+My name is Mrs Kadi Hamanin.I have decided to seek a confidential
+co-operation with you for the execution of the deal described
+hereunder for our mutual benefit. I Hope you will keep it a secret due
+to the nature of the transaction. During the course of our audit last
+month, I discovered an unclaimed/abandoned fund total US$3.5 million
+in a bank account that belongs to a customer who unfortunately lost
+his life and entire family in a car accident.
 
-Not sure if it's true for legacy platforms.
+Now our bank has been waiting for any of the relatives to come-up for
+the claim but nobody has done that. I personally has been unsuccessful
+in locating any of the relatives, now, I sincerely seek your consent
+to present you as the next of kin / Will Beneficiary to the deceased
+so that the proceeds of this account valued at {US$3.5 Million United
+State Dollars} can be paid to you, which we will share in these
+percentages ratio, 60% to me and 40% to you. All I request is your
+utmost sincere co- operation; trust and maximum confidentiality to
+achieve this project successfully. I have carefully mapped out the
+moralities for execution of this transaction under a legitimate
+arrangement to protect you from any breach of the law both in your
+country and here in my country when the fund is being transferred to
+your bank account.
 
->> Where do you see this? I see similar text regarding TSC packets in the
->> section on Intel Processor Trace, but nothing about PMU counters
->> advancing at a scaled TSC frequency.
-> 
-> Indeed it seems quite unlikely that PMU counters can count fractionally.
-> 
-> Even for tracing the SDM says "Like the value returned by RDTSC, TSC packets 
-> will include these adjustments, but other timing packets (such as MTC, CYC, and 
-> CBR) are not impacted".  Considering that "stand-alone TSC packets are typically 
-> generated only when generation of other timing packets (MTCs and CYCs) has 
-> ceased for a period of time", I'm not even sure it's a good thing that the 
-> values in TSC packets are scaled and offset.
+I will have to provide the entire relevant document that will be
+requested to indicate that you are the rightful beneficiary of this
+legacy and our bank will release the fund to you without any further
+delay, upon your consideration and acceptance of this offer, please
+send me the following information as stated below so we can proceed
+and get this fund transferred to your designated bank account
+immediately. I know much about the existence of this fund and the
+secrets surrounding this money.
 
-There are some discussion that cannot be made public.
-
-We recommend (as software developers) that any PMU enabled guest
-should keep the host/guest TSC as a joint progression for
-performance tuning since guest doesn't have AMPERF capability.
-
-> 
-> Back to the PMU, for non-architectural counters it's not really possible to know 
-> if they count in cycles or not.  So it may not be a good idea to special case 
-> the architectural counters.
-
-Yes captain.
-Let's see if we have real world challenges or bugs to explore this detail further.
-
-> 
-> Paolo
-> 
+-Your Full Name:
+-Your Contact Address:
+-Your direct Mobile telephone Number:
+-Your Date of Birth:
