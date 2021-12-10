@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 986EC4701C0
-	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 14:36:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 533CB4701C7
+	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 14:36:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242041AbhLJNjn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Dec 2021 08:39:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43464 "EHLO
+        id S242198AbhLJNkD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Dec 2021 08:40:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242038AbhLJNji (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Dec 2021 08:39:38 -0500
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F380C061D76;
-        Fri, 10 Dec 2021 05:35:58 -0800 (PST)
-Received: by mail-pf1-x42b.google.com with SMTP id z6so8483075pfe.7;
-        Fri, 10 Dec 2021 05:35:58 -0800 (PST)
+        with ESMTP id S242057AbhLJNjj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Dec 2021 08:39:39 -0500
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB6C8C0698C9;
+        Fri, 10 Dec 2021 05:36:00 -0800 (PST)
+Received: by mail-pj1-x1029.google.com with SMTP id x7so6899193pjn.0;
+        Fri, 10 Dec 2021 05:36:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=8587tQ45k2WukqplN/nd9/AOQH8Rgtn1yhiBRCc/n+U=;
-        b=dtkz8GlvJpg0rz7WQ13oPfUTAfeLiLE9uoGhS6nicZy5uTWMKXVx1/wPFMSadI4Qr9
-         P5Iffk8N8C1BOr43eVmqHRHbaR58hh5vkGdorrswQnCA2eZQvasHsh6Kado5VYzDNveC
-         CX1jfgMAmPJKRgtk5sUeRRQ60o2Ole/UNAqBfKxX5Mk4NbKeNdCzedj0kOl+4yUgjIT/
-         6D8ZNYSNo7iLf7Pb+I52gAK+Avl7Dr4GtS06qfGSIEjct64VFceU/FhM9nA468jl1E75
-         U0zQ0w4yOM5yvWSddJ0lAVaTthiux50Rpy72wPd9yUNTyxljQA2D7lfUQeUq8L4cXEZN
-         Gw6Q==
+        bh=0WjwTyGG9bV97hr7RCNl6Qo+GaIwTl4Nt2MWUdNajFQ=;
+        b=CcpN/AAxyrtLTPWp47YxVqkooHEm4nAefiO3TD6hAvdTYZcEgfQB2pwzEh3q3nRKUy
+         CegwUPRreGfcmU8GWz80gQoOCSvfsmP8A4DOtJnLc0cdbS5AhNRMr6Jdy5cAhsVW9xFx
+         RFa8ficAW4cAQIrrtBwe6JW7ikimJs8VcRyjOsz6wIXcqu18Z4q2VFfnPXFHxzaeVAlk
+         wAekjhJQTLHSH5L7sZOBsW61wDEZX6FbQZ0le+mcvi1Db6mry/BQlcsk7aRJYOTOzG1i
+         mHwlZ9Rn0FLlvYAYlaTYcAC8B/tD016s7a27E2Vb5iBWcFvDbYcwghavBCu4qfGZbGyp
+         k7TA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=8587tQ45k2WukqplN/nd9/AOQH8Rgtn1yhiBRCc/n+U=;
-        b=KqmEzU+RUWgEP5It6HQ7DPMQLS8tEKfaiS4BDj6qg2t2QT7LS9gSISDLaZfHDy9grB
-         Ml4yFyu0VZAPgsgC9C6dhWzvFwIDTNL1E3KDZQuYf91GqKTkam8v/J9d7KNw7JoHD8f4
-         dNUDG/IdBNg03+Yzag8oqFTqgAPcoZHHYlMUs6WpGSi6FlDUiwKEuyaWIZGDanjXrhRD
-         Bm9CzLyii3chV1USBJT/SqgdNX5ylZVayTIehXmFGY+ARiGdk4BAIdWb9T914kF+SA6R
-         72cS8XeZf3gpGCvDRi8gWFPWgqqw5B+V/ud2VlF3cDrsUMpmiZBST9zwVLhja92LAe8R
-         XSFA==
-X-Gm-Message-State: AOAM532V/n8DouV+p6bxuHwT9R5ZG75BxqQqcK+u2GxIfKz9OzOLnGTB
-        wm4OPQw3h00lA/jFWZ8KLn7kfmPdqWw=
-X-Google-Smtp-Source: ABdhPJye40o04ubQPLmtB7vViZr1n7OHYSBYJWkBpNgt2yLvXKnVSj3uN5EpZqZD3Ngu108JVktsIQ==
-X-Received: by 2002:a62:d10f:0:b0:4b1:3bd6:533 with SMTP id z15-20020a62d10f000000b004b13bd60533mr3708923pfg.8.1639143357632;
-        Fri, 10 Dec 2021 05:35:57 -0800 (PST)
+        bh=0WjwTyGG9bV97hr7RCNl6Qo+GaIwTl4Nt2MWUdNajFQ=;
+        b=cwq0Www7D90f7mzvLAnNyNzLxGciaOr+mWDEfOZSs1guujwyPpk/FCYO2GrzMJGnT4
+         Ylp3RRd65CiF2ExE+GIYNkR3nR0wngpPuM6gCXIYzLYhBdI2u5PXtKZotWYQTLgnmQ/h
+         CVF6XKAZe/CETbjM78ug24KT5PVZOjtys1DZ9f++9wwALaa7pkk+web1FCsxu7dNZr/l
+         eqPK4aifXSm1bf2MFTIDPHpfMQGw3SbcWu6L2kx7xe/Tzjybv6muUBy4adYBpHN+O3qk
+         hwCGl4/O0Q273bctSfSs+Oc+VOs/TjDgXjllS1CVktWqrsvfUN98mUOI2vzLZDsagsLO
+         Lgxg==
+X-Gm-Message-State: AOAM533StZot58cdn8cB61FW/cqiNceHrlwedq8IPwfKj/J8+xUssH0E
+        pF3+nLqFNeBeAxER8+Z9irs=
+X-Google-Smtp-Source: ABdhPJzq1BwOXtkwg4tu0exbij+FU0zNeKwzw4IHeaWNqeQ9MOvT0lZMuMvZ27pzC7Zon/wio94uYA==
+X-Received: by 2002:a17:902:ba84:b0:142:5514:8dd7 with SMTP id k4-20020a170902ba8400b0014255148dd7mr76148916pls.87.1639143360492;
+        Fri, 10 Dec 2021 05:36:00 -0800 (PST)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id t4sm3596068pfj.168.2021.12.10.05.35.54
+        by smtp.gmail.com with ESMTPSA id t4sm3596068pfj.168.2021.12.10.05.35.57
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 10 Dec 2021 05:35:57 -0800 (PST)
+        Fri, 10 Dec 2021 05:36:00 -0800 (PST)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
@@ -58,9 +58,9 @@ Cc:     Jim Mattson <jmattson@google.com>,
         Peter Zijlstra <peterz@infradead.org>,
         Like Xu <likexu@tencent.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v11 05/17] KVM: x86/pmu: Introduce the ctrl_mask value for fixed counter
-Date:   Fri, 10 Dec 2021 21:35:13 +0800
-Message-Id: <20211210133525.46465-6-likexu@tencent.com>
+Subject: [PATCH v11 06/17] x86/perf/core: Add pebs_capable to store valid PEBS_COUNTER_MASK value
+Date:   Fri, 10 Dec 2021 21:35:14 +0800
+Message-Id: <20211210133525.46465-7-likexu@tencent.com>
 X-Mailer: git-send-email 2.33.1
 In-Reply-To: <20211210133525.46465-1-likexu@tencent.com>
 References: <20211210133525.46465-1-likexu@tencent.com>
@@ -70,74 +70,92 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <like.xu@linux.intel.com>
+From: "Peter Zijlstra (Intel)" <peterz@infradead.org>
 
-From: Like Xu <like.xu@linux.intel.com>
+From: "Peter Zijlstra (Intel)" <peterz@infradead.org>
 
-The mask value of fixed counter control register should be dynamic
-adjusted with the number of fixed counters. This patch introduces a
-variable that includes the reserved bits of fixed counter control
-registers. This is a generic code refactoring.
+The value of pebs_counter_mask will be accessed frequently
+for repeated use in the intel_guest_get_msrs(). So it can be
+optimized instead of endlessly mucking about with branches.
 
-Co-developed-by: Luwei Kang <luwei.kang@intel.com>
-Signed-off-by: Luwei Kang <luwei.kang@intel.com>
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
-Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 ---
- arch/x86/include/asm/kvm_host.h | 1 +
- arch/x86/kvm/vmx/pmu_intel.c    | 6 +++++-
- 2 files changed, 6 insertions(+), 1 deletion(-)
+ arch/x86/events/intel/core.c | 14 ++++++--------
+ arch/x86/events/perf_event.h |  1 +
+ 2 files changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index d225fb2c0187..9cee034445e3 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -503,6 +503,7 @@ struct kvm_pmu {
- 	unsigned nr_arch_fixed_counters;
- 	unsigned available_event_types;
- 	u64 fixed_ctr_ctrl;
-+	u64 fixed_ctr_ctrl_mask;
- 	u64 global_ctrl;
- 	u64 global_status;
- 	u64 counter_bitmask[2];
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 8b9a7686f264..b76210622232 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -388,7 +388,7 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	case MSR_CORE_PERF_FIXED_CTR_CTRL:
- 		if (pmu->fixed_ctr_ctrl == data)
- 			return 0;
--		if (!(data & 0xfffffffffffff444ull)) {
-+		if (!(data & pmu->fixed_ctr_ctrl_mask)) {
- 			reprogram_fixed_counters(pmu, data);
- 			return 0;
- 		}
-@@ -472,6 +472,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- 	struct kvm_cpuid_entry2 *entry;
- 	union cpuid10_eax eax;
- 	union cpuid10_edx edx;
-+	int i;
+diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
+index 6721ccd9067b..c886e360698c 100644
+--- a/arch/x86/events/intel/core.c
++++ b/arch/x86/events/intel/core.c
+@@ -2911,10 +2911,7 @@ static int handle_pmi_common(struct pt_regs *regs, u64 status)
+ 	 * counters from the GLOBAL_STATUS mask and we always process PEBS
+ 	 * events via drain_pebs().
+ 	 */
+-	if (x86_pmu.flags & PMU_FL_PEBS_ALL)
+-		status &= ~cpuc->pebs_enabled;
+-	else
+-		status &= ~(cpuc->pebs_enabled & PEBS_COUNTER_MASK);
++	status &= ~(cpuc->pebs_enabled & x86_pmu.pebs_capable);
  
- 	pmu->nr_arch_gp_counters = 0;
- 	pmu->nr_arch_fixed_counters = 0;
-@@ -479,6 +480,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- 	pmu->counter_bitmask[KVM_PMC_FIXED] = 0;
- 	pmu->version = 0;
- 	pmu->reserved_bits = 0xffffffff00200000ull;
-+	pmu->fixed_ctr_ctrl_mask = ~0ull;
+ 	/*
+ 	 * PEBS overflow sets bit 62 in the global status register
+@@ -3963,10 +3960,7 @@ static struct perf_guest_switch_msr *intel_guest_get_msrs(int *nr, void *data)
+ 	arr[0].msr = MSR_CORE_PERF_GLOBAL_CTRL;
+ 	arr[0].host = intel_ctrl & ~cpuc->intel_ctrl_guest_mask;
+ 	arr[0].guest = intel_ctrl & ~cpuc->intel_ctrl_host_mask;
+-	if (x86_pmu.flags & PMU_FL_PEBS_ALL)
+-		arr[0].guest &= ~cpuc->pebs_enabled;
+-	else
+-		arr[0].guest &= ~(cpuc->pebs_enabled & PEBS_COUNTER_MASK);
++	arr[0].guest &= ~(cpuc->pebs_enabled & x86_pmu.pebs_capable);
+ 	*nr = 1;
  
- 	entry = kvm_find_cpuid_entry(vcpu, 0xa, 0);
- 	if (!entry)
-@@ -514,6 +516,8 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- 		setup_fixed_pmc_eventsel(pmu);
- 	}
+ 	if (x86_pmu.pebs && x86_pmu.pebs_no_isolation) {
+@@ -5657,6 +5651,7 @@ __init int intel_pmu_init(void)
+ 	x86_pmu.events_mask_len		= eax.split.mask_length;
  
-+	for (i = 0; i < pmu->nr_arch_fixed_counters; i++)
-+		pmu->fixed_ctr_ctrl_mask &= ~(0xbull << (i * 4));
- 	pmu->global_ctrl = ((1ull << pmu->nr_arch_gp_counters) - 1) |
- 		(((1ull << pmu->nr_arch_fixed_counters) - 1) << INTEL_PMC_IDX_FIXED);
- 	pmu->global_ctrl_mask = ~pmu->global_ctrl;
+ 	x86_pmu.max_pebs_events		= min_t(unsigned, MAX_PEBS_EVENTS, x86_pmu.num_counters);
++	x86_pmu.pebs_capable		= PEBS_COUNTER_MASK;
+ 
+ 	/*
+ 	 * Quirk: v2 perfmon does not report fixed-purpose events, so
+@@ -5841,6 +5836,7 @@ __init int intel_pmu_init(void)
+ 		x86_pmu.pebs_aliases = NULL;
+ 		x86_pmu.pebs_prec_dist = true;
+ 		x86_pmu.lbr_pt_coexist = true;
++		x86_pmu.pebs_capable = ~0ULL;
+ 		x86_pmu.flags |= PMU_FL_HAS_RSP_1;
+ 		x86_pmu.flags |= PMU_FL_PEBS_ALL;
+ 		x86_pmu.get_event_constraints = glp_get_event_constraints;
+@@ -6198,6 +6194,7 @@ __init int intel_pmu_init(void)
+ 		x86_pmu.pebs_aliases = NULL;
+ 		x86_pmu.pebs_prec_dist = true;
+ 		x86_pmu.pebs_block = true;
++		x86_pmu.pebs_capable = ~0ULL;
+ 		x86_pmu.flags |= PMU_FL_HAS_RSP_1;
+ 		x86_pmu.flags |= PMU_FL_NO_HT_SHARING;
+ 		x86_pmu.flags |= PMU_FL_PEBS_ALL;
+@@ -6240,6 +6237,7 @@ __init int intel_pmu_init(void)
+ 		x86_pmu.pebs_aliases = NULL;
+ 		x86_pmu.pebs_prec_dist = true;
+ 		x86_pmu.pebs_block = true;
++		x86_pmu.pebs_capable = ~0ULL;
+ 		x86_pmu.flags |= PMU_FL_HAS_RSP_1;
+ 		x86_pmu.flags |= PMU_FL_NO_HT_SHARING;
+ 		x86_pmu.flags |= PMU_FL_PEBS_ALL;
+diff --git a/arch/x86/events/perf_event.h b/arch/x86/events/perf_event.h
+index 21f84cc6a827..28ca0ada1616 100644
+--- a/arch/x86/events/perf_event.h
++++ b/arch/x86/events/perf_event.h
+@@ -824,6 +824,7 @@ struct x86_pmu {
+ 	void		(*pebs_aliases)(struct perf_event *event);
+ 	unsigned long	large_pebs_flags;
+ 	u64		rtm_abort_event;
++	u64		pebs_capable;
+ 
+ 	/*
+ 	 * Intel LBR
 -- 
 2.33.1
 
