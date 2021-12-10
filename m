@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8ADF1470689
-	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 17:58:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8259347068D
+	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 17:58:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240761AbhLJRBs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Dec 2021 12:01:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35942 "EHLO
+        id S243175AbhLJRBu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Dec 2021 12:01:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241357AbhLJRBr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Dec 2021 12:01:47 -0500
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D5DEC0617A1
-        for <kvm@vger.kernel.org>; Fri, 10 Dec 2021 08:58:12 -0800 (PST)
-Received: by mail-pg1-x54a.google.com with SMTP id i15-20020a63e90f000000b0033a835b882cso556685pgh.13
-        for <kvm@vger.kernel.org>; Fri, 10 Dec 2021 08:58:12 -0800 (PST)
+        with ESMTP id S243073AbhLJRBt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Dec 2021 12:01:49 -0500
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E9B4C0617A1
+        for <kvm@vger.kernel.org>; Fri, 10 Dec 2021 08:58:14 -0800 (PST)
+Received: by mail-pj1-x1049.google.com with SMTP id gf12-20020a17090ac7cc00b001a968c11642so6287717pjb.4
+        for <kvm@vger.kernel.org>; Fri, 10 Dec 2021 08:58:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=soRf/f86tn9EgpDz/Rxh2hqi6M9zCN/IpkFxvnGPCO0=;
-        b=OYPS1qh4ANQgQiAAb+Tmau/RNBCYIbP12Fcrjwkaytv25JIJHVfw6u5BBU0XqmJRNS
-         FYzTYQC60QYgACItEttbP03k45/Hg5O4VGRgQbT3H+2cGYv4HuiNMzA5n3/VUG9fXzJ9
-         bdeLN7YAK1UEqL1GLalbSztmd1e43YXZJRhmjYBzqcmDSTI7USrwECbboBasNUQVM+XX
-         VFwowZRvQ+BooBtqJpw342mWsnpcjlTwVCzdmnX619NSmOcjaEJwu4Qn0bkzAsHFOoWS
-         RrVX6hwMgdoj6/FuczQfuqy2CJM/F9RjhDYvTct5CxXHnpZgz1Ry6ZIw4QaoTwbNQE4c
-         jn4Q==
+        bh=eKQesUFjYD5NfEB4UvQVXF1znz9HszyH0XL6Z4lPT7E=;
+        b=pLZZPADyNN9UJUo/y6m5A586urPxDvD011OjasTyFvpXgxTNPjOdg4iIuHxKiis28b
+         zNXWr9X95dauDgG3SrAnWBEDXRw85qrjzgoryyRAoZs9IDhRNTrUol+9RkTtWpiFZKYd
+         JSRVHeBkx7lA35hOQxSuziYZFqaf5O5VjQYuHex/vmZtI3gnG/mXbW0WXAyEARz2KNSF
+         Di9yci3dLMjlRZO7xrg/io5jI12uK7rcIAT0ZiomJw0mFuwJeYIm1T+BIMJQn3IwxSBL
+         NLVrOVQrkanj5ipPAlHDFA/GrGtvruUASEbJEApUjdtEy2Vw1qvgBKVhh3z+5ssnjgD0
+         Ulhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=soRf/f86tn9EgpDz/Rxh2hqi6M9zCN/IpkFxvnGPCO0=;
-        b=hbx49q9BIO7AOymbodQJ8NtWzIZ0rqotF4FrN2v3Q11EqBPMdR6E18wmjNZTwmoxBw
-         1paSF35B5kqx65NLX3A7uDRApoF33HL6EgTaUbfJ3Kvli3eoh0XWX9fkKPf6KDZ8/Zys
-         fq8R94W2JCvyLR1o6nGcqYMuQOpfOT2yqb8b+XCaMoFsqHEYhpPwymSxrgFQghpqFsvQ
-         o0LCXbN5pZW1yfJTBXLqq8MURrTleaSJv4cLK6/N92XakaV27lEoDPenbcqlsy/IMDIz
-         3eAQHBCZz7FH1x1rma8dhVK05DwfuY2whUTzpWRLRK3ZujquErfpmSEsGQ9wa56liGmJ
-         Y/tQ==
-X-Gm-Message-State: AOAM531BKHu4aD6kuVkx3YJkQGm3SgwMPWYgL3/64keXFjrHN7zk9rPt
-        H38twE1ziQn7t2lM/T45j9u2WO21CTXHpnEzf+OBz/vzqP9Wm+vClINz6bWlADONqCe9DwPWbdc
-        gZO69rNCVu1/swlI3qHUwTKpqI97pXfpaiFqwvi/Cg9ZADPL2wbY1h7oMT9iAnw8=
-X-Google-Smtp-Source: ABdhPJw9DvlA0cqU820KIioRpH7GZNDlOYSdpCWD+JN1yzQboRKYwTmpx0Szg+6dBvUgXi9jLCgclA0G24K0dw==
+        bh=eKQesUFjYD5NfEB4UvQVXF1znz9HszyH0XL6Z4lPT7E=;
+        b=GawL7OVBQ8PFuzQk3I5LfSSapqUUoaLFrnnACBCNMODy2x4uNIhbEDBGVOLuxOcG6N
+         SoYuFDPutshwsWY9CJfDQ+tiJc7b0rSyI3Lxmh68uHo6W+iCYoqxwPJY6HJkNG0jfbsl
+         F+pB4zCHv5sOLyE4ycLx+ZSLbm3S6d9ZBlXEVNMykpujc+m2lmof81KYCb/BoceVnCrA
+         Yb54+mXn/4dphMs5ALS9mNTeJ+LN+O9UOAcT+yVqGKeP2lRNtKmuP/OivUXR6piQ01NM
+         z0J8ZPJum9R1TKsun6S9bELTNLVnlipifsAHSf2rsCCGPW34nhRh2zARHIys2f+blNpF
+         yQig==
+X-Gm-Message-State: AOAM531ETFXrfwOrvh5R0k14e0xDXlGo+ZjUiNYhK4d6piXgzE29tNhP
+        Gg+B/b6M32G2Ab3q+NvJ3KEnnjz1a4vqWh1wcBuM3bNJYfYIKpEtKkPGWONBFPDnqYQnsmJUBMW
+        Ksc4e9molBTZ8D2VwWpU+RnL6YAVOk7Nkpv6woBkOLcICmwHx6sGYfYKWLqo31X8=
+X-Google-Smtp-Source: ABdhPJxrlb29OM6chmNq04VCtKjTZI3T5q3zrOTqQXOnHJ5M/LwUa4Repgd6cICtUvBgVw2HN6RYjaaTq9xQ5g==
 X-Received: from ricarkol2.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a62:798e:0:b0:4a7:89cf:8526 with SMTP id
- u136-20020a62798e000000b004a789cf8526mr19011939pfc.10.1639155491469; Fri, 10
- Dec 2021 08:58:11 -0800 (PST)
-Date:   Fri, 10 Dec 2021 08:58:03 -0800
+ (user=ricarkol job=sendgmr) by 2002:a17:90b:4c4b:: with SMTP id
+ np11mr25621615pjb.233.1639155493365; Fri, 10 Dec 2021 08:58:13 -0800 (PST)
+Date:   Fri, 10 Dec 2021 08:58:04 -0800
 In-Reply-To: <20211210165804.1623253-1-ricarkol@google.com>
-Message-Id: <20211210165804.1623253-3-ricarkol@google.com>
+Message-Id: <20211210165804.1623253-4-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20211210165804.1623253-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.34.1.173.g76aa8bc2d0-goog
-Subject: [kvm-unit-tests PATCH 2/3] arm64: debug: add a migration test for
- watchpoint state
+Subject: [kvm-unit-tests PATCH 3/3] arm64: debug: add a migration test for
+ single-step state
 From:   Ricardo Koller <ricarkol@google.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc:     drjones@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
@@ -65,268 +64,122 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Test the migration of watchpoint state. Program as many watchpoints as
-possible, migrate, and check that we get the corresponding exceptions.
+Test the migration of single-step state. Setup single-stepping, migrate,
+and check that we are actually single-stepping.
 
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- arm/debug.c       | 164 ++++++++++++++++++++++++++++++++++++++++++++++
- arm/unittests.cfg |  12 ++++
- 2 files changed, 176 insertions(+)
+ arm/debug.c       | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+ arm/unittests.cfg | 12 ++++++++++++
+ 2 files changed, 59 insertions(+)
 
 diff --git a/arm/debug.c b/arm/debug.c
-index fedf4ab..b2240d7 100644
+index b2240d7..54f059d 100644
 --- a/arm/debug.c
 +++ b/arm/debug.c
-@@ -9,20 +9,31 @@
+@@ -23,8 +23,10 @@
+ #define DBGWCR_E		(0x1 << 0)
  
- #define MDSCR_KDE		(1 << 13)
- #define MDSCR_MDE		(1 << 15)
-+#define MDSCR_SS		(1 << 0)
- 
- #define DBGBCR_LEN8		(0xff << 5)
- #define DBGBCR_EXEC		(0x0 << 3)
- #define DBGBCR_EL1		(0x1 << 1)
- #define DBGBCR_E		(0x1 << 0)
- 
-+#define DBGWCR_LEN8		(0xff << 5)
-+#define DBGWCR_RD		(0x1 << 3)
-+#define DBGWCR_WR		(0x2 << 3)
-+#define DBGWCR_EL1		(0x1 << 1)
-+#define DBGWCR_E		(0x1 << 0)
-+
  #define SPSR_D			(1 << 9)
++#define SPSR_SS			(1 << 21)
  
  #define ESR_EC_HW_BP_CURRENT    0x31
-+#define ESR_EC_WP_CURRENT       0x35
++#define ESR_EC_SSTEP_CURRENT    0x33
+ #define ESR_EC_WP_CURRENT       0x35
  
  #define ID_AA64DFR0_BRPS_SHIFT	12
- #define ID_AA64DFR0_BRPS_MASK	0xf
-+#define ID_AA64DFR0_WRPS_SHIFT	20
-+#define ID_AA64DFR0_WRPS_MASK	0xf
+@@ -34,6 +36,7 @@
  
  static volatile uint64_t hw_bp_idx, hw_bp_addr[16];
-+static volatile uint64_t wp_idx, wp_data_addr[16];
+ static volatile uint64_t wp_idx, wp_data_addr[16];
++static volatile uint64_t ss_addr[4], ss_idx;
  
  static void hw_bp_handler(struct pt_regs *regs, unsigned int esr)
  {
-@@ -30,6 +41,12 @@ static void hw_bp_handler(struct pt_regs *regs, unsigned int esr)
+@@ -47,6 +50,12 @@ static void wp_handler(struct pt_regs *regs, unsigned int esr)
  	regs->pstate |= SPSR_D;
  }
  
-+static void wp_handler(struct pt_regs *regs, unsigned int esr)
++static void ss_handler(struct pt_regs *regs, unsigned int esr)
 +{
-+	wp_data_addr[wp_idx++] = read_sysreg(far_el1);
-+	regs->pstate |= SPSR_D;
++	ss_addr[ss_idx++] = regs->pc;
++	regs->pstate |= SPSR_SS;
 +}
 +
  static int get_num_hw_bp(void)
  {
  	uint64_t reg = read_sysreg(id_aa64dfr0_el1);
-@@ -39,6 +56,15 @@ static int get_num_hw_bp(void)
- 	return brps + 1;
- }
- 
-+static int get_num_wp(void)
-+{
-+	uint64_t reg = read_sysreg(id_aa64dfr0_el1);
-+	/* Number of watchpoints, minus 1 */
-+	uint8_t wrps = (reg >> ID_AA64DFR0_WRPS_SHIFT) & ID_AA64DFR0_WRPS_MASK;
-+
-+	return wrps + 1;
-+}
-+
- static void write_dbgbcr(int n, uint32_t bcr)
- {
- 	switch (n) {
-@@ -119,9 +145,90 @@ static void write_dbgbvr(int n, uint64_t bvr)
+@@ -344,6 +353,36 @@ static void test_wp(bool migrate)
  	}
  }
  
-+static void write_dbgwcr(int n, uint32_t wcr)
++static void test_ss(bool migrate)
 +{
-+	switch (n) {
-+	case 0:
-+		write_sysreg(wcr, dbgwcr0_el1); break;
-+	case 1:
-+		write_sysreg(wcr, dbgwcr1_el1); break;
-+	case 2:
-+		write_sysreg(wcr, dbgwcr2_el1); break;
-+	case 3:
-+		write_sysreg(wcr, dbgwcr3_el1); break;
-+	case 4:
-+		write_sysreg(wcr, dbgwcr4_el1); break;
-+	case 5:
-+		write_sysreg(wcr, dbgwcr5_el1); break;
-+	case 6:
-+		write_sysreg(wcr, dbgwcr6_el1); break;
-+	case 7:
-+		write_sysreg(wcr, dbgwcr7_el1); break;
-+	case 8:
-+		write_sysreg(wcr, dbgwcr8_el1); break;
-+	case 9:
-+		write_sysreg(wcr, dbgwcr9_el1); break;
-+	case 10:
-+		write_sysreg(wcr, dbgwcr10_el1); break;
-+	case 11:
-+		write_sysreg(wcr, dbgwcr11_el1); break;
-+	case 12:
-+		write_sysreg(wcr, dbgwcr12_el1); break;
-+	case 13:
-+		write_sysreg(wcr, dbgwcr13_el1); break;
-+	case 14:
-+		write_sysreg(wcr, dbgwcr14_el1); break;
-+	case 15:
-+		write_sysreg(wcr, dbgwcr15_el1); break;
-+	default:
-+		report_abort("Invalid wcr");
-+	}
-+}
-+
-+static void write_dbgwvr(int n, uint64_t wvr)
-+{
-+	switch (n) {
-+	case 0:
-+		write_sysreg(wvr, dbgwvr0_el1); break;
-+	case 1:
-+		write_sysreg(wvr, dbgwvr1_el1); break;
-+	case 2:
-+		write_sysreg(wvr, dbgwvr2_el1); break;
-+	case 3:
-+		write_sysreg(wvr, dbgwvr3_el1); break;
-+	case 4:
-+		write_sysreg(wvr, dbgwvr4_el1); break;
-+	case 5:
-+		write_sysreg(wvr, dbgwvr5_el1); break;
-+	case 6:
-+		write_sysreg(wvr, dbgwvr6_el1); break;
-+	case 7:
-+		write_sysreg(wvr, dbgwvr7_el1); break;
-+	case 8:
-+		write_sysreg(wvr, dbgwvr8_el1); break;
-+	case 9:
-+		write_sysreg(wvr, dbgwvr9_el1); break;
-+	case 10:
-+		write_sysreg(wvr, dbgwvr10_el1); break;
-+	case 11:
-+		write_sysreg(wvr, dbgwvr11_el1); break;
-+	case 12:
-+		write_sysreg(wvr, dbgwvr12_el1); break;
-+	case 13:
-+		write_sysreg(wvr, dbgwvr13_el1); break;
-+	case 14:
-+		write_sysreg(wvr, dbgwvr14_el1); break;
-+	case 15:
-+		write_sysreg(wvr, dbgwvr15_el1); break;
-+	default:
-+		report_abort("invalid wvr");
-+	}
-+}
-+
- static void reset_debug_state(void)
- {
- 	int i, num_bp = get_num_hw_bp();
-+	int num_wp = get_num_wp();
- 
- 	asm volatile("msr daifset, #8");
- 
-@@ -134,6 +241,10 @@ static void reset_debug_state(void)
- 		write_dbgbvr(i, 0);
- 		write_dbgbcr(i, 0);
- 	}
-+	for (i = 0; i < num_wp; i++) {
-+		write_dbgwvr(i, 0);
-+		write_dbgwcr(i, 0);
-+	}
- 	isb();
- }
- 
-@@ -188,6 +299,51 @@ static void test_hw_bp(bool migrate)
- 		report(hw_bp_addr[i] == addr, "hw breakpoint: %d", i);
- }
- 
-+static volatile char write_data[16];
-+
-+static void test_wp(bool migrate)
-+{
-+	uint32_t wcr;
++	extern unsigned char ss_start;
 +	uint32_t mdscr;
-+	int num_wp = get_num_wp();
-+	int i;
 +
-+	install_exception_handler(EL1H_SYNC, ESR_EC_WP_CURRENT, wp_handler);
++	install_exception_handler(EL1H_SYNC, ESR_EC_SSTEP_CURRENT, ss_handler);
 +
 +	reset_debug_state();
 +
-+	wcr = DBGWCR_LEN8 | DBGWCR_RD | DBGWCR_WR | DBGWCR_EL1 | DBGWCR_E;
-+	for (i = 0; i < num_wp; i++) {
-+		write_dbgwcr(i, wcr);
-+		write_dbgwvr(i, (uint64_t)&write_data[i]);
-+	}
-+	isb();
++	ss_idx = 0;
 +
-+	asm volatile("msr daifclr, #8");
-+
-+	mdscr = read_sysreg(mdscr_el1) | MDSCR_KDE | MDSCR_MDE;
++	mdscr = read_sysreg(mdscr_el1) | MDSCR_KDE | MDSCR_SS;
 +	write_sysreg(mdscr, mdscr_el1);
 +	isb();
 +
 +	if (migrate) {
 +		do_migrate();
-+		report(num_wp == get_num_wp(), "wrps match after migrate");
 +	}
 +
-+	wp_idx = 0;
++	asm volatile("msr daifclr, #8");
 +
-+	for (i = 0; i < num_wp; i++) {
-+		write_data[i] = i;
-+		asm volatile("msr daifclr, #8");
-+	}
++	asm volatile("ss_start:\n"
++			"mrs x0, esr_el1\n"
++			"add x0, x0, #1\n"
++			"msr daifset, #8\n"
++			: : : "x0");
 +
-+	for (i = 0; i < num_wp; i++) {
-+		report(wp_data_addr[i] == (uint64_t)&write_data[i],
-+			"watchpoint received: %d", i);
-+		report(write_data[i] == i, "watchpoint data: %d", i);
-+	}
++	report(ss_addr[0] == (uint64_t)&ss_start, "single step");
 +}
 +
  int main(int argc, char **argv)
  {
  	if (argc < 2)
-@@ -201,6 +357,14 @@ int main(int argc, char **argv)
+@@ -365,6 +404,14 @@ int main(int argc, char **argv)
  		report_prefix_push(argv[1]);
- 		test_hw_bp(true);
+ 		test_wp(true);
  		report_prefix_pop();
-+	} else if (strcmp(argv[1], "wp") == 0) {
++	} else if (strcmp(argv[1], "ss") == 0) {
 +		report_prefix_push(argv[1]);
-+		test_wp(false);
++		test_ss(false);
 +		report_prefix_pop();
-+	} else if (strcmp(argv[1], "wp-migration") == 0) {
++	} else if (strcmp(argv[1], "ss-migration") == 0) {
 +		report_prefix_push(argv[1]);
-+		test_wp(true);
++		test_ss(true);
 +		report_prefix_pop();
  	} else {
  		report_abort("Unknown subtest '%s'", argv[1]);
  	}
 diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index 896ff87..bca2fad 100644
+index bca2fad..c8c51d2 100644
 --- a/arm/unittests.cfg
 +++ b/arm/unittests.cfg
-@@ -254,3 +254,15 @@ file = debug.flat
+@@ -266,3 +266,15 @@ file = debug.flat
  arch = arm64
- extra_params = -append 'bp-migration'
+ extra_params = -append 'wp-migration'
  groups = debug migration
 +
-+[debug-wp]
++[debug-sstep]
 +file = debug.flat
 +arch = arm64
-+extra_params = -append 'wp'
++extra_params = -append 'ss'
 +groups = debug
 +
-+[debug-wp-migration]
++[debug-sstep-migration]
 +file = debug.flat
 +arch = arm64
-+extra_params = -append 'wp-migration'
++extra_params = -append 'ss-migration'
 +groups = debug migration
 -- 
 2.34.1.173.g76aa8bc2d0-goog
