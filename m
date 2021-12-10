@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A9729470687
-	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 17:58:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8ADF1470689
+	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 17:58:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241198AbhLJRBq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Dec 2021 12:01:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35932 "EHLO
+        id S240761AbhLJRBs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Dec 2021 12:01:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240761AbhLJRBp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Dec 2021 12:01:45 -0500
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66F10C061746
-        for <kvm@vger.kernel.org>; Fri, 10 Dec 2021 08:58:10 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id m20-20020a17090aab1400b001ad6e2148ccso5223026pjq.1
-        for <kvm@vger.kernel.org>; Fri, 10 Dec 2021 08:58:10 -0800 (PST)
+        with ESMTP id S241357AbhLJRBr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Dec 2021 12:01:47 -0500
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D5DEC0617A1
+        for <kvm@vger.kernel.org>; Fri, 10 Dec 2021 08:58:12 -0800 (PST)
+Received: by mail-pg1-x54a.google.com with SMTP id i15-20020a63e90f000000b0033a835b882cso556685pgh.13
+        for <kvm@vger.kernel.org>; Fri, 10 Dec 2021 08:58:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=LZscy7U5ALfD1frMqggail4BJIPnE2PJTdnWpLXa2lE=;
-        b=CNkTVZU3LmW/KWRri1WJ75uAagDZAHpc8l3vgZWAb/hV2Rq5RPv06ZFdGb62Arr1/n
-         4NaEfwOq/zNDBOkqQEpXAg8rm7QMFLXsDJuHefdcWA59BRjJFR53btYm2FlsVXlIv6Qc
-         Q/1vOy0IT9lke/lvbpyPq7Nu9sb+v/bXqlDT5K24PS/usYboNyr+urLM5OFCRZT8WgzW
-         d5z2D3pCNVQ8IsRC9Hv0Bte0k1mokiHlLsJ+AJdHosbFdr06xQX4E6WaShlqWJjiab0p
-         Z7ZssV5VHyY1boAT9f78kErgcqxs0bbpO6gAh+XucdBqVPP2fmi9CROmMkP2yQo5Nnnh
-         x8bQ==
+        bh=soRf/f86tn9EgpDz/Rxh2hqi6M9zCN/IpkFxvnGPCO0=;
+        b=OYPS1qh4ANQgQiAAb+Tmau/RNBCYIbP12Fcrjwkaytv25JIJHVfw6u5BBU0XqmJRNS
+         FYzTYQC60QYgACItEttbP03k45/Hg5O4VGRgQbT3H+2cGYv4HuiNMzA5n3/VUG9fXzJ9
+         bdeLN7YAK1UEqL1GLalbSztmd1e43YXZJRhmjYBzqcmDSTI7USrwECbboBasNUQVM+XX
+         VFwowZRvQ+BooBtqJpw342mWsnpcjlTwVCzdmnX619NSmOcjaEJwu4Qn0bkzAsHFOoWS
+         RrVX6hwMgdoj6/FuczQfuqy2CJM/F9RjhDYvTct5CxXHnpZgz1Ry6ZIw4QaoTwbNQE4c
+         jn4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=LZscy7U5ALfD1frMqggail4BJIPnE2PJTdnWpLXa2lE=;
-        b=CBTkWc/b5Ae2tvX8DtkBA74BVX++Q2JBsUtVZUXrXFs9tPx98UZOnkpz9oeBU9xoO3
-         zJYjyaKBBBUazyLMjv+SQZCscMLFfqyrq6/2FrhtILYuy1JMEELdsrP1+VZuF530JUAx
-         +9Z525jV82j7gGe6AucaxUn8eowIlmkbexpoARvkZEHtwMXGeHzYsYzydNEhQBCB5faJ
-         9P7i8WHqFmXHSkzuY902W6sBxRz9U2NSTrfPfVqGSM2RGi7NiHwo9XjZCqbp26oZtSAx
-         MRi4Pf0WX8h9qXPrtjm9XEq77Ki3jtvjsXMK2EagSWdzOH3gFJ5nWipwn9hzPdLsZmX/
-         ECgA==
-X-Gm-Message-State: AOAM531NDG2QPgb2smDV+mP8qmHO14VPdL7HWJrwbcydWgaEgFz26SOc
-        c1726i5m4GYahFe4Gt1VXla7DxQc5Am1qLmxqA5gbosvcY37pBVfEzivQGnnX1IwI+8hVFPpqss
-        GcRG0l95uM0aRgsBx4S9ydLagaCmQ0gQi5NieJ2V3NNIBoWz+SU3rvy/e0N/Vjzc=
-X-Google-Smtp-Source: ABdhPJzxiCvCCA3XBnLd+t5as/ENSdXbNnNht3YNFEzu+8LRgj11KF9OaX8kOm290lw6r7aP3p0aUZAQ+tEXpQ==
+        bh=soRf/f86tn9EgpDz/Rxh2hqi6M9zCN/IpkFxvnGPCO0=;
+        b=hbx49q9BIO7AOymbodQJ8NtWzIZ0rqotF4FrN2v3Q11EqBPMdR6E18wmjNZTwmoxBw
+         1paSF35B5kqx65NLX3A7uDRApoF33HL6EgTaUbfJ3Kvli3eoh0XWX9fkKPf6KDZ8/Zys
+         fq8R94W2JCvyLR1o6nGcqYMuQOpfOT2yqb8b+XCaMoFsqHEYhpPwymSxrgFQghpqFsvQ
+         o0LCXbN5pZW1yfJTBXLqq8MURrTleaSJv4cLK6/N92XakaV27lEoDPenbcqlsy/IMDIz
+         3eAQHBCZz7FH1x1rma8dhVK05DwfuY2whUTzpWRLRK3ZujquErfpmSEsGQ9wa56liGmJ
+         Y/tQ==
+X-Gm-Message-State: AOAM531BKHu4aD6kuVkx3YJkQGm3SgwMPWYgL3/64keXFjrHN7zk9rPt
+        H38twE1ziQn7t2lM/T45j9u2WO21CTXHpnEzf+OBz/vzqP9Wm+vClINz6bWlADONqCe9DwPWbdc
+        gZO69rNCVu1/swlI3qHUwTKpqI97pXfpaiFqwvi/Cg9ZADPL2wbY1h7oMT9iAnw8=
+X-Google-Smtp-Source: ABdhPJw9DvlA0cqU820KIioRpH7GZNDlOYSdpCWD+JN1yzQboRKYwTmpx0Szg+6dBvUgXi9jLCgclA0G24K0dw==
 X-Received: from ricarkol2.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:62fe])
- (user=ricarkol job=sendgmr) by 2002:a17:902:8f97:b0:143:88c2:e2d5 with SMTP
- id z23-20020a1709028f9700b0014388c2e2d5mr77191442plo.70.1639155489691; Fri,
- 10 Dec 2021 08:58:09 -0800 (PST)
-Date:   Fri, 10 Dec 2021 08:58:02 -0800
+ (user=ricarkol job=sendgmr) by 2002:a62:798e:0:b0:4a7:89cf:8526 with SMTP id
+ u136-20020a62798e000000b004a789cf8526mr19011939pfc.10.1639155491469; Fri, 10
+ Dec 2021 08:58:11 -0800 (PST)
+Date:   Fri, 10 Dec 2021 08:58:03 -0800
 In-Reply-To: <20211210165804.1623253-1-ricarkol@google.com>
-Message-Id: <20211210165804.1623253-2-ricarkol@google.com>
+Message-Id: <20211210165804.1623253-3-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20211210165804.1623253-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.34.1.173.g76aa8bc2d0-goog
-Subject: [kvm-unit-tests PATCH 1/3] arm64: debug: add a migration test for
- breakpoint state
+Subject: [kvm-unit-tests PATCH 2/3] arm64: debug: add a migration test for
+ watchpoint state
 From:   Ricardo Koller <ricarkol@google.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 Cc:     drjones@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
@@ -65,198 +65,203 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Test the migration of breakpoint state. Program as many breakpoitns as
+Test the migration of watchpoint state. Program as many watchpoints as
 possible, migrate, and check that we get the corresponding exceptions.
 
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- arm/Makefile.arm64 |   1 +
- arm/debug.c        | 209 +++++++++++++++++++++++++++++++++++++++++++++
- arm/unittests.cfg  |  13 +++
- 3 files changed, 223 insertions(+)
- create mode 100644 arm/debug.c
+ arm/debug.c       | 164 ++++++++++++++++++++++++++++++++++++++++++++++
+ arm/unittests.cfg |  12 ++++
+ 2 files changed, 176 insertions(+)
 
-diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-index e8a38d7..6feac76 100644
---- a/arm/Makefile.arm64
-+++ b/arm/Makefile.arm64
-@@ -31,6 +31,7 @@ OBJDIRS += lib/arm64
- tests = $(TEST_DIR)/timer.flat
- tests += $(TEST_DIR)/micro-bench.flat
- tests += $(TEST_DIR)/cache.flat
-+tests += $(TEST_DIR)/debug.flat
- 
- include $(SRCDIR)/$(TEST_DIR)/Makefile.common
- 
 diff --git a/arm/debug.c b/arm/debug.c
-new file mode 100644
-index 0000000..fedf4ab
---- /dev/null
+index fedf4ab..b2240d7 100644
+--- a/arm/debug.c
 +++ b/arm/debug.c
-@@ -0,0 +1,209 @@
-+#include <libcflat.h>
-+#include <errata.h>
-+#include <asm/setup.h>
-+#include <asm/processor.h>
-+#include <asm/delay.h>
-+#include <asm/smp.h>
-+#include <asm/barrier.h>
-+#include <asm/io.h>
+@@ -9,20 +9,31 @@
+ 
+ #define MDSCR_KDE		(1 << 13)
+ #define MDSCR_MDE		(1 << 15)
++#define MDSCR_SS		(1 << 0)
+ 
+ #define DBGBCR_LEN8		(0xff << 5)
+ #define DBGBCR_EXEC		(0x0 << 3)
+ #define DBGBCR_EL1		(0x1 << 1)
+ #define DBGBCR_E		(0x1 << 0)
+ 
++#define DBGWCR_LEN8		(0xff << 5)
++#define DBGWCR_RD		(0x1 << 3)
++#define DBGWCR_WR		(0x2 << 3)
++#define DBGWCR_EL1		(0x1 << 1)
++#define DBGWCR_E		(0x1 << 0)
 +
-+#define MDSCR_KDE		(1 << 13)
-+#define MDSCR_MDE		(1 << 15)
-+
-+#define DBGBCR_LEN8		(0xff << 5)
-+#define DBGBCR_EXEC		(0x0 << 3)
-+#define DBGBCR_EL1		(0x1 << 1)
-+#define DBGBCR_E		(0x1 << 0)
-+
-+#define SPSR_D			(1 << 9)
-+
-+#define ESR_EC_HW_BP_CURRENT    0x31
-+
-+#define ID_AA64DFR0_BRPS_SHIFT	12
-+#define ID_AA64DFR0_BRPS_MASK	0xf
-+
-+static volatile uint64_t hw_bp_idx, hw_bp_addr[16];
-+
-+static void hw_bp_handler(struct pt_regs *regs, unsigned int esr)
+ #define SPSR_D			(1 << 9)
+ 
+ #define ESR_EC_HW_BP_CURRENT    0x31
++#define ESR_EC_WP_CURRENT       0x35
+ 
+ #define ID_AA64DFR0_BRPS_SHIFT	12
+ #define ID_AA64DFR0_BRPS_MASK	0xf
++#define ID_AA64DFR0_WRPS_SHIFT	20
++#define ID_AA64DFR0_WRPS_MASK	0xf
+ 
+ static volatile uint64_t hw_bp_idx, hw_bp_addr[16];
++static volatile uint64_t wp_idx, wp_data_addr[16];
+ 
+ static void hw_bp_handler(struct pt_regs *regs, unsigned int esr)
+ {
+@@ -30,6 +41,12 @@ static void hw_bp_handler(struct pt_regs *regs, unsigned int esr)
+ 	regs->pstate |= SPSR_D;
+ }
+ 
++static void wp_handler(struct pt_regs *regs, unsigned int esr)
 +{
-+	hw_bp_addr[hw_bp_idx++] = regs->pc;
++	wp_data_addr[wp_idx++] = read_sysreg(far_el1);
 +	regs->pstate |= SPSR_D;
 +}
 +
-+static int get_num_hw_bp(void)
+ static int get_num_hw_bp(void)
+ {
+ 	uint64_t reg = read_sysreg(id_aa64dfr0_el1);
+@@ -39,6 +56,15 @@ static int get_num_hw_bp(void)
+ 	return brps + 1;
+ }
+ 
++static int get_num_wp(void)
 +{
 +	uint64_t reg = read_sysreg(id_aa64dfr0_el1);
-+	/* Number of breakpoints, minus 1 */
-+	uint8_t brps = (reg >> ID_AA64DFR0_BRPS_SHIFT) & ID_AA64DFR0_BRPS_MASK;
++	/* Number of watchpoints, minus 1 */
++	uint8_t wrps = (reg >> ID_AA64DFR0_WRPS_SHIFT) & ID_AA64DFR0_WRPS_MASK;
 +
-+	return brps + 1;
++	return wrps + 1;
 +}
 +
-+static void write_dbgbcr(int n, uint32_t bcr)
+ static void write_dbgbcr(int n, uint32_t bcr)
+ {
+ 	switch (n) {
+@@ -119,9 +145,90 @@ static void write_dbgbvr(int n, uint64_t bvr)
+ 	}
+ }
+ 
++static void write_dbgwcr(int n, uint32_t wcr)
 +{
 +	switch (n) {
 +	case 0:
-+		write_sysreg(bcr, dbgbcr0_el1); break;
++		write_sysreg(wcr, dbgwcr0_el1); break;
 +	case 1:
-+		write_sysreg(bcr, dbgbcr1_el1); break;
++		write_sysreg(wcr, dbgwcr1_el1); break;
 +	case 2:
-+		write_sysreg(bcr, dbgbcr2_el1); break;
++		write_sysreg(wcr, dbgwcr2_el1); break;
 +	case 3:
-+		write_sysreg(bcr, dbgbcr3_el1); break;
++		write_sysreg(wcr, dbgwcr3_el1); break;
 +	case 4:
-+		write_sysreg(bcr, dbgbcr4_el1); break;
++		write_sysreg(wcr, dbgwcr4_el1); break;
 +	case 5:
-+		write_sysreg(bcr, dbgbcr5_el1); break;
++		write_sysreg(wcr, dbgwcr5_el1); break;
 +	case 6:
-+		write_sysreg(bcr, dbgbcr6_el1); break;
++		write_sysreg(wcr, dbgwcr6_el1); break;
 +	case 7:
-+		write_sysreg(bcr, dbgbcr7_el1); break;
++		write_sysreg(wcr, dbgwcr7_el1); break;
 +	case 8:
-+		write_sysreg(bcr, dbgbcr8_el1); break;
++		write_sysreg(wcr, dbgwcr8_el1); break;
 +	case 9:
-+		write_sysreg(bcr, dbgbcr9_el1); break;
++		write_sysreg(wcr, dbgwcr9_el1); break;
 +	case 10:
-+		write_sysreg(bcr, dbgbcr10_el1); break;
++		write_sysreg(wcr, dbgwcr10_el1); break;
 +	case 11:
-+		write_sysreg(bcr, dbgbcr11_el1); break;
++		write_sysreg(wcr, dbgwcr11_el1); break;
 +	case 12:
-+		write_sysreg(bcr, dbgbcr12_el1); break;
++		write_sysreg(wcr, dbgwcr12_el1); break;
 +	case 13:
-+		write_sysreg(bcr, dbgbcr13_el1); break;
++		write_sysreg(wcr, dbgwcr13_el1); break;
 +	case 14:
-+		write_sysreg(bcr, dbgbcr14_el1); break;
++		write_sysreg(wcr, dbgwcr14_el1); break;
 +	case 15:
-+		write_sysreg(bcr, dbgbcr15_el1); break;
++		write_sysreg(wcr, dbgwcr15_el1); break;
 +	default:
-+		report_abort("Invalid bcr");
++		report_abort("Invalid wcr");
 +	}
 +}
 +
-+static void write_dbgbvr(int n, uint64_t bvr)
++static void write_dbgwvr(int n, uint64_t wvr)
 +{
 +	switch (n) {
 +	case 0:
-+		write_sysreg(bvr, dbgbvr0_el1); break;
++		write_sysreg(wvr, dbgwvr0_el1); break;
 +	case 1:
-+		write_sysreg(bvr, dbgbvr1_el1); break;
++		write_sysreg(wvr, dbgwvr1_el1); break;
 +	case 2:
-+		write_sysreg(bvr, dbgbvr2_el1); break;
++		write_sysreg(wvr, dbgwvr2_el1); break;
 +	case 3:
-+		write_sysreg(bvr, dbgbvr3_el1); break;
++		write_sysreg(wvr, dbgwvr3_el1); break;
 +	case 4:
-+		write_sysreg(bvr, dbgbvr4_el1); break;
++		write_sysreg(wvr, dbgwvr4_el1); break;
 +	case 5:
-+		write_sysreg(bvr, dbgbvr5_el1); break;
++		write_sysreg(wvr, dbgwvr5_el1); break;
 +	case 6:
-+		write_sysreg(bvr, dbgbvr6_el1); break;
++		write_sysreg(wvr, dbgwvr6_el1); break;
 +	case 7:
-+		write_sysreg(bvr, dbgbvr7_el1); break;
++		write_sysreg(wvr, dbgwvr7_el1); break;
 +	case 8:
-+		write_sysreg(bvr, dbgbvr8_el1); break;
++		write_sysreg(wvr, dbgwvr8_el1); break;
 +	case 9:
-+		write_sysreg(bvr, dbgbvr9_el1); break;
++		write_sysreg(wvr, dbgwvr9_el1); break;
 +	case 10:
-+		write_sysreg(bvr, dbgbvr10_el1); break;
++		write_sysreg(wvr, dbgwvr10_el1); break;
 +	case 11:
-+		write_sysreg(bvr, dbgbvr11_el1); break;
++		write_sysreg(wvr, dbgwvr11_el1); break;
 +	case 12:
-+		write_sysreg(bvr, dbgbvr12_el1); break;
++		write_sysreg(wvr, dbgwvr12_el1); break;
 +	case 13:
-+		write_sysreg(bvr, dbgbvr13_el1); break;
++		write_sysreg(wvr, dbgwvr13_el1); break;
 +	case 14:
-+		write_sysreg(bvr, dbgbvr14_el1); break;
++		write_sysreg(wvr, dbgwvr14_el1); break;
 +	case 15:
-+		write_sysreg(bvr, dbgbvr15_el1); break;
++		write_sysreg(wvr, dbgwvr15_el1); break;
 +	default:
-+		report_abort("invalid bvr");
++		report_abort("invalid wvr");
 +	}
 +}
 +
-+static void reset_debug_state(void)
-+{
-+	int i, num_bp = get_num_hw_bp();
-+
-+	asm volatile("msr daifset, #8");
-+
-+	write_sysreg(0, osdlr_el1);
-+	write_sysreg(0, oslar_el1);
-+	isb();
-+
-+	write_sysreg(0, mdscr_el1);
-+	for (i = 0; i < num_bp; i++) {
-+		write_dbgbvr(i, 0);
-+		write_dbgbcr(i, 0);
+ static void reset_debug_state(void)
+ {
+ 	int i, num_bp = get_num_hw_bp();
++	int num_wp = get_num_wp();
+ 
+ 	asm volatile("msr daifset, #8");
+ 
+@@ -134,6 +241,10 @@ static void reset_debug_state(void)
+ 		write_dbgbvr(i, 0);
+ 		write_dbgbcr(i, 0);
+ 	}
++	for (i = 0; i < num_wp; i++) {
++		write_dbgwvr(i, 0);
++		write_dbgwcr(i, 0);
 +	}
-+	isb();
-+}
+ 	isb();
+ }
+ 
+@@ -188,6 +299,51 @@ static void test_hw_bp(bool migrate)
+ 		report(hw_bp_addr[i] == addr, "hw breakpoint: %d", i);
+ }
+ 
++static volatile char write_data[16];
 +
-+static void do_migrate(void)
++static void test_wp(bool migrate)
 +{
-+	puts("Now migrate the VM, then press a key to continue...\n");
-+	(void)getchar();
-+	report_info("Migration complete");
-+}
-+
-+static void test_hw_bp(bool migrate)
-+{
-+	extern unsigned char hw_bp0;
-+	uint32_t bcr;
++	uint32_t wcr;
 +	uint32_t mdscr;
-+	uint64_t addr;
-+	int num_bp = get_num_hw_bp();
++	int num_wp = get_num_wp();
 +	int i;
 +
-+	install_exception_handler(EL1H_SYNC, ESR_EC_HW_BP_CURRENT, hw_bp_handler);
++	install_exception_handler(EL1H_SYNC, ESR_EC_WP_CURRENT, wp_handler);
 +
 +	reset_debug_state();
 +
-+	bcr = DBGBCR_LEN8 | DBGBCR_EXEC | DBGBCR_EL1 | DBGBCR_E;
-+	for (i = 0, addr = (uint64_t)&hw_bp0; i < num_bp; i++, addr += 4) {
-+		write_dbgbcr(i, bcr);
-+		write_dbgbvr(i, addr);
++	wcr = DBGWCR_LEN8 | DBGWCR_RD | DBGWCR_WR | DBGWCR_EL1 | DBGWCR_E;
++	for (i = 0; i < num_wp; i++) {
++		write_dbgwcr(i, wcr);
++		write_dbgwvr(i, (uint64_t)&write_data[i]);
 +	}
 +	isb();
 +
@@ -268,61 +273,60 @@ index 0000000..fedf4ab
 +
 +	if (migrate) {
 +		do_migrate();
-+		report(num_bp == get_num_hw_bp(), "brps match after migrate");
++		report(num_wp == get_num_wp(), "wrps match after migrate");
 +	}
 +
-+	hw_bp_idx = 0;
++	wp_idx = 0;
 +
-+	/* Trap on up to 16 debug exception unmask instructions. */
-+	asm volatile("hw_bp0:\n"
-+	     "msr daifclr, #8; msr daifclr, #8; msr daifclr, #8; msr daifclr, #8\n"
-+	     "msr daifclr, #8; msr daifclr, #8; msr daifclr, #8; msr daifclr, #8\n"
-+	     "msr daifclr, #8; msr daifclr, #8; msr daifclr, #8; msr daifclr, #8\n"
-+	     "msr daifclr, #8; msr daifclr, #8; msr daifclr, #8; msr daifclr, #8\n");
-+
-+	for (i = 0, addr = (uint64_t)&hw_bp0; i < num_bp; i++, addr += 4)
-+		report(hw_bp_addr[i] == addr, "hw breakpoint: %d", i);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	if (argc < 2)
-+		report_abort("no test specified");
-+
-+	if (strcmp(argv[1], "bp") == 0) {
-+		report_prefix_push(argv[1]);
-+		test_hw_bp(false);
-+		report_prefix_pop();
-+	} else if (strcmp(argv[1], "bp-migration") == 0) {
-+		report_prefix_push(argv[1]);
-+		test_hw_bp(true);
-+		report_prefix_pop();
-+	} else {
-+		report_abort("Unknown subtest '%s'", argv[1]);
++	for (i = 0; i < num_wp; i++) {
++		write_data[i] = i;
++		asm volatile("msr daifclr, #8");
 +	}
 +
-+	return report_summary();
++	for (i = 0; i < num_wp; i++) {
++		report(wp_data_addr[i] == (uint64_t)&write_data[i],
++			"watchpoint received: %d", i);
++		report(write_data[i] == i, "watchpoint data: %d", i);
++	}
 +}
++
+ int main(int argc, char **argv)
+ {
+ 	if (argc < 2)
+@@ -201,6 +357,14 @@ int main(int argc, char **argv)
+ 		report_prefix_push(argv[1]);
+ 		test_hw_bp(true);
+ 		report_prefix_pop();
++	} else if (strcmp(argv[1], "wp") == 0) {
++		report_prefix_push(argv[1]);
++		test_wp(false);
++		report_prefix_pop();
++	} else if (strcmp(argv[1], "wp-migration") == 0) {
++		report_prefix_push(argv[1]);
++		test_wp(true);
++		report_prefix_pop();
+ 	} else {
+ 		report_abort("Unknown subtest '%s'", argv[1]);
+ 	}
 diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index 945c2d0..896ff87 100644
+index 896ff87..bca2fad 100644
 --- a/arm/unittests.cfg
 +++ b/arm/unittests.cfg
-@@ -241,3 +241,16 @@ arch = arm64
- file = cache.flat
+@@ -254,3 +254,15 @@ file = debug.flat
  arch = arm64
- groups = cache
+ extra_params = -append 'bp-migration'
+ groups = debug migration
 +
-+# Debug tests
-+[debug-bp]
++[debug-wp]
 +file = debug.flat
 +arch = arm64
-+extra_params = -append 'bp'
++extra_params = -append 'wp'
 +groups = debug
 +
-+[debug-bp-migration]
++[debug-wp-migration]
 +file = debug.flat
 +arch = arm64
-+extra_params = -append 'bp-migration'
++extra_params = -append 'wp-migration'
 +groups = debug migration
 -- 
 2.34.1.173.g76aa8bc2d0-goog
