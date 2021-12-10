@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B492C46FE4A
-	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 10:57:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DACAA46FE4E
+	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 10:58:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239744AbhLJKBU convert rfc822-to-8bit (ORCPT
-        <rfc822;lists+kvm@lfdr.de>); Fri, 10 Dec 2021 05:01:20 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:16360 "EHLO
+        id S239789AbhLJKC3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Dec 2021 05:02:29 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:16361 "EHLO
         szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239747AbhLJKBT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Dec 2021 05:01:19 -0500
-Received: from canpemm100005.china.huawei.com (unknown [172.30.72.55])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4J9RC31fXNz92xw;
-        Fri, 10 Dec 2021 17:57:03 +0800 (CST)
+        with ESMTP id S236592AbhLJKC2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Dec 2021 05:02:28 -0500
+Received: from dggpemm500020.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4J9RDN4B0Wz931q;
+        Fri, 10 Dec 2021 17:58:12 +0800 (CST)
 Received: from kwepemm600017.china.huawei.com (7.193.23.234) by
- canpemm100005.china.huawei.com (7.192.105.21) with Microsoft SMTP Server
+ dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Fri, 10 Dec 2021 17:57:43 +0800
+ 15.1.2308.20; Fri, 10 Dec 2021 17:58:52 +0800
 Received: from kwepemm600017.china.huawei.com ([7.193.23.234]) by
  kwepemm600017.china.huawei.com ([7.193.23.234]) with mapi id 15.01.2308.020;
- Fri, 10 Dec 2021 17:57:42 +0800
+ Fri, 10 Dec 2021 17:58:52 +0800
 From:   Jiangyifei <jiangyifei@huawei.com>
 To:     Anup Patel <anup@brainfault.org>
 CC:     QEMU Developers <qemu-devel@nongnu.org>,
@@ -37,248 +37,136 @@ CC:     QEMU Developers <qemu-devel@nongnu.org>,
         "Wanghaibin (D)" <wanghaibin.wang@huawei.com>,
         "wanbo (G)" <wanbo13@huawei.com>,
         "limingwang (A)" <limingwang@huawei.com>
-Subject: RE: [PATCH v1 04/12] target/riscv: Implement kvm_arch_get_registers
-Thread-Topic: [PATCH v1 04/12] target/riscv: Implement kvm_arch_get_registers
-Thread-Index: AQHX3eLLjNdjzYP2iE6AIP7NO6R7r6wf2ceAgAvDAxA=
-Date:   Fri, 10 Dec 2021 09:57:42 +0000
-Message-ID: <7d88cc865bcc4dada21cfe09d9665d73@huawei.com>
+Subject: RE: [PATCH v1 05/12] target/riscv: Implement kvm_arch_put_registers
+Thread-Topic: [PATCH v1 05/12] target/riscv: Implement kvm_arch_put_registers
+Thread-Index: AQHX3eLMkh+eAfnl1EGwmXA6fYyia6wf2lGAgAvC0QA=
+Date:   Fri, 10 Dec 2021 09:58:52 +0000
+Message-ID: <240d9fa6bf214abf8169816e6901fd90@huawei.com>
 References: <20211120074644.729-1-jiangyifei@huawei.com>
- <20211120074644.729-5-jiangyifei@huawei.com>
- <CAAhSdy2gFufV4Xuu9Ewn2htLRB8SZ+xohbAnjYmnM1D_xMQP4A@mail.gmail.com>
-In-Reply-To: <CAAhSdy2gFufV4Xuu9Ewn2htLRB8SZ+xohbAnjYmnM1D_xMQP4A@mail.gmail.com>
+ <20211120074644.729-6-jiangyifei@huawei.com>
+ <CAAhSdy0umeb2Qu=6hJZGy4g1FhW-bsYL=80Msao_pULsJ0+2mw@mail.gmail.com>
+In-Reply-To: <CAAhSdy0umeb2Qu=6hJZGy4g1FhW-bsYL=80Msao_pULsJ0+2mw@mail.gmail.com>
 Accept-Language: zh-CN, en-US
 Content-Language: zh-CN
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
 x-originating-ip: [10.174.186.236]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-> -----Original Message-----
-> From: kvm-riscv [mailto:kvm-riscv-bounces@lists.infradead.org] On Behalf Of
-> Anup Patel
-> Sent: Friday, December 3, 2021 2:20 PM
-> To: Jiangyifei <jiangyifei@huawei.com>
-> Cc: QEMU Developers <qemu-devel@nongnu.org>; open list:RISC-V
-> <qemu-riscv@nongnu.org>; kvm-riscv@lists.infradead.org; KVM General
-> <kvm@vger.kernel.org>; libvir-list@redhat.com; Anup Patel
-> <anup.patel@wdc.com>; Palmer Dabbelt <palmer@dabbelt.com>; Alistair
-> Francis <Alistair.Francis@wdc.com>; Bin Meng <bin.meng@windriver.com>;
-> Fanliang (EulerOS) <fanliang@huawei.com>; Wubin (H)
-> <wu.wubin@huawei.com>; Wanghaibin (D) <wanghaibin.wang@huawei.com>;
-> wanbo (G) <wanbo13@huawei.com>; limingwang (A)
-> <limingwang@huawei.com>
-> Subject: Re: [PATCH v1 04/12] target/riscv: Implement kvm_arch_get_registers
-> 
-> On Sat, Nov 20, 2021 at 1:17 PM Yifei Jiang <jiangyifei@huawei.com> wrote:
-> >
-> > Get GPR CSR and FP registers from kvm by KVM_GET_ONE_REG ioctl.
-> >
-> > Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
-> > Signed-off-by: Mingwang Li <limingwang@huawei.com>
-> > Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-> > ---
-> >  target/riscv/kvm.c | 150
-> > ++++++++++++++++++++++++++++++++++++++++++++-
-> >  1 file changed, 149 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/target/riscv/kvm.c b/target/riscv/kvm.c index
-> > 9f9692fb9e..b49c24be0a 100644
-> > --- a/target/riscv/kvm.c
-> > +++ b/target/riscv/kvm.c
-> > @@ -55,13 +55,161 @@ static uint64_t kvm_riscv_reg_id(CPURISCVState
-> *env, uint64_t type, uint64_t idx
-> >      return id;
-> >  }
-> >
-> > +#define RISCV_CORE_REG(env, name)  kvm_riscv_reg_id(env,
-> KVM_REG_RISCV_CORE, \
-> > +                 KVM_REG_RISCV_CORE_REG(name))
-> > +
-> > +#define RISCV_CSR_REG(env, name)  kvm_riscv_reg_id(env,
-> KVM_REG_RISCV_CSR, \
-> > +                 KVM_REG_RISCV_CSR_REG(name))
-> > +
-> > +#define RISCV_FP_F_REG(env, idx)  kvm_riscv_reg_id(env,
-> > +KVM_REG_RISCV_FP_F, idx)
-> > +
-> > +#define RISCV_FP_D_REG(env, idx)  kvm_riscv_reg_id(env,
-> > +KVM_REG_RISCV_FP_D, idx)
-> > +
-> > +static int kvm_riscv_get_regs_core(CPUState *cs) {
-> > +    int ret = 0;
-> > +    int i;
-> > +    target_ulong reg;
-> > +    CPURISCVState *env = &RISCV_CPU(cs)->env;
-> > +
-> > +    ret = kvm_get_one_reg(cs, RISCV_CORE_REG(env, regs.pc), &reg);
-> > +    if (ret) {
-> > +        return ret;
-> > +    }
-> > +    env->pc = reg;
-> > +
-> > +    for (i = 1; i < 32; i++) {
-> > +        uint64_t id = kvm_riscv_reg_id(env, KVM_REG_RISCV_CORE, i);
-> > +        ret = kvm_get_one_reg(cs, id, &reg);
-> > +        if (ret) {
-> > +            return ret;
-> > +        }
-> > +        env->gpr[i] = reg;
-> > +    }
-> > +
-> > +    return ret;
-> > +}
-> > +
-> > +static int kvm_riscv_get_regs_csr(CPUState *cs) {
-> > +    int ret = 0;
-> > +    target_ulong reg;
-> > +    CPURISCVState *env = &RISCV_CPU(cs)->env;
-> > +
-> > +    ret = kvm_get_one_reg(cs, RISCV_CSR_REG(env, sstatus), &reg);
-> > +    if (ret) {
-> > +        return ret;
-> > +    }
-> > +    env->mstatus = reg;
-> > +
-> > +    ret = kvm_get_one_reg(cs, RISCV_CSR_REG(env, sie), &reg);
-> > +    if (ret) {
-> > +        return ret;
-> > +    }
-> > +    env->mie = reg;
-> > +
-> > +    ret = kvm_get_one_reg(cs, RISCV_CSR_REG(env, stvec), &reg);
-> > +    if (ret) {
-> > +        return ret;
-> > +    }
-> > +    env->stvec = reg;
-> > +
-> > +    ret = kvm_get_one_reg(cs, RISCV_CSR_REG(env, sscratch), &reg);
-> > +    if (ret) {
-> > +        return ret;
-> > +    }
-> > +    env->sscratch = reg;
-> > +
-> > +    ret = kvm_get_one_reg(cs, RISCV_CSR_REG(env, sepc), &reg);
-> > +    if (ret) {
-> > +        return ret;
-> > +    }
-> > +    env->sepc = reg;
-> > +
-> > +    ret = kvm_get_one_reg(cs, RISCV_CSR_REG(env, scause), &reg);
-> > +    if (ret) {
-> > +        return ret;
-> > +    }
-> > +    env->scause = reg;
-> > +
-> > +    ret = kvm_get_one_reg(cs, RISCV_CSR_REG(env, stval), &reg);
-> > +    if (ret) {
-> > +        return ret;
-> > +    }
-> > +    env->stval = reg;
-> > +
-> > +    ret = kvm_get_one_reg(cs, RISCV_CSR_REG(env, sip), &reg);
-> > +    if (ret) {
-> > +        return ret;
-> > +    }
-> > +    env->mip = reg;
-> > +
-> > +    ret = kvm_get_one_reg(cs, RISCV_CSR_REG(env, satp), &reg);
-> > +    if (ret) {
-> > +        return ret;
-> > +    }
-> > +    env->satp = reg;
-> 
-> There is a common pattern in above kvm_get_one_reg() calls so I suggest
-> creating a macro for repeating code patterns. This can help us to have one line
-> for each CSR and in future it is easy to add more CSRs.
-> 
-> Regards,
-> Anup
-> 
-
-Thanks, it will be modified in the next series.
-
-Yifei
-
-> > +
-> > +    return ret;
-> > +}
-> > +
-> > +static int kvm_riscv_get_regs_fp(CPUState *cs) {
-> > +    int ret = 0;
-> > +    int i;
-> > +    CPURISCVState *env = &RISCV_CPU(cs)->env;
-> > +
-> > +    if (riscv_has_ext(env, RVD)) {
-> > +        uint64_t reg;
-> > +        for (i = 0; i < 32; i++) {
-> > +            ret = kvm_get_one_reg(cs, RISCV_FP_D_REG(env, i), &reg);
-> > +            if (ret) {
-> > +                return ret;
-> > +            }
-> > +            env->fpr[i] = reg;
-> > +        }
-> > +        return ret;
-> > +    }
-> > +
-> > +    if (riscv_has_ext(env, RVF)) {
-> > +        uint32_t reg;
-> > +        for (i = 0; i < 32; i++) {
-> > +            ret = kvm_get_one_reg(cs, RISCV_FP_F_REG(env, i), &reg);
-> > +            if (ret) {
-> > +                return ret;
-> > +            }
-> > +            env->fpr[i] = reg;
-> > +        }
-> > +        return ret;
-> > +    }
-> > +
-> > +    return ret;
-> > +}
-> > +
-> >  const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
-> >      KVM_CAP_LAST_INFO
-> >  };
-> >
-> >  int kvm_arch_get_registers(CPUState *cs)  {
-> > -    return 0;
-> > +    int ret = 0;
-> > +
-> > +    ret = kvm_riscv_get_regs_core(cs);
-> > +    if (ret) {
-> > +        return ret;
-> > +    }
-> > +
-> > +    ret = kvm_riscv_get_regs_csr(cs);
-> > +    if (ret) {
-> > +        return ret;
-> > +    }
-> > +
-> > +    ret = kvm_riscv_get_regs_fp(cs);
-> > +    if (ret) {
-> > +        return ret;
-> > +    }
-> > +
-> > +    return ret;
-> >  }
-> >
-> >  int kvm_arch_put_registers(CPUState *cs, int level)
-> > --
-> > 2.19.1
-> >
-> >
-> > --
-> > kvm-riscv mailing list
-> > kvm-riscv@lists.infradead.org
-> > http://lists.infradead.org/mailman/listinfo/kvm-riscv
-> 
-> --
-> kvm-riscv mailing list
-> kvm-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/kvm-riscv
+DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IEFudXAgUGF0ZWwgW21haWx0
+bzphbnVwQGJyYWluZmF1bHQub3JnXQ0KPiBTZW50OiBGcmlkYXksIERlY2VtYmVyIDMsIDIwMjEg
+MjoyMiBQTQ0KPiBUbzogSmlhbmd5aWZlaSA8amlhbmd5aWZlaUBodWF3ZWkuY29tPg0KPiBDYzog
+UUVNVSBEZXZlbG9wZXJzIDxxZW11LWRldmVsQG5vbmdudS5vcmc+OyBvcGVuIGxpc3Q6UklTQy1W
+DQo+IDxxZW11LXJpc2N2QG5vbmdudS5vcmc+OyBrdm0tcmlzY3ZAbGlzdHMuaW5mcmFkZWFkLm9y
+ZzsgS1ZNIEdlbmVyYWwNCj4gPGt2bUB2Z2VyLmtlcm5lbC5vcmc+OyBsaWJ2aXItbGlzdEByZWRo
+YXQuY29tOyBBbnVwIFBhdGVsDQo+IDxhbnVwLnBhdGVsQHdkYy5jb20+OyBQYWxtZXIgRGFiYmVs
+dCA8cGFsbWVyQGRhYmJlbHQuY29tPjsgQWxpc3RhaXINCj4gRnJhbmNpcyA8QWxpc3RhaXIuRnJh
+bmNpc0B3ZGMuY29tPjsgQmluIE1lbmcgPGJpbi5tZW5nQHdpbmRyaXZlci5jb20+Ow0KPiBGYW5s
+aWFuZyAoRXVsZXJPUykgPGZhbmxpYW5nQGh1YXdlaS5jb20+OyBXdWJpbiAoSCkNCj4gPHd1Lnd1
+YmluQGh1YXdlaS5jb20+OyBXYW5naGFpYmluIChEKSA8d2FuZ2hhaWJpbi53YW5nQGh1YXdlaS5j
+b20+Ow0KPiB3YW5ibyAoRykgPHdhbmJvMTNAaHVhd2VpLmNvbT47IGxpbWluZ3dhbmcgKEEpDQo+
+IDxsaW1pbmd3YW5nQGh1YXdlaS5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggdjEgMDUvMTJd
+IHRhcmdldC9yaXNjdjogSW1wbGVtZW50IGt2bV9hcmNoX3B1dF9yZWdpc3RlcnMNCj4gDQo+IE9u
+IFNhdCwgTm92IDIwLCAyMDIxIGF0IDE6MTcgUE0gWWlmZWkgSmlhbmcgPGppYW5neWlmZWlAaHVh
+d2VpLmNvbT4gd3JvdGU6DQo+ID4NCj4gPiBQdXQgR1BSIENTUiBhbmQgRlAgcmVnaXN0ZXJzIHRv
+IGt2bSBieSBLVk1fU0VUX09ORV9SRUcgaW9jdGwNCj4gPg0KPiA+IFNpZ25lZC1vZmYtYnk6IFlp
+ZmVpIEppYW5nIDxqaWFuZ3lpZmVpQGh1YXdlaS5jb20+DQo+ID4gU2lnbmVkLW9mZi1ieTogTWlu
+Z3dhbmcgTGkgPGxpbWluZ3dhbmdAaHVhd2VpLmNvbT4NCj4gPiBSZXZpZXdlZC1ieTogQWxpc3Rh
+aXIgRnJhbmNpcyA8YWxpc3RhaXIuZnJhbmNpc0B3ZGMuY29tPg0KPiA+IC0tLQ0KPiA+ICB0YXJn
+ZXQvcmlzY3Yva3ZtLmMgfCAxNDENCj4gPiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrKysrKysrKysrKy0NCj4gPiAgMSBmaWxlIGNoYW5nZWQsIDE0MCBpbnNlcnRpb25zKCspLCAx
+IGRlbGV0aW9uKC0pDQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEvdGFyZ2V0L3Jpc2N2L2t2bS5jIGIv
+dGFyZ2V0L3Jpc2N2L2t2bS5jIGluZGV4DQo+ID4gYjQ5YzI0YmUwYS4uNWZlNWNhNDQzNCAxMDA2
+NDQNCj4gPiAtLS0gYS90YXJnZXQvcmlzY3Yva3ZtLmMNCj4gPiArKysgYi90YXJnZXQvcmlzY3Yv
+a3ZtLmMNCj4gPiBAQCAtOTAsNiArOTAsMzEgQEAgc3RhdGljIGludCBrdm1fcmlzY3ZfZ2V0X3Jl
+Z3NfY29yZShDUFVTdGF0ZSAqY3MpDQo+ID4gICAgICByZXR1cm4gcmV0Ow0KPiA+ICB9DQo+ID4N
+Cj4gPiArc3RhdGljIGludCBrdm1fcmlzY3ZfcHV0X3JlZ3NfY29yZShDUFVTdGF0ZSAqY3MpIHsN
+Cj4gPiArICAgIGludCByZXQgPSAwOw0KPiA+ICsgICAgaW50IGk7DQo+ID4gKyAgICB0YXJnZXRf
+dWxvbmcgcmVnOw0KPiA+ICsgICAgQ1BVUklTQ1ZTdGF0ZSAqZW52ID0gJlJJU0NWX0NQVShjcykt
+PmVudjsNCj4gPiArDQo+ID4gKyAgICByZWcgPSBlbnYtPnBjOw0KPiA+ICsgICAgcmV0ID0ga3Zt
+X3NldF9vbmVfcmVnKGNzLCBSSVNDVl9DT1JFX1JFRyhlbnYsIHJlZ3MucGMpLCAmcmVnKTsNCj4g
+PiArICAgIGlmIChyZXQpIHsNCj4gPiArICAgICAgICByZXR1cm4gcmV0Ow0KPiA+ICsgICAgfQ0K
+PiA+ICsNCj4gPiArICAgIGZvciAoaSA9IDE7IGkgPCAzMjsgaSsrKSB7DQo+ID4gKyAgICAgICAg
+dWludDY0X3QgaWQgPSBrdm1fcmlzY3ZfcmVnX2lkKGVudiwgS1ZNX1JFR19SSVNDVl9DT1JFLCBp
+KTsNCj4gPiArICAgICAgICByZWcgPSBlbnYtPmdwcltpXTsNCj4gPiArICAgICAgICByZXQgPSBr
+dm1fc2V0X29uZV9yZWcoY3MsIGlkLCAmcmVnKTsNCj4gPiArICAgICAgICBpZiAocmV0KSB7DQo+
+ID4gKyAgICAgICAgICAgIHJldHVybiByZXQ7DQo+ID4gKyAgICAgICAgfQ0KPiA+ICsgICAgfQ0K
+PiA+ICsNCj4gPiArICAgIHJldHVybiByZXQ7DQo+ID4gK30NCj4gPiArDQo+ID4gIHN0YXRpYyBp
+bnQga3ZtX3Jpc2N2X2dldF9yZWdzX2NzcihDUFVTdGF0ZSAqY3MpICB7DQo+ID4gICAgICBpbnQg
+cmV0ID0gMDsNCj4gPiBAQCAtMTUzLDYgKzE3OCw2OSBAQCBzdGF0aWMgaW50IGt2bV9yaXNjdl9n
+ZXRfcmVnc19jc3IoQ1BVU3RhdGUgKmNzKQ0KPiA+ICAgICAgcmV0dXJuIHJldDsNCj4gPiAgfQ0K
+PiA+DQo+ID4gK3N0YXRpYyBpbnQga3ZtX3Jpc2N2X3B1dF9yZWdzX2NzcihDUFVTdGF0ZSAqY3Mp
+IHsNCj4gPiArICAgIGludCByZXQgPSAwOw0KPiA+ICsgICAgdGFyZ2V0X3Vsb25nIHJlZzsNCj4g
+PiArICAgIENQVVJJU0NWU3RhdGUgKmVudiA9ICZSSVNDVl9DUFUoY3MpLT5lbnY7DQo+ID4gKw0K
+PiA+ICsgICAgcmVnID0gZW52LT5tc3RhdHVzOw0KPiA+ICsgICAgcmV0ID0ga3ZtX3NldF9vbmVf
+cmVnKGNzLCBSSVNDVl9DU1JfUkVHKGVudiwgc3N0YXR1cyksICZyZWcpOw0KPiA+ICsgICAgaWYg
+KHJldCkgew0KPiA+ICsgICAgICAgIHJldHVybiByZXQ7DQo+ID4gKyAgICB9DQo+ID4gKw0KPiA+
+ICsgICAgcmVnID0gZW52LT5taWU7DQo+ID4gKyAgICByZXQgPSBrdm1fc2V0X29uZV9yZWcoY3Ms
+IFJJU0NWX0NTUl9SRUcoZW52LCBzaWUpLCAmcmVnKTsNCj4gPiArICAgIGlmIChyZXQpIHsNCj4g
+PiArICAgICAgICByZXR1cm4gcmV0Ow0KPiA+ICsgICAgfQ0KPiA+ICsNCj4gPiArICAgIHJlZyA9
+IGVudi0+c3R2ZWM7DQo+ID4gKyAgICByZXQgPSBrdm1fc2V0X29uZV9yZWcoY3MsIFJJU0NWX0NT
+Ul9SRUcoZW52LCBzdHZlYyksICZyZWcpOw0KPiA+ICsgICAgaWYgKHJldCkgew0KPiA+ICsgICAg
+ICAgIHJldHVybiByZXQ7DQo+ID4gKyAgICB9DQo+ID4gKw0KPiA+ICsgICAgcmVnID0gZW52LT5z
+c2NyYXRjaDsNCj4gPiArICAgIHJldCA9IGt2bV9zZXRfb25lX3JlZyhjcywgUklTQ1ZfQ1NSX1JF
+RyhlbnYsIHNzY3JhdGNoKSwgJnJlZyk7DQo+ID4gKyAgICBpZiAocmV0KSB7DQo+ID4gKyAgICAg
+ICAgcmV0dXJuIHJldDsNCj4gPiArICAgIH0NCj4gPiArDQo+ID4gKyAgICByZWcgPSBlbnYtPnNl
+cGM7DQo+ID4gKyAgICByZXQgPSBrdm1fc2V0X29uZV9yZWcoY3MsIFJJU0NWX0NTUl9SRUcoZW52
+LCBzZXBjKSwgJnJlZyk7DQo+ID4gKyAgICBpZiAocmV0KSB7DQo+ID4gKyAgICAgICAgcmV0dXJu
+IHJldDsNCj4gPiArICAgIH0NCj4gPiArDQo+ID4gKyAgICByZWcgPSBlbnYtPnNjYXVzZTsNCj4g
+PiArICAgIHJldCA9IGt2bV9zZXRfb25lX3JlZyhjcywgUklTQ1ZfQ1NSX1JFRyhlbnYsIHNjYXVz
+ZSksICZyZWcpOw0KPiA+ICsgICAgaWYgKHJldCkgew0KPiA+ICsgICAgICAgIHJldHVybiByZXQ7
+DQo+ID4gKyAgICB9DQo+ID4gKw0KPiA+ICsgICAgcmVnID0gZW52LT5zdHZhbDsNCj4gPiArICAg
+IHJldCA9IGt2bV9zZXRfb25lX3JlZyhjcywgUklTQ1ZfQ1NSX1JFRyhlbnYsIHN0dmFsKSwgJnJl
+Zyk7DQo+ID4gKyAgICBpZiAocmV0KSB7DQo+ID4gKyAgICAgICAgcmV0dXJuIHJldDsNCj4gPiAr
+ICAgIH0NCj4gPiArDQo+ID4gKyAgICByZWcgPSBlbnYtPm1pcDsNCj4gPiArICAgIHJldCA9IGt2
+bV9zZXRfb25lX3JlZyhjcywgUklTQ1ZfQ1NSX1JFRyhlbnYsIHNpcCksICZyZWcpOw0KPiA+ICsg
+ICAgaWYgKHJldCkgew0KPiA+ICsgICAgICAgIHJldHVybiByZXQ7DQo+ID4gKyAgICB9DQo+ID4g
+Kw0KPiA+ICsgICAgcmVnID0gZW52LT5zYXRwOw0KPiA+ICsgICAgcmV0ID0ga3ZtX3NldF9vbmVf
+cmVnKGNzLCBSSVNDVl9DU1JfUkVHKGVudiwgc2F0cCksICZyZWcpOw0KPiA+ICsgICAgaWYgKHJl
+dCkgew0KPiA+ICsgICAgICAgIHJldHVybiByZXQ7DQo+ID4gKyAgICB9DQo+IA0KPiBTYW1lIGFz
+IHRoZSBwcmV2aW91cyBwYXRjaCwgdGhlcmUgaXMgYSBjb21tb24gcGF0dGVybiBpbiBhYm92ZQ0K
+PiBrdm1fc2V0X29uZV9yZWcoKSBjYWxscy4gUGxlYXNlIHVzZSBhIG1hY3JvIHRvIHNpbXBsaWZ5
+Lg0KPiANCj4gUmVnYXJkcywNCj4gQW51cA0KPiANCg0KVGhhbmtzLCBpdCB3aWxsIGJlIG1vZGlm
+aWVkIGluIHRoZSBuZXh0IHNlcmllcy4NCg0KWWlmZWkNCg0KPiA+ICsNCj4gPiArICAgIHJldHVy
+biByZXQ7DQo+ID4gK30NCj4gPiArDQo+ID4gIHN0YXRpYyBpbnQga3ZtX3Jpc2N2X2dldF9yZWdz
+X2ZwKENQVVN0YXRlICpjcykgIHsNCj4gPiAgICAgIGludCByZXQgPSAwOw0KPiA+IEBAIC0xODYs
+NiArMjc0LDQwIEBAIHN0YXRpYyBpbnQga3ZtX3Jpc2N2X2dldF9yZWdzX2ZwKENQVVN0YXRlICpj
+cykNCj4gPiAgICAgIHJldHVybiByZXQ7DQo+ID4gIH0NCj4gPg0KPiA+ICtzdGF0aWMgaW50IGt2
+bV9yaXNjdl9wdXRfcmVnc19mcChDUFVTdGF0ZSAqY3MpIHsNCj4gPiArICAgIGludCByZXQgPSAw
+Ow0KPiA+ICsgICAgaW50IGk7DQo+ID4gKyAgICBDUFVSSVNDVlN0YXRlICplbnYgPSAmUklTQ1Zf
+Q1BVKGNzKS0+ZW52Ow0KPiA+ICsNCj4gPiArICAgIGlmIChyaXNjdl9oYXNfZXh0KGVudiwgUlZE
+KSkgew0KPiA+ICsgICAgICAgIHVpbnQ2NF90IHJlZzsNCj4gPiArICAgICAgICBmb3IgKGkgPSAw
+OyBpIDwgMzI7IGkrKykgew0KPiA+ICsgICAgICAgICAgICByZWcgPSBlbnYtPmZwcltpXTsNCj4g
+PiArICAgICAgICAgICAgcmV0ID0ga3ZtX3NldF9vbmVfcmVnKGNzLCBSSVNDVl9GUF9EX1JFRyhl
+bnYsIGkpLCAmcmVnKTsNCj4gPiArICAgICAgICAgICAgaWYgKHJldCkgew0KPiA+ICsgICAgICAg
+ICAgICAgICAgcmV0dXJuIHJldDsNCj4gPiArICAgICAgICAgICAgfQ0KPiA+ICsgICAgICAgIH0N
+Cj4gPiArICAgICAgICByZXR1cm4gcmV0Ow0KPiA+ICsgICAgfQ0KPiA+ICsNCj4gPiArICAgIGlm
+IChyaXNjdl9oYXNfZXh0KGVudiwgUlZGKSkgew0KPiA+ICsgICAgICAgIHVpbnQzMl90IHJlZzsN
+Cj4gPiArICAgICAgICBmb3IgKGkgPSAwOyBpIDwgMzI7IGkrKykgew0KPiA+ICsgICAgICAgICAg
+ICByZWcgPSBlbnYtPmZwcltpXTsNCj4gPiArICAgICAgICAgICAgcmV0ID0ga3ZtX3NldF9vbmVf
+cmVnKGNzLCBSSVNDVl9GUF9GX1JFRyhlbnYsIGkpLCAmcmVnKTsNCj4gPiArICAgICAgICAgICAg
+aWYgKHJldCkgew0KPiA+ICsgICAgICAgICAgICAgICAgcmV0dXJuIHJldDsNCj4gPiArICAgICAg
+ICAgICAgfQ0KPiA+ICsgICAgICAgIH0NCj4gPiArICAgICAgICByZXR1cm4gcmV0Ow0KPiA+ICsg
+ICAgfQ0KPiA+ICsNCj4gPiArICAgIHJldHVybiByZXQ7DQo+ID4gK30NCj4gPiArDQo+ID4gKw0K
+PiA+ICBjb25zdCBLVk1DYXBhYmlsaXR5SW5mbyBrdm1fYXJjaF9yZXF1aXJlZF9jYXBhYmlsaXRp
+ZXNbXSA9IHsNCj4gPiAgICAgIEtWTV9DQVBfTEFTVF9JTkZPDQo+ID4gIH07DQo+ID4gQEAgLTIx
+NCw3ICszMzYsMjQgQEAgaW50IGt2bV9hcmNoX2dldF9yZWdpc3RlcnMoQ1BVU3RhdGUgKmNzKQ0K
+PiA+DQo+ID4gIGludCBrdm1fYXJjaF9wdXRfcmVnaXN0ZXJzKENQVVN0YXRlICpjcywgaW50IGxl
+dmVsKSAgew0KPiA+IC0gICAgcmV0dXJuIDA7DQo+ID4gKyAgICBpbnQgcmV0ID0gMDsNCj4gPiAr
+DQo+ID4gKyAgICByZXQgPSBrdm1fcmlzY3ZfcHV0X3JlZ3NfY29yZShjcyk7DQo+ID4gKyAgICBp
+ZiAocmV0KSB7DQo+ID4gKyAgICAgICAgcmV0dXJuIHJldDsNCj4gPiArICAgIH0NCj4gPiArDQo+
+ID4gKyAgICByZXQgPSBrdm1fcmlzY3ZfcHV0X3JlZ3NfY3NyKGNzKTsNCj4gPiArICAgIGlmIChy
+ZXQpIHsNCj4gPiArICAgICAgICByZXR1cm4gcmV0Ow0KPiA+ICsgICAgfQ0KPiA+ICsNCj4gPiAr
+ICAgIHJldCA9IGt2bV9yaXNjdl9wdXRfcmVnc19mcChjcyk7DQo+ID4gKyAgICBpZiAocmV0KSB7
+DQo+ID4gKyAgICAgICAgcmV0dXJuIHJldDsNCj4gPiArICAgIH0NCj4gPiArDQo+ID4gKyAgICBy
+ZXR1cm4gcmV0Ow0KPiA+ICB9DQo+ID4NCj4gPiAgaW50IGt2bV9hcmNoX3JlbGVhc2VfdmlycV9w
+b3N0KGludCB2aXJxKQ0KPiA+IC0tDQo+ID4gMi4xOS4xDQo+ID4NCj4gPg0KPiA+IC0tDQo+ID4g
+a3ZtLXJpc2N2IG1haWxpbmcgbGlzdA0KPiA+IGt2bS1yaXNjdkBsaXN0cy5pbmZyYWRlYWQub3Jn
+DQo+ID4gaHR0cDovL2xpc3RzLmluZnJhZGVhZC5vcmcvbWFpbG1hbi9saXN0aW5mby9rdm0tcmlz
+Y3YNCg==
