@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DACAA46FE4E
-	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 10:58:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1FF6646FE51
+	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 11:00:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239789AbhLJKC3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Dec 2021 05:02:29 -0500
-Received: from szxga02-in.huawei.com ([45.249.212.188]:16361 "EHLO
-        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236592AbhLJKC2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Dec 2021 05:02:28 -0500
-Received: from dggpemm500020.china.huawei.com (unknown [172.30.72.53])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4J9RDN4B0Wz931q;
-        Fri, 10 Dec 2021 17:58:12 +0800 (CST)
+        id S239796AbhLJKEG convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Fri, 10 Dec 2021 05:04:06 -0500
+Received: from szxga08-in.huawei.com ([45.249.212.255]:29117 "EHLO
+        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234244AbhLJKEF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Dec 2021 05:04:05 -0500
+Received: from canpemm100008.china.huawei.com (unknown [172.30.72.53])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4J9RCh2tcvz1DK8V;
+        Fri, 10 Dec 2021 17:57:36 +0800 (CST)
 Received: from kwepemm600017.china.huawei.com (7.193.23.234) by
- dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
+ canpemm100008.china.huawei.com (7.192.104.152) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Fri, 10 Dec 2021 17:58:52 +0800
+ 15.1.2308.20; Fri, 10 Dec 2021 18:00:29 +0800
 Received: from kwepemm600017.china.huawei.com ([7.193.23.234]) by
  kwepemm600017.china.huawei.com ([7.193.23.234]) with mapi id 15.01.2308.020;
- Fri, 10 Dec 2021 17:58:52 +0800
+ Fri, 10 Dec 2021 18:00:29 +0800
 From:   Jiangyifei <jiangyifei@huawei.com>
 To:     Anup Patel <anup@brainfault.org>
 CC:     QEMU Developers <qemu-devel@nongnu.org>,
@@ -37,136 +37,306 @@ CC:     QEMU Developers <qemu-devel@nongnu.org>,
         "Wanghaibin (D)" <wanghaibin.wang@huawei.com>,
         "wanbo (G)" <wanbo13@huawei.com>,
         "limingwang (A)" <limingwang@huawei.com>
-Subject: RE: [PATCH v1 05/12] target/riscv: Implement kvm_arch_put_registers
-Thread-Topic: [PATCH v1 05/12] target/riscv: Implement kvm_arch_put_registers
-Thread-Index: AQHX3eLMkh+eAfnl1EGwmXA6fYyia6wf2lGAgAvC0QA=
-Date:   Fri, 10 Dec 2021 09:58:52 +0000
-Message-ID: <240d9fa6bf214abf8169816e6901fd90@huawei.com>
+Subject: RE: [PATCH v1 06/12] target/riscv: Support start kernel directly by
+ KVM
+Thread-Topic: [PATCH v1 06/12] target/riscv: Support start kernel directly by
+ KVM
+Thread-Index: AQHX3eLNsKdHnPfBGEyf744y/i/qHawf3NCAgAvAilA=
+Date:   Fri, 10 Dec 2021 10:00:28 +0000
+Message-ID: <f399e2a21c574cfaab27275fbfdc0915@huawei.com>
 References: <20211120074644.729-1-jiangyifei@huawei.com>
- <20211120074644.729-6-jiangyifei@huawei.com>
- <CAAhSdy0umeb2Qu=6hJZGy4g1FhW-bsYL=80Msao_pULsJ0+2mw@mail.gmail.com>
-In-Reply-To: <CAAhSdy0umeb2Qu=6hJZGy4g1FhW-bsYL=80Msao_pULsJ0+2mw@mail.gmail.com>
+ <20211120074644.729-7-jiangyifei@huawei.com>
+ <CAAhSdy2Og53cfF6=ae1kLycLgj9O_2FnYp=BExEGYs7uQeSxow@mail.gmail.com>
+In-Reply-To: <CAAhSdy2Og53cfF6=ae1kLycLgj9O_2FnYp=BExEGYs7uQeSxow@mail.gmail.com>
 Accept-Language: zh-CN, en-US
 Content-Language: zh-CN
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
 x-originating-ip: [10.174.186.236]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IEFudXAgUGF0ZWwgW21haWx0
-bzphbnVwQGJyYWluZmF1bHQub3JnXQ0KPiBTZW50OiBGcmlkYXksIERlY2VtYmVyIDMsIDIwMjEg
-MjoyMiBQTQ0KPiBUbzogSmlhbmd5aWZlaSA8amlhbmd5aWZlaUBodWF3ZWkuY29tPg0KPiBDYzog
-UUVNVSBEZXZlbG9wZXJzIDxxZW11LWRldmVsQG5vbmdudS5vcmc+OyBvcGVuIGxpc3Q6UklTQy1W
-DQo+IDxxZW11LXJpc2N2QG5vbmdudS5vcmc+OyBrdm0tcmlzY3ZAbGlzdHMuaW5mcmFkZWFkLm9y
-ZzsgS1ZNIEdlbmVyYWwNCj4gPGt2bUB2Z2VyLmtlcm5lbC5vcmc+OyBsaWJ2aXItbGlzdEByZWRo
-YXQuY29tOyBBbnVwIFBhdGVsDQo+IDxhbnVwLnBhdGVsQHdkYy5jb20+OyBQYWxtZXIgRGFiYmVs
-dCA8cGFsbWVyQGRhYmJlbHQuY29tPjsgQWxpc3RhaXINCj4gRnJhbmNpcyA8QWxpc3RhaXIuRnJh
-bmNpc0B3ZGMuY29tPjsgQmluIE1lbmcgPGJpbi5tZW5nQHdpbmRyaXZlci5jb20+Ow0KPiBGYW5s
-aWFuZyAoRXVsZXJPUykgPGZhbmxpYW5nQGh1YXdlaS5jb20+OyBXdWJpbiAoSCkNCj4gPHd1Lnd1
-YmluQGh1YXdlaS5jb20+OyBXYW5naGFpYmluIChEKSA8d2FuZ2hhaWJpbi53YW5nQGh1YXdlaS5j
-b20+Ow0KPiB3YW5ibyAoRykgPHdhbmJvMTNAaHVhd2VpLmNvbT47IGxpbWluZ3dhbmcgKEEpDQo+
-IDxsaW1pbmd3YW5nQGh1YXdlaS5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0ggdjEgMDUvMTJd
-IHRhcmdldC9yaXNjdjogSW1wbGVtZW50IGt2bV9hcmNoX3B1dF9yZWdpc3RlcnMNCj4gDQo+IE9u
-IFNhdCwgTm92IDIwLCAyMDIxIGF0IDE6MTcgUE0gWWlmZWkgSmlhbmcgPGppYW5neWlmZWlAaHVh
-d2VpLmNvbT4gd3JvdGU6DQo+ID4NCj4gPiBQdXQgR1BSIENTUiBhbmQgRlAgcmVnaXN0ZXJzIHRv
-IGt2bSBieSBLVk1fU0VUX09ORV9SRUcgaW9jdGwNCj4gPg0KPiA+IFNpZ25lZC1vZmYtYnk6IFlp
-ZmVpIEppYW5nIDxqaWFuZ3lpZmVpQGh1YXdlaS5jb20+DQo+ID4gU2lnbmVkLW9mZi1ieTogTWlu
-Z3dhbmcgTGkgPGxpbWluZ3dhbmdAaHVhd2VpLmNvbT4NCj4gPiBSZXZpZXdlZC1ieTogQWxpc3Rh
-aXIgRnJhbmNpcyA8YWxpc3RhaXIuZnJhbmNpc0B3ZGMuY29tPg0KPiA+IC0tLQ0KPiA+ICB0YXJn
-ZXQvcmlzY3Yva3ZtLmMgfCAxNDENCj4gPiArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrKysrKysrKy0NCj4gPiAgMSBmaWxlIGNoYW5nZWQsIDE0MCBpbnNlcnRpb25zKCspLCAx
-IGRlbGV0aW9uKC0pDQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEvdGFyZ2V0L3Jpc2N2L2t2bS5jIGIv
-dGFyZ2V0L3Jpc2N2L2t2bS5jIGluZGV4DQo+ID4gYjQ5YzI0YmUwYS4uNWZlNWNhNDQzNCAxMDA2
-NDQNCj4gPiAtLS0gYS90YXJnZXQvcmlzY3Yva3ZtLmMNCj4gPiArKysgYi90YXJnZXQvcmlzY3Yv
-a3ZtLmMNCj4gPiBAQCAtOTAsNiArOTAsMzEgQEAgc3RhdGljIGludCBrdm1fcmlzY3ZfZ2V0X3Jl
-Z3NfY29yZShDUFVTdGF0ZSAqY3MpDQo+ID4gICAgICByZXR1cm4gcmV0Ow0KPiA+ICB9DQo+ID4N
-Cj4gPiArc3RhdGljIGludCBrdm1fcmlzY3ZfcHV0X3JlZ3NfY29yZShDUFVTdGF0ZSAqY3MpIHsN
-Cj4gPiArICAgIGludCByZXQgPSAwOw0KPiA+ICsgICAgaW50IGk7DQo+ID4gKyAgICB0YXJnZXRf
-dWxvbmcgcmVnOw0KPiA+ICsgICAgQ1BVUklTQ1ZTdGF0ZSAqZW52ID0gJlJJU0NWX0NQVShjcykt
-PmVudjsNCj4gPiArDQo+ID4gKyAgICByZWcgPSBlbnYtPnBjOw0KPiA+ICsgICAgcmV0ID0ga3Zt
-X3NldF9vbmVfcmVnKGNzLCBSSVNDVl9DT1JFX1JFRyhlbnYsIHJlZ3MucGMpLCAmcmVnKTsNCj4g
-PiArICAgIGlmIChyZXQpIHsNCj4gPiArICAgICAgICByZXR1cm4gcmV0Ow0KPiA+ICsgICAgfQ0K
-PiA+ICsNCj4gPiArICAgIGZvciAoaSA9IDE7IGkgPCAzMjsgaSsrKSB7DQo+ID4gKyAgICAgICAg
-dWludDY0X3QgaWQgPSBrdm1fcmlzY3ZfcmVnX2lkKGVudiwgS1ZNX1JFR19SSVNDVl9DT1JFLCBp
-KTsNCj4gPiArICAgICAgICByZWcgPSBlbnYtPmdwcltpXTsNCj4gPiArICAgICAgICByZXQgPSBr
-dm1fc2V0X29uZV9yZWcoY3MsIGlkLCAmcmVnKTsNCj4gPiArICAgICAgICBpZiAocmV0KSB7DQo+
-ID4gKyAgICAgICAgICAgIHJldHVybiByZXQ7DQo+ID4gKyAgICAgICAgfQ0KPiA+ICsgICAgfQ0K
-PiA+ICsNCj4gPiArICAgIHJldHVybiByZXQ7DQo+ID4gK30NCj4gPiArDQo+ID4gIHN0YXRpYyBp
-bnQga3ZtX3Jpc2N2X2dldF9yZWdzX2NzcihDUFVTdGF0ZSAqY3MpICB7DQo+ID4gICAgICBpbnQg
-cmV0ID0gMDsNCj4gPiBAQCAtMTUzLDYgKzE3OCw2OSBAQCBzdGF0aWMgaW50IGt2bV9yaXNjdl9n
-ZXRfcmVnc19jc3IoQ1BVU3RhdGUgKmNzKQ0KPiA+ICAgICAgcmV0dXJuIHJldDsNCj4gPiAgfQ0K
-PiA+DQo+ID4gK3N0YXRpYyBpbnQga3ZtX3Jpc2N2X3B1dF9yZWdzX2NzcihDUFVTdGF0ZSAqY3Mp
-IHsNCj4gPiArICAgIGludCByZXQgPSAwOw0KPiA+ICsgICAgdGFyZ2V0X3Vsb25nIHJlZzsNCj4g
-PiArICAgIENQVVJJU0NWU3RhdGUgKmVudiA9ICZSSVNDVl9DUFUoY3MpLT5lbnY7DQo+ID4gKw0K
-PiA+ICsgICAgcmVnID0gZW52LT5tc3RhdHVzOw0KPiA+ICsgICAgcmV0ID0ga3ZtX3NldF9vbmVf
-cmVnKGNzLCBSSVNDVl9DU1JfUkVHKGVudiwgc3N0YXR1cyksICZyZWcpOw0KPiA+ICsgICAgaWYg
-KHJldCkgew0KPiA+ICsgICAgICAgIHJldHVybiByZXQ7DQo+ID4gKyAgICB9DQo+ID4gKw0KPiA+
-ICsgICAgcmVnID0gZW52LT5taWU7DQo+ID4gKyAgICByZXQgPSBrdm1fc2V0X29uZV9yZWcoY3Ms
-IFJJU0NWX0NTUl9SRUcoZW52LCBzaWUpLCAmcmVnKTsNCj4gPiArICAgIGlmIChyZXQpIHsNCj4g
-PiArICAgICAgICByZXR1cm4gcmV0Ow0KPiA+ICsgICAgfQ0KPiA+ICsNCj4gPiArICAgIHJlZyA9
-IGVudi0+c3R2ZWM7DQo+ID4gKyAgICByZXQgPSBrdm1fc2V0X29uZV9yZWcoY3MsIFJJU0NWX0NT
-Ul9SRUcoZW52LCBzdHZlYyksICZyZWcpOw0KPiA+ICsgICAgaWYgKHJldCkgew0KPiA+ICsgICAg
-ICAgIHJldHVybiByZXQ7DQo+ID4gKyAgICB9DQo+ID4gKw0KPiA+ICsgICAgcmVnID0gZW52LT5z
-c2NyYXRjaDsNCj4gPiArICAgIHJldCA9IGt2bV9zZXRfb25lX3JlZyhjcywgUklTQ1ZfQ1NSX1JF
-RyhlbnYsIHNzY3JhdGNoKSwgJnJlZyk7DQo+ID4gKyAgICBpZiAocmV0KSB7DQo+ID4gKyAgICAg
-ICAgcmV0dXJuIHJldDsNCj4gPiArICAgIH0NCj4gPiArDQo+ID4gKyAgICByZWcgPSBlbnYtPnNl
-cGM7DQo+ID4gKyAgICByZXQgPSBrdm1fc2V0X29uZV9yZWcoY3MsIFJJU0NWX0NTUl9SRUcoZW52
-LCBzZXBjKSwgJnJlZyk7DQo+ID4gKyAgICBpZiAocmV0KSB7DQo+ID4gKyAgICAgICAgcmV0dXJu
-IHJldDsNCj4gPiArICAgIH0NCj4gPiArDQo+ID4gKyAgICByZWcgPSBlbnYtPnNjYXVzZTsNCj4g
-PiArICAgIHJldCA9IGt2bV9zZXRfb25lX3JlZyhjcywgUklTQ1ZfQ1NSX1JFRyhlbnYsIHNjYXVz
-ZSksICZyZWcpOw0KPiA+ICsgICAgaWYgKHJldCkgew0KPiA+ICsgICAgICAgIHJldHVybiByZXQ7
-DQo+ID4gKyAgICB9DQo+ID4gKw0KPiA+ICsgICAgcmVnID0gZW52LT5zdHZhbDsNCj4gPiArICAg
-IHJldCA9IGt2bV9zZXRfb25lX3JlZyhjcywgUklTQ1ZfQ1NSX1JFRyhlbnYsIHN0dmFsKSwgJnJl
-Zyk7DQo+ID4gKyAgICBpZiAocmV0KSB7DQo+ID4gKyAgICAgICAgcmV0dXJuIHJldDsNCj4gPiAr
-ICAgIH0NCj4gPiArDQo+ID4gKyAgICByZWcgPSBlbnYtPm1pcDsNCj4gPiArICAgIHJldCA9IGt2
-bV9zZXRfb25lX3JlZyhjcywgUklTQ1ZfQ1NSX1JFRyhlbnYsIHNpcCksICZyZWcpOw0KPiA+ICsg
-ICAgaWYgKHJldCkgew0KPiA+ICsgICAgICAgIHJldHVybiByZXQ7DQo+ID4gKyAgICB9DQo+ID4g
-Kw0KPiA+ICsgICAgcmVnID0gZW52LT5zYXRwOw0KPiA+ICsgICAgcmV0ID0ga3ZtX3NldF9vbmVf
-cmVnKGNzLCBSSVNDVl9DU1JfUkVHKGVudiwgc2F0cCksICZyZWcpOw0KPiA+ICsgICAgaWYgKHJl
-dCkgew0KPiA+ICsgICAgICAgIHJldHVybiByZXQ7DQo+ID4gKyAgICB9DQo+IA0KPiBTYW1lIGFz
-IHRoZSBwcmV2aW91cyBwYXRjaCwgdGhlcmUgaXMgYSBjb21tb24gcGF0dGVybiBpbiBhYm92ZQ0K
-PiBrdm1fc2V0X29uZV9yZWcoKSBjYWxscy4gUGxlYXNlIHVzZSBhIG1hY3JvIHRvIHNpbXBsaWZ5
-Lg0KPiANCj4gUmVnYXJkcywNCj4gQW51cA0KPiANCg0KVGhhbmtzLCBpdCB3aWxsIGJlIG1vZGlm
-aWVkIGluIHRoZSBuZXh0IHNlcmllcy4NCg0KWWlmZWkNCg0KPiA+ICsNCj4gPiArICAgIHJldHVy
-biByZXQ7DQo+ID4gK30NCj4gPiArDQo+ID4gIHN0YXRpYyBpbnQga3ZtX3Jpc2N2X2dldF9yZWdz
-X2ZwKENQVVN0YXRlICpjcykgIHsNCj4gPiAgICAgIGludCByZXQgPSAwOw0KPiA+IEBAIC0xODYs
-NiArMjc0LDQwIEBAIHN0YXRpYyBpbnQga3ZtX3Jpc2N2X2dldF9yZWdzX2ZwKENQVVN0YXRlICpj
-cykNCj4gPiAgICAgIHJldHVybiByZXQ7DQo+ID4gIH0NCj4gPg0KPiA+ICtzdGF0aWMgaW50IGt2
-bV9yaXNjdl9wdXRfcmVnc19mcChDUFVTdGF0ZSAqY3MpIHsNCj4gPiArICAgIGludCByZXQgPSAw
-Ow0KPiA+ICsgICAgaW50IGk7DQo+ID4gKyAgICBDUFVSSVNDVlN0YXRlICplbnYgPSAmUklTQ1Zf
-Q1BVKGNzKS0+ZW52Ow0KPiA+ICsNCj4gPiArICAgIGlmIChyaXNjdl9oYXNfZXh0KGVudiwgUlZE
-KSkgew0KPiA+ICsgICAgICAgIHVpbnQ2NF90IHJlZzsNCj4gPiArICAgICAgICBmb3IgKGkgPSAw
-OyBpIDwgMzI7IGkrKykgew0KPiA+ICsgICAgICAgICAgICByZWcgPSBlbnYtPmZwcltpXTsNCj4g
-PiArICAgICAgICAgICAgcmV0ID0ga3ZtX3NldF9vbmVfcmVnKGNzLCBSSVNDVl9GUF9EX1JFRyhl
-bnYsIGkpLCAmcmVnKTsNCj4gPiArICAgICAgICAgICAgaWYgKHJldCkgew0KPiA+ICsgICAgICAg
-ICAgICAgICAgcmV0dXJuIHJldDsNCj4gPiArICAgICAgICAgICAgfQ0KPiA+ICsgICAgICAgIH0N
-Cj4gPiArICAgICAgICByZXR1cm4gcmV0Ow0KPiA+ICsgICAgfQ0KPiA+ICsNCj4gPiArICAgIGlm
-IChyaXNjdl9oYXNfZXh0KGVudiwgUlZGKSkgew0KPiA+ICsgICAgICAgIHVpbnQzMl90IHJlZzsN
-Cj4gPiArICAgICAgICBmb3IgKGkgPSAwOyBpIDwgMzI7IGkrKykgew0KPiA+ICsgICAgICAgICAg
-ICByZWcgPSBlbnYtPmZwcltpXTsNCj4gPiArICAgICAgICAgICAgcmV0ID0ga3ZtX3NldF9vbmVf
-cmVnKGNzLCBSSVNDVl9GUF9GX1JFRyhlbnYsIGkpLCAmcmVnKTsNCj4gPiArICAgICAgICAgICAg
-aWYgKHJldCkgew0KPiA+ICsgICAgICAgICAgICAgICAgcmV0dXJuIHJldDsNCj4gPiArICAgICAg
-ICAgICAgfQ0KPiA+ICsgICAgICAgIH0NCj4gPiArICAgICAgICByZXR1cm4gcmV0Ow0KPiA+ICsg
-ICAgfQ0KPiA+ICsNCj4gPiArICAgIHJldHVybiByZXQ7DQo+ID4gK30NCj4gPiArDQo+ID4gKw0K
-PiA+ICBjb25zdCBLVk1DYXBhYmlsaXR5SW5mbyBrdm1fYXJjaF9yZXF1aXJlZF9jYXBhYmlsaXRp
-ZXNbXSA9IHsNCj4gPiAgICAgIEtWTV9DQVBfTEFTVF9JTkZPDQo+ID4gIH07DQo+ID4gQEAgLTIx
-NCw3ICszMzYsMjQgQEAgaW50IGt2bV9hcmNoX2dldF9yZWdpc3RlcnMoQ1BVU3RhdGUgKmNzKQ0K
-PiA+DQo+ID4gIGludCBrdm1fYXJjaF9wdXRfcmVnaXN0ZXJzKENQVVN0YXRlICpjcywgaW50IGxl
-dmVsKSAgew0KPiA+IC0gICAgcmV0dXJuIDA7DQo+ID4gKyAgICBpbnQgcmV0ID0gMDsNCj4gPiAr
-DQo+ID4gKyAgICByZXQgPSBrdm1fcmlzY3ZfcHV0X3JlZ3NfY29yZShjcyk7DQo+ID4gKyAgICBp
-ZiAocmV0KSB7DQo+ID4gKyAgICAgICAgcmV0dXJuIHJldDsNCj4gPiArICAgIH0NCj4gPiArDQo+
-ID4gKyAgICByZXQgPSBrdm1fcmlzY3ZfcHV0X3JlZ3NfY3NyKGNzKTsNCj4gPiArICAgIGlmIChy
-ZXQpIHsNCj4gPiArICAgICAgICByZXR1cm4gcmV0Ow0KPiA+ICsgICAgfQ0KPiA+ICsNCj4gPiAr
-ICAgIHJldCA9IGt2bV9yaXNjdl9wdXRfcmVnc19mcChjcyk7DQo+ID4gKyAgICBpZiAocmV0KSB7
-DQo+ID4gKyAgICAgICAgcmV0dXJuIHJldDsNCj4gPiArICAgIH0NCj4gPiArDQo+ID4gKyAgICBy
-ZXR1cm4gcmV0Ow0KPiA+ICB9DQo+ID4NCj4gPiAgaW50IGt2bV9hcmNoX3JlbGVhc2VfdmlycV9w
-b3N0KGludCB2aXJxKQ0KPiA+IC0tDQo+ID4gMi4xOS4xDQo+ID4NCj4gPg0KPiA+IC0tDQo+ID4g
-a3ZtLXJpc2N2IG1haWxpbmcgbGlzdA0KPiA+IGt2bS1yaXNjdkBsaXN0cy5pbmZyYWRlYWQub3Jn
-DQo+ID4gaHR0cDovL2xpc3RzLmluZnJhZGVhZC5vcmcvbWFpbG1hbi9saXN0aW5mby9rdm0tcmlz
-Y3YNCg==
+
+> -----Original Message-----
+> From: kvm-riscv [mailto:kvm-riscv-bounces@lists.infradead.org] On Behalf Of
+> Anup Patel
+> Sent: Friday, December 3, 2021 2:31 PM
+> To: Jiangyifei <jiangyifei@huawei.com>
+> Cc: QEMU Developers <qemu-devel@nongnu.org>; open list:RISC-V
+> <qemu-riscv@nongnu.org>; kvm-riscv@lists.infradead.org; KVM General
+> <kvm@vger.kernel.org>; libvir-list@redhat.com; Anup Patel
+> <anup.patel@wdc.com>; Palmer Dabbelt <palmer@dabbelt.com>; Alistair
+> Francis <Alistair.Francis@wdc.com>; Bin Meng <bin.meng@windriver.com>;
+> Fanliang (EulerOS) <fanliang@huawei.com>; Wubin (H)
+> <wu.wubin@huawei.com>; Wanghaibin (D) <wanghaibin.wang@huawei.com>;
+> wanbo (G) <wanbo13@huawei.com>; limingwang (A)
+> <limingwang@huawei.com>
+> Subject: Re: [PATCH v1 06/12] target/riscv: Support start kernel directly by KVM
+> 
+> On Sat, Nov 20, 2021 at 1:17 PM Yifei Jiang <jiangyifei@huawei.com> wrote:
+> >
+> > Get kernel and fdt start address in virt.c, and pass them to KVM when
+> > cpu reset. In addition, add kvm_riscv.h to place riscv specific
+> > interface.
+> >
+> > Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
+> > Signed-off-by: Mingwang Li <limingwang@huawei.com>
+> > Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+> > ---
+> >  hw/riscv/boot.c          | 11 +++++++++++
+> >  hw/riscv/virt.c          |  7 +++++++
+> >  include/hw/riscv/boot.h  |  1 +
+> >  target/riscv/cpu.c       |  8 ++++++++
+> >  target/riscv/cpu.h       |  3 +++
+> >  target/riscv/kvm-stub.c  | 25 +++++++++++++++++++++++++
+> >  target/riscv/kvm.c       | 14 ++++++++++++++
+> >  target/riscv/kvm_riscv.h | 24 ++++++++++++++++++++++++
+> > target/riscv/meson.build |  2 +-
+> >  9 files changed, 94 insertions(+), 1 deletion(-)  create mode 100644
+> > target/riscv/kvm-stub.c  create mode 100644 target/riscv/kvm_riscv.h
+> >
+> > diff --git a/hw/riscv/boot.c b/hw/riscv/boot.c index
+> > 519fa455a1..00df6d7810 100644
+> > --- a/hw/riscv/boot.c
+> > +++ b/hw/riscv/boot.c
+> > @@ -317,3 +317,14 @@ void riscv_setup_rom_reset_vec(MachineState
+> > *machine, RISCVHartArrayState *harts
+> >
+> >      return;
+> >  }
+> > +
+> > +void riscv_setup_direct_kernel(hwaddr kernel_addr, hwaddr fdt_addr) {
+> > +    CPUState *cs;
+> > +
+> > +    for (cs = first_cpu; cs; cs = CPU_NEXT(cs)) {
+> > +        RISCVCPU *riscv_cpu = RISCV_CPU(cs);
+> > +        riscv_cpu->env.kernel_addr = kernel_addr;
+> > +        riscv_cpu->env.fdt_addr = fdt_addr;
+> > +    }
+> > +}
+> > diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c index
+> > 3af074148e..e3452b25e8 100644
+> > --- a/hw/riscv/virt.c
+> > +++ b/hw/riscv/virt.c
+> > @@ -941,6 +941,13 @@ static void virt_machine_init(MachineState
+> *machine)
+> >                                virt_memmap[VIRT_MROM].size,
+> kernel_entry,
+> >                                fdt_load_addr, machine->fdt);
+> >
+> > +    /*
+> > +     * Only direct boot kernel is currently supported for KVM VM,
+> > +     * So here setup kernel start address and fdt address.
+> > +     * TODO:Support firmware loading and integrate to TCG start
+> > +     */
+> > +    riscv_setup_direct_kernel(kernel_entry, fdt_load_addr);
+> 
+> This should be under "if (kvm_enabled()) {".
+> 
+> Also, update virt machine such that the "-bios" parameter is ignored and
+> treated like "-bios none" when KVM is enabled.
+> 
+
+Thanks, it will be modified in the next series.
+
+> Further, virt machine should not create an ACLINT (or SiFive CLINT) instance
+> when KVM is enabled. Event the PLIC should be created without M-mode PLIC
+> contexts when KVM is enabled.
+> 
+> Regards,
+> Anup
+> 
+
+Yes, you are right. But in order to reuse the PLIC, it is not planned to modify the PLIC at this time.
+
+Yifei
+
+> > +
+> >      /* SiFive Test MMIO device */
+> >      sifive_test_create(memmap[VIRT_TEST].base);
+> >
+> > diff --git a/include/hw/riscv/boot.h b/include/hw/riscv/boot.h index
+> > baff11dd8a..5834c234aa 100644
+> > --- a/include/hw/riscv/boot.h
+> > +++ b/include/hw/riscv/boot.h
+> > @@ -58,5 +58,6 @@ void riscv_rom_copy_firmware_info(MachineState
+> *machine, hwaddr rom_base,
+> >                                    hwaddr rom_size,
+> >                                    uint32_t reset_vec_size,
+> >                                    uint64_t kernel_entry);
+> > +void riscv_setup_direct_kernel(hwaddr kernel_addr, hwaddr fdt_addr);
+> >
+> >  #endif /* RISCV_BOOT_H */
+> > diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c index
+> > f812998123..1c944872a3 100644
+> > --- a/target/riscv/cpu.c
+> > +++ b/target/riscv/cpu.c
+> > @@ -29,6 +29,8 @@
+> >  #include "hw/qdev-properties.h"
+> >  #include "migration/vmstate.h"
+> >  #include "fpu/softfloat-helpers.h"
+> > +#include "sysemu/kvm.h"
+> > +#include "kvm_riscv.h"
+> >
+> >  /* RISC-V CPU definitions */
+> >
+> > @@ -380,6 +382,12 @@ static void riscv_cpu_reset(DeviceState *dev)
+> >      cs->exception_index = RISCV_EXCP_NONE;
+> >      env->load_res = -1;
+> >      set_default_nan_mode(1, &env->fp_status);
+> > +
+> > +#ifndef CONFIG_USER_ONLY
+> > +    if (kvm_enabled()) {
+> > +        kvm_riscv_reset_vcpu(cpu);
+> > +    }
+> > +#endif
+> >  }
+> >
+> >  static void riscv_cpu_disas_set_info(CPUState *s, disassemble_info
+> > *info) diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h index
+> > 0760c0af93..2807eb1bcb 100644
+> > --- a/target/riscv/cpu.h
+> > +++ b/target/riscv/cpu.h
+> > @@ -255,6 +255,9 @@ struct CPURISCVState {
+> >
+> >      /* Fields from here on are preserved across CPU reset. */
+> >      QEMUTimer *timer; /* Internal timer */
+> > +
+> > +    hwaddr kernel_addr;
+> > +    hwaddr fdt_addr;
+> >  };
+> >
+> >  OBJECT_DECLARE_TYPE(RISCVCPU, RISCVCPUClass, diff --git
+> > a/target/riscv/kvm-stub.c b/target/riscv/kvm-stub.c new file mode
+> > 100644 index 0000000000..39b96fe3f4
+> > --- /dev/null
+> > +++ b/target/riscv/kvm-stub.c
+> > @@ -0,0 +1,25 @@
+> > +/*
+> > + * QEMU KVM RISC-V specific function stubs
+> > + *
+> > + * Copyright (c) 2020 Huawei Technologies Co., Ltd
+> > + *
+> > + * This program is free software; you can redistribute it and/or
+> > +modify it
+> > + * under the terms and conditions of the GNU General Public License,
+> > + * version 2 or later, as published by the Free Software Foundation.
+> > + *
+> > + * This program is distributed in the hope it will be useful, but
+> > +WITHOUT
+> > + * ANY WARRANTY; without even the implied warranty of
+> MERCHANTABILITY
+> > +or
+> > + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+> > +License for
+> > + * more details.
+> > + *
+> > + * You should have received a copy of the GNU General Public License
+> > +along with
+> > + * this program.  If not, see <http://www.gnu.org/licenses/>.
+> > + */
+> > +#include "qemu/osdep.h"
+> > +#include "cpu.h"
+> > +#include "kvm_riscv.h"
+> > +
+> > +void kvm_riscv_reset_vcpu(RISCVCPU *cpu) {
+> > +    abort();
+> > +}
+> > diff --git a/target/riscv/kvm.c b/target/riscv/kvm.c index
+> > 5fe5ca4434..7f3ffcc2b4 100644
+> > --- a/target/riscv/kvm.c
+> > +++ b/target/riscv/kvm.c
+> > @@ -37,6 +37,7 @@
+> >  #include "hw/irq.h"
+> >  #include "qemu/log.h"
+> >  #include "hw/loader.h"
+> > +#include "kvm_riscv.h"
+> >
+> >  static uint64_t kvm_riscv_reg_id(CPURISCVState *env, uint64_t type,
+> > uint64_t idx)  { @@ -444,6 +445,19 @@ int
+> > kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+> >      return 0;
+> >  }
+> >
+> > +void kvm_riscv_reset_vcpu(RISCVCPU *cpu) {
+> > +    CPURISCVState *env = &cpu->env;
+> > +
+> > +    if (!kvm_enabled()) {
+> > +        return;
+> > +    }
+> > +    env->pc = cpu->env.kernel_addr;
+> > +    env->gpr[10] = kvm_arch_vcpu_id(CPU(cpu)); /* a0 */
+> > +    env->gpr[11] = cpu->env.fdt_addr;          /* a1 */
+> > +    env->satp = 0;
+> > +}
+> > +
+> >  bool kvm_arch_cpu_check_are_resettable(void)
+> >  {
+> >      return true;
+> > diff --git a/target/riscv/kvm_riscv.h b/target/riscv/kvm_riscv.h new
+> > file mode 100644 index 0000000000..f38c82bf59
+> > --- /dev/null
+> > +++ b/target/riscv/kvm_riscv.h
+> > @@ -0,0 +1,24 @@
+> > +/*
+> > + * QEMU KVM support -- RISC-V specific functions.
+> > + *
+> > + * Copyright (c) 2020 Huawei Technologies Co., Ltd
+> > + *
+> > + * This program is free software; you can redistribute it and/or
+> > +modify it
+> > + * under the terms and conditions of the GNU General Public License,
+> > + * version 2 or later, as published by the Free Software Foundation.
+> > + *
+> > + * This program is distributed in the hope it will be useful, but
+> > +WITHOUT
+> > + * ANY WARRANTY; without even the implied warranty of
+> MERCHANTABILITY
+> > +or
+> > + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+> > +License for
+> > + * more details.
+> > + *
+> > + * You should have received a copy of the GNU General Public License
+> > +along with
+> > + * this program.  If not, see <http://www.gnu.org/licenses/>.
+> > + */
+> > +
+> > +#ifndef QEMU_KVM_RISCV_H
+> > +#define QEMU_KVM_RISCV_H
+> > +
+> > +void kvm_riscv_reset_vcpu(RISCVCPU *cpu);
+> > +
+> > +#endif
+> > diff --git a/target/riscv/meson.build b/target/riscv/meson.build index
+> > 2faf08a941..fe41cc5805 100644
+> > --- a/target/riscv/meson.build
+> > +++ b/target/riscv/meson.build
+> > @@ -19,7 +19,7 @@ riscv_ss.add(files(
+> >    'bitmanip_helper.c',
+> >    'translate.c',
+> >  ))
+> > -riscv_ss.add(when: 'CONFIG_KVM', if_true: files('kvm.c'))
+> > +riscv_ss.add(when: 'CONFIG_KVM', if_true: files('kvm.c'), if_false:
+> > +files('kvm-stub.c'))
+> >
+> >  riscv_softmmu_ss = ss.source_set()
+> >  riscv_softmmu_ss.add(files(
+> > --
+> > 2.19.1
+> >
+> >
+> > --
+> > kvm-riscv mailing list
+> > kvm-riscv@lists.infradead.org
+> > http://lists.infradead.org/mailman/listinfo/kvm-riscv
+> 
+> --
+> kvm-riscv mailing list
+> kvm-riscv@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/kvm-riscv
