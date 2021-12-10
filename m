@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BBBD4701B8
+	by mail.lfdr.de (Postfix) with ESMTP id AF4604701BA
 	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 14:36:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241927AbhLJNjW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Dec 2021 08:39:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43364 "EHLO
+        id S241944AbhLJNjZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Dec 2021 08:39:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241922AbhLJNjU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Dec 2021 08:39:20 -0500
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68E66C061746;
-        Fri, 10 Dec 2021 05:35:45 -0800 (PST)
-Received: by mail-pf1-x430.google.com with SMTP id g19so8496405pfb.8;
-        Fri, 10 Dec 2021 05:35:45 -0800 (PST)
+        with ESMTP id S241943AbhLJNjX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Dec 2021 08:39:23 -0500
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC5D9C061746;
+        Fri, 10 Dec 2021 05:35:48 -0800 (PST)
+Received: by mail-pl1-x62a.google.com with SMTP id p18so6268157plf.13;
+        Fri, 10 Dec 2021 05:35:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=hqu8vyG7yPFJXxjcuKhos5Y6YEOCCEkLSoLXjY4a+cQ=;
-        b=LyXHBZTYsjVQhI5J0HhKoBxVmBfFzwPC+EKRjY9+fgMk8Mmt3ZBSZjFTLoOYrnjLAJ
-         /9Avno48ZrpczROp3JrOhPb8/uwQBBtnCUwxH86gvE8B+c5GEnPb3lC4PnOEB9FPMC3g
-         ihbreMU8WWsw1Dw9kmMnL3P1OpW700VupY2mWVUcQIZOeLyl9aZeap8xl/1qzhWFVpAN
-         zCsHGzwLp33bM+7gy1y2/8onopBK29PHExC9uf5YIFGZL6ViWPOtAOYnLWWiDi62XHzk
-         rJANGPxVmR9LxwC3lCJAJyeOtu7qYXMUwxMfcyvCE1wHdtNCmUVgPUM4e3uX+4kYqyTw
-         UIOQ==
+        bh=WhxWgL0+NlveoahZPABKS+nvP2UibJwzczVR+3A9i0Q=;
+        b=Oy/FMcEdBjcvO8QhVbLQEzmRofWxXMNcrygfrYhjKibhUZFyZn9PxMc2U9zGxOMleL
+         oZMqRl86h4SQkaNbxhyXgQ1qXz+IKhGsAEJhlOYR5JlIsvwXe8Bdi+/131eN7mlRiRZD
+         CUxd7UMbsGBalGWWzEboRVNzbMEXL4zI9GXJ9Twzr0INMbouDtKm76hIYEkT1F794FgN
+         BjNU03VwdKGP7yalUfZHDmJEyZtR/HIe/cCZqnfUWdGU/mTwKO/sIkP1HQ1h4wGKUjH5
+         QtpKH5Q1w0cEFiXdgouAgkPgMGlIC3tjNjGgMbj3Kh4wKzL/bJSHA2OtKiuJ2r9KJa5u
+         +2Aw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=hqu8vyG7yPFJXxjcuKhos5Y6YEOCCEkLSoLXjY4a+cQ=;
-        b=iBUXVS2d8CYilS6uEx0ygKi4RgcZUWkpakFV/qQw5DGWxdEzvZjNBhHl8h+T5ws/Vj
-         zLupqcLSAXYL8mkqeX8Zl0omwrkiaLnuAJQr4S2dN013r1xwXT0rS1BuVNSEJx3wc9RK
-         S40VSt+/8BfKoV/X/TXAC8YeDOW9W8drI0C0J56oY6Py2FZxg8Wrxy1uIxdZfAxrfj5o
-         P/RQ3b1C3Ml3kJhNDdH16f3ZBrgkdofZATI8PBkbJN547tbX0KJGFqBm93Yh/iMb7djJ
-         8SR/mKBWN4sPv3huNWSHYE1lDqVoaehnopn7MxYWjH6qddsa5obaRsCqOh0vuNNGn1fr
-         gx6w==
-X-Gm-Message-State: AOAM532MiBJwCoeuOOzsxmY4rddVxfcQ2KNnEt09j4Pu6nmpoLjppNe4
-        FKiFmtg6XWSe2sU+mP1tviM=
-X-Google-Smtp-Source: ABdhPJxnUGTwAeD8WVNtwmESnGfcpZNRL8hS8jsf+LHon7RW6m3kEty4HD81WlxEn+vPTvv/tK6T0g==
-X-Received: by 2002:a63:461c:: with SMTP id t28mr26319210pga.171.1639143345021;
-        Fri, 10 Dec 2021 05:35:45 -0800 (PST)
+        bh=WhxWgL0+NlveoahZPABKS+nvP2UibJwzczVR+3A9i0Q=;
+        b=P3jxUtvNuxDLmUvveIf4AQNxZDqTqcBSR+HNTa5pFBi/r7hlNAxbm8XkVI7u9rRGxS
+         A/W+yHHWS2TLI30tNJVHpl2DlTWaJSvRskMuuJJRtmG9jq/66nFzDGDvAggtb7dw9iKH
+         M8eWpjJKk1OlwTc3mBbOL1BVtgQr2HJdOQx9kUrveBUmOV6Mzc0ksFPF10uzgO4cST13
+         E+bW1I/xD0gHji1xuqbF++Pe9vajer5PFkebQPsYUe8xLW4SbzCwXHTziX8A4RwOAmp0
+         f8wpGdUDsVAGhAnmyN506vzLF3Ybk2r2ygGjZNRjNucMw7Z+ax/z/JYWn/KcxWEMVHvM
+         oFZg==
+X-Gm-Message-State: AOAM53158wvaxKFtHbGaDA0DgGAThVAltHf+F0IcLf4I8OEjhA7Wd7Xb
+        XcHpW99khYFWNBWuZIZSHysnOKUYtX8=
+X-Google-Smtp-Source: ABdhPJwHaA9cg6OrdMkDK0VB20cK+zmYGHGuziyLhpc+YqFiwhKl98+7+MMz7FzrKAVzl6Z2tUYylw==
+X-Received: by 2002:a17:902:b588:b0:143:b732:834 with SMTP id a8-20020a170902b58800b00143b7320834mr76026040pls.22.1639143348107;
+        Fri, 10 Dec 2021 05:35:48 -0800 (PST)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id t4sm3596068pfj.168.2021.12.10.05.35.41
+        by smtp.gmail.com with ESMTPSA id t4sm3596068pfj.168.2021.12.10.05.35.45
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 10 Dec 2021 05:35:44 -0800 (PST)
+        Fri, 10 Dec 2021 05:35:47 -0800 (PST)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
@@ -58,9 +58,9 @@ Cc:     Jim Mattson <jmattson@google.com>,
         Peter Zijlstra <peterz@infradead.org>,
         Like Xu <likexu@tencent.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v11 01/17] perf/x86/intel: Add EPT-Friendly PEBS for Ice Lake Server
-Date:   Fri, 10 Dec 2021 21:35:09 +0800
-Message-Id: <20211210133525.46465-2-likexu@tencent.com>
+Subject: [PATCH v11 02/17] perf/x86/intel: Handle guest PEBS overflow PMI for KVM guest
+Date:   Fri, 10 Dec 2021 21:35:10 +0800
+Message-Id: <20211210133525.46465-3-likexu@tencent.com>
 X-Mailer: git-send-email 2.33.1
 In-Reply-To: <20211210133525.46465-1-likexu@tencent.com>
 References: <20211210133525.46465-1-likexu@tencent.com>
@@ -70,74 +70,88 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <like.xu@linux.intel.com>
+From: Like Xu <likexu@tencent.com>
 
-From: Like Xu <like.xu@linux.intel.com>
+With PEBS virtualization, the guest PEBS records get delivered to the
+guest DS, and the host pmi handler uses perf_guest_cbs->is_in_guest()
+to distinguish whether the PMI comes from the guest code like Intel PT.
 
-The new hardware facility supporting guest PEBS is only available on
-Intel Ice Lake Server platforms for now. KVM will check this field
-through perf_get_x86_pmu_capability() instead of hard coding the cpu
-models in the KVM code. If it is supported, the guest PEBS capability
-will be exposed to the guest.
+No matter how many guest PEBS counters are overflowed, only triggering
+one fake event is enough. The fake event causes the KVM PMI callback to
+be called, thereby injecting the PEBS overflow PMI into the guest.
 
-Signed-off-by: Like Xu <like.xu@linux.intel.com>
-Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+KVM may inject the PMI with BUFFER_OVF set, even if the guest DS is
+empty. That should really be harmless. Thus guest PEBS handler would
+retrieve the correct information from its own PEBS records buffer.
+
+Originally-by: Andi Kleen <ak@linux.intel.com>
+Co-developed-by: Kan Liang <kan.liang@linux.intel.com>
+Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
+Signed-off-by: Like Xu <likexu@tencent.com>
 ---
- arch/x86/events/core.c            | 1 +
- arch/x86/events/intel/core.c      | 1 +
- arch/x86/events/perf_event.h      | 3 ++-
- arch/x86/include/asm/perf_event.h | 1 +
- 4 files changed, 5 insertions(+), 1 deletion(-)
+ arch/x86/events/intel/core.c | 42 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
 
-diff --git a/arch/x86/events/core.c b/arch/x86/events/core.c
-index 38b2c779146f..03133e96ddb0 100644
---- a/arch/x86/events/core.c
-+++ b/arch/x86/events/core.c
-@@ -2993,5 +2993,6 @@ void perf_get_x86_pmu_capability(struct x86_pmu_capability *cap)
- 	cap->bit_width_fixed	= x86_pmu.cntval_bits;
- 	cap->events_mask	= (unsigned int)x86_pmu.events_maskl;
- 	cap->events_mask_len	= x86_pmu.events_mask_len;
-+	cap->pebs_vmx		= x86_pmu.pebs_vmx;
- }
- EXPORT_SYMBOL_GPL(perf_get_x86_pmu_capability);
 diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
-index ec6444f2c9dc..869684ed55b1 100644
+index 869684ed55b1..1f8fe07d5cb7 100644
 --- a/arch/x86/events/intel/core.c
 +++ b/arch/x86/events/intel/core.c
-@@ -6103,6 +6103,7 @@ __init int intel_pmu_init(void)
+@@ -2831,6 +2831,47 @@ static void intel_pmu_reset(void)
+ 	local_irq_restore(flags);
+ }
  
- 	case INTEL_FAM6_ICELAKE_X:
- 	case INTEL_FAM6_ICELAKE_D:
-+		x86_pmu.pebs_vmx = 1;
- 		pmem = true;
- 		fallthrough;
- 	case INTEL_FAM6_ICELAKE_L:
-diff --git a/arch/x86/events/perf_event.h b/arch/x86/events/perf_event.h
-index 5480db242083..fdda099867c2 100644
---- a/arch/x86/events/perf_event.h
-+++ b/arch/x86/events/perf_event.h
-@@ -814,7 +814,8 @@ struct x86_pmu {
- 			pebs_prec_dist		:1,
- 			pebs_no_tlb		:1,
- 			pebs_no_isolation	:1,
--			pebs_block		:1;
-+			pebs_block		:1,
-+			pebs_vmx		:1;
- 	int		pebs_record_size;
- 	int		pebs_buffer_size;
- 	int		max_pebs_events;
-diff --git a/arch/x86/include/asm/perf_event.h b/arch/x86/include/asm/perf_event.h
-index 8fc1b5003713..42d7bcf1a896 100644
---- a/arch/x86/include/asm/perf_event.h
-+++ b/arch/x86/include/asm/perf_event.h
-@@ -192,6 +192,7 @@ struct x86_pmu_capability {
- 	int		bit_width_fixed;
- 	unsigned int	events_mask;
- 	int		events_mask_len;
-+	unsigned int	pebs_vmx	:1;
- };
++/*
++ * We may be running with guest PEBS events created by KVM, and the
++ * PEBS records are logged into the guest's DS and invisible to host.
++ *
++ * In the case of guest PEBS overflow, we only trigger a fake event
++ * to emulate the PEBS overflow PMI for guest PEBS counters in KVM.
++ * The guest will then vm-entry and check the guest DS area to read
++ * the guest PEBS records.
++ *
++ * The contents and other behavior of the guest event do not matter.
++ */
++static void x86_pmu_handle_guest_pebs(struct pt_regs *regs,
++				      struct perf_sample_data *data)
++{
++	struct cpu_hw_events *cpuc = this_cpu_ptr(&cpu_hw_events);
++	u64 guest_pebs_idxs = cpuc->pebs_enabled & ~cpuc->intel_ctrl_host_mask;
++	struct perf_event *event = NULL;
++	int bit;
++
++	if (!unlikely(perf_guest_cbs && perf_guest_cbs->is_in_guest()))
++		return;
++
++	if (!x86_pmu.pebs_vmx || !x86_pmu.pebs_active ||
++	    !guest_pebs_idxs)
++		return;
++
++	for_each_set_bit(bit, (unsigned long *)&guest_pebs_idxs,
++			 INTEL_PMC_IDX_FIXED + x86_pmu.num_counters_fixed) {
++		event = cpuc->events[bit];
++		if (!event->attr.precise_ip)
++			continue;
++
++		perf_sample_data_init(data, 0, event->hw.last_period);
++		if (perf_event_overflow(event, data, regs))
++			x86_pmu_stop(event, 0);
++
++		/* Inject one fake event is enough. */
++		break;
++	}
++}
++
+ static int handle_pmi_common(struct pt_regs *regs, u64 status)
+ {
+ 	struct perf_sample_data data;
+@@ -2882,6 +2923,7 @@ static int handle_pmi_common(struct pt_regs *regs, u64 status)
+ 		u64 pebs_enabled = cpuc->pebs_enabled;
  
- /*
+ 		handled++;
++		x86_pmu_handle_guest_pebs(regs, &data);
+ 		x86_pmu.drain_pebs(regs, &data);
+ 		status &= intel_ctrl | GLOBAL_STATUS_TRACE_TOPAPMI;
+ 
 -- 
 2.33.1
 
