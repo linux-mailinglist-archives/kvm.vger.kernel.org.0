@@ -2,121 +2,230 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 90E21470E45
-	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 23:59:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AD50B470E53
+	for <lists+kvm@lfdr.de>; Sat, 11 Dec 2021 00:05:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243508AbhLJXDZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Dec 2021 18:03:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35830 "EHLO
+        id S1344909AbhLJXIf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Dec 2021 18:08:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239946AbhLJXDZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Dec 2021 18:03:25 -0500
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CF8BC061746;
-        Fri, 10 Dec 2021 14:59:49 -0800 (PST)
-Received: by mail-ed1-x52e.google.com with SMTP id l25so34804003eda.11;
-        Fri, 10 Dec 2021 14:59:49 -0800 (PST)
+        with ESMTP id S229685AbhLJXIe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Dec 2021 18:08:34 -0500
+Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1687CC061746
+        for <kvm@vger.kernel.org>; Fri, 10 Dec 2021 15:04:59 -0800 (PST)
+Received: by mail-io1-xd29.google.com with SMTP id b187so12063577iof.11
+        for <kvm@vger.kernel.org>; Fri, 10 Dec 2021 15:04:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=T2puOokeCNV8xWAxhgz6YPlQa9F/yVQdmT6GpYFr/Zc=;
-        b=CCL811133lml5fd6U1ueyd3Fxrn45u9zqPDFGfCdpB/EXRG6oRsNsMDuyE8XFpDFnA
-         4V2noEE0PHrv0wyttvk2BRV2Q1ES7+OXiAAenzWydEFyOXiEAcFH8o0mzCXHzeDYNfJN
-         JkzViCvaGid5GI/ve3nYCm8wANkiYNziU39tud7fDjTNWxLQVMmnE0hXfjiVLZG/HaRi
-         0aql2OVCN0CZ5rT7OFz80abW5d+oQAtz3ATZuugl8XyUG7gThjP+bWB7js7NkpBX6+JK
-         y2LBvwYPpqoaMhuv29/y8hU0XcZhdlX4p3cPBXqQCj1BKJsc6EzhySIeqdy8geOAyo9a
-         NJxQ==
+        d=cloudflare.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=5I5NHgS46XSTVWtKSECiaKdiPzg+nWy0GLfCMRd923Y=;
+        b=XY4WIrb2h/Fq6MEWC/l/zYhJ/HxlN3W6fwsKP0IeGpr3Wdy/+/OVgqKQVZle5S2SNl
+         GtRtcH8+iYfpv2KUx89DpxjYTHSfO+gKEt7afStUw5JN4dqPGSIJiwb8BZTcXyTq6ULv
+         8psjwk2HQ+WAYC9ccFarVQyYOqm5eO0mwLOPQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=T2puOokeCNV8xWAxhgz6YPlQa9F/yVQdmT6GpYFr/Zc=;
-        b=6+A39iTAaI9rcna9HSsNPuIhh7SU6deiceqk3FbzKm7RHgzPmZNaXDNY/zSW/5oI6g
-         S0CLjJgr9pbAi2Vb7FozbU+EvSAbRAA6S4o8Dl2ctZrwkheaD9wVJ7Eb6Co5Sj1MqOMz
-         QzwAtoUFSzts68G70YrXDjFFyG3idcuFMDMsZhuEE2SW7TOKiAMyNMMlxWR81YVPdh0h
-         MgrKsGNr/c2pcZKNXg1iEPb7zDs0ra2FC4qHSCpSM/Tee73IWND1z/0hxhYZE/yens7b
-         Nixy0RTjOfkrWwELC+AJ4vNeIuUrUZstEAgVLfIsMXCwoG4HH8Y/y3ENoTj8UeOUC1vn
-         vQmQ==
-X-Gm-Message-State: AOAM533VugPtSD5IzUe8HSI7FQsQf3btAns4oNTzGrxjqdmbXFtlSNzg
-        K3yWaOSjAGWnl4QzmiTmYYI=
-X-Google-Smtp-Source: ABdhPJwZw8dSkutBgvsjnnlCtJC5aztTokriuEiyFlFXjYartfxcC9JMZ/9I4QWDbVzqZf+BkDizYw==
-X-Received: by 2002:a05:6402:40d3:: with SMTP id z19mr43198775edb.185.1639177187825;
-        Fri, 10 Dec 2021 14:59:47 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id w5sm2214182edc.58.2021.12.10.14.59.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Dec 2021 14:59:47 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <c381aa2c-beb5-480f-1f24-a14de693e78f@redhat.com>
-Date:   Fri, 10 Dec 2021 23:59:42 +0100
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=5I5NHgS46XSTVWtKSECiaKdiPzg+nWy0GLfCMRd923Y=;
+        b=O8XzunskRcAfP9slOgx20bxMSJf7BhnSVJn2homUtmXI1r3KNJNbSUvFxzCQixbUR8
+         HcAXKrxL84l9WxY6lXVhT3s3B9bU70srInpYkW2qJDgmUj5jiZG8BlOuZKGfjpUAvXRH
+         A5Y1NimOdsAkXD2iER43nowzjAejFtviolufK7+tbV1npdGsoCUCUXMRc4LlaITUm4U9
+         BhBxY5tps5c3xvsatSA9xR5GFdcyAFhwNzZhhatfdv652wBb0zHA5LDLaztGV6VMjipR
+         0Ol5Hna6FYbIyYJeaF3WAYRmwRW067AMkGQo3pmTqv0QFC/OJzpo/zUGttij5ccp6XYo
+         VlzA==
+X-Gm-Message-State: AOAM533kenNyc5zOUMHF+3E9W4EX5EQkGZcHnv+wUfEyjBZ/tqCJ12WO
+        rRExO1YHecrCfvxsUjZeDf6zLo0zpH1yhfxIy+zxdf0lLqSbuA==
+X-Google-Smtp-Source: ABdhPJzOx6jiq45fs2ZYLx83QQ39kMmHkkwk0yRdJVAXf9TWu4pDN57Rr5EWfVIDuFMrs7mAjOO5+MuCa23j79/aPRY=
+X-Received: by 2002:a05:6602:1604:: with SMTP id x4mr24099249iow.84.1639177498281;
+ Fri, 10 Dec 2021 15:04:58 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH v2 4/6] KVM: x86/pmu: Add pmc->intr to refactor
- kvm_perf_overflow{_intr}()
-Content-Language: en-US
-To:     Jim Mattson <jmattson@google.com>
-Cc:     Like Xu <like.xu.linux@gmail.com>, Andi Kleen <ak@linux.intel.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>
-References: <20211130074221.93635-1-likexu@tencent.com>
- <20211130074221.93635-5-likexu@tencent.com>
- <CALMp9eRAxBFE5mYw=isUSsMTWZS2VOjqZfgh0r3hFuF+5npCAQ@mail.gmail.com>
- <0ca44f61-f7f1-0440-e1e1-8d5e8aa9b540@gmail.com>
- <CALMp9eTtsMuEsimONp7TOjJ-uskwJBD-52kZzOefSKXeCwn_5A@mail.gmail.com>
- <b6c1eb18-9237-f604-9a96-9e6ca397121c@redhat.com>
- <CALMp9eRy==yu1uQriqbeezeQ+mtFyfyP_iy9HdDiSZ27SnEfFg@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <CALMp9eRy==yu1uQriqbeezeQ+mtFyfyP_iy9HdDiSZ27SnEfFg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <CALrw=nEaWhpG1y7VNTGDFfF1RWbPvm5ka5xWxD-YWTS3U=r9Ng@mail.gmail.com>
+ <d49e157a-5915-fbdc-8103-d7ba2621aea9@redhat.com> <CALrw=nHTJpoSFFadmDL2EL95D2kAiH5G-dgLvU0L7X=emxrP2A@mail.gmail.com>
+ <YaaIRv0n2E8F5YpX@google.com> <CALrw=nGrAhSn=MkW-wvNr=UnaS5=t24yY-TWjSvcNJa1oJ85ww@mail.gmail.com>
+In-Reply-To: <CALrw=nGrAhSn=MkW-wvNr=UnaS5=t24yY-TWjSvcNJa1oJ85ww@mail.gmail.com>
+From:   Ignat Korchagin <ignat@cloudflare.com>
+Date:   Fri, 10 Dec 2021 23:04:47 +0000
+Message-ID: <CALrw=nE+yGtRi-0bFFwXa9R8ydHKV7syRYeAYuC0EBTvdFiidQ@mail.gmail.com>
+Subject: Re: Potential bug in TDP MMU
+To:     kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>, stevensd@chromium.org,
+        kernel-team <kernel-team@cloudflare.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/10/21 23:55, Jim Mattson wrote:
->>
->> Even for tracing the SDM says "Like the value returned by RDTSC, TSC
->> packets will include these adjustments, but other timing packets (such
->> as MTC, CYC, and CBR) are not impacted".  Considering that "stand-alone
->> TSC packets are typically generated only when generation of other timing
->> packets (MTCs and CYCs) has ceased for a period of time", I'm not even
->> sure it's a good thing that the values in TSC packets are scaled and offset.
->>
->> Back to the PMU, for non-architectural counters it's not really possible
->> to know if they count in cycles or not.  So it may not be a good idea to
->> special case the architectural counters.
->
-> In that case, what we're doing with the guest PMU is not
-> virtualization. I don't know what it is, but it's not virtualization.
+I've been trying to figure out the difference between "good" runs and
+"bad" runs of gvisor. So, if I've been running the following bpftrace
+onliner:
 
-It is virtualization even if it is incompatible with live migration to a 
-different SKU (where, as you point out below, multiple TSC frequencies 
-might also count as multiple SKUs).  But yeah, it's virtualization with 
-more caveats than usual.
+$ bpftrace -e 'kprobe:kvm_set_pfn_dirty { @[kstack] = count(); }'
 
-> Exposing non-architectural events is questionable with live migration,
-> and TSC scaling is unnecessary without live migration. I suppose you
-> could have a migration pool with different SKUs of the same generation
-> with 'seemingly compatible' PMU events but different TSC frequencies,
-> in which case it might be reasonable to expose non-architectural
-> events, but I would argue that any of those 'seemingly compatible'
-> events are actually not compatible if they count in cycles.
+while also executing a single:
 
-I agree.  Support for marshaling/unmarshaling PMU state exists but it's 
-more useful for intra-host updates than for actual live migration, since 
-these days most live migration will use TSC scaling on the destination.
+$ sudo runsc --platform=kvm --network=none do echo ok
 
-Paolo
+So, for "good" runs the stacks are the following:
 
-> 
-> Unless, of course, Like is right, and the PMU counters do count fractionally.
-> 
+# bpftrace -e 'kprobe:kvm_set_pfn_dirty { @[kstack] = count(); }'
+Attaching 1 probe...
+^C
 
+@[
+    kvm_set_pfn_dirty+1
+    __handle_changed_spte+2535
+    __tdp_mmu_set_spte+396
+    zap_gfn_range+2229
+    kvm_tdp_mmu_unmap_gfn_range+331
+    kvm_unmap_gfn_range+774
+    kvm_mmu_notifier_invalidate_range_start+743
+    __mmu_notifier_invalidate_range_start+508
+    unmap_vmas+566
+    unmap_region+494
+    __do_munmap+1172
+    __vm_munmap+226
+    __x64_sys_munmap+98
+    do_syscall_64+64
+    entry_SYSCALL_64_after_hwframe+68
+]: 1
+@[
+    kvm_set_pfn_dirty+1
+    __handle_changed_spte+2535
+    __tdp_mmu_set_spte+396
+    zap_gfn_range+2229
+    kvm_tdp_mmu_unmap_gfn_range+331
+    kvm_unmap_gfn_range+774
+    kvm_mmu_notifier_invalidate_range_start+743
+    __mmu_notifier_invalidate_range_start+508
+    zap_page_range_single+870
+    unmap_mapping_pages+434
+    shmem_fallocate+2518
+    vfs_fallocate+684
+    __x64_sys_fallocate+181
+    do_syscall_64+64
+    entry_SYSCALL_64_after_hwframe+68
+]: 32
+@[
+    kvm_set_pfn_dirty+1
+    __handle_changed_spte+2535
+    __handle_changed_spte+1746
+    __handle_changed_spte+1746
+    __handle_changed_spte+1746
+    __tdp_mmu_set_spte+396
+    zap_gfn_range+2229
+    __kvm_tdp_mmu_zap_gfn_range+162
+    kvm_tdp_mmu_zap_all+34
+    kvm_mmu_zap_all+518
+    kvm_mmu_notifier_release+83
+    __mmu_notifier_release+420
+    exit_mmap+965
+    mmput+167
+    do_exit+2482
+    do_group_exit+236
+    get_signal+1000
+    arch_do_signal_or_restart+580
+    exit_to_user_mode_prepare+300
+    syscall_exit_to_user_mode+25
+    do_syscall_64+77
+    entry_SYSCALL_64_after_hwframe+68
+]: 365
+
+For "bad" runs, when I get the warning - I get this:
+
+# bpftrace -e 'kprobe:kvm_set_pfn_dirty { @[kstack] = count(); }'
+Attaching 1 probe...
+^C
+
+@[
+    kvm_set_pfn_dirty+1
+    __handle_changed_spte+2535
+    __tdp_mmu_set_spte+396
+    zap_gfn_range+2229
+    kvm_tdp_mmu_unmap_gfn_range+331
+    kvm_unmap_gfn_range+774
+    kvm_mmu_notifier_invalidate_range_start+743
+    __mmu_notifier_invalidate_range_start+508
+    unmap_vmas+566
+    unmap_region+494
+    __do_munmap+1172
+    __vm_munmap+226
+    __x64_sys_munmap+98
+    do_syscall_64+64
+    entry_SYSCALL_64_after_hwframe+68
+]: 1
+@[
+    kvm_set_pfn_dirty+1
+    __handle_changed_spte+2535
+    __handle_changed_spte+1746
+    __handle_changed_spte+1746
+    __handle_changed_spte+1746
+    __tdp_mmu_set_spte+396
+    zap_gfn_range+2229
+    kvm_tdp_mmu_put_root+465
+    mmu_free_root_page+537
+    kvm_mmu_free_roots+629
+    kvm_mmu_unload+28
+    kvm_arch_destroy_vm+510
+    kvm_put_kvm+1017
+    kvm_vcpu_release+78
+    __fput+516
+    task_work_run+206
+    do_exit+2615
+    do_group_exit+236
+    get_signal+1000
+    arch_do_signal_or_restart+580
+    exit_to_user_mode_prepare+300
+    syscall_exit_to_user_mode+25
+    do_syscall_64+77
+    entry_SYSCALL_64_after_hwframe+68
+]: 2
+@[
+    kvm_set_pfn_dirty+1
+    __handle_changed_spte+2535
+    __tdp_mmu_set_spte+396
+    zap_gfn_range+2229
+    kvm_tdp_mmu_unmap_gfn_range+331
+    kvm_unmap_gfn_range+774
+    kvm_mmu_notifier_invalidate_range_start+743
+    __mmu_notifier_invalidate_range_start+508
+    zap_page_range_single+870
+    unmap_mapping_pages+434
+    shmem_fallocate+2518
+    vfs_fallocate+684
+    __x64_sys_fallocate+181
+    do_syscall_64+64
+    entry_SYSCALL_64_after_hwframe+68
+]: 32
+@[
+    kvm_set_pfn_dirty+1
+    __handle_changed_spte+2535
+    __handle_changed_spte+1746
+    __handle_changed_spte+1746
+    __handle_changed_spte+1746
+    __tdp_mmu_set_spte+396
+    zap_gfn_range+2229
+    __kvm_tdp_mmu_zap_gfn_range+162
+    kvm_tdp_mmu_zap_all+34
+    kvm_mmu_zap_all+518
+    kvm_mmu_notifier_release+83
+    __mmu_notifier_release+420
+    exit_mmap+965
+    mmput+167
+    do_exit+2482
+    do_group_exit+236
+    get_signal+1000
+    arch_do_signal_or_restart+580
+    exit_to_user_mode_prepare+300
+    syscall_exit_to_user_mode+25
+    do_syscall_64+77
+    entry_SYSCALL_64_after_hwframe+68
+]: 344
+
+That is, I never get a stack with
+kvm_tdp_mmu_put_root->..->kvm_set_pfn_dirty with a "good" run.
+Perhaps, this may shed some light onto what is going on.
+
+Ignat
