@@ -2,66 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2EBD5470032
-	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 12:38:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D0DF5470071
+	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 13:07:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240727AbhLJLlf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Dec 2021 06:41:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44664 "EHLO
+        id S240870AbhLJMLb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Dec 2021 07:11:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240732AbhLJLld (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Dec 2021 06:41:33 -0500
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 615CCC0617A1;
-        Fri, 10 Dec 2021 03:37:58 -0800 (PST)
-Received: by mail-ed1-x535.google.com with SMTP id t5so28658577edd.0;
-        Fri, 10 Dec 2021 03:37:58 -0800 (PST)
+        with ESMTP id S229762AbhLJMLb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Dec 2021 07:11:31 -0500
+Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1ABE0C061746;
+        Fri, 10 Dec 2021 04:07:56 -0800 (PST)
+Received: by mail-ed1-x536.google.com with SMTP id t5so28916864edd.0;
+        Fri, 10 Dec 2021 04:07:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=sender:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=9PGzqzVr2lWR3c2FT6fcegvnLqjE5zdT1FTCSBDISuI=;
-        b=OM3Nsd4ERses81PNwgGaV6Q7lHZ2NrIuizdbzBgNTGK9RHnDCOrAsDnSChO7XKFAZi
-         vLUjMEQcVNFHcGMVfYKcGFH2HBh6Vw3rIMPk91Mzbko3xYPcjWXaD0QhzPgcRCzi/rmz
-         TigzgBdHpHE1kgICxTUm3FPaWKeuU6uYvAJUZCVcvdbmCN0jXN6JZcfN1tyLFT310IQs
-         7O4yK8ofsPkeRg6dtwxD+XD/+2wNTzt9Q0pA3c5hwe74Zk+jsx176dHTG9EnmTmbYPbD
-         tYe4dTjQoFl1jcBSNq1N8m6APJC9eoK8SuIahBSIyDP06/QAkhsmqLyGvpnFOkJO7Mnz
-         G1qA==
+        bh=nj7aP+DT5LdcUR+5nEFGqEHWsnVehVd/fkoHc9nNYc4=;
+        b=PhzM3O1qKcQ6YnFuTodoI7J8Z5uhpIMeuJx8RqlbzOzof2j0B6UdH5KOD+SOTHa0N3
+         PM6y2bII+meR0KzImjli57ZPHMHaamPbDdJ56NIWPXQW4qJ82ZBgUF1rILyur0lf6TGo
+         Nj6OFNLNWLyEzg10MLoZxC3P1TzkpOiDfHu6u2h8YlhzsvZVYl8c4BbV3p463PGqDx15
+         Q8W2b2arNtQ4MDSo75tLzzUg5OaLvUEMF4pTXpoEQZIpkijgvXTk6TJnoeFtcIBRW2uF
+         bhmpXNCDm7Z/G9xVyJMXeb0TGD+iP15y92UaPhIeIYJRqXffDEQUAmhQOR0pzsOZ7Bja
+         kg8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
          :subject:content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=9PGzqzVr2lWR3c2FT6fcegvnLqjE5zdT1FTCSBDISuI=;
-        b=1xwpjRNz4ZZi7ifvhev+HPpGx6TBYxmIMWAW/65diX0fgktnDhQZKSvhQE2lh+HVmZ
-         wzHxhsMULbPWbozbxR5mAoYe/FIY4F2dMN94cHwHymg+uneBarqp5Rd2nCaycVuDa1fd
-         Ot34zuU5EI1T/LKR8irL7GFURP4PEey4k0ewr3bWRZuhKVh/T6AXz8+sPso+aOf0Tcak
-         LUSBF+IqB0lqoY7TlmN4gQnTujRj+AaKlKKrTyz2mxtHcSz9MokIN/GZJwTFUMBG8ARS
-         KqdQCn9akKgpGszmr+x3M0BtrXoM2AwIbKgdzKfZWZREMZ2YPEWBZCwy2LeAhbtTLPGB
-         rhKg==
-X-Gm-Message-State: AOAM531eiMeBSIoBg6Uulw+fI/zu0j7QKfQ2EGxspO5WIcoSQg/wvlT3
-        w7awceM7jOrAyMYyFHqbPjY=
-X-Google-Smtp-Source: ABdhPJx6v0WRp3OGfTassW/62i7NBEybv5+nw9b4oMWyDZPAfmhh2AuYeK9X3ZI4bHRxlhTob2it/g==
-X-Received: by 2002:a50:9ea6:: with SMTP id a35mr37180244edf.400.1639136276255;
-        Fri, 10 Dec 2021 03:37:56 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312::973? ([2001:b07:6468:f312::973])
-        by smtp.googlemail.com with ESMTPSA id sa17sm1389929ejc.123.2021.12.10.03.37.54
+        bh=nj7aP+DT5LdcUR+5nEFGqEHWsnVehVd/fkoHc9nNYc4=;
+        b=7U/eVgNcmjKfAlOBnraduYF3rlWSEDU/6yPiLfhqElVsEwlRAthYG0XwDGdjDQ7hWR
+         Te5TGOs5ZemLxCb6egSeq9giINhyzIJUgeB+n/wjVUCcHF86PRdWRqY8FqXKWsTslPDf
+         56BwY2JdYd3N8hydwaH3dHkdXJPlnxl6SexGsfw5rJgZBbfS7+qaVn4GFYsBpnPLG/mp
+         IstNGHbKXIVhE//rivEsEmj4CvqEuWors3nqcYm7I+Fh0LeWZcTW3VGZFRGVW6DEBNmJ
+         4FHwT3dR8PmJUCFisVChAwi1b+6hLmPlRCO3UgXJN84RQAFtbuJoOth4g4xDIEAaWIL0
+         VKJA==
+X-Gm-Message-State: AOAM531qGoxymq4W2ZXZZP6lg9bc69H/5vFwAP+jaZ5qv4PAWnRdAqoZ
+        shP5KoniBoDzdKoVdZDRzOc=
+X-Google-Smtp-Source: ABdhPJxM8AmICWv2HgQ8A1RCPyWqAzT+vD4vNLzvjcG0RW1U58Rr9OllD13q/j4OJf7YTLam2+qihg==
+X-Received: by 2002:a17:906:ff47:: with SMTP id zo7mr23315986ejb.148.1639138074679;
+        Fri, 10 Dec 2021 04:07:54 -0800 (PST)
+Received: from [192.168.10.118] ([93.56.170.1])
+        by smtp.googlemail.com with ESMTPSA id bd12sm1337669edb.11.2021.12.10.04.07.53
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Dec 2021 03:37:55 -0800 (PST)
+        Fri, 10 Dec 2021 04:07:54 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <ad666891-a67e-f126-da14-6de382bf0659@redhat.com>
-Date:   Fri, 10 Dec 2021 12:37:54 +0100
+Message-ID: <636dd644-8160-645a-ce5a-f4eb344f001c@redhat.com>
+Date:   Fri, 10 Dec 2021 13:07:52 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.2.0
-Subject: Re: [PATCH 4/6] KVM: SVM: fix races in the AVIC incomplete IPI
- delivery to vCPUs
+Subject: Re: [PATCH 5/6] KVM: x86: never clear irr_pending in
+ kvm_apic_update_apicv
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     kvm@vger.kernel.org,
-        "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
+To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
+Cc:     "open list:X86 ARCHITECTURE (32-BIT AND 64-BIT)" 
         <linux-kernel@vger.kernel.org>, Wanpeng Li <wanpengli@tencent.com>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Joerg Roedel <joro@8bytes.org>,
@@ -71,24 +69,35 @@ Cc:     kvm@vger.kernel.org,
         "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
         Ingo Molnar <mingo@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Jim Mattson <jmattson@google.com>
+        Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <seanjc@google.com>
 References: <20211209115440.394441-1-mlevitsk@redhat.com>
- <20211209115440.394441-5-mlevitsk@redhat.com> <YbIjCUAECOyIbsYQ@google.com>
+ <20211209115440.394441-6-mlevitsk@redhat.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <YbIjCUAECOyIbsYQ@google.com>
+In-Reply-To: <20211209115440.394441-6-mlevitsk@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/9/21 16:38, Sean Christopherson wrote:
-> +                       if (svm_deliver_avic_intr(vcpu, -1) {
-> +                               vcpu->arch.apic->irr_pending = true;
-> +                               kvm_make_request(KVM_REQ_EVENT, vcpu);
-> +                       }
+On 12/9/21 12:54, Maxim Levitsky wrote:
+> It is possible that during the AVIC incomplete IPI vmexit,
+> its handler will set irr_pending to true,
+> but the target vCPU will still see the IRR bit not set,
+> due to the apparent lack of memory ordering between CPU's vIRR write
+> that is supposed to happen prior to the AVIC incomplete IPI
+> vmexit and the write of the irr_pending in that handler.
 
-This is a good idea, but the details depends on patch 3 so I'll send a 
-series of my own.
+Are you sure about this?  Store-to-store ordering should be 
+guaranteed---if not by the architecture---by existing memory barriers 
+between vmrun returning and avic_incomplete_ipi_interception().  For 
+example, srcu_read_lock implies an smp_mb().
+
+Even more damning: no matter what internal black magic the processor 
+could be using to write to IRR, the processor needs to order the writes 
+against reads of IsRunning on processors without the erratum.  That 
+would be equivalent to flushing the store buffer, and it would imply 
+that the write of vIRR is ordered before the write to irr_pending.
 
 Paolo
