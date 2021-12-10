@@ -2,246 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 036A34709B6
-	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 20:05:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 605FB470A37
+	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 20:17:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343516AbhLJTIl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Dec 2021 14:08:41 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:62854 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S244771AbhLJTIk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 10 Dec 2021 14:08:40 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1BAIvX3U028646;
-        Fri, 10 Dec 2021 19:05:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=mTc6O31oy03pyueB0ZzmE2BTEFYfLWzisz8ir47qnPE=;
- b=eG6sd8Iw97iOO+94KvU8ID3hjBT/BUp+nL48K/6J/5/mnwa70a1MTDdI/U+keRcnlq9H
- 3idmFgIyzSjCjx3SLqHSxl5SQ8WDDKW9tpfjuYen42GHtvsqDEmNB22L3skIqiFBm0aB
- apb9/fwyMa+RmNBj/VMxEMXpIw5PBNs8i1MpZUevo5K0mrk4pJ3uLAmt7tMNFprKTQlo
- gfx24RDB3S/3eAOJvURhQvyDalqL/nsNu5fxcoQepZiD9RGxY2cJAjWy3YjQ0apbovjt
- jWS9/kvSAjTj+nGfAQvKmyTffHrvu8mrH8TKYTLpIr6scLjJf/f+4mPB3gtxpCppf7RC zA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3cvcmn842d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 10 Dec 2021 19:05:04 +0000
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1BAJ2qVM018055;
-        Fri, 10 Dec 2021 19:05:04 GMT
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3cvcmn8421-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 10 Dec 2021 19:05:03 +0000
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
-        by ppma03wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1BAIcRfS009598;
-        Fri, 10 Dec 2021 19:05:03 GMT
-Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
-        by ppma03wdc.us.ibm.com with ESMTP id 3cqyy9w30n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 10 Dec 2021 19:05:03 +0000
-Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
-        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1BAJ52kA47055216
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 10 Dec 2021 19:05:02 GMT
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0CF0D2806A;
-        Fri, 10 Dec 2021 19:05:02 +0000 (GMT)
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 604522805E;
-        Fri, 10 Dec 2021 19:04:57 +0000 (GMT)
-Received: from farman-thinkpad-t470p (unknown [9.211.80.105])
-        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
-        Fri, 10 Dec 2021 19:04:57 +0000 (GMT)
-Message-ID: <8c5a0eadb764cfd7769fdbcd4b060eee40c6a43d.camel@linux.ibm.com>
-Subject: Re: [PATCH 13/32] KVM: s390: pci: add basic kvm_zdev structure
-From:   Eric Farman <farman@linux.ibm.com>
-To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        schnelle@linux.ibm.com, pmorel@linux.ibm.com,
-        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
-        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
-        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date:   Fri, 10 Dec 2021 14:04:55 -0500
-In-Reply-To: <20211207205743.150299-14-mjrosato@linux.ibm.com>
-References: <20211207205743.150299-1-mjrosato@linux.ibm.com>
-         <20211207205743.150299-14-mjrosato@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-16.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: MJwru0hY28u-mzsAofYsjX8e18mBUNlI
-X-Proofpoint-GUID: N1NmPQxi88FQTUAArtvypkzHZEnl1d8Z
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2021-12-10_07,2021-12-10_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- clxscore=1015 adultscore=0 suspectscore=0 spamscore=0 mlxscore=0
- lowpriorityscore=0 malwarescore=0 impostorscore=0 mlxlogscore=999
- phishscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2112100104
+        id S245364AbhLJTV3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Dec 2021 14:21:29 -0500
+Received: from mga14.intel.com ([192.55.52.115]:15844 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S235292AbhLJTV2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Dec 2021 14:21:28 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1639163873; x=1670699873;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=3EHValpJ29nH+vMGckzz7nU/Iej7vZerlJ9zwjcABL8=;
+  b=ONP4pCSm5AIU1NtbdRZgIJkqi3f8dgfBu17u+csxeza40d3v4NEq5Y+u
+   cidU+lK4Q3rKmLWNlVSDwgJxbpx+R59qmkuDh5/bB7F19eZBZXttGl0cc
+   S1UH/ktK0cKij2bqool5/KVNtdIfrVo3s1/bMUiS4q7TIwwzoDD50faC8
+   sn7/tmuFT+t6Ez32WyI2jJbBm/0i/h1Dx2w6DGec9apgPYxFGFInWewq/
+   npQDQKgPSqko9cUkGbYZfrm9aSrHPrdEjuLBJGyStYiT8n8yPmAzdsMUx
+   mt27uQu9VfGRJ9IPMA2q8Vhoi8NMjRkLIQhlbk37bj8zNwS5A9GWwwIVb
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10194"; a="238646741"
+X-IronPort-AV: E=Sophos;i="5.88,196,1635231600"; 
+   d="scan'208";a="238646741"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2021 11:13:01 -0800
+X-IronPort-AV: E=Sophos;i="5.88,196,1635231600"; 
+   d="scan'208";a="607606386"
+Received: from klarson-mobl.amr.corp.intel.com (HELO [10.251.16.229]) ([10.251.16.229])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2021 11:12:57 -0800
+Subject: Re: [PATCH v8 27/40] x86/boot: Add Confidential Computing type to
+ setup_data
+To:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+References: <20211210154332.11526-1-brijesh.singh@amd.com>
+ <20211210154332.11526-28-brijesh.singh@amd.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+ z5cecg==
+Message-ID: <1fdaca61-884a-ac13-fb33-a47db198f050@intel.com>
+Date:   Fri, 10 Dec 2021 11:12:54 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+MIME-Version: 1.0
+In-Reply-To: <20211210154332.11526-28-brijesh.singh@amd.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2021-12-07 at 15:57 -0500, Matthew Rosato wrote:
-> This structure will be used to carry kvm passthrough information
-> related to
-> zPCI devices.
-> 
-> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-
-Reviewed-by: Eric Farman <farman@linux.ibm.com>
-
-> ---
->  arch/s390/include/asm/kvm_pci.h | 29 +++++++++++++++++
->  arch/s390/include/asm/pci.h     |  3 ++
->  arch/s390/kvm/Makefile          |  2 +-
->  arch/s390/kvm/pci.c             | 57
-> +++++++++++++++++++++++++++++++++
->  4 files changed, 90 insertions(+), 1 deletion(-)
->  create mode 100644 arch/s390/include/asm/kvm_pci.h
->  create mode 100644 arch/s390/kvm/pci.c
-> 
-> diff --git a/arch/s390/include/asm/kvm_pci.h
-> b/arch/s390/include/asm/kvm_pci.h
-> new file mode 100644
-> index 000000000000..3e491a39704c
-> --- /dev/null
-> +++ b/arch/s390/include/asm/kvm_pci.h
-> @@ -0,0 +1,29 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +/*
-> + * KVM PCI Passthrough for virtual machines on s390
-> + *
-> + * Copyright IBM Corp. 2021
-> + *
-> + *    Author(s): Matthew Rosato <mjrosato@linux.ibm.com>
-> + */
-> +
-> +
-> +#ifndef ASM_KVM_PCI_H
-> +#define ASM_KVM_PCI_H
-> +
-> +#include <linux/types.h>
-> +#include <linux/kvm_types.h>
-> +#include <linux/kvm_host.h>
-> +#include <linux/kvm.h>
-> +#include <linux/pci.h>
-> +
-> +struct kvm_zdev {
-> +	struct zpci_dev *zdev;
-> +	struct kvm *kvm;
+On 12/10/21 7:43 AM, Brijesh Singh wrote:
+> +/* AMD SEV Confidential computing blob structure */
+> +#define CC_BLOB_SEV_HDR_MAGIC	0x45444d41
+> +struct cc_blob_sev_info {
+> +	u32 magic;
+> +	u16 version;
+> +	u16 reserved;
+> +	u64 secrets_phys;
+> +	u32 secrets_len;
+> +	u64 cpuid_phys;
+> +	u32 cpuid_len;
 > +};
-> +
-> +extern int kvm_s390_pci_dev_open(struct zpci_dev *zdev);
-> +extern void kvm_s390_pci_dev_release(struct zpci_dev *zdev);
-> +extern int kvm_s390_pci_attach_kvm(struct zpci_dev *zdev, struct kvm
-> *kvm);
-> +
-> +#endif /* ASM_KVM_PCI_H */
-> diff --git a/arch/s390/include/asm/pci.h
-> b/arch/s390/include/asm/pci.h
-> index 86f43644756d..32810e1ed308 100644
-> --- a/arch/s390/include/asm/pci.h
-> +++ b/arch/s390/include/asm/pci.h
-> @@ -97,6 +97,7 @@ struct zpci_bar_struct {
->  };
->  
->  struct s390_domain;
-> +struct kvm_zdev;
->  
->  #define ZPCI_FUNCTIONS_PER_BUS 256
->  struct zpci_bus {
-> @@ -190,6 +191,8 @@ struct zpci_dev {
->  	struct dentry	*debugfs_dev;
->  
->  	struct s390_domain *s390_domain; /* s390 IOMMU domain data */
-> +
-> +	struct kvm_zdev *kzdev; /* passthrough data */
->  };
->  
->  static inline bool zdev_enabled(struct zpci_dev *zdev)
-> diff --git a/arch/s390/kvm/Makefile b/arch/s390/kvm/Makefile
-> index b3aaadc60ead..95ea865e5d29 100644
-> --- a/arch/s390/kvm/Makefile
-> +++ b/arch/s390/kvm/Makefile
-> @@ -10,6 +10,6 @@ common-objs = $(KVM)/kvm_main.o
-> $(KVM)/eventfd.o  $(KVM)/async_pf.o \
->  ccflags-y := -Ivirt/kvm -Iarch/s390/kvm
->  
->  kvm-objs := $(common-objs) kvm-s390.o intercept.o interrupt.o priv.o
-> sigp.o
-> -kvm-objs += diag.o gaccess.o guestdbg.o vsie.o pv.o
-> +kvm-objs += diag.o gaccess.o guestdbg.o vsie.o pv.o pci.o
->  
->  obj-$(CONFIG_KVM) += kvm.o
-> diff --git a/arch/s390/kvm/pci.c b/arch/s390/kvm/pci.c
-> new file mode 100644
-> index 000000000000..ecfc458a5b39
-> --- /dev/null
-> +++ b/arch/s390/kvm/pci.c
-> @@ -0,0 +1,57 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * s390 kvm PCI passthrough support
-> + *
-> + * Copyright IBM Corp. 2021
-> + *
-> + *    Author(s): Matthew Rosato <mjrosato@linux.ibm.com>
-> + */
-> +
-> +#include <linux/kvm_host.h>
-> +#include <linux/pci.h>
-> +#include <asm/kvm_pci.h>
-> +
-> +int kvm_s390_pci_dev_open(struct zpci_dev *zdev)
-> +{
-> +	struct kvm_zdev *kzdev;
-> +
-> +	if (zdev == NULL)
-> +		return -ENODEV;
-> +
-> +	kzdev = kzalloc(sizeof(struct kvm_zdev), GFP_KERNEL);
-> +	if (!kzdev)
-> +		return -ENOMEM;
-> +
-> +	kzdev->zdev = zdev;
-> +	zdev->kzdev = kzdev;
-> +
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(kvm_s390_pci_dev_open);
-> +
-> +void kvm_s390_pci_dev_release(struct zpci_dev *zdev)
-> +{
-> +	struct kvm_zdev *kzdev;
-> +
-> +	if (!zdev || !zdev->kzdev)
-> +		return;
-> +
-> +	kzdev = zdev->kzdev;
-> +	WARN_ON(kzdev->zdev != zdev);
-> +	zdev->kzdev = 0;
-> +	kfree(kzdev);
-> +
-> +}
-> +EXPORT_SYMBOL_GPL(kvm_s390_pci_dev_release);
-> +
-> +int kvm_s390_pci_attach_kvm(struct zpci_dev *zdev, struct kvm *kvm)
-> +{
-> +	struct kvm_zdev *kzdev = zdev->kzdev;
-> +
-> +	if (!kzdev)
-> +		return -ENODEV;
-> +
-> +	kzdev->kvm = kvm;
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(kvm_s390_pci_attach_kvm);
 
+This is an ABI structure rather than some purely kernel construct, right?
+
+I searched through all of the specs to which you linked in the cover
+letter.  I looked for "blob", "guid", the magic and part of the GUID
+itself trying to find where this is defined to see if the struct is correct.
+
+I couldn't find anything.
+
+Where is the spec for this blob?  How large is it?  Did you mean to
+leave a 4-byte hole after secrets_len and before cpuid_phys?
