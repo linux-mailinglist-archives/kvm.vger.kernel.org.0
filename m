@@ -2,304 +2,289 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DEF8646F9D5
-	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 05:26:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 59C3546F9E6
+	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 05:37:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234318AbhLJEaZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Dec 2021 23:30:25 -0500
-Received: from alexa-out-sd-02.qualcomm.com ([199.106.114.39]:28890 "EHLO
-        alexa-out-sd-02.qualcomm.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231805AbhLJEaY (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 Dec 2021 23:30:24 -0500
+        id S230412AbhLJEl2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Dec 2021 23:41:28 -0500
+Received: from mx0b-00069f02.pphosted.com ([205.220.177.32]:13538 "EHLO
+        mx0b-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229481AbhLJEl1 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 9 Dec 2021 23:41:27 -0500
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1BA0W5gb012280;
+        Fri, 10 Dec 2021 04:37:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=references : from :
+ to : cc : subject : in-reply-to : date : message-id : content-type :
+ mime-version; s=corp-2021-07-09;
+ bh=PgsXyRv1zMmct7k+oq+R4dzh3F5/48R3Bo1dLsHxNNM=;
+ b=RRH16bhR7h77ugnPahJSlL047EWPoKIsCApHJecv72KZzjx8WraqaEBEzP/noM/iqTgZ
+ 1eChYJWYmJb5AtmUpPV102OMqrqAFWFeI4E3g70b4d3DN02NkNfrDsmTYN0gpyMR30JD
+ tcf97g9Glg2WsP8tQixTzUdLsSMZ4ZD5GiV87sJzoglrefRE905zf94ptHZBNNhXAOAU
+ 3NGUHELXezv4llSg5DzbUHwhGA3iKiJgT3CwBvt7MP5pOzPFwzCqAmRGv5T1ViwqOT66
+ AdVodJNyO+BHtnh0xm5/RKQxy7uTh0f4Sw8CtwMBNLoc4j58ktmJ4xf2YeyVTFfQnWzc sw== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by mx0b-00069f02.pphosted.com with ESMTP id 3ctrj2wcdh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 10 Dec 2021 04:37:22 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 1BA4ZXX0081657;
+        Fri, 10 Dec 2021 04:37:21 GMT
+Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2103.outbound.protection.outlook.com [104.47.55.103])
+        by aserp3030.oracle.com with ESMTP id 3csc4x79v0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 10 Dec 2021 04:37:21 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=j9x/zLFrE8HB7TX7Ajdf9FQHURjsAHXAghtjWKaZvFaDGN+0q8wh+3ryJ1EU2uU6IhRmM7M/f6rrEHbA7sLyz0TwE7jYMLIxgnSh7F27FVhCXZzIxpxlbL0qgruUaeo80mjvU+fvpfZ62yNbCwREKZyzgTUADzTS8lJ599GM1dbDM/tCyn4+wqJCyfQa00ZOnVfiNIBpZ3yNz9Axbpce+/xhubFKdOYhazjt8QZV6aQRMky1qes5AWC1tem1snJ2gyo3NOB0DSbflKHP8coN9SwjeuzgAJqS0oTUdT0eFoJaHgnNkBbFQVq6VUiJz4y5gQyjWJks/tUqHQHp44fhxA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PgsXyRv1zMmct7k+oq+R4dzh3F5/48R3Bo1dLsHxNNM=;
+ b=f6DnyBq6XdviJJuQNAzV8n0Ba2ke0vnBF7LBJ6Ptr2tSuApQRmdlv9TyLNph+8Co+YyDQ+P3291Cs6L2BChRYwqoV4KuidQXUZP1hLkB6l9309miJmDOIBHaaBgAUkalht6LdkwkGvATccgpeUQO6ik2UsWTpZ5dEyhACjSa6y36E4xGKoISzCWUrpxNXVfGBPwKGfjLB0oq5PCFhGrS4BAPw98p2FKIpM1e26MHI2L5TC5idhdN7GNJHv0zsT/ghcyda5cjrXt39aaplSHLAwARh/yFDD61ntFnXkEdNvMtlnIqUM/1WON6XnK7izd4b5JtxYPqExreqJZ3+AdC5A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
-  t=1639110410; x=1670646410;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=g8Uqg5l40Sk/Jnd6qrQl6K9TwkNkMVjfkkyCjBuSqqU=;
-  b=b/x5tX6w2HZooMx8Q2+1kwjtQCTl2D0WMZnURKjmef8/HRraEOknBNtc
-   O15R/qS8to/yrtvTSV7OjxfumssMqv0Ba5Hh4yqF6xACuVKM14Azcd+Qf
-   LY4dTzYTBh4/QTP6Ggex9CIxiEjieTAeEon27zK542jEoxAwn9pKJt+bV
-   E=;
-Received: from unknown (HELO ironmsg03-sd.qualcomm.com) ([10.53.140.143])
-  by alexa-out-sd-02.qualcomm.com with ESMTP; 09 Dec 2021 20:26:50 -0800
-X-QCInternal: smtphost
-Received: from nasanex01b.na.qualcomm.com ([10.46.141.250])
-  by ironmsg03-sd.qualcomm.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2021 20:26:50 -0800
-Received: from [10.216.12.12] (10.80.80.8) by nasanex01b.na.qualcomm.com
- (10.46.141.250) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.922.19; Thu, 9 Dec 2021
- 20:26:42 -0800
-Message-ID: <b7f2bb55-4f0e-f52d-d41c-b591aa3927f2@quicinc.com>
-Date:   Fri, 10 Dec 2021 09:56:38 +0530
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=PgsXyRv1zMmct7k+oq+R4dzh3F5/48R3Bo1dLsHxNNM=;
+ b=sf6Utu78CYNdwkhyx8SUS1uzgf74XHIUFtSZuNjfAmll4ywOKmLk4Qa2Gz8M38U3mUgA4IDBq2JrXfHcvB/IjsUVjXBeBJS2q6t4wWi1sazKcouKebkMzlk5Ms3ONb5/bc/7nsRoXkqo0jHkoi8uvdnhRai+2idwnXvO39xRHIM=
+Received: from CO6PR10MB5409.namprd10.prod.outlook.com (2603:10b6:5:357::14)
+ by MWHPR10MB1824.namprd10.prod.outlook.com (2603:10b6:300:10a::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4755.21; Fri, 10 Dec
+ 2021 04:37:19 +0000
+Received: from CO6PR10MB5409.namprd10.prod.outlook.com
+ ([fe80::8cb9:73cc:9b75:6098]) by CO6PR10MB5409.namprd10.prod.outlook.com
+ ([fe80::8cb9:73cc:9b75:6098%8]) with mapi id 15.20.4778.013; Fri, 10 Dec 2021
+ 04:37:19 +0000
+References: <20211020170305.376118-1-ankur.a.arora@oracle.com>
+ <20211020170305.376118-8-ankur.a.arora@oracle.com>
+ <b955c5c4-bc4b-9f43-be1c-3a45973de259@linux.alibaba.com>
+User-agent: mu4e 1.4.10; emacs 27.1
+From:   Ankur Arora <ankur.a.arora@oracle.com>
+To:     Yu Xu <xuyu@linux.alibaba.com>
+Cc:     Ankur Arora <ankur.a.arora@oracle.com>,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
+        mingo@kernel.org, bp@alien8.de, luto@kernel.org,
+        akpm@linux-foundation.org, mike.kravetz@oracle.com,
+        jon.grimm@amd.com, kvm@vger.kernel.org, konrad.wilk@oracle.com,
+        boris.ostrovsky@oracle.com
+Subject: Re: [PATCH v2 07/14] x86/clear_page: add clear_page_uncached()
+In-reply-to: <b955c5c4-bc4b-9f43-be1c-3a45973de259@linux.alibaba.com>
+Date:   Thu, 09 Dec 2021 20:37:07 -0800
+Message-ID: <87czm5ulcc.fsf@oracle.com>
+Content-Type: text/plain
+X-ClientProxiedBy: PN2PR01CA0003.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:25::8) To CO6PR10MB5409.namprd10.prod.outlook.com
+ (2603:10b6:5:357::14)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.2
-Subject: Re: [PATCH v1.1 02/11] rcu: Kill rnp->ofl_seq and use only
- rcu_state.ofl_lock for exclusion
-Content-Language: en-US
-To:     David Woodhouse <dwmw2@infradead.org>,
-        Thomas Gleixner <tglx@linutronix.de>
-CC:     Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, <x86@kernel.org>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <rcu@vger.kernel.org>, <mimoja@mimoja.de>,
-        <hewenliang4@huawei.com>, <hushiyuan@huawei.com>,
-        <luolongjun@huawei.com>, <hejingxian@huawei.com>
-References: <20211209150938.3518-1-dwmw2@infradead.org>
- <20211209150938.3518-3-dwmw2@infradead.org>
- <dfa110f0-8fd0-0f37-2c37-89eccac1ad08@quicinc.com>
- <5b086c9e5a92bb91e6f4c086e6d01e380a7491af.camel@infradead.org>
-From:   Neeraj Upadhyay <quic_neeraju@quicinc.com>
-In-Reply-To: <5b086c9e5a92bb91e6f4c086e6d01e380a7491af.camel@infradead.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 78236596-2d77-4f01-6c4f-08d9bb96c027
+X-MS-TrafficTypeDiagnostic: MWHPR10MB1824:EE_
+X-Microsoft-Antispam-PRVS: <MWHPR10MB1824371682E33D3688C7E11ACE719@MWHPR10MB1824.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: suT7ruqut5M0glCgZtSmHyyjdO0ZzrQLGm168TQioAHK8F/vgIVpz/yRf0dGFlGhrAbnwCY93oql9VcDDs0iNl0qlMUMDtHkwBRdIoajfPOEp8U15E319xt6ej4E5hO0H5RorxfKNHXKN8V03ScM1uP91oetZRNyywa/Czp5HrBBWwpeLpptio7SLkHcBLokRSi8muROsjJRXisBRTydrG68ouYefmdwKwa5SJ29bTJyer9hVOspUff2AkxYM7nIe10RZbi/USAll38tGa/HGaDIwgaHvQEhUjrTlom8LaPYcZZ4W7PGIsgk6ZgfEnqCemC5Z4p8OAXKc6ssypd4jF1BCnQQTwoc8WS2jRzUvZ+Bt0t1+J0TVQhsMv7Q3lHhdL8zCvGST1r/kxSqOStlRle4VU44Q6YGyIU3gnGBU4ryOhUwLM7BsvG11DkTYFpAm/tteWseKSicyD0zUSHlzMgfNqjM5bGxDB8V08OjtI+iMwDqLxC0qzoFork0r49xefRzWDun/KeVDmJQzYAAkB0dVIbkY3lMoLzbBFKEqdlx/BadeH7rI3AnrltCYIg/JV7//WGEMEsfxoZnOkBOtLxSinmVFth1Ejord0UcgLzlnQZK/wBqgL6qSOjnMtr+ses9fTcyU7QYWVb08kE78Y/O6FbMQq13Oi9fAC8ZHAVD0qG1kCBqWxIuNn0OiJVo6g6WZM1YkpvRb+5rWTlG8A==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO6PR10MB5409.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(26005)(5660300002)(8936002)(38350700002)(38100700002)(8676002)(107886003)(316002)(2616005)(4326008)(508600001)(7416002)(6666004)(86362001)(6486002)(52116002)(66476007)(66556008)(36756003)(53546011)(6506007)(6512007)(6916009)(83380400001)(186003)(2906002)(66946007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ksVTf66Hr2zcGXz0S7vTLsTe7qETqQ2QUf29i8+3/JBLw6B367u+wdIpa1xI?=
+ =?us-ascii?Q?strkHMDFibcEForZB6kRSpcQeQ974hJ9btw/DxwDODWKS/60aoRQQlTww4tT?=
+ =?us-ascii?Q?lmN5bPscgg+05+zc879gpto9cO6x+ed+94Kv2A85LwVSDqR6CADkdJ/3G/oo?=
+ =?us-ascii?Q?4Ev5Ivge6yPV1MAqLmx8D6W7KKXwybjeQmRJJn9rEVGkNGXeqSqUJr7TUscN?=
+ =?us-ascii?Q?kQXMNDs/5Cie1fgu1mXQLlwUlqTTQLPFLqpTw31ww3XP+1b5m71j4hhFhvIi?=
+ =?us-ascii?Q?fCar53YyBn5QxBPec3kqGiTD9mTWRdvMwMEmd31t0rxYfu6W1lFC+TwTjEqp?=
+ =?us-ascii?Q?aI5m0IWTAeKP+fgXB7uGFvvISwWzzRDGwdV7gJSbqUcXWOW82ZtHhS7geCEh?=
+ =?us-ascii?Q?YIC7FJMtFp7v1VJbR+2HT+/fEikK7eQqtAuYTeAXNXOmO5tAcYmWrwcmjvJC?=
+ =?us-ascii?Q?BAd3suqRa/h5KbdwVtQ1+iW35HsMsfzMoRqrSBtHUBjo6Zdcw25EfbTNR2/w?=
+ =?us-ascii?Q?9C9OUfE/ovt9QYjxbGpAlhtZepWPRPSqPtM7n+0z0XL7p68v9RcFHTEDVDL8?=
+ =?us-ascii?Q?s2q00P2GyYi3xu5Hic3hpS6tf/MZKFKiDPm1xm5+wQOGczlh6B/xj+PabKki?=
+ =?us-ascii?Q?9yQDfo22sEzZStJV4KCtn9vqhzOe16CqW+kpzd6Gok6oNU5bJj/qgJfrE3iV?=
+ =?us-ascii?Q?5KtT+untw89HMmDGmv61TW7nK/hii8fb4ze+VtpvHoACjDwSApcfv/qwGPIK?=
+ =?us-ascii?Q?tdpnKsskc8nYpETNnPfEF64N0KFFClF+Gvqqi/s9D5CtK+zCX7ietAp8FEHh?=
+ =?us-ascii?Q?Ko2RB5yvbsQNdfLUIAMdcxTs5/T5qKQxQdYzkks9zD9B34yKaZRTFO7AHo2C?=
+ =?us-ascii?Q?1SwmlzfRBOocPpUOxCBrY15VKxFRV5L6DizuI2oZnmq09WyBF1p6bj2a5KJ4?=
+ =?us-ascii?Q?ritQeNh4uvVhzrvciTvXTyREGfVlw1VECT7VekbyHNkqg4b6f8AXIg5kF33D?=
+ =?us-ascii?Q?rHdmqFdIBibqEKUMYqYhzWpymoaKO01IwP2wE0HvERtro6VLB/w3jh4441Ii?=
+ =?us-ascii?Q?mRx1Ura+ni7ainfzgtSO2xSKlmCW5KMS5VEb7svds5fbmcotfhTxy4cpG747?=
+ =?us-ascii?Q?1CNWF7JHuuPwEfaGThL3bokNDhdQlW1FZLXOYs0j38tXHZP4U8Y440GOYEL0?=
+ =?us-ascii?Q?pUxNblJAjTH3TqKUStsOJrp8URFVSjC+ok0h+1IovtILdP1dVJpx5DKDwtu3?=
+ =?us-ascii?Q?opq9zmDO/WGrxqj3kpVayQEap5MYed9MAerzgMNnyGQKGt56pYKyAE8ZiWSL?=
+ =?us-ascii?Q?WajuawYHEq9YX8a83veM3xZVgrv/hT0ZDP/KqGhtMb1/yZcJjexttc8MJvvT?=
+ =?us-ascii?Q?9HdOiTiMo2Ka6aSoCkw7oP6wIO4TY+8iMWGRnBnbrZMmkerZYKVOY69VHY2F?=
+ =?us-ascii?Q?fY5GKRul1CwpVjdYbiDGW9xcWNTRNPvYGGgfOCOo7jISaof3ZlpMhv2QITYl?=
+ =?us-ascii?Q?eSJdzk2bwWod/q3seeGASTun53ZMK3QNc7ZVd5VucnS4xTzH06BRWYwSIgCZ?=
+ =?us-ascii?Q?MF2+UfkaHe0kKvp66OuVCXqcOpK0tj0hXQlcD4i9vBPVgxPtwItCEdpykqXa?=
+ =?us-ascii?Q?sr8N0uk0y/RFgk3cEYWHM0SkHbI7wUqG1tFA2x2E7Xdu5OmWNNFhwetp//nn?=
+ =?us-ascii?Q?fVGIag=3D=3D?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 78236596-2d77-4f01-6c4f-08d9bb96c027
+X-MS-Exchange-CrossTenant-AuthSource: CO6PR10MB5409.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Dec 2021 04:37:19.4964
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: AAbuG9xGdFC+LtKnWUtAHuhejbytio1v0euvapKotRoOseHMfvs7dYAmgu3h1/R5huUK2ThxPDiA1el2eioDqV0gM+2pZaTH1r7bxiSurbs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR10MB1824
+X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10193 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxlogscore=999
+ phishscore=0 bulkscore=0 malwarescore=0 spamscore=0 suspectscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2112100024
+X-Proofpoint-ORIG-GUID: FOM953yynR2HNOtv8ZY59lKV6jGAbJ96
+X-Proofpoint-GUID: FOM953yynR2HNOtv8ZY59lKV6jGAbJ96
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi David,
 
-Few minor comments
+Yu Xu <xuyu@linux.alibaba.com> writes:
 
-On 12/10/2021 12:51 AM, David Woodhouse wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
-> 
-> If we allow architectures to bring APs online in parallel, then we end
-> up requiring rcu_cpu_starting() to be reentrant. But currently, the
-> manipulation of rnp->ofl_seq is not thread-safe.
-> 
-> However, rnp->ofl_seq is also fairly much pointless anyway since both
-> rcu_cpu_starting() and rcu_report_dead() hold rcu_state.ofl_lock for
-> fairly much the whole time that rnp->ofl_seq is set to an odd number
-> to indicate that an operation is in progress.
-> 
-> So drop rnp->ofl_seq completely, and use only rcu_state.ofl_lock.
-> 
-> This has a couple of minor complexities: lockdep will complain when we
-> take rcu_state.ofl_lock, and currently accepts the 'excuse' of having
-> an odd value in rnp->ofl_seq. So switch it to an arch_spinlock_t to
-> avoid that false positive complaint. Since we're killing rnp->ofl_seq
-> of course that 'excuse' has to be changed too, so make it check for
-> arch_spin_is_locked(rcu_state.ofl_lock).
-> 
-> There's no arch_spin_lock_irqsave() so we have to manually save and
-> restore local interrupts around the locking.
-> 
-> At Paul's request based on Neeraj's analysis, make rcu_gp_init not just
-> wait but *exclude* any CPU online/offline activity, which was fairly
-> much true already by virtue of it holding rcu_state.ofl_lock.
-> 
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> ---
-> If we're going to split the series up and let the various patches take
-> their own paths to Linus, I'll just repost this one alone as 'v1.1'.
-> 
->   kernel/rcu/tree.c | 71 ++++++++++++++++++++++++-----------------------
->   kernel/rcu/tree.h |  4 +--
->   2 files changed, 37 insertions(+), 38 deletions(-)
-> 
-> diff --git a/kernel/rcu/tree.c b/kernel/rcu/tree.c
-> index ef8d36f580fc..2e1ae611be98 100644
-> --- a/kernel/rcu/tree.c
-> +++ b/kernel/rcu/tree.c
-> @@ -91,7 +91,7 @@ static struct rcu_state rcu_state = {
->   	.abbr = RCU_ABBR,
->   	.exp_mutex = __MUTEX_INITIALIZER(rcu_state.exp_mutex),
->   	.exp_wake_mutex = __MUTEX_INITIALIZER(rcu_state.exp_wake_mutex),
-> -	.ofl_lock = __RAW_SPIN_LOCK_UNLOCKED(rcu_state.ofl_lock),
-> +	.ofl_lock = __ARCH_SPIN_LOCK_UNLOCKED,
->   };
->   
->   /* Dump rcu_node combining tree at boot to verify correct setup. */
-> @@ -1168,7 +1168,15 @@ bool rcu_lockdep_current_cpu_online(void)
->   	preempt_disable_notrace();
->   	rdp = this_cpu_ptr(&rcu_data);
->   	rnp = rdp->mynode;
-> -	if (rdp->grpmask & rcu_rnp_online_cpus(rnp) || READ_ONCE(rnp->ofl_seq) & 0x1)
-> +	/*
-> +	 * Strictly, we care here about the case where the current CPU is
-> +	 * in rcu_cpu_starting() and thus has an excuse for rdp->grpmask
-> +	 * not being up to date. So arch_spin_is_locked() might have a
+> On 10/21/21 1:02 AM, Ankur Arora wrote:
+>> Expose the low-level uncached primitives (clear_page_movnt(),
+>> clear_page_clzero()) as alternatives via clear_page_uncached().
+>> Also fallback to clear_page(), if X86_FEATURE_MOVNT_SLOW is set
+>> and the CPU does not have X86_FEATURE_CLZERO.
+>> Both the uncached primitives use stores which are weakly ordered
+>> with respect to other instructions accessing the memory hierarchy.
+>> To ensure that callers don't mix accesses to different types of
+>> address_spaces, annotate clear_user_page_uncached(), and
+>> clear_page_uncached() as taking __incoherent pointers as arguments.
+>> Also add clear_page_uncached_make_coherent() which provides the
+>> necessary store fence to flush out the uncached regions.
+>> Signed-off-by: Ankur Arora <ankur.a.arora@oracle.com>
+>> ---
+>> Notes:
+>>      This patch adds the fallback definitions of clear_user_page_uncached()
+>>      etc in include/linux/mm.h which is likely not the right place for it.
+>>      I'm guessing these should be moved to include/asm-generic/page.h
+>>      (or maybe a new include/asm-generic/page_uncached.h) and for
+>>      architectures that do have arch/$arch/include/asm/page.h (which
+>>      seems like all of them), also replicate there?
+>>      Anyway, wanted to first check if that's the way to do it, before
+>>      doing that.
+>>   arch/x86/include/asm/page.h    | 10 ++++++++++
+>>   arch/x86/include/asm/page_32.h |  9 +++++++++
+>>   arch/x86/include/asm/page_64.h | 32 ++++++++++++++++++++++++++++++++
+>>   include/linux/mm.h             | 14 ++++++++++++++
+>>   4 files changed, 65 insertions(+)
+>> diff --git a/arch/x86/include/asm/page_32.h b/arch/x86/include/asm/page_32.h
+>> index 94dbd51df58f..163be03ac422 100644
+>> --- a/arch/x86/include/asm/page_32.h
+>> +++ b/arch/x86/include/asm/page_32.h
+>> @@ -39,6 +39,15 @@ static inline void clear_page(void *page)
+>>   	memset(page, 0, PAGE_SIZE);
+>>   }
+>>   +static inline void clear_page_uncached(__incoherent void *page)
+>> +{
+>> +	clear_page((__force void *) page);
+>> +}
+>> +
+>> +static inline void clear_page_uncached_make_coherent(void)
+>> +{
+>> +}
+>> +
+>>   static inline void copy_page(void *to, void *from)
+>>   {
+>>   	memcpy(to, from, PAGE_SIZE);
+>> diff --git a/arch/x86/include/asm/page_64.h b/arch/x86/include/asm/page_64.h
+>> index 3c53f8ef8818..d7946047c70f 100644
+>> --- a/arch/x86/include/asm/page_64.h
+>> +++ b/arch/x86/include/asm/page_64.h
+>> @@ -56,6 +56,38 @@ static inline void clear_page(void *page)
+>>   			   : "cc", "memory", "rax", "rcx");
+>>   }
+>>   +/*
+>> + * clear_page_uncached: only allowed on __incoherent memory regions.
+>> + */
+>> +static inline void clear_page_uncached(__incoherent void *page)
+>> +{
+>> +	alternative_call_2(clear_page_movnt,
+>> +			   clear_page, X86_FEATURE_MOVNT_SLOW,
+>> +			   clear_page_clzero, X86_FEATURE_CLZERO,
+>> +			   "=D" (page),
+>> +			   "0" (page)
+>> +			   : "cc", "memory", "rax", "rcx");
+>> +}
+>> +
+>> +/*
+>> + * clear_page_uncached_make_coherent: executes the necessary store
+>> + * fence after which __incoherent regions can be safely accessed.
+>> + */
+>> +static inline void clear_page_uncached_make_coherent(void)
+>> +{
+>> +	/*
+>> +	 * Keep the sfence for oldinstr and clzero separate to guard against
+>> +	 * the possibility that a cpu-model both has X86_FEATURE_MOVNT_SLOW
+>> +	 * and X86_FEATURE_CLZERO.
+>> +	 *
+>> +	 * The alternatives need to be in the same order as the ones
+>> +	 * in clear_page_uncached().
+>> +	 */
+>> +	alternative_2("sfence",
+>> +		      "", X86_FEATURE_MOVNT_SLOW,
+>> +		      "sfence", X86_FEATURE_CLZERO);
+>> +}
+>> +
+>>   void copy_page(void *to, void *from);
+>>     #ifdef CONFIG_X86_5LEVEL
+>> diff --git a/include/linux/mm.h b/include/linux/mm.h
+>> index 73a52aba448f..b88069d1116c 100644
+>> --- a/include/linux/mm.h
+>> +++ b/include/linux/mm.h
+>> @@ -3192,6 +3192,20 @@ static inline bool vma_is_special_huge(const struct vm_area_struct *vma)
+>>     #endif /* CONFIG_TRANSPARENT_HUGEPAGE || CONFIG_HUGETLBFS */
+>>   +#ifndef clear_user_page_uncached
+>
+> Hi Ankur Arora,
+>
+> I've been looking for where clear_user_page_uncached is defined in this
+> patchset, but failed.
+>
+> There should be something like follows in arch/x86, right?
+>
+> static inline void clear_user_page_uncached(__incoherent void *page,
+>                                unsigned long vaddr, struct page *pg)
+> {
+>         clear_page_uncached(page);
+> }
+>
+>
+> Did I miss something?
+>
+Hi Yu Xu,
 
-Minor:
+Defined in include/linux/mm.h. Just below :).
 
-Is this comment right - "thus has an excuse for rdp->grpmask not being 
-up to date"; shouldn't it be "thus has an excuse for rnp->qsmaskinitnext 
-not being up to date"?
+>> +/*
+>> + * clear_user_page_uncached: fallback to the standard clear_user_page().
+>> + */
+>> +static inline void clear_user_page_uncached(__incoherent void *page,
+>> +					unsigned long vaddr, struct page *pg)
+>> +{
+>> +	clear_user_page((__force void *)page, vaddr, pg);
+>> +}
 
-Also, arch_spin_is_locked() also handles the rcu_report_dead() case,
-where raw_spin_unlock_irqrestore_rcu_node() can have a rcu_read_lock 
-from lockdep path with CPU bits already cleared from rnp->qsmaskinitnext?
+That said, as this note in the patch mentions, this isn't really a great
+place for this definition. As you also mention, the right place for this
+would be somewhere in the arch/.../include and include/asm-generic hierarchy.
 
+>>      This patch adds the fallback definitions of clear_user_page_uncached()
+>>      etc in include/linux/mm.h which is likely not the right place for it.
+>>      I'm guessing these should be moved to include/asm-generic/page.h
+>>      (or maybe a new include/asm-generic/page_uncached.h) and for
+>>      architectures that do have arch/$arch/include/asm/page.h (which
+>>      seems like all of them), also replicate there?
+>>      Anyway, wanted to first check if that's the way to do it, before
+>>      doing that.
 
-
-> +	 * false positive if it's held by some *other* CPU, but that's
-> +	 * OK because that just means a false *negative* on the warning.
-> +	 */
-> +	if (rdp->grpmask & rcu_rnp_online_cpus(rnp) ||
-> +	    arch_spin_is_locked(&rcu_state.ofl_lock))
->   		ret = true;
->   	preempt_enable_notrace();
->   	return ret;
-> @@ -1731,7 +1739,6 @@ static void rcu_strict_gp_boundary(void *unused)
->    */
->   static noinline_for_stack bool rcu_gp_init(void)
->   {
-> -	unsigned long firstseq;
->   	unsigned long flags;
->   	unsigned long oldmask;
->   	unsigned long mask;
-> @@ -1774,22 +1781,17 @@ static noinline_for_stack bool rcu_gp_init(void)
->   	 * of RCU's Requirements documentation.
->   	 */
->   	WRITE_ONCE(rcu_state.gp_state, RCU_GP_ONOFF);
-> +	/* Exclude CPU hotplug operations. */
->   	rcu_for_each_leaf_node(rnp) {
-> -		// Wait for CPU-hotplug operations that might have
-> -		// started before this grace period did.
-> -		smp_mb(); // Pair with barriers used when updating ->ofl_seq to odd values.
-> -		firstseq = READ_ONCE(rnp->ofl_seq);
-> -		if (firstseq & 0x1)
-> -			while (firstseq == READ_ONCE(rnp->ofl_seq))
-> -				schedule_timeout_idle(1);  // Can't wake unless RCU is watching.
-> -		smp_mb(); // Pair with barriers used when updating ->ofl_seq to even values.
-> -		raw_spin_lock(&rcu_state.ofl_lock);
-> -		raw_spin_lock_irq_rcu_node(rnp);
-> +		local_irq_save(flags);
-> +		arch_spin_lock(&rcu_state.ofl_lock);
-> +		raw_spin_lock_rcu_node(rnp);
->   		if (rnp->qsmaskinit == rnp->qsmaskinitnext &&
->   		    !rnp->wait_blkd_tasks) {
->   			/* Nothing to do on this leaf rcu_node structure. */
-> -			raw_spin_unlock_irq_rcu_node(rnp);
-> -			raw_spin_unlock(&rcu_state.ofl_lock);
-> +			raw_spin_unlock_rcu_node(rnp);
-> +			arch_spin_unlock(&rcu_state.ofl_lock);
-> +			local_irq_restore(flags);
->   			continue;
->   		}
->   
-> @@ -1824,8 +1826,9 @@ static noinline_for_stack bool rcu_gp_init(void)
->   				rcu_cleanup_dead_rnp(rnp);
->   		}
->   
-> -		raw_spin_unlock_irq_rcu_node(rnp);
-> -		raw_spin_unlock(&rcu_state.ofl_lock);
-> +		raw_spin_unlock_rcu_node(rnp);
-> +		arch_spin_unlock(&rcu_state.ofl_lock);
-> +		local_irq_restore(flags);
->   	}
->   	rcu_gp_slow(gp_preinit_delay); /* Races with CPU hotplug. */
->   
-> @@ -4246,11 +4249,10 @@ void rcu_cpu_starting(unsigned int cpu)
->   
->   	rnp = rdp->mynode;
->   	mask = rdp->grpmask;
-> -	WRITE_ONCE(rnp->ofl_seq, rnp->ofl_seq + 1);
-> -	WARN_ON_ONCE(!(rnp->ofl_seq & 0x1));
-> +	local_irq_save(flags);
-> +	arch_spin_lock(&rcu_state.ofl_lock);
->   	rcu_dynticks_eqs_online();
-> -	smp_mb(); // Pair with rcu_gp_cleanup()'s ->ofl_seq barrier().
-> -	raw_spin_lock_irqsave_rcu_node(rnp, flags);
-> +	raw_spin_lock_rcu_node(rnp);
->   	WRITE_ONCE(rnp->qsmaskinitnext, rnp->qsmaskinitnext | mask);
->   	newcpu = !(rnp->expmaskinitnext & mask);
->   	rnp->expmaskinitnext |= mask;
-> @@ -4263,15 +4265,18 @@ void rcu_cpu_starting(unsigned int cpu)
->   
->   	/* An incoming CPU should never be blocking a grace period. */
->   	if (WARN_ON_ONCE(rnp->qsmask & mask)) { /* RCU waiting on incoming CPU? */
-> +		/* rcu_report_qs_rnp() *really* wants some flags to restore */
-> +		unsigned long flags2;
-
-Minor: checkpatch flags it "Missing a blank line after declarations"
-
-
+Recommendations on how to handle this, welcome.
 
 Thanks
-Neeraj
 
-> +		local_irq_save(flags2);
-> +
->   		rcu_disable_urgency_upon_qs(rdp);
->   		/* Report QS -after- changing ->qsmaskinitnext! */
-> -		rcu_report_qs_rnp(mask, rnp, rnp->gp_seq, flags);
-> +		rcu_report_qs_rnp(mask, rnp, rnp->gp_seq, flags2);
->   	} else {
-> -		raw_spin_unlock_irqrestore_rcu_node(rnp, flags);
-> +		raw_spin_unlock_rcu_node(rnp);
->   	}
-> -	smp_mb(); // Pair with rcu_gp_cleanup()'s ->ofl_seq barrier().
-> -	WRITE_ONCE(rnp->ofl_seq, rnp->ofl_seq + 1);
-> -	WARN_ON_ONCE(rnp->ofl_seq & 0x1);
-> +	arch_spin_unlock(&rcu_state.ofl_lock);
-> +	local_irq_restore(flags);
->   	smp_mb(); /* Ensure RCU read-side usage follows above initialization. */
->   }
->   
-> @@ -4285,7 +4290,7 @@ void rcu_cpu_starting(unsigned int cpu)
->    */
->   void rcu_report_dead(unsigned int cpu)
->   {
-> -	unsigned long flags;
-> +	unsigned long flags, seq_flags;
->   	unsigned long mask;
->   	struct rcu_data *rdp = per_cpu_ptr(&rcu_data, cpu);
->   	struct rcu_node *rnp = rdp->mynode;  /* Outgoing CPU's rdp & rnp. */
-> @@ -4299,10 +4304,8 @@ void rcu_report_dead(unsigned int cpu)
->   
->   	/* Remove outgoing CPU from mask in the leaf rcu_node structure. */
->   	mask = rdp->grpmask;
-> -	WRITE_ONCE(rnp->ofl_seq, rnp->ofl_seq + 1);
-> -	WARN_ON_ONCE(!(rnp->ofl_seq & 0x1));
-> -	smp_mb(); // Pair with rcu_gp_cleanup()'s ->ofl_seq barrier().
-> -	raw_spin_lock(&rcu_state.ofl_lock);
-> +	local_irq_save(seq_flags);
-> +	arch_spin_lock(&rcu_state.ofl_lock);
->   	raw_spin_lock_irqsave_rcu_node(rnp, flags); /* Enforce GP memory-order guarantee. */
->   	rdp->rcu_ofl_gp_seq = READ_ONCE(rcu_state.gp_seq);
->   	rdp->rcu_ofl_gp_flags = READ_ONCE(rcu_state.gp_flags);
-> @@ -4313,10 +4316,8 @@ void rcu_report_dead(unsigned int cpu)
->   	}
->   	WRITE_ONCE(rnp->qsmaskinitnext, rnp->qsmaskinitnext & ~mask);
->   	raw_spin_unlock_irqrestore_rcu_node(rnp, flags);
-> -	raw_spin_unlock(&rcu_state.ofl_lock);
-> -	smp_mb(); // Pair with rcu_gp_cleanup()'s ->ofl_seq barrier().
-> -	WRITE_ONCE(rnp->ofl_seq, rnp->ofl_seq + 1);
-> -	WARN_ON_ONCE(rnp->ofl_seq & 0x1);
-> +	arch_spin_unlock(&rcu_state.ofl_lock);
-> +	local_irq_restore(seq_flags);
->   
->   	rdp->cpu_started = false;
->   }
-> diff --git a/kernel/rcu/tree.h b/kernel/rcu/tree.h
-> index 305cf6aeb408..aff4cc9303fb 100644
-> --- a/kernel/rcu/tree.h
-> +++ b/kernel/rcu/tree.h
-> @@ -56,8 +56,6 @@ struct rcu_node {
->   				/*  Initialized from ->qsmaskinitnext at the */
->   				/*  beginning of each grace period. */
->   	unsigned long qsmaskinitnext;
-> -	unsigned long ofl_seq;	/* CPU-hotplug operation sequence count. */
-> -				/* Online CPUs for next grace period. */
->   	unsigned long expmask;	/* CPUs or groups that need to check in */
->   				/*  to allow the current expedited GP */
->   				/*  to complete. */
-> @@ -358,7 +356,7 @@ struct rcu_state {
->   	const char *name;			/* Name of structure. */
->   	char abbr;				/* Abbreviated name. */
->   
-> -	raw_spinlock_t ofl_lock ____cacheline_internodealigned_in_smp;
-> +	arch_spinlock_t ofl_lock ____cacheline_internodealigned_in_smp;
->   						/* Synchronize offline with */
->   						/*  GP pre-initialization. */
->   };
-> 
+--
+ankur
