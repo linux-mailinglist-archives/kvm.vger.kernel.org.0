@@ -2,101 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E67B646F933
-	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 03:28:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 23DB346F967
+	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 03:55:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236039AbhLJCbg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Dec 2021 21:31:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33128 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233852AbhLJCbf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Dec 2021 21:31:35 -0500
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8858DC061746;
-        Thu,  9 Dec 2021 18:28:01 -0800 (PST)
-Received: by mail-pf1-x435.google.com with SMTP id k26so7152804pfp.10;
-        Thu, 09 Dec 2021 18:28:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=sLFKEFmsq3SGmkOwN4l/i+bv2/Bc/K1S6JMbIUmp7Ck=;
-        b=hoz2DZ2LKoVusNKhN8wWwbGbbyWrLLnhsYoCfDvvlLAyNJqpTBsXsnKXR+eeZ5ubmR
-         ANl729GY4toot5pfQrSpa414UgnI62ZeAi81WYiRhP+rkdFdHf57cIkUHClolnBzxtue
-         wDG22tNe4Bj00vmCM5Jg4TmxJAHN8X5bSTESnH86psJ9u6O3yhZ0CXpNVr521V8XzkbN
-         0TDtZi/ap1eJJnhtQHHJSH1Hx7g4ToGI2uhwmGsNmwTDtIh+IMmLQQ77Lrl+G75uTREP
-         +ZHoH0vlsrba0M1mE1m/Gluuc1g1YUkJVVCe3CaGX0s1JgFrc5kcgRNCOpgtFjVIUBqo
-         iJTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=sLFKEFmsq3SGmkOwN4l/i+bv2/Bc/K1S6JMbIUmp7Ck=;
-        b=wY5lJJR866h4d7Ln2eMiRfdo6DjH7ldKMIDqsfMzK2tsfz+nZGUSMwitTucrQ4JNnv
-         9piOjfrmrgSHbjOyXjEu5X7TQ3kDvC9oInOSyigPGK00ySDJGkh3aOo0cyNqJauoBwAX
-         k3Xx3G+PJH6b7jpZ0U220PXip2GdIvmt8DS87SmVVs4JuGHHaojqFWZ0jF4yaBsuEb+J
-         TUv29Rg3bbDAlheKbcYyJ90TOZhoEWfE/aNDsl97t1pe/IwAjnGM7kHJRbRrgVuFLjPY
-         s/F7xOq1Jq8UdPtlC81cWUuM49wFEzF49lKaysL+rKFqIzl2pM5ayKSRgj8PQ0VetFUw
-         L3Cg==
-X-Gm-Message-State: AOAM533KsGaopWUCKJNmkfzW/3Tlwr7ljcOukcisBqJlwh26KnEG2KsC
-        qMM/GkpCl7YZj1zxSkDFMmg=
-X-Google-Smtp-Source: ABdhPJyBQ7dWzxG6EHcpP/IT0r/n7dUp/aJaiwV+9jMU7rctGoAjU0IDu0M+jMJRsOoV7GAfudWn+g==
-X-Received: by 2002:a05:6a00:2d1:b0:4af:437c:5f50 with SMTP id b17-20020a056a0002d100b004af437c5f50mr15348205pft.32.1639103281108;
-        Thu, 09 Dec 2021 18:28:01 -0800 (PST)
-Received: from localhost.localdomain ([193.203.214.57])
-        by smtp.gmail.com with ESMTPSA id mi14sm11044267pjb.6.2021.12.09.18.27.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Dec 2021 18:28:00 -0800 (PST)
-From:   cgel.zte@gmail.com
-X-Google-Original-From: chi.minghao@zte.com.cn
-To:     pbonzini@redhat.com
-Cc:     shuah@kernel.org, seanjc@google.com, vkuznets@redhat.com,
-        ricarkol@google.com, maz@kernel.org, aaronlewis@google.com,
-        like.xu@linux.intel.com, dmatlack@google.com, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Minghao Chi <chi.minghao@zte.com.cn>,
-        Zeal Robot <zealci@zte.com.cm>
-Subject: [PATCH kvm-next] selftests/kvm: remove unneeded variable
-Date:   Fri, 10 Dec 2021 02:27:55 +0000
-Message-Id: <20211210022755.424428-1-chi.minghao@zte.com.cn>
-X-Mailer: git-send-email 2.25.1
+        id S236222AbhLJC7S (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Dec 2021 21:59:18 -0500
+Received: from out28-100.mail.aliyun.com ([115.124.28.100]:37580 "EHLO
+        out28-100.mail.aliyun.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230255AbhLJC7R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Dec 2021 21:59:17 -0500
+X-Alimail-AntiSpam: AC=CONTINUE;BC=0.07455772|-1;CH=green;DM=|CONTINUE|false|;DS=CONTINUE|ham_system_inform|0.00302495-0.000273766-0.996701;FP=0|0|0|0|0|-1|-1|-1;HT=ay29a033018047198;MF=haibiao.xiao@zstack.io;NM=1;PH=DS;RN=6;RT=6;SR=0;TI=SMTPD_---.M8-.uzC_1639104940;
+Received: from 172.21.0.111(mailfrom:haibiao.xiao@zstack.io fp:SMTPD_---.M8-.uzC_1639104940)
+          by smtp.aliyun-inc.com(10.147.44.118);
+          Fri, 10 Dec 2021 10:55:40 +0800
+Message-ID: <28ff4bb3-851a-e287-b008-c2a91370c90d@zstack.io>
+Date:   Fri, 10 Dec 2021 10:55:40 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.1
+Subject: Re: [PATCH kvmtool] Makefile: 'lvm version' works incorrect. Because
+ CFLAGS can not get sub-make variable $(KVMTOOLS_VERSION)
+Content-Language: en-US
+To:     Andre Przywara <andre.przywara@arm.com>
+Cc:     kvm@vger.kernel.org, will@kernel.org,
+        julien.thierry.kdev@gmail.com,
+        "haibiao.xiao" <xiaohaibiao331@outlook.com>,
+        Alexandru Elisei <Alexandru.Elisei@arm.com>
+References: <20211204061436.36642-1-haibiao.xiao@zstack.io>
+ <20211209155746.3f6bd016@donnerap.cambridge.arm.com>
+From:   "haibiao.xiao" <haibiao.xiao@zstack.io>
+In-Reply-To: <20211209155746.3f6bd016@donnerap.cambridge.arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Minghao Chi <chi.minghao@zte.com.cn>
+Hi,
 
-Return status directly from function called.
+On Thu, 9 Dec 2021 15:57:46 +0000, Andre Przywara wrote:
+> On Sat,  4 Dec 2021 14:14:36 +0800
+> "haibiao.xiao" <haibiao.xiao@zstack.io> wrote:
+> 
+> Hi,
+> 
+>> From: "haibiao.xiao" <xiaohaibiao331@outlook.com>
+>>
+>> Command 'lvm version' works incorrect.
+>> It is expected to print:
+>>
+>>     # ./lvm version
+>>     # kvm tool [KVMTOOLS_VERSION]
+>>
+>> but the KVMTOOLS_VERSION is missed:
+>>
+>>     # ./lvm version
+>>     # kvm tool
+>>
+>> The KVMTOOLS_VERSION is defined in the KVMTOOLS-VERSION-FILE file which
+>> is included at the end of Makefile. Since the CFLAGS is a 'Simply
+>> expanded variables' which means CFLAGS is only scanned once. So the
+>> definetion of KVMTOOLS_VERSION at the end of Makefile would not scanned
+>> by CFLAGS. So the '-DKVMTOOLS_VERSION=' remains empty.
+>>
+>> I fixed the bug by moving the '-include $(OUTPUT)KVMTOOLS-VERSION-FILE'
+>> before the CFLAGS.
+> 
+> While this is indeed a bug that this patch fixes, I wonder if we should
+> actually get rid of this whole versioning attempt altogether at this
+> point. Originally this was following the containing kernel version, but
+> it is stuck ever since at v3.18, without any change.
+> 
+> So either we introduce proper versioning (not sure it's worth it?), or we
+> just remove all code that pretends to print a version number? Or just
+> hardcode v3.18 into the printf, at least for now? At the very least I
+> think we don't need a KVMTOOLS-VERSION-FILE anymore.
+> 
 
-Reported-by: Zeal Robot <zealci@zte.com.cm>
-Signed-off-by: Minghao Chi <chi.minghao@zte.com.cn>
----
- tools/testing/selftests/kvm/lib/x86_64/processor.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+Thanks for your reply. 
 
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index 82c39db91369..80ab802aa8f8 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -931,15 +931,13 @@ int _vcpu_set_msr(struct kvm_vm *vm, uint32_t vcpuid, uint64_t msr_index,
- 		struct kvm_msrs header;
- 		struct kvm_msr_entry entry;
- 	} buffer = {};
--	int r;
+The reason I look at this project is tend to learn something about kvm. 
+With the version number I can tell which kernel(kvm) is compatible.
  
- 	TEST_ASSERT(vcpu != NULL, "vcpu not found, vcpuid: %u", vcpuid);
- 	memset(&buffer, 0, sizeof(buffer));
- 	buffer.header.nmsrs = 1;
- 	buffer.entry.index = msr_index;
- 	buffer.entry.data = msr_value;
--	r = ioctl(vcpu->fd, KVM_SET_MSRS, &buffer.header);
--	return r;
-+	return ioctl(vcpu->fd, KVM_SET_MSRS, &buffer.header);
- }
- 
- /*
--- 
-2.25.1
+Although it is stuck at v3.18, there still some commits in recent 
+months, which means the kvmtool still changing according to the kvm 
+features. So I think what's kvmtool need is a version control, but not 
+remove/hardcode.
 
+Thanks,
+haibiao.xiao
+> Cheers,
+> Andre
+> 
+>>
+>> Signed-off-by: haibiao.xiao <xiaohaibiao331@outlook.com>
+>> ---
+>>  Makefile | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/Makefile b/Makefile
+>> index bb7ad3e..9afb5e3 100644
+>> --- a/Makefile
+>> +++ b/Makefile
+>> @@ -17,6 +17,7 @@ export E Q
+>>  
+>>  include config/utilities.mak
+>>  include config/feature-tests.mak
+>> +-include $(OUTPUT)KVMTOOLS-VERSION-FILE
+>>  
+>>  CC	:= $(CROSS_COMPILE)gcc
+>>  CFLAGS	:=
+>> @@ -559,5 +560,4 @@ ifneq ($(MAKECMDGOALS),clean)
+>>  
+>>  KVMTOOLS-VERSION-FILE:
+>>  	@$(SHELL_PATH) util/KVMTOOLS-VERSION-GEN $(OUTPUT)
+>> --include $(OUTPUT)KVMTOOLS-VERSION-FILE
+>> -endif
+>> +endif
+>> \ No newline at end of file
