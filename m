@@ -2,168 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 946FB470514
-	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 17:02:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8C7CE470528
+	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 17:02:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237810AbhLJQFd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Dec 2021 11:05:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49792 "EHLO
+        id S238959AbhLJQGc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Dec 2021 11:06:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237578AbhLJQFc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Dec 2021 11:05:32 -0500
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD468C0617A2
-        for <kvm@vger.kernel.org>; Fri, 10 Dec 2021 08:01:57 -0800 (PST)
-Received: by mail-pg1-x536.google.com with SMTP id j11so8456610pgs.2
-        for <kvm@vger.kernel.org>; Fri, 10 Dec 2021 08:01:57 -0800 (PST)
+        with ESMTP id S235710AbhLJQGb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Dec 2021 11:06:31 -0500
+Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB3A1C061746;
+        Fri, 10 Dec 2021 08:02:55 -0800 (PST)
+Received: by mail-ed1-x529.google.com with SMTP id x15so32205579edv.1;
+        Fri, 10 Dec 2021 08:02:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=NiYccNuLcNBRlC5KaB4he5MerECPJFjS2bdvaOZwdxE=;
-        b=ogkDbjaAnKg5xZwOD9bqh6FZp+TRLVfLIcjKzm0RPCwEja/seXtKWbXqeBMbEWwJgP
-         qEIpnceFAH50r1kbhP2C80Hp6Yc4QWtnpnfRdrLmARQS2S14pIa7QWSXTrnBBGXZvVim
-         RADE8SwMmX4HxuqeZV8HyhyERMtCurKKvqTPJB8zkwTlZq4PNGvkbKUJGU/38S0QXtr/
-         S0ooYd4ZObhWGasG4d5iFsgD6LQZFwN0ZVmE6pI3+pB8PFvXHBrNfhvoZXj6HJxvoWAu
-         pJ/PvlOga9gjd/FpDId7xCYi1uYEb49TEF9DzjtN8JZmqKU6qk56vDLImWKBBMK0nKgF
-         20gA==
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=/pkJHvkTfabgrFQXprPevptDQISmN/4EQn4Qrf0/B5w=;
+        b=BYYU8cVJm1bdb6CJZ7f9UU3YrRYGE/5Ba1PAe+LRINvDA9fY6nbxyhy+/M7pjoYleR
+         gcnOvij5CYygQ0X0NXpwySIKB6rpDyg3MJyJaiv1qwnL/p5oEmP1wVu+M6a6NVdgclvO
+         YBnYjTtCIa8A9LHUE1Ho1h5OFJIIDsBdDnfoCrKMcBk/qH3AAvuWUB/0iDgd1dE0AY5d
+         /6TfPwbuLAweLfhX0ci2gxe3vYFpQorYDgfIrqjxmphOKSqGB/Mxz9/ds9wzVsfKq4MN
+         6dCnajj0B3MrmwIcqrZwcGu534j/fYVYND9mSPyxkcx1wY8erlUp9HD/6mQFNPQ1SS5A
+         dA3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=NiYccNuLcNBRlC5KaB4he5MerECPJFjS2bdvaOZwdxE=;
-        b=0H/JO2mUPYtzhAsNRGIHdkU/TsWXnyTs8lPLZWZV0McJUTtEhuxgFcBl7qqKRmriil
-         rbfjZxDAPHRtO1QohxAGo+ipL09XTXiDoa8JO787OTKzep9+MME5L54udgvNgQXkdTEr
-         2lP5pH2gX3mfHp6hsrc2bSwhz+GKrhLiGqvbLLmhrvzkZbVAmhunWJLD3zccbsU90tUz
-         4N2MQUDldXG1ua3ds2ntZ8/MWf8kbCPHPHxqVY2B7ie66kSVEuoGKzT6lXTQFtL31suZ
-         oiKRYvsCwhrIBY5PUwFPK8sGcQxV9M780WU/gFVdfysZGF6ahBQJSFgOjtoOWIdzeFBm
-         8zIQ==
-X-Gm-Message-State: AOAM532J7aX4Ect3lNs1/oisusk+pwU96R2rwJH1wgUG+xe+jg8Fo2OI
-        6d97EjYoFXoImcbHx+oKbNPUFg==
-X-Google-Smtp-Source: ABdhPJww/L2uC5TBriFHo4R9taIefxyHIVU5rsqIoQwKVt42zY+BdxT5q0u8bv70baR4ut3wwXiikg==
-X-Received: by 2002:a65:6a45:: with SMTP id o5mr2860107pgu.273.1639152116894;
-        Fri, 10 Dec 2021 08:01:56 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id j13sm4097139pfc.151.2021.12.10.08.01.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Dec 2021 08:01:56 -0800 (PST)
-Date:   Fri, 10 Dec 2021 16:01:52 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>,
-        Ben Gardon <bgardon@google.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>
-Subject: Re: [PATCH 1/7] KVM: x86: Retry page fault if MMU reload is pending
- and root has no sp
-Message-ID: <YbN58FS67bEBOZZu@google.com>
-References: <20211209060552.2956723-1-seanjc@google.com>
- <20211209060552.2956723-2-seanjc@google.com>
- <c94b3aec-981e-8557-ba29-0094b075b8e4@redhat.com>
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=/pkJHvkTfabgrFQXprPevptDQISmN/4EQn4Qrf0/B5w=;
+        b=MpgC0XSOjtWaYKKfZg1mN9LcyaJKyW98xPtHOdzfzNOl7MC5pBu6L+zwtrIF70oax5
+         kyBpEUMCgejWAqWj1k1mrUCst7cHAGu6uzamTt3WcTj3VYKX7VtbAlwdz9IPUaDlkEcd
+         xoanaeHypjaHUvm2PYrgJjlskth9QbhMEKJv4rsy6oLZtl8T5wH0AxX+CdzYZpd/1ZQ9
+         SXLOJWTEMpnioi0xTw2wyzwUXwLY5TgEsAEjY7OPWhAMbQ9ZOq7AoyDWBpXbUAb8nbC3
+         bZqtbgJLQaJv5n/jhd4Gf8g2b8EYy3UtF0pK3qSyDDFajEVc9Pb59RiGC0VdSiX09bRR
+         QyHA==
+X-Gm-Message-State: AOAM530uwbvyw1J4EJNyB3/OjYkZg53UTVyGqDqejOB8+XxixrSMRvPk
+        Ow3Nw2/xlClEG9zxcHrYTAg=
+X-Google-Smtp-Source: ABdhPJzssn4S/xQ5V49eHRjMYCrQLa4HgYN/sv8evrMol0f204BZKdptMwGflzm3QIXSjB7iif+2BQ==
+X-Received: by 2002:a17:906:4792:: with SMTP id cw18mr25672327ejc.224.1639152174324;
+        Fri, 10 Dec 2021 08:02:54 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:48f9:bea:a04c:3dfe? ([2001:b07:6468:f312:48f9:bea:a04c:3dfe])
+        by smtp.googlemail.com with ESMTPSA id gn16sm1672620ejc.67.2021.12.10.08.02.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 10 Dec 2021 08:02:53 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <fd16797c-b80f-c414-a731-0b9b73a3732e@redhat.com>
+Date:   Fri, 10 Dec 2021 17:02:49 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c94b3aec-981e-8557-ba29-0094b075b8e4@redhat.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH 10/19] kvm: x86: Emulate WRMSR of guest IA32_XFD
+Content-Language: en-US
+To:     Yang Zhong <yang.zhong@intel.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com
+Cc:     seanjc@google.com, jun.nakajima@intel.com, kevin.tian@intel.com,
+        jing2.liu@linux.intel.com, jing2.liu@intel.com
+References: <20211208000359.2853257-1-yang.zhong@intel.com>
+ <20211208000359.2853257-11-yang.zhong@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20211208000359.2853257-11-yang.zhong@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 10, 2021, Paolo Bonzini wrote:
-> On 12/9/21 07:05, Sean Christopherson wrote:
-> > +	/* Special roots, e.g. pae_root, are not backed by shadow pages. */
-> > +	if (sp && is_obsolete_sp(vcpu->kvm, sp))
-> > +		return true;
-> > +
-> > +	/*
-> > +	 * Roots without an associated shadow page are considered invalid if
-> > +	 * there is a pending request to free obsolete roots.  The request is
-> > +	 * only a hint that the current root_may_  be obsolete and needs to be
-> > +	 * reloaded, e.g. if the guest frees a PGD that KVM is tracking as a
-> > +	 * previous root, then __kvm_mmu_prepare_zap_page() signals all vCPUs
-> > +	 * to reload even if no vCPU is actively using the root.
-> > +	 */
-> > +	if (!sp && kvm_test_request(KVM_REQ_MMU_RELOAD, vcpu))
-> >   		return true;
+First, the MSR should be added to msrs_to_save_all and 
+kvm_cpu_cap_has(X86_FEATURE_XFD) should be checked in kvm_init_msr_list.
+
+It seems that RDMSR support is missing, too.
+
+More important, please include:
+
+- documentation for the new KVM_EXIT_* value
+
+- a selftest that explains how userspace should react to it.
+
+This is a strong requirement for any new API (the first has been for 
+years; but the latter is also almost always respected these days).  This 
+series should not have been submitted without documentation.
+
+Also:
+
+On 12/8/21 01:03, Yang Zhong wrote:
 > 
-> Hmm I don't understand this (or maybe I do and I just don't like what I
-> understand).
-> 
-> KVM_REQ_MMU_RELOAD is raised after kvm->arch.mmu_valid_gen is fixed (of
-> course, otherwise the other CPU might just not see any obsoleted page
-> from the legacy MMU), therefore any check on KVM_REQ_MMU_RELOAD is just
-> advisory.
+> +		if (!guest_cpuid_has(vcpu, X86_FEATURE_XFD))
+> +			return 1;
 
-I disagree.  IMO, KVM should not be installing SPTEs into obsolete shadow pages,
-which is what continuing on allows.  I don't _think_ it's problematic, but I do
-think it's wrong.
+This should allow msr->host_initiated always (even if XFD is not part of 
+CPUID).  However, if XFD is nonzero and kvm_check_guest_realloc_fpstate 
+returns true, then it should return 1.
 
-> This is not a problem per se; in the other commit message you said,
-> 
->     For other MMUs, the resulting behavior is far more convoluted,
->     though unlikely to be truly problematic.
-> 
-> but it's unnecessarily complicating the logic.  I'm more inclined to
-> just play it simple and make the special roots process the page fault;
-> Jiangshan's work should clean things up a bit:
+The selftest should also cover using KVM_GET_MSR/KVM_SET_MSR.
 
-Ya.
+> +		/* Setting unsupported bits causes #GP */
+> +		if (~XFEATURE_MASK_USER_DYNAMIC & data) {
+> +			kvm_inject_gp(vcpu, 0);
+> +			break;
+> +		}
 
-> --------- 8< -------------
-> From 0c1e30d4e7e17692668d960452107f983dd2c9a9 Mon Sep 17 00:00:00 2001
-> From: Paolo Bonzini <pbonzini@redhat.com>
-> Date: Fri, 10 Dec 2021 07:41:02 -0500
-> Subject: [PATCH] KVM: x86: Do not check obsoleteness of roots that have no sp
->  attached
-> 
-> The "special" roots, e.g. pae_root when KVM uses PAE paging, are not
-> backed by a shadow page.  Running with TDP disabled or with nested NPT
-> explodes spectaculary due to dereferencing a NULL shadow page pointer.
-> Play nice with a NULL shadow page when checking for an obsolete root in
-> is_page_fault_stale().
-> 
-> Fixes: a955cad84cda ("KVM: x86/mmu: Retry page fault if root is invalidated by memslot update")
-> Cc: stable@vger.kernel.org
-> Cc: Maxim Levitsky <mlevitsk@redhat.com>
-> Analyzed-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index e2e1d012df22..4a3bcdd3cfe7 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -3987,7 +3987,17 @@ static bool kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
->  static bool is_page_fault_stale(struct kvm_vcpu *vcpu,
->  				struct kvm_page_fault *fault, int mmu_seq)
->  {
-> -	if (is_obsolete_sp(vcpu->kvm, to_shadow_page(vcpu->arch.mmu->root_hpa)))
-> +	struct kvm_mmu_page *sp = to_shadow_page(vcpu->arch.mmu->root_hpa);
-> +
-> +	/*
-> +	 * Special roots, e.g. pae_root, are not backed by shadow pages
-> +	 * so there isn't an easy way to detect if they're obsolete.
+This should check
 
-Eh, for all intents and purposes, KVM_REQ_MMU_RELOAD very much says special roots
-are obsolete.  The root will be unloaded, i.e. will no longer be used, i.e. is obsolete.
+	if (data & ~(XFEATURE_MASK_USER_DYNAMIC &
+		    vcpu->arch.guest_supported_xcr0))
 
-The other way to check for an invalid special root would be to treat it as obsolete
-if any of its children in entries 0-3 are present and obsolete.  That would be more
-precise, but it provides no benefit given KVM's current implementation.
+instead.
 
-I'm not completely opposed to doing nothing, but I do think it's silly to continue
-on knowing that the work done by the page fault is all but gauranteed to be useless.
-
-> +	 * If they are, any child SPTE created by the fault will be useless
-> +	 * (they will instantly be treated as obsolete because they don't
-> +	 * match the mmu_valid_gen); but they will not leak, so just play
-> +	 * it simple.
-> +	 */
-> +	if (sp && is_obsolete_sp(vcpu->kvm, sp))
->  		return true;
->  	return fault->slot &&
+Paolo
