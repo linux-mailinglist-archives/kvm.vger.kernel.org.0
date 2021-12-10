@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0700D4701DA
-	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 14:37:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7AB324701DE
+	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 14:37:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242093AbhLJNk3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Dec 2021 08:40:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43508 "EHLO
+        id S242458AbhLJNkh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Dec 2021 08:40:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43422 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242071AbhLJNjw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Dec 2021 08:39:52 -0500
+        with ESMTP id S241922AbhLJNkD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Dec 2021 08:40:03 -0500
 Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC5D0C0617A2;
-        Fri, 10 Dec 2021 05:36:17 -0800 (PST)
-Received: by mail-pg1-x535.google.com with SMTP id j11so8120745pgs.2;
-        Fri, 10 Dec 2021 05:36:17 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9F37C0698CB;
+        Fri, 10 Dec 2021 05:36:20 -0800 (PST)
+Received: by mail-pg1-x535.google.com with SMTP id 137so8126499pgg.3;
+        Fri, 10 Dec 2021 05:36:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=OudSjjha7j8S1ZrMSbfvC3a7Ljbl4kMnz01lRG2RAlU=;
-        b=hn8TB1ObBF6CSBcyVO4WYkhXElqQ2PyBcMmPOuYxjGMfmqEfedrHlvrT8oZuzezH8l
-         oNa7d24dlwPu3UjOKIh62fwvOr2NmaOO2olxGZA8A6naB+hwliLlODHrOwjcE7wd6R0W
-         Rc04Idhkk/niQfWiAJiEpsx9fvILjuQq/mPm4CFQChS+SEzYdX0bQ98uoZJeTPVJTRgd
-         2SZ6OfB5imibL1iMqlMZvgTt1TfNCuQgCAZA9ugyc49sKLSajBViI5Cp2VNjC75bibUi
-         Rk6UUn3GIcxJITBjsi7Sf+1G+y6bai1ZLA5xxGOyW0lq0tSYfKCX9qPhV1MPplEvuqMI
-         JneQ==
+        bh=/7Zcr+HyNanLEf+1i+3zWybEdEC4GFJeQgtkWfdckoI=;
+        b=aS6XBadUQ6B2eQCf7H//l13oPlNMi3AL+2GzrBfSGHB8iXerWOFwChhVv+Tklw3rVM
+         2l1HcicB5uNpf3qc4/4kaavq9pt0hfngH7uA0GfdsK43d7/+fgGUKsP9adrtD8lQT4OT
+         rGbxUAK6jgd2J1/3AhPUeKthVsEpBGEyQ+NEs+FJoQFuupT1FxE/P4VduEoUpHyeF9gP
+         nSbYlPuMYtVMU3QVLcpuitnMmMJeJxFyrxI6n78sfLPAWqFOpTm8L6GFw+0Sr1mbjWK9
+         rXdLf3Vll/0HsmV7yP7MVQZAqKiS2l3E461QJTrZUPbgtgaTDC8EhOQ4+Fi1cB1BOpvd
+         p/7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=OudSjjha7j8S1ZrMSbfvC3a7Ljbl4kMnz01lRG2RAlU=;
-        b=cwkgU5+rkwR2ZgUlPGiL3os/aypk+6HQK+tExUga6Pd445mvGH17IBj8pkCog467XG
-         xRiGAUwNkOjrzgIJrY/z5pEgb0wRbvAJCk2NePKMqY+A5crTdMzQffJepfYzqaYgfHhq
-         c7tH5asariiCwgge/d9mCXXW4j7OV3evE0lSRco1QHsMFcHCGDyMWEh8ONalAtwz3b5S
-         gKPNTqYYIxhV0ym1I3LXSvZYCBuBPqSqnoTGNvjbrum7BEUTey2MMPtlwio0dDjeCGu1
-         VCUxORf0u+hFiral/3mt9zU37ZyoOD2MWmRVTKS6ReoqUqOMJm46LVa0qJmFRgINcKZR
-         moFA==
-X-Gm-Message-State: AOAM532jqSvfMtOKyexrdQRiMFhtIpoeq/lsmSWEtlvtuYWFeoOzLkMr
-        WvQI1Iy3NnuxG5oJOoRqjBc=
-X-Google-Smtp-Source: ABdhPJzhEQSX1zBJDvZfegbFit1UXX4r2yPrihAaYYkYJam9dj8FqMo/F2XCoI8NT4fWIunmr9mZzw==
-X-Received: by 2002:a05:6a00:ad0:b0:4ac:3d49:d8d with SMTP id c16-20020a056a000ad000b004ac3d490d8dmr18191250pfl.25.1639143377342;
-        Fri, 10 Dec 2021 05:36:17 -0800 (PST)
+        bh=/7Zcr+HyNanLEf+1i+3zWybEdEC4GFJeQgtkWfdckoI=;
+        b=LRcxLzEpfSx8ryDi2rRpjN1hHv4n8+r4yitpSv3DBgfWGluKK8xapwsVGM9/4bsTS5
+         DmQefUiaf9ACV98RnUusJNlkClgG7a8FLUFG1kLFIvOFboClsjB9VWB1+2UraGNvFwZv
+         /7BSH41W1d/C9DrjGZcjHH4TPA7mHHOsswtYqFrg84ljJSoFbWRnu0YEnvpb4jLpx/DB
+         xcR7suUv5VDwyQzqJSjD/EGn5i4KT5Z1gvFdciXNFJcA81ZUan1NMeNvd4+r+Qhve6I6
+         Wt2GIw1pjfxA4jMKtnAUrbLGz2+T7RuJkYbTXhnjDVjlqwtGFlBtNvDuDYWQzobi70mG
+         jv7w==
+X-Gm-Message-State: AOAM532guIZ6ohYrU5B6AQL8oF4AtjRUG1kOF/0wfEYx4GUvE58n8aaC
+        YtiDQoc3SVL7zoUPyC53a90wbstjm/E=
+X-Google-Smtp-Source: ABdhPJw9Lbxu0BLR1WbEkFE19tmV+uwmmh4CxUX2s4cmLzzudWJ0rK1DcgZKA+VpICcmSV9ha3DkyQ==
+X-Received: by 2002:a65:654f:: with SMTP id a15mr39924814pgw.195.1639143380451;
+        Fri, 10 Dec 2021 05:36:20 -0800 (PST)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id t4sm3596068pfj.168.2021.12.10.05.36.14
+        by smtp.gmail.com with ESMTPSA id t4sm3596068pfj.168.2021.12.10.05.36.17
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 10 Dec 2021 05:36:17 -0800 (PST)
+        Fri, 10 Dec 2021 05:36:20 -0800 (PST)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
@@ -58,9 +58,9 @@ Cc:     Jim Mattson <jmattson@google.com>,
         Peter Zijlstra <peterz@infradead.org>,
         Like Xu <likexu@tencent.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v11 11/17] KVM: x86/pmu: Add PEBS_DATA_CFG MSR emulation to support adaptive PEBS
-Date:   Fri, 10 Dec 2021 21:35:19 +0800
-Message-Id: <20211210133525.46465-12-likexu@tencent.com>
+Subject: [PATCH v11 12/17] KVM: x86: Set PEBS_UNAVAIL in IA32_MISC_ENABLE when PEBS is enabled
+Date:   Fri, 10 Dec 2021 21:35:20 +0800
+Message-Id: <20211210133525.46465-13-likexu@tencent.com>
 X-Mailer: git-send-email 2.33.1
 In-Reply-To: <20211210133525.46465-1-likexu@tencent.com>
 References: <20211210133525.46465-1-likexu@tencent.com>
@@ -74,118 +74,58 @@ From: Like Xu <like.xu@linux.intel.com>
 
 From: Like Xu <like.xu@linux.intel.com>
 
-If IA32_PERF_CAPABILITIES.PEBS_BASELINE [bit 14] is set, the adaptive
-PEBS is supported. The PEBS_DATA_CFG MSR and adaptive record enable
-bits (IA32_PERFEVTSELx.Adaptive_Record and IA32_FIXED_CTR_CTRL.
-FCx_Adaptive_Record) are also supported.
+The bit 12 represents "Processor Event Based Sampling Unavailable (RO)" :
+	1 = PEBS is not supported.
+	0 = PEBS is supported.
 
-Adaptive PEBS provides software the capability to configure the PEBS
-records to capture only the data of interest, keeping the record size
-compact. An overflow of PMCx results in generation of an adaptive PEBS
-record with state information based on the selections specified in
-MSR_PEBS_DATA_CFG.By default, the record only contain the Basic group.
+A write to this PEBS_UNAVL available bit will bring #GP(0) when guest PEBS
+is enabled. Some PEBS drivers in guest may care about this bit.
 
-When guest adaptive PEBS is enabled, the IA32_PEBS_ENABLE MSR will
-be added to the perf_guest_switch_msr() and switched during the VMX
-transitions just like CORE_PERF_GLOBAL_CTRL MSR.
-
-Co-developed-by: Luwei Kang <luwei.kang@intel.com>
-Signed-off-by: Luwei Kang <luwei.kang@intel.com>
 Signed-off-by: Like Xu <like.xu@linux.intel.com>
-Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 ---
- arch/x86/events/intel/core.c    |  8 ++++++++
- arch/x86/include/asm/kvm_host.h |  2 ++
- arch/x86/kvm/vmx/pmu_intel.c    | 16 ++++++++++++++++
- 3 files changed, 26 insertions(+)
+ arch/x86/kvm/vmx/pmu_intel.c | 2 ++
+ arch/x86/kvm/x86.c           | 8 +++++++-
+ 2 files changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
-index 7c6ba10c8422..afc20ae1c3cb 100644
---- a/arch/x86/events/intel/core.c
-+++ b/arch/x86/events/intel/core.c
-@@ -4015,6 +4015,14 @@ static struct perf_guest_switch_msr *intel_guest_get_msrs(int *nr, void *data)
- 		.guest = kvm_pmu->ds_area,
- 	};
- 
-+	if (x86_pmu.intel_cap.pebs_baseline) {
-+		arr[(*nr)++] = (struct perf_guest_switch_msr){
-+			.msr = MSR_PEBS_DATA_CFG,
-+			.host = cpuc->pebs_data_cfg,
-+			.guest = kvm_pmu->pebs_data_cfg,
-+		};
-+	}
-+
- 	pebs_enable = (*nr)++;
- 	arr[pebs_enable] = (struct perf_guest_switch_msr){
- 		.msr = MSR_IA32_PEBS_ENABLE,
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 8eac3ef5b05f..c07d33895612 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -521,6 +521,8 @@ struct kvm_pmu {
- 	u64 ds_area;
- 	u64 pebs_enable;
- 	u64 pebs_enable_mask;
-+	u64 pebs_data_cfg;
-+	u64 pebs_data_cfg_mask;
- 
- 	/*
- 	 * The gate to release perf_events not marked in
 diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index a60221ed9b78..10de5815deca 100644
+index 10de5815deca..10424dacb53d 100644
 --- a/arch/x86/kvm/vmx/pmu_intel.c
 +++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -214,6 +214,9 @@ static bool intel_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr)
- 	case MSR_IA32_DS_AREA:
- 		ret = guest_cpuid_has(vcpu, X86_FEATURE_DS);
- 		break;
-+	case MSR_PEBS_DATA_CFG:
-+		ret = vcpu->arch.perf_capabilities & PERF_CAP_PEBS_BASELINE;
-+		break;
- 	default:
- 		ret = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0) ||
- 			get_gp_pmc(pmu, msr, MSR_P6_EVNTSEL0) ||
-@@ -367,6 +370,9 @@ static int intel_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	case MSR_IA32_DS_AREA:
- 		msr_info->data = pmu->ds_area;
- 		return 0;
-+	case MSR_PEBS_DATA_CFG:
-+		msr_info->data = pmu->pebs_data_cfg;
-+		return 0;
- 	default:
- 		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
- 		    (pmc = get_gp_pmc(pmu, msr, MSR_IA32_PMC0))) {
-@@ -439,6 +445,14 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 			return 1;
- 		pmu->ds_area = data;
- 		return 0;
-+	case MSR_PEBS_DATA_CFG:
-+		if (pmu->pebs_data_cfg == data)
-+			return 0;
-+		if (!(data & pmu->pebs_data_cfg_mask)) {
-+			pmu->pebs_data_cfg = data;
-+			return 0;
-+		}
-+		break;
- 	default:
- 		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
- 		    (pmc = get_gp_pmc(pmu, msr, MSR_IA32_PMC0))) {
-@@ -507,6 +521,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- 	pmu->reserved_bits = 0xffffffff00200000ull;
- 	pmu->fixed_ctr_ctrl_mask = ~0ull;
- 	pmu->pebs_enable_mask = ~0ull;
-+	pmu->pebs_data_cfg_mask = ~0ull;
+@@ -591,6 +591,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
+ 		bitmap_set(pmu->all_valid_pmc_idx, INTEL_PMC_IDX_FIXED_VLBR, 1);
  
- 	entry = kvm_find_cpuid_entry(vcpu, 0xa, 0);
- 	if (!entry)
-@@ -583,6 +598,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
- 				pmu->fixed_ctr_ctrl_mask &=
- 					~(1ULL << (INTEL_PMC_IDX_FIXED + i * 4));
- 			}
-+			pmu->pebs_data_cfg_mask = ~0xff00000full;
- 		} else {
- 			pmu->pebs_enable_mask =
+ 	if (vcpu->arch.perf_capabilities & PERF_CAP_PEBS_FORMAT) {
++		vcpu->arch.ia32_misc_enable_msr &= ~MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL;
+ 		if (vcpu->arch.perf_capabilities & PERF_CAP_PEBS_BASELINE) {
+ 			pmu->pebs_enable_mask = ~pmu->global_ctrl;
+ 			pmu->reserved_bits &= ~ICL_EVENTSEL_ADAPTIVE;
+@@ -604,6 +605,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
  				~((1ull << pmu->nr_arch_gp_counters) - 1);
+ 		}
+ 	} else {
++		vcpu->arch.ia32_misc_enable_msr |= MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL;
+ 		vcpu->arch.perf_capabilities &= ~PERF_CAP_PEBS_MASK;
+ 	}
+ }
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index bd331f2e123b..d7201762c1b1 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3480,7 +3480,13 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 		break;
+ 	case MSR_IA32_MISC_ENABLE: {
+ 		u64 old_val = vcpu->arch.ia32_misc_enable_msr;
+-		u64 pmu_mask = MSR_IA32_MISC_ENABLE_EMON;
++		u64 pmu_mask = MSR_IA32_MISC_ENABLE_EMON |
++			MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL;
++
++		/* RO bits */
++		if (!msr_info->host_initiated &&
++		    ((old_val ^ data) & MSR_IA32_MISC_ENABLE_PEBS_UNAVAIL))
++			return 1;
+ 
+ 		/*
+ 		 * For a dummy user space, the order of setting vPMU capabilities and
 -- 
 2.33.1
 
