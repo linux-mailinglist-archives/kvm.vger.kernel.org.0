@@ -2,203 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 66BEC46FA04
-	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 05:48:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 000DA46FCCF
+	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 09:36:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234354AbhLJEwI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Dec 2021 23:52:08 -0500
-Received: from out4436.biz.mail.alibaba.com ([47.88.44.36]:7806 "EHLO
-        out4436.biz.mail.alibaba.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231842AbhLJEwH (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 9 Dec 2021 23:52:07 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R661e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=xuyu@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0V-7NqY1_1639111700;
-Received: from 30.225.28.134(mailfrom:xuyu@linux.alibaba.com fp:SMTPD_---0V-7NqY1_1639111700)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Fri, 10 Dec 2021 12:48:21 +0800
-Message-ID: <acc75c62-b919-12da-25b4-2b65ecf89ab6@linux.alibaba.com>
-Date:   Fri, 10 Dec 2021 12:48:17 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.3.2
-Subject: Re: [PATCH v2 07/14] x86/clear_page: add clear_page_uncached()
-Content-Language: en-US
-To:     Ankur Arora <ankur.a.arora@oracle.com>
-Cc:     linux-kernel@vger.kernel.org, linux-mm@kvack.org, x86@kernel.org,
-        mingo@kernel.org, bp@alien8.de, luto@kernel.org,
-        akpm@linux-foundation.org, mike.kravetz@oracle.com,
-        jon.grimm@amd.com, kvm@vger.kernel.org, konrad.wilk@oracle.com,
-        boris.ostrovsky@oracle.com
-References: <20211020170305.376118-1-ankur.a.arora@oracle.com>
- <20211020170305.376118-8-ankur.a.arora@oracle.com>
- <b955c5c4-bc4b-9f43-be1c-3a45973de259@linux.alibaba.com>
- <87czm5ulcc.fsf@oracle.com>
-From:   Yu Xu <xuyu@linux.alibaba.com>
-In-Reply-To: <87czm5ulcc.fsf@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+        id S238545AbhLJIkN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Dec 2021 03:40:13 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57004 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232663AbhLJIkM (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 10 Dec 2021 03:40:12 -0500
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1BA6wkPR040266;
+        Fri, 10 Dec 2021 08:36:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=FJ2WBO1seFaD3EU10SvBw7CNtQkrcZB2rnVjxCeLqfM=;
+ b=nao+kDG5ZdrSVf74uxjJu6mCzGLh+uajSFXLNsq5QhYFXRmLRnixF3b5doXoEh/EJEmT
+ 4XSFTB+F3zuNL0VAaNz/id//JH5m8nOFqysiL8CfvMU/aJG65c0vqwEa91AspbRNIK2w
+ pAc1krGN/2GYndxFmBRwONl/ELmTMtKzLreZgJwMZHK1vK2vCCquy/vKKB0qZej3rOIm
+ H9Xj1KuExFejahmvf7YuM8UG27cNfMtO745ZEAA1mk3KKzVDnw32anEwbD6WQ1wo0XZe
+ m7S+pwetMqsW4indg2oakgXjcSBWKWbO4ChxkEYIm9KjGei1oRlXG62n0ShNHH5Zl8qZ Ow== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cv23nhrty-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 10 Dec 2021 08:36:37 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1BA7Rgpl021771;
+        Fri, 10 Dec 2021 08:36:37 GMT
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cv23nhrss-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 10 Dec 2021 08:36:37 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1BA8S65c011156;
+        Fri, 10 Dec 2021 08:36:34 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma06fra.de.ibm.com with ESMTP id 3cqykget2n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 10 Dec 2021 08:36:34 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1BA8aV4g27591064
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 10 Dec 2021 08:36:31 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0D772A4054;
+        Fri, 10 Dec 2021 08:36:31 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CC182A4067;
+        Fri, 10 Dec 2021 08:36:29 +0000 (GMT)
+Received: from sig-9-145-163-175.de.ibm.com (unknown [9.145.163.175])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 10 Dec 2021 08:36:29 +0000 (GMT)
+Message-ID: <d08ddd8008468dddb02876c38313c17e57be89af.camel@linux.ibm.com>
+Subject: Re: [PATCH 14/32] KVM: s390: pci: do initial setup for AEN
+ interpretation
+From:   Niklas Schnelle <schnelle@linux.ibm.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        linux-s390@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
+        farman@linux.ibm.com, pmorel@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, gerald.schaefer@linux.ibm.com,
+        agordeev@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
+        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Date:   Fri, 10 Dec 2021 09:36:29 +0100
+In-Reply-To: <31980a07-e2e8-cef3-f0b4-370dad4cb14c@linux.ibm.com>
+References: <20211207205743.150299-1-mjrosato@linux.ibm.com>
+         <20211207205743.150299-15-mjrosato@linux.ibm.com>
+         <596857e3-ab13-7513-eeda-ed407fe22732@linux.ibm.com>
+         <31980a07-e2e8-cef3-f0b4-370dad4cb14c@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-16.el8) 
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: toWC4W74o5bzcLAcc3TR0xGgU_7EsKtc
+X-Proofpoint-GUID: 5qo78H_0h78S6eR4H29CDSe9yDRDJF7C
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2021-12-10_03,2021-12-08_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
+ mlxscore=0 priorityscore=1501 phishscore=0 bulkscore=0 malwarescore=0
+ impostorscore=0 clxscore=1015 mlxlogscore=999 adultscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2112100047
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/10/21 12:37 PM, Ankur Arora wrote:
+On Thu, 2021-12-09 at 15:20 -0500, Matthew Rosato wrote:
+> On 12/9/21 2:54 PM, Christian Borntraeger wrote:
+> > Am 07.12.21 um 21:57 schrieb Matthew Rosato:
+> > > Initial setup for Adapter Event Notification Interpretation for zPCI
+> > > passthrough devices.  Specifically, allocate a structure for 
+> > > forwarding of
+> > > adapter events and pass the address of this structure to firmware.
+> > > 
+> > > Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> > > ---
+> > >   arch/s390/include/asm/pci_insn.h |  12 ++++
+> > >   arch/s390/kvm/interrupt.c        |  17 +++++
+> > >   arch/s390/kvm/kvm-s390.c         |   3 +
+> > >   arch/s390/kvm/pci.c              | 113 +++++++++++++++++++++++++++++++
+> > >   arch/s390/kvm/pci.h              |  42 ++++++++++++
+> > >   5 files changed, 187 insertions(+)
+> > >   create mode 100644 arch/s390/kvm/pci.h
+> > > 
+---8<---
+> > >   int kvm_s390_pci_dev_open(struct zpci_dev *zdev)
+> > >   {
+> > > @@ -55,3 +162,9 @@ int kvm_s390_pci_attach_kvm(struct zpci_dev *zdev, 
+> > > struct kvm *kvm)
+> > >       return 0;
+> > >   }
+> > >   EXPORT_SYMBOL_GPL(kvm_s390_pci_attach_kvm);
+> > > +
+> > > +void kvm_s390_pci_init(void)
+> > > +{
+> > > +    spin_lock_init(&aift.gait_lock);
+> > > +    mutex_init(&aift.lock);
+> > > +}
+> > 
+> > Can we maybe use designated initializer for the static definition of 
+> > aift, e.g. something
+> > like
+> > static struct zpci_aift aift = {
+> >      .gait_lock = __SPIN_LOCK_UNLOCKED(aift.gait_lock),
+> >      .lock    = __MUTEX_INITIALIZER(aift.lock),
+> > }
+> > and get rid of the init function? >
 > 
-> Yu Xu <xuyu@linux.alibaba.com> writes:
+> Maybe -- I can certainly do the above, but I do add a call to 
+> zpci_get_mdd() in the init function (patch 23), so if I want to in patch 
+> 23 instead add .mdd = zpci_get_mdd() to this designated initializer I'd 
+> have to re-work zpci_get_mdd (patch 12) to return the mdd rather than 
+> the CLP LIST PCI return code.  We want at least a warning if we're 
+> setting a 0 for mdd because the CLP failed for some bizarre reason.
 > 
->> On 10/21/21 1:02 AM, Ankur Arora wrote:
->>> Expose the low-level uncached primitives (clear_page_movnt(),
->>> clear_page_clzero()) as alternatives via clear_page_uncached().
->>> Also fallback to clear_page(), if X86_FEATURE_MOVNT_SLOW is set
->>> and the CPU does not have X86_FEATURE_CLZERO.
->>> Both the uncached primitives use stores which are weakly ordered
->>> with respect to other instructions accessing the memory hierarchy.
->>> To ensure that callers don't mix accesses to different types of
->>> address_spaces, annotate clear_user_page_uncached(), and
->>> clear_page_uncached() as taking __incoherent pointers as arguments.
->>> Also add clear_page_uncached_make_coherent() which provides the
->>> necessary store fence to flush out the uncached regions.
->>> Signed-off-by: Ankur Arora <ankur.a.arora@oracle.com>
->>> ---
->>> Notes:
->>>       This patch adds the fallback definitions of clear_user_page_uncached()
->>>       etc in include/linux/mm.h which is likely not the right place for it.
->>>       I'm guessing these should be moved to include/asm-generic/page.h
->>>       (or maybe a new include/asm-generic/page_uncached.h) and for
->>>       architectures that do have arch/$arch/include/asm/page.h (which
->>>       seems like all of them), also replicate there?
->>>       Anyway, wanted to first check if that's the way to do it, before
->>>       doing that.
->>>    arch/x86/include/asm/page.h    | 10 ++++++++++
->>>    arch/x86/include/asm/page_32.h |  9 +++++++++
->>>    arch/x86/include/asm/page_64.h | 32 ++++++++++++++++++++++++++++++++
->>>    include/linux/mm.h             | 14 ++++++++++++++
->>>    4 files changed, 65 insertions(+)
->>> diff --git a/arch/x86/include/asm/page_32.h b/arch/x86/include/asm/page_32.h
->>> index 94dbd51df58f..163be03ac422 100644
->>> --- a/arch/x86/include/asm/page_32.h
->>> +++ b/arch/x86/include/asm/page_32.h
->>> @@ -39,6 +39,15 @@ static inline void clear_page(void *page)
->>>    	memset(page, 0, PAGE_SIZE);
->>>    }
->>>    +static inline void clear_page_uncached(__incoherent void *page)
->>> +{
->>> +	clear_page((__force void *) page);
->>> +}
->>> +
->>> +static inline void clear_page_uncached_make_coherent(void)
->>> +{
->>> +}
->>> +
->>>    static inline void copy_page(void *to, void *from)
->>>    {
->>>    	memcpy(to, from, PAGE_SIZE);
->>> diff --git a/arch/x86/include/asm/page_64.h b/arch/x86/include/asm/page_64.h
->>> index 3c53f8ef8818..d7946047c70f 100644
->>> --- a/arch/x86/include/asm/page_64.h
->>> +++ b/arch/x86/include/asm/page_64.h
->>> @@ -56,6 +56,38 @@ static inline void clear_page(void *page)
->>>    			   : "cc", "memory", "rax", "rcx");
->>>    }
->>>    +/*
->>> + * clear_page_uncached: only allowed on __incoherent memory regions.
->>> + */
->>> +static inline void clear_page_uncached(__incoherent void *page)
->>> +{
->>> +	alternative_call_2(clear_page_movnt,
->>> +			   clear_page, X86_FEATURE_MOVNT_SLOW,
->>> +			   clear_page_clzero, X86_FEATURE_CLZERO,
->>> +			   "=D" (page),
->>> +			   "0" (page)
->>> +			   : "cc", "memory", "rax", "rcx");
->>> +}
->>> +
->>> +/*
->>> + * clear_page_uncached_make_coherent: executes the necessary store
->>> + * fence after which __incoherent regions can be safely accessed.
->>> + */
->>> +static inline void clear_page_uncached_make_coherent(void)
->>> +{
->>> +	/*
->>> +	 * Keep the sfence for oldinstr and clzero separate to guard against
->>> +	 * the possibility that a cpu-model both has X86_FEATURE_MOVNT_SLOW
->>> +	 * and X86_FEATURE_CLZERO.
->>> +	 *
->>> +	 * The alternatives need to be in the same order as the ones
->>> +	 * in clear_page_uncached().
->>> +	 */
->>> +	alternative_2("sfence",
->>> +		      "", X86_FEATURE_MOVNT_SLOW,
->>> +		      "sfence", X86_FEATURE_CLZERO);
->>> +}
->>> +
->>>    void copy_page(void *to, void *from);
->>>      #ifdef CONFIG_X86_5LEVEL
->>> diff --git a/include/linux/mm.h b/include/linux/mm.h
->>> index 73a52aba448f..b88069d1116c 100644
->>> --- a/include/linux/mm.h
->>> +++ b/include/linux/mm.h
->>> @@ -3192,6 +3192,20 @@ static inline bool vma_is_special_huge(const struct vm_area_struct *vma)
->>>      #endif /* CONFIG_TRANSPARENT_HUGEPAGE || CONFIG_HUGETLBFS */
->>>    +#ifndef clear_user_page_uncached
->>
->> Hi Ankur Arora,
->>
->> I've been looking for where clear_user_page_uncached is defined in this
->> patchset, but failed.
->>
->> There should be something like follows in arch/x86, right?
->>
->> static inline void clear_user_page_uncached(__incoherent void *page,
->>                                 unsigned long vaddr, struct page *pg)
->> {
->>          clear_page_uncached(page);
->> }
->>
->>
->> Did I miss something?
->>
-> Hi Yu Xu,
-> 
-> Defined in include/linux/mm.h. Just below :).
+> I guess one option would be to move the WARN_ON into the zpci_get_mdd() 
+> function itself and then now we can do
 
-Thanks for your reply :)
+Hmm, if we do change zpci_get_mdd() which I'm generally fine with I
+feel like the initializer would be weird mix of truly static lock
+initialization and a function that actually does a CLP.
+I'm also a little worried about initialization order if kvm is built-
+in. The CLP should work even with PCI not initialized but what if for
+example the facility isn't even there?
 
-This is the version when #ifndef clear_user_page_uncached, i.e., fall
-back to standard clear_user_page.
+Also if you do change zpci_get-mdd() I'd prefer a pr_err() instead of a
+WARN_ON(), no reason to crash the system for this if it runs with
+panic-on-warn. So I think overall keeping it as is makes more sense.
 
-But where is the uncached version of clear_user_page? I am looking for
-this.
-
-> 
->>> +/*
->>> + * clear_user_page_uncached: fallback to the standard clear_user_page().
->>> + */
->>> +static inline void clear_user_page_uncached(__incoherent void *page,
->>> +					unsigned long vaddr, struct page *pg)
->>> +{
->>> +	clear_user_page((__force void *)page, vaddr, pg);
->>> +}
-> 
-> That said, as this note in the patch mentions, this isn't really a great
-> place for this definition. As you also mention, the right place for this
-> would be somewhere in the arch/.../include and include/asm-generic hierarchy.
-> 
->>>       This patch adds the fallback definitions of clear_user_page_uncached()
->>>       etc in include/linux/mm.h which is likely not the right place for it.
->>>       I'm guessing these should be moved to include/asm-generic/page.h
->>>       (or maybe a new include/asm-generic/page_uncached.h) and for
->>>       architectures that do have arch/$arch/include/asm/page.h (which
->>>       seems like all of them), also replicate there?
->>>       Anyway, wanted to first check if that's the way to do it, before
->>>       doing that.
-> 
-> Recommendations on how to handle this, welcome.
-> 
-> Thanks
-> 
-> --
-> ankur
-> 
-
--- 
-Thanks,
-Yu
