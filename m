@@ -2,152 +2,256 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BF52646FEBC
-	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 11:27:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0772C46FF2B
+	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 11:54:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235429AbhLJKbQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Dec 2021 05:31:16 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:29704 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229685AbhLJKbP (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 10 Dec 2021 05:31:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1639132059;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=jVG9S7QFXKQmXdxA4E0LVfPojr/jyMhDEBcJlsGRzV4=;
-        b=bp1VoEB1XBxHHGpxLUf02bZqjRO2KwRaaqpdS04WTVWum9YbuzSmcQX36fDvrwWR6Z+vSD
-        IM86ZklpCckeF5D3UC179PQLXFTnkb+Ka1Tg7Pa8p5GvbBGGubN2wIQMAi74UPdRj/JI3D
-        7nI4mJzRLWlZyqabxozHUZGloT7aJtI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-334-K3jfAX1sO-W25NkmoL-Vww-1; Fri, 10 Dec 2021 05:27:36 -0500
-X-MC-Unique: K3jfAX1sO-W25NkmoL-Vww-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 784391B2C980;
-        Fri, 10 Dec 2021 10:27:35 +0000 (UTC)
-Received: from starship (unknown [10.40.192.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7839245D77;
-        Fri, 10 Dec 2021 10:27:33 +0000 (UTC)
-Message-ID: <e62a3f5f55159bc941360d489d8bffb2b0b716f9.camel@redhat.com>
-Subject: Re: [RFC PATCH 0/6] KVM: X86: Add and use shadow page with level
- promoted or acting as pae_root
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Lai Jiangshan <jiangshanlai@gmail.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Lai Jiangshan <laijs@linux.alibaba.com>
-Date:   Fri, 10 Dec 2021 12:27:32 +0200
-In-Reply-To: <20211210092508.7185-1-jiangshanlai@gmail.com>
-References: <20211210092508.7185-1-jiangshanlai@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        id S236965AbhLJK6O (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Dec 2021 05:58:14 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:61452 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234152AbhLJK6N (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 10 Dec 2021 05:58:13 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1BAARRQJ013030;
+        Fri, 10 Dec 2021 10:54:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : from : to : cc : references : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=kxoiwD+73F5/gWkak1Ha+u2AaAfacQl1MT15ZEXwpeE=;
+ b=deTsFbBq5eazwVskE2mgTK3Gs/9ngv3YVnPRmPzF3NYzWloc17eYwTdKYA1IlaxP3/pO
+ gtob9i3myAeqbZFac/cRXdcPHHirhHhz49Gj5JO4+rJzg+sqwxgE19S7FD0r5e6KEIZq
+ sLe2NMA0zgaQmSWVoIOs7w3I7/NLQmu13B4NNZAz7i/XhyMa0bYzm85BR9im6toUplvS
+ TotIewHQw4Y+Y7dR+7FHHbgM9xp86gPVF0Hm+1e0PtBuqNrrDffMhY+xWJd96bOh0wmC
+ V/DHLftUAJon/dDoKw0ZVIu8wE0yh5oClAmrKVS+2xxPofB8vwYsKn0udzRWonyTzqZB ng== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cv55j8f4y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 10 Dec 2021 10:54:37 +0000
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1BAAZB0O024276;
+        Fri, 10 Dec 2021 10:54:37 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cv55j8f4f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 10 Dec 2021 10:54:37 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1BAAlX7o010916;
+        Fri, 10 Dec 2021 10:54:34 GMT
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
+        by ppma04ams.nl.ibm.com with ESMTP id 3cqyybj3g0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 10 Dec 2021 10:54:34 +0000
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1BAAsU8P18088192
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 10 Dec 2021 10:54:31 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D6494AE057;
+        Fri, 10 Dec 2021 10:54:30 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D6539AE055;
+        Fri, 10 Dec 2021 10:54:29 +0000 (GMT)
+Received: from [9.171.35.34] (unknown [9.171.35.34])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 10 Dec 2021 10:54:29 +0000 (GMT)
+Message-ID: <d2e6c444-9ff5-6263-471b-96d0805a375e@linux.ibm.com>
+Date:   Fri, 10 Dec 2021 11:55:28 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH 14/32] KVM: s390: pci: do initial setup for AEN
+ interpretation
+Content-Language: en-US
+From:   Pierre Morel <pmorel@linux.ibm.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
+        schnelle@linux.ibm.com, farman@linux.ibm.com,
+        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
+        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
+        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20211207205743.150299-1-mjrosato@linux.ibm.com>
+ <20211207205743.150299-15-mjrosato@linux.ibm.com>
+ <1816b176-0866-5f68-d3ea-813fab13d3e3@linux.ibm.com>
+In-Reply-To: <1816b176-0866-5f68-d3ea-813fab13d3e3@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: _6cftZhry1li2A6pY73J__xd87ZQepc8
+X-Proofpoint-GUID: mTGSVv4AzONsz4M5CS8vye0sAjolXUIq
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2021-12-10_03,2021-12-08_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
+ lowpriorityscore=0 bulkscore=0 malwarescore=0 suspectscore=0 adultscore=0
+ mlxlogscore=999 clxscore=1015 priorityscore=1501 impostorscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2112100057
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2021-12-10 at 17:25 +0800, Lai Jiangshan wrote:
-> From: Lai Jiangshan <laijs@linux.alibaba.com>
-> 
-> (Request For Help for testing on AMD machine with 32 bit L1 hypervisor,
-> see information below)
-> 
-> KVM handles root pages specially for these cases:
-> 
-> direct mmu (nonpaping for 32 bit guest):
-> 	gCR0_PG=0
-> shadow mmu (shadow paping for 32 bit guest):
-> 	gCR0_PG=1,gEFER_LMA=0,gCR4_PSE=0
-> 	gCR0_PG=1,gEFER_LMA=0,gCR4_PSE=1
-> direct mmu (NPT for 32bit host):
-> 	hEFER_LMA=0
-> shadow nested NPT (for 32bit L1 hypervisor):
-> 	gCR0_PG=1,gEFER_LMA=0,gCR4_PSE=0,hEFER_LMA=0
-> 	gCR0_PG=1,gEFER_LMA=0,gCR4_PSE=1,hEFER_LMA=0
-> 	gCR0_PG=1,gEFER_LMA=0,gCR4_PSE={0|1},hEFER_LMA=1,hCR4_LA57={0|1}
-> Shadow nested NPT for 64bit L1 hypervisor:
-> 	gEFER_LMA=1,gCR4_LA57=0,hEFER_LMA=1,hCR4_LA57=1
-> 
-> They are either using special roots or matched the condition 
-> ((mmu->shadow_root_level > mmu->root_level) && !mm->direct_map)
-> (refered as level promotion) or both.
-> 
-> All the cases are using special roots except the last one.
-> Many cases are doing level promotion including the last one.
-> 
-> When special roots are used, the root page will not be backed by
-> kvm_mmu_page.  So they must be treated specially, but not all places
-> is considering this problem, and Sean is adding some code to check
-> this special roots.
-> 
-> When level promotion, the kvm treats them silently always.
-> 
-> These treaments incur problems or complication, see the changelog
-> of every patch.
-> 
-> These patches were made when I reviewed all the usage of shadow_root_level
-> and root_level.  Some of them are sent and accepted.  Patch3-6 are too
-> complicated so they had been held back.  Patch1 and patch2 were sent.
-> Patch1 was rejected, but I think it is good.  Patch2 is said to be
-> accepted, but it is not shown in the kvm/queue.  Patch3-6 conflicts
-> with patch1,2 so patch1,2 are included here too.
-> 
-> Other reason that patch 3-6 were held back is that the patch 3-6 are
-> not tested with shadow NPT cases listed above.  Because I don't have
-> guest images can act as 32 bit L1 hypervisor, nor I can access to
-> AMD machine with 5 level paging.  I'm a bit reluctant to ask for the
-> resource, so I send the patches and wish someone test them and modify
-> them.  At least, it provides some thinking and reveals problems of the
-> existing code and of the AMD cases.
-> ( *Request For Help* here.)
-> 
-> These patches have been tested with the all cases except the shadow-NPT
-> cases, the code coverage is believed to be more than 95% (hundreds of
-> code related to shadow-NPT are shoved, and be replaced with common
-> role.pae_root and role.level_promoted code with only 8 line of code is
-> added for shadow-NPT, only 2 line of code is not covered in my tests).
-> 
-> And Sean also found the problem of the last case listed above and asked
-> questions in a reply[1] to one of my emails, I hope this patchset can
-> be my reply to his questions about such complicated case.
-> 
-> If special roots are removed and PAE page is write-protected, there
-> can be some more cleanups.
-> 
-> [1]: https://lore.kernel.org/lkml/YbFY533IT3XSIqAK@google.com/
-> 
-> Lai Jiangshan (6):
->   KVM: X86: Check root_level only in fast_pgd_switch()
->   KVM: X86: Walk shadow page starting with shadow_root_level
->   KVM: X86: Add arguement gfn and role to kvm_mmu_alloc_page()
->   KVM: X86: Introduce role.level_promoted
->   KVM: X86: Alloc pae_root shadow page
->   KVM: X86: Use level_promoted and pae_root shadow page for 32bit guests
-> 
->  arch/x86/include/asm/kvm_host.h |   9 +-
->  arch/x86/kvm/mmu/mmu.c          | 440 ++++++++++----------------------
->  arch/x86/kvm/mmu/mmu_audit.c    |  26 +-
->  arch/x86/kvm/mmu/paging_tmpl.h  |  15 +-
->  arch/x86/kvm/mmu/tdp_mmu.h      |   7 +-
->  5 files changed, 164 insertions(+), 333 deletions(-)
-> 
 
 
-I have 32 bit VM which can run an other 32 bit VM, and both it and the nested VM are using the mainline kernel).
-I'll test this patch series soon.
+On 12/10/21 10:54, Pierre Morel wrote:
+> 
+> 
+> On 12/7/21 21:57, Matthew Rosato wrote:
+>> Initial setup for Adapter Event Notification Interpretation for zPCI
+>> passthrough devices.  Specifically, allocate a structure for 
+>> forwarding of
+>> adapter events and pass the address of this structure to firmware.
+>>
+>> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+>> ---
+>>   arch/s390/include/asm/pci_insn.h |  12 ++++
+>>   arch/s390/kvm/interrupt.c        |  17 +++++
+>>   arch/s390/kvm/kvm-s390.c         |   3 +
+>>   arch/s390/kvm/pci.c              | 113 +++++++++++++++++++++++++++++++
+>>   arch/s390/kvm/pci.h              |  42 ++++++++++++
+>>   5 files changed, 187 insertions(+)
+>>   create mode 100644 arch/s390/kvm/pci.h
+>>
+>> diff --git a/arch/s390/include/asm/pci_insn.h 
+>> b/arch/s390/include/asm/pci_insn.h
+>> index 5331082fa516..e5f57cfe1d45 100644
+>> --- a/arch/s390/include/asm/pci_insn.h
+>> +++ b/arch/s390/include/asm/pci_insn.h
+>> @@ -101,6 +101,7 @@ struct zpci_fib {
+>>   /* Set Interruption Controls Operation Controls  */
+>>   #define    SIC_IRQ_MODE_ALL        0
+>>   #define    SIC_IRQ_MODE_SINGLE        1
+>> +#define    SIC_SET_AENI_CONTROLS        2
+>>   #define    SIC_IRQ_MODE_DIRECT        4
+>>   #define    SIC_IRQ_MODE_D_ALL        16
+>>   #define    SIC_IRQ_MODE_D_SINGLE        17
+>> @@ -127,9 +128,20 @@ struct zpci_cdiib {
+>>       u64 : 64;
+>>   } __packed __aligned(8);
+>> +/* adapter interruption parameters block */
+>> +struct zpci_aipb {
+>> +    u64 faisb;
+>> +    u64 gait;
+>> +    u16 : 13;
+>> +    u16 afi : 3;
+>> +    u32 : 32;
+>> +    u16 faal;
+>> +} __packed __aligned(8);
+>> +
+>>   union zpci_sic_iib {
+>>       struct zpci_diib diib;
+>>       struct zpci_cdiib cdiib;
+>> +    struct zpci_aipb aipb;
+>>   };
+>>   DECLARE_STATIC_KEY_FALSE(have_mio);
+>> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
+>> index f9b872e358c6..4efe0e95a40f 100644
+>> --- a/arch/s390/kvm/interrupt.c
+>> +++ b/arch/s390/kvm/interrupt.c
+>> @@ -32,6 +32,7 @@
+>>   #include "kvm-s390.h"
+>>   #include "gaccess.h"
+>>   #include "trace-s390.h"
+>> +#include "pci.h"
+>>   #define PFAULT_INIT 0x0600
+>>   #define PFAULT_DONE 0x0680
+>> @@ -3276,8 +3277,16 @@ static struct airq_struct gib_alert_irq = {
+>>   void kvm_s390_gib_destroy(void)
+>>   {
+>> +    struct zpci_aift *aift;
+>> +
+>>       if (!gib)
+>>           return;
+>> +    aift = kvm_s390_pci_get_aift();
+>> +    if (aift) {
+>> +        mutex_lock(&aift->lock);
+>> +        kvm_s390_pci_aen_exit();
+> 
+> Shouldn't we check for CONFIG_PCI and sclp.gas_aeni here as in gib_init ?
+> 
+>> +        mutex_unlock(&aift->lock);
+>> +    }
+>>       chsc_sgib(0);
+>>       unregister_adapter_interrupt(&gib_alert_irq);
+>>       free_page((unsigned long)gib);
+>> @@ -3315,6 +3324,14 @@ int kvm_s390_gib_init(u8 nisc)
+>>           goto out_unreg_gal;
+>>       }
+>> +    if (IS_ENABLED(CONFIG_PCI) && sclp.has_aeni) {
+>> +        if (kvm_s390_pci_aen_init(nisc)) {
+>> +            pr_err("Initializing AEN for PCI failed\n");
+>> +            rc = -EIO;
+>> +            goto out_unreg_gal;
+>> +        }
+>> +    }
+>> +
+>>       KVM_EVENT(3, "gib 0x%pK (nisc=%d) initialized", gib, gib->nisc);
+>>       goto out;
+>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+>> index 14a18ba5ff2c..9cd3c8eb59e8 100644
+>> --- a/arch/s390/kvm/kvm-s390.c
+>> +++ b/arch/s390/kvm/kvm-s390.c
+>> @@ -48,6 +48,7 @@
+>>   #include <asm/fpu/api.h>
+>>   #include "kvm-s390.h"
+>>   #include "gaccess.h"
+>> +#include "pci.h"
+>>   #define CREATE_TRACE_POINTS
+>>   #include "trace.h"
+>> @@ -503,6 +504,8 @@ int kvm_arch_init(void *opaque)
+>>           goto out;
+>>       }
+>> +    kvm_s390_pci_init();
+>> +
+>>       rc = kvm_s390_gib_init(GAL_ISC);
+>>       if (rc)
+>>           goto out;
+>> diff --git a/arch/s390/kvm/pci.c b/arch/s390/kvm/pci.c
+>> index ecfc458a5b39..f0e5386ff943 100644
+>> --- a/arch/s390/kvm/pci.c
+>> +++ b/arch/s390/kvm/pci.c
+>> @@ -10,6 +10,113 @@
+>>   #include <linux/kvm_host.h>
+>>   #include <linux/pci.h>
+>>   #include <asm/kvm_pci.h>
+>> +#include "pci.h"
+>> +
+>> +static struct zpci_aift aift;
+>> +
+>> +static inline int __set_irq_noiib(u16 ctl, u8 isc)
+>> +{
+>> +    union zpci_sic_iib iib = {{0}};
+>> +
+>> +    return zpci_set_irq_ctrl(ctl, isc, &iib);
+>> +}
+>> +
+>> +struct zpci_aift *kvm_s390_pci_get_aift(void)
+>> +{
+>> +    return &aift;
+>> +}
+>> +
+>> +/* Caller must hold the aift lock before calling this function */
+>> +void kvm_s390_pci_aen_exit(void)
+>> +{
+>> +    struct zpci_gaite *gait;
+>> +    unsigned long flags;
+>> +    struct airq_iv *sbv;
+>> +    struct kvm_zdev **gait_kzdev;
+>> +    int size;
+>> +
+>> +    /* Clear the GAIT and forwarding summary vector */
+>> +    __set_irq_noiib(SIC_SET_AENI_CONTROLS, 0);
+> 
+> Why don't we use the PCI ISC here?
 
-I also have seabios hacked to use PAE instead of no paging, which I usually use for my 32 bit guests,
-so I can make it switch to SMM+PAE paging mode to test it.
+hum OK, sorry, isc is ignored for SIC_SET_AENI_CONTROLS
 
-Best regards,
-	Maxim Levitsky
+> 
+> ...snip...
+> 
 
+-- 
+Pierre Morel
+IBM Lab Boeblingen
