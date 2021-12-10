@@ -2,226 +2,257 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C4579470199
-	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 14:27:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C10B24701B5
+	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 14:35:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241810AbhLJNar (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Dec 2021 08:30:47 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40700 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235759AbhLJNaq (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 10 Dec 2021 08:30:46 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1BAD6e4S013035;
-        Fri, 10 Dec 2021 13:27:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=g8mjf7yT4sUfGXNRSVv2wV8bVE4YsrEFdhmLbtC9Roo=;
- b=lBTHH8LcWqBdALOpHkpuJvuj83LPTVivjK+SShvJBHiamSlDN1yRDXpkdtMm8eTtswUu
- sKXd49CV6B+DiJ8MqcbBSrMkDW7tgajVyv7Z5RvoZJOA39u/Ze0OEb5aO1H0cYyCM8bh
- Pt75VAweVAFWdE6rwVJrMjeuc37yTfj14mKFwt2bqleRtdty7Gs9BX54KKjcT5xV7br3
- STmIOq03dwuC8sLRNNyfTAEAUwmpYWvJQdamXf7nnBIpkTdZX8WD6kWRayHViOlri24O
- bitCmDaMWpn/Eb5g0bMfCThF/E1V5JCgJPQACel0CkyT3rvkQ7t1z6MtH72far4Ohiub QQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cv7g1gch8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 10 Dec 2021 13:27:10 +0000
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1BAD6o8Q013252;
-        Fri, 10 Dec 2021 13:27:10 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cv7g1gcgc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 10 Dec 2021 13:27:10 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1BADNbsv006037;
-        Fri, 10 Dec 2021 13:27:08 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma04ams.nl.ibm.com with ESMTP id 3cqyybkc3a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 10 Dec 2021 13:27:07 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1BADR2q625362914
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 10 Dec 2021 13:27:02 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8F29D11C054;
-        Fri, 10 Dec 2021 13:27:02 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7AE9E11C04A;
-        Fri, 10 Dec 2021 13:27:01 +0000 (GMT)
-Received: from [9.171.76.123] (unknown [9.171.76.123])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 10 Dec 2021 13:27:01 +0000 (GMT)
-Message-ID: <7df88bde-2b63-4a91-036c-28527f56e22d@linux.ibm.com>
-Date:   Fri, 10 Dec 2021 14:27:01 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH 19/32] KVM: s390: mechanism to enable guest zPCI
- Interpretation
-Content-Language: en-US
-To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
-        hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
-        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
-        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
+        id S241916AbhLJNjT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Dec 2021 08:39:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43354 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238651AbhLJNjR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Dec 2021 08:39:17 -0500
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28224C061746;
+        Fri, 10 Dec 2021 05:35:42 -0800 (PST)
+Received: by mail-pf1-x434.google.com with SMTP id x131so8450074pfc.12;
+        Fri, 10 Dec 2021 05:35:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=AcEqlkXHP9ZzLk/utvAQtDlFTfoDwMaXmTyTNp2RW9I=;
+        b=gIN4mBzOXNdl47BcUn6/kWzetMKmNO37uPrfXEN9FB9+1nivhPMy8hACPT79+A5tzS
+         asYGcFoNa3aX/CnD+Hru4VdxQHKlKh7bjN8E50LuIJ+eeKRVtyDOMMrYlx/Wj16ylLXW
+         RsGvEmXYyM7/JkrKVzXrUF9ew6f8saPQi800829zEZH4PBWFl3fXLedMMlgokAko983J
+         qBgYKFQMSIoMoPCcsv3Y2rgWnVZK85Jz9MREO/MLy2O49tivExq10Wiu8WqYiSlYjbE8
+         ltaHD2aKsBObr2zYKbVsSVsHFiHt2Or/4mIPPo6atATrLyvug7SFxu9bIVZWZV9+Zlha
+         qPDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=AcEqlkXHP9ZzLk/utvAQtDlFTfoDwMaXmTyTNp2RW9I=;
+        b=sD7ap0o3UY4EAFK7Fin34xO5ayKt2FZQoEJ2+6AnpOpDhlG59U9zuiGlkVHpkjmdyG
+         3cBEsJ4ZJvL46JMMMkpd2Urma/GtZi3vcjpFOHv8/EhxnOF+buH6Vxdhb3Pfyh8bDGpS
+         bxnJhz5tHLJ7vB3V5gR/ufQYvqHqdm+tzHAHKSg/losSUOey7jfQuMIAc43xiWSWUH2Y
+         dbOntrbHmxIYc0K8TjYnx+WRH/PBY7ePQkozXoeIgbN6LDviKzD151He8jhsUxS/XYNV
+         BFwfOzugzbKuknJwl9JTiHYgMD4S8GxQ90lpAs+9/CegnMln4jgNTmSYHCNiNVq2kOtk
+         Eg5w==
+X-Gm-Message-State: AOAM532olYYhaf17rRmf1OU4XEzmkpZ2C6Rdn/tuyCoyvjbOWOgWr92b
+        l5ioTjO7HBvkHbMSpQ3BmUU=
+X-Google-Smtp-Source: ABdhPJxuZaNGIN95dCiHAXWHkP95vlsiDL5IBP2MIHc9GoX97W62pOVO+YEeY/5Ka7SWWflCU5PmXw==
+X-Received: by 2002:a63:d3:: with SMTP id 202mr5206843pga.502.1639143341609;
+        Fri, 10 Dec 2021 05:35:41 -0800 (PST)
+Received: from localhost.localdomain ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id t4sm3596068pfj.168.2021.12.10.05.35.38
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 10 Dec 2021 05:35:41 -0800 (PST)
+From:   Like Xu <like.xu.linux@gmail.com>
+X-Google-Original-From: Like Xu <likexu@tencent.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Jim Mattson <jmattson@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Like Xu <likexu@tencent.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-References: <20211207205743.150299-1-mjrosato@linux.ibm.com>
- <20211207205743.150299-20-mjrosato@linux.ibm.com>
-From:   Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <20211207205743.150299-20-mjrosato@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: ksrWEH1EFFtqOOcqEP_NuBHvBFQY07J_
-X-Proofpoint-ORIG-GUID: Y0rX5weCRoKgLaaHvXVciBBR3QBT_NWQ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2021-12-10_04,2021-12-10_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- phishscore=0 suspectscore=0 bulkscore=0 mlxlogscore=999 impostorscore=0
- clxscore=1015 adultscore=0 malwarescore=0 mlxscore=0 lowpriorityscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2112100073
+Subject: [PATCH v11 00/17] KVM: x86/pmu: Add *basic* support to enable guest PEBS via DS
+Date:   Fri, 10 Dec 2021 21:35:08 +0800
+Message-Id: <20211210133525.46465-1-likexu@tencent.com>
+X-Mailer: git-send-email 2.33.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi,
 
+It's said that Lingshan's plate is pretty full and as requested by Paolo [*],
+a new rebased version is here. I'm looking forward to maintaining this
+feature in an upstream manner, which may reduce the learning burden
+for some newcomers at Intel virt team.
 
-Am 07.12.21 um 21:57 schrieb Matthew Rosato:
-> The guest must have access to certain facilities in order to allow
-> interpretive execution of zPCI instructions and adapter event
-> notifications.  However, there are some cases where a guest might
-> disable interpretation -- provide a mechanism via which we can defer
-> enabling the associated zPCI interpretation facilities until the guest
-> indicates it wishes to use them.
-> 
-> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> ---
->   arch/s390/include/asm/kvm_host.h |  4 +++
->   arch/s390/kvm/kvm-s390.c         | 43 ++++++++++++++++++++++++++++++++
->   arch/s390/kvm/kvm-s390.h         | 10 ++++++++
->   3 files changed, 57 insertions(+)
-> 
-> diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-> index 3f147b8d050b..38982c1de413 100644
-> --- a/arch/s390/include/asm/kvm_host.h
-> +++ b/arch/s390/include/asm/kvm_host.h
-> @@ -252,7 +252,10 @@ struct kvm_s390_sie_block {
->   #define ECB2_IEP	0x20
->   #define ECB2_PFMFI	0x08
->   #define ECB2_ESCA	0x04
-> +#define ECB2_ZPCI_LSI	0x02
->   	__u8    ecb2;                   /* 0x0062 */
-> +#define ECB3_AISI	0x20
-> +#define ECB3_AISII	0x10
->   #define ECB3_DEA 0x08
->   #define ECB3_AES 0x04
->   #define ECB3_RI  0x01
-> @@ -938,6 +941,7 @@ struct kvm_arch{
->   	int use_cmma;
->   	int use_pfmfi;
->   	int use_skf;
-> +	int use_zpci_interp;
->   	int user_cpu_state_ctrl;
->   	int user_sigp;
->   	int user_stsi;
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index a680f2a02b67..361d742cdf0d 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -1023,6 +1023,47 @@ static int kvm_s390_vm_set_crypto(struct kvm *kvm, struct kvm_device_attr *attr)
->   	return 0;
->   }
->   
-> +static void kvm_s390_vcpu_pci_setup(struct kvm_vcpu *vcpu)
-> +{
-> +	/*
-> +	 * If the facilities aren't available for PCI interpretation and
-> +	 * interrupt forwarding, we shouldn't be here.
-> +	 */
+[*] https://lore.kernel.org/kvm/95bf3dca-c6d1-02c8-40b6-8bb29a3a7a36@redhat.com/
 
-This reads like we want a WARN_ON or BUG_ON, but as we call this uncoditionally this is
-actually a valid check. So instead of "shouldn't be here" say something like "bail out
-if interpretion is not active".  ?
+Please note that we need at least one diff to make the feature work
+the next time the kvm/queue tree is merged with the tip/perf/core tree:
 
-> +	if (!vcpu->kvm->arch.use_zpci_interp)
-> +		return;
-> +
-> +	vcpu->arch.sie_block->ecb2 |= ECB2_ZPCI_LSI;
-> +	vcpu->arch.sie_block->ecb3 |= ECB3_AISII + ECB3_AISI;
-> +}
-> +
-> +void kvm_s390_vcpu_pci_enable_interp(struct kvm *kvm)
-> +{
-> +	struct kvm_vcpu *vcpu;
-> +	int i;
-> +
-> +	/*
-> +	 * If host facilities are available, turn on interpretation for the
-> +	 * life of this guest
-> +	 */
-> +	if (!test_facility(69) || !test_facility(70) || !test_facility(71) ||
-> +	    !test_facility(72))
-> +		return;
+diff --git a/arch/x86/events/intel/core.c b/arch/x86/events/intel/core.c
+index 3490a1bb78e9..cee135fd6da0 100644
+--- a/arch/x86/events/intel/core.c
++++ b/arch/x86/events/intel/core.c
+@@ -2851,7 +2851,7 @@ static void x86_pmu_handle_guest_pebs(struct pt_regs *regs,
+ 	struct perf_event *event = NULL;
+ 	int bit;
+ 
+-	if (!unlikely(perf_guest_cbs && perf_guest_cbs->is_in_guest()))
++	if (!unlikely(perf_guest_state()))
+ 		return;
+ 
+ 	if (!x86_pmu.pebs_vmx || !x86_pmu.pebs_active ||
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index 0fb222fe1b1d..cc648e474748 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -87,7 +87,7 @@ static inline void __kvm_perf_overflow(struct kvm_pmc *pmc, bool in_pmi)
+ 	 * woken up. So we should wake it, but this is impossible from
+ 	 * NMI context. Do it from irq work instead.
+ 	 */
+-	if (in_pmi && !kvm_is_in_guest())
++	if (in_pmi && !kvm_arch_pmi_in_guest(vcpu))
+ 		irq_work_queue(&pmc_to_pmu(pmc)->irq_work);
+ 	else
+ 		kvm_make_request(KVM_REQ_PMI, pmc->vcpu);
 
-Wouldnt that also enable interpretion for VSIE? I guess we should check for the
-sclp facilities from patches 1,2,3, and 4 instead.
+Signed-off-by: Like Xu <likexu@tencent.com>
 
+---
 
-> +
-> +	mutex_lock(&kvm->lock);
-> +
-> +	kvm->arch.use_zpci_interp = 1;
-> +
-> +	kvm_s390_vcpu_block_all(kvm);
-> +
-> +	kvm_for_each_vcpu(i, vcpu, kvm) {
-> +		kvm_s390_vcpu_pci_setup(vcpu);
-> +		kvm_s390_sync_request(KVM_REQ_VSIE_RESTART, vcpu);
-> +	}
-> +
-> +	kvm_s390_vcpu_unblock_all(kvm);
-> +	mutex_unlock(&kvm->lock);
-> +}
-> +
->   static void kvm_s390_sync_request_broadcast(struct kvm *kvm, int req)
->   {
->   	int cx;
-> @@ -3288,6 +3329,8 @@ static int kvm_s390_vcpu_setup(struct kvm_vcpu *vcpu)
->   h
->   	kvm_s390_vcpu_crypto_setup(vcpu);
->   
-> +	kvm_s390_vcpu_pci_setup(vcpu);
-> +
->   	mutex_lock(&vcpu->kvm->lock);
->   	if (kvm_s390_pv_is_protected(vcpu->kvm)) {
->   		rc = kvm_s390_pv_create_cpu(vcpu, &uvrc, &uvrrc);
-> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
-> index c07a050d757d..a2eccb8b977e 100644
-> --- a/arch/s390/kvm/kvm-s390.h
-> +++ b/arch/s390/kvm/kvm-s390.h
-> @@ -481,6 +481,16 @@ void kvm_s390_reinject_machine_check(struct kvm_vcpu *vcpu,
->    */
->   void kvm_s390_vcpu_crypto_reset_all(struct kvm *kvm);
->   
-> +/**
-> + * kvm_s390_vcpu_pci_enable_interp
-> + *
-> + * Set the associated PCI attributes for each vcpu to allow for zPCI Load/Store
-> + * interpretation as well as adapter interruption forwarding.
-> + *
-> + * @kvm: the KVM guest
-> + */
-> +void kvm_s390_vcpu_pci_enable_interp(struct kvm *kvm);
-> +
->   /**
->    * diag9c_forwarding_hz
->    *
-> 
+The guest Precise Event Based Sampling (PEBS) feature can provide an
+architectural state of the instruction executed after the guest instruction
+that exactly caused the event. It needs new hardware facility only available
+on Intel Ice Lake Server platforms. This patch set enables the basic PEBS
+feature for KVM guests on ICX.
+
+We can use PEBS feature on the Linux guest like native:
+
+   # echo 0 > /proc/sys/kernel/watchdog (on the host)
+   # perf record -e instructions:ppp ./br_instr a
+   # perf record -c 100000 -e instructions:pp ./br_instr a
+
+To emulate guest PEBS facility for the above perf usages,
+we need to implement 2 code paths:
+
+1) Fast path
+
+This is when the host assigned physical PMC has an identical index as the
+virtual PMC (e.g. using physical PMC0 to emulate virtual PMC0).
+This path is used in most common use cases.
+
+2) Slow path
+
+This is when the host assigned physical PMC has a different index from the
+virtual PMC (e.g. using physical PMC1 to emulate virtual PMC0) In this case,
+KVM needs to rewrite the PEBS records to change the applicable counter indexes
+to the virtual PMC indexes, which would otherwise contain the physical counter
+index written by PEBS facility, and switch the counter reset values to the
+offset corresponding to the physical counter indexes in the DS data structure.
+
+The previous version [0] enables both fast path and slow path, which seems
+a bit more complex as the first step. In this patchset, we want to start with
+the fast path to get the basic guest PEBS enabled while keeping the slow path
+disabled. More focused discussion on the slow path [1] is planned to be put to
+another patchset in the next step.
+
+Compared to later versions in subsequent steps, the functionality to support
+host-guest PEBS both enabled and the functionality to emulate guest PEBS when
+the counter is cross-mapped are missing in this patch set
+(neither of these are typical scenarios).
+
+With the basic support, the guest can retrieve the correct PEBS information from
+its own PEBS records on the Ice Lake servers. And we expect it should work when
+migrating to another Ice Lake and no regression about host perf is expected.
+
+Here are the results of pebs test from guest/host for same workload:
+
+perf report on guest:
+# Samples: 2K of event 'instructions:ppp', # Event count (approx.): 1473377250 # Overhead  Command   Shared Object      Symbol
+   57.74%  br_instr  br_instr           [.] lfsr_cond
+   41.40%  br_instr  br_instr           [.] cmp_end
+    0.21%  br_instr  [kernel.kallsyms]  [k] __lock_acquire
+
+perf report on host:
+# Samples: 2K of event 'instructions:ppp', # Event count (approx.): 1462721386 # Overhead  Command   Shared Object     Symbol
+   57.90%  br_instr  br_instr          [.] lfsr_cond
+   41.95%  br_instr  br_instr          [.] cmp_end
+    0.05%  br_instr  [kernel.vmlinux]  [k] lock_acquire
+    Conclusion: the profiling results on the guest are similar tothat on the host.
+
+A minimum guest kernel version may be v5.4 or a backport version support
+Icelake server PEBS.
+
+Please check more details in each commit and feel free to comment.
+
+Previous:
+https://lore.kernel.org/kvm/20210806133802.3528-1-lingshan.zhu@intel.com/
+
+[0]
+https://lore.kernel.org/kvm/20210104131542.495413-1-like.xu@linux.intel.com/
+[1]
+https://lore.kernel.org/kvm/20210115191113.nktlnmivc3edstiv@two.firstfloor.org/
+
+V10->V11:
+- Merge perf_guest_info_callbacks static_call to the tip/perf/core;
+- Keep use perf_guest_cbs in the kvm/queue context before merge window;
+- Fix MSR_IA32_MISC_ENABLE_EMON bit (Liu XiangDong);
+- Rebase "Reprogram PEBS event to emulate guest PEBS counter" patch;
+
+V9->V10:
+- improve readability in core.c(Peter Z)
+- reuse guest_pebs_idxs(Liu XiangDong)
+
+V8 -> V9 Changelog:
+-fix a brackets error in xen_guest_state()
+
+V7 -> V8 Changelog:
+- fix coding style, add {} for single statement of multiple lines(Peter Z)
+- fix coding style in xen_guest_state() (Boris Ostrovsky)
+- s/pmu/kvm_pmu/ in intel_guest_get_msrs() (Peter Z)
+- put lower cost branch in the first place for x86_pmu_handle_guest_pebs() (Peter Z)
+
+V6 -> V7 Changelog:
+- Fix conditions order and call x86_pmu_handle_guest_pebs() unconditionally; (PeterZ)
+- Add a new patch to make all that perf_guest_cbs stuff suck less; (PeterZ)
+- Document IA32_MISC_ENABLE[7] that that behavior matches bare metal; (Sean & Venkatesh)
+- Update commit message for fixed counter mask refactoring;(PeterZ)
+- Clarifying comments about {.host and .guest} for intel_guest_get_msrs(); (PeterZ)
+- Add pebs_capable to store valid PEBS_COUNTER_MASK value; (PeterZ)
+- Add more comments for perf's precise_ip field; (Andi & PeterZ)
+- Refactor perf_overflow_handler_t and make it more legible; (PeterZ)
+- Use "(unsigned long)cpuc->ds" instead of __this_cpu_read(cpu_hw_events.ds); (PeterZ)
+- Keep using "(struct kvm_pmu *)data" to follow K&R; (Andi)
+
+Like Xu (16):
+  perf/x86/intel: Add EPT-Friendly PEBS for Ice Lake Server
+  perf/x86/intel: Handle guest PEBS overflow PMI for KVM guest
+  perf/x86/core: Pass "struct kvm_pmu *" to determine the guest values
+  KVM: x86/pmu: Set MSR_IA32_MISC_ENABLE_EMON bit when vPMU is enabled
+  KVM: x86/pmu: Introduce the ctrl_mask value for fixed counter
+  KVM: x86/pmu: Add IA32_PEBS_ENABLE MSR emulation for extended PEBS
+  KVM: x86/pmu: Reprogram PEBS event to emulate guest PEBS counter
+  KVM: x86/pmu: Adjust precise_ip to emulate Ice Lake guest PDIR counter
+  KVM: x86/pmu: Add IA32_DS_AREA MSR emulation to support guest DS
+  KVM: x86/pmu: Add PEBS_DATA_CFG MSR emulation to support adaptive PEBS
+  KVM: x86: Set PEBS_UNAVAIL in IA32_MISC_ENABLE when PEBS is enabled
+  KVM: x86/pmu: Move pmc_speculative_in_use() to arch/x86/kvm/pmu.h
+  KVM: x86/pmu: Disable guest PEBS temporarily in two rare situations
+  KVM: x86/pmu: Add kvm_pmu_cap to optimize perf_get_x86_pmu_capability
+  KVM: x86/cpuid: Refactor host/guest CPU model consistency check
+  KVM: x86/pmu: Expose CPUIDs feature bits PDCM, DS, DTES64
+
+Peter Zijlstra (Intel) (1):
+  x86/perf/core: Add pebs_capable to store valid PEBS_COUNTER_MASK value
+
+ arch/x86/events/core.c            |   5 +-
+ arch/x86/events/intel/core.c      | 157 +++++++++++++++++++++++++-----
+ arch/x86/events/perf_event.h      |   6 +-
+ arch/x86/include/asm/kvm_host.h   |  16 +++
+ arch/x86/include/asm/msr-index.h  |   6 ++
+ arch/x86/include/asm/perf_event.h |   5 +-
+ arch/x86/kvm/cpuid.c              |  26 ++---
+ arch/x86/kvm/cpuid.h              |   5 +
+ arch/x86/kvm/pmu.c                |  52 +++++++---
+ arch/x86/kvm/pmu.h                |  38 ++++++++
+ arch/x86/kvm/vmx/capabilities.h   |  26 +++--
+ arch/x86/kvm/vmx/pmu_intel.c      | 116 ++++++++++++++++++----
+ arch/x86/kvm/vmx/vmx.c            |  24 ++++-
+ arch/x86/kvm/vmx/vmx.h            |   2 +-
+ arch/x86/kvm/x86.c                |  30 ++++--
+ 15 files changed, 410 insertions(+), 104 deletions(-)
+
+-- 
+2.33.1
+
