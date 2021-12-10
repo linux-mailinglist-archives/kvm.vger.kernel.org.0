@@ -2,117 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9165B46FDDE
-	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 10:35:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E618D46FE35
+	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 10:54:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237747AbhLJJjM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Dec 2021 04:39:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43848 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229649AbhLJJjM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Dec 2021 04:39:12 -0500
-Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B32CC061746;
-        Fri, 10 Dec 2021 01:35:37 -0800 (PST)
-Received: by mail-ed1-x536.google.com with SMTP id t5so27632583edd.0;
-        Fri, 10 Dec 2021 01:35:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=J7+bfSl77k8qoKRfxoMaCemHVKj1XiOHFVSzqWLEq1U=;
-        b=IxdtM2RgbgdqXYq+PnABuVIMOt1ff6DKxgFQ4SyincfofYFQ40qErcr1ZLmdDKFMRf
-         MJX+mMcnVf61L2d0dbT5HM0MI9blIf4ZJ73h1rr0o4XoCmpJ0TQStETFGmJ0t5CO74Ot
-         Z8suMAWfhkPu9fBtUN0ZLkKcfKjH1IjwrypVx9tkaS/vnBxFdF1wn42LQc+dz/2csNUA
-         6ZdLwLT8IdPbgok+Q7IhkSwHkC9fJCM8+xDdxlvX/qBaFN9bc7nAP/qZOs/RKPLmTdCh
-         KiX77FAtKC1Pq7980eVWRbWz7PQQM1XQ0/9/+p+xOY5W2OJS1PfFHAJBarkxxr/SjR/C
-         iXVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=J7+bfSl77k8qoKRfxoMaCemHVKj1XiOHFVSzqWLEq1U=;
-        b=sjhNiQkoZDbxHgU1JF8F0AjBhbCBJAM/gmGgAwDCDD7plNMblbsX0XIHyXDwSYr5Kx
-         sYeynvlMGpgpdUlWSmgUgc5pPz5v4do2FmbW41wXRM1iF83T2bekjjLWyRBjYjl7l9nW
-         HyeWzvKUi8dy41W9mJVYMbCMDwn0VVRwTs61d+JzckUv4nNmbXRfu43ePW1PC9br/Ppm
-         cUgr/umn+qU7MZXb51WAt8UafZVdUkMdTdKdHvtsluNsorq6pddAQiqyLYHbcouSp8KF
-         nHRZhJT91VHI8LsHwJIhYanICUdcGAeeH6FDXtYWQT/REmHtEXSOCQdLO5JXI8Yv2/Qk
-         ryig==
-X-Gm-Message-State: AOAM530Npu9FdrF9t8Q4XI8DU/ZfSSF1d2jMM5+E6yU2ZXLjoCiM2/OP
-        c/zRKd9+HgElFYEAIlDDoJM=
-X-Google-Smtp-Source: ABdhPJx6LeQTDODOD8BSaFoJoDbt86J4KIl9CB80zm0rZMvG3trQ0MR1VhZgrlcxSnV5p8ZlauA4gw==
-X-Received: by 2002:a17:906:e28b:: with SMTP id gg11mr22837899ejb.23.1639128935850;
-        Fri, 10 Dec 2021 01:35:35 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312::973? ([2001:b07:6468:f312::973])
-        by smtp.googlemail.com with ESMTPSA id m25sm1105752edj.80.2021.12.10.01.35.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Dec 2021 01:35:35 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <b6c1eb18-9237-f604-9a96-9e6ca397121c@redhat.com>
-Date:   Fri, 10 Dec 2021 10:35:32 +0100
+        id S239651AbhLJJ5w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Dec 2021 04:57:52 -0500
+Received: from mga18.intel.com ([134.134.136.126]:18482 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S239633AbhLJJ5v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Dec 2021 04:57:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1639130056; x=1670666056;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=i5mi2ux2NWMV234M1FllWOI2g2yLlRa0QdVRhusT3Og=;
+  b=jXjSg1o11jQstUvNfIEOFiN4k7aZin+xk+NMw6sHx3leMoAZmHspfCVK
+   NsaOYWrxZjV/++yqLvMH0DtzYMc+T12IOtjK7lqA7AVUOsnMlONqW/cxE
+   8W5WWgR+V3FMhqOqruWtdxUGBL2FoKpRwc79Xvgk1s5oXRMfQzar1xiEf
+   xGvKc9XS9fTQEGPtpQQQtqMW0dCKRBEpRCpznhV0Dc7lgBhwM8lNEa2oL
+   SuhO2Pm30BYLbi/6eh0bUpJJadsYbQ376z8wxaqUn8pWL34uQpN7K59TG
+   7KbxGo7ewEZYQ9Ur8BtTb5NEdxQe71bjhi610Ml5TrlwicfHQYygOfABe
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10193"; a="225185189"
+X-IronPort-AV: E=Sophos;i="5.88,195,1635231600"; 
+   d="scan'208";a="225185189"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2021 01:54:16 -0800
+X-IronPort-AV: E=Sophos;i="5.88,195,1635231600"; 
+   d="scan'208";a="503868624"
+Received: from xiaoyaol-mobl.ccr.corp.intel.com (HELO [10.249.171.165]) ([10.249.171.165])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2021 01:54:13 -0800
+Message-ID: <6031a4ed-1544-c563-9f05-cfcf2ae351b6@intel.com>
+Date:   Fri, 10 Dec 2021 17:54:10 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH v2 4/6] KVM: x86/pmu: Add pmc->intr to refactor
- kvm_perf_overflow{_intr}()
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Firefox/91.0 Thunderbird/91.3.2
+Subject: Re: [RFC PATCH v2 34/44] target/i386/tdx: set reboot action to
+ shutdown when tdx
 Content-Language: en-US
-To:     Jim Mattson <jmattson@google.com>,
-        Like Xu <like.xu.linux@gmail.com>
-Cc:     Andi Kleen <ak@linux.intel.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>
-References: <20211130074221.93635-1-likexu@tencent.com>
- <20211130074221.93635-5-likexu@tencent.com>
- <CALMp9eRAxBFE5mYw=isUSsMTWZS2VOjqZfgh0r3hFuF+5npCAQ@mail.gmail.com>
- <0ca44f61-f7f1-0440-e1e1-8d5e8aa9b540@gmail.com>
- <CALMp9eTtsMuEsimONp7TOjJ-uskwJBD-52kZzOefSKXeCwn_5A@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <CALMp9eTtsMuEsimONp7TOjJ-uskwJBD-52kZzOefSKXeCwn_5A@mail.gmail.com>
+To:     Connor Kuehl <ckuehl@redhat.com>, isaku.yamahata@gmail.com,
+        qemu-devel@nongnu.org, pbonzini@redhat.com, alistair@alistair23.me,
+        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, mst@redhat.com,
+        cohuck@redhat.com, mtosatti@redhat.com, seanjc@google.com,
+        erdemaktas@google.com
+Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org
+References: <cover.1625704980.git.isaku.yamahata@intel.com>
+ <d1afced8a92c01367d0aed7c6f82659c9bf79956.1625704981.git.isaku.yamahata@intel.com>
+ <0ccf5a5c-2322-eae3-bd4b-9e72e2f4bbd1@redhat.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <0ccf5a5c-2322-eae3-bd4b-9e72e2f4bbd1@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/10/21 01:54, Jim Mattson wrote:
-> On Thu, Dec 9, 2021 at 12:28 AM Like Xu <like.xu.linux@gmail.com> wrote:
+On 7/23/2021 1:54 AM, Connor Kuehl wrote:
+> On 7/7/21 7:55 PM, isaku.yamahata@gmail.com wrote:
+>> From: Isaku Yamahata <isaku.yamahata@intel.com>
 >>
->> On 9/12/2021 12:25 pm, Jim Mattson wrote:
->>>
->>> Not your change, but if the event is counting anything based on
->>> cycles, and the guest TSC is scaled to run at a different rate from
->>> the host TSC, doesn't the initial value of the underlying hardware
->>> counter have to be adjusted as well, so that the interrupt arrives
->>> when the guest's counter overflows rather than when the host's counter
->>> overflows?
+>> In TDX CPU state is also protected, thus vcpu state can't be reset by 
+>> VMM.
+>> It assumes -action reboot=shutdown instead of silently ignoring vcpu 
+>> reset.
 >>
->> I've thought about this issue too and at least the Intel Specification
->> did not let me down on this detail:
+>> TDX module spec version 344425-002US doesn't support vcpu reset by 
+>> VMM.  VM
+>> needs to be destroyed and created again to emulate REBOOT_ACTION_RESET.
+>> For simplicity, put its responsibility to management system like libvirt
+>> because it's difficult for the current qemu implementation to destroy and
+>> re-create KVM VM resources with keeping other resources.
 >>
->>          "The counter changes in the VMX non-root mode will follow
->>          VMM's use of the TSC offset or TSC scaling VMX controls"
+>> If management system wants reboot behavior for its users, it needs to
+>>   - set reboot_action to REBOOT_ACTION_SHUTDOWN,
+>>   - set shutdown_action to SHUTDOWN_ACTION_PAUSE optionally and,
+>>   - subscribe VM state change and on reboot, (destroy qemu if
+>>     SHUTDOWN_ACTION_PAUSE and) start new qemu.
+>>
+>> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+>> ---
+>>   target/i386/kvm/tdx.c | 14 ++++++++++++++
+>>   1 file changed, 14 insertions(+)
+>>
+>> diff --git a/target/i386/kvm/tdx.c b/target/i386/kvm/tdx.c
+>> index 1316d95209..0621317b0a 100644
+>> --- a/target/i386/kvm/tdx.c
+>> +++ b/target/i386/kvm/tdx.c
+>> @@ -25,6 +25,7 @@
+>>   #include "qapi/qapi-types-misc-target.h"
+>>   #include "standard-headers/asm-x86/kvm_para.h"
+>>   #include "sysemu/sysemu.h"
+>> +#include "sysemu/runstate-action.h"
+>>   #include "sysemu/kvm.h"
+>>   #include "sysemu/kvm_int.h"
+>>   #include "sysemu/tdx.h"
+>> @@ -363,6 +364,19 @@ static void tdx_guest_init(Object *obj)
+>>       qemu_mutex_init(&tdx->lock);
+>> +    /*
+>> +     * TDX module spec version 344425-002US doesn't support reset of 
+>> vcpu by
+>> +     * VMM.  VM needs to be destroyed and created again to emulate
+>> +     * REBOOT_ACTION_RESET.  For simplicity, put its responsibility to
+>> +     * management system like libvirt.
+>> +     *
+>> +     * Management system should
+>> +     *  - set reboot_action to REBOOT_ACTION_SHUTDOWN
+>> +     *  - set shutdown_action to SHUTDOWN_ACTION_PAUSE
+>> +     *  - subscribe VM state and on reboot, destroy qemu and start 
+>> new qemu
+>> +     */
+>> +    reboot_action = REBOOT_ACTION_SHUTDOWN;
+>> +
+>>       tdx->debug = false;
+>>       object_property_add_bool(obj, "debug", tdx_guest_get_debug,
+>>                                tdx_guest_set_debug);
+>>
 > 
-> Where do you see this? I see similar text regarding TSC packets in the
-> section on Intel Processor Trace, but nothing about PMU counters
-> advancing at a scaled TSC frequency.
+> I think the same effect could be accomplished with modifying
+> kvm_arch_cpu_check_are_resettable.
+> 
 
-Indeed it seems quite unlikely that PMU counters can count fractionally.
-
-Even for tracing the SDM says "Like the value returned by RDTSC, TSC 
-packets will include these adjustments, but other timing packets (such 
-as MTC, CYC, and CBR) are not impacted".  Considering that "stand-alone 
-TSC packets are typically generated only when generation of other timing 
-packets (MTCs and CYCs) has ceased for a period of time", I'm not even 
-sure it's a good thing that the values in TSC packets are scaled and offset.
-
-Back to the PMU, for non-architectural counters it's not really possible 
-to know if they count in cycles or not.  So it may not be a good idea to 
-special case the architectural counters.
-
-Paolo
+Yes. Thanks for pointing it out. We will take this approach.
