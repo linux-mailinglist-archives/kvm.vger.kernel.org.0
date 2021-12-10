@@ -2,92 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4A56746F82C
-	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 01:54:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6479146F868
+	for <lists+kvm@lfdr.de>; Fri, 10 Dec 2021 02:23:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234983AbhLJA6Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 9 Dec 2021 19:58:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40232 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234953AbhLJA6P (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 9 Dec 2021 19:58:15 -0500
-Received: from mail-oo1-xc2a.google.com (mail-oo1-xc2a.google.com [IPv6:2607:f8b0:4864:20::c2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C978DC0617A1
-        for <kvm@vger.kernel.org>; Thu,  9 Dec 2021 16:54:41 -0800 (PST)
-Received: by mail-oo1-xc2a.google.com with SMTP id v19-20020a4a2453000000b002bb88bfb594so2080491oov.4
-        for <kvm@vger.kernel.org>; Thu, 09 Dec 2021 16:54:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=PWSk6caqvw2Au0Kq7gSkUUH//LBYrIaVkaVjdQPwyR4=;
-        b=IOlMdKeYy196r8n0PAcOxjUB0ETIqkl1nL3Cw5mVz/oH8PLyC/QoJL5cFV5a0lo6P6
-         jKIuocs2zxpr/Dwi1v3XG0qChzeCU+yKZgwlGV0mLk7I2RKrsf61AIHSOUPgN5aDrZmn
-         KnjTcG98KkfZIMw99M3eIlx0IOZqg+vO1ffaOSrESbDCv3ZDK62DMLgWwxZJ6QDFihK5
-         imbt51xWySK0Z5w7O42BaxpANJhTuwspB43Eb3nG4BeZL+Nlgq6zLzfBOwcXPhvc9TCW
-         6QKP6Mjd7ABkOxZMJyu+Ag2tkWTpY6jDpUHfX4CqAXdiS4ZojngbazxSgOFtWV1+6fyN
-         nrQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=PWSk6caqvw2Au0Kq7gSkUUH//LBYrIaVkaVjdQPwyR4=;
-        b=QmmbK8sss3DUUs9cuajLnaAwatQLW+jEEeC3Il8zksRfcOi3ZOlcj8F7NWDI8eK4Dz
-         Ek3xz2K6LXfcf/5QqIQWSw5LQcsgIY0PwgNXsehN0brZFeK257A71wO6zXw7HaG94jiP
-         8Rdne+8oOry2gkY+Cgt40GCB7g4THU4Z7rBeuGjbNldnVEVBzHxvPCIl+lg3rInbTx8z
-         tY4ydcrkwdqFW8q9qsB3JBtm2l9drvQtbuSuKrvwfrMo2a5OTAjxNY6FhKxdy0nWJKCc
-         Y9mNUXkx4fBjHjTorAwGi36F4SNo4LQO2sOE+T5CLNRIk1nt7k/CDVCOwuaa3ZaazOOh
-         EFgQ==
-X-Gm-Message-State: AOAM531afZIcV4kNmgQ8UJ0W0D9VvUwlwGYbw/dJrFsSxVrqK3uRyK8J
-        BLOpvxnaoOhDtw5evPDAecTqDhyrWOpUWRKsrJNjLw==
-X-Google-Smtp-Source: ABdhPJy3fxlViF5YsiaUrlmQ7lDKoLcWRAbIkuAC5QKtqf9Pu6c2RqE4NKgnir0c/u09WjzeRYQlcZ2YcGfsPnO1sbs=
-X-Received: by 2002:a4a:d284:: with SMTP id h4mr6427005oos.31.1639097680669;
- Thu, 09 Dec 2021 16:54:40 -0800 (PST)
+        id S235378AbhLJB1M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 9 Dec 2021 20:27:12 -0500
+Received: from mga04.intel.com ([192.55.52.120]:35897 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S235357AbhLJB1L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 9 Dec 2021 20:27:11 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10193"; a="236982194"
+X-IronPort-AV: E=Sophos;i="5.88,194,1635231600"; 
+   d="scan'208";a="236982194"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2021 17:23:37 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,194,1635231600"; 
+   d="scan'208";a="516558392"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.118]) ([10.239.159.118])
+  by orsmga008.jf.intel.com with ESMTP; 09 Dec 2021 17:23:29 -0800
+Cc:     baolu.lu@linux.intel.com, Joerg Roedel <joro@8bytes.org>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>, Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Dan Williams <dan.j.williams@intel.com>, rafael@kernel.org,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Liu Yi L <yi.l.liu@intel.com>,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Stuart Yoder <stuyoder@gmail.com>,
+        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Li Yang <leoyang.li@nxp.com>,
+        Dmitry Osipenko <digetx@gmail.com>,
+        iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 04/18] driver core: platform: Add driver dma ownership
+ management
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Christoph Hellwig <hch@infradead.org>
+References: <20211206015903.88687-1-baolu.lu@linux.intel.com>
+ <20211206015903.88687-5-baolu.lu@linux.intel.com>
+ <Ya4f662Af+8kE2F/@infradead.org> <20211206150647.GE4670@nvidia.com>
+ <56a63776-48ca-0d6e-c25c-016dc016e0d5@linux.intel.com>
+ <20211207131627.GA6385@nvidia.com>
+ <c170d215-6aef-ff21-8733-1bae4478e39c@linux.intel.com>
+From:   Lu Baolu <baolu.lu@linux.intel.com>
+Message-ID: <b42ffaee-bb96-6db4-8540-b399214f6881@linux.intel.com>
+Date:   Fri, 10 Dec 2021 09:23:19 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-References: <20211130074221.93635-1-likexu@tencent.com> <20211130074221.93635-5-likexu@tencent.com>
- <CALMp9eRAxBFE5mYw=isUSsMTWZS2VOjqZfgh0r3hFuF+5npCAQ@mail.gmail.com> <0ca44f61-f7f1-0440-e1e1-8d5e8aa9b540@gmail.com>
-In-Reply-To: <0ca44f61-f7f1-0440-e1e1-8d5e8aa9b540@gmail.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 9 Dec 2021 16:54:29 -0800
-Message-ID: <CALMp9eTtsMuEsimONp7TOjJ-uskwJBD-52kZzOefSKXeCwn_5A@mail.gmail.com>
-Subject: Re: [PATCH v2 4/6] KVM: x86/pmu: Add pmc->intr to refactor kvm_perf_overflow{_intr}()
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Andi Kleen <ak@linux.intel.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <c170d215-6aef-ff21-8733-1bae4478e39c@linux.intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 9, 2021 at 12:28 AM Like Xu <like.xu.linux@gmail.com> wrote:
->
-> On 9/12/2021 12:25 pm, Jim Mattson wrote:
-> >
-> > Not your change, but if the event is counting anything based on
-> > cycles, and the guest TSC is scaled to run at a different rate from
-> > the host TSC, doesn't the initial value of the underlying hardware
-> > counter have to be adjusted as well, so that the interrupt arrives
-> > when the guest's counter overflows rather than when the host's counter
-> > overflows?
->
-> I've thought about this issue too and at least the Intel Specification
-> did not let me down on this detail:
->
->         "The counter changes in the VMX non-root mode will follow
->         VMM's use of the TSC offset or TSC scaling VMX controls"
+Hi Greg, Jason and Christoph,
 
-Where do you see this? I see similar text regarding TSC packets in the
-section on Intel Processor Trace, but nothing about PMU counters
-advancing at a scaled TSC frequency.
+On 12/9/21 9:20 AM, Lu Baolu wrote:
+> On 12/7/21 9:16 PM, Jason Gunthorpe wrote:
+>> On Tue, Dec 07, 2021 at 10:57:25AM +0800, Lu Baolu wrote:
+>>> On 12/6/21 11:06 PM, Jason Gunthorpe wrote:
+>>>> On Mon, Dec 06, 2021 at 06:36:27AM -0800, Christoph Hellwig wrote:
+>>>>> I really hate the amount of boilerplate code that having this in each
+>>>>> bus type causes.
+>>>> +1
+>>>>
+>>>> I liked the first version of this series better with the code near
+>>>> really_probe().
+>>>>
+>>>> Can we go back to that with some device_configure_dma() wrapper
+>>>> condtionally called by really_probe as we discussed?
 
-> Not knowing if AMD or the real world hardware
-> will live up to this expectation and I'm pessimistic.
->
-> cc Andi and Kim.
->
+[...]
+
+> 
+> diff --git a/drivers/base/dd.c b/drivers/base/dd.c
+> index 68ea1f949daa..68ca5a579eb1 100644
+> --- a/drivers/base/dd.c
+> +++ b/drivers/base/dd.c
+> @@ -538,6 +538,32 @@ static int call_driver_probe(struct device *dev, 
+> struct device_driver *drv)
+>          return ret;
+>   }
+> 
+> +static int device_dma_configure(struct device *dev, struct 
+> device_driver *drv)
+> +{
+> +       int ret;
+> +
+> +       if (!dev->bus->dma_configure)
+> +               return 0;
+> +
+> +       ret = dev->bus->dma_configure(dev);
+> +       if (ret)
+> +               return ret;
+> +
+> +       if (!drv->suppress_auto_claim_dma_owner)
+> +               ret = iommu_device_set_dma_owner(dev, DMA_OWNER_DMA_API, 
+> NULL);
+> +
+> +       return ret;
+> +}
+> +
+> +static void device_dma_cleanup(struct device *dev, struct device_driver 
+> *drv)
+> +{
+> +       if (!dev->bus->dma_configure)
+> +               return;
+> +
+> +       if (!drv->suppress_auto_claim_dma_owner)
+> +               iommu_device_release_dma_owner(dev, DMA_OWNER_DMA_API, 
+> NULL);
+> +}
+> +
+>   static int really_probe(struct device *dev, struct device_driver *drv)
+>   {
+>          bool test_remove = IS_ENABLED(CONFIG_DEBUG_TEST_DRIVER_REMOVE) &&
+> @@ -574,11 +600,8 @@ static int really_probe(struct device *dev, struct 
+> device_driver *drv)
+>          if (ret)
+>                  goto pinctrl_bind_failed;
+> 
+> -       if (dev->bus->dma_configure) {
+> -               ret = dev->bus->dma_configure(dev);
+> -               if (ret)
+> -                       goto probe_failed;
+> -       }
+> +       if (device_dma_configure(dev, drv))
+> +               goto pinctrl_bind_failed;
+> 
+>          ret = driver_sysfs_add(dev);
+>          if (ret) {
+> @@ -660,6 +683,8 @@ static int really_probe(struct device *dev, struct 
+> device_driver *drv)
+>          if (dev->bus)
+>                  blocking_notifier_call_chain(&dev->bus->p->bus_notifier,
+> 
+> BUS_NOTIFY_DRIVER_NOT_BOUND, dev);
+> +
+> +       device_dma_cleanup(dev, drv);
+>   pinctrl_bind_failed:
+>          device_links_no_driver(dev);
+>          devres_release_all(dev);
+> @@ -1204,6 +1229,7 @@ static void __device_release_driver(struct device 
+> *dev, struct device *parent)
+>                  else if (drv->remove)
+>                          drv->remove(dev);
+> 
+> +               device_dma_cleanup(dev, drv);
+>                  device_links_driver_cleanup(dev);
+> 
+>                  devres_release_all(dev);
+> diff --git a/include/linux/device/driver.h b/include/linux/device/driver.h
+> index a498ebcf4993..374a3c2cc10d 100644
+> --- a/include/linux/device/driver.h
+> +++ b/include/linux/device/driver.h
+> @@ -100,6 +100,7 @@ struct device_driver {
+>          const char              *mod_name;      /* used for built-in 
+> modules */
+> 
+>          bool suppress_bind_attrs;       /* disables bind/unbind via 
+> sysfs */
+> +       bool suppress_auto_claim_dma_owner;
+>          enum probe_type probe_type;
+> 
+>          const struct of_device_id       *of_match_table;
+
+Does this work for you? Can I work towards this in the next version?
+
+Best regards,
+baolu
