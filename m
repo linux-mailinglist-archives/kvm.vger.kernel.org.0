@@ -2,84 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C2B6470F48
-	for <lists+kvm@lfdr.de>; Sat, 11 Dec 2021 01:12:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DB730470FBD
+	for <lists+kvm@lfdr.de>; Sat, 11 Dec 2021 02:05:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345409AbhLKAPq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Dec 2021 19:15:46 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:29869 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S244137AbhLKAPk (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 10 Dec 2021 19:15:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1639181524;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=cvGP21/tndevis1BecHSxZ3W2vlszEHfVpFxmLIpCPs=;
-        b=Ju/TooJKz+ggSuvLFoKec3k/cPNx99pz6l8hWoY3982DkQCnHBK1TNuIYuDBu+ks9g5maJ
-        uLOKjSpmxSBDsX/i0eq2xEY4CpU5r2sFROkSCk6sLxhdyCFiwkrLucUS69oqarSBG0inot
-        8m+6EqAjXasidSJLKfxOmHzacXcrTW8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-453-3Y2GxqywObSQthUteKlEow-1; Fri, 10 Dec 2021 19:12:01 -0500
-X-MC-Unique: 3Y2GxqywObSQthUteKlEow-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B09A31006AA0;
-        Sat, 11 Dec 2021 00:11:59 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 411D97AB47;
-        Sat, 11 Dec 2021 00:11:59 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     laijs@linux.alibaba.com, Sean Christopherson <seanjc@google.com>
-Subject: [PATCH] Revert "KVM: X86: Update mmu->pdptrs only when it is changed"
-Date:   Fri, 10 Dec 2021 19:11:57 -0500
-Message-Id: <20211211001157.74709-2-pbonzini@redhat.com>
+        id S1345534AbhLKBIi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Dec 2021 20:08:38 -0500
+Received: from out30-132.freemail.mail.aliyun.com ([115.124.30.132]:56970 "EHLO
+        out30-132.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232244AbhLKBIh (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 10 Dec 2021 20:08:37 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R721e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04395;MF=laijs@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0V-CAHnF_1639184698;
+Received: from 30.212.189.94(mailfrom:laijs@linux.alibaba.com fp:SMTPD_---0V-CAHnF_1639184698)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Sat, 11 Dec 2021 09:05:00 +0800
+Message-ID: <bbde6da2-9441-53c1-6b7c-bb6551933a2e@linux.alibaba.com>
+Date:   Sat, 11 Dec 2021 09:04:58 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.2.1
+Subject: Re: VM_BUG_ON in vmx_prepare_switch_to_guest->__get_current_cr3_fast
+ at kvm/queue
+Content-Language: en-US
+From:   Lai Jiangshan <laijs@linux.alibaba.com>
+To:     David Matlack <dmatlack@google.com>, kvm@vger.kernel.org
+Cc:     seanjc@google.com, pbonzini@redhat.com, vkuznets@redhat.com
+References: <YbOVBDCcpuwtXD/7@google.com>
+ <b66710af-4f52-4097-9cba-27703c49f784@linux.alibaba.com>
+In-Reply-To: <b66710af-4f52-4097-9cba-27703c49f784@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This reverts commit 24cd19a28cb7174df502162641d6e1e12e7ffbd9.
-Sean Christopherson reports:
 
-"Commit 24cd19a28cb7 ('KVM: X86: Update mmu->pdptrs only when it is
-changed') breaks nested VMs with EPT in L0 and PAE shadow paging in L2.
-Reproducing is trivial, just disable EPT in L1 and run a VM.  I haven't
-investigating how it breaks things."
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- arch/x86/kvm/x86.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+On 2021/12/11 07:54, Lai Jiangshan wrote:
+> 
+> 
+> On 2021/12/11 01:57, David Matlack wrote:
+>> While testing some patches I ran into a VM_BUG_ON that I have been able to
+>> reproduce at kvm/queue commit 45af1bb99b72 ("KVM: VMX: Clean up PI
+>> pre/post-block WARNs").
+>>
+>> To repro run the kvm-unit-tests on a kernel built from kvm/queue with
+>> CONFIG_DEBUG_VM=y. I was testing on an Intel Cascade Lake host and have not
+>> tested in any other environments yet. The repro is not 100% reliable, although
+>> it's fairly easy to trigger and always during a vmx* kvm-unit-tests
+>>
+>> Given the details of the crash, commit 15ad9762d69f ("KVM: VMX: Save HOST_CR3
+>> in vmx_prepare_switch_to_guest()") and surrounding commits look most suspect.
+> 
+> Hello, is it producible if this commit is reverted?
+> 
+> Which test in kvm-unit-tests can trigger it?
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 85127b3e3690..af22ad79e081 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -841,12 +841,9 @@ int load_pdptrs(struct kvm_vcpu *vcpu, unsigned long cr3)
- 		}
- 	}
- 
--	kvm_register_mark_available(vcpu, VCPU_EXREG_PDPTR);
--	if (memcmp(mmu->pdptrs, pdpte, sizeof(mmu->pdptrs))) {
--		memcpy(mmu->pdptrs, pdpte, sizeof(mmu->pdptrs));
--		kvm_register_mark_dirty(vcpu, VCPU_EXREG_PDPTR);
--		kvm_make_request(KVM_REQ_LOAD_MMU_PGD, vcpu);
--	}
-+	memcpy(mmu->pdptrs, pdpte, sizeof(mmu->pdptrs));
-+	kvm_register_mark_dirty(vcpu, VCPU_EXREG_PDPTR);
-+	kvm_make_request(KVM_REQ_LOAD_MMU_PGD, vcpu);
- 	vcpu->arch.pdptrs_from_userspace = false;
- 
- 	return 1;
--- 
-2.31.1
+Hello, commit 15ad9762d69f ("KVM: VMX: Save HOST_CR3
+in vmx_prepare_switch_to_guest()") must be the culprit.
 
+Is the test related to nested vmx?
+
+Could you also apply the following patch and retest please.
+
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 95f3823b3a9d..c93849be73f1 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -251,6 +251,10 @@ static void vmx_sync_vmcs_host_state(struct vcpu_vmx *vmx,
+  	dest->ds_sel = src->ds_sel;
+  	dest->es_sel = src->es_sel;
+  #endif
++	if (unlikely(dest->cr3 != src->cr3)) {
++		vmcs_writel(HOST_CR3, src->cr3);
++		dest->cr3 = src->cr3;
++	}
+  }
+
+  static void vmx_switch_vmcs(struct kvm_vcpu *vcpu, struct loaded_vmcs *vmcs)
