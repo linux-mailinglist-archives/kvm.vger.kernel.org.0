@@ -2,99 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 601BD4712DA
-	for <lists+kvm@lfdr.de>; Sat, 11 Dec 2021 09:22:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C90A47132C
+	for <lists+kvm@lfdr.de>; Sat, 11 Dec 2021 10:38:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230040AbhLKIWU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 11 Dec 2021 03:22:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46400 "EHLO
+        id S230225AbhLKJi0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 11 Dec 2021 04:38:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34660 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230037AbhLKIWT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 11 Dec 2021 03:22:19 -0500
-Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA52AC061751;
-        Sat, 11 Dec 2021 00:22:18 -0800 (PST)
-Received: by mail-ed1-x531.google.com with SMTP id e3so37399536edu.4;
-        Sat, 11 Dec 2021 00:22:18 -0800 (PST)
+        with ESMTP id S229835AbhLKJiZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 11 Dec 2021 04:38:25 -0500
+Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9046EC061714
+        for <kvm@vger.kernel.org>; Sat, 11 Dec 2021 01:38:25 -0800 (PST)
+Received: by mail-io1-xd33.google.com with SMTP id p65so13009085iof.3
+        for <kvm@vger.kernel.org>; Sat, 11 Dec 2021 01:38:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=5kEcZxkBXlWefk5sypVc8zvnb+Y3Uf9P6j2F6q18Als=;
-        b=CEdX4vSeEr3TaiJyStU4U2YGWcRgKqOCkzz2AN2/kPKLEoO0H8z12D1Mjt3zS9RQxr
-         xKT87Jl3Z1Ve0e8QqOESz96xWOf3ZG9CNj10KZ7EoRUJ581VzK3f9Fyb3O17tPO6EUc6
-         BXGIm9vmSWAr12CPQhY5r64TJ5NwysvMwY8KPX9QviGllStB8hqqIugzD29KGxkbCxof
-         3gfoBN83GTd3ZKVRCY88AXqykJrRmvps3Zy3ok1RrU8trk7HKiMmZ9sw9QLkRLDIkX23
-         TKKHU31dEQyFkJcThANukdsCEU+jfzgRIcRYfpkouEjY/VreUhyyCIAyC/G/prOGpKSv
-         AJHA==
+        d=cloudflare.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=p3C4s4KqOD1h4ZUgwYhTIXX5RK9WIsFxfn73zdhJs5M=;
+        b=LdQYszvuNnXkM9BjEujv3wXoxOVzmm994hXH10EDlBbyRZ0tmAAgLKW9CM3vM0B6Kb
+         dnc/Gs0ooYQi9AHhkeePzWpRWO5xw6XkcEg6WKTJoNBg56HxltloyMOme8Jw6kahgSXX
+         8TuOnIp8WaMfjlOctuAdEchoA7djQksOePJ48=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=5kEcZxkBXlWefk5sypVc8zvnb+Y3Uf9P6j2F6q18Als=;
-        b=7/t8/8mGilx9eSsSpv11tsr3iejSf3mIVwPhgyGIOXmVeuGtwUUGSqdMUsvUTBCrRE
-         H0WZizmABUoyq3pG7H/nUNoRRJwwJtvjVoXe5lLHjYEwVItgZTywpSniq70XBIBm+fhF
-         h6aZXLXLbIwT/ec4QBmH6qlfGlXAoNWMXpbw99KAlAi3/04ImGScp0i+mqF6sn49djUM
-         mpX7M8EafNfeUEmsnW1x89wgS9bvTUu066NKxUhneHKXy02AN/A4Q7zkWuQf5p1e9WVl
-         7wGWq2FoPWqcKriyuMnFV1DVdEr4H2AYa+7Npdez9Vjt7mji72yDNwFB7qD06AYJH926
-         s5AA==
-X-Gm-Message-State: AOAM53065eu05XY4p84Cc7+E7yJ4ortGStUfwJSOoB7KWFWs0jzZNDVD
-        qZcWrKUYRrSyjXk2b8cMlzHPUzzuAqAGEA==
-X-Google-Smtp-Source: ABdhPJyUXSSeb2vgponB2mBfQznJjlZCp+iEDtjqo3JMKjhZZY+B/C/QwBu5mWnU4Sbeg0ykknjb5g==
-X-Received: by 2002:a17:907:2da2:: with SMTP id gt34mr27760282ejc.372.1639210937454;
-        Sat, 11 Dec 2021 00:22:17 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:48f9:bea:a04c:3dfe? ([2001:b07:6468:f312:48f9:bea:a04c:3dfe])
-        by smtp.googlemail.com with ESMTPSA id eg8sm2649455edb.75.2021.12.11.00.22.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 11 Dec 2021 00:22:16 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <56281d07-de85-69be-8855-71e7219e0227@redhat.com>
-Date:   Sat, 11 Dec 2021 09:22:15 +0100
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=p3C4s4KqOD1h4ZUgwYhTIXX5RK9WIsFxfn73zdhJs5M=;
+        b=1rQxjb90KqpE1K/hL1baecu8S31NbYnE0eu/GXHOv51jO9jucMcKMjnN1Y1FjRTNgw
+         dvIcSAWlQsMU3Nx1jNzAbF72ZIvHQqAxrHKExFHCrYfdOcuuhWTOJnaK8KI8rsVdqQj1
+         gImMqSV1dWfV6NiZ1UOHEmvvZz7prTWH5fAU2c4iu2tTndq27Ef6kXwo53BFOUghJvtq
+         QjXJRCUPxpTO24d6ahWzHdtAB4hYUHUziVgkbKZVjnUbBd0luUYIR0teA/DYHyyNoWxy
+         EvPg677eVCf98CGvmRfozRdrINU1ovXOl+ELvFEcnTHIhGKc5Ml1wvGeGHTfH4nRqIGS
+         dpyg==
+X-Gm-Message-State: AOAM532YockSCcqAp6iMXD2LS16Z7Vcxw1ha8Ip8wkVKBq+iYipP8/jI
+        HxR7VqZHfNj3SRPYd0A6Ib6yv8nrSxQnR5GjJCJCbBm079k3Gg==
+X-Google-Smtp-Source: ABdhPJyRffBbIyge+mxx3+rocW2yBPQPsr3ydSTIpmTalNBESQZDakdQjJ8vxpfHURqjys+PlniLHyXxp7XbExrM0AA=
+X-Received: by 2002:a05:6602:1604:: with SMTP id x4mr25723516iow.84.1639215504879;
+ Sat, 11 Dec 2021 01:38:24 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH 17/15] KVM: X86: Ensure pae_root to be reconstructed for
- shadow paging if the guest PDPTEs is changed
-Content-Language: en-US
-To:     Maxim Levitsky <mlevitsk@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Lai Jiangshan <jiangshanlai@gmail.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Lai Jiangshan <laijs@linux.alibaba.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Xiao Guangrong <guangrong.xiao@linux.intel.com>
-References: <20211108124407.12187-1-jiangshanlai@gmail.com>
- <20211111144634.88972-1-jiangshanlai@gmail.com> <Ya/5MOYef4L4UUAb@google.com>
- <11219bdb-669c-cf6f-2a70-f4e5f909a2ad@redhat.com>
- <YbPBjdAz1GQGr8DT@google.com>
- <42701fedbe10acf164ec56818b941061be6ffd4e.camel@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <42701fedbe10acf164ec56818b941061be6ffd4e.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <CALrw=nEaWhpG1y7VNTGDFfF1RWbPvm5ka5xWxD-YWTS3U=r9Ng@mail.gmail.com>
+ <d49e157a-5915-fbdc-8103-d7ba2621aea9@redhat.com> <CALrw=nHTJpoSFFadmDL2EL95D2kAiH5G-dgLvU0L7X=emxrP2A@mail.gmail.com>
+ <YaaIRv0n2E8F5YpX@google.com> <CALrw=nGrAhSn=MkW-wvNr=UnaS5=t24yY-TWjSvcNJa1oJ85ww@mail.gmail.com>
+ <CALrw=nE+yGtRi-0bFFwXa9R8ydHKV7syRYeAYuC0EBTvdFiidQ@mail.gmail.com> <YbQPcsnpowmCP7G8@google.com>
+In-Reply-To: <YbQPcsnpowmCP7G8@google.com>
+From:   Ignat Korchagin <ignat@cloudflare.com>
+Date:   Sat, 11 Dec 2021 09:38:14 +0000
+Message-ID: <CALrw=nFK7vhBXXzAB0pti-pdp1T_wtr+50Dj8nwYDHF77AsBZA@mail.gmail.com>
+Subject: Re: Potential bug in TDP MMU
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        stevensd@chromium.org, kernel-team <kernel-team@cloudflare.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/11/21 07:56, Maxim Levitsky wrote:
->> This apparently wasn't validated against a simple use case, let
->> alone against things like migration with nested VMs, multliple L2s,
->> etc...
-> 
-> I did validate the *SREGS2* against all the cases I could (like
-> migration, EPT/NPT disabled/etc. I even started testing SMM to see
-> how it affects PDPTRs, and patched seabios to use PAE paging. I still
-> could have missed something.
+On Sat, Dec 11, 2021 at 2:39 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Fri, Dec 10, 2021, Ignat Korchagin wrote:
+> > I've been trying to figure out the difference between "good" runs and
+> > "bad" runs of gvisor. So, if I've been running the following bpftrace
+> > onliner:
+>
+> ...
+>
+> > That is, I never get a stack with
+> > kvm_tdp_mmu_put_root->..->kvm_set_pfn_dirty with a "good" run.
+> > Perhaps, this may shed some light onto what is going on.
+>
+> Hmm, a little?
+>
+> Based on the WARN backtrace, KVM encounters an entire chain of valid, present TDP
+> MMU paging structures _after_ exit_mm() in the do_exit() path, as the call to
+> task_work_run() in do_exit() occurs after exit_mm().
+>
+> That means that kvm_mmu_zap_all() is guaranteed to have been called before the
+> fatal kvm_arch_destroy_vm(), as either:
+>
+>   a) exit_mm() put the last reference to mm_users and thus called __mmput ->
+>      exit_mmap() -> mmu_notifier_release() -> ... -> kvm_mmu_zap_all().
+>
+>   b) Something else had a reference to mm_users, and so KVM's ->release hook was
+>      invoked by kvm_destroy_vm() -> mmu_notifier_unregister().
+>
+> It's probably fairly safe to assume this is a TDP MMU bug, which rules out races
+> or bad refcounts in other areas.
 
-Don't worry, I think Sean was talking about patch 16 and specifically
-digging at me (who deserved it completely).
+Most likely. Currently we're using kvm.tdp_mmu=0 kernel cmdline as a
+workaround and haven't encountered any issues.
 
-Paolo
+> That means that KVM (a) is somehow losing track of a root, (b) isn't zapping all
+> SPTEs in kvm_mmu_zap_all(), or (c) is installing a SPTE after the mm has been released.
+>
+> (a) is unlikely because kvm_tdp_mmu_get_vcpu_root_hpa() is the only way for a
+> vCPU to get a reference, and it holds mmu_lock for write, doesn't yield, and
+> either gets a root from the list or adds a root to the list.
+>
+> (b) is unlikely because I would expect the fallout to be much larger and not
+> unique to your setup.
+>
+> That leaves (c), which isn't all that likely either.  I can think of a variety of
+> ways KVM might write a defunct SPTE, but I can't concoct a scenario where an
+> entire tree of a present paging structures is written.
+>
+> Can you run with the below debug patch and see if you get a hit in the failure
+> scenario?  Or possibly even a non-failure scenario?  This should either confirm
+> or rule out (c).
+>
+>
+> ---
+>  arch/x86/kvm/mmu/mmu.c     | 2 ++
+>  arch/x86/kvm/mmu/tdp_mmu.c | 5 +++++
+>  include/linux/kvm_host.h   | 2 ++
+>  3 files changed, 9 insertions(+)
+>
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 1ccee4d17481..e4e283a38570 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -5939,6 +5939,8 @@ void kvm_mmu_zap_all(struct kvm *kvm)
+>         LIST_HEAD(invalid_list);
+>         int ign;
+>
+> +       atomic_set(&kvm->mm_released, 1);
+> +
+>         write_lock(&kvm->mmu_lock);
+>  restart:
+>         list_for_each_entry_safe(sp, node, &kvm->arch.active_mmu_pages, link) {
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index b69e47e68307..432ccf05f446 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -504,6 +504,9 @@ static inline bool tdp_mmu_set_spte_atomic(struct kvm *kvm,
+>  {
+>         lockdep_assert_held_read(&kvm->mmu_lock);
+>
+> +       WARN_ON(atomic_read(&kvm->mm_released) &&
+> +               new_spte && !is_removed_spte(new_spte));
+> +
+>         /*
+>          * Do not change removed SPTEs. Only the thread that froze the SPTE
+>          * may modify it.
+> @@ -577,6 +580,8 @@ static inline void __tdp_mmu_set_spte(struct kvm *kvm, struct tdp_iter *iter,
+>  {
+>         lockdep_assert_held_write(&kvm->mmu_lock);
+>
+> +       WARN_ON(atomic_read(&kvm->mm_released) && new_spte);
+> +
+>         /*
+>          * No thread should be using this function to set SPTEs to the
+>          * temporary removed SPTE value.
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index e7bfcc3b6b0b..8e76e2f6c3be 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -569,6 +569,8 @@ struct kvm {
+>
+>         struct mutex slots_lock;
+>
+> +       atomic_t mm_released;
+> +
+>         /*
+>          * Protects the arch-specific fields of struct kvm_memory_slots in
+>          * use by the VM. To be used under the slots_lock (above) or in a
+>
+> base-commit: 1c10f4b4877ffaed602d12ff8cbbd5009e82c970
+> --
+
+Thanks. Applied the patch, but no warnings are triggered neither in
+"good" case nor in "bad" case.
+
+Ignat
