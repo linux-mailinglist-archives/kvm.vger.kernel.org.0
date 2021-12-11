@@ -2,181 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id ED41D47127E
-	for <lists+kvm@lfdr.de>; Sat, 11 Dec 2021 08:29:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 601BD4712DA
+	for <lists+kvm@lfdr.de>; Sat, 11 Dec 2021 09:22:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229838AbhLKH3D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 11 Dec 2021 02:29:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34750 "EHLO
+        id S230040AbhLKIWU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 11 Dec 2021 03:22:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229455AbhLKH3D (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 11 Dec 2021 02:29:03 -0500
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAECBC061714
-        for <kvm@vger.kernel.org>; Fri, 10 Dec 2021 23:29:02 -0800 (PST)
-Received: by mail-wr1-x42e.google.com with SMTP id q3so18435066wru.5
-        for <kvm@vger.kernel.org>; Fri, 10 Dec 2021 23:29:02 -0800 (PST)
+        with ESMTP id S230037AbhLKIWT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 11 Dec 2021 03:22:19 -0500
+Received: from mail-ed1-x531.google.com (mail-ed1-x531.google.com [IPv6:2a00:1450:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA52AC061751;
+        Sat, 11 Dec 2021 00:22:18 -0800 (PST)
+Received: by mail-ed1-x531.google.com with SMTP id e3so37399536edu.4;
+        Sat, 11 Dec 2021 00:22:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=NCxbKQbBvq7DAhX8XxN50vu86niU3L9rA+r4FBy78NI=;
-        b=WnWMTCmF/oJ7lcN32MHHE3EzTeXGytb5JGkc++i6GG2lVAowTOfZcdm5tUUWfsSSBz
-         KVGffsSg4BoiV8gRWO7QX1p4X41udFVteKlDSTf8xNMtSRNub+7UHgzNcj8PPYsWxoSx
-         yDLBRfARyEkTFoY2TnkuQh+JgQQ7A3wznckXVIJ/NknUVMi5iAo+A0tcDIU1RBZFq9bI
-         wsz05yyY121S62mcptyjd6ZRg9y35B+4tctMg2Cemf03Fh2oCNNyPDskuIL/ZOrNed1q
-         GHWMD8sNPioh5FZ46NQazf+v9T2LnQ8CJeTDgVGOiCiksGG6+lwanv8AjMnYTOkT0LEg
-         g8HA==
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=5kEcZxkBXlWefk5sypVc8zvnb+Y3Uf9P6j2F6q18Als=;
+        b=CEdX4vSeEr3TaiJyStU4U2YGWcRgKqOCkzz2AN2/kPKLEoO0H8z12D1Mjt3zS9RQxr
+         xKT87Jl3Z1Ve0e8QqOESz96xWOf3ZG9CNj10KZ7EoRUJ581VzK3f9Fyb3O17tPO6EUc6
+         BXGIm9vmSWAr12CPQhY5r64TJ5NwysvMwY8KPX9QviGllStB8hqqIugzD29KGxkbCxof
+         3gfoBN83GTd3ZKVRCY88AXqykJrRmvps3Zy3ok1RrU8trk7HKiMmZ9sw9QLkRLDIkX23
+         TKKHU31dEQyFkJcThANukdsCEU+jfzgRIcRYfpkouEjY/VreUhyyCIAyC/G/prOGpKSv
+         AJHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=NCxbKQbBvq7DAhX8XxN50vu86niU3L9rA+r4FBy78NI=;
-        b=Xy/xf+a7k8hHG6Kv7fxmsdUchw6oP++vjMadCYwtsATOkBfOKyuDJJ0G1S4Y5f2z3g
-         YzWkxfa7RPIo6TDtwItK8mViqg9XK5ecFubSPDaS09FYRNAbzeKuSa3uCmWPPsPq8wit
-         SgHCZuNm3Wamd9nyf4bbktI4Wi/rBXjzkl5qWp96IFEdhhIYAij1C5WxedPhVP6sS7S6
-         2eT65HUfYADG0ydlrf0qbTDd8f06l03BQadNM832Xm4Ssm3gpaVm0ZyYDhF1S1QsM6K5
-         RHHPgSOKEzmSTxYqFSO9YZfxP7SumlAtGB0wGSSK/Il5ujT5GXnQcdLyTlpaN6lPPr+N
-         i7Bg==
-X-Gm-Message-State: AOAM53038nQRmkM77fYNVXBLR5VFEBs8OVH0MpHG4KHY0SArqwrsldMu
-        UxTJ0DhB1v40i/FsG8hQ1Ij6uichprhz3jWwx6tWSBKonmQ=
-X-Google-Smtp-Source: ABdhPJzGtZWleUsxAg6ZN7iRhKt1By3irNcDyGM4y5afLzs9+QBzgJa/sOu4xfMMgFdZ8ts6+dY2MKYgaoM3TSnmqNg=
-X-Received: by 2002:adf:d082:: with SMTP id y2mr19460738wrh.214.1639207741180;
- Fri, 10 Dec 2021 23:29:01 -0800 (PST)
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=5kEcZxkBXlWefk5sypVc8zvnb+Y3Uf9P6j2F6q18Als=;
+        b=7/t8/8mGilx9eSsSpv11tsr3iejSf3mIVwPhgyGIOXmVeuGtwUUGSqdMUsvUTBCrRE
+         H0WZizmABUoyq3pG7H/nUNoRRJwwJtvjVoXe5lLHjYEwVItgZTywpSniq70XBIBm+fhF
+         h6aZXLXLbIwT/ec4QBmH6qlfGlXAoNWMXpbw99KAlAi3/04ImGScp0i+mqF6sn49djUM
+         mpX7M8EafNfeUEmsnW1x89wgS9bvTUu066NKxUhneHKXy02AN/A4Q7zkWuQf5p1e9WVl
+         7wGWq2FoPWqcKriyuMnFV1DVdEr4H2AYa+7Npdez9Vjt7mji72yDNwFB7qD06AYJH926
+         s5AA==
+X-Gm-Message-State: AOAM53065eu05XY4p84Cc7+E7yJ4ortGStUfwJSOoB7KWFWs0jzZNDVD
+        qZcWrKUYRrSyjXk2b8cMlzHPUzzuAqAGEA==
+X-Google-Smtp-Source: ABdhPJyUXSSeb2vgponB2mBfQznJjlZCp+iEDtjqo3JMKjhZZY+B/C/QwBu5mWnU4Sbeg0ykknjb5g==
+X-Received: by 2002:a17:907:2da2:: with SMTP id gt34mr27760282ejc.372.1639210937454;
+        Sat, 11 Dec 2021 00:22:17 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:48f9:bea:a04c:3dfe? ([2001:b07:6468:f312:48f9:bea:a04c:3dfe])
+        by smtp.googlemail.com with ESMTPSA id eg8sm2649455edb.75.2021.12.11.00.22.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 11 Dec 2021 00:22:16 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <56281d07-de85-69be-8855-71e7219e0227@redhat.com>
+Date:   Sat, 11 Dec 2021 09:22:15 +0100
 MIME-Version: 1.0
-References: <20211119124515.89439-1-anup.patel@wdc.com>
-In-Reply-To: <20211119124515.89439-1-anup.patel@wdc.com>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Sat, 11 Dec 2021 12:58:49 +0530
-Message-ID: <CAAhSdy1pqS5PYdxuxx5RD8baeqfd07Vm1DM7_Eq9Mby37mS_ig@mail.gmail.com>
-Subject: Re: [PATCH v11 kvmtool 0/8] KVMTOOL RISC-V Support
-To:     Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>
-Cc:     julien.thierry.kdev@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Vincent Chen <vincent.chen@sifive.com>,
-        KVM General <kvm@vger.kernel.org>,
-        kvm-riscv@lists.infradead.org, Anup Patel <anup.patel@wdc.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH 17/15] KVM: X86: Ensure pae_root to be reconstructed for
+ shadow paging if the guest PDPTEs is changed
+Content-Language: en-US
+To:     Maxim Levitsky <mlevitsk@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Lai Jiangshan <jiangshanlai@gmail.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Lai Jiangshan <laijs@linux.alibaba.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Xiao Guangrong <guangrong.xiao@linux.intel.com>
+References: <20211108124407.12187-1-jiangshanlai@gmail.com>
+ <20211111144634.88972-1-jiangshanlai@gmail.com> <Ya/5MOYef4L4UUAb@google.com>
+ <11219bdb-669c-cf6f-2a70-f4e5f909a2ad@redhat.com>
+ <YbPBjdAz1GQGr8DT@google.com>
+ <42701fedbe10acf164ec56818b941061be6ffd4e.camel@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <42701fedbe10acf164ec56818b941061be6ffd4e.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc, Hi Will,
+On 12/11/21 07:56, Maxim Levitsky wrote:
+>> This apparently wasn't validated against a simple use case, let
+>> alone against things like migration with nested VMs, multliple L2s,
+>> etc...
+> 
+> I did validate the *SREGS2* against all the cases I could (like
+> migration, EPT/NPT disabled/etc. I even started testing SMM to see
+> how it affects PDPTRs, and patched seabios to use PAE paging. I still
+> could have missed something.
 
-On Fri, Nov 19, 2021 at 6:15 PM Anup Patel <anup.patel@wdc.com> wrote:
->
-> This series adds RISC-V support for KVMTOOL and it is based on the
-> Linux-5.16-rc1. The KVM RISC-V patches have been merged in the Linux
-> kernel since 5.16-rc1.
->
-> The KVMTOOL RISC-V patches can be found in riscv_master branch at:
-> https//github.com/kvm-riscv/kvmtool.git
+Don't worry, I think Sean was talking about patch 16 and specifically
+digging at me (who deserved it completely).
 
-Ping ?
-Do you have further comments on this series ?
-
-Regards,
-Anup
-
->
-> Changes since v10:
->  - Updated PLIC CLAIM write emulation in PATCH5 to ignore writes when
->    interrupt is disabled for the PLIC context. This behaviour is as-per
->    definition of interrupt completion process in the RISC-V PLIC spec.
->
-> Changes since v9:
->  - Rebased on recent commit 39181fc6429f4e9e71473284940e35857b42772a
->  - Sync-up headers with Linux-5.16-rc1
->
-> Changes since v8:
->  - Rebased on recent commit 2e7380db438defbc5aa24652fe10b7bf99822355
->  - Sync-up headers with latest KVM RISC-V v20 series which is based
->    on Linux-5.15-rc3
->  - Fixed PLIC context CLAIM register emulation in PATCH5
->
-> Changes since v7:
->  - Rebased on recent commit 25c1dc6c4942ff0949c08780fcad6b324fec6bf7
->  - Sync-up headers with latest KVM RISC-V v19 series which is based
->    on Linux-5.14-rc3
->
-> Changes since v6:
->  - Rebased on recent commit 117d64953228afa90b52f6e1b4873770643ffdc9
->  - Sync-up headers with latest KVM RISC-V v17 series which is based
->    on Linux-5.12-rc5
->
-> Changes since v5:
->  - Sync-up headers with latest KVM RISC-V v16 series which is based
->    on Linux-5.11-rc3
->
-> Changes since v4:
->  - Rebased on recent commit 90b2d3adadf218dfc6bdfdfcefe269843360223c
->  - Sync-up headers with latest KVM RISC-V v15 series which is based
->    on Linux-5.10-rc3
->
-> Changes since v3:
->  - Rebased on recent commit 351d931f496aeb2e97b8daa44c943d8b59351d07
->  - Improved kvm_cpu__show_registers() implementation
->
-> Changes since v2:
->  - Support compiling KVMTOOL for both RV32 and RV64 systems using
->    a multilib toolchain
->  - Fix kvm_cpu__arch_init() for RV32 system
->
-> Changes since v1:
->  - Use linux/sizes.h in kvm/kvm-arch.h
->  - Added comment in kvm/kvm-arch.h about why PCI config space is 256M
->  - Remove forward declaration of "struct kvm" from kvm/kvm-cpu-arch.h
->  - Fixed placement of DTB and INITRD in guest RAM
->  - Use __riscv_xlen instead of sizeof(unsigned long) in __kvm_reg_id()
->
-> Anup Patel (8):
->   update_headers: Sync-up ABI headers with Linux-5.16-rc1
->   riscv: Initial skeletal support
->   riscv: Implement Guest/VM arch functions
->   riscv: Implement Guest/VM VCPU arch functions
->   riscv: Add PLIC device emulation
->   riscv: Generate FDT at runtime for Guest/VM
->   riscv: Handle SBI calls forwarded to user space
->   riscv: Generate PCI host DT node
->
->  INSTALL                             |   7 +-
->  Makefile                            |  24 +-
->  arm/aarch64/include/asm/kvm.h       |  56 ++-
->  include/linux/kvm.h                 | 441 ++++++++++++++++++++-
->  powerpc/include/asm/kvm.h           |  10 +
->  riscv/fdt.c                         | 195 ++++++++++
->  riscv/include/asm/kvm.h             | 128 +++++++
->  riscv/include/kvm/barrier.h         |  14 +
->  riscv/include/kvm/fdt-arch.h        |   8 +
->  riscv/include/kvm/kvm-arch.h        |  89 +++++
->  riscv/include/kvm/kvm-config-arch.h |  15 +
->  riscv/include/kvm/kvm-cpu-arch.h    |  51 +++
->  riscv/include/kvm/sbi.h             |  48 +++
->  riscv/ioport.c                      |   7 +
->  riscv/irq.c                         |  13 +
->  riscv/kvm-cpu.c                     | 490 ++++++++++++++++++++++++
->  riscv/kvm.c                         | 174 +++++++++
->  riscv/pci.c                         | 109 ++++++
->  riscv/plic.c                        | 571 ++++++++++++++++++++++++++++
->  util/update_headers.sh              |   2 +-
->  x86/include/asm/kvm.h               |  64 +++-
->  21 files changed, 2497 insertions(+), 19 deletions(-)
->  create mode 100644 riscv/fdt.c
->  create mode 100644 riscv/include/asm/kvm.h
->  create mode 100644 riscv/include/kvm/barrier.h
->  create mode 100644 riscv/include/kvm/fdt-arch.h
->  create mode 100644 riscv/include/kvm/kvm-arch.h
->  create mode 100644 riscv/include/kvm/kvm-config-arch.h
->  create mode 100644 riscv/include/kvm/kvm-cpu-arch.h
->  create mode 100644 riscv/include/kvm/sbi.h
->  create mode 100644 riscv/ioport.c
->  create mode 100644 riscv/irq.c
->  create mode 100644 riscv/kvm-cpu.c
->  create mode 100644 riscv/kvm.c
->  create mode 100644 riscv/pci.c
->  create mode 100644 riscv/plic.c
->
-> --
-> 2.25.1
->
+Paolo
