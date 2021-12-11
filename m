@@ -2,129 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BE56471242
-	for <lists+kvm@lfdr.de>; Sat, 11 Dec 2021 07:56:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ED41D47127E
+	for <lists+kvm@lfdr.de>; Sat, 11 Dec 2021 08:29:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229739AbhLKG4k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 11 Dec 2021 01:56:40 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:31039 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229607AbhLKG4j (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sat, 11 Dec 2021 01:56:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1639205798;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Tqlq6AmDWNzPiJUWu/M8hOZ4wSsTPUgjGqMIHLFfx8w=;
-        b=U8RwHq2neKznLHMhZfZJGwDWO0ek+uAkrop+TgcfXiEZx9pJdvPhgRS7nSoaR6DUInhb6s
-        eikZwXc9hGQd5zM9p5+nQoaAls/TPntXRtE3ztPnFXXN88s1V8SIS6+S0BBYzg/k/Cs0Oj
-        f9qe2q44cQ1kICIqkKO2NPA/xNot0bU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-408-CjjodwTEPH66bHLZpw0JCg-1; Sat, 11 Dec 2021 01:56:35 -0500
-X-MC-Unique: CjjodwTEPH66bHLZpw0JCg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5029F801AAB;
-        Sat, 11 Dec 2021 06:56:32 +0000 (UTC)
-Received: from starship (unknown [10.40.192.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 7A38568D94;
-        Sat, 11 Dec 2021 06:56:24 +0000 (UTC)
-Message-ID: <42701fedbe10acf164ec56818b941061be6ffd4e.camel@redhat.com>
-Subject: Re: [PATCH 17/15] KVM: X86: Ensure pae_root to be reconstructed for
- shadow paging if the guest PDPTEs is changed
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Lai Jiangshan <jiangshanlai@gmail.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Lai Jiangshan <laijs@linux.alibaba.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
-        Xiao Guangrong <guangrong.xiao@linux.intel.com>
-Date:   Sat, 11 Dec 2021 08:56:23 +0200
-In-Reply-To: <YbPBjdAz1GQGr8DT@google.com>
-References: <20211108124407.12187-1-jiangshanlai@gmail.com>
-         <20211111144634.88972-1-jiangshanlai@gmail.com>
-         <Ya/5MOYef4L4UUAb@google.com>
-         <11219bdb-669c-cf6f-2a70-f4e5f909a2ad@redhat.com>
-         <YbPBjdAz1GQGr8DT@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        id S229838AbhLKH3D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 11 Dec 2021 02:29:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34750 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229455AbhLKH3D (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 11 Dec 2021 02:29:03 -0500
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAECBC061714
+        for <kvm@vger.kernel.org>; Fri, 10 Dec 2021 23:29:02 -0800 (PST)
+Received: by mail-wr1-x42e.google.com with SMTP id q3so18435066wru.5
+        for <kvm@vger.kernel.org>; Fri, 10 Dec 2021 23:29:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=NCxbKQbBvq7DAhX8XxN50vu86niU3L9rA+r4FBy78NI=;
+        b=WnWMTCmF/oJ7lcN32MHHE3EzTeXGytb5JGkc++i6GG2lVAowTOfZcdm5tUUWfsSSBz
+         KVGffsSg4BoiV8gRWO7QX1p4X41udFVteKlDSTf8xNMtSRNub+7UHgzNcj8PPYsWxoSx
+         yDLBRfARyEkTFoY2TnkuQh+JgQQ7A3wznckXVIJ/NknUVMi5iAo+A0tcDIU1RBZFq9bI
+         wsz05yyY121S62mcptyjd6ZRg9y35B+4tctMg2Cemf03Fh2oCNNyPDskuIL/ZOrNed1q
+         GHWMD8sNPioh5FZ46NQazf+v9T2LnQ8CJeTDgVGOiCiksGG6+lwanv8AjMnYTOkT0LEg
+         g8HA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=NCxbKQbBvq7DAhX8XxN50vu86niU3L9rA+r4FBy78NI=;
+        b=Xy/xf+a7k8hHG6Kv7fxmsdUchw6oP++vjMadCYwtsATOkBfOKyuDJJ0G1S4Y5f2z3g
+         YzWkxfa7RPIo6TDtwItK8mViqg9XK5ecFubSPDaS09FYRNAbzeKuSa3uCmWPPsPq8wit
+         SgHCZuNm3Wamd9nyf4bbktI4Wi/rBXjzkl5qWp96IFEdhhIYAij1C5WxedPhVP6sS7S6
+         2eT65HUfYADG0ydlrf0qbTDd8f06l03BQadNM832Xm4Ssm3gpaVm0ZyYDhF1S1QsM6K5
+         RHHPgSOKEzmSTxYqFSO9YZfxP7SumlAtGB0wGSSK/Il5ujT5GXnQcdLyTlpaN6lPPr+N
+         i7Bg==
+X-Gm-Message-State: AOAM53038nQRmkM77fYNVXBLR5VFEBs8OVH0MpHG4KHY0SArqwrsldMu
+        UxTJ0DhB1v40i/FsG8hQ1Ij6uichprhz3jWwx6tWSBKonmQ=
+X-Google-Smtp-Source: ABdhPJzGtZWleUsxAg6ZN7iRhKt1By3irNcDyGM4y5afLzs9+QBzgJa/sOu4xfMMgFdZ8ts6+dY2MKYgaoM3TSnmqNg=
+X-Received: by 2002:adf:d082:: with SMTP id y2mr19460738wrh.214.1639207741180;
+ Fri, 10 Dec 2021 23:29:01 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+References: <20211119124515.89439-1-anup.patel@wdc.com>
+In-Reply-To: <20211119124515.89439-1-anup.patel@wdc.com>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Sat, 11 Dec 2021 12:58:49 +0530
+Message-ID: <CAAhSdy1pqS5PYdxuxx5RD8baeqfd07Vm1DM7_Eq9Mby37mS_ig@mail.gmail.com>
+Subject: Re: [PATCH v11 kvmtool 0/8] KVMTOOL RISC-V Support
+To:     Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>
+Cc:     julien.thierry.kdev@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Vincent Chen <vincent.chen@sifive.com>,
+        KVM General <kvm@vger.kernel.org>,
+        kvm-riscv@lists.infradead.org, Anup Patel <anup.patel@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2021-12-10 at 21:07 +0000, Sean Christopherson wrote:
-> On Thu, Dec 09, 2021, Paolo Bonzini wrote:
-> > On 12/8/21 01:15, Sean Christopherson wrote:
-> > > > @@ -832,8 +832,14 @@ int load_pdptrs(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu, unsigned long cr3)
-> > > >   	if (memcmp(mmu->pdptrs, pdpte, sizeof(mmu->pdptrs))) {
-> > > >   		memcpy(mmu->pdptrs, pdpte, sizeof(mmu->pdptrs));
-> > > >   		kvm_register_mark_dirty(vcpu, VCPU_EXREG_PDPTR);
-> > > > -		/* Ensure the dirty PDPTEs to be loaded. */
-> > > > -		kvm_make_request(KVM_REQ_LOAD_MMU_PGD, vcpu);
-> > > > +		/*
-> > > > +		 * Ensure the dirty PDPTEs to be loaded for VMX with EPT
-> > > > +		 * enabled or pae_root to be reconstructed for shadow paging.
-> > > > +		 */
-> > > > +		if (tdp_enabled)
-> > > > +			kvm_make_request(KVM_REQ_LOAD_MMU_PGD, vcpu);
-> > > > +		else
-> > > > +			kvm_mmu_free_roots(vcpu, vcpu->arch.mmu, KVM_MMU_ROOT_CURRENT);
-> > > Shouldn't matter since it's legacy shadow paging, but @mmu should be used instead
-> > > of vcpu->arch.mmuvcpu->arch.mmu.
-> > 
-> > In kvm/next actually there's no mmu parameter to load_pdptrs, so it's okay
-> > to keep vcpu->arch.mmu.
-> > 
-> > > To avoid a dependency on the previous patch, I think it makes sense to have this be:
-> > > 
-> > > 	if (!tdp_enabled && memcmp(mmu->pdptrs, pdpte, sizeof(mmu->pdptrs)))
-> > > 		kvm_mmu_free_roots(vcpu, mmu, KVM_MMU_ROOT_CURRENT);
-> > > 
-> > > before the memcpy().
-> > > 
-> > > Then we can decide independently if skipping the KVM_REQ_LOAD_MMU_PGD if the
-> > > PDPTRs are unchanged with respect to the MMU is safe.
-> > 
-> > Do you disagree that there's already an invariant that the PDPTRs can only
-> > be dirty if KVM_REQ_LOAD_MMU_PGD---and therefore a previous change to the
-> > PDPTRs would have triggered KVM_REQ_LOAD_MMU_PGD?
-> 
-> What I think is moot, because commit 24cd19a28cb7 ("KVM: X86: Update mmu->pdptrs
-> only when it is changed") breaks nested VMs with EPT in L0 and PAE shadow paging
-> in L2.  Reproducing is trivial, just disable EPT in L1 and run a VM.  I haven't
-> investigating how it breaks things, because why it's broken is secondary for me.
-> 
-> My primary concern is that we would even consider optimizing the PDPTR logic without
-> a mountain of evidence that any patch is correct for all scenarios.  We had to add
-> an entire ioctl() just to get PDPTRs functional.  This apparently wasn't validated
-> against a simple use case, let alone against things like migration with nested VMs,
-> multliple L2s, etc...
+Hi Marc, Hi Will,
 
-I did validate the *SREGS2* against all the cases I could (like migration, EPT/NPT disabled/etc.
-I even started testing SMM to see how it affects PDPTRs, and patched seabios to use PAE paging.
-I still could have missed something.
+On Fri, Nov 19, 2021 at 6:15 PM Anup Patel <anup.patel@wdc.com> wrote:
+>
+> This series adds RISC-V support for KVMTOOL and it is based on the
+> Linux-5.16-rc1. The KVM RISC-V patches have been merged in the Linux
+> kernel since 5.16-rc1.
+>
+> The KVMTOOL RISC-V patches can be found in riscv_master branch at:
+> https//github.com/kvm-riscv/kvmtool.git
 
-But note that qemu still doesn't use that ioctl (patch stuck in review).
+Ping ?
+Do you have further comments on this series ?
 
-Best regards,
-	Maxim Levitsky
+Regards,
+Anup
 
-
-> 
-
-
+>
+> Changes since v10:
+>  - Updated PLIC CLAIM write emulation in PATCH5 to ignore writes when
+>    interrupt is disabled for the PLIC context. This behaviour is as-per
+>    definition of interrupt completion process in the RISC-V PLIC spec.
+>
+> Changes since v9:
+>  - Rebased on recent commit 39181fc6429f4e9e71473284940e35857b42772a
+>  - Sync-up headers with Linux-5.16-rc1
+>
+> Changes since v8:
+>  - Rebased on recent commit 2e7380db438defbc5aa24652fe10b7bf99822355
+>  - Sync-up headers with latest KVM RISC-V v20 series which is based
+>    on Linux-5.15-rc3
+>  - Fixed PLIC context CLAIM register emulation in PATCH5
+>
+> Changes since v7:
+>  - Rebased on recent commit 25c1dc6c4942ff0949c08780fcad6b324fec6bf7
+>  - Sync-up headers with latest KVM RISC-V v19 series which is based
+>    on Linux-5.14-rc3
+>
+> Changes since v6:
+>  - Rebased on recent commit 117d64953228afa90b52f6e1b4873770643ffdc9
+>  - Sync-up headers with latest KVM RISC-V v17 series which is based
+>    on Linux-5.12-rc5
+>
+> Changes since v5:
+>  - Sync-up headers with latest KVM RISC-V v16 series which is based
+>    on Linux-5.11-rc3
+>
+> Changes since v4:
+>  - Rebased on recent commit 90b2d3adadf218dfc6bdfdfcefe269843360223c
+>  - Sync-up headers with latest KVM RISC-V v15 series which is based
+>    on Linux-5.10-rc3
+>
+> Changes since v3:
+>  - Rebased on recent commit 351d931f496aeb2e97b8daa44c943d8b59351d07
+>  - Improved kvm_cpu__show_registers() implementation
+>
+> Changes since v2:
+>  - Support compiling KVMTOOL for both RV32 and RV64 systems using
+>    a multilib toolchain
+>  - Fix kvm_cpu__arch_init() for RV32 system
+>
+> Changes since v1:
+>  - Use linux/sizes.h in kvm/kvm-arch.h
+>  - Added comment in kvm/kvm-arch.h about why PCI config space is 256M
+>  - Remove forward declaration of "struct kvm" from kvm/kvm-cpu-arch.h
+>  - Fixed placement of DTB and INITRD in guest RAM
+>  - Use __riscv_xlen instead of sizeof(unsigned long) in __kvm_reg_id()
+>
+> Anup Patel (8):
+>   update_headers: Sync-up ABI headers with Linux-5.16-rc1
+>   riscv: Initial skeletal support
+>   riscv: Implement Guest/VM arch functions
+>   riscv: Implement Guest/VM VCPU arch functions
+>   riscv: Add PLIC device emulation
+>   riscv: Generate FDT at runtime for Guest/VM
+>   riscv: Handle SBI calls forwarded to user space
+>   riscv: Generate PCI host DT node
+>
+>  INSTALL                             |   7 +-
+>  Makefile                            |  24 +-
+>  arm/aarch64/include/asm/kvm.h       |  56 ++-
+>  include/linux/kvm.h                 | 441 ++++++++++++++++++++-
+>  powerpc/include/asm/kvm.h           |  10 +
+>  riscv/fdt.c                         | 195 ++++++++++
+>  riscv/include/asm/kvm.h             | 128 +++++++
+>  riscv/include/kvm/barrier.h         |  14 +
+>  riscv/include/kvm/fdt-arch.h        |   8 +
+>  riscv/include/kvm/kvm-arch.h        |  89 +++++
+>  riscv/include/kvm/kvm-config-arch.h |  15 +
+>  riscv/include/kvm/kvm-cpu-arch.h    |  51 +++
+>  riscv/include/kvm/sbi.h             |  48 +++
+>  riscv/ioport.c                      |   7 +
+>  riscv/irq.c                         |  13 +
+>  riscv/kvm-cpu.c                     | 490 ++++++++++++++++++++++++
+>  riscv/kvm.c                         | 174 +++++++++
+>  riscv/pci.c                         | 109 ++++++
+>  riscv/plic.c                        | 571 ++++++++++++++++++++++++++++
+>  util/update_headers.sh              |   2 +-
+>  x86/include/asm/kvm.h               |  64 +++-
+>  21 files changed, 2497 insertions(+), 19 deletions(-)
+>  create mode 100644 riscv/fdt.c
+>  create mode 100644 riscv/include/asm/kvm.h
+>  create mode 100644 riscv/include/kvm/barrier.h
+>  create mode 100644 riscv/include/kvm/fdt-arch.h
+>  create mode 100644 riscv/include/kvm/kvm-arch.h
+>  create mode 100644 riscv/include/kvm/kvm-config-arch.h
+>  create mode 100644 riscv/include/kvm/kvm-cpu-arch.h
+>  create mode 100644 riscv/include/kvm/sbi.h
+>  create mode 100644 riscv/ioport.c
+>  create mode 100644 riscv/irq.c
+>  create mode 100644 riscv/kvm-cpu.c
+>  create mode 100644 riscv/kvm.c
+>  create mode 100644 riscv/pci.c
+>  create mode 100644 riscv/plic.c
+>
+> --
+> 2.25.1
+>
