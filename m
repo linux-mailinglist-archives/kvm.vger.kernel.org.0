@@ -2,175 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C90A47132C
-	for <lists+kvm@lfdr.de>; Sat, 11 Dec 2021 10:38:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 413E8471372
+	for <lists+kvm@lfdr.de>; Sat, 11 Dec 2021 11:50:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230225AbhLKJi0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 11 Dec 2021 04:38:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34660 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229835AbhLKJiZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 11 Dec 2021 04:38:25 -0500
-Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9046EC061714
-        for <kvm@vger.kernel.org>; Sat, 11 Dec 2021 01:38:25 -0800 (PST)
-Received: by mail-io1-xd33.google.com with SMTP id p65so13009085iof.3
-        for <kvm@vger.kernel.org>; Sat, 11 Dec 2021 01:38:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=p3C4s4KqOD1h4ZUgwYhTIXX5RK9WIsFxfn73zdhJs5M=;
-        b=LdQYszvuNnXkM9BjEujv3wXoxOVzmm994hXH10EDlBbyRZ0tmAAgLKW9CM3vM0B6Kb
-         dnc/Gs0ooYQi9AHhkeePzWpRWO5xw6XkcEg6WKTJoNBg56HxltloyMOme8Jw6kahgSXX
-         8TuOnIp8WaMfjlOctuAdEchoA7djQksOePJ48=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=p3C4s4KqOD1h4ZUgwYhTIXX5RK9WIsFxfn73zdhJs5M=;
-        b=1rQxjb90KqpE1K/hL1baecu8S31NbYnE0eu/GXHOv51jO9jucMcKMjnN1Y1FjRTNgw
-         dvIcSAWlQsMU3Nx1jNzAbF72ZIvHQqAxrHKExFHCrYfdOcuuhWTOJnaK8KI8rsVdqQj1
-         gImMqSV1dWfV6NiZ1UOHEmvvZz7prTWH5fAU2c4iu2tTndq27Ef6kXwo53BFOUghJvtq
-         QjXJRCUPxpTO24d6ahWzHdtAB4hYUHUziVgkbKZVjnUbBd0luUYIR0teA/DYHyyNoWxy
-         EvPg677eVCf98CGvmRfozRdrINU1ovXOl+ELvFEcnTHIhGKc5Ml1wvGeGHTfH4nRqIGS
-         dpyg==
-X-Gm-Message-State: AOAM532YockSCcqAp6iMXD2LS16Z7Vcxw1ha8Ip8wkVKBq+iYipP8/jI
-        HxR7VqZHfNj3SRPYd0A6Ib6yv8nrSxQnR5GjJCJCbBm079k3Gg==
-X-Google-Smtp-Source: ABdhPJyRffBbIyge+mxx3+rocW2yBPQPsr3ydSTIpmTalNBESQZDakdQjJ8vxpfHURqjys+PlniLHyXxp7XbExrM0AA=
-X-Received: by 2002:a05:6602:1604:: with SMTP id x4mr25723516iow.84.1639215504879;
- Sat, 11 Dec 2021 01:38:24 -0800 (PST)
-MIME-Version: 1.0
-References: <CALrw=nEaWhpG1y7VNTGDFfF1RWbPvm5ka5xWxD-YWTS3U=r9Ng@mail.gmail.com>
- <d49e157a-5915-fbdc-8103-d7ba2621aea9@redhat.com> <CALrw=nHTJpoSFFadmDL2EL95D2kAiH5G-dgLvU0L7X=emxrP2A@mail.gmail.com>
- <YaaIRv0n2E8F5YpX@google.com> <CALrw=nGrAhSn=MkW-wvNr=UnaS5=t24yY-TWjSvcNJa1oJ85ww@mail.gmail.com>
- <CALrw=nE+yGtRi-0bFFwXa9R8ydHKV7syRYeAYuC0EBTvdFiidQ@mail.gmail.com> <YbQPcsnpowmCP7G8@google.com>
-In-Reply-To: <YbQPcsnpowmCP7G8@google.com>
-From:   Ignat Korchagin <ignat@cloudflare.com>
-Date:   Sat, 11 Dec 2021 09:38:14 +0000
-Message-ID: <CALrw=nFK7vhBXXzAB0pti-pdp1T_wtr+50Dj8nwYDHF77AsBZA@mail.gmail.com>
-Subject: Re: Potential bug in TDP MMU
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        stevensd@chromium.org, kernel-team <kernel-team@cloudflare.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S230392AbhLKKub (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 11 Dec 2021 05:50:31 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:19442 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229977AbhLKKua (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sat, 11 Dec 2021 05:50:30 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1BB9vkU3014356;
+        Sat, 11 Dec 2021 10:50:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : content-type :
+ content-transfer-encoding : mime-version : subject : message-id : date :
+ cc : to; s=pp1; bh=dPt4m+468piYs6hjhD5dMImtszl0/ST8y+Nc1uJWV24=;
+ b=oya4sgjNrmORJWKz7gOno8r0EeBBfDfJm2OucROVvnk+18efDMwEw0CB9B7nvvy49H9t
+ 2xgvnFu1nrWTSpx3aLBq2Xxtahlq0ZpZi5HbW3jtRzIZKhQtf8z5xZ3zeuaDyGyNzZcK
+ 3BH6P/WgO5A+4OISYlUM23by6E830ZUgGWE4kS/TFsy6PlJ7Ccpbh+His8hUIdzgSSrZ
+ +Xls5dQvk1shsW57Tt1uLqZrZQyTRt47T190RBgUr8s3Dtlv31JtXzwSTjwStGAxvPvV
+ dqmg5ze83hrUyAGbXXjLjnBObijOcNKvqEwOaW2Zo340ToG7WA4wKglgsbHtWfxgOX67 CQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cvstm0hav-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sat, 11 Dec 2021 10:50:23 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1BBAmagl025009;
+        Sat, 11 Dec 2021 10:50:23 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cvstm0ha9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sat, 11 Dec 2021 10:50:23 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1BBAmHLW020921;
+        Sat, 11 Dec 2021 10:50:21 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma04fra.de.ibm.com with ESMTP id 3cvkm9hhrk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sat, 11 Dec 2021 10:50:20 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1BBAgSiO27525458
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sat, 11 Dec 2021 10:42:28 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 538165204F;
+        Sat, 11 Dec 2021 10:50:18 +0000 (GMT)
+Received: from smtpclient.apple (unknown [9.195.36.3])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 57BEC5204E;
+        Sat, 11 Dec 2021 10:50:17 +0000 (GMT)
+From:   Sachin Sant <sachinp@linux.vnet.ibm.com>
+Content-Type: text/plain;
+        charset=us-ascii
+Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
+Subject: [next-20211210] Build break powerpc/kvm: unknown member wait
+Message-Id: <496ECBB3-36F3-4F07-83B2-875F683BC446@linux.vnet.ibm.com>
+Date:   Sat, 11 Dec 2021 16:20:16 +0530
+Cc:     linux-next@vger.kernel.org, seanjc@google.com
+To:     kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+X-Mailer: Apple Mail (2.3654.120.0.1.13)
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: de0TqpFZK0zsbTO3n0TOsCdKJSibrJbP
+X-Proofpoint-ORIG-GUID: 3sa16O813q4o-hY-Y5_bORTbmHHoWpe2
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2021-12-11_04,2021-12-10_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ impostorscore=0 clxscore=1011 mlxscore=0 phishscore=0 spamscore=0
+ bulkscore=0 mlxlogscore=836 adultscore=0 priorityscore=1501 suspectscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2112110056
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Dec 11, 2021 at 2:39 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Fri, Dec 10, 2021, Ignat Korchagin wrote:
-> > I've been trying to figure out the difference between "good" runs and
-> > "bad" runs of gvisor. So, if I've been running the following bpftrace
-> > onliner:
->
-> ...
->
-> > That is, I never get a stack with
-> > kvm_tdp_mmu_put_root->..->kvm_set_pfn_dirty with a "good" run.
-> > Perhaps, this may shed some light onto what is going on.
->
-> Hmm, a little?
->
-> Based on the WARN backtrace, KVM encounters an entire chain of valid, present TDP
-> MMU paging structures _after_ exit_mm() in the do_exit() path, as the call to
-> task_work_run() in do_exit() occurs after exit_mm().
->
-> That means that kvm_mmu_zap_all() is guaranteed to have been called before the
-> fatal kvm_arch_destroy_vm(), as either:
->
->   a) exit_mm() put the last reference to mm_users and thus called __mmput ->
->      exit_mmap() -> mmu_notifier_release() -> ... -> kvm_mmu_zap_all().
->
->   b) Something else had a reference to mm_users, and so KVM's ->release hook was
->      invoked by kvm_destroy_vm() -> mmu_notifier_unregister().
->
-> It's probably fairly safe to assume this is a TDP MMU bug, which rules out races
-> or bad refcounts in other areas.
+next-20211210 ( commit ea922272cbe547) powerpc build fails due to =
+following error:
 
-Most likely. Currently we're using kvm.tdp_mmu=0 kernel cmdline as a
-workaround and haven't encountered any issues.
+arch/powerpc/kvm/book3s_hv.c: In function 'kvmhv_run_single_vcpu':
+arch/powerpc/kvm/book3s_hv.c:4591:27: error: 'struct kvm_vcpu' has no =
+member named 'wait'
+   prepare_to_rcuwait(&vcpu->wait);
+                           ^~
+arch/powerpc/kvm/book3s_hv.c:4608:23: error: 'struct kvm_vcpu' has no =
+member named 'wait'
+   finish_rcuwait(&vcpu->wait);
+                       ^~=20
 
-> That means that KVM (a) is somehow losing track of a root, (b) isn't zapping all
-> SPTEs in kvm_mmu_zap_all(), or (c) is installing a SPTE after the mm has been released.
->
-> (a) is unlikely because kvm_tdp_mmu_get_vcpu_root_hpa() is the only way for a
-> vCPU to get a reference, and it holds mmu_lock for write, doesn't yield, and
-> either gets a root from the list or adds a root to the list.
->
-> (b) is unlikely because I would expect the fallout to be much larger and not
-> unique to your setup.
->
-> That leaves (c), which isn't all that likely either.  I can think of a variety of
-> ways KVM might write a defunct SPTE, but I can't concoct a scenario where an
-> entire tree of a present paging structures is written.
->
-> Can you run with the below debug patch and see if you get a hit in the failure
-> scenario?  Or possibly even a non-failure scenario?  This should either confirm
-> or rule out (c).
->
->
-> ---
->  arch/x86/kvm/mmu/mmu.c     | 2 ++
->  arch/x86/kvm/mmu/tdp_mmu.c | 5 +++++
->  include/linux/kvm_host.h   | 2 ++
->  3 files changed, 9 insertions(+)
->
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 1ccee4d17481..e4e283a38570 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -5939,6 +5939,8 @@ void kvm_mmu_zap_all(struct kvm *kvm)
->         LIST_HEAD(invalid_list);
->         int ign;
->
-> +       atomic_set(&kvm->mm_released, 1);
-> +
->         write_lock(&kvm->mmu_lock);
->  restart:
->         list_for_each_entry_safe(sp, node, &kvm->arch.active_mmu_pages, link) {
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index b69e47e68307..432ccf05f446 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -504,6 +504,9 @@ static inline bool tdp_mmu_set_spte_atomic(struct kvm *kvm,
->  {
->         lockdep_assert_held_read(&kvm->mmu_lock);
->
-> +       WARN_ON(atomic_read(&kvm->mm_released) &&
-> +               new_spte && !is_removed_spte(new_spte));
-> +
->         /*
->          * Do not change removed SPTEs. Only the thread that froze the SPTE
->          * may modify it.
-> @@ -577,6 +580,8 @@ static inline void __tdp_mmu_set_spte(struct kvm *kvm, struct tdp_iter *iter,
->  {
->         lockdep_assert_held_write(&kvm->mmu_lock);
->
-> +       WARN_ON(atomic_read(&kvm->mm_released) && new_spte);
-> +
->         /*
->          * No thread should be using this function to set SPTEs to the
->          * temporary removed SPTE value.
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index e7bfcc3b6b0b..8e76e2f6c3be 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -569,6 +569,8 @@ struct kvm {
->
->         struct mutex slots_lock;
->
-> +       atomic_t mm_released;
-> +
->         /*
->          * Protects the arch-specific fields of struct kvm_memory_slots in
->          * use by the VM. To be used under the slots_lock (above) or in a
->
-> base-commit: 1c10f4b4877ffaed602d12ff8cbbd5009e82c970
-> --
+commit 510958e997217: KVM: Force PPC to define its own rcuwait object=20
+introduced the error.=20
 
-Thanks. Applied the patch, but no warnings are triggered neither in
-"good" case nor in "bad" case.
-
-Ignat
+Thanks
+-Sachin=
