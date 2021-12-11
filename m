@@ -2,118 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 30A4F47114C
-	for <lists+kvm@lfdr.de>; Sat, 11 Dec 2021 04:41:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C910471152
+	for <lists+kvm@lfdr.de>; Sat, 11 Dec 2021 04:48:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238675AbhLKDov (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Dec 2021 22:44:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42062 "EHLO
+        id S1345806AbhLKDwQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Dec 2021 22:52:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237709AbhLKDou (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Dec 2021 22:44:50 -0500
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66220C061746
-        for <kvm@vger.kernel.org>; Fri, 10 Dec 2021 19:41:14 -0800 (PST)
-Received: by mail-wr1-x431.google.com with SMTP id q3so17978363wru.5
-        for <kvm@vger.kernel.org>; Fri, 10 Dec 2021 19:41:14 -0800 (PST)
+        with ESMTP id S236273AbhLKDwQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Dec 2021 22:52:16 -0500
+Received: from mail-oo1-xc31.google.com (mail-oo1-xc31.google.com [IPv6:2607:f8b0:4864:20::c31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46DEAC061714
+        for <kvm@vger.kernel.org>; Fri, 10 Dec 2021 19:48:40 -0800 (PST)
+Received: by mail-oo1-xc31.google.com with SMTP id w15-20020a4a9d0f000000b002c5cfa80e84so2864645ooj.5
+        for <kvm@vger.kernel.org>; Fri, 10 Dec 2021 19:48:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
+        d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=EO75poJK2xgDITlrG7RVKgMYEM37BaniCA9cW2F8IAE=;
-        b=UUDpGaZ4TlqJucB7PlMbEakgQYttvolbBk2bus1Xxo0uqDAkjBhl6iolgunNvqfE4U
-         3KMqZsunqRx3/AcboOFf5R27X31eWeINs/lCdD0CN8XoBYreShHbrLW7XS8g2GI4cW6a
-         /XIe8l8fwtz17Yzq3YFS59etRNEVvfce/S12CxewPjX9R7+NV+Mzwy55+yF8c43a8rHT
-         P+B+9Bq+1n6YJYgJCOEaFak1CQozKjbeQHcE6+Objr962V5BNP2bjfK+cKL0xHYt+iYf
-         8BZizLTYTR72actmkvGRv0lVG7Zz42wUizEILE+4S6d+kPg/YiunXbps391KW8V9kpk5
-         nupQ==
+        bh=+DAiWwhbhf5mzupY++s4IWYZHYOZ9W8B0LFJHzjR4SI=;
+        b=YxowbIUKlq3wkGPorar1DdyK8l3BCxozc2EV6JQV4fiA+VDVLgHmk6ME1DwUsLx8St
+         AvXWGHWM6B48Uk5oi0GyB7b7CtP4DxriI7XxA+kqp0E6FuW+mN1KqsjxazCRHPNovgyR
+         pZotyZ6W35hQbRMW6vaOzQrttmBSe7aKT2NgPeWhZsjZaoU47EV/KoCnjGrMTCbRNnZT
+         EFKCvUHGNSn0Sdiv+EWNOrH46j6vtuoIsyXK4YELqt5Rp3VTfXeh5yALVFpzFReTxIko
+         55fKgEzy7eboqKDWd2L9WfAFE0vF9tlGzH+YD8Qa5j6uipqbBOHE6am8N/58bnC4ZG8w
+         uVdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=EO75poJK2xgDITlrG7RVKgMYEM37BaniCA9cW2F8IAE=;
-        b=Bbklu0n+Vv9GFIEaj7SCCwer/n2UU/Mec9V8hncwaBc1z8rcMw+qKf79OfZmw8YCzK
-         96HvnNrrmIi+Rgd5VK9m3Nl4sNEN3Z2KocZACiJQsJV6RlVGRMzDImW63gWlvaNSkTBu
-         yIsFiHHun7rKItkJbWKbWHN1LSvAoThyCfqMzs7DNETpxtyTHv7Mvr3N+3PT2JsITBiq
-         qdDzC82Wgk3Z7LOWrtCEhrPudyw1HJXVF3QlomQ9Zzb/aIATkiiMzMmt6TqpyCnl/mzA
-         6KvptIqWGxXiRIt24VuKry3sq3oIl0v4kNOjMebru0fltoIakLOR6sKwONM4y0W1XmKV
-         6PcQ==
-X-Gm-Message-State: AOAM531pVqsv0mLwjT8CVXiiJ3+oSGrJPRl2YYYUe8SSskfcy4Kf4QZZ
-        peyFYZcVw9t++pBuPeI4oj6HZq7udMUePY+jA3s1zA==
-X-Google-Smtp-Source: ABdhPJxU5WTGxoPImoqEQQ34iwc3zq+NMIe3iv94HfKYLahaxjZujpAul0sWWjXgr8vVvi8pSAKSsitBxMOpHCyl5ZY=
-X-Received: by 2002:adf:eb0f:: with SMTP id s15mr2303012wrn.690.1639194072549;
- Fri, 10 Dec 2021 19:41:12 -0800 (PST)
+        bh=+DAiWwhbhf5mzupY++s4IWYZHYOZ9W8B0LFJHzjR4SI=;
+        b=qcOFfM3+M6Hn0U7kS7XI/HG3TeSGfYDhqICuf++L1+CdmA3wYQRXyNNYNw6D/Kd9zN
+         b1bWx2VOd+AjcuRNbR9SF33dLPWIyujwuC6CdB6lWSv10WCDqii1vgR+OKASRuIkQ6Hb
+         6eOiYaYpeBkov8Txa31qUJguWDxbYs61Gve+l7GJgIg8B2xdCtEYEInDgEAqAIdCREAi
+         iB8EIQILdlj6N65y6pnzroa6yi3J2+wTk2/g6bY6etdVRzS6L10L7awze6s32NQErgcP
+         j3GO73ydk30uteiBc1Ht92BqjnZdtw/9NMFRGepk11pWLIbM3XdHDdDPKt9prYTIAiw6
+         k1+A==
+X-Gm-Message-State: AOAM530Ik2X4vjt9HP0dThqN1Foq2x/3Elk6ZZ+JDWQfhsdcZV1rWawb
+        sZnZ67cf0HLS8vW/iax2PmHRXOqUfNJmf6c/7HB73MyfOmQotg==
+X-Google-Smtp-Source: ABdhPJzQ3WEnpBZx1+MKClb8xTkWkqLKlVYYUvJBIikKDOS7TwrepwTdpFxygZgNVXHMAGcTGlKSeBwkRAQTG86lRSc=
+X-Received: by 2002:a4a:3042:: with SMTP id z2mr10915248ooz.47.1639194519067;
+ Fri, 10 Dec 2021 19:48:39 -0800 (PST)
 MIME-Version: 1.0
-References: <20211129075451.418122-1-anup.patel@wdc.com>
-In-Reply-To: <20211129075451.418122-1-anup.patel@wdc.com>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Sat, 11 Dec 2021 09:11:01 +0530
-Message-ID: <CAAhSdy3S5HAYh24mH7JpZKSnk4Vjrw2SJToAHaMjyegwiR4XXg@mail.gmail.com>
-Subject: Re: [PATCH v2 0/4] KVM RISC-V 64-bit selftests support
+References: <20211117080304.38989-1-likexu@tencent.com> <c840f1fe-5000-fb45-b5f6-eac15e205995@redhat.com>
+ <CALMp9eRA8hw9zVEwnZEX56Gao-MibX5A+XXYS-n-+X0BkhrSvQ@mail.gmail.com> <438d42de-78e1-0ce9-6a06-38194de4abd4@redhat.com>
+In-Reply-To: <438d42de-78e1-0ce9-6a06-38194de4abd4@redhat.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Fri, 10 Dec 2021 19:48:27 -0800
+Message-ID: <CALMp9eSLU1kfffC3Du58L8iPY6LmKyVO0yU7c3wEnJAD9JZw4w@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86/svm: Add module param to control PMU virtualization
 To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Shuah Khan <shuah@kernel.org>, Atish Patra <atishp@atishpatra.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        KVM General <kvm@vger.kernel.org>,
-        kvm-riscv@lists.infradead.org,
-        linux-riscv <linux-riscv@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
-        linux-kselftest@vger.kernel.org, Anup Patel <anup.patel@wdc.com>
+Cc:     Like Xu <like.xu.linux@gmail.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Paolo,
+On Fri, Dec 10, 2021 at 6:15 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 12/10/21 20:25, Jim Mattson wrote:
+> > In the long run, I'd like to be able to override this system-wide
+> > setting on a per-VM basis, for VMs that I trust. (Of course, this
+> > implies that I trust the userspace process as well.)
+> >
+> > How would you feel if we were to add a kvm ioctl to override this
+> > setting, for a particular VM, guarded by an appropriate permissions
+> > check, like capable(CAP_SYS_ADMIN) or capable(CAP_SYS_MODULE)?
+>
+> What's the rationale for guarding this with a capability check?  IIRC
+> you don't have such checks for perf_event_open (apart for getting kernel
+> addresses, which is not a problem for virtualization).
 
-On Mon, Nov 29, 2021 at 1:40 PM Anup Patel <anup.patel@wdc.com> wrote:
->
-> This series adds initial support for testing KVM RISC-V 64-bit using
-> kernel selftests framework. The PATCH1 & PATCH2 of this series does
-> some ground work in KVM RISC-V to implement RISC-V support in the KVM
-> selftests whereas remaining patches does required changes in the KVM
-> selftests.
->
-> These patches can be found in riscv_kvm_selftests_v2 branch at:
-> https://github.com/avpatel/linux.git
->
-> Changes since v1:
->  - Renamed kvm_sbi_ext_expevend_handler() to kvm_sbi_ext_forward_handler()
->    in PATCH1
->  - Renamed KVM_CAP_RISCV_VM_GPA_SIZE to KVM_CAP_VM_GPA_BITS in PATCH2
->    and PATCH4
->
-> Anup Patel (4):
->   RISC-V: KVM: Forward SBI experimental and vendor extensions
->   RISC-V: KVM: Add VM capability to allow userspace get GPA bits
->   KVM: selftests: Add EXTRA_CFLAGS in top-level Makefile
->   KVM: selftests: Add initial support for RISC-V 64-bit
-
-Any further comments on this series ?
-
-Regards,
-Anup
-
->
->  arch/riscv/include/asm/kvm_host.h             |   1 +
->  arch/riscv/kvm/mmu.c                          |   5 +
->  arch/riscv/kvm/vcpu_sbi.c                     |   4 +
->  arch/riscv/kvm/vcpu_sbi_base.c                |  27 ++
->  arch/riscv/kvm/vm.c                           |   3 +
->  include/uapi/linux/kvm.h                      |   1 +
->  tools/testing/selftests/kvm/Makefile          |  14 +-
->  .../testing/selftests/kvm/include/kvm_util.h  |  10 +
->  .../selftests/kvm/include/riscv/processor.h   | 135 +++++++
->  tools/testing/selftests/kvm/lib/guest_modes.c |  10 +
->  .../selftests/kvm/lib/riscv/processor.c       | 362 ++++++++++++++++++
->  tools/testing/selftests/kvm/lib/riscv/ucall.c |  87 +++++
->  12 files changed, 658 insertions(+), 1 deletion(-)
->  create mode 100644 tools/testing/selftests/kvm/include/riscv/processor.h
->  create mode 100644 tools/testing/selftests/kvm/lib/riscv/processor.c
->  create mode 100644 tools/testing/selftests/kvm/lib/riscv/ucall.c
->
-> --
-> 2.25.1
->
+My reasoning was simply that for userspace to override a mode 0444
+kernel module parameter, it should have the rights to reload the
+module with the parameter override. I wasn't thinking specifically
+about PMU capabilities.
