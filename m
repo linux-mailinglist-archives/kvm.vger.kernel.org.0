@@ -2,234 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F39647143C
-	for <lists+kvm@lfdr.de>; Sat, 11 Dec 2021 15:27:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 23A5247150E
+	for <lists+kvm@lfdr.de>; Sat, 11 Dec 2021 18:47:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231226AbhLKO1U (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 11 Dec 2021 09:27:20 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:32912 "EHLO
-        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229924AbhLKO1T (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 11 Dec 2021 09:27:19 -0500
-Received: from dggpeml500025.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4JB9865f6Lzcbl1;
-        Sat, 11 Dec 2021 22:27:02 +0800 (CST)
-Received: from dggpeml100016.china.huawei.com (7.185.36.216) by
- dggpeml500025.china.huawei.com (7.185.36.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Sat, 11 Dec 2021 22:27:17 +0800
-Received: from DESKTOP-27KDQMV.china.huawei.com (10.174.148.223) by
- dggpeml100016.china.huawei.com (7.185.36.216) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Sat, 11 Dec 2021 22:27:16 +0800
-From:   "Longpeng(Mike)" <longpeng2@huawei.com>
-To:     <pbonzini@redhat.com>, <alex.williamson@redhat.com>,
-        <mst@redhat.com>, <mtosatti@redhat.com>
-CC:     <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>,
-        <arei.gonglei@huawei.com>, Longpeng <longpeng2@huawei.com>
-Subject: [PATCH 2/2] kvm/msi: do explicit commit when adding msi routes
-Date:   Sat, 11 Dec 2021 22:27:03 +0800
-Message-ID: <20211211142703.1941-3-longpeng2@huawei.com>
-X-Mailer: git-send-email 2.25.0.windows.1
-In-Reply-To: <20211211142703.1941-1-longpeng2@huawei.com>
-References: <20211211142703.1941-1-longpeng2@huawei.com>
+        id S229724AbhLKRr1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 11 Dec 2021 12:47:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55666 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229456AbhLKRr0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 11 Dec 2021 12:47:26 -0500
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 761C0C061714
+        for <kvm@vger.kernel.org>; Sat, 11 Dec 2021 09:47:26 -0800 (PST)
+Received: by mail-lf1-x12b.google.com with SMTP id cf39so11480776lfb.8
+        for <kvm@vger.kernel.org>; Sat, 11 Dec 2021 09:47:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=duVrd96PNRshWKtg4UOlv42sD0qi3K1fzHB5Mspl/Ko=;
+        b=QCeACeMXD8DaL2BL5PZ+mEJmegRIOcsHYaoANjrLNBtTQk4dK9qzAPKZoORJ7lszWA
+         FzGjPNyuwpIjiSPwK2wHSKRQLtzMM587r36d1pXcEG5jgHk7Qe7rp1En/VgwDGHwAc+5
+         DP9yOY+68yArWwHHNmtyflDc9lJzlOrSeg2uZ9qxriKM/mrBcyWIDaGffN2aUNLigv3e
+         PGTk8PbBoDfyjU3d3guvhZ8Ve9OT3REugAsv7iN3VlUN5FlBYOxZzGGbe7zXhI2E1IPG
+         jbNhv1jk65kafqPxtbVtYtkex+Wn4AnPTH3vqNLvpwVWfIyu9MubA5Ui9TcoQNlGzO2N
+         fCAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=duVrd96PNRshWKtg4UOlv42sD0qi3K1fzHB5Mspl/Ko=;
+        b=jpwaMarNYVIT5E/sldu+TWoWM66iDPVc6Qlce+YtcwbyH14zx5AL/oSZZcp4dUIjoJ
+         /UDJEL4OYiwuL0zMiHjwA+MgagD9iJFKd7SC4cy4WOiA1b3pNWKqaCDlSfDlwc2beH5d
+         rOMw+4wVYzRQin6svxlZSI6zEeATX+z4Ar1jN4tIwNos8IQdlrf8T9CWmdi6GUNOR5AR
+         Ib+d98Hnhvftn5sMhptsJrFr6cPxzHhaJ3jO3gooptfO7uqRIsuSa1mZo1md6uyZ+UHg
+         iRuGcXG+EQJVx8x29uEfOld9FKYNxUrY7hslHphOt+uyx+UsNiEzuyXJwYOl4SKUmJ9R
+         Ez9A==
+X-Gm-Message-State: AOAM531l+Wj8za39tmA+xZ4Bck8MqSSQ3qqwwABYI34oV/C/xtQMOFYu
+        RPbzE5zvFzUYsGyN97aSvW1ZnixD6keQLKJ2qizozQ==
+X-Google-Smtp-Source: ABdhPJxNE8S9ES8bR36etOmpzMEtkh7K6QbS5Pp+C+L2iNC7nNAOaBy5T0rURuBjGGM+uNj+lBdlyLcRgrQEqko2/Wg=
+X-Received: by 2002:a05:6512:3503:: with SMTP id h3mr20039161lfs.235.1639244844213;
+ Sat, 11 Dec 2021 09:47:24 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.174.148.223]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpeml100016.china.huawei.com (7.185.36.216)
-X-CFilter-Loop: Reflected
+References: <CALrw=nEaWhpG1y7VNTGDFfF1RWbPvm5ka5xWxD-YWTS3U=r9Ng@mail.gmail.com>
+ <d49e157a-5915-fbdc-8103-d7ba2621aea9@redhat.com> <CALrw=nHTJpoSFFadmDL2EL95D2kAiH5G-dgLvU0L7X=emxrP2A@mail.gmail.com>
+ <YaaIRv0n2E8F5YpX@google.com> <CALrw=nGrAhSn=MkW-wvNr=UnaS5=t24yY-TWjSvcNJa1oJ85ww@mail.gmail.com>
+ <CALrw=nE+yGtRi-0bFFwXa9R8ydHKV7syRYeAYuC0EBTvdFiidQ@mail.gmail.com>
+ <CALzav=fyaXAn4CLRW2qKTrROGUh6+F4bphhfoMZ13Qp5Njx3gw@mail.gmail.com> <e995aceb-40cc-e4cc-f3c8-2e8c2877a896@redhat.com>
+In-Reply-To: <e995aceb-40cc-e4cc-f3c8-2e8c2877a896@redhat.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Sat, 11 Dec 2021 09:46:57 -0800
+Message-ID: <CALzav=d2-Q2GfuSZYo7J-SZyt9vH7GLZeSTNYtKPE=H+p0RLsw@mail.gmail.com>
+Subject: Re: Potential bug in TDP MMU
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Ignat Korchagin <ignat@cloudflare.com>, kvm@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>, stevensd@chromium.org,
+        kernel-team <kernel-team@cloudflare.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Longpeng <longpeng2@huawei.com>
+On Fri, Dec 10, 2021 at 5:49 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 12/11/21 02:34, David Matlack wrote:
+> > The stacks help, thanks for including them. It seems like a race
+> > during do_exit teardown. One thing I notice is that
+> > do_exit->mmput->kvm_mmu_zap_all can interleave with
+> > kvm_vcpu_release->kvm_tdp_mmu_put_root (full call chains omitted),
+> > since the former path allows yielding. But I don't yet see that could
+> > lead to any issues, let alone cause us to encounter a PFN in the EPT
+> > with a zero refcount.
+>
+> Can it? The call chains are
+>
+>      zap_gfn_range+2229
+>      kvm_tdp_mmu_put_root+465
+>      kvm_mmu_free_roots+629
+>      kvm_mmu_unload+28
+>      kvm_arch_destroy_vm+510
+>      kvm_put_kvm+1017
+>      kvm_vcpu_release+78
+>      __fput+516
+>      task_work_run+206
+>      do_exit+2615
+>      do_group_exit+236
+>
+> and
+>
+>      zap_gfn_range+2229
+>      __kvm_tdp_mmu_zap_gfn_range+162
+>      kvm_tdp_mmu_zap_all+34
+>      kvm_mmu_zap_all+518
+>      kvm_mmu_notifier_release+83
+>      __mmu_notifier_release+420
+>      exit_mmap+965
+>      mmput+167
+>      do_exit+2482
+>      do_group_exit+236
+>
+> but there can be no parallelism or interleaving here, because the call
+> to kvm_vcpu_release() is scheduled in exit_files() (and performed in
+> exit_task_work()).  That comes after exit_mm(), where mmput() is called.
 
-We invoke commit operation for each addition to msi route table, this
-is not efficient if we are adding lots of routes in some cases (e.g.
-the resume phase of vfio migration [1]).
+Ah I was thinking each thread in the process would be run do_exit()
+concurrently (first thread enters mmput() but the refcount is not at
+zero and proceeds to task_work_run, second enters mmput() and the
+refcount is at zero and invokes notifier->release()).
 
-This patch moves the call to kvm_irqchip_commit_routes() to the callers,
-so the callers can decide how to optimize.
-
-[1] https://lists.gnu.org/archive/html/qemu-devel/2021-11/msg00967.html
-
-Signed-off-by: Longpeng <longpeng2@huawei.com>
----
- accel/kvm/kvm-all.c    | 7 ++++---
- accel/stubs/kvm-stub.c | 2 +-
- hw/misc/ivshmem.c      | 5 ++++-
- hw/vfio/pci.c          | 5 ++++-
- hw/virtio/virtio-pci.c | 4 +++-
- include/sysemu/kvm.h   | 4 ++--
- target/i386/kvm/kvm.c  | 4 +++-
- 7 files changed, 21 insertions(+), 10 deletions(-)
-
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index eecd8031cf..ba35477272 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -1955,10 +1955,11 @@ int kvm_irqchip_send_msi(KVMState *s, MSIMessage msg)
-     return kvm_set_irq(s, route->kroute.gsi, 1);
- }
- 
--int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
-+int kvm_irqchip_add_msi_route(KVMRouteChange *c, int vector, PCIDevice *dev)
- {
-     struct kvm_irq_routing_entry kroute = {};
-     int virq;
-+    KVMState *s = c->s;
-     MSIMessage msg = {0, 0};
- 
-     if (pci_available && dev) {
-@@ -1998,7 +1999,7 @@ int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
- 
-     kvm_add_routing_entry(s, &kroute);
-     kvm_arch_add_msi_route_post(&kroute, vector, dev);
--    kvm_irqchip_commit_routes(s);
-+    c->changes++;
- 
-     return virq;
- }
-@@ -2156,7 +2157,7 @@ int kvm_irqchip_send_msi(KVMState *s, MSIMessage msg)
-     abort();
- }
- 
--int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
-+int kvm_irqchip_add_msi_route(KVMRouteChange *c, int vector, PCIDevice *dev)
- {
-     return -ENOSYS;
- }
-diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
-index 5319573e00..ae6e8e9aa7 100644
---- a/accel/stubs/kvm-stub.c
-+++ b/accel/stubs/kvm-stub.c
-@@ -81,7 +81,7 @@ int kvm_on_sigbus(int code, void *addr)
- }
- 
- #ifndef CONFIG_USER_ONLY
--int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev)
-+int kvm_irqchip_add_msi_route(KVMRouteChange *c, int vector, PCIDevice *dev)
- {
-     return -ENOSYS;
- }
-diff --git a/hw/misc/ivshmem.c b/hw/misc/ivshmem.c
-index 1ba4a98377..5122e91b72 100644
---- a/hw/misc/ivshmem.c
-+++ b/hw/misc/ivshmem.c
-@@ -424,16 +424,19 @@ static void ivshmem_add_kvm_msi_virq(IVShmemState *s, int vector,
-                                      Error **errp)
- {
-     PCIDevice *pdev = PCI_DEVICE(s);
-+    KVMRouteChange c;
-     int ret;
- 
-     IVSHMEM_DPRINTF("ivshmem_add_kvm_msi_virq vector:%d\n", vector);
-     assert(!s->msi_vectors[vector].pdev);
- 
--    ret = kvm_irqchip_add_msi_route(kvm_state, vector, pdev);
-+    c = kvm_irqchip_begin_route_changes(kvm_state);
-+    ret = kvm_irqchip_add_msi_route(&c, vector, pdev);
-     if (ret < 0) {
-         error_setg(errp, "kvm_irqchip_add_msi_route failed");
-         return;
-     }
-+    kvm_irqchip_commit_route_changes(&c);
- 
-     s->msi_vectors[vector].virq = ret;
-     s->msi_vectors[vector].pdev = pdev;
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 7b45353ce2..d07a4e99b1 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -412,6 +412,7 @@ static int vfio_enable_vectors(VFIOPCIDevice *vdev, bool msix)
- static void vfio_add_kvm_msi_virq(VFIOPCIDevice *vdev, VFIOMSIVector *vector,
-                                   int vector_n, bool msix)
- {
-+    KVMRouteChange c;
-     int virq;
- 
-     if ((msix && vdev->no_kvm_msix) || (!msix && vdev->no_kvm_msi)) {
-@@ -422,11 +423,13 @@ static void vfio_add_kvm_msi_virq(VFIOPCIDevice *vdev, VFIOMSIVector *vector,
-         return;
-     }
- 
--    virq = kvm_irqchip_add_msi_route(kvm_state, vector_n, &vdev->pdev);
-+    c = kvm_irqchip_begin_route_changes(kvm_state);
-+    virq = kvm_irqchip_add_msi_route(&c, vector_n, &vdev->pdev);
-     if (virq < 0) {
-         event_notifier_cleanup(&vector->kvm_interrupt);
-         return;
-     }
-+    kvm_irqchip_commit_route_changes(&c);
- 
-     if (kvm_irqchip_add_irqfd_notifier_gsi(kvm_state, &vector->kvm_interrupt,
-                                        NULL, virq) < 0) {
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index 750aa47ec1..fc648c1e54 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -684,10 +684,12 @@ static int kvm_virtio_pci_vq_vector_use(VirtIOPCIProxy *proxy,
-     int ret;
- 
-     if (irqfd->users == 0) {
--        ret = kvm_irqchip_add_msi_route(kvm_state, vector, &proxy->pci_dev);
-+        KVMRouteChange c = kvm_irqchip_begin_route_changes(kvm_state);
-+        ret = kvm_irqchip_add_msi_route(&c, vector, &proxy->pci_dev);
-         if (ret < 0) {
-             return ret;
-         }
-+        kvm_irqchip_commit_route_changes(&c);
-         irqfd->virq = ret;
-     }
-     irqfd->users++;
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index ef143c2da4..03cb82a475 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -471,7 +471,7 @@ void kvm_init_cpu_signals(CPUState *cpu);
- 
- /**
-  * kvm_irqchip_add_msi_route - Add MSI route for specific vector
-- * @s:      KVM state
-+ * @c:      KVMRouteChange instance.
-  * @vector: which vector to add. This can be either MSI/MSIX
-  *          vector. The function will automatically detect whether
-  *          MSI/MSIX is enabled, and fetch corresponding MSI
-@@ -480,7 +480,7 @@ void kvm_init_cpu_signals(CPUState *cpu);
-  *          as @NULL, an empty MSI message will be inited.
-  * @return: virq (>=0) when success, errno (<0) when failed.
-  */
--int kvm_irqchip_add_msi_route(KVMState *s, int vector, PCIDevice *dev);
-+int kvm_irqchip_add_msi_route(KVMRouteChange *c, int vector, PCIDevice *dev);
- int kvm_irqchip_update_msi_route(KVMState *s, int virq, MSIMessage msg,
-                                  PCIDevice *dev);
- void kvm_irqchip_commit_routes(KVMState *s);
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index 5a698bde19..1290756308 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -4841,16 +4841,18 @@ void kvm_arch_init_irq_routing(KVMState *s)
-     kvm_gsi_routing_allowed = true;
- 
-     if (kvm_irqchip_is_split()) {
-+        KVMRouteChange c = kvm_irqchip_begin_route_changes(s);
-         int i;
- 
-         /* If the ioapic is in QEMU and the lapics are in KVM, reserve
-            MSI routes for signaling interrupts to the local apics. */
-         for (i = 0; i < IOAPIC_NUM_PINS; i++) {
--            if (kvm_irqchip_add_msi_route(s, 0, NULL) < 0) {
-+            if (kvm_irqchip_add_msi_route(&c, 0, NULL) < 0) {
-                 error_report("Could not enable split IRQ mode.");
-                 exit(1);
-             }
-         }
-+        kvm_irqchip_commit_route_changes(&c);
-     }
- }
- 
--- 
-2.23.0
-
+>
+> Even if the two could interleave, they go through the same zap_gfn_range
+> path.  That path takes the lock for write and only yields on the 512
+> top-level page structures.  Anything below is handled by
+> tdp_mmu_set_spte's (with mutual recursion between handle_changed_spte
+> and handle_removed_tdp_mmu_page), and there are no yields on that path.
+>
+> Paolo
