@@ -2,147 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9850E470FEA
-	for <lists+kvm@lfdr.de>; Sat, 11 Dec 2021 02:37:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 879B5470FFC
+	for <lists+kvm@lfdr.de>; Sat, 11 Dec 2021 02:49:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241105AbhLKBlQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 10 Dec 2021 20:41:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42682 "EHLO
+        id S239789AbhLKBwl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 10 Dec 2021 20:52:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232406AbhLKBlP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 10 Dec 2021 20:41:15 -0500
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA964C061714
-        for <kvm@vger.kernel.org>; Fri, 10 Dec 2021 17:37:39 -0800 (PST)
-Received: by mail-ed1-x535.google.com with SMTP id x15so35948922edv.1
-        for <kvm@vger.kernel.org>; Fri, 10 Dec 2021 17:37:39 -0800 (PST)
+        with ESMTP id S229462AbhLKBwl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 10 Dec 2021 20:52:41 -0500
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D1E8C061714
+        for <kvm@vger.kernel.org>; Fri, 10 Dec 2021 17:49:05 -0800 (PST)
+Received: by mail-ed1-x52a.google.com with SMTP id l25so35567832eda.11
+        for <kvm@vger.kernel.org>; Fri, 10 Dec 2021 17:49:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=sender:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=pzG/Li+M9QEbAKeuK7YjBwTyxjI6r5pab/36cXoNYk8=;
-        b=G58mbVf0M0S0PZ2vYal6M2Vr6sRfhKYUxx9g3Vz4swn2dyzmIEIzabhc0puq5k8Ytp
-         TSLH9ZGSYMQBK9rOFm/UQOZ9p6WOjKnHbL2tsckIvSfihRX/igGJm8mnYYkRtnhRvoIV
-         eBJSkxqDQ2WAyKoKm53u8EaK/DD/8WpTsU/M400hNkclxdbtmabNJhyVqt877HWjYExF
-         koVOEtGaRRsIoaIaWWGuFO08VqCzgCtuerRCLm/HqsganZcjUvM7UuAZbEFonwcOuNFf
-         xN87daMjU40wMl77+UEb3P/2bsnxkBEvsAaaQ8t6RYRo7FFV9hV1O2cDLiSrmuf+GsAU
-         KuAg==
+        bh=CtUEEf0nYmx09LAdIiwLN87OWs0KrNUSNDB3nl76mgs=;
+        b=WxBB0Vf9aKolqwS3o7uidMMn8Hxf4+SmCRYd38xaOV/yxIFVyj/gjyaEbePaVchn1J
+         foHs1r88nKTTFCGWIO184Dr/wmNR7H9T+a6ifnwvt5lDPJ/+XeLBf1WFQGjvk6zFJM4N
+         nyFVk2dGdTjovdk8emtse8KVWjpdt9D0FzCrd2DAJct1Va6Yk12Q8mIfnkJocOkMCub/
+         agnOSPv8WDXvBS1J887Gv3ens/NkUMJ3PRS1uYshKcLjoAea030qoon7qE5+J+NNnsWV
+         KLdxxKebHv6Z1WwEniAVPYy+LxlLPzhDhVZGI0SzVnOPlv5jgVPYe4EQRx4ZuuzEVN1n
+         tnHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
          :subject:content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=pzG/Li+M9QEbAKeuK7YjBwTyxjI6r5pab/36cXoNYk8=;
-        b=2kWMKKLjVf0aq+QO/DI/QfhmMX7joh9iQehOm/Lpfax/gsUkt/M1ry8Tl507YXnZcg
-         9UPL1GCnNU3UAxweemY5cz+EPXhz6dQkfsKcWdz5NbhhPukj7HAD2DnafTz26QEbH0IP
-         w+iX06qjtZiJnEhPGYLzQv51jmIQ/B+K535YewQTPm7yPU5I/CqULglqjVsT5kN3P7JY
-         lwKBdRmhAJcPUVNrOxIW50EmmnNBonXU3RrNT72h+aE5QfTJRqKxc63rImqlUaUtkU7e
-         yu1NtFF7nQEYtZyjcibiuSYmZe2m24T66PtAGGmRpmvh2/gFhGs2Bvo/oPBEEXh/ZkFZ
-         zYYA==
-X-Gm-Message-State: AOAM530txPYe8V1yIXQs1kp9FbUKlkXavEN7xE2Lj1GgTNzAUcDcbyUW
-        hpHrKNjvhOUFAlQuvnZpxa0=
-X-Google-Smtp-Source: ABdhPJynlw/SBVQTFMqkSUafTkhVK8OLd0tcMIVyxIyT2yMTp1HrkCCth0effvKqfnZX1SEOld45dw==
-X-Received: by 2002:a17:906:fb0e:: with SMTP id lz14mr28531282ejb.108.1639186658368;
-        Fri, 10 Dec 2021 17:37:38 -0800 (PST)
+        bh=CtUEEf0nYmx09LAdIiwLN87OWs0KrNUSNDB3nl76mgs=;
+        b=pWDfhJYQS81G/ppGAltwRxzvq48e6Ww7D/PpuczBGEdOfn72JBJg0Kkb9RyZ3gao6Y
+         HR0vpCwaJ21yVdWSb9AHzhA3gSPojCKumpvhwCEhwNIfCrvEw0eiMVRM/0dLFilmfmLp
+         Av1q1hzsS5o/bG84SwwiyE8NSdUevBHEZKGse5trrFba/Vi1O4J/XoMQngGmSzlSJMqc
+         kUbRN4fp2pV7j3Aoh63ftABAz6MSzFD1ki1joWBukPFoQyJZq1jkoC3ceen+cky9CV+T
+         PuUfyCKgafqrPYAs1dNJfvANfIUyef3Oit/H6oxh0ZuRLqUvL9v48hko+xUjTrZC4a4y
+         CA8A==
+X-Gm-Message-State: AOAM531keUy/E7NFoAfCyZSEJIv3Sk/npUcLrBzqyqVeH/ATbScqShDi
+        xRitd8Z4bHs8lrMfMnr4brjZRs7/nlw=
+X-Google-Smtp-Source: ABdhPJz0Bu/XNCGU1cOhATSO5zzCuGLKAMn/lnf9EFaT06KpKxpO1ap6Cvwec2KitdEJD8zTa6GAOw==
+X-Received: by 2002:a50:ce4a:: with SMTP id k10mr44436312edj.31.1639187343704;
+        Fri, 10 Dec 2021 17:49:03 -0800 (PST)
 Received: from ?IPV6:2001:b07:6468:f312:48f9:bea:a04c:3dfe? ([2001:b07:6468:f312:48f9:bea:a04c:3dfe])
-        by smtp.googlemail.com with ESMTPSA id eg8sm2192903edb.75.2021.12.10.17.37.37
+        by smtp.googlemail.com with ESMTPSA id ne33sm2363211ejc.6.2021.12.10.17.49.02
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Dec 2021 17:37:37 -0800 (PST)
+        Fri, 10 Dec 2021 17:49:03 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <77dabd5d-b9aa-1fc7-b555-dae67dc6f272@redhat.com>
-Date:   Sat, 11 Dec 2021 02:37:36 +0100
+Message-ID: <e995aceb-40cc-e4cc-f3c8-2e8c2877a896@redhat.com>
+Date:   Sat, 11 Dec 2021 02:49:02 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.2.0
 Subject: Re: Potential bug in TDP MMU
 Content-Language: en-US
-To:     Ignat Korchagin <ignat@cloudflare.com>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>, stevensd@chromium.org,
-        kernel-team <kernel-team@cloudflare.com>
+To:     David Matlack <dmatlack@google.com>,
+        Ignat Korchagin <ignat@cloudflare.com>
+Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
+        stevensd@chromium.org, kernel-team <kernel-team@cloudflare.com>
 References: <CALrw=nEaWhpG1y7VNTGDFfF1RWbPvm5ka5xWxD-YWTS3U=r9Ng@mail.gmail.com>
  <d49e157a-5915-fbdc-8103-d7ba2621aea9@redhat.com>
  <CALrw=nHTJpoSFFadmDL2EL95D2kAiH5G-dgLvU0L7X=emxrP2A@mail.gmail.com>
  <YaaIRv0n2E8F5YpX@google.com>
  <CALrw=nGrAhSn=MkW-wvNr=UnaS5=t24yY-TWjSvcNJa1oJ85ww@mail.gmail.com>
  <CALrw=nE+yGtRi-0bFFwXa9R8ydHKV7syRYeAYuC0EBTvdFiidQ@mail.gmail.com>
+ <CALzav=fyaXAn4CLRW2qKTrROGUh6+F4bphhfoMZ13Qp5Njx3gw@mail.gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <CALrw=nE+yGtRi-0bFFwXa9R8ydHKV7syRYeAYuC0EBTvdFiidQ@mail.gmail.com>
+In-Reply-To: <CALzav=fyaXAn4CLRW2qKTrROGUh6+F4bphhfoMZ13Qp5Njx3gw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/11/21 00:04, Ignat Korchagin wrote:
-> That is, I never get a stack with
-> kvm_tdp_mmu_put_root->..->kvm_set_pfn_dirty with a "good" run.
-> Perhaps, this may shed some light onto what is going on.
+On 12/11/21 02:34, David Matlack wrote:
+> The stacks help, thanks for including them. It seems like a race
+> during do_exit teardown. One thing I notice is that
+> do_exit->mmput->kvm_mmu_zap_all can interleave with
+> kvm_vcpu_release->kvm_tdp_mmu_put_root (full call chains omitted),
+> since the former path allows yielding. But I don't yet see that could
+> lead to any issues, let alone cause us to encounter a PFN in the EPT
+> with a zero refcount.
 
-Maybe not kvm_tdp_mmu_put_root->...->kvm_set_pfn_dirty per se, but
-do_exit->kvm_tdp_mmu_put_root->...->kvm_set_pfn_dirty seems to be
-part of the problem.
+Can it? The call chains are
 
-Both kvm_set_pfn_dirty and kvm_set_pfn_accessed, which is where
-execution really goes in the weeds, have this conditional:
+     zap_gfn_range+2229
+     kvm_tdp_mmu_put_root+465
+     kvm_mmu_free_roots+629
+     kvm_mmu_unload+28
+     kvm_arch_destroy_vm+510
+     kvm_put_kvm+1017
+     kvm_vcpu_release+78
+     __fput+516
+     task_work_run+206
+     do_exit+2615
+     do_group_exit+236
 
-	if (!kvm_is_reserved_pfn(pfn) && !kvm_is_zone_device_pfn(pfn))
-		...
+and
 
-And indeed kvm_is_zone_device_pfn(pfn) returns false if the WARN_ON_ONCE
-fires.  What happens is that the page has already been released by the
-process's exiting, so it has no A/D tracking anymore.  But the conditional
-is true and bad things happen in workingset_activation: while
-!page_count(pfn_to_page(pfn)) is definitely not a ZONE_DEVICE page,
-it's _also_ not a page that should be marked dirty or accessed.
+     zap_gfn_range+2229
+     __kvm_tdp_mmu_zap_gfn_range+162
+     kvm_tdp_mmu_zap_all+34
+     kvm_mmu_zap_all+518
+     kvm_mmu_notifier_release+83
+     __mmu_notifier_release+420
+     exit_mmap+965
+     mmput+167
+     do_exit+2482
+     do_group_exit+236
 
-Something like the following, while completely wrong or at least nothing
-more than a bandaid, should at least avoid the worst consequences of the
-bug:
+but there can be no parallelism or interleaving here, because the call 
+to kvm_vcpu_release() is scheduled in exit_files() (and performed in 
+exit_task_work()).  That comes after exit_mm(), where mmput() is called.
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 168d0ab93c88..699455715699 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -176,6 +176,14 @@ bool kvm_is_zone_device_pfn(kvm_pfn_t pfn)
-  	return is_zone_device_page(pfn_to_page(pfn));
-  }
-  
-+static inline bool kvm_pfn_has_accessed_dirty(kvm_pfn_t pfn)
-+{
-+	if (!pfn_valid(pfn) || !page_count(pfn_to_page(pfn)))
-+		return false;
-+
-+	return !PageReserved(pfn_to_page(pfn)) || is_zero_pfn(pfn);
-+}
-+
-  bool kvm_is_reserved_pfn(kvm_pfn_t pfn)
-  {
-  	/*
-@@ -2812,14 +2820,14 @@ EXPORT_SYMBOL_GPL(kvm_release_pfn_dirty);
-  
-  void kvm_set_pfn_dirty(kvm_pfn_t pfn)
-  {
--	if (!kvm_is_reserved_pfn(pfn) && !kvm_is_zone_device_pfn(pfn))
-+	if (kvm_pfn_has_accessed_dirty(pfn))
-  		SetPageDirty(pfn_to_page(pfn));
-  }
-  EXPORT_SYMBOL_GPL(kvm_set_pfn_dirty);
-  
-  void kvm_set_pfn_accessed(kvm_pfn_t pfn)
-  {
--	if (!kvm_is_reserved_pfn(pfn) && !kvm_is_zone_device_pfn(pfn))
-+	if (kvm_pfn_has_accessed_dirty(pfn))
-  		mark_page_accessed(pfn_to_page(pfn));
-  }
-  EXPORT_SYMBOL_GPL(kvm_set_pfn_accessed);
-
-The real question is why kvm_mmu_free_roots is finding some dirty pages
-in the do_exit->exit_files->...->close_files path, well after exit_mm()
-has finished running.  I'm not sure how kvm_mmu_zap_all could leave
-something behind.
-
-Th might be completely off track, but maybe it helps someone fixing
-the bug while I get some sleep.
+Even if the two could interleave, they go through the same zap_gfn_range 
+path.  That path takes the lock for write and only yields on the 512 
+top-level page structures.  Anything below is handled by 
+tdp_mmu_set_spte's (with mutual recursion between handle_changed_spte 
+and handle_removed_tdp_mmu_page), and there are no yields on that path.
 
 Paolo
