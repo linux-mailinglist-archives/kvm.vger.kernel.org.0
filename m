@@ -2,79 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D39AF471A67
-	for <lists+kvm@lfdr.de>; Sun, 12 Dec 2021 14:26:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9CFC5471E78
+	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 00:00:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231153AbhLLNZ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Dec 2021 08:25:59 -0500
-Received: from mga18.intel.com ([134.134.136.126]:25181 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231147AbhLLNZ6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Dec 2021 08:25:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1639315558; x=1670851558;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=UVgsHQ0yCvU4R2e1t7Q7njPEsjY6WlZzqKR6lmHRqxw=;
-  b=QfBdKkcORThQ3ha8S4zgcJPJmctO/9gcxw5rWjO+3EYTAGJMaRb0b5d2
-   fiwLOTeUImx43xheV3QPzneBLbIDgpR5C94+DXCeg4TRzOUB2RJDUA2FK
-   2Dciq/67d20nbZu7Tive2Ypx1nGHKioA3tLv6RjP3SYOZHcLBrmurYgGB
-   8fb4C7cLNF3ez4jopZ4OMJK+IMxckzzaqLwS+B0v4epcMrjA1ArIMo9a9
-   sFBRmmAapnmPTJHCGXJ8hJ5eZ7pS33PPJSaTzmxxR0DVTv3eJFwqlIkG8
-   Yu25EWldS8ecJLcrC8TEfx8NA4qNNfW12T87PSQPsMcppYL9X2LZnSbDc
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10195"; a="225465564"
-X-IronPort-AV: E=Sophos;i="5.88,200,1635231600"; 
-   d="scan'208";a="225465564"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2021 05:25:58 -0800
-X-IronPort-AV: E=Sophos;i="5.88,200,1635231600"; 
-   d="scan'208";a="608521467"
-Received: from yangzhon-virtual.bj.intel.com (HELO yangzhon-Virtual) ([10.238.144.101])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-SHA256; 12 Dec 2021 05:25:54 -0800
-Date:   Sun, 12 Dec 2021 21:10:59 +0800
-From:   Yang Zhong <yang.zhong@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, seanjc@google.com,
-        jun.nakajima@intel.com, kevin.tian@intel.com,
-        jing2.liu@linux.intel.com, jing2.liu@intel.com,
-        yang.zhong@intel.com
-Subject: Re: [PATCH 15/19] kvm: x86: Save and restore guest XFD_ERR properly
-Message-ID: <20211212131059.GA21846@yangzhon-Virtual>
-References: <20211208000359.2853257-1-yang.zhong@intel.com>
- <20211208000359.2853257-16-yang.zhong@intel.com>
- <97814bdf-2e58-2823-ca55-30b2447af3f1@redhat.com>
+        id S230175AbhLLXAC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Dec 2021 18:00:02 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:59209 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230127AbhLLXAB (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Sun, 12 Dec 2021 18:00:01 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1639350000;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=WYVQFnDIbcgI5d/vqJyK9JfPBSSPc6zKfbYcO57Li1U=;
+        b=WmuhVWsO5mi80RT4m+no3isY1iJou4o3YpWQaknax9Wih1bUHUku36xax5VFio+o60zIc7
+        1OGTA7llpIy1V9V4ymdA9oRteRF9FpbmNZ5nA42fn0bQH0A++73QEiJu0FpkduZ58GoFj1
+        7cL4stQ+xqGrzmI1cpzkRO3SI4HcvFI=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-337-sanHZ7XkPliQ_vXhoHiXnA-1; Sun, 12 Dec 2021 17:59:59 -0500
+X-MC-Unique: sanHZ7XkPliQ_vXhoHiXnA-1
+Received: by mail-wm1-f69.google.com with SMTP id 145-20020a1c0197000000b0032efc3eb9bcso10728237wmb.0
+        for <kvm@vger.kernel.org>; Sun, 12 Dec 2021 14:59:59 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=WYVQFnDIbcgI5d/vqJyK9JfPBSSPc6zKfbYcO57Li1U=;
+        b=sWkJJ75VbICGIMPFbbwOgixr2HrJaLdG7eTN657btonJMeT/bC1g6IscudNPS81R/d
+         e4YG1bpNunT9qhajLvI2iVHHahFQ9xMp8RsTgbg7MFhu1fxBzyWwW5eXyZ0FLxoCIQoI
+         ul1zSz0EFHOe0B7XmfepeehVYuKAMpUmhq/xkCiob2OgUg4XnGxhGKll545jkkoX8ZHP
+         i8eWbgtgEGShlMPubM6GNWgRJbsGNYTSF4JFRHULam2j7xQCmdTLaRU3xH9Q1FeyGpdy
+         D5ft9xcr3nVVms++fjjciuOwF844NBiWfs1P2AQrxen1Xa8A0MO7cvamgASUFiLiNLkz
+         hSZQ==
+X-Gm-Message-State: AOAM5326wi1DHwqYvGLQvl4nz0qjUzbaHnm75KLZ3dnUWe8orAptg0np
+        wGQw/FzxcE7079Ufmxuw8J/yajHX1o4zByaO68hjSd+TPBFGfbUFZoTXjlBOIOZa6tCDCwQFFXR
+        8q2mi0J6htc3m
+X-Received: by 2002:a05:600c:1987:: with SMTP id t7mr32456833wmq.24.1639349998304;
+        Sun, 12 Dec 2021 14:59:58 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJx2bTppYN2huiK2nylUvg6FCr00HLDzfg04TlPUjrDVfn+bIvC2GBhAeUTenJbfKS0A/G9aQQ==
+X-Received: by 2002:a05:600c:1987:: with SMTP id t7mr32456804wmq.24.1639349998099;
+        Sun, 12 Dec 2021 14:59:58 -0800 (PST)
+Received: from redhat.com ([2a03:c5c0:107e:eefb:294:6ac8:eff6:22df])
+        by smtp.gmail.com with ESMTPSA id bd18sm5203284wmb.43.2021.12.12.14.59.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 12 Dec 2021 14:59:57 -0800 (PST)
+Date:   Sun, 12 Dec 2021 17:59:51 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        arnd@arndb.de, dan.carpenter@oracle.com, hch@lst.de,
+        jasowang@redhat.com, jroedel@suse.de, konrad.wilk@oracle.com,
+        lkp@intel.com, maz@kernel.org, mst@redhat.com, parav@nvidia.com,
+        qperret@google.com, robin.murphy@arm.com, stable@vger.kernel.org,
+        steven.price@arm.com, suzuki.poulose@arm.com, wei.w.wang@intel.com,
+        will@kernel.org, xieyongji@bytedance.com
+Subject: [GIT PULL] vhost: cleanups and fixes
+Message-ID: <20211212175951-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <97814bdf-2e58-2823-ca55-30b2447af3f1@redhat.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Mutt-Fcc: =sent
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 10, 2021 at 11:01:15PM +0100, Paolo Bonzini wrote:
-> On 12/8/21 01:03, Yang Zhong wrote:
-> >--- a/arch/x86/kvm/cpuid.c
-> >+++ b/arch/x86/kvm/cpuid.c
-> >@@ -219,6 +219,11 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
-> >  		kvm_apic_set_version(vcpu);
-> >  	}
-> >+	/* Enable saving guest XFD_ERR */
-> >+	best = kvm_find_cpuid_entry(vcpu, 7, 0);
-> >+	if (best && cpuid_entry_has(best, X86_FEATURE_AMX_TILE))
-> >+		vcpu->arch.guest_fpu.xfd_err = 0;
-> >+
-> 
-> This is incorrect.  Instead it should check whether leaf 0xD
-> includes any dynamic features.
-> 
+The following changes since commit 0fcfb00b28c0b7884635dacf38e46d60bf3d4eb1:
 
-  Thanks Paolo, So ditto for "[PATCH 04/19] kvm: x86: Check guest xstate permissions when KVM_SET_CPUID2".
+  Linux 5.16-rc4 (2021-12-05 14:08:22 -0800)
 
-  Yang
+are available in the Git repository at:
 
-> Paolo
+  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+
+for you to fetch changes up to bb47620be322c5e9e372536cb6b54e17b3a00258:
+
+  vdpa: Consider device id larger than 31 (2021-12-08 15:41:50 -0500)
+
+----------------------------------------------------------------
+virtio,vdpa: bugfixes
+
+Misc bugfixes.
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+Arnd Bergmann (1):
+      virtio: always enter drivers/virtio/
+
+Dan Carpenter (3):
+      vduse: fix memory corruption in vduse_dev_ioctl()
+      vdpa: check that offsets are within bounds
+      vduse: check that offset is within bounds in get_config()
+
+Parav Pandit (1):
+      vdpa: Consider device id larger than 31
+
+Wei Wang (1):
+      virtio/vsock: fix the transport to work with VMADDR_CID_ANY
+
+Will Deacon (1):
+      virtio_ring: Fix querying of maximum DMA mapping size for virtio device
+
+ drivers/Makefile                        | 3 +--
+ drivers/vdpa/vdpa.c                     | 3 ++-
+ drivers/vdpa/vdpa_user/vduse_dev.c      | 6 ++++--
+ drivers/vhost/vdpa.c                    | 2 +-
+ drivers/virtio/virtio_ring.c            | 2 +-
+ net/vmw_vsock/virtio_transport_common.c | 3 ++-
+ 6 files changed, 11 insertions(+), 8 deletions(-)
+
