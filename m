@@ -2,67 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 73E42471979
-	for <lists+kvm@lfdr.de>; Sun, 12 Dec 2021 10:25:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D39AF471A67
+	for <lists+kvm@lfdr.de>; Sun, 12 Dec 2021 14:26:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229997AbhLLJZD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Dec 2021 04:25:03 -0500
-Received: from smtp179.sjtu.edu.cn ([202.120.2.179]:41494 "EHLO
-        smtp179.sjtu.edu.cn" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229888AbhLLJZC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Dec 2021 04:25:02 -0500
-X-Greylist: delayed 430 seconds by postgrey-1.27 at vger.kernel.org; Sun, 12 Dec 2021 04:25:02 EST
-Received: from proxy01.sjtu.edu.cn (smtp185.sjtu.edu.cn [202.120.2.185])
-        by smtp179.sjtu.edu.cn (Postfix) with ESMTPS id 654FE100888E1;
-        Sun, 12 Dec 2021 17:17:50 +0800 (CST)
-Received: from localhost (localhost [127.0.0.1])
-        by proxy01.sjtu.edu.cn (Postfix) with ESMTP id 425E720426994;
-        Sun, 12 Dec 2021 17:17:50 +0800 (CST)
-X-Virus-Scanned: amavisd-new at proxy01.sjtu.edu.cn
-Received: from proxy01.sjtu.edu.cn ([127.0.0.1])
-        by localhost (proxy01.sjtu.edu.cn [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id qRjsQwV-nyd3; Sun, 12 Dec 2021 17:17:50 +0800 (CST)
-Received: from ubuntu.localdomain (unknown [101.82.107.170])
-        (Authenticated sender: billsjc@sjtu.edu.cn)
-        by proxy01.sjtu.edu.cn (Postfix) with ESMTPSA id 7762920424208;
-        Sun, 12 Dec 2021 17:17:43 +0800 (CST)
-From:   Jiacheng Shi <billsjc@sjtu.edu.cn>
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        Jiacheng Shi <billsjc@sjtu.edu.cn>
-Subject: [PATCH] vfio/iommu_type1: replace kfree with kvfree
-Date:   Sun, 12 Dec 2021 01:16:00 -0800
-Message-Id: <20211212091600.2560-1-billsjc@sjtu.edu.cn>
-X-Mailer: git-send-email 2.25.1
+        id S231153AbhLLNZ7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Dec 2021 08:25:59 -0500
+Received: from mga18.intel.com ([134.134.136.126]:25181 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231147AbhLLNZ6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 Dec 2021 08:25:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1639315558; x=1670851558;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=UVgsHQ0yCvU4R2e1t7Q7njPEsjY6WlZzqKR6lmHRqxw=;
+  b=QfBdKkcORThQ3ha8S4zgcJPJmctO/9gcxw5rWjO+3EYTAGJMaRb0b5d2
+   fiwLOTeUImx43xheV3QPzneBLbIDgpR5C94+DXCeg4TRzOUB2RJDUA2FK
+   2Dciq/67d20nbZu7Tive2Ypx1nGHKioA3tLv6RjP3SYOZHcLBrmurYgGB
+   8fb4C7cLNF3ez4jopZ4OMJK+IMxckzzaqLwS+B0v4epcMrjA1ArIMo9a9
+   sFBRmmAapnmPTJHCGXJ8hJ5eZ7pS33PPJSaTzmxxR0DVTv3eJFwqlIkG8
+   Yu25EWldS8ecJLcrC8TEfx8NA4qNNfW12T87PSQPsMcppYL9X2LZnSbDc
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10195"; a="225465564"
+X-IronPort-AV: E=Sophos;i="5.88,200,1635231600"; 
+   d="scan'208";a="225465564"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2021 05:25:58 -0800
+X-IronPort-AV: E=Sophos;i="5.88,200,1635231600"; 
+   d="scan'208";a="608521467"
+Received: from yangzhon-virtual.bj.intel.com (HELO yangzhon-Virtual) ([10.238.144.101])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-SHA256; 12 Dec 2021 05:25:54 -0800
+Date:   Sun, 12 Dec 2021 21:10:59 +0800
+From:   Yang Zhong <yang.zhong@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, seanjc@google.com,
+        jun.nakajima@intel.com, kevin.tian@intel.com,
+        jing2.liu@linux.intel.com, jing2.liu@intel.com,
+        yang.zhong@intel.com
+Subject: Re: [PATCH 15/19] kvm: x86: Save and restore guest XFD_ERR properly
+Message-ID: <20211212131059.GA21846@yangzhon-Virtual>
+References: <20211208000359.2853257-1-yang.zhong@intel.com>
+ <20211208000359.2853257-16-yang.zhong@intel.com>
+ <97814bdf-2e58-2823-ca55-30b2447af3f1@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <97814bdf-2e58-2823-ca55-30b2447af3f1@redhat.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Variables allocated by kvzalloc should not be freed by kfree.
-Because they may be allocated by vmalloc.
-So we replace kfree with kvfree here.
+On Fri, Dec 10, 2021 at 11:01:15PM +0100, Paolo Bonzini wrote:
+> On 12/8/21 01:03, Yang Zhong wrote:
+> >--- a/arch/x86/kvm/cpuid.c
+> >+++ b/arch/x86/kvm/cpuid.c
+> >@@ -219,6 +219,11 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+> >  		kvm_apic_set_version(vcpu);
+> >  	}
+> >+	/* Enable saving guest XFD_ERR */
+> >+	best = kvm_find_cpuid_entry(vcpu, 7, 0);
+> >+	if (best && cpuid_entry_has(best, X86_FEATURE_AMX_TILE))
+> >+		vcpu->arch.guest_fpu.xfd_err = 0;
+> >+
+> 
+> This is incorrect.  Instead it should check whether leaf 0xD
+> includes any dynamic features.
+> 
 
-Fixes: d6a4c185660c ("vfio iommu: Implementation of ioctl for dirty pages tracking")
-Signed-off-by: Jiacheng Shi <billsjc@sjtu.edu.cn>
----
- drivers/vfio/vfio_iommu_type1.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+  Thanks Paolo, So ditto for "[PATCH 04/19] kvm: x86: Check guest xstate permissions when KVM_SET_CPUID2".
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index f17490ab238f..9394aa9444c1 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -256,7 +256,7 @@ static int vfio_dma_bitmap_alloc(struct vfio_dma *dma, size_t pgsize)
- 
- static void vfio_dma_bitmap_free(struct vfio_dma *dma)
- {
--	kfree(dma->bitmap);
-+	kvfree(dma->bitmap);
- 	dma->bitmap = NULL;
- }
- 
--- 
-2.17.1
+  Yang
 
+> Paolo
