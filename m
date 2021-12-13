@@ -2,205 +2,222 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B97B9473660
-	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 22:06:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 55172473663
+	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 22:08:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243069AbhLMVGA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Dec 2021 16:06:00 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:22358 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S243070AbhLMVF6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 13 Dec 2021 16:05:58 -0500
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1BDKEX1n016717;
-        Mon, 13 Dec 2021 21:05:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=rgE5PSsOCbGdEWUOvZ0pRoP7hzyxITJomcJINmGifMc=;
- b=Ze3Hxn3bzJxjdUq+T0bs4No/6QdKSA9kEmoE9vWp71tj21/odb52T9WxrIiPURYhVbaq
- 3UXNktgL4KWbALF3sV6oANIEH5l7S3JUtj96g/Egk96PVtAztXczPNL7+PlrFzo+TAJl
- 7hhziRLL93pu0Qpi0cqweAbTznq8Yu/Ff3/oDc+qwdl/6L3Wuf8PEoueIUKEokxkdBrU
- 6cKYuj8nNRtP416pzHBnCxEemY7kqWcZtIW4VFPJ25+ktj1bt9cb0oZXOUW/PtJsO+rC
- TqpxbLLQ+T7jwnbsowLzOFkcpTTEz4vfbjaaVkuUoUcWCqSEat4Tn7am1sFF7iwxmZQF dg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cx9r9eq3m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 13 Dec 2021 21:05:58 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1BDKEYaV016889;
-        Mon, 13 Dec 2021 21:05:58 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cx9r9eq2s-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 13 Dec 2021 21:05:57 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1BDL2GWD026903;
-        Mon, 13 Dec 2021 21:05:55 GMT
-Received: from b06cxnps4076.portsmouth.uk.ibm.com (d06relay13.portsmouth.uk.ibm.com [9.149.109.198])
-        by ppma06ams.nl.ibm.com with ESMTP id 3cvk8hrran-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 13 Dec 2021 21:05:55 +0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1BDL5qLl45613426
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 13 Dec 2021 21:05:52 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E79A8A4067;
-        Mon, 13 Dec 2021 21:05:51 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D73D1A4066;
-        Mon, 13 Dec 2021 21:05:51 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
-        Mon, 13 Dec 2021 21:05:51 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
-        id 803E0E041D; Mon, 13 Dec 2021 22:05:51 +0100 (CET)
-From:   Eric Farman <farman@linux.ibm.com>
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>
-Cc:     Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, Eric Farman <farman@linux.ibm.com>
-Subject: [RFC PATCH v5 1/1] KVM: s390: Clarify SIGP orders versus STOP/RESTART
-Date:   Mon, 13 Dec 2021 22:05:50 +0100
-Message-Id: <20211213210550.856213-2-farman@linux.ibm.com>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20211213210550.856213-1-farman@linux.ibm.com>
-References: <20211213210550.856213-1-farman@linux.ibm.com>
+        id S242567AbhLMVIa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Dec 2021 16:08:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49570 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S241460AbhLMVI3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Dec 2021 16:08:29 -0500
+Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9499C061751
+        for <kvm@vger.kernel.org>; Mon, 13 Dec 2021 13:08:29 -0800 (PST)
+Received: by mail-yb1-xb31.google.com with SMTP id d10so41596681ybn.0
+        for <kvm@vger.kernel.org>; Mon, 13 Dec 2021 13:08:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=atishpatra.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=qvvfVGKq2r4h6KgjK824L1pTxzdWnyMXPhPq1Abh2Pc=;
+        b=OhnCM8HmOxUmeTJ8oEfNP7AxeaEroLySOUJgpAH2eAjbuT58h22HJ2buXWPJOVx6X4
+         qsLPi5Li2w+KekHaK76mfwW5ITYXQ4r5QSXKGVpUIgME/enF/XrCu1RYxSft/tAH/vlJ
+         A8LDbv3NW/2XkuLD4ljhVHSd9gsiRLgpv5PUc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=qvvfVGKq2r4h6KgjK824L1pTxzdWnyMXPhPq1Abh2Pc=;
+        b=Kc16xMh2Lu/OthIwd2XzRWzNT405pJJUhMYQMjxZRom5I8M8L3j1Y73lDc/ZW4UeFl
+         EzscJKxhIssUIiKxbUO2d9AznL+mlWf5OB+kGZBzVaZZagsnTfRjIQKCXqGn+GQyZ7qJ
+         CLblPGnexfGiHcAsaWnu4TiPzfkke7e1cixrT2d7shcccGkSsPqb/+JAjYZfM1Yw6QBv
+         k4WwoQVSao+Q0f/dUiRFqQ4fhzLIMQ7HKGOqnvFgn7kTtPU4huG22RH6rwu0DwMMdQnX
+         rk7YipBKO8PYMky2ba3uxkuQctibp5C4RhRC3bun/dxSJ1IwcCwDz/EQv+Lf1vojK9hh
+         dX1g==
+X-Gm-Message-State: AOAM530wWjba2oLHNZbWQn8iVlwGUl8iRp+UPdl8bjtZnTZVWGx96E3h
+        Y97/HdFkJk95FF+/1sY8XtCqmA67qVyGbqxa2lg5
+X-Google-Smtp-Source: ABdhPJySH293yyZH4o0ftTnpFHpzJBygH5SyLk84APfDVxuvxrOAU7+LkNTBs3WLK3icgPpUkUlQND5CUFinaUtkqck=
+X-Received: by 2002:a25:d157:: with SMTP id i84mr988416ybg.703.1639429708496;
+ Mon, 13 Dec 2021 13:08:28 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Oj4ZaMkbYwxd4lfwOQJLY8b70f3pMdPP
-X-Proofpoint-GUID: 6DWpg0IJyTo3zizbhIcN4NwUB-vjNaUF
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2021-12-13_10,2021-12-13_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 clxscore=1015
- priorityscore=1501 bulkscore=0 phishscore=0 mlxlogscore=999 mlxscore=0
- adultscore=0 impostorscore=0 lowpriorityscore=0 spamscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
- definitions=main-2112130125
+References: <20211204002038.113653-1-atishp@atishpatra.org>
+ <20211204002038.113653-6-atishp@atishpatra.org> <CAAhSdy26i0KiHce_FveXS795WecSJJ3ujbCmOVVVBiSOd8chRw@mail.gmail.com>
+In-Reply-To: <CAAhSdy26i0KiHce_FveXS795WecSJJ3ujbCmOVVVBiSOd8chRw@mail.gmail.com>
+From:   Atish Patra <atishp@atishpatra.org>
+Date:   Mon, 13 Dec 2021 13:08:17 -0800
+Message-ID: <CAOnJCU+LnN=YrQ34VEgj83dSH1NmDLfozoZPPbxT0SCfBM9PyA@mail.gmail.com>
+Subject: Re: [RFC 5/6] RISC-V: Move spinwait booting method to its own config
+To:     Anup Patel <anup@brainfault.org>
+Cc:     "linux-kernel@vger.kernel.org List" <linux-kernel@vger.kernel.org>,
+        Atish Patra <atishp@rivosinc.com>,
+        Alexandre Ghiti <alex@ghiti.fr>,
+        Anup Patel <anup.patel@wdc.com>,
+        Greentime Hu <greentime.hu@sifive.com>,
+        Guo Ren <guoren@linux.alibaba.com>,
+        Heinrich Schuchardt <xypron.glpk@gmx.de>,
+        Ingo Molnar <mingo@kernel.org>,
+        Jisheng Zhang <jszhang@kernel.org>,
+        kvm-riscv@lists.infradead.org, KVM General <kvm@vger.kernel.org>,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Nanyong Sun <sunnanyong@huawei.com>,
+        Nick Kossifidis <mick@ics.forth.gr>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Pekka Enberg <penberg@kernel.org>,
+        Vincent Chen <vincent.chen@sifive.com>,
+        Vitaly Wool <vitaly.wool@konsulko.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-With KVM_CAP_S390_USER_SIGP, there are only five Signal Processor
-orders (CONDITIONAL EMERGENCY SIGNAL, EMERGENCY SIGNAL, EXTERNAL CALL,
-SENSE, and SENSE RUNNING STATUS) which are intended for frequent use
-and thus are processed in-kernel. The remainder are sent to userspace
-with the KVM_CAP_S390_USER_SIGP capability. Of those, three orders
-(RESTART, STOP, and STOP AND STORE STATUS) have the potential to
-inject work back into the kernel, and thus are asynchronous.
+On Mon, Dec 13, 2021 at 5:02 AM Anup Patel <anup@brainfault.org> wrote:
+>
+> On Sat, Dec 4, 2021 at 5:51 AM Atish Patra <atishp@atishpatra.org> wrote:
+> >
+> > From: Atish Patra <atishp@rivosinc.com>
+> >
+> > The spinwait booting method should only be used for platforms with older
+> > firmware without SBI HSM extension or M-mode firmware because spinwait
+> > method can't support cpu hotplug, kexec or sparse hartid. It is better
+> > to move the entire spinwait implementation to its own config which can
+> > be disabled if required. It is enabled by default to maintain backward
+> > compatibility and M-mode Linux.
+> >
+> > Signed-off-by: Atish Patra <atishp@rivosinc.com>
+> > ---
+> >  arch/riscv/Kconfig          | 14 ++++++++++++++
+> >  arch/riscv/kernel/Makefile  |  3 ++-
+> >  arch/riscv/kernel/cpu_ops.c |  8 ++++++++
+> >  arch/riscv/kernel/head.S    |  6 +++---
+> >  arch/riscv/kernel/head.h    |  2 ++
+> >  5 files changed, 29 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+> > index 821252b65f89..4afb42d5707d 100644
+> > --- a/arch/riscv/Kconfig
+> > +++ b/arch/riscv/Kconfig
+> > @@ -403,6 +403,20 @@ config RISCV_SBI_V01
+> >           This config allows kernel to use SBI v0.1 APIs. This will be
+> >           deprecated in future once legacy M-mode software are no longer in use.
+> >
+> > +config RISCV_BOOT_SPINWAIT
+> > +       bool "Spinwait booting method"
+> > +       depends on SMP
+> > +       default y
+> > +       help
+> > +         This enables support for booting Linux via spinwait method. In the
+> > +         spinwait method, all cores randomly jump to Linux. One of the core
+> > +         gets chosen via lottery and all other keeps spinning on a percpu
+> > +         variable. This method can not support cpu hotplug and sparse hartid
+> > +         scheme. It should be only enabled for M-mode Linux or platforms relying
+> > +         on older firmware without SBI HSM extension. All other platform should
+> > +         rely on ordered booing via SBI HSM extension which gets chosen
+> > +          dynamically at runtime if the firmware supports it.
+> > +
+> >  config KEXEC
+> >         bool "Kexec system call"
+> >         select KEXEC_CORE
+> > diff --git a/arch/riscv/kernel/Makefile b/arch/riscv/kernel/Makefile
+> > index 3397ddac1a30..612556faa527 100644
+> > --- a/arch/riscv/kernel/Makefile
+> > +++ b/arch/riscv/kernel/Makefile
+> > @@ -43,7 +43,8 @@ obj-$(CONFIG_FPU)             += fpu.o
+> >  obj-$(CONFIG_SMP)              += smpboot.o
+> >  obj-$(CONFIG_SMP)              += smp.o
+> >  obj-$(CONFIG_SMP)              += cpu_ops.o
+> > -obj-$(CONFIG_SMP)              += cpu_ops_spinwait.o
+> > +
+> > +obj-$(CONFIG_RISCV_BOOT_SPINWAIT) += cpu_ops_spinwait.o
+> >  obj-$(CONFIG_MODULES)          += module.o
+> >  obj-$(CONFIG_MODULE_SECTIONS)  += module-sections.o
+> >
+> > diff --git a/arch/riscv/kernel/cpu_ops.c b/arch/riscv/kernel/cpu_ops.c
+> > index c1e30f403c3b..170d07e57721 100644
+> > --- a/arch/riscv/kernel/cpu_ops.c
+> > +++ b/arch/riscv/kernel/cpu_ops.c
+> > @@ -15,7 +15,15 @@
+> >  const struct cpu_operations *cpu_ops[NR_CPUS] __ro_after_init;
+> >
+> >  extern const struct cpu_operations cpu_ops_sbi;
+> > +#ifdef CONFIG_RISCV_BOOT_SPINWAIT
+> >  extern const struct cpu_operations cpu_ops_spinwait;
+> > +#else
+> > +const struct cpu_operations cpu_ops_spinwait = {
+> > +       .name           = "",
+> > +       .cpu_prepare    = NULL,
+> > +       .cpu_start      = NULL,
+> > +};
+> > +#endif
+> >
+> >  void __init cpu_set_ops(int cpuid)
+> >  {
+> > diff --git a/arch/riscv/kernel/head.S b/arch/riscv/kernel/head.S
+> > index 9f16bfe9307e..4a694e15b95b 100644
+> > --- a/arch/riscv/kernel/head.S
+> > +++ b/arch/riscv/kernel/head.S
+> > @@ -259,7 +259,7 @@ pmp_done:
+> >         li t0, SR_FS
+> >         csrc CSR_STATUS, t0
+> >
+> > -#ifdef CONFIG_SMP
+> > +#ifdef CONFIG_RISCV_BOOT_SPINWAIT
+> >         li t0, CONFIG_NR_CPUS
+> >         blt a0, t0, .Lgood_cores
+> >         tail .Lsecondary_park
+> > @@ -285,7 +285,7 @@ pmp_done:
+> >         beq t0, t1, .Lsecondary_start
+> >
+> >  #endif /* CONFIG_XIP */
+> > -#endif /* CONFIG_SMP */
+> > +#endif /* CONFIG_RISCV_BOOT_SPINWAIT */
+> >
+> >  #ifdef CONFIG_XIP_KERNEL
+> >         la sp, _end + THREAD_SIZE
+> > @@ -344,7 +344,7 @@ clear_bss_done:
+> >         call soc_early_init
+> >         tail start_kernel
+> >
+> > -#ifdef CONFIG_SMP
+> > +#if defined(CONFIG_SMP) && defined(CONFIG_RISCV_BOOT_SPINWAIT)
+>
+> The RISCV_BOOT_SPINWAIT option already depends on SMP.
+>
+> Do you still need to check defined(CONFIG_SMP) here ?
+>
 
-Let's look for those pending IRQs when processing one of the in-kernel
-SIGP orders, and return BUSY (CC2) if one is in process. This is in
-agreement with the Principles of Operation, which states that only one
-order can be "active" on a CPU at a time.
+Nope. I guess this one slipped through the cracks. All other related
+#ifdef have only CONFIG_RISCV_BOOT_SPINWAIT
+I will fix it in v2.
 
-Suggested-by: David Hildenbrand <david@redhat.com>
-Signed-off-by: Eric Farman <farman@linux.ibm.com>
----
- arch/s390/kvm/interrupt.c |  7 +++++++
- arch/s390/kvm/kvm-s390.c  |  9 +++++++--
- arch/s390/kvm/kvm-s390.h  |  1 +
- arch/s390/kvm/sigp.c      | 28 ++++++++++++++++++++++++++++
- 4 files changed, 43 insertions(+), 2 deletions(-)
+> Regards,
+> Anup
+>
+> >  .Lsecondary_start:
+> >         /* Set trap vector to spin forever to help debug */
+> >         la a3, .Lsecondary_park
+> > diff --git a/arch/riscv/kernel/head.h b/arch/riscv/kernel/head.h
+> > index 5393cca77790..726731ada534 100644
+> > --- a/arch/riscv/kernel/head.h
+> > +++ b/arch/riscv/kernel/head.h
+> > @@ -16,7 +16,9 @@ asmlinkage void __init setup_vm(uintptr_t dtb_pa);
+> >  asmlinkage void __init __copy_data(void);
+> >  #endif
+> >
+> > +#ifdef CONFIG_RISCV_BOOT_SPINWAIT
+> >  extern void *__cpu_spinwait_stack_pointer[];
+> >  extern void *__cpu_spinwait_task_pointer[];
+> > +#endif
+> >
+> >  #endif /* __ASM_HEAD_H */
+> > --
+> > 2.33.1
+> >
 
-diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
-index 37f47e32d9c4..d339e1c47e4d 100644
---- a/arch/s390/kvm/interrupt.c
-+++ b/arch/s390/kvm/interrupt.c
-@@ -2115,6 +2115,13 @@ int kvm_s390_is_stop_irq_pending(struct kvm_vcpu *vcpu)
- 	return test_bit(IRQ_PEND_SIGP_STOP, &li->pending_irqs);
- }
- 
-+int kvm_s390_is_restart_irq_pending(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_s390_local_interrupt *li = &vcpu->arch.local_int;
-+
-+	return test_bit(IRQ_PEND_RESTART, &li->pending_irqs);
-+}
-+
- void kvm_s390_clear_stop_irq(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_s390_local_interrupt *li = &vcpu->arch.local_int;
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 5f52e7eec02f..bfdf610bfecb 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -4641,10 +4641,15 @@ int kvm_s390_vcpu_stop(struct kvm_vcpu *vcpu)
- 		}
- 	}
- 
--	/* SIGP STOP and SIGP STOP AND STORE STATUS has been fully processed */
-+	/*
-+	 * Set the VCPU to STOPPED and THEN clear the interrupt flag,
-+	 * now that the SIGP STOP and SIGP STOP AND STORE STATUS orders
-+	 * have been fully processed. This will ensure that the VCPU
-+	 * is kept BUSY if another VCPU is inquiring with SIGP SENSE.
-+	 */
-+	kvm_s390_set_cpuflags(vcpu, CPUSTAT_STOPPED);
- 	kvm_s390_clear_stop_irq(vcpu);
- 
--	kvm_s390_set_cpuflags(vcpu, CPUSTAT_STOPPED);
- 	__disable_ibs_on_vcpu(vcpu);
- 
- 	for (i = 0; i < online_vcpus; i++) {
-diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
-index c07a050d757d..1876ab0c293f 100644
---- a/arch/s390/kvm/kvm-s390.h
-+++ b/arch/s390/kvm/kvm-s390.h
-@@ -427,6 +427,7 @@ void kvm_s390_destroy_adapters(struct kvm *kvm);
- int kvm_s390_ext_call_pending(struct kvm_vcpu *vcpu);
- extern struct kvm_device_ops kvm_flic_ops;
- int kvm_s390_is_stop_irq_pending(struct kvm_vcpu *vcpu);
-+int kvm_s390_is_restart_irq_pending(struct kvm_vcpu *vcpu);
- void kvm_s390_clear_stop_irq(struct kvm_vcpu *vcpu);
- int kvm_s390_set_irq_state(struct kvm_vcpu *vcpu,
- 			   void __user *buf, int len);
-diff --git a/arch/s390/kvm/sigp.c b/arch/s390/kvm/sigp.c
-index 5ad3fb4619f1..c4884de0858b 100644
---- a/arch/s390/kvm/sigp.c
-+++ b/arch/s390/kvm/sigp.c
-@@ -276,6 +276,34 @@ static int handle_sigp_dst(struct kvm_vcpu *vcpu, u8 order_code,
- 	if (!dst_vcpu)
- 		return SIGP_CC_NOT_OPERATIONAL;
- 
-+	/*
-+	 * SIGP RESTART, SIGP STOP, and SIGP STOP AND STORE STATUS orders
-+	 * are processed asynchronously. Until the affected VCPU finishes
-+	 * its work and calls back into KVM to clear the (RESTART or STOP)
-+	 * interrupt, we need to return any new non-reset orders "busy".
-+	 *
-+	 * This is important because a single VCPU could issue:
-+	 *  1) SIGP STOP $DESTINATION
-+	 *  2) SIGP SENSE $DESTINATION
-+	 *
-+	 * If the SIGP SENSE would not be rejected as "busy", it could
-+	 * return an incorrect answer as to whether the VCPU is STOPPED
-+	 * or OPERATING.
-+	 */
-+	if (order_code != SIGP_INITIAL_CPU_RESET &&
-+	    order_code != SIGP_CPU_RESET) {
-+		/*
-+		 * Lockless check. Both SIGP STOP and SIGP (RE)START
-+		 * properly synchronize everything while processing
-+		 * their orders, while the guest cannot observe a
-+		 * difference when issuing other orders from two
-+		 * different VCPUs.
-+		 */
-+		if (kvm_s390_is_stop_irq_pending(dst_vcpu) ||
-+		    kvm_s390_is_restart_irq_pending(dst_vcpu))
-+			return SIGP_CC_BUSY;
-+	}
-+
- 	switch (order_code) {
- 	case SIGP_SENSE:
- 		vcpu->stat.instruction_sigp_sense++;
+
+
 -- 
-2.32.0
-
+Regards,
+Atish
