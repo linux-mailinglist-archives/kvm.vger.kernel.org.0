@@ -2,130 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B95A47353E
-	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 20:50:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F5F747356F
+	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 20:59:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236790AbhLMTuU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Dec 2021 14:50:20 -0500
-Received: from Galois.linutronix.de ([193.142.43.55]:36882 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233215AbhLMTuT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Dec 2021 14:50:19 -0500
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1639425018;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to; bh=wYckKKvewtBcVFlW8nrro81h3BRkBO7Fro639TQehrs=;
-        b=1gALEEOiekKQbNzJ+i/yHebFnVvq8DkQMOc03gSYbc2C1invCPu/rrUsdC98Mr463gcEWO
-        Y/B5imh3Q7NG1dZFHQLgTnPXauoPkAEyleaXNWD98t3sHeG2AndgzaCwT1maSAI5s1K4Nt
-        7xnde9hLIz3BNgunn8HOUWgZpKNfV2Bs7cgvk0w396wdATfO2rkrvkYRcO34MPtox4i7Ag
-        b+LNuZLcGl+j50jTe/LJ7mn1qhZfZoePEPOLSrtRBEUYyUk6K3n3wq8PHCHPIXBR768Fky
-        NyAImqg4BCDRFnSQgbDVIYaK4dZMKPyaikMFqIzWrtlSoTZqDGnI3HCqAZEvzw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1639425018;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to; bh=wYckKKvewtBcVFlW8nrro81h3BRkBO7Fro639TQehrs=;
-        b=WDQQ++O/y/vHVZQt6hWGa6SZlR3PBHfsvGC6O97zJvMy2IGHeVxCp0nPjwF4bY/c3YLcCW
-        HrD6+R2E+SivLsBg==
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Yang Zhong <yang.zhong@intel.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com
-Cc:     seanjc@google.com, jun.nakajima@intel.com, kevin.tian@intel.com,
-        jing2.liu@linux.intel.com, jing2.liu@intel.com
-Subject: Re: [PATCH 02/19] x86/fpu: Prepare KVM for dynamically enabled states
-In-Reply-To: <16c938e2-2427-c8dd-94a1-eba8f967283b@redhat.com>
-Date:   Mon, 13 Dec 2021 20:50:17 +0100
-Message-ID: <87v8zsthc6.ffs@tglx>
-MIME-Version: 1.0
-Content-Type: text/plain
+        id S242607AbhLMT7k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Dec 2021 14:59:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33730 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S242660AbhLMT7S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Dec 2021 14:59:18 -0500
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 458C2C061574
+        for <kvm@vger.kernel.org>; Mon, 13 Dec 2021 11:59:18 -0800 (PST)
+Received: by mail-pf1-x44a.google.com with SMTP id s22-20020a056a00179600b004b31f2cdb19so1976149pfg.7
+        for <kvm@vger.kernel.org>; Mon, 13 Dec 2021 11:59:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=8J9lNG7qusp7IKUlm+Z/cw9Edy7QEJ39Y0anc/ZdikM=;
+        b=HqbrqM0g/0DWDdAcp3Peib6GEcl+jOYlohZxBdL55y/0g/QE5tEIoDuEfDCYhv18pv
+         +u4Gxnsn+xXn9Cax4bN+am/Vr9B1DQHNbEvdNlRp1fh1tU9qxR5Vd5oYHwnvM/hyWpEj
+         iDP1CkXQQ9kMKlBIza+RvxYlItfqR6uXoNGYo1ZqfgRuI0igWHZYT+DpakxwiGv8Gbw6
+         UGSL9V4JqkkBZ0O6hNYXkN32mmUxYejz+MlOWoh5J9DaXP9vjpn7bmYwQb9eoGCbSqSl
+         nsOi+g+jVg6e8FDrmxLEx4ou6POPkxwY1hpeHHGm8aQ3kUXQkibKjrdwpyJw08WDVW2t
+         6cBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=8J9lNG7qusp7IKUlm+Z/cw9Edy7QEJ39Y0anc/ZdikM=;
+        b=3WByWKBzkC7zDRWnKiLRaGH0RI2BoEf0+iF+k9zQOwjIiwFwCLPQPkhwEdomJ/WRqC
+         /6xgF9u/o23Uq6V+tXA9iswVoFfkhHbWEBFcvdL6vAvc395s8rwIMbVyagCa63oEI030
+         KNskvdij3d1QOs+B4n3G+LnwvAORqsO1OOb7rhO+6OjbykKaumSd2QjvPFxIOUQx6i70
+         NR48fyxCJ5JL2px4OO3WQSPV29mZmYs848Vf61DVWfK2USKPfzF+vWT4EZMXRugXW+20
+         bUSxFyzY3pNAZt/5Sfny1SjMuPzC/pxB/RLH8HPiA078qkBjyBs69DmauFAZnz4nsXJC
+         rFCw==
+X-Gm-Message-State: AOAM532YNQCxM22tk1oTmodLIhROS9lnHwyNTfHFpAc5yAjlkMPyF4wL
+        PYWGQbzzA62SI8XQ9aLDW6Phx7wwN1MdXg==
+X-Google-Smtp-Source: ABdhPJyTWNSj7J7HYTBJgxKMlx7Ns2FVUOvMzgwoBCqHCpAy97CHIIZB4HaeW6WXcO72c5Dain37Rwnc+eva+w==
+X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
+ (user=dmatlack job=sendgmr) by 2002:a65:684e:: with SMTP id
+ q14mr551139pgt.378.1639425557761; Mon, 13 Dec 2021 11:59:17 -0800 (PST)
+Date:   Mon, 13 Dec 2021 19:59:12 +0000
+Message-Id: <20211213195912.447258-1-dmatlack@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.34.1.173.g76aa8bc2d0-goog
+Subject: [kvm-unit-tests PATCH] x86: Increase timeout for vmx_vmcs_shadow_test
+From:   David Matlack <dmatlack@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, drjones@redhat.com,
+        David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo,
+When testing with debug kernels (e.g. CONFIG_DEBUG_VM)
+vmx_vmcs_shadow_test exceeds the default 90s timeout. The test ends up
+taking about 120s to complete (on a barmetal host), so increase the
+timeout to 180s.
 
-On Mon, Dec 13 2021 at 13:45, Paolo Bonzini wrote:
-> On 12/13/21 13:00, Thomas Gleixner wrote:
->> On Mon, Dec 13 2021 at 10:12, Paolo Bonzini wrote:
->>> Please rename to alloc_xfeatures
->> 
->> That name makes no sense at all. This has nothing to do with alloc.
->
-> Isn't that the features for which space is currently allocated?
+Signed-off-by: David Matlack <dmatlack@google.com>
+---
+ x86/unittests.cfg | 1 +
+ 1 file changed, 1 insertion(+)
 
-It is, but from the kernel POV this is user. :)
+diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+index 3000e53c790f..133a2a1501dd 100644
+--- a/x86/unittests.cfg
++++ b/x86/unittests.cfg
+@@ -346,6 +346,7 @@ file = vmx.flat
+ extra_params = -cpu max,+vmx -append vmx_vmcs_shadow_test
+ arch = x86_64
+ groups = vmx
++timeout = 180
+ 
+ [debug]
+ file = debug.flat
 
-> Reading "user_xfeatures" in there is cryptic, it seems like it's 
-> something related to the userspace thread or group that has invoked the 
-> KVM ioctl.  If it's renamed to alloc_xfeatures, then this:
->
-> +		missing = request & ~guest_fpu->alloc_xfeatures;
-> +		if (missing) {
-> +			vcpu->arch.guest_fpu.realloc_request |= missing;
-> +			return true;
-> +		}
->
-> makes it obvious that the allocation is for features that are requested 
-> but haven't been allocated in the xstate yet.
-
-Let's rename it to xfeatures and perm and be done with it.
-
->> Why? Yet another export of FPU internals just because?
->
-> It's one function more and one field less.  I prefer another export of 
-> FPU internals, to a write to a random field with undocumented
-> invariants.
-
-We want less not more exports. :)
-
-> For example, why WARN_ON_ONCE if enter_guest == true?  If you enter the 
-> guest after the host has restored MSR_IA32_XFD with KVM_SET_MSR, the
-
-Indeed restoring a guest might require buffer reallocation, I missed
-that, duh!
-
-On restore the following components are involved:
-
-   XCR0, XFD, XSTATE
-
-XCR0 and XFD have to be restored _before_ XSTATE and that needs to
-be enforced.
-
-But independent of the ordering of XCR0 and XFD restore the following
-check applies to both the restore and the runtime logic:
-
-int kvm_fpu_realloc(struct kvm_vcpu *vcpu, u64 xcr0, u64 xfd)
-{
-   	u64 expand, enabled = xcr0 & ~xfd;
-
-        expand = enabled & ~vcpu->arch.guest_fpu.xfeatures;
-        if (!expand)
-        	return 0;
-        
-        return fpu_enable_guest_features(&vcpu->arch.guest_fpu, expand);
-}
-
-int fpu_enable_guest_features(struct guest_fpu *gfpu, u64 which)
-{
-        permission_checks();
-        ...
-        return fpstate_realloc(.....)
-}
-
-fpstate_realloc() needs to be careful about flipping the pointers
-depending on the question whether guest_fpu->fpstate is actually active,
-i.e.:
-
-        current->thread.fpu.fpstate == gfpu->fpstate
-
-I'm halfways done with that. Will send something soonish.
-
-Thanks,
-
-        tglx
-
-       
+base-commit: 0c111b370ad3c5a89e11caee79bc93a66fd004f2
+-- 
+2.34.1.173.g76aa8bc2d0-goog
 
