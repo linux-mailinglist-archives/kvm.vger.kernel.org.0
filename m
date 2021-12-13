@@ -2,55 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E36E473838
+	by mail.lfdr.de (Postfix) with ESMTP id A6623473839
 	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 23:59:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244071AbhLMW7o (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        id S244112AbhLMW7o (ORCPT <rfc822;lists+kvm@lfdr.de>);
         Mon, 13 Dec 2021 17:59:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47610 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244112AbhLMW7l (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Dec 2021 17:59:41 -0500
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A049C06173F
-        for <kvm@vger.kernel.org>; Mon, 13 Dec 2021 14:59:41 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id hg9-20020a17090b300900b001a6aa0b7d8cso10790035pjb.2
-        for <kvm@vger.kernel.org>; Mon, 13 Dec 2021 14:59:41 -0800 (PST)
+        with ESMTP id S244109AbhLMW7n (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Dec 2021 17:59:43 -0500
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8BF5C061748
+        for <kvm@vger.kernel.org>; Mon, 13 Dec 2021 14:59:42 -0800 (PST)
+Received: by mail-pf1-x449.google.com with SMTP id l7-20020a622507000000b00494608c84a4so10898475pfl.6
+        for <kvm@vger.kernel.org>; Mon, 13 Dec 2021 14:59:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=VdGaN5L7OJ2U0UndQcZO7SPHQBeyLglC8eNYzsCUojk=;
-        b=WwCQ6wfjwENs0PeaEtri9xJS77rN0uifxOv5MLSbmdJv5Bdh9V8Gd8i3Sv071LoFym
-         mVNO5j78asLUedsxb0P7D3tlYmTmstqTEd0XYh0Xqeo91EJUb3c0UiXXyn2ElZGh1Gm7
-         ZfVO2Vbo+ZYMQYbyXBfCTu0N0hPOH4lLVlH6OJ0A3nee2DZdY+EMw5vgYkEvBePyEImj
-         XTN4RowSCy3C8/+Yx4tHSZWc+LwwlBhmuzr6BmQ0j9x4hH8eQRjGqBUPpLy8fEI++oQA
-         /1kR62t7jDgCkqtAfoO1eu6ELEPW7TNxtzk0S0izLZdruR/YMJSIBd2M9nDMOr8+DpQd
-         Cqwg==
+        bh=qw/gci8IX1okT5YydzCOdlI7c/eHaurUYfspM0RXE+0=;
+        b=Dp9m6CaTA99gmmT5gmsRnzU95V2hN1Hndv8sfxTz7ZB+pG/Wc4zURE24VPitdFxv2I
+         Sj7fQ7LyiBR/WoFNHlzQasvbEl+DLcVjxVOBIodkSEP7rVYL227Z070+2ZsnoME8LSBe
+         crJ/mUA5xD2mO6oMVCsM1jymYigsdm3mjG62Vt3/K840NMHuxckMoUPCX0A+u4A/Mzac
+         u8o8XRxQ91D4rlf1rz0Xm/h6F4Ig9ZvR0r9MdcVcG6k053yS5JlHVrTCTFXFgHDgQMzp
+         K+0jHC3siLzccTpGxwBs6Vg1lvAWx2OxH3Ct8E2CrrIS3ssc8Z56IK5c4e4NsCQegjYE
+         Goaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=VdGaN5L7OJ2U0UndQcZO7SPHQBeyLglC8eNYzsCUojk=;
-        b=QeLyDldtuSGuwl0J07xuKphSvrD5IFME+XSqK4DeKSPLY/LCM+SCXFgDSDGoIhcWHn
-         34t70259dy6I1qo9IzZFJnyEThHEcCs1fyotq3WQNF+g1XMEfnUanKQs0X3C9RyEmPQR
-         4ONGSkTjqxUV61DmDdiKOP0D6MAUN9MZMwmUMcSPJn42NGplL1nhkCwyXy9s2T5mcS7n
-         Y6tEm0BGFEaR2T5Q+PrY7sn1B8GJTlN5ZARnWhA7s7aysen35cvoCx9d+HVhea3hmwSP
-         TN7wfjoJwJbJrauZTq2Rin+xwlftbwE4zW4D2TQEPAc3AO4tDvPaICOKLj5Rng09WVlr
-         aabw==
-X-Gm-Message-State: AOAM533GdUdM4Y3n5jHKVwmADSbZOPuA/UmTJ+ER2+IJymsmbNwB1s5Q
-        K5mDw+bIC7Iiux0czFk72YtunxIXjV7pAw==
-X-Google-Smtp-Source: ABdhPJwMeVajrFBE90cPxlJ/0DxK5HsgOXuYwfYm0L1wrQtN9xwxAt6wYplA6UhkNc0vp3gnVuKh9mpBnQy3/g==
+        bh=qw/gci8IX1okT5YydzCOdlI7c/eHaurUYfspM0RXE+0=;
+        b=Sed53e22HfGpmrdik1cl89HbOX+q53NpkYuFcOeXqdLTiy/WYaMS+W1K3qyjtG1tZY
+         UKhxZ3PqMkQwr0xukAWR4ONfWOB0SooLcNdVco4Ff98norxJGc95BMapZRi8xikxDfZl
+         nzevmJFqd9eW+tvNjbKp4i+WTtubcnvU/CZqNp7xYWsaaGB4RTZbg7Z6LKR8R1F+xYKz
+         Qmf7yK4xngIPKM/9d15c4AdC3oM/zsGKNDtDudSEcAf2zg5qLdKQb6gf0Uyh7h2L79HP
+         UDHTfPiH1tZcOw/WZ8tEHb9lE10cEczLf3s85nYztOri/LdPUdg9rGwTGt8eh74q/5vi
+         hewQ==
+X-Gm-Message-State: AOAM533udS/dcSZCUfML2CvfCXJSXHJXbQTD0CWbb4ewH6+dZlij0Gsg
+        F6GY26J9nzJIBpY9bwXENf739nWQOz7QsQ==
+X-Google-Smtp-Source: ABdhPJw1PtDtdtBdiIicIEZAR/xU2ss5GOasKvclx/0EvAYEZ3m4CJGf/UUcDcviwTnTsJdcORTT776h5wEDDQ==
 X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a63:6703:: with SMTP id
- b3mr1178490pgc.18.1639436380650; Mon, 13 Dec 2021 14:59:40 -0800 (PST)
-Date:   Mon, 13 Dec 2021 22:59:17 +0000
+ (user=dmatlack job=sendgmr) by 2002:a63:3285:: with SMTP id
+ y127mr1098792pgy.479.1639436382406; Mon, 13 Dec 2021 14:59:42 -0800 (PST)
+Date:   Mon, 13 Dec 2021 22:59:18 +0000
 In-Reply-To: <20211213225918.672507-1-dmatlack@google.com>
-Message-Id: <20211213225918.672507-13-dmatlack@google.com>
+Message-Id: <20211213225918.672507-14-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20211213225918.672507-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.34.1.173.g76aa8bc2d0-goog
-Subject: [PATCH v1 12/13] KVM: x86/mmu: Add tracepoint for splitting huge pages
+Subject: [PATCH v1 13/13] KVM: selftests: Add an option to disable
+ MANUAL_PROTECT_ENABLE and INITIALLY_SET
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Ben Gardon <bgardon@google.com>,
@@ -71,58 +72,48 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a tracepoint that records whenever KVM eagerly splits a huge page.
+Add an option to dirty_log_perf_test to disable MANUAL_PROTECT_ENABLE
+and INITIALLY_SET so the legacy dirty logging code path can be tested.
 
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- arch/x86/kvm/mmu/mmutrace.h | 20 ++++++++++++++++++++
- arch/x86/kvm/mmu/tdp_mmu.c  |  2 ++
- 2 files changed, 22 insertions(+)
+ tools/testing/selftests/kvm/dirty_log_perf_test.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmutrace.h b/arch/x86/kvm/mmu/mmutrace.h
-index de5e8e4e1aa7..4feabf773387 100644
---- a/arch/x86/kvm/mmu/mmutrace.h
-+++ b/arch/x86/kvm/mmu/mmutrace.h
-@@ -416,6 +416,26 @@ TRACE_EVENT(
- 	)
- );
+diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+index 1954b964d1cf..a0c2247855f6 100644
+--- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
++++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+@@ -298,12 +298,15 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+ static void help(char *name)
+ {
+ 	puts("");
+-	printf("usage: %s [-h] [-i iterations] [-p offset] "
++	printf("usage: %s [-h] [-i iterations] [-p offset] [-g]"
+ 	       "[-m mode] [-b vcpu bytes] [-v vcpus] [-o] [-s mem type]"
+ 	       "[-x memslots]\n", name);
+ 	puts("");
+ 	printf(" -i: specify iteration counts (default: %"PRIu64")\n",
+ 	       TEST_HOST_LOOP_N);
++	printf(" -g: Use the legacy dirty logging mode where KVM_GET_DIRTY_LOG\n"
++	       "     fetches and *clears* the dirty log. By default the test will\n"
++	       "     use MANUAL_PROTECT_ENABLE and INITIALLY_SET.\n");
+ 	printf(" -p: specify guest physical test memory offset\n"
+ 	       "     Warning: a low offset can conflict with the loaded test code.\n");
+ 	guest_modes_help();
+@@ -343,8 +346,11 @@ int main(int argc, char *argv[])
  
-+TRACE_EVENT(
-+	kvm_mmu_split_huge_page,
-+	TP_PROTO(u64 gfn, u64 spte, int level),
-+	TP_ARGS(gfn, spte, level),
-+
-+	TP_STRUCT__entry(
-+		__field(u64, gfn)
-+		__field(u64, spte)
-+		__field(int, level)
-+	),
-+
-+	TP_fast_assign(
-+		__entry->gfn = gfn;
-+		__entry->spte = spte;
-+		__entry->level = level;
-+	),
-+
-+	TP_printk("gfn %llx spte %llx level %d", __entry->gfn, __entry->spte, __entry->level)
-+);
-+
- #endif /* _TRACE_KVMMMU_H */
+ 	guest_modes_append_default();
  
- #undef TRACE_INCLUDE_PATH
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index be5eb74ac053..e6910b9b5c12 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -1325,6 +1325,8 @@ tdp_mmu_split_huge_page_atomic(struct kvm *kvm, struct tdp_iter *iter, struct kv
- 	u64 child_spte;
- 	int i;
- 
-+	trace_kvm_mmu_split_huge_page(iter->gfn, huge_spte, level);
-+
- 	init_child_tdp_mmu_page(sp, iter);
- 
- 	for (i = 0; i < PT64_ENT_PER_PAGE; i++) {
+-	while ((opt = getopt(argc, argv, "hi:p:m:b:f:v:os:x:")) != -1) {
++	while ((opt = getopt(argc, argv, "ghi:p:m:b:f:v:os:x:")) != -1) {
+ 		switch (opt) {
++		case 'g':
++			dirty_log_manual_caps = 0;
++			break;
+ 		case 'i':
+ 			p.iterations = atoi(optarg);
+ 			break;
 -- 
 2.34.1.173.g76aa8bc2d0-goog
 
