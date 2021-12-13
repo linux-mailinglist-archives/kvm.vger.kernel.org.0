@@ -2,57 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C96F473830
+	by mail.lfdr.de (Postfix) with ESMTP id A696C473831
 	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 23:59:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244053AbhLMW7a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Dec 2021 17:59:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47518 "EHLO
+        id S244062AbhLMW7b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Dec 2021 17:59:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244066AbhLMW72 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Dec 2021 17:59:28 -0500
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B60C1C061751
-        for <kvm@vger.kernel.org>; Mon, 13 Dec 2021 14:59:28 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id gf15-20020a17090ac7cf00b001a9a31687d0so9486269pjb.1
-        for <kvm@vger.kernel.org>; Mon, 13 Dec 2021 14:59:28 -0800 (PST)
+        with ESMTP id S242437AbhLMW7a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Dec 2021 17:59:30 -0500
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F4BBC061574
+        for <kvm@vger.kernel.org>; Mon, 13 Dec 2021 14:59:30 -0800 (PST)
+Received: by mail-pj1-x1049.google.com with SMTP id gf15-20020a17090ac7cf00b001a9a31687d0so9486300pjb.1
+        for <kvm@vger.kernel.org>; Mon, 13 Dec 2021 14:59:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=7FL2w8dpPfO+G2QLXIxjm0csK2DC0KxYpauIDjxm0W4=;
-        b=JZJEl3xodRJIDgfu8OkIMkbS7DBGGMWibPsNL7OqBNacy1HHNZJkU/XLzr71r0zHxl
-         6ejE1eCRfIN9J+cAWg0/ms7ZJfYa0+CMF0sbvM3VmbM/bl2ZTAzA2B6GCLZnXb9YKfGQ
-         vIRsRQ4hF5MNj7Uvc41GNTkl4amUj8iACgfohHSJFnQRX/62aAOfu8JJuNrn+FbR80jF
-         ze5GuK2omvjVaGp5c9cdwIkdHhnm+0eY8JcVFBVMib47fOe0NsIGE0KnJ5D3i4nmKYgF
-         dwMUaTRFZHH1WOcqRAzjtmyUmD095UIi3RgOaXDXAyWkECpDeGYF0pSIKLAaL8KGiXnG
-         ejOA==
+        bh=CUA8Kpd1Qp4b7Qr2EMkSmyJ+XKRmg8wbahlTIVobdrE=;
+        b=PbcEzTdKafMKp+eUzL1oodmKvuQHx6/c4TZfNF7+r53N2md0gHPMcpwQGuYtHgZr8g
+         hGJe738lQgrtLog6yPCTT705/UXkkpbi+rItGaBZ8gpBO0NRF64lT6BW3lc0+frB8SLV
+         QHNl9lSZoofOnbrYx23ziOF0Q4fN7ktsb9K7Ssk4McM+JDbsFk9Kj8mKmB1OiayU/zrS
+         4407ac0dAC/NCwvd3M9+ZFUrs/nwitysaupXFOikbSWq2VrwABUrvNqEa5CnfK2c75N6
+         X8+6pMc0t2yrB7w8PEV/AE+JLnf38/H0aDV0+mU4YE6fDfcxC7f7vuWpDgLKSa6nPjLI
+         w5VA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=7FL2w8dpPfO+G2QLXIxjm0csK2DC0KxYpauIDjxm0W4=;
-        b=YG610YprjkZY9QuveD6l1BU+KO57Ld2lDs+rWWOKLJQjjED2DYSmex6XLGo4ZPfl50
-         crQibGoBxMThJ5En8Eh6f2uiFK74vxbGqFINktkm5RLtlCrMwhnuHhmmYaAuHsms64ah
-         ZZiU935+elnmX2bKFSnn66SwfFxB8qGlXE9mn98BpP8pY7POwU3IWV/WjmJn2oF1ihJV
-         LpwVDPtleb/J9GYwACau5m7pNC2e2bqM5wUal4FEr9e5ewt0srMz2EklWyyiFq8bZT/F
-         PhKr4CJSuasRVzU3gr8oz/3jV7cIMM1BCvRNdA0tvld7ctYBYRUbMyQ0GVMqCi/WxVwi
-         5xoQ==
-X-Gm-Message-State: AOAM532MwcVsIID+5ANoIoR1vc99NIXViWC+LOT89D/hGzJcEMhS0bU2
-        oPuihZiltnNXE9oFditffxv2Xcm0cEuKTg==
-X-Google-Smtp-Source: ABdhPJzN2VsU0o8SxPQHyOSfFLQ6BjlTNn/thWcNFkZjJSo8shVVvaFc9PGJJ2RiiUpvuBzsWqQoN4TbH0jRsA==
+        bh=CUA8Kpd1Qp4b7Qr2EMkSmyJ+XKRmg8wbahlTIVobdrE=;
+        b=vtsDpHhr7js3KOWPA1m7Wlh2UFzsM3HCcfX5FWOrq46aOwzzouvE+SijBistgI180E
+         qBmvcQVpB6bQ1BXwBbHf+24tV9uscdD37t4GStul9eaLGl6hT3/XZVR0YMzC0DWdesFG
+         Reh3/BYlA8DlJ99DAI5fXoWI0O+9g/5/yY6phEXMl/crM38S9ZT3PQ4AIbTPAGs8Wq9H
+         E0H6RMpFfwhrqVwtiP3OQiUv6na9vsrkTiy/MptUKuRUGBR3BGGSFMTt9SFOlUBG1Glg
+         XvCCATUCjAGAyXjYLkh6Dl366Wdz3GwO2Gi7ds/PAk9qhPHB6UKo2mnNkpMnMDAblmfh
+         6LAQ==
+X-Gm-Message-State: AOAM530v6q8+xG9en+/hiHTod9rC5WD3nGGhqHkHr9WIchjonMoUzX3j
+        f/4UyVPph2mdZHz9qrxgwIl9jAhQ6LxS2A==
+X-Google-Smtp-Source: ABdhPJyF9vipN2UHMSw4CPV8el2571Um5meXegkAgICDEMzS+8ut7ADT8jfu+VcMHESL5tC+aPch9d0L8jE01A==
 X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a17:902:e804:b0:142:1c0b:c2a6 with SMTP
- id u4-20020a170902e80400b001421c0bc2a6mr1160949plg.23.1639436368190; Mon, 13
- Dec 2021 14:59:28 -0800 (PST)
-Date:   Mon, 13 Dec 2021 22:59:09 +0000
+ (user=dmatlack job=sendgmr) by 2002:a17:90b:3889:: with SMTP id
+ mu9mr1275973pjb.160.1639436369901; Mon, 13 Dec 2021 14:59:29 -0800 (PST)
+Date:   Mon, 13 Dec 2021 22:59:10 +0000
 In-Reply-To: <20211213225918.672507-1-dmatlack@google.com>
-Message-Id: <20211213225918.672507-5-dmatlack@google.com>
+Message-Id: <20211213225918.672507-6-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20211213225918.672507-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.34.1.173.g76aa8bc2d0-goog
-Subject: [PATCH v1 04/13] KVM: x86/mmu: Factor out logic to atomically install
- a new page table
+Subject: [PATCH v1 05/13] KVM: x86/mmu: Move restore_acc_track_spte to spte.c
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Ben Gardon <bgardon@google.com>,
@@ -73,99 +71,90 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Factor out the logic to atomically replace an SPTE with an SPTE that
-points to a new page table. This will be used in a follow-up commit to
-split a large page SPTE into one level lower.
+restore_acc_track_spte is purely an SPTE manipulation, making it a good
+fit for spte.c. It is also needed in spte.c in a follow-up commit so we
+can construct child SPTEs during large page splitting.
 
-Opportunistically drop the kvm_mmu_get_page tracepoint in
-kvm_tdp_mmu_map() since it is redundant with the identical tracepoint in
-alloc_tdp_mmu_page().
+No functional change intended.
 
 Signed-off-by: David Matlack <dmatlack@google.com>
+Reviewed-by: Ben Gardon <bgardon@google.com>
 ---
- arch/x86/kvm/mmu/tdp_mmu.c | 48 +++++++++++++++++++++++++++-----------
- 1 file changed, 34 insertions(+), 14 deletions(-)
+ arch/x86/kvm/mmu/mmu.c  | 18 ------------------
+ arch/x86/kvm/mmu/spte.c | 18 ++++++++++++++++++
+ arch/x86/kvm/mmu/spte.h |  1 +
+ 3 files changed, 19 insertions(+), 18 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 656ebf5b20dc..dbd07c10d11a 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -950,6 +950,36 @@ static int tdp_mmu_map_handle_target_level(struct kvm_vcpu *vcpu,
- 	return ret;
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 8b702f2b6a70..3c2cb4dd1f11 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -646,24 +646,6 @@ static u64 mmu_spte_get_lockless(u64 *sptep)
+ 	return __get_spte_lockless(sptep);
  }
  
-+/*
-+ * tdp_mmu_install_sp_atomic - Atomically replace the given spte with an
-+ * spte pointing to the provided page table.
-+ *
-+ * @kvm: kvm instance
-+ * @iter: a tdp_iter instance currently on the SPTE that should be set
-+ * @sp: The new TDP page table to install.
-+ * @account_nx: True if this page table is being installed to split a
-+ *              non-executable huge page.
-+ *
-+ * Returns: True if the new page table was installed. False if spte being
-+ *          replaced changed, causing the atomic compare-exchange to fail.
-+ *          If this function returns false the sp will be freed before
-+ *          returning.
-+ */
-+static bool tdp_mmu_install_sp_atomic(struct kvm *kvm,
-+				      struct tdp_iter *iter,
-+				      struct kvm_mmu_page *sp,
-+				      bool account_nx)
+-/* Restore an acc-track PTE back to a regular PTE */
+-static u64 restore_acc_track_spte(u64 spte)
+-{
+-	u64 new_spte = spte;
+-	u64 saved_bits = (spte >> SHADOW_ACC_TRACK_SAVED_BITS_SHIFT)
+-			 & SHADOW_ACC_TRACK_SAVED_BITS_MASK;
+-
+-	WARN_ON_ONCE(spte_ad_enabled(spte));
+-	WARN_ON_ONCE(!is_access_track_spte(spte));
+-
+-	new_spte &= ~shadow_acc_track_mask;
+-	new_spte &= ~(SHADOW_ACC_TRACK_SAVED_BITS_MASK <<
+-		      SHADOW_ACC_TRACK_SAVED_BITS_SHIFT);
+-	new_spte |= saved_bits;
+-
+-	return new_spte;
+-}
+-
+ /* Returns the Accessed status of the PTE and resets it at the same time. */
+ static bool mmu_spte_age(u64 *sptep)
+ {
+diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+index 8a7b03207762..fd34ae5d6940 100644
+--- a/arch/x86/kvm/mmu/spte.c
++++ b/arch/x86/kvm/mmu/spte.c
+@@ -268,6 +268,24 @@ u64 mark_spte_for_access_track(u64 spte)
+ 	return spte;
+ }
+ 
++/* Restore an acc-track PTE back to a regular PTE */
++u64 restore_acc_track_spte(u64 spte)
 +{
-+	u64 spte = make_nonleaf_spte(sp->spt, !shadow_accessed_mask);
++	u64 new_spte = spte;
++	u64 saved_bits = (spte >> SHADOW_ACC_TRACK_SAVED_BITS_SHIFT)
++			 & SHADOW_ACC_TRACK_SAVED_BITS_MASK;
 +
-+	if (!tdp_mmu_set_spte_atomic(kvm, iter, spte))
-+		return false;
++	WARN_ON_ONCE(spte_ad_enabled(spte));
++	WARN_ON_ONCE(!is_access_track_spte(spte));
 +
-+	tdp_mmu_link_page(kvm, sp, account_nx);
++	new_spte &= ~shadow_acc_track_mask;
++	new_spte &= ~(SHADOW_ACC_TRACK_SAVED_BITS_MASK <<
++		      SHADOW_ACC_TRACK_SAVED_BITS_SHIFT);
++	new_spte |= saved_bits;
 +
-+	return true;
++	return new_spte;
 +}
 +
- /*
-  * Handle a TDP page fault (NPT/EPT violation/misconfiguration) by installing
-  * page tables and SPTEs to translate the faulting guest physical address.
-@@ -959,8 +989,6 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 	struct kvm_mmu *mmu = vcpu->arch.mmu;
- 	struct tdp_iter iter;
- 	struct kvm_mmu_page *sp;
--	u64 *child_pt;
--	u64 new_spte;
- 	int ret;
+ void kvm_mmu_set_mmio_spte_mask(u64 mmio_value, u64 mmio_mask, u64 access_mask)
+ {
+ 	BUG_ON((u64)(unsigned)access_mask != access_mask);
+diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
+index a4af2a42695c..9b0c7b27f23f 100644
+--- a/arch/x86/kvm/mmu/spte.h
++++ b/arch/x86/kvm/mmu/spte.h
+@@ -337,6 +337,7 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+ u64 make_nonleaf_spte(u64 *child_pt, bool ad_disabled);
+ u64 make_mmio_spte(struct kvm_vcpu *vcpu, u64 gfn, unsigned int access);
+ u64 mark_spte_for_access_track(u64 spte);
++u64 restore_acc_track_spte(u64 spte);
+ u64 kvm_mmu_changed_pte_notifier_make_spte(u64 old_spte, kvm_pfn_t new_pfn);
  
- 	kvm_mmu_hugepage_adjust(vcpu, fault);
-@@ -996,6 +1024,9 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 		}
- 
- 		if (!is_shadow_present_pte(iter.old_spte)) {
-+			bool account_nx = fault->huge_page_disallowed &&
-+					  fault->req_level >= iter.level;
-+
- 			/*
- 			 * If SPTE has been frozen by another thread, just
- 			 * give up and retry, avoiding unnecessary page table
-@@ -1005,18 +1036,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 				break;
- 
- 			sp = alloc_tdp_mmu_page(vcpu, iter.gfn, iter.level - 1);
--			child_pt = sp->spt;
--
--			new_spte = make_nonleaf_spte(child_pt,
--						     !shadow_accessed_mask);
--
--			if (tdp_mmu_set_spte_atomic(vcpu->kvm, &iter, new_spte)) {
--				tdp_mmu_link_page(vcpu->kvm, sp,
--						  fault->huge_page_disallowed &&
--						  fault->req_level >= iter.level);
--
--				trace_kvm_mmu_get_page(sp, true);
--			} else {
-+			if (!tdp_mmu_install_sp_atomic(vcpu->kvm, &iter, sp, account_nx)) {
- 				tdp_mmu_free_sp(sp);
- 				break;
- 			}
+ void kvm_mmu_reset_all_pte_masks(void);
 -- 
 2.34.1.173.g76aa8bc2d0-goog
 
