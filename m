@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F2AE472A97
-	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 11:47:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 07A8A472A99
+	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 11:48:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235824AbhLMKry (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Dec 2021 05:47:54 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45255 "EHLO
+        id S234458AbhLMKsK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Dec 2021 05:48:10 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:39503 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236542AbhLMKrx (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 13 Dec 2021 05:47:53 -0500
+        by vger.kernel.org with ESMTP id S230033AbhLMKsJ (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 13 Dec 2021 05:48:09 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1639392473;
+        s=mimecast20190719; t=1639392488;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=59HMtpTMQ9i7eUmXBrMB6oGvSjYwRln+nBm30V7CKiY=;
-        b=cvDfVlRkkCuLsouYzfGS0RKpeN53G7baRdkUcoii0cLPVQBtKF59WLgF7eb65zUueNCihD
-        OxkmnozQchzJfOMGgmKVbuYieTlDUU/MCsG8FQMxG6WffI5okYsOJsXLhN4LYBUj0kMESV
-        /NP6qyIoTvNWN3XmzEqD0ZAfWkIhJMw=
+        bh=jnXL5IiyKlqaAw3UKpSxxZyirByxfhySDRurZ1Ij+oA=;
+        b=LSvT6HTwg1+tCPJReYwkLDU22+VgBlyu3xyhh01babzCRP/17R1CA1mHKUGRpUUNFO6l5Y
+        j/sBmfB+zczxSdpYIR7pmt7UA2GKibQkRJWuFDRCVTT1Pl+5RQBhK4CEVtAOEj3YA/q4vv
+        V4lvqLUyiMXJ9jwwOthP7mTR4LM+jkU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-438-ELnzw9ZaOCeLXC2pEKNjHw-1; Mon, 13 Dec 2021 05:47:50 -0500
-X-MC-Unique: ELnzw9ZaOCeLXC2pEKNjHw-1
+ us-mta-537-XBVA_j1IOd2ehJoQPF96TQ-1; Mon, 13 Dec 2021 05:48:05 -0500
+X-MC-Unique: XBVA_j1IOd2ehJoQPF96TQ-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DB1B5802921;
-        Mon, 13 Dec 2021 10:47:48 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9D49664083;
+        Mon, 13 Dec 2021 10:48:03 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.40.192.24])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 4FF595F70B;
-        Mon, 13 Dec 2021 10:47:23 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D46595F70B;
+        Mon, 13 Dec 2021 10:47:49 +0000 (UTC)
 From:   Maxim Levitsky <mlevitsk@redhat.com>
 To:     kvm@vger.kernel.org
 Cc:     Jim Mattson <jmattson@google.com>,
@@ -49,9 +49,9 @@ Cc:     Jim Mattson <jmattson@google.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Ingo Molnar <mingo@redhat.com>,
         Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH v2 1/5] KVM: nSVM: deal with L1 hypervisor that intercepts interrupts but lets L2 control EFLAGS.IF
-Date:   Mon, 13 Dec 2021 12:46:30 +0200
-Message-Id: <20211213104634.199141-2-mlevitsk@redhat.com>
+Subject: [PATCH v2 2/5] KVM: SVM: allow to force AVIC to be enabled
+Date:   Mon, 13 Dec 2021 12:46:31 +0200
+Message-Id: <20211213104634.199141-3-mlevitsk@redhat.com>
 In-Reply-To: <20211213104634.199141-1-mlevitsk@redhat.com>
 References: <20211213104634.199141-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
@@ -61,55 +61,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Fix a corner case in which L1 hypervisor intercepts interrupts (INTERCEPT_INTR)
-and either doesn't use virtual interrupt masking (V_INTR_MASKING) or
-enters a nested guest with EFLAGS.IF disabled prior to the entry.
+Apparently on some systems AVIC is disabled in CPUID but still usable.
 
-In this case, despite the fact that L1 intercepts the interrupts,
-KVM still needs to set up an interrupt window to wait before it
-can deliver INTR vmexit.
-
-Currently instead, the KVM enters an endless loop of 'req_immediate_exit'.
-
-Note that on VMX this case is impossible as there is only
-'vmexit on external interrupts' execution control which either set,
-in which case both host and guest's EFLAGS.IF
-is ignored, or clear, in which case no VMexit is delivered.
+Allow the user to override the CPUID if the user is willing to
+take the risk.
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/x86/kvm/svm/svm.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ arch/x86/kvm/svm/svm.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index e57e6857e0630..c9668a3b51011 100644
+index c9668a3b51011..468cc385c35f0 100644
 --- a/arch/x86/kvm/svm/svm.c
 +++ b/arch/x86/kvm/svm/svm.c
-@@ -3372,17 +3372,21 @@ bool svm_interrupt_blocked(struct kvm_vcpu *vcpu)
- static int svm_interrupt_allowed(struct kvm_vcpu *vcpu, bool for_injection)
- {
- 	struct vcpu_svm *svm = to_svm(vcpu);
-+	bool blocked;
-+
- 	if (svm->nested.nested_run_pending)
- 		return -EBUSY;
+@@ -206,6 +206,9 @@ module_param(tsc_scaling, int, 0444);
+ static bool avic;
+ module_param(avic, bool, 0444);
  
-+	blocked = svm_interrupt_blocked(vcpu);
++static bool force_avic;
++module_param_unsafe(force_avic, bool, 0444);
 +
- 	/*
- 	 * An IRQ must not be injected into L2 if it's supposed to VM-Exit,
- 	 * e.g. if the IRQ arrived asynchronously after checking nested events.
- 	 */
- 	if (for_injection && is_guest_mode(vcpu) && nested_exit_on_intr(svm))
--		return -EBUSY;
--
--	return !svm_interrupt_blocked(vcpu);
-+		return !blocked ? -EBUSY : 0;
-+	else
-+		return !blocked;
- }
+ bool __read_mostly dump_invalid_vmcb;
+ module_param(dump_invalid_vmcb, bool, 0644);
  
- static void svm_enable_irq_window(struct kvm_vcpu *vcpu)
+@@ -4656,10 +4659,14 @@ static __init int svm_hardware_setup(void)
+ 			nrips = false;
+ 	}
+ 
+-	enable_apicv = avic = avic && npt_enabled && boot_cpu_has(X86_FEATURE_AVIC);
++	enable_apicv = avic = avic && npt_enabled && (boot_cpu_has(X86_FEATURE_AVIC) || force_avic);
+ 
+ 	if (enable_apicv) {
+-		pr_info("AVIC enabled\n");
++		if (!boot_cpu_has(X86_FEATURE_AVIC)) {
++			pr_warn("AVIC is not supported in CPUID but force enabled");
++			pr_warn("Your system might crash and burn");
++		} else
++			pr_info("AVIC enabled\n");
+ 
+ 		amd_iommu_register_ga_log_notifier(&avic_ga_log_notifier);
+ 	} else {
 -- 
 2.26.3
 
