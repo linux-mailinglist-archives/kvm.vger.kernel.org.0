@@ -2,106 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CF458471FD1
-	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 05:12:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 906B0471FD2
+	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 05:15:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229922AbhLMEMd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Dec 2021 23:12:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37598 "EHLO
+        id S229950AbhLMEP1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Dec 2021 23:15:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229748AbhLMEMc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Dec 2021 23:12:32 -0500
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E38B9C06173F
-        for <kvm@vger.kernel.org>; Sun, 12 Dec 2021 20:12:31 -0800 (PST)
-Received: by mail-wr1-x431.google.com with SMTP id d9so24889708wrw.4
-        for <kvm@vger.kernel.org>; Sun, 12 Dec 2021 20:12:31 -0800 (PST)
+        with ESMTP id S229748AbhLMEP0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 Dec 2021 23:15:26 -0500
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EC9AC06173F
+        for <kvm@vger.kernel.org>; Sun, 12 Dec 2021 20:15:26 -0800 (PST)
+Received: by mail-wr1-x432.google.com with SMTP id d24so24993498wra.0
+        for <kvm@vger.kernel.org>; Sun, 12 Dec 2021 20:15:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=brainfault-org.20210112.gappssmtp.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=fP9dnLtCeBgzLlR/Lw9mBCQ4DyaLsnx9vXvgOb0yNOk=;
-        b=LJPnA3Nj10kzmHbWiltzioBJ8miNw97Tt+5j1x6H5YJqi6hbXqgTiB/yY5n+t5oGdC
-         Nc8usqLj6jGn7ik+rnSox0WsmNrAzhoGEhxBxTUIG0BoT+fLkob7J6oor/VQbMQlPvBJ
-         5qyUBM8jHaxy1GIib2gb2vM2yOwh2m3C13nxNLjDa15Hn+AA8+bLqWqW21voEMtp3Mui
-         C0I1ydEyj/pFmg/yth2dm3sB5qQdwXmW7d8YV6cGSkY6AbPGlSsSkWVQbEcNiOWsya6l
-         T3BgqowUDa8OARsKHh1wgktzd4y39ROY+snlM1ofp3cNpPZ2Fbqn2MJR5SYvo4trr4sw
-         +f2w==
+        bh=hQuNNiV36mSAjdx2A+UDnj7IsJtVFFXiaU04Zk+mx+E=;
+        b=aAJCn2VYvrJO3L1q1FQFa2YE3Ji4AgEAr++5j5JSEWn4z31W0lNbFNEdugdo8/HQFN
+         QwaiLEhrrdopD8g9RUhrZ6q+aGrEWP4nQbOFHkZl1kvJomRkxf2vW/6eEfqNWs7m13va
+         B/9wanYfbipg+zo1KecnjKRki2pgIFj9qtsDm7q/sjEs1rR+JNO6qJvA+U+8DWrXAFsS
+         X8e0e0JoaAhBqKMwRLSndwRLcrdGWJvE7bq5o0fBUH1QL13y/NAY9GXkwOWKMe1mO0+l
+         tL3ApUPbMU66pN8FUalPoIwI2Nu7RfBrTPR6P3mUMEK+oqO3Hxh9DORia78fF27C2vnO
+         bumQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=fP9dnLtCeBgzLlR/Lw9mBCQ4DyaLsnx9vXvgOb0yNOk=;
-        b=f2W932pOyHSFkMaw+Gd3vLmQuW8WuotdF6HZQ8UIyM//ddRs5lK5PnCWQGMzsc4p6/
-         tqDMhkKpaY0sCs7MtkioEdyEl59SgRaN3CPnaJ8wgBzb+yBQtOn/sNwkGcikE1WC2pqM
-         cdRAa71DFZtRNw732odqrRIJ7ehYSYCPpY82XgPrcAzMcLVqJJPyyUaE0SYpcfMYHVmd
-         hze4Km15qV9Hu3cBfuC96pU3Cg+XutNNIvkgl6euZwoeZVE5xays9a9SLZvLzng4uBa4
-         2awHLkP7sMNswjIg13QOQxD1Jr/jcEcoIwbX5YJl1t7HVEq7lVQtVDCpJtI+XFpCaQAv
-         fVkA==
-X-Gm-Message-State: AOAM532PIF27RXW5OUR7//DXBQX7+SbICuRmK1yT1558xlOm98+X9FDO
-        AAGfjDm5jI5y4FarrLOyViscfIVPfCpWRXo/ZnMhcji+cl8=
-X-Google-Smtp-Source: ABdhPJxysva3nO33JUSd0bnK/tZzNMemtYt0k+xWYPhfLAhRCBvrcCRGdk7+Txt972NJLGqI3Qtn/bgrd64KzAao10s=
-X-Received: by 2002:adf:eb0f:: with SMTP id s15mr13042553wrn.690.1639368749832;
- Sun, 12 Dec 2021 20:12:29 -0800 (PST)
+        bh=hQuNNiV36mSAjdx2A+UDnj7IsJtVFFXiaU04Zk+mx+E=;
+        b=ocIl4cR0t9Scxs9TKAFKFzBumuXHBQsTuisIsY0ANzr9tlc26yBt9Kjet7hc6i7/3o
+         3fffxT7f87M1mBTDEAeHxVrzWd2wTxfVEJYpDF4LCr2akAQq6PJrBcuUJ+L61yefDJnD
+         cSLT4kqq/Imv9pvtaU43h3u7LWGWQtJDqKJB4McAoyi4Y7RtA5Vbrrar7vbR91hqNy4u
+         i7Mj7p25B4iTiOmpFXG1Y+7Yi4eKlPCefzFQPyJgWiJZDIugqgxbvHJbNNar2ZGZd3x7
+         2Ez/nqIhlhnF1gKu+xrrlGYEZcbamAMOhZuLn8qKZFtOUGVY+zmlYqVa5f/U2h0qMF3H
+         7imQ==
+X-Gm-Message-State: AOAM53275qcTOhwKRmsoJvUcYgfpxl3TGQhqgeWVQxZCbYj7PVkGhjxZ
+        dbxbC+xO74agoCUv20Msb16F3CR3r1I2/GLR4NHwiA==
+X-Google-Smtp-Source: ABdhPJzsEO0NbXWE7QXUW9Ts0TN3/8EV4LxFUxaBHg8aNp0CX9LcsDcD85gipYZvAa6eRtBVN7Col3rHPtQcrxKMluI=
+X-Received: by 2002:adf:d1e2:: with SMTP id g2mr29797466wrd.346.1639368924975;
+ Sun, 12 Dec 2021 20:15:24 -0800 (PST)
 MIME-Version: 1.0
-References: <20211119124515.89439-1-anup.patel@wdc.com> <CAAhSdy1pqS5PYdxuxx5RD8baeqfd07Vm1DM7_Eq9Mby37mS_ig@mail.gmail.com>
- <87sfuz9q8p.wl-maz@kernel.org>
-In-Reply-To: <87sfuz9q8p.wl-maz@kernel.org>
+References: <20211210100732.1080-1-jiangyifei@huawei.com> <20211210100732.1080-4-jiangyifei@huawei.com>
+In-Reply-To: <20211210100732.1080-4-jiangyifei@huawei.com>
 From:   Anup Patel <anup@brainfault.org>
-Date:   Mon, 13 Dec 2021 09:42:18 +0530
-Message-ID: <CAAhSdy1Lnbe8VhnFW2nhnCzs_74PzuAeyaADvnMfo7iY0qhxsQ@mail.gmail.com>
-Subject: Re: [PATCH v11 kvmtool 0/8] KVMTOOL RISC-V Support
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Will Deacon <will@kernel.org>, julien.thierry.kdev@gmail.com,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <atishp@atishpatra.org>,
+Date:   Mon, 13 Dec 2021 09:45:12 +0530
+Message-ID: <CAAhSdy12sRcAarGN0z4HNDYrWPoJ+H6_HjXzc=2+ohdDvzeg5A@mail.gmail.com>
+Subject: Re: [PATCH v2 03/12] target/riscv: Implement function kvm_arch_init_vcpu
+To:     Yifei Jiang <jiangyifei@huawei.com>
+Cc:     QEMU Developers <qemu-devel@nongnu.org>,
+        "open list:RISC-V" <qemu-riscv@nongnu.org>,
+        kvm-riscv@lists.infradead.org, KVM General <kvm@vger.kernel.org>,
+        libvir-list@redhat.com, Anup Patel <anup.patel@wdc.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
         Alistair Francis <Alistair.Francis@wdc.com>,
-        Vincent Chen <vincent.chen@sifive.com>,
-        KVM General <kvm@vger.kernel.org>,
-        kvm-riscv@lists.infradead.org, Anup Patel <anup.patel@wdc.com>
+        Bin Meng <bin.meng@windriver.com>, fanliang@huawei.com,
+        "Wubin (H)" <wu.wubin@huawei.com>, wanghaibin.wang@huawei.com,
+        wanbo13@huawei.com, Mingwang Li <limingwang@huawei.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Dec 11, 2021 at 7:51 PM Marc Zyngier <maz@kernel.org> wrote:
+On Fri, Dec 10, 2021 at 3:37 PM Yifei Jiang <jiangyifei@huawei.com> wrote:
 >
-> On Sat, 11 Dec 2021 07:28:49 +0000,
-> Anup Patel <anup@brainfault.org> wrote:
-> >
-> > Hi Marc, Hi Will,
-> >
-> > On Fri, Nov 19, 2021 at 6:15 PM Anup Patel <anup.patel@wdc.com> wrote:
-> > >
-> > > This series adds RISC-V support for KVMTOOL and it is based on the
-> > > Linux-5.16-rc1. The KVM RISC-V patches have been merged in the Linux
-> > > kernel since 5.16-rc1.
-> > >
-> > > The KVMTOOL RISC-V patches can be found in riscv_master branch at:
-> > > https//github.com/kvm-riscv/kvmtool.git
-> >
-> > Ping ?
-> > Do you have further comments on this series ?
+> Get isa info from kvm while kvm init.
 >
-> Not much on my side, apart that it is a bit annoying that some of the
-> support is actually an almost exact copy of the arm code (PCI being a
-> striking example). It would have been nice to see some effort to make
-> the code common, although it isn't a blocker on my side.
+> Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
+> Signed-off-by: Mingwang Li <limingwang@huawei.com>
+> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-Thanks Marc.
+Looks good to me.
 
-I agree with you. The code sharing between ARM and RISC-V support
-needs to be improved. We have more stuff to be added after this series
-so I will prioritize code sharing.
+Reviewed-by: Anup Patel <anup.patel@wdc.com>
 
 Regards,
 Anup
 
-
+> ---
+>  target/riscv/kvm.c | 32 +++++++++++++++++++++++++++++++-
+>  1 file changed, 31 insertions(+), 1 deletion(-)
 >
-> Thanks,
+> diff --git a/target/riscv/kvm.c b/target/riscv/kvm.c
+> index 687dd4b621..ccf3753048 100644
+> --- a/target/riscv/kvm.c
+> +++ b/target/riscv/kvm.c
+> @@ -38,6 +38,23 @@
+>  #include "qemu/log.h"
+>  #include "hw/loader.h"
 >
->         M.
+> +static uint64_t kvm_riscv_reg_id(CPURISCVState *env, uint64_t type, uint64_t idx)
+> +{
+> +    uint64_t id = KVM_REG_RISCV | type | idx;
+> +
+> +    switch (riscv_cpu_mxl(env)) {
+> +    case MXL_RV32:
+> +        id |= KVM_REG_SIZE_U32;
+> +        break;
+> +    case MXL_RV64:
+> +        id |= KVM_REG_SIZE_U64;
+> +        break;
+> +    default:
+> +        g_assert_not_reached();
+> +    }
+> +    return id;
+> +}
+> +
+>  const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
+>      KVM_CAP_LAST_INFO
+>  };
+> @@ -79,7 +96,20 @@ void kvm_arch_init_irq_routing(KVMState *s)
 >
+>  int kvm_arch_init_vcpu(CPUState *cs)
+>  {
+> -    return 0;
+> +    int ret = 0;
+> +    target_ulong isa;
+> +    RISCVCPU *cpu = RISCV_CPU(cs);
+> +    CPURISCVState *env = &cpu->env;
+> +    uint64_t id;
+> +
+> +    id = kvm_riscv_reg_id(env, KVM_REG_RISCV_CONFIG, KVM_REG_RISCV_CONFIG_REG(isa));
+> +    ret = kvm_get_one_reg(cs, id, &isa);
+> +    if (ret) {
+> +        return ret;
+> +    }
+> +    env->misa_ext = isa;
+> +
+> +    return ret;
+>  }
+>
+>  int kvm_arch_msi_data_to_gsi(uint32_t data)
 > --
-> Without deviation from the norm, progress is not possible.
+> 2.19.1
+>
