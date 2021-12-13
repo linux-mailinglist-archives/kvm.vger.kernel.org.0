@@ -2,84 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A9141473018
-	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 16:07:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B939C473021
+	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 16:08:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231924AbhLMPHG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Dec 2021 10:07:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49580 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234797AbhLMPG5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Dec 2021 10:06:57 -0500
-Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F21BC061574;
-        Mon, 13 Dec 2021 07:06:57 -0800 (PST)
-Received: by mail-ed1-x52e.google.com with SMTP id w1so52985799edc.6;
-        Mon, 13 Dec 2021 07:06:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=D+OM0ZcmedPw5LKW8sfyRrJjP9nbgID1f4xqcJPjBqg=;
-        b=dGtwxoABqgZdJ5QjvI4V8UtjlNuiMAQ3vWwTGuWwrK2drWzZCZZI4vGHWuI/wD16Oc
-         qjVBzujgQpZh89ulOq87nBrULvmABQfl84GIiSsuEj7f6TdCz1d1MaVVIZ7WTrb3A/6I
-         rn3IRSdzHiebOeQlBeF5y+8oCt5tSdZft76fxgcwb0+aA8LBbcii2IIm1Q8C8tnIQssH
-         /xUUITLAvM5UU3OqKHgsjhT6gfreOyXB5ZG0KG+T7X1muJl6xVswp8cxIFrvXl+IEYsV
-         e+GhLek8C7BCKwPErAvxBMW9Qm3Ytrnaf+/5pRJT/x1yeheWfpqI5aZSdRddJoZD5QZw
-         /v7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=D+OM0ZcmedPw5LKW8sfyRrJjP9nbgID1f4xqcJPjBqg=;
-        b=YePVV+Mo4CYt8qxaIL6Q3/Ud4HeL8VJfkONogbozdIR51WiJaDX9YdWqxReP3Ez1rb
-         NainbYvt9cSXNDLEcFbtJbyYmub4F6u62LnIb6qXcamECgXzRMzdCHWTg6NoFXVZneJp
-         ZQBJj8/V8dOtkIfImNzzCFPEJ32rBwPXt98B1furkFinhF/szpXDpiUnKnM56pPltUps
-         lHq2J7V0xKowbiRsPPJKg4ADvbWVh2Lx3K2C5YxUqgLsUlPfb27D4B3tRnIdPdRU801N
-         pXP/xunt+oTaMZ/1G+tCCuR05Ad3EYskbybsRt9kWWqOxJy9szcu1IIIY3fjv1hcc9K4
-         nN6g==
-X-Gm-Message-State: AOAM531tZ3OsSLhdEctYW49CZ7xGSfT6Ib6eWgMHjCO/hqBFhoHK8MPF
-        KDAFU5v1ji8GvneGxvl5LPo=
-X-Google-Smtp-Source: ABdhPJwjITmETfb+FsdYrE5cod1vvUS9pztM2qIpHDo9t+iIrJaI3IyW7a5Kw0VCSn9jSjeOKWFbqA==
-X-Received: by 2002:a17:907:7250:: with SMTP id ds16mr44384421ejc.54.1639408011892;
-        Mon, 13 Dec 2021 07:06:51 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
-        by smtp.googlemail.com with ESMTPSA id cq19sm6308649edb.33.2021.12.13.07.06.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Dec 2021 07:06:51 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <452f3642-04fd-aa32-920e-5ad5925c0c91@redhat.com>
-Date:   Mon, 13 Dec 2021 16:06:49 +0100
+        id S239947AbhLMPIN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Dec 2021 10:08:13 -0500
+Received: from mga03.intel.com ([134.134.136.65]:41906 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233162AbhLMPIM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Dec 2021 10:08:12 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1639408092; x=1670944092;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=Ln0+vE8wrxPHB5+sl1PGPaxOXedMn7wnxkhrIv1Bgmc=;
+  b=UA9XDtpdRKDAPliumW57D8jafRpgKLcBqJ9kVphtReC9iz/c7gj13hAX
+   kAkUiMvKDYqE55SVUe5usYZC15f1tt+v93D8F6NjUlmxpb7Jf45oKtzZB
+   vk8Lc5o+HckKhaVR9zEwBNr+eKd9wgKwBZT81JiGHGhQDjlsSX6vPIFra
+   dkQ49YpSz2zBWCpflagkxu2E8xCl6BpgxYAA0caBQCPdsibl5Gio5x/Gx
+   nnhKg6Ehpnbsl70G7dOWDa+T5xwgKJM50eezauNO9zPhI0VUxosKe6AY2
+   d9U2x2eQgMKDvP5JBZmW+b43/FDY3S5JgCwYvbV6l6sWq+R/ibZFwfDzU
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10196"; a="238696143"
+X-IronPort-AV: E=Sophos;i="5.88,202,1635231600"; 
+   d="scan'208";a="238696143"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2021 07:08:11 -0800
+X-IronPort-AV: E=Sophos;i="5.88,202,1635231600"; 
+   d="scan'208";a="752294967"
+Received: from chenb-mobl1.amr.corp.intel.com (HELO [10.212.210.237]) ([10.212.210.237])
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2021 07:08:09 -0800
+Subject: Re: [PATCH v8 27/40] x86/boot: Add Confidential Computing type to
+ setup_data
+To:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+References: <20211210154332.11526-1-brijesh.singh@amd.com>
+ <20211210154332.11526-28-brijesh.singh@amd.com>
+ <1fdaca61-884a-ac13-fb33-a47db198f050@intel.com>
+ <ba485a09-9c35-4115-decc-1b9c25519358@amd.com>
+ <2a5cfbd0-865c-2a8b-b70b-f8f64aba5575@intel.com>
+ <f442ca7f-4530-1443-27eb-206d6ca0e7a4@amd.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+ z5cecg==
+Message-ID: <48625a39-9e31-d7f2-dccf-74e9c27126f5@intel.com>
+Date:   Mon, 13 Dec 2021 07:08:07 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH 0/2] KVM: x86: Fix dangling page reference in TDP MMU
+In-Reply-To: <f442ca7f-4530-1443-27eb-206d6ca0e7a4@amd.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-To:     Ignat Korchagin <ignat@cloudflare.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>, bgardon@google.com,
-        dmatlack@google.com, stevensd@chromium.org,
-        kernel-team <kernel-team@cloudflare.com>
-References: <20211213112514.78552-1-pbonzini@redhat.com>
- <CALrw=nEM6LEAD8LA1Bd15=8BK=TFwwwAMKy_DWRrDkD=r+1Tqg@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <CALrw=nEM6LEAD8LA1Bd15=8BK=TFwwwAMKy_DWRrDkD=r+1Tqg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/13/21 14:43, Ignat Korchagin wrote:
-> The only difference I noticed is the presence of __tdp_mmu_set_spte
-> between zap_gfn_range and __handle_changed_spte, which is absent from
-> the original stacktrace.
+On 12/13/21 6:49 AM, Brijesh Singh wrote:
+>> I was more concerned that this structure could change sizes if it were
+>> compiled on 32-bit versus 64-bit code.  For kernel ABIs, we try not to
+>> do that.
+>>
+>> Is this somehow OK when talking to firmware?  Or can a 32-bit OS and
+>> 64-bit firmware never interact?
+> 
+> For SNP, both the firmware and OS need to be 64-bit. IIRC, both the
+> Linux and OVMF do not enable the memory encryption for the 32-bit.
 
-That's just a difference in inlining decisions, so it doesn't really matter.
-
-Let's see if Sean has some more ideas or finds something obviously wrong 
-in my patch.
-
-Paolo
+Could you please make the structure's size invariant?  That's great if
+there's no problem in today's implementation, but it's best no to leave
+little land mines like this around.  Let's say someone copies your code
+as an example of something that interacts with a firmware table a few
+years or months down the road.
