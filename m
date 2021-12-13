@@ -2,207 +2,248 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3BC26472FBD
-	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 15:49:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FD47472FE4
+	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 15:58:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239183AbhLMOtu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Dec 2021 09:49:50 -0500
-Received: from mail-dm6nam11on2060.outbound.protection.outlook.com ([40.107.223.60]:13664
-        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230122AbhLMOtt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Dec 2021 09:49:49 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=R8xDitrvnzTwogIKREBEC1d4Ad5OQcsvjLcWMsMsf2doIuURJY7N4Ki6o65Soug/8JRkuhv2671sN730jLk+XgMkYvMLH8tM+RXCXe+5qIXwUhhRih1Ms9B/lLYv8aYM0Anfmxx0n5leO6+UxhCrhw150M6cYjyM7fnSW2CYf3YdM5CXJWFxN0YTaklnWNx5m94tpHjjiBsOV3g7zxUUcLLNbkHXqLBMrWFQd6WQgZSKFWoCbqPPPLDgY2sQGhEh4N5Tz+DCQ1IxvsUrcXk9hKtpLWc1QGoEdO93pL3duKaG9eWmoX2SqWxwF44gu/P9725O2LEwDH+9iCIWTCaRkA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Xl8wF20jOLbRpeY8mSXLE+CgszMsGURQOSlkW1YQbMs=;
- b=fprtHLNFhRVxZEq16Q2F8h55eY1QdDHa8B5bdKjvFCCyZM5sZvGoLl8uaqw1YNWarrLnsZSAfeUb8CpZLMSbc6zVq6iwdc7nlEGpgpqV4D5S1m3JdY+krchc5Ar7NYxaOXFOGNqwxapGVX9lJLqGAL/P2a0rXb9nZEhFd2ECt4shYbxF67TW1HUh8+U1/E6BAm2qT5ErXyDJTLc/gD97NyErREk0BBjF80fNz8T1WQwE4YhWcj66ir/NZhNZdNai2XapCxYiK9TgnUIrJoXW9dIwQCwfAzmgKmzKuYfEGHLn1nLHnJdxdYxcAhiB0yaNmrO0dQdoUvRaE3bfKj5q4A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Xl8wF20jOLbRpeY8mSXLE+CgszMsGURQOSlkW1YQbMs=;
- b=5bvYK19eqJTPok37O/ZhUbwHgQ+HAAF8WGEmbOhzru52uhkmNrQOhCZQjLKHS/SG2tPFeC5RaV6gmSa00vYenOzh65ji4DhcAAJHbAVzkl5YbBzJRV0aToIq0+HCxppEbunCdXiBvAqEymAEsBSapeoXc6wAHG0qX+r/ZRScfu8=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
- by SN6PR12MB4671.namprd12.prod.outlook.com (2603:10b6:805:e::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4778.17; Mon, 13 Dec
- 2021 14:49:46 +0000
-Received: from SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::35:281:b7f8:ed4c]) by SN6PR12MB2718.namprd12.prod.outlook.com
- ([fe80::35:281:b7f8:ed4c%6]) with mapi id 15.20.4778.018; Mon, 13 Dec 2021
- 14:49:46 +0000
-Cc:     brijesh.singh@amd.com, Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v8 27/40] x86/boot: Add Confidential Computing type to
- setup_data
-To:     Dave Hansen <dave.hansen@intel.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org
-References: <20211210154332.11526-1-brijesh.singh@amd.com>
- <20211210154332.11526-28-brijesh.singh@amd.com>
- <1fdaca61-884a-ac13-fb33-a47db198f050@intel.com>
- <ba485a09-9c35-4115-decc-1b9c25519358@amd.com>
- <2a5cfbd0-865c-2a8b-b70b-f8f64aba5575@intel.com>
-From:   Brijesh Singh <brijesh.singh@amd.com>
-Message-ID: <f442ca7f-4530-1443-27eb-206d6ca0e7a4@amd.com>
-Date:   Mon, 13 Dec 2021 08:49:41 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
-In-Reply-To: <2a5cfbd0-865c-2a8b-b70b-f8f64aba5575@intel.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MN2PR12CA0015.namprd12.prod.outlook.com
- (2603:10b6:208:a8::28) To SN6PR12MB2718.namprd12.prod.outlook.com
- (2603:10b6:805:6f::22)
+        id S239146AbhLMO6q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Dec 2021 09:58:46 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54676 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S235529AbhLMO6p (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 13 Dec 2021 09:58:45 -0500
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1BDEvS3p016460;
+        Mon, 13 Dec 2021 14:58:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=PcM1IYvLm+adT2oBLqqFvlyfjemGDOnOGmZ7UYreepc=;
+ b=dDxKZkYzqZx/8rjIgSr755V2qYgCincwcbFO+jVIOKJVj6mZ3QXDckDU2MVFqF4TIcC/
+ yi9O/lT0ttxG64jWrAtELw1Yxa8o/ZRcvMtoYHb3eVlXFaN/5CWqYptEtMF0/K5col0B
+ BW534LKwkGl6NV5kN6LDXJLCRm8D9OBPXe5rNOqcabsvbiN/Vv3n6yVJSzg6056zWJwh
+ TPK226Xz6CqYePl+xwoxPTJyi/6L2XJxa+MyK/EWIV8SJtse+lA3Slxqwx+Vc/jovTPj
+ uRAxZDF0izKjHth63/h9PgITbE9OKlyMvOwlJ0PhZaRQ1e7ck8bvMJBqT1y3KmPi3ick hw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3cx8d3r1fg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 13 Dec 2021 14:58:44 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1BDEw4Yh017793;
+        Mon, 13 Dec 2021 14:58:44 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 3cx8d3r1ed-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 13 Dec 2021 14:58:43 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1BDEwCBJ025347;
+        Mon, 13 Dec 2021 14:58:42 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma03ams.nl.ibm.com with ESMTP id 3cvkm963e8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 13 Dec 2021 14:58:42 +0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1BDEwcAt35389852
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 13 Dec 2021 14:58:38 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7AD8211C06F;
+        Mon, 13 Dec 2021 14:58:38 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 76C0211C066;
+        Mon, 13 Dec 2021 14:58:37 +0000 (GMT)
+Received: from [9.171.24.181] (unknown [9.171.24.181])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 13 Dec 2021 14:58:37 +0000 (GMT)
+Message-ID: <f5180bc1-8500-6c62-1002-87c1550a2011@linux.ibm.com>
+Date:   Mon, 13 Dec 2021 15:59:41 +0100
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 192afab3-ddd4-457f-4a41-08d9be47ce50
-X-MS-TrafficTypeDiagnostic: SN6PR12MB4671:EE_
-X-Microsoft-Antispam-PRVS: <SN6PR12MB46712FBD37216E642726CE81E5749@SN6PR12MB4671.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: QFwjMqDJ2sK2VAryjfFqJCTiw5szCpXPZnBaaoPPK8kOeBlk9wUISyYFNEjmpA4+2fv6Kj9bptgnCgFVbDlCPVH9qNxDNx4BCQeE1QNZj2xQelsu1Map5TaIPIS8YEdL/QCgiZ/zehgaaJxEM9f4ARaQ7zTzj2WRqD4/aBXD1ZmPYfjFBEFID8thZWUkR/xL66ER4HXOmVZn+nE7P0/wF31i69jFJgzz3F3c0NDBWj1CqFTHkx36P7EJobZP0g5O+IUylXyZkl30VXWIjOwdpakb3DBxfl+RHlVd1ZPttuy+D21P78Ugn+WRAF79fLkInQJjsxnUftROld3RUi3+WoAjr404YDHZvA5DKXN5i7P4Zhn99MEcXK6XaizNCuJpryXx5MVzIp+dUE1KgFr4wLtpjPH1iLo5OpPf38C92S/eUSaxsxJHQRgNnMwb1JMPNVrtOiydHqQT4IGwbjcHu4q/LOs0U8uUm28ayxC3psvaKsCTMODcosex+C9oPV5J/ZsLSKaB2loWopRvZzdnTSsecvs+G2FTHYU5G/6p2po9iXpzdvShbjTb4rCv8wC3v/8TX9pSTQrv0CINIE+YlUzF5BiD/GsZW9kowg++3McB0ZL4W5RdtTP4AUD3l8zo0ETFV71G8uKr6LKeTCvVyezJmQDVRC23rZnIQ86n+SMLzYByGOINo0GRcuXdx8l1yCbXPFCamCY4vqDJNq6r4V0vC+PcgPELN7Krx6ldFE7x5Ujh/xKN02n3v4HxT461jcbNNORuXP6koOqstpi0YsKZhlw/CIpqx8fka/HwnQgdd0UoCcdLZwOYx/FkmRfLbqp4QhCmnYIjc+LYSZZUhS6UyLUeHASP3pBWpC4+TYc=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(6512007)(36756003)(8936002)(8676002)(2616005)(7416002)(86362001)(45080400002)(7406005)(6666004)(38100700002)(2906002)(186003)(66476007)(6506007)(53546011)(54906003)(84970400001)(4326008)(66946007)(31686004)(31696002)(26005)(316002)(6486002)(44832011)(966005)(508600001)(5660300002)(66556008)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dzZRQ0I0L3dDeVkxdWFxY21kNUNlckpseWxWMzhaZG45bUsrZUZ0bzhlREFp?=
- =?utf-8?B?NloxbTdTeEpVdXN4N1I4U3BmR2JieTlHcjRVYVFrWWdHRmpYQ0tmcjhKRUFT?=
- =?utf-8?B?V210Y0xPU3NrMGZ2MjBGbGh3dUZjS3R4TGRheXB5RnM4RURnZ2hYazRNR3hR?=
- =?utf-8?B?b0V1ZGFEREFnOHJqcVpnamo4dGl5SjV4eWg0MHZuaEdYNWdnTFBGWm54RmpL?=
- =?utf-8?B?SHlPZnVmb2R4cFNsYU5TTzZjQzB2ZGs1RXRDaG5RaDlkOGsrSHFodngvTDdl?=
- =?utf-8?B?dkNtYUFKL3gxOEx0V3BHYUhXQ1FwK0MwZTNoa1kxQXczbnN2Y1ZhT1gyN3Zw?=
- =?utf-8?B?dTVaaTFPZ1N4YWlPSkV6OU9HMWRHbHBnRkRxOFA3eVc5cWxIVk1DZFkzTFND?=
- =?utf-8?B?MExaVUI3aVhqbnBoRXNHNnFYSWhsQncwWHBFZEw5eDZRWUtKSE5rdFNobFlp?=
- =?utf-8?B?WU9tcHdPUllQbmpObWs0cVY2R0tZMUg2M3RLSEp2UFRjVktSR3hSVFIrWlVi?=
- =?utf-8?B?elNSSmd3WnNhUTBCS0NSRTYvVmNFWWRqYXN4UDBQNUoxM0dZS3ZQR041TGVr?=
- =?utf-8?B?NWxzR2duZkhNdnB4Um9tYTRBejE1RWlXeFFGR3Y2aEd2bkt0eG9uVXF1cnY1?=
- =?utf-8?B?c0hKbDdNaUt5dmFldlgrQjFFcWpOUCt5b2dYUjB2WURma25Yc1lqdjlWR0Jn?=
- =?utf-8?B?NGgvSzB1TDY1S2t5bUNGbWdDU3pQeHJNRzlrL01nbTI3VWhaUWNwR1dvbjBK?=
- =?utf-8?B?UGtVZ0FNbG1VMEhBbEVhV3o4V1hPeWJxS3kveENkSElsbzNIa1N1UTU2bHJ4?=
- =?utf-8?B?bWFEV3pYODNtcndLaFJQT29meUYwVWZvbk9uN005WFI0c1JRMkN2c3k0emFr?=
- =?utf-8?B?RlU2bTlUalpJQ0t3SWlDdEtLRjlaenhwbVdMOVB1Smw0SDNqdG9XTTZvT0RP?=
- =?utf-8?B?VWwwOWJiQkF1c1NyR3p3UFQ4M2Q5R1YzRk85Q09BZkZCak5rYzVXZHJuUnU0?=
- =?utf-8?B?U2xKU2NhOVg2TUVzcGcxNWhrMmdxQ3hjdW9vdm55OVFrRmozYU1HZHlTRUxR?=
- =?utf-8?B?OHU2T0JNR0pZVXpOaFc1MkJQRCtab1BtdFhwZ2dscElhdk9Dcis4WWtzMkRO?=
- =?utf-8?B?V3pJYTBKU3VPMHJDTUZJdUVQNXJMT3NaTU9hVS9aMjd1LzU3eis2WnVZVnV5?=
- =?utf-8?B?bHh4L1ZUWHNZWG9NVHdCaWxXa1l6RzBCZGE4eVJIaW02YUMzelRoOG1CL2M3?=
- =?utf-8?B?OHJSSEUvV0Q3bkE2ODgvUmZJZ0JYT0hzU2xEb1FzNktNVDFSUEpFQ3ZnbHVo?=
- =?utf-8?B?amZKZ1FwaTBSOUtxZTF1ZUVPQlEvNmQ5ZW81ZWZOYTI3ZlNiOXRxTVZmQnRL?=
- =?utf-8?B?ZHRsZzVWa0JWYWc3aTJwU3AzTnhwa2Vua3hlRTJPZUtoV1Q5T05LUW9ZRk9u?=
- =?utf-8?B?WHB4U3VGeHpzMm9yQ1dONDZ6RGUweXdwK3J3Ymp1NTFVYUIvby9YTGZSTFNW?=
- =?utf-8?B?RDMyUTZhWmlJc1ZYWVBzUGhOZE5XV3pSSnVCUkR1anZLWUVtZkRianRybzIx?=
- =?utf-8?B?ZnI4aWhPZTA5MWNRaVBqRXdHNEdPS0FCNnBGQVdxMWJMMk51aU4rd0RYeXJx?=
- =?utf-8?B?Ky8xZXh0cmxiaEY0amhSeWtDaktIMUlTL0tpbkgrdVdBbXFFVEJXM2xYV20y?=
- =?utf-8?B?THdIZ0VsMGNaRlU1cUdwTGl1UU0yaGtTRUNtYzhmNDJMRk9ZSHk3OWtOeDIw?=
- =?utf-8?B?YlhvM3grN2E4Mzh1WVIza3hONTg4d0RuWFZmM09FTGp6ZGZzM2t6bHhtcHd1?=
- =?utf-8?B?SXlYYit2S1BVbWc3eXdlSXE3Z0tvQmVCTVZhQjFmK2xwM3owZGJBN0JhUkxG?=
- =?utf-8?B?RDB0RVhRcTVSMFJCTDBiSjBJUjlKdXh5VVp1S1cwc3ZSalZ5WWRDNEw2Y0hv?=
- =?utf-8?B?VGNaWWRSMEpUY0hQL3ZxVEtjS00xZTRaZGdBSlRpaExaclcxczVWWWFvY2d6?=
- =?utf-8?B?eGpsbmJrRElrSldMdnR3QUc4VXVoYUZ3UkFoNm9vclZzalZpT3lDVkJ4aVh5?=
- =?utf-8?B?aFpOZFhLSXpEdi9yZi94TjltUTk2V1RWZGJFTjhxbE5uU0tPbHR6cFpDaEtV?=
- =?utf-8?B?K2dISElSYkdESHVxbzlraXBDT0RsUDJSOVlQR0NVOWJRVkx3UEMwNDN4WElN?=
- =?utf-8?Q?NxUxgDQuVrOcwh1TG0iFzvE=3D?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 192afab3-ddd4-457f-4a41-08d9be47ce50
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Dec 2021 14:49:46.5378
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 60abzf4ZEdNS6cpWDQSVOQqcBCq3kwau2SUTVHm5mCAsHezYLAuT60Y+It33mZ1tafNHlrye+Ro85qSuJz5wHQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB4671
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH 08/32] s390/pci: stash associated GISA designation
+Content-Language: en-US
+To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
+        schnelle@linux.ibm.com, farman@linux.ibm.com,
+        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
+        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
+        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20211207205743.150299-1-mjrosato@linux.ibm.com>
+ <20211207205743.150299-9-mjrosato@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <20211207205743.150299-9-mjrosato@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: _QCrBYjUwSEQmUrgDaXuetJE2ahulXWj
+X-Proofpoint-GUID: sMQc4QF0rfZmP5c_9jzqNOGDV2ETqBdA
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2021-12-13_06,2021-12-13_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ priorityscore=1501 bulkscore=0 phishscore=0 mlxscore=0 clxscore=1015
+ mlxlogscore=999 spamscore=0 lowpriorityscore=0 suspectscore=0
+ impostorscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2110150000 definitions=main-2112130093
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 12/10/21 2:30 PM, Dave Hansen wrote:
-> On 12/10/21 12:18 PM, Brijesh Singh wrote:
->> On 12/10/21 1:12 PM, Dave Hansen wrote:
->>> On 12/10/21 7:43 AM, Brijesh Singh wrote:
->>>> +/* AMD SEV Confidential computing blob structure */
->>>> +#define CC_BLOB_SEV_HDR_MAGIC	0x45444d41
->>>> +struct cc_blob_sev_info {
->>>> +	u32 magic;
->>>> +	u16 version;
->>>> +	u16 reserved;
->>>> +	u64 secrets_phys;
->>>> +	u32 secrets_len;
->>>> +	u64 cpuid_phys;
->>>> +	u32 cpuid_len;
->>>> +};
->>> This is an ABI structure rather than some purely kernel construct, right?
->>
->> This is ABI between the guest BIOS and Guest OS. It is defined in the OVMF.
->>
->> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgithub.com%2Ftianocore%2Fedk2%2Fblob%2Fmaster%2FOvmfPkg%2FInclude%2FGuid%2FConfidentialComputingSevSnpBlob.h&amp;data=04%7C01%7Cbrijesh.singh%40amd.com%7C460f6abff7f04e065c9108d9bc1bfcf7%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637747650681544593%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000&amp;sdata=GI1fAngRJ%2Bj4hcM91UutVXlS1F7kfk2xxtG6I%2BL%2FRYc%3D&amp;reserved=0
->>
->> SEV-SNP FW spec does not have it documented; it's up to the guest BIOS
->> on how it wants to communicate the Secrets and CPUID page location to
->> guest OS.
+On 12/7/21 21:57, Matthew Rosato wrote:
+> For passthrough devices, we will need to know the GISA designation of the
+> guest if interpretation facilities are to be used.  Setup to stash this in
+> the zdev and set a default of 0 (no GISA designation) for now; a subsequent
+> patch will set a valid GISA designation for passthrough devices.
+> Also, extend mpcific routines to specify this stashed designation as part
+> of the mpcific command.
 > 
-> Well, no matter where it is defined, could we please make it a bit
-> easier for folks to find it in the future?
+> Reviewed-by: Niklas Schnelle <schnelle@linux.ibm.com>
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> ---
+>   arch/s390/include/asm/pci.h     | 1 +
+>   arch/s390/include/asm/pci_clp.h | 3 ++-
+>   arch/s390/pci/pci.c             | 9 +++++++++
+>   arch/s390/pci/pci_clp.c         | 1 +
+>   arch/s390/pci/pci_irq.c         | 5 +++++
+>   5 files changed, 18 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/s390/include/asm/pci.h b/arch/s390/include/asm/pci.h
+> index 90824be5ce9a..2474b8d30f2a 100644
+> --- a/arch/s390/include/asm/pci.h
+> +++ b/arch/s390/include/asm/pci.h
+> @@ -123,6 +123,7 @@ struct zpci_dev {
+>   	enum zpci_state state;
+>   	u32		fid;		/* function ID, used by sclp */
+>   	u32		fh;		/* function handle, used by insn's */
+> +	u32		gd;		/* GISA designation for passthrough */
+>   	u16		vfn;		/* virtual function number */
+>   	u16		pchid;		/* physical channel ID */
+>   	u8		pfgid;		/* function group ID */
+> diff --git a/arch/s390/include/asm/pci_clp.h b/arch/s390/include/asm/pci_clp.h
+> index 1f4b666e85ee..3af8d196da74 100644
+> --- a/arch/s390/include/asm/pci_clp.h
+> +++ b/arch/s390/include/asm/pci_clp.h
+> @@ -173,7 +173,8 @@ struct clp_req_set_pci {
+>   	u16 reserved2;
+>   	u8 oc;				/* operation controls */
+>   	u8 ndas;			/* number of dma spaces */
+> -	u64 reserved3;
+> +	u32 reserved3;
+> +	u32 gd;				/* GISA designation */
+>   } __packed;
+>   
+>   /* Set PCI function response */
+> diff --git a/arch/s390/pci/pci.c b/arch/s390/pci/pci.c
+> index 2f9b78fa82a5..9b4d3d78b444 100644
+> --- a/arch/s390/pci/pci.c
+> +++ b/arch/s390/pci/pci.c
+> @@ -119,6 +119,7 @@ int zpci_register_ioat(struct zpci_dev *zdev, u8 dmaas,
+>   	fib.pba = base;
+>   	fib.pal = limit;
+>   	fib.iota = iota | ZPCI_IOTA_RTTO_FLAG;
+> +	fib.gd = zdev->gd;
+>   	cc = zpci_mod_fc(req, &fib, &status);
+>   	if (cc)
+>   		zpci_dbg(3, "reg ioat fid:%x, cc:%d, status:%d\n", zdev->fid, cc, status);
+> @@ -132,6 +133,8 @@ int zpci_unregister_ioat(struct zpci_dev *zdev, u8 dmaas)
+>   	struct zpci_fib fib = {0};
+>   	u8 cc, status;
+>   
+> +	fib.gd = zdev->gd;
+> +
+>   	cc = zpci_mod_fc(req, &fib, &status);
+>   	if (cc)
+>   		zpci_dbg(3, "unreg ioat fid:%x, cc:%d, status:%d\n", zdev->fid, cc, status);
+> @@ -159,6 +162,7 @@ int zpci_fmb_enable_device(struct zpci_dev *zdev)
+>   	atomic64_set(&zdev->unmapped_pages, 0);
+>   
+>   	fib.fmb_addr = virt_to_phys(zdev->fmb);
+> +	fib.gd = zdev->gd;
+>   	cc = zpci_mod_fc(req, &fib, &status);
+>   	if (cc) {
+>   		kmem_cache_free(zdev_fmb_cache, zdev->fmb);
+> @@ -177,6 +181,8 @@ int zpci_fmb_disable_device(struct zpci_dev *zdev)
+>   	if (!zdev->fmb)
+>   		return -EINVAL;
+>   
+> +	fib.gd = zdev->gd;
+> +
+>   	/* Function measurement is disabled if fmb address is zero */
+>   	cc = zpci_mod_fc(req, &fib, &status);
+>   	if (cc == 3) /* Function already gone. */
+> @@ -807,6 +813,9 @@ struct zpci_dev *zpci_create_device(u32 fid, u32 fh, enum zpci_state state)
+>   	zdev->fid = fid;
+>   	zdev->fh = fh;
+>   
+> +	/* For now, assume it is not a passthrough device */
+> +	zdev->gd = 0;
+
+useless as zdev is zallocated
+
+
+> +
+>   	/* Query function properties and update zdev */
+>   	rc = clp_query_pci_fn(zdev);
+>   	if (rc)
+> diff --git a/arch/s390/pci/pci_clp.c b/arch/s390/pci/pci_clp.c
+> index be077b39da33..e9ed0e4a5cf0 100644
+> --- a/arch/s390/pci/pci_clp.c
+> +++ b/arch/s390/pci/pci_clp.c
+> @@ -240,6 +240,7 @@ static int clp_set_pci_fn(struct zpci_dev *zdev, u32 *fh, u8 nr_dma_as, u8 comma
+>   		rrb->request.fh = zdev->fh;
+>   		rrb->request.oc = command;
+>   		rrb->request.ndas = nr_dma_as;
+> +		rrb->request.gd = zdev->gd;
+>   
+>   		rc = clp_req(rrb, CLP_LPS_PCI);
+>   		if (rrb->response.hdr.rsp == CLP_RC_SETPCIFN_BUSY) {
+> diff --git a/arch/s390/pci/pci_irq.c b/arch/s390/pci/pci_irq.c
+> index 6b29e39496d1..9e8b4507234d 100644
+> --- a/arch/s390/pci/pci_irq.c
+> +++ b/arch/s390/pci/pci_irq.c
+> @@ -43,6 +43,7 @@ static int zpci_set_airq(struct zpci_dev *zdev)
+>   	fib.fmt0.aibvo = 0;	/* each zdev has its own interrupt vector */
+>   	fib.fmt0.aisb = (unsigned long) zpci_sbv->vector + (zdev->aisb/64)*8;
+>   	fib.fmt0.aisbo = zdev->aisb & 63;
+> +	fib.gd = zdev->gd;
+>   
+>   	return zpci_mod_fc(req, &fib, &status) ? -EIO : 0;
+>   }
+> @@ -54,6 +55,8 @@ static int zpci_clear_airq(struct zpci_dev *zdev)
+>   	struct zpci_fib fib = {0};
+>   	u8 cc, status;
+>   
+> +	fib.gd = zdev->gd;
+> +
+>   	cc = zpci_mod_fc(req, &fib, &status);
+>   	if (cc == 3 || (cc == 1 && status == 24))
+>   		/* Function already gone or IRQs already deregistered. */
+> @@ -72,6 +75,7 @@ static int zpci_set_directed_irq(struct zpci_dev *zdev)
+>   	fib.fmt = 1;
+>   	fib.fmt1.noi = zdev->msi_nr_irqs;
+>   	fib.fmt1.dibvo = zdev->msi_first_bit;
+> +	fib.gd = zdev->gd;
+>   
+>   	return zpci_mod_fc(req, &fib, &status) ? -EIO : 0;
+>   }
+> @@ -84,6 +88,7 @@ static int zpci_clear_directed_irq(struct zpci_dev *zdev)
+>   	u8 cc, status;
+>   
+>   	fib.fmt = 1;
+> +	fib.gd = zdev->gd;
+>   	cc = zpci_mod_fc(req, &fib, &status);
+>   	if (cc == 3 || (cc == 1 && status == 24))
+>   		/* Function already gone or IRQs already deregistered. */
 > 
 
-Noted, I will add a comment so that readers can find it easily. 
-Additionally, I will create a doc and get it published on 
-developer.amd.com/sev so that information is documented outside the 
-source code files.
+With the correction
+Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
 
->>> I searched through all of the specs to which you linked in the cover
->>> letter.  I looked for "blob", "guid", the magic and part of the GUID
->>> itself trying to find where this is defined to see if the struct is correct.
->>>
->>> I couldn't find anything.
->>>
->>> Where is the spec for this blob?  How large is it?  Did you mean to
->>> leave a 4-byte hole after secrets_len and before cpuid_phys?
->> Yes, the length is never going to be > 4GB.
-> 
-> I was more concerned that this structure could change sizes if it were
-> compiled on 32-bit versus 64-bit code.  For kernel ABIs, we try not to
-> do that.
-> 
-> Is this somehow OK when talking to firmware?  Or can a 32-bit OS and
-> 64-bit firmware never interact?
-> 
 
-For SNP, both the firmware and OS need to be 64-bit. IIRC, both the 
-Linux and OVMF do not enable the memory encryption for the 32-bit.
-
-thanks
+-- 
+Pierre Morel
+IBM Lab Boeblingen
