@@ -2,143 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B939C473021
-	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 16:08:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F52C473050
+	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 16:19:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239947AbhLMPIN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Dec 2021 10:08:13 -0500
-Received: from mga03.intel.com ([134.134.136.65]:41906 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233162AbhLMPIM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Dec 2021 10:08:12 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1639408092; x=1670944092;
-  h=subject:to:cc:references:from:message-id:date:
-   mime-version:in-reply-to:content-transfer-encoding;
-  bh=Ln0+vE8wrxPHB5+sl1PGPaxOXedMn7wnxkhrIv1Bgmc=;
-  b=UA9XDtpdRKDAPliumW57D8jafRpgKLcBqJ9kVphtReC9iz/c7gj13hAX
-   kAkUiMvKDYqE55SVUe5usYZC15f1tt+v93D8F6NjUlmxpb7Jf45oKtzZB
-   vk8Lc5o+HckKhaVR9zEwBNr+eKd9wgKwBZT81JiGHGhQDjlsSX6vPIFra
-   dkQ49YpSz2zBWCpflagkxu2E8xCl6BpgxYAA0caBQCPdsibl5Gio5x/Gx
-   nnhKg6Ehpnbsl70G7dOWDa+T5xwgKJM50eezauNO9zPhI0VUxosKe6AY2
-   d9U2x2eQgMKDvP5JBZmW+b43/FDY3S5JgCwYvbV6l6sWq+R/ibZFwfDzU
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10196"; a="238696143"
-X-IronPort-AV: E=Sophos;i="5.88,202,1635231600"; 
-   d="scan'208";a="238696143"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2021 07:08:11 -0800
-X-IronPort-AV: E=Sophos;i="5.88,202,1635231600"; 
-   d="scan'208";a="752294967"
-Received: from chenb-mobl1.amr.corp.intel.com (HELO [10.212.210.237]) ([10.212.210.237])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2021 07:08:09 -0800
-Subject: Re: [PATCH v8 27/40] x86/boot: Add Confidential Computing type to
- setup_data
-To:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-References: <20211210154332.11526-1-brijesh.singh@amd.com>
- <20211210154332.11526-28-brijesh.singh@amd.com>
- <1fdaca61-884a-ac13-fb33-a47db198f050@intel.com>
- <ba485a09-9c35-4115-decc-1b9c25519358@amd.com>
- <2a5cfbd0-865c-2a8b-b70b-f8f64aba5575@intel.com>
- <f442ca7f-4530-1443-27eb-206d6ca0e7a4@amd.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
- z5cecg==
-Message-ID: <48625a39-9e31-d7f2-dccf-74e9c27126f5@intel.com>
-Date:   Mon, 13 Dec 2021 07:08:07 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+        id S240074AbhLMPTs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Dec 2021 10:19:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52626 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230072AbhLMPTr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Dec 2021 10:19:47 -0500
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6EA0C061574
+        for <kvm@vger.kernel.org>; Mon, 13 Dec 2021 07:19:46 -0800 (PST)
+Received: by mail-pj1-x102b.google.com with SMTP id p18-20020a17090ad31200b001a78bb52876so14870117pju.3
+        for <kvm@vger.kernel.org>; Mon, 13 Dec 2021 07:19:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=wRQAdwlSSg+bW7hgiu0nEjyCka8fgmrwoXgoQdwAwg8=;
+        b=Ma7t3l5fQrrhWhCF88CDY8aSKMwrsIT2PFUDhbJrSkkF75g91uGWjG9Zxe9VMgfttm
+         w7lnEVeTmbF4fmyDP5ZlWJVaqWqxuo9jPJ9Q2nU1DKOciN0Idmsd0knN2G6acDyhucn4
+         X5lhVsRs1HdLbXH21xDUBMMpQsC3gJ02ef0uha/mcucMYtkTOE7ZsHey0SNQhhltEBpZ
+         khxTQHEh7RaLEGpObxPH9eHAHllyrcsZ6Jk5KDjN4BVCfIHDAs71B7ZliiLlzhsSZ3VB
+         IvuQ96b3ScOQQYi6YqzYgN2826dx7xvq5x0ZsV+YU84vou0Zi602RlrsF5DCsZ1GV1d/
+         IyQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=wRQAdwlSSg+bW7hgiu0nEjyCka8fgmrwoXgoQdwAwg8=;
+        b=DuDWn8lELGw2J4hbb0P4iLPto8v34oMMLBbCSTQlXFKAjpXvtIyVUO5UT78G8e055c
+         LrOBdUkkic4jLmnZBJJCubE/9xJfETm22WzTwPrf/M/4dpOmguV0TzFKBoRnhpGLFTxa
+         9XXRwW4FA6s/jDoriuBczt55ic9/5Tcw9rez6yWytixEnOqH9mXXC0Av1iC3PRI+50Fd
+         MWErq8tSut1DdRmy9gk0izhqw7DF6t4EBHWTvRyk8Jb/oXwqVNNThS0GPYvTNNHggheu
+         mK89XBM+wMbofVzVbKXSTalbixGKnZSSv2t+7ES0Lx4IIY6aJIPmw9FpAEgpZ0dXLdgc
+         9b+g==
+X-Gm-Message-State: AOAM532lH9i5jVkquKLppjmC5cz6ctxHDaZR1trWlJGp7GI1N+V3BJ5E
+        g5otOGmUqp2F4mk6iT3eYF6yBQ==
+X-Google-Smtp-Source: ABdhPJwbaG79dJScJWvcC0ogdKFfMMGqBdfnrx/CE72uqmWs8soTZH0BMziycvnXeMZf8h+kNZjtKg==
+X-Received: by 2002:a17:902:7284:b0:142:728b:46a6 with SMTP id d4-20020a170902728400b00142728b46a6mr96313949pll.45.1639408786350;
+        Mon, 13 Dec 2021 07:19:46 -0800 (PST)
+Received: from [192.168.1.11] (174-21-75-75.tukw.qwest.net. [174.21.75.75])
+        by smtp.gmail.com with ESMTPSA id e29sm10643082pge.17.2021.12.13.07.19.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 13 Dec 2021 07:19:45 -0800 (PST)
+Subject: Re: [PATCH v2 10/12] target/riscv: Add kvm_riscv_get/put_regs_timer
+To:     Anup Patel <anup@brainfault.org>,
+        Yifei Jiang <jiangyifei@huawei.com>
+Cc:     Bin Meng <bin.meng@windriver.com>,
+        "open list:RISC-V" <qemu-riscv@nongnu.org>,
+        Mingwang Li <limingwang@huawei.com>,
+        KVM General <kvm@vger.kernel.org>, libvir-list@redhat.com,
+        Anup Patel <anup.patel@wdc.com>,
+        QEMU Developers <qemu-devel@nongnu.org>, wanbo13@huawei.com,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        kvm-riscv@lists.infradead.org, wanghaibin.wang@huawei.com,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        fanliang@huawei.com, "Wubin (H)" <wu.wubin@huawei.com>
+References: <20211210100732.1080-1-jiangyifei@huawei.com>
+ <20211210100732.1080-11-jiangyifei@huawei.com>
+ <CAAhSdy11yd+f6OZZxjX9mWxkVH4AC7Kz5Vp+RPUz6cCam9GvNQ@mail.gmail.com>
+From:   Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <dec3147b-24bc-7e48-680b-a7423b0640f9@linaro.org>
+Date:   Mon, 13 Dec 2021 07:19:43 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-In-Reply-To: <f442ca7f-4530-1443-27eb-206d6ca0e7a4@amd.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CAAhSdy11yd+f6OZZxjX9mWxkVH4AC7Kz5Vp+RPUz6cCam9GvNQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/13/21 6:49 AM, Brijesh Singh wrote:
->> I was more concerned that this structure could change sizes if it were
->> compiled on 32-bit versus 64-bit code.  For kernel ABIs, we try not to
->> do that.
->>
->> Is this somehow OK when talking to firmware?  Or can a 32-bit OS and
->> 64-bit firmware never interact?
+On 12/12/21 9:05 PM, Anup Patel wrote:
+>> +    ret = kvm_get_one_reg(cs, RISCV_TIMER_REG(env, state), &reg);
+>> +    if (ret) {
+>> +        abort();
+>> +    }
+>> +    env->kvm_timer_state = reg;
 > 
-> For SNP, both the firmware and OS need to be 64-bit. IIRC, both the
-> Linux and OVMF do not enable the memory encryption for the 32-bit.
+> Please read the timer frequency here.
 
-Could you please make the structure's size invariant?  That's great if
-there's no problem in today's implementation, but it's best no to leave
-little land mines like this around.  Let's say someone copies your code
-as an example of something that interacts with a firmware table a few
-years or months down the road.
+Yep.
+
+>> +
+>> +    env->kvm_timer_dirty = true;
+>> +}
+>> +
+>> +static void kvm_riscv_put_regs_timer(CPUState *cs)
+>> +{
+>> +    int ret;
+>> +    uint64_t reg;
+>> +    CPURISCVState *env = &RISCV_CPU(cs)->env;
+>> +
+>> +    if (!env->kvm_timer_dirty) {
+>> +        return;
+>> +    }
+> 
+> Over here, we should get the timer frequency and abort() with an
+> error message if it does not match env->kvm_timer_frequency
+> 
+> For now, migration will not work between Hosts with different
+> timer frequency.
+
+You shouldn't have to do this every "put", only on migration, at which point you can 
+actually signal a migration error rather than aborting directly.
+
+
+r~
