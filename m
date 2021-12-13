@@ -2,475 +2,222 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EC64A473753
-	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 23:16:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AC70E4737AB
+	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 23:37:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234248AbhLMWQj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Dec 2021 17:16:39 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:25392 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235327AbhLMWQi (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 13 Dec 2021 17:16:38 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1639433798;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=5mPQpNeqcZ83eIiiua1etHsxbGoZK3PI7rklCcuhwsg=;
-        b=iLtjv5YTuLUu14sFiyVrQVsox8qWY1BJjeWGGD3ZTfzgzl3lcaN7LDThBmadQx9O2YLyWR
-        WEPpiluKb4Vpc1Z8Ar7xq+Lsal2ESZBD7z43yt9r2baUeSag2p/RrZN9FQK5tJaVNItXCh
-        Y9seFsq4123DXVkHBqw1JoYrejv46RU=
-Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com
- [209.85.210.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-182-sujHEa-yP8OqTg7MFrkwrw-1; Mon, 13 Dec 2021 17:16:36 -0500
-X-MC-Unique: sujHEa-yP8OqTg7MFrkwrw-1
-Received: by mail-ot1-f69.google.com with SMTP id p7-20020a9d7447000000b0057a4ef67426so6926263otk.23
-        for <kvm@vger.kernel.org>; Mon, 13 Dec 2021 14:16:36 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=5mPQpNeqcZ83eIiiua1etHsxbGoZK3PI7rklCcuhwsg=;
-        b=bzl8p43JoRnPkCWb3DQSgZg/s4xPAxeDgIec/xfk3YN+zKak9CvF9s7gZi6OjYqcRh
-         Ve9roae48kvR87Knaz8ELmFXfFUxy4z0A1fOgDTeHSmmBkD6xtilq7KD0EgZl5nfPdAH
-         sHZOzmwayEdgRzD8M9Veef0RAqusWH0o+YIprDvQfG/xP12m3wftCbkM+cR+MZcGGVym
-         wv73otA24Zyo7Hg2qbpRxrxrQQ3TbA+HvDCE1SDHrdyEd3bMH7wndzj8G1cGAN4gey7V
-         oydCFPZiawF5ebgcdVA89elagXtyhTE8Ll87qWv6dY9t7kN9oO8Fjs6KqTncmNfiTMdq
-         MkNw==
-X-Gm-Message-State: AOAM533eth6cYBWOHJWZeEJfIqBOamQTZo4upLHnbqGK/gsowIYr5yzS
-        5MPHAFITwk1gEkIgePWMh5nFq+OJ5c7yeWvNLM4wPNz0IWuo+BxdWX+qSBX9JoSStt9RupSFXY4
-        mMRFEYQPMVQ5b
-X-Received: by 2002:a05:6830:1d87:: with SMTP id y7mr1057569oti.269.1639433796082;
-        Mon, 13 Dec 2021 14:16:36 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxk2Ir+89A4vzh7l05D/iGE0gZl/NBKcKhwiGxPjLxRs4R6P/sUoKSrj6i+UkYp9HL+RpStDQ==
-X-Received: by 2002:a05:6830:1d87:: with SMTP id y7mr1057552oti.269.1639433795813;
-        Mon, 13 Dec 2021 14:16:35 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id m23sm2391339otj.39.2021.12.13.14.16.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Dec 2021 14:16:35 -0800 (PST)
-Date:   Mon, 13 Dec 2021 15:16:34 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org
-Subject: Re: [PATCH v3] vfio: Documentation for the migration region
-Message-ID: <20211213151634.24bd80bb.alex.williamson@redhat.com>
-In-Reply-To: <20211210004659.GB6385@nvidia.com>
-References: <0-v3-184b374ad0a8+24c-vfio_mig_doc_jgg@nvidia.com>
-        <20211209163457.3e74ebaf.alex.williamson@redhat.com>
-        <20211210004659.GB6385@nvidia.com>
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.33; x86_64-redhat-linux-gnu)
+        id S243600AbhLMWhd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Dec 2021 17:37:33 -0500
+Received: from mx0b-00069f02.pphosted.com ([205.220.177.32]:35550 "EHLO
+        mx0b-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237073AbhLMWhb (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 13 Dec 2021 17:37:31 -0500
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1BDL6oFf021570;
+        Mon, 13 Dec 2021 22:36:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : content-type : in-reply-to :
+ mime-version; s=corp-2021-07-09;
+ bh=0AYou5OgtH1XR67KRsP0ZUi3aHIdZqjatMNI4vLEycU=;
+ b=lS//FBR+YTLOIamjsix42RXzOcLXW++wZCRaCqP7IXT4Hd2vgVx8JQq2lfQrzcN6IlGH
+ A7n+TPOJzHkYt44WKamIkKogvJnfRrw1Bcy8sFOwTkRPiQDAycG4ofJyQyMbcvo/HGUj
+ +rBZwdDNiM9BobhNhuh5/lh/GQeLlYsk6yJ410aYkO3gLpRld0x6MvOZS9qbnCPPWXLY
+ 93KMnOm5YX31fefZXBccjOZQXPzD9/6q4hYnJ3O1bt6IrlT1OCtKDWQoyWgWl1ZarG6k
+ es6nIRLyFgSTu1eco54ZTVZAvQ2/3IPsQKZpGRl8Qx5XpVkC++Oa/JqogFaczkp87a8F dQ== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by mx0b-00069f02.pphosted.com with ESMTP id 3cx3uka4v2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 13 Dec 2021 22:36:51 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 1BDMURtI049821;
+        Mon, 13 Dec 2021 22:36:50 GMT
+Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2174.outbound.protection.outlook.com [104.47.57.174])
+        by aserp3020.oracle.com with ESMTP id 3cvkt3mu9x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 13 Dec 2021 22:36:50 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NclVSF4vJe6fZHHrS6MNMM6HPV1hI9W39hHXjsJGjaf6uNP7XYdwbh8nU5rQr9s39DoppAdWrRuz4xIfu/TE2Q7NwfKCsG9l7QbCOhEEJpvm4pt8a1fqrf1gibKzXSgqZMBmLTqWB5DshGNNooeLVxPHqv9KohF52+xPAZNgUu02YzSqeBw1PwiQ+Mw4sbDo5UmngATgPAyqQWVegbLOj4B9n1ZgfOro0d+EFBSBpNb9wgtelkDDnB35fVT9gXZyg+wWGOiTJCxbbRe3fFNaowSjq83WEB+x3aDeHpCZcCGpyTBcQBJJwKVI5iXP2NpBGBYGbY206l5RSHD3VzDcBQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0AYou5OgtH1XR67KRsP0ZUi3aHIdZqjatMNI4vLEycU=;
+ b=UjgouGyshm9hbqKAWBYsspvk4k40MO418UNobEeyKWSMag2xyf5Y9dpaOYaVz8YgjiJuhA9ZkCFOV8MZqwzyYIw6/0sHIhDzsjFxZjm2tMAdWa+xZnEbzldVivTT738lj/xoK7XXmnwt4dHR4gOAHbOcxr6reVhwm0DYXIheDgh/htrWPnRgAjlpCVsIdz4iL3tXTDyulsiuSt4el8ZSXQsbQwO1cqXk23AzSnGSC25M58If1NUyOVvvSUO2NJ4YYdYh2x1FOlzV8SStW53SnhDFkwUlHClJq6Y7emvnmX2C1IIiaMZT/k1hJa4ueyby6ETCoW4jhNVTVL+aL0S3Tg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0AYou5OgtH1XR67KRsP0ZUi3aHIdZqjatMNI4vLEycU=;
+ b=fwAqSE33blFHk6WnMqAc9UUZS0E52a3EtOcBU0jS9HDF1anwuJmSl+sJE2H7DizFBfvImxOWE9w8UrmLo1HzpivNSL8wMzyKipA53fG+NeyzME671zHKAJ63UcJMvcE4IuHGTL4OVoB+85UT8jLuCzDAOhmAnaz9nfFC/1E6HqI=
+Received: from SN6PR10MB2576.namprd10.prod.outlook.com (2603:10b6:805:44::15)
+ by SN4PR10MB5622.namprd10.prod.outlook.com (2603:10b6:806:209::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4778.11; Mon, 13 Dec
+ 2021 22:36:48 +0000
+Received: from SN6PR10MB2576.namprd10.prod.outlook.com
+ ([fe80::4c8c:47df:f81e:f412]) by SN6PR10MB2576.namprd10.prod.outlook.com
+ ([fe80::4c8c:47df:f81e:f412%5]) with mapi id 15.20.4778.017; Mon, 13 Dec 2021
+ 22:36:48 +0000
+Date:   Mon, 13 Dec 2021 16:36:42 -0600
+From:   Venu Busireddy <venu.busireddy@oracle.com>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH v8 02/40] x86/sev: detect/setup SEV/SME features earlier
+ in boot
+Message-ID: <YbfK+tQ40+z9BUo+@dt>
+References: <20211210154332.11526-1-brijesh.singh@amd.com>
+ <20211210154332.11526-3-brijesh.singh@amd.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211210154332.11526-3-brijesh.singh@amd.com>
+X-ClientProxiedBy: SN4PR0501CA0037.namprd05.prod.outlook.com
+ (2603:10b6:803:41::14) To SN6PR10MB2576.namprd10.prod.outlook.com
+ (2603:10b6:805:44::15)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 89c99c1c-5368-4419-9a72-08d9be890c94
+X-MS-TrafficTypeDiagnostic: SN4PR10MB5622:EE_
+X-Microsoft-Antispam-PRVS: <SN4PR10MB5622407D6F515E1FB87F37B6E6749@SN4PR10MB5622.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:5236;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: dQY+trGQoTMzLCwkWHvCWP6GV0kfZieiqQvJop/sDfFRvYujZddK1Ad5NQ4QaWOND3ofsztalRaJNjg4OCHDMdG1V02rQbLx9JJQNrvTAPniXf7vdgD/poMEqLH/0zR8QLpkQj6QMTfgA3V1cZpWhJbcqwmVOpj1WJ/8YPWp83DPMj24oH2aEc8TGMVMVS6XTzm32gkoUL7PXQ1+S2SYBHOY4AgAaE48a2eDdCBEEhFhzHixjtXBNu3UQBh4yykAoLHClOHYWm0/MD31XzWQJwxdYMl9LhqSK5jNAjbjxnceAKIoUpvb1PNsGy9URuMRdPvLP8INuh0FwvFcT4iL1YvDrvAwJaxHEH9Smm8WrOQkVFX3ZYlWCpnIlXYQg9wjtjSoT1ADkBzsAw3R3zZp2KPwiBMX4/hfoengNZBE6z2RO30pN9Tzpb4uxVm6sfYjQ6ohz54M9bG2sYiZOYMaJeW3lSLvoY8YcS2qY7TJk0Whx3+1+gGK6XUDUelyeFKLsyub5dD/VHyLJAYe2mW1Sw1gU50vtvHP6mqGMmUmRO4rHdkCsIku8NfQSvRpZToHYn1xhUrwxzUmTi8whdm/Ex3XggaR1hkCcSRbycvnTxzL0J1M/x3xD2x6mAF2qtpwTu2pj8beVE53D+AWrRWN9Q==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR10MB2576.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(7916004)(366004)(9686003)(53546011)(66476007)(6506007)(186003)(26005)(5660300002)(6916009)(44832011)(6666004)(2906002)(508600001)(316002)(66556008)(6512007)(54906003)(83380400001)(33716001)(66946007)(38100700002)(8676002)(7416002)(86362001)(7406005)(6486002)(4326008)(8936002)(4001150100001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?K9jtdfCdA0obP1P6eDBTA9kZTdcdQBmsjCyUqzPUSV8UUJYf0kI9h/Ij297q?=
+ =?us-ascii?Q?hLs1k1E3Rtef5WuSK0WivAHh5mf2b4jfT0tkwc6O1oWKHOwJylvYDjZwnolP?=
+ =?us-ascii?Q?S/jxqKyApKnyz6ovR6V8Ucq133jzlcOVk41iIQM3f5lYBm3HS2E8S1HG0wi0?=
+ =?us-ascii?Q?mAZppz0yB9VUtHIulZUMBBpuoYcRVJUMpHcYZPvsRwodAgfZvPCXexshmr/u?=
+ =?us-ascii?Q?lYeRgFTgFM+2J+r1vsmdM6lMEeY2DHAPm52NPktf3d2YiyLY1b8nFtcYG8tT?=
+ =?us-ascii?Q?ELrh9Zbul6tEJzXGP8RinVghcJH/EGWSBY+e2e+sN4ee4ddzGxDceIzoyGVV?=
+ =?us-ascii?Q?JbNIQFtnvgj+966aAX+STjA0iJbBqxOX6P+hawLzK89QFdbEdoW6rw9mMacO?=
+ =?us-ascii?Q?6B2hwx6Cfv7D9jBg3L9o1MBiu90m06N700nK/u2p/zCvooe10IwWXKSWzfJ1?=
+ =?us-ascii?Q?RRSSUHJevOLbOMRfmD10LqbIwbnVpnLQOjAz66PX5HZC9qkdz3IYOq9zFcRV?=
+ =?us-ascii?Q?TpajVl4Pbw9c2qgyWbzSGIIhKkp0m3Mdzh8NiheNsmypYibq+Kv+XxYq746d?=
+ =?us-ascii?Q?RfJezHWjtr0F1zXMrVxPJtuxCCS0AIeam0grBmynvuwOkTTDyLMbY/Vv2+Y/?=
+ =?us-ascii?Q?nrlL01wZYHgJw6BrlOk7wY1diXUoWLeFOFnF1CkgCg2i6lQb3D96NyIPToDn?=
+ =?us-ascii?Q?HV1gR6YvTPehe6QfJqaUdKjvvkEyEMqdz3Ka9nbI3T7t6+Lg3YdvW/OTRhzC?=
+ =?us-ascii?Q?HQqEHU7oVqrKnIFrrZTLALGOn0FMeTqhJMawZW41DTHQbaOhXwdGIbkKUnNd?=
+ =?us-ascii?Q?2txKwWPsutyE3kExMKZQ6jO0ifsFuH2j3EGkVc4B6UraA9ZmyiuBwrv/8Qzx?=
+ =?us-ascii?Q?EmXFcwcC0V/xtJha2i4ufXg16xyZcBOuReCLNBLpddUdTlqfkrcQXZcdHhK0?=
+ =?us-ascii?Q?w3ak8uynpX4C48A1K8d6QGS9PZeY/fwRtGKiOlqe1x5z3/9zHMTSH0z2o5L3?=
+ =?us-ascii?Q?8ptrsUGjUTRVX7VqhqcjYHPY3hLOPIOD8eWxmqEOrUetf/bLcKDHjCwWAtni?=
+ =?us-ascii?Q?91iCtVmXRioocM10AgWS06MP4UWgXsMlmW+baCmvmPnmmvpr0xWdVr4Bfem9?=
+ =?us-ascii?Q?eaK5wdHIE7JVaznfQbAy9zlJ9AXNf9qL9SZUP95WP1nN8yqytFhO9arQA2pn?=
+ =?us-ascii?Q?0koxl35hFb9mmQ5s0FBgfpBjDUVz8OW4JwpTAULDytC6KCrD4u0ikdzw+qHK?=
+ =?us-ascii?Q?I9HBXTWU4Mng24uEoLwwAA0pNsyN8fsZz6RJ8eePUp/UTfFZTXMxXx8JeGsm?=
+ =?us-ascii?Q?E+nRgpIW2BFdIQWS1pIWe+McvvgdM63dTiC4A54iKfyBiZQFNrVrCPNuifp5?=
+ =?us-ascii?Q?WmWXFDb/bLLJC973RiS1ebRXdCC/nkKrYoU+3MOLu+YcKyTXyCb2MK2E9QZM?=
+ =?us-ascii?Q?WEOjzVxnl8+N0VKILwydzOXoNP2t3muzu6ZViiQCljgMedrIUlgQ1n3Mjoh9?=
+ =?us-ascii?Q?RJ3xkljRwU2v57kzLFgF5YO5hqA05Jf3+FfUP9nsDTurcTkbAwS3Oe1vlelh?=
+ =?us-ascii?Q?hRjdieIDJL+lQ70S8/DSbmuEmZR1SB84xMIENywuKIXdfTST6KJCUZWypM1x?=
+ =?us-ascii?Q?6SSfxC+xW8i047F4v3F0a+V8YgEm0YLVd/Wf3nWylWAFfUEM0O8gxrRTmoUW?=
+ =?us-ascii?Q?sltYmw=3D=3D?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 89c99c1c-5368-4419-9a72-08d9be890c94
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR10MB2576.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Dec 2021 22:36:48.2757
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: xgsCMryQFDwzWKWLUYB+JPTNmA5WLUsXB+nUEHL0uUtRqeytqacgdkY8psdM5/v7SlEBaKl53MhyZ4JUulmokcIK0/a3vyuusx+JXmLm3uw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR10MB5622
+X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10197 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 adultscore=0 suspectscore=0
+ mlxlogscore=999 phishscore=0 malwarescore=0 bulkscore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
+ definitions=main-2112130131
+X-Proofpoint-GUID: 1JTb1RxnfrutvmFwJK4cAjkkbwymTSC8
+X-Proofpoint-ORIG-GUID: 1JTb1RxnfrutvmFwJK4cAjkkbwymTSC8
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 9 Dec 2021 20:46:59 -0400
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+On 2021-12-10 09:42:54 -0600, Brijesh Singh wrote:
+> From: Michael Roth <michael.roth@amd.com>
+> 
+> sme_enable() handles feature detection for both SEV and SME. Future
+> patches will also use it for SEV-SNP feature detection/setup, which
+> will need to be done immediately after the first #VC handler is set up.
+> Move it now in preparation.
+> 
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 
-> On Thu, Dec 09, 2021 at 04:34:57PM -0700, Alex Williamson wrote:
-> > On Tue,  7 Dec 2021 13:13:00 -0400
-> > Jason Gunthorpe <jgg@nvidia.com> wrote:
-> >   
-> > > Provide some more complete documentation for the migration regions
-> > > behavior, specifically focusing on the device_state bits and the whole
-> > > system view from a VMM.
-> > > 
-> > > To: Alex Williamson <alex.williamson@redhat.com>
-> > > Cc: Cornelia Huck <cohuck@redhat.com>
-> > > Cc: kvm@vger.kernel.org
-> > > Cc: Max Gurtovoy <mgurtovoy@nvidia.com>
-> > > Cc: Kirti Wankhede <kwankhede@nvidia.com>
-> > > Cc: Yishai Hadas <yishaih@nvidia.com>
-> > > Cc: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
-> > > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> > >  Documentation/driver-api/vfio.rst | 301 +++++++++++++++++++++++++++++-
-> > >  1 file changed, 300 insertions(+), 1 deletion(-)  
-> > 
-> > I'm sending a rewrite of the uAPI separately.  I hope this brings it
-> > more in line with what you consider to be a viable specification and
-> > perhaps makes some of the below new documentation unnecessary.  
-> 
-> It is far better than what was there before, and sufficiently terse it
-> is OK in a header file. Really, it is quite a great job what you've
-> got there.
-> 
-> Honestly, I don't think I can write something at quite that level, if
-> that is your expectation of what we need to achieve here..
-> 
-> > > +-------------------------------------------------------------------------------
-> > > +
-> > > +VFIO migration driver API
-> > > +-------------------------------------------------------------------------------
-> > > +
-> > > +VFIO drivers that support migration implement a migration control register
-> > > +called device_state in the struct vfio_device_migration_info which is in its
-> > > +VFIO_REGION_TYPE_MIGRATION region.
-> > > +
-> > > +The device_state controls both device action and continuous behavior.
-> > > +Setting/clearing bit groups triggers device action, and each bit controls a
-> > > +continuous device behavior.  
-> > 
-> > This notion of device actions and continuous behavior seems to make
-> > such a simple concept incredibly complicated.  We have "is the device
-> > running or not" and a new modifier bit to that, and which mode is the
-> > migration region, off, saving, or resuming.  Seems simple enough, but I
-> > can't follow your bit groups below.  
-> 
-> It is an effort to bridge from the very simple view you wrote to a
-> fuller understanding what the driver should be implementing.
-> 
-> We must talk about SAVING|RUNING / SAVING|!RUNNING together to be able
-> to explain everything that is going on.
-> 
-> But we probably don't want the introductory paragraphs at all. Lets
-> just refer to the header file and explain the following discussion
-> elaborates on that.
-> 
-> > > +Along with the device_state the migration driver provides a data window which
-> > > +allows streaming migration data into or out of the device. The entire
-> > > +migration data, up to the end of stream must be transported from the saving to
-> > > +resuming side.
-> > > +
-> > > +A lot of flexibility is provided to user-space in how it operates these
-> > > +bits. What follows is a reference flow for saving device state in a live
-> > > +migration, with all features, and an illustration how other external non-VFIO
-> > > +entities (VCPU_RUNNING and DIRTY_TRACKING) the VMM controls fit in.
-> > > +
-> > > +  RUNNING, VCPU_RUNNING
-> > > +     Normal operating state
-> > > +  RUNNING, DIRTY_TRACKING, VCPU_RUNNING
-> > > +     Log DMAs
-> > > +
-> > > +     Stream all memory
-> > > +  SAVING | RUNNING, DIRTY_TRACKING, VCPU_RUNNING
-> > > +     Log internal device changes (pre-copy)
-> > > +
-> > > +     Stream device state through the migration window
-> > > +
-> > > +     While in this state repeat as desired:
-> > > +
-> > > +	Atomic Read and Clear DMA Dirty log
-> > > +
-> > > +	Stream dirty memory
-> > > +  SAVING | NDMA | RUNNING, VCPU_RUNNING
-> > > +     vIOMMU grace state
-> > > +
-> > > +     Complete all in progress IO page faults, idle the vIOMMU
-> > > +  SAVING | NDMA | RUNNING
-> > > +     Peer to Peer DMA grace state
-> > > +
-> > > +     Final snapshot of DMA dirty log (atomic not required)
-> > > +  SAVING
-> > > +     Stream final device state through the migration window
-> > > +
-> > > +     Copy final dirty data  
-> > 
-> > So yes, let's move use of migration region in support of a VMM here,
-> > but as I mentioned in the last round, these notes per state are all
-> > over the map and some of them barely provide enough of a clue to know
-> > what you're getting at.  Let's start simple and build.  
-> 
-> I'm not sure what you are suggesting?
+Reviewed-by: Venu Busireddy <venu.busireddy@oracle.com>
 
-I'm suggesting that we need to start with the basic device level view
-of migration, ie. the device starts RUNNING, the VMM may optionally
-have a pre-copy stage where the device is both RUNNING and SAVING where
-the value of this state relative to both the device and VMM are briefly
-discussed, the mandatory stop-and-copy phase, and the interaction of
-data streams collected during those phases to a device in the RESUMING
-state.
-
-The next section might fold in how device dirtied pages fit into the
-picture.
-
-Another section would fit the idea of DMA grace periods to support
-devices engaging in p2p.
-
-I don't expect this to be an entirely self supporting document, the
-reader should have some idea how migration of a VMM works, but at the
-same time we can't just write a phrase with insufficient context and
-expect that if someone reads it enough times they'll figure it out.
-
-> Combined with the new header file this is much better, it tersely
-> explains from a VMM point of view what each state is about
+> ---
+>  arch/x86/kernel/head64.c  |  3 ---
+>  arch/x86/kernel/head_64.S | 13 +++++++++++++
+>  2 files changed, 13 insertions(+), 3 deletions(-)
 > 
-> Do you think this section should be longer and the section below much
-> shorter? That might be a better document.
-
-My proposed uAPI update removes the mapping of device_state to VMM
-migration terminology, so I'd like to see that moved here.  Your
-discussion about externally controlled states relative to !RUNNING and
-what userspace is allowed to touch without risking interfering with the
-migration data stream, as well as the edge cases discussion are all
-things that I would think this document update would focus on.
-
-> > > +  0
-> > > +     Device is halted  
-> > 
-> > We don't care what the device state goes to after we're done collecting
-> > data from it.  
+> diff --git a/arch/x86/kernel/head64.c b/arch/x86/kernel/head64.c
+> index 3be9dd213dad..b01f64e8389b 100644
+> --- a/arch/x86/kernel/head64.c
+> +++ b/arch/x86/kernel/head64.c
+> @@ -192,9 +192,6 @@ unsigned long __head __startup_64(unsigned long physaddr,
+>  	if (load_delta & ~PMD_PAGE_MASK)
+>  		for (;;);
+>  
+> -	/* Activate Secure Memory Encryption (SME) if supported and enabled */
+> -	sme_enable(bp);
+> -
+>  	/* Include the SME encryption mask in the fixup value */
+>  	load_delta += sme_get_me_mask();
+>  
+> diff --git a/arch/x86/kernel/head_64.S b/arch/x86/kernel/head_64.S
+> index d8b3ebd2bb85..99de8fd461e8 100644
+> --- a/arch/x86/kernel/head_64.S
+> +++ b/arch/x86/kernel/head_64.S
+> @@ -69,6 +69,19 @@ SYM_CODE_START_NOALIGN(startup_64)
+>  	call	startup_64_setup_env
+>  	popq	%rsi
+>  
+> +#ifdef CONFIG_AMD_MEM_ENCRYPT
+> +	/*
+> +	 * Activate SEV/SME memory encryption if supported/enabled. This needs to
+> +	 * be done now, since this also includes setup of the SEV-SNP CPUID table,
+> +	 * which needs to be done before any CPUID instructions are executed in
+> +	 * subsequent code.
+> +	 */
+> +	movq	%rsi, %rdi
+> +	pushq	%rsi
+> +	call	sme_enable
+> +	popq	%rsi
+> +#endif
+> +
+>  	/* Now switch to __KERNEL_CS so IRET works reliably */
+>  	pushq	$__KERNEL_CS
+>  	leaq	.Lon_kernel_cs(%rip), %rax
+> -- 
+> 2.25.1
 > 
-> The reference flow is just a reference, choosing to go to 0 is fine,
-> right?
-
-It's fine that a user can do this, my question is more whether it's
-relevant to the flow and if a migration driver author might read
-"reference" in ways other than "example" and code their support to
-expect such a terminating transition.
- 
-> > > +and the reference flow for resuming:
-> > > +
-> > > +  RUNNING
-> > > +     Use ioctl(VFIO_GROUP_GET_DEVICE_FD) to obtain a fresh device
-> > > +  RESUMING
-> > > +     Push in migration data.
-> > > +  NDMA | RUNNING
-> > > +     Peer to Peer DMA grace state
-> > > +  RUNNING, VCPU_RUNNING
-> > > +     Normal operating state
-> > > +
-> > > +If the VMM has multiple VFIO devices undergoing migration then the grace
-> > > +states act as cross device synchronization points. The VMM must bring all
-> > > +devices to the grace state before advancing past it.  
-> > 
-> > Why?  (rhetorical)  Describe that we can't stop all device atomically
-> > therefore we need to running-but-not-initiating state to quiesce the
-> > system to finish up saving and the same because we can't atomically
-> > release all devices on the restoring end.  
-> 
-> OK
-> 
-> > > +Event triggered actions happen when user-space requests a new device_state
-> > > +that differs from the current device_state. Actions happen on a bit group
-> > > +basis:
-> > > +
-> > > + SAVING  
-> > 
-> > Does this mean the entire new device_state is (SAVING) or does this
-> > mean that we set the SAVING bit independent of all other bits.  
-> 
-> It says "actions happen on a bit group basis", so independent of all
-> other bits as you say
-> 
-> But perhaps we don't need this at all anymore as the header file is
-> sufficent enough
-
-That would be ideal, otherwise we need to be really careful about
-alignment with the header.  I really want the header to be the source
-of truth and this document to supplement that with typical usage flows,
-considerations how to handle multiple devices, clarifying what !RUNNING
-means to the device internal state and resilience to generating host
-fault, user access to devices while !RUNNING, etc.
- 
-> > > +   The device clears the data window and prepares to stream migration data.
-> > > +   The entire data from the start of SAVING to the end of stream is transfered
-> > > +   to the other side to execute a resume.  
-> > 
-> > "Clearing the data window" is an implementation, each iteration of the
-> > migration protocol provides "something" in the data window.  The
-> > migration driver could take no action when SAVING is set and simply
-> > evaluate what the current device state is when pending_bytes is read.  
-> 
-> It is the same as what you said: "initializes the migration region
-> data window" 
-
-The connotation is different for me.  If I'm clearing the data window,
-I infer that there's something backing the data window that can be
-cleared.  The data window might just be a mapping of the internal
-device registers.  Clearing those would probably not be a good idea.
-OTOH, initializing the data window only suggests to me that the driver
-does what is necessary to make the data window usable in this mode for
-their implementation.
-
-> > > + SAVING | RUNNING  
-> > 
-> > If we're trying to model typical usage scenarios, it's confusing that
-> > we started with SAVING and jumped back to (SAVING | RUNNING).  
-> 
-> This section isn't about usage scenarios this is talking about what
-> the driver must do in all the state combinations. SAVING is
-> "initializing the data window"
-> 
-> And then the two variations of RUNNING have their own special behaviors.
-> 
-> > > +   This allows the device to implement a dirty log for its internal state.
-> > > +   During this state the data window should present the device state being
-> > > +   logged and during SAVING | !RUNNING the data window should transfer the
-> > > +   dirtied state and conclude the migration data.  
-> > 
-> > As we discussed in the previous revision, invariant data could also
-> > reasonably be included here.  We're again sort of pushing an
-> > implementation agenda, but the more useful thing to include here would
-> > be to say something about how drivers and devices should attempt to
-> > support any bulk data in this pre-copy phase in order to allow
-> > userspace to perform a migration with minimal actual time in the next
-> > state.  
-> 
-> Invarient data is implicitly already "device state being logged" - the
-> log is always 'no change'
-
-That's subtle.  In any case, I was confused last time, I'm still
-confused.  I'd suggest this falls into the category that we describe
-how SAVING | RUNNING vs SAVING is consumed by userspace and possible
-strategies for both invariant and state that supports dirty logging and
-let the migration driver figure out an optimal implementation.
- 
-> > > +   The state is only concerned with internal device state. External DMAs are
-> > > +   covered by the separate DIRTY_TRACKING function.
-> > > +
-> > > + SAVING | !RUNNING  
-> > 
-> > And this means we set SAVING and cleared RUNNING, and only those bits
-> > or independent of other bits?  Give your reader a chance to follow
-> > along even if you do expect them to read it a few times for it all to
-> > sink in.  
-> 
-> None of this is about set or cleared, where did you get that? The top
-> paragph said: "requests a new device_state" - that means only the new
-> device_state value matters, the change to get there is irrelevant.
-
-All I can say is that I read it many times and was still not clear how
-to process it.  My intention Thursday was to try to contribute some
-rewrites to this as well, but I didn't understand it well enough for
-that.
- 
-> > > +   If the migration data is invalid then the ERROR state must be set.  
-> > 
-> > I don't know why we're specifying this, it's at the driver discretion
-> > to use the ERROR state, but we tend to suggest it for irrecoverable
-> > errors.  Maybe any such error here could be considered irrecoverable,
-> > or maybe the last data segment was missing and once it's added we can
-> > continue.  
-> 
-> This was an explicit statement that seems to contridict what you wrote
-> in the header. I prefer we are deterministic, if the RESUME fails then
-> go to ERROR, always. Devices do not have the choice to do something
-> else.
-
-The determinism is that if clearing RESUMING fails, the user gets an
-errno.  But defining that if that transition fails then the device must
-enter the ERROR state removes any opportunity that the failure could be
-transient or recoverable.  For what?  It also makes this state
-transition failure different than other state transitions and makes
-the ERROR state a required state for the device, whereas it's really
-meant as a catch-all, internal error recovery path.
- 
-> > > + ERROR
-> > > +   The behavior of the device is largely undefined. The device must be
-> > > +   recovered by issuing VFIO_DEVICE_RESET or closing the device file
-> > > +   descriptor.
-> > > +
-> > > +   However, devices supporting NDMA must behave as though NDMA is asserted
-> > > +   during ERROR to avoid corrupting other devices or a VM during a failed
-> > > +   migration.  
-> > 
-> > As clarified in the uAPI, we chose the invalid state that we did as the
-> > error state specifically because of the !RUNNING value.  Migration
-> > drivers should honor that, therefore NDMA in ERROR state is irrelevant.  
-> 
-> This is another explict statement that you have contridicted in the
-> header. I'm not sure mlx5 can implement this. Certainly, it becomes
-> very hard if we continue to support precedence.
-> 
-> Unwinding an error during a multi-bit sequence and guaranteeing that
-> we can somehow make it back to !RUNNING is far very complex. Several
-> error scenarios mean the driver has lost control of the device.
-> 
-> I'm not even sure we can do the !NDMA I wrote, in hindsight I don't
-> think we checked that enough. Yishai noticed all the error unwinding
-> was broken in mlx5 for precedence cases after I wrote this.
-
-I think I phrased it along the lines that the driver should make every
-effort to make sure the device is equivalently !RUNNING in the ERROR
-state, including device resets.  So there's room should that not be
-possible, but I'd expect such a state to be the goal.  We require
-device supporting migration to support the RESET ioctl, so the worst
-case of unwinding state changes should be to internally reset the
-device and report ERROR state.  If the device is still wedged/lost
-beyond that, the RESET ioctl from the user should also errno.  At that
-point the device remains in ERROR state and cannot be used.
-
-I have concerns if that's not a model mlx5 can support.
- 
-> > > +  NDMA is made optional to support simple HW implementations that either just
-> > > +  cannot do NDMA, or cannot do NDMA without a performance cost. NDMA is only
-> > > +  necessary for special features like P2P and PRI, so devices can omit it in
-> > > +  exchange for limitations on the guest.  
-> > 
-> > Maybe we can emphasize this a little more as it's potentially pretty
-> > significant.  Developers should not just think of their own device in
-> > isolation, but their device in the context of devices that may have
-> > performance, if not functional, restrictions with those limitations.  
-> 
-> Ok
-> 
-> > > +
-> > > +- Devices that have their HW migration control MMIO registers inside the same
-> > > +  iommu_group as the VFIO device have some special considerations. In this
-> > > +  case a driver will be operating HW registers from kernel space that are also
-> > > +  subjected to userspace controlled DMA due to the iommu_group.
-> > > +
-> > > +  This immediately raises a security concern as user-space can use Peer to
-> > > +  Peer DMA to manipulate these migration control registers concurrently with
-> > > +  any kernel actions.
-> > > +
-> > > +  A device driver operating such a device must ensure that kernel integrity
-> > > +  cannot be broken by hostile user space operating the migration MMIO
-> > > +  registers via peer to peer, at any point in the sequence. Further the kernel
-> > > +  cannot use DMA to transfer any migration data.
-> > > +
-> > > +  However, as discussed above in the "Device Peer to Peer DMA" section, it can
-> > > +  assume quiet MMIO as a condition to have a successful and uncorrupted
-> > > +  migration.
-> > > +
-> > > +To elaborate details on the reference flows, they assume the following details
-> > > +about the external behaviors:
-> > > +
-> > > + !VCPU_RUNNING
-> > > +   User-space must not generate dirty pages or issue MMIO, PIO or equivalent
-> > > +   operations to devices.  For a VMM this would typically be controlled by
-> > > +   KVM.
-> > > +
-> > > + DIRTY_TRACKING
-> > > +   Clear the DMA log and start DMA logging
-> > > +
-> > > +   DMA logs should be readable with an "atomic test and clear" to allow
-> > > +   continuous non-disruptive sampling of the log.
-> > > +
-> > > +   This is controlled by VFIO_IOMMU_DIRTY_PAGES_FLAG_START on the container
-> > > +   fd.
-> > > +
-> > > + !DIRTY_TRACKING
-> > > +   Freeze the DMA log, stop tracking and allow user-space to read it.
-> > > +
-> > > +   If user-space is going to have any use of the dirty log it must ensure that
-> > > +   all DMA is suspended before clearing DIRTY_TRACKING, for instance by using
-> > > +   NDMA or !RUNNING on all VFIO devices.  
-> > 
-> > Minimally there should be reference markers to direct to these
-> > definitions before they were thrown at the reader in the beginning, but
-> > better yet would be to adjust the flow to make them unnecessary.  
-> 
-> The first draft was orderd like this, Connie felt that was confusing,
-> so it was moved to the end :)
-
-I only read the comments on the first draft since I was on PTO and v2
-was out when I returned.
- 
-> > > +TDB - discoverable feature flag for NDMA  
-> > 
-> > Updated in the uAPI spec.  Thanks,  
-> 
-> It matches what Yishai did
-
-Cool.  Thanks,
-
-Alex
-
