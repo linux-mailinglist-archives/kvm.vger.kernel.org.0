@@ -2,106 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C15E473162
-	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 17:14:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 422EC473183
+	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 17:21:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240575AbhLMQOz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Dec 2021 11:14:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37398 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238112AbhLMQOx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Dec 2021 11:14:53 -0500
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F127FC061574
-        for <kvm@vger.kernel.org>; Mon, 13 Dec 2021 08:14:52 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id fv9-20020a17090b0e8900b001a6a5ab1392so13752735pjb.1
-        for <kvm@vger.kernel.org>; Mon, 13 Dec 2021 08:14:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=gbg5NBcU+Kt7bMbQGsll86R5wmp6wy+SeQg+HFeWQMU=;
-        b=TJB7Qin1sYghSOjLKjmgWXT42aw2P6kr/Ngk6/01rj+e5fc9J/41emHTRKYiTKAl97
-         4UdDM+CRlqfrxs83pyD4MZyXT7N4yCxrtyPTWelHc+qWbJ+wyynfDbefkniVjC5n3S3H
-         i9UADEXlQGTY2Hu0t6wlKBJ2F8cY+XgR3sGrk5pZ7ZtAVBKQuNKWfBGtLzk+hlHdMEfE
-         1H7RBK6Tt2xSf0cXBTNaAkQ5O21CPw9K8S6twCbacoqd1Py3lHo9KITAuLE2BNPtSxer
-         jq9P6HomyxLMgBreghLJkw1cUhXVJGhZxNvzE3LtY+WZrFdYU1MJGhaUBShMzzXCvY5Q
-         s4jA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=gbg5NBcU+Kt7bMbQGsll86R5wmp6wy+SeQg+HFeWQMU=;
-        b=s+A9N9l1Ux9NTq19Ti7FC+X4pcPYVcS0WN2n6sh2LD7zWyulBlRS+QW/lNyWZMKCdu
-         PKXYwKNEOUd+6BemWY4FMOepL+M8byxLegJIQVzmjFMjLeQkPfk/cbJXjX8mCYkKNThV
-         ju7s1kbHH5OpB7P51UyaOd1L8Uxow8cuWcmIWHTU2inHFcmMjhFHufg+nyhgFfidxBLu
-         xLBMtmBgoFG+lGSYzSxHWKkXXpF14XLtoB1HDonLG2MiXo13dagdRNC/ZhBXwNmydPnr
-         5DrsCO7tOEMG5vNu0sUGXB9BvpOBY/n9agROlEVM5LlpDT5pml+OM8ZClCjpVELVv0QJ
-         euPA==
-X-Gm-Message-State: AOAM530t3oOjz3aDBWOfxLymjHCUHQz66o1+PObgRHpI7aClbj2LCAKT
-        IqJPCgY9xJA1LTA9l68l0SHJeg==
-X-Google-Smtp-Source: ABdhPJy6vkREUxeKHnjXtrwjlQx57ir/+wUT/CJQUc0NqX1mv/nKXQeOj95DPQ3+9dJ3w7LzBbvOFg==
-X-Received: by 2002:a17:90b:3ec1:: with SMTP id rm1mr45400647pjb.171.1639412092238;
-        Mon, 13 Dec 2021 08:14:52 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id p15sm14262517pfo.143.2021.12.13.08.14.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Dec 2021 08:14:51 -0800 (PST)
-Date:   Mon, 13 Dec 2021 16:14:47 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Ignat Korchagin <ignat@cloudflare.com>,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>, kvm@vger.kernel.org,
-        stevensd@chromium.org, kernel-team <kernel-team@cloudflare.com>
-Subject: Re: Potential bug in TDP MMU
-Message-ID: <Ybdxd7QcJI71UpHm@google.com>
-References: <CALrw=nEaWhpG1y7VNTGDFfF1RWbPvm5ka5xWxD-YWTS3U=r9Ng@mail.gmail.com>
- <d49e157a-5915-fbdc-8103-d7ba2621aea9@redhat.com>
- <CALrw=nHTJpoSFFadmDL2EL95D2kAiH5G-dgLvU0L7X=emxrP2A@mail.gmail.com>
- <YaaIRv0n2E8F5YpX@google.com>
- <CALrw=nGrAhSn=MkW-wvNr=UnaS5=t24yY-TWjSvcNJa1oJ85ww@mail.gmail.com>
- <CALrw=nE+yGtRi-0bFFwXa9R8ydHKV7syRYeAYuC0EBTvdFiidQ@mail.gmail.com>
- <YbQPcsnpowmCP7G8@google.com>
- <501ebf09-dee3-6394-cda7-bf94c7b55695@redhat.com>
+        id S240662AbhLMQVt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Dec 2021 11:21:49 -0500
+Received: from mga04.intel.com ([192.55.52.120]:9866 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234388AbhLMQVs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Dec 2021 11:21:48 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1639412508; x=1670948508;
+  h=subject:to:cc:references:from:message-id:date:
+   mime-version:in-reply-to:content-transfer-encoding;
+  bh=5JPXTdH98Td8AiK63KisL2UW+/Ucg3zalU9FuXrzAtA=;
+  b=TYaPbMqP0KLs9YUE3Rf6zMOq1mfvI2YGpE7hdWbn8teTYvzhHG6IS3/8
+   DTDQUUuRnEo4AaTdYurunwHUXoSM44TInuT2vhqnRBSDZYLL1ilDD4BH3
+   BiZQh/gAxxCJP/xV7MBjUsqxAHm1v0rHyxRsP7yUYTIsm/Lf7TTJXFKqT
+   zZyKLUslicQxqnYtsUgYN56y7bLPw3x76+l1T5LxqBaqQKDgGzCqPHKvY
+   c2/LYrYMZjfY1/xed2Oo7TVAlIjS3iiGKkUIzoZO4sHI7aOoK7eRVcrGs
+   O9NMNqP9X4KhjTr5q3MWlz0QnoAA9mhQgxRY9pYKFisNDePROTPKsnfpA
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10196"; a="237502297"
+X-IronPort-AV: E=Sophos;i="5.88,202,1635231600"; 
+   d="scan'208";a="237502297"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2021 08:21:48 -0800
+X-IronPort-AV: E=Sophos;i="5.88,202,1635231600"; 
+   d="scan'208";a="752317062"
+Received: from chenb-mobl1.amr.corp.intel.com (HELO [10.212.210.237]) ([10.212.210.237])
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2021 08:21:46 -0800
+Subject: Re: [PATCH v8 24/40] x86/compressed/acpi: move EFI system table
+ lookup to helper
+To:     Michael Roth <michael.roth@amd.com>, fanc.fnst@cn.fujitsu.com,
+        j-nomura@ce.jp.nec.com, bp@suse.de
+Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+References: <20211210154332.11526-1-brijesh.singh@amd.com>
+ <20211210154332.11526-25-brijesh.singh@amd.com>
+ <cd8f3190-75b3-1fd5-000a-370e6c53f766@intel.com>
+ <20211213154753.nkkxk6w25tdnagwt@amd.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+Autocrypt: addr=dave.hansen@intel.com; keydata=
+ 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
+ z5cecg==
+Message-ID: <28ab05eb-65b5-0919-74da-a16cd25db2b7@intel.com>
+Date:   Mon, 13 Dec 2021 08:21:44 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <501ebf09-dee3-6394-cda7-bf94c7b55695@redhat.com>
+In-Reply-To: <20211213154753.nkkxk6w25tdnagwt@amd.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Dec 11, 2021, Paolo Bonzini wrote:
-> On 12/11/21 03:39, Sean Christopherson wrote:
-> > That means that KVM (a) is somehow losing track of a root, (b) isn't zapping all
-> > SPTEs in kvm_mmu_zap_all(), or (c) is installing a SPTE after the mm has been released.
-> > 
-> > (a) is unlikely because kvm_tdp_mmu_get_vcpu_root_hpa() is the only way for a
-> > vCPU to get a reference, and it holds mmu_lock for write, doesn't yield, and
-> > either gets a root from the list or adds a root to the list.
-> > 
-> > (b) is unlikely because I would expect the fallout to be much larger and not
-> > unique to your setup.
-> 
-> Hmm, I think it's kvm_mmu_zap_all() skipping invalidated roots.
+On 12/13/21 7:47 AM, Michael Roth wrote:
+> Otherwise, I'll plan on adopting the acpi.c precedent for this as well, which
+> is to not list individual authors, since it doesn't seem right to add Author
+> fields retroactively without their permission.
 
-That should be impossible.  kvm_mmu_zap_all_fast() invalidates those roots before
-it completes, and all paths that lead to kvm_mmu_zap_all_fast() prevent
-kvm_destroy_vm() from getting to mmu_notifier_unregister().
+That's fine with me, especially if it follows precedent in the subsystem.
 
-kvm_mmu_invalidate_mmio_sptes() and kvm_mmu_invalidate_zap_pages_in_memslot()
-are reachable only via memslot update, which requires a reference to KVM and thus
-prevents putting the last reference to to KVM.
-
-set_nx_huge_pages() runs with kvm_lock held, which prevent kvm_destroy_vm() from
-proceeding to mmu_notifier_unregister().
-
-If your patch does make the problem go away, we have a bug somewhere else.
-
-One other experiment that's probably worth trying at this point is running with
-my zap and flush overhaul[*], which is based on commit 81d7c6659da0 ("KVM: VMX:
-Remove vCPU from PI wakeup list before updating PID.NV").  I highly doubt it will
-fix the issue, but I'm out of other ideas until one of us can reproduce the bug.
-
-https://lore.kernel.org/all/20211120045046.3940942-1-seanjc@google.com/
+Could you also please take a quick scan over the rest of the series to
+make sure there are no more of these?
