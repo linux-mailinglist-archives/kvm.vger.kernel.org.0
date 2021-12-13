@@ -2,206 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 15B01472037
-	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 06:06:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E98D472127
+	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 07:38:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231816AbhLMFGN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Dec 2021 00:06:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49462 "EHLO
+        id S230433AbhLMGiH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Dec 2021 01:38:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41826 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231761AbhLMFGM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Dec 2021 00:06:12 -0500
-Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04146C06173F
-        for <kvm@vger.kernel.org>; Sun, 12 Dec 2021 21:06:11 -0800 (PST)
-Received: by mail-wm1-x32a.google.com with SMTP id p27-20020a05600c1d9b00b0033bf8532855so10829493wms.3
-        for <kvm@vger.kernel.org>; Sun, 12 Dec 2021 21:06:11 -0800 (PST)
+        with ESMTP id S230390AbhLMGiH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Dec 2021 01:38:07 -0500
+Received: from mail-oi1-x230.google.com (mail-oi1-x230.google.com [IPv6:2607:f8b0:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1253AC061748
+        for <kvm@vger.kernel.org>; Sun, 12 Dec 2021 22:38:06 -0800 (PST)
+Received: by mail-oi1-x230.google.com with SMTP id q25so22054740oiw.0
+        for <kvm@vger.kernel.org>; Sun, 12 Dec 2021 22:38:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
+        d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=CXDbZ72EhvPIsbyJ5EezoEwlOzUgft6D4XqjM/k4Tos=;
-        b=KSCMfIXUndmM5XtTu7qvshpTyYQ+K4SvpaqDdOqNi2TfOfuEoxNE5PUoIRlE/UnWvM
-         LyKmhmwQuCXgl+JQ2b8cHpfzGr1BcLgVQL3LFYREOKqN/rh82VjT4GGcUUyT39OuWQju
-         d8O5AaXIEvGizGSfZqVgbKd+oYfw+SYFwVN+7jOlC21RhcG5zWKOlqeu+9/GedtmQNvn
-         K2qveAB13BUIQBlvO8gK/KbGiTEyKkeCWsBsmkksGh+PAwGP+exdnaglc16o9g3ce50M
-         cQegVUDBeeqtG7toIbbN8qEUL9phsyYYnB/p9fWmhS6GTTVQs7C1GwruxCRCsA2vn+8m
-         YhvQ==
+        bh=8lP8OOorDp4RjZXoLRJhvTaaFlxLo7QMGtZf6Mua7X0=;
+        b=VvqbD7i/phDRw4qlo/3D8JSYLBuK9N9Idj+2AhKszf22QRc3mns9rbQIAGYmQR9Cre
+         JJpX/99WXVnfLUPMIEYw2BTEp9BUVjizx52QBoujIaooCUu8OPiqPGCw82L8McPAGRwT
+         casmlHZ73tCkjgVEfcjpBt9xLgXUc90nWtz8/VKTj7VYJ2Vx6cTxdr6bSrsa3jKd0HNR
+         3gdzjbK/ZXnJy/ZFb1NuP0MOixRinsKK6eqEnnAUNPJu02kCTdEWdJrxMnwSwJ+xOHak
+         k7h4HU4Yiic7u4xbqqGgQzrRaf3PyGTYV4OAhvomtwbga8lCFria43ju8aUxFnAS32XI
+         lhtw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=CXDbZ72EhvPIsbyJ5EezoEwlOzUgft6D4XqjM/k4Tos=;
-        b=yxp35LevrqPxpYMvd4SyaVirdfemKkskJomw+wuGmBCdMj5DVJQMRD6bVfbw53nbMD
-         B9V07pQfR0MfcilJEsdnfuwsjR1rIw7q2IKAZGHoJ/2JTSnzriJ1hpYS+pBqkFQVQyLM
-         bwAjtGUeQq2g898+HMgXYfbyxl7LRixmPmFj1mpqIgevl2b7Q77fzFgfxYFfqB3619MI
-         GEhLzZ+ZhmtWQl5xtuqw5Sip1qDj//he4w5Cx1ERBsgp8zgRXeoVmc6klciH4OlOC+AT
-         NJA69jBEZJh56TCIHvu3fcAuCXKLv6D+cOUdVyh1oYjCfpmKq5n/yJyvLGtKMc41wwCh
-         Onvg==
-X-Gm-Message-State: AOAM530peoGfVe1IiT/lPXbEDy4qAbh9MtGqZTw2Zvhs2v51dRh5LAkK
-        qhtnhm2j+2g7qp9L48OguldONYR2a7tmIAYmygytKg==
-X-Google-Smtp-Source: ABdhPJzffgWI5BpJ72eaC/aE9on/1jFRzBqZ0PO6HX1zF1PGpy7gZGBrO+0xBSdDIZvjqofZjzR0DSV1/EJw8UQpHro=
-X-Received: by 2002:a7b:c256:: with SMTP id b22mr34822265wmj.176.1639371970299;
- Sun, 12 Dec 2021 21:06:10 -0800 (PST)
+        bh=8lP8OOorDp4RjZXoLRJhvTaaFlxLo7QMGtZf6Mua7X0=;
+        b=UUbY4/xgvqIICz8SdyOi37HKeopdE02qdZ/FPKlutgc8zvtIuOzsJ3hjoGSHOUu89M
+         WxXI5jFtXmne/P2WMA66HNuCxPG8acR2DG3PqLU+dfr5ZyHMJ+k4RBsIhFb+LVwlsnqa
+         TW5Pf9r8PbOd+oMwPv7JCRWx7TbHh8dEaHH5+V3emfbzyfne9DOmb4h1YUlFYuA5HGhb
+         f83ohWBZplpQAJtSvWOf8VeDZOEEN0NnF0hG582/8mvvi5Dvngn79o8oaKDloGyqPjbl
+         pFTI5z2oXEOpHtKaf1yMa+swBVEVWoMabs24/LRBikjBHQt4zt/M00PNIugQBUZEniWW
+         TmXQ==
+X-Gm-Message-State: AOAM531qFdZLNG+KQ1O2uucwkfhgQdvbJF+R5jfHVD8DJYTn8WZtVvSY
+        MOPBpjQUF+evM/eYwHdzeZkYgNl5c0PQ9OACnQklAQ==
+X-Google-Smtp-Source: ABdhPJxrvfANGAnK2tE5T2zE6CDhSVPk9jE0d3+LQ+mW7YRbOoSb0FlzP9qgVi00dKe8M4+tNVTTAP024Bdvq936/zY=
+X-Received: by 2002:aca:674a:: with SMTP id b10mr26934304oiy.66.1639377485743;
+ Sun, 12 Dec 2021 22:38:05 -0800 (PST)
 MIME-Version: 1.0
-References: <20211210100732.1080-1-jiangyifei@huawei.com> <20211210100732.1080-11-jiangyifei@huawei.com>
-In-Reply-To: <20211210100732.1080-11-jiangyifei@huawei.com>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Mon, 13 Dec 2021 10:35:59 +0530
-Message-ID: <CAAhSdy11yd+f6OZZxjX9mWxkVH4AC7Kz5Vp+RPUz6cCam9GvNQ@mail.gmail.com>
-Subject: Re: [PATCH v2 10/12] target/riscv: Add kvm_riscv_get/put_regs_timer
-To:     Yifei Jiang <jiangyifei@huawei.com>
-Cc:     QEMU Developers <qemu-devel@nongnu.org>,
-        "open list:RISC-V" <qemu-riscv@nongnu.org>,
-        kvm-riscv@lists.infradead.org, KVM General <kvm@vger.kernel.org>,
-        libvir-list@redhat.com, Anup Patel <anup.patel@wdc.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Bin Meng <bin.meng@windriver.com>, fanliang@huawei.com,
-        "Wubin (H)" <wu.wubin@huawei.com>, wanghaibin.wang@huawei.com,
-        wanbo13@huawei.com, Mingwang Li <limingwang@huawei.com>
+References: <20211130074221.93635-1-likexu@tencent.com> <20211130074221.93635-5-likexu@tencent.com>
+ <CALMp9eRAxBFE5mYw=isUSsMTWZS2VOjqZfgh0r3hFuF+5npCAQ@mail.gmail.com>
+ <0ca44f61-f7f1-0440-e1e1-8d5e8aa9b540@gmail.com> <CALMp9eTtsMuEsimONp7TOjJ-uskwJBD-52kZzOefSKXeCwn_5A@mail.gmail.com>
+ <b6c1eb18-9237-f604-9a96-9e6ca397121c@redhat.com> <CALMp9eRy==yu1uQriqbeezeQ+mtFyfyP_iy9HdDiSZ27SnEfFg@mail.gmail.com>
+ <c381aa2c-beb5-480f-1f24-a14de693e78f@redhat.com> <CALMp9eTKrQVCQPm=hcA50JSUCctPaGLEP19biVbGAtBN54dQfA@mail.gmail.com>
+ <CALMp9eS8xDgdbfJTbzMmek3RcXKwkLdGMW-uMkJR3eJZ6sf0GA@mail.gmail.com>
+In-Reply-To: <CALMp9eS8xDgdbfJTbzMmek3RcXKwkLdGMW-uMkJR3eJZ6sf0GA@mail.gmail.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Sun, 12 Dec 2021 22:37:54 -0800
+Message-ID: <CALMp9eThnOMnCkYp1LYM6Ph3NeB296QvXEWtn06A_1XtS+VCDA@mail.gmail.com>
+Subject: Re: [PATCH v2 4/6] KVM: x86/pmu: Add pmc->intr to refactor kvm_perf_overflow{_intr}()
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Like Xu <like.xu.linux@gmail.com>, Andi Kleen <ak@linux.intel.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 10, 2021 at 3:37 PM Yifei Jiang <jiangyifei@huawei.com> wrote:
+On Sat, Dec 11, 2021 at 8:56 PM Jim Mattson <jmattson@google.com> wrote:
 >
-> Add kvm_riscv_get/put_regs_timer to synchronize virtual time context
-> from KVM.
+> On Fri, Dec 10, 2021 at 3:31 PM Jim Mattson <jmattson@google.com> wrote:
+> >
+> > On Fri, Dec 10, 2021 at 2:59 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+> > >
+> > > On 12/10/21 23:55, Jim Mattson wrote:
+> > > >>
+> > > >> Even for tracing the SDM says "Like the value returned by RDTSC, TSC
+> > > >> packets will include these adjustments, but other timing packets (such
+> > > >> as MTC, CYC, and CBR) are not impacted".  Considering that "stand-alone
+> > > >> TSC packets are typically generated only when generation of other timing
+> > > >> packets (MTCs and CYCs) has ceased for a period of time", I'm not even
+> > > >> sure it's a good thing that the values in TSC packets are scaled and offset.
+> > > >>
+> > > >> Back to the PMU, for non-architectural counters it's not really possible
+> > > >> to know if they count in cycles or not.  So it may not be a good idea to
+> > > >> special case the architectural counters.
+> > > >
+> > > > In that case, what we're doing with the guest PMU is not
+> > > > virtualization. I don't know what it is, but it's not virtualization.
+> > >
+> > > It is virtualization even if it is incompatible with live migration to a
+> > > different SKU (where, as you point out below, multiple TSC frequencies
+> > > might also count as multiple SKUs).  But yeah, it's virtualization with
+> > > more caveats than usual.
+> >
+> > It's not virtualization if the counters don't count at the rate the
+> > guest expects them to count.
 >
-> To set register of RISCV_TIMER_REG(state) will occur a error from KVM
-> on kvm_timer_state == 0. It's better to adapt in KVM, but it doesn't matter
-> that adaping in QEMU.
->
-> Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
-> Signed-off-by: Mingwang Li <limingwang@huawei.com>
-> ---
->  target/riscv/cpu.h |  7 +++++
->  target/riscv/kvm.c | 72 ++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 79 insertions(+)
->
-> diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-> index e7dba35acb..c892a2c8b7 100644
-> --- a/target/riscv/cpu.h
-> +++ b/target/riscv/cpu.h
-> @@ -259,6 +259,13 @@ struct CPURISCVState {
->
->      hwaddr kernel_addr;
->      hwaddr fdt_addr;
-> +
-> +    /* kvm timer */
-> +    bool kvm_timer_dirty;
-> +    uint64_t kvm_timer_time;
-> +    uint64_t kvm_timer_compare;
-> +    uint64_t kvm_timer_state;
-> +    uint64_t kvm_timer_frequency;
->  };
->
->  OBJECT_DECLARE_TYPE(RISCVCPU, RISCVCPUClass,
-> diff --git a/target/riscv/kvm.c b/target/riscv/kvm.c
-> index 171a32adf9..802c076b22 100644
-> --- a/target/riscv/kvm.c
-> +++ b/target/riscv/kvm.c
-> @@ -64,6 +64,9 @@ static uint64_t kvm_riscv_reg_id(CPURISCVState *env, uint64_t type, uint64_t idx
->  #define RISCV_CSR_REG(env, name)  kvm_riscv_reg_id(env, KVM_REG_RISCV_CSR, \
->                   KVM_REG_RISCV_CSR_REG(name))
->
-> +#define RISCV_TIMER_REG(env, name)  kvm_riscv_reg_id(env, KVM_REG_RISCV_TIMER, \
-> +                 KVM_REG_RISCV_TIMER_REG(name))
-> +
->  #define RISCV_FP_F_REG(env, idx)  kvm_riscv_reg_id(env, KVM_REG_RISCV_FP_F, idx)
->
->  #define RISCV_FP_D_REG(env, idx)  kvm_riscv_reg_id(env, KVM_REG_RISCV_FP_D, idx)
-> @@ -235,6 +238,75 @@ static int kvm_riscv_put_regs_fp(CPUState *cs)
->      return ret;
->  }
->
-> +static void kvm_riscv_get_regs_timer(CPUState *cs)
-> +{
-> +    int ret;
-> +    uint64_t reg;
-> +    CPURISCVState *env = &RISCV_CPU(cs)->env;
-> +
-> +    if (env->kvm_timer_dirty) {
-> +        return;
-> +    }
-> +
-> +    ret = kvm_get_one_reg(cs, RISCV_TIMER_REG(env, time), &reg);
-> +    if (ret) {
-> +        abort();
-> +    }
-> +    env->kvm_timer_time = reg;
-> +
-> +    ret = kvm_get_one_reg(cs, RISCV_TIMER_REG(env, compare), &reg);
-> +    if (ret) {
-> +        abort();
-> +    }
-> +    env->kvm_timer_compare = reg;
-> +
-> +    ret = kvm_get_one_reg(cs, RISCV_TIMER_REG(env, state), &reg);
-> +    if (ret) {
-> +        abort();
-> +    }
-> +    env->kvm_timer_state = reg;
+> Per the SDM, unhalted reference cycles count at "a fixed frequency."
+> If the frequency changes on migration, then the value of this event is
+> questionable at best. For unhalted core cycles, on the other hand, the
+> SDM says, "The performance counter for this event counts across
+> performance state transitions using different core clock frequencies."
+> That does seem to permit frequency changes on migration, but I suspect
+> that software expects the event to count at a fixed frequency if
+> INVARIANT_TSC is set.
 
-Please read the timer frequency here.
+Actually, I now realize that unhalted reference cycles is independent
+of the host or guest TSC, so it is not affected by TSC scaling.
+However, we still have to decide on a specific fixed frequency to
+virtualize so that the frequency doesn't change on migration. As a
+practical matter, it may be the case that the reference cycles
+frequency is the same on all processors in a migration pool, and we
+don't have to do anything.
 
-> +
-> +    env->kvm_timer_dirty = true;
-> +}
-> +
-> +static void kvm_riscv_put_regs_timer(CPUState *cs)
-> +{
-> +    int ret;
-> +    uint64_t reg;
-> +    CPURISCVState *env = &RISCV_CPU(cs)->env;
-> +
-> +    if (!env->kvm_timer_dirty) {
-> +        return;
-> +    }
 
-Over here, we should get the timer frequency and abort() with an
-error message if it does not match env->kvm_timer_frequency
-
-For now, migration will not work between Hosts with different
-timer frequency.
-
-Regards,
-Anup
-
-> +
-> +    reg = env->kvm_timer_time;
-> +    ret = kvm_set_one_reg(cs, RISCV_TIMER_REG(env, time), &reg);
-> +    if (ret) {
-> +        abort();
-> +    }
-> +
-> +    reg = env->kvm_timer_compare;
-> +    ret = kvm_set_one_reg(cs, RISCV_TIMER_REG(env, compare), &reg);
-> +    if (ret) {
-> +        abort();
-> +    }
-> +
-> +    /*
-> +     * To set register of RISCV_TIMER_REG(state) will occur a error from KVM
-> +     * on env->kvm_timer_state == 0, It's better to adapt in KVM, but it
-> +     * doesn't matter that adaping in QEMU now.
-> +     * TODO If KVM changes, adapt here.
-> +     */
-> +    if (env->kvm_timer_state) {
-> +        reg = env->kvm_timer_state;
-> +        ret = kvm_set_one_reg(cs, RISCV_TIMER_REG(env, state), &reg);
-> +        if (ret) {
-> +            abort();
-> +        }
-> +    }
-> +
-> +    env->kvm_timer_dirty = false;
-> +}
+> I'm not sure that I buy your argument regarding consistency. In
+> general, I would expect the hypervisor to exclude non-architected
+> events from the allow-list for any VM instances running in a
+> heterogeneous migration pool. Certainly, those events could be allowed
+> in a heterogeneous migration pool consisting of multiple SKUs of the
+> same microarchitecture running at different clock frequencies, but
+> that seems like a niche case.
 >
->  const KVMCapabilityInfo kvm_arch_required_capabilities[] = {
->      KVM_CAP_LAST_INFO
-> --
-> 2.19.1
 >
+> > > > Exposing non-architectural events is questionable with live migration,
+> > > > and TSC scaling is unnecessary without live migration. I suppose you
+> > > > could have a migration pool with different SKUs of the same generation
+> > > > with 'seemingly compatible' PMU events but different TSC frequencies,
+> > > > in which case it might be reasonable to expose non-architectural
+> > > > events, but I would argue that any of those 'seemingly compatible'
+> > > > events are actually not compatible if they count in cycles.
+> > > I agree.  Support for marshaling/unmarshaling PMU state exists but it's
+> > > more useful for intra-host updates than for actual live migration, since
+> > > these days most live migration will use TSC scaling on the destination.
+> > >
+> > > Paolo
+> > >
+> > > >
+> > > > Unless, of course, Like is right, and the PMU counters do count fractionally.
+> > > >
+> > >
