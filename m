@@ -2,290 +2,207 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DB984472F67
-	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 15:34:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3BC26472FBD
+	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 15:49:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239440AbhLMOeN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Dec 2021 09:34:13 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:13144 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234686AbhLMOeM (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 13 Dec 2021 09:34:12 -0500
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1BDEXR5a016118;
-        Mon, 13 Dec 2021 14:34:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=Zz8uZrc6G/GVdZemOhCq+X0BxzIkWbjqtaYx1tbOEyM=;
- b=i0GC1ocR77lio9pz4+RP7iR+sk6E1QEEThIVZURepagNYiWfCjraz2veg4Gf3NpbTO6/
- Lvb8D6AmSp2JIV4JUglP82eXV+XzNGqS0K9SVLdNpZq8sGrb91ReYnWS/gjjCf5OtWOX
- /kJx7IvQNHEX0p2d6yhp6+MeL/PTe7taNh5PIrAiR5Xexkxv+XFUbNqaj3J4rrkb3yvy
- SpltWbLUmKnn1c65aZLDPF4Q4VKkZTm4fx3rAuzcQQXRfQVykcVqr9BruiN3io1JcgQ+
- D/RWKrJj3FDLDT1nyYcTt8W+HNIlhrlzsiU/TYeCSz0gbP1MCQDgeJTdP81mhYPan636 gA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cx42g5mwv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 13 Dec 2021 14:34:11 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1BDEYBl6018203;
-        Mon, 13 Dec 2021 14:34:11 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3cx42g5mw0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 13 Dec 2021 14:34:11 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1BDESBlH005881;
-        Mon, 13 Dec 2021 14:34:09 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma03ams.nl.ibm.com with ESMTP id 3cvkm95w3r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 13 Dec 2021 14:34:09 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1BDEQAsh49545546
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 13 Dec 2021 14:26:10 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5DC2511C066;
-        Mon, 13 Dec 2021 14:34:05 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5932C11C05E;
-        Mon, 13 Dec 2021 14:34:04 +0000 (GMT)
-Received: from [9.171.24.181] (unknown [9.171.24.181])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 13 Dec 2021 14:34:04 +0000 (GMT)
-Message-ID: <3e84e25c-825a-e791-a689-91b50b38aca9@linux.ibm.com>
-Date:   Mon, 13 Dec 2021 15:35:08 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH 05/32] s390/airq: pass more TPI info to airq handlers
+        id S239183AbhLMOtu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Dec 2021 09:49:50 -0500
+Received: from mail-dm6nam11on2060.outbound.protection.outlook.com ([40.107.223.60]:13664
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S230122AbhLMOtt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Dec 2021 09:49:49 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=R8xDitrvnzTwogIKREBEC1d4Ad5OQcsvjLcWMsMsf2doIuURJY7N4Ki6o65Soug/8JRkuhv2671sN730jLk+XgMkYvMLH8tM+RXCXe+5qIXwUhhRih1Ms9B/lLYv8aYM0Anfmxx0n5leO6+UxhCrhw150M6cYjyM7fnSW2CYf3YdM5CXJWFxN0YTaklnWNx5m94tpHjjiBsOV3g7zxUUcLLNbkHXqLBMrWFQd6WQgZSKFWoCbqPPPLDgY2sQGhEh4N5Tz+DCQ1IxvsUrcXk9hKtpLWc1QGoEdO93pL3duKaG9eWmoX2SqWxwF44gu/P9725O2LEwDH+9iCIWTCaRkA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Xl8wF20jOLbRpeY8mSXLE+CgszMsGURQOSlkW1YQbMs=;
+ b=fprtHLNFhRVxZEq16Q2F8h55eY1QdDHa8B5bdKjvFCCyZM5sZvGoLl8uaqw1YNWarrLnsZSAfeUb8CpZLMSbc6zVq6iwdc7nlEGpgpqV4D5S1m3JdY+krchc5Ar7NYxaOXFOGNqwxapGVX9lJLqGAL/P2a0rXb9nZEhFd2ECt4shYbxF67TW1HUh8+U1/E6BAm2qT5ErXyDJTLc/gD97NyErREk0BBjF80fNz8T1WQwE4YhWcj66ir/NZhNZdNai2XapCxYiK9TgnUIrJoXW9dIwQCwfAzmgKmzKuYfEGHLn1nLHnJdxdYxcAhiB0yaNmrO0dQdoUvRaE3bfKj5q4A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Xl8wF20jOLbRpeY8mSXLE+CgszMsGURQOSlkW1YQbMs=;
+ b=5bvYK19eqJTPok37O/ZhUbwHgQ+HAAF8WGEmbOhzru52uhkmNrQOhCZQjLKHS/SG2tPFeC5RaV6gmSa00vYenOzh65ji4DhcAAJHbAVzkl5YbBzJRV0aToIq0+HCxppEbunCdXiBvAqEymAEsBSapeoXc6wAHG0qX+r/ZRScfu8=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com (2603:10b6:805:6f::22)
+ by SN6PR12MB4671.namprd12.prod.outlook.com (2603:10b6:805:e::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4778.17; Mon, 13 Dec
+ 2021 14:49:46 +0000
+Received: from SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::35:281:b7f8:ed4c]) by SN6PR12MB2718.namprd12.prod.outlook.com
+ ([fe80::35:281:b7f8:ed4c%6]) with mapi id 15.20.4778.018; Mon, 13 Dec 2021
+ 14:49:46 +0000
+Cc:     brijesh.singh@amd.com, Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH v8 27/40] x86/boot: Add Confidential Computing type to
+ setup_data
+To:     Dave Hansen <dave.hansen@intel.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org
+References: <20211210154332.11526-1-brijesh.singh@amd.com>
+ <20211210154332.11526-28-brijesh.singh@amd.com>
+ <1fdaca61-884a-ac13-fb33-a47db198f050@intel.com>
+ <ba485a09-9c35-4115-decc-1b9c25519358@amd.com>
+ <2a5cfbd0-865c-2a8b-b70b-f8f64aba5575@intel.com>
+From:   Brijesh Singh <brijesh.singh@amd.com>
+Message-ID: <f442ca7f-4530-1443-27eb-206d6ca0e7a4@amd.com>
+Date:   Mon, 13 Dec 2021 08:49:41 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
+In-Reply-To: <2a5cfbd0-865c-2a8b-b70b-f8f64aba5575@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com,
-        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
-        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
-        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20211207205743.150299-1-mjrosato@linux.ibm.com>
- <20211207205743.150299-6-mjrosato@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <20211207205743.150299-6-mjrosato@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: CtmGTHgVqeOCIVKtkSlh9IAEkJHGkG02
-X-Proofpoint-GUID: tS1BqkPZ4FESUwBb6JnbjF3bEQ8ENNN9
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2021-12-13_06,2021-12-13_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
- impostorscore=0 mlxscore=0 malwarescore=0 clxscore=1015 adultscore=0
- bulkscore=0 phishscore=0 mlxlogscore=999 priorityscore=1501
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2112130093
+X-ClientProxiedBy: MN2PR12CA0015.namprd12.prod.outlook.com
+ (2603:10b6:208:a8::28) To SN6PR12MB2718.namprd12.prod.outlook.com
+ (2603:10b6:805:6f::22)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 192afab3-ddd4-457f-4a41-08d9be47ce50
+X-MS-TrafficTypeDiagnostic: SN6PR12MB4671:EE_
+X-Microsoft-Antispam-PRVS: <SN6PR12MB46712FBD37216E642726CE81E5749@SN6PR12MB4671.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: QFwjMqDJ2sK2VAryjfFqJCTiw5szCpXPZnBaaoPPK8kOeBlk9wUISyYFNEjmpA4+2fv6Kj9bptgnCgFVbDlCPVH9qNxDNx4BCQeE1QNZj2xQelsu1Map5TaIPIS8YEdL/QCgiZ/zehgaaJxEM9f4ARaQ7zTzj2WRqD4/aBXD1ZmPYfjFBEFID8thZWUkR/xL66ER4HXOmVZn+nE7P0/wF31i69jFJgzz3F3c0NDBWj1CqFTHkx36P7EJobZP0g5O+IUylXyZkl30VXWIjOwdpakb3DBxfl+RHlVd1ZPttuy+D21P78Ugn+WRAF79fLkInQJjsxnUftROld3RUi3+WoAjr404YDHZvA5DKXN5i7P4Zhn99MEcXK6XaizNCuJpryXx5MVzIp+dUE1KgFr4wLtpjPH1iLo5OpPf38C92S/eUSaxsxJHQRgNnMwb1JMPNVrtOiydHqQT4IGwbjcHu4q/LOs0U8uUm28ayxC3psvaKsCTMODcosex+C9oPV5J/ZsLSKaB2loWopRvZzdnTSsecvs+G2FTHYU5G/6p2po9iXpzdvShbjTb4rCv8wC3v/8TX9pSTQrv0CINIE+YlUzF5BiD/GsZW9kowg++3McB0ZL4W5RdtTP4AUD3l8zo0ETFV71G8uKr6LKeTCvVyezJmQDVRC23rZnIQ86n+SMLzYByGOINo0GRcuXdx8l1yCbXPFCamCY4vqDJNq6r4V0vC+PcgPELN7Krx6ldFE7x5Ujh/xKN02n3v4HxT461jcbNNORuXP6koOqstpi0YsKZhlw/CIpqx8fka/HwnQgdd0UoCcdLZwOYx/FkmRfLbqp4QhCmnYIjc+LYSZZUhS6UyLUeHASP3pBWpC4+TYc=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2718.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(6512007)(36756003)(8936002)(8676002)(2616005)(7416002)(86362001)(45080400002)(7406005)(6666004)(38100700002)(2906002)(186003)(66476007)(6506007)(53546011)(54906003)(84970400001)(4326008)(66946007)(31686004)(31696002)(26005)(316002)(6486002)(44832011)(966005)(508600001)(5660300002)(66556008)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dzZRQ0I0L3dDeVkxdWFxY21kNUNlckpseWxWMzhaZG45bUsrZUZ0bzhlREFp?=
+ =?utf-8?B?NloxbTdTeEpVdXN4N1I4U3BmR2JieTlHcjRVYVFrWWdHRmpYQ0tmcjhKRUFT?=
+ =?utf-8?B?V210Y0xPU3NrMGZ2MjBGbGh3dUZjS3R4TGRheXB5RnM4RURnZ2hYazRNR3hR?=
+ =?utf-8?B?b0V1ZGFEREFnOHJqcVpnamo4dGl5SjV4eWg0MHZuaEdYNWdnTFBGWm54RmpL?=
+ =?utf-8?B?SHlPZnVmb2R4cFNsYU5TTzZjQzB2ZGs1RXRDaG5RaDlkOGsrSHFodngvTDdl?=
+ =?utf-8?B?dkNtYUFKL3gxOEx0V3BHYUhXQ1FwK0MwZTNoa1kxQXczbnN2Y1ZhT1gyN3Zw?=
+ =?utf-8?B?dTVaaTFPZ1N4YWlPSkV6OU9HMWRHbHBnRkRxOFA3eVc5cWxIVk1DZFkzTFND?=
+ =?utf-8?B?MExaVUI3aVhqbnBoRXNHNnFYSWhsQncwWHBFZEw5eDZRWUtKSE5rdFNobFlp?=
+ =?utf-8?B?WU9tcHdPUllQbmpObWs0cVY2R0tZMUg2M3RLSEp2UFRjVktSR3hSVFIrWlVi?=
+ =?utf-8?B?elNSSmd3WnNhUTBCS0NSRTYvVmNFWWRqYXN4UDBQNUoxM0dZS3ZQR041TGVr?=
+ =?utf-8?B?NWxzR2duZkhNdnB4Um9tYTRBejE1RWlXeFFGR3Y2aEd2bkt0eG9uVXF1cnY1?=
+ =?utf-8?B?c0hKbDdNaUt5dmFldlgrQjFFcWpOUCt5b2dYUjB2WURma25Yc1lqdjlWR0Jn?=
+ =?utf-8?B?NGgvSzB1TDY1S2t5bUNGbWdDU3pQeHJNRzlrL01nbTI3VWhaUWNwR1dvbjBK?=
+ =?utf-8?B?UGtVZ0FNbG1VMEhBbEVhV3o4V1hPeWJxS3kveENkSElsbzNIa1N1UTU2bHJ4?=
+ =?utf-8?B?bWFEV3pYODNtcndLaFJQT29meUYwVWZvbk9uN005WFI0c1JRMkN2c3k0emFr?=
+ =?utf-8?B?RlU2bTlUalpJQ0t3SWlDdEtLRjlaenhwbVdMOVB1Smw0SDNqdG9XTTZvT0RP?=
+ =?utf-8?B?VWwwOWJiQkF1c1NyR3p3UFQ4M2Q5R1YzRk85Q09BZkZCak5rYzVXZHJuUnU0?=
+ =?utf-8?B?U2xKU2NhOVg2TUVzcGcxNWhrMmdxQ3hjdW9vdm55OVFrRmozYU1HZHlTRUxR?=
+ =?utf-8?B?OHU2T0JNR0pZVXpOaFc1MkJQRCtab1BtdFhwZ2dscElhdk9Dcis4WWtzMkRO?=
+ =?utf-8?B?V3pJYTBKU3VPMHJDTUZJdUVQNXJMT3NaTU9hVS9aMjd1LzU3eis2WnVZVnV5?=
+ =?utf-8?B?bHh4L1ZUWHNZWG9NVHdCaWxXa1l6RzBCZGE4eVJIaW02YUMzelRoOG1CL2M3?=
+ =?utf-8?B?OHJSSEUvV0Q3bkE2ODgvUmZJZ0JYT0hzU2xEb1FzNktNVDFSUEpFQ3ZnbHVo?=
+ =?utf-8?B?amZKZ1FwaTBSOUtxZTF1ZUVPQlEvNmQ5ZW81ZWZOYTI3ZlNiOXRxTVZmQnRL?=
+ =?utf-8?B?ZHRsZzVWa0JWYWc3aTJwU3AzTnhwa2Vua3hlRTJPZUtoV1Q5T05LUW9ZRk9u?=
+ =?utf-8?B?WHB4U3VGeHpzMm9yQ1dONDZ6RGUweXdwK3J3Ymp1NTFVYUIvby9YTGZSTFNW?=
+ =?utf-8?B?RDMyUTZhWmlJc1ZYWVBzUGhOZE5XV3pSSnVCUkR1anZLWUVtZkRianRybzIx?=
+ =?utf-8?B?ZnI4aWhPZTA5MWNRaVBqRXdHNEdPS0FCNnBGQVdxMWJMMk51aU4rd0RYeXJx?=
+ =?utf-8?B?Ky8xZXh0cmxiaEY0amhSeWtDaktIMUlTL0tpbkgrdVdBbXFFVEJXM2xYV20y?=
+ =?utf-8?B?THdIZ0VsMGNaRlU1cUdwTGl1UU0yaGtTRUNtYzhmNDJMRk9ZSHk3OWtOeDIw?=
+ =?utf-8?B?YlhvM3grN2E4Mzh1WVIza3hONTg4d0RuWFZmM09FTGp6ZGZzM2t6bHhtcHd1?=
+ =?utf-8?B?SXlYYit2S1BVbWc3eXdlSXE3Z0tvQmVCTVZhQjFmK2xwM3owZGJBN0JhUkxG?=
+ =?utf-8?B?RDB0RVhRcTVSMFJCTDBiSjBJUjlKdXh5VVp1S1cwc3ZSalZ5WWRDNEw2Y0hv?=
+ =?utf-8?B?VGNaWWRSMEpUY0hQL3ZxVEtjS00xZTRaZGdBSlRpaExaclcxczVWWWFvY2d6?=
+ =?utf-8?B?eGpsbmJrRElrSldMdnR3QUc4VXVoYUZ3UkFoNm9vclZzalZpT3lDVkJ4aVh5?=
+ =?utf-8?B?aFpOZFhLSXpEdi9yZi94TjltUTk2V1RWZGJFTjhxbE5uU0tPbHR6cFpDaEtV?=
+ =?utf-8?B?K2dISElSYkdESHVxbzlraXBDT0RsUDJSOVlQR0NVOWJRVkx3UEMwNDN4WElN?=
+ =?utf-8?Q?NxUxgDQuVrOcwh1TG0iFzvE=3D?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 192afab3-ddd4-457f-4a41-08d9be47ce50
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2718.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Dec 2021 14:49:46.5378
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 60abzf4ZEdNS6cpWDQSVOQqcBCq3kwau2SUTVHm5mCAsHezYLAuT60Y+It33mZ1tafNHlrye+Ro85qSuJz5wHQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB4671
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 12/7/21 21:57, Matthew Rosato wrote:
-> A subsequent patch will introduce an airq handler that requires additional
-> TPI information beyond directed vs floating, so pass the entire tpi_info
-> structure via the handler.  Only pci actually uses this information today,
-> for the other airq handlers this is effectively a no-op.
+On 12/10/21 2:30 PM, Dave Hansen wrote:
+> On 12/10/21 12:18 PM, Brijesh Singh wrote:
+>> On 12/10/21 1:12 PM, Dave Hansen wrote:
+>>> On 12/10/21 7:43 AM, Brijesh Singh wrote:
+>>>> +/* AMD SEV Confidential computing blob structure */
+>>>> +#define CC_BLOB_SEV_HDR_MAGIC	0x45444d41
+>>>> +struct cc_blob_sev_info {
+>>>> +	u32 magic;
+>>>> +	u16 version;
+>>>> +	u16 reserved;
+>>>> +	u64 secrets_phys;
+>>>> +	u32 secrets_len;
+>>>> +	u64 cpuid_phys;
+>>>> +	u32 cpuid_len;
+>>>> +};
+>>> This is an ABI structure rather than some purely kernel construct, right?
+>>
+>> This is ABI between the guest BIOS and Guest OS. It is defined in the OVMF.
+>>
+>> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgithub.com%2Ftianocore%2Fedk2%2Fblob%2Fmaster%2FOvmfPkg%2FInclude%2FGuid%2FConfidentialComputingSevSnpBlob.h&amp;data=04%7C01%7Cbrijesh.singh%40amd.com%7C460f6abff7f04e065c9108d9bc1bfcf7%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637747650681544593%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000&amp;sdata=GI1fAngRJ%2Bj4hcM91UutVXlS1F7kfk2xxtG6I%2BL%2FRYc%3D&amp;reserved=0
+>>
+>> SEV-SNP FW spec does not have it documented; it's up to the guest BIOS
+>> on how it wants to communicate the Secrets and CPUID page location to
+>> guest OS.
 > 
-> Reviewed-by: Eric Farman <farman@linux.ibm.com>
-> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-
-Reviewed-by: Pierre Morel <pmorel@linux.ibm.com>
-
-
-> ---
->   arch/s390/include/asm/airq.h     | 3 ++-
->   arch/s390/kvm/interrupt.c        | 4 +++-
->   arch/s390/pci/pci_irq.c          | 9 +++++++--
->   drivers/s390/cio/airq.c          | 2 +-
->   drivers/s390/cio/qdio_thinint.c  | 6 ++++--
->   drivers/s390/crypto/ap_bus.c     | 9 ++++++---
->   drivers/s390/virtio/virtio_ccw.c | 4 +++-
->   7 files changed, 26 insertions(+), 11 deletions(-)
-> 
-> diff --git a/arch/s390/include/asm/airq.h b/arch/s390/include/asm/airq.h
-> index 01936fdfaddb..7918a7d09028 100644
-> --- a/arch/s390/include/asm/airq.h
-> +++ b/arch/s390/include/asm/airq.h
-> @@ -12,10 +12,11 @@
->   
->   #include <linux/bit_spinlock.h>
->   #include <linux/dma-mapping.h>
-> +#include <asm/tpi.h>
->   
->   struct airq_struct {
->   	struct hlist_node list;		/* Handler queueing. */
-> -	void (*handler)(struct airq_struct *airq, bool floating);
-> +	void (*handler)(struct airq_struct *airq, struct tpi_info *tpi_info);
->   	u8 *lsi_ptr;			/* Local-Summary-Indicator pointer */
->   	u8 lsi_mask;			/* Local-Summary-Indicator mask */
->   	u8 isc;				/* Interrupt-subclass */
-> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
-> index c3bd993fdd0c..f9b872e358c6 100644
-> --- a/arch/s390/kvm/interrupt.c
-> +++ b/arch/s390/kvm/interrupt.c
-> @@ -28,6 +28,7 @@
->   #include <asm/switch_to.h>
->   #include <asm/nmi.h>
->   #include <asm/airq.h>
-> +#include <asm/tpi.h>
->   #include "kvm-s390.h"
->   #include "gaccess.h"
->   #include "trace-s390.h"
-> @@ -3261,7 +3262,8 @@ int kvm_s390_gisc_unregister(struct kvm *kvm, u32 gisc)
->   }
->   EXPORT_SYMBOL_GPL(kvm_s390_gisc_unregister);
->   
-> -static void gib_alert_irq_handler(struct airq_struct *airq, bool floating)
-> +static void gib_alert_irq_handler(struct airq_struct *airq,
-> +				  struct tpi_info *tpi_info)
->   {
->   	inc_irq_stat(IRQIO_GAL);
->   	process_gib_alert_list();
-> diff --git a/arch/s390/pci/pci_irq.c b/arch/s390/pci/pci_irq.c
-> index 954bb7a83124..880bcd73f11a 100644
-> --- a/arch/s390/pci/pci_irq.c
-> +++ b/arch/s390/pci/pci_irq.c
-> @@ -11,6 +11,7 @@
->   
->   #include <asm/isc.h>
->   #include <asm/airq.h>
-> +#include <asm/tpi.h>
->   
->   static enum {FLOATING, DIRECTED} irq_delivery;
->   
-> @@ -216,8 +217,11 @@ static void zpci_handle_fallback_irq(void)
->   	}
->   }
->   
-> -static void zpci_directed_irq_handler(struct airq_struct *airq, bool floating)
-> +static void zpci_directed_irq_handler(struct airq_struct *airq,
-> +				      struct tpi_info *tpi_info)
->   {
-> +	bool floating = !tpi_info->directed_irq;
-> +
->   	if (floating) {
->   		inc_irq_stat(IRQIO_PCF);
->   		zpci_handle_fallback_irq();
-> @@ -227,7 +231,8 @@ static void zpci_directed_irq_handler(struct airq_struct *airq, bool floating)
->   	}
->   }
->   
-> -static void zpci_floating_irq_handler(struct airq_struct *airq, bool floating)
-> +static void zpci_floating_irq_handler(struct airq_struct *airq,
-> +				      struct tpi_info *tpi_info)
->   {
->   	unsigned long si, ai;
->   	struct airq_iv *aibv;
-> diff --git a/drivers/s390/cio/airq.c b/drivers/s390/cio/airq.c
-> index e56535c99888..2f2226786319 100644
-> --- a/drivers/s390/cio/airq.c
-> +++ b/drivers/s390/cio/airq.c
-> @@ -99,7 +99,7 @@ static irqreturn_t do_airq_interrupt(int irq, void *dummy)
->   	rcu_read_lock();
->   	hlist_for_each_entry_rcu(airq, head, list)
->   		if ((*airq->lsi_ptr & airq->lsi_mask) != 0)
-> -			airq->handler(airq, !tpi_info->directed_irq);
-> +			airq->handler(airq, tpi_info);
->   	rcu_read_unlock();
->   
->   	return IRQ_HANDLED;
-> diff --git a/drivers/s390/cio/qdio_thinint.c b/drivers/s390/cio/qdio_thinint.c
-> index 8e09bf3a2fcd..9b9335dd06db 100644
-> --- a/drivers/s390/cio/qdio_thinint.c
-> +++ b/drivers/s390/cio/qdio_thinint.c
-> @@ -15,6 +15,7 @@
->   #include <asm/qdio.h>
->   #include <asm/airq.h>
->   #include <asm/isc.h>
-> +#include <asm/tpi.h>
->   
->   #include "cio.h"
->   #include "ioasm.h"
-> @@ -93,9 +94,10 @@ static inline u32 clear_shared_ind(void)
->   /**
->    * tiqdio_thinint_handler - thin interrupt handler for qdio
->    * @airq: pointer to adapter interrupt descriptor
-> - * @floating: flag to recognize floating vs. directed interrupts (unused)
-> + * @tpi_info: interrupt information (e.g. floating vs directed -- unused)
->    */
-> -static void tiqdio_thinint_handler(struct airq_struct *airq, bool floating)
-> +static void tiqdio_thinint_handler(struct airq_struct *airq,
-> +				   struct tpi_info *tpi_info)
->   {
->   	u64 irq_time = S390_lowcore.int_clock;
->   	u32 si_used = clear_shared_ind();
-> diff --git a/drivers/s390/crypto/ap_bus.c b/drivers/s390/crypto/ap_bus.c
-> index 1986243f9cd3..df1a038442db 100644
-> --- a/drivers/s390/crypto/ap_bus.c
-> +++ b/drivers/s390/crypto/ap_bus.c
-> @@ -27,6 +27,7 @@
->   #include <linux/kthread.h>
->   #include <linux/mutex.h>
->   #include <asm/airq.h>
-> +#include <asm/tpi.h>
->   #include <linux/atomic.h>
->   #include <asm/isc.h>
->   #include <linux/hrtimer.h>
-> @@ -129,7 +130,8 @@ static int ap_max_adapter_id = 63;
->   static struct bus_type ap_bus_type;
->   
->   /* Adapter interrupt definitions */
-> -static void ap_interrupt_handler(struct airq_struct *airq, bool floating);
-> +static void ap_interrupt_handler(struct airq_struct *airq,
-> +				 struct tpi_info *tpi_info);
->   
->   static bool ap_irq_flag;
->   
-> @@ -442,9 +444,10 @@ static enum hrtimer_restart ap_poll_timeout(struct hrtimer *unused)
->   /**
->    * ap_interrupt_handler() - Schedule ap_tasklet on interrupt
->    * @airq: pointer to adapter interrupt descriptor
-> - * @floating: ignored
-> + * @tpi_info: ignored
->    */
-> -static void ap_interrupt_handler(struct airq_struct *airq, bool floating)
-> +static void ap_interrupt_handler(struct airq_struct *airq,
-> +				 struct tpi_info *tpi_info)
->   {
->   	inc_irq_stat(IRQIO_APB);
->   	tasklet_schedule(&ap_tasklet);
-> diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
-> index d35e7a3f7067..52c376d15978 100644
-> --- a/drivers/s390/virtio/virtio_ccw.c
-> +++ b/drivers/s390/virtio/virtio_ccw.c
-> @@ -33,6 +33,7 @@
->   #include <asm/virtio-ccw.h>
->   #include <asm/isc.h>
->   #include <asm/airq.h>
-> +#include <asm/tpi.h>
->   
->   /*
->    * virtio related functions
-> @@ -203,7 +204,8 @@ static void drop_airq_indicator(struct virtqueue *vq, struct airq_info *info)
->   	write_unlock_irqrestore(&info->lock, flags);
->   }
->   
-> -static void virtio_airq_handler(struct airq_struct *airq, bool floating)
-> +static void virtio_airq_handler(struct airq_struct *airq,
-> +				struct tpi_info *tpi_info)
->   {
->   	struct airq_info *info = container_of(airq, struct airq_info, airq);
->   	unsigned long ai;
+> Well, no matter where it is defined, could we please make it a bit
+> easier for folks to find it in the future?
 > 
 
--- 
-Pierre Morel
-IBM Lab Boeblingen
+Noted, I will add a comment so that readers can find it easily. 
+Additionally, I will create a doc and get it published on 
+developer.amd.com/sev so that information is documented outside the 
+source code files.
+
+>>> I searched through all of the specs to which you linked in the cover
+>>> letter.  I looked for "blob", "guid", the magic and part of the GUID
+>>> itself trying to find where this is defined to see if the struct is correct.
+>>>
+>>> I couldn't find anything.
+>>>
+>>> Where is the spec for this blob?  How large is it?  Did you mean to
+>>> leave a 4-byte hole after secrets_len and before cpuid_phys?
+>> Yes, the length is never going to be > 4GB.
+> 
+> I was more concerned that this structure could change sizes if it were
+> compiled on 32-bit versus 64-bit code.  For kernel ABIs, we try not to
+> do that.
+> 
+> Is this somehow OK when talking to firmware?  Or can a 32-bit OS and
+> 64-bit firmware never interact?
+> 
+
+For SNP, both the firmware and OS need to be 64-bit. IIRC, both the 
+Linux and OVMF do not enable the memory encryption for the 32-bit.
+
+thanks
