@@ -2,111 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 626A64731E4
-	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 17:36:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 49AC7473235
+	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 17:47:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240763AbhLMQgH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Dec 2021 11:36:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42668 "EHLO
+        id S237145AbhLMQri (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Dec 2021 11:47:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235632AbhLMQgH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Dec 2021 11:36:07 -0500
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95D01C061748
-        for <kvm@vger.kernel.org>; Mon, 13 Dec 2021 08:36:05 -0800 (PST)
-Received: by mail-pf1-x42b.google.com with SMTP id i12so15406589pfd.6
-        for <kvm@vger.kernel.org>; Mon, 13 Dec 2021 08:36:05 -0800 (PST)
+        with ESMTP id S231593AbhLMQrh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Dec 2021 11:47:37 -0500
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C021AC06173F
+        for <kvm@vger.kernel.org>; Mon, 13 Dec 2021 08:47:37 -0800 (PST)
+Received: by mail-pl1-x62d.google.com with SMTP id n8so11581056plf.4
+        for <kvm@vger.kernel.org>; Mon, 13 Dec 2021 08:47:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=5wyxUOFKzXzWH6KmMgR+HYDbJTzQzijXFBl960+ZGjY=;
-        b=D8O81HGIxMuUln1CvFs5EppKQefv7NmfhODLWT6c95m5ppaYrbylr/8cX4L3KfDPG/
-         KwTwxNpcAZUCpn1+SywI9p6Mo2PwVKUSmKkpKGoiWlgLqY8QzAhdXR4Lxf6Sx8B6KEOl
-         9Y4wvQPORVDvX/Xq9OwUDBf7DgvYBz+tjueGiOed2Rrcz14r0yb+kNN5Vd+u6dHsWc0R
-         XpqeSCjvAjo5yhyTI6ughv6riC68rRsXPaGBa+Xx/5U3yp8lAzBo+JWXzcJfW79E+Kpu
-         kGbFUH4Jf4vKZdlaSqyIqPUQ9L9OG3S71vKMhrj57V8gSru8Qozg4tu/OmEFXTkNRm78
-         MBvA==
+        bh=d7XshzHO0ogGg8acACHycxEJMao7hYdDLYe6OwIM0lk=;
+        b=ppJT8y/zHPNyX8MGuhcvnLdOVVkf8u0jny2LsQ8tffQDOkVaRa5+mpRylvJx+6iOUH
+         XoCh2rocyZsttBGtI22X7IVSbFUNILcihWiu9WxRfeux6u547SJ6xFatGEa5n3XU2EVy
+         nokar6Un+jKll7zVMG8O+fxT/srxlDxTDuh+Jmp04Yci7+2At1elb72Atd7Ses05qhvi
+         mn96dUm5tRo8xsBxjMSvVaP66ry9t04pJ5oSinPOzTPet9az8XTrFVLyBMDCULOXNNWy
+         T+WmnFmir1JM88oRr1xSBcGg1O9Se+BqG//HcuW4aIR1q7JFITMzacGUDqdGqylVl3tp
+         D2Iw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=5wyxUOFKzXzWH6KmMgR+HYDbJTzQzijXFBl960+ZGjY=;
-        b=QZx52GnjJhJpxa6McQLSzf4DuvND/NKi2DzrrdcW0ff7hLGoDv4UAVqZJs0TtiNedC
-         dpEfPP0GLmd0aIUlUGp9Mad8awDRxzxMj0nhczG6D5D1OgGVjySNoF2XRnmiakb/JpkZ
-         MXh0dhQVzsANW0vIfXxfWk5XTFEeJtwyhAIgwpMk44I4J2N5FMvfTRYojVmLy/clLurH
-         Au7Acq/5swFcHxv3wW/jtdc/TEKNbqqbeBL9oDXLV49DMSesWgXfn3TULRfIIrjps+w3
-         tgriKRkinkqABBuzjn7TxPwAxPo/VWp03kzWX19Pa+YmvEc4SkdRtlTmNx/C10uZYi8k
-         ncOA==
-X-Gm-Message-State: AOAM533SmszLWzxXa2tvnGKCDlrI2vrxebhG/mPML6qiX5wZ47x4JbL7
-        nZx7nyJUvfzC0mrsXYt75eTXhXRoWBwIwg==
-X-Google-Smtp-Source: ABdhPJyXncbWfDcnfXrMsKYIsvJnDH5haMuRwYLqcxc16EUEfKi0gk5UXHBHOqGpstTcilOU7RUBsw==
-X-Received: by 2002:a63:c155:: with SMTP id p21mr46985502pgi.156.1639413364899;
-        Mon, 13 Dec 2021 08:36:04 -0800 (PST)
+        bh=d7XshzHO0ogGg8acACHycxEJMao7hYdDLYe6OwIM0lk=;
+        b=AWll/tXjG89EJm5J4Q6qxcfA0cOHMS2IN1pZ+jJq0rydpz0miGjXuNDMuuJUFwUhUQ
+         SXB8Ot+6pcSaCRNgXOMXTLEjn6MGW6tbx5Y0IdlEAtdzVDJ7eLyAo2Nui3/YIkczQmII
+         Aj8Tq4cPvV8LVtN6IpyPF0a3oB6yVfmASTJ5SXhid1p9rsigWLDFKkw+lSNckQ1getHR
+         7ws3d5IV005Nj1Qq7va3kbw/iPV0CRHI4Y0BpC2R/uy/Sryg0BIXzSmx4rx8X8DZsgG7
+         +CtCGcj5mbhk2YuAJ3lriafNOC9lWZyFgLomGeiM4ZYg2Sy2FefOSrbMQombkwwOqpSW
+         YkxQ==
+X-Gm-Message-State: AOAM531NY0bwD4jPX7V2YWgQzjUa35MHJTMj8l7ABJd+HjivziDq2YAD
+        jjMBKrl324HFsDQgGoIYuKM2N1YaVzMZ4w==
+X-Google-Smtp-Source: ABdhPJy0GpHOCW0uHzMRgLmkIPVPTjcQI5Qx6Nr352xJjGzPh1hsDg0X78uF7DEoKjABjY1ij64D7g==
+X-Received: by 2002:a17:90b:4b0e:: with SMTP id lx14mr46321531pjb.160.1639414057065;
+        Mon, 13 Dec 2021 08:47:37 -0800 (PST)
 Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id y28sm12953221pfa.208.2021.12.13.08.36.04
+        by smtp.gmail.com with ESMTPSA id pj12sm7609651pjb.51.2021.12.13.08.47.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Dec 2021 08:36:04 -0800 (PST)
-Date:   Mon, 13 Dec 2021 16:36:00 +0000
+        Mon, 13 Dec 2021 08:47:36 -0800 (PST)
+Date:   Mon, 13 Dec 2021 16:47:32 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        ignat@cloudflare.com, bgardon@google.com, dmatlack@google.com,
-        stevensd@chromium.org, kernel-team@cloudflare.com,
-        stable@vger.kernel.org
-Subject: Re: [PATCH 2/2] KVM: x86: zap invalid roots in kvm_tdp_mmu_zap_all
-Message-ID: <Ybd2cEqUnxiy/JBd@google.com>
+To:     Ignat Korchagin <ignat@cloudflare.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        bgardon@google.com, dmatlack@google.com, stevensd@chromium.org,
+        kernel-team <kernel-team@cloudflare.com>
+Subject: Re: [PATCH 0/2] KVM: x86: Fix dangling page reference in TDP MMU
+Message-ID: <Ybd5JJ/IZvcW/b2Y@google.com>
 References: <20211213112514.78552-1-pbonzini@redhat.com>
- <20211213112514.78552-3-pbonzini@redhat.com>
+ <CALrw=nEM6LEAD8LA1Bd15=8BK=TFwwwAMKy_DWRrDkD=r+1Tqg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211213112514.78552-3-pbonzini@redhat.com>
+In-Reply-To: <CALrw=nEM6LEAD8LA1Bd15=8BK=TFwwwAMKy_DWRrDkD=r+1Tqg@mail.gmail.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 13, 2021, Paolo Bonzini wrote:
-> kvm_tdp_mmu_zap_all is intended to visit all roots and zap their page
-> tables, which flushes the accessed and dirty bits out to the Linux
-> "struct page"s.  Missing some of the roots has catastrophic effects,
-> because kvm_tdp_mmu_zap_all is called when the MMU notifier is being
-> removed and any PTEs left behind might become dangling by the time
-> kvm-arch_destroy_vm tears down the roots for good.
-> 
-> Unfortunately that is exactly what kvm_tdp_mmu_zap_all is doing: it
-> visits all roots via for_each_tdp_mmu_root_yield_safe, which in turn
-> uses kvm_tdp_mmu_get_root to skip invalid roots.  If the current root is
-> invalid at the time of kvm_tdp_mmu_zap_all, its page tables will remain
-> in place but will later be zapped during kvm_arch_destroy_vm.
+On Mon, Dec 13, 2021, Ignat Korchagin wrote:
+> Unfortunately, this patchset does not fix the original issue reported in [1].
 
-As stated in the bug report thread[*], it should be impossible as for the MMU
-notifier to be unregistered while kvm_mmu_zap_all_fast() is running.
-
-I do believe there's a race between set_nx_huge_pages() and kvm_mmu_notifier_release(),
-but that would result in the use-after-free kvm_set_pfn_dirty() tracing back to
-set_nx_huge_pages(), not kvm_destroy_vm().  And for that, I would much prefer we
-elevant mm->users while changing the NX hugepage setting.
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 8f0035517450..985df4db8192 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -6092,10 +6092,15 @@ static int set_nx_huge_pages(const char *val, const struct kernel_param *kp)
-                mutex_lock(&kvm_lock);
-
-                list_for_each_entry(kvm, &vm_list, vm_list) {
-+                       if (!mmget_not_zero(kvm->mm))
-+                               continue;
-+
-                        mutex_lock(&kvm->slots_lock);
-                        kvm_mmu_zap_all_fast(kvm);
-                        mutex_unlock(&kvm->slots_lock);
-
-+                       mmput_async(kvm->mm);
-+
-                        wake_up_process(kvm->arch.nx_lpage_recovery_thread);
-                }
-                mutex_unlock(&kvm_lock);
-
-[*] https://lore.kernel.org/all/Ybdxd7QcJI71UpHm@google.com/
+Can you provide your kernel config?  And any other version/config info that might
+be relevant, e.g. anything in gvisor or runsc?
