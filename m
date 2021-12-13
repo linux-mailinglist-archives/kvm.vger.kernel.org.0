@@ -2,81 +2,220 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 3DA3C472C6F
-	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 13:40:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CB316472C87
+	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 13:45:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236864AbhLMMkb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Dec 2021 07:40:31 -0500
-Received: from Galois.linutronix.de ([193.142.43.55]:34742 "EHLO
-        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231709AbhLMMka (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Dec 2021 07:40:30 -0500
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1639399229;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=EpBecaDs8+vtbv/9pJevHVEwRrggPN7/5F3+DVdz3vE=;
-        b=bjp/Pe0eO5BZ4+PSqiDnNTYnvk7cZRj5bWIs6W9Xptm7WvDp3+WB4zQewsD/SVd9wW7MzZ
-        VqkS9CTMaOFdxX/pUPGZAylimVfqCLx6+0lyZfRsjXPOXswDMeoRS1tplOMfjTjQQ0e0AX
-        p2lxthgdE3sesh6VqhNKYbwoA0unHEHKoDRNONTrIvgQ8u1gDt73NlCN5xHYZJbC8JUdhX
-        qkMU2DTiRI0+PeqJrstBCkGEIRjN4Od1BlMMce4FOLFz4Yo9hV5yNS8uoSkCTq1+Hih052
-        Tdo89qqkLWmqf1GT/P20C1mmqCJ89hpmaqbLPSL5ZV9wZU+aPwvN0W7QKiHvFQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1639399229;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=EpBecaDs8+vtbv/9pJevHVEwRrggPN7/5F3+DVdz3vE=;
-        b=s6V3rVQGql8NCneb8+Vh2L/caDyWLUanhnsiTldNZC7q+0q+tuWt2MrCJ5VguY9evNeHjy
-        AmOZSQ9dRmtuWUCA==
-To:     Paolo Bonzini <pbonzini@redhat.com>,
+        id S234244AbhLMMp4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Dec 2021 07:45:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43286 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231649AbhLMMpy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Dec 2021 07:45:54 -0500
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAD77C061574;
+        Mon, 13 Dec 2021 04:45:53 -0800 (PST)
+Received: by mail-ed1-x534.google.com with SMTP id l25so52052553eda.11;
+        Mon, 13 Dec 2021 04:45:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=uG7G4oTlj1kZ6bR9KXEkUB/36kR857FRM8BO3kXuCKE=;
+        b=OC0icbW5DzwIwnNUf/Ll3Ev87gq+8OI/9larpvGEn9nGskMfWCmK3mEpUv4k40eJXW
+         900wOxU0rnlJZaYRczL/z7dExMv/U94YFTMuiQFma45wdz3cBqLsGgoXu6ZzALraKQHB
+         B33PzSbcaTP5cy8/VvEeaLZ1ePRAneywQc4exsMLWesncigiYiM+HDCwoqpZyJUTwTLZ
+         ZxC4OOLiW0Co+c8D1ISibywfS58sQqiHmXtHQt0QrEJHD96Z4/6//LoFKZH0m5ITCrMQ
+         0dHYjpcN7Zq8MtnsFC6ameQE4koZWAsouOExmDSl0oGqcHRQeoznkg05nXRdDMyi7gMw
+         QePw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=uG7G4oTlj1kZ6bR9KXEkUB/36kR857FRM8BO3kXuCKE=;
+        b=qqWb0hNHy8c5+i1hzHp96EGcgP8jJTl5+fqW1bboCyG18UY7aFNfs+TAz4tSsJ66pp
+         +d7syGrM4DSIUn7r/CDrURKqD+0OHHqtX1EJvzol0bxDp/Wz6btwE7TfupVr6xa1g/qz
+         yPAB6IAJ1M2H5GRD7GX9O4fRLJFCHnXc67vfokDjb1ZrMQuLJ83x1ExNAH5Zot/uWV45
+         DVU+dsF0D7c0ZHEUBJr1vLLDfraVKFbfpUymFoe/vu5yvS5+sP+OafbK173JQ1xnVf4j
+         Y83TYVRA2GAhR3aY+wWc1mAJSlusblQhPTkAU+zbiYj8jq6MMnKPEkAoyIZjNav3x0nD
+         EXTw==
+X-Gm-Message-State: AOAM5307SziGb6eDPFksMarvxnhUGUMufAcwmO5Ye0JeaDhT/TL0Joaa
+        Ack/hYZjSu7jpXXRxz7J1P4=
+X-Google-Smtp-Source: ABdhPJwkZ3NBUWpL/xh4TKzNN4/XnrS3IvFu3x0uqtN8rlg3toaJHZKYU2WOx8VdlRKtIAGiqiDkfw==
+X-Received: by 2002:a05:6402:154:: with SMTP id s20mr67258471edu.148.1639399552332;
+        Mon, 13 Dec 2021 04:45:52 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
+        by smtp.googlemail.com with ESMTPSA id o17sm36279ejj.162.2021.12.13.04.45.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 13 Dec 2021 04:45:51 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <16c938e2-2427-c8dd-94a1-eba8f967283b@redhat.com>
+Date:   Mon, 13 Dec 2021 13:45:49 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH 02/19] x86/fpu: Prepare KVM for dynamically enabled states
+Content-Language: en-US
+To:     Thomas Gleixner <tglx@linutronix.de>,
         Yang Zhong <yang.zhong@intel.com>, x86@kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com
 Cc:     seanjc@google.com, jun.nakajima@intel.com, kevin.tian@intel.com,
         jing2.liu@linux.intel.com, jing2.liu@intel.com
-Subject: Re: [PATCH 16/19] kvm: x86: Introduce KVM_{G|S}ET_XSAVE2 ioctl
-In-Reply-To: <08107331-34b9-b33d-67ee-300f216341e0@redhat.com>
 References: <20211208000359.2853257-1-yang.zhong@intel.com>
- <20211208000359.2853257-17-yang.zhong@intel.com>
- <d16aab21-0f81-f758-a61e-5919f223be78@redhat.com> <87bl1kvmqg.ffs@tglx>
- <08107331-34b9-b33d-67ee-300f216341e0@redhat.com>
-Date:   Mon, 13 Dec 2021 13:40:28 +0100
-Message-ID: <874k7cvfsz.ffs@tglx>
-MIME-Version: 1.0
-Content-Type: text/plain
+ <20211208000359.2853257-3-yang.zhong@intel.com>
+ <dae6cc09-2464-f1f5-c909-2374d33c75b5@redhat.com> <878rwovhnh.ffs@tglx>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <878rwovhnh.ffs@tglx>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 13 2021 at 11:43, Paolo Bonzini wrote:
-> On 12/13/21 11:10, Thomas Gleixner wrote:
->> On Fri, Dec 10 2021 at 17:30, Paolo Bonzini wrote:
->>> I think fpu_copy_uabi_to_guest_fpstate (and therefore
->>> copy_uabi_from_kernel_to_xstate) needs to check that the size is
->>> compatible with the components in the input.
->> 
->> fpu_copy_uabi_to_guest_fpstate() expects that the input buffer is
->> correctly sized. We surely can add a size check there.
->
-> fpu_copy_guest_fpstate_to_uabi is more problematic because that one
-> writes memory.  For fpu_copy_uabi_to_guest_fpstate, we know the input
-> buffer size from the components and we can use it to do a properly-sized
-> memdup_user.
->
-> For fpu_copy_guest_fpstate_to_uabi we can just decide that KVM_GET_XSAVE
-> will only save up to the first 4K.  Something like the following might
-> actually be good for 5.16-rc; right now, header.xfeatures might lead
-> userspace into reading uninitialized or unmapped memory:
+On 12/13/21 13:00, Thomas Gleixner wrote:
+> On Mon, Dec 13 2021 at 10:12, Paolo Bonzini wrote:
+>> On 12/8/21 01:03, Yang Zhong wrote:
+>>>     - user_xfeatures
+>>>
+>>>       Track which features are currently enabled for the vCPU
+>>
+>> Please rename to alloc_xfeatures
+> 
+> That name makes no sense at all. This has nothing to do with alloc.
 
-If user space supplies a 4k buffer and reads beyond the end of the
-buffer then it's hardly a kernel problem.
+Isn't that the features for which space is currently allocated?
 
-That function allows to provide a short buffer and fill it up to the
-point where the buffer ends with the real information.
+fpstate_realloc does
 
-Thanks,
++	if (guest_fpu) {
++		newfps->is_guest = true;
++		newfps->is_confidential = curfps->is_confidential;
++		guest_fpu->user_xfeatures |= xfeatures;
++	}
++
 
-        tglx
+and kvm_check_guest_realloc_fpstate does
+
+
++		if ((guest_fpu->user_xfeatures & request) != request) {
++			vcpu->arch.guest_fpu.realloc_request |= request;
++			return true;
++		}
+
+Reading "user_xfeatures" in there is cryptic, it seems like it's 
+something related to the userspace thread or group that has invoked the 
+KVM ioctl.  If it's renamed to alloc_xfeatures, then this:
+
++		missing = request & ~guest_fpu->alloc_xfeatures;
++		if (missing) {
++			vcpu->arch.guest_fpu.realloc_request |= missing;
++			return true;
++		}
+
+makes it obvious that the allocation is for features that are requested 
+but haven't been allocated in the xstate yet.
+
+>>>     - user_perm
+>>>
+>>>       Copied from guest_perm of the group leader thread. The first
+>>>       vCPU which does the copy locks the guest_perm
+>>
+>> Please rename to perm_xfeatures.
+> 
+> All of that is following the naming conventions in the FPU code related
+> to permissions etc.
+
+perm or guest_perm is just fine as well; but user_perm is not (there's 
+no preexisting reference to user_perm in the code, in fact, as far as I 
+can see).
+
+>>>     - realloc_request
+>>>
+>>>       KVM sets this field to request dynamically-enabled features
+>>>       which require reallocation of @fpstate
+>>
+>> This field should be in vcpu->arch, and there is no need for
+>> fpu_guest_realloc_fpstate.  Rename __xfd_enable_feature to
+>> fpu_enable_xfd_feature and add it to the public API, then just do
+>>
+>> 	if (unlikely(vcpu->arch.xfd_realloc_request)) {
+>> 		u64 request = vcpu->arch.xfd_realloc_request;
+>> 		ret = fpu_enable_xfd(request, enter_guest);
+>> 	}
+>>
+>> to kvm_put_guest_fpu.
+> 
+> Why? Yet another export of FPU internals just because?
+
+It's one function more and one field less.  I prefer another export of 
+FPU internals, to a write to a random field with undocumented invariants.
+
+For example, why WARN_ON_ONCE if enter_guest == true?  If you enter the 
+guest after the host has restored MSR_IA32_XFD with KVM_SET_MSR, the 
+WARN_ON_ONCE can actually fire.  It would be just fine to skip the 
+reallocation until enter_guest == false, which is you actually XSAVE 
+into the guest_fpu.
+
+As an aside, realloc_request (if it survives, see below) shouldn't be 
+added until patch 6.
+
+> Also what clears the reallocation request and what is the @enter_guest
+> argument supposed to help with?
+
+Nothing---make it
+
+  	if (unlikely(vcpu->arch.xfd_realloc_request)) {
+  		u64 request = vcpu->arch.xfd_realloc_request;
+  		ret = fpu_enable_xfd(request, &vcpu->arch.guest_fpu);
+		if (!ret)
+			vcpu->arch.xfd_realloc_request = 0;
+  	}
+
+but in fact, I'm not sure why the request has to be delayed at all.  The 
+obvious implementation of a write to XFD, after all the validity checks, 
+is just
+
+	/* This function just calls xfd_enable_feature.  */
+	r = fpu_guest_alloc_xfeatures(&vcpu->arch.guest_fpu,
+				      vcpu->arch.xcr0 & ~xfd);
+	/*
+	 * An error means that userspace has screwed up by not doing
+	 * arch_prctl(ARCH_REQ_XCOMP_GUEST_PERM).  If we are here coming
+	 * from a ioctl fail it, if the guest has done WRMSR or XSETBV
+	 * it will inject a #GP.
+	 */
+	if (r < 0)
+		return 1;
+
+	vcpu->arch.xfd = xfd;
+
+with none of the kvm_check_guest_realloc_fpstate or KVM_EXIT_FPU_REALLOC 
+business.  No field and a simple, self-contained external API.  The same 
+code works for __kvm_set_xcr as well, just with "xcr0 & ~vcpu->arch.xfd" 
+as the second argument instead.
+
+(Maybe I'm missing why KVM_EXIT_FPU_REALLOC is needed, but I'm not 
+ashamed to say that, given that new userspace API was added with 
+documentation or tests.  The only comment in the code is:
+
++		/*
++		 * Check if fpstate reallocate is required. If yes, then
++		 * let the fpu core do reallocation and update xfd;
++		 * otherwise, update xfd here.
++		 */
++		if (kvm_check_guest_realloc_fpstate(vcpu, data)) {
++			vcpu->run->exit_reason = KVM_EXIT_FPU_REALLOC;
++			vcpu->arch.complete_userspace_io =
++				kvm_skip_emulated_instruction;
++			return KVM_MSR_RET_USERSPACE;
++		}
++
+
+which has nothing to do with the actual content of either 
+kvm_check_guest_realloc_fpstate or the "then" branch.  Userspace can 
+just do ARCH_REQ_XCOMP_GUEST_PERM based on the guest CPUID, before 
+KVM_SET_CPUID2, KVM_SET_MSR or KVM_SET_XCR).
+
+Paolo
