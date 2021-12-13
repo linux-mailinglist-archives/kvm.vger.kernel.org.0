@@ -2,163 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5139A471F8A
-	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 04:19:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CF458471FD1
+	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 05:12:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231441AbhLMDTG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 12 Dec 2021 22:19:06 -0500
-Received: from out28-195.mail.aliyun.com ([115.124.28.195]:38233 "EHLO
-        out28-195.mail.aliyun.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229510AbhLMDTF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 12 Dec 2021 22:19:05 -0500
-X-Alimail-AntiSpam: AC=CONTINUE;BC=0.07437623|-1;CH=green;DM=|CONTINUE|false|;DS=CONTINUE|ham_alarm|0.0034559-0.000173672-0.99637;FP=0|0|0|0|0|-1|-1|-1;HT=ay29a033018047208;MF=haibiao.xiao@zstack.io;NM=1;PH=DS;RN=6;RT=6;SR=0;TI=SMTPD_---.MBPTiKk_1639365542;
-Received: from 172.21.0.111(mailfrom:haibiao.xiao@zstack.io fp:SMTPD_---.MBPTiKk_1639365542)
-          by smtp.aliyun-inc.com(10.147.40.26);
-          Mon, 13 Dec 2021 11:19:02 +0800
-Message-ID: <9b41e9ec-6e8e-855b-a002-0914d8b6a3db@zstack.io>
-Date:   Mon, 13 Dec 2021 11:19:02 +0800
+        id S229922AbhLMEMd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 12 Dec 2021 23:12:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37598 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229748AbhLMEMc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 12 Dec 2021 23:12:32 -0500
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E38B9C06173F
+        for <kvm@vger.kernel.org>; Sun, 12 Dec 2021 20:12:31 -0800 (PST)
+Received: by mail-wr1-x431.google.com with SMTP id d9so24889708wrw.4
+        for <kvm@vger.kernel.org>; Sun, 12 Dec 2021 20:12:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=fP9dnLtCeBgzLlR/Lw9mBCQ4DyaLsnx9vXvgOb0yNOk=;
+        b=LJPnA3Nj10kzmHbWiltzioBJ8miNw97Tt+5j1x6H5YJqi6hbXqgTiB/yY5n+t5oGdC
+         Nc8usqLj6jGn7ik+rnSox0WsmNrAzhoGEhxBxTUIG0BoT+fLkob7J6oor/VQbMQlPvBJ
+         5qyUBM8jHaxy1GIib2gb2vM2yOwh2m3C13nxNLjDa15Hn+AA8+bLqWqW21voEMtp3Mui
+         C0I1ydEyj/pFmg/yth2dm3sB5qQdwXmW7d8YV6cGSkY6AbPGlSsSkWVQbEcNiOWsya6l
+         T3BgqowUDa8OARsKHh1wgktzd4y39ROY+snlM1ofp3cNpPZ2Fbqn2MJR5SYvo4trr4sw
+         +f2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=fP9dnLtCeBgzLlR/Lw9mBCQ4DyaLsnx9vXvgOb0yNOk=;
+        b=f2W932pOyHSFkMaw+Gd3vLmQuW8WuotdF6HZQ8UIyM//ddRs5lK5PnCWQGMzsc4p6/
+         tqDMhkKpaY0sCs7MtkioEdyEl59SgRaN3CPnaJ8wgBzb+yBQtOn/sNwkGcikE1WC2pqM
+         cdRAa71DFZtRNw732odqrRIJ7ehYSYCPpY82XgPrcAzMcLVqJJPyyUaE0SYpcfMYHVmd
+         hze4Km15qV9Hu3cBfuC96pU3Cg+XutNNIvkgl6euZwoeZVE5xays9a9SLZvLzng4uBa4
+         2awHLkP7sMNswjIg13QOQxD1Jr/jcEcoIwbX5YJl1t7HVEq7lVQtVDCpJtI+XFpCaQAv
+         fVkA==
+X-Gm-Message-State: AOAM532PIF27RXW5OUR7//DXBQX7+SbICuRmK1yT1558xlOm98+X9FDO
+        AAGfjDm5jI5y4FarrLOyViscfIVPfCpWRXo/ZnMhcji+cl8=
+X-Google-Smtp-Source: ABdhPJxysva3nO33JUSd0bnK/tZzNMemtYt0k+xWYPhfLAhRCBvrcCRGdk7+Txt972NJLGqI3Qtn/bgrd64KzAao10s=
+X-Received: by 2002:adf:eb0f:: with SMTP id s15mr13042553wrn.690.1639368749832;
+ Sun, 12 Dec 2021 20:12:29 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.1
-Subject: Re: [PATCH kvmtool] Makefile: 'lvm version' works incorrect. Because
- CFLAGS can not get sub-make variable $(KVMTOOLS_VERSION)
-Content-Language: en-US
-To:     Andre Przywara <andre.przywara@arm.com>
-Cc:     kvm@vger.kernel.org, will@kernel.org,
-        julien.thierry.kdev@gmail.com,
-        "haibiao.xiao" <xiaohaibiao331@outlook.com>,
-        Alexandru Elisei <Alexandru.Elisei@arm.com>
-References: <20211204061436.36642-1-haibiao.xiao@zstack.io>
- <20211209155746.3f6bd016@donnerap.cambridge.arm.com>
- <28ff4bb3-851a-e287-b008-c2a91370c90d@zstack.io>
- <20211210110002.137a2fc3@donnerap.cambridge.arm.com>
-From:   "haibiao.xiao" <haibiao.xiao@zstack.io>
-In-Reply-To: <20211210110002.137a2fc3@donnerap.cambridge.arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20211119124515.89439-1-anup.patel@wdc.com> <CAAhSdy1pqS5PYdxuxx5RD8baeqfd07Vm1DM7_Eq9Mby37mS_ig@mail.gmail.com>
+ <87sfuz9q8p.wl-maz@kernel.org>
+In-Reply-To: <87sfuz9q8p.wl-maz@kernel.org>
+From:   Anup Patel <anup@brainfault.org>
+Date:   Mon, 13 Dec 2021 09:42:18 +0530
+Message-ID: <CAAhSdy1Lnbe8VhnFW2nhnCzs_74PzuAeyaADvnMfo7iY0qhxsQ@mail.gmail.com>
+Subject: Re: [PATCH v11 kvmtool 0/8] KVMTOOL RISC-V Support
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     Will Deacon <will@kernel.org>, julien.thierry.kdev@gmail.com,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        Vincent Chen <vincent.chen@sifive.com>,
+        KVM General <kvm@vger.kernel.org>,
+        kvm-riscv@lists.infradead.org, Anup Patel <anup.patel@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Sat, Dec 11, 2021 at 7:51 PM Marc Zyngier <maz@kernel.org> wrote:
+>
+> On Sat, 11 Dec 2021 07:28:49 +0000,
+> Anup Patel <anup@brainfault.org> wrote:
+> >
+> > Hi Marc, Hi Will,
+> >
+> > On Fri, Nov 19, 2021 at 6:15 PM Anup Patel <anup.patel@wdc.com> wrote:
+> > >
+> > > This series adds RISC-V support for KVMTOOL and it is based on the
+> > > Linux-5.16-rc1. The KVM RISC-V patches have been merged in the Linux
+> > > kernel since 5.16-rc1.
+> > >
+> > > The KVMTOOL RISC-V patches can be found in riscv_master branch at:
+> > > https//github.com/kvm-riscv/kvmtool.git
+> >
+> > Ping ?
+> > Do you have further comments on this series ?
+>
+> Not much on my side, apart that it is a bit annoying that some of the
+> support is actually an almost exact copy of the arm code (PCI being a
+> striking example). It would have been nice to see some effort to make
+> the code common, although it isn't a blocker on my side.
 
-Hi,
+Thanks Marc.
 
-Sorry for getting back to you late.
+I agree with you. The code sharing between ARM and RISC-V support
+needs to be improved. We have more stuff to be added after this series
+so I will prioritize code sharing.
 
-Fri, 10 Dec 2021 11:00:02 +0000, Andre Przywara wrote:
-> On Fri, 10 Dec 2021 10:55:40 +0800
-> "haibiao.xiao" <haibiao.xiao@zstack.io> wrote:
-> 
-> Hi,
-> 
->> On Thu, 9 Dec 2021 15:57:46 +0000, Andre Przywara wrote:
->>> On Sat,  4 Dec 2021 14:14:36 +0800
->>> "haibiao.xiao" <haibiao.xiao@zstack.io> wrote:
->>>
->>> Hi,
->>>   
->>>> From: "haibiao.xiao" <xiaohaibiao331@outlook.com>
->>>>
->>>> Command 'lvm version' works incorrect.
->>>> It is expected to print:
->>>>
->>>>     # ./lvm version
->>>>     # kvm tool [KVMTOOLS_VERSION]
->>>>
->>>> but the KVMTOOLS_VERSION is missed:
->>>>
->>>>     # ./lvm version
->>>>     # kvm tool
->>>>
->>>> The KVMTOOLS_VERSION is defined in the KVMTOOLS-VERSION-FILE file which
->>>> is included at the end of Makefile. Since the CFLAGS is a 'Simply
->>>> expanded variables' which means CFLAGS is only scanned once. So the
->>>> definetion of KVMTOOLS_VERSION at the end of Makefile would not scanned
->>>> by CFLAGS. So the '-DKVMTOOLS_VERSION=' remains empty.
->>>>
->>>> I fixed the bug by moving the '-include $(OUTPUT)KVMTOOLS-VERSION-FILE'
->>>> before the CFLAGS.  
->>>
->>> While this is indeed a bug that this patch fixes, I wonder if we should
->>> actually get rid of this whole versioning attempt altogether at this
->>> point. Originally this was following the containing kernel version, but
->>> it is stuck ever since at v3.18, without any change.
->>>
->>> So either we introduce proper versioning (not sure it's worth it?), or we
->>> just remove all code that pretends to print a version number? Or just
->>> hardcode v3.18 into the printf, at least for now? At the very least I
->>> think we don't need a KVMTOOLS-VERSION-FILE anymore.
->>>   
->>
->> Thanks for your reply. 
->>
->> The reason I look at this project is tend to learn something about kvm. 
->> With the version number I can tell which kernel(kvm) is compatible.
-> 
-> I am afraid this is not what the version number tells you. The Linux
-> kernel provides a stable interface to userland, that includes KVM.
-> So you should be able to run any kvmtool version on any host kernel
-> (ignoring bugs). Granted, you will only get the features implemented in
-> both parts, but this only applies to new features (like PMU
-> virtualisation), not the main functionality.
-> 
+Regards,
+Anup
 
-I thought about it again. Yes, you are right.
 
->> Although it is stuck at v3.18, there still some commits in recent 
->> months, which means the kvmtool still changing according to the kvm 
->> features.
-> 
-> Sure, we keep it alive, but adapting to new kernel features is only one
-> part of that. Recently we mostly improved functionality (like
-> adding firmware support, emulating later PCIe versions, ...) and were
-> fixing bugs, independent of the kernel version.
-> 
->> So I think what's kvmtool need is a version control, but not 
->> remove/hardcode.
-> 
-> So whether that's really worth it, is the question. If you need some number
-> to compare, distributions tend to use the date of the last commit for that.
-> 
-
-And I reviewed the code about version generation this weekends. I found it
-was already hardcode to 3.18.0 in `kvmtool/util/KVMTOOLS-VERSION-GEN`. What's
-more, it leaves a way to change the version number by getting from git 
-describe.
-
-> Cheers,
-> Andre
-> 
-> 
->>
->> Thanks,
->> haibiao.xiao
->>> Cheers,
->>> Andre
->>>   
->>>>
->>>> Signed-off-by: haibiao.xiao <xiaohaibiao331@outlook.com>
->>>> ---
->>>>  Makefile | 4 ++--
->>>>  1 file changed, 2 insertions(+), 2 deletions(-)
->>>>
->>>> diff --git a/Makefile b/Makefile
->>>> index bb7ad3e..9afb5e3 100644
->>>> --- a/Makefile
->>>> +++ b/Makefile
->>>> @@ -17,6 +17,7 @@ export E Q
->>>>  
->>>>  include config/utilities.mak
->>>>  include config/feature-tests.mak
->>>> +-include $(OUTPUT)KVMTOOLS-VERSION-FILE
->>>>  
->>>>  CC	:= $(CROSS_COMPILE)gcc
->>>>  CFLAGS	:=
->>>> @@ -559,5 +560,4 @@ ifneq ($(MAKECMDGOALS),clean)
->>>>  
->>>>  KVMTOOLS-VERSION-FILE:
->>>>  	@$(SHELL_PATH) util/KVMTOOLS-VERSION-GEN $(OUTPUT)
->>>> --include $(OUTPUT)KVMTOOLS-VERSION-FILE
->>>> -endif
->>>> +endif
->>>> \ No newline at end of file  
+>
+> Thanks,
+>
+>         M.
+>
+> --
+> Without deviation from the norm, progress is not possible.
