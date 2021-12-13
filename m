@@ -2,102 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7EC75472D08
-	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 14:16:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C2E7472D2A
+	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 14:24:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233590AbhLMNQQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Dec 2021 08:16:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50480 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233288AbhLMNQP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Dec 2021 08:16:15 -0500
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2E8CC061574;
-        Mon, 13 Dec 2021 05:16:14 -0800 (PST)
-Received: by mail-ed1-x533.google.com with SMTP id w1so51786380edc.6;
-        Mon, 13 Dec 2021 05:16:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=q0rvbhn63gQKVZEWack1tAOTzbiQ34HJtQMGG7mhGh0=;
-        b=J50lKBUNZ/QFX/hXza3LrsiCcoeodSHcSdm3LgK6um2wxoDQ/AYcjMe37cyh/6vdy7
-         J5YBlAiQk2PbqrgTnX8jf3eNaz2oXrqnkHzX6bI5toCyMUV1Xq5/aVE4FExkiFNefJ21
-         TNLkpyQf0wx6KOlkBjd/lwj732zI+itn7mjCPCBUPviAUathVdBvnI9YqeJljN6oWTaS
-         UlwxVTFnLphrs9vDdibs5Ns9zuwd4m1XJkESZHQJdytXCO2KZ1KAw0cyy8+tR5ooeDB+
-         4lMT2+kB5DQQ6yaLuBiyXEs2rmg6eMOw9wc/z8NKj9+Ty1qtKLjOWmvYVsKhTtW5J+tY
-         Eh8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=q0rvbhn63gQKVZEWack1tAOTzbiQ34HJtQMGG7mhGh0=;
-        b=ppyHwCLMo5+ebkDvWvdxpOjBDDH7B7f0uxjRIdmRQl6P77lAhpfQ79HRvP8c1nFJmN
-         hVZfBflbtrYDyEsRTaq1fIrgjbV2LYl75Guox6ciDLoHq28ApAjzMCGcV/jDkGQzIWNP
-         pRAqtkNag6eUjufhQZlhjuU0UOoBQO1IjqVGzOkRATgAdUNwzctCMx7A8HKgV9sv9nd3
-         ME2kQkaAb5mv3SdB0ebEEApoBvMn1J6pkwlI2O3rPGKI24u4KF+1iph5sbtgRnd7k+Ba
-         iTBsmmPA5Y2ew7+4zOyK2zIrdI2iQ9uh0tjePZTMYdv7IV0kal144P19eJ/fgblrdT8H
-         KfaA==
-X-Gm-Message-State: AOAM531ZjEBd2fni4hNUTciaa6k209Ara12jWtnsTZe8ZOYbp1pd0sKP
-        HlheIxMXt8RmyZeE+fmIi5k=
-X-Google-Smtp-Source: ABdhPJwWci3+2M2TLk0/q6XZywG2dYCsmUcUrYrJBA7N+Ca4AFsydUIo+iqtIG7Y/J+MmPrQKcdibQ==
-X-Received: by 2002:aa7:c390:: with SMTP id k16mr64603823edq.161.1639401373505;
-        Mon, 13 Dec 2021 05:16:13 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id hz15sm5731499ejc.63.2021.12.13.05.15.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Dec 2021 05:16:13 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <6ce77eaf-ed2e-9092-0822-84caddd4a80c@redhat.com>
-Date:   Mon, 13 Dec 2021 14:15:51 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH v2 1/5] KVM: nSVM: deal with L1 hypervisor that intercepts
- interrupts but lets L2 control EFLAGS.IF
-Content-Language: en-US
-To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
-Cc:     Jim Mattson <jmattson@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
+        id S237389AbhLMNYv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Dec 2021 08:24:51 -0500
+Received: from mail-dm3nam07on2079.outbound.protection.outlook.com ([40.107.95.79]:19457
+        "EHLO NAM02-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S237411AbhLMNYr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Dec 2021 08:24:47 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eOTZnzBNIU+Dk4+uTKk5oAnfEtlLb1da5DJablClJEj0ywafgTJmCV8Z9XH6heTZud62aXOh0SgQZXiswUQVikSiTrMHjJvjbN29jzXqvusXQXqm4xi3+ogfIGQByjpuRAPjSxb7avuXbq78JunbgdtgCAKpTnAWoyI+SxtegcaN4Oo3Orqr9miSd6IdaeoHeMUVZi8RFrkLxVcMPZTodStRh/u0cfjvlurAgGo10C/p3jh5PobFOCBtnQJ53i9zqGAWhAusMBdMB4Q0RfTZVEOk0HeLC0itwSJcH8bcthwaOeYc/BJ728+UsTxtiX6QMFdMsd4ObW3/Rlo1ym59pg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yir30ALPdw4GZhG7Qt+eng1cFM16ldlNqLHtDsTCNBk=;
+ b=av8YO/TslTYN0LTUeuo8Cp3Uz+PB8eEeKUlb4QKl2M/WH9ExnHRN+se14i4gJFM5Ele+FwOyEnfLcUFJ/L4PaZPDzF3PGFeoqMFG1i1T71dOqSJIqnuJ0MR8ljpNb3nGM+hoA+aLihlFmjFbnyNy0wx3cyz1tuoG5wNsvav54QGbWMtaky3do8LAvbT7pB83Kv8NpLTITswh6npJiPmJGztGVmBygfy3qNJKaKlTx0WE/OHA9c9cJARDHBHIck4NzOYPk82b0QSlGbVmrDG3MtgME/tbjZHR0tE2ek6GZLNw/Q1P80RwZA2RFhHPSJHz/9yDP3xE79iCz7j9RNuv2g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yir30ALPdw4GZhG7Qt+eng1cFM16ldlNqLHtDsTCNBk=;
+ b=OK6jWTdt5JJ+Mo9mJmCzM4T/g/A9R9VDJ6cQtU/XKCr9UzcYHzO4TF9Mv96nDasvRbpVHew+0NzqA/P46CSPuNJUBbS6k9fqJpsv3VrUQXNQYmmk7GMXKV30WMeW26hNnwDtoncgHnTMHWORZ2r92Byb3wAfxIMja5U/iUvV645T/Knc/LEOhHisx4jPtXZtY4jnoJR3y0L9uVM9Ks72znrDrnqVyUs9HUwGi8BTBKaxDBWQzQloymo+Slz5XFNTwVwe+eutxChKu9jcwOdlG7PdqgUpY3UE9NKGTHk8V93q+1Y0AzeZ4iHGo6pRryjNL0innJ4R1Uk3q1Leb/5KpQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com (2603:10b6:208:1cb::22)
+ by BL0PR12MB5553.namprd12.prod.outlook.com (2603:10b6:208:1c9::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4778.11; Mon, 13 Dec
+ 2021 13:24:45 +0000
+Received: from BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::d8be:e4e4:ce53:6d11]) by BL0PR12MB5506.namprd12.prod.outlook.com
+ ([fe80::d8be:e4e4:ce53:6d11%7]) with mapi id 15.20.4778.017; Mon, 13 Dec 2021
+ 13:24:45 +0000
+Date:   Mon, 13 Dec 2021 09:24:43 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Lu Baolu <baolu.lu@linux.intel.com>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Christoph Hellwig <hch@infradead.org>,
         Joerg Roedel <joro@8bytes.org>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Borislav Petkov <bp@alien8.de>, linux-kernel@vger.kernel.org,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Ingo Molnar <mingo@redhat.com>
-References: <20211213104634.199141-1-mlevitsk@redhat.com>
- <20211213104634.199141-2-mlevitsk@redhat.com>
- <0d893664-ff8d-83ed-e9be-441b45992f68@redhat.com>
- <74c548c61aeb4afba3acb4143fcb91d92e7de8d6.camel@redhat.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <74c548c61aeb4afba3acb4143fcb91d92e7de8d6.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Ashok Raj <ashok.raj@intel.com>, Will Deacon <will@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Dan Williams <dan.j.williams@intel.com>, rafael@kernel.org,
+        Diana Craciun <diana.craciun@oss.nxp.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Liu Yi L <yi.l.liu@intel.com>,
+        Jacob jun Pan <jacob.jun.pan@intel.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Stuart Yoder <stuyoder@gmail.com>,
+        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Li Yang <leoyang.li@nxp.com>,
+        Dmitry Osipenko <digetx@gmail.com>,
+        iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 04/18] driver core: platform: Add driver dma ownership
+ management
+Message-ID: <20211213132443.GS6385@nvidia.com>
+References: <20211206015903.88687-1-baolu.lu@linux.intel.com>
+ <20211206015903.88687-5-baolu.lu@linux.intel.com>
+ <Ya4f662Af+8kE2F/@infradead.org>
+ <20211206150647.GE4670@nvidia.com>
+ <56a63776-48ca-0d6e-c25c-016dc016e0d5@linux.intel.com>
+ <20211207131627.GA6385@nvidia.com>
+ <c170d215-6aef-ff21-8733-1bae4478e39c@linux.intel.com>
+ <b42ffaee-bb96-6db4-8540-b399214f6881@linux.intel.com>
+ <5d537286-2cb3-cf91-c0de-019355110aa1@linux.intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5d537286-2cb3-cf91-c0de-019355110aa1@linux.intel.com>
+X-ClientProxiedBy: YT3PR01CA0008.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:86::12) To BL0PR12MB5506.namprd12.prod.outlook.com
+ (2603:10b6:208:1cb::22)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 39e7bdac-ab4e-4103-96d2-08d9be3bedb3
+X-MS-TrafficTypeDiagnostic: BL0PR12MB5553:EE_
+X-Microsoft-Antispam-PRVS: <BL0PR12MB555379F72C79487E07DD0E90C2749@BL0PR12MB5553.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:4125;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: PrJ0M2DWJZm3Mopzb/P0Yszph6YwZD/LKf6XsKsJwjTSU1wlYDITQphc+m6tcNgRJtraxnm3+a/Mqnjv1wlrSLjoRaNtKQ6lVNnYjtMRN185Pfjj/vHfqD/UchKdber1AuHgeh4IHNX/zGKN02nd9bMFp3HGABRr+a2cavIO7b5mLvrGMlkBABiYM6MRqYrzFtEt6MrG3m5PQxpw4n2lAjDEofogJk2TZBp+LmqxmCb22xFRErHzOB9bkLdWDfxahI2tqeOYBVJwddIE8RsVZ0eLgPqDxt5JOHhCaGQL4sHfu/vk2HYtF1wV9FXBLMuMNT8JyAM97d6dKhez85GJWWNSYNzsURX3mWAWE1koYOrgIniyeqA/wLzJV2JR1djPFA6D17dS3gyOIQouObgNmGwA7V1BDLAQiqrxjWMyAile/BrlrL2X1nZ6Acz1n9Mdk0lhYpHHPJffOznB71CDeF4fC6X/+sN4zHJJSDULPED5VrgHEIg7QkpQhzk2RjHoiem+5hC9KyUJH6fZTh0tVQimgsjHxPTv+RV4sLW9uHZdmuARMDFRMfqr7caCTSBfnfM+jajJ4Ywq6vssBEiNIQqYuk8i32wgJPFonapZRLCvHv4LuU52VAEEQFV1nymv3Y/zp4nCPg2jOliqaGew9w==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR12MB5506.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(84040400005)(66556008)(1076003)(66476007)(6512007)(316002)(6486002)(66946007)(8936002)(54906003)(33656002)(8676002)(83380400001)(2906002)(36756003)(86362001)(2616005)(6506007)(6916009)(186003)(26005)(4744005)(508600001)(4326008)(5660300002)(38100700002)(7416002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?qgeNdbCgm6orJ4AJrkar+9GFRzzFIcHZRvfWQrQOBGA/fb8bF9BSTWkmAIld?=
+ =?us-ascii?Q?wI9naXFedjpMlWjwrz4eQpqGdHFw9g9psfNswveyvHVmWfRelflXcSW4E0Xf?=
+ =?us-ascii?Q?vo0ELz5+dJFIxzySgKA/4Ro97iZYglBPocc7rd10fwdWQEiHjRf+eLDFNKLz?=
+ =?us-ascii?Q?MNYdsVuBEGMGq2JRSzUfm++hrPuU5ziDblMihITOhwhiNT1+U6wGpsZOtfeq?=
+ =?us-ascii?Q?C1Z7ArUVrWNAfnVHXUE/Zu5/8JJu8ybhGXlMZe5TyrZdsiVoRRwTlyF2NwzM?=
+ =?us-ascii?Q?cNq2zFtFGDMkwAJ+lptHV4P8MjGXdsHQLp3B4lSvk/2sMIgFi/NQlz4eEodV?=
+ =?us-ascii?Q?eILMiIA5FhBiFO4LCCPaAdQlJfcr6GWHtuUgtStJA15MOoDaRWiUpx00EnNI?=
+ =?us-ascii?Q?/N452gVYTGBv5UJfKJzjP3j/pMC1Qv3SsHOOTX5qzudOUuChFit/lGR0Y0s9?=
+ =?us-ascii?Q?zaKXhRg+aQBeUoDggSnY0Q1FM+Og9/ng2FKkliaEMV1pIJxhzBYMcU8qrEGL?=
+ =?us-ascii?Q?f4tQQVmkYsBMxx07qOr1lY/0FLgWo0yYJWaS+8PjXQxBDiCy9lnE2dgz+J1s?=
+ =?us-ascii?Q?Nnm2KjAHMzlfXkbynak0UKVZTyqReXCjYqnFmcyRqfWjXpo9Z+YhBpoCMTd/?=
+ =?us-ascii?Q?VEupV6GVmpdHT+1m6tjATi651NcmuhsiP3ZsLJXkEBNKBVn42L6qG8EZb4Xq?=
+ =?us-ascii?Q?Xfb3IlCDGyJGaPojCcuaKekBzhX9BOZkWIwyq1TCW3iUDnCmC+h7N3i00yIG?=
+ =?us-ascii?Q?W4uWRWaVKsYRCIBUTC3KzgpP8eVH0clbRxOQ/HRmkK/cZ5oMDBuK1K2EXaZw?=
+ =?us-ascii?Q?KJntjIlr9jfu8MOug/oGdaqJ5RdGjwRIznAeP6LJheI7lsr+ejZ+3drF4+gT?=
+ =?us-ascii?Q?+NMMrQVL8zIC5O6KJ2ottoZKxp3Gm6f9vDbbseE0Uto/yq9HVQXBO93qF43O?=
+ =?us-ascii?Q?BVZVvkWXpI0ebsUhWS71hlQE6YPXyyS1lt7G+L6mK/Rqh0pkHL0SbQKvsEl8?=
+ =?us-ascii?Q?HoYt7GPJO9rsTAPAEwUCG2SR825lYIHakvOn89peT+cf7mI7SsHJI0VsuBn3?=
+ =?us-ascii?Q?ZTE8pOD04uQ45GzQiugtGfJHtKjlBcHtYN4bYaBkxQEdAmxycPiH1WqsNYlP?=
+ =?us-ascii?Q?IIe9oT7Y6kI8fJXJlQQtSiEeMzvx5b1lwtWYGkDOt3Z1jZpwCslKoIM45dRt?=
+ =?us-ascii?Q?P3HCt9cRtcsya0pEqDMCjxPWIBSa8MAuDq7Q/M5r9EtOHtZzaNmqS24M72Br?=
+ =?us-ascii?Q?2vsAZbZxq/dpZjLhZgwBi8nmOmE0KceJUr/Uxj50LX3d3ksMegAD8umLq61o?=
+ =?us-ascii?Q?rFdy6IkWfCQhYwifeJti3SIVTxQV0AZT+tpJqIQAXu9EzmbA7yBvbSUVv1NZ?=
+ =?us-ascii?Q?86r7Ea3O/Qo972xrFlyraIieXJpT/5rHhfStMkPpMIg3nhhNX8TLW0vMEGLl?=
+ =?us-ascii?Q?SW6GYJKzWGVWGOJLT7TZESevOmPF8xBYH7nC36fhhDmCCwL7J5y8bm/IVTYW?=
+ =?us-ascii?Q?1fh4lNm9kXBJAtI9sIJXKrMUXvBNTnjUkU4fnRcTSkuGI53VtAigw8jdA9r/?=
+ =?us-ascii?Q?x29dqwOXUAQBm2C8Vjc=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 39e7bdac-ab4e-4103-96d2-08d9be3bedb3
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR12MB5506.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Dec 2021 13:24:45.7297
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ep7rAoZ8i6hspNKrFdCWrbo79reGyBgFp1ELpMtz2UDeQfJ5RwHEVyx8iM0jBa1q
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR12MB5553
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/13/21 14:07, Maxim Levitsky wrote:
->> Right, another case is when CLGI is not trapped and the guest therefore
->> runs with GIF=0.  I think that means that a similar change has to be
->> done in all the *_allowed functions.
->
-> I think that SVM sets real GIF to 1 on VMentry regardless if it is trapped or not.
+On Mon, Dec 13, 2021 at 08:50:05AM +0800, Lu Baolu wrote:
 
-Yes, the issue is only when CLGI is not trapped (and vGIF is disabled).
+> > Does this work for you? Can I work towards this in the next version?
+> 
+> A kindly ping ... Is this heading the right direction? I need your
+> advice to move ahead. :-)
 
-> However if not trapped, and neither EFLAGS.IF is trapped, one could enter a guest
-> that has EFLAGS.IF == 0, then the guest could disable GIF, enable EFLAGS.IF,
-> and then enable GIF, but then GIF enablement should trigger out interrupt window
-> VINTR as well.
+I prefer this to all the duplicated code in the v3 series.. Given it
+touches almost every bus type that implements the dma_configure it
+seems appropriate.
 
-While GIF=0 you have svm_nmi_blocked returning true and svm_nmi_allowed 
-returning -EBUSY; that's wrong isn't it?
-
-Paolo
-
+Jason
