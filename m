@@ -2,86 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7AEFE4734C3
-	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 20:17:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 23F4D473529
+	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 20:44:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242210AbhLMTRe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Dec 2021 14:17:34 -0500
-Received: from mail.skyhub.de ([5.9.137.197]:51638 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S242204AbhLMTRb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Dec 2021 14:17:31 -0500
-Received: from zn.tnic (dslb-088-067-202-008.088.067.pools.vodafone-ip.de [88.67.202.8])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 224691EC01FC;
-        Mon, 13 Dec 2021 20:17:25 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1639423045;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=CyU1Voewt67FOiN6uGWgs4NjYI+V8PTIa4NfUS3rVmI=;
-        b=GAuN/wD0b0I6OByHXioqOpexNFUfkv1bBm9sNpS/zvsBCx0lWl2LbRqLvJkWCzY0/UW+wv
-        ThwpjazX1ruB4HoWCIGyfV/+i2AMYgoybzLr8NhmU0ab2iQORdqXIghnEH44x82SnVm4Gr
-        kdV/1cCF8MGq4sLkA9P/zSoRvlLnrnU=
-Date:   Mon, 13 Dec 2021 20:17:31 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Venu Busireddy <venu.busireddy@oracle.com>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v8 01/40] x86/compressed/64: detect/setup SEV/SME
- features earlier in boot
-Message-ID: <YbecS4Py2hAPBrTD@zn.tnic>
-References: <20211210154332.11526-1-brijesh.singh@amd.com>
- <20211210154332.11526-2-brijesh.singh@amd.com>
- <YbeaX+FViak2mgHO@dt>
+        id S242460AbhLMToP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Dec 2021 14:44:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58304 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S242424AbhLMToP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Dec 2021 14:44:15 -0500
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33819C06173F
+        for <kvm@vger.kernel.org>; Mon, 13 Dec 2021 11:44:14 -0800 (PST)
+Received: by mail-pf1-x42d.google.com with SMTP id p13so15886772pfw.2
+        for <kvm@vger.kernel.org>; Mon, 13 Dec 2021 11:44:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=ME1prsBK5y2s/TuairpTrn8GnmoJtUSZrFIhH9W9WcY=;
+        b=ZwYwi5inxpKI9iCEmuqii70nhXQojehT5dYm1r5u45whCEe/NINA/vD/UlTFswkrb+
+         CSkBmBYfTYIApQiMVbj/mt3LalQyfjKaS0iShIU3Y8oDw+v39B1emW3y5PgKLiiWE0qA
+         b6STiQ5k/8u8BsEDngpBFTAoJAbNf9mmSuS43t52JwbWr9p7RLwo8zV20VHMqJv3WPXN
+         a4Xq95b3/UMg8qq4xfeGx3vrgGOaftNUKR8XirunkQBhO61dC0UGO0hGC4UuLvQYiNus
+         iqvk0gp7KYNJQ8Z2JjKJf3URZcUfWI+qpWFboi7c0SrCu5DxaKvqZuTT+rUMztgZbVa6
+         WCYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ME1prsBK5y2s/TuairpTrn8GnmoJtUSZrFIhH9W9WcY=;
+        b=TQY8CjzfRl5FGWPH9LZnjbufKFmCkHxHdVYAnuZm/unKVzoufmzUWT+Rzp8f8v3MXg
+         wgDM+3AVm/HlVs6sDy926zPOu+r66qPq4NNuniwl43El3lkWQfGRbyOHXLHexrtSVYVd
+         WGPWfXkPeNAxSfM6RSeXGDLFTNlaer48kTNPl+5aZWdUgCnJ0M96IXkYWmGfdSCrUgaX
+         KGHXiC0xyZqIRgdyWWbxi7qRRpQWEusp+8XLxSxZYl8h3qczcTsppujz6Alh5UMGfoHp
+         uTDKA9NVts8woaYuS0RabkVorarlHbWQLUOjTfKFxolAHCmNRBuRNriNSGY1Wzc3IZ/3
+         5Nnw==
+X-Gm-Message-State: AOAM53379wrSUl0CQDE83zeoE6cy+9rJ0BtZTq1A8iVc8callzhlsT0D
+        pPxI+USgnG2fSIQR1BadqspTHZNkepWG5w==
+X-Google-Smtp-Source: ABdhPJwnvqQ5c+YJfxrtRKuAgKIkvVSjuHwzczHzds1rPinaQwQcQyOgwZj0zbP55rAiNB5wrGmfnw==
+X-Received: by 2002:a63:d103:: with SMTP id k3mr512140pgg.6.1639424653551;
+        Mon, 13 Dec 2021 11:44:13 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id a18sm12477587pfn.185.2021.12.13.11.44.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Dec 2021 11:44:12 -0800 (PST)
+Date:   Mon, 13 Dec 2021 19:44:09 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Ignat Korchagin <ignat@cloudflare.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+        bgardon@google.com, dmatlack@google.com, stevensd@chromium.org,
+        kernel-team <kernel-team@cloudflare.com>
+Subject: Re: [PATCH 0/2] KVM: x86: Fix dangling page reference in TDP MMU
+Message-ID: <YbeiiT9b350lYBiR@google.com>
+References: <20211213112514.78552-1-pbonzini@redhat.com>
+ <CALrw=nEM6LEAD8LA1Bd15=8BK=TFwwwAMKy_DWRrDkD=r+1Tqg@mail.gmail.com>
+ <Ybd5JJ/IZvcW/b2Y@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YbeaX+FViak2mgHO@dt>
+In-Reply-To: <Ybd5JJ/IZvcW/b2Y@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 13, 2021 at 01:09:19PM -0600, Venu Busireddy wrote:
-> I made this suggestion while reviewing v7 too, but it appears that it
-> fell through the cracks. Most of the code in sev_enable() is duplicated
-> from sme_enable(). Wouldn't it be better to put all that common code
-> in a different function, and call that function from sme_enable()
-> and sev_enable()?
+On Mon, Dec 13, 2021, Sean Christopherson wrote:
+> On Mon, Dec 13, 2021, Ignat Korchagin wrote:
+> > Unfortunately, this patchset does not fix the original issue reported in [1].
+> 
+> Can you provide your kernel config?  And any other version/config info that might
+> be relevant, e.g. anything in gvisor or runsc?
 
-How about you look where both functions are defined? Which kernel stages?
-
-And please trim your mails when you reply.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Scratch that, I've reproduced this, with luck I'll have a root cause by end of day.
