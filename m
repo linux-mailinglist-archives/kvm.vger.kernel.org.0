@@ -2,84 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F5F747356F
-	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 20:59:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C35164735B2
+	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 21:18:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242607AbhLMT7k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Dec 2021 14:59:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33730 "EHLO
+        id S241059AbhLMUSc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Dec 2021 15:18:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38198 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242660AbhLMT7S (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Dec 2021 14:59:18 -0500
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 458C2C061574
-        for <kvm@vger.kernel.org>; Mon, 13 Dec 2021 11:59:18 -0800 (PST)
-Received: by mail-pf1-x44a.google.com with SMTP id s22-20020a056a00179600b004b31f2cdb19so1976149pfg.7
-        for <kvm@vger.kernel.org>; Mon, 13 Dec 2021 11:59:18 -0800 (PST)
+        with ESMTP id S233984AbhLMUSc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Dec 2021 15:18:32 -0500
+Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEC32C061574
+        for <kvm@vger.kernel.org>; Mon, 13 Dec 2021 12:18:31 -0800 (PST)
+Received: by mail-io1-xd36.google.com with SMTP id e128so20190435iof.1
+        for <kvm@vger.kernel.org>; Mon, 13 Dec 2021 12:18:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=8J9lNG7qusp7IKUlm+Z/cw9Edy7QEJ39Y0anc/ZdikM=;
-        b=HqbrqM0g/0DWDdAcp3Peib6GEcl+jOYlohZxBdL55y/0g/QE5tEIoDuEfDCYhv18pv
-         +u4Gxnsn+xXn9Cax4bN+am/Vr9B1DQHNbEvdNlRp1fh1tU9qxR5Vd5oYHwnvM/hyWpEj
-         iDP1CkXQQ9kMKlBIza+RvxYlItfqR6uXoNGYo1ZqfgRuI0igWHZYT+DpakxwiGv8Gbw6
-         UGSL9V4JqkkBZ0O6hNYXkN32mmUxYejz+MlOWoh5J9DaXP9vjpn7bmYwQb9eoGCbSqSl
-         nsOi+g+jVg6e8FDrmxLEx4ou6POPkxwY1hpeHHGm8aQ3kUXQkibKjrdwpyJw08WDVW2t
-         6cBQ==
+        d=cloudflare.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=d59ukG1E1IEnmj51I/O+6OWFLSVcVUonuO2KPlj8wx8=;
+        b=ODLysn0wdyGs9wKGoJ6VuxzEkytVcji9RwjjX3aAG1Q3mmy/XtzY66ziUMmkF+lJi9
+         u/BV+dMHpBh5s5XPVyM8BcZZ8d+fvO6EymZuFaijPSeEWkVrGO76iskyUX232zxYttO3
+         qgSbwZrBTQzi+tVVSLf0NyvQgng2PxyTkTyqA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=8J9lNG7qusp7IKUlm+Z/cw9Edy7QEJ39Y0anc/ZdikM=;
-        b=3WByWKBzkC7zDRWnKiLRaGH0RI2BoEf0+iF+k9zQOwjIiwFwCLPQPkhwEdomJ/WRqC
-         /6xgF9u/o23Uq6V+tXA9iswVoFfkhHbWEBFcvdL6vAvc395s8rwIMbVyagCa63oEI030
-         KNskvdij3d1QOs+B4n3G+LnwvAORqsO1OOb7rhO+6OjbykKaumSd2QjvPFxIOUQx6i70
-         NR48fyxCJ5JL2px4OO3WQSPV29mZmYs848Vf61DVWfK2USKPfzF+vWT4EZMXRugXW+20
-         bUSxFyzY3pNAZt/5Sfny1SjMuPzC/pxB/RLH8HPiA078qkBjyBs69DmauFAZnz4nsXJC
-         rFCw==
-X-Gm-Message-State: AOAM532YNQCxM22tk1oTmodLIhROS9lnHwyNTfHFpAc5yAjlkMPyF4wL
-        PYWGQbzzA62SI8XQ9aLDW6Phx7wwN1MdXg==
-X-Google-Smtp-Source: ABdhPJyTWNSj7J7HYTBJgxKMlx7Ns2FVUOvMzgwoBCqHCpAy97CHIIZB4HaeW6WXcO72c5Dain37Rwnc+eva+w==
-X-Received: from dmatlack-heavy.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:19cd])
- (user=dmatlack job=sendgmr) by 2002:a65:684e:: with SMTP id
- q14mr551139pgt.378.1639425557761; Mon, 13 Dec 2021 11:59:17 -0800 (PST)
-Date:   Mon, 13 Dec 2021 19:59:12 +0000
-Message-Id: <20211213195912.447258-1-dmatlack@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.34.1.173.g76aa8bc2d0-goog
-Subject: [kvm-unit-tests PATCH] x86: Increase timeout for vmx_vmcs_shadow_test
-From:   David Matlack <dmatlack@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, drjones@redhat.com,
-        David Matlack <dmatlack@google.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=d59ukG1E1IEnmj51I/O+6OWFLSVcVUonuO2KPlj8wx8=;
+        b=Oo4atJgmjcJZRlHoKvAF45w/YkC8QSMsBxXr7dYa3nxpaBWIb1WYiUpuRWQPTjPMa7
+         3Jn9u+0koioD37cQ/niY1NZv/4CKqnLyEjQMCX40QVSuJpGijArSlQoS9sKomRnUawkE
+         sU2lV/3ILZqttpEa6Ptr9QCU71uQOtu0WZXtXcH6wonnk8Dr4hhp0sOcf33gr+9eKCWf
+         KukHIxJ1IQDijlnCgokPWJ0copj2zA6TLiPPeQYFo5dPGEP+mN/rfBoFDt120x4G1PT5
+         xznfRMjFWYSzcnuvr0JaNZsiJwSnTxYuwa9p3+DJks9RdqpiFlp+lXpAl88sZ/BoC9T8
+         O+nA==
+X-Gm-Message-State: AOAM530s2mHAKozMypb5OWXr0MpYUiGgZV0RJK33YJH/D4Kudu4ri8js
+        Z6aWpKCyywgdD04/RChrVzm7aG7XP4LkIUEtInczSw==
+X-Google-Smtp-Source: ABdhPJwpGpvjbKYbymlDwe+XZ6aP4p9PAP/JRvelCiAralywfZnIRtZkKuoNLoI7P5J+yzQuLCvICvv0S4ZKhkPH5Gw=
+X-Received: by 2002:a02:c898:: with SMTP id m24mr317140jao.744.1639426710800;
+ Mon, 13 Dec 2021 12:18:30 -0800 (PST)
+MIME-Version: 1.0
+References: <20211213112514.78552-1-pbonzini@redhat.com> <CALrw=nEM6LEAD8LA1Bd15=8BK=TFwwwAMKy_DWRrDkD=r+1Tqg@mail.gmail.com>
+ <Ybd5JJ/IZvcW/b2Y@google.com> <YbeiiT9b350lYBiR@google.com>
+In-Reply-To: <YbeiiT9b350lYBiR@google.com>
+From:   Ignat Korchagin <ignat@cloudflare.com>
+Date:   Mon, 13 Dec 2021 20:18:19 +0000
+Message-ID: <CALrw=nE3Jh31LNoDN914DQv9AJSWyznejJtb0qG_GUgqwdH3+A@mail.gmail.com>
+Subject: Re: [PATCH 0/2] KVM: x86: Fix dangling page reference in TDP MMU
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>, bgardon@google.com,
+        dmatlack@google.com, stevensd@chromium.org,
+        kernel-team <kernel-team@cloudflare.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When testing with debug kernels (e.g. CONFIG_DEBUG_VM)
-vmx_vmcs_shadow_test exceeds the default 90s timeout. The test ends up
-taking about 120s to complete (on a barmetal host), so increase the
-timeout to 180s.
+Just for the reference, here is my repro environment:
 
-Signed-off-by: David Matlack <dmatlack@google.com>
----
- x86/unittests.cfg | 1 +
- 1 file changed, 1 insertion(+)
+* kernel config:
+https://gist.githubusercontent.com/ignatk/3a5457b8641d636963a2a4f14ccc854f/raw/e9b76b66454e4a3c0f7e395b1792b32ef053a541/gistfile1.txt
+Kernel compiled from kvm/master. The config is processed with
+mod2yesconfig, but when many things are modules - works too. I just
+didn't want to bother with installing modules in the target VM.
 
-diff --git a/x86/unittests.cfg b/x86/unittests.cfg
-index 3000e53c790f..133a2a1501dd 100644
---- a/x86/unittests.cfg
-+++ b/x86/unittests.cfg
-@@ -346,6 +346,7 @@ file = vmx.flat
- extra_params = -cpu max,+vmx -append vmx_vmcs_shadow_test
- arch = x86_64
- groups = vmx
-+timeout = 180
- 
- [debug]
- file = debug.flat
+* host: Debian Bullseye with qemu version: QEMU emulator version 6.1.0
+(Debian 1:6.1+dfsg-6~bpo11+1)
 
-base-commit: 0c111b370ad3c5a89e11caee79bc93a66fd004f2
--- 
-2.34.1.173.g76aa8bc2d0-goog
+* qemu commandline:
+  qemu-system-x86_64 -nographic -cpu host \
+                   -enable-kvm \
+                   -machine q35 \
+                   -smp 8 \
+                   -m 8G \
+                   -drive
+if=pflash,format=raw,readonly=on,file=/usr/share/OVMF/OVMF_CODE.fd \
+                   -drive
+if=pflash,format=raw,file=/usr/share/OVMF/OVMF_VARS.fd \
+                   -drive file=/work/rootfs.img,format=qcow2 \
+                   -nic user,model=virtio-net-pci,hostfwd=tcp::22-:22 \
+                   -kernel vmlinuz \
+                   -append "console=ttyS0 root=/dev/sda rw
+systemd.unified_cgroup_hierarchy=0"
 
+* rootfs.img is barebones standard Debian Bullseye installation
+
+* to install gvisor I just run the following in the VM (blindly
+copypasted from https://gvisor.dev/docs/user_guide/install/):
+
+(
+  set -e
+  ARCH=$(uname -m)
+  URL=https://storage.googleapis.com/gvisor/releases/release/latest/${ARCH}
+  wget ${URL}/runsc ${URL}/runsc.sha512 \
+    ${URL}/containerd-shim-runsc-v1 ${URL}/containerd-shim-runsc-v1.sha512
+  sha512sum -c runsc.sha512 \
+    -c containerd-shim-runsc-v1.sha512
+  rm -f *.sha512
+  chmod a+rx runsc containerd-shim-runsc-v1
+  sudo mv runsc containerd-shim-runsc-v1 /usr/local/bin
+)
+
+* to reproduce, just run "sudo runsc --platform=kvm --network=none do
+echo ok" several times
+
+Regards,
+Ignat
+
+On Mon, Dec 13, 2021 at 7:44 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Mon, Dec 13, 2021, Sean Christopherson wrote:
+> > On Mon, Dec 13, 2021, Ignat Korchagin wrote:
+> > > Unfortunately, this patchset does not fix the original issue reported in [1].
+> >
+> > Can you provide your kernel config?  And any other version/config info that might
+> > be relevant, e.g. anything in gvisor or runsc?
+>
+> Scratch that, I've reproduced this, with luck I'll have a root cause by end of day.
