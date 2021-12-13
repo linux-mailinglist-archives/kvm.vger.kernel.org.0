@@ -2,79 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 92EE047352F
-	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 20:45:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B95A47353E
+	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 20:50:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242483AbhLMTpz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Dec 2021 14:45:55 -0500
-Received: from Galois.linutronix.de ([193.142.43.55]:36844 "EHLO
+        id S236790AbhLMTuU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Dec 2021 14:50:20 -0500
+Received: from Galois.linutronix.de ([193.142.43.55]:36882 "EHLO
         galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242466AbhLMTpy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Dec 2021 14:45:54 -0500
+        with ESMTP id S233215AbhLMTuT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Dec 2021 14:50:19 -0500
 From:   Thomas Gleixner <tglx@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1639424753;
+        s=2020; t=1639425018;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=oufnHXYKWMpsck9vW/q3Ibwbij8WawXCFTeH9I9rutE=;
-        b=AdVHW8wKcLlKaHcW57soga9/hHUUYJSl4/azuP4y+lm/R0fb3EQ0Vul6RaObe+VLaEwBjf
-        ImZW3vuaVgQmVyvF+I+HFwOxbzZdjhH4Vd8frRofbc66khLlCk43I5EGwWn9W2ZNOCChgO
-        znABdaPTmabHl8D2fHiRIiBHXGhYakdewMjVeK+hAoXFOBNMC7CCBBbECzH6altFyHhHrK
-        uJCZLsT3kZjSMOYWIrhMIYtJT/GMSX7vIUhYKeF6pF6AUQSf6elaG8cTCd3BJXeMznZcQm
-        PB5Dd0SN7RvLTEWtgFRZMZl2BQMXfVBWH7mR+LIaiv2fUtVmcjJqZN3H2VCUbw==
+         in-reply-to:in-reply-to; bh=wYckKKvewtBcVFlW8nrro81h3BRkBO7Fro639TQehrs=;
+        b=1gALEEOiekKQbNzJ+i/yHebFnVvq8DkQMOc03gSYbc2C1invCPu/rrUsdC98Mr463gcEWO
+        Y/B5imh3Q7NG1dZFHQLgTnPXauoPkAEyleaXNWD98t3sHeG2AndgzaCwT1maSAI5s1K4Nt
+        7xnde9hLIz3BNgunn8HOUWgZpKNfV2Bs7cgvk0w396wdATfO2rkrvkYRcO34MPtox4i7Ag
+        b+LNuZLcGl+j50jTe/LJ7mn1qhZfZoePEPOLSrtRBEUYyUk6K3n3wq8PHCHPIXBR768Fky
+        NyAImqg4BCDRFnSQgbDVIYaK4dZMKPyaikMFqIzWrtlSoTZqDGnI3HCqAZEvzw==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1639424753;
+        s=2020e; t=1639425018;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=oufnHXYKWMpsck9vW/q3Ibwbij8WawXCFTeH9I9rutE=;
-        b=1rFnbcD6r40GZCKT3sispCAVEyEIoKC8iC4oKzuJqDhQcnC6z3dQZH5Ey7yV+51sOmXfxs
-        tFVxspyislFrL1Bw==
+         in-reply-to:in-reply-to; bh=wYckKKvewtBcVFlW8nrro81h3BRkBO7Fro639TQehrs=;
+        b=WDQQ++O/y/vHVZQt6hWGa6SZlR3PBHfsvGC6O97zJvMy2IGHeVxCp0nPjwF4bY/c3YLcCW
+        HrD6+R2E+SivLsBg==
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Yang Zhong <yang.zhong@intel.com>, x86@kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com
 Cc:     seanjc@google.com, jun.nakajima@intel.com, kevin.tian@intel.com,
         jing2.liu@linux.intel.com, jing2.liu@intel.com
-Subject: Re: [PATCH 10/19] kvm: x86: Emulate WRMSR of guest IA32_XFD
-In-Reply-To: <022620db-13ad-8118-5296-ae2913d41f1f@redhat.com>
-References: <20211208000359.2853257-1-yang.zhong@intel.com>
- <20211208000359.2853257-11-yang.zhong@intel.com>
- <022620db-13ad-8118-5296-ae2913d41f1f@redhat.com>
-Date:   Mon, 13 Dec 2021 20:45:52 +0100
-Message-ID: <87y24othjj.ffs@tglx>
+Subject: Re: [PATCH 02/19] x86/fpu: Prepare KVM for dynamically enabled states
+In-Reply-To: <16c938e2-2427-c8dd-94a1-eba8f967283b@redhat.com>
+Date:   Mon, 13 Dec 2021 20:50:17 +0100
+Message-ID: <87v8zsthc6.ffs@tglx>
 MIME-Version: 1.0
 Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 13 2021 at 16:06, Paolo Bonzini wrote:
-> On 12/8/21 01:03, Yang Zhong wrote:
->> +		/*
->> +		 * Update IA32_XFD to the guest value so #NM can be
->> +		 * raised properly in the guest. Instead of directly
->> +		 * writing the MSR, call a helper to avoid breaking
->> +		 * per-cpu cached value in fpu core.
->> +		 */
->> +		fpregs_lock();
->> +		current->thread.fpu.fpstate->xfd = data;
->
-> This is wrong, it should be written in vcpu->arch.guest_fpu.
->
->> +		xfd_update_state(current->thread.fpu.fpstate);
->
-> This is okay though, so that KVM_SET_MSR will not write XFD and WRMSR
-> will.
->
-> That said, I think xfd_update_state should not have an argument. 
-> current->thread.fpu.fpstate->xfd is the only fpstate that should be 
-> synced with the xfd_state per-CPU variable.
+Paolo,
 
-I'm looking into this right now. The whole restore versus runtime thing
-needs to be handled differently.
+On Mon, Dec 13 2021 at 13:45, Paolo Bonzini wrote:
+> On 12/13/21 13:00, Thomas Gleixner wrote:
+>> On Mon, Dec 13 2021 at 10:12, Paolo Bonzini wrote:
+>>> Please rename to alloc_xfeatures
+>> 
+>> That name makes no sense at all. This has nothing to do with alloc.
+>
+> Isn't that the features for which space is currently allocated?
+
+It is, but from the kernel POV this is user. :)
+
+> Reading "user_xfeatures" in there is cryptic, it seems like it's 
+> something related to the userspace thread or group that has invoked the 
+> KVM ioctl.  If it's renamed to alloc_xfeatures, then this:
+>
+> +		missing = request & ~guest_fpu->alloc_xfeatures;
+> +		if (missing) {
+> +			vcpu->arch.guest_fpu.realloc_request |= missing;
+> +			return true;
+> +		}
+>
+> makes it obvious that the allocation is for features that are requested 
+> but haven't been allocated in the xstate yet.
+
+Let's rename it to xfeatures and perm and be done with it.
+
+>> Why? Yet another export of FPU internals just because?
+>
+> It's one function more and one field less.  I prefer another export of 
+> FPU internals, to a write to a random field with undocumented
+> invariants.
+
+We want less not more exports. :)
+
+> For example, why WARN_ON_ONCE if enter_guest == true?  If you enter the 
+> guest after the host has restored MSR_IA32_XFD with KVM_SET_MSR, the
+
+Indeed restoring a guest might require buffer reallocation, I missed
+that, duh!
+
+On restore the following components are involved:
+
+   XCR0, XFD, XSTATE
+
+XCR0 and XFD have to be restored _before_ XSTATE and that needs to
+be enforced.
+
+But independent of the ordering of XCR0 and XFD restore the following
+check applies to both the restore and the runtime logic:
+
+int kvm_fpu_realloc(struct kvm_vcpu *vcpu, u64 xcr0, u64 xfd)
+{
+   	u64 expand, enabled = xcr0 & ~xfd;
+
+        expand = enabled & ~vcpu->arch.guest_fpu.xfeatures;
+        if (!expand)
+        	return 0;
+        
+        return fpu_enable_guest_features(&vcpu->arch.guest_fpu, expand);
+}
+
+int fpu_enable_guest_features(struct guest_fpu *gfpu, u64 which)
+{
+        permission_checks();
+        ...
+        return fpstate_realloc(.....)
+}
+
+fpstate_realloc() needs to be careful about flipping the pointers
+depending on the question whether guest_fpu->fpstate is actually active,
+i.e.:
+
+        current->thread.fpu.fpstate == gfpu->fpstate
+
+I'm halfways done with that. Will send something soonish.
 
 Thanks,
 
         tglx
+
+       
+
