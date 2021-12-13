@@ -2,76 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 23F4D473529
-	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 20:44:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 92EE047352F
+	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 20:45:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242460AbhLMToP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Dec 2021 14:44:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58304 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242424AbhLMToP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Dec 2021 14:44:15 -0500
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33819C06173F
-        for <kvm@vger.kernel.org>; Mon, 13 Dec 2021 11:44:14 -0800 (PST)
-Received: by mail-pf1-x42d.google.com with SMTP id p13so15886772pfw.2
-        for <kvm@vger.kernel.org>; Mon, 13 Dec 2021 11:44:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ME1prsBK5y2s/TuairpTrn8GnmoJtUSZrFIhH9W9WcY=;
-        b=ZwYwi5inxpKI9iCEmuqii70nhXQojehT5dYm1r5u45whCEe/NINA/vD/UlTFswkrb+
-         CSkBmBYfTYIApQiMVbj/mt3LalQyfjKaS0iShIU3Y8oDw+v39B1emW3y5PgKLiiWE0qA
-         b6STiQ5k/8u8BsEDngpBFTAoJAbNf9mmSuS43t52JwbWr9p7RLwo8zV20VHMqJv3WPXN
-         a4Xq95b3/UMg8qq4xfeGx3vrgGOaftNUKR8XirunkQBhO61dC0UGO0hGC4UuLvQYiNus
-         iqvk0gp7KYNJQ8Z2JjKJf3URZcUfWI+qpWFboi7c0SrCu5DxaKvqZuTT+rUMztgZbVa6
-         WCYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ME1prsBK5y2s/TuairpTrn8GnmoJtUSZrFIhH9W9WcY=;
-        b=TQY8CjzfRl5FGWPH9LZnjbufKFmCkHxHdVYAnuZm/unKVzoufmzUWT+Rzp8f8v3MXg
-         wgDM+3AVm/HlVs6sDy926zPOu+r66qPq4NNuniwl43El3lkWQfGRbyOHXLHexrtSVYVd
-         WGPWfXkPeNAxSfM6RSeXGDLFTNlaer48kTNPl+5aZWdUgCnJ0M96IXkYWmGfdSCrUgaX
-         KGHXiC0xyZqIRgdyWWbxi7qRRpQWEusp+8XLxSxZYl8h3qczcTsppujz6Alh5UMGfoHp
-         uTDKA9NVts8woaYuS0RabkVorarlHbWQLUOjTfKFxolAHCmNRBuRNriNSGY1Wzc3IZ/3
-         5Nnw==
-X-Gm-Message-State: AOAM53379wrSUl0CQDE83zeoE6cy+9rJ0BtZTq1A8iVc8callzhlsT0D
-        pPxI+USgnG2fSIQR1BadqspTHZNkepWG5w==
-X-Google-Smtp-Source: ABdhPJwnvqQ5c+YJfxrtRKuAgKIkvVSjuHwzczHzds1rPinaQwQcQyOgwZj0zbP55rAiNB5wrGmfnw==
-X-Received: by 2002:a63:d103:: with SMTP id k3mr512140pgg.6.1639424653551;
-        Mon, 13 Dec 2021 11:44:13 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id a18sm12477587pfn.185.2021.12.13.11.44.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Dec 2021 11:44:12 -0800 (PST)
-Date:   Mon, 13 Dec 2021 19:44:09 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ignat Korchagin <ignat@cloudflare.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        linux-kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        bgardon@google.com, dmatlack@google.com, stevensd@chromium.org,
-        kernel-team <kernel-team@cloudflare.com>
-Subject: Re: [PATCH 0/2] KVM: x86: Fix dangling page reference in TDP MMU
-Message-ID: <YbeiiT9b350lYBiR@google.com>
-References: <20211213112514.78552-1-pbonzini@redhat.com>
- <CALrw=nEM6LEAD8LA1Bd15=8BK=TFwwwAMKy_DWRrDkD=r+1Tqg@mail.gmail.com>
- <Ybd5JJ/IZvcW/b2Y@google.com>
+        id S242483AbhLMTpz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Dec 2021 14:45:55 -0500
+Received: from Galois.linutronix.de ([193.142.43.55]:36844 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S242466AbhLMTpy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Dec 2021 14:45:54 -0500
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1639424753;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=oufnHXYKWMpsck9vW/q3Ibwbij8WawXCFTeH9I9rutE=;
+        b=AdVHW8wKcLlKaHcW57soga9/hHUUYJSl4/azuP4y+lm/R0fb3EQ0Vul6RaObe+VLaEwBjf
+        ImZW3vuaVgQmVyvF+I+HFwOxbzZdjhH4Vd8frRofbc66khLlCk43I5EGwWn9W2ZNOCChgO
+        znABdaPTmabHl8D2fHiRIiBHXGhYakdewMjVeK+hAoXFOBNMC7CCBBbECzH6altFyHhHrK
+        uJCZLsT3kZjSMOYWIrhMIYtJT/GMSX7vIUhYKeF6pF6AUQSf6elaG8cTCd3BJXeMznZcQm
+        PB5Dd0SN7RvLTEWtgFRZMZl2BQMXfVBWH7mR+LIaiv2fUtVmcjJqZN3H2VCUbw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1639424753;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=oufnHXYKWMpsck9vW/q3Ibwbij8WawXCFTeH9I9rutE=;
+        b=1rFnbcD6r40GZCKT3sispCAVEyEIoKC8iC4oKzuJqDhQcnC6z3dQZH5Ey7yV+51sOmXfxs
+        tFVxspyislFrL1Bw==
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Yang Zhong <yang.zhong@intel.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com
+Cc:     seanjc@google.com, jun.nakajima@intel.com, kevin.tian@intel.com,
+        jing2.liu@linux.intel.com, jing2.liu@intel.com
+Subject: Re: [PATCH 10/19] kvm: x86: Emulate WRMSR of guest IA32_XFD
+In-Reply-To: <022620db-13ad-8118-5296-ae2913d41f1f@redhat.com>
+References: <20211208000359.2853257-1-yang.zhong@intel.com>
+ <20211208000359.2853257-11-yang.zhong@intel.com>
+ <022620db-13ad-8118-5296-ae2913d41f1f@redhat.com>
+Date:   Mon, 13 Dec 2021 20:45:52 +0100
+Message-ID: <87y24othjj.ffs@tglx>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Ybd5JJ/IZvcW/b2Y@google.com>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 13, 2021, Sean Christopherson wrote:
-> On Mon, Dec 13, 2021, Ignat Korchagin wrote:
-> > Unfortunately, this patchset does not fix the original issue reported in [1].
-> 
-> Can you provide your kernel config?  And any other version/config info that might
-> be relevant, e.g. anything in gvisor or runsc?
+On Mon, Dec 13 2021 at 16:06, Paolo Bonzini wrote:
+> On 12/8/21 01:03, Yang Zhong wrote:
+>> +		/*
+>> +		 * Update IA32_XFD to the guest value so #NM can be
+>> +		 * raised properly in the guest. Instead of directly
+>> +		 * writing the MSR, call a helper to avoid breaking
+>> +		 * per-cpu cached value in fpu core.
+>> +		 */
+>> +		fpregs_lock();
+>> +		current->thread.fpu.fpstate->xfd = data;
+>
+> This is wrong, it should be written in vcpu->arch.guest_fpu.
+>
+>> +		xfd_update_state(current->thread.fpu.fpstate);
+>
+> This is okay though, so that KVM_SET_MSR will not write XFD and WRMSR
+> will.
+>
+> That said, I think xfd_update_state should not have an argument. 
+> current->thread.fpu.fpstate->xfd is the only fpstate that should be 
+> synced with the xfd_state per-CPU variable.
 
-Scratch that, I've reproduced this, with luck I'll have a root cause by end of day.
+I'm looking into this right now. The whole restore versus runtime thing
+needs to be handled differently.
+
+Thanks,
+
+        tglx
