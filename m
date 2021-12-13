@@ -2,96 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DAD9D472BD8
-	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 13:00:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3DA3C472C6F
+	for <lists+kvm@lfdr.de>; Mon, 13 Dec 2021 13:40:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235924AbhLMMAh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Dec 2021 07:00:37 -0500
-Received: from Galois.linutronix.de ([193.142.43.55]:34570 "EHLO
+        id S236864AbhLMMkb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Dec 2021 07:40:31 -0500
+Received: from Galois.linutronix.de ([193.142.43.55]:34742 "EHLO
         galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234046AbhLMMAg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Dec 2021 07:00:36 -0500
+        with ESMTP id S231709AbhLMMka (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Dec 2021 07:40:30 -0500
 From:   Thomas Gleixner <tglx@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1639396834;
+        s=2020; t=1639399229;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=risZnaVcZe9oeVlIXObZYM8AUPdYjg7GB0KMq5+o648=;
-        b=Z7BIR/3xkeQ1+hfLzGihhRhTWl+wzq6RNcc3XmTYaNZZzczrlacPVqNB7JHh/9lDeEAJ0g
-        Wp3f3q3LKPHlJNq8X5E3CqgcmKgODxpAjigBwv0o47g5GRnlKmdloRHkRhPYpmqqTRUZnK
-        kWxvghYb4ikzSYcTC6Km6IdPnW8Ynj7ho8KQJyj5mPzIrRW622Md9q7wqQRCSByw6uo4Gb
-        daBn72yDApo8LMl66TzrPPdWMwjKuhu3X9sty1vp9TGUEgRAIsmpH8WU9Cm07kz8GkK1bQ
-        2iRGQtUUHO/NchQqjwdPhRfRS39ywd4lnK8zIw1rL1LpAFc5EQ6xzYNTU2+8FQ==
+        bh=EpBecaDs8+vtbv/9pJevHVEwRrggPN7/5F3+DVdz3vE=;
+        b=bjp/Pe0eO5BZ4+PSqiDnNTYnvk7cZRj5bWIs6W9Xptm7WvDp3+WB4zQewsD/SVd9wW7MzZ
+        VqkS9CTMaOFdxX/pUPGZAylimVfqCLx6+0lyZfRsjXPOXswDMeoRS1tplOMfjTjQQ0e0AX
+        p2lxthgdE3sesh6VqhNKYbwoA0unHEHKoDRNONTrIvgQ8u1gDt73NlCN5xHYZJbC8JUdhX
+        qkMU2DTiRI0+PeqJrstBCkGEIRjN4Od1BlMMce4FOLFz4Yo9hV5yNS8uoSkCTq1+Hih052
+        Tdo89qqkLWmqf1GT/P20C1mmqCJ89hpmaqbLPSL5ZV9wZU+aPwvN0W7QKiHvFQ==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1639396834;
+        s=2020e; t=1639399229;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=risZnaVcZe9oeVlIXObZYM8AUPdYjg7GB0KMq5+o648=;
-        b=SRpLAmiIEJ7HG7R4OVXjuYAdeV8lDtNmtFAZ+nRH5DCxDqXJAherlRINBnZaDMHM2U4jLY
-        0KOvFLdx6ZkQDCAw==
+        bh=EpBecaDs8+vtbv/9pJevHVEwRrggPN7/5F3+DVdz3vE=;
+        b=s6V3rVQGql8NCneb8+Vh2L/caDyWLUanhnsiTldNZC7q+0q+tuWt2MrCJ5VguY9evNeHjy
+        AmOZSQ9dRmtuWUCA==
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Yang Zhong <yang.zhong@intel.com>, x86@kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com
 Cc:     seanjc@google.com, jun.nakajima@intel.com, kevin.tian@intel.com,
         jing2.liu@linux.intel.com, jing2.liu@intel.com
-Subject: Re: [PATCH 02/19] x86/fpu: Prepare KVM for dynamically enabled states
-In-Reply-To: <dae6cc09-2464-f1f5-c909-2374d33c75b5@redhat.com>
+Subject: Re: [PATCH 16/19] kvm: x86: Introduce KVM_{G|S}ET_XSAVE2 ioctl
+In-Reply-To: <08107331-34b9-b33d-67ee-300f216341e0@redhat.com>
 References: <20211208000359.2853257-1-yang.zhong@intel.com>
- <20211208000359.2853257-3-yang.zhong@intel.com>
- <dae6cc09-2464-f1f5-c909-2374d33c75b5@redhat.com>
-Date:   Mon, 13 Dec 2021 13:00:34 +0100
-Message-ID: <878rwovhnh.ffs@tglx>
+ <20211208000359.2853257-17-yang.zhong@intel.com>
+ <d16aab21-0f81-f758-a61e-5919f223be78@redhat.com> <87bl1kvmqg.ffs@tglx>
+ <08107331-34b9-b33d-67ee-300f216341e0@redhat.com>
+Date:   Mon, 13 Dec 2021 13:40:28 +0100
+Message-ID: <874k7cvfsz.ffs@tglx>
 MIME-Version: 1.0
 Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 13 2021 at 10:12, Paolo Bonzini wrote:
-> On 12/8/21 01:03, Yang Zhong wrote:
->>    - user_xfeatures
+On Mon, Dec 13 2021 at 11:43, Paolo Bonzini wrote:
+> On 12/13/21 11:10, Thomas Gleixner wrote:
+>> On Fri, Dec 10 2021 at 17:30, Paolo Bonzini wrote:
+>>> I think fpu_copy_uabi_to_guest_fpstate (and therefore
+>>> copy_uabi_from_kernel_to_xstate) needs to check that the size is
+>>> compatible with the components in the input.
 >> 
->>      Track which features are currently enabled for the vCPU
+>> fpu_copy_uabi_to_guest_fpstate() expects that the input buffer is
+>> correctly sized. We surely can add a size check there.
 >
-> Please rename to alloc_xfeatures
-
-That name makes no sense at all. This has nothing to do with alloc.
-
->>    - user_perm
->> 
->>      Copied from guest_perm of the group leader thread. The first
->>      vCPU which does the copy locks the guest_perm
+> fpu_copy_guest_fpstate_to_uabi is more problematic because that one
+> writes memory.  For fpu_copy_uabi_to_guest_fpstate, we know the input
+> buffer size from the components and we can use it to do a properly-sized
+> memdup_user.
 >
-> Please rename to perm_xfeatures.
+> For fpu_copy_guest_fpstate_to_uabi we can just decide that KVM_GET_XSAVE
+> will only save up to the first 4K.  Something like the following might
+> actually be good for 5.16-rc; right now, header.xfeatures might lead
+> userspace into reading uninitialized or unmapped memory:
 
-All of that is following the naming conventions in the FPU code related
-to permissions etc.
+If user space supplies a 4k buffer and reads beyond the end of the
+buffer then it's hardly a kernel problem.
 
->>    - realloc_request
->> 
->>      KVM sets this field to request dynamically-enabled features
->>      which require reallocation of @fpstate
->
-> This field should be in vcpu->arch, and there is no need for 
-> fpu_guest_realloc_fpstate.  Rename __xfd_enable_feature to 
-> fpu_enable_xfd_feature and add it to the public API, then just do
->
-> 	if (unlikely(vcpu->arch.xfd_realloc_request)) {
-> 		u64 request = vcpu->arch.xfd_realloc_request;
-> 		ret = fpu_enable_xfd(request, enter_guest);
-> 	}
->
-> to kvm_put_guest_fpu.
-
-Why? Yet another export of FPU internals just because?
-
-Also what clears the reallocation request and what is the @enter_guest
-argument supposed to help with?
-
-I have no idea what you are trying to achieve.
+That function allows to provide a short buffer and fill it up to the
+point where the buffer ends with the real information.
 
 Thanks,
 
