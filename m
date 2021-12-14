@@ -2,184 +2,258 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F7384749F7
-	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 18:47:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 582544749F3
+	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 18:45:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236519AbhLNRrE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Dec 2021 12:47:04 -0500
-Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:55258 "EHLO
-        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236716AbhLNRq7 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 14 Dec 2021 12:46:59 -0500
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1BEGXwXK002477;
-        Tue, 14 Dec 2021 17:46:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : content-type : in-reply-to :
- mime-version; s=corp-2021-07-09;
- bh=2yucvMLXAlPfqaPPACj8nqVILYA+Q5Iu3wONe7D/IEk=;
- b=cWbh96lAm1KZu8vJ8pwAtpP188zFwIct9nDRmT/Z14LtsTKNM92XuIt2zjAFBTqbULbz
- UkFSCdSPAsJKueg3AcjsYq9Vi7LhWmJI92tPHTFUpgi7nDBNo9dyeeNCKgDvMOXkZAla
- cRG3mdxDsWvkCUsPTyyQDsmKpNBiRfKlVXQBr886wkunkNZ/oOQ3TLuGob4PavwqMMnf
- ccQEWudFP0Bvq9fVYxdRxc/ulGtTx/MD8GwM8AOFC3esuIzrcz+LdeNMSu0im77Dg+32
- 84FcMZEIaR4d7AvZkgjjSAu+D9bNuJQUsQIbesibL/YV+K0KUB7mfK+QFWTvAgvZTaZR cQ== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3cx56u47k4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 14 Dec 2021 17:46:26 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 1BEHZqMF090213;
-        Tue, 14 Dec 2021 17:46:25 GMT
-Received: from nam02-dm3-obe.outbound.protection.outlook.com (mail-dm3nam07lp2045.outbound.protection.outlook.com [104.47.56.45])
-        by userp3030.oracle.com with ESMTP id 3cvh3xr7hu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 14 Dec 2021 17:46:25 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PNUwGeDvFvslLLFpa+ePsUrgKAkVaQfRg7tb7v6dtCfJKh57m68T1A2x58x90pjr7AConG91/w+mZCOyhF4zXzlCTzs6sH0Wxm5aPykYmpmFUuPUXVl0unoUIHvm1xeJKYowp2uuiTp4+1gYetGt1cv1ml8wjSCBKyUztP5aj1lByr6jrdBmEdUKEJ8lWHHoK56kdUZZ60anzJdKrqJsFf3HR/bts6sEjN0yMA4+Pi8bLknzK0iraIniXojvfpWylxgvUst1NhQfTvx853JDLfQCPWrMp+clnn6gjMeekCwzUmllmxKu65/lFyYBr/iTyhQ/ZxpqrP7GRvK8q/ajGg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2yucvMLXAlPfqaPPACj8nqVILYA+Q5Iu3wONe7D/IEk=;
- b=AQGPrO7j0pYy8dshN1gB+ZsbRgmxTgZkpPLBynGUBWGik8yRQoTqLvW+yK0jcCERU7zeZMfiXCDbap0E/KBpslFj91f4bhhNx/4LWUoCeHlATKj4UUbF0V7mUS0agUApAjJENuH1Sj0VBB6ybRyvUxRQBu0qXHU0TUeUcduNGV65uW9Ff86MZ4jz7h4smsjGIAYgBUmXONgmMH7We1bmz2RbHgPrc5ln8+hyxPSOEy4S3Ob4SWV/3jOq5urEg5ICNhv9CN+XWObv4DDJr6BMeto2EUs+BLyewB91i0QVOpWwO1yWPT/dQ/Eh7jeyYLCLVm7AkertrDfoGIHG5l448A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2yucvMLXAlPfqaPPACj8nqVILYA+Q5Iu3wONe7D/IEk=;
- b=S242jw89YfrhWA2xlvafP2RCfotsq9+t0jim5K4DhVMsf/erN6JtzAaZGpOft+L6rOL3ifj4Zuks7eMpEsYfRpdgYg+wwhyIEwBIAzXr60oP4qwCkazDCU8FRKI16qy0ISQw12XciOGhkBrWQsnk2m7aoAmDzHVgpvxsy3akN0o=
-Received: from SN6PR10MB2576.namprd10.prod.outlook.com (2603:10b6:805:44::15)
- by SN4PR10MB5541.namprd10.prod.outlook.com (2603:10b6:806:1e8::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4778.16; Tue, 14 Dec
- 2021 17:46:23 +0000
-Received: from SN6PR10MB2576.namprd10.prod.outlook.com
- ([fe80::4c8c:47df:f81e:f412]) by SN6PR10MB2576.namprd10.prod.outlook.com
- ([fe80::4c8c:47df:f81e:f412%5]) with mapi id 15.20.4778.018; Tue, 14 Dec 2021
- 17:46:23 +0000
-Date:   Tue, 14 Dec 2021 11:46:14 -0600
-From:   Venu Busireddy <venu.busireddy@oracle.com>
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v8 01/40] x86/compressed/64: detect/setup SEV/SME
- features earlier in boot
-Message-ID: <YbjYZtXlbRdUznUO@dt>
-References: <20211210154332.11526-1-brijesh.singh@amd.com>
- <20211210154332.11526-2-brijesh.singh@amd.com>
- <YbeaX+FViak2mgHO@dt>
- <YbecS4Py2hAPBrTD@zn.tnic>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YbecS4Py2hAPBrTD@zn.tnic>
-X-ClientProxiedBy: SJ0P220CA0003.NAMP220.PROD.OUTLOOK.COM
- (2603:10b6:a03:41b::34) To SN6PR10MB2576.namprd10.prod.outlook.com
- (2603:10b6:805:44::15)
+        id S236699AbhLNRpz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Dec 2021 12:45:55 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:11372 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229593AbhLNRpy (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 14 Dec 2021 12:45:54 -0500
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1BEGroRe039985;
+        Tue, 14 Dec 2021 17:45:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=cQL974FWxJ8GeGIYdBY1quzzHN3qGVlLLB+fGlZEPS0=;
+ b=SUUfuhSc5Tj7s16LM8wjHl9VkFPO3g9xgf4ZPR+1rrWgH2wQGdo9PE1j0GNoUUvHEnAQ
+ oroUHaIvBRlcawTjrZJwFr2zYSiiifJxkAZogmCfAXVUadkrXtT8f9XQSU9669ABDiDy
+ L0uOeNoB48P4/AJPeFkh4myZ81PoAqPaZk5Mu4gcCdD/zGX0qBGNqZJUdm757yZStPZC
+ Bh+uB01iafX3HcGDP+bj4c3fXa1do5vwvUdMRJFRTs+TiKRpq30hVjw3ZZzJzq6EsaGO
+ gc35jnWQnMBYLqDklnQve0CkmsPxxox8BlEtQlaYfU681EpyLkMRX/gJyiCJXq9D4meK zA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cx9r95tb9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 14 Dec 2021 17:45:53 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1BEFCMLC018596;
+        Tue, 14 Dec 2021 17:45:53 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cx9r95taa-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 14 Dec 2021 17:45:52 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1BEHMJ2a024935;
+        Tue, 14 Dec 2021 17:45:50 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma05fra.de.ibm.com with ESMTP id 3cvkm98f9g-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 14 Dec 2021 17:45:50 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1BEHbnou46793134
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 14 Dec 2021 17:37:50 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1E5BBA4040;
+        Tue, 14 Dec 2021 17:45:47 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0B98DA4051;
+        Tue, 14 Dec 2021 17:45:46 +0000 (GMT)
+Received: from [9.171.24.181] (unknown [9.171.24.181])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 14 Dec 2021 17:45:45 +0000 (GMT)
+Message-ID: <c1f1ca6b-916d-418a-5bc3-8debe53bfa5e@linux.ibm.com>
+Date:   Tue, 14 Dec 2021 18:46:49 +0100
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 914dbb89-8021-4252-b206-08d9bf29a4b3
-X-MS-TrafficTypeDiagnostic: SN4PR10MB5541:EE_
-X-Microsoft-Antispam-PRVS: <SN4PR10MB5541B0EA409709ADDA20C3A0E6759@SN4PR10MB5541.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Z8AcnTzwhczZ0cWBwgFLcrRPSgHurm0UM1kCrFvpmiPeEs2dhEs+zacd0G6b+Gb82n2+7/KO0I0jTx/gKpdV+Hf28KkHSe5knsC+oYXcU+/HAEXDfPS8lOXWetDiZb0pf1kuYZ1of4TvQYGqFff7mpzpR9tNXmQwbBgjj7Kjc8HL4kS8T97bGS/DfTQRULBFd5v3TkM0NunivPP2MJp91ps82oQCEZYncGuin9RMqXqTfE7LFSribVryoISLZFq9UcZDWAlwoCL7QEnNZRdRqVQ4N2onEtvNmvco0jfQdev2HgCItWEKKX8A1Qt3xiY/zh3yTtcn5W17uYi1ToVmHdQyGvGwxiLZGVAm5buyUgjm79b6wrYQ033LjnEv2kbXf63FiRmo/lSF1URwuAWNlu4Mx040PYSC/rnDRjskwZC6oIxxZqabExviLcMrGGTyA9GsRQheygvxmf4mSIv8YawvExCufZXUyd7c3Q2yZHwKxU52U08cgiYiealjTcsXZjGbMChi5VqytFtjV/3rAOmRwb6fa/ap7Tjoj2RvmpKy+8CCAVzcqluvOIsEnAEifCq7bQJ4JnRtIR5SuzvZaAexkwMhTqvzbx9rHuVR2RvfH90Pda638mqgJXtIzr93obqgC8Fgm3jN8Nz69dx+cg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR10MB2576.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(7916004)(366004)(54906003)(26005)(4744005)(508600001)(186003)(5660300002)(6916009)(2906002)(38100700002)(316002)(33716001)(86362001)(53546011)(7406005)(6666004)(66476007)(4326008)(8936002)(4001150100001)(66946007)(6512007)(9686003)(8676002)(66556008)(44832011)(6506007)(7416002)(6486002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ujqC7h2AhESVO/P/jOMyRLfqLlPYqq/rLXqbp2rUjRl5/h1NiyqbwMlwhip7?=
- =?us-ascii?Q?1kr39/eT0H94fMQy7S0Ytcb9m3TqYpi9mjR584MLJYAdbAujHQP82Htc6Oj4?=
- =?us-ascii?Q?ki9k9OAxz+3J4STRBGrIP3SE/W/myW0Gj/dgg/RsTEhKwCI28FfOOYi4ccOS?=
- =?us-ascii?Q?xCKn8E+WBXSs6gWotB1U+DIGJGVHl0AIgYyr1dgwceaINmZeA76474dMyAz+?=
- =?us-ascii?Q?ukHKMAivva0dzlta/E15uW5ZZsZFyZ4ipYsBhlmFD21Eu/YRiusy1xq69hbQ?=
- =?us-ascii?Q?T5SWeDMjABPoDD5EXrUMnSZYzT23Sz419Rz72k6iDNBkqWl0XrsjBWujcQHY?=
- =?us-ascii?Q?BSRvQYFwkIs5jeaYb1Z0p3XHPtu0Gu33Rtj3UoEoNqg2GRYNplB0CBpKce8e?=
- =?us-ascii?Q?lWDvLWohBF7MoX3UteXgi6eLfYe/0qNmTaaIamyECJ/WjquP5/jVud+7Frg+?=
- =?us-ascii?Q?KG4gyH5P92423lynL17NUULx4upHDqT6CuMv5i7xooh4mkY2HMHBxyc2lDyH?=
- =?us-ascii?Q?D9Evz7gdaV8u9W9rtNptxXjiMnnRiIiyGZedOCSb6ir5EkY+FLu50QUT1i1c?=
- =?us-ascii?Q?iMkU+jUmU+rvhTyh4sILDoV7pfCeIKqHzH57xfRsqd/IkY+pOn4xW6u5CbiZ?=
- =?us-ascii?Q?sZfBbhcUHaaHLtCVGT2WDUvQTbpKAmmwHPrQQitaN/uqrim+dK9q9rxDasrH?=
- =?us-ascii?Q?a+JCudswDZgzTvOooYivNmsVFQaRlJtVhciMyAYSusnws0pYV85Get9Kh7Mz?=
- =?us-ascii?Q?bdWYfJ/gn3he6GuXvIJfGyhRZA9JZv5U+GOD58h9fM3KG1u1Y6FLwITj7Lka?=
- =?us-ascii?Q?L97Rx023uiC/TvmiQ/WVbt5lBlJq5Aw42Et43Qble3wmc/7SiInw2dcW2XcY?=
- =?us-ascii?Q?UZkbZXQYU7yyZ3but4RBzlKfvKzirAGx3zNmyQr0i6XRgBdhjUYnG30aEv1/?=
- =?us-ascii?Q?z7u4rUyJshmrSOefv2/esn/yzbSpY9n4EZwsfX3YqdG6iyM9Vq5wEGUPwGP9?=
- =?us-ascii?Q?HheNcyT1yJKEWAI7Xor8yADEIXQ1dQnI/sTWwdlzapyW8OZceilHyKENdmZB?=
- =?us-ascii?Q?PHe0PLLkCxzG4YBaCcbJP2y7gp7CuQQrPYWvpAQndVBAs/ZY3ySZvD/HAovw?=
- =?us-ascii?Q?umDN7je09L7S5CvWlTWU6tDJd7425NWZzpUpBdLQ22rg2adPPxVDUb1TVPbj?=
- =?us-ascii?Q?lqYeJT37I93eDw4J8SJa4IqA4EsSiSfX33cfamakQDYaOY88eu14w5xdq7Xi?=
- =?us-ascii?Q?mVcwTHeW0PPMppVssCGUMYhZppeYR1D1xP/IY5Q7XcUjz23sAtpaR9RAYzcz?=
- =?us-ascii?Q?AQ4PWWbxRcsuH35aaHE50QtsCe2vYVScMDVcmD7UzH5fcX3W7Rk51WE1lcWE?=
- =?us-ascii?Q?0RA5zDi0Ba7uAMqIkv8PUazJwt0Wo+3Qr6M3whSNvHeLlQ8z1A32HSpTRYFF?=
- =?us-ascii?Q?/ktYNxPBgjr2+JE4vUznMh72bJ27LAP0gkq1iKkQdfoNLU0KnSDQAYNZrPjq?=
- =?us-ascii?Q?MuuJ+h97VSKS4YknL8K6MgYtKK/ktApml7GojYdoHt8l8n7l7JoJKZKmPPhg?=
- =?us-ascii?Q?SiL3G0LvdIx3Zsj+i58A2jTn/rEPr9zWgS10Cz5hW3PP07kt8nCOVwwuJgyn?=
- =?us-ascii?Q?VQ8D2sf71GpLoGUK4Ok/vvfG6z+HI2yk+msfBzloSfYLQ3NtQvCTaiWYr4T7?=
- =?us-ascii?Q?QSh/qg=3D=3D?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 914dbb89-8021-4252-b206-08d9bf29a4b3
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR10MB2576.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Dec 2021 17:46:22.8539
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: wq+fOoT2mJx/3BEuNAfWxk8Y5EG+vaSB+75Rf6SyRmzkX+7gsUr6iUEojYN/y2gCf4EWQ1pRjziUGi0Usdc5hHgQOF68yCfj/LQtQZ/wVJo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR10MB5541
-X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10198 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 spamscore=0 suspectscore=0
- malwarescore=0 mlxlogscore=637 bulkscore=0 mlxscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
- definitions=main-2112140096
-X-Proofpoint-ORIG-GUID: EVmatg_d9AehE6WKRuPeyUvBLYJzolhk
-X-Proofpoint-GUID: EVmatg_d9AehE6WKRuPeyUvBLYJzolhk
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH 22/32] KVM: s390: pci: provide routines for
+ enabling/disabling IOAT assist
+Content-Language: en-US
+To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
+        schnelle@linux.ibm.com, farman@linux.ibm.com,
+        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
+        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
+        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20211207205743.150299-1-mjrosato@linux.ibm.com>
+ <20211207205743.150299-23-mjrosato@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <20211207205743.150299-23-mjrosato@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: L8tKdtZwRmEz7ZQiC-TuPZFqky6QhJUl
+X-Proofpoint-ORIG-GUID: QlgHwbTQkcs8YqhgsuUhXuVCIcxMjYls
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2021-12-14_07,2021-12-14_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
+ spamscore=0 phishscore=0 adultscore=0 malwarescore=0 priorityscore=1501
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2112140095
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021-12-13 20:17:31 +0100, Borislav Petkov wrote:
-> On Mon, Dec 13, 2021 at 01:09:19PM -0600, Venu Busireddy wrote:
-> > I made this suggestion while reviewing v7 too, but it appears that it
-> > fell through the cracks. Most of the code in sev_enable() is duplicated
-> > from sme_enable(). Wouldn't it be better to put all that common code
-> > in a different function, and call that function from sme_enable()
-> > and sev_enable()?
+
+
+On 12/7/21 21:57, Matthew Rosato wrote:
+> These routines will be wired into the vfio_pci_zdev ioctl handlers to
+> respond to requests to enable / disable a device for PCI I/O Address
+> Translation assistance.
 > 
-> How about you look where both functions are defined? Which kernel stages?
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> ---
+>   arch/s390/include/asm/kvm_pci.h |  15 ++++
+>   arch/s390/include/asm/pci_dma.h |   2 +
+>   arch/s390/kvm/pci.c             | 133 ++++++++++++++++++++++++++++++++
+>   arch/s390/kvm/pci.h             |   2 +
+>   4 files changed, 152 insertions(+)
+> 
+> diff --git a/arch/s390/include/asm/kvm_pci.h b/arch/s390/include/asm/kvm_pci.h
+> index 54a0afdbe7d0..254275399f21 100644
+> --- a/arch/s390/include/asm/kvm_pci.h
+> +++ b/arch/s390/include/asm/kvm_pci.h
+> @@ -16,11 +16,21 @@
+>   #include <linux/kvm_host.h>
+>   #include <linux/kvm.h>
+>   #include <linux/pci.h>
+> +#include <linux/mutex.h>
+>   #include <asm/pci_insn.h>
+> +#include <asm/pci_dma.h>
+> +
+> +struct kvm_zdev_ioat {
+> +	unsigned long *head[ZPCI_TABLE_PAGES];
+> +	unsigned long **seg;
+> +	unsigned long ***pt;
+> +	struct mutex lock;
+> +};
+>   
+>   struct kvm_zdev {
+>   	struct zpci_dev *zdev;
+>   	struct kvm *kvm;
+> +	struct kvm_zdev_ioat ioat;
+>   	struct zpci_fib fib;
+>   };
+>   
+> @@ -33,6 +43,11 @@ extern int kvm_s390_pci_aif_enable(struct zpci_dev *zdev, struct zpci_fib *fib,
+>   				   bool assist);
+>   extern int kvm_s390_pci_aif_disable(struct zpci_dev *zdev);
+>   
+> +extern int kvm_s390_pci_ioat_probe(struct zpci_dev *zdev);
+> +extern int kvm_s390_pci_ioat_enable(struct zpci_dev *zdev, u64 iota);
+> +extern int kvm_s390_pci_ioat_disable(struct zpci_dev *zdev);
+> +extern u8 kvm_s390_pci_get_dtsm(struct zpci_dev *zdev);
+> +
+>   extern int kvm_s390_pci_interp_probe(struct zpci_dev *zdev);
+>   extern int kvm_s390_pci_interp_enable(struct zpci_dev *zdev);
+>   extern int kvm_s390_pci_interp_disable(struct zpci_dev *zdev);
+> diff --git a/arch/s390/include/asm/pci_dma.h b/arch/s390/include/asm/pci_dma.h
+> index 3b8e89d4578a..e1d3c1d3fc8a 100644
+> --- a/arch/s390/include/asm/pci_dma.h
+> +++ b/arch/s390/include/asm/pci_dma.h
+> @@ -50,6 +50,8 @@ enum zpci_ioat_dtype {
+>   #define ZPCI_TABLE_ALIGN		ZPCI_TABLE_SIZE
+>   #define ZPCI_TABLE_ENTRY_SIZE		(sizeof(unsigned long))
+>   #define ZPCI_TABLE_ENTRIES		(ZPCI_TABLE_SIZE / ZPCI_TABLE_ENTRY_SIZE)
+> +#define ZPCI_TABLE_PAGES		(ZPCI_TABLE_SIZE >> PAGE_SHIFT)
+> +#define ZPCI_TABLE_ENTRIES_PAGES	(ZPCI_TABLE_ENTRIES * ZPCI_TABLE_PAGES)
+>   
+>   #define ZPCI_TABLE_BITS			11
+>   #define ZPCI_PT_BITS			8
+> diff --git a/arch/s390/kvm/pci.c b/arch/s390/kvm/pci.c
+> index 3a29398dd53b..a1c0c0881332 100644
+> --- a/arch/s390/kvm/pci.c
+> +++ b/arch/s390/kvm/pci.c
+> @@ -12,6 +12,7 @@
+>   #include <asm/kvm_pci.h>
+>   #include <asm/pci.h>
+>   #include <asm/pci_insn.h>
+> +#include <asm/pci_dma.h>
+>   #include <asm/sclp.h>
+>   #include "pci.h"
+>   #include "kvm-s390.h"
+> @@ -315,6 +316,131 @@ int kvm_s390_pci_aif_disable(struct zpci_dev *zdev)
+>   }
+>   EXPORT_SYMBOL_GPL(kvm_s390_pci_aif_disable);
+>   
+> +int kvm_s390_pci_ioat_probe(struct zpci_dev *zdev)
+> +{
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_s390_pci_ioat_probe);
+> +
+> +int kvm_s390_pci_ioat_enable(struct zpci_dev *zdev, u64 iota)
+> +{
+> +	gpa_t gpa = (gpa_t)(iota & ZPCI_RTE_ADDR_MASK);
+> +	struct kvm_zdev_ioat *ioat;
+> +	struct page *page;
+> +	struct kvm *kvm;
+> +	unsigned int idx;
+> +	void *iaddr;
+> +	int i, rc = 0;
+> +
+> +	if (!zdev->kzdev || !zdev->kzdev->kvm || zdev->kzdev->ioat.head[0])
+> +		return -EINVAL;
 
-What I am suggesting should not have anything to do with the boot stage
-of the kernel.
+The only caller already checked zdev->kzdev.
+Could we use a macro to replace zdev->kzdev->ioat.head[0] ?
+like
+#define shadow_pgtbl_initialized zdev->kzdev->ioat.head[0]
 
-For example, both these functions call native_cpuid(), which is declared
-as an inline function. I am merely suggesting to do something similar
-to avoid the code duplication.
+Would be clearer for me.
 
-Venu
+> +
+> +	/* Ensure supported type specified */
+> +	if ((iota & ZPCI_IOTA_RTTO_FLAG) != ZPCI_IOTA_RTTO_FLAG)
+> +		return -EINVAL;
+> +
+> +	kvm = zdev->kzdev->kvm;
+> +	ioat = &zdev->kzdev->ioat;
+> +	mutex_lock(&ioat->lock);
+> +	idx = srcu_read_lock(&kvm->srcu);
+> +	for (i = 0; i < ZPCI_TABLE_PAGES; i++) {
+> +		page = gfn_to_page(kvm, gpa_to_gfn(gpa));
+> +		if (is_error_page(page)) {
+> +			srcu_read_unlock(&kvm->srcu, idx);
+> +			rc = -EIO;
+> +			goto out;
+> +		}
+> +		iaddr = page_to_virt(page) + (gpa & ~PAGE_MASK);
+> +		ioat->head[i] = (unsigned long *)iaddr;
+> +		gpa += PAGE_SIZE;
+> +	}
+> +	srcu_read_unlock(&kvm->srcu, idx);
+> +
+> +	zdev->kzdev->ioat.seg = kcalloc(ZPCI_TABLE_ENTRIES_PAGES,
+> +					sizeof(unsigned long *), GFP_KERNEL);
+> +	if (!zdev->kzdev->ioat.seg)
+> +		goto unpin;
+> +	zdev->kzdev->ioat.pt = kcalloc(ZPCI_TABLE_ENTRIES,
+> +				       sizeof(unsigned long **), GFP_KERNEL);
+> +	if (!zdev->kzdev->ioat.pt)
+> +		goto free_seg;
+> +
+> +out:
+> +	mutex_unlock(&ioat->lock);
+> +	return rc;
+> +
+> +free_seg:
+> +	kfree(zdev->kzdev->ioat.seg);
+> +unpin:
+> +	for (i = 0; i < ZPCI_TABLE_PAGES; i++) {
+> +		kvm_release_pfn_dirty((u64)ioat->head[i] >> PAGE_SHIFT);
 
+I did not find when the pages are pinned.
+
+> +		ioat->head[i] = 0;
+> +	}
+> +	mutex_unlock(&ioat->lock);
+> +	return -ENOMEM;
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_s390_pci_ioat_enable);
+> +
+
+...snip...
+> 
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
