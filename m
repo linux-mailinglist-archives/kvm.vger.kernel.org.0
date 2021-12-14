@@ -2,126 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 357D8474915
-	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 18:16:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 74E86474966
+	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 18:28:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236380AbhLNRQh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Dec 2021 12:16:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44274 "EHLO
+        id S236385AbhLNR2V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Dec 2021 12:28:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47006 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236208AbhLNRQg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Dec 2021 12:16:36 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13C90C06173E
-        for <kvm@vger.kernel.org>; Tue, 14 Dec 2021 09:16:36 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id n15-20020a17090a160f00b001a75089daa3so17762013pja.1
-        for <kvm@vger.kernel.org>; Tue, 14 Dec 2021 09:16:36 -0800 (PST)
+        with ESMTP id S236396AbhLNR2S (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Dec 2021 12:28:18 -0500
+Received: from mail-il1-x149.google.com (mail-il1-x149.google.com [IPv6:2607:f8b0:4864:20::149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F0BBC06173F
+        for <kvm@vger.kernel.org>; Tue, 14 Dec 2021 09:28:17 -0800 (PST)
+Received: by mail-il1-x149.google.com with SMTP id y15-20020a056e02174f00b002a4222f24a5so18351459ill.3
+        for <kvm@vger.kernel.org>; Tue, 14 Dec 2021 09:28:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=DLIiHWejTvBczvMB4LaGo/x+JKahlOS065QQRy4QKls=;
-        b=TgAWkk1RgihXiWq6f70ui5/U8oLI+Up2x5oVLr+g8O5t6clJf9vmq6VHne4c/SDTWk
-         +Sk9Hn+gCzrsfeEPbUxUzKPfJTUZafnlALOlWBwwU7Wk4UuIa95qcWxDcYtEk6KlXPpq
-         1SEjBr0O0NSmet7rpfuUErsOmttjuIe8TQdDA+NHuvP+W+09fUlDUbPxW7f7SBS3MBSF
-         307N7Tw1Lvd9mB/OrAEo7d00EsteCEPUld/mZ/j8hO6Wf+GBqrvVp7ctprivqjnL1ftZ
-         CRWuaPnj5vBI6fY9qu4eBVWS2wp4qGOefJfIoT3uwWl2pBPyhswP7YBooqr8jXCta9xK
-         gdrg==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=zk8b273QnCh6EBKHsBLZCwm7phsH1qXNNxAFMztBRMQ=;
+        b=Z1p6iB38u4qCLN3DR6XCPMSeigD1Z90OlOv79x1GPPrkP/Zle4CFrX7F1AkqkyLyv7
+         pTfAm2sxx5KBGsVYl56DkuvF8sus9B08ph5GevUidg2bCb2erwD34UEBUPgQOLv2mcgR
+         ttlLQ+aDL8Y+RBNggNyu2CUQAdU88fB6nPfi8d7KDMjMMZQ8uVCn5U/6ZJr8yehKvQq0
+         YK4s3ktTyMmfdGY1232w6DsMQ2PcXxxJkoJxHs+J6kv9Z3xtxkjSTBPdaELbVMwVRRj6
+         Vpp1uDVLDs+pDeM0HqOS9PL1A9Jajy0DfNyDpiCp0whq9oBBQx135HKMKyhmTo12gaXb
+         NmRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=DLIiHWejTvBczvMB4LaGo/x+JKahlOS065QQRy4QKls=;
-        b=t+GB3/eXG8H1CC2WkGTNH4jGQGWiSi9GpWpiaOzGtKezeaLUzZ+5HkPx0kESH+lYb6
-         oTExTlPcqHodGYD/a7uNNJ+AnRKMDIDZxNyeiDmxwdovTK3k70Qw8BUhn7VgW8WRKtoF
-         LkaD1SU3qyRHNrz8t9080mEsTgQ97OtDxLDcbNcNjOeouecGpO4haY0G3f2BwlCEJhcO
-         yepM3GTqvh2vq1JhpysnXaX8ZjrCgi7BMxfQ+9HYfDuqRcl0TQ8XVvgbBJWTnlgOyYrt
-         GtMlFfen4FRMbtPMJQuOcmY0sVEs6d918t9HY+5AsHs7Ik0xAWNKllWi3w4eOyfTa1JU
-         5aTA==
-X-Gm-Message-State: AOAM533cX0BStGeIZVgccFZ/BuNvaFtW1mcHAbXZ7igTVdzk/mHQmPn1
-        sQMiCn8W1b8JpShyGsTdpv1bSw==
-X-Google-Smtp-Source: ABdhPJzQmyeG2ksZ5pIDoEX8o40MojieVj9iFPK8wm5P1cfsFVeI/npALxTfLbDyJ1dtqzBqe0IGeg==
-X-Received: by 2002:a17:90b:17cc:: with SMTP id me12mr7049760pjb.179.1639502195385;
-        Tue, 14 Dec 2021 09:16:35 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id lb4sm3267104pjb.18.2021.12.14.09.16.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Dec 2021 09:16:34 -0800 (PST)
-Date:   Tue, 14 Dec 2021 17:16:31 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vipin Sharma <vipinsh@google.com>
-Cc:     pbonzini@redhat.com, dmatlack@google.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: Move VM's worker kthreads back to the original
- cgroups before exiting.
-Message-ID: <YbjRb0XR7neyX/Gy@google.com>
-References: <20211214050708.4040200-1-vipinsh@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211214050708.4040200-1-vipinsh@google.com>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=zk8b273QnCh6EBKHsBLZCwm7phsH1qXNNxAFMztBRMQ=;
+        b=TsDkcKCvyoRIoLarK6lV53WokKT8yBT8uDNYHY4ajhOVLqeD94hAQcOSK3u+aagKSM
+         V6tLwukY5FeSCeKumWCsUG2hmMXAmoU2gtLh5Tr1lDCnJQh3NAoSCEmfZqwWTOi6ZYD+
+         ZLRrn/K9kaP9dfiShtvh31LckIgBTILhQvPZFnTIIDFysrRgHmMa2hp9aI/qV51wMP+O
+         Gs07BJHKBZs1BwxzAUa/80/S5UY6dXNXmCkdhctpbQyElZy/49xBtm76SSITAz4yun1U
+         WR2xfkJTnGye99R4qYET0TcLJi4XnksP0sADTx/pt+m6DkVdZK6wBf2XCeLd+WqML+KK
+         Wg/g==
+X-Gm-Message-State: AOAM533nkZiylEaJNItGKvdpBbeQ/KcVUGsg4LdyHVrR8ZZD0pSs11SF
+        +I8xW2Qikjmaf81q5KV0ElRA2rSeMZs=
+X-Google-Smtp-Source: ABdhPJwm2kW1tWIdTafhk7By1Qz8hjfZFCojXCQPPWKGX9iyHrDuiA02tnU4jkY+2HaL5PjwP1IH8HpANww=
+X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
+ (user=oupton job=sendgmr) by 2002:a92:8747:: with SMTP id d7mr4479540ilm.203.1639502896974;
+ Tue, 14 Dec 2021 09:28:16 -0800 (PST)
+Date:   Tue, 14 Dec 2021 17:28:06 +0000
+Message-Id: <20211214172812.2894560-1-oupton@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.34.1.173.g76aa8bc2d0-goog
+Subject: [PATCH v4 0/6] KVM: arm64: Emulate the OS Lock
+From:   Oliver Upton <oupton@google.com>
+To:     kvmarm@lists.cs.columbia.edu
+Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Andrew Jones <drjones@redhat.com>,
+        Peter Shier <pshier@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        Oliver Upton <oupton@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 14, 2021, Vipin Sharma wrote:
-> VM worker kthreads can linger in the VM process's cgroup for sometime
-> after KVM temrinates the VM process.
-> 
-> KVM terminates the worker kthreads by calling kthread_stop() which waits
-> on the signal generated by exit_mm() in do_exit() during kthread's exit.
-> However, these kthreads are removed from the cgroup using cgroup_exit()
-> call which happens after exit_mm() in do_exit(). A VM process can
-> terminate between the time window of exit_mm() to cgroup_exit(), leaving
-> only worker kthreads in the cgroup.
-> 
-> Moving worker kthreads back to the original cgroup (kthreadd_task's
-> cgroup) makes sure that cgroup is empty as soon as the main VM process
-> is terminated.
-> 
-> Signed-off-by: Vipin Sharma <vipinsh@google.com>
-> ---
->  virt/kvm/kvm_main.c | 11 ++++++++++-
->  1 file changed, 10 insertions(+), 1 deletion(-)
-> 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index b0f7e6eb00ff..edd304a18f16 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -5785,7 +5785,7 @@ static int kvm_vm_worker_thread(void *context)
->  	init_context = NULL;
->  
->  	if (err)
-> -		return err;
-> +		goto out;
->  
->  	/* Wait to be woken up by the spawner before proceeding. */
->  	kthread_parkme();
-> @@ -5793,6 +5793,15 @@ static int kvm_vm_worker_thread(void *context)
->  	if (!kthread_should_stop())
->  		err = thread_fn(kvm, data);
->  
-> +out:
-> +	/*
-> +	 * We need to move the kthread back to its original cgroups, so that it
-> +	 * doesn't linger in the cgroups of the user process after that has
-> +	 * already terminated. exit_mm() in do_exit() signals kthread_stop() to
-> +	 * return, whereas, removal of the task from the cgroups happens in
-> +	 * cgroup_exit() which happens after exit_mm().
-> +	 */
-> +	WARN_ON(cgroup_attach_task_all(kthreadd_task, current));
+KVM does not implement the debug architecture to the letter of the
+specification. One such issue is the fact that KVM treats the OS Lock as
+RAZ/WI, rather than emulating its behavior on hardware. This series adds
+emulation support for the OS Lock to KVM. Emulation is warranted as the
+OS Lock affects debug exceptions taken from all ELs, and is not limited
+to only the context of the guest.
 
-As the build bot noted, kthreadd_task isn't exported, and I doubt you'll convince
-folks to let you export it.
+The 1st patch is a correctness fix for the OSLSR register, ensuring
+the trap handler actually is written to suggest WO behavior. Note that
+the changed code should never be reached on a correct implementation, as
+hardware should generate the undef, not KVM.
 
-Why is it problematic for the kthread to linger in the cgroup?  Conceptually, it's
-not really wrong.
+The 2nd patch adds the necessary context to track guest values of the
+OS Lock bit and exposes the value to userspace for the sake of
+migration.
 
->  	return err;
->  }
->  
-> 
-> base-commit: d8f6ef45a623d650f9b97e11553adb4978f6aa70
-> -- 
-> 2.34.1.173.g76aa8bc2d0-goog
-> 
+The 3rd patch makes the OSLK bit writable in OSLAR_EL1 (from the guest)
+and OSLSR_EL1 (from userspace), but does nothing with its value.
+
+The 4th patch actually implements the OS Lock behavior, disabling all
+debug exceptions (except breakpoint instructions) from the perspective
+of the guest. This is done by disabling MDE and SS in MDSCR_EL1.
+
+The 5th patch asserts that OSLSR_EL1 is exposed by KVM to userspace
+through the KVM_GET_REG_LIST ioctl. Lastly, the 6th patch asserts that
+no debug exceptions are routed to the guest when the OSLK bit is set.
+
+This series applies cleanly to 5.16-rc4. Tested on an Ampere Altra
+machine with the included selftests patches.
+
+Oliver Upton (6):
+  KVM: arm64: Correctly treat writes to OSLSR_EL1 as undefined
+  KVM: arm64: Stash OSLSR_EL1 in the cpu context
+  KVM: arm64: Allow guest to set the OSLK bit
+  KVM: arm64: Emulate the OS Lock
+  selftests: KVM: Add OSLSR_EL1 to the list of blessed regs
+  selftests: KVM: Test OS lock behavior
+
+ arch/arm64/include/asm/kvm_host.h             |  6 ++
+ arch/arm64/include/asm/sysreg.h               |  9 +++
+ arch/arm64/kvm/debug.c                        | 26 ++++++-
+ arch/arm64/kvm/sys_regs.c                     | 74 ++++++++++++++-----
+ .../selftests/kvm/aarch64/debug-exceptions.c  | 58 ++++++++++++++-
+ .../selftests/kvm/aarch64/get-reg-list.c      |  1 +
+ 6 files changed, 151 insertions(+), 23 deletions(-)
+
+-- 
+2.34.1.173.g76aa8bc2d0-goog
+
