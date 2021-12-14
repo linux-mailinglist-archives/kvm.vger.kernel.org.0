@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id C8DC447496F
-	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 18:28:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 33CC9474970
+	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 18:28:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236467AbhLNR2Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Dec 2021 12:28:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47026 "EHLO
+        id S236474AbhLNR20 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Dec 2021 12:28:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236460AbhLNR2W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Dec 2021 12:28:22 -0500
-Received: from mail-il1-x14a.google.com (mail-il1-x14a.google.com [IPv6:2607:f8b0:4864:20::14a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E902C061574
-        for <kvm@vger.kernel.org>; Tue, 14 Dec 2021 09:28:22 -0800 (PST)
-Received: by mail-il1-x14a.google.com with SMTP id i11-20020a056e0212cb00b002ae39e26bb0so4520306ilm.4
-        for <kvm@vger.kernel.org>; Tue, 14 Dec 2021 09:28:22 -0800 (PST)
+        with ESMTP id S236465AbhLNR2X (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Dec 2021 12:28:23 -0500
+Received: from mail-io1-xd49.google.com (mail-io1-xd49.google.com [IPv6:2607:f8b0:4864:20::d49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7EA1C061574
+        for <kvm@vger.kernel.org>; Tue, 14 Dec 2021 09:28:23 -0800 (PST)
+Received: by mail-io1-xd49.google.com with SMTP id o11-20020a0566022e0b00b005e95edf792dso18417536iow.14
+        for <kvm@vger.kernel.org>; Tue, 14 Dec 2021 09:28:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=1Jwvt2jUDR/UART7D/evy6xX8nTOg9MzOLHWtI9aqPs=;
-        b=SzpEesm+Mh2jg4QGy8qBWU5SuQUrhFLEHQSQshWM9fM4hoZ9A7wBdjrOY5vU7OIJ2h
-         G3Ye+hM9b1QwZJvy9WGZyTpicP54IeYAVoMLcvcY2NYRkOVUvIILLL7dsfh0DbRNj/Wk
-         LNfobwMekfHZuTNXHlaMmu+WlD2KONk+nM3s8drKYTagGFa/Mnpx1MhsVA9gyz2DxpsB
-         A10VPKejwxiLgNvOm0pvoxY+xDNSPbwsxeDlIQYKhTl52zX5PoJsoIUx+od9VJELicAp
-         IZYShzHylChaqzxJhRTArPhpSQxSRA6cbYBn7l+GjtDdkfZtQKph6JvnXFjoDiScnQpx
-         2csg==
+        bh=2KsIfF/OkZ9dy42g5M0MSW1Bp0JJrNex4RjUkPqKNds=;
+        b=BTupxORVlkQAx/Iy53cFyu5AChY6Dwql1j31uAUZPphY3Jkui/DZwf9uw/Epm3gPtH
+         hhofflryL/VpdwS/YjAPHRLHjUiQ7tfPr23XRtOSeu33fEtjMwJoAibQ9ny7R0BsrLkI
+         1m5llWRHwW1COSo0402NBQtIYNNDTHrVwVP6maaHol9MJoUZK5s7nE3zBRw0wnIXNhSm
+         cblJ0vEgi9/GfY2FtvAP6pUgeNHIJiw3zuhTXUQuhydKDKcab5ntd30uRQ4g6NmhjZt5
+         1t5Motk6j/C51AN5IwNjSy4tZ8SOmuicISUuHtolxa31fcA0htcP47S+v4+2gnq/0/sg
+         7D+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=1Jwvt2jUDR/UART7D/evy6xX8nTOg9MzOLHWtI9aqPs=;
-        b=mHmtIUNKvbQ9Az8EHnBvqqYLD+qRXmYZanLDkOPJCVJhg2Gz1Re/9cN+1OtlWlnyYW
-         lK2KhdyAEtRIWZ1bK9Zj3GOkaC3SjN2Q+/uJX5mj4D33vlx39vEWCxRxZ9su1xupLb3i
-         otBgnOiPIgm1xNRWrWZb/0F8jaBhcb3G5ztbhHwPY7+PGFWSQbX3NWQo/lgjOhFD68tb
-         LaABHt733vGfenJdlweWfjyKhN98v0OWQ5eCk1wSS3SHa4dX2TFU10X8WMinEBcVsXVg
-         wOEanNvVUHDQwHaBipAEtoNVqrWToykBlAUnL/R2H+atBmv5K+G3L8hRY7EDqxJw9t/0
-         2WLw==
-X-Gm-Message-State: AOAM531k+aYkF2hsUXzs9zY/yMS/JlFVosoSazqL7BYEyxE72i4lDSMS
-        LZsQJP8dknZzVNh2IqeNhBlZjR35gdQ=
-X-Google-Smtp-Source: ABdhPJy18yNyWrBFa7EmeTStINtjn7maODxM/UjDHu9TWrMLPrCpYH3fBbsImp3Jixp6csA+szHEYxhmlG0=
+        bh=2KsIfF/OkZ9dy42g5M0MSW1Bp0JJrNex4RjUkPqKNds=;
+        b=m6hQe1G9RW0D+ouJ6a1j83xd98dOBSzgBbdvmS4P+ZOymgU/ka1uAKn0BoXK1GbRyX
+         YcTFSndUqBDQHukqUxwETcdjkrTqktTQoLZ7Cs21E3axjHtkw6779UXDGutcO7O4MBpZ
+         gP/m0JN7JkaFwIdQRlMeB70ePeFj41ZHGBKJZ3f6IWpO49a9tt+97BG2inp4gfmcY/S3
+         V7OJ3y3hfzkkDYScBgep6aE+N+4+eihzsHNKj44Kj+mL+S9neJ5SbfET2dHPNR/mzrUK
+         mYRbOk9+wnX1XDFamcwsT25jsheL+aAAszy01gFiNDdP37rVQBtU7JFLq5AuqiecLjBP
+         9j8w==
+X-Gm-Message-State: AOAM530B+DZnoYKS+wfgIr31WL6KTWJ1JjY1TrtdAe8xCDGEc+onNxcB
+        KGBVmxOxKvQLSDj5cL00zbfzWi4IAEQ=
+X-Google-Smtp-Source: ABdhPJwobQAZeq2s7m3v81+Wf50FFSnaXP3bVgG+rf4cUMi0f5NKEKThGGU9QLnF3Rxf9jtnho1DIhl9g/k=
 X-Received: from oupton.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:404])
- (user=oupton job=sendgmr) by 2002:a05:6602:1604:: with SMTP id
- x4mr4626833iow.84.1639502901988; Tue, 14 Dec 2021 09:28:21 -0800 (PST)
-Date:   Tue, 14 Dec 2021 17:28:11 +0000
+ (user=oupton job=sendgmr) by 2002:a05:6e02:2162:: with SMTP id
+ s2mr4543585ilv.247.1639502903053; Tue, 14 Dec 2021 09:28:23 -0800 (PST)
+Date:   Tue, 14 Dec 2021 17:28:12 +0000
 In-Reply-To: <20211214172812.2894560-1-oupton@google.com>
-Message-Id: <20211214172812.2894560-6-oupton@google.com>
+Message-Id: <20211214172812.2894560-7-oupton@google.com>
 Mime-Version: 1.0
 References: <20211214172812.2894560-1-oupton@google.com>
 X-Mailer: git-send-email 2.34.1.173.g76aa8bc2d0-goog
-Subject: [PATCH v4 5/6] selftests: KVM: Add OSLSR_EL1 to the list of blessed regs
+Subject: [PATCH v4 6/6] selftests: KVM: Test OS lock behavior
 From:   Oliver Upton <oupton@google.com>
 To:     kvmarm@lists.cs.columbia.edu
 Cc:     kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
@@ -68,26 +68,114 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-OSLSR_EL1 is now part of the visible system register state. Add it to
-the get-reg-list selftest to ensure we keep it that way.
+KVM now correctly handles the OS Lock for its guests. When set, KVM
+blocks all debug exceptions originating from the guest. Add test cases
+to the debug-exceptions test to assert that software breakpoint,
+hardware breakpoint, watchpoint, and single-step exceptions are in fact
+blocked.
 
 Signed-off-by: Oliver Upton <oupton@google.com>
 ---
- tools/testing/selftests/kvm/aarch64/get-reg-list.c | 1 +
- 1 file changed, 1 insertion(+)
+ .../selftests/kvm/aarch64/debug-exceptions.c  | 58 ++++++++++++++++++-
+ 1 file changed, 56 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-index cc898181faab..0c7c39a16b3f 100644
---- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-+++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-@@ -761,6 +761,7 @@ static __u64 base_regs[] = {
- 	ARM64_SYS_REG(2, 0, 0, 15, 6),
- 	ARM64_SYS_REG(2, 0, 0, 15, 7),
- 	ARM64_SYS_REG(2, 4, 0, 7, 0),	/* DBGVCR32_EL2 */
-+	ARM64_SYS_REG(2, 0, 1, 1, 4),	/* OSLSR_EL1 */
- 	ARM64_SYS_REG(3, 0, 0, 0, 5),	/* MPIDR_EL1 */
- 	ARM64_SYS_REG(3, 0, 0, 1, 0),	/* ID_PFR0_EL1 */
- 	ARM64_SYS_REG(3, 0, 0, 1, 1),	/* ID_PFR1_EL1 */
+diff --git a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+index ea189d83abf7..63b2178210c4 100644
+--- a/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
++++ b/tools/testing/selftests/kvm/aarch64/debug-exceptions.c
+@@ -23,7 +23,7 @@
+ #define SPSR_D		(1 << 9)
+ #define SPSR_SS		(1 << 21)
+ 
+-extern unsigned char sw_bp, hw_bp, bp_svc, bp_brk, hw_wp, ss_start;
++extern unsigned char sw_bp, sw_bp2, hw_bp, hw_bp2, bp_svc, bp_brk, hw_wp, ss_start;
+ static volatile uint64_t sw_bp_addr, hw_bp_addr;
+ static volatile uint64_t wp_addr, wp_data_addr;
+ static volatile uint64_t svc_addr;
+@@ -47,6 +47,14 @@ static void reset_debug_state(void)
+ 	isb();
+ }
+ 
++static void enable_os_lock(void)
++{
++	write_sysreg(1, oslar_el1);
++	isb();
++
++	GUEST_ASSERT(read_sysreg(oslsr_el1) & 2);
++}
++
+ static void install_wp(uint64_t addr)
+ {
+ 	uint32_t wcr;
+@@ -99,6 +107,7 @@ static void guest_code(void)
+ 	GUEST_SYNC(0);
+ 
+ 	/* Software-breakpoint */
++	reset_debug_state();
+ 	asm volatile("sw_bp: brk #0");
+ 	GUEST_ASSERT_EQ(sw_bp_addr, PC(sw_bp));
+ 
+@@ -152,6 +161,51 @@ static void guest_code(void)
+ 	GUEST_ASSERT_EQ(ss_addr[1], PC(ss_start) + 4);
+ 	GUEST_ASSERT_EQ(ss_addr[2], PC(ss_start) + 8);
+ 
++	GUEST_SYNC(6);
++
++	/* OS Lock does not block software-breakpoint */
++	reset_debug_state();
++	enable_os_lock();
++	sw_bp_addr = 0;
++	asm volatile("sw_bp2: brk #0");
++	GUEST_ASSERT_EQ(sw_bp_addr, PC(sw_bp2));
++
++	GUEST_SYNC(7);
++
++	/* OS Lock blocking hardware-breakpoint */
++	reset_debug_state();
++	enable_os_lock();
++	install_hw_bp(PC(hw_bp2));
++	hw_bp_addr = 0;
++	asm volatile("hw_bp2: nop");
++	GUEST_ASSERT_EQ(hw_bp_addr, 0);
++
++	GUEST_SYNC(8);
++
++	/* OS Lock blocking watchpoint */
++	reset_debug_state();
++	enable_os_lock();
++	write_data = '\0';
++	wp_data_addr = 0;
++	install_wp(PC(write_data));
++	write_data = 'x';
++	GUEST_ASSERT_EQ(write_data, 'x');
++	GUEST_ASSERT_EQ(wp_data_addr, 0);
++
++	GUEST_SYNC(9);
++
++	/* OS Lock blocking single-step */
++	reset_debug_state();
++	enable_os_lock();
++	ss_addr[0] = 0;
++	install_ss();
++	ss_idx = 0;
++	asm volatile("mrs x0, esr_el1\n\t"
++		     "add x0, x0, #1\n\t"
++		     "msr daifset, #8\n\t"
++		     : : : "x0");
++	GUEST_ASSERT_EQ(ss_addr[0], 0);
++
+ 	GUEST_DONE();
+ }
+ 
+@@ -223,7 +277,7 @@ int main(int argc, char *argv[])
+ 	vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT,
+ 				ESR_EC_SVC64, guest_svc_handler);
+ 
+-	for (stage = 0; stage < 7; stage++) {
++	for (stage = 0; stage < 11; stage++) {
+ 		vcpu_run(vm, VCPU_ID);
+ 
+ 		switch (get_ucall(vm, VCPU_ID, &uc)) {
 -- 
 2.34.1.173.g76aa8bc2d0-goog
 
