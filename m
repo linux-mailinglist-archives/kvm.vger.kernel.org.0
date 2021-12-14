@@ -2,181 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5752C47460E
-	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 16:10:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D364474634
+	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 16:18:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233174AbhLNPKA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Dec 2021 10:10:00 -0500
-Received: from mga01.intel.com ([192.55.52.88]:26162 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229883AbhLNPKA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Dec 2021 10:10:00 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1639494600; x=1671030600;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=ynucwZXL4GShMHXFnLAM1Skqd3YPOwEBYgdBTgug/WA=;
-  b=BbHuXA0H1oIv3XnbRpbBx9IP8bQXDuo/0jN/Js1QTbPWfcFmENDVZsIl
-   5QgLj4wbFcRlxFpfYcVyo2LJpswB+nsW4KNv1LmYLEasoeN52r7iAdfi7
-   zHDeyGxKKSl+Q6GfddA/HKTGzsuZ33A06ffn+mI88qX2jY2zQfkFVILRO
-   wg9VlL3w5uAp3nwwV/X9WLNNgpypcRScLLlMNUEuxj8P3P2awx9ZeD+AU
-   R1AuEKvWI8oiASKnTcK8N2deAiQu2waBNi8yMhY15Cq73xbN/3lh2Malc
-   gyCIjliNH1QWScPh/naWWUOz29U9KRDK0cGMEfcwEpbzKkMQZuwB5BvGJ
-   A==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10197"; a="263137177"
-X-IronPort-AV: E=Sophos;i="5.88,205,1635231600"; 
-   d="scan'208";a="263137177"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Dec 2021 07:09:59 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,205,1635231600"; 
-   d="scan'208";a="505389032"
-Received: from fmsmsx604.amr.corp.intel.com ([10.18.126.84])
-  by orsmga007.jf.intel.com with ESMTP; 14 Dec 2021 07:09:59 -0800
-Received: from shsmsx605.ccr.corp.intel.com (10.109.6.215) by
- fmsmsx604.amr.corp.intel.com (10.18.126.84) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Tue, 14 Dec 2021 07:09:58 -0800
-Received: from shsmsx601.ccr.corp.intel.com (10.109.6.141) by
- SHSMSX605.ccr.corp.intel.com (10.109.6.215) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Tue, 14 Dec 2021 23:09:54 +0800
-Received: from shsmsx601.ccr.corp.intel.com ([10.109.6.141]) by
- SHSMSX601.ccr.corp.intel.com ([10.109.6.141]) with mapi id 15.01.2308.020;
- Tue, 14 Dec 2021 23:09:54 +0800
-From:   "Wang, Wei W" <wei.w.wang@intel.com>
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        LKML <linux-kernel@vger.kernel.org>
-CC:     Jing Liu <jing2.liu@linux.intel.com>,
-        "Zhong, Yang" <yang.zhong@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Sean Christoperson" <seanjc@google.com>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>
-Subject: RE: [patch 5/6] x86/fpu: Provide fpu_update_guest_xcr0/xfd()
-Thread-Topic: [patch 5/6] x86/fpu: Provide fpu_update_guest_xcr0/xfd()
-Thread-Index: AQHX8JWhvlRQU5T/lU6dpNiL1wIQjqwyEDNg
-Date:   Tue, 14 Dec 2021 15:09:54 +0000
-Message-ID: <854480525e7f4f3baeba09ec6a864b80@intel.com>
-References: <20211214022825.563892248@linutronix.de>
- <20211214024948.048572883@linutronix.de>
-In-Reply-To: <20211214024948.048572883@linutronix.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-reaction: no-action
-dlp-version: 11.6.200.16
-x-originating-ip: [10.239.127.36]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S234470AbhLNPS2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Dec 2021 10:18:28 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:45662 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232994AbhLNPSY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Dec 2021 10:18:24 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 529DB61565
+        for <kvm@vger.kernel.org>; Tue, 14 Dec 2021 15:18:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41C3DC34601;
+        Tue, 14 Dec 2021 15:18:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1639495103;
+        bh=uxvNWmo7E2cDPFH+8p6MIfTuS2eQzq+7lncs4TS9T2w=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=VBjP1jE2iBnxO5RmP/aXjVs0wG7HydRKdxvBCjXDXuO+qedOOnJ56+IJyyx5zn7pf
+         ICfKEkXKCenRCB9MLEWFdHWeaP8fRaxU9+5Tt92mQN1XGlmDGhZ7ffPCUmuNeXZkM8
+         w8odnEA2gycOAAw1fqWQvVCASRzOydJcRn4LWVLaiNGawrt5RtuHBy75c/jiw1pKj4
+         mUpx/qSxk8tJEjFJT7RdBX/87D7N4p/qhAP65uzP+o+akGMo9R6Iu/7hyobgrDWEnr
+         4ygJeqDPEBV+kr8oadZVNOlBmZE/AmJMTt5wkEuSG9sTkAz8sGClU++OkHk5NrUb6h
+         sJUxZBQ7yUMUQ==
+From:   Will Deacon <will@kernel.org>
+To:     Anup Patel <anup.patel@wdc.com>, maz@kernel.org,
+        julien.thierry.kdev@gmail.com
+Cc:     catalin.marinas@arm.com, kernel-team@android.com,
+        Will Deacon <will@kernel.org>,
+        Vincent Chen <vincent.chen@sifive.com>,
+        Alistair Francis <Alistair.Francis@wdc.com>,
+        kvm-riscv@lists.infradead.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
+        Atish Patra <atishp@atishpatra.org>
+Subject: Re: [PATCH v11 kvmtool 0/8] KVMTOOL RISC-V Support
+Date:   Tue, 14 Dec 2021 15:18:10 +0000
+Message-Id: <163949433071.4049230.18094387124072062307.b4-ty@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20211119124515.89439-1-anup.patel@wdc.com>
+References: <20211119124515.89439-1-anup.patel@wdc.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gVHVlc2RheSwgRGVjZW1iZXIgMTQsIDIwMjEgMTA6NTAgQU0sIFRob21hcyBHbGVpeG5lciB3
-cm90ZToNCj4gS1ZNIGNhbiByZXF1aXJlIGZwc3RhdGUgZXhwYW5zaW9uIGR1ZSB0byB1cGRhdGVz
-IHRvIFhDUjAgYW5kIHRvIHRoZSBYRkQNCj4gTVNSLiBJbiBib3RoIGNhc2VzIGl0IGlzIHJlcXVp
-cmVkIHRvIGNoZWNrIHdoZXRoZXI6DQo+IA0KPiAgIC0gdGhlIHJlcXVlc3RlZCB2YWx1ZXMgYXJl
-IGNvcnJlY3Qgb3IgcGVybWl0dGVkDQo+IA0KPiAgIC0gdGhlIHJlc3VsdGluZyB4ZmVhdHVyZSBt
-YXNrIHdoaWNoIGlzIHJlbGV2YW50IGZvciBYU0FWRVMgaXMgYSBzdWJzZXQgb2YNCj4gICAgIHRo
-ZSBndWVzdHMgZnBzdGF0ZSB4ZmVhdHVyZSBtYXNrIGZvciB3aGljaCB0aGUgcmVnaXN0ZXIgYnVm
-ZmVyIGlzIHNpemVkLg0KPiANCj4gICAgIElmIHRoZSBmZWF0dXJlIG1hc2sgZG9lcyBub3QgZml0
-IGludG8gdGhlIGd1ZXN0cyBmcHN0YXRlIHRoZW4NCj4gICAgIHJlYWxsb2NhdGlvbiBpcyByZXF1
-aXJlZC4NCj4gDQo+IFByb3ZpZGUgYSBjb21tb24gdXBkYXRlIGZ1bmN0aW9uIHdoaWNoIHV0aWxp
-emVzIHRoZSBleGlzdGluZyBYRkQNCj4gZW5hYmxlbWVudCBtZWNoYW5pY3MgYW5kIHR3byB3cmFw
-cGVyIGZ1bmN0aW9ucywgb25lIGZvciBYQ1IwIGFuZCBvbmUNCj4gZm9yIFhGRC4NCj4gDQo+IFRo
-ZXNlIHdyYXBwZXJzIGhhdmUgdG8gYmUgaW52b2tlZCBmcm9tIFhTRVRCViBlbXVsYXRpb24gYW5k
-IHRoZSBYRkQNCj4gTVNSIHdyaXRlIGVtdWxhdGlvbi4NCj4gDQo+IFhDUjAgbW9kaWZpY2F0aW9u
-IGNhbiBvbmx5IHByb2NlZWQgd2hlbiBmcHVfdXBkYXRlX2d1ZXN0X3hjcjAoKSByZXR1cm5zDQo+
-IHN1Y2Nlc3MuDQo+IA0KPiBYRkQgbW9kaWZpY2F0aW9uIGlzIGRvbmUgYnkgdGhlIEZQVSBjb3Jl
-IGNvZGUgYXMgaXQgcmVxdWlyZXMgdG8gdXBkYXRlIHRoZQ0KPiBzb2Z0d2FyZSBzdGF0ZSBhcyB3
-ZWxsLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogVGhvbWFzIEdsZWl4bmVyIDx0Z2x4QGxpbnV0cm9u
-aXguZGU+DQo+IC0tLQ0KPiBOZXcgdmVyc2lvbiB0byBoYW5kbGUgdGhlIHJlc3RvcmUgY2FzZSBh
-bmQgWENSMCB1cGRhdGVzIGNvcnJlY3RseS4NCj4gLS0tDQo+ICBhcmNoL3g4Ni9pbmNsdWRlL2Fz
-bS9mcHUvYXBpLmggfCAgIDU3DQo+ICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKysrDQo+ICBhcmNoL3g4Ni9rZXJuZWwvZnB1L2NvcmUuYyAgICAgfCAgIDU3DQo+ICsrKysr
-KysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrDQo+ICAyIGZpbGVzIGNoYW5nZWQs
-IDExNCBpbnNlcnRpb25zKCspDQo+IA0KPiAtLS0gYS9hcmNoL3g4Ni9pbmNsdWRlL2FzbS9mcHUv
-YXBpLmgNCj4gKysrIGIvYXJjaC94ODYvaW5jbHVkZS9hc20vZnB1L2FwaS5oDQo+IEBAIC0xMzYs
-NiArMTM2LDYzIEBAIGV4dGVybiB2b2lkIGZwc3RhdGVfY2xlYXJfeHN0YXRlX2NvbXBvbmUNCj4g
-ZXh0ZXJuIGJvb2wgZnB1X2FsbG9jX2d1ZXN0X2Zwc3RhdGUoc3RydWN0IGZwdV9ndWVzdCAqZ2Zw
-dSk7ICBleHRlcm4gdm9pZA0KPiBmcHVfZnJlZV9ndWVzdF9mcHN0YXRlKHN0cnVjdCBmcHVfZ3Vl
-c3QgKmdmcHUpOyAgZXh0ZXJuIGludA0KPiBmcHVfc3dhcF9rdm1fZnBzdGF0ZShzdHJ1Y3QgZnB1
-X2d1ZXN0ICpnZnB1LCBib29sIGVudGVyX2d1ZXN0KTsNCj4gK2V4dGVybiBpbnQgX19mcHVfdXBk
-YXRlX2d1ZXN0X2ZlYXR1cmVzKHN0cnVjdCBmcHVfZ3Vlc3QgKmd1ZXN0X2ZwdSwgdTY0DQo+ICt4
-Y3IwLCB1NjQgeGZkKTsNCj4gKw0KPiArLyoqDQo+ICsgKiBmcHVfdXBkYXRlX2d1ZXN0X3hjcjAg
-LSBVcGRhdGUgZ3Vlc3QgWENSMCBmcm9tIFhTRVRCViBlbXVsYXRpb24NCj4gKyAqIEBndWVzdF9m
-cHU6CVBvaW50ZXIgdG8gdGhlIGd1ZXN0IEZQVSBjb250YWluZXINCj4gKyAqIEB4Y3IwOglSZXF1
-ZXN0ZWQgZ3Vlc3QgWENSMA0KPiArICoNCj4gKyAqIEhhcyB0byBiZSBpbnZva2VkIGJlZm9yZSBt
-YWtpbmcgdGhlIGd1ZXN0IFhDUjAgdXBkYXRlIGVmZmVjdGl2ZS4gVGhlDQo+ICsgKiBmdW5jdGlv
-biB2YWxpZGF0ZXMgdGhhdCB0aGUgcmVxdWVzdGVkIGZlYXR1cmVzIGFyZSBwZXJtaXR0ZWQgYW5k
-DQo+ICtlbnN1cmVzDQo+ICsgKiB0aGF0IEBndWVzdF9mcHUtPmZwc3RhdGUgaXMgcHJvcGVybHkg
-c2l6ZWQgdGFraW5nDQo+ICtAZ3Vlc3RfZnB1LT5mcHN0YXRlLT54ZmQNCj4gKyAqIGludG8gYWNj
-b3VudC4NCj4gKyAqDQo+ICsgKiBJZiBAZ3Vlc3RfZnB1LT5mcHN0YXRlIGlzIG5vdCB0aGUgY3Vy
-cmVudCB0YXNrcyBhY3RpdmUgZnBzdGF0ZSB0aGVuDQo+ICt0aGUNCj4gKyAqIGNhbGxlciBoYXMg
-dG8gZW5zdXJlIHRoYXQgQGd1ZXN0X2ZwdS0+ZnBzdGF0ZSBjYW5ub3QgYmUgY29uY3VycmVudGx5
-DQo+ICtpbg0KPiArICogdXNlLCBpLmUuIHRoZSBndWVzdCByZXN0b3JlIGNhc2UuDQo+ICsgKg0K
-PiArICogUmV0dXJuOg0KPiArICogMAkJLSBTdWNjZXNzDQo+ICsgKiAtRVBFUk0JLSBGZWF0dXJl
-KHMpIG5vdCBwZXJtaXR0ZWQNCj4gKyAqIC1FRkFVTFQJLSBSZXNpemluZyBvZiBmcHN0YXRlIGZh
-aWxlZA0KPiArICovDQo+ICtzdGF0aWMgaW5saW5lIGludCBmcHVfdXBkYXRlX2d1ZXN0X3hjcjAo
-c3RydWN0IGZwdV9ndWVzdCAqZ3Vlc3RfZnB1LA0KPiArdTY0IHhjcjApIHsNCj4gKwlyZXR1cm4g
-X19mcHVfdXBkYXRlX2d1ZXN0X2ZlYXR1cmVzKGd1ZXN0X2ZwdSwgeGNyMCwNCj4gK2d1ZXN0X2Zw
-dS0+ZnBzdGF0ZS0+eGZkKTsgfQ0KPiArDQo+ICsvKioNCj4gKyAqIGZwdV91cGRhdGVfZ3Vlc3Rf
-eGZkIC0gVXBkYXRlIGd1ZXN0IFhGRCBmcm9tIE1TUiB3cml0ZSBlbXVsYXRpb24NCj4gKyAqIEBn
-dWVzdF9mcHU6CVBvaW50ZXIgdG8gdGhlIGd1ZXN0IEZQVSBjb250YWluZXINCj4gKyAqIEB4Y3Iw
-OglDdXJyZW50IGd1ZXN0IFhDUjANCj4gKyAqIEB4ZmQ6CVJlcXVlc3RlZCBYRkQgdmFsdWUNCj4g
-KyAqDQo+ICsgKiBIYXMgdG8gYmUgaW52b2tlZCB0byBtYWtlIHRoZSBndWVzdCBYRkQgdXBkYXRl
-IGVmZmVjdGl2ZS4gVGhlDQo+ICtmdW5jdGlvbg0KPiArICogdmFsaWRhdGVzIHRoZSBYRkQgdmFs
-dWUgYW5kIGVuc3VyZXMgdGhhdCBAZ3Vlc3RfZnB1LT5mcHN0YXRlIGlzDQo+ICtwcm9wZXJseQ0K
-PiArICogc2l6ZWQgYnkgdGFraW5nIEB4Y3IwIGludG8gYWNjb3VudC4NCj4gKyAqDQo+ICsgKiBU
-aGUgY2FsbGVyIG11c3Qgbm90IG1vZGlmeSBAZ3Vlc3RfZnB1LT5mcHN0YXRlLT54ZmQgb3IgdGhl
-IFhGRCBNU1INCj4gKyAqIGRpcmVjdGx5Lg0KPiArICoNCj4gKyAqIElmIEBndWVzdF9mcHUtPmZw
-c3RhdGUgaXMgbm90IHRoZSBjdXJyZW50IHRhc2tzIGFjdGl2ZSBmcHN0YXRlIHRoZW4NCj4gK3Ro
-ZQ0KPiArICogY2FsbGVyIGhhcyB0byBlbnN1cmUgdGhhdCBAZ3Vlc3RfZnB1LT5mcHN0YXRlIGNh
-bm5vdCBiZSBjb25jdXJyZW50bHkNCj4gK2luDQo+ICsgKiB1c2UsIGkuZS4gdGhlIGd1ZXN0IHJl
-c3RvcmUgY2FzZS4NCj4gKyAqDQo+ICsgKiBPbiBzdWNjZXNzIHRoZSBidWZmZXIgc2l6ZSBpcyB2
-YWxpZCwgQGd1ZXN0X2ZwdS0+ZnBzdGF0ZS54ZmQgPT0gQHhmZA0KPiArYW5kDQo+ICsgKiBpZiB0
-aGUgZ3Vlc3QgZnBzdGF0ZSBpcyBhY3RpdmUgdGhlbiBNU1JfSUEzMl9YRkQgPT0gQHhmZC4NCj4g
-KyAqDQo+ICsgKiBPbiBmYWlsdXJlIHRoZSBwcmV2aW91cyBzdGF0ZSBpcyByZXRhaW5lZC4NCj4g
-KyAqDQo+ICsgKiBSZXR1cm46DQo+ICsgKiAwCQktIFN1Y2Nlc3MNCj4gKyAqIC1FTk9UU1VQUAkt
-IFhGRCB2YWx1ZSBub3Qgc3VwcG9ydGVkDQo+ICsgKiAtRUZBVUxUCS0gUmVzaXppbmcgb2YgZnBz
-dGF0ZSBmYWlsZWQNCj4gKyAqLw0KPiArc3RhdGljIGlubGluZSBpbnQgZnB1X3VwZGF0ZV9ndWVz
-dF94ZmQoc3RydWN0IGZwdV9ndWVzdCAqZ3Vlc3RfZnB1LCB1NjQNCj4gK3hjcjAsIHU2NCB4ZmQp
-IHsNCj4gKwlyZXR1cm4gX19mcHVfdXBkYXRlX2d1ZXN0X2ZlYXR1cmVzKGd1ZXN0X2ZwdSwgeGNy
-MCwgeGZkKTsgfQ0KPiANCj4gIGV4dGVybiB2b2lkIGZwdV9jb3B5X2d1ZXN0X2Zwc3RhdGVfdG9f
-dWFiaShzdHJ1Y3QgZnB1X2d1ZXN0ICpnZnB1LCB2b2lkDQo+ICpidWYsIHVuc2lnbmVkIGludCBz
-aXplLCB1MzIgcGtydSk7ICBleHRlcm4gaW50DQo+IGZwdV9jb3B5X3VhYmlfdG9fZ3Vlc3RfZnBz
-dGF0ZShzdHJ1Y3QgZnB1X2d1ZXN0ICpnZnB1LCBjb25zdCB2b2lkICpidWYsDQo+IHU2NCB4Y3Iw
-LCB1MzIgKnZwa3J1KTsNCj4gLS0tIGEvYXJjaC94ODYva2VybmVsL2ZwdS9jb3JlLmMNCj4gKysr
-IGIvYXJjaC94ODYva2VybmVsL2ZwdS9jb3JlLmMNCj4gQEAgLTI2MSw2ICsyNjEsNjMgQEAgdm9p
-ZCBmcHVfZnJlZV9ndWVzdF9mcHN0YXRlKHN0cnVjdCBmcHVfZyAgfQ0KPiBFWFBPUlRfU1lNQk9M
-X0dQTChmcHVfZnJlZV9ndWVzdF9mcHN0YXRlKTsNCj4gDQo+ICsvKioNCj4gKyAqIF9fZnB1X3Vw
-ZGF0ZV9ndWVzdF9mZWF0dXJlcyAtIFZhbGlkYXRlIGFuZCBlbmFibGUgZ3Vlc3QgWENSMCBhbmQg
-WEZEDQo+IHVwZGF0ZXMNCj4gKyAqIEBndWVzdF9mcHU6CVBvaW50ZXIgdG8gdGhlIGd1ZXN0IEZQ
-VSBjb250YWluZXINCj4gKyAqIEB4Y3IwOglHdWVzdCBYQ1IwDQo+ICsgKiBAeGZkOglHdWVzdCBY
-RkQNCj4gKyAqDQo+ICsgKiBOb3RlOiBAeGNyMCBhbmQgQHhmZCBtdXN0IGVpdGhlciBiZSB0aGUg
-YWxyZWFkeSB2YWxpZGF0ZWQgdmFsdWVzIG9yDQo+ICt0aGUNCj4gKyAqIHJlcXVlc3RlZCB2YWx1
-ZXMgKGd1ZXN0IGVtdWxhdGlvbiBvciBob3N0IHdyaXRlIG9uIHJlc3RvcmUpLg0KPiArICoNCj4g
-KyAqIERvIG5vdCBpbnZva2UgZGlyZWN0bHkuIFVzZSB0aGUgcHJvdmlkZWQgd3JhcHBlcnMNCj4g
-K2ZwdV92YWxpZGF0ZV9ndWVzdF94Y3IwKCkNCj4gKyAqIGFuZCBmcHVfdXBkYXRlX2d1ZXN0X3hm
-ZCgpIGluc3RlYWQuDQo+ICsgKg0KPiArICogUmV0dXJuOiAwIG9uIHN1Y2Nlc3MsIGVycm9yIGNv
-ZGUgb3RoZXJ3aXNlICAqLyBpbnQNCj4gK19fZnB1X3VwZGF0ZV9ndWVzdF9mZWF0dXJlcyhzdHJ1
-Y3QgZnB1X2d1ZXN0ICpndWVzdF9mcHUsIHU2NCB4Y3IwLCB1NjQNCj4gK3hmZCkgew0KDQpJIHRo
-aW5rIHRoZXJlIHdvdWxkIGJlIG9uZSBpc3N1ZSBmb3IgdGhlICJob3N0IHdyaXRlIG9uIHJlc3Rv
-cmUiIGNhc2UuDQpUaGUgY3VycmVudCBRRU1VIGJhc2VkIGhvc3QgcmVzdG9yZSB1c2VzIHRoZSBm
-b2xsb3dpbmcgc2VxdWVuY2U6DQoxKSByZXN0b3JlIHhzYXZlDQoyKSByZXN0b3JlIHhjcjANCjMp
-IHJlc3RvcmUgWEZEIE1TUg0KDQpBdCB0aGUgdGltZSBvZiAiMSkgcmVzdG9yZSB4c2F2ZSIsIEtW
-TSBhbHJlYWR5IG5lZWRzIGZwc3RhdGUgZXhwYW5zaW9uIGJlZm9yZSByZXN0b3JpbmcgdGhlIHhz
-YXZlIGRhdGEuDQpTbyB0aGUgMiBBUElzIGhlcmUgbWlnaHQgbm90IGJlIHVzYWJsZSBmb3IgdGhp
-cyB1c2FnZS4NCk91ciBjdXJyZW50IHNvbHV0aW9uIHRvIGZwc3RhdGUgZXhwYW5zaW9uIGF0IEtW
-TV9TRVRfWFNBVkUgKGkuZS4gc3RlcCAxKSBhYm92ZSkgaXM6DQoNCmt2bV9sb2FkX2d1ZXN0X2Zw
-dSh2Y3B1KTsNCmd1ZXN0X2ZwdS0+cmVhbGxvY19yZXF1ZXN0ID0gcmVhbGxvY19yZXF1ZXN0Ow0K
-a3ZtX3B1dF9ndWVzdF9mcHUodmNwdSk7DQoNCiJyZWFsbG9jX3JlcXVlc3QiIGFib3ZlIGlzIGdl
-bmVyYXRlZCBmcm9tIHRoZSAieHN0YXRlX2hlYWRlciIgcmVjZWl2ZWQgZnJvbSB1c2Vyc3BhY2Uu
-DQoNClRoYW5rcywNCldlaQ0KDQo=
+On Fri, 19 Nov 2021 18:15:07 +0530, Anup Patel wrote:
+> This series adds RISC-V support for KVMTOOL and it is based on the
+> Linux-5.16-rc1. The KVM RISC-V patches have been merged in the Linux
+> kernel since 5.16-rc1.
+> 
+> The KVMTOOL RISC-V patches can be found in riscv_master branch at:
+> https//github.com/kvm-riscv/kvmtool.git
+> 
+> [...]
+
+Applied to kvmtool (master), thanks!
+
+[1/8] update_headers: Sync-up ABI headers with Linux-5.16-rc1
+      https://git.kernel.org/will/kvmtool/c/5968b5ff26bb
+[2/8] riscv: Initial skeletal support
+      https://git.kernel.org/will/kvmtool/c/2e99678314c2
+[3/8] riscv: Implement Guest/VM arch functions
+      https://git.kernel.org/will/kvmtool/c/867159a7963b
+[4/8] riscv: Implement Guest/VM VCPU arch functions
+      https://git.kernel.org/will/kvmtool/c/42bfe448c1c3
+[5/8] riscv: Add PLIC device emulation
+      https://git.kernel.org/will/kvmtool/c/762224e47cc2
+[6/8] riscv: Generate FDT at runtime for Guest/VM
+      https://git.kernel.org/will/kvmtool/c/7c9aac003925
+[7/8] riscv: Handle SBI calls forwarded to user space
+      https://git.kernel.org/will/kvmtool/c/721da166a698
+[8/8] riscv: Generate PCI host DT node
+      https://git.kernel.org/will/kvmtool/c/cdd7d8cc0109
+
+Cheers,
+-- 
+Will
+
+https://fixes.arm64.dev
+https://next.arm64.dev
+https://will.arm64.dev
