@@ -2,75 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CF315474639
-	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 16:18:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 311EA474648
+	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 16:19:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235294AbhLNPSc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Dec 2021 10:18:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44530 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234452AbhLNPSc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Dec 2021 10:18:32 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E3D4C061574
-        for <kvm@vger.kernel.org>; Tue, 14 Dec 2021 07:18:32 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S235261AbhLNPSu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Dec 2021 10:18:50 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:27472 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235366AbhLNPSq (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 14 Dec 2021 10:18:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1639495126;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=S9AF7OnmRk+OCSDWZ+0WFjDmpnGnCkenqOvglMBXsmE=;
+        b=O0N/2ER5EQwwCEJgl/x3WdbpqQRI1ZHbDv6cfHZT63bn78EU0A+mLOUPqS0PHyQaiGPYm5
+        ZgVQiN1+Jf11eR0rFPG4v5Z6Y3MerZSVlv+crBqd7o6LPY0WtSzMfFcQlKh1huxz7MQnsr
+        b7agOGW+BFhycBJZQ7z5mgx+Ai7pn1g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-549-8r1apI2ANy-9dG6U3QgixA-1; Tue, 14 Dec 2021 10:18:44 -0500
+X-MC-Unique: 8r1apI2ANy-9dG6U3QgixA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B964661581
-        for <kvm@vger.kernel.org>; Tue, 14 Dec 2021 15:18:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09214C34606;
-        Tue, 14 Dec 2021 15:18:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1639495111;
-        bh=UriMdmZ+AeOcoV1G6zXI5X5WLwoTiyx3V7TzycPA3Iw=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=SXtg3Fja4XqrPdOh8vzLdLyXU91ULFx81uw3C98I8xDWECgWZsvBUHUdv66EQxyqM
-         aXXf0YJZW49Z3adgDw1KXojU2Q7z8EuLwE5YPAaQqwpduMktKNYdaDYYPxjqHSVPWl
-         a9kSBJr/QnMfC8EArXmDKGRzt0A2EFN1jVxXiG+qssbpijILfnWWZ5Ocy/d4y05zVk
-         w8qxT10EdoHeyUC4JnfELaA2ZOkdxb0EnwstBhEdPegkCkGrS6b2JF9cK/+ly2QEEH
-         1dLwOzdJTJpKXtq+8R2bgPJdkcyD1iYH5LsrJ1kA2BuI60Ea1DeV8Ri/Gai0mbbB4B
-         5YqPMbAE8NvVA==
-From:   Will Deacon <will@kernel.org>
-To:     julien.thierry.kdev@gmail.com, kvm@vger.kernel.org,
-        Sathyam Panda <panda.sathyam9@gmail.com>
-Cc:     catalin.marinas@arm.com, kernel-team@android.com,
-        Will Deacon <will@kernel.org>, jean-philippe@linaro.org,
-        alexandru.elisei@arm.com, sathyam.panda@arm.com,
-        andre.przywara@arm.com, vivek.gautam@arm.com
-Subject: Re: [PATCH kvmtool RESENT] arm/pci: update interrupt-map only for legacy interrupts
-Date:   Tue, 14 Dec 2021 15:18:13 +0000
-Message-Id: <163949402712.3919523.5844807265902321769.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20211111120231.5468-1-sathyam.panda@arm.com>
-References: <20211111120231.5468-1-sathyam.panda@arm.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 05631801B0C
+        for <kvm@vger.kernel.org>; Tue, 14 Dec 2021 15:18:44 +0000 (UTC)
+Received: from gator.home (unknown [10.40.192.130])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1B8AE1042AAC;
+        Tue, 14 Dec 2021 15:18:42 +0000 (UTC)
+From:   Andrew Jones <drjones@redhat.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com
+Subject: [PATCH] selftests: KVM: Fix non-x86 compiling
+Date:   Tue, 14 Dec 2021 16:18:42 +0100
+Message-Id: <20211214151842.848314-1-drjones@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 11 Nov 2021 12:02:31 +0000, Sathyam Panda wrote:
-> The interrupt pin cell in "interrupt-map" property
-> is defined only for legacy interrupts with a valid
-> range in [1-4] corrspoding to INTA#..INTD#. And the
-> PCI endpoint devices that support advance interrupt
-> mechanism like MSI or MSI-X should not have an entry
-> with value 0 in "interrupt-map". This patch takes
-> care of this problem by avoiding redundant entries.
-> 
-> [...]
+Attempting to compile on a non-x86 architecture fails with
 
-Applied to kvmtool (master), thanks!
+include/kvm_util.h: In function ‘vm_compute_max_gfn’:
+include/kvm_util.h:79:21: error: dereferencing pointer to incomplete type ‘struct kvm_vm’
+  return ((1ULL << vm->pa_bits) >> vm->page_shift) - 1;
+                     ^~
 
-[1/1] arm/pci: update interrupt-map only for legacy interrupts
-      https://git.kernel.org/will/kvmtool/c/7a60af05c183
+This is because the declaration of struct kvm_vm is in
+lib/kvm_util_internal.h as an effort to make it private to
+the test lib code. We can still provide arch specific functions,
+though, by making the generic function symbols weak. Do that to
+fix the compile error.
 
-Cheers,
+Fixes: c8cc43c1eae2 ("selftests: KVM: avoid failures due to reserved HyperTransport region")
+Cc: stable@vger.kernel.org
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+---
+ tools/testing/selftests/kvm/include/kvm_util.h | 10 +---------
+ tools/testing/selftests/kvm/lib/kvm_util.c     |  5 +++++
+ 2 files changed, 6 insertions(+), 9 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
+index da2b702da71a..2d62edc49d67 100644
+--- a/tools/testing/selftests/kvm/include/kvm_util.h
++++ b/tools/testing/selftests/kvm/include/kvm_util.h
+@@ -71,15 +71,6 @@ enum vm_guest_mode {
+ 
+ #endif
+ 
+-#if defined(__x86_64__)
+-unsigned long vm_compute_max_gfn(struct kvm_vm *vm);
+-#else
+-static inline unsigned long vm_compute_max_gfn(struct kvm_vm *vm)
+-{
+-	return ((1ULL << vm->pa_bits) >> vm->page_shift) - 1;
+-}
+-#endif
+-
+ #define MIN_PAGE_SIZE		(1U << MIN_PAGE_SHIFT)
+ #define PTES_PER_MIN_PAGE	ptes_per_page(MIN_PAGE_SIZE)
+ 
+@@ -330,6 +321,7 @@ bool vm_is_unrestricted_guest(struct kvm_vm *vm);
+ 
+ unsigned int vm_get_page_size(struct kvm_vm *vm);
+ unsigned int vm_get_page_shift(struct kvm_vm *vm);
++unsigned long vm_compute_max_gfn(struct kvm_vm *vm);
+ uint64_t vm_get_max_gfn(struct kvm_vm *vm);
+ int vm_get_fd(struct kvm_vm *vm);
+ 
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index daf6fdb217a7..53d2b5d04b82 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -2328,6 +2328,11 @@ unsigned int vm_get_page_shift(struct kvm_vm *vm)
+ 	return vm->page_shift;
+ }
+ 
++unsigned long __attribute__((weak)) vm_compute_max_gfn(struct kvm_vm *vm)
++{
++	return ((1ULL << vm->pa_bits) >> vm->page_shift) - 1;
++}
++
+ uint64_t vm_get_max_gfn(struct kvm_vm *vm)
+ {
+ 	return vm->max_gfn;
 -- 
-Will
+2.31.1
 
-https://fixes.arm64.dev
-https://next.arm64.dev
-https://will.arm64.dev
