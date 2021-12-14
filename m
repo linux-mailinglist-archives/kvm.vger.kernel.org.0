@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E4E347429F
-	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 13:34:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 121E547429A
+	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 13:33:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234025AbhLNMdW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Dec 2021 07:33:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33686 "EHLO
+        id S234044AbhLNMdY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Dec 2021 07:33:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230258AbhLNMdS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S231928AbhLNMdS (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 14 Dec 2021 07:33:18 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8532C06173F;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8555C061748;
         Tue, 14 Dec 2021 04:33:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=oWcP44DqIXuh+ENXgoAHL+hfeMmGuCZsSvXLfenUULg=; b=U7jdA+/A+EKhnCUNwn0EptLeAW
-        7e0bQ8YlHJGV/FSiP69pmlO0Rj5NzIpD5w/wBa5YXv+FI8nuhpHKYOL/a+2ZA/R4ipJS465n6h0f9
-        5oQOnNUDvHEiusT8YfqVtHSVjKqN3j3GJgCRMu0QnNENvVLPiTa7/2Nm1n1CsiLOYgBaTZ85rCJUe
-        kpQNr94IemBXdw7fHpptOKavYo6Vr+bHYqs+CNUMEKej8E8yVMqM6vTf93ifcIcsZg1X1qctecmeF
-        y7s315S8Ds5hS1V85tooFHYIP47QjA2tEcday+7qT8pJKJXGH4SiCsFgT+lQJgudGuUXnz9e1VrM7
-        zgt41niA==;
+        bh=Zw/QL/Q3OwFDg61HR11ET7Tf2W9jYgbtHFjH3MuV1cs=; b=WsTwUA+5GzxJIQw9mfrbaoPzpp
+        HC/c2YCwEMvu9z1TuIDy+cUB/q2o5baqNmIeSgBCNaCK5GGUIfl7la9aqDCzW8SX/m+ToJrimxXhg
+        /cdZpzuqN5mEMdBXDvv22ZF4XSaNKclBYVb2ryBd8iqk2+PMRfsQt+ylXNI98t6+iWWxMSJiDY8MP
+        voxCvaJWhj+I1rTTCP/QnIO9V7w314/VSL2xjDvMeLlki4Jig6YbDmgE41sCSjxx0kLoCON+Ar0Gy
+        f0VI7ugFrn2GmxVgttBIeg3hwx3g/FqoGUJW/ihXtqdttqH4x4EOkajgee3MLfsCuyLL51VKfm6Lr
+        stfM+rlA==;
 Received: from i7.infradead.org ([2001:8b0:10b:1:21e:67ff:fecb:7a92])
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mx6zE-00DhTA-6F; Tue, 14 Dec 2021 12:32:52 +0000
+        id 1mx6zE-00DhTB-9y; Tue, 14 Dec 2021 12:32:53 +0000
 Received: from dwoodhou by i7.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mx6zE-000N6O-De; Tue, 14 Dec 2021 12:32:52 +0000
+        id 1mx6zE-000N6T-GH; Tue, 14 Dec 2021 12:32:52 +0000
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     Thomas Gleixner <tglx@linutronix.de>
 Cc:     Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
@@ -39,9 +39,9 @@ Cc:     Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
         hushiyuan@huawei.com, luolongjun@huawei.com, hejingxian@huawei.com
-Subject: [PATCH v2 1/7] x86/apic/x2apic: Fix parallel handling of cluster_mask
-Date:   Tue, 14 Dec 2021 12:32:44 +0000
-Message-Id: <20211214123250.88230-2-dwmw2@infradead.org>
+Subject: [PATCH v2 2/7] cpu/hotplug: Move idle_thread_get() to <linux/smpboot.h>
+Date:   Tue, 14 Dec 2021 12:32:45 +0000
+Message-Id: <20211214123250.88230-3-dwmw2@infradead.org>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20211214123250.88230-1-dwmw2@infradead.org>
 References: <20211214123250.88230-1-dwmw2@infradead.org>
@@ -55,145 +55,58 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: David Woodhouse <dwmw@amazon.co.uk>
 
-For each CPU being brought up, the alloc_clustermask() function
-allocates a new struct cluster_mask just in case it's needed. Then the
-target CPU actually runs, and in init_x2apic_ldr() it either uses a
-cluster_mask from a previous CPU in the same cluster, or consumes the
-"spare" one and sets the global pointer to NULL.
+Instead of relying purely on the special-case wrapper in bringup_cpu()
+to pass the idle thread to __cpu_up(), expose idle_thread_get() so that
+the architecture code can obtain it directly when necessary.
 
-That isn't going to parallelise stunningly well.
+This will be useful when the existing __cpu_up() is split into multiple
+phases, only *one* of which will actually need the idle thread.
 
-Ditch the global variable, let alloc_clustermask() install the struct
-*directly* in the per_cpu data for the CPU being brought up. As an
-optimisation, actually make it do so for *all* present CPUs in the same
-cluster, which means only one iteration over for_each_present_cpu()
-instead of doing so repeatedly, once for each CPU.
+If the architecture code is to register its new pre-bringup states with
+the cpuhp core, having a special-case wrapper to pass extra arguments is
+non-trivial and it's easier just to let the arch register its function
+pointer to be invoked with the standard API.
 
-This was a harmless "bug" while CPU bringup wasn't actually happening in
-parallel. It's about to become less harmless...
-
-Fixes: 023a611748fd5 ("x86/apic/x2apic: Simplify cluster management")
 Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 ---
- arch/x86/kernel/apic/x2apic_cluster.c | 82 ++++++++++++++++-----------
- 1 file changed, 49 insertions(+), 33 deletions(-)
+ include/linux/smpboot.h | 7 +++++++
+ kernel/smpboot.h        | 2 --
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kernel/apic/x2apic_cluster.c b/arch/x86/kernel/apic/x2apic_cluster.c
-index e696e22d0531..4ff6a6005ad6 100644
---- a/arch/x86/kernel/apic/x2apic_cluster.c
-+++ b/arch/x86/kernel/apic/x2apic_cluster.c
-@@ -24,7 +24,6 @@ static u32 *x86_cpu_to_logical_apicid __read_mostly;
+diff --git a/include/linux/smpboot.h b/include/linux/smpboot.h
+index 9d1bc65d226c..3862addcaa34 100644
+--- a/include/linux/smpboot.h
++++ b/include/linux/smpboot.h
+@@ -5,6 +5,13 @@
+ #include <linux/types.h>
  
- static DEFINE_PER_CPU(cpumask_var_t, ipi_mask);
- static DEFINE_PER_CPU_READ_MOSTLY(struct cluster_mask *, cluster_masks);
--static struct cluster_mask *cluster_hotplug_mask;
+ struct task_struct;
++
++#ifdef CONFIG_GENERIC_SMP_IDLE_THREAD
++struct task_struct *idle_thread_get(unsigned int cpu);
++#else
++static inline struct task_struct *idle_thread_get(unsigned int cpu) { return NULL; }
++#endif
++
+ /* Cookie handed to the thread_fn*/
+ struct smpboot_thread_data;
  
- static int x2apic_acpi_madt_oem_check(char *oem_id, char *oem_table_id)
- {
-@@ -106,54 +105,71 @@ static u32 x2apic_calc_apicid(unsigned int cpu)
- static void init_x2apic_ldr(void)
- {
- 	struct cluster_mask *cmsk = this_cpu_read(cluster_masks);
--	u32 cluster, apicid = apic_read(APIC_LDR);
--	unsigned int cpu;
+diff --git a/kernel/smpboot.h b/kernel/smpboot.h
+index 34dd3d7ba40b..60c609318ad6 100644
+--- a/kernel/smpboot.h
++++ b/kernel/smpboot.h
+@@ -5,11 +5,9 @@
+ struct task_struct;
  
--	x86_cpu_to_logical_apicid[smp_processor_id()] = apicid;
-+	BUG_ON(!cmsk);
- 
--	if (cmsk)
--		goto update;
--
--	cluster = apicid >> 16;
--	for_each_online_cpu(cpu) {
--		cmsk = per_cpu(cluster_masks, cpu);
--		/* Matching cluster found. Link and update it. */
--		if (cmsk && cmsk->clusterid == cluster)
--			goto update;
--	}
--	cmsk = cluster_hotplug_mask;
--	cmsk->clusterid = cluster;
--	cluster_hotplug_mask = NULL;
--update:
--	this_cpu_write(cluster_masks, cmsk);
- 	cpumask_set_cpu(smp_processor_id(), &cmsk->mask);
- }
- 
--static int alloc_clustermask(unsigned int cpu, int node)
-+static int alloc_clustermask(unsigned int cpu, u32 cluster, int node)
- {
-+	struct cluster_mask *cmsk = NULL;
-+	unsigned int cpu_i;
-+	u32 apicid;
-+
- 	if (per_cpu(cluster_masks, cpu))
- 		return 0;
--	/*
--	 * If a hotplug spare mask exists, check whether it's on the right
--	 * node. If not, free it and allocate a new one.
-+
-+	/* For the hotplug case, don't always allocate a new one */
-+	for_each_present_cpu(cpu_i) {
-+		apicid = apic->cpu_present_to_apicid(cpu_i);
-+		if (apicid != BAD_APICID && apicid >> 4 == cluster) {
-+			cmsk = per_cpu(cluster_masks, cpu_i);
-+			if (cmsk)
-+				break;
-+		}
-+	}
-+	if (!cmsk) {
-+		cmsk = kzalloc_node(sizeof(*cmsk), GFP_KERNEL, node);
-+	}
-+	if (!cmsk)
-+		return -ENOMEM;
-+
-+	cmsk->node = node;
-+	cmsk->clusterid = cluster;
-+
-+	per_cpu(cluster_masks, cpu) = cmsk;
-+
-+        /*
-+	 * As an optimisation during boot, set the cluster_mask for *all*
-+	 * present CPUs at once, to prevent *each* of them having to iterate
-+	 * over the others to find the existing cluster_mask.
- 	 */
--	if (cluster_hotplug_mask) {
--		if (cluster_hotplug_mask->node == node)
--			return 0;
--		kfree(cluster_hotplug_mask);
-+	if (system_state < SYSTEM_RUNNING) {
-+		for_each_present_cpu(cpu) {
-+			u32 apicid = apic->cpu_present_to_apicid(cpu);
-+			if (apicid != BAD_APICID && apicid >> 4 == cluster) {
-+				struct cluster_mask **cpu_cmsk = &per_cpu(cluster_masks, cpu);
-+				if (*cpu_cmsk)
-+					BUG_ON(*cpu_cmsk != cmsk);
-+				else
-+					*cpu_cmsk = cmsk;
-+			}
-+		}
- 	}
- 
--	cluster_hotplug_mask = kzalloc_node(sizeof(*cluster_hotplug_mask),
--					    GFP_KERNEL, node);
--	if (!cluster_hotplug_mask)
--		return -ENOMEM;
--	cluster_hotplug_mask->node = node;
- 	return 0;
- }
- 
- static int x2apic_prepare_cpu(unsigned int cpu)
- {
--	if (alloc_clustermask(cpu, cpu_to_node(cpu)) < 0)
-+	u32 phys_apicid = apic->cpu_present_to_apicid(cpu);
-+	u32 cluster = phys_apicid >> 4;
-+	u32 logical_apicid = (cluster << 16) | (1 << (phys_apicid & 0xf));
-+
-+	x86_cpu_to_logical_apicid[cpu] = logical_apicid;
-+
-+	if (alloc_clustermask(cpu, cluster, cpu_to_node(cpu)) < 0)
- 		return -ENOMEM;
- 	if (!zalloc_cpumask_var(&per_cpu(ipi_mask, cpu), GFP_KERNEL))
- 		return -ENOMEM;
+ #ifdef CONFIG_GENERIC_SMP_IDLE_THREAD
+-struct task_struct *idle_thread_get(unsigned int cpu);
+ void idle_thread_set_boot_cpu(void);
+ void idle_threads_init(void);
+ #else
+-static inline struct task_struct *idle_thread_get(unsigned int cpu) { return NULL; }
+ static inline void idle_thread_set_boot_cpu(void) { }
+ static inline void idle_threads_init(void) { }
+ #endif
 -- 
 2.31.1
 
