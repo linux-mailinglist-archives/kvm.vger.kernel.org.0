@@ -2,113 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CCDD4474E80
-	for <lists+kvm@lfdr.de>; Wed, 15 Dec 2021 00:21:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A18D9474EE3
+	for <lists+kvm@lfdr.de>; Wed, 15 Dec 2021 01:08:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231684AbhLNXVR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Dec 2021 18:21:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42810 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238197AbhLNXVQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Dec 2021 18:21:16 -0500
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E74AC061574
-        for <kvm@vger.kernel.org>; Tue, 14 Dec 2021 15:21:16 -0800 (PST)
-Received: by mail-pf1-x42f.google.com with SMTP id p13so19125135pfw.2
-        for <kvm@vger.kernel.org>; Tue, 14 Dec 2021 15:21:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=DWjZjRsv4tD+w9qRLUX1i2B9Ki8I9AN3kx6gj18PMRk=;
-        b=hxq0YmLTGRzBkQPvIN58iLvyz1qg/qdOQe31/HnpNXBC2aUE5t2N58pyn5KazeA8rb
-         KnsIA83Xs2BVGw/A0EJTHIKrfUZyLck9o3PqFny6a6rqK6EGG5LWDiYbXrcGUSQC+4Cb
-         Rw8Rhfu114Yl8MkV96U5NwkbYfjr16KqTVMWI/qOjeGiYfZuKzgZo7MdXJ7dyjR107Wy
-         KDunVQME6nw0IYYuz6N+IagVGAk19eYkvk7i7nqDoh2agpEDPolfKltDDn4vS4aTCK4+
-         mmfJuQoSqVZTWUWpQ5G6WU6kdfWsZ5iNfYF4kLC6URO4q70TGd3wEreon6mznJRlU8HX
-         1PWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=DWjZjRsv4tD+w9qRLUX1i2B9Ki8I9AN3kx6gj18PMRk=;
-        b=kLt91IFnC/nVyQ/vzxmU+ZjgLlvw0JLeY39vyTWI6whwun7qsa7iZ7hTXBlxToOpjg
-         glJE4yZ6q7Wg/UqzqhtSE/SOayeZvjXN4iJtjyf355BDJX7ljtKBdRVV6WeVKXJQpBTf
-         n8mmQeoHJzW/d5H/MhIKOejpKoNLJt2rlkHUfctifDo+hkgU3L1isr+zf2FvXx2F6O2q
-         NPfjse2PjDru+UV8P/0TtPeNz/3yusLWKlkvlwiekB2Yh2E9pxc7JeYsDILUsifr/4WU
-         aRNADEFrcR3qgay3cxvb28aSJGX8yrCw24EMucEcWrZmyiXJfehPKgw6wjX1fz85vg60
-         Nhvw==
-X-Gm-Message-State: AOAM5318VyTmpMi2HhsTQm8T2WsO4jOpAFRPaUY2+Ram3k3Y6IBAcmcG
-        F7wCDgcgIUSBGo2t6mohwZWGrw==
-X-Google-Smtp-Source: ABdhPJwQ2yMvsmOkmjBGk1RNf+ZtdAyFRBbCtE4QFFxzuNQPc/YA+n/Dc1l17R+DDv+4nNVGNwX7BQ==
-X-Received: by 2002:a65:44c4:: with SMTP id g4mr5704209pgs.103.1639524075943;
-        Tue, 14 Dec 2021 15:21:15 -0800 (PST)
-Received: from localhost.localdomain ([50.39.160.154])
-        by smtp.gmail.com with ESMTPSA id l26sm103826pgm.67.2021.12.14.15.21.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Dec 2021 15:21:15 -0800 (PST)
-From:   Tadeusz Struk <tadeusz.struk@linaro.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Tadeusz Struk <tadeusz.struk@linaro.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        kvm@vger.kernel.org, stable@vger.kernel.org,
-        syzbot+6cde2282daa792c49ab8@syzkaller.appspotmail.com
-Subject: [PATCH RFC] KVM: x86/mmu: fix UAF in paging_update_accessed_dirty_bits
-Date:   Tue, 14 Dec 2021 15:20:39 -0800
-Message-Id: <20211214232039.851405-1-tadeusz.struk@linaro.org>
-X-Mailer: git-send-email 2.33.1
+        id S238390AbhLOAIH convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Tue, 14 Dec 2021 19:08:07 -0500
+Received: from bizcloud-diss.on.ca ([147.182.156.70]:44526 "EHLO
+        bizcloud-diss.on.ca" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S234512AbhLOAIG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Dec 2021 19:08:06 -0500
+X-Greylist: delayed 2354 seconds by postgrey-1.27 at vger.kernel.org; Tue, 14 Dec 2021 19:08:06 EST
+Received: from ip224.ip-5-39-25.eu (bizcloud-diss.on.ca [IPv6:::1])
+        by bizcloud-diss.on.ca (Postfix) with ESMTP id 6A1A71A92B4
+        for <kvm@vger.kernel.org>; Tue, 14 Dec 2021 23:21:26 +0000 (UTC)
+Reply-To: luisfernandezconsultant@gmail.com
+From:   Luis Fernandez <luisfernandezfirm@consultant.com>
+To:     kvm@vger.kernel.org
+Subject: Re:Mutual Investment Proposal
+Date:   14 Dec 2021 15:21:25 -0800
+Message-ID: <20211214152125.6C448A4DC805D9A6@consultant.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain;
+        charset="utf-8"
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Syzbot reported an use-after-free bug in update_accessed_dirty_bits().
-Fix this by checking if the memremap'ed pointer is still valid.
+Good Day,
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: Wanpeng Li <wanpengli@tencent.com>
-Cc: Jim Mattson <jmattson@google.com>
-Cc: Joerg Roedel <joro@8bytes.org>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: Borislav Petkov <bp@alien8.de>
-Cc: Dave Hansen <dave.hansen@linux.intel.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: <x86@kernel.org>
-Cc: <kvm@vger.kernel.org>
-Cc: <stable@vger.kernel.org>
-Fixes: bd53cb35a3e9 ("X86/KVM: Handle PFNs outside of kernel reach when touching GPTEs")
-Link: https://syzkaller.appspot.com/bug?id=6cb6102a0a7b0c52060753dd62d070a1d1e71347
-Reported-by: syzbot+6cde2282daa792c49ab8@syzkaller.appspotmail.com
-Signed-off-by: Tadeusz Struk <tadeusz.struk@linaro.org>
----
- arch/x86/kvm/mmu/paging_tmpl.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+My name is Luis Fernandez, I am contacting you because we have 
+investors that have the capacity to invest in any massive project 
+in your country or invest in your existing project that requires 
+funding.
+Kindly get back to me for more details.
 
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 708a5d297fe1..5cf4815d1c45 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -174,7 +174,7 @@ static int FNAME(cmpxchg_gpte)(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
- 		pfn = ((vaddr - vma->vm_start) >> PAGE_SHIFT) + vma->vm_pgoff;
- 		paddr = pfn << PAGE_SHIFT;
- 		table = memremap(paddr, PAGE_SIZE, MEMREMAP_WB);
--		if (!table) {
-+		if (!table || !access_ok(table, PAGE_SIZE)) {
- 			mmap_read_unlock(current->mm);
- 			return -EFAULT;
- 		}
--- 
-2.33.1
 
+Regards
+
+Luis Fernandez
