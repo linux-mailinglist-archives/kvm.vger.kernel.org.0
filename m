@@ -2,198 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 819DD474564
-	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 15:41:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BF7384745BB
+	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 15:59:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235013AbhLNOl6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Dec 2021 09:41:58 -0500
-Received: from mga09.intel.com ([134.134.136.24]:48217 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229944AbhLNOly (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Dec 2021 09:41:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1639492914; x=1671028914;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=jL/IUDRxOtRx/uk3ggiimChryhHbP6FKJ1B/81jycpA=;
-  b=ERPh1olO083c+HEslZPbCPpDAbMZ3FHAmWwM6dEcNXUS+N3jX7DftTIx
-   aS0cglK7pl6mv3PI8Mks2FEFRzZeeutIAlgwGk6VE2Ek5LufvBBgSbrbi
-   CJkKuahjvVvpIM0S7wXDGwMFlm762GBuMK41jfjK3PcKkWF07ywEte8BD
-   elMIRxIk/WdDDpXGN1NdwP5GSsD+7pnf64i4tRBvj2F69OXayEuQYBdO/
-   Y/dxydd+g0rq+GsFm2av1GLp50EDmdJ+Uh7A1E+2G0Mu7UQaeF/KlS5D0
-   hvT1ODofyBOS9ERxXZduB/hO9nMZPx3mmxEqAJkjHXeYIC0roOfQIF2KJ
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10197"; a="238801188"
-X-IronPort-AV: E=Sophos;i="5.88,205,1635231600"; 
-   d="scan'208";a="238801188"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Dec 2021 06:41:53 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,205,1635231600"; 
-   d="scan'208";a="661401099"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by fmsmga001.fm.intel.com with ESMTP; 14 Dec 2021 06:41:53 -0800
-Received: from fmsmsx609.amr.corp.intel.com (10.18.126.89) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Tue, 14 Dec 2021 06:41:53 -0800
-Received: from fmsmsx606.amr.corp.intel.com (10.18.126.86) by
- fmsmsx609.amr.corp.intel.com (10.18.126.89) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Tue, 14 Dec 2021 06:41:52 -0800
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx606.amr.corp.intel.com (10.18.126.86) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20 via Frontend Transport; Tue, 14 Dec 2021 06:41:52 -0800
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.168)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2308.20; Tue, 14 Dec 2021 06:41:51 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Hq1Ma8tfM62G2Uzx8aNWF0YFUC4rz/uLULhdGscWJ9IUJzJQ+OcdXjUrTnb8Uv47m+NuP1Gh+pLuZozvo8qjCRIvVVyT3GqTATXAUEqkmyTXuGzWODBDWNaMKNLPmyVP2xRYfqNzhed5XkMIlDH924guWkfvA2x7UmQuxw+dbyk4YNO8IJyqGj+SlP2uPfiOH3xB+0LGfHLW1m+jr4Q620L7hjtysIUtkW+ruxVHL0PfxSzhUcPXw1iumygIZwsOR4O21MBPU99fd7LBR8LL++0VM1exaYaWXiFTbD2HZV1PVrksLFTs+7Z6QEa72+4oh5os7G3n8B5GDJumyRSsAw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jL/IUDRxOtRx/uk3ggiimChryhHbP6FKJ1B/81jycpA=;
- b=e/4gmeeeYBMM8DnNGRzF46gaelSuj5ZqkYN5F44JVTXX+F7YvHOul0u74hFAaposAweMyx1PyxmuS5X8eGCdw8mhZlrKC+rXNRlE1lt5Pa2QYv689FwwkXBlzOILRoJmTaYGMh4YdLt9MY6izWVghVFwS92PgKc/f1CQHgiVk9UCNXd5bLfqpChQmzK7emnSljHbkau7e2l+QoD2XbIh/Vw7QhziGteAgYOf2qBQCbXs5zLuomwrzbvjic441qeEhjscdVm94pf9KbxK7v+8Oa2SJKtOMZUBjrPtoo9mhJOiLbHYhOPxS1MGbti3VVqTXJPPAd8yHXqWxDaxSN9qXQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jL/IUDRxOtRx/uk3ggiimChryhHbP6FKJ1B/81jycpA=;
- b=BxE2eueWKBN/KyPhrfwyl1Fbf9K7dxSMxBeFg3YdZ1zMnH07zCcfGWR16j9RDOqF2SmgptofM/MB43Dm5aCLnx2jJM1N3k/HF8hr2/awQreReVaPWPboFWxbDGSuGbXXK7Js4kT0fJdg/tP0bfINQS5tr8bHiYCt/4ah/U4gGCo=
-Received: from MWHPR11MB1245.namprd11.prod.outlook.com (2603:10b6:300:28::11)
- by MWHPR11MB1453.namprd11.prod.outlook.com (2603:10b6:301:c::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4801.14; Tue, 14 Dec
- 2021 14:41:46 +0000
-Received: from MWHPR11MB1245.namprd11.prod.outlook.com
- ([fe80::9dd3:f8f0:48a8:1506]) by MWHPR11MB1245.namprd11.prod.outlook.com
- ([fe80::9dd3:f8f0:48a8:1506%12]) with mapi id 15.20.4778.018; Tue, 14 Dec
- 2021 14:41:46 +0000
-From:   "Liu, Jing2" <jing2.liu@intel.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "Zhong, Yang" <yang.zhong@intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>
-CC:     "Christopherson,, Sean" <seanjc@google.com>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        "jing2.liu@linux.intel.com" <jing2.liu@linux.intel.com>
-Subject: RE: [PATCH 09/19] kvm: x86: Prepare reallocation check
-Thread-Topic: [PATCH 09/19] kvm: x86: Prepare reallocation check
-Thread-Index: AQHX63yAPk/dUCWBwkiolv7SwM9W3awwLT2AgAFuEgCAADT1AIAASDcQ
-Date:   Tue, 14 Dec 2021 14:41:46 +0000
-Message-ID: <MWHPR11MB12453B3CE026CE7087C29E3FA9759@MWHPR11MB1245.namprd11.prod.outlook.com>
-References: <20211208000359.2853257-1-yang.zhong@intel.com>
- <20211208000359.2853257-10-yang.zhong@intel.com>
- <fc113a81-b5b8-aaae-5799-c6d49b77b2b4@redhat.com>
- <BN9PR11MB5276416CED5892C20F56EB888C759@BN9PR11MB5276.namprd11.prod.outlook.com>
- <d513db49-bb94-becf-be7e-f26dceb3e1bf@redhat.com>
-In-Reply-To: <d513db49-bb94-becf-be7e-f26dceb3e1bf@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-reaction: no-action
-dlp-version: 11.6.200.16
-dlp-product: dlpe-windows
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: eada8e3b-3fc7-44f1-d535-08d9bf0fda94
-x-ms-traffictypediagnostic: MWHPR11MB1453:EE_
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-microsoft-antispam-prvs: <MWHPR11MB14538C93829D417A91D06BBEA9759@MWHPR11MB1453.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: QaFZ63jroo4aDPCZyyvjf+kK4vfPEwuVonj/5p9BVB7Aas50fLXzQsfSGwiL5TGImVTnAozihgdU2n4nz7aWkzLKZy95TMWunQ+COlCM7iRZOW39cAmCKSJ+AjqEDxSLa9KUYKbYkwnzkQtbAgflt7SyzonwJaPegvmgCSvjR1u24E+MLoHY5OXbXcF0xn5T6FgbkLgs4z035WFbMLajOVmVF8Li6LlpEUfBTEEd0LSkaqM37Aub5sTRQ+f2Lk258rTqtyGGpYPCab49haAenLe4BTwhch0s9ALGjX36XM+GlhIAnQy30dPZBhtvTm0efEku1RzC2F9hm5nrH7EOl1IxhkC5E8eiJURc9KBK/T9T6H8UGxund4175mgu4bn7VA+WAwZfg/iL5GoWBSh6Nv5yu/UOz2q8idqWjmw/7cmT8E6jmPIONuNiZw3LVcvdqt4cJixflSnKkovF7Icm9cYgZd2MXNoCUrCoKQjor/nY8em+9mzcdCzRpb27frdfixWfJjSuzUqT3yx+n73jLJ5Y7+5bg4dv4hYFbpjT7+/GaVPdtV4ItDi42oMEvw4ArUMD6Sv+P9LlO1H22aD0w6vkZ9MPCkZSUkDdGf7TIUrzFE4a+kDbnvOmymlJbm+4B4UroG3+nt/6az+SUkAws4ko0UBKvivLdIXZyG5CatxtP15bHmpz2b6r5T6DBcxVVldFhgvw/qBjLnfaH5Igd4SN6k8jv6psX0O7eGC+4y+C+TAW9VcoaK7mo3+xn5//
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR11MB1245.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(110136005)(4326008)(26005)(82960400001)(8676002)(55016003)(66446008)(921005)(316002)(86362001)(64756008)(66556008)(122000001)(54906003)(38100700002)(186003)(71200400001)(7416002)(8936002)(508600001)(5660300002)(6506007)(53546011)(76116006)(38070700005)(66946007)(7696005)(33656002)(52536014)(83380400001)(2906002)(9686003)(66476007)(13296009);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?MTIxeHgycGpsdTBBWW1pZDlFRVRSb0ZqRjR0MzNiS0FaV2lTNUF4WVdFYVFO?=
- =?utf-8?B?bURCL1Y3anY3WlZPMjQvdDVocDZ6a0FDdVVKdE9BL0pwRWE4NUlhNm9NSmtT?=
- =?utf-8?B?SEYvQWZEZUVnK0o4VGJPQkZsTGkyNHdUTEhVdkNFTW5xYjZDZkxtRjUwSUc1?=
- =?utf-8?B?SVNXekt2WVlSVUJ1RkpHeUJWVXNoWFJHMGZvVkMrK1o5ZENRUlhBRjkrTEtY?=
- =?utf-8?B?ZjkvMEJFZ2I3RjQvcHkvZzNCK0o1Ty90d2V2KzhwUG1jd3Q4ZjRCOWVFU3lD?=
- =?utf-8?B?YnhLcVFQV0hmei9nY1RVYmYyS0w0enA0eGpsdTJRRGRxaUU5a3FTQVJybUM2?=
- =?utf-8?B?Y1loME5CRlZIa0FxQUFvQkFqM0tTUG9nV0hMVmdWZTFrMWdJWU1CaERKeUpo?=
- =?utf-8?B?dUZlL1UrNCt3b0VoTUxjOVBZcG5CcUlWeExzUk5oVkdBRTBwRk9mOGhrWTRF?=
- =?utf-8?B?bFNSNU5ZL3g5QlUzNGZSZUZHM1NDbm5VSVZCNXJkR3cwaEFoKytmWG9hczYy?=
- =?utf-8?B?UTdjSU5LVE1mSi9FNHM3cXgxOHZrNDV1YllQdGkxU1puY1VFZk5PNUUrREJV?=
- =?utf-8?B?N21yZmJYWkdHWkxKcDE0d0s5bmlSeEJjSTRMZWVsRWZlOWE3NERMNWloTHU5?=
- =?utf-8?B?b0hUbnRZdW9jNlYwb2FjdkZ0SnJ6c0k4U2dKMERXZGJsYWFac1pnK0hWMmlT?=
- =?utf-8?B?NGtUVU5TUkNLWnpyd0I5UG9hSzV5Z3FFVDN5amRtZkQ2b01heVBTSFZyZjRl?=
- =?utf-8?B?TVNsZjVGN2txK1NYd0ZaMmliejc2cXFRVjRWSUlMeEM3Z1A4ZlFCaHhoeENh?=
- =?utf-8?B?dnBVZzZNZGVpQ3oxNzNXMFQwaUlhVitlblhUaWhHQ0tBTWZ5aHE5aEl0SkpZ?=
- =?utf-8?B?Z3pPemNSaWlQeEpFRytsdDVUclQ3cTcrYXZFRm92MWs1WTNwN1IyVURpOG1n?=
- =?utf-8?B?ZGFVVXBNWHgvdWtGRUVZUjU0ZTlYaXVwblBFOTB4WFRTMXhwR05zMFVCalpx?=
- =?utf-8?B?MzJsQ012bkVTMlhMdHNYVVUveEJ4a1owUE9SSjFtVjFGUTBBaTRUdFc3elQ5?=
- =?utf-8?B?VCtlWThFUkRGaktNZTdMelJGdE9HSUF5aWdKeWs0S0sxemZzTzM5YkNtUitx?=
- =?utf-8?B?elRNdUsrTVJXOXhIK1hYOGZvU3FQb3NiV2Z5RXNGWTFwTHpKL1ByRktyU3Vt?=
- =?utf-8?B?dFczc3czaHNRdWdRTVRCWG02TUVjQTUrVzZCbTlTOE51bHdQdDZjd05ZaFZE?=
- =?utf-8?B?ZEI4QnQ3RDQrNTJUN3dCdndHT1dDOG9VQ2JRdTdOeGFHbU9uRVlmSG1SRWlr?=
- =?utf-8?B?SjN4MUQ4bWpQcFA1eTArbDF5eUFYSU44em9kb0tlQjRwVzlSM0FrNDRnSzZG?=
- =?utf-8?B?TktIWmFCd2ZkUTZ5VFI0SHlRMW5XSzJ5SkU2Mnd2OFVxQ2xXV1pQaXJWSjha?=
- =?utf-8?B?dnZJT2RuUkRmQ09hdTZkSUpPc3gxNXJiZWJyVjB6bW9DY092bitBSG9yd21J?=
- =?utf-8?B?TlJpMGZ0VVY0SnpIdDQ5RlBDTVRXK0NaY3hybm1QcFFNWWxiYzlueTloRk1D?=
- =?utf-8?B?VHZnQ2ZIN1IwZDFFbXdNelVIa2xkVkJuK0l5UjNZcVpHZUpBdjl1UGhzQTRp?=
- =?utf-8?B?bm56SmlWT1YwVVkyR0Z3cVU0dFVJTDhFbDVGeWs0YXorWDNMcmU4TEgyazRX?=
- =?utf-8?B?WjVMckp3ZDZnNWc3Ym9MR2ZlbXFSQTAxdTRMQWpLOVNlRVdNVDFEWmJONklF?=
- =?utf-8?B?a1BOOGkzZklaSXNKQWtkaWphemEvVmdzUVJsL3d2K2pnT0taL2E0d2FuWi9k?=
- =?utf-8?B?aVhvY2NBYm1iWE9nZVVsQ2E1MDBUWEJ4a0VXRnpzVGJ6eFRRemFySXAvNjll?=
- =?utf-8?B?MElIT3VnWWxYVStLUkJXTXBNejZXZjhqbXdQU2tqemRBVHNpLzkvZldjTjV2?=
- =?utf-8?B?cW9sTXB0UFlxb0hUeVFJeXdRYWxJU1RnMHg3MW5UbHU0R0FBRklBQXl0U2pr?=
- =?utf-8?B?UlRhK3d4OEZKc1JmYXJHbmVLcXNjWGNsVTFjY01Ta3F6OWpFTElER2lWak5X?=
- =?utf-8?B?RkdPSjYvOU9KQkRJYkxyUnJkU1BaaGNOZ3p1aFhWVURvMjZkZ1pLWDJEdzRk?=
- =?utf-8?B?c1JQQzJJRVVDTVl4SWZ5K1RBSW1ZQVdYYXBwVDZkZU16dWNVR0xwQmNSWEVZ?=
- =?utf-8?Q?6uimU3P3mxHx4tOdjyDz3eg=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S235028AbhLNO7Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Dec 2021 09:59:25 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:46888 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232616AbhLNO7X (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 14 Dec 2021 09:59:23 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1BEEmXYU021242;
+        Tue, 14 Dec 2021 14:59:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=MzM9dBEun0fHvPVR9vM3PuPGKzAZl/8OMytYz2PWxRo=;
+ b=KDOqhKMlA4sYfoWlWwU6Gg/bMRYBJgf1wWQKk/ykRHa43QHjVm79FtqMzAF++ZntXcXT
+ MknMk84RPdqS7iEhiPIXrV0I1k1yRfDJJfV6UxYCteR4b4stSjAkt9UY5eBvWMZ5hc2d
+ RblxeNa+fQjy6sAKaXteILboy4mjpe3CwJJSkoQC7nX/NwakiF29FeOaoAr8QzA3dQOu
+ +4hHLH8y7a1sAfpoNchB1RUfeCJjSxrD5ldWlGvxO81xDWnqcveOOFM8rv2d6LGEsWsL
+ 9B9sAOIsy4cuK0J86MFhRE/TBmzKKvmsYW5U3swZ4/ptumSPoCjq/qihhkjI8Ave1Dob 1g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cx9rafved-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 14 Dec 2021 14:59:22 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1BEEwROh005839;
+        Tue, 14 Dec 2021 14:59:21 GMT
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cx9rafvdw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 14 Dec 2021 14:59:21 +0000
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1BEEWBUJ014727;
+        Tue, 14 Dec 2021 14:59:20 GMT
+Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
+        by ppma01wdc.us.ibm.com with ESMTP id 3cvkmagd14-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 14 Dec 2021 14:59:20 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1BEExJjx50069914
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 14 Dec 2021 14:59:19 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1F3F1AC075;
+        Tue, 14 Dec 2021 14:59:19 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6BC5FAC060;
+        Tue, 14 Dec 2021 14:59:13 +0000 (GMT)
+Received: from [9.211.79.24] (unknown [9.211.79.24])
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+        Tue, 14 Dec 2021 14:59:13 +0000 (GMT)
+Message-ID: <bb401f7d-7b2d-15ef-51c8-2c63be70f04c@linux.ibm.com>
+Date:   Tue, 14 Dec 2021 09:59:11 -0500
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MWHPR11MB1245.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: eada8e3b-3fc7-44f1-d535-08d9bf0fda94
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Dec 2021 14:41:46.0818
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: r+MkgeUJBoVTHCj8xyweLdW4+3Gv8IeGq0oBFa95u2I5UGvXC7pODOAgG3dz6sN7HE16GRxvvv8ziSLFSj1PTw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR11MB1453
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH 30/32] vfio-pci/zdev: add DTSM to clp group capability
+Content-Language: en-US
+To:     Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
+        schnelle@linux.ibm.com, farman@linux.ibm.com,
+        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
+        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
+        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20211207205743.150299-1-mjrosato@linux.ibm.com>
+ <20211207205743.150299-31-mjrosato@linux.ibm.com>
+ <b54b2ee9-3d7f-11b7-9aa4-e5dafd01a086@linux.ibm.com>
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+In-Reply-To: <b54b2ee9-3d7f-11b7-9aa4-e5dafd01a086@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: hzmXHhR6DxiFNB1VzwWaSFX3vuC_vCxw
+X-Proofpoint-ORIG-GUID: UPfsLR96wmCl1CfsA1dgUK9C7cBrYbnc
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2021-12-14_06,2021-12-14_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ malwarescore=0 clxscore=1015 priorityscore=1501 spamscore=0 bulkscore=0
+ mlxlogscore=999 lowpriorityscore=0 mlxscore=0 adultscore=0 phishscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2112140084
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQpPbiAxMi8xNC8yMDIxIDY6MTYgUE0sIFBhb2xvIEJvbnppbmkgd3JvdGU6DQo+IA0KPiBPbiAx
-Mi8xNC8yMSAwODowNiwgVGlhbiwgS2V2aW4gd3JvdGU6DQo+ID4+IC0gaWYgKGR5bmFtaWNfZW5h
-YmxlZCAmIH5ndWVzdF9mcHUtPnVzZXJfcGVybSkgIT0gMCwgdGhlbiB0aGlzIGlzIGENCj4gPj4g
-dXNlcnNwYWNlIGVycm9yIGFuZCB5b3UgY2FuICNHUCB0aGUgZ3Vlc3Qgd2l0aG91dCBhbnkgaXNz
-dWUuDQo+ID4+IFVzZXJzcGFjZSBpcyBidWdneQ0KPiA+DQo+ID4gSXMgaXQgYSBnZW5lcmFsIGd1
-aWRlbGluZSB0aGF0IGFuIGVycm9yIGNhdXNlZCBieSBlbXVsYXRpb24gaXRzZWxmIChlLmcuDQo+
-ID4gZHVlIHRvIG5vIG1lbW9yeSkgY2FuIGJlIHJlZmxlY3RlZCBpbnRvIHRoZSBndWVzdCBhcyAj
-R1AsIGV2ZW4gd2hlbg0KPiA+IGZyb20gZ3Vlc3QgcC5vLnYgdGhlcmUgaXMgbm90aGluZyB3cm9u
-ZyB3aXRoIGl0cyBzZXR0aW5nPw0KPiANCj4gTm8gbWVtb3J5IGlzIGEgdHJpY2t5IG9uZSwgaWYg
-cG9zc2libGUgaXQgc2hvdWxkIHByb3BhZ2F0ZSAtRU5PTUVNIHVwIHRvDQo+IEtWTV9SVU4gb3Ig
-S1ZNX1NFVF9NU1IuICBCdXQgaXQncyBiYXNpY2FsbHkgYW4gaW1wb3NzaWJsZSBjYXNlIGFueXdh
-eSwNCj4gYmVjYXVzZSBldmVuIHdpdGggOEsgVElMRURBVEEgd2UncmUgd2l0aGluIHRoZSBsaW1p
-dCBvZg0KPiBQQUdFX0FMTE9DX0NPU1RMWV9PUkRFUi4NCj4gDQo+IFNvLCBzaW5jZSBpdCdzIG5v
-dCBlYXN5IHRvIGRvIGl0IHJpZ2h0IG5vdywgd2UgY2FuIGxvb2sgYXQgaXQgbGF0ZXIuDQoNCkZv
-ciB0aGUgd2F5IGhhbmRsaW5nIHhjcjAgYW5kIHhmZCBpb2N0bCBmYWlsdXJlLCB4Y3IwIGFuZCB4
-ZmQgaGF2ZSANCmRpZmZlcmVudCBoYW5kbGluZ3MuIEN1cnJlbnQgS1ZNX1NFVF9YQ1JTIHJldHVy
-bnMgLUVJTlZBTCB0byANCnVzZXJzcGFjZS4gS1ZNX1NFVF9NU1IgaXMgYWx3YXlzIGFsbG93ZWQg
-YXMgdGhlIGRpc2N1c3Npb24gaW4gDQphbm90aGVyIHRocmVhZC4NCg0KU28gSSdtIHRoaW5raW5n
-IGlmIHJlYWxsb2NhdGlvbiBmYWlsdXJlIGluIEtWTV9TRVRfWENSUyBhbmQgDQpLVk1fU0VUX01T
-UiAobWF5IGR1ZSB0byBOT01FTSBvciBFUEVSTSBvciBFTk9UU1VQUCksIA0Kd2hhdCBpcyB0aGUg
-d2F5IHdlIHdvdWxkIGxpa2UgdG8gY2hvb3NlPw0KDQpUaGFua3MsDQpKaW5nDQogDQo+IFBhb2xv
-DQo=
+On 12/14/21 4:58 AM, Pierre Morel wrote:
+> 
+> 
+> On 12/7/21 21:57, Matthew Rosato wrote:
+>> The DTSM, or designation type supported mask, indicates what IOAT formats
+>> are available to the guest.  For an interpreted device, userspace will 
+>> not
+>> know what format(s) the IOAT assist supports, so pass it via the
+>> capability chain.  Since the value belongs to the Query PCI Function 
+>> Group
+>> clp, let's extend the existing capability with a new version.
+>>
+>> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+>> ---
+>>   drivers/vfio/pci/vfio_pci_zdev.c | 9 ++++++---
+>>   include/uapi/linux/vfio_zdev.h   | 3 +++
+>>   2 files changed, 9 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/drivers/vfio/pci/vfio_pci_zdev.c 
+>> b/drivers/vfio/pci/vfio_pci_zdev.c
+>> index 85be77492a6d..342b59ed36c9 100644
+>> --- a/drivers/vfio/pci/vfio_pci_zdev.c
+>> +++ b/drivers/vfio/pci/vfio_pci_zdev.c
+>> @@ -45,19 +45,22 @@ static int zpci_group_cap(struct zpci_dev *zdev, 
+>> struct vfio_info_cap *caps)
+>>   {
+>>       struct vfio_device_info_cap_zpci_group cap = {
+>>           .header.id = VFIO_DEVICE_INFO_CAP_ZPCI_GROUP,
+>> -        .header.version = 1,
+>> +        .header.version = 2,
+>>           .dasm = zdev->dma_mask,
+>>           .msi_addr = zdev->msi_addr,
+>>           .flags = VFIO_DEVICE_INFO_ZPCI_FLAG_REFRESH,
+>>           .mui = zdev->fmb_update,
+>>           .noi = zdev->max_msi,
+>>           .maxstbl = ZPCI_MAX_WRITE_SIZE,
+> 
+> This, maxstbl, is not part of the patch but shouldn't we consider it too?
+> The maxstbl is fixed for intercepted VFIO because the kernel is handling 
+> the STBL instruction in behalf of the guest.
+> Here the guest will use STBL directly.
+> 
+> I think we should report the right maxstbl value.
+> 
+
+I think we are OK, I think you missed the line that does this already, 
+it was added in patch 27 when we wire up interpretive execution.  So, 
+here we are defaulting to reporting ZPCI_MAX_WRITE_SIZE, and then ...
+
+>> -        .version = zdev->version
+>> +        .version = zdev->version,
+>> +        .dtsm = 0
+>>       };
+>>       /* Some values are different for interpreted devices */
+>> -    if (zdev->kzdev && zdev->kzdev->interp)
+>> +    if (zdev->kzdev && zdev->kzdev->interp) {
+>>           cap.maxstbl = zdev->maxstbl;
+
+... Here we overwrite this with the hardware value only for interpreted 
+devices.  Just like we are also now additionally doing for DTSM with 
+this patch.
+
+>> +        cap.dtsm = kvm_s390_pci_get_dtsm(zdev);
+>> +    }
+>>       return vfio_info_add_capability(caps, &cap.header, sizeof(cap));
+>>   }
+>> diff --git a/include/uapi/linux/vfio_zdev.h 
+>> b/include/uapi/linux/vfio_zdev.h
+>> index 1a5229b7bb18..b4c2ba8e71f0 100644
+>> --- a/include/uapi/linux/vfio_zdev.h
+>> +++ b/include/uapi/linux/vfio_zdev.h
+>> @@ -47,6 +47,9 @@ struct vfio_device_info_cap_zpci_group {
+>>       __u16 noi;        /* Maximum number of MSIs */
+>>       __u16 maxstbl;        /* Maximum Store Block Length */
+>>       __u8 version;        /* Supported PCI Version */
+>> +    /* End of version 1 */
+>> +    __u8 dtsm;        /* Supported IOAT Designations */
+>> +    /* End of version 2 */
+>>   };
+>>   /**
+>>
+> 
+
