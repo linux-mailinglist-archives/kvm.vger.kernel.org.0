@@ -2,75 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 49049473A1F
-	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 02:19:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0ED5E473AE5
+	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 03:50:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243098AbhLNBTN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Dec 2021 20:19:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50970 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237215AbhLNBTN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Dec 2021 20:19:13 -0500
-Received: from mail-yb1-xb2e.google.com (mail-yb1-xb2e.google.com [IPv6:2607:f8b0:4864:20::b2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE420C061574
-        for <kvm@vger.kernel.org>; Mon, 13 Dec 2021 17:19:12 -0800 (PST)
-Received: by mail-yb1-xb2e.google.com with SMTP id f186so42616274ybg.2
-        for <kvm@vger.kernel.org>; Mon, 13 Dec 2021 17:19:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ZRkndmsDMVuEIH+6KsPSMK2F22PPxmnCH8dPJZ239sA=;
-        b=rNSQG5PRTClLXS1K5OYsTfmHHAax4N65XcACquxpJyEiMNRNqdyAjf3eI9r8cKYh9J
-         LqBW2wGF6b30ycX0+AabjeH1uQxQjt1+lS3kAiRE7X6vypUz1LmB1CM35lDemDsDDIk1
-         JAStA6aZC7uoTpayvc3FX32UlVPPoZ5hjKfnqepOIhPwczH4O22jPAKoJut3dyA0g7fO
-         itgqOxBnrfUiv7lda9WCWXP8Mj29AvYOtiuXoXRqUkYQoFX4jOwk0Xh3wgW2dLXX+NDi
-         hr4TLM6oR46Ufn2rx+wYfMYTptH1B/v3ZbD8U7cJgYatHg1trfOqPdko97Td/o3rCqyd
-         fnlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ZRkndmsDMVuEIH+6KsPSMK2F22PPxmnCH8dPJZ239sA=;
-        b=OP+eppXhZhq9/T+dLoDRyLCcI4WNHFt9jttmeRlaJJbEVHkXPp7gFp2FZTLjYEgHdW
-         kZfh0AfmgWKjpoycXk+WKLPQDKuZj6Bm+N5xLIVt/w2v+rv/SO2flrInTF2eeZm1HMoD
-         lEwIQ84+jgzF15OCErcJ09Fl30lBk4cfZYIFFO9PuyHLkUGz7mviLySyBVeCo+X9MCYZ
-         PCixqHISRciLf+3BBS/ARsiTOpB+k5BxvrndzbUdSOO711Etk4tgmmy60M6zNHXNTvO8
-         QDlbkj/TCaeMf/oCkEHLmMD++0fLUXQIWXs9XF0lSpKOxMHRhqJog7Eex6S68HaBMehZ
-         Xp4w==
-X-Gm-Message-State: AOAM533MxslfC8Ga9DSwWyIqdpuAyF8ru08dAV3GXcKwuYEuqxjpHV8z
-        vYDa/CFuGgC+af5BEKDJR2ACk+lLj1mNqFiLa0FiIBqCh3k=
-X-Google-Smtp-Source: ABdhPJxgY+gRB3eOLIdsnEE62qAeXY9hPWGv3MHbsJ3OFChAsUE/DvuOZTTvnhQeMqJr1hgFi9OjN0hso9KLc2sy+6w=
-X-Received: by 2002:a25:4cc5:: with SMTP id z188mr2451952yba.248.1639444751847;
- Mon, 13 Dec 2021 17:19:11 -0800 (PST)
+        id S244766AbhLNCuW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Dec 2021 21:50:22 -0500
+Received: from Galois.linutronix.de ([193.142.43.55]:38678 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232754AbhLNCuV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Dec 2021 21:50:21 -0500
+Message-ID: <20211214022825.563892248@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1639450220;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=RS8w1ntWF9Elwuw8NTIMZxe9Vi1YIjkM8chgJOO0tOU=;
+        b=Ko9KW253p+Pnqc0ljxTNZvXGs5G1vhHoZivIyKKsyRlPRBP8JlOR3JimcdGbeoiZcC8oBN
+        9kInyS+Cw4zSai8CWGIGFvt5HPFXQD/LfffxOsr0m45MTrWR+TDYsfYE/TX/P9btOHJXuk
+        cyT0lHFBkCrtTAcxp1UfNRURed/s3/EjqsRyHIan1wCyzVYZSakGDxy7Zg94akVQCllWnp
+        XuW1MUw475aCn/sYIlogVIxjntcF1t0HlMjWEOBwkamwVjdcvDt9j9Vd67rItdN+t7D3xo
+        iHEnQfMUFWmEzUKh4QMN4j1NtwwOzvil84mVuxUsrIcjKPYjglR/k6g0cT/uMw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1639450220;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=RS8w1ntWF9Elwuw8NTIMZxe9Vi1YIjkM8chgJOO0tOU=;
+        b=QTxM0AHYjaaJ/GYwJrtmPIyZViJj0SbzYHYZCYkvQP8IEbviPQCDT4z16YFeuIOSDba/+i
+        H5VoszeBzwnbYVAg==
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     LKML <linux-kernel@vger.kernel.org>
+Cc:     Jing Liu <jing2.liu@linux.intel.com>,
+        Yang Zhong <yang.zhong@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org,
+        kvm@vger.kernel.org, Sean Christoperson <seanjc@google.com>,
+        Jin Nakajima <jun.nakajima@intel.com>,
+        Kevin Tian <kevin.tian@intel.com>
+Subject: [patch 0/6] x86/fpu: Preparatory changes for guest AMX support
 MIME-Version: 1.0
-References: <20211209182624.2316453-1-aaronlewis@google.com>
- <20211209182624.2316453-4-aaronlewis@google.com> <YbJx1iB9ZowrVcuF@google.com>
-In-Reply-To: <YbJx1iB9ZowrVcuF@google.com>
-From:   Aaron Lewis <aaronlewis@google.com>
-Date:   Tue, 14 Dec 2021 01:19:00 +0000
-Message-ID: <CAAAPnDH9ghcFid5_b-US6o0eMyLFSCBWXBASbV_PB92srzdO6A@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH 3/3] x86: Add test coverage for the routing
- logic when exceptions occur in L2
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Date:   Tue, 14 Dec 2021 03:50:19 +0100 (CET)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> Having a gigantic asm blob is also unnecessary.  #GP can be generated with a
-> non-canonical access purely in C.  Ditto for #AC though that may or may not be
-> more readable.  #DE probably requires assembly to avoid compiler intervention.
-
-For #AC I'd prefer to leave this in ASM.  To get this to work in C I
-had to trick the compiler to not optimize the code away and when I was
-playing with it in compiler explorer clang seemed to outsmart my
-unaligning access with an aligned one which defeated the purpose.  It
-seems more reliable for what I want to leave it in ASM.
-
-> #UD and #BP should be short and sweet.  E.g.
->
-> It should be fairly straightforward to create a framework to handle running each
-> test, a la the vmx_tests array.  E.g. something like the below (completely untested).
-> This way there's no need to skip instructions, thus no need for a exposing a bunch
+Rm9sa3MsCgp0aGlzIGlzIGEgZm9sbG93IHVwIHRvIHRoZSBpbml0aWFsIHNrZXRjaCBvZiBwYXRj
+aGVzIHdoaWNoIGdvdCBwaWNrZWQgdXAgYnkKSmluZyBhbmQgaGF2ZSBiZWVuIHBvc3RlZCBpbiBj
+b21iaW5hdGlvbiB3aXRoIHRoZSBLVk0gcGFydHM6CgogICBodHRwczovL2xvcmUua2VybmVsLm9y
+Zy9yLzIwMjExMjA4MDAwMzU5LjI4NTMyNTctMS15YW5nLnpob25nQGludGVsLmNvbQoKVGhpcyB1
+cGRhdGUgaXMgb25seSB0b3VjaGluZyB0aGUgeDg2L2ZwdSBjb2RlIGFuZCBub3QgY2hhbmdpbmcg
+YW55dGhpbmcgb24KdGhlIEtWTSBzaWRlLgoKICAgIEJJRyBGQVQgV0FSTklORzogVGhpcyBpcyBj
+b21waWxlIHRlc3RlZCBvbmx5IQoKSW4gY291cnNlIG9mIHRoZSBkaWNzdXNzaW9uIG9mIHRoZSBh
+Ym92ZSBwYXRjaHNldCBpdCB0dXJuZWQgb3V0IHRoYXQgdGhlcmUKYXJlIGEgZmV3IGNvbmNlcHR1
+YWwgaXNzdWVzIHZzLiBoYXJkd2FyZSBhbmQgc29mdHdhcmUgc3RhdGUgYW5kIGFsc28KdnMuIGd1
+ZXN0IHJlc3RvcmUuCgpUaGlzIHNlcmllcyBhZGRyZXNzZXMgdGhpcyB3aXRoIHRoZSBmb2xsb3dp
+bmcgY2hhbmdlcyB2cy4gdGhlIG9yaWdpbmFsCmFwcHJvYWNoOgoKICAxKSBmcHN0YXRlIHJlYWxs
+b2NhdGlvbiBpcyBub3cgaW5kZXBlbmRlbnQgb2YgZnB1X3N3YXBfa3ZtX2Zwc3RhdGUoKQoKICAg
+ICBJdCBpcyB0cmlnZ2VyZWQgZGlyZWN0bHkgdmlhIFhTRVRCViBhbmQgWEZEIE1TUiB3cml0ZSBl
+bXVsYXRpb24gd2hpY2gKICAgICBhcmUgdXNlZCBib3RoIGZvciBydW50aW1lIGFuZCByZXN0b3Jl
+IHB1cnBvc2VzLgoKICAgICBGb3IgdGhpcyBpdCBwcm92aWRlcyB0d28gd3JhcHBlcnMgYXJvdW5k
+IGEgY29tbW9uIHVwZGF0ZSBmdW5jdGlvbiwgb25lCiAgICAgZm9yIFhDUjAgYW5kIG9uZSBmb3Ig
+WEZELgoKICAgICBCb3RoIGNoZWNrIHRoZSB2YWxpZGl0eSBvZiB0aGUgYXJndW1lbnRzIGFuZCB0
+aGUgY29ycmVjdCBzaXppbmcgb2YgdGhlCiAgICAgZ3Vlc3QgRlBVIGZwc3RhdGUuIElmIHRoZSBz
+aXplIGlzIG5vdCBzdWZmaWNpZW50LCBmcHN0YXRlIGlzCiAgICAgcmVhbGxvY2F0ZWQuCgogICAg
+IFRoZSBmdW5jdGlvbnMgY2FuIGZhaWwuCgogIDIpIFhGRCBzeW5jaHJvbml6YXRpb24KCiAgICAg
+S1ZNIG11c3QgbmVpdGhlciB0b3VjaCB0aGUgWEZEIE1TUiBub3IgdGhlIGZwc3RhdGUtPnhmZCBz
+b2Z0d2FyZSBzdGF0ZQogICAgIGluIG9yZGVyIHRvIGd1YXJhbnRlZSBzdGF0ZSBjb25zaXN0ZW5j
+eS4KCiAgICAgSW4gdGhlIE1TUiB3cml0ZSBlbXVsYXRpb24gY2FzZSB0aGUgWEZEIHNwZWNpZmlj
+IHVwZGF0ZSBoYW5kbGVyIGhhcyB0bwogICAgIGJlIGludm9rZWQuIFNlZSAjMQoKICAgICBJZiBN
+U1Igd3JpdGUgZW11bGF0aW9uIGlzIGRpc2FibGVkIGJlY2F1c2UgdGhlIGJ1ZmZlciBzaXplIGlz
+CiAgICAgc3VmZmljaWVudCBmb3IgYWxsIHVzZSBjYXNlcywgaS5lLjoKCiAgICAgCQlndWVzdF9m
+cHU6OnhmZWF0dXJlcyA9PSBndWVzdF9mcHU6OnBlcm0KCiAgICAgdGhlbiB0aGVyZSBpcyBubyBn
+dWFyYW50ZWUgdGhhdCB0aGUgWEZEIHNvZnR3YXJlIHN0YXRlIG9uIFZNRVhJVCBpcwogICAgIHRo
+ZSBzYW1lIGFzIHRoZSBzdGF0ZSBvbiBWTUVOVEVSLgoKICAgICBBIHNlcGFyYXRlIHN5bmNocm9u
+aXphdGlvbiBmdW5jdGlvbiBpcyBwcm92aWRlZCB3aGljaCByZWFkcyB0aGUgWEZECiAgICAgTVNS
+IGFuZCB1cGRhdGVzIHRoZSByZWxldmFudCBzb2Z0d2FyZSBzdGF0ZS4gVGhpcyBmdW5jdGlvbiBo
+YXMgdG8gYmUKICAgICBpbnZva2VkIGFmdGVyIGEgVk1FWElUIGJlZm9yZSByZWVuYWJsaW5nIGlu
+dGVycnVwdHMuCgpXaXRoIHRoYXQgdGhlIEtWTSBsb2dpYyBsb29rcyBsaWtlIHRoaXM6CgogICAg
+IHhzZXRidl9lbXVsYXRlKCkKCXJldCA9IGZwdV91cGRhdGVfZ3Vlc3RfeGNyMCgmdmNwdS0+YXJj
+aC5ndWVzdF9mcHUsIHhjcjApOwoJaWYgKHJldCkKCQloYW5kbGVfZmFpbCgpCgkuLi4uCgoKICAg
+ICBrdm1fZW11bGF0ZV93cm1zcigpCiAgICAgICAgLi4uLgoJY2FzZSBNU1JfSUEzMl9YRkQ6Cgkg
+ICAgIHJldCA9IGZwdV91cGRhdGVfZ3Vlc3RfeGZkKCZ2Y3B1LT5hcmNoLmd1ZXN0X2ZwdSwgdmNw
+dS0+YXJjaC54Y3IwLCBtc3J2YWwpOwoJICAgICBpZiAocmV0KQoJCWhhbmRsZV9mYWlsKCkKCSAg
+ICAgLi4uLgoKVGhpcyBjb3ZlcnMgYm90aCB0aGUgY2FzZSBvZiBhIHJ1bm5pbmcgdkNQVSBhbmQg
+dGhlIGNhc2Ugb2YgcmVzdG9yZS4KClRoZSBYRkQgc3luY2hyb25pemF0aW9uIG1lY2hhbmlzbSBp
+cyBvbmx5IHJlbGV2YW50IGZvciBhIHJ1bm5pbmcgdkNQVSBhZnRlcgpWTUVYSVQgd2hlbiBYRkQg
+TVNSIHdyaXRlIGVtdWxhdGlvbiBpcyBkaXNhYmxlZDoKCiAgICAgdmNwdV9ydW4oKQoJdmNwdV9l
+bnRlcl9ndWVzdCgpCgkgIGZvciAoOzspIHsKCSAgICAgIC4uLgoJICAgICAgdm1lbnRlcigpOwoJ
+ICAgICAgLi4uCgkgIH07CgkgIC4uLgoKCSAgaWYgKCF4ZmRfd3JpdGVfZW11bGF0ZWQodmNwdSkp
+CgkJZnB1X3N5bmNfZ3Vlc3Rfdm1leGl0X3hmZF9zdGF0ZSgpOwoKCSAgbG9jYWxfaXJxX2VuYWJs
+ZSgpOwoKSXQgaGFzIG5vIHJlbGV2YW5jZSBmb3IgdGhlIGd1ZXN0IHJlc3RvcmUgY2FzZS4KCldp
+dGggdGhhdCBhbGwgWEZEL2Zwc3RhdGUgcmVsYXRlZCBpc3N1ZXMgc2hvdWxkIGJlIGNvdmVyZWQg
+aW4gYSBjb25zaXN0ZW50CndheS4KCkNQVUlEIHZhbGlkYXRpb24gY2FuIGJlIGRvbmUgd2l0aG91
+dCBleHBvcnRpbmcgeWV0IG1vcmUgRlBVIGZ1bmN0aW9uczoKCiAgICAgIGlmIChyZXF1ZXN0ZWRf
+eGZlYXR1cmVzICYgfnZjcHUtPmFyY2guZ3Vlc3RfZnB1LnBlcm0pCiAgICAgIAkJcmV0dXJuIC1F
+Tk9QT05ZOwoKVGhhdCdzIHRoZSBwdXJwb3NlIG9mIGZwdV9ndWVzdDo6cGVybSBmcm9tIHRoZSBi
+ZWdpbm5pbmcgYWxvbmcgd2l0aApmcHVfZ3Vlc3Q6OnhmZWF0dXJlcyBmb3Igb3RoZXIgdmFsaWRh
+dGlvbiBwdXJwb3Nlcy4KClhGRF9FUlIgTVNSIGhhbmRsaW5nIGlzIGNvbXBsZXRlbHkgc2VwYXJh
+dGUgYW5kIGFzIGRpc2N1c3NlZCBhIEtWTSBvbmx5Cmlzc3VlIGZvciBub3cuIEtWTSBoYXMgdG8g
+ZW5zdXJlIHRoYXQgdGhlIE1TUiBpcyAwIGJlZm9yZSBpbnRlcnJ1cHRzIGFyZQplbmFibGVkLiBT
+byB0aGlzIGlzIG5vdCB0b3VjaGVkIGhlcmUuCgpUaGUgb25seSByZW1haW5pbmcgaXNzdWUgaXMg
+dGhlIEtWTSBYU1RBVEUgc2F2ZS9yZXN0b3JlIHNpemUgY2hlY2tpbmcgd2hpY2gKcHJvYmFibHkg
+cmVxdWlyZXMgc29tZSBGUFUgY29yZSBhc3Npc3RhbmNlLiBCdXQgdGhhdCByZXF1aXJlcyBzb21l
+IG1vcmUKdGhvdWdodHMgdnMuIHRoZSBJT0NUTCBpbnRlcmZhY2UgZXh0ZW5zaW9uIGFuZCBvbmNl
+IHRoYXQgaXMgc2V0dGxlZCBpdApuZWVkcyB0byBiZSBzb2x2ZWQgaW4gb25lIGdvLiBCdXQgdGhh
+dCdzIGFuIG9ydGhvZ29uYWwgaXNzdWUgdG8gdGhlIGFib3ZlLgoKVGhlIHNlcmllcyBpcyBhbHNv
+IGF2YWlsYWJsZSBmcm9tIGdpdDoKCiAgIGdpdDovL2dpdC5rZXJuZWwub3JnL3B1Yi9zY20vbGlu
+dXgva2VybmVsL2dpdC9wZW9wbGUvdGdseC9kZXZlbC5naXQgeDg2L2ZwdS1rdm0KClRoYW5rcywK
+Cgl0Z2x4Ci0tLQogaW5jbHVkZS9hc20vZnB1L2FwaS5oICAgIHwgICA2MyArKysrKysrKysrKysr
+KysrKysrKysrKysKIGluY2x1ZGUvYXNtL2ZwdS90eXBlcy5oICB8ICAgMjIgKysrKysrKysKIGlu
+Y2x1ZGUvdWFwaS9hc20vcHJjdGwuaCB8ICAgMjYgKysrKystLS0tCiBrZXJuZWwvZnB1L2NvcmUu
+YyAgICAgICAgfCAgMTIzICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
+KysrLS0tCiBrZXJuZWwvZnB1L3hzdGF0ZS5jICAgICAgfCAgMTE4ICsrKysrKysrKysrKysrKysr
+KysrKysrKysrKy0tLS0tLS0tLS0tLS0tLS0tLQoga2VybmVsL2ZwdS94c3RhdGUuaCAgICAgIHwg
+ICAyMCArKysrKystCiBrZXJuZWwvcHJvY2Vzcy5jICAgICAgICAgfCAgICAyIAogNyBmaWxlcyBj
+aGFuZ2VkLCAzMDcgaW5zZXJ0aW9ucygrKSwgNjcgZGVsZXRpb25zKC0pCg==
