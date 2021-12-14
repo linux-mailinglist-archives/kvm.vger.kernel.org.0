@@ -2,77 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BB6D473BF5
-	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 05:26:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B816473C4F
+	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 06:07:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231587AbhLNEZ4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Dec 2021 23:25:56 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:53508 "EHLO
-        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229513AbhLNEZz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Dec 2021 23:25:55 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 66C10B817DB
-        for <kvm@vger.kernel.org>; Tue, 14 Dec 2021 04:25:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E6BD8C34604
-        for <kvm@vger.kernel.org>; Tue, 14 Dec 2021 04:25:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1639455952;
-        bh=6e55LovKUpSbuApAjA8NaSPUezarH3QzJXJaPdXlWqY=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=lKLcTw2bHxqNcklbjkktvi60uKCH06mg3/2xM9BxeKs0akGpLuf1SGb4Y1LkCbWgV
-         ENLXu0GSm0HAmQ0SRbvJbHPXtRHd/qVyukd3unpMlz6UHDgsddTJzhPGkJIL+da7kX
-         uY6d7xzYzjXcrL3Zwmecjl5vZY8jYLniLutbahIEgq4YVyxjlo+7EpgL6RCx8pdINw
-         48kbWoF0eo/CJN3M3EjeITzHn7NS3a8ohPKO32dFl5qQwAD2iZ/DXlm5ZtMW3FXc0u
-         mYejB9xukFBcEg0UW3xBSX6T/16mzlYBRmfvvuXoV7t3ETRGmX/EKhhg/kKMOjgDRh
-         5mHtaD3eCoxeg==
-Received: by pdx-korg-bugzilla-2.web.codeaurora.org (Postfix, from userid 48)
-        id C8A6E611AF; Tue, 14 Dec 2021 04:25:52 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 215317] Unable to launch QEMU Linux guest VM - "Guest has not
- initialized the display (yet)"
-Date:   Tue, 14 Dec 2021 04:25:51 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: rherbert@sympatico.ca
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: attachments.created
-Message-ID: <bug-215317-28872-gqT72gGzwA@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-215317-28872@https.bugzilla.kernel.org/>
-References: <bug-215317-28872@https.bugzilla.kernel.org/>
+        id S229812AbhLNFHY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Dec 2021 00:07:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45462 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229789AbhLNFHX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Dec 2021 00:07:23 -0500
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16A6FC06173F
+        for <kvm@vger.kernel.org>; Mon, 13 Dec 2021 21:07:23 -0800 (PST)
+Received: by mail-pf1-x449.google.com with SMTP id e7-20020aa798c7000000b004a254db7946so11269718pfm.17
+        for <kvm@vger.kernel.org>; Mon, 13 Dec 2021 21:07:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=aMtF/xTKjH/hDNL2f6HsS53Q5whzzCvMecLOYsTP6Zk=;
+        b=cPYmX14JCXSXYqmHaDC39xhOgIcPcpQY5jZ6afSXI0DDclhgnZ67Tl1rOYdHNTFGNp
+         RKfaSoDLdxvNm9JJyd9so/QtOqyiDch7IbGdeXBZUvbB/GT5TORsLHvZK9xgyfzk0d+G
+         Bal9Gx3rjEp4D7qrMXfiXBHj5KfZitgBYiri3WuS5Pvb9VW3e6JHn4X+X8MQxXHifN+5
+         2Ylk0ou2U3QW7mJ6xLp6lADbp+gLHvsXO6Fqfv2mhAFTQ64sBHu4XfPSTTKJikpMcRK9
+         F2B0OvZnc2YBIu/CAfKLPP9eWHhQZqhix/eDJvSEzOA6bbx9QGDveXIFW3DLp9PKzRAV
+         WfpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=aMtF/xTKjH/hDNL2f6HsS53Q5whzzCvMecLOYsTP6Zk=;
+        b=66cfC89lrtGYx8ZSPpfz3ZJgWzoIvq8RDfgURg+4tmCsvgjwtVivMRT7C033UOlklm
+         Q8+Wo/Gv4alwfjdsse5SIi07Gntc+bvzwZ+2Gz9TdMhmq+GyrBxuE6iTfV0TpSCbtQlp
+         5QRnvCgE/hkj83cQQzRH4my/MZTlSsfSVsljeFl+/Gkdko5e1vegBhdrMi2h2UcBNM4u
+         saA5/Wd2QV6SpmLumq7RiWASiIw1b+jkK0Fr9YKQ7WrQB7DdSrBdXR00E87VzPPDNS5z
+         MgM6ccrKsvrpp/weE55pmsORzsaanOGOeKh2OgPYLACRyZeuH/Hm4A2LtWlPUHR7a7LB
+         dQIQ==
+X-Gm-Message-State: AOAM533ZEvyQHErp/2QIXdL+QvVhMuIGaSgejr1PXvNl++8m/zgN/eKC
+        1lvwoo3hjPnOvA3Sp1JQuzLlfIYMulHk
+X-Google-Smtp-Source: ABdhPJz9eu52CKWxSKlp3gTNE0TTa5wWXsMsMgjt95pV/PWcPjzAAY+i/y9WmfloZO/Ew4JHYwaV0KXNbzXg
+X-Received: from vipinsh.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:36b0])
+ (user=vipinsh job=sendgmr) by 2002:a17:902:b097:b0:141:ec7d:a055 with SMTP id
+ p23-20020a170902b09700b00141ec7da055mr2955600plr.3.1639458442549; Mon, 13 Dec
+ 2021 21:07:22 -0800 (PST)
+Date:   Tue, 14 Dec 2021 05:07:08 +0000
+Message-Id: <20211214050708.4040200-1-vipinsh@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.34.1.173.g76aa8bc2d0-goog
+Subject: [PATCH] KVM: Move VM's worker kthreads back to the original cgroups
+ before exiting.
+From:   Vipin Sharma <vipinsh@google.com>
+To:     pbonzini@redhat.com, seanjc@google.com
+Cc:     dmatlack@google.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Vipin Sharma <vipinsh@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D215317
+VM worker kthreads can linger in the VM process's cgroup for sometime
+after KVM temrinates the VM process.
 
---- Comment #1 from Richard Herbert (rherbert@sympatico.ca) ---
-Created attachment 300019
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D300019&action=3Dedit
-qemu-kvm stack trace kernel 5.16.0-rc5
+KVM terminates the worker kthreads by calling kthread_stop() which waits
+on the signal generated by exit_mm() in do_exit() during kthread's exit.
+However, these kthreads are removed from the cgroup using cgroup_exit()
+call which happens after exit_mm() in do_exit(). A VM process can
+terminate between the time window of exit_mm() to cgroup_exit(), leaving
+only worker kthreads in the cgroup.
 
-Qemu-kvm bug when starting VM with kernel 5.16.0-rc5.
+Moving worker kthreads back to the original cgroup (kthreadd_task's
+cgroup) makes sure that cgroup is empty as soon as the main VM process
+is terminated.
 
---=20
-You may reply to this email to add a comment.
+Signed-off-by: Vipin Sharma <vipinsh@google.com>
+---
+ virt/kvm/kvm_main.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index b0f7e6eb00ff..edd304a18f16 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -5785,7 +5785,7 @@ static int kvm_vm_worker_thread(void *context)
+ 	init_context = NULL;
+ 
+ 	if (err)
+-		return err;
++		goto out;
+ 
+ 	/* Wait to be woken up by the spawner before proceeding. */
+ 	kthread_parkme();
+@@ -5793,6 +5793,15 @@ static int kvm_vm_worker_thread(void *context)
+ 	if (!kthread_should_stop())
+ 		err = thread_fn(kvm, data);
+ 
++out:
++	/*
++	 * We need to move the kthread back to its original cgroups, so that it
++	 * doesn't linger in the cgroups of the user process after that has
++	 * already terminated. exit_mm() in do_exit() signals kthread_stop() to
++	 * return, whereas, removal of the task from the cgroups happens in
++	 * cgroup_exit() which happens after exit_mm().
++	 */
++	WARN_ON(cgroup_attach_task_all(kthreadd_task, current));
+ 	return err;
+ }
+ 
+
+base-commit: d8f6ef45a623d650f9b97e11553adb4978f6aa70
+-- 
+2.34.1.173.g76aa8bc2d0-goog
+
