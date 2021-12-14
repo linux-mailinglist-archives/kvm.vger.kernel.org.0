@@ -2,36 +2,36 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 44A6B473AE9
-	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 03:51:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D1A2473AEC
+	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 03:51:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244815AbhLNCu2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 13 Dec 2021 21:50:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43070 "EHLO
+        id S244833AbhLNCuc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 13 Dec 2021 21:50:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244700AbhLNCuZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 13 Dec 2021 21:50:25 -0500
+        with ESMTP id S244799AbhLNCu0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 13 Dec 2021 21:50:26 -0500
 Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07696C061748;
-        Mon, 13 Dec 2021 18:50:24 -0800 (PST)
-Message-ID: <20211214024947.878061856@linutronix.de>
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 325F2C061756;
+        Mon, 13 Dec 2021 18:50:26 -0800 (PST)
+Message-ID: <20211214024947.935581464@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1639450223;
+        s=2020; t=1639450224;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=/QiR8LFIIghIdHuWPiT2Ph3EWm0DI3KfVwkZ9edwUik=;
-        b=z4U6/hKo5Cx2hyMl0XZm6FByhOr0rSn5jEzghHwA+lIYB4hzXl7rb+5se6kG0xQza0hLvu
-        Sn1taBF/DlpbhbOVCTjzDc7+rgHl4QUJHykLz8h/OcRBYkE88PFVsZI7MdoV17odhJe3r7
-        kwHMvyw5PpFMD3sx4OJvmz6WeYH/OEvO0knZenWhJhxjkpkmFVrzv3uOn6GrVVbmBXROCo
-        iIlv6fm22hpTg1NFz/CE0/tKcvg1i5VqXLq1W8Kvr2jBA3eywOY/toTfmG2pZLmG68dyEz
-        Bk22BA+sH8WwA8QO+l5oVn+6G1k3UfKfxELbyvqHO8VAWT5hEr4vzi+LckiJ0w==
+         references:references; bh=iLKtbFbkcvbY13Oep2yqrRjp8gb+L60IaMXOjILVTMQ=;
+        b=JtUdEGit4Q8/P/pxsCdqjXbmTg6AcU2S3DXeadSa3xrfq3FLhWv3Jry4AJu/1tRQOOPrbN
+        kHVPddQfqHJsbloFcH3ymbxWZ4/LE3+UDFv32guIG+lXZ/FOJjzvegJ6GWUdLGe9fUp5Dr
+        c07+6iU2JX8rXvN1eCVjNh84ERQcSfevxpMy35z5pGrnAEfvu3wwqXl8Zfz9VPxtF6P80O
+        qix9E/0VR7wQgvqnAGlEtmuZCHSwXUvPAADuGqrhkxTEpP6Npphib76JZiTCQsB1Mkrd+N
+        v6kx7IL7rvewAFWvDmTCp/1c7ftAUaAro8p8yTT8kCzX+f7b4cIhHt+KEzHnug==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1639450223;
+        s=2020e; t=1639450224;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         references:references; bh=/QiR8LFIIghIdHuWPiT2Ph3EWm0DI3KfVwkZ9edwUik=;
-        b=mRUSRdZa2KYJ+7klW4efK6ryMNt4aIbxV/KR4Kd4Bjun1TxyD6EO/7Fr9fkDNQm0igD6j8
-        Dyja/mqRGO+wVmCQ==
+         references:references; bh=iLKtbFbkcvbY13Oep2yqrRjp8gb+L60IaMXOjILVTMQ=;
+        b=TJHWMkyVmY/iosFZWKqHLw5FULGGjhkNZqBQ2XcnODnPtXi3ekQ/ORKoDs3J7QgqzJrGFJ
+        3Px70toez4sIvNBg==
 From:   Thomas Gleixner <tglx@linutronix.de>
 To:     LKML <linux-kernel@vger.kernel.org>
 Cc:     Jing Liu <jing2.liu@linux.intel.com>,
@@ -39,88 +39,83 @@ Cc:     Jing Liu <jing2.liu@linux.intel.com>,
         Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org,
         kvm@vger.kernel.org, Sean Christoperson <seanjc@google.com>,
         Jin Nakajima <jun.nakajima@intel.com>,
-        Kevin Tian <kevin.tian@intel.com>
-Subject: [patch 2/6] x86/fpu: Prepare guest FPU for dynamically enabled FPU features
+        Kevin Tian <kevin.tian@intel.com>,
+        Jing Liu <jing2.liu@intel.com>
+Subject: [patch 3/6] x86/fpu: Make XFD initialization in __fpstate_reset() a
+ function argument
 References: <20211214022825.563892248@linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Date:   Tue, 14 Dec 2021 03:50:22 +0100 (CET)
+Date:   Tue, 14 Dec 2021 03:50:24 +0100 (CET)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-To support dynamically enabled FPU features for guests prepare the guest
-pseudo FPU container to keep track of the currently enabled xfeatures and
-the guest permissions.
+From: Jing Liu <jing2.liu@intel.com>
 
+vCPU threads are different from native tasks regarding to the initial XFD
+value. While all native tasks follow a fixed value (init_fpstate::xfd)
+established by the FPU core at boot, vCPU threads need to obey the reset
+value (i.e. ZERO) defined by the specification, to meet the expectation of
+the guest.
+
+Let the caller supply an argument and adjust the host and guest related
+invocations accordingly.
+
+[ tglx: Make it explicit via function argument ]
+
+Signed-off-by: Jing Liu <jing2.liu@intel.com>
+Signed-off-by: Yang Zhong <yang.zhong@intel.com>
 Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
 ---
- arch/x86/include/asm/fpu/types.h |   13 +++++++++++++
- arch/x86/kernel/fpu/core.c       |   26 +++++++++++++++++++++++++-
- 2 files changed, 38 insertions(+), 1 deletion(-)
+---
+ arch/x86/kernel/fpu/core.c |   11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
---- a/arch/x86/include/asm/fpu/types.h
-+++ b/arch/x86/include/asm/fpu/types.h
-@@ -505,6 +505,19 @@ struct fpu {
-  */
- struct fpu_guest {
- 	/*
-+	 * @xfeatures:			xfeature bitmap of features which are
-+	 *				currently enabled for the guest vCPU.
-+	 */
-+	u64				xfeatures;
-+
-+	/*
-+	 * @perm:			xfeature bitmap of features which are
-+	 *				permitted to be enabled for the guest
-+	 *				vCPU.
-+	 */
-+	u64				perm;
-+
-+	/*
- 	 * @fpstate:			Pointer to the allocated guest fpstate
- 	 */
- 	struct fpstate			*fpstate;
 --- a/arch/x86/kernel/fpu/core.c
 +++ b/arch/x86/kernel/fpu/core.c
-@@ -201,6 +201,26 @@ void fpu_reset_from_exception_fixup(void
- #if IS_ENABLED(CONFIG_KVM)
- static void __fpstate_reset(struct fpstate *fpstate);
+@@ -199,7 +199,7 @@ void fpu_reset_from_exception_fixup(void
+ }
  
-+static void fpu_init_guest_permissions(struct fpu_guest *gfpu)
-+{
-+	struct fpu_state_perm *fpuperm;
-+	u64 perm;
-+
-+	if (!IS_ENABLED(CONFIG_X86_64))
-+		return;
-+
-+	spin_lock_irq(&current->sighand->siglock);
-+	fpuperm = &current->group_leader->thread.fpu.guest_perm;
-+	perm = fpuperm->__state_perm;
-+
-+	/* First fpstate allocation locks down permissions. */
-+	WRITE_ONCE(fpuperm->__state_perm, perm | FPU_GUEST_PERM_LOCKED);
-+
-+	spin_unlock_irq(&current->sighand->siglock);
-+
-+	gfpu->perm = perm & ~FPU_GUEST_PERM_LOCKED;
-+}
-+
- bool fpu_alloc_guest_fpstate(struct fpu_guest *gfpu)
+ #if IS_ENABLED(CONFIG_KVM)
+-static void __fpstate_reset(struct fpstate *fpstate);
++static void __fpstate_reset(struct fpstate *fpstate, u64 xfd);
+ 
+ static void fpu_init_guest_permissions(struct fpu_guest *gfpu)
  {
- 	struct fpstate *fpstate;
-@@ -216,7 +236,11 @@ bool fpu_alloc_guest_fpstate(struct fpu_
+@@ -231,7 +231,8 @@ bool fpu_alloc_guest_fpstate(struct fpu_
+ 	if (!fpstate)
+ 		return false;
+ 
+-	__fpstate_reset(fpstate);
++	/* Leave xfd to 0 (the reset value defined by spec) */
++	__fpstate_reset(fpstate, 0);
+ 	fpstate_init_user(fpstate);
  	fpstate->is_valloc	= true;
  	fpstate->is_guest	= true;
- 
--	gfpu->fpstate = fpstate;
-+	gfpu->fpstate		= fpstate;
-+	gfpu->xfeatures		= fpu_user_cfg.default_features;
-+	gfpu->perm		= fpu_user_cfg.default_features;
-+	fpu_init_guest_permissions(gfpu);
-+
- 	return true;
+@@ -454,21 +455,21 @@ void fpstate_init_user(struct fpstate *f
+ 		fpstate_init_fstate(fpstate);
  }
- EXPORT_SYMBOL_GPL(fpu_alloc_guest_fpstate);
+ 
+-static void __fpstate_reset(struct fpstate *fpstate)
++static void __fpstate_reset(struct fpstate *fpstate, u64 xfd)
+ {
+ 	/* Initialize sizes and feature masks */
+ 	fpstate->size		= fpu_kernel_cfg.default_size;
+ 	fpstate->user_size	= fpu_user_cfg.default_size;
+ 	fpstate->xfeatures	= fpu_kernel_cfg.default_features;
+ 	fpstate->user_xfeatures	= fpu_user_cfg.default_features;
+-	fpstate->xfd		= init_fpstate.xfd;
++	fpstate->xfd		= xfd;
+ }
+ 
+ void fpstate_reset(struct fpu *fpu)
+ {
+ 	/* Set the fpstate pointer to the default fpstate */
+ 	fpu->fpstate = &fpu->__fpstate;
+-	__fpstate_reset(fpu->fpstate);
++	__fpstate_reset(fpu->fpstate, init_fpstate.xfd);
+ 
+ 	/* Initialize the permission related info in fpu */
+ 	fpu->perm.__state_perm		= fpu_kernel_cfg.default_features;
 
