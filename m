@@ -2,118 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5802347473E
-	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 17:12:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C19ED474747
+	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 17:14:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235509AbhLNQMy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Dec 2021 11:12:54 -0500
-Received: from mga07.intel.com ([134.134.136.100]:1123 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231215AbhLNQMw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Dec 2021 11:12:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1639498372; x=1671034372;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=x1BztRLHTFRFEg8Z0YOuA4q7ZTHvBkBUxlUcWZdiZHE=;
-  b=gnnqlx8NQ2F0L8mB1yQalZc8Gip42ClvA85PBWefbT4hqANAs5p5CHRp
-   AOgMNNXNzPO3vNu4ODgIvqdjhMycH3P5WFcAroCg+Drpzn+QNOaAC4aJw
-   bKrmfAy6+VHcRogFsfczG8lerzDJs8g0/KQvBkKL9utsaYyb+6awMmN/Y
-   sS/266ZhbNEE5UX8O2Z5+3sFmXC0hAdp1AmfQSiny0mjJei+TmfDUmmRI
-   lR1F0klG1dEq8fmOPuXYDEhIIgZ7ix+zahPLddIUqOG66wHmiDTpTZAcj
-   M5OGCmtroXtBtpetc+8+pf/eBSbhbKoH3BZQbB2Esj34cRFmASRnLfSuU
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10197"; a="302388382"
-X-IronPort-AV: E=Sophos;i="5.88,205,1635231600"; 
-   d="scan'208";a="302388382"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Dec 2021 08:11:50 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,205,1635231600"; 
-   d="scan'208";a="545217825"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by orsmga001.jf.intel.com with ESMTP; 14 Dec 2021 08:11:50 -0800
-Received: from shsmsx602.ccr.corp.intel.com (10.109.6.142) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Tue, 14 Dec 2021 08:11:49 -0800
-Received: from shsmsx601.ccr.corp.intel.com (10.109.6.141) by
- SHSMSX602.ccr.corp.intel.com (10.109.6.142) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.20; Wed, 15 Dec 2021 00:11:47 +0800
-Received: from shsmsx601.ccr.corp.intel.com ([10.109.6.141]) by
- SHSMSX601.ccr.corp.intel.com ([10.109.6.141]) with mapi id 15.01.2308.020;
- Wed, 15 Dec 2021 00:11:47 +0800
-From:   "Wang, Wei W" <wei.w.wang@intel.com>
-To:     Thomas Gleixner <tglx@linutronix.de>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Juan Quintela <quintela@redhat.com>
-CC:     Jing Liu <jing2.liu@linux.intel.com>,
-        "Zhong, Yang" <yang.zhong@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Sean Christoperson" <seanjc@google.com>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>
-Subject: RE: [patch 5/6] x86/fpu: Provide fpu_update_guest_xcr0/xfd()
-Thread-Topic: [patch 5/6] x86/fpu: Provide fpu_update_guest_xcr0/xfd()
-Thread-Index: AQHX8JWhvlRQU5T/lU6dpNiL1wIQjqwyEDNg//+KXYCAAIkxEA==
-Date:   Tue, 14 Dec 2021 16:11:47 +0000
-Message-ID: <b3ac7ba45c984cf39783e33e0c25274d@intel.com>
-References: <20211214022825.563892248@linutronix.de>
- <20211214024948.048572883@linutronix.de>
- <854480525e7f4f3baeba09ec6a864b80@intel.com> <87zgp3ry8i.ffs@tglx>
-In-Reply-To: <87zgp3ry8i.ffs@tglx>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-reaction: no-action
-dlp-version: 11.6.200.16
-x-originating-ip: [10.239.127.36]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        id S235579AbhLNQOa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Dec 2021 11:14:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57382 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231215AbhLNQO3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Dec 2021 11:14:29 -0500
+Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 620FFC061574;
+        Tue, 14 Dec 2021 08:14:29 -0800 (PST)
+Received: by mail-io1-xd32.google.com with SMTP id m9so25163276iop.0;
+        Tue, 14 Dec 2021 08:14:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=mIUbm6GVaM2s8DkzRCMakgkhau0TGlKfc/bpfsLq9zc=;
+        b=GirMxCj/1duVgQYMjOhjt4PWDJoe0b/HBCI3Zop/SuqErp/V7eEu8UGbNoADtIi4UU
+         KlScah2rVNICUhRA4L+RuOJNoTnUVpfzmzjGFQeqtCKe+z5ZIpXfCk44riAUTFw9I9Hv
+         kBbymKub8u5VMvGT5bHj+wNohrJux48s/ZS+Tf6Br1E/RDodBTcpoFPQcvdMJfN9Y9w2
+         Zl8IItKlH8/7H+CTEA1bv+Rfsgs/5u7Lu/sSqSXKb9JZOVzX8IyAixS96pTk8evG2zO7
+         yglWYWYXxi+6o/29kGCswDXWkl59XWNx8e39kIeTXSjggoKpAqeVNgQFMhzN92l6l129
+         zy/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=mIUbm6GVaM2s8DkzRCMakgkhau0TGlKfc/bpfsLq9zc=;
+        b=jCR3jUfsYxk7HKu9i7oDvrHz0spqIN/AcB2RJSx2raWGZiNos3z7Kt8yluUnr03fCJ
+         RovPvBLbGAMEcZbLHjCWJ4DPdsZrBE+DEhHhSq28tNWktqzCcYZGfe2DUB32gY3uXqN+
+         FkJzsMR/KtA93Yby9y8aAxT7Ke9kMrOA/JmajJ9aqG+B5pf3MUzPwU4EbSJKLoj2lCe6
+         9lb2Ks8VOxcUbVC/VnXPD8PkjjGOOZ/ITvqp7RX4BZ+GLcVJaHf+RIwPOdeCNIM1NeYy
+         bkggFYPF74Ov8q3bJdu6rBb9BFi4mQGvMUJ9p2IIVYWwOzK58qDir71QUvkfTEPTklL7
+         U03Q==
+X-Gm-Message-State: AOAM533vqzK2bT9ZMO/Sz5mbcAKF4d/pr6q5jm9kpd3MRjqDk19pjytq
+        jmZajOpBmjo8T84viBwfzDUAbbrk28dEZ9oWgd+tDhArzjeEGA==
+X-Google-Smtp-Source: ABdhPJzPxfevKNVoBk+go/ISnf2ll2SwMCqK/o4jGaMBuidcRoj3fNVISbEWJIS3Pn/Cuhabd2F06BusOZ7xiC2BMm0=
+X-Received: by 2002:a02:830e:: with SMTP id v14mr3519638jag.644.1639498468518;
+ Tue, 14 Dec 2021 08:14:28 -0800 (PST)
 MIME-Version: 1.0
+References: <20211214050708.4040200-1-vipinsh@google.com>
+In-Reply-To: <20211214050708.4040200-1-vipinsh@google.com>
+From:   Lai Jiangshan <jiangshanlai@gmail.com>
+Date:   Wed, 15 Dec 2021 00:14:17 +0800
+Message-ID: <CAJhGHyDJ8XG6ZCC-NoATFgyeuyEq_A7zmF4TSFA5ubONv7Mx1g@mail.gmail.com>
+Subject: Re: [PATCH] KVM: Move VM's worker kthreads back to the original
+ cgroups before exiting.
+To:     Vipin Sharma <vipinsh@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        David Matlack <dmatlack@google.com>, kvm@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tuesday, December 14, 2021 11:40 PM, Thomas Gleixner wrote:
-> On Tue, Dec 14 2021 at 15:09, Wei W. Wang wrote:
-> > On Tuesday, December 14, 2021 10:50 AM, Thomas Gleixner wrote:
-> >> + * Return: 0 on success, error code otherwise  */ int
-> >> +__fpu_update_guest_features(struct fpu_guest *guest_fpu, u64 xcr0,
-> >> +u64
-> >> +xfd) {
-> >
-> > I think there would be one issue for the "host write on restore" case.
-> > The current QEMU based host restore uses the following sequence:
-> > 1) restore xsave
-> > 2) restore xcr0
-> > 3) restore XFD MSR
->=20
-> This needs to be fixed. Ordering clearly needs to be:
->=20
->   XFD, XCR0, XSTATE
+On Tue, Dec 14, 2021 at 4:13 PM Vipin Sharma <vipinsh@google.com> wrote:
+>
+> VM worker kthreads can linger in the VM process's cgroup for sometime
+> after KVM temrinates the VM process.
+>
+> KVM terminates the worker kthreads by calling kthread_stop() which waits
+> on the signal generated by exit_mm() in do_exit() during kthread's exit.
+> However, these kthreads are removed from the cgroup using cgroup_exit()
+> call which happens after exit_mm() in do_exit(). A VM process can
+> terminate between the time window of exit_mm() to cgroup_exit(), leaving
+> only worker kthreads in the cgroup.
+>
+> Moving worker kthreads back to the original cgroup (kthreadd_task's
+> cgroup) makes sure that cgroup is empty as soon as the main VM process
+> is terminated.
+>
+> Signed-off-by: Vipin Sharma <vipinsh@google.com>
+> ---
+>  virt/kvm/kvm_main.c | 11 ++++++++++-
+>  1 file changed, 10 insertions(+), 1 deletion(-)
 
-Sorry, just to clarify that the ordering in QEMU isn't made by us for this =
-specific XFD enabling.
-It has been there for long time for the general restoring of all the XCRs a=
-nd MSRs.
-(if you are interested..FYI: https://github.com/qemu/qemu/blob/master/targe=
-t/i386/kvm/kvm.c#L4168).
-- kvm_put_xsave()
-- kvm_put_xcrs()
-- kvm_put_msrs()
+Hello
 
-We need to check with the QEMU migration maintainer (Dave and Juan CC-ed)
-if changing that ordering would be OK.
-(In general, I think there are no hard rules documented for this ordering)
+Off-topic, can this kvm worker_thread and the thread to do async pagefault
+be possibly changed to use something like io_uring's IOWQ (fs/io-wq.c)
+created by create_io_thread()?
 
-Thanks,
-Wei
+So that every resource the threads used are credited to the process
+of the vm.
 
+Thanks
+Lai
