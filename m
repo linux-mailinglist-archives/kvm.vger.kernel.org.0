@@ -2,55 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B2318473EFC
-	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 10:10:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7121C473EFD
+	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 10:10:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232098AbhLNJKD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Dec 2021 04:10:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43098 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229931AbhLNJKC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Dec 2021 04:10:02 -0500
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57906C061574
-        for <kvm@vger.kernel.org>; Tue, 14 Dec 2021 01:10:02 -0800 (PST)
-Received: from ip4d173d4a.dynamic.kabel-deutschland.de ([77.23.61.74] helo=[192.168.66.200]); authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1mx3ou-000566-DO; Tue, 14 Dec 2021 10:10:00 +0100
-Message-ID: <7ac766c2-eb7b-3d4b-8c9f-40e9a7d3609e@leemhuis.info>
-Date:   Tue, 14 Dec 2021 10:10:00 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [Bug 215317] New: Unable to launch QEMU Linux guest VM - "Guest
- has not initialized the display (yet)"
-Content-Language: en-BS
-To:     bugzilla-daemon@bugzilla.kernel.org, kvm@vger.kernel.org,
-        "regressions@lists.linux.dev" <regressions@lists.linux.dev>
-References: <bug-215317-28872@https.bugzilla.kernel.org/>
-From:   Thorsten Leemhuis <regressions@leemhuis.info>
+        id S232101AbhLNJKJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Dec 2021 04:10:09 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:59312 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232100AbhLNJKH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Dec 2021 04:10:07 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 379026138B
+        for <kvm@vger.kernel.org>; Tue, 14 Dec 2021 09:10:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 9A618C34601
+        for <kvm@vger.kernel.org>; Tue, 14 Dec 2021 09:10:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1639473006;
+        bh=aBmFuGgJa2PsfJ/JoXoPOJiDalbcd3Hx0NausXr4+pw=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=PVgTUd8G9NavfAxydJwhVKCphvtTf7+r54cqQJwZyEC1LFJqSlxhPpI0anbkN6FsQ
+         KAocst3mGd/EP4l96+VsgRKBliTJY/o2PTCia+jKc0larTZlIzX1uQK0TjS34H/XYJ
+         puxwwKbUzsDxrDW+liceHQDpGxGY+x28odVSJvSQvfz8oXeveWCc7NiWhJFTHPF6QH
+         IFoqPHj+AKHwXGBq9ew6pr4wA42EdD52IVqf3SDosqHNxIofR80A8VQ7vXpHQWf95N
+         tSiHhF3QtmcCMFwkxky8eIWGLYzNYPp8Tbs05awxLut77jpnx+V9qQJygq89WGwa9Z
+         0r3ekSgfOSk5w==
+Received: by pdx-korg-bugzilla-2.web.codeaurora.org (Postfix, from userid 48)
+        id 86DA861139; Tue, 14 Dec 2021 09:10:06 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 215317] Unable to launch QEMU Linux guest VM - "Guest has not
+ initialized the display (yet)"
+Date:   Tue, 14 Dec 2021 09:10:06 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: regressions@leemhuis.info
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-215317-28872-pyOEhTXj0W@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-215317-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1639473002;68844e1f;
-X-HE-SMSGID: 1mx3ou-000566-DO
+References: <bug-215317-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215317
+
+--- Comment #2 from Thorsten Leemhuis (regressions@leemhuis.info) ---
 Hi, this is your Linux kernel regression tracker speaking.
 
 [TLDR: adding this regression to regzbot; most of this mail is compiled
 from a few templates paragraphs some of you might have seen already.]
 
 On 13.12.21 02:38, bugzilla-daemon@bugzilla.kernel.org wrote:
-> https://bugzilla.kernel.org/show_bug.cgi?id=215317
+> https://bugzilla.kernel.org/show_bug.cgi?id=3D215317
 > [...]
 > Something changed between kernel 5.16.0-rc3 and -rc4, and remains unfixed
-> between -rc4 and -rc5. Attempting to start a QEMU VM, the display is stuck at
-> "Guest has not initialized the display (yet)". The QEMU version I'm trying is
-> 6.2.0-rc4, but QEMU version 6.1.0 has also been tried. I noticed many changes
-> in the KVM code between Linux 5.16.0-rc3 and 5.16.0-rc4, and I apologize for
+> between -rc4 and -rc5. Attempting to start a QEMU VM, the display is stuc=
+k at
+> "Guest has not initialized the display (yet)". The QEMU version I'm tryin=
+g is
+> 6.2.0-rc4, but QEMU version 6.1.0 has also been tried. I noticed many cha=
+nges
+> in the KVM code between Linux 5.16.0-rc3 and 5.16.0-rc4, and I apologize =
+for
 > not being able to narrow it down.
 
 Thanks for the report.
@@ -66,7 +97,7 @@ adding it to regzbot, my Linux kernel regression tracking bot:
 #regzbot title Unable to launch QEMU Linux guest VM - "Guest has not
 initialized the display (yet)"
 #regzbot ignore-activity
-#regzbot link: https://bugzilla.kernel.org/show_bug.cgi?id=215317
+#regzbot link: https://bugzilla.kernel.org/show_bug.cgi?id=3D215317
 
 Reminder: when fixing the issue, please add a 'Link:' tag with the URL
 to the report (the parent of this mail), then regzbot will automatically
@@ -100,3 +131,9 @@ regzbot, my Linux kernel regression tracking bot
 (https://linux-regtracking.leemhuis.info/regzbot/). I'm only posting
 this mail to get things rolling again and hence don't need to be CC on
 all further activities wrt to this regression.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
