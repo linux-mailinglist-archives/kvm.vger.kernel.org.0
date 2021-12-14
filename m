@@ -2,93 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 707A0474C37
-	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 20:45:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BBB97474CA4
+	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 21:28:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237502AbhLNTpo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Dec 2021 14:45:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50880 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237473AbhLNTpo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Dec 2021 14:45:44 -0500
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FBD0C06173F
-        for <kvm@vger.kernel.org>; Tue, 14 Dec 2021 11:45:44 -0800 (PST)
-Received: by mail-pf1-x42f.google.com with SMTP id u80so18697669pfc.9
-        for <kvm@vger.kernel.org>; Tue, 14 Dec 2021 11:45:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=5Z3UBTl7jPBQ/S77snk8IVzLmGP+ErnAZOzUMW8UTq8=;
-        b=HQyBo4dU6xQwWMptNtxQhOBNd3KOQMO22T5cBp/sfKJbYIQ9b8TBYWqzbVJw2pktXI
-         XnGx9xoczWwZeflQyEUu39rb0VKEd0dCI9sCtuq/ixotURahbkMmD4kNyDMXITI+As1K
-         DEkxXv+26zNmoCDE6LqJ1do2FaTZzV7Wz0MIe1Jg0xbjB1o0eDKTsJl6rt8mZra40ExO
-         KJ8yEhFbJIiRSD7xletEENNaa2fzadQNjli1rlMb1xr73q3rVyCf09n1gI7S40fr3o6R
-         +VAbhaBId1qZnyEsB0n+GqhwBu1UcpPVmrbon5mJfUWmKsMiFrSj052g5HoLNQUGPER3
-         iSCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=5Z3UBTl7jPBQ/S77snk8IVzLmGP+ErnAZOzUMW8UTq8=;
-        b=CnBLhB9fSV5Onn3BO0e0x7Z4yP3tP/7H73xqNib9MMij7zyuRw21+MXA3y1FqIvzSP
-         6dRFOJY0FvCS6+iRPE7/AJVbwhTfgz3HcDqHpPV9kX62qX5DXIlU53NHVTOIZQeH2HaR
-         zRJxDDEqLLMqXxNofuMgV9Z1HwAIOBodZGyS0jTg4QbyZVyUqom+GH44uQIPk0V0OmLw
-         GKXYAS4Cfp5hEtk/u6GbtH/qHQoWOgc/YWl205cG6oNsmYHYs2lIhvAZ9sNdvWA15FhA
-         5KQAKJS++jJMrSjh9E/muMa800w3VDuI8clqLdsKB+2lqWKiyAv1RTnzOxJXV3BG61cL
-         eRRw==
-X-Gm-Message-State: AOAM531ZN7jeXDKf2vlJ2BuV0UeH4uWSylJX6ZCOCEZ/23sFyyFRwvme
-        biGh2ozF08x+24guEjQdDwnHMA==
-X-Google-Smtp-Source: ABdhPJx8bDekdaRVb6HNjxh3olkWUHPaGJdisWXeDRilvZ4B6gdcgX6jH46fsqkDStdycbDbM0C9tg==
-X-Received: by 2002:a63:4559:: with SMTP id u25mr5012691pgk.15.1639511143347;
-        Tue, 14 Dec 2021 11:45:43 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id m15sm3126304pjc.35.2021.12.14.11.45.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Dec 2021 11:45:42 -0800 (PST)
-Date:   Tue, 14 Dec 2021 19:45:39 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        ignat@cloudflare.com, bgardon@google.com, dmatlack@google.com,
-        stevensd@chromium.org, kernel-team@cloudflare.com,
-        stable@vger.kernel.org
-Subject: Re: [PATCH 2/2] KVM: x86: zap invalid roots in kvm_tdp_mmu_zap_all
-Message-ID: <Ybj0Yx17u0MmiOdi@google.com>
-References: <20211213112514.78552-1-pbonzini@redhat.com>
- <20211213112514.78552-3-pbonzini@redhat.com>
- <Ybd2cEqUnxiy/JBd@google.com>
+        id S237637AbhLNU2a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Dec 2021 15:28:30 -0500
+Received: from Galois.linutronix.de ([193.142.43.55]:43888 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237615AbhLNU2a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Dec 2021 15:28:30 -0500
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1639513708;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=tIrltjIa8LXE70tFlkI4s3RIRynR1uteQ692uHXzOeQ=;
+        b=ex7P/8huN52fxzfClVJkzVoyJSYVArVN/kVMdCPW+Wb5XR16m5uNTWhNpbLLm28NWvmgjm
+        42s7uFnjZLNXPy8zKOd3NAaLEKWBYLFp6QAe6NybfR6sUA6war0DcVQZpf49Zhq2nMbVk3
+        n0mp8/uBznKYmGhueapAvosF4qHCiKa+8/fh+0Vb1upg2d6yl8D2RKb+9fyxGSnrEkjSck
+        iAHGbxjjTkzoV/9cEeJMRuEmDuAMMMZ92KxyZFl2s/YrQOPutZ4LQ5bF+Vov8v5Hm55zG4
+        k3nUVGQsUzZV3px3BYHrTPT+2hHGr8lDjUDi97w7Q+kogfakM2mitU9Nv1MuXA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1639513708;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=tIrltjIa8LXE70tFlkI4s3RIRynR1uteQ692uHXzOeQ=;
+        b=uLTp4lgAnPhxBX8J3kSgy+H1ADSxH+0bOtVVX5NoBX9x8Va1iPnDdPYjmhxoReljLthDko
+        KT7G+FctlAzpVEBw==
+To:     quintela@redhat.com
+Cc:     "Wang, Wei W" <wei.w.wang@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+        Jing Liu <jing2.liu@linux.intel.com>,
+        "Zhong, Yang" <yang.zhong@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        Sean Christoperson <seanjc@google.com>,
+        "Nakajima, Jun" <jun.nakajima@intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>
+Subject: Re: [patch 5/6] x86/fpu: Provide fpu_update_guest_xcr0/xfd()
+In-Reply-To: <87k0g7qa3t.fsf@secure.mitica>
+References: <20211214022825.563892248@linutronix.de>
+ <20211214024948.048572883@linutronix.de>
+ <854480525e7f4f3baeba09ec6a864b80@intel.com> <87zgp3ry8i.ffs@tglx>
+ <b3ac7ba45c984cf39783e33e0c25274d@intel.com> <87r1afrrjx.ffs@tglx>
+ <87k0g7qa3t.fsf@secure.mitica>
+Date:   Tue, 14 Dec 2021 21:28:28 +0100
+Message-ID: <87k0g7rkwj.ffs@tglx>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Ybd2cEqUnxiy/JBd@google.com>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 13, 2021, Sean Christopherson wrote:
-> On Mon, Dec 13, 2021, Paolo Bonzini wrote:
-> > kvm_tdp_mmu_zap_all is intended to visit all roots and zap their page
-> > tables, which flushes the accessed and dirty bits out to the Linux
-> > "struct page"s.  Missing some of the roots has catastrophic effects,
-> > because kvm_tdp_mmu_zap_all is called when the MMU notifier is being
-> > removed and any PTEs left behind might become dangling by the time
-> > kvm-arch_destroy_vm tears down the roots for good.
-> > 
-> > Unfortunately that is exactly what kvm_tdp_mmu_zap_all is doing: it
-> > visits all roots via for_each_tdp_mmu_root_yield_safe, which in turn
-> > uses kvm_tdp_mmu_get_root to skip invalid roots.  If the current root is
-> > invalid at the time of kvm_tdp_mmu_zap_all, its page tables will remain
-> > in place but will later be zapped during kvm_arch_destroy_vm.
-> 
-> As stated in the bug report thread[*], it should be impossible as for the MMU
-> notifier to be unregistered while kvm_mmu_zap_all_fast() is running.
-> 
-> I do believe there's a race between set_nx_huge_pages() and kvm_mmu_notifier_release(),
-> but that would result in the use-after-free kvm_set_pfn_dirty() tracing back to
-> set_nx_huge_pages(), not kvm_destroy_vm().  And for that, I would much prefer we
-> elevant mm->users while changing the NX hugepage setting.
+Juan,
 
-Mwhahaha, race confirmed with a bit of hacking to force the issue.  I'll get a
-patch out.
+On Tue, Dec 14 2021 at 20:07, Juan Quintela wrote:
+> Thomas Gleixner <tglx@linutronix.de> wrote:
+>> On Tue, Dec 14 2021 at 16:11, Wei W. Wang wrote:
+>>> We need to check with the QEMU migration maintainer (Dave and Juan CC-ed)
+>>> if changing that ordering would be OK.
+>>> (In general, I think there are no hard rules documented for this ordering)
+>>
+>> There haven't been ordering requirements so far, but with dynamic
+>> feature enablement there are.
+>>
+>> I really want to avoid going to the point to deduce it from the
+>> xstate:xfeatures bitmap, which is just backwards and Qemu has all the
+>> required information already.
+>
+> First of all, I claim ZERO knowledge about low level x86_64.
+
+Lucky you.
+
+> Once told that, this don't matter for qemu migration, code is at
+
+Once, that was at the time where rubber boots were still made of wood,
+right? :)
+
+> target/i386/kvm/kvm.c:kvm_arch_put_registers()
+>
+>
+>     ret = kvm_put_xsave(x86_cpu);
+>     if (ret < 0) {
+>         return ret;
+>     }
+>     ret = kvm_put_xcrs(x86_cpu);
+>     if (ret < 0) {
+>         return ret;
+>     }
+>     /* must be before kvm_put_msrs */
+>     ret = kvm_inject_mce_oldstyle(x86_cpu);
+
+So this has already ordering requirements.
+
+>     if (ret < 0) {
+>         return ret;
+>     }
+>     ret = kvm_put_msrs(x86_cpu, level);
+>     if (ret < 0) {
+>         return ret;
+>     }
+>
+> If it needs to be done in any other order, it is completely independent
+> of whatever is inside the migration stream.
+
+From the migration data perspective that's correct, but I have the
+nagging feeling that this in not that simple.
+
+> I guess that Paolo will put some light here.
+
+I fear shining light on that will unearth quite a few skeletons :)
+
+Thanks,
+
+        tglx
