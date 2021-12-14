@@ -2,102 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C12C47438D
-	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 14:34:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B50E14743F7
+	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 14:55:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234445AbhLNNey (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Dec 2021 08:34:54 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:38299 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229902AbhLNNex (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Tue, 14 Dec 2021 08:34:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1639488893;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Ks3M5C8EaCK4GjMRAAKSo6Eyx91OR1oex8ha7Ihy6PQ=;
-        b=V1vNl5hxufoW6Uo2LjG2tv68PV21tQwFIrBsADuUJIlUXiK6BPlMOE6lFscN5fABWoH84P
-        cRkxncO8CyFxlmjlOxNu1UICHzVQP96/salTnrJd7Tkp0emYf4Q+vXfLx+nCQ9F0emRp+o
-        ti7EaAly2sX6NsbA+9XjJkVU0I/YjHE=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-593-V_5TZXitObWEdHXwtthqNA-1; Tue, 14 Dec 2021 08:34:52 -0500
-X-MC-Unique: V_5TZXitObWEdHXwtthqNA-1
-Received: by mail-ed1-f71.google.com with SMTP id p4-20020aa7d304000000b003e7ef120a37so16916626edq.16
-        for <kvm@vger.kernel.org>; Tue, 14 Dec 2021 05:34:52 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=Ks3M5C8EaCK4GjMRAAKSo6Eyx91OR1oex8ha7Ihy6PQ=;
-        b=fo3Jgc4MBdv75Au4OCCGFwfRJ8wxJMfZ2+6dENwsEbZyq4oTcMbUt8Tg7nBjAXIk8i
-         lDJ1ycd1EFecfRPXuVtoQ//FFc8cbirJmnIVSYRUCmV17suVNCdcnR8+2tNeBRFPAKi8
-         VpIUs9dpfTcfLXRqy7dBxr4TnJJulj6xJar4o5n2rtKBZuCeQEiIKrTOUljxvqdV12Jt
-         Eye2FGtwgl/9xilIFOIt3WYn3w/PlLctn+9MOyQd5HVJaQbWic2JbwsRIO4HXQg7ZnAY
-         yZhWKY+LTw5J9v8VeytYF2Jt6zmNH+veERZ7eFA/dM66R6508Z0kh7V2kxL0cp97mHjB
-         +AnQ==
-X-Gm-Message-State: AOAM531IufRMAn0hQ/bFnhkxyRnxGnbre6x4t6ii7s2huejkfSW4z5/k
-        KeWs3zhw0S/sP9+lIYNGcnqtsDTKspedApiVUk132zTm/VUWblaJBUw1auv+i5+KYDyxNdFKWEU
-        PRg9PDvuuR96b
-X-Received: by 2002:a17:907:7f9e:: with SMTP id qk30mr5484647ejc.238.1639488891030;
-        Tue, 14 Dec 2021 05:34:51 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwqM5EYX790yLEJfRzJAdIh/+o6T7TWGGY3j7D/yNFbJe/W4j2ZKaCKFYpB7QwPBGLGQXJupg==
-X-Received: by 2002:a17:907:7f9e:: with SMTP id qk30mr5484625ejc.238.1639488890815;
-        Tue, 14 Dec 2021 05:34:50 -0800 (PST)
-Received: from gator.home (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
-        by smtp.gmail.com with ESMTPSA id sh33sm7367278ejc.56.2021.12.14.05.34.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Dec 2021 05:34:50 -0800 (PST)
-Date:   Tue, 14 Dec 2021 14:34:48 +0100
-From:   Andrew Jones <drjones@redhat.com>
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        Paolo Bonzini <pbonzini@redhat.com>, maz@kernel.org,
-        oupton@google.com, yuzenghui@huawei.com, jingzhangos@google.com,
-        pshier@google.com, rananta@google.com, reijiw@google.com
-Subject: Re: [kvm-unit-tests PATCH 0/3] arm64: debug: add migration tests for
- debug state
-Message-ID: <20211214133448.6yjlbputjfabzftq@gator.home>
-References: <20211210165804.1623253-1-ricarkol@google.com>
+        id S232428AbhLNNzl convert rfc822-to-8bit (ORCPT
+        <rfc822;lists+kvm@lfdr.de>); Tue, 14 Dec 2021 08:55:41 -0500
+Received: from szxga02-in.huawei.com ([45.249.212.188]:16807 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230038AbhLNNzk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Dec 2021 08:55:40 -0500
+Received: from dggpeml500020.china.huawei.com (unknown [172.30.72.56])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4JD0Hg1Kkhz91h2;
+        Tue, 14 Dec 2021 21:54:55 +0800 (CST)
+Received: from dggpeml100025.china.huawei.com (7.185.36.37) by
+ dggpeml500020.china.huawei.com (7.185.36.88) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Tue, 14 Dec 2021 21:55:38 +0800
+Received: from dggpeml100016.china.huawei.com (7.185.36.216) by
+ dggpeml100025.china.huawei.com (7.185.36.37) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Tue, 14 Dec 2021 21:55:38 +0800
+Received: from dggpeml100016.china.huawei.com ([7.185.36.216]) by
+ dggpeml100016.china.huawei.com ([7.185.36.216]) with mapi id 15.01.2308.020;
+ Tue, 14 Dec 2021 21:55:38 +0800
+From:   "Longpeng (Mike, Cloud Infrastructure Service Product Dept.)" 
+        <longpeng2@huawei.com>
+To:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+CC:     "Gonglei (Arei)" <arei.gonglei@huawei.com>,
+        Huangzhichao <huangzhichao@huawei.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "Wanpeng Li" <wanpengli@tencent.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        "Jim Mattson" <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Subject: The vcpu won't be wakened for a long time
+Thread-Topic: The vcpu won't be wakened for a long time
+Thread-Index: Adfw8hOY5GAlKZgbTtqexw2IMvmqfA==
+Date:   Tue, 14 Dec 2021 13:55:38 +0000
+Message-ID: <73d46f3cc46a499c8e39fdf704b2deaf@huawei.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.174.148.223]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211210165804.1623253-1-ricarkol@google.com>
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 10, 2021 at 08:58:01AM -0800, Ricardo Koller wrote:
-> Add some tests for checking that we can migrate debug state correctly: setup
-> some breakpoints/watchpoints/single-stepping, migrate, and then check that we
-> get the expected exceptions.
-> 
-> The 3 patches in this series add tests for breakpoints, watchpoints, and
-> single-stepping one patch at a time.  Each patch adds a migration test and a
-> sanity test (to test that debugging works with no migration).
-> 
-> Note that this is limited to 64-bits and a single vcpu. Also note that some of
-> the code, like reset_debug_state, is borrowed from kvm selftests.
-> 
-> Ricardo Koller (3):
->   arm64: debug: add a migration test for breakpoint state
->   arm64: debug: add a migration test for watchpoint state
->   arm64: debug: add a migration test for single-step state
-> 
->  arm/Makefile.arm64 |   1 +
->  arm/debug.c        | 420 +++++++++++++++++++++++++++++++++++++++++++++
->  arm/unittests.cfg  |  37 ++++
->  3 files changed, 458 insertions(+)
->  create mode 100644 arm/debug.c
-> 
-> -- 
-> 2.34.1.173.g76aa8bc2d0-goog
->
+Hi guys,
 
-Applied to https://gitlab.com/rhdrjones/kvm-unit-tests/-/commits/arm/queue
+We find a problem in kvm_vcpu_block().
 
-Thanks,
-drew 
+The testcase is:
+ - VM configured with 1 vcpu and 1 VF (using vfio-pci passthrough)
+ - the vfio interrupt and the vcpu are bound to the same pcpu
+ - using remapped mode IRTE, NOT posted mode
 
+The bug was triggered when the vcpu executed HLT instruction:
+
+kvm_vcpu_block:
+    prepare_to_rcuwait(&vcpu->wait);
+    for (;;) {
+        set_current_state(TASK_INTERRUPTIBLE);
+
+        if (kvm_vcpu_check_block(vcpu) < 0)
+            break;
+					<------------ (*)
+        waited = true;
+        schedule();
+    }
+    finish_rcuwait(&vcpu->wait);
+
+The vcpu will go to sleep even if an interrupt from the VF is fired at (*) and
+the PIR and ON bit will be set ( in vmx_deliver_posted_interrupt ), so the vcpu
+won't be wakened by subsequent interrupts.
+
+Any suggestions ? Thanks.
