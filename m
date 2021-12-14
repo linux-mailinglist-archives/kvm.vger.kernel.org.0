@@ -2,108 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 7EE2C47435C
-	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 14:24:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 106BA474371
+	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 14:27:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234355AbhLNNYz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Dec 2021 08:24:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45542 "EHLO
+        id S232227AbhLNN05 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Dec 2021 08:26:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46086 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232033AbhLNNYy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Dec 2021 08:24:54 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75E82C061574;
-        Tue, 14 Dec 2021 05:24:54 -0800 (PST)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1639488291;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ojo5CfB1kqd6Oz7Ue8byTDePBgU77WIcGI14kiPW2MY=;
-        b=FiWW4gr6J2vA6cw2HzsxieR2sV6BeH3/U/R6EURFyJOchc5jCxYyeEMD4AwsLOWHPZ/0yL
-        aXEMO8jEdM5B44wl92TbdB3kvlJOaX0muBcRsTZ4xwxFgV0+RFlNCTqwNb/INH2LJasbhA
-        H7IKpmLqrza3iZeEOcXfiTwvxnTviwdhHwtsFfW6WnJWF+Glh2DUYPgUmOHrpyPbbxlm9q
-        6S/fCR8477PuRcoX0nAEF06uqe4e7XM/K7zwHhGy1FmMLJjNkyovlVMn2HBwArYIDGz/d9
-        EIM7keOxwAHlX151vZPq7QeHmXkRTkmNwrIiE3yFZN4WDSutkBrEqIykS7FJ2g==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1639488291;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ojo5CfB1kqd6Oz7Ue8byTDePBgU77WIcGI14kiPW2MY=;
-        b=RceVS/6e5lVGJTjqWYYH9Syhhuib5UMpTVTmXSrR+sJvh59TQJFz4A6ibOewOmPReo9rhC
-        qbbH5gOecp7yc+CA==
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>
-Cc:     Jing Liu <jing2.liu@linux.intel.com>,
-        Yang Zhong <yang.zhong@intel.com>, x86@kernel.org,
-        kvm@vger.kernel.org, Sean Christoperson <seanjc@google.com>,
-        Jin Nakajima <jun.nakajima@intel.com>,
-        Kevin Tian <kevin.tian@intel.com>
-Subject: Re: [patch 0/6] x86/fpu: Preparatory changes for guest AMX support
-In-Reply-To: <09e06d62-33f5-b41f-e913-a8c5e43ba881@redhat.com>
-References: <20211214022825.563892248@linutronix.de>
- <09e06d62-33f5-b41f-e913-a8c5e43ba881@redhat.com>
-Date:   Tue, 14 Dec 2021 14:24:51 +0100
-Message-ID: <877dc7tj30.ffs@tglx>
+        with ESMTP id S230077AbhLNN05 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Dec 2021 08:26:57 -0500
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1090C061574
+        for <kvm@vger.kernel.org>; Tue, 14 Dec 2021 05:26:56 -0800 (PST)
+Received: by mail-ed1-x535.google.com with SMTP id y13so62580562edd.13
+        for <kvm@vger.kernel.org>; Tue, 14 Dec 2021 05:26:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:reply-to:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=xcVaKlMKT6FRxiHLt+zYM1MzTEiTnl7gjtSTpfEhQ1Q=;
+        b=mdeF/JqJYgovFQmfH7b8p8cP8iId4zV9GdzNFEyJMiqINTrioTQYDs7LxgV2myNVFD
+         gDVhLYgEqGXb6neaP1M+9upOf23T4vLmYCe5lSwhHJg4cih+LVDymlI+1JrEth/bwVhM
+         3nGGRUU9rI1oZi/dsz+y4a+dBnlHvQwmDJTF8+BLrljsJ2l4hoGBgUYXVaY3+wpAmWTv
+         O6OTcsD5bF1FkiVpRwTBGXYzDKOXXH1dtrU3zUFMX/KQd8sq3tFSCAPEaMeUwFpxjjgm
+         Xpdt4BHaNlEqkKNC7sCxlQAFLhTgPtEbuewPr/LuBDSgvBydjuG7apbDj+AsMP3CpjPN
+         b/tw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to:content-transfer-encoding;
+        bh=xcVaKlMKT6FRxiHLt+zYM1MzTEiTnl7gjtSTpfEhQ1Q=;
+        b=gIb/csdoGuiURlogHneue/wabV1LxLiUWtKsamOWk0P9r/WwxyYJSPwktI5BMdbx61
+         mIO0s67M9rTBSzCleqjufhAN4wk5VYJvM0xeCPX/IWuX4G8RbNFYHRhUAyQTPgCK1K6r
+         at/4IiyMx3XdovtSmjKro2+RCq8jzGzE+jAYk7fAVY48IpIaqBZ4RfEBFL/IaKo0Cqbi
+         DWIa+0vZJVlZec8g0qxVGsnvKi6jTP/fe9+a27+5+maEPsAvoTnFVoYVBTNB5MCL0Qnv
+         kycRtdeY5lHU4vaSbxx5iKD2P+4KyXXkuJ/R6pTUqZAg8me4p81vxHRsz702/Az2hg0h
+         ORUQ==
+X-Gm-Message-State: AOAM533ITTsmZAZK7PovOlVRRUp+hbD9v6X/QJa1WMrRUhSRgGOBfisU
+        EfDTIydtw9komnlx/FobTqVP/6b7m4wQi/aaLXo=
+X-Google-Smtp-Source: ABdhPJw7EhSDNDvnyovXzuMqVmVr8T0k7AhWgUQpcMFAvrOz8nu+X4B0sNL1ayIFTjcXCZ/gefdR+/omZ3GgKbZcmUU=
+X-Received: by 2002:a05:6402:4c4:: with SMTP id n4mr7960187edw.30.1639488415171;
+ Tue, 14 Dec 2021 05:26:55 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
+Received: by 2002:ab4:a122:0:0:0:0:0 with HTTP; Tue, 14 Dec 2021 05:26:54
+ -0800 (PST)
+Reply-To: lilyluv88@yahoo.com
+From:   Lily William <dw2396468@gmail.com>
+Date:   Tue, 14 Dec 2021 05:26:54 -0800
+Message-ID: <CACri2vQ5fYjcCS-pOw+fQW2UewGpJ0T3TU8iXtVvGBrTeAmxyg@mail.gmail.com>
+Subject: Hi Dear,
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 14 2021 at 11:42, Paolo Bonzini wrote:
-> On 12/14/21 03:50, Thomas Gleixner wrote:
->> The only remaining issue is the KVM XSTATE save/restore size checking which
->> probably requires some FPU core assistance. But that requires some more
->> thoughts vs. the IOCTL interface extension and once that is settled it
->> needs to be solved in one go. But that's an orthogonal issue to the above.
->
-> That's not a big deal because KVM uses the uncompacted format.  So 
-> KVM_CHECK_EXTENSION and KVM_GET_XSAVE can just use CPUID to retrieve the 
-> size and uncompacted offset of the largest bit that is set in 
-> kvm_supported_xcr0, while KVM_SET_XSAVE can do the same with the largest 
-> bit that is set in the xstate_bv.
+Hi Dear,
 
-For simplicity you can just get that information from guest_fpu. See
-below.
+My name is Lily=C2=A0 William, I am from the United States of America, Its
+my pleasure to contact you for new and special friendship=C2=A0 I will be
+glad to see your reply for us to know each other better and exchange
+pictures.
 
-Thanks,
-
-        tglx
----
---- a/arch/x86/include/asm/fpu/types.h
-+++ b/arch/x86/include/asm/fpu/types.h
-@@ -518,6 +518,11 @@ struct fpu_guest {
- 	u64				perm;
- 
- 	/*
-+	 * @uabi_size:			Size required for save/restore
-+	 */
-+	unsigned int			uabi_size;
-+
-+	/*
- 	 * @fpstate:			Pointer to the allocated guest fpstate
- 	 */
- 	struct fpstate			*fpstate;
---- a/arch/x86/kernel/fpu/core.c
-+++ b/arch/x86/kernel/fpu/core.c
-@@ -240,6 +240,7 @@ bool fpu_alloc_guest_fpstate(struct fpu_
- 	gfpu->fpstate		= fpstate;
- 	gfpu->xfeatures		= fpu_user_cfg.default_features;
- 	gfpu->perm		= fpu_user_cfg.default_features;
-+	gfpu->uabi_size		= fpu_user_cfg.default_size;
- 	fpu_init_guest_permissions(gfpu);
- 
- 	return true;
---- a/arch/x86/kernel/fpu/xstate.c
-+++ b/arch/x86/kernel/fpu/xstate.c
-@@ -1545,6 +1545,7 @@ static int fpstate_realloc(u64 xfeatures
- 		newfps->is_confidential = curfps->is_confidential;
- 		newfps->in_use = curfps->in_use;
- 		guest_fpu->xfeatures |= xfeatures;
-+		guest_fpu->uabi_size = usize;
- 	}
- 
- 	fpregs_lock();
+Yours
+Lily
