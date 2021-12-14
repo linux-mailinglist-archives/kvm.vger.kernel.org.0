@@ -2,107 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B5599474993
-	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 18:36:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 921004749ED
+	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 18:45:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236526AbhLNRg0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Dec 2021 12:36:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48992 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235559AbhLNRg0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Dec 2021 12:36:26 -0500
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2A8EC06173E
-        for <kvm@vger.kernel.org>; Tue, 14 Dec 2021 09:36:25 -0800 (PST)
-Received: by mail-pl1-x630.google.com with SMTP id y7so14143105plp.0
-        for <kvm@vger.kernel.org>; Tue, 14 Dec 2021 09:36:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=8qfoCk9NYj36wSO78chHeHprCwWDcDj2DQwomY20Cuc=;
-        b=OUZQ8DCHjP9TRW8CJm+8LSgPbnAxZlVxs4OzE40QKhFaYd2m7JZEn+vySxLM0pB3pX
-         Gr8+TxFGWRg4W9UQMIh2Jbe7wm7b+SSyDou3BBhjhTI4AEy8hWAd83ri8jlQ7SBhyfZD
-         xlFNBekQNhOZtE62lEBj6v3PWDZ/jfAnYzaW72F9JuI/51oT1G/N2Yt/vGLJLjf8qCzE
-         lf6nyfzhhSqy7H3VAGjwDma+i9bTJ+ZSpEtgqGt+u2cWi8hvc/3Piy4pG+p8RsbzvdaT
-         7VpNg20B0AwbsvgVnqRfkk6/WBLpkQK/LU8ft30oYEyHUaj5U+3n+mIagSlvuturhVf/
-         DyHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=8qfoCk9NYj36wSO78chHeHprCwWDcDj2DQwomY20Cuc=;
-        b=6tA6QQ6uHbCdL31iCG8RisDnBjiWUMPiNyhfQij7PxroWWWVMLvnBa03yZ+eYI8hb7
-         gI0pkvzfAwps8mtr65f5ssHXM9F33wtvz3JhkW9Q4LFo2aoyDHgRrKAiUHMZ1cJ8/djG
-         3CYyIo9QnIqbP3VpCpQyGG68Kx2iGyMdQ1jznSBhruWfCKpGSDJv8vWYeBlC3oD7+X+Q
-         DqEoc+Y05giyyeonz99dMnIWxqjqc01k+04Hww5fby6wXRNTi0lNFylI338b/PNSD0Ri
-         GuZeGcOiqz1iYhCKIF2RCPDnxInyVoCUgqj/+Dr0MBnPWHMCfp+/a8SMnsIwfIQFfEy+
-         cyNA==
-X-Gm-Message-State: AOAM5320ZaWQJwzoFWPXBO73C3+Z7f5tFQv6apBQsXPPX4KHNO8kmJqU
-        NQ5UHISqPdaADKqHCOvoMY6g5Q==
-X-Google-Smtp-Source: ABdhPJybrbbAKyROLXuOjybmV0nvQSHW/baM2Y1cBztL8vk2eAGw9GH1zzra5MJK4rFe86GdrgSg+w==
-X-Received: by 2002:a17:903:283:b0:142:1243:d879 with SMTP id j3-20020a170903028300b001421243d879mr6960928plr.61.1639503385324;
-        Tue, 14 Dec 2021 09:36:25 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id z8sm325250pgc.53.2021.12.14.09.36.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Dec 2021 09:36:24 -0800 (PST)
-Date:   Tue, 14 Dec 2021 17:36:21 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Longpeng (Mike, Cloud Infrastructure Service Product Dept.)" 
-        <longpeng2@huawei.com>
-Cc:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Gonglei (Arei)" <arei.gonglei@huawei.com>,
-        Huangzhichao <huangzhichao@huawei.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Subject: Re: The vcpu won't be wakened for a long time
-Message-ID: <YbjWFTtNo9Ap7kDp@google.com>
-References: <73d46f3cc46a499c8e39fdf704b2deaf@huawei.com>
+        id S233430AbhLNRpS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Dec 2021 12:45:18 -0500
+Received: from mga04.intel.com ([192.55.52.120]:39347 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229593AbhLNRpR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Dec 2021 12:45:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1639503917; x=1671039917;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=F8wZFJ9eIhe2A/T3CaWak765dnWzf/E7CLYtFT1BJy0=;
+  b=hojZf01jyzRlStJf6g68ZSScBK7eAXkQDPaVrqR3rJEh7klyXLuch3sR
+   Y66nL/AvWI85I4iNrf+qULMV3oeAaJZVnjL0JjG/P3DXJDF/+tn1k8m/z
+   cjJSEk7NJ4XweiAXytnmmbkIdZJwF+nX5ESKFPI5dPlG/jfAvrLZDe32g
+   NXUMOGJ2ueHm3moX37iZbTBSk3Wr9JPigAUzqvCcdJfIySeLryLFiPru+
+   jbFoxuusRXwohEcTGiRcDw2tAJA91qdOgmCl4G9//IGba8mZjFed7ctV1
+   7VKWQ55MKMY0Q/+f/H1Ti6vORx5aDDCGTUihKYZr7ab4CfAal9mKNMpkk
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10197"; a="237772361"
+X-IronPort-AV: E=Sophos;i="5.88,205,1635231600"; 
+   d="scan'208";a="237772361"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Dec 2021 09:45:17 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,205,1635231600"; 
+   d="scan'208";a="682147017"
+Received: from lkp-server02.sh.intel.com (HELO 9f38c0981d9f) ([10.239.97.151])
+  by orsmga005.jf.intel.com with ESMTP; 14 Dec 2021 09:45:15 -0800
+Received: from kbuild by 9f38c0981d9f with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1mxBrW-0000Zy-JO; Tue, 14 Dec 2021 17:45:14 +0000
+Date:   Wed, 15 Dec 2021 01:44:14 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Vipin Sharma <vipinsh@google.com>, pbonzini@redhat.com,
+        seanjc@google.com
+Cc:     kbuild-all@lists.01.org, dmatlack@google.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Vipin Sharma <vipinsh@google.com>
+Subject: Re: [PATCH] KVM: Move VM's worker kthreads back to the original
+ cgroups before exiting.
+Message-ID: <202112150131.MaZ9xOJx-lkp@intel.com>
+References: <20211214050708.4040200-1-vipinsh@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <73d46f3cc46a499c8e39fdf704b2deaf@huawei.com>
+In-Reply-To: <20211214050708.4040200-1-vipinsh@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 14, 2021, Longpeng (Mike, Cloud Infrastructure Service Product Dept.) wrote:
-> Hi guys,
-> 
-> We find a problem in kvm_vcpu_block().
-> 
-> The testcase is:
->  - VM configured with 1 vcpu and 1 VF (using vfio-pci passthrough)
->  - the vfio interrupt and the vcpu are bound to the same pcpu
->  - using remapped mode IRTE, NOT posted mode
+Hi Vipin,
 
-What exactly is configured to force remapped mode?
+Thank you for the patch! Yet something to improve:
 
-> The bug was triggered when the vcpu executed HLT instruction:
-> 
-> kvm_vcpu_block:
->     prepare_to_rcuwait(&vcpu->wait);
->     for (;;) {
->         set_current_state(TASK_INTERRUPTIBLE);
-> 
->         if (kvm_vcpu_check_block(vcpu) < 0)
->             break;
-> 					<------------ (*)
->         waited = true;
->         schedule();
->     }
->     finish_rcuwait(&vcpu->wait);
-> 
-> The vcpu will go to sleep even if an interrupt from the VF is fired at (*) and
-> the PIR and ON bit will be set ( in vmx_deliver_posted_interrupt ), so the vcpu
-> won't be wakened by subsequent interrupts.
-> 
-> Any suggestions ? Thanks.
+[auto build test ERROR on d8f6ef45a623d650f9b97e11553adb4978f6aa70]
 
-What kernel version?  There have been a variety of fixes/changes in the area in
-recent kernels.
+url:    https://github.com/0day-ci/linux/commits/Vipin-Sharma/KVM-Move-VM-s-worker-kthreads-back-to-the-original-cgroups-before-exiting/20211214-130827
+base:   d8f6ef45a623d650f9b97e11553adb4978f6aa70
+config: x86_64-rhel-8.3 (https://download.01.org/0day-ci/archive/20211215/202112150131.MaZ9xOJx-lkp@intel.com/config)
+compiler: gcc-9 (Debian 9.3.0-22) 9.3.0
+reproduce (this is a W=1 build):
+        # https://github.com/0day-ci/linux/commit/fd29d23507ef3f06b61d9de1b7ecd1a0d70136f3
+        git remote add linux-review https://github.com/0day-ci/linux
+        git fetch --no-tags linux-review Vipin-Sharma/KVM-Move-VM-s-worker-kthreads-back-to-the-original-cgroups-before-exiting/20211214-130827
+        git checkout fd29d23507ef3f06b61d9de1b7ecd1a0d70136f3
+        # save the config file to linux build tree
+        mkdir build_dir
+        make W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash
+
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
+
+All errors (new ones prefixed by >>, old ones prefixed by <<):
+
+>> ERROR: modpost: "kthreadd_task" [arch/x86/kvm/kvm.ko] undefined!
+
+---
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
