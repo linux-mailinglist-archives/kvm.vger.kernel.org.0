@@ -2,68 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 106BA474371
-	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 14:27:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C12C47438D
+	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 14:34:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232227AbhLNN05 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Dec 2021 08:26:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46086 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230077AbhLNN05 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Dec 2021 08:26:57 -0500
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1090C061574
-        for <kvm@vger.kernel.org>; Tue, 14 Dec 2021 05:26:56 -0800 (PST)
-Received: by mail-ed1-x535.google.com with SMTP id y13so62580562edd.13
-        for <kvm@vger.kernel.org>; Tue, 14 Dec 2021 05:26:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:reply-to:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=xcVaKlMKT6FRxiHLt+zYM1MzTEiTnl7gjtSTpfEhQ1Q=;
-        b=mdeF/JqJYgovFQmfH7b8p8cP8iId4zV9GdzNFEyJMiqINTrioTQYDs7LxgV2myNVFD
-         gDVhLYgEqGXb6neaP1M+9upOf23T4vLmYCe5lSwhHJg4cih+LVDymlI+1JrEth/bwVhM
-         3nGGRUU9rI1oZi/dsz+y4a+dBnlHvQwmDJTF8+BLrljsJ2l4hoGBgUYXVaY3+wpAmWTv
-         O6OTcsD5bF1FkiVpRwTBGXYzDKOXXH1dtrU3zUFMX/KQd8sq3tFSCAPEaMeUwFpxjjgm
-         Xpdt4BHaNlEqkKNC7sCxlQAFLhTgPtEbuewPr/LuBDSgvBydjuG7apbDj+AsMP3CpjPN
-         b/tw==
+        id S234445AbhLNNey (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Dec 2021 08:34:54 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:38299 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229902AbhLNNex (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Tue, 14 Dec 2021 08:34:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1639488893;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Ks3M5C8EaCK4GjMRAAKSo6Eyx91OR1oex8ha7Ihy6PQ=;
+        b=V1vNl5hxufoW6Uo2LjG2tv68PV21tQwFIrBsADuUJIlUXiK6BPlMOE6lFscN5fABWoH84P
+        cRkxncO8CyFxlmjlOxNu1UICHzVQP96/salTnrJd7Tkp0emYf4Q+vXfLx+nCQ9F0emRp+o
+        ti7EaAly2sX6NsbA+9XjJkVU0I/YjHE=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-593-V_5TZXitObWEdHXwtthqNA-1; Tue, 14 Dec 2021 08:34:52 -0500
+X-MC-Unique: V_5TZXitObWEdHXwtthqNA-1
+Received: by mail-ed1-f71.google.com with SMTP id p4-20020aa7d304000000b003e7ef120a37so16916626edq.16
+        for <kvm@vger.kernel.org>; Tue, 14 Dec 2021 05:34:52 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to:content-transfer-encoding;
-        bh=xcVaKlMKT6FRxiHLt+zYM1MzTEiTnl7gjtSTpfEhQ1Q=;
-        b=gIb/csdoGuiURlogHneue/wabV1LxLiUWtKsamOWk0P9r/WwxyYJSPwktI5BMdbx61
-         mIO0s67M9rTBSzCleqjufhAN4wk5VYJvM0xeCPX/IWuX4G8RbNFYHRhUAyQTPgCK1K6r
-         at/4IiyMx3XdovtSmjKro2+RCq8jzGzE+jAYk7fAVY48IpIaqBZ4RfEBFL/IaKo0Cqbi
-         DWIa+0vZJVlZec8g0qxVGsnvKi6jTP/fe9+a27+5+maEPsAvoTnFVoYVBTNB5MCL0Qnv
-         kycRtdeY5lHU4vaSbxx5iKD2P+4KyXXkuJ/R6pTUqZAg8me4p81vxHRsz702/Az2hg0h
-         ORUQ==
-X-Gm-Message-State: AOAM533ITTsmZAZK7PovOlVRRUp+hbD9v6X/QJa1WMrRUhSRgGOBfisU
-        EfDTIydtw9komnlx/FobTqVP/6b7m4wQi/aaLXo=
-X-Google-Smtp-Source: ABdhPJw7EhSDNDvnyovXzuMqVmVr8T0k7AhWgUQpcMFAvrOz8nu+X4B0sNL1ayIFTjcXCZ/gefdR+/omZ3GgKbZcmUU=
-X-Received: by 2002:a05:6402:4c4:: with SMTP id n4mr7960187edw.30.1639488415171;
- Tue, 14 Dec 2021 05:26:55 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Ks3M5C8EaCK4GjMRAAKSo6Eyx91OR1oex8ha7Ihy6PQ=;
+        b=fo3Jgc4MBdv75Au4OCCGFwfRJ8wxJMfZ2+6dENwsEbZyq4oTcMbUt8Tg7nBjAXIk8i
+         lDJ1ycd1EFecfRPXuVtoQ//FFc8cbirJmnIVSYRUCmV17suVNCdcnR8+2tNeBRFPAKi8
+         VpIUs9dpfTcfLXRqy7dBxr4TnJJulj6xJar4o5n2rtKBZuCeQEiIKrTOUljxvqdV12Jt
+         Eye2FGtwgl/9xilIFOIt3WYn3w/PlLctn+9MOyQd5HVJaQbWic2JbwsRIO4HXQg7ZnAY
+         yZhWKY+LTw5J9v8VeytYF2Jt6zmNH+veERZ7eFA/dM66R6508Z0kh7V2kxL0cp97mHjB
+         +AnQ==
+X-Gm-Message-State: AOAM531IufRMAn0hQ/bFnhkxyRnxGnbre6x4t6ii7s2huejkfSW4z5/k
+        KeWs3zhw0S/sP9+lIYNGcnqtsDTKspedApiVUk132zTm/VUWblaJBUw1auv+i5+KYDyxNdFKWEU
+        PRg9PDvuuR96b
+X-Received: by 2002:a17:907:7f9e:: with SMTP id qk30mr5484647ejc.238.1639488891030;
+        Tue, 14 Dec 2021 05:34:51 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJwqM5EYX790yLEJfRzJAdIh/+o6T7TWGGY3j7D/yNFbJe/W4j2ZKaCKFYpB7QwPBGLGQXJupg==
+X-Received: by 2002:a17:907:7f9e:: with SMTP id qk30mr5484625ejc.238.1639488890815;
+        Tue, 14 Dec 2021 05:34:50 -0800 (PST)
+Received: from gator.home (cst2-173-70.cust.vodafone.cz. [31.30.173.70])
+        by smtp.gmail.com with ESMTPSA id sh33sm7367278ejc.56.2021.12.14.05.34.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Dec 2021 05:34:50 -0800 (PST)
+Date:   Tue, 14 Dec 2021 14:34:48 +0100
+From:   Andrew Jones <drjones@redhat.com>
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        Paolo Bonzini <pbonzini@redhat.com>, maz@kernel.org,
+        oupton@google.com, yuzenghui@huawei.com, jingzhangos@google.com,
+        pshier@google.com, rananta@google.com, reijiw@google.com
+Subject: Re: [kvm-unit-tests PATCH 0/3] arm64: debug: add migration tests for
+ debug state
+Message-ID: <20211214133448.6yjlbputjfabzftq@gator.home>
+References: <20211210165804.1623253-1-ricarkol@google.com>
 MIME-Version: 1.0
-Received: by 2002:ab4:a122:0:0:0:0:0 with HTTP; Tue, 14 Dec 2021 05:26:54
- -0800 (PST)
-Reply-To: lilyluv88@yahoo.com
-From:   Lily William <dw2396468@gmail.com>
-Date:   Tue, 14 Dec 2021 05:26:54 -0800
-Message-ID: <CACri2vQ5fYjcCS-pOw+fQW2UewGpJ0T3TU8iXtVvGBrTeAmxyg@mail.gmail.com>
-Subject: Hi Dear,
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211210165804.1623253-1-ricarkol@google.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Dear,
+On Fri, Dec 10, 2021 at 08:58:01AM -0800, Ricardo Koller wrote:
+> Add some tests for checking that we can migrate debug state correctly: setup
+> some breakpoints/watchpoints/single-stepping, migrate, and then check that we
+> get the expected exceptions.
+> 
+> The 3 patches in this series add tests for breakpoints, watchpoints, and
+> single-stepping one patch at a time.  Each patch adds a migration test and a
+> sanity test (to test that debugging works with no migration).
+> 
+> Note that this is limited to 64-bits and a single vcpu. Also note that some of
+> the code, like reset_debug_state, is borrowed from kvm selftests.
+> 
+> Ricardo Koller (3):
+>   arm64: debug: add a migration test for breakpoint state
+>   arm64: debug: add a migration test for watchpoint state
+>   arm64: debug: add a migration test for single-step state
+> 
+>  arm/Makefile.arm64 |   1 +
+>  arm/debug.c        | 420 +++++++++++++++++++++++++++++++++++++++++++++
+>  arm/unittests.cfg  |  37 ++++
+>  3 files changed, 458 insertions(+)
+>  create mode 100644 arm/debug.c
+> 
+> -- 
+> 2.34.1.173.g76aa8bc2d0-goog
+>
 
-My name is Lily=C2=A0 William, I am from the United States of America, Its
-my pleasure to contact you for new and special friendship=C2=A0 I will be
-glad to see your reply for us to know each other better and exchange
-pictures.
+Applied to https://gitlab.com/rhdrjones/kvm-unit-tests/-/commits/arm/queue
 
-Yours
-Lily
+Thanks,
+drew 
+
