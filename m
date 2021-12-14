@@ -2,172 +2,266 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9BEFF474294
-	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 13:33:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EA923474342
+	for <lists+kvm@lfdr.de>; Tue, 14 Dec 2021 14:15:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233949AbhLNMdO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Dec 2021 07:33:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33658 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229622AbhLNMdM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Dec 2021 07:33:12 -0500
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BAC1C061574;
-        Tue, 14 Dec 2021 04:33:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
-        Content-Type:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:
-        To:From:Reply-To:Content-ID:Content-Description;
-        bh=lhHn2kiA8oUwFBYVA6aNjog75ME7409J8cIOPHIQIpI=; b=Q38ECZBp5a84p4TK7jdd8sUYfJ
-        wLTD4zD6vc038/RMSCFk+Wc5x9gqbrrvTZAEHU751F82BVEL5E9/2x7wEO2vr19ZKJnFXgfGLqNwQ
-        UMbrSZgpf2JbYU8jJhIogDy3FsGcekHYBBV34Q8fl4ulL2/B0ygMODR6+0jo8pX5Kz/2UtXbDHGzN
-        4kzVG/3zXVA97QRUeDI4drPmtokp9RTgHCv+A3oaYpRLzKWPLFyV87Ph9uBQT7LE3V2E2ic/2MyKf
-        qBFvbBjv04bw3ul8Zwdelks20StgAfqicPO4MQXuGvBR0egl3QzZmeC1apm20oTUltOYF0Nm8mQEc
-        RkWiVc3g==;
-Received: from i7.infradead.org ([2001:8b0:10b:1:21e:67ff:fecb:7a92])
-        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mx6zF-001JJQ-99; Tue, 14 Dec 2021 12:32:53 +0000
-Received: from dwoodhou by i7.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mx6zE-000N6n-UQ; Tue, 14 Dec 2021 12:32:52 +0000
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Paul E . McKenney" <paulmck@kernel.org>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
-        hushiyuan@huawei.com, luolongjun@huawei.com, hejingxian@huawei.com
-Subject: [PATCH v2 7/7] x86/smpboot: Send INIT/SIPI/SIPI to secondary CPUs in parallel
-Date:   Tue, 14 Dec 2021 12:32:50 +0000
-Message-Id: <20211214123250.88230-8-dwmw2@infradead.org>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20211214123250.88230-1-dwmw2@infradead.org>
-References: <20211214123250.88230-1-dwmw2@infradead.org>
+        id S234299AbhLNNPp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Dec 2021 08:15:45 -0500
+Received: from Galois.linutronix.de ([193.142.43.55]:41688 "EHLO
+        galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234288AbhLNNPp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Dec 2021 08:15:45 -0500
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1639487743;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=+Y534tHX2TqPsdgSVQYHGTSXqoz9tYVG5PVyuPDBvjc=;
+        b=P+F7bjhojezTxjpWzqnNf70rtCWnHV97U82RZ40bGo8DKI6VxMDFJPsYUugKdxIR+D8rLo
+        b89pbOAb2r7ohsgxPNC6LasqyH/q7EAZzkKJAPQo4TSVj37QecsgNgPIscaL8mHq1lLu1Y
+        yDPDwNvzWmzAOmPZAGpOiL55vWccSt7600S87SSFj9rcFX/rs9/fXqkVqiFdO1V68OcA9K
+        Y4VX4IfuvAE02foHcJzDCD4nQRxB0Th/jKmPRZe5iVs+VQDRTdESz779efmidAebbs1d2C
+        8hStASe051iTwAjRooxSnIlslQLAGtxEMZXX9YzWcdbOnl55F6+MP9bUNzU34w==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1639487743;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=+Y534tHX2TqPsdgSVQYHGTSXqoz9tYVG5PVyuPDBvjc=;
+        b=yrNGW3u3ygfj9R1QNG3JLK1LjaoOHR9iLGhW/sHHNZB/10BNzKsGjBVldBz+Bzyz4QX+kj
+        t5Qep7PMRnj91yBw==
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        LKML <linux-kernel@vger.kernel.org>
+Cc:     Jing Liu <jing2.liu@linux.intel.com>,
+        "Zhong, Yang" <yang.zhong@intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "Nakajima, Jun" <jun.nakajima@intel.com>
+Subject: Re: [patch 4/6] x86/fpu: Add guest support to xfd_enable_feature()
+In-Reply-To: <f49f9358-a903-3ee1-46f8-1662911390ef@redhat.com>
+References: <20211214022825.563892248@linutronix.de>
+ <20211214024947.991506193@linutronix.de>
+ <BN9PR11MB5276D76F3F0729865FCE02938C759@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <f49f9358-a903-3ee1-46f8-1662911390ef@redhat.com>
+Date:   Tue, 14 Dec 2021 14:15:43 +0100
+Message-ID: <87a6h3tji8.ffs@tglx>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Sender: David Woodhouse <dwmw2@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: David Woodhouse <dwmw@amazon.co.uk>
+On Tue, Dec 14 2021 at 11:21, Paolo Bonzini wrote:
+> On 12/14/21 07:05, Tian, Kevin wrote:
+>>> +	if (guest_fpu) {
+>>> +		newfps->is_guest = true;
+>>> +		newfps->is_confidential = curfps->is_confidential;
+>>> +		newfps->in_use = curfps->in_use;
+>>> +		guest_fpu->xfeatures |= xfeatures;
+>>> +	}
+>>> +
+>> As you explained guest fpstate is not current active in the restoring
+>> path, thus it's not correct to always inherit attributes from the
+>> active one.
 
-When the APs can find their own APIC ID without assistance, we can do
-the AP bringup in parallel.
+Good catch!
 
-Register a CPUHP_BP_PARALLEL_DYN stage "x86/cpu:kick" which just calls
-do_boot_cpu() to deliver INIT/SIPI/SIPI to each AP in turn before the
-normal native_cpu_up() does the rest of the hand-holding.
+> Indeed, guest_fpu->fpstate should be used instead of curfps.
 
-The APs will then take turns through the real mode code (which has its
-own bitlock for exclusion) until they make it to their own stack, then
-proceed through the first few lines of start_secondary() and execute
-these parts in parallel:
+Something like the below.
 
- start_secondary()
-    -> cr4_init()
-    -> (some 32-bit only stuff so not in the parallel cases)
-    -> cpu_init_secondary()
-       -> cpu_init_exception_handling()
-       -> cpu_init()
-          -> wait_for_master_cpu()
+Thanks,
 
-At this point they wait for the BSP to set their bit in cpu_callout_mask
-(from do_wait_cpu_initialized()), and release them to continue through
-the rest of cpu_init() and beyond.
-
-This reduces the time taken for bringup on my 28-thread Haswell system
-from about 120ms to 80ms. On a socket 96-thread Skylake it takes the
-bringup time from 500ms to 100ms.
-
-There is more speedup to be had by doing the remaining parts in parallel
-too — especially notify_cpu_starting() in which the AP takes itself
-through all the stages from CPUHP_BRINGUP_CPU to CPUHP_ONLINE. But those
-require careful auditing to ensure they are reentrant, before we can go
-that far.
-
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+        tglx
 ---
- arch/x86/kernel/smpboot.c | 37 ++++++++++++++++++++++++++++++++++---
- 1 file changed, 34 insertions(+), 3 deletions(-)
-
-diff --git a/arch/x86/kernel/smpboot.c b/arch/x86/kernel/smpboot.c
-index 1e38d44c3603..d194116305a7 100644
---- a/arch/x86/kernel/smpboot.c
-+++ b/arch/x86/kernel/smpboot.c
-@@ -57,6 +57,7 @@
- #include <linux/pgtable.h>
- #include <linux/overflow.h>
- #include <linux/syscore_ops.h>
-+#include <linux/smpboot.h>
- 
- #include <asm/acpi.h>
- #include <asm/desc.h>
-@@ -1309,13 +1310,26 @@ int do_cpu_up(unsigned int cpu, struct task_struct *tidle)
- 	return ret;
+--- a/arch/x86/kernel/fpu/xstate.c
++++ b/arch/x86/kernel/fpu/xstate.c
+@@ -1500,35 +1500,13 @@ void fpstate_free(struct fpu *fpu)
  }
  
-+static bool do_parallel_bringup = true;
-+
-+static int __init no_parallel_bringup(char *str)
-+{
-+	do_parallel_bringup = false;
-+
-+	return 0;
-+}
-+early_param("no_parallel_bringup", no_parallel_bringup);
-+
- int native_cpu_up(unsigned int cpu, struct task_struct *tidle)
- {
- 	int ret;
- 
--	ret = do_cpu_up(cpu, tidle);
--	if (ret)
--		return ret;
-+	/* If parallel AP bringup isn't enabled, perform the first steps now. */
-+	if (!do_parallel_bringup) {
-+		ret = do_cpu_up(cpu, tidle);
-+		if (ret)
-+			return ret;
-+	}
- 
- 	ret = do_wait_cpu_initialized(cpu);
- 	if (ret)
-@@ -1337,6 +1351,12 @@ int native_cpu_up(unsigned int cpu, struct task_struct *tidle)
- 	return ret;
- }
- 
-+/* Bringup step one: Send INIT/SIPI to the target AP */
-+static int native_cpu_kick(unsigned int cpu)
-+{
-+	return do_cpu_up(cpu, idle_thread_get(cpu));
-+}
-+
  /**
-  * arch_disable_smp_support() - disables SMP support for x86 at runtime
+- * fpu_install_fpstate - Update the active fpstate in the FPU
+- *
+- * @fpu:	A struct fpu * pointer
+- * @newfps:	A struct fpstate * pointer
+- *
+- * Returns:	A null pointer if the last active fpstate is the embedded
+- *		one or the new fpstate is already installed;
+- *		otherwise, a pointer to the old fpstate which has to
+- *		be freed by the caller.
+- */
+-static struct fpstate *fpu_install_fpstate(struct fpu *fpu,
+-					   struct fpstate *newfps)
+-{
+-	struct fpstate *oldfps = fpu->fpstate;
+-
+-	if (fpu->fpstate == newfps)
+-		return NULL;
+-
+-	fpu->fpstate = newfps;
+-	return oldfps != &fpu->__fpstate ? oldfps : NULL;
+-}
+-
+-/**
+  * fpstate_realloc - Reallocate struct fpstate for the requested new features
+  *
+  * @xfeatures:	A bitmap of xstate features which extend the enabled features
+  *		of that task
+  * @ksize:	The required size for the kernel buffer
+  * @usize:	The required size for user space buffers
++ * @guest_fpu:	Pointer to a guest FPU container. NULL for host allocations
+  *
+  * Note vs. vmalloc(): If the task with a vzalloc()-allocated buffer
+  * terminates quickly, vfree()-induced IPIs may be a concern, but tasks
+@@ -1537,13 +1515,13 @@ static struct fpstate *fpu_install_fpsta
+  * Returns: 0 on success, -ENOMEM on allocation error.
   */
-@@ -1515,6 +1535,17 @@ void __init native_smp_prepare_cpus(unsigned int max_cpus)
- 	smp_quirk_init_udelay();
+ static int fpstate_realloc(u64 xfeatures, unsigned int ksize,
+-			   unsigned int usize)
++			   unsigned int usize, struct fpu_guest *guest_fpu)
+ {
+ 	struct fpu *fpu = &current->thread.fpu;
+ 	struct fpstate *curfps, *newfps = NULL;
+ 	unsigned int fpsize;
++	bool in_use;
  
- 	speculative_store_bypass_ht_init();
-+
+-	curfps = fpu->fpstate;
+ 	fpsize = ksize + ALIGN(offsetof(struct fpstate, regs), 64);
+ 
+ 	newfps = vzalloc(fpsize);
+@@ -1553,28 +1531,55 @@ static int fpstate_realloc(u64 xfeatures
+ 	newfps->user_size = usize;
+ 	newfps->is_valloc = true;
+ 
 +	/*
-+	 * We can do 64-bit AP bringup in parallel if the CPU reports its
-+	 * APIC ID in CPUID leaf 0x0B. Otherwise it's too hard.
++	 * When a guest FPU is supplied, use @guest_fpu->fpstate
++	 * as reference independent whether it is in use or not.
 +	 */
-+	if (IS_ENABLED(CONFIG_X86_32) || boot_cpu_data.cpuid_level < 0x0B)
-+		do_parallel_bringup = false;
++	curfps = guest_fpu ? guest_fpu->fpstate : fpu->fpstate;
 +
-+	if (do_parallel_bringup)
-+		cpuhp_setup_state_nocalls(CPUHP_BP_PARALLEL_DYN, "x86/cpu:kick",
-+					  native_cpu_kick, NULL);
++	/* Determine whether @curfps is the active fpstate */
++	in_use = fpu->fpstate == curfps;
++
++	if (guest_fpu) {
++		newfps->is_guest = true;
++		newfps->is_confidential = curfps->is_confidential;
++		newfps->in_use = curfps->in_use;
++		guest_fpu->xfeatures |= xfeatures;
++	}
++
+ 	fpregs_lock();
+ 	/*
+-	 * Ensure that the current state is in the registers before
+-	 * swapping fpstate as that might invalidate it due to layout
+-	 * changes.
++	 * If @curfps is in use, ensure that the current state is in the
++	 * registers before swapping fpstate as that might invalidate it
++	 * due to layout changes.
+ 	 */
+-	if (test_thread_flag(TIF_NEED_FPU_LOAD))
++	if (in_use && test_thread_flag(TIF_NEED_FPU_LOAD))
+ 		fpregs_restore_userregs();
+ 
+ 	newfps->xfeatures = curfps->xfeatures | xfeatures;
+ 	newfps->user_xfeatures = curfps->user_xfeatures | xfeatures;
+ 	newfps->xfd = curfps->xfd & ~xfeatures;
+ 
+-	curfps = fpu_install_fpstate(fpu, newfps);
+-
+ 	/* Do the final updates within the locked region */
+ 	xstate_init_xcomp_bv(&newfps->regs.xsave, newfps->xfeatures);
+-	xfd_update_state(newfps);
+ 
++	if (guest_fpu) {
++		curfps = xchg(&guest_fpu->fpstate, newfps);
++		/* If curfps is active, update the FPU fpstate pointer */
++		if (in_use)
++			fpu->fpstate = newfps;
++	} else {
++		curfps = xchg(&fpu->fpstate, newfps);
++	}
++
++	if (in_use)
++		xfd_update_state(fpu->fpstate);
+ 	fpregs_unlock();
+ 
+-	vfree(curfps);
++	/* Only free valloc'ed state */
++	if (curfps && curfps->is_valloc)
++		vfree(curfps);
++
+ 	return 0;
  }
  
- void arch_thaw_secondary_cpus_begin(void)
--- 
-2.31.1
+@@ -1682,14 +1687,16 @@ static int xstate_request_perm(unsigned
+ 	return ret;
+ }
+ 
+-int xfd_enable_feature(u64 xfd_err)
++int __xfd_enable_feature(u64 xfd_err, struct fpu_guest *guest_fpu)
+ {
+ 	u64 xfd_event = xfd_err & XFEATURE_MASK_USER_DYNAMIC;
++	struct fpu_state_perm *perm;
+ 	unsigned int ksize, usize;
+ 	struct fpu *fpu;
+ 
+ 	if (!xfd_event) {
+-		pr_err_once("XFD: Invalid xfd error: %016llx\n", xfd_err);
++		if (!guest_fpu)
++			pr_err_once("XFD: Invalid xfd error: %016llx\n", xfd_err);
+ 		return 0;
+ 	}
+ 
+@@ -1697,14 +1704,16 @@ int xfd_enable_feature(u64 xfd_err)
+ 	spin_lock_irq(&current->sighand->siglock);
+ 
+ 	/* If not permitted let it die */
+-	if ((xstate_get_host_group_perm() & xfd_event) != xfd_event) {
++	if ((xstate_get_group_perm(!!guest_fpu) & xfd_event) != xfd_event) {
+ 		spin_unlock_irq(&current->sighand->siglock);
+ 		return -EPERM;
+ 	}
+ 
+ 	fpu = &current->group_leader->thread.fpu;
+-	ksize = fpu->perm.__state_size;
+-	usize = fpu->perm.__user_state_size;
++	perm = guest_fpu ? &fpu->guest_perm : &fpu->perm;
++	ksize = perm->__state_size;
++	usize = perm->__user_state_size;
++
+ 	/*
+ 	 * The feature is permitted. State size is sufficient.  Dropping
+ 	 * the lock is safe here even if more features are added from
+@@ -1717,10 +1726,16 @@ int xfd_enable_feature(u64 xfd_err)
+ 	 * Try to allocate a new fpstate. If that fails there is no way
+ 	 * out.
+ 	 */
+-	if (fpstate_realloc(xfd_event, ksize, usize))
++	if (fpstate_realloc(xfd_event, ksize, usize, guest_fpu))
+ 		return -EFAULT;
+ 	return 0;
+ }
++
++int xfd_enable_feature(u64 xfd_err)
++{
++	return __xfd_enable_feature(xfd_err, NULL);
++}
++
+ #else /* CONFIG_X86_64 */
+ static inline int xstate_request_perm(unsigned long idx, bool guest)
+ {
+--- a/arch/x86/kernel/fpu/xstate.h
++++ b/arch/x86/kernel/fpu/xstate.h
+@@ -60,6 +60,8 @@ extern void fpu__init_system_xstate(unsi
+ 
+ extern void *get_xsave_addr(struct xregs_state *xsave, int xfeature_nr);
+ 
++extern int __xfd_enable_feature(u64 which, struct fpu_guest *guest_fpu);
++
+ static inline u64 xfeatures_mask_supervisor(void)
+ {
+ 	return fpu_kernel_cfg.max_features & XFEATURE_MASK_SUPERVISOR_SUPPORTED;
 
