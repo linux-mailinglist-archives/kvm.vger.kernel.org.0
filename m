@@ -2,160 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9B38647600C
-	for <lists+kvm@lfdr.de>; Wed, 15 Dec 2021 19:00:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 10945476058
+	for <lists+kvm@lfdr.de>; Wed, 15 Dec 2021 19:12:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245383AbhLOSAA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Dec 2021 13:00:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44254 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245374AbhLOSAA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Dec 2021 13:00:00 -0500
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7B9FC061574
-        for <kvm@vger.kernel.org>; Wed, 15 Dec 2021 09:59:59 -0800 (PST)
-Received: by mail-pg1-x531.google.com with SMTP id d11so12108053pgl.1
-        for <kvm@vger.kernel.org>; Wed, 15 Dec 2021 09:59:59 -0800 (PST)
+        id S245707AbhLOSL1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Dec 2021 13:11:27 -0500
+Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:59492 "EHLO
+        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233548AbhLOSL0 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 15 Dec 2021 13:11:26 -0500
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1BFHw5cU030510;
+        Wed, 15 Dec 2021 18:11:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : content-type : in-reply-to :
+ mime-version; s=corp-2021-07-09;
+ bh=beKlXv8VV5zGyjk66VMveuzHOWuVW1OizrwffhuXjWI=;
+ b=EhDC8a84HSZ9NUE9b7GPpeokcAwie6VmUo7bLE3am2jHy7rk93N3fA4GzZ2ZVL1nLUJK
+ b5BUhXbTsad6t4CXS0cT+HjzC7blwkmVSU+h++eNLi5cn2b91TULb0qfzYk56C795pRc
+ dW8vaFJCEl1qAwPYaTdp1dcCuBFe0Lm3cA1uiJGqfuw38DVx0QRXT9jhdcA7VtzkxhKS
+ UpFwAPqnEO6Mj/a1adq+fSZPtob+wH/rX1QJow9x4WvbPnCeBmfGQPZrlRZbyshM74SR
+ V2M38+qp1/MezCKQ4NMbw4ulgjfFENG/IJI+zYZGMje1xKS9MfEZkw/i4tmEfHt9XeaY Zg== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by mx0b-00069f02.pphosted.com with ESMTP id 3cykm58e6v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 15 Dec 2021 18:11:24 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 1BFHtj00189969;
+        Wed, 15 Dec 2021 18:11:23 GMT
+Received: from nam11-co1-obe.outbound.protection.outlook.com (mail-co1nam11lp2175.outbound.protection.outlook.com [104.47.56.175])
+        by userp3020.oracle.com with ESMTP id 3cvnesaeeb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 15 Dec 2021 18:11:23 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KIGcrE4Cff9kKV9FhqVhm9X7E00HwH+IMcBDBBAUd4XtoOm0VmAQgL+fkW2XlVWgfYfBGdPPrtlI8IM5hZX5d1aYmDa1Z84Vv5DCBDu7YY62L1DKuz4i7m2CQYm086GEnsohXDIoZ125HoCvhh7Svfar8bPX6eVKzNg7K2xUjFtQKz195qb5r8pmnhYSoG2z1o9xzgQ5gqRecmiuX4jTbG3xfJaE5GQtbSgpxVqQ3b5FzoKg+mZtfS6LIXUm4JZzsLXyBPRel+8XJKK1JICMOMDVwwItK2yPFcm5Xg3nlVbKUE8N/DjbmEJ7lL1HlzuhBVfsLTiL5zqT/W9GzBhOsQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=beKlXv8VV5zGyjk66VMveuzHOWuVW1OizrwffhuXjWI=;
+ b=SmEvtWj/Lm0AIn8reMbMGAS2Bacdc/4YfIt1qo/wDHgTTyhM6Ufg7qcPKQLBtyD0H/lUPnSgrnEa6g7/FHwY6UNKcyp/0KdkXRqspyM8jn+0kBuj+vu/ZUYIALGbyxnox7u/koXjQvLvDTCsUlC4/rbqY1auNwnrFWt8ixijHiQplLcBVf5ohIPwXylpTmfK0rK47IMFairDupYHyC2FtL+9/h6TFe1KZIfvMvxbD9jD9k8IPuXskoa3v2fe8nP75xJTA99IJUJQ9pBgpk9P8XBJO7MLYjg9U+WavW2cFbQA4siPCHUBGHjULZI+xvwiKzWD/04MxA4Y1PoVyWFBLw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ggAc5NwHgbAF9NQ5yQbvGZ42z1DyZ9O0jHYH8xXLJJE=;
-        b=UHNgNEZTROoPzSn3k142OQynuy8gPCqn4AiAb4DazbLBufkSpzd1vMbjoggiyDC6aT
-         EeM9/gE32ezen5sRZioO00/E5LYmlXZen96XCBNsX+NiUYvhm3jOl42pcqOIUWLZiA0s
-         zIUHCbZdif/Rk7PRC9FRftqmK9r4oWvCtPVGk1i1Z9ykghyzKcQndXVhTk2BR/KtPzX8
-         KMcubm/1lVycqfNdtzlFNKTo23pYLIWnq37lwzFS66lVPdV+VsjqT+EcX1LHxMicpemD
-         ut0OyySFVM/MNSnjAIUWbxnagHU6bO1a29hB93XBgKxu7uNv7iL+sW4SBviPyPp6gtZw
-         TK2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ggAc5NwHgbAF9NQ5yQbvGZ42z1DyZ9O0jHYH8xXLJJE=;
-        b=nTh1oJi5F++f79dZ8q3xtVF9crpTz9sVThXUwJG11qbun905ndu4uuW6o/eg1vRrYM
-         JHiaehPqdMJGZ91NWCPxbLki67vsEozSLiETJuBZdLjaPASW4b1Ps/8q/RVtNKLxKvxc
-         4eBHgD1fTKy0/J+7NsEJ61+Ecn8QjBA+9n1FlUCve6ox0FBNeEWfQFqfR+a33RccVDAR
-         pJp6Z/wcClOMwTRNUL8b5sCPqjLUO8/tcWuMN7pl+U0ZUh7AHCW/w9/JPA/FJMpocGfh
-         6s27f5nOHy/a+D0xJ9ddxK3z52iTddPgbQSJgQS2k6TFidC2cp16SnK6ibR077X1OMDi
-         IJwQ==
-X-Gm-Message-State: AOAM532Usxq61O1zMeq+cJyF2gzYCs+bLr2sqw6spUJTE8OT90ffV2PN
-        rjsb4XTMM0DoS9oODjOEPcxliw==
-X-Google-Smtp-Source: ABdhPJxZITx/2X7Ak7nVdnVGM6felhmNd0m69P7830XVD/z43avptEodeKdGFY58zQdQ8Zv4aehUWg==
-X-Received: by 2002:a63:f443:: with SMTP id p3mr8634580pgk.385.1639591199160;
-        Wed, 15 Dec 2021 09:59:59 -0800 (PST)
-Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
-        by smtp.gmail.com with ESMTPSA id z22sm3645466pfe.93.2021.12.15.09.59.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Dec 2021 09:59:58 -0800 (PST)
-Date:   Wed, 15 Dec 2021 17:59:55 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>, oliver.sang@intel.com,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: selftests: Avoid KVM_SET_CPUID2 after KVM_RUN in
- vmx_pmu_msrs_test
-Message-ID: <YbotG5neKyzhv22Z@google.com>
-References: <20211215161617.246563-1-vkuznets@redhat.com>
-MIME-Version: 1.0
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=beKlXv8VV5zGyjk66VMveuzHOWuVW1OizrwffhuXjWI=;
+ b=GhhsEXfvk4K3McNgJ3/tg4mkMJBtLTybWz3HSQDdS46eV7GbPZbuCJmE9UWqLDOG/HbFMjgo3y1Eb5powollqGhO79sp9bb25rBxDlXKk6pjR/Yv0nt9jM2bzj6FJs1UqnjZHYE50ToOFncssl0BbTE+SxqD4ag7hwr9lShFPbo=
+Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
+ (2603:10b6:301:2d::28) by MWHPR10MB1485.namprd10.prod.outlook.com
+ (2603:10b6:300:25::7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4778.17; Wed, 15 Dec
+ 2021 18:11:21 +0000
+Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
+ ([fe80::7194:c377:36cc:d9f0]) by MWHPR1001MB2365.namprd10.prod.outlook.com
+ ([fe80::7194:c377:36cc:d9f0%6]) with mapi id 15.20.4801.014; Wed, 15 Dec 2021
+ 18:11:20 +0000
+Date:   Wed, 15 Dec 2021 21:11:02 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org
+Subject: Re: [bug report] KVM: Dynamically allocate "new" memslots from the
+ get-go
+Message-ID: <20211215181102.GC1978@kadam>
+References: <20211215112440.GA13974@kili>
+ <YboZE29SMR/EgLOL@google.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211215161617.246563-1-vkuznets@redhat.com>
+In-Reply-To: <YboZE29SMR/EgLOL@google.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-ClientProxiedBy: JNAP275CA0016.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:4c::21)
+ To MWHPR1001MB2365.namprd10.prod.outlook.com (2603:10b6:301:2d::28)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 85b2ffde-1242-46bb-1b05-08d9bff64bf0
+X-MS-TrafficTypeDiagnostic: MWHPR10MB1485:EE_
+X-Microsoft-Antispam-PRVS: <MWHPR10MB14856627125678814FF6C2818E769@MWHPR10MB1485.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: sA5ggeVfkGrL5jioRaNEZr3IYmA5/vu48hYHzEMnZ3U6nfA0VfXOhGssRGOVdIqKGd1O+BmOBuopLB3f/vhB2csmWG/Y6DcKdltAyw9NtG0hFw+nKfrxGI6SEmQNVuQ2gZKQ0CVHgFSilL3v3bECkhflKn22cqWUjb6UFZyiOSxCktxk/RQbbzfYjqPmxKLSx8KoGXgLjBv5PTGRx8+DTL9Dycf7sBv0qaAYwV5HWmZ7Z1QYN41zClMh3bl795NuKRnBqV9hjI0dv/gEQHXiOTvVurzty+0LCTU2MlJzYH/8eQYe6WvDAnSOAi78K3t4u8VJ2ymukO4wp9vdOSJBMiBe7bmg+RYcbJQ1uZc2bQxnF5h2RSNVjx9sjKTHupg0Q/Uiqy7mOx1OuMqi8QQlSMdXZG/U0zKgnKc6fBO9BohwMlHVqYsF7Fn3ZjU4TexC1KfA1E3Nt2VSOomFSgumLN4HBG7DI42deq6yEAqNlW3faCO/4zcsV4eOVNN9Jgv5+4EVvgXhp2q3Z0mrmhStTvokzEy6l2Pri86Zl2NMiaTN/E8Lbd7O/gikFbY1AZ4CjppRSUXWddchNY6O1+rZPBJJjel2OJSkOAB+hxHuYll4Yzfgmsd0GO9e6pyt9iDrX7Ru6U/y/4FzoXyp0rH0UC+v5VGDwkT560pnLRghJ1t/eTrK6FPGyZPtw7Gb4kIxV3km/7fb7HUoxv0iDTayMg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR1001MB2365.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(7916004)(366004)(26005)(186003)(86362001)(6512007)(66556008)(38350700002)(4744005)(8936002)(9686003)(33656002)(66946007)(508600001)(6666004)(66476007)(6486002)(316002)(33716001)(4326008)(6916009)(2906002)(6506007)(44832011)(1076003)(52116002)(8676002)(5660300002)(38100700002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?0+uGOiR10+Kyn3zxBGR7TKFU6suQwFWrMt9D83jcjZupmNb7anS7X5n+EYC6?=
+ =?us-ascii?Q?fGqRMCZlsUPnHzJy+ZyrzFMOW/Rnw2bxDlfVuXEGcKfgSQedQcexaj/uLhA9?=
+ =?us-ascii?Q?px1bC98CwP+snzacLngv4fF+LiA8DRoio8gZ3QY2tThzyRcSEdrJDeXQJ5qj?=
+ =?us-ascii?Q?jBEPLg0mJ3NYpGQzzFBX6Udh6hRaHRPWsXJuLZXggfOk4rNwhQkOjNEweL2v?=
+ =?us-ascii?Q?NUVq21Gj0rQMtnPgpOvjEqf6UPoW6paMJG1GNZldMMvqCVxjeqNdfEMALIhe?=
+ =?us-ascii?Q?zqTX80ZKWDiomzz76cOz7nno2Mf93M+qlGvFh+EvxNNBEwb/acpddX4MuFnR?=
+ =?us-ascii?Q?q4wVFG2rxeECn84n0vkyyf4MFbd2g6fsoT66f4v1DqIw8uFn08Hms2s4WGxq?=
+ =?us-ascii?Q?BQuJ6BsEK5gNkNockzhEu8nRce9YH2shhrhZj6ix3KcX+XGRNkYqEDDGe2li?=
+ =?us-ascii?Q?aiV/eehwmu3QOh3ZQUgPGtmb7wP2hl3bupeuO2dGt3MbcAZLiCsqUcc4q7tl?=
+ =?us-ascii?Q?TMJgwPzQkeFabFZ9w2rsVyks4VDpUdkMvbAYZlTfItJsStwSX3SuY0vlBxxQ?=
+ =?us-ascii?Q?00GEDUPUooN+H2fosCmPyyVxuogHxY3Av/4m2hU1TbGj5FBNGb/Iz5iNjm/O?=
+ =?us-ascii?Q?DB/xl387quV5FKFLA3NamGNQ1d7PiHqEnlW/d3kbT3wdwAj/aa7L+Y2/TtdA?=
+ =?us-ascii?Q?BAdyszY+H/t01p0RqL7h3/6HkIjfsoYNDbtHRWrLQsQTJQRf53rF/jxJ/KV7?=
+ =?us-ascii?Q?igAuGeUqdVWdumuu/1B+XzcobCmGRHfgNaQtdVctvgxVcUYrEBZHtFyCz1yW?=
+ =?us-ascii?Q?/VaA2uRx7Ru0l6rv3JD5pd0NZa3YauMIvp0IxXqoePv1czTOIfwUiEGgH8x9?=
+ =?us-ascii?Q?VRWTxn4ED7ZQNavBstskUHSNXU8T+L/mYqbjwl12WdKg+oXyTjv3DveWKlw8?=
+ =?us-ascii?Q?jpxX75xk6E748+Z5y6CSL8PXXEP5ErzWqCcN3k1xEG1D6yiT1JPGcz4pZkK+?=
+ =?us-ascii?Q?Af4qYJ4Ta7KGpTRF0NUv8F8EBjO1y3LFxnZr9ihO00xDftwPOqw/eYo07cHz?=
+ =?us-ascii?Q?XqVVExPjZ5kEuwDm8VeSwb3l7EYM6PBH3ptVdZM3zVEDDJEVSOXekrFBYo2q?=
+ =?us-ascii?Q?wTEfQYRGhittgcb9vGNTU6rM4oLu9++GFXTyAzsQa/UkKUrJ6xC63CjWOLNh?=
+ =?us-ascii?Q?bfgQzFgVOJnO+OhJK7i9xImjP5mK9g5WbW7LPMR60xOucBK3nsv5Y7eqmhv7?=
+ =?us-ascii?Q?JOX8pgkLjAvqQkz4Uihcm3xLFnrrr44VFTAovPLuc5JOM+gYT7p/Fy9B14eX?=
+ =?us-ascii?Q?+i148N0g1z4mkv/P4ZMb8CjEwy4ufO1UaglxREUSsAoIjAlZeWI294cXycpG?=
+ =?us-ascii?Q?4b7svnbd2zzBYO9OkDZh448mLR6ClPCgJZBu0bJ4sNSSi3FU9qp8sind0Ike?=
+ =?us-ascii?Q?eFb3bCNswTDMoHuhWlYkJX98mCblMgqybCSytz1BipWA9K35njOpmy8Ocs1/?=
+ =?us-ascii?Q?tmlDxqmM5JS3yqSokRAyEQIWCfycLUgyPMxiIExlbLbvnPl2Ger62kjOodu8?=
+ =?us-ascii?Q?o5qLEhCG84LLGPuHNRDKqucOrp/lOxMLVzzBTPlCmlUo9zwgiBQoJDCklIHS?=
+ =?us-ascii?Q?NUhh1ciWdOflW5l5nauE/BuObGVXysUJVmmQsvbLOSwMfGHYaudAG+APdR7g?=
+ =?us-ascii?Q?jG+gUaVJ4lHYK6e2drEIBUS28ec=3D?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 85b2ffde-1242-46bb-1b05-08d9bff64bf0
+X-MS-Exchange-CrossTenant-AuthSource: MWHPR1001MB2365.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Dec 2021 18:11:20.8451
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: baSvb3gjB9fWuXlA0EycujHgL+Hyy7R0s+GDmkKinQ51XkqVMeYds00oOudtX4DIISletNsSYTc7ZDtnSBHNV3fhWA1FbPnOqp77G3Ce030=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR10MB1485
+X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10199 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 adultscore=0
+ malwarescore=0 bulkscore=0 spamscore=0 mlxlogscore=590 mlxscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2112150101
+X-Proofpoint-GUID: EfmLH_QLKkMoWLPr4iMO29FvEQ1Kfwxr
+X-Proofpoint-ORIG-GUID: EfmLH_QLKkMoWLPr4iMO29FvEQ1Kfwxr
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 15, 2021, Vitaly Kuznetsov wrote:
-> Commit feb627e8d6f6 ("KVM: x86: Forbid KVM_SET_CPUID{,2} after KVM_RUN")
-> forbade chaning vCPU's CPUID data after the first KVM_RUN but
-> vmx_pmu_msrs_test does exactly that. Test VM needs to be re-created after
-> vcpu_run().
-> 
-> Reported-by: kernel test robot <oliver.sang@intel.com>
-> Fixes: feb627e8d6f6 ("KVM: x86: Forbid KVM_SET_CPUID{,2} after KVM_RUN")
-> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
-> ---
->  tools/testing/selftests/kvm/x86_64/vmx_pmu_msrs_test.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/kvm/x86_64/vmx_pmu_msrs_test.c b/tools/testing/selftests/kvm/x86_64/vmx_pmu_msrs_test.c
-> index 23051d84b907..17882f79deed 100644
-> --- a/tools/testing/selftests/kvm/x86_64/vmx_pmu_msrs_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/vmx_pmu_msrs_test.c
-> @@ -99,6 +99,11 @@ int main(int argc, char *argv[])
->  	vcpu_run(vm, VCPU_ID);
->  	ASSERT_EQ(vcpu_get_msr(vm, VCPU_ID, MSR_IA32_PERF_CAPABILITIES), PMU_CAP_FW_WRITES);
->  
-> +	/* Re-create guest VM after KVM_RUN so CPUID can be changed */
-> +	kvm_vm_free(vm);
-> +	vm = vm_create_default(VCPU_ID, 0, guest_code);
-> +	vcpu_set_cpuid(vm, VCPU_ID, cpuid);
+On Wed, Dec 15, 2021 at 04:34:27PM +0000, Sean Christopherson wrote:
+> There's no true dereference, architectures are responsible for ensuring @old and
+> @new are non-NULL, either via explicit checks on the pointer or implicit checks
+> on @change.
 
-Why is this test even setting CPUID for the below cases?  Guest CPUID shouldn't
-affect host_initiated writes.  This part in particular looks wrong:
+Ah...  Okay.  Thanks.
 
-	entry_1_0->ecx |= X86_FEATURE_PDCM;
-	eax.split.version_id = 0;
-	entry_1_0->ecx = eax.full;
-	vcpu_set_cpuid(vm, VCPU_ID, cpuid);
-	ret = _vcpu_set_msr(vm, 0, MSR_IA32_PERF_CAPABILITIES, PMU_CAP_FW_WRITES);
-	TEST_ASSERT(ret == 0, "Bad PERF_CAPABILITIES didn't fail.");
+Smatch tries to track these implicit checks within a function but the
+relationships get lost at the function boundaries.  So, for example, if
+there were three callers and two were non-NULL and one was NULL then
+Smatch could figure it out.  But in this case there is only one caller
+so the data gets squished together and the relationship between "change"
+and "new" gets lost.
 
-As does the KVM code.  The WRMSR path for MSR_IA32_PERF_CAPABILITIES looks especially
-wrong, as rejects a bad write iff userspace set PDCM in guest CPUID.
+regards,
+dan carpenter
 
-		struct kvm_msr_entry msr_ent = {.index = msr, .data = 0};
-
-		if (!msr_info->host_initiated)
-			return 1;
-		if (guest_cpuid_has(vcpu, X86_FEATURE_PDCM) && kvm_get_msr_feature(&msr_ent))  <===== Huh?
-			return 1;
-		if (data & ~msr_ent.data)
-			return 1;
-
-		vcpu->arch.perf_capabilities = data;
-
-		return 0;
-		}
-
-So I think we should fix KVM and then clean up the test accordingly.
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 85127b3e3690..65e297875405 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3424,7 +3424,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-
-                if (!msr_info->host_initiated)
-                        return 1;
--               if (guest_cpuid_has(vcpu, X86_FEATURE_PDCM) && kvm_get_msr_feature(&msr_ent))
-+               if (kvm_get_msr_feature(&msr_ent))
-                        return 1;
-                if (data & ~msr_ent.data)
-                        return 1;
-@@ -3779,14 +3779,12 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-                msr_info->data = vcpu->arch.microcode_version;
-                break;
-        case MSR_IA32_ARCH_CAPABILITIES:
--               if (!msr_info->host_initiated &&
--                   !guest_cpuid_has(vcpu, X86_FEATURE_ARCH_CAPABILITIES))
-+               if (!msr_info->host_initiated)
-                        return 1;
-                msr_info->data = vcpu->arch.arch_capabilities;
-                break;
-        case MSR_IA32_PERF_CAPABILITIES:
--               if (!msr_info->host_initiated &&
--                   !guest_cpuid_has(vcpu, X86_FEATURE_PDCM))
-+               if (!msr_info->host_initiated)
-                        return 1;
-                msr_info->data = vcpu->arch.perf_capabilities;
-                break;
-
-> +
->  	/* testcase 2, check valid LBR formats are accepted */
->  	vcpu_set_msr(vm, 0, MSR_IA32_PERF_CAPABILITIES, 0);
->  	ASSERT_EQ(vcpu_get_msr(vm, VCPU_ID, MSR_IA32_PERF_CAPABILITIES), 0);
-> -- 
-> 2.33.1
-> 
