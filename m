@@ -2,199 +2,215 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 86B824758D1
-	for <lists+kvm@lfdr.de>; Wed, 15 Dec 2021 13:25:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 14DD8475956
+	for <lists+kvm@lfdr.de>; Wed, 15 Dec 2021 14:07:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242468AbhLOMZD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Dec 2021 07:25:03 -0500
-Received: from mga07.intel.com ([134.134.136.100]:15730 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S242416AbhLOMZC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Dec 2021 07:25:02 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10198"; a="302588599"
-X-IronPort-AV: E=Sophos;i="5.88,207,1635231600"; 
-   d="scan'208";a="302588599"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Dec 2021 04:25:02 -0800
-X-IronPort-AV: E=Sophos;i="5.88,207,1635231600"; 
-   d="scan'208";a="518749567"
-Received: from blu2-mobl3.ccr.corp.intel.com (HELO [10.254.215.57]) ([10.254.215.57])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Dec 2021 04:24:55 -0800
-Message-ID: <faa67db1-cba7-cc23-2a36-7dd716a1f7e3@linux.intel.com>
-Date:   Wed, 15 Dec 2021 20:24:52 +0800
+        id S237388AbhLONHg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Dec 2021 08:07:36 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:32888 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234376AbhLONHg (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 15 Dec 2021 08:07:36 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1BFCveui014522;
+        Wed, 15 Dec 2021 13:07:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=0+AIDY6aicStdOTOtfpuutFkGIYd/2EI3Dhgl0iB0GE=;
+ b=A24UhHtLd2mnxVPiseeH+OYyY9vml71Re+jGpk8yqH0Tkt1rIuLIAyZFNo8Av1KPinf9
+ 0NXZOSQ7D4+j/JbhHSTL9BiYuV5MyxAHkWpBTYwvG2T8vyeJ4mfTecKzNtm8xSZG12Dy
+ UF8lpZhXCT1u7CX+datpBJ099kXL5Ee9ja0zuFwMm7ccsRBxPAavDKWJMIN6eF/3gGIk
+ qD0x88rj1PUtgnaAq7upUn3NruBiK7e3w7YvkHXdqkVDK2Irffpm9P0SPbpcu01lAHBF
+ 3GDWsnU1myktRHniWWr9sbNMq7yIBaTBXMTQvJWLWaQspkifhc8CwI5N2ehE4GTXEkZR rA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cygtrr8wm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 15 Dec 2021 13:07:35 +0000
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1BFCx2Ah025536;
+        Wed, 15 Dec 2021 13:07:35 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cygtrr8vh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 15 Dec 2021 13:07:35 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1BFD7Pv4012518;
+        Wed, 15 Dec 2021 13:07:32 GMT
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
+        by ppma02fra.de.ibm.com with ESMTP id 3cy7sjcvdq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 15 Dec 2021 13:07:32 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1BFD7TsN38994386
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 15 Dec 2021 13:07:29 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E7A5DA4057;
+        Wed, 15 Dec 2021 13:07:28 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 673D8A405B;
+        Wed, 15 Dec 2021 13:07:28 +0000 (GMT)
+Received: from [9.171.32.186] (unknown [9.171.32.186])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 15 Dec 2021 13:07:28 +0000 (GMT)
+Message-ID: <c6536d85-dcee-1b6b-08bc-335716c7f23e@de.ibm.com>
+Date:   Wed, 15 Dec 2021 14:07:27 +0100
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Cc:     baolu.lu@linux.intel.com, Joerg Roedel <joro@8bytes.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Ashok Raj <ashok.raj@intel.com>, Will Deacon <will@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Dan Williams <dan.j.williams@intel.com>, rafael@kernel.org,
-        Diana Craciun <diana.craciun@oss.nxp.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Liu Yi L <yi.l.liu@intel.com>,
-        Jacob jun Pan <jacob.jun.pan@intel.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Stuart Yoder <stuyoder@gmail.com>,
-        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        Li Yang <leoyang.li@nxp.com>,
-        Dmitry Osipenko <digetx@gmail.com>,
-        iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 04/18] driver core: platform: Add driver dma ownership
- management
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [RFC PATCH v5 1/1] KVM: s390: Clarify SIGP orders versus
+ STOP/RESTART
 Content-Language: en-US
-To:     Jason Gunthorpe <jgg@nvidia.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Christoph Hellwig <hch@infradead.org>
-References: <20211206015903.88687-1-baolu.lu@linux.intel.com>
- <20211206015903.88687-5-baolu.lu@linux.intel.com>
- <Ya4f662Af+8kE2F/@infradead.org> <20211206150647.GE4670@nvidia.com>
- <56a63776-48ca-0d6e-c25c-016dc016e0d5@linux.intel.com>
- <20211207131627.GA6385@nvidia.com>
- <c170d215-6aef-ff21-8733-1bae4478e39c@linux.intel.com>
- <b42ffaee-bb96-6db4-8540-b399214f6881@linux.intel.com>
- <5d537286-2cb3-cf91-c0de-019355110aa1@linux.intel.com>
-From:   Lu Baolu <baolu.lu@linux.intel.com>
-In-Reply-To: <5d537286-2cb3-cf91-c0de-019355110aa1@linux.intel.com>
+To:     Eric Farman <farman@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>
+Cc:     Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+References: <20211213210550.856213-1-farman@linux.ibm.com>
+ <20211213210550.856213-2-farman@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@de.ibm.com>
+In-Reply-To: <20211213210550.856213-2-farman@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: k49_iMw4vKlu42L2E7j03tTn7QjQnykj
+X-Proofpoint-GUID: 5l40OtMiCEzqw4uSbYosrnZ74vwcpQUP
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2021-12-15_08,2021-12-14_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 spamscore=0
+ phishscore=0 suspectscore=0 clxscore=1015 bulkscore=0 adultscore=0
+ malwarescore=0 mlxscore=0 lowpriorityscore=0 impostorscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2112150074
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Greg,
 
-On 2021/12/13 8:50, Lu Baolu wrote:
-> On 12/10/21 9:23 AM, Lu Baolu wrote:
->> Hi Greg, Jason and Christoph,
->>
->> On 12/9/21 9:20 AM, Lu Baolu wrote:
->>> On 12/7/21 9:16 PM, Jason Gunthorpe wrote:
->>>> On Tue, Dec 07, 2021 at 10:57:25AM +0800, Lu Baolu wrote:
->>>>> On 12/6/21 11:06 PM, Jason Gunthorpe wrote:
->>>>>> On Mon, Dec 06, 2021 at 06:36:27AM -0800, Christoph Hellwig wrote:
->>>>>>> I really hate the amount of boilerplate code that having this in 
->>>>>>> each
->>>>>>> bus type causes.
->>>>>> +1
->>>>>>
->>>>>> I liked the first version of this series better with the code near
->>>>>> really_probe().
->>>>>>
->>>>>> Can we go back to that with some device_configure_dma() wrapper
->>>>>> condtionally called by really_probe as we discussed?
->>
->> [...]
->>
->>>
->>> diff --git a/drivers/base/dd.c b/drivers/base/dd.c
->>> index 68ea1f949daa..68ca5a579eb1 100644
->>> --- a/drivers/base/dd.c
->>> +++ b/drivers/base/dd.c
->>> @@ -538,6 +538,32 @@ static int call_driver_probe(struct device *dev, 
->>> struct device_driver *drv)
->>>          return ret;
->>>   }
->>>
->>> +static int device_dma_configure(struct device *dev, struct 
->>> device_driver *drv)
->>> +{
->>> +       int ret;
->>> +
->>> +       if (!dev->bus->dma_configure)
->>> +               return 0;
->>> +
->>> +       ret = dev->bus->dma_configure(dev);
->>> +       if (ret)
->>> +               return ret;
->>> +
->>> +       if (!drv->suppress_auto_claim_dma_owner)
->>> +               ret = iommu_device_set_dma_owner(dev, 
->>> DMA_OWNER_DMA_API, NULL);
->>> +
->>> +       return ret;
->>> +}
->>> +
->>> +static void device_dma_cleanup(struct device *dev, struct 
->>> device_driver *drv)
->>> +{
->>> +       if (!dev->bus->dma_configure)
->>> +               return;
->>> +
->>> +       if (!drv->suppress_auto_claim_dma_owner)
->>> +               iommu_device_release_dma_owner(dev, DMA_OWNER_DMA_API);
->>> +}
->>> +
->>>   static int really_probe(struct device *dev, struct device_driver *drv)
->>>   {
->>>          bool test_remove = 
->>> IS_ENABLED(CONFIG_DEBUG_TEST_DRIVER_REMOVE) &&
->>> @@ -574,11 +600,8 @@ static int really_probe(struct device *dev, 
->>> struct device_driver *drv)
->>>          if (ret)
->>>                  goto pinctrl_bind_failed;
->>>
->>> -       if (dev->bus->dma_configure) {
->>> -               ret = dev->bus->dma_configure(dev);
->>> -               if (ret)
->>> -                       goto probe_failed;
->>> -       }
->>> +       if (device_dma_configure(dev, drv))
->>> +               goto pinctrl_bind_failed;
->>>
->>>          ret = driver_sysfs_add(dev);
->>>          if (ret) {
->>> @@ -660,6 +683,8 @@ static int really_probe(struct device *dev, 
->>> struct device_driver *drv)
->>>          if (dev->bus)
->>>                  
->>> blocking_notifier_call_chain(&dev->bus->p->bus_notifier,
->>>
->>> BUS_NOTIFY_DRIVER_NOT_BOUND, dev);
->>> +
->>> +       device_dma_cleanup(dev, drv);
->>>   pinctrl_bind_failed:
->>>          device_links_no_driver(dev);
->>>          devres_release_all(dev);
->>> @@ -1204,6 +1229,7 @@ static void __device_release_driver(struct 
->>> device *dev, struct device *parent)
->>>                  else if (drv->remove)
->>>                          drv->remove(dev);
->>>
->>> +               device_dma_cleanup(dev, drv);
->>>                  device_links_driver_cleanup(dev);
->>>
->>>                  devres_release_all(dev);
->>> diff --git a/include/linux/device/driver.h 
->>> b/include/linux/device/driver.h
->>> index a498ebcf4993..374a3c2cc10d 100644
->>> --- a/include/linux/device/driver.h
->>> +++ b/include/linux/device/driver.h
->>> @@ -100,6 +100,7 @@ struct device_driver {
->>>          const char              *mod_name;      /* used for built-in 
->>> modules */
->>>
->>>          bool suppress_bind_attrs;       /* disables bind/unbind via 
->>> sysfs */
->>> +       bool suppress_auto_claim_dma_owner;
->>>          enum probe_type probe_type;
->>>
->>>          const struct of_device_id       *of_match_table;
->>
->> Does this work for you? Can I work towards this in the next version?
+
+Am 13.12.21 um 22:05 schrieb Eric Farman:
+> With KVM_CAP_S390_USER_SIGP, there are only five Signal Processor
+> orders (CONDITIONAL EMERGENCY SIGNAL, EMERGENCY SIGNAL, EXTERNAL CALL,
+> SENSE, and SENSE RUNNING STATUS) which are intended for frequent use
+> and thus are processed in-kernel. The remainder are sent to userspace
+> with the KVM_CAP_S390_USER_SIGP capability. Of those, three orders
+> (RESTART, STOP, and STOP AND STORE STATUS) have the potential to
+> inject work back into the kernel, and thus are asynchronous.
 > 
-> A kindly ping ... Is this heading the right direction? I need your
-> advice to move ahead. :-)
+> Let's look for those pending IRQs when processing one of the in-kernel
+> SIGP orders, and return BUSY (CC2) if one is in process. This is in
+> agreement with the Principles of Operation, which states that only one
+> order can be "active" on a CPU at a time.
 
-Can I do it like this? :-)
+As far as I understand this fixes a real bug with some test tools. Correct?
+Then a stable tag might be appropriate.
+(Still have to review this)
 
-Best regards,
-baolu
+How hard would it be to also build a kvm-unit test testcase?
+
+> Suggested-by: David Hildenbrand <david@redhat.com>
+> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> ---
+>   arch/s390/kvm/interrupt.c |  7 +++++++
+>   arch/s390/kvm/kvm-s390.c  |  9 +++++++--
+>   arch/s390/kvm/kvm-s390.h  |  1 +
+>   arch/s390/kvm/sigp.c      | 28 ++++++++++++++++++++++++++++
+>   4 files changed, 43 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
+> index 37f47e32d9c4..d339e1c47e4d 100644
+> --- a/arch/s390/kvm/interrupt.c
+> +++ b/arch/s390/kvm/interrupt.c
+> @@ -2115,6 +2115,13 @@ int kvm_s390_is_stop_irq_pending(struct kvm_vcpu *vcpu)
+>   	return test_bit(IRQ_PEND_SIGP_STOP, &li->pending_irqs);
+>   }
+>   
+> +int kvm_s390_is_restart_irq_pending(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_s390_local_interrupt *li = &vcpu->arch.local_int;
+> +
+> +	return test_bit(IRQ_PEND_RESTART, &li->pending_irqs);
+> +}
+> +
+>   void kvm_s390_clear_stop_irq(struct kvm_vcpu *vcpu)
+>   {
+>   	struct kvm_s390_local_interrupt *li = &vcpu->arch.local_int;
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 5f52e7eec02f..bfdf610bfecb 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -4641,10 +4641,15 @@ int kvm_s390_vcpu_stop(struct kvm_vcpu *vcpu)
+>   		}
+>   	}
+>   
+> -	/* SIGP STOP and SIGP STOP AND STORE STATUS has been fully processed */
+> +	/*
+> +	 * Set the VCPU to STOPPED and THEN clear the interrupt flag,
+> +	 * now that the SIGP STOP and SIGP STOP AND STORE STATUS orders
+> +	 * have been fully processed. This will ensure that the VCPU
+> +	 * is kept BUSY if another VCPU is inquiring with SIGP SENSE.
+> +	 */
+> +	kvm_s390_set_cpuflags(vcpu, CPUSTAT_STOPPED);
+>   	kvm_s390_clear_stop_irq(vcpu);
+>   
+> -	kvm_s390_set_cpuflags(vcpu, CPUSTAT_STOPPED);
+>   	__disable_ibs_on_vcpu(vcpu);
+>   
+>   	for (i = 0; i < online_vcpus; i++) {
+> diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
+> index c07a050d757d..1876ab0c293f 100644
+> --- a/arch/s390/kvm/kvm-s390.h
+> +++ b/arch/s390/kvm/kvm-s390.h
+> @@ -427,6 +427,7 @@ void kvm_s390_destroy_adapters(struct kvm *kvm);
+>   int kvm_s390_ext_call_pending(struct kvm_vcpu *vcpu);
+>   extern struct kvm_device_ops kvm_flic_ops;
+>   int kvm_s390_is_stop_irq_pending(struct kvm_vcpu *vcpu);
+> +int kvm_s390_is_restart_irq_pending(struct kvm_vcpu *vcpu);
+>   void kvm_s390_clear_stop_irq(struct kvm_vcpu *vcpu);
+>   int kvm_s390_set_irq_state(struct kvm_vcpu *vcpu,
+>   			   void __user *buf, int len);
+> diff --git a/arch/s390/kvm/sigp.c b/arch/s390/kvm/sigp.c
+> index 5ad3fb4619f1..c4884de0858b 100644
+> --- a/arch/s390/kvm/sigp.c
+> +++ b/arch/s390/kvm/sigp.c
+> @@ -276,6 +276,34 @@ static int handle_sigp_dst(struct kvm_vcpu *vcpu, u8 order_code,
+>   	if (!dst_vcpu)
+>   		return SIGP_CC_NOT_OPERATIONAL;
+>   
+> +	/*
+> +	 * SIGP RESTART, SIGP STOP, and SIGP STOP AND STORE STATUS orders
+> +	 * are processed asynchronously. Until the affected VCPU finishes
+> +	 * its work and calls back into KVM to clear the (RESTART or STOP)
+> +	 * interrupt, we need to return any new non-reset orders "busy".
+> +	 *
+> +	 * This is important because a single VCPU could issue:
+> +	 *  1) SIGP STOP $DESTINATION
+> +	 *  2) SIGP SENSE $DESTINATION
+> +	 *
+> +	 * If the SIGP SENSE would not be rejected as "busy", it could
+> +	 * return an incorrect answer as to whether the VCPU is STOPPED
+> +	 * or OPERATING.
+> +	 */
+> +	if (order_code != SIGP_INITIAL_CPU_RESET &&
+> +	    order_code != SIGP_CPU_RESET) {
+> +		/*
+> +		 * Lockless check. Both SIGP STOP and SIGP (RE)START
+> +		 * properly synchronize everything while processing
+> +		 * their orders, while the guest cannot observe a
+> +		 * difference when issuing other orders from two
+> +		 * different VCPUs.
+> +		 */
+> +		if (kvm_s390_is_stop_irq_pending(dst_vcpu) ||
+> +		    kvm_s390_is_restart_irq_pending(dst_vcpu))
+> +			return SIGP_CC_BUSY;
+> +	}
+> +
+>   	switch (order_code) {
+>   	case SIGP_SENSE:
+>   		vcpu->stat.instruction_sigp_sense++;
+> 
