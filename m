@@ -2,86 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 609AB475C72
-	for <lists+kvm@lfdr.de>; Wed, 15 Dec 2021 16:57:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 54AD6475C7E
+	for <lists+kvm@lfdr.de>; Wed, 15 Dec 2021 17:00:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244286AbhLOP5P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Dec 2021 10:57:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42614 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244334AbhLOP5F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Dec 2021 10:57:05 -0500
-Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A5EBC06173E
-        for <kvm@vger.kernel.org>; Wed, 15 Dec 2021 07:57:05 -0800 (PST)
-Received: by mail-oi1-x22b.google.com with SMTP id t19so32303102oij.1
-        for <kvm@vger.kernel.org>; Wed, 15 Dec 2021 07:57:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:sender:from:date:message-id:subject:to;
-        bh=PqeKwfGtry3Hm5mwkXDEHiRgHh6Y5S1ouypmzni3hLo=;
-        b=LiALh5pg8IjDXbIdDYMKh1P1qibM6cke/9BbnO5+WfCCaHS4uFqhgRBFhfAHmwTHjN
-         FFADSqBOBLeuq/f2OBa2/4qgd1IQfC5H76FeQC5+zAVBEV0WMbH9Y7Z00ZlPHmAHM376
-         Ceo9DPN+yUCkQE3BllL3vZCET0u8Izzx8v/lu6CDLd5GtYJHb97XsQFS8Rz6N8UcyCHv
-         z6N45V2hzs6visShCXzzjn5MjwohH/k5vuzVoAC0mlSczIea1Rn3lmpBs8RB+wTRKPyl
-         02Gdkg+ElEeAwJ7Q52TS3aq1n5kFvsuBNmFxPUElwlLy/icwXCu14e/dA/JLWSzGtpeV
-         ZwxA==
+        id S244326AbhLOP7E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Dec 2021 10:59:04 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45878 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S244303AbhLOP7D (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 15 Dec 2021 10:59:03 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1639583942;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ee3a2nNJn1qDhuFcuIsHsDIPYmBR4a8NwMwEtT5aJqY=;
+        b=IYugZ5OPYXT4Ih/L/OVibdeU2Wf11b7Rl/sevfSSamS4OAdseD/v37eKJe/Vr2BqxW/6+I
+        VRKRUjDknBkJWsDHA03RDX3lI6jYI/PRS09gWzv4GP+3oMgGiCiCF5m4BHhojq1VLwRmqn
+        SjGVy+K9Tr1S7EdyfplUHkt2YkKytAs=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-172-eitkWDE2POa751TbbKSYHg-1; Wed, 15 Dec 2021 10:59:01 -0500
+X-MC-Unique: eitkWDE2POa751TbbKSYHg-1
+Received: by mail-wm1-f72.google.com with SMTP id p13-20020a05600c1d8d00b0034565e7e5c6so1354262wms.9
+        for <kvm@vger.kernel.org>; Wed, 15 Dec 2021 07:59:00 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:sender:from:date:message-id:subject
-         :to;
-        bh=PqeKwfGtry3Hm5mwkXDEHiRgHh6Y5S1ouypmzni3hLo=;
-        b=OIuAbgt3H9rOSYt/r7f9C+NH9bvfby5n0j/a4teQfnJw71qO09wfJy1D6egMl6gQ9a
-         rz0SKsNo6TTV34Q5xZcXbAdUeoQ4xW2yFIQNzvr9R1fL715L2ayG79vwWN4xJFbImYtE
-         XAZd4VQozJ8ay4VwFkfG+xDquH4GtRJQZ7xOpkcDwMu9mwwZMM+W89bv0U9L0I5qwXz4
-         3vM8lsRY8AJ0km00u8fSl/7NI1gkyjDwq6FzJTz/PJ7EoyvRjaqc4Il5uJ4LDC0Thbxe
-         zboD+go8/AnkDfNcREu9/+jUtcHQppMgcThCCnD9wSqlKW7aQb0Ko8EpirnOOH/o1VuM
-         LMLA==
-X-Gm-Message-State: AOAM531nw+UDS0WglNirn+D9j7DwVQCxe+JjVkGpS+bVnYyRgUZd00Jx
-        ddZ9nba2F75gA2RlLbM/+N30qxkWT8V5GANAyYs=
-X-Google-Smtp-Source: ABdhPJwihfkMu+euPV/Gu1WCQQqAMAAQ/lNJfLTbuqkF6zfvl8qzd39Itn9+WRyA/b1mVt0od/QtVEHdke5PagApkM0=
-X-Received: by 2002:a05:6808:1315:: with SMTP id y21mr352292oiv.103.1639583824135;
- Wed, 15 Dec 2021 07:57:04 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=ee3a2nNJn1qDhuFcuIsHsDIPYmBR4a8NwMwEtT5aJqY=;
+        b=d6+NS3Y5/qqX0lcJX4L4GjzvQSX1kbzVo5xQEwuh3Xag0mCb9ZepJquC4TRvBxtFnc
+         0sL79uNyd8bGRwQbJOetIKxCiLEXla8JNL7TRDL5ss4RnJLGZgdDIK96GcyYJYPAL7MT
+         qyQ+Sce/VCliGf+6BVn9rgr6Hst6q6jKe5IH3tK2SypqfyfhwqbgQW+5B9mqLLePgaIx
+         V57H2JuBVJ6t3WpMNY6ggpi4tMGAXicY74hDTVz1vNX1T4P30tK8xB/gMsGc2OMpoQSQ
+         QxwLSaP6ysVHlWECJf9LgaFvjgFlCAnOMmYfzNPjGTc9+NlGaR5NKxMtlW7JCRyjvS9j
+         bBHw==
+X-Gm-Message-State: AOAM5323U2GW42dY4UWjEJNW5SloOGucKy4nY/jy2NBjzsOjTEATLiKN
+        MyQ8wNsRs80+a1rmbnl5Lz9hmjwZNLtuU4Me+WZRz5atdfYJuUvYS37xJsHj3VS8xp1EFV1Z73M
+        C4tJ6bw5pJrwM
+X-Received: by 2002:adf:cf11:: with SMTP id o17mr5042864wrj.554.1639583939996;
+        Wed, 15 Dec 2021 07:58:59 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzaNRZQnHx4dPArhfayJDD5m03QWjgmsTVKizylqLsrk4G9k9x+g6rNXJtal/SJiOJVxIzwsw==
+X-Received: by 2002:adf:cf11:: with SMTP id o17mr5042842wrj.554.1639583939735;
+        Wed, 15 Dec 2021 07:58:59 -0800 (PST)
+Received: from fedora (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id i17sm2581675wmq.48.2021.12.15.07.58.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Dec 2021 07:58:59 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>, lkp@lists.01.org,
+        lkp@intel.com, xudong.hao@intel.com,
+        kernel test robot <oliver.sang@intel.com>
+Subject: Re: [KVM]  feb627e8d6: kernel-selftests.kvm.vmx_pmu_msrs_test.fail
+In-Reply-To: <20211215154643.GE34913@xsang-OptiPlex-9020>
+References: <20211215154643.GE34913@xsang-OptiPlex-9020>
+Date:   Wed, 15 Dec 2021 16:58:56 +0100
+Message-ID: <87czlxvozj.fsf@redhat.com>
 MIME-Version: 1.0
-Sender: gaddafiayesha532@gmail.com
-Received: by 2002:a05:6820:1693:0:0:0:0 with HTTP; Wed, 15 Dec 2021 07:57:03
- -0800 (PST)
-From:   Anderson Thereza <anderson.thereza24@gmail.com>
-Date:   Wed, 15 Dec 2021 07:57:03 -0800
-X-Google-Sender-Auth: 51zjt6FKqQhsk18S_hDElw4FReY
-Message-ID: <CALeZTrep6oRQ3H943z2s79h3=SSdM_tJ84Txz0+QXWjFU-rJmQ@mail.gmail.com>
-Subject: Re: Greetings My Dear,
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Greetings,
+kernel test robot <oliver.sang@intel.com> writes:
 
-I sent this mail praying it will find you in a good condition, since I
-myself am in a very critical health condition in which I sleep every
-night without knowing if I may be alive to see the next day. I am
-Mrs.Theresa Anderson, a widow suffering from a long time illness. I
-have some funds I inherited from my late husband, the sum of
-($11,000,000.00, Eleven Million Dollars) my Doctor told me recently
-that I have serious sickness which is a cancer problem. What disturbs
-me most is my stroke sickness. Having known my condition, I decided to
-donate this fund to a good person that will utilize it the way I am
-going to instruct herein. I need a very honest God.
+> Greeting,
+>
+> FYI, we noticed the following commit (built with gcc-9):
+>
+> commit: feb627e8d6f69c9a319fe279710959efb3eba873 ("KVM: x86: Forbid KVM_SET_CPUID{,2} after KVM_RUN")
+> https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git master
+>
 
-fearing a person who can claim this money and use it for Charity
-works, for orphanages, widows and also build schools for less
-privileges that will be named after my late husband if possible and to
-promote the word of God and the effort that the house of God is
-maintained. I do not want a situation where this money will be used in
-an ungodly manner. That's why I' making this decision. I'm not afraid
-of death so I know where I'm going. I accept this decision because I
-do not have any child who will inherit this money after I die. Please
-I want your sincere and urgent answer to know if you will be able to
-execute this project, and I will give you more information on how the
-fund will be transferred to your bank account. I am waiting for your
-reply.
+...
 
-May God Bless you,
-Mrs.Theresa Anderson,
+>
+> # selftests: kvm: vmx_pmu_msrs_test
+> # ==== Test Assertion Failure ====
+> #   lib/x86_64/processor.c:874: rc == 0
+> #   pid=10415 tid=10415 errno=22 - Invalid argument
+> #      1	0x000000000040b24f: vcpu_set_cpuid at processor.c:873
+> #      2	0x000000000040260a: main at vmx_pmu_msrs_test.c:115
+> #      3	0x00007f07e1aec09a: ?? ??:0
+> #      4	0x0000000000402759: _start at ??:?
+> #   KVM_SET_CPUID2 failed, rc: -1 errno: 22
+> not ok 33 selftests: kvm: vmx_pmu_msrs_test # exit=254
+>
+
+Hm, I'm pretty sure I've tested feb627e8d6f6 on both Intel and AMD and I
+don't remember seeing this failure :-( . vmx_pmu_msrs_test test does
+KVM_SET_CPUID after KVM_RUN and thus needs to be fixed too. Will send a
+patch shortly.
+
+-- 
+Vitaly
+
