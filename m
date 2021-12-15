@@ -2,92 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E53B94760B2
-	for <lists+kvm@lfdr.de>; Wed, 15 Dec 2021 19:27:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 573964760D1
+	for <lists+kvm@lfdr.de>; Wed, 15 Dec 2021 19:34:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343777AbhLOS1t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Dec 2021 13:27:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50682 "EHLO
+        id S1343848AbhLOSeN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Dec 2021 13:34:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231138AbhLOS1s (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Dec 2021 13:27:48 -0500
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F1D4C061574;
-        Wed, 15 Dec 2021 10:27:48 -0800 (PST)
-Received: by mail-wr1-x435.google.com with SMTP id t26so3420499wrb.4;
-        Wed, 15 Dec 2021 10:27:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=H2yw4CxLWWiIu+RlENTNUgfNQZOv9uZwwB7smlx2LRE=;
-        b=o+7iYHYe/KaKO7VigWAHSzhdOSt0x+gm0lRTk0Y4pthcUHqJTAhfRgdT3YdPrxNHu5
-         ebc1lhgQQHmg9yakDjDqj2GUcvidZjuW+hm7qduffFFNDkQPJiBLj1LGH01ljRVPU+qw
-         tMebbX8AX0igX0pWUjKM/IwbzSQ5zGWfCrrf2xHcZobvgNfLuVG+ZsNUq+2i+3quRRT3
-         JzT+8aYqK5aNQYmeZW1YuLDg1bu3TqMHnOcgYuuCUjMlF9UY6s3hILzzlZYBcobi1ylN
-         D2VeFt7bCgWT8PJLtufZYkARDLXOGBZkF/uGlmIZupDFvUZdY9t1hdRTc3oPX5XXT+Be
-         qSWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=H2yw4CxLWWiIu+RlENTNUgfNQZOv9uZwwB7smlx2LRE=;
-        b=Z0TgWD7lqS0YrS7xe0KtEo9/gxCd2x+C9Mqw/0HZPjpr1faUFVYX4W3hPw9Y6HXB/q
-         ok6umWFWBqQWLErRhMqCKvZMokfKfchyPzfR2MUTKiBOg2GQTnha+3yxjUQ4hdWNnIux
-         g8zxigQxW3RVSupAmcCHaKsp5Gc8a6Dsfp7fsKqMvCfc6T5ozD7APndLLVwIKAC8Vrpn
-         cvNsEI0tDKDJnSGKdVR85lG66Mx1R8V4SB7LT27mybH90b5RLMA7QwByH2VgJ4np0CCR
-         fQPfy72lyMysxROXaF7d65u8TG4JNhnut6kUBlfdLmnMUSZgLUA+9OQRZMlZM1oWROnL
-         RbAg==
-X-Gm-Message-State: AOAM530aFuo5N2e7qGOaS6M9NkjQ/gBFzzX9NZ8HatdPSyGh9QqU/x3j
-        O869xqu95hWFyJop1Plsbgw/b4/YnxY=
-X-Google-Smtp-Source: ABdhPJwswYr96p0T4bhaCiYByYrvfmHP5VDsroNG1S7kV3+r7MlxSkDkBrq/Z8N9NvNm4NgugxuMuw==
-X-Received: by 2002:a05:6000:1867:: with SMTP id d7mr1271457wri.21.1639592867044;
-        Wed, 15 Dec 2021 10:27:47 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
-        by smtp.googlemail.com with ESMTPSA id o5sm2562162wrx.83.2021.12.15.10.27.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Dec 2021 10:27:46 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <ac81dcba-13db-8286-0f2e-f46a413a09cf@redhat.com>
-Date:   Wed, 15 Dec 2021 19:27:44 +0100
+        with ESMTP id S1343840AbhLOSdx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Dec 2021 13:33:53 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C7FEC061401;
+        Wed, 15 Dec 2021 10:33:51 -0800 (PST)
+Received: from zn.tnic (dslb-088-067-202-008.088.067.pools.vodafone-ip.de [88.67.202.8])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 317B01EC02B9;
+        Wed, 15 Dec 2021 19:33:45 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1639593225;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=pI1cfs0sye4rkAbVP9bxLeZ1PzV7S4Ntz69iDw6ZWT0=;
+        b=nuPlfwo/nPurBQL3rwNReGM0rLIfsiRLAoa5oV0W/SnMy9FEcPKfJ0+Ricsb/6GnvX3xOo
+        Pg1dCcrPSPvjYOV5vPrn8O4XoVxHhDwDNhSIizJhjQqkoY0MEiAezSjOK++g2oabzvnLFc
+        bzFMjpublalbdEUXDyFvJnCl2jjn0Xc=
+Date:   Wed, 15 Dec 2021 19:33:47 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Venu Busireddy <venu.busireddy@oracle.com>
+Cc:     Michael Roth <michael.roth@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH v8 01/40] x86/compressed/64: detect/setup SEV/SME
+ features earlier in boot
+Message-ID: <Ybo1C6kpcPJBzMGq@zn.tnic>
+References: <20211210154332.11526-1-brijesh.singh@amd.com>
+ <20211210154332.11526-2-brijesh.singh@amd.com>
+ <YbeaX+FViak2mgHO@dt>
+ <YbecS4Py2hAPBrTD@zn.tnic>
+ <YbjYZtXlbRdUznUO@dt>
+ <YbjsGHSUUwomjbpc@zn.tnic>
+ <YbkzaiC31/DzO5Da@dt>
+ <b18655e3-3922-2b5d-0c35-1dcfef568e4d@amd.com>
+ <20211215174934.tgn3c7c4s3toelbq@amd.com>
+ <YboxSPFGF0Cqo5Fh@dt>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH] KVM: Move VM's worker kthreads back to the original
- cgroups before exiting.
-Content-Language: en-US
-To:     Vipin Sharma <vipinsh@google.com>, seanjc@google.com,
-        "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     dmatlack@google.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20211214050708.4040200-1-vipinsh@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211214050708.4040200-1-vipinsh@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <YboxSPFGF0Cqo5Fh@dt>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/14/21 06:07, Vipin Sharma wrote:
-> 
-> KVM terminates the worker kthreads by calling kthread_stop() which waits
-> on the signal generated by exit_mm() in do_exit() during kthread's exit.
+On Wed, Dec 15, 2021 at 12:17:44PM -0600, Venu Busireddy wrote:
+> Boris & Tom, which implementation would you prefer?
 
-Instead of "signal", please spell it as "the 'exited' completion, 
-triggered by exit_mm(), via mm_release(), during the kthread's exit". 
-That makes things a bit clearer.
+I'd like to see how that sme_sev_parse_cpuid() would look like. And that
+function should be called sev_parse_cpuid(), btw.
 
-So the issue is that the kthread_stop happens around the time 
-exit_task_work() destroys the VM, but the process can go on and signal 
-its demise to the parent process before the kthread has been completely 
-dropped.  Not even close() can fix it, though it may reduce the window 
-completely, so I agree that this is a bug and vhost has the same bug too.
+Because if that function turns out to be a subset of your suggestion,
+functionality-wise, then we should save us the churn and simply do one
+generic helper.
 
-Due to the issue with kthreadd_task not being exported, perhaps you can 
-change cgroup_attach_task_all to use kthreadd_task if the "from" 
-argument is NULL?
+Btw 2, that helper should be in arch/x86/kernel/sev-shared.c so that it
+gets shared by both kernel stages instead having an inline function in
+some random header.
 
-Paolo
+Btw 3, I'm not crazy about the feature testing with the @features param
+either. Maybe that function should return the eYx register directly,
+like the cpuid_eYx() variants in the kernel do, where Y in { a, b, c, d
+}.
+
+The caller can than do its own testing:
+
+	eax = sev_parse_cpuid(RET_EAX, ...)
+	if (eax > 0) {
+		if (eax & BIT(1))
+			...
+
+Something along those lines, for example.
+
+But I'd have to see a concrete diff from Michael to get a better idea
+how that CPUID parsing from the CPUID page is going to look like.
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
