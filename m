@@ -2,229 +2,366 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CDE3E475066
-	for <lists+kvm@lfdr.de>; Wed, 15 Dec 2021 02:16:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4EEAD47508F
+	for <lists+kvm@lfdr.de>; Wed, 15 Dec 2021 02:39:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238811AbhLOBQK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 14 Dec 2021 20:16:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40910 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235593AbhLOBQH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 14 Dec 2021 20:16:07 -0500
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A52D7C061574
-        for <kvm@vger.kernel.org>; Tue, 14 Dec 2021 17:16:06 -0800 (PST)
-Received: by mail-pf1-x449.google.com with SMTP id 184-20020a6217c1000000b0049f9aad0040so12627850pfx.21
-        for <kvm@vger.kernel.org>; Tue, 14 Dec 2021 17:16:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=reply-to:date:in-reply-to:message-id:mime-version:references
-         :subject:from:to:cc;
-        bh=UZ+15oJmdjibeS/LqSfmbc4z9W6A6Fq/YCpfMYzK6Pc=;
-        b=nBITaegwM6XU1MUrXN975MbS92biPy0aczHT4OisoI1XPyo/TdBL/jMDTmg7+WiyrB
-         kR8yXkhMlvXlsxb2okrYmdLSN6IKvYBkZ8DDntbWfIQCme/EeQVm7fmHWTkBTrmWzy2F
-         Idz73SMSrWCEs3jCU9QUxHDsw0kZiL/VqBh0A8ir2E5w487scdJoIes3WcPX6tQtI9+2
-         BBbyAHheT92ORticthLWDyJpsE6TiS0S6QJTy7fke9X87aHPnq2FjM9L0JyjI0oEzrys
-         t5+ca7pe5+wZrTGUj4BiBSeCEcyYJ7U3n8utoBpD6S7wVeohYMa1411rQRzKTye+Z0lH
-         I7Ig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:reply-to:date:in-reply-to:message-id
-         :mime-version:references:subject:from:to:cc;
-        bh=UZ+15oJmdjibeS/LqSfmbc4z9W6A6Fq/YCpfMYzK6Pc=;
-        b=HN9+g6p55MQwLeE1AxwOPcP+Di+720WHzt7IUzFnZq4Y+4yPeP9V88Hf+eqg/A0s3x
-         N/kinB7mAnUE0CuX7Z+n4hMMmyjDDHN9pnuWEe5D5sCQ8c4lGNDQ6cY18XjbY2GJ/cGi
-         wKTAAih9rPYqdIc5y6uQeWh7F65LESHuIbdpVTLFPTbATqjbdQaeMKVCfXxI0gPvL48B
-         6Rxl6s71GM8x04l72tKIA+cYayKKnwdoJF3dub8dUuziehjKCGpjS4UKXO7imrj9v1VQ
-         Wx8CmDSrBrprq07yJqveWNImPhoTNcfCZok9RyOdVv5FOKZY7PGPYsXLNuFR8w7PP0eF
-         UO2g==
-X-Gm-Message-State: AOAM532T++M7yeDzGRVJ6YJbJ9qhAUGrlMmov4Ddcnf/0htGYgywElpC
-        gyjBioERI8DgDhPH01YuqEoEiMbDltA=
-X-Google-Smtp-Source: ABdhPJw+AUfxjbDVFEpdrUOPYphZ3gJ393PRXkNdcigeg+9dXQ43jj1lgXGyzF5HZHsL2pOH7msOJxPUXsY=
-X-Received: from seanjc.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:3e5])
- (user=seanjc job=sendgmr) by 2002:a17:90b:1a8b:: with SMTP id
- ng11mr9095066pjb.3.1639530966212; Tue, 14 Dec 2021 17:16:06 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Wed, 15 Dec 2021 01:15:57 +0000
-In-Reply-To: <20211215011557.399940-1-seanjc@google.com>
-Message-Id: <20211215011557.399940-5-seanjc@google.com>
-Mime-Version: 1.0
-References: <20211215011557.399940-1-seanjc@google.com>
-X-Mailer: git-send-email 2.34.1.173.g76aa8bc2d0-goog
-Subject: [PATCH 4/4] KVM: x86/mmu: Use common iterator for walking invalid TDP
- MMU roots
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S238932AbhLOBjM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 14 Dec 2021 20:39:12 -0500
+Received: from 107-174-27-60-host.colocrossing.com ([107.174.27.60]:58202 "EHLO
+        ozlabs.ru" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org with ESMTP
+        id S234983AbhLOBjL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 14 Dec 2021 20:39:11 -0500
+X-Greylist: delayed 351 seconds by postgrey-1.27 at vger.kernel.org; Tue, 14 Dec 2021 20:39:11 EST
+Received: from fstn1-p1.ozlabs.ibm.com. (localhost [IPv6:::1])
+        by ozlabs.ru (Postfix) with ESMTP id 4BC13804B3;
+        Tue, 14 Dec 2021 20:33:14 -0500 (EST)
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+To:     linuxppc-dev@lists.ozlabs.org
+Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>, kvm-ppc@vger.kernel.org,
+        kvm@vger.kernel.org, Fabiano Rosas <farosas@linux.ibm.com>,
+        =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Subject: [PATCH kernel v3] KVM: PPC: Merge powerpc's debugfs entry content into generic entry
+Date:   Wed, 15 Dec 2021 12:33:09 +1100
+Message-Id: <20211215013309.217102-1-aik@ozlabs.ru>
+X-Mailer: git-send-email 2.30.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Now that tdp_mmu_next_root() can process both valid and invalid roots,
-extend it to be able to process _only_ invalid roots, add yet another
-iterator macro for walking invalid roots, and use the new macro in
-kvm_tdp_mmu_zap_invalidated_roots().
+At the moment KVM on PPC creates 3 types of entries under the kvm debugfs:
+1) "%pid-%fd" per a KVM instance (for all platforms);
+2) "vm%pid" (for PPC Book3s HV KVM);
+3) "vm%u_vcpu%u_timing" (for PPC Book3e KVM).
 
-No functional change intended.
+The problem with this is that multiple VMs per process is not allowed for
+2) and 3) which makes it possible for userspace to trigger errors when
+creating duplicated debugfs entries.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
+This merges all these into 1).
+
+This defines kvm_arch_create_kvm_debugfs() similar to
+kvm_arch_create_vcpu_debugfs().
+
+This defines 2 hooks in kvmppc_ops that allow specific KVM implementations
+add necessary entries, this adds the _e500 suffix to
+kvmppc_create_vcpu_debugfs_e500() to make it clear what platform it is for.
+
+This makes use of already existing kvm_arch_create_vcpu_debugfs() on PPC.
+
+This removes no more used debugfs_dir pointers from PPC kvm_arch structs.
+
+This stops removing vcpu entries as once created vcpus stay around
+for the entire life of a VM and removed when the KVM instance is closed,
+see commit d56f5136b010 ("KVM: let kvm_destroy_vm_debugfs clean up vCPU
+debugfs directories").
+
+Suggested-by: Fabiano Rosas <farosas@linux.ibm.com>
+Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
 ---
- arch/x86/kvm/mmu/tdp_mmu.c | 76 ++++++++++++++------------------------
- 1 file changed, 27 insertions(+), 49 deletions(-)
+Changes:
+v3:
+* reworked commit log, especially, the bit about removing vcpus
 
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 577985fa001d..b6f7ba057f65 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -98,22 +98,34 @@ void kvm_tdp_mmu_put_root(struct kvm *kvm, struct kvm_mmu_page *root,
- 	call_rcu(&root->rcu_head, tdp_mmu_free_sp_rcu_callback);
- }
+v2:
+* handled powerpc-booke
+* s/kvm/vm/ in arch hooks
+---
+ arch/powerpc/include/asm/kvm_host.h    |  6 ++---
+ arch/powerpc/include/asm/kvm_ppc.h     |  2 ++
+ arch/powerpc/kvm/timing.h              |  9 ++++----
+ arch/powerpc/kvm/book3s_64_mmu_hv.c    |  2 +-
+ arch/powerpc/kvm/book3s_64_mmu_radix.c |  2 +-
+ arch/powerpc/kvm/book3s_hv.c           | 31 ++++++++++----------------
+ arch/powerpc/kvm/e500.c                |  1 +
+ arch/powerpc/kvm/e500mc.c              |  1 +
+ arch/powerpc/kvm/powerpc.c             | 16 ++++++++++---
+ arch/powerpc/kvm/timing.c              | 20 ++++-------------
+ 10 files changed, 41 insertions(+), 49 deletions(-)
+
+diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
+index 17263276189e..f5e14fa683f4 100644
+--- a/arch/powerpc/include/asm/kvm_host.h
++++ b/arch/powerpc/include/asm/kvm_host.h
+@@ -26,6 +26,8 @@
+ #include <asm/hvcall.h>
+ #include <asm/mce.h>
  
-+enum tdp_mmu_roots_iter_type {
-+	ALL_ROOTS = -1,
-+	VALID_ROOTS = 0,
-+	INVALID_ROOTS = 1,
-+};
++#define __KVM_HAVE_ARCH_VCPU_DEBUGFS
 +
- /*
-  * Returns the next root after @prev_root (or the first root if @prev_root is
-  * NULL).  A reference to the returned root is acquired, and the reference to
-  * @prev_root is released (the caller obviously must hold a reference to
-  * @prev_root if it's non-NULL).
-  *
-- * If @only_valid is true, invalid roots are skipped.
-+ * If @type is not ALL_ROOTS, (in)valid roots are skipped accordingly.
-  *
-  * Returns NULL if the end of tdp_mmu_roots was reached.
-  */
- static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
- 					      struct kvm_mmu_page *prev_root,
--					      bool shared, bool only_valid)
-+					      bool shared,
-+					      enum tdp_mmu_roots_iter_type type)
+ #define KVM_MAX_VCPUS		NR_CPUS
+ #define KVM_MAX_VCORES		NR_CPUS
+ 
+@@ -295,7 +297,6 @@ struct kvm_arch {
+ 	bool dawr1_enabled;
+ 	pgd_t *pgtable;
+ 	u64 process_table;
+-	struct dentry *debugfs_dir;
+ 	struct kvm_resize_hpt *resize_hpt; /* protected by kvm->lock */
+ #endif /* CONFIG_KVM_BOOK3S_HV_POSSIBLE */
+ #ifdef CONFIG_KVM_BOOK3S_PR_POSSIBLE
+@@ -673,7 +674,6 @@ struct kvm_vcpu_arch {
+ 	u64 timing_min_duration[__NUMBER_OF_KVM_EXIT_TYPES];
+ 	u64 timing_max_duration[__NUMBER_OF_KVM_EXIT_TYPES];
+ 	u64 timing_last_exit;
+-	struct dentry *debugfs_exit_timing;
+ #endif
+ 
+ #ifdef CONFIG_PPC_BOOK3S
+@@ -829,8 +829,6 @@ struct kvm_vcpu_arch {
+ 	struct kvmhv_tb_accumulator rm_exit;	/* real-mode exit code */
+ 	struct kvmhv_tb_accumulator guest_time;	/* guest execution */
+ 	struct kvmhv_tb_accumulator cede_time;	/* time napping inside guest */
+-
+-	struct dentry *debugfs_dir;
+ #endif /* CONFIG_KVM_BOOK3S_HV_EXIT_TIMING */
+ };
+ 
+diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
+index 33db83b82fbd..d2b192dea0d2 100644
+--- a/arch/powerpc/include/asm/kvm_ppc.h
++++ b/arch/powerpc/include/asm/kvm_ppc.h
+@@ -316,6 +316,8 @@ struct kvmppc_ops {
+ 	int (*svm_off)(struct kvm *kvm);
+ 	int (*enable_dawr1)(struct kvm *kvm);
+ 	bool (*hash_v3_possible)(void);
++	int (*create_vm_debugfs)(struct kvm *kvm);
++	int (*create_vcpu_debugfs)(struct kvm_vcpu *vcpu, struct dentry *debugfs_dentry);
+ };
+ 
+ extern struct kvmppc_ops *kvmppc_hv_ops;
+diff --git a/arch/powerpc/kvm/timing.h b/arch/powerpc/kvm/timing.h
+index feef7885ba82..493a7d510fd5 100644
+--- a/arch/powerpc/kvm/timing.h
++++ b/arch/powerpc/kvm/timing.h
+@@ -14,8 +14,8 @@
+ #ifdef CONFIG_KVM_EXIT_TIMING
+ void kvmppc_init_timing_stats(struct kvm_vcpu *vcpu);
+ void kvmppc_update_timing_stats(struct kvm_vcpu *vcpu);
+-void kvmppc_create_vcpu_debugfs(struct kvm_vcpu *vcpu, unsigned int id);
+-void kvmppc_remove_vcpu_debugfs(struct kvm_vcpu *vcpu);
++void kvmppc_create_vcpu_debugfs_e500(struct kvm_vcpu *vcpu,
++				     struct dentry *debugfs_dentry);
+ 
+ static inline void kvmppc_set_exit_type(struct kvm_vcpu *vcpu, int type)
  {
- 	struct kvm_mmu_page *next_root;
+@@ -26,9 +26,8 @@ static inline void kvmppc_set_exit_type(struct kvm_vcpu *vcpu, int type)
+ /* if exit timing is not configured there is no need to build the c file */
+ static inline void kvmppc_init_timing_stats(struct kvm_vcpu *vcpu) {}
+ static inline void kvmppc_update_timing_stats(struct kvm_vcpu *vcpu) {}
+-static inline void kvmppc_create_vcpu_debugfs(struct kvm_vcpu *vcpu,
+-						unsigned int id) {}
+-static inline void kvmppc_remove_vcpu_debugfs(struct kvm_vcpu *vcpu) {}
++static inline void kvmppc_create_vcpu_debugfs_e500(struct kvm_vcpu *vcpu,
++						   struct dentry *debugfs_dentry) {}
+ static inline void kvmppc_set_exit_type(struct kvm_vcpu *vcpu, int type) {}
+ #endif /* CONFIG_KVM_EXIT_TIMING */
  
-+	kvm_lockdep_assert_mmu_lock_held(kvm, shared);
-+
-+	/* Ensure correctness for the below comparison against role.invalid. */
-+	BUILD_BUG_ON(!!VALID_ROOTS || !INVALID_ROOTS);
-+
- 	rcu_read_lock();
+diff --git a/arch/powerpc/kvm/book3s_64_mmu_hv.c b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+index c63e263312a4..33dae253a0ac 100644
+--- a/arch/powerpc/kvm/book3s_64_mmu_hv.c
++++ b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+@@ -2112,7 +2112,7 @@ static const struct file_operations debugfs_htab_fops = {
  
- 	if (prev_root)
-@@ -125,7 +137,7 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
- 						   typeof(*next_root), link);
- 
- 	while (next_root) {
--		if ((!only_valid || !next_root->role.invalid) &&
-+		if ((type == ALL_ROOTS || (type == !!next_root->role.invalid)) &&
- 		    kvm_tdp_mmu_get_root(kvm, next_root))
- 			break;
- 
-@@ -151,18 +163,21 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
-  * mode. In the unlikely event that this thread must free a root, the lock
-  * will be temporarily dropped and reacquired in write mode.
-  */
--#define __for_each_tdp_mmu_root_yield_safe(_kvm, _root, _as_id, _shared, _only_valid)\
--	for (_root = tdp_mmu_next_root(_kvm, NULL, _shared, _only_valid);	\
-+#define __for_each_tdp_mmu_root_yield_safe(_kvm, _root, _as_id, _shared, _type) \
-+	for (_root = tdp_mmu_next_root(_kvm, NULL, _shared, _type);		\
- 	     _root;								\
--	     _root = tdp_mmu_next_root(_kvm, _root, _shared, _only_valid))	\
--		if (kvm_mmu_page_as_id(_root) != _as_id) {			\
-+	     _root = tdp_mmu_next_root(_kvm, _root, _shared, _type))		\
-+		if (_as_id > 0 && kvm_mmu_page_as_id(_root) != _as_id) {	\
- 		} else
- 
-+#define for_each_invalid_tdp_mmu_root_yield_safe(_kvm, _root)			\
-+	__for_each_tdp_mmu_root_yield_safe(_kvm, _root, -1, true, INVALID_ROOTS)
-+
- #define for_each_valid_tdp_mmu_root_yield_safe(_kvm, _root, _as_id, _shared)	\
--	__for_each_tdp_mmu_root_yield_safe(_kvm, _root, _as_id, _shared, true)
-+	__for_each_tdp_mmu_root_yield_safe(_kvm, _root, _as_id, _shared, VALID_ROOTS)
- 
- #define for_each_tdp_mmu_root_yield_safe(_kvm, _root, _as_id, _shared)		\
--	__for_each_tdp_mmu_root_yield_safe(_kvm, _root, _as_id, _shared, false)
-+	__for_each_tdp_mmu_root_yield_safe(_kvm, _root, _as_id, _shared, ALL_ROOTS)
- 
- #define for_each_tdp_mmu_root(_kvm, _root, _as_id)				\
- 	list_for_each_entry_rcu(_root, &_kvm->arch.tdp_mmu_roots, link,		\
-@@ -811,28 +826,6 @@ void kvm_tdp_mmu_zap_all(struct kvm *kvm)
- 		kvm_flush_remote_tlbs(kvm);
+ void kvmppc_mmu_debugfs_init(struct kvm *kvm)
+ {
+-	debugfs_create_file("htab", 0400, kvm->arch.debugfs_dir, kvm,
++	debugfs_create_file("htab", 0400, kvm->debugfs_dentry, kvm,
+ 			    &debugfs_htab_fops);
  }
  
--static struct kvm_mmu_page *next_invalidated_root(struct kvm *kvm,
--						  struct kvm_mmu_page *prev_root)
--{
--	struct kvm_mmu_page *next_root;
+diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+index 8cebe5542256..e4ce2a35483f 100644
+--- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
++++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+@@ -1454,7 +1454,7 @@ static const struct file_operations debugfs_radix_fops = {
+ 
+ void kvmhv_radix_debugfs_init(struct kvm *kvm)
+ {
+-	debugfs_create_file("radix", 0400, kvm->arch.debugfs_dir, kvm,
++	debugfs_create_file("radix", 0400, kvm->debugfs_dentry, kvm,
+ 			    &debugfs_radix_fops);
+ }
+ 
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index bf1eb1160ae2..4c52541b6f37 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -2768,20 +2768,17 @@ static const struct file_operations debugfs_timings_ops = {
+ };
+ 
+ /* Create a debugfs directory for the vcpu */
+-static void debugfs_vcpu_init(struct kvm_vcpu *vcpu, unsigned int id)
++static int kvmppc_arch_create_vcpu_debugfs_hv(struct kvm_vcpu *vcpu, struct dentry *debugfs_dentry)
+ {
+-	char buf[16];
+-	struct kvm *kvm = vcpu->kvm;
 -
--	if (prev_root)
--		next_root = list_next_or_null_rcu(&kvm->arch.tdp_mmu_roots,
--						  &prev_root->link,
--						  typeof(*prev_root), link);
--	else
--		next_root = list_first_or_null_rcu(&kvm->arch.tdp_mmu_roots,
--						   typeof(*next_root), link);
+-	snprintf(buf, sizeof(buf), "vcpu%u", id);
+-	vcpu->arch.debugfs_dir = debugfs_create_dir(buf, kvm->arch.debugfs_dir);
+-	debugfs_create_file("timings", 0444, vcpu->arch.debugfs_dir, vcpu,
++	debugfs_create_file("timings", 0444, debugfs_dentry, vcpu,
+ 			    &debugfs_timings_ops);
++	return 0;
+ }
+ 
+ #else /* CONFIG_KVM_BOOK3S_HV_EXIT_TIMING */
+-static void debugfs_vcpu_init(struct kvm_vcpu *vcpu, unsigned int id)
++static int kvmppc_arch_create_vcpu_debugfs_hv(struct kvm_vcpu *vcpu, struct dentry *debugfs_dentry)
+ {
++	return 0;
+ }
+ #endif /* CONFIG_KVM_BOOK3S_HV_EXIT_TIMING */
+ 
+@@ -2904,8 +2901,6 @@ static int kvmppc_core_vcpu_create_hv(struct kvm_vcpu *vcpu)
+ 	vcpu->arch.cpu_type = KVM_CPU_3S_64;
+ 	kvmppc_sanity_check(vcpu);
+ 
+-	debugfs_vcpu_init(vcpu, id);
 -
--	while (next_root && !(next_root->role.invalid &&
--			      refcount_read(&next_root->tdp_mmu_root_count)))
--		next_root = list_next_or_null_rcu(&kvm->arch.tdp_mmu_roots,
--						  &next_root->link,
--						  typeof(*next_root), link);
+ 	return 0;
+ }
+ 
+@@ -5226,7 +5221,6 @@ void kvmppc_free_host_rm_ops(void)
+ static int kvmppc_core_init_vm_hv(struct kvm *kvm)
+ {
+ 	unsigned long lpcr, lpid;
+-	char buf[32];
+ 	int ret;
+ 
+ 	mutex_init(&kvm->arch.uvmem_lock);
+@@ -5359,15 +5353,14 @@ static int kvmppc_core_init_vm_hv(struct kvm *kvm)
+ 		kvm->arch.smt_mode = 1;
+ 	kvm->arch.emul_smt_mode = 1;
+ 
+-	/*
+-	 * Create a debugfs directory for the VM
+-	 */
+-	snprintf(buf, sizeof(buf), "vm%d", current->pid);
+-	kvm->arch.debugfs_dir = debugfs_create_dir(buf, kvm_debugfs_dir);
++	return 0;
++}
++
++static int kvmppc_arch_create_vm_debugfs_hv(struct kvm *kvm)
++{
+ 	kvmppc_mmu_debugfs_init(kvm);
+ 	if (radix_enabled())
+ 		kvmhv_radix_debugfs_init(kvm);
 -
--	return next_root;
+ 	return 0;
+ }
+ 
+@@ -5382,8 +5375,6 @@ static void kvmppc_free_vcores(struct kvm *kvm)
+ 
+ static void kvmppc_core_destroy_vm_hv(struct kvm *kvm)
+ {
+-	debugfs_remove_recursive(kvm->arch.debugfs_dir);
+-
+ 	if (!cpu_has_feature(CPU_FTR_ARCH_300))
+ 		kvm_hv_vm_deactivated();
+ 
+@@ -6044,6 +6035,8 @@ static struct kvmppc_ops kvm_ops_hv = {
+ 	.svm_off = kvmhv_svm_off,
+ 	.enable_dawr1 = kvmhv_enable_dawr1,
+ 	.hash_v3_possible = kvmppc_hash_v3_possible,
++	.create_vcpu_debugfs = kvmppc_arch_create_vcpu_debugfs_hv,
++	.create_vm_debugfs = kvmppc_arch_create_vm_debugfs_hv,
+ };
+ 
+ static int kvm_init_subcore_bitmap(void)
+diff --git a/arch/powerpc/kvm/e500.c b/arch/powerpc/kvm/e500.c
+index 7e8b69015d20..c8b2b4478545 100644
+--- a/arch/powerpc/kvm/e500.c
++++ b/arch/powerpc/kvm/e500.c
+@@ -495,6 +495,7 @@ static struct kvmppc_ops kvm_ops_e500 = {
+ 	.emulate_op = kvmppc_core_emulate_op_e500,
+ 	.emulate_mtspr = kvmppc_core_emulate_mtspr_e500,
+ 	.emulate_mfspr = kvmppc_core_emulate_mfspr_e500,
++	.create_vcpu_debugfs = kvmppc_create_vcpu_debugfs_e500,
+ };
+ 
+ static int __init kvmppc_e500_init(void)
+diff --git a/arch/powerpc/kvm/e500mc.c b/arch/powerpc/kvm/e500mc.c
+index 1c189b5aadcc..fa0d8dbbe484 100644
+--- a/arch/powerpc/kvm/e500mc.c
++++ b/arch/powerpc/kvm/e500mc.c
+@@ -381,6 +381,7 @@ static struct kvmppc_ops kvm_ops_e500mc = {
+ 	.emulate_op = kvmppc_core_emulate_op_e500,
+ 	.emulate_mtspr = kvmppc_core_emulate_mtspr_e500,
+ 	.emulate_mfspr = kvmppc_core_emulate_mfspr_e500,
++	.create_vcpu_debugfs = kvmppc_create_vcpu_debugfs_e500,
+ };
+ 
+ static int __init kvmppc_e500mc_init(void)
+diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+index a72920f4f221..2ea73dfcebb2 100644
+--- a/arch/powerpc/kvm/powerpc.c
++++ b/arch/powerpc/kvm/powerpc.c
+@@ -763,7 +763,6 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+ 		goto out_vcpu_uninit;
+ 
+ 	vcpu->arch.waitp = &vcpu->wait;
+-	kvmppc_create_vcpu_debugfs(vcpu, vcpu->vcpu_id);
+ 	return 0;
+ 
+ out_vcpu_uninit:
+@@ -780,8 +779,6 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+ 	/* Make sure we're not using the vcpu anymore */
+ 	hrtimer_cancel(&vcpu->arch.dec_timer);
+ 
+-	kvmppc_remove_vcpu_debugfs(vcpu);
+-
+ 	switch (vcpu->arch.irq_type) {
+ 	case KVMPPC_IRQ_MPIC:
+ 		kvmppc_mpic_disconnect_vcpu(vcpu->arch.mpic, vcpu);
+@@ -2505,3 +2502,16 @@ int kvm_arch_init(void *opaque)
+ }
+ 
+ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_ppc_instr);
++
++void kvm_arch_create_vcpu_debugfs(struct kvm_vcpu *vcpu, struct dentry *debugfs_dentry)
++{
++	if (vcpu->kvm->arch.kvm_ops->create_vcpu_debugfs)
++		vcpu->kvm->arch.kvm_ops->create_vcpu_debugfs(vcpu, debugfs_dentry);
++}
++
++int kvm_arch_create_vm_debugfs(struct kvm *kvm)
++{
++	if (kvm->arch.kvm_ops->create_vm_debugfs)
++		kvm->arch.kvm_ops->create_vm_debugfs(kvm);
++	return 0;
++}
+diff --git a/arch/powerpc/kvm/timing.c b/arch/powerpc/kvm/timing.c
+index ba56a5cbba97..f6d472874c85 100644
+--- a/arch/powerpc/kvm/timing.c
++++ b/arch/powerpc/kvm/timing.c
+@@ -204,21 +204,9 @@ static const struct file_operations kvmppc_exit_timing_fops = {
+ 	.release = single_release,
+ };
+ 
+-void kvmppc_create_vcpu_debugfs(struct kvm_vcpu *vcpu, unsigned int id)
++void kvmppc_create_vcpu_debugfs_e500(struct kvm_vcpu *vcpu,
++				     struct dentry *debugfs_dentry)
+ {
+-	static char dbg_fname[50];
+-	struct dentry *debugfs_file;
+-
+-	snprintf(dbg_fname, sizeof(dbg_fname), "vm%u_vcpu%u_timing",
+-		 current->pid, id);
+-	debugfs_file = debugfs_create_file(dbg_fname, 0666, kvm_debugfs_dir,
+-						vcpu, &kvmppc_exit_timing_fops);
+-
+-	vcpu->arch.debugfs_exit_timing = debugfs_file;
 -}
 -
- /*
-  * Since kvm_tdp_mmu_zap_all_fast has acquired a reference to each
-  * invalidated root, they will not be freed until this function drops the
-@@ -843,36 +836,21 @@ static struct kvm_mmu_page *next_invalidated_root(struct kvm *kvm,
-  */
- void kvm_tdp_mmu_zap_invalidated_roots(struct kvm *kvm)
- {
--	struct kvm_mmu_page *next_root;
- 	struct kvm_mmu_page *root;
- 	bool flush = false;
- 
- 	lockdep_assert_held_read(&kvm->mmu_lock);
- 
--	rcu_read_lock();
--
--	root = next_invalidated_root(kvm, NULL);
--
--	while (root) {
--		next_root = next_invalidated_root(kvm, root);
--
--		rcu_read_unlock();
--
-+	for_each_invalid_tdp_mmu_root_yield_safe(kvm, root) {
- 		flush = zap_gfn_range(kvm, root, 0, -1ull, true, flush, true);
- 
- 		/*
--		 * Put the reference acquired in
--		 * kvm_tdp_mmu_invalidate_roots
-+		 * Put the reference acquired in kvm_tdp_mmu_invalidate_roots().
-+		 * Note, the iterator holds its own reference.
- 		 */
- 		kvm_tdp_mmu_put_root(kvm, root, true);
--
--		root = next_root;
--
--		rcu_read_lock();
- 	}
- 
--	rcu_read_unlock();
--
- 	if (flush)
- 		kvm_flush_remote_tlbs(kvm);
+-void kvmppc_remove_vcpu_debugfs(struct kvm_vcpu *vcpu)
+-{
+-	debugfs_remove(vcpu->arch.debugfs_exit_timing);
+-	vcpu->arch.debugfs_exit_timing = NULL;
++	debugfs_create_file("timing", 0666, debugfs_dentry,
++			    vcpu, &kvmppc_exit_timing_fops);
  }
 -- 
-2.34.1.173.g76aa8bc2d0-goog
+2.30.2
 
