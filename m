@@ -2,228 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9896547630A
-	for <lists+kvm@lfdr.de>; Wed, 15 Dec 2021 21:19:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 04105476311
+	for <lists+kvm@lfdr.de>; Wed, 15 Dec 2021 21:21:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235537AbhLOUTa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Dec 2021 15:19:30 -0500
-Received: from mail-dm6nam08on2051.outbound.protection.outlook.com ([40.107.102.51]:39221
-        "EHLO NAM04-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S235425AbhLOUT3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Dec 2021 15:19:29 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kKvcneuB1MHSlzqzHCqFJbZVC9f3zYuJvDcgwEN9hGvy2dg+9Ko1xkqXmv9otOGPw9SvIUn9gC3ryuX0LxS08lTo1Pp+dFZ51eqKj3yZdV47YJsxg3W7zV+NO8p1ySwf2mOO28UKip4Onxm1Bt30xZTSp5Yd/Ya7klq20NztSpVxqek8BKigqDbfJ0CVogoqRrqQ9d3JmLfi1Tsy7krGsvX0r7R0IjSO+ukzNy7rvil4AnYyPSpW2ZHOknxObzoi9V2gXmIrXQxuiXpWYJUwOY7a4tLRc3HRT7C4g9JTHBrxRfDTyoiSrX6IrFCDPvqjnSsaZilN0V7Xx0zO/Z+syg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jluifcnSuGncFW4f+lZK43WK4tu4gdrY95lopL4LdQ0=;
- b=ee8IE+NTwovEAMmUEKvewAfBGN/2L31+d3Pj5nbre4GspgvnkSOIg+Q5fbi/Cl3dJegBon0ylshxzbVvaaiLZQp+mY8WPO8Wd3UrXPZf34MStX6sqabg5eP+4V/M4J8UKP/1MNtWBA4kPo/9YLeoiIstMNf3HOymfN2hWvkIhDu565E6QJ5/cVc6LNCvTf8iROVP8Q8Cda3UlAP3kOxjSeUABV2uRhV5GSzwY886D5M+zeohNnrRRxxmFNAatUjiIfrgY08foH7u+8Rdo831TDEAZzfvtOx9D2jX0q+fRLpA06xpDnkmU+VLhapw0il7X+oRjjkCdfkwgcyJaUWXdQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=alien8.de smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jluifcnSuGncFW4f+lZK43WK4tu4gdrY95lopL4LdQ0=;
- b=tmEAncar0EAUXkBtCQU8mtNPjTJ/JzjveriQdSAZczYuXfxlg7CeG6WCYqLlz7638x2/lkzbsCvJ3XQK8OCUA93QcBQZ431cZ7TWupuAFtJWFMKbXskY+cV1+RMY9sXx5wvrlsudFEgWeQumFcvzOO+MZD3xRi9FapWSuZ+1zfQ=
-Received: from MWHPR14CA0064.namprd14.prod.outlook.com (2603:10b6:300:81::26)
- by CY4PR1201MB0070.namprd12.prod.outlook.com (2603:10b6:910:18::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4778.16; Wed, 15 Dec
- 2021 20:19:25 +0000
-Received: from CO1NAM11FT066.eop-nam11.prod.protection.outlook.com
- (2603:10b6:300:81:cafe::77) by MWHPR14CA0064.outlook.office365.com
- (2603:10b6:300:81::26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4778.13 via Frontend
- Transport; Wed, 15 Dec 2021 20:19:25 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB03.amd.com;
-Received: from SATLEXMB03.amd.com (165.204.84.17) by
- CO1NAM11FT066.mail.protection.outlook.com (10.13.175.18) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.4778.13 via Frontend Transport; Wed, 15 Dec 2021 20:19:24 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB03.amd.com
- (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.17; Wed, 15 Dec
- 2021 14:19:23 -0600
-Date:   Wed, 15 Dec 2021 14:17:34 -0600
-From:   Michael Roth <michael.roth@amd.com>
-To:     Borislav Petkov <bp@alien8.de>
-CC:     Venu Busireddy <venu.busireddy@oracle.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Brijesh Singh <brijesh.singh@amd.com>, <x86@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <linux-efi@vger.kernel.org>, <platform-driver-x86@vger.kernel.org>,
-        <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
+        id S235602AbhLOUVH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Dec 2021 15:21:07 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:51328 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233601AbhLOUVH (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 15 Dec 2021 15:21:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1639599666;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=/oU+MO6xSXAxFoQ6r9t9U2EPhK7g5y/gHx01nI9vvYg=;
+        b=IMUPCwIuI1iJxpNpa3wnNzq9V3PSo01qQ8eTGNfXi9+Rope+81eerX86y3BANn2j6c5P6G
+        Cq4x8R4YebvxDUvduFufkibr+VNz8Gk3ZfdoUbPSsnxsjZeaRTi9xmgd7/F6+TuN1bElj1
+        PtrI82H4pUUMWm/6OzZOhwD7vApSENs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-622-hQj2QffeNGyg9DP_4LZZHg-1; Wed, 15 Dec 2021 15:21:02 -0500
+X-MC-Unique: hQj2QffeNGyg9DP_4LZZHg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 609F01018F73;
+        Wed, 15 Dec 2021 20:20:56 +0000 (UTC)
+Received: from starship (unknown [10.40.192.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id DA18A7A239;
+        Wed, 15 Dec 2021 20:20:36 +0000 (UTC)
+Message-ID: <5d608bd0c5964d620dc23bcf8847713115404b3b.camel@redhat.com>
+Subject: Re: [PATCH 11/15] KVM: VMX: Update vmcs.GUEST_CR3 only when the
+ guest CR3 is dirty
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Lai Jiangshan <laijs@linux.alibaba.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
         Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        "Srinivas Pandruvada" <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        "Tobin Feldman-Fitzthum" <tobin@ibm.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        <tony.luck@intel.com>, <marcorr@google.com>,
-        <sathyanarayanan.kuppuswamy@linux.intel.com>
-Subject: Re: [PATCH v8 01/40] x86/compressed/64: detect/setup SEV/SME
- features earlier in boot
-Message-ID: <20211215201734.glq5gsle6crj25sf@amd.com>
-References: <20211210154332.11526-2-brijesh.singh@amd.com>
- <YbeaX+FViak2mgHO@dt>
- <YbecS4Py2hAPBrTD@zn.tnic>
- <YbjYZtXlbRdUznUO@dt>
- <YbjsGHSUUwomjbpc@zn.tnic>
- <YbkzaiC31/DzO5Da@dt>
- <b18655e3-3922-2b5d-0c35-1dcfef568e4d@amd.com>
- <20211215174934.tgn3c7c4s3toelbq@amd.com>
- <YboxSPFGF0Cqo5Fh@dt>
- <Ybo1C6kpcPJBzMGq@zn.tnic>
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>
+Date:   Wed, 15 Dec 2021 22:20:35 +0200
+In-Reply-To: <604709fa-e8bd-4eb6-6b79-8bf031a785ce@linux.alibaba.com>
+References: <20211108124407.12187-1-jiangshanlai@gmail.com>
+         <20211108124407.12187-12-jiangshanlai@gmail.com>
+         <0271da9d3a7494d9e7439d4b8d6d9c857c83a45e.camel@redhat.com>
+         <604709fa-e8bd-4eb6-6b79-8bf031a785ce@linux.alibaba.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <Ybo1C6kpcPJBzMGq@zn.tnic>
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB03.amd.com
- (10.181.40.144)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 75f638b2-b570-4e75-6441-08d9c0082fee
-X-MS-TrafficTypeDiagnostic: CY4PR1201MB0070:EE_
-X-Microsoft-Antispam-PRVS: <CY4PR1201MB007060973F83A14EF3EEA2FC95769@CY4PR1201MB0070.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: IOeh7EaE+fs9Xwoobxs3qCYvHIwtg0XUUU9AWbNcrCjKCB3vcplAIhNvCgYxIgFyInqbBRwfnPGR3CAy/9JXOWBguzMsLS9ffBTlwoMBS4jVe5CUWk6L96r8mIX4VI9JhBlIIWp0dNuU1xhWPfzMO9knb4/8fh2Dux8SmW1eAmP9BQavdNbHXRCh3VOgg0uAYeIh/OtOvA9WXIZzxyey95ZDv2psK1lVIfPOOaPYLPd9w+ehoqvpPTcTr4ixaoHwJ0+sJngFCvRMl+JhGiUOduPxPo1xj0iPtKQgokvLCYNRb+i4rLBQ78w5GBUMWlFLztQcQDje8PLb0puDgv8HrHAkeImvoCslzmkaPHR5QBRhCFNp7eiTL713kNOle/UwrofuWjF+2xgoIe0sG3j6ge16cyYX29NRlHnxIaA3xoZh0iXSVXpoO4hT7k+ae7/Uo8xJCI3s+InJXGMsKFbnJX/JJa0VFrQHx9oYqxbrGPDkioG4+2Cuh32xVoaFivNyNV+wLkXq7paMJ1B8hQp9eIZWQ3kWvTjjqC+XiD6hBY1E1Yi56TuXglh/+mYtXdgdT/UHasDWJl9f5OSGAZURRvRBtpmD1WPlxGPCs6+gxHrbaMrqaZsc/UupqNzia2cPF78JHfZQu21bEfVWwExqfhuP5XhiegneXJE0XcJMa4TLGKhLuVku8N954A0LNU7yKOn2Se6JtnPrxVqPMqskFSVj3keIcPLvXg0wfy438jtKfDmhSxrpXR0hg5/UKf/NBkKUiqLSdiE0Q73Q8UIRli0Np33Bag72uMzZCi02t9lG7bmbCZhSdgF+sQXaDcCNt99+0CZ92zm0sutYRFmNReQvTYBqmVBbZIzCz9IHhpTgMWtcapkWC3n3j4SCHG7Z
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(4636009)(46966006)(36840700001)(40470700001)(426003)(186003)(40460700001)(86362001)(47076005)(26005)(8936002)(1076003)(7406005)(81166007)(336012)(82310400004)(16526019)(83380400001)(36756003)(2616005)(44832011)(8676002)(356005)(36860700001)(70586007)(2906002)(7416002)(5660300002)(316002)(70206006)(54906003)(45080400002)(6916009)(4326008)(6666004)(508600001)(966005)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Dec 2021 20:19:24.4497
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 75f638b2-b570-4e75-6441-08d9c0082fee
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT066.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR1201MB0070
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 15, 2021 at 07:33:47PM +0100, Borislav Petkov wrote:
-> On Wed, Dec 15, 2021 at 12:17:44PM -0600, Venu Busireddy wrote:
-> > Boris & Tom, which implementation would you prefer?
+On Thu, 2021-12-16 at 00:31 +0800, Lai Jiangshan wrote:
 > 
-> I'd like to see how that sme_sev_parse_cpuid() would look like. And that
-> function should be called sev_parse_cpuid(), btw.
+> On 2021/12/15 23:47, Maxim Levitsky wrote:
+> > On Mon, 2021-11-08 at 20:44 +0800, Lai Jiangshan wrote:
+> > > From: Lai Jiangshan <laijs@linux.alibaba.com>
+> > > 
+> > > When vcpu->arch.cr3 is changed, it is marked dirty, so vmcs.GUEST_CR3
+> > > can be updated only when kvm_register_is_dirty(vcpu, VCPU_EXREG_CR3).
+> > > 
+> > > Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
+> > > ---
+> > >   arch/x86/kvm/vmx/vmx.c | 4 ++--
+> > >   1 file changed, 2 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > > index d94e51e9c08f..38b65b97fb7b 100644
+> > > --- a/arch/x86/kvm/vmx/vmx.c
+> > > +++ b/arch/x86/kvm/vmx/vmx.c
+> > > @@ -3126,9 +3126,9 @@ static void vmx_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa,
+> > >   
+> > >   		if (!enable_unrestricted_guest && !is_paging(vcpu))
+> > >   			guest_cr3 = to_kvm_vmx(kvm)->ept_identity_map_addr;
+> > > -		else if (test_bit(VCPU_EXREG_CR3, (ulong *)&vcpu->arch.regs_avail))
+> > > +		else if (kvm_register_is_dirty(vcpu, VCPU_EXREG_CR3))
+> > >   			guest_cr3 = vcpu->arch.cr3;
+> > > -		else /* vmcs01.GUEST_CR3 is already up-to-date. */
+> > > +		else /* vmcs.GUEST_CR3 is already up-to-date. */
+> > >   			update_guest_cr3 = false;
+> > >   		vmx_ept_load_pdptrs(vcpu);
+> > >   	} else {
+> > 
+> > I just bisected this patch to break booting a VM with ept=1 but unrestricted_guest=0
+> > (I needed to re-test unrestricted_guest=0 bug related to SMM, but didn't want
+> > to boot without EPT. With ept=0,the VM boots with this patch applied).
+> > 
 > 
-> Because if that function turns out to be a subset of your suggestion,
-> functionality-wise, then we should save us the churn and simply do one
-> generic helper.
-
-I was actually thinking this proposed sev_parse_cpuid() helper would be
-a superset of what Venu currently has implemented. E.g. Venu's most recent
-patch does:
-
-sev_enable():
-  unsigned int me_bit_pos;
-
-  me_bit_pos = get_me_bit(AMD_SEV_BIT)
-  if (!me_bit_pos)
-    return;
-
-  ...
-
-Let's say in the future there's need to also grab say, the VTE bit. We
-could introduce a new helper, get_vte_bit() that re-does all the
-0x80000000-0x8000001F range checks, some sanity checks that SEV is set if
-VTE bit is set, and then now have a nice single-purpose helper that
-duplicates similar checks in get_me_bit(), or we could avoid the
-duplication by expanding get_me_bit() so it could be used something like:
-
-  me_bit_pos = get_me_bit(AMD_SEV_BIT, &vte_enabled)
-
-at which point it makes more sense to just have it be a more generic
-helper, called via:
-
-  ret = sev_parse_cpuid(AMD_SEV_BIT, &me_bit_pos, &vte_enabled)
-
-i.e. Venu's original patch basically, but with the helper function
-renamed.
-
-and if fields are added in the future:
-
-  sev_parse_cpuid(AMD_SEV_BIT, &me_bit_pos, &vte_enabled, &new_feature_enabled, etc..)
-
-or if that eventually becomes unwieldly it could later be changed to return
-a feature mask.
-
+> Thanks for reporting.
 > 
-> Btw 2, that helper should be in arch/x86/kernel/sev-shared.c so that it
-> gets shared by both kernel stages instead having an inline function in
-> some random header.
+> Sorry, I never tested it with unrestricted_guest=0. I can't reproduce it now shortly
+> with unrestricted_guest=0.  Maybe it can be reproduced easily if I try more guests or
+> I write a piece of guest code to deliberate hit it if the following analyses is correct.
 > 
-> Btw 3, I'm not crazy about the feature testing with the @features param
-> either. Maybe that function should return the eYx register directly,
-> like the cpuid_eYx() variants in the kernel do, where Y in { a, b, c, d
-> }.
+> All the paths changing %cr3 are followed with kvm_register_mark_dirty(vcpu, VCPU_EXREG_CR3)
+> and GUEST_CR3 will be expected to be updated.
 > 
-> The caller can than do its own testing:
+> What I missed is the case of "if (!enable_unrestricted_guest && !is_paging(vcpu))"
+> in vmx_load_mmu_pgd() which doesn't load GUEST_CR3 but clears dirty of VCPU_EXREG_CR3
+> (when after next run).
 > 
-> 	eax = sev_parse_cpuid(RET_EAX, ...)
-> 	if (eax > 0) {
-> 		if (eax & BIT(1))
-> 			...
+> So when CR0 !PG -> PG, VCPU_EXREG_CR3 dirty bit should be set.
 > 
-> Something along those lines, for example.
+> Maybe adding the following patch on top of the original patch can work.
+> 
+> Thanks
+> Lai
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 85127b3e3690..55b45005ebb9 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -858,6 +858,7 @@ void kvm_post_set_cr0(struct kvm_vcpu *vcpu, unsigned long old_cr0, unsigned lon
+>   	if ((cr0 ^ old_cr0) & X86_CR0_PG) {
+>   		kvm_clear_async_pf_completion_queue(vcpu);
+>   		kvm_async_pf_hash_reset(vcpu);
+> +		kvm_register_mark_dirty(vcpu, VCPU_EXREG_CR3);
+>   	}
+> 
+>   	if ((cr0 ^ old_cr0) & KVM_MMU_CR0_ROLE_BITS)
+> 
 
-I think having sev_parse_cpuid() using a more "human-readable" format
-for reporting features/fields will make it easier to abstract away the
-nitty-gritty details and reduce that chances for more duplication
-between boot/compressed and kernel proper in the future. That
-"human-readable" format could be in the form of a boolean/int
-parameter list that gets expanded over time as needed (like the above
-examples), or a higher-level construct like a struct/bitmask/etc. But
-either way it would be nice to only have to think about specific CPUID
-bits when looking at sev_parse_cpuid(), and have callers instead rely
-purely on the sev_parse_cpuid() function prototype/documentation to
-know what's going on.
+Tested this patch and my guests boot. I didn't test more stuff like migration or so,
+will do tomorrow.
 
-> 
-> But I'd have to see a concrete diff from Michael to get a better idea
-> how that CPUID parsing from the CPUID page is going to look like.
+Best regards,
+	Maxim Levitsky
 
-It should look the same with/without CPUID page, since the CPUID page
-will have already been set up early in sev_enable()/sme_enable() based
-on the presence of the CC blob via snp_init(), introduced in:
-
- [PATCH v8 31/40] x86/compressed: add SEV-SNP feature detection/setup
-
-Thanks,
-
-Mike
-
-> 
-> Thx.
-> 
-> -- 
-> Regards/Gruss,
->     Boris.
-> 
-> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fpeople.kernel.org%2Ftglx%2Fnotes-about-netiquette&amp;data=04%7C01%7Cmichael.roth%40amd.com%7C6a28b961ef1441ed08f908d9bff970ea%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637751900351173552%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000&amp;sdata=nnCrpsw9%2FYlmhK1Xbx5y5vUScVsEOQeU%2F%2FTCmBMQ3v4%3D&amp;reserved=0
