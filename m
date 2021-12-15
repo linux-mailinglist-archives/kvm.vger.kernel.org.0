@@ -2,106 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9FFA0475993
-	for <lists+kvm@lfdr.de>; Wed, 15 Dec 2021 14:24:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0AFD34759DB
+	for <lists+kvm@lfdr.de>; Wed, 15 Dec 2021 14:43:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237399AbhLONYf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Dec 2021 08:24:35 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:48152 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237419AbhLONYe (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 15 Dec 2021 08:24:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1639574674;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=faX0xzTuw4r5Ss1p1Z66O3C+rjUZMW4qDeU2/6j1vvQ=;
-        b=B0tBW3Iv4VJi6HafhbAT2cNrO+1o1JkbEZeU86ah7IK/KSPLo13Nl7CbuHXcHLUpVqKslH
-        +iiG+SWpPlbb7EFHFG5wEIrvsZYwkk4jv8LVU1YEYq609Cv6+lnaRhAsigB0vZT6m+DrSO
-        L2YDG4ZWaG2ur0iRwmOOrE0VQZskDYU=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-655-VDwPgsw-OBCga6fnWoz7UA-1; Wed, 15 Dec 2021 08:24:33 -0500
-X-MC-Unique: VDwPgsw-OBCga6fnWoz7UA-1
-Received: by mail-wr1-f70.google.com with SMTP id v17-20020adfedd1000000b0017c5e737b02so5888821wro.18
-        for <kvm@vger.kernel.org>; Wed, 15 Dec 2021 05:24:33 -0800 (PST)
+        id S237403AbhLONm5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Dec 2021 08:42:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39404 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S242974AbhLONmy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Dec 2021 08:42:54 -0500
+Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D24D8C06173E;
+        Wed, 15 Dec 2021 05:42:53 -0800 (PST)
+Received: by mail-wr1-x42d.google.com with SMTP id a18so38297105wrn.6;
+        Wed, 15 Dec 2021 05:42:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=PQjMxn6qJTOCu4WLYBTC7H6yDOVC/lj7pDQpiSi6VaI=;
+        b=Y+sCX/uXXoSnqNOsQpRuA4Qer6cbTzPqlZvKri6W1VXh+wM9sN8nJmQKGeGuEMMTCh
+         OzNUE7rX6ZJ+V38UFtFN+UNTvZpW+JTXIswzAjawhJCOgnGltRNtAPJiaTsBJUw1UE9n
+         Fb6lELQtB52N1WyUSfeidytqaXSktzzhp9DIhSfAe37fbTH/VviFYODVL+1UaX223xVI
+         7O9AQxYrpcNN+LUg7I8oUL4YntN85A/BbbwwuP4s6UD1ZBJ+blh/7Z97FaO4QzEADztO
+         i7MBDagLm2PVOYkQcbDyc+leNoSKPt5yIEqtwbxgjeSknMiSTgirDW57xTpf/zi+jUt9
+         du4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:organization:in-reply-to
+        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
+         :subject:content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=faX0xzTuw4r5Ss1p1Z66O3C+rjUZMW4qDeU2/6j1vvQ=;
-        b=p5WkhwBWQSXLUd2e3c1XyVDgzZkI28pPTaRPNS121Ejn/dp3X5UeM+kz50Q4NpuJy3
-         Ixg8yl/I4kt+HJAPTMR43od+gW4l8eCzzvUtezEsSo9UN0T1wyrIWuggtJepLIHA8A2p
-         9DuW1mK5DigYkkOzVW9jchpoG8HO1+YJ3CkFUczpj7ZeA1yYXMirrNb/jBKQ7RUSJIEl
-         tz0PQE8LMV0vTPTEQ80WNqI/Ca5eJnZdFqzLoSn50ZEhDUuT5AcLWdnchBSgvBSrf2Is
-         esGcd+ZDIrnCmAakbSRaAekFQbhve4YGkTwvWEe1wQds0oJ9Vq3H/TEqvMkEdURjJFQo
-         PW9Q==
-X-Gm-Message-State: AOAM532twIDujHCj/ebJS1EYn82QUg3iwADwJ0qIOvO9XP0DO2BNPjMv
-        CaZdplDzzgfNDQGDdfq0rxz6FaHxdUiCXmek/zGQdmD67S7Kc0yy+EpiyRntA07/QmfJMXHB8SR
-        qgwD6935mMGGC
-X-Received: by 2002:a5d:4e92:: with SMTP id e18mr4477443wru.89.1639574672097;
-        Wed, 15 Dec 2021 05:24:32 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJxvYE115YTEnXyOnYw+6M9nPcYQcDwa5GAYcHppd/Ruc2VVaVYWw55fHwyFOHuOPUuAyhomuw==
-X-Received: by 2002:a5d:4e92:: with SMTP id e18mr4477429wru.89.1639574671898;
-        Wed, 15 Dec 2021 05:24:31 -0800 (PST)
-Received: from [192.168.3.132] (p5b0c609b.dip0.t-ipconnect.de. [91.12.96.155])
-        by smtp.gmail.com with ESMTPSA id b132sm1894704wmd.38.2021.12.15.05.24.31
+        bh=PQjMxn6qJTOCu4WLYBTC7H6yDOVC/lj7pDQpiSi6VaI=;
+        b=Xx/oQchNgwLwII9xU0tO+KFHltFwXp9tAb0CUPVPV1r/CkBadeTHkZP6z1MjF7t55v
+         Dzk+SqL8dCaXq4GuVPFIExzDleAu+A9IELmq2nX6F0PRE9srRWrv7Kw9x7LzqgpBk4lH
+         r1oqNviLUIOGhn1DIw4pKg/10cwg4CvxkbHdVdiczv7Po9H6+5kciHVoRWuTSrShFRl6
+         MipHxd2ynKNkRlvFw2BwcN5EWd4LaCOQ8PNH5t2UmhU2br3fa9aXI2ZxCC2G2bXrDFpN
+         /XZeQGkfiVAL2xQEj0qY+75aG6iruRvn6QAkTchnvKiFHmVNEXNud0JGrwRnyjTAllx1
+         qvXw==
+X-Gm-Message-State: AOAM533ivcXQan1bSIq8faMEQpw0zYfjhX9MiFi6aa6sjuU9pDT2C7Iy
+        /mJCrOtbOVldbLtz6dRYpeDIvXa6yhc=
+X-Google-Smtp-Source: ABdhPJxcvMJ4OEvpcjc32m30jB/7icgUUTlB7pMFor2DIIcYMwjGGBvNxumXQVaznXM5L5xVld+02A==
+X-Received: by 2002:a05:6000:10c4:: with SMTP id b4mr4047469wrx.514.1639575772365;
+        Wed, 15 Dec 2021 05:42:52 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:c8dd:75d4:99ab:290a? ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+        by smtp.googlemail.com with ESMTPSA id v6sm5146887wmh.8.2021.12.15.05.42.51
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Dec 2021 05:24:31 -0800 (PST)
-Message-ID: <3832e4ab-ffb7-3389-908d-99225ccea038@redhat.com>
-Date:   Wed, 15 Dec 2021 14:24:30 +0100
+        Wed, 15 Dec 2021 05:42:51 -0800 (PST)
+Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
+Message-ID: <cf329949-b81c-3e8c-0f38-4a28de22c456@redhat.com>
+Date:   Wed, 15 Dec 2021 14:42:50 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.2.0
-Subject: Re: [RFC PATCH v5 1/1] KVM: s390: Clarify SIGP orders versus
- STOP/RESTART
+Subject: Re: [PATCH 16/19] kvm: x86: Introduce KVM_{G|S}ET_XSAVE2 ioctl
 Content-Language: en-US
-To:     Eric Farman <farman@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>
-Cc:     Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-References: <20211213210550.856213-1-farman@linux.ibm.com>
- <20211213210550.856213-2-farman@linux.ibm.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <20211213210550.856213-2-farman@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
+To:     "Wang, Wei W" <wei.w.wang@intel.com>,
+        "Zhong, Yang" <yang.zhong@intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>
+Cc:     "seanjc@google.com" <seanjc@google.com>,
+        "Nakajima, Jun" <jun.nakajima@intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "jing2.liu@linux.intel.com" <jing2.liu@linux.intel.com>,
+        "Liu, Jing2" <jing2.liu@intel.com>,
+        "Zeng, Guang" <guang.zeng@intel.com>
+References: <20211208000359.2853257-1-yang.zhong@intel.com>
+ <20211208000359.2853257-17-yang.zhong@intel.com>
+ <d16aab21-0f81-f758-a61e-5919f223be78@redhat.com>
+ <26ea7039-3186-c23f-daba-d039bb8d6f48@redhat.com>
+ <86d3c3a5d61649079800a2038370365b@intel.com>
+ <bdda79b5-79e4-22fd-9af8-ec6e87a412ab@redhat.com>
+ <3ec6019a551249d6994063e56a448625@intel.com>
+ <ba78d142-6a97-99dd-9d00-465f7d6aa712@redhat.com>
+ <0c2dae4264ae4d3b87d023879c51833c@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <0c2dae4264ae4d3b87d023879c51833c@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13.12.21 22:05, Eric Farman wrote:
-> With KVM_CAP_S390_USER_SIGP, there are only five Signal Processor
-> orders (CONDITIONAL EMERGENCY SIGNAL, EMERGENCY SIGNAL, EXTERNAL CALL,
-> SENSE, and SENSE RUNNING STATUS) which are intended for frequent use
-> and thus are processed in-kernel. The remainder are sent to userspace
-> with the KVM_CAP_S390_USER_SIGP capability. Of those, three orders
-> (RESTART, STOP, and STOP AND STORE STATUS) have the potential to
-> inject work back into the kernel, and thus are asynchronous.
-> 
-> Let's look for those pending IRQs when processing one of the in-kernel
-> SIGP orders, and return BUSY (CC2) if one is in process. This is in
-> agreement with the Principles of Operation, which states that only one
-> order can be "active" on a CPU at a time.
-> 
-> Suggested-by: David Hildenbrand <david@redhat.com>
-> Signed-off-by: Eric Farman <farman@linux.ibm.com>
-> ---
+On 12/15/21 03:39, Wang, Wei W wrote:
+>>> Why would KVM_GET_XSAVE2 still be needed in this case?
+>>>
+>>> I'm thinking it would also be possible to reuse KVM_GET_XSAVE:
+>>>
+>>> - If userspace calls to KVM_CHECK_EXTENSION(KVM_CAP_XSAVE2),
+>>>    then KVM knows that the userspace is a new version and it works with
+>> larger xsave buffer using the "size" that it returns via KVM_CAP_XSAVE2.
+>>>    So we can add a flag "kvm->xsave2_enabled", which gets set upon
+>> userspace checks KVM_CAP_XSAVE2.
+>>
+>> You can use KVM_ENABLE_CAP(KVM_CAP_XSAVE2) for that, yes.  In that case
+>> you don't need KVM_GET_XSAVE2.
+>
+> On more thing here, what size should KVM_CHECK_EXTENSION(KVM_CAP_XSAVE2) return?
+> If the size still comes from the guest CPUID(0xd, 0)::RCX, would it be better to just return 1?
+> This requires that the QEMU CPUID info has been set to KVM before checking the cap.
+> QEMU already has this CPUID info to get the size (seems no need to inquire KVM for it).
 
-In general, LGTM. As raised, with SIGP RESTART there are other cases we
-could fix in the kernel, but they are of very low priority IMHO.
+It's still easier to return the full size of the buffer from 
+KVM_CHECK_EXTENSION(KVM_CAP_XSAVE2).  It makes the userspace code a bit 
+easier.
 
--- 
-Thanks,
+I'm also thinking that I prefer KVM_GET_XSAVE2 to 
+KVM_ENABLE_CAP(KVM_CAP_XSAVE2), after all.  Since it would be a 
+backwards-incompatible change to an _old_ ioctl (KVM_GET_XSAVE), I 
+prefer to limit the ways that userspace can shoot itself in the foot.
 
-David / dhildenb
-
+Paolo
