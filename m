@@ -2,108 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DC451475972
-	for <lists+kvm@lfdr.de>; Wed, 15 Dec 2021 14:11:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9FFA0475993
+	for <lists+kvm@lfdr.de>; Wed, 15 Dec 2021 14:24:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242740AbhLONKt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Dec 2021 08:10:49 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:51102 "EHLO
-        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233297AbhLONKr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Dec 2021 08:10:47 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id B091AB81EE1;
-        Wed, 15 Dec 2021 13:10:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9817BC34604;
-        Wed, 15 Dec 2021 13:10:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1639573844;
-        bh=cSCHf08gNddSPudJMuHhsja3lVVsLg6htioa9itM0kg=;
-        h=From:To:Cc:Subject:Date:From;
-        b=rqpMEzO4BPigITRsCG3cE7IjJQAdbqfFpwM2mlK0tb6a3ZOHeUT+rFKHu4tTqnBAn
-         OSznOAsGaePpqjUxqw7mVCIo0P56W1JXjVcPjZs1zBmpXatW6lpUu8z/SuII7gKGRn
-         0n5W131UJFUVIbm/zvNyeSgD2MGi5iKOOGRwlXVJGbqz0T7fB3bcSAkplpowfoTOGh
-         XjsqcMtE6d53cvrXvGvxtViPiEXzce/M9DgRGdYJNAvL1mOOqEOY3WnC0yYuE7mAvA
-         Z3s85YGIeooGyJylTQs4j0AJNPCqy+0oSrLT2IOhJeYmZmITLDdeojcW6X3Fn3XsN3
-         SvofUVtQF3vdg==
-From:   broonie@kernel.org
-To:     Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
-Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Sean Christopherson <seanjc@google.com>
-Subject: linux-next: manual merge of the kvm tree with the kvm tree
-Date:   Wed, 15 Dec 2021 13:10:33 +0000
-Message-Id: <20211215131033.2541027-1-broonie@kernel.org>
-X-Mailer: git-send-email 2.30.2
+        id S237399AbhLONYf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Dec 2021 08:24:35 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:48152 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237419AbhLONYe (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 15 Dec 2021 08:24:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1639574674;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=faX0xzTuw4r5Ss1p1Z66O3C+rjUZMW4qDeU2/6j1vvQ=;
+        b=B0tBW3Iv4VJi6HafhbAT2cNrO+1o1JkbEZeU86ah7IK/KSPLo13Nl7CbuHXcHLUpVqKslH
+        +iiG+SWpPlbb7EFHFG5wEIrvsZYwkk4jv8LVU1YEYq609Cv6+lnaRhAsigB0vZT6m+DrSO
+        L2YDG4ZWaG2ur0iRwmOOrE0VQZskDYU=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-655-VDwPgsw-OBCga6fnWoz7UA-1; Wed, 15 Dec 2021 08:24:33 -0500
+X-MC-Unique: VDwPgsw-OBCga6fnWoz7UA-1
+Received: by mail-wr1-f70.google.com with SMTP id v17-20020adfedd1000000b0017c5e737b02so5888821wro.18
+        for <kvm@vger.kernel.org>; Wed, 15 Dec 2021 05:24:33 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:organization:in-reply-to
+         :content-transfer-encoding;
+        bh=faX0xzTuw4r5Ss1p1Z66O3C+rjUZMW4qDeU2/6j1vvQ=;
+        b=p5WkhwBWQSXLUd2e3c1XyVDgzZkI28pPTaRPNS121Ejn/dp3X5UeM+kz50Q4NpuJy3
+         Ixg8yl/I4kt+HJAPTMR43od+gW4l8eCzzvUtezEsSo9UN0T1wyrIWuggtJepLIHA8A2p
+         9DuW1mK5DigYkkOzVW9jchpoG8HO1+YJ3CkFUczpj7ZeA1yYXMirrNb/jBKQ7RUSJIEl
+         tz0PQE8LMV0vTPTEQ80WNqI/Ca5eJnZdFqzLoSn50ZEhDUuT5AcLWdnchBSgvBSrf2Is
+         esGcd+ZDIrnCmAakbSRaAekFQbhve4YGkTwvWEe1wQds0oJ9Vq3H/TEqvMkEdURjJFQo
+         PW9Q==
+X-Gm-Message-State: AOAM532twIDujHCj/ebJS1EYn82QUg3iwADwJ0qIOvO9XP0DO2BNPjMv
+        CaZdplDzzgfNDQGDdfq0rxz6FaHxdUiCXmek/zGQdmD67S7Kc0yy+EpiyRntA07/QmfJMXHB8SR
+        qgwD6935mMGGC
+X-Received: by 2002:a5d:4e92:: with SMTP id e18mr4477443wru.89.1639574672097;
+        Wed, 15 Dec 2021 05:24:32 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJxvYE115YTEnXyOnYw+6M9nPcYQcDwa5GAYcHppd/Ruc2VVaVYWw55fHwyFOHuOPUuAyhomuw==
+X-Received: by 2002:a5d:4e92:: with SMTP id e18mr4477429wru.89.1639574671898;
+        Wed, 15 Dec 2021 05:24:31 -0800 (PST)
+Received: from [192.168.3.132] (p5b0c609b.dip0.t-ipconnect.de. [91.12.96.155])
+        by smtp.gmail.com with ESMTPSA id b132sm1894704wmd.38.2021.12.15.05.24.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 15 Dec 2021 05:24:31 -0800 (PST)
+Message-ID: <3832e4ab-ffb7-3389-908d-99225ccea038@redhat.com>
+Date:   Wed, 15 Dec 2021 14:24:30 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [RFC PATCH v5 1/1] KVM: s390: Clarify SIGP orders versus
+ STOP/RESTART
+Content-Language: en-US
+To:     Eric Farman <farman@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>
+Cc:     Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+References: <20211213210550.856213-1-farman@linux.ibm.com>
+ <20211213210550.856213-2-farman@linux.ibm.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+In-Reply-To: <20211213210550.856213-2-farman@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi all,
+On 13.12.21 22:05, Eric Farman wrote:
+> With KVM_CAP_S390_USER_SIGP, there are only five Signal Processor
+> orders (CONDITIONAL EMERGENCY SIGNAL, EMERGENCY SIGNAL, EXTERNAL CALL,
+> SENSE, and SENSE RUNNING STATUS) which are intended for frequent use
+> and thus are processed in-kernel. The remainder are sent to userspace
+> with the KVM_CAP_S390_USER_SIGP capability. Of those, three orders
+> (RESTART, STOP, and STOP AND STORE STATUS) have the potential to
+> inject work back into the kernel, and thus are asynchronous.
+> 
+> Let's look for those pending IRQs when processing one of the in-kernel
+> SIGP orders, and return BUSY (CC2) if one is in process. This is in
+> agreement with the Principles of Operation, which states that only one
+> order can be "active" on a CPU at a time.
+> 
+> Suggested-by: David Hildenbrand <david@redhat.com>
+> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> ---
 
-Today's linux-next merge of the kvm tree got a conflict in:
+In general, LGTM. As raised, with SIGP RESTART there are other cases we
+could fix in the kernel, but they are of very low priority IMHO.
 
-  arch/powerpc/kvm/book3s_hv.c
+-- 
+Thanks,
 
-between commit:
+David / dhildenb
 
-  511d25d6b789f ("KVM: PPC: Book3S: Suppress warnings when allocating too big memory slots")
-
-from the kvm tree and commits:
-
-  537a17b314930 ("KVM: Let/force architectures to deal with arch specific memslot data")
-  eaaaed137eccb ("KVM: PPC: Avoid referencing userspace memory region in memslot updates")
-
-from the kvm tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
-diff --cc arch/powerpc/kvm/book3s_hv.c
-index f64e45d6c0f4c,51e1c29a6fa08..0000000000000
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@@ -4866,21 -4854,17 +4866,22 @@@ static void kvmppc_core_free_memslot_hv
-  }
-  
-  static int kvmppc_core_prepare_memory_region_hv(struct kvm *kvm,
-- 					struct kvm_memory_slot *slot,
-- 					const struct kvm_userspace_memory_region *mem,
-- 					enum kvm_mr_change change)
-+ 				const struct kvm_memory_slot *old,
-+ 				struct kvm_memory_slot *new,
-+ 				enum kvm_mr_change change)
-  {
-- 	unsigned long npages = mem->memory_size >> PAGE_SHIFT;
-- 
-  	if (change == KVM_MR_CREATE) {
-- 		unsigned long size = array_size(npages, sizeof(*slot->arch.rmap));
- -		new->arch.rmap = vzalloc(array_size(new->npages,
- -					  sizeof(*new->arch.rmap)));
-++		unsigned long size = array_size(new->npages,
-++						sizeof(*new->arch.rmap));
- +
- +		if ((size >> PAGE_SHIFT) > totalram_pages())
- +			return -ENOMEM;
- +
-- 		slot->arch.rmap = vzalloc(size);
-- 		if (!slot->arch.rmap)
-++		new->arch.rmap = vzalloc(size);
-+ 		if (!new->arch.rmap)
-  			return -ENOMEM;
-+ 	} else if (change != KVM_MR_DELETE) {
-+ 		new->arch.rmap = old->arch.rmap;
-  	}
-  
-  	return 0;
