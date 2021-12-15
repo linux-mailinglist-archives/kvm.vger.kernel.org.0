@@ -2,291 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 5EA10475E4F
-	for <lists+kvm@lfdr.de>; Wed, 15 Dec 2021 18:14:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 96A5B475E78
+	for <lists+kvm@lfdr.de>; Wed, 15 Dec 2021 18:22:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245188AbhLORN7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Dec 2021 12:13:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33034 "EHLO
+        id S245240AbhLORUi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Dec 2021 12:20:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34628 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232113AbhLORN6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Dec 2021 12:13:58 -0500
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0999AC061574;
-        Wed, 15 Dec 2021 09:13:58 -0800 (PST)
-Received: by mail-wr1-x430.google.com with SMTP id t18so39334700wrg.11;
-        Wed, 15 Dec 2021 09:13:57 -0800 (PST)
+        with ESMTP id S245248AbhLORUh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Dec 2021 12:20:37 -0500
+Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57B89C06173E;
+        Wed, 15 Dec 2021 09:20:37 -0800 (PST)
+Received: by mail-wm1-x333.google.com with SMTP id az34-20020a05600c602200b0033bf8662572so16474548wmb.0;
+        Wed, 15 Dec 2021 09:20:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=sender:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=oiOetQYwkDndCOOaU2d1ZDUVu7Bxxzb3CDEYCSeKO2Q=;
-        b=PmCA2xXuww/GXETpX/igpBTF1+w3nUVvuQY3Rs3ytrdz43fjrvaBu0Hz9NfYa6DPEL
-         BuaeglaVHpLnvCTxILKyDEcm6qO26QvaP1K6Oi/i9Vws201GaM2+E+qAp+Y6WZHLl0cV
-         lWokvssCjOJmJ7GxOkeihdPa0UlcR6UMHVjCL5L6x32CsReXYzo0pvCVp6v5N5QejdaK
-         vBEBWb6FJz3LbIiuqq5jwy36TaMRM6VBfzD5wVVf97TN9vyP1dw4nxeBvkOmu0/PCLRH
-         eYqZyV2mKv7Ymgu45nhBIhlr/zI683kLcx2p8/q06Rj0PNJJXlFBFFqAHlyC3QbCYZow
-         60wg==
+        bh=gBnmKSGLNuMvymhhy5hZJRhuWEJ7BIugf8vR/bIuOqM=;
+        b=KCLZaZDQQvg018ER4RJ25YN2zuBW58lZWc7tx1pn54BQ/20m/VK0Ijoz1tOwebSdBx
+         61/TRUIdYuw7flDNY3/SJCmbW67ZvpJORo3h16tmnm57ZJZCnRVebHhMb98aFx7DRz/P
+         pmbJRHpRfkyz5USGQHyhHRsyoHyFNmfgEv2pVfsUuGSmhPF2vMqwNo31YgulJdBfqMB6
+         qAzMVustltXloIf1FsU/KgxEPNX66be95DgH9/Y3+oPPqOIYsnED574cOm75t0TMvS8F
+         goDrf+aIt8x3oZyChAFBAgD9x2qO6TDvxWzQ2PYMqjWghPSDXFd6mC/wkFddawMfyNaI
+         kEoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
          :subject:content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=oiOetQYwkDndCOOaU2d1ZDUVu7Bxxzb3CDEYCSeKO2Q=;
-        b=F9gXTH9IJ7/jE+9SvCAm4PcIpttQYe/tHQr6ckLAYoIiSl6ScpZLLXIRIlS7r4fyQ8
-         co3yw/hPs/Pk1b0FkK+ZGxUjxUIntFb52XT4hA/YLp86IV/Qje5usdfU4LKf3194ceYN
-         iq6DrXNNEb40HbPKPfz68LL/vdTIREzAJeGy925OnWSQw+v/v+CAKW/q4VBnFWZFn7wE
-         wl5Bzc+bzV9BkcEEVir61JPR+8wNM4KcheCL+eGv1PC7Hs+kMQDbGJSSr/4inGPL7C7M
-         DenmZ7ZRb6mq8ovNhdm7UZLC6kd719DyHX7V8i/GrxgiWWsn6oe73X5c3uCEu4USzOfh
-         xmmg==
-X-Gm-Message-State: AOAM5325QVb+7bzq6n2kVjnasdfl0VamRo59ZOVpODpcRaBH/nvy1sr5
-        NWsURr++I2aG6m9zzIpvCY4=
-X-Google-Smtp-Source: ABdhPJzKH4jIcGWjf30MdvXRsNVed3AsC+a+KHk1oPjfKSYE2gWDRP4gKmczx63T6eykwCX8yyAv2A==
-X-Received: by 2002:adf:ec89:: with SMTP id z9mr5291926wrn.645.1639588436454;
-        Wed, 15 Dec 2021 09:13:56 -0800 (PST)
+        bh=gBnmKSGLNuMvymhhy5hZJRhuWEJ7BIugf8vR/bIuOqM=;
+        b=OrwHLjcxpxSlp4XW/v1WmfKZ34dTtSiqGLWv4fy7xMjX3p3oWz/6qAAJDXAL094s1X
+         SkwWoh+Ha9nEhh96jeoOs8w/0ylIlVDg/adEI+rXCLiPeKZurQTmuphTVNPZeLmshyPN
+         gmjkuvvuT8SB7u5Z+YCcMEd/xNe0WCLuaXW7qFvEv0vQ6mYy2kZGLxM+7RzuP2AkuW69
+         BVhOpMclMETR+T/253dVjD4IVEJ6pw9fL/DEf+Sj1VMZDgPIqT+HhmjmIy2fvxxdRWQh
+         WHPlGMQTzO2Hvo997MS7y30U6qZHzLCHMARzSzMpEgcfhW8ijV505cpoCZhat+9UFwn/
+         f05A==
+X-Gm-Message-State: AOAM532S7jP6HwBofhNFIA9+gYAGlbGhKzPktOYxWI60oj41iQnDklEn
+        zuxjrU+Wqn7ljXxpfFvbg8g=
+X-Google-Smtp-Source: ABdhPJwojD9YKCPuESlm+kt+n4P3cUJuGJ1Uccelxcnq8snmgdS+pH9okyrfRk3HN7t/yeFBxs6XXg==
+X-Received: by 2002:a05:600c:1f17:: with SMTP id bd23mr913120wmb.57.1639588835923;
+        Wed, 15 Dec 2021 09:20:35 -0800 (PST)
 Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id b132sm2464483wmd.38.2021.12.15.09.13.55
+        by smtp.googlemail.com with ESMTPSA id d2sm2535828wra.61.2021.12.15.09.20.33
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Dec 2021 09:13:56 -0800 (PST)
+        Wed, 15 Dec 2021 09:20:35 -0800 (PST)
 Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <cafdfc3d-5e4b-f791-82a3-d669ba2d6039@redhat.com>
-Date:   Wed, 15 Dec 2021 18:13:54 +0100
+Message-ID: <b4295e77-aaf1-f0f5-cfd5-2a4fda923fb4@redhat.com>
+Date:   Wed, 15 Dec 2021 18:20:31 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.2.0
-Subject: Re: [PATCH] KVM: x86/mmu: Don't advance iterator after restart due to
- yielding
+Subject: Re: [PATCH 0/4] KVM: x86/mmu: Zap invalid TDP MMU roots when
+ unmapping
 Content-Language: en-US
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
         Wanpeng Li <wanpengli@tencent.com>,
         Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Ignat Korchagin <ignat@cloudflare.com>
-References: <20211214033528.123268-1-seanjc@google.com>
+        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>
+References: <20211215011557.399940-1-seanjc@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211214033528.123268-1-seanjc@google.com>
+In-Reply-To: <20211215011557.399940-1-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/14/21 04:35, Sean Christopherson wrote:
-> After dropping mmu_lock in the TDP MMU, restart the iterator during
-> tdp_iter_next() and do not advance the iterator.  Advancing the iterator
-> results in skipping the top-level SPTE and all its children, which is
-> fatal if any of the skipped SPTEs were not visited before yielding.
+On 12/15/21 02:15, Sean Christopherson wrote:
+> Patches 01-03 implement a bug fix by ensuring KVM zaps both valid and
+> invalid roots when unmapping a gfn range (including the magic "all" range).
+> Failure to zap invalid roots means KVM doesn't honor the mmu_notifier's
+> requirement that all references are dropped.
 > 
-> When zapping all SPTEs, i.e. when min_level == root_level, restarting the
-> iter and then invoking tdp_iter_next() is always fatal if the current gfn
-> has as a valid SPTE, as advancing the iterator results in try_step_side()
-> skipping the current gfn, which wasn't visited before yielding.
+> set_nx_huge_pages() is the most blatant offender, as it doesn't elevate
+> mm_users and so a VM's entire mm can be released, but the same underlying
+> bug exists for any "unmap" command from the mmu_notifier in combination
+> with a memslot update.  E.g. if KVM is deleting a memslot, and a
+> mmu_notifier hook acquires mmu_lock while it's dropped by
+> kvm_mmu_zap_all_fast(), the mmu_notifier hook will see the to-be-deleted
+> memslot but won't zap entries from the invalid roots.
 > 
-> Sprinkle WARNs on iter->yielded being true in various helpers that are
-> often used in conjunction with yielding, and tag the helper with
-> __must_check to reduce the probabily of improper usage.
+> Patch 04 is cleanup to reuse the common iterator for walking _only_
+> invalid roots.
 > 
-> Failing to zap a top-level SPTE manifests in one of two ways.  If a valid
-> SPTE is skipped by both kvm_tdp_mmu_zap_all() and kvm_tdp_mmu_put_root(),
-> the shadow page will be leaked and KVM will WARN accordingly.
+> Sean Christopherson (4):
+>    KVM: x86/mmu: Use common TDP MMU zap helper for MMU notifier unmap
+>      hook
+>    KVM: x86/mmu: Move "invalid" check out of kvm_tdp_mmu_get_root()
+>    KVM: x86/mmu: Zap _all_ roots when unmapping gfn range in TDP MMU
+>    KVM: x86/mmu: Use common iterator for walking invalid TDP MMU roots
 > 
->    WARNING: CPU: 1 PID: 3509 at arch/x86/kvm/mmu/tdp_mmu.c:46 [kvm]
->    RIP: 0010:kvm_mmu_uninit_tdp_mmu+0x3e/0x50 [kvm]
->    Call Trace:
->     <TASK>
->     kvm_arch_destroy_vm+0x130/0x1b0 [kvm]
->     kvm_destroy_vm+0x162/0x2a0 [kvm]
->     kvm_vcpu_release+0x34/0x60 [kvm]
->     __fput+0x82/0x240
->     task_work_run+0x5c/0x90
->     do_exit+0x364/0xa10
->     ? futex_unqueue+0x38/0x60
->     do_group_exit+0x33/0xa0
->     get_signal+0x155/0x850
->     arch_do_signal_or_restart+0xed/0x750
->     exit_to_user_mode_prepare+0xc5/0x120
->     syscall_exit_to_user_mode+0x1d/0x40
->     do_syscall_64+0x48/0xc0
->     entry_SYSCALL_64_after_hwframe+0x44/0xae
-> 
-> If kvm_tdp_mmu_zap_all() skips a gfn/SPTE but that SPTE is then zapped by
-> kvm_tdp_mmu_put_root(), KVM triggers a use-after-free in the form of
-> marking a struct page as dirty/accessed after it has been put back on the
-> free list.  This directly triggers a WARN due to encountering a page with
-> page_count() == 0, but it can also lead to data corruption and additional
-> errors in the kernel.
-> 
->    WARNING: CPU: 7 PID: 1995658 at arch/x86/kvm/../../../virt/kvm/kvm_main.c:171
->    RIP: 0010:kvm_is_zone_device_pfn.part.0+0x9e/0xd0 [kvm]
->    Call Trace:
->     <TASK>
->     kvm_set_pfn_dirty+0x120/0x1d0 [kvm]
->     __handle_changed_spte+0x92e/0xca0 [kvm]
->     __handle_changed_spte+0x63c/0xca0 [kvm]
->     __handle_changed_spte+0x63c/0xca0 [kvm]
->     __handle_changed_spte+0x63c/0xca0 [kvm]
->     zap_gfn_range+0x549/0x620 [kvm]
->     kvm_tdp_mmu_put_root+0x1b6/0x270 [kvm]
->     mmu_free_root_page+0x219/0x2c0 [kvm]
->     kvm_mmu_free_roots+0x1b4/0x4e0 [kvm]
->     kvm_mmu_unload+0x1c/0xa0 [kvm]
->     kvm_arch_destroy_vm+0x1f2/0x5c0 [kvm]
->     kvm_put_kvm+0x3b1/0x8b0 [kvm]
->     kvm_vcpu_release+0x4e/0x70 [kvm]
->     __fput+0x1f7/0x8c0
->     task_work_run+0xf8/0x1a0
->     do_exit+0x97b/0x2230
->     do_group_exit+0xda/0x2a0
->     get_signal+0x3be/0x1e50
->     arch_do_signal_or_restart+0x244/0x17f0
->     exit_to_user_mode_prepare+0xcb/0x120
->     syscall_exit_to_user_mode+0x1d/0x40
->     do_syscall_64+0x4d/0x90
->     entry_SYSCALL_64_after_hwframe+0x44/0xae
-> 
-> Note, the underlying bug existed even before commit 1af4a96025b3 ("KVM:
-> x86/mmu: Yield in TDU MMU iter even if no SPTES changed") moved calls to
-> tdp_mmu_iter_cond_resched() to the beginning of loops, as KVM could still
-> incorrectly advance past a top-level entry when yielding on a lower-level
-> entry.  But with respect to leaking shadow pages, the bug was introduced
-> by yielding before processing the current gfn.
-> 
-> Alternatively, tdp_mmu_iter_cond_resched() could simply fall through, or
-> callers could jump to their "retry" label.  The downside of that approach
-> is that tdp_mmu_iter_cond_resched() _must_ be called before anything else
-> in the loop, and there's no easy way to enfornce that requirement.
-> 
-> Ideally, KVM would handling the cond_resched() fully within the iterator
-> macro (the code is actually quite clean) and avoid this entire class of
-> bugs, but that is extremely difficult do while also supporting yielding
-> after tdp_mmu_set_spte_atomic() fails.  Yielding after failing to set a
-> SPTE is very desirable as the "owner" of the REMOVED_SPTE isn't strictly
-> bounded, e.g. if it's zapping a high-level shadow page, the REMOVED_SPTE
-> may block operations on the SPTE for a significant amount of time.
-> 
-> Fixes: faaf05b00aec ("kvm: x86/mmu: Support zapping SPTEs in the TDP MMU")
-> Fixes: 1af4a96025b3 ("KVM: x86/mmu: Yield in TDU MMU iter even if no SPTES changed")
-> Reported-by: Ignat Korchagin <ignat@cloudflare.com>
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   arch/x86/kvm/mmu/tdp_iter.c |  6 ++++++
->   arch/x86/kvm/mmu/tdp_iter.h |  6 ++++++
->   arch/x86/kvm/mmu/tdp_mmu.c  | 29 ++++++++++++++++-------------
->   3 files changed, 28 insertions(+), 13 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/tdp_iter.c b/arch/x86/kvm/mmu/tdp_iter.c
-> index b3ed302c1a35..caa96c270b95 100644
-> --- a/arch/x86/kvm/mmu/tdp_iter.c
-> +++ b/arch/x86/kvm/mmu/tdp_iter.c
-> @@ -26,6 +26,7 @@ static gfn_t round_gfn_for_level(gfn_t gfn, int level)
->    */
->   void tdp_iter_restart(struct tdp_iter *iter)
->   {
-> +	iter->yielded = false;
->   	iter->yielded_gfn = iter->next_last_level_gfn;
->   	iter->level = iter->root_level;
->   
-> @@ -160,6 +161,11 @@ static bool try_step_up(struct tdp_iter *iter)
->    */
->   void tdp_iter_next(struct tdp_iter *iter)
->   {
-> +	if (iter->yielded) {
-> +		tdp_iter_restart(iter);
-> +		return;
-> +	}
-> +
->   	if (try_step_down(iter))
->   		return;
->   
-> diff --git a/arch/x86/kvm/mmu/tdp_iter.h b/arch/x86/kvm/mmu/tdp_iter.h
-> index b1748b988d3a..e19cabbcb65c 100644
-> --- a/arch/x86/kvm/mmu/tdp_iter.h
-> +++ b/arch/x86/kvm/mmu/tdp_iter.h
-> @@ -45,6 +45,12 @@ struct tdp_iter {
->   	 * iterator walks off the end of the paging structure.
->   	 */
->   	bool valid;
-> +	/*
-> +	 * True if KVM dropped mmu_lock and yielded in the middle of a walk, in
-> +	 * which case tdp_iter_next() needs to restart the walk at the root
-> +	 * level instead of advancing to the next entry.
-> +	 */
-> +	bool yielded;
->   };
->   
->   /*
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index b69e47e68307..7b1bc816b7c3 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -502,6 +502,8 @@ static inline bool tdp_mmu_set_spte_atomic(struct kvm *kvm,
->   					   struct tdp_iter *iter,
->   					   u64 new_spte)
->   {
-> +	WARN_ON_ONCE(iter->yielded);
-> +
->   	lockdep_assert_held_read(&kvm->mmu_lock);
->   
->   	/*
-> @@ -575,6 +577,8 @@ static inline void __tdp_mmu_set_spte(struct kvm *kvm, struct tdp_iter *iter,
->   				      u64 new_spte, bool record_acc_track,
->   				      bool record_dirty_log)
->   {
-> +	WARN_ON_ONCE(iter->yielded);
-> +
->   	lockdep_assert_held_write(&kvm->mmu_lock);
->   
->   	/*
-> @@ -640,18 +644,19 @@ static inline void tdp_mmu_set_spte_no_dirty_log(struct kvm *kvm,
->    * If this function should yield and flush is set, it will perform a remote
->    * TLB flush before yielding.
->    *
-> - * If this function yields, it will also reset the tdp_iter's walk over the
-> - * paging structure and the calling function should skip to the next
-> - * iteration to allow the iterator to continue its traversal from the
-> - * paging structure root.
-> + * If this function yields, iter->yielded is set and the caller must skip to
-> + * the next iteration, where tdp_iter_next() will reset the tdp_iter's walk
-> + * over the paging structures to allow the iterator to continue its traversal
-> + * from the paging structure root.
->    *
-> - * Return true if this function yielded and the iterator's traversal was reset.
-> - * Return false if a yield was not needed.
-> + * Returns true if this function yielded.
->    */
-> -static inline bool tdp_mmu_iter_cond_resched(struct kvm *kvm,
-> -					     struct tdp_iter *iter, bool flush,
-> -					     bool shared)
-> +static inline bool __must_check tdp_mmu_iter_cond_resched(struct kvm *kvm,
-> +							  struct tdp_iter *iter,
-> +							  bool flush, bool shared)
->   {
-> +	WARN_ON(iter->yielded);
-> +
->   	/* Ensure forward progress has been made before yielding. */
->   	if (iter->next_last_level_gfn == iter->yielded_gfn)
->   		return false;
-> @@ -671,12 +676,10 @@ static inline bool tdp_mmu_iter_cond_resched(struct kvm *kvm,
->   
->   		WARN_ON(iter->gfn > iter->next_last_level_gfn);
->   
-> -		tdp_iter_restart(iter);
-> -
-> -		return true;
-> +		iter->yielded = true;
->   	}
->   
-> -	return false;
-> +	return iter->yielded;
->   }
->   
->   /*
+>   arch/x86/kvm/mmu/tdp_mmu.c | 116 +++++++++++++++++--------------------
+>   arch/x86/kvm/mmu/tdp_mmu.h |   3 -
+>   2 files changed, 53 insertions(+), 66 deletions(-)
 > 
 
-Queued, thnaks.
+Queued 1-3 for 5.16 and 4 for 5.17.
 
 Paolo
