@@ -2,172 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A458C475FDC
-	for <lists+kvm@lfdr.de>; Wed, 15 Dec 2021 18:52:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9B38647600C
+	for <lists+kvm@lfdr.de>; Wed, 15 Dec 2021 19:00:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238640AbhLORwf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Dec 2021 12:52:35 -0500
-Received: from mail-dm6nam11on2061.outbound.protection.outlook.com ([40.107.223.61]:26848
-        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S238305AbhLORwb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Dec 2021 12:52:31 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ibKRcUOBj/V4qE9wiUX2nVEqn/80DqKeBOU2t1zywZoTefmfzQkHhXnFnNll741iPEMOPEY1p+CDmxpH2+41pyMLVXvPeBVVm0+/gMTkazvShZVY+CTA0FKxuBt0aA4suV1B8Hfd4hyvHia0fVLIKgMy73s63dZSBgGzwgoP8MeTnqc3tYhFiLmE8dHhEIt6bsBTKzr79LVElAVD8BKFUoYPjKxGKGAfO6JhU8PkBaanq+JRLcfHMdO3+nhybtUmJP72dDtsTVMYH3NS7hXNcRrT3qFRD+/jEgM72EwtekfvNLZd25xk8Ns2TosWHoYpGD2BX67zC56lJ3tg+YsPlQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DzJdflHFmHa4TuGszXR9N7gtkHVUjMNdtQ/NS0c4BjA=;
- b=iY/qgUQ/YLDVHFFC6PCJg2YOMdcyXG7akRlBJGqqvgSFVh4Dy+dt84OIRAV1XCuEBU1QBK8VRUQ4TNlVYSipfttSFyYJTUi1VxE2Cf3zwWURvbeXjDE4D8h7UJjojGmqCRsGSKHoQ9K1Imcl+oanY2jnl+bWKy2atZwnyZFr6q53sZlwfoTCYoV5bvyP/UlK/FE01boLOgBhEuAqGjn2FvOICNTWUWS9VWiFD2RxXH0ozOjsa4Kz5FU4Mzf9OEyZYqj4/SRG5T0Him1mkVBTDPiKP49kLfwX9L515uWRibYMxAXj0I0XE93KvCjfIwE9Ju312XpWL0hxsdCCI59/Lw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=oracle.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DzJdflHFmHa4TuGszXR9N7gtkHVUjMNdtQ/NS0c4BjA=;
- b=UACLFa4vQO7aQVigPKYmf5+cVvSjZT4aJEny/q62pcOF4myYazwD1zRBG7+xos/jdx32QQlpUCmpcEwe0JyZszgLURZVs5kweRu+9WCLhdaPQ7C9xKisI59CBjICYqq/qoF42IE8QDm5NQNU5JSwcKnMoHgMCxdRBQ/G1cFRIR4=
-Received: from DM6PR07CA0118.namprd07.prod.outlook.com (2603:10b6:5:330::31)
- by BL1PR12MB5096.namprd12.prod.outlook.com (2603:10b6:208:316::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4801.14; Wed, 15 Dec
- 2021 17:52:28 +0000
-Received: from DM6NAM11FT056.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:330:cafe::41) by DM6PR07CA0118.outlook.office365.com
- (2603:10b6:5:330::31) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4778.15 via Frontend
- Transport; Wed, 15 Dec 2021 17:52:28 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com;
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DM6NAM11FT056.mail.protection.outlook.com (10.13.173.99) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.4778.13 via Frontend Transport; Wed, 15 Dec 2021 17:52:27 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.17; Wed, 15 Dec
- 2021 11:52:25 -0600
-Date:   Wed, 15 Dec 2021 11:51:48 -0600
-From:   Michael Roth <michael.roth@amd.com>
-To:     Venu Busireddy <venu.busireddy@oracle.com>
-CC:     Borislav Petkov <bp@alien8.de>,
-        Brijesh Singh <brijesh.singh@amd.com>, <x86@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <linux-efi@vger.kernel.org>, <platform-driver-x86@vger.kernel.org>,
-        <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        "Vitaly Kuznetsov" <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        "Andy Lutomirski" <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        "Peter Zijlstra" <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        <tony.luck@intel.com>, <marcorr@google.com>,
-        <sathyanarayanan.kuppuswamy@linux.intel.com>
-Subject: Re: [PATCH v8 01/40] x86/compressed/64: detect/setup SEV/SME
- features earlier in boot
-Message-ID: <20211215175148.rtgyyqgymouvs7ft@amd.com>
-References: <20211210154332.11526-1-brijesh.singh@amd.com>
- <20211210154332.11526-2-brijesh.singh@amd.com>
- <YbeaX+FViak2mgHO@dt>
- <YbecS4Py2hAPBrTD@zn.tnic>
- <YbjYZtXlbRdUznUO@dt>
- <YbjsGHSUUwomjbpc@zn.tnic>
- <YbkzaiC31/DzO5Da@dt>
+        id S245383AbhLOSAA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Dec 2021 13:00:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44254 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S245374AbhLOSAA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Dec 2021 13:00:00 -0500
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7B9FC061574
+        for <kvm@vger.kernel.org>; Wed, 15 Dec 2021 09:59:59 -0800 (PST)
+Received: by mail-pg1-x531.google.com with SMTP id d11so12108053pgl.1
+        for <kvm@vger.kernel.org>; Wed, 15 Dec 2021 09:59:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=ggAc5NwHgbAF9NQ5yQbvGZ42z1DyZ9O0jHYH8xXLJJE=;
+        b=UHNgNEZTROoPzSn3k142OQynuy8gPCqn4AiAb4DazbLBufkSpzd1vMbjoggiyDC6aT
+         EeM9/gE32ezen5sRZioO00/E5LYmlXZen96XCBNsX+NiUYvhm3jOl42pcqOIUWLZiA0s
+         zIUHCbZdif/Rk7PRC9FRftqmK9r4oWvCtPVGk1i1Z9ykghyzKcQndXVhTk2BR/KtPzX8
+         KMcubm/1lVycqfNdtzlFNKTo23pYLIWnq37lwzFS66lVPdV+VsjqT+EcX1LHxMicpemD
+         ut0OyySFVM/MNSnjAIUWbxnagHU6bO1a29hB93XBgKxu7uNv7iL+sW4SBviPyPp6gtZw
+         TK2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ggAc5NwHgbAF9NQ5yQbvGZ42z1DyZ9O0jHYH8xXLJJE=;
+        b=nTh1oJi5F++f79dZ8q3xtVF9crpTz9sVThXUwJG11qbun905ndu4uuW6o/eg1vRrYM
+         JHiaehPqdMJGZ91NWCPxbLki67vsEozSLiETJuBZdLjaPASW4b1Ps/8q/RVtNKLxKvxc
+         4eBHgD1fTKy0/J+7NsEJ61+Ecn8QjBA+9n1FlUCve6ox0FBNeEWfQFqfR+a33RccVDAR
+         pJp6Z/wcClOMwTRNUL8b5sCPqjLUO8/tcWuMN7pl+U0ZUh7AHCW/w9/JPA/FJMpocGfh
+         6s27f5nOHy/a+D0xJ9ddxK3z52iTddPgbQSJgQS2k6TFidC2cp16SnK6ibR077X1OMDi
+         IJwQ==
+X-Gm-Message-State: AOAM532Usxq61O1zMeq+cJyF2gzYCs+bLr2sqw6spUJTE8OT90ffV2PN
+        rjsb4XTMM0DoS9oODjOEPcxliw==
+X-Google-Smtp-Source: ABdhPJxZITx/2X7Ak7nVdnVGM6felhmNd0m69P7830XVD/z43avptEodeKdGFY58zQdQ8Zv4aehUWg==
+X-Received: by 2002:a63:f443:: with SMTP id p3mr8634580pgk.385.1639591199160;
+        Wed, 15 Dec 2021 09:59:59 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id z22sm3645466pfe.93.2021.12.15.09.59.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Dec 2021 09:59:58 -0800 (PST)
+Date:   Wed, 15 Dec 2021 17:59:55 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>, oliver.sang@intel.com,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: selftests: Avoid KVM_SET_CPUID2 after KVM_RUN in
+ vmx_pmu_msrs_test
+Message-ID: <YbotG5neKyzhv22Z@google.com>
+References: <20211215161617.246563-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YbkzaiC31/DzO5Da@dt>
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a5af497e-5be6-485b-dfeb-08d9bff3a8dc
-X-MS-TrafficTypeDiagnostic: BL1PR12MB5096:EE_
-X-Microsoft-Antispam-PRVS: <BL1PR12MB5096A95C2DBBF31A5B91149F95769@BL1PR12MB5096.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5516;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 6vj+CmqGPoS+IdnKq808awTf2W+Hrxu1M2OkzJ89l8nvHbekLGX2gwjb8lS09T0EpPwDT0MrENCuXBhr1bAuaZx8KVje0OU5uG5qhcw4Dzuw3PuywuyQmp5T/p8xwLoQg5MRWblWv9E4ZR2Wp33xUa6DFE0PWG1pcYrNdfiJItf/+OShuYbneAVDneNmeGi3VUemhLxp2puaNPJYTDXRgAhn7hAzvowzz1+CKWWn3aHiVLaXz8OhO9fht2er3mF1ANIMHLSlucMLI8GI3S2eb41JLBk+6W9wQx/wHeA5n+jbRCxHuTZj6o4i/lkjPE+EPSdqiYni2zlxDpGUd75zUJkRQb/gUfSsyRBgmLVJYLFK5wR+QTm4NbDjyQsJvTDKv6xCiU53zer4qsgnfUYn5i07AyKU+zwfsO3Yfz6ZVGM5vKzvCB5IuqJ2ujULBX7jli7bIlgMessuDtweXFihmFv4IBOODrSulfZppMHDMkMsXjniHDC6Bj5Sn7rs1Huaz2qJ7oETQ4k1rh+MPZX/TATlVAhN5eI/mfW9iOczeHcYZOSqNXVIaR3Vxw3SGJmFSJeIKxUJ+eVFoP39NUl/rtXvBprfZ/b/lmPZqXrtMAa8WRhadQv2NeX1FpnzuGAeqhsBeVM2G66A/Bs0BVISbXpsr5WFCZH1e3eNbz5u5Rkxi6jIXvDVCZSZ4BkqauW1I+RwazX296MvHNgVRzvQeo20HOoHV6ErVtxlE4vWWkTVuwsmtinL7kZUOn0yTUgLhnZzylgT60HfgshZ22yJyb3Ap/szCsdyvw2rKNY49fIgiFbVMOZyANq+utZZJjlK8W+bYHSjo2vxMfZq6JOtBBfpllDNu425/JYoYqKGvofQYjxQv3D3hZQgJhwXMV5d
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(4636009)(36840700001)(46966006)(40470700001)(47076005)(82310400004)(8676002)(4326008)(7416002)(5660300002)(7406005)(356005)(8936002)(40460700001)(36860700001)(81166007)(70206006)(2616005)(26005)(6666004)(1076003)(6916009)(36756003)(16526019)(70586007)(45080400002)(508600001)(336012)(186003)(44832011)(53546011)(316002)(2906002)(4001150100001)(86362001)(54906003)(426003)(966005)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Dec 2021 17:52:27.9704
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a5af497e-5be6-485b-dfeb-08d9bff3a8dc
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT056.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5096
+In-Reply-To: <20211215161617.246563-1-vkuznets@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 14, 2021 at 06:14:34PM -0600, Venu Busireddy wrote:
-> On 2021-12-14 20:10:16 +0100, Borislav Petkov wrote:
-> > On Tue, Dec 14, 2021 at 11:46:14AM -0600, Venu Busireddy wrote:
-> > > What I am suggesting should not have anything to do with the boot stage
-> > > of the kernel.
-> > 
-> > I know exactly what you're suggesting.
-> > 
-> > > For example, both these functions call native_cpuid(), which is declared
-> > > as an inline function. I am merely suggesting to do something similar
-> > > to avoid the code duplication.
-> > 
-> > Try it yourself. If you can come up with something halfway readable and
-> > it builds, I'm willing to take a look.
+On Wed, Dec 15, 2021, Vitaly Kuznetsov wrote:
+> Commit feb627e8d6f6 ("KVM: x86: Forbid KVM_SET_CPUID{,2} after KVM_RUN")
+> forbade chaning vCPU's CPUID data after the first KVM_RUN but
+> vmx_pmu_msrs_test does exactly that. Test VM needs to be re-created after
+> vcpu_run().
 > 
-> Patch (to be applied on top of sev-snp-v8 branch of
-> https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgithub.com%2FAMDESE%2Flinux.git&amp;data=04%7C01%7Cmichael.roth%40amd.com%7Cbff83ee03b1147c39ea808d9bf5fe9d8%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C637751240979543818%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000&amp;sdata=DZpgEtthswLhhfWqZlLkHHd5nJW2jb%2FVFuTssAFJ6Uo%3D&amp;reserved=0) is attached at the end.
+> Reported-by: kernel test robot <oliver.sang@intel.com>
+> Fixes: feb627e8d6f6 ("KVM: x86: Forbid KVM_SET_CPUID{,2} after KVM_RUN")
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> ---
+>  tools/testing/selftests/kvm/x86_64/vmx_pmu_msrs_test.c | 5 +++++
+>  1 file changed, 5 insertions(+)
 > 
-> Here are a few things I did.
-> 
-> 1. Moved all the common code that existed at the begining of
->    sme_enable() and sev_enable() to an inline function named
->    get_pagetable_bit_pos().
-> 2. sme_enable() was using AMD_SME_BIT and AMD_SEV_BIT, whereas
->    sev_enable() was dealing with raw bits. Moved those definitions to
->    sev.h, and changed sev_enable() to use those definitions.
-> 3. Make consistent use of BIT_ULL.
+> diff --git a/tools/testing/selftests/kvm/x86_64/vmx_pmu_msrs_test.c b/tools/testing/selftests/kvm/x86_64/vmx_pmu_msrs_test.c
+> index 23051d84b907..17882f79deed 100644
+> --- a/tools/testing/selftests/kvm/x86_64/vmx_pmu_msrs_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/vmx_pmu_msrs_test.c
+> @@ -99,6 +99,11 @@ int main(int argc, char *argv[])
+>  	vcpu_run(vm, VCPU_ID);
+>  	ASSERT_EQ(vcpu_get_msr(vm, VCPU_ID, MSR_IA32_PERF_CAPABILITIES), PMU_CAP_FW_WRITES);
+>  
+> +	/* Re-create guest VM after KVM_RUN so CPUID can be changed */
+> +	kvm_vm_free(vm);
+> +	vm = vm_create_default(VCPU_ID, 0, guest_code);
+> +	vcpu_set_cpuid(vm, VCPU_ID, cpuid);
 
-Hi Venu,
+Why is this test even setting CPUID for the below cases?  Guest CPUID shouldn't
+affect host_initiated writes.  This part in particular looks wrong:
 
-I know there's still comments floating around, but once there's consensus feel
-free to respond with a separate precursor patch against tip which moves
-sme_enable() cpuid code into your helper function, along with your S-o-B, and I
-can include it directly in the next version. Otherwise, I can incorporate your
-suggestions into the next spin, just let me know if it's okay to add:
+	entry_1_0->ecx |= X86_FEATURE_PDCM;
+	eax.split.version_id = 0;
+	entry_1_0->ecx = eax.full;
+	vcpu_set_cpuid(vm, VCPU_ID, cpuid);
+	ret = _vcpu_set_msr(vm, 0, MSR_IA32_PERF_CAPABILITIES, PMU_CAP_FW_WRITES);
+	TEST_ASSERT(ret == 0, "Bad PERF_CAPABILITIES didn't fail.");
 
-  Co-authored-by: Venu Busireddy <venu.busireddy@oracle.com>
-  Signed-off-by:  Venu Busireddy <venu.busireddy@oracle.com>
+As does the KVM code.  The WRMSR path for MSR_IA32_PERF_CAPABILITIES looks especially
+wrong, as rejects a bad write iff userspace set PDCM in guest CPUID.
 
-to the relevant commits.
+		struct kvm_msr_entry msr_ent = {.index = msr, .data = 0};
 
-Thank you (and Boris/Tom) for the suggestions!
+		if (!msr_info->host_initiated)
+			return 1;
+		if (guest_cpuid_has(vcpu, X86_FEATURE_PDCM) && kvm_get_msr_feature(&msr_ent))  <===== Huh?
+			return 1;
+		if (data & ~msr_ent.data)
+			return 1;
 
--Mike
+		vcpu->arch.perf_capabilities = data;
 
-> 
-> Venu
+		return 0;
+		}
+
+So I think we should fix KVM and then clean up the test accordingly.
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 85127b3e3690..65e297875405 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -3424,7 +3424,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+
+                if (!msr_info->host_initiated)
+                        return 1;
+-               if (guest_cpuid_has(vcpu, X86_FEATURE_PDCM) && kvm_get_msr_feature(&msr_ent))
++               if (kvm_get_msr_feature(&msr_ent))
+                        return 1;
+                if (data & ~msr_ent.data)
+                        return 1;
+@@ -3779,14 +3779,12 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+                msr_info->data = vcpu->arch.microcode_version;
+                break;
+        case MSR_IA32_ARCH_CAPABILITIES:
+-               if (!msr_info->host_initiated &&
+-                   !guest_cpuid_has(vcpu, X86_FEATURE_ARCH_CAPABILITIES))
++               if (!msr_info->host_initiated)
+                        return 1;
+                msr_info->data = vcpu->arch.arch_capabilities;
+                break;
+        case MSR_IA32_PERF_CAPABILITIES:
+-               if (!msr_info->host_initiated &&
+-                   !guest_cpuid_has(vcpu, X86_FEATURE_PDCM))
++               if (!msr_info->host_initiated)
+                        return 1;
+                msr_info->data = vcpu->arch.perf_capabilities;
+                break;
+
+> +
+>  	/* testcase 2, check valid LBR formats are accepted */
+>  	vcpu_set_msr(vm, 0, MSR_IA32_PERF_CAPABILITIES, 0);
+>  	ASSERT_EQ(vcpu_get_msr(vm, VCPU_ID, MSR_IA32_PERF_CAPABILITIES), 0);
+> -- 
+> 2.33.1
 > 
