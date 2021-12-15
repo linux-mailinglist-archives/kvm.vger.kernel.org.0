@@ -2,155 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 96F1047583F
-	for <lists+kvm@lfdr.de>; Wed, 15 Dec 2021 12:57:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 10E0D475843
+	for <lists+kvm@lfdr.de>; Wed, 15 Dec 2021 12:57:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242236AbhLOL5i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Dec 2021 06:57:38 -0500
-Received: from foss.arm.com ([217.140.110.172]:49970 "EHLO foss.arm.com"
+        id S242245AbhLOL5t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Dec 2021 06:57:49 -0500
+Received: from mail.skyhub.de ([5.9.137.197]:42512 "EHLO mail.skyhub.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S242231AbhLOL5h (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Dec 2021 06:57:37 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5D186D6E;
-        Wed, 15 Dec 2021 03:57:37 -0800 (PST)
-Received: from FVFF77S0Q05N (unknown [10.57.67.176])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 41F603F774;
-        Wed, 15 Dec 2021 03:57:36 -0800 (PST)
-Date:   Wed, 15 Dec 2021 11:57:33 +0000
-From:   Mark Rutland <mark.rutland@arm.com>
-To:     Oliver Upton <oupton@google.com>
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        Marc Zyngier <maz@kernel.org>, Peter Shier <pshier@google.com>,
-        linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v4 2/6] KVM: arm64: Stash OSLSR_EL1 in the cpu context
-Message-ID: <YbnYLTR+UCcr6AUh@FVFF77S0Q05N>
-References: <20211214172812.2894560-1-oupton@google.com>
- <20211214172812.2894560-3-oupton@google.com>
+        id S242231AbhLOL5s (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Dec 2021 06:57:48 -0500
+Received: from zn.tnic (dslb-088-067-202-008.088.067.pools.vodafone-ip.de [88.67.202.8])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id A4F931EC0105;
+        Wed, 15 Dec 2021 12:57:42 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1639569462;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=ER+WXJjaSLqJ9tsy2K/I4s6XucuqFb6jbaTEpQwLM9Q=;
+        b=oVALQHceuC97MU8vwp2RvKFbCv04i7xOl8k4Ca5KpVBA7ycnsCaBZCdYFJ3J8uh1Xjy2a1
+        lMd8cgbY4wvmywNzJhcjUTf0J9qZmYqMhJ2Dw6VPF0npeJu9iaU2PyMc4yUcJBByqv7Rhe
+        uOrBuqi3PsspW9FkGuBYKAgzSzr1k4g=
+Date:   Wed, 15 Dec 2021 12:57:42 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Venu Busireddy <venu.busireddy@oracle.com>
+Cc:     Brijesh Singh <brijesh.singh@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH v8 01/40] x86/compressed/64: detect/setup SEV/SME
+ features earlier in boot
+Message-ID: <YbnYNg/UXh/JGBBJ@zn.tnic>
+References: <20211210154332.11526-1-brijesh.singh@amd.com>
+ <20211210154332.11526-2-brijesh.singh@amd.com>
+ <YbeaX+FViak2mgHO@dt>
+ <YbecS4Py2hAPBrTD@zn.tnic>
+ <YbjYZtXlbRdUznUO@dt>
+ <YbjsGHSUUwomjbpc@zn.tnic>
+ <YbkzaiC31/DzO5Da@dt>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20211214172812.2894560-3-oupton@google.com>
+In-Reply-To: <YbkzaiC31/DzO5Da@dt>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 14, 2021 at 05:28:08PM +0000, Oliver Upton wrote:
-> An upcoming change to KVM will context switch the OS Lock status between
-> guest/host. Add OSLSR_EL1 to the cpu context and handle guest reads
-> using the stored value.
-
-The "context switch" wording is stale here, since later patches emulate the
-behaviour of the OS lock (and explain why a context switch isn't appropriate).
-
-That first sentence needs to change to something like:
-
-| An upcoming change to KVM will emulate the OS Lock from the PoV of the guest.
-
-> Wire up a custom handler for writes from userspace and prevent any of
-> the invariant bits from changing.
-> 
-> Reviewed-by: Reiji Watanabe <reijiw@google.com>
-> Signed-off-by: Oliver Upton <oupton@google.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h |  2 ++
->  arch/arm64/kvm/sys_regs.c         | 31 ++++++++++++++++++++++++-------
->  2 files changed, 26 insertions(+), 7 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> index 2a5f7f38006f..53fc8a6eaf1c 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -172,8 +172,10 @@ enum vcpu_sysreg {
->  	PAR_EL1,	/* Physical Address Register */
->  	MDSCR_EL1,	/* Monitor Debug System Control Register */
->  	MDCCINT_EL1,	/* Monitor Debug Comms Channel Interrupt Enable Reg */
-> +	OSLSR_EL1,	/* OS Lock Status Register */
->  	DISR_EL1,	/* Deferred Interrupt Status Register */
->  
-> +
-
-I don't think this whitespace needed to change.
-
->  	/* Performance Monitors Registers */
->  	PMCR_EL0,	/* Control Register */
->  	PMSELR_EL0,	/* Event Counter Selection Register */
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 11b4212c2036..7bf350b3d9cd 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -291,12 +291,28 @@ static bool trap_oslsr_el1(struct kvm_vcpu *vcpu,
->  			   struct sys_reg_params *p,
->  			   const struct sys_reg_desc *r)
->  {
-> -	if (p->is_write) {
-> +	if (p->is_write)
->  		return write_to_read_only(vcpu, p, r);
-> -	} else {
-> -		p->regval = (1 << 3);
-> -		return true;
-> -	}
-> +
-> +	p->regval = __vcpu_sys_reg(vcpu, r->reg);
-> +	return true;
-> +}
-> +
-> +static int set_oslsr_el1(struct kvm_vcpu *vcpu, const struct sys_reg_desc *rd,
-> +			 const struct kvm_one_reg *reg, void __user *uaddr)
-> +{
-> +	u64 id = sys_reg_to_index(rd);
-> +	u64 val;
-> +	int err;
-> +
-> +	err = reg_from_user(&val, uaddr, id);
-> +	if (err)
-> +		return err;
-> +
-> +	if (val != rd->val)
-> +		return -EINVAL;
-
-Bit 1 isn't invariant; why can't the user set that? If there's a rationale,
-that needs to be stated in the commit message.
-
-> +
-> +	return 0;
+On Tue, Dec 14, 2021 at 06:14:34PM -0600, Venu Busireddy wrote:
+> diff --git a/arch/x86/include/asm/processor.h b/arch/x86/include/asm/processor.h
+> index 2c5f12ae7d04..41b096f28d02 100644
+> --- a/arch/x86/include/asm/processor.h
+> +++ b/arch/x86/include/asm/processor.h
+> @@ -224,6 +224,43 @@ static inline void native_cpuid(unsigned int *eax, unsigned int *ebx,
+>  	    : "memory");
 >  }
 >  
->  static bool trap_dbgauthstatus_el1(struct kvm_vcpu *vcpu,
-> @@ -1448,7 +1464,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  
->  	{ SYS_DESC(SYS_MDRAR_EL1), trap_raz_wi },
->  	{ SYS_DESC(SYS_OSLAR_EL1), trap_raz_wi },
-> -	{ SYS_DESC(SYS_OSLSR_EL1), trap_oslsr_el1 },
-> +	{ SYS_DESC(SYS_OSLSR_EL1), trap_oslsr_el1, reset_val, OSLSR_EL1, 0x00000008,
+> +/*
+> + * Returns the pagetable bit position in pt_bit_pos,
+> + * iff the specified features are supported.
+> + */
+> +static inline int get_pagetable_bit_pos(unsigned long *pt_bit_pos,
+> +					unsigned long features)
 
-Could we add mnemonics for this to <asm/sysreg.h>, e.g.
+You can simply return pt_bit_pos:
 
-#define	OSLSR_EL1_OSLM_LOCK_NI			0
-#define	OSLSR_EL1_OSLM_LOCK_IMPLEMENTED		BIT(3)
+static inline unsigned int get_pagetable_bit_pos(unsigned long features)
 
-... and use that here for clarity?
+and return a negative value on error.
 
-Thanks,
-Mark.
+Also, the only duplication this is saving is visual - that function will
+get inlined at the call sites.
 
-> +		.set_user = set_oslsr_el1, },
->  	{ SYS_DESC(SYS_OSDLR_EL1), trap_raz_wi },
->  	{ SYS_DESC(SYS_DBGPRCR_EL1), trap_raz_wi },
->  	{ SYS_DESC(SYS_DBGCLAIMSET_EL1), trap_raz_wi },
-> @@ -1923,7 +1940,7 @@ static const struct sys_reg_desc cp14_regs[] = {
->  	{ Op1( 0), CRn( 1), CRm( 0), Op2( 4), trap_raz_wi },
->  	DBGBXVR(1),
->  	/* DBGOSLSR */
-> -	{ Op1( 0), CRn( 1), CRm( 1), Op2( 4), trap_oslsr_el1 },
-> +	{ Op1( 0), CRn( 1), CRm( 1), Op2( 4), trap_oslsr_el1, NULL, OSLSR_EL1 },
->  	DBGBXVR(2),
->  	DBGBXVR(3),
->  	/* DBGOSDLR */
-> -- 
-> 2.34.1.173.g76aa8bc2d0-goog
-> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+Also, I'd love to separate the compressed kernel headers from the
+kernel proper ones but I'm afraid that ship has sailed. But if I could,
+that would have to be in a special header that gets included by both
+stages...
+
+So I don't mind this but I'd let Brijesh and Tom have a look at it too.
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
