@@ -2,206 +2,397 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 57AF54763A2
-	for <lists+kvm@lfdr.de>; Wed, 15 Dec 2021 21:44:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 221D04764C8
+	for <lists+kvm@lfdr.de>; Wed, 15 Dec 2021 22:47:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236511AbhLOUoU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Dec 2021 15:44:20 -0500
-Received: from mail-mw2nam10on2051.outbound.protection.outlook.com ([40.107.94.51]:32356
-        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S235170AbhLOUoT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Dec 2021 15:44:19 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AYPY6rNmroqhvCmKgJvLjSRNtCktUziQ+ZtYRYFK/p1Ml86MUf6rswnQ1OkKSaTB+SmLiOhTCUB/uAdKVEoj+GCEHRHd95YGbUVrRCJr2BPTCtRpTfaEp8B61/jqhQlRP+MCWEQ5grCcgP9PRG8eIYiOGyHmbcaVlsevWNmhiAYMhBmFk5R57d/3sK/Vm528Fccowrf/4EYXJLO8YDs1fls8XcihXbyLl7vyY6j7TJoRCiQ8gyb7VmI87VOOEpXei0+lXqAVBSvQSCr3F0+h7PneObSp6tr50bvXJWostqIV00YI1nnJwmKP73ZDfeFKxhit1i2oxrbdlGDyOPbtGQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2ZLona5DZ9C33MDnxdiWILaJcCR4MTePVXg0IaQsWsA=;
- b=kSASYt2P4huAVvejFEqq2eQftuRjfuvH9jKeI8dIHOMQU7+mHol+WcI8NdJBtbh9CfiAxUvkQQIuA/BEi1rMFCdYzNuJlum1kNf3Y7VmtZLQPUlu13KNVD4jxCU6blzy198MxzByIP5Rj669J1MXYJHKwDkVlmirsTSvhDIjaa0fHT5MjgckQEex0EI5Pb/fxZV/g22QxKHZy/nCLxaH1q9emlvwNR2U9Dd85ajAV5RThL+UgSsI4Yhgti0EZuGPObGK5ombMuFEYc79muPCcr47eLzS/zoO6PG7R/5O9xD0Wp4lhghmN3hKr7lU+tiVRYqexNd5x8mHXjEPloNiuw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=oracle.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2ZLona5DZ9C33MDnxdiWILaJcCR4MTePVXg0IaQsWsA=;
- b=FlHa6KzeKkFtML7BbmtoAohjVMH8xBRbgk+u1K8ZH7gOBNMlyAYzj9miAnXBbx42IOk813RpkCeeZE9He7y5S4gfDMHZm0EPjUolf+wd2NDqeGLVY6Iyha3tUt5kY1NZeiuZZAyzFl9KjOhVQeBIckBN4pwiE+MB5J7ME6QXrTs=
-Received: from DM5PR06CA0071.namprd06.prod.outlook.com (2603:10b6:3:37::33) by
- MN2PR12MB4990.namprd12.prod.outlook.com (2603:10b6:208:fe::16) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4778.13; Wed, 15 Dec 2021 20:44:16 +0000
-Received: from DM6NAM11FT065.eop-nam11.prod.protection.outlook.com
- (2603:10b6:3:37:cafe::1d) by DM5PR06CA0071.outlook.office365.com
- (2603:10b6:3:37::33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4778.14 via Frontend
- Transport; Wed, 15 Dec 2021 20:44:15 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB03.amd.com;
-Received: from SATLEXMB03.amd.com (165.204.84.17) by
- DM6NAM11FT065.mail.protection.outlook.com (10.13.172.109) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.4801.14 via Frontend Transport; Wed, 15 Dec 2021 20:44:15 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB03.amd.com
- (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
+        id S229964AbhLOVrX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Dec 2021 16:47:23 -0500
+Received: from 4.mo548.mail-out.ovh.net ([188.165.42.229]:32799 "EHLO
+        4.mo548.mail-out.ovh.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229961AbhLOVrX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Dec 2021 16:47:23 -0500
+X-Greylist: delayed 10796 seconds by postgrey-1.27 at vger.kernel.org; Wed, 15 Dec 2021 16:47:22 EST
+Received: from mxplan5.mail.ovh.net (unknown [10.109.143.188])
+        by mo548.mail-out.ovh.net (Postfix) with ESMTPS id AD77620E85;
+        Wed, 15 Dec 2021 18:11:50 +0000 (UTC)
+Received: from kaod.org (37.59.142.95) by DAG4EX1.mxp5.local (172.16.2.31)
+ with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.17; Wed, 15 Dec
- 2021 14:44:15 -0600
-Date:   Wed, 15 Dec 2021 14:43:55 -0600
-From:   Michael Roth <michael.roth@amd.com>
-To:     Venu Busireddy <venu.busireddy@oracle.com>
-CC:     Tom Lendacky <thomas.lendacky@amd.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Brijesh Singh <brijesh.singh@amd.com>, <x86@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>,
-        <linux-efi@vger.kernel.org>, <platform-driver-x86@vger.kernel.org>,
-        <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        "Srinivas Pandruvada" <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        "Tobin Feldman-Fitzthum" <tobin@ibm.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        <tony.luck@intel.com>, <marcorr@google.com>,
-        <sathyanarayanan.kuppuswamy@linux.intel.com>
-Subject: Re: [PATCH v8 01/40] x86/compressed/64: detect/setup SEV/SME
- features earlier in boot
-Message-ID: <20211215204355.mbzfaxco6ltx3oty@amd.com>
-References: <20211210154332.11526-1-brijesh.singh@amd.com>
- <20211210154332.11526-2-brijesh.singh@amd.com>
- <YbeaX+FViak2mgHO@dt>
- <YbecS4Py2hAPBrTD@zn.tnic>
- <YbjYZtXlbRdUznUO@dt>
- <YbjsGHSUUwomjbpc@zn.tnic>
- <YbkzaiC31/DzO5Da@dt>
- <b18655e3-3922-2b5d-0c35-1dcfef568e4d@amd.com>
- <20211215174934.tgn3c7c4s3toelbq@amd.com>
- <YboxSPFGF0Cqo5Fh@dt>
+ 2021 19:11:49 +0100
+Authentication-Results: garm.ovh; auth=pass (GARM-95G0017cc86e53-eee5-40b7-a96b-21362674cb97,
+                    DB2000250E14A505ED1736C7348301D5E40ED0AA) smtp.auth=clg@kaod.org
+X-OVh-ClientIp: 90.76.172.47
+Message-ID: <d980eeb7-1f32-dbd3-f60d-ea6ef24dbaaa@kaod.org>
+Date:   Wed, 15 Dec 2021 19:11:48 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <YboxSPFGF0Cqo5Fh@dt>
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB03.amd.com
- (10.181.40.144)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 562fe0ad-d9fb-4bc2-04be-08d9c00ba8ce
-X-MS-TrafficTypeDiagnostic: MN2PR12MB4990:EE_
-X-Microsoft-Antispam-PRVS: <MN2PR12MB4990C102E89CC93C6B79049795769@MN2PR12MB4990.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: B++HUZaYswxIAHFNGJ2wfFcoyvcHB8ND1468XM03iqTmDxLlpQ+dK443iEaoA3ylpxGUUfQ5DaDDsYYCAWPUKXtW0cU4vZ+3QvldB4hqqxfQeEMjWnye+gSBbJGlUFkf29tcGWJgWZMXgUZjyon0k1ODCYiJVr+OY6Gsq90b9Gm1vjsPnphKJVX49szg75u+vPYAV2130MW8RIq+EVpuHinxyOQl1PuTDf6U2OwxP2VqcHqcKwdvUd0/aJNL34NQR/a1x3y9RaybuDYAsDRHwO80SmjzMx4pmR7ePv82Q7QF0vsYRPZI4UYmwTWrZElzFxR/30vxl0zf8Xd2WZM8jggsSi4+73B4m6pnumv/MTttLR23Q5azYaR1kalvJunDPeeN6vzcsviLzIMurT2kP46X1Ois4ujuXZwMVCI2keUaEM0LtcBNtJeaK7DuHDdTE5+1FTZtpDxGMcE3DtGRXae541eAEwfBg8SQvouDnsQSFLXQiCDRsOLxHiGsv7MYUTvSfd3l6N4UGQuzs9Up5Z2k26Rxs4yibQqOcsYqFTbiKYxPYv04q8lGP/bE3fW7hlSGhQIWjrzv037kzwSJS62QEE/bxusUHTGA/q77g24NnW+U305q6OcrguOyz1oeRzuU4TL037QfadT3g3hv/tpiLvl9WySbHi1i8E1xlUFadEo3YMr1ByrQu3W1xig7hYmRn2kb1KHKOcUW00z1uPRJgGQvWF9MXivF3OV537f+EBkn6U0SHHyFFbamTi71P2oYD82sY9OZFAIkJDEoGdDn6kL91XO6+CetrY+JxKk=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(4636009)(46966006)(36840700001)(40470700001)(44832011)(70206006)(426003)(508600001)(4326008)(316002)(86362001)(40460700001)(82310400004)(54906003)(6916009)(356005)(81166007)(2616005)(8936002)(70586007)(6666004)(336012)(47076005)(5660300002)(1076003)(8676002)(4001150100001)(83380400001)(7406005)(7416002)(186003)(53546011)(36756003)(26005)(16526019)(2906002)(36860700001)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Dec 2021 20:44:15.7789
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 562fe0ad-d9fb-4bc2-04be-08d9c00ba8ce
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT065.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4990
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Subject: Re: [PATCH kernel v3] KVM: PPC: Merge powerpc's debugfs entry content
+ into generic entry
+Content-Language: en-US
+To:     Alexey Kardashevskiy <aik@ozlabs.ru>,
+        <linuxppc-dev@lists.ozlabs.org>
+CC:     <kvm-ppc@vger.kernel.org>, <kvm@vger.kernel.org>,
+        Fabiano Rosas <farosas@linux.ibm.com>
+References: <20211215013309.217102-1-aik@ozlabs.ru>
+From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+In-Reply-To: <20211215013309.217102-1-aik@ozlabs.ru>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [37.59.142.95]
+X-ClientProxiedBy: DAG5EX1.mxp5.local (172.16.2.41) To DAG4EX1.mxp5.local
+ (172.16.2.31)
+X-Ovh-Tracer-GUID: 865273c1-ade8-4b17-ac86-6ab14a2095e7
+X-Ovh-Tracer-Id: 3451446168262249379
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvuddrledvgdduudduucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepkfffgggfuffvfhfhjggtgfhisehtjeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhephffhleegueektdetffdvffeuieeugfekkeelheelteeftdfgtefffeehueegleehnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrdelheenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehfrghrohhsrghssehlihhnuhigrdhisghmrdgtohhm
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 15, 2021 at 12:17:44PM -0600, Venu Busireddy wrote:
-> On 2021-12-15 11:49:34 -0600, Michael Roth wrote:
-> > 
-> > I think in the greater context of consolidating all the SME/SEV setup
-> > and re-using code, this helper stands a high chance of eventually becoming
-> > something more along the lines of sme_sev_parse_cpuid(), since otherwise
-> > we'd end up re-introducing multiple helpers to parse the same 0x8000001F
-> > fields if we ever need to process any of the other fields advertised in
-> > there. Given that, it makes sense to reserve the return value as an
-> > indication that either SEV or SME are enabled, and then have a
-> > pass-by-pointer parameters list to collect the individual feature
-> > bits/encryption mask for cases where SEV/SME are enabled, which are only
-> > treated as valid if sme_sev_parse_cpuid() returns 0.
-> > 
-> > So Venu's original approach of passing the encryption mask by pointer
-> > seems a little closer toward that end, but I also agree Tom's approach
-> > is cleaner for the current code base, so I'm fine either way, just
-> > figured I'd mention this.
-> > 
-> > I think needing to pass in the SME/SEV CPUID bits to tell the helper when
-> > to parse encryption bit and when not to is a little bit awkward though.
-> > If there's some agreement that this will ultimately serve the purpose of
-> > handling all (or most) of SME/SEV-related CPUID parsing, then the caller
-> > shouldn't really need to be aware of any individual bit positions.
-> > Maybe a bool could handle that instead, e.g.:
-> > 
-> >   int get_me_bit(bool sev_only, ...)
-> > 
-> >   or
-> > 
-> >   int sme_sev_parse_cpuid(bool sev_only, ...)
-> > 
-> > where for boot/compressed sev_only=true, for kernel proper sev_only=false.
+On 12/15/21 02:33, Alexey Kardashevskiy wrote:
+> At the moment KVM on PPC creates 3 types of entries under the kvm debugfs:
+> 1) "%pid-%fd" per a KVM instance (for all platforms);
+> 2) "vm%pid" (for PPC Book3s HV KVM);
+> 3) "vm%u_vcpu%u_timing" (for PPC Book3e KVM).
 > 
-> I can implement it this way too. But I am wondering if having a
-> boolean argument limits us from handling any future additions to the
-> bit positions.
+> The problem with this is that multiple VMs per process is not allowed for
+> 2) and 3) which makes it possible for userspace to trigger errors when
+> creating duplicated debugfs entries.
+> 
+> This merges all these into 1).
+> 
+> This defines kvm_arch_create_kvm_debugfs() similar to
+> kvm_arch_create_vcpu_debugfs().
+> 
+> This defines 2 hooks in kvmppc_ops that allow specific KVM implementations
+> add necessary entries, this adds the _e500 suffix to
+> kvmppc_create_vcpu_debugfs_e500() to make it clear what platform it is for.
+> 
+> This makes use of already existing kvm_arch_create_vcpu_debugfs() on PPC.
+> 
+> This removes no more used debugfs_dir pointers from PPC kvm_arch structs.
+> 
+> This stops removing vcpu entries as once created vcpus stay around
+> for the entire life of a VM and removed when the KVM instance is closed,
+> see commit d56f5136b010 ("KVM: let kvm_destroy_vm_debugfs clean up vCPU
+> debugfs directories").
 
-That's the thing, we'll pretty much always want to parse cpuid in
-boot/compressed if SEV is enabled, and in kernel proper if either SEV or
-SME are enabled, because they both require, at a minimum, the c-bit
-position. Extensions to either SEV/SME likely won't change this, but by
-using CPUID feature masks to handle this it gives the impression that
-this helper relies on individual features being present in the mask in
-order for the corresponding fields to be parsed, when in reality it
-boils down more to SEV features needing to be enabled earlier because
-they don't trust the host during early boot.
+It would nice to also move the KVM device debugfs files :
 
-I agree the boolean flag makes things a bit less readable without
-checking the function prototype though. I was going to suggest 2
-separate functions that use a common helper and hide away the
-boolean, e.g:
+   /sys/kernel/debug/powerpc/kvm-xive-%p
 
-  sev_parse_cpuid() //sev-only
+These are dynamically created and destroyed at run time depending
+on the interrupt mode negociated by CAS. It might be more complex ?
 
-and
-
-  sme_parse_cpuid() //sev or sme
-
-but the latter maybe is a bit misleading and I couldn't think of a
-better name. It's really more like sev_sme_parse_cpuid(), but I'm
-not sure that will fly. Maybe sme_parse_cpuid() is fine.
-
-You could also just have it take an enum as the first arg though:
-
-enum sev_parse_cpuid {
-    SEV_PARSE_CPUID_SEV_ONLY = 0
-    SEV_PARSE_CPUID_SME_ONLY //unused
-    SEV_PARSE_CPUID_BOTH
-}
-
-Personally I still prefer the boolean but just some alternatives
-you could consider otherwise.
+C.
 
 > 
-> Boris & Tom, which implementation would you prefer?
+> Suggested-by: Fabiano Rosas <farosas@linux.ibm.com>
+> Signed-off-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+> ---
+> Changes:
+> v3:
+> * reworked commit log, especially, the bit about removing vcpus
 > 
-> Venu
+> v2:
+> * handled powerpc-booke
+> * s/kvm/vm/ in arch hooks
+> ---
+>   arch/powerpc/include/asm/kvm_host.h    |  6 ++---
+>   arch/powerpc/include/asm/kvm_ppc.h     |  2 ++
+>   arch/powerpc/kvm/timing.h              |  9 ++++----
+>   arch/powerpc/kvm/book3s_64_mmu_hv.c    |  2 +-
+>   arch/powerpc/kvm/book3s_64_mmu_radix.c |  2 +-
+>   arch/powerpc/kvm/book3s_hv.c           | 31 ++++++++++----------------
+>   arch/powerpc/kvm/e500.c                |  1 +
+>   arch/powerpc/kvm/e500mc.c              |  1 +
+>   arch/powerpc/kvm/powerpc.c             | 16 ++++++++++---
+>   arch/powerpc/kvm/timing.c              | 20 ++++-------------
+>   10 files changed, 41 insertions(+), 49 deletions(-)
 > 
+> diff --git a/arch/powerpc/include/asm/kvm_host.h b/arch/powerpc/include/asm/kvm_host.h
+> index 17263276189e..f5e14fa683f4 100644
+> --- a/arch/powerpc/include/asm/kvm_host.h
+> +++ b/arch/powerpc/include/asm/kvm_host.h
+> @@ -26,6 +26,8 @@
+>   #include <asm/hvcall.h>
+>   #include <asm/mce.h>
+>   
+> +#define __KVM_HAVE_ARCH_VCPU_DEBUGFS
+> +
+>   #define KVM_MAX_VCPUS		NR_CPUS
+>   #define KVM_MAX_VCORES		NR_CPUS
+>   
+> @@ -295,7 +297,6 @@ struct kvm_arch {
+>   	bool dawr1_enabled;
+>   	pgd_t *pgtable;
+>   	u64 process_table;
+> -	struct dentry *debugfs_dir;
+>   	struct kvm_resize_hpt *resize_hpt; /* protected by kvm->lock */
+>   #endif /* CONFIG_KVM_BOOK3S_HV_POSSIBLE */
+>   #ifdef CONFIG_KVM_BOOK3S_PR_POSSIBLE
+> @@ -673,7 +674,6 @@ struct kvm_vcpu_arch {
+>   	u64 timing_min_duration[__NUMBER_OF_KVM_EXIT_TYPES];
+>   	u64 timing_max_duration[__NUMBER_OF_KVM_EXIT_TYPES];
+>   	u64 timing_last_exit;
+> -	struct dentry *debugfs_exit_timing;
+>   #endif
+>   
+>   #ifdef CONFIG_PPC_BOOK3S
+> @@ -829,8 +829,6 @@ struct kvm_vcpu_arch {
+>   	struct kvmhv_tb_accumulator rm_exit;	/* real-mode exit code */
+>   	struct kvmhv_tb_accumulator guest_time;	/* guest execution */
+>   	struct kvmhv_tb_accumulator cede_time;	/* time napping inside guest */
+> -
+> -	struct dentry *debugfs_dir;
+>   #endif /* CONFIG_KVM_BOOK3S_HV_EXIT_TIMING */
+>   };
+>   
+> diff --git a/arch/powerpc/include/asm/kvm_ppc.h b/arch/powerpc/include/asm/kvm_ppc.h
+> index 33db83b82fbd..d2b192dea0d2 100644
+> --- a/arch/powerpc/include/asm/kvm_ppc.h
+> +++ b/arch/powerpc/include/asm/kvm_ppc.h
+> @@ -316,6 +316,8 @@ struct kvmppc_ops {
+>   	int (*svm_off)(struct kvm *kvm);
+>   	int (*enable_dawr1)(struct kvm *kvm);
+>   	bool (*hash_v3_possible)(void);
+> +	int (*create_vm_debugfs)(struct kvm *kvm);
+> +	int (*create_vcpu_debugfs)(struct kvm_vcpu *vcpu, struct dentry *debugfs_dentry);
+>   };
+>   
+>   extern struct kvmppc_ops *kvmppc_hv_ops;
+> diff --git a/arch/powerpc/kvm/timing.h b/arch/powerpc/kvm/timing.h
+> index feef7885ba82..493a7d510fd5 100644
+> --- a/arch/powerpc/kvm/timing.h
+> +++ b/arch/powerpc/kvm/timing.h
+> @@ -14,8 +14,8 @@
+>   #ifdef CONFIG_KVM_EXIT_TIMING
+>   void kvmppc_init_timing_stats(struct kvm_vcpu *vcpu);
+>   void kvmppc_update_timing_stats(struct kvm_vcpu *vcpu);
+> -void kvmppc_create_vcpu_debugfs(struct kvm_vcpu *vcpu, unsigned int id);
+> -void kvmppc_remove_vcpu_debugfs(struct kvm_vcpu *vcpu);
+> +void kvmppc_create_vcpu_debugfs_e500(struct kvm_vcpu *vcpu,
+> +				     struct dentry *debugfs_dentry);
+>   
+>   static inline void kvmppc_set_exit_type(struct kvm_vcpu *vcpu, int type)
+>   {
+> @@ -26,9 +26,8 @@ static inline void kvmppc_set_exit_type(struct kvm_vcpu *vcpu, int type)
+>   /* if exit timing is not configured there is no need to build the c file */
+>   static inline void kvmppc_init_timing_stats(struct kvm_vcpu *vcpu) {}
+>   static inline void kvmppc_update_timing_stats(struct kvm_vcpu *vcpu) {}
+> -static inline void kvmppc_create_vcpu_debugfs(struct kvm_vcpu *vcpu,
+> -						unsigned int id) {}
+> -static inline void kvmppc_remove_vcpu_debugfs(struct kvm_vcpu *vcpu) {}
+> +static inline void kvmppc_create_vcpu_debugfs_e500(struct kvm_vcpu *vcpu,
+> +						   struct dentry *debugfs_dentry) {}
+>   static inline void kvmppc_set_exit_type(struct kvm_vcpu *vcpu, int type) {}
+>   #endif /* CONFIG_KVM_EXIT_TIMING */
+>   
+> diff --git a/arch/powerpc/kvm/book3s_64_mmu_hv.c b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+> index c63e263312a4..33dae253a0ac 100644
+> --- a/arch/powerpc/kvm/book3s_64_mmu_hv.c
+> +++ b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+> @@ -2112,7 +2112,7 @@ static const struct file_operations debugfs_htab_fops = {
+>   
+>   void kvmppc_mmu_debugfs_init(struct kvm *kvm)
+>   {
+> -	debugfs_create_file("htab", 0400, kvm->arch.debugfs_dir, kvm,
+> +	debugfs_create_file("htab", 0400, kvm->debugfs_dentry, kvm,
+>   			    &debugfs_htab_fops);
+>   }
+>   
+> diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+> index 8cebe5542256..e4ce2a35483f 100644
+> --- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
+> +++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+> @@ -1454,7 +1454,7 @@ static const struct file_operations debugfs_radix_fops = {
+>   
+>   void kvmhv_radix_debugfs_init(struct kvm *kvm)
+>   {
+> -	debugfs_create_file("radix", 0400, kvm->arch.debugfs_dir, kvm,
+> +	debugfs_create_file("radix", 0400, kvm->debugfs_dentry, kvm,
+>   			    &debugfs_radix_fops);
+>   }
+>   
+> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+> index bf1eb1160ae2..4c52541b6f37 100644
+> --- a/arch/powerpc/kvm/book3s_hv.c
+> +++ b/arch/powerpc/kvm/book3s_hv.c
+> @@ -2768,20 +2768,17 @@ static const struct file_operations debugfs_timings_ops = {
+>   };
+>   
+>   /* Create a debugfs directory for the vcpu */
+> -static void debugfs_vcpu_init(struct kvm_vcpu *vcpu, unsigned int id)
+> +static int kvmppc_arch_create_vcpu_debugfs_hv(struct kvm_vcpu *vcpu, struct dentry *debugfs_dentry)
+>   {
+> -	char buf[16];
+> -	struct kvm *kvm = vcpu->kvm;
+> -
+> -	snprintf(buf, sizeof(buf), "vcpu%u", id);
+> -	vcpu->arch.debugfs_dir = debugfs_create_dir(buf, kvm->arch.debugfs_dir);
+> -	debugfs_create_file("timings", 0444, vcpu->arch.debugfs_dir, vcpu,
+> +	debugfs_create_file("timings", 0444, debugfs_dentry, vcpu,
+>   			    &debugfs_timings_ops);
+> +	return 0;
+>   }
+>   
+>   #else /* CONFIG_KVM_BOOK3S_HV_EXIT_TIMING */
+> -static void debugfs_vcpu_init(struct kvm_vcpu *vcpu, unsigned int id)
+> +static int kvmppc_arch_create_vcpu_debugfs_hv(struct kvm_vcpu *vcpu, struct dentry *debugfs_dentry)
+>   {
+> +	return 0;
+>   }
+>   #endif /* CONFIG_KVM_BOOK3S_HV_EXIT_TIMING */
+>   
+> @@ -2904,8 +2901,6 @@ static int kvmppc_core_vcpu_create_hv(struct kvm_vcpu *vcpu)
+>   	vcpu->arch.cpu_type = KVM_CPU_3S_64;
+>   	kvmppc_sanity_check(vcpu);
+>   
+> -	debugfs_vcpu_init(vcpu, id);
+> -
+>   	return 0;
+>   }
+>   
+> @@ -5226,7 +5221,6 @@ void kvmppc_free_host_rm_ops(void)
+>   static int kvmppc_core_init_vm_hv(struct kvm *kvm)
+>   {
+>   	unsigned long lpcr, lpid;
+> -	char buf[32];
+>   	int ret;
+>   
+>   	mutex_init(&kvm->arch.uvmem_lock);
+> @@ -5359,15 +5353,14 @@ static int kvmppc_core_init_vm_hv(struct kvm *kvm)
+>   		kvm->arch.smt_mode = 1;
+>   	kvm->arch.emul_smt_mode = 1;
+>   
+> -	/*
+> -	 * Create a debugfs directory for the VM
+> -	 */
+> -	snprintf(buf, sizeof(buf), "vm%d", current->pid);
+> -	kvm->arch.debugfs_dir = debugfs_create_dir(buf, kvm_debugfs_dir);
+> +	return 0;
+> +}
+> +
+> +static int kvmppc_arch_create_vm_debugfs_hv(struct kvm *kvm)
+> +{
+>   	kvmppc_mmu_debugfs_init(kvm);
+>   	if (radix_enabled())
+>   		kvmhv_radix_debugfs_init(kvm);
+> -
+>   	return 0;
+>   }
+>   
+> @@ -5382,8 +5375,6 @@ static void kvmppc_free_vcores(struct kvm *kvm)
+>   
+>   static void kvmppc_core_destroy_vm_hv(struct kvm *kvm)
+>   {
+> -	debugfs_remove_recursive(kvm->arch.debugfs_dir);
+> -
+>   	if (!cpu_has_feature(CPU_FTR_ARCH_300))
+>   		kvm_hv_vm_deactivated();
+>   
+> @@ -6044,6 +6035,8 @@ static struct kvmppc_ops kvm_ops_hv = {
+>   	.svm_off = kvmhv_svm_off,
+>   	.enable_dawr1 = kvmhv_enable_dawr1,
+>   	.hash_v3_possible = kvmppc_hash_v3_possible,
+> +	.create_vcpu_debugfs = kvmppc_arch_create_vcpu_debugfs_hv,
+> +	.create_vm_debugfs = kvmppc_arch_create_vm_debugfs_hv,
+>   };
+>   
+>   static int kvm_init_subcore_bitmap(void)
+> diff --git a/arch/powerpc/kvm/e500.c b/arch/powerpc/kvm/e500.c
+> index 7e8b69015d20..c8b2b4478545 100644
+> --- a/arch/powerpc/kvm/e500.c
+> +++ b/arch/powerpc/kvm/e500.c
+> @@ -495,6 +495,7 @@ static struct kvmppc_ops kvm_ops_e500 = {
+>   	.emulate_op = kvmppc_core_emulate_op_e500,
+>   	.emulate_mtspr = kvmppc_core_emulate_mtspr_e500,
+>   	.emulate_mfspr = kvmppc_core_emulate_mfspr_e500,
+> +	.create_vcpu_debugfs = kvmppc_create_vcpu_debugfs_e500,
+>   };
+>   
+>   static int __init kvmppc_e500_init(void)
+> diff --git a/arch/powerpc/kvm/e500mc.c b/arch/powerpc/kvm/e500mc.c
+> index 1c189b5aadcc..fa0d8dbbe484 100644
+> --- a/arch/powerpc/kvm/e500mc.c
+> +++ b/arch/powerpc/kvm/e500mc.c
+> @@ -381,6 +381,7 @@ static struct kvmppc_ops kvm_ops_e500mc = {
+>   	.emulate_op = kvmppc_core_emulate_op_e500,
+>   	.emulate_mtspr = kvmppc_core_emulate_mtspr_e500,
+>   	.emulate_mfspr = kvmppc_core_emulate_mfspr_e500,
+> +	.create_vcpu_debugfs = kvmppc_create_vcpu_debugfs_e500,
+>   };
+>   
+>   static int __init kvmppc_e500mc_init(void)
+> diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+> index a72920f4f221..2ea73dfcebb2 100644
+> --- a/arch/powerpc/kvm/powerpc.c
+> +++ b/arch/powerpc/kvm/powerpc.c
+> @@ -763,7 +763,6 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>   		goto out_vcpu_uninit;
+>   
+>   	vcpu->arch.waitp = &vcpu->wait;
+> -	kvmppc_create_vcpu_debugfs(vcpu, vcpu->vcpu_id);
+>   	return 0;
+>   
+>   out_vcpu_uninit:
+> @@ -780,8 +779,6 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+>   	/* Make sure we're not using the vcpu anymore */
+>   	hrtimer_cancel(&vcpu->arch.dec_timer);
+>   
+> -	kvmppc_remove_vcpu_debugfs(vcpu);
+> -
+>   	switch (vcpu->arch.irq_type) {
+>   	case KVMPPC_IRQ_MPIC:
+>   		kvmppc_mpic_disconnect_vcpu(vcpu->arch.mpic, vcpu);
+> @@ -2505,3 +2502,16 @@ int kvm_arch_init(void *opaque)
+>   }
+>   
+>   EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_ppc_instr);
+> +
+> +void kvm_arch_create_vcpu_debugfs(struct kvm_vcpu *vcpu, struct dentry *debugfs_dentry)
+> +{
+> +	if (vcpu->kvm->arch.kvm_ops->create_vcpu_debugfs)
+> +		vcpu->kvm->arch.kvm_ops->create_vcpu_debugfs(vcpu, debugfs_dentry);
+> +}
+> +
+> +int kvm_arch_create_vm_debugfs(struct kvm *kvm)
+> +{
+> +	if (kvm->arch.kvm_ops->create_vm_debugfs)
+> +		kvm->arch.kvm_ops->create_vm_debugfs(kvm);
+> +	return 0;
+> +}
+> diff --git a/arch/powerpc/kvm/timing.c b/arch/powerpc/kvm/timing.c
+> index ba56a5cbba97..f6d472874c85 100644
+> --- a/arch/powerpc/kvm/timing.c
+> +++ b/arch/powerpc/kvm/timing.c
+> @@ -204,21 +204,9 @@ static const struct file_operations kvmppc_exit_timing_fops = {
+>   	.release = single_release,
+>   };
+>   
+> -void kvmppc_create_vcpu_debugfs(struct kvm_vcpu *vcpu, unsigned int id)
+> +void kvmppc_create_vcpu_debugfs_e500(struct kvm_vcpu *vcpu,
+> +				     struct dentry *debugfs_dentry)
+>   {
+> -	static char dbg_fname[50];
+> -	struct dentry *debugfs_file;
+> -
+> -	snprintf(dbg_fname, sizeof(dbg_fname), "vm%u_vcpu%u_timing",
+> -		 current->pid, id);
+> -	debugfs_file = debugfs_create_file(dbg_fname, 0666, kvm_debugfs_dir,
+> -						vcpu, &kvmppc_exit_timing_fops);
+> -
+> -	vcpu->arch.debugfs_exit_timing = debugfs_file;
+> -}
+> -
+> -void kvmppc_remove_vcpu_debugfs(struct kvm_vcpu *vcpu)
+> -{
+> -	debugfs_remove(vcpu->arch.debugfs_exit_timing);
+> -	vcpu->arch.debugfs_exit_timing = NULL;
+> +	debugfs_create_file("timing", 0666, debugfs_dentry,
+> +			    vcpu, &kvmppc_exit_timing_fops);
+>   }
 > 
+
