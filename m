@@ -2,106 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 96A5B475E78
-	for <lists+kvm@lfdr.de>; Wed, 15 Dec 2021 18:22:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D08F475F9D
+	for <lists+kvm@lfdr.de>; Wed, 15 Dec 2021 18:45:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245240AbhLORUi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Dec 2021 12:20:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34628 "EHLO
+        id S237713AbhLORpo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Dec 2021 12:45:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245248AbhLORUh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Dec 2021 12:20:37 -0500
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57B89C06173E;
-        Wed, 15 Dec 2021 09:20:37 -0800 (PST)
-Received: by mail-wm1-x333.google.com with SMTP id az34-20020a05600c602200b0033bf8662572so16474548wmb.0;
-        Wed, 15 Dec 2021 09:20:37 -0800 (PST)
+        with ESMTP id S235513AbhLORpn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Dec 2021 12:45:43 -0500
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA136C061574;
+        Wed, 15 Dec 2021 09:45:42 -0800 (PST)
+Received: by mail-pj1-x102a.google.com with SMTP id n15-20020a17090a160f00b001a75089daa3so21092777pja.1;
+        Wed, 15 Dec 2021 09:45:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=gBnmKSGLNuMvymhhy5hZJRhuWEJ7BIugf8vR/bIuOqM=;
-        b=KCLZaZDQQvg018ER4RJ25YN2zuBW58lZWc7tx1pn54BQ/20m/VK0Ijoz1tOwebSdBx
-         61/TRUIdYuw7flDNY3/SJCmbW67ZvpJORo3h16tmnm57ZJZCnRVebHhMb98aFx7DRz/P
-         pmbJRHpRfkyz5USGQHyhHRsyoHyFNmfgEv2pVfsUuGSmhPF2vMqwNo31YgulJdBfqMB6
-         qAzMVustltXloIf1FsU/KgxEPNX66be95DgH9/Y3+oPPqOIYsnED574cOm75t0TMvS8F
-         goDrf+aIt8x3oZyChAFBAgD9x2qO6TDvxWzQ2PYMqjWghPSDXFd6mC/wkFddawMfyNaI
-         kEoQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=RLdWdHoT6O3wLXgWsRx2m2m62hSjV0BcJXlTjn5JUFY=;
+        b=fVGVY8wqrxR8Y9FDXFtr4SE6iyR8BVVbZ5vgJ4y8dkqTnryOyAM1f7oIOnezuj4A6J
+         xZUPr4yWMlNLYsHQ1fallxSJg8aU00+SwAnq0ijeJb6rpCasKd3VYye0HMu7Rz4Fmzli
+         VTY7ooY+g0kHA+TAUoyyLgzX0mSn9ha1KmFllLdg51BzQBC+Mgmo9+XdPBjphX6Y4e34
+         aHA3UHFWRC7Btex9u1tZiEFoYFee/G/WGm4rYd3nNUPqV0MpixQGc6Vx0PruHv6wejmQ
+         Ow0n2j4fyu9ba9vCZKTh9cTJvx1bERx0Yn7rh5DuRA2QxMZuAeUzJXU06wIQ9Mevfcss
+         WI7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=gBnmKSGLNuMvymhhy5hZJRhuWEJ7BIugf8vR/bIuOqM=;
-        b=OrwHLjcxpxSlp4XW/v1WmfKZ34dTtSiqGLWv4fy7xMjX3p3oWz/6qAAJDXAL094s1X
-         SkwWoh+Ha9nEhh96jeoOs8w/0ylIlVDg/adEI+rXCLiPeKZurQTmuphTVNPZeLmshyPN
-         gmjkuvvuT8SB7u5Z+YCcMEd/xNe0WCLuaXW7qFvEv0vQ6mYy2kZGLxM+7RzuP2AkuW69
-         BVhOpMclMETR+T/253dVjD4IVEJ6pw9fL/DEf+Sj1VMZDgPIqT+HhmjmIy2fvxxdRWQh
-         WHPlGMQTzO2Hvo997MS7y30U6qZHzLCHMARzSzMpEgcfhW8ijV505cpoCZhat+9UFwn/
-         f05A==
-X-Gm-Message-State: AOAM532S7jP6HwBofhNFIA9+gYAGlbGhKzPktOYxWI60oj41iQnDklEn
-        zuxjrU+Wqn7ljXxpfFvbg8g=
-X-Google-Smtp-Source: ABdhPJwojD9YKCPuESlm+kt+n4P3cUJuGJ1Uccelxcnq8snmgdS+pH9okyrfRk3HN7t/yeFBxs6XXg==
-X-Received: by 2002:a05:600c:1f17:: with SMTP id bd23mr913120wmb.57.1639588835923;
-        Wed, 15 Dec 2021 09:20:35 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id d2sm2535828wra.61.2021.12.15.09.20.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Dec 2021 09:20:35 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <b4295e77-aaf1-f0f5-cfd5-2a4fda923fb4@redhat.com>
-Date:   Wed, 15 Dec 2021 18:20:31 +0100
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=RLdWdHoT6O3wLXgWsRx2m2m62hSjV0BcJXlTjn5JUFY=;
+        b=sXa4PcQUXBKlR2VROcfOlrvxsOIi4XVb+mljr5YNYnVds/2Me+M5DI44i8rGe9Rcnk
+         UY8yugizTuUUUgzZfMVuh3URcNtM660AB1Gkd67ZcxQTgY24kDF9abv/x9fBJqAeEReX
+         7Zhgo7ET0YVC0GzDKs17CDVjYYvF160fhZSSG+SILcsHJRVm1vPoqWcO6rSfwCUaY+lV
+         PlbbsWM06gUdehVGBC4896CjSbgZKstoR0VClDQoo6UyaLnWd9E9cshdwORHG/jN/RdJ
+         xaV+ctip9qT+NOtVFAFVnv0azE6qDGv3C/xyePJvckwSI/ZKrDcygb4xLSWyNvJ6P6b4
+         7aPQ==
+X-Gm-Message-State: AOAM531bZh5ia5V0qOR9CYeeK4bH6cqyS2+9ClJCKIRMj41tZ4/JaYmR
+        GzI4SXUAq703SpgzI+2TkhJHRYocxravu9zYHsQ=
+X-Google-Smtp-Source: ABdhPJxIcVzS1V95pBlMUcYP2k7Lrcyzl/rBNhnf3pbvrkTovj6aQvXpyQPCUffP2FcbLTl6T7AIgJQIhLFRrE2qAuQ=
+X-Received: by 2002:a17:90a:4a06:: with SMTP id e6mr968675pjh.228.1639590342342;
+ Wed, 15 Dec 2021 09:45:42 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH 0/4] KVM: x86/mmu: Zap invalid TDP MMU roots when
- unmapping
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ben Gardon <bgardon@google.com>
-References: <20211215011557.399940-1-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211215011557.399940-1-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20211128035704.270739-1-yury.norov@gmail.com> <20211128035704.270739-3-yury.norov@gmail.com>
+ <YaPGDOvBzhiRFcOP@qmqm.qmqm.pl> <CAAH8bW9-dbENFUrwPUQ-uJVVX_s=PWb2zpAJ8BqkV3vJE696mA@mail.gmail.com>
+ <0ccb827de1164b2989d652bfb6f1bbab@AcuMS.aculab.com>
+In-Reply-To: <0ccb827de1164b2989d652bfb6f1bbab@AcuMS.aculab.com>
+From:   Yury Norov <yury.norov@gmail.com>
+Date:   Wed, 15 Dec 2021 09:45:30 -0800
+Message-ID: <CAAH8bW-u5AsFTXUOJPRkF-6dk1LcL7PE0Tm+dUc9Ctb6JMy=tg@mail.gmail.com>
+Subject: Re: [PATCH 2/9] lib/bitmap: implement bitmap_{empty,full} with bitmap_weight_eq()
+To:     David Laight <David.Laight@aculab.com>
+Cc:     =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Alexey Klimov <aklimov@redhat.com>,
+        Amitkumar Karwar <amitkarwar@gmail.com>,
+        Andi Kleen <ak@linux.intel.com>, Andrew Lunn <andrew@lunn.ch>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andy Gross <agross@kernel.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Andy Shevchenko <andy@infradead.org>,
+        Anup Patel <anup.patel@wdc.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>, Borislav Petkov <bp@alien8.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Christoph Lameter <cl@linux.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        David Airlie <airlied@linux.ie>,
+        Dennis Zhou <dennis@kernel.org>,
+        Dinh Nguyen <dinguyen@kernel.org>,
+        Geetha sowjanya <gakula@marvell.com>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Guo Ren <guoren@kernel.org>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Ian Rogers <irogers@google.com>,
+        Ingo Molnar <mingo@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Jason Wessel <jason.wessel@windriver.com>,
+        Jens Axboe <axboe@fb.com>, Jiri Olsa <jolsa@redhat.com>,
+        Jonathan Cameron <jic23@kernel.org>,
+        Juri Lelli <juri.lelli@redhat.com>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Kees Cook <keescook@chromium.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
+        Lee Jones <lee.jones@linaro.org>,
+        Marc Zyngier <maz@kernel.org>, Marcin Wojtas <mw@semihalf.com>,
+        Mark Gross <markgross@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Matti Vaittinen <mazziesaccount@gmail.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Mel Gorman <mgorman@suse.de>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Mike Marciniszyn <mike.marciniszyn@cornelisnetworks.com>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Petr Mladek <pmladek@suse.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Roy Pledge <Roy.Pledge@nxp.com>,
+        Russell King <linux@armlinux.org.uk>,
+        Saeed Mahameed <saeedm@nvidia.com>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Solomon Peachy <pizza@shaftnet.org>,
+        Stephen Boyd <sboyd@kernel.org>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Subbaraya Sundeep <sbhatta@marvell.com>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Sunil Goutham <sgoutham@marvell.com>,
+        Tariq Toukan <tariqt@nvidia.com>, Tejun Heo <tj@kernel.org>,
+        Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Vineet Gupta <vgupta@kernel.org>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Vivien Didelot <vivien.didelot@gmail.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Will Deacon <will@kernel.org>,
+        "bcm-kernel-feedback-list@broadcom.com" 
+        <bcm-kernel-feedback-list@broadcom.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-alpha@vger.kernel.org" <linux-alpha@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-csky@vger.kernel.org" <linux-csky@vger.kernel.org>,
+        "linux-ia64@vger.kernel.org" <linux-ia64@vger.kernel.org>,
+        "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "linux-perf-users@vger.kernel.org" <linux-perf-users@vger.kernel.org>,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "linux-snps-arc@lists.infradead.org" 
+        <linux-snps-arc@lists.infradead.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/15/21 02:15, Sean Christopherson wrote:
-> Patches 01-03 implement a bug fix by ensuring KVM zaps both valid and
-> invalid roots when unmapping a gfn range (including the magic "all" range).
-> Failure to zap invalid roots means KVM doesn't honor the mmu_notifier's
-> requirement that all references are dropped.
-> 
-> set_nx_huge_pages() is the most blatant offender, as it doesn't elevate
-> mm_users and so a VM's entire mm can be released, but the same underlying
-> bug exists for any "unmap" command from the mmu_notifier in combination
-> with a memslot update.  E.g. if KVM is deleting a memslot, and a
-> mmu_notifier hook acquires mmu_lock while it's dropped by
-> kvm_mmu_zap_all_fast(), the mmu_notifier hook will see the to-be-deleted
-> memslot but won't zap entries from the invalid roots.
-> 
-> Patch 04 is cleanup to reuse the common iterator for walking _only_
-> invalid roots.
-> 
-> Sean Christopherson (4):
->    KVM: x86/mmu: Use common TDP MMU zap helper for MMU notifier unmap
->      hook
->    KVM: x86/mmu: Move "invalid" check out of kvm_tdp_mmu_get_root()
->    KVM: x86/mmu: Zap _all_ roots when unmapping gfn range in TDP MMU
->    KVM: x86/mmu: Use common iterator for walking invalid TDP MMU roots
-> 
->   arch/x86/kvm/mmu/tdp_mmu.c | 116 +++++++++++++++++--------------------
->   arch/x86/kvm/mmu/tdp_mmu.h |   3 -
->   2 files changed, 53 insertions(+), 66 deletions(-)
-> 
+On Wed, Dec 15, 2021 at 12:41 AM David Laight <David.Laight@aculab.com> wrote:
+>
+> From: Yury Norov
+> > Sent: 14 December 2021 19:43
+> ...
+> >
+> > I think that for long bitmaps the most time consuming operation is moving
+> > data to L1, and for short bitmaps the difference between approaches is
+> > barely measurable.
+> >
+> > But hweght_long on each iteration can't be more effective than the current
+> > version. So, I'll drop this patch for v2 and keep things unchanged.
+>
+> Actually do bitmap_full/empty() calls make any sense at all?
+> The result is stale since bitmaps are designed to do locked operations.
+> If you have a lock covering the bitmap then you should be using
+> something that uses non-locked accesses.
+> Rightly or wrongly that isn't the bitmap api.
 
-Queued 1-3 for 5.16 and 4 for 5.17.
-
-Paolo
+Are you talking about __{set,clear}_bit()?
+include/asm-generic/bitops/non-atomic.h
