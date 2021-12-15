@@ -2,100 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 54AD6475C7E
-	for <lists+kvm@lfdr.de>; Wed, 15 Dec 2021 17:00:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 03EEF475D32
+	for <lists+kvm@lfdr.de>; Wed, 15 Dec 2021 17:17:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244326AbhLOP7E (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Dec 2021 10:59:04 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:45878 "EHLO
+        id S244732AbhLOQQz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Dec 2021 11:16:55 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:50705 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S244303AbhLOP7D (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Wed, 15 Dec 2021 10:59:03 -0500
+        by vger.kernel.org with ESMTP id S244747AbhLOQQn (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Wed, 15 Dec 2021 11:16:43 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1639583942;
+        s=mimecast20190719; t=1639585002;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ee3a2nNJn1qDhuFcuIsHsDIPYmBR4a8NwMwEtT5aJqY=;
-        b=IYugZ5OPYXT4Ih/L/OVibdeU2Wf11b7Rl/sevfSSamS4OAdseD/v37eKJe/Vr2BqxW/6+I
-        VRKRUjDknBkJWsDHA03RDX3lI6jYI/PRS09gWzv4GP+3oMgGiCiCF5m4BHhojq1VLwRmqn
-        SjGVy+K9Tr1S7EdyfplUHkt2YkKytAs=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=8NJRR+a9hlTKwcYiYBaZVulZ3Qw4EA1LMUIGcFZHriw=;
+        b=DcOv6pX1U3zwrCdpi+5m1estPT8ifbBRKT6XcQQpbaObkMEG7ZfjJ8Rt1j4JKpL1ijbm8e
+        iC4pxEFV1WQii82ehHHdp7PkQ4McaPBCLE97+7yHoTWakHPWo77F2l8dmuaiCqMHkuKZ6l
+        7Z9Hk0y+Rh9QVanrrdfCJCDkVvGT3JU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-172-eitkWDE2POa751TbbKSYHg-1; Wed, 15 Dec 2021 10:59:01 -0500
-X-MC-Unique: eitkWDE2POa751TbbKSYHg-1
-Received: by mail-wm1-f72.google.com with SMTP id p13-20020a05600c1d8d00b0034565e7e5c6so1354262wms.9
-        for <kvm@vger.kernel.org>; Wed, 15 Dec 2021 07:59:00 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=ee3a2nNJn1qDhuFcuIsHsDIPYmBR4a8NwMwEtT5aJqY=;
-        b=d6+NS3Y5/qqX0lcJX4L4GjzvQSX1kbzVo5xQEwuh3Xag0mCb9ZepJquC4TRvBxtFnc
-         0sL79uNyd8bGRwQbJOetIKxCiLEXla8JNL7TRDL5ss4RnJLGZgdDIK96GcyYJYPAL7MT
-         qyQ+Sce/VCliGf+6BVn9rgr6Hst6q6jKe5IH3tK2SypqfyfhwqbgQW+5B9mqLLePgaIx
-         V57H2JuBVJ6t3WpMNY6ggpi4tMGAXicY74hDTVz1vNX1T4P30tK8xB/gMsGc2OMpoQSQ
-         QxwLSaP6ysVHlWECJf9LgaFvjgFlCAnOMmYfzNPjGTc9+NlGaR5NKxMtlW7JCRyjvS9j
-         bBHw==
-X-Gm-Message-State: AOAM5323U2GW42dY4UWjEJNW5SloOGucKy4nY/jy2NBjzsOjTEATLiKN
-        MyQ8wNsRs80+a1rmbnl5Lz9hmjwZNLtuU4Me+WZRz5atdfYJuUvYS37xJsHj3VS8xp1EFV1Z73M
-        C4tJ6bw5pJrwM
-X-Received: by 2002:adf:cf11:: with SMTP id o17mr5042864wrj.554.1639583939996;
-        Wed, 15 Dec 2021 07:58:59 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzaNRZQnHx4dPArhfayJDD5m03QWjgmsTVKizylqLsrk4G9k9x+g6rNXJtal/SJiOJVxIzwsw==
-X-Received: by 2002:adf:cf11:: with SMTP id o17mr5042842wrj.554.1639583939735;
-        Wed, 15 Dec 2021 07:58:59 -0800 (PST)
-Received: from fedora (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id i17sm2581675wmq.48.2021.12.15.07.58.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Dec 2021 07:58:59 -0800 (PST)
+ us-mta-663-op_bkYODMPCejNi40MvNyg-1; Wed, 15 Dec 2021 11:16:39 -0500
+X-MC-Unique: op_bkYODMPCejNi40MvNyg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AA4CD64141;
+        Wed, 15 Dec 2021 16:16:37 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.40.195.160])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E46405E26D;
+        Wed, 15 Dec 2021 16:16:18 +0000 (UTC)
 From:   Vitaly Kuznetsov <vkuznets@redhat.com>
 To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>, lkp@lists.01.org,
-        lkp@intel.com, xudong.hao@intel.com,
-        kernel test robot <oliver.sang@intel.com>
-Subject: Re: [KVM]  feb627e8d6: kernel-selftests.kvm.vmx_pmu_msrs_test.fail
-In-Reply-To: <20211215154643.GE34913@xsang-OptiPlex-9020>
-References: <20211215154643.GE34913@xsang-OptiPlex-9020>
-Date:   Wed, 15 Dec 2021 16:58:56 +0100
-Message-ID: <87czlxvozj.fsf@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>, oliver.sang@intel.com,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: selftests: Avoid KVM_SET_CPUID2 after KVM_RUN in vmx_pmu_msrs_test
+Date:   Wed, 15 Dec 2021 17:16:17 +0100
+Message-Id: <20211215161617.246563-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-kernel test robot <oliver.sang@intel.com> writes:
+Commit feb627e8d6f6 ("KVM: x86: Forbid KVM_SET_CPUID{,2} after KVM_RUN")
+forbade chaning vCPU's CPUID data after the first KVM_RUN but
+vmx_pmu_msrs_test does exactly that. Test VM needs to be re-created after
+vcpu_run().
 
-> Greeting,
->
-> FYI, we noticed the following commit (built with gcc-9):
->
-> commit: feb627e8d6f69c9a319fe279710959efb3eba873 ("KVM: x86: Forbid KVM_SET_CPUID{,2} after KVM_RUN")
-> https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git master
->
+Reported-by: kernel test robot <oliver.sang@intel.com>
+Fixes: feb627e8d6f6 ("KVM: x86: Forbid KVM_SET_CPUID{,2} after KVM_RUN")
+Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+---
+ tools/testing/selftests/kvm/x86_64/vmx_pmu_msrs_test.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-...
-
->
-> # selftests: kvm: vmx_pmu_msrs_test
-> # ==== Test Assertion Failure ====
-> #   lib/x86_64/processor.c:874: rc == 0
-> #   pid=10415 tid=10415 errno=22 - Invalid argument
-> #      1	0x000000000040b24f: vcpu_set_cpuid at processor.c:873
-> #      2	0x000000000040260a: main at vmx_pmu_msrs_test.c:115
-> #      3	0x00007f07e1aec09a: ?? ??:0
-> #      4	0x0000000000402759: _start at ??:?
-> #   KVM_SET_CPUID2 failed, rc: -1 errno: 22
-> not ok 33 selftests: kvm: vmx_pmu_msrs_test # exit=254
->
-
-Hm, I'm pretty sure I've tested feb627e8d6f6 on both Intel and AMD and I
-don't remember seeing this failure :-( . vmx_pmu_msrs_test test does
-KVM_SET_CPUID after KVM_RUN and thus needs to be fixed too. Will send a
-patch shortly.
-
+diff --git a/tools/testing/selftests/kvm/x86_64/vmx_pmu_msrs_test.c b/tools/testing/selftests/kvm/x86_64/vmx_pmu_msrs_test.c
+index 23051d84b907..17882f79deed 100644
+--- a/tools/testing/selftests/kvm/x86_64/vmx_pmu_msrs_test.c
++++ b/tools/testing/selftests/kvm/x86_64/vmx_pmu_msrs_test.c
+@@ -99,6 +99,11 @@ int main(int argc, char *argv[])
+ 	vcpu_run(vm, VCPU_ID);
+ 	ASSERT_EQ(vcpu_get_msr(vm, VCPU_ID, MSR_IA32_PERF_CAPABILITIES), PMU_CAP_FW_WRITES);
+ 
++	/* Re-create guest VM after KVM_RUN so CPUID can be changed */
++	kvm_vm_free(vm);
++	vm = vm_create_default(VCPU_ID, 0, guest_code);
++	vcpu_set_cpuid(vm, VCPU_ID, cpuid);
++
+ 	/* testcase 2, check valid LBR formats are accepted */
+ 	vcpu_set_msr(vm, 0, MSR_IA32_PERF_CAPABILITIES, 0);
+ 	ASSERT_EQ(vcpu_get_msr(vm, VCPU_ID, MSR_IA32_PERF_CAPABILITIES), 0);
 -- 
-Vitaly
+2.33.1
 
