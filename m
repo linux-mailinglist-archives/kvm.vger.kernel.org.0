@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id EEB38477C7E
-	for <lists+kvm@lfdr.de>; Thu, 16 Dec 2021 20:25:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3686A477CD9
+	for <lists+kvm@lfdr.de>; Thu, 16 Dec 2021 20:53:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241028AbhLPTZZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Dec 2021 14:25:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58386 "EHLO
+        id S241122AbhLPTxD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Dec 2021 14:53:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231376AbhLPTZW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Dec 2021 14:25:22 -0500
+        with ESMTP id S229909AbhLPTxC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Dec 2021 14:53:02 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECDD5C061574;
-        Thu, 16 Dec 2021 11:25:21 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 505BDC061574;
+        Thu, 16 Dec 2021 11:53:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=nw+QyVmvoeztudKCPr7lg9PgQJIVm8glncAr2T+hc8k=; b=YbPTvuBHTFRiwIbsm09Yh+hEtI
-        vHQWG88ab465nk6HMhQAvhTkI/37kficvHXgb67iIKT3/cID3xmEiFfjFfuVLSIms8NtlwRVSUIpA
-        BecdoteOR2XxZHxgd2YccqZxdZKmpLeaQCyGmj71FjCbjRfx/PXVlUfJ92X+zDRapJ0gRz1xAJQo9
-        InjfLU/YCAbTLxnEvkSHCySjI5pIYOv/9HCc+h/zmbGgeSaBU0Q32YcxX+XdtO9B0oPFyeF0iwV2E
-        kqfvOhpxvf/AblGjMzKYz4QkLSfjtzeECyZv0oBfv1eHt6RGjSA/ZmerFy+kTJfuhPZfc5dLA9LOZ
-        TP2rL60A==;
+        bh=FagIrzHZaoI8LWtumL9lv327gd26yRzP0j0dqHS0OxY=; b=4JMTfcWA8xrUg+VnFM+gd6L24Y
+        S002yVPcfeycj4gXrMKaafnpFeS61tYeSOAFlokpby/ybB/ulBY/ZxhiVlQniLG5qfF2iPVfi4V5J
+        YCDPelyw0E5k+MzwdeVtZcFy4MRkIorzS9dZiyXzp4QmKIWeTD5RMk9IRFVIqv4a4yhZKoPpP2uLO
+        S1Mlouil/VgCrPJyCKaw3AntOVYd8A5gFNJpGR+iZSfnEp5sYBlr1InlKG5TkjZ8qZO5FlEZLjnoC
+        3Cg64b9cAoytCo/k7jVZDyRjCjvF5d2DV9Cx0LTj+UsVx2VQ3D85+dmf2xQIMx0c9KqYx7TrRnbGs
+        D9DPR8Lw==;
 Received: from [2001:8b0:10b:1::3ae] (helo=u3832b3a9db3152.ant.amazon.com)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mxwNB-007LRh-I0; Thu, 16 Dec 2021 19:25:01 +0000
-Message-ID: <ca0751c864570015ffe4d8cccdc94e0a5ef3086d.camel@infradead.org>
+        id 1mxwo1-007OH4-Rb; Thu, 16 Dec 2021 19:52:46 +0000
+Message-ID: <f0b4eddc2cdb3aae190bacd0a5285c393e4f8ea3.camel@infradead.org>
 Subject: Re: [PATCH v3 0/9] Parallel CPU bringup for x86_64
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     Tom Lendacky <thomas.lendacky@amd.com>,
@@ -40,12 +40,12 @@ Cc:     Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
         hushiyuan@huawei.com, luolongjun@huawei.com, hejingxian@huawei.com
-Date:   Thu, 16 Dec 2021 19:24:56 +0000
+Date:   Thu, 16 Dec 2021 19:52:41 +0000
 In-Reply-To: <761c1552-0ca0-403b-3461-8426198180d0@amd.com>
 References: <20211215145633.5238-1-dwmw2@infradead.org>
          <761c1552-0ca0-403b-3461-8426198180d0@amd.com>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-5RF9FfvqskXvLvB+S+1Q"
+        boundary="=-jbZxvCR5TRk+ktacvQYp"
 User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
@@ -54,12 +54,13 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-5RF9FfvqskXvLvB+S+1Q
+--=-jbZxvCR5TRk+ktacvQYp
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Thu, 2021-12-16 at 10:27 -0600, Tom Lendacky wrote:
 > On 12/15/21 8:56 AM, David Woodhouse wrote:
+>=20
 > > Doing the INIT/SIPI/SIPI in parallel for all APs and *then* waiting for
 > > them shaves about 80% off the AP bringup time on a 96-thread socket
 > > Skylake box (EC2 c5.metal) =E2=80=94 from about 500ms to 100ms.
@@ -74,17 +75,20 @@ On Thu, 2021-12-16 at 10:27 -0600, Tom Lendacky wrote:
 =20
 > I'll arrive at anything.
 
-Thanks for testing. This is working for me with BIOS and EFI boots in
-qemu and real hardware but it's mostly been Intel so far. I'll try
-harder on an AMD box.
+I've pushed the SEV-ES fix to
+https://git.infradead.org/users/dwmw2/linux.git/shortlog/refs/heads/paralle=
+l-5.16
+and in doing so I've moved the 'no_parallel_bringup' command line
+argument earlier in the series, to Thomas's "Support parallel startup
+of secondary CPUs" commit (now 191f0899757). It would be interesting to
+see if you can reproduce with just that much, both with and with
+no_parallel_bringup. And then whether the subsequent commit that
+actually enables the parallel INIT/SIPI/SIPI actually makes the
+difference?
 
-Anything else special about your setup, kernel config or qemu
-invocation that might help me reproduce?
+Thanks!
 
-If it can repro without KVM, 'qemu -d in_asm' can be extremely useful
-for this kind of thing btw.
-
---=-5RF9FfvqskXvLvB+S+1Q
+--=-jbZxvCR5TRk+ktacvQYp
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -167,20 +171,20 @@ BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
 BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
 ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
 ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjEx
-MjE2MTkyNDU2WjAvBgkqhkiG9w0BCQQxIgQgRt1fP3lsUxUvwoTuTXcyBI8X6e2aKRHzWYznmguN
-50kwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+MjE2MTk1MjQxWjAvBgkqhkiG9w0BCQQxIgQgBS5Xx8+RofROhLb9iQ2hbv2XLGiyFy0ajsOFPLwX
+Wgswgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
 TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
 PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
 aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
 A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
 bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBABCo7osHNaWKVYblPXBHH6ToLgYxAkgirh5nNXfOeTsuBxBS9cuSe6cmdAi/ch7Z
-glHdhNBkL+8NNi1pCYVVny/6xb2WdJyUrliSLM6ZmuzcwovTm7x4MGmrwTIbDPvKtAtKsNKmklIG
-en30qr4Ek8zmqs0Slu0Mq6wjvuxUEZtI06LUtpIbObv2lBuxk3cwJmRcJaF4sL94WOZhz+cxjZRX
-UHENmzSi3b1W3MeZCVtk9bghwSI9GuRlUd+NwMwQHOZ8NxDhQHmue3rKmzo/R6WwMReYl1ZBCd2i
-PuMDG2K1lBHjMNc4FD85NaScLbfVt3uH/cvWbNxLkmiiPW/xBrgAAAAAAAA=
+DQEBAQUABIIBAGiffsGq5OJv8q6fxRE2sZy6DcdXY4lo4/SGBSvfTN2TYYTs9xbrFulrGzoSfNfa
+G+ul2B9FQbXljf/QQO7+6VMvowIYcRJWeKoyPuLbZCENfP0re+p+Y7fz8p5Bwp07VcGy1Sz0MExf
+3GDVoDTzfEKMiyxPd7IeJtqNqIiEj61bsKcFm+wwbcC5hCpw1TFw9mhQr/5bUXl/RJ2xE4QjZTnW
+Iw6u4CzQ7zTsrW/JGab6tdPDyDRDLj55qYUA/LMI777KDn2Tl6R6cl03USKy+V7CDEC0cxFS1muK
+9F7/SG2coHeHlhUvU5wTsV1o5Is74J9A2vWXUOKgJ9WcpXdeUEMAAAAAAAA=
 
 
---=-5RF9FfvqskXvLvB+S+1Q--
+--=-jbZxvCR5TRk+ktacvQYp--
 
