@@ -2,194 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id E00DD47764E
-	for <lists+kvm@lfdr.de>; Thu, 16 Dec 2021 16:48:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 32F99477659
+	for <lists+kvm@lfdr.de>; Thu, 16 Dec 2021 16:48:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238670AbhLPPrw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Dec 2021 10:47:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33900 "EHLO
+        id S238723AbhLPPsf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Dec 2021 10:48:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34166 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232741AbhLPPrw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Dec 2021 10:47:52 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9299C061574;
-        Thu, 16 Dec 2021 07:47:51 -0800 (PST)
-Received: from zn.tnic (dslb-088-067-202-008.088.067.pools.vodafone-ip.de [88.67.202.8])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 0A6E51EC01A2;
-        Thu, 16 Dec 2021 16:47:46 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1639669666;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=w2zw5w9zdbclGVjd2mcfzFrzgn7sBAWZNCdTsQYykhk=;
-        b=HOSNWrPkxPtVrP+QzbncJoQNAqagO6/nOkVG3sXbVKWfE/24GyfWge5/8230enJQIghU91
-        CeCqrdvkWGJYi0yOX1vOhtgg49xfGrdlGoiWDGDG64jPbOh+vwbdb5cViWyGbFySlIelWH
-        iebgN19BrUYcG6qBiaDh42Sp3lSWbhI=
-Date:   Thu, 16 Dec 2021 16:47:46 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v8 06/40] x86/sev: Check SEV-SNP features support
-Message-ID: <Ybtfon70/+lG63BP@zn.tnic>
-References: <20211210154332.11526-1-brijesh.singh@amd.com>
- <20211210154332.11526-7-brijesh.singh@amd.com>
+        with ESMTP id S238705AbhLPPse (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Dec 2021 10:48:34 -0500
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DE62C061574
+        for <kvm@vger.kernel.org>; Thu, 16 Dec 2021 07:48:34 -0800 (PST)
+Received: by mail-pj1-x102b.google.com with SMTP id y16-20020a17090a6c9000b001b13ffaa625so466879pjj.2
+        for <kvm@vger.kernel.org>; Thu, 16 Dec 2021 07:48:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=ezi/caBJl2i4eI7LH4KdLkWBEsHo9ynhHqXr0f1eK30=;
+        b=I2ks2WiPn93u/j+iDcTqyGAlCxIqK6tz6FZleGRtI/CNc2BxvfxVhLGSvw9XZpojMT
+         UxexSmNxTB0FmDwZTNR4DuRJ6mPaUzQ+fl61LzYZFVMQgp0CUCIZWa46nvXYmGoxxoGg
+         LM8EZ+Ay1+Ymqbt8DgLCmvSOFh9wUARDbiNtHD+rT3NEth62KcXnz/Q7be++IlAz5VsQ
+         6E+q5M4W+3MgpRZUn5BWzJe0dDttHfh9cDFfYP/riOp1BdtoLg7LHoNDn4aPV8Bco/mF
+         cT4tbF/x0XaCsP6rtF3Mat5MNrvTnKu8+Q/pSyiR9SEDzqaUD1Dy9oahLrcSz2an1v6K
+         4U0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ezi/caBJl2i4eI7LH4KdLkWBEsHo9ynhHqXr0f1eK30=;
+        b=Oyy9fhF8Za96qHqyC/ZpzDmCloUW4X4vUlYx9epEs2IEXzm3vEMrPrm/VoGw1MmJ7R
+         p+/156AUOALBhs7Pq5Y7aGz3eHBxgu+z3W6Bp4bMAYvbDUso5oVsl9hcJMjMBXxhUuxi
+         Ith4q/wlrviWpbIzvvpPRMk+gcvtE0vfvSceXa03WW2ugaurSrvZ1bK2NawB+My1R1uU
+         vYcMPLMPGi+/KLKQiKKq5tMbslsADk40cGLBqf4InGQS4l1WlExplfjQ+ifA1mrAoEv0
+         Wpquv9r0BVNHYvK/452x6gfm8Z4BwDXsgcqAN2OcQkvgTwZRiRRlk5D/hRrBjdhC+rkS
+         lcGw==
+X-Gm-Message-State: AOAM530B3d7dyQm8Ox480mq/GxLTXWVy8uBXrjLkV6gEIsr+MdGiNonJ
+        zloRPaGvBQxaL50ZGqIwsAnGhg==
+X-Google-Smtp-Source: ABdhPJwXJ2BdU7mXNLVn66CWsR9ai6kDIs+aM7Uhvpk84nE/3cQYOE6aJiacfLkhQnOxlW1NhWjIow==
+X-Received: by 2002:a17:903:1d2:b0:142:24f1:1213 with SMTP id e18-20020a17090301d200b0014224f11213mr17040987plh.81.1639669713954;
+        Thu, 16 Dec 2021 07:48:33 -0800 (PST)
+Received: from google.com (157.214.185.35.bc.googleusercontent.com. [35.185.214.157])
+        by smtp.gmail.com with ESMTPSA id gk13sm9128336pjb.43.2021.12.16.07.48.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Dec 2021 07:48:33 -0800 (PST)
+Date:   Thu, 16 Dec 2021 15:48:30 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>, oliver.sang@intel.com,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: selftests: Avoid KVM_SET_CPUID2 after KVM_RUN in
+ vmx_pmu_msrs_test
+Message-ID: <Ybtfzo6Fx6KLfK3V@google.com>
+References: <20211215161617.246563-1-vkuznets@redhat.com>
+ <YbotG5neKyzhv22Z@google.com>
+ <87a6h0vs36.fsf@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211210154332.11526-7-brijesh.singh@amd.com>
+In-Reply-To: <87a6h0vs36.fsf@redhat.com>
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 10, 2021 at 09:42:58AM -0600, Brijesh Singh wrote:
-> Version 2 of the GHCB specification added the advertisement of features
-> that are supported by the hypervisor. If hypervisor supports the SEV-SNP
-> then it must set the SEV-SNP features bit to indicate that the base
-> SEV-SNP is supported.
+On Thu, Dec 16, 2021, Vitaly Kuznetsov wrote:
+> Sean Christopherson <seanjc@google.com> writes:
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 85127b3e3690..65e297875405 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -3424,7 +3424,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+> >
+> >                 if (!msr_info->host_initiated)
+> >                         return 1;
+> > -               if (guest_cpuid_has(vcpu, X86_FEATURE_PDCM) && kvm_get_msr_feature(&msr_ent))
+> > +               if (kvm_get_msr_feature(&msr_ent))
+> >                         return 1;
+> >                 if (data & ~msr_ent.data)
+> >                         return 1;
 > 
-> Check the SEV-SNP feature while establishing the GHCB, if failed,
-> terminate the guest.
+> This looks OK.
 > 
-> Version 2 of GHCB specification adds several new NAEs, most of them are
-> optional except the hypervisor feature. Now that hypervisor feature NAE
-> is implemented, so bump the GHCB maximum support protocol version.
+> > @@ -3779,14 +3779,12 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+> >                 msr_info->data = vcpu->arch.microcode_version;
+> >                 break;
+> >         case MSR_IA32_ARCH_CAPABILITIES:
+> > -               if (!msr_info->host_initiated &&
+> > -                   !guest_cpuid_has(vcpu, X86_FEATURE_ARCH_CAPABILITIES))
+> > +               if (!msr_info->host_initiated)
+> >                         return 1;
+> >                 msr_info->data = vcpu->arch.arch_capabilities;
+> >                 break;
+> >         case MSR_IA32_PERF_CAPABILITIES:
+> > -               if (!msr_info->host_initiated &&
+> > -                   !guest_cpuid_has(vcpu, X86_FEATURE_PDCM))
+> > +               if (!msr_info->host_initiated)
+> >                         return 1;
+> >                 msr_info->data = vcpu->arch.perf_capabilities;
+> >                 break;
+> >
 > 
-> While at it, move the GHCB protocol negotitation check from VC exception
+> Hm, this change will unconditionally forbid reading
+> MSR_IA32_ARCH_CAPABILITIES/MSR_IA32_PERF_CAPABILITIES from the guest. Is
+> this what we want?
 
-Unknown word [negotitation] in commit message, suggestions:
-        ['negotiation', 'negotiator', 'negotiate', 'abnegation', 'vegetation']
-
-> handler to sev_enable() so that all feature detection happens before
-> the first VC exception.
-> 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  arch/x86/boot/compressed/sev.c    | 21 ++++++++++++++++-----
->  arch/x86/include/asm/sev-common.h |  6 ++++++
->  arch/x86/include/asm/sev.h        |  2 +-
->  arch/x86/include/uapi/asm/svm.h   |  2 ++
->  arch/x86/kernel/sev-shared.c      | 20 ++++++++++++++++++++
->  arch/x86/kernel/sev.c             | 16 ++++++++++++++++
->  6 files changed, 61 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/x86/boot/compressed/sev.c b/arch/x86/boot/compressed/sev.c
-> index 0b6cc6402ac1..a0708f359a46 100644
-> --- a/arch/x86/boot/compressed/sev.c
-> +++ b/arch/x86/boot/compressed/sev.c
-> @@ -119,11 +119,8 @@ static enum es_result vc_read_mem(struct es_em_ctxt *ctxt,
->  /* Include code for early handlers */
->  #include "../../kernel/sev-shared.c"
->  
-> -static bool early_setup_sev_es(void)
-> +static bool early_setup_ghcb(void)
->  {
-> -	if (!sev_es_negotiate_protocol())
-> -		sev_es_terminate(SEV_TERM_SET_GEN, GHCB_SEV_ES_PROT_UNSUPPORTED);
-> -
->  	if (set_page_decrypted((unsigned long)&boot_ghcb_page))
->  		return false;
->  
-> @@ -174,7 +171,7 @@ void do_boot_stage2_vc(struct pt_regs *regs, unsigned long exit_code)
->  	struct es_em_ctxt ctxt;
->  	enum es_result result;
->  
-> -	if (!boot_ghcb && !early_setup_sev_es())
-> +	if (!boot_ghcb && !early_setup_ghcb())
->  		sev_es_terminate(SEV_TERM_SET_GEN, GHCB_SEV_ES_GEN_REQ);
-
-Can you setup the GHCB in sev_enable() too, after the protocol version
-negotiation succeeds?
-
->  	vc_ghcb_invalidate(boot_ghcb);
-> @@ -247,5 +244,19 @@ void sev_enable(struct boot_params *bp)
->  	if (!(sev_status & MSR_AMD64_SEV_ENABLED))
->  		return;
->  
-> +	/* Negotiate the GHCB protocol version */
-> +	if (sev_status & MSR_AMD64_SEV_ES_ENABLED)
-> +		if (!sev_es_negotiate_protocol())
-> +			sev_es_terminate(SEV_TERM_SET_GEN, GHCB_SEV_ES_PROT_UNSUPPORTED);
-> +
-> +	/*
-> +	 * SNP is supported in v2 of the GHCB spec which mandates support for HV
-> +	 * features. If SEV-SNP is enabled, then check if the hypervisor supports
-> +	 * the SEV-SNP features.
-> +	 */
-> +	if (sev_status & MSR_AMD64_SEV_SNP_ENABLED && !(get_hv_features() & GHCB_HV_FT_SNP))
-> +		sev_es_terminate(SEV_TERM_SET_GEN, GHCB_SNP_UNSUPPORTED);
-> +
-> +
-^ Superfluous newline.
-
->  	sme_me_mask = BIT_ULL(ebx & 0x3f);
-
-...
-
-> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
-> index 19ad09712902..a0cada8398a4 100644
-> --- a/arch/x86/kernel/sev.c
-> +++ b/arch/x86/kernel/sev.c
-> @@ -43,6 +43,10 @@ static struct ghcb boot_ghcb_page __bss_decrypted __aligned(PAGE_SIZE);
->   */
->  static struct ghcb __initdata *boot_ghcb;
->  
-> +/* Bitmap of SEV features supported by the hypervisor */
-> +static u64 sev_hv_features;
-
-__ro_after_init
-
-> +
-> +
->  /* #VC handler runtime per-CPU data */
->  struct sev_es_runtime_data {
->  	struct ghcb ghcb_page;
-> @@ -766,6 +770,18 @@ void __init sev_es_init_vc_handling(void)
->  	if (!sev_es_check_cpu_features())
->  		panic("SEV-ES CPU Features missing");
->  
-> +	/*
-> +	 * SNP is supported in v2 of the GHCB spec which mandates support for HV
-> +	 * features. If SEV-SNP is enabled, then check if the hypervisor supports
-
-s/SEV-SNP/SNP/g
-
-And please do that everywhere in sev-specific files.
-
-This file is called sev.c and there's way too many acronyms flying
-around so the simpler the better.
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+No, I completely misread the code.  The kvm_set_msr_common() goof seems to be
+the only bug, and that would also explain the selftest's bad testcase.
