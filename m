@@ -2,95 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 379AE476F19
-	for <lists+kvm@lfdr.de>; Thu, 16 Dec 2021 11:46:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B8314770C8
+	for <lists+kvm@lfdr.de>; Thu, 16 Dec 2021 12:42:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236213AbhLPKpe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Dec 2021 05:45:34 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:47038 "EHLO
-        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236195AbhLPKpd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Dec 2021 05:45:33 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 0A888B82299
-        for <kvm@vger.kernel.org>; Thu, 16 Dec 2021 10:45:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6499C36AE2;
-        Thu, 16 Dec 2021 10:45:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1639651530;
-        bh=lsuTIb4QAadkxB8JMSkIQ9kqbNzDrbIGstkl5NzJwos=;
-        h=From:To:Cc:Subject:Date:From;
-        b=B0qqq+k/zpavypznn4lXvo8eWd3jIvRsOq1wLuNkkcKE2eCwmxsykIfqoV6UB6glQ
-         fXov3G3Bbiw7lvoqb0D1L1QXsoFqcVESCGRd1QmYpkqvm58c4iIwzNM0wA2FZ2BRiB
-         Py9/ydqN86OSU6WumHXwmiVsxQdqzKfYwPiP4/tIB1uRQKtqLnFn8Vb8iYwkcngok0
-         rKUA/g3Gg3H9Y58ZLkxEjrUl1gnnxmmImBznoZO3anypRsLrFwQjLGePJ0UeyUfQtH
-         +T3JOg35lDnxAUlipIfz1KubrL5vRZRXGar7zxdFLdzhKAZNa/uBql/AyL0KnV+NnX
-         7QNz4dQsP6jSw==
-Received: from cfbb000407.r.cam.camfibre.uk ([185.219.108.64] helo=hot-poop.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <maz@kernel.org>)
-        id 1mxoGO-00CUtK-TR; Thu, 16 Dec 2021 10:45:29 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu
-Cc:     James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        kernel-team@android.com
-Subject: [PATCH] KVM: arm64: vgic-v3: Fix vcpu index comparison
-Date:   Thu, 16 Dec 2021 10:45:26 +0000
-Message-Id: <20211216104526.1482124-1-maz@kernel.org>
-X-Mailer: git-send-email 2.30.2
+        id S233464AbhLPLm5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Dec 2021 06:42:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60220 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233419AbhLPLmb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Dec 2021 06:42:31 -0500
+Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70C07C061761
+        for <kvm@vger.kernel.org>; Thu, 16 Dec 2021 03:42:29 -0800 (PST)
+Received: by mail-qt1-x82f.google.com with SMTP id z9so25080970qtj.9
+        for <kvm@vger.kernel.org>; Thu, 16 Dec 2021 03:42:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:reply-to:from:date:message-id:subject:to;
+        bh=xre5um49Rnqa1tZMCD58Cd6UlD4MleswKAp3tzt2gjo=;
+        b=XAiY5JQCbKhUV3kfV68NxknTY8076aQ+jZiIG+NNSnrj8SbWsLA5ZyVis9Hv7MDsX5
+         Wp1aJ8rEmDfQ1U3vhA+W5Q6fUW0sQxhqwaHiosPbQFbyYijHt4Icvm/T0vEK5/kKmBc+
+         QqELCOAj0es+5TzRQyWwGBhwQGehjbOewfhMN3/S4hQw7QoR6Y3+tDzh1TbUcqm1TT9t
+         NYT2/qpfB6ahTcpnyVYoBu/0br0EmuZ66fyA68h0ieuZcBkGcxPgfheRqd2GHCJMPyzP
+         6QgpFUXd/uCVTtz1/hZUUGudKd9Q0ZImcSJeB1tjd8lIsCPvJkt1eKVnbTcB60Kk9v0/
+         CoRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+         :subject:to;
+        bh=xre5um49Rnqa1tZMCD58Cd6UlD4MleswKAp3tzt2gjo=;
+        b=jnV87M0yrTtdV2wR5mgeTzvwD3jiLahOMzU4oONR+9ZFVSe6BH2ekc75KFRuHLVqfT
+         y9eZKoFIou86dC5kAQvPoJ6sl+KWi8o9jbHbsWW5tFA2iqDuY9oMLj/DnK3+VLnAMe0n
+         LY6C1cvtRByQV9PC15AhSN3UK3fIIxkJ4FSZvo1UwcOlsixOs8tAVK/T7BcHAYqPbvZh
+         KXxNHPxisvtgSTnmHDgYCzBMFbyL2ddyzT7PNkjgot0Yc/9eW1Ns5hwGjpNbBQl7Tfr1
+         xFXLVwNrXoNfUsJdxI3+cAjogLGBtOw5t+3pSqH4wdPi45cLRGKTpm15qhMJuQOSOMhd
+         /AXA==
+X-Gm-Message-State: AOAM533umAPoVAeimXK9h4y/stXAtPxu2XxHK1+1GisBUH5hfbhkZX+V
+        Br/pSLw25aEd95e0Oj1kDoPB7ZuH8OpcjOSPaoI=
+X-Google-Smtp-Source: ABdhPJxzAaV5DauAecsJzqBWmheSvDxk3ghiLfb6YRovClVg4kL4yUlGwYUFAnV+1q8jYrfo3AT6l8iJutzsg/2jTPA=
+X-Received: by 2002:a05:622a:1d4:: with SMTP id t20mr16497208qtw.84.1639654948506;
+ Thu, 16 Dec 2021 03:42:28 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, kernel-team@android.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Received: by 2002:a05:622a:199c:0:0:0:0 with HTTP; Thu, 16 Dec 2021 03:42:28
+ -0800 (PST)
+Reply-To: selviasantiago1@gmail.com
+From:   Selvia Santiago <mariamatinez119@gmail.com>
+Date:   Thu, 16 Dec 2021 11:42:28 +0000
+Message-ID: <CAONDhKOtxcgjB1YEPd0RXNOVbbQ8k-9k32v_cdFxEKFzk62kJg@mail.gmail.com>
+Subject: Urgent
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When handling an error at the point where we try and register
-all the redistributors, we unregister all the previously
-registered frames by counting down from the failing index.
-
-However, the way the code is written relies on that index
-being a signed value. Which won't be true once we switch to
-an xarray-based vcpu set.
-
-Since this code is pretty awkward the first place, and that the
-failure mode is hard to spot, rewrite this loop to iterate
-over the vcpus upwards rather than downwards.
-
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/vgic/vgic-mmio-v3.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
-
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-index bf7ec4a78497..9943a3fe1b0a 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-@@ -763,10 +763,12 @@ static int vgic_register_all_redist_iodevs(struct kvm *kvm)
- 	}
- 
- 	if (ret) {
--		/* The current c failed, so we start with the previous one. */
-+		/* The current c failed, so iterate over the previous ones. */
-+		int i;
-+
- 		mutex_lock(&kvm->slots_lock);
--		for (c--; c >= 0; c--) {
--			vcpu = kvm_get_vcpu(kvm, c);
-+		for (i = 0; i < c; i++) {
-+			vcpu = kvm_get_vcpu(kvm, i);
- 			vgic_unregister_redist_iodev(vcpu);
- 		}
- 		mutex_unlock(&kvm->slots_lock);
 -- 
-2.30.2
+Urgent
 
+I am Mrs. Selvia Santiago from Abidjan, Cote D'Ivoire, I am a widow
+suffering from long time illness (Cancer), there is funds I inherited
+from my late loving husband Mr. Santiago Carlos, the sum of (US$2.7
+Million Dollars) which he deposited in bank before his death, I need a
+honest and Faithful person that can use these funds for humanity work.
+
+I took this decision because I don't have any child that will inherit
+this money and I don't want a situation where this money will be used
+in an ungodly way. That is why I am taking this decision, and my
+doctor has confirmed to me that I have less than two weeks to live,
+having known my condition I decided to donate this fund to a charity
+or individual that will utilize this money to assist the poor and the
+needy in accordance to my instructions.
+
+I want you to use 70% of this funds for orphanages, school, church,
+widows, propagating the word and other humanity works,The remaining
+30% should be yours for your efforts as the new beneficiary.
+
+Please if you would be able to use these funds for humanity work
+kindly reply me. As soon as I have received your response, I will give
+you further directives on how you are to go about the claims of the
+said funds.
+
+Remain blessed.
+Mrs Selvia Santiago.
