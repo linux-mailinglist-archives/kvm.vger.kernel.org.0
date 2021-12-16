@@ -2,138 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 90049476BCF
-	for <lists+kvm@lfdr.de>; Thu, 16 Dec 2021 09:23:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 554FA476BD6
+	for <lists+kvm@lfdr.de>; Thu, 16 Dec 2021 09:26:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229789AbhLPIXP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Dec 2021 03:23:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41706 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229471AbhLPIXP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Dec 2021 03:23:15 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02003C061574;
-        Thu, 16 Dec 2021 00:23:14 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id np6-20020a17090b4c4600b001a90b011e06so21902460pjb.5;
-        Thu, 16 Dec 2021 00:23:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:in-reply-to:references
-         :organization:mime-version:content-transfer-encoding;
-        bh=HLeccMgObWGxz81bJE+3Vca+86bEOL8IL5Tkqn2xXf4=;
-        b=RigCruDdm2697dk3JS+zKv8hMjgJpHnTU7tEa9MmVvL+46CisvnQGv0UfmaMJNv3xk
-         dkwvQcZ4MieFawUUzyVcujIQeEpic9h9ycYT9CKUlmH5+hQlZKUq4sURNeb4Z9w7sBbR
-         ysvwsaKR4FQkutidEz8sc86bKKO9wiqWednGjkoSSDCWgX4RA7Lgvt8QiGodRDMyIsdo
-         62hJwGGDGRdJQ2nMxS469V5wKcnCDZmkVI5rwn8yF/N+PjHpqyeQwYKCY0MaZQnJjRJF
-         4zMwtzChe5rcNpHKt4r5kQHLPIwUHMfEagbpnqLOzwlKBnVRltHuPF+V1NzROxd6mWV5
-         MeoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=HLeccMgObWGxz81bJE+3Vca+86bEOL8IL5Tkqn2xXf4=;
-        b=03JO7jQGZjdwmcCDSbQgUf7r5iO5thAB8nVATAYdMKfNZvlp5DPiH0FKhoAK1ey8Ox
-         t7ha2Dt1Dt0tSKww70mr9zZVJ+biWCWlK/yFb+KMLbv0IOs4sHkO+8Api7AdnDgneb1k
-         4UGltjotHaQ8Kj63sxDnl5R1j6s0+9HHykk5RG21jKKH4DNENdnif37Wxr0oQnhr5VaV
-         knvILNRegZdya6qUimnyCMRm9DNDVok150x8JhiQXojlSRWJiYjx8Dxl6ZdD5gwA2l12
-         fEG5lroow/G3SjOZhnxQp7vLpZUM1sGhzZMOve6zZxDR8L/qoVWFBtA+Sm6xuzb/U/ww
-         tt+w==
-X-Gm-Message-State: AOAM530WjXJxA9mZqfPCsxPvJL/hKfGBK9xkS5M7QE+ATbASmcoZHehs
-        WiC5GjPDmxA5nOIaW6xPaNs=
-X-Google-Smtp-Source: ABdhPJxQRoYY/viJyRk7MR85tHB6G4snUPbXXj/PD05aKcFG/NwwrlGsrzMQg+eALAazgumorjMOVQ==
-X-Received: by 2002:a17:90a:4a06:: with SMTP id e6mr4710500pjh.228.1639642994393;
-        Thu, 16 Dec 2021 00:23:14 -0800 (PST)
-Received: from localhost.localdomain ([43.128.78.144])
-        by smtp.gmail.com with ESMTPSA id h10sm4531971pgj.64.2021.12.16.00.23.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Dec 2021 00:23:14 -0800 (PST)
-Date:   Thu, 16 Dec 2021 16:23:03 +0800
-From:   Aili Yao <yaoaili126@gmail.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yaoaili@kingsoft.com
-Subject: Re: [PATCH v2] KVM: LAPIC: Per vCPU control over
- kvm_can_post_timer_interrupt
-Message-ID: <20211216162303.230dbdaa@gmail.com>
-In-Reply-To: <Ya/s17QDlGZi9COR@google.com>
-References: <20211124125409.6eec3938@gmail.com>
-        <Ya/s17QDlGZi9COR@google.com>
-Organization: ksyun
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+        id S229979AbhLPI0J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Dec 2021 03:26:09 -0500
+Received: from mga18.intel.com ([134.134.136.126]:45242 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229471AbhLPI0I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Dec 2021 03:26:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1639643168; x=1671179168;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=bi2ZQJ6FrZq2iL6VsUI2CR7xMzLnMFInEN8ODbNOIe8=;
+  b=jM2WZyOOH15gFvr93oamLxPZXQGubE74JN9bqwN69aYv4HR8dCrHF8mf
+   J9LPkpPFPgYaiMVCDFF6HPvv7LABlI64Y+tLKxaZ5ITnN+o4lA712jvhN
+   3xqvD6LJU8O+B15g/GwX2fOSakFlYGuHiegGBmCJf2Site8xUQ4XmzLKN
+   Moe58mqqF0im4ROukXStTTegZVb+PELgP7CDC+Ooc2j+uirYe6DbdB9cy
+   uYf6T0GzMQHuveu/q8ZY3VtBNkjAgrjaSrQ4oDM6jHP9gOGSIEJ3mDU1x
+   nWOSWWJiC1gEIGHyRpApPT3j+HTWU4xnZoJdjwqFwleLdsRA7munE24+7
+   w==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10199"; a="226292520"
+X-IronPort-AV: E=Sophos;i="5.88,211,1635231600"; 
+   d="scan'208";a="226292520"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Dec 2021 00:26:05 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,211,1635231600"; 
+   d="scan'208";a="464588759"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orsmga003.jf.intel.com with ESMTP; 16 Dec 2021 00:26:05 -0800
+Received: from shsmsx605.ccr.corp.intel.com (10.109.6.215) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Thu, 16 Dec 2021 00:26:04 -0800
+Received: from shsmsx601.ccr.corp.intel.com (10.109.6.141) by
+ SHSMSX605.ccr.corp.intel.com (10.109.6.215) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.20; Thu, 16 Dec 2021 16:25:54 +0800
+Received: from shsmsx601.ccr.corp.intel.com ([10.109.6.141]) by
+ SHSMSX601.ccr.corp.intel.com ([10.109.6.141]) with mapi id 15.01.2308.020;
+ Thu, 16 Dec 2021 16:25:54 +0800
+From:   "Wang, Wei W" <wei.w.wang@intel.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        "Zhong, Yang" <yang.zhong@intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>
+CC:     "seanjc@google.com" <seanjc@google.com>,
+        "Nakajima, Jun" <jun.nakajima@intel.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "jing2.liu@linux.intel.com" <jing2.liu@linux.intel.com>,
+        "Liu, Jing2" <jing2.liu@intel.com>,
+        "Zeng, Guang" <guang.zeng@intel.com>
+Subject: RE: [PATCH 16/19] kvm: x86: Introduce KVM_{G|S}ET_XSAVE2 ioctl
+Thread-Topic: [PATCH 16/19] kvm: x86: Introduce KVM_{G|S}ET_XSAVE2 ioctl
+Thread-Index: AQHX63yobhR7xaimuUSU4jknnLqQN6wraUsAgABf8YCABEZs0P//mZ4AgAHaVHD//4REgIAB1a7QgAA4qwCAAbnSIA==
+Date:   Thu, 16 Dec 2021 08:25:54 +0000
+Message-ID: <d6828340c5a64da88caf90bd283b62c9@intel.com>
+References: <20211208000359.2853257-1-yang.zhong@intel.com>
+ <20211208000359.2853257-17-yang.zhong@intel.com>
+ <d16aab21-0f81-f758-a61e-5919f223be78@redhat.com>
+ <26ea7039-3186-c23f-daba-d039bb8d6f48@redhat.com>
+ <86d3c3a5d61649079800a2038370365b@intel.com>
+ <bdda79b5-79e4-22fd-9af8-ec6e87a412ab@redhat.com>
+ <3ec6019a551249d6994063e56a448625@intel.com>
+ <ba78d142-6a97-99dd-9d00-465f7d6aa712@redhat.com>
+ <0c2dae4264ae4d3b87d023879c51833c@intel.com>
+ <cf329949-b81c-3e8c-0f38-4a28de22c456@redhat.com>
+In-Reply-To: <cf329949-b81c-3e8c-0f38-4a28de22c456@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-reaction: no-action
+dlp-version: 11.6.200.16
+x-originating-ip: [10.239.127.36]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 7 Dec 2021 23:23:03 +0000
-Sean Christopherson <seanjc@google.com> wrote:
-> On Tue, Nov 23, 2021 at 10:00 PM Wanpeng Li <kernellwp@gmail.com> wrote:
-> > ---
-> >  arch/x86/kvm/lapic.c | 5 ++---
-> >  1 file changed, 2 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > index 759952dd1222..8257566d44c7 100644
-> > --- a/arch/x86/kvm/lapic.c
-> > +++ b/arch/x86/kvm/lapic.c
-> > @@ -113,14 +113,13 @@ static inline u32 kvm_x2apic_id(struct kvm_lapic *apic)
-> >
-> >  static bool kvm_can_post_timer_interrupt(struct kvm_vcpu *vcpu)
-> >  {
-> > -       return pi_inject_timer && kvm_vcpu_apicv_active(vcpu);
-> > +       return pi_inject_timer && kvm_mwait_in_guest(vcpu->kvm) && kvm_vcpu_apicv_active(vcpu);  
-> 
-> As Aili's changelog pointed out, MWAIT may not be advertised to the guest. 
-> 
-> So I think we want this?  With a non-functional, opinionated refactoring of
-> kvm_can_use_hv_timer() because I'm terrible at reading !(a || b).
-> 
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index 40270d7bc597..c77cb386d03d 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -113,14 +113,25 @@ static inline u32 kvm_x2apic_id(struct kvm_lapic *apic)
-> 
->  static bool kvm_can_post_timer_interrupt(struct kvm_vcpu *vcpu)
->  {
-> -       return pi_inject_timer && kvm_vcpu_apicv_active(vcpu);
-> +       return pi_inject_timer && kvm_vcpu_apicv_active(vcpu) &&
-> +              (kvm_mwait_in_guest(vcpu) || kvm_hlt_in_guest(vcpu));
->  }
-> 
->  bool kvm_can_use_hv_timer(struct kvm_vcpu *vcpu)
->  {
-> -       return kvm_x86_ops.set_hv_timer
-> -              && !(kvm_mwait_in_guest(vcpu->kvm) ||
-> -                   kvm_can_post_timer_interrupt(vcpu));
-> +       /*
-> +        * Don't use the hypervisor timer, a.k.a. VMX Preemption Timer, if the
-> +        * guest can execute MWAIT without exiting as the timer will stop
-> +        * counting if the core enters C3 or lower.  HLT in the guest is ok as
-> +        * HLT is effectively C1 and the timer counts in C0, C1, and C2.
-> +        *
-> +        * Don't use the hypervisor timer if KVM can post a timer interrupt to
-> +        * the guest since posted the timer avoids taking an extra a VM-Exit
-> +        * when the timer expires.
-> +        */
-> +       return kvm_x86_ops.set_hv_timer &&
-> +              !kvm_mwait_in_guest(vcpu->kvm) &&
-> +              !kvm_can_post_timer_interrupt(vcpu));
->  }
->  EXPORT_SYMBOL_GPL(kvm_can_use_hv_timer);
-> 
-
-It seems Sean and Wanpeng are busy with some other more important issues;
-So Please let me try to merge Sean, Wanpeng's ideas and suggestions together,also including my opinions
-into one possible approach and get it reviewed, Only if others are OK with this;
-
-I will post a new patch for this later today or tomorrow.
-
-Thanks!
-
---Aili Yao
+T24gV2VkbmVzZGF5LCBEZWNlbWJlciAxNSwgMjAyMSA5OjQzIFBNLCBQYW9sbyBCb256aW5pIHdy
+b3RlOg0KPiBJdCdzIHN0aWxsIGVhc2llciB0byByZXR1cm4gdGhlIGZ1bGwgc2l6ZSBvZiB0aGUg
+YnVmZmVyIGZyb20NCj4gS1ZNX0NIRUNLX0VYVEVOU0lPTihLVk1fQ0FQX1hTQVZFMikuICBJdCBt
+YWtlcyB0aGUgdXNlcnNwYWNlIGNvZGUgYQ0KPiBiaXQgZWFzaWVyLg0KDQpPSy4gRm9yIHRoZSAi
+ZnVsbCBzaXplIiByZXR1cm5lZCB0byB1c2Vyc3BhY2UsIHdvdWxkIHlvdSBwcmVmZXIgdG8gZGly
+ZWN0bHkgdXNlIHRoZSB2YWx1ZSByZXRyaWV2ZWQgZnJvbSBndWVzdCBDUFVJRCgweGQpLA0Kb3Ig
+Z2V0IGl0IGZyb20gZ3Vlc3RfZnB1IChpLmUuIGZwc3RhdGUtPnVzZXJfc2l6ZSk/DQoocmV0cmll
+dmVkIGZyb20gQ1BVSUQgd2lsbCBiZSB0aGUgbWF4IHNpemUgYW5kIHNob3VsZCB3b3JrIGZpbmUg
+YXMgd2VsbCkNCg0KPiANCj4gSSdtIGFsc28gdGhpbmtpbmcgdGhhdCBJIHByZWZlciBLVk1fR0VU
+X1hTQVZFMiB0bw0KPiBLVk1fRU5BQkxFX0NBUChLVk1fQ0FQX1hTQVZFMiksIGFmdGVyIGFsbC4g
+IFNpbmNlIGl0IHdvdWxkIGJlIGENCj4gYmFja3dhcmRzLWluY29tcGF0aWJsZSBjaGFuZ2UgdG8g
+YW4gX29sZF8gaW9jdGwgKEtWTV9HRVRfWFNBVkUpLCBJIHByZWZlcg0KPiB0byBsaW1pdCB0aGUg
+d2F5cyB0aGF0IHVzZXJzcGFjZSBjYW4gc2hvb3QgaXRzZWxmIGluIHRoZSBmb290Lg0KDQpPSywg
+d2Ugd2lsbCB1c2UgS1ZNX0dFVF9YU0FWRTIuDQoNClRoYW5rcywNCldlaQ0K
