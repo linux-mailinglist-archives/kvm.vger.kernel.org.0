@@ -2,61 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 31A70477C52
-	for <lists+kvm@lfdr.de>; Thu, 16 Dec 2021 20:21:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EEB38477C7E
+	for <lists+kvm@lfdr.de>; Thu, 16 Dec 2021 20:25:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240872AbhLPTVR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Dec 2021 14:21:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57284 "EHLO
+        id S241028AbhLPTZZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Dec 2021 14:25:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232973AbhLPTVR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Dec 2021 14:21:17 -0500
+        with ESMTP id S231376AbhLPTZW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Dec 2021 14:25:22 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF55EC061574;
-        Thu, 16 Dec 2021 11:21:16 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECDD5C061574;
+        Thu, 16 Dec 2021 11:25:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=/zSsJvbx138/k5jm0hV5yqkFOYtq99WfAJC/54IF1a0=; b=4g6rO0OXhkwvqdsMMxTZW0b2AS
-        eK3WwFHb8Yk8IXZbUGznUwRhsTZ3allaLeGfVK+UtASNHjttuhfbdfGvWFWZb8TZ9E4U4KwPIIGE5
-        IA3NyrYXtjy7eNsGt05UGiSqUHfFjUuYuyPYDmRDRloyPFh6hpP94BLA9rYPkT5UwAssdD13Rzdjz
-        MTSVhwayPAmu9cP9ipRvRYfKBT/6LJ/ueMnnHBjZkhXjIt3Ym16Qr+uxsNMjHOmPDMIQhpf36+rtI
-        H1Pd5e9bmtE2D0ZXZwRpmrXGTGAR6QX51RlhkOc3q3pdKTFgvIOK15LvcziaifhsPUvGKH7kugvB4
-        dYbGFe1Q==;
+        bh=nw+QyVmvoeztudKCPr7lg9PgQJIVm8glncAr2T+hc8k=; b=YbPTvuBHTFRiwIbsm09Yh+hEtI
+        vHQWG88ab465nk6HMhQAvhTkI/37kficvHXgb67iIKT3/cID3xmEiFfjFfuVLSIms8NtlwRVSUIpA
+        BecdoteOR2XxZHxgd2YccqZxdZKmpLeaQCyGmj71FjCbjRfx/PXVlUfJ92X+zDRapJ0gRz1xAJQo9
+        InjfLU/YCAbTLxnEvkSHCySjI5pIYOv/9HCc+h/zmbGgeSaBU0Q32YcxX+XdtO9B0oPFyeF0iwV2E
+        kqfvOhpxvf/AblGjMzKYz4QkLSfjtzeECyZv0oBfv1eHt6RGjSA/ZmerFy+kTJfuhPZfc5dLA9LOZ
+        TP2rL60A==;
 Received: from [2001:8b0:10b:1::3ae] (helo=u3832b3a9db3152.ant.amazon.com)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mxwJI-007L08-Lo; Thu, 16 Dec 2021 19:21:01 +0000
-Message-ID: <e742473935bf81be84adea6fa8061ce0846cc630.camel@infradead.org>
-Subject: Re: [PATCH v3 6/9] x86/smpboot: Support parallel startup of
- secondary CPUs
+        id 1mxwNB-007LRh-I0; Thu, 16 Dec 2021 19:25:01 +0000
+Message-ID: <ca0751c864570015ffe4d8cccdc94e0a5ef3086d.camel@infradead.org>
+Subject: Re: [PATCH v3 0/9] Parallel CPU bringup for x86_64
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     Tom Lendacky <thomas.lendacky@amd.com>,
         Thomas Gleixner <tglx@linutronix.de>
 Cc:     Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
         "H . Peter Anvin" <hpa@zytor.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         "Paul E . McKenney" <paulmck@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "rcu@vger.kernel.org" <rcu@vger.kernel.org>,
-        "mimoja@mimoja.de" <mimoja@mimoja.de>,
-        "hewenliang4@huawei.com" <hewenliang4@huawei.com>,
-        "hushiyuan@huawei.com" <hushiyuan@huawei.com>,
-        "luolongjun@huawei.com" <luolongjun@huawei.com>,
-        "hejingxian@huawei.com" <hejingxian@huawei.com>,
-        Joerg Roedel <joro@8bytes.org>
-Date:   Thu, 16 Dec 2021 19:20:55 +0000
-In-Reply-To: <3d8e2d0d-1830-48fb-bc2d-995099f39ef0@amd.com>
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
+        hushiyuan@huawei.com, luolongjun@huawei.com, hejingxian@huawei.com
+Date:   Thu, 16 Dec 2021 19:24:56 +0000
+In-Reply-To: <761c1552-0ca0-403b-3461-8426198180d0@amd.com>
 References: <20211215145633.5238-1-dwmw2@infradead.org>
-         <20211215145633.5238-7-dwmw2@infradead.org>
-         <d10f529e-b1ee-6220-c6fc-80435f0061ee@amd.com>
-         <f25c6ad00689fee6ce3e294393c13f3dcdd5985f.camel@infradead.org>
-         <3d8e2d0d-1830-48fb-bc2d-995099f39ef0@amd.com>
+         <761c1552-0ca0-403b-3461-8426198180d0@amd.com>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-WWkmIz+fMWLrlrRAP/wf"
+        boundary="=-5RF9FfvqskXvLvB+S+1Q"
 User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
@@ -65,117 +54,37 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-WWkmIz+fMWLrlrRAP/wf
+--=-5RF9FfvqskXvLvB+S+1Q
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, 2021-12-16 at 13:00 -0600, Tom Lendacky wrote:
-> On 12/16/21 12:24 PM, David Woodhouse wrote:
-> > On Thu, 2021-12-16 at 08:24 -0600, Tom Lendacky wrote:
+On Thu, 2021-12-16 at 10:27 -0600, Tom Lendacky wrote:
+> On 12/15/21 8:56 AM, David Woodhouse wrote:
+> > Doing the INIT/SIPI/SIPI in parallel for all APs and *then* waiting for
+> > them shaves about 80% off the AP bringup time on a 96-thread socket
+> > Skylake box (EC2 c5.metal) =E2=80=94 from about 500ms to 100ms.
 > >=20
-> > > This will break an SEV-ES guest because CPUID will generate a #VC and=
- a
-> > > #VC handler has not been established yet.
-> > >=20
-> > > I guess for now, you can probably just not enable parallel startup fo=
-r
-> > > SEV-ES guests.
-> >=20
-> > OK, thanks. I'll expand it to allow 24 bits of (physical) APIC ID then,
-> > since it's no longer limited to CPUs without X2APIC. Then we can
-> > refrain from doing parallel bringup for SEV-ES guests, as you suggest.
-> >=20
-> > What precisely is the check I should be using for that?
+> > There are more wins to be had with further parallelisation, but this is
+> > the simple part.
 >=20
-> Calling cc_platform_has(CC_ATTR_GUEST_STATE_ENCRYPT) will return true for=
+> I applied this series and began booting a regular non-SEV guest and hit a=
 =20
-> an SEV-ES guest.
+> failure at 39 vCPUs. No panic or warning, just a reset and OVMF was=20
+> executing again. I'll try to debug what's going, but not sure how quickly=
+=20
+> I'll arrive at anything.
 
-Thanks. Incremental patch (which I'll roll into Thomas's patch) looks a
-bit like this. Testing it now...
+Thanks for testing. This is working for me with BIOS and EFI boots in
+qemu and real hardware but it's mostly been Intel so far. I'll try
+harder on an AMD box.
 
+Anything else special about your setup, kernel config or qemu
+invocation that might help me reproduce?
 
-diff --git a/arch/x86/include/asm/smp.h b/arch/x86/include/asm/smp.h
-index 0b6012fd3e55..1ac33ce1d60e 100644
---- a/arch/x86/include/asm/smp.h
-+++ b/arch/x86/include/asm/smp.h
-@@ -199,7 +199,6 @@ extern unsigned int smpboot_control;
- #endif /* !__ASSEMBLY__ */
-=20
- /* Control bits for startup_64 */
--#define	STARTUP_USE_APICID	0x10000
--#define	STARTUP_USE_CPUID_0B	0x20000
-+#define	STARTUP_PARALLEL	0x80000000
-=20
- #endif /* _ASM_X86_SMP_H */
-diff --git a/arch/x86/kernel/head_64.S b/arch/x86/kernel/head_64.S
-index 0249212e23d2..3e4c3c416bce 100644
---- a/arch/x86/kernel/head_64.S
-+++ b/arch/x86/kernel/head_64.S
-@@ -189,11 +189,10 @@ SYM_INNER_LABEL(secondary_startup_64_no_verify, SYM_L=
-_GLOBAL)
- 	 * Secondary CPUs find out the offsets via the APIC ID. For parallel
- 	 * boot the APIC ID is retrieved from CPUID, otherwise it's encoded
- 	 * in smpboot_control:
--	 * Bit 0-15	APICID if STARTUP_USE_CPUID_0B is not set
--	 * Bit 16 	Secondary boot flag
--	 * Bit 17	Parallel boot flag
-+	 * Bit 0-30	APIC ID if STARTUP_PARALLEL is not set
-+	 * Bit 31	Parallel boot flag (use CPUID leaf 0x0b for APIC ID).
- 	 */
--	testl	$STARTUP_USE_CPUID_0B, %eax
-+	testl	$STARTUP_PARALLEL, %eax
- 	jz	.Lsetup_AP
-=20
- 	mov	$0x0B, %eax
-@@ -203,7 +202,6 @@ SYM_INNER_LABEL(secondary_startup_64_no_verify, SYM_L_G=
-LOBAL)
-=20
- .Lsetup_AP:
- 	/* EAX contains the APICID of the current CPU */
--	andl	$0xFFFF, %eax
- 	xorl	%ecx, %ecx
- 	leaq	cpuid_to_apicid(%rip), %rbx
-=20
-diff --git a/arch/x86/kernel/smpboot.c b/arch/x86/kernel/smpboot.c
-index 725fede281ac..acfb22ce8d4f 100644
---- a/arch/x86/kernel/smpboot.c
-+++ b/arch/x86/kernel/smpboot.c
-@@ -1125,13 +1125,10 @@ static int do_boot_cpu(int apicid, int cpu, struct =
-task_struct *idle,
- 	if (IS_ENABLED(CONFIG_X86_32)) {
- 		early_gdt_descr.address =3D (unsigned long)get_cpu_gdt_rw(cpu);
- 		initial_stack  =3D idle->thread.sp;
--	} else if (boot_cpu_data.cpuid_level < 0x0B) {
--		/* Anything with X2APIC should have CPUID leaf 0x0B */
--		if (WARN_ON_ONCE(x2apic_mode) && apicid > 0xffff)
--			return -EIO;
--		smpboot_control =3D apicid | STARTUP_USE_APICID;
-+	} else if (do_parallel_bringup) {
-+		smpboot_control =3D STARTUP_PARALLEL;
- 	} else {
--		smpboot_control =3D STARTUP_USE_CPUID_0B;
-+		smpboot_control =3D apicid;
- 	}
-=20
- 	/* Enable the espfix hack for this CPU */
-@@ -1553,9 +1550,11 @@ void __init native_smp_prepare_cpus(unsigned int max=
-_cpus)
-=20
- 	/*
- 	 * We can do 64-bit AP bringup in parallel if the CPU reports its
--	 * APIC ID in CPUID leaf 0x0B. Otherwise it's too hard.
-+	 * APIC ID in CPUID leaf 0x0B. Otherwise it's too hard. And not
-+	 * for SEV-ES guests because they can't use CPUID that early.
- 	 */
--	if (IS_ENABLED(CONFIG_X86_32) || boot_cpu_data.cpuid_level < 0x0B)
-+	if (IS_ENABLED(CONFIG_X86_32) || boot_cpu_data.cpuid_level < 0x0B ||
-+	    cc_platform_has(CC_ATTR_GUEST_STATE_ENCRYPT))
- 		do_parallel_bringup =3D false;
-=20
- 	if (do_parallel_bringup)
+If it can repro without KVM, 'qemu -d in_asm' can be extremely useful
+for this kind of thing btw.
 
---=-WWkmIz+fMWLrlrRAP/wf
+--=-5RF9FfvqskXvLvB+S+1Q
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -258,20 +167,20 @@ BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
 BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
 ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
 ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjEx
-MjE2MTkyMDU1WjAvBgkqhkiG9w0BCQQxIgQggIkKAUld+Fk1xZ68ZWinxKJwQvj7pkbSJCKaKK6L
-4mcwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+MjE2MTkyNDU2WjAvBgkqhkiG9w0BCQQxIgQgRt1fP3lsUxUvwoTuTXcyBI8X6e2aKRHzWYznmguN
+50kwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
 TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
 PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
 aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
 A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
 bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBADAvDSrAmtJJNknjzlOKKny2lLdg8Ec+yV8mydwckDiZ/7rq2hHsOiMMb1H5alCP
-9hU3JU3/HYCnOVVEdlX2uqGvld0UL/YHdCg9FaiGuFXWbp730ziLq06LHBEDAmyxMai8i+NYZOQO
-oQIG0Iu1JkshXnd8Eim0xPsmptgY+71DxQA4ZM8c2GWCfnYYf8JrjHsGU9PLgM9fSPQJoqvIx70j
-SX7MVJy0i1+luB9jGByCYg4S/hi0I7VoHmYNPzz4ykjIFq+c/2YumVnO1j5FfFjIUiXSlkNZ+/SK
-FnJMONaGbQ0Xlmdz5iMtuYMWtIj8UWkJ6yjL+AnWzBo7jkSvGU8AAAAAAAA=
+DQEBAQUABIIBABCo7osHNaWKVYblPXBHH6ToLgYxAkgirh5nNXfOeTsuBxBS9cuSe6cmdAi/ch7Z
+glHdhNBkL+8NNi1pCYVVny/6xb2WdJyUrliSLM6ZmuzcwovTm7x4MGmrwTIbDPvKtAtKsNKmklIG
+en30qr4Ek8zmqs0Slu0Mq6wjvuxUEZtI06LUtpIbObv2lBuxk3cwJmRcJaF4sL94WOZhz+cxjZRX
+UHENmzSi3b1W3MeZCVtk9bghwSI9GuRlUd+NwMwQHOZ8NxDhQHmue3rKmzo/R6WwMReYl1ZBCd2i
+PuMDG2K1lBHjMNc4FD85NaScLbfVt3uH/cvWbNxLkmiiPW/xBrgAAAAAAAA=
 
 
---=-WWkmIz+fMWLrlrRAP/wf--
+--=-5RF9FfvqskXvLvB+S+1Q--
 
