@@ -2,211 +2,276 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D3CBE477C1E
-	for <lists+kvm@lfdr.de>; Thu, 16 Dec 2021 20:02:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 31A70477C52
+	for <lists+kvm@lfdr.de>; Thu, 16 Dec 2021 20:21:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240797AbhLPTCU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Dec 2021 14:02:20 -0500
-Received: from mx0b-00069f02.pphosted.com ([205.220.177.32]:49664 "EHLO
-        mx0b-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231410AbhLPTCT (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Thu, 16 Dec 2021 14:02:19 -0500
-Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1BGIn64p016286;
-        Thu, 16 Dec 2021 19:01:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : content-type : in-reply-to :
- mime-version; s=corp-2021-07-09;
- bh=qMhXvCz9GQZ64/zMgvaX3d3miwUZakYOkA2J8hfMhrg=;
- b=TUvXqfjtvjXII16PtXJxf5lN9ND4rQ4Dm+axXIp08lPFZipLt9YZkvaL3TlJjZpIex2z
- 5RxlI2kTmgKDtVfqQsymROnApipX/NJXy9NuQjCIRn8MW1Z5h4bWHDVn6GTIxQ1V6Dn/
- 0s7VrIxlnW8OUB+X5E/768QDvopXokuMq0Dh+WP6CI7+P1JddS7PHzrdwlNsYEm4/xQv
- cRlR5SXcu2CyhlEk58oGoFf23rCiS7Ck0HjgZBXo0VYU9Ul0Nvo8d15QzLPuBAJ/ylji
- UVlRbxi80f5+EtSXxA9mf+KW9xKUes0qUo8RE3KpPvI+LGToz1k4q71GOGDZdDeQBd8E Cg== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3cykmbkruk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 16 Dec 2021 19:01:26 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 1BGIqCiC021259;
-        Thu, 16 Dec 2021 19:01:25 GMT
-Received: from nam02-bn1-obe.outbound.protection.outlook.com (mail-bn1nam07lp2048.outbound.protection.outlook.com [104.47.51.48])
-        by aserp3030.oracle.com with ESMTP id 3cyjuaapkj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 16 Dec 2021 19:01:25 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JqHKYQmSLPEwIUNHTiYSA1nHCYh0wjjN26Chf3w/JZxkeF+5daUbMHjgXVbme7BD/uB7Xh/4L3Qagz9SfYkiNQplMFLii79XVxHojfiGyi/BFifUJZ3jZlFQgwnf54+K+oT+IgaHBH9UiY48pXiVZh3NEff33SKMIgBqyUorE9Rpztq+oZEcyDCzo8iVlHqLzwZLXz7F6UroX3nLar4hQSUD18C4jCWIz04epVlxHYtJa9GvgD0ErW0EtUXGbpvnhzCAUJuoSMXQpB7BawgFgooEGaewQk9BqarPH0tpuofWZkjiEnp/k1Od2mSQYGIaEZP6wOTLoPBuUJojbcx+AA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qMhXvCz9GQZ64/zMgvaX3d3miwUZakYOkA2J8hfMhrg=;
- b=HVI2Cvk3XfoqrwPNN0kwr5OrD2N6YUDXqtvmwsBoimTdog9X6rokH6BhrKW8zNhH1KyoCxzpdYlClJucNKeitYAbMfekUhRFbMCSuCzKH8zUpaWKfcQmIIfZvnxS4mHYKvHAoTiDgQWtIc8Im2Z9rarToPs+HolNcbabFR/vgoYnFrri5bYF9iK5zqMJ6e6lOReLNbqbh80xGP5gKA0rrTjzzDUwdqRmatZmoz5ZUTfK4g7WXOphIW8KRbFSzYFcU0WvQhK5DxUU+G7SFmSgiSGMk5WP+dJPQDIW4E73dYs7D8Teik9Ara4ynD1Hw301ZqMOsuNJ+x4ph0s9v5V0LA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qMhXvCz9GQZ64/zMgvaX3d3miwUZakYOkA2J8hfMhrg=;
- b=foCzHsgz66IH0z9AJo0aqb+VNg5moOccNNc/attef8DIfqAlBsL0VEYI4QAF/YKXwRgbcmWnCVsFuoVM33JiGaOEEEp3tIGzhKDDa+qyXeg4Zu7v+nrFZsp4jy5eoPMqgrLnDg9GyHvEsu2s+P5CFpMh3INgkkn8FnV12MqQMjk=
-Received: from SN6PR10MB2576.namprd10.prod.outlook.com (2603:10b6:805:44::15)
- by SN6PR10MB2621.namprd10.prod.outlook.com (2603:10b6:805:49::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4801.14; Thu, 16 Dec
- 2021 19:01:22 +0000
-Received: from SN6PR10MB2576.namprd10.prod.outlook.com
- ([fe80::4c8c:47df:f81e:f412]) by SN6PR10MB2576.namprd10.prod.outlook.com
- ([fe80::4c8c:47df:f81e:f412%5]) with mapi id 15.20.4801.015; Thu, 16 Dec 2021
- 19:01:22 +0000
-Date:   Thu, 16 Dec 2021 13:01:13 -0600
-From:   Venu Busireddy <venu.busireddy@oracle.com>
-To:     Brijesh Singh <brijesh.singh@amd.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
+        id S240872AbhLPTVR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Dec 2021 14:21:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57284 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232973AbhLPTVR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Dec 2021 14:21:17 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF55EC061574;
+        Thu, 16 Dec 2021 11:21:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=/zSsJvbx138/k5jm0hV5yqkFOYtq99WfAJC/54IF1a0=; b=4g6rO0OXhkwvqdsMMxTZW0b2AS
+        eK3WwFHb8Yk8IXZbUGznUwRhsTZ3allaLeGfVK+UtASNHjttuhfbdfGvWFWZb8TZ9E4U4KwPIIGE5
+        IA3NyrYXtjy7eNsGt05UGiSqUHfFjUuYuyPYDmRDRloyPFh6hpP94BLA9rYPkT5UwAssdD13Rzdjz
+        MTSVhwayPAmu9cP9ipRvRYfKBT/6LJ/ueMnnHBjZkhXjIt3Ym16Qr+uxsNMjHOmPDMIQhpf36+rtI
+        H1Pd5e9bmtE2D0ZXZwRpmrXGTGAR6QX51RlhkOc3q3pdKTFgvIOK15LvcziaifhsPUvGKH7kugvB4
+        dYbGFe1Q==;
+Received: from [2001:8b0:10b:1::3ae] (helo=u3832b3a9db3152.ant.amazon.com)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1mxwJI-007L08-Lo; Thu, 16 Dec 2021 19:21:01 +0000
+Message-ID: <e742473935bf81be84adea6fa8061ce0846cc630.camel@infradead.org>
+Subject: Re: [PATCH v3 6/9] x86/smpboot: Support parallel startup of
+ secondary CPUs
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Tom Lendacky <thomas.lendacky@amd.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+Cc:     Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-Subject: Re: [PATCH v8 06/40] x86/sev: Check SEV-SNP features support
-Message-ID: <YbuM+WgDr+wL+jsu@dt>
-References: <20211210154332.11526-1-brijesh.singh@amd.com>
- <20211210154332.11526-7-brijesh.singh@amd.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211210154332.11526-7-brijesh.singh@amd.com>
-X-ClientProxiedBy: SJ0PR03CA0273.namprd03.prod.outlook.com
- (2603:10b6:a03:39e::8) To SN6PR10MB2576.namprd10.prod.outlook.com
- (2603:10b6:805:44::15)
+        "x86@kernel.org" <x86@kernel.org>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Paul E . McKenney" <paulmck@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "rcu@vger.kernel.org" <rcu@vger.kernel.org>,
+        "mimoja@mimoja.de" <mimoja@mimoja.de>,
+        "hewenliang4@huawei.com" <hewenliang4@huawei.com>,
+        "hushiyuan@huawei.com" <hushiyuan@huawei.com>,
+        "luolongjun@huawei.com" <luolongjun@huawei.com>,
+        "hejingxian@huawei.com" <hejingxian@huawei.com>,
+        Joerg Roedel <joro@8bytes.org>
+Date:   Thu, 16 Dec 2021 19:20:55 +0000
+In-Reply-To: <3d8e2d0d-1830-48fb-bc2d-995099f39ef0@amd.com>
+References: <20211215145633.5238-1-dwmw2@infradead.org>
+         <20211215145633.5238-7-dwmw2@infradead.org>
+         <d10f529e-b1ee-6220-c6fc-80435f0061ee@amd.com>
+         <f25c6ad00689fee6ce3e294393c13f3dcdd5985f.camel@infradead.org>
+         <3d8e2d0d-1830-48fb-bc2d-995099f39ef0@amd.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-WWkmIz+fMWLrlrRAP/wf"
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 13783614-086a-4af3-4f9b-08d9c0c67387
-X-MS-TrafficTypeDiagnostic: SN6PR10MB2621:EE_
-X-Microsoft-Antispam-PRVS: <SN6PR10MB2621C28633AE07CD0A9EEC5BE6779@SN6PR10MB2621.namprd10.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: mxOlVpK17IHKc8imJn+kGZn3wV7jKat76yDJV6CXvIyrJJBTyqlkXDMzx8M38Z/+zkni+GyC/zZ7I7wPSQmUqZ7zUg5mwpICxt7AC/E0vmOyCT+WMgrQsJaP/4dOTvvci3V0Z2TK2r6MQoCHwSe6AAqx5VINzzIysxfi4OI/GV+m1gJTA9UqT2YeYtONtoIw94xzJh0PsoY5gU5NnYQO92h4dS9kZJgu3vel3jkh0SHiOV9NJRHhIhWYIuea5a0um6EZYtHdFfAM45KKsuYPKvIJzHphwgWFOinl5DZnnlhyQ67/SbyrM5ddnkrYWDT8wk7+KrGiABMRGzRVXpDJeZLQGUWWToXbqSutNr2uwHfTR0m4lojXQDwlMs+rM1xrkmPmxSowMg8YzQ6FHBcB8sYWmEvSQQitMwkEyWMRInnUzBQ09ScneMe7+SYk6neA4WiMM+oan4NcGfvLiVvY1L9oWBnE8Q2D7gi2H2dhltIAHGyJz5e4MBgt0Bx4f1dRIkEzQ+9T7MMQDJk+ybfQP91/Vdpo6daJ+7aTo7AzrfhoCv601ocg7MfWICFmh7M0Y7hOkGCxTEb6oT8/TznwRla23gMv7OcTBT9X5MKN/U4my6JbAg3hdzRWvYBK5NVGrj8LkWici+QO6lCRPvWS6g==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR10MB2576.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(7916004)(366004)(26005)(83380400001)(8676002)(54906003)(33716001)(38100700002)(6512007)(316002)(4326008)(6506007)(186003)(508600001)(6486002)(44832011)(7406005)(8936002)(9686003)(6916009)(86362001)(6666004)(53546011)(7416002)(4001150100001)(66946007)(66476007)(5660300002)(2906002)(66556008);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?eAGEdmBrNuMdeggd0NZWBM3lrllqd0TBmywtiHbtmWqpe578XB6YvfUiOOXB?=
- =?us-ascii?Q?JnXaatGQ4k8xSd6uiw+pZpCo2GXbwEvXFOkbOIR1VYaqTnepIcZLmBPPFzj2?=
- =?us-ascii?Q?TJ5aZqjwMTqQ+VbRjgYdUOmQvnQLMSRynyY71NUTuasQrfZChNH5WT19sPaX?=
- =?us-ascii?Q?TbgOeK5Y11OySmFgj9widXzynw4gNzxZou6pkaFrBnZWiBxrr4znxHbOtmmP?=
- =?us-ascii?Q?pqrGtm6UVW7OwYBIxPGH2Tu5gg16gfa2/Dnqb2/oR6g/kxBQX8Q9azCWjJKb?=
- =?us-ascii?Q?x67PVd8Su+CIHb9FSWmyu5P6N6TILOVBSG+OzcjZXLmkKSFcg83RW8snQU1d?=
- =?us-ascii?Q?swEBkcWZeb7o/a5G3DKxD96xyjNyCQ/m/gubCVMX9uxTdVvVJLbNpxp8mGud?=
- =?us-ascii?Q?HpD+4PxWFtDql+lDXHFCy5kHohwJnrpcNKTjKoy7fRbsbAzUCD23S1M2o0j1?=
- =?us-ascii?Q?ZSGH5iWnWL6zi4JCd7BkKxy5FbRZ2BDdRDV2FMYY0+gX3dCO81JbVZWKZuTM?=
- =?us-ascii?Q?R9V1jv/KaI9zD5hklngVC/YqeqosJRfejg6ZlK5H7RXuU6SSDB2gjzVCpdaC?=
- =?us-ascii?Q?cbMaHaFYIkqUhvreaSU0iropC4c6l/9eihsmxkMtqoBHgyWqIOBg1wfAlZ9C?=
- =?us-ascii?Q?ypIrSvSgLxWFN9i7zTwgX/IiXMLHw+SxelOTEkxWtgwR5k+6DuxdW5tVD4qH?=
- =?us-ascii?Q?HgysUB8XYQpTJ4Shv9Cmkl4EXlT3wkvt6V3MhKv+I4bPfqXxG3Y9QqXyfHTz?=
- =?us-ascii?Q?FHg05iAvNRG4Kq0QYjbLbpOirSbNN1kJ1SIP5lGRckH9LEkVtagV/YYoubHe?=
- =?us-ascii?Q?RqBQ6NH+5JItwev3deZ+Z+MLco9CqqxYFy6rL+NLaQrCWphQwlXaKhQMrb9h?=
- =?us-ascii?Q?tPI9c8wVjo9t3r6NouRTCW5lmIqWcljPromi/5JU+Y3DaAJgY3OzTnW4Zm1H?=
- =?us-ascii?Q?/5PXMWJRfBfzFZRVkj3syBQmLp+miNHhsZxLPKrl+KJ4zKJ9ZddbQ+fOcmmj?=
- =?us-ascii?Q?m7O8zyVUNJ12+kC0Br8C7v2GtV7aR/RGptciZ9JAUAKpHN41eo0UYu6rYwcA?=
- =?us-ascii?Q?23uLAc7mtozkaQuiP8WpbRSaThLjhyw3ns0GhwVilupBGPRli4VNtsaActQw?=
- =?us-ascii?Q?A8gp4TJ2N+NBigD3TEoxeH0prKHKVxVAM4xAMZos69o8Aj3mqeSk2IRKLzf6?=
- =?us-ascii?Q?9NTv79JIqvRoLcoVJPJEg5DEjpNH47Og5HAzD/P80Lk8mZIf4GoNhehPdNJ6?=
- =?us-ascii?Q?BLGuEZPwB8ONkLeTvx1mxLOf9JewnHcBsXGp6q52xTXXygOjVMFv1OWtMi2w?=
- =?us-ascii?Q?CHfmyLzup0S2cG80cRaJeYzvJruMkNcRFNA3IRnFR33U3exCK238XE8xvqdt?=
- =?us-ascii?Q?NALTU12fe82LGISW+C80DaZjUUzYbjaYPDRIideO0EGeGx6QePBUZuaLAS43?=
- =?us-ascii?Q?42V3tUyut3YwjDZMfB81uhK+vaU0IL9dnP9GgTkbhQ9D2A2dtK45XgKF8z68?=
- =?us-ascii?Q?ARmius8bTUaL+JVrrel0PGqcUmLGgKVxD+tSFLn9ngK3c+4/7UWm2a7AP0aj?=
- =?us-ascii?Q?fYem68PbFoFR9D3LN9wmUMvFyDQuz/D3PpZk9BT10yuPl2ZmK3N7olYZ0vIh?=
- =?us-ascii?Q?ElXnyftL+BGm+kc1wRwe4oGkGOI5EN8uUDJMd6A2l2/2ZV6ZVHkkV4CZScFO?=
- =?us-ascii?Q?QimV1Q=3D=3D?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 13783614-086a-4af3-4f9b-08d9c0c67387
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR10MB2576.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Dec 2021 19:01:22.6079
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: KqgROCoRgFZ8ifw4SX+Y7NHvtAMzXYF/uarD0E1UrYyuN0JwBahLuhlI593sWHyXQ8VD+uxt+VbuRlk0SRkEG2uWxo0fs4QLdTSUF+RpRTc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR10MB2621
-X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10200 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 phishscore=0
- spamscore=0 mlxscore=0 adultscore=0 bulkscore=0 suspectscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2112160105
-X-Proofpoint-ORIG-GUID: jbccMwoIjphroNV3RQFMZLVeopGdnTU9
-X-Proofpoint-GUID: jbccMwoIjphroNV3RQFMZLVeopGdnTU9
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2021-12-10 09:42:58 -0600, Brijesh Singh wrote:
-> Version 2 of the GHCB specification added the advertisement of features
-> that are supported by the hypervisor. If hypervisor supports the SEV-SNP
-> then it must set the SEV-SNP features bit to indicate that the base
-> SEV-SNP is supported.
-> 
-> Check the SEV-SNP feature while establishing the GHCB, if failed,
-> terminate the guest.
-> 
-> Version 2 of GHCB specification adds several new NAEs, most of them are
-> optional except the hypervisor feature. Now that hypervisor feature NAE
-> is implemented, so bump the GHCB maximum support protocol version.
-> 
-> While at it, move the GHCB protocol negotitation check from VC exception
-> handler to sev_enable() so that all feature detection happens before
-> the first VC exception.
-> 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> ---
->  arch/x86/boot/compressed/sev.c    | 21 ++++++++++++++++-----
->  arch/x86/include/asm/sev-common.h |  6 ++++++
->  arch/x86/include/asm/sev.h        |  2 +-
->  arch/x86/include/uapi/asm/svm.h   |  2 ++
->  arch/x86/kernel/sev-shared.c      | 20 ++++++++++++++++++++
->  arch/x86/kernel/sev.c             | 16 ++++++++++++++++
->  6 files changed, 61 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/x86/boot/compressed/sev.c b/arch/x86/boot/compressed/sev.c
-> index 0b6cc6402ac1..a0708f359a46 100644
-> --- a/arch/x86/boot/compressed/sev.c
-> +++ b/arch/x86/boot/compressed/sev.c
-> @@ -119,11 +119,8 @@ static enum es_result vc_read_mem(struct es_em_ctxt *ctxt,
->  /* Include code for early handlers */
->  #include "../../kernel/sev-shared.c"
->  
-> -static bool early_setup_sev_es(void)
-> +static bool early_setup_ghcb(void)
->  {
-> -	if (!sev_es_negotiate_protocol())
-> -		sev_es_terminate(SEV_TERM_SET_GEN, GHCB_SEV_ES_PROT_UNSUPPORTED);
 
-Should the name sev_es_terminate() be changed to a more generic
-name, as we are simply terminating the guest, not SEV or ES as the
-name implies?
+--=-WWkmIz+fMWLrlrRAP/wf
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Other than that...
+On Thu, 2021-12-16 at 13:00 -0600, Tom Lendacky wrote:
+> On 12/16/21 12:24 PM, David Woodhouse wrote:
+> > On Thu, 2021-12-16 at 08:24 -0600, Tom Lendacky wrote:
+> >=20
+> > > This will break an SEV-ES guest because CPUID will generate a #VC and=
+ a
+> > > #VC handler has not been established yet.
+> > >=20
+> > > I guess for now, you can probably just not enable parallel startup fo=
+r
+> > > SEV-ES guests.
+> >=20
+> > OK, thanks. I'll expand it to allow 24 bits of (physical) APIC ID then,
+> > since it's no longer limited to CPUs without X2APIC. Then we can
+> > refrain from doing parallel bringup for SEV-ES guests, as you suggest.
+> >=20
+> > What precisely is the check I should be using for that?
+>=20
+> Calling cc_platform_has(CC_ATTR_GUEST_STATE_ENCRYPT) will return true for=
+=20
+> an SEV-ES guest.
 
-Reviewed-by: Venu Busireddy <venu.busireddy@oracle.com>
+Thanks. Incremental patch (which I'll roll into Thomas's patch) looks a
+bit like this. Testing it now...
+
+
+diff --git a/arch/x86/include/asm/smp.h b/arch/x86/include/asm/smp.h
+index 0b6012fd3e55..1ac33ce1d60e 100644
+--- a/arch/x86/include/asm/smp.h
++++ b/arch/x86/include/asm/smp.h
+@@ -199,7 +199,6 @@ extern unsigned int smpboot_control;
+ #endif /* !__ASSEMBLY__ */
+=20
+ /* Control bits for startup_64 */
+-#define	STARTUP_USE_APICID	0x10000
+-#define	STARTUP_USE_CPUID_0B	0x20000
++#define	STARTUP_PARALLEL	0x80000000
+=20
+ #endif /* _ASM_X86_SMP_H */
+diff --git a/arch/x86/kernel/head_64.S b/arch/x86/kernel/head_64.S
+index 0249212e23d2..3e4c3c416bce 100644
+--- a/arch/x86/kernel/head_64.S
++++ b/arch/x86/kernel/head_64.S
+@@ -189,11 +189,10 @@ SYM_INNER_LABEL(secondary_startup_64_no_verify, SYM_L=
+_GLOBAL)
+ 	 * Secondary CPUs find out the offsets via the APIC ID. For parallel
+ 	 * boot the APIC ID is retrieved from CPUID, otherwise it's encoded
+ 	 * in smpboot_control:
+-	 * Bit 0-15	APICID if STARTUP_USE_CPUID_0B is not set
+-	 * Bit 16 	Secondary boot flag
+-	 * Bit 17	Parallel boot flag
++	 * Bit 0-30	APIC ID if STARTUP_PARALLEL is not set
++	 * Bit 31	Parallel boot flag (use CPUID leaf 0x0b for APIC ID).
+ 	 */
+-	testl	$STARTUP_USE_CPUID_0B, %eax
++	testl	$STARTUP_PARALLEL, %eax
+ 	jz	.Lsetup_AP
+=20
+ 	mov	$0x0B, %eax
+@@ -203,7 +202,6 @@ SYM_INNER_LABEL(secondary_startup_64_no_verify, SYM_L_G=
+LOBAL)
+=20
+ .Lsetup_AP:
+ 	/* EAX contains the APICID of the current CPU */
+-	andl	$0xFFFF, %eax
+ 	xorl	%ecx, %ecx
+ 	leaq	cpuid_to_apicid(%rip), %rbx
+=20
+diff --git a/arch/x86/kernel/smpboot.c b/arch/x86/kernel/smpboot.c
+index 725fede281ac..acfb22ce8d4f 100644
+--- a/arch/x86/kernel/smpboot.c
++++ b/arch/x86/kernel/smpboot.c
+@@ -1125,13 +1125,10 @@ static int do_boot_cpu(int apicid, int cpu, struct =
+task_struct *idle,
+ 	if (IS_ENABLED(CONFIG_X86_32)) {
+ 		early_gdt_descr.address =3D (unsigned long)get_cpu_gdt_rw(cpu);
+ 		initial_stack  =3D idle->thread.sp;
+-	} else if (boot_cpu_data.cpuid_level < 0x0B) {
+-		/* Anything with X2APIC should have CPUID leaf 0x0B */
+-		if (WARN_ON_ONCE(x2apic_mode) && apicid > 0xffff)
+-			return -EIO;
+-		smpboot_control =3D apicid | STARTUP_USE_APICID;
++	} else if (do_parallel_bringup) {
++		smpboot_control =3D STARTUP_PARALLEL;
+ 	} else {
+-		smpboot_control =3D STARTUP_USE_CPUID_0B;
++		smpboot_control =3D apicid;
+ 	}
+=20
+ 	/* Enable the espfix hack for this CPU */
+@@ -1553,9 +1550,11 @@ void __init native_smp_prepare_cpus(unsigned int max=
+_cpus)
+=20
+ 	/*
+ 	 * We can do 64-bit AP bringup in parallel if the CPU reports its
+-	 * APIC ID in CPUID leaf 0x0B. Otherwise it's too hard.
++	 * APIC ID in CPUID leaf 0x0B. Otherwise it's too hard. And not
++	 * for SEV-ES guests because they can't use CPUID that early.
+ 	 */
+-	if (IS_ENABLED(CONFIG_X86_32) || boot_cpu_data.cpuid_level < 0x0B)
++	if (IS_ENABLED(CONFIG_X86_32) || boot_cpu_data.cpuid_level < 0x0B ||
++	    cc_platform_has(CC_ATTR_GUEST_STATE_ENCRYPT))
+ 		do_parallel_bringup =3D false;
+=20
+ 	if (do_parallel_bringup)
+
+--=-WWkmIz+fMWLrlrRAP/wf
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCECow
+ggUcMIIEBKADAgECAhEA4rtJSHkq7AnpxKUY8ZlYZjANBgkqhkiG9w0BAQsFADCBlzELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
+A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
+bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTkwMTAyMDAwMDAwWhcNMjIwMTAxMjM1
+OTU5WjAkMSIwIAYJKoZIhvcNAQkBFhNkd213MkBpbmZyYWRlYWQub3JnMIIBIjANBgkqhkiG9w0B
+AQEFAAOCAQ8AMIIBCgKCAQEAsv3wObLTCbUA7GJqKj9vHGf+Fa+tpkO+ZRVve9EpNsMsfXhvFpb8
+RgL8vD+L133wK6csYoDU7zKiAo92FMUWaY1Hy6HqvVr9oevfTV3xhB5rQO1RHJoAfkvhy+wpjo7Q
+cXuzkOpibq2YurVStHAiGqAOMGMXhcVGqPuGhcVcVzVUjsvEzAV9Po9K2rpZ52FE4rDkpDK1pBK+
+uOAyOkgIg/cD8Kugav5tyapydeWMZRJQH1vMQ6OVT24CyAn2yXm2NgTQMS1mpzStP2ioPtTnszIQ
+Ih7ASVzhV6csHb8Yrkx8mgllOyrt9Y2kWRRJFm/FPRNEurOeNV6lnYAXOymVJwIDAQABo4IB0zCC
+Ac8wHwYDVR0jBBgwFoAUgq9sjPjF/pZhfOgfPStxSF7Ei8AwHQYDVR0OBBYEFLfuNf820LvaT4AK
+xrGK3EKx1DE7MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUF
+BwMEBggrBgEFBQcDAjBGBgNVHSAEPzA9MDsGDCsGAQQBsjEBAgEDBTArMCkGCCsGAQUFBwIBFh1o
+dHRwczovL3NlY3VyZS5jb21vZG8ubmV0L0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3Js
+LmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWls
+Q0EuY3JsMIGLBggrBgEFBQcBAQR/MH0wVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuY29tb2RvY2Eu
+Y29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYI
+KwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmNvbW9kb2NhLmNvbTAeBgNVHREEFzAVgRNkd213MkBpbmZy
+YWRlYWQub3JnMA0GCSqGSIb3DQEBCwUAA4IBAQALbSykFusvvVkSIWttcEeifOGGKs7Wx2f5f45b
+nv2ghcxK5URjUvCnJhg+soxOMoQLG6+nbhzzb2rLTdRVGbvjZH0fOOzq0LShq0EXsqnJbbuwJhK+
+PnBtqX5O23PMHutP1l88AtVN+Rb72oSvnD+dK6708JqqUx2MAFLMevrhJRXLjKb2Mm+/8XBpEw+B
+7DisN4TMlLB/d55WnT9UPNHmQ+3KFL7QrTO8hYExkU849g58Dn3Nw3oCbMUgny81ocrLlB2Z5fFG
+Qu1AdNiBA+kg/UxzyJZpFbKfCITd5yX49bOriL692aMVDyqUvh8fP+T99PqorH4cIJP6OxSTdxKM
+MIIFHDCCBASgAwIBAgIRAOK7SUh5KuwJ6cSlGPGZWGYwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
+ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTE5MDEwMjAwMDAwMFoXDTIyMDEwMTIz
+NTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCASIwDQYJKoZIhvcN
+AQEBBQADggEPADCCAQoCggEBALL98Dmy0wm1AOxiaio/bxxn/hWvraZDvmUVb3vRKTbDLH14bxaW
+/EYC/Lw/i9d98CunLGKA1O8yogKPdhTFFmmNR8uh6r1a/aHr301d8YQea0DtURyaAH5L4cvsKY6O
+0HF7s5DqYm6tmLq1UrRwIhqgDjBjF4XFRqj7hoXFXFc1VI7LxMwFfT6PStq6WedhROKw5KQytaQS
+vrjgMjpICIP3A/CroGr+bcmqcnXljGUSUB9bzEOjlU9uAsgJ9sl5tjYE0DEtZqc0rT9oqD7U57My
+ECIewElc4VenLB2/GK5MfJoJZTsq7fWNpFkUSRZvxT0TRLqznjVepZ2AFzsplScCAwEAAaOCAdMw
+ggHPMB8GA1UdIwQYMBaAFIKvbIz4xf6WYXzoHz0rcUhexIvAMB0GA1UdDgQWBBS37jX/NtC72k+A
+CsaxitxCsdQxOzAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEF
+BQcDBAYIKwYBBQUHAwIwRgYDVR0gBD8wPTA7BgwrBgEEAbIxAQIBAwUwKzApBggrBgEFBQcCARYd
+aHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9DUFMwWgYDVR0fBFMwUTBPoE2gS4ZJaHR0cDovL2Ny
+bC5jb21vZG9jYS5jb20vQ09NT0RPUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFp
+bENBLmNybDCBiwYIKwYBBQUHAQEEfzB9MFUGCCsGAQUFBzAChklodHRwOi8vY3J0LmNvbW9kb2Nh
+LmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3J0MCQG
+CCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAC20spBbrL71ZEiFrbXBHonzhhirO1sdn+X+O
+W579oIXMSuVEY1LwpyYYPrKMTjKECxuvp24c829qy03UVRm742R9Hzjs6tC0oatBF7KpyW27sCYS
+vj5wbal+TttzzB7rT9ZfPALVTfkW+9qEr5w/nSuu9PCaqlMdjABSzHr64SUVy4ym9jJvv/FwaRMP
+gew4rDeEzJSwf3eeVp0/VDzR5kPtyhS+0K0zvIWBMZFPOPYOfA59zcN6AmzFIJ8vNaHKy5QdmeXx
+RkLtQHTYgQPpIP1Mc8iWaRWynwiE3ecl+PWzq4i+vdmjFQ8qlL4fHz/k/fT6qKx+HCCT+jsUk3cS
+jDCCBeYwggPOoAMCAQICEGqb4Tg7/ytrnwHV2binUlYwDQYJKoZIhvcNAQEMBQAwgYUxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMSswKQYDVQQDEyJDT01PRE8gUlNBIENlcnRpZmljYXRp
+b24gQXV0aG9yaXR5MB4XDTEzMDExMDAwMDAwMFoXDTI4MDEwOTIzNTk1OVowgZcxCzAJBgNVBAYT
+AkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNV
+BAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAvrOeV6wodnVAFsc4A5jTxhh2IVDzJXkLTLWg0X06WD6cpzEup/Y0dtmEatrQPTRI5Or1u6zf
++bGBSyD9aH95dDSmeny1nxdlYCeXIoymMv6pQHJGNcIDpFDIMypVpVSRsivlJTRENf+RKwrB6vcf
+WlP8dSsE3Rfywq09N0ZfxcBa39V0wsGtkGWC+eQKiz4pBZYKjrc5NOpG9qrxpZxyb4o4yNNwTqza
+aPpGRqXB7IMjtf7tTmU2jqPMLxFNe1VXj9XB1rHvbRikw8lBoNoSWY66nJN/VCJv5ym6Q0mdCbDK
+CMPybTjoNCQuelc0IAaO4nLUXk0BOSxSxt8kCvsUtQIDAQABo4IBPDCCATgwHwYDVR0jBBgwFoAU
+u69+Aj36pvE8hI6t7jiY7NkyMtQwHQYDVR0OBBYEFIKvbIz4xf6WYXzoHz0rcUhexIvAMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMBEGA1UdIAQKMAgwBgYEVR0gADBMBgNVHR8E
+RTBDMEGgP6A9hjtodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDZXJ0aWZpY2F0aW9u
+QXV0aG9yaXR5LmNybDBxBggrBgEFBQcBAQRlMGMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9jcnQuY29t
+b2RvY2EuY29tL0NPTU9ET1JTQUFkZFRydXN0Q0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2Nz
+cC5jb21vZG9jYS5jb20wDQYJKoZIhvcNAQEMBQADggIBAHhcsoEoNE887l9Wzp+XVuyPomsX9vP2
+SQgG1NgvNc3fQP7TcePo7EIMERoh42awGGsma65u/ITse2hKZHzT0CBxhuhb6txM1n/y78e/4ZOs
+0j8CGpfb+SJA3GaBQ+394k+z3ZByWPQedXLL1OdK8aRINTsjk/H5Ns77zwbjOKkDamxlpZ4TKSDM
+KVmU/PUWNMKSTvtlenlxBhh7ETrN543j/Q6qqgCWgWuMAXijnRglp9fyadqGOncjZjaaSOGTTFB+
+E2pvOUtY+hPebuPtTbq7vODqzCM6ryEhNhzf+enm0zlpXK7q332nXttNtjv7VFNYG+I31gnMrwfH
+M5tdhYF/8v5UY5g2xANPECTQdu9vWPoqNSGDt87b3gXb1AiGGaI06vzgkejL580ul+9hz9D0S0U4
+jkhJiA7EuTecP/CFtR72uYRBcunwwH3fciPjviDDAI9SnC/2aPY8ydehzuZutLbZdRJ5PDEJM/1t
+yZR2niOYihZ+FCbtf3D9mB12D4ln9icgc7CwaxpNSCPt8i/GqK2HsOgkL3VYnwtx7cJUmpvVdZ4o
+gnzgXtgtdk3ShrtOS1iAN2ZBXFiRmjVzmehoMof06r1xub+85hFQzVxZx5/bRaTKTlL8YXLI8nAb
+R9HWdFqzcOoB/hxfEyIQpx9/s81rgzdEZOofSlZHynoSMYIDyjCCA8YCAQEwga0wgZcxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
+ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
+ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjEx
+MjE2MTkyMDU1WjAvBgkqhkiG9w0BCQQxIgQggIkKAUld+Fk1xZ68ZWinxKJwQvj7pkbSJCKaKK6L
+4mcwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
+PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
+aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
+A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
+bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
+DQEBAQUABIIBADAvDSrAmtJJNknjzlOKKny2lLdg8Ec+yV8mydwckDiZ/7rq2hHsOiMMb1H5alCP
+9hU3JU3/HYCnOVVEdlX2uqGvld0UL/YHdCg9FaiGuFXWbp730ziLq06LHBEDAmyxMai8i+NYZOQO
+oQIG0Iu1JkshXnd8Eim0xPsmptgY+71DxQA4ZM8c2GWCfnYYf8JrjHsGU9PLgM9fSPQJoqvIx70j
+SX7MVJy0i1+luB9jGByCYg4S/hi0I7VoHmYNPzz4ykjIFq+c/2YumVnO1j5FfFjIUiXSlkNZ+/SK
+FnJMONaGbQ0Xlmdz5iMtuYMWtIj8UWkJ6yjL+AnWzBo7jkSvGU8AAAAAAAA=
+
+
+--=-WWkmIz+fMWLrlrRAP/wf--
 
