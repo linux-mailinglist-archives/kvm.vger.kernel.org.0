@@ -2,61 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 731704767CC
-	for <lists+kvm@lfdr.de>; Thu, 16 Dec 2021 03:19:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3BD4B4767CE
+	for <lists+kvm@lfdr.de>; Thu, 16 Dec 2021 03:19:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232821AbhLPCTY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 15 Dec 2021 21:19:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45466 "EHLO
+        id S232833AbhLPCTb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 15 Dec 2021 21:19:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229955AbhLPCTX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 15 Dec 2021 21:19:23 -0500
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09372C061574;
-        Wed, 15 Dec 2021 18:19:23 -0800 (PST)
-Received: by mail-pg1-x52d.google.com with SMTP id f125so21748649pgc.0;
-        Wed, 15 Dec 2021 18:19:23 -0800 (PST)
+        with ESMTP id S232836AbhLPCTa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 15 Dec 2021 21:19:30 -0500
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1504C06173E;
+        Wed, 15 Dec 2021 18:19:29 -0800 (PST)
+Received: by mail-pj1-x1029.google.com with SMTP id x1-20020a17090a2b0100b001b103e48cfaso1007652pjc.0;
+        Wed, 15 Dec 2021 18:19:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=jQV7FfPG/i8kPxltYpwfNsq8SB4s3/l4Q6kb1p2cVFA=;
-        b=iQgjLSKvkj+yHSVeQJYFXpzEAQWq+NPItDT4Wa4q3FxXVdzZd8OeKVjESiF66O9c+I
-         1dtSLL4On4zLRLYxrPbVlTEBqVPCYFjjdvzW+UCqLBoH2k2pQJmZRAH/8T4b9Kbw8pEX
-         m2JhUnz2I2FuKTp57+2VNzjs3cCTwBKpmKrfcWrYC075O0BkKBE62kEomHdvEk3qf75B
-         lww/R3Ac8YDvV8tKHdfANXdF6miPn6T0hprvgdFVmL2F1oMb3DpaSGFcsfuflYmhtuGV
-         jOx8+S+P6hkiARNSlWh7AaJjuXJuFBPMfRLh8D+ntNkhHKqRjCb8r1eTng7lFzFlXCRP
-         aMQw==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=3zlEE86FcAx6r0dZXJsCvgarwdcik5/I5BPIqtrkrAo=;
+        b=QlCYncsP5gdmeUCiKHKeTsFvcyvAqok5CbopbK9Ial/jmXmwj4xG6x5PbpNRPOGGEy
+         cZZ2qwJMwjv6iXriYVGUM2FX8V6joZHh6uqiHXzE9FuaoY8xsgNwUI+QXL2Z36hT3mfc
+         P0WLiJD1LAk18rw9y3deRhBbhEuUC/CTkslwWjiDoBFky5krfxRU+xnWGyIBvjpMN5Yx
+         jAr8q61ukTaQgTLMfiwJqCWV+0XhMQIOnx4ongEeie4GGjnvu8nrYgnl7gvGs3S97fZB
+         x3W7eMQuM3UWvekBiUpmiCLT6NDPhMvhcBjjm4nD6h7ld7eBs6GBSJSAOmj6gy31DteY
+         vGBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=jQV7FfPG/i8kPxltYpwfNsq8SB4s3/l4Q6kb1p2cVFA=;
-        b=tPCC9Ooc2nWuGzAabpCHRVo69+ireA6c5xRL2tED3kRCZPv0FQu50757kX4Lo8tIGa
-         2HDd7GtipRPzPf2UjnuPm5VGrbi2HJ2lIC4WhoxC+NWajQwRfsfNmFXSLoo2Uwakph1W
-         DM6VR+UASgnx73Fg78T6WKFEdAqhHEP+MDVUFoD7dIAqklLwhLSwxT11jfKdJFCEZac3
-         3iQ6giCLcjZYlzP+0fuYpMNPdUWO/rrFiQsRYXNpRocAaAt4ilcEIKLXuZ6fIZyH3+zl
-         2gy5x6nPSSXk+9IJQ8q+27oAXcOsGSzZfa1pw/KD33FFalnMZWE1DjmtV3GAuHByJH8p
-         swEw==
-X-Gm-Message-State: AOAM531xgAnRDRbNrAp08+2CI2gmPqNCJfIkBVA8Gj2usodOyZqlShRm
-        bgy/7/2B5OFOfqqZNca/7szSJP9LX3ICCg==
-X-Google-Smtp-Source: ABdhPJz/ovzEFvbLSkyH78y2230v4/B2RolhcPGN89OcTDMllxm3WHSMK0CFDx2x3Tesff+0UGyxBA==
-X-Received: by 2002:a65:6895:: with SMTP id e21mr9995968pgt.546.1639621162188;
-        Wed, 15 Dec 2021 18:19:22 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=3zlEE86FcAx6r0dZXJsCvgarwdcik5/I5BPIqtrkrAo=;
+        b=sXcupMHWQqww1/gW7Gc/eyYdqfsFd2t/zoi+n90VIyMWNNvrjpV1ACq1a/FD2teb56
+         wJh22p7YM3GMAd3qYyeYkeiFEHDxISlBFGqvmeB5Efg4imt1IJKNsnJI5BYO5j02SUt/
+         0wPUJ7vIjVR5egr/NyXkwGPEwcjb6fP7O4DjCnWZVmsoZBYjCc+tCP+ORV3APTlOV0y1
+         tAkIiJorai1FDMSYBQeT7Nm++2wa3Ma4HjDWH49OgOc2epSxa04wpRxd62X9FClHsvWM
+         hZ0ktW9mVk/Ypb9gg44Yp4vrZEW28d0rXZ5xCY+5IBR8KXcSXltAYwv+09i2rokvhwMe
+         YVYg==
+X-Gm-Message-State: AOAM5307jpSTR15QMR44sDFxUpBUgHjxMkwaYMKQRdRQt6p8lpmjGnUZ
+        nvz3HU3WBqtkeAldlv4zR/xYAPN8om10GA==
+X-Google-Smtp-Source: ABdhPJxqV2uZE0ptJj0rlZsugLlIFlf3oOgOiS4UGT2D259WGgXXKIT36UBB37Qbr35LIJw5MQKUDQ==
+X-Received: by 2002:a17:902:c410:b0:142:2506:cb5b with SMTP id k16-20020a170902c41000b001422506cb5bmr14384413plk.36.1639621169341;
+        Wed, 15 Dec 2021 18:19:29 -0800 (PST)
 Received: from localhost ([198.11.176.14])
-        by smtp.gmail.com with ESMTPSA id i67sm3853845pfg.189.2021.12.15.18.19.21
+        by smtp.gmail.com with ESMTPSA id z3sm4259814pfe.174.2021.12.15.18.19.28
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 15 Dec 2021 18:19:21 -0800 (PST)
+        Wed, 15 Dec 2021 18:19:29 -0800 (PST)
 From:   Lai Jiangshan <jiangshanlai@gmail.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Lai Jiangshan <laijs@linux.alibaba.com>
-Subject: [PATCH 0/3] KVM: x86: Fixes for kvm/queue
-Date:   Thu, 16 Dec 2021 10:19:35 +0800
-Message-Id: <20211216021938.11752-1-jiangshanlai@gmail.com>
+Cc:     Lai Jiangshan <laijs@linux.alibaba.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>
+Subject: [PATCH V2 1/3] KVM: VMX: Save HOST_CR3 in vmx_prepare_switch_to_guest()
+Date:   Thu, 16 Dec 2021 10:19:36 +0800
+Message-Id: <20211216021938.11752-2-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
+In-Reply-To: <20211216021938.11752-1-jiangshanlai@gmail.com>
+References: <20211216021938.11752-1-jiangshanlai@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -65,31 +75,127 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Lai Jiangshan <laijs@linux.alibaba.com>
 
-Patch 1 and patch 2 are updated version of the original patches with
-the same title.  The original patches need to be dequeued.  (Paolo has
-sent the reverting patches to the mail list and done the work, but I
-haven't seen the original patches dequeued or reverted in the public
-kvm tree.  I need to learn a bit more how patches are managed in kvm
-tree.)
+The host CR3 in the vcpu thread can only be changed when scheduling.
 
-Patch 3 fixes for commit c62c7bd4f95b ("KVM: VMX: Update vmcs.GUEST_CR3
-only when the guest CR3 is dirty").  Patch 3 is better to be reordered
-to before the commit since the commit has not yet into Linus' tree.
+So HOST_CR3 can be saved only in vmx_prepare_switch_to_guest() and be
+synced in vmx_sync_vmcs_host_state() when switching VMCS.
 
+vmx_set_host_fs_gs() is called in both places, so it is renamed to
+vmx_set_vmcs_host_state() and it also updates the HOST_CR3.
 
-Lai Jiangshan (3):
-  KVM: VMX: Save HOST_CR3 in vmx_prepare_switch_to_guest()
-  KVM: X86: Ensure pae_root to be reconstructed for shadow paging if the
-    guest PDPTEs is changed
-  KVM: VMX: Mark VCPU_EXREG_CR3 dirty when !CR0_PG -> CR0_PG if EPT +
-    !URG
-
+Signed-off-by: Lai Jiangshan <laijs@linux.alibaba.com>
+---
  arch/x86/kvm/vmx/nested.c | 11 +++--------
- arch/x86/kvm/vmx/vmx.c    | 28 ++++++++++++++++++----------
+ arch/x86/kvm/vmx/vmx.c    | 21 +++++++++++----------
  arch/x86/kvm/vmx/vmx.h    |  5 +++--
- arch/x86/kvm/x86.c        |  7 +++++++
- 4 files changed, 31 insertions(+), 20 deletions(-)
+ 3 files changed, 17 insertions(+), 20 deletions(-)
 
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index 26b236187850..d07a7fa75783 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -245,7 +245,8 @@ static void vmx_sync_vmcs_host_state(struct vcpu_vmx *vmx,
+ 	src = &prev->host_state;
+ 	dest = &vmx->loaded_vmcs->host_state;
+ 
+-	vmx_set_host_fs_gs(dest, src->fs_sel, src->gs_sel, src->fs_base, src->gs_base);
++	vmx_set_vmcs_host_state(dest, src->cr3, src->fs_sel, src->gs_sel,
++				src->fs_base, src->gs_base);
+ 	dest->ldt_sel = src->ldt_sel;
+ #ifdef CONFIG_X86_64
+ 	dest->ds_sel = src->ds_sel;
+@@ -3054,7 +3055,7 @@ static int nested_vmx_check_guest_state(struct kvm_vcpu *vcpu,
+ static int nested_vmx_check_vmentry_hw(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+-	unsigned long cr3, cr4;
++	unsigned long cr4;
+ 	bool vm_fail;
+ 
+ 	if (!nested_early_check)
+@@ -3077,12 +3078,6 @@ static int nested_vmx_check_vmentry_hw(struct kvm_vcpu *vcpu)
+ 	 */
+ 	vmcs_writel(GUEST_RFLAGS, 0);
+ 
+-	cr3 = __get_current_cr3_fast();
+-	if (unlikely(cr3 != vmx->loaded_vmcs->host_state.cr3)) {
+-		vmcs_writel(HOST_CR3, cr3);
+-		vmx->loaded_vmcs->host_state.cr3 = cr3;
+-	}
+-
+ 	cr4 = cr4_read_shadow();
+ 	if (unlikely(cr4 != vmx->loaded_vmcs->host_state.cr4)) {
+ 		vmcs_writel(HOST_CR4, cr4);
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 7826556b2a47..5f281f5ee961 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -1069,9 +1069,14 @@ static void pt_guest_exit(struct vcpu_vmx *vmx)
+ 		wrmsrl(MSR_IA32_RTIT_CTL, vmx->pt_desc.host.ctl);
+ }
+ 
+-void vmx_set_host_fs_gs(struct vmcs_host_state *host, u16 fs_sel, u16 gs_sel,
+-			unsigned long fs_base, unsigned long gs_base)
++void vmx_set_vmcs_host_state(struct vmcs_host_state *host, unsigned long cr3,
++			     u16 fs_sel, u16 gs_sel,
++			     unsigned long fs_base, unsigned long gs_base)
+ {
++	if (unlikely(cr3 != host->cr3)) {
++		vmcs_writel(HOST_CR3, cr3);
++		host->cr3 = cr3;
++	}
+ 	if (unlikely(fs_sel != host->fs_sel)) {
+ 		if (!(fs_sel & 7))
+ 			vmcs_write16(HOST_FS_SELECTOR, fs_sel);
+@@ -1166,7 +1171,9 @@ void vmx_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
+ 	gs_base = segment_base(gs_sel);
+ #endif
+ 
+-	vmx_set_host_fs_gs(host_state, fs_sel, gs_sel, fs_base, gs_base);
++	vmx_set_vmcs_host_state(host_state, __get_current_cr3_fast(),
++				fs_sel, gs_sel, fs_base, gs_base);
++
+ 	vmx->guest_state_loaded = true;
+ }
+ 
+@@ -6629,7 +6636,7 @@ static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
+ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+-	unsigned long cr3, cr4;
++	unsigned long cr4;
+ 
+ 	/* Record the guest's net vcpu time for enforced NMI injections. */
+ 	if (unlikely(!enable_vnmi &&
+@@ -6674,12 +6681,6 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
+ 		vmcs_writel(GUEST_RIP, vcpu->arch.regs[VCPU_REGS_RIP]);
+ 	vcpu->arch.regs_dirty = 0;
+ 
+-	cr3 = __get_current_cr3_fast();
+-	if (unlikely(cr3 != vmx->loaded_vmcs->host_state.cr3)) {
+-		vmcs_writel(HOST_CR3, cr3);
+-		vmx->loaded_vmcs->host_state.cr3 = cr3;
+-	}
+-
+ 	cr4 = cr4_read_shadow();
+ 	if (unlikely(cr4 != vmx->loaded_vmcs->host_state.cr4)) {
+ 		vmcs_writel(HOST_CR4, cr4);
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index 99588aa8474b..acb874db02da 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -374,8 +374,9 @@ int allocate_vpid(void);
+ void free_vpid(int vpid);
+ void vmx_set_constant_host_state(struct vcpu_vmx *vmx);
+ void vmx_prepare_switch_to_guest(struct kvm_vcpu *vcpu);
+-void vmx_set_host_fs_gs(struct vmcs_host_state *host, u16 fs_sel, u16 gs_sel,
+-			unsigned long fs_base, unsigned long gs_base);
++void vmx_set_vmcs_host_state(struct vmcs_host_state *host, unsigned long cr3,
++			     u16 fs_sel, u16 gs_sel,
++			     unsigned long fs_base, unsigned long gs_base);
+ int vmx_get_cpl(struct kvm_vcpu *vcpu);
+ bool vmx_emulation_required(struct kvm_vcpu *vcpu);
+ unsigned long vmx_get_rflags(struct kvm_vcpu *vcpu);
 -- 
 2.19.1.6.gb485710b
 
