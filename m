@@ -2,105 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E0F4477CEE
-	for <lists+kvm@lfdr.de>; Thu, 16 Dec 2021 21:00:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E701477D63
+	for <lists+kvm@lfdr.de>; Thu, 16 Dec 2021 21:21:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241171AbhLPUAk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Dec 2021 15:00:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38226 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241161AbhLPUAj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Dec 2021 15:00:39 -0500
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16B50C061574;
-        Thu, 16 Dec 2021 12:00:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
-        :MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:
-        Sender:Reply-To:Content-ID:Content-Description;
-        bh=/tbyhrSETlpUpGhD0V4CZpJ4NJ4ekYWEeecjiaVic+s=; b=enk5B+yDYYwupFnXkTU84KPAfb
-        4gvcArFFggB2771NVqEjSCiPVRrXfDRDz1bFaWfq9aTWN4NVhF9fAnwoz7uIkp3ManZjYUXTMf7DC
-        twHoaMU2QxDcJN5NsZhrpL5E0dAryCRk0PIf8YeQDnIU7rhLdWNU4/zAUI2jEZWEdSE+FFkqer3zz
-        XvkeDipWFHX+Glgyo4gbVKr5twjYJLxEuUHq78W/mP2RINEBuftmVKGQ0mS2EUT/j3aoc4iAON8a8
-        lEK+epfx9qCDpY+fW0n9uDwXHQ/uv5R7qi7G/cXBB9aZhIXH50H2twXHcyC9uIfMPpUZsaE+gkeOK
-        48b5onFQ==;
-Received: from [2001:8b0:10b:1:f126:48a8:ed41:1898] (helo=[IPv6:::1])
-        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mxwv0-001kAx-Vl; Thu, 16 Dec 2021 19:59:59 +0000
-Date:   Thu, 16 Dec 2021 19:59:57 +0000
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Tom Lendacky <thomas.lendacky@amd.com>,
-        Thomas Gleixner <tglx@linutronix.de>
-CC:     Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "H . Peter Anvin" <hpa@zytor.com>,
+        id S238648AbhLPUVW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Dec 2021 15:21:22 -0500
+Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:10874 "EHLO
+        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234322AbhLPUVV (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Thu, 16 Dec 2021 15:21:21 -0500
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1BGInLxL016460;
+        Thu, 16 Dec 2021 20:20:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : content-type :
+ content-transfer-encoding : in-reply-to : mime-version; s=corp-2021-07-09;
+ bh=sTmIGreCsyjggHenqoaULIPndzh70/rMm7t4BiOhgH8=;
+ b=crLKx2A8KxAuqtCxuZYpOuDYdrTmWVv77Nn4/QnDzW/Pkac46LoxesBaGeXzPlZMEJxF
+ Qzh3ZuzLY+Asu4TqrmWTnfOF1SCVctdwqP4A2AZMD9Dwo+Uu2EGlRK4I9iOy91Vtz63v
+ 4rMJ1SujlDKV1ENCCOLoP6tNXAbTln9XFqKDMu4rdOQCjT8hl4P8If1VpIQj1R9GIg3I
+ 5QsuVOMu5J/fkDUxkHit1fa4+ZMpsfRb+BP9Sv7NYDVfmesdZo+DjT9NymCS5T9EuYL3
+ 7uwbet7HEC6RJGk4MFaZjzdaGlP5lG3uR/pt/rD8jRrFz3HdxEWXejHHHOigmHfJb4mi MA== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by mx0b-00069f02.pphosted.com with ESMTP id 3cykm5c1nt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 16 Dec 2021 20:20:34 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 1BGKFqDa177981;
+        Thu, 16 Dec 2021 20:20:33 GMT
+Received: from nam10-dm6-obe.outbound.protection.outlook.com (mail-dm6nam10lp2100.outbound.protection.outlook.com [104.47.58.100])
+        by userp3020.oracle.com with ESMTP id 3cvneua7ut-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 16 Dec 2021 20:20:33 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=J4NzUxXA5Gvui+IYuA6ugeqS+7/bpo7FWSJgBi1SM/JNRSi6aG+XS6dOXaOTMVCT1eD32a6UQFsAiBetysUUeCyje/MlIO/Vf1bIvbgRHQguQ3/WZ0qtMDz/izUC8S4aqW31I3zEoR2AKn1begrEjM3JJYQsJw7AN0O2d0/iHdAez62RD1WiiCv3b28aBnYODmpuyHRGWnVTGw19O5qqSAYNGCnaSzC5UJFGqvjwzGyWaUMZAdI3NNGM7QozfjWq0Lp+VeCos390ZiYnZj9/KWfhWgIQTLpLzMqPnXF4spFgCiyHb9z26lKFdRDITxgusfYFAS/MJ9N/10+4968ycg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=sTmIGreCsyjggHenqoaULIPndzh70/rMm7t4BiOhgH8=;
+ b=lOyFtxS5K0tDRH8MD+KpoCPyeM+T3rfv6oAC95Bkx2/7nw5PHUSggVbJ7D0lHITWWRkNz2cNVEPRoIa5VUlRsa8Wjb7p3jSsXQwXPacbowpI9vQL0ZBmNKgwTuStrKI4ldQHlfreQMCnB8YHoEDo+8dZNqAznY3WzWrxSYXDds6L4qRuWIHqOGPZn5534TRMIdssjpp215Mp7NItdfXChg7gaZui9mEJlMXsq4cm0nNhy5Z9o8SLSu3jdtahTvVJEWi5ApU0R8TKNrzy2tKMdQZd8qJMF5kFbsIXtCPNh5jY3tQq0knaGIc0IofOobZf38C/ZzEAA7Cp24AmJj4KKQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sTmIGreCsyjggHenqoaULIPndzh70/rMm7t4BiOhgH8=;
+ b=iCXsOR5I/UNtydFQlRROxI6CJxdGX+xp+ldhtSzHGft7Xexfjz7MDDjM7/nf4Q6v6NbP0EzMHTTjLFuZGJELEdlCPSis3KvGL3NefBGrC1rr+Zd5fKGJ/XSSU7RQGgTEW4te1q10MZtXJEowedlH9hQuWX2byGyrq0/EAJAOBR0=
+Received: from SN6PR10MB2576.namprd10.prod.outlook.com (2603:10b6:805:44::15)
+ by SA2PR10MB4683.namprd10.prod.outlook.com (2603:10b6:806:112::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4801.14; Thu, 16 Dec
+ 2021 20:20:31 +0000
+Received: from SN6PR10MB2576.namprd10.prod.outlook.com
+ ([fe80::4c8c:47df:f81e:f412]) by SN6PR10MB2576.namprd10.prod.outlook.com
+ ([fe80::4c8c:47df:f81e:f412%5]) with mapi id 15.20.4801.015; Thu, 16 Dec 2021
+ 20:20:30 +0000
+Date:   Thu, 16 Dec 2021 14:20:21 -0600
+From:   Venu Busireddy <venu.busireddy@oracle.com>
+To:     Brijesh Singh <brijesh.singh@amd.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        "Paul E . McKenney" <paulmck@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "rcu@vger.kernel.org" <rcu@vger.kernel.org>,
-        "mimoja@mimoja.de" <mimoja@mimoja.de>,
-        "hewenliang4@huawei.com" <hewenliang4@huawei.com>,
-        "hushiyuan@huawei.com" <hushiyuan@huawei.com>,
-        "luolongjun@huawei.com" <luolongjun@huawei.com>,
-        "hejingxian@huawei.com" <hejingxian@huawei.com>
-Subject: Re: [PATCH v3 0/9] Parallel CPU bringup for x86_64
-User-Agent: K-9 Mail for Android
-In-Reply-To: <0247ce40-1f1e-3581-95a2-8a1d51cb8fad@amd.com>
-References: <20211215145633.5238-1-dwmw2@infradead.org> <761c1552-0ca0-403b-3461-8426198180d0@amd.com> <f0b4eddc2cdb3aae190bacd0a5285c393e4f8ea3.camel@infradead.org> <0247ce40-1f1e-3581-95a2-8a1d51cb8fad@amd.com>
-Message-ID: <E92CDF5A-229A-4D57-8C38-2E89373A37AD@infradead.org>
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        David Rientjes <rientjes@google.com>,
+        Dov Murik <dovmurik@linux.ibm.com>,
+        Tobin Feldman-Fitzthum <tobin@ibm.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Michael Roth <michael.roth@amd.com>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Kirill A . Shutemov" <kirill@shutemov.name>,
+        Andi Kleen <ak@linux.intel.com>,
+        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com
+Subject: Re: [PATCH v8 07/40] x86/sev: Add a helper for the PVALIDATE
+ instruction
+Message-ID: <YbufhatJNvJEl6GK@dt>
+References: <20211210154332.11526-1-brijesh.singh@amd.com>
+ <20211210154332.11526-8-brijesh.singh@amd.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20211210154332.11526-8-brijesh.singh@amd.com>
+X-ClientProxiedBy: SN7PR18CA0003.namprd18.prod.outlook.com
+ (2603:10b6:806:f3::23) To SN6PR10MB2576.namprd10.prod.outlook.com
+ (2603:10b6:805:44::15)
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: fdb39ccd-65a3-409e-4f8e-08d9c0d181af
+X-MS-TrafficTypeDiagnostic: SA2PR10MB4683:EE_
+X-Microsoft-Antispam-PRVS: <SA2PR10MB4683B42BBF47EFF14413087AE6779@SA2PR10MB4683.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:5516;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: M1YmdUFc1QXypmLv2KS7QBPTqQC4/mt8mENz5GQ5uRM1lUXfjdUOpLbZmwKVsbVk8m/GvxAvnOw5SvtSOb2E2I6glLcpKzhoPEB5LSdLwVuGHjhSjK27kw5zDKWRjyElxg1LoxVprMkMCa7DtkWKVT64s6wgHJQUAY/lE5uAAPT4iRrWkzNVBRBMRXYwz7GkGa5yrNazxDiZf4WiUBuplrx7tVpalJywAOBy1QAXi6U4FsWkfAHVNggmAfqGQdkRLoUoIZHX0Bimx8tCyxHwfrO/0u2g7P9EqNtgLwkGUse6wTsSza9K/g+jJaBZXr9ARueOU/tt5IqJk+bbUhNkkiKiHUeLe8tKDQF9ArHW3kPBBuaz32vwuZgUJte8JDV4z9HlJvM0UBrkQaCViBEs3Mvi9YE3JOvlYgrTzPL8YeOKSV8jDfaIdxSIsRf3PXsGSK6Pr6Q857v+tVLKqcgpmHjwh2Av7J9lFCmWoG+IBoBnKsWJksSK+4ZU+vG5zlPPKVVKo8hU+IrhWFH/Lbu1kzSUqah4vaUv3I6w5aEhnscTpran2CeFtieLPXihW8srWT3zIKQ2OwFDyTSgaj0eep/y+7f4R9xVNb2D636HnjQ3qPlGo+/vlCu/lD5l32QN2+n8D6ApuBWOVTclZbuB+Q==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR10MB2576.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(7916004)(366004)(54906003)(53546011)(2906002)(7416002)(6666004)(66476007)(6916009)(5660300002)(7406005)(66946007)(4001150100001)(8676002)(508600001)(8936002)(4744005)(66556008)(26005)(6486002)(33716001)(6506007)(38100700002)(4326008)(86362001)(316002)(6512007)(9686003)(83380400001)(186003)(44832011);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TnVUWWFBMndOend0ajU1WVh0MjJSMFZ5c0pDdFdwek5LazRpdWhJME1hUE85?=
+ =?utf-8?B?NDBrY25pMjRTdXRpR2NhYU9EYW5pQmZYSjBlTG1EaUNrQUp3Y1hKODBkd0Rr?=
+ =?utf-8?B?bCszUktCL1orRGp6SGU5bm5QTFpab1NoUVhhWkkyL21EMm9XYUdIdTErVWx5?=
+ =?utf-8?B?eW1TRjBTVE91OFptbkpIL2RWUDNmOU4zckVlVm9Mcjg1Y3Vtd0p1UForQ2kr?=
+ =?utf-8?B?Wk5rWFZ3bmEyd1UrT2F4L3VQem5oSEpLSGc0Q2Q5dXo0MWZZSzlaREFCVjln?=
+ =?utf-8?B?U2oxUm9TYXd5VlZ1cTR1NDRmVkxNNzN1QVJON0l4aER5NUtBTitCVkQydzl3?=
+ =?utf-8?B?WFFYQ2l2SXdoV0dhdUhOQ2JwdnlHUVpyQjZOdDk2Q1VLUWFMS1UwTzB3ZFAv?=
+ =?utf-8?B?UzQxQytOTzZScm1uSDNOSW1JdTZQSW5iVkJ2RktnL21tWi9BRXYxQlQ2NXlY?=
+ =?utf-8?B?TU4wYmU1MDVRNU5pcWpnTzRsbENmSWQvcXE1YktseGFzZms0WTV3MWZ5SnND?=
+ =?utf-8?B?eld1cHZxYWlGRUZOaC96b1lqVGVnbjNtb2ZwbWtFa01tK0lwTU9jT0lpQWU0?=
+ =?utf-8?B?S0x2OTZCbkJHWVVBZDJkU3ZTWmVXSFJKYTJLMlVlVzk4dW5QeVlBMjZGcUYy?=
+ =?utf-8?B?eVpTTHVSVjNVSDVLVTdOVTZhTk8wZHVHSm80WFJHd3REOFI4dVlzbjhGZzdL?=
+ =?utf-8?B?U0NrZG9ZUzBOTmwwc2tzRzlHNS9Ldk83NjR4SytOWFdtbzVVUzFiYi80RktI?=
+ =?utf-8?B?ZzB3U2V2d1FTdVlOZUhCR2xudmprVkRPOHJaNUtDTmlrMFcyNFQvMXA1K05z?=
+ =?utf-8?B?Si9zVjRRV0tpcGVlcEJlUXRYUTlSdzZJcCt6REpsL3dnb0lCdVQ2RkxQMUI3?=
+ =?utf-8?B?VU1QZkxwUWtsbkV3OHdza0tpVXJYbU1NeGhCZWVSMlBEdjhBY2xTdTZFdHpu?=
+ =?utf-8?B?a2hsWWk2Y1JLUFJKdkV4WFJ5OUFzUUlxRkNYN2Ftc2FhYmhSVzMrbGdhWXlS?=
+ =?utf-8?B?MnM0MWhyUzFUdmJiQnYwOHNabm5XaURvcXUveUpRbG9PYTRHTXpra1JMT0VX?=
+ =?utf-8?B?QnUvcElGSjNhZ2tNSFRFUzZ5QlhmTTNRbFhMajhtZ0hVZzZjSVMrQXJlbkty?=
+ =?utf-8?B?bzZmZXRLOWU1a0REbElQTlp1SW1takswayt5T0kzeWFsTXgxYlB1Q05vTUEx?=
+ =?utf-8?B?Kys1TEJsVllFS2V0TFRGdnJxaUtPeWxjQ3hwdmxCYlpDRHFtV2lHWHpSK1Zw?=
+ =?utf-8?B?bjhUb2NvWDlXYzdpRWg3MzRwQ1RmNlpCRDJHS0pUZDk5RDJjaCtEbGVtdDNw?=
+ =?utf-8?B?aGF6ZXEva2VFazFlZ1R1alhLL3ZjNTF2NTFCWUJzb3g4RmxvZHp1R1duMjA4?=
+ =?utf-8?B?MmJlbDhPUUN4QkllSzB2ZlZqclZPQlFBcGJ5dXo5aERuQTJvcnpzZ0JuSFBw?=
+ =?utf-8?B?QndkczNaQzhSTDFsbFU3dFhRTVpWeDNBbHNpd3RaZVNtblh1WjBGa0ZHVGZt?=
+ =?utf-8?B?TUtRcFhvWEdMTG9POTA5clBmNkk3T2ZmUmkvL2h5dVZCMWlnbTZQNGEyc3FV?=
+ =?utf-8?B?c0dJRkRnK1VMQzVjam9GRUVNWjBSbi9Bb2pFSEJ1V0gvV2hDSDk4LzhZUzR2?=
+ =?utf-8?B?d1B1amNxZThkbWNHWjFhcE96bjkrRjJUMmlOWkVtdGNOSVdHRFh5dGVxVWc5?=
+ =?utf-8?B?UjliVEYvVnJMeDRPdGRVa2NHdlE4QXorbUlkZTBtbE1Rd29aelZMRHNEcDNM?=
+ =?utf-8?B?aXVFSno5bWtLZ1NaUlA3dzQ5U3ZhNXRFWEVIYWhnVXVMRG9PcEdweEZFOEZL?=
+ =?utf-8?B?SzM3Smo1aU5JaTY1S0lHWkR1MFc1eFU2K2R3eHBzZkYrVzdSUUhyVTQ2eDdN?=
+ =?utf-8?B?ZG9EVk92UHlKeWpYNnpha1pPNm9PK2U3cnJ3ckVQNnY2VDlWQ2UxVmd0Znhi?=
+ =?utf-8?B?TzJtbzNrWWVybDNuRFhpMG16aEVLbzFVNzdoRFVaY3NVVm1XT05PanNYZHVk?=
+ =?utf-8?B?VmdXNWp0Qjh6aU83MGY2MnRDdHNtOTdCY1FpL3c4cmFmQmx2a0NDYmpxcVI1?=
+ =?utf-8?B?MGxwbXBEQVpoMVJVQVpnY1AzVzZqL1E0S2plWWRGZGp5MXFQR0EwdzBrUXRh?=
+ =?utf-8?B?T3FFQWNwS0VuUzZJd3p6d3RnR0REWFkxRkNtQWs0TWhQb1lOZTVHRHJkeUNT?=
+ =?utf-8?B?MmlPck9kM2RVZmloU2FHMG1qcHNlZ2VGb2VMNTJuay9NY2tjVWJ4NXpPMHZi?=
+ =?utf-8?B?OUdoR0VCKzFOT25BY0NHVGJsWUl3PT0=?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fdb39ccd-65a3-409e-4f8e-08d9c0d181af
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR10MB2576.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Dec 2021 20:20:30.8352
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 0SwVn03P/wtH2bAaEb9U0p8Z4+9zXAzMqrZ4WfZWyPuO1XiskVq8m9m4FNugClfdyh2r7TlM+F1UWRJq3zVqXM1Yop3M9BJhwRbUGfTNwBE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR10MB4683
+X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10200 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 adultscore=0
+ malwarescore=0 bulkscore=0 spamscore=0 mlxlogscore=999 mlxscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2112160110
+X-Proofpoint-GUID: Ktq0AqsY_HjRvqisu8n0DTqByEKo6hyy
+X-Proofpoint-ORIG-GUID: Ktq0AqsY_HjRvqisu8n0DTqByEKo6hyy
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 2021-12-10 09:42:59 -0600, Brijesh Singh wrote:
+> An SNP-active guest uses the PVALIDATE instruction to validate or
+> rescind the validation of a guest page’s RMP entry. Upon completion,
+> a return code is stored in EAX and rFLAGS bits are set based on the
+> return code. If the instruction completed successfully, the CF
+> indicates if the content of the RMP were changed or not.
+> 
+> See AMD APM Volume 3 for additional details.
+> 
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
 
+Reviewed-by: Venu Busireddy <venu.busireddy@oracle.com>
 
-On 16 December 2021 19:55:36 GMT, Tom Lendacky <thomas=2Elendacky@amd=2Eco=
-m> wrote:
->On 12/16/21 1:52 PM, David Woodhouse wrote:
->> On Thu, 2021-12-16 at 10:27 -0600, Tom Lendacky wrote:
->>> On 12/15/21 8:56 AM, David Woodhouse wrote:
->>>
->>>> Doing the INIT/SIPI/SIPI in parallel for all APs and *then* waiting f=
-or
->>>> them shaves about 80% off the AP bringup time on a 96-thread socket
->>>> Skylake box (EC2 c5=2Emetal) =E2=80=94 from about 500ms to 100ms=2E
->>>>
->>>> There are more wins to be had with further parallelisation, but this =
-is
->>>> the simple part=2E
->>>
->>> I applied this series and began booting a regular non-SEV guest and hi=
-t a
->>> failure at 39 vCPUs=2E No panic or warning, just a reset and OVMF was
->>> executing again=2E I'll try to debug what's going, but not sure how qu=
-ickly
->>> I'll arrive at anything=2E
->>=20
->> I've pushed the SEV-ES fix to
->> https://git=2Einfradead=2Eorg/users/dwmw2/linux=2Egit/shortlog/refs/hea=
-ds/parallel-5=2E16
->> and in doing so I've moved the 'no_parallel_bringup' command line
->> argument earlier in the series, to Thomas's "Support parallel startup
->> of secondary CPUs" commit (now 191f0899757)=2E It would be interesting =
-to
->> see if you can reproduce with just that much, both with and with
->> no_parallel_bringup=2E And then whether the subsequent commit that
->> actually enables the parallel INIT/SIPI/SIPI actually makes the
->> difference?
->>=20
->
->I'll pull it down and give it try=2E
-
-Thanks=2E Note: don't use the whole thing; that last "parallel part2" patc=
-h in particular isn't ready=2E And probably isn't where the next low-hangin=
-g fruit is anyway=2E
-
---=20
-Sent from my Android device with K-9 Mail=2E Please excuse my brevity=2E
