@@ -2,154 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 2DA9F47862E
-	for <lists+kvm@lfdr.de>; Fri, 17 Dec 2021 09:28:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C922478667
+	for <lists+kvm@lfdr.de>; Fri, 17 Dec 2021 09:42:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233812AbhLQI2L (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Dec 2021 03:28:11 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:34234 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233262AbhLQI2K (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 17 Dec 2021 03:28:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1639729689;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=26LIJ1YdIsB73eNvPXzazi/kBaf5btKN6tb7Yo1wgdw=;
-        b=JBxtAYgGuUkzX5/aPUX9JZHyWd3Cnj1pT1D/NEMY93AaBBhCLh4k7tQYb4gUFzUK4SPOqD
-        EU6k2mi6nSyeuzgs7olQ9uGmzJZihheUeY2w5wji1TMkPztbyRaxKACylKoukE1HnseL23
-        qZTuRpPBbOOv5w90yscu3Y/CsjCkaUA=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-378--bZYMrdANneMH37f1VVmBw-1; Fri, 17 Dec 2021 03:28:08 -0500
-X-MC-Unique: -bZYMrdANneMH37f1VVmBw-1
-Received: by mail-wm1-f71.google.com with SMTP id 187-20020a1c02c4000000b003335872db8dso767919wmc.2
-        for <kvm@vger.kernel.org>; Fri, 17 Dec 2021 00:28:08 -0800 (PST)
+        id S231462AbhLQImG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Dec 2021 03:42:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46502 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230426AbhLQImF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Dec 2021 03:42:05 -0500
+Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24D54C061574;
+        Fri, 17 Dec 2021 00:42:05 -0800 (PST)
+Received: by mail-qt1-x82b.google.com with SMTP id t11so1900845qtw.3;
+        Fri, 17 Dec 2021 00:42:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=euNZsuO5chCnJL4h1RRy3rz6SEECSJxqExqR2vzYIgc=;
+        b=JlZ33jI3dKjdOEJgC8wH4AilxnMZqHDPYsqsHW1wAOROGwwJZjFWb53ZKEPOaepKAJ
+         n/hKq1qiMLl/EUBr6r9En2JP72cnEGK/S1xltCQNmn/2meQMvJG+YVrNCyvtfYsehQbb
+         bw1O6fkyOj/emvJnQUCWIBA0DbycVeQeDUrOZhZc79RdM1Fh46jgdnzqpJJTWGzNLymH
+         5BzVcJq740cmBHm0Gx/VotXUTXOi1R/FXV9rWEht8VYBW4eS+vtXyKDVElPXK53QMHby
+         W8t0QCB0iQ2K8017GLS48aYOHjteDPQE+ixJM440251YVvYC02YVGwtRjAv8NRm6pUkZ
+         PZsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=26LIJ1YdIsB73eNvPXzazi/kBaf5btKN6tb7Yo1wgdw=;
-        b=TVvvxsbdN9+4jOntitLF0A295iuJaq6Fn8NHADOvVsKDt9FfXL6wuEp+OkdcSIZ/51
-         oJVXfOyEZXTILFRuEIg5wg2ZVf+YNXg3FzpTOsKLuRhzizC2DeIzNZ8gILBSjJfPVCdL
-         Vg0+cc9pVmZNl7nWB587sLVihe6Pvos8fdDKZ/QyQqdzumcBPhIgaWeexN5S9ze0lazZ
-         bZhy5QjmCXgpyVOktnaMV9Dq1JH/eGscs6qabN1om9upJZZqyUiINlpK6XCB6sANG3QD
-         VMA8MEPq5AH6JpTe6/YRew8919yBcjeNbgH5GdFlZfEpZ5jmSNKFcvsYEl6MydcUyklI
-         vJfg==
-X-Gm-Message-State: AOAM5300s/aV7wk0H+2vjdpnx9xrC3bqnsqeEFHWkaPkt4SWjS0RIw67
-        ddsty3B0d9ifEkPNvcFsU+E841EGLyh3T2GnX2XI/hRVeUGUzKKTwSBrRdnz+4yH/fHYjJHYJmy
-        Aa4EGPNvFl2xI
-X-Received: by 2002:adf:f10f:: with SMTP id r15mr1465017wro.553.1639729687526;
-        Fri, 17 Dec 2021 00:28:07 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyqmD+ti2U+gXLkJIXbA6dH/cRko3HnTprM5FpnCFB+dff8kIv2MHRCc7cqlV3ofyjCfG18KQ==
-X-Received: by 2002:adf:f10f:: with SMTP id r15mr1464998wro.553.1639729687242;
-        Fri, 17 Dec 2021 00:28:07 -0800 (PST)
-Received: from ?IPV6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a? ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
-        by smtp.googlemail.com with ESMTPSA id m6sm8866287wrp.34.2021.12.17.00.28.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Dec 2021 00:28:06 -0800 (PST)
-Message-ID: <3c5472f4-44ce-9ba8-4dbc-967ea377ae10@redhat.com>
-Date:   Fri, 17 Dec 2021 09:28:00 +0100
+        bh=euNZsuO5chCnJL4h1RRy3rz6SEECSJxqExqR2vzYIgc=;
+        b=o0GuPzn9nTiqyypf2y3MNbbINBDQErIc1rReamdvGCMz0zUg+I+aC6Fpk02QmCZ4FU
+         GDOVtFCqgKQrl5ZhqD5IsIpxt1+1AKPKFMJfbNPaqhxoSZ5u8bs28IAy0E9xXtY+YcK/
+         oqU45+HKB1LsUZ3grOPShr6hGIKX4dpoGmfvxK4+psv4TmZyqZsxJuQcZSxI6SsfG3yU
+         1nUUDyrKWRiXmyl3v0LnJ4PV/5nQU4RyfpDUKc+5kDekSeFwrNNt3VJkgFctbq7Tim6P
+         3FAucDP9j6L+t01zTIVXCjB4hMiMnsQN4+9Lf2rNRLfvqRgUQm6LznuqKIbaGWWhuTta
+         ytlg==
+X-Gm-Message-State: AOAM531j0fUSabrS69MlQLkbz2fWhha4xUaefMfuT7jcku3Ax3+yMYg9
+        BR+8/vIhqIB19WQN6VhvfqE=
+X-Google-Smtp-Source: ABdhPJxMefYN6bC4KnrtZQAOdWJ8jW/5MZDBAfR2DrXl7H+Ww4eegx09BSvolw6t8k5h+v92HXYLZA==
+X-Received: by 2002:ac8:5c54:: with SMTP id j20mr1408448qtj.121.1639730524381;
+        Fri, 17 Dec 2021 00:42:04 -0800 (PST)
+Received: from localhost.localdomain ([193.203.214.57])
+        by smtp.gmail.com with ESMTPSA id 14sm6436102qtx.84.2021.12.17.00.41.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 17 Dec 2021 00:42:03 -0800 (PST)
+From:   cgel.zte@gmail.com
+X-Google-Original-From: deng.changcheng@zte.com.cn
+To:     pbonzini@redhat.com
+Cc:     seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Changcheng Deng <deng.changcheng@zte.com.cn>,
+        Zeal Robot <zealci@zte.com.cn>
+Subject: [PATCH] KVM: x86: Use div64_ul instead of do_div
+Date:   Fri, 17 Dec 2021 08:41:55 +0000
+Message-Id: <20211217084155.452262-1-deng.changcheng@zte.com.cn>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH v2 2/4] RISC-V: KVM: Add VM capability to allow userspace
- get GPA bits
-Content-Language: en-US
-To:     Anup Patel <anup.patel@wdc.com>, Shuah Khan <shuah@kernel.org>,
-        Atish Patra <atishp@atishpatra.org>
-Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Alistair Francis <Alistair.Francis@wdc.com>,
-        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20211129075451.418122-1-anup.patel@wdc.com>
- <20211129075451.418122-3-anup.patel@wdc.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211129075451.418122-3-anup.patel@wdc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/29/21 08:54, Anup Patel wrote:
-> The number of GPA bits supported for a RISC-V Guest/VM is based on the
-> MMU mode used by the G-stage translation. The KVM RISC-V will detect and
-> use the best possible MMU mode for the G-stage in kvm_arch_init().
-> 
-> We add a generic VM capability KVM_CAP_VM_GPA_BITS which can be used by
-> the KVM userspace to get the number of GPA (guest physical address) bits
-> supported for a Guest/VM.
-> 
-> Signed-off-by: Anup Patel <anup.patel@wdc.com>
-> ---
->   arch/riscv/include/asm/kvm_host.h | 1 +
->   arch/riscv/kvm/mmu.c              | 5 +++++
->   arch/riscv/kvm/vm.c               | 3 +++
->   include/uapi/linux/kvm.h          | 1 +
->   4 files changed, 10 insertions(+)
-> 
-> diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
-> index 37589b953bcb..ae5d238607fe 100644
-> --- a/arch/riscv/include/asm/kvm_host.h
-> +++ b/arch/riscv/include/asm/kvm_host.h
-> @@ -221,6 +221,7 @@ void kvm_riscv_stage2_free_pgd(struct kvm *kvm);
->   void kvm_riscv_stage2_update_hgatp(struct kvm_vcpu *vcpu);
->   void kvm_riscv_stage2_mode_detect(void);
->   unsigned long kvm_riscv_stage2_mode(void);
-> +int kvm_riscv_stage2_gpa_size(void);
->   
->   void kvm_riscv_stage2_vmid_detect(void);
->   unsigned long kvm_riscv_stage2_vmid_bits(void);
-> diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
-> index 9ffd0255af43..9b6d6465094f 100644
-> --- a/arch/riscv/kvm/mmu.c
-> +++ b/arch/riscv/kvm/mmu.c
-> @@ -760,3 +760,8 @@ unsigned long kvm_riscv_stage2_mode(void)
->   {
->   	return stage2_mode >> HGATP_MODE_SHIFT;
->   }
-> +
-> +int kvm_riscv_stage2_gpa_size(void)
-> +{
-> +	return stage2_gpa_bits;
-> +}
-> diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
-> index fb18af34a4b5..6f959639ec45 100644
-> --- a/arch/riscv/kvm/vm.c
-> +++ b/arch/riscv/kvm/vm.c
-> @@ -82,6 +82,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   	case KVM_CAP_NR_MEMSLOTS:
->   		r = KVM_USER_MEM_SLOTS;
->   		break;
-> +	case KVM_CAP_VM_GPA_BITS:
-> +		r = kvm_riscv_stage2_gpa_size();
-> +		break;
->   	default:
->   		r = 0;
->   		break;
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 1daa45268de2..469f05d69c8d 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1131,6 +1131,7 @@ struct kvm_ppc_resize_hpt {
->   #define KVM_CAP_EXIT_ON_EMULATION_FAILURE 204
->   #define KVM_CAP_ARM_MTE 205
->   #define KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM 206
-> +#define KVM_CAP_VM_GPA_BITS 207
->   
->   #ifdef KVM_CAP_IRQ_ROUTING
->   
-> 
+From: Changcheng Deng <deng.changcheng@zte.com.cn>
 
-This is nice and other architectures could support it.
+do_div() does a 64-by-32 division. Here the divisor is an unsigned long
+which on some platforms is 64 bit wide. So use div64_ul instead of do_div
+to avoid a possible truncation.
 
-Paolo
+Reported-by: Zeal Robot <zealci@zte.com.cn>
+Signed-off-by: Changcheng Deng <deng.changcheng@zte.com.cn>
+---
+ arch/x86/kvm/lapic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index c5028e6b0f96..3b629870632c 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -1707,7 +1707,7 @@ static void start_sw_tscdeadline(struct kvm_lapic *apic)
+ 	guest_tsc = kvm_read_l1_tsc(vcpu, rdtsc());
+ 
+ 	ns = (tscdeadline - guest_tsc) * 1000000ULL;
+-	do_div(ns, this_tsc_khz);
++	ns = div64_ul(ns, this_tsc_khz);
+ 
+ 	if (likely(tscdeadline > guest_tsc) &&
+ 	    likely(ns > apic->lapic_timer.timer_advance_ns)) {
+-- 
+2.25.1
 
