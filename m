@@ -2,158 +2,231 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id A875F4791D9
-	for <lists+kvm@lfdr.de>; Fri, 17 Dec 2021 17:49:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6BF2F4791E2
+	for <lists+kvm@lfdr.de>; Fri, 17 Dec 2021 17:51:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239332AbhLQQtV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Dec 2021 11:49:21 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:7322 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S235967AbhLQQtR (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 17 Dec 2021 11:49:17 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1BHGeqGt016438;
-        Fri, 17 Dec 2021 16:49:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=k09d+GGnx5zwaMlBATH76XnriCr9KMVpFUw6EzYvU+0=;
- b=H6Pgyh5RFoMBGchwYLvyD/32j/Mqj8nbn7UNkDN7zbNo85nPeZH24XSdLrHCF2xe/7NN
- ymGrTJgiVY6ZfH8Ehvy5J4JHxuqstbVPsB901XhwqLWfPzv/AqpZ3ewKi/8t8NJyyV7c
- hyJSGMbO93zeIb9o9DziOh9QtyBG8fA5QJ3QUtv1hqeSoV7Sw3c2QlCKXdysEqxHgvKf
- SqnoRaD7j+LibAMrOtfJKoKXwM0r1HT7ku65wIPTKqcukninu+4L8EnqwxMGllSUOfe1
- w76xbpJE+zqMqKAEj2gq20b7fFyXgq/rwCysTZPQ+6GR9Z79QTFHZjoq4D3RpVlhidAn 0g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3d0v68bcrc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 17 Dec 2021 16:49:12 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1BHGUNr1017364;
-        Fri, 17 Dec 2021 16:49:12 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3d0v68bcqy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 17 Dec 2021 16:49:12 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1BHGOYWi006552;
-        Fri, 17 Dec 2021 16:49:10 GMT
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (d06relay11.portsmouth.uk.ibm.com [9.149.109.196])
-        by ppma03fra.de.ibm.com with ESMTP id 3cy7k9t9bm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 17 Dec 2021 16:49:10 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1BHGn7sd42598910
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 17 Dec 2021 16:49:07 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0964411C058;
-        Fri, 17 Dec 2021 16:49:07 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1CF2811C04C;
-        Fri, 17 Dec 2021 16:49:06 +0000 (GMT)
-Received: from [9.171.54.231] (unknown [9.171.54.231])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 17 Dec 2021 16:49:06 +0000 (GMT)
-Message-ID: <01530507-184c-782d-0ae3-632df0308d56@linux.ibm.com>
-Date:   Fri, 17 Dec 2021 17:49:05 +0100
+        id S239349AbhLQQvo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Dec 2021 11:51:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49038 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229533AbhLQQvn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Dec 2021 11:51:43 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AEAAC061574
+        for <kvm@vger.kernel.org>; Fri, 17 Dec 2021 08:51:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=PdZd2/fP+RWLkgOJmKa22wHAYOpj7wygNSr6gXt0GHA=; b=tG/cdSxh1ZpdjXRNotUOsZ8Xsw
+        eP4HtwEis6AsftbL0d/TTbawm78VQSd8fzK6h3NcUBdUE7wNlhAhxhDSbxJq6YZirkITTgStdNXkv
+        fIDRxezrYfZZBZ7S4InffmOEYfhfF+oVhJhUp2+CPLMv9NOLzRy9kMAsIjwsCFiopvB8HqAT60JX/
+        aH0HGKgPjBgiIFnWUCCrLxXNns+3o6aHVN7J2SiyIXEdXLSnTQdVoG26tPQqEKLz2PcdDJVNH48aC
+        Y7OZXZlvOWYTvlHLM6z5sp+dyo3bc5KZXn5g6RxAkP7aT2GZ1xVloAbc4i25pGDurDPcQpnZmjM5Q
+        w0qBPF5w==;
+Received: from [2001:8b0:10b:1::3ae] (helo=u3832b3a9db3152.ant.amazon.com)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1myGS4-00BH0i-4g; Fri, 17 Dec 2021 16:51:24 +0000
+Message-ID: <ebaa70df2b126e3cdded33d0281828cd9cd6de04.camel@infradead.org>
+Subject: Re: [PATCH v2 4/4] intel_iommu: Fix irqchip / X2APIC configuration
+ checks
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Peter Xu <peterx@redhat.com>
+Cc:     qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org
+Date:   Fri, 17 Dec 2021 16:51:20 +0000
+In-Reply-To: <Ybr9Cn7GPKbm/rzL@xz-m1.local>
+References: <20211209220840.14889-1-dwmw2@infradead.org>
+         <20211209220840.14889-4-dwmw2@infradead.org> <Ybr9Cn7GPKbm/rzL@xz-m1.local>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-mxCmuhdQSps0LN6xXixe"
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH 25/32] vfio/pci: re-introduce CONFIG_VFIO_PCI_ZDEV
-Content-Language: en-US
-To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
-        hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
-        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
-        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20211207205743.150299-1-mjrosato@linux.ibm.com>
- <20211207205743.150299-26-mjrosato@linux.ibm.com>
-From:   Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <20211207205743.150299-26-mjrosato@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: tBUQpTeDvmphaPRVLfZB_mhTL0Yu_Izk
-X-Proofpoint-GUID: 2ZJ3pyQlADeZbsWjn6FIHIYfN-RFBW11
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2021-12-17_06,2021-12-16_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
- phishscore=0 impostorscore=0 malwarescore=0 suspectscore=0 mlxlogscore=999
- bulkscore=0 priorityscore=1501 clxscore=1015 spamscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
- definitions=main-2112170095
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
+--=-mxCmuhdQSps0LN6xXixe
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Am 07.12.21 um 21:57 schrieb Matthew Rosato:
-> This was previously removed as unnecessary; while that was true, subsequent
-> changes will make KVM an additional required component for vfio-pci-zdev.
-> Let's re-introduce CONFIG_VFIO_PCI_ZDEV as now there is actually a reason
-> to say 'n' for it (when not planning to CONFIG_KVM).
-> 
-> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> ---
->   drivers/vfio/pci/Kconfig      | 11 +++++++++++
->   drivers/vfio/pci/Makefile     |  2 +-
->   include/linux/vfio_pci_core.h |  2 +-
->   3 files changed, 13 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/vfio/pci/Kconfig b/drivers/vfio/pci/Kconfig
-> index 860424ccda1b..fedd1d4cb592 100644
-> --- a/drivers/vfio/pci/Kconfig
-> +++ b/drivers/vfio/pci/Kconfig
-> @@ -42,5 +42,16 @@ config VFIO_PCI_IGD
->   	  and LPC bridge config space.
->   
->   	  To enable Intel IGD assignment through vfio-pci, say Y.
-> +
-> +config VFIO_PCI_ZDEV
-> +	bool "VFIO PCI extensions for s390x KVM passthrough"
-> +	depends on S390 && KVM
+On Thu, 2021-12-16 at 16:47 +0800, Peter Xu wrote:
+> Hi, David,
+>=20
+> On Thu, Dec 09, 2021 at 10:08:40PM +0000, David Woodhouse wrote:
+> > We don't need to check kvm_enable_x2apic(). It's perfectly OK to suppor=
+t
+> > interrupt remapping even if we can't address CPUs above 254. Kind of
+> > pointless, but still functional.
+>=20
+> We only checks kvm_enable_x2apic() if eim=3Don is set, right?  I mean, we=
+ can
+> still enable IR without x2apic even with current code?
+>=20
+> Could you elaborate what's the use scenario for this patch?  Thanks in ad=
+vance.
 
-does this also depend on vfio-pci?
+You can have IR, EIM *and* X2APIC if kvm_enable_x2apic() fails. You
+just can't have any CPUs with an APIC ID > 254.
 
-> +	default y
-> +	help
-> +	  Support s390x-specific extensions to enable support for enhancements
-> +	  to KVM passthrough capabilities, such as interpretive execution of
-> +	  zPCI instructions.
-> +
-> +	  To enable s390x KVM vfio-pci extensions, say Y.
->   endif
->   endif
-> diff --git a/drivers/vfio/pci/Makefile b/drivers/vfio/pci/Makefile
-> index 349d68d242b4..01b1f83d83d7 100644
-> --- a/drivers/vfio/pci/Makefile
-> +++ b/drivers/vfio/pci/Makefile
-> @@ -1,7 +1,7 @@
->   # SPDX-License-Identifier: GPL-2.0-only
->   
->   vfio-pci-core-y := vfio_pci_core.o vfio_pci_intrs.o vfio_pci_rdwr.o vfio_pci_config.o
-> -vfio-pci-core-$(CONFIG_S390) += vfio_pci_zdev.o
-> +vfio-pci-core-$(CONFIG_VFIO_PCI_ZDEV) += vfio_pci_zdev.o
->   obj-$(CONFIG_VFIO_PCI_CORE) += vfio-pci-core.o
->   
->   vfio-pci-y := vfio_pci.o
-> diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
-> index ef9a44b6cf5d..5e2bca3b89db 100644
-> --- a/include/linux/vfio_pci_core.h
-> +++ b/include/linux/vfio_pci_core.h
-> @@ -195,7 +195,7 @@ static inline int vfio_pci_igd_init(struct vfio_pci_core_device *vdev)
->   }
->   #endif
->   
-> -#ifdef CONFIG_S390
-> +#ifdef CONFIG_VFIO_PCI_ZDEV
->   extern int vfio_pci_info_zdev_add_caps(struct vfio_pci_core_device *vdev,
->   				       struct vfio_info_cap *caps);
->   #else
-> 
+But qemu is going to bail out *anyway* if you attempt to have CPUs with
+APIC IDs above 254 without the corresponding kernel-side support, so
+there's no need to check it here.
+
+> > The check on kvm_enable_x2apic() needs to happen *anyway* in order to
+> > allow CPUs above 254 even without an IOMMU, so allow that to happen
+> > elsewhere.
+> >=20
+> > However, we do require the *split* irqchip in order to rewrite I/OAPIC
+> > destinations. So fix that check while we're here.
+> >=20
+> > Signed-off-by: David Woodhouse <dwmw2@infradead.org>
+> > Reviewed-by: Peter Xu <peterx@redhat.com>
+> > Acked-by: Jason Wang <jasowang@redhat.com>
+>=20
+> I think the r-b and a-b should be for patch 2 not this one? :)
+>=20
+
+Yes, I think I must have swapped those round. Thanks.
+
+> > ---
+> >  hw/i386/intel_iommu.c | 7 +------
+> >  1 file changed, 1 insertion(+), 6 deletions(-)
+> >=20
+> > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> > index bd288d45bb..0d1c72f08e 100644
+> > --- a/hw/i386/intel_iommu.c
+> > +++ b/hw/i386/intel_iommu.c
+> > @@ -3760,15 +3760,10 @@ static bool vtd_decide_config(IntelIOMMUState *=
+s, Error **errp)
+> >                                                ON_OFF_AUTO_ON : ON_OFF_=
+AUTO_OFF;
+> >      }
+> >      if (s->intr_eim =3D=3D ON_OFF_AUTO_ON && !s->buggy_eim) {
+> > -        if (!kvm_irqchip_in_kernel()) {
+> > +        if (!kvm_irqchip_is_split()) {
+>=20
+> I think this is okay, but note that we'll already fail if !split in
+> x86_iommu_realize():
+>=20
+>     bool irq_all_kernel =3D kvm_irqchip_in_kernel() && !kvm_irqchip_is_sp=
+lit();
+>=20
+>     /* Both Intel and AMD IOMMU IR only support "kernel-irqchip=3D{off|sp=
+lit}" */
+>     if (x86_iommu_ir_supported(x86_iommu) && irq_all_kernel) {
+>         error_setg(errp, "Interrupt Remapping cannot work with "
+>                          "kernel-irqchip=3Don, please use 'split|off'.");
+>         return;
+>     }
+
+OK, then perhaps the entire check is redundant?
+
+
+--=-mxCmuhdQSps0LN6xXixe
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCECow
+ggUcMIIEBKADAgECAhEA4rtJSHkq7AnpxKUY8ZlYZjANBgkqhkiG9w0BAQsFADCBlzELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
+A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
+bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTkwMTAyMDAwMDAwWhcNMjIwMTAxMjM1
+OTU5WjAkMSIwIAYJKoZIhvcNAQkBFhNkd213MkBpbmZyYWRlYWQub3JnMIIBIjANBgkqhkiG9w0B
+AQEFAAOCAQ8AMIIBCgKCAQEAsv3wObLTCbUA7GJqKj9vHGf+Fa+tpkO+ZRVve9EpNsMsfXhvFpb8
+RgL8vD+L133wK6csYoDU7zKiAo92FMUWaY1Hy6HqvVr9oevfTV3xhB5rQO1RHJoAfkvhy+wpjo7Q
+cXuzkOpibq2YurVStHAiGqAOMGMXhcVGqPuGhcVcVzVUjsvEzAV9Po9K2rpZ52FE4rDkpDK1pBK+
+uOAyOkgIg/cD8Kugav5tyapydeWMZRJQH1vMQ6OVT24CyAn2yXm2NgTQMS1mpzStP2ioPtTnszIQ
+Ih7ASVzhV6csHb8Yrkx8mgllOyrt9Y2kWRRJFm/FPRNEurOeNV6lnYAXOymVJwIDAQABo4IB0zCC
+Ac8wHwYDVR0jBBgwFoAUgq9sjPjF/pZhfOgfPStxSF7Ei8AwHQYDVR0OBBYEFLfuNf820LvaT4AK
+xrGK3EKx1DE7MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUF
+BwMEBggrBgEFBQcDAjBGBgNVHSAEPzA9MDsGDCsGAQQBsjEBAgEDBTArMCkGCCsGAQUFBwIBFh1o
+dHRwczovL3NlY3VyZS5jb21vZG8ubmV0L0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3Js
+LmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWls
+Q0EuY3JsMIGLBggrBgEFBQcBAQR/MH0wVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuY29tb2RvY2Eu
+Y29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYI
+KwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmNvbW9kb2NhLmNvbTAeBgNVHREEFzAVgRNkd213MkBpbmZy
+YWRlYWQub3JnMA0GCSqGSIb3DQEBCwUAA4IBAQALbSykFusvvVkSIWttcEeifOGGKs7Wx2f5f45b
+nv2ghcxK5URjUvCnJhg+soxOMoQLG6+nbhzzb2rLTdRVGbvjZH0fOOzq0LShq0EXsqnJbbuwJhK+
+PnBtqX5O23PMHutP1l88AtVN+Rb72oSvnD+dK6708JqqUx2MAFLMevrhJRXLjKb2Mm+/8XBpEw+B
+7DisN4TMlLB/d55WnT9UPNHmQ+3KFL7QrTO8hYExkU849g58Dn3Nw3oCbMUgny81ocrLlB2Z5fFG
+Qu1AdNiBA+kg/UxzyJZpFbKfCITd5yX49bOriL692aMVDyqUvh8fP+T99PqorH4cIJP6OxSTdxKM
+MIIFHDCCBASgAwIBAgIRAOK7SUh5KuwJ6cSlGPGZWGYwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
+ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTE5MDEwMjAwMDAwMFoXDTIyMDEwMTIz
+NTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCASIwDQYJKoZIhvcN
+AQEBBQADggEPADCCAQoCggEBALL98Dmy0wm1AOxiaio/bxxn/hWvraZDvmUVb3vRKTbDLH14bxaW
+/EYC/Lw/i9d98CunLGKA1O8yogKPdhTFFmmNR8uh6r1a/aHr301d8YQea0DtURyaAH5L4cvsKY6O
+0HF7s5DqYm6tmLq1UrRwIhqgDjBjF4XFRqj7hoXFXFc1VI7LxMwFfT6PStq6WedhROKw5KQytaQS
+vrjgMjpICIP3A/CroGr+bcmqcnXljGUSUB9bzEOjlU9uAsgJ9sl5tjYE0DEtZqc0rT9oqD7U57My
+ECIewElc4VenLB2/GK5MfJoJZTsq7fWNpFkUSRZvxT0TRLqznjVepZ2AFzsplScCAwEAAaOCAdMw
+ggHPMB8GA1UdIwQYMBaAFIKvbIz4xf6WYXzoHz0rcUhexIvAMB0GA1UdDgQWBBS37jX/NtC72k+A
+CsaxitxCsdQxOzAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEF
+BQcDBAYIKwYBBQUHAwIwRgYDVR0gBD8wPTA7BgwrBgEEAbIxAQIBAwUwKzApBggrBgEFBQcCARYd
+aHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9DUFMwWgYDVR0fBFMwUTBPoE2gS4ZJaHR0cDovL2Ny
+bC5jb21vZG9jYS5jb20vQ09NT0RPUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFp
+bENBLmNybDCBiwYIKwYBBQUHAQEEfzB9MFUGCCsGAQUFBzAChklodHRwOi8vY3J0LmNvbW9kb2Nh
+LmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3J0MCQG
+CCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAC20spBbrL71ZEiFrbXBHonzhhirO1sdn+X+O
+W579oIXMSuVEY1LwpyYYPrKMTjKECxuvp24c829qy03UVRm742R9Hzjs6tC0oatBF7KpyW27sCYS
+vj5wbal+TttzzB7rT9ZfPALVTfkW+9qEr5w/nSuu9PCaqlMdjABSzHr64SUVy4ym9jJvv/FwaRMP
+gew4rDeEzJSwf3eeVp0/VDzR5kPtyhS+0K0zvIWBMZFPOPYOfA59zcN6AmzFIJ8vNaHKy5QdmeXx
+RkLtQHTYgQPpIP1Mc8iWaRWynwiE3ecl+PWzq4i+vdmjFQ8qlL4fHz/k/fT6qKx+HCCT+jsUk3cS
+jDCCBeYwggPOoAMCAQICEGqb4Tg7/ytrnwHV2binUlYwDQYJKoZIhvcNAQEMBQAwgYUxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMSswKQYDVQQDEyJDT01PRE8gUlNBIENlcnRpZmljYXRp
+b24gQXV0aG9yaXR5MB4XDTEzMDExMDAwMDAwMFoXDTI4MDEwOTIzNTk1OVowgZcxCzAJBgNVBAYT
+AkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNV
+BAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAvrOeV6wodnVAFsc4A5jTxhh2IVDzJXkLTLWg0X06WD6cpzEup/Y0dtmEatrQPTRI5Or1u6zf
++bGBSyD9aH95dDSmeny1nxdlYCeXIoymMv6pQHJGNcIDpFDIMypVpVSRsivlJTRENf+RKwrB6vcf
+WlP8dSsE3Rfywq09N0ZfxcBa39V0wsGtkGWC+eQKiz4pBZYKjrc5NOpG9qrxpZxyb4o4yNNwTqza
+aPpGRqXB7IMjtf7tTmU2jqPMLxFNe1VXj9XB1rHvbRikw8lBoNoSWY66nJN/VCJv5ym6Q0mdCbDK
+CMPybTjoNCQuelc0IAaO4nLUXk0BOSxSxt8kCvsUtQIDAQABo4IBPDCCATgwHwYDVR0jBBgwFoAU
+u69+Aj36pvE8hI6t7jiY7NkyMtQwHQYDVR0OBBYEFIKvbIz4xf6WYXzoHz0rcUhexIvAMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMBEGA1UdIAQKMAgwBgYEVR0gADBMBgNVHR8E
+RTBDMEGgP6A9hjtodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDZXJ0aWZpY2F0aW9u
+QXV0aG9yaXR5LmNybDBxBggrBgEFBQcBAQRlMGMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9jcnQuY29t
+b2RvY2EuY29tL0NPTU9ET1JTQUFkZFRydXN0Q0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2Nz
+cC5jb21vZG9jYS5jb20wDQYJKoZIhvcNAQEMBQADggIBAHhcsoEoNE887l9Wzp+XVuyPomsX9vP2
+SQgG1NgvNc3fQP7TcePo7EIMERoh42awGGsma65u/ITse2hKZHzT0CBxhuhb6txM1n/y78e/4ZOs
+0j8CGpfb+SJA3GaBQ+394k+z3ZByWPQedXLL1OdK8aRINTsjk/H5Ns77zwbjOKkDamxlpZ4TKSDM
+KVmU/PUWNMKSTvtlenlxBhh7ETrN543j/Q6qqgCWgWuMAXijnRglp9fyadqGOncjZjaaSOGTTFB+
+E2pvOUtY+hPebuPtTbq7vODqzCM6ryEhNhzf+enm0zlpXK7q332nXttNtjv7VFNYG+I31gnMrwfH
+M5tdhYF/8v5UY5g2xANPECTQdu9vWPoqNSGDt87b3gXb1AiGGaI06vzgkejL580ul+9hz9D0S0U4
+jkhJiA7EuTecP/CFtR72uYRBcunwwH3fciPjviDDAI9SnC/2aPY8ydehzuZutLbZdRJ5PDEJM/1t
+yZR2niOYihZ+FCbtf3D9mB12D4ln9icgc7CwaxpNSCPt8i/GqK2HsOgkL3VYnwtx7cJUmpvVdZ4o
+gnzgXtgtdk3ShrtOS1iAN2ZBXFiRmjVzmehoMof06r1xub+85hFQzVxZx5/bRaTKTlL8YXLI8nAb
+R9HWdFqzcOoB/hxfEyIQpx9/s81rgzdEZOofSlZHynoSMYIDyjCCA8YCAQEwga0wgZcxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
+ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
+ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjEx
+MjE3MTY1MTIwWjAvBgkqhkiG9w0BCQQxIgQgMfeRy6dQM2U84gvExHycdr18xdSMYzd4HTBk5Ugg
+tscwgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
+PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
+aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
+A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
+bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
+DQEBAQUABIIBAHRPFGFwT3FDSOY74WhxVI7TUvQfbNg0RMria+1sbrVaz+UNksYtWkTKDmEwMtZc
+KbQ8BvqG4oLptOq4DVMFyTZPpjYUzwbsUoyLXEQKQQ/S3Rv4qGlRmC4C19YFQYR987nDSNBfWjIK
+7ADdKrwND4ja92efl3LRsMW1GKtqSNQUtWhJDLzckIM4AJTbv0m5viBhLzGM1ODwVT1A50Jvdnmr
+qLc2lKCL2KSWwagiGoEHbJOy4ut/xtbsRtQGb3drmmQlpXBmgyDv2AEpRGzgGc6aIMRK1QnaplH2
+WoYIFrX4xxjHIRABeDt4PRBuxzVNv4qdy3UKokL+qR5M6qHqKe8AAAAAAAA=
+
+
+--=-mxCmuhdQSps0LN6xXixe--
+
