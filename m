@@ -2,127 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D9179478DC3
-	for <lists+kvm@lfdr.de>; Fri, 17 Dec 2021 15:25:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BD26C478DF6
+	for <lists+kvm@lfdr.de>; Fri, 17 Dec 2021 15:40:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234592AbhLQOZE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Dec 2021 09:25:04 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:34884 "EHLO
+        id S237339AbhLQOk7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Dec 2021 09:40:59 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:50347 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231652AbhLQOZC (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 17 Dec 2021 09:25:02 -0500
+        by vger.kernel.org with ESMTP id S237281AbhLQOk6 (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 17 Dec 2021 09:40:58 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1639751102;
+        s=mimecast20190719; t=1639752057;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Yof0t9L7kPtXzpqrUUe+78TSbXMmLOHbqj/saGE07Ho=;
-        b=R2jOI4z9HHfj1xCbm3Hk95yeL8PqCaJr2G7U3HyrFseVldPygCKgY+FimQ14ojQltfgMsY
-        Tt80abZmKopsupT5yPU6HLqcz5feSeP4GeBKNuPQ9c8giqUsQoOwWlmr0HJbdA5KIqKXqm
-        6AIMlZPoNd+m+LRCjUAEr8o1yE8QXik=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=/yoWJglPXPAZw0bxQGxzTmnTF1ai7Cyb2lA49+zOQaA=;
+        b=Kbvin4prC3uNSwcVxZJMcwSpi9gn8nOGIFby/7whGAk4SaDMzRVj685pyztsFC36Santke
+        72nocJTQsAU2vqwSLxv+lwHPUUhiUbNUJlR6vCxaNB779rvSVqIL2P9myXqP5fBo5Dgy8Q
+        BcR6pxfwcAXTYgkly85g7z1F+x1emqA=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-479-0TaoJRrWN9KZwLugCJkrQw-1; Fri, 17 Dec 2021 09:25:01 -0500
-X-MC-Unique: 0TaoJRrWN9KZwLugCJkrQw-1
-Received: by mail-wr1-f71.google.com with SMTP id h7-20020adfaa87000000b001885269a937so671287wrc.17
-        for <kvm@vger.kernel.org>; Fri, 17 Dec 2021 06:25:00 -0800 (PST)
+ us-mta-608-Snd99FrmOVuTOXBbtFVKYw-1; Fri, 17 Dec 2021 09:40:56 -0500
+X-MC-Unique: Snd99FrmOVuTOXBbtFVKYw-1
+Received: by mail-wm1-f72.google.com with SMTP id o18-20020a05600c511200b00332fa17a02eso1136801wms.5
+        for <kvm@vger.kernel.org>; Fri, 17 Dec 2021 06:40:56 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=Yof0t9L7kPtXzpqrUUe+78TSbXMmLOHbqj/saGE07Ho=;
-        b=l/qGtlpz5Z+K8ET/T0SgP91JDVwb8MUUj5rp8/WQFBNxR7oTIZfxO7Tax9GsqAyuUb
-         cfWbuUXo0C5HJcFCC5EAenISdtK1/gdUVPIWer6rA3BRqrAdOF62zKDYHx3Uhpnofdwa
-         Af/vwx8ngX9wpMz2Yco3eQEot4h23UQ/Z6xVofMrQXP6vUlt1Fg/IWahTZMrofPk0JYj
-         dWapfz6aYsNrHKK1VWsY2Cu3IEyim90RM9NDMQkNB9qJCdLtK22WzCsmaZJftn5u2dCs
-         Kid6Rf6XrEnng4GTjUAyezyuSi/lCd6AUVdx4jzH7WpGubWiC2C0wx4+x7qAcihlezj3
-         5Kzg==
-X-Gm-Message-State: AOAM531WYqL3F/bx1ReoxGzO7YneEJr0WQMZVk5Q8aKkukqKDbZcZCJ9
-        kfchHLyg1g37dMybDbQ0f85mJJw+2y9oCXfTDgoi0RxC9wvyek6+1F/TI/OdoW07iY+/tjED45E
-        P3NeHQjiH0Brv
-X-Received: by 2002:a05:6000:15cd:: with SMTP id y13mr2793329wry.581.1639751099855;
-        Fri, 17 Dec 2021 06:24:59 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyEZJhx0XW4LNBmwJ2SkNBM98b6Qaw95HU4EUxBpNOF+91SFyDFTqCn3IZXPp6VGf4cqVvfCQ==
-X-Received: by 2002:a05:6000:15cd:: with SMTP id y13mr2793317wry.581.1639751099602;
-        Fri, 17 Dec 2021 06:24:59 -0800 (PST)
-Received: from [192.168.2.110] (p54886ae3.dip0.t-ipconnect.de. [84.136.106.227])
-        by smtp.gmail.com with ESMTPSA id n8sm6835395wri.47.2021.12.17.06.24.58
+        bh=/yoWJglPXPAZw0bxQGxzTmnTF1ai7Cyb2lA49+zOQaA=;
+        b=gp6BoBjUKPgHKUn2ABi/ADwdFYtUMTBcILJEEItQCVMvpfhpoy9B+hnOYJqRO9lXW2
+         xJDH/TJfQVt/KdCraRAIxFfeUN3slZfmBRdKitePcCqEMFwgP3Oe1NgFN9amLEZsW9Oe
+         b5B/8LLZtCJyFD3P02IDhC/bY9KRVGQ8EQ9ywA9jE2q2PkA2wxAfiNqdiYbRkd2RdRyS
+         ZlY2fm9DcsyuAp3LkTaHD8AVYtJiLJyoQpVEX+VMutEG22jS6DMmWWFu++E4hGD2zYvk
+         +Tpv2vbFkmM9ysW2rbyq17r8l1u1YZvigen3OFdmmXALvrtj93FBlE5zS9Kq2SOMgoTR
+         BY7Q==
+X-Gm-Message-State: AOAM531soKhA8kwR8x+kv6/Imaa25PSXBKZu4yeKSfCxZ0A+ZcghNfVl
+        d1Ak9h5G+LZ67FwnTy+3Vs9uh9kcaD9P50LyGAGPVlcA3tr9F851g21KWJQhPth997Y4RPMzy1u
+        TiS7ekxTKo+eF
+X-Received: by 2002:a1c:e915:: with SMTP id q21mr3099373wmc.94.1639752055545;
+        Fri, 17 Dec 2021 06:40:55 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzcbPf9fupPFiQTxl/6Lq5J6o57nKgktC42aQsYNIOLu2CqrhXXCb//5f7F/Lc1vxEHhsPDEA==
+X-Received: by 2002:a1c:e915:: with SMTP id q21mr3099360wmc.94.1639752055373;
+        Fri, 17 Dec 2021 06:40:55 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:48f9:bea:a04c:3dfe? ([2001:b07:6468:f312:48f9:bea:a04c:3dfe])
+        by smtp.googlemail.com with ESMTPSA id j17sm10249998wmq.41.2021.12.17.06.40.54
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Dec 2021 06:24:59 -0800 (PST)
-Message-ID: <f861e42c-bd52-2f35-b0da-c44500fff3b6@redhat.com>
-Date:   Fri, 17 Dec 2021 15:24:57 +0100
+        Fri, 17 Dec 2021 06:40:54 -0800 (PST)
+Message-ID: <785732e0-733b-fccd-0b3d-0a597f2f68bf@redhat.com>
+Date:   Fri, 17 Dec 2021 15:40:53 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH kvm-unit-tests 1/2] s390x: diag288: Add missing clobber
+ Thunderbird/91.2.0
+Subject: Re: [kvm-unit-tests PATCH] x86/pmu: Test PMU virtualization on
+ emulated instructions
 Content-Language: en-US
-To:     Janosch Frank <frankja@linux.ibm.com>,
-        Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
-        david@redhat.com
-References: <20211217103137.1293092-1-nrb@linux.ibm.com>
- <20211217103137.1293092-2-nrb@linux.ibm.com>
- <3e2035bd-0929-488c-28f3-d8256bec14a4@redhat.com>
- <329aced6-df4f-2802-cbc6-99469c5f9462@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <329aced6-df4f-2802-cbc6-99469c5f9462@linux.ibm.com>
+To:     Ma Xinjian <xinjianx.ma@intel.com>, jmattson@google.com
+Cc:     ehankland@google.com, kvm@vger.kernel.org,
+        Philip Li <philip.li@intel.com>
+References: <a2cc8bd6-df74-95a7-f3a2-6ff6407a5543@intel.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <a2cc8bd6-df74-95a7-f3a2-6ff6407a5543@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/12/2021 15.16, Janosch Frank wrote:
-> On 12/17/21 14:47, Thomas Huth wrote:
->> On 17/12/2021 11.31, Nico Boehr wrote:
->>> We clobber r0 and thus should let the compiler know we're doing so.
->>>
->>> Because we change from basic to extended ASM, we need to change the
->>> register names, as %r0 will be interpreted as a token in the assembler
->>> template.
->>>
->>> For consistency, we align with the common style in kvm-unit-tests which
->>> is just 0.
->>>
->>> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
->>> ---
->>>    s390x/diag288.c | 7 ++++---
->>>    1 file changed, 4 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/s390x/diag288.c b/s390x/diag288.c
->>> index 072c04a5cbd6..da7b06c365bf 100644
->>> --- a/s390x/diag288.c
->>> +++ b/s390x/diag288.c
->>> @@ -94,11 +94,12 @@ static void test_bite(void)
->>>        /* Arm watchdog */
->>>        lc->restart_new_psw.mask = extract_psw_mask() & ~PSW_MASK_EXT;
->>>        diag288(CODE_INIT, 15, ACTION_RESTART);
->>> -    asm volatile("        larl    %r0, 1f\n"
->>> -             "        stg    %r0, 424\n"
->>> +    asm volatile("        larl    0, 1f\n"
->>> +             "        stg    0, 424\n"
->>
->> Would it work to use %%r0 instead?
+On 12/17/21 10:47, Ma Xinjian wrote:
+> Hi, Jim
 > 
-> Yes, but I told him that looks weird, so that one is on me.
-> @claudio @thomas What's your preferred way of dealing with this?
+> I am from Intel LKP team, we noticed that pmu_emulation was new added 
+> recently by you.
+> 
+> We tested it and finished with 2 unexpected failures
 
-I think it's mostly a matter of taste. I slightly prefer %%r0 to just 0 so 
-that it is clear from the first sight that it is a register and not an 
-immediate constant.
-Additionally, there used to be a problem with older versions of Clang that 
-required the %%rX syntax, see:
+The patch for this is not yet in kvm.git, since there were some 
+discussions on the list.  It will be fixed before the merge window.
 
-  https://git.qemu.org/?p=qemu.git;a=commitdiff;h=052b66e7211af6
-
-But we're not supporting those Clang versions for the kvm-unit-tests anyway, 
-so that doesn't really count.
-
-Thus, I don't mind too much, if everybody else prefers the bare numbers, 
-then let's go with this.
-
-  Thomas
+Paolo
 
