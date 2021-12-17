@@ -2,158 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B674647831A
-	for <lists+kvm@lfdr.de>; Fri, 17 Dec 2021 03:23:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C5FA247837B
+	for <lists+kvm@lfdr.de>; Fri, 17 Dec 2021 04:07:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231196AbhLQCXF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Dec 2021 21:23:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40792 "EHLO
+        id S229471AbhLQDHM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Dec 2021 22:07:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230464AbhLQCXE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Dec 2021 21:23:04 -0500
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81FC8C061574;
-        Thu, 16 Dec 2021 18:23:04 -0800 (PST)
-Received: by mail-pl1-x62a.google.com with SMTP id u17so577892plg.9;
-        Thu, 16 Dec 2021 18:23:04 -0800 (PST)
+        with ESMTP id S232089AbhLQDHL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Dec 2021 22:07:11 -0500
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72F34C061574
+        for <kvm@vger.kernel.org>; Thu, 16 Dec 2021 19:07:11 -0800 (PST)
+Received: by mail-pg1-x52f.google.com with SMTP id 200so841844pgg.3
+        for <kvm@vger.kernel.org>; Thu, 16 Dec 2021 19:07:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:in-reply-to:references
-         :organization:mime-version:content-transfer-encoding;
-        bh=YkC57fIQYOJd6l+HEs53okpuCiM+wlfOFUu3D4S4VL8=;
-        b=TXf1+sH3CHPLox/x/TeYmaYOxV79u7dfdXQ4YqeSqa/l3eEKnkJtx4KSY8HOdZuiiY
-         3eQfX1Jng1kaqvPyoN1XCxZlGgcQTAF6QwsqXyweEFWegvgtIxHjsSFGJkr+v36bw2uI
-         wiQAUtMHbRbXTiU09zeUB7ARQPlHabIQZuzsy2SH/A0jZDVQWbkflYGxqfabvHCJkSJw
-         qzjk3qauAmyhK3F92Yh6MWN1Q/BBJ1x+yOImiHWr0QR8i2kFShYjVFkTUU8e4qivL2eF
-         wT+AwkmgReOqWAQmIXGSO4JseoIgPBCybbxj5spSkqVhqceov4lg1mheh+EHUT3cFkbK
-         9SJw==
+        d=ozlabs-ru.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=hqVeHYszJrco9ra2C2j8EHyWbAh1gF1XNTB+IDSGnkA=;
+        b=iN8HmKrVxt9lDjYWhkv3zQxN0RsFwJipjLVg/CpyYVKDbnOpE7+sppxleWAOKvAUYt
+         /vs+W5tTUWcVFpVkza3BPSSBSsE2OSzA+dWxVtU2rP+p6G70Yc6mBjpye3oEulabdFw9
+         n75XUtpOn78rDY0AuTOMmgikPJjHZVEeae4Meo5oorSqISHjDLjLQieddAgwWW6rGdc/
+         R48/uss4DnWlZRiGwOcBr5bQMy6wgMP60Hqclcf8tO0ikcpfiyF1C3Fajdt8V5pGzbRL
+         wIFmaxOjOvXqciceCy6OZpnTfiAjesS04p/5EZc1fT9OwCHXQUOjgh602ZPIIrbuv4NW
+         Vugg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=YkC57fIQYOJd6l+HEs53okpuCiM+wlfOFUu3D4S4VL8=;
-        b=WBKkYiMvyzSheZJkJexUpq2mlThah+19o8sVrtGD92jz/+derbKAjjX3d1MQDPIK1D
-         udtazMpSdbDoQJ4huS7o8iaguwVLwG+GsnJQCSEveq+wtxvYljiJWADQaaVnwL/auNiS
-         AN92Yz9Zgyp+zu5VVPmTbvONuw22cMOcGpNo/ykEmp0NnU+78Es5+697f9t9YboQqMge
-         HMpLXIcBPEGIldliAvEMmX7yWmrCHyAM3hSRcVq+VfB3HLTE0ay5i8Bcsg+TIfJI2BRW
-         0SBc9KbEjTmIkr6n6K0Q7eStClgropjB0KKLMJBNSzLh+dKB01ut22As0uRdopX8xcDc
-         YFxw==
-X-Gm-Message-State: AOAM532jVu+ZXaHQV9W6RfRQftH4o86mFaDMNCa2hJyIF8Kdfd2Tx+5t
-        WpLBvWQwmQAgt5HCJLDttHc=
-X-Google-Smtp-Source: ABdhPJwN1XrN5B8b4WgxB64cirDloPcYXtFP8VF7uv9k995G0YMwetE+9bSxfKVsRneLXsjqyRR1qw==
-X-Received: by 2002:a17:90b:1b03:: with SMTP id nu3mr9470286pjb.240.1639707784058;
-        Thu, 16 Dec 2021 18:23:04 -0800 (PST)
-Received: from localhost.localdomain ([43.128.78.144])
-        by smtp.gmail.com with ESMTPSA id m1sm548349pjv.28.2021.12.16.18.23.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Dec 2021 18:23:03 -0800 (PST)
-Date:   Fri, 17 Dec 2021 10:22:55 +0800
-From:   Aili Yao <yaoaili126@gmail.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yaoaili@kingsoft.com
-Subject: Re: [PATCH v2] KVM: LAPIC: Per vCPU control over
- kvm_can_post_timer_interrupt
-Message-ID: <20211217102255.481a1e1d@gmail.com>
-In-Reply-To: <YbtfNVVtLlvxE2YB@google.com>
-References: <20211124125409.6eec3938@gmail.com>
-        <Ya/s17QDlGZi9COR@google.com>
-        <20211216162303.230dbdaa@gmail.com>
-        <YbtfNVVtLlvxE2YB@google.com>
-Organization: ksyun
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=hqVeHYszJrco9ra2C2j8EHyWbAh1gF1XNTB+IDSGnkA=;
+        b=7fGcBxXUm2vYcek2eDWnj6cRzec5tb5DdXl2sC8NSVGhU7Et0Gk1zp9wqBLKdMPa85
+         zudb8wVCaSjlPwi0bo9fABLXvNvwdUSgJJIceYZYT3yCMA1HHDqDKLg1T0sIQ7m0CoIx
+         SCmnl/3jxBYlNLuCFDSMNdfdOAGxEhZ1tGXfcAXKBah286y+7BvuTa6E01s4OQOW0H7T
+         gVQf9tfaSfhgoauZ8nTq7fAKi5r1TycrZvmvsc1RF5a4OnP8Yxmm9wzGnvxWHV1pHP8b
+         DXpVpEOW/tvM0NJvHUHDHHXYhninDJPIM1S0BbDFx+wZkM3AoxEd2Pv/PslTv1hcas5/
+         VMsA==
+X-Gm-Message-State: AOAM530FbocX81oeEXG1+422q3UUjxOFFlxyEe8JLivRbHYBWzmSdQRc
+        AGroAcSMkExvOYj3YOObKZRSWQ==
+X-Google-Smtp-Source: ABdhPJzicJEgh8Afueuqf6fIiQw6DhvqKmheZLxm2ppty6gVVTSeoRHzK5ZA6uGKH0l8i7HYsn4atw==
+X-Received: by 2002:a63:d753:: with SMTP id w19mr1095375pgi.174.1639710430889;
+        Thu, 16 Dec 2021 19:07:10 -0800 (PST)
+Received: from [192.168.10.24] (124-171-108-209.dyn.iinet.net.au. [124.171.108.209])
+        by smtp.gmail.com with ESMTPSA id s38sm7998233pfg.17.2021.12.16.19.07.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 16 Dec 2021 19:07:09 -0800 (PST)
+Message-ID: <e59eaa8c-6c60-521f-dc5d-d7c549a7c80f@ozlabs.ru>
+Date:   Fri, 17 Dec 2021 14:07:05 +1100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:96.0) Gecko/20100101
+ Thunderbird/96.0
+Subject: Re: [PATCH kernel v3] KVM: PPC: Merge powerpc's debugfs entry content
+ into generic entry
+Content-Language: en-US
+To:     =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+        linuxppc-dev@lists.ozlabs.org
+Cc:     kvm-ppc@vger.kernel.org, kvm@vger.kernel.org,
+        Fabiano Rosas <farosas@linux.ibm.com>
+References: <20211215013309.217102-1-aik@ozlabs.ru>
+ <d980eeb7-1f32-dbd3-f60d-ea6ef24dbaaa@kaod.org>
+From:   Alexey Kardashevskiy <aik@ozlabs.ru>
+In-Reply-To: <d980eeb7-1f32-dbd3-f60d-ea6ef24dbaaa@kaod.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 16 Dec 2021 15:45:57 +0000
-Sean Christopherson <seanjc@google.com> wrote:
 
-> On Thu, Dec 16, 2021, Aili Yao wrote:
-> > On Tue, 7 Dec 2021 23:23:03 +0000
-> > Sean Christopherson <seanjc@google.com> wrote:  
-> > > On Tue, Nov 23, 2021 at 10:00 PM Wanpeng Li <kernellwp@gmail.com> wrote:  
-> > > > ---
-> > > >  arch/x86/kvm/lapic.c | 5 ++---
-> > > >  1 file changed, 2 insertions(+), 3 deletions(-)
-> > > >
-> > > > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > > > index 759952dd1222..8257566d44c7 100644
-> > > > --- a/arch/x86/kvm/lapic.c
-> > > > +++ b/arch/x86/kvm/lapic.c
-> > > > @@ -113,14 +113,13 @@ static inline u32 kvm_x2apic_id(struct kvm_lapic *apic)
-> > > >
-> > > >  static bool kvm_can_post_timer_interrupt(struct kvm_vcpu *vcpu)
-> > > >  {
-> > > > -       return pi_inject_timer && kvm_vcpu_apicv_active(vcpu);
-> > > > +       return pi_inject_timer && kvm_mwait_in_guest(vcpu->kvm) && kvm_vcpu_apicv_active(vcpu);    
-> > > 
-> > > As Aili's changelog pointed out, MWAIT may not be advertised to the guest. 
-> > > 
-> > > So I think we want this?  With a non-functional, opinionated refactoring of
-> > > kvm_can_use_hv_timer() because I'm terrible at reading !(a || b).
-> > > 
-> > > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > > index 40270d7bc597..c77cb386d03d 100644
-> > > --- a/arch/x86/kvm/lapic.c
-> > > +++ b/arch/x86/kvm/lapic.c
-> > > @@ -113,14 +113,25 @@ static inline u32 kvm_x2apic_id(struct kvm_lapic *apic)
-> > > 
-> > >  static bool kvm_can_post_timer_interrupt(struct kvm_vcpu *vcpu)
-> > >  {
-> > > -       return pi_inject_timer && kvm_vcpu_apicv_active(vcpu);
-> > > +       return pi_inject_timer && kvm_vcpu_apicv_active(vcpu) &&
-> > > +              (kvm_mwait_in_guest(vcpu) || kvm_hlt_in_guest(vcpu));
-> > >  }
-> > > 
-> > >  bool kvm_can_use_hv_timer(struct kvm_vcpu *vcpu)
-> > >  {
-> > > -       return kvm_x86_ops.set_hv_timer
-> > > -              && !(kvm_mwait_in_guest(vcpu->kvm) ||
-> > > -                   kvm_can_post_timer_interrupt(vcpu));
-> > > +       /*
-> > > +        * Don't use the hypervisor timer, a.k.a. VMX Preemption Timer, if the
-> > > +        * guest can execute MWAIT without exiting as the timer will stop
-> > > +        * counting if the core enters C3 or lower.  HLT in the guest is ok as
-> > > +        * HLT is effectively C1 and the timer counts in C0, C1, and C2.
-> > > +        *
-> > > +        * Don't use the hypervisor timer if KVM can post a timer interrupt to
-> > > +        * the guest since posted the timer avoids taking an extra a VM-Exit
-> > > +        * when the timer expires.
-> > > +        */
-> > > +       return kvm_x86_ops.set_hv_timer &&
-> > > +              !kvm_mwait_in_guest(vcpu->kvm) &&
-> > > +              !kvm_can_post_timer_interrupt(vcpu));
-> > >  }
-> > >  EXPORT_SYMBOL_GPL(kvm_can_use_hv_timer);
-> > >   
-> > 
-> > It seems Sean and Wanpeng are busy with some other more important issues;
-> > So Please let me try to merge Sean, Wanpeng's ideas and suggestions together,also including my opinions
-> > into one possible approach and get it reviewed, Only if others are OK with this;
-> > 
-> > I will post a new patch for this later today or tomorrow.  
+
+On 12/16/21 05:11, Cédric Le Goater wrote:
+> On 12/15/21 02:33, Alexey Kardashevskiy wrote:
+>> At the moment KVM on PPC creates 3 types of entries under the kvm debugfs:
+>> 1) "%pid-%fd" per a KVM instance (for all platforms);
+>> 2) "vm%pid" (for PPC Book3s HV KVM);
+>> 3) "vm%u_vcpu%u_timing" (for PPC Book3e KVM).
+>>
+>> The problem with this is that multiple VMs per process is not allowed for
+>> 2) and 3) which makes it possible for userspace to trigger errors when
+>> creating duplicated debugfs entries.
+>>
+>> This merges all these into 1).
+>>
+>> This defines kvm_arch_create_kvm_debugfs() similar to
+>> kvm_arch_create_vcpu_debugfs().
+>>
+>> This defines 2 hooks in kvmppc_ops that allow specific KVM implementations
+>> add necessary entries, this adds the _e500 suffix to
+>> kvmppc_create_vcpu_debugfs_e500() to make it clear what platform it is for.
+>>
+>> This makes use of already existing kvm_arch_create_vcpu_debugfs() on PPC.
+>>
+>> This removes no more used debugfs_dir pointers from PPC kvm_arch structs.
+>>
+>> This stops removing vcpu entries as once created vcpus stay around
+>> for the entire life of a VM and removed when the KVM instance is closed,
+>> see commit d56f5136b010 ("KVM: let kvm_destroy_vm_debugfs clean up vCPU
+>> debugfs directories").
 > 
-> Sorry, I was waiting for someone to say "this works", but never actually said as
-> much.
+> It would nice to also move the KVM device debugfs files :
 > 
-> Does the above change address your use case?  If not, what's missing?
+>    /sys/kernel/debug/powerpc/kvm-xive-%p
+> 
+> These are dynamically created and destroyed at run time depending
+> on the interrupt mode negociated by CAS. It might be more complex ?
 
-After a little modifications, This works in my test.
+With this addition:
 
-static bool kvm_can_post_timer_interrupt(struct kvm_vcpu *vcpu)
-{
--       return pi_inject_timer && kvm_vcpu_apicv_active(vcpu);
-+       return pi_inject_timer && kvm_vcpu_apicv_active(vcpu) &&
-+              (kvm_mwait_in_guest(vcpu->kvm) || kvm_hlt_in_guest(vcpu->kvm));
- }
+diff --git a/arch/powerpc/kvm/book3s_xive_native.c
+b/arch/powerpc/kvm/book3s_xive_native.c
+index 99db9ac49901..511f643e2875 100644
+--- a/arch/powerpc/kvm/book3s_xive_native.c
++++ b/arch/powerpc/kvm/book3s_xive_native.c
+@@ -1267,10 +1267,10 @@ static void xive_native_debugfs_init(struct
+kvmppc_xive *xive)
+                return;
+        }
 
-and also you can delete or keep kvm_mwait_in_guest() check;
+-       xive->dentry = debugfs_create_file(name, 0444, arch_debugfs_dir,
++       xive->dentry = debugfs_create_file(name, 0444,
+xive->kvm->debugfs_dentry,
+                                           xive, &xive_native_debug_fops);
 
-Thanks!
+
+it looks fine, this is "before":
+
+root@zz1:/sys/kernel/debug# find -iname "*xive*"
+./slab/xive-provision
+./powerpc/kvm-xive-c0000000208c0000
+./powerpc/xive
+
+
+and this is "after" the patch applied.
+
+root@zz1:/sys/kernel/debug# find -iname "*xive*"
+./kvm/29058-11/kvm-xive-c0000000208c0000
+./slab/xive-provision
+./powerpc/xive
+
+
+I'll repost unless there is something more to it. Thanks,
+
+
+-- 
+Alexey
