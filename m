@@ -2,167 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 17D50478300
-	for <lists+kvm@lfdr.de>; Fri, 17 Dec 2021 03:11:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B674647831A
+	for <lists+kvm@lfdr.de>; Fri, 17 Dec 2021 03:23:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229784AbhLQCLy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 16 Dec 2021 21:11:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38282 "EHLO
+        id S231196AbhLQCXF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 16 Dec 2021 21:23:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229449AbhLQCLx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 16 Dec 2021 21:11:53 -0500
-Received: from mail-oi1-x230.google.com (mail-oi1-x230.google.com [IPv6:2607:f8b0:4864:20::230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 423F7C061574;
-        Thu, 16 Dec 2021 18:11:53 -0800 (PST)
-Received: by mail-oi1-x230.google.com with SMTP id m6so1582956oim.2;
-        Thu, 16 Dec 2021 18:11:53 -0800 (PST)
+        with ESMTP id S230464AbhLQCXE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 16 Dec 2021 21:23:04 -0500
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81FC8C061574;
+        Thu, 16 Dec 2021 18:23:04 -0800 (PST)
+Received: by mail-pl1-x62a.google.com with SMTP id u17so577892plg.9;
+        Thu, 16 Dec 2021 18:23:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=RSQtSqbGAahik3lofKuwuzkCALOuuG/K6xcfqSLYhNA=;
-        b=SHLw4f2H+5gWTcS6HVLp1w4KnEdCBxTCtWAdg4Qz+l7oer8vx4fAqjANgo0F1TbYx/
-         1GuYcQ16H7wTPRKWZMUxhJdHr/tCT4ZnTSHRgZxBkcxHgOEzGwOAbvsYuPlshL0i7T/F
-         hIV/v9Zczgwly4IeAYNKS9N1s+mNUlYCLZJbPR14S484XekgZZno/6rjwIDV6oBA6XV0
-         eZzupvk9wnrvUj72wP5c30fRVgIcXVsbB6GOi6lp2f7sUvcHs2HZV24JHdlYIzsnOozZ
-         OC8G+JFB3BY1JcmpyJKtRPxqioNGb5n8kSUazp5rPe9aQvq9DR1DhdXTIgNsv/llx3y6
-         Ld/w==
+        h=date:from:to:cc:subject:message-id:in-reply-to:references
+         :organization:mime-version:content-transfer-encoding;
+        bh=YkC57fIQYOJd6l+HEs53okpuCiM+wlfOFUu3D4S4VL8=;
+        b=TXf1+sH3CHPLox/x/TeYmaYOxV79u7dfdXQ4YqeSqa/l3eEKnkJtx4KSY8HOdZuiiY
+         3eQfX1Jng1kaqvPyoN1XCxZlGgcQTAF6QwsqXyweEFWegvgtIxHjsSFGJkr+v36bw2uI
+         wiQAUtMHbRbXTiU09zeUB7ARQPlHabIQZuzsy2SH/A0jZDVQWbkflYGxqfabvHCJkSJw
+         qzjk3qauAmyhK3F92Yh6MWN1Q/BBJ1x+yOImiHWr0QR8i2kFShYjVFkTUU8e4qivL2eF
+         wT+AwkmgReOqWAQmIXGSO4JseoIgPBCybbxj5spSkqVhqceov4lg1mheh+EHUT3cFkbK
+         9SJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=RSQtSqbGAahik3lofKuwuzkCALOuuG/K6xcfqSLYhNA=;
-        b=LrxyASK4flgHOnKpjhl0nCjR2Dy4YCzD53JsBCjbLZpacwRM0D+KUOd7tza1I3UIO9
-         Mdp9XqFiU6mKa2cZtPQ5gsd8Wq3JdH6/+KTApE9IxI1AR6BQZFFvWoyH4smdSvJFccfF
-         4DKaE63Rz5u4WxtayBpS7rLocH5f4vhslLuPdwImtn0UWhgZ/gvyCaCtog41Iil+LwYH
-         wPHNiM1rt+cpjMTpd8grxtIqFxSX+PGspcdUihUD2uv4fx5Va3TI8ugSC0aCt3yw3k6w
-         EtBGiBBn/mtSqg6ESVbLPC+9ctEWwLD2bOhP89uAEoGymY8DLdtc5SSZixcUMEIdwBjI
-         biGw==
-X-Gm-Message-State: AOAM530Xu1zZgBNcFxSr7JNjqzYuz9wdtzruzTompmk63nBqq/oq3WiE
-        pWrkElSwo22pwJ45sG8SGOqG+SKb5QBmgH0rOA0=
-X-Google-Smtp-Source: ABdhPJwfrvfnTOnAEYB4YjLS/zEy0yUDDe6beDVjzqRnidWGzK3Gg2JACukT+DRDVtVJseugwJuePp3UXhdTBNFRagg=
-X-Received: by 2002:a05:6808:68f:: with SMTP id k15mr6105547oig.5.1639707112651;
- Thu, 16 Dec 2021 18:11:52 -0800 (PST)
-MIME-Version: 1.0
-References: <73d46f3cc46a499c8e39fdf704b2deaf@huawei.com> <YbjWFTtNo9Ap7kDp@google.com>
- <9e5aef1ae0c141e49c2b1d19692b9295@huawei.com> <Ybtea42RxZ9aVzCh@google.com>
-In-Reply-To: <Ybtea42RxZ9aVzCh@google.com>
-From:   Wanpeng Li <kernellwp@gmail.com>
-Date:   Fri, 17 Dec 2021 10:11:41 +0800
-Message-ID: <CANRm+CwbOw8sXL4h9e5S6O7XcerUkfD+uG=iNu365qROeJTMKw@mail.gmail.com>
-Subject: Re: The vcpu won't be wakened for a long time
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=YkC57fIQYOJd6l+HEs53okpuCiM+wlfOFUu3D4S4VL8=;
+        b=WBKkYiMvyzSheZJkJexUpq2mlThah+19o8sVrtGD92jz/+derbKAjjX3d1MQDPIK1D
+         udtazMpSdbDoQJ4huS7o8iaguwVLwG+GsnJQCSEveq+wtxvYljiJWADQaaVnwL/auNiS
+         AN92Yz9Zgyp+zu5VVPmTbvONuw22cMOcGpNo/ykEmp0NnU+78Es5+697f9t9YboQqMge
+         HMpLXIcBPEGIldliAvEMmX7yWmrCHyAM3hSRcVq+VfB3HLTE0ay5i8Bcsg+TIfJI2BRW
+         0SBc9KbEjTmIkr6n6K0Q7eStClgropjB0KKLMJBNSzLh+dKB01ut22As0uRdopX8xcDc
+         YFxw==
+X-Gm-Message-State: AOAM532jVu+ZXaHQV9W6RfRQftH4o86mFaDMNCa2hJyIF8Kdfd2Tx+5t
+        WpLBvWQwmQAgt5HCJLDttHc=
+X-Google-Smtp-Source: ABdhPJwN1XrN5B8b4WgxB64cirDloPcYXtFP8VF7uv9k995G0YMwetE+9bSxfKVsRneLXsjqyRR1qw==
+X-Received: by 2002:a17:90b:1b03:: with SMTP id nu3mr9470286pjb.240.1639707784058;
+        Thu, 16 Dec 2021 18:23:04 -0800 (PST)
+Received: from localhost.localdomain ([43.128.78.144])
+        by smtp.gmail.com with ESMTPSA id m1sm548349pjv.28.2021.12.16.18.23.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Dec 2021 18:23:03 -0800 (PST)
+Date:   Fri, 17 Dec 2021 10:22:55 +0800
+From:   Aili Yao <yaoaili126@gmail.com>
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     "Longpeng (Mike, Cloud Infrastructure Service Product Dept.)" 
-        <longpeng2@huawei.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Gonglei (Arei)" <arei.gonglei@huawei.com>,
-        Huangzhichao <huangzhichao@huawei.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Cc:     pbonzini@redhat.com, vkuznets@redhat.com, wanpengli@tencent.com,
+        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
+        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yaoaili@kingsoft.com
+Subject: Re: [PATCH v2] KVM: LAPIC: Per vCPU control over
+ kvm_can_post_timer_interrupt
+Message-ID: <20211217102255.481a1e1d@gmail.com>
+In-Reply-To: <YbtfNVVtLlvxE2YB@google.com>
+References: <20211124125409.6eec3938@gmail.com>
+        <Ya/s17QDlGZi9COR@google.com>
+        <20211216162303.230dbdaa@gmail.com>
+        <YbtfNVVtLlvxE2YB@google.com>
+Organization: ksyun
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 17 Dec 2021 at 07:48, Sean Christopherson <seanjc@google.com> wrote:
->
-> On Thu, Dec 16, 2021, Longpeng (Mike, Cloud Infrastructure Service Product Dept.) wrote:
-> > > What kernel version?  There have been a variety of fixes/changes in the
-> > > area in recent kernels.
-> >
-> > The kernel version is 4.18, and it seems the latest kernel also has this problem.
-> >
-> > The following code can fixes this bug, I've tested it on 4.18.
-> >
-> > (4.18)
-> >
-> > @@ -3944,6 +3944,11 @@ static void vmx_deliver_posted_interrupt(struct kvm_vcpu *vcpu, int vector)
-> >         if (pi_test_and_set_on(&vmx->pi_desc))
-> >                 return;
-> >
-> > +       if (swq_has_sleeper(kvm_arch_vcpu_wq(vcpu))) {
-> > +               kvm_vcpu_kick(vcpu);
-> > +               return;
-> > +       }
-> > +
-> >         if (vcpu != kvm_get_running_vcpu() &&
-> >                 !kvm_vcpu_trigger_posted_interrupt(vcpu, false))
-> >                 kvm_vcpu_kick(vcpu);
-> >
-> >
-> > (latest)
-> >
-> > @@ -3959,6 +3959,11 @@ static int vmx_deliver_posted_interrupt(struct kvm_vcpu *vcpu, int vector)
-> >         if (pi_test_and_set_on(&vmx->pi_desc))
-> >                 return 0;
-> >
-> > +       if (rcuwait_active(&vcpu->wait)) {
-> > +               kvm_vcpu_kick(vcpu);
-> > +               return 0;
-> > +       }
-> > +
-> >         if (vcpu != kvm_get_running_vcpu() &&
-> >             !kvm_vcpu_trigger_posted_interrupt(vcpu, false))
-> >                 kvm_vcpu_kick(vcpu);
-> >
-> > Do you have any suggestions ?
->
-> Hmm, that strongly suggests the "vcpu != kvm_get_running_vcpu()" is at fault.
+On Thu, 16 Dec 2021 15:45:57 +0000
+Sean Christopherson <seanjc@google.com> wrote:
 
-This was introduced in 5.8-rc1, however, his kernel version is 4.18.
+> On Thu, Dec 16, 2021, Aili Yao wrote:
+> > On Tue, 7 Dec 2021 23:23:03 +0000
+> > Sean Christopherson <seanjc@google.com> wrote:  
+> > > On Tue, Nov 23, 2021 at 10:00 PM Wanpeng Li <kernellwp@gmail.com> wrote:  
+> > > > ---
+> > > >  arch/x86/kvm/lapic.c | 5 ++---
+> > > >  1 file changed, 2 insertions(+), 3 deletions(-)
+> > > >
+> > > > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> > > > index 759952dd1222..8257566d44c7 100644
+> > > > --- a/arch/x86/kvm/lapic.c
+> > > > +++ b/arch/x86/kvm/lapic.c
+> > > > @@ -113,14 +113,13 @@ static inline u32 kvm_x2apic_id(struct kvm_lapic *apic)
+> > > >
+> > > >  static bool kvm_can_post_timer_interrupt(struct kvm_vcpu *vcpu)
+> > > >  {
+> > > > -       return pi_inject_timer && kvm_vcpu_apicv_active(vcpu);
+> > > > +       return pi_inject_timer && kvm_mwait_in_guest(vcpu->kvm) && kvm_vcpu_apicv_active(vcpu);    
+> > > 
+> > > As Aili's changelog pointed out, MWAIT may not be advertised to the guest. 
+> > > 
+> > > So I think we want this?  With a non-functional, opinionated refactoring of
+> > > kvm_can_use_hv_timer() because I'm terrible at reading !(a || b).
+> > > 
+> > > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> > > index 40270d7bc597..c77cb386d03d 100644
+> > > --- a/arch/x86/kvm/lapic.c
+> > > +++ b/arch/x86/kvm/lapic.c
+> > > @@ -113,14 +113,25 @@ static inline u32 kvm_x2apic_id(struct kvm_lapic *apic)
+> > > 
+> > >  static bool kvm_can_post_timer_interrupt(struct kvm_vcpu *vcpu)
+> > >  {
+> > > -       return pi_inject_timer && kvm_vcpu_apicv_active(vcpu);
+> > > +       return pi_inject_timer && kvm_vcpu_apicv_active(vcpu) &&
+> > > +              (kvm_mwait_in_guest(vcpu) || kvm_hlt_in_guest(vcpu));
+> > >  }
+> > > 
+> > >  bool kvm_can_use_hv_timer(struct kvm_vcpu *vcpu)
+> > >  {
+> > > -       return kvm_x86_ops.set_hv_timer
+> > > -              && !(kvm_mwait_in_guest(vcpu->kvm) ||
+> > > -                   kvm_can_post_timer_interrupt(vcpu));
+> > > +       /*
+> > > +        * Don't use the hypervisor timer, a.k.a. VMX Preemption Timer, if the
+> > > +        * guest can execute MWAIT without exiting as the timer will stop
+> > > +        * counting if the core enters C3 or lower.  HLT in the guest is ok as
+> > > +        * HLT is effectively C1 and the timer counts in C0, C1, and C2.
+> > > +        *
+> > > +        * Don't use the hypervisor timer if KVM can post a timer interrupt to
+> > > +        * the guest since posted the timer avoids taking an extra a VM-Exit
+> > > +        * when the timer expires.
+> > > +        */
+> > > +       return kvm_x86_ops.set_hv_timer &&
+> > > +              !kvm_mwait_in_guest(vcpu->kvm) &&
+> > > +              !kvm_can_post_timer_interrupt(vcpu));
+> > >  }
+> > >  EXPORT_SYMBOL_GPL(kvm_can_use_hv_timer);
+> > >   
+> > 
+> > It seems Sean and Wanpeng are busy with some other more important issues;
+> > So Please let me try to merge Sean, Wanpeng's ideas and suggestions together,also including my opinions
+> > into one possible approach and get it reviewed, Only if others are OK with this;
+> > 
+> > I will post a new patch for this later today or tomorrow.  
+> 
+> Sorry, I was waiting for someone to say "this works", but never actually said as
+> much.
+> 
+> Does the above change address your use case?  If not, what's missing?
 
-> Can you try running with the below commit?  It's currently sitting in kvm/queue,
-> but not marked for stable because I didn't think it was possible for the check
-> to a cause a missed wake event in KVM's current code base.
->
-> commit 6a8110fea2c1b19711ac1ef718680dfd940363c6
-> Author: Sean Christopherson <seanjc@google.com>
-> Date:   Wed Dec 8 01:52:27 2021 +0000
->
->     KVM: VMX: Wake vCPU when delivering posted IRQ even if vCPU == this vCPU
->
->     Drop a check that guards triggering a posted interrupt on the currently
->     running vCPU, and more importantly guards waking the target vCPU if
->     triggering a posted interrupt fails because the vCPU isn't IN_GUEST_MODE.
->     The "do nothing" logic when "vcpu == running_vcpu" works only because KVM
->     doesn't have a path to ->deliver_posted_interrupt() from asynchronous
->     context, e.g. if apic_timer_expired() were changed to always go down the
->     posted interrupt path for APICv, or if the IN_GUEST_MODE check in
->     kvm_use_posted_timer_interrupt() were dropped, and the hrtimer fired in
->     kvm_vcpu_block() after the final kvm_vcpu_check_block() check, the vCPU
->     would be scheduled() out without being awakened, i.e. would "miss" the
->     timer interrupt.
->
->     One could argue that invoking kvm_apic_local_deliver() from (soft) IRQ
->     context for the current running vCPU should be illegal, but nothing in
->     KVM actually enforces that rules.  There's also no strong obvious benefit
->     to making such behavior illegal, e.g. checking IN_GUEST_MODE and calling
->     kvm_vcpu_wake_up() is at worst marginally more costly than querying the
->     current running vCPU.
->
->     Lastly, this aligns the non-nested and nested usage of triggering posted
->     interrupts, and will allow for additional cleanups.
->
->     Signed-off-by: Sean Christopherson <seanjc@google.com>
->     Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
->     Message-Id: <20211208015236.1616697-18-seanjc@google.com>
->     Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 38749063da0e..f61a6348cffd 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -3995,8 +3995,7 @@ static int vmx_deliver_posted_interrupt(struct kvm_vcpu *vcpu, int vector)
->          * guaranteed to see PID.ON=1 and sync the PIR to IRR if triggering a
->          * posted interrupt "fails" because vcpu->mode != IN_GUEST_MODE.
->          */
-> -       if (vcpu != kvm_get_running_vcpu() &&
-> -           !kvm_vcpu_trigger_posted_interrupt(vcpu, false))
-> +       if (!kvm_vcpu_trigger_posted_interrupt(vcpu, false))
->                 kvm_vcpu_wake_up(vcpu);
->
->         return 0;
+After a little modifications, This works in my test.
+
+static bool kvm_can_post_timer_interrupt(struct kvm_vcpu *vcpu)
+{
+-       return pi_inject_timer && kvm_vcpu_apicv_active(vcpu);
++       return pi_inject_timer && kvm_vcpu_apicv_active(vcpu) &&
++              (kvm_mwait_in_guest(vcpu->kvm) || kvm_hlt_in_guest(vcpu->kvm));
+ }
+
+and also you can delete or keep kvm_mwait_in_guest() check;
+
+Thanks!
