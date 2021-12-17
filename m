@@ -2,184 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 34AF44787E1
-	for <lists+kvm@lfdr.de>; Fri, 17 Dec 2021 10:39:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5BDB34787F1
+	for <lists+kvm@lfdr.de>; Fri, 17 Dec 2021 10:41:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234282AbhLQJjh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Dec 2021 04:39:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59726 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231770AbhLQJjg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Dec 2021 04:39:36 -0500
-Received: from mail-qt1-x844.google.com (mail-qt1-x844.google.com [IPv6:2607:f8b0:4864:20::844])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8453DC061574;
-        Fri, 17 Dec 2021 01:39:36 -0800 (PST)
-Received: by mail-qt1-x844.google.com with SMTP id a1so1963860qtx.11;
-        Fri, 17 Dec 2021 01:39:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=OOpMd3X90BKP/ZtpWdIPJ8+M8gFN2Ocwe7sVB2q7Hdg=;
-        b=oqHzW8ok9MXgfVqWgJtQoyP1zGXQyUcr52i1nAze3/tkFU3J9b6+Pexe67OPGPrWjd
-         Okk+Wq48KlWuMLahdqMYwp6BVo0wsJdGZ0xqgQI3qOc91uRMgby4gU82h+ND543NJbRz
-         ExTytbVigqbOXZ5C4TUiFEWWI2k6OEMORGbTA5NeX6ba/EDv8XXHjgQ51AOD575qFDge
-         rOXimWuWUr9nUB3S75gmzKzmZ2o1WoMFkia6YpLteorH8Qj4rcCkV4yohsZIaDmq1U8L
-         ZM7VuE57a4nO57SLhZIWNi12kiDpmF4w6Q9auqavFcrGjdxgwCEgdd3gxGv67ATEzLS6
-         JBOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=OOpMd3X90BKP/ZtpWdIPJ8+M8gFN2Ocwe7sVB2q7Hdg=;
-        b=wTfTxyTTTJw4MMEaW/qnrFsrr4EUimA1kA1FCwG78BnR1Zi7JyXj9SamtA9FfdikNm
-         QoPTYROE4Y7j4Y3QzTlCMgA1IGX10mDiudB2djg7loxL99eq93yTQPWRAk76re0UFvol
-         iuCb3pLQcSP7anVCImRZO1Rqbqd/vwpskwPoE7MzFxUuLA52doyUtRwSx5mWYzEQKh68
-         aZUj6Rr8UVaePVyWQqkdmUW3B9FvzDffLo1c6FHUDZoE2cqCzwuvzirgvmC9+JM6d0rE
-         B5YiHmeBWAAFZ9PmWNIROZ+Du3e/vGb7m+ct66zvkc1ELz9JAZ6F9Z2/8375ue8DAxOM
-         nkzA==
-X-Gm-Message-State: AOAM530tPrTg0ZRnuXF8toppFi1asxN2g+VwHxJWcwNF3EZZION43/Hl
-        pnBXHUby3NklzkXQhG7VaJkbQSTNAUS7/Yh8+I/K0YKI3RI=
-X-Google-Smtp-Source: ABdhPJxe372TIjyCLCQN3sud3qhRo8J8K4VhlXHjIz3adiVNBhdQvfz3QA5Aq6AoPcDiQMQyOLG1sRbHISnmI0FWHIQ=
-X-Received: by 2002:a05:622a:c8:: with SMTP id p8mr1583216qtw.52.1639733975443;
- Fri, 17 Dec 2021 01:39:35 -0800 (PST)
-MIME-Version: 1.0
-References: <20210831015919.13006-1-skyele@sjtu.edu.cn>
-In-Reply-To: <20210831015919.13006-1-skyele@sjtu.edu.cn>
-From:   Jinrong Liang <ljr.kernel@gmail.com>
-Date:   Fri, 17 Dec 2021 17:39:24 +0800
-Message-ID: <CAFg_LQWV56zok563F8WbPEuUiJeeEhfUK3ua+tcm8ChZETWKWg@mail.gmail.com>
-Subject: Re: [PATCH 1/4] KVM: x86: Introduce .pcpu_is_idle() stub infrastructure
-To:     Tianqiang Xu <skyele@sjtu.edu.cn>
-Cc:     x86@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, kvm@vger.kernel.org, hpa@zytor.com,
-        jarkko@kernel.org, dave.hansen@linux.intel.com,
-        linux-kernel@vger.kernel.org, linux-sgx@vger.kernel.org
+        id S234494AbhLQJlV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Dec 2021 04:41:21 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57944 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S233456AbhLQJlU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 17 Dec 2021 04:41:20 -0500
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1BH9NUV8018689;
+        Fri, 17 Dec 2021 09:41:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=1V2h6CdA68+Ix1SJbVML7WtOGTNAplQbD008lyEOFzY=;
+ b=a+VvS0pyzA1RcAn22LrWw5He6Pz7wV6AnICiv/0lGd5AtPIJla0XR6+B6T7NwJjtuoEH
+ 0mZF/m/itZvIs431ZPsJJoDKBQsCN+s+1CiJb2eMfDmDH/iRsbYU47DmoC9cOjrAj+zE
+ BTtSYrRQMXCC9m4rmGcfRKRbP2O8zL+Hp5muvcAz4J9d6pdiQHvccWGRGryXglil4AZB
+ TR84/HD1rh0r/P8gWDB4hdjuEQKeH0aMFDsO+GLM1pKOuZGYbiqMYdpKE3t1Q8lXcRWl
+ hW0sAbisbP2VKG5A7EtEEcZnaIN+KsbTwC5fNiWpbnEl3rvNxGXcEeNB6eKBPQdvlb/8 GA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cyn1km27v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 17 Dec 2021 09:41:20 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1BH9RbFZ001842;
+        Fri, 17 Dec 2021 09:41:19 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cyn1km26s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 17 Dec 2021 09:41:19 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1BH9Xlvs013143;
+        Fri, 17 Dec 2021 09:41:17 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma04ams.nl.ibm.com with ESMTP id 3cy7qwfqka-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 17 Dec 2021 09:41:16 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1BH9fDdg30867958
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 17 Dec 2021 09:41:13 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B9397A4051;
+        Fri, 17 Dec 2021 09:41:13 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 83BF4A4055;
+        Fri, 17 Dec 2021 09:41:12 +0000 (GMT)
+Received: from sig-9-145-149-59.de.ibm.com (unknown [9.145.149.59])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 17 Dec 2021 09:41:12 +0000 (GMT)
+Message-ID: <e2525cc5e236852f23bfc22c49e150edf67d8e10.camel@linux.ibm.com>
+Subject: Re: [PATCH 23/32] KVM: s390: pci: handle refresh of PCI translations
+From:   Niklas Schnelle <schnelle@linux.ibm.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>, linux-s390@vger.kernel.org
+Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
+        farman@linux.ibm.com, borntraeger@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, gerald.schaefer@linux.ibm.com,
+        agordeev@linux.ibm.com, frankja@linux.ibm.com, david@redhat.com,
+        imbrenda@linux.ibm.com, vneethv@linux.ibm.com,
+        oberpar@linux.ibm.com, freude@linux.ibm.com, thuth@redhat.com,
+        pasic@linux.ibm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Date:   Fri, 17 Dec 2021 10:41:12 +0100
+In-Reply-To: <ee217f34-539f-2759-e4ac-5098e3923555@linux.ibm.com>
+References: <20211207205743.150299-1-mjrosato@linux.ibm.com>
+         <20211207205743.150299-24-mjrosato@linux.ibm.com>
+         <d2af697e-bf48-e78b-eed6-766f0790232f@linux.ibm.com>
+         <a963388d-b13e-07c5-c256-c91671b3aa73@linux.ibm.com>
+         <9a953a7938218afed246e93995d22ee7d09a81f3.camel@linux.ibm.com>
+         <ee217f34-539f-2759-e4ac-5098e3923555@linux.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Vy7a1gi6tcHhcK5s5bCt3BykxBTP31cs
+X-Proofpoint-GUID: Q5vGsOesOpy4B_D25kFuoR89pQGrXlT6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2021-12-17_03,2021-12-16_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=999
+ lowpriorityscore=0 priorityscore=1501 impostorscore=0 suspectscore=0
+ clxscore=1015 malwarescore=0 spamscore=0 mlxscore=0 adultscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2112170054
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Tianqiang,
-Tianqiang Xu <skyele@sjtu.edu.cn> =E4=BA=8E2021=E5=B9=B412=E6=9C=8817=E6=97=
-=A5=E5=91=A8=E4=BA=94 15:55=E5=86=99=E9=81=93=EF=BC=9A
->
-> This patch series aims to fix performance issue caused by current
-> para-virtualized scheduling design.
->
-> The current para-virtualized scheduling design uses 'preempted' field of
-> kvm_steal_time to avoid scheduling task on the preempted vCPU.
-> However, when the pCPU where the preempted vCPU most recently run is idle=
-,
-> it will result in low cpu utilization, and consequently poor performance.
->
-> The new field: 'is_idle' of kvm_steal_time can precisely reveal
-> the status of pCPU where preempted vCPU most recently run, and
-> then improve cpu utilization.
->
-> pcpu_is_idle() is used to get the value of 'is_idle' of kvm_steal_time.
->
-> Experiments on a VM with 16 vCPUs show that the patch can reduce around
-> 50% to 80% execution time for most PARSEC benchmarks.
-> This also holds true for a VM with 112 vCPUs.
->
-> Experiments on 2 VMs with 112 vCPUs show that the patch can reduce around
-> 20% to 80% execution time for most PARSEC benchmarks.
->
-> Test environment:
-> -- PowerEdge R740
-> -- 56C-112T CPU Intel(R) Xeon(R) Gold 6238R CPU
-> -- Host 190G DRAM
-> -- QEMU 5.0.0
-> -- PARSEC 3.0 Native Inputs
-> -- Host is idle during the test
-> -- Host and Guest kernel are both kernel-5.14.0
->
-> Results:
-> 1. 1 VM, 16 VCPU, 16 THREAD.
->    Host Topology: sockets=3D2 cores=3D28 threads=3D2
->    VM Topology:   sockets=3D1 cores=3D16 threads=3D1
->    Command: <path to parsec>/bin/parsecmgmt -a run -p <benchmark> -i nati=
-ve -n 16
->    Statistics below are the real time of running each benchmark.(lower is=
- better)
->
->                         before patch    after patch     improvements
-> bodytrack               52.866s         22.619s         57.21%
-> fluidanimate            84.009s         38.148s         54.59%
-> streamcluster           270.17s         42.726s         84.19%
-> splash2x.ocean_cp       31.932s         9.539s          70.13%
-> splash2x.ocean_ncp      36.063s         14.189s         60.65%
-> splash2x.volrend        134.587s        21.79s          83.81%
->
-> 2. 1VM, 112 VCPU. Some benchmarks require the number of threads to be the=
- power of 2,
-> so we run them with 64 threads and 128 threads.
->    Host Topology: sockets=3D2 cores=3D28 threads=3D2
->    VM Topology:   sockets=3D1 cores=3D112 threads=3D1
->    Command: <path to parsec>/bin/parsecmgmt -a run -p <benchmark> -i nati=
-ve -n <64,112,128>
->    Statistics below are the real time of running each benchmark.(lower is=
- better)
->
->                                         before patch    after patch     i=
-mprovements
-> fluidanimate(64 thread)                 124.235s        27.924s         7=
-7.52%
-> fluidanimate(128 thread)                169.127s        64.541s         6=
-1.84%
-> streamcluster(112 thread)               861.879s        496.66s         4=
-2.37%
-> splash2x.ocean_cp(64 thread)            46.415s         18.527s         6=
-0.08%
-> splash2x.ocean_cp(128 thread)           53.647s         28.929s         4=
-6.08%
-> splash2x.ocean_ncp(64 thread)           47.613s         19.576s         5=
-8.89%
-> splash2x.ocean_ncp(128 thread)          54.94s          29.199s         4=
-6.85%
-> splash2x.volrend(112 thread)            801.384s        144.824s        8=
-1.93%
->
-> 3. 2VM, each VM: 112 VCPU. Some benchmarks require the number of threads =
-to
-> be the power of 2, so we run them with 64 threads and 128 threads.
->    Host Topology: sockets=3D2 cores=3D28 threads=3D2
->    VM Topology:   sockets=3D1 cores=3D112 threads=3D1
->    Command: <path to parsec>/bin/parsecmgmt -a run -p <benchmark> -i nati=
-ve -n <64,112,128>
->    Statistics below are the average real time of running each benchmark i=
-n 2 VMs.(lower is better)
->
->                                         before patch    after patch     i=
-mprovements
-> fluidanimate(64 thread)                 135.2125s       49.827s         6=
-3.15%
-> fluidanimate(128 thread)                178.309s        86.964s         5=
-1.23%
-> splash2x.ocean_cp(64 thread)            47.4505s        20.314s         5=
-7.19%
-> splash2x.ocean_cp(128 thread)           55.5645s        30.6515s        4=
-4.84%
-> splash2x.ocean_ncp(64 thread)           49.9775s        23.489s         5=
-3.00%
-> splash2x.ocean_ncp(128 thread)          56.847s         28.545s         4=
-9.79%
-> splash2x.volrend(112 thread)            838.939s        239.632s        7=
-1.44%
->
-> For space limit, we list representative statistics here.
+On Thu, 2021-12-16 at 09:51 -0500, Matthew Rosato wrote:
+> On 12/16/21 9:39 AM, Niklas Schnelle wrote:
+> > On Tue, 2021-12-14 at 12:54 -0500, Matthew Rosato wrote:
+> > > On 12/14/21 11:59 AM, Pierre Morel wrote:
+> > > > On 12/7/21 21:57, Matthew Rosato wrote:
+> > > > > Add a routine that will perform a shadow operation between a guest
+> > > > > and host IOAT.  A subsequent patch will invoke this in response to
+> > > > > an 04 RPCIT instruction intercept.
+> > > > > 
+> > > > > Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> > > > > ---
+> > > > >    arch/s390/include/asm/kvm_pci.h |   1 +
+> > > > >    arch/s390/include/asm/pci_dma.h |   1 +
+> > > > >    arch/s390/kvm/pci.c             | 191 ++++++++++++++++++++++++++++++++
+> > > > >    arch/s390/kvm/pci.h             |   4 +-
+> > > > >    4 files changed, 196 insertions(+), 1 deletion(-)
+> > > > > 
+> > ---8<---
+> > > > > +
+> > > > > +int kvm_s390_pci_refresh_trans(struct kvm_vcpu *vcpu, unsigned long req,
+> > > > > +                   unsigned long start, unsigned long size)
+> > > > > +{
+> > > > > +    struct zpci_dev *zdev;
+> > > > > +    u32 fh;
+> > > > > +    int rc;
+> > > > > +
+> > > > > +    /* If the device has a SHM bit on, let userspace take care of
+> > > > > this */
+> > > > > +    fh = req >> 32;
+> > > > > +    if ((fh & aift.mdd) != 0)
+> > > > > +        return -EOPNOTSUPP;
+> > > > 
+> > > > I think you should make this check in the caller.
+> > > 
+> > > OK
+> > > 
+> > > > > +
+> > > > > +    /* Make sure this is a valid device associated with this guest */
+> > > > > +    zdev = get_zdev_by_fh(fh);
+> > > > > +    if (!zdev || !zdev->kzdev || zdev->kzdev->kvm != vcpu->kvm)
+> > > > > +        return -EINVAL;
+> > > > > +
+> > > > > +    /* Only proceed if the device is using the assist */
+> > > > > +    if (zdev->kzdev->ioat.head[0] == 0)
+> > > > > +        return -EOPNOTSUPP;
+> > > > 
+> > > > Using the assist means using interpretation over using interception and
+> > > > legacy vfio-pci. right?
+> > > 
+> > > Right - more specifically that the IOAT assist feature was never set via
+> > > the vfio feature ioctl, so we can't handle the RPCIT for this device and
+> > > so throw to userspace.
+> > > 
+> > > The way the QEMU series is being implemented, a device using
+> > > interpretation will always have the IOAT feature set on.
+> > > 
+> > > > > +
+> > > > > +    rc = dma_table_shadow(vcpu, zdev, start, size);
+> > > > > +    if (rc > 0)
+> > > > > +        rc = zpci_refresh_trans((u64) zdev->fh << 32, start, size);
+> > > > 
+> > > > Here you lose the status reported by the hardware.
+> > > > You should directly use __rpcit(fn, addr, range, &status);
+> > > 
+> > > OK, I can have a look at doing this.
+> > > 
+> > > @Niklas thoughts on how you would want this exported.  Renamed to
+> > > zpci_rpcit or so?
+> > 
+> > Hmm with using __rpcit() directly we would lose the error reporting in
+> > s390dbf and this ist still kind of a RPCIT in the host. How about we
+> > add the status as an out parameter to zpci_refresh_trans()? But yes if
+> 
+> Another advantage of doing this would be that we then also keep the cc2 
+> retry logic in zpci_refresh_trans(), which would be nice.
 
-I did a performance test according to the description in the patch,
-but did not get the performance improvement described in the description.
+Yeah thought about that too. If we don't have that I believe the guest
+would retry but that means doing two full intercepts and going through
+all the other logic too. Since these retries are afaik extremely rare
+it shouldn't matter much but on the other hand I would expect them to
+only happen when the system is overloaded and then doing all this extra
+work surely isn't helpful.
 
-I suspect that the big difference between my kernel configuration
-and yours has caused this problem. Can you please provide more detailed
-test information, such as kernel configuration that must be turned on or of=
-f ?
+> 
+> However we do still lose the returned CC value from the instruction. 
+> But I think we can infer a CC1 from a nonzero status and a CC3 from a 
+> zero status so maybe this is OK too.
 
-Regards,
-Jinrong Liang
+I agree.
+
+
