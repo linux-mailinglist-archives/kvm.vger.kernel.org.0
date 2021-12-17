@@ -2,52 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DAC9D4784A6
-	for <lists+kvm@lfdr.de>; Fri, 17 Dec 2021 06:47:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E1B704784AE
+	for <lists+kvm@lfdr.de>; Fri, 17 Dec 2021 06:50:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233042AbhLQFr2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Dec 2021 00:47:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35820 "EHLO
+        id S231998AbhLQFuZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Dec 2021 00:50:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233036AbhLQFr1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Dec 2021 00:47:27 -0500
-Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F95DC061574
-        for <kvm@vger.kernel.org>; Thu, 16 Dec 2021 21:47:27 -0800 (PST)
-Received: by mail-yb1-xb29.google.com with SMTP id f9so3230077ybq.10
-        for <kvm@vger.kernel.org>; Thu, 16 Dec 2021 21:47:27 -0800 (PST)
+        with ESMTP id S233042AbhLQFuY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Dec 2021 00:50:24 -0500
+Received: from mail-yb1-xb34.google.com (mail-yb1-xb34.google.com [IPv6:2607:f8b0:4864:20::b34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8163C06173F
+        for <kvm@vger.kernel.org>; Thu, 16 Dec 2021 21:50:24 -0800 (PST)
+Received: by mail-yb1-xb34.google.com with SMTP id g17so3189061ybe.13
+        for <kvm@vger.kernel.org>; Thu, 16 Dec 2021 21:50:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=atishpatra.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=BwdXAZqwcOgfTzbPvhOiD7YDfbOTo8m/P9qk7qvdRbg=;
-        b=TbJ8b6Q1XadCQi/ETXO7KnR0eVyxVPo6CYumNoLxIIHHsWte48o341tqjtH/OZIKz1
-         D+yS5qpJMo9NJYArpISYebQHEghellf1QZRJq/vkFJfRf8fIv8WO2io3c2Az6JqJXRFZ
-         oH7HEaBC/awQW4WTz17249wf3AtN3MwJMqYso=
+        bh=jbxYFuhXciRdXFUcsp1Eus+7OgrQ8HqeVPRIesPErvo=;
+        b=CicHRuYsu9gQulT86tmfz9IDPjUyCOGgQ61C6jEChS1p35Ve3SiBo15EEzdpWSqG3y
+         AQ17V2JgwbunVjVOx5nHRUlnjGwg4L1BEvZqzjEBtFagQk/zaPaYd/qYef/a/DWzA/X3
+         3iPE4HKUtAcZlz705NyfyBPEZ22Mob+bXXxdc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=BwdXAZqwcOgfTzbPvhOiD7YDfbOTo8m/P9qk7qvdRbg=;
-        b=GjbbkmQeJVdjIq/DN63CRwyYoYaHcYr2IpdmKA72Uvgmso26nZNeZJBmvvyVC+R8bx
-         07JH4cf1LjcR0rdlhGCOUtD6jRMmye8oRsxN+2hMaJDha0JRKgU8EVb5GS9BjMaaDcPx
-         0/8zB/fJFv0UvyQAEx6mS8pIsJutr3WEHfAX2yEG6SVpTvdC4j/VnYIhqQg99x5egqjx
-         1lgELfxdjMSadN+wWlyc7736fSAzFv6DXHWcAU2KRe189r2WVzYaUuTfBDI2w4jtPlcp
-         lZVFmmt0Llr/IomImbkP1eVQt1IGPjS1MHQyyY+nnqWa002zjZUH2RNZHzWwk86OyMyK
-         DcJw==
-X-Gm-Message-State: AOAM530jJ1eYyqh3G79EHPn+fhBNGItUm9nAKRG0U+B37KoY72+Qnb5Q
-        OAs0/eddN7ztwEPvUt0rcJfX/MDYPEqCGPggNgdq
-X-Google-Smtp-Source: ABdhPJym0ejx2zDX2ah9KB9aFnBYNo3/Jeu0eMo9QzZYrU+lCsv59ObD5++THmdkCuYRNxANRZg8W5NhsjmGjXossFA=
-X-Received: by 2002:a25:2450:: with SMTP id k77mr2228286ybk.121.1639720046870;
- Thu, 16 Dec 2021 21:47:26 -0800 (PST)
+        bh=jbxYFuhXciRdXFUcsp1Eus+7OgrQ8HqeVPRIesPErvo=;
+        b=aRU08QiKyDCdaxdRPJ9n7TGw08WLqoAzwkMbopSYyQgvHHsC1KVolobpx2MkPMiqnc
+         n54mdWeP9Q+qGT9H53RwyDd9T8nukKGEvNB0pyUz8DyMq90hpMhaWwLEqzm317HQYDsa
+         RcBDYXqHOFhkcjefNxqFGCLhqNOolKqOEr5X2RFmS6N4yAjBbVMGLxzwBZ5kUoQwE7Z6
+         BE6KNgCie8yLCHMLXwXsDBJMMcUdStD2zBM33PfP0nPCd3KI3euK5cHyhcC3392qbExu
+         /+O6LbuJiJ/2vopE5s/TlF7iJOqmcNZXH1yEx71xxsuhRA9alp+obInMXO/5XaVJtQBk
+         /hBQ==
+X-Gm-Message-State: AOAM530gyIyeOsjF3aS5PzgmSW47XVpqV1VLuPZXandO6ER02S2EqCZI
+        RZ8nSfEblsTnmCIOMJVzW2XbIJJ82YnC3xASg9D8
+X-Google-Smtp-Source: ABdhPJySH+njHDMdSsHjZNNEk79KBchC3iVUT1MckIXEbQ7YXVj2esVyGamHDnSMMU0LlK81DUevSaIQmJ6P0mJOzjI=
+X-Received: by 2002:a05:6902:568:: with SMTP id a8mr2423433ybt.472.1639720223901;
+ Thu, 16 Dec 2021 21:50:23 -0800 (PST)
 MIME-Version: 1.0
-References: <20211129075451.418122-1-anup.patel@wdc.com> <20211129075451.418122-3-anup.patel@wdc.com>
-In-Reply-To: <20211129075451.418122-3-anup.patel@wdc.com>
+References: <20211129075451.418122-1-anup.patel@wdc.com> <20211129075451.418122-4-anup.patel@wdc.com>
+In-Reply-To: <20211129075451.418122-4-anup.patel@wdc.com>
 From:   Atish Patra <atishp@atishpatra.org>
-Date:   Thu, 16 Dec 2021 21:47:16 -0800
-Message-ID: <CAOnJCU+Yft5EjgUUCi=nW79pYSGYPWB1ew5iyTjViFvGGQxQCA@mail.gmail.com>
-Subject: Re: [PATCH v2 2/4] RISC-V: KVM: Add VM capability to allow userspace
- get GPA bits
+Date:   Thu, 16 Dec 2021 21:50:13 -0800
+Message-ID: <CAOnJCU+MvAj79Pyjg+pimPkcWTVbq9kwSaoUAXSCV9Y1odD+5g@mail.gmail.com>
+Subject: Re: [PATCH v2 3/4] KVM: selftests: Add EXTRA_CFLAGS in top-level Makefile
 To:     Anup Patel <anup.patel@wdc.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
         Palmer Dabbelt <palmer@dabbelt.com>,
@@ -67,85 +66,37 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Mon, Nov 29, 2021 at 12:10 AM Anup Patel <anup.patel@wdc.com> wrote:
 >
-> The number of GPA bits supported for a RISC-V Guest/VM is based on the
-> MMU mode used by the G-stage translation. The KVM RISC-V will detect and
-> use the best possible MMU mode for the G-stage in kvm_arch_init().
->
-> We add a generic VM capability KVM_CAP_VM_GPA_BITS which can be used by
-> the KVM userspace to get the number of GPA (guest physical address) bits
-> supported for a Guest/VM.
+> We add EXTRA_CFLAGS to the common CFLAGS of top-level Makefile
+> which will allow users to pass additional compile-time flags such
+> as "-static".
 >
 > Signed-off-by: Anup Patel <anup.patel@wdc.com>
 > ---
->  arch/riscv/include/asm/kvm_host.h | 1 +
->  arch/riscv/kvm/mmu.c              | 5 +++++
->  arch/riscv/kvm/vm.c               | 3 +++
->  include/uapi/linux/kvm.h          | 1 +
->  4 files changed, 10 insertions(+)
+>  tools/testing/selftests/kvm/Makefile | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
-> index 37589b953bcb..ae5d238607fe 100644
-> --- a/arch/riscv/include/asm/kvm_host.h
-> +++ b/arch/riscv/include/asm/kvm_host.h
-> @@ -221,6 +221,7 @@ void kvm_riscv_stage2_free_pgd(struct kvm *kvm);
->  void kvm_riscv_stage2_update_hgatp(struct kvm_vcpu *vcpu);
->  void kvm_riscv_stage2_mode_detect(void);
->  unsigned long kvm_riscv_stage2_mode(void);
-> +int kvm_riscv_stage2_gpa_size(void);
+> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> index c4e34717826a..ee6740e9ecdb 100644
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -131,7 +131,7 @@ endif
+>  CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
+>         -fno-stack-protector -fno-PIE -I$(LINUX_TOOL_INCLUDE) \
+>         -I$(LINUX_TOOL_ARCH_INCLUDE) -I$(LINUX_HDR_PATH) -Iinclude \
+> -       -I$(<D) -Iinclude/$(UNAME_M) -I..
+> +       -I$(<D) -Iinclude/$(UNAME_M) -I.. $(EXTRA_CFLAGS)
 >
->  void kvm_riscv_stage2_vmid_detect(void);
->  unsigned long kvm_riscv_stage2_vmid_bits(void);
-> diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
-> index 9ffd0255af43..9b6d6465094f 100644
-> --- a/arch/riscv/kvm/mmu.c
-> +++ b/arch/riscv/kvm/mmu.c
-> @@ -760,3 +760,8 @@ unsigned long kvm_riscv_stage2_mode(void)
->  {
->         return stage2_mode >> HGATP_MODE_SHIFT;
->  }
-> +
-> +int kvm_riscv_stage2_gpa_size(void)
-> +{
-> +       return stage2_gpa_bits;
-> +}
-
-The ioctl & the underlying stage2_gpa_bits has bits.
-Maybe rename the function to kvm_riscv_stage2_gpa_bits as well ?
-
-> diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
-> index fb18af34a4b5..6f959639ec45 100644
-> --- a/arch/riscv/kvm/vm.c
-> +++ b/arch/riscv/kvm/vm.c
-> @@ -82,6 +82,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->         case KVM_CAP_NR_MEMSLOTS:
->                 r = KVM_USER_MEM_SLOTS;
->                 break;
-> +       case KVM_CAP_VM_GPA_BITS:
-> +               r = kvm_riscv_stage2_gpa_size();
-> +               break;
->         default:
->                 r = 0;
->                 break;
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 1daa45268de2..469f05d69c8d 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1131,6 +1131,7 @@ struct kvm_ppc_resize_hpt {
->  #define KVM_CAP_EXIT_ON_EMULATION_FAILURE 204
->  #define KVM_CAP_ARM_MTE 205
->  #define KVM_CAP_VM_MOVE_ENC_CONTEXT_FROM 206
-> +#define KVM_CAP_VM_GPA_BITS 207
->
->  #ifdef KVM_CAP_IRQ_ROUTING
->
+>  no-pie-option := $(call try-run, echo 'int main() { return 0; }' | \
+>          $(CC) -Werror -no-pie -x c - -o "$$TMP", -no-pie)
 > --
 > 2.25.1
 >
 
-Other than that, it looks good to me.
-
 Reviewed-by: Atish Patra <atishp@rivosinc.com>
 
+--
+Regards,
+Atish
 
 -- 
 Regards,
