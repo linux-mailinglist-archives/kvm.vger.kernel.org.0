@@ -2,76 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 601F44787F3
-	for <lists+kvm@lfdr.de>; Fri, 17 Dec 2021 10:41:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F38247880D
+	for <lists+kvm@lfdr.de>; Fri, 17 Dec 2021 10:48:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234500AbhLQJla (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Dec 2021 04:41:30 -0500
-Received: from mout.kundenserver.de ([217.72.192.74]:34007 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234502AbhLQJl2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Dec 2021 04:41:28 -0500
-Received: from [192.168.100.1] ([82.142.30.186]) by mrelayeu.kundenserver.de
- (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1Mv2pC-1mgcv93SMK-00r0Fu; Fri, 17 Dec 2021 10:41:19 +0100
-Message-ID: <d7ec6d55-1260-cf98-0920-18ac422906ed@vivier.eu>
-Date:   Fri, 17 Dec 2021 10:41:18 +0100
+        id S234147AbhLQJsk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Dec 2021 04:48:40 -0500
+Received: from mga05.intel.com ([192.55.52.43]:19949 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233096AbhLQJsj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Dec 2021 04:48:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1639734519; x=1671270519;
+  h=to:cc:from:subject:message-id:date:mime-version:
+   content-transfer-encoding;
+  bh=pmQGdwTEQmU04w91tsawa6Fg0wFYFFUuoqMSq/MrTzQ=;
+  b=N/7n7oLkdlHLsje7HliS7HMwROgHyaT5tTJBPg14uXr5xLFfINdyDAV6
+   J1jZA0d8NCwqHNod3rUKAW8jOwBdFuICJ5I1uciahPF14ZQv2p1fRqlz8
+   Cj3DduOr7ZdbR5nZCJNg9kfKCM9WdNwoNqBJ8e1XYlxzNdw9iFQQfH4cm
+   VwUD6ecGQkOoUnDv5eIVBzV4A/vBHdQfXni44lSszRPa0J6QmY4IG321Y
+   5QAmzg674xBdQgaqbDxBwvfjTjA8f1AVkrFDXF5t73w/OfCpwW0nTd6BD
+   dNfsiTBnW0Eeexn2NNIm/xEqQCaMQn81XGE1hSu147R4Hjr6IPmsN3THK
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10200"; a="326010045"
+X-IronPort-AV: E=Sophos;i="5.88,213,1635231600"; 
+   d="scan'208";a="326010045"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Dec 2021 01:48:39 -0800
+X-IronPort-AV: E=Sophos;i="5.88,213,1635231600"; 
+   d="scan'208";a="506705446"
+Received: from zhengmia-mobl.ccr.corp.intel.com (HELO [10.255.31.240]) ([10.255.31.240])
+  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Dec 2021 01:48:37 -0800
+To:     jmattson@google.com
+Cc:     ehankland@google.com, kvm@vger.kernel.org, pbonzini@redhat.com,
+        Philip Li <philip.li@intel.com>
+From:   Ma Xinjian <xinjianx.ma@intel.com>
+Subject: Re: [kvm-unit-tests PATCH] x86/pmu: Test PMU virtualization on
+ emulated instructions
+Message-ID: <a2cc8bd6-df74-95a7-f3a2-6ff6407a5543@intel.com>
+Date:   Fri, 17 Dec 2021 17:47:54 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH-for-7.0] target/i386/kvm: Replace use of __u32 type
-Content-Language: fr
-To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
-        qemu-devel@nongnu.org
-Cc:     qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>, kvm@vger.kernel.org
-References: <20211116193955.2793171-1-philmd@redhat.com>
-From:   Laurent Vivier <laurent@vivier.eu>
-In-Reply-To: <20211116193955.2793171-1-philmd@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:vBDF5a2UX+SM84erX35iC7LViCsu2LwVNTDbx1PonKv7rKdTOb4
- SYHKoNugrTEbmDP5uSdCgNh9Cbi16dQbTKcamCnF65gam+zcDxDxFb2N7Ess0oQAxTwsjOC
- /LCP68IUWPybARi0tVgED1psi7Cf1f9innZvDJpTNF1eJR4LjUtqRvTmCeOwVP3kUzr2+SW
- B6JXZFj81CszLuuBHdilw==
-X-Spam-Flag: NO
-X-UI-Out-Filterresults: notjunk:1;V03:K0:v3mtfSElf64=:XCVfw16ZPaa2Tgk0dqtYGN
- QLCpuU4YjP96qsYWKVzSxbHFAkpVuvGyJyeoQqfK60n2g8ERB0T6SOfB5MHISoRfybPJdFbWI
- db7fugPS5ubaqPrhQio/zZnb+IoZvUN8RyRBUCArIQHBeGL3CoTcKbTakGS1HTH/Lq/2bNGTP
- cj7LT4x6WOvhLdKRWWM9x46H5g1kIqSHLhxScT52RtLNmH/kwqOghdBJm/kFS53fUSfRwSi5w
- IYaASAkTKrfNWacGYC7vEQoztl7Vw7oUzn82gEEpTlQjq8J94iy5mNfLz5+lhW6Iyd6fc9BmO
- JbJKZoiaHCidGhjgup296o6NiYKho1a5NcoKaPoAQLDtj4vsyvIxW1ztcPYyjVycSS6Bmi/EV
- V4x1Bit9tgdgOiQlsC/1OHE3tpebNJqDK9IT5lPb8lFIT+Yl46GVRjsidOsETt1hby/vTXD3I
- sRIEpDaB0VszBfV0X4YMJJuHaOXoBSg=
+Content-Language: en-US
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Le 16/11/2021 à 20:39, Philippe Mathieu-Daudé a écrit :
-> QEMU coding style mandates to not use Linux kernel internal
-> types for scalars types. Replace __u32 by uint32_t.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->   target/i386/kvm/kvm.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-> index 5a698bde19a..13f8e30c2a5 100644
-> --- a/target/i386/kvm/kvm.c
-> +++ b/target/i386/kvm/kvm.c
-> @@ -1406,7 +1406,7 @@ static int hyperv_fill_cpuids(CPUState *cs,
->       c->edx = cpu->hyperv_limits[2];
->   
->       if (hyperv_feat_enabled(cpu, HYPERV_FEAT_EVMCS)) {
-> -        __u32 function;
-> +        uint32_t function;
->   
->           /* Create zeroed 0x40000006..0x40000009 leaves */
->           for (function = HV_CPUID_IMPLEMENT_LIMITS + 1;
-> 
+Hi, Jim
 
-Applied to my trivial-patches branch.
+I am from Intel LKP team, we noticed that pmu_emulation was new added 
+recently by you.
 
-Thanks,
-Laurent
+We tested it and finished with 2 unexpected failures
+
+```
+
+timeout -k 1s --foreground 90s /usr/bin/qemu-system-x86_64 --no-reboot 
+-nodefaults -device pc-testdev -device 
+isa-debug-exit,iobase=0xf4,iosize=0x4 -vnc none -serial stdio -device 
+pci-testdev -machine accel=kvm -kernel x86/pmu.flat -smp 1 -cpu max 
+-append emulation # -initrd /tmp/tmp.Y0jCDA5Jlw
+enabling apic
+paging enabled
+cr0 = 80010011
+cr3 = 1007000
+cr4 = 20
+PMU version:         2
+GP counters:         4
+GP counter width:    48
+Mask length:         7
+Fixed counters:      3
+Fixed counter width: 48
+PASS: emulated instruction: instruction count
+PASS: emulated instruction: branch count
+FAIL: emulated instruction: instruction counter overflow
+FAIL: emulated instruction: branch counter overflow
+SUMMARY: 4 tests, 2 unexpected failures
+
+```
+
+we have tried on kernel v5.15 v5.16-rc5
+
+on 2 different machine
+
+machine 1:
+
+```
+
+model: Haswell
+cpu: 8
+memory: 16G
+brand: Intel(R) Core(TM) i7-4790T CPU @ 2.70GH
+
+```
+
+machine2:
+
+```
+
+model: Ice Lake
+cpu: 96
+memory: 256G
+kernel_cmdline_hw: acpi_rsdp=0x667fd014
+rootfs_partition: 
+/dev/disk/by-id/ata-INTEL_SSDSC2BB800G4_PHWL4204005K800RGN-part3
+
+```
+
+If you confirm and fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
+
+
+Thanks
+
+Ma Xinjian
+
