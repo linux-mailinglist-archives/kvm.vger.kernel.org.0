@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0CE5B47949F
-	for <lists+kvm@lfdr.de>; Fri, 17 Dec 2021 20:11:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C70854794C1
+	for <lists+kvm@lfdr.de>; Fri, 17 Dec 2021 20:27:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239809AbhLQTLh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Dec 2021 14:11:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53614 "EHLO
+        id S240628AbhLQT0x (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Dec 2021 14:26:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232853AbhLQTLg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Dec 2021 14:11:36 -0500
+        with ESMTP id S240570AbhLQT0t (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Dec 2021 14:26:49 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E348C061574;
-        Fri, 17 Dec 2021 11:11:36 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DEA6C061574;
+        Fri, 17 Dec 2021 11:26:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=J4ub23026kjPlOzjxHivVJq/4ie0Dz90kkwgKbGyc4Q=; b=Go3CvrSCf7Eomrvxd8QnPeQ5pd
-        dVwe61EIpJFpAIC+qHZO7DRK7lYHh9UBKV3k2t4bunC8Y36ruEQZuMBKWFqb1Edblscpka5SDRjJs
-        CKB4l75kYxoB4B3E85rGKSQIIXIdW4sPjF4QG+eqSRYx9y1NXae33m4Yx22QKM7EiLesU5zsj8Ue/
-        oPOE9o2EwDU4isLTWCf5YWtGGH7l+aUSA03aAu9+m6ljQZFQ884f961WKHomzO8BLrTaQYccQMUNY
-        UD5zWIGYIciXYPveQ6JuO+d69RWwUq1HwPPCHNcXUaMViAQiyMiC0OvJBUUsIWoF11Bkb1y4kF1Xi
-        rI7qSegA==;
-Received: from [2001:8b0:10b:1::3ae] (helo=u3832b3a9db3152.infradead.org)
+        bh=stCqq8yX/632+84Y+BNzC4Ct1x0b+NuqV5Ro8nzoTfc=; b=OJeCaAGO9dluZjWXDhFA1yLPxO
+        XAptppp2NQR4cpEmFvSXOlAL98yxUAiyP9NLmKt2sl6kUutsPbXvFzqFj50UNmSzgKgJYqJRtUUSN
+        PKpZrGwfjtSJ4QkCTnMbQXaXjdBvH2gGaoDB8kJK4IOVqDLj4MN4vw2N/2heE5hpG8semPJM8A3sl
+        W0LKmztmwWU6HC7qpyOOgDodDyTwZ17JkaPG1mSgcY+D1JP65YgfvEaDpNxKH3Wc9kkz0X/TLp1QK
+        zqg6V7TwARpafABpyBDR103LCwGR6zTZcNzWS+9cEHvFyBE4P6jxuGhDyaU/wJ2Hk52Ch/TlPn2p0
+        sji11G3w==;
+Received: from [2001:8b0:10b:1::3ae] (helo=u3832b3a9db3152.ant.amazon.com)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1myIdR-00C4ir-N7; Fri, 17 Dec 2021 19:11:18 +0000
-Message-ID: <2bfb13ed5d565ab09bd794f69a6ef2b1b75e507a.camel@infradead.org>
+        id 1myIsF-00C7PC-Ch; Fri, 17 Dec 2021 19:26:35 +0000
+Message-ID: <62714ae555a42dfccc992925691c44024d7d0e3a.camel@infradead.org>
 Subject: Re: [PATCH v3 0/9] Parallel CPU bringup for x86_64
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     Tom Lendacky <thomas.lendacky@amd.com>,
@@ -46,16 +46,17 @@ Cc:     Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         "hushiyuan@huawei.com" <hushiyuan@huawei.com>,
         "luolongjun@huawei.com" <luolongjun@huawei.com>,
         "hejingxian@huawei.com" <hejingxian@huawei.com>
-Date:   Fri, 17 Dec 2021 19:11:12 +0000
-In-Reply-To: <1401c5a1-c8a2-cca1-e548-cab143f59d8f@amd.com>
+Date:   Fri, 17 Dec 2021 19:26:31 +0000
+In-Reply-To: <2bfb13ed5d565ab09bd794f69a6ef2b1b75e507a.camel@infradead.org>
 References: <20211215145633.5238-1-dwmw2@infradead.org>
          <761c1552-0ca0-403b-3461-8426198180d0@amd.com>
          <ca0751c864570015ffe4d8cccdc94e0a5ef3086d.camel@infradead.org>
          <b13eac6c-ea87-aef9-437f-7266be2e2031@amd.com>
          <721484e0fa719e99f9b8f13e67de05033dd7cc86.camel@infradead.org>
          <1401c5a1-c8a2-cca1-e548-cab143f59d8f@amd.com>
+         <2bfb13ed5d565ab09bd794f69a6ef2b1b75e507a.camel@infradead.org>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-OuLVbXvPdBitGtpIQfSd"
+        boundary="=-fTXVE2NNHO+dxZLXmpaq"
 User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
@@ -64,261 +65,33 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-OuLVbXvPdBitGtpIQfSd
+--=-fTXVE2NNHO+dxZLXmpaq
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2021-12-17 at 11:48 -0600, Tom Lendacky wrote:
-> On 12/16/21 6:13 PM, David Woodhouse wrote:
-> > On Thu, 2021-12-16 at 16:52 -0600, Tom Lendacky wrote:
-> > > On baremetal, I haven't seen an issue. This only seems to have a prob=
-lem
-> > > with Qemu/KVM.
-> > >=20
-> > > With 191f08997577 I could boot without issues with and without the
-> > > no_parallel_bringup. Only after I applied e78fa57dd642 did the failur=
-e happen.
-> > >=20
-> > > With e78fa57dd642 I could boot 64 vCPUs pretty consistently, but when=
- I
-> > > jumped to 128 vCPUs it failed again. When I moved the series to
-> > > df9726cb7178, then 64 vCPUs also failed pretty consistently.
-> > >=20
-> > > Strange thing is it is random. Sometimes (rarely) it works on the fir=
-st
-> > > boot and then sometimes it doesn't, at which point it will reset and
-> > > reboot 3 or 4 times and then make it past the failure and fully boot.
-> >=20
-> > Hm, some of that is just artifacts of timing, I'm sure. But now I'm
-> > staring at the way that early_setup_idt() can run in parallel on all
-> > CPUs, rewriting bringup_idt_descr and loading it.
-> >=20
-> > To start with, let's try unlocking the trampoline_lock much later,
-> > after cpu_init_exception_handling() has loaded the real IDT.
-> >=20
-> > I think we can probably make secondaries load the real IDT early and
-> > never use bringup_idt_descr at all, can't we? But let's see if this
-> > makes it go away, to start with...
-> >=20
->=20
-> This still fails. I ran with -d cpu_reset on the command line and will
-> forward the full log to you. I ran "grep "[ER]IP=3D" stderr.log | uniq -c=
-"
-> and got:
->=20
->      128 EIP=3D00000000 EFL=3D00000000 [-------] CPL=3D0 II=3D0 A20=3D0 S=
-MM=3D0 HLT=3D0
->      128 EIP=3D0000fff0 EFL=3D00000002 [-------] CPL=3D0 II=3D0 A20=3D1 S=
-MM=3D0 HLT=3D0
-> These are before running any of the vCPUs.
->
->        1 RIP=3Dffffffff810705c6 RFL=3D00000206 [-----P-] CPL=3D0 II=3D0 A=
-20=3D1 SMM=3D0 HLT=3D0
-> This is where vCPU0 is at the time of the reset. This address tends to
-> be different all the time and so I think it is just where it happens to
-> be when the reset occurs and isn't contributing to the reset.
+On Fri, 2021-12-17 at 19:11 +0000, David Woodhouse wrote:
+> I note that one is in native_write_msr() though. I wonder what it's
+> writing?
 
-I note that one is in native_write_msr() though. I wonder what it's writing=
-?
+CPU Reset (CPU 0)
+RAX=3D0000000000000000 RBX=3D0000000000000202 RCX=3D0000000000000828 RDX=3D=
+0000000000000000
+RSI=3D0000000000000000 RDI=3D0000000000000828 RBP=3D0000000000000000 RSP=3D=
+ffffc90000023ce0
+R8 =3D0000000000000000 R9 =3Dffffc90000023b60 R10=3D0000000000000001 R11=3D=
+0000000000000001
+R12=3D000000000000069a R13=3D0000000000000005 R14=3D000000000000001c R15=3D=
+0000000000000001
+RIP=3Dffffffff810705c6 RFL=3D00000206 [-----P-] CPL=3D0 II=3D0 A20=3D1 SMM=
+=3D0 HLT=3D0
 
-Do you have console output (perhaps with earlyprintk=3DttyS0) to go with th=
-is?
+It's writing zero (%rax/%rsi) to MSR 0x828 (%rcx/%rdi) which is the
+X2APIC's APIC_ESR.
 
->        5 RIP=3Dffffffff8104aefb RFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A=
-20=3D1 SMM=3D0 HLT=3D0
->        1 RIP=3Dffffffff8104af06 RFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A=
-20=3D1 SMM=3D0 HLT=3D0
->       15 RIP=3Dffffffff8104aefb RFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A=
-20=3D1 SMM=3D0 HLT=3D0
-> These are some of the APs and all are in wait_for_master_cpu().
+Can you reproduce this without the guest being in X2APIC mode? You'll
+have to cut it back to only 254 vCPUs for that test.
 
-As is right and proper. They should be coming up to that point and
-waiting for the... erm... controlling CPU to tell them to go any
-further.
-
-
->        1 EIP=3D0000101b EFL=3D00000003 [------C] CPL=3D0 II=3D0 A20=3D1 S=
-MM=3D0 HLT=3D0
-> This seems ok because: CS =3D9900 00099000 0000ffff 00009b00
-> So likely in the trampoline code.
-
-Yeah, that'll be in the bitlock waiting for its turn through the real
-mode stack.
-
-    1010:       66 0f ba 26 18          btw    $0x18,(%esi)
-    1015:       40                      inc    %eax
-    1016:       00 73 04                add    %dh,0x4(%ebx)
-    1019:       f3 90                   pause =20
-    101b:       eb f3                   jmp    1010 <trampoline_start+0x10>
->        1 EIP=3D0000fff0 EFL=3D00000002 [-------] CPL=3D0 II=3D0 A20=3D1 S=
-MM=3D0 HLT=3D0
-> This one seems odd... could it be the one causing the reset?
-> CS =3Df000 ffff0000 0000ffff 00009a00
-
-
-Yeah. I'm finding it slightly easier without the 'uniq'...
-
-> CPU Reset (CPU 0)
-> RIP=3Dffffffff810705c6 RFL=3D00000206 [-----P-] CPL=3D0 II=3D0 A20=3D1 SM=
-M=3D0 HLT=3D0
-> CPU Reset (CPU 1)
-> RIP=3Dffffffff8104aefb RFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SM=
-M=3D0 HLT=3D0
-> CPU Reset (CPU 2)
-> RIP=3Dffffffff8104aefb RFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SM=
-M=3D0 HLT=3D0
-> CPU Reset (CPU 3)
-> RIP=3Dffffffff8104aefb RFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SM=
-M=3D0 HLT=3D0
-> CPU Reset (CPU 4)
-> RIP=3Dffffffff8104aefb RFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SM=
-M=3D0 HLT=3D0
-> CPU Reset (CPU 5)
-> RIP=3Dffffffff8104aefb RFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SM=
-M=3D0 HLT=3D0
-> CPU Reset (CPU 6)
-> RIP=3Dffffffff8104af06 RFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SM=
-M=3D0 HLT=3D0
-> CPU Reset (CPU 7)
-> RIP=3Dffffffff8104aefb RFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SM=
-M=3D0 HLT=3D0
-> CPU Reset (CPU 8)
-> RIP=3Dffffffff8104aefb RFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SM=
-M=3D0 HLT=3D0
-> CPU Reset (CPU 9)
-> RIP=3Dffffffff8104aefb RFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SM=
-M=3D0 HLT=3D0
-> CPU Reset (CPU 10)
-> RIP=3Dffffffff8104aefb RFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SM=
-M=3D0 HLT=3D0
-> CPU Reset (CPU 11)
-> RIP=3Dffffffff8104aefb RFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SM=
-M=3D0 HLT=3D0
-> CPU Reset (CPU 12)
-> RIP=3Dffffffff8104aefb RFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SM=
-M=3D0 HLT=3D0
-> CPU Reset (CPU 13)
-> RIP=3Dffffffff8104aefb RFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SM=
-M=3D0 HLT=3D0
-> CPU Reset (CPU 14)
-> RIP=3Dffffffff8104aefb RFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SM=
-M=3D0 HLT=3D0
-> CPU Reset (CPU 15)
-> RIP=3Dffffffff8104aefb RFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SM=
-M=3D0 HLT=3D0
-> CPU Reset (CPU 16)
-> RIP=3Dffffffff8104aefb RFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SM=
-M=3D0 HLT=3D0
-> CPU Reset (CPU 17)
-> RIP=3Dffffffff8104aefb RFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SM=
-M=3D0 HLT=3D0
-> CPU Reset (CPU 18)
-> RIP=3Dffffffff8104aefb RFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SM=
-M=3D0 HLT=3D0
-> CPU Reset (CPU 19)
-> RIP=3Dffffffff8104aefb RFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SM=
-M=3D0 HLT=3D0
-> CPU Reset (CPU 20)
-> RIP=3Dffffffff8104aefb RFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SM=
-M=3D0 HLT=3D0
-> CPU Reset (CPU 21)
-> RIP=3Dffffffff8104aefb RFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SM=
-M=3D0 HLT=3D0
-
-All those came up and are waiting in wait_for_master_cpu() as they
-should.
-
-
-> CPU Reset (CPU 22)
-> EIP=3D0000101b EFL=3D00000003 [------C] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HL=
-T=3D0
-
-That one's in the bitlock, also waiting.
-
-> CPU Reset (CPU 23)
-> EIP=3D0000fff0 EFL=3D00000002 [-------] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HL=
-T=3D0
-
-This one we suspect. Is this what a triple-fault would look like? Not
-if it's *already* at f000:fff0, surely?=20
-
-CPU Reset (CPU 23)
-EAX=3D00000000 EBX=3D00000000 ECX=3D00000000 EDX=3D00800f12
-ESI=3D00000000 EDI=3D00000000 EBP=3D00000000 ESP=3D00000000
-EIP=3D0000fff0 EFL=3D00000002 [-------] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HLT=
-=3D0
-ES =3D0000 00000000 0000ffff 00009300
-CS =3Df000 ffff0000 0000ffff 00009a00
-SS =3D0000 00000000 0000ffff 00009200
-DS =3D0000 00000000 0000ffff 00009300
-FS =3D0000 00000000 0000ffff 00009300
-GS =3D0000 00000000 0000ffff 00009300
-LDT=3D0000 00000000 0000ffff 00008200
-TR =3D0000 00000000 0000ffff 00008300
-GDT=3D     00000000 0000ffff
-IDT=3D     00000000 0000ffff
-CR0=3D00000010 CR2=3D00000000 CR3=3D00000000 CR4=3D00000000
-DR0=3D0000000000000000 DR1=3D0000000000000000 DR2=3D0000000000000000 DR3=3D=
-0000000000000000=20
-DR6=3D00000000ffff0ff0 DR7=3D0000000000000400
-CCS=3D00000000 CCD=3D00000000 CCO=3DDYNAMIC=20
-EFER=3D0000000000000000
-FCW=3D037f FSW=3D0000 [ST=3D0] FTW=3D00 MXCSR=3D00001f80
-FPR0=3D0000000000000000 0000 FPR1=3D0000000000000000 0000
-FPR2=3D0000000000000000 0000 FPR3=3D0000000000000000 0000
-FPR4=3D0000000000000000 0000 FPR5=3D0000000000000000 0000
-FPR6=3D0000000000000000 0000 FPR7=3D0000000000000000 0000
-XMM00=3D0000000000000000 0000000000000000 XMM01=3D0000000000000000 00000000=
-00000000
-XMM02=3D0000000000000000 0000000000000000 XMM03=3D0000000000000000 00000000=
-00000000
-XMM04=3D0000000000000000 0000000000000000 XMM05=3D0000000000000000 00000000=
-00000000
-XMM06=3D0000000000000000 0000000000000000 XMM07=3D0000000000000000 00000000=
-00000000
-
-
-> CPU Reset (CPU 24)
-> RIP=3Dffffffff8104aefb RFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SM=
-M=3D0 HLT=3D0
-> CPU Reset (CPU 25)
-> RIP=3Dffffffff8104aefb RFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SM=
-M=3D0 HLT=3D0
-> CPU Reset (CPU 26)
-> RIP=3Dffffffff8104aefb RFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SM=
-M=3D0 HLT=3D0
-
-These ones made it through the real mode first and are also waiting.
-
-> CPU Reset (CPU 27)
-> EIP=3D0000101b EFL=3D00000003 [------C] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HL=
-T=3D0
-> CPU Reset (CPU 28)
-> EIP=3D0000101b EFL=3D00000003 [------C] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HL=
-T=3D0
-> CPU Reset (CPU 29)
-
-Still in the real mode bitlock. And after this point they are still
-halted in presumably 32-bit BIOS code because the BSP hasn't even
-touched them yet.
-
-> EIP=3D3f36e11b EFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HL=
-T=3D1
-> CPU Reset (CPU 30)
-> EIP=3D3f36e11b EFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HL=
-T=3D1
-> CPU Reset (CPU 31)
-> EIP=3D3f36e11b EFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HL=
-T=3D1
-> CPU Reset (CPU 32)
-> ...
-> CPU Reset (CPU 127)
-> EIP=3D3f36e11b EFL=3D00000046 [---Z-P-] CPL=3D0 II=3D0 A20=3D1 SMM=3D0 HL=
-T=3D1
-
-
-
---=-OuLVbXvPdBitGtpIQfSd
+--=-fTXVE2NNHO+dxZLXmpaq
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -401,20 +174,20 @@ BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
 BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
 ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
 ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjEx
-MjE3MTkxMTEyWjAvBgkqhkiG9w0BCQQxIgQgFnoGqr8l+yZVl/VyuA6a6Vps5YTVLzuf39m/8Wu5
-+8swgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+MjE3MTkyNjMxWjAvBgkqhkiG9w0BCQQxIgQghJYPgL8UtPbii6DIWbqam9gF/4tAKI93/HCrY7KP
+b80wgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
 TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
 PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
 aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
 A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
 bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
-DQEBAQUABIIBAJA6Md6kDTKaTjK3gPxQhx6OZLRZ8EXHbWVpvBCGU47GNYN1dgu5qn1wR+2fICe/
-jxN04Sgo3iIDJlEWkTDDsDX+2PB15dJ7CSJuhHhZxVSaNgl/NQ4ozwpPbRJog99tI6pWB7FtxQt5
-dbHFhBKwxFRBB1DxhiL4bAZif8Gaf904PYyrioE1wPZYeumLShogpXn08Up+VFp4NuXPLrdMKQ5R
-WNpzJEXKl5iDe440+06ygOjFqQJL2hrgesN+L2wBBIx5/JQ44sPZeYRACk3Kn3ECC1VAlYVbcYB5
-RteBnjLbyiMOtrkqpjdBJJnV7tH/sv2m6WFMOeDJ7hpGEhpWnn4AAAAAAAA=
+DQEBAQUABIIBAIlDVVQXGgrTPsmO2ik72/P5xEnhN+/CKGeKz73rddGbkexZrJ8Mcqe36X3pLqQn
+aPrPmvvL/2OqTx8k8653OQNfjHgA5f1QEhlnKBIiMzkHy++iOCaY00ZQizSswpMeFmZJxKHxRHJx
+JedZ6Y9vvZlMnaqEYsR4lVrCZEVIqEo900ey3uzZfuUgQMXY+Q+IWqVNyWdawdu5xRDkQspN/5ar
+jbxLUm/G8s1rV6x15hpS09C17SQZIzAJUvq63DoHUcRFgyCacxrQLXfowfljuRZ1tgbW+OJONcGE
+cCoQrTSr1R3TwfhJJPbLZy6ZxCxSl1QUI5VpOCSKhRDAM2L52qsAAAAAAAA=
 
 
---=-OuLVbXvPdBitGtpIQfSd--
+--=-fTXVE2NNHO+dxZLXmpaq--
 
