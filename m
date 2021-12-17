@@ -2,234 +2,231 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id F2414479735
-	for <lists+kvm@lfdr.de>; Fri, 17 Dec 2021 23:33:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EC539479756
+	for <lists+kvm@lfdr.de>; Fri, 17 Dec 2021 23:48:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230495AbhLQWdJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Dec 2021 17:33:09 -0500
-Received: from mail-mw2nam12on2074.outbound.protection.outlook.com ([40.107.244.74]:36928
-        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230454AbhLQWdI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Dec 2021 17:33:08 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RzLgH07kEwAFmFCvZ9VwIQCNK+a7YC4LxrX0PoVe33wwszkLLz8ibv7eL2/j5bMjRKmbS+0Shuj6jatvhYVLCuDIctowDJfr535wH8NEWtSQFb3yPzYXDqYfPLL/IKQ/8qBQLOi48kmYr+fTZq0+pRGq64eUKV9VgifFPkPnzuik8YEAXG7MFk4L4B5HyHXTaJOHaysJYhHSIlWvT8K7gLvtotnrV70g+C3d+4ohuVugXQIHAjxZsY2a1UNScxzlL4+EXYtkMTcT1UlPtwwUmoaVyRAiik1bGoOIaTLufKx1PmskVK67MRX8KKohsG2yBlmZpE8nKn2KYur9eDY2SA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=VMcy5MK7iCAF8uZSvBiqO7vXGJXyzs7HoWluZSCQLrU=;
- b=SBgPcxTUATiQliEDnRNNcEQTuMOqMZ5qQlLWNHhcXfCvETOYRTcsQynjailhyekW+/w/cU/z8swSmJRmWsl9BQwk/WVzvwWoABwor9vKYLw5APAOPXulq1pqVLvdMWklOm4ZYvIYraDjQzb7yUfw/PpGl10a1xF9z0YA3V/LZnt1G5O40F66SyE0gpIW77Nk58g8T1/zkLf/DkkObijlUYrvMjf5F5qlZFMtg6Bd7x0dmjpbHLqso2HqPCDeapJco+/6buq6symMVxHuWHehb22uHv3g4XuJY4YosJ0nEuP7jUdK8Ics4KRkQBrZ0lrzggTxRFv7m1SB0RjDUlrQUg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VMcy5MK7iCAF8uZSvBiqO7vXGJXyzs7HoWluZSCQLrU=;
- b=BcHWa+qFjQlvrBPpcrksIjRF3xBG9rAJ5ULq8VkIEXKGruQTOmK+WQW8VCMnkGhr+yplHA2QdyssejbF1IXifpV7O8RYx/k37dQ4czUBdF1Q0+5ACHobrEO1D3XwM/85fkNMzYgvVzUHt0X6RixcjK5YeWFLTQb6Bcz9ygY/XWc=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
- by DM4PR12MB5182.namprd12.prod.outlook.com (2603:10b6:5:395::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4801.14; Fri, 17 Dec
- 2021 22:33:06 +0000
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::1ddd:71e4:5803:e44a]) by DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::1ddd:71e4:5803:e44a%3]) with mapi id 15.20.4734.028; Fri, 17 Dec 2021
- 22:33:06 +0000
-Subject: Re: [PATCH v8 08/40] x86/sev: Check the vmpl level
-To:     Brijesh Singh <brijesh.singh@amd.com>,
-        Mikolaj Lisik <lisik@google.com>,
-        Venu Busireddy <venu.busireddy@oracle.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-efi@vger.kernel.org, platform-driver-x86@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Joerg Roedel <jroedel@suse.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ard Biesheuvel <ardb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
+        id S231300AbhLQWsg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Dec 2021 17:48:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46604 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230506AbhLQWsg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Dec 2021 17:48:36 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 072CCC061574;
+        Fri, 17 Dec 2021 14:48:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=lWBXNtMn+fnetC+GQQJ1BicA7CaNfZQwX3afKTQCWuw=; b=YwTnLaRSrmXZerctD1iyb2OJa0
+        y/zsflA6qUIFXmYKyoQCFAe/D/Ihk1wJgy21U77bhkiXi4E2lkuGyGS0cZqh+TxbrM3pWBQbydY/A
+        EEZmAHUlv2o4wse+liyEIs6OOZ8CvyHpb+yd+dCejzbJX+ucKwmOgFrDSEWXMJ7O7EZHiF2QGrco5
+        Ihwefry8c2GuN332kLY+vTBKUfmj+hbdf0VKj7FPWyk2EyHKqj90uq4+355sZj4xUaw5iLbAzR3IJ
+        UcBCttu3QkM9Ih3yEPVZHZ5GvI78ckCP76Fp6RhHHHACZ6kWtBaomMetUDlq2tT2gL6s+VvjV5blO
+        VL1FONzQ==;
+Received: from [2001:8b0:10b:1::3ae] (helo=u3832b3a9db3152.infradead.org)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1myM1R-00CdXh-Gh; Fri, 17 Dec 2021 22:48:17 +0000
+Message-ID: <1e68760ba5452ec23f89485b20f8aa3bf9f9b039.camel@infradead.org>
+Subject: Re: [PATCH v3 0/9] Parallel CPU bringup for x86_64
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Tom Lendacky <thomas.lendacky@amd.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+Cc:     Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>,
-        Sergio Lopez <slp@redhat.com>, Peter Gonda <pgonda@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        David Rientjes <rientjes@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>,
-        Tobin Feldman-Fitzthum <tobin@ibm.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Kirill A . Shutemov" <kirill@shutemov.name>,
-        Andi Kleen <ak@linux.intel.com>,
-        "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com
-References: <20211210154332.11526-1-brijesh.singh@amd.com>
- <20211210154332.11526-9-brijesh.singh@amd.com> <YbugbgXhApv9ECM2@dt>
- <CADtC8PX_bEk3rQR1sonbp-rX7rAG4fdbM41r3YLhfj3qWvqJrw@mail.gmail.com>
- <79c91197-a7d8-4b93-b6c3-edb7b2da4807@amd.com>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-Message-ID: <d56c2f64-9e31-81d8-f250-e9772ba37d7e@amd.com>
-Date:   Fri, 17 Dec 2021 16:33:02 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-In-Reply-To: <79c91197-a7d8-4b93-b6c3-edb7b2da4807@amd.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SN6PR04CA0083.namprd04.prod.outlook.com
- (2603:10b6:805:f2::24) To DM4PR12MB5229.namprd12.prod.outlook.com
- (2603:10b6:5:398::12)
+        "x86@kernel.org" <x86@kernel.org>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Paul E . McKenney" <paulmck@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "rcu@vger.kernel.org" <rcu@vger.kernel.org>,
+        "mimoja@mimoja.de" <mimoja@mimoja.de>,
+        "hewenliang4@huawei.com" <hewenliang4@huawei.com>,
+        "hushiyuan@huawei.com" <hushiyuan@huawei.com>,
+        "luolongjun@huawei.com" <luolongjun@huawei.com>,
+        "hejingxian@huawei.com" <hejingxian@huawei.com>
+Date:   Fri, 17 Dec 2021 22:48:12 +0000
+In-Reply-To: <c3dbd3b9-accf-bc28-f808-1d842d642309@amd.com>
+References: <20211215145633.5238-1-dwmw2@infradead.org>
+         <761c1552-0ca0-403b-3461-8426198180d0@amd.com>
+         <ca0751c864570015ffe4d8cccdc94e0a5ef3086d.camel@infradead.org>
+         <b13eac6c-ea87-aef9-437f-7266be2e2031@amd.com>
+         <721484e0fa719e99f9b8f13e67de05033dd7cc86.camel@infradead.org>
+         <1401c5a1-c8a2-cca1-e548-cab143f59d8f@amd.com>
+         <2bfb13ed5d565ab09bd794f69a6ef2b1b75e507a.camel@infradead.org>
+         <b798bcef-d750-ce42-986c-0d11d0bb47b0@amd.com>
+         <41e63d89f1b2debc0280f243d7c8c3212e9499ee.camel@infradead.org>
+         <c3dbd3b9-accf-bc28-f808-1d842d642309@amd.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-MXhw661q7sB5Ph09VW1m"
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-Received: from office-ryzen.texastahm.com (67.79.209.213) by SN6PR04CA0083.namprd04.prod.outlook.com (2603:10b6:805:f2::24) with Microsoft SMTP Server (version=TLS1_2, cipher=) via Frontend Transport; Fri, 17 Dec 2021 22:33:04 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 8434f5e2-d80a-4f3d-38de-08d9c1ad321a
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5182:EE_
-X-Microsoft-Antispam-PRVS: <DM4PR12MB5182FCFDAA8DB01F9E1CB98FEC789@DM4PR12MB5182.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: iP/w30h1NE89EFDw8mzPxbpWuVRq0/avzpMi73ucyGojqL97wLIguOVMKqpFUH+SFN7YwJeKMMf4dqTeheMUfIVJWu6Dqt2Ybn1uY38AW2ZCQdUmIK8wlr+ffCdPIdYEzrD8QBxCg8aby1oP9NKPlVZ0pzJh/aXPrWf+0+elOZZ54HQkrhx8+OGqGh/N7FS2c4q8ZWde+XJtIC4vDpAbm7KXXPRDotHIw+tUFUg9jJbo8hv3RWwei9VOTmUccRBaOP0iLvW8C8rHmYQW9J5rbZ9egf099/pcKzDoPc48nzeSXAKs9raxYLIAdl/hx4yWyZdpfDztzdCYHCADfpwUjEjzdGLCXTxvTIMYAVUnbJvyV6OqkL5EwMExu052cy8mxW4kc6yyn7arkJbuPEGmwKTFTGvqei/o4qvhPXP0aGH+yriYfk5i+HfzdQx9O1Tsy9tgLfb95x+wzUTRvpmSI/HRRreA/IuWKTdhzntQtqVXcIqI6KkWd08C97N38tjyOXOILawgjqpKAb7UeJ3w2jcTrjnUrffQR624ylineAzpgHpmSW8fU4jhRft3u6kWL9zFtRgU7iy6VOIEHuKH16V3kuttJll/F9HwaE//CEwcgSxrWaOmlM2lwpFhprP/7xaTvMtrPLGi6/yuWuozxqu2IBl842IBRDVDqs2Dipn1D3UsagsH7uHfDoxv05qf71YlEWIfRE2Uzae9ZA03oNxjIcswuzJfNlTiR63USg+DrxOce1jA9x9gsM0I7t0G
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(86362001)(31696002)(66556008)(2906002)(508600001)(54906003)(83380400001)(186003)(2616005)(6512007)(4001150100001)(5660300002)(7416002)(316002)(66946007)(956004)(31686004)(7406005)(26005)(4326008)(110136005)(8936002)(6506007)(66476007)(8676002)(6486002)(53546011)(38100700002)(36756003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YjNpTkptdTlJQlFPNEVtLzRLYmU4ajczdklYQWhFY3poNDJEejRSUDREeW9T?=
- =?utf-8?B?THNBS3M4ZmxJb2FsdjJnd25wVHdHK2pJMm1ELzJSRUEvNzQyRlIvd2pzeEV3?=
- =?utf-8?B?MnJQaFBTRmpaNy9EdDd6K1RVbGlwZWlQOGxWM0FLQmNzQlJmTUc2SnM1aGw3?=
- =?utf-8?B?aHl4dmNMblFQcHU3c2UwNGlZZmxEekllTTZ3dlhHWWQvb0hpcnF5ZTUzNmJ0?=
- =?utf-8?B?eXpPME9CK2RBSnJZWmcraGJSNzYvdTFvVDBPMkw5K0QvbTZCcFRhUzBaQzlQ?=
- =?utf-8?B?ZCtkM0tDZ3JGTWpCNHZyaFRqS09FYmdBdlhyZm1Dc256WGxzTzNKQlA2RENC?=
- =?utf-8?B?RUwxK2pJanJtVkJJM2dNbHcvcEJRV3Nha1k2dmN2KzBZUW5LajJNYW5KTGRk?=
- =?utf-8?B?SllzcUQwbWIwUURqMmpaTkUwaFRsV09UUTcvTmh0MGRUdG5kLzdIM3doZ0xE?=
- =?utf-8?B?RDlMRHJVcm1PcmRSalY0MUJJVm9GblNXRWUrU3JJdVlSbXIzVVlHbkVjTG9F?=
- =?utf-8?B?T0tsTkxlRnFNRkJwaHI5YkJzNmlDRjcxelA5OUVlNlBzejBKcFNHZWgvM1ho?=
- =?utf-8?B?RjNONUxXSHRCQ3p2cGRlSUJhTE51TVR2UFkxM1hZcWtlWFhPUTBVZFNrS00z?=
- =?utf-8?B?eDhHOFdFYVcvdjdPUnJ6SUtod041d0FPWjB5R3ZxN1ZkSGhPUjRhM3QvMDd5?=
- =?utf-8?B?UVBLWnJIL0NKWG5mSFNvaUV1MlNGYS92STFQWmN6MG5xRnpRdllmMzQrQ0lO?=
- =?utf-8?B?aHlRTlNkZk5GNlhVeXVJakJiZEhiclJJVFh3a2FqSHVuaWM4aCtWTTdFYzkz?=
- =?utf-8?B?eklZUE5iZDdLQzdpTVp5K0k0czFud1BKVWtQd1ZnbjJad2toN0c1d3JQN0xL?=
- =?utf-8?B?cGN4c1J1UFRIYTRqV1dqSW9qelI1TVBBN1QxRmRocFNYRlJjeDNWY0Q2Q3BB?=
- =?utf-8?B?RS9ib0RaWGxBanBrWkdQaDlVQ05ab3RXWEpNTnFWTEdYNG9kNTFNN3diQVNB?=
- =?utf-8?B?TUtXd08vNGxPa201T2xiR2dSckY0UXRMazZoWWRlZzcxM3JiN1hsMVo0ckY2?=
- =?utf-8?B?V1FPWXpSL0N1ZC85bGlhRlpoNjV0WHZMNUsrV0Y3dnZTWkdrQ1d0ZFBLdHJH?=
- =?utf-8?B?NHAzbnh6MVRrNUU3OWM1R04zZWIwRzRhcmRPY2hhZ2k2dlF3L0lQK3VkUDRE?=
- =?utf-8?B?QlQ4S0FZVDZhVS9jV0w0dENVRWd1UHNhN0MzcklCS29KQ0F3WjZYejJ2Ymtl?=
- =?utf-8?B?R0FTZE1ueC9ac0Mxc01tWk9oekcwMkYyTUJpNTNKd3pqSHhrT2Y2MjllUG1x?=
- =?utf-8?B?NG5Idk9RZlhYMWhCcml6R3ZLYm9aczlNKzZIZ2ZzR2JMYzRpMFl4ek5DUm10?=
- =?utf-8?B?Z3NRWE5EbU5BYnZNOXYrUFNjU2k0VUovbFpiMG91dTQrSUplQVBHYW1jTXFj?=
- =?utf-8?B?L01sUTVLQ1JGZTRiazNYZngxa1BWMUxNWW9wNWE3SEJCeEc2RzlLbUJubTY5?=
- =?utf-8?B?V1AvR2U4amMwTUIzV2MwaDk0bG44K2lEL0pUeG9TT2NsU1c0Q2hFTmt4Sm5C?=
- =?utf-8?B?blhGRllzTzJPdWlsNHVVaDBocUNKc3ZTbHhWbFp5Q0RlQjVqWjYwanpjYmN4?=
- =?utf-8?B?UEVVUkEzNGZZZ2ZxNkRrSjUrV1VwUWR2MFlOY0JPUUt2U0VoZUxqS0lFTTl0?=
- =?utf-8?B?Q1k5L1dTV3pEWWZUeThLUW9RbkJQVG83blZuaG9yR0ZjRnpoNGJWakorRmZS?=
- =?utf-8?B?S1JGS21QWHBhU3k5d1NFUEJmdEFnNHc4V2owUFQrRkZhbHl6MG5nQTE1bDJL?=
- =?utf-8?B?azNiZ0NUQzRUOHROWVNEYmNzUklrNVN3ajlrN3Y5Yi9GOURJZnFPTC9pYVJz?=
- =?utf-8?B?UloxcmZsdlF2N1ZOS0RiVmRhOFJBd3grQW93emdBeEhtNXAwZlpBU3BrYzFa?=
- =?utf-8?B?TWI5YnFDaEFNZ05FMS9ycXBEMXdjdktxaGRHWGoxT3cxdElsRXlicmJWUlBH?=
- =?utf-8?B?andZdnVZZjlNWFhucW1Dbld4UkhYQVFuejVPa3pURDRZV1lGUFBzcEs1eFRk?=
- =?utf-8?B?ZGlFZERCM2pCV3pFYVZPRUNraTd4Y1VXSU8ydjdqVFM4ejAwVFc5eC85bUFK?=
- =?utf-8?B?YlhhNzB0VWFwQTdsNlcwMllBVVlTdjQ1M2FCRVorNm16NHRpZGFGYnROQXlB?=
- =?utf-8?Q?evL9eUhPhZG+LgJI38E+cms=3D?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8434f5e2-d80a-4f3d-38de-08d9c1ad321a
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Dec 2021 22:33:06.5410
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Az6UWmVmkoP4p13zRoz021iPQrEkZzd9zjc0zg73dJ7IoY648UKOUGo8WFJ/9ZT9WGuph+zwfXwtowd0VVQQeg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5182
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/17/21 4:19 PM, Brijesh Singh wrote:
-> 
-> On 12/16/21 5:39 PM, Mikolaj Lisik wrote:
->> On Thu, Dec 16, 2021 at 12:24 PM Venu Busireddy
->> <venu.busireddy@oracle.com> wrote:
->>> On 2021-12-10 09:43:00 -0600, Brijesh Singh wrote:
->>>> Virtual Machine Privilege Level (VMPL) feature in the SEV-SNP architecture
->>>> allows a guest VM to divide its address space into four levels. The level
->>>> can be used to provide the hardware isolated abstraction layers with a VM.
->>>> The VMPL0 is the highest privilege, and VMPL3 is the least privilege.
->>>> Certain operations must be done by the VMPL0 software, such as:
->>>>
->>>> * Validate or invalidate memory range (PVALIDATE instruction)
->>>> * Allocate VMSA page (RMPADJUST instruction when VMSA=1)
->>>>
->>>> The initial SEV-SNP support requires that the guest kernel is running on
->>>> VMPL0. Add a check to make sure that kernel is running at VMPL0 before
->>>> continuing the boot. There is no easy method to query the current VMPL
->>>> level, so use the RMPADJUST instruction to determine whether the guest is
->>>> running at the VMPL0.
->>>>
->>>> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
->>>> ---
->>>>   arch/x86/boot/compressed/sev.c    | 34 ++++++++++++++++++++++++++++---
->>>>   arch/x86/include/asm/sev-common.h |  1 +
->>>>   arch/x86/include/asm/sev.h        | 16 +++++++++++++++
->>>>   3 files changed, 48 insertions(+), 3 deletions(-)
->>>>
->>>> diff --git a/arch/x86/boot/compressed/sev.c b/arch/x86/boot/compressed/sev.c
->>>> index a0708f359a46..9be369f72299 100644
->>>> --- a/arch/x86/boot/compressed/sev.c
->>>> +++ b/arch/x86/boot/compressed/sev.c
->>>> @@ -212,6 +212,31 @@ static inline u64 rd_sev_status_msr(void)
->>>>        return ((high << 32) | low);
->>>>   }
->>>>
->>>> +static void enforce_vmpl0(void)
->>>> +{
->>>> +     u64 attrs;
->>>> +     int err;
->>>> +
->>>> +     /*
->>>> +      * There is no straightforward way to query the current VMPL level. The
->>>> +      * simplest method is to use the RMPADJUST instruction to change a page
->>>> +      * permission to a VMPL level-1, and if the guest kernel is launched at
->>>> +      * a level <= 1, then RMPADJUST instruction will return an error.
->>> Perhaps a nit. When you say "level <= 1", do you mean a level lower than or
->>> equal to 1 semantically, or numerically?
-> 
-> Its numerically, please see the AMD APM vol 3.
 
-Actually it is not numerically...  if it was numerically, then 0 <= 1 
-would return an error, but VMPL0 is the highest permission level.
+--=-MXhw661q7sB5Ph09VW1m
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> 
-> Here is the snippet from the APM RMPAJUST.
-> 
-> IF (TARGET_VMPL <= CURRENT_VMPL)  // Only permissions for numerically
+On Fri, 2021-12-17 at 14:55 -0600, Tom Lendacky wrote:
+> On 12/17/21 2:13 PM, David Woodhouse wrote:
+> > On Fri, 2021-12-17 at 13:46 -0600, Tom Lendacky wrote:
+> > > There's no WARN or PANIC, just a reset. I can look to try and capture=
+ some
+> > > KVM trace data if that would help. If so, let me know what events you=
+'d
+> > > like captured.
+> >=20
+> >=20
+> > Could start with just kvm_run_exit?
+> >=20
+> > Reason 8 would be KVM_EXIT_SHUTDOWN and would potentially indicate a
+> > triple fault.
+>=20
+> qemu-system-x86-24093   [005] .....  1601.759486: kvm_exit: vcpu 112 reas=
+on shutdown rip 0xffffffff81070574 info1 0x0000000000000000 info2 0x0000000=
+000000000 intr_info 0x80000b08 error_code 0x00000000
+>=20
+> # addr2line -e woodhouse-build-x86_64/vmlinux 0xffffffff81070574
+> /root/kernels/woodhouse-build-x86_64/./arch/x86/include/asm/desc.h:272
+>=20
+> Which is: asm volatile("ltr %w0"::"q" (GDT_ENTRY_TSS*8));
 
-Notice, that the target VMPL is checked against the current VMPL. So if 
-the target VMPL is numerically less than or equal to the current VMPL 
-(e.g. you are trying to modify permissions for VMPL1 when you are running 
-at VMPL2), that is a permission error. So similar to CPL, 0 is the highest 
-permission followed by 1 then 2 then 3.
+OK, that seems like enough of a smoking gun; I'll stare at that harder. Tha=
+nks.
 
-Thanks,
-Tom
+/*
+ * The LTR instruction marks the TSS GDT entry as busy. On 64-bit, the GDT =
+is
+ * a read-only remapping. To prevent a page fault, the GDT is switched to t=
+he
+ * original writeable version when needed.
+ */
+#ifdef CONFIG_X86_64
+static inline void native_load_tr_desc(void)
+{
+        struct desc_ptr gdt;
+        int cpu =3D raw_smp_processor_id();
+        bool restore =3D 0;
+        struct desc_struct *fixmap_gdt;
 
-> 
->          EAX = FAIL_PERMISSION                // higher VMPL can be modified
-> 
->          EXIT
-> 
-> 
->> +1 to this. Additionally I found the "level-1" confusing which I
->> interpreted as "level minus one".
->>
->> Perhaps phrasing it as "level one", or "level=1" would be more explicit?
->>
-> Sure, I will make it clear that its target vmpl level 1 and not (target
-> level - 1).
-> 
-> thanks
-> 
-> 
+        native_store_gdt(&gdt);
+        fixmap_gdt =3D get_cpu_gdt_ro(cpu);
+
+        /*
+         * If the current GDT is the read-only fixmap, swap to the original
+         * writeable version. Swap back at the end.
+         */
+        if (gdt.address =3D=3D (unsigned long)fixmap_gdt) {
+                load_direct_gdt(cpu);
+                restore =3D 1;
+        }
+        asm volatile("ltr %w0"::"q" (GDT_ENTRY_TSS*8));
+        if (restore)
+                load_fixmap_gdt(cpu);
+}
+
+--=-MXhw661q7sB5Ph09VW1m
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCECow
+ggUcMIIEBKADAgECAhEA4rtJSHkq7AnpxKUY8ZlYZjANBgkqhkiG9w0BAQsFADCBlzELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
+A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
+bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0EwHhcNMTkwMTAyMDAwMDAwWhcNMjIwMTAxMjM1
+OTU5WjAkMSIwIAYJKoZIhvcNAQkBFhNkd213MkBpbmZyYWRlYWQub3JnMIIBIjANBgkqhkiG9w0B
+AQEFAAOCAQ8AMIIBCgKCAQEAsv3wObLTCbUA7GJqKj9vHGf+Fa+tpkO+ZRVve9EpNsMsfXhvFpb8
+RgL8vD+L133wK6csYoDU7zKiAo92FMUWaY1Hy6HqvVr9oevfTV3xhB5rQO1RHJoAfkvhy+wpjo7Q
+cXuzkOpibq2YurVStHAiGqAOMGMXhcVGqPuGhcVcVzVUjsvEzAV9Po9K2rpZ52FE4rDkpDK1pBK+
+uOAyOkgIg/cD8Kugav5tyapydeWMZRJQH1vMQ6OVT24CyAn2yXm2NgTQMS1mpzStP2ioPtTnszIQ
+Ih7ASVzhV6csHb8Yrkx8mgllOyrt9Y2kWRRJFm/FPRNEurOeNV6lnYAXOymVJwIDAQABo4IB0zCC
+Ac8wHwYDVR0jBBgwFoAUgq9sjPjF/pZhfOgfPStxSF7Ei8AwHQYDVR0OBBYEFLfuNf820LvaT4AK
+xrGK3EKx1DE7MA4GA1UdDwEB/wQEAwIFoDAMBgNVHRMBAf8EAjAAMB0GA1UdJQQWMBQGCCsGAQUF
+BwMEBggrBgEFBQcDAjBGBgNVHSAEPzA9MDsGDCsGAQQBsjEBAgEDBTArMCkGCCsGAQUFBwIBFh1o
+dHRwczovL3NlY3VyZS5jb21vZG8ubmV0L0NQUzBaBgNVHR8EUzBRME+gTaBLhklodHRwOi8vY3Js
+LmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWls
+Q0EuY3JsMIGLBggrBgEFBQcBAQR/MH0wVQYIKwYBBQUHMAKGSWh0dHA6Ly9jcnQuY29tb2RvY2Eu
+Y29tL0NPTU9ET1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcnQwJAYI
+KwYBBQUHMAGGGGh0dHA6Ly9vY3NwLmNvbW9kb2NhLmNvbTAeBgNVHREEFzAVgRNkd213MkBpbmZy
+YWRlYWQub3JnMA0GCSqGSIb3DQEBCwUAA4IBAQALbSykFusvvVkSIWttcEeifOGGKs7Wx2f5f45b
+nv2ghcxK5URjUvCnJhg+soxOMoQLG6+nbhzzb2rLTdRVGbvjZH0fOOzq0LShq0EXsqnJbbuwJhK+
+PnBtqX5O23PMHutP1l88AtVN+Rb72oSvnD+dK6708JqqUx2MAFLMevrhJRXLjKb2Mm+/8XBpEw+B
+7DisN4TMlLB/d55WnT9UPNHmQ+3KFL7QrTO8hYExkU849g58Dn3Nw3oCbMUgny81ocrLlB2Z5fFG
+Qu1AdNiBA+kg/UxzyJZpFbKfCITd5yX49bOriL692aMVDyqUvh8fP+T99PqorH4cIJP6OxSTdxKM
+MIIFHDCCBASgAwIBAgIRAOK7SUh5KuwJ6cSlGPGZWGYwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
+ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTE5MDEwMjAwMDAwMFoXDTIyMDEwMTIz
+NTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCASIwDQYJKoZIhvcN
+AQEBBQADggEPADCCAQoCggEBALL98Dmy0wm1AOxiaio/bxxn/hWvraZDvmUVb3vRKTbDLH14bxaW
+/EYC/Lw/i9d98CunLGKA1O8yogKPdhTFFmmNR8uh6r1a/aHr301d8YQea0DtURyaAH5L4cvsKY6O
+0HF7s5DqYm6tmLq1UrRwIhqgDjBjF4XFRqj7hoXFXFc1VI7LxMwFfT6PStq6WedhROKw5KQytaQS
+vrjgMjpICIP3A/CroGr+bcmqcnXljGUSUB9bzEOjlU9uAsgJ9sl5tjYE0DEtZqc0rT9oqD7U57My
+ECIewElc4VenLB2/GK5MfJoJZTsq7fWNpFkUSRZvxT0TRLqznjVepZ2AFzsplScCAwEAAaOCAdMw
+ggHPMB8GA1UdIwQYMBaAFIKvbIz4xf6WYXzoHz0rcUhexIvAMB0GA1UdDgQWBBS37jX/NtC72k+A
+CsaxitxCsdQxOzAOBgNVHQ8BAf8EBAMCBaAwDAYDVR0TAQH/BAIwADAdBgNVHSUEFjAUBggrBgEF
+BQcDBAYIKwYBBQUHAwIwRgYDVR0gBD8wPTA7BgwrBgEEAbIxAQIBAwUwKzApBggrBgEFBQcCARYd
+aHR0cHM6Ly9zZWN1cmUuY29tb2RvLm5ldC9DUFMwWgYDVR0fBFMwUTBPoE2gS4ZJaHR0cDovL2Ny
+bC5jb21vZG9jYS5jb20vQ09NT0RPUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFp
+bENBLmNybDCBiwYIKwYBBQUHAQEEfzB9MFUGCCsGAQUFBzAChklodHRwOi8vY3J0LmNvbW9kb2Nh
+LmNvbS9DT01PRE9SU0FDbGllbnRBdXRoZW50aWNhdGlvbmFuZFNlY3VyZUVtYWlsQ0EuY3J0MCQG
+CCsGAQUFBzABhhhodHRwOi8vb2NzcC5jb21vZG9jYS5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAC20spBbrL71ZEiFrbXBHonzhhirO1sdn+X+O
+W579oIXMSuVEY1LwpyYYPrKMTjKECxuvp24c829qy03UVRm742R9Hzjs6tC0oatBF7KpyW27sCYS
+vj5wbal+TttzzB7rT9ZfPALVTfkW+9qEr5w/nSuu9PCaqlMdjABSzHr64SUVy4ym9jJvv/FwaRMP
+gew4rDeEzJSwf3eeVp0/VDzR5kPtyhS+0K0zvIWBMZFPOPYOfA59zcN6AmzFIJ8vNaHKy5QdmeXx
+RkLtQHTYgQPpIP1Mc8iWaRWynwiE3ecl+PWzq4i+vdmjFQ8qlL4fHz/k/fT6qKx+HCCT+jsUk3cS
+jDCCBeYwggPOoAMCAQICEGqb4Tg7/ytrnwHV2binUlYwDQYJKoZIhvcNAQEMBQAwgYUxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMSswKQYDVQQDEyJDT01PRE8gUlNBIENlcnRpZmljYXRp
+b24gQXV0aG9yaXR5MB4XDTEzMDExMDAwMDAwMFoXDTI4MDEwOTIzNTk1OVowgZcxCzAJBgNVBAYT
+AkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAYBgNV
+BAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAvrOeV6wodnVAFsc4A5jTxhh2IVDzJXkLTLWg0X06WD6cpzEup/Y0dtmEatrQPTRI5Or1u6zf
++bGBSyD9aH95dDSmeny1nxdlYCeXIoymMv6pQHJGNcIDpFDIMypVpVSRsivlJTRENf+RKwrB6vcf
+WlP8dSsE3Rfywq09N0ZfxcBa39V0wsGtkGWC+eQKiz4pBZYKjrc5NOpG9qrxpZxyb4o4yNNwTqza
+aPpGRqXB7IMjtf7tTmU2jqPMLxFNe1VXj9XB1rHvbRikw8lBoNoSWY66nJN/VCJv5ym6Q0mdCbDK
+CMPybTjoNCQuelc0IAaO4nLUXk0BOSxSxt8kCvsUtQIDAQABo4IBPDCCATgwHwYDVR0jBBgwFoAU
+u69+Aj36pvE8hI6t7jiY7NkyMtQwHQYDVR0OBBYEFIKvbIz4xf6WYXzoHz0rcUhexIvAMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMBEGA1UdIAQKMAgwBgYEVR0gADBMBgNVHR8E
+RTBDMEGgP6A9hjtodHRwOi8vY3JsLmNvbW9kb2NhLmNvbS9DT01PRE9SU0FDZXJ0aWZpY2F0aW9u
+QXV0aG9yaXR5LmNybDBxBggrBgEFBQcBAQRlMGMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9jcnQuY29t
+b2RvY2EuY29tL0NPTU9ET1JTQUFkZFRydXN0Q0EuY3J0MCQGCCsGAQUFBzABhhhodHRwOi8vb2Nz
+cC5jb21vZG9jYS5jb20wDQYJKoZIhvcNAQEMBQADggIBAHhcsoEoNE887l9Wzp+XVuyPomsX9vP2
+SQgG1NgvNc3fQP7TcePo7EIMERoh42awGGsma65u/ITse2hKZHzT0CBxhuhb6txM1n/y78e/4ZOs
+0j8CGpfb+SJA3GaBQ+394k+z3ZByWPQedXLL1OdK8aRINTsjk/H5Ns77zwbjOKkDamxlpZ4TKSDM
+KVmU/PUWNMKSTvtlenlxBhh7ETrN543j/Q6qqgCWgWuMAXijnRglp9fyadqGOncjZjaaSOGTTFB+
+E2pvOUtY+hPebuPtTbq7vODqzCM6ryEhNhzf+enm0zlpXK7q332nXttNtjv7VFNYG+I31gnMrwfH
+M5tdhYF/8v5UY5g2xANPECTQdu9vWPoqNSGDt87b3gXb1AiGGaI06vzgkejL580ul+9hz9D0S0U4
+jkhJiA7EuTecP/CFtR72uYRBcunwwH3fciPjviDDAI9SnC/2aPY8ydehzuZutLbZdRJ5PDEJM/1t
+yZR2niOYihZ+FCbtf3D9mB12D4ln9icgc7CwaxpNSCPt8i/GqK2HsOgkL3VYnwtx7cJUmpvVdZ4o
+gnzgXtgtdk3ShrtOS1iAN2ZBXFiRmjVzmehoMof06r1xub+85hFQzVxZx5/bRaTKTlL8YXLI8nAb
+R9HWdFqzcOoB/hxfEyIQpx9/s81rgzdEZOofSlZHynoSMYIDyjCCA8YCAQEwga0wgZcxCzAJBgNV
+BAYTAkdCMRswGQYDVQQIExJHcmVhdGVyIE1hbmNoZXN0ZXIxEDAOBgNVBAcTB1NhbGZvcmQxGjAY
+BgNVBAoTEUNPTU9ETyBDQSBMaW1pdGVkMT0wOwYDVQQDEzRDT01PRE8gUlNBIENsaWVudCBBdXRo
+ZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA4rtJSHkq7AnpxKUY8ZlYZjANBglghkgB
+ZQMEAgEFAKCCAe0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMjEx
+MjE3MjI0ODEyWjAvBgkqhkiG9w0BCQQxIgQgsawwSn4yORJ/WFGklmbYio67eo5b4KzDZ89piWcf
+05Ywgb4GCSsGAQQBgjcQBDGBsDCBrTCBlzELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIg
+TWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQx
+PTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhlbnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1h
+aWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMIHABgsqhkiG9w0BCRACCzGBsKCBrTCBlzELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgG
+A1UEChMRQ09NT0RPIENBIExpbWl0ZWQxPTA7BgNVBAMTNENPTU9ETyBSU0EgQ2xpZW50IEF1dGhl
+bnRpY2F0aW9uIGFuZCBTZWN1cmUgRW1haWwgQ0ECEQDiu0lIeSrsCenEpRjxmVhmMA0GCSqGSIb3
+DQEBAQUABIIBAEl88DimwTbrwP6mFSVlxSdEU/uusPhrH3CSiT3RNT/bZAAblNAwSqc9dYzL/Nbm
+t+/KfIhVYkaIDi49T/sK65IsPBDJbqSg6XLbX2+VvSBnbNF+RFq8/B2AcAIIsW1uyxaMcFth4B2q
+vulzlFKfHEnlXA4C5PsRdmkRU6UrDFsOy5/4PhEn6RWSEzIdUfKx6MZ6jXqF936nFVorQjBMzf+v
+LDhGfN5U3XHs+l4KSOVdaMchqbsS0zrwAwBRn+bXtSRYBMeeMPt4yU7d7tU/EF75Tyr3MxY5Ljem
+QhQhNxGwd4s21MBba0aujIlFxspX9tBQSJmrxCvpxGx89aohpDYAAAAAAAA=
+
+
+--=-MXhw661q7sB5Ph09VW1m--
+
