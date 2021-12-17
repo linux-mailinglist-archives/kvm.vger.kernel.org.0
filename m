@@ -2,135 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DEB14479222
-	for <lists+kvm@lfdr.de>; Fri, 17 Dec 2021 17:58:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7F71347926D
+	for <lists+kvm@lfdr.de>; Fri, 17 Dec 2021 18:07:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239468AbhLQQ62 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Dec 2021 11:58:28 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:37442 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S235918AbhLQQ60 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 17 Dec 2021 11:58:26 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1BHGgpT5016386;
-        Fri, 17 Dec 2021 16:58:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=rIl8Y8gIDIMcLp9fb71vMtr3soLL3buKSlRYEaDkn1E=;
- b=cDTpApMmdoADvjHdyK9zdEjPCUTi17dHUeCIWi5/pFrUO0F60IzbSLZBbklbzduSVAQc
- LZ6WYs1Ow88s6dzZ21RZyz1ReRTzycHPlFMJwdGV5JR7bqcvGlT8ZXiJyifyNqD9ukm0
- qyG8nDWvCO3OuR/56eSgjIa9bkljllGi6MjQ5VEhK0YUHnMHiHrY62w9lXCkhs4RR0d7
- rybgDB1UmDMrpfB4YhN/RA+1KrulqJi8BPg3zMq6VIqaI/AAm3wKmuA5jNbQTlfjV9j3
- ogz6IP1lVUvVMwEUS9J6taree5pMkGA3YJ5di41XCYyYq2xUejJXvy15Bc4t++Aaf79R WQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3d0v68bk15-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 17 Dec 2021 16:58:25 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1BHGcDmE026263;
-        Fri, 17 Dec 2021 16:58:24 GMT
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3d0v68bk0j-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 17 Dec 2021 16:58:24 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1BHG1WcK016935;
-        Fri, 17 Dec 2021 16:58:22 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma06fra.de.ibm.com with ESMTP id 3cy77pteh8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 17 Dec 2021 16:58:22 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1BHGwJDJ38994428
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 17 Dec 2021 16:58:19 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7251511C064;
-        Fri, 17 Dec 2021 16:58:19 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 85AFE11C05B;
-        Fri, 17 Dec 2021 16:58:18 +0000 (GMT)
-Received: from [9.171.54.231] (unknown [9.171.54.231])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri, 17 Dec 2021 16:58:18 +0000 (GMT)
-Message-ID: <a9507752-6e45-3f07-d670-8c377cce73ab@linux.ibm.com>
-Date:   Fri, 17 Dec 2021 17:58:18 +0100
+        id S239649AbhLQRHV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Dec 2021 12:07:21 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:20057 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231311AbhLQRHU (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 17 Dec 2021 12:07:20 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1639760839;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=2+WRMJfHlXftJ9YeoYXvWKoQ/evPaqEvHg4A06Tryvs=;
+        b=g6jzlncyysZwniBw6OvSxPpYehBt7fIKm0NOjpEKa+g5g0nRT4/5jj0rYuSf9Wm+tPHfR6
+        ZeC8YkF04IJPICKMJByOpByri79iaViy/GAPkqSxLO3Jkk7s/btKTALMftRaqgj8+E8oY7
+        zRRM0J1sClDS0k4Yr+n5vVQixeYPfmU=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-218-2raO_SSPNzusxLEDYd3jNQ-1; Fri, 17 Dec 2021 12:07:18 -0500
+X-MC-Unique: 2raO_SSPNzusxLEDYd3jNQ-1
+Received: by mail-wm1-f69.google.com with SMTP id b20-20020a05600c4e1400b003457da1c91eso453058wmq.4
+        for <kvm@vger.kernel.org>; Fri, 17 Dec 2021 09:07:18 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=2+WRMJfHlXftJ9YeoYXvWKoQ/evPaqEvHg4A06Tryvs=;
+        b=2CNOmXk0QTWlDtED7+t9EbF/FMLEvWJilGxx8Rd7Sj3tUJ1WWw5ZVG8YwBusr7kgze
+         d7P3FqC+WxFiVCSOhZy3vDtQCSax+5GzwxzVoRYvRgtR0APhefQkwnfCNMmEFuESogXI
+         EduA/gacXQ4LdDHN7r+j8XQUD3nkK3P6+fzzt48SVNBfH4J/SHxj9ZGsUtLrAUOpbOsU
+         p05WuAt2M94E6lPUtbVPi1jDkuMgru85UiNNk+hxJNpCdvHCaKlTbCRgcmSYCKbjbE0W
+         HGadFxKKjtmCU6oCup9Oew96K39Fe/GddZSnSf4XE8O/0Bgn5zBjVJgFBa7V9p6oyvNd
+         DwqA==
+X-Gm-Message-State: AOAM530JM62mDd5mRj/1LFGwIeBiR8cGIVxRabhBITB0uSF9aTOSeVv6
+        szG2vdNvHC2OkedyVt2u+gh3Fd0a0dCz0LdgxY5S+SJWKy7Jf+qWfgHW5FAb/dZSAE3OeYgKeEB
+        xdTcw1NKpKdKe
+X-Received: by 2002:a05:6000:1d1:: with SMTP id t17mr3197092wrx.569.1639760837288;
+        Fri, 17 Dec 2021 09:07:17 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJzPrYWvecakOGWsrLS6D0tWwhJI2tzgqzCBikFjyuarJQEgYziFKpjwXCffRMF6yVCr1Gcj9A==
+X-Received: by 2002:a05:6000:1d1:: with SMTP id t17mr3197082wrx.569.1639760837095;
+        Fri, 17 Dec 2021 09:07:17 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312::ac3? ([2001:b07:6468:f312::ac3])
+        by smtp.googlemail.com with ESMTPSA id s8sm9077955wra.9.2021.12.17.09.07.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 17 Dec 2021 09:07:16 -0800 (PST)
+Message-ID: <6e2518c1-78d0-8103-69ea-40a625259ef8@redhat.com>
+Date:   Fri, 17 Dec 2021 18:07:15 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH 16/32] KVM: s390: expose the guest zPCI interpretation
- facility
+ Thunderbird/91.2.0
+Subject: Re: linux-next: manual merge of the kvm tree with the kvm tree
 Content-Language: en-US
-To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
-        hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
-        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
-        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20211207205743.150299-1-mjrosato@linux.ibm.com>
- <20211207205743.150299-17-mjrosato@linux.ibm.com>
- <23ee6e80-b857-11ab-1d80-c8b1f4ff6f04@linux.ibm.com>
- <edd0dcee-12db-bc31-203a-bc1c94a072a5@linux.ibm.com>
-From:   Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <edd0dcee-12db-bc31-203a-bc1c94a072a5@linux.ibm.com>
+To:     Michael Ellerman <mpe@ellerman.id.au>, broonie@kernel.org,
+        KVM <kvm@vger.kernel.org>
+Cc:     Alexey Kardashevskiy <aik@ozlabs.ru>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        "Maciej S . Szmigiero" <maciej.szmigiero@oracle.com>,
+        Sean Christopherson <seanjc@google.com>
+References: <20211215131033.2541027-1-broonie@kernel.org>
+ <87wnk5kvfz.fsf@mpe.ellerman.id.au>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <87wnk5kvfz.fsf@mpe.ellerman.id.au>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: yHamXnUzofEXjYnWWhg_woGauJMfgXq_
-X-Proofpoint-GUID: HASkp606eaFJdjW8NoFNKLt-BizOWlT2
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2021-12-17_06,2021-12-16_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
- phishscore=0 impostorscore=0 malwarescore=0 suspectscore=0 mlxlogscore=999
- bulkscore=0 priorityscore=1501 clxscore=1015 spamscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
- definitions=main-2112170095
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-Am 17.12.21 um 16:19 schrieb Matthew Rosato:
-> On 12/17/21 10:05 AM, Christian Borntraeger wrote:
+On 12/16/21 05:47, Michael Ellerman wrote:
+> broonie@kernel.org writes:
+>> Hi all,
 >>
+>> Today's linux-next merge of the kvm tree got a conflict in:
 >>
->> Am 07.12.21 um 21:57 schrieb Matthew Rosato:
->>> This facility will be used to enable interpretive execution of zPCI
->>> instructions.
->>>
->>> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
->>> ---
->>>   arch/s390/kvm/kvm-s390.c | 4 ++++
->>>   1 file changed, 4 insertions(+)
->>>
->>> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
->>> index c8fe9b7c2395..09991d05c871 100644
->>> --- a/arch/s390/kvm/kvm-s390.c
->>> +++ b/arch/s390/kvm/kvm-s390.c
->>> @@ -2751,6 +2751,10 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->>>           set_kvm_facility(kvm->arch.model.fac_mask, 147);
->>>           set_kvm_facility(kvm->arch.model.fac_list, 147);
->>>       }
->>> +    if (sclp.has_zpci_interp && test_facility(69)) {
->>> +        set_kvm_facility(kvm->arch.model.fac_mask, 69);
->>> +        set_kvm_facility(kvm->arch.model.fac_list, 69);
->>> +    }
+>>    arch/powerpc/kvm/book3s_hv.c
 >>
+>> between commit:
 >>
->> Do we need the setting of these stfle bits somewhere? I think QEMU sets them as well for the guest. > We only need this when the kernel probes for this (test_kvm_facility)
->> But then the question is, shouldnt
->> we then simply check for sclp bits in those places?
->> See also patch 19. We need to build it in a way that allows VSIE support later on.
+>>    511d25d6b789f ("KVM: PPC: Book3S: Suppress warnings when allocating too big memory slots")
 >>
+>> from the kvm tree and commits:
 > 
-> Right, so this currently sets the facility bits but we don't set the associated guest SCLP bits.  I guess since we are not enabling for VSIE now it would make sense to not set either.
+> That's from the powerpc tree.
 > 
-> So then just to confirm we are on the same page:  I will drop these patches 16-18 and leave the kvm facilities unset until we wish to enable VSIE.  And then also make sure we are checking sclp bits (e.g. patch 19).  OK?
+>>    537a17b314930 ("KVM: Let/force architectures to deal with arch specific memslot data")
+>>    eaaaed137eccb ("KVM: PPC: Avoid referencing userspace memory region in memslot updates")
+>>
+>> from the kvm tree.
+>>
+>> I fixed it up (see below) and can carry the fix as necessary. This
+>> is now fixed as far as linux-next is concerned, but any non trivial
+>> conflicts should be mentioned to your upstream maintainer when your tree
+>> is submitted for merging.  You may also want to consider cooperating
+>> with the maintainer of the conflicting tree to minimise any particularly
+>> complex conflicts.
+> 
+> Thanks.
+> 
+> Paolo, if you want to avoid the conflict going to Linus, I have that
+> commit (and others) in a topic branch here (based on rc2):
+> 
+>    https://git.kernel.org/pub/scm/linux/kernel/git/powerpc/linux.git/log/?h=topic/ppc-kvm
 
-Right drop these patches and change patch 19. When we later enable VSIE we need QEMU to set the sclp bits. Not sure, does this work as of today or do we need additional vsie changes (I would assume so)?
+Will pull, thanks!
+
+Paolo
+
