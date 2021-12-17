@@ -2,86 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id BD26C478DF6
-	for <lists+kvm@lfdr.de>; Fri, 17 Dec 2021 15:40:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7FBAD478E9B
+	for <lists+kvm@lfdr.de>; Fri, 17 Dec 2021 15:55:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237339AbhLQOk7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Dec 2021 09:40:59 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:50347 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237281AbhLQOk6 (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 17 Dec 2021 09:40:58 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1639752057;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/yoWJglPXPAZw0bxQGxzTmnTF1ai7Cyb2lA49+zOQaA=;
-        b=Kbvin4prC3uNSwcVxZJMcwSpi9gn8nOGIFby/7whGAk4SaDMzRVj685pyztsFC36Santke
-        72nocJTQsAU2vqwSLxv+lwHPUUhiUbNUJlR6vCxaNB779rvSVqIL2P9myXqP5fBo5Dgy8Q
-        BcR6pxfwcAXTYgkly85g7z1F+x1emqA=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-608-Snd99FrmOVuTOXBbtFVKYw-1; Fri, 17 Dec 2021 09:40:56 -0500
-X-MC-Unique: Snd99FrmOVuTOXBbtFVKYw-1
-Received: by mail-wm1-f72.google.com with SMTP id o18-20020a05600c511200b00332fa17a02eso1136801wms.5
-        for <kvm@vger.kernel.org>; Fri, 17 Dec 2021 06:40:56 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=/yoWJglPXPAZw0bxQGxzTmnTF1ai7Cyb2lA49+zOQaA=;
-        b=gp6BoBjUKPgHKUn2ABi/ADwdFYtUMTBcILJEEItQCVMvpfhpoy9B+hnOYJqRO9lXW2
-         xJDH/TJfQVt/KdCraRAIxFfeUN3slZfmBRdKitePcCqEMFwgP3Oe1NgFN9amLEZsW9Oe
-         b5B/8LLZtCJyFD3P02IDhC/bY9KRVGQ8EQ9ywA9jE2q2PkA2wxAfiNqdiYbRkd2RdRyS
-         ZlY2fm9DcsyuAp3LkTaHD8AVYtJiLJyoQpVEX+VMutEG22jS6DMmWWFu++E4hGD2zYvk
-         +Tpv2vbFkmM9ysW2rbyq17r8l1u1YZvigen3OFdmmXALvrtj93FBlE5zS9Kq2SOMgoTR
-         BY7Q==
-X-Gm-Message-State: AOAM531soKhA8kwR8x+kv6/Imaa25PSXBKZu4yeKSfCxZ0A+ZcghNfVl
-        d1Ak9h5G+LZ67FwnTy+3Vs9uh9kcaD9P50LyGAGPVlcA3tr9F851g21KWJQhPth997Y4RPMzy1u
-        TiS7ekxTKo+eF
-X-Received: by 2002:a1c:e915:: with SMTP id q21mr3099373wmc.94.1639752055545;
-        Fri, 17 Dec 2021 06:40:55 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJzcbPf9fupPFiQTxl/6Lq5J6o57nKgktC42aQsYNIOLu2CqrhXXCb//5f7F/Lc1vxEHhsPDEA==
-X-Received: by 2002:a1c:e915:: with SMTP id q21mr3099360wmc.94.1639752055373;
-        Fri, 17 Dec 2021 06:40:55 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:48f9:bea:a04c:3dfe? ([2001:b07:6468:f312:48f9:bea:a04c:3dfe])
-        by smtp.googlemail.com with ESMTPSA id j17sm10249998wmq.41.2021.12.17.06.40.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Dec 2021 06:40:54 -0800 (PST)
-Message-ID: <785732e0-733b-fccd-0b3d-0a597f2f68bf@redhat.com>
-Date:   Fri, 17 Dec 2021 15:40:53 +0100
+        id S237630AbhLQOzR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Dec 2021 09:55:17 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:10888 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231971AbhLQOzR (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 17 Dec 2021 09:55:17 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1BHDaxFG022998;
+        Fri, 17 Dec 2021 14:55:16 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=jn+7vU3DeFwv40C/Xn8u61FAyk08AIabx42PwN2Qc20=;
+ b=kCKpv+yClD+BkC6ITtMnuH2kAQymlt+5UtAcFL1gxsQaJpfckIo7vvxmdnUzKdPNS+++
+ niiAC+Cpn3Srq/FWxfvPOzrO4bgiR2Imbyr0/iqxn1ES7LTA4TUtxt3aN8vxlLndAkae
+ wMGAqaLubw1zr1pYFIE4TosBfLqcNvLNqL7sHnDsH31H4b1ybPwiQnARkou0rS9IeYY5
+ vOyz3PNJ0Rub/rsY7rpVEZ5kla2sOJq0Pif4oiWeNoT1XdwU/djmit8mgwHiTfkqQRck
+ W9OitakvcE2LoYVWmzGF2cyINDRDZBHd/c+Y6Ya0H73iecqXmXkDxFGisXdZAziICI6q iA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3d0pywyx5d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 17 Dec 2021 14:55:16 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1BHEX4VG007533;
+        Fri, 17 Dec 2021 14:55:16 GMT
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3d0pywyx3x-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 17 Dec 2021 14:55:16 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1BHEal4j009415;
+        Fri, 17 Dec 2021 14:55:13 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+        by ppma01fra.de.ibm.com with ESMTP id 3cy7k3sawg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 17 Dec 2021 14:55:13 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1BHEtABG39452952
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 17 Dec 2021 14:55:10 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id F3ADF52050;
+        Fri, 17 Dec 2021 14:55:09 +0000 (GMT)
+Received: from [9.171.60.51] (unknown [9.171.60.51])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 102EA5204F;
+        Fri, 17 Dec 2021 14:55:09 +0000 (GMT)
+Message-ID: <5073966a-0e99-977b-dc97-e72f55ff7091@linux.ibm.com>
+Date:   Fri, 17 Dec 2021 15:55:08 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [kvm-unit-tests PATCH] x86/pmu: Test PMU virtualization on
- emulated instructions
+ Thunderbird/91.3.0
+Subject: Re: [PATCH 32/32] MAINTAINERS: additional files related kvm s390 pci
+ passthrough
 Content-Language: en-US
-To:     Ma Xinjian <xinjianx.ma@intel.com>, jmattson@google.com
-Cc:     ehankland@google.com, kvm@vger.kernel.org,
-        Philip Li <philip.li@intel.com>
-References: <a2cc8bd6-df74-95a7-f3a2-6ff6407a5543@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <a2cc8bd6-df74-95a7-f3a2-6ff6407a5543@intel.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>,
+        linux-s390@vger.kernel.org, alex.williamson@redhat.com
+Cc:     cohuck@redhat.com, schnelle@linux.ibm.com, farman@linux.ibm.com,
+        pmorel@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
+        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
+        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
+        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20211207205743.150299-1-mjrosato@linux.ibm.com>
+ <20211207205743.150299-33-mjrosato@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <20211207205743.150299-33-mjrosato@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: z7n_tkup5mnXNl0_WSrva9gAXKtIGLKC
+X-Proofpoint-ORIG-GUID: XeGCCKbsEKjIvCA7LCjSS-Iai_Io2P_s
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2021-12-17_05,2021-12-16_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ bulkscore=0 mlxlogscore=999 mlxscore=0 phishscore=0 adultscore=0
+ malwarescore=0 priorityscore=1501 suspectscore=0 impostorscore=0
+ spamscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2110150000 definitions=main-2112170084
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/17/21 10:47, Ma Xinjian wrote:
-> Hi, Jim
+
+
+Am 07.12.21 um 21:57 schrieb Matthew Rosato:
+> Add entries from the s390 kvm subdirectory related to pci passthrough.
 > 
-> I am from Intel LKP team, we noticed that pmu_emulation was new added 
-> recently by you.
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+
+Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+
+Question for Alex. Shall I take these and future patches regarding KVM hw support for PCI passthru via my tree or via your vfio tree?
+
+> ---
+>   MAINTAINERS | 2 ++
+>   1 file changed, 2 insertions(+)
 > 
-> We tested it and finished with 2 unexpected failures
-
-The patch for this is not yet in kvm.git, since there were some 
-discussions on the list.  It will be fixed before the merge window.
-
-Paolo
-
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 43007f2d29e0..a88f8e4f2c80 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -16689,6 +16689,8 @@ M:	Eric Farman <farman@linux.ibm.com>
+>   L:	linux-s390@vger.kernel.org
+>   L:	kvm@vger.kernel.org
+>   S:	Supported
+> +F:	arch/s390/include/asm/kvm_pci.h
+> +F:	arch/s390/kvm/pci*
+>   F:	drivers/vfio/pci/vfio_pci_zdev.c
+>   F:	include/uapi/linux/vfio_zdev.h
+>   
+> 
