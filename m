@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id DD9D3478523
-	for <lists+kvm@lfdr.de>; Fri, 17 Dec 2021 07:39:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7AD58478525
+	for <lists+kvm@lfdr.de>; Fri, 17 Dec 2021 07:39:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233412AbhLQGik (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Dec 2021 01:38:40 -0500
-Received: from mga05.intel.com ([192.55.52.43]:56699 "EHLO mga05.intel.com"
+        id S233429AbhLQGis (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Dec 2021 01:38:48 -0500
+Received: from mga06.intel.com ([134.134.136.31]:50426 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233382AbhLQGik (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 17 Dec 2021 01:38:40 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10200"; a="325979496"
+        id S233421AbhLQGis (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 17 Dec 2021 01:38:48 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10200"; a="300467728"
 X-IronPort-AV: E=Sophos;i="5.88,213,1635231600"; 
-   d="scan'208";a="325979496"
+   d="scan'208";a="300467728"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Dec 2021 22:38:39 -0800
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Dec 2021 22:38:47 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.88,213,1635231600"; 
-   d="scan'208";a="519623324"
+   d="scan'208";a="519623361"
 Received: from allen-box.sh.intel.com ([10.239.159.118])
-  by orsmga008.jf.intel.com with ESMTP; 16 Dec 2021 22:38:32 -0800
+  by orsmga008.jf.intel.com with ESMTP; 16 Dec 2021 22:38:39 -0800
 From:   Lu Baolu <baolu.lu@linux.intel.com>
 To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Joerg Roedel <joro@8bytes.org>,
@@ -49,9 +49,9 @@ Cc:     Will Deacon <will@kernel.org>, Robin Murphy <robin.murphy@arm.com>,
         iommu@lists.linux-foundation.org, linux-pci@vger.kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         Lu Baolu <baolu.lu@linux.intel.com>
-Subject: [PATCH v4 08/13] vfio: Set DMA USER ownership for VFIO devices
-Date:   Fri, 17 Dec 2021 14:37:03 +0800
-Message-Id: <20211217063708.1740334-9-baolu.lu@linux.intel.com>
+Subject: [PATCH v4 09/13] vfio: Remove use of vfio_group_viable()
+Date:   Fri, 17 Dec 2021 14:37:04 +0800
+Message-Id: <20211217063708.1740334-10-baolu.lu@linux.intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20211217063708.1740334-1-baolu.lu@linux.intel.com>
 References: <20211217063708.1740334-1-baolu.lu@linux.intel.com>
@@ -61,106 +61,71 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Set DMA_OWNER_PRIVATE_DOMAIN_USER when an iommu group is set to a
-container, and release DMA_OWNER_USER once the iommu group is unset
-from a container.
+As DMA USER ownership is claimed for the iommu group when a vfio group is
+added to a vfio container, the vfio group viability is guaranteed as long
+as group->container_users > 0. Remove those unnecessary group viability
+checks which are only hit when group->container_users is not zero.
+
+The only remaining reference is in GROUP_GET_STATUS, which could be called
+at any time when group fd is valid. Here we just replace the
+vfio_group_viable() by directly calling iommu core to get viability status.
 
 Signed-off-by: Lu Baolu <baolu.lu@linux.intel.com>
 ---
- drivers/vfio/fsl-mc/vfio_fsl_mc.c     |  1 +
- drivers/vfio/pci/vfio_pci.c           |  3 +++
- drivers/vfio/platform/vfio_amba.c     |  1 +
- drivers/vfio/platform/vfio_platform.c |  1 +
- drivers/vfio/vfio.c                   | 13 ++++++++++++-
- 5 files changed, 18 insertions(+), 1 deletion(-)
+ drivers/vfio/vfio.c | 18 ++++++------------
+ 1 file changed, 6 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc.c b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-index 6e2e62c6f47a..b749d092a185 100644
---- a/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-+++ b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-@@ -587,6 +587,7 @@ static struct fsl_mc_driver vfio_fsl_mc_driver = {
- 	.driver	= {
- 		.name	= "vfio-fsl-mc",
- 		.owner	= THIS_MODULE,
-+		.suppress_auto_claim_dma_owner = true,
- 	},
- };
- 
-diff --git a/drivers/vfio/pci/vfio_pci.c b/drivers/vfio/pci/vfio_pci.c
-index a5ce92beb655..ce3e814b5506 100644
---- a/drivers/vfio/pci/vfio_pci.c
-+++ b/drivers/vfio/pci/vfio_pci.c
-@@ -193,6 +193,9 @@ static struct pci_driver vfio_pci_driver = {
- 	.remove			= vfio_pci_remove,
- 	.sriov_configure	= vfio_pci_sriov_configure,
- 	.err_handler		= &vfio_pci_core_err_handlers,
-+	.driver			= {
-+		.suppress_auto_claim_dma_owner = true,
-+	},
- };
- 
- static void __init vfio_pci_fill_ids(void)
-diff --git a/drivers/vfio/platform/vfio_amba.c b/drivers/vfio/platform/vfio_amba.c
-index badfffea14fb..2146ee52901a 100644
---- a/drivers/vfio/platform/vfio_amba.c
-+++ b/drivers/vfio/platform/vfio_amba.c
-@@ -94,6 +94,7 @@ static struct amba_driver vfio_amba_driver = {
- 	.drv = {
- 		.name = "vfio-amba",
- 		.owner = THIS_MODULE,
-+		.suppress_auto_claim_dma_owner = true,
- 	},
- };
- 
-diff --git a/drivers/vfio/platform/vfio_platform.c b/drivers/vfio/platform/vfio_platform.c
-index 68a1c87066d7..5ef06e668192 100644
---- a/drivers/vfio/platform/vfio_platform.c
-+++ b/drivers/vfio/platform/vfio_platform.c
-@@ -75,6 +75,7 @@ static struct platform_driver vfio_platform_driver = {
- 	.remove		= vfio_platform_remove,
- 	.driver	= {
- 		.name	= "vfio-platform",
-+		.suppress_auto_claim_dma_owner = true,
- 	},
- };
- 
 diff --git a/drivers/vfio/vfio.c b/drivers/vfio/vfio.c
-index 735d1d344af9..b75ba7551079 100644
+index b75ba7551079..241756b85705 100644
 --- a/drivers/vfio/vfio.c
 +++ b/drivers/vfio/vfio.c
-@@ -1198,6 +1198,9 @@ static void __vfio_group_unset_container(struct vfio_group *group)
- 		driver->ops->detach_group(container->iommu_data,
- 					  group->iommu_group);
+@@ -1316,12 +1316,6 @@ static int vfio_group_set_container(struct vfio_group *group, int container_fd)
+ 	return ret;
+ }
  
-+	iommu_group_release_dma_owner(group->iommu_group,
-+				      DMA_OWNER_PRIVATE_DOMAIN_USER);
-+
- 	group->container = NULL;
- 	wake_up(&group->container_q);
- 	list_del(&group->container_next);
-@@ -1282,13 +1285,21 @@ static int vfio_group_set_container(struct vfio_group *group, int container_fd)
- 		goto unlock_out;
+-static bool vfio_group_viable(struct vfio_group *group)
+-{
+-	return (iommu_group_for_each_dev(group->iommu_group,
+-					 group, vfio_dev_viable) == 0);
+-}
+-
+ static int vfio_group_add_container_user(struct vfio_group *group)
+ {
+ 	if (!atomic_inc_not_zero(&group->container_users))
+@@ -1331,7 +1325,7 @@ static int vfio_group_add_container_user(struct vfio_group *group)
+ 		atomic_dec(&group->container_users);
+ 		return -EPERM;
  	}
- 
-+	ret = iommu_group_set_dma_owner(group->iommu_group,
-+					DMA_OWNER_PRIVATE_DOMAIN_USER, f.file);
-+	if (ret)
-+		goto unlock_out;
-+
- 	driver = container->iommu_driver;
- 	if (driver) {
- 		ret = driver->ops->attach_group(container->iommu_data,
- 						group->iommu_group,
- 						group->type);
--		if (ret)
-+		if (ret) {
-+			iommu_group_release_dma_owner(group->iommu_group,
-+						      DMA_OWNER_PRIVATE_DOMAIN_USER);
- 			goto unlock_out;
-+		}
+-	if (!group->container->iommu_driver || !vfio_group_viable(group)) {
++	if (!group->container->iommu_driver) {
+ 		atomic_dec(&group->container_users);
+ 		return -EINVAL;
  	}
+@@ -1349,7 +1343,7 @@ static int vfio_group_get_device_fd(struct vfio_group *group, char *buf)
+ 	int ret = 0;
  
- 	group->container = container;
+ 	if (0 == atomic_read(&group->container_users) ||
+-	    !group->container->iommu_driver || !vfio_group_viable(group))
++	    !group->container->iommu_driver)
+ 		return -EINVAL;
+ 
+ 	if (group->type == VFIO_NO_IOMMU && !capable(CAP_SYS_RAWIO))
+@@ -1441,11 +1435,11 @@ static long vfio_group_fops_unl_ioctl(struct file *filep,
+ 
+ 		status.flags = 0;
+ 
+-		if (vfio_group_viable(group))
+-			status.flags |= VFIO_GROUP_FLAGS_VIABLE;
+-
+ 		if (group->container)
+-			status.flags |= VFIO_GROUP_FLAGS_CONTAINER_SET;
++			status.flags |= VFIO_GROUP_FLAGS_CONTAINER_SET |
++					VFIO_GROUP_FLAGS_VIABLE;
++		else if (iommu_group_dma_owner_unclaimed(group->iommu_group))
++			status.flags |= VFIO_GROUP_FLAGS_VIABLE;
+ 
+ 		if (copy_to_user((void __user *)arg, &status, minsz))
+ 			return -EFAULT;
 -- 
 2.25.1
 
