@@ -2,112 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A73847866B
-	for <lists+kvm@lfdr.de>; Fri, 17 Dec 2021 09:45:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 68A9F4786E4
+	for <lists+kvm@lfdr.de>; Fri, 17 Dec 2021 10:18:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232529AbhLQIpV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 17 Dec 2021 03:45:21 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:38977 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230194AbhLQIpU (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Fri, 17 Dec 2021 03:45:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1639730720;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=W1WFS25x/hLZ6A8mSaxKO8h95Gv9OAldcWDpPXz2GBE=;
-        b=VPCl7IUVCQQGI3WkJlh0cUY8iUhSUm1XEV+E1KtRSpmNpv2c1OQ6IVx7hpN7CFN2fFjupb
-        X9h2r5kGoC3o2yQnXWJET6KmeROqGb5UgaL83dTYGVbc11hzcfrdlq6Hq+1KLfrJ0UzrNJ
-        +/7QzLgQrZtYaB9ifFC9hlua84g011Q=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-528-PzWuFYClO7y6cPV8x9ddnQ-1; Fri, 17 Dec 2021 03:45:18 -0500
-X-MC-Unique: PzWuFYClO7y6cPV8x9ddnQ-1
-Received: by mail-ed1-f69.google.com with SMTP id y17-20020a056402271100b003f7ef5ca612so1284882edd.17
-        for <kvm@vger.kernel.org>; Fri, 17 Dec 2021 00:45:18 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=W1WFS25x/hLZ6A8mSaxKO8h95Gv9OAldcWDpPXz2GBE=;
-        b=SXcoKJbkDLTOL8J4q7T/71lqRkomqttYiQd6QpdBOPy7+k1ORSk1FlsJX4r4WLcmYg
-         f36mW8hR0ASd6r1XyvTI80cSi4tcL/Uc7v7K+glakD0JRH0B7C9pb5Q/shySvXKjQr21
-         ZuvkGty9LWelOZlYSBSXl1vcNKpNKjYHadPxyqwigdP2LlvzWQKuzz0F5a+Ggtv+cTKz
-         ewdTUJPzrx/z+nVjcT4iXTLW+e0EKeotVnyRxjw1EZjYZDkqE2gVEFsiJCKMjP5DDa27
-         6OiAU7Z/bsKnl/2DPRVHDRBWUgYQSi4SNNrCz3oxrgKduc7RFUycrzpyePVpBpr/uf0i
-         qNfw==
-X-Gm-Message-State: AOAM5332LFq976GmLMiCt0YExb4uX+A/3ffiTLvSxiCr2WA02eGt8/fe
-        3IaDp13Mkst4Opub4HlkSsiNtazP6JkvFFEMr4l8ChTnOr/RHE93NMw5OsogC1Oh2jxXryzDhF5
-        lux/t7QNZvn/Q
-X-Received: by 2002:a05:6402:1e92:: with SMTP id f18mr1829658edf.153.1639730717773;
-        Fri, 17 Dec 2021 00:45:17 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyulrYmwimpg1/zvrNRe0VHKW9o3WEZBH7A+DzvCdKBr++K0QKgOB5w5yxBs04sV5UeBcVGCA==
-X-Received: by 2002:a05:6402:1e92:: with SMTP id f18mr1829642edf.153.1639730717557;
-        Fri, 17 Dec 2021 00:45:17 -0800 (PST)
-Received: from ?IPV6:2001:b07:add:ec09:c399:bc87:7b6c:fb2a? ([2001:b07:add:ec09:c399:bc87:7b6c:fb2a])
-        by smtp.googlemail.com with ESMTPSA id b73sm1091762edf.37.2021.12.17.00.45.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Dec 2021 00:45:17 -0800 (PST)
-Message-ID: <afacee89-4edb-f4fb-156d-7b6c8dd0bb3b@redhat.com>
-Date:   Fri, 17 Dec 2021 09:44:55 +0100
+        id S234081AbhLQJSL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 17 Dec 2021 04:18:11 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:23628 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S230037AbhLQJSK (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Fri, 17 Dec 2021 04:18:10 -0500
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1BH71erF017663;
+        Fri, 17 Dec 2021 09:18:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=fsgDETjS/+KdERY05SY1CvdLmE3+2/3B0+czWa/5t/w=;
+ b=JLnE5N+mBfZB+ad14JitJdPSPAnoERpA/vBBkFPK5RLIEM+8fJLfnfrj6j1cP78xftP9
+ TkP8qccUnt4W7OO7NFVKydEGyE1WwXCMRYUc3T75qiaNV6bb1ECLeRjI7rkidCad4a5f
+ om4pULcs7oNllaiCr73/X0aV3qhFBvOwyDXhN42eIjaJriJRfQDOnZrgUeZyQ1Z7ttMP
+ jmIkb5C4vUun79A4/p3P8RraKBEcCqlR/XPs8Ub2oJ2GuD3ILim5V8XJ7w5pkGMy0cwF
+ vvi5IdZv1FyfD45Hs+Mt/RzO9yQV92sJsjm1tq6IzYNwyyTT3dC5326u2zTszFiQ/DAq 6g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cynfx2x7s-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 17 Dec 2021 09:18:03 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1BH9Gtlo019150;
+        Fri, 17 Dec 2021 09:18:03 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3cynfx2x6g-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 17 Dec 2021 09:18:02 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1BH96qlf015988;
+        Fri, 17 Dec 2021 09:18:00 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+        by ppma05fra.de.ibm.com with ESMTP id 3cy78hpprd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 17 Dec 2021 09:18:00 +0000
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1BH99r9T44171764
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 17 Dec 2021 09:09:53 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D9CDCA4060;
+        Fri, 17 Dec 2021 09:17:56 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2BCDDA4054;
+        Fri, 17 Dec 2021 09:17:56 +0000 (GMT)
+Received: from [9.171.60.51] (unknown [9.171.60.51])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 17 Dec 2021 09:17:56 +0000 (GMT)
+Message-ID: <9170c198-d5da-1d41-c1d1-81a0e3a8e634@linux.ibm.com>
+Date:   Fri, 17 Dec 2021 10:17:55 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH] KVM: x86: Use div64_ul instead of do_div
+ Thunderbird/91.3.0
+Subject: Re: [PATCH 00/12] s390x/pci: zPCI interpretation support
 Content-Language: en-US
-To:     cgel.zte@gmail.com
-Cc:     seanjc@google.com, vkuznets@redhat.com, wanpengli@tencent.com,
-        jmattson@google.com, joro@8bytes.org, tglx@linutronix.de,
-        mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        x86@kernel.org, hpa@zytor.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Changcheng Deng <deng.changcheng@zte.com.cn>,
-        Zeal Robot <zealci@zte.com.cn>
-References: <20211217084155.452262-1-deng.changcheng@zte.com.cn>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211217084155.452262-1-deng.changcheng@zte.com.cn>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     alex.williamson@redhat.com, schnelle@linux.ibm.com,
+        cohuck@redhat.com, thuth@redhat.com, farman@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com,
+        pasic@linux.ibm.com, mst@redhat.com, pbonzini@redhat.com,
+        qemu-devel@nongnu.org, kvm@vger.kernel.org
+References: <20211207210425.150923-1-mjrosato@linux.ibm.com>
+ <e1ba4cce-d6b9-bc86-9999-dc135046129d@linux.ibm.com>
+ <6103b709-f29d-16f2-7fe6-f9a25dd85b89@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <6103b709-f29d-16f2-7fe6-f9a25dd85b89@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: KtpZLSHHFDzVR5vn_e1ooCdKyH-QEW2y
+X-Proofpoint-ORIG-GUID: wuj4l0OYeTFV_gAr13E-x2bVQEvvEFPc
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
+ definitions=2021-12-17_03,2021-12-16_01,2021-12-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
+ lowpriorityscore=0 phishscore=0 adultscore=0 spamscore=0
+ priorityscore=1501 bulkscore=0 mlxlogscore=999 malwarescore=0
+ suspectscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2110150000 definitions=main-2112170051
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/17/21 09:41, cgel.zte@gmail.com wrote:
-> From: Changcheng Deng <deng.changcheng@zte.com.cn>
-> 
-> do_div() does a 64-by-32 division. Here the divisor is an unsigned long
-> which on some platforms is 64 bit wide. So use div64_ul instead of do_div
-> to avoid a possible truncation.
-> 
-> Reported-by: Zeal Robot <zealci@zte.com.cn>
-> Signed-off-by: Changcheng Deng <deng.changcheng@zte.com.cn>
-> ---
->   arch/x86/kvm/lapic.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> index c5028e6b0f96..3b629870632c 100644
-> --- a/arch/x86/kvm/lapic.c
-> +++ b/arch/x86/kvm/lapic.c
-> @@ -1707,7 +1707,7 @@ static void start_sw_tscdeadline(struct kvm_lapic *apic)
->   	guest_tsc = kvm_read_l1_tsc(vcpu, rdtsc());
->   
->   	ns = (tscdeadline - guest_tsc) * 1000000ULL;
-> -	do_div(ns, this_tsc_khz);
-> +	ns = div64_ul(ns, this_tsc_khz);
->   
->   	if (likely(tscdeadline > guest_tsc) &&
->   	    likely(ns > apic->lapic_timer.timer_advance_ns)) {
-> 
 
-You could change this_tsc_khz to u32 instead, it's assigned from a 
-32-bit value.
 
-Using div64_ul would be unnecessary and less efficient.
+Am 15.12.21 um 16:53 schrieb Matthew Rosato:
+> On 12/15/21 2:35 AM, Pierre Morel wrote:
+>>
+>>
+>> On 12/7/21 22:04, Matthew Rosato wrote:
+>>> Note:  The first 3 patches of this series are included as pre-reqs, but
+>>> should be pulled via a separate series.  Also, patch 5 is needed to
+>>> support 5.16+ linux header-sync and was already done by Paolo but not
+>>> merged yet so is thus included here as well.
+>>>
+>>> For QEMU, the majority of the work in enabling instruction interpretation
+>>> is handled via new VFIO ioctls to SET the appropriate interpretation and
+>>> interrupt forwarding modes, and to GET the function handle to use for
+>>> interpretive execution.
+>>>
+>>> This series implements these new ioctls, as well as adding a new, optional
+>>> 'intercept' parameter to zpci to request interpretation support not be used
+>>> as well as an 'intassist' parameter to determine whether or not the
+>>> firmware assist will be used for interrupt delivery or whether the host
+>>> will be responsible for delivering all interrupts.
+>>
+>> In which circumstances do we have an added value by not using interrupt delivered by firmware?
+>>
+> 
+> Disabling it can be a tool to debug and assist in problem determination, but that's about the only scenario I can think of where you would intentionally want to disable intassist.  Perhaps then it's not worth leaving in place.
 
-Paolo
+I would leave it in in case we run into problems. Things like the nomio parameter for the kernel have proven to be useful.
 
