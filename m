@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 0DADE479D1E
-	for <lists+kvm@lfdr.de>; Sat, 18 Dec 2021 22:21:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A0EF479D05
+	for <lists+kvm@lfdr.de>; Sat, 18 Dec 2021 22:21:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234445AbhLRVVL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 18 Dec 2021 16:21:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56308 "EHLO
+        id S234525AbhLRVUx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 18 Dec 2021 16:20:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234415AbhLRVUl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 18 Dec 2021 16:20:41 -0500
-Received: from mail-oo1-xc2d.google.com (mail-oo1-xc2d.google.com [IPv6:2607:f8b0:4864:20::c2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03E22C06173E;
-        Sat, 18 Dec 2021 13:20:41 -0800 (PST)
-Received: by mail-oo1-xc2d.google.com with SMTP id w5-20020a4a2745000000b002c2649b8d5fso1838343oow.10;
-        Sat, 18 Dec 2021 13:20:40 -0800 (PST)
+        with ESMTP id S234465AbhLRVUo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 18 Dec 2021 16:20:44 -0500
+Received: from mail-ot1-x32e.google.com (mail-ot1-x32e.google.com [IPv6:2607:f8b0:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0D48C061401;
+        Sat, 18 Dec 2021 13:20:43 -0800 (PST)
+Received: by mail-ot1-x32e.google.com with SMTP id w6-20020a9d77c6000000b0055e804fa524so7492711otl.3;
+        Sat, 18 Dec 2021 13:20:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=Y8ExfgOcgrA4CHmSecZvjPn/xavwnyrvtMRh3tqxxrw=;
-        b=ky3nIm4VKfqY0Iq4zNauj3NXFN9QLbU64c4NLKd8+eXyY5UHvMFlx9aiNTA/qwjF5p
-         5WEcS0LUjqwMpD0Ly9X7LVxbhmiOR2GbQ+abrUk6bHvx7+Cvj1ungkoH5D46b1QyLWQz
-         km2XM/SS0wgiVd0HWTiaIFErZ5cDFzoDijXs35dCpitpd1tSBTdIYvXxDqkzZELiy25H
-         54tm+5ByXHXPQCWtpde4rVewBv2R910Nw8U1BZzohGqANJ92nhEfKoJ9hVS5V3Wa/96H
-         D15GnwPbjMyWcfB02PLIxfn7tGI1glt4iKIi7P1KZiLFMB3n2s8o4pHZOlsQnok+/jIH
-         ei5Q==
+        bh=yzUNsvJwnd0v47Q5AxP6lhYkyqcCWxa0P2De/g+O3S0=;
+        b=aeyrRdsbMj+T7Uh+RBjZZWB/kA4U6108/E5yXjYzEClA1t4rVOhg/TvjA0URGEfjoS
+         8yYx9V7mJF6lmAgq1RzTAn0dXWVtCFnCSFSksRA2bCDS1+uiI+TNu4nmPvKC0vculKAb
+         2vav+lP6DUjfNbJW+bp5U8XrXK8lFMlsnqbY6Zewmwd9n5fAAW+kNcP//A8BmAU23hFg
+         Lq0+BqGt31qmsHiR1/82tonV9twgXObMrhuAwajRpq5K5rv0K69gHMcZp/93pbohASi1
+         adq5kjwvFtWTOSo4i7GJNxLBBtYCHu1eTmkd8vxkfTbiK5L1H6Us5Ch8+PPNqfwfmUKe
+         oUZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Y8ExfgOcgrA4CHmSecZvjPn/xavwnyrvtMRh3tqxxrw=;
-        b=fHXfqAebV1wq4SdWsWqsuvdedoRhoqBh89xZaQS1POjaDz/GvI2uNSlpKjxUg1MTi3
-         ZAw50cGKDLoFe/29eh+5cjNINYeXj9fSInrCePES0mwPyDmmJ7B3QlMM1fAeWRjaFg9g
-         dgR9Bagt1hI++tnfb/hqd8IBci3LQaFtiPmVclrcose32kPmkO7D27yZEWOQ/Ks60I26
-         MyUdkG9Hg4xxRw1JBcbgvPBi/ydMQDMiUD9YYzE3ggWWDxcOs1rPG4rSvLVMHRCHGigg
-         cdzXTV5NU9VCxNXrGfoUpvkM7nhaIHVhqu5VfgwZctfxZHUFK5IbpyzF7X3HAFOLgwz8
-         toiQ==
-X-Gm-Message-State: AOAM532ik+6aDIC1bLiDJ8B0+MoJwrd84Yo5Vr+FGwqcwmaB9fvptMxx
-        xmFvI2o6hhx9jc0mFfrvI8FYsVLTecIVnw==
-X-Google-Smtp-Source: ABdhPJxRJAChWm8hZEgKNS5uqGfM1GLlIQqNCNXw8p1t/B+Bt/JWEVwLsC+a2lNQnmWVQu7sh+mn1Q==
-X-Received: by 2002:a05:6820:820:: with SMTP id bg32mr5869341oob.10.1639862439949;
-        Sat, 18 Dec 2021 13:20:39 -0800 (PST)
+        bh=yzUNsvJwnd0v47Q5AxP6lhYkyqcCWxa0P2De/g+O3S0=;
+        b=ybFHFk5jbFNbS500SMwAUlg12+xbWkV6a8r2GE8C/DtbbePaqdk5nviB2nYTaOIQWG
+         CCUo4K+a4GPJWeTYuIFQL3qUB4FBUeNcx7qVQtpbCnhJxrnPE+TJQ/HO+Tc+UxYYBwmK
+         PbDxtVy0KOH/698GalvD8luagi40P92AiHXDqlB0r1WewcR1YtIegaz8GA2CyyH9GGmG
+         6GJq/Z5ubPZ2dTSmhWS5nQx07nk2ZT7n9ACk3LYHhu7tnAYwBlalg7ov0rBEpAvVt4jh
+         bj4Jw3aZvrJJQtk1kyL/PVswynWXPVzlHPCVptm4Mc5pL3u/MD7fPb4/E6eax4RXyZ0s
+         u04g==
+X-Gm-Message-State: AOAM530511QBgKMz+sDnVRHADEL/8UhJExqffsrdmGbMqBkbwpq4jfOu
+        1D5NGa8FlKPk5HZS6azrE8/pJfKW0789UA==
+X-Google-Smtp-Source: ABdhPJwfIZ0Qa4eLLyeYlPDfGf2rm+0UPfH1JNF0NiYHXOLlCwWJPU0EMB/YwfrozpLsXV17jLZYCg==
+X-Received: by 2002:a05:6830:2681:: with SMTP id l1mr6437156otu.378.1639862442812;
+        Sat, 18 Dec 2021 13:20:42 -0800 (PST)
 Received: from localhost (searspoint.nvidia.com. [216.228.112.21])
-        by smtp.gmail.com with ESMTPSA id r26sm2292099otn.15.2021.12.18.13.20.39
+        by smtp.gmail.com with ESMTPSA id s1sm2263399ooo.11.2021.12.18.13.20.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 18 Dec 2021 13:20:39 -0800 (PST)
+        Sat, 18 Dec 2021 13:20:42 -0800 (PST)
 From:   Yury Norov <yury.norov@gmail.com>
 To:     linux-kernel@vger.kernel.org, Yury Norov <yury.norov@gmail.com>,
         "James E.J. Bottomley" <jejb@linux.ibm.com>,
@@ -134,182 +134,250 @@ To:     linux-kernel@vger.kernel.org, Yury Norov <yury.norov@gmail.com>,
         linux-mm@kvack.org, linux-perf-users@vger.kernel.org,
         linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
         linux-snps-arc@lists.infradead.org, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH 07/17] lib/bitmap: add bitmap_weight_{cmp,eq,gt,ge,lt,le} functions
-Date:   Sat, 18 Dec 2021 13:20:03 -0800
-Message-Id: <20211218212014.1315894-8-yury.norov@gmail.com>
+Subject: [PATCH 08/17] all: replace bitmap_weight with bitmap_weight_{eq,gt,ge,lt,le} where appropriate
+Date:   Sat, 18 Dec 2021 13:20:04 -0800
+Message-Id: <20211218212014.1315894-9-yury.norov@gmail.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20211218212014.1315894-1-yury.norov@gmail.com>
 References: <20211218212014.1315894-1-yury.norov@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Many kernel users use bitmap_weight() to compare the result against
-some number or expression:
+Kernel code calls bitmap_weight() to compare the weight of bitmap with
+a given number. We can do it more efficiently with bitmap_weight_{eq, ...}
+because conditional bitmap_weight may stop traversing the bitmap earlier,
+as soon as condition is met.
 
-	if (bitmap_weight(...) > 1)
-		do_something();
+This patch replaces bitmap_weight with conditional versions where possible,
+except for small bitmaps which size is not configurable and  known at
+constant time. In that case conditional version of bitmap_weight would not
+benefit due to small_const_nbits() optimization; but readability may
+suffer.
 
-It works OK, but may be significantly improved for large bitmaps: if
-first few words count set bits to a number greater than given, we can
-stop counting and immediately return.
-
-The same idea would work in other direction: if we know that the number
-of set bits that we counted so far is small enough, so that it would be
-smaller than required number even if all bits of the rest of the bitmap
-are set, we can stop counting earlier.
-
-This patch adds new bitmap_weight_cmp() as suggested by Michał Mirosław
-and a family of eq, gt, ge, lt and le wrappers to allow this optimization.
-The following patches apply new functions where appropriate.
-
-Suggested-by: "Michał Mirosław" <mirq-linux@rere.qmqm.pl> (for bitmap_weight_cmp)
 Signed-off-by: Yury Norov <yury.norov@gmail.com>
 ---
- include/linux/bitmap.h | 80 ++++++++++++++++++++++++++++++++++++++++++
- lib/bitmap.c           | 21 +++++++++++
- 2 files changed, 101 insertions(+)
+ arch/x86/kernel/cpu/resctrl/rdtgroup.c                 |  2 +-
+ drivers/iio/dummy/iio_simple_dummy_buffer.c            |  4 ++--
+ drivers/iio/industrialio-trigger.c                     |  2 +-
+ drivers/memstick/core/ms_block.c                       |  4 ++--
+ drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c         |  2 +-
+ .../net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c  |  2 +-
+ .../net/ethernet/marvell/octeontx2/nic/otx2_flows.c    |  4 ++--
+ drivers/net/ethernet/mellanox/mlx4/cmd.c               | 10 +++-------
+ drivers/net/ethernet/mellanox/mlx4/eq.c                |  4 ++--
+ drivers/net/ethernet/mellanox/mlx4/fw.c                |  4 ++--
+ drivers/net/ethernet/mellanox/mlx4/main.c              |  2 +-
+ drivers/perf/thunderx2_pmu.c                           |  4 ++--
+ drivers/staging/media/tegra-video/vi.c                 |  2 +-
+ 13 files changed, 21 insertions(+), 25 deletions(-)
 
-diff --git a/include/linux/bitmap.h b/include/linux/bitmap.h
-index 7dba0847510c..708e57b32362 100644
---- a/include/linux/bitmap.h
-+++ b/include/linux/bitmap.h
-@@ -51,6 +51,12 @@ struct device;
-  *  bitmap_empty(src, nbits)                    Are all bits zero in *src?
-  *  bitmap_full(src, nbits)                     Are all bits set in *src?
-  *  bitmap_weight(src, nbits)                   Hamming Weight: number set bits
-+ *  bitmap_weight_cmp(src, nbits)               compare Hamming Weight with a number
-+ *  bitmap_weight_eq(src, nbits, num)           Hamming Weight == num
-+ *  bitmap_weight_gt(src, nbits, num)           Hamming Weight >  num
-+ *  bitmap_weight_ge(src, nbits, num)           Hamming Weight >= num
-+ *  bitmap_weight_lt(src, nbits, num)           Hamming Weight <  num
-+ *  bitmap_weight_le(src, nbits, num)           Hamming Weight <= num
-  *  bitmap_set(dst, pos, nbits)                 Set specified bit area
-  *  bitmap_clear(dst, pos, nbits)               Clear specified bit area
-  *  bitmap_find_next_zero_area(buf, len, pos, n, mask)  Find bit free area
-@@ -162,6 +168,7 @@ int __bitmap_intersects(const unsigned long *bitmap1,
- int __bitmap_subset(const unsigned long *bitmap1,
- 		    const unsigned long *bitmap2, unsigned int nbits);
- int __bitmap_weight(const unsigned long *bitmap, unsigned int nbits);
-+int __bitmap_weight_cmp(const unsigned long *bitmap, unsigned int bits, int num);
- void __bitmap_set(unsigned long *map, unsigned int start, int len);
- void __bitmap_clear(unsigned long *map, unsigned int start, int len);
+diff --git a/arch/x86/kernel/cpu/resctrl/rdtgroup.c b/arch/x86/kernel/cpu/resctrl/rdtgroup.c
+index e23ff03290b8..9d42e592c1cf 100644
+--- a/arch/x86/kernel/cpu/resctrl/rdtgroup.c
++++ b/arch/x86/kernel/cpu/resctrl/rdtgroup.c
+@@ -2752,7 +2752,7 @@ static int __init_one_rdt_domain(struct rdt_domain *d, struct resctrl_schema *s,
+ 	 * bitmap_weight() does not access out-of-bound memory.
+ 	 */
+ 	tmp_cbm = cfg->new_ctrl;
+-	if (bitmap_weight(&tmp_cbm, r->cache.cbm_len) < r->cache.min_cbm_bits) {
++	if (bitmap_weight_lt(&tmp_cbm, r->cache.cbm_len, r->cache.min_cbm_bits)) {
+ 		rdt_last_cmd_printf("No space on %s:%d\n", s->name, d->id);
+ 		return -ENOSPC;
+ 	}
+diff --git a/drivers/iio/dummy/iio_simple_dummy_buffer.c b/drivers/iio/dummy/iio_simple_dummy_buffer.c
+index 59aa60d4ca37..cd2470ddf82b 100644
+--- a/drivers/iio/dummy/iio_simple_dummy_buffer.c
++++ b/drivers/iio/dummy/iio_simple_dummy_buffer.c
+@@ -72,8 +72,8 @@ static irqreturn_t iio_simple_dummy_trigger_h(int irq, void *p)
+ 		int i, j;
  
-@@ -403,6 +410,79 @@ static __always_inline int bitmap_weight(const unsigned long *src, unsigned int
- 	return __bitmap_weight(src, nbits);
- }
- 
-+/**
-+ * bitmap_weight_cmp - compares number of set bits in @src with @num.
-+ * @src:   source bitmap
-+ * @nbits: length of bitmap in bits
-+ * @num:   number to compare with
-+ *
-+ * As opposite to bitmap_weight() this function doesn't necessarily
-+ * traverse full bitmap and may return earlier.
-+ *
-+ * Returns zero if weight of @src is equal to @num;
-+ *	   negative number if weight of @src is less than @num;
-+ *	   positive number if weight of @src is greater than @num;
-+ *
-+ * NOTES
-+ *
-+ * Because number of set bits cannot decrease while counting, when user
-+ * wants to know if the number of set bits in the bitmap is less than
-+ * @num, calling
-+ *	bitmap_weight_cmp(..., @num) < 0
-+ * is potentially less effective than
-+ *	bitmap_weight_cmp(..., @num - 1) <= 0
-+ *
-+ * Consider an example:
-+ * bitmap_weight_cmp(1000 0000 0000 0000, 1) < 0
-+ *				    ^
-+ *				    stop here
-+ *
-+ * bitmap_weight_cmp(1000 0000 0000 0000, 0) <= 0
-+ *		     ^
-+ *		     stop here
-+ */
-+static __always_inline
-+int bitmap_weight_cmp(const unsigned long *src, unsigned int nbits, int num)
-+{
-+	if (num > (int)nbits || num < 0)
-+		return -num;
-+
-+	if (small_const_nbits(nbits))
-+		return hweight_long(*src & BITMAP_LAST_WORD_MASK(nbits)) - num;
-+
-+	return __bitmap_weight_cmp(src, nbits, num);
-+}
-+
-+static __always_inline
-+bool bitmap_weight_eq(const unsigned long *src, unsigned int nbits, int num)
-+{
-+	return bitmap_weight_cmp(src, nbits, num) == 0;
-+}
-+
-+static __always_inline
-+bool bitmap_weight_gt(const unsigned long *src, unsigned int nbits, int num)
-+{
-+	return bitmap_weight_cmp(src, nbits, num) > 0;
-+}
-+
-+static __always_inline
-+bool bitmap_weight_ge(const unsigned long *src, unsigned int nbits, int num)
-+{
-+	return bitmap_weight_cmp(src, nbits, num - 1) > 0;
-+}
-+
-+static __always_inline
-+bool bitmap_weight_lt(const unsigned long *src, unsigned int nbits, int num)
-+{
-+	return bitmap_weight_cmp(src, nbits, num - 1) <= 0;
-+}
-+
-+static __always_inline
-+bool bitmap_weight_le(const unsigned long *src, unsigned int nbits, int num)
-+{
-+	return bitmap_weight_cmp(src, nbits, num) <= 0;
-+}
-+
- static __always_inline void bitmap_set(unsigned long *map, unsigned int start,
- 		unsigned int nbits)
+ 		for (i = 0, j = 0;
+-		     i < bitmap_weight(indio_dev->active_scan_mask,
+-				       indio_dev->masklength);
++		     bitmap_weight_gt(indio_dev->active_scan_mask,
++				       indio_dev->masklength, i);
+ 		     i++, j++) {
+ 			j = find_next_bit(indio_dev->active_scan_mask,
+ 					  indio_dev->masklength, j);
+diff --git a/drivers/iio/industrialio-trigger.c b/drivers/iio/industrialio-trigger.c
+index f504ed351b3e..98c54022fecf 100644
+--- a/drivers/iio/industrialio-trigger.c
++++ b/drivers/iio/industrialio-trigger.c
+@@ -331,7 +331,7 @@ int iio_trigger_detach_poll_func(struct iio_trigger *trig,
  {
-diff --git a/lib/bitmap.c b/lib/bitmap.c
-index 926408883456..fb84ca70c5d9 100644
---- a/lib/bitmap.c
-+++ b/lib/bitmap.c
-@@ -348,6 +348,27 @@ int __bitmap_weight(const unsigned long *bitmap, unsigned int bits)
- }
- EXPORT_SYMBOL(__bitmap_weight);
+ 	struct iio_dev_opaque *iio_dev_opaque = to_iio_dev_opaque(pf->indio_dev);
+ 	bool no_other_users =
+-		bitmap_weight(trig->pool, CONFIG_IIO_CONSUMERS_PER_TRIGGER) == 1;
++		bitmap_weight_eq(trig->pool, CONFIG_IIO_CONSUMERS_PER_TRIGGER, 1);
+ 	int ret = 0;
  
-+int __bitmap_weight_cmp(const unsigned long *bitmap, unsigned int bits, int num)
-+{
-+	unsigned int k, w, lim = bits / BITS_PER_LONG;
-+
-+	for (k = 0, w = 0; k < lim; k++) {
-+		if (w + bits - k * BITS_PER_LONG < num)
-+			goto out;
-+
-+		w += hweight_long(bitmap[k]);
-+
-+		if (w > num)
-+			goto out;
-+	}
-+
-+	if (bits % BITS_PER_LONG)
-+		w += hweight_long(bitmap[k] & BITMAP_LAST_WORD_MASK(bits));
-+out:
-+	return w - num;
-+}
-+EXPORT_SYMBOL(__bitmap_weight_cmp);
-+
- void __bitmap_set(unsigned long *map, unsigned int start, int len)
+ 	if (trig->ops && trig->ops->set_trigger_state && no_other_users) {
+diff --git a/drivers/memstick/core/ms_block.c b/drivers/memstick/core/ms_block.c
+index 0cda6c6baefc..5cdd987e78f7 100644
+--- a/drivers/memstick/core/ms_block.c
++++ b/drivers/memstick/core/ms_block.c
+@@ -155,8 +155,8 @@ static int msb_validate_used_block_bitmap(struct msb_data *msb)
+ 	for (i = 0; i < msb->zone_count; i++)
+ 		total_free_blocks += msb->free_block_count[i];
+ 
+-	if (msb->block_count - bitmap_weight(msb->used_blocks_bitmap,
+-					msb->block_count) == total_free_blocks)
++	if (bitmap_weight_eq(msb->used_blocks_bitmap, msb->block_count,
++				msb->block_count - total_free_blocks))
+ 		return 0;
+ 
+ 	pr_err("BUG: free block counts don't match the bitmap");
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
+index 214a38de3f41..35297d8a488b 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
+@@ -246,7 +246,7 @@ int ixgbe_disable_sriov(struct ixgbe_adapter *adapter)
+ #endif
+ 
+ 	/* Disable VMDq flag so device will be set in VM mode */
+-	if (bitmap_weight(adapter->fwd_bitmask, adapter->num_rx_pools) == 1) {
++	if (bitmap_weight_eq(adapter->fwd_bitmask, adapter->num_rx_pools, 1)) {
+ 		adapter->flags &= ~IXGBE_FLAG_VMDQ_ENABLED;
+ 		adapter->flags &= ~IXGBE_FLAG_SRIOV_ENABLED;
+ 		rss = min_t(int, ixgbe_max_rss_indices(adapter),
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
+index d85db90632d6..a55fd1d0c653 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
+@@ -287,7 +287,7 @@ static int otx2_set_channels(struct net_device *dev,
+ 	if (!channel->rx_count || !channel->tx_count)
+ 		return -EINVAL;
+ 
+-	if (bitmap_weight(&pfvf->rq_bmap, pfvf->hw.rx_queues) > 1) {
++	if (bitmap_weight_gt(&pfvf->rq_bmap, pfvf->hw.rx_queues, 1)) {
+ 		netdev_err(dev,
+ 			   "Receive queues are in use by TC police action\n");
+ 		return -EINVAL;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
+index 80b2d64b4136..55c899a6fcdd 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
+@@ -1170,8 +1170,8 @@ int otx2_remove_flow(struct otx2_nic *pfvf, u32 location)
+ 		 * interface mac address and configure CGX/RPM block in
+ 		 * promiscuous mode
+ 		 */
+-		if (bitmap_weight(&flow_cfg->dmacflt_bmap,
+-				  flow_cfg->dmacflt_max_flows) == 1)
++		if (bitmap_weight_eq(&flow_cfg->dmacflt_bmap,
++				     flow_cfg->dmacflt_max_flows, 1))
+ 			otx2_update_rem_pfmac(pfvf, DMAC_ADDR_DEL);
+ 	} else {
+ 		err = otx2_remove_flow_msg(pfvf, flow->entry, false);
+diff --git a/drivers/net/ethernet/mellanox/mlx4/cmd.c b/drivers/net/ethernet/mellanox/mlx4/cmd.c
+index c56d2194cbfc..5bca0c68f00a 100644
+--- a/drivers/net/ethernet/mellanox/mlx4/cmd.c
++++ b/drivers/net/ethernet/mellanox/mlx4/cmd.c
+@@ -2792,9 +2792,8 @@ int mlx4_slave_convert_port(struct mlx4_dev *dev, int slave, int port)
  {
- 	unsigned long *p = map + BIT_WORD(start);
+ 	unsigned n;
+ 	struct mlx4_active_ports actv_ports = mlx4_get_active_ports(dev, slave);
+-	unsigned m = bitmap_weight(actv_ports.ports, dev->caps.num_ports);
+ 
+-	if (port <= 0 || port > m)
++	if (port <= 0 || bitmap_weight_lt(actv_ports.ports, dev->caps.num_ports, port))
+ 		return -EINVAL;
+ 
+ 	n = find_first_bit(actv_ports.ports, dev->caps.num_ports);
+@@ -3404,10 +3403,6 @@ int mlx4_vf_set_enable_smi_admin(struct mlx4_dev *dev, int slave, int port,
+ 	struct mlx4_priv *priv = mlx4_priv(dev);
+ 	struct mlx4_active_ports actv_ports = mlx4_get_active_ports(
+ 			&priv->dev, slave);
+-	int min_port = find_first_bit(actv_ports.ports,
+-				      priv->dev.caps.num_ports) + 1;
+-	int max_port = min_port - 1 +
+-		bitmap_weight(actv_ports.ports, priv->dev.caps.num_ports);
+ 
+ 	if (slave == mlx4_master_func_num(dev))
+ 		return 0;
+@@ -3417,7 +3412,8 @@ int mlx4_vf_set_enable_smi_admin(struct mlx4_dev *dev, int slave, int port,
+ 	    enabled < 0 || enabled > 1)
+ 		return -EINVAL;
+ 
+-	if (min_port == max_port && dev->caps.num_ports > 1) {
++	if (dev->caps.num_ports > 1 &&
++	    bitmap_weight_eq(actv_ports.ports, priv->dev.caps.num_ports, 1)) {
+ 		mlx4_info(dev, "SMI access disallowed for single ported VFs\n");
+ 		return -EPROTONOSUPPORT;
+ 	}
+diff --git a/drivers/net/ethernet/mellanox/mlx4/eq.c b/drivers/net/ethernet/mellanox/mlx4/eq.c
+index 414e390e6b48..0c09432ff389 100644
+--- a/drivers/net/ethernet/mellanox/mlx4/eq.c
++++ b/drivers/net/ethernet/mellanox/mlx4/eq.c
+@@ -1435,8 +1435,8 @@ int mlx4_is_eq_shared(struct mlx4_dev *dev, int vector)
+ 	if (vector <= 0 || (vector >= dev->caps.num_comp_vectors + 1))
+ 		return -EINVAL;
+ 
+-	return !!(bitmap_weight(priv->eq_table.eq[vector].actv_ports.ports,
+-				dev->caps.num_ports) > 1);
++	return bitmap_weight_gt(priv->eq_table.eq[vector].actv_ports.ports,
++				dev->caps.num_ports, 1);
+ }
+ EXPORT_SYMBOL(mlx4_is_eq_shared);
+ 
+diff --git a/drivers/net/ethernet/mellanox/mlx4/fw.c b/drivers/net/ethernet/mellanox/mlx4/fw.c
+index 42c96c9d7fb1..855aae326ccb 100644
+--- a/drivers/net/ethernet/mellanox/mlx4/fw.c
++++ b/drivers/net/ethernet/mellanox/mlx4/fw.c
+@@ -1300,8 +1300,8 @@ int mlx4_QUERY_DEV_CAP_wrapper(struct mlx4_dev *dev, int slave,
+ 	actv_ports = mlx4_get_active_ports(dev, slave);
+ 	first_port = find_first_bit(actv_ports.ports, dev->caps.num_ports);
+ 	for (slave_port = 0, real_port = first_port;
+-	     real_port < first_port +
+-	     bitmap_weight(actv_ports.ports, dev->caps.num_ports);
++	     bitmap_weight_gt(actv_ports.ports, dev->caps.num_ports,
++			      real_port - first_port);
+ 	     ++real_port, ++slave_port) {
+ 		if (flags & (MLX4_DEV_CAP_FLAG_WOL_PORT1 << real_port))
+ 			flags |= MLX4_DEV_CAP_FLAG_WOL_PORT1 << slave_port;
+diff --git a/drivers/net/ethernet/mellanox/mlx4/main.c b/drivers/net/ethernet/mellanox/mlx4/main.c
+index b187c210d4d6..cfbaa7ac712f 100644
+--- a/drivers/net/ethernet/mellanox/mlx4/main.c
++++ b/drivers/net/ethernet/mellanox/mlx4/main.c
+@@ -1383,7 +1383,7 @@ static int mlx4_mf_bond(struct mlx4_dev *dev)
+ 		   dev->persist->num_vfs + 1);
+ 
+ 	/* only single port vfs are allowed */
+-	if (bitmap_weight(slaves_port_1_2, dev->persist->num_vfs + 1) > 1) {
++	if (bitmap_weight_gt(slaves_port_1_2, dev->persist->num_vfs + 1, 1)) {
+ 		mlx4_warn(dev, "HA mode unsupported for dual ported VFs\n");
+ 		return -EINVAL;
+ 	}
+diff --git a/drivers/perf/thunderx2_pmu.c b/drivers/perf/thunderx2_pmu.c
+index 05378c0fd8f3..ebfa66b212c7 100644
+--- a/drivers/perf/thunderx2_pmu.c
++++ b/drivers/perf/thunderx2_pmu.c
+@@ -623,8 +623,8 @@ static void tx2_uncore_event_start(struct perf_event *event, int flags)
+ 		return;
+ 
+ 	/* Start timer for first event */
+-	if (bitmap_weight(tx2_pmu->active_counters,
+-				tx2_pmu->max_counters) == 1) {
++	if (bitmap_weight_eq(tx2_pmu->active_counters,
++				tx2_pmu->max_counters, 1)) {
+ 		hrtimer_start(&tx2_pmu->hrtimer,
+ 			ns_to_ktime(tx2_pmu->hrtimer_interval),
+ 			HRTIMER_MODE_REL_PINNED);
+diff --git a/drivers/staging/media/tegra-video/vi.c b/drivers/staging/media/tegra-video/vi.c
+index 69d9787d5338..98d878a5ca6b 100644
+--- a/drivers/staging/media/tegra-video/vi.c
++++ b/drivers/staging/media/tegra-video/vi.c
+@@ -436,7 +436,7 @@ static int tegra_channel_enum_format(struct file *file, void *fh,
+ 	if (!IS_ENABLED(CONFIG_VIDEO_TEGRA_TPG))
+ 		fmts_bitmap = chan->fmts_bitmap;
+ 
+-	if (f->index >= bitmap_weight(fmts_bitmap, MAX_FORMAT_NUM))
++	if (bitmap_weight_le(fmts_bitmap, MAX_FORMAT_NUM, f->index))
+ 		return -EINVAL;
+ 
+ 	for (i = 0; i < f->index + 1; i++, index++)
 -- 
 2.30.2
 
