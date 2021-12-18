@@ -2,32 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id CDE72479DF1
-	for <lists+kvm@lfdr.de>; Sat, 18 Dec 2021 23:16:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D8DB479E27
+	for <lists+kvm@lfdr.de>; Sun, 19 Dec 2021 00:28:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232516AbhLRWQQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 18 Dec 2021 17:16:16 -0500
-Received: from rere.qmqm.pl ([91.227.64.183]:17258 "EHLO rere.qmqm.pl"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229591AbhLRWQP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 18 Dec 2021 17:16:15 -0500
-Received: from remote.user (localhost [127.0.0.1])
-        by rere.qmqm.pl (Postfix) with ESMTPSA id 4JGgCw0MShzYX;
-        Sat, 18 Dec 2021 23:15:55 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=rere.qmqm.pl; s=1;
-        t=1639865771; bh=p9dTd1veiWUw4cfb9+OomK8Wcfce+mkX5nKMW8drZII=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=O71ZaJP5ODxCFPaoR8j66Ikjj4EJrloyQfx49pvi8th2LFY/8l1Q+SCjjVp+gaQ6W
-         tnkNCrMB49ZAk1DXlyYTXcurGZnXEZiY4aZzfabzMlUto6ly6alqMIah+MFnX1p0f9
-         84z8n8THEbmdF1ajb1sGxeQHQ6cDCJGonzSml/lVMRg0xcU36xIys+6LGgiXwcKgs4
-         JTuYI7KUXZnGY5rNyDBEKe2yAB8dDcMwmd6pm652u9UjcTrQO2cJ9RPun1jw3D+0fo
-         NWqf1Qpy9qliPjmhfZYXnYERdUbDXnnUg7WbDLTcmnqX03ee/kBb9lrEjJpNr9TH/V
-         aAueEb7NrYLKw==
-X-Virus-Status: Clean
-X-Virus-Scanned: clamav-milter 0.103.3 at mail
-Date:   Sat, 18 Dec 2021 23:15:54 +0100
-From:   =?iso-8859-2?Q?Micha=B3_Miros=B3aw?= <mirq-linux@rere.qmqm.pl>
-To:     Yury Norov <yury.norov@gmail.com>
+        id S232124AbhLRX2k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 18 Dec 2021 18:28:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56178 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229745AbhLRX2j (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 18 Dec 2021 18:28:39 -0500
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B204BC061574;
+        Sat, 18 Dec 2021 15:28:39 -0800 (PST)
+Received: by mail-pg1-x535.google.com with SMTP id d11so5761429pgl.1;
+        Sat, 18 Dec 2021 15:28:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=pIYxkiGisug+VVJYFtmCG20TylNRXB8zO8kw91s3wyc=;
+        b=TIuyQXz6oo8PN+yMbImlC2c2rmmoCdLu5CdlQlReccXapNNMDZyLSkZvnzlgZ9AIdV
+         6+qzntuQo5gBX86FaZFlCIaH4FCNC7RUVw367F08QPEjoiFWXa2CV6SAzISHS5RZPpY/
+         QbkHqa0fdrihFEuRX0X/GeMy6P75DvnBsKWfABXcb5D5/2zTgkKaV4VEiJSuyy+zBwcd
+         zNIVzererH+Fx7ZEOWvTBpmd3THvXh1KHtzsLHvjMiIPuGFGIqMdZbyjf9H7vLYP6+7J
+         cQ/P2vAafsI3DEFtzgX9UWRj1ZmCeXy01hG6ih9PN1N9Tz70SEQsg8aJQpCrrbXl1cqP
+         QppQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=pIYxkiGisug+VVJYFtmCG20TylNRXB8zO8kw91s3wyc=;
+        b=55CrRinAexYQVLLCAVeuG8I9J21GY3IqcaFC2wR8Ap2MiD9sYKYzust2I4EPxGXnlS
+         Pe0dCuc92IRHO1MDoXneWrcsOs3n++GqV+AbWUpP/Vou5TnzYWC1vO6s+RSD0/fctkrP
+         PInFYv0lzakRglwYu8kqv8ie8FPD29R5DblmhYAINOWuiKTZW7+80IQ9deoTuWfCqWnT
+         HqmOjOvMV9tFtMFrpfSWt3ekPZ74xg1blyPjdcw0tv2jvgo63uA3Es616/CIhgUtYerz
+         hBTc4KAVndNYIcaoApCeR6jtlsw4/OwO6twxIBYK2tBHgdyBIgrVer5Lcw5EuOJh5eFk
+         4Vow==
+X-Gm-Message-State: AOAM531ln7opi6qLxgmfcxBohJ4InyB6hBVL0qNWaopTWH3Rac2lqjtR
+        Pm1Msu47bv19vvsytkJ3BktocnLs6bznKqaEF9A=
+X-Google-Smtp-Source: ABdhPJxWDXMTWC77oOKCjFiIpES/JejUzoFwUACXrmSW9T47MOn3N7k2dUXoB6NpZZlsfwgvBd+k97C3LkDR7q0l13Y=
+X-Received: by 2002:a63:2a0d:: with SMTP id q13mr8815341pgq.513.1639870119035;
+ Sat, 18 Dec 2021 15:28:39 -0800 (PST)
+MIME-Version: 1.0
+References: <20211218212014.1315894-1-yury.norov@gmail.com>
+ <20211218212014.1315894-2-yury.norov@gmail.com> <Yb5dmqlYd3owtH29@qmqm.qmqm.pl>
+In-Reply-To: <Yb5dmqlYd3owtH29@qmqm.qmqm.pl>
+From:   Yury Norov <yury.norov@gmail.com>
+Date:   Sat, 18 Dec 2021 15:28:29 -0800
+Message-ID: <CAAH8bW9uWW+t5TvkMt_e-sKp71hiLpXhXeuGuSZPK-3kds-GgQ@mail.gmail.com>
+Subject: Re: [PATCH 01/17] all: don't use bitmap_weight() where possible
+To:     =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>
 Cc:     linux-kernel@vger.kernel.org,
         "James E.J. Bottomley" <jejb@linux.ibm.com>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
@@ -113,32 +137,52 @@ Cc:     linux-kernel@vger.kernel.org,
         linux-mm@kvack.org, linux-perf-users@vger.kernel.org,
         linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
         linux-snps-arc@lists.infradead.org, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH 01/17] all: don't use bitmap_weight() where possible
-Message-ID: <Yb5dmqlYd3owtH29@qmqm.qmqm.pl>
-References: <20211218212014.1315894-1-yury.norov@gmail.com>
- <20211218212014.1315894-2-yury.norov@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-2
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20211218212014.1315894-2-yury.norov@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Dec 18, 2021 at 01:19:57PM -0800, Yury Norov wrote:
-> Don't call bitmap_weight() if the following code can get by
-> without it.
-> 
-> Signed-off-by: Yury Norov <yury.norov@gmail.com>
-> ---
->  drivers/net/dsa/b53/b53_common.c           | 6 +-----
->  drivers/net/ethernet/broadcom/bcmsysport.c | 6 +-----
->  drivers/thermal/intel/intel_powerclamp.c   | 9 +++------
->  3 files changed, 5 insertions(+), 16 deletions(-)
-[...]
+On Sat, Dec 18, 2021 at 2:16 PM Micha=C5=82 Miros=C5=82aw <mirq-linux@rere.=
+qmqm.pl> wrote:
+>
+> On Sat, Dec 18, 2021 at 01:19:57PM -0800, Yury Norov wrote:
+> > Don't call bitmap_weight() if the following code can get by
+> > without it.
+> >
+> > Signed-off-by: Yury Norov <yury.norov@gmail.com>
+> > ---
+> >  drivers/net/dsa/b53/b53_common.c           | 6 +-----
+> >  drivers/net/ethernet/broadcom/bcmsysport.c | 6 +-----
+> >  drivers/thermal/intel/intel_powerclamp.c   | 9 +++------
+> >  3 files changed, 5 insertions(+), 16 deletions(-)
+> [...]
+>
+> Looks good,
 
-Looks good, but I think this needs to be split per subsystem.
+Does it mean Acked-by, Reviewed-by, or something else?
 
-Best Regards
-Micha³ Miros³aw
+> but I think this needs to be split per subsystem.
+
+What you ask breaks rules:
+
+Documentation/process/submitting-patches.rst:
+
+Separate each **logical change** into a separate patch.
+
+For example, if your changes include both bug fixes and performance
+enhancements for a single driver, separate those changes into two
+or more patches.  If your changes include an API update, and a new
+driver which uses that new API, separate those into two patches.
+
+On the other hand, if you make a single change to numerous files,
+group those changes into a single patch.  Thus a single logical change
+is contained within a single patch.
+
+This is not a dead rule, refer for example the 96d4f267e40f9 ("Remove
+'type' argument from access_ok() functioin.")
+
+Or this: https://lkml.org/lkml/2021/6/14/1736
+
+Thanks,
+Yury
