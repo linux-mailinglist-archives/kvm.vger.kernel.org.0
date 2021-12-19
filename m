@@ -2,94 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id B8D7A47A0BA
-	for <lists+kvm@lfdr.de>; Sun, 19 Dec 2021 14:53:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CA1AC47A117
+	for <lists+kvm@lfdr.de>; Sun, 19 Dec 2021 16:03:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234475AbhLSNxO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 19 Dec 2021 08:53:14 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:56056 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233148AbhLSNxN (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Sun, 19 Dec 2021 08:53:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1639921993;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6y4s59fRDhRXZ+MFWbqd48C+ut3PapB8I0wNJafkmy8=;
-        b=h8rNu1UUHx0/68L66fy5MfWpRZmp4jZRXxeiS2IWd0VOcFH2AFdGWdwsbIMtdhHsoXEV5k
-        3bNVOzQIQvYu9d/o06YXzI6cjBN08AqpDtx4z0b3wvyHySlvpYJyii2wnPnV0TxkfsMoS7
-        AW/aq1axjt8iCMpwz8Ojpj+60okZf5Q=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-160-QmyTGO9JPnWKfyYMvR_08A-1; Sun, 19 Dec 2021 08:53:11 -0500
-X-MC-Unique: QmyTGO9JPnWKfyYMvR_08A-1
-Received: by mail-wr1-f70.google.com with SMTP id d6-20020adfa346000000b001a262748c6fso1682141wrb.12
-        for <kvm@vger.kernel.org>; Sun, 19 Dec 2021 05:53:11 -0800 (PST)
+        id S235980AbhLSPDX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 19 Dec 2021 10:03:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58482 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230483AbhLSPDX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 19 Dec 2021 10:03:23 -0500
+Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2CDCC061574;
+        Sun, 19 Dec 2021 07:03:22 -0800 (PST)
+Received: by mail-ed1-x52e.google.com with SMTP id bm14so15260351edb.5;
+        Sun, 19 Dec 2021 07:03:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=5mMtDCLy2U7eCNCb3ooc8pht0zAzJqAqiGnOR/N8AcU=;
+        b=XgPr58TRNB0C6ZKhz7XndENwl7j2CkLC86gmmPwzK7yrsqY/y1oMCnSqGk0d9mrZSB
+         HVZqqgJADbn24rnSYYCc/QvPT0PCPIhzPrjzn3J4UELxF/qBqxc45HR1hrAUUh4UtMys
+         OiZ4RgoRz3VzFAs9YBCAMDQO3SyCTX3lpvLbeo9g7yrgcet/EeoxUnFdrz1/xLeozYcb
+         p9sR4ydamFPGLuS+Z9cOxg604MiBRYsiSkiSbvykCGj/M8GAB0Ifn65jaHtU0hCfIGg1
+         XCItIIJHPUNCglMQLqVreRgU88q4HYCsSZxgKqku7QH5Po23r9mjrv0fitzQIkaQbj8+
+         JZRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=6y4s59fRDhRXZ+MFWbqd48C+ut3PapB8I0wNJafkmy8=;
-        b=lfQIlJQGZxTJK5EiR5Sxyd4a0VjMAU4xHb+yJtJkso4YYQbGCYV/Z5Hmmq4Y+uQgND
-         JWFwf06WR470infLHpTkG08g+HAifK9IKiTYNQoia2dPY3nBDzyOcQYku8FhKaz95BGx
-         LRyO89m21p3gQbNKCYnL4VEaJRsprT7hvkyEMIzSwmI+J608B9j85oeA0IHFIHz7sgQs
-         cfNydCpChZ1mHeIc/KQgf17klB3PsIM1uPMC+ehAElsrSPSMQ2zxfNvQ9iPCkbesY+dJ
-         JbIRTe8MGw2Ik2uKOle4N2qJqT/7qnC4KfQq0W289zuOCa085CECIScu+D/H4ZnKIiOc
-         cerw==
-X-Gm-Message-State: AOAM530eeXLhMzb9Er3JE+A+Do+ORT36lpRofl9CXNQv+Fdw4a3PpV54
-        FgcOTEOI0VtlX+VEehhgpUVEv6TgPiy+xVzkOKTaYbjzju0Hn8JwSpF7nAXHtQcY+i8L1keNfgd
-        Gg18RRWzx7KN4
-X-Received: by 2002:adf:9004:: with SMTP id h4mr9692860wrh.593.1639921990366;
-        Sun, 19 Dec 2021 05:53:10 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJyypGLj1tKxFj+LSvvFpiaauxTLO+snS8pEJl5hCgc9MrMvK2mCfttd2iYEcvhftK55oUc5Fw==
-X-Received: by 2002:adf:9004:: with SMTP id h4mr9692849wrh.593.1639921990179;
-        Sun, 19 Dec 2021 05:53:10 -0800 (PST)
-Received: from [192.168.10.118] ([93.56.170.41])
-        by smtp.googlemail.com with ESMTPSA id w17sm14564116wmc.14.2021.12.19.05.53.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 19 Dec 2021 05:53:09 -0800 (PST)
-Message-ID: <54749944-d33d-8364-ad17-6297abf883f5@redhat.com>
-Date:   Sun, 19 Dec 2021 14:49:52 +0100
+        bh=5mMtDCLy2U7eCNCb3ooc8pht0zAzJqAqiGnOR/N8AcU=;
+        b=GAjBIG3pJBgPRHT21/wc1f2Sm25tl0RAXmbS3BignzJ8d7Y2Cy5yIX76dZPzZiiEXb
+         NArUjy4yKvF8cflNsgmPSwOvCnfhg+/8AAGycE3fk6+4YwGUEDWE27v1vLfBOWGYu++f
+         gig7mxrCAc8B0RT9ft3mEBIjU7U8oF9gOfpr+5ejZRgEjZR7czf31uVQ3fCtLMuo4wK0
+         p+MArcXEDiP5yvhErMzV6qLYgRSwWKZf+yVg384DhsGswF6xFlQCg1AYv3fJpjPQL0u/
+         XJDwr/xfqHE1RC1pecGF1U0ihmHWADw1U01Ih0UaxZpCRfKW7C7CUxsGKRXIRKA4cPVL
+         5qNA==
+X-Gm-Message-State: AOAM530VR+GDnnuXsd3NEYZ6iU7H7zC22Bh3V0F5FVitGL1uWqSIIFil
+        fOEpFK8r0i4eC8syV2AwYUs=
+X-Google-Smtp-Source: ABdhPJwyG2OVdS1fX0XJvwNoziHSFQguNADgCYAN3Pio1A1MmdEP3qT1OsHMijhIbeljKvGrfBhA6g==
+X-Received: by 2002:a05:6402:1702:: with SMTP id y2mr806112edu.372.1639926201428;
+        Sun, 19 Dec 2021 07:03:21 -0800 (PST)
+Received: from ubuntu.localdomain ([185.37.253.175])
+        by smtp.gmail.com with ESMTPSA id qw20sm1266733ejc.185.2021.12.19.07.03.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 19 Dec 2021 07:03:21 -0800 (PST)
+From:   Quanfa Fu <quanfafu@gmail.com>
+To:     pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, joro@8bytes.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, hpa@zytor.com
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Quanfa Fu <quanfafu@gmail.com>
+Subject: [PATCH] KVM/X86: Remove unneeded variable
+Date:   Sun, 19 Dec 2021 23:03:07 +0800
+Message-Id: <20211219150307.179306-1-quanfafu@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [regression] kvm: Kernel OOPS in vmx.c when starting a kvm VM
- since v5.15.7
-Content-Language: en-US
-To:     Thorsten Leemhuis <regressions@leemhuis.info>, kvm@vger.kernel.org,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>,
-        "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
-        Greg KH <gregkh@linuxfoundation.org>
-Cc:     doc@lame.org
-References: <f1ea22d3-cff8-406a-ad6a-cb8e0124a9b4@leemhuis.info>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <f1ea22d3-cff8-406a-ad6a-cb8e0124a9b4@leemhuis.info>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/19/21 06:01, Thorsten Leemhuis wrote:
-> Hi, this is your Linux kernel regression tracker speaking.
-> 
-> TWIMC, I stumbled on a bug report from George Shearer about a KVM
-> problem I couldn't find any further discussions about, that's why I'm
-> forwarding it manually here.
-> 
-> https://bugzilla.kernel.org/show_bug.cgi?id=215351
-> 
-> George, BTW: if reverting the change you suspect doesn't help, please
-> consider doing a bisection to find the culprit.
+Remove unneeded variable used to store return value.
 
-This should be fixed by commit e90e51d5f01d.  I'll send it to 
-stable@vger.kernel.org.
+No functional change intended.
 
-Thanks,
+Signed-off-by: Quanfa Fu <quanfafu@gmail.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-Paolo
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index e2e1d012df22..7603db81b902 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -2553,16 +2553,13 @@ int kvm_mmu_unprotect_page(struct kvm *kvm, gfn_t gfn)
+ static int kvm_mmu_unprotect_page_virt(struct kvm_vcpu *vcpu, gva_t gva)
+ {
+ 	gpa_t gpa;
+-	int r;
+ 
+ 	if (vcpu->arch.mmu->direct_map)
+ 		return 0;
+ 
+ 	gpa = kvm_mmu_gva_to_gpa_read(vcpu, gva, NULL);
+ 
+-	r = kvm_mmu_unprotect_page(vcpu->kvm, gpa >> PAGE_SHIFT);
+-
+-	return r;
++	return kvm_mmu_unprotect_page(vcpu->kvm, gpa >> PAGE_SHIFT);
+ }
+ 
+ static void kvm_unsync_page(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
+-- 
+2.25.1
 
