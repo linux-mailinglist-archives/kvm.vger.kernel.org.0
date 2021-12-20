@@ -2,90 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 6746447AA41
-	for <lists+kvm@lfdr.de>; Mon, 20 Dec 2021 14:20:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E5C047AFE8
+	for <lists+kvm@lfdr.de>; Mon, 20 Dec 2021 16:22:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232816AbhLTNUK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Dec 2021 08:20:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41446 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231194AbhLTNUK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Dec 2021 08:20:10 -0500
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0D68C061574;
-        Mon, 20 Dec 2021 05:20:09 -0800 (PST)
-Received: by mail-ed1-x532.google.com with SMTP id m21so11023734edc.0;
-        Mon, 20 Dec 2021 05:20:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=KPcdrfLKkxhOvPXWy6bq391b76cEL5bWLUG4OI0ap0U=;
-        b=pUZLH/gRRsns4SZK3MVzCImWQYzN5LDb1Ix9/cuKjEcKBiMcDzFmxfPHWUv4gOXY4M
-         QYTizXBTcvDSL4xHlO5sHFvB41b3Q7XJY/H4yiODTytdQufSX/vHe+xDoblMGzw5+NFk
-         AKiJ8FULmSM+Xs0++6fS88sLzL1azjBJMOSvfut3l6fv//JQkcquylYPEYmg81n1Gq/U
-         QtH2V7PvK5NZEbvO8KX977MjMYuqvl95Ub08bGArwE7tEWk0O3kvAxyzE+FzRSOaXt3X
-         oOagw4X0QM0L+UrfZID2Xd1g84gevX2mzimfkd6hANY/NfYF//KCtf316oKN+pAmjLS6
-         lABw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:message-id:date:mime-version:user-agent
-         :subject:content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=KPcdrfLKkxhOvPXWy6bq391b76cEL5bWLUG4OI0ap0U=;
-        b=uVxtLEiFwSMWqmH93o11I9df0F3iBIL6J9y/WABmUqILqhkRBD9yx82/s/+YEYguT1
-         Hu18FaCsL0UonRZNbZ9tnJCpJvdTKA6IJnxypD+wrtQemL0mP/TgMXjvMLY7xN7rm3HA
-         qHH6fvFqG9JsjrqNaO1MQoRY3wCBWAJrl5oQ615CBpwHMyVftpQQYubla7/527ASkOfo
-         clYCoyzSjoTzQN8bj1mcHjR6iBBWJYqKNpvaxHFjbW5zoRin4eAePfE/GT1j627Jv0bF
-         HApeiVBy3kWjIIXCStSKenaTNavnMeWur6XxebC8JmaDjU7cVsTxNc1utrgs0W9myQfd
-         7ojA==
-X-Gm-Message-State: AOAM531wfrU+ZIjMemA/mwAQ7h8uCXDeVgbq6qZmXjWdpdhMW2XU+cu9
-        eJYrpfs5LmurrAbDxKAm6SA=
-X-Google-Smtp-Source: ABdhPJwp0q/5CsMXETdbjw47y2ioci+s6vdPbblFj/X6wh0r9+AVIIQMwNrjZcvSypDA2RGhMYV8zw==
-X-Received: by 2002:a17:906:9b8e:: with SMTP id dd14mr13407697ejc.337.1640006408406;
-        Mon, 20 Dec 2021 05:20:08 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id gb10sm365983ejc.49.2021.12.20.05.20.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 20 Dec 2021 05:20:08 -0800 (PST)
-Sender: Paolo Bonzini <paolo.bonzini@gmail.com>
-Message-ID: <da09e079-23c3-4414-0c45-16413f704dbc@redhat.com>
-Date:   Mon, 20 Dec 2021 14:20:05 +0100
+        id S238639AbhLTPWi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Dec 2021 10:22:38 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:40882 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S239663AbhLTPVs (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 20 Dec 2021 10:21:48 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1640013707;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=Lw5slxjixiems1mI2kUAJ2ICdnSN+YeINpTB5Htz2PE=;
+        b=UYTaV1NXyR5QHgUDzTPtrP3euxFdO5Kr1OMF6XRhiSNGyjnJoRVwCF+D4es478bZ0WgTuj
+        LkLMwb0bPE6/XNmG1V/fvajlbz703rQ3GYJy4eq8pN3HAtcQUpVNi08wnvT+eIg2peGq6P
+        OyB+ctWlu0PCdg4OhMfEy4pBJt8wh1Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-323-_H-GiVkiOwmbHHLi1_mefg-1; Mon, 20 Dec 2021 10:21:46 -0500
+X-MC-Unique: _H-GiVkiOwmbHHLi1_mefg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A14CD1006AA9;
+        Mon, 20 Dec 2021 15:21:44 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.40.194.72])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 052C57B6CE;
+        Mon, 20 Dec 2021 15:21:40 +0000 (UTC)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Vineeth Pillai <viremana@linux.microsoft.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 0/5] KVM: SVM: nSVM: Implement Enlightened MSR-Bitmap for Hyper-V-on-KVM and fix it for KVM-on-Hyper-V
+Date:   Mon, 20 Dec 2021 16:21:34 +0100
+Message-Id: <20211220152139.418372-1-vkuznets@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH v2 04/23] kvm: x86: Exclude unpermitted xfeatures at
- KVM_GET_SUPPORTED_CPUID
-Content-Language: en-US
-To:     Jing Liu <jing2.liu@intel.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com
-Cc:     seanjc@google.com, jun.nakajima@intel.com, kevin.tian@intel.com,
-        jing2.liu@linux.intel.com, guang.zeng@intel.com,
-        wei.w.wang@intel.com, yang.zhong@intel.com
-References: <20211217153003.1719189-1-jing2.liu@intel.com>
- <20211217153003.1719189-5-jing2.liu@intel.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20211217153003.1719189-5-jing2.liu@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/17/21 16:29, Jing Liu wrote:
->   
-> +Permissions must be set via prctl() for dynamically-enabled XSAVE
-> +features before calling this ioctl. Otherwise those feature bits are
-> +excluded.
-> +
+Enlightened MSR-Bitmap feature implements a PV protocol for L0 and L1
+hypervisors to collaborate and skip unneeded updates to MSR-Bitmap.
+KVM implements the feature for KVM-on-Hyper-V but it seems there was
+a flaw in the implementation and the feature may not be fully functional.
+PATCHes 1-2 fix the problem. The rest of the series implements the same
+feature for Hyper-V-on-KVM.
 
-Dynamically-enabled feature bits need to be requested with 
-``arch_prctl()`` before calling this ioctl.  Feature bits that have not 
-been requested are excluded from the result.
+Vitaly Kuznetsov (5):
+  KVM: SVM: Drop stale comment from
+    svm_hv_vmcb_dirty_nested_enlightenments()
+  KVM: SVM: hyper-v: Enable Enlightened MSR-Bitmap support for real
+  KVM: nSVM: Track whether changes in L0 require MSR bitmap for L2 to be
+    rebuilt
+  KVM: x86: Make kvm_hv_hypercall_enabled() static inline
+  KVM: nSVM: Implement Enlightened MSR-Bitmap feature
 
-Thanks,
+ arch/x86/kvm/hyperv.c           | 12 +--------
+ arch/x86/kvm/hyperv.h           |  6 ++++-
+ arch/x86/kvm/svm/nested.c       | 47 ++++++++++++++++++++++++++++-----
+ arch/x86/kvm/svm/svm.c          |  3 ++-
+ arch/x86/kvm/svm/svm.h          | 16 +++++++----
+ arch/x86/kvm/svm/svm_onhyperv.h | 12 +++------
+ 6 files changed, 63 insertions(+), 33 deletions(-)
 
-Paolo
+-- 
+2.33.1
+
