@@ -2,56 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 931CA47B29F
-	for <lists+kvm@lfdr.de>; Mon, 20 Dec 2021 19:11:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D7FFB47B299
+	for <lists+kvm@lfdr.de>; Mon, 20 Dec 2021 19:11:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240373AbhLTSLQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Dec 2021 13:11:16 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:56376 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S233340AbhLTSLM (ORCPT
+        id S240360AbhLTSLN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Dec 2021 13:11:13 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37246 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S240332AbhLTSLM (ORCPT
         <rfc822;kvm@vger.kernel.org>); Mon, 20 Dec 2021 13:11:12 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1BKG8RYJ005888;
-        Mon, 20 Dec 2021 18:11:11 GMT
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1BKHinxa022122;
+        Mon, 20 Dec 2021 18:11:12 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : content-transfer-encoding : mime-version; s=pp1;
- bh=0dBIE2T/ZUmIbGqS8NCfzLF1CrXGI36LccET0x3dqzI=;
- b=jBe+j5LEKEFSVcbH5axFh4Mf8x4DrNZ3pb1efJULTnrEsqRRofnxfSC4TaNRfH68xgSO
- uX70kcyayhL0jxpU7lJKfK9JNV86eHfKraRFPhF0P7L4yX14MxIRofAMGbttGKGxja86
- MA+fBAJHE/IthG/ho7UUFvcM4zMRiiJ3uvEW1l5D6N3wQhVhYslMuFEZWydOZUPzOvfa
- sf6m/kGG6WNlqAGKLCZbWeOMXFgFGPSRUnvLQ8VNT47GNpp0mvAUGxSr57+tbqrDzx0A
- +/h09gxKcStZh1cf1Zkg5yWGpn5+CPIj5yMzGfDDBBAppaCXVjhuUXeh8uUvNxtvn53C qQ== 
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=uq8LYrtkuLTktp4XCUxI9Z+w4fQ3/w09etQgw07T4iY=;
+ b=DOfTEW/CjrvDMR5aq5AdYCW4tCrFqg2TOfCattsmLqydlt2GrH+rfEhF2rzxHosThO1Z
+ wzxUOx9siUYPGpYnkQZf3kWhqAdgtQuftS0ahF9txBC+WxaHRspFTwNfrnqEvLC8YpV6
+ WF34zcKNM1w1UprWNMiSxh1KtgGIbjOi5pWZ14KoGyjQdDqkldgVqonqIn1DZQR+bhmH
+ 3nat41dl/a53KnXj9NEBWad1SDcxTIAKXZRvePSFP5RgRkhHb4WwTQHPQ7bU9mkwPsoF
+ iUUGBbB+OsKKKHMR2LdFTXtwVJ4lhdgSGYjPgm/Q10v78v48hbRYj13JkF7ajkpY7Xs7 5Q== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3d1s0pagrd-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3d1sqn96c4-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Mon, 20 Dec 2021 18:11:11 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1BKI8HHx011033;
-        Mon, 20 Dec 2021 18:11:10 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3d1s0pagqy-1
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1BKHjPad031611;
+        Mon, 20 Dec 2021 18:11:11 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 3d1sqn96be-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 20 Dec 2021 18:11:10 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1BKI3QAs024544;
+        Mon, 20 Dec 2021 18:11:11 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1BKI4iB5029688;
         Mon, 20 Dec 2021 18:11:09 GMT
 Received: from b06avi18626390.portsmouth.uk.ibm.com (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
-        by ppma05fra.de.ibm.com with ESMTP id 3d17996bh3-1
+        by ppma03fra.de.ibm.com with ESMTP id 3d1799pc9r-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Mon, 20 Dec 2021 18:11:08 +0000
 Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1BKI2stu48497058
+        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1BKI2soE48497062
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Mon, 20 Dec 2021 18:02:54 GMT
 Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 71B215204F;
+        by IMSVA (Postfix) with ESMTP id AE40F52050;
         Mon, 20 Dec 2021 18:11:05 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id 5F27C5204E;
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTPS id 9AA6D5204E;
         Mon, 20 Dec 2021 18:11:05 +0000 (GMT)
 Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 25651)
-        id 194D1E63A4; Mon, 20 Dec 2021 19:11:05 +0100 (CET)
+        id 560B8E63B2; Mon, 20 Dec 2021 19:11:05 +0100 (CET)
 From:   Christian Borntraeger <borntraeger@linux.ibm.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     KVM <kvm@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
@@ -63,70 +64,75 @@ Cc:     KVM <kvm@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>,
         Eric Farman <farman@linux.ibm.com>,
         Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-Subject: [GIT PULL 0/6] KVM: s390: Fix and cleanup for 5.17
-Date:   Mon, 20 Dec 2021 19:10:58 +0100
-Message-Id: <20211220181104.595009-1-borntraeger@linux.ibm.com>
+Subject: [GIT PULL 1/6] KVM: s390: Fix names of skey constants in api documentation
+Date:   Mon, 20 Dec 2021 19:10:59 +0100
+Message-Id: <20211220181104.595009-2-borntraeger@linux.ibm.com>
 X-Mailer: git-send-email 2.33.1
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 3wmg73tWF7s2kzMRxjSD5YJDO0HBf8iG
-X-Proofpoint-ORIG-GUID: UWCOiqTjAIi6hMqstsOWaAGlIuMiIuQd
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+In-Reply-To: <20211220181104.595009-1-borntraeger@linux.ibm.com>
+References: <20211220181104.595009-1-borntraeger@linux.ibm.com>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: otH4a5O1ebnH1jSIxdlx4nnmdRGD96PQ
+X-Proofpoint-GUID: RdsgtP3cLR7_iXsSTW-5anTsm_GSHqOj
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
  definitions=2021-12-20_08,2021-12-20_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxscore=0
- malwarescore=0 spamscore=0 suspectscore=0 bulkscore=0 clxscore=1015
- impostorscore=0 mlxlogscore=999 lowpriorityscore=0 priorityscore=1501
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
+ priorityscore=1501 mlxlogscore=858 spamscore=0 clxscore=1015 bulkscore=0
+ mlxscore=0 impostorscore=0 lowpriorityscore=0 malwarescore=0 adultscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2110150000 definitions=main-2112200101
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Paolo,
+From: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
 
-the first set of patches for 5.17, mostly cleanups but also one fix. I
-will let this go in via next instead of master as we probably have less
-non-CI testing during the holidays and it is not security-related.
+They are defined in include/uapi/linux/kvm.h as
+KVM_S390_GET_SKEYS_NONE and KVM_S390_SKEYS_MAX, but the
+api documetation talks of KVM_S390_GET_KEYS_NONE and
+KVM_S390_SKEYS_ALLOC_MAX respectively.
 
-The following changes since commit 136057256686de39cc3a07c2e39ef6bc43003ff6:
+Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+Message-Id: <20211118102522.569660-1-scgl@linux.ibm.com>
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+---
+ Documentation/virt/kvm/api.rst | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-  Linux 5.16-rc2 (2021-11-21 13:47:39 -0800)
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index aeeb071c7688..b86c7edae888 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -3701,7 +3701,7 @@ KVM with the currently defined set of flags.
+ :Architectures: s390
+ :Type: vm ioctl
+ :Parameters: struct kvm_s390_skeys
+-:Returns: 0 on success, KVM_S390_GET_KEYS_NONE if guest is not using storage
++:Returns: 0 on success, KVM_S390_GET_SKEYS_NONE if guest is not using storage
+           keys, negative value on error
+ 
+ This ioctl is used to get guest storage key values on the s390
+@@ -3720,7 +3720,7 @@ you want to get.
+ 
+ The count field is the number of consecutive frames (starting from start_gfn)
+ whose storage keys to get. The count field must be at least 1 and the maximum
+-allowed value is defined as KVM_S390_SKEYS_ALLOC_MAX. Values outside this range
++allowed value is defined as KVM_S390_SKEYS_MAX. Values outside this range
+ will cause the ioctl to return -EINVAL.
+ 
+ The skeydata_addr field is the address to a buffer large enough to hold count
+@@ -3744,7 +3744,7 @@ you want to set.
+ 
+ The count field is the number of consecutive frames (starting from start_gfn)
+ whose storage keys to get. The count field must be at least 1 and the maximum
+-allowed value is defined as KVM_S390_SKEYS_ALLOC_MAX. Values outside this range
++allowed value is defined as KVM_S390_SKEYS_MAX. Values outside this range
+ will cause the ioctl to return -EINVAL.
+ 
+ The skeydata_addr field is the address to a buffer containing count bytes of
+-- 
+2.33.1
 
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git  tags/kvm-s390-next-5.17-1
-
-for you to fetch changes up to 812de04661c4daa7ac385c0dfd62594540538034:
-
-  KVM: s390: Clarify SIGP orders versus STOP/RESTART (2021-12-17 14:52:47 +0100)
-
-----------------------------------------------------------------
-KVM: s390: Fix and cleanup
-
-- fix sigp sense/start/stop/inconsistency
-- cleanups
-
-----------------------------------------------------------------
-Eric Farman (1):
-      KVM: s390: Clarify SIGP orders versus STOP/RESTART
-
-Janis Schoetterl-Glausch (4):
-      KVM: s390: Fix names of skey constants in api documentation
-      KVM: s390: gaccess: Refactor gpa and length calculation
-      KVM: s390: gaccess: Refactor access address range check
-      KVM: s390: gaccess: Cleanup access to guest pages
-
-Janosch Frank (1):
-      s390: uv: Add offset comments to UV query struct and fix naming
-
- Documentation/virt/kvm/api.rst |   6 +-
- arch/s390/include/asm/uv.h     |  34 ++++-----
- arch/s390/kvm/gaccess.c        | 158 ++++++++++++++++++++++++-----------------
- arch/s390/kvm/interrupt.c      |   7 ++
- arch/s390/kvm/kvm-s390.c       |   9 ++-
- arch/s390/kvm/kvm-s390.h       |   1 +
- arch/s390/kvm/sigp.c           |  28 ++++++++
- 7 files changed, 155 insertions(+), 88 deletions(-)
