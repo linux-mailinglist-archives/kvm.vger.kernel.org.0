@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C5F447A69E
-	for <lists+kvm@lfdr.de>; Mon, 20 Dec 2021 10:10:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6860B47A6B7
+	for <lists+kvm@lfdr.de>; Mon, 20 Dec 2021 10:18:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230036AbhLTJKo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Dec 2021 04:10:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40408 "EHLO
+        id S231215AbhLTJSJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Dec 2021 04:18:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229474AbhLTJKn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 20 Dec 2021 04:10:43 -0500
+        with ESMTP id S229951AbhLTJSI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 20 Dec 2021 04:18:08 -0500
 Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C1A0C061574
-        for <kvm@vger.kernel.org>; Mon, 20 Dec 2021 01:10:43 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 054E6C061574
+        for <kvm@vger.kernel.org>; Mon, 20 Dec 2021 01:18:08 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 34480B801B8
-        for <kvm@vger.kernel.org>; Mon, 20 Dec 2021 09:10:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA1F2C36AE8;
-        Mon, 20 Dec 2021 09:10:40 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id B84F2B80DA2
+        for <kvm@vger.kernel.org>; Mon, 20 Dec 2021 09:18:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B1CEC36AE5;
+        Mon, 20 Dec 2021 09:18:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1639991440;
-        bh=EJumnoaZeL0MRLglZLFSP0eOcfo9r/+3WUIOJDJ1E4A=;
+        s=k20201202; t=1639991885;
+        bh=QT8TE5OZg9xFpKPCWQf7/TdMscTgPU04EByEA7AUTnw=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=qCePg3LrYhG8im9BNU0aClXtAXDhqvEBxQusPxr97oE0DEpZdrhR3bzBFbg8Lu56G
-         yT1/RAnHyex6sbpIwMzq85AbNpv7Jc9/T7+HNYDCEKA9HWEDfaVsLqMAFHSX1Hyulp
-         7ZX2NuNkwo5wyAHLdMHaZtePlPm+ibE0Su82X+2O/+E9Jnjtm/OoTRcv/7IQ8ilb1c
-         FvEyvjPy7p3sVHo4l7CtvxwFMFoZpynyUyFtYgXNSKHw7unDmUzyChxlM0PFVXSq1/
-         lsXDEZ7H9bghrbLirFPesSHYVcZ1cOiR+8jjHBRwaIHFbi89gP5Idh7uiqed1gMLBQ
-         XOy92uisLw/SA==
+        b=rISuHgPlbqDcAqJ8hAMJDPNXGw0Br2+w9sPz1vUDTVIB/X1R5ZaEVVyOXYTlss/0i
+         lxLI1s1stXGzKveHpWcwJ1LIUQLLaTk3rMqvvSuNWX65CSCNRNdvZVEumYnCvOzb5p
+         xcp6YI/xvqLkyufZyoszFkrQeOssFI30HjzYqI49ngH+OhGxcSw1EC75WFeeGIxuM6
+         2nL8vuFKeXNFwVphPCMSeYgAftG1IG8qnvkMFlO+RHpTdnydZ9wTJaEItr8W7PbTxz
+         Rog/2YkUmNHR09KBmIotnoxAzPIu7mQHXXOaeFsgWWdAMfD/0C9bBlXdLGsNwun18y
+         7WdHHHhdUYCRg==
 Received: from cfbb000407.r.cam.camfibre.uk ([185.219.108.64] helo=why.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <maz@kernel.org>)
-        id 1mzEgo-00DFGF-Qz; Mon, 20 Dec 2021 09:10:38 +0000
-Date:   Mon, 20 Dec 2021 09:10:38 +0000
-Message-ID: <87lf0fwsj5.wl-maz@kernel.org>
+        id 1mzEnz-00DFJn-I5; Mon, 20 Dec 2021 09:18:03 +0000
+Date:   Mon, 20 Dec 2021 09:18:03 +0000
+Message-ID: <87k0fzws6s.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
 Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
@@ -49,11 +49,11 @@ Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         kernel-team@android.com
-Subject: Re: [PATCH v5 18/69] KVM: arm64: nv: Handle virtual EL2 registers in vcpu_read/write_sys_reg()
-In-Reply-To: <13046e57-b7e5-7f0b-15bd-38c09e21807a@os.amperecomputing.com>
+Subject: Re: [PATCH v5 29/69] KVM: arm64: nv: Respect the virtual HCR_EL2.NV bit setting
+In-Reply-To: <c9e1cae5-ded4-d4e5-e60e-2e2044800ad1@os.amperecomputing.com>
 References: <20211129200150.351436-1-maz@kernel.org>
-        <20211129200150.351436-19-maz@kernel.org>
-        <13046e57-b7e5-7f0b-15bd-38c09e21807a@os.amperecomputing.com>
+        <20211129200150.351436-30-maz@kernel.org>
+        <c9e1cae5-ded4-d4e5-e60e-2e2044800ad1@os.amperecomputing.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -67,35 +67,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 20 Dec 2021 07:04:44 +0000,
+On Mon, 20 Dec 2021 07:11:03 +0000,
 Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
 > 
+> Hi Marc,
 > 
-> On 30-11-2021 01:30 am, Marc Zyngier wrote:
-> > KVM internally uses accessor functions when reading or writing the
-> > guest's system registers. This takes care of accessing either the stored
-> > copy or using the "live" EL1 system registers when the host uses VHE.
+> On 30-11-2021 01:31 am, Marc Zyngier wrote:
+> > From: Jintack Lim <jintack.lim@linaro.org>
 > > 
-> > With the introduction of virtual EL2 we add a bunch of EL2 system
-> > registers, which now must also be taken care of:
-> > - If the guest is running in vEL2, and we access an EL1 sysreg, we must
-> >    revert to the stored version of that, and not use the CPU's copy.
-> > - If the guest is running in vEL1, and we access an EL2 sysreg, we must
+> > Forward traps due to HCR_EL2.NV bit to the virtual EL2 if they are not
+> > coming from the virtual EL2 and the virtual HCR_EL2.NV bit is set.
+> > 
+> > In addition to EL2 register accesses, setting NV bit will also make EL12
+> > register accesses trap to EL2. To emulate this for the virtual EL2,
+> > forword traps due to EL12 register accessses to the virtual EL2 if the
+> > virtual HCR_EL2.NV bit is set.
+> > 
+> > This is for recursive nested virtualization.
 > 
-> Do we have vEL1? or is it a typo?
+> What is recursive nested virtualization means?
+> Are we going to set NV/NV1/NV2 bits of ID_AA64MMFR2_EL1 of
+> Guest-Hypervisor to support NV in Guest-Hypervisor?
 
-Not a typo, but only a convention (there is no such concept in the
-architecture). vELx denotes the exception level the guest thinks it is
-running at while running at EL1 (as it is the case for both vEL1 and
-vEL2).
+Of course. An implementation of nested virtualisation that would stop
+at L1 would be pretty crap and fail to live up to the 'turtles all the
+way down' paradigm.
 
-Depending on the exception level and the running mode (VHE or not) you
-emulate at any given time, you access the sysregs differently: they
-can be either live in the CPU, stored in memory, with or without
-translation. That's why I'm using these 'parallel' exception levels to
-denote which is which...
+Note that the recursive support is still a work in progress, as making
+it work for real in a software model is an exercise in futility (for
+example, we make no effort to make the VNCR_EL2 mapping work past L1).
 
-HTH,
+Once someone sends me a NV-capable box, I'll get it working.
 
 	M.
 
