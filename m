@@ -2,137 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.lfdr.de (Postfix) with ESMTP id D90C547B20D
-	for <lists+kvm@lfdr.de>; Mon, 20 Dec 2021 18:25:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E73747B23E
+	for <lists+kvm@lfdr.de>; Mon, 20 Dec 2021 18:38:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240180AbhLTRZQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 20 Dec 2021 12:25:16 -0500
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:25244 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233139AbhLTRZO (ORCPT
-        <rfc822;kvm@vger.kernel.org>); Mon, 20 Dec 2021 12:25:14 -0500
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1BKGSs9b016600;
-        Mon, 20 Dec 2021 17:25:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=gqSD4h4kvlqVEOACO6pfhDgwtbRTJH/z9VOTPQEA4kA=;
- b=HulK5k8roXdJwT2+/7jcKYJIoYIrtt6K2Nc1XG07kQ9SsQEd7PHq57hJSfTYZABx3SEH
- ZSLgBzm6SZY40PRY8Yi/mjPwLLjvvJV3P0TziY+tLYKXw1KlRnCAKVNo6H+TG3PYIdFj
- VffkAQUY/PBa6ANod83V0w5h7fFWTjNuO+2l9w0YPDcce/cEJys3x8kq71mEnPr7r28I
- E7yI+hY7PXomDAVcsAEOKvqfkdKvqf08hGBXcMAGmk28JqqGQ4K8P9jnp/ARZvwCuhlN
- xrkiWCK0I1ylKG/WxtmZlreEkEegfTOmbpowcp6nQXSz4dxJc5qIrro72qra6ePwW/xb iw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3d1sqn8dp2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 20 Dec 2021 17:25:14 +0000
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 1BKGrFvq016984;
-        Mon, 20 Dec 2021 17:25:13 GMT
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3d1sqn8dn3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 20 Dec 2021 17:25:13 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 1BKHNUda015231;
-        Mon, 20 Dec 2021 17:25:11 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma04fra.de.ibm.com with ESMTP id 3d1799x17p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 20 Dec 2021 17:25:11 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 1BKHP7iB41353608
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 20 Dec 2021 17:25:07 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A47C2AE051;
-        Mon, 20 Dec 2021 17:25:07 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9C414AE045;
-        Mon, 20 Dec 2021 17:25:06 +0000 (GMT)
-Received: from [9.171.18.110] (unknown [9.171.18.110])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon, 20 Dec 2021 17:25:06 +0000 (GMT)
-Message-ID: <3c7e0bb9-f698-066b-8f6d-93c45438ff32@linux.ibm.com>
-Date:   Mon, 20 Dec 2021 18:26:17 +0100
+        id S239298AbhLTRip (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 20 Dec 2021 12:38:45 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:30118 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237749AbhLTRim (ORCPT
+        <rfc822;kvm@vger.kernel.org>); Mon, 20 Dec 2021 12:38:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1640021922;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=FTqh4/MwPrq1Z+d4aqOZ1nMLxXrSCTWu4CIR9IAv3Oc=;
+        b=RErAWo/Z43FqOTHk5OrvB3Hi/PCaM6HJBsJI6sFGqs/u5L4nSbDrDQu3N8+x8qPjYCbQKc
+        62ApTNjQznsFfFmJHMonCkaOYMbM9yv/HRcvQxlqEAChqJY/dj0o1jY473ZisN4K55dT9z
+        pEpIij9E0ctN8lCe+4m8AuInygNFwds=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-652-MHjPnU2POSC5_ERuldINFQ-1; Mon, 20 Dec 2021 12:38:38 -0500
+X-MC-Unique: MHjPnU2POSC5_ERuldINFQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8538792500;
+        Mon, 20 Dec 2021 17:38:37 +0000 (UTC)
+Received: from localhost (unknown [10.39.193.132])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 15A0F5BE3B;
+        Mon, 20 Dec 2021 17:38:27 +0000 (UTC)
+From:   Cornelia Huck <cohuck@redhat.com>
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        alex.williamson@redhat.com
+Cc:     jgg@nvidia.com, corbet@lwn.net, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, farman@linux.ibm.com,
+        mjrosato@linux.ibm.com, pasic@linux.ibm.com
+Subject: Re: [RFC PATCH] vfio: Update/Clarify migration uAPI, add NDMA state
+In-Reply-To: <163909282574.728533.7460416142511440919.stgit@omen>
+Organization: Red Hat GmbH
+References: <163909282574.728533.7460416142511440919.stgit@omen>
+User-Agent: Notmuch/0.34 (https://notmuchmail.org)
+Date:   Mon, 20 Dec 2021 18:38:26 +0100
+Message-ID: <87v8zjp46l.fsf@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH 13/32] KVM: s390: pci: add basic kvm_zdev structure
-Content-Language: en-US
-To:     Matthew Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org
-Cc:     alex.williamson@redhat.com, cohuck@redhat.com,
-        schnelle@linux.ibm.com, farman@linux.ibm.com,
-        borntraeger@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        gerald.schaefer@linux.ibm.com, agordeev@linux.ibm.com,
-        frankja@linux.ibm.com, david@redhat.com, imbrenda@linux.ibm.com,
-        vneethv@linux.ibm.com, oberpar@linux.ibm.com, freude@linux.ibm.com,
-        thuth@redhat.com, pasic@linux.ibm.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20211207205743.150299-1-mjrosato@linux.ibm.com>
- <20211207205743.150299-14-mjrosato@linux.ibm.com>
- <37b5de48-adef-225e-fafc-f918b64e7736@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <37b5de48-adef-225e-fafc-f918b64e7736@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: NIW17LTxKi8tqhU4MdcEcwiTb9b4kVic
-X-Proofpoint-GUID: z_THP8IatfApU7TLD_NvyKHRKAC_bPMc
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.790,Hydra:6.0.425,FMLib:17.11.62.513
- definitions=2021-12-20_08,2021-12-20_01,2021-12-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
- priorityscore=1501 mlxlogscore=999 spamscore=0 clxscore=1015 bulkscore=0
- mlxscore=0 impostorscore=0 lowpriorityscore=0 malwarescore=0 adultscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2110150000 definitions=main-2112200096
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Dec 09 2021, Alex Williamson <alex.williamson@redhat.com> wrote:
 
+> A new NDMA state is being proposed to support a quiescent state for
+> contexts containing multiple devices with peer-to-peer DMA support.
+> Formally define it.
 
-On 12/17/21 21:26, Matthew Rosato wrote:
-> On 12/7/21 3:57 PM, Matthew Rosato wrote:
->> This structure will be used to carry kvm passthrough information 
->> related to
->> zPCI devices.
->>
->> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
->> ---
-> ...
->>   static inline bool zdev_enabled(struct zpci_dev *zdev)
->> diff --git a/arch/s390/kvm/Makefile b/arch/s390/kvm/Makefile
->> index b3aaadc60ead..95ea865e5d29 100644
->> --- a/arch/s390/kvm/Makefile
->> +++ b/arch/s390/kvm/Makefile
->> @@ -10,6 +10,6 @@ common-objs = $(KVM)/kvm_main.o $(KVM)/eventfd.o  
->> $(KVM)/async_pf.o \
->>   ccflags-y := -Ivirt/kvm -Iarch/s390/kvm
->>   kvm-objs := $(common-objs) kvm-s390.o intercept.o interrupt.o priv.o 
->> sigp.o
->> -kvm-objs += diag.o gaccess.o guestdbg.o vsie.o pv.o
->> +kvm-objs += diag.o gaccess.o guestdbg.o vsie.o pv.o pci.o
-> 
-> This should instead be
-> 
-> kvm-objs-$(CONFIG_PCI) += pci.o
-> 
-> I think this makes sense as we aren't about to do PCI passthrough 
-> support anyway if the host kernel doesn't support PCI (no vfio-pci, 
-> etc).   This will quiet the kernel test robot complaints about 
-> CONFIG_PCI_NR_FUNCTIONS seen on the next patch in this series.
+[I'm wondering if we would want to use NDMA in other cases as well. Just
+thinking out loud below.]
 
-hum, then you will need more than this to put all pci references in 
-priv.c and kvm-s390.c away.
+>
+> Clarify various aspects of the migration region data fields and
+> protocol.  Remove QEMU related terminology and flows from the uAPI;
+> these will be provided in Documentation/ so as not to confuse the
+> device_state bitfield with a finite state machine with restricted
+> state transitions.
+>
+> Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> ---
+>  include/uapi/linux/vfio.h |  405 ++++++++++++++++++++++++---------------------
+>  1 file changed, 214 insertions(+), 191 deletions(-)
+>
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index ef33ea002b0b..1fdbc928f886 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
 
-> 
->>   obj-$(CONFIG_KVM) += kvm.o
+(...)
 
+> + *   The device_state field defines the following bitfield use:
+> + *
+> + *     - Bit 0 (RUNNING) [REQUIRED]:
+> + *        - Setting this bit indicates the device is fully operational, the
+> + *          device may generate interrupts, DMA, respond to MMIO, all vfio
+> + *          device regions are functional, and the device may advance its
+> + *          internal state.  The default device_state must indicate the device
+> + *          in exclusively the RUNNING state, with no other bits in this field
+> + *          set.
+> + *        - Clearing this bit (ie. !RUNNING) must stop the operation of the
+> + *          device.  The device must not generate interrupts, DMA, or advance
+> + *          its internal state.  The user should take steps to restrict access
+> + *          to vfio device regions other than the migration region while the
+> + *          device is !RUNNING or risk corruption of the device migration data
+> + *          stream.  The device and kernel migration driver must accept and
+> + *          respond to interaction to support external subsystems in the
+> + *          !RUNNING state, for example PCI MSI-X and PCI config space.
+> + *          Failure by the user to restrict device access while !RUNNING must
+> + *          not result in error conditions outside the user context (ex.
+> + *          host system faults).
 
+If I consider ccw, this would mean that user space would need to stop
+writing to the regions that initiate start/halt/... when RUNNING is
+cleared (makes sense) and that the subchannel must be idle or even
+disabled (so that it does not become status pending). The question is,
+does it make sense to stop new requests and wait for the subchannel to
+become idle during the !RUNNING transition (or even forcefully kill
+outstanding I/O), or...
 
--- 
-Pierre Morel
-IBM Lab Boeblingen
+> + *     - Bit 1 (SAVING) [REQUIRED]:
+> + *        - Setting this bit enables and initializes the migration region data
+> + *          window and associated fields within vfio_device_migration_info for
+> + *          capturing the migration data stream for the device.  The migration
+> + *          driver may perform actions such as enabling dirty logging of device
+> + *          state with this bit.  The SAVING bit is mutually exclusive with the
+> + *          RESUMING bit defined below.
+> + *        - Clearing this bit (ie. !SAVING) de-initializes the migration region
+> + *          data window and indicates the completion or termination of the
+> + *          migration data stream for the device.
+> + *     - Bit 2 (RESUMING) [REQUIRED]:
+> + *        - Setting this bit enables and initializes the migration region data
+> + *          window and associated fields within vfio_device_migration_info for
+> + *          restoring the device from a migration data stream captured from a
+> + *          SAVING session with a compatible device.  The migration driver may
+> + *          perform internal device resets as necessary to reinitialize the
+> + *          internal device state for the incoming migration data.
+> + *        - Clearing this bit (ie. !RESUMING) de-initializes the migration
+> + *          region data window and indicates the end of a resuming session for
+> + *          the device.  The kernel migration driver should complete the
+> + *          incorporation of data written to the migration data window into the
+> + *          device internal state and perform final validity and consistency
+> + *          checking of the new device state.  If the user provided data is
+> + *          found to be incomplete, inconsistent, or otherwise invalid, the
+> + *          migration driver must indicate a write(2) error and follow the
+> + *          previously described protocol to return either the previous state
+> + *          or an error state.
+> + *     - Bit 3 (NDMA) [OPTIONAL]:
+> + *        The NDMA or "No DMA" state is intended to be a quiescent state for
+> + *        the device for the purposes of managing multiple devices within a
+> + *        user context where peer-to-peer DMA between devices may be active.
+> + *        Support for the NDMA bit is indicated through the presence of the
+> + *        VFIO_REGION_INFO_CAP_MIG_NDMA capability as reported by
+> + *        VFIO_DEVICE_GET_REGION_INFO for the associated device migration
+> + *        region.
+> + *        - Setting this bit must prevent the device from initiating any
+> + *          new DMA or interrupt transactions.  The migration driver must
+> + *          complete any such outstanding operations prior to completing
+> + *          the transition to the NDMA state.  The NDMA device_state
+> + *          essentially represents a sub-set of the !RUNNING state for the
+> + *          purpose of quiescing the device, therefore the NDMA device_state
+> + *          bit is superfluous in combinations including !RUNNING.
+> + *        - Clearing this bit (ie. !NDMA) negates the device operational
+> + *          restrictions required by the NDMA state.
+
+...should we use NDMA as the "stop new requests" state, but allow
+running channel programs to conclude? I'm not entirely sure whether
+that's in the spirit of NDMA (subchannels are independent of each
+other), but it would be kind of "quiescing" already.
+
+(We should probably clarify things like that in the Documentation/
+file.)
+
